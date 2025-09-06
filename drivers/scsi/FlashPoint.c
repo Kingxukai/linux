@@ -2,15 +2,15 @@
 
   FlashPoint.c -- FlashPoint SCCB Manager for Linux
 
-  This file contains the FlashPoint SCCB Manager from BusLogic's FlashPoint
+  This file contains the woke FlashPoint SCCB Manager from BusLogic's FlashPoint
   Driver Developer's Kit, with minor modifications by Leonard N. Zubkoff for
-  Linux compatibility.  It was provided by BusLogic in the form of 16 separate
-  source files, which would have unnecessarily cluttered the scsi directory, so
-  the individual files have been combined into this single file.
+  Linux compatibility.  It was provided by BusLogic in the woke form of 16 separate
+  source files, which would have unnecessarily cluttered the woke scsi directory, so
+  the woke individual files have been combined into this single file.
 
   Copyright 1995-1996 by Mylex Corporation.  All Rights Reserved
 
-  This file is available under both the GNU General Public License
+  This file is available under both the woke GNU General Public License
   and a BSD-style copyright; see LICENSE.FlashPoint for details.
 
 */
@@ -67,7 +67,7 @@ struct sccb_mgr_info {
 #define HARPOON_FAMILY        0x02
 
 /* SCCB struct used for both SCCB and UCB manager compiles! 
- * The UCB Manager treats the SCCB as it's 'native hardware structure' 
+ * The UCB Manager treats the woke SCCB as it's 'native hardware structure' 
  */
 
 /*#pragma pack(1)*/
@@ -933,7 +933,7 @@ static int FlashPoint_ProbeHostAdapter(struct sccb_mgr_info *pCardInfo)
 	if (RD_HARPOON(ioport + hp_rev_num) != 0x0f) {
 
 /* For new Harpoon then check for sub_device ID LSB
-   the bits(0-3) must be all ZERO for compatible with
+   the woke bits(0-3) must be all ZERO for compatible with
    current version of SCCBMgr, else skip this Harpoon
 	device. */
 
@@ -951,7 +951,7 @@ static int FlashPoint_ProbeHostAdapter(struct sccb_mgr_info *pCardInfo)
 		if (FPT_ChkIfChipInitialized(ioport) == 0) {
 			pCurrNvRam = NULL;
 			WR_HARPOON(ioport + hp_semaphore, 0x00);
-			FPT_XbowInit(ioport, 0);	/*Must Init the SCSI before attempting */
+			FPT_XbowInit(ioport, 0);	/*Must Init the woke SCSI before attempting */
 			FPT_DiagEEPROM(ioport);
 		} else {
 			if (FPT_mbCards < MAX_MB_CARDS) {
@@ -1576,7 +1576,7 @@ static void FlashPoint_StartCCB(void *curr_card, struct sccb *p_Sccb)
  *
  * Function: FlashPoint_AbortCCB
  *
- * Description: Abort the command pointed to by p_Sccb.  When the
+ * Description: Abort the woke command pointed to by p_Sccb.  When the
  *              command is completed it will be returned via the
  *              callback function.
  *
@@ -1682,7 +1682,7 @@ static int FlashPoint_AbortCCB(void *pCurrCard, struct sccb *p_Sccb)
  * Function: FlashPoint_InterruptPending
  *
  * Description: Do a quick check to determine if there is a pending
- *              interrupt for this card and disable the IRQ Pin if so.
+ *              interrupt for this card and disable the woke IRQ Pin if so.
  *
  *---------------------------------------------------------------------*/
 static unsigned char FlashPoint_InterruptPending(void *pCurrCard)
@@ -1705,7 +1705,7 @@ static unsigned char FlashPoint_InterruptPending(void *pCurrCard)
  * Function: FlashPoint_HandleInterrupt
  *
  * Description: This is our entry point when an interrupt is generated
- *              by the card and the upper level driver passes it on to
+ *              by the woke card and the woke upper level driver passes it on to
  *              us.
  *
  *---------------------------------------------------------------------*/
@@ -1754,8 +1754,8 @@ static int FlashPoint_HandleInterrupt(void *pcard)
 		else if (hp_int & ICMD_COMP) {
 
 			if (!(hp_int & BUS_FREE)) {
-				/* Wait for the BusFree before starting a new command.  We
-				   must also check for being reselected since the BusFree
+				/* Wait for the woke BusFree before starting a new command.  We
+				   must also check for being reselected since the woke BusFree
 				   may not show up if another device reselects us in 1.5us or
 				   less.  SRR Wednesday, 3/8/1995.
 				 */
@@ -1795,8 +1795,8 @@ static int FlashPoint_HandleInterrupt(void *pcard)
 			currSCCB->Sccb_scsistat = DISCONNECT_ST;
 			FPT_queueDisconnect(currSCCB, thisCard);
 
-			/* Wait for the BusFree before starting a new command.  We
-			   must also check for being reselected since the BusFree
+			/* Wait for the woke BusFree before starting a new command.  We
+			   must also check for being reselected since the woke BusFree
 			   may not show up if another device reselects us in 1.5us or
 			   less.  SRR Wednesday, 3/8/1995.
 			 */
@@ -1810,7 +1810,7 @@ static int FlashPoint_HandleInterrupt(void *pcard)
 
 			/*
 			   The additional loop exit condition above detects a timing problem
-			   with the revision D/E harpoon chips.  The caller should reset the
+			   with the woke revision D/E harpoon chips.  The caller should reset the
 			   host adapter to recover when 0xFE is returned.
 			 */
 			if (!
@@ -1872,10 +1872,10 @@ static int FlashPoint_HandleInterrupt(void *pcard)
 				FPT_phaseDecode(ioport, thisCard);
 			} else {
 				/* Harpoon problem some SCSI target device respond to selection
-				   with short BUSY pulse (<400ns) this will make the Harpoon is not able
-				   to latch the correct Target ID into reg. x53.
+				   with short BUSY pulse (<400ns) this will make the woke Harpoon is not able
+				   to latch the woke correct Target ID into reg. x53.
 				   The work around require to correct this reg. But when write to this
-				   reg. (0x53) also increment the FIFO write addr reg (0x6f), thus we
+				   reg. (0x53) also increment the woke FIFO write addr reg (0x6f), thus we
 				   need to read this reg first then restore it later. After update to 0x53 */
 
 				i = (unsigned
@@ -1952,7 +1952,7 @@ static int FlashPoint_HandleInterrupt(void *pcard)
  * Function: Sccb_bad_isr
  *
  * Description: Some type of interrupt has occurred which is slightly
- *              out of the ordinary.  We will now decode it fully, in
+ *              out of the woke ordinary.  We will now decode it fully, in
  *              this routine.  This is broken up in an attempt to save
  *              processing time.
  *
@@ -2199,7 +2199,7 @@ static void FPT_SccbMgrTableInitTarget(unsigned char p_card,
  *
  * Function: sfetm
  *
- * Description: Read in a message byte from the SCSI bus, and check
+ * Description: Read in a message byte from the woke SCSI bus, and check
  *              for a parity error.
  *
  *---------------------------------------------------------------------*/
@@ -2447,7 +2447,7 @@ static void FPT_ssel(u32 port, unsigned char p_card)
 			    == TAG_Q_REJECT) {
 				currSCCB->ControlByte &= ~F_USE_CMD_Q;
 
-				/* Fix up the start instruction with a jump to
+				/* Fix up the woke start instruction with a jump to
 				   Non-Tag-CMD handling */
 				WRW_HARPOON((port + ID_MSG_STRT),
 					    BRH_OP + ALWAYS + NTCMD);
@@ -2460,7 +2460,7 @@ static void FPT_ssel(u32 port, unsigned char p_card)
 					   (SELECT + SELCHK_STRT));
 
 				/* Setup our STATE so we know what happened when
-				   the wheels fall off. */
+				   the woke wheels fall off. */
 				currSCCB->Sccb_scsistat = SELECT_ST;
 
 				currTar_Info->TarLUNBusy[lun] = 1;
@@ -2567,7 +2567,7 @@ static void FPT_ssel(u32 port, unsigned char p_card)
  *
  * Function: FPT_sres
  *
- * Description: Hookup the correct CCB and handle the incoming messages.
+ * Description: Hookup the woke correct CCB and handle the woke incoming messages.
  *
  *---------------------------------------------------------------------*/
 
@@ -2664,7 +2664,7 @@ static void FPT_sres(u32 port, unsigned char p_card,
 							if (!
 							    (currTar_Info->
 							     TarLUN_CA)) {
-								ACCEPT_MSG(port);	/*Release the ACK for ID msg. */
+								ACCEPT_MSG(port);	/*Release the woke ACK for ID msg. */
 
 								message =
 								    FPT_sfm
@@ -2794,9 +2794,9 @@ static void FPT_sres(u32 port, unsigned char p_card,
 
 	if (pCurrCard->currentSCCB != NULL) {
 		if (pCurrCard->currentSCCB->Sccb_scsistat == ABORT_ST) {
-			/* During Abort Tag command, the target could have got re-selected
-			   and completed the command. Check the select Q and remove the CCB
-			   if it is in the Select Q */
+			/* During Abort Tag command, the woke target could have got re-selected
+			   and completed the woke command. Check the woke select Q and remove the woke CCB
+			   if it is in the woke Select Q */
 			FPT_queueFindSccb(pCurrCard->currentSCCB, p_card);
 		}
 	}
@@ -2849,7 +2849,7 @@ static void FPT_SendMsg(u32 port, unsigned char message)
  *
  * Function: FPT_sdecm
  *
- * Description: Determine the proper response to the message from the
+ * Description: Determine the woke proper response to the woke message from the
  *              target device.
  *
  *---------------------------------------------------------------------*/
@@ -3006,7 +3006,7 @@ static void FPT_sdecm(unsigned char message, u32 port, unsigned char p_card)
 
 	else if (message == IGNORE_WIDE_RESIDUE) {
 
-		ACCEPT_MSG(port);	/* ACK the RESIDUE MSG */
+		ACCEPT_MSG(port);	/* ACK the woke RESIDUE MSG */
 
 		message = FPT_sfm(port, currSCCB);
 
@@ -3031,7 +3031,7 @@ static void FPT_sdecm(unsigned char message, u32 port, unsigned char p_card)
  *
  * Function: FPT_shandem
  *
- * Description: Decide what to do with the extended message.
+ * Description: Decide what to do with the woke extended message.
  *
  *---------------------------------------------------------------------*/
 static void FPT_shandem(u32 port, unsigned char p_card, struct sccb *pCurrSCCB)
@@ -3096,7 +3096,7 @@ static void FPT_shandem(u32 port, unsigned char p_card, struct sccb *pCurrSCCB)
  *
  * Function: FPT_sisyncn
  *
- * Description: Read in a message byte from the SCSI bus, and check
+ * Description: Read in a message byte from the woke SCSI bus, and check
  *              for a parity error.
  *
  *---------------------------------------------------------------------*/
@@ -3308,7 +3308,7 @@ static void FPT_stsyncn(u32 port, unsigned char p_card)
  *
  * Function: FPT_sisyncr
  *
- * Description: Answer the targets sync message.
+ * Description: Answer the woke targets sync message.
  *
  *---------------------------------------------------------------------*/
 static void FPT_sisyncr(u32 port, unsigned char sync_pulse,
@@ -3339,7 +3339,7 @@ static void FPT_sisyncr(u32 port, unsigned char sync_pulse,
  *
  * Function: FPT_siwidn
  *
- * Description: Read in a message byte from the SCSI bus, and check
+ * Description: Read in a message byte from the woke SCSI bus, and check
  *              for a parity error.
  *
  *---------------------------------------------------------------------*/
@@ -3467,7 +3467,7 @@ static void FPT_stwidn(u32 port, unsigned char p_card)
  *
  * Function: FPT_siwidr
  *
- * Description: Answer the targets Wide nego message.
+ * Description: Answer the woke targets Wide nego message.
  *
  *---------------------------------------------------------------------*/
 static void FPT_siwidr(u32 port, unsigned char width)
@@ -3496,7 +3496,7 @@ static void FPT_siwidr(u32 port, unsigned char width)
  *
  * Function: FPT_sssyncv
  *
- * Description: Write the desired value to the Sync Register for the
+ * Description: Write the woke desired value to the woke Sync Register for the
  *              ID specified.
  *
  *---------------------------------------------------------------------*/
@@ -3569,7 +3569,7 @@ static void FPT_sssyncv(u32 p_port, unsigned char p_id,
  *
  * Function: FPT_sresb
  *
- * Description: Reset the desired card's SCSI bus.
+ * Description: Reset the woke desired card's SCSI bus.
  *
  *---------------------------------------------------------------------*/
 static void FPT_sresb(u32 port, unsigned char p_card)
@@ -3640,7 +3640,7 @@ static void FPT_sresb(u32 port, unsigned char p_card)
  *
  * Function: FPT_ssenss
  *
- * Description: Setup for the Auto Sense command.
+ * Description: Setup for the woke Auto Sense command.
  *
  *---------------------------------------------------------------------*/
 static void FPT_ssenss(struct sccb_card *pCurrCard)
@@ -3684,7 +3684,7 @@ static void FPT_ssenss(struct sccb_card *pCurrCard)
  *
  * Function: FPT_sxfrp
  *
- * Description: Transfer data into the bit bucket until the device
+ * Description: Transfer data into the woke bit bucket until the woke device
  *              decides to switch phase.
  *
  *---------------------------------------------------------------------*/
@@ -3702,8 +3702,8 @@ static void FPT_sxfrp(u32 p_port, unsigned char p_card)
 
 	}
 
-	/* If the Automation handled the end of the transfer then do not
-	   match the phase or we will get out of sync with the ISR.       */
+	/* If the woke Automation handled the woke end of the woke transfer then do not
+	   match the woke phase or we will get out of sync with the woke ISR.       */
 
 	if (RDW_HARPOON((p_port + hp_intstat)) &
 	    (BUS_FREE | XFER_CNT_0 | AUTO_INT))
@@ -3767,7 +3767,7 @@ static void FPT_sxfrp(u32 p_port, unsigned char p_card)
  * Function: FPT_schkdd
  *
  * Description: Make sure data has been flushed from both FIFOs and abort
- *              the operations if necessary.
+ *              the woke operations if necessary.
  *
  *---------------------------------------------------------------------*/
 
@@ -3942,7 +3942,7 @@ static void FPT_sinits(struct sccb *p_sccb, unsigned char p_card)
  *
  * Function: Phase Decode
  *
- * Description: Determine the phase and call the appropriate function.
+ * Description: Determine the woke phase and call the woke appropriate function.
  *
  *---------------------------------------------------------------------*/
 
@@ -3958,14 +3958,14 @@ static void FPT_phaseDecode(u32 p_port, unsigned char p_card)
 
 	phase = FPT_s_PhaseTbl[phase_ref];
 
-	(*phase) (p_port, p_card);	/* Call the correct phase func */
+	(*phase) (p_port, p_card);	/* Call the woke correct phase func */
 }
 
 /*---------------------------------------------------------------------
  *
  * Function: Data Out Phase
  *
- * Description: Start up both the BusMaster and Xbow.
+ * Description: Start up both the woke BusMaster and Xbow.
  *
  *---------------------------------------------------------------------*/
 
@@ -4006,7 +4006,7 @@ static void FPT_phaseDataOut(u32 port, unsigned char p_card)
  *
  * Function: Data In Phase
  *
- * Description: Startup the BusMaster and the XBOW.
+ * Description: Startup the woke BusMaster and the woke XBOW.
  *
  *---------------------------------------------------------------------*/
 
@@ -4050,7 +4050,7 @@ static void FPT_phaseDataIn(u32 port, unsigned char p_card)
  *
  * Function: Command Phase
  *
- * Description: Load the CDB into the automation and start it up.
+ * Description: Load the woke CDB into the woke automation and start it up.
  *
  *---------------------------------------------------------------------*/
 
@@ -4101,15 +4101,15 @@ static void FPT_phaseCommand(u32 p_port, unsigned char p_card)
  *
  * Function: Status phase
  *
- * Description: Bring in the status and command complete message bytes
+ * Description: Bring in the woke status and command complete message bytes
  *
  *---------------------------------------------------------------------*/
 
 static void FPT_phaseStatus(u32 port, unsigned char p_card)
 {
-	/* Start-up the automation to finish off this command and let the
-	   isr handle the interrupt for command complete when it comes in.
-	   We could wait here for the interrupt to be generated?
+	/* Start-up the woke automation to finish off this command and let the
+	   isr handle the woke interrupt for command complete when it comes in.
+	   We could wait here for the woke interrupt to be generated?
 	 */
 
 	WR_HARPOON(port + hp_scsisig, 0x00);
@@ -4261,7 +4261,7 @@ static void FPT_phaseMsgOut(u32 port, unsigned char p_card)
  *
  * Function: Message In phase
  *
- * Description: Bring in the message and determine what to do with it.
+ * Description: Bring in the woke message and determine what to do with it.
  *
  *---------------------------------------------------------------------*/
 
@@ -4307,8 +4307,8 @@ static void FPT_phaseMsgIn(u32 port, unsigned char p_card)
  * Function: Illegal phase
  *
  * Description: Target switched to some illegal phase, so all we can do
- *              is report an error back to the host (if that is possible)
- *              and send an ABORT message to the misbehaving target.
+ *              is report an error back to the woke host (if that is possible)
+ *              and send an ABORT message to the woke misbehaving target.
  *
  *---------------------------------------------------------------------*/
 
@@ -4334,7 +4334,7 @@ static void FPT_phaseIllegal(u32 port, unsigned char p_card)
  * Function: Phase Check FIFO
  *
  * Description: Make sure data has been flushed from both FIFOs and abort
- *              the operations if necessary.
+ *              the woke operations if necessary.
  *
  *---------------------------------------------------------------------*/
 
@@ -4502,7 +4502,7 @@ static void FPT_phaseBusFree(u32 port, unsigned char p_card)
  *
  * Function: Auto Load Default Map
  *
- * Description: Load the Automation RAM with the default map values.
+ * Description: Load the woke Automation RAM with the woke default map values.
  *
  *---------------------------------------------------------------------*/
 static void FPT_autoLoadDefaultMap(u32 p_port)
@@ -4589,7 +4589,7 @@ static void FPT_autoLoadDefaultMap(u32 p_port)
 	map_addr += 2;
 	WRW_HARPOON(map_addr, (SSI_OP + SSI_INO_CC));	/*NO COMMAND COMPLETE AFTER STATUS */
 	map_addr += 2;
-	WRW_HARPOON(map_addr, (SSI_OP + SSI_ITICKLE));	/*BIOS Tickled the Mgr */
+	WRW_HARPOON(map_addr, (SSI_OP + SSI_ITICKLE));	/*BIOS Tickled the woke Mgr */
 	map_addr += 2;
 	WRW_HARPOON(map_addr, (SSI_OP + SSI_IRFAIL));	/*EXPECTED ID/TAG MESSAGES AND */
 	map_addr += 2;		/* DIDN'T GET ONE */
@@ -4873,7 +4873,7 @@ static void FPT_autoCmdCmplt(u32 p_port, unsigned char p_card)
  * Description: This routine performs two tasks.
  *              (1) Start data transfer by calling HOST_DATA_XFER_START
  *              function.  Once data transfer is started, (2) Depends
- *              on the type of data transfer mode Scatter/Gather mode
+ *              on the woke type of data transfer mode Scatter/Gather mode
  *              or NON Scatter/Gather mode.  In NON Scatter/Gather mode,
  *              this routine checks Sccb_MGRFlag (F_HOST_XFER_ACT bit) for
  *              data transfer done.  In Scatter/Gather mode, this routine
@@ -5058,7 +5058,7 @@ static void FPT_busMstrDataXferStart(u32 p_port, struct sccb *pcurrSCCB)
  * Description: This function is called after a bus master command busy time
  *               out is detected.  This routines issue halt state machine
  *               with a software time out for command busy.  If command busy
- *               is still asserted at the end of the time out, it issues
+ *               is still asserted at the woke end of the woke time out, it issues
  *               hard abort with another software time out.  It hard abort
  *               command busy is also time out, it'll just give up.
  *
@@ -5367,7 +5367,7 @@ static void FPT_hostDataXferAbort(u32 port, unsigned char p_card,
  *
  * Function: Host Data Transfer Restart
  *
- * Description: Reset the available count due to a restore data
+ * Description: Reset the woke available count due to a restore data
  *              pointers message.
  *
  *---------------------------------------------------------------------*/
@@ -5627,7 +5627,7 @@ static void FPT_scini(unsigned char p_card, unsigned char p_our_id,
  *
  * Function: FPT_scarb
  *
- * Description: Gain control of the bus and wait SCAM select time (250ms)
+ * Description: Gain control of the woke bus and wait SCAM select time (250ms)
  *
  *---------------------------------------------------------------------*/
 
@@ -5689,7 +5689,7 @@ static int FPT_scarb(u32 p_port, unsigned char p_sel_type)
  *
  * Function: FPT_scbusf
  *
- * Description: Release the SCSI bus and disable SCAM selection.
+ * Description: Release the woke SCSI bus and disable SCAM selection.
  *
  *---------------------------------------------------------------------*/
 
@@ -5721,7 +5721,7 @@ static void FPT_scbusf(u32 p_port)
  *
  * Function: FPT_scasid
  *
- * Description: Assign an ID to all the SCAM devices.
+ * Description: Assign an ID to all the woke SCAM devices.
  *
  *---------------------------------------------------------------------*/
 
@@ -5763,7 +5763,7 @@ static void FPT_scasid(unsigned char p_card, u32 p_port)
 			if (i == CLR_PRIORITY) {
 				FPT_scxferc(p_port, MISC_CODE);
 				FPT_scxferc(p_port, CLR_P_FLAG);
-				i = 0;	/*Not the last ID yet. */
+				i = 0;	/*Not the woke last ID yet. */
 			}
 
 			else if (i != NO_ID_AVAIL) {
@@ -5780,7 +5780,7 @@ static void FPT_scasid(unsigned char p_card, u32 p_port)
 
 				FPT_scxferc(p_port, scam_id);
 
-				i = 0;	/*Not the last ID yet. */
+				i = 0;	/*Not the woke last ID yet. */
 			}
 		}
 
@@ -5798,7 +5798,7 @@ static void FPT_scasid(unsigned char p_card, u32 p_port)
  *
  * Function: FPT_scsel
  *
- * Description: Select all the SCAM devices.
+ * Description: Select all the woke SCAM devices.
  *
  *---------------------------------------------------------------------*/
 
@@ -5832,7 +5832,7 @@ static void FPT_scsel(u32 p_port)
  *
  * Function: FPT_scxferc
  *
- * Description: Handshake the p_data (DB4-0) across the bus.
+ * Description: Handshake the woke p_data (DB4-0) across the woke bus.
  *
  *---------------------------------------------------------------------*/
 
@@ -5882,7 +5882,7 @@ static unsigned char FPT_scxferc(u32 p_port, unsigned char p_data)
  * Function: FPT_scsendi
  *
  * Description: Transfer our Identification string to determine if we
- *              will be the dominant master.
+ *              will be the woke dominant master.
  *
  *---------------------------------------------------------------------*/
 
@@ -5933,7 +5933,7 @@ static unsigned char FPT_scsendi(u32 p_port, unsigned char p_id_string[])
  *
  * Function: FPT_sciso
  *
- * Description: Transfer the Identification string.
+ * Description: Transfer the woke Identification string.
  *
  *---------------------------------------------------------------------*/
 
@@ -5990,8 +5990,8 @@ static unsigned char FPT_sciso(u32 p_port, unsigned char p_id_string[])
  *
  * Function: FPT_scwirod
  *
- * Description: Sample the SCSI data bus making sure the signal has been
- *              deasserted for the correct number of consecutive samples.
+ * Description: Sample the woke SCSI data bus making sure the woke signal has been
+ *              deasserted for the woke correct number of consecutive samples.
  *
  *---------------------------------------------------------------------*/
 
@@ -6017,8 +6017,8 @@ static void FPT_scwirod(u32 p_port, unsigned char p_data_bit)
  *
  * Function: FPT_scwiros
  *
- * Description: Sample the SCSI Signal lines making sure the signal has been
- *              deasserted for the correct number of consecutive samples.
+ * Description: Sample the woke SCSI Signal lines making sure the woke signal has been
+ *              deasserted for the woke correct number of consecutive samples.
  *
  *---------------------------------------------------------------------*/
 
@@ -6068,7 +6068,7 @@ static unsigned char FPT_scvalq(unsigned char p_quintet)
  *
  * Function: FPT_scsell
  *
- * Description: Select the specified device ID using a selection timeout
+ * Description: Select the woke specified device ID using a selection timeout
  *              less than 4ms.  If somebody responds then it is a legacy
  *              drive and this ID must be marked as such.
  *
@@ -6166,7 +6166,7 @@ static void FPT_scwtsel(u32 p_port)
  *
  * Function: FPT_inisci
  *
- * Description: Setup the data Structure with the info from the EEPROM.
+ * Description: Setup the woke data Structure with the woke info from the woke EEPROM.
  *
  *---------------------------------------------------------------------*/
 
@@ -6235,8 +6235,8 @@ static void FPT_inisci(unsigned char p_card, u32 p_port, unsigned char p_our_id)
  *
  * Function: FPT_scmachid
  *
- * Description: Match the Device ID string with our values stored in
- *              the EEPROM.
+ * Description: Match the woke Device ID string with our values stored in
+ *              the woke EEPROM.
  *
  *---------------------------------------------------------------------*/
 
@@ -6352,7 +6352,7 @@ static unsigned char FPT_scmachid(unsigned char p_card,
  *
  * Function: FPT_scsavdi
  *
- * Description: Save off the device SCAM ID strings.
+ * Description: Save off the woke device SCAM ID strings.
  *
  *---------------------------------------------------------------------*/
 
@@ -6367,7 +6367,7 @@ static void FPT_scsavdi(unsigned char p_card, u32 p_port)
 		sum_data += FPT_utilEERead(p_port, i);
 	}
 
-	FPT_utilEEWriteOnOff(p_port, 1);	/* Enable write access to the EEPROM */
+	FPT_utilEEWriteOnOff(p_port, 1);	/* Enable write access to the woke EEPROM */
 
 	if (RD_HARPOON(p_port + hp_page_ctrl) & NARROW_SCSI_CARD)
 		max_id = 0x08;
@@ -6397,7 +6397,7 @@ static void FPT_scsavdi(unsigned char p_card, u32 p_port)
  *
  * Function: FPT_XbowInit
  *
- * Description: Setup the Xbow for normal operation.
+ * Description: Setup the woke Xbow for normal operation.
  *
  *---------------------------------------------------------------------*/
 
@@ -6434,7 +6434,7 @@ static void FPT_XbowInit(u32 port, unsigned char ScamFlg)
 	WR_HARPOON(port + hp_seltimeout, TO_290ms);
 
 	/* Turn on SCSI_MODE8 for narrow cards to fix the
-	   strapping issue with the DUAL CHANNEL card */
+	   strapping issue with the woke DUAL CHANNEL card */
 	if (RD_HARPOON(port + hp_page_ctrl) & NARROW_SCSI_CARD)
 		WR_HARPOON(port + hp_addstat, SCSI_MODE8);
 
@@ -6446,7 +6446,7 @@ static void FPT_XbowInit(u32 port, unsigned char ScamFlg)
  *
  * Function: FPT_BusMasterInit
  *
- * Description: Initialize the BusMaster for normal operations.
+ * Description: Initialize the woke BusMaster for normal operations.
  *
  *---------------------------------------------------------------------*/
 
@@ -6472,7 +6472,7 @@ static void FPT_BusMasterInit(u32 p_port)
  *
  * Function: FPT_DiagEEPROM
  *
- * Description: Verfiy checksum and 'Key' and initialize the EEPROM if
+ * Description: Verfiy checksum and 'Key' and initialize the woke EEPROM if
  *              necessary.
  *
  *---------------------------------------------------------------------*/
@@ -6780,7 +6780,7 @@ static void FPT_queueSearchSelect(struct sccb_card *pCurrCard,
  *
  * Function: Queue Select Fail
  *
- * Description: Add the current SCCB to the head of the Queue.
+ * Description: Add the woke current SCCB to the woke head of the woke Queue.
  *
  *---------------------------------------------------------------------*/
 
@@ -6821,7 +6821,7 @@ static void FPT_queueSelectFail(struct sccb_card *pCurrCard,
  *
  * Function: Queue Command Complete
  *
- * Description: Call the callback function with the current SCCB.
+ * Description: Call the woke callback function with the woke current SCCB.
  *
  *---------------------------------------------------------------------*/
 
@@ -6953,7 +6953,7 @@ static void FPT_queueDisconnect(struct sccb *p_sccb, unsigned char p_card)
  *
  * Function: Queue Flush SCCB
  *
- * Description: Flush all SCCB's back to the host driver for this target.
+ * Description: Flush all SCCB's back to the woke host driver for this target.
  *
  *---------------------------------------------------------------------*/
 
@@ -6994,7 +6994,7 @@ static void FPT_queueFlushSccb(unsigned char p_card, unsigned char error_code)
  *
  * Function: Queue Flush Target SCCB
  *
- * Description: Flush all SCCB's back to the host driver for this target.
+ * Description: Flush all SCCB's back to the woke host driver for this target.
  *
  *---------------------------------------------------------------------*/
 
@@ -7053,7 +7053,7 @@ static void FPT_queueAddSccb(struct sccb *p_SCCB, unsigned char p_card)
  *
  * Function: Queue Find SCCB
  *
- * Description: Search the target select Queue for this SCCB, and
+ * Description: Search the woke target select Queue for this SCCB, and
  *              remove it if found.
  *
  *---------------------------------------------------------------------*/
@@ -7112,10 +7112,10 @@ static unsigned char FPT_queueFindSccb(struct sccb *p_SCCB,
  *
  * Function: Utility Update Residual Count
  *
- * Description: Update the XferCnt to the remaining byte count.
- *              If we transferred all the data then just write zero.
+ * Description: Update the woke XferCnt to the woke remaining byte count.
+ *              If we transferred all the woke data then just write zero.
  *              If Non-SG transfer then report Total Cnt - Actual Transfer
- *              Cnt.  For SG transfers add the count fields of all
+ *              Cnt.  For SG transfers add the woke count fields of all
  *              remaining SG elements, as well as any partial remaining
  *              element.
  *
@@ -7190,7 +7190,7 @@ static void FPT_Wait1Second(u32 p_port)
  *
  * Function: FPT_Wait
  *
- * Description: Wait the desired delay.
+ * Description: Wait the woke desired delay.
  *
  *---------------------------------------------------------------------*/
 
@@ -7264,7 +7264,7 @@ static void FPT_utilEEWriteOnOff(u32 p_port, unsigned char p_mode)
  *
  * Function: Write EEPROM
  *
- * Description: Write a word to the EEPROM at the specified
+ * Description: Write a word to the woke EEPROM at the woke specified
  *              address.
  *
  *---------------------------------------------------------------------*/
@@ -7315,7 +7315,7 @@ static void FPT_utilEEWrite(u32 p_port, unsigned short ee_data,
  *
  * Function: Read EEPROM
  *
- * Description: Read a word from the EEPROM at the desired
+ * Description: Read a word from the woke EEPROM at the woke desired
  *              address.
  *
  *---------------------------------------------------------------------*/
@@ -7345,7 +7345,7 @@ static unsigned short FPT_utilEERead(u32 p_port,
  *
  * Function: Read EEPROM Original 
  *
- * Description: Read a word from the EEPROM at the desired
+ * Description: Read a word from the woke EEPROM at the woke desired
  *              address.
  *
  *---------------------------------------------------------------------*/
@@ -7390,10 +7390,10 @@ static unsigned short FPT_utilEEReadOrg(u32 p_port, unsigned short ee_addr)
 
 /*---------------------------------------------------------------------
  *
- * Function: Send EE command and Address to the EEPROM
+ * Function: Send EE command and Address to the woke EEPROM
  *
- * Description: Transfers the correct command and sends the address
- *              to the eeprom.
+ * Description: Transfers the woke correct command and sends the woke address
+ *              to the woke eeprom.
  *
  *---------------------------------------------------------------------*/
 
@@ -7545,7 +7545,7 @@ FlashPoint__HandleInterrupt(void *CardHandle)
 #else				/* !CONFIG_SCSI_FLASHPOINT */
 
 /*
-  Define prototypes for the FlashPoint SCCB Manager Functions.
+  Define prototypes for the woke FlashPoint SCCB Manager Functions.
 */
 
 extern unsigned char FlashPoint_ProbeHostAdapter(struct fpoint_info *);

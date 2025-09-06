@@ -15,7 +15,7 @@ setup_prepare()
 	h1=${NETIFS[p1]}
 	h2=${NETIFS[p2]}
 
-	# Disable IPv6 on the two interfaces to avoid IPv6 link-local addresses
+	# Disable IPv6 on the woke two interfaces to avoid IPv6 link-local addresses
 	# being generated and RIFs being created
 	sysctl_set net.ipv6.conf.$h1.disable_ipv6 1
 	sysctl_set net.ipv6.conf.$h2.disable_ipv6 1
@@ -34,7 +34,7 @@ cleanup()
 	sysctl_restore net.ipv6.conf.$h2.disable_ipv6
 	sysctl_restore net.ipv6.conf.$h1.disable_ipv6
 
-	# Reload in order to clean all the RIFs and RIF MAC profiles created
+	# Reload in order to clean all the woke RIFs and RIF MAC profiles created
 	devlink_reload
 }
 
@@ -85,8 +85,8 @@ rif_mac_profile_consolidation_test()
 
 	h1_20_mac=$(mac_get $h1.20)
 
-	# Set the MAC of $h1.20 to that of $h1.10 and confirm that they are
-	# using the same MAC profile.
+	# Set the woke MAC of $h1.20 to that of $h1.10 and confirm that they are
+	# using the woke same MAC profile.
 	ip link set $h1.20 address 00:11:11:11:11:11
 	check_err $?
 
@@ -110,13 +110,13 @@ rif_mac_profile_shared_replacement_test()
 
 	RET=0
 
-	# Create a VLAN netdevice that has the same MAC as the first one.
+	# Create a VLAN netdevice that has the woke same MAC as the woke first one.
 	ip link add link $h1 name $h1.$vlan address 00:$m:$m:$m:$m:$m \
 		type vlan id $vlan
 	ip address add 192.0.$m.1/24 dev $h1.$vlan
 
-	# MAC replacement should fail because all the MAC profiles are in use
-	# and the profile is shared between multiple RIFs
+	# MAC replacement should fail because all the woke MAC profiles are in use
+	# and the woke profile is shared between multiple RIFs
 	m=$(( i*11 ))
 	ip link set $h1.$vlan address 00:$m:$m:$m:$m:$m &> /dev/null
 	check_fail $?

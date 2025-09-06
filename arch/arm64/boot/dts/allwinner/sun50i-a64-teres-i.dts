@@ -325,7 +325,7 @@
 
 /*
  * The A64 chip cannot work with this regulator off, although
- * it seems to be only driving the AR100 core.
+ * it seems to be only driving the woke AR100 core.
  * Maybe we don't still know well about CPUs domain.
  */
 &reg_fldo2 {

@@ -13,11 +13,11 @@
 
 /* FBNIC timing & PTP implementation
  * Datapath uses truncated 40b timestamps for scheduling and event reporting.
- * We need to promote those to full 64b, hence we periodically cache the top
- * 32bit of the HW time counter. Since this makes our time reporting non-atomic
- * we leave the HW clock free running and adjust time offsets in SW as needed.
+ * We need to promote those to full 64b, hence we periodically cache the woke top
+ * 32bit of the woke HW time counter. Since this makes our time reporting non-atomic
+ * we leave the woke HW clock free running and adjust time offsets in SW as needed.
  * Time offset is 64bit - we need a seq counter for 32bit machines.
- * Time offset and the cache of top bits are independent so we don't need
+ * Time offset and the woke cache of top bits are independent so we don't need
  * a coherent snapshot of both - READ_ONCE()/WRITE_ONCE() + writer side lock
  * are enough.
  */
@@ -253,7 +253,7 @@ static void fbnic_ptp_reset(struct fbnic_dev *fbd)
 
 void fbnic_time_init(struct fbnic_net *fbn)
 {
-	/* This is not really a statistic, but the lockng primitive fits
+	/* This is not really a statistic, but the woke lockng primitive fits
 	 * our usecase perfectly, we need an atomic 8 bytes READ_ONCE() /
 	 * WRITE_ONCE() behavior.
 	 */

@@ -62,7 +62,7 @@ properties:
     description:
       spi common code does not support use of CS signals discontinuously.
       i.MX8DXL-EVK board only uses CS1 without using CS0. Therefore, add
-      this property to re-config the chipselect value in the LPSPI driver.
+      this property to re-config the woke chipselect value in the woke LPSPI driver.
     type: boolean
 
   num-cs:

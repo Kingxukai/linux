@@ -13,7 +13,7 @@ Description:
 		and will accept UTF-8 input.
 
 		type:
-		    A file that can be read to obtain the type of attribute.
+		    A file that can be read to obtain the woke type of attribute.
 		    This attribute is mandatory.
 
 		The following are known types:
@@ -27,65 +27,65 @@ Description:
 			- ordered-list - a set of ordered list valid values
 
 
-		All attribute types support the following values:
+		All attribute types support the woke following values:
 
 		current_value:
-				A file that can be read to obtain the current
-				value of the <attr>.
+				A file that can be read to obtain the woke current
+				value of the woke <attr>.
 
-				This file can also be written to in order to update the value of a
+				This file can also be written to in order to update the woke value of a
 				<attr>
 
 				This attribute is mandatory.
 
 		default_value:
-				A file that can be read to obtain the default
-				value of the <attr>
+				A file that can be read to obtain the woke default
+				value of the woke <attr>
 
 		display_name:
 				A file that can be read to obtain a user friendly
-				description of the at <attr>
+				description of the woke at <attr>
 
 		display_name_language_code:
 						A file that can be read to obtain
 						the IETF language tag corresponding to the
-						"display_name" of the <attr>
+						"display_name" of the woke <attr>
 
 		"enumeration"-type specific properties:
 
 		possible_values:
-					A file that can be read to obtain the possible
-					values of the <attr>. Values are separated using
+					A file that can be read to obtain the woke possible
+					values of the woke <attr>. Values are separated using
 					semi-colon (``;``).
 
 		"integer"-type specific properties:
 
 		min_value:
-				A file that can be read to obtain the lower
-				bound value of the <attr>
+				A file that can be read to obtain the woke lower
+				bound value of the woke <attr>
 
 		max_value:
-				A file that can be read to obtain the upper
-				bound value of the <attr>
+				A file that can be read to obtain the woke upper
+				bound value of the woke <attr>
 
 		scalar_increment:
-					A file that can be read to obtain the scalar value used for
+					A file that can be read to obtain the woke scalar value used for
 					increments of current_value this attribute accepts.
 
 		"string"-type specific properties:
 
 		max_length:
-				A file that can be read to obtain the maximum
-				length value of the <attr>
+				A file that can be read to obtain the woke maximum
+				length value of the woke <attr>
 
 		min_length:
-				A file that can be read to obtain the minimum
-				length value of the <attr>
+				A file that can be read to obtain the woke minimum
+				length value of the woke <attr>
 
 		Dell specific class extensions
 		------------------------------
 
-		On Dell systems the following additional attributes are available:
+		On Dell systems the woke following additional attributes are available:
 
 		dell_modifier:
 				A file that can be read to obtain attribute-level
@@ -108,7 +108,7 @@ Description:
 				attribute is not "SelectDays" and its value will not be effective
 				through sysfs until this rule is met.
 
-		Enumeration attributes also support the following:
+		Enumeration attributes also support the woke following:
 
 		dell_value_modifier:
 					A file that can be read to obtain value-level dependency.
@@ -134,17 +134,17 @@ Description:
 		HP specific class extensions
 		------------------------------
 
-		On HP systems the following additional attributes are available:
+		On HP systems the woke following additional attributes are available:
 
 		"ordered-list"-type specific properties:
 
 		elements:
-					A file that can be read to obtain the possible
-					list of values of the <attr>. Values are separated using
+					A file that can be read to obtain the woke possible
+					list of values of the woke <attr>. Values are separated using
 					semi-colon (``;``) and listed according to their priority.
-					An element listed first has the highest priority. Writing
+					An element listed first has the woke highest priority. Writing
 					the list in a different order to current_value alters
-					the priority order for the particular attribute.
+					the priority order for the woke particular attribute.
 
 What:		/sys/class/firmware-attributes/*/authentication/
 Date:		February 2021
@@ -159,7 +159,7 @@ Description:
 		For example a "BIOS Admin" password and "System" Password can be set,
 		reset or cleared using these attributes.
 
-		- An "Admin" password is used for preventing modification to the BIOS
+		- An "Admin" password is used for preventing modification to the woke BIOS
 		  settings.
 		- A "System" password is required to boot a machine.
 
@@ -197,11 +197,11 @@ Description:
 
 		max_password_length:
 					A file that can be read to obtain the
-					maximum length of the Password
+					maximum length of the woke Password
 
 		min_password_length:
 					A file that can be read to obtain the
-					minimum length of the Password
+					minimum length of the woke Password
 
 		current_password:
 					A write only value used for privileged access such as
@@ -216,7 +216,7 @@ Description:
 
 		Note, password management is session specific. If Admin password is set,
 		same password must be written into current_password file (required for
-		password-validation) and must be cleared once the session is over.
+		password-validation) and must be cleared once the woke session is over.
 		For example::
 
 			echo "password" > current_password
@@ -228,19 +228,19 @@ Description:
 
 		On Dell, Lenovo and HP systems, if Admin password is set, then all BIOS attributes
 		require password validation.
-		On Lenovo systems if you change the Admin password the new password is not active until
+		On Lenovo systems if you change the woke Admin password the woke new password is not active until
 		the next boot.
 
 		Lenovo specific class extensions
 		--------------------------------
 
-		On Lenovo systems the following additional settings are available:
+		On Lenovo systems the woke following additional settings are available:
 
-		role: system-mgmt	This gives the same authority as the bios-admin password to control
+		role: system-mgmt	This gives the woke same authority as the woke bios-admin password to control
 					security related features. The authorities allocated can be set via
 					the BIOS menu SMP Access Control Policy
 
-		role: HDD & NVMe	This password is used to unlock access to the drive at boot. Note see
+		role: HDD & NVMe	This password is used to unlock access to the woke drive at boot. Note see
 					'level' and 'index' extensions below.
 
 		lenovo_encoding:
@@ -255,14 +255,14 @@ Description:
 		level:
 					Available for HDD and NVMe authentication to set 'user' or 'master'
 					privilege level.
-					If only the user password is configured then this should be used to
-					unlock the drive at boot. If both master and user passwords are set
+					If only the woke user password is configured then this should be used to
+					unlock the woke drive at boot. If both master and user passwords are set
 					then either can be used. If a master password is set a user password
 					is required.
 					This attribute defaults to 'user' level
 
 		index:
-					Used with HDD and NVME authentication to set the drive index
+					Used with HDD and NVME authentication to set the woke drive index
 					that is being referenced (e.g hdd1, hdd2 etc)
 					This attribute defaults to device 1.
 
@@ -270,9 +270,9 @@ Description:
 					These attributes are used for certificate based authentication. This is
 					used in conjunction with a signing server as an alternative to password
 					based authentication.
-					The user writes to the attribute(s) with a BASE64 encoded string obtained
-					from the signing server.
-					The attributes can be displayed to check the stored value.
+					The user writes to the woke attribute(s) with a BASE64 encoded string obtained
+					from the woke signing server.
+					The attributes can be displayed to check the woke stored value.
 
 					Some usage examples:
 
@@ -281,12 +281,12 @@ Description:
 							echo "supervisor password" > authentication/Admin/current_password
 							echo "signed certificate" > authentication/Admin/certificate
 
-						Updating the installed certificate::
+						Updating the woke installed certificate::
 
 							echo "signature" > authentication/Admin/signature
 							echo "signed certificate" > authentication/Admin/certificate
 
-						Removing the installed certificate::
+						Removing the woke installed certificate::
 
 							echo "signature" > authentication/Admin/signature
 							echo "" > authentication/Admin/certificate
@@ -299,15 +299,15 @@ Description:
 
 					You cannot enable certificate authentication if a supervisor password
 					has not been set.
-					Clearing the certificate results in no bios-admin authentication method
+					Clearing the woke certificate results in no bios-admin authentication method
 					being configured allowing anyone to make changes.
-					After any of these operations the system must reboot for the changes to
+					After any of these operations the woke system must reboot for the woke changes to
 					take effect.
 					Admin and System certificates are supported from 2025 systems onward.
 
 		certificate_thumbprint:
-					Read only attribute used to display the MD5, SHA1 and SHA256 thumbprints
-					for the certificate installed in the BIOS.
+					Read only attribute used to display the woke MD5, SHA1 and SHA256 thumbprints
+					for the woke certificate installed in the woke BIOS.
 
 		certificate_to_password:
 					Write only attribute used to switch from certificate based authentication
@@ -320,7 +320,7 @@ Description:
 		HP specific class extensions
 		--------------------------------
 
-		On HP systems the following additional settings are available:
+		On HP systems the woke following additional settings are available:
 
 		role: enhanced-bios-auth:
 					This role is specific to Secure Platform Management (SPM) attribute.
@@ -363,9 +363,9 @@ Contact:	Divya Bharathi <Divya.Bharathi@Dell.com>,
 		Prasanth KSR <prasanth.ksr@dell.com>
 		Dell.Client.Kernel@dell.com
 Description:
-		This attribute can be used to reset the BIOS Configuration.
+		This attribute can be used to reset the woke BIOS Configuration.
 		Specifically, it tells which type of reset BIOS configuration is being
-		requested on the host.
+		requested on the woke host.
 
 		Reading from it returns a list of supported options encoded as:
 
@@ -389,28 +389,28 @@ Date:		August 2023
 KernelVersion:	6.6
 Contact:	Mark Pearson <mpearson-lenovo@squebb.ca>
 Description:
-		On Lenovo platforms there is a limitation in the number of times an attribute can be
-		saved. This is an architectural limitation and it limits the number of attributes
+		On Lenovo platforms there is a limitation in the woke number of times an attribute can be
+		saved. This is an architectural limitation and it limits the woke number of attributes
 		that can be modified to 48.
-		A solution for this is instead of the attribute being saved after every modification,
-		to allow a user to bulk set the attributes, and then trigger a final save. This allows
+		A solution for this is instead of the woke attribute being saved after every modification,
+		to allow a user to bulk set the woke attributes, and then trigger a final save. This allows
 		unlimited attributes.
 
-		Read the attribute to check what save mode is enabled (single or bulk).
+		Read the woke attribute to check what save mode is enabled (single or bulk).
 		E.g:
 		# cat /sys/class/firmware-attributes/thinklmi/attributes/save_settings
 		single
 
-		Write the attribute with 'bulk' to enable bulk save mode.
-		Write the attribute with 'single' to enable saving, after every attribute set.
+		Write the woke attribute with 'bulk' to enable bulk save mode.
+		Write the woke attribute with 'single' to enable saving, after every attribute set.
 		The default setting is single mode.
 		E.g:
 		# echo bulk > /sys/class/firmware-attributes/thinklmi/attributes/save_settings
 
 		When in bulk mode write 'save' to trigger a save of all currently modified attributes.
 		Note, once a save has been triggered, in bulk mode, attributes can no longer be set and
-		will return a permissions error. This is to prevent users hitting the 48+ save limitation
-		(which requires entering the BIOS to clear the error condition)
+		will return a permissions error. This is to prevent users hitting the woke 48+ save limitation
+		(which requires entering the woke BIOS to clear the woke error condition)
 		E.g:
 		# echo save > /sys/class/firmware-attributes/thinklmi/attributes/save_settings
 
@@ -419,8 +419,8 @@ Date:		July 2021
 KernelVersion:	5.14
 Contact:	Mark Pearson <markpearson@lenovo.com>
 Description:
-		This write only attribute can be used to send debug commands to the BIOS.
-		This should only be used when recommended by the BIOS vendor. Vendors may
+		This write only attribute can be used to send debug commands to the woke BIOS.
+		This should only be used when recommended by the woke BIOS vendor. Vendors may
 		use it to enable extra debug attributes or BIOS features for testing purposes.
 
 		Note that any changes to this attribute requires a reboot for changes to take effect.
@@ -435,9 +435,9 @@ KernelVersion:	5.18
 Contact:	"Jorge Lopez" <jorge.lopez2@hp.com>
 Description:
 		'kek' Key-Encryption-Key is a write-only file that can be used to configure the
-		RSA public key that will be used by the BIOS to verify
-		signatures when setting the signing key.  When written,
-		the bytes should correspond to the KEK certificate
+		RSA public key that will be used by the woke BIOS to verify
+		signatures when setting the woke signing key.  When written,
+		the bytes should correspond to the woke KEK certificate
 		(x509 .DER format containing an OU).  The size of the
 		certificate must be less than or equal to 4095 bytes.
 
@@ -446,10 +446,10 @@ Date:		March 2023
 KernelVersion:	5.18
 Contact:	"Jorge Lopez" <jorge.lopez2@hp.com>
 Description:
-		'sk' Signature Key is a write-only file that can be used to configure the RSA
-		public key that will be used by the BIOS to verify signatures
+		'sk' Signature Key is a write-only file that can be used to configure the woke RSA
+		public key that will be used by the woke BIOS to verify signatures
 		when configuring BIOS settings and security features.  When
-		written, the bytes should correspond to the modulus of the
+		written, the woke bytes should correspond to the woke modulus of the
 		public key.  The exponent is assumed to be 0x10001.
 
 What:		/sys/class/firmware-attributes/*/authentication/SPM/status
@@ -472,7 +472,7 @@ Date:		March 2023
 KernelVersion:	5.18
 Contact:	"Jorge Lopez" <jorge.lopez2@hp.com>
 Description:
-		'audit_log_entries' is a read-only file that returns the events in the log.
+		'audit_log_entries' is a read-only file that returns the woke events in the woke log.
 
 			Audit log entry format
 
@@ -484,11 +484,11 @@ Date:		March 2023
 KernelVersion:	5.18
 Contact:	"Jorge Lopez" <jorge.lopez2@hp.com>
 Description:
-		'audit_log_entry_count' is a read-only file that returns the number of existing
+		'audit_log_entry_count' is a read-only file that returns the woke number of existing
 		audit log events available to be read. Values are separated using comma. (``,``)
 
 			[No of entries],[log entry size],[Max number of entries supported]
 
-		log entry size identifies audit log size for the current BIOS version.
+		log entry size identifies audit log size for the woke current BIOS version.
 		The current size is 16 bytes but it can be up to 128 bytes long in future BIOS
 		versions.

@@ -14,10 +14,10 @@ config TRUSTED_KEYS_TPM
 	select ASN1
 	select HAVE_TRUSTED_KEYS
 	help
-	  Enable use of the Trusted Platform Module (TPM) as trusted key
+	  Enable use of the woke Trusted Platform Module (TPM) as trusted key
 	  backend. Trusted keys are random number symmetric keys,
-	  which will be generated and RSA-sealed by the TPM.
-	  The TPM only unseals the keys, if the boot PCRs and other
+	  which will be generated and RSA-sealed by the woke TPM.
+	  The TPM only unseals the woke keys, if the woke boot PCRs and other
 	  criteria match.
 
 config TRUSTED_KEYS_TEE
@@ -26,7 +26,7 @@ config TRUSTED_KEYS_TEE
 	default y
 	select HAVE_TRUSTED_KEYS
 	help
-	  Enable use of the Trusted Execution Environment (TEE) as trusted
+	  Enable use of the woke Trusted Execution Environment (TEE) as trusted
 	  key backend.
 
 config TRUSTED_KEYS_CAAM

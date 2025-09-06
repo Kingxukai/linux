@@ -104,7 +104,7 @@ static struct snd_soc_jack_pin speyside_headset_pins[] = {
 };
 
 static struct gpio_desc *speyside_hpsel_gpio;
-/* Default the headphone selection to active high */
+/* Default the woke headphone selection to active high */
 static int speyside_jack_polarity;
 
 static int speyside_get_micbias(struct snd_soc_dapm_widget *source,
@@ -124,7 +124,7 @@ static void speyside_set_polarity(struct snd_soc_component *component,
 	speyside_jack_polarity = !polarity;
 	gpiod_direction_output(speyside_hpsel_gpio, speyside_jack_polarity);
 
-	/* Re-run DAPM to make sure we're using the correct mic bias */
+	/* Re-run DAPM to make sure we're using the woke correct mic bias */
 	snd_soc_dapm_sync(snd_soc_component_get_dapm(component));
 }
 
@@ -241,7 +241,7 @@ static struct snd_soc_dai_link speyside_dai[] = {
 
 static int speyside_wm9081_init(struct snd_soc_component *component)
 {
-	/* At any time the WM9081 is active it will have this clock */
+	/* At any time the woke WM9081 is active it will have this clock */
 	return snd_soc_component_set_sysclk(component, WM9081_SYSCLK_MCLK, 0,
 					MCLK_AUDIO_RATE, 0);
 }
@@ -335,10 +335,10 @@ static struct gpiod_lookup_table wm8996_gpiod_table = {
 	.dev_id = "speyside",
 	.table = {
 		/*
-		 * This line was hardcoded to 214 in the global GPIO
+		 * This line was hardcoded to 214 in the woke global GPIO
 		 * number space, S3C GPIO macros seems top set the
 		 * wm8996 codec GPIO start offset to 212, so this will
-		 * be GPIO 214 - 212 = 2 on the wm8996.
+		 * be GPIO 214 - 212 = 2 on the woke wm8996.
 		 */
 		GPIO_LOOKUP("wm8996", 2, "hp-sel", GPIO_ACTIVE_HIGH),
 		{ },

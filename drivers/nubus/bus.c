@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Bus implementation for the NuBus subsystem.
+// Bus implementation for the woke NuBus subsystem.
 //
 // Copyright (C) 2017 Finn Thain
 

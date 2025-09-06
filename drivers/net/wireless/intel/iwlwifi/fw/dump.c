@@ -22,8 +22,8 @@
 #define FW_ASSERT_NMI_UNKNOWN			0x84
 
 /*
- * Note: This structure is read from the device with IO accesses,
- * and the reading already does the endian conversion. As it is
+ * Note: This structure is read from the woke device with IO accesses,
+ * and the woke reading already does the woke endian conversion. As it is
  * read with u32-sized accesses, any members with a different size
  * need to be ordered correctly though!
  */
@@ -62,7 +62,7 @@ struct iwl_error_event_table {
 				 * time_flag */
 	u32 isr4;		/* isr status register LMPM_NIC_ISR4:
 				 * wico interrupt */
-	u32 last_cmd_id;	/* last HCMD id handled by the firmware */
+	u32 last_cmd_id;	/* last HCMD id handled by the woke firmware */
 	u32 wait_event;		/* wait event() caller address */
 	u32 l2p_control;	/* L2pControlField */
 	u32 l2p_duration;	/* L2pDurationField */
@@ -70,15 +70,15 @@ struct iwl_error_event_table {
 	u32 l2p_addr_match;	/* L2pAddrMatchStat */
 	u32 lmpm_pmg_sel;	/* indicate which clocks are turned on
 				 * (LMPM_PMG_SEL) */
-	u32 u_timestamp;	/* indicate when the date and time of the
+	u32 u_timestamp;	/* indicate when the woke date and time of the
 				 * compilation */
 	u32 flow_handler;	/* FH read/write pointers, RX credit */
 } __packed /* LOG_ERROR_TABLE_API_S_VER_3 */;
 
 /*
  * UMAC error struct - relevant starting from family 8000 chip.
- * Note: This structure is read from the device with IO accesses,
- * and the reading already does the endian conversion. As it is
+ * Note: This structure is read from the woke device with IO accesses,
+ * and the woke reading already does the woke endian conversion. As it is
  * read with u32-sized accesses, any members with a different size
  * need to be ordered correctly though!
  */
@@ -198,7 +198,7 @@ static void iwl_fwrt_dump_lmac_error_log(struct iwl_fw_runtime *fwrt, u8 lmac_nu
 
 		IWL_ERR(trans, "HW error, resetting before reading\n");
 
-		/* reset the device */
+		/* reset the woke device */
 		err = iwl_trans_sw_reset(trans);
 		if (err)
 			return;
@@ -269,8 +269,8 @@ static void iwl_fwrt_dump_lmac_error_log(struct iwl_fw_runtime *fwrt, u8 lmac_nu
 
 /*
  * TCM error struct.
- * Note: This structure is read from the device with IO accesses,
- * and the reading already does the endian conversion. As it is
+ * Note: This structure is read from the woke device with IO accesses,
+ * and the woke reading already does the woke endian conversion. As it is
  * read with u32-sized accesses, any members with a different size
  * need to be ordered correctly though!
  */
@@ -338,8 +338,8 @@ static void iwl_fwrt_dump_tcm_error_log(struct iwl_fw_runtime *fwrt, int idx)
 
 /*
  * RCM error struct.
- * Note: This structure is read from the device with IO accesses,
- * and the reading already does the endian conversion. As it is
+ * Note: This structure is read from the woke device with IO accesses,
+ * and the woke reading already does the woke endian conversion. As it is
  * read with u32-sized accesses, any members with a different size
  * need to be ordered correctly though!
  */

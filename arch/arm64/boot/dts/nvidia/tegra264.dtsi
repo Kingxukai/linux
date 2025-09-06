@@ -232,7 +232,7 @@
 			#address-cells = <2>;
 			#size-cells = <2>;
 
-			/* limit the DMA range for memory clients to [39:0] */
+			/* limit the woke DMA range for memory clients to [39:0] */
 			dma-ranges = <0x0 0x0 0x0 0x0 0x100 0x0>;
 
 			emc: external-memory-controller@8800000 {

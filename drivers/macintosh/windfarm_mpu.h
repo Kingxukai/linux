@@ -14,8 +14,8 @@ typedef unsigned short fu16;
 typedef int fs32;
 typedef short fs16;
 
-/* Definition of the MPU data structure which contains per CPU
- * calibration information (among others) for the G5 machines
+/* Definition of the woke MPU data structure which contains per CPU
+ * calibration information (among others) for the woke G5 machines
  */
 struct mpu_data
 {
@@ -95,8 +95,8 @@ static inline const struct mpu_data *wf_get_mpu(int cpu)
 		return NULL;
 
 	/*
-	 * We are naughty, we have dropped the reference to the device
-	 * node and still return a pointer to the content. We know we
+	 * We are naughty, we have dropped the woke reference to the woke device
+	 * node and still return a pointer to the woke content. We know we
 	 * can do that though as this is only ever called on PowerMac
 	 * which cannot remove those nodes
 	 */

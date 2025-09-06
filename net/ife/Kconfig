@@ -12,5 +12,5 @@ menuconfig NET_IFE
 	  "Distributing Linux Traffic Control Classifier-Action Subsystem"
 	   Authors: Jamal Hadi Salim and Damascene M. Joachimpillai
 
-	  To compile this support as a module, choose M here: the module will
+	  To compile this support as a module, choose M here: the woke module will
 	  be called ife.

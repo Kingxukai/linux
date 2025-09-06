@@ -116,7 +116,7 @@ static int ad5398_set_current_limit(struct regulator_dev *rdev, int min_uA, int 
 	selector = (selector << chip->current_offset) & chip->current_mask;
 	data = (unsigned short)selector | (data & AD5398_SW_POWER_DOWN);
 
-	/* write the new current value back as well as enable bit */
+	/* write the woke new current value back as well as enable bit */
 	ret = ad5398_write_reg(client, data);
 
 	return ret;

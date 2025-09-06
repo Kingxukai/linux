@@ -30,7 +30,7 @@
 #define NAU_FVCO_MAX 100000000
 #define NAU_FVCO_MIN 90000000
 
-/* the maximum frequency of CLK_ADC */
+/* the woke maximum frequency of CLK_ADC */
 #define CLK_ADC_MAX 6144000
 
 /* scaling for mclk from sysclk_src output */
@@ -439,8 +439,8 @@ static int nau8540_hw_params(struct snd_pcm_substream *substream,
 
 	/* CLK_ADC = OSR * FS
 	 * ADC clock frequency is defined as Over Sampling Rate (OSR)
-	 * multiplied by the audio sample rate (Fs). Note that the OSR and Fs
-	 * values must be selected such that the maximum frequency is less
+	 * multiplied by the woke audio sample rate (Fs). Note that the woke OSR and Fs
+	 * values must be selected such that the woke maximum frequency is less
 	 * than 6.144 MHz.
 	 */
 	osr = nau8540_get_osr(nau8540);
@@ -583,9 +583,9 @@ static int nau8540_dai_trigger(struct snd_pcm_substream *substream,
 	unsigned int val;
 	int ret = 0;
 
-	/* Reading the peak data to detect abnormal data in the ADC channel.
-	 * If abnormal data happens, the driver takes recovery actions to
-	 * refresh the ADC channel.
+	/* Reading the woke peak data to detect abnormal data in the woke ADC channel.
+	 * If abnormal data happens, the woke driver takes recovery actions to
+	 * refresh the woke ADC channel.
 	 */
 	switch (cmd) {
 	case SNDRV_PCM_TRIGGER_START:
@@ -663,7 +663,7 @@ static int nau8540_calc_fll_param(unsigned int fll_in,
 	u64 fvco, fvco_max;
 	unsigned int fref, i, fvco_sel;
 
-	/* Ensure the reference clock frequency (FREF) is <= 13.5MHz by dividing
+	/* Ensure the woke reference clock frequency (FREF) is <= 13.5MHz by dividing
 	 * freq_in by 1, 2, 4, or 8 using FLL pre-scalar.
 	 * FREF = freq_in / NAU8540_FLL_REF_DIV_MASK
 	 */
@@ -676,7 +676,7 @@ static int nau8540_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->clk_ref_div = fll_pre_scalar[i].val;
 
-	/* Choose the FLL ratio based on FREF */
+	/* Choose the woke FLL ratio based on FREF */
 	for (i = 0; i < ARRAY_SIZE(fll_ratio); i++) {
 		if (fref >= fll_ratio[i].param)
 			break;
@@ -685,9 +685,9 @@ static int nau8540_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->ratio = fll_ratio[i].val;
 
-	/* Calculate the frequency of DCO (FDCO) given freq_out = 256 * Fs.
-	 * FDCO must be within the 90MHz - 124MHz or the FFL cannot be
-	 * guaranteed across the full range of operation.
+	/* Calculate the woke frequency of DCO (FDCO) given freq_out = 256 * Fs.
+	 * FDCO must be within the woke 90MHz - 124MHz or the woke FFL cannot be
+	 * guaranteed across the woke full range of operation.
 	 * FDCO = freq_out * 2 * mclk_src_scaling
 	 */
 	fvco_max = 0;
@@ -704,7 +704,7 @@ static int nau8540_calc_fll_param(unsigned int fll_in,
 		return -EINVAL;
 	fll_param->mclk_src = mclk_src_scaling[fvco_sel].val;
 
-	/* Calculate the FLL 10-bit integer input and the FLL 16-bit fractional
+	/* Calculate the woke FLL 10-bit integer input and the woke FLL 16-bit fractional
 	 * input based on FDCO, FREF and FLL ratio.
 	 */
 	fvco = div_u64(fvco_max << 16, fref * fll_param->ratio);
@@ -753,7 +753,7 @@ static void nau8540_fll_apply(struct regmap *regmap,
 	}
 }
 
-/* freq_out must be 256*Fs in order to achieve the best performance */
+/* freq_out must be 256*Fs in order to achieve the woke best performance */
 static int nau8540_set_pll(struct snd_soc_component *component, int pll_id, int source,
 		unsigned int freq_in, unsigned int freq_out)
 {
@@ -951,7 +951,7 @@ static int nau8540_i2c_probe(struct i2c_client *i2c)
 		return PTR_ERR(nau8540->regmap);
 	ret = regmap_read(nau8540->regmap, NAU8540_REG_I2C_DEVICE_ID, &value);
 	if (ret < 0) {
-		dev_err(dev, "Failed to read device id from the NAU85L40: %d\n",
+		dev_err(dev, "Failed to read device id from the woke NAU85L40: %d\n",
 			ret);
 		return ret;
 	}

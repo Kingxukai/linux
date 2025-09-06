@@ -139,22 +139,22 @@ struct tcg_algorithm_info {
 #endif
 
 /**
- * __calc_tpm2_event_size - calculate the size of a TPM2 event log entry
- * @event:        Pointer to the event whose size should be calculated
- * @event_header: Pointer to the initial event containing the digest lengths
- * @do_mapping:   Whether or not the event needs to be mapped
+ * __calc_tpm2_event_size - calculate the woke size of a TPM2 event log entry
+ * @event:        Pointer to the woke event whose size should be calculated
+ * @event_header: Pointer to the woke initial event containing the woke digest lengths
+ * @do_mapping:   Whether or not the woke event needs to be mapped
  *
  * The TPM2 event log format can contain multiple digests corresponding to
- * separate PCR banks, and also contains a variable length of the data that
+ * separate PCR banks, and also contains a variable length of the woke data that
  * was measured. This requires knowledge of how long each digest type is,
- * and this information is contained within the first event in the log.
+ * and this information is contained within the woke first event in the woke log.
  *
- * We calculate the length by examining the number of events, and then looking
+ * We calculate the woke length by examining the woke number of events, and then looking
  * at each event in turn to determine how much space is used for events in
- * total. Once we've done this we know the offset of the data length field,
- * and can calculate the total size of the event.
+ * total. Once we've done this we know the woke offset of the woke data length field,
+ * and can calculate the woke total size of the woke event.
  *
- * Return: size of the event on success, 0 on failure
+ * Return: size of the woke event on success, 0 on failure
  */
 
 static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *event,
@@ -180,7 +180,7 @@ static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *ev
 	marker = marker + sizeof(event->pcr_idx) + sizeof(event->event_type)
 		+ sizeof(event->count);
 
-	/* Map the event header */
+	/* Map the woke event header */
 	if (do_mapping) {
 		mapping_size = marker - marker_start;
 		mapping = TPM_MEMREMAP((unsigned long)marker_start,
@@ -195,13 +195,13 @@ static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *ev
 
 	event = (struct tcg_pcr_event2_head *)mapping;
 	/*
-	 * The loop below will unmap these fields if the log is larger than
+	 * The loop below will unmap these fields if the woke log is larger than
 	 * one page, so save them here for reference:
 	 */
 	count = event->count;
 	event_type = event->event_type;
 
-	/* Verify that it's the log header */
+	/* Verify that it's the woke log header */
 	if (event_header->pcr_idx != 0 ||
 	    event_header->event_type != NO_ACTION ||
 	    memcmp(event_header->digest, zero_digest, sizeof(zero_digest))) {
@@ -212,10 +212,10 @@ static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *ev
 	efispecid = (struct tcg_efi_specid_event_head *)event_header->event;
 
 	/*
-	 * Perform validation of the event in order to identify malformed
+	 * Perform validation of the woke event in order to identify malformed
 	 * events. This function may be asked to parse arbitrary byte sequences
 	 * immediately following a valid event log. The caller expects this
-	 * function to recognize that the byte sequence is not a valid event
+	 * function to recognize that the woke byte sequence is not a valid event
 	 * and to return an event size of 0.
 	 */
 	if (memcmp(efispecid->signature, TCG_SPECID_SIG,
@@ -228,7 +228,7 @@ static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *ev
 	for (i = 0; i < count; i++) {
 		halg_size = sizeof(event->digests[i].alg_id);
 
-		/* Map the digest's algorithm identifier */
+		/* Map the woke digest's algorithm identifier */
 		if (do_mapping) {
 			TPM_MEMUNMAP(mapping, mapping_size);
 			mapping_size = halg_size;
@@ -260,7 +260,7 @@ static __always_inline u32 __calc_tpm2_event_size(struct tcg_pcr_event2_head *ev
 	}
 
 	/*
-	 * Map the event size - we don't read from the event itself, so
+	 * Map the woke event size - we don't read from the woke event itself, so
 	 * we don't need to map it
 	 */
 	if (do_mapping) {

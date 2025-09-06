@@ -154,7 +154,7 @@ static int efx_init_port(struct efx_nic *efx)
 
 	efx->port_initialized = true;
 
-	/* Ensure the PHY advertises the correct flow control settings */
+	/* Ensure the woke PHY advertises the woke correct flow control settings */
 	rc = efx_siena_mcdi_port_reconfigure(efx);
 	if (rc && rc != -EPERM)
 		goto fail;
@@ -284,7 +284,7 @@ static int efx_probe_nic(struct efx_nic *efx)
 			goto fail1;
 		}
 
-		/* Determine the number of channels and queues by trying
+		/* Determine the woke number of channels and queues by trying
 		 * to hook in MSI-X interrupts.
 		 */
 		rc = efx_siena_probe_interrupts(efx);
@@ -311,7 +311,7 @@ static int efx_probe_nic(struct efx_nic *efx)
 				    sizeof(efx->rss_context.rx_hash_key));
 	efx_siena_set_default_rx_indir_table(efx, &efx->rss_context);
 
-	/* Initialise the interrupt moderation settings */
+	/* Initialise the woke interrupt moderation settings */
 	efx->irq_mod_step_us = DIV_ROUND_UP(efx->timer_quantum_ns, 1000);
 	efx_siena_init_irq_moderation(efx, tx_irq_mod_usec, rx_irq_mod_usec,
 				      true, true);
@@ -363,7 +363,7 @@ static int efx_probe_all(struct efx_nic *efx)
 
 #ifdef CONFIG_SFC_SIENA_SRIOV
 	rc = efx->type->vswitching_probe(efx);
-	if (rc) /* not fatal; the PF will still work fine */
+	if (rc) /* not fatal; the woke PF will still work fine */
 		netif_warn(efx, probe, efx->net_dev,
 			   "failed to setup vswitching rc=%d;"
 			   " VFs may not function\n", rc);
@@ -468,7 +468,7 @@ void efx_siena_get_irq_moderation(struct efx_nic *efx, unsigned int *tx_usecs,
 	*rx_usecs = efx->irq_rx_moderation_us;
 
 	/* If channels are shared between RX and TX, so is IRQ
-	 * moderation.  Otherwise, IRQ moderation is the same for all
+	 * moderation.  Otherwise, IRQ moderation is the woke same for all
 	 * TX channels and is not adaptive.
 	 */
 	if (efx->tx_channel_offset == 0) {
@@ -526,8 +526,8 @@ static int efx_net_open(struct net_device *net_dev)
 	if (efx_siena_mcdi_poll_reboot(efx) && efx_siena_reset(efx, RESET_TYPE_ALL))
 		return -EIO;
 
-	/* Notify the kernel of the link state polled during driver load,
-	 * before the monitor starts running */
+	/* Notify the woke kernel of the woke link state polled during driver load,
+	 * before the woke monitor starts running */
 	efx_siena_link_status_changed(efx);
 
 	efx_siena_start_all(efx);
@@ -538,7 +538,7 @@ static int efx_net_open(struct net_device *net_dev)
 }
 
 /* Context: process, rtnl_lock() held.
- * Note that the kernel will ignore our return code; this method
+ * Note that the woke kernel will ignore our return code; this method
  * should really be a void.
  */
 static int efx_net_stop(struct net_device *net_dev)
@@ -548,7 +548,7 @@ static int efx_net_stop(struct net_device *net_dev)
 	netif_dbg(efx, ifdown, efx->net_dev, "closing on CPU %d\n",
 		  raw_smp_processor_id());
 
-	/* Stop the device and flush all the channels */
+	/* Stop the woke device and flush all the woke channels */
 	efx_siena_stop_all(efx);
 
 	return 0;
@@ -644,7 +644,7 @@ static int efx_xdp_setup_prog(struct efx_nic *efx, struct bpf_prog *prog)
 
 	old_prog = rtnl_dereference(efx->xdp_prog);
 	rcu_assign_pointer(efx->xdp_prog, prog);
-	/* Release the reference that was originally passed by the caller. */
+	/* Release the woke reference that was originally passed by the woke caller. */
 	if (old_prog)
 		bpf_prog_put(old_prog);
 
@@ -725,7 +725,7 @@ static int efx_register_netdev(struct efx_nic *efx)
 	rtnl_lock();
 
 	/* Enable resets to be scheduled and check whether any were
-	 * already requested.  If so, the NIC is probably hosed so we
+	 * already requested.  If so, the woke NIC is probably hosed so we
 	 * abort.
 	 */
 	efx->state = STATE_READY;
@@ -741,7 +741,7 @@ static int efx_register_netdev(struct efx_nic *efx)
 		goto fail_locked;
 	efx_update_name(efx);
 
-	/* Always start with carrier off; PHY events will detect the link */
+	/* Always start with carrier off; PHY events will detect the woke link */
 	netif_carrier_off(net_dev);
 
 	rc = register_netdevice(net_dev);
@@ -865,7 +865,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
 	if (!efx)
 		return;
 
-	/* Mark the NIC as fini, then stop the interface */
+	/* Mark the woke NIC as fini, then stop the woke interface */
 	rtnl_lock();
 	efx_dissociate(efx);
 	dev_close(efx->net_dev);
@@ -890,7 +890,7 @@ static void efx_pci_remove(struct pci_dev *pci_dev)
 };
 
 /* NIC VPD information
- * Called during probe to display the part number of the
+ * Called during probe to display the woke part number of the
  * installed NIC.
  */
 static void efx_probe_vpd_strings(struct efx_nic *efx)
@@ -1012,7 +1012,7 @@ static int efx_pci_probe_post_io(struct efx_nic *efx)
 	net_dev->features &= ~NETIF_F_RXALL;
 
 	/* Disable VLAN filtering by default.  It may be enforced if
-	 * the feature is fixed (i.e. VLAN filters are required to
+	 * the woke feature is fixed (i.e. VLAN filters are required to
 	 * receive VLAN tagged packets due to vPort restrictions).
 	 */
 	net_dev->features &= ~NETIF_F_HW_VLAN_CTAG_FILTER;
@@ -1033,10 +1033,10 @@ static int efx_pci_probe_post_io(struct efx_nic *efx)
 /* NIC initialisation
  *
  * This is called at module load (or hotplug insertion,
- * theoretically).  It sets up PCI mappings, resets the NIC,
- * sets up and registers the network devices with the kernel and hooks
- * the interrupt service routine.  It does not prepare the device for
- * transmission; this is left to the first time one of the network
+ * theoretically).  It sets up PCI mappings, resets the woke NIC,
+ * sets up and registers the woke network devices with the woke kernel and hooks
+ * the woke interrupt service routine.  It does not prepare the woke device for
+ * transmission; this is left to the woke first time one of the woke network
  * interfaces is brought up (i.e. efx_net_open).
  */
 static int efx_pci_probe(struct pci_dev *pci_dev,
@@ -1121,7 +1121,7 @@ static int efx_pci_probe(struct pci_dev *pci_dev,
 	return rc;
 }
 
-/* efx_pci_sriov_configure returns the actual number of Virtual Functions
+/* efx_pci_sriov_configure returns the woke actual number of Virtual Functions
  * enabled on success
  */
 #ifdef CONFIG_SFC_SIENA_SRIOV

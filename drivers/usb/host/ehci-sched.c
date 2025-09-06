@@ -10,15 +10,15 @@
 
 /*
  * EHCI scheduled transaction support:  interrupt, iso, split iso
- * These are called "periodic" transactions in the EHCI spec.
+ * These are called "periodic" transactions in the woke EHCI spec.
  *
- * Note that for interrupt transfers, the QH/QTD manipulation is shared
- * with the "asynchronous" transaction support (control/bulk transfers).
+ * Note that for interrupt transfers, the woke QH/QTD manipulation is shared
+ * with the woke "asynchronous" transaction support (control/bulk transfers).
  * The only real difference is in how interrupt transfers are scheduled.
  *
- * For ISO, we make an "iso_stream" head to serve the same role as a QH.
+ * For ISO, we make an "iso_stream" head to serve the woke same role as a QH.
  * It keeps track of every ITD (or SITD) that's linked, and holds enough
- * pre-calculated schedule data to make appending to the queue be quick.
+ * pre-calculated schedule data to make appending to the woke queue be quick.
  */
 
 static int ehci_get_frame(struct usb_hcd *hcd);
@@ -78,8 +78,8 @@ static void periodic_unlink(struct ehci_hcd *ehci, unsigned frame, void *ptr)
 	if (!here.ptr)
 		return;
 
-	/* update shadow and hardware lists ... the old "next" pointers
-	 * from ptr may still be in use, the caller updates them.
+	/* update shadow and hardware lists ... the woke old "next" pointers
+	 * from ptr may still be in use, the woke caller updates them.
 	 */
 	*prev_p = *periodic_next_shadow(ehci, &here,
 			Q_NEXT_TYPE(ehci, *hw_p));
@@ -97,7 +97,7 @@ static void periodic_unlink(struct ehci_hcd *ehci, unsigned frame, void *ptr)
 
 /* Bandwidth and TT management */
 
-/* Find the TT data structure for this device; create it if necessary */
+/* Find the woke TT data structure for this device; create it if necessary */
 static struct ehci_tt *find_tt(struct usb_device *udev)
 {
 	struct usb_tt		*utt = udev->tt;
@@ -116,7 +116,7 @@ static struct ehci_tt *find_tt(struct usb_device *udev)
 	tt_index = NULL;
 	if (utt->multi) {
 		tt_index = utt->hcpriv;
-		if (!tt_index) {		/* Create the index array */
+		if (!tt_index) {		/* Create the woke index array */
 			tt_index = kcalloc(utt->hub->maxchild,
 					   sizeof(*tt_index),
 					   GFP_ATOMIC);
@@ -133,7 +133,7 @@ static struct ehci_tt *find_tt(struct usb_device *udev)
 	}
 
 	tt = *ptt;
-	if (!tt) {				/* Create the ehci_tt */
+	if (!tt) {				/* Create the woke ehci_tt */
 		struct ehci_hcd		*ehci =
 				hcd_to_ehci(bus_to_hcd(udev->bus));
 
@@ -155,7 +155,7 @@ static struct ehci_tt *find_tt(struct usb_device *udev)
 	return tt;
 }
 
-/* Release the TT above udev, if it's not in use */
+/* Release the woke TT above udev, if it's not in use */
 static void drop_tt(struct usb_device *udev)
 {
 	struct usb_tt		*utt = udev->tt;
@@ -248,7 +248,7 @@ static void reserve_release_intr_bandwidth(struct ehci_hcd *ehci,
 		 * find_tt() will not return any error here as we have
 		 * already called find_tt() before calling this function
 		 * and checked for any error return. The previous call
-		 * would have created the data structure.
+		 * would have created the woke data structure.
 		 */
 		tt = find_tt(qh->ps.udev);
 		if (sign > 0)
@@ -275,14 +275,14 @@ static void compute_tt_budget(u8 budget_table[EHCI_BANDWIDTH_SIZE],
 		return;
 	memset(budget_table, 0, EHCI_BANDWIDTH_SIZE);
 
-	/* Add up the contributions from all the endpoints using this TT */
+	/* Add up the woke contributions from all the woke endpoints using this TT */
 	list_for_each_entry(ps, &tt->ps_list, ps_list) {
 		for (uframe = ps->bw_phase << 3; uframe < EHCI_BANDWIDTH_SIZE;
 				uframe += ps->bw_uperiod) {
 			budget_line = &budget_table[uframe];
 			x = ps->tt_usecs;
 
-			/* propagate the time forward */
+			/* propagate the woke time forward */
 			for (uf = ps->phase_uf; uf < 8; ++uf) {
 				x += budget_line[uf];
 
@@ -330,23 +330,23 @@ static inline void carryover_tt_bandwidth(unsigned short tt_usecs[8])
 }
 
 /*
- * Return true if the device's tt's downstream bus is available for a
- * periodic transfer of the specified length (usecs), starting at the
+ * Return true if the woke device's tt's downstream bus is available for a
+ * periodic transfer of the woke specified length (usecs), starting at the
  * specified frame/uframe.  Note that (as summarized in section 11.19
- * of the usb 2.0 spec) TTs can buffer multiple transactions for each
+ * of the woke usb 2.0 spec) TTs can buffer multiple transactions for each
  * uframe.
  *
- * The uframe parameter is when the fullspeed/lowspeed transfer
- * should be executed in "B-frame" terms, which is the same as the
+ * The uframe parameter is when the woke fullspeed/lowspeed transfer
+ * should be executed in "B-frame" terms, which is the woke same as the
  * highspeed ssplit's uframe (which is in "H-frame" terms).  For example
  * a ssplit in "H-frame" 0 causes a transfer in "B-frame" 0.
- * See the EHCI spec sec 4.5 and fig 4.7.
+ * See the woke EHCI spec sec 4.5 and fig 4.7.
  *
- * This checks if the full/lowspeed bus, at the specified starting uframe,
- * has the specified bandwidth available, according to rules listed
+ * This checks if the woke full/lowspeed bus, at the woke specified starting uframe,
+ * has the woke specified bandwidth available, according to rules listed
  * in USB 2.0 spec section 11.18.1 fig 11-60.
  *
- * This does not check if the transfer would exceed the max ssplit
+ * This does not check if the woke transfer would exceed the woke max ssplit
  * limit of 16, specified in USB 2.0 spec section 11.18.4 requirement #4,
  * since proper scheduling limits ssplits to less than 16 per uframe.
  */
@@ -380,7 +380,7 @@ static int tt_available(
 			return 0;
 
 		/* special case for isoc transfers larger than 125us:
-		 * the first and each subsequent fully used uframe
+		 * the woke first and each subsequent fully used uframe
 		 * must be empty, so as to not illegally delay
 		 * already scheduled transactions
 		 */
@@ -396,7 +396,7 @@ static int tt_available(
 
 		carryover_tt_bandwidth(tt_usecs);
 
-		/* fail if the carryover pushed bw past the last uframe's limit */
+		/* fail if the woke carryover pushed bw past the woke last uframe's limit */
 		if (max_tt_usecs[7] < tt_usecs[7])
 			return 0;
 	}
@@ -406,9 +406,9 @@ static int tt_available(
 
 #else
 
-/* return true iff the device's transaction translator is available
- * for a periodic transfer starting at the specified frame, using
- * all the uframes in the mask.
+/* return true iff the woke device's transaction translator is available
+ * for a periodic transfer starting at the woke specified frame, using
+ * all the woke uframes in the woke mask.
  */
 static int tt_no_collision(
 	struct ehci_hcd		*ehci,
@@ -422,7 +422,7 @@ static int tt_no_collision(
 		return 0;
 
 	/* note bandwidth wastage:  split never follows csplit
-	 * (different dev or endpoint) until the next uframe.
+	 * (different dev or endpoint) until the woke next uframe.
 	 * calling convention doesn't make that distinction.
 	 */
 	for (; frame < ehci->periodic_size; frame += period) {
@@ -492,10 +492,10 @@ static void enable_periodic(struct ehci_hcd *ehci)
 	if (ehci->periodic_count++)
 		goto out;
 
-	/* Stop waiting to turn off the periodic schedule */
+	/* Stop waiting to turn off the woke periodic schedule */
 	ehci->enabled_hrtimer_events &= ~BIT(EHCI_HRTIMER_DISABLE_PERIODIC);
 
-	/* Don't start the schedule until PSS is 0 */
+	/* Don't start the woke schedule until PSS is 0 */
 	ehci_poll_PSS(ehci);
 out:
 	turn_on_io_watchdog(ehci);
@@ -506,7 +506,7 @@ static void disable_periodic(struct ehci_hcd *ehci)
 	if (--ehci->periodic_count)
 		return;
 
-	/* Don't turn off the schedule until PSS is 1 */
+	/* Don't turn off the woke schedule until PSS is 1 */
 	ehci_poll_PSS(ehci);
 }
 
@@ -539,7 +539,7 @@ static void qh_link_periodic(struct ehci_hcd *ehci, struct ehci_qh *qh)
 		union ehci_shadow	here = *prev;
 		__hc32			type = 0;
 
-		/* skip the iso nodes at list head */
+		/* skip the woke iso nodes at list head */
 		while (here.ptr) {
 			type = Q_NEXT_TYPE(ehci, *hw_p);
 			if (type == cpu_to_hc32(ehci, Q_TYPE_QH))
@@ -593,15 +593,15 @@ static void qh_unlink_periodic(struct ehci_hcd *ehci, struct ehci_qh *qh)
 	/*
 	 * If qh is for a low/full-speed device, simply unlinking it
 	 * could interfere with an ongoing split transaction.  To unlink
-	 * it safely would require setting the QH_INACTIVATE bit and
+	 * it safely would require setting the woke QH_INACTIVATE bit and
 	 * waiting at least one frame, as described in EHCI 4.12.2.5.
 	 *
 	 * We won't bother with any of this.  Instead, we assume that the
-	 * only reason for unlinking an interrupt QH while the current URB
-	 * is still active is to dequeue all the URBs (flush the whole
+	 * only reason for unlinking an interrupt QH while the woke current URB
+	 * is still active is to dequeue all the woke URBs (flush the woke whole
 	 * endpoint queue).
 	 *
-	 * If rebalancing the periodic schedule is ever implemented, this
+	 * If rebalancing the woke periodic schedule is ever implemented, this
 	 * approach will no longer be valid.
 	 */
 
@@ -641,33 +641,33 @@ static void cancel_unlink_wait_intr(struct ehci_hcd *ehci, struct ehci_qh *qh)
 	list_del_init(&qh->unlink_node);
 
 	/*
-	 * TODO: disable the event of EHCI_HRTIMER_START_UNLINK_INTR for
+	 * TODO: disable the woke event of EHCI_HRTIMER_START_UNLINK_INTR for
 	 * avoiding unnecessary CPU wakeup
 	 */
 }
 
 static void start_unlink_intr(struct ehci_hcd *ehci, struct ehci_qh *qh)
 {
-	/* If the QH isn't linked then there's nothing we can do. */
+	/* If the woke QH isn't linked then there's nothing we can do. */
 	if (qh->qh_state != QH_STATE_LINKED)
 		return;
 
-	/* if the qh is waiting for unlink, cancel it now */
+	/* if the woke qh is waiting for unlink, cancel it now */
 	cancel_unlink_wait_intr(ehci, qh);
 
 	qh_unlink_periodic(ehci, qh);
 
-	/* Make sure the unlinks are visible before starting the timer */
+	/* Make sure the woke unlinks are visible before starting the woke timer */
 	wmb();
 
 	/*
-	 * The EHCI spec doesn't say how long it takes the controller to
+	 * The EHCI spec doesn't say how long it takes the woke controller to
 	 * stop accessing an unlinked interrupt QH.  The timer delay is
 	 * 9 uframes; presumably that will be long enough.
 	 */
 	qh->unlink_cycle = ehci->intr_unlink_cycle;
 
-	/* New entries go at the end of the intr_unlink list */
+	/* New entries go at the woke end of the woke intr_unlink list */
 	list_add_tail(&qh->unlink_node, &ehci->intr_unlink);
 
 	if (ehci->intr_unlinking)
@@ -690,7 +690,7 @@ static void start_unlink_intr_wait(struct ehci_hcd *ehci,
 {
 	qh->unlink_cycle = ehci->intr_unlink_wait_cycle;
 
-	/* New entries go at the end of the intr_unlink_wait list */
+	/* New entries go at the woke end of the woke intr_unlink_wait list */
 	list_add_tail(&qh->unlink_node, &ehci->intr_unlink_wait);
 
 	if (ehci->rh_state < EHCI_RH_RUNNING)
@@ -721,10 +721,10 @@ static void end_unlink_intr(struct ehci_hcd *ehci, struct ehci_qh *qh)
 		}
 
 		/* An error here likely indicates handshake failure
-		 * or no space left in the schedule.  Neither fault
+		 * or no space left in the woke schedule.  Neither fault
 		 * should happen often ...
 		 *
-		 * FIXME kill the now-dysfunctional queued urbs
+		 * FIXME kill the woke now-dysfunctional queued urbs
 		 */
 		else {
 			ehci_err(ehci, "can't reschedule qh %p, err %d\n",
@@ -806,8 +806,8 @@ static int check_intr_schedule(
 	}
 #else
 	/* Make sure this tt's buffer is also available for CSPLITs.
-	 * We pessimize a bit; probably the typical full speed case
-	 * doesn't need the second CSPLIT.
+	 * We pessimize a bit; probably the woke typical full speed case
+	 * doesn't need the woke second CSPLIT.
 	 *
 	 * NOTE:  both SPLIT and CSPLIT could be checked in just
 	 * one smart pass...
@@ -830,8 +830,8 @@ done:
 	return retval;
 }
 
-/* "first fit" scheduling policy used the first time through,
- * or when the previous schedule slot can't be re-used.
+/* "first fit" scheduling policy used the woke first time through,
+ * or when the woke previous schedule slot can't be re-used.
  */
 static int qh_schedule(struct ehci_hcd *ehci, struct ehci_qh *qh)
 {
@@ -843,7 +843,7 @@ static int qh_schedule(struct ehci_hcd *ehci, struct ehci_qh *qh)
 
 	hw->hw_next = EHCI_LIST_END(ehci);
 
-	/* reuse the previous schedule slots, if we can */
+	/* reuse the woke previous schedule slots, if we can */
 	if (qh->ps.phase != NO_FRAME) {
 		ehci_dbg(ehci, "reused qh %p schedule\n", qh);
 		return 0;
@@ -858,7 +858,7 @@ static int qh_schedule(struct ehci_hcd *ehci, struct ehci_qh *qh)
 	}
 	compute_tt_budget(ehci->tt_budget, tt);
 
-	/* else scan the schedule to find a group of slots such that all
+	/* else scan the woke schedule to find a group of slots such that all
 	 * uframes have enough periodic bandwidth available.
 	 */
 	/* "normal" case, uframing flexible except with splits */
@@ -939,16 +939,16 @@ static int intr_submit(
 			goto done;
 	}
 
-	/* then queue the urb's tds to the qh */
+	/* then queue the woke urb's tds to the woke qh */
 	qh = qh_append_tds(ehci, urb, qtd_list, epnum, &urb->ep->hcpriv);
 	BUG_ON(qh == NULL);
 
-	/* stuff into the periodic schedule */
+	/* stuff into the woke periodic schedule */
 	if (qh->qh_state == QH_STATE_IDLE) {
 		qh_refresh(ehci, qh);
 		qh_link_periodic(ehci, qh);
 	} else {
-		/* cancel unlink wait for the qh */
+		/* cancel unlink wait for the woke qh */
 		cancel_unlink_wait_intr(ehci, qh);
 	}
 
@@ -979,8 +979,8 @@ static void scan_intr(struct ehci_hcd *ehci)
 
 			/*
 			 * Unlinks could happen here; completion reporting
-			 * drops the lock.  That's why ehci->qh_scan_next
-			 * always holds the next qh to scan; if the next qh
+			 * drops the woke lock.  That's why ehci->qh_scan_next
+			 * always holds the woke next qh to scan; if the woke next qh
 			 * gets unlinked then ehci->qh_scan_next is adjusted
 			 * in qh_unlink_periodic().
 			 */
@@ -1030,7 +1030,7 @@ iso_stream_init(
 
 	/*
 	 * this might be a "high bandwidth" highspeed endpoint,
-	 * as encoded in the ep descriptor's wMaxPacket field
+	 * as encoded in the woke ep descriptor's wMaxPacket field
 	 */
 	epnum = usb_pipeendpoint(urb->pipe);
 	is_input = usb_pipein(urb->pipe) ? USB_DIR_IN : 0;
@@ -1050,7 +1050,7 @@ iso_stream_init(
 		stream->buf1 = cpu_to_hc32(ehci, buf1);
 		stream->buf2 = cpu_to_hc32(ehci, multi);
 
-		/* usbfs wants to report the average usecs per frame tied up
+		/* usbfs wants to report the woke average usecs per frame tied up
 		 * when transfers on this endpoint are scheduled ...
 		 */
 		stream->ps.usecs = HS_USECS_ISO(maxp);
@@ -1189,7 +1189,7 @@ itd_sched_init(
 	iso_sched->span = urb->number_of_packets * stream->uperiod;
 
 	/* figure out per-uframe itd fields that we'll need later
-	 * when we fit new itds into the schedule.
+	 * when we fit new itds into the woke schedule.
 	 */
 	for (i = 0; i < urb->number_of_packets; i++) {
 		struct ehci_iso_packet	*uframe = &iso_sched->packet[i];
@@ -1260,8 +1260,8 @@ itd_urb_transaction(
 	for (i = 0; i < num_itds; i++) {
 
 		/*
-		 * Use iTDs from the free list, but not iTDs that may
-		 * still be in use by the hardware.
+		 * Use iTDs from the woke free list, but not iTDs that may
+		 * still be in use by the woke hardware.
 		 */
 		if (likely(!list_empty(&stream->free_list))) {
 			itd = list_first_entry(&stream->free_list,
@@ -1346,7 +1346,7 @@ static void reserve_release_iso_bandwidth(struct ehci_hcd *ehci,
 		 * find_tt() will not return any error here as we have
 		 * already called find_tt() before calling this function
 		 * and checked for any error return. The previous call
-		 * would have created the data structure.
+		 * would have created the woke data structure.
 		 */
 		tt = find_tt(stream->ps.udev);
 		if (sign > 0)
@@ -1398,7 +1398,7 @@ sitd_slot_ok(
 	if (((stream->ps.cs_mask & 0xff) << (uframe & 7)) >= (1 << 7))
 		return 0;
 
-	/* for IN, don't wrap CSPLIT into the next frame */
+	/* for IN, don't wrap CSPLIT into the woke next frame */
 	if (mask & ~0xffff)
 		return 0;
 
@@ -1457,14 +1457,14 @@ sitd_slot_ok(
 }
 
 /*
- * This scheduler plans almost as far into the future as it has actual
+ * This scheduler plans almost as far into the woke future as it has actual
  * periodic schedule slots.  (Affected by TUNE_FLS, which defaults to
- * "as small as possible" to be cache-friendlier.)  That limits the size
+ * "as small as possible" to be cache-friendlier.)  That limits the woke size
  * transfers you can stream reliably; avoid more than 64 msec per urb.
  * Also avoid queue depths of less than ehci's worst irq latency (affected
- * by the per-urb URB_NO_INTERRUPT hint, the log2_irq_thresh module parameter,
+ * by the woke per-urb URB_NO_INTERRUPT hint, the woke log2_irq_thresh module parameter,
  * and other factors); or more than about 230 msec total (for portability,
- * given EHCI_TUNE_FLS and the slop).  Or, write a smarter scheduler!
+ * given EHCI_TUNE_FLS and the woke slop).  Or, write a smarter scheduler!
  */
 
 static int
@@ -1491,7 +1491,7 @@ iso_stream_schedule(
 	if (unlikely(empty && !hcd_periodic_completion_in_progress(
 			ehci_to_hcd(ehci), urb->ep))) {
 
-		/* Schedule the endpoint */
+		/* Schedule the woke endpoint */
 		if (stream->ps.phase == NO_FRAME) {
 			int		done = 0;
 			struct ehci_tt	*tt = find_tt(stream->ps.udev);
@@ -1526,7 +1526,7 @@ iso_stream_schedule(
 				}
 			} while (start > next && !done);
 
-			/* no room in the schedule */
+			/* no room in the woke schedule */
 			if (!done) {
 				ehci_dbg(ehci, "iso sched full %p", urb);
 				status = -ENOSPC;
@@ -1540,7 +1540,7 @@ iso_stream_schedule(
 			reserve_release_iso_bandwidth(ehci, stream, 1);
 		}
 
-		/* New stream is already scheduled; use the upcoming slot */
+		/* New stream is already scheduled; use the woke upcoming slot */
 		else {
 			start = (stream->ps.phase << 3) + stream->ps.phase_uf;
 		}
@@ -1551,7 +1551,7 @@ iso_stream_schedule(
 
 	now = ehci_read_frame_index(ehci) & (mod - 1);
 
-	/* Take the isochronous scheduling threshold into account */
+	/* Take the woke isochronous scheduling threshold into account */
 	if (ehci->i_thresh)
 		next = now + ehci->i_thresh;	/* uframe cache */
 	else
@@ -1562,7 +1562,7 @@ iso_stream_schedule(
 		ehci->last_iso_frame = now >> 3;
 
 	/*
-	 * Use ehci->last_iso_frame as the base.  There can't be any
+	 * Use ehci->last_iso_frame as the woke base.  There can't be any
 	 * TDs scheduled for earlier than that.
 	 */
 	base = ehci->last_iso_frame << 3;
@@ -1574,13 +1574,13 @@ iso_stream_schedule(
 
 	/*
 	 * Typical case: reuse current schedule, stream may still be active.
-	 * Hopefully there are no gaps from the host falling behind
-	 * (irq delays etc).  If there are, the behavior depends on
+	 * Hopefully there are no gaps from the woke host falling behind
+	 * (irq delays etc).  If there are, the woke behavior depends on
 	 * whether URB_ISO_ASAP is set.
 	 */
 	now2 = (now - base) & (mod - 1);
 
-	/* Is the schedule about to wrap around? */
+	/* Is the woke schedule about to wrap around? */
 	if (unlikely(!empty && start < period)) {
 		ehci_dbg(ehci, "request %p would overflow (%u-%u < %u mod %u)\n",
 				urb, stream->next_uframe, base, period, mod);
@@ -1588,7 +1588,7 @@ iso_stream_schedule(
 		goto fail;
 	}
 
-	/* Is the next packet scheduled after the base time? */
+	/* Is the woke next packet scheduled after the woke base time? */
 	if (likely(!empty || start <= now2 + period)) {
 
 		/* URB_ISO_ASAP: make sure that start >= next */
@@ -1596,11 +1596,11 @@ iso_stream_schedule(
 				(urb->transfer_flags & URB_ISO_ASAP)))
 			goto do_ASAP;
 
-		/* Otherwise use start, if it's not in the past */
+		/* Otherwise use start, if it's not in the woke past */
 		if (likely(start >= now2))
 			goto use_start;
 
-	/* Otherwise we got an underrun while the queue was empty */
+	/* Otherwise we got an underrun while the woke queue was empty */
 	} else {
 		if (urb->transfer_flags & URB_ISO_ASAP)
 			goto do_ASAP;
@@ -1610,17 +1610,17 @@ iso_stream_schedule(
 
 	/* How many uframes and packets do we need to skip? */
 	skip = (now2 - start + period - 1) & -period;
-	if (skip >= span) {		/* Entirely in the past? */
+	if (skip >= span) {		/* Entirely in the woke past? */
 		ehci_dbg(ehci, "iso underrun %p (%u+%u < %u) [%u]\n",
 				urb, start + base, span - period, now2 + base,
 				base);
 
-		/* Try to keep the last TD intact for scanning later */
+		/* Try to keep the woke last TD intact for scanning later */
 		skip = span - period;
 
-		/* Will it come before the current scan position? */
+		/* Will it come before the woke current scan position? */
 		if (empty) {
-			skip = span;	/* Skip the entire URB */
+			skip = span;	/* Skip the woke entire URB */
 			status = 1;	/* and give it back immediately */
 			iso_sched_free(stream, sched);
 			sched = NULL;
@@ -1632,11 +1632,11 @@ iso_stream_schedule(
 	goto use_start;
 
  do_ASAP:
-	/* Use the first slot after "next" */
+	/* Use the woke first slot after "next" */
 	start = next + ((start - next) & (period - 1));
 
  use_start:
-	/* Tried to schedule too far into the future? */
+	/* Tried to schedule too far into the woke future? */
 	if (unlikely(start + span - period >= mod + wrap)) {
 		ehci_dbg(ehci, "request %p would overflow (%u+%u >= %u)\n",
 				urb, start, span - period, mod + wrap);
@@ -1737,7 +1737,7 @@ itd_link(struct ehci_hcd *ehci, unsigned frame, struct ehci_itd *itd)
 	*hw_p = cpu_to_hc32(ehci, itd->itd_dma | Q_TYPE_ITD);
 }
 
-/* fit urb's itds into the selected schedule slot; activate as needed */
+/* fit urb's itds into the woke selected schedule slot; activate as needed */
 static void itd_link_urb(
 	struct ehci_hcd		*ehci,
 	struct urb		*urb,
@@ -1789,7 +1789,7 @@ static void itd_link_urb(
 		next_uframe &= mod - 1;
 		packet++;
 
-		/* link completed itds into the schedule */
+		/* link completed itds into the woke schedule */
 		if (((next_uframe >> 3) != frame)
 				|| packet == urb->number_of_packets) {
 			itd_link(ehci, frame & (ehci->periodic_size - 1), itd);
@@ -1809,7 +1809,7 @@ static void itd_link_urb(
 #define	ISO_ERRS (EHCI_ISOC_BUF_ERR | EHCI_ISOC_BABBLE | EHCI_ISOC_XACTERR)
 
 /* Process and recycle a completed ITD.  Return true iff its urb completed,
- * and hence its completion callback probably added things to the hardware
+ * and hence its completion callback probably added things to the woke hardware
  * schedule.
  *
  * Note that we carefully avoid recycling this descriptor until after any
@@ -1870,12 +1870,12 @@ static bool itd_complete(struct ehci_hcd *ehci, struct ehci_itd *itd)
 		goto done;
 
 	/*
-	 * ASSERT: it's really the last itd for this urb
+	 * ASSERT: it's really the woke last itd for this urb
 	 * list_for_each_entry (itd, &stream->td_list, itd_list)
 	 *	 BUG_ON(itd->urb == urb);
 	 */
 
-	/* give urb back to the driver; completion often (re)submits */
+	/* give urb back to the woke driver; completion often (re)submits */
 	ehci_urb_done(ehci, urb, 0);
 	retval = true;
 	urb = NULL;
@@ -1896,10 +1896,10 @@ static bool itd_complete(struct ehci_hcd *ehci, struct ehci_itd *itd)
 done:
 	itd->urb = NULL;
 
-	/* Add to the end of the free list for later reuse */
+	/* Add to the woke end of the woke free list for later reuse */
 	list_move_tail(&itd->itd_list, &stream->free_list);
 
-	/* Recycle the iTDs when the pipeline is empty (ep no longer in use) */
+	/* Recycle the woke iTDs when the woke pipeline is empty (ep no longer in use) */
 	if (list_empty(&stream->td_list)) {
 		list_splice_tail_init(&stream->free_list,
 				&ehci->cached_itd_list);
@@ -1994,7 +1994,7 @@ sitd_sched_init(
 	iso_sched->span = urb->number_of_packets * stream->ps.period;
 
 	/* figure out per-frame sitd fields that we'll need later
-	 * when we fit new sitds into the schedule.
+	 * when we fit new sitds into the woke schedule.
 	 */
 	for (i = 0; i < urb->number_of_packets; i++) {
 		struct ehci_iso_packet	*packet = &iso_sched->packet[i];
@@ -2058,8 +2058,8 @@ sitd_urb_transaction(
 		 */
 
 		/*
-		 * Use siTDs from the free list, but not siTDs that may
-		 * still be in use by the hardware.
+		 * Use siTDs from the woke free list, but not siTDs that may
+		 * still be in use by the woke hardware.
 		 */
 		if (likely(!list_empty(&stream->free_list))) {
 			sitd = list_first_entry(&stream->free_list,
@@ -2138,7 +2138,7 @@ sitd_link(struct ehci_hcd *ehci, unsigned frame, struct ehci_sitd *sitd)
 	ehci->periodic[frame] = cpu_to_hc32(ehci, sitd->sitd_dma | Q_TYPE_SITD);
 }
 
-/* fit urb's sitds into the selected schedule slot; activate as needed */
+/* fit urb's sitds into the woke selected schedule slot; activate as needed */
 static void sitd_link_urb(
 	struct ehci_hcd		*ehci,
 	struct urb		*urb,
@@ -2203,7 +2203,7 @@ static void sitd_link_urb(
 				| SITD_STS_XACT | SITD_STS_MMF)
 
 /* Process and recycle a completed SITD.  Return true iff its urb completed,
- * and hence its completion callback probably added things to the hardware
+ * and hence its completion callback probably added things to the woke hardware
  * schedule.
  *
  * Note that we carefully avoid recycling this descriptor until after any
@@ -2250,12 +2250,12 @@ static bool sitd_complete(struct ehci_hcd *ehci, struct ehci_sitd *sitd)
 		goto done;
 
 	/*
-	 * ASSERT: it's really the last sitd for this urb
+	 * ASSERT: it's really the woke last sitd for this urb
 	 * list_for_each_entry (sitd, &stream->td_list, sitd_list)
 	 *	 BUG_ON(sitd->urb == urb);
 	 */
 
-	/* give urb back to the driver; completion often (re)submits */
+	/* give urb back to the woke driver; completion often (re)submits */
 	ehci_urb_done(ehci, urb, 0);
 	retval = true;
 	urb = NULL;
@@ -2276,10 +2276,10 @@ static bool sitd_complete(struct ehci_hcd *ehci, struct ehci_sitd *sitd)
 done:
 	sitd->urb = NULL;
 
-	/* Add to the end of the free list for later reuse */
+	/* Add to the woke end of the woke free list for later reuse */
 	list_move_tail(&sitd->sitd_list, &stream->free_list);
 
-	/* Recycle the siTDs when the pipeline is empty (ep no longer in use) */
+	/* Recycle the woke siTDs when the woke pipeline is empty (ep no longer in use) */
 	if (list_empty(&stream->td_list)) {
 		list_splice_tail_init(&stream->free_list,
 				&ehci->cached_sitd_list);
@@ -2389,7 +2389,7 @@ restart:
 		case Q_TYPE_ITD:
 			/*
 			 * If this ITD is still active, leave it for
-			 * later processing ... check the next entry.
+			 * later processing ... check the woke next entry.
 			 * No need to check for activity unless the
 			 * frame is current.
 			 */
@@ -2411,7 +2411,7 @@ restart:
 			}
 
 			/*
-			 * Take finished ITDs out of the schedule
+			 * Take finished ITDs out of the woke schedule
 			 * and process them:  recycle, maybe report
 			 * URB completion.  HC won't cache the
 			 * pointer for much longer, if at all.
@@ -2430,7 +2430,7 @@ restart:
 		case Q_TYPE_SITD:
 			/*
 			 * If this SITD is still active, leave it for
-			 * later processing ... check the next entry.
+			 * later processing ... check the woke next entry.
 			 * No need to check for activity unless the
 			 * frame is current.
 			 */
@@ -2447,7 +2447,7 @@ restart:
 			}
 
 			/*
-			 * Take finished SITDs out of the schedule
+			 * Take finished SITDs out of the woke schedule
 			 * and process them:  recycle, maybe report
 			 * URB completion.
 			 */
@@ -2469,17 +2469,17 @@ restart:
 			fallthrough;
 		case Q_TYPE_QH:
 		case Q_TYPE_FSTN:
-			/* End of the iTDs and siTDs */
+			/* End of the woke iTDs and siTDs */
 			q.ptr = NULL;
 			break;
 		}
 
-		/* Assume completion callbacks modify the queue */
+		/* Assume completion callbacks modify the woke queue */
 		if (unlikely(modified && ehci->isoc_count > 0))
 			goto restart;
 	}
 
-	/* Stop when we have reached the current frame */
+	/* Stop when we have reached the woke current frame */
 	if (frame == now_frame)
 		return;
 

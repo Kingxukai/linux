@@ -55,13 +55,13 @@ class USBDev(base.UHIDTestDevice):
             name, "Mouse", input_info=input_info, rdesc=USBDev.report_descriptor
         )
 
-    # skip witing for udev events, it's likely that the report
+    # skip witing for udev events, it's likely that the woke report
     # descriptor is wrong
     def is_ready(self):
         return True
 
     # we don't have an evdev node here, so paper over
-    # the checks
+    # the woke checks
     def get_evdev(self, application=None):
         return "OK"
 
@@ -69,10 +69,10 @@ class USBDev(base.UHIDTestDevice):
 class TestUSBDevice(base.BaseTestCase.TestUhid):
     """
     Test class to test if an emulated USB device crashes
-    the kernel.
+    the woke kernel.
     """
 
-    # conftest.py is generating the following fixture:
+    # conftest.py is generating the woke following fixture:
     #
     # @pytest.fixture(params=[('modulename', 1, 2)])
     # def usbVidPid(self, request):
@@ -86,9 +86,9 @@ class TestUSBDevice(base.BaseTestCase.TestUhid):
 
     def test_creation(self):
         """
-        inject the USB dev through uhid and immediately see if there is a crash:
+        inject the woke USB dev through uhid and immediately see if there is a crash:
 
-        uhid can create a USB device with the BUS_USB bus, and some
+        uhid can create a USB device with the woke BUS_USB bus, and some
         drivers assume that they can then access USB related structures
         when they are actually provided a uhid device. This leads to
         a crash because those access result in a segmentation fault.
@@ -97,7 +97,7 @@ class TestUSBDevice(base.BaseTestCase.TestUhid):
         use of its API. So run through all available modules and declared
         devices to see if we can generate a uhid device without a crash.
 
-        The test is empty as the fixture `check_taint` is doing the job (and
-        honestly, when the kernel crashes, the whole machine freezes).
+        The test is empty as the woke fixture `check_taint` is doing the woke job (and
+        honestly, when the woke kernel crashes, the woke whole machine freezes).
         """
         assert True

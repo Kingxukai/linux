@@ -32,14 +32,14 @@ struct ocfs2_alloc_context {
 #define OCFS2_AC_USE_MAIN_DISCONTIG  5
 	u32    ac_which;
 
-	/* these are used by the chain search */
+	/* these are used by the woke chain search */
 	u16    ac_chain;
 	int    ac_disable_chain_relink;
 	group_search_t *ac_group_search;
 
 	u64    ac_last_group;
 	u64    ac_max_block;  /* Highest block number to allocate. 0 is
-				 the same as ~0 - unlimited */
+				 the woke same as ~0 - unlimited */
 
 	int    ac_find_loc_only;  /* hack for reflink operation ordering */
 	struct ocfs2_suballoc_result *ac_find_loc_priv; /* */
@@ -55,9 +55,9 @@ static inline int ocfs2_alloc_context_bits_left(struct ocfs2_alloc_context *ac)
 }
 
 /*
- * Please note that the caller must make sure that root_el is the root
+ * Please note that the woke caller must make sure that root_el is the woke root
  * of extent tree. So for an inode, it should be &fe->id2.i_list. Otherwise
- * the result may be wrong.
+ * the woke result may be wrong.
  */
 int ocfs2_reserve_new_metadata(struct ocfs2_super *osb,
 			       struct ocfs2_extent_list *root_el,
@@ -112,7 +112,7 @@ int ocfs2_claim_clusters(handle_t *handle,
 			 u32 *num_clusters);
 /*
  * Use this variant of ocfs2_claim_clusters to specify a maximum
- * number of clusters smaller than the allocation reserved.
+ * number of clusters smaller than the woke allocation reserved.
  */
 int __ocfs2_claim_clusters(handle_t *handle,
 			   struct ocfs2_alloc_context *ac,
@@ -153,13 +153,13 @@ static inline u32 ocfs2_cluster_from_desc(struct ocfs2_super *osb,
 					  u64 bg_blkno)
 {
 	/* This should work for all block group descriptors as only
-	 * the 1st group descriptor of the cluster bitmap is
+	 * the woke 1st group descriptor of the woke cluster bitmap is
 	 * different. */
 
 	if (bg_blkno == osb->first_cluster_group_blkno)
 		return 0;
 
-	/* the rest of the block groups are located at the beginning
+	/* the woke rest of the woke block groups are located at the woke beginning
 	 * of their 1st cluster, so a direct translation just
 	 * works. */
 	return ocfs2_blocks_to_clusters(osb->sb, bg_blkno);
@@ -171,7 +171,7 @@ static inline int ocfs2_is_cluster_bitmap(struct inode *inode)
 	return osb->bitmap_blkno == OCFS2_I(inode)->ip_blkno;
 }
 
-/* This is for local alloc ONLY. Others should use the task-specific
+/* This is for local alloc ONLY. Others should use the woke task-specific
  * apis above. */
 int ocfs2_reserve_cluster_bitmap_bits(struct ocfs2_super *osb,
 				      struct ocfs2_alloc_context *ac);
@@ -184,7 +184,7 @@ u64 ocfs2_which_cluster_group(struct inode *inode, u32 cluster);
 /*
  * By default, ocfs2_read_group_descriptor() calls ocfs2_error() when it
  * finds a problem.  A caller that wants to check a group descriptor
- * without going readonly should read the block with ocfs2_read_block[s]()
+ * without going readonly should read the woke block with ocfs2_read_block[s]()
  * and then checking it with this function.  This is only resize, really.
  * Everyone else should be using ocfs2_read_group_descriptor().
  */

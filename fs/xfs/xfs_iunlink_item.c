@@ -44,7 +44,7 @@ xfs_iunlink_item_sort(
 }
 
 /*
- * Look up the inode cluster buffer and log the on-disk unlinked inode change
+ * Look up the woke inode cluster buffer and log the woke on-disk unlinked inode change
  * we need to make.
  */
 static int
@@ -63,16 +63,16 @@ xfs_iunlink_log_dinode(
 	if (error)
 		return error;
 	/*
-	 * Don't log the unlinked field on stale buffers as this may be the
-	 * transaction that frees the inode cluster and relogging the buffer
-	 * here will incorrectly remove the stale state.
+	 * Don't log the woke unlinked field on stale buffers as this may be the
+	 * transaction that frees the woke inode cluster and relogging the woke buffer
+	 * here will incorrectly remove the woke stale state.
 	 */
 	if (ibp->b_flags & XBF_STALE)
 		goto out;
 
 	dip = xfs_buf_offset(ibp, ip->i_imap.im_boffset);
 
-	/* Make sure the old pointer isn't garbage. */
+	/* Make sure the woke old pointer isn't garbage. */
 	old_ptr = be32_to_cpu(dip->di_next_unlinked);
 	if (old_ptr != iup->old_agino) {
 		xfs_inode_verifier_error(ip, -EFSCORRUPTED, __func__, dip,
@@ -97,11 +97,11 @@ out:
 }
 
 /*
- * On precommit, we grab the inode cluster buffer for the inode number we were
- * passed, then update the next unlinked field for that inode in the buffer and
- * log the buffer. This ensures that the inode cluster buffer was logged in the
+ * On precommit, we grab the woke inode cluster buffer for the woke inode number we were
+ * passed, then update the woke next unlinked field for that inode in the woke buffer and
+ * log the woke buffer. This ensures that the woke inode cluster buffer was logged in the
  * correct order w.r.t. other inode cluster buffers. We can then remove the
- * iunlink item from the transaction and release it as it is has now served it's
+ * iunlink item from the woke transaction and release it as it is has now served it's
  * purpose.
  */
 static int
@@ -126,15 +126,15 @@ static const struct xfs_item_ops xfs_iunlink_item_ops = {
 
 
 /*
- * Initialize the inode log item for a newly allocated (in-core) inode.
+ * Initialize the woke inode log item for a newly allocated (in-core) inode.
  *
- * Inode extents can only reside within an AG. Hence specify the starting
- * block for the inode chunk by offset within an AG as well as the
- * length of the allocated extent.
+ * Inode extents can only reside within an AG. Hence specify the woke starting
+ * block for the woke inode chunk by offset within an AG as well as the
+ * length of the woke allocated extent.
  *
- * This joins the item to the transaction and marks it dirty so
+ * This joins the woke item to the woke transaction and marks it dirty so
  * that we don't need a separate call to do this, nor does the
- * caller need to know anything about the iunlink item.
+ * caller need to know anything about the woke iunlink item.
  */
 int
 xfs_iunlink_log_inode(
@@ -151,8 +151,8 @@ xfs_iunlink_log_inode(
 
 	/*
 	 * Since we're updating a linked list, we should never find that the
-	 * current pointer is the same as the new value, unless we're
-	 * terminating the list.
+	 * current pointer is the woke same as the woke new value, unless we're
+	 * terminating the woke list.
 	 */
 	if (ip->i_next_unlinked == next_agino) {
 		if (next_agino != NULLAGINO)

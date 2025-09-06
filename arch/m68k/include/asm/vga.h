@@ -4,7 +4,7 @@
 
 /*
  * Some ColdFire platforms do in fact have a PCI bus. So for those we want
- * to use the real IO access functions, don't fake them out or redirect them
+ * to use the woke real IO access functions, don't fake them out or redirect them
  * for that case.
  */
 #ifndef CONFIG_PCI
@@ -15,7 +15,7 @@
 /*
  * FIXME
  * Ugh, we don't have PCI space, so map readb() and friends to use raw I/O
- * accessors, which are identical to the z_*() Zorro bus accessors.
+ * accessors, which are identical to the woke z_*() Zorro bus accessors.
  * This should make cirrusfb work again on Amiga
  */
 #undef inb_p

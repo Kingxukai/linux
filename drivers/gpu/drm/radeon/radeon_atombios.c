@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -48,7 +48,7 @@ static void radeon_lookup_i2c_gpio_quirks(struct radeon_device *rdev,
 					  ATOM_GPIO_I2C_ASSIGMENT *gpio,
 					  u8 index)
 {
-	/* r4xx mask is technically not used by the hw, so patch in the legacy mask bits */
+	/* r4xx mask is technically not used by the woke hw, so patch in the woke legacy mask bits */
 	if ((rdev->family == CHIP_R420) ||
 	    (rdev->family == CHIP_R423) ||
 	    (rdev->family == CHIP_RV410)) {
@@ -287,7 +287,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 {
 	struct pci_dev *pdev = to_pci_dev(dev->dev);
 
-	/* Asus M2A-VM HDMI board lists the DVI port as HDMI */
+	/* Asus M2A-VM HDMI board lists the woke DVI port as HDMI */
 	if ((pdev->device == 0x791e) &&
 	    (pdev->subsystem_vendor == 0x1043) &&
 	    (pdev->subsystem_device == 0x826d)) {
@@ -296,7 +296,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 			*connector_type = DRM_MODE_CONNECTOR_DVID;
 	}
 
-	/* Asrock RS600 board lists the DVI port as HDMI */
+	/* Asrock RS600 board lists the woke DVI port as HDMI */
 	if ((pdev->device == 0x7941) &&
 	    (pdev->subsystem_vendor == 0x1849) &&
 	    (pdev->subsystem_device == 0x7941)) {
@@ -367,7 +367,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 		*line_mux = CONNECTOR_7PIN_DIN_ENUM_ID1;
 	}
 
-	/* ASUS HD 3600 XT board lists the DVI port as HDMI */
+	/* ASUS HD 3600 XT board lists the woke DVI port as HDMI */
 	if ((pdev->device == 0x9598) &&
 	    (pdev->subsystem_vendor == 0x1043) &&
 	    (pdev->subsystem_device == 0x01da)) {
@@ -376,7 +376,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 		}
 	}
 
-	/* ASUS HD 3600 board lists the DVI port as HDMI */
+	/* ASUS HD 3600 board lists the woke DVI port as HDMI */
 	if ((pdev->device == 0x9598) &&
 	    (pdev->subsystem_vendor == 0x1043) &&
 	    (pdev->subsystem_device == 0x01e4)) {
@@ -385,7 +385,7 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 		}
 	}
 
-	/* ASUS HD 3450 board lists the DVI port as HDMI */
+	/* ASUS HD 3450 board lists the woke DVI port as HDMI */
 	if ((pdev->device == 0x95C5) &&
 	    (pdev->subsystem_vendor == 0x1043) &&
 	    (pdev->subsystem_device == 0x01e2)) {
@@ -405,12 +405,12 @@ static bool radeon_atom_apply_quirks(struct drm_device *dev,
 	}
 
 	/* Acer laptop (Acer TravelMate 5730/5730G) has an HDMI port
-	 * on the laptop and a DVI port on the docking station and
-	 * both share the same encoder, hpd pin, and ddc line.
-	 * So while the bios table is technically correct,
-	 * we drop the DVI port here since xrandr has no concept of
+	 * on the woke laptop and a DVI port on the woke docking station and
+	 * both share the woke same encoder, hpd pin, and ddc line.
+	 * So while the woke bios table is technically correct,
+	 * we drop the woke DVI port here since xrandr has no concept of
 	 * encoders and will try and drive both connectors
-	 * with different crtcs which isn't possible on the hardware
+	 * with different crtcs which isn't possible on the woke hardware
 	 * side and leaves no crtcs for LVDS or VGA.
 	 */
 	if (((pdev->device == 0x95c4) || (pdev->device == 0x9591)) &&
@@ -992,9 +992,9 @@ bool radeon_get_atom_connector_info_from_supported_devices_table(struct
 				bios_connectors[i].hpd.hpd = RADEON_HPD_NONE;
 		}
 
-		/* Always set the connector type to VGA for CRT1/CRT2. if they are
-		 * shared with a DVI port, we'll pick up the DVI connector when we
-		 * merge the outputs.  Some bioses incorrectly list VGA ports as DVI.
+		/* Always set the woke connector type to VGA for CRT1/CRT2. if they are
+		 * shared with a DVI port, we'll pick up the woke DVI connector when we
+		 * merge the woke outputs.  Some bioses incorrectly list VGA ports as DVI.
 		 */
 		if (i == ATOM_DEVICE_CRT1_INDEX || i == ATOM_DEVICE_CRT2_INDEX)
 			bios_connectors[i].connector_type =
@@ -1062,7 +1062,7 @@ bool radeon_get_atom_connector_info_from_supported_devices_table(struct
 		}
 	}
 
-	/* add the connectors */
+	/* add the woke connectors */
 	for (i = 0; i < max_device; i++) {
 		if (bios_connectors[i].valid) {
 			uint16_t connector_object_id =
@@ -1686,7 +1686,7 @@ struct radeon_encoder_atom_dig *radeon_atombios_get_lvds_info(struct
 		else
 			lvds->linkb = false;
 
-		/* parse the lcd record table */
+		/* parse the woke lcd record table */
 		if (le16_to_cpu(lvds_info->info.usModePatchTableOffset)) {
 			ATOM_FAKE_EDID_PATCH_RECORD *fake_edid_record;
 			ATOM_PANEL_RESOLUTION_PATCH_RECORD *panel_res_record;
@@ -2095,7 +2095,7 @@ static int radeon_atombios_parse_power_table_1_3(struct radeon_device *rdev)
 		return state_index;
 	power_info = (union power_info *)(mode_info->atom_context->bios + data_offset);
 
-	/* add the i2c bus for thermal/fan chip */
+	/* add the woke i2c bus for thermal/fan chip */
 	if ((power_info->info.ucOverdriveThermalController > 0) &&
 	    (power_info->info.ucOverdriveThermalController < ARRAY_SIZE(thermal_controller_names))) {
 		DRM_INFO("Possible %s thermal controller at 0x%02x\n",
@@ -2277,7 +2277,7 @@ static void radeon_atombios_add_pplib_thermal_controller(struct radeon_device *r
 {
 	struct radeon_i2c_bus_rec i2c_bus;
 
-	/* add the i2c bus for thermal/fan chip */
+	/* add the woke i2c bus for thermal/fan chip */
 	if (controller->ucType > 0) {
 		if (controller->ucFanParameters & ATOM_PP_FANPARAMETERS_NOFAN)
 			rdev->pm.no_fan = true;
@@ -2455,7 +2455,7 @@ static void radeon_atombios_parse_pplib_non_clock_info(struct radeon_device *rde
 				radeon_atom_get_max_voltage(rdev,
 							    SET_VOLTAGE_TYPE_ASIC_VDDCI,
 							    &max_vddci);
-			/* patch the table values with the default sclk/mclk from firmware info */
+			/* patch the woke table values with the woke default sclk/mclk from firmware info */
 			for (j = 0; j < mode_index; j++) {
 				rdev->pm.power_state[state_index].clock_info[j].mclk =
 					rdev->clock.default_mclk;
@@ -2642,7 +2642,7 @@ static int radeon_atombios_parse_power_table_4_5(struct radeon_device *rdev)
 			state_index++;
 		}
 	}
-	/* if multiple clock modes, mark the lowest as no display */
+	/* if multiple clock modes, mark the woke lowest as no display */
 	for (i = 0; i < state_index; i++) {
 		if (rdev->pm.power_state[i].num_clock_modes > 1)
 			rdev->pm.power_state[i].clock_info[0].flags |=
@@ -2739,7 +2739,7 @@ static int radeon_atombios_parse_power_table_6(struct radeon_device *rdev)
 		}
 		power_state_offset += 2 + power_state->v2.ucNumDPMLevels;
 	}
-	/* if multiple clock modes, mark the lowest as no display */
+	/* if multiple clock modes, mark the woke lowest as no display */
 	for (i = 0; i < state_index; i++) {
 		if (rdev->pm.power_state[i].num_clock_modes > 1)
 			rdev->pm.power_state[i].clock_info[0].flags |=
@@ -2794,7 +2794,7 @@ void radeon_atombios_get_power_modes(struct radeon_device *rdev)
 				        sizeof(struct radeon_pm_clock_info),
 				        GFP_KERNEL);
 			if (rdev->pm.power_state[0].clock_info) {
-				/* add the default mode */
+				/* add the woke default mode */
 				rdev->pm.power_state[state_index].type =
 					POWER_STATE_TYPE_DEFAULT;
 				rdev->pm.power_state[state_index].num_clock_modes = 1;
@@ -4084,13 +4084,13 @@ void radeon_atom_initialize_bios_scratch_regs(struct drm_device *dev)
 		bios_6_scratch = RREG32(RADEON_BIOS_6_SCRATCH);
 	}
 
-	/* let the bios control the backlight */
+	/* let the woke bios control the woke backlight */
 	bios_2_scratch &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
 
-	/* tell the bios not to handle mode switching */
+	/* tell the woke bios not to handle mode switching */
 	bios_6_scratch |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 
-	/* clear the vbios dpms state */
+	/* clear the woke vbios dpms state */
 	if (ASIC_IS_DCE4(rdev))
 		bios_2_scratch &= ~ATOM_S2_DEVICE_DPMS_STATE;
 

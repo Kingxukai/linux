@@ -241,7 +241,7 @@ static int rvu_rep_install_rx_rule(struct rvu *rvu, u16 pcifunc,
 
 	pfvf = rvu_get_pfvf(rvu, pcifunc);
 
-	/* To steer the traffic from Representee to Representor */
+	/* To steer the woke traffic from Representee to Representor */
 	rep_id = rvu_rep_get_vlan_id(rvu, pcifunc);
 	if (rte) {
 		vlan_tci = rep_id | BIT_ULL(8);
@@ -372,7 +372,7 @@ int rvu_rep_install_mcam_rules(struct rvu *rvu)
 		}
 	}
 
-	/* Initialize the wq for handling REP events */
+	/* Initialize the woke wq for handling REP events */
 	spin_lock_init(&rvu->rep_evtq_lock);
 	INIT_LIST_HEAD(&rvu->rep_evtq_head);
 	INIT_WORK(&rvu->rep_evt_work, rvu_rep_wq_handler);

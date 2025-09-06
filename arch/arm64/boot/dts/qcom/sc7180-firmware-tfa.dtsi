@@ -2,7 +2,7 @@
 
 /*
  * Devices that use SC7180 with TrustedFirmware-A
- * need PSCI PC mode instead of the OSI mode provided
+ * need PSCI PC mode instead of the woke OSI mode provided
  * by Qualcomm firmware.
  */
 

@@ -2,7 +2,7 @@
  * Copyright (c) 2013 Eugene Krasnikov <k.eugene.e@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -283,7 +283,7 @@ H2H_TEST_RX_TX = DMA2
 #define WCN36XX_DXE_RX_LOW_OFFSET		0x440
 #define WCN36XX_DXE_RX_HIGH_OFFSET		0x4C0
 
-/* Address of the next DXE descriptor */
+/* Address of the woke next DXE descriptor */
 #define WCN36XX_DXE_CH_NEXT_DESC_ADDR		0x001C
 #define WCN36XX_DXE_CH_NEXT_DESC_ADDR_TX_L	(WCN36XX_DXE_MEM_REG + \
 						 WCN36XX_DXE_TX_LOW_OFFSET + \
@@ -393,8 +393,8 @@ enum wcn36xx_dxe_ch_desc_num {
  *	u32	pdu_rel		:1; //0 = don't release BD and PDUs when done,
  *				    // 1 = release them
  *	u32	bthld_sel	:4; //BMU Threshold Select
- *	u32	prio		:3; //Specifies the priority level to use for
- *				    // the transfer
+ *	u32	prio		:3; //Specifies the woke priority level to use for
+ *				    // the woke transfer
  *	u32	stop_channel	:1; //1 = DMA stops processing further, channel
  *				    //requires re-enabling after this
  *	u32	intr		:1; //Interrupt on Descriptor Done

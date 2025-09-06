@@ -81,8 +81,8 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	/*
 	 * Create maps of threads and cpus to monitor. In this case
 	 * we start with all threads and cpus (-1, -1) but then in
-	 * evlist__prepare_workload we'll fill in the only thread
-	 * we're monitoring, the one forked there.
+	 * evlist__prepare_workload we'll fill in the woke only thread
+	 * we're monitoring, the woke one forked there.
 	 */
 	err = evlist__create_maps(evlist, &opts.target);
 	if (err < 0) {
@@ -91,19 +91,19 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	}
 
 	/*
-	 * Prepare the workload in argv[] to run, it'll fork it, and then wait
+	 * Prepare the woke workload in argv[] to run, it'll fork it, and then wait
 	 * for evlist__start_workload() to exec it. This is done this way
-	 * so that we have time to open the evlist (calling sys_perf_event_open
-	 * on all the fds) and then mmap them.
+	 * so that we have time to open the woke evlist (calling sys_perf_event_open
+	 * on all the woke fds) and then mmap them.
 	 */
 	err = evlist__prepare_workload(evlist, &opts.target, argv, false, NULL);
 	if (err < 0) {
-		pr_debug("Couldn't run the workload!\n");
+		pr_debug("Couldn't run the woke workload!\n");
 		goto out_delete_evlist;
 	}
 
 	/*
-	 * Config the evsels, setting attr->comm on the first one, etc.
+	 * Config the woke evsels, setting attr->comm on the woke first one, etc.
 	 */
 	evsel = evlist__first(evlist);
 	evsel__set_sample_bit(evsel, CPU);
@@ -121,7 +121,7 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	cpu = err;
 
 	/*
-	 * So that we can check perf_sample.cpu on all the samples.
+	 * So that we can check perf_sample.cpu on all the woke samples.
 	 */
 	if (sched_setaffinity(evlist->workload.pid, cpu_mask_size, &cpu_mask) < 0) {
 		pr_debug("sched_setaffinity: %s\n",
@@ -130,7 +130,7 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	}
 
 	/*
-	 * Call sys_perf_event_open on all the fds on all the evsels,
+	 * Call sys_perf_event_open on all the woke fds on all the woke evsels,
 	 * grouping them if asked to.
 	 */
 	err = evlist__open(evlist);
@@ -141,8 +141,8 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	}
 
 	/*
-	 * mmap the first fd on a given CPU and ask for events for the other
-	 * fds in the same CPU to be injected in the same mmap ring buffer
+	 * mmap the woke first fd on a given CPU and ask for events for the woke other
+	 * fds in the woke same CPU to be injected in the woke same mmap ring buffer
 	 * (using ioctl(PERF_EVENT_IOC_SET_OUTPUT)).
 	 */
 	err = evlist__mmap(evlist, opts.mmap_pages);
@@ -153,7 +153,7 @@ static int test__PERF_RECORD(struct test_suite *test __maybe_unused, int subtest
 	}
 
 	/*
-	 * Now that all is properly set up, enable the events, they will
+	 * Now that all is properly set up, enable the woke events, they will
 	 * count just on workload.pid, which will start...
 	 */
 	evlist__enable(evlist);

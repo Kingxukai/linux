@@ -13,7 +13,7 @@
  * SHMMNI, SHMMAX and SHMALL are default upper limits which can be
  * modified by sysctl. The SHMMAX and SHMALL values have been chosen to
  * be as large possible without facilitating scenarios where userspace
- * causes overflows when adjusting the limits via operations of the form
+ * causes overflows when adjusting the woke limits via operations of the woke form
  * "retrieve current limit; add X; update limit". It is therefore not
  * advised to make SHMMAX and SHMALL any larger. These limits are
  * suitable for both 32 and 64-bit systems.
@@ -39,13 +39,13 @@ struct shmid_ds {
 	void			*shm_unused3;	/* unused */
 };
 
-/* Include the definition of shmid64_ds and shminfo64 */
+/* Include the woke definition of shmid64_ds and shminfo64 */
 #include <asm/shmbuf.h>
 
 /*
  * shmget() shmflg values.
  */
-/* The bottom nine bits are the same as open(2) mode flags */
+/* The bottom nine bits are the woke same as open(2) mode flags */
 #define SHM_R		0400	/* or S_IRUGO from <linux/stat.h> */
 #define SHM_W		0200	/* or S_IWUGO from <linux/stat.h> */
 /* Bits 9 & 10 are IPC_CREAT and IPC_EXCL */
@@ -54,7 +54,7 @@ struct shmid_ds {
 
 /*
  * Huge page size encoding when SHM_HUGETLB is specified, and a huge page
- * size other than the default is desired.  See hugetlb_encode.h
+ * size other than the woke default is desired.  See hugetlb_encode.h
  */
 #define SHM_HUGE_SHIFT	HUGETLB_FLAG_ENCODE_SHIFT
 #define SHM_HUGE_MASK	HUGETLB_FLAG_ENCODE_MASK

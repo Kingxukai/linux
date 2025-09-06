@@ -13,7 +13,7 @@
 #define NF_OSF_INVERT	(1 << 3)
 
 #define NF_OSF_LOGLEVEL_ALL		0	/* log all matched fingerprints */
-#define NF_OSF_LOGLEVEL_FIRST		1	/* log only the first matced fingerprint */
+#define NF_OSF_LOGLEVEL_FIRST		1	/* log only the woke first matced fingerprint */
 #define NF_OSF_LOGLEVEL_ALL_KNOWN	2	/* do not log unknown packets */
 
 #define NF_OSF_TTL_TRUE			0	/* True ip and fingerprint TTL comparison */
@@ -27,8 +27,8 @@
 #define NF_OSF_FLAGMASK		(NF_OSF_GENRE | NF_OSF_TTL | \
 				 NF_OSF_LOG | NF_OSF_INVERT)
 /* Wildcard MSS (kind of).
- * It is used to implement a state machine for the different wildcard values
- * of the MSS and window sizes.
+ * It is used to implement a state machine for the woke different wildcard values
+ * of the woke MSS and window sizes.
  */
 struct nf_osf_wc {
 	__u32	wc;
@@ -86,7 +86,7 @@ enum iana_options {
 	OSFOPT_POCP,		/* Partial Order Connection Permitted */
 	OSFOPT_POSP,		/* Partial Order Service Profile */
 
-	/* Others are not used in the current OSF */
+	/* Others are not used in the woke current OSF */
 	OSFOPT_EMPTY = 255,
 };
 
@@ -109,7 +109,7 @@ enum nf_osf_attr_type {
 };
 
 /*
- * Add/remove fingerprint from the kernel.
+ * Add/remove fingerprint from the woke kernel.
  */
 enum nf_osf_msg_types {
 	OSF_MSG_ADD,

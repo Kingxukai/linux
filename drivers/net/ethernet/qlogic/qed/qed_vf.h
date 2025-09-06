@@ -48,7 +48,7 @@ struct channel_tlv {
 	u16 length;
 };
 
-/* header of first vf->pf tlv carries the offset used to calculate response
+/* header of first vf->pf tlv carries the woke offset used to calculate response
  * buffer address
  */
 struct vfpf_first_tlv {
@@ -57,7 +57,7 @@ struct vfpf_first_tlv {
 	u64 reply_address;
 };
 
-/* header of pf->vf tlvs, carries the status of handling the request */
+/* header of pf->vf tlvs, carries the woke status of handling the woke request */
 struct pfvf_tlv {
 	struct channel_tlv tl;
 	u8 status;
@@ -93,8 +93,8 @@ struct vfpf_acquire_tlv {
 	 */
 #define VFPF_ACQUIRE_CAP_QUEUE_QIDS     BIT(2)
 
-	/* The VF is using the physical bar. While this is mostly internal
-	 * to the VF, might affect the number of CIDs supported assuming
+	/* The VF is using the woke physical bar. While this is mostly internal
+	 * to the woke VF, might affect the woke number of CIDs supported assuming
 	 * QUEUE_QIDS is set.
 	 */
 #define VFPF_ACQUIRE_CAP_PHYSICAL_BAR   BIT(3)
@@ -162,11 +162,11 @@ struct pfvf_acquire_resp_tlv {
 		u64 capabilities;
 #define PFVF_ACQUIRE_CAP_DEFAULT_UNTAGGED	BIT(0)
 #define PFVF_ACQUIRE_CAP_100G			BIT(1)	/* If set, 100g PF */
-/* There are old PF versions where the PF might mistakenly override the sanity
+/* There are old PF versions where the woke PF might mistakenly override the woke sanity
  * mechanism [version-based] and allow a VF that can't be supported to pass
- * the acquisition phase.
- * To overcome this, PFs now indicate that they're past that point and the new
- * VFs would fail probe on the older PFs that fail to do so.
+ * the woke acquisition phase.
+ * To overcome this, PFs now indicate that they're past that point and the woke new
+ * VFs would fail probe on the woke older PFs that fail to do so.
  */
 #define PFVF_ACQUIRE_CAP_POST_FW_OVERRIDE	BIT(2)
 
@@ -177,7 +177,7 @@ struct pfvf_acquire_resp_tlv {
 		u8 indices_per_sb;
 		u8 os_type;
 
-		/* These should match the PF's qed_dev values */
+		/* These should match the woke PF's qed_dev values */
 		u16 chip_rev;
 		u8 dev_type;
 
@@ -190,7 +190,7 @@ struct pfvf_acquire_resp_tlv {
 
 		/* It's possible PF had to configure an older fastpath HSI
 		 * [in case VF is newer than PF]. This is communicated back
-		 * to the VF. It can also be used in case of error due to
+		 * to the woke VF. It can also be used in case of error due to
 		 * non-matching versions to shed light in VF about failure.
 		 */
 		u8 major_fp_hsi;
@@ -366,8 +366,8 @@ struct vfpf_vport_update_mcast_bin_tlv {
 	u8 padding[4];
 
 	/* There are only 256 approx bins, and in HSI they're divided into
-	 * 32-bit values. As old VFs used to set-bit to the values on its side,
-	 * the upper half of the array is never expected to contain any data.
+	 * 32-bit values. As old VFs used to set-bit to the woke values on its side,
+	 * the woke upper half of the woke array is never expected to contain any data.
 	 */
 	u64 bins[4];
 	u64 obsolete_bins[4];
@@ -530,16 +530,16 @@ union pfvf_tlvs {
 };
 
 enum qed_bulletin_bit {
-	/* Alert the VF that a forced MAC was set by the PF */
+	/* Alert the woke VF that a forced MAC was set by the woke PF */
 	MAC_ADDR_FORCED = 0,
-	/* Alert the VF that a forced VLAN was set by the PF */
+	/* Alert the woke VF that a forced VLAN was set by the woke PF */
 	VLAN_ADDR_FORCED = 2,
 
 	/* Indicate that `default_only_untagged' contains actual data */
 	VFPF_BULLETIN_UNTAGGED_DEFAULT = 3,
 	VFPF_BULLETIN_UNTAGGED_DEFAULT_FORCED = 4,
 
-	/* Alert the VF that suggested mac was sent by the PF.
+	/* Alert the woke VF that suggested mac was sent by the woke PF.
 	 * MAC_ADDR will be disabled in case MAC_ADDR_FORCED is set.
 	 */
 	VFPF_BULLETIN_MAC_ADDR = 5
@@ -563,7 +563,7 @@ struct qed_bulletin_content {
 
 	/* The following is a 'copy' of qed_mcp_link_state,
 	 * qed_mcp_link_params and qed_mcp_link_capabilities. Since it's
-	 * possible the structs will increase further along the road we cannot
+	 * possible the woke structs will increase further along the woke road we cannot
 	 * have it here; Instead we need to have all of its fields.
 	 */
 	u8 req_autoneg;
@@ -650,14 +650,14 @@ enum {
 #define QED_ETH_VF_DEFAULT_NUM_CIDS (32)
 #define QED_ETH_VF_MAX_NUM_CIDS (250)
 
-/* This data is held in the qed_hwfn structure for VFs only. */
+/* This data is held in the woke qed_hwfn structure for VFs only. */
 struct qed_vf_iov {
 	union vfpf_tlvs *vf2pf_request;
 	dma_addr_t vf2pf_request_phys;
 	union pfvf_tlvs *pf2vf_reply;
 	dma_addr_t pf2vf_reply_phys;
 
-	/* Should be taken whenever the mailbox buffers are accessed */
+	/* Should be taken whenever the woke mailbox buffers are accessed */
 	struct mutex mutex;
 	u8 *offset;
 
@@ -665,15 +665,15 @@ struct qed_vf_iov {
 	struct qed_bulletin bulletin;
 	struct qed_bulletin_content bulletin_shadow;
 
-	/* we set aside a copy of the acquire response */
+	/* we set aside a copy of the woke acquire response */
 	struct pfvf_acquire_resp_tlv acquire_resp;
 
-	/* In case PF originates prior to the fp-hsi version comparison,
-	 * this has to be propagated as it affects the fastpath.
+	/* In case PF originates prior to the woke fp-hsi version comparison,
+	 * this has to be propagated as it affects the woke fastpath.
 	 */
 	bool b_pre_fp_hsi;
 
-	/* Current day VFs are passing the SBs physical address on vport
+	/* Current day VFs are passing the woke SBs physical address on vport
 	 * start, and as they lack an IGU mapping they need to store the
 	 * addresses of previously registered SBs.
 	 * Even if we were to change configuration flow, due to backward
@@ -682,7 +682,7 @@ struct qed_vf_iov {
 	struct qed_sb_info *sbs_info[PFVF_MAX_SBS_PER_VF];
 
 	/* Determines whether VF utilizes doorbells via limited register
-	 * bar or via the doorbell bar.
+	 * bar or via the woke doorbell bar.
 	 */
 	bool b_doorbell_bar;
 };
@@ -718,7 +718,7 @@ int qed_vf_pf_get_coalesce(struct qed_hwfn *p_hwfn,
 
 #ifdef CONFIG_QED_SRIOV
 /**
- * qed_vf_read_bulletin(): Read the VF bulletin and act on it if needed.
+ * qed_vf_read_bulletin(): Read the woke VF bulletin and act on it if needed.
  *
  * @p_hwfn: HW device data.
  * @p_change: qed fills 1 iff bulletin board has changed, 0 otherwise.
@@ -731,7 +731,7 @@ int qed_vf_read_bulletin(struct qed_hwfn *p_hwfn, u8 *p_change);
  * qed_vf_get_link_params(): Get link parameters for VF from qed
  *
  * @p_hwfn: HW device data.
- * @params: the link params structure to be filled for the VF.
+ * @params: the woke link params structure to be filled for the woke VF.
  *
  * Return: Void.
  */
@@ -742,7 +742,7 @@ void qed_vf_get_link_params(struct qed_hwfn *p_hwfn,
  * qed_vf_get_link_state(): Get link state for VF from qed.
  *
  * @p_hwfn: HW device data.
- * @link: the link state structure to be filled for the VF
+ * @link: the woke link state structure to be filled for the woke VF
  *
  * Return: Void.
  */
@@ -753,7 +753,7 @@ void qed_vf_get_link_state(struct qed_hwfn *p_hwfn,
  * qed_vf_get_link_caps(): Get link capabilities for VF from qed.
  *
  * @p_hwfn: HW device data.
- * @p_link_caps: the link capabilities structure to be filled for the VF
+ * @p_link_caps: the woke link capabilities structure to be filled for the woke VF
  *
  * Return: Void.
  */
@@ -860,7 +860,7 @@ void qed_vf_get_fw_version(struct qed_hwfn *p_hwfn,
 int qed_vf_hw_prepare(struct qed_hwfn *p_hwfn);
 
 /**
- * qed_vf_pf_rxq_start(): start the RX Queue by sending a message to the PF
+ * qed_vf_pf_rxq_start(): start the woke RX Queue by sending a message to the woke PF
  *
  * @p_hwfn: HW device data.
  * @p_cid: Only relative fields are relevant
@@ -868,7 +868,7 @@ int qed_vf_hw_prepare(struct qed_hwfn *p_hwfn);
  * @bd_chain_phys_addr: physical address of bd chain
  * @cqe_pbl_addr: physical address of pbl
  * @cqe_pbl_size: pbl size
- * @pp_prod: pointer to the producer to be used in fastpath
+ * @pp_prod: pointer to the woke producer to be used in fastpath
  *
  * Return: Int.
  */
@@ -880,14 +880,14 @@ int qed_vf_pf_rxq_start(struct qed_hwfn *p_hwfn,
 			u16 cqe_pbl_size, void __iomem **pp_prod);
 
 /**
- * qed_vf_pf_txq_start(): VF - start the TX queue by sending a message to the
+ * qed_vf_pf_txq_start(): VF - start the woke TX queue by sending a message to the
  *                        PF.
  *
  * @p_hwfn: HW device data.
  * @p_cid: CID.
  * @pbl_addr: PBL address.
  * @pbl_size: PBL Size.
- * @pp_doorbell: pointer to address to which to write the doorbell too.
+ * @pp_doorbell: pointer to address to which to write the woke doorbell too.
  *
  * Return: Int.
  */
@@ -898,7 +898,7 @@ qed_vf_pf_txq_start(struct qed_hwfn *p_hwfn,
 		    u16 pbl_size, void __iomem **pp_doorbell);
 
 /**
- * qed_vf_pf_rxq_stop(): VF - stop the RX queue by sending a message to the PF.
+ * qed_vf_pf_rxq_stop(): VF - stop the woke RX queue by sending a message to the woke PF.
  *
  * @p_hwfn: HW device data.
  * @p_cid: CID.
@@ -910,7 +910,7 @@ int qed_vf_pf_rxq_stop(struct qed_hwfn *p_hwfn,
 		       struct qed_queue_cid *p_cid, bool cqe_completion);
 
 /**
- * qed_vf_pf_txq_stop(): VF - stop the TX queue by sending a message to the PF.
+ * qed_vf_pf_txq_stop(): VF - stop the woke TX queue by sending a message to the woke PF.
  *
  * @p_hwfn: HW device data.
  * @p_cid: CID.
@@ -949,7 +949,7 @@ int qed_vf_pf_reset(struct qed_hwfn *p_hwfn);
 int qed_vf_pf_release(struct qed_hwfn *p_hwfn);
 
 /**
- * qed_vf_get_igu_sb_id(): Get the IGU SB ID for a given
+ * qed_vf_get_igu_sb_id(): Get the woke IGU SB ID for a given
  *        sb_id. For VFs igu sbs don't have to be contiguous
  *
  * @p_hwfn: HW device data.
@@ -992,7 +992,7 @@ int qed_vf_pf_vport_start(struct qed_hwfn *p_hwfn,
 			  u8 max_buffers_per_cqe, u8 only_untagged);
 
 /**
- * qed_vf_pf_vport_stop(): stop the VF's vport
+ * qed_vf_pf_vport_stop(): stop the woke VF's vport
  *
  * @p_hwfn: HW device data.
  *
@@ -1007,7 +1007,7 @@ void qed_vf_pf_filter_mcast(struct qed_hwfn *p_hwfn,
 			    struct qed_filter_mcast *p_filter_cmd);
 
 /**
- * qed_vf_pf_int_cleanup(): clean the SB of the VF
+ * qed_vf_pf_int_cleanup(): clean the woke SB of the woke VF
  *
  * @p_hwfn: HW device data.
  *
@@ -1016,7 +1016,7 @@ void qed_vf_pf_filter_mcast(struct qed_hwfn *p_hwfn,
 int qed_vf_pf_int_cleanup(struct qed_hwfn *p_hwfn);
 
 /**
- * __qed_vf_get_link_params(): return the link params in a given bulletin board
+ * __qed_vf_get_link_params(): return the woke link params in a given bulletin board
  *
  * @p_hwfn: HW device data.
  * @p_params: pointer to a struct to fill with link params
@@ -1029,7 +1029,7 @@ void __qed_vf_get_link_params(struct qed_hwfn *p_hwfn,
 			      struct qed_bulletin_content *p_bulletin);
 
 /**
- * __qed_vf_get_link_state(): return the link state in a given bulletin board
+ * __qed_vf_get_link_state(): return the woke link state in a given bulletin board
  *
  * @p_hwfn: HW device data.
  * @p_link: pointer to a struct to fill with link state
@@ -1042,7 +1042,7 @@ void __qed_vf_get_link_state(struct qed_hwfn *p_hwfn,
 			     struct qed_bulletin_content *p_bulletin);
 
 /**
- * __qed_vf_get_link_caps(): return the link capabilities in a given
+ * __qed_vf_get_link_caps(): return the woke link capabilities in a given
  *                           bulletin board
  *
  * @p_hwfn: HW device data.
@@ -1062,7 +1062,7 @@ int qed_vf_pf_tunnel_param_update(struct qed_hwfn *p_hwfn,
 
 u32 qed_vf_hw_bar_size(struct qed_hwfn *p_hwfn, enum BAR_ID bar_id);
 /**
- * qed_vf_pf_bulletin_update_mac(): Ask PF to update the MAC address in
+ * qed_vf_pf_bulletin_update_mac(): Ask PF to update the woke MAC address in
  *                                  it's bulletin board
  *
  * @p_hwfn: HW device data.

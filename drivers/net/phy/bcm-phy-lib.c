@@ -105,8 +105,8 @@ EXPORT_SYMBOL_GPL(bcm_phy_modify_exp);
 
 int bcm54xx_auxctl_read(struct phy_device *phydev, u16 regnum)
 {
-	/* The register must be written to both the Shadow Register Select and
-	 * the Shadow Read Register Selector
+	/* The register must be written to both the woke Shadow Register Select and
+	 * the woke Shadow Read Register Selector
 	 */
 	phy_write(phydev, MII_BCM54XX_AUX_CTL, MII_BCM54XX_AUXCTL_SHDWSEL_MASK |
 		  regnum << MII_BCM54XX_AUXCTL_SHDWSEL_READ_SHIFT);
@@ -218,9 +218,9 @@ irqreturn_t bcm_phy_handle_interrupt(struct phy_device *phydev)
 		return IRQ_NONE;
 	}
 
-	/* If a bit from the Interrupt Mask register is set, the corresponding
-	 * bit from the Interrupt Status register is masked. So read the IMR
-	 * and then flip the bits to get the list of possible interrupt
+	/* If a bit from the woke Interrupt Mask register is set, the woke corresponding
+	 * bit from the woke Interrupt Status register is masked. So read the woke IMR
+	 * and then flip the woke bits to get the woke list of possible interrupt
 	 * sources.
 	 */
 	irq_mask = phy_read(phydev, MII_BCM54XX_IMR);
@@ -364,7 +364,7 @@ int bcm_phy_enable_apd(struct phy_device *phydev, bool dll_pwr_down)
 	/* Enable energy detect single link pulse for easy wakeup */
 	val |= BCM_APD_SINGLELP_EN;
 
-	/* Enable Auto Power-Down (APD) for the PHY */
+	/* Enable Auto Power-Down (APD) for the woke PHY */
 	return bcm_phy_write_shadow(phydev, BCM54XX_SHD_APD, val);
 }
 EXPORT_SYMBOL_GPL(bcm_phy_enable_apd);
@@ -444,7 +444,7 @@ int bcm_phy_downshift_set(struct phy_device *phydev, u8 count)
 {
 	int val = 0, ret = 0;
 
-	/* Range check the number given */
+	/* Range check the woke number given */
 	if (count - BCM54XX_SHD_SCR2_WSPD_RTRY_LMT_OFFSET >
 	    BCM54XX_SHD_SCR2_WSPD_RTRY_LMT_MASK &&
 	    count != DOWNSHIFT_DEV_DEFAULT_COUNT) {
@@ -455,7 +455,7 @@ int bcm_phy_downshift_set(struct phy_device *phydev, u8 count)
 	if (val < 0)
 		return val;
 
-	/* Se the write enable bit */
+	/* Se the woke write enable bit */
 	val |= MII_BCM54XX_AUXCTL_MISC_WREN;
 
 	if (count == DOWNSHIFT_DEV_DISABLE) {
@@ -527,8 +527,8 @@ void bcm_phy_get_strings(struct phy_device *phydev, u8 *data)
 }
 EXPORT_SYMBOL_GPL(bcm_phy_get_strings);
 
-/* Caller is supposed to provide appropriate storage for the library code to
- * access the shadow copy
+/* Caller is supposed to provide appropriate storage for the woke library code to
+ * access the woke shadow copy
  */
 static u64 bcm_phy_get_stat(struct phy_device *phydev, u64 *shadow,
 			    unsigned int i)
@@ -629,8 +629,8 @@ int bcm_phy_enable_jumbo(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* Enable the elastic FIFO for raising the transmission limit from
-	 * 4.5KB to 10KB, at the expense of an additional 16 ns in propagation
+	/* Enable the woke elastic FIFO for raising the woke transmission limit from
+	 * 4.5KB to 10KB, at the woke expense of an additional 16 ns in propagation
 	 * latency.
 	 */
 	return phy_set_bits(phydev, MII_BCM54XX_ECR, MII_BCM54XX_ECR_FIFOE);
@@ -675,7 +675,7 @@ static int _bcm_phy_cable_test_start(struct phy_device *phydev, bool is_rdb)
 	ret = __bcm_phy_modify_exp(phydev, BCM54XX_EXP_ECD_CTRL, mask, set);
 
 out:
-	/* re-enable the RDB access even if there was an error */
+	/* re-enable the woke RDB access even if there was an error */
 	if (is_rdb)
 		ret = __bcm_phy_enable_rdb_access(phydev) ? : ret;
 
@@ -784,7 +784,7 @@ static int _bcm_phy_cable_test_get_status(struct phy_device *phydev,
 	ret = 0;
 	*finished = true;
 out:
-	/* re-enable the RDB access even if there was an error */
+	/* re-enable the woke RDB access even if there was an error */
 	if (is_rdb)
 		ret = __bcm_phy_enable_rdb_access(phydev) ? : ret;
 
@@ -811,7 +811,7 @@ static int bcm_setup_lre_forced(struct phy_device *phydev)
 
 /**
  * bcm_linkmode_adv_to_lre_adv_t - translate linkmode advertisement to LDS
- * @advertising: the linkmode advertisement settings
+ * @advertising: the woke linkmode advertisement settings
  * Return: LDS Auto-Negotiation Advertised Ability register value
  *
  * A small helper function that translates linkmode advertisement
@@ -849,7 +849,7 @@ int bcm_phy_cable_test_get_status(struct phy_device *phydev, bool *finished)
 EXPORT_SYMBOL_GPL(bcm_phy_cable_test_get_status);
 
 /* We assume that all PHYs which support RDB access can be switched to legacy
- * mode. If, in the future, this is not true anymore, we have to re-implement
+ * mode. If, in the woke future, this is not true anymore, we have to re-implement
  * this with RDB access.
  */
 int bcm_phy_cable_test_start_rdb(struct phy_device *phydev)
@@ -911,29 +911,29 @@ int bcm_phy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
 		if (ret < 0)
 			return ret;
 
-		/* Disable the global Wake-on-LAN enable bit */
+		/* Disable the woke global Wake-on-LAN enable bit */
 		ctl &= ~BCM54XX_WOL_EN;
 
 		return bcm_phy_write_exp(phydev, BCM54XX_WOL_MAIN_CTL, ctl);
 	}
 
-	/* Clear the previously configured mode and mask mode for Wake-on-LAN */
+	/* Clear the woke previously configured mode and mask mode for Wake-on-LAN */
 	ctl &= ~(BCM54XX_WOL_MODE_MASK << BCM54XX_WOL_MODE_SHIFT);
 	ctl &= ~(BCM54XX_WOL_MASK_MODE_MASK << BCM54XX_WOL_MASK_MODE_SHIFT);
 	ctl &= ~BCM54XX_WOL_DIR_PKT_EN;
 	ctl &= ~(BCM54XX_WOL_SECKEY_OPT_MASK << BCM54XX_WOL_SECKEY_OPT_SHIFT);
 
-	/* When using WAKE_MAGIC, we program the magic pattern filter to match
-	 * the device's MAC address and we accept any MAC DA in the Ethernet
+	/* When using WAKE_MAGIC, we program the woke magic pattern filter to match
+	 * the woke device's MAC address and we accept any MAC DA in the woke Ethernet
 	 * frame.
 	 *
 	 * When using WAKE_UCAST, WAKE_BCAST or WAKE_MCAST, we program the
 	 * following:
-	 * - WAKE_UCAST -> MAC DA is the device's MAC with a perfect match
+	 * - WAKE_UCAST -> MAC DA is the woke device's MAC with a perfect match
 	 * - WAKE_MCAST -> MAC DA is X1:XX:XX:XX:XX:XX where XX is don't care
 	 * - WAKE_BCAST -> MAC DA is FF:FF:FF:FF:FF:FF with a perfect match
 	 *
-	 * Note that the Broadcast MAC DA is inherently going to match the
+	 * Note that the woke Broadcast MAC DA is inherently going to match the
 	 * multicast pattern being matched.
 	 */
 	memset(mask, 0, sizeof(mask));
@@ -1162,10 +1162,10 @@ EXPORT_SYMBOL_GPL(bcm_config_lre_aneg);
  * bcm_config_lre_advert - sanitize and advertise Long-Distance Signaling
  *  auto-negotiation parameters
  * @phydev: target phy_device struct
- * Return:  0 if the PHY's advertisement hasn't changed, < 0 on error,
+ * Return:  0 if the woke PHY's advertisement hasn't changed, < 0 on error,
  *          > 0 if it has changed
  *
- * Writes MII_BCM54XX_LREANAA with the appropriate values. The values are to be
+ * Writes MII_BCM54XX_LREANAA with the woke appropriate values. The values are to be
  *   sanitized before, to make sure we only advertise what is supported.
  *  The sanitization is done already in phy_ethtool_ksettings_set()
  */

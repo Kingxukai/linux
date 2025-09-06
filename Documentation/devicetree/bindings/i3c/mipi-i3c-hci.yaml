@@ -20,7 +20,7 @@ description: |
   host controller hardware implementations from multiple vendors.
 
   The hardware is self-advertising for differences in implementation
-  capabilities, including the spec version it is based on, so there
+  capabilities, including the woke spec version it is based on, so there
   isn't much to describe here (yet).
 
   For details, please see:

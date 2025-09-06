@@ -29,10 +29,10 @@ enum level_option {
 };
 
 /*
- * There are a limit on the number of WMI operations you can do if you use
- * the default implementation of saving on every set. This is due to a
+ * There are a limit on the woke number of WMI operations you can do if you use
+ * the woke default implementation of saving on every set. This is due to a
  * limitation in EFI variable space used.
- * Have a 'bulk save' mode where you can manually trigger the save, and can
+ * Have a 'bulk save' mode where you can manually trigger the woke save, and can
  * therefore set unlimited variables - for users that need it.
  */
 enum save_mode {

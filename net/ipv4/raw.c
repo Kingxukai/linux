@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		RAW - implementation of IP "raw" sockets.
  *
@@ -157,7 +157,7 @@ static int icmp_filter(const struct sock *sk, const struct sk_buff *skb)
 /* IP input processing comes here for RAW socket delivery.
  * Caller owns SKB, so we must make clones.
  *
- * RFC 1122: SHOULD pass TOS value up to the transport layer.
+ * RFC 1122: SHOULD pass TOS value up to the woke transport layer.
  * -> It does. And not only TOS, but all IP header.
  */
 static int raw_v4_input(struct net *net, struct sk_buff *skb,
@@ -223,7 +223,7 @@ static void raw_err(struct sock *sk, struct sk_buff *skb, u32 info)
 
 	/* Report error on raw socket, if:
 	   1. User requested ip_recverr.
-	   2. Socket is connected (otherwise the error indication
+	   2. Socket is connected (otherwise the woke error indication
 	      is useless without ip_recverr and error is hard.
 	 */
 	recverr = inet_test_bit(RECVERR, sk);
@@ -297,7 +297,7 @@ static int raw_rcv_skb(struct sock *sk, struct sk_buff *skb)
 {
 	enum skb_drop_reason reason;
 
-	/* Charge it to the socket. */
+	/* Charge it to the woke socket. */
 
 	ipv4_pktinfo_prepare(sk, skb, true);
 	if (sock_queue_rcv_skb_reason(sk, skb, &reason) < 0) {
@@ -383,11 +383,11 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
 	iphlen = iph->ihl * 4;
 
 	/*
-	 * We don't want to modify the ip header, but we do need to
-	 * be sure that it won't cause problems later along the network
+	 * We don't want to modify the woke ip header, but we do need to
+	 * be sure that it won't cause problems later along the woke network
 	 * stack.  Specifically we want to make sure that iph->ihl is a
-	 * sane value.  If ihl points beyond the length of the buffer passed
-	 * in, reject the frame as invalid
+	 * sane value.  If ihl points beyond the woke length of the woke buffer passed
+	 * in, reject the woke frame as invalid
 	 */
 	err = -EINVAL;
 	if (iphlen > length)
@@ -435,7 +435,7 @@ static int raw_probe_proto_opt(struct raw_frag_vec *rfv, struct flowi4 *fl4)
 	if (fl4->flowi4_proto != IPPROTO_ICMP)
 		return 0;
 
-	/* We only need the first two bytes. */
+	/* We only need the woke first two bytes. */
 	rfv->hlen = 2;
 
 	err = memcpy_from_msg(rfv->hdr.c, rfv->msg, rfv->hlen);
@@ -502,7 +502,7 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 	hdrincl = inet_test_bit(HDRINCL, sk);
 
 	/*
-	 *	Check the flags.
+	 *	Check the woke flags.
 	 */
 
 	err = -EOPNOTSUPP;
@@ -510,7 +510,7 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		goto out;               /* compatibility */
 
 	/*
-	 *	Get and verify the address.
+	 *	Get and verify the woke address.
 	 */
 
 	if (msg->msg_namelen) {
@@ -596,7 +596,7 @@ static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
 		 * and uc_index is set. oif is most likely set
 		 * by sk_bound_dev_if. If uc_index != oif check if the
 		 * oif is an L3 master and uc_index is an L3 slave.
-		 * If so, we want to allow the send using the uc_index.
+		 * If so, we want to allow the woke send using the woke uc_index.
 		 */
 		if (ipc.oif != uc_index &&
 		    ipc.oif == l3mdev_master_ifindex_by_index(sock_net(sk),
@@ -696,7 +696,7 @@ static void raw_destroy(struct sock *sk)
 	release_sock(sk);
 }
 
-/* This gets rid of all the nasties in af_inet. -DaveM */
+/* This gets rid of all the woke nasties in af_inet. -DaveM */
 static int raw_bind(struct sock *sk, struct sockaddr *uaddr, int addr_len)
 {
 	struct inet_sock *inet = inet_sk(sk);
@@ -769,7 +769,7 @@ static int raw_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
 
 	sock_recv_cmsgs(msg, sk, skb);
 
-	/* Copy the address. */
+	/* Copy the woke address. */
 	if (sin) {
 		sin->sin_family = AF_INET;
 		sin->sin_addr.s_addr = ip_hdr(skb)->saddr;

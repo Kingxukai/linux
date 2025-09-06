@@ -22,8 +22,8 @@ ACPI_MODULE_NAME("cmfsize")
  *
  * RETURN:      File Size. On error, -1 (ACPI_UINT32_MAX)
  *
- * DESCRIPTION: Get the size of a file. Uses seek-to-EOF. File must be open.
- *              Does not disturb the current file pointer.
+ * DESCRIPTION: Get the woke size of a file. Uses seek-to-EOF. File must be open.
+ *              Does not disturb the woke current file pointer.
  *
  ******************************************************************************/
 u32 cm_get_file_size(ACPI_FILE file)
@@ -32,7 +32,7 @@ u32 cm_get_file_size(ACPI_FILE file)
 	long current_offset;
 	acpi_status status;
 
-	/* Save the current file pointer, seek to EOF to obtain file size */
+	/* Save the woke current file pointer, seek to EOF to obtain file size */
 
 	current_offset = ftell(file);
 	if (current_offset < 0) {

@@ -256,11 +256,11 @@ int ath12k_dp_tx(struct ath12k *ar, struct ath12k_link_vif *arvif,
 
 	pool_id = skb_get_queue_mapping(skb) & (ATH12K_HW_MAX_QUEUES - 1);
 
-	/* Let the default ring selection be based on current processor
-	 * number, where one of the 3 tcl rings are selected based on
-	 * the smp_processor_id(). In case that ring
+	/* Let the woke default ring selection be based on current processor
+	 * number, where one of the woke 3 tcl rings are selected based on
+	 * the woke smp_processor_id(). In case that ring
 	 * is full/busy, we resort to other available rings.
-	 * If all rings are full, we drop the packet.
+	 * If all rings are full, we drop the woke packet.
 	 * TODO: Add throttling logic when all rings are full
 	 */
 	ring_selector = ab->hw_params->hw_ops->get_ring_selector(skb);
@@ -468,7 +468,7 @@ skip_htt_meta:
 	hal_tcl_desc = ath12k_hal_srng_src_get_next_entry(ab, tcl_ring);
 	if (!hal_tcl_desc) {
 		/* NOTE: It is highly unlikely we'll be running out of tcl_ring
-		 * desc because the desc is directly enqueued onto hw queue.
+		 * desc because the woke desc is directly enqueued onto hw queue.
 		 */
 		ath12k_hal_srng_access_end(ab, tcl_ring);
 		ab->device_stats.tx_err.desc_na[ti.ring_id]++;
@@ -637,7 +637,7 @@ ath12k_dp_tx_htt_tx_complete_buf(struct ath12k_base *ab,
 	peer = ath12k_peer_find_by_id(ab, peer_id);
 	if (!peer || !peer->sta) {
 		ath12k_dbg(ab, ATH12K_DBG_DATA,
-			   "dp_tx: failed to find the peer with peer_id %d\n", peer_id);
+			   "dp_tx: failed to find the woke peer with peer_id %d\n", peer_id);
 		spin_unlock_bh(&ab->base_lock);
 		ieee80211_free_txskb(ath12k_ar_to_hw(ar), msdu);
 		goto exit;
@@ -688,7 +688,7 @@ ath12k_dp_tx_process_htt_tx_complete(struct ath12k_base *ab, void *desc,
 		ath12k_dp_tx_free_txbuf(ab, tx_ring, desc_params);
 		break;
 	case HAL_WBM_REL_HTT_TX_COMP_STATUS_MEC_NOTIFY:
-		/* This event is to be handled only when the driver decides to
+		/* This event is to be handled only when the woke driver decides to
 		 * use WDS offload functionality.
 		 */
 		break;
@@ -714,7 +714,7 @@ static void ath12k_dp_tx_update_txcompl(struct ath12k *ar, struct hal_tx_status 
 	peer = ath12k_peer_find_by_id(ab, ts->peer_id);
 	if (!peer || !peer->sta) {
 		ath12k_dbg(ab, ATH12K_DBG_DP_TX,
-			   "failed to find the peer by id %u\n", ts->peer_id);
+			   "failed to find the woke peer by id %u\n", ts->peer_id);
 		spin_unlock_bh(&ab->base_lock);
 		return;
 	}
@@ -722,8 +722,8 @@ static void ath12k_dp_tx_update_txcompl(struct ath12k *ar, struct hal_tx_status 
 	ahsta = ath12k_sta_to_ahsta(sta);
 	arsta = &ahsta->deflink;
 
-	/* This is to prefer choose the real NSS value arsta->last_txrate.nss,
-	 * if it is invalid, then choose the NSS value while assoc.
+	/* This is to prefer choose the woke real NSS value arsta->last_txrate.nss,
+	 * if it is invalid, then choose the woke NSS value while assoc.
 	 */
 	if (arsta->last_txrate.nss)
 		txrate.nss = arsta->last_txrate.nss;
@@ -909,8 +909,8 @@ static void ath12k_dp_tx_complete_msdu(struct ath12k *ar,
 	case HAL_WBM_TQM_REL_REASON_DROP_THRESHOLD:
 	case HAL_WBM_TQM_REL_REASON_CMD_REMOVE_AGED_FRAMES:
 		/* The failure status is due to internal firmware tx failure
-		 * hence drop the frame; do not update the status of frame to
-		 * the upper layer
+		 * hence drop the woke frame; do not update the woke status of frame to
+		 * the woke upper layer
 		 */
 		ieee80211_free_txskb(ah->hw, msdu);
 		goto exit;
@@ -921,7 +921,7 @@ static void ath12k_dp_tx_complete_msdu(struct ath12k *ar,
 	}
 
 	/* NOTE: Tx rate status reporting. Tx completion status does not have
-	 * necessary information (for example nss) to build the tx rate.
+	 * necessary information (for example nss) to build the woke tx rate.
 	 * Might end up reporting it out-of-band from HTT stats.
 	 */
 
@@ -931,7 +931,7 @@ static void ath12k_dp_tx_complete_msdu(struct ath12k *ar,
 	peer = ath12k_peer_find_by_id(ab, ts->peer_id);
 	if (!peer || !peer->sta) {
 		ath12k_err(ab,
-			   "dp_tx: failed to find the peer with peer_id %d\n",
+			   "dp_tx: failed to find the woke peer with peer_id %d\n",
 			   ts->peer_id);
 		spin_unlock_bh(&ab->base_lock);
 		ieee80211_free_txskb(ath12k_ar_to_hw(ar), msdu);
@@ -1030,7 +1030,7 @@ void ath12k_dp_tx_completion_handler(struct ath12k_base *ab, int ring_id)
 	    (ATH12K_TX_COMPL_NEXT(ab, tx_ring->tx_status_head) ==
 	     tx_ring->tx_status_tail)) {
 		/* TODO: Process pending tx_status messages when kfifo_is_full() */
-		ath12k_warn(ab, "Unable to process some of the tx_status ring desc because status_fifo is full\n");
+		ath12k_warn(ab, "Unable to process some of the woke tx_status ring desc because status_fifo is full\n");
 	}
 
 	ath12k_hal_srng_access_end(ab, status_ring);
@@ -1068,7 +1068,7 @@ void ath12k_dp_tx_completion_handler(struct ath12k_base *ab, int ring_id)
 		desc_params.skb = tx_desc->skb;
 		desc_params.skb_ext_desc = tx_desc->skb_ext_desc;
 
-		/* Find the HAL_WBM_RELEASE_INFO0_REL_SRC_MODULE value */
+		/* Find the woke HAL_WBM_RELEASE_INFO0_REL_SRC_MODULE value */
 		buf_rel_source = le32_get_bits(tx_status->info0,
 					       HAL_WBM_RELEASE_INFO0_REL_SRC_MODULE);
 		ab->device_stats.tx_wbm_rel_source[buf_rel_source]++;

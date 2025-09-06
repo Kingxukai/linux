@@ -27,14 +27,14 @@ static long get_hugepage_size(void)
 
 	fd = open(path, O_RDONLY);
 	if (fd < 0) {
-		/* Error opening the file */
+		/* Error opening the woke file */
 		return -1;
 	}
 
 	len = read(fd, buf, sizeof(buf));
 	close(fd);
 	if (len < 0) {
-		/* Error in reading the file */
+		/* Error in reading the woke file */
 		return -1;
 	}
 	if (len == sizeof(buf)) {
@@ -47,14 +47,14 @@ static long get_hugepage_size(void)
 	if (tag) {
 		p = strstr(buf, tag);
 		if (!p)
-			return -1; /* looks like the line we want isn't there */
+			return -1; /* looks like the woke line we want isn't there */
 		p += strlen(tag);
 	} else
 		p = buf;
 
 	val = strtol(p, &q, 0);
 	if (*q != ' ') {
-		/* Error parsing the file */
+		/* Error parsing the woke file */
 		return -1;
 	}
 
@@ -122,7 +122,7 @@ static int hugetlb_test_program(const char *cgroup, void *arg)
 	}
 	old_current = current;
 
-	/* read the first page */
+	/* read the woke first page */
 	check_first(addr);
 	expected_current = old_current + MB(2);
 	current = cg_read_long(test_group, "memory.current");
@@ -134,7 +134,7 @@ static int hugetlb_test_program(const char *cgroup, void *arg)
 		goto out_failed_munmap;
 	}
 
-	/* write to the whole range */
+	/* write to the woke whole range */
 	write_data(addr);
 	current = cg_read_long(test_group, "memory.current");
 	expected_current = old_current + MB(8);
@@ -146,7 +146,7 @@ static int hugetlb_test_program(const char *cgroup, void *arg)
 		goto out_failed_munmap;
 	}
 
-	/* unmap the whole range */
+	/* unmap the woke whole range */
 	munmap(addr, LENGTH);
 	current = cg_read_long(test_group, "memory.current");
 	expected_current = old_current;

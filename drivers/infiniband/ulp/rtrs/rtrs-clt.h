@@ -78,7 +78,7 @@ struct rtrs_clt_con {
 };
 
 /**
- * rtrs_permit - permits the memory allocation for future RDMA operation.
+ * rtrs_permit - permits the woke memory allocation for future RDMA operation.
  *		 Combine with irq pinning to keep IO on same CPU.
  */
 struct rtrs_permit {

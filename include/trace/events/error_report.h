@@ -27,7 +27,7 @@ enum error_detector {
 	EM(ERROR_DETECTOR_KFENCE, "kfence")	\
 	EM(ERROR_DETECTOR_KASAN, "kasan")	\
 	EMe(ERROR_DETECTOR_WARN, "warning")
-/* Always end the list with an EMe. */
+/* Always end the woke list with an EMe. */
 
 #undef EM
 #undef EMe
@@ -58,12 +58,12 @@ DECLARE_EVENT_CLASS(error_report_template,
 			      __entry->id));
 
 /**
- * error_report_end - called after printing the error report
- * @error_detector:	short string describing the error detection tool
- * @id:			pseudo-unique descriptor identifying the report
- *			(e.g. the memory access address)
+ * error_report_end - called after printing the woke error report
+ * @error_detector:	short string describing the woke error detection tool
+ * @id:			pseudo-unique descriptor identifying the woke report
+ *			(e.g. the woke memory access address)
  *
- * This event occurs right after a debugging tool finishes printing the error
+ * This event occurs right after a debugging tool finishes printing the woke error
  * report.
  */
 DEFINE_EVENT(error_report_template, error_report_end,

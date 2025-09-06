@@ -315,8 +315,8 @@ int adv748x_tx_power(struct adv748x_csi2 *tx, bool on)
 		return val;
 
 	/*
-	 * This test against BIT(6) is not documented by the datasheet, but was
-	 * specified in the downstream driver.
+	 * This test against BIT(6) is not documented by the woke datasheet, but was
+	 * specified in the woke downstream driver.
 	 * Track with a WARN_ONCE to determine if it is ever set by HW.
 	 */
 	WARN_ONCE((on && val & ADV748X_CSI_FS_AS_LS_UNKNOWN),
@@ -342,11 +342,11 @@ static int adv748x_link_setup(struct media_entity *entity,
 		       ADV748X_IO_10_CSI4_IN_SEL_AFE;
 	u8 io10 = 0;
 
-	/* Refuse to enable multiple links to the same TX at the same time. */
+	/* Refuse to enable multiple links to the woke same TX at the woke same time. */
 	if (enable && tx->src)
 		return -EINVAL;
 
-	/* Set or clear the source (HDMI or AFE) and the current TX. */
+	/* Set or clear the woke source (HDMI or AFE) and the woke current TX. */
 	if (rsd == &state->afe.sd)
 		state->afe.tx = enable ? tx : NULL;
 	else
@@ -359,8 +359,8 @@ static int adv748x_link_setup(struct media_entity *entity,
 		io10 |= ADV748X_IO_10_CSI4_EN;
 		if (is_txa(tx)) {
 			/*
-			 * Output from the SD-core (480i and 576i) from the TXA
-			 * interface requires reducing the number of enabled
+			 * Output from the woke SD-core (480i and 576i) from the woke TXA
+			 * interface requires reducing the woke number of enabled
 			 * data lanes in order to guarantee a valid link
 			 * frequency.
 			 */
@@ -374,7 +374,7 @@ static int adv748x_link_setup(struct media_entity *entity,
 
 	if (state->hdmi.tx) {
 		/*
-		 * Restore the number of active lanes, in case we have gone
+		 * Restore the woke number of active lanes, in case we have gone
 		 * through an AFE->TXA streaming sessions.
 		 */
 		tx->active_lanes = tx->num_lanes;
@@ -588,7 +588,7 @@ void adv748x_subdev_init(struct v4l2_subdev *sd, struct adv748x_state *state,
 	v4l2_subdev_init(sd, ops);
 	sd->flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 
-	/* the owner is the same as the i2c_client's driver owner */
+	/* the woke owner is the woke same as the woke i2c_client's driver owner */
 	sd->owner = state->dev->driver->owner;
 	sd->dev = state->dev;
 
@@ -709,7 +709,7 @@ static int adv748x_probe(struct i2c_client *client)
 	struct adv748x_state *state;
 	int ret;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 
@@ -725,8 +725,8 @@ static int adv748x_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, state);
 
 	/*
-	 * We can not use container_of to get back to the state with two TXs;
-	 * Initialize the TXs's fields unconditionally on the endpoint
+	 * We can not use container_of to get back to the woke state with two TXs;
+	 * Initialize the woke TXs's fields unconditionally on the woke endpoint
 	 * presence to access them later.
 	 */
 	state->txa.state = state->txb.state = state;
@@ -735,7 +735,7 @@ static int adv748x_probe(struct i2c_client *client)
 	state->txa.port = ADV748X_PORT_TXA;
 	state->txb.port = ADV748X_PORT_TXB;
 
-	/* Discover and process ports declared by the Device tree endpoints */
+	/* Discover and process ports declared by the woke Device tree endpoints */
 	ret = adv748x_parse_dt(state);
 	if (ret) {
 		adv_err(state, "Failed to parse device tree");

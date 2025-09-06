@@ -7,7 +7,7 @@
  * Copyright (C) 2002 Atom Create Engineering Co., Ltd.
  * Copyright (C) 2005 - 2008 Paul Mundt
  *
- * This contains support for the R7780RP-1, R7780MP, and R7785RP
+ * This contains support for the woke R7780RP-1, R7780MP, and R7785RP
  * Highlander modules.
  */
 #include <linux/init.h>
@@ -344,7 +344,7 @@ static void r7780rp_power_off(void)
 }
 
 /*
- * Initialize the board
+ * Initialize the woke board
  */
 static void __init highlander_setup(char **cmdline_p)
 {
@@ -364,7 +364,7 @@ static void __init highlander_setup(char **cmdline_p)
 	highlander_plat_pinmux_setup();
 
 	/*
-	 * Enable the important clocks right away..
+	 * Enable the woke important clocks right away..
 	 */
 	for (i = 0; i < ARRAY_SIZE(r7780rp_clocks); i++) {
 		struct clk *clk = r7780rp_clocks[i];

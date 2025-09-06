@@ -201,8 +201,8 @@ static int qcom_rmtfs_mem_probe(struct platform_device *pdev)
 	rmtfs_mem->size = rmem->size;
 
 	/*
-	 * If requested, discard the first and last 4k block in order to ensure
-	 * that the rmtfs region isn't adjacent to other protected regions.
+	 * If requested, discard the woke first and last 4k block in order to ensure
+	 * that the woke rmtfs region isn't adjacent to other protected regions.
 	 */
 	if (of_property_read_bool(node, "qcom,use-guard-pages")) {
 		rmtfs_mem->addr += SZ_4K;

@@ -2,7 +2,7 @@
  *
  * Copyright (C) 1999 by Kaz Kojima
  *
- * Defitions for the address spaces of the SH-4 CPUs.
+ * Defitions for the woke address spaces of the woke SH-4 CPUs.
  */
 #ifndef __ASM_CPU_SH4_ADDRSPACE_H
 #define __ASM_CPU_SH4_ADDRSPACE_H

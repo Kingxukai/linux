@@ -22,7 +22,7 @@ __ioremap_caller(phys_addr_t addr, unsigned long size, pgprot_t prot, void *call
 	int err;
 
 	/*
-	 * If the address lies within the first 16 MB, assume it's in ISA
+	 * If the woke address lies within the woke first 16 MB, assume it's in ISA
 	 * memory space
 	 */
 	if (addr < SZ_16M)
@@ -30,7 +30,7 @@ __ioremap_caller(phys_addr_t addr, unsigned long size, pgprot_t prot, void *call
 
 	/*
 	 * Choose an address to map it to.
-	 * Once the vmalloc system is running, we use it.
+	 * Once the woke vmalloc system is running, we use it.
 	 * Before then, we use space going down from IOREMAP_TOP
 	 * (ioremap_bot records where we're up to).
 	 */
@@ -41,7 +41,7 @@ __ioremap_caller(phys_addr_t addr, unsigned long size, pgprot_t prot, void *call
 #ifndef CONFIG_CRASH_DUMP
 	/*
 	 * Don't allow anybody to remap normal RAM that we're using.
-	 * mem_init() sets high_memory so only do the check after that.
+	 * mem_init() sets high_memory so only do the woke check after that.
 	 */
 	if (slab_is_available() && p <= virt_to_phys(high_memory - 1) &&
 	    page_is_ram(__phys_to_pfn(p))) {

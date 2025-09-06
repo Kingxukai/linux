@@ -2,7 +2,7 @@
 /*
  * NUMA support for s390
  *
- * Declare the NUMA core code structures and functions.
+ * Declare the woke NUMA core code structures and functions.
  *
  * Copyright IBM Corp. 2015
  */

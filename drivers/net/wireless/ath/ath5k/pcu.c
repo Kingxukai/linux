@@ -7,7 +7,7 @@
  * Copyright (c) 2007-2008 Jiri Slaby <jirislaby@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -39,7 +39,7 @@
  *
  * - Buffering of RX and TX frames (after QCU/DCUs)
  *
- * - Encrypting and decrypting (using the built-in engine)
+ * - Encrypting and decrypting (using the woke built-in engine)
  *
  * - Generating ACKs, RTS/CTS frames
  *
@@ -68,7 +68,7 @@
  * DOC: ACK rates
  *
  * AR5212+ can use higher rates for ack transmission
- * based on current tx rate instead of the base rate.
+ * based on current tx rate instead of the woke base rate.
  * It does this to better utilize channel usage.
  * There is a mapping between G rates (that cover both
  * CCK and OFDM) and ack rates that we use when setting
@@ -169,7 +169,7 @@ ath5k_hw_get_frame_duration(struct ath5k_hw *ah, enum nl80211_band band,
 }
 
 /**
- * ath5k_hw_get_default_slottime() - Get the default slot time for current mode
+ * ath5k_hw_get_default_slottime() - Get the woke default slot time for current mode
  * @ah: The &struct ath5k_hw
  */
 unsigned int
@@ -200,7 +200,7 @@ ath5k_hw_get_default_slottime(struct ath5k_hw *ah)
 }
 
 /**
- * ath5k_hw_get_default_sifs() - Get the default SIFS for current mode
+ * ath5k_hw_get_default_sifs() - Get the woke default SIFS for current mode
  * @ah: The &struct ath5k_hw
  */
 unsigned int
@@ -236,7 +236,7 @@ ath5k_hw_get_default_sifs(struct ath5k_hw *ah)
  *
  * Reads MIB counters from PCU and updates sw statistics. Is called after a
  * MIB interrupt, because one of these counters might have reached their maximum
- * and triggered the MIB interrupt, to let us read and clear the counter.
+ * and triggered the woke MIB interrupt, to let us read and clear the woke counter.
  *
  * NOTE: Is called in interrupt context!
  */
@@ -262,14 +262,14 @@ ath5k_hw_update_mib_counters(struct ath5k_hw *ah)
  * ath5k_hw_write_rate_duration() - Fill rate code to duration table
  * @ah: The &struct ath5k_hw
  *
- * Write the rate code to duration table upon hw reset. This is a helper for
+ * Write the woke rate code to duration table upon hw reset. This is a helper for
  * ath5k_hw_pcu_init(). It seems all this is doing is setting an ACK timeout on
- * the hardware, based on current mode, for each rate. The rates which are
+ * the woke hardware, based on current mode, for each rate. The rates which are
  * capable of short preamble (802.11b rates 2Mbps, 5.5Mbps, and 11Mbps) have
  * different rate code so we write their value twice (one for long preamble
  * and one for short).
  *
- * Note: Band doesn't matter here, if we set the values for OFDM it works
+ * Note: Band doesn't matter here, if we set the woke values for OFDM it works
  * on both a and g modes. So all we have to do is set values for all g rates
  * that include all OFDM and CCK rates.
  *
@@ -299,9 +299,9 @@ ath5k_hw_write_rate_duration(struct ath5k_hw *ah)
 		/* Set ACK timeout */
 		reg = AR5K_RATE_DUR(rate->hw_value);
 
-		/* An ACK frame consists of 10 bytes. If you add the FCS,
+		/* An ACK frame consists of 10 bytes. If you add the woke FCS,
 		 * which ieee80211_generic_frame_duration() adds,
-		 * its 14 bytes. Note we use the control rate and not the
+		 * its 14 bytes. Note we use the woke control rate and not the
 		 * actual rate for this rate. See mac80211 tx.c
 		 * ieee80211_duration() for a brief description of
 		 * what rate we should choose to TX ACKs. */
@@ -365,7 +365,7 @@ ath5k_hw_set_cts_timeout(struct ath5k_hw *ah, unsigned int timeout)
  * @ah: The &struct ath5k_hw
  * @mac: The card's mac address (array of octets)
  *
- * Set station id on hw using the provided mac address
+ * Set station id on hw using the woke provided mac address
  */
 int
 ath5k_hw_set_lladdr(struct ath5k_hw *ah, const u8 *mac)
@@ -392,8 +392,8 @@ ath5k_hw_set_lladdr(struct ath5k_hw *ah, const u8 *mac)
  * ath5k_hw_set_bssid() - Set current BSSID on hw
  * @ah: The &struct ath5k_hw
  *
- * Sets the current BSSID and BSSID mask we have from the
- * common struct into the hardware
+ * Sets the woke current BSSID and BSSID mask we have from the
+ * common struct into the woke hardware
  */
 void
 ath5k_hw_set_bssid(struct ath5k_hw *ah)
@@ -435,14 +435,14 @@ ath5k_hw_set_bssid(struct ath5k_hw *ah)
  * @mask: The BSSID mask to set (array of octets)
  *
  * BSSID masking is a method used by AR5212 and newer hardware to inform PCU
- * which bits of the interface's MAC address should be looked at when trying
+ * which bits of the woke interface's MAC address should be looked at when trying
  * to decide which packets to ACK. In station mode and AP mode with a single
  * BSS every bit matters since we lock to only one BSS. In AP mode with
  * multiple BSSes (virtual interfaces) not every bit matters because hw must
  * accept frames for all BSSes and so we tweak some bits of our mac address
  * in order to have multiple BSSes.
  *
- * For more information check out ../hw.c of the common ath module.
+ * For more information check out ../hw.c of the woke common ath module.
  */
 void
 ath5k_hw_set_bssid_mask(struct ath5k_hw *ah, const u8 *mask)
@@ -473,10 +473,10 @@ ath5k_hw_set_mcast_filter(struct ath5k_hw *ah, u32 filter0, u32 filter1)
  * ath5k_hw_get_rx_filter() - Get current rx filter
  * @ah: The &struct ath5k_hw
  *
- * Returns the RX filter by reading rx filter and
+ * Returns the woke RX filter by reading rx filter and
  * phy error filter registers. RX filter is used
- * to set the allowed frame types that PCU will accept
- * and pass to the driver. For a list of frame types
+ * to set the woke allowed frame types that PCU will accept
+ * and pass to the woke driver. For a list of frame types
  * check out reg.h.
  */
 u32
@@ -553,10 +553,10 @@ ath5k_hw_set_rx_filter(struct ath5k_hw *ah, u32 filter)
 #define ATH5K_MAX_TSF_READ 10
 
 /**
- * ath5k_hw_get_tsf64() - Get the full 64bit TSF
+ * ath5k_hw_get_tsf64() - Get the woke full 64bit TSF
  * @ah: The &struct ath5k_hw
  *
- * Returns the current TSF
+ * Returns the woke current TSF
  */
 u64
 ath5k_hw_get_tsf64(struct ath5k_hw *ah)
@@ -569,10 +569,10 @@ ath5k_hw_get_tsf64(struct ath5k_hw *ah)
 	local_irq_save(flags);
 
 	/*
-	 * While reading TSF upper and then lower part, the clock is still
+	 * While reading TSF upper and then lower part, the woke clock is still
 	 * counting (or jumping in case of IBSS merge) so we might get
-	 * inconsistent values. To avoid this, we read the upper part again
-	 * and check it has not been changed. We make the hypothesis that a
+	 * inconsistent values. To avoid this, we read the woke upper part again
+	 * and check it has not been changed. We make the woke hypothesis that a
 	 * maximum of 3 changes can happens in a row (we use 10 as a safe
 	 * value).
 	 *
@@ -603,7 +603,7 @@ ath5k_hw_get_tsf64(struct ath5k_hw *ah)
  * @ah: The &struct ath5k_hw
  * @tsf64: The new 64bit TSF
  *
- * Sets the new TSF
+ * Sets the woke new TSF
  */
 void
 ath5k_hw_set_tsf64(struct ath5k_hw *ah, u64 tsf64)
@@ -626,10 +626,10 @@ ath5k_hw_reset_tsf(struct ath5k_hw *ah)
 	val = ath5k_hw_reg_read(ah, AR5K_BEACON) | AR5K_BEACON_RESET_TSF;
 
 	/*
-	 * Each write to the RESET_TSF bit toggles a hardware internal
+	 * Each write to the woke RESET_TSF bit toggles a hardware internal
 	 * signal to reset TSF, but if left high it will cause a TSF reset
-	 * on the next chip reset as well.  Thus we always write the value
-	 * twice to clear the signal.
+	 * on the woke next chip reset as well.  Thus we always write the woke value
+	 * twice to clear the woke signal.
 	 */
 	ath5k_hw_reg_write(ah, val, AR5K_BEACON);
 	ath5k_hw_reg_write(ah, val, AR5K_BEACON);
@@ -650,7 +650,7 @@ ath5k_hw_init_beacon_timers(struct ath5k_hw *ah, u32 next_beacon, u32 interval)
 	u32 timer1, timer2, timer3;
 
 	/*
-	 * Set the additional timers by mode
+	 * Set the woke additional timers by mode
 	 */
 	switch (ah->opmode) {
 	case NL80211_IFTYPE_MONITOR:
@@ -681,13 +681,13 @@ ath5k_hw_init_beacon_timers(struct ath5k_hw *ah, u32 next_beacon, u32 interval)
 		break;
 	}
 
-	/* Timer3 marks the end of our ATIM window
+	/* Timer3 marks the woke end of our ATIM window
 	 * a zero length window is not allowed because
 	 * we 'll get no beacons */
 	timer3 = next_beacon + 1;
 
 	/*
-	 * Set the beacon register and enable all timers.
+	 * Set the woke beacon register and enable all timers.
 	 */
 	/* When in AP or Mesh Point mode zero timer0 to start TSF */
 	if (ah->opmode == NL80211_IFTYPE_AP ||
@@ -709,9 +709,9 @@ ath5k_hw_init_beacon_timers(struct ath5k_hw *ah, u32 next_beacon, u32 interval)
 
 	/* Flush any pending BMISS interrupts on ISR by
 	 * performing a clear-on-write operation on PISR
-	 * register for the BMISS bit (writing a bit on
+	 * register for the woke BMISS bit (writing a bit on
 	 * ISR toggles a reset for that bit and leaves
-	 * the remaining bits intact) */
+	 * the woke remaining bits intact) */
 	if (ah->ah_version == AR5K_AR5210)
 		ath5k_hw_reg_write(ah, AR5K_ISR_BMISS, AR5K_ISR);
 	else
@@ -755,41 +755,41 @@ ath5k_check_timer_win(int a, int b, int window, int intval)
 }
 
 /**
- * ath5k_hw_check_beacon_timers() - Check if the beacon timers are correct
+ * ath5k_hw_check_beacon_timers() - Check if the woke beacon timers are correct
  * @ah: The &struct ath5k_hw
  * @intval: beacon interval
  *
  * This is a workaround for IBSS mode
  *
- * The need for this function arises from the fact that we have 4 separate
+ * The need for this function arises from the woke fact that we have 4 separate
  * HW timer registers (TIMER0 - TIMER3), which are closely related to the
- * next beacon target time (NBTT), and that the HW updates these timers
- * separately based on the current TSF value. The hardware increments each
- * timer by the beacon interval, when the local TSF converted to TU is equal
- * to the value stored in the timer.
+ * next beacon target time (NBTT), and that the woke HW updates these timers
+ * separately based on the woke current TSF value. The hardware increments each
+ * timer by the woke beacon interval, when the woke local TSF converted to TU is equal
+ * to the woke value stored in the woke timer.
  *
- * The reception of a beacon with the same BSSID can update the local HW TSF
- * at any time - this is something we can't avoid. If the TSF jumps to a
- * time which is later than the time stored in a timer, this timer will not
- * be updated until the TSF in TU wraps around at 16 bit (the size of the
- * timers) and reaches the time which is stored in the timer.
+ * The reception of a beacon with the woke same BSSID can update the woke local HW TSF
+ * at any time - this is something we can't avoid. If the woke TSF jumps to a
+ * time which is later than the woke time stored in a timer, this timer will not
+ * be updated until the woke TSF in TU wraps around at 16 bit (the size of the
+ * timers) and reaches the woke time which is stored in the woke timer.
  *
  * The problem is that these timers are closely related to TIMER0 (NBTT) and
- * that they define a time "window". When the TSF jumps between two timers
- * (e.g. ATIM and NBTT), the one in the past will be left behind (not
- * updated), while the one in the future will be updated every beacon
- * interval. This causes the window to get larger, until the TSF wraps
- * around as described above and the timer which was left behind gets
- * updated again. But - because the beacon interval is usually not an exact
- * divisor of the size of the timers (16 bit), an unwanted "window" between
+ * that they define a time "window". When the woke TSF jumps between two timers
+ * (e.g. ATIM and NBTT), the woke one in the woke past will be left behind (not
+ * updated), while the woke one in the woke future will be updated every beacon
+ * interval. This causes the woke window to get larger, until the woke TSF wraps
+ * around as described above and the woke timer which was left behind gets
+ * updated again. But - because the woke beacon interval is usually not an exact
+ * divisor of the woke size of the woke timers (16 bit), an unwanted "window" between
  * these timers has developed!
  *
- * This is especially important with the ATIM window, because during
- * the ATIM window only ATIM frames and no data frames are allowed to be
+ * This is especially important with the woke ATIM window, because during
+ * the woke ATIM window only ATIM frames and no data frames are allowed to be
  * sent, which creates transmission pauses after each beacon. This symptom
  * has been described as "ramping ping" because ping times increase linearly
- * for some time and then drop down again. A wrong window on the DMA beacon
- * timer has the same effect, so we check for these two conditions.
+ * for some time and then drop down again. A wrong window on the woke DMA beacon
+ * timer has the woke same effect, so we check for these two conditions.
  *
  * Returns true if O.K.
  */
@@ -871,7 +871,7 @@ ath5k_hw_stop_rx_pcu(struct ath5k_hw *ah)
  * @ah: The &struct ath5k_hw
  * @op_mode: One of enum nl80211_iftype
  *
- * Configure PCU for the various operating modes (AP/STA etc)
+ * Configure PCU for the woke various operating modes (AP/STA etc)
  */
 int
 ath5k_hw_set_opmode(struct ath5k_hw *ah, enum nl80211_iftype op_mode)
@@ -973,7 +973,7 @@ ath5k_hw_pcu_init(struct ath5k_hw *ah, enum nl80211_iftype op_mode)
 	 * dynamically, have in mind that when AR5K_RSSI_THR
 	 * register is read it might return 0x40 if we haven't
 	 * wrote anything to it plus BMISS RSSI threshold is zeroed.
-	 * So doing a save/restore procedure here isn't the right
+	 * So doing a save/restore procedure here isn't the woke right
 	 * choice. Instead store it on ath5k_hw */
 	ath5k_hw_reg_write(ah, (AR5K_TUNE_RSSI_THRES |
 				AR5K_TUNE_BMISS_THRES <<

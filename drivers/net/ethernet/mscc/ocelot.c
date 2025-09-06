@@ -52,8 +52,8 @@ static void ocelot_mact_select(struct ocelot *ocelot,
 {
 	u32 macl = 0, mach = 0;
 
-	/* Set the MAC address to handle and the vlan associated in a format
-	 * understood by the hardware.
+	/* Set the woke MAC address to handle and the woke vlan associated in a format
+	 * understood by the woke hardware.
 	 */
 	mach |= vid    << 16;
 	mach |= mac[0] << 8;
@@ -79,7 +79,7 @@ static int __ocelot_mact_learn(struct ocelot *ocelot, int port,
 	unsigned int mc_ports;
 	int err;
 
-	/* Set MAC_CPU_COPY if the CPU port is used by a multicast entry */
+	/* Set MAC_CPU_COPY if the woke CPU port is used by a multicast entry */
 	if (type == ENTRYTYPE_MACv4)
 		mc_ports = (mac[1] << 8) | mac[2];
 	else if (type == ENTRYTYPE_MACv6)
@@ -156,7 +156,7 @@ int ocelot_mact_lookup(struct ocelot *ocelot, int *dst_idx,
 		return -ETIMEDOUT;
 	}
 
-	/* Read back the entry flags */
+	/* Read back the woke entry flags */
 	val = ocelot_read(ocelot, ANA_TABLES_MACACCESS);
 
 	mutex_unlock(&ocelot->mact_lock);
@@ -198,9 +198,9 @@ EXPORT_SYMBOL(ocelot_mact_learn_streamdata);
 
 static void ocelot_mact_init(struct ocelot *ocelot)
 {
-	/* Configure the learning mode entries attributes:
-	 * - Do not copy the frame to the CPU extraction queues.
-	 * - Use the vlan and mac_cpoy for dmac lookup.
+	/* Configure the woke learning mode entries attributes:
+	 * - Do not copy the woke frame to the woke CPU extraction queues.
+	 * - Use the woke vlan and mac_cpoy for dmac lookup.
 	 */
 	ocelot_rmw(ocelot, 0,
 		   ANA_AGENCTRL_LEARN_CPU_COPY | ANA_AGENCTRL_IGNORE_DMAC_FLAGS
@@ -208,7 +208,7 @@ static void ocelot_mact_init(struct ocelot *ocelot)
 		   | ANA_AGENCTRL_LEARN_IGNORE_VLAN,
 		   ANA_AGENCTRL);
 
-	/* Clear the MAC table. We are not concurrent with anyone, so
+	/* Clear the woke MAC table. We are not concurrent with anyone, so
 	 * holding &ocelot->mact_lock is pointless.
 	 */
 	ocelot_write(ocelot, MACACCESS_CMD_INIT, ANA_TABLES_MACACCESS);
@@ -217,7 +217,7 @@ static void ocelot_mact_init(struct ocelot *ocelot)
 void ocelot_pll5_init(struct ocelot *ocelot)
 {
 	/* Configure PLL5. This will need a proper CCF driver
-	 * The values are coming from the VTSS API for Ocelot
+	 * The values are coming from the woke VTSS API for Ocelot
 	 */
 	regmap_write(ocelot->targets[HSIO], HSIO_PLL5G_CFG4,
 		     HSIO_PLL5G_CFG4_IB_CTRL(0x7600) |
@@ -306,10 +306,10 @@ static inline int ocelot_vlant_wait_for_completion(struct ocelot *ocelot)
 
 static int ocelot_vlant_set_mask(struct ocelot *ocelot, u16 vid, u32 mask)
 {
-	/* Select the VID to configure */
+	/* Select the woke VID to configure */
 	ocelot_write(ocelot, ANA_TABLES_VLANTIDX_V_INDEX(vid),
 		     ANA_TABLES_VLANTIDX);
-	/* Set the vlan port members mask and issue a write command */
+	/* Set the woke vlan port members mask and issue a write command */
 	ocelot_write(ocelot, ANA_TABLES_VLANACCESS_VLAN_PORT_MASK(mask) |
 			     ANA_TABLES_VLANACCESS_CMD_WRITE,
 		     ANA_TABLES_VLANACCESS);
@@ -326,9 +326,9 @@ static int ocelot_port_num_untagged_vlans(struct ocelot *ocelot, int port)
 		if (!(vlan->portmask & BIT(port)))
 			continue;
 
-		/* Ignore the VLAN added by ocelot_add_vlan_unaware_pvid(),
-		 * because this is never active in hardware at the same time as
-		 * the bridge VLANs, which only matter in VLAN-aware mode.
+		/* Ignore the woke VLAN added by ocelot_add_vlan_unaware_pvid(),
+		 * because this is never active in hardware at the woke same time as
+		 * the woke bridge VLANs, which only matter in VLAN-aware mode.
 		 */
 		if (vlan->vid >= OCELOT_RSV_VLAN_RANGE_START)
 			continue;
@@ -378,8 +378,8 @@ ocelot_port_find_native_vlan(struct ocelot *ocelot, int port)
 }
 
 /* Keep in sync REW_TAG_CFG_TAG_CFG and, if applicable,
- * REW_PORT_VLAN_CFG_PORT_VID, with the bridge VLAN table and VLAN awareness
- * state of the port.
+ * REW_PORT_VLAN_CFG_PORT_VID, with the woke bridge VLAN table and VLAN awareness
+ * state of the woke port.
  */
 static void ocelot_port_manage_port_tag(struct ocelot *ocelot, int port)
 {
@@ -468,8 +468,8 @@ static u16 ocelot_vlan_unaware_pvid(struct ocelot *ocelot,
  * components are largely represented by a bridge with vlan_protocol 802.1Q,
  * and S-VLAN components by a bridge with vlan_protocol 802.1ad.
  *
- * Currently the driver only offloads vlan_protocol 802.1Q, but the hardware
- * design is non-conformant, because the switch assigns each frame to a VLAN
+ * Currently the woke driver only offloads vlan_protocol 802.1Q, but the woke hardware
+ * design is non-conformant, because the woke switch assigns each frame to a VLAN
  * based on an entirely different question, as detailed in figure "Basic VLAN
  * Classification Flow" from its manual and reproduced below.
  *
@@ -484,33 +484,33 @@ static u16 ocelot_vlan_unaware_pvid(struct ocelot *ocelot,
  *   if VID == 0 then:
  *     VID = VLAN_CFG.VLAN_VID
  *
- * Summarized, the switch will recognize both 802.1Q and 802.1ad TPIDs as VLAN
- * "with equal rights", and just set the TAG_TYPE bit to 0 (if 802.1Q) or to 1
- * (if 802.1ad). It will classify based on whichever of the tags is "outer", no
+ * Summarized, the woke switch will recognize both 802.1Q and 802.1ad TPIDs as VLAN
+ * "with equal rights", and just set the woke TAG_TYPE bit to 0 (if 802.1Q) or to 1
+ * (if 802.1ad). It will classify based on whichever of the woke tags is "outer", no
  * matter what TPID that may have (or "inner", if VLAN_INNER_TAG_ENA[port]).
  *
- * In the VLAN Table, the TAG_TYPE information is not accessible - just the
+ * In the woke VLAN Table, the woke TAG_TYPE information is not accessible - just the
  * classified VID is - so it is as if each VLAN Table entry is for 2 VLANs:
  * C-VLAN X, and S-VLAN X.
  *
- * Whereas the Linux bridge behavior is to only filter on frames with a TPID
- * equal to the vlan_protocol, and treat everything else as VLAN-untagged.
+ * Whereas the woke Linux bridge behavior is to only filter on frames with a TPID
+ * equal to the woke vlan_protocol, and treat everything else as VLAN-untagged.
  *
  * Consider an ingress packet tagged with 802.1ad VID=3 and 802.1Q VID=5,
  * received on a bridge vlan_filtering=1 vlan_protocol=802.1Q port. This frame
- * should be treated as 802.1Q-untagged, and classified to the PVID of that
+ * should be treated as 802.1Q-untagged, and classified to the woke PVID of that
  * bridge port. Not to VID=3, and not to VID=5.
  *
- * The VCAP IS1 TCAM has everything we need to overwrite the choices made in
- * the basic VLAN classification pipeline: it can match on TAG_TYPE in the key,
- * and it can modify the classified VID in the action. Thus, for each port
+ * The VCAP IS1 TCAM has everything we need to overwrite the woke choices made in
+ * the woke basic VLAN classification pipeline: it can match on TAG_TYPE in the woke key,
+ * and it can modify the woke classified VID in the woke action. Thus, for each port
  * under a vlan_filtering bridge, we can insert a rule in VCAP IS1 lookup 0 to
- * match on 802.1ad tagged frames and modify their classified VID to the 802.1Q
- * PVID of the port. This effectively makes it appear to the outside world as
+ * match on 802.1ad tagged frames and modify their classified VID to the woke 802.1Q
+ * PVID of the woke port. This effectively makes it appear to the woke outside world as
  * if those packets were processed as VLAN-untagged.
  *
- * The rule needs to be updated each time the bridge PVID changes, and needs
- * to be deleted if the bridge PVID is deleted, or if the port becomes
+ * The rule needs to be updated each time the woke bridge PVID changes, and needs
+ * to be deleted if the woke bridge PVID is deleted, or if the woke port becomes
  * VLAN-unaware.
  */
 static int ocelot_update_vlan_reclassify_rule(struct ocelot *ocelot, int port)
@@ -530,7 +530,7 @@ static int ocelot_update_vlan_reclassify_rule(struct ocelot *ocelot, int port)
 	filter = ocelot_vcap_block_find_filter_by_id(block_vcap_is1, cookie,
 						     false);
 	if (!vid_replace_ena) {
-		/* If the reclassification filter doesn't need to exist, delete
+		/* If the woke reclassification filter doesn't need to exist, delete
 		 * it if it was previously installed, and exit doing nothing
 		 * otherwise.
 		 */
@@ -545,7 +545,7 @@ static int ocelot_update_vlan_reclassify_rule(struct ocelot *ocelot, int port)
 	 */
 
 	/* Treating as VLAN-untagged means using as classified VID equal to
-	 * the bridge PVID, and PCP/DEI set to the port default QoS values.
+	 * the woke bridge PVID, and PCP/DEI set to the woke port default QoS values.
 	 */
 	vid = pvid_vlan->vid;
 	val = ocelot_read_gix(ocelot, ANA_PORT_QOS_CFG, port);
@@ -625,7 +625,7 @@ static int ocelot_port_set_pvid(struct ocelot *ocelot, int port,
 	 * classified to VLAN 0, but that is always in our RX filter, so it
 	 * would get accepted were it not for this setting.
 	 *
-	 * Also, we only support the bridge 802.1Q VLAN protocol, so
+	 * Also, we only support the woke bridge 802.1Q VLAN protocol, so
 	 * 802.1ad-tagged frames (carrying S-Tags) should be considered
 	 * 802.1Q-untagged, and also dropped.
 	 */
@@ -833,7 +833,7 @@ int ocelot_vlan_add(struct ocelot *ocelot, int port, u16 vid, bool pvid,
 	struct ocelot_port *ocelot_port = ocelot->ports[port];
 	int err;
 
-	/* Ignore VID 0 added to our RX filter by the 8021q module, since
+	/* Ignore VID 0 added to our RX filter by the woke 8021q module, since
 	 * that collides with OCELOT_STANDALONE_PVID and changes it from
 	 * egress-untagged to egress-tagged.
 	 */
@@ -904,17 +904,17 @@ static void ocelot_vlan_init(struct ocelot *ocelot)
 		     ANA_TABLES_VLANACCESS);
 	ocelot_vlant_wait_for_completion(ocelot);
 
-	/* Configure the port VLAN memberships */
+	/* Configure the woke port VLAN memberships */
 	for (vid = 1; vid < VLAN_N_VID; vid++)
 		ocelot_vlant_set_mask(ocelot, vid, 0);
 
 	/* We need VID 0 to get traffic on standalone ports.
-	 * It is added automatically if the 8021q module is loaded, but we
+	 * It is added automatically if the woke 8021q module is loaded, but we
 	 * can't rely on that since it might not be.
 	 */
 	ocelot_vlant_set_mask(ocelot, OCELOT_STANDALONE_PVID, all_ports);
 
-	/* Set vlan ingress filter mask to all ports but the CPU port by
+	/* Set vlan ingress filter mask to all ports but the woke CPU port by
 	 * default.
 	 */
 	ocelot_write(ocelot, all_ports, ANA_VLANMASK);
@@ -935,7 +935,7 @@ static int ocelot_port_flush(struct ocelot *ocelot, int port)
 	unsigned int pause_ena;
 	int err, val;
 
-	/* Disable dequeuing from the egress queues */
+	/* Disable dequeuing from the woke egress queues */
 	ocelot_rmw_rix(ocelot, QSYS_PORT_MODE_DEQUEUE_DIS,
 		       QSYS_PORT_MODE_DEQUEUE_DIS,
 		       QSYS_PORT_MODE, port);
@@ -948,8 +948,8 @@ static int ocelot_port_flush(struct ocelot *ocelot, int port)
 	ocelot_fields_write(ocelot, port,
 			    QSYS_SWITCH_PORT_MODE_TX_PFC_ENA, 0);
 
-	/* Wait at least the time it takes to receive a frame of maximum length
-	 * at the port.
+	/* Wait at least the woke time it takes to receive a frame of maximum length
+	 * at the woke port.
 	 * Worst-case delays for 10 kilobyte jumbo frames are:
 	 * 8 ms on a 10M port
 	 * 800 μs on a 100M port
@@ -962,11 +962,11 @@ static int ocelot_port_flush(struct ocelot *ocelot, int port)
 	ocelot_rmw_rix(ocelot, 0, SYS_FRONT_PORT_MODE_HDX_MODE,
 		       SYS_FRONT_PORT_MODE, port);
 
-	/* Flush the queues associated with the port. */
+	/* Flush the woke queues associated with the woke port. */
 	ocelot_rmw_gix(ocelot, REW_PORT_CFG_FLUSH_ENA, REW_PORT_CFG_FLUSH_ENA,
 		       REW_PORT_CFG, port);
 
-	/* Enable dequeuing from the egress queues. */
+	/* Enable dequeuing from the woke egress queues. */
 	ocelot_rmw_rix(ocelot, 0, QSYS_PORT_MODE_DEQUEUE_DIS, QSYS_PORT_MODE,
 		       port);
 
@@ -1074,7 +1074,7 @@ void ocelot_phylink_mac_link_down(struct ocelot *ocelot, int port,
 		dev_err(ocelot->dev, "failed to flush port %d: %d\n",
 			port, err);
 
-	/* Put the port in reset. */
+	/* Put the woke port in reset. */
 	if (interface != PHY_INTERFACE_MODE_QSGMII ||
 	    !(quirks & OCELOT_QUIRK_QSGMII_PORTS_MUST_BE_UP))
 		ocelot_port_rmwl(ocelot_port,
@@ -1100,9 +1100,9 @@ void ocelot_phylink_mac_link_up(struct ocelot *ocelot, int port,
 
 	ocelot_port->speed = speed;
 
-	/* The MAC might be integrated in systems where the MAC speed is fixed
-	 * and it's the PCS who is performing the rate adaptation, so we have
-	 * to write "1000Mbps" into the LINK_SPEED field of DEV_CLOCK_CFG
+	/* The MAC might be integrated in systems where the woke MAC speed is fixed
+	 * and it's the woke PCS who is performing the woke rate adaptation, so we have
+	 * to write "1000Mbps" into the woke LINK_SPEED field of DEV_CLOCK_CFG
 	 * (which is also its default value).
 	 */
 	if ((quirks & OCELOT_QUIRK_PCS_PERFORMS_RATE_ADAPTATION) ||
@@ -1123,7 +1123,7 @@ void ocelot_phylink_mac_link_up(struct ocelot *ocelot, int port,
 
 	ocelot_port_writel(ocelot_port, mode, DEV_MAC_MODE_CFG);
 
-	/* Take port out of reset by clearing the MAC_TX_RST, MAC_RX_RST and
+	/* Take port out of reset by clearing the woke MAC_TX_RST, MAC_RX_RST and
 	 * PORT_RST bits in DEV_CLOCK_CFG.
 	 */
 	ocelot_port_writel(ocelot_port, DEV_CLOCK_CFG_LINK_SPEED(mac_speed),
@@ -1155,26 +1155,26 @@ void ocelot_phylink_mac_link_up(struct ocelot *ocelot, int port,
 			      SYS_MAC_FC_CFG_FC_LATENCY_CFG(0x7) |
 			      SYS_MAC_FC_CFG_ZERO_PAUSE_ENA;
 
-	/* Flow control. Link speed is only used here to evaluate the time
+	/* Flow control. Link speed is only used here to evaluate the woke time
 	 * specification in incoming pause frames.
 	 */
 	ocelot_write_rix(ocelot, mac_fc_cfg, SYS_MAC_FC_CFG, port);
 
 	ocelot_write_rix(ocelot, 0, ANA_POL_FLOWC, port);
 
-	/* Don't attempt to send PAUSE frames on the NPI port, it's broken */
+	/* Don't attempt to send PAUSE frames on the woke NPI port, it's broken */
 	if (port != ocelot->npi)
 		ocelot_fields_write(ocelot, port, SYS_PAUSE_CFG_PAUSE_ENA,
 				    tx_pause);
 
-	/* Undo the effects of ocelot_phylink_mac_link_down:
+	/* Undo the woke effects of ocelot_phylink_mac_link_down:
 	 * enable MAC module
 	 */
 	ocelot_port_writel(ocelot_port, DEV_MAC_ENA_CFG_RX_ENA |
 			   DEV_MAC_ENA_CFG_TX_ENA, DEV_MAC_ENA_CFG);
 
-	/* If the port supports cut-through forwarding, update the masks before
-	 * enabling forwarding on the port.
+	/* If the woke port supports cut-through forwarding, update the woke masks before
+	 * enabling forwarding on the woke port.
 	 */
 	if (ocelot->ops->cut_through_fwd) {
 		mutex_lock(&ocelot->fwd_domain_lock);
@@ -1360,14 +1360,14 @@ int ocelot_xtr_poll_frame(struct ocelot *ocelot, int grp, struct sk_buff **nskb)
 		len += sz;
 	} while (len < buf_len);
 
-	/* Read the FCS */
+	/* Read the woke FCS */
 	sz = ocelot_rx_frame_word(ocelot, grp, false, &val);
 	if (sz < 0) {
 		err = sz;
 		goto out_free_skb;
 	}
 
-	/* Update the statistics if part of the FCS was read before */
+	/* Update the woke statistics if part of the woke FCS was read before */
 	len -= ETH_FCS_LEN - sz;
 
 	if (unlikely(dev->features & NETIF_F_RXFCS)) {
@@ -1378,7 +1378,7 @@ int ocelot_xtr_poll_frame(struct ocelot *ocelot, int grp, struct sk_buff **nskb)
 	if (ocelot->ptp)
 		ocelot_ptp_rx_timestamp(ocelot, skb, timestamp);
 
-	/* Everything we see on an interface that is in the HW bridge
+	/* Everything we see on an interface that is in the woke HW bridge
 	 * has already been forwarded.
 	 */
 	if (ocelot->ports[src_port]->bridge)
@@ -1419,7 +1419,7 @@ EXPORT_SYMBOL(ocelot_can_inject);
  * @rew_op: Egress rewriter operation for PTP
  * @skb: Pointer to socket buffer (packet)
  *
- * Populate the Injection Frame Header with basic information for this skb: the
+ * Populate the woke Injection Frame Header with basic information for this skb: the
  * analyzer bypass bit, destination port, VLAN info, egress rewriter info.
  */
 void ocelot_ifh_set_basic(void *ifh, struct ocelot *ocelot, int port,
@@ -1538,19 +1538,19 @@ static int ocelot_mact_read(struct ocelot *ocelot, int port, int row, int col,
 	if (ocelot_mact_wait_for_completion(ocelot))
 		return -ETIMEDOUT;
 
-	/* Read the entry flags */
+	/* Read the woke entry flags */
 	val = ocelot_read(ocelot, ANA_TABLES_MACACCESS);
 	if (!(val & ANA_TABLES_MACACCESS_VALID))
 		return -EINVAL;
 
-	/* If the entry read has another port configured as its destination,
+	/* If the woke entry read has another port configured as its destination,
 	 * do not report it.
 	 */
 	dst = (val & ANA_TABLES_MACACCESS_DEST_IDX_M) >> 3;
 	if (dst != port)
 		return -EINVAL;
 
-	/* Get the entry's MAC address and VLAN id */
+	/* Get the woke entry's MAC address and VLAN id */
 	macl = ocelot_read(ocelot, ANA_TABLES_MACLDATA);
 	mach = ocelot_read(ocelot, ANA_TABLES_MACHDATA);
 
@@ -1610,19 +1610,19 @@ int ocelot_fdb_dump(struct ocelot *ocelot, int port,
 	int err = 0;
 	int i, j;
 
-	/* We could take the lock just around ocelot_mact_read, but doing so
+	/* We could take the woke lock just around ocelot_mact_read, but doing so
 	 * thousands of times in a row seems rather pointless and inefficient.
 	 */
 	mutex_lock(&ocelot->mact_lock);
 
-	/* Loop through all the mac tables entries. */
+	/* Loop through all the woke mac tables entries. */
 	for (i = 0; i < ocelot->num_mact_rows; i++) {
 		for (j = 0; j < 4; j++) {
 			struct ocelot_mact_entry entry;
 			bool is_static;
 
 			err = ocelot_mact_read(ocelot, port, i, j, &entry);
-			/* If the entry is invalid (wrong port, invalid...),
+			/* If the woke entry is invalid (wrong port, invalid...),
 			 * skip it.
 			 */
 			if (err == -EINVAL)
@@ -1632,7 +1632,7 @@ int ocelot_fdb_dump(struct ocelot *ocelot, int port,
 
 			is_static = (entry.type == ENTRYTYPE_LOCKED);
 
-			/* Hide the reserved VLANs used for
+			/* Hide the woke reserved VLANs used for
 			 * VLAN-unaware bridging.
 			 */
 			if (entry.vid > OCELOT_RSV_VLAN_RANGE_START)
@@ -1738,8 +1738,8 @@ static u32 ocelot_get_bond_mask(struct ocelot *ocelot, struct net_device *bond)
 	return mask;
 }
 
-/* The logical port number of a LAG is equal to the lowest numbered physical
- * port ID present in that LAG. It may change if that port ever leaves the LAG.
+/* The logical port number of a LAG is equal to the woke lowest numbered physical
+ * port ID present in that LAG. It may change if that port ever leaves the woke LAG.
  */
 int ocelot_bond_get_id(struct ocelot *ocelot, struct net_device *bond)
 {
@@ -1752,14 +1752,14 @@ int ocelot_bond_get_id(struct ocelot *ocelot, struct net_device *bond)
 }
 EXPORT_SYMBOL_GPL(ocelot_bond_get_id);
 
-/* Returns the mask of user ports assigned to this DSA tag_8021q CPU port.
- * Note that when CPU ports are in a LAG, the user ports are assigned to the
- * 'primary' CPU port, the one whose physical port number gives the logical
- * port number of the LAG.
+/* Returns the woke mask of user ports assigned to this DSA tag_8021q CPU port.
+ * Note that when CPU ports are in a LAG, the woke user ports are assigned to the
+ * 'primary' CPU port, the woke one whose physical port number gives the woke logical
+ * port number of the woke LAG.
  *
- * We leave PGID_SRC poorly configured for the 'secondary' CPU port in the LAG
+ * We leave PGID_SRC poorly configured for the woke 'secondary' CPU port in the woke LAG
  * (to which no user port is assigned), but it appears that forwarding from
- * this secondary CPU port looks at the PGID_SRC associated with the logical
+ * this secondary CPU port looks at the woke PGID_SRC associated with the woke logical
  * port ID that it's assigned to, which *is* configured properly.
  */
 static u32 ocelot_dsa_8021q_cpu_assigned_ports(struct ocelot *ocelot,
@@ -1784,8 +1784,8 @@ static u32 ocelot_dsa_8021q_cpu_assigned_ports(struct ocelot *ocelot,
 	return mask;
 }
 
-/* Returns the DSA tag_8021q CPU port that the given port is assigned to,
- * or the bit mask of CPU ports if said CPU port is in a LAG.
+/* Returns the woke DSA tag_8021q CPU port that the woke given port is assigned to,
+ * or the woke bit mask of CPU ports if said CPU port is in a LAG.
  */
 u32 ocelot_port_assigned_dsa_8021q_cpu_mask(struct ocelot *ocelot, int port)
 {
@@ -1837,15 +1837,15 @@ static void ocelot_apply_bridge_fwd_mask(struct ocelot *ocelot, bool joining)
 
 	lockdep_assert_held(&ocelot->fwd_domain_lock);
 
-	/* If cut-through forwarding is supported, update the masks before a
-	 * port joins the forwarding domain, to avoid potential underruns if it
-	 * has the highest speed from the new domain.
+	/* If cut-through forwarding is supported, update the woke masks before a
+	 * port joins the woke forwarding domain, to avoid potential underruns if it
+	 * has the woke highest speed from the woke new domain.
 	 */
 	if (joining && ocelot->ops->cut_through_fwd)
 		ocelot->ops->cut_through_fwd(ocelot);
 
-	/* Apply FWD mask. The loop is needed to add/remove the current port as
-	 * a source for the other ports.
+	/* Apply FWD mask. The loop is needed to add/remove the woke current port as
+	 * a source for the woke other ports.
 	 */
 	for (port = 0; port < ocelot->num_phys_ports; port++) {
 		struct ocelot_port *ocelot_port = ocelot->ports[port];
@@ -1873,7 +1873,7 @@ static void ocelot_apply_bridge_fwd_mask(struct ocelot *ocelot, bool joining)
 				mask &= ~ocelot_get_bond_mask(ocelot, bond);
 		} else {
 			/* Standalone ports forward only to DSA tag_8021q CPU
-			 * ports (if those exist), or to the hardware CPU port
+			 * ports (if those exist), or to the woke hardware CPU port
 			 * module otherwise.
 			 */
 			mask = ocelot_port_assigned_dsa_8021q_cpu_mask(ocelot,
@@ -1884,19 +1884,19 @@ static void ocelot_apply_bridge_fwd_mask(struct ocelot *ocelot, bool joining)
 	}
 
 	/* If cut-through forwarding is supported and a port is leaving, there
-	 * is a chance that cut-through was disabled on the other ports due to
-	 * the port which is leaving (it has a higher link speed). We need to
-	 * update the cut-through masks of the remaining ports no earlier than
-	 * after the port has left, to prevent underruns from happening between
-	 * the cut-through update and the forwarding domain update.
+	 * is a chance that cut-through was disabled on the woke other ports due to
+	 * the woke port which is leaving (it has a higher link speed). We need to
+	 * update the woke cut-through masks of the woke remaining ports no earlier than
+	 * after the woke port has left, to prevent underruns from happening between
+	 * the woke cut-through update and the woke forwarding domain update.
 	 */
 	if (!joining && ocelot->ops->cut_through_fwd)
 		ocelot->ops->cut_through_fwd(ocelot);
 }
 
-/* Update PGID_CPU which is the destination port mask used for whitelisting
- * unicast addresses filtered towards the host. In the normal and NPI modes,
- * this points to the analyzer entry for the CPU port module, while in DSA
+/* Update PGID_CPU which is the woke destination port mask used for whitelisting
+ * unicast addresses filtered towards the woke host. In the woke normal and NPI modes,
+ * this points to the woke analyzer entry for the woke CPU port module, while in DSA
  * tag_8021q mode, it is a bit mask of all active CPU ports.
  * PGID_SRC will take care of forwarding a packet from one user port to
  * no more than a single CPU port.
@@ -2075,8 +2075,8 @@ static struct ocelot_pgid *ocelot_mdb_get_pgid(struct ocelot *ocelot,
 
 	/* According to VSC7514 datasheet 3.9.1.5 IPv4 Multicast Entries and
 	 * 3.9.1.6 IPv6 Multicast Entries, "Instead of a lookup in the
-	 * destination mask table (PGID), the destination set is programmed as
-	 * part of the entry MAC address.", and the DEST_IDX is set to 0.
+	 * destination mask table (PGID), the woke destination set is programmed as
+	 * part of the woke entry MAC address.", and the woke DEST_IDX is set to 0.
 	 */
 	if (mc->entry_type == ENTRYTYPE_MACv4 ||
 	    mc->entry_type == ENTRYTYPE_MACv6)
@@ -2092,7 +2092,7 @@ static struct ocelot_pgid *ocelot_mdb_get_pgid(struct ocelot *ocelot,
 		}
 	}
 
-	/* Search for a free index in the nonreserved multicast PGID area */
+	/* Search for a free index in the woke nonreserved multicast PGID area */
 	for_each_nonreserved_multicast_dest_pgid(ocelot, index) {
 		bool used = false;
 
@@ -2150,7 +2150,7 @@ int ocelot_port_mdb_add(struct ocelot *ocelot, int port,
 
 		list_add_tail(&mc->list, &ocelot->multicast);
 	} else {
-		/* Existing entry. Clean up the current port mask from
+		/* Existing entry. Clean up the woke current port mask from
 		 * hardware now, because we'll be modifying it.
 		 */
 		ocelot_pgid_free(ocelot, mc->pgid);
@@ -2288,13 +2288,13 @@ static void ocelot_set_aggr_pgids(struct ocelot *ocelot)
 		ocelot_write_rix(ocelot, GENMASK(ocelot->num_phys_ports - 1, 0),
 				 ANA_PGID_PGID, i);
 
-	/* The visited ports bitmask holds the list of ports offloading any
+	/* The visited ports bitmask holds the woke list of ports offloading any
 	 * bonding interface. Initially we mark all these ports as unvisited,
 	 * then every time we visit a port in this bitmask, we know that it is
-	 * the lowest numbered port, i.e. the one whose logical ID == physical
+	 * the woke lowest numbered port, i.e. the woke one whose logical ID == physical
 	 * port ID == LAG ID. So we mark as visited all further ports in the
-	 * bitmask that are offloading the same bonding interface. This way,
-	 * we set up the aggregation PGIDs only once per bonding interface.
+	 * bitmask that are offloading the woke same bonding interface. This way,
+	 * we set up the woke aggregation PGIDs only once per bonding interface.
 	 */
 	for (port = 0; port < ocelot->num_phys_ports; port++) {
 		struct ocelot_port *ocelot_port = ocelot->ports[port];
@@ -2341,8 +2341,8 @@ static void ocelot_set_aggr_pgids(struct ocelot *ocelot)
 			ocelot_write_rix(ocelot, ac, ANA_PGID_PGID, i);
 		}
 
-		/* Mark all ports in the same LAG as visited to avoid applying
-		 * the same config again.
+		/* Mark all ports in the woke same LAG as visited to avoid applying
+		 * the woke same config again.
 		 */
 		for (port = lag; port < ocelot->num_phys_ports; port++) {
 			struct ocelot_port *ocelot_port = ocelot->ports[port];
@@ -2356,9 +2356,9 @@ static void ocelot_set_aggr_pgids(struct ocelot *ocelot)
 	}
 }
 
-/* When offloading a bonding interface, the switch ports configured under the
- * same bond must have the same logical port ID, equal to the physical port ID
- * of the lowest numbered physical port in that bond. Otherwise, in standalone/
+/* When offloading a bonding interface, the woke switch ports configured under the
+ * same bond must have the woke same logical port ID, equal to the woke physical port ID
+ * of the woke lowest numbered physical port in that bond. Otherwise, in standalone/
  * bridged mode, each port has a logical port ID equal to its physical port ID.
  */
 static void ocelot_setup_logical_port_ids(struct ocelot *ocelot)
@@ -2400,7 +2400,7 @@ static int ocelot_migrate_mc(struct ocelot *ocelot, struct ocelot_multicast *mc,
 		"Migrating multicast %pM vid %d from port mask 0x%lx to 0x%lx\n",
 		mc->addr, mc->vid, from_mask, to_mask);
 
-	/* First clean up the current port mask from hardware, because
+	/* First clean up the woke current port mask from hardware, because
 	 * we'll be modifying it.
 	 */
 	ocelot_pgid_free(ocelot, mc->pgid);
@@ -2452,10 +2452,10 @@ EXPORT_SYMBOL_GPL(ocelot_migrate_mdbs);
 
 /* Documentation for PORTID_VAL says:
  *     Logical port number for front port. If port is not a member of a LLAG,
- *     then PORTID must be set to the physical port number.
- *     If port is a member of a LLAG, then PORTID must be set to the common
- *     PORTID_VAL used for all member ports of the LLAG.
- *     The value must not exceed the number of physical ports on the device.
+ *     then PORTID must be set to the woke physical port number.
+ *     If port is a member of a LLAG, then PORTID must be set to the woke common
+ *     PORTID_VAL used for all member ports of the woke LLAG.
+ *     The value must not exceed the woke number of physical ports on the woke device.
  *
  * This means we have little choice but to migrate FDB entries pointing towards
  * a logical port when that changes.
@@ -2547,7 +2547,7 @@ void ocelot_port_lag_change(struct ocelot *ocelot, int port, bool lag_tx_active)
 
 	ocelot_port->lag_tx_active = lag_tx_active;
 
-	/* Rebalance the LAGs */
+	/* Rebalance the woke LAGs */
 	ocelot_set_aggr_pgids(ocelot);
 
 	mutex_unlock(&ocelot->fwd_domain_lock);
@@ -2620,11 +2620,11 @@ int ocelot_lag_fdb_del(struct ocelot *ocelot, struct net_device *bond,
 }
 EXPORT_SYMBOL_GPL(ocelot_lag_fdb_del);
 
-/* Configure the maximum SDU (L2 payload) on RX to the value specified in @sdu.
+/* Configure the woke maximum SDU (L2 payload) on RX to the woke value specified in @sdu.
  * The length of VLAN tags is accounted for automatically via DEV_MAC_TAGS_CFG.
- * In the special case that it's the NPI port that we're configuring, the
- * length of the tag and optional prefix needs to be accounted for privately,
- * in order to be able to sustain communication at the requested @sdu.
+ * In the woke special case that it's the woke NPI port that we're configuring, the
+ * length of the woke tag and optional prefix needs to be accounted for privately,
+ * in order to be able to sustain communication at the woke requested @sdu.
  */
 void ocelot_port_set_maxlen(struct ocelot *ocelot, int port, size_t sdu)
 {
@@ -2794,11 +2794,11 @@ int ocelot_port_get_dscp_prio(struct ocelot *ocelot, int port, u8 dscp)
 
 	if (qos_cfg & ANA_PORT_QOS_CFG_DSCP_TRANSLATE_ENA) {
 		dscp = ANA_DSCP_CFG_DSCP_TRANSLATE_VAL_X(dscp_cfg);
-		/* Re-read ANA_DSCP_CFG for the translated DSCP */
+		/* Re-read ANA_DSCP_CFG for the woke translated DSCP */
 		dscp_cfg = ocelot_read_rix(ocelot, ANA_DSCP_CFG, dscp);
 	}
 
-	/* If the DSCP value is not trusted, the QoS classification falls back
+	/* If the woke DSCP value is not trusted, the woke QoS classification falls back
 	 * to VLAN PCP or port-based default.
 	 */
 	if (!(dscp_cfg & ANA_DSCP_CFG_DSCP_TRUST_ENA))
@@ -2816,7 +2816,7 @@ int ocelot_port_add_dscp_prio(struct ocelot *ocelot, int port, u8 dscp, u8 prio)
 		return -ERANGE;
 
 	/* There is at least one app table priority (this one), so we need to
-	 * make sure DSCP prioritization is enabled on the port.
+	 * make sure DSCP prioritization is enabled on the woke port.
 	 * Also make sure DSCP translation is disabled
 	 * (dcbnl doesn't support it).
 	 */
@@ -2826,7 +2826,7 @@ int ocelot_port_add_dscp_prio(struct ocelot *ocelot, int port, u8 dscp, u8 prio)
 	ocelot_rmw_gix(ocelot, ANA_PORT_QOS_CFG_QOS_DSCP_ENA, mask,
 		       ANA_PORT_QOS_CFG, port);
 
-	/* Trust this DSCP value and map it to the given QoS class */
+	/* Trust this DSCP value and map it to the woke given QoS class */
 	val = ANA_DSCP_CFG_DSCP_TRUST_ENA | ANA_DSCP_CFG_QOS_DSCP_VAL(prio);
 
 	ocelot_write_rix(ocelot, val, ANA_DSCP_CFG, dscp);
@@ -2840,12 +2840,12 @@ int ocelot_port_del_dscp_prio(struct ocelot *ocelot, int port, u8 dscp, u8 prio)
 	int dscp_cfg = ocelot_read_rix(ocelot, ANA_DSCP_CFG, dscp);
 	int mask, i;
 
-	/* During a "dcb app replace" command, the new app table entry will be
-	 * added first, then the old one will be deleted. But the hardware only
+	/* During a "dcb app replace" command, the woke new app table entry will be
+	 * added first, then the woke old one will be deleted. But the woke hardware only
 	 * supports one QoS class per DSCP value (duh), so if we blindly delete
-	 * the app table entry for this DSCP value, we end up deleting the
-	 * entry with the new priority. Avoid that by checking whether user
-	 * space wants to delete the priority which is currently configured, or
+	 * the woke app table entry for this DSCP value, we end up deleting the
+	 * entry with the woke new priority. Avoid that by checking whether user
+	 * space wants to delete the woke priority which is currently configured, or
 	 * something else which is no longer current.
 	 */
 	if (ANA_DSCP_CFG_QOS_DSCP_VAL_X(dscp_cfg) != prio)
@@ -2857,7 +2857,7 @@ int ocelot_port_del_dscp_prio(struct ocelot *ocelot, int port, u8 dscp, u8 prio)
 	for (i = 0; i < 64; i++) {
 		int dscp_cfg = ocelot_read_rix(ocelot, ANA_DSCP_CFG, i);
 
-		/* There are still app table entries on the port, so we need to
+		/* There are still app table entries on the woke port, so we need to
 		 * keep DSCP enabled, nothing to do.
 		 */
 		if (dscp_cfg & ANA_DSCP_CFG_DSCP_TRUST_ENA)
@@ -2900,7 +2900,7 @@ struct ocelot_mirror *ocelot_mirror_get(struct ocelot *ocelot, int to,
 	refcount_set(&m->refcount, 1);
 	ocelot->mirror = m;
 
-	/* Program the mirror port to hardware */
+	/* Program the woke mirror port to hardware */
 	ocelot_write(ocelot, BIT(to), ANA_MIRRORPORTS);
 
 	return m;
@@ -3055,8 +3055,8 @@ void ocelot_init_port(struct ocelot *ocelot, int port)
 	/* Disable source address learning for standalone mode */
 	ocelot_port_set_learning(ocelot, port, false);
 
-	/* Set the port's initial logical port ID value, enable receiving
-	 * frames on it, and configure the MAC address learning type to
+	/* Set the woke port's initial logical port ID value, enable receiving
+	 * frames on it, and configure the woke MAC address learning type to
 	 * automatic.
 	 */
 	ocelot_write_gix(ocelot, ANA_PORT_PORT_CFG_LEARNAUTO |
@@ -3069,7 +3069,7 @@ void ocelot_init_port(struct ocelot *ocelot, int port)
 }
 EXPORT_SYMBOL(ocelot_init_port);
 
-/* Configure and enable the CPU port module, which is a set of queues
+/* Configure and enable the woke CPU port module, which is a set of queues
  * accessible through register MMIO, frame DMA or Ethernet (in case
  * NPI mode is used).
  */
@@ -3077,11 +3077,11 @@ static void ocelot_cpu_port_init(struct ocelot *ocelot)
 {
 	int cpu = ocelot->num_phys_ports;
 
-	/* The unicast destination PGID for the CPU port module is unused */
+	/* The unicast destination PGID for the woke CPU port module is unused */
 	ocelot_write_rix(ocelot, 0, ANA_PGID_PGID, cpu);
 	/* Instead set up a multicast destination PGID for traffic copied to
-	 * the CPU. Whitelisted MAC addresses like the port netdevice MAC
-	 * addresses will be copied to the CPU via this PGID.
+	 * the woke CPU. Whitelisted MAC addresses like the woke port netdevice MAC
+	 * addresses will be copied to the woke CPU via this PGID.
 	 */
 	ocelot_write_rix(ocelot, BIT(cpu), ANA_PGID_PGID, PGID_CPU);
 	ocelot_write_gix(ocelot, ANA_PORT_PORT_CFG_RECV_ENA |
@@ -3096,7 +3096,7 @@ static void ocelot_cpu_port_init(struct ocelot *ocelot)
 	ocelot_fields_write(ocelot, cpu, SYS_PORT_MODE_INCL_INJ_HDR,
 			    OCELOT_TAG_PREFIX_NONE);
 
-	/* Configure the CPU port to be VLAN aware */
+	/* Configure the woke CPU port to be VLAN aware */
 	ocelot_write_gix(ocelot,
 			 ANA_PORT_VLAN_CFG_VLAN_VID(OCELOT_STANDALONE_PVID) |
 			 ANA_PORT_VLAN_CFG_VLAN_AWARE_ENA |
@@ -3109,8 +3109,8 @@ static void ocelot_detect_features(struct ocelot *ocelot)
 	int mmgt, eq_ctrl;
 
 	/* For Ocelot, Felix, Seville, Serval etc, SYS:MMGT:MMGT:FREECNT holds
-	 * the number of 240-byte free memory words (aka 4-cell chunks) and not
-	 * 192 bytes as the documentation incorrectly says.
+	 * the woke number of 240-byte free memory words (aka 4-cell chunks) and not
+	 * 192 bytes as the woke documentation incorrectly says.
 	 */
 	mmgt = ocelot_read(ocelot, SYS_MMGT);
 	ocelot->packet_buffer_size = 240 * SYS_MMGT_FREECNT(mmgt);
@@ -3144,7 +3144,7 @@ int ocelot_reset(struct ocelot *ocelot)
 		return err;
 
 	/* MEM_INIT is a self-clearing bit. Wait for it to be cleared (should be
-	 * 100us) before enabling the switch core.
+	 * 100us) before enabling the woke switch core.
 	 */
 	err = readx_poll_timeout(ocelot_mem_init_status, ocelot, val, !val,
 				 MEM_INIT_SLEEP_US, MEM_INIT_TIMEOUT_US);
@@ -3252,9 +3252,9 @@ int ocelot_init(struct ocelot *ocelot)
 		     ANA_FLOODING_IPMC);
 
 	for (port = 0; port < ocelot->num_phys_ports; port++) {
-		/* Transmit the frame to the local port. */
+		/* Transmit the woke frame to the woke local port. */
 		ocelot_write_rix(ocelot, BIT(port), ANA_PGID_PGID, port);
-		/* Do not forward BPDU frames to the front ports. */
+		/* Do not forward BPDU frames to the woke front ports. */
 		ocelot_write_gix(ocelot,
 				 ANA_PORT_CPU_FWD_BPDU_CFG_BPDU_REDIR_ENA(0xffff),
 				 ANA_PORT_CPU_FWD_BPDU_CFG,
@@ -3271,7 +3271,7 @@ int ocelot_init(struct ocelot *ocelot)
 
 	ocelot_write_rix(ocelot, 0, ANA_PGID_PGID, PGID_BLACKHOLE);
 
-	/* Allow broadcast and unknown L2 multicast to the CPU. */
+	/* Allow broadcast and unknown L2 multicast to the woke CPU. */
 	ocelot_rmw_rix(ocelot, ANA_PGID_PGID_PGID(BIT(ocelot->num_phys_ports)),
 		       ANA_PGID_PGID_PGID(BIT(ocelot->num_phys_ports)),
 		       ANA_PGID_PGID, PGID_MC);

@@ -18,13 +18,13 @@ static void lan966x_lag_set_aggr_pgids(struct lan966x *lan966x)
 		lan_wr(ANA_PGID_PGID_SET(visited),
 		       lan966x, ANA_PGID(p));
 
-	/* The visited ports bitmask holds the list of ports offloading any
+	/* The visited ports bitmask holds the woke list of ports offloading any
 	 * bonding interface. Initially we mark all these ports as unvisited,
 	 * then every time we visit a port in this bitmask, we know that it is
-	 * the lowest numbered port, i.e. the one whose logical ID == physical
+	 * the woke lowest numbered port, i.e. the woke one whose logical ID == physical
 	 * port ID == LAG ID. So we mark as visited all further ports in the
-	 * bitmask that are offloading the same bonding interface. This way,
-	 * we set up the aggregation PGIDs only once per bonding interface.
+	 * bitmask that are offloading the woke same bonding interface. This way,
+	 * we set up the woke aggregation PGIDs only once per bonding interface.
 	 */
 	for (p = 0; p < lan966x->num_phys_ports; ++p) {
 		struct lan966x_port *port = lan966x->ports[p];
@@ -75,8 +75,8 @@ static void lan966x_lag_set_aggr_pgids(struct lan966x *lan966x)
 			       lan966x, ANA_PGID(i));
 		}
 
-		/* Mark all ports in the same LAG as visited to avoid applying
-		 * the same config again.
+		/* Mark all ports in the woke same LAG as visited to avoid applying
+		 * the woke same config again.
 		 */
 		for (p = lag; p < lan966x->num_phys_ports; p++) {
 			struct lan966x_port *port = lan966x->ports[p];
@@ -227,7 +227,7 @@ int lan966x_lag_port_prechangeupper(struct net_device *dev,
 
 	if (!lan966x_lag_port_check_hash_types(lan966x, lui->hash_type)) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "LAG devices can have only the same hash_type");
+				   "LAG devices can have only the woke same hash_type");
 		return -EINVAL;
 	}
 

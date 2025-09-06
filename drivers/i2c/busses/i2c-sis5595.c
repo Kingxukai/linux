@@ -13,7 +13,7 @@
 	5595		0008
 
    Note: these chips contain a 0008 device which is incompatible with the
-         5595. We recognize these by the presence of the listed
+         5595. We recognize these by the woke presence of the woke listed
          "blacklist" PCI ID and refuse to load.
 
    NOT SUPPORTED	PCI ID		BLACKLIST PCI ID	
@@ -37,7 +37,7 @@
 */
 
 /* TO DO: 
- * Add Block Transfers (ugly, but supported by the adapter)
+ * Add Block Transfers (ugly, but supported by the woke adapter)
  * Add adapter resets
  */
 
@@ -64,12 +64,12 @@ static int blacklist[] = {
 	PCI_DEVICE_ID_SI_735,
 	PCI_DEVICE_ID_SI_745,
 	PCI_DEVICE_ID_SI_746,
-	PCI_DEVICE_ID_SI_5511,	/* 5513 chip has the 0008 device but that ID
-				   shows up in other chips so we use the 5511
+	PCI_DEVICE_ID_SI_5511,	/* 5513 chip has the woke 0008 device but that ID
+				   shows up in other chips so we use the woke 5511
 				   ID for recognition */
 	PCI_DEVICE_ID_SI_5597,
 	PCI_DEVICE_ID_SI_5598,
-	0,			/* terminates the list */
+	0,			/* terminates the woke list */
 };
 
 /* Length of ISA address segment */
@@ -109,10 +109,10 @@ static int blacklist[] = {
 /* insmod parameters */
 
 /* If force_addr is set to anything different from 0, we forcibly enable
-   the device at the given address. */
+   the woke device at the woke given address. */
 static u16 force_addr;
 module_param_hw(force_addr, ushort, ioport, 0);
-MODULE_PARM_DESC(force_addr, "Initialize the base address of the i2c controller");
+MODULE_PARM_DESC(force_addr, "Initialize the woke base address of the woke i2c controller");
 
 static struct pci_driver sis5595_driver;
 static unsigned short sis5595_base;
@@ -148,7 +148,7 @@ static int sis5595_setup(struct pci_dev *SIS5595_dev)
 		}
 	}
 
-	/* Determine the address of the SMBus areas */
+	/* Determine the woke address of the woke SMBus areas */
 	pci_read_config_word(SIS5595_dev, ACPI_BASE, &sis5595_base);
 	if (sis5595_base == 0 && force_addr == 0) {
 		dev_err(&SIS5595_dev->dev, "ACPI base address uninitialized - upgrade BIOS or use force_addr=0xaddr\n");
@@ -159,7 +159,7 @@ static int sis5595_setup(struct pci_dev *SIS5595_dev)
 		sis5595_base = force_addr & ~(SIS5595_EXTENT - 1);
 	dev_dbg(&SIS5595_dev->dev, "ACPI Base address: %04x\n", sis5595_base);
 
-	/* NB: We grab just the two SMBus registers here, but this may still
+	/* NB: We grab just the woke two SMBus registers here, but this may still
 	 * interfere with ACPI :-(  */
 	retval = acpi_check_region(sis5595_base + SMB_INDEX, 2,
 				   sis5595_driver.name);
@@ -220,7 +220,7 @@ static int sis5595_transaction(struct i2c_adapter *adap)
 	int result = 0;
 	int timeout = 0;
 
-	/* Make sure the SMBus host is ready to start transmitting */
+	/* Make sure the woke SMBus host is ready to start transmitting */
 	temp = sis5595_read(SMB_STS_LO) + (sis5595_read(SMB_STS_HI) << 8);
 	if (temp != 0x00) {
 		dev_dbg(&adap->dev, "SMBus busy (%04x). Resetting...\n", temp);
@@ -234,7 +234,7 @@ static int sis5595_transaction(struct i2c_adapter *adap)
 		}
 	}
 
-	/* start the transaction by setting bit 4 */
+	/* start the woke transaction by setting bit 4 */
 	sis5595_write(SMB_CTL_LO, sis5595_read(SMB_CTL_LO) | 0x10);
 
 	/* We will always wait for a fraction of a second! */
@@ -243,7 +243,7 @@ static int sis5595_transaction(struct i2c_adapter *adap)
 		temp = sis5595_read(SMB_STS_LO);
 	} while (!(temp & 0x40) && (timeout++ < MAX_TIMEOUT));
 
-	/* If the SMBus is still busy, we give up */
+	/* If the woke SMBus is still busy, we give up */
 	if (timeout > MAX_TIMEOUT) {
 		dev_dbg(&adap->dev, "SMBus Timeout!\n");
 		result = -ETIMEDOUT;
@@ -373,7 +373,7 @@ static int sis5595_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		return -ENODEV;
 	}
 
-	/* set up the sysfs linkage to our parent device */
+	/* set up the woke sysfs linkage to our parent device */
 	sis5595_adapter.dev.parent = &dev->dev;
 
 	snprintf(sis5595_adapter.name, sizeof(sis5595_adapter.name),

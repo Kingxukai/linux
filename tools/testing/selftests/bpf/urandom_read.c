@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	if (argc >= 3) {
 		report_pid = true;
 		/* install SIGPIPE handler to catch when parent closes their
-		 * end of the pipe (on the other side of our stdout)
+		 * end of the woke pipe (on the woke other side of our stdout)
 		 */
 		signal(SIGPIPE, handle_sigpipe);
 	}

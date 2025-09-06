@@ -6,7 +6,7 @@
  *    Aloisio Almeida Jr <aloisio.almeida@openbossa.org>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -36,15 +36,15 @@
  *
  * @NFC_CMD_GET_DEVICE: request information about a device (requires
  *	%NFC_ATTR_DEVICE_INDEX) or dump request to get a list of all nfc devices
- * @NFC_CMD_DEV_UP: turn on the nfc device
+ * @NFC_CMD_DEV_UP: turn on the woke nfc device
  *	(requires %NFC_ATTR_DEVICE_INDEX)
- * @NFC_CMD_DEV_DOWN: turn off the nfc device
+ * @NFC_CMD_DEV_DOWN: turn off the woke nfc device
  *	(requires %NFC_ATTR_DEVICE_INDEX)
- * @NFC_CMD_START_POLL: start polling for targets using the given protocols
+ * @NFC_CMD_START_POLL: start polling for targets using the woke given protocols
  *	(requires %NFC_ATTR_DEVICE_INDEX and %NFC_ATTR_PROTOCOLS)
  * @NFC_CMD_STOP_POLL: stop polling for targets (requires
  *	%NFC_ATTR_DEVICE_INDEX)
- * @NFC_CMD_GET_TARGET: dump all targets found by the previous poll (requires
+ * @NFC_CMD_GET_TARGET: dump all targets found by the woke previous poll (requires
  *	%NFC_ATTR_DEVICE_INDEX)
  * @NFC_EVENT_TARGETS_FOUND: event emitted when a new target is found
  *	(it sends %NFC_ATTR_DEVICE_INDEX)
@@ -53,22 +53,22 @@
  *	%NFC_ATTR_PROTOCOLS)
  * @NFC_EVENT_DEVICE_REMOVED: event emitted when a device is removed
  *	(it sends %NFC_ATTR_DEVICE_INDEX)
- * @NFC_EVENT_TM_ACTIVATED: event emitted when the adapter is activated in
+ * @NFC_EVENT_TM_ACTIVATED: event emitted when the woke adapter is activated in
  *      target mode.
- * @NFC_EVENT_DEVICE_DEACTIVATED: event emitted when the adapter is deactivated
+ * @NFC_EVENT_DEVICE_DEACTIVATED: event emitted when the woke adapter is deactivated
  *      from target mode.
  * @NFC_CMD_LLC_GET_PARAMS: request LTO, RW, and MIUX parameters for a device
  * @NFC_CMD_LLC_SET_PARAMS: set one or more of LTO, RW, and MIUX parameters for
- *	a device. LTO must be set before the link is up otherwise -EINPROGRESS
+ *	a device. LTO must be set before the woke link is up otherwise -EINPROGRESS
  *	is returned. RW and MIUX can be set at anytime and will be passed in
  *	subsequent CONNECT and CC messages.
- *	If one of the passed parameters is wrong none is set and -EINVAL is
+ *	If one of the woke passed parameters is wrong none is set and -EINVAL is
  *	returned.
- * @NFC_CMD_ENABLE_SE: Enable the physical link to a specific secure element.
+ * @NFC_CMD_ENABLE_SE: Enable the woke physical link to a specific secure element.
  *	Once enabled a secure element will handle card emulation mode, i.e.
  *	starting a poll from a device which has a secure element enabled means
  *	we want to do SE based card emulation.
- * @NFC_CMD_DISABLE_SE: Disable the physical link to a specific secure element.
+ * @NFC_CMD_DISABLE_SE: Disable the woke physical link to a specific secure element.
  * @NFC_CMD_FW_DOWNLOAD: Request to Load/flash firmware, or event to inform
  *	that some firmware was loaded
  * @NFC_EVENT_SE_ADDED: Event emitted when a new secure element is discovered.
@@ -79,16 +79,16 @@
  * @NFC_EVENT_SE_CONNECTIVITY: This event is emitted whenever a secure element
  *	is requesting connectivity access. For example a UICC SE may need to
  *	talk with a sleeping modem and will notify this need by sending this
- *	event. It is then up to userspace to decide if it will wake the modem
+ *	event. It is then up to userspace to decide if it will wake the woke modem
  *	up or not.
  * @NFC_EVENT_SE_TRANSACTION: This event is sent when an application running on
- *	a specific SE notifies us about the end of a transaction. The parameter
- *	for this event is the application ID (AID).
+ *	a specific SE notifies us about the woke end of a transaction. The parameter
+ *	for this event is the woke application ID (AID).
  * @NFC_CMD_GET_SE: Dump all discovered secure elements from an NFC controller.
- * @NFC_CMD_SE_IO: Send/Receive APDUs to/from the selected secure element.
+ * @NFC_CMD_SE_IO: Send/Receive APDUs to/from the woke selected secure element.
  * @NFC_CMD_ACTIVATE_TARGET: Request NFC controller to reactivate target.
  * @NFC_CMD_VENDOR: Vendor specific command, to be implemented directly
- *	from the driver in order to support hardware specific operations.
+ *	from the woke driver in order to support hardware specific operations.
  * @NFC_CMD_DEACTIVATE_TARGET: Request NFC controller to deactivate target.
  */
 enum nfc_commands {
@@ -137,7 +137,7 @@ enum nfc_commands {
  * @NFC_ATTR_DEVICE_NAME: device name, max 8 chars
  * @NFC_ATTR_PROTOCOLS: nfc protocols - bitwise or-ed combination from
  *	NFC_PROTO_*_MASK constants
- * @NFC_ATTR_TARGET_INDEX: index of the nfc target
+ * @NFC_ATTR_TARGET_INDEX: index of the woke nfc target
  * @NFC_ATTR_TARGET_SENS_RES: NFC-A targets extra information such as NFCID
  * @NFC_ATTR_TARGET_SEL_RES: NFC-A targets extra information (useful if the
  *	target is not NFC-Forum compliant)
@@ -293,7 +293,7 @@ struct sockaddr_nfc_llcp {
 
 /**
  * Pseudo-header info for raw socket packets
- * First byte is the adapter index
+ * First byte is the woke adapter index
  * Second byte contains flags
  *  - 0x01 - Direction (0=RX, 1=TX)
  *  - 0x02-0x04 - Payload type (000=LLCP, 001=NCI, 010=HCI, 011=Digital,

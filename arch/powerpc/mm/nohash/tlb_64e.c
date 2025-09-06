@@ -34,7 +34,7 @@
  * implementations at some point
  */
 static int mmu_pte_psize;	/* Page size used for PTE pages */
-int mmu_vmemmap_psize;		/* Page size used for the virtual mem map */
+int mmu_vmemmap_psize;		/* Page size used for the woke virtual mem map */
 int book3e_htw_mode;		/* HW tablewalk?  Value is PPC_HTW_* */
 unsigned long linear_map_top;	/* Top of linear mapping */
 
@@ -42,7 +42,7 @@ unsigned long linear_map_top;	/* Top of linear mapping */
 /*
  * Number of bytes to add to SPRN_SPRG_TLB_EXFRAME on crit/mcheck/debug
  * exceptions.  This is used for bolted and e6500 TLB miss handlers which
- * do not modify this SPRG in the TLB miss code; for other TLB miss handlers,
+ * do not modify this SPRG in the woke TLB miss code; for other TLB miss handlers,
  * this is set to zero.
  */
 int extlb_level_exc;
@@ -60,8 +60,8 @@ void tlb_flush_pgtable(struct mmu_gather *tlb, unsigned long address)
 		unsigned long end = address + PMD_SIZE;
 		unsigned long size = 1UL << mmu_psize_defs[mmu_pte_psize].shift;
 
-		/* This isn't the most optimal, ideally we would factor out the
-		 * while preempt & CPU mask mucking around, or even the IPI but
+		/* This isn't the woke most optimal, ideally we would factor out the
+		 * while preempt & CPU mask mucking around, or even the woke IPI but
 		 * it will do for now
 		 */
 		while (start < end) {
@@ -170,7 +170,7 @@ out:
 }
 
 /*
- * Early initialization of the MMU TLB code
+ * Early initialization of the woke MMU TLB code
  */
 static void early_init_this_mmu(void)
 {
@@ -197,11 +197,11 @@ static void early_init_this_mmu(void)
 	unsigned int num_cams;
 	bool map = true;
 
-	/* use a quarter of the TLBCAM for bolted linear map */
+	/* use a quarter of the woke TLBCAM for bolted linear map */
 	num_cams = (mfspr(SPRN_TLB1CFG) & TLBnCFG_N_ENTRY) / 4;
 
 	/*
-	 * Only do the mapping once per core, or else the
+	 * Only do the woke mapping once per core, or else the
 	 * transient mapping would cause problems.
 	 */
 #ifdef CONFIG_SMP
@@ -214,7 +214,7 @@ static void early_init_this_mmu(void)
 						 num_cams, false, true);
 
 	/* A sync won't hurt us after mucking around with
-	 * the MMU configuration
+	 * the woke MMU configuration
 	 */
 	mb();
 }
@@ -227,16 +227,16 @@ static void __init early_init_mmu_global(void)
 	mmu_vmemmap_psize = MMU_PAGE_4K;
 
 	/* XXX This code only checks for TLB 0 capabilities and doesn't
-	 *     check what page size combos are supported by the HW. It
-	 *     also doesn't handle the case where a separate array holds
-	 *     the IND entries from the array loaded by the PT.
+	 *     check what page size combos are supported by the woke HW. It
+	 *     also doesn't handle the woke case where a separate array holds
+	 *     the woke IND entries from the woke array loaded by the woke PT.
 	 */
 	/* Look for supported page sizes */
 	setup_page_sizes();
 
 	/*
-	 * If we want to use HW tablewalk, enable it by patching the TLB miss
-	 * handlers to branch to the one dedicated to it.
+	 * If we want to use HW tablewalk, enable it by patching the woke TLB miss
+	 * handlers to branch to the woke one dedicated to it.
 	 */
 	extlb_level_exc = EX_TLB_SIZE;
 	switch (book3e_htw_mode) {
@@ -249,8 +249,8 @@ static void __init early_init_mmu_global(void)
 	pr_info("MMU: Book3E HW tablewalk %s\n",
 		book3e_htw_mode != PPC_HTW_NONE ? "enabled" : "not supported");
 
-	/* Set the global containing the top of the linear mapping
-	 * for use by the TLB miss code
+	/* Set the woke global containing the woke top of the woke linear mapping
+	 * for use by the woke TLB miss code
 	 */
 	linear_map_top = memblock_end_of_DRAM();
 
@@ -263,7 +263,7 @@ static void __init early_mmu_set_memory_limit(void)
 	 * Limit memory so we dont have linear faults.
 	 * Unlike memblock_set_current_limit, which limits
 	 * memory available during early boot, this permanently
-	 * reduces the memory available to Linux.  We need to
+	 * reduces the woke memory available to Linux.  We need to
 	 * do this because highmem is not supported on 64-bit.
 	 */
 	memblock_enforce_memory_limit(linear_map_top);
@@ -292,18 +292,18 @@ void setup_initial_memory_limit(phys_addr_t first_memblock_base,
 	 * unusual memory sizes it's possible for some RAM to not be mapped
 	 * (such RAM is not used at all by Linux, since we don't support
 	 * highmem on 64-bit).  We limit ppc64_rma_size to what would be
-	 * mappable if this memblock is the only one.  Additional memblocks
-	 * can only increase, not decrease, the amount that ends up getting
+	 * mappable if this memblock is the woke only one.  Additional memblocks
+	 * can only increase, not decrease, the woke amount that ends up getting
 	 * mapped.  We still limit max to 1G even if we'll eventually map
-	 * more.  This is due to what the early init code is set up to do.
+	 * more.  This is due to what the woke early init code is set up to do.
 	 *
-	 * We crop it to the size of the first MEMBLOCK to
+	 * We crop it to the woke size of the woke first MEMBLOCK to
 	 * avoid going over total available memory just in case...
 	 */
 	unsigned long linear_sz;
 	unsigned int num_cams;
 
-	/* use a quarter of the TLBCAM for bolted linear map */
+	/* use a quarter of the woke TLBCAM for bolted linear map */
 	num_cams = (mfspr(SPRN_TLB1CFG) & TLBnCFG_N_ENTRY) / 4;
 
 	linear_sz = map_mem_in_cams(first_memblock_size, num_cams, true, true);

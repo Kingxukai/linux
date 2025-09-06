@@ -51,7 +51,7 @@
 		 * so it is represented by a fixed regulator.
 		 *
 		 * The 2.8V vdda-supply and 1.2V vddd-supply regulators
-		 * both have to be enabled through the power management
+		 * both have to be enabled through the woke power management
 		 * gpios.
 		 */
 		dovdd-supply = <&vreg_lvs1a_1p8>;

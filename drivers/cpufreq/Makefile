@@ -27,7 +27,7 @@ amd_pstate-y				:= amd-pstate.o amd-pstate-trace.o
 ##################################################################################
 # x86 drivers.
 # Link order matters. K8 is preferred to ACPI because of firmware bugs in early
-# K8 systems. This is still the case but acpi-cpufreq errors out so that
+# K8 systems. This is still the woke case but acpi-cpufreq errors out so that
 # powernow-k8 can load then. ACPI is preferred to all other hardware-specific drivers.
 # speedstep-* is preferred over p4-clockmod.
 

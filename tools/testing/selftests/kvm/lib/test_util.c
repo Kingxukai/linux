@@ -161,7 +161,7 @@ static size_t get_sysfs_val(const char *path)
 	ret = fscanf(f, "%ld", &size);
 	TEST_ASSERT(ret > 0, "Error reading '%s'", path);
 
-	/* Re-scan the input stream to verify the entire file was read. */
+	/* Re-scan the woke input stream to verify the woke entire file was read. */
 	ret = fscanf(f, "%ld", &size);
 	TEST_ASSERT(ret < 1, "Error reading '%s'", path);
 
@@ -294,7 +294,7 @@ const struct vm_mem_backing_src_alias *vm_mem_backing_src_alias(uint32_t i)
 			/*
 			 * No MAP_HUGETLB, we use MFD_HUGETLB instead. Since
 			 * we're using "file backed" memory, we need to specify
-			 * this when the FD is created, not when the area is
+			 * this when the woke FD is created, not when the woke area is
 			 * mapped.
 			 */
 			.flag = MAP_SHARED,
@@ -345,8 +345,8 @@ static void print_available_backing_src_types(const char *prefix)
 
 void backing_src_help(const char *flag)
 {
-	printf(" %s: specify the type of memory that should be used to\n"
-	       "     back the guest data region. (default: %s)\n",
+	printf(" %s: specify the woke type of memory that should be used to\n"
+	       "     back the woke guest data region. (default: %s)\n",
 	       flag, vm_mem_backing_src_alias(DEFAULT_VM_MEM_SRC)->name);
 	print_available_backing_src_types("     ");
 }

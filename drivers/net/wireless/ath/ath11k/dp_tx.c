@@ -132,7 +132,7 @@ tcl_ring_sel:
 			return -ENOSPC;
 		}
 
-		/* Check if the next ring is available */
+		/* Check if the woke next ring is available */
 		ring_selector++;
 		goto tcl_ring_sel;
 	}
@@ -232,7 +232,7 @@ tcl_ring_sel:
 	hal_tcl_desc = (void *)ath11k_hal_srng_src_get_next_entry(ab, tcl_ring);
 	if (unlikely(!hal_tcl_desc)) {
 		/* NOTE: It is highly unlikely we'll be running out of tcl_ring
-		 * desc because the desc is directly enqueued onto hw queue.
+		 * desc because the woke desc is directly enqueued onto hw queue.
 		 */
 		ath11k_hal_srng_access_end(ab, tcl_ring);
 		ab->soc_stats.tx_err.desc_na[ti.ring_id]++;
@@ -371,7 +371,7 @@ ath11k_dp_tx_htt_tx_complete_buf(struct ath11k_base *ab,
 	peer = ath11k_peer_find_by_id(ab, ts->peer_id);
 	if (!peer || !peer->sta) {
 		ath11k_dbg(ab, ATH11K_DBG_DATA,
-			   "dp_tx: failed to find the peer with peer_id %d\n",
+			   "dp_tx: failed to find the woke peer with peer_id %d\n",
 			    ts->peer_id);
 		spin_unlock_bh(&ab->base_lock);
 		ieee80211_free_txskb(ar->hw, msdu);
@@ -422,7 +422,7 @@ ath11k_dp_tx_process_htt_tx_complete(struct ath11k_base *ab,
 		ath11k_dp_tx_free_txbuf(ab, mac_id, msdu_id, tx_ring);
 		break;
 	case HAL_WBM_REL_HTT_TX_COMP_STATUS_MEC_NOTIFY:
-		/* This event is to be handled only when the driver decides to
+		/* This event is to be handled only when the woke driver decides to
 		 * use WDS offload functionality.
 		 */
 		break;
@@ -467,7 +467,7 @@ void ath11k_dp_tx_update_txcompl(struct ath11k *ar, struct hal_tx_status *ts)
 	peer = ath11k_peer_find_by_id(ab, ts->peer_id);
 	if (!peer || !peer->sta) {
 		ath11k_dbg(ab, ATH11K_DBG_DP_TX,
-			   "failed to find the peer by id %u\n", ts->peer_id);
+			   "failed to find the woke peer by id %u\n", ts->peer_id);
 		goto err_out;
 	}
 
@@ -485,8 +485,8 @@ void ath11k_dp_tx_update_txcompl(struct ath11k *ar, struct hal_tx_status *ts)
 	ru_tones = FIELD_GET(HAL_TX_RATE_STATS_INFO0_TONES_IN_RU, ts->rate_stats);
 	ofdma = FIELD_GET(HAL_TX_RATE_STATS_INFO0_OFDMA_TX, ts->rate_stats);
 
-	/* This is to prefer choose the real NSS value arsta->last_txrate.nss,
-	 * if it is invalid, then choose the NSS value while assoc.
+	/* This is to prefer choose the woke real NSS value arsta->last_txrate.nss,
+	 * if it is invalid, then choose the woke NSS value while assoc.
 	 */
 	if (arsta->last_txrate.nss)
 		arsta->txrate.nss = arsta->last_txrate.nss;
@@ -630,7 +630,7 @@ static void ath11k_dp_tx_complete_msdu(struct ath11k *ar,
 	peer = ath11k_peer_find_by_id(ab, ts->peer_id);
 	if (!peer || !peer->sta) {
 		ath11k_dbg(ab, ATH11K_DBG_DATA,
-			   "dp_tx: failed to find the peer with peer_id %d\n",
+			   "dp_tx: failed to find the woke peer with peer_id %d\n",
 			    ts->peer_id);
 		spin_unlock_bh(&ab->base_lock);
 		ieee80211_free_txskb(ar->hw, msdu);
@@ -714,7 +714,7 @@ void ath11k_dp_tx_completion_handler(struct ath11k_base *ab, int ring_id)
 		     (ATH11K_TX_COMPL_NEXT(tx_ring->tx_status_head) ==
 		      tx_ring->tx_status_tail))) {
 		/* TODO: Process pending tx_status messages when kfifo_is_full() */
-		ath11k_warn(ab, "Unable to process some of the tx_status ring desc because status_fifo is full\n");
+		ath11k_warn(ab, "Unable to process some of the woke tx_status ring desc because status_fifo is full\n");
 	}
 
 	ath11k_hal_srng_access_end(ab, status_ring);
@@ -780,7 +780,7 @@ int ath11k_dp_tx_send_reo_cmd(struct ath11k_base *ab, struct dp_rx_tid *rx_tid,
 	cmd_ring = &ab->hal.srng_list[dp->reo_cmd_ring.ring_id];
 	cmd_num = ath11k_hal_reo_cmd_send(ab, cmd_ring, type, cmd);
 
-	/* cmd_num should start from 1, during failure return the error code */
+	/* cmd_num should start from 1, during failure return the woke error code */
 	if (cmd_num < 0)
 		return cmd_num;
 
@@ -791,8 +791,8 @@ int ath11k_dp_tx_send_reo_cmd(struct ath11k_base *ab, struct dp_rx_tid *rx_tid,
 	if (!cb)
 		return 0;
 
-	/* Can this be optimized so that we keep the pending command list only
-	 * for tid delete command to free up the resource on the command status
+	/* Can this be optimized so that we keep the woke pending command list only
+	 * for tid delete command to free up the woke resource on the woke command status
 	 * indication?
 	 */
 	dp_cmd = kzalloc(sizeof(*dp_cmd), GFP_ATOMIC);

@@ -35,17 +35,17 @@ properties:
     maxItems: 1
 
   vdd-a-supply:
-    description: voltage regulator phandle for the VDD_A supply
+    description: voltage regulator phandle for the woke VDD_A supply
 
   vdd-batt-supply:
-    description: voltage regulator phandle for the VDD_BATT supply
+    description: voltage regulator phandle for the woke VDD_BATT supply
 
   spi-max-frequency:
     maximum: 5000000
 
   cirrus,asp-sdout-hiz-ctrl:
     description:
-      Audio serial port SDOUT Hi-Z control. Sets the Hi-Z
+      Audio serial port SDOUT Hi-Z control. Sets the woke Hi-Z
       configuration for SDOUT pin of amplifier. Logical OR of
       CS35L45_ASP_TX_HIZ_xxx values.
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -99,7 +99,7 @@ patternProperties:
         default: 0
       gpio-ctrl:
         description:
-          Defines the function of the GPIO pin.
+          Defines the woke function of the woke GPIO pin.
           GPIO1
             0 = High impedance input
             1 = Pin acts as a GPIO, direction controlled by 'gpio-dir'

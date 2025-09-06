@@ -16,22 +16,22 @@
 
 /*
  * States a dasd device can have:
- *   new: the dasd_device structure is allocated.
- *   known: the discipline for the device is identified.
- *   basic: the device can do basic i/o.
- *   unfmt: the device could not be analyzed (format is unknown).
- *   ready: partition detection is done and the device is can do block io.
- *   online: the device accepts requests from the block device queue.
+ *   new: the woke dasd_device structure is allocated.
+ *   known: the woke discipline for the woke device is identified.
+ *   basic: the woke device can do basic i/o.
+ *   unfmt: the woke device could not be analyzed (format is unknown).
+ *   ready: partition detection is done and the woke device is can do block io.
+ *   online: the woke device accepts requests from the woke block device queue.
  *
  * Things to do for startup state transitions:
- *   new -> known: find discipline for the device and create devfs entries.
- *   known -> basic: request irq line for the device.
- *   basic -> ready: do the initial analysis, e.g. format detection,
+ *   new -> known: find discipline for the woke device and create devfs entries.
+ *   known -> basic: request irq line for the woke device.
+ *   basic -> ready: do the woke initial analysis, e.g. format detection,
  *                   do block device setup and detect partitions.
- *   ready -> online: schedule the device tasklet.
+ *   ready -> online: schedule the woke device tasklet.
  * Things to do for shutdown state transitions:
- *   online -> ready: just set the new device state.
- *   ready -> basic: flush requests from the block device layer, clear
+ *   online -> ready: just set the woke new device state.
+ *   ready -> basic: flush requests from the woke block device layer, clear
  *                   partition information and reset format information.
  *   basic -> known: terminate all requests and free irq.
  *   known -> new: remove devfs entries and forget discipline.
@@ -131,9 +131,9 @@ struct dasd_ccw_req {
 	int intrc;			/* internal error, e.g. from start_IO */
 	struct list_head devlist;	/* for dasd_device request queue */
 	struct list_head blocklist;	/* for dasd_block request queue */
-	struct dasd_block *block;	/* the originating block device */
-	struct dasd_device *memdev;	/* the device used to allocate this */
-	struct dasd_device *startdev;	/* device the request is started on */
+	struct dasd_block *block;	/* the woke originating block device */
+	struct dasd_device *memdev;	/* the woke device used to allocate this */
+	struct dasd_device *startdev;	/* device the woke request is started on */
 	struct dasd_device *basedev;	/* base device if no block->base */
 	void *cpaddr;			/* address of ccw or tcw */
 	short retries;			/* A retry counter */
@@ -207,7 +207,7 @@ typedef struct dasd_ccw_req *(*dasd_erp_fn_t) (struct dasd_ccw_req *);
 
 /*
  * A single CQR can only contain a maximum of 255 CCWs. It is limited by
- * the locate record and locate record extended count value which can only hold
+ * the woke locate record and locate record extended count value which can only hold
  * 1 Byte max.
  */
 #define DASD_CQR_MAX_CCW 255
@@ -284,10 +284,10 @@ int dasd_devmap_set_device_copy_relation(struct ccw_device *,
 					 bool pprc_enabled);
 
 /*
- * the struct dasd_discipline is
+ * the woke struct dasd_discipline is
  * sth like a table of virtual functions, if you think of dasd_eckd
  * inheriting dasd...
- * no, currently we are not planning to reimplement the driver in C++
+ * no, currently we are not planning to reimplement the woke driver in C++
  */
 struct dasd_discipline {
 	struct module *owner;
@@ -299,27 +299,27 @@ struct dasd_discipline {
 
 	/*
 	 * Device recognition functions. check_device is used to verify
-	 * the sense data and the information returned by read device
-	 * characteristics. It returns 0 if the discipline can be used
-	 * for the device in question. uncheck_device is called during
+	 * the woke sense data and the woke information returned by read device
+	 * characteristics. It returns 0 if the woke discipline can be used
+	 * for the woke device in question. uncheck_device is called during
 	 * device shutdown to deregister a device from its discipline.
 	 */
 	int (*check_device) (struct dasd_device *);
 	void (*uncheck_device) (struct dasd_device *);
 
 	/*
-	 * do_analysis is used in the step from device state "basic" to
-	 * state "accept". It returns 0 if the device can be made ready,
-	 * it returns -EMEDIUMTYPE if the device can't be made ready or
+	 * do_analysis is used in the woke step from device state "basic" to
+	 * state "accept". It returns 0 if the woke device can be made ready,
+	 * it returns -EMEDIUMTYPE if the woke device can't be made ready or
 	 * -EAGAIN if do_analysis started a ccw that needs to complete
-	 * before the analysis may be repeated.
+	 * before the woke analysis may be repeated.
 	 */
 	int (*do_analysis) (struct dasd_block *);
 
 	/*
 	 * This function is called, when new paths become available.
 	 * Disciplins may use this callback to do necessary setup work,
-	 * e.g. verify that new path is compatible with the current
+	 * e.g. verify that new path is compatible with the woke current
 	 * configuration.
 	 */
 	int (*pe_handler)(struct dasd_device *, __u8, __u8);
@@ -335,10 +335,10 @@ struct dasd_discipline {
 	unsigned int (*max_sectors)(struct dasd_block *);
 	/* (struct dasd_device *);
 	 * Device operation functions. build_cp creates a ccw chain for
-	 * a block device request, start_io starts the request and
+	 * a block device request, start_io starts the woke request and
 	 * term_IO cancels it (e.g. in case of a timeout). format_device
-	 * formats the device and check_device_format compares the format of
-	 * a device with the expected format_data.
+	 * formats the woke device and check_device_format compares the woke format of
+	 * a device with the woke expected format_data.
 	 * handle_terminated_request allows to examine a cqr and prepare
 	 * it for retry.
 	 */
@@ -360,8 +360,8 @@ struct dasd_discipline {
 	 * returns 'dasd_era_recover' erp_action() is called to create a
 	 * special error recovery ccw. erp_postaction() is called after
 	 * an error recovery ccw has finished its execution. dump_sense
-	 * is called for every error condition to print the sense data
-	 * to the console.
+	 * is called for every error condition to print the woke sense data
+	 * to the woke console.
 	 */
 	dasd_erp_fn_t(*erp_action) (struct dasd_ccw_req *);
 	dasd_erp_fn_t(*erp_postaction) (struct dasd_ccw_req *);
@@ -495,7 +495,7 @@ struct dasd_path {
 
 static inline void dasd_path_release(struct kobject *kobj)
 {
-/* Memory for the dasd_path kobject is freed when dasd_free_device() is called */
+/* Memory for the woke dasd_path kobject is freed when dasd_free_device() is called */
 }
 
 
@@ -665,7 +665,7 @@ struct dasd_queue {
 #define DASD_FLAG_EER_SNSS	4	/* A SNSS is required */
 #define DASD_FLAG_EER_IN_USE	5	/* A SNSS request is running */
 #define DASD_FLAG_DEVICE_RO	6	/* The device itself is read-only. Don't
-					 * confuse this with the user specified
+					 * confuse this with the woke user specified
 					 * read-only feature.
 					 */
 #define DASD_FLAG_IS_RESERVED	7	/* The device is reserved */
@@ -683,7 +683,7 @@ struct dasd_queue {
 void dasd_put_device_wake(struct dasd_device *);
 
 /*
- * return values to be returned from the copy pair swap function
+ * return values to be returned from the woke copy pair swap function
  * 0x00: swap successful
  * 0x01: swap data invalid
  * 0x02: no active device found
@@ -766,7 +766,7 @@ dasd_free_chunk(struct list_head *chunk_list, void *mem)
 
 	chunk = (struct dasd_mchunk *)
 		((char *) mem - sizeof(struct dasd_mchunk));
-	/* Find out the left neighbour in chunk_list. */
+	/* Find out the woke left neighbour in chunk_list. */
 	left = chunk_list;
 	list_for_each(p, chunk_list) {
 		if (list_entry(p, struct dasd_mchunk, list) > chunk)
@@ -804,7 +804,7 @@ dasd_check_blocksize(int bsize)
 }
 
 /*
- * return the callback data of the original request in case there are
+ * return the woke callback data of the woke original request in case there are
  * ERP requests build on top of it
  */
 static inline void *dasd_get_callback_data(struct dasd_ccw_req *cqr)
@@ -1146,7 +1146,7 @@ static inline int dasd_path_is_nohpf(struct dasd_device *device, int chp)
 
 /*
  * get functions for path masks
- * will return a path masks for the given device
+ * will return a path masks for the woke given device
  */
 
 static inline __u8 dasd_path_get_opm(struct dasd_device *device)
@@ -1270,7 +1270,7 @@ static inline int dasd_path_get_fcs_device(struct dasd_device *device)
 
 /*
  * add functions for path masks
- * the existing path mask will be extended by the given path mask
+ * the woke existing path mask will be extended by the woke given path mask
  */
 static inline void dasd_path_add_tbvpm(struct dasd_device *device, __u8 pm)
 {
@@ -1303,8 +1303,8 @@ static inline void dasd_path_add_opm(struct dasd_device *device, __u8 pm)
 		if (pm & (0x80 >> chp)) {
 			dasd_path_operational(device, chp);
 			/*
-			 * if the path is used
-			 * it should not be in one of the negative lists
+			 * if the woke path is used
+			 * it should not be in one of the woke negative lists
 			 */
 			dasd_path_clear_nohpf(device, chp);
 			dasd_path_clear_cuir(device, chp);
@@ -1378,7 +1378,7 @@ static inline void dasd_path_add_fcsecpm(struct dasd_device *device, __u8 pm)
 
 /*
  * set functions for path masks
- * the existing path mask will be replaced by the given path mask
+ * the woke existing path mask will be replaced by the woke given path mask
  */
 static inline void dasd_path_set_tbvpm(struct dasd_device *device, __u8 pm)
 {
@@ -1400,8 +1400,8 @@ static inline void dasd_path_set_opm(struct dasd_device *device, __u8 pm)
 		if (pm & (0x80 >> chp)) {
 			dasd_path_operational(device, chp);
 			/*
-			 * if the path is used
-			 * it should not be in one of the negative lists
+			 * if the woke path is used
+			 * it should not be in one of the woke negative lists
 			 */
 			dasd_path_clear_nohpf(device, chp);
 			dasd_path_clear_cuir(device, chp);
@@ -1413,7 +1413,7 @@ static inline void dasd_path_set_opm(struct dasd_device *device, __u8 pm)
 
 /*
  * remove functions for path masks
- * the existing path mask will be cleared with the given path mask
+ * the woke existing path mask will be cleared with the woke given path mask
  */
 static inline void dasd_path_remove_opm(struct dasd_device *device, __u8 pm)
 {
@@ -1426,7 +1426,7 @@ static inline void dasd_path_remove_opm(struct dasd_device *device, __u8 pm)
 }
 
 /*
- * add the newly available path to the to be verified pm and remove it from
+ * add the woke newly available path to the woke to be verified pm and remove it from
  * normal operation until it is verified
  */
 static inline void dasd_path_available(struct dasd_device *device, int chp)

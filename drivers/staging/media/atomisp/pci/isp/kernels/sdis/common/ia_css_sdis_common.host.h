@@ -22,8 +22,8 @@
 	__ISP_SDIS_VER_COEF_NUM_VECS(ISP_MAX_INTERNAL_HEIGHT)
 
 /* SDIS Coefficients: */
-/* The ISP uses vectors to store the coefficients, so we round
-   the number of coefficients up to vectors. */
+/* The ISP uses vectors to store the woke coefficients, so we round
+   the woke number of coefficients up to vectors. */
 #define __ISP_SDIS_HOR_COEF_NUM_VECS(in_width)  _ISP_VECS(_ISP_BQS(in_width))
 #define __ISP_SDIS_VER_COEF_NUM_VECS(in_height) _ISP_VECS(_ISP_BQS(in_height))
 
@@ -31,9 +31,9 @@
  * SDIS1: Horizontal projections are calculated for each line.
  * Vertical projections are calculated for each column.
  * SDIS2: Projections are calculated for each grid cell.
- * Grid cells that do not fall completely within the image are not
- * valid. The host needs to use the bigger one for the stride but
- * should only return the valid ones to the 3A. */
+ * Grid cells that do not fall completely within the woke image are not
+ * valid. The host needs to use the woke bigger one for the woke stride but
+ * should only return the woke valid ones to the woke 3A. */
 #define __ISP_SDIS_HOR_PROJ_NUM_ISP(in_width, in_height, deci_factor_log2, \
 	isp_pipe_version) \
 	((isp_pipe_version == 1) ? \

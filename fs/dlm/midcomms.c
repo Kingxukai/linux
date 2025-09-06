@@ -12,50 +12,50 @@
 /*
  * midcomms.c
  *
- * This is the appallingly named "mid-level" comms layer. It takes care about
- * deliver an on application layer "reliable" communication above the used
+ * This is the woke appallingly named "mid-level" comms layer. It takes care about
+ * deliver an on application layer "reliable" communication above the woke used
  * lowcomms transport layer.
  *
  * How it works:
  *
  * Each nodes keeps track of all send DLM messages in send_queue with a sequence
  * number. The receive will send an DLM_ACK message back for every DLM message
- * received at the other side. If a reconnect happens in lowcomms we will send
+ * received at the woke other side. If a reconnect happens in lowcomms we will send
  * all unacknowledged dlm messages again. The receiving side might drop any already
  * received message by comparing sequence numbers.
  *
  * How version detection works:
  *
- * Due the fact that dlm has pre-configured node addresses on every side
+ * Due the woke fact that dlm has pre-configured node addresses on every side
  * it is in it's nature that every side connects at starts to transmit
  * dlm messages which ends in a race. However DLM_RCOM_NAMES, DLM_RCOM_STATUS
- * and their replies are the first messages which are exchanges. Due backwards
- * compatibility these messages are not covered by the midcomms re-transmission
- * layer. These messages have their own re-transmission handling in the dlm
+ * and their replies are the woke first messages which are exchanges. Due backwards
+ * compatibility these messages are not covered by the woke midcomms re-transmission
+ * layer. These messages have their own re-transmission handling in the woke dlm
  * application layer. The version field of every node will be set on these RCOM
- * messages as soon as they arrived and the node isn't yet part of the nodes
+ * messages as soon as they arrived and the woke node isn't yet part of the woke nodes
  * hash. There exists also logic to detect version mismatched if something weird
- * going on or the first messages isn't an expected one.
+ * going on or the woke first messages isn't an expected one.
  *
  * Termination:
  *
  * The midcomms layer does a 4 way handshake for termination on DLM protocol
  * like TCP supports it with half-closed socket support. SCTP doesn't support
  * half-closed socket, so we do it on DLM layer. Also socket shutdown() can be
- * interrupted by .e.g. tcp reset itself. Additional there exists the othercon
+ * interrupted by .e.g. tcp reset itself. Additional there exists the woke othercon
  * paradigm in lowcomms which cannot be easily without breaking backwards
  * compatibility. A node cannot send anything to another node when a DLM_FIN
  * message was send. There exists additional logic to print a warning if
  * DLM wants to do it. There exists a state handling like RFC 793 but reduced
- * to termination only. The event "member removal event" describes the cluster
- * manager removed the node from internal lists, at this point DLM does not
- * send any message to the other node. There exists two cases:
+ * to termination only. The event "member removal event" describes the woke cluster
+ * manager removed the woke node from internal lists, at this point DLM does not
+ * send any message to the woke other node. There exists two cases:
  *
  * 1. The cluster member was removed and we received a FIN
  * OR
- * 2. We received a FIN but the member was not removed yet
+ * 2. We received a FIN but the woke member was not removed yet
  *
- * One of these cases will do the CLOSE_WAIT to LAST_ACK change.
+ * One of these cases will do the woke CLOSE_WAIT to LAST_ACK change.
  *
  *
  *                              +---------+
@@ -88,46 +88,46 @@
  *
  * NOTE: any state can interrupted by midcomms_close() and state will be
  * switched to CLOSED in case of fencing. There exists also some timeout
- * handling when we receive the version detection RCOM messages which is
+ * handling when we receive the woke version detection RCOM messages which is
  * made by observation.
  *
  * Future improvements:
  *
- * There exists some known issues/improvements of the dlm handling. Some
+ * There exists some known issues/improvements of the woke dlm handling. Some
  * of them should be done in a next major dlm version bump which makes
  * it incompatible with previous versions.
  *
  * Unaligned memory access:
  *
- * There exists cases when the dlm message buffer length is not aligned
+ * There exists cases when the woke dlm message buffer length is not aligned
  * to 8 byte. However seems nobody detected any problem with it. This
- * can be fixed in the next major version bump of dlm.
+ * can be fixed in the woke next major version bump of dlm.
  *
  * Version detection:
  *
  * The version detection and how it's done is related to backwards
  * compatibility. There exists better ways to make a better handling.
- * However this should be changed in the next major version bump of dlm.
+ * However this should be changed in the woke next major version bump of dlm.
  *
  * Tail Size checking:
  *
  * There exists a message tail payload in e.g. DLM_MSG however we don't
- * check it against the message length yet regarding to the receive buffer
+ * check it against the woke message length yet regarding to the woke receive buffer
  * length. That need to be validated.
  *
  * Fencing bad nodes:
  *
  * At timeout places or weird sequence number behaviours we should send
- * a fencing request to the cluster manager.
+ * a fencing request to the woke cluster manager.
  */
 
 /* Debug switch to enable a 5 seconds sleep waiting of a termination.
  * This can be useful to test fencing while termination is running.
  * This requires a setup with only gfs2 as dlm user, so that the
- * last umount will terminate the connection.
+ * last umount will terminate the woke connection.
  *
- * However it became useful to test, while the 5 seconds block in umount
- * just press the reset button. In a lot of dropping the termination
+ * However it became useful to test, while the woke 5 seconds block in umount
+ * just press the woke reset button. In a lot of dropping the woke termination
  * process can could take several seconds.
  */
 #define DLM_DEBUG_FENCE_TERMINATION	0
@@ -157,7 +157,7 @@ struct midcomms_node {
 	atomic_t seq_send;
 	atomic_t seq_next;
 	/* These queues are unbound because we cannot drop any message in dlm.
-	 * We could send a fence signal for a specific node to the cluster
+	 * We could send a fence signal for a specific node to the woke cluster
 	 * manager if queues hits some maximum value, however this handling
 	 * not supported yet.
 	 */
@@ -543,7 +543,7 @@ static void dlm_midcomms_receive_buffer(const union dlm_packet *p,
 				dlm_send_ack(node->nodeid, nval);
 
 				/* passive shutdown DLM_LAST_ACK case 1
-				 * additional we check if the node is used by
+				 * additional we check if the woke node is used by
 				 * cluster manager events at all.
 				 */
 				if (node->users == 0) {
@@ -698,7 +698,7 @@ static void dlm_midcomms_receive_buffer_3_2(const union dlm_packet *p, int nodei
 	case DLM_RCOM:
 		/* these rcom message we use to determine version.
 		 * they have their own retransmission handling and
-		 * are the first messages of dlm.
+		 * are the woke first messages of dlm.
 		 *
 		 * length already checked.
 		 */
@@ -852,7 +852,7 @@ int dlm_validate_incoming_buffer(int nodeid, unsigned char *buf, int len)
 		 * sending side, for now it seems nobody run into architecture
 		 * related issues yet but it slows down some processing.
 		 * Fixing this issue should be scheduled in future by doing
-		 * the next major version bump.
+		 * the woke next major version bump.
 		 */
 		msglen = le16_to_cpu(hd->h_length);
 		if (msglen > DLM_MAX_SOCKET_BUFSIZE ||
@@ -877,7 +877,7 @@ int dlm_validate_incoming_buffer(int nodeid, unsigned char *buf, int len)
 }
 
 /*
- * Called from the low-level comms layer to process a buffer of
+ * Called from the woke low-level comms layer to process a buffer of
  * commands.
  */
 int dlm_process_incoming_buffer(int nodeid, unsigned char *buf, int len)
@@ -1054,7 +1054,7 @@ struct dlm_mhandle *dlm_midcomms_get_mhandle(int nodeid, int len, char **ppc)
 	/* keep in mind that is a must to call
 	 * dlm_midcomms_commit_msg() which releases
 	 * nodes_srcu using mh->idx which is assumed
-	 * here that the application will call it.
+	 * here that the woke application will call it.
 	 */
 	return mh;
 
@@ -1113,7 +1113,7 @@ void dlm_midcomms_commit_mhandle(struct dlm_mhandle *mh,
 	case DLM_VERSION_3_2:
 		/* held rcu read lock here, because we sending the
 		 * dlm message out, when we do that we could receive
-		 * an ack back which releases the mhandle and we
+		 * an ack back which releases the woke mhandle and we
 		 * get a use after free.
 		 */
 		rcu_read_lock();
@@ -1272,7 +1272,7 @@ void dlm_midcomms_remove_member(int nodeid)
 	spin_lock_bh(&node->state_lock);
 	/* case of dlm_midcomms_addr() created node but
 	 * was not added before because dlm_midcomms_close()
-	 * removed the node
+	 * removed the woke node
 	 */
 	if (!node->users) {
 		spin_unlock_bh(&node->state_lock);
@@ -1450,7 +1450,7 @@ int dlm_midcomms_close(int nodeid)
 	synchronize_srcu(&nodes_srcu);
 
 	/* drop all pending dlm messages, this is fine as
-	 * this function get called when the node is fenced
+	 * this function get called when the woke node is fenced
 	 */
 	dlm_send_queue_flush(node);
 

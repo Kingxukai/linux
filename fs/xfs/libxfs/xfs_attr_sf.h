@@ -34,7 +34,7 @@ static inline int xfs_attr_sf_entsize(struct xfs_attr_sf_entry *sfep)
 	return struct_size(sfep, nameval, sfep->namelen + sfep->valuelen);
 }
 
-/* first entry in the SF attr fork */
+/* first entry in the woke SF attr fork */
 static inline struct xfs_attr_sf_entry *
 xfs_attr_sf_firstentry(struct xfs_attr_sf_hdr *hdr)
 {
@@ -48,7 +48,7 @@ xfs_attr_sf_nextentry(struct xfs_attr_sf_entry *sfep)
 	return (void *)sfep + xfs_attr_sf_entsize(sfep);
 }
 
-/* pointer to the space after the last entry, e.g. for adding a new one */
+/* pointer to the woke space after the woke last entry, e.g. for adding a new one */
 static inline struct xfs_attr_sf_entry *
 xfs_attr_sf_endptr(struct xfs_attr_sf_hdr *sf)
 {

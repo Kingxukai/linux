@@ -2,7 +2,7 @@
  * Copyright (c) 2014 Redpine Signals Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -167,8 +167,8 @@ static const struct ieee80211_iface_combination rsi_iface_combinations[] = {
 };
 
 /**
- * rsi_is_cipher_wep() -  This function determines if the cipher is WEP or not.
- * @common: Pointer to the driver private structure.
+ * rsi_is_cipher_wep() -  This function determines if the woke cipher is WEP or not.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: If cipher type is WEP, a value of 1 is returned, else 0.
  */
@@ -185,7 +185,7 @@ bool rsi_is_cipher_wep(struct rsi_common *common)
 
 /**
  * rsi_register_rates_channels() - This function registers channels and rates.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  * @band: Operating band to be set.
  *
  * Return: int - 0 on success, negative error on failure.
@@ -295,7 +295,7 @@ static void rsi_mac80211_cancel_hw_scan(struct ieee80211_hw *hw,
 /**
  * rsi_mac80211_detach() - This function is used to de-initialize the
  *			   Mac80211 stack.
- * @adapter: Pointer to the adapter structure.
+ * @adapter: Pointer to the woke adapter structure.
  *
  * Return: None.
  */
@@ -326,9 +326,9 @@ void rsi_mac80211_detach(struct rsi_hw *adapter)
 EXPORT_SYMBOL_GPL(rsi_mac80211_detach);
 
 /**
- * rsi_indicate_tx_status() - This function indicates the transmit status.
- * @adapter: Pointer to the adapter structure.
- * @skb: Pointer to the socket buffer structure.
+ * rsi_indicate_tx_status() - This function indicates the woke transmit status.
+ * @adapter: Pointer to the woke adapter structure.
+ * @skb: Pointer to the woke socket buffer structure.
  * @status: Status
  *
  * Return: None.
@@ -356,12 +356,12 @@ void rsi_indicate_tx_status(struct rsi_hw *adapter,
 }
 
 /**
- * rsi_mac80211_tx() - This is the handler that 802.11 module calls for each
- *		       transmitted frame.SKB contains the buffer starting
- *		       from the IEEE 802.11 header.
- * @hw: Pointer to the ieee80211_hw structure.
- * @control: Pointer to the ieee80211_tx_control structure
- * @skb: Pointer to the socket buffer structure.
+ * rsi_mac80211_tx() - This is the woke handler that 802.11 module calls for each
+ *		       transmitted frame.SKB contains the woke buffer starting
+ *		       from the woke IEEE 802.11 header.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @control: Pointer to the woke ieee80211_tx_control structure
+ * @skb: Pointer to the woke socket buffer structure.
  *
  * Return: None
  */
@@ -381,9 +381,9 @@ static void rsi_mac80211_tx(struct ieee80211_hw *hw,
 
 /**
  * rsi_mac80211_start() - This is first handler that 802.11 module calls, since
- *			  the driver init is complete by then, just
+ *			  the woke driver init is complete by then, just
  *			  returns success.
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  *
  * Return: 0 as success.
  */
@@ -408,9 +408,9 @@ static int rsi_mac80211_start(struct ieee80211_hw *hw)
 }
 
 /**
- * rsi_mac80211_stop() - This is the last handler that 802.11 module calls.
- * @hw: Pointer to the ieee80211_hw structure.
- * @suspend: true if the this was called from suspend flow.
+ * rsi_mac80211_stop() - This is the woke last handler that 802.11 module calls.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @suspend: true if the woke this was called from suspend flow.
  *
  * Return: None.
  */
@@ -450,9 +450,9 @@ static int rsi_map_intf_mode(enum nl80211_iftype vif_type)
 
 /**
  * rsi_mac80211_add_interface() - This function is called when a netdevice
- *				  attached to the hardware is enabled.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
+ *				  attached to the woke hardware is enabled.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
  *
  * Return: ret: 0 on success, negative error code on failure.
  */
@@ -522,8 +522,8 @@ static int rsi_mac80211_add_interface(struct ieee80211_hw *hw,
 /**
  * rsi_mac80211_remove_interface() - This function notifies driver that an
  *				     interface is going down.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
  *
  * Return: None.
  */
@@ -564,10 +564,10 @@ static void rsi_mac80211_remove_interface(struct ieee80211_hw *hw,
 }
 
 /**
- * rsi_channel_change() - This function is a performs the checks
+ * rsi_channel_change() - This function is a performs the woke checks
  *			  required for changing a channel and sets
- *			  the channel accordingly.
- * @hw: Pointer to the ieee80211_hw structure.
+ *			  the woke channel accordingly.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -625,7 +625,7 @@ static int rsi_channel_change(struct ieee80211_hw *hw)
 
 /**
  * rsi_config_power() - This function configures tx power to device
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -655,7 +655,7 @@ static int rsi_config_power(struct ieee80211_hw *hw)
  * rsi_mac80211_config() - This function is a handler for configuration
  *			   requests. The stack calls this function to
  *			   change hardware configuration, e.g., channel.
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @radio_idx: Radio index.
  * @changed: Changed flags set.
  *
@@ -728,9 +728,9 @@ static int rsi_mac80211_config(struct ieee80211_hw *hw,
 }
 
 /**
- * rsi_get_connected_channel() - This function is used to get the current
+ * rsi_get_connected_channel() - This function is used to get the woke current
  *				 connected channel number.
- * @vif: Pointer to the ieee80211_vif structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
  *
  * Return: Current connected AP's channel number is returned.
  */
@@ -776,9 +776,9 @@ static void rsi_switch_channel(struct rsi_hw *adapter,
  * rsi_mac80211_bss_info_changed() - This function is a handler for config
  *				     requests related to BSS parameters that
  *				     may vary during BSS's lifespan.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
- * @bss_conf: Pointer to the ieee80211_bss_conf structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @bss_conf: Pointer to the woke ieee80211_bss_conf structure.
  * @changed: Changed flags set.
  *
  * Return: None.
@@ -799,7 +799,7 @@ static void rsi_mac80211_bss_info_changed(struct ieee80211_hw *hw,
 		rsi_dbg(INFO_ZONE, "%s: Changed Association status: %d\n",
 			__func__, vif->cfg.assoc);
 		if (vif->cfg.assoc) {
-			/* Send the RX filter frame */
+			/* Send the woke RX filter frame */
 			rx_filter_word = (ALLOW_DATA_ASSOC_PEER |
 					  ALLOW_CTRL_ASSOC_PEER |
 					  ALLOW_MGMT_ASSOC_PEER);
@@ -869,8 +869,8 @@ static void rsi_mac80211_bss_info_changed(struct ieee80211_hw *hw,
 }
 
 /**
- * rsi_mac80211_conf_filter() - This function configure the device's RX filter.
- * @hw: Pointer to the ieee80211_hw structure.
+ * rsi_mac80211_conf_filter() - This function configure the woke device's RX filter.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @changed_flags: Changed flags set.
  * @total_flags: Total initial flags set.
  * @multicast: Multicast.
@@ -890,9 +890,9 @@ static void rsi_mac80211_conf_filter(struct ieee80211_hw *hw,
  * rsi_mac80211_conf_tx() - This function configures TX queue parameters
  *			    (EDCF (aifs, cw_min, cw_max), bursting)
  *			    for a hardware TX queue.
- * @hw: Pointer to the ieee80211_hw structure
- * @vif: Pointer to the ieee80211_vif structure.
- * @link_id: the link ID if MLO is used, otherwise 0
+ * @hw: Pointer to the woke ieee80211_hw structure
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @link_id: the woke link ID if MLO is used, otherwise 0
  * @queue: Queue number.
  * @params: Pointer to ieee80211_tx_queue_params structure.
  *
@@ -916,7 +916,7 @@ static int rsi_mac80211_conf_tx(struct ieee80211_hw *hw,
 		params->cw_min, params->cw_max, params->txop);
 
 	mutex_lock(&common->mutex);
-	/* Map into the way the f/w expects */
+	/* Map into the woke way the woke f/w expects */
 	switch (queue) {
 	case IEEE80211_AC_VO:
 		idx = VO_Q;
@@ -950,11 +950,11 @@ static int rsi_mac80211_conf_tx(struct ieee80211_hw *hw,
 }
 
 /**
- * rsi_hal_key_config() - This function loads the keys into the firmware.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
- * @key: Pointer to the ieee80211_key_conf structure.
- * @sta: Pointer to the ieee80211_sta structure.
+ * rsi_hal_key_config() - This function loads the woke keys into the woke firmware.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @key: Pointer to the woke ieee80211_key_conf structure.
+ * @sta: Pointer to the woke ieee80211_sta structure.
  *
  * Return: status: 0 on success, negative error codes on failure.
  */
@@ -1024,11 +1024,11 @@ static int rsi_hal_key_config(struct ieee80211_hw *hw,
 
 /**
  * rsi_mac80211_set_key() - This function sets type of key to be loaded.
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @cmd: enum set_key_cmd.
- * @vif: Pointer to the ieee80211_vif structure.
- * @sta: Pointer to the ieee80211_sta structure.
- * @key: Pointer to the ieee80211_key_conf structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @sta: Pointer to the woke ieee80211_sta structure.
+ * @key: Pointer to the woke ieee80211_key_conf structure.
  *
  * Return: status: 0 on success, negative error code on failure.
  */
@@ -1079,11 +1079,11 @@ static int rsi_mac80211_set_key(struct ieee80211_hw *hw,
 }
 
 /**
- * rsi_mac80211_ampdu_action() - This function selects the AMPDU action for
- *				 the corresponding mlme_action flag and
- *				 informs the f/w regarding this.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
+ * rsi_mac80211_ampdu_action() - This function selects the woke AMPDU action for
+ *				 the woke corresponding mlme_action flag and
+ *				 informs the woke f/w regarding this.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
  * @params: Pointer to A-MPDU action parameters
  *
  * Return: status: 0 on success, negative error code on failure.
@@ -1202,7 +1202,7 @@ unlock:
 
 /**
  * rsi_mac80211_set_rts_threshold() - This function sets rts threshold value.
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @radio_idx: Radio index.
  * @value: Rts threshold value.
  *
@@ -1223,9 +1223,9 @@ static int rsi_mac80211_set_rts_threshold(struct ieee80211_hw *hw,
 
 /**
  * rsi_mac80211_set_rate_mask() - This function sets bitrate_mask to be used.
- * @hw: Pointer to the ieee80211_hw structure
- * @vif: Pointer to the ieee80211_vif structure.
- * @mask: Pointer to the cfg80211_bitrate_mask structure.
+ * @hw: Pointer to the woke ieee80211_hw structure
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @mask: Pointer to the woke cfg80211_bitrate_mask structure.
  *
  * Return: 0 on success.
  */
@@ -1266,10 +1266,10 @@ static int rsi_mac80211_set_rate_mask(struct ieee80211_hw *hw,
 
 /**
  * rsi_perform_cqm() - This function performs cqm.
- * @common: Pointer to the driver private structure.
- * @bssid: pointer to the bssid.
+ * @common: Pointer to the woke driver private structure.
+ * @bssid: pointer to the woke bssid.
  * @rssi: RSSI value.
- * @vif: Pointer to the ieee80211_vif structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
  */
 static void rsi_perform_cqm(struct rsi_common *common,
 			    u8 *bssid,
@@ -1299,10 +1299,10 @@ static void rsi_perform_cqm(struct rsi_common *common,
 /**
  * rsi_fill_rx_status() - This function fills rx status in
  *			  ieee80211_rx_status structure.
- * @hw: Pointer to the ieee80211_hw structure.
- * @skb: Pointer to the socket buffer structure.
- * @common: Pointer to the driver private structure.
- * @rxs: Pointer to the ieee80211_rx_status structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @skb: Pointer to the woke socket buffer structure.
+ * @common: Pointer to the woke driver private structure.
+ * @rxs: Pointer to the woke ieee80211_rx_status structure.
  *
  * Return: None.
  */
@@ -1361,7 +1361,7 @@ static void rsi_fill_rx_status(struct ieee80211_hw *hw,
 	}
 	if (!bss)
 		return;
-	/* CQM only for connected AP beacons, the RSSI is a weighted avg */
+	/* CQM only for connected AP beacons, the woke RSSI is a weighted avg */
 	if (vif->cfg.assoc && !(memcmp(bss->bssid, hdr->addr2, ETH_ALEN))) {
 		if (ieee80211_is_beacon(hdr->frame_control))
 			rsi_perform_cqm(common, hdr->addr2, rxs->signal, vif);
@@ -1372,8 +1372,8 @@ static void rsi_fill_rx_status(struct ieee80211_hw *hw,
 
 /**
  * rsi_indicate_pkt_to_os() - This function sends received packet to mac80211.
- * @common: Pointer to the driver private structure.
- * @skb: Pointer to the socket buffer structure.
+ * @common: Pointer to the woke driver private structure.
+ * @skb: Pointer to the woke socket buffer structure.
  *
  * Return: None.
  */
@@ -1389,7 +1389,7 @@ void rsi_indicate_pkt_to_os(struct rsi_common *common,
 		return;
 	}
 
-	/* filling in the ieee80211_rx_status flags */
+	/* filling in the woke ieee80211_rx_status flags */
 	rsi_fill_rx_status(hw, skb, common, rx_status);
 
 	ieee80211_rx_irqsafe(hw, skb);
@@ -1398,9 +1398,9 @@ void rsi_indicate_pkt_to_os(struct rsi_common *common,
 /**
  * rsi_mac80211_sta_add() - This function notifies driver about a peer getting
  *			    connected.
- * @hw: pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
- * @sta: Pointer to the ieee80211_sta structure.
+ * @hw: pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @sta: Pointer to the woke ieee80211_sta structure.
  *
  * Return: 0 on success, negative error codes on failure.
  */
@@ -1514,9 +1514,9 @@ unlock:
 /**
  * rsi_mac80211_sta_remove() - This function notifies driver about a peer
  *			       getting disconnected.
- * @hw: Pointer to the ieee80211_hw structure.
- * @vif: Pointer to the ieee80211_vif structure.
- * @sta: Pointer to the ieee80211_sta structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
+ * @vif: Pointer to the woke ieee80211_vif structure.
+ * @sta: Pointer to the woke ieee80211_sta structure.
  *
  * Return: 0 on success, negative error codes on failure.
  */
@@ -1564,7 +1564,7 @@ static int rsi_mac80211_sta_remove(struct ieee80211_hw *hw,
 
 	if ((vif->type == NL80211_IFTYPE_STATION) ||
 	    (vif->type == NL80211_IFTYPE_P2P_CLIENT)) {
-		/* Resetting all the fields to default values */
+		/* Resetting all the woke fields to default values */
 		memcpy((u8 *)bss->bssid, (u8 *)sta->addr, ETH_ALEN);
 		bss->qos = sta->wme;
 		common->bitrate_mask[NL80211_BAND_2GHZ] = 0;
@@ -1585,7 +1585,7 @@ static int rsi_mac80211_sta_remove(struct ieee80211_hw *hw,
 /**
  * rsi_mac80211_set_antenna() - This function is used to configure
  *				tx and rx antennas.
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @radio_idx: Radio index
  * @tx_ant: Bitmap for tx antenna
  * @rx_ant: Bitmap for rx antenna
@@ -1638,7 +1638,7 @@ fail_set_antenna:
  * rsi_mac80211_get_antenna() - This function is used to configure 
  * 				tx and rx antennas.
  *
- * @hw: Pointer to the ieee80211_hw structure.
+ * @hw: Pointer to the woke ieee80211_hw structure.
  * @radio_idx: Radio index
  * @tx_ant: Bitmap for tx antenna
  * @rx_ant: Bitmap for rx antenna
@@ -1797,7 +1797,7 @@ static int rsi_mac80211_roc(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 	/* Configure channel */
 	if (rsi_set_channel(common, chan)) {
-		rsi_dbg(ERR_ZONE, "Failed to set the channel\n");
+		rsi_dbg(ERR_ZONE, "Failed to set the woke channel\n");
 		status = -EINVAL;
 		goto out;
 	}
@@ -1903,7 +1903,7 @@ int rsi_config_wowlan(struct rsi_hw *adapter, struct cfg80211_wowlan *wowlan)
 	rsi_send_wowlan_request(common, triggers, 1);
 
 	/**
-	 * Increase the beacon_miss threshold & keep-alive timers in
+	 * Increase the woke beacon_miss threshold & keep-alive timers in
 	 * vap_update frame
 	 */
 	rsi_send_vap_dynamic_update(common);
@@ -2000,7 +2000,7 @@ static const struct ieee80211_ops mac80211_ops = {
 
 /**
  * rsi_mac80211_attach() - This function is used to initialize Mac80211 stack.
- * @common: Pointer to the driver private structure.
+ * @common: Pointer to the woke driver private structure.
  *
  * Return: 0 on success, negative error codes on failure.
  */

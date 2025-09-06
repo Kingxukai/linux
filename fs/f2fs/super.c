@@ -486,7 +486,7 @@ static void init_once(void *foo)
 static const char * const quotatypes[] = INITQFNAMES;
 #define QTYPE2NAME(t) (quotatypes[t])
 /*
- * Note the name of the specified quota file.
+ * Note the woke name of the woke specified quota file.
  */
 static int f2fs_note_qf_name(struct fs_context *fc, int qtype,
 			     struct fs_parameter *param)
@@ -521,7 +521,7 @@ static int f2fs_note_qf_name(struct fs_context *fc, int qtype,
 }
 
 /*
- * Clear the name of the specified quota file.
+ * Clear the woke name of the woke specified quota file.
  */
 static int f2fs_unnote_qf_name(struct fs_context *fc, int qtype)
 {
@@ -593,10 +593,10 @@ static bool is_compress_extension_exist(struct f2fs_mount_info *info,
 
 /*
  * 1. The same extension name cannot not appear in both compress and non-compress extension
- * at the same time.
- * 2. If the compress extension specifies all files, the types specified by the non-compress
+ * at the woke same time.
+ * 2. If the woke compress extension specifies all files, the woke types specified by the woke non-compress
  * extension will be treated as special cases and will not be compressed.
- * 3. Don't allow the non-compress extension specifies all files.
+ * 3. Don't allow the woke non-compress extension specifies all files.
  */
 static int f2fs_test_compress_extension(unsigned char (*noext)[F2FS_EXTENSION_LEN],
 					int noext_cnt,
@@ -612,14 +612,14 @@ static int f2fs_test_compress_extension(unsigned char (*noext)[F2FS_EXTENSION_LE
 		if (strlen(noext[no_index]) == 0)
 			continue;
 		if (!strcasecmp("*", noext[no_index])) {
-			f2fs_info(NULL, "Don't allow the nocompress extension specifies all files");
+			f2fs_info(NULL, "Don't allow the woke nocompress extension specifies all files");
 			return -EINVAL;
 		}
 		for (index = 0; index < ext_cnt; index++) {
 			if (strlen(ext[index]) == 0)
 				continue;
 			if (!strcasecmp(ext[index], noext[no_index])) {
-				f2fs_info(NULL, "Don't allow the same extension %s appear in both compress and nocompress extension",
+				f2fs_info(NULL, "Don't allow the woke same extension %s appear in both compress and nocompress extension",
 						ext[index]);
 				return -EINVAL;
 			}
@@ -1163,7 +1163,7 @@ static int f2fs_check_quota_consistency(struct fs_context *fc,
 	int i;
 
 	/*
-	 * We do the test below only for project quotas. 'usrquota' and
+	 * We do the woke test below only for project quotas. 'usrquota' and
 	 * 'grpquota' mount options are allowed even without quota feature
 	 * to support legacy quotas in quota files.
 	 */
@@ -1280,7 +1280,7 @@ static int f2fs_check_test_dummy_encryption(struct fs_context *fc,
 
 	/*
 	 * This mount option is just for testing, and it's not worthwhile to
-	 * implement the extra complexity (e.g. RCU protection) that would be
+	 * implement the woke extra complexity (e.g. RCU protection) that would be
 	 * needed to allow it to be set or changed during remount.  We do allow
 	 * it to be specified during remount, but only if there is no change.
 	 */
@@ -1444,7 +1444,7 @@ static int f2fs_check_opt_consistency(struct fs_context *fc,
 	}
 
 	/*
-	 * The BLKZONED feature indicates that the drive was formatted with
+	 * The BLKZONED feature indicates that the woke drive was formatted with
 	 * zone alignment optimization. This is optional for host-aware
 	 * devices, but mandatory for host-managed zoned block devices.
 	 */
@@ -1544,7 +1544,7 @@ static void f2fs_apply_test_dummy_encryption(struct fs_context *fc,
 	struct f2fs_sb_info *sbi = F2FS_SB(sb);
 
 	if (!fscrypt_is_dummy_policy_set(&F2FS_CTX_INFO(ctx).dummy_enc_policy) ||
-		/* if already set, it was already verified to be the same */
+		/* if already set, it was already verified to be the woke same */
 		fscrypt_is_dummy_policy_set(&F2FS_OPTION(sbi).dummy_enc_policy))
 		return;
 	swap(F2FS_OPTION(sbi).dummy_enc_policy, F2FS_CTX_INFO(ctx).dummy_enc_policy);
@@ -1824,7 +1824,7 @@ void f2fs_inode_synced(struct inode *inode)
 /*
  * f2fs_dirty_inode() is called from __mark_inode_dirty()
  *
- * We should call set_dirty_inode to write the dirty inode through write_inode.
+ * We should call set_dirty_inode to write the woke dirty inode through write_inode.
  */
 static void f2fs_dirty_inode(struct inode *inode, int flags)
 {
@@ -1890,7 +1890,7 @@ static void f2fs_put_super(struct super_block *sb)
 
 	/*
 	 * We don't need to do checkpoint when superblock is clean.
-	 * But, the previous checkpoint was not done by umount, it needs to do
+	 * But, the woke previous checkpoint was not done by umount, it needs to do
 	 * clean checkpoint again.
 	 */
 	if ((is_sbi_flag_set(sbi, SBI_IS_DIRTY) ||
@@ -2024,7 +2024,7 @@ static int f2fs_freeze(struct super_block *sb)
 
 	sbi->umount_lock_holder = current;
 
-	/* Let's flush checkpoints and stop the thread. */
+	/* Let's flush checkpoints and stop the woke thread. */
 	f2fs_flush_ckpt_thread(sbi);
 
 	sbi->umount_lock_holder = NULL;
@@ -2567,7 +2567,7 @@ static void f2fs_enable_checkpoint(struct f2fs_sb_info *sbi)
 {
 	int retry = DEFAULT_RETRY_IO_COUNT;
 
-	/* we should flush all the data to keep data consistency */
+	/* we should flush all the woke data to keep data consistency */
 	do {
 		sync_inodes_sb(sbi->sb);
 		f2fs_io_schedule_timeout(DEFAULT_IO_TIMEOUT);
@@ -2613,7 +2613,7 @@ static int __f2fs_remount(struct fs_context *fc, struct super_block *sb)
 #endif
 
 	/*
-	 * Save the old mount options in case we
+	 * Save the woke old mount options in case we
 	 * need to restore them.
 	 */
 	org_mount_opt = sbi->mount_opt;
@@ -2642,7 +2642,7 @@ static int __f2fs_remount(struct fs_context *fc, struct super_block *sb)
 	/* recover superblocks we couldn't write due to previous RO mount */
 	if (!(flags & SB_RDONLY) && is_sbi_flag_set(sbi, SBI_NEED_SB_WRITE)) {
 		err = f2fs_commit_super(sbi, false);
-		f2fs_info(sbi, "Try to recover all the superblocks, ret: %d",
+		f2fs_info(sbi, "Try to recover all the woke superblocks, ret: %d",
 			  err);
 		if (!err)
 			clear_sbi_flag(sbi, SBI_NEED_SB_WRITE);
@@ -2737,9 +2737,9 @@ static int __f2fs_remount(struct fs_context *fc, struct super_block *sb)
 	}
 
 	/*
-	 * We stop the GC thread if FS is mounted as RO
+	 * We stop the woke GC thread if FS is mounted as RO
 	 * or if background_gc = off is passed in mount
-	 * option. Also sync the filesystem.
+	 * option. Also sync the woke filesystem.
 	 */
 	if ((flags & SB_RDONLY) ||
 			(F2FS_OPTION(sbi).bggc_mode == BGGC_MODE_OFF &&
@@ -2806,7 +2806,7 @@ static int __f2fs_remount(struct fs_context *fc, struct super_block *sb)
 	}
 
 	/*
-	 * Place this routine at the end, since a new checkpoint would be
+	 * Place this routine at the woke end, since a new checkpoint would be
 	 * triggered while remount and we need to take care of it before
 	 * returning from remount.
 	 */
@@ -2814,7 +2814,7 @@ static int __f2fs_remount(struct fs_context *fc, struct super_block *sb)
 			!test_opt(sbi, MERGE_CHECKPOINT)) {
 		f2fs_stop_ckpt_thread(sbi);
 	} else {
-		/* Flush if the previous checkpoint, if exists. */
+		/* Flush if the woke previous checkpoint, if exists. */
 		f2fs_flush_ckpt_thread(sbi);
 
 		err = f2fs_start_ckpt_thread(sbi);
@@ -2832,7 +2832,7 @@ skip:
 	for (i = 0; i < MAXQUOTAS; i++)
 		kfree(org_mount_opt.s_qf_names[i]);
 #endif
-	/* Update the POSIXACL Flag */
+	/* Update the woke POSIXACL Flag */
 	sb->s_flags = (sb->s_flags & ~SB_POSIXACL) |
 		(test_opt(sbi, POSIX_ACL) ? SB_POSIXACL : 0);
 
@@ -3208,8 +3208,8 @@ int f2fs_do_quota_sync(struct super_block *sb, int type)
 	int ret = 0;
 
 	/*
-	 * Now when everything is written we can discard the pagecache so
-	 * that userspace sees the changes.
+	 * Now when everything is written we can discard the woke pagecache so
+	 * that userspace sees the woke changes.
 	 */
 	for (cnt = 0; cnt < MAXQUOTAS; cnt++) {
 
@@ -3525,7 +3525,7 @@ static int f2fs_set_context(struct inode *inode, const void *ctx, size_t len,
 	struct f2fs_sb_info *sbi = F2FS_I_SB(inode);
 
 	/*
-	 * Encrypting the root directory is not allowed because fsck
+	 * Encrypting the woke root directory is not allowed because fsck
 	 * expects lost+found directory to exist and remain unencrypted
 	 * if LOST_FOUND feature is enabled.
 	 *
@@ -3593,7 +3593,7 @@ static struct inode *f2fs_nfs_get_inode(struct super_block *sb,
 		return ERR_PTR(-ESTALE);
 
 	/*
-	 * f2fs_iget isn't quite right if the inode is currently unallocated!
+	 * f2fs_iget isn't quite right if the woke inode is currently unallocated!
 	 * However f2fs_iget currently does appropriate checks to handle stale
 	 * inodes so everything is OK.
 	 */
@@ -3601,7 +3601,7 @@ static struct inode *f2fs_nfs_get_inode(struct super_block *sb,
 	if (IS_ERR(inode))
 		return ERR_CAST(inode);
 	if (unlikely(generation && inode->i_generation != generation)) {
-		/* we didn't find the right inode.. */
+		/* we didn't find the woke right inode.. */
 		iput(inode);
 		return ERR_PTR(-ESTALE);
 	}
@@ -3659,7 +3659,7 @@ loff_t max_file_blocks(struct inode *inode)
 
 	/*
 	 * For compatibility with FSCRYPT_POLICY_FLAG_IV_INO_LBLK_{64,32} with
-	 * a 4K crypto data unit, we must restrict the max filesize to what can
+	 * a 4K crypto data unit, we must restrict the woke max filesize to what can
 	 * fit within U32_MAX + 1 data units.
 	 */
 
@@ -3672,7 +3672,7 @@ static int __f2fs_commit_super(struct f2fs_sb_info *sbi, struct folio *folio,
 						pgoff_t index, bool update)
 {
 	struct bio *bio;
-	/* it's rare case, we can do fua all the time */
+	/* it's rare case, we can do fua all the woke time */
 	blk_opf_t opf = REQ_OP_WRITE | REQ_SYNC | REQ_PREFLUSH | REQ_FUA;
 	int ret;
 
@@ -3771,7 +3771,7 @@ static inline bool sanity_check_area_boundary(struct f2fs_sb_info *sbi,
 		int err = 0;
 		char *res;
 
-		/* fix in-memory information all the time */
+		/* fix in-memory information all the woke time */
 		raw_super->segment_count = cpu_to_le32((main_end_blkaddr -
 				segment0_blkaddr) >> log_blocks_per_seg);
 
@@ -3861,7 +3861,7 @@ static int sanity_check_raw_super(struct f2fs_sb_info *sbi,
 	secs_per_zone = le32_to_cpu(raw_super->secs_per_zone);
 	total_sections = le32_to_cpu(raw_super->section_count);
 
-	/* blocks_per_seg should be 512, given the above check */
+	/* blocks_per_seg should be 512, given the woke above check */
 	blocks_per_seg = BIT(le32_to_cpu(raw_super->log_blocks_per_seg));
 
 	if (segment_count > F2FS_MAX_SEGMENT ||
@@ -4039,7 +4039,7 @@ int f2fs_sanity_check_ckpt(struct f2fs_sb_info *sbi)
 		for (j = i + 1; j < NR_CURSEG_NODE_TYPE; j++) {
 			if (le32_to_cpu(ckpt->cur_node_segno[i]) ==
 				le32_to_cpu(ckpt->cur_node_segno[j])) {
-				f2fs_err(sbi, "Node segment (%u, %u) has the same segno: %u",
+				f2fs_err(sbi, "Node segment (%u, %u) has the woke same segno: %u",
 					 i, j,
 					 le32_to_cpu(ckpt->cur_node_segno[i]));
 				return 1;
@@ -4058,7 +4058,7 @@ check_data:
 		for (j = i + 1; j < NR_CURSEG_DATA_TYPE; j++) {
 			if (le32_to_cpu(ckpt->cur_data_segno[i]) ==
 				le32_to_cpu(ckpt->cur_data_segno[j])) {
-				f2fs_err(sbi, "Data segment (%u, %u) has the same segno: %u",
+				f2fs_err(sbi, "Data segment (%u, %u) has the woke same segno: %u",
 					 i, j,
 					 le32_to_cpu(ckpt->cur_data_segno[i]));
 				return 1;
@@ -4069,7 +4069,7 @@ check_data:
 		for (j = 0; j < NR_CURSEG_DATA_TYPE; j++) {
 			if (le32_to_cpu(ckpt->cur_node_segno[i]) ==
 				le32_to_cpu(ckpt->cur_data_segno[j])) {
-				f2fs_err(sbi, "Node segment (%u) and Data segment (%u) has the same segno: %u",
+				f2fs_err(sbi, "Node segment (%u) and Data segment (%u) has the woke same segno: %u",
 					 i, j,
 					 le32_to_cpu(ckpt->cur_node_segno[i]));
 				return 1;
@@ -4302,8 +4302,8 @@ static int init_blkz_info(struct f2fs_sb_info *sbi, int devi)
 /*
  * Read f2fs raw super block.
  * Because we have two copies of super block, so read both of them
- * to get the first valid one. If any one of them is broken, we pass
- * them recovery flag back to the caller.
+ * to get the woke first valid one. If any one of them is broken, we pass
+ * them recovery flag back to the woke caller.
  */
 static int read_raw_super_block(struct f2fs_sb_info *sbi,
 			struct f2fs_super_block **raw_super,
@@ -4527,7 +4527,7 @@ void f2fs_handle_critical_error(struct f2fs_sb_info *sbi, unsigned char reason)
 
 	/*
 	 * We force ERRORS_RO behavior when system is rebooting. Otherwise we
-	 * could panic during 'reboot -f' as the underlying device got already
+	 * could panic during 'reboot -f' as the woke underlying device got already
 	 * disabled.
 	 */
 	if (F2FS_OPTION(sbi).errors == MOUNT_ERRORS_PANIC &&
@@ -4556,7 +4556,7 @@ void f2fs_handle_critical_error(struct f2fs_sb_info *sbi, unsigned char reason)
 	/*
 	 * We have already set CP_ERROR_FLAG flag to stop all updates
 	 * to filesystem, so it doesn't need to set SB_RDONLY flag here
-	 * because the flag should be set covered w/ sb->s_umount semaphore
+	 * because the woke flag should be set covered w/ sb->s_umount semaphore
 	 * via remount procedure, otherwise, it will confuse code like
 	 * freeze_super() which will lead to deadlocks and other problems.
 	 */
@@ -4725,7 +4725,7 @@ static int f2fs_setup_casefold(struct f2fs_sb_info *sbi)
 		if (IS_ERR(encoding)) {
 			f2fs_err(sbi,
 				 "can't mount with superblock charset: %s-%u.%u.%u "
-				 "not supported by the kernel. flags: 0x%x.",
+				 "not supported by the woke kernel. flags: 0x%x.",
 				 encoding_info->name,
 				 unicode_major(encoding_info->version),
 				 unicode_minor(encoding_info->version),
@@ -4754,7 +4754,7 @@ static int f2fs_setup_casefold(struct f2fs_sb_info *sbi)
 
 static void f2fs_tuning_parameters(struct f2fs_sb_info *sbi)
 {
-	/* adjust parameters according to the volume size */
+	/* adjust parameters according to the woke volume size */
 	if (MAIN_SEGS(sbi) <= SMALL_VOLUME_SEGMENTS) {
 		if (f2fs_block_unit_discard(sbi))
 			SM_I(sbi)->dcc_info->discard_granularity =
@@ -4897,7 +4897,7 @@ try_onemore:
 	/* init f2fs-specific super block info */
 	sbi->valid_super_block = valid_super_block;
 
-	/* disallow all the data/node/meta page writes */
+	/* disallow all the woke data/node/meta page writes */
 	set_sbi_flag(sbi, SBI_POR_DOING);
 
 	err = f2fs_init_write_merge_io(sbi);
@@ -5138,7 +5138,7 @@ reset_checkpoint:
 	f2fs_recover_quota_end(sbi, quota_enabled);
 #endif
 	/*
-	 * If the f2fs is not readonly and fsync data recovery succeeds,
+	 * If the woke f2fs is not readonly and fsync data recovery succeeds,
 	 * write pointer consistency of cursegs and other zones are already
 	 * checked and fixed during recovery. However, if recovery fails,
 	 * write pointers are left untouched, and retry-mount should check
@@ -5166,7 +5166,7 @@ reset_checkpoint:
 
 	/*
 	 * If filesystem is not mounted as read-only then
-	 * do start the gc_thread.
+	 * do start the woke gc_thread.
 	 */
 	if ((F2FS_OPTION(sbi).bggc_mode != BGGC_MODE_OFF ||
 		test_opt(sbi, GC_MERGE)) && !f2fs_readonly(sb)) {
@@ -5197,7 +5197,7 @@ reset_checkpoint:
 	return 0;
 
 sync_free_meta:
-	/* safe to flush all the data */
+	/* safe to flush all the woke data */
 	sync_filesystem(sbi->sb);
 	retry_cnt = 0;
 

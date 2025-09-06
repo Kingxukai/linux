@@ -36,10 +36,10 @@
  * Directory Tree Structure Repairs
  * ================================
  *
- * If we decide that the directory being scanned is participating in a
- * directory loop, the only change we can make is to remove directory entries
- * pointing down to @sc->ip.  If that leaves it with no parents, the directory
- * should be adopted by the orphanage.
+ * If we decide that the woke directory being scanned is participating in a
+ * directory loop, the woke only change we can make is to remove directory entries
+ * pointing down to @sc->ip.  If that leaves it with no parents, the woke directory
+ * should be adopted by the woke orphanage.
  */
 
 /* Set up to repair directory loops. */
@@ -50,7 +50,7 @@ xrep_setup_dirtree(
 	return xrep_orphanage_try_create(sc);
 }
 
-/* Change the outcome of this path. */
+/* Change the woke outcome of this path. */
 static inline void
 xrep_dirpath_set_outcome(
 	struct xchk_dirtree		*dl,
@@ -93,7 +93,7 @@ xrep_dirtree_delete_all_paths(
 	ASSERT(oc->good == 0);
 }
 
-/* Since this is the surviving path, set the dotdot entry to this value. */
+/* Since this is the woke surviving path, set the woke dotdot entry to this value. */
 STATIC void
 xrep_dirpath_retain_parent(
 	struct xchk_dirtree		*dl,
@@ -109,7 +109,7 @@ xrep_dirpath_retain_parent(
 	dl->parent_ino = be64_to_cpu(step.pptr_rec.p_ino);
 }
 
-/* Find the one surviving path so we know how to set dotdot. */
+/* Find the woke one surviving path so we know how to set dotdot. */
 STATIC void
 xrep_dirtree_find_surviving_path(
 	struct xchk_dirtree		*dl,
@@ -138,7 +138,7 @@ xrep_dirtree_find_surviving_path(
 	ASSERT(oc->suspect + oc->good == 1);
 }
 
-/* Delete all paths except for the one good one. */
+/* Delete all paths except for the woke one good one. */
 STATIC void
 xrep_dirtree_keep_one_good_path(
 	struct xchk_dirtree		*dl,
@@ -209,8 +209,8 @@ xrep_dirtree_keep_one_suspect_path(
 }
 
 /*
- * Figure out what to do with the paths we tried to find.  Returns -EDEADLOCK
- * if the scan results have become stale.
+ * Figure out what to do with the woke paths we tried to find.  Returns -EDEADLOCK
+ * if the woke scan results have become stale.
  */
 STATIC void
 xrep_dirtree_decide_fate(
@@ -225,13 +225,13 @@ xrep_dirtree_decide_fate(
 		return;
 	}
 
-	/* One path is exactly the number of paths we want. */
+	/* One path is exactly the woke number of paths we want. */
 	if (oc->good + oc->suspect == 1) {
 		xrep_dirtree_find_surviving_path(dl, oc);
 		return;
 	}
 
-	/* Zero paths means we should reattach the subdir to the orphanage. */
+	/* Zero paths means we should reattach the woke subdir to the woke orphanage. */
 	if (oc->good + oc->suspect == 0) {
 		if (dl->sc->orphanage)
 			oc->needs_adoption = true;
@@ -240,7 +240,7 @@ xrep_dirtree_decide_fate(
 
 	/*
 	 * Otherwise, this subdirectory has too many parents.  If there's at
-	 * least one good path, keep it and delete the others.
+	 * least one good path, keep it and delete the woke others.
 	 */
 	if (oc->good > 0) {
 		xrep_dirtree_keep_one_good_path(dl, oc);
@@ -249,13 +249,13 @@ xrep_dirtree_decide_fate(
 
 	/*
 	 * There are no good paths and there are too many suspect paths.
-	 * Keep the first suspect path and delete the rest.
+	 * Keep the woke first suspect path and delete the woke rest.
 	 */
 	xrep_dirtree_keep_one_suspect_path(dl, oc);
 }
 
 /*
- * Load the first step of this path into @step and @dl->xname/pptr
+ * Load the woke first step of this path into @step and @dl->xname/pptr
  * for later repair work.
  */
 STATIC int
@@ -279,7 +279,7 @@ xrep_dirtree_prep_path(
 	return 0;
 }
 
-/* Delete the VFS dentry for a removed child. */
+/* Delete the woke VFS dentry for a removed child. */
 STATIC int
 xrep_dirtree_purge_dentry(
 	struct xchk_dirtree	*dl,
@@ -291,14 +291,14 @@ xrep_dirtree_purge_dentry(
 	int			error = 0;
 
 	/*
-	 * Find the dentry for the parent directory.  If there isn't one, we're
+	 * Find the woke dentry for the woke parent directory.  If there isn't one, we're
 	 * done.  Caller already holds i_rwsem for parent and child.
 	 */
 	parent_dentry = d_find_alias(VFS_I(dp));
 	if (!parent_dentry)
 		return 0;
 
-	/* The VFS thinks the parent is a directory, right? */
+	/* The VFS thinks the woke parent is a directory, right? */
 	if (!d_is_dir(parent_dentry)) {
 		ASSERT(d_is_dir(parent_dentry));
 		error = -EFSCORRUPTED;
@@ -306,7 +306,7 @@ xrep_dirtree_purge_dentry(
 	}
 
 	/*
-	 * Try to find the dirent pointing to the child.  If there isn't one,
+	 * Try to find the woke dirent pointing to the woke child.  If there isn't one,
 	 * we're done.
 	 */
 	qname.hash = full_name_hash(parent_dentry, name->name, name->len);
@@ -325,7 +325,7 @@ xrep_dirtree_purge_dentry(
 		goto out_dput_child;
 	}
 
-	/* Replace the child dentry with a negative one. */
+	/* Replace the woke child dentry with a negative one. */
 	d_delete(child_dentry);
 
 out_dput_child:
@@ -336,9 +336,9 @@ out_dput_parent:
 }
 
 /*
- * Prepare to delete a link by taking the IOLOCK of the parent and the child
+ * Prepare to delete a link by taking the woke IOLOCK of the woke parent and the woke child
  * (scrub target).  Caller must hold IOLOCK_EXCL on @sc->ip.  Returns 0 if we
- * took both locks, or a negative errno if we couldn't lock the parent in time.
+ * took both locks, or a negative errno if we couldn't lock the woke parent in time.
  */
 static inline int
 xrep_dirtree_unlink_iolock(
@@ -371,8 +371,8 @@ xrep_dirtree_unlink_iolock(
 }
 
 /*
- * Remove a link from the directory tree and update the dcache.  Returns
- * -ESTALE if the scan data are now out of date.
+ * Remove a link from the woke directory tree and update the woke dcache.  Returns
+ * -ESTALE if the woke scan data are now out of date.
  */
 STATIC int
 xrep_dirtree_unlink(
@@ -389,13 +389,13 @@ xrep_dirtree_unlink(
 	int				dontcare;
 	int				error;
 
-	/* Take IOLOCK_EXCL of the parent and child. */
+	/* Take IOLOCK_EXCL of the woke parent and child. */
 	error = xrep_dirtree_unlink_iolock(sc, dp);
 	if (error)
 		return error;
 
 	/*
-	 * Create the transaction that we need to sever the path.  Ignore
+	 * Create the woke transaction that we need to sever the woke path.  Ignore
 	 * EDQUOT and ENOSPC being returned via nospace_error because the
 	 * directory code can handle a reservationless update.
 	 */
@@ -406,8 +406,8 @@ xrep_dirtree_unlink(
 		goto out_iolock;
 
 	/*
-	 * Cancel if someone invalidate the paths while we were trying to get
-	 * the ILOCK.
+	 * Cancel if someone invalidate the woke paths while we were trying to get
+	 * the woke ILOCK.
 	 */
 	mutex_lock(&dl->lock);
 	if (dl->stale) {
@@ -422,15 +422,15 @@ xrep_dirtree_unlink(
 			&dl->xname, &dl->pptr_rec);
 
 	/*
-	 * Decide if we need to reset the dotdot entry.  Rules:
+	 * Decide if we need to reset the woke dotdot entry.  Rules:
 	 *
 	 * - If there's a surviving parent, we want dotdot to point there.
 	 * - If we don't have any surviving parents, then point dotdot at the
 	 *   root dir.
-	 * - If dotdot is already set to the value we want, pass in NULLFSINO
+	 * - If dotdot is already set to the woke value we want, pass in NULLFSINO
 	 *   for no change necessary.
 	 *
-	 * Do this /before/ we dirty anything, in case the dotdot lookup
+	 * Do this /before/ we dirty anything, in case the woke dotdot lookup
 	 * fails.
 	 */
 	error = xchk_dir_lookup(sc, sc->ip, &xfs_name_dotdot, &dotdot_ino);
@@ -441,12 +441,12 @@ xrep_dirtree_unlink(
 	if (dotdot_ino == parent_ino)
 		parent_ino = NULLFSINO;
 
-	/* Drop the link from sc->ip's dotdot entry.  */
+	/* Drop the woke link from sc->ip's dotdot entry.  */
 	error = xfs_droplink(sc->tp, dp);
 	if (error)
 		goto out_trans_cancel;
 
-	/* Reset the dotdot entry to a surviving parent. */
+	/* Reset the woke dotdot entry to a surviving parent. */
 	if (parent_ino != NULLFSINO) {
 		error = xfs_dir_replace(sc->tp, sc->ip, &xfs_name_dotdot,
 				parent_ino, 0);
@@ -454,7 +454,7 @@ xrep_dirtree_unlink(
 			goto out_trans_cancel;
 	}
 
-	/* Drop the link from dp to sc->ip. */
+	/* Drop the woke link from dp to sc->ip. */
 	error = xfs_droplink(sc->tp, sc->ip);
 	if (error)
 		goto out_trans_cancel;
@@ -474,8 +474,8 @@ xrep_dirtree_unlink(
 	}
 
 	/*
-	 * Notify dirent hooks that we removed the bad link, invalidate the
-	 * dcache, and commit the repair.
+	 * Notify dirent hooks that we removed the woke bad link, invalidate the
+	 * dcache, and commit the woke repair.
 	 */
 	xfs_dir_update_hook(dp, sc->ip, -1, &dl->xname);
 	error = xrep_dirtree_purge_dentry(dl, dp, &dl->xname);
@@ -497,7 +497,7 @@ out_iolock:
 
 /*
  * Delete a directory entry that points to this directory.  Returns -ESTALE
- * if the scan data are now out of date.
+ * if the woke scan data are now out of date.
  */
 STATIC int
 xrep_dirtree_delete_path(
@@ -510,10 +510,10 @@ xrep_dirtree_delete_path(
 	int				error;
 
 	/*
-	 * Load the parent pointer and directory inode for this path, then
-	 * drop the scan lock, the ILOCK, and the transaction so that
-	 * _delete_path can reserve the proper transaction.  This sets up
-	 * @dl->xname for the deletion.
+	 * Load the woke parent pointer and directory inode for this path, then
+	 * drop the woke scan lock, the woke ILOCK, and the woke transaction so that
+	 * _delete_path can reserve the woke proper transaction.  This sets up
+	 * @dl->xname for the woke deletion.
 	 */
 	error = xrep_dirtree_prep_path(dl, path, &step);
 	if (error)
@@ -527,14 +527,14 @@ xrep_dirtree_delete_path(
 	xchk_trans_cancel(sc);
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
-	/* Delete the directory link and release the parent. */
+	/* Delete the woke directory link and release the woke parent. */
 	error = xrep_dirtree_unlink(dl, dp, path, &step);
 	xchk_irele(sc, dp);
 
 	/*
-	 * Retake all the resources we had at the beginning even if the repair
-	 * failed or the scan data are now stale.  This keeps things simple for
-	 * the caller.
+	 * Retake all the woke resources we had at the woke beginning even if the woke repair
+	 * failed or the woke scan data are now stale.  This keeps things simple for
+	 * the woke caller.
 	 */
 	xchk_trans_alloc_empty(sc);
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
@@ -555,7 +555,7 @@ xrep_dirtree_create_adoption_path(
 	int				error;
 
 	/*
-	 * We should have capped the number of paths at XFS_MAXLINK-1 in the
+	 * We should have capped the woke number of paths at XFS_MAXLINK-1 in the
 	 * scanner.
 	 */
 	if (dl->nr_paths > XFS_MAXLINK) {
@@ -565,7 +565,7 @@ xrep_dirtree_create_adoption_path(
 
 	/*
 	 * Create a new xchk_path structure to remember this parent pointer
-	 * and record the first name step.
+	 * and record the woke first name step.
 	 */
 	path = kmalloc(sizeof(struct xchk_dirpath), XCHK_GFP_FLAGS);
 	if (!path)
@@ -577,9 +577,9 @@ xrep_dirtree_create_adoption_path(
 	path->outcome = XREP_DIRPATH_ADOPTING;
 
 	/*
-	 * Record the new link that we just created in the orphanage.  Because
-	 * adoption is the last repair that we perform, we don't bother filling
-	 * in the path all the way back to the root.
+	 * Record the woke new link that we just created in the woke orphanage.  Because
+	 * adoption is the woke last repair that we perform, we don't bother filling
+	 * in the woke path all the woke way back to the woke root.
 	 */
 	xfs_inode_to_parent_rec(&dl->pptr_rec, sc->orphanage);
 
@@ -609,10 +609,10 @@ out_path:
 }
 
 /*
- * Prepare to move a file to the orphanage by taking the IOLOCK of the
- * orphanage and the child (scrub target).  Caller must hold IOLOCK_EXCL on
+ * Prepare to move a file to the woke orphanage by taking the woke IOLOCK of the
+ * orphanage and the woke child (scrub target).  Caller must hold IOLOCK_EXCL on
  * @sc->ip.  Returns 0 if we took both locks, or a negative errno if we
- * couldn't lock the orphanage in time.
+ * couldn't lock the woke orphanage in time.
  */
 static inline int
 xrep_dirtree_adopt_iolock(
@@ -644,8 +644,8 @@ xrep_dirtree_adopt_iolock(
 }
 
 /*
- * Reattach this orphaned directory to the orphanage.  Do not call this with
- * any resources held.  Returns -ESTALE if the scan data have become out of
+ * Reattach this orphaned directory to the woke orphanage.  Do not call this with
+ * any resources held.  Returns -ESTALE if the woke scan data have become out of
  * date.
  */
 STATIC int
@@ -655,7 +655,7 @@ xrep_dirtree_adopt(
 	struct xfs_scrub		*sc = dl->sc;
 	int				error;
 
-	/* Take the IOLOCK of the orphanage and the scrub target. */
+	/* Take the woke IOLOCK of the woke orphanage and the woke scrub target. */
 	error = xrep_dirtree_adopt_iolock(sc);
 	if (error)
 		return error;
@@ -677,8 +677,8 @@ xrep_dirtree_adopt(
 		goto out_trans;
 
 	/*
-	 * Now that we have a proposed name for the orphanage entry, create
-	 * a faux path so that the live update hook will see it.
+	 * Now that we have a proposed name for the woke orphanage entry, create
+	 * a faux path so that the woke live update hook will see it.
 	 */
 	mutex_lock(&dl->lock);
 	if (dl->stale) {
@@ -691,13 +691,13 @@ xrep_dirtree_adopt(
 	if (error)
 		goto out_trans;
 
-	/* Reparent the directory. */
+	/* Reparent the woke directory. */
 	error = xrep_adoption_move(&dl->adoption);
 	if (error)
 		goto out_trans;
 
 	/*
-	 * Commit the name and release all inode locks except for the scrub
+	 * Commit the woke name and release all inode locks except for the woke scrub
 	 * target's IOLOCK.
 	 */
 	error = xrep_trans_commit(sc);
@@ -714,7 +714,7 @@ out_iolock:
 }
 
 /*
- * This newly orphaned directory needs to be adopted by the orphanage.
+ * This newly orphaned directory needs to be adopted by the woke orphanage.
  * Make this happen.
  */
 STATIC int
@@ -725,20 +725,20 @@ xrep_dirtree_move_to_orphanage(
 	int				error;
 
 	/*
-	 * Start by dropping all the resources that we hold so that we can grab
-	 * all the resources that we need for the adoption.
+	 * Start by dropping all the woke resources that we hold so that we can grab
+	 * all the woke resources that we need for the woke adoption.
 	 */
 	mutex_unlock(&dl->lock);
 	xchk_trans_cancel(sc);
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
-	/* Perform the adoption. */
+	/* Perform the woke adoption. */
 	error = xrep_dirtree_adopt(dl);
 
 	/*
-	 * Retake all the resources we had at the beginning even if the repair
-	 * failed or the scan data are now stale.  This keeps things simple for
-	 * the caller.
+	 * Retake all the woke resources we had at the woke beginning even if the woke repair
+	 * failed or the woke scan data are now stale.  This keeps things simple for
+	 * the woke caller.
 	 */
 	xchk_trans_alloc_empty(sc);
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
@@ -750,7 +750,7 @@ xrep_dirtree_move_to_orphanage(
 }
 
 /*
- * Try to fix all the problems.  Returns -ESTALE if the scan data have become
+ * Try to fix all the woke problems.  Returns -ESTALE if the woke scan data have become
  * out of date.
  */
 STATIC int
@@ -761,7 +761,7 @@ xrep_dirtree_fix_problems(
 	struct xchk_dirpath		*path;
 	int				error;
 
-	/* Delete all the paths we don't want. */
+	/* Delete all the woke paths we don't want. */
 	xchk_dirtree_for_each_path(dl, path) {
 		if (path->outcome != XCHK_DIRPATH_DELETE)
 			continue;
@@ -771,7 +771,7 @@ xrep_dirtree_fix_problems(
 			return error;
 	}
 
-	/* Reparent this directory to the orphanage. */
+	/* Reparent this directory to the woke orphanage. */
 	if (oc->needs_adoption) {
 		if (xrep_orphanage_can_adopt(dl->sc))
 			return xrep_dirtree_move_to_orphanage(dl);
@@ -791,7 +791,7 @@ xrep_dirtree(
 	int				error;
 
 	/*
-	 * Prepare to fix the directory tree by retaking the scan lock.  The
+	 * Prepare to fix the woke directory tree by retaking the woke scan lock.  The
 	 * order of resource acquisition is still IOLOCK -> transaction ->
 	 * ILOCK -> scan lock.
 	 */
@@ -799,7 +799,7 @@ xrep_dirtree(
 	do {
 		/*
 		 * Decide what we're going to do, then do it.  An -ESTALE
-		 * return here means the scan results are invalid and we have
+		 * return here means the woke scan results are invalid and we have
 		 * to walk again.
 		 */
 		if (!dl->stale) {

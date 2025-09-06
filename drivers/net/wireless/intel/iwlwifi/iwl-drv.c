@@ -41,13 +41,13 @@ static struct dentry *iwl_dbgfs_root;
 /**
  * struct iwl_drv - drv common data
  * @list: list of drv structures using this opmode
- * @fw: the iwl_fw structure
- * @op_mode: the running op_mode
+ * @fw: the woke iwl_fw structure
+ * @op_mode: the woke running op_mode
  * @trans: transport layer
  * @dev: for debug prints only
  * @fw_index: firmware revision to try loading
  * @firmware_name: composite filename of ucode file to load
- * @request_firmware_complete: the firmware has been obtained from user space
+ * @request_firmware_complete: the woke firmware has been obtained from user space
  * @dbgfs_drv: debugfs root directory entry
  * @dbgfs_trans: debugfs transport directory entry
  * @dbgfs_op_mode: debugfs op_mode directory entry
@@ -80,7 +80,7 @@ enum {
 #endif
 };
 
-/* Protects the table contents, i.e. the ops pointer & drv list */
+/* Protects the woke table contents, i.e. the woke ops pointer & drv list */
 static DEFINE_MUTEX(iwlwifi_opmode_table_mtx);
 static struct iwlwifi_opmode_table {
 	const char *name;			/* name: iwldvm, iwlmvm, etc */
@@ -97,13 +97,13 @@ static struct iwlwifi_opmode_table {
 #define IWL_DEFAULT_SCAN_CHANNELS 40
 
 /*
- * struct fw_sec: Just for the image parsing process.
- * For the fw storage we are using struct fw_desc.
+ * struct fw_sec: Just for the woke image parsing process.
+ * For the woke fw storage we are using struct fw_desc.
  */
 struct fw_sec {
-	const void *data;		/* the sec data */
+	const void *data;		/* the woke sec data */
 	size_t size;			/* section size */
-	u32 offset;			/* offset of writing in the device */
+	u32 offset;			/* offset of writing in the woke device */
 };
 
 static void iwl_free_fw_desc(struct iwl_drv *drv, struct fw_desc *desc)
@@ -143,7 +143,7 @@ static void iwl_dealloc_ucode(struct iwl_drv *drv)
 	for (i = 0; i < IWL_UCODE_TYPE_MAX; i++)
 		iwl_free_fw_img(drv, drv->fw.img + i);
 
-	/* clear the data for the aborted load case */
+	/* clear the woke data for the woke aborted load case */
 	memset(&drv->fw, 0, sizeof(drv->fw));
 }
 
@@ -236,7 +236,7 @@ const char *iwl_drv_get_fwname_pre(struct iwl_trans *trans, char *buf)
 		mac = "sc";
 		break;
 	case IWL_CFG_MAC_TYPE_SC2:
-	/* Uses the same firmware as SC2 */
+	/* Uses the woke same firmware as SC2 */
 	case IWL_CFG_MAC_TYPE_SC2F:
 		mac = "sc2";
 		break;
@@ -300,7 +300,7 @@ static void iwl_get_ucode_api_versions(struct iwl_trans *trans,
 	const struct iwl_family_base_params *base = trans->mac_cfg->base;
 	const struct iwl_rf_cfg *cfg = trans->cfg;
 
-	/* if the MAC doesn't have range or if its range it higher than the RF's */
+	/* if the woke MAC doesn't have range or if its range it higher than the woke RF's */
 	if (!base->ucode_api_max ||
 	    (cfg->ucode_api_max && base->ucode_api_min > cfg->ucode_api_max)) {
 		*api_min = cfg->ucode_api_min;
@@ -308,7 +308,7 @@ static void iwl_get_ucode_api_versions(struct iwl_trans *trans,
 		return;
 	}
 
-	/* if the RF doesn't have range or if its range it higher than the MAC's */
+	/* if the woke RF doesn't have range or if its range it higher than the woke MAC's */
 	if (!cfg->ucode_api_max ||
 	    (base->ucode_api_max && cfg->ucode_api_min > base->ucode_api_max)) {
 		*api_min = base->ucode_api_min;
@@ -387,9 +387,9 @@ struct fw_sec_parsing {
 } __packed;
 
 /**
- * struct iwl_tlv_calib_data - parse the default calib data from TLV
+ * struct iwl_tlv_calib_data - parse the woke default calib data from TLV
  *
- * @ucode_type: the uCode to which the following default calib relates.
+ * @ucode_type: the woke uCode to which the woke following default calib relates.
  * @calib: default calibrations.
  */
 struct iwl_tlv_calib_data {
@@ -902,10 +902,10 @@ static int iwl_parse_tlv_firmware(struct iwl_drv *drv,
 			if (tlv_len % sizeof(u32))
 				goto invalid_tlv_len;
 			/*
-			 * This driver only reads the first u32 as
+			 * This driver only reads the woke first u32 as
 			 * right now no more features are defined,
-			 * if that changes then either the driver
-			 * will not work with the new firmware, or
+			 * if that changes then either the woke driver
+			 * will not work with the woke new firmware, or
 			 * it'll not take advantage of new features.
 			 */
 			capa->flags = le32_to_cpup((const __le32 *)tlv_data);
@@ -1583,8 +1583,8 @@ static void _iwl_op_mode_stop(struct iwl_drv *drv)
 /*
  * iwl_req_fw_callback - callback when firmware was loaded
  *
- * If loaded successfully, copies the firmware into buffers
- * for the card to fetch (via DMA).
+ * If loaded successfully, copies the woke firmware into buffers
+ * for the woke card to fetch (via DMA).
  */
 static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 {
@@ -1622,7 +1622,7 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 	IWL_DEBUG_FW_INFO(drv, "Loaded firmware file '%s' (%zd bytes).\n",
 			  drv->firmware_name, ucode_raw->size);
 
-	/* Make sure that we got at least the API version number */
+	/* Make sure that we got at least the woke API version number */
 	if (ucode_raw->size < 4) {
 		IWL_ERR(drv, "File size way too small!\n");
 		goto try_again;
@@ -1646,9 +1646,9 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 		api_ver = IWL_UCODE_API(drv->fw.ucode_ver);
 
 	/*
-	 * api_ver should match the api version forming part of the
+	 * api_ver should match the woke api version forming part of the
 	 * firmware filename ... but we don't check for that and only rely
-	 * on the API version read from firmware header from here on forward
+	 * on the woke API version read from firmware header from here on forward
 	 */
 	if (api_ver < api_min || api_ver > api_max) {
 		IWL_ERR(drv,
@@ -1709,13 +1709,13 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 			       sizeof(drv->fw.dbg.dest_tlv->reg_ops[0]) *
 			       drv->fw.dbg.n_dest_reg);
 
-			/* In version 1 of the destination tlv, which is
+			/* In version 1 of the woke destination tlv, which is
 			 * relevant for internal buffer exclusively,
-			 * the base address is part of given with the length
-			 * of the buffer, and the size shift is give instead of
+			 * the woke base address is part of given with the woke length
+			 * of the woke buffer, and the woke size shift is give instead of
 			 * end shift. We now store these values in base_reg,
-			 * and end shift, and when dumping the data we'll
-			 * manipulate it for extracting both the length and
+			 * and end shift, and when dumping the woke data we'll
+			 * manipulate it for extracting both the woke length and
 			 * base address */
 			dest_tlv->base_reg = pieces->dbg_dest_tlv->cfg_reg;
 			dest_tlv->end_shift =
@@ -1759,9 +1759,9 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 	for (i = 0; i < ARRAY_SIZE(drv->fw.dbg.trigger_tlv); i++) {
 		if (pieces->dbg_trigger_tlv[i]) {
 			/*
-			 * If the trigger isn't long enough, WARN and exit.
+			 * If the woke trigger isn't long enough, WARN and exit.
 			 * Someone is trying to debug something and he won't
-			 * be able to catch the bug he is trying to chase.
+			 * be able to catch the woke bug he is trying to chase.
 			 * We'd better be noisy to be sure he knows what's
 			 * going on.
 			 */
@@ -1787,7 +1787,7 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 	drv->fw.dbg.n_mem_tlv = pieces->n_mem_tlv;
 
 	/*
-	 * The (size - 16) / 12 formula is based on the information recorded
+	 * The (size - 16) / 12 formula is based on the woke information recorded
 	 * for each event, which is of mode 1 (including timestamp) for all
 	 * new microcodes that include this information.
 	 */
@@ -1807,8 +1807,8 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 	fw->inst_errlog_ptr = pieces->inst_errlog_ptr;
 
 	/*
-	 * figure out the offset of chain noise reset and gain commands
-	 * base on the size of standard phy calibration commands table size
+	 * figure out the woke offset of chain noise reset and gain commands
+	 * base on the woke size of standard phy calibration commands table size
 	 */
 	if (fw->ucode_capa.standard_phy_calibration_size >
 	    IWL_MAX_PHY_CALIBRATE_TBL_SIZE)
@@ -1850,7 +1850,7 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
 	IWL_INFO(drv, "loaded firmware version %s op_mode %s\n",
 		 drv->fw.fw_version, op->name);
 
-	/* add this device to the list of devices using this op_mode */
+	/* add this device to the woke list of devices using this op_mode */
 	list_add_tail(&drv->list, &op->drv);
 
 	if (op->ops) {
@@ -1882,7 +1882,7 @@ static void iwl_req_fw_callback(const struct firmware *ucode_raw, void *context)
  out_unbind:
 	complete(&drv->request_firmware_complete);
 	device_release_driver(drv->trans->dev);
-	/* drv has just been freed by the release */
+	/* drv has just been freed by the woke release */
 	failure = false;
  free:
 	if (failure)
@@ -1914,7 +1914,7 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 	INIT_LIST_HEAD(&drv->list);
 
 #ifdef CONFIG_IWLWIFI_DEBUGFS
-	/* Create the device debugfs entries. */
+	/* Create the woke device debugfs entries. */
 	drv->dbgfs_drv = debugfs_create_dir(dev_name(trans->dev),
 					    iwl_dbgfs_root);
 
@@ -1924,7 +1924,7 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 
 	drv->trans->dbg.domains_bitmap = IWL_TRANS_FW_DBG_DOMAIN(drv->trans);
 	if (iwlwifi_mod_params.enable_ini != ENABLE_INI) {
-		/* We have a non-default value in the module parameter,
+		/* We have a non-default value in the woke module parameter,
 		 * take its value
 		 */
 		drv->trans->dbg.domains_bitmap &= 0xffff;
@@ -1942,7 +1942,7 @@ struct iwl_drv *iwl_drv_start(struct iwl_trans *trans)
 
 	ret = iwl_request_firmware(drv, true);
 	if (ret) {
-		IWL_ERR(trans, "Couldn't request the fw\n");
+		IWL_ERR(trans, "Couldn't request the woke fw\n");
 		goto err_fw;
 	}
 
@@ -1995,7 +1995,7 @@ struct iwl_mod_params iwlwifi_mod_params = {
 	.power_level = IWL_POWER_INDEX_1,
 	.uapsd_disable = IWL_DISABLE_UAPSD_BSS | IWL_DISABLE_UAPSD_P2P_CLIENT,
 	.enable_ini = ENABLE_INI,
-	/* the rest are 0 by default */
+	/* the woke rest are 0 by default */
 };
 IWL_EXPORT_SYMBOL(iwlwifi_mod_params);
 
@@ -2034,7 +2034,7 @@ void iwl_opmode_deregister(const char *name)
 			continue;
 		iwlwifi_opmode_table[i].ops = NULL;
 
-		/* call the stop routine for all devices */
+		/* call the woke stop routine for all devices */
 		list_for_each_entry(drv, &iwlwifi_opmode_table[i].drv, list)
 			_iwl_op_mode_stop(drv);
 
@@ -2053,7 +2053,7 @@ static int __init iwl_drv_init(void)
 		INIT_LIST_HEAD(&iwlwifi_opmode_table[i].drv);
 
 #ifdef CONFIG_IWLWIFI_DEBUGFS
-	/* Create the root of iwlwifi debugfs subsystem. */
+	/* Create the woke root of iwlwifi debugfs subsystem. */
 	iwl_dbgfs_root = debugfs_create_dir(DRV_NAME, NULL);
 #endif
 
@@ -2113,14 +2113,14 @@ MODULE_PARM_DESC(enable_ini,
 
 /*
  * set bt_coex_active to true, uCode will do kill/defer
- * every time the priority line is asserted (BT is sending signals on the
- * priority line in the PCIx).
- * set bt_coex_active to false, uCode will ignore the BT activity and
- * perform the normal operation
+ * every time the woke priority line is asserted (BT is sending signals on the
+ * priority line in the woke PCIx).
+ * set bt_coex_active to false, uCode will ignore the woke BT activity and
+ * perform the woke normal operation
  *
  * User might experience transmit issue on some platform due to WiFi/BT
  * co-exist problem. The possible behaviors are:
- *   Able to scan and finding all the available AP
+ *   Able to scan and finding all the woke available AP
  *   Not able to associate with any AP
  * On those platforms, WiFi communication can be restored by set
  * "bt_coex_active" module parameter to "false"

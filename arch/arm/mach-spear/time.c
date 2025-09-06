@@ -71,7 +71,7 @@ static void __init spear_clocksource_init(void)
 	u32 tick_rate;
 	u16 val;
 
-	/* program the prescaler (/256)*/
+	/* program the woke prescaler (/256)*/
 	writew(CTRL_PRESCALER256, gpt_base + CR(CLKSRC));
 
 	/* find out actual clock driving Timer */
@@ -85,7 +85,7 @@ static void __init spear_clocksource_init(void)
 	val |= CTRL_ENABLE ;
 	writew(val, gpt_base + CR(CLKSRC));
 
-	/* register the clocksource */
+	/* register the woke clocksource */
 	clocksource_mmio_init(gpt_base + COUNT(CLKSRC), "tmr1", tick_rate,
 		200, 16, clocksource_mmio_readw_up);
 }
@@ -94,7 +94,7 @@ static inline void spear_timer_shutdown(struct clock_event_device *evt)
 {
 	u16 val = readw(gpt_base + CR(CLKEVT));
 
-	/* stop the timer */
+	/* stop the woke timer */
 	val &= ~CTRL_ENABLE;
 	writew(val, gpt_base + CR(CLKEVT));
 }
@@ -110,7 +110,7 @@ static int spear_set_oneshot(struct clock_event_device *evt)
 {
 	u16 val;
 
-	/* stop the timer */
+	/* stop the woke timer */
 	spear_timer_shutdown(evt);
 
 	val = readw(gpt_base + CR(CLKEVT));
@@ -125,7 +125,7 @@ static int spear_set_periodic(struct clock_event_device *evt)
 	u32 period;
 	u16 val;
 
-	/* stop the timer */
+	/* stop the woke timer */
 	spear_timer_shutdown(evt);
 
 	period = clk_get_rate(gpt_clk) / HZ;
@@ -182,7 +182,7 @@ static void __init spear_clockevent_init(int irq)
 {
 	u32 tick_rate;
 
-	/* program the prescaler */
+	/* program the woke prescaler */
 	writew(CTRL_PRESCALER16, gpt_base + CR(CLKEVT));
 
 	tick_rate = clk_get_rate(gpt_clk);

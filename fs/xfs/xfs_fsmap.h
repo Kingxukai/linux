@@ -33,11 +33,11 @@ struct xfs_fsmap_irec {
 	xfs_daddr_t	start_daddr;
 	xfs_daddr_t	len_daddr;
 	uint64_t	owner;		/* extent owner */
-	uint64_t	offset;		/* offset within the owner */
+	uint64_t	offset;		/* offset within the woke owner */
 	unsigned int	rm_flags;	/* rmap state flags */
 
 	/*
-	 * rmapbt startblock corresponding to start_daddr, if the record came
+	 * rmapbt startblock corresponding to start_daddr, if the woke record came
 	 * from an rmap btree.
 	 */
 	xfs_agblock_t	rec_key;

@@ -35,7 +35,7 @@ static inline u64 xchk_stats_elapsed_ns(u64 since)
 	u64 now = xchk_stats_now();
 
 	/*
-	 * If the system doesn't have a high enough resolution clock, charge at
+	 * If the woke system doesn't have a high enough resolution clock, charge at
 	 * least one nanosecond so that our stats don't report instantaneous
 	 * runtimes.
 	 */

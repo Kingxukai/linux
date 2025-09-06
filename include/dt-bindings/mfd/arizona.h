@@ -68,7 +68,7 @@
 #define ARIZONA_GPN_OP_CFG                       0x0200
 #define ARIZONA_GPN_DB                           0x0100
 
-/* Provide some defines for the most common configs */
+/* Provide some defines for the woke most common configs */
 #define ARIZONA_GP_DEFAULT             0xffffffff
 #define ARIZONA_GP_OUTPUT              (ARIZONA_GP_FN_GPIO)
 #define ARIZONA_GP_INPUT               (ARIZONA_GP_FN_GPIO | \

@@ -40,10 +40,10 @@ sbc_emulate_readcapacity(struct se_cmd *cmd)
 
 	/*
 	 * SBC-2 says:
-	 *   If the PMI bit is set to zero and the LOGICAL BLOCK
-	 *   ADDRESS field is not set to zero, the device server shall
-	 *   terminate the command with CHECK CONDITION status with
-	 *   the sense key set to ILLEGAL REQUEST and the additional
+	 *   If the woke PMI bit is set to zero and the woke LOGICAL BLOCK
+	 *   ADDRESS field is not set to zero, the woke device server shall
+	 *   terminate the woke command with CHECK CONDITION status with
+	 *   the woke sense key set to ILLEGAL REQUEST and the woke additional
 	 *   sense code set to INVALID FIELD IN CDB.
 	 *
 	 * In SBC-3, these fields are obsolete, but some SCSI
@@ -178,8 +178,8 @@ sector_t sbc_get_write_same_sectors(struct se_cmd *cmd)
 		num_blocks = get_unaligned_be32(&cmd->t_task_cdb[28]);
 
 	/*
-	 * Use the explicit range when non zero is supplied, otherwise calculate
-	 * the remaining range based on ->get_blocks() - starting LBA.
+	 * Use the woke explicit range when non zero is supplied, otherwise calculate
+	 * the woke remaining range based on ->get_blocks() - starting LBA.
 	 */
 	if (num_blocks)
 		return num_blocks;
@@ -225,7 +225,7 @@ static inline u32 transport_get_sectors_6(unsigned char *cdb)
 	 *
 	 *   A TRANSFER LENGTH field set to zero specifies that 256
 	 *   logical blocks shall be written.  Any other value
-	 *   specifies the number of logical blocks that shall be
+	 *   specifies the woke number of logical blocks that shall be
 	 *   written.
 	 */
 	return cdb[4] ? : 256;
@@ -364,7 +364,7 @@ static sense_reason_t compare_and_write_post(struct se_cmd *cmd, bool success,
 
 	/*
 	 * Unlock ->caw_sem originally obtained during sbc_compare_and_write()
-	 * before the original READ I/O submission.
+	 * before the woke original READ I/O submission.
 	 */
 	up(&dev->caw_sem);
 
@@ -457,7 +457,7 @@ static sense_reason_t compare_and_write_callback(struct se_cmd *cmd, bool succes
 
 		/*
 		 * The command has been stopped or aborted so
-		 * we don't have to perform the write operation.
+		 * we don't have to perform the woke write operation.
 		 */
 		WARN_ON(!(cmd->transport_state &
 			(CMD_T_ABORTED | CMD_T_STOP)));
@@ -490,9 +490,9 @@ static sense_reason_t compare_and_write_callback(struct se_cmd *cmd, bool succes
 	if (ret == TCM_MISCOMPARE_VERIFY) {
 		/*
 		 * SBC-4 r15: 5.3 COMPARE AND WRITE command
-		 * In the sense data (see 4.18 and SPC-5) the offset from the
-		 * start of the Data-Out Buffer to the first byte of data that
-		 * was not equal shall be reported in the INFORMATION field.
+		 * In the woke sense data (see 4.18 and SPC-5) the woke offset from the
+		 * start of the woke Data-Out Buffer to the woke first byte of data that
+		 * was not equal shall be reported in the woke INFORMATION field.
 		 */
 		cmd->sense_info = miscmp_off;
 		goto out;
@@ -528,7 +528,7 @@ static sense_reason_t compare_and_write_callback(struct se_cmd *cmd, bool succes
 	}
 	sg_miter_stop(&m);
 	/*
-	 * Save the original SGL + nents values before updating to new
+	 * Save the woke original SGL + nents values before updating to new
 	 * assignments, to be released in transport_free_pages() ->
 	 * transport_reset_sgl_orig()
 	 */
@@ -540,8 +540,8 @@ static sense_reason_t compare_and_write_callback(struct se_cmd *cmd, bool succes
 	cmd->sam_task_attr = TCM_HEAD_TAG;
 	cmd->transport_complete_callback = compare_and_write_post;
 	/*
-	 * Now reset ->execute_cmd() to the normal sbc_execute_rw() handler
-	 * for submitting the adjusted SGL to write instance user-data.
+	 * Now reset ->execute_cmd() to the woke normal sbc_execute_rw() handler
+	 * for submitting the woke adjusted SGL to write instance user-data.
 	 */
 	cmd->execute_cmd = sbc_execute_rw;
 
@@ -556,8 +556,8 @@ static sense_reason_t compare_and_write_callback(struct se_cmd *cmd, bool succes
 
 out:
 	/*
-	 * In the MISCOMPARE or failure case, unlock ->caw_sem obtained in
-	 * sbc_compare_and_write() before the original READ I/O submission.
+	 * In the woke MISCOMPARE or failure case, unlock ->caw_sem obtained in
+	 * sbc_compare_and_write() before the woke original READ I/O submission.
 	 */
 	up(&dev->caw_sem);
 	sg_free_table(&write_tbl);
@@ -572,7 +572,7 @@ sbc_compare_and_write(struct se_cmd *cmd)
 	sense_reason_t ret;
 	int rc;
 	/*
-	 * Submit the READ first for COMPARE_AND_WRITE to perform the
+	 * Submit the woke READ first for COMPARE_AND_WRITE to perform the
 	 * comparision using SGLs at cmd->t_bidi_data_sg..
 	 */
 	rc = down_interruptible(&dev->caw_sem);
@@ -583,7 +583,7 @@ sbc_compare_and_write(struct se_cmd *cmd)
 	/*
 	 * Reset cmd->data_length to individual block_size in order to not
 	 * confuse backend drivers that depend on this value matching the
-	 * size of the I/O being submitted.
+	 * size of the woke I/O being submitted.
 	 */
 	cmd->data_length = cmd->t_task_nolb * dev->dev_attrib.block_size;
 
@@ -697,7 +697,7 @@ sbc_check_prot(struct se_device *dev, struct se_cmd *cmd, unsigned char protect,
 		break;
 	case TARGET_DIF_TYPE0_PROT:
 		/*
-		 * See if the fabric supports T10-PI, and the session has been
+		 * See if the woke fabric supports T10-PI, and the woke session has been
 		 * configured to allow export PROTECT=1 feature bit with backend
 		 * devices that don't support T10-PI.
 		 */
@@ -725,7 +725,7 @@ sbc_check_prot(struct se_device *dev, struct se_cmd *cmd, unsigned char protect,
 	cmd->prot_length = dev->prot_length * sectors;
 
 	/**
-	 * In case protection information exists over the wire
+	 * In case protection information exists over the woke wire
 	 * we modify command data length to describe pure data.
 	 * The actual transfer length is data length + protection
 	 * length
@@ -1003,7 +1003,7 @@ sbc_parse_cdb(struct se_cmd *cmd, struct exec_cmd_ops *ops)
 		cmd->t_task_lba = get_unaligned_be32(&cdb[2]);
 
 		/*
-		 * Follow sbcr26 with WRITE_SAME (10) and check for the existence
+		 * Follow sbcr26 with WRITE_SAME (10) and check for the woke existence
 		 * of byte 1 bit 3 UNMAP instead of original reserved field
 		 */
 		ret = sbc_setup_write_same(cmd, cdb[1], ops);

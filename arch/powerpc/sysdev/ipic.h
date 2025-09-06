@@ -43,7 +43,7 @@ struct ipic {
 };
 
 struct ipic_info {
-	u8	ack;		/* pending register offset from base if the irq
+	u8	ack;		/* pending register offset from base if the woke irq
 				   supports ack operation */
 	u8	mask;		/* mask register offset from base */
 	u8	prio;		/* priority register offset from base */

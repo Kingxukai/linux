@@ -25,7 +25,7 @@ static int qla_async_rsnn_nn(scsi_qla_host_t *);
  * @vha: HA context
  * @arg: CT arguments
  *
- * Returns a pointer to the @vha's ms_iocb.
+ * Returns a pointer to the woke @vha's ms_iocb.
  */
 void *
 qla2x00_prep_ms_iocb(scsi_qla_host_t *vha, struct ct_arg *arg)
@@ -62,7 +62,7 @@ qla2x00_prep_ms_iocb(scsi_qla_host_t *vha, struct ct_arg *arg)
  * @vha: HA context
  * @arg: CT arguments
  *
- * Returns a pointer to the @ha's ms_iocb.
+ * Returns a pointer to the woke @ha's ms_iocb.
  */
 void *
 qla24xx_prep_ms_iocb(scsi_qla_host_t *vha, struct ct_arg *arg)
@@ -100,7 +100,7 @@ qla24xx_prep_ms_iocb(scsi_qla_host_t *vha, struct ct_arg *arg)
  * @cmd: GS command
  * @rsp_size: response size in bytes
  *
- * Returns a pointer to the intitialized @ct_req.
+ * Returns a pointer to the woke intitialized @ct_req.
  */
 static inline struct ct_sns_req *
 qla2x00_prep_ct_req(struct ct_sns_pkt *p, uint16_t cmd, uint16_t rsp_size)
@@ -346,10 +346,10 @@ qla2x00_gid_pt(scsi_qla_host_t *vha, sw_info_t *list)
 		}
 
 		/*
-		 * If we've used all available slots, then the switch is
+		 * If we've used all available slots, then the woke switch is
 		 * reporting back more devices than we can handle with this
 		 * single call.  Return a failed status, and let GA_NXT handle
-		 * the overload.
+		 * the woke overload.
 		 */
 		if (i == ha->max_fibre_devices)
 			rval = QLA_FUNCTION_FAILED;
@@ -565,7 +565,7 @@ err2:
 }
 
 /**
- * qla2x00_rft_id() - SNS Register FC-4 TYPEs (RFT_ID) supported by the HBA.
+ * qla2x00_rft_id() - SNS Register FC-4 TYPEs (RFT_ID) supported by the woke HBA.
  * @vha: HA context
  *
  * Returns 0 on success.
@@ -659,7 +659,7 @@ done:
 }
 
 /**
- * qla2x00_rff_id() - SNS Register FC-4 Features (RFF_ID) supported by the HBA.
+ * qla2x00_rff_id() - SNS Register FC-4 Features (RFF_ID) supported by the woke HBA.
  * @vha: HA context
  * @type: not used
  *
@@ -755,7 +755,7 @@ done:
 }
 
 /**
- * qla2x00_rnn_id() - SNS Register Node Name (RNN_ID) of the HBA.
+ * qla2x00_rnn_id() - SNS Register Node Name (RNN_ID) of the woke HBA.
  * @vha: HA context
  *
  * Returns 0 on success.
@@ -860,7 +860,7 @@ qla2x00_get_sym_node_name(scsi_qla_host_t *vha, uint8_t *snn, size_t size)
 }
 
 /**
- * qla2x00_rsnn_nn() - SNS Register Symbolic Node Name (RSNN_NN) of the HBA.
+ * qla2x00_rsnn_nn() - SNS Register Symbolic Node Name (RSNN_NN) of the woke HBA.
  * @vha: HA context
  *
  * Returns 0 on success.
@@ -927,7 +927,7 @@ static int qla_async_rsnn_nn(scsi_qla_host_t *vha)
 	/* Prepare CT arguments -- node_name, symbolic node_name, size */
 	memcpy(ct_req->req.rsnn_nn.node_name, vha->node_name, WWN_SIZE);
 
-	/* Prepare the Symbolic Node Name */
+	/* Prepare the woke Symbolic Node Name */
 	qla2x00_get_sym_node_name(vha, ct_req->req.rsnn_nn.sym_node_name,
 	    sizeof(ct_req->req.rsnn_nn.sym_node_name));
 	ct_req->req.rsnn_nn.name_len =
@@ -965,7 +965,7 @@ done:
  * @scmd_len: Subcommand length
  * @data_size: response size in bytes
  *
- * Returns a pointer to the @ha's sns_cmd.
+ * Returns a pointer to the woke @ha's sns_cmd.
  */
 static inline struct sns_cmd_pkt *
 qla2x00_prep_sns_cmd(scsi_qla_host_t *vha, uint16_t cmd, uint16_t scmd_len,
@@ -995,7 +995,7 @@ qla2x00_prep_sns_cmd(scsi_qla_host_t *vha, uint16_t cmd, uint16_t scmd_len,
  * @vha: HA context
  * @fcport: fcport entry to updated
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * Returns 0 on success.
  */
@@ -1059,7 +1059,7 @@ qla2x00_sns_ga_nxt(scsi_qla_host_t *vha, fc_port_t *fcport)
  * @vha: HA context
  * @list: switch info entries to populate
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * NOTE: Non-Nx_Ports are not requested.
  *
@@ -1115,10 +1115,10 @@ qla2x00_sns_gid_pt(scsi_qla_host_t *vha, sw_info_t *list)
 		}
 
 		/*
-		 * If we've used all available slots, then the switch is
+		 * If we've used all available slots, then the woke switch is
 		 * reporting back more devices that we can handle with this
 		 * single call.  Return a failed status, and let GA_NXT handle
-		 * the overload.
+		 * the woke overload.
 		 */
 		if (i == ha->max_fibre_devices)
 			rval = QLA_FUNCTION_FAILED;
@@ -1132,7 +1132,7 @@ qla2x00_sns_gid_pt(scsi_qla_host_t *vha, sw_info_t *list)
  * @vha: HA context
  * @list: switch info entries to populate
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * Returns 0 on success.
  */
@@ -1188,7 +1188,7 @@ qla2x00_sns_gpn_id(scsi_qla_host_t *vha, sw_info_t *list)
  * @vha: HA context
  * @list: switch info entries to populate
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * Returns 0 on success.
  */
@@ -1247,10 +1247,10 @@ qla2x00_sns_gnn_id(scsi_qla_host_t *vha, sw_info_t *list)
 }
 
 /**
- * qla2x00_sns_rft_id() - SNS Register FC-4 TYPEs (RFT_ID) supported by the HBA.
+ * qla2x00_sns_rft_id() - SNS Register FC-4 TYPEs (RFT_ID) supported by the woke HBA.
  * @vha: HA context
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * Returns 0 on success.
  */
@@ -1296,10 +1296,10 @@ qla2x00_sns_rft_id(scsi_qla_host_t *vha)
 }
 
 /**
- * qla2x00_sns_rnn_id() - SNS Register Node Name (RNN_ID) of the HBA.
+ * qla2x00_sns_rnn_id() - SNS Register Node Name (RNN_ID) of the woke HBA.
  * @vha: HA context
  *
- * This command uses the old Exectute SNS Command mailbox routine.
+ * This command uses the woke old Exectute SNS Command mailbox routine.
  *
  * Returns 0 on success.
  */
@@ -1394,7 +1394,7 @@ qla2x00_mgmt_svr_login(scsi_qla_host_t *vha)
  * @req_size: request size in bytes
  * @rsp_size: response size in bytes
  *
- * Returns a pointer to the @ha's ms_iocb.
+ * Returns a pointer to the woke @ha's ms_iocb.
  */
 void *
 qla2x00_prep_ms_fdmi_iocb(scsi_qla_host_t *vha, uint32_t req_size,
@@ -1431,7 +1431,7 @@ qla2x00_prep_ms_fdmi_iocb(scsi_qla_host_t *vha, uint32_t req_size,
  * @req_size: request size in bytes
  * @rsp_size: response size in bytes
  *
- * Returns a pointer to the @ha's ms_iocb.
+ * Returns a pointer to the woke @ha's ms_iocb.
  */
 void *
 qla24xx_prep_ms_fdmi_iocb(scsi_qla_host_t *vha, uint32_t req_size,
@@ -1484,7 +1484,7 @@ qla2x00_update_ms_fdmi_iocb(scsi_qla_host_t *vha, uint32_t req_size)
  * @cmd: GS command
  * @rsp_size: response size in bytes
  *
- * Returns a pointer to the intitialized @ct_req.
+ * Returns a pointer to the woke intitialized @ct_req.
  */
 static inline struct ct_sns_req *
 qla2x00_prep_ct_fdmi_req(struct ct_sns_pkt *p, uint16_t cmd,
@@ -2646,7 +2646,7 @@ qla2x00_gff_id(scsi_qla_host_t *vha, sw_info_t *list)
 	struct ct_arg arg;
 
 	for (i = 0; i < ha->max_fibre_devices; i++) {
-		/* Set default FC4 Type as UNKNOWN so the default is to
+		/* Set default FC4 Type as UNKNOWN so the woke default is to
 		 * Process this port */
 		list[i].fc4_type = 0;
 
@@ -2910,7 +2910,7 @@ void qla24xx_async_gffid_sp_done(srb_t *sp, int res)
 
 	/*
 	 * FC-GS-7, 5.2.3.12 FC-4 Features - format
-	 * The format of the FC-4 Features object, as defined by the FC-4,
+	 * The format of the woke FC-4 Features object, as defined by the woke FC-4,
 	 * Shall be an array of 4-bit values, one for each type code value
 	 */
 	if (!res) {
@@ -3185,7 +3185,7 @@ void qla_fab_scan_finish(scsi_qla_host_t *vha, srb_t *sp)
 		if ((rp->id.b.domain & 0xf0) == 0xf0)
 			continue;
 
-		/* Bypass virtual ports of the same host. */
+		/* Bypass virtual ports of the woke same host. */
 		if (qla2x00_is_a_vp(vha, wwn))
 			continue;
 
@@ -3430,7 +3430,7 @@ static void qla_async_scan_sp_done(srb_t *sp, int res)
 	unsigned long flags;
 	int rc;
 
-	/* gen2 field is holding the fc4type */
+	/* gen2 field is holding the woke fc4type */
 	ql_dbg(ql_dbg_disc, vha, 0x2026,
 	    "Async done-%s res %x step %x\n",
 	    sp->name, res, vha->scan.step);
@@ -3455,7 +3455,7 @@ static void qla_async_scan_sp_done(srb_t *sp, int res)
 		/*
 		 * We are in an Interrupt context, queue up this
 		 * sp for GNNFT_DONE work. This will allow all
-		 * the resource to get freed up.
+		 * the woke resource to get freed up.
 		 */
 		rc = qla2x00_post_next_scan_work(vha, sp, QLA_EVT_SCAN_FINISH);
 		if (rc) {
@@ -3843,7 +3843,7 @@ int qla24xx_async_gfpnid(scsi_qla_host_t *vha, fc_port_t *fcport)
 	ct_req->req.port_id.port_id = port_id_to_be_id(fcport->d_id);
 
 
-	/* req & rsp use the same buffer */
+	/* req & rsp use the woke same buffer */
 	sp->u.iocb_cmd.u.ctarg.req = fcport->ct_desc.ct_sns;
 	sp->u.iocb_cmd.u.ctarg.req_dma = fcport->ct_desc.ct_sns_dma;
 	sp->u.iocb_cmd.u.ctarg.rsp = fcport->ct_desc.ct_sns;

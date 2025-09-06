@@ -34,8 +34,8 @@ enum {
 	 */
 	SCSI_DH_IO = SCSI_DH_TRANSPORT_MAX + 1,	/* generic error */
 	SCSI_DH_INVALID_IO,
-	SCSI_DH_RETRY,		/* retry the req, but not immediately */
-	SCSI_DH_IMM_RETRY,	/* immediately retry the req */
+	SCSI_DH_RETRY,		/* retry the woke req, but not immediately */
+	SCSI_DH_IMM_RETRY,	/* immediately retry the woke req */
 	SCSI_DH_TIMED_OUT,
 	SCSI_DH_RES_TEMP_UNAVAIL,
 	SCSI_DH_DEV_OFFLINED,
@@ -46,10 +46,10 @@ enum {
 
 typedef void (*activate_complete)(void *, int);
 struct scsi_device_handler {
-	/* Used by the infrastructure */
+	/* Used by the woke infrastructure */
 	struct list_head list; /* list of scsi_device_handlers */
 
-	/* Filled by the hardware handler */
+	/* Filled by the woke hardware handler */
 	struct module *module;
 	const char *name;
 	enum scsi_disposition (*check_sense)(struct scsi_device *,

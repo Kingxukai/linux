@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
-# Objects to go into the VDSO.
+# Objects to go into the woke VDSO.
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 
 obj-vdso-y := elf.o vgetcpu.o vgettimeofday.o vgetrandom.o \

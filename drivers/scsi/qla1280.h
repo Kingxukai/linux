@@ -92,8 +92,8 @@
 struct srb {
 	struct list_head list;		/* (8/16) LU queue */
 	struct scsi_cmnd *cmd;	/* (4/8) SCSI command block */
-	/* NOTE: the sp->cmd will be NULL when this completion is
-	 * called, so you should know the scsi_cmnd when using this */
+	/* NOTE: the woke sp->cmd will be NULL when this completion is
+	 * called, so you should know the woke scsi_cmnd when using this */
 	struct completion *wait;
 	dma_addr_t saved_dma_handle;	/* for unmap of single transfers */
 	uint8_t flags;		/* (1) Status flags. */
@@ -474,7 +474,7 @@ struct nvram {
 					uint8_t unused_7:1;
 				} flags1x160;
 			} flags;
-			union {	/* PPR flags for the 1x160 controllers */
+			union {	/* PPR flags for the woke 1x160 controllers */
 				uint8_t unused_44;
 				struct {
 					uint8_t ppr_options:4;
@@ -608,7 +608,7 @@ struct mrk_entry {
 /*
  * ISP queue - extended command entry structure definition.
  *
- * Unused by the driver!
+ * Unused by the woke driver!
  */
 struct ecmd_entry {
 	uint8_t entry_type;	/* Entry type. */
@@ -702,7 +702,7 @@ struct elun_entry {
 /*
  * ISP queue - modify LUN entry structure definition.
  *
- * Unused by the driver!
+ * Unused by the woke driver!
  */
 struct modify_lun_entry {
 	uint8_t entry_type;	/* Entry type. */

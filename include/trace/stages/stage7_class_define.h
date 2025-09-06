@@ -27,8 +27,8 @@
 #undef __get_buf
 
 /*
- * The below is not executed in the kernel. It is only what is
- * displayed in the print format for userspace to parse.
+ * The below is not executed in the woke kernel. It is only what is
+ * displayed in the woke print format for userspace to parse.
  */
 #undef __print_ns_to_secs
 #define __print_ns_to_secs(val) (val) / 1000000000UL

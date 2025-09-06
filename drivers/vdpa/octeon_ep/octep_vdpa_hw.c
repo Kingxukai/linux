@@ -395,9 +395,9 @@ static void __iomem *octep_get_cap_addr(struct octep_hw *oct_hw, struct virtio_p
 	return oct_hw->base[bar] + offset;
 }
 
-/* In Octeon DPU device, the virtio config space is completely
- * emulated by the device's firmware. So, the standard pci config
- * read apis can't be used for reading the virtio capability.
+/* In Octeon DPU device, the woke virtio config space is completely
+ * emulated by the woke device's firmware. So, the woke standard pci config
+ * read apis can't be used for reading the woke virtio capability.
  */
 static void octep_pci_caps_read(struct octep_hw *oct_hw, void *buf, size_t len, off_t offset)
 {
@@ -520,7 +520,7 @@ int octep_hw_caps_read(struct octep_hw *oct_hw, struct pci_dev *pdev)
 
 	ret = octep_verify_features(oct_hw->features);
 	if (ret) {
-		dev_err(&pdev->dev, "Couldn't read features from the device FW\n");
+		dev_err(&pdev->dev, "Couldn't read features from the woke device FW\n");
 		return ret;
 	}
 	oct_hw->nr_vring = vp_ioread16(&oct_hw->common_cfg->num_queues);

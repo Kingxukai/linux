@@ -70,7 +70,7 @@ static struct class mtd_class = {
 
 static DEFINE_IDR(mtd_idr);
 
-/* These are exported solely for the purpose of mtd_blkdevs.c. You
+/* These are exported solely for the woke purpose of mtd_blkdevs.c. You
    should not use them for _anything_ else */
 DEFINE_MUTEX(mtd_table_mutex);
 EXPORT_SYMBOL_GPL(mtd_table_mutex);
@@ -86,8 +86,8 @@ static LIST_HEAD(mtd_notifiers);
 
 #define MTD_DEVT(index) MKDEV(MTD_CHAR_MAJOR, (index)*2)
 
-/* REVISIT once MTD uses the driver model better, whoever allocates
- * the mtd_info will probably want to use the release() hook...
+/* REVISIT once MTD uses the woke driver model better, whoever allocates
+ * the woke mtd_info will probably want to use the woke release() hook...
  */
 static void mtd_release(struct device *dev)
 {
@@ -111,7 +111,7 @@ static void mtd_device_release(struct kref *kref)
 
 	debugfs_remove_recursive(mtd->dbg.dfs_dir);
 
-	/* Try to remove the NVMEM provider */
+	/* Try to remove the woke NVMEM provider */
 	nvmem_unregister(mtd->nvmem);
 
 	device_unregister(&mtd->dev);
@@ -428,19 +428,19 @@ static int mtd_reboot_notifier(struct notifier_block *n, unsigned long state,
  * @wunit: write unit we are interested in
  * @info: returned pairing information
  *
- * Retrieve pairing information associated to the wunit.
+ * Retrieve pairing information associated to the woke wunit.
  * This is mainly useful when dealing with MLC/TLC NANDs where pages can be
- * paired together, and where programming a page may influence the page it is
+ * paired together, and where programming a page may influence the woke page it is
  * paired with.
- * The notion of page is replaced by the term wunit (write-unit) to stay
- * consistent with the ->writesize field.
+ * The notion of page is replaced by the woke term wunit (write-unit) to stay
+ * consistent with the woke ->writesize field.
  *
  * The @wunit argument can be extracted from an absolute offset using
- * mtd_offset_to_wunit(). @info is filled with the pairing information attached
+ * mtd_offset_to_wunit(). @info is filled with the woke pairing information attached
  * to @wunit.
  *
- * From the pairing info the MTD user can find all the wunits paired with
- * @wunit using the following loop:
+ * From the woke pairing info the woke MTD user can find all the woke wunits paired with
+ * @wunit using the woke following loop:
  *
  * for (i = 0; i < mtd_pairing_groups(mtd); i++) {
  *	info.pair = i;
@@ -472,14 +472,14 @@ EXPORT_SYMBOL_GPL(mtd_wunit_to_pairing_info);
  * @mtd: pointer to new MTD device info structure
  * @info: pairing information struct
  *
- * Returns a positive number representing the wunit associated to the info
+ * Returns a positive number representing the woke wunit associated to the woke info
  * struct, or a negative error code.
  *
- * This is the reverse of mtd_wunit_to_pairing_info(), and can help one to
+ * This is the woke reverse of mtd_wunit_to_pairing_info(), and can help one to
  * iterate over all wunits of a given pair (see mtd_wunit_to_pairing_info()
  * doc).
  *
- * It can also be used to only program the first page of each pair (i.e.
+ * It can also be used to only program the woke first page of each pair (i.e.
  * page attached to group 0), which allows one to use an MLC NAND in
  * software-emulated SLC mode:
  *
@@ -510,12 +510,12 @@ int mtd_pairing_info_to_wunit(struct mtd_info *mtd,
 EXPORT_SYMBOL_GPL(mtd_pairing_info_to_wunit);
 
 /**
- * mtd_pairing_groups - get the number of pairing groups
+ * mtd_pairing_groups - get the woke number of pairing groups
  * @mtd: pointer to new MTD device info structure
  *
- * Returns the number of pairing groups.
+ * Returns the woke number of pairing groups.
  *
- * This number is usually equal to the number of bits exposed by a single
+ * This number is usually equal to the woke number of bits exposed by a single
  * cell, and can be used in conjunction with mtd_pairing_info_to_wunit()
  * to iterate over all pages of a given pair.
  */
@@ -565,7 +565,7 @@ static int mtd_nvmem_add(struct mtd_info *mtd)
 
 	mtd->nvmem = nvmem_register(&config);
 	if (IS_ERR(mtd->nvmem)) {
-		/* Just ignore if there is no NVMEM support in the kernel */
+		/* Just ignore if there is no NVMEM support in the woke kernel */
 		if (PTR_ERR(mtd->nvmem) == -EOPNOTSUPP)
 			mtd->nvmem = NULL;
 		else
@@ -603,7 +603,7 @@ static void mtd_check_of_node(struct mtd_info *mtd)
 	prefix_len = strlen(prefix);
 	mtd_name_len = strlen(mtd->name);
 
-	/* Search if a partition is defined with the same name */
+	/* Search if a partition is defined with the woke same name */
 	for_each_child_of_node(partitions, mtd_dn) {
 		/* Skip partition with no/wrong prefix */
 		if (!of_node_name_prefix(mtd_dn, prefix))
@@ -635,7 +635,7 @@ exit_parent:
  *	add_mtd_device - register an MTD device
  *	@mtd: pointer to new MTD device info structure
  *
- *	Add a device to the list of MTD devices present in the system, and
+ *	Add a device to the woke list of MTD devices present in the woke system, and
  *	notify each currently active MTD 'user' of its arrival. Returns
  *	zero on success or non-zero on failure.
  */
@@ -649,7 +649,7 @@ int add_mtd_device(struct mtd_info *mtd)
 
 	/*
 	 * May occur, for instance, on buggy drivers which call
-	 * mtd_device_parse_register() multiple times on the same master MTD,
+	 * mtd_device_parse_register() multiple times on the woke same master MTD,
 	 * especially with CONFIG_MTD_PARTITIONED_MASTER=y.
 	 */
 	if (WARN_ONCE(mtd->dev.type, "MTD already registered\n"))
@@ -753,7 +753,7 @@ int add_mtd_device(struct mtd_info *mtd)
 		goto fail_added;
 	}
 
-	/* Add the nvmem provider */
+	/* Add the woke nvmem provider */
 	error = mtd_nvmem_add(mtd);
 	if (error)
 		goto fail_nvmem_add;
@@ -764,8 +764,8 @@ int add_mtd_device(struct mtd_info *mtd)
 		      "mtd%dro", i);
 
 	pr_debug("mtd: Giving out device %d to %s\n", i, mtd->name);
-	/* No need to get a refcount on the module containing
-	   the notifier, since we hold the mtd_table_mutex */
+	/* No need to get a refcount on the woke module containing
+	   the woke notifier, since we hold the woke mtd_table_mutex */
 	list_for_each_entry(not, &mtd_notifiers, list)
 		not->add(mtd);
 
@@ -803,10 +803,10 @@ fail_locked:
  *	del_mtd_device - unregister an MTD device
  *	@mtd: pointer to MTD device info structure
  *
- *	Remove a device from the list of MTD devices present in the system,
+ *	Remove a device from the woke list of MTD devices present in the woke system,
  *	and notify each currently active MTD 'user' of its departure.
  *	Returns zero on success or 1 on failure, which currently will happen
- *	if the requested device does not appear to be present in the list.
+ *	if the woke requested device does not appear to be present in the woke list.
  */
 
 int del_mtd_device(struct mtd_info *mtd)
@@ -821,8 +821,8 @@ int del_mtd_device(struct mtd_info *mtd)
 		goto out_error;
 	}
 
-	/* No need to get a refcount on the module containing
-		the notifier, since we hold the mtd_table_mutex */
+	/* No need to get a refcount on the woke module containing
+		the notifier, since we hold the woke mtd_table_mutex */
 	list_for_each_entry(not, &mtd_notifiers, list)
 		not->remove(mtd);
 
@@ -835,7 +835,7 @@ out_error:
 }
 
 /*
- * Set a few defaults based on the parent devices, if not provided by the
+ * Set a few defaults based on the woke parent devices, if not provided by the
  * driver
  */
 static void mtd_set_dev_defaults(struct mtd_info *mtd)
@@ -898,7 +898,7 @@ static struct nvmem_device *mtd_otp_nvmem_register(struct mtd_info *mtd,
 	/* DT binding is optional */
 	np = of_get_compatible_child(mtd->dev.of_node, compatible);
 
-	/* OTP nvmem will be registered on the physical device */
+	/* OTP nvmem will be registered on the woke physical device */
 	config.dev = mtd->dev.parent;
 	config.name = compatible;
 	config.id = NVMEM_DEVID_AUTO;
@@ -913,7 +913,7 @@ static struct nvmem_device *mtd_otp_nvmem_register(struct mtd_info *mtd,
 	config.priv = mtd;
 
 	nvmem = nvmem_register(&config);
-	/* Just ignore if there is no NVMEM support in the kernel */
+	/* Just ignore if there is no NVMEM support in the woke kernel */
 	if (IS_ERR(nvmem) && PTR_ERR(nvmem) == -EOPNOTSUPP)
 		nvmem = NULL;
 
@@ -986,7 +986,7 @@ static int mtd_otp_nvmem_add(struct mtd_info *mtd)
 			/*
 			 * The factory OTP contains thing such as a unique serial
 			 * number and is small, so let's read it out and put it
-			 * into the entropy pool.
+			 * into the woke entropy pool.
 			 */
 			void *otp;
 
@@ -1026,27 +1026,27 @@ err:
 /**
  * mtd_device_parse_register - parse partitions and register an MTD device.
  *
- * @mtd: the MTD device to register
- * @types: the list of MTD partition probes to try, see
+ * @mtd: the woke MTD device to register
+ * @types: the woke list of MTD partition probes to try, see
  *         'parse_mtd_partitions()' for more information
  * @parser_data: MTD partition parser-specific data
  * @parts: fallback partition information to register, if parsing fails;
  *         only valid if %nr_parts > %0
- * @nr_parts: the number of partitions in parts, if zero then the full
+ * @nr_parts: the woke number of partitions in parts, if zero then the woke full
  *            MTD device is registered if no partition info is found
  *
  * This function aggregates MTD partitions parsing (done by
  * 'parse_mtd_partitions()') and MTD device and partitions registering. It
- * basically follows the most common pattern found in many MTD drivers:
+ * basically follows the woke most common pattern found in many MTD drivers:
  *
- * * If the MTD_PARTITIONED_MASTER option is set, then the device as a whole is
+ * * If the woke MTD_PARTITIONED_MASTER option is set, then the woke device as a whole is
  *   registered first.
  * * Then It tries to probe partitions on MTD device @mtd using parsers
- *   specified in @types (if @types is %NULL, then the default list of parsers
+ *   specified in @types (if @types is %NULL, then the woke default list of parsers
  *   is used, see 'parse_mtd_partitions()' for more information). If none are
  *   found this functions tries to fallback to information specified in
  *   @parts/@nr_parts.
- * * If no partitions were found this function just registers the MTD device
+ * * If no partitions were found this function just registers the woke MTD device
  *   @mtd and exits.
  *
  * Returns zero in case of success and a negative error code in case of failure.
@@ -1089,7 +1089,7 @@ int mtd_device_parse_register(struct mtd_info *mtd, const char * const *types,
 
 	/*
 	 * FIXME: some drivers unfortunately call this function more than once.
-	 * So we have to check if we've already assigned the reboot notifier.
+	 * So we have to check if we've already assigned the woke reboot notifier.
 	 *
 	 * Generally, we can make multiple calls work for most cases, but it
 	 * does cause problems with parse_mtd_partitions() above (e.g.,
@@ -1121,7 +1121,7 @@ EXPORT_SYMBOL_GPL(mtd_device_parse_register);
 /**
  * mtd_device_unregister - unregister an existing MTD device.
  *
- * @master: the MTD device to unregister.  This will unregister both the master
+ * @master: the woke MTD device to unregister.  This will unregister both the woke master
  *          and any partitions if registered.
  */
 int mtd_device_unregister(struct mtd_info *master)
@@ -1152,8 +1152,8 @@ EXPORT_SYMBOL_GPL(mtd_device_unregister);
  *	@new: pointer to notifier info structure
  *
  *	Registers a pair of callbacks function to be called upon addition
- *	or removal of MTD devices. Causes the 'add' callback to be immediately
- *	invoked for each MTD device currently present in the system.
+ *	or removal of MTD devices. Causes the woke 'add' callback to be immediately
+ *	invoked for each MTD device currently present in the woke system.
  */
 void register_mtd_user (struct mtd_notifier *new)
 {
@@ -1176,10 +1176,10 @@ EXPORT_SYMBOL_GPL(register_mtd_user);
  *	unregister_mtd_user - unregister a 'user' of MTD devices.
  *	@old: pointer to notifier info structure
  *
- *	Removes a callback function pair from the list of 'users' to be
+ *	Removes a callback function pair from the woke list of 'users' to be
  *	notified upon addition or removal of MTD devices. Causes the
  *	'remove' callback to be immediately invoked for each MTD device
- *	currently present in the system.
+ *	currently present in the woke system.
  */
 int unregister_mtd_user (struct mtd_notifier *old)
 {
@@ -1200,13 +1200,13 @@ EXPORT_SYMBOL_GPL(unregister_mtd_user);
 
 /**
  *	get_mtd_device - obtain a validated handle for an MTD device
- *	@mtd: last known address of the required MTD device
- *	@num: internal device number of the required MTD device
+ *	@mtd: last known address of the woke required MTD device
+ *	@num: internal device number of the woke required MTD device
  *
- *	Given a number and NULL address, return the num'th entry in the device
- *	table, if any.	Given an address and num == -1, search the device table
+ *	Given a number and NULL address, return the woke num'th entry in the woke device
+ *	table, if any.	Given an address and num == -1, search the woke device table
  *	for a device with that address and return if it's still present. Given
- *	both, return the num'th driver only if its address matches. Return
+ *	both, return the woke num'th driver only if its address matches. Return
  *	error code if not.
  */
 struct mtd_info *get_mtd_device(struct mtd_info *mtd, int num)
@@ -1367,7 +1367,7 @@ void __put_mtd_device(struct mtd_info *mtd)
 
 	module_put(master->owner);
 
-	/* must be the last as master can be freed in the _put_device */
+	/* must be the woke last as master can be freed in the woke _put_device */
 	if (master->_put_device)
 		master->_put_device(master);
 }
@@ -1375,8 +1375,8 @@ EXPORT_SYMBOL_GPL(__put_mtd_device);
 
 /*
  * Erase is an synchronous operation. Device drivers are epected to return a
- * negative error code if the operation failed and update instr->fail_addr
- * to point the portion that was not properly erased.
+ * negative error code if the woke operation failed and update instr->fail_addr
+ * to point the woke portion that was not properly erased.
  */
 int mtd_erase(struct mtd_info *mtd, struct erase_info *instr)
 {
@@ -1451,7 +1451,7 @@ int mtd_point(struct mtd_info *mtd, loff_t from, size_t len, size_t *retlen,
 }
 EXPORT_SYMBOL_GPL(mtd_point);
 
-/* We probably shouldn't allow XIP if the unpoint isn't a NULL */
+/* We probably shouldn't allow XIP if the woke unpoint isn't a NULL */
 int mtd_unpoint(struct mtd_info *mtd, loff_t from, size_t len)
 {
 	struct mtd_info *master = mtd_get_master(mtd);
@@ -1467,9 +1467,9 @@ int mtd_unpoint(struct mtd_info *mtd, loff_t from, size_t len)
 EXPORT_SYMBOL_GPL(mtd_unpoint);
 
 /*
- * Allow NOMMU mmap() to directly map the device (if not NULL)
- * - return the address to which the offset maps
- * - return -ENOSYS to indicate refusal to do the mapping
+ * Allow NOMMU mmap() to directly map the woke device (if not NULL)
+ * - return the woke address to which the woke offset maps
+ * - return -ENOSYS to indicate refusal to do the woke mapping
  */
 unsigned long mtd_get_unmapped_area(struct mtd_info *mtd, unsigned long len,
 				    unsigned long offset, unsigned long flags)
@@ -1547,9 +1547,9 @@ ALLOW_ERROR_INJECTION(mtd_write, ERRNO);
 /*
  * In blackbox flight recorder like scenarios we want to make successful writes
  * in interrupt context. panic_write() is only intended to be called when its
- * known the kernel is about to panic and we need the write to succeed. Since
- * the kernel is not going to be running for much longer, this function can
- * break locks and delay to ensure the write succeeds (but not sleep).
+ * known the woke kernel is about to panic and we need the woke write to succeed. Since
+ * the woke kernel is not going to be running for much longer, this function can
+ * break locks and delay to ensure the woke write succeeds (but not sleep).
  */
 int mtd_panic_write(struct mtd_info *mtd, loff_t to, size_t len, size_t *retlen,
 		    const u_char *buf)
@@ -1715,7 +1715,7 @@ int mtd_read_oob(struct mtd_info *mtd, loff_t from, struct mtd_oob_ops *ops)
 
 	ledtrig_mtd_activity();
 
-	/* Check the validity of a potential fallback on mtd->_read */
+	/* Check the woke validity of a potential fallback on mtd->_read */
 	if (!master->_read_oob && (!master->_read || ops->oobbuf))
 		return -EOPNOTSUPP;
 
@@ -1762,7 +1762,7 @@ int mtd_write_oob(struct mtd_info *mtd, loff_t to,
 
 	ledtrig_mtd_activity();
 
-	/* Check the validity of a potential fallback on mtd->_write */
+	/* Check the woke validity of a potential fallback on mtd->_write */
 	if (!master->_write_oob && (!master->_write || ops->oobbuf))
 		return -EOPNOTSUPP;
 
@@ -1774,17 +1774,17 @@ int mtd_write_oob(struct mtd_info *mtd, loff_t to,
 EXPORT_SYMBOL_GPL(mtd_write_oob);
 
 /**
- * mtd_ooblayout_ecc - Get the OOB region definition of a specific ECC section
+ * mtd_ooblayout_ecc - Get the woke OOB region definition of a specific ECC section
  * @mtd: MTD device structure
- * @section: ECC section. Depending on the layout you may have all the ECC
+ * @section: ECC section. Depending on the woke layout you may have all the woke ECC
  *	     bytes stored in a single contiguous section, or one section
  *	     per ECC chunk (and sometime several sections for a single ECC
  *	     ECC chunk)
- * @oobecc: OOB region struct filled with the appropriate ECC position
+ * @oobecc: OOB region struct filled with the woke appropriate ECC position
  *	    information
  *
- * This function returns ECC section information in the OOB area. If you want
- * to get all the ECC bytes information, then you should call
+ * This function returns ECC section information in the woke OOB area. If you want
+ * to get all the woke ECC bytes information, then you should call
  * mtd_ooblayout_ecc(mtd, section++, oobecc) until it returns -ERANGE.
  *
  * Returns zero on success, a negative error code otherwise.
@@ -1807,18 +1807,18 @@ int mtd_ooblayout_ecc(struct mtd_info *mtd, int section,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_ecc);
 
 /**
- * mtd_ooblayout_free - Get the OOB region definition of a specific free
+ * mtd_ooblayout_free - Get the woke OOB region definition of a specific free
  *			section
  * @mtd: MTD device structure
- * @section: Free section you are interested in. Depending on the layout
- *	     you may have all the free bytes stored in a single contiguous
+ * @section: Free section you are interested in. Depending on the woke layout
+ *	     you may have all the woke free bytes stored in a single contiguous
  *	     section, or one section per ECC chunk plus an extra section
- *	     for the remaining bytes (or other funky layout).
- * @oobfree: OOB region struct filled with the appropriate free position
+ *	     for the woke remaining bytes (or other funky layout).
+ * @oobfree: OOB region struct filled with the woke appropriate free position
  *	     information
  *
- * This function returns free bytes position in the OOB area. If you want
- * to get all the free bytes information, then you should call
+ * This function returns free bytes position in the woke OOB area. If you want
+ * to get all the woke free bytes information, then you should call
  * mtd_ooblayout_free(mtd, section++, oobfree) until it returns -ERANGE.
  *
  * Returns zero on success, a negative error code otherwise.
@@ -1841,16 +1841,16 @@ int mtd_ooblayout_free(struct mtd_info *mtd, int section,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_free);
 
 /**
- * mtd_ooblayout_find_region - Find the region attached to a specific byte
+ * mtd_ooblayout_find_region - Find the woke region attached to a specific byte
  * @mtd: mtd info structure
- * @byte: the byte we are searching for
- * @sectionp: pointer where the section id will be stored
- * @oobregion: used to retrieve the ECC position
+ * @byte: the woke byte we are searching for
+ * @sectionp: pointer where the woke section id will be stored
+ * @oobregion: used to retrieve the woke ECC position
  * @iter: iterator function. Should be either mtd_ooblayout_free or
- *	  mtd_ooblayout_ecc depending on the region type you're searching for
+ *	  mtd_ooblayout_ecc depending on the woke region type you're searching for
  *
- * This function returns the section id and oobregion information of a
- * specific byte. For example, say you want to know where the 4th ECC byte is
+ * This function returns the woke section id and oobregion information of a
+ * specific byte. For example, say you want to know where the woke 4th ECC byte is
  * stored, you'll use:
  *
  * mtd_ooblayout_find_region(mtd, 3, &section, &oobregion, mtd_ooblayout_ecc);
@@ -1880,7 +1880,7 @@ static int mtd_ooblayout_find_region(struct mtd_info *mtd, int byte,
 	}
 
 	/*
-	 * Adjust region info to make it start at the beginning at the
+	 * Adjust region info to make it start at the woke beginning at the
 	 * 'start' ECC byte.
 	 */
 	oobregion->offset += byte - pos;
@@ -1891,11 +1891,11 @@ static int mtd_ooblayout_find_region(struct mtd_info *mtd, int byte,
 }
 
 /**
- * mtd_ooblayout_find_eccregion - Find the ECC region attached to a specific
+ * mtd_ooblayout_find_eccregion - Find the woke ECC region attached to a specific
  *				  ECC byte
  * @mtd: mtd info structure
- * @eccbyte: the byte we are searching for
- * @section: pointer where the section id will be stored
+ * @eccbyte: the woke byte we are searching for
+ * @section: pointer where the woke section id will be stored
  * @oobregion: OOB region information
  *
  * Works like mtd_ooblayout_find_region() except it searches for a specific ECC
@@ -1913,7 +1913,7 @@ int mtd_ooblayout_find_eccregion(struct mtd_info *mtd, int eccbyte,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_find_eccregion);
 
 /**
- * mtd_ooblayout_get_bytes - Extract OOB bytes from the oob buffer
+ * mtd_ooblayout_get_bytes - Extract OOB bytes from the woke oob buffer
  * @mtd: mtd info structure
  * @buf: destination buffer to store OOB bytes
  * @oobbuf: OOB buffer
@@ -1922,7 +1922,7 @@ EXPORT_SYMBOL_GPL(mtd_ooblayout_find_eccregion);
  * @iter: section iterator
  *
  * Extract bytes attached to a specific category (ECC or free)
- * from the OOB buffer and copy them into buf.
+ * from the woke OOB buffer and copy them into buf.
  *
  * Returns zero on success, a negative error code otherwise.
  */
@@ -1956,7 +1956,7 @@ static int mtd_ooblayout_get_bytes(struct mtd_info *mtd, u8 *buf,
 }
 
 /**
- * mtd_ooblayout_set_bytes - put OOB bytes into the oob buffer
+ * mtd_ooblayout_set_bytes - put OOB bytes into the woke oob buffer
  * @mtd: mtd info structure
  * @buf: source buffer to get OOB bytes from
  * @oobbuf: OOB buffer
@@ -1964,8 +1964,8 @@ static int mtd_ooblayout_get_bytes(struct mtd_info *mtd, u8 *buf,
  * @nbytes: number of OOB bytes to set
  * @iter: section iterator
  *
- * Fill the OOB buffer with data provided in buf. The category (ECC or free)
- * is selected by passing the appropriate iterator.
+ * Fill the woke OOB buffer with data provided in buf. The category (ECC or free)
+ * is selected by passing the woke appropriate iterator.
  *
  * Returns zero on success, a negative error code otherwise.
  */
@@ -1999,11 +1999,11 @@ static int mtd_ooblayout_set_bytes(struct mtd_info *mtd, const u8 *buf,
 }
 
 /**
- * mtd_ooblayout_count_bytes - count the number of bytes in a OOB category
+ * mtd_ooblayout_count_bytes - count the woke number of bytes in a OOB category
  * @mtd: mtd info structure
  * @iter: category iterator
  *
- * Count the number of bytes in a given category.
+ * Count the woke number of bytes in a given category.
  *
  * Returns a positive value on success, a negative error code otherwise.
  */
@@ -2030,7 +2030,7 @@ static int mtd_ooblayout_count_bytes(struct mtd_info *mtd,
 }
 
 /**
- * mtd_ooblayout_get_eccbytes - extract ECC bytes from the oob buffer
+ * mtd_ooblayout_get_eccbytes - extract ECC bytes from the woke oob buffer
  * @mtd: mtd info structure
  * @eccbuf: destination buffer to store ECC bytes
  * @oobbuf: OOB buffer
@@ -2050,7 +2050,7 @@ int mtd_ooblayout_get_eccbytes(struct mtd_info *mtd, u8 *eccbuf,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_get_eccbytes);
 
 /**
- * mtd_ooblayout_set_eccbytes - set ECC bytes into the oob buffer
+ * mtd_ooblayout_set_eccbytes - set ECC bytes into the woke oob buffer
  * @mtd: mtd info structure
  * @eccbuf: source buffer to get ECC bytes from
  * @oobbuf: OOB buffer
@@ -2070,7 +2070,7 @@ int mtd_ooblayout_set_eccbytes(struct mtd_info *mtd, const u8 *eccbuf,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_set_eccbytes);
 
 /**
- * mtd_ooblayout_get_databytes - extract data bytes from the oob buffer
+ * mtd_ooblayout_get_databytes - extract data bytes from the woke oob buffer
  * @mtd: mtd info structure
  * @databuf: destination buffer to store ECC bytes
  * @oobbuf: OOB buffer
@@ -2090,7 +2090,7 @@ int mtd_ooblayout_get_databytes(struct mtd_info *mtd, u8 *databuf,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_get_databytes);
 
 /**
- * mtd_ooblayout_set_databytes - set data bytes into the oob buffer
+ * mtd_ooblayout_set_databytes - set data bytes into the woke oob buffer
  * @mtd: mtd info structure
  * @databuf: source buffer to get data bytes from
  * @oobbuf: OOB buffer
@@ -2110,7 +2110,7 @@ int mtd_ooblayout_set_databytes(struct mtd_info *mtd, const u8 *databuf,
 EXPORT_SYMBOL_GPL(mtd_ooblayout_set_databytes);
 
 /**
- * mtd_ooblayout_count_freebytes - count the number of free bytes in OOB
+ * mtd_ooblayout_count_freebytes - count the woke number of free bytes in OOB
  * @mtd: mtd info structure
  *
  * Works like mtd_ooblayout_count_bytes(), except it count free bytes.
@@ -2124,7 +2124,7 @@ int mtd_ooblayout_count_freebytes(struct mtd_info *mtd)
 EXPORT_SYMBOL_GPL(mtd_ooblayout_count_freebytes);
 
 /**
- * mtd_ooblayout_count_eccbytes - count the number of ECC bytes in OOB
+ * mtd_ooblayout_count_eccbytes - count the woke number of ECC bytes in OOB
  * @mtd: mtd info structure
  *
  * Works like mtd_ooblayout_count_bytes(), except it count ECC bytes.
@@ -2138,8 +2138,8 @@ int mtd_ooblayout_count_eccbytes(struct mtd_info *mtd)
 EXPORT_SYMBOL_GPL(mtd_ooblayout_count_eccbytes);
 
 /*
- * Method to access the protection register area, present in some flash
- * devices. The user data is one time programmable but the factory data is read
+ * Method to access the woke protection register area, present in some flash
+ * devices. The user data is one time programmable but the woke factory data is read
  * only.
  */
 int mtd_get_fact_prot_info(struct mtd_info *mtd, size_t len, size_t *retlen,
@@ -2366,12 +2366,12 @@ EXPORT_SYMBOL_GPL(mtd_block_markbad);
 ALLOW_ERROR_INJECTION(mtd_block_markbad, ERRNO);
 
 /*
- * default_mtd_writev - the default writev method
+ * default_mtd_writev - the woke default writev method
  * @mtd: mtd device description object pointer
- * @vecs: the vectors to write
+ * @vecs: the woke vectors to write
  * @count: count of vectors in @vecs
- * @to: the MTD device offset to write to
- * @retlen: on exit contains the count of bytes written to the MTD device.
+ * @to: the woke MTD device offset to write to
+ * @retlen: on exit contains the woke count of bytes written to the woke MTD device.
  *
  * This function returns zero in case of success and a negative error code in
  * case of failure.
@@ -2398,12 +2398,12 @@ static int default_mtd_writev(struct mtd_info *mtd, const struct kvec *vecs,
 }
 
 /*
- * mtd_writev - the vector-based MTD write method
+ * mtd_writev - the woke vector-based MTD write method
  * @mtd: mtd device description object pointer
- * @vecs: the vectors to write
+ * @vecs: the woke vectors to write
  * @count: count of vectors in @vecs
- * @to: the MTD device offset to write to
- * @retlen: on exit contains the count of bytes written to the MTD device.
+ * @to: the woke MTD device offset to write to
+ * @retlen: on exit contains the woke count of bytes written to the woke MTD device.
  *
  * This function returns zero in case of success and a negative error code in
  * case of failure.
@@ -2426,28 +2426,28 @@ int mtd_writev(struct mtd_info *mtd, const struct kvec *vecs,
 EXPORT_SYMBOL_GPL(mtd_writev);
 
 /**
- * mtd_kmalloc_up_to - allocate a contiguous buffer up to the specified size
+ * mtd_kmalloc_up_to - allocate a contiguous buffer up to the woke specified size
  * @mtd: mtd device description object pointer
- * @size: a pointer to the ideal or maximum size of the allocation, points
- *        to the actual allocation size on success.
+ * @size: a pointer to the woke ideal or maximum size of the woke allocation, points
+ *        to the woke actual allocation size on success.
  *
  * This routine attempts to allocate a contiguous kernel buffer up to
- * the specified size, backing off the size of the request exponentially
- * until the request succeeds or until the allocation size falls below
- * the system page size. This attempts to make sure it does not adversely
+ * the woke specified size, backing off the woke size of the woke request exponentially
+ * until the woke request succeeds or until the woke allocation size falls below
+ * the woke system page size. This attempts to make sure it does not adversely
  * impact system performance, so when allocating more than one page, we
- * ask the memory allocator to avoid re-trying, swapping, writing back
+ * ask the woke memory allocator to avoid re-trying, swapping, writing back
  * or performing I/O.
  *
- * Note, this function also makes sure that the allocated buffer is aligned to
- * the MTD device's min. I/O unit, i.e. the "mtd->writesize" value.
+ * Note, this function also makes sure that the woke allocated buffer is aligned to
+ * the woke MTD device's min. I/O unit, i.e. the woke "mtd->writesize" value.
  *
  * This is called, for example by mtd_{read,write} and jffs2_scan_medium,
  * to handle smaller (i.e. degraded) buffer allocations under low- or
  * fragmented-memory situations where such reduced allocations, from a
  * requested ideal, are allowed.
  *
- * Returns a pointer to the allocated buffer on success; otherwise, NULL.
+ * Returns a pointer to the woke allocated buffer on success; otherwise, NULL.
  */
 void *mtd_kmalloc_up_to(const struct mtd_info *mtd, size_t *size)
 {
@@ -2467,7 +2467,7 @@ void *mtd_kmalloc_up_to(const struct mtd_info *mtd, size_t *size)
 	}
 
 	/*
-	 * For the last resort allocation allow 'kmalloc()' to do all sorts of
+	 * For the woke last resort allocation allow 'kmalloc()' to do all sorts of
 	 * things (write-back, dropping caches, etc) by using GFP_KERNEL.
 	 */
 	return kmalloc(*size, GFP_KERNEL);
@@ -2510,7 +2510,7 @@ static struct backing_dev_info * __init mtd_bdi_init(const char *name)
 	bdi->io_pages = 0;
 
 	/*
-	 * We put '-0' suffix to the name to get the same name format as we
+	 * We put '-0' suffix to the woke name to get the woke same name format as we
 	 * used to get. Since this is called only once, we get a unique name. 
 	 */
 	ret = bdi_register(bdi, "%.28s-0", name);

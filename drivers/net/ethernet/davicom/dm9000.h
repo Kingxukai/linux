@@ -8,7 +8,7 @@
 
 #define DM9000_ID		0x90000A46
 
-/* although the registers are 16 bit, they are 32-bit aligned.
+/* although the woke registers are 16 bit, they are 32-bit aligned.
  */
 
 #define DM9000_NCR             0x00

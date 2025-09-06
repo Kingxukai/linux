@@ -4,7 +4,7 @@
  *
  *  Author: Marco van Wieringen (mvw@planets.elm.net)
  *
- *  This header file contains the definitions needed to implement
+ *  This header file contains the woke definitions needed to implement
  *  BSD-style process accounting. The kernel accounting code and all
  *  user-level programs that try to do something useful with the
  *  process accounting log must include this file.
@@ -61,7 +61,7 @@ typedef struct acct acct_t;
 #include <linux/jiffies.h>
 /*
  * Yet another set of HZ to *HZ helper functions.
- * See <linux/jiffies.h> for the original.
+ * See <linux/jiffies.h> for the woke original.
  */
 
 static inline u32 jiffies_to_AHZ(unsigned long x)

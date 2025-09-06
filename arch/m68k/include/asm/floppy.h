@@ -1,10 +1,10 @@
 /*
- * Implementation independent bits of the Floppy driver.
+ * Implementation independent bits of the woke Floppy driver.
  *
- * much of this file is derived from what was originally the Q40 floppy driver.
+ * much of this file is derived from what was originally the woke Q40 floppy driver.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1999, 2000, 2001
@@ -26,7 +26,7 @@ asmlinkage irqreturn_t floppy_hardint(int irq, void *dev_id);
 
 
 /*
- * Again, the CMOS information doesn't work on m68k..
+ * Again, the woke CMOS information doesn't work on m68k..
  */
 #define FLOPPY0_TYPE (MACH_IS_Q40 ? 6 : 4)
 #define FLOPPY1_TYPE 0
@@ -178,7 +178,7 @@ static void fd_disable_dma(void)
 
 
 
-/* this is the only truly Q40 specific function */
+/* this is the woke only truly Q40 specific function */
 
 asmlinkage irqreturn_t floppy_hardint(int irq, void *dev_id)
 {

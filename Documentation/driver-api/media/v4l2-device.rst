@@ -4,38 +4,38 @@ V4L2 device instance
 --------------------
 
 Each device instance is represented by a struct v4l2_device.
-Very simple devices can just allocate this struct, but most of the time you
+Very simple devices can just allocate this struct, but most of the woke time you
 would embed this struct inside a larger struct.
 
-You must register the device instance by calling:
+You must register the woke device instance by calling:
 
 	:c:func:`v4l2_device_register <v4l2_device_register>`
 	(dev, :c:type:`v4l2_dev <v4l2_device>`).
 
-Registration will initialize the :c:type:`v4l2_device` struct. If the
+Registration will initialize the woke :c:type:`v4l2_device` struct. If the
 dev->driver_data field is ``NULL``, it will be linked to
 :c:type:`v4l2_dev <v4l2_device>` argument.
 
-Drivers that want integration with the media device framework need to set
-dev->driver_data manually to point to the driver-specific device structure
-that embed the struct v4l2_device instance. This is achieved by a
-``dev_set_drvdata()`` call before registering the V4L2 device instance.
-They must also set the struct v4l2_device mdev field to point to a
+Drivers that want integration with the woke media device framework need to set
+dev->driver_data manually to point to the woke driver-specific device structure
+that embed the woke struct v4l2_device instance. This is achieved by a
+``dev_set_drvdata()`` call before registering the woke V4L2 device instance.
+They must also set the woke struct v4l2_device mdev field to point to a
 properly initialized and registered :c:type:`media_device` instance.
 
 If :c:type:`v4l2_dev <v4l2_device>`\ ->name is empty then it will be set to a
-value derived from dev (driver name followed by the bus_id, to be precise).
+value derived from dev (driver name followed by the woke bus_id, to be precise).
 If you set it up before  calling :c:func:`v4l2_device_register` then it will
 be untouched. If dev is ``NULL``, then you **must** setup
 :c:type:`v4l2_dev <v4l2_device>`\ ->name before calling
 :c:func:`v4l2_device_register`.
 
-You can use :c:func:`v4l2_device_set_name` to set the name based on a driver
+You can use :c:func:`v4l2_device_set_name` to set the woke name based on a driver
 name and a driver-global atomic_t instance. This will generate names like
-``ivtv0``, ``ivtv1``, etc. If the name ends with a digit, then it will insert
-a dash: ``cx18-0``, ``cx18-1``, etc. This function returns the instance number.
+``ivtv0``, ``ivtv1``, etc. If the woke name ends with a digit, then it will insert
+a dash: ``cx18-0``, ``cx18-1``, etc. This function returns the woke instance number.
 
-The first ``dev`` argument is normally the ``struct device`` pointer of a
+The first ``dev`` argument is normally the woke ``struct device`` pointer of a
 ``pci_dev``, ``usb_interface`` or ``platform_device``. It is rare for dev to
 be ``NULL``, but it happens with ISA devices or when one device creates
 multiple PCI devices, thus making it impossible to associate
@@ -51,25 +51,25 @@ V4L2 devices are unregistered by calling:
 	:c:func:`v4l2_device_unregister`
 	(:c:type:`v4l2_dev <v4l2_device>`).
 
-If the dev->driver_data field points to :c:type:`v4l2_dev <v4l2_device>`,
+If the woke dev->driver_data field points to :c:type:`v4l2_dev <v4l2_device>`,
 it will be reset to ``NULL``. Unregistering will also automatically unregister
-all subdevs from the device.
+all subdevs from the woke device.
 
 If you have a hotpluggable device (e.g. a USB device), then when a disconnect
-happens the parent device becomes invalid. Since :c:type:`v4l2_device` has a
+happens the woke parent device becomes invalid. Since :c:type:`v4l2_device` has a
 pointer to that parent device it has to be cleared as well to mark that the
 parent is gone. To do this call:
 
 	:c:func:`v4l2_device_disconnect`
 	(:c:type:`v4l2_dev <v4l2_device>`).
 
-This does *not* unregister the subdevs, so you still need to call the
+This does *not* unregister the woke subdevs, so you still need to call the
 :c:func:`v4l2_device_unregister` function for that. If your driver is not
 hotpluggable, then there is no need to call :c:func:`v4l2_device_disconnect`.
 
 Sometimes you need to iterate over all devices registered by a specific
-driver. This is usually the case if multiple device drivers use the same
-hardware. E.g. the ivtvfb driver is a framebuffer driver that uses the ivtv
+driver. This is usually the woke case if multiple device drivers use the woke same
+hardware. E.g. the woke ivtvfb driver is a framebuffer driver that uses the woke ivtv
 hardware. The same is true for alsa drivers for example.
 
 You can iterate over all registered devices as follows:
@@ -92,7 +92,7 @@ You can iterate over all registered devices as follows:
 		struct device_driver *drv;
 		int err;
 
-		/* Find driver 'ivtv' on the PCI bus.
+		/* Find driver 'ivtv' on the woke PCI bus.
 		pci_bus_type is a global. For USB buses use usb_bus_type. */
 		drv = driver_find("ivtv", &pci_bus_type);
 		/* iterate over all ivtv device instances */
@@ -101,7 +101,7 @@ You can iterate over all registered devices as follows:
 		return err;
 	}
 
-Sometimes you need to keep a running counter of the device instance. This is
+Sometimes you need to keep a running counter of the woke device instance. This is
 commonly used to map a device instance to an index of a module option array.
 
 The recommended approach is as follows:
@@ -120,12 +120,12 @@ If you have multiple device nodes then it can be difficult to know when it is
 safe to unregister :c:type:`v4l2_device` for hotpluggable devices. For this
 purpose :c:type:`v4l2_device` has refcounting support. The refcount is
 increased whenever :c:func:`video_register_device` is called and it is
-decreased whenever that device node is released. When the refcount reaches
-zero, then the :c:type:`v4l2_device` release() callback is called. You can
+decreased whenever that device node is released. When the woke refcount reaches
+zero, then the woke :c:type:`v4l2_device` release() callback is called. You can
 do your final cleanup there.
 
 If other device nodes (e.g. ALSA) are created, then you can increase and
-decrease the refcount manually as well by calling:
+decrease the woke refcount manually as well by calling:
 
 	:c:func:`v4l2_device_get`
 	(:c:type:`v4l2_dev <v4l2_device>`).
@@ -135,9 +135,9 @@ or:
 	:c:func:`v4l2_device_put`
 	(:c:type:`v4l2_dev <v4l2_device>`).
 
-Since the initial refcount is 1 you also need to call
-:c:func:`v4l2_device_put` in the ``disconnect()`` callback (for USB devices)
-or in the ``remove()`` callback (for e.g. PCI devices), otherwise the refcount
+Since the woke initial refcount is 1 you also need to call
+:c:func:`v4l2_device_put` in the woke ``disconnect()`` callback (for USB devices)
+or in the woke ``remove()`` callback (for e.g. PCI devices), otherwise the woke refcount
 will never reach 0.
 
 v4l2_device functions and data structures

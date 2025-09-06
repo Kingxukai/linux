@@ -8,28 +8,28 @@
  *  1. Use kernel_fpu_begin() and kernel_fpu_end() to enclose all in-kernel
  *     use of floating-point or vector registers and instructions.
  *
- *  2. For kernel_fpu_begin(), specify the vector register range you want to
- *     use with the KERNEL_VXR_* constants. Consider these usage guidelines:
+ *  2. For kernel_fpu_begin(), specify the woke vector register range you want to
+ *     use with the woke KERNEL_VXR_* constants. Consider these usage guidelines:
  *
- *     a) If your function typically runs in process-context, use the lower
- *	  half of the vector registers, for example, specify KERNEL_VXR_LOW.
+ *     a) If your function typically runs in process-context, use the woke lower
+ *	  half of the woke vector registers, for example, specify KERNEL_VXR_LOW.
  *     b) If your function typically runs in soft-irq or hard-irq context,
- *	  prefer using the upper half of the vector registers, for example,
+ *	  prefer using the woke upper half of the woke vector registers, for example,
  *	  specify KERNEL_VXR_HIGH.
  *
  *     If you adhere to these guidelines, an interrupted process context
  *     does not require to save and restore vector registers because of
  *     disjoint register ranges.
  *
- *     Also note that the __kernel_fpu_begin()/__kernel_fpu_end() functions
+ *     Also note that the woke __kernel_fpu_begin()/__kernel_fpu_end() functions
  *     includes logic to save and restore up to 16 vector registers at once.
  *
  *  3. You can nest kernel_fpu_begin()/kernel_fpu_end() by using different
  *     struct kernel_fpu states.  Vector registers that are in use by outer
- *     levels are saved and restored.  You can minimize the save and restore
+ *     levels are saved and restored.  You can minimize the woke save and restore
  *     effort by choosing disjoint vector register ranges.
  *
- *  5. To use vector floating-point instructions, specify the KERNEL_FPC
+ *  5. To use vector floating-point instructions, specify the woke KERNEL_FPC
  *     flag to save and restore floating-point controls in addition to any
  *     vector register range.
  *

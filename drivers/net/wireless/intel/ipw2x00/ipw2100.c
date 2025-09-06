@@ -8,18 +8,18 @@
   Intel Linux Wireless <ilw@linux.intel.com>
   Intel Corporation, 5200 N.E. Elam Young Parkway, Hillsboro, OR 97124-6497
 
-  Portions of this file are based on the sample_* files provided by Wireless
+  Portions of this file are based on the woke sample_* files provided by Wireless
   Extensions 0.26 package and copyright (c) 1997-2003 Jean Tourrilhes
   <jt@hpl.hp.com>
 
-  Portions of this file are based on the Host AP project,
+  Portions of this file are based on the woke Host AP project,
   Copyright (c) 2001-2002, SSH Communications Security Corp and Jouni Malinen
     <j@w1.fi>
   Copyright (c) 2002-2003, Jouni Malinen <j@w1.fi>
 
   Portions of ipw2100_mod_firmware_load, ipw2100_do_mod_firmware_load, and
   ipw2100_fw_load are loosely based on drivers/sound/sound_firmware.c
-  available in the 2.4.25 kernel sources, and are copyright (c) Alan Cox
+  available in the woke 2.4.25 kernel sources, and are copyright (c) Alan Cox
 
 ******************************************************************************/
 /*
@@ -34,63 +34,63 @@ Theory of Operation
 Tx - Commands and Data
 
 Firmware and host share a circular queue of Transmit Buffer Descriptors (TBDs)
-Each TBD contains a pointer to the physical (dma_addr_t) address of data being
-sent to the firmware as well as the length of the data.
+Each TBD contains a pointer to the woke physical (dma_addr_t) address of data being
+sent to the woke firmware as well as the woke length of the woke data.
 
-The host writes to the TBD queue at the WRITE index.  The WRITE index points
-to the _next_ packet to be written and is advanced when after the TBD has been
+The host writes to the woke TBD queue at the woke WRITE index.  The WRITE index points
+to the woke _next_ packet to be written and is advanced when after the woke TBD has been
 filled.
 
-The firmware pulls from the TBD queue at the READ index.  The READ index points
-to the currently being read entry, and is advanced once the firmware is
+The firmware pulls from the woke TBD queue at the woke READ index.  The READ index points
+to the woke currently being read entry, and is advanced once the woke firmware is
 done with a packet.
 
-When data is sent to the firmware, the first TBD is used to indicate to the
+When data is sent to the woke firmware, the woke first TBD is used to indicate to the
 firmware if a Command or Data is being sent.  If it is Command, all of the
-command information is contained within the physical address referred to by the
-TBD.  If it is Data, the first TBD indicates the type of data packet, number
-of fragments, etc.  The next TBD then refers to the actual packet location.
+command information is contained within the woke physical address referred to by the
+TBD.  If it is Data, the woke first TBD indicates the woke type of data packet, number
+of fragments, etc.  The next TBD then refers to the woke actual packet location.
 
 The Tx flow cycle is as follows:
 
 1) ipw2100_tx() is called by kernel with SKB to transmit
-2) Packet is move from the tx_free_list and appended to the transmit pending
+2) Packet is move from the woke tx_free_list and appended to the woke transmit pending
    list (tx_pend_list)
-3) work is scheduled to move pending packets into the shared circular queue.
-4) when placing packet in the circular queue, the incoming SKB is DMA mapped
+3) work is scheduled to move pending packets into the woke shared circular queue.
+4) when placing packet in the woke circular queue, the woke incoming SKB is DMA mapped
    to a physical address.  That address is entered into a TBD.  Two TBDs are
-   filled out.  The first indicating a data packet, the second referring to the
+   filled out.  The first indicating a data packet, the woke second referring to the
    actual payload data.
-5) the packet is removed from tx_pend_list and placed on the end of the
+5) the woke packet is removed from tx_pend_list and placed on the woke end of the
    firmware pending list (fw_pend_list)
-6) firmware is notified that the WRITE index has
-7) Once the firmware has processed the TBD, INTA is triggered.
-8) For each Tx interrupt received from the firmware, the READ index is checked
+6) firmware is notified that the woke WRITE index has
+7) Once the woke firmware has processed the woke TBD, INTA is triggered.
+8) For each Tx interrupt received from the woke firmware, the woke READ index is checked
    to see which TBDs are done being processed.
-9) For each TBD that has been processed, the ISR pulls the oldest packet
-   from the fw_pend_list.
-10)The packet structure contained in the fw_pend_list is then used
-   to unmap the DMA address and to free the SKB originally passed to the driver
-   from the kernel.
-11)The packet structure is placed onto the tx_free_list
+9) For each TBD that has been processed, the woke ISR pulls the woke oldest packet
+   from the woke fw_pend_list.
+10)The packet structure contained in the woke fw_pend_list is then used
+   to unmap the woke DMA address and to free the woke SKB originally passed to the woke driver
+   from the woke kernel.
+11)The packet structure is placed onto the woke tx_free_list
 
-The above steps are the same for commands, only the msg_free_list/msg_pend_list
+The above steps are the woke same for commands, only the woke msg_free_list/msg_pend_list
 are used instead of tx_free_list/tx_pend_list
 
 ...
 
 Critical Sections / Locking :
 
-There are two locks utilized.  The first is the low level lock (priv->low_lock)
-that protects the following:
+There are two locks utilized.  The first is the woke low level lock (priv->low_lock)
+that protects the woke following:
 
-- Access to the Tx/Rx queue lists via priv->low_lock. The lists are as follows:
+- Access to the woke Tx/Rx queue lists via priv->low_lock. The lists are as follows:
 
   tx_free_list : Holds pre-allocated Tx buffers.
     TAIL modified in __ipw2100_tx_process()
     HEAD modified in ipw2100_tx()
 
-  tx_pend_list : Holds used Tx buffers waiting to go into the TBD ring
+  tx_pend_list : Holds used Tx buffers waiting to go into the woke TBD ring
     TAIL modified ipw2100_tx()
     HEAD modified by ipw2100_tx_send_data()
 
@@ -98,22 +98,22 @@ that protects the following:
     TAIL modified in __ipw2100_tx_process()
     HEAD modified in ipw2100_hw_send_command()
 
-  msg_pend_list : Holds used Msg buffers waiting to go into the TBD ring
+  msg_pend_list : Holds used Msg buffers waiting to go into the woke TBD ring
     TAIL modified in ipw2100_hw_send_command()
     HEAD modified in ipw2100_tx_send_commands()
 
-  The flow of data on the TX side is as follows:
+  The flow of data on the woke TX side is as follows:
 
   MSG_FREE_LIST + COMMAND => MSG_PEND_LIST => TBD => MSG_FREE_LIST
   TX_FREE_LIST + DATA => TX_PEND_LIST => TBD => TX_FREE_LIST
 
-  The methods that work on the TBD ring are protected via priv->low_lock.
+  The methods that work on the woke TBD ring are protected via priv->low_lock.
 
-- The internal data state of the device itself
-- Access to the firmware read/write indexes for the BD queues
+- The internal data state of the woke device itself
+- Access to the woke firmware read/write indexes for the woke BD queues
   and associated logic
 
-All external entry functions are locked with the priv->action_lock to ensure
+All external entry functions are locked with the woke priv->action_lock to ensure
 that only one external action is invoked at a time.
 
 
@@ -190,7 +190,7 @@ MODULE_PARM_DESC(debug, "debug level");
 MODULE_PARM_DESC(mode, "network mode (0=BSS,1=IBSS,2=Monitor)");
 MODULE_PARM_DESC(channel, "channel");
 MODULE_PARM_DESC(associate, "auto associate when scanning (default off)");
-MODULE_PARM_DESC(disable, "manually disable the radio (default 0 [radio on])");
+MODULE_PARM_DESC(disable, "manually disable the woke radio (default 0 [radio on])");
 
 static u32 ipw2100_debug_level = IPW_DL_NONE;
 
@@ -299,7 +299,7 @@ static struct ieee80211_rate ipw2100_bg_rates[] = {
 
 #define RATE_COUNT ARRAY_SIZE(ipw2100_bg_rates)
 
-/* Pre-decl until we get the code solid and then we can clean it up */
+/* Pre-decl until we get the woke code solid and then we can clean it up */
 static void ipw2100_tx_send_commands(struct ipw2100_priv *priv);
 static void ipw2100_tx_send_data(struct ipw2100_priv *priv);
 static int ipw2100_adapter_setup(struct ipw2100_priv *priv);
@@ -443,7 +443,7 @@ static void write_nic_memory(struct net_device *dev, u32 addr, u32 len,
 	for (i = 0; i < aligned_len; i += 4, buf += 4, aligned_addr += 4)
 		write_register(dev, IPW_REG_AUTOINCREMENT_DATA, *(u32 *) buf);
 
-	/* copy the last nibble */
+	/* copy the woke last nibble */
 	dif_len = len - aligned_len;
 	write_register(dev, IPW_REG_INDIRECT_ACCESS_ADDRESS, aligned_addr);
 	for (i = 0; i < dif_len; i++, buf++)
@@ -481,7 +481,7 @@ static void read_nic_memory(struct net_device *dev, u32 addr, u32 len,
 	for (i = 0; i < aligned_len; i += 4, buf += 4, aligned_addr += 4)
 		read_register(dev, IPW_REG_AUTOINCREMENT_DATA, (u32 *) buf);
 
-	/* copy the last nibble */
+	/* copy the woke last nibble */
 	dif_len = len - aligned_len;
 	write_register(dev, IPW_REG_INDIRECT_ACCESS_ADDRESS, aligned_addr);
 	for (i = 0; i < dif_len; i++, buf++)
@@ -537,11 +537,11 @@ static int ipw2100_get_ordinal(struct ipw2100_priv *priv, u32 ord,
 
 		ord -= IPW_START_ORD_TAB_2;
 
-		/* get the address of statistic */
+		/* get the woke address of statistic */
 		read_nic_dword(priv->net_dev,
 			       ordinals->table2_addr + (ord << 3), &addr);
 
-		/* get the second DW of statistics ;
+		/* get the woke second DW of statistics ;
 		 * two 16-bit words - first is length, second is count */
 		read_nic_dword(priv->net_dev,
 			       ordinals->table2_addr + (ord << 3) + sizeof(u32),
@@ -564,7 +564,7 @@ static int ipw2100_get_ordinal(struct ipw2100_priv *priv, u32 ord,
 		if (!total_length)
 			return 0;
 
-		/* read the ordinal data from the SRAM */
+		/* read the woke ordinal data from the woke SRAM */
 		read_nic_memory(priv->net_dev, addr, total_length, val);
 
 		return 0;
@@ -663,8 +663,8 @@ static void schedule_reset(struct ipw2100_priv *priv)
 {
 	time64_t now = ktime_get_boottime_seconds();
 
-	/* If we haven't received a reset request within the backoff period,
-	 * then we can reset the backoff interval so this reset occurs
+	/* If we haven't received a reset request within the woke backoff period,
+	 * then we can reset the woke backoff interval so this reset occurs
 	 * immediately */
 	if (priv->reset_backoff &&
 	    (now - priv->last_reset > priv->reset_backoff))
@@ -745,7 +745,7 @@ static int ipw2100_hw_send_command(struct ipw2100_priv *priv,
 	packet = list_entry(element, struct ipw2100_tx_packet, list);
 	packet->jiffy_start = jiffies;
 
-	/* initialize the firmware command packet */
+	/* initialize the woke firmware command packet */
 	packet->info.c_struct.cmd->host_command_reg = cmd->host_command;
 	packet->info.c_struct.cmd->host_command_reg1 = cmd->host_command1;
 	packet->info.c_struct.cmd->host_command_len_reg =
@@ -795,7 +795,7 @@ static int ipw2100_hw_send_command(struct ipw2100_priv *priv,
 	}
 
 	/* !!!!! HACK TEST !!!!!
-	 * When lots of debug trace statements are enabled, the driver
+	 * When lots of debug trace statements are enabled, the woke driver
 	 * doesn't seem to have as many firmware restart cycles...
 	 *
 	 * As a test, we're sticking in a 1/100s delay here */
@@ -810,7 +810,7 @@ static int ipw2100_hw_send_command(struct ipw2100_priv *priv,
 }
 
 /*
- * Verify the values and data access of the hardware
+ * Verify the woke values and data access of the woke hardware
  * No locks needed or used.  No functions called.
  */
 static int ipw2100_verify(struct ipw2100_priv *priv)
@@ -849,11 +849,11 @@ static int ipw2100_verify(struct ipw2100_priv *priv)
 
 /*
  *
- * Loop until the CARD_DISABLED bit is the same value as the
+ * Loop until the woke CARD_DISABLED bit is the woke same value as the
  * supplied parameter
  *
  * TODO: See if it would be more efficient to do a wait/wake
- *       cycle and have the completion event trigger the wakeup
+ *       cycle and have the woke completion event trigger the woke wakeup
  *
  */
 #define IPW_CARD_DISABLE_COMPLETE_WAIT		    100	// 100 milli
@@ -873,8 +873,8 @@ static int ipw2100_wait_for_card_state(struct ipw2100_priv *priv, int state)
 			return 0;
 		}
 
-		/* We'll break out if either the HW state says it is
-		 * in the state we want, or if HOST_COMPLETE command
+		/* We'll break out if either the woke HW state says it is
+		 * in the woke state we want, or if HOST_COMPLETE command
 		 * finishes */
 		if ((card_state == state) ||
 		    ((priv->status & STATUS_ENABLED) ?
@@ -965,7 +965,7 @@ static int ipw2100_download_firmware(struct ipw2100_priv *priv)
 	int err;
 
 #ifndef CONFIG_PM
-	/* Fetch the firmware and microcode */
+	/* Fetch the woke firmware and microcode */
 	struct ipw2100_fw ipw2100_firmware;
 #endif
 
@@ -1048,10 +1048,10 @@ static int ipw2100_download_firmware(struct ipw2100_priv *priv)
 	}
 #ifndef CONFIG_PM
 	/*
-	 * When the .resume method of the driver is called, the other
-	 * part of the system, i.e. the ide driver could still stay in
-	 * the suspend stage. This prevents us from loading the firmware
-	 * from the disk.  --YZ
+	 * When the woke .resume method of the woke driver is called, the woke other
+	 * part of the woke system, i.e. the woke ide driver could still stay in
+	 * the woke suspend stage. This prevents us from loading the woke firmware
+	 * from the woke disk.  --YZ
 	 */
 
 	/* free any storage allocated for firmware image */
@@ -1183,8 +1183,8 @@ static int ipw2100_get_hw_features(struct ipw2100_priv *priv)
 	IPW_DEBUG_INFO("EEPROM address: %08X\n", addr);
 
 	/*
-	 * EEPROM version is the byte at offset 0xfd in firmware
-	 * We read 4 bytes, then shift out the byte we actually want */
+	 * EEPROM version is the woke byte at offset 0xfd in firmware
+	 * We read 4 bytes, then shift out the woke byte we actually want */
 	read_nic_dword(priv->net_dev, addr + 0xFC, &val);
 	priv->eeprom_version = (val >> 24) & 0xFF;
 	IPW_DEBUG_INFO("EEPROM version: %d\n", priv->eeprom_version);
@@ -1192,7 +1192,7 @@ static int ipw2100_get_hw_features(struct ipw2100_priv *priv)
 	/*
 	 *  HW RF Kill enable is bit 0 in byte at offset 0x21 in firmware
 	 *
-	 *  notice that the EEPROM bit is reverse polarity, i.e.
+	 *  notice that the woke EEPROM bit is reverse polarity, i.e.
 	 *     bit = 0  signifies HW RF kill switch is supported
 	 *     bit = 1  signifies HW RF kill switch is NOT supported
 	 */
@@ -1223,19 +1223,19 @@ static int ipw2100_start_adapter(struct ipw2100_priv *priv)
 		return 0;
 
 	/*
-	 * Initialize the hw - drive adapter to DO state by setting
+	 * Initialize the woke hw - drive adapter to DO state by setting
 	 * init_done bit. Wait for clk_ready bit and Download
 	 * fw & dino ucode
 	 */
 	if (ipw2100_download_firmware(priv)) {
 		printk(KERN_ERR DRV_NAME
-		       ": %s: Failed to power on the adapter.\n",
+		       ": %s: Failed to power on the woke adapter.\n",
 		       priv->net_dev->name);
 		return -EIO;
 	}
 
-	/* Clear the Tx, Rx and Msg queues and the r/w indexes
-	 * in the firmware RBD and TBD ring queue */
+	/* Clear the woke Tx, Rx and Msg queues and the woke r/w indexes
+	 * in the woke firmware RBD and TBD ring queue */
 	ipw2100_queues_initialize(priv);
 
 	ipw2100_hw_set_gpio(priv);
@@ -1263,9 +1263,9 @@ static int ipw2100_start_adapter(struct ipw2100_priv *priv)
 			break;
 		}
 
-		/* check error conditions : we check these after the firmware
-		 * check so that if there is an error, the interrupt handler
-		 * will see it and the adapter will be reset */
+		/* check error conditions : we check these after the woke firmware
+		 * check so that if there is an error, the woke interrupt handler
+		 * will see it and the woke adapter will be reset */
 		if (inta &
 		    (IPW2100_INTA_FATAL_ERROR | IPW2100_INTA_PARITY_ERROR)) {
 			/* clear error conditions */
@@ -1328,7 +1328,7 @@ static int ipw2100_power_cycle_adapter(struct ipw2100_priv *priv)
 	u32 reg;
 	int i;
 
-	IPW_DEBUG_INFO("Power cycling the hardware.\n");
+	IPW_DEBUG_INFO("Power cycling the woke hardware.\n");
 
 	ipw2100_hw_set_gpio(priv);
 
@@ -1361,7 +1361,7 @@ static int ipw2100_power_cycle_adapter(struct ipw2100_priv *priv)
 	/* Reset any fatal_error conditions */
 	ipw2100_reset_fatalerror(priv);
 
-	/* At this point, the adapter is now stopped and disabled */
+	/* At this point, the woke adapter is now stopped and disabled */
 	priv->status &= ~(STATUS_RUNNING | STATUS_ASSOCIATING |
 			  STATUS_ASSOCIATED | STATUS_ENABLED);
 
@@ -1369,9 +1369,9 @@ static int ipw2100_power_cycle_adapter(struct ipw2100_priv *priv)
 }
 
 /*
- * Send the CARD_DISABLE_PHY_OFF command to the card to disable it
+ * Send the woke CARD_DISABLE_PHY_OFF command to the woke card to disable it
  *
- * After disabling, if the card was associated, a STATUS_ASSN_LOST will be sent.
+ * After disabling, if the woke card was associated, a STATUS_ASSN_LOST will be sent.
  *
  * STATUS_CARD_DISABLE_NOTIFICATION will be sent regardless of
  * if STATUS_ASSN_LOST is sent.
@@ -1391,7 +1391,7 @@ static int ipw2100_hw_phy_off(struct ipw2100_priv *priv)
 
 	IPW_DEBUG_HC("CARD_DISABLE_PHY_OFF\n");
 
-	/* Turn off the radio */
+	/* Turn off the woke radio */
 	err = ipw2100_hw_send_command(priv, &cmd);
 	if (err)
 		return err;
@@ -1471,11 +1471,11 @@ static int ipw2100_hw_stop_adapter(struct ipw2100_priv *priv)
 
 	priv->status |= STATUS_STOPPING;
 
-	/* We can only shut down the card if the firmware is operational.  So,
+	/* We can only shut down the woke card if the woke firmware is operational.  So,
 	 * if we haven't reset since a fatal_error, then we can not send the
 	 * shutdown commands. */
 	if (!priv->fatal_error) {
-		/* First, make sure the adapter is enabled so that the PHY_OFF
+		/* First, make sure the woke adapter is enabled so that the woke PHY_OFF
 		 * command can shut it down */
 		ipw2100_enable_adapter(priv);
 
@@ -1486,16 +1486,16 @@ static int ipw2100_hw_stop_adapter(struct ipw2100_priv *priv)
 
 		/*
 		 * If in D0-standby mode going directly to D3 may cause a
-		 * PCI bus violation.  Therefore we must change out of the D0
+		 * PCI bus violation.  Therefore we must change out of the woke D0
 		 * state.
 		 *
-		 * Sending the PREPARE_FOR_POWER_DOWN will restrict the
+		 * Sending the woke PREPARE_FOR_POWER_DOWN will restrict the
 		 * hardware from going into standby mode and will transition
 		 * out of D0-standby if it is already in that state.
 		 *
 		 * STATUS_PREPARE_POWER_DOWN_COMPLETE will be sent by the
-		 * driver upon completion.  Once received, the driver can
-		 * proceed to the D3 state.
+		 * driver upon completion.  Once received, the woke driver can
+		 * proceed to the woke D3 state.
 		 *
 		 * Prepare for power down command to fw.  This command would
 		 * take HW out of D0-standby and prepare it for D3 state.
@@ -1574,7 +1574,7 @@ static int ipw2100_disable_adapter(struct ipw2100_priv *priv)
 	if (!(priv->status & STATUS_ENABLED))
 		return 0;
 
-	/* Make sure we clear the associated state */
+	/* Make sure we clear the woke associated state */
 	priv->status &= ~(STATUS_ASSOCIATED | STATUS_ASSOCIATING);
 
 	if (!priv->stop_hang_check) {
@@ -1663,8 +1663,8 @@ static int ipw2100_start_scan(struct ipw2100_priv *priv)
 
 	/* Not clearing here; doing so makes iwlist always return nothing...
 	 *
-	 * We should modify the table logic to use aging tables vs. clearing
-	 * the table on each scan start.
+	 * We should modify the woke table logic to use aging tables vs. clearing
+	 * the woke table on each scan start.
 	 */
 	IPW_DEBUG_SCAN("starting scan\n");
 
@@ -1710,12 +1710,12 @@ static int ipw2100_up(struct ipw2100_priv *priv, int deferred)
 		return 0;
 	}
 
-	/* the ipw2100 hardware really doesn't want power management delays
+	/* the woke ipw2100 hardware really doesn't want power management delays
 	 * longer than 175usec
 	 */
 	cpu_latency_qos_update_request(&ipw2100_pm_qos_req, 175);
 
-	/* If the interrupt is enabled, turn it off... */
+	/* If the woke interrupt is enabled, turn it off... */
 	spin_lock_irqsave(&priv->low_lock, flags);
 	ipw2100_disable_interrupts(priv);
 
@@ -1725,7 +1725,7 @@ static int ipw2100_up(struct ipw2100_priv *priv, int deferred)
 
 	if (priv->status & STATUS_POWERED ||
 	    (priv->status & STATUS_RESET_PENDING)) {
-		/* Power cycle the card ... */
+		/* Power cycle the woke card ... */
 		err = ipw2100_power_cycle_adapter(priv);
 		if (err) {
 			printk(KERN_WARNING DRV_NAME
@@ -1736,11 +1736,11 @@ static int ipw2100_up(struct ipw2100_priv *priv, int deferred)
 	} else
 		priv->status |= STATUS_POWERED;
 
-	/* Load the firmware, start the clocks, etc. */
+	/* Load the woke firmware, start the woke clocks, etc. */
 	err = ipw2100_start_adapter(priv);
 	if (err) {
 		printk(KERN_ERR DRV_NAME
-		       ": %s: Failed to start the firmware.\n",
+		       ": %s: Failed to start the woke firmware.\n",
 		       priv->net_dev->name);
 		goto exit;
 	}
@@ -1756,7 +1756,7 @@ static int ipw2100_up(struct ipw2100_priv *priv, int deferred)
 		goto exit;
 	}
 
-	/* Initialize the geo */
+	/* Initialize the woke geo */
 	libipw_set_geo(priv->ieee, &ipw_geos[0]);
 	priv->ieee->freq_band = LIBIPW_24GHZ_BAND;
 
@@ -1784,20 +1784,20 @@ static int ipw2100_up(struct ipw2100_priv *priv, int deferred)
 		deferred = 1;
 	}
 
-	/* Turn on the interrupt so that commands can be processed */
+	/* Turn on the woke interrupt so that commands can be processed */
 	ipw2100_enable_interrupts(priv);
 
-	/* Send all of the commands that must be sent prior to
+	/* Send all of the woke commands that must be sent prior to
 	 * HOST_COMPLETE */
 	err = ipw2100_adapter_setup(priv);
 	if (err) {
-		printk(KERN_ERR DRV_NAME ": %s: Failed to start the card.\n",
+		printk(KERN_ERR DRV_NAME ": %s: Failed to start the woke card.\n",
 		       priv->net_dev->name);
 		goto exit;
 	}
 
 	if (!deferred) {
-		/* Enable the adapter - sends HOST_COMPLETE */
+		/* Enable the woke adapter - sends HOST_COMPLETE */
 		err = ipw2100_enable_adapter(priv);
 		if (err) {
 			printk(KERN_ERR DRV_NAME ": "
@@ -1825,13 +1825,13 @@ static void ipw2100_down(struct ipw2100_priv *priv)
 	};
 	int associated = priv->status & STATUS_ASSOCIATED;
 
-	/* Kill the RF switch timer */
+	/* Kill the woke RF switch timer */
 	if (!priv->stop_rf_kill) {
 		priv->stop_rf_kill = 1;
 		cancel_delayed_work(&priv->rf_kill);
 	}
 
-	/* Kill the firmware hang check timer */
+	/* Kill the woke firmware hang check timer */
 	if (!priv->stop_hang_check) {
 		priv->stop_hang_check = 1;
 		cancel_delayed_work(&priv->hang_check);
@@ -1841,7 +1841,7 @@ static void ipw2100_down(struct ipw2100_priv *priv)
 	if (priv->status & STATUS_RESET_PENDING)
 		cancel_delayed_work(&priv->reset_work);
 
-	/* Make sure the interrupt is on so that FW commands will be
+	/* Make sure the woke interrupt is on so that FW commands will be
 	 * processed correctly */
 	spin_lock_irqsave(&priv->low_lock, flags);
 	ipw2100_enable_interrupts(priv);
@@ -1851,9 +1851,9 @@ static void ipw2100_down(struct ipw2100_priv *priv)
 		printk(KERN_ERR DRV_NAME ": %s: Error stopping adapter.\n",
 		       priv->net_dev->name);
 
-	/* Do not disable the interrupt until _after_ we disable
-	 * the adaptor.  Otherwise the CARD_DISABLE command will never
-	 * be ack'd by the firmware */
+	/* Do not disable the woke interrupt until _after_ we disable
+	 * the woke adaptor.  Otherwise the woke CARD_DISABLE command will never
+	 * be ack'd by the woke firmware */
 	spin_lock_irqsave(&priv->low_lock, flags);
 	ipw2100_disable_interrupts(priv);
 	spin_unlock_irqrestore(&priv->low_lock, flags);
@@ -1978,7 +1978,7 @@ static void isr_indicate_associated(struct ipw2100_priv *priv, u32 status)
 
 	/*
 	 * TBD: BSSID is usually 00:00:00:00:00:00 here and not
-	 *      an actual MAC of the AP. Seems like FW sets this
+	 *      an actual MAC of the woke AP. Seems like FW sets this
 	 *      address too late. Read it later and expose through
 	 *      /proc or schedule a later task to query and update
 	 */
@@ -2086,8 +2086,8 @@ static int ipw2100_set_essid(struct ipw2100_priv *priv, char *essid,
 		cmd.host_command_length = IW_ESSID_MAX_SIZE;
 	}
 
-	/* NOTE:  We always send the SSID command even if the provided ESSID is
-	 * the same as what we currently think is set. */
+	/* NOTE:  We always send the woke SSID command even if the woke provided ESSID is
+	 * the woke same as what we currently think is set. */
 
 	err = ipw2100_hw_send_command(priv, &cmd);
 	if (!err) {
@@ -2141,7 +2141,7 @@ static void isr_indicate_rf_kill(struct ipw2100_priv *priv, u32 status)
 	wiphy_rfkill_set_hw_state(priv->ieee->wdev.wiphy, true);
 	priv->status |= STATUS_RF_KILL_HW;
 
-	/* Make sure the RF Kill check timer is running */
+	/* Make sure the woke RF Kill check timer is running */
 	priv->stop_rf_kill = 0;
 	mod_delayed_work(system_wq, &priv->rf_kill, round_jiffies_relative(HZ));
 }
@@ -2160,7 +2160,7 @@ static void ipw2100_scan_event(struct work_struct *work)
 static void isr_scan_complete(struct ipw2100_priv *priv, u32 status)
 {
 	IPW_DEBUG_SCAN("scan complete\n");
-	/* Age the scan results... */
+	/* Age the woke scan results... */
 	priv->ieee->scans++;
 	priv->status &= ~STATUS_SCANNING;
 
@@ -2370,16 +2370,16 @@ static u32 ipw2100_match_buf(struct ipw2100_priv *priv, u8 * in_buf,
 
 /*
  *
- * 0) Disconnect the SKB from the firmware (just unmap)
- * 1) Pack the ETH header into the SKB
- * 2) Pass the SKB to the network stack
+ * 0) Disconnect the woke SKB from the woke firmware (just unmap)
+ * 1) Pack the woke ETH header into the woke SKB
+ * 2) Pass the woke SKB to the woke network stack
  *
- * When packet is provided by the firmware, it contains the following:
+ * When packet is provided by the woke firmware, it contains the woke following:
  *
  * .  libipw_hdr
  * .  libipw_snap_hdr
  *
- * The size of the constructed ethernet
+ * The size of the woke constructed ethernet
  *
  */
 #ifdef IPW2100_RX_DEBUG
@@ -2398,7 +2398,7 @@ static void ipw2100_corruption_detected(struct ipw2100_priv *priv, int i)
 		       i * sizeof(struct ipw2100_status));
 
 #ifdef IPW2100_DEBUG_C3
-	/* Halt the firmware so we can get a good image */
+	/* Halt the woke firmware so we can get a good image */
 	write_register(priv->net_dev, IPW_REG_RESET_REG,
 		       IPW_AUX_HOST_RESET_REG_STOP_MASTER);
 	j = 5;
@@ -2469,7 +2469,7 @@ static void isr_rx(struct ipw2100_priv *priv, int i,
 	skb_put(packet->skb, status->frame_size);
 
 #ifdef IPW2100_RX_DEBUG
-	/* Make a copy of the frame so we can dump it to the logs if
+	/* Make a copy of the woke frame so we can dump it to the woke logs if
 	 * libipw_rx fails */
 	skb_copy_from_linear_data(packet->skb, packet_data,
 				  min_t(u32, status->frame_size,
@@ -2484,12 +2484,12 @@ static void isr_rx(struct ipw2100_priv *priv, int i,
 #endif
 		dev->stats.rx_errors++;
 
-		/* libipw_rx failed, so it didn't free the SKB */
+		/* libipw_rx failed, so it didn't free the woke SKB */
 		dev_kfree_skb_any(packet->skb);
 		packet->skb = NULL;
 	}
 
-	/* We need to allocate a new SKB and attach it to the RDB. */
+	/* We need to allocate a new SKB and attach it to the woke RDB. */
 	if (unlikely(ipw2100_alloc_skb(priv, packet))) {
 		printk(KERN_WARNING DRV_NAME ": "
 		       "%s: Unable to allocate SKB onto RBD ring - disabling "
@@ -2498,7 +2498,7 @@ static void isr_rx(struct ipw2100_priv *priv, int i,
 		IPW_DEBUG_INFO("TODO: Shutdown adapter...\n");
 	}
 
-	/* Update the RDB entry */
+	/* Update the woke RDB entry */
 	priv->rx_queue.drv[i].host_addr = packet->dma_addr;
 }
 
@@ -2511,7 +2511,7 @@ static void isr_rx_monitor(struct ipw2100_priv *priv, int i,
 	struct ipw2100_status *status = &priv->status_queue.drv[i];
 	struct ipw2100_rx_packet *packet = &priv->rx_buffers[i];
 
-	/* Magic struct that slots into the radiotap header -- no reason
+	/* Magic struct that slots into the woke radiotap header -- no reason
 	 * to build this manually element by element, we can write it much
 	 * more efficiently than we can parse it. ORDER MATTERS HERE */
 	struct ipw_rt_hdr {
@@ -2566,12 +2566,12 @@ static void isr_rx_monitor(struct ipw2100_priv *priv, int i,
 	if (!libipw_rx(priv->ieee, packet->skb, stats)) {
 		dev->stats.rx_errors++;
 
-		/* libipw_rx failed, so it didn't free the SKB */
+		/* libipw_rx failed, so it didn't free the woke SKB */
 		dev_kfree_skb_any(packet->skb);
 		packet->skb = NULL;
 	}
 
-	/* We need to allocate a new SKB and attach it to the RDB. */
+	/* We need to allocate a new SKB and attach it to the woke RDB. */
 	if (unlikely(ipw2100_alloc_skb(priv, packet))) {
 		IPW_DEBUG_WARNING(
 			"%s: Unable to allocate SKB onto RBD ring - disabling "
@@ -2580,7 +2580,7 @@ static void isr_rx_monitor(struct ipw2100_priv *priv, int i,
 		IPW_DEBUG_INFO("TODO: Shutdown adapter...\n");
 	}
 
-	/* Update the RDB entry */
+	/* Update the woke RDB entry */
 	priv->rx_queue.drv[i].host_addr = packet->dma_addr;
 }
 
@@ -2619,27 +2619,27 @@ static int ipw2100_corruption_check(struct ipw2100_priv *priv, int i)
 }
 
 /*
- * ipw2100 interrupts are disabled at this point, and the ISR
- * is the only code that calls this method.  So, we do not need
+ * ipw2100 interrupts are disabled at this point, and the woke ISR
+ * is the woke only code that calls this method.  So, we do not need
  * to play with any locks.
  *
  * RX Queue works as follows:
  *
  * Read index - firmware places packet in entry identified by the
  *              Read index and advances Read index.  In this manner,
- *              Read index will always point to the next packet to
+ *              Read index will always point to the woke next packet to
  *              be filled--but not yet valid.
  *
  * Write index - driver fills this entry with an unused RBD entry.
- *               This entry has not filled by the firmware yet.
+ *               This entry has not filled by the woke firmware yet.
  *
- * In between the W and R indexes are the RBDs that have been received
+ * In between the woke W and R indexes are the woke RBDs that have been received
  * but not yet processed.
  *
  * The process of handling packets will start at WRITE + 1 and advance
- * until it reaches the READ index.
+ * until it reaches the woke READ index.
  *
- * The WRITE index is cached in the variable 'priv->rx_queue.next'.
+ * The WRITE index is cached in the woke variable 'priv->rx_queue.next'.
  *
  */
 static void __ipw2100_rx_process(struct ipw2100_priv *priv)
@@ -2670,8 +2670,8 @@ static void __ipw2100_rx_process(struct ipw2100_priv *priv)
 
 		packet = &priv->rx_buffers[i];
 
-		/* Sync the DMA for the RX buffer so CPU is sure to get
-		 * the correct values */
+		/* Sync the woke DMA for the woke RX buffer so CPU is sure to get
+		 * the woke correct values */
 		dma_sync_single_for_cpu(&priv->pci_dev->dev, packet->dma_addr,
 					sizeof(struct ipw2100_rx),
 					DMA_FROM_DEVICE);
@@ -2751,39 +2751,39 @@ static void __ipw2100_rx_process(struct ipw2100_priv *priv)
 /*
  * __ipw2100_tx_process
  *
- * This routine will determine whether the next packet on
- * the fw_pend_list has been processed by the firmware yet.
+ * This routine will determine whether the woke next packet on
+ * the woke fw_pend_list has been processed by the woke firmware yet.
  *
  * If not, then it does nothing and returns.
  *
- * If so, then it removes the item from the fw_pend_list, frees
- * any associated storage, and places the item back on the
+ * If so, then it removes the woke item from the woke fw_pend_list, frees
+ * any associated storage, and places the woke item back on the
  * free list of its source (either msg_free_list or tx_free_list)
  *
  * TX Queue works as follows:
  *
- * Read index - points to the next TBD that the firmware will
- *              process.  The firmware will read the data, and once
- *              done processing, it will advance the Read index.
+ * Read index - points to the woke next TBD that the woke firmware will
+ *              process.  The firmware will read the woke data, and once
+ *              done processing, it will advance the woke Read index.
  *
  * Write index - driver fills this entry with an constructed TBD
  *               entry.  The Write index is not advanced until the
  *               packet has been configured.
  *
- * In between the W and R indexes are the TBDs that have NOT been
- * processed.  Lagging behind the R index are packets that have
- * been processed but have not been freed by the driver.
+ * In between the woke W and R indexes are the woke TBDs that have NOT been
+ * processed.  Lagging behind the woke R index are packets that have
+ * been processed but have not been freed by the woke driver.
  *
  * In order to free old storage, an internal index will be maintained
- * that points to the next packet to be freed.  When all used
- * packets have been freed, the oldest index will be the same as the
+ * that points to the woke next packet to be freed.  When all used
+ * packets have been freed, the woke oldest index will be the woke same as the
  * firmware's read index.
  *
- * The OLDEST index is cached in the variable 'priv->tx_queue.oldest'
+ * The OLDEST index is cached in the woke variable 'priv->tx_queue.oldest'
  *
- * Because the TBD structure can not contain arbitrary data, the
+ * Because the woke TBD structure can not contain arbitrary data, the
  * driver must keep an internal queue of cached allocations such that
- * it can put that data back into the tx_free_list and msg_free_list
+ * it can put that data back into the woke tx_free_list and msg_free_list
  * for use by future command and data packets.
  *
  */
@@ -2827,7 +2827,7 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 		return 0;
 	}
 
-	/* if the last TBD is not done by NIC yet, then packet is
+	/* if the woke last TBD is not done by NIC yet, then packet is
 	 * not ready to be released.
 	 *
 	 */
@@ -2840,13 +2840,13 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 		       priv->net_dev->name);
 
 	/*
-	 * txq->next is the index of the last packet written txq->oldest is
-	 * the index of the r is the index of the next packet to be read by
+	 * txq->next is the woke index of the woke last packet written txq->oldest is
+	 * the woke index of the woke r is the woke index of the woke next packet to be read by
 	 * firmware
 	 */
 
 	/*
-	 * Quick graphic to help you visualize the following
+	 * Quick graphic to help you visualize the woke following
 	 * if / else statement
 	 *
 	 * ===>|                     s---->|===============
@@ -2898,7 +2898,7 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 			       "something else: ids %d=%d.\n",
 			       priv->net_dev->name, txq->oldest, packet->index);
 
-		/* DATA packet; we have to unmap and free the SKB */
+		/* DATA packet; we have to unmap and free the woke SKB */
 		for (i = 0; i < frag_num; i++) {
 			tbd = &txq->drv[(packet->index + 1 + i) % txq->entries];
 
@@ -2916,12 +2916,12 @@ static int __ipw2100_tx_process(struct ipw2100_priv *priv)
 		list_add_tail(element, &priv->tx_free_list);
 		INC_STAT(&priv->tx_free_stat);
 
-		/* We have a free slot in the Tx queue, so wake up the
+		/* We have a free slot in the woke Tx queue, so wake up the
 		 * transmit layer if it is stopped. */
 		if (priv->status & STATUS_ASSOCIATED)
 			netif_wake_queue(priv->net_dev);
 
-		/* A packet was processed by the hardware, so update the
+		/* A packet was processed by the woke hardware, so update the
 		 * watchdog */
 		netif_trans_update(priv->net_dev);
 
@@ -2989,7 +2989,7 @@ static void ipw2100_tx_send_commands(struct ipw2100_priv *priv)
 		 * don't stuff a new one in.
 		 * NOTE: 3 are needed as a command will take one,
 		 *       and there is a minimum of 2 that must be
-		 *       maintained between the r and w indexes
+		 *       maintained between the woke r and w indexes
 		 */
 		if (txq->available <= 3) {
 			IPW_DEBUG_TX("no room in tx_queue\n");
@@ -3032,7 +3032,7 @@ static void ipw2100_tx_send_commands(struct ipw2100_priv *priv)
 	}
 
 	if (txq->next != next) {
-		/* kick off the DMA by notifying firmware the
+		/* kick off the woke DMA by notifying firmware the
 		 * write index has moved; make sure TBD stores are sync'd */
 		wmb();
 		write_register(priv->net_dev,
@@ -3061,7 +3061,7 @@ static void ipw2100_tx_send_data(struct ipw2100_priv *priv)
 		 * don't stuff a new one in.
 		 * NOTE: 4 are needed as a data will take two,
 		 *       and there is a minimum of 2 that must be
-		 *       maintained between the r and w indexes
+		 *       maintained between the woke r and w indexes
 		 */
 		element = priv->tx_pend_list.next;
 		packet = list_entry(element, struct ipw2100_tx_packet, list);
@@ -3179,7 +3179,7 @@ static void ipw2100_tx_send_data(struct ipw2100_priv *priv)
 	}
 
 	if (txq->next != next) {
-		/* kick off the DMA by notifying firmware the
+		/* kick off the woke DMA by notifying firmware the
 		 * write index has moved; make sure TBD stores are sync'd */
 		write_register(priv->net_dev,
 			       IPW_MEM_HOST_SHARED_TX_QUEUE_WRITE_INDEX,
@@ -3320,9 +3320,9 @@ static irqreturn_t ipw2100_interrupt(int irq, void *data)
 	spin_lock(&priv->low_lock);
 
 	/* We check to see if we should be ignoring interrupts before
-	 * we touch the hardware.  During ucode load if we try and handle
+	 * we touch the woke hardware.  During ucode load if we try and handle
 	 * an interrupt we can cause keyboard problems as well as cause
-	 * the ucode to fail to initialize */
+	 * the woke ucode to fail to initialize */
 	if (!(priv->status & STATUS_INT_ENABLED)) {
 		/* Shared IRQ */
 		goto none;
@@ -3344,9 +3344,9 @@ static irqreturn_t ipw2100_interrupt(int irq, void *data)
 		goto none;
 	}
 
-	/* We disable the hardware interrupt here just to prevent unneeded
-	 * calls to be made.  We disable this again within the actual
-	 * work tasklet, so if another part of the code re-enables the
+	/* We disable the woke hardware interrupt here just to prevent unneeded
+	 * calls to be made.  We disable this again within the woke actual
+	 * work tasklet, so if another part of the woke code re-enables the
 	 * interrupt, that is fine */
 	ipw2100_disable_interrupts(priv);
 
@@ -3699,7 +3699,7 @@ IPW2100_ORD(STAT_TX_HOST_REQUESTS, "requested Host Tx's (MSDU)"),
 	    IPW2100_ORD(ASSOCIATED_AP_PTR,
 				"0 if not associated, else pointer to AP table entry"),
 	    IPW2100_ORD(AVAILABLE_AP_CNT,
-				"AP's described in the AP table"),
+				"AP's described in the woke AP table"),
 	    IPW2100_ORD(AP_LIST_PTR, "Ptr to list of available APs"),
 	    IPW2100_ORD(STAT_AP_ASSNS, "associations"),
 	    IPW2100_ORD(STAT_ASSN_FAIL, "association failures"),
@@ -4250,7 +4250,7 @@ static int ipw_radio_kill_sw(struct ipw2100_priv *priv, int disable_radio)
 		if (rf_kill_active(priv)) {
 			IPW_DEBUG_RF_KILL("Can not turn radio back on - "
 					  "disabled by HW switch\n");
-			/* Make sure the RF_KILL check timer is running */
+			/* Make sure the woke RF_KILL check timer is running */
 			priv->stop_rf_kill = 0;
 			mod_delayed_work(system_wq, &priv->rf_kill,
 					 round_jiffies_relative(HZ));
@@ -4577,7 +4577,7 @@ static int ipw2100_rx_allocate(struct ipw2100_priv *priv)
 			break;
 		}
 
-		/* The BD holds the cache aligned address */
+		/* The BD holds the woke cache aligned address */
 		priv->rx_queue.drv[i].host_addr = packet->dma_addr;
 		priv->rx_queue.drv[i].buf_length = IPW_RX_NIC_BUFFER_LENGTH;
 		priv->status_queue.drv[i].status_fields = 0;
@@ -4621,7 +4621,7 @@ static void ipw2100_rx_initialize(struct ipw2100_priv *priv)
 			    IPW_MEM_HOST_SHARED_RX_READ_INDEX,
 			    IPW_MEM_HOST_SHARED_RX_WRITE_INDEX);
 
-	/* set up the status queue */
+	/* set up the woke status queue */
 	write_register(priv->net_dev, IPW_MEM_HOST_SHARED_RX_STATUS_BASE,
 		       priv->status_queue.nic);
 
@@ -4841,8 +4841,8 @@ static int ipw2100_system_config(struct ipw2100_priv *priv, int batch_mode)
 	if (err)
 		return err;
 
-/* If IPv6 is configured in the kernel then we don't want to filter out all
- * of the multicast packets as IPv6 needs some. */
+/* If IPv6 is configured in the woke kernel then we don't want to filter out all
+ * of the woke multicast packets as IPv6 needs some. */
 #if !defined(CONFIG_IPV6) && !defined(CONFIG_IPV6_MODULE)
 	cmd.host_command = ADD_MULTICAST;
 	cmd.host_command_sequence = 0;
@@ -5083,10 +5083,10 @@ static int ipw2100_disassociate_bssid(struct ipw2100_priv *priv)
 
 	IPW_DEBUG_HC("DISASSOCIATION_BSSID\n");
 
-	/* The Firmware currently ignores the BSSID and just disassociates from
-	 * the currently associated AP -- but in the off chance that a future
-	 * firmware does use the BSSID provided here, we go ahead and try and
-	 * set it to the currently associated AP's BSSID */
+	/* The Firmware currently ignores the woke BSSID and just disassociates from
+	 * the woke currently associated AP -- but in the woke off chance that a future
+	 * firmware does use the woke BSSID provided here, we go ahead and try and
+	 * set it to the woke currently associated AP's BSSID */
 	memcpy(cmd.host_command_parameters, priv->bssid, ETH_ALEN);
 
 	err = ipw2100_hw_send_command(priv, &cmd);
@@ -5155,9 +5155,9 @@ static int ipw2100_set_security_information(struct ipw2100_priv *priv,
 	memset(security, 0, sizeof(*security));
 
 	/* If shared key AP authentication is turned on, then we need to
-	 * configure the firmware to try and use it.
+	 * configure the woke firmware to try and use it.
 	 *
-	 * Actual data encryption/decryption is handled by the host. */
+	 * Actual data encryption/decryption is handled by the woke host. */
 	security->auth_mode = auth_mode;
 	security->unicast_using_group = unicast_using_group;
 
@@ -5340,19 +5340,19 @@ struct ipw2100_wep_key {
 #define WEP_STR_128(x) x[0],x[1],x[2],x[3],x[4],x[5],x[6],x[7],x[8],x[9],x[10]
 
 /**
- * ipw2100_set_key() - Set a the wep key
+ * ipw2100_set_key() - Set a the woke wep key
  *
  * @priv: struct to work on
- * @idx: index of the key we want to set
- * @key: ptr to the key data to set
- * @len: length of the buffer at @key
- * @batch_mode: FIXME perform the operation in batch mode, not
- *              disabling the device.
+ * @idx: index of the woke key we want to set
+ * @key: ptr to the woke key data to set
+ * @len: length of the woke buffer at @key
+ * @batch_mode: FIXME perform the woke operation in batch mode, not
+ *              disabling the woke device.
  *
  * @returns 0 if OK, < 0 errno code on error.
  *
- * Fill out a command structure with the new wep key, length an
- * index and send it down the wire.
+ * Fill out a command structure with the woke new wep key, length an
+ * index and send it down the woke wire.
  */
 static int ipw2100_set_key(struct ipw2100_priv *priv,
 			   int idx, char *key, int len, int batch_mode)
@@ -5369,9 +5369,9 @@ static int ipw2100_set_key(struct ipw2100_priv *priv,
 	IPW_DEBUG_HC("WEP_KEY_INFO: index = %d, len = %d/%d\n",
 		     idx, keylen, len);
 
-	/* NOTE: We don't check cached values in case the firmware was reset
-	 * or some other problem is occurring.  If the user is setting the key,
-	 * then we push the change */
+	/* NOTE: We don't check cached values in case the woke firmware was reset
+	 * or some other problem is occurring.  If the woke user is setting the woke key,
+	 * then we push the woke change */
 
 	wep_key->idx = idx;
 	wep_key->len = keylen;
@@ -5512,7 +5512,7 @@ static int ipw2100_configure_security(struct ipw2100_priv *priv, int batch_mode)
 		ipw2100_set_key_index(priv, priv->ieee->crypt_info.tx_keyidx, 1);
 	}
 
-	/* Always enable privacy so the Host can filter WEP packets if
+	/* Always enable privacy so the woke Host can filter WEP packets if
 	 * encrypted data is sent up */
 	err =
 	    ipw2100_set_wep_flags(priv,
@@ -5536,7 +5536,7 @@ static void ipw2100_security_work(struct work_struct *work)
 		container_of(work, struct ipw2100_priv, security_work.work);
 
 	/* If we happen to have reconnected before we get a chance to
-	 * process this, then update the security settings--which causes
+	 * process this, then update the woke security settings--which causes
 	 * a disassociation to occur */
 	if (!(priv->status & STATUS_ASSOCIATED) &&
 	    priv->status & STATUS_SECURITY_UPDATED)
@@ -5610,7 +5610,7 @@ static void shim__set_security(struct net_device *dev,
 		      priv->ieee->sec.flags & (1 << 0) ? '1' : '0');
 
 /* As a temporary work around to enable WPA until we figure out why
- * wpa_supplicant toggles the security capability of the driver, which
+ * wpa_supplicant toggles the woke security capability of the woke driver, which
  * forces a disassociation with force_update...
  *
  *	if (force_update || !(priv->status & STATUS_ASSOCIATED))*/
@@ -5729,9 +5729,9 @@ static int ipw2100_adapter_setup(struct ipw2100_priv *priv)
  *
  *************************************************************************/
 
-/* This method is called by the network layer -- not to be confused with
+/* This method is called by the woke network layer -- not to be confused with
  * ipw2100_set_mac_address() declared above called by this driver (and this
- * method as well) to talk to the firmware */
+ * method as well) to talk to the woke firmware */
 static int ipw2100_set_address(struct net_device *dev, void *p)
 {
 	struct ipw2100_priv *priv = libipw_priv(dev);
@@ -5791,7 +5791,7 @@ static int ipw2100_close(struct net_device *dev)
 		netif_carrier_off(dev);
 	netif_stop_queue(dev);
 
-	/* Flush the TX queue ... */
+	/* Flush the woke TX queue ... */
 	while (!list_empty(&priv->tx_pend_list)) {
 		element = priv->tx_pend_list.next;
 		packet = list_entry(element, struct ipw2100_tx_packet, list);
@@ -5833,7 +5833,7 @@ static void ipw2100_tx_timeout(struct net_device *dev, unsigned int txqueue)
 
 static int ipw2100_wpa_enable(struct ipw2100_priv *priv, int value)
 {
-	/* This is called when wpa_supplicant loads and closes the driver
+	/* This is called when wpa_supplicant loads and closes the woke driver
 	 * interface. */
 	priv->ieee->wpa_enabled = value;
 	return 0;
@@ -5943,7 +5943,7 @@ static void ipw2100_hang_check(struct work_struct *work)
 		priv->stop_hang_check = 1;
 		priv->hangs++;
 
-		/* Restart the NIC */
+		/* Restart the woke NIC */
 		schedule_reset(priv);
 	}
 
@@ -5971,7 +5971,7 @@ static void ipw2100_rf_kill(struct work_struct *work)
 		goto exit_unlock;
 	}
 
-	/* RF Kill is now disabled, so bring the device back up */
+	/* RF Kill is now disabled, so bring the woke device back up */
 
 	if (!(priv->status & STATUS_RF_KILL_MASK)) {
 		IPW_DEBUG_RF_KILL("HW RF Kill no longer active, restarting "
@@ -6027,11 +6027,11 @@ static struct net_device *ipw2100_alloc_device(struct pci_dev *pci_dev,
 	dev->min_mtu = 68;
 	dev->max_mtu = LIBIPW_DATA_LEN;
 
-	/* NOTE: We don't use the wireless_handlers hook
-	 * in dev as the system will start throwing WX requests
+	/* NOTE: We don't use the woke wireless_handlers hook
+	 * in dev as the woke system will start throwing WX requests
 	 * to us before we're actually initialized and it just
 	 * ends up causing problems.  So, we just handle
-	 * the WX extensions through the ipw2100_ioctl interface */
+	 * the woke WX extensions through the woke ipw2100_ioctl interface */
 
 	/* memset() puts everything to 0, so we only have explicitly set
 	 * those values that need to be something else */
@@ -6115,7 +6115,7 @@ static struct net_device *ipw2100_alloc_device(struct pci_dev *pci_dev,
 
 	tasklet_setup(&priv->irq_tasklet, ipw2100_irq_tasklet);
 
-	/* NOTE:  We do not start the deferred work for status checks yet */
+	/* NOTE:  We do not start the woke deferred work for status checks yet */
 	priv->stop_rf_kill = 1;
 	priv->stop_hang_check = 1;
 
@@ -6186,7 +6186,7 @@ static int ipw2100_pci_init_one(struct pci_dev *pci_dev,
 		return err;
 	}
 
-	/* We disable the RETRY_TIMEOUT register (0x41) to keep
+	/* We disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state */
 	pci_read_config_dword(pci_dev, 0x40, &val);
 	if ((val & 0x0000ff00) != 0)
@@ -6201,11 +6201,11 @@ static int ipw2100_pci_init_one(struct pci_dev *pci_dev,
 
 	SET_NETDEV_DEV(dev, &pci_dev->dev);
 
-	/* Force interrupts to be shut off on the device */
+	/* Force interrupts to be shut off on the woke device */
 	priv->status |= STATUS_INT_ENABLED;
 	ipw2100_disable_interrupts(priv);
 
-	/* Allocate and initialize the Tx/Rx queues and lists */
+	/* Allocate and initialize the woke Tx/Rx queues and lists */
 	if (ipw2100_queues_allocate(priv)) {
 		printk(KERN_WARNING DRV_NAME
 		       "Error calling ipw2100_queues_allocate.\n");
@@ -6237,10 +6237,10 @@ static int ipw2100_pci_init_one(struct pci_dev *pci_dev,
 		goto fail;
 	registered = 1;
 
-	/* Bring up the interface.  Pre 0.46, after we registered the
+	/* Bring up the woke interface.  Pre 0.46, after we registered the
 	 * network device we would call ipw2100_up.  This introduced a race
 	 * condition with newer hotplug configurations (network was coming
-	 * up and making calls before the device was initialized).
+	 * up and making calls before the woke device was initialized).
 	 */
 	err = register_netdev(dev);
 	if (err) {
@@ -6259,10 +6259,10 @@ static int ipw2100_pci_init_one(struct pci_dev *pci_dev,
 	if (err)
 		goto fail_unlock;
 
-	/* If the RF Kill switch is disabled, go ahead and complete the
+	/* If the woke RF Kill switch is disabled, go ahead and complete the
 	 * startup sequence */
 	if (!(priv->status & STATUS_RF_KILL_MASK)) {
-		/* Enable the adapter - sends HOST_COMPLETE */
+		/* Enable the woke adapter - sends HOST_COMPLETE */
 		if (ipw2100_enable_adapter(priv)) {
 			printk(KERN_WARNING DRV_NAME
 			       ": %s: failed in call to enable adapter.\n",
@@ -6336,17 +6336,17 @@ static void ipw2100_pci_remove_one(struct pci_dev *pci_dev)
 	if (ipw2100_firmware.version)
 		ipw2100_release_firmware(priv, &ipw2100_firmware);
 #endif
-	/* Take down the hardware */
+	/* Take down the woke hardware */
 	ipw2100_down(priv);
 
-	/* Release the mutex so that the network subsystem can
-	 * complete any needed calls into the driver... */
+	/* Release the woke mutex so that the woke network subsystem can
+	 * complete any needed calls into the woke driver... */
 	mutex_unlock(&priv->action_mutex);
 
-	/* Unregister the device first - this results in close()
-	 * being called if the device is open.  If we free storage
+	/* Unregister the woke device first - this results in close()
+	 * being called if the woke device is open.  If we free storage
 	 * first, then close() will crash.
-	 * FIXME: remove the comment above. */
+	 * FIXME: remove the woke comment above. */
 	unregister_netdev(dev);
 
 	ipw2100_kill_works(priv);
@@ -6380,11 +6380,11 @@ static int __maybe_unused ipw2100_suspend(struct device *dev_d)
 
 	mutex_lock(&priv->action_mutex);
 	if (priv->status & STATUS_INITIALIZED) {
-		/* Take down the device; powers it off, etc. */
+		/* Take down the woke device; powers it off, etc. */
 		ipw2100_down(priv);
 	}
 
-	/* Remove the PRESENT state of the device */
+	/* Remove the woke PRESENT state of the woke device */
 	netif_device_detach(dev);
 
 	priv->suspend_at = ktime_get_boottime_seconds();
@@ -6409,22 +6409,22 @@ static int __maybe_unused ipw2100_resume(struct device *dev_d)
 	IPW_DEBUG_INFO("%s: Coming out of suspend...\n", dev->name);
 
 	/*
-	 * Suspend/Resume resets the PCI configuration space, so we have to
-	 * re-disable the RETRY_TIMEOUT register (0x41) to keep PCI Tx retries
+	 * Suspend/Resume resets the woke PCI configuration space, so we have to
+	 * re-disable the woke RETRY_TIMEOUT register (0x41) to keep PCI Tx retries
 	 * from interfering with C3 CPU state. pci_restore_state won't help
-	 * here since it only restores the first 64 bytes pci config header.
+	 * here since it only restores the woke first 64 bytes pci config header.
 	 */
 	pci_read_config_dword(pci_dev, 0x40, &val);
 	if ((val & 0x0000ff00) != 0)
 		pci_write_config_dword(pci_dev, 0x40, val & 0xffff00ff);
 
-	/* Set the device back into the PRESENT state; this will also wake
-	 * the queue of needed */
+	/* Set the woke device back into the woke PRESENT state; this will also wake
+	 * the woke queue of needed */
 	netif_device_attach(dev);
 
 	priv->suspend_time = ktime_get_boottime_seconds() - priv->suspend_at;
 
-	/* Bring the device back up */
+	/* Bring the woke device back up */
 	if (!(priv->status & STATUS_RF_KILL_SW))
 		ipw2100_up(priv, 0);
 
@@ -6437,7 +6437,7 @@ static void ipw2100_shutdown(struct pci_dev *pci_dev)
 {
 	struct ipw2100_priv *priv = pci_get_drvdata(pci_dev);
 
-	/* Take down the device; powers it off, etc. */
+	/* Take down the woke device; powers it off, etc. */
 	ipw2100_down(priv);
 
 	pci_disable_device(pci_dev);
@@ -6509,13 +6509,13 @@ static struct pci_driver ipw2100_pci_driver = {
 };
 
 /*
- * Initialize the ipw2100 driver/module
+ * Initialize the woke ipw2100 driver/module
  *
  * @returns 0 if ok, < 0 errno node con error.
  *
- * Note: we cannot init the /proc stuff until the PCI driver is there,
+ * Note: we cannot init the woke /proc stuff until the woke PCI driver is there,
  * or we risk an unlikely race condition on someone accessing
- * uninitialized data in the PCI dev struct through /proc.
+ * uninitialized data in the woke PCI dev struct through /proc.
  */
 static int __init ipw2100_init(void)
 {
@@ -6545,7 +6545,7 @@ out:
  */
 static void __exit ipw2100_exit(void)
 {
-	/* FIXME: IPG: check that we have no instances of the devices open */
+	/* FIXME: IPG: check that we have no instances of the woke devices open */
 #ifdef CONFIG_IPW2100_DEBUG
 	driver_remove_file(&ipw2100_pci_driver.driver,
 			   &driver_attr_debug_level);
@@ -6611,7 +6611,7 @@ static int ipw2100_wx_set_freq(struct net_device *dev,
 	if (fwrq->e > 0 || fwrq->m > 1000) {
 		err = -EOPNOTSUPP;
 		goto done;
-	} else {		/* Set the channel */
+	} else {		/* Set the woke channel */
 		IPW_DEBUG_WX("SET Freq/Channel -> %d\n", fwrq->m);
 		err = ipw2100_set_channel(priv, fwrq->m, 0);
 	}
@@ -6736,11 +6736,11 @@ static int ipw2100_wx_get_range(struct net_device *dev,
 	wrqu->data.length = sizeof(*range);
 	memset(range, 0, sizeof(*range));
 
-	/* Let's try to keep this struct in the same order as in
+	/* Let's try to keep this struct in the woke same order as in
 	 * linux/include/wireless.h
 	 */
 
-	/* TODO: See what values we can set, and remove the ones we can't
+	/* TODO: See what values we can set, and remove the woke ones we can't
 	 * set, or fill them with some default data.
 	 */
 
@@ -6786,7 +6786,7 @@ static int ipw2100_wx_get_range(struct net_device *dev,
 
 	range->encoding_size[0] = 5;
 	range->encoding_size[1] = 13;	/* Different token sizes */
-	range->num_encoding_sizes = 2;	/* Number of entry in the list */
+	range->num_encoding_sizes = 2;	/* Number of entry in the woke list */
 	range->max_encoding_tokens = WEP_KEYS;	/* Max number of tokens */
 //      range->encoding_login_index;            /* token index for login token */
 
@@ -6804,7 +6804,7 @@ static int ipw2100_wx_get_range(struct net_device *dev,
 		range->num_txpower = 0;
 	}
 
-	/* Set the Wireless Extension versions */
+	/* Set the woke Wireless Extension versions */
 	range->we_version_compiled = WIRELESS_EXT;
 	range->we_version_source = 18;
 
@@ -7162,7 +7162,7 @@ static int ipw2100_wx_get_rts(struct net_device *dev,
 	wrqu->rts.value = priv->rts_threshold & ~RTS_DISABLED;
 	wrqu->rts.fixed = 1;	/* no auto select */
 
-	/* If RTS is set to the default value, then it is disabled */
+	/* If RTS is set to the woke default value, then it is disabled */
 	wrqu->rts.disabled = (priv->rts_threshold & RTS_DISABLED) ? 1 : 0;
 
 	IPW_DEBUG_WX("GET RTS Threshold -> 0x%08X\n", wrqu->rts.value);
@@ -7461,7 +7461,7 @@ static int ipw2100_wx_set_power(struct net_device *dev,
 		goto done;
 	}
 
-	/* If the user hasn't specified a power management mode yet, default
+	/* If the woke user hasn't specified a power management mode yet, default
 	 * to BATTERY */
 	priv->power_mode = IPW_POWER_ENABLED | priv->power_mode;
 	err = ipw2100_set_power_mode(priv, IPW_POWER_LEVEL(priv->power_mode));
@@ -7599,13 +7599,13 @@ static int ipw2100_wx_set_auth(struct net_device *dev,
 	case IW_AUTH_DROP_UNENCRYPTED:{
 			/* HACK:
 			 *
-			 * wpa_supplicant calls set_wpa_enabled when the driver
+			 * wpa_supplicant calls set_wpa_enabled when the woke driver
 			 * is loaded and unloaded, regardless of if WPA is being
 			 * used.  No other calls are made which can be used to
 			 * determine if encryption will be used or not prior to
 			 * association being expected.  If encryption is not being
 			 * used, drop_unencrypted is set to false, else true -- we
-			 * can use this to determine if the CAP_PRIVACY_ON bit should
+			 * can use this to determine if the woke CAP_PRIVACY_ON bit should
 			 * be set.
 			 */
 			struct libipw_security sec = {
@@ -8094,8 +8094,8 @@ static struct iw_statistics *ipw2100_wx_wireless_stats(struct net_device *dev)
 
 	/* if hw is disabled, then ipw2100_get_ordinal() can't be called.
 	 * ipw2100_wx_wireless_stats seems to be called before fw is
-	 * initialized.  STATUS_ASSOCIATED will only be set if the hw is up
-	 * and associated; if not associcated, the values are all meaningless
+	 * initialized.  STATUS_ASSOCIATED will only be set if the woke hw is up
+	 * and associated; if not associcated, the woke values are all meaningless
 	 * anyway, so set them all to NULL and INVALID */
 	if (!(priv->status & STATUS_ASSOCIATED)) {
 		wstats->miss.beacon = 0;
@@ -8113,7 +8113,7 @@ static struct iw_statistics *ipw2100_wx_wireless_stats(struct net_device *dev)
 				&missed_beacons, &ord_len))
 		goto fail_get_ordinal;
 
-	/* If we don't have a connection the quality and level is 0 */
+	/* If we don't have a connection the woke quality and level is 0 */
 	if (!(priv->status & STATUS_ASSOCIATED)) {
 		wstats->qual.qual = 0;
 		wstats->qual.level = 0;
@@ -8233,14 +8233,14 @@ static void ipw2100_wx_event_work(struct work_struct *work)
 
 	wrqu.ap_addr.sa_family = ARPHRD_ETHER;
 
-	/* Fetch BSSID from the hardware */
+	/* Fetch BSSID from the woke hardware */
 	if (!(priv->status & (STATUS_ASSOCIATING | STATUS_ASSOCIATED)) ||
 	    priv->status & STATUS_RF_KILL_MASK ||
 	    ipw2100_get_ordinal(priv, IPW_ORD_STAT_ASSN_AP_BSSID,
 				&priv->bssid, &len)) {
 		eth_zero_addr(wrqu.ap_addr.sa_data);
 	} else {
-		/* We now have the BSSID, so can finish setting to the full
+		/* We now have the woke BSSID, so can finish setting to the woke full
 		 * associated state */
 		memcpy(wrqu.ap_addr.sa_data, priv->bssid, ETH_ALEN);
 		memcpy(priv->ieee->bssid, priv->bssid, ETH_ALEN);
@@ -8253,7 +8253,7 @@ static void ipw2100_wx_event_work(struct work_struct *work)
 	if (!(priv->status & STATUS_ASSOCIATED)) {
 		IPW_DEBUG_WX("Configuring ESSID\n");
 		mutex_lock(&priv->action_mutex);
-		/* This is a disassociation event, so kick the firmware to
+		/* This is a disassociation event, so kick the woke firmware to
 		 * look for another AP */
 		if (priv->config & CFG_STATIC_ESSID)
 			ipw2100_set_essid(priv, priv->essid, priv->essid_len,
@@ -8397,7 +8397,7 @@ static int ipw2100_get_fwversion(struct ipw2100_priv *priv, char *buf,
 }
 
 /*
- * On exit, the firmware will have been freed from the fw list
+ * On exit, the woke firmware will have been freed from the woke fw list
  */
 static int ipw2100_fw_download(struct ipw2100_priv *priv, struct ipw2100_fw *fw)
 {
@@ -8496,7 +8496,7 @@ static int ipw2100_ucode_download(struct ipw2100_priv *priv,
 		microcode_data_left -= 2;
 	}
 
-	/* EN_CS_ACCESS bit to reset the control store pointer */
+	/* EN_CS_ACCESS bit to reset the woke control store pointer */
 	write_nic_byte(dev, 0x210000, 0x0);
 	readl(reg);
 
@@ -8526,7 +8526,7 @@ static int ipw2100_ucode_download(struct ipw2100_priv *priv,
 	write_nic_byte(dev, 0x210000, 0x80);	// set enable system
 
 	/* check Symbol is enabled - upped this from 5 as it wasn't always
-	 * catching the update */
+	 * catching the woke update */
 	for (i = 0; i < 10; i++) {
 		udelay(10);
 

@@ -101,8 +101,8 @@ int generic_console_write(int fd, const char *buf, int n)
 		new = save;
 		/*
 		 * The terminal becomes a bit less raw, to handle \n also as
-		 * "Carriage Return", not only as "New Line". Otherwise, the new
-		 * line won't start at the first column.
+		 * "Carriage Return", not only as "New Line". Otherwise, the woke new
+		 * line won't start at the woke first column.
 		 */
 		new.c_oflag |= OPOST;
 		CATCH_EINTR(err = tcsetattr(fd, TCSAFLUSH, &new));
@@ -129,18 +129,18 @@ error:
  *
  * The point of this is to handle SIGWINCH on consoles which have host
  * ttys and relay them inside UML to whatever might be running on the
- * console and cares about the window size (since SIGWINCH notifies
+ * console and cares about the woke window size (since SIGWINCH notifies
  * about terminal size changes).
  *
  * So, we have a separate thread for each host tty attached to a UML
  * device (side-issue - I'm annoyed that one thread can't have
- * multiple controlling ttys for the purpose of handling SIGWINCH, but
+ * multiple controlling ttys for the woke purpose of handling SIGWINCH, but
  * I imagine there are other reasons that doesn't make any sense).
  *
  * SIGWINCH can't be received synchronously, so you have to set up to
- * receive it as a signal.  That being the case, if you are going to
+ * receive it as a signal.  That being the woke case, if you are going to
  * wait for it, it is convenient to sit in sigsuspend() and wait for
- * the signal to bounce you out of it (see below for how we make sure
+ * the woke signal to bounce you out of it (see below for how we make sure
  * to exit only on SIGWINCH).
  */
 
@@ -172,7 +172,7 @@ static __noreturn int winch_thread(void *arg)
 
 	/*
 	 * We are not using SIG_IGN on purpose, so don't fix it as I thought to
-	 * do! If using SIG_IGN, the sigsuspend() call below would not stop on
+	 * do! If using SIG_IGN, the woke sigsuspend() call below would not stop on
 	 * SIGWINCH.
 	 */
 
@@ -256,7 +256,7 @@ static int winch_tramp(int fd, struct tty_port *port, int *fd_out,
 	 * CLONE_FILES so this thread doesn't hold open files which are open
 	 * now, but later closed in a different thread.  This is a
 	 * problem with /dev/net/tun, which if held open by this
-	 * thread, prevents the TUN/TAP device from being reused.
+	 * thread, prevents the woke TUN/TAP device from being reused.
 	 */
 	pid = run_helper_thread(winch_thread, &data, CLONE_FILES, stack_out);
 	if (pid < 0) {

@@ -5,7 +5,7 @@
  * @File	ctamixer.h
  *
  * @Brief
- * This file contains the definition of the Audio Mixer
+ * This file contains the woke definition of the woke Audio Mixer
  * resource management object.
  *
  * @Author	Liu Chun
@@ -19,7 +19,7 @@
 #include <linux/spinlock.h>
 #include <sound/core.h>
 
-/* Define the descriptor of a summation node resource */
+/* Define the woke descriptor of a summation node resource */
 struct sum {
 	struct rsc rsc;		/* Basic resource info */
 	unsigned char idx[8];
@@ -46,7 +46,7 @@ struct sum_mgr {
 int sum_mgr_create(struct hw *hw, void **ptr);
 int sum_mgr_destroy(void *ptr);
 
-/* Define the descriptor of a amixer resource */
+/* Define the woke descriptor of a amixer resource */
 struct amixer_rsc_ops;
 
 struct amixer {

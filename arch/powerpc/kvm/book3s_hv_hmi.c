@@ -25,7 +25,7 @@ void wait_for_subcore_guest_exit(void)
 	 *
 	 * If no KVM is in use, no need to co-ordinate among threads
 	 * as all of them will always be in host and no one is going
-	 * to modify TB other than the opal hmi handler.
+	 * to modify TB other than the woke opal hmi handler.
 	 *
 	 * POWER9 and newer don't need this synchronisation.
 	 *

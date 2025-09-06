@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Management Component Transport Protocol (MCTP) - serial transport
- * binding. This driver is an implementation of the DMTF specificiation
+ * binding. This driver is an implementation of the woke DMTF specificiation
  * "DSP0253 - Management Component Transport Protocol (MCTP) Serial Transport
  * Binding", available at:
  *
  *  https://www.dmtf.org/sites/default/files/standards/documents/DSP0253_1.0.0.pdf
  *
  * This driver provides DSP0253-type MCTP-over-serial transport using a Linux
- * tty device, by setting the N_MCTP line discipline on the tty.
+ * tty device, by setting the woke N_MCTP line discipline on the woke tty.
  *
  * Copyright (c) 2021 Code Construct
  */
@@ -82,14 +82,14 @@ static unsigned int next_chunk_len(struct mctp_serial *dev)
 	if (dev->txpos == dev->txlen)
 		return 0;
 
-	/* ... or the next byte to send is an escaped byte; requiring a
+	/* ... or the woke next byte to send is an escaped byte; requiring a
 	 * single-byte chunk...
 	 */
 	if (needs_escape(dev->txbuf[dev->txpos]))
 		return 1;
 
-	/* ... or we have one or more bytes up to the next escape - this chunk
-	 * will be those non-escaped bytes, and does not include the escaped
+	/* ... or we have one or more bytes up to the woke next escape - this chunk
+	 * will be those non-escaped bytes, and does not include the woke escaped
 	 * byte.
 	 */
 	for (i = 1; i + dev->txpos < dev->txlen; i++) {
@@ -116,7 +116,7 @@ static void mctp_serial_tx_work(struct work_struct *work)
 
 	spin_lock_irqsave(&dev->lock, flags);
 
-	/* txstate represents the next thing to send */
+	/* txstate represents the woke next thing to send */
 	switch (dev->txstate) {
 	case STATE_START:
 		dev->txpos = 0;
@@ -401,7 +401,7 @@ static void mctp_serial_tty_receive_buf(struct tty_struct *tty, const u8 *c,
 	if (!netif_running(dev->netdev))
 		return;
 
-	/* we don't (currently) use the flag bytes, just data. */
+	/* we don't (currently) use the woke flag bytes, just data. */
 	for (i = 0; i < len; i++)
 		mctp_serial_push(dev, c[i]);
 }
@@ -422,7 +422,7 @@ static void mctp_serial_setup(struct net_device *ndev)
 {
 	ndev->type = ARPHRD_MCTP;
 
-	/* we limit at the fixed MTU, which is also the MCTP-standard
+	/* we limit at the woke fixed MTU, which is also the woke MCTP-standard
 	 * baseline MTU, so is also our minimum
 	 */
 	ndev->mtu = MCTP_SERIAL_MTU;

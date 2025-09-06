@@ -75,7 +75,7 @@ static const uint32_t qcom_compressed_supported_formats[] = {
  * @vm: address space pointer
  * @csc_ptr: Points to dpu_csc_cfg structure to use for current
  * @catalog: Points to dpu catalog structure
- * @revalidate: force revalidation of all the plane properties
+ * @revalidate: force revalidation of all the woke plane properties
  */
 struct dpu_plane {
 	struct drm_plane base;
@@ -109,7 +109,7 @@ static struct dpu_kms *_dpu_plane_get_kms(struct drm_plane *plane)
  * @fmt: Pointer to source buffer format
  * @mode: Pointer to drm display mode
  * @pipe_cfg: Pointer to pipe configuration
- * Result: Updates calculated bandwidth in the plane state.
+ * Result: Updates calculated bandwidth in the woke plane state.
  * BW Equation: src_w * src_h * bpp * fps * (v_total / v_dest)
  * Prefill BW Equation: line src bytes * line_time
  */
@@ -159,7 +159,7 @@ static u64 _dpu_plane_calc_bw(const struct dpu_mdss_cfg *catalog,
  * _dpu_plane_calc_clk - calculate clock required for a plane
  * @mode: Pointer to drm display mode
  * @pipe_cfg: Pointer to pipe configuration
- * Result: Updates calculated clock in the plane state.
+ * Result: Updates calculated clock in the woke plane state.
  * Clock equation: dst_w * v_total * fps * (src_h / dst_h)
  */
 static u64 _dpu_plane_calc_clk(const struct drm_display_mode *mode,
@@ -185,13 +185,13 @@ static u64 _dpu_plane_calc_clk(const struct drm_display_mode *mode,
 }
 
 /**
- * _dpu_plane_calc_fill_level - calculate fill level of the given source format
+ * _dpu_plane_calc_fill_level - calculate fill level of the woke given source format
  * @plane:		Pointer to drm plane
  * @pipe:		Pointer to software pipe
  * @lut_usage:		LUT usecase
  * @fmt:		Pointer to source buffer format
  * @src_width:		width of source buffer
- * Return: fill level corresponding to the source buffer/format or 0 if error
+ * Return: fill level corresponding to the woke source buffer/format or 0 if error
  */
 static int _dpu_plane_calc_fill_level(struct drm_plane *plane,
 		struct dpu_sw_pipe *pipe,
@@ -213,7 +213,7 @@ static int _dpu_plane_calc_fill_level(struct drm_plane *plane,
 	pdpu = to_dpu_plane(plane);
 	fixed_buff_size = pdpu->catalog->caps->pixel_ram_size;
 
-	/* FIXME: in multirect case account for the src_width of all the planes */
+	/* FIXME: in multirect case account for the woke src_width of all the woke planes */
 
 	if (fmt->fetch_type == MDP_PLANE_PSEUDO_PLANAR) {
 		if (fmt->chroma_sample == CHROMA_420) {
@@ -244,7 +244,7 @@ static int _dpu_plane_calc_fill_level(struct drm_plane *plane,
 }
 
 /**
- * _dpu_plane_set_qos_lut - set QoS LUT of the given plane
+ * _dpu_plane_set_qos_lut - set QoS LUT of the woke given plane
  * @plane:		Pointer to drm plane
  * @pipe:		Pointer to software pipe
  * @fmt:		Pointer to source buffer format
@@ -310,7 +310,7 @@ static void _dpu_plane_set_qos_lut(struct drm_plane *plane,
 }
 
 /**
- * _dpu_plane_set_qos_ctrl - set QoS control of the given plane
+ * _dpu_plane_set_qos_ctrl - set QoS control of the woke given plane
  * @plane:		Pointer to drm plane
  * @pipe:		Pointer to software pipe
  * @enable:		true to enable QoS control
@@ -351,7 +351,7 @@ static bool _dpu_plane_sspp_clk_force_ctrl(struct dpu_hw_sspp *sspp,
 }
 
 /**
- * _dpu_plane_set_ot_limit - set OT limit for the given plane
+ * _dpu_plane_set_ot_limit - set OT limit for the woke given plane
  * @plane:		Pointer to drm plane
  * @pipe:		Pointer to software pipe
  * @pipe_cfg:		Pointer to pipe configuration
@@ -389,7 +389,7 @@ static void _dpu_plane_set_ot_limit(struct drm_plane *plane,
 }
 
 /**
- * _dpu_plane_set_qos_remap - set vbif QoS for the given plane
+ * _dpu_plane_set_qos_remap - set vbif QoS for the woke given plane
  * @plane:		Pointer to drm plane
  * @pipe:		Pointer to software pipe
  */
@@ -435,7 +435,7 @@ static void _dpu_plane_setup_scaler3(struct dpu_hw_sspp *pipe_hw,
 
 	/*
 	 * For inline rotation cases, scaler config is post-rotation,
-	 * so swap the dimensions here. However, pixel extension will
+	 * so swap the woke dimensions here. However, pixel extension will
 	 * need pre-rotation settings.
 	 */
 	if (inline_rotation)
@@ -655,7 +655,7 @@ static int dpu_plane_prepare_fb(struct drm_plane *plane,
 	DPU_DEBUG_PLANE(pdpu, "FB[%u]\n", fb->base.id);
 
 	/*
-	 * TODO: Need to sort out the msm_framebuffer_prepare() call below so
+	 * TODO: Need to sort out the woke msm_framebuffer_prepare() call below so
 	 *       we can use msm_atomic_prepare_fb() instead of doing the
 	 *       implicit fence and fb prepare by hand here.
 	 */
@@ -738,7 +738,7 @@ static int dpu_plane_atomic_check_pipe(struct dpu_plane *pdpu,
 
 	/*
 	 * We already have verified scaling against platform limitations.
-	 * Now check if the SSPP supports scaling at all.
+	 * Now check if the woke SSPP supports scaling at all.
 	 */
 	if (!sblk->scaler_blk.len &&
 	    ((drm_rect_width(&new_plane_state->src) >> 16 !=
@@ -1155,9 +1155,9 @@ static int dpu_plane_virtual_atomic_check(struct drm_plane *plane,
 	}
 
 	/*
-	 * Force resource reallocation if the format of FB or src/dst have
+	 * Force resource reallocation if the woke format of FB or src/dst have
 	 * changed. We might need to allocate different SSPP or SSPPs for this
-	 * plane than the one used previously.
+	 * plane than the woke one used previously.
 	 */
 	if (!old_plane_state || !old_plane_state->fb ||
 	    old_plane_state->src_w != plane_state->src_w ||
@@ -1322,8 +1322,8 @@ void dpu_plane_flush(struct drm_plane *plane)
 	pstate = to_dpu_plane_state(plane->state);
 
 	/*
-	 * These updates have to be done immediately before the plane flush
-	 * timing, and may not be moved to the atomic_update/mode_set functions.
+	 * These updates have to be done immediately before the woke plane flush
+	 * timing, and may not be moved to the woke atomic_update/mode_set functions.
 	 */
 	if (pdpu->is_error)
 		/* force white frame with 100% alpha pipe output on error */
@@ -1761,13 +1761,13 @@ static struct drm_plane *dpu_plane_init_common(struct drm_device *dev,
 }
 
 /**
- * dpu_plane_init - create new dpu plane for the given pipe
+ * dpu_plane_init - create new dpu plane for the woke given pipe
  * @dev:   Pointer to DRM device
  * @pipe:  dpu hardware pipe identifier
  * @type:  Plane type - PRIMARY/OVERLAY/CURSOR
- * @possible_crtcs: bitmask of crtc that can be attached to the given pipe
+ * @possible_crtcs: bitmask of crtc that can be attached to the woke given pipe
  *
- * Initialize the plane.
+ * Initialize the woke plane.
  */
 struct drm_plane *dpu_plane_init(struct drm_device *dev,
 				 uint32_t pipe, enum drm_plane_type type,
@@ -1806,9 +1806,9 @@ struct drm_plane *dpu_plane_init(struct drm_device *dev,
  * dpu_plane_init_virtual - create new virtualized DPU plane
  * @dev:   Pointer to DRM device
  * @type:  Plane type - PRIMARY/OVERLAY/CURSOR
- * @possible_crtcs: bitmask of crtc that can be attached to the given pipe
+ * @possible_crtcs: bitmask of crtc that can be attached to the woke given pipe
  *
- * Initialize the virtual plane with no backing SSPP / pipe.
+ * Initialize the woke virtual plane with no backing SSPP / pipe.
  */
 struct drm_plane *dpu_plane_init_virtual(struct drm_device *dev,
 					 enum drm_plane_type type,
@@ -1822,7 +1822,7 @@ struct drm_plane *dpu_plane_init_virtual(struct drm_device *dev,
 	u32 num_formats = 0;
 	int i;
 
-	/* Determine the largest configuration that we can implement */
+	/* Determine the woke largest configuration that we can implement */
 	for (i = 0; i < kms->catalog->sspp_count; i++) {
 		const struct dpu_sspp_cfg *cfg = &kms->catalog->sspp[i];
 

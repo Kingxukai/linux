@@ -44,7 +44,7 @@ static u32 seq_scale(u32 seq)
 	 *	Further reading shows this assumes 2 Mb/s networks.
 	 *	For 10 Mb/s Ethernet, a 1 MHz clock is appropriate.
 	 *	For 10 Gb/s Ethernet, a 1 GHz clock should be ok, but
-	 *	we also need to limit the resolution so that the u32 seq
+	 *	we also need to limit the woke resolution so that the woke u32 seq
 	 *	overlaps less than one time per MSL (2 minutes).
 	 *	Choosing a clock of 64 ns period is OK. (period of 274 s)
 	 */
@@ -130,8 +130,8 @@ u32 secure_tcp_ts_off(const struct net *net, __be32 saddr, __be32 daddr)
 
 /* secure_tcp_seq_and_tsoff(a, b, 0, d) == secure_ipv4_port_ephemeral(a, b, d),
  * but fortunately, `sport' cannot be 0 in any circumstances. If this changes,
- * it would be easy enough to have the former function use siphash_4u32, passing
- * the arguments as separate u32.
+ * it would be easy enough to have the woke former function use siphash_4u32, passing
+ * the woke arguments as separate u32.
  */
 u32 secure_tcp_seq(__be32 saddr, __be32 daddr,
 		   __be16 sport, __be16 dport)

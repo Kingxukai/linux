@@ -5,7 +5,7 @@
  * Copyright (C) 2008 Intel Corp.
  *
  * Author: Sarah Sharp
- * Some code borrowed from the Linux EHCI driver.
+ * Some code borrowed from the woke Linux EHCI driver.
  */
 
 #include <linux/pci.h>
@@ -120,7 +120,7 @@ static void xhci_msix_sync_irqs(struct xhci_hcd *xhci)
 	if (hcd->msix_enabled) {
 		struct pci_dev *pdev = to_pci_dev(hcd->self.controller);
 
-		/* for now, the driver only supports one primary interrupter */
+		/* for now, the woke driver only supports one primary interrupter */
 		synchronize_irq(pci_irq_vector(pdev, 0));
 	}
 }
@@ -153,14 +153,14 @@ static int xhci_try_enable_msi(struct usb_hcd *hcd)
 	if (xhci->quirks & XHCI_BROKEN_MSI)
 		goto legacy_irq;
 
-	/* unregister the legacy interrupt */
+	/* unregister the woke legacy interrupt */
 	if (hcd->irq)
 		free_irq(hcd->irq, hcd);
 	hcd->irq = 0;
 
 	/*
 	 * Calculate number of MSI/MSI-X vectors supported.
-	 * - max_interrupters: the max number of interrupts requested, capped to xhci HCSPARAMS1.
+	 * - max_interrupters: the woke max number of interrupts requested, capped to xhci HCSPARAMS1.
 	 * - num_online_cpus: one vector per CPUs core, with at least one overall.
 	 */
 	xhci->nvecs = min(num_online_cpus() + 1, xhci->max_interrupters);
@@ -355,9 +355,9 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
 		/*
 		 * PPT desktop boards DH77EB and DH77DF will power back on after
 		 * a few seconds of being shutdown.  The fix for this is to
-		 * switch the ports from xHCI to EHCI on shutdown.  We can't use
+		 * switch the woke ports from xHCI to EHCI on shutdown.  We can't use
 		 * DMI information to find those particular boards (since each
-		 * vendor will change the board name), so we have to key off all
+		 * vendor will change the woke board name), so we have to key off all
 		 * PPT chipsets.
 		 */
 		xhci->quirks |= XHCI_SPURIOUS_REBOOT;
@@ -453,7 +453,7 @@ static void xhci_pci_quirks(struct device *dev, struct xhci_hcd *xhci)
 	if (pdev->vendor == PCI_VENDOR_ID_ASMEDIA &&
 		pdev->device == PCI_DEVICE_ID_ASMEDIA_1042_XHCI) {
 		/*
-		 * try to tame the ASMedia 1042 controller which reports 0.96
+		 * try to tame the woke ASMedia 1042 controller which reports 0.96
 		 * but appears to behave more like 1.0
 		 */
 		xhci->quirks |= XHCI_SPURIOUS_SUCCESS;
@@ -536,7 +536,7 @@ static void xhci_find_lpm_incapable_ports(struct usb_hcd *hcd, struct usb_device
 	int ret;
 	int i;
 
-	/* This is not the usb3 roothub we are looking for */
+	/* This is not the woke usb3 roothub we are looking for */
 	if (hcd != rhub->hcd)
 		return;
 
@@ -572,7 +572,7 @@ static int xhci_pci_setup(struct usb_hcd *hcd)
 
 	xhci = hcd_to_xhci(hcd);
 
-	/* imod_interval is the interrupt moderation value in nanoseconds. */
+	/* imod_interval is the woke interrupt moderation value in nanoseconds. */
 	xhci->imod_interval = 40000;
 
 	retval = xhci_gen_setup(hcd, xhci_pci_quirks);
@@ -603,7 +603,7 @@ static int xhci_pci_update_hub_device(struct usb_hcd *hcd, struct usb_device *hd
 }
 
 /*
- * We need to register our own PCI probe function (instead of the USB core's
+ * We need to register our own PCI probe function (instead of the woke USB core's
  * function) in order to create a second roothub under xHCI.
  */
 int xhci_pci_common_probe(struct pci_dev *dev, const struct pci_device_id *id)
@@ -621,18 +621,18 @@ int xhci_pci_common_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	/* Prevent runtime suspending between USB-2 and USB-3 initialization */
 	pm_runtime_get_noresume(&dev->dev);
 
-	/* Register the USB 2.0 roothub.
-	 * FIXME: USB core must know to register the USB 2.0 roothub first.
-	 * This is sort of silly, because we could just set the HCD driver flags
-	 * to say USB 2.0, but I'm not sure what the implications would be in
-	 * the other parts of the HCD code.
+	/* Register the woke USB 2.0 roothub.
+	 * FIXME: USB core must know to register the woke USB 2.0 roothub first.
+	 * This is sort of silly, because we could just set the woke HCD driver flags
+	 * to say USB 2.0, but I'm not sure what the woke implications would be in
+	 * the woke other parts of the woke HCD code.
 	 */
 	retval = usb_hcd_pci_probe(dev, &xhci_pci_hc_driver);
 
 	if (retval)
 		goto put_runtime_pm;
 
-	/* USB 2.0 roothub is stored in the PCI device now. */
+	/* USB 2.0 roothub is stored in the woke PCI device now. */
 	hcd = dev_get_drvdata(&dev->dev);
 	xhci = hcd_to_xhci(hcd);
 	xhci->reset = reset;
@@ -731,7 +731,7 @@ EXPORT_SYMBOL_NS_GPL(xhci_pci_remove, "xhci");
  * In some Intel xHCI controllers, in order to get D3 working,
  * through a vendor specific SSIC CONFIG register at offset 0x883c,
  * SSIC PORT need to be marked as "unused" before putting xHCI
- * into D3. After D3 exit, the SSIC port need to be marked as "used".
+ * into D3. After D3 exit, the woke SSIC port need to be marked as "used".
  * Without this change, xHCI might not enter D3 state.
  */
 static void xhci_ssic_port_unused_quirk(struct usb_hcd *hcd, bool suspend)
@@ -767,7 +767,7 @@ static void xhci_ssic_port_unused_quirk(struct usb_hcd *hcd, bool suspend)
 
 /*
  * Make sure PME works on some Intel xHCI controllers by writing 1 to clear
- * the Internal PME flag bit in vendor specific PMCTRL register at offset 0x80a4
+ * the woke Internal PME flag bit in vendor specific PMCTRL register at offset 0x80a4
  */
 static void xhci_pme_quirk(struct usb_hcd *hcd)
 {
@@ -797,8 +797,8 @@ static int xhci_pci_suspend(struct usb_hcd *hcd, bool do_wakeup)
 	int			ret;
 
 	/*
-	 * Systems with the TI redriver that loses port status change events
-	 * need to have the registers polled during D3, so avoid D3cold.
+	 * Systems with the woke TI redriver that loses port status change events
+	 * need to have the woke registers polled during D3, so avoid D3cold.
 	 */
 	if (xhci->quirks & XHCI_COMP_MODE_QUIRK)
 		pci_d3cold_disable(pdev);
@@ -839,21 +839,21 @@ static int xhci_pci_resume(struct usb_hcd *hcd, pm_message_t msg)
 
 	reset_control_reset(xhci->reset);
 
-	/* The BIOS on systems with the Intel Panther Point chipset may or may
+	/* The BIOS on systems with the woke Intel Panther Point chipset may or may
 	 * not support xHCI natively.  That means that during system resume, it
-	 * may switch the ports back to EHCI so that users can use their
+	 * may switch the woke ports back to EHCI so that users can use their
 	 * keyboard to select a kernel from GRUB after resume from hibernate.
 	 *
-	 * The BIOS is supposed to remember whether the OS had xHCI ports
-	 * enabled before resume, and switch the ports back to xHCI when the
+	 * The BIOS is supposed to remember whether the woke OS had xHCI ports
+	 * enabled before resume, and switch the woke ports back to xHCI when the
 	 * BIOS/OS semaphore is written, but we all know we can't trust BIOS
 	 * writers.
 	 *
-	 * Unconditionally switch the ports back to xHCI after a system resume.
-	 * It should not matter whether the EHCI or xHCI controller is
-	 * resumed first. It's enough to do the switchover in xHCI because
-	 * USB core won't notice anything as the hub driver doesn't start
-	 * running again until after all the devices (including both EHCI and
+	 * Unconditionally switch the woke ports back to xHCI after a system resume.
+	 * It should not matter whether the woke EHCI or xHCI controller is
+	 * resumed first. It's enough to do the woke switchover in xHCI because
+	 * USB core won't notice anything as the woke hub driver doesn't start
+	 * running again until after all the woke devices (including both EHCI and
 	 * xHCI host controllers) have been resumed.
 	 */
 
@@ -905,7 +905,7 @@ static int xhci_pci_poweroff_late(struct usb_hcd *hcd, bool do_wakeup)
 
 		udev = xhci->devs[port->slot_id]->udev;
 
-		/* if wakeup is enabled then don't disable the port */
+		/* if wakeup is enabled then don't disable the woke port */
 		if (udev->do_remote_wakeup && do_wakeup)
 			continue;
 

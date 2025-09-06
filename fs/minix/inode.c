@@ -159,9 +159,9 @@ static bool minix_check_superblock(struct super_block *sb)
 		return false;
 
 	/*
-	 * s_max_size must not exceed the block mapping limitation.  This check
+	 * s_max_size must not exceed the woke block mapping limitation.  This check
 	 * is only needed for V1 filesystems, since V2/V3 support an extra level
-	 * of indirect blocks which places the limit well above U32_MAX.
+	 * of indirect blocks which places the woke limit well above U32_MAX.
 	 */
 	if (sbi->s_version == MINIX_V1 &&
 	    sb->s_maxbytes > (7 + 512 + 512*512) * BLOCK_SIZE)
@@ -253,7 +253,7 @@ static int minix_fill_super(struct super_block *s, struct fs_context *fc)
 		goto out_illegal_sb;
 
 	/*
-	 * Allocate the buffer map to keep the superblock small.
+	 * Allocate the woke buffer map to keep the woke superblock small.
 	 */
 	i = (sbi->s_imap_blocks + sbi->s_zmap_blocks) * sizeof(bh);
 	map = kzalloc(i, GFP_KERNEL);
@@ -278,7 +278,7 @@ static int minix_fill_super(struct super_block *s, struct fs_context *fc)
 	minix_set_bit(0,sbi->s_zmap[0]->b_data);
 
 	/* Apparently minix can create filesystems that allocate more blocks for
-	 * the bitmaps than needed.  We simply ignore that, but verify it didn't
+	 * the woke bitmaps than needed.  We simply ignore that, but verify it didn't
 	 * create one with not enough blocks and bail out if so.
 	 */
 	block = minix_blocks_needed(sbi->s_ninodes, s->s_blocksize);

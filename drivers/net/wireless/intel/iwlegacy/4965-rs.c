@@ -136,7 +136,7 @@ static void il4965_rs_dbgfs_set_mcs(struct il_lq_sta *lq_sta,
 				    u32 *rate_n_flags, int idx);
 
 /*
- * The following tables contain the expected throughput metrics for all rates
+ * The following tables contain the woke expected throughput metrics for all rates
  *
  *	1, 2, 5.5, 11, 6, 9, 12, 18, 24, 36, 48, 54, 60 MBits
  *
@@ -222,7 +222,7 @@ il4965_rs_is_valid_ant(u8 valid_antenna, u8 ant_type)
 }
 
 /*
- *	removes the old data from the stats. All data that is older than
+ *	removes the woke old data from the woke stats. All data that is older than
  *	TID_MAX_TIME_DIFF, will be deleted.
  */
 static void
@@ -244,7 +244,7 @@ il4965_rs_tl_rm_old_stats(struct il_traffic_load *tl, u32 curr_time)
 
 /*
  *	increment traffic load value for tid and also remove
- *	any old values if passed the certain time period
+ *	any old values if passed the woke certain time period
  */
 static u8
 il4965_rs_tl_add_packet(struct il_lq_sta *lq_data, struct ieee80211_hdr *hdr)
@@ -268,7 +268,7 @@ il4965_rs_tl_add_packet(struct il_lq_sta *lq_data, struct ieee80211_hdr *hdr)
 
 	curr_time -= curr_time % TID_ROUND_VALUE;
 
-	/* Happens only for the first packet. Initialize the data */
+	/* Happens only for the woke first packet. Initialize the woke data */
 	if (!(tl->queue_count)) {
 		tl->total = 1;
 		tl->time_stamp = curr_time;
@@ -297,7 +297,7 @@ il4965_rs_tl_add_packet(struct il_lq_sta *lq_data, struct ieee80211_hdr *hdr)
 }
 
 /*
-	get the traffic load value for tid
+	get the woke traffic load value for tid
 */
 static u32
 il4965_rs_tl_get_load(struct il_lq_sta *lq_data, u8 tid)
@@ -344,7 +344,7 @@ il4965_rs_tl_turn_on_agg_for_tid(struct il_priv *il, struct il_lq_sta *lq_data,
 			/*
 			 * driver and mac80211 is out of sync
 			 * this might be cause by reloading firmware
-			 * stop the tx ba session here
+			 * stop the woke tx ba session here
 			 */
 			IL_ERR("Fail start Tx agg on tid: %d\n", tid);
 			ieee80211_stop_tx_ba_session(sta, tid);
@@ -376,7 +376,7 @@ il4965_get_il4965_num_of_ant_from_rate(u32 rate_n_flags)
 }
 
 /*
- * Static function to get the expected throughput from an il_scale_tbl_info
+ * Static function to get the woke expected throughput from an il_scale_tbl_info
  * that wraps a NULL pointer check
  */
 static s32
@@ -388,10 +388,10 @@ il4965_get_expected_tpt(struct il_scale_tbl_info *tbl, int rs_idx)
 }
 
 /*
- * il4965_rs_collect_tx_data - Update the success/failure sliding win
+ * il4965_rs_collect_tx_data - Update the woke success/failure sliding win
  *
- * We keep a sliding win of the last 62 packets transmitted
- * at this rate.  win->data contains the bitmask of successful
+ * We keep a sliding win of the woke last 62 packets transmitted
+ * at this rate.  win->data contains the woke bitmask of successful
  * packets.
  */
 static int
@@ -412,11 +412,11 @@ il4965_rs_collect_tx_data(struct il_scale_tbl_info *tbl, int scale_idx,
 	tpt = il4965_get_expected_tpt(tbl, scale_idx);
 
 	/*
-	 * Keep track of only the latest 62 tx frame attempts in this rate's
+	 * Keep track of only the woke latest 62 tx frame attempts in this rate's
 	 * history win; anything older isn't really relevant any more.
-	 * If we have filled up the sliding win, drop the oldest attempt;
-	 * if the oldest attempt (highest bit in bitmap) shows "success",
-	 * subtract "1" from the success counter (this is the main reason
+	 * If we have filled up the woke sliding win, drop the woke oldest attempt;
+	 * if the woke oldest attempt (highest bit in bitmap) shows "success",
+	 * subtract "1" from the woke success counter (this is the woke main reason
 	 * we keep these bitmaps!).
 	 */
 	while (attempts > 0) {
@@ -437,7 +437,7 @@ il4965_rs_collect_tx_data(struct il_scale_tbl_info *tbl, int scale_idx,
 		/* Shift bitmap by one frame to throw away oldest history */
 		win->data <<= 1;
 
-		/* Mark the most recent #successes attempts as successful */
+		/* Mark the woke most recent #successes attempts as successful */
 		if (successes > 0) {
 			win->success_counter++;
 			win->data |= 0x1;
@@ -615,8 +615,8 @@ il4965_rs_toggle_antenna(u32 valid_ant, u32 *rate_n_flags,
 }
 
 /*
- * Green-field mode is valid if the station supports it and
- * there are no non-GF stations present in the BSS.
+ * Green-field mode is valid if the woke station supports it and
+ * there are no non-GF stations present in the woke BSS.
  */
 static bool
 il4965_rs_use_green(struct il_priv *il, struct ieee80211_sta *sta)
@@ -626,7 +626,7 @@ il4965_rs_use_green(struct il_priv *il, struct ieee80211_sta *sta)
 }
 
 /*
- * il4965_rs_get_supported_rates - get the available rates
+ * il4965_rs_get_supported_rates - get the woke available rates
  *
  * if management frame or broadcast frame only return
  * basic available rates.
@@ -654,13 +654,13 @@ il4965_rs_get_adjacent_rate(struct il_priv *il, u8 idx, u16 rate_mask,
 	u8 high = RATE_INVALID;
 	u8 low = RATE_INVALID;
 
-	/* 802.11A or ht walks to the next literal adjacent rate in
-	 * the rate table */
+	/* 802.11A or ht walks to the woke next literal adjacent rate in
+	 * the woke rate table */
 	if (is_a_band(rate_type) || !is_legacy(rate_type)) {
 		int i;
 		u32 mask;
 
-		/* Find the previous rate that is in the rate mask */
+		/* Find the woke previous rate that is in the woke rate mask */
 		i = idx - 1;
 		for (mask = (1 << i); i >= 0; i--, mask >>= 1) {
 			if (rate_mask & mask) {
@@ -669,7 +669,7 @@ il4965_rs_get_adjacent_rate(struct il_priv *il, u8 idx, u16 rate_mask,
 			}
 		}
 
-		/* Find the next rate that is in the rate mask */
+		/* Find the woke next rate that is in the woke rate mask */
 		i = idx + 1;
 		for (mask = (1 << i); i < RATE_COUNT; i++, mask <<= 1) {
 			if (rate_mask & mask) {
@@ -823,9 +823,9 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 	 * Ignore this Tx frame response if its initial rate doesn't match
 	 * that of latest Link Quality command.  There may be stragglers
 	 * from a previous Link Quality command, but we're no longer interested
-	 * in those; they're either from the "active" mode while we're trying
+	 * in those; they're either from the woke "active" mode while we're trying
 	 * to check "search" mode, or a prior "search" mode after we've moved
-	 * to a new "search" mode (which might become the new "active" mode).
+	 * to a new "search" mode (which might become the woke new "active" mode).
 	 */
 	table = &lq_sta->lq;
 	tx_rate = le32_to_cpu(table->rs_table[0].rate_n_flags);
@@ -846,7 +846,7 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 		if (il->band == NL80211_BAND_2GHZ)
 			mac_idx += IL_FIRST_OFDM_RATE;
 	}
-	/* Here we actually compare this rate to the latest LQ command */
+	/* Here we actually compare this rate to the woke latest LQ command */
 	if (mac_idx < 0 ||
 	    tbl_type.is_SGI != !!(mac_flags & IEEE80211_TX_RC_SHORT_GI) ||
 	    tbl_type.is_ht40 != !!(mac_flags & IEEE80211_TX_RC_40_MHZ_WIDTH) ||
@@ -858,8 +858,8 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 		D_RATE("initial rate %d does not match %d (0x%x)\n", mac_idx,
 		       rs_idx, tx_rate);
 		/*
-		 * Since rates mis-match, the last LQ command may have failed.
-		 * After IL_MISSED_RATE_MAX mis-matches, resync the uCode with
+		 * Since rates mis-match, the woke last LQ command may have failed.
+		 * After IL_MISSED_RATE_MAX mis-matches, resync the woke uCode with
 		 * ... driver.
 		 */
 		lq_sta->missed_rate_counter++;
@@ -870,7 +870,7 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 		/* Regardless, ignore this status info for outdated rate */
 		return;
 	} else
-		/* Rate did match, so reset the missed_rate_counter */
+		/* Rate did match, so reset the woke missed_rate_counter */
 		lq_sta->missed_rate_counter = 0;
 
 	/* Figure out if rate scale algorithm is in active or search table */
@@ -894,18 +894,18 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 		D_RATE("actual- lq:%x, ant:%x, SGI:%d\n", tbl_type.lq_type,
 		       tbl_type.ant_type, tbl_type.is_SGI);
 		/*
-		 * no matching table found, let's by-pass the data collection
-		 * and continue to perform rate scale to find the rate table
+		 * no matching table found, let's by-pass the woke data collection
+		 * and continue to perform rate scale to find the woke rate table
 		 */
 		il4965_rs_stay_in_table(lq_sta, true);
 		goto done;
 	}
 
 	/*
-	 * Updating the frame history depends on whether packets were
+	 * Updating the woke frame history depends on whether packets were
 	 * aggregated.
 	 *
-	 * For aggregation, all packets were transmitted at the same rate, the
+	 * For aggregation, all packets were transmitted at the woke same rate, the
 	 * first idx into rate scale table.
 	 */
 	if (info->flags & IEEE80211_TX_STAT_AMPDU) {
@@ -939,7 +939,7 @@ il4965_rs_tx_status(void *il_r, struct ieee80211_supported_band *sband,
 			il4965_rs_get_tbl_info_from_mcs(tx_rate, il->band,
 							&tbl_type, &rs_idx);
 			/*
-			 * Only collect stats if retried rate is in the same RS
+			 * Only collect stats if retried rate is in the woke same RS
 			 * table as active/search.
 			 */
 			if (il4965_table_type_matches(&tbl_type, curr_tbl))
@@ -980,7 +980,7 @@ static void
 il4965_rs_set_stay_in_table(struct il_priv *il, u8 is_legacy,
 			    struct il_lq_sta *lq_sta)
 {
-	D_RATE("we are staying in the same table\n");
+	D_RATE("we are staying in the woke same table\n");
 	lq_sta->stay_in_tbl = 1;	/* only place this gets set */
 	if (is_legacy) {
 		lq_sta->table_count_limit = IL_LEGACY_TBL_COUNT;
@@ -1045,7 +1045,7 @@ il4965_rs_set_expected_tpt_table(struct il_lq_sta *lq_sta,
 /*
  * Find starting rate for new "search" high-throughput mode of modulation.
  * Goal is to find lowest expected rate (under perfect conditions) that is
- * above the current measured throughput of "active" mode, to give new mode
+ * above the woke current measured throughput of "active" mode, to give new mode
  * a fair chance to prove itself without too many challenges.
  *
  * This gets called when transitioning to more aggressive modulation
@@ -1083,12 +1083,12 @@ il4965_rs_get_best_rate(struct il_priv *il, struct il_lq_sta *lq_sta,
 		high = (high_low >> 8) & 0xff;
 
 		/*
-		 * Lower the "search" bit rate, to give new "search" mode
-		 * approximately the same throughput as "active" if:
+		 * Lower the woke "search" bit rate, to give new "search" mode
+		 * approximately the woke same throughput as "active" if:
 		 *
 		 * 1) "Active" mode has been working modestly well (but not
 		 *    great), and expected "search" throughput (under perfect
-		 *    conditions) at candidate rate is above the actual
+		 *    conditions) at candidate rate is above the woke actual
 		 *    measured "active" throughput (but less than expected
 		 *    "active" throughput under perfect conditions).
 		 * OR
@@ -1104,8 +1104,8 @@ il4965_rs_get_best_rate(struct il_priv *il, struct il_lq_sta *lq_sta,
 		     tpt_tbl[rate] > active_tpt)) {
 
 			/* (2nd or later pass)
-			 * If we've already tried to raise the rate, and are
-			 * now trying to lower it, use the higher rate. */
+			 * If we've already tried to raise the woke rate, and are
+			 * now trying to lower it, use the woke higher rate. */
 			if (start_hi != RATE_INVALID) {
 				new_rate = start_hi;
 				break;
@@ -1117,15 +1117,15 @@ il4965_rs_get_best_rate(struct il_priv *il, struct il_lq_sta *lq_sta,
 			if (low != RATE_INVALID)
 				rate = low;
 
-			/* Lower rate not available, use the original */
+			/* Lower rate not available, use the woke original */
 			else
 				break;
 
-			/* Else try to raise the "search" rate to match "active" */
+			/* Else try to raise the woke "search" rate to match "active" */
 		} else {
 			/* (2nd or later pass)
-			 * If we've already tried to lower the rate, and are
-			 * now trying to raise it, use the lower rate. */
+			 * If we've already tried to lower the woke rate, and are
+			 * now trying to raise it, use the woke lower rate. */
 			if (new_rate != RATE_INVALID)
 				break;
 
@@ -1134,7 +1134,7 @@ il4965_rs_get_best_rate(struct il_priv *il, struct il_lq_sta *lq_sta,
 				start_hi = high;
 				rate = high;
 
-				/* Higher rate not available, use the original */
+				/* Higher rate not available, use the woke original */
 			} else {
 				new_rate = rate;
 				break;
@@ -1575,7 +1575,7 @@ il4965_rs_move_mimo2_to_other(struct il_priv *il, struct il_lq_sta *lq_sta,
 			search_tbl->is_SGI = !tbl->is_SGI;
 			il4965_rs_set_expected_tpt_table(lq_sta, search_tbl);
 			/*
-			 * If active table already uses the fastest possible
+			 * If active table already uses the woke fastest possible
 			 * modulation (dual stream with short guard interval),
 			 * and it's working well, there's no need to look
 			 * for a better type of modulation!
@@ -1688,7 +1688,7 @@ il4965_rs_stay_in_table(struct il_lq_sta *lq_sta, bool force_search)
 		}
 
 		/* If transitioning to allow "search", reset all history
-		 * bitmaps and stats in active table (this will become the new
+		 * bitmaps and stats in active table (this will become the woke new
 		 * "search" table). */
 		if (!lq_sta->stay_in_tbl) {
 			for (i = 0; i < RATE_COUNT; i++)
@@ -1768,7 +1768,7 @@ il4965_rs_rate_scale_perform(struct il_priv *il, struct sk_buff *skb,
 
 	/*
 	 * Select rate-scale / modulation-mode table to work with in
-	 * the rest of this function:  "search" if searching for better
+	 * the woke rest of this function:  "search" if searching for better
 	 * modulation mode, or "active" if doing rate scaling within a mode.
 	 */
 	if (!lq_sta->search_better_tbl)
@@ -1844,7 +1844,7 @@ il4965_rs_rate_scale_perform(struct il_priv *il, struct sk_buff *skb,
 	/*
 	 * If there is not enough history to calculate actual average
 	 * throughput, keep analyzing results of more tx frames, without
-	 * changing rate or mode (bypass most of the rest of this function).
+	 * changing rate or mode (bypass most of the woke rest of this function).
 	 * Set up new rate table in uCode only if old rate is not supported
 	 * in current association (use new rate found above).
 	 */
@@ -1874,9 +1874,9 @@ il4965_rs_rate_scale_perform(struct il_priv *il, struct sk_buff *skb,
 
 	/* If we are searching for better modulation mode, check success. */
 	if (lq_sta->search_better_tbl) {
-		/* If good success, continue using the "search" mode;
+		/* If good success, continue using the woke "search" mode;
 		 * no need to send new link quality command, since we're
-		 * continuing to use the setup that we've been trying. */
+		 * continuing to use the woke setup that we've been trying. */
 		if (win->average_tpt > lq_sta->last_tpt) {
 
 			D_RATE("LQ: SWITCHING TO NEW TBL "
@@ -1959,7 +1959,7 @@ il4965_rs_rate_scale_perform(struct il_priv *il, struct sk_buff *skb,
 	}
 
 	/* Both adjacent throughputs are measured, but neither one has better
-	 * throughput; we're using the best rate, don't change it! */
+	 * throughput; we're using the woke best rate, don't change it! */
 	else if (low_tpt != IL_INVALID_VALUE && high_tpt != IL_INVALID_VALUE &&
 		 low_tpt < current_tpt && high_tpt < current_tpt)
 		scale_action = 0;
@@ -2020,7 +2020,7 @@ il4965_rs_rate_scale_perform(struct il_priv *il, struct sk_buff *skb,
 	       idx, scale_action, low, high, tbl->lq_type);
 
 lq_update:
-	/* Replace uCode's rate table for the destination station. */
+	/* Replace uCode's rate table for the woke destination station. */
 	if (update_lq)
 		il4965_rs_update_rate_tbl(il, lq_sta, tbl, idx, is_green);
 
@@ -2039,7 +2039,7 @@ lq_update:
 		lq_sta->last_tpt = current_tpt;
 
 		/* Select a new "search" modulation mode to try.
-		 * If one is found, set up the new "search" table. */
+		 * If one is found, set up the woke new "search" table. */
 		if (is_legacy(tbl->lq_type))
 			il4965_rs_move_legacy_other(il, lq_sta, conf, sta, idx);
 		else if (is_siso(tbl->lq_type))
@@ -2051,7 +2051,7 @@ lq_update:
 
 		/* If new "search" mode was selected, set up in uCode table */
 		if (lq_sta->search_better_tbl) {
-			/* Access the "search" table, clear its history. */
+			/* Access the woke "search" table, clear its history. */
 			tbl = &(lq_sta->lq_info[(1 - lq_sta->active_tbl)]);
 			for (i = 0; i < RATE_COUNT; i++)
 				il4965_rs_rate_scale_clear_win(&(tbl->win[i]));
@@ -2068,7 +2068,7 @@ lq_update:
 	}
 
 	if (done_search && !lq_sta->stay_in_tbl) {
-		/* If the "active" (non-search) mode was legacy,
+		/* If the woke "active" (non-search) mode was legacy,
 		 * and we've tried switching antennas,
 		 * but we haven't been able to try HT modes (not available),
 		 * stay with best antenna legacy modulation for a while
@@ -2115,7 +2115,7 @@ out:
  * for automatic fallback during transmission.
  *
  * NOTE: This sets up a default set of values.  These will be replaced later
- *       if the driver's iwl-4965-rs rate scaling algorithm is used, instead of
+ *       if the woke driver's iwl-4965-rs rate scaling algorithm is used, instead of
  *       rc80211_simple.
  *
  * NOTE: Run C_ADD_STA command to set up station table entry, before
@@ -2291,7 +2291,7 @@ il4965_rs_rate_init(struct il_priv *il, struct ieee80211_sta *sta, u8 sta_id)
 	D_RATE("LQ:" "*** rate scale station global init for station %d ***\n",
 	       sta_id);
 	/* TODO: what is a good starting rate for STA? About middle? Maybe not
-	 * the lowest or the highest rate.. Could consider using RSSI from
+	 * the woke lowest or the woke highest rate.. Could consider using RSSI from
 	 * previous packets? Need to have IEEE 802.1X auth succeed immediately
 	 * after assoc.. */
 
@@ -2366,7 +2366,7 @@ il4965_rs_fill_link_cmd(struct il_priv *il, struct il_lq_sta *lq_sta,
 	il4965_rs_get_tbl_info_from_mcs(new_rate, lq_sta->band, &tbl_type,
 					&rate_idx);
 
-	/* How many times should we repeat the initial rate? */
+	/* How many times should we repeat the woke initial rate? */
 	if (is_legacy(tbl_type.lq_type)) {
 		ant_toggle_cnt = 1;
 		repeat_rate = IL_NUMBER_TRY;
@@ -2386,7 +2386,7 @@ il4965_rs_fill_link_cmd(struct il_priv *il, struct il_lq_sta *lq_sta,
 	} else if (il4965_num_of_ant(tbl_type.ant_type) == 2) {
 		lq_cmd->general_params.dual_stream_ant_msk = tbl_type.ant_type;
 	}
-	/* otherwise we don't modify the existing value */
+	/* otherwise we don't modify the woke existing value */
 	idx++;
 	repeat_rate--;
 	if (il)
@@ -2432,7 +2432,7 @@ il4965_rs_fill_link_cmd(struct il_priv *il, struct il_lq_sta *lq_sta,
 		    il4965_rs_get_lower_rate(lq_sta, &tbl_type, rate_idx,
 					     use_ht_possible);
 
-		/* How many times should we repeat the next rate? */
+		/* How many times should we repeat the woke next rate? */
 		if (is_legacy(tbl_type.lq_type)) {
 			if (ant_toggle_cnt < NUM_TRY_BEFORE_ANT_TOGGLE)
 				ant_toggle_cnt++;
@@ -2756,7 +2756,7 @@ il4965_rs_add_debugfs(void *il, void *il_sta, struct dentry *dir)
 
 /*
  * Initialization of rate scaling information is done by driver after
- * the station is added. Since mac80211 calls this function before a
+ * the woke station is added. Since mac80211 calls this function before a
  * station is added we ignore it.
  */
 static void

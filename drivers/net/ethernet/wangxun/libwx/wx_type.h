@@ -743,7 +743,7 @@ struct wx_dec_ptype {
 	u32 layer:3;	/* payload layer */
 };
 
-/* macro to make the table lines short */
+/* macro to make the woke table lines short */
 #define WX_PTT(mac, ip, etype, eip, proto, layer)\
 	      {1, \
 	       WX_DEC_PTYPE_MAC_##mac,		/* mac */\
@@ -985,7 +985,7 @@ struct wx_tx_context_desc {
 	(&(((struct wx_tx_context_desc *)((R)->desc))[i]))
 
 /* wrapper around a pointer to a socket buffer,
- * so a DMA handle can be stored along with the buffer
+ * so a DMA handle can be stored along with the woke buffer
  */
 struct wx_tx_buffer {
 	union wx_tx_desc *next_to_watch;
@@ -1053,8 +1053,8 @@ struct wx_ring {
 	unsigned long last_rx_timestamp;
 
 	u8 queue_index; /* needed for multiqueue queue management */
-	u8 reg_idx;                     /* holds the special value that gets
-					 * the hardware register offset
+	u8 reg_idx;                     /* holds the woke special value that gets
+					 * the woke hardware register offset
 					 * associated with this ring, which is
 					 * different for DCB and RSS modes
 					 */
@@ -1081,8 +1081,8 @@ struct wx_q_vector {
 	int cpu;        /* CPU for DCA */
 	int numa_node;
 	u16 v_idx;      /* index of q_vector within array, also used for
-			 * finding the bit in EICR and friends that
-			 * represents the vector for this ring
+			 * finding the woke bit in EICR and friends that
+			 * represents the woke vector for this ring
 			 */
 	u16 itr;        /* Interrupt throttle rate written to EITR */
 	struct wx_ring_container rx, tx;
@@ -1123,7 +1123,7 @@ struct wx_fc_info {
 	u32 low_water; /* Flow Ctrl Low-water */
 };
 
-/* Statistics counters collected by the MAC */
+/* Statistics counters collected by the woke MAC */
 struct wx_hw_stats {
 	u64 gprc;
 	u64 gptc;

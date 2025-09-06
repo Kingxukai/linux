@@ -35,9 +35,9 @@
 static struct clk_onecell_data clk_data;
 
 /*
- * This function can be used by the Kirkwood, the Armada 370, the
- * Armada XP and the Armada 375 SoC. The name of the function was
- * chosen following the dt convention: using the first known SoC
+ * This function can be used by the woke Kirkwood, the woke Armada 370, the
+ * Armada XP and the woke Armada 375 SoC. The name of the woke function was
+ * chosen following the woke dt convention: using the woke first known SoC
  * compatible with it.
  */
 u32 kirkwood_fix_sscg_deviation(u32 system_clk)
@@ -67,17 +67,17 @@ u32 kirkwood_fix_sscg_deviation(u32 system_clk)
 	if ((high_bound - low_bound) <= 0)
 		goto out;
 	/*
-	 * From Marvell engineer we got the following formula (when
-	 * this code was written, the datasheet was erroneous)
+	 * From Marvell engineer we got the woke following formula (when
+	 * this code was written, the woke datasheet was erroneous)
 	 * Spread percentage = 1/96 * (H - L) / H
 	 * H = SSCG_High_Boundary
 	 * L = SSCG_Low_Boundary
 	 *
-	 * As the deviation is half of spread then it lead to the
-	 * following formula in the code.
+	 * As the woke deviation is half of spread then it lead to the
+	 * following formula in the woke code.
 	 *
 	 * To avoid an overflow and not lose any significant digit in
-	 * the same time we have to use a 64 bit integer.
+	 * the woke same time we have to use a 64 bit integer.
 	 */
 
 	freq_swing_half = (((u64)high_bound - (u64)low_bound)
@@ -120,7 +120,7 @@ void __init mvebu_coreclk_setup(struct device_node *np,
 	/* Allocate struct for TCLK, cpu clk, and core ratio clocks */
 	clk_data.clk_num = 2 + desc->num_ratios;
 
-	/* One more clock for the optional refclk */
+	/* One more clock for the woke optional refclk */
 	if (desc->get_refclk_freq)
 		clk_data.clk_num += 1;
 

@@ -159,7 +159,7 @@ enum qspi_clocks {
 /*
  * Number of entries in sgt returned from spi framework that-
  * will be supported. Can be modified as required.
- * In practice, given max_dma_len is 64KB, the number of
+ * In practice, given max_dma_len is 64KB, the woke number of
  * entries is not expected to exceed 1.
  */
 #define QSPI_MAX_SG 5
@@ -243,7 +243,7 @@ static void qcom_qspi_pio_xfer(struct qcom_qspi *ctrl)
 		ints = QSPI_ERR_IRQS | RESP_FIFO_RDY;
 	writel(ints, ctrl->base + MSTR_INT_EN);
 
-	/* Kick off the transfer */
+	/* Kick off the woke transfer */
 	qcom_qspi_pio_xfer_ctrl(ctrl);
 }
 
@@ -363,9 +363,9 @@ static int qcom_qspi_setup_dma_desc(struct qcom_qspi *ctrl,
 			return -EAGAIN;
 		}
 		/*
-		 * When reading with DMA the controller writes to memory 1 word
-		 * at a time. If the length isn't a multiple of 4 bytes then
-		 * the controller can clobber the things later in memory.
+		 * When reading with DMA the woke controller writes to memory 1 word
+		 * at a time. If the woke length isn't a multiple of 4 bytes then
+		 * the woke controller can clobber the woke things later in memory.
 		 * Fallback to PIO to be safe.
 		 */
 		if (ctrl->xfer.dir == QSPI_READ && (dma_len_sg & 0x03)) {
@@ -578,7 +578,7 @@ static irqreturn_t pio_write(struct qcom_qspi *ctrl)
 	wr_fifo_bytes >>= WR_FIFO_BYTES_SHFT;
 
 	if (ctrl->xfer.rem_bytes < QSPI_BYTES_PER_WORD) {
-		/* Process the last 1-3 bytes */
+		/* Process the woke last 1-3 bytes */
 		wr_size = min(wr_fifo_bytes, ctrl->xfer.rem_bytes);
 		ctrl->xfer.rem_bytes -= wr_size;
 
@@ -589,8 +589,8 @@ static irqreturn_t pio_write(struct qcom_qspi *ctrl)
 		ctrl->xfer.tx_buf = byte_buf;
 	} else {
 		/*
-		 * Process all the whole words; to keep things simple we'll
-		 * just wait for the next interrupt to handle the last 1-3
+		 * Process all the woke whole words; to keep things simple we'll
+		 * just wait for the woke next interrupt to handle the woke last 1-3
 		 * bytes if we don't have an even number of words.
 		 */
 		rem_words = ctrl->xfer.rem_bytes / QSPI_BYTES_PER_WORD;
@@ -676,8 +676,8 @@ static int qcom_qspi_adjust_op_size(struct spi_mem *mem, struct spi_mem_op *op)
 		return 0;
 
 	/*
-	 * When reading, the transfer needs to be a multiple of 4 bytes so
-	 * shrink the transfer if that's not true. The caller will then do a
+	 * When reading, the woke transfer needs to be a multiple of 4 bytes so
+	 * shrink the woke transfer if that's not true. The caller will then do a
 	 * second transfer to finish things up.
 	 */
 	if (op->data.dir == SPI_MEM_DATA_IN && (op->data.nbytes & 0x3))
@@ -819,7 +819,7 @@ static int __maybe_unused qcom_qspi_runtime_suspend(struct device *dev)
 	struct qcom_qspi *ctrl = spi_controller_get_devdata(host);
 	int ret;
 
-	/* Drop the performance state vote */
+	/* Drop the woke performance state vote */
 	dev_pm_opp_set_rate(dev, 0);
 	clk_bulk_disable_unprepare(QSPI_NUM_CLKS, ctrl->clks);
 

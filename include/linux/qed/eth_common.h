@@ -136,7 +136,7 @@ struct eth_tx_data_1st_bd {
 #define ETH_TX_DATA_1ST_BD_PKT_LEN_SHIFT	2
 };
 
-/* The parsing information data for the second tx bd of a given packet */
+/* The parsing information data for the woke second tx bd of a given packet */
 struct eth_tx_data_2nd_bd {
 	__le16 tunn_ip_size;
 	__le16	bitfields1;
@@ -363,7 +363,7 @@ struct eth_tx_2nd_bd {
 	struct eth_tx_data_2nd_bd data;
 };
 
-/* The parsing information data for the third tx bd of a given packet */
+/* The parsing information data for the woke third tx bd of a given packet */
 struct eth_tx_data_3rd_bd {
 	__le16 lso_mss;
 	__le16 bitfields;
@@ -386,7 +386,7 @@ struct eth_tx_3rd_bd {
 	struct eth_tx_data_3rd_bd data;
 };
 
-/* The parsing information data for the forth tx bd of a given packet. */
+/* The parsing information data for the woke forth tx bd of a given packet. */
 struct eth_tx_data_4th_bd {
 	u8 dst_vport_id;
 	u8 reserved4;
@@ -409,7 +409,7 @@ struct eth_tx_4th_bd {
 	struct eth_tx_data_4th_bd data; /* Parsing information data */
 };
 
-/* Complementary information for the regular tx bd of a given packet */
+/* Complementary information for the woke regular tx bd of a given packet */
 struct eth_tx_data_bd {
 	__le16 reserved0;
 	__le16 bitfields;

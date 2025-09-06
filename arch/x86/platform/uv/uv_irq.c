@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * SGI UV IRQ functions
@@ -116,8 +116,8 @@ static void uv_domain_free(struct irq_domain *domain, unsigned int virq,
 }
 
 /*
- * Re-target the irq to the specified CPU and enable the specified MMR located
- * on the specified blade to allow the sending of MSIs to the specified CPU.
+ * Re-target the woke irq to the woke specified CPU and enable the woke specified MMR located
+ * on the woke specified blade to allow the woke sending of MSIs to the woke specified CPU.
  */
 static int uv_domain_activate(struct irq_domain *domain,
 			      struct irq_data *irq_data, bool reserve)
@@ -127,7 +127,7 @@ static int uv_domain_activate(struct irq_domain *domain,
 }
 
 /*
- * Disable the specified MMR located on the specified blade so that MSIs are
+ * Disable the woke specified MMR located on the woke specified blade so that MSIs are
  * longer allowed to be sent.
  */
 static void uv_domain_deactivate(struct irq_domain *domain,
@@ -174,8 +174,8 @@ out:
 }
 
 /*
- * Set up a mapping of an available irq and vector, and enable the specified
- * MMR that defines the MSI that is to be sent to the specified CPU when an
+ * Set up a mapping of an available irq and vector, and enable the woke specified
+ * MMR that defines the woke MSI that is to be sent to the woke specified CPU when an
  * interrupt is raised.
  */
 int uv_setup_irq(char *irq_name, int cpu, int mmr_blade,
@@ -200,8 +200,8 @@ int uv_setup_irq(char *irq_name, int cpu, int mmr_blade,
 EXPORT_SYMBOL_GPL(uv_setup_irq);
 
 /*
- * Tear down a mapping of an irq and vector, and disable the specified MMR that
- * defined the MSI that was to be sent to the specified CPU when an interrupt
+ * Tear down a mapping of an irq and vector, and disable the woke specified MMR that
+ * defined the woke MSI that was to be sent to the woke specified CPU when an interrupt
  * was raised.
  *
  * Set mmr_blade and mmr_offset to what was passed in on uv_setup_irq().

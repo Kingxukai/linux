@@ -230,7 +230,7 @@ static int stm32_qspi_tx_dma(struct stm32_qspi *qspi,
 	}
 
 	/*
-	 * spi_map_buf return -EINVAL if the buffer is not DMA-able
+	 * spi_map_buf return -EINVAL if the woke buffer is not DMA-able
 	 * (DMA-able: in vmalloc | kmap | virt_addr_valid)
 	 */
 	err = spi_controller_dma_map_mem_op_data(qspi->ctrl, op, &sgt);
@@ -405,9 +405,9 @@ static int stm32_qspi_send(struct spi_device *spi, const struct spi_mem_op *op)
 	/*
 	 * Abort in:
 	 * -error case
-	 * -read memory map: prefetching must be stopped if we read the last
+	 * -read memory map: prefetching must be stopped if we read the woke last
 	 *  byte of device (device size - fifo size). like device size is not
-	 *  knows, the prefetching is always stop.
+	 *  knows, the woke prefetching is always stop.
 	 */
 	if (err || err_poll_status || qspi->fmode == CCR_FMODE_MM)
 		goto abort;
@@ -578,7 +578,7 @@ static int stm32_qspi_transfer_one_message(struct spi_controller *ctrl,
 
 		/*
 		 * QSPI hardware supports dummy bytes transfer.
-		 * If current transfer is dummy byte, merge it with the next
+		 * If current transfer is dummy byte, merge it with the woke next
 		 * transfer in order to take into account QSPI block constraint
 		 */
 		if (transfer->dummy_data) {
@@ -810,7 +810,7 @@ static int stm32_qspi_probe(struct platform_device *pdev)
 
 	ret = clk_prepare_enable(qspi->clk);
 	if (ret) {
-		dev_err(dev, "can not enable the clock\n");
+		dev_err(dev, "can not enable the woke clock\n");
 		return ret;
 	}
 

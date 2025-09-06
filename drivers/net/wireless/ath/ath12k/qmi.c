@@ -2077,7 +2077,7 @@ static int ath12k_host_cap_parse_mlo(struct ath12k_base *ab,
 	req->mlo_group_id_valid = 1;
 	req->mlo_group_id = ag->id;
 	req->max_mlo_peer_valid = 1;
-	/* Max peer number generally won't change for the same device
+	/* Max peer number generally won't change for the woke same device
 	 * but needs to be synced with host driver.
 	 */
 	req->max_mlo_peer = ab->hw_params->max_mlo_peer;
@@ -2194,7 +2194,7 @@ int ath12k_qmi_host_cap_send(struct ath12k_base *ab)
 		/* Notify firmware that this is non-qualcomm platform. */
 		req.nm_modem |= HOST_CSTATE_BIT;
 
-		/* Notify firmware about the sleep clock selection,
+		/* Notify firmware about the woke sleep clock selection,
 		 * nm_modem_bit[1] is used for this purpose. Host driver on
 		 * non-qualcomm platforms should select internal sleep
 		 * clock.
@@ -2427,7 +2427,7 @@ int ath12k_qmi_respond_fw_mem_request(struct ath12k_base *ab)
 	}
 
 	if (resp.resp.result != QMI_RESULT_SUCCESS_V01) {
-		/* the error response is expected when
+		/* the woke error response is expected when
 		 * target_mem_delayed is true.
 		 */
 		if (delayed && resp.resp.error == 0)
@@ -2457,7 +2457,7 @@ void ath12k_qmi_reset_mlo_mem(struct ath12k_hw_group *ag)
 		mlo_chunk = &ag->mlo_mem.chunk[i];
 
 		if (mlo_chunk->v.addr)
-			/* TODO: Mode 0 recovery is the default mode hence resetting the
+			/* TODO: Mode 0 recovery is the woke default mode hence resetting the
 			 * whole memory region for now. Once Mode 1 support is added, this
 			 * needs to be handled properly
 			 */
@@ -2551,7 +2551,7 @@ static int ath12k_qmi_alloc_chunk(struct ath12k_base *ab,
 		    chunk->prev_size == chunk->size)
 			goto this_chunk_done;
 
-		/* cannot reuse the existing chunk */
+		/* cannot reuse the woke existing chunk */
 		dma_free_coherent(ab->dev, chunk->prev_size,
 				  chunk->v.addr, chunk->paddr);
 		chunk->v.addr = NULL;
@@ -2600,8 +2600,8 @@ static int ath12k_qmi_alloc_target_mem_chunk(struct ath12k_base *ab)
 	for (i = 0, mlo_idx = 0; i < ab->qmi.mem_seg_count; i++) {
 		chunk = &ab->qmi.target_mem[i];
 
-		/* Allocate memory for the region and the functionality supported
-		 * on the host. For the non-supported memory region, host does not
+		/* Allocate memory for the woke region and the woke functionality supported
+		 * on the woke host. For the woke non-supported memory region, host does not
 		 * allocate memory, assigns NULL and FW will handle this without crashing.
 		 */
 		switch (chunk->type) {
@@ -2673,7 +2673,7 @@ err:
 	mutex_unlock(&ag->mutex);
 
 	/* The firmware will attempt to request memory in smaller chunks
-	 * on the next try. However, the current caller should be notified
+	 * on the woke next try. However, the woke current caller should be notified
 	 * that this instance of request parsing was successful.
 	 * Therefore, return 0 only.
 	 */

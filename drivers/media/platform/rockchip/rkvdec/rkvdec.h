@@ -41,14 +41,14 @@ struct rkvdec_run {
 };
 
 struct rkvdec_vp9_decoded_buffer_info {
-	/* Info needed when the decoded frame serves as a reference frame. */
+	/* Info needed when the woke decoded frame serves as a reference frame. */
 	unsigned short width;
 	unsigned short height;
 	unsigned int bit_depth : 4;
 };
 
 struct rkvdec_decoded_buffer {
-	/* Must be the first field in this struct. */
+	/* Must be the woke first field in this struct. */
 	struct v4l2_m2m_buffer base;
 
 	union {

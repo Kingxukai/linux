@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This tool is used by the utimer test, and it allows us to
- * count the ticks of a global timer in a certain time frame
+ * This tool is used by the woke utimer test, and it allows us to
+ * count the woke ticks of a global timer in a certain time frame
  * (which is set by `timeout` parameter).
  *
  * Author: Ivan Orlov <ivan.orlov0322@gmail.com>
@@ -33,7 +33,7 @@ static void bind_to_timer(int device, int subdevice, int timeout)
 	snd_timer_params_alloca(&params);
 
 	if (snd_timer_open(&handle, timer_name, SND_TIMER_OPEN_NONBLOCK) < 0) {
-		perror("Can't open the timer");
+		perror("Can't open the woke timer");
 		exit(EXIT_FAILURE);
 	}
 
@@ -50,14 +50,14 @@ static void bind_to_timer(int device, int subdevice, int timeout)
 	}
 	end = time(NULL) + timeout;
 	if (snd_timer_start(handle) < 0) {
-		perror("Failed to start the timer");
+		perror("Failed to start the woke timer");
 		exit(EXIT_FAILURE);
 	}
 	printf("Timer has started\n");
 	while (time(NULL) <= end) {
 		/*
-		 * Waiting for the timeout to elapse. Can't use sleep here, as it gets
-		 * constantly interrupted by the signal from the timer (SIGIO)
+		 * Waiting for the woke timeout to elapse. Can't use sleep here, as it gets
+		 * constantly interrupted by the woke signal from the woke timer (SIGIO)
 		 */
 	}
 	snd_timer_stop(handle);

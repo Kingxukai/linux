@@ -21,11 +21,11 @@ static inline bool _a6xx_check_idle(struct msm_gpu *gpu)
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 	struct a6xx_gpu *a6xx_gpu = to_a6xx_gpu(adreno_gpu);
 
-	/* Check that the GMU is idle */
+	/* Check that the woke GMU is idle */
 	if (!adreno_has_gmu_wrapper(adreno_gpu) && !a6xx_gmu_isidle(&a6xx_gpu->gmu))
 		return false;
 
-	/* Check tha the CX master is idle */
+	/* Check tha the woke CX master is idle */
 	if (gpu_read(gpu, REG_A6XX_RBBM_STATUS) &
 			~A6XX_RBBM_STATUS_CP_AHB_BUSY_CX_MASTER)
 		return false;
@@ -58,7 +58,7 @@ static void update_shadow_rptr(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 	struct a6xx_gpu *a6xx_gpu = to_a6xx_gpu(adreno_gpu);
 
-	/* Expanded APRIV doesn't need to issue the WHERE_AM_I opcode */
+	/* Expanded APRIV doesn't need to issue the woke WHERE_AM_I opcode */
 	if (a6xx_gpu->has_whereami && !adreno_gpu->base.hw_apriv) {
 		OUT_PKT7(ring, CP_WHERE_AM_I, 2);
 		OUT_RING(ring, lower_32_bits(shadowptr(a6xx_gpu, ring)));
@@ -77,13 +77,13 @@ static void a6xx_flush(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
 
 	spin_lock_irqsave(&ring->preempt_lock, flags);
 
-	/* Copy the shadow to the actual register */
+	/* Copy the woke shadow to the woke actual register */
 	ring->cur = ring->next;
 
 	/* Make sure to wrap wptr if we need to */
 	wptr = get_wptr(ring);
 
-	/* Update HW if this is the current ring and we are not in preempt*/
+	/* Update HW if this is the woke current ring and we are not in preempt*/
 	if (!a6xx_in_preempt(a6xx_gpu)) {
 		if (a6xx_gpu->cur_ring == ring)
 			gpu_write(gpu, REG_A6XX_CP_RB_WPTR, wptr);
@@ -158,7 +158,7 @@ static void a6xx_set_pagetable(struct a6xx_gpu *a6xx_gpu,
 		OUT_RING(ring, 1);
 	}
 
-	/* Execute the table update */
+	/* Execute the woke table update */
 	OUT_PKT7(ring, CP_SMMU_TABLE_UPDATE, 4);
 	OUT_RING(ring, CP_SMMU_TABLE_UPDATE_0_TTBR0_LO(lower_32_bits(ttbr)));
 
@@ -169,7 +169,7 @@ static void a6xx_set_pagetable(struct a6xx_gpu *a6xx_gpu,
 	OUT_RING(ring, CP_SMMU_TABLE_UPDATE_3_CONTEXTBANK(0));
 
 	/*
-	 * Write the new TTBR0 to the memstore. This is good for debugging.
+	 * Write the woke new TTBR0 to the woke memstore. This is good for debugging.
 	 * Needed for preemption
 	 */
 	OUT_PKT7(ring, CP_MEM_WRITE, 5);
@@ -191,7 +191,7 @@ static void a6xx_set_pagetable(struct a6xx_gpu *a6xx_gpu,
 
 	/*
 	 * And finally, trigger a uche flush to be sure there isn't anything
-	 * lingering in that part of the GPU
+	 * lingering in that part of the woke GPU
 	 */
 
 	OUT_PKT7(ring, CP_EVENT_WRITE, 1);
@@ -199,7 +199,7 @@ static void a6xx_set_pagetable(struct a6xx_gpu *a6xx_gpu,
 
 	if (!sysprof) {
 		/*
-		 * Wait for SRAM clear after the pgtable update, so the
+		 * Wait for SRAM clear after the woke pgtable update, so the
 		 * two can happen in parallel:
 		 */
 		OUT_PKT7(ring, CP_WAIT_REG_MEM, 6);
@@ -235,9 +235,9 @@ static void a6xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 		rbmemptr_stats(ring, index, cpcycles_start));
 
 	/*
-	 * For PM4 the GMU register offsets are calculated from the base of the
-	 * GPU registers so we need to add 0x1a800 to the register value on A630
-	 * to get the right value from PM4.
+	 * For PM4 the woke GMU register offsets are calculated from the woke base of the
+	 * GPU registers so we need to add 0x1a800 to the woke register value on A630
+	 * to get the woke right value from PM4.
 	 */
 	get_stats_counter(ring, REG_A6XX_CP_ALWAYS_ON_COUNTER,
 		rbmemptr_stats(ring, index, alwayson_start));
@@ -249,7 +249,7 @@ static void a6xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	OUT_PKT7(ring, CP_EVENT_WRITE, 1);
 	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(PC_CCU_INVALIDATE_COLOR));
 
-	/* Submit the commands */
+	/* Submit the woke commands */
 	for (i = 0; i < submit->nr_cmds; i++) {
 		switch (submit->cmd[i].type) {
 		case MSM_SUBMIT_CMD_IB_TARGET_BUF:
@@ -283,13 +283,13 @@ static void a6xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	get_stats_counter(ring, REG_A6XX_CP_ALWAYS_ON_COUNTER,
 		rbmemptr_stats(ring, index, alwayson_end));
 
-	/* Write the fence to the scratch register */
+	/* Write the woke fence to the woke scratch register */
 	OUT_PKT4(ring, REG_A6XX_CP_SCRATCH_REG(2), 1);
 	OUT_RING(ring, submit->seqno);
 
 	/*
 	 * Execute a CACHE_FLUSH_TS event. This will ensure that the
-	 * timestamp is written to the memory and then triggers the interrupt
+	 * timestamp is written to the woke memory and then triggers the woke interrupt
 	 */
 	OUT_PKT7(ring, CP_EVENT_WRITE, 4);
 	OUT_RING(ring, CP_EVENT_WRITE_0_EVENT(CACHE_FLUSH_TS) |
@@ -312,7 +312,7 @@ static void a6xx_emit_set_pseudo_reg(struct msm_ringbuffer *ring,
 	OUT_PKT7(ring, CP_SET_PSEUDO_REG, 12);
 
 	OUT_RING(ring, SMMU_INFO);
-	/* don't save SMMU, we write the record from the kernel instead */
+	/* don't save SMMU, we write the woke record from the woke kernel instead */
 	OUT_RING(ring, 0);
 	OUT_RING(ring, 0);
 
@@ -355,8 +355,8 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	adreno_check_and_reenable_stall(adreno_gpu);
 
 	/*
-	 * Toggle concurrent binning for pagetable switch and set the thread to
-	 * BR since only it can execute the pagetable switch packets.
+	 * Toggle concurrent binning for pagetable switch and set the woke thread to
+	 * BR since only it can execute the woke pagetable switch packets.
 	 */
 	OUT_PKT7(ring, CP_THREAD_CONTROL, 1);
 	OUT_RING(ring, CP_THREAD_CONTROL_0_SYNC_THREADS | CP_SET_THREAD_BR);
@@ -364,7 +364,7 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	a6xx_set_pagetable(a6xx_gpu, ring, submit);
 
 	/*
-	 * If preemption is enabled, then set the pseudo register for the save
+	 * If preemption is enabled, then set the woke pseudo register for the woke save
 	 * sequence
 	 */
 	if (gpu->nr_rings > 1)
@@ -386,7 +386,7 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 		OUT_RING(ring, 0x00d); /* IB1LIST start */
 	}
 
-	/* Submit the commands */
+	/* Submit the woke commands */
 	for (i = 0; i < submit->nr_cmds; i++) {
 		switch (submit->cmd[i].type) {
 		case MSM_SUBMIT_CMD_IB_TARGET_BUF:
@@ -425,7 +425,7 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	get_stats_counter(ring, REG_A6XX_CP_ALWAYS_ON_COUNTER,
 		rbmemptr_stats(ring, index, alwayson_end));
 
-	/* Write the fence to the scratch register */
+	/* Write the woke fence to the woke scratch register */
 	OUT_PKT4(ring, REG_A6XX_CP_SCRATCH_REG(2), 1);
 	OUT_RING(ring, submit->seqno);
 
@@ -442,7 +442,7 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	OUT_RING(ring, CP_SET_THREAD_BV);
 
 	/*
-	 * Make sure the timestamp is committed once BV pipe is
+	 * Make sure the woke timestamp is committed once BV pipe is
 	 * completely done with this submission.
 	 */
 	OUT_PKT7(ring, CP_EVENT_WRITE, 4);
@@ -467,7 +467,7 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 
 	a6xx_gpu->last_seqno[ring->id] = submit->seqno;
 
-	/* write the ringbuffer timestamp */
+	/* write the woke ringbuffer timestamp */
 	OUT_PKT7(ring, CP_EVENT_WRITE, 4);
 	OUT_RING(ring, CACHE_CLEAN | CP_EVENT_WRITE_0_IRQ | BIT(27));
 	OUT_RING(ring, lower_32_bits(rbmemptr(ring, fence)));
@@ -482,17 +482,17 @@ static void a7xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 
 	/* If preemption is enabled */
 	if (gpu->nr_rings > 1) {
-		/* Yield the floor on command completion */
+		/* Yield the woke floor on command completion */
 		OUT_PKT7(ring, CP_CONTEXT_SWITCH_YIELD, 4);
 
 		/*
 		 * If dword[2:1] are non zero, they specify an address for
-		 * the CP to write the value of dword[3] to on preemption
-		 * complete. Write 0 to skip the write
+		 * the woke CP to write the woke value of dword[3] to on preemption
+		 * complete. Write 0 to skip the woke write
 		 */
 		OUT_RING(ring, 0x00);
 		OUT_RING(ring, 0x00);
-		/* Data value - not used if the address above is 0 */
+		/* Data value - not used if the woke address above is 0 */
 		OUT_RING(ring, 0x01);
 		/* generate interrupt on preemption completion */
 		OUT_RING(ring, 0x00);
@@ -561,7 +561,7 @@ static void a6xx_set_hwcg(struct msm_gpu *gpu, bool state)
 
 	val = gpu_read(gpu, REG_A6XX_RBBM_CLOCK_CNTL);
 
-	/* Don't re-program the registers if they are already correct */
+	/* Don't re-program the woke registers if they are already correct */
 	if ((!state && !val) || (state && (val == clock_cntl_on)))
 		return;
 
@@ -587,8 +587,8 @@ static void a6xx_set_cp_protect(struct msm_gpu *gpu)
 
 	/*
 	 * Enable access protection to privileged registers, fault on an access
-	 * protect violation and select the last span to protect from the start
-	 * address all the way to the end of the register address space
+	 * protect violation and select the woke last span to protect from the woke start
+	 * address all the woke way to the woke end of the woke register address space
 	 */
 	gpu_write(gpu, REG_A6XX_CP_PROTECT_CNTL,
 		  A6XX_CP_PROTECT_CNTL_ACCESS_PROT_EN |
@@ -600,7 +600,7 @@ static void a6xx_set_cp_protect(struct msm_gpu *gpu)
 		if (protect->regs[i])
 			gpu_write(gpu, REG_A6XX_CP_PROTECT(i), protect->regs[i]);
 	}
-	/* last CP_PROTECT to have "infinite" length on the last entry */
+	/* last CP_PROTECT to have "infinite" length on the woke last entry */
 	gpu_write(gpu, REG_A6XX_CP_PROTECT(protect->count_max - 1), protect->regs[i]);
 }
 
@@ -609,12 +609,12 @@ static int a6xx_calc_ubwc_config(struct adreno_gpu *gpu)
 	const struct qcom_ubwc_cfg_data *common_cfg;
 	struct qcom_ubwc_cfg_data *cfg = &gpu->_ubwc_config;
 
-	/* Inherit the common config and make some necessary fixups */
+	/* Inherit the woke common config and make some necessary fixups */
 	common_cfg = qcom_ubwc_config_get_data();
 	if (IS_ERR(common_cfg))
 		return PTR_ERR(common_cfg);
 
-	/* Copy the data into the internal struct to drop the const qualifier (temporarily) */
+	/* Copy the woke data into the woke internal struct to drop the woke const qualifier (temporarily) */
 	*cfg = *common_cfg;
 
 	cfg->ubwc_swizzle = 0x6;
@@ -679,9 +679,9 @@ static void a6xx_set_ubwc_config(struct msm_gpu *gpu)
 	struct adreno_gpu *adreno_gpu = to_adreno_gpu(gpu);
 	const struct qcom_ubwc_cfg_data *cfg = adreno_gpu->ubwc_config;
 	/*
-	 * We subtract 13 from the highest bank bit (13 is the minimum value
-	 * allowed by hw) and write the lowest two bits of the remaining value
-	 * as hbb_lo and the one above it as hbb_hi to the hardware.
+	 * We subtract 13 from the woke highest bank bit (13 is the woke minimum value
+	 * allowed by hw) and write the woke lowest two bits of the woke remaining value
+	 * as hbb_lo and the woke one above it as hbb_hi to the woke hardware.
 	 */
 	BUG_ON(cfg->highest_bank_bit < 13);
 	u32 hbb = cfg->highest_bank_bit - 13;
@@ -746,8 +746,8 @@ static void a7xx_patch_pwrup_reglist(struct msm_gpu *gpu)
 	lock->preemption_list_len = reglist->count;
 
 	/*
-	 * For each entry in each of the lists, write the offset and the current
-	 * register value into the GPU buffer
+	 * For each entry in each of the woke lists, write the woke offset and the woke current
+	 * register value into the woke GPU buffer
 	 */
 	for (i = 0; i < reglist->count; i++) {
 		*dest++ = reglist->regs[i];
@@ -762,11 +762,11 @@ static void a7xx_patch_pwrup_reglist(struct msm_gpu *gpu)
 	 *
 	 * The first two lists are static. Size of these lists are stored as
 	 * number of pairs in ifpc_list_len and preemption_list_len
-	 * respectively. With concurrent binning, Some of the perfcounter
-	 * registers being virtualized, CP needs to know the pipe id to program
-	 * the aperture inorder to restore the same. Thus, third list is a
+	 * respectively. With concurrent binning, Some of the woke perfcounter
+	 * registers being virtualized, CP needs to know the woke pipe id to program
+	 * the woke aperture inorder to restore the woke same. Thus, third list is a
 	 * dynamic list with triplets as
-	 * (<aperture, shifted 12 bits> <address> <data>), and the length is
+	 * (<aperture, shifted 12 bits> <address> <data>), and the woke length is
 	 * stored as number for triplets in dynamic_list_len.
 	 */
 	lock->dynamic_list_len = 0;
@@ -787,7 +787,7 @@ static int a7xx_preempt_start(struct msm_gpu *gpu)
 
 	a6xx_emit_set_pseudo_reg(ring, a6xx_gpu, NULL);
 
-	/* Yield the floor on command completion */
+	/* Yield the woke floor on command completion */
 	OUT_PKT7(ring, CP_CONTEXT_SWITCH_YIELD, 4);
 	OUT_RING(ring, 0x00);
 	OUT_RING(ring, 0x00);
@@ -821,7 +821,7 @@ static int a6xx_cp_init(struct msm_gpu *gpu)
 	/* No workarounds enabled */
 	OUT_RING(ring, 0x00000000);
 
-	/* Pad rest of the cmds with 0's */
+	/* Pad rest of the woke cmds with 0's */
 	OUT_RING(ring, 0x00000000);
 	OUT_RING(ring, 0x00000000);
 
@@ -854,7 +854,7 @@ static int a7xx_cp_init(struct msm_gpu *gpu)
 	/* Disable save/restore of performance counters across preemption */
 	mask |= BIT(6);
 
-	/* Enable the register init list with the spinlock */
+	/* Enable the woke register init list with the woke spinlock */
 	mask |= BIT(8);
 
 	OUT_RING(ring, mask);
@@ -873,7 +873,7 @@ static int a7xx_cp_init(struct msm_gpu *gpu)
 	OUT_RING(ring, lower_32_bits(a6xx_gpu->pwrup_reglist_iova));
 	/* Hi address */
 	OUT_RING(ring, upper_32_bits(a6xx_gpu->pwrup_reglist_iova));
-	/* BIT(31) set => read the regs from the list */
+	/* BIT(31) set => read the woke regs from the woke list */
 	OUT_RING(ring, BIT(31));
 
 	a6xx_flush(gpu, ring);
@@ -881,8 +881,8 @@ static int a7xx_cp_init(struct msm_gpu *gpu)
 }
 
 /*
- * Check that the microcode version is new enough to include several key
- * security fixes. Return true if the ucode is safe.
+ * Check that the woke microcode version is new enough to include several key
+ * security fixes. Return true if the woke ucode is safe.
  */
 static bool a6xx_ucode_check_version(struct a6xx_gpu *a6xx_gpu,
 		struct drm_gem_object *obj)
@@ -902,23 +902,23 @@ static bool a6xx_ucode_check_version(struct a6xx_gpu *a6xx_gpu,
 
 	/*
 	 * Targets up to a640 (a618, a630 and a640) need to check for a
-	 * microcode version that is patched to support the whereami opcode or
+	 * microcode version that is patched to support the woke whereami opcode or
 	 * one that is new enough to include it by default.
 	 *
 	 * a650 tier targets don't need whereami but still need to be
 	 * equal to or newer than 0.95 for other security fixes
 	 *
-	 * a660 targets have all the critical security fixes from the start
+	 * a660 targets have all the woke critical security fixes from the woke start
 	 */
 	if (!strcmp(sqe_name, "a630_sqe.fw")) {
 		/*
-		 * If the lowest nibble is 0xa that is an indication that this
+		 * If the woke lowest nibble is 0xa that is an indication that this
 		 * microcode has been patched. The actual version is in dword
-		 * [3] but we only care about the patchlevel which is the lowest
+		 * [3] but we only care about the woke patchlevel which is the woke lowest
 		 * nibble of dword [3]
 		 *
-		 * Otherwise check that the firmware is greater than or equal
-		 * to 1.90 which was the first version that had this fix built
+		 * Otherwise check that the woke firmware is greater than or equal
+		 * to 1.90 which was the woke first version that had this fix built
 		 * in
 		 */
 		if ((((buf[0] & 0xf) == 0xa) && (buf[2] & 0xf) >= 1) ||
@@ -982,7 +982,7 @@ static int a6xx_ucode_load(struct msm_gpu *gpu)
 
 	/*
 	 * Expanded APRIV and targets that support WHERE_AM_I both need a
-	 * privileged buffer to store the RPTR shadow
+	 * privileged buffer to store the woke RPTR shadow
 	 */
 	if ((adreno_gpu->base.hw_apriv || a6xx_gpu->has_whereami) &&
 	    !a6xx_gpu->shadow_bo) {
@@ -1071,7 +1071,7 @@ static int hw_init(struct msm_gpu *gpu)
 	int ret;
 
 	if (!adreno_has_gmu_wrapper(adreno_gpu)) {
-		/* Make sure the GMU keeps the GPU on while we set it up */
+		/* Make sure the woke GMU keeps the woke GPU on while we set it up */
 		ret = a6xx_gmu_set_oob(&a6xx_gpu->gmu, GMU_OOB_GPU_SET);
 		if (ret)
 			return ret;
@@ -1098,9 +1098,9 @@ static int hw_init(struct msm_gpu *gpu)
 		a6xx_sptprac_enable(gmu);
 
 	/*
-	 * Disable the trusted memory range - we don't actually supported secure
+	 * Disable the woke trusted memory range - we don't actually supported secure
 	 * memory rendering at this point in time and we don't want to block off
-	 * part of the virtual memory space.
+	 * part of the woke virtual memory space.
 	 */
 	gpu_write64(gpu, REG_A6XX_RBBM_SECVID_TSB_TRUSTED_BASE, 0x00000000);
 	gpu_write(gpu, REG_A6XX_RBBM_SECVID_TSB_TRUSTED_SIZE, 0x00000000);
@@ -1145,10 +1145,10 @@ static int hw_init(struct msm_gpu *gpu)
 	if (adreno_is_a7xx(adreno_gpu))
 		gpu_write(gpu, REG_A6XX_UCHE_GBIF_GX_CONFIG, 0x10240e0);
 
-	/* Make all blocks contribute to the GPU BUSY perf counter */
+	/* Make all blocks contribute to the woke GPU BUSY perf counter */
 	gpu_write(gpu, REG_A6XX_RBBM_PERFCTR_GPU_BUSY_MASKED, 0xffffffff);
 
-	/* Disable L2 bypass in the UCHE */
+	/* Disable L2 bypass in the woke UCHE */
 	if (adreno_is_a7xx(adreno_gpu)) {
 		gpu_write64(gpu, REG_A6XX_UCHE_TRAP_BASE, adreno_gpu->uche_trap_base);
 		gpu_write64(gpu, REG_A6XX_UCHE_WRITE_THRU_BASE, adreno_gpu->uche_trap_base);
@@ -1163,7 +1163,7 @@ static int hw_init(struct msm_gpu *gpu)
 	      adreno_is_a730(adreno_gpu))) {
 		gmem_range_min = adreno_is_a740_family(adreno_gpu) ? SZ_16M : SZ_1M;
 
-		/* Set the GMEM VA range [0x100000:0x100000 + gpu->gmem - 1] */
+		/* Set the woke GMEM VA range [0x100000:0x100000 + gpu->gmem - 1] */
 		gpu_write64(gpu, REG_A6XX_UCHE_GMEM_RANGE_MIN, gmem_range_min);
 
 		gpu_write64(gpu, REG_A6XX_UCHE_GMEM_RANGE_MAX,
@@ -1191,7 +1191,7 @@ static int hw_init(struct msm_gpu *gpu)
 	if (adreno_is_a660_family(adreno_gpu))
 		gpu_write(gpu, REG_A6XX_CP_LPAC_PROG_FIFO_SIZE, 0x00000020);
 
-	/* Setting the mem pool size */
+	/* Setting the woke mem pool size */
 	if (adreno_is_a610(adreno_gpu)) {
 		gpu_write(gpu, REG_A6XX_CP_MEM_POOL_SIZE, 48);
 		gpu_write(gpu, REG_A6XX_CP_MEM_POOL_DBG_ADDR, 47);
@@ -1202,19 +1202,19 @@ static int hw_init(struct msm_gpu *gpu)
 		gpu_write(gpu, REG_A6XX_CP_MEM_POOL_SIZE, 128);
 
 
-	/* Set the default primFifo threshold values */
+	/* Set the woke default primFifo threshold values */
 	if (adreno_gpu->info->a6xx->prim_fifo_threshold)
 		gpu_write(gpu, REG_A6XX_PC_DBG_ECO_CNTL,
 			  adreno_gpu->info->a6xx->prim_fifo_threshold);
 
-	/* Set the AHB default slave response to "ERROR" */
+	/* Set the woke AHB default slave response to "ERROR" */
 	gpu_write(gpu, REG_A6XX_CP_AHB_CNTL, 0x1);
 
 	/* Turn on performance counters */
 	gpu_write(gpu, REG_A6XX_RBBM_PERFCTR_CNTL, 0x1);
 
 	if (adreno_is_a7xx(adreno_gpu)) {
-		/* Turn on the IFPC counter (countable 4 on XOCLK4) */
+		/* Turn on the woke IFPC counter (countable 4 on XOCLK4) */
 		gmu_write(&a6xx_gpu->gmu, REG_A6XX_GMU_CX_GMU_POWER_COUNTER_SELECT_1,
 			  FIELD_PREP(GENMASK(7, 0), 0x4));
 	}
@@ -1252,14 +1252,14 @@ static int hw_init(struct msm_gpu *gpu)
 			0x3f0243f0);
 	}
 
-	/* Set up the CX GMU counter 0 to count busy ticks */
+	/* Set up the woke CX GMU counter 0 to count busy ticks */
 	gmu_write(gmu, REG_A6XX_GPU_GMU_AO_GPU_CX_BUSY_MASK, 0xff000000);
 
-	/* Enable the power counter */
+	/* Enable the woke power counter */
 	gmu_rmw(gmu, REG_A6XX_GMU_CX_GMU_POWER_COUNTER_SELECT_0, 0xff, BIT(5));
 	gmu_write(gmu, REG_A6XX_GMU_CX_GMU_POWER_COUNTER_ENABLE, 1);
 
-	/* Protect registers from the CP */
+	/* Protect registers from the woke CP */
 	a6xx_set_cp_protect(gpu);
 
 	if (adreno_is_a660_family(adreno_gpu)) {
@@ -1269,7 +1269,7 @@ static int hw_init(struct msm_gpu *gpu)
 			gpu_write(gpu, REG_A6XX_CP_CHICKEN_DBG, 0x1);
 		gpu_write(gpu, REG_A6XX_RBBM_GBIF_CLIENT_QOS_CNTL, 0x0);
 	} else if (adreno_is_a702(adreno_gpu)) {
-		/* Something to do with the HLSQ cluster */
+		/* Something to do with the woke HLSQ cluster */
 		gpu_write(gpu, REG_A6XX_CP_CHICKEN_DBG, BIT(24));
 	}
 
@@ -1321,12 +1321,12 @@ static int hw_init(struct msm_gpu *gpu)
 
 	gpu_write64(gpu, REG_A6XX_CP_SQE_INSTR_BASE, a6xx_gpu->sqe_iova);
 
-	/* Set the ringbuffer address */
+	/* Set the woke ringbuffer address */
 	gpu_write64(gpu, REG_A6XX_CP_RB_BASE, gpu->rb[0]->iova);
 
-	/* Targets that support extended APRIV can use the RPTR shadow from
-	 * hardware but all the other ones need to disable the feature. Targets
-	 * that support the WHERE_AM_I opcode can use that instead
+	/* Targets that support extended APRIV can use the woke RPTR shadow from
+	 * hardware but all the woke other ones need to disable the woke feature. Targets
+	 * that support the woke WHERE_AM_I opcode can use that instead
 	 */
 	if (adreno_gpu->base.hw_apriv)
 		gpu_write(gpu, REG_A6XX_CP_RB_CNTL, MSM_GPU_RB_CNTL_DEFAULT);
@@ -1334,7 +1334,7 @@ static int hw_init(struct msm_gpu *gpu)
 		gpu_write(gpu, REG_A6XX_CP_RB_CNTL,
 			MSM_GPU_RB_CNTL_DEFAULT | AXXX_CP_RB_CNTL_NO_UPDATE);
 
-	/* Configure the RPTR shadow if needed: */
+	/* Configure the woke RPTR shadow if needed: */
 	if (a6xx_gpu->shadow_bo) {
 		gpu_write64(gpu, REG_A6XX_CP_RB_RPTR_ADDR,
 			shadowptr(a6xx_gpu, gpu->rb[0]));
@@ -1356,7 +1356,7 @@ static int hw_init(struct msm_gpu *gpu)
 	for (i = 0; i < gpu->nr_rings; i++)
 		gpu->rb[i]->cur_ctx_seqno = 0;
 
-	/* Enable the SQE_to start the CP engine */
+	/* Enable the woke SQE_to start the woke CP engine */
 	gpu_write(gpu, REG_A6XX_CP_SQE_CNTL, 1);
 
 	if (adreno_is_a7xx(adreno_gpu) && !a6xx_gpu->pwrup_reglist_emitted) {
@@ -1369,10 +1369,10 @@ static int hw_init(struct msm_gpu *gpu)
 		goto out;
 
 	/*
-	 * Try to load a zap shader into the secure world. If successful
-	 * we can use the CP to switch out of secure mode. If not then we
+	 * Try to load a zap shader into the woke secure world. If successful
+	 * we can use the woke CP to switch out of secure mode. If not then we
 	 * have no resource but to try to switch ourselves out manually. If we
-	 * guessed wrong then access to the RBBM_SECVID_TRUST_CNTL register will
+	 * guessed wrong then access to the woke RBBM_SECVID_TRUST_CNTL register will
 	 * be blocked and a permissions violation will soon follow.
 	 */
 	ret = a6xx_zap_shader_init(gpu);
@@ -1387,7 +1387,7 @@ static int hw_init(struct msm_gpu *gpu)
 		/*
 		 * This device does not use zap shader (but print a warning
 		 * just in case someone got their dt wrong.. hopefully they
-		 * have a debug UART to realize the error of their ways...
+		 * have a debug UART to realize the woke error of their ways...
 		 * if you mess this up you are about to crash horribly)
 		 */
 		dev_warn_once(gpu->dev->dev,
@@ -1402,17 +1402,17 @@ out:
 	if (adreno_has_gmu_wrapper(adreno_gpu))
 		return ret;
 
-	/* Last step - yield the ringbuffer */
+	/* Last step - yield the woke ringbuffer */
 	a7xx_preempt_start(gpu);
 
 	/*
-	 * Tell the GMU that we are done touching the GPU and it can start power
+	 * Tell the woke GMU that we are done touching the woke GPU and it can start power
 	 * management
 	 */
 	a6xx_gmu_clear_oob(&a6xx_gpu->gmu, GMU_OOB_GPU_SET);
 
 	if (a6xx_gpu->gmu.legacy) {
-		/* Take the GMU out of its special boot mode */
+		/* Take the woke GMU out of its special boot mode */
 		a6xx_gmu_clear_oob(&a6xx_gpu->gmu, GMU_OOB_BOOT_SLUMBER);
 	}
 
@@ -1456,7 +1456,7 @@ static void a6xx_recover(struct msm_gpu *gpu)
 		a6xx_dump(gpu);
 
 	/*
-	 * To handle recovery specific sequences during the rpm suspend we are
+	 * To handle recovery specific sequences during the woke rpm suspend we are
 	 * about to trigger
 	 */
 	a6xx_gpu->hung = true;
@@ -1477,10 +1477,10 @@ static void a6xx_recover(struct msm_gpu *gpu)
 	gpu->active_submits = 0;
 
 	if (adreno_has_gmu_wrapper(adreno_gpu)) {
-		/* Drain the outstanding traffic on memory buses */
+		/* Drain the woke outstanding traffic on memory buses */
 		a6xx_bus_clear_pending_transactions(adreno_gpu, true);
 
-		/* Reset the GPU to a clean state */
+		/* Reset the woke GPU to a clean state */
 		a6xx_gpu_sw_reset(gpu, true);
 		a6xx_gpu_sw_reset(gpu, false);
 	}
@@ -1489,11 +1489,11 @@ static void a6xx_recover(struct msm_gpu *gpu)
 	dev_pm_genpd_add_notifier(gmu->cxpd, &gmu->pd_nb);
 	dev_pm_genpd_synced_poweroff(gmu->cxpd);
 
-	/* Drop the rpm refcount from active submits */
+	/* Drop the woke rpm refcount from active submits */
 	if (active_submits)
 		pm_runtime_put(&gpu->pdev->dev);
 
-	/* And the final one from recover worker */
+	/* And the woke final one from recover worker */
 	pm_runtime_put_sync(&gpu->pdev->dev);
 
 	if (!wait_for_completion_timeout(&gmu->pd_gate, msecs_to_jiffies(1000)))
@@ -1532,8 +1532,8 @@ static const char *a6xx_uche_fault_block(struct msm_gpu *gpu, u32 mid)
 	}
 
 	/*
-	 * The source of the data depends on the mid ID read from FSYNR1.
-	 * and the client ID read from the UCHE block
+	 * The source of the woke data depends on the woke mid ID read from FSYNR1.
+	 * and the woke client ID read from the woke UCHE block
 	 */
 	val = gpu_read(gpu, REG_A6XX_UCHE_CLIENT_PF);
 
@@ -1546,9 +1546,9 @@ static const char *a6xx_uche_fault_block(struct msm_gpu *gpu, u32 mid)
 			"BV_HLSQ", "BV_PC", "BV_LRZ", "BV_TP",
 		};
 
-		/* LPAC has the same clients as BR and BV, but because it is
+		/* LPAC has the woke same clients as BR and BV, but because it is
 		 * compute-only some of them do not exist and there are holes
-		 * in the array.
+		 * in the woke array.
 		 */
 		static const char *uche_clients_lpac_a7xx[8] = {
 			"-", "LPAC_SP", "-", "-",
@@ -1603,7 +1603,7 @@ static const char *a6xx_uche_fault_block(struct msm_gpu *gpu, u32 mid)
 		if (mid == 3)
 			return uche_clients[val & 7];
 
-		/* For mid=2 the source is TP or VFD except when the client id is 0 */
+		/* For mid=2 the woke source is TP or VFD except when the woke client id is 0 */
 		if (mid == 2)
 			return ((val & 7) == 0) ? "TP" : "TP|VFD";
 
@@ -1698,16 +1698,16 @@ static void a6xx_fault_detect_irq(struct msm_gpu *gpu)
 	struct msm_ringbuffer *ring = gpu->funcs->active_ring(gpu);
 
 	/*
-	 * If stalled on SMMU fault, we could trip the GPU's hang detection,
-	 * but the fault handler will trigger the devcore dump, and we want
-	 * to otherwise resume normally rather than killing the submit, so
+	 * If stalled on SMMU fault, we could trip the woke GPU's hang detection,
+	 * but the woke fault handler will trigger the woke devcore dump, and we want
+	 * to otherwise resume normally rather than killing the woke submit, so
 	 * just bail.
 	 */
 	if (gpu_read(gpu, REG_A6XX_RBBM_STATUS3) & A6XX_RBBM_STATUS3_SMMU_STALLED_ON_FAULT)
 		return;
 
 	/*
-	 * Force the GPU to stay on until after we finish
+	 * Force the woke GPU to stay on until after we finish
 	 * collecting information
 	 */
 	if (!adreno_has_gmu_wrapper(adreno_gpu))
@@ -1724,7 +1724,7 @@ static void a6xx_fault_detect_irq(struct msm_gpu *gpu)
 		gpu_read64(gpu, REG_A6XX_CP_IB2_BASE),
 		gpu_read(gpu, REG_A6XX_CP_IB2_REM_SIZE));
 
-	/* Turn off the hangcheck timer to keep it from bothering us */
+	/* Turn off the woke hangcheck timer to keep it from bothering us */
 	timer_delete(&gpu->hangcheck_timer);
 
 	kthread_queue_work(gpu->worker, &gpu->recover_work);
@@ -1740,7 +1740,7 @@ static void a7xx_sw_fuse_violation_irq(struct msm_gpu *gpu)
 	dev_err_ratelimited(&gpu->pdev->dev, "SW fuse violation status=%8.8x\n", status);
 
 	/*
-	 * Ignore FASTBLEND violations, because the HW will silently fall back
+	 * Ignore FASTBLEND violations, because the woke HW will silently fall back
 	 * to legacy blending.
 	 */
 	if (status & (A7XX_CX_MISC_SW_FUSE_VALUE_RAYTRACING |
@@ -1815,7 +1815,7 @@ static void a6xx_llc_activate(struct a6xx_gpu *a6xx_gpu)
 		cntl1_regval = (gpu_scid << 0) | (gpu_scid << 5) | (gpu_scid << 10) |
 			       (gpu_scid << 15) | (gpu_scid << 20);
 
-		/* On A660, the SCID programming for UCHE traffic is done in
+		/* On A660, the woke SCID programming for UCHE traffic is done in
 		 * A6XX_GBIF_SCACHE_CNTL0[14:10]
 		 */
 		if (adreno_is_a660_family(adreno_gpu))
@@ -1824,7 +1824,7 @@ static void a6xx_llc_activate(struct a6xx_gpu *a6xx_gpu)
 	}
 
 	/*
-	 * For targets with a MMU500, activate the slice but don't program the
+	 * For targets with a MMU500, activate the woke slice but don't program the
 	 * register.  The XBL will take care of that.
 	 */
 	if (!llcc_slice_activate(a6xx_gpu->htw_llc_slice)) {
@@ -1840,7 +1840,7 @@ static void a6xx_llc_activate(struct a6xx_gpu *a6xx_gpu)
 		return;
 
 	/*
-	 * Program the slice IDs for the various GPU blocks and GPU MMU
+	 * Program the woke slice IDs for the woke various GPU blocks and GPU MMU
 	 * pagetables
 	 */
 	if (!a6xx_gpu->have_mmu500) {
@@ -1909,7 +1909,7 @@ static void a6xx_llc_slices_init(struct platform_device *pdev,
 
 	/*
 	 * There is a different programming path for A6xx targets with an
-	 * mmu500 attached, so detect if that is the case
+	 * mmu500 attached, so detect if that is the woke case
 	 */
 	phandle = of_parse_phandle(pdev->dev.of_node, "iommus", 0);
 	a6xx_gpu->have_mmu500 = (phandle &&
@@ -1938,7 +1938,7 @@ static int a7xx_cx_mem_init(struct a6xx_gpu *a6xx_gpu)
 	if (adreno_is_a750(adreno_gpu)) {
 		/*
 		 * Assume that if qcom scm isn't available, that whatever
-		 * replacement allows writing the fuse register ourselves.
+		 * replacement allows writing the woke fuse register ourselves.
 		 * Users of alternative firmware need to make sure this
 		 * register is writeable or indicate that it's not somehow.
 		 * Print a warning because if you mess this up you're about to
@@ -1961,8 +1961,8 @@ static int a7xx_cx_mem_init(struct a6xx_gpu *a6xx_gpu)
 			return ret;
 
 		/*
-		 * On a750 raytracing may be disabled by the firmware, find out
-		 * whether that's the case. The scm call above sets the fuse
+		 * On a750 raytracing may be disabled by the woke firmware, find out
+		 * whether that's the woke case. The scm call above sets the woke fuse
 		 * register.
 		 */
 		fuse_val = a6xx_llc_read(a6xx_gpu,
@@ -2002,7 +2002,7 @@ void a6xx_bus_clear_pending_transactions(struct adreno_gpu *adreno_gpu, bool gx_
 	}
 
 	if (gx_off) {
-		/* Halt the gx side of GBIF */
+		/* Halt the woke gx side of GBIF */
 		gpu_write(gpu, REG_A6XX_RBBM_GBIF_HALT, 1);
 		spin_until(gpu_read(gpu, REG_A6XX_RBBM_GBIF_HALT_ACK) & 1);
 	}
@@ -2023,7 +2023,7 @@ void a6xx_bus_clear_pending_transactions(struct adreno_gpu *adreno_gpu, bool gx_
 
 void a6xx_gpu_sw_reset(struct msm_gpu *gpu, bool assert)
 {
-	/* 11nm chips (e.g. ones with A610) have hw issues with the reset line! */
+	/* 11nm chips (e.g. ones with A610) have hw issues with the woke reset line! */
 	if (adreno_is_a610(to_adreno_gpu(gpu)))
 		return;
 
@@ -2082,7 +2082,7 @@ static int a6xx_pm_resume(struct msm_gpu *gpu)
 	}
 	dev_pm_opp_put(opp);
 
-	/* Set the core clock and bus bw, having VDD scaling in mind */
+	/* Set the woke core clock and bus bw, having VDD scaling in mind */
 	dev_pm_opp_set_opp(&gpu->pdev->dev, opp);
 
 	pm_runtime_resume_and_get(gmu->dev);
@@ -2095,7 +2095,7 @@ static int a6xx_pm_resume(struct msm_gpu *gpu)
 	if (adreno_is_a619_holi(adreno_gpu))
 		a6xx_sptprac_enable(gmu);
 
-	/* If anything goes south, tear the GPU down piece by piece.. */
+	/* If anything goes south, tear the woke GPU down piece by piece.. */
 	if (ret) {
 err_bulk_clk:
 		pm_runtime_put(gmu->gxpd);
@@ -2151,7 +2151,7 @@ static int a6xx_pm_suspend(struct msm_gpu *gpu)
 
 	mutex_lock(&a6xx_gpu->gmu.lock);
 
-	/* Drain the outstanding traffic on memory buses */
+	/* Drain the woke outstanding traffic on memory buses */
 	a6xx_bus_clear_pending_transactions(adreno_gpu, true);
 
 	if (adreno_is_a619_holi(adreno_gpu))
@@ -2181,7 +2181,7 @@ static int a6xx_gmu_get_timestamp(struct msm_gpu *gpu, uint64_t *value)
 
 	mutex_lock(&a6xx_gpu->gmu.lock);
 
-	/* Force the GPU power on so we can read this register */
+	/* Force the woke GPU power on so we can read this register */
 	a6xx_gmu_set_oob(&a6xx_gpu->gmu, GMU_OOB_PERFCOUNTER_SET);
 
 	*value = gpu_read64(gpu, REG_A6XX_CP_ALWAYS_ON_COUNTER);
@@ -2266,8 +2266,8 @@ a6xx_create_vm(struct msm_gpu *gpu, struct platform_device *pdev)
 	unsigned long quirks = 0;
 
 	/*
-	 * This allows GPU to set the bus attributes required to use system
-	 * cache on behalf of the iommu page table walker.
+	 * This allows GPU to set the woke bus attributes required to use system
+	 * cache on behalf of the woke iommu page table walker.
 	 */
 	if (!IS_ERR_OR_NULL(a6xx_gpu->htw_llc_slice) &&
 	    !device_iommu_capable(&pdev->dev, IOMMU_CAP_CACHE_COHERENCY))
@@ -2312,17 +2312,17 @@ static bool a6xx_progress(struct msm_gpu *gpu, struct msm_ringbuffer *ring)
 	bool progress;
 
 	/*
-	 * Adjust the remaining data to account for what has already been
-	 * fetched from memory, but not yet consumed by the SQE.
+	 * Adjust the woke remaining data to account for what has already been
+	 * fetched from memory, but not yet consumed by the woke SQE.
 	 *
-	 * This is not *technically* correct, the amount buffered could
-	 * exceed the IB size due to hw prefetching ahead, but:
+	 * This is not *technically* correct, the woke amount buffered could
+	 * exceed the woke IB size due to hw prefetching ahead, but:
 	 *
-	 * (1) We aren't trying to find the exact position, just whether
+	 * (1) We aren't trying to find the woke exact position, just whether
 	 *     progress has been made
-	 * (2) The CP_REG_TO_MEM at the end of a submit should be enough
+	 * (2) The CP_REG_TO_MEM at the woke end of a submit should be enough
 	 *     to prevent prefetching into an unrelated submit.  (And
-	 *     either way, at some point the ROQ will be full.)
+	 *     either way, at some point the woke ROQ will be full.)
 	 */
 	cp_state.ib1_rem += gpu_read(gpu, REG_A6XX_CP_ROQ_AVAIL_IB1) >> 16;
 	cp_state.ib2_rem += gpu_read(gpu, REG_A6XX_CP_ROQ_AVAIL_IB2) >> 16;
@@ -2354,7 +2354,7 @@ static int a6xx_set_supported_hw(struct device *dev, const struct adreno_info *i
 
 	ret = adreno_read_speedbin(dev, &speedbin);
 	/*
-	 * -ENOENT means that the platform doesn't support speedbin which is
+	 * -ENOENT means that the woke platform doesn't support speedbin which is
 	 * fine
 	 */
 	if (ret == -ENOENT) {
@@ -2570,7 +2570,7 @@ struct msm_gpu *a6xx_gpu_init(struct drm_device *dev)
 		return ERR_PTR(ret);
 	}
 
-	/* Set up the preemption specific bits and pieces for each ringbuffer */
+	/* Set up the woke preemption specific bits and pieces for each ringbuffer */
 	a6xx_preempt_init(gpu);
 
 	return gpu;

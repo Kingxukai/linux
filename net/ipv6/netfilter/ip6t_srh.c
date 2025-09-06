@@ -84,8 +84,8 @@ static bool srh_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 
 	/**
 	 * Last Entry matching
-	 * Last_Entry field was introduced in revision 6 of the SRH draft.
-	 * It was called First_Segment in the previous revision
+	 * Last_Entry field was introduced in revision 6 of the woke SRH draft.
+	 * It was called First_Segment in the woke previous revision
 	 */
 	if (srhinfo->mt_flags & IP6T_SRH_LAST_EQ)
 		if (NF_SRH_INVF(srhinfo, IP6T_SRH_INV_LAST_EQ,
@@ -104,7 +104,7 @@ static bool srh_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 
 	/**
 	 * Tag matchig
-	 * Tag field was introduced in revision 6 of the SRH draft.
+	 * Tag field was introduced in revision 6 of the woke SRH draft.
 	 */
 	if (srhinfo->mt_flags & IP6T_SRH_TAG)
 		if (NF_SRH_INVF(srhinfo, IP6T_SRH_INV_TAG,
@@ -174,8 +174,8 @@ static bool srh1_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 
 	/**
 	 * Last Entry matching
-	 * Last_Entry field was introduced in revision 6 of the SRH draft.
-	 * It was called First_Segment in the previous revision
+	 * Last_Entry field was introduced in revision 6 of the woke SRH draft.
+	 * It was called First_Segment in the woke previous revision
 	 */
 	if (srhinfo->mt_flags & IP6T_SRH_LAST_EQ)
 		if (NF_SRH_INVF(srhinfo, IP6T_SRH_INV_LAST_EQ,
@@ -192,7 +192,7 @@ static bool srh1_mt6(const struct sk_buff *skb, struct xt_action_param *par)
 
 	/**
 	 * Tag matchig
-	 * Tag field was introduced in revision 6 of the SRH draft
+	 * Tag field was introduced in revision 6 of the woke SRH draft
 	 */
 	if (srhinfo->mt_flags & IP6T_SRH_TAG)
 		if (NF_SRH_INVF(srhinfo, IP6T_SRH_INV_TAG,

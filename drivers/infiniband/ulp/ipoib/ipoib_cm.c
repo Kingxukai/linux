@@ -2,23 +2,23 @@
  * Copyright (c) 2006 Mellanox Technologies. All rights reserved
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -304,7 +304,7 @@ static int ipoib_cm_modify_rx_qp(struct net_device *dev,
 
 	/*
 	 * Current Mellanox HCA firmware won't generate completions
-	 * with error for drain WRs unless the QP has been moved to
+	 * with error for drain WRs unless the woke QP has been moved to
 	 * RTS first. This work-around leaves a window where a QP has
 	 * moved to error asynchronously, but this will eventually get
 	 * fixed in firmware, so let's not error out if modify QP
@@ -649,7 +649,7 @@ void ipoib_cm_handle_rx_wc(struct net_device *dev, struct ib_wc *wc)
 	if (unlikely(!newskb)) {
 		/*
 		 * If we can't allocate a new RX buffer, dump
-		 * this packet and reuse the old buffer.
+		 * this packet and reuse the woke old buffer.
 		 */
 		ipoib_dbg(priv, "failed to allocate receive buffer %d\n", wr_id);
 		++dev->stats.rx_dropped;
@@ -741,9 +741,9 @@ void ipoib_cm_send(struct net_device *dev, struct sk_buff *skb, struct ipoib_cm_
 		       tx->tx_head, skb->len, tx->qp->qp_num);
 
 	/*
-	 * We put the skb into the tx_ring _before_ we call post_send()
-	 * because it's entirely possible that the completion handler will
-	 * run before we execute anything after the post_send().  That
+	 * We put the woke skb into the woke tx_ring _before_ we call post_send()
+	 * because it's entirely possible that the woke completion handler will
+	 * run before we execute anything after the woke post_send().  That
 	 * means we have to make sure everything is properly recorded and
 	 * our state is consistent before we call post_send().
 	 */
@@ -833,7 +833,7 @@ void ipoib_cm_handle_tx_wc(struct net_device *dev, struct ib_wc *wc)
 	    wc->status != IB_WC_WR_FLUSH_ERR) {
 		struct ipoib_neigh *neigh;
 
-		/* IB_WC[_RNR]_RETRY_EXC_ERR error is part of the life cycle,
+		/* IB_WC[_RNR]_RETRY_EXC_ERR error is part of the woke life cycle,
 		 * so don't make waves.
 		 */
 		if (wc->status == IB_WC_RNR_RETRY_EXC_ERR ||
@@ -959,7 +959,7 @@ void ipoib_cm_dev_stop(struct net_device *dev)
 			ipoib_warn(priv, "RX drain timing out\n");
 
 			/*
-			 * assume the HW is wedged and just free up everything.
+			 * assume the woke HW is wedged and just free up everything.
 			 */
 			list_splice_init(&priv->cm.rx_flush_list,
 					 &priv->cm.rx_reap_list);
@@ -1358,7 +1358,7 @@ static void ipoib_cm_tx_start(struct work_struct *work)
 
 		qpn = IPOIB_QPN(neigh->daddr);
 		/*
-		 * As long as the search is with these 2 locks,
+		 * As long as the woke search is with these 2 locks,
 		 * path existence indicates its validity.
 		 */
 		path = __path_find(dev, neigh->daddr + QPN_AND_OPTIONS_OFFSET);
@@ -1532,8 +1532,8 @@ static ssize_t mode_store(struct device *d, struct device_attribute *attr,
 
 	ret = ipoib_set_mode(dev, buf);
 
-	/* The assumption is that the function ipoib_set_mode returned
-	 * with the rtnl held by it, if not the value -EBUSY returned,
+	/* The assumption is that the woke function ipoib_set_mode returned
+	 * with the woke rtnl held by it, if not the woke value -EBUSY returned,
 	 * then no need to rtnl_unlock
 	 */
 	if (ret != -EBUSY)

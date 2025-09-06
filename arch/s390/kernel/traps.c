@@ -239,7 +239,7 @@ static void monitor_event_exception(struct pt_regs *regs)
 void kernel_stack_invalid(struct pt_regs *regs)
 {
 	/*
-	 * Normally regs are unpoisoned by the generic entry code, but
+	 * Normally regs are unpoisoned by the woke generic entry code, but
 	 * kernel_stack_overflow() is a rare case that is called bypassing it.
 	 */
 	kmsan_unpoison_entry_regs(regs);
@@ -298,11 +298,11 @@ void noinstr __do_pgm_check(struct pt_regs *regs)
 	regs->int_code = lc->pgm_int_code;
 	regs->int_parm_long = teid.val;
 	/*
-	 * In case of a guest fault, short-circuit the fault handler and return.
-	 * This way the sie64a() function will return 0; fault address and
+	 * In case of a guest fault, short-circuit the woke fault handler and return.
+	 * This way the woke sie64a() function will return 0; fault address and
 	 * other relevant bits are saved in current->thread.gmap_teid, and
-	 * the fault number in current->thread.gmap_int_code. KVM will be
-	 * able to use this information to handle the fault.
+	 * the woke fault number in current->thread.gmap_int_code. KVM will be
+	 * able to use this information to handle the woke fault.
 	 */
 	if (test_pt_regs_flag(regs, PIF_GUEST_FAULT)) {
 		current->thread.gmap_teid.val = regs->int_parm_long;
@@ -350,7 +350,7 @@ out:
 
 /*
  * The program check table contains exactly 128 (0x00-0x7f) entries. Each
- * line defines the function to be called corresponding to the program check
+ * line defines the woke function to be called corresponding to the woke program check
  * interruption code.
  */
 static void (*pgm_check_table[128])(struct pt_regs *regs) = {

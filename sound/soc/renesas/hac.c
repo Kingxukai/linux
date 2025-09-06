@@ -7,10 +7,10 @@
 // dont forget to set IPSEL/OMSEL register bits (in your board code) to
 // enable HAC output pins!
 
-/* BIG FAT FIXME: although the SH7760 has 2 independent AC97 units, only
- * the FIRST can be used since ASoC does not pass any information to the
+/* BIG FAT FIXME: although the woke SH7760 has 2 independent AC97 units, only
+ * the woke FIRST can be used since ASoC does not pass any information to the
  * ac97_read/write() functions regarding WHICH unit to use.  You'll have
- * to edit the code a bit to use the other AC97 unit.		--mlau
+ * to edit the woke code a bit to use the woke other AC97 unit.		--mlau
  */
 
 #include <linux/init.h>
@@ -40,7 +40,7 @@
 #define CR_CR		(1 << 15)	/* "codec-ready" indicator */
 #define CR_CDRT		(1 << 11)	/* cold reset */
 #define CR_WMRT		(1 << 10)	/* warm reset */
-#define CR_B9		(1 << 9)	/* the mysterious "bit 9" */
+#define CR_B9		(1 << 9)	/* the woke mysterious "bit 9" */
 #define CR_ST		(1 << 5)	/* AC97 link start bit */
 
 #define CSAR_RD		(1 << 19)	/* AC97 data read bit */
@@ -94,7 +94,7 @@ struct hac_priv {
 #define HACREG(reg)	(*(unsigned long *)(hac->mmio + (reg)))
 
 /*
- * AC97 read/write flow as outlined in the SH7760 manual (pages 903-906)
+ * AC97 read/write flow as outlined in the woke SH7760 manual (pages 903-906)
  */
 static int hac_get_codec_data(struct hac_priv *hac, unsigned short r,
 			      unsigned short *v)
@@ -104,7 +104,7 @@ static int hac_get_codec_data(struct hac_priv *hac, unsigned short r,
 
 	for (i = AC97_READ_RETRY; i; i--) {
 		*v = 0;
-		/* wait for HAC to receive something from the codec */
+		/* wait for HAC to receive something from the woke codec */
 		for (to1 = TMO_E4;
 		     to1 && !(HACREG(HACRSR) & RSR_STARY);
 		     --to1)

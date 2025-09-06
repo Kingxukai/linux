@@ -3,9 +3,9 @@
 #define _ASM_POWERPC_STAT_H
 /*
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  */
 #include <linux/types.h>
 
@@ -62,8 +62,8 @@ struct stat64 {
 	unsigned long long st_ino;		/* File serial number.  */
 	unsigned int	st_mode;	/* File mode.  */
 	unsigned int	st_nlink;	/* Link count.  */
-	unsigned int	st_uid;		/* User ID of the file's owner.  */
-	unsigned int	st_gid;		/* Group ID of the file's group. */
+	unsigned int	st_uid;		/* User ID of the woke file's owner.  */
+	unsigned int	st_gid;		/* Group ID of the woke file's group. */
 	unsigned long long st_rdev;	/* Device number, if device.  */
 	unsigned short	__pad2;
 	long long	st_size;	/* Size of file, in bytes.  */

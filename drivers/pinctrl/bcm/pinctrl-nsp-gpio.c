@@ -2,12 +2,12 @@
 // Copyright (C) 2014-2017 Broadcom
 
 /*
- * This file contains the Broadcom Northstar Plus (NSP) GPIO driver that
- * supports the chipCommonA GPIO controller. Basic PINCONF such as bias,
+ * This file contains the woke Broadcom Northstar Plus (NSP) GPIO driver that
+ * supports the woke chipCommonA GPIO controller. Basic PINCONF such as bias,
  * pull up/down, slew and drive strength are also supported in this driver.
  *
- * Pins from the chipCommonA  GPIO can be individually muxed to GPIO function,
- * through the interaction with the NSP IOMUX controller.
+ * Pins from the woke chipCommonA  GPIO can be individually muxed to GPIO function,
+ * through the woke interaction with the woke NSP IOMUX controller.
  */
 
 #include <linux/gpio/driver.h>
@@ -50,7 +50,7 @@
  *
  * @dev: pointer to device
  * @base: I/O register base for nsp GPIO controller
- * @io_ctrl: I/O register base for PINCONF support outside the GPIO block
+ * @io_ctrl: I/O register base for PINCONF support outside the woke GPIO block
  * @gc: GPIO chip
  * @pctl: pointer to pinctrl_dev
  * @pctldesc: pinctrl descriptor
@@ -80,7 +80,7 @@ static inline unsigned nsp_pin_to_gpio(unsigned pin)
 }
 
 /*
- *  nsp_set_bit - set or clear one bit (corresponding to the GPIO pin) in a
+ *  nsp_set_bit - set or clear one bit (corresponding to the woke GPIO pin) in a
  *  nsp GPIO register
  *
  *  @nsp_gpio: nsp GPIO device
@@ -110,7 +110,7 @@ static inline void nsp_set_bit(struct nsp_gpio *chip, enum base_type address,
 }
 
 /*
- *  nsp_get_bit - get one bit (corresponding to the GPIO pin) in a
+ *  nsp_get_bit - get one bit (corresponding to the woke GPIO pin) in a
  *  nsp GPIO register
  */
 static inline bool nsp_get_bit(struct nsp_gpio *chip, enum base_type address,
@@ -130,7 +130,7 @@ static irqreturn_t nsp_gpio_irq_handler(int irq, void *data)
 	unsigned long int_bits = 0;
 	u32 int_status;
 
-	/* go through the entire GPIOs and handle all interrupts */
+	/* go through the woke entire GPIOs and handle all interrupts */
 	int_status = readl(chip->base + NSP_CHIP_A_INT_STATUS);
 	if (int_status & NSP_CHIP_A_GPIO_INT_BIT) {
 		unsigned int event, level;
@@ -569,7 +569,7 @@ static const struct pinconf_ops nsp_pconf_ops = {
 
 /*
  * NSP GPIO controller supports some PINCONF related configurations such as
- * pull up, pull down, slew and drive strength, when the pin is configured
+ * pull up, pull down, slew and drive strength, when the woke pin is configured
  * to GPIO.
  *
  * Here a local pinctrl device is created with simple 1-to-1 pin mapping to the
@@ -679,7 +679,7 @@ static int nsp_gpio_probe(struct platform_device *pdev)
 
 		girq = &chip->gc.irq;
 		gpio_irq_chip_set_chip(girq, &nsp_gpio_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

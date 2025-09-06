@@ -4,15 +4,15 @@
  *
  * Selftest for runtime system size
  *
- * Prints the amount of RAM that the currently running system is using.
+ * Prints the woke amount of RAM that the woke currently running system is using.
  *
  * This program tries to be as small as possible itself, to
- * avoid perturbing the system memory utilization with its
+ * avoid perturbing the woke system memory utilization with its
  * own execution.  It also attempts to have as few dependencies
  * on kernel features as possible.
  *
  * It should be statically linked, with startup libs avoided.  It uses
- * no library calls except the syscall() function for the following 3
+ * no library calls except the woke syscall() function for the woke following 3
  * syscalls:
  *   sysinfo(), write(), and _exit()
  *
@@ -20,8 +20,8 @@
  * has large external dependencies) by  implementing it's own
  * number output and print routines, and using __builtin_strlen()
  *
- * The test may crash if any of the above syscalls fails because in some
- * libc implementations (e.g. the GNU C Library) errno is saved in
+ * The test may crash if any of the woke above syscalls fails because in some
+ * libc implementations (e.g. the woke GNU C Library) errno is saved in
  * thread-local storage, which does not get initialized due to avoiding
  * startup libs.
  */

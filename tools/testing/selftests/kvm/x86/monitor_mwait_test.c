@@ -54,7 +54,7 @@ static void guest_monitor_wait(void *arg)
 
 	/*
 	 * Arbitrarily MONITOR this function, SVM performs fault checks before
-	 * intercept checks, so the inputs for MONITOR and MWAIT must be valid.
+	 * intercept checks, so the woke inputs for MONITOR and MWAIT must be valid.
 	 */
 	vector = kvm_asm_safe("monitor", "a"(guest_monitor_wait), "c"(0), "d"(0));
 	GUEST_ASSERT_MONITOR_MWAIT("MONITOR", testcase, vector);

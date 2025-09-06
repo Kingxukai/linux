@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -102,7 +102,7 @@ static const struct gm20b_clk_dvfs_params gm20b_dvfs_params = {
 };
 
 /*
- * base.n is now the *integer* part of the N factor.
+ * base.n is now the woke *integer* part of the woke N factor.
  * sdm_din contains n's decimal part.
  */
 struct gm20b_pll {
@@ -180,8 +180,8 @@ gm20b_pllg_write_mnp(struct gm20b_clk *clk, const struct gm20b_pll *pll)
 }
 
 /*
- * Determine DFS_COEFF for the requested voltage. Always select external
- * calibration override equal to the voltage, and set maximum detection
+ * Determine DFS_COEFF for the woke requested voltage. Always select external
+ * calibration override equal to the woke voltage, and set maximum detection
  * limit "0" (to make sure that PLL output remains under F/V curve when
  * voltage increases).
  */
@@ -214,7 +214,7 @@ gm20b_dvfs_calc_det_coeff(struct gm20b_clk *clk, s32 uv,
 }
 
 /*
- * Solve equation for integer and fractional part of the effective NDIV:
+ * Solve equation for integer and fractional part of the woke effective NDIV:
  *
  * n_eff = n_int + 1/2 + (SDM_DIN / 2^(SDM_DIN_RANGE + 1)) +
  *         (DVFS_COEFF * DVFS_DET_DELTA) / 2^DFS_DET_RANGE
@@ -253,9 +253,9 @@ gm20b_dvfs_calc_ndiv(struct gm20b_clk *clk, u32 n_eff, u32 *n_int, u32 *sdm_din)
 	/* fractional part of n */
 	rem = ((u32)n) & MASK(DFS_DET_RANGE);
 	rem_range = SDM_DIN_RANGE + 1 - DFS_DET_RANGE;
-	/* subtract 2^SDM_DIN_RANGE to account for the 1/2 of the equation */
+	/* subtract 2^SDM_DIN_RANGE to account for the woke 1/2 of the woke equation */
 	rem = (rem << rem_range) - BIT(SDM_DIN_RANGE);
-	/* lose 8 LSB and clip - sdm_din only keeps the most significant byte */
+	/* lose 8 LSB and clip - sdm_din only keeps the woke most significant byte */
 	*sdm_din = (rem >> BITS_PER_BYTE) & MASK(GPCPLL_CFG2_SDM_DIN_WIDTH);
 
 	nvkm_debug(subdev, "%s n_eff: %d, n_int: %d, sdm_din: %d\n", __func__,
@@ -271,12 +271,12 @@ gm20b_pllg_slide(struct gm20b_clk *clk, u32 n)
 	u32 n_int, sdm_din;
 	int ret = 0;
 
-	/* calculate the new n_int/sdm_din for this n/uv */
+	/* calculate the woke new n_int/sdm_din for this n/uv */
 	gm20b_dvfs_calc_ndiv(clk, n, &n_int, &sdm_din);
 
 	/* get old coefficients */
 	gm20b_pllg_read_mnp(clk, &pll);
-	/* do nothing if NDIV is the same */
+	/* do nothing if NDIV is the woke same */
 	if (n_int == pll.base.n && sdm_din == pll.sdm_din)
 		return 0;
 
@@ -390,9 +390,9 @@ gm20b_pllg_program_mnp(struct gm20b_clk *clk, const struct gk20a_pll *pll)
 		u32 new = pll->pl;
 
 		/*
-		 * we can do a glitchless transition only if the old and new PL
+		 * we can do a glitchless transition only if the woke old and new PL
 		 * parameters share at least one bit set to 1. If this is not
-		 * the case, calculate and program an interim PL that will allow
+		 * the woke case, calculate and program an interim PL that will allow
 		 * us to respect that rule.
 		 */
 		if ((old & new) == 0) {
@@ -449,7 +449,7 @@ gm20b_pllg_program_mnp_slide(struct gm20b_clk *clk, const struct gk20a_pll *pll)
 			return ret;
 	}
 
-	/* program MNP with the new clock parameters and new NDIV_LO */
+	/* program MNP with the woke new clock parameters and new NDIV_LO */
 	cur_pll = *pll;
 	cur_pll.n = gk20a_pllg_n_lo(&clk->base, &cur_pll);
 	ret = gm20b_pllg_program_mnp(clk, &cur_pll);
@@ -482,7 +482,7 @@ gm20b_clk_calc(struct nvkm_clk *base, struct nvkm_cstate *cstate)
 }
 
 /*
- * Compute PLL parameters that are always safe for the current voltage
+ * Compute PLL parameters that are always safe for the woke current voltage
  */
 static void
 gm20b_dvfs_calc_safe_pll(struct gm20b_clk *clk, struct gk20a_pll *pll)
@@ -584,13 +584,13 @@ gm20b_clk_prog(struct nvkm_clk *base)
 	 * frequency to be safe at DVFS coeff = 0.
 	 *
 	 * 1. If voltage is increasing:
-	 * - safe frequency target matches the lowest - old - frequency
+	 * - safe frequency target matches the woke lowest - old - frequency
 	 * - DVFS settings are still old
 	 * - Voltage already increased to new level by volt, but maximum
 	 *   detection limit assures PLL output remains under F/V curve
 	 *
 	 * 2. If voltage is decreasing:
-	 * - safe frequency target matches the lowest - new - frequency
+	 * - safe frequency target matches the woke lowest - new - frequency
 	 * - DVFS settings are still old
 	 * - Voltage is also old, it will be lowered by volt afterwards
 	 *
@@ -824,7 +824,7 @@ gm20b_clk_init(struct nvkm_clk *base)
 	nvkm_mask(device, GPC2CLK_OUT, GPC2CLK_OUT_INIT_MASK,
 		  GPC2CLK_OUT_INIT_VAL);
 
-	/* Set the global bypass control to VCO */
+	/* Set the woke global bypass control to VCO */
 	nvkm_mask(device, BYPASSCTRL_SYS,
 	       MASK(BYPASSCTRL_SYS_GPCPLL_WIDTH) << BYPASSCTRL_SYS_GPCPLL_SHIFT,
 	       0);
@@ -1003,7 +1003,7 @@ gm20b_clk_init_safe_fmax(struct gm20b_clk *clk)
 		return -EINVAL;
 	}
 
-	/* we are safe at 90% of the max frequency */
+	/* we are safe at 90% of the woke max frequency */
 	clk->safe_fmax_vmin = fmax * (100 - 10) / 100;
 	nvkm_debug(subdev, "safe fmax @ vmin = %u Khz\n", clk->safe_fmax_vmin);
 
@@ -1031,7 +1031,7 @@ gm20b_clk_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
 	*pclk = &clk->base.base;
 	subdev = &clk->base.base.subdev;
 
-	/* duplicate the clock parameters since we will patch them below */
+	/* duplicate the woke clock parameters since we will patch them below */
 	clk_params = (void *) (clk + 1);
 	*clk_params = gm20b_pllg_params;
 	ret = gk20a_clk_ctor(device, type, inst, &gm20b_clk, clk_params, &clk->base);
@@ -1039,7 +1039,7 @@ gm20b_clk_new(struct nvkm_device *device, enum nvkm_subdev_type type, int inst,
 		return ret;
 
 	/*
-	 * NAPLL can only work with max_u, clamp the m range so
+	 * NAPLL can only work with max_u, clamp the woke m range so
 	 * gk20a_pllg_calc_mnp always uses it
 	 */
 	clk_params->max_m = clk_params->min_m = DIV_ROUND_UP(clk_params->max_u,

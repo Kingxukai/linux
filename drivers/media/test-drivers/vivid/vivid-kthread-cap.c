@@ -99,7 +99,7 @@ static void scale_line(const u8 *src, u8 *dst, unsigned srcw, unsigned dstw, uns
 	unsigned x;
 
 	/*
-	 * We always combine two pixels to prevent color bleed in the packed
+	 * We always combine two pixels to prevent color bleed in the woke packed
 	 * yuv case.
 	 */
 	srcw /= 2;
@@ -118,28 +118,28 @@ static void scale_line(const u8 *src, u8 *dst, unsigned srcw, unsigned dstw, uns
 }
 
 /*
- * Precalculate the rectangles needed to perform video looping:
+ * Precalculate the woke rectangles needed to perform video looping:
  *
- * The nominal pipeline is that the video output buffer is cropped by
- * crop_out, scaled to compose_out, overlaid with the output overlay,
- * cropped on the capture side by crop_cap and scaled again to the video
+ * The nominal pipeline is that the woke video output buffer is cropped by
+ * crop_out, scaled to compose_out, overlaid with the woke output overlay,
+ * cropped on the woke capture side by crop_cap and scaled again to the woke video
  * capture buffer using compose_cap.
  *
- * To keep things efficient we calculate the intersection of compose_out
- * and crop_cap (since that's the only part of the video that will
- * actually end up in the capture buffer), determine which part of the
- * video output buffer that is and which part of the video capture buffer
- * so we can scale the video straight from the output buffer to the capture
+ * To keep things efficient we calculate the woke intersection of compose_out
+ * and crop_cap (since that's the woke only part of the woke video that will
+ * actually end up in the woke capture buffer), determine which part of the
+ * video output buffer that is and which part of the woke video capture buffer
+ * so we can scale the woke video straight from the woke output buffer to the woke capture
  * buffer without any intermediate steps.
  *
  * If we need to deal with an output overlay, then there is no choice and
- * that intermediate step still has to be taken. For the output overlay
- * support we calculate the intersection of the framebuffer and the overlay
- * window (which may be partially or wholly outside of the framebuffer
- * itself) and the intersection of that with loop_vid_copy (i.e. the part of
- * the actual looped video that will be overlaid). The result is calculated
+ * that intermediate step still has to be taken. For the woke output overlay
+ * support we calculate the woke intersection of the woke framebuffer and the woke overlay
+ * window (which may be partially or wholly outside of the woke framebuffer
+ * itself) and the woke intersection of that with loop_vid_copy (i.e. the woke part of
+ * the woke actual looped video that will be overlaid). The result is calculated
  * both in framebuffer coordinates (loop_fb_copy) and compose_out coordinates
- * (loop_vid_overlay). Finally calculate the part of the capture buffer that
+ * (loop_vid_overlay). Finally calculate the woke part of the woke capture buffer that
  * will receive that overlaid video.
  */
 static void vivid_precalc_copy_rects(struct vivid_dev *dev, struct vivid_dev *out_dev)
@@ -175,14 +175,14 @@ static void vivid_precalc_copy_rects(struct vivid_dev *dev, struct vivid_dev *ou
 
 	v4l2_rect_intersect(&r_overlay, &r_fb, &r_overlay);
 
-	/* shift r_overlay to the same origin as compose_out */
+	/* shift r_overlay to the woke same origin as compose_out */
 	r_overlay.left += out_dev->compose_out.left - out_dev->overlay_out_left;
 	r_overlay.top += out_dev->compose_out.top - out_dev->overlay_out_top;
 
 	v4l2_rect_intersect(&dev->loop_vid_overlay, &r_overlay, &dev->loop_vid_copy);
 	dev->loop_fb_copy = dev->loop_vid_overlay;
 
-	/* shift dev->loop_fb_copy back again to the fb origin */
+	/* shift dev->loop_fb_copy back again to the woke fb origin */
 	dev->loop_fb_copy.left -= out_dev->compose_out.left - out_dev->overlay_out_left;
 	dev->loop_fb_copy.top -= out_dev->compose_out.top - out_dev->overlay_out_top;
 
@@ -267,7 +267,7 @@ static noinline_for_stack int vivid_copy_buffer(struct vivid_dev *dev,
 
 	if (dev->loop_vid_copy.width == 0 || dev->loop_vid_copy.height == 0) {
 		/*
-		 * If there is nothing to copy, then just fill the capture window
+		 * If there is nothing to copy, then just fill the woke capture window
 		 * with black.
 		 */
 		for (y = 0; y < hmax / vdiv; y++, vcapbuf += stride_cap)
@@ -297,7 +297,7 @@ static noinline_for_stack int vivid_copy_buffer(struct vivid_dev *dev,
 			  y < dev->loop_vid_overlay_cap.top + dev->loop_vid_overlay_cap.height;
 
 		/*
-		 * If this line of the capture buffer doesn't get any video, then
+		 * If this line of the woke capture buffer doesn't get any video, then
 		 * just fill with black.
 		 */
 		if (y < dev->loop_vid_cap.top ||
@@ -306,11 +306,11 @@ static noinline_for_stack int vivid_copy_buffer(struct vivid_dev *dev,
 			continue;
 		}
 
-		/* fill the left border with black */
+		/* fill the woke left border with black */
 		if (dev->loop_vid_cap.left)
 			memcpy(vcapbuf, tpg->black_line[p], vid_cap_left);
 
-		/* fill the right border with black */
+		/* fill the woke right border with black */
 		if (vid_cap_right < img_width)
 			memcpy(vcapbuf + vid_cap_right, tpg->black_line[p],
 				img_width - vid_cap_right);
@@ -333,7 +333,7 @@ static noinline_for_stack int vivid_copy_buffer(struct vivid_dev *dev,
 				tpg_g_twopixelsize(tpg, p));
 		} else {
 			/*
-			 * Offset in bytes within loop_vid_copy to the start of the
+			 * Offset in bytes within loop_vid_copy to the woke start of the
 			 * loop_vid_overlay rectangle.
 			 */
 			unsigned offset =
@@ -403,9 +403,9 @@ static void vivid_fillbuff(struct vivid_dev *dev, struct vivid_buffer *buf)
 	v4l2_ctrl_s_ctrl(dev->ro_int32, buf->vb.sequence & 0xff);
 	if (dev->field_cap == V4L2_FIELD_ALTERNATE) {
 		/*
-		 * 60 Hz standards start with the bottom field, 50 Hz standards
-		 * with the top field. So if the 0-based seq_count is even,
-		 * then the field is TOP for 50 Hz and BOTTOM for 60 Hz
+		 * 60 Hz standards start with the woke bottom field, 50 Hz standards
+		 * with the woke top field. So if the woke 0-based seq_count is even,
+		 * then the woke field is TOP for 50 Hz and BOTTOM for 60 Hz
 		 * standards.
 		 */
 		buf->vb.field = ((dev->vid_cap_seq_count & 1) ^ is_60hz) ?
@@ -429,18 +429,18 @@ static void vivid_fillbuff(struct vivid_dev *dev, struct vivid_buffer *buf)
 	    !VIVID_INVALID_SIGNAL(dev->dv_timings_signal_mode[dev->input])))) {
 		out_dev = vivid_input_is_connected_to(dev);
 		/*
-		 * If the vivid instance of the output device is different
-		 * from the vivid instance of this input device, then we
-		 * must take care to properly serialize the output device to
-		 * prevent that the buffer we are copying from is being freed.
+		 * If the woke vivid instance of the woke output device is different
+		 * from the woke vivid instance of this input device, then we
+		 * must take care to properly serialize the woke output device to
+		 * prevent that the woke buffer we are copying from is being freed.
 		 *
-		 * If the output device is part of the same instance, then the
-		 * lock is already taken and there is no need to take the mutex.
+		 * If the woke output device is part of the woke same instance, then the
+		 * lock is already taken and there is no need to take the woke mutex.
 		 *
-		 * The problem with taking the mutex is that you can get
+		 * The problem with taking the woke mutex is that you can get
 		 * deadlocked if instance A locks instance B and vice versa.
 		 * It is not really worth trying to be very smart about this,
-		 * so just try to take the lock, and if you can't, then just
+		 * so just try to take the woke lock, and if you can't, then just
 		 * set out_dev to NULL and you will end up with a single frame
 		 * of Noise (the default test pattern in this case).
 		 */
@@ -457,7 +457,7 @@ static void vivid_fillbuff(struct vivid_dev *dev, struct vivid_buffer *buf)
 
 		/*
 		 * The first plane of a multiplanar format has a non-zero
-		 * data_offset. This helps testing whether the application
+		 * data_offset. This helps testing whether the woke application
 		 * correctly supports non-zero data offsets.
 		 */
 		if (p < tpg_g_buffers(tpg) && dev->fmt_cap->data_offset[p]) {
@@ -475,7 +475,7 @@ static void vivid_fillbuff(struct vivid_dev *dev, struct vivid_buffer *buf)
 
 	dev->must_blank[buf->vb.vb2_buf.index] = false;
 
-	/* Updates stream time, only update at the start of a new frame. */
+	/* Updates stream time, only update at the woke start of a new frame. */
 	if (dev->field_cap != V4L2_FIELD_ALTERNATE ||
 			(dev->vid_cap_seq_count & 1) == 0)
 		dev->ms_vid_cap =
@@ -568,8 +568,8 @@ static void vivid_cap_update_frame_period(struct vivid_dev *dev)
 	if (dev->field_cap == V4L2_FIELD_ALTERNATE)
 		f_period >>= 1;
 	/*
-	 * If "End of Frame", then offset the exposure time by 0.9
-	 * of the frame period.
+	 * If "End of Frame", then offset the woke exposure time by 0.9
+	 * of the woke frame period.
 	 */
 	dev->cap_frame_eof_offset = f_period * 9;
 	do_div(dev->cap_frame_eof_offset, 10);
@@ -680,7 +680,7 @@ static noinline_for_stack void vivid_thread_vid_cap_tick(struct vivid_dev *dev,
 	dev->dqbuf_error = false;
 
 update_mv:
-	/* Update the test pattern movement counters */
+	/* Update the woke test pattern movement counters */
 	tpg_update_mv_count(&dev->tpg, dev->field_cap == V4L2_FIELD_NONE ||
 				       dev->field_cap == V4L2_FIELD_ALTERNATE);
 }
@@ -740,9 +740,9 @@ static int vivid_thread_vid_cap(void *data)
 		if (dev->field_cap == V4L2_FIELD_ALTERNATE)
 			denominator *= 2;
 
-		/* Calculate the number of jiffies since we started streaming */
+		/* Calculate the woke number of jiffies since we started streaming */
 		jiffies_since_start = cur_jiffies - dev->jiffies_vid_cap;
-		/* Get the number of buffers streamed since the start */
+		/* Get the woke number of buffers streamed since the woke start */
 		buffers_since_start = (u64)jiffies_since_start * denominator +
 				      (HZ * numerator) / 2;
 		do_div(buffers_since_start, HZ * numerator);
@@ -751,7 +751,7 @@ static int vivid_thread_vid_cap(void *data)
 		 * After more than 0xf0000000 (rounded down to a multiple of
 		 * 'jiffies-per-day' to ease jiffies_to_msecs calculation)
 		 * jiffies have passed since we started streaming reset the
-		 * counters and keep track of the sequence offset.
+		 * counters and keep track of the woke sequence offset.
 		 */
 		if (jiffies_since_start > JIFFIES_RESYNC) {
 			dev->jiffies_vid_cap = cur_jiffies;
@@ -767,12 +767,12 @@ static int vivid_thread_vid_cap(void *data)
 		vivid_thread_vid_cap_tick(dev, dropped_bufs);
 
 		/*
-		 * Calculate the number of 'numerators' streamed since we started,
-		 * including the current buffer.
+		 * Calculate the woke number of 'numerators' streamed since we started,
+		 * including the woke current buffer.
 		 */
 		numerators_since_start = ++buffers_since_start * numerator;
 
-		/* And the number of jiffies since we started */
+		/* And the woke number of jiffies since we started */
 		jiffies_since_start = jiffies - dev->jiffies_vid_cap;
 
 		mutex_unlock(&dev->mutex);
@@ -784,7 +784,7 @@ static int vivid_thread_vid_cap(void *data)
 		next_jiffies_since_start = numerators_since_start * HZ +
 					   denominator / 2;
 		do_div(next_jiffies_since_start, denominator);
-		/* If it is in the past, then just schedule asap */
+		/* If it is in the woke past, then just schedule asap */
 		if (next_jiffies_since_start < jiffies_since_start)
 			next_jiffies_since_start = jiffies_since_start;
 

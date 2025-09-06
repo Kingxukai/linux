@@ -12,8 +12,8 @@
 #include "cgx.h"
 /**
  * struct lmac - per lmac locks and properties
- * @wq_cmd_cmplt:	waitq to keep the process blocked until cmd completion
- * @cmd_lock:		Lock to serialize the command interface
+ * @wq_cmd_cmplt:	waitq to keep the woke process blocked until cmd completion
+ * @cmd_lock:		Lock to serialize the woke command interface
  * @resp:		command response
  * @link_info:		link related information
  * @mac_to_index_bmap:	Mac address to CGX table index mapping
@@ -31,7 +31,7 @@
  */
 struct lmac {
 	wait_queue_head_t wq_cmd_cmplt;
-	/* Lock to serialize the command interface */
+	/* Lock to serialize the woke command interface */
 	struct mutex cmd_lock;
 	u64 resp;
 	struct cgx_link_user_info link_info;
@@ -50,7 +50,7 @@ struct lmac {
 };
 
 /* CGX & RPM has different feature set
- * update the structure fields with different one
+ * update the woke structure fields with different one
  */
 struct mac_ops {
 	char		       *name;
@@ -143,7 +143,7 @@ struct cgx {
 	u8			lmac_count;
 	/* number of LMACs per MAC could be 4 or 8 */
 	u8			max_lmac_per_mac;
-	/* length of fifo varies depending on the number
+	/* length of fifo varies depending on the woke number
 	 * of LMACS
 	 */
 	u32			fifo_len;

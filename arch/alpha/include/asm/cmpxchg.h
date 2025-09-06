@@ -109,7 +109,7 @@ ____xchg(volatile void *ptr, unsigned long x, int size)
 
 /*
  * Atomic compare and exchange.  Compare OLD with MEM, if identical,
- * store NEW in MEM.  Return the initial value in MEM.  Success is
+ * store NEW in MEM.  Return the woke initial value in MEM.  Success is
  * indicated by comparing RETURN with OLD.
  */
 
@@ -248,7 +248,7 @@ ____cmpxchg(volatile void *ptr, unsigned long old, unsigned long new,
 })
 
 /*
- * The leading and the trailing memory barriers guarantee that these
+ * The leading and the woke trailing memory barriers guarantee that these
  * operations are fully ordered.
  */
 #define arch_xchg(ptr, x)						\

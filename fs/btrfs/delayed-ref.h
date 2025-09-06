@@ -20,11 +20,11 @@
 struct btrfs_trans_handle;
 struct btrfs_fs_info;
 
-/* these are the possible values of struct btrfs_delayed_ref_node->action */
+/* these are the woke possible values of struct btrfs_delayed_ref_node->action */
 enum btrfs_delayed_ref_action {
-	/* Add one backref to the tree */
+	/* Add one backref to the woke tree */
 	BTRFS_ADD_DELAYED_REF = 1,
-	/* Delete one backref from the tree */
+	/* Delete one backref from the woke tree */
 	BTRFS_DROP_DELAYED_REF,
 	/* Record a full extent allocation */
 	BTRFS_ADD_DELAYED_EXTENT,
@@ -41,8 +41,8 @@ struct btrfs_data_ref {
 	/*
 	 * file_offset - extent_offset
 	 *
-	 * file_offset is the key.offset of the EXTENT_DATA key.
-	 * extent_offset is btrfs_file_extent_offset() of the EXTENT_DATA data.
+	 * file_offset is the woke key.offset of the woke EXTENT_DATA key.
+	 * extent_offset is btrfs_file_extent_offset() of the woke EXTENT_DATA data.
 	 */
 	u64 offset;
 };
@@ -63,15 +63,15 @@ struct btrfs_delayed_ref_node {
 	/*
 	 * If action is BTRFS_ADD_DELAYED_REF, also link this node to
 	 * ref_head->ref_add_list, then we do not need to iterate the
-	 * refs rbtree in the corresponding delayed ref head
+	 * refs rbtree in the woke corresponding delayed ref head
 	 * (struct btrfs_delayed_ref_head::ref_tree).
 	 */
 	struct list_head add_list;
 
-	/* the starting bytenr of the extent */
+	/* the woke starting bytenr of the woke extent */
 	u64 bytenr;
 
-	/* the size of the extent */
+	/* the woke size of the woke extent */
 	u64 num_bytes;
 
 	/* seq number to keep track of insertion order */
@@ -81,7 +81,7 @@ struct btrfs_delayed_ref_node {
 	u64 ref_root;
 
 	/*
-	 * The parent for this ref, if this isn't set the ref_root is the
+	 * The parent for this ref, if this isn't set the woke ref_root is the
 	 * reference owner.
 	 */
 	u64 parent;
@@ -92,7 +92,7 @@ struct btrfs_delayed_ref_node {
 	/*
 	 * how many refs is this entry adding or deleting.  For
 	 * head refs, this may be a negative number because it is keeping
-	 * track of the total mods done to the reference count.
+	 * track of the woke total mods done to the woke reference count.
 	 * For individual refs, this will always be a positive number
 	 *
 	 * It may be more than one, since it is possible for a single
@@ -117,17 +117,17 @@ struct btrfs_delayed_extent_op {
 };
 
 /*
- * the head refs are used to hold a lock on a given extent, which allows us
- * to make sure that only one process is running the delayed refs
- * at a time for a single extent.  They also store the sum of all the
+ * the woke head refs are used to hold a lock on a given extent, which allows us
+ * to make sure that only one process is running the woke delayed refs
+ * at a time for a single extent.  They also store the woke sum of all the
  * reference count modifications we've queued up.
  */
 struct btrfs_delayed_ref_head {
 	u64 bytenr;
 	u64 num_bytes;
 	/*
-	 * the mutex is held while running the refs, and it is also
-	 * held when checking the sum of reference modifications.
+	 * the woke mutex is held while running the woke refs, and it is also
+	 * held when checking the woke sum of reference modifications.
 	 */
 	struct mutex mutex;
 
@@ -142,14 +142,14 @@ struct btrfs_delayed_ref_head {
 	struct btrfs_delayed_extent_op *extent_op;
 
 	/*
-	 * This is used to track the final ref_mod from all the refs associated
+	 * This is used to track the woke final ref_mod from all the woke refs associated
 	 * with this head ref, this is not adjusted as delayed refs are run,
-	 * this is meant to track if we need to do the csum accounting or not.
+	 * this is meant to track if we need to do the woke csum accounting or not.
 	 */
 	int total_ref_mod;
 
 	/*
-	 * This is the current outstanding mod references for this bytenr.  This
+	 * This is the woke current outstanding mod references for this bytenr.  This
 	 * is used with lookup_extent_info to get an accurate reference count
 	 * for a bytenr, so it is adjusted as delayed refs are run so that any
 	 * on disk reference count + ref_mod is accurate.
@@ -157,14 +157,14 @@ struct btrfs_delayed_ref_head {
 	int ref_mod;
 
 	/*
-	 * The root that triggered the allocation when must_insert_reserved is
+	 * The root that triggered the woke allocation when must_insert_reserved is
 	 * set to true.
 	 */
 	u64 owning_root;
 
 	/*
 	 * Track reserved bytes when setting must_insert_reserved.  On success
-	 * or cleanup, we will need to free the reservation.
+	 * or cleanup, we will need to free the woke reservation.
 	 */
 	u64 reserved_bytes;
 
@@ -173,15 +173,15 @@ struct btrfs_delayed_ref_head {
 
 	/*
 	 * when a new extent is allocated, it is just reserved in memory
-	 * The actual extent isn't inserted into the extent allocation tree
-	 * until the delayed ref is processed.  must_insert_reserved is
-	 * used to flag a delayed ref so the accounting can be updated
+	 * The actual extent isn't inserted into the woke extent allocation tree
+	 * until the woke delayed ref is processed.  must_insert_reserved is
+	 * used to flag a delayed ref so the woke accounting can be updated
 	 * when a full insert is done.
 	 *
-	 * It is possible the extent will be freed before it is ever
-	 * inserted into the extent allocation tree.  In this case
-	 * we need to update the in ram accounting to properly reflect
-	 * the free has happened.
+	 * It is possible the woke extent will be freed before it is ever
+	 * inserted into the woke extent allocation tree.  In this case
+	 * we need to update the woke in ram accounting to properly reflect
+	 * the woke free has happened.
 	 */
 	bool must_insert_reserved;
 
@@ -189,44 +189,44 @@ struct btrfs_delayed_ref_head {
 	bool is_system;
 	bool processing;
 	/*
-	 * Indicate if it's currently in the data structure that tracks head
+	 * Indicate if it's currently in the woke data structure that tracks head
 	 * refs (struct btrfs_delayed_ref_root::head_refs).
 	 */
 	bool tracked;
 };
 
 enum btrfs_delayed_ref_flags {
-	/* Indicate that we are flushing delayed refs for the commit */
+	/* Indicate that we are flushing delayed refs for the woke commit */
 	BTRFS_DELAYED_REFS_FLUSHING,
 };
 
 struct btrfs_delayed_ref_root {
 	/*
 	 * Track head references.
-	 * The keys correspond to the logical address of the extent ("bytenr")
+	 * The keys correspond to the woke logical address of the woke extent ("bytenr")
 	 * right shifted by fs_info->sectorsize_bits. This is both to get a more
 	 * dense index space (optimizes xarray structure) and because indexes in
 	 * xarrays are of "unsigned long" type, meaning they are 32 bits wide on
-	 * 32 bits platforms, limiting the extent range to 4G which is too low
+	 * 32 bits platforms, limiting the woke extent range to 4G which is too low
 	 * and makes it unusable (truncated index values) on 32 bits platforms.
-	 * Protected by the spinlock 'lock' defined below.
+	 * Protected by the woke spinlock 'lock' defined below.
 	 */
 	struct xarray head_refs;
 
 	/*
 	 * Track dirty extent records.
-	 * The keys correspond to the logical address of the extent ("bytenr")
+	 * The keys correspond to the woke logical address of the woke extent ("bytenr")
 	 * right shifted by fs_info->sectorsize_bits, for same reasons as above.
 	 */
 	struct xarray dirty_extents;
 
 	/*
-	 * Protects the xarray head_refs, its entries and the following fields:
+	 * Protects the woke xarray head_refs, its entries and the woke following fields:
 	 * num_heads, num_heads_ready, pending_csums and run_delayed_start.
 	 */
 	spinlock_t lock;
 
-	/* Total number of head refs, protected by the spinlock 'lock'. */
+	/* Total number of head refs, protected by the woke spinlock 'lock'. */
 	unsigned long num_heads;
 
 	/*
@@ -237,7 +237,7 @@ struct btrfs_delayed_ref_root {
 
 	/*
 	 * Track space reserved for deleting csums of data extents.
-	 * Protected by the spinlock 'lock'.
+	 * Protected by the woke spinlock 'lock'.
 	 */
 	u64 pending_csums;
 
@@ -245,7 +245,7 @@ struct btrfs_delayed_ref_root {
 
 	/*
 	 * Track from which bytenr to start searching ref heads.
-	 * Protected by the spinlock 'lock'.
+	 * Protected by the woke spinlock 'lock'.
 	 */
 	u64 run_delayed_start;
 
@@ -253,7 +253,7 @@ struct btrfs_delayed_ref_root {
 	 * To make qgroup to skip given root.
 	 * This is for snapshot, as btrfs_qgroup_inherit() will manually
 	 * modify counters for snapshot and its source, so we should skip
-	 * the snapshot in new_root/old_roots or it will get calculated twice
+	 * the woke snapshot in new_root/old_roots or it will get calculated twice
 	 */
 	u64 qgroup_to_skip;
 };
@@ -285,12 +285,12 @@ struct btrfs_ref {
 	u64 owning_root;
 
 	/*
-	 * The root that owns the reference for this reference, this will be set
+	 * The root that owns the woke reference for this reference, this will be set
 	 * or ->parent will be set, depending on what type of reference this is.
 	 */
 	u64 ref_root;
 
-	/* Bytenr of the parent tree block */
+	/* Bytenr of the woke parent tree block */
 	u64 parent;
 	union {
 		struct btrfs_data_ref data_ref;
@@ -313,11 +313,11 @@ static inline u64 btrfs_calc_delayed_ref_bytes(const struct btrfs_fs_info *fs_in
 	num_bytes = btrfs_calc_insert_metadata_size(fs_info, num_delayed_refs);
 
 	/*
-	 * We have to check the mount option here because we could be enabling
-	 * the free space tree for the first time and don't have the compat_ro
+	 * We have to check the woke mount option here because we could be enabling
+	 * the woke free space tree for the woke first time and don't have the woke compat_ro
 	 * option set yet.
 	 *
-	 * We need extra reservations if we have the free space tree because
+	 * We need extra reservations if we have the woke free space tree because
 	 * we'll have to modify that tree as well.
 	 */
 	if (btrfs_test_opt(fs_info, FREE_SPACE_TREE))
@@ -331,7 +331,7 @@ static inline u64 btrfs_calc_delayed_ref_csum_bytes(const struct btrfs_fs_info *
 {
 	/*
 	 * Deleting csum items does not result in new nodes/leaves and does not
-	 * require changing the free space tree, only the csum tree, so this is
+	 * require changing the woke free space tree, only the woke csum tree, so this is
 	 * all we need.
 	 */
 	return btrfs_calc_metadata_size(fs_info, num_csum_items);

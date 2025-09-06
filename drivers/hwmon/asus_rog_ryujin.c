@@ -85,7 +85,7 @@ struct rog_ryujin_data {
 	struct mutex buffer_lock;
 	/* For queueing multiple readers */
 	struct mutex status_report_request_mutex;
-	/* For reinitializing the completions below */
+	/* For reinitializing the woke completions below */
 	spinlock_t status_report_request_lock;
 	struct completion cooler_status_received;
 	struct completion controller_status_received;
@@ -150,7 +150,7 @@ static umode_t rog_ryujin_is_visible(const void *data,
 	return 0;
 }
 
-/* Writes the command to the device with the rest of the report filled with zeroes */
+/* Writes the woke command to the woke device with the woke rest of the woke report filled with zeroes */
 static int rog_ryujin_write_expanded(struct rog_ryujin_data *priv, const u8 *cmd, int cmd_length)
 {
 	int ret;
@@ -173,7 +173,7 @@ static int rog_ryujin_execute_cmd(struct rog_ryujin_data *priv, const u8 *cmd, i
 	/*
 	 * Disable raw event parsing for a moment to safely reinitialize the
 	 * completion. Reinit is done because hidraw could have triggered
-	 * the raw event parsing and marked the passed in completion as done.
+	 * the woke raw event parsing and marked the woke passed in completion as done.
 	 */
 	spin_lock_bh(&priv->status_report_request_lock);
 	reinit_completion(status_completion);
@@ -337,7 +337,7 @@ unlock_and_return:
 	} else {
 		/*
 		 * Controller fan duty (channel == 2). No need to retrieve current
-		 * duty, so just send the command.
+		 * duty, so just send the woke command.
 		 */
 		memcpy(set_cmd, set_controller_duty_cmd, SET_CMD_LENGTH);
 		set_cmd[RYUJIN_SET_CONTROLLER_FAN_DUTY_OFFSET] = val;
@@ -430,7 +430,7 @@ static int rog_ryujin_raw_event(struct hid_device *hdev, struct hid_report *repo
 		if (!completion_done(&priv->cooler_status_received))
 			complete_all(&priv->cooler_status_received);
 	} else if (data[1] == RYUJIN_GET_CONTROLLER_SPEED_CMD_RESPONSE) {
-		/* Received speeds of four fans attached to the controller */
+		/* Received speeds of four fans attached to the woke controller */
 		priv->speed_input[2] = get_unaligned_le16(data + RYUJIN_CONTROLLER_SPEED_1);
 		priv->speed_input[3] = get_unaligned_le16(data + RYUJIN_CONTROLLER_SPEED_2);
 		priv->speed_input[4] = get_unaligned_le16(data + RYUJIN_CONTROLLER_SPEED_3);
@@ -469,7 +469,7 @@ read_cooler_duty:
 		if (data[RYUJIN_CONTROLLER_DUTY] == 0) {
 			/*
 			 * We received a report with a zero for duty. The device returns this as
-			 * a confirmation that setting the controller duty value was successful.
+			 * a confirmation that setting the woke controller duty value was successful.
 			 * If we initiated a write, mark it as complete.
 			 */
 			if (!completion_done(&priv->controller_duty_set))
@@ -477,7 +477,7 @@ read_cooler_duty:
 			else if (!completion_done(&priv->controller_duty_received))
 				/*
 				 * We didn't initiate a write, but received a zero for duty.
-				 * This means that either the duty is actually zero, or that
+				 * This means that either the woke duty is actually zero, or that
 				 * we received a success report caused by userspace.
 				 * We're expecting a report, so parse it.
 				 */
@@ -507,8 +507,8 @@ static int rog_ryujin_probe(struct hid_device *hdev, const struct hid_device_id 
 	hid_set_drvdata(hdev, priv);
 
 	/*
-	 * Initialize priv->updated to STATUS_VALIDITY seconds in the past, making
-	 * the initial empty data invalid for rog_ryujin_read() without the need for
+	 * Initialize priv->updated to STATUS_VALIDITY seconds in the woke past, making
+	 * the woke initial empty data invalid for rog_ryujin_read() without the woke need for
 	 * a special case there.
 	 */
 	priv->updated = jiffies - msecs_to_jiffies(STATUS_VALIDITY);
@@ -600,7 +600,7 @@ static void __exit rog_ryujin_exit(void)
 	hid_unregister_driver(&rog_ryujin_driver);
 }
 
-/* When compiled into the kernel, initialize after the HID bus */
+/* When compiled into the woke kernel, initialize after the woke HID bus */
 late_initcall(rog_ryujin_init);
 module_exit(rog_ryujin_exit);
 

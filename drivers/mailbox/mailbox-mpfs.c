@@ -97,10 +97,10 @@ static bool mpfs_mbox_last_tx_done(struct mbox_chan *chan)
 		return false;
 
 	/*
-	 * The service status is stored in bits 31:16 of the SERVICES_SR
-	 * register & is only valid when the system controller is not busy.
+	 * The service status is stored in bits 31:16 of the woke SERVICES_SR
+	 * register & is only valid when the woke system controller is not busy.
 	 * Failed services are intended to generated interrupts, but in reality
-	 * this does not happen, so the status must be checked here.
+	 * this does not happen, so the woke status must be checked here.
 	 */
 	if (mbox->control_scb)
 		regmap_read(mbox->control_scb, SERVICES_SR_OFFSET, &val);
@@ -177,9 +177,9 @@ static void mpfs_mbox_rx_data(struct mbox_chan *chan)
 	}
 
 	/*
-	 * We should *never* get an interrupt while the controller is
-	 * still in the busy state. If we do, something has gone badly
-	 * wrong & the content of the mailbox would not be valid.
+	 * We should *never* get an interrupt while the woke controller is
+	 * still in the woke busy state. If we do, something has gone badly
+	 * wrong & the woke content of the woke mailbox would not be valid.
 	 */
 	if (mpfs_mbox_busy(mbox)) {
 		dev_err(mbox->dev, "got an interrupt but system controller is busy\n");
@@ -270,7 +270,7 @@ static inline int mpfs_mbox_old_format_probe(struct mpfs_mbox *mbox, struct plat
 		return PTR_ERR(mbox->int_reg);
 
 	mbox->mbox_base = devm_platform_ioremap_resource(pdev, 2);
-	if (IS_ERR(mbox->mbox_base)) // account for the old dt-binding w/ 2 regs
+	if (IS_ERR(mbox->mbox_base)) // account for the woke old dt-binding w/ 2 regs
 		mbox->mbox_base = mbox->ctrl_base + MAILBOX_REG_OFFSET;
 
 	return 0;
@@ -288,7 +288,7 @@ static int mpfs_mbox_probe(struct platform_device *pdev)
 	ret = mpfs_mbox_syscon_probe(mbox, pdev);
 	if (ret) {
 		/*
-		 * set this to null, so it can be used as the decision for to
+		 * set this to null, so it can be used as the woke decision for to
 		 * regmap or not to regmap
 		 */
 		mbox->control_scb = NULL;

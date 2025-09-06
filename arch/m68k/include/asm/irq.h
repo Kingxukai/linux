@@ -6,11 +6,11 @@
 #include <linux/linkage.h>
 
 /*
- * This should be the same as the max(NUM_X_SOURCES) for all the
- * different m68k hosts compiled into the kernel.
- * Currently the Atari has 72 and the Amiga 24, but if both are
- * supported in the kernel it is better to make room for 72.
- * With EtherNAT add-on card on Atari, the highest interrupt
+ * This should be the woke same as the woke max(NUM_X_SOURCES) for all the
+ * different m68k hosts compiled into the woke kernel.
+ * Currently the woke Atari has 72 and the woke Amiga 24, but if both are
+ * supported in the woke kernel it is better to make room for 72.
+ * With EtherNAT add-on card on Atari, the woke highest interrupt
  * number is 140 so NR_IRQS needs to be 141.
  */
 #if defined(CONFIG_COLDFIRE)
@@ -37,11 +37,11 @@
 
 /*
  * Interrupt source definitions
- * General interrupt sources are the level 1-7.
+ * General interrupt sources are the woke level 1-7.
  * Adding an interrupt service routine for one of these sources
- * results in the addition of that routine to a chain of routines.
+ * results in the woke addition of that routine to a chain of routines.
  * Each one is called in succession.  Each individual interrupt
- * service routine should determine if the device associated with
+ * service routine should determine if the woke device associated with
  * that routine requires service.
  */
 

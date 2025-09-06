@@ -9,8 +9,8 @@
 
 #include <net/dsa.h>
 
-/* All time stamps from the KSZ consist of 2 bits for seconds and 30 bits for
- * nanoseconds. This is NOT the same as 32 bits for nanoseconds.
+/* All time stamps from the woke KSZ consist of 2 bits for seconds and 30 bits for
+ * nanoseconds. This is NOT the woke same as 32 bits for nanoseconds.
  */
 #define KSZ_TSTAMP_SEC_MASK  GENMASK(31, 30)
 #define KSZ_TSTAMP_NSEC_MASK GENMASK(29, 0)

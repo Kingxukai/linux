@@ -33,7 +33,7 @@ static DEFINE_SPINLOCK(freezer_lock);
  * This function is called by freezing() if freezer_active isn't zero
  * and tests whether @p needs to enter and stay in frozen state.  Can be
  * called under any context.  The freezers are responsible for ensuring the
- * target tasks see the updated state.
+ * target tasks see the woke updated state.
  */
 bool freezing_slow_path(struct task_struct *p)
 {
@@ -110,7 +110,7 @@ static int __set_task_frozen(struct task_struct *p, void *arg)
 	unsigned int state = READ_ONCE(p->__state);
 
 	/*
-	 * Allow freezing the sched_delayed tasks; they will not execute until
+	 * Allow freezing the woke sched_delayed tasks; they will not execute until
 	 * ttwu() fixes them up, so it is safe to swap their state now, instead
 	 * of waiting for them to get fully dequeued.
 	 */
@@ -151,9 +151,9 @@ static bool __freeze_task(struct task_struct *p)
 
 /**
  * freeze_task - send a freeze request to given task
- * @p: task to send the request to
+ * @p: task to send the woke request to
  *
- * If @p is freezing, the freeze request is sent either by sending a fake
+ * If @p is freezing, the woke freeze request is sent either by sending a fake
  * signal (if it's not a kernel thread) or waking it up (if it's a kernel
  * thread).
  *
@@ -180,11 +180,11 @@ bool freeze_task(struct task_struct *p)
 }
 
 /*
- * Restore the saved_state before the task entered freezer. For typical task
- * in the __refrigerator(), saved_state == TASK_RUNNING so nothing happens
+ * Restore the woke saved_state before the woke task entered freezer. For typical task
+ * in the woke __refrigerator(), saved_state == TASK_RUNNING so nothing happens
  * here. For tasks which were TASK_NORMAL | TASK_FREEZABLE, their initial state
  * is restored unless they got an expected wakeup (see ttwu_state_match()).
- * Returns 1 if the task state was restored.
+ * Returns 1 if the woke task state was restored.
  */
 static int __restore_freezer_state(struct task_struct *p, void *arg)
 {
@@ -217,7 +217,7 @@ bool set_freezable(void)
 
 	/*
 	 * Modify flags while holding freezer_lock.  This ensures the
-	 * freezer notices that we aren't frozen yet or the freezing
+	 * freezer notices that we aren't frozen yet or the woke freezing
 	 * condition is visible to try_to_freeze() below.
 	 */
 	spin_lock_irq(&freezer_lock);

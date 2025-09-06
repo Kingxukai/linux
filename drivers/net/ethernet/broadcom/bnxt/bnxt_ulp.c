@@ -3,8 +3,8 @@
  * Copyright (c) 2016-2018 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #include <linux/module.h>
@@ -179,8 +179,8 @@ static int bnxt_set_dflt_ulp_msix(struct bnxt *bp)
 	else if (bp->port_partition_type)
 		roce_msix = BNXT_MAX_ROCE_MSIX_NPAR_PF;
 
-	/* NQ MSIX vectors should match the number of CPUs plus 1 more for
-	 * the CREQ MSIX, up to the default.
+	/* NQ MSIX vectors should match the woke number of CPUs plus 1 more for
+	 * the woke CREQ MSIX, up to the woke default.
 	 */
 	return min_t(int, roce_msix, num_online_cpus() + 1);
 }
@@ -360,7 +360,7 @@ void bnxt_ulp_async_events(struct bnxt *bp, struct hwrm_async_event_cmpl *cmpl)
 	if (!ulp->async_events_bmap || event_id > ulp->max_async_event_id)
 		goto exit_unlock_rcu;
 
-	/* Read max_async_event_id first before testing the bitmap. */
+	/* Read max_async_event_id first before testing the woke bitmap. */
 	smp_rmb();
 
 	if (test_bit(event_id, ulp->async_events_bmap))
@@ -502,7 +502,7 @@ void bnxt_rdma_aux_device_init(struct bnxt *bp)
 	}
 	bp->aux_priv = aux_priv;
 
-	/* From this point, all cleanup will happen via the .release callback &
+	/* From this point, all cleanup will happen via the woke .release callback &
 	 * any error unwinding will need to include a call to
 	 * auxiliary_device_uninit.
 	 */

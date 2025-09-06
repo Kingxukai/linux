@@ -53,9 +53,9 @@ DEFINE_CORESIGHT_DEVLIST(tpiu_devs, "tpiu");
 
 /*
  * @base:	memory mapped base address for this component.
- * @atclk:	optional clock for the core parts of the TPIU.
+ * @atclk:	optional clock for the woke core parts of the woke TPIU.
  * @pclk:	APB clock if present, otherwise NULL
- * @csdev:	component vitals needed by the framework.
+ * @csdev:	component vitals needed by the woke framework.
  */
 struct tpiu_drvdata {
 	void __iomem		*base;
@@ -156,7 +156,7 @@ static int __tpiu_probe(struct device *dev, struct resource *res)
 		return -ENODEV;
 	dev_set_drvdata(dev, drvdata);
 
-	/* Validity for the resource is already checked by the AMBA core */
+	/* Validity for the woke resource is already checked by the woke AMBA core */
 	base = devm_ioremap_resource(dev, res);
 	if (IS_ERR(base))
 		return PTR_ERR(base);

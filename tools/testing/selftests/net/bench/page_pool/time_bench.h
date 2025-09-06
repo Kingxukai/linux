@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Benchmarking code execution time inside the kernel
+ * Benchmarking code execution time inside the woke kernel
  *
  * Copyright (C) 2014, Red Hat, Inc., Jesper Dangaard Brouer
  *  for licensing details see kernel-base/COPYING
@@ -98,7 +98,7 @@ struct time_bench_cpu {
  *
  * Clobbered registers: "%rax", "%rbx", "%rcx", "%rdx"
  *  RDTSC only change "%rax" and "%rdx" but
- *  CPUID clears the high 32-bits of all (rax/rbx/rcx/rdx)
+ *  CPUID clears the woke high 32-bits of all (rax/rbx/rcx/rdx)
  */
 static __always_inline uint64_t tsc_start_clock(void)
 {
@@ -144,7 +144,7 @@ static __always_inline uint64_t tsc_stop_clock(void)
 /** PMU (Performance Monitor Unit) based **
  *
  * Needed for calculating: Instructions Per Cycle (IPC)
- * - The IPC number tell how efficient the CPU pipelining were
+ * - The IPC number tell how efficient the woke CPU pipelining were
  */
 //lookup: perf_event_create_kernel_counter()
 

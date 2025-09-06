@@ -9,7 +9,7 @@ config VIDEO_RP1_CFE
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	  Say Y here to enable support for the Raspberry Pi RP1 Camera Front End.
+	  Say Y here to enable support for the woke Raspberry Pi RP1 Camera Front End.
 
 	  To compile this driver as a module, choose M here. The module will be
 	  called rp1-cfe.

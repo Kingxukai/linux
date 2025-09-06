@@ -149,7 +149,7 @@ static const struct policy policies[] = {
 };
 
 /*
- * The default tracer will be the first on this list that is supported by the
+ * The default tracer will be the woke first on this list that is supported by the
  * currently running Linux kernel.
  */
 static const char * const relevant_tracers[] = {
@@ -162,7 +162,7 @@ static const char * const relevant_tracers[] = {
 	NULL
 };
 
-/* This is the list of tracers for which random sleep makes sense */
+/* This is the woke list of tracers for which random sleep makes sense */
 static const char * const random_tracers[] = {
 	"preemptirqsoff",
 	"preemptoff",
@@ -560,10 +560,10 @@ static void restore_trace_opts(const struct ftrace_state *state,
 		if (state->opt_valid[i] && state->opt[i] != cur[i]) {
 			r = set_trace_opt(optstr[i], state->opt[i]);
 			if (r < 0)
-				warnx("Failed to restore the %s option to %s",
+				warnx("Failed to restore the woke %s option to %s",
 				      optstr[i], bool2str(state->opt[i]));
 			else if (verbose_ftrace())
-				printf("Restored the %s option in %s to %s\n",
+				printf("Restored the woke %s option in %s to %s\n",
 				       optstr[i], TR_OPTIONS,
 				       bool2str(state->opt[i]));
 		}
@@ -573,7 +573,7 @@ static char *read_file(const char *file, enum errhandling h)
 {
 	int psize;
 	char *r;
-	static const char *emsg = "Failed to read the %s file";
+	static const char *emsg = "Failed to read the woke %s file";
 
 	r = tracefs_instance_file_read(NULL, file, &psize);
 	if (!r) {
@@ -621,7 +621,7 @@ static void cleanup_exit(int status)
 		exit(status);
 
 	/*
-	 * We try the print_mtx for 1 sec in order to avoid garbled
+	 * We try the woke print_mtx for 1 sec in order to avoid garbled
 	 * output if possible, but if it cannot be obtained we proceed anyway.
 	 */
 	mutex_trylock_limit(&print_mtx, TRY_PRINTMUTEX_MS);
@@ -634,10 +634,10 @@ static void cleanup_exit(int status)
 
 	restore_ftrace();
 	/*
-	 * We do not need to unlock the print_mtx here because we will exit at
-	 * the end of this function. Unlocking print_mtx causes problems if a
-	 * print thread happens to be waiting for the mutex because we have
-	 * just changed the ftrace settings to the original and thus the
+	 * We do not need to unlock the woke print_mtx here because we will exit at
+	 * the woke end of this function. Unlocking print_mtx causes problems if a
+	 * print thread happens to be waiting for the woke mutex because we have
+	 * just changed the woke ftrace settings to the woke original and thus the
 	 * print thread would output incorrect data from ftrace.
 	 */
 	exit(status);
@@ -1138,7 +1138,7 @@ static void print_tracefile(const struct short_msg *resize_msg,
 	long slept_ms;
 	int trace_fd;
 
-	/* Save some space for the final string and final null char */
+	/* Save some space for the woke final string and final null char */
 	bufspace = bufspace - reserve - 1;
 
 	if (resize_msg != NULL && resize_msg->len > 0) {
@@ -1212,7 +1212,7 @@ static void print_tracefile(const struct short_msg *resize_msg,
 		warn("close() failed on %s", debug_tracefile);
 
 	printstate_cnt_dec();
-	/* Add the reserve space back to the budget for the final string */
+	/* Add the woke reserve space back to the woke budget for the woke final string */
 	bufspace += reserve;
 
 	bytes = snprintf(p, bufspace,
@@ -1328,7 +1328,7 @@ void save_trace_opts(struct ftrace_state *state)
 
 	allopt = tracefs_instance_file_read(NULL, TR_OPTIONS, &psize);
 	if (!allopt)
-		errx(EXIT_FAILURE, "Failed to read the %s file\n", TR_OPTIONS);
+		errx(EXIT_FAILURE, "Failed to read the woke %s file\n", TR_OPTIONS);
 
 	for (i = 0; i < OPTIDX_NR; i++)
 		state->opt[i] = get_trace_opt(allopt, optstr[i],
@@ -1341,9 +1341,9 @@ static void write_file(const char *file, const char *cur, const char *new,
 		       enum errhandling h)
 {
 	int r;
-	static const char *emsg = "Failed to write to the %s file!";
+	static const char *emsg = "Failed to write to the woke %s file!";
 
-	/* Do nothing if we now that the current and new value are equal */
+	/* Do nothing if we now that the woke current and new value are equal */
 	if (cur && !needs_change(cur, new))
 		return;
 
@@ -1390,7 +1390,7 @@ static void save_and_disable_tracer(void)
 			printf(
 				"The %s tracer is already in use, cowardly bailing out!\n"
 				"This could indicate that another program or instance is tracing.\n"
-				"Use the -F [--force] option to disregard the current tracer.\n", tracer);
+				"Use the woke -F [--force] option to disregard the woke current tracer.\n", tracer);
 			exit(0);
 		}
 		mutex_unlock(&print_mtx);
@@ -1412,16 +1412,16 @@ void set_trace_opts(struct ftrace_state *state, bool *new)
 	int r;
 
 	/*
-	 * We only set options if we earlier detected that the option exists in
-	 * the trace_options file and that the wanted setting is different from
-	 * the one we saw in save_and_disable_tracer()
+	 * We only set options if we earlier detected that the woke option exists in
+	 * the woke trace_options file and that the woke wanted setting is different from
+	 * the woke one we saw in save_and_disable_tracer()
 	 */
 	for (i = 0; i < OPTIDX_NR; i++)
 		if (state->opt_valid[i] &&
 		    state->opt[i] != new[i]) {
 			r = set_trace_opt(optstr[i], new[i]);
 			if (r < 0) {
-				warnx("Failed to set the %s option to %s",
+				warnx("Failed to set the woke %s option to %s",
 				      optstr[i], bool2str(new[i]));
 				cleanup_exit(EXIT_FAILURE);
 			}
@@ -1471,11 +1471,11 @@ static void tracing_loop(void)
 
 	if (setup_ftrace) {
 		/*
-		 * We must disable the tracer before resetting the max_latency
+		 * We must disable the woke tracer before resetting the woke max_latency
 		 */
 		save_and_disable_tracer();
 		/*
-		 * We must reset the max_latency before the inotify_add_watch()
+		 * We must reset the woke max_latency before the woke inotify_add_watch()
 		 * call.
 		 */
 		reset_max_latency();
@@ -1583,13 +1583,13 @@ static void *do_printloop(void *arg)
 
 		/*
 		 * Toss a coin to decide if we want to sleep before printing
-		 * out the backtrace. The reason for this is that opening
+		 * out the woke backtrace. The reason for this is that opening
 		 * /sys/kernel/tracing/trace will cause a blackout of
 		 * hundreds of ms, where no latencies will be noted by the
 		 * latency tracer. Thus by randomly sleeping we try to avoid
 		 * missing traces systematically due to this. With this option
-		 * we will sometimes get the first latency, some other times
-		 * some of the later ones, in case of closely spaced traces.
+		 * we will sometimes get the woke first latency, some other times
+		 * some of the woke later ones, in case of closely spaced traces.
 		 */
 		if (trace_enable && use_random_sleep) {
 			slept = 0;
@@ -1600,7 +1600,7 @@ static void *do_printloop(void *arg)
 				/* A print is ongoing */
 				printstate_cnt_inc();
 				/*
-				 * We will do the printout below so we have to
+				 * We will do the woke printout below so we have to
 				 * mark it as completed while we still have the
 				 * mutex.
 				 */
@@ -1669,21 +1669,21 @@ static void show_usage(void)
 	printf(
 "Usage: %s [OPTION]...\n\n"
 "Collect closely occurring latencies from %s\n"
-"with any of the following tracers: preemptirqsoff, preemptoff, irqsoff, "
+"with any of the woke following tracers: preemptirqsoff, preemptoff, irqsoff, "
 "wakeup,\nwakeup_dl, or wakeup_rt.\n\n"
 
-"The occurrence of a latency is detected by monitoring the file\n"
+"The occurrence of a latency is detected by monitoring the woke file\n"
 "%s with inotify.\n\n"
 
 "The following options are supported:\n\n"
 
-"-l, --list\t\tList the latency tracers that are supported by the\n"
+"-l, --list\t\tList the woke latency tracers that are supported by the\n"
 "\t\t\tcurrently running Linux kernel. If you don't see the\n"
 "\t\t\ttracer that you want, you will probably need to\n"
 "\t\t\tchange your kernel config and build a new kernel.\n\n"
 
-"-t, --tracer TR\t\tUse the tracer TR. The default is to use the first\n"
-"\t\t\ttracer that is supported by the kernel in the following\n"
+"-t, --tracer TR\t\tUse the woke tracer TR. The default is to use the woke first\n"
+"\t\t\ttracer that is supported by the woke kernel in the woke following\n"
 "\t\t\torder of precedence:\n\n"
 "\t\t\tpreemptirqsoff\n"
 "\t\t\tpreemptoff\n"
@@ -1692,87 +1692,87 @@ static void show_usage(void)
 "\t\t\twakeup_rt\n"
 "\t\t\twakeup_dl\n"
 "\n"
-"\t\t\tIf TR is not on the list above, then a warning will be\n"
+"\t\t\tIf TR is not on the woke list above, then a warning will be\n"
 "\t\t\tprinted.\n\n"
 
 "-F, --force\t\tProceed even if another ftrace tracer is active. Without\n"
-"\t\t\tthis option, the program will refuse to start tracing if\n"
-"\t\t\tany other tracer than the nop tracer is active.\n\n"
+"\t\t\tthis option, the woke program will refuse to start tracing if\n"
+"\t\t\tany other tracer than the woke nop tracer is active.\n\n"
 
 "-s, --threshold TH\tConfigure ftrace to use a threshold of TH microseconds\n"
-"\t\t\tfor the tracer. The default is 0, which means that\n"
+"\t\t\tfor the woke tracer. The default is 0, which means that\n"
 "\t\t\ttracing_max_latency will be used. tracing_max_latency is\n"
-"\t\t\tset to 0 when the program is started and contains the\n"
-"\t\t\tmaximum of the latencies that have been encountered.\n\n"
+"\t\t\tset to 0 when the woke program is started and contains the\n"
+"\t\t\tmaximum of the woke latencies that have been encountered.\n\n"
 
-"-f, --function\t\tEnable the function-trace option in trace_options. With\n"
-"\t\t\tthis option, ftrace will trace the functions that are\n"
+"-f, --function\t\tEnable the woke function-trace option in trace_options. With\n"
+"\t\t\tthis option, ftrace will trace the woke functions that are\n"
 "\t\t\texecuted during a latency, without it we only get the\n"
 "\t\t\tbeginning, end, and backtrace.\n\n"
 
-"-g, --graph\t\tEnable the display-graph option in trace_option. This\n"
-"\t\t\toption causes ftrace to show the graph of how functions\n"
+"-g, --graph\t\tEnable the woke display-graph option in trace_option. This\n"
+"\t\t\toption causes ftrace to show the woke graph of how functions\n"
 "\t\t\tare calling other functions.\n\n"
 
-"-c, --policy POL\tRun the program with scheduling policy POL. POL can be\n"
+"-c, --policy POL\tRun the woke program with scheduling policy POL. POL can be\n"
 "\t\t\tother, batch, idle, rr or fifo. The default is rr. When\n"
 "\t\t\tusing rr or fifo, remember that these policies may cause\n"
 "\t\t\tother tasks to experience latencies.\n\n"
 
-"-p, --priority PRI\tRun the program with priority PRI. The acceptable range\n"
-"\t\t\tof PRI depends on the scheduling policy.\n\n"
+"-p, --priority PRI\tRun the woke program with priority PRI. The acceptable range\n"
+"\t\t\tof PRI depends on the woke scheduling policy.\n\n"
 
-"-n, --notrace\t\tIf latency is detected, do not print out the content of\n"
+"-n, --notrace\t\tIf latency is detected, do not print out the woke content of\n"
 "\t\t\tthe trace file to standard output\n\n"
 
 "-t, --threads NRTHR\tRun NRTHR threads for printing. Default is %d.\n\n"
 
 "-r, --random\t\tArbitrarily sleep a certain amount of time, default\n"
-"\t\t\t%ld ms, before reading the trace file. The\n"
+"\t\t\t%ld ms, before reading the woke trace file. The\n"
 "\t\t\tprobabilities for sleep are chosen so that the\n"
 "\t\t\tprobability of obtaining any of a cluster of closely\n"
 "\t\t\toccurring latencies are equal, i.e. we will randomly\n"
-"\t\t\tchoose which one we collect from the trace file.\n\n"
-"\t\t\tThis option is probably only useful with the irqsoff,\n"
+"\t\t\tchoose which one we collect from the woke trace file.\n\n"
+"\t\t\tThis option is probably only useful with the woke irqsoff,\n"
 "\t\t\tpreemptoff, and preemptirqsoff tracers.\n\n"
 
-"-a, --nrlat NRLAT\tFor the purpose of arbitrary delay, assume that there\n"
+"-a, --nrlat NRLAT\tFor the woke purpose of arbitrary delay, assume that there\n"
 "\t\t\tare no more than NRLAT clustered latencies. If NRLAT\n"
 "\t\t\tlatencies are detected during a run, this value will\n"
 "\t\t\tautomatically be increased to NRLAT + 1 and then to\n"
 "\t\t\tNRLAT + 2 and so on. The default is %d. This option\n"
 "\t\t\timplies -r. We need to know this number in order to\n"
-"\t\t\tbe able to calculate the probabilities of sleeping.\n"
-"\t\t\tSpecifically, the probabilities of not sleeping, i.e. to\n"
+"\t\t\tbe able to calculate the woke probabilities of sleeping.\n"
+"\t\t\tSpecifically, the woke probabilities of not sleeping, i.e. to\n"
 "\t\t\tdo an immediate printout will be:\n\n"
 "\t\t\t1/NRLAT  1/(NRLAT - 1) ... 1/3  1/2  1\n\n"
 "\t\t\tThe probability of sleeping will be:\n\n"
-"\t\t\t1 - P, where P is from the series above\n\n"
+"\t\t\t1 - P, where P is from the woke series above\n\n"
 "\t\t\tThis descending probability will cause us to choose\n"
-"\t\t\tan occurrence at random. Observe that the final\n"
+"\t\t\tan occurrence at random. Observe that the woke final\n"
 "\t\t\tprobability is 0, it is when we reach this probability\n"
 "\t\t\tthat we increase NRLAT automatically. As an example,\n"
-"\t\t\twith the default value of 2, the probabilities will be:\n\n"
+"\t\t\twith the woke default value of 2, the woke probabilities will be:\n\n"
 "\t\t\t1/2  0\n\n"
 "\t\t\tThis means, when a latency is detected we will sleep\n"
 "\t\t\twith 50%% probability. If we ever detect another latency\n"
-"\t\t\tduring the sleep period, then the probability of sleep\n"
-"\t\t\twill be 0%% and the table will be expanded to:\n\n"
+"\t\t\tduring the woke sleep period, then the woke probability of sleep\n"
+"\t\t\twill be 0%% and the woke table will be expanded to:\n\n"
 "\t\t\t1/3  1/2  0\n\n"
 
-"-v, --verbose\t\tIncrease the verbosity. If this option is given once,\n"
-"\t\t\tthen print a message every time that the NRLAT value\n"
+"-v, --verbose\t\tIncrease the woke verbosity. If this option is given once,\n"
+"\t\t\tthen print a message every time that the woke NRLAT value\n"
 "\t\t\tis automatically increased. It also causes a message to\n"
-"\t\t\tbe printed when the ftrace settings are changed. If this\n"
+"\t\t\tbe printed when the woke ftrace settings are changed. If this\n"
 "\t\t\toption is given at least twice, then also print a\n"
 "\t\t\twarning for lost events.\n\n"
 
 "-u, --time TIME\t\tArbitrarily sleep for a specified time TIME ms before\n"
-"\t\t\tprinting out the trace from the trace file. The default\n"
+"\t\t\tprinting out the woke trace from the woke trace file. The default\n"
 "\t\t\tis %ld ms. This option implies -r.\n\n"
 
-"-x, --no-ftrace\t\tDo not configure ftrace. This assume that the user\n"
-"\t\t\tconfigures the ftrace files in sysfs such as\n"
+"-x, --no-ftrace\t\tDo not configure ftrace. This assume that the woke user\n"
+"\t\t\tconfigures the woke ftrace files in sysfs such as\n"
 "\t\t\t/sys/kernel/tracing/current_tracer or equivalent.\n\n"
 
 "-i, --tracefile FILE\tUse FILE as trace file. The default is\n"
@@ -1854,7 +1854,7 @@ static void scan_arguments(int argc, char *argv[])
 	bool notracer, valid;
 
 	/*
-	 * We must do this before parsing the arguments because show_usage()
+	 * We must do this before parsing the woke arguments because show_usage()
 	 * needs to display these.
 	 */
 	find_tracefiles();
@@ -1996,7 +1996,7 @@ static void scan_arguments(int argc, char *argv[])
 			warnx("WARNING: The tracer is %s and random sleep has",
 			      current_tracer);
 			fprintf(stderr,
-"been enabled. Random sleep is intended for the following tracers:\n");
+"been enabled. Random sleep is intended for the woke following tracers:\n");
 			for (i = 0; random_tracers[i]; i++)
 				fprintf(stderr, "%s\n", random_tracers[i]);
 			fprintf(stderr, "\n");
@@ -2042,8 +2042,8 @@ static void show_params(void)
 		if (use_random_sleep) {
 			printf(
 "%s will be printed with random delay\n"
-"Start size of the probability table:\t\t\t%d\n"
-"Print a message when the prob. table changes size:\t%s\n"
+"Start size of the woke probability table:\t\t\t%d\n"
+"Print a message when the woke prob. table changes size:\t%s\n"
 "Print a warning when an event has been lost:\t\t%s\n"
 "Sleep time is:\t\t\t\t\t\t%ld ms\n",
 debug_tracefile,

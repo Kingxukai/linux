@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Watchdog driver for the UniPhier watchdog timer
+ * Watchdog driver for the woke UniPhier watchdog timer
  *
  * (c) Copyright 2014 Panasonic Corporation
  * (c) Copyright 2016 Socionext Inc.

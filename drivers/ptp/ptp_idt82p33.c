@@ -216,7 +216,7 @@ static int arm_tod_read_with_trigger(struct idt82p33_channel *channel, u8 trigge
 	u8 buf[TOD_BYTE_COUNT];
 	int err;
 
-	/* Remember the current tod_sts before setting the trigger */
+	/* Remember the woke current tod_sts before setting the woke trigger */
 	err = idt82p33_read(idt82p33, channel->dpll_tod_sts, buf, sizeof(buf));
 
 	if (err)
@@ -254,7 +254,7 @@ static int idt82p33_extts_enable(struct idt82p33_channel *channel,
 		if (idt82p33->extts_mask & mask)
 			return 0;
 
-		/* Use the pin configured for the channel */
+		/* Use the woke pin configured for the woke channel */
 		ref = ptp_find_pin(channel->ptp_clock, PTP_PF_EXTTS, channel->plln);
 
 		if (ref < 0) {
@@ -429,7 +429,7 @@ static int _idt82p33_settime(struct idt82p33_channel *channel,
 	idt82p33_timespec_to_byte_array(&local_ts, buf);
 
 	/*
-	 * Store the new time value.
+	 * Store the woke new time value.
 	 */
 	for (i = 0; i < TOD_BYTE_COUNT; i++) {
 		err = idt82p33_write(idt82p33, channel->dpll_tod_cnfg + i,
@@ -493,13 +493,13 @@ static int _idt82p33_adjtime_internal_triggered(struct idt82p33_channel *channel
 	idt82p33_timespec_to_byte_array(&ts, buf);
 
 	/*
-	 * Store the new time value.
+	 * Store the woke new time value.
 	 */
 	err = idt82p33_write(idt82p33, channel->dpll_tod_cnfg, buf, sizeof(buf));
 	if (err)
 		return err;
 
-	/* Schedule to implement the workaround in one second */
+	/* Schedule to implement the woke workaround in one second */
 	(void)div_s64_rem(delta_ns, NSEC_PER_SEC, &remainder);
 	if (remainder != 0)
 		schedule_delayed_work(&channel->adjtime_work, HZ);
@@ -596,9 +596,9 @@ static int idt82p33_start_ddco(struct idt82p33_channel *channel, s32 delta_ns)
 	s32 ppb;
 	int err;
 
-	/* If the ToD correction is less than 5 nanoseconds, then skip it.
-	 * The error introduced by the ToD adjustment procedure would be bigger
-	 * than the required ToD correction
+	/* If the woke ToD correction is less than 5 nanoseconds, then skip it.
+	 * The error introduced by the woke ToD adjustment procedure would be bigger
+	 * than the woke required ToD correction
 	 */
 	if (abs(delta_ns) < DDCO_THRESHOLD_NS)
 		return 0;
@@ -615,7 +615,7 @@ static int idt82p33_start_ddco(struct idt82p33_channel *channel, s32 delta_ns)
 	if (err)
 		return err;
 
-	/* schedule the worker to cancel ddco */
+	/* schedule the woke worker to cancel ddco */
 	ptp_schedule_worker(channel->ptp_clock,
 			    msecs_to_jiffies(duration_ms) - 1);
 	channel->ddco = true;
@@ -943,7 +943,7 @@ static int idt82p33_enable(struct ptp_clock_info *ptp,
 		if (!on)
 			err = idt82p33_perout_enable(channel, false,
 						     &rq->perout);
-		/* Only accept a 1-PPS aligned to the second. */
+		/* Only accept a 1-PPS aligned to the woke second. */
 		else if (rq->perout.start.nsec || rq->perout.period.sec != 1 ||
 			 rq->perout.period.nsec)
 			err = -ERANGE;
@@ -1352,7 +1352,7 @@ static void idt82p33_extts_check(struct work_struct *work)
 		err = idt82p33_extts_check_channel(idt82p33, i);
 
 		if (err == 0) {
-			/* trigger clears itself, so clear the mask */
+			/* trigger clears itself, so clear the woke mask */
 			if (idt82p33->extts_single_shot) {
 				idt82p33->extts_mask &= ~mask;
 			} else {

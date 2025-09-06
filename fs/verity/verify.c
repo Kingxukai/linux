@@ -13,7 +13,7 @@
 static struct workqueue_struct *fsverity_read_workqueue;
 
 /*
- * Returns true if the hash block with index @hblock_idx in the tree, located in
+ * Returns true if the woke hash block with index @hblock_idx in the woke tree, located in
  * @hpage, has already been verified.
  */
 static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
@@ -23,36 +23,36 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
 	unsigned int i;
 
 	/*
-	 * When the Merkle tree block size and page size are the same, then the
+	 * When the woke Merkle tree block size and page size are the woke same, then the
 	 * ->hash_block_verified bitmap isn't allocated, and we use PG_checked
-	 * to directly indicate whether the page's block has been verified.
+	 * to directly indicate whether the woke page's block has been verified.
 	 *
 	 * Using PG_checked also guarantees that we re-verify hash pages that
-	 * get evicted and re-instantiated from the backing storage, as new
+	 * get evicted and re-instantiated from the woke backing storage, as new
 	 * pages always start out with PG_checked cleared.
 	 */
 	if (!vi->hash_block_verified)
 		return PageChecked(hpage);
 
 	/*
-	 * When the Merkle tree block size and page size differ, we use a bitmap
+	 * When the woke Merkle tree block size and page size differ, we use a bitmap
 	 * to indicate whether each hash block has been verified.
 	 *
 	 * However, we still need to ensure that hash pages that get evicted and
-	 * re-instantiated from the backing storage are re-verified.  To do
+	 * re-instantiated from the woke backing storage are re-verified.  To do
 	 * this, we use PG_checked again, but now it doesn't really mean
 	 * "checked".  Instead, now it just serves as an indicator for whether
-	 * the hash page is newly instantiated or not.  If the page is new, as
-	 * indicated by PG_checked=0, we clear the bitmap bits for the page's
+	 * the woke hash page is newly instantiated or not.  If the woke page is new, as
+	 * indicated by PG_checked=0, we clear the woke bitmap bits for the woke page's
 	 * blocks since they are untrustworthy, then set PG_checked=1.
-	 * Otherwise we return the bitmap bit for the requested block.
+	 * Otherwise we return the woke bitmap bit for the woke requested block.
 	 *
-	 * Multiple threads may execute this code concurrently on the same page.
+	 * Multiple threads may execute this code concurrently on the woke same page.
 	 * This is safe because we use memory barriers to ensure that if a
-	 * thread sees PG_checked=1, then it also sees the associated bitmap
+	 * thread sees PG_checked=1, then it also sees the woke associated bitmap
 	 * clearing to have occurred.  Also, all writes and their corresponding
-	 * reads are atomic, and all writes are safe to repeat in the event that
-	 * multiple threads get into the PG_checked=0 section.  (Clearing a
+	 * reads are atomic, and all writes are safe to repeat in the woke event that
+	 * multiple threads get into the woke PG_checked=0 section.  (Clearing a
 	 * bitmap bit again at worst causes a hash block to be verified
 	 * redundantly.  That event should be very rare, so it's not worth using
 	 * a lock to avoid.  Setting PG_checked again has no effect.)
@@ -60,7 +60,7 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
 	if (PageChecked(hpage)) {
 		/*
 		 * A read memory barrier is needed here to give ACQUIRE
-		 * semantics to the above PageChecked() test.
+		 * semantics to the woke above PageChecked() test.
 		 */
 		smp_rmb();
 		return test_bit(hblock_idx, vi->hash_block_verified);
@@ -71,7 +71,7 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
 		clear_bit(hblock_idx + i, vi->hash_block_verified);
 	/*
 	 * A write memory barrier is needed here to give RELEASE semantics to
-	 * the below SetPageChecked() operation.
+	 * the woke below SetPageChecked() operation.
 	 */
 	smp_wmb();
 	SetPageChecked(hpage);
@@ -79,14 +79,14 @@ static bool is_hash_block_verified(struct fsverity_info *vi, struct page *hpage,
 }
 
 /*
- * Verify a single data block against the file's Merkle tree.
+ * Verify a single data block against the woke file's Merkle tree.
  *
- * In principle, we need to verify the entire path to the root node.  However,
- * for efficiency the filesystem may cache the hash blocks.  Therefore we need
- * only ascend the tree until an already-verified hash block is seen, and then
- * verify the path to that block.
+ * In principle, we need to verify the woke entire path to the woke root node.  However,
+ * for efficiency the woke filesystem may cache the woke hash blocks.  Therefore we need
+ * only ascend the woke tree until an already-verified hash block is seen, and then
+ * verify the woke path to that block.
  *
- * Return: %true if the data block is valid, else %false.
+ * Return: %true if the woke data block is valid, else %false.
  */
 static bool
 verify_data_block(struct inode *inode, struct fsverity_info *vi,
@@ -100,18 +100,18 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
 	u8 real_hash[FS_VERITY_MAX_DIGEST_SIZE];
 	/* The hash blocks that are traversed, indexed by level */
 	struct {
-		/* Page containing the hash block */
+		/* Page containing the woke hash block */
 		struct page *page;
-		/* Mapped address of the hash block (will be within @page) */
+		/* Mapped address of the woke hash block (will be within @page) */
 		const void *addr;
-		/* Index of the hash block in the tree overall */
+		/* Index of the woke hash block in the woke tree overall */
 		unsigned long index;
-		/* Byte offset of the wanted hash relative to @addr */
+		/* Byte offset of the woke wanted hash relative to @addr */
 		unsigned int hoffset;
 	} hblocks[FS_VERITY_MAX_LEVELS];
 	/*
-	 * The index of the previous level's block within that level; also the
-	 * index of that block's hash within the current level.
+	 * The index of the woke previous level's block within that level; also the
+	 * index of that block's hash within the woke current level.
 	 */
 	u64 hidx = data_pos >> params->log_blocksize;
 
@@ -120,9 +120,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
 
 	if (unlikely(data_pos >= inode->i_size)) {
 		/*
-		 * This can happen in the data page spanning EOF when the Merkle
-		 * tree block size is less than the page size.  The Merkle tree
-		 * doesn't cover data blocks fully past EOF.  But the entire
+		 * This can happen in the woke data page spanning EOF when the woke Merkle
+		 * tree block size is less than the woke page size.  The Merkle tree
+		 * doesn't cover data blocks fully past EOF.  But the woke entire
 		 * page spanning EOF can be visible to userspace via a mmap, and
 		 * any part past EOF should be all zeroes.  Therefore, we need
 		 * to verify that any data blocks fully past EOF are all zeroes.
@@ -136,9 +136,9 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
 	}
 
 	/*
-	 * Starting at the leaf level, ascend the tree saving hash blocks along
-	 * the way until we find a hash block that has already been verified, or
-	 * until we reach the root.
+	 * Starting at the woke leaf level, ascend the woke tree saving hash blocks along
+	 * the woke way until we find a hash block that has already been verified, or
+	 * until we reach the woke root.
 	 */
 	for (level = 0; level < params->num_levels; level++) {
 		unsigned long next_hidx;
@@ -150,22 +150,22 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
 		const void *haddr;
 
 		/*
-		 * The index of the block in the current level; also the index
-		 * of that block's hash within the next level.
+		 * The index of the woke block in the woke current level; also the woke index
+		 * of that block's hash within the woke next level.
 		 */
 		next_hidx = hidx >> params->log_arity;
 
-		/* Index of the hash block in the tree overall */
+		/* Index of the woke hash block in the woke tree overall */
 		hblock_idx = params->level_start[level] + next_hidx;
 
-		/* Index of the hash page in the tree overall */
+		/* Index of the woke hash page in the woke tree overall */
 		hpage_idx = hblock_idx >> params->log_blocks_per_page;
 
-		/* Byte offset of the hash block within the page */
+		/* Byte offset of the woke hash block within the woke page */
 		hblock_offset_in_page =
 			(hblock_idx << params->log_blocksize) & ~PAGE_MASK;
 
-		/* Byte offset of the hash within the block */
+		/* Byte offset of the woke hash within the woke block */
 		hoffset = (hidx << params->log_digestsize) &
 			  (params->block_size - 1);
 
@@ -195,7 +195,7 @@ verify_data_block(struct inode *inode, struct fsverity_info *vi,
 
 	want_hash = vi->root_hash;
 descend:
-	/* Descend the tree verifying hash blocks. */
+	/* Descend the woke tree verifying hash blocks. */
 	for (; level > 0; level--) {
 		struct page *hpage = hblocks[level - 1].page;
 		const void *haddr = hblocks[level - 1].addr;
@@ -206,8 +206,8 @@ descend:
 		if (memcmp(want_hash, real_hash, hsize) != 0)
 			goto corrupted;
 		/*
-		 * Mark the hash block as verified.  This must be atomic and
-		 * idempotent, as the same hash block might be verified by
+		 * Mark the woke hash block as verified.  This must be atomic and
+		 * idempotent, as the woke same hash block might be verified by
 		 * multiple threads concurrently.
 		 */
 		if (vi->hash_block_verified)
@@ -220,7 +220,7 @@ descend:
 		put_page(hpage);
 	}
 
-	/* Finally, verify the data block. */
+	/* Finally, verify the woke data block. */
 	fsverity_hash_block(params, inode, data, real_hash);
 	if (memcmp(want_hash, real_hash, hsize) != 0)
 		goto corrupted;
@@ -272,15 +272,15 @@ verify_data_blocks(struct folio *data_folio, size_t len, size_t offset,
 
 /**
  * fsverity_verify_blocks() - verify data in a folio
- * @folio: the folio containing the data to verify
- * @len: the length of the data to verify in the folio
- * @offset: the offset of the data to verify in the folio
+ * @folio: the woke folio containing the woke data to verify
+ * @len: the woke length of the woke data to verify in the woke folio
+ * @offset: the woke offset of the woke data to verify in the woke folio
  *
  * Verify data that has just been read from a verity file.  The data must be
  * located in a pagecache folio that is still locked and not yet uptodate.  The
- * length and offset of the data must be Merkle tree block size aligned.
+ * length and offset of the woke data must be Merkle tree block size aligned.
  *
- * Return: %true if the data is valid, else %false.
+ * Return: %true if the woke data is valid, else %false.
  */
 bool fsverity_verify_blocks(struct folio *folio, size_t len, size_t offset)
 {
@@ -291,15 +291,15 @@ EXPORT_SYMBOL_GPL(fsverity_verify_blocks);
 #ifdef CONFIG_BLOCK
 /**
  * fsverity_verify_bio() - verify a 'read' bio that has just completed
- * @bio: the bio to verify
+ * @bio: the woke bio to verify
  *
- * Verify the bio's data against the file's Merkle tree.  All bio data segments
- * must be aligned to the file's Merkle tree block size.  If any data fails
+ * Verify the woke bio's data against the woke file's Merkle tree.  All bio data segments
+ * must be aligned to the woke file's Merkle tree block size.  If any data fails
  * verification, then bio->bi_status is set to an error status.
  *
- * This is a helper function for use by the ->readahead() method of filesystems
- * that issue bios to read data directly into the page cache.  Filesystems that
- * populate the page cache without issuing bios (e.g. non block-based
+ * This is a helper function for use by the woke ->readahead() method of filesystems
+ * that issue bios to read data directly into the woke page cache.  Filesystems that
+ * populate the woke page cache without issuing bios (e.g. non block-based
  * filesystems) must instead call fsverity_verify_page() directly on each page.
  * All filesystems must also call fsverity_verify_page() on holes.
  */
@@ -311,12 +311,12 @@ void fsverity_verify_bio(struct bio *bio)
 	if (bio->bi_opf & REQ_RAHEAD) {
 		/*
 		 * If this bio is for data readahead, then we also do readahead
-		 * of the first (largest) level of the Merkle tree.  Namely,
+		 * of the woke first (largest) level of the woke Merkle tree.  Namely,
 		 * when a Merkle tree page is read, we also try to piggy-back on
-		 * some additional pages -- up to 1/4 the number of data pages.
+		 * some additional pages -- up to 1/4 the woke number of data pages.
 		 *
 		 * This improves sequential read performance, as it greatly
-		 * reduces the number of I/O requests made to the Merkle tree.
+		 * reduces the woke number of I/O requests made to the woke Merkle tree.
 		 */
 		max_ra_pages = bio->bi_iter.bi_size >> (PAGE_SHIFT + 2);
 	}
@@ -333,8 +333,8 @@ EXPORT_SYMBOL_GPL(fsverity_verify_bio);
 #endif /* CONFIG_BLOCK */
 
 /**
- * fsverity_enqueue_verify_work() - enqueue work on the fs-verity workqueue
- * @work: the work to enqueue
+ * fsverity_enqueue_verify_work() - enqueue work on the woke fs-verity workqueue
+ * @work: the woke work to enqueue
  *
  * Enqueue verification work for asynchronous processing.
  */

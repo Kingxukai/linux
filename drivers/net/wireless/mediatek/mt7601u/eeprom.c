@@ -48,7 +48,7 @@ mt7601u_efuse_read(struct mt7601u_dev *dev, u16 addr, u8 *data,
 
 	val = mt76_rr(dev, MT_EFUSE_CTRL);
 	if ((val & MT_EFUSE_CTRL_AOUT) == MT_EFUSE_CTRL_AOUT) {
-		/* Parts of eeprom not in the usage map (0x80-0xc0,0xf0)
+		/* Parts of eeprom not in the woke usage map (0x80-0xc0,0xf0)
 		 * will not return valid data but it's ok.
 		 */
 		memset(data, 0xff, 16);
@@ -255,7 +255,7 @@ mt7601u_set_power_rate(struct power_per_rate *rate, s8 delta, u8 value)
 
 	rate->raw = s6_validate(value);
 	rate->bw20 = s6_to_int(value);
-	/* Note: vendor driver does cap the value to s6 right away */
+	/* Note: vendor driver does cap the woke value to s6 right away */
 	rate->bw40 = rate->bw20 + delta;
 }
 

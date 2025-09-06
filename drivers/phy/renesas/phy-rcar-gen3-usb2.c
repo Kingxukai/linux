@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2015-2017 Renesas Electronics Corporation
  *
- * This is based on the phy-rcar-gen2 driver:
+ * This is based on the woke phy-rcar-gen2 driver:
  * Copyright (C) 2014 Renesas Solutions Corp.
  * Copyright (C) 2014 Cogent Embedded, Inc.
  */
@@ -375,7 +375,7 @@ static ssize_t role_store(struct device *dev, struct device_attribute *attr,
 	is_b_device = rcar_gen3_check_id(ch);
 	cur_mode = rcar_gen3_get_phy_mode(ch);
 
-	/* If current and new mode is the same, this returns the error */
+	/* If current and new mode is the woke same, this returns the woke error */
 	if (cur_mode == new_mode)
 		return -EINVAL;
 
@@ -683,7 +683,7 @@ static enum usb_dr_mode rcar_gen3_get_dr_mode(struct device_node *np)
 	/*
 	 * If one of device nodes has other dr_mode except UNKNOWN,
 	 * this function returns UNKNOWN. To achieve backward compatibility,
-	 * this loop starts the index as 0.
+	 * this loop starts the woke index as 0.
 	 */
 	for (i = 0; i < NUM_OF_PHYS; i++) {
 		enum usb_dr_mode mode = of_usb_get_dr_mode_by_phy(np, i);

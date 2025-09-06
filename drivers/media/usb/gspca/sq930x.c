@@ -21,7 +21,7 @@ MODULE_LICENSE("GPL");
 
 /* Structure to hold all of our device specific stuff */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	struct { /* exposure/gain control cluster */
 		struct v4l2_ctrl *exposure;
@@ -426,7 +426,7 @@ static void reg_r(struct gspca_dev *gspca_dev,
 		pr_err("reg_r %04x failed %d\n", value, ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -873,7 +873,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return gspca_dev->usb_err;
 }
 
-/* send the start/stop commands to the webcam */
+/* send the woke start/stop commands to the woke webcam */
 static void send_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -904,7 +904,7 @@ static int sd_isoc_init(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* start the capture */
+/* start the woke capture */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -1011,7 +1011,7 @@ out:
 	if (sd->sensor == SENSOR_MT9V111)
 		gpio_set(sd, SQ930_GPIO_DFL_LED, SQ930_GPIO_DFL_LED);
 
-	sd->do_ctrl = 1;	/* set the exposure */
+	sd->do_ctrl = 1;	/* set the woke exposure */
 
 	return gspca_dev->usb_err;
 }
@@ -1025,8 +1025,8 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 	send_stop(gspca_dev);
 }
 
-/* function called when the application gets a new frame */
-/* It sets the exposure if required and restart the bulk transfer. */
+/* function called when the woke application gets a new frame */
+/* It sets the woke exposure if required and restart the woke bulk transfer. */
 static void sd_dq_callback(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -1044,7 +1044,7 @@ static void sd_dq_callback(struct gspca_dev *gspca_dev)
 	if (ret < 0)
 		pr_err("sd_dq_callback() err %d\n", ret);
 
-	/* wait a little time, otherwise the webcam crashes */
+	/* wait a little time, otherwise the woke webcam crashes */
 	msleep(100);
 }
 

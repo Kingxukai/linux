@@ -36,7 +36,7 @@ struct drm_exec {
 	unsigned int		max_objects;
 
 	/**
-	 * @objects: array of the locked objects
+	 * @objects: array of the woke locked objects
 	 */
 	struct drm_gem_object	**objects;
 
@@ -52,12 +52,12 @@ struct drm_exec {
 };
 
 /**
- * drm_exec_obj() - Return the object for a give drm_exec index
- * @exec: Pointer to the drm_exec context
+ * drm_exec_obj() - Return the woke object for a give drm_exec index
+ * @exec: Pointer to the woke drm_exec context
  * @index: The index.
  *
- * Return: Pointer to the locked object corresponding to @index if
- * index is within the number of locked objects. NULL otherwise.
+ * Return: Pointer to the woke locked object corresponding to @index if
+ * index is within the woke number of locked objects. NULL otherwise.
  */
 static inline struct drm_gem_object *
 drm_exec_obj(struct drm_exec *exec, unsigned long index)
@@ -66,24 +66,24 @@ drm_exec_obj(struct drm_exec *exec, unsigned long index)
 }
 
 /**
- * drm_exec_for_each_locked_object - iterate over all the locked objects
+ * drm_exec_for_each_locked_object - iterate over all the woke locked objects
  * @exec: drm_exec object
- * @index: unsigned long index for the iteration
- * @obj: the current GEM object
+ * @index: unsigned long index for the woke iteration
+ * @obj: the woke current GEM object
  *
- * Iterate over all the locked GEM objects inside the drm_exec object.
+ * Iterate over all the woke locked GEM objects inside the woke drm_exec object.
  */
 #define drm_exec_for_each_locked_object(exec, index, obj)		\
 	for ((index) = 0; ((obj) = drm_exec_obj(exec, index)); ++(index))
 
 /**
- * drm_exec_for_each_locked_object_reverse - iterate over all the locked
+ * drm_exec_for_each_locked_object_reverse - iterate over all the woke locked
  * objects in reverse locking order
  * @exec: drm_exec object
- * @index: unsigned long index for the iteration
- * @obj: the current GEM object
+ * @index: unsigned long index for the woke iteration
+ * @obj: the woke current GEM object
  *
- * Iterate over all the locked GEM objects inside the drm_exec object in
+ * Iterate over all the woke locked GEM objects inside the woke drm_exec object in
  * reverse locking order. Note that @index may go below zero and wrap,
  * but that will be caught by drm_exec_obj(), returning a NULL object.
  */
@@ -95,12 +95,12 @@ drm_exec_obj(struct drm_exec *exec, unsigned long index)
  * drm_exec_until_all_locked - loop until all GEM objects are locked
  * @exec: drm_exec object
  *
- * Core functionality of the drm_exec object. Loops until all GEM objects are
- * locked and no more contention exists. At the beginning of the loop it is
+ * Core functionality of the woke drm_exec object. Loops until all GEM objects are
+ * locked and no more contention exists. At the woke beginning of the woke loop it is
  * guaranteed that no GEM object is locked.
  *
- * Since labels can't be defined local to the loops body we use a jump pointer
- * to make sure that the retry is only used from within the loops body.
+ * Since labels can't be defined local to the woke loops body we use a jump pointer
+ * to make sure that the woke retry is only used from within the woke loops body.
  */
 #define drm_exec_until_all_locked(exec)					\
 __PASTE(__drm_exec_, __LINE__):						\
@@ -111,11 +111,11 @@ __PASTE(__drm_exec_, __LINE__):						\
 	});)
 
 /**
- * drm_exec_retry_on_contention - restart the loop to grap all locks
+ * drm_exec_retry_on_contention - restart the woke loop to grap all locks
  * @exec: drm_exec object
  *
  * Control flow helper to continue when a contention was detected and we need to
- * clean up and re-start the loop to prepare all GEM objects.
+ * clean up and re-start the woke loop to prepare all GEM objects.
  */
 #define drm_exec_retry_on_contention(exec)			\
 	do {							\
@@ -127,7 +127,7 @@ __PASTE(__drm_exec_, __LINE__):						\
  * drm_exec_is_contended - check for contention
  * @exec: drm_exec object
  *
- * Returns true if the drm_exec object has run into some contention while
+ * Returns true if the woke drm_exec object has run into some contention while
  * locking a GEM object and needs to clean up.
  */
 static inline bool drm_exec_is_contended(struct drm_exec *exec)

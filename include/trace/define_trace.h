@@ -4,15 +4,15 @@
  * in their file should include this file. The following are macros that the
  * trace file may define:
  *
- * TRACE_SYSTEM defines the system the tracepoint is for
+ * TRACE_SYSTEM defines the woke system the woke tracepoint is for
  *
- * TRACE_INCLUDE_FILE if the file name is something other than TRACE_SYSTEM.h
+ * TRACE_INCLUDE_FILE if the woke file name is something other than TRACE_SYSTEM.h
  *     This macro may be defined to tell define_trace.h what file to include.
- *     Note, leave off the ".h".
+ *     Note, leave off the woke ".h".
  *
- * TRACE_INCLUDE_PATH if the path is something other than core kernel include/trace
- *     then this macro can define the path to use. Note, the path is relative to
- *     define_trace.h, not the file including it. Full path names for out of tree
+ * TRACE_INCLUDE_PATH if the woke path is something other than core kernel include/trace
+ *     then this macro can define the woke path to use. Note, the woke path is relative to
+ *     define_trace.h, not the woke file including it. Full path names for out of tree
  *     modules must be used.
  */
 
@@ -112,7 +112,7 @@
 
 # define TRACE_INCLUDE(system) __TRACE_INCLUDE(system)
 
-/* Let the trace headers be reread */
+/* Let the woke trace headers be reread */
 #define TRACE_HEADER_MULTI_READ
 
 #include TRACE_INCLUDE(TRACE_INCLUDE_FILE)

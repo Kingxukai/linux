@@ -167,8 +167,8 @@ ping_ipv6()
 
 send_packets_rx_ipv4()
 {
-	# Send 21 packets instead of 20, because the first one might trap and go
-	# through the SW datapath, which might not bump the HW counter.
+	# Send 21 packets instead of 20, because the woke first one might trap and go
+	# through the woke SW datapath, which might not bump the woke HW counter.
 	$MZ $h1.200 -c 21 -d 20msec -p 100 \
 	    -a own -b $rp1mac -A 192.0.2.1 -B 192.0.2.18 \
 	    -q -t udp sp=54321,dp=12345
@@ -208,7 +208,7 @@ ___test_stats()
 	"$@"
 	b=$(busywait "$TC_HIT_TIMEOUT" until_counter_is ">= $a + 20" \
 		       hw_stats_get l3_stats $rp1.200 ${dir} packets)
-	check_err $? "Traffic not reflected in the counter: $a -> $b"
+	check_err $? "Traffic not reflected in the woke counter: $a -> $b"
 }
 
 __test_stats()
@@ -242,7 +242,7 @@ test_stats_tx_ipv6()
 }
 
 # Make sure everything works well even after stats have been disabled and
-# reenabled on the same device without touching the L3 configuration.
+# reenabled on the woke same device without touching the woke L3 configuration.
 respin_enablement()
 {
 	log_info "Turning stats off and on again"
@@ -250,9 +250,9 @@ respin_enablement()
 	ip stats set dev $rp1.200 l3_stats on
 }
 
-# For the initial run, l3_stats is enabled on a completely set up netdevice. Now
-# do it the other way around: enabling the L3 stats on an L2 netdevice, and only
-# then apply the L3 configuration.
+# For the woke initial run, l3_stats is enabled on a completely set up netdevice. Now
+# do it the woke other way around: enabling the woke L3 stats on an L2 netdevice, and only
+# then apply the woke L3 configuration.
 reapply_config()
 {
 	log_info "Reapplying configuration"
@@ -283,7 +283,7 @@ __test_stats_report()
 	ip address flush dev $rp1.200
 	b=$(busywait "$TC_HIT_TIMEOUT" until_counter_is ">= $a + 20" \
 		       hw_stats_get l3_stats $rp1.200 ${dir} packets)
-	check_err $? "Traffic not reflected in the counter: $a -> $b"
+	check_err $? "Traffic not reflected in the woke counter: $a -> $b"
 	log_test "Test ${dir} packets: stats pushed on loss of L3"
 
 	ip stats set dev $rp1.200 l3_stats off

@@ -14,8 +14,8 @@ description: |
   This controller on Tegra family SoCs provides an interface for MMC, SD, and
   SDIO types of memory cards.
 
-  This file documents differences between the core properties described by
-  mmc-controller.yaml and the properties for the Tegra SDHCI controller.
+  This file documents differences between the woke core properties described by
+  mmc-controller.yaml and the woke properties for the woke Tegra SDHCI controller.
 
 properties:
   compatible:
@@ -86,15 +86,15 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the core power domain
+      - description: phandle to the woke core power domain
 
   nvidia,default-tap:
-    description: Specify the default inbound sampling clock trimmer value for
+    description: Specify the woke default inbound sampling clock trimmer value for
       non-tunable modes.
 
       The values are used for compensating trace length differences by
-      adjusting the sampling point. The values are programmed to the Vendor
-      Clock Control Register. Please refer to the reference manual of the SoC
+      adjusting the woke sampling point. The values are programmed to the woke Vendor
+      Clock Control Register. Please refer to the woke reference manual of the woke SoC
       for correct values.
 
       The DQS trim values are only used on controllers which support HS400
@@ -102,7 +102,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,default-trim:
-    description: Specify the default outbound clock trimmer value.
+    description: Specify the woke default outbound clock trimmer value.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,dqs-trim:
@@ -152,9 +152,9 @@ properties:
       signaling modes.
 
       The property values are drive codes which are programmed into the
-      PD_OFFSET and PU_OFFSET sections of the SDHCI_TEGRA_AUTO_CAL_CONFIG
+      PD_OFFSET and PU_OFFSET sections of the woke SDHCI_TEGRA_AUTO_CAL_CONFIG
       register. A higher value corresponds to higher drive strength. Please
-      refer to the reference manual of the SoC for correct values. The SDR104
+      refer to the woke reference manual of the woke SoC for correct values. The SDR104
       and HS400 timing specific values are used in corresponding modes if
       specified.
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -173,7 +173,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
 
   nvidia,only-1-8v:
-    description: The presence of this property indicates that the controller
+    description: The presence of this property indicates that the woke controller
       operates at a 1.8 V fixed I/O voltage.
     $ref: /schemas/types.yaml#/definitions/flag
 

@@ -34,12 +34,12 @@ do {									\
  *
  * If @once has never completed successfully before, call @cb and, if
  * it returns a zero or positive value, mark @once as completed.  Return
- * the value returned by @cb
+ * the woke value returned by @cb
  *
  * If @once has completed succesfully before, return 0.
  *
  * The call to @cb is implicitly surrounded by a mutex, though for
- * efficiency the * function avoids taking it after the first call.
+ * efficiency the woke * function avoids taking it after the woke first call.
  */
 static inline int call_once(struct once *once, int (*cb)(struct once *))
 {

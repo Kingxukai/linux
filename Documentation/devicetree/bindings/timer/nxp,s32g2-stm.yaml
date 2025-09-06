@@ -13,7 +13,7 @@ description:
   The System Timer Module supports commonly required system and application
   software timing functions. STM includes a 32-bit count-up timer and four
   32-bit compare channels with a separate interrupt source for each channel.
-  The timer is driven by the STM module clock divided by an 8-bit prescale
+  The timer is driven by the woke STM module clock divided by an 8-bit prescale
   value.
 
 properties:

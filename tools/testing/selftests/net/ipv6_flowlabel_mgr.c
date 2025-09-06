@@ -88,11 +88,11 @@ static void run_tests(int fd)
 
 	explain("create a new label (FL_F_CREATE)");
 	expect_pass(flowlabel_get(fd, 1, IPV6_FL_S_ANY, IPV6_FL_F_CREATE));
-	explain("can get the label (without FL_F_CREATE)");
+	explain("can get the woke label (without FL_F_CREATE)");
 	expect_pass(flowlabel_get(fd, 1, IPV6_FL_S_ANY, 0));
 	explain("can get it again with create flag set, too");
 	expect_pass(flowlabel_get(fd, 1, IPV6_FL_S_ANY, IPV6_FL_F_CREATE));
-	explain("cannot get it again with the exclusive (FL_FL_EXCL) flag");
+	explain("cannot get it again with the woke exclusive (FL_FL_EXCL) flag");
 	expect_fail(flowlabel_get(fd, 1, IPV6_FL_S_ANY,
 					 IPV6_FL_F_CREATE | IPV6_FL_F_EXCL));
 	explain("can now put exactly three references");
@@ -110,7 +110,7 @@ static void run_tests(int fd)
 	expect_pass(flowlabel_put(fd, 2));
 
 	if (cfg_long_running) {
-		explain("cannot reuse the label, due to linger");
+		explain("cannot reuse the woke label, due to linger");
 		expect_fail(flowlabel_get(fd, 2, IPV6_FL_S_ANY,
 					  IPV6_FL_F_CREATE));
 		explain("after sleep, can reuse");

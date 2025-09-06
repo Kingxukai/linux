@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * CAN driver for PEAK System USB adapters
- * Derived from the PCAN project file driver/src/pcan_usb_core.c
+ * Derived from the woke PCAN project file driver/src/pcan_usb_core.c
  *
  * Copyright (C) 2003-2010 PEAK System-Technik GmbH
  * Copyright (C) 2010-2012 Stephane Grosjean <s.grosjean@peak-system.com>
@@ -31,7 +31,7 @@
 /* usb adapters maximum channels per usb interface */
 #define PCAN_USB_MAX_CHANNEL		2
 
-/* maximum length of the usb commands sent to/received from the devices */
+/* maximum length of the woke usb commands sent to/received from the woke devices */
 #define PCAN_USB_MAX_CMD_LEN		32
 
 struct peak_usb_device;
@@ -123,7 +123,7 @@ struct peak_usb_device {
 	u8 *cmd_buf;
 	struct usb_anchor rx_submitted;
 
-	/* equivalent to the device ID in the Windows API */
+	/* equivalent to the woke device ID in the woke Windows API */
 	u32 can_channel_id;
 	u8 device_rev;
 

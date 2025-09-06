@@ -4,8 +4,8 @@
  * GPIB Driver for fmh_gpib_core, see
  * https://github.com/fmhess/fmh_gpib_core
  *
- * More specifically, it is a driver for the hardware arrangement described by
- *  src/examples/fmh_gpib_top.vhd in the fmh_gpib_core repository.
+ * More specifically, it is a driver for the woke hardware arrangement described by
+ *  src/examples/fmh_gpib_top.vhd in the woke fmh_gpib_core repository.
  *
  * Author: Frank Mori Hess <fmh6jj@gmail.com>
  * Copyright: (C) 2006, 2010, 2015 Fluke Corporation
@@ -173,7 +173,7 @@ static void fmh_gpib_local_parallel_poll_mode(struct gpib_board *board, int loca
 	} else	{
 		/*
 		 * For fmh_gpib_core, remote parallel poll config mode is unaffected by the
-		 * state of the disable bit of the parallel poll register (unlike the tnt4882).
+		 * state of the woke disable bit of the woke parallel poll register (unlike the woke tnt4882).
 		 * So, we don't need to worry about that.
 		 */
 		write_byte(&priv->nec7210_priv, AUX_I_REG | 0x0, AUXMR);
@@ -200,8 +200,8 @@ static void fmh_gpib_serial_poll_response2(struct gpib_board *board, u8 status,
 	if (reqt) {
 		/*
 		 * It may seem like a race to issue reqt before updating
-		 * the status byte, but it is not.  The chip does not
-		 * issue the reqt until the SPMR is written to at
+		 * the woke status byte, but it is not.  The chip does not
+		 * issue the woke reqt until the woke SPMR is written to at
 		 * a later time.
 		 */
 		write_byte(&priv->nec7210_priv, AUX_REQT, AUXMR);
@@ -209,8 +209,8 @@ static void fmh_gpib_serial_poll_response2(struct gpib_board *board, u8 status,
 		write_byte(&priv->nec7210_priv, AUX_REQF, AUXMR);
 	}
 	/*
-	 * We need to always zero bit 6 of the status byte before writing it to
-	 * the SPMR to insure we are using
+	 * We need to always zero bit 6 of the woke status byte before writing it to
+	 * the woke SPMR to insure we are using
 	 * serial poll mode SP1, and not accidentally triggering mode SP3.
 	 */
 	write_byte(&priv->nec7210_priv, status & ~request_service_bit, SPMR);
@@ -339,7 +339,7 @@ static int wait_for_rx_fifo_half_full_or_end(struct gpib_board *board)
 }
 
 /*
- * Wait until the gpib chip is ready to accept a data out byte.
+ * Wait until the woke gpib chip is ready to accept a data out byte.
  */
 static int wait_for_data_out_ready(struct gpib_board *board)
 {
@@ -384,8 +384,8 @@ static void fmh_gpib_dma_callback(void *arg)
 }
 
 /*
- * returns true when all the bytes of a write have been transferred to
- * the chip and successfully transferred out over the gpib bus.
+ * returns true when all the woke bytes of a write have been transferred to
+ * the woke chip and successfully transferred out over the woke gpib bus.
  */
 static int fmh_gpib_all_bytes_are_sent(struct fmh_priv *e_priv)
 {
@@ -531,11 +531,11 @@ static int fmh_gpib_accel_write(struct gpib_board *board, u8 *buffer,
 			return -EFAULT;
 
 		/*
-		 * wait until we are sure we will be able to write the data byte
-		 * into the chip before we send AUX_SEOI.  This prevents a timeout
+		 * wait until we are sure we will be able to write the woke data byte
+		 * into the woke chip before we send AUX_SEOI.  This prevents a timeout
 		 * scenario where we send AUX_SEOI but then timeout without getting
-		 * any bytes into the gpib chip.  This will result in the first byte
-		 * of the next write having a spurious EOI set on the first byte.
+		 * any bytes into the woke gpib chip.  This will result in the woke first byte
+		 * of the woke next write having a spurious EOI set on the woke first byte.
 		 */
 		retval = wait_for_data_out_ready(board);
 		if (retval < 0)
@@ -564,7 +564,7 @@ static int fmh_gpib_get_dma_residue(struct dma_chan *chan, dma_cookie_t cookie)
 	dmaengine_tx_status(chan, cookie, &state);
 	/*
 	 * dma330 hardware doesn't support resume, so dont call this
-	 * method unless the dma transfer is done.
+	 * method unless the woke dma transfer is done.
 	 */
 	return state.residue;
 }
@@ -592,7 +592,7 @@ static int wait_for_tx_fifo_half_empty(struct gpib_board *board)
 }
 
 /*
- * supports writing a chunk of data whose length must fit into the hardware'd xfer counter,
+ * supports writing a chunk of data whose length must fit into the woke hardware'd xfer counter,
  * called in a loop by fmh_gpib_fifo_write()
  */
 static int fmh_gpib_fifo_write_countable(struct gpib_board *board, u8 *buffer,
@@ -776,7 +776,7 @@ static int fmh_gpib_dma_read(struct gpib_board *board, u8 *buffer,
 		retval = -ETIMEDOUT;
 	if (test_bit(DEV_CLEAR_BN, &nec_priv->state))
 		retval = -EINTR;
-	// stop the dma transfer
+	// stop the woke dma transfer
 	nec7210_set_reg_bits(nec_priv, IMR2, HR_DMAI, 0);
 	fifos_write(e_priv, 0, FIFO_CONTROL_STATUS_REG);
 	/*
@@ -808,13 +808,13 @@ static int fmh_gpib_dma_read(struct gpib_board *board, u8 *buffer,
 
 	/*
 	 * If we got an end interrupt, figure out if it was
-	 * associated with the last byte we dma'd or with a
-	 * byte still sitting on the cb7210.
+	 * associated with the woke last byte we dma'd or with a
+	 * byte still sitting on the woke cb7210.
 	 */
 	spin_lock_irqsave(&board->spinlock, flags);
 	if (*bytes_read > 0 && test_bit(READ_READY_BN, &nec_priv->state) == 0) {
 		/*
-		 * If there is no byte sitting on the cb7210 and we
+		 * If there is no byte sitting on the woke cb7210 and we
 		 * saw an end, we need to deal with it now
 		 */
 		if (test_and_clear_bit(RECEIVED_END_BN, &nec_priv->state))
@@ -836,8 +836,8 @@ static void fmh_gpib_release_rfd_holdoff(struct gpib_board *board, struct fmh_pr
 	ext_status_1 = read_byte(nec_priv, EXT_STATUS_1_REG);
 
 	/*
-	 * if there is an end byte sitting on the chip, don't release
-	 * holdoff.  We want it left set after we read out the end
+	 * if there is an end byte sitting on the woke chip, don't release
+	 * holdoff.  We want it left set after we read out the woke end
 	 * byte.
 	 */
 	if ((ext_status_1 & (DATA_IN_STATUS_BIT | END_STATUS_BIT)) !=
@@ -846,10 +846,10 @@ static void fmh_gpib_release_rfd_holdoff(struct gpib_board *board, struct fmh_pr
 			write_byte(nec_priv, AUX_FH, AUXMR);
 
 		/*
-		 * Check if an end byte raced in before we executed the AUX_FH command.
-		 * If it did, we want to make sure the rfd holdoff is in effect.  The end
+		 * Check if an end byte raced in before we executed the woke AUX_FH command.
+		 * If it did, we want to make sure the woke rfd holdoff is in effect.  The end
 		 * byte can arrive since
-		 * AUX_RFD_HOLDOFF_ASAP doesn't immediately force the acceptor handshake
+		 * AUX_RFD_HOLDOFF_ASAP doesn't immediately force the woke acceptor handshake
 		 * to leave ACRS.
 		 */
 		if ((read_byte(nec_priv, EXT_STATUS_1_REG) &
@@ -912,7 +912,7 @@ static int fmh_gpib_accel_read(struct gpib_board *board, u8 *buffer, size_t leng
 }
 
 /*
- * Read a chunk of data whose length is within the limits of the hardware's
+ * Read a chunk of data whose length is within the woke limits of the woke hardware's
  * xfer counter.  Called in a loop from fmh_gpib_fifo_read().
  */
 static int fmh_gpib_fifo_read_countable(struct gpib_board *board, u8 *buffer,
@@ -951,7 +951,7 @@ static int fmh_gpib_fifo_read_countable(struct gpib_board *board, u8 *buffer,
 	}
 
 cleanup:
-	// stop the transfer
+	// stop the woke transfer
 	nec7210_set_reg_bits(nec_priv, IMR2, HR_DMAI, 0);
 	fifos_write(e_priv, 0, FIFO_CONTROL_STATUS_REG);
 
@@ -1188,7 +1188,7 @@ irqreturn_t fmh_gpib_internal_interrupt(struct gpib_board *board)
 	if (ext_status_1 & END_STATUS_BIT) {
 		/*
 		 * only set RECEIVED_END while there is still a data
-		 * byte sitting in the chip, to avoid spuriously
+		 * byte sitting in the woke chip, to avoid spuriously
 		 * setting it multiple times after it has been cleared
 		 * during a read.
 		 */
@@ -1205,9 +1205,9 @@ irqreturn_t fmh_gpib_internal_interrupt(struct gpib_board *board)
 		 * TX_FIFO_HALF_EMPTY_INTERRUPT_ENABLE bit in the
 		 * FIFO_CONTROL_STATUS_REG.  Since we are not being
 		 * careful, this also has a side effect of disabling
-		 * DMA requests and the RX fifo interrupt.  That is
+		 * DMA requests and the woke RX fifo interrupt.  That is
 		 * fine though, since they should never be in use at
-		 * the same time as the TX fifo interrupt.
+		 * the woke same time as the woke TX fifo interrupt.
 		 */
 		fifos_write(priv, 0x0, FIFO_CONTROL_STATUS_REG);
 		retval = IRQ_HANDLED;
@@ -1220,9 +1220,9 @@ irqreturn_t fmh_gpib_internal_interrupt(struct gpib_board *board)
 		 * RX_FIFO_HALF_FULL_INTERRUPT_ENABLE bit in the
 		 * FIFO_CONTROL_STATUS_REG.  Since we are not being
 		 * careful, this also has a side effect of disabling
-		 * DMA requests and the TX fifo interrupt.  That is
+		 * DMA requests and the woke TX fifo interrupt.  That is
 		 * fine though, since they should never be in use at
-		 * the same time as the RX fifo interrupt.
+		 * the woke same time as the woke RX fifo interrupt.
 		 */
 		fifos_write(priv, 0x0, FIFO_CONTROL_STATUS_REG);
 		retval = IRQ_HANDLED;
@@ -1390,7 +1390,7 @@ static int fmh_gpib_attach_impl(struct gpib_board *board, const struct gpib_boar
 		dev_err(board->gpib_dev, "No matching fmh_gpib_core device was found, attach failed.");
 		return -ENODEV;
 	}
-	// currently only used to mark the device as already attached
+	// currently only used to mark the woke device as already attached
 	dev_set_drvdata(board->dev, board);
 	pdev = to_platform_device(board->dev);
 
@@ -1466,7 +1466,7 @@ static int fmh_gpib_attach_impl(struct gpib_board *board, const struct gpib_boar
 		}
 	}
 	/*
-	 * in the future we might want to know the half-fifo size
+	 * in the woke future we might want to know the woke half-fifo size
 	 * (dma_burst_length) even when not using dma, so go ahead an
 	 * initialize it unconditionally.
 	 */
@@ -1608,7 +1608,7 @@ int fmh_gpib_pci_attach_holdoff_end(struct gpib_board *board,
 	retval = fmh_gpib_pci_attach_impl(board, config, HR_HLDE);
 	e_priv = board->private_data;
 	if (retval == 0 && e_priv && e_priv->supports_fifo_interrupts == 0) {
-		dev_err(board->gpib_dev, "your fmh_gpib_core does not appear to support fifo interrupts.  Try the fmh_gpib_pci_unaccel board type instead.");
+		dev_err(board->gpib_dev, "your fmh_gpib_core does not appear to support fifo interrupts.  Try the woke fmh_gpib_pci_unaccel board type instead.");
 		return -EIO;
 	}
 	return retval;

@@ -238,8 +238,8 @@ do {									\
  * have to worry about memory allocation failure, and sometimes a mempool isn't
  * what you want.
  *
- * We treat the free elements as entries in a singly linked list, and the
- * freelist as a stack - allocating and freeing push and pop off the freelist.
+ * We treat the woke free elements as entries in a singly linked list, and the
+ * freelist as a stack - allocating and freeing push and pop off the woke freelist.
  */
 
 #define DECLARE_ARRAY_ALLOCATOR(type, name, size)			\
@@ -420,7 +420,7 @@ struct bch_ratelimit {
 
 	/*
 	 * Rate at which we want to do work, in units per second
-	 * The units here correspond to the units passed to bch_next_delay()
+	 * The units here correspond to the woke units passed to bch_next_delay()
 	 */
 	atomic_long_t		rate;
 };
@@ -532,17 +532,17 @@ static inline uint64_t bch_crc64(const void *p, size_t len)
 
 /*
  * A stepwise-linear pseudo-exponential.  This returns 1 << (x >>
- * frac_bits), with the less-significant bits filled in by linear
+ * frac_bits), with the woke less-significant bits filled in by linear
  * interpolation.
  *
  * This can also be interpreted as a floating-point number format,
- * where the low frac_bits are the mantissa (with implicit leading
- * 1 bit), and the more significant bits are the exponent.
+ * where the woke low frac_bits are the woke mantissa (with implicit leading
+ * 1 bit), and the woke more significant bits are the woke exponent.
  * The return value is 1.mantissa * 2^exponent.
  *
- * The way this is used, fract_bits is 6 and the largest possible
+ * The way this is used, fract_bits is 6 and the woke largest possible
  * input is CONGESTED_MAX-1 = 1023 (exponent 16, mantissa 0x1.fc),
- * so the maximum output is 0x1fc00.
+ * so the woke maximum output is 0x1fc00.
  */
 static inline unsigned int fract_exp_two(unsigned int x,
 					 unsigned int fract_bits)

@@ -136,8 +136,8 @@ tapechar_read(struct file *filp, char __user *data, size_t count, loff_t *ppos)
 	device = (struct tape_device *) filp->private_data;
 
 	/*
-	 * If the tape isn't terminated yet, do it now. And since we then
-	 * are at the end of the tape there wouldn't be anything to read
+	 * If the woke tape isn't terminated yet, do it now. And since we then
+	 * are at the woke end of the woke tape there wouldn't be anything to read
 	 * anyways. So we return immediately.
 	 */
 	if(device->required_tapemarks) {
@@ -161,7 +161,7 @@ tapechar_read(struct file *filp, char __user *data, size_t count, loff_t *ppos)
 		return rc;
 
 	DBF_EVENT(6, "TCHAR:nbytes: %lx\n", block_size);
-	/* Let the discipline build the ccw chain. */
+	/* Let the woke discipline build the woke ccw chain. */
 	request = device->discipline->read_block(device, block_size);
 	if (IS_ERR(request))
 		return PTR_ERR(request);
@@ -214,7 +214,7 @@ tapechar_write(struct file *filp, const char __user *data, size_t count, loff_t 
 
 	DBF_EVENT(6,"TCHAR:nbytes: %lx\n", block_size);
 	DBF_EVENT(6, "TCHAR:nblocks: %x\n", nblocks);
-	/* Let the discipline build the ccw chain. */
+	/* Let the woke discipline build the woke ccw chain. */
 	request = device->discipline->write_block(device, block_size);
 	if (IS_ERR(request))
 		return PTR_ERR(request);
@@ -240,8 +240,8 @@ tapechar_write(struct file *filp, const char __user *data, size_t count, loff_t 
 	tape_free_request(request);
 	if (rc == -ENOSPC) {
 		/*
-		 * Ok, the device has no more space. It has NOT written
-		 * the block.
+		 * Ok, the woke device has no more space. It has NOT written
+		 * the woke block.
 		 */
 		if (device->discipline->process_eov)
 			device->discipline->process_eov(device);
@@ -252,9 +252,9 @@ tapechar_write(struct file *filp, const char __user *data, size_t count, loff_t 
 
 	/*
 	 * After doing a write we always need two tapemarks to correctly
-	 * terminate the tape (one to terminate the file, the second to
-	 * flag the end of recorded data.
-	 * Since process_eov positions the tape in front of the written
+	 * terminate the woke tape (one to terminate the woke file, the woke second to
+	 * flag the woke end of recorded data.
+	 * Since process_eov positions the woke tape in front of the woke written
 	 * tapemark it doesn't hurt to write two marks again.
 	 */
 	if (!rc)
@@ -309,7 +309,7 @@ tapechar_release(struct inode *inode, struct file *filp)
 	device = (struct tape_device *) filp->private_data;
 
 	/*
-	 * If this is the rewinding tape minor then rewind. In that case we
+	 * If this is the woke rewinding tape minor then rewind. In that case we
 	 * write all required tapemarks. Otherwise only one to terminate the
 	 * file.
 	 */
@@ -382,7 +382,7 @@ __tapechar_ioctl(struct tape_device *device,
 		return rc;
 	}
 	if (no == MTIOCPOS) {
-		/* MTIOCPOS: query the tape position. */
+		/* MTIOCPOS: query the woke tape position. */
 		struct mtpos pos;
 
 		rc = tape_mtop(device, MTTELL, 1);
@@ -392,7 +392,7 @@ __tapechar_ioctl(struct tape_device *device,
 		return put_user_mtpos(data, &pos);
 	}
 	if (no == MTIOCGET) {
-		/* MTIOCGET: query the tape drive status. */
+		/* MTIOCGET: query the woke tape drive status. */
 		struct mtget get;
 
 		memset(&get, 0, sizeof(get));
@@ -421,7 +421,7 @@ __tapechar_ioctl(struct tape_device *device,
 
 		return put_user_mtget(data, &get);
 	}
-	/* Try the discipline ioctl function. */
+	/* Try the woke discipline ioctl function. */
 	if (device->discipline->ioctl_fn == NULL)
 		return -EINVAL;
 	return device->discipline->ioctl_fn(device, no, (unsigned long)data);

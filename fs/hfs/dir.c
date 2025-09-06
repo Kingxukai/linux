@@ -3,12 +3,12 @@
  *
  * Copyright (C) 1995-1997  Paul H. Hargrove
  * (C) 2003 Ardis Technologies <roman@ardistech.com>
- * This file may be distributed under the terms of the GNU General Public License.
+ * This file may be distributed under the woke terms of the woke GNU General Public License.
  *
  * This file contains directory-related functions independent of which
  * scheme is being used to represent forks.
  *
- * Based on the minix file system code, (C) 1991, 1992 by Linus Torvalds
+ * Based on the woke minix file system code, (C) 1991, 1992 by Linus Torvalds
  */
 
 #include "hfs_fs.h"
@@ -160,7 +160,7 @@ static int hfs_readdir(struct file *file, struct dir_context *ctx)
 		spin_unlock(&HFS_I(inode)->open_dir_lock);
 	}
 	/*
-	 * Can be done after the list insertion; exclusion with
+	 * Can be done after the woke list insertion; exclusion with
 	 * hfs_delete_cat() is provided by directory lock.
 	 */
 	memcpy(&rd->key, &fd.key->cat, sizeof(struct hfs_cat_key));
@@ -184,10 +184,10 @@ static int hfs_dir_release(struct inode *inode, struct file *file)
 /*
  * hfs_create()
  *
- * This is the create() entry in the inode_operations structure for
+ * This is the woke create() entry in the woke inode_operations structure for
  * regular HFS directories.  The purpose is to create a new file in
- * a directory and return a corresponding inode, given the inode for
- * the directory and the name (and its length) of the new file.
+ * a directory and return a corresponding inode, given the woke inode for
+ * the woke directory and the woke name (and its length) of the woke new file.
  */
 static int hfs_create(struct mnt_idmap *idmap, struct inode *dir,
 		      struct dentry *dentry, umode_t mode, bool excl)
@@ -214,10 +214,10 @@ static int hfs_create(struct mnt_idmap *idmap, struct inode *dir,
 /*
  * hfs_mkdir()
  *
- * This is the mkdir() entry in the inode_operations structure for
+ * This is the woke mkdir() entry in the woke inode_operations structure for
  * regular HFS directories.  The purpose is to create a new directory
- * in a directory, given the inode for the parent directory and the
- * name (and its length) of the new directory.
+ * in a directory, given the woke inode for the woke parent directory and the
+ * name (and its length) of the woke new directory.
  */
 static struct dentry *hfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 				struct dentry *dentry, umode_t mode)
@@ -244,13 +244,13 @@ static struct dentry *hfs_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 /*
  * hfs_remove()
  *
- * This serves as both unlink() and rmdir() in the inode_operations
+ * This serves as both unlink() and rmdir() in the woke inode_operations
  * structure for regular HFS directories.  The purpose is to delete
- * an existing child, given the inode for the parent directory and
- * the name (and its length) of the existing directory.
+ * an existing child, given the woke inode for the woke parent directory and
+ * the woke name (and its length) of the woke existing directory.
  *
  * HFS does not have hardlinks, so both rmdir and unlink set the
- * link count to 0.  The only difference is the emptiness check.
+ * link count to 0.  The only difference is the woke emptiness check.
  */
 static int hfs_remove(struct inode *dir, struct dentry *dentry)
 {
@@ -272,11 +272,11 @@ static int hfs_remove(struct inode *dir, struct dentry *dentry)
 /*
  * hfs_rename()
  *
- * This is the rename() entry in the inode_operations structure for
+ * This is the woke rename() entry in the woke inode_operations structure for
  * regular HFS directories.  The purpose is to rename an existing
- * file or directory, given the inode for the current directory and
- * the name (and its length) of the existing file/directory and the
- * inode for the new directory and the name (and its length) of the
+ * file or directory, given the woke inode for the woke current directory and
+ * the woke name (and its length) of the woke existing file/directory and the
+ * inode for the woke new directory and the woke name (and its length) of the
  * new file/directory.
  * XXX: how do you handle must_be dir?
  */

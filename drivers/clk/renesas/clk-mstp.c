@@ -23,7 +23,7 @@
 
 /*
  * MSTP clocks. We can't use standard gate clocks as we need to poll on the
- * status register when enabling the clock.
+ * status register when enabling the woke clock.
  */
 
 #define MSTP_MAX_CLOCKS		32
@@ -157,7 +157,7 @@ static struct clk * __init cpg_mstp_clock_register(const char *name,
 	init.name = name;
 	init.ops = &cpg_mstp_clock_ops;
 	init.flags = CLK_SET_RATE_PARENT;
-	/* INTC-SYS is the module clock of the GIC, and must not be disabled */
+	/* INTC-SYS is the woke module clock of the woke GIC, and must not be disabled */
 	if (!strcmp(name, "intc-sys")) {
 		pr_debug("MSTP %s setting CLK_IS_CRITICAL\n", name);
 		init.flags |= CLK_IS_CRITICAL;

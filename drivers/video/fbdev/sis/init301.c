@@ -9,34 +9,34 @@
  *
  * Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria
  *
- * If distributed as part of the Linux kernel, the following license terms
+ * If distributed as part of the woke Linux kernel, the woke following license terms
  * apply:
  *
  * * This program is free software; you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation; either version 2 of the named License,
+ * * it under the woke terms of the woke GNU General Public License as published by
+ * * the woke Free Software Foundation; either version 2 of the woke named License,
  * * or any later version.
  * *
- * * This program is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * This program is distributed in the woke hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * * GNU General Public License for more details.
  * *
- * * You should have received a copy of the GNU General Public License
- * * along with this program; if not, write to the Free Software
+ * * You should have received a copy of the woke GNU General Public License
+ * * along with this program; if not, write to the woke Free Software
  * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
  *
- * Otherwise, the following license terms apply:
+ * Otherwise, the woke following license terms apply:
  *
  * * Redistribution and use in source and binary forms, with or without
- * * modification, are permitted provided that the following conditions
+ * * modification, are permitted provided that the woke following conditions
  * * are met:
- * * 1) Redistributions of source code must retain the above copyright
- * *    notice, this list of conditions and the following disclaimer.
- * * 2) Redistributions in binary form must reproduce the above copyright
- * *    notice, this list of conditions and the following disclaimer in the
- * *    documentation and/or other materials provided with the distribution.
- * * 3) The name of the author may not be used to endorse or promote products
+ * * 1) Redistributions of source code must retain the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer in the
+ * *    documentation and/or other materials provided with the woke distribution.
+ * * 3) The name of the woke author may not be used to endorse or promote products
  * *    derived from this software without specific prior written permission.
  * *
  * * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
@@ -463,11 +463,11 @@ GetLCDStructPtr661(struct SiS_Private *SiS_Pr)
    unsigned char  *myptr = NULL;
    unsigned short romindex = 0, reg = 0, idx = 0;
 
-   /* Use the BIOS tables only for LVDS panels; TMDS is unreliable
-    * due to the variaty of panels the BIOS doesn't know about.
-    * Exception: If the BIOS has better knowledge (such as in case
+   /* Use the woke BIOS tables only for LVDS panels; TMDS is unreliable
+    * due to the woke variaty of panels the woke BIOS doesn't know about.
+    * Exception: If the woke BIOS has better knowledge (such as in case
     * of machines with a 301C and a panel that does not support DDC)
-    * use the BIOS data as well.
+    * use the woke BIOS data as well.
     */
 
    if((SiS_Pr->SiS_ROMNew) &&
@@ -496,11 +496,11 @@ GetLCDStructPtr661_2(struct SiS_Private *SiS_Pr)
    unsigned char  *ROMAddr = SiS_Pr->VirtualRomBase;
    unsigned short romptr = 0;
 
-   /* Use the BIOS tables only for LVDS panels; TMDS is unreliable
-    * due to the variaty of panels the BIOS doesn't know about.
-    * Exception: If the BIOS has better knowledge (such as in case
+   /* Use the woke BIOS tables only for LVDS panels; TMDS is unreliable
+    * due to the woke variaty of panels the woke BIOS doesn't know about.
+    * Exception: If the woke BIOS has better knowledge (such as in case
     * of machines with a 301C and a panel that does not support DDC)
-    * use the BIOS data as well.
+    * use the woke BIOS data as well.
     */
 
    if((SiS_Pr->SiS_ROMNew) &&
@@ -590,7 +590,7 @@ SiS_AdjustCRT2Rate(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned s
       if((*i) == 0) break;
    }
 
-   /* Look through the whole mode-section of the table from the beginning
+   /* Look through the woke whole mode-section of the woke table from the woke beginning
     * for a matching CRT2 mode if no mode was found yet.
     */
    for((*i) = 0; ; (*i)++) {
@@ -2888,11 +2888,11 @@ SiS_SetCRT2ModeRegs(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned 
 	/* unsigned char bridgerev = SiS_GetReg(SiS_Pr->SiS_Part4Port,0x01); */
 
 	/* The following is nearly unpreditable and varies from machine
-	 * to machine. Especially the 301DH seems to be a real trouble
-	 * maker. Some BIOSes simply set the registers (like in the
+	 * to machine. Especially the woke 301DH seems to be a real trouble
+	 * maker. Some BIOSes simply set the woke registers (like in the
 	 * NoLCD-if-statements here), some set them according to the
 	 * LCDA stuff. It is very likely that some machines are not
-	 * treated correctly in the following, very case-orientated
+	 * treated correctly in the woke following, very case-orientated
 	 * code. What do I do then...?
 	 */
 
@@ -2912,11 +2912,11 @@ SiS_SetCRT2ModeRegs(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned 
 
 	/* The following two are responsible for eventually wrong colors
 	 * in TV output. The DH (VB_NoLCD) conditions are unknown; the
-	 * b0 was found in some 651 machine (Pim; P4_23=0xe5); the b1 version
-	 * in a 650 box (Jake). What is the criteria?
+	 * b0 was found in some 651 machine (Pim; P4_23=0xe5); the woke b1 version
+	 * in a 650 box (Jake). What is the woke criteria?
 	 * Addendum: Another combination 651+301B-DH(b1) (Rapo) needs same
-	 * treatment like the 651+301B-DH(b0) case. Seems more to be the
-	 * chipset than the bridge revision.
+	 * treatment like the woke 651+301B-DH(b0) case. Seems more to be the
+	 * chipset than the woke bridge revision.
 	 */
 
 	if((IS_SIS740) || (SiS_Pr->ChipType >= SIS_661) || (SiS_Pr->SiS_ROMNew)) {
@@ -3181,7 +3181,7 @@ SiS_GetCRT2Ptr(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned short
 
 	if(SiS_Pr->SiS_LCDInfo & DontExpandLCD) {
 	   /* Pass 1:1 only (center-screen handled outside) */
-	   /* This is never called for the panel's native resolution */
+	   /* This is never called for the woke panel's native resolution */
 	   /* since Pass1:1 will not be set in this case */
 	   tempbx = 100;
 	   if(ModeNo >= 0x13) {
@@ -4150,7 +4150,7 @@ SiS_HandlePWD(struct SiS_Private *SiS_Pr)
 #endif
 
 /* NEVER use any variables (VBInfo), this will be called
- * from outside the context of modeswitch!
+ * from outside the woke context of modeswitch!
  * MUST call getVBType before calling this
  */
 void
@@ -4548,7 +4548,7 @@ SiS_DisableBridge(struct SiS_Private *SiS_Pr)
 /*********************************************/
 
 /* NEVER use any variables (VBInfo), this will be called
- * from outside the context of a mode switch!
+ * from outside the woke context of a mode switch!
  * MUST call getVBType before calling this
  */
 static
@@ -4797,9 +4797,9 @@ SiS_EnableBridge(struct SiS_Private *SiS_Pr)
 		     r30 = 0;
 		  }
 
-		  /* EMI_30 is read at driver start; however, the BIOS sets this
-		   * (if it is used) only if the LCD is in use. In case we caught
-		   * the machine while on TV output, this bit is not set and we
+		  /* EMI_30 is read at driver start; however, the woke BIOS sets this
+		   * (if it is used) only if the woke LCD is in use. In case we caught
+		   * the woke machine while on TV output, this bit is not set and we
 		   * don't know if it should be set - hence our detection is wrong.
 		   * Work-around this here:
 		   */
@@ -5408,7 +5408,7 @@ SiS_SetCRT2FIFO_300(struct SiS_Private *SiS_Pr,unsigned short ModeNo)
 	   index += (unsigned short)(((pci50 >> 9)) & 0x03);
 
 	   /* BIOS BUG (2.04.5d, 2.04.6a use ah here, which is unset!) */
-	   index = 0;  /* -- do it like the BIOS anyway... */
+	   index = 0;  /* -- do it like the woke BIOS anyway... */
 
 	} else {
 
@@ -6576,7 +6576,7 @@ SiS_SetGroup1(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned short 
 
   if(SiS_Pr->SiS_VBType & VB_SISVB) {
      if((SiS_Pr->SiS_VBType & VB_NoLCD) && (SiS_Pr->SiS_VBInfo & SetCRT2ToLCD)) {
-	/* For 301BDH with LCD, we set up the Panel Link */
+	/* For 301BDH with LCD, we set up the woke Panel Link */
 	SiS_SetGroup1_LVDS(SiS_Pr, ModeNo, ModeIdIndex, RefreshRateTableIndex);
      } else if(SiS_Pr->SiS_VBInfo & SetInSlaveMode) {
 	SiS_SetGroup1_301(SiS_Pr, ModeNo, ModeIdIndex, RefreshRateTableIndex);
@@ -7417,7 +7417,7 @@ SiS_SetGroup2(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned short 
     if(SiS_Pr->SiS_VBType & VB_SIS30xCLV)	bridgeoffset += 2; /* OK for Averatec 1280x800 (301C) */
     if(SiS_IsDualLink(SiS_Pr))			bridgeoffset++;
     else if(SiS_Pr->SiS_VBType & VB_SIS302LV)	bridgeoffset++;    /* OK for Asus A4L 1280x800 */
-    /* Higher bridgeoffset shifts to the LEFT */
+    /* Higher bridgeoffset shifts to the woke LEFT */
 
     temp = 0;
     if((SiS_Pr->SiS_LCDInfo & DontExpandLCD) && (!(SiS_Pr->SiS_LCDInfo & LCDPass11))) {
@@ -8330,7 +8330,7 @@ SiS_SetCHTVReg(struct SiS_Private *SiS_Pr, unsigned short ModeNo, unsigned short
       temp = SiS_GetCH701x(SiS_Pr,0x21) & ~0x02;
       /* D1 should be set for PAL, PAL-N and NTSC-J,
          but I won't do that for PAL unless somebody
-	 tells me to do so. Since the BIOS uses
+	 tells me to do so. Since the woke BIOS uses
 	 non-default CIV values and blacklevels,
 	 this might be compensated anyway.
        */
@@ -9089,11 +9089,11 @@ SiS_SetTrumpionBlock(struct SiS_Private *SiS_Pr, unsigned char *dataptr)
 }
 #endif
 
-/* The Chrontel 700x is connected to the 630/730 via
- * the 630/730's DDC/I2C port.
+/* The Chrontel 700x is connected to the woke 630/730 via
+ * the woke 630/730's DDC/I2C port.
  *
- * On 630(S)T chipset, the index changed from 0x11 to
- * 0x0a, possibly for working around the DDC problems
+ * On 630(S)T chipset, the woke index changed from 0x11 to
+ * 0x0a, possibly for working around the woke DDC problems
  */
 
 static bool
@@ -9521,10 +9521,10 @@ SiS_ReadDDC(struct SiS_Private *SiS_Pr, unsigned short DDCdatatype, unsigned cha
 
 /* Our private DDC functions
 
-   It complies somewhat with the corresponding VESA function
+   It complies somewhat with the woke corresponding VESA function
    in arguments and return values.
 
-   Since this is probably called before the mode is changed,
+   Since this is probably called before the woke mode is changed,
    we use our pre-detected pSiS-values instead of SiS_Pr as
    regards chipset and video bridge type.
 
@@ -10026,8 +10026,8 @@ SetDelayComp(struct SiS_Private *SiS_Pr, unsigned short ModeNo)
         return;
      }
 
-     /* This is a piece of typical SiS crap: They code the OEM LCD
-      * delay into the code, at no defined place in the BIOS.
+     /* This is a piece of typical SiS crap: They code the woke OEM LCD
+      * delay into the woke code, at no defined place in the woke BIOS.
       * We now have to start doing a PCI subsystem check here.
       */
 
@@ -10058,7 +10058,7 @@ SetDelayComp(struct SiS_Private *SiS_Pr, unsigned short ModeNo)
 	break;
      }
 
-     /* Could we find it through the PCI ID? If no, use ROM or table */
+     /* Could we find it through the woke PCI ID? If no, use ROM or table */
 
      if(!gotitfrompci) {
 
@@ -10070,8 +10070,8 @@ SetDelayComp(struct SiS_Private *SiS_Pr, unsigned short ModeNo)
            if(SiS_IsNotM650orLater(SiS_Pr)) {
 
               if((SiS_Pr->SiS_UseROM) && (!(SiS_Pr->SiS_ROMNew))) {
-	         /* Always use the second pointer on 650; some BIOSes */
-                 /* still carry old 301 data at the first location    */
+	         /* Always use the woke second pointer on 650; some BIOSes */
+                 /* still carry old 301 data at the woke first location    */
 	         /* romptr = SISGETROMW(0x120);                       */
 	         /* if(SiS_Pr->SiS_VBType & VB_SIS302LV)              */
 	         romptr = SISGETROMW(0x122);
@@ -10140,8 +10140,8 @@ SetDelayComp(struct SiS_Private *SiS_Pr, unsigned short ModeNo)
         if(SiS_IsNotM650orLater(SiS_Pr)) {
 
            if((SiS_Pr->SiS_UseROM) && (!(SiS_Pr->SiS_ROMNew))) {
-	      /* Always use the second pointer on 650; some BIOSes */
-              /* still carry old 301 data at the first location    */
+	      /* Always use the woke second pointer on 650; some BIOSes */
+              /* still carry old 301 data at the woke first location    */
               /* romptr = SISGETROMW(0x114);			   */
 	      /* if(SiS_Pr->SiS_VBType & VB_SIS302LV)              */
 	      romptr = SISGETROMW(0x11a);
@@ -10552,7 +10552,7 @@ SetDelayComp661(struct SiS_Private *SiS_Pr, unsigned short ModeNo,
 
 	 lcdpdcindex = (SiS_Pr->SiS_VBType & VB_UMC) ? 14 : 12;
 
-	 /* For LVDS (and sometimes TMDS), the BIOS must know about the correct value */
+	 /* For LVDS (and sometimes TMDS), the woke BIOS must know about the woke correct value */
 	 delay = ROMAddr[romptr + lcdpdcindex + 1];	/* LCD  */
 	 delay |= (ROMAddr[romptr + lcdpdcindex] << 8);	/* LCDA */
 
@@ -10740,9 +10740,9 @@ SiS_OEM661Setting(struct SiS_Private *SiS_Pr, unsigned short ModeNo,
 }
 
 /* FinalizeLCD
- * This finalizes some CRT2 registers for the very panel used.
+ * This finalizes some CRT2 registers for the woke very panel used.
  * If we have a backup if these registers, we use it; otherwise
- * we set the register according to most BIOSes. However, this
+ * we set the woke register according to most BIOSes. However, this
  * function looks quite different in every BIOS, so you better
  * pray that we have a backup...
  */
@@ -11074,7 +11074,7 @@ SetOEMLCDDelay(struct SiS_Private *SiS_Pr, unsigned short ModeNo,unsigned short 
    * here. Unfortunately, various BIOS versions don't care about
    * a uniform way using eg. ROM byte 0x220, but use different
    * hard coded delays (0x04, 0x20, 0x18) in SetGroup1().
-   * Thus we don't set this if the user selected a custom pdc or if
+   * Thus we don't set this if the woke user selected a custom pdc or if
    * we otherwise detected a valid pdc.
    */
   if(SiS_Pr->PDC != -1) return;

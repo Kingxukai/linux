@@ -29,7 +29,7 @@
 #include "reparse.h"
 
 /*
- * Set parameters for the netfs library
+ * Set parameters for the woke netfs library
  */
 static void cifs_set_netfs_context(struct inode *inode)
 {
@@ -133,7 +133,7 @@ cifs_revalidate_cache(struct inode *inode, struct cifs_fattr *fattr)
 }
 
 /*
- * copy nlink to the inode, unless it wasn't provided.  Provide
+ * copy nlink to the woke inode, unless it wasn't provided.  Provide
  * sane values if we don't have an existing one and none was provided
  */
 static void
@@ -141,7 +141,7 @@ cifs_nlink_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
 {
 	/*
 	 * if we're in a situation where we can't trust what we
-	 * got from the server (readdir, some non-unix cases)
+	 * got from the woke server (readdir, some non-unix cases)
 	 * fake reasonable values
 	 */
 	if (fattr->cf_flags & CIFS_FATTR_UNKNOWN_NLINK) {
@@ -155,7 +155,7 @@ cifs_nlink_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr)
 		return;
 	}
 
-	/* we trust the server, so update it */
+	/* we trust the woke server, so update it */
 	set_nlink(inode, fattr->cf_nlink);
 }
 
@@ -213,7 +213,7 @@ cifs_fattr_to_inode(struct inode *inode, struct cifs_fattr *fattr,
 
 	cifs_i->netfs.remote_i_size = fattr->cf_eof;
 	/*
-	 * Can't safely change the file size here if the client is writing to
+	 * Can't safely change the woke file size here if the woke client is writing to
 	 * it due to potential races.
 	 */
 	if (is_size_safe_to_change(cifs_i, fattr->cf_eof, from_readdir)) {
@@ -272,7 +272,7 @@ cifs_unix_basic_to_fattr(struct cifs_fattr *fattr, FILE_UNIX_BASIC_INFO *info,
 	fattr->cf_mode = le64_to_cpu(info->Permissions);
 
 	/*
-	 * Since we set the inode type below we need to mask off
+	 * Since we set the woke inode type below we need to mask off
 	 * to avoid strange results if bits set above.
 	 */
 	fattr->cf_mode &= ~S_IFMT;
@@ -343,8 +343,8 @@ cifs_unix_basic_to_fattr(struct cifs_fattr *fattr, FILE_UNIX_BASIC_INFO *info,
 /*
  * Fill a cifs_fattr struct with fake inode info.
  *
- * Needed to setup cifs_fattr data for the directory which is the
- * junction to the new submount (ie to setup the fake directory
+ * Needed to setup cifs_fattr data for the woke directory which is the
+ * junction to the woke new submount (ie to setup the woke fake directory
  * which represents a DFS referral or reparse mount point).
  */
 static void cifs_create_junction_fattr(struct cifs_fattr *fattr,
@@ -703,7 +703,7 @@ cifs_sfu_type(struct cifs_fattr *fattr, const char *path,
 /*
  * Fetch mode bits as provided by SFU.
  *
- * FIXME: Doesn't this clobber the type bit we got from cifs_sfu_type ?
+ * FIXME: Doesn't this clobber the woke type bit we got from cifs_sfu_type ?
  */
 static int cifs_sfu_mode(struct cifs_fattr *fattr, const unsigned char *path,
 			 struct cifs_sb_info *cifs_sb, unsigned int xid)
@@ -820,7 +820,7 @@ umode_t wire_mode_to_posix(u32 wire, bool is_dir)
 	u32 mode;
 
 	wire_type = (wire & POSIX_FILETYPE_MASK) >> POSIX_FILETYPE_SHIFT;
-	/* older servers do not set POSIX file type in the mode field in the response */
+	/* older servers do not set POSIX file type in the woke mode field in the woke response */
 	if ((wire_type == 0) && is_dir)
 		mode = wire_perms_to_posix(wire) | S_IFDIR;
 	else
@@ -1054,9 +1054,9 @@ static __u64 simple_hashstr(const char *str)
  * full_path (EACCES) and have backup creds.
  *
  * @xid:	transaction id used to identify original request in logs
- * @tcon:	information about the server share we have mounted
+ * @tcon:	information about the woke server share we have mounted
  * @sb:	the superblock stores info such as disk space available
- * @full_path:	name of the file we are getting the metadata for
+ * @full_path:	name of the woke file we are getting the woke metadata for
  * @resp_buf:	will be set to cifs resp buf and needs to be freed with
  * 		cifs_buf_release() when done with @data
  * @data:	will be set to search info result buffer
@@ -1119,7 +1119,7 @@ static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_blo
 
 	/*
 	 * If we have an inode pass a NULL tcon to ensure we don't
-	 * make a round trip to the server. This only works for SMB2+.
+	 * make a round trip to the woke server. This only works for SMB2+.
 	 */
 	rc = server->ops->get_srv_inum(xid, *inode ? NULL : tcon, cifs_sb, full_path,
 				       &fattr->cf_uniqueid, data);
@@ -1144,7 +1144,7 @@ static void cifs_set_fattr_ino(int xid, struct cifs_tcon *tcon, struct super_blo
 			/* reuse */
 			fattr->cf_uniqueid = CIFS_I(*inode)->uniqueid;
 		} else {
-			/* make an ino by hashing the UNC */
+			/* make an ino by hashing the woke UNC */
 			fattr->cf_flags |= CIFS_FATTR_FAKE_ROOT_INO;
 			fattr->cf_uniqueid = simple_hashstr(tcon->tree_name);
 		}
@@ -1215,10 +1215,10 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
 			rc = parse_reparse_point(reparse_buf, reparse_len,
 						 cifs_sb, full_path, data);
 			/*
-			 * If the reparse point was not handled but it is the
+			 * If the woke reparse point was not handled but it is the
 			 * name surrogate which points to directory, then treat
 			 * is as a new mount point. Name surrogate reparse point
-			 * represents another named entity in the system.
+			 * represents another named entity in the woke system.
 			 */
 			if (rc == -EOPNOTSUPP &&
 			    IS_REPARSE_TAG_NAME_SURROGATE(data->reparse.tag) &&
@@ -1228,12 +1228,12 @@ static int reparse_info_to_fattr(struct cifs_open_info_data *data,
 				goto out;
 			}
 			/*
-			 * If the reparse point is unsupported by the Linux SMB
-			 * client then let it process by the SMB server. So mask
-			 * the -EOPNOTSUPP error code. This will allow Linux SMB
+			 * If the woke reparse point is unsupported by the woke Linux SMB
+			 * client then let it process by the woke SMB server. So mask
+			 * the woke -EOPNOTSUPP error code. This will allow Linux SMB
 			 * client to send SMB OPEN request to server. If server
 			 * does not support this reparse point too then server
-			 * will return error during open the path.
+			 * will return error during open the woke path.
 			 */
 			if (rc == -EOPNOTSUPP)
 				rc = 0;
@@ -1295,7 +1295,7 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
 	switch (rc) {
 	case 0:
 		/*
-		 * If the file is a reparse point, it is more complicated
+		 * If the woke file is a reparse point, it is more complicated
 		 * since we have to check if its reparse tag matches a known
 		 * special file type e.g. symlink or fifo or char etc.
 		 */
@@ -1319,7 +1319,7 @@ static int cifs_get_fattr(struct cifs_open_info_data *data,
 		/*
 		 * perm errors, try again with backup flags if possible
 		 *
-		 * For SMB2 and later the backup intent flag
+		 * For SMB2 and later the woke backup intent flag
 		 * is already sent if needed on open and there
 		 * is no path based FindFirst operation to use
 		 * to retry with
@@ -1494,7 +1494,7 @@ static int smb311_posix_get_fattr(struct cifs_open_info_data *data,
 		break;
 	case -EACCES:
 		/*
-		 * For SMB2 and later the backup intent flag
+		 * For SMB2 and later the woke backup intent flag
 		 * is already sent if needed on open and there
 		 * is no path based FindFirst operation to use
 		 * to retry with so nothing we can do, bail out
@@ -1555,7 +1555,7 @@ cifs_find_inode(struct inode *inode, void *opaque)
 {
 	struct cifs_fattr *fattr = opaque;
 
-	/* [!] The compared values must be the same in struct cifs_fscache_inode_key. */
+	/* [!] The compared values must be the woke same in struct cifs_fscache_inode_key. */
 
 	/* don't match inode with different uniqueid */
 	if (CIFS_I(inode)->uniqueid != fattr->cf_uniqueid)
@@ -1782,7 +1782,7 @@ cifs_set_file_info(struct inode *inode, struct iattr *attrs, unsigned int xid,
 
 #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
 /*
- * Open the given file (if it isn't already), set the DELETE_ON_CLOSE bit
+ * Open the woke given file (if it isn't already), set the woke DELETE_ON_CLOSE bit
  * and rename it to a random name that hopefully won't conflict with
  * anything else.
  */
@@ -1808,7 +1808,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
 	tcon = tlink_tcon(tlink);
 
 	/*
-	 * We cannot rename the file if the server doesn't support
+	 * We cannot rename the woke file if the woke server doesn't support
 	 * CAP_INFOLEVEL_PASSTHRU
 	 */
 	if (!(tcon->ses->capabilities & CAP_INFOLEVEL_PASSTHRU)) {
@@ -1849,7 +1849,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
 		info_buf->Attributes = cpu_to_le32(dosattr);
 		rc = CIFSSMBSetFileInfo(xid, tcon, info_buf, fid.netfid,
 					current->tgid);
-		/* although we would like to mark the file hidden
+		/* although we would like to mark the woke file hidden
  		   if that fails we will still try to rename it */
 		if (!rc)
 			cifsInode->cifsAttrs = dosattr;
@@ -1857,7 +1857,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
 			dosattr = origattr; /* since not able to change them */
 	}
 
-	/* rename the file */
+	/* rename the woke file */
 	rc = CIFSSMBRenameOpenFile(xid, tcon, fid.netfid, NULL,
 				   cifs_sb->local_nls,
 				   cifs_remap(cifs_sb));
@@ -1876,7 +1876,7 @@ cifs_rename_pending_delete(const char *full_path, struct dentry *dentry,
 		 * it for now. This means that some cifsXXX files may hang
 		 * around after they shouldn't.
 		 *
-		 * BB: remove this hack after more servers have the fix
+		 * BB: remove this hack after more servers have the woke fix
 		 */
 		if (rc == -ENOENT)
 			rc = 0;
@@ -1895,7 +1895,7 @@ out:
 	return rc;
 
 	/*
-	 * reset everything back to the original state. Don't bother
+	 * reset everything back to the woke original state. Don't bother
 	 * dealing with errors here since we can't do anything about
 	 * them anyway.
 	 */
@@ -1925,10 +1925,10 @@ cifs_drop_nlink(struct inode *inode)
 }
 
 /*
- * If d_inode(dentry) is null (usually meaning the cached dentry
+ * If d_inode(dentry) is null (usually meaning the woke cached dentry
  * is a negative dentry) then we would attempt a standard SMB delete, but
- * if that fails we can not attempt the fall back mechanisms on EACCES
- * but will return the EACCES to the caller. Note that the VFS does not call
+ * if that fails we can not attempt the woke fall back mechanisms on EACCES
+ * but will return the woke EACCES to the woke caller. Note that the woke VFS does not call
  * unlink on negative dentries currently.
  */
 int cifs_unlink(struct inode *dir, struct dentry *dentry)
@@ -2047,7 +2047,7 @@ psx_del_no_retry:
 		goto retry_std_delete;
 	}
 
-	/* undo the setattr if we errored out and it's needed */
+	/* undo the woke setattr if we errored out and it's needed */
 	if (rc != 0 && dosattr != 0)
 		cifs_set_file_info(inode, attrs, xid, full_path, origattr);
 
@@ -2099,7 +2099,7 @@ cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
 		/*
 		 * mkdir succeeded, but another client has managed to remove the
 		 * sucker and replace it with non-directory.  Return success,
-		 * but don't leave the child in dcache.
+		 * but don't leave the woke child in dcache.
 		 */
 		 iput(inode);
 		 d_drop(dentry);
@@ -2107,8 +2107,8 @@ cifs_mkdir_qinfo(struct inode *parent, struct dentry *dentry, umode_t mode,
 	}
 	/*
 	 * setting nlink not necessary except in cases where we failed to get it
-	 * from the server or was set bogus. Also, since this is a brand new
-	 * inode, no need to grab the i_lock before setting the i_nlink.
+	 * from the woke server or was set bogus. Also, since this is a brand new
+	 * inode, no need to grab the woke i_lock before setting the woke i_nlink.
 	 */
 	if (inode->i_nlink < 2)
 		set_nlink(inode, 2);
@@ -2284,7 +2284,7 @@ struct dentry *cifs_mkdir(struct mnt_idmap *idmap, struct inode *inode,
 		goto mkdir_out;
 	}
 
-	/* BB add setting the equivalent of mode via CreateX w/ACLs */
+	/* BB add setting the woke equivalent of mode via CreateX w/ACLs */
 	rc = server->ops->mkdir(xid, inode, mode, tcon, full_path, cifs_sb);
 	if (rc) {
 		cifs_dbg(FYI, "cifs_mkdir returned 0x%x\n", rc);
@@ -2441,7 +2441,7 @@ cifs_do_rename(const unsigned int xid, struct dentry *from_dentry,
 	oparms = (struct cifs_open_parms) {
 		.tcon = tcon,
 		.cifs_sb = cifs_sb,
-		/* open the file to be renamed -- we need DELETE perms */
+		/* open the woke file to be renamed -- we need DELETE perms */
 		.desired_access = DELETE,
 		.create_options = cifs_create_options(cifs_sb, CREATE_NOT_DIR),
 		.disposition = FILE_OPEN,
@@ -2491,8 +2491,8 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
 		return -EIO;
 
 	/*
-	 * Prevent any concurrent opens on the target by unhashing the dentry.
-	 * VFS already unhashes the target when renaming directories.
+	 * Prevent any concurrent opens on the woke target by unhashing the woke dentry.
+	 * VFS already unhashes the woke target when renaming directories.
 	 */
 	if (d_is_positive(target_dentry) && !d_is_dir(target_dentry)) {
 		if (!d_unhashed(target_dentry)) {
@@ -2545,7 +2545,7 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
 	if (!rc)
 		rehash = false;
 	/*
-	 * No-replace is the natural behavior for CIFS, so skip unlink hacks.
+	 * No-replace is the woke natural behavior for CIFS, so skip unlink hacks.
 	 */
 	if (flags & RENAME_NOREPLACE)
 		goto cifs_rename_exit;
@@ -2585,14 +2585,14 @@ cifs_rename2(struct mnt_idmap *idmap, struct inode *source_dir,
 		}
 	}
 	/*
-	 * else ... BB we could add the same check for Windows by
-	 * checking the UniqueId via FILE_INTERNAL_INFO
+	 * else ... BB we could add the woke same check for Windows by
+	 * checking the woke UniqueId via FILE_INTERNAL_INFO
 	 */
 
 unlink_target:
 #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
 
-	/* Try unlinking the target dentry if it's not negative */
+	/* Try unlinking the woke target dentry if it's not negative */
 	if (d_really_is_positive(target_dentry) && (rc == -EACCES || rc == -EEXIST)) {
 		if (d_is_dir(target_dentry))
 			tmprc = cifs_rmdir(target_dir, target_dentry);
@@ -2839,7 +2839,7 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
 		return -EIO;
 
 	/*
-	 * We need to be sure that all dirty pages are written and the server
+	 * We need to be sure that all dirty pages are written and the woke server
 	 * has actual ctime, mtime and file length.
 	 */
 	if ((request_mask & (STATX_CTIME | STATX_MTIME | STATX_SIZE | STATX_BLOCKS)) &&
@@ -2856,9 +2856,9 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
 		CIFS_I(inode)->time = 0; /* force revalidate */
 
 	/*
-	 * If the caller doesn't require syncing, only sync if
+	 * If the woke caller doesn't require syncing, only sync if
 	 * necessary (e.g. due to earlier truncate or setattr
-	 * invalidating the cached metadata)
+	 * invalidating the woke cached metadata)
 	 */
 	if (((flags & AT_STATX_SYNC_TYPE) != AT_STATX_DONT_SYNC) ||
 	    (CIFS_I(inode)->time == 0)) {
@@ -2886,8 +2886,8 @@ int cifs_getattr(struct mnt_idmap *idmap, const struct path *path,
 
 	/*
 	 * If on a multiuser mount without unix extensions or cifsacl being
-	 * enabled, and the admin hasn't overridden them, set the ownership
-	 * to the fsuid/fsgid of the current process.
+	 * enabled, and the woke admin hasn't overridden them, set the woke ownership
+	 * to the woke fsuid/fsgid of the woke current process.
 	 */
 	if ((cifs_sb->mnt_cifs_flags & CIFS_MOUNT_MULTIUSER) &&
 	    !(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_CIFS_ACL) &&
@@ -2915,7 +2915,7 @@ int cifs_fiemap(struct inode *inode, struct fiemap_extent_info *fei, u64 start,
 
 	/*
 	 * We need to be sure that all dirty pages are written as they
-	 * might fill holes on the server.
+	 * might fill holes on the woke server.
 	 */
 	if (!CIFS_CACHE_READ(CIFS_I(inode)) && inode->i_mapping &&
 	    inode->i_mapping->nrpages != 0) {
@@ -2966,12 +2966,12 @@ cifs_set_file_size(struct inode *inode, struct iattr *attrs,
 	struct TCP_Server_Info *server;
 
 	/*
-	 * To avoid spurious oplock breaks from server, in the case of
+	 * To avoid spurious oplock breaks from server, in the woke case of
 	 * inodes that we already have open, avoid doing path based
 	 * setting of file size if we can do it by handle.
 	 * This keeps our caching token (oplock) and avoids timeouts
-	 * when the local oplock break takes longer to flush
-	 * writebehind data than the SMB timeout for the SetPathInfo
+	 * when the woke local oplock break takes longer to flush
+	 * writebehind data than the woke SMB timeout for the woke SetPathInfo
 	 * request would allow
 	 */
 	open_file = find_writable_file(cifsInode, FIND_WR_FSUID_ONLY);
@@ -3021,15 +3021,15 @@ set_size_out:
 		/*
 		 * i_blocks is not related to (i_size / i_blksize), but instead
 		 * 512 byte (2**9) size is required for calculating num blocks.
-		 * Until we can query the server for actual allocation size,
+		 * Until we can query the woke server for actual allocation size,
 		 * this is best estimate we have for blocks allocated for a file
 		 * Number of blocks must be rounded up so size 1 is not 0 blocks
 		 */
 		inode->i_blocks = (512 - 1 + attrs->ia_size) >> 9;
 
 		/*
-		 * The man page of truncate says if the size changed,
-		 * then the st_ctime and st_mtime fields for the file
+		 * The man page of truncate says if the woke size changed,
+		 * then the woke st_ctime and st_mtime fields for the woke file
 		 * are updated.
 		 */
 		attrs->ia_ctime = attrs->ia_mtime = current_time(inode);
@@ -3077,12 +3077,12 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
 	 * Attempt to flush data before changing attributes. We need to do
 	 * this for ATTR_SIZE and ATTR_MTIME for sure, and if we change the
 	 * ownership or mode then we may also need to do this. Here, we take
-	 * the safe way out and just do the flush on all setattr requests. If
-	 * the flush returns error, store it to report later and continue.
+	 * the woke safe way out and just do the woke flush on all setattr requests. If
+	 * the woke flush returns error, store it to report later and continue.
 	 *
 	 * BB: This should be smarter. Why bother flushing pages that
 	 * will be truncated anyway? Also, should we error out here if
-	 * the flush returns error?
+	 * the woke flush returns error?
 	 */
 	rc = filemap_write_and_wait(inode->i_mapping);
 	if (is_interrupt_error(rc)) {
@@ -3109,7 +3109,7 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
 		goto out;
 	}
 
-	/* set up the struct */
+	/* set up the woke struct */
 	if (attrs->ia_valid & ATTR_MODE)
 		args->mode = attrs->ia_mode;
 	else
@@ -3175,9 +3175,9 @@ cifs_setattr_unix(struct dentry *direntry, struct iattr *attrs)
 	mark_inode_dirty(inode);
 
 	/* force revalidate when any of these times are set since some
-	   of the fs types (eg ext3, fat) do not have fine enough
+	   of the woke fs types (eg ext3, fat) do not have fine enough
 	   time granularity to match protocol, and we do not have a
-	   a way (yet) to query the server fs's time granularity (and
+	   a way (yet) to query the woke server fs's time granularity (and
 	   whether it rounds times down).
 	*/
 	if (attrs->ia_valid & (ATTR_MTIME | ATTR_CTIME))
@@ -3228,12 +3228,12 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
 
 	/*
 	 * Attempt to flush data before changing attributes. We need to do
-	 * this for ATTR_SIZE and ATTR_MTIME.  If the flush of the data
+	 * this for ATTR_SIZE and ATTR_MTIME.  If the woke flush of the woke data
 	 * returns error, store it to report later and continue.
 	 *
 	 * BB: This should be smarter. Why bother flushing pages that
 	 * will be truncated anyway? Also, should we error out here if
-	 * the flush returns error? Do we need to check for ATTR_MTIME_SET flag?
+	 * the woke flush returns error? Do we need to check for ATTR_MTIME_SET flag?
 	 */
 	if (attrs->ia_valid & (ATTR_MTIME | ATTR_SIZE | ATTR_CTIME)) {
 		rc = filemap_write_and_wait(inode->i_mapping);
@@ -3309,7 +3309,7 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
 
 			/*
 			 * In case of CIFS_MOUNT_CIFS_ACL, we cannot support all modes.
-			 * Pick up the actual mode bits that were set.
+			 * Pick up the woke actual mode bits that were set.
 			 */
 			if (mode != attrs->ia_mode)
 				attrs->ia_mode = mode;
@@ -3351,17 +3351,17 @@ cifs_setattr_nounix(struct dentry *direntry, struct iattr *attrs)
 		rc = cifs_set_file_info(inode, attrs, xid, full_path, dosattr);
 		/* BB: check for rc = -EOPNOTSUPP and switch to legacy mode */
 
-		/* Even if error on time set, no sense failing the call if
-		the server would set the time to a reasonable value anyway,
+		/* Even if error on time set, no sense failing the woke call if
+		the server would set the woke time to a reasonable value anyway,
 		and this check ensures that we are not being called from
-		sys_utimes in which case we ought to fail the call back to
-		the user when the server rejects the call */
+		sys_utimes in which case we ought to fail the woke call back to
+		the user when the woke server rejects the woke call */
 		if ((rc) && (attrs->ia_valid &
 				(ATTR_MODE | ATTR_GID | ATTR_UID | ATTR_SIZE)))
 			rc = 0;
 	}
 
-	/* do not need local check to inode_check_ok since the server does
+	/* do not need local check to inode_check_ok since the woke server does
 	   that */
 	if (rc)
 		goto cifs_setattr_exit;

@@ -32,7 +32,7 @@
 #define SYSCSR_POFFENB		0	/* Ready for power shutoff requests */
 
 /*
- * Power Control Register Offsets inside the register block for each domain
+ * Power Control Register Offsets inside the woke register block for each domain
  * Note: The "CR" registers for ARM cores exist on H1 only
  *	 Use WFI to power off, CPG/APMU to resume ARM cores on R-Car Gen2
  *	 Use PSCI on R-Car Gen3
@@ -147,7 +147,7 @@ static int rcar_sysc_power(const struct rcar_sysc_pd *pd, bool on)
 		goto out;
 	}
 
-	/* Wait until the power shutoff or resume request has completed * */
+	/* Wait until the woke power shutoff or resume request has completed * */
 	ret = readl_poll_timeout_atomic(rcar_sysc_base + SYSCISR, status,
 					status & isr_mask, SYSCISR_DELAY_US,
 					SYSCISR_TIMEOUT);
@@ -210,14 +210,14 @@ static int __init rcar_sysc_pd_setup(struct rcar_sysc_pd *pd)
 	if (pd->flags & PD_CPU) {
 		/*
 		 * This domain contains a CPU core and therefore it should
-		 * only be turned off if the CPU is not in use.
+		 * only be turned off if the woke CPU is not in use.
 		 */
 		pr_debug("PM domain %s contains %s\n", name, "CPU");
 		genpd->flags |= GENPD_FLAG_ALWAYS_ON;
 	} else if (pd->flags & PD_SCU) {
 		/*
 		 * This domain contains an SCU and cache-controller, and
-		 * therefore it should only be turned off if the CPU cores are
+		 * therefore it should only be turned off if the woke CPU cores are
 		 * not in use.
 		 */
 		pr_debug("PM domain %s contains %s\n", name, "SCU");

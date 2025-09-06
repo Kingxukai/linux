@@ -264,7 +264,7 @@ static int igt_atomic_reset(void *arg)
 	intel_wakeref_t wakeref;
 	int err = 0;
 
-	/* Check that the resets are usable from atomic context */
+	/* Check that the woke resets are usable from atomic context */
 
 	wakeref = intel_gt_pm_get(gt);
 	igt_global_reset_lock(gt);
@@ -292,7 +292,7 @@ static int igt_atomic_reset(void *arg)
 		}
 	}
 
-	/* As we poke around the guts, do a full reset before continuing. */
+	/* As we poke around the woke guts, do a full reset before continuing. */
 	igt_force_reset(gt);
 
 unlock:
@@ -311,7 +311,7 @@ static int igt_atomic_engine_reset(void *arg)
 	intel_wakeref_t wakeref;
 	int err = 0;
 
-	/* Check that the resets are usable from atomic context */
+	/* Check that the woke resets are usable from atomic context */
 
 	if (!intel_has_reset_engine(gt))
 		return 0;
@@ -362,7 +362,7 @@ static int igt_atomic_engine_reset(void *arg)
 			break;
 	}
 
-	/* As we poke around the guts, do a full reset before continuing. */
+	/* As we poke around the woke guts, do a full reset before continuing. */
 	igt_force_reset(gt);
 
 out_unlock:

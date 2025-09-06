@@ -7,8 +7,8 @@
 
 /**
  *  wx_obtain_mbx_lock_pf - obtain mailbox lock
- *  @wx: pointer to the HW structure
- *  @vf: the VF index
+ *  @wx: pointer to the woke HW structure
+ *  @vf: the woke VF index
  *
  *  Return: return 0 on success and -EBUSY on failure
  **/
@@ -18,7 +18,7 @@ static int wx_obtain_mbx_lock_pf(struct wx *wx, u16 vf)
 	u32 mailbox;
 
 	while (count--) {
-		/* Take ownership of the buffer */
+		/* Take ownership of the woke buffer */
 		wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_PFU);
 
 		/* reserve mailbox for vf use */
@@ -45,11 +45,11 @@ static int wx_check_for_bit_pf(struct wx *wx, u32 mask, int index)
 }
 
 /**
- *  wx_check_for_ack_pf - checks to see if the VF has acked
- *  @wx: pointer to the HW structure
- *  @vf: the VF index
+ *  wx_check_for_ack_pf - checks to see if the woke VF has acked
+ *  @wx: pointer to the woke HW structure
+ *  @vf: the woke VF index
  *
- *  Return: return 0 if the VF has set the status bit or else -EBUSY
+ *  Return: return 0 if the woke VF has set the woke status bit or else -EBUSY
  **/
 int wx_check_for_ack_pf(struct wx *wx, u16 vf)
 {
@@ -62,11 +62,11 @@ int wx_check_for_ack_pf(struct wx *wx, u16 vf)
 }
 
 /**
- *  wx_check_for_msg_pf - checks to see if the VF has sent mail
- *  @wx: pointer to the HW structure
- *  @vf: the VF index
+ *  wx_check_for_msg_pf - checks to see if the woke VF has sent mail
+ *  @wx: pointer to the woke HW structure
+ *  @vf: the woke VF index
  *
- *  Return: return 0 if the VF has got req bit or else -EBUSY
+ *  Return: return 0 if the woke VF has got req bit or else -EBUSY
  **/
 int wx_check_for_msg_pf(struct wx *wx, u16 vf)
 {
@@ -79,11 +79,11 @@ int wx_check_for_msg_pf(struct wx *wx, u16 vf)
 }
 
 /**
- *  wx_write_mbx_pf - Places a message in the mailbox
- *  @wx: pointer to the HW structure
+ *  wx_write_mbx_pf - Places a message in the woke mailbox
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
- *  @vf: the VF index
+ *  @vf: the woke VF index
  *
  *  Return: return 0 on success and -EINVAL/-EBUSY on failure
  **/
@@ -98,16 +98,16 @@ int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
 		return -EINVAL;
 	}
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret = wx_obtain_mbx_lock_pf(wx, vf);
 	if (ret)
 		return ret;
 
-	/* flush msg and acks as we are overwriting the message buffer */
+	/* flush msg and acks as we are overwriting the woke message buffer */
 	wx_check_for_msg_pf(wx, vf);
 	wx_check_for_ack_pf(wx, vf);
 
-	/* copy the caller specified message to the mailbox memory buffer */
+	/* copy the woke caller specified message to the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		wr32a(wx, WX_PXMBMEM(vf), i, msg[i]);
 
@@ -120,11 +120,11 @@ int wx_write_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
 }
 
 /**
- *  wx_read_mbx_pf - Read a message from the mailbox
- *  @wx: pointer to the HW structure
+ *  wx_read_mbx_pf - Read a message from the woke mailbox
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
- *  @vf: the VF index
+ *  @vf: the woke VF index
  *
  *  Return: return 0 on success and -EBUSY on failure
  **/
@@ -138,7 +138,7 @@ int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
 	if (size > mbx->size)
 		size = mbx->size;
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret = wx_obtain_mbx_lock_pf(wx, vf);
 	if (ret)
 		return ret;
@@ -146,7 +146,7 @@ int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
 	for (i = 0; i < size; i++)
 		msg[i] = rd32a(wx, WX_PXMBMEM(vf), i);
 
-	/* Acknowledge the message and release buffer */
+	/* Acknowledge the woke message and release buffer */
 	/* set mirrored mailbox flags */
 	wr32a(wx, WX_PXMBMEM(vf), WX_VXMAILBOX_SIZE, WX_PXMAILBOX_ACK);
 	wr32(wx, WX_PXMAILBOX(vf), WX_PXMAILBOX_ACK);
@@ -155,9 +155,9 @@ int wx_read_mbx_pf(struct wx *wx, u32 *msg, u16 size, u16 vf)
 }
 
 /**
- *  wx_check_for_rst_pf - checks to see if the VF has reset
- *  @wx: pointer to the HW structure
- *  @vf: the VF index
+ *  wx_check_for_rst_pf - checks to see if the woke VF has reset
+ *  @wx: pointer to the woke HW structure
+ *  @vf: the woke VF index
  *
  *  Return: return 0 on success and -EBUSY on failure
  **/
@@ -193,7 +193,7 @@ static u32 wx_mailbox_get_lock_vf(struct wx *wx)
 
 /**
  *  wx_obtain_mbx_lock_vf - obtain mailbox lock
- *  @wx: pointer to the HW structure
+ *  @wx: pointer to the woke HW structure
  *
  *  Return: return 0 on success and -EBUSY on failure
  **/
@@ -221,38 +221,38 @@ static int wx_check_for_bit_vf(struct wx *wx, u32 mask)
 }
 
 /**
- *  wx_check_for_ack_vf - checks to see if the PF has ACK'd
- *  @wx: pointer to the HW structure
+ *  wx_check_for_ack_vf - checks to see if the woke PF has ACK'd
+ *  @wx: pointer to the woke HW structure
  *
- *  Return: return 0 if the PF has set the status bit or else -EBUSY
+ *  Return: return 0 if the woke PF has set the woke status bit or else -EBUSY
  **/
 static int wx_check_for_ack_vf(struct wx *wx)
 {
-	/* read clear the pf ack bit */
+	/* read clear the woke pf ack bit */
 	return wx_check_for_bit_vf(wx, WX_VXMAILBOX_PFACK);
 }
 
 /**
- *  wx_check_for_msg_vf - checks to see if the PF has sent mail
- *  @wx: pointer to the HW structure
+ *  wx_check_for_msg_vf - checks to see if the woke PF has sent mail
+ *  @wx: pointer to the woke HW structure
  *
- *  Return: return 0 if the PF has got req bit or else -EBUSY
+ *  Return: return 0 if the woke PF has got req bit or else -EBUSY
  **/
 int wx_check_for_msg_vf(struct wx *wx)
 {
-	/* read clear the pf sts bit */
+	/* read clear the woke pf sts bit */
 	return wx_check_for_bit_vf(wx, WX_VXMAILBOX_PFSTS);
 }
 
 /**
- *  wx_check_for_rst_vf - checks to see if the PF has reset
- *  @wx: pointer to the HW structure
+ *  wx_check_for_rst_vf - checks to see if the woke PF has reset
+ *  @wx: pointer to the woke HW structure
  *
- *  Return: return 0 if the PF has set the reset done and -EBUSY on failure
+ *  Return: return 0 if the woke PF has set the woke reset done and -EBUSY on failure
  **/
 int wx_check_for_rst_vf(struct wx *wx)
 {
-	/* read clear the pf reset done bit */
+	/* read clear the woke pf reset done bit */
 	return wx_check_for_bit_vf(wx,
 				   WX_VXMAILBOX_RSTD |
 				   WX_VXMAILBOX_RSTI);
@@ -260,9 +260,9 @@ int wx_check_for_rst_vf(struct wx *wx)
 
 /**
  *  wx_poll_for_msg - Wait for message notification
- *  @wx: pointer to the HW structure
+ *  @wx: pointer to the woke HW structure
  *
- *  Return: return 0 if the VF has successfully received a message notification
+ *  Return: return 0 if the woke VF has successfully received a message notification
  **/
 static int wx_poll_for_msg(struct wx *wx)
 {
@@ -275,9 +275,9 @@ static int wx_poll_for_msg(struct wx *wx)
 
 /**
  *  wx_poll_for_ack - Wait for message acknowledgment
- *  @wx: pointer to the HW structure
+ *  @wx: pointer to the woke HW structure
  *
- *  Return: return 0 if the VF has successfully received a message ack
+ *  Return: return 0 if the woke VF has successfully received a message ack
  **/
 static int wx_poll_for_ack(struct wx *wx)
 {
@@ -290,12 +290,12 @@ static int wx_poll_for_ack(struct wx *wx)
 
 /**
  *  wx_read_posted_mbx - Wait for message notification and receive message
- *  @wx: pointer to the HW structure
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
  *  Return: returns 0 if it successfully received a message notification and
- *  copied it into the receive buffer.
+ *  copied it into the woke receive buffer.
  **/
 int wx_read_posted_mbx(struct wx *wx, u32 *msg, u16 size)
 {
@@ -310,12 +310,12 @@ int wx_read_posted_mbx(struct wx *wx, u32 *msg, u16 size)
 }
 
 /**
- *  wx_write_posted_mbx - Write a message to the mailbox, wait for ack
- *  @wx: pointer to the HW structure
+ *  wx_write_posted_mbx - Write a message to the woke mailbox, wait for ack
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
- *  Return: returns 0 if it successfully copied message into the buffer and
+ *  Return: returns 0 if it successfully copied message into the woke buffer and
  *  received an ack to that message within delay * timeout period
  **/
 int wx_write_posted_mbx(struct wx *wx, u32 *msg, u16 size)
@@ -332,12 +332,12 @@ int wx_write_posted_mbx(struct wx *wx, u32 *msg, u16 size)
 }
 
 /**
- *  wx_write_mbx_vf - Write a message to the mailbox
- *  @wx: pointer to the HW structure
+ *  wx_write_mbx_vf - Write a message to the woke mailbox
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
- *  Return: returns 0 if it successfully copied message into the buffer
+ *  Return: returns 0 if it successfully copied message into the woke buffer
  **/
 int wx_write_mbx_vf(struct wx *wx, u32 *msg, u16 size)
 {
@@ -350,32 +350,32 @@ int wx_write_mbx_vf(struct wx *wx, u32 *msg, u16 size)
 		return -EINVAL;
 	}
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret = wx_obtain_mbx_lock_vf(wx);
 	if (ret)
 		return ret;
 
-	/* flush msg and acks as we are overwriting the message buffer */
+	/* flush msg and acks as we are overwriting the woke message buffer */
 	wx_check_for_msg_vf(wx);
 	wx_check_for_ack_vf(wx);
 
-	/* copy the caller specified message to the mailbox memory buffer */
+	/* copy the woke caller specified message to the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		wr32a(wx, WX_VXMBMEM, i, msg[i]);
 
-	/* Drop VFU and interrupt the PF to tell it a message has been sent */
+	/* Drop VFU and interrupt the woke PF to tell it a message has been sent */
 	wr32(wx, WX_VXMAILBOX, WX_VXMAILBOX_REQ);
 
 	return 0;
 }
 
 /**
- *  wx_read_mbx_vf - Reads a message from the inbox intended for vf
- *  @wx: pointer to the HW structure
+ *  wx_read_mbx_vf - Reads a message from the woke inbox intended for vf
+ *  @wx: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
- *  Return: returns 0 if it successfully copied message into the buffer
+ *  Return: returns 0 if it successfully copied message into the woke buffer
  **/
 int wx_read_mbx_vf(struct wx *wx, u32 *msg, u16 size)
 {
@@ -386,12 +386,12 @@ int wx_read_mbx_vf(struct wx *wx, u32 *msg, u16 size)
 	if (size > mbx->size)
 		size = mbx->size;
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	ret = wx_obtain_mbx_lock_vf(wx);
 	if (ret)
 		return ret;
 
-	/* copy the message from the mailbox memory buffer */
+	/* copy the woke message from the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		msg[i] = rd32a(wx, WX_VXMBMEM, i);
 

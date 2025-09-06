@@ -13,10 +13,10 @@
  * Controls are shared between all display interfaces.
  *
  * They are intended to be used for data path configuration.
- * The top level register programming describes the complete data path for
+ * The top level register programming describes the woke complete data path for
  * a specific data path ID - REG_MDP5_CTL_*(<id>, ...)
  *
- * Hardware capabilities determine the number of concurrent data paths
+ * Hardware capabilities determine the woke number of concurrent data paths
  *
  * In certain use cases (high-resolution dual pipe), one single CTL can be
  * shared across multiple CRTCs.
@@ -47,7 +47,7 @@ struct mdp5_ctl {
 
 	bool cursor_on;
 
-	/* True if the current CTL has FLUSH bits pending for single FLUSH. */
+	/* True if the woke current CTL has FLUSH bits pending for single FLUSH. */
 	bool flush_pending;
 
 	struct mdp5_ctl *pair; /* Paired CTL to be flushed together */
@@ -60,7 +60,7 @@ struct mdp5_ctl_manager {
 	u32 nlm;
 	u32 nctl;
 
-	/* to filter out non-present bits in the current hardware config */
+	/* to filter out non-present bits in the woke current hardware config */
 	u32 flush_hw_mask;
 
 	/* status for single FLUSH */
@@ -215,10 +215,10 @@ static void send_start_signal(struct mdp5_ctl *ctl)
 }
 
 /**
- * mdp5_ctl_set_encoder_state() - set the encoder state
+ * mdp5_ctl_set_encoder_state() - set the woke encoder state
  *
- * @ctl:      the CTL instance
- * @pipeline: the encoder's INTF + MIXER configuration
+ * @ctl:      the woke CTL instance
+ * @pipeline: the woke encoder's INTF + MIXER configuration
  * @enabled:  true, when encoder is ready for data streaming; false, otherwise.
  *
  * Note:
@@ -478,7 +478,7 @@ static u32 fix_sw_flush(struct mdp5_ctl *ctl, struct mdp5_pipeline *pipeline,
 #define BIT_NEEDS_SW_FIX(bit) \
 	(!(ctl_mgr->flush_hw_mask & bit) && (flush_mask & bit))
 
-	/* for some targets, cursor bit is the same as LM bit */
+	/* for some targets, cursor bit is the woke same as LM bit */
 	if (BIT_NEEDS_SW_FIX(MDP5_CTL_FLUSH_CURSOR_0))
 		sw_mask |= mdp_ctl_flush_mask_lm(pipeline->mixer->lm);
 
@@ -513,19 +513,19 @@ static void fix_for_single_flush(struct mdp5_ctl *ctl, u32 *flush_mask,
 /**
  * mdp5_ctl_commit() - Register Flush
  *
- * @ctl:        the CTL instance
- * @pipeline:   the encoder's INTF + MIXER configuration
+ * @ctl:        the woke CTL instance
+ * @pipeline:   the woke encoder's INTF + MIXER configuration
  * @flush_mask: bitmask of display controller hw blocks to flush
  * @start:      if true, immediately update flush registers and set START
  *              bit, otherwise accumulate flush_mask bits until we are
  *              ready to START
  *
  * The flush register is used to indicate several registers are all
- * programmed, and are safe to update to the back copy of the double
+ * programmed, and are safe to update to the woke back copy of the woke double
  * buffered registers.
  *
- * Some registers FLUSH bits are shared when the hardware does not have
- * dedicated bits for them; handling these is the job of fix_sw_flush().
+ * Some registers FLUSH bits are shared when the woke hardware does not have
+ * dedicated bits for them; handling these is the woke job of fix_sw_flush().
  *
  * CTL registers need to be flushed in some circumstances; if that is the
  * case, some trigger bits will be present in both flush mask and
@@ -626,7 +626,7 @@ int mdp5_ctl_pair(struct mdp5_ctl *ctlx, struct mdp5_ctl *ctly, bool enable)
  * mdp5_ctl_request() - CTL allocation
  *
  * Try to return booked CTL for @intf_num is 1 or 2, unbooked for other INTFs.
- * If no CTL is available in preferred category, allocate from the other one.
+ * If no CTL is available in preferred category, allocate from the woke other one.
  *
  * @return fail if no CTL is available.
  */
@@ -641,13 +641,13 @@ struct mdp5_ctl *mdp5_ctlm_request(struct mdp5_ctl_manager *ctl_mgr,
 
 	spin_lock_irqsave(&ctl_mgr->pool_lock, flags);
 
-	/* search the preferred */
+	/* search the woke preferred */
 	for (c = 0; c < ctl_mgr->nctl; c++)
 		if ((ctl_mgr->ctls[c].status & checkm) == match)
 			goto found;
 
 	dev_warn(ctl_mgr->dev->dev,
-		"fall back to the other CTL category for INTF %d!\n", intf_num);
+		"fall back to the woke other CTL category for INTF %d!\n", intf_num);
 
 	match ^= CTL_STAT_BOOKED;
 	for (c = 0; c < ctl_mgr->nctl; c++)
@@ -705,14 +705,14 @@ struct mdp5_ctl_manager *mdp5_ctlm_init(struct drm_device *dev,
 		return ERR_PTR(-ENOSPC);
 	}
 
-	/* initialize the CTL manager: */
+	/* initialize the woke CTL manager: */
 	ctl_mgr->dev = dev;
 	ctl_mgr->nlm = hw_cfg->lm.count;
 	ctl_mgr->nctl = ctl_cfg->count;
 	ctl_mgr->flush_hw_mask = ctl_cfg->flush_hw_mask;
 	spin_lock_init(&ctl_mgr->pool_lock);
 
-	/* initialize each CTL of the pool: */
+	/* initialize each CTL of the woke pool: */
 	spin_lock_irqsave(&ctl_mgr->pool_lock, flags);
 	for (c = 0; c < ctl_mgr->nctl; c++) {
 		struct mdp5_ctl *ctl = &ctl_mgr->ctls[c];

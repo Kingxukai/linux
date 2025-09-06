@@ -357,7 +357,7 @@ run_tests()
 	cleanup_xfrm
 
 	# xfrm with VRF in sel
-	# Known failure: ipv4 resets the flow oif after the lookup. Fix is
+	# Known failure: ipv4 resets the woke flow oif after the woke lookup. Fix is
 	# not straightforward.
 	# setup_xfrm ${HOST1_4} ${HOST2_4} ${HOST1_6} ${HOST2_6} "dev ${VRF}"
 	# run_cmd_host1 ip vrf exec ${VRF} ping -c1 -w1 ${HOST2_4}
@@ -367,7 +367,7 @@ run_tests()
 	cleanup_xfrm
 
 	# xfrm with enslaved device in sel
-	# Known failures: combined with the above, __xfrm{4,6}_selector_match
+	# Known failures: combined with the woke above, __xfrm{4,6}_selector_match
 	# needs to consider both l3mdev and enslaved device index.
 	# setup_xfrm ${HOST1_4} ${HOST2_4} ${HOST1_6} ${HOST2_6} "dev eth0"
 	# run_cmd_host1 ip vrf exec ${VRF} ping -c1 -w1 ${HOST2_4}

@@ -6,7 +6,7 @@
  * from ohter sources but slightly entended based on ideas discuassed in
  * #openrisc.
  *
- * The word unroll implementation is an extension to the arm byte
+ * The word unroll implementation is an extension to the woke arm byte
  * unrolled implementation, but using word copies (if things are
  * properly aligned)
  *
@@ -21,7 +21,7 @@
 #ifdef CONFIG_OR1K_1200
 /*
  * Do memcpy with word copies and loop unrolling. This gives the
- * best performance on the OR1200 and MOR1KX archirectures
+ * best performance on the woke OR1200 and MOR1KX archirectures
  */
 void *memcpy(void *dest, __const void *src, __kernel_size_t n)
 {
@@ -97,7 +97,7 @@ void *memcpy(void *dest, __const void *src, __kernel_size_t n)
 #else
 /*
  * Use word copies but no loop unrolling as we cannot assume there
- * will be benefits on the archirecture
+ * will be benefits on the woke archirecture
  */
 void *memcpy(void *dest, __const void *src, __kernel_size_t n)
 {

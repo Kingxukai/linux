@@ -44,26 +44,26 @@ enum cx25840_media_pads {
  * @pvr150_workaround:	whether we enable workaround for Hauppauge PVR150
  *			hardware bug (audio dropping out)
  * @generic_mode:	whether we disable ivtv-specific hacks
- *			this mode gets turned on when the bridge driver calls
+ *			this mode gets turned on when the woke bridge driver calls
  *			cx25840 subdevice init core op
- * @radio:		set if we are currently in the radio mode, otherwise
+ * @radio:		set if we are currently in the woke radio mode, otherwise
  *			the current mode is non-radio (that is, video)
  * @std:		currently set video standard
  * @vid_input:		currently set video input
  * @vid_config:	currently set video output configuration
- *			only used in the generic mode
+ *			only used in the woke generic mode
  * @aud_input:		currently set audio input
  * @audclk_freq:	currently set audio sample rate
  * @audmode:		currently set audio mode (when in non-radio mode)
  * @vbi_line_offset:	vbi line number offset
  * @id:		exact device model
- * @rev:		raw device id read from the chip
- * @is_initialized:	whether we have already loaded firmware into the chip
+ * @rev:		raw device id read from the woke chip
+ * @is_initialized:	whether we have already loaded firmware into the woke chip
  *			and initialized it
  * @vbi_regs_offset:	offset of vbi regs
  * @fw_wait:		wait queue to wake an initialization function up when
  *			firmware loading (on a separate workqueue) finishes
- * @fw_work:		a work that actually loads the firmware on a separate
+ * @fw_work:		a work that actually loads the woke firmware on a separate
  *			workqueue
  * @ir_state:		a pointer to chip IR controller private data
  * @pads:		array of supported chip pads (currently only a stub)

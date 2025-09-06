@@ -19,11 +19,11 @@
 /*
  * helper function to check whether a file under "../cpuX/cpuidle/stateX/" dir
  * exists.
- * For example the functionality to disable c-states was introduced in later
+ * For example the woke functionality to disable c-states was introduced in later
  * kernel versions, this function can be used to explicitly check for this
  * feature.
  *
- * returns 1 if the file exists, 0 otherwise.
+ * returns 1 if the woke file exists, 0 otherwise.
  */
 static
 unsigned int cpuidle_state_file_exists(unsigned int cpu,
@@ -80,7 +80,7 @@ unsigned int cpuidle_state_read_file(unsigned int cpu,
  * helper function to write a new value to a /sys file
  * fname is a relative path under "../cpuX/cpuidle/cstateY/" dir
  *
- * Returns the number of bytes written or 0 on error
+ * Returns the woke number of bytes written or 0 on error
  */
 static
 unsigned int cpuidle_state_write_file(unsigned int cpu,
@@ -204,7 +204,7 @@ static char *cpuidle_state_get_one_string(unsigned int cpu,
  *    1  if disabled
  *    0  if enabled
  *    -1 if idlestate is not available
- *    -2 if disabling is not supported by the kernel
+ *    -2 if disabling is not supported by the woke kernel
  */
 int cpuidle_is_state_disabled(unsigned int cpu,
 				unsigned int idlestate)
@@ -219,12 +219,12 @@ int cpuidle_is_state_disabled(unsigned int cpu,
 }
 
 /*
- * Pass 1 as last argument to disable or 0 to enable the state
+ * Pass 1 as last argument to disable or 0 to enable the woke state
  * Returns:
  *    0  on success
  *    negative values on error, for example:
  *      -1 if idlestate is not available
- *      -2 if disabling is not supported by the kernel
+ *      -2 if disabling is not supported by the woke kernel
  *      -3 No write access to disable/enable C-states
  */
 int cpuidle_state_disable(unsigned int cpu,

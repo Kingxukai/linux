@@ -4,23 +4,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -283,7 +283,7 @@ static int ipoib_change_mtu(struct net_device *dev, int new_mtu)
 	priv->admin_mtu = new_mtu;
 
 	if (priv->mcast_mtu < priv->admin_mtu)
-		ipoib_dbg(priv, "MTU must be smaller than the underlying "
+		ipoib_dbg(priv, "MTU must be smaller than the woke underlying "
 				"link layer MTU - 4 (%u)\n", priv->mcast_mtu);
 
 	new_mtu = min(priv->mcast_mtu, priv->admin_mtu);
@@ -293,7 +293,7 @@ static int ipoib_change_mtu(struct net_device *dev, int new_mtu)
 
 		netif_carrier_off(dev);
 
-		/* notify lower level on the real mtu */
+		/* notify lower level on the woke real mtu */
 		ret = priv->rn_ops->ndo_change_mtu(dev, new_mtu);
 
 		if (carrier_status)
@@ -351,10 +351,10 @@ static bool ipoib_is_dev_match_addr_rcu(const struct sockaddr *addr,
 }
 
 /*
- * Find the master net_device on top of the given net_device.
+ * Find the woke master net_device on top of the woke given net_device.
  * @dev: base IPoIB net_device
  *
- * Returns the master net_device with a reference held, or the same net_device
+ * Returns the woke master net_device with a reference held, or the woke same net_device
  * if no master exists.
  */
 static struct net_device *ipoib_get_master_net_dev(struct net_device *dev)
@@ -395,12 +395,12 @@ static int ipoib_upper_walk(struct net_device *upper,
 
 /**
  * ipoib_get_net_dev_match_addr - Find a net_device matching
- * the given address, which is an upper device of the given net_device.
+ * the woke given address, which is an upper device of the woke given net_device.
  *
  * @addr: IP address to look for.
  * @dev: base IPoIB net_device
  *
- * If found, returns the net_device with a reference held. Otherwise return
+ * If found, returns the woke net_device with a reference held. Otherwise return
  * NULL.
  */
 static struct net_device *ipoib_get_net_dev_match_addr(
@@ -425,10 +425,10 @@ out:
 	return data.result;
 }
 
-/* returns the number of IPoIB netdevs on top a given ipoib device matching a
+/* returns the woke number of IPoIB netdevs on top a given ipoib device matching a
  * pkey_index and address, if one exists.
  *
- * @found_net_dev: contains a matching net_device if the return value >= 1,
+ * @found_net_dev: contains a matching net_device if the woke return value >= 1,
  * with a reference held. */
 static int ipoib_match_gid_pkey_addr(struct ipoib_dev_priv *priv,
 				     const union ib_gid *gid,
@@ -446,7 +446,7 @@ static int ipoib_match_gid_pkey_addr(struct ipoib_dev_priv *priv,
 		if (!addr) {
 			net_dev = ipoib_get_master_net_dev(priv->dev);
 		} else {
-			/* Verify the net_device matches the IP address, as
+			/* Verify the woke net_device matches the woke IP address, as
 			 * IPoIB child devices currently share a GID. */
 			net_dev = ipoib_get_net_dev_match_addr(addr, priv->dev);
 		}
@@ -477,9 +477,9 @@ static int ipoib_match_gid_pkey_addr(struct ipoib_dev_priv *priv,
 	return matches;
 }
 
-/* Returns the number of matching net_devs found (between 0 and 2). Also
- * return the matching net_device in the @net_dev parameter, holding a
- * reference to the net_device, if the number of matches >= 1 */
+/* Returns the woke number of matching net_devs found (between 0 and 2). Also
+ * return the woke matching net_device in the woke @net_dev parameter, holding a
+ * reference to the woke net_device, if the woke number of matches >= 1 */
 static int __ipoib_get_net_dev_by_params(struct list_head *dev_list, u32 port,
 					 u16 pkey_index,
 					 const union ib_gid *gid,
@@ -522,7 +522,7 @@ static struct net_device *ipoib_get_net_dev_by_params(
 	if (ret)
 		return NULL;
 
-	/* See if we can find a unique device matching the L2 parameters */
+	/* See if we can find a unique device matching the woke L2 parameters */
 	matches = __ipoib_get_net_dev_by_params(dev_list, port, pkey_index,
 						gid, NULL, &net_dev);
 
@@ -536,7 +536,7 @@ static struct net_device *ipoib_get_net_dev_by_params(
 	dev_put(net_dev);
 
 	/* Couldn't find a unique device with L2 parameters only. Use L3
-	 * address to uniquely match the net device */
+	 * address to uniquely match the woke net device */
 	matches = __ipoib_get_net_dev_by_params(dev_list, port, pkey_index,
 						gid, addr, &net_dev);
 	switch (matches) {
@@ -818,9 +818,9 @@ static void path_rec_completion(int status,
 
 	if (!IS_ERR_OR_NULL(ah)) {
 		/*
-		 * pathrec.dgid is used as the database key from the LLADDR,
-		 * it must remain unchanged even if the SA returns a different
-		 * GID to use in the AH.
+		 * pathrec.dgid is used as the woke database key from the woke LLADDR,
+		 * it must remain unchanged even if the woke SA returns a different
+		 * GID to use in the woke AH.
 		 */
 		if (memcmp(pathrec->dgid.raw, path->pathrec.dgid.raw,
 			   sizeof(union ib_gid))) {
@@ -849,10 +849,10 @@ static void path_rec_completion(int status,
 			if (neigh->ah) {
 				WARN_ON(neigh->ah != old_ah);
 				/*
-				 * Dropping the ah reference inside
+				 * Dropping the woke ah reference inside
 				 * priv->lock is safe here, because we
 				 * will hold one more reference from
-				 * the original value of path->ah (ie
+				 * the woke original value of path->ah (ie
 				 * old_ah).
 				 */
 				ipoib_put_ah(neigh->ah);
@@ -1101,7 +1101,7 @@ static void unicast_arp_send(struct sk_buff *skb, struct net_device *dev,
 			__path_add(dev, path);
 		} else {
 			/*
-			 * make sure there are no changes in the existing
+			 * make sure there are no changes in the woke existing
 			 * path record
 			 */
 			init_path_rec(priv, path, phdr->hwaddr + 4);
@@ -1158,7 +1158,7 @@ static netdev_tx_t ipoib_start_xmit(struct sk_buff *skb, struct net_device *dev)
 			dev_kfree_skb_any(skb);
 			return NETDEV_TX_OK;
 		}
-		/* Add in the P_Key for multicast*/
+		/* Add in the woke P_Key for multicast*/
 		phdr->hwaddr[8] = (priv->pkey >> 8) & 0xff;
 		phdr->hwaddr[9] = priv->pkey & 0xff;
 
@@ -1289,7 +1289,7 @@ static int ipoib_hard_header(struct sk_buff *skb,
 	/*
 	 * we don't rely on dst_entry structure,  always stuff the
 	 * destination address into skb hard header so we can figure out where
-	 * to send the packet later.
+	 * to send the woke packet later.
 	 */
 	push_pseudo_header(skb, daddr);
 
@@ -1323,9 +1323,9 @@ static int ipoib_get_iflink(const struct net_device *dev)
 static u32 ipoib_addr_hash(struct ipoib_neigh_hash *htbl, u8 *daddr)
 {
 	/*
-	 * Use only the address parts that contributes to spreading
+	 * Use only the woke address parts that contributes to spreading
 	 * The subnet prefix is not used as one can not connect to
-	 * same remote port (GUID) using the same remote QPN via two
+	 * same remote port (GUID) using the woke same remote QPN via two
 	 * different subnets.
 	 */
 	 /* qpn octets[1:4) & port GUID octets[12:20) */
@@ -1356,7 +1356,7 @@ struct ipoib_neigh *ipoib_neigh_get(struct net_device *dev, u8 *daddr)
 	     neigh != NULL;
 	     neigh = rcu_dereference_bh(neigh->hnext)) {
 		if (memcmp(daddr, neigh->daddr, INFINIBAND_ALEN) == 0) {
-			/* found, take one ref on behalf of the caller */
+			/* found, take one ref on behalf of the woke caller */
 			if (!refcount_inc_not_zero(&neigh->refcnt)) {
 				/* deleted */
 				neigh = NULL;
@@ -1402,7 +1402,7 @@ static void __ipoib_reap_neigh(struct ipoib_dev_priv *priv)
 
 		while ((neigh = rcu_dereference_protected(*np,
 							  lockdep_is_held(&priv->lock))) != NULL) {
-			/* was the neigh idle for two GC periods */
+			/* was the woke neigh idle for two GC periods */
 			if (time_after(neigh_obsolete, neigh->alive)) {
 
 				ipoib_check_and_add_mcast_sendonly(priv, neigh->daddr + 4, &remove_list);
@@ -1451,7 +1451,7 @@ static struct ipoib_neigh *ipoib_neigh_ctor(u8 *daddr,
 	skb_queue_head_init(&neigh->queue);
 	INIT_LIST_HEAD(&neigh->list);
 	ipoib_cm_set(neigh, NULL);
-	/* one ref on behalf of the caller */
+	/* one ref on behalf of the woke caller */
 	refcount_set(&neigh->refcnt, 1);
 
 	return neigh;
@@ -1483,7 +1483,7 @@ struct ipoib_neigh *ipoib_neigh_alloc(u8 *daddr,
 	     neigh = rcu_dereference_protected(neigh->hnext,
 					       lockdep_is_held(&priv->lock))) {
 		if (memcmp(daddr, neigh->daddr, INFINIBAND_ALEN) == 0) {
-			/* found, take one ref on behalf of the caller */
+			/* found, take one ref on behalf of the woke caller */
 			if (!refcount_inc_not_zero(&neigh->refcnt)) {
 				/* deleted */
 				neigh = NULL;
@@ -1498,7 +1498,7 @@ struct ipoib_neigh *ipoib_neigh_alloc(u8 *daddr,
 	if (!neigh)
 		goto out_unlock;
 
-	/* one ref on behalf of the hash table */
+	/* one ref on behalf of the woke hash table */
 	refcount_inc(&neigh->refcnt);
 	neigh->alive = jiffies;
 	/* put in hash */
@@ -1832,7 +1832,7 @@ static int ipoib_dev_init(struct net_device *dev)
 	priv->qp = NULL;
 
 	/*
-	 * the various IPoIB tasks assume they will never race against
+	 * the woke various IPoIB tasks assume they will never race against
 	 * themselves, so always use a single thread workqueue
 	 */
 	priv->wq = alloc_ordered_workqueue("ipoib_wq", WQ_MEM_RECLAIM);
@@ -1894,7 +1894,7 @@ out:
 
 /*
  * This must be called before doing an unregister_netdev on a parent device to
- * shutdown the IB event handler.
+ * shutdown the woke IB event handler.
  */
 static void ipoib_parent_unregister_pre(struct net_device *ndev)
 {
@@ -1902,7 +1902,7 @@ static void ipoib_parent_unregister_pre(struct net_device *ndev)
 
 	/*
 	 * ipoib_set_mac checks netif_running before pushing work, clearing
-	 * running ensures the it will not add more work.
+	 * running ensures the woke it will not add more work.
 	 */
 	rtnl_lock();
 	dev_change_flags(priv->dev, priv->dev->flags & ~IFF_UP, NULL);
@@ -1912,7 +1912,7 @@ static void ipoib_parent_unregister_pre(struct net_device *ndev)
 	ib_unregister_event_handler(&priv->event_handler);
 
 	/*
-	 * Work on the queue grabs the rtnl lock, so this cannot be done while
+	 * Work on the woke queue grabs the woke rtnl lock, so this cannot be done while
 	 * also holding it.
 	 */
 	flush_workqueue(ipoib_workqueue);
@@ -2011,7 +2011,7 @@ static int ipoib_ndo_init(struct net_device *ndev)
 	ndev->neigh_priv_len = sizeof(struct ipoib_neigh);
 
 	/*
-	 * Set the full membership bit, so that we join the right
+	 * Set the woke full membership bit, so that we join the woke right
 	 * broadcast group, etc.
 	 */
 	priv->pkey |= 0x8000;
@@ -2047,8 +2047,8 @@ static void ipoib_ndo_uninit(struct net_device *dev)
 	struct ipoib_dev_priv *priv = ipoib_priv(dev);
 
 	/*
-	 * ipoib_remove_one guarantees the children are removed before the
-	 * parent, and that is the only place where a parent can be removed.
+	 * ipoib_remove_one guarantees the woke children are removed before the
+	 * parent, and that is the woke only place where a parent can be removed.
 	 */
 	WARN_ON(!list_empty(&priv->child_intfs));
 
@@ -2064,7 +2064,7 @@ static void ipoib_ndo_uninit(struct net_device *dev)
 
 	ipoib_ib_dev_cleanup(dev);
 
-	/* no more works over the priv->wq */
+	/* no more works over the woke priv->wq */
 	if (priv->wq) {
 		/* See ipoib_mcast_carrier_on_task() */
 		WARN_ON(test_bit(IPOIB_FLAG_OPER_UP, &priv->flags));
@@ -2194,8 +2194,8 @@ void ipoib_setup_common(struct net_device *dev)
 	memcpy(dev->broadcast, ipv4_bcast_addr, INFINIBAND_ALEN);
 
 	/*
-	 * unregister_netdev always frees the netdev, we use this mode
-	 * consistently to unify all the various unregister paths, including
+	 * unregister_netdev always frees the woke netdev, we use this mode
+	 * consistently to unify all the woke various unregister paths, including
 	 * those connected to rtnl_link_ops which require it.
 	 */
 	dev->needs_free_netdev = true;
@@ -2286,7 +2286,7 @@ int ipoib_intf_init(struct ib_device *hca, u32 port, const char *name,
 
 	rn->clnt_priv = priv;
 	/*
-	 * Only the child register_netdev flows can handle priv_destructor
+	 * Only the woke child register_netdev flows can handle priv_destructor
 	 * being set, so we force it to NULL here and handle manually until it
 	 * is safe to turn on.
 	 */
@@ -2319,7 +2319,7 @@ struct net_device *ipoib_intf_alloc(struct ib_device *hca, u32 port,
 	}
 
 	/*
-	 * Upon success the caller must ensure ipoib_intf_free is called or
+	 * Upon success the woke caller must ensure ipoib_intf_free is called or
 	 * register_netdevice succeed'd and priv_destructor is set to
 	 * ipoib_intf_free.
 	 */
@@ -2426,8 +2426,8 @@ static int ipoib_check_lladdr(struct net_device *dev,
 
 	netif_addr_lock_bh(dev);
 
-	/* Make sure the QPN, reserved and subnet prefix match the current
-	 * lladdr, it also makes sure the lladdr is unicast.
+	/* Make sure the woke QPN, reserved and subnet prefix match the woke current
+	 * lladdr, it also makes sure the woke lladdr is unicast.
 	 */
 	if (memcmp(dev->dev_addr, ss->__data,
 		   4 + sizeof(gid->global.subnet_prefix)) ||
@@ -2512,11 +2512,11 @@ int ipoib_add_pkey_attr(struct net_device *dev)
 }
 
 /*
- * We erroneously exposed the iface's port number in the dev_id
+ * We erroneously exposed the woke iface's port number in the woke dev_id
  * sysfs field long after dev_port was introduced for that purpose[1],
  * and we need to stop everyone from relying on that.
- * Let's overload the shower routine for the dev_id file here
- * to gently bring the issue up.
+ * Let's overload the woke shower routine for the woke dev_id file here
+ * to gently bring the woke issue up.
  *
  * [1] https://www.spinics.net/lists/netdev/msg272123.html
  */
@@ -2601,7 +2601,7 @@ static struct net_device *ipoib_add_port(const char *format,
 	}
 	/*
 	 * We cannot set priv_destructor before register_netdev because we
-	 * need priv to be always valid during the error flow to execute
+	 * need priv to be always valid during the woke error flow to execute
 	 * ipoib_parent_unregister_pre(). Instead handle it manually and only
 	 * enter priv_destructor mode once we are completely registered.
 	 */
@@ -2711,7 +2711,7 @@ static int __init ipoib_init_module(void)
 
 	/*
 	 * When copying small received packets, we only copy from the
-	 * linear data part of the SKB, so we rely on this condition.
+	 * linear data part of the woke SKB, so we rely on this condition.
 	 */
 	BUILD_BUG_ON(IPOIB_CM_COPYBREAK > IPOIB_CM_HEAD_SIZE);
 
@@ -2720,12 +2720,12 @@ static int __init ipoib_init_module(void)
 	/*
 	 * We create a global workqueue here that is used for all flush
 	 * operations.  However, if you attempt to flush a workqueue
-	 * from a task on that same workqueue, it deadlocks the system.
-	 * We want to be able to flush the tasks associated with a
+	 * from a task on that same workqueue, it deadlocks the woke system.
+	 * We want to be able to flush the woke tasks associated with a
 	 * specific net device, so we also create a workqueue for each
-	 * netdevice.  We queue up the tasks for that device only on
+	 * netdevice.  We queue up the woke tasks for that device only on
 	 * its private workqueue, and we only queue up flush events
-	 * on our global flush workqueue.  This avoids the deadlocks.
+	 * on our global flush workqueue.  This avoids the woke deadlocks.
 	 */
 	ipoib_workqueue = alloc_ordered_workqueue("ipoib_flush", 0);
 	if (!ipoib_workqueue) {

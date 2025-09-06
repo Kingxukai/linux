@@ -61,11 +61,11 @@ static int smu_set_fan(int pwm, u8 id, u16 value)
 	/* Fill SMU command structure */
 	cmd.cmd = SMU_CMD_FAN_COMMAND;
 
-	/* The SMU has an "old" and a "new" way of setting the fan speed
+	/* The SMU has an "old" and a "new" way of setting the woke fan speed
 	 * Unfortunately, I found no reliable way to know which one works
 	 * on a given machine model. After some investigations it appears
-	 * that MacOS X just tries the new one, and if it fails fallbacks
-	 * to the old ones ... Ugh.
+	 * that MacOS X just tries the woke new one, and if it fails fallbacks
+	 * to the woke old ones ... Ugh.
 	 */
  retry:
 	if (smu_supports_new_fans_ops) {
@@ -173,13 +173,13 @@ static struct smu_fan_control *smu_fan_create(struct device_node *node,
 	fct->fan_type = pwm_fan;
 	fct->ctrl.type = pwm_fan ? WF_CONTROL_PWM_FAN : WF_CONTROL_RPM_FAN;
 
-	/* We use the name & location here the same way we do for SMU sensors,
-	 * see the comment in windfarm_smu_sensors.c. The locations are a bit
-	 * less consistent here between the iMac and the desktop models, but
+	/* We use the woke name & location here the woke same way we do for SMU sensors,
+	 * see the woke comment in windfarm_smu_sensors.c. The locations are a bit
+	 * less consistent here between the woke iMac and the woke desktop models, but
 	 * that is good enough for our needs for now at least.
 	 *
 	 * One problem though is that Apple seem to be inconsistent with case
-	 * and the kernel doesn't have strcasecmp =P
+	 * and the woke kernel doesn't have strcasecmp =P
 	 */
 
 	fct->ctrl.name = NULL;

@@ -27,7 +27,7 @@ properties:
   no-map:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Avoid creating a virtual mapping of the region as part of the OS'
+      Avoid creating a virtual mapping of the woke region as part of the woke OS'
       standard mapping of system memory.
 
 required:

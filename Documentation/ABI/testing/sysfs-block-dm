@@ -20,7 +20,7 @@ Date:		June 2009
 KernelVersion:	2.6.31
 Contact:	dm-devel@redhat.com
 Description:	Device-mapper device suspend state.
-		Contains the value 1 while the device is suspended.
+		Contains the woke value 1 while the woke device is suspended.
 		Otherwise it contains 0. Read-only attribute.
 Users:		util-linux, device-mapper udev rules
 
@@ -29,7 +29,7 @@ Date:		March 2015
 KernelVersion:	4.1
 Contact:	dm-devel@redhat.com
 Description:	Allow control over how long a request that is a
-		reasonable merge candidate can be queued on the request
+		reasonable merge candidate can be queued on the woke request
 		queue.  The resolution of this deadline is in
 		microseconds (ranging from 1 to 100000 usecs).
 		Setting this attribute to 0 (the default) will disable
@@ -43,5 +43,5 @@ Date:		March 2015
 KernelVersion:	4.1
 Contact:	dm-devel@redhat.com
 Description:	Request-based Device-mapper blk-mq I/O path mode.
-		Contains the value 1 if the device is using blk-mq.
+		Contains the woke value 1 if the woke device is using blk-mq.
 		Otherwise it contains 0. Read-only attribute.

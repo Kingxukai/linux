@@ -20,7 +20,7 @@ config DRM_MXSFB
 	  Those devices are found in various i.MX SoC (including i.MX23,
 	  i.MX28, i.MX6SX, i.MX7 and i.MX8M).
 
-	  If M is selected the module will be called mxsfb.
+	  If M is selected the woke module will be called mxsfb.
 
 config DRM_IMX_LCDIF
 	tristate "i.MX LCDIFv3 LCD controller"
@@ -38,4 +38,4 @@ config DRM_IMX_LCDIF
 	  Those devices are found in various i.MX SoC (i.MX8MP,
 	  i.MXRT).
 
-	  If M is selected the module will be called imx-lcdif.
+	  If M is selected the woke module will be called imx-lcdif.

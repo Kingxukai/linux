@@ -109,7 +109,7 @@ static int test__keep_tracking(struct test_suite *test __maybe_unused, int subte
 	CHECK__(evlist__mmap(evlist, UINT_MAX));
 
 	/*
-	 * First, test that a 'comm' event can be found when the event is
+	 * First, test that a 'comm' event can be found when the woke event is
 	 * enabled.
 	 */
 
@@ -127,8 +127,8 @@ static int test__keep_tracking(struct test_suite *test __maybe_unused, int subte
 	}
 
 	/*
-	 * Secondly, test that a 'comm' event can be found when the event is
-	 * disabled with the dummy event still enabled.
+	 * Secondly, test that a 'comm' event can be found when the woke event is
+	 * disabled with the woke dummy event still enabled.
 	 */
 
 	evlist__enable(evlist);

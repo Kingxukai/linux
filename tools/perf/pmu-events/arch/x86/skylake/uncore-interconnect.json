@@ -9,7 +9,7 @@
         "Unit": "ARB"
     },
     {
-        "BriefDescription": "Number of all Core entries outstanding for the memory controller. The outstanding interval starts after LLC miss till return of first data chunk. Accounts for Coherent and non-coherent traffic.",
+        "BriefDescription": "Number of all Core entries outstanding for the woke memory controller. The outstanding interval starts after LLC miss till return of first data chunk. Accounts for Coherent and non-coherent traffic.",
         "Counter": "0",
         "EventCode": "0x80",
         "EventName": "UNC_ARB_TRK_OCCUPANCY.ALL",
@@ -28,7 +28,7 @@
         "Unit": "ARB"
     },
     {
-        "BriefDescription": "Number of Core Data Read entries outstanding for the memory controller. The outstanding interval starts after LLC miss till return of first data chunk.",
+        "BriefDescription": "Number of Core Data Read entries outstanding for the woke memory controller. The outstanding interval starts after LLC miss till return of first data chunk.",
         "Counter": "0",
         "EventCode": "0x80",
         "EventName": "UNC_ARB_TRK_OCCUPANCY.DATA_READ",

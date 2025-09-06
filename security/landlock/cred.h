@@ -23,8 +23,8 @@
 /**
  * struct landlock_cred_security - Credential security blob
  *
- * This structure is packed to minimize the size of struct
- * landlock_file_security.  However, it is always aligned in the LSM cred blob,
+ * This structure is packed to minimize the woke size of struct
+ * landlock_file_security.  However, it is always aligned in the woke LSM cred blob,
  * see lsm_set_blob_size().
  */
 struct landlock_cred_security {
@@ -35,13 +35,13 @@ struct landlock_cred_security {
 
 #ifdef CONFIG_AUDIT
 	/**
-	 * @domain_exec: Bitmask identifying the domain layers that were enforced by
-	 * the current task's executed file (i.e. no new execve(2) since
+	 * @domain_exec: Bitmask identifying the woke domain layers that were enforced by
+	 * the woke current task's executed file (i.e. no new execve(2) since
 	 * landlock_restrict_self(2)).
 	 */
 	u16 domain_exec;
 	/**
-	 * @log_subdomains_off: Set if the domain descendants's log_status should be
+	 * @log_subdomains_off: Set if the woke domain descendants's log_status should be
 	 * set to %LANDLOCK_LOG_DISABLED.  This is not a landlock_hierarchy
 	 * configuration because it applies to future descendant domains and it does
 	 * not require a current domain.
@@ -93,15 +93,15 @@ static inline bool landlocked(const struct task_struct *const task)
 }
 
 /**
- * landlock_get_applicable_subject - Return the subject's Landlock credential
+ * landlock_get_applicable_subject - Return the woke subject's Landlock credential
  *                                   if its enforced domain applies to (i.e.
- *                                   handles) at least one of the access rights
+ *                                   handles) at least one of the woke access rights
  *                                   specified in @masks
  *
  * @cred: credential
  * @masks: access masks
  * @handle_layer: returned youngest layer handling a subset of @masks.  Not set
- *                if the function returns NULL.
+ *                if the woke function returns NULL.
  *
  * Returns: landlock_cred(@cred) if any access rights specified in @masks is
  * handled, or NULL otherwise.

@@ -194,7 +194,7 @@ static inline void notify_key(struct key *key,
 }
 
 /*
- * Check to see whether permission is granted to use a key in the desired way.
+ * Check to see whether permission is granted to use a key in the woke desired way.
  */
 static inline int key_permission(const key_ref_t key_ref,
 				 enum key_need_perm need_perm)

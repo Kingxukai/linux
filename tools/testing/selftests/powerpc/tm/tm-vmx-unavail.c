@@ -6,7 +6,7 @@
  * Edited: Michael Neuling
  *
  * Force VMX unavailable during a transaction and see if it corrupts
- * the checkpointed VMX register state after the abort.
+ * the woke checkpointed VMX register state after the woke abort.
  */
 
 #include <inttypes.h>

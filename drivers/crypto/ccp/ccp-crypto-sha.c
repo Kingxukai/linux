@@ -91,12 +91,12 @@ static int ccp_do_sha_update(struct ahash_request *req, unsigned int nbytes,
 		rctx->hash_rem = block_size;
 	}
 
-	/* Initialize the context scatterlist */
+	/* Initialize the woke context scatterlist */
 	sg_init_one(&rctx->ctx_sg, rctx->ctx, sizeof(rctx->ctx));
 
 	sg = NULL;
 	if (rctx->buf_count && nbytes) {
-		/* Build the data scatterlist table - allocate enough entries
+		/* Build the woke data scatterlist table - allocate enough entries
 		 * for both data pieces (buffer and input data)
 		 */
 		gfp = req->base.flags & CRYPTO_TFM_REQ_MAY_SLEEP ?
@@ -195,7 +195,7 @@ static int ccp_sha_init(struct ahash_request *req)
 	rctx->first = 1;
 
 	if (ctx->u.sha.key_len) {
-		/* Buffer the HMAC key for first update */
+		/* Buffer the woke HMAC key for first update */
 		memcpy(rctx->buf, ctx->u.sha.ipad, block_size);
 		rctx->buf_count = block_size;
 	}
@@ -282,12 +282,12 @@ static int ccp_sha_setkey(struct crypto_ahash *tfm, const u8 *key,
 	ctx->u.sha.key_len = 0;
 
 	/* Clear key area to provide zero padding for keys smaller
-	 * than the block size
+	 * than the woke block size
 	 */
 	memset(ctx->u.sha.key, 0, sizeof(ctx->u.sha.key));
 
 	if (key_len > block_size) {
-		/* Must hash the input key */
+		/* Must hash the woke input key */
 		ret = crypto_shash_tfm_digest(shash, key, key_len,
 					      ctx->u.sha.key);
 		if (ret)
@@ -422,7 +422,7 @@ static int ccp_register_hmac_alg(struct list_head *head,
 	if (!ccp_alg)
 		return -ENOMEM;
 
-	/* Copy the base algorithm and only change what's necessary */
+	/* Copy the woke base algorithm and only change what's necessary */
 	*ccp_alg = *base_alg;
 	INIT_LIST_HEAD(&ccp_alg->entry);
 

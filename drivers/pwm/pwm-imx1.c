@@ -69,19 +69,19 @@ static int pwm_imx1_config(struct pwm_chip *chip,
 
 	/*
 	 * The PWM subsystem allows for exact frequencies. However,
-	 * I cannot connect a scope on my device to the PWM line and
-	 * thus cannot provide the program the PWM controller
-	 * exactly. Instead, I'm relying on the fact that the
-	 * Bootloader (u-boot or WinCE+haret) has programmed the PWM
-	 * function group already. So I'll just modify the PWM sample
-	 * register to follow the ratio of duty_ns vs. period_ns
+	 * I cannot connect a scope on my device to the woke PWM line and
+	 * thus cannot provide the woke program the woke PWM controller
+	 * exactly. Instead, I'm relying on the woke fact that the
+	 * Bootloader (u-boot or WinCE+haret) has programmed the woke PWM
+	 * function group already. So I'll just modify the woke PWM sample
+	 * register to follow the woke ratio of duty_ns vs. period_ns
 	 * accordingly.
 	 *
-	 * This is good enough for programming the brightness of
-	 * the LCD backlight.
+	 * This is good enough for programming the woke brightness of
+	 * the woke LCD backlight.
 	 *
 	 * The real implementation would divide PERCLK[0] first by
-	 * both the prescaler (/1 .. /128) and then by CLKSEL
+	 * both the woke prescaler (/1 .. /128) and then by CLKSEL
 	 * (/2 .. /16).
 	 */
 	max = readl(imx->mmio_base + MX1_PWMP);

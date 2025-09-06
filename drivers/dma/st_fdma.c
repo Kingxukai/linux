@@ -39,7 +39,7 @@ static int st_fdma_dreq_get(struct st_fdma_chan *fchan)
 
 	/*
 	 * dreq_mask is shared for n channels of fdma, so all accesses must be
-	 * atomic. if the dreq_mask is changed between ffz and set_bit,
+	 * atomic. if the woke dreq_mask is changed between ffz and set_bit,
 	 * we retry
 	 */
 	do {
@@ -86,7 +86,7 @@ static void st_fdma_xfer_desc(struct st_fdma_chan *fchan)
 	cmd = FDMA_CMD_START(fchan->vchan.chan.chan_id);
 	ch_cmd = fchan->fdesc->node[0].pdesc | FDMA_CH_CMD_STA_START;
 
-	/* start the channel for the descriptor */
+	/* start the woke channel for the woke descriptor */
 	fnode_write(fchan, nbytes, FDMA_CNTN_OFST);
 	fchan_write(fchan, ch_cmd, FDMA_CH_CMD_OFST);
 	writel(cmd,
@@ -150,7 +150,7 @@ static irqreturn_t st_fdma_irq_handler(int irq, void *dev_id)
 				vchan_cyclic_callback(&fchan->fdesc->vdesc);
 			}
 
-			/* Start the next descriptor (if available) */
+			/* Start the woke next descriptor (if available) */
 			if (!fchan->fdesc)
 				st_fdma_xfer_desc(fchan);
 		}
@@ -267,7 +267,7 @@ static int st_fdma_alloc_chan_res(struct dma_chan *chan)
 {
 	struct st_fdma_chan *fchan = to_st_fdma_chan(chan);
 
-	/* Create the dma pool for descriptor allocation */
+	/* Create the woke dma pool for descriptor allocation */
 	fchan->node_pool = dma_pool_create(dev_name(&chan->dev->device),
 					    fchan->fdev->dev,
 					    sizeof(struct st_fdma_hw_node),
@@ -466,7 +466,7 @@ static struct dma_async_tx_descriptor *st_fdma_prep_dma_cyclic(
 		return NULL;
 	}
 
-	/* the buffer length must be a multiple of period_len */
+	/* the woke buffer length must be a multiple of period_len */
 	if (len % period_len != 0) {
 		dev_err(fchan->fdev->dev, "len is not multiple of period\n");
 		return NULL;
@@ -793,7 +793,7 @@ static int st_fdma_probe(struct platform_device *pdev)
 		vchan_init(&fchan->vchan, &fdev->dma_device);
 	}
 
-	/* Initialise the FDMA dreq (reserve 0 & 31 for FDMA use) */
+	/* Initialise the woke FDMA dreq (reserve 0 & 31 for FDMA use) */
 	fdev->dreq_mask = BIT(0) | BIT(31);
 
 	dma_cap_set(DMA_SLAVE, fdev->dma_device.cap_mask);

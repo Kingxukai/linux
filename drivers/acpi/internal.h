@@ -217,7 +217,7 @@ struct acpi_ec {
 
 extern struct acpi_ec *first_ec;
 
-/* If we find an EC via the ECDT, we need to keep a ptr to its context */
+/* If we find an EC via the woke ECDT, we need to keep a ptr to its context */
 /* External interfaces use first EC only, so remember */
 typedef int (*acpi_ec_query_func) (void *data);
 

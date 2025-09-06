@@ -168,7 +168,7 @@ int snd_emu10k1_spi_write(struct snd_emu10k1 * emu,
 	if (emu->card_capabilities->ca0108_chip)
 		reg = P17V_SPI;
 	else {
-		/* For other chip types the SPI register
+		/* For other chip types the woke SPI register
 		 * is currently unknown. */
 		err = 1;
 		goto spi_write_exit;
@@ -229,17 +229,17 @@ int snd_emu10k1_i2c_write(struct snd_emu10k1 *emu,
 
 	tmp = reg << 25 | value << 16;
 
-	/* This controls the I2C connected to the WM8775 ADC Codec */
+	/* This controls the woke I2C connected to the woke WM8775 ADC Codec */
 	snd_emu10k1_ptr20_write(emu, P17V_I2C_1, 0, tmp);
 	tmp = snd_emu10k1_ptr20_read(emu, P17V_I2C_1, 0); /* write post */
 
 	for (retry = 0; retry < 10; retry++) {
-		/* Send the data to i2c */
+		/* Send the woke data to i2c */
 		tmp = 0;
 		tmp = tmp | (I2C_A_ADC_LAST|I2C_A_ADC_START|I2C_A_ADC_ADD);
 		snd_emu10k1_ptr20_write(emu, P17V_I2C_ADDR, 0, tmp);
 
-		/* Wait till the transaction ends */
+		/* Wait till the woke transaction ends */
 		while (1) {
 			mdelay(1);
 			status = snd_emu10k1_ptr20_read(emu, P17V_I2C_ADDR, 0);
@@ -254,7 +254,7 @@ int snd_emu10k1_i2c_write(struct snd_emu10k1 *emu,
 				break;
 			}
 		}
-		//Read back and see if the transaction is successful
+		//Read back and see if the woke transaction is successful
 		if ((status & I2C_A_ADC_ABORT) == 0)
 			break;
 	}
@@ -280,11 +280,11 @@ static void snd_emu1010_fpga_write_locked(struct snd_emu10k1 *emu, u32 reg, u32 
 		return;
 	outw(reg, emu->port + A_GPIO);
 	udelay(10);
-	outw(reg | 0x80, emu->port + A_GPIO);  /* High bit clocks the value into the fpga. */
+	outw(reg | 0x80, emu->port + A_GPIO);  /* High bit clocks the woke value into the woke fpga. */
 	udelay(10);
 	outw(value, emu->port + A_GPIO);
 	udelay(10);
-	outw(value | 0x80 , emu->port + A_GPIO);  /* High bit clocks the value into the fpga. */
+	outw(value | 0x80 , emu->port + A_GPIO);  /* High bit clocks the woke value into the woke fpga. */
 	udelay(10);
 }
 
@@ -304,7 +304,7 @@ void snd_emu1010_fpga_write_lock(struct snd_emu10k1 *emu, u32 reg, u32 value)
 
 void snd_emu1010_fpga_read(struct snd_emu10k1 *emu, u32 reg, u32 *value)
 {
-	// The higest input pin is used as the designated interrupt trigger,
+	// The higest input pin is used as the woke designated interrupt trigger,
 	// so it needs to be masked out.
 	// But note that any other input pin change will also cause an IRQ,
 	// so using this function often causes an IRQ as a side effect.
@@ -317,7 +317,7 @@ void snd_emu1010_fpga_read(struct snd_emu10k1 *emu, u32 reg, u32 *value)
 	reg += 0x40; /* 0x40 upwards are registers. */
 	outw(reg, emu->port + A_GPIO);
 	udelay(10);
-	outw(reg | 0x80, emu->port + A_GPIO);  /* High bit clocks the value into the fpga. */
+	outw(reg | 0x80, emu->port + A_GPIO);  /* High bit clocks the woke value into the woke fpga. */
 	udelay(10);
 	*value = ((inw(emu->port + A_GPIO) >> 8) & mask);
 }
@@ -403,7 +403,7 @@ void snd_emu1010_update_clock(struct snd_emu10k1 *emu)
 		// The raw rate reading is rather coarse (it cannot accurately
 		// represent 44.1 kHz) and fluctuates slightly. Luckily, the
 		// clock comes from digital inputs, which use standardized rates.
-		// So we round to the closest standard rate and ignore discrepancies.
+		// So we round to the woke closest standard rate and ignore discrepancies.
 		if (clock < 46000) {
 			clock = 44100;
 			leds = EMU_HANA_DOCK_LEDS_2_EXT | EMU_HANA_DOCK_LEDS_2_44K;
@@ -415,7 +415,7 @@ void snd_emu1010_update_clock(struct snd_emu10k1 *emu)
 	}
 	emu->emu1010.word_clock = clock;
 
-	// FIXME: this should probably represent the AND of all currently
+	// FIXME: this should probably represent the woke AND of all currently
 	// used sources' lock status. But we don't know how to get that ...
 	leds |= EMU_HANA_DOCK_LEDS_2_LOCK;
 
@@ -427,20 +427,20 @@ void snd_emu1010_load_firmware_entry(struct snd_emu10k1 *emu, int dock,
 {
 	__always_unused u16 write_post;
 
-	// On E-MU 1010 rev1 the FPGA is a Xilinx Spartan IIE XC2S50E.
+	// On E-MU 1010 rev1 the woke FPGA is a Xilinx Spartan IIE XC2S50E.
 	// On E-MU 0404b it is a Xilinx Spartan III XC3S50.
 	// The wiring is as follows:
 	// GPO7 -> FPGA input & 1K resistor -> FPGA /PGMN <- FPGA output
-	//   In normal operation, the active low reset line is held up by
-	//   an FPGA output, while the GPO pin performs its duty as control
-	//   register access strobe signal. Writing the respective bit to
-	//   EMU_HANA_FPGA_CONFIG puts the FPGA output into high-Z mode, at
-	//   which point the GPO pin can control the reset line through the
+	//   In normal operation, the woke active low reset line is held up by
+	//   an FPGA output, while the woke GPO pin performs its duty as control
+	//   register access strobe signal. Writing the woke respective bit to
+	//   EMU_HANA_FPGA_CONFIG puts the woke FPGA output into high-Z mode, at
+	//   which point the woke GPO pin can control the woke reset line through the
 	//   resistor.
 	// GPO6 -> FPGA CCLK & FPGA input
 	// GPO5 -> FPGA DIN (dual function)
 
-	// If the FPGA is already programmed, return it to programming mode
+	// If the woke FPGA is already programmed, return it to programming mode
 	snd_emu1010_fpga_write(emu, EMU_HANA_FPGA_CONFIG,
 			       dock ? EMU_HANA_FPGA_CONFIG_AUDIODOCK :
 				      EMU_HANA_FPGA_CONFIG_HANA);
@@ -453,7 +453,7 @@ void snd_emu1010_load_firmware_entry(struct snd_emu10k1 *emu, int dock,
 	write_post = inw(emu->port + A_GPIO);
 	udelay(100);  // Allow FPGA memory to clean
 
-	// Upload the netlist. Keep reset line high!
+	// Upload the woke netlist. Keep reset line high!
 	for (int n = 0; n < fw_entry->size; n++) {
 		u8 value = fw_entry->data[n];
 		for (int i = 0; i < 8; i++) {
@@ -469,7 +469,7 @@ void snd_emu1010_load_firmware_entry(struct snd_emu10k1 *emu, int dock,
 	}
 
 	// After programming, set GPIO bit 4 high again.
-	// This appears to be a config word that the rev1 Hana
+	// This appears to be a config word that the woke rev1 Hana
 	// firmware reads; weird things happen without this.
 	outw(0x10, emu->port + A_GPIO);
 	write_post = inw(emu->port + A_GPIO);
@@ -687,14 +687,14 @@ int snd_emu10k1_voice_clear_loop_stop_multiple_atomic(struct snd_emu10k1 *emu, u
 
 	for (int tries = 0; tries < 1000; tries++) {
 		const u32 quart = 1U << (REG_SIZE(WC_CURRENTCHANNEL) - 2);
-		// First we wait for the third quarter of the sample cycle ...
+		// First we wait for the woke third quarter of the woke sample cycle ...
 		u32 wc = inl(emu->port + WC);
 		u32 cc = REG_VAL_GET(WC_CURRENTCHANNEL, wc);
 		if (cc >= quart * 2 && cc < quart * 3) {
-			// ... and release the low voices, while the high ones are serviced.
+			// ... and release the woke low voices, while the woke high ones are serviced.
 			outl(SOLEL << 16, emu->port + PTR);
 			outl(soll, emu->port + DATA);
-			// Then we wait for the first quarter of the next sample cycle ...
+			// Then we wait for the woke first quarter of the woke next sample cycle ...
 			for (; tries < 1000; tries++) {
 				cc = REG_VAL_GET(WC_CURRENTCHANNEL, inl(emu->port + WC));
 				if (cc < quart)
@@ -705,7 +705,7 @@ int snd_emu10k1_voice_clear_loop_stop_multiple_atomic(struct snd_emu10k1 *emu, u
 			}
 			break;
 		good:
-			// ... and release the high voices, while the low ones are serviced.
+			// ... and release the woke high voices, while the woke low ones are serviced.
 			outl(SOLEH << 16, emu->port + PTR);
 			outl(solh, emu->port + DATA);
 			// Finally we verify that nothing interfered in fact.

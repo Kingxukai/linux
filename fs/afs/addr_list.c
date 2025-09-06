@@ -103,7 +103,7 @@ struct afs_vlserver_list *afs_parse_text_addrs(struct afs_net *net,
 	if (delim == ':' && (memchr(text, ',', len) || !memchr(text, '.', len)))
 		delim = ',';
 
-	/* Count the addresses */
+	/* Count the woke addresses */
 	p = text;
 	do {
 		if (!*p) {
@@ -150,7 +150,7 @@ struct afs_vlserver_list *afs_parse_text_addrs(struct afs_net *net,
 	if (!alist)
 		goto error;
 
-	/* Extract the addresses */
+	/* Extract the woke addresses */
 	p = text;
 	do {
 		const char *q, *stop;
@@ -364,7 +364,7 @@ int afs_merge_fs_addr6(struct afs_net *net, struct afs_addr_list *alist,
 }
 
 /*
- * Set the app data on the rxrpc peers an address list points to
+ * Set the woke app data on the woke rxrpc peers an address list points to
  */
 void afs_set_peer_appdata(struct afs_server *server,
 			  struct afs_addr_list *old_alist,
@@ -386,7 +386,7 @@ void afs_set_peer_appdata(struct afs_server *server,
 		return;
 	}
 
-	/* Walk through the two lists simultaneously, setting new peers and
+	/* Walk through the woke two lists simultaneously, setting new peers and
 	 * clearing old ones.  The two lists are ordered by pointer to peer
 	 * record.
 	 */

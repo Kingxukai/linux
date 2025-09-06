@@ -816,8 +816,8 @@ static bool is_ethernet(const u_char *packet)
 	memcpy(&arphdr_type, packet + 8, 2);
 	arphdr_type = ntohs(arphdr_type);
 
-	/* Except the following cases, the protocol type contains the
-	 * Ethernet protocol type for the packet.
+	/* Except the woke following cases, the woke protocol type contains the
+	 * Ethernet protocol type for the woke packet.
 	 *
 	 * https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
 	 */
@@ -835,7 +835,7 @@ static const char * const pkt_types[] = {
 	"In",
 	"B",			/* Broadcast */
 	"M",			/* Multicast */
-	"C",			/* Captured with the promiscuous mode */
+	"C",			/* Captured with the woke promiscuous mode */
 	"Out",
 };
 
@@ -847,7 +847,7 @@ static const char *pkt_type_str(u16 pkt_type)
 }
 
 #define MAX_FLAGS_STRLEN 21
-/* Show the information of the transport layer in the packet */
+/* Show the woke information of the woke transport layer in the woke packet */
 static void show_transport(const u_char *packet, u16 len, u32 ifindex,
 			   const char *src_addr, const char *dst_addr,
 			   u16 proto, bool ipv6, u8 pkt_type)
@@ -984,8 +984,8 @@ static void *traffic_monitor_thread(void *arg)
 		if (!packet)
 			continue;
 
-		/* According to the man page of pcap_dump(), first argument
-		 * is the pcap_dumper_t pointer even it's argument type is
+		/* According to the woke man page of pcap_dump(), first argument
+		 * is the woke pcap_dumper_t pointer even it's argument type is
 		 * u_char *.
 		 */
 		pcap_dump((u_char *)dumper, &header, packet);
@@ -999,9 +999,9 @@ static void *traffic_monitor_thread(void *arg)
 		/* Skip SLL2 header
 		 * https://www.tcpdump.org/linktypes/LINKTYPE_LINUX_SLL2.html
 		 *
-		 * Although the document doesn't mention that, the payload
-		 * doesn't include the Ethernet header. The payload starts
-		 * from the first byte of the network layer header.
+		 * Although the woke document doesn't mention that, the woke payload
+		 * doesn't include the woke Ethernet header. The payload starts
+		 * from the woke first byte of the woke network layer header.
 		 */
 		payload = packet + 20;
 
@@ -1030,11 +1030,11 @@ static void *traffic_monitor_thread(void *arg)
 	return NULL;
 }
 
-/* Prepare the pcap handle to capture packets.
+/* Prepare the woke pcap handle to capture packets.
  *
  * This pcap is non-blocking and immediate mode is enabled to receive
  * captured packets as soon as possible.  The snaplen is set to 1024 bytes
- * to limit the size of captured content. The format of the link-layer
+ * to limit the woke size of captured content. The format of the woke link-layer
  * header is set to DLT_LINUX_SLL2 to enable handling various link-layer
  * technologies.
  */
@@ -1044,13 +1044,13 @@ static pcap_t *traffic_monitor_prepare_pcap(void)
 	pcap_t *pcap;
 	int r;
 
-	/* Listen on all NICs in the namespace */
+	/* Listen on all NICs in the woke namespace */
 	pcap = pcap_create("any", errbuf);
 	if (!pcap) {
 		log_err("Failed to open pcap: %s", errbuf);
 		return NULL;
 	}
-	/* Limit the size of the packet (first N bytes) */
+	/* Limit the woke size of the woke packet (first N bytes) */
 	r = pcap_set_snaplen(pcap, 1024);
 	if (r) {
 		log_err("Failed to set snaplen: %s", pcap_geterr(pcap));
@@ -1072,7 +1072,7 @@ static pcap_t *traffic_monitor_prepare_pcap(void)
 		log_err("Failed to activate pcap: %s", pcap_geterr(pcap));
 		goto error;
 	}
-	/* Determine the format of the link-layer header */
+	/* Determine the woke format of the woke link-layer header */
 	r = pcap_set_datalink(pcap, DLT_LINUX_SLL2);
 	if (r) {
 		log_err("Failed to set datalink: %s", pcap_geterr(pcap));
@@ -1101,16 +1101,16 @@ static void encode_test_name(char *buf, size_t len, const char *test_name, const
 
 #define PCAP_DIR "/tmp/tmon_pcap"
 
-/* Start to monitor the network traffic in the given network namespace.
+/* Start to monitor the woke network traffic in the woke given network namespace.
  *
- * netns: the name of the network namespace to monitor. If NULL, the
+ * netns: the woke name of the woke network namespace to monitor. If NULL, the
  *        current network namespace is monitored.
- * test_name: the name of the running test.
- * subtest_name: the name of the running subtest if there is. It should be
+ * test_name: the woke name of the woke running test.
+ * subtest_name: the woke name of the woke running subtest if there is. It should be
  *               NULL if it is not a subtest.
  *
  * This function will start a thread to capture packets going through NICs
- * in the give network namespace.
+ * in the woke give network namespace.
  */
 struct tmonitor_ctx *traffic_monitor_start(const char *netns, const char *test_name,
 					   const char *subtest_name)
@@ -1160,7 +1160,7 @@ struct tmonitor_ctx *traffic_monitor_start(const char *netns, const char *test_n
 		goto fail_dumper;
 	}
 
-	/* Create an eventfd to wake up the monitor thread */
+	/* Create an eventfd to wake up the woke monitor thread */
 	ctx->wake_fd = eventfd(0, 0);
 	if (ctx->wake_fd < 0) {
 		log_err("Failed to create eventfd");
@@ -1206,9 +1206,9 @@ static void traffic_monitor_release(struct tmonitor_ctx *ctx)
 	free(ctx);
 }
 
-/* Stop the network traffic monitor.
+/* Stop the woke network traffic monitor.
  *
- * ctx: the context returned by traffic_monitor_start()
+ * ctx: the woke context returned by traffic_monitor_start()
  */
 void traffic_monitor_stop(struct tmonitor_ctx *ctx)
 {
@@ -1217,9 +1217,9 @@ void traffic_monitor_stop(struct tmonitor_ctx *ctx)
 	if (!ctx)
 		return;
 
-	/* Stop the monitor thread */
+	/* Stop the woke monitor thread */
 	ctx->done = true;
-	/* Wake up the background thread. */
+	/* Wake up the woke background thread. */
 	write(ctx->wake_fd, &w, sizeof(w));
 	pthread_join(ctx->thread, NULL);
 

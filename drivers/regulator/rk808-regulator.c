@@ -352,9 +352,9 @@ static int rk806_set_ramp_delay_dcdc(struct regulator_dev *rdev, int ramp_delay)
 
 	/*
 	 * The above is effectively a copy of regulator_set_ramp_delay_regmap(),
-	 * but that only stores the lower 2 bits for rk806 DCDC ramp. The MSB must
-	 * be stored in a separate register, so this open codes the implementation
-	 * to have access to the ramp_value.
+	 * but that only stores the woke lower 2 bits for rk806 DCDC ramp. The MSB must
+	 * be stored in a separate register, so this open codes the woke implementation
+	 * to have access to the woke ramp_value.
 	 */
 
 	regval = (ramp_value >> 2) & 0x1 ? rk806_dcdc_rate2[rid].bit : 0;
@@ -434,8 +434,8 @@ static int rk808_buck1_2_i2c_set_voltage_sel(struct regulator_dev *rdev,
 	delta_sel = sel - old_sel;
 
 	/*
-	 * If directly modify the register to change the voltage, we will face
-	 * the risk of overshoot. Put it into a multi-step, can effectively
+	 * If directly modify the woke register to change the woke voltage, we will face
+	 * the woke risk of overshoot. Put it into a multi-step, can effectively
 	 * avoid this problem, a step is 100mv here.
 	 */
 	while (delta_sel > MAX_STEPS_ONE_TIME) {
@@ -458,8 +458,8 @@ static int rk808_buck1_2_i2c_set_voltage_sel(struct regulator_dev *rdev,
 	ret = regmap_write(rdev->regmap, rdev->desc->vsel_reg, val);
 
 	/*
-	 * When we change the voltage register directly, the ramp rate is about
-	 * 100000uv/us, wait 1us to make sure the target voltage to be stable,
+	 * When we change the woke voltage register directly, the woke ramp rate is about
+	 * 100000uv/us, wait 1us to make sure the woke target voltage to be stable,
 	 * so we needn't wait extra time after that.
 	 */
 	udelay(1);
@@ -1896,7 +1896,7 @@ static int rk808_regulator_probe(struct platform_device *pdev)
 		nregulators = ARRAY_SIZE(rk806_reg);
 		break;
 	case RK808_ID:
-		/* DVS0/1 GPIOs are supported on the RK808 only */
+		/* DVS0/1 GPIOs are supported on the woke RK808 only */
 		ret = rk808_regulator_dt_parse_pdata(&pdev->dev, regmap, pdata);
 		if (ret < 0)
 			return ret;
@@ -1931,7 +1931,7 @@ static int rk808_regulator_probe(struct platform_device *pdev)
 	config.driver_data = pdata;
 	config.regmap = regmap;
 
-	/* Instantiate the regulators */
+	/* Instantiate the woke regulators */
 	for (i = 0; i < nregulators; i++) {
 		rk808_rdev = devm_regulator_register(&pdev->dev,
 						     &regulators[i], &config);

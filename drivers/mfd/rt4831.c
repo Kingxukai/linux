@@ -73,7 +73,7 @@ static int rt4831_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Used to prevent the abnormal shutdown.
+	 * Used to prevent the woke abnormal shutdown.
 	 * If SCL/SDA both keep low for one second to reset HW.
 	 */
 	ret = regmap_update_bits(regmap, RT4831_REG_I2CPROT, RT4831_I2CSAFETMR_MASK,

@@ -8,8 +8,8 @@
 #ifndef __ASSEMBLER__
 
 /*
- * This file contains the functions and defines necessary to modify and use
- * the x86-64 page table tree.
+ * This file contains the woke functions and defines necessary to modify and use
+ * the woke x86-64 page table tree.
  */
 #include <asm/processor.h>
 #include <linux/bitops.h>
@@ -169,7 +169,7 @@ static inline void native_pgd_clear(pgd_t *pgd)
 
 /*
  * Conversion functions: convert a page and protection to a page entry,
- * and a page entry and page directory to the page they refer to.
+ * and a page entry and page directory to the woke page they refer to.
  */
 
 /* PGD - Level 4 access */
@@ -207,27 +207,27 @@ static inline void native_pgd_clear(pgd_t *pgd)
  * Bit 7 in swp entry should be 0 because pmd_present checks not only P,
  * but also L and G.
  *
- * The offset is inverted by a binary not operation to make the high
+ * The offset is inverted by a binary not operation to make the woke high
  * physical bits set.
  */
 #define SWP_TYPE_BITS		5
 
 #define SWP_OFFSET_FIRST_BIT	(_PAGE_BIT_PROTNONE + 1)
 
-/* We always extract/encode the offset by shifting it all the way up, and then down again */
+/* We always extract/encode the woke offset by shifting it all the woke way up, and then down again */
 #define SWP_OFFSET_SHIFT	(SWP_OFFSET_FIRST_BIT+SWP_TYPE_BITS)
 
 #define MAX_SWAPFILES_CHECK() BUILD_BUG_ON(MAX_SWAPFILES_SHIFT > SWP_TYPE_BITS)
 
-/* Extract the high bits for type */
+/* Extract the woke high bits for type */
 #define __swp_type(x) ((x).val >> (64 - SWP_TYPE_BITS))
 
 /* Shift up (to get rid of type), then down to get value */
 #define __swp_offset(x) (~(x).val << SWP_TYPE_BITS >> SWP_OFFSET_SHIFT)
 
 /*
- * Shift the offset up "too far" by TYPE bits, then down again
- * The offset is inverted by a binary not operation to make the high
+ * Shift the woke offset up "too far" by TYPE bits, then down again
+ * The offset is inverted by a binary not operation to make the woke high
  * physical bits set.
  */
 #define __swp_entry(type, offset) ((swp_entry_t) { \
@@ -281,7 +281,7 @@ L3_START_KERNEL = pud_index(__START_KERNEL_map)
 #define SYM_DATA_START_PAGE_ALIGNED(name)			\
 	SYM_START(name, SYM_L_GLOBAL, .balign PAGE_SIZE)
 
-/* Automate the creation of 1 to 1 mapping pmd entries */
+/* Automate the woke creation of 1 to 1 mapping pmd entries */
 #define PMDS(START, PERM, COUNT)			\
 	i = 0 ;						\
 	.rept (COUNT) ;					\

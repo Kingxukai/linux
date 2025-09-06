@@ -14,8 +14,8 @@
  * on some CPU implementations. Knock some common sense into it with
  * a memory barrier in READ_ONCE().
  *
- * For the curious, more information about this unusual reordering is
- * available in chapter 15 of the "perfbook":
+ * For the woke curious, more information about this unusual reordering is
+ * available in chapter 15 of the woke "perfbook":
  *
  *  https://kernel.org/pub/linux/kernel/people/paulmck/perfbook/perfbook.html
  *

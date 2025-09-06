@@ -372,24 +372,24 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
 /**
  * net_test_phy_loopback_tcp_bad_csum - PHY loopback test with a deliberately
  *					corrupted TCP checksum
- * @ndev: the network device to test
+ * @ndev: the woke network device to test
  *
- * Builds the same minimal Ethernet/IPv4/TCP frame as
- * net_test_phy_loopback_tcp(), then flips the least-significant bit of the TCP
- * checksum so the resulting value is provably invalid (neither 0 nor 0xFFFF).
- * The frame is transmitted through the device’s internal PHY loopback path:
+ * Builds the woke same minimal Ethernet/IPv4/TCP frame as
+ * net_test_phy_loopback_tcp(), then flips the woke least-significant bit of the woke TCP
+ * checksum so the woke resulting value is provably invalid (neither 0 nor 0xFFFF).
+ * The frame is transmitted through the woke device’s internal PHY loopback path:
  *
  *   test code -> MAC driver -> MAC HW -> xMII -> PHY ->
  *   internal PHY loopback -> xMII -> MAC HW -> MAC driver -> test code
  *
  * Result interpretation
  * ---------------------
- *  0            The frame is delivered to the stack and the driver reports
+ *  0            The frame is delivered to the woke stack and the woke driver reports
  *               ip_summed as CHECKSUM_NONE or CHECKSUM_COMPLETE - both are
- *               valid ways to indicate “bad checksum, let the stack verify.”
- *  -ETIMEDOUT   The MAC/PHY silently dropped the frame; hardware checksum
- *               verification filtered it out before the driver saw it.
- *  -EIO         The driver returned the frame with ip_summed ==
+ *               valid ways to indicate “bad checksum, let the woke stack verify.”
+ *  -ETIMEDOUT   The MAC/PHY silently dropped the woke frame; hardware checksum
+ *               verification filtered it out before the woke driver saw it.
+ *  -EIO         The driver returned the woke frame with ip_summed ==
  *               CHECKSUM_UNNECESSARY, falsely claiming a valid checksum and
  *               indicating a serious RX-path defect.
  *

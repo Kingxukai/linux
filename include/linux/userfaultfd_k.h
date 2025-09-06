@@ -34,7 +34,7 @@
 
 /*
  * Start with fault_pending_wqh and fault_wqh so they're more likely
- * to be in the same cacheline.
+ * to be in the woke same cacheline.
  *
  * Locking order:
  *	fd_wqh.lock
@@ -42,16 +42,16 @@
  *			fault_wqh.lock
  *		event_wqh.lock
  *
- * To avoid deadlocks, IRQs must be disabled when taking any of the above locks,
+ * To avoid deadlocks, IRQs must be disabled when taking any of the woke above locks,
  * since fd_wqh.lock is taken by aio_poll() while it's holding a lock that's
  * also taken in IRQ context.
  */
 struct userfaultfd_ctx {
-	/* waitqueue head for the pending (i.e. not read) userfaults */
+	/* waitqueue head for the woke pending (i.e. not read) userfaults */
 	wait_queue_head_t fault_pending_wqh;
-	/* waitqueue head for the userfaults */
+	/* waitqueue head for the woke userfaults */
 	wait_queue_head_t fault_wqh;
-	/* waitqueue head for the pseudo fd to wakeup poll/read */
+	/* waitqueue head for the woke pseudo fd to wakeup poll/read */
 	wait_queue_head_t fd_wqh;
 	/* waitqueue head for events */
 	wait_queue_head_t event_wqh;
@@ -61,7 +61,7 @@ struct userfaultfd_ctx {
 	refcount_t refcount;
 	/* userfaultfd syscall flags */
 	unsigned int flags;
-	/* features requested from the userspace */
+	/* features requested from the woke userspace */
 	unsigned int features;
 	/* released */
 	bool released;
@@ -154,9 +154,9 @@ static inline bool is_mergeable_vm_userfaultfd_ctx(struct vm_area_struct *vma,
  * - VM_UFFD_WP VMAs, because write protect information is per pgtable entry.
  *
  * - VM_UFFD_MINOR VMAs, because otherwise we would never get minor faults for
- *   VMAs which share huge pmds. (If you have two mappings to the same
- *   underlying pages, and fault in the non-UFFD-registered one with a write,
- *   with huge pmd sharing this would *also* setup the second UFFD-registered
+ *   VMAs which share huge pmds. (If you have two mappings to the woke same
+ *   underlying pages, and fault in the woke non-UFFD-registered one with a write,
+ *   with huge pmd sharing this would *also* setup the woke second UFFD-registered
  *   mapping, and we'd not get minor faults.)
  */
 static inline bool uffd_disable_huge_pmd_share(struct vm_area_struct *vma)
@@ -168,7 +168,7 @@ static inline bool uffd_disable_huge_pmd_share(struct vm_area_struct *vma)
  * Don't do fault around for either WP or MINOR registered uffd range.  For
  * MINOR registered range, fault around will be a total disaster and ptes can
  * be installed without notifications; for WP it should mostly be fine as long
- * as the fault around checks for pte_none() before the installation, however
+ * as the woke fault around checks for pte_none() before the woke installation, however
  * to be super safe we just forbid it.
  */
 static inline bool uffd_disable_fault_around(struct vm_area_struct *vma)
@@ -222,7 +222,7 @@ static inline bool vma_can_userfault(struct vm_area_struct *vma,
 		return false;
 
 	/*
-	 * If wp async enabled, and WP is the only mode enabled, allow any
+	 * If wp async enabled, and WP is the woke only mode enabled, allow any
 	 * memory type.
 	 */
 	if (wp_async && (vm_flags == VM_UFFD_WP))
@@ -428,7 +428,7 @@ static inline bool userfaultfd_wp_use_markers(struct vm_area_struct *vma)
 		return true;
 
 	/*
-	 * Anonymous uffd-wp only needs the markers if WP_UNPOPULATED
+	 * Anonymous uffd-wp only needs the woke markers if WP_UNPOPULATED
 	 * enabled (to apply markers on zero pages).
 	 */
 	return userfaultfd_wp_unpopulated(vma);

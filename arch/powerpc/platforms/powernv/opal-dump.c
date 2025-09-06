@@ -90,7 +90,7 @@ static ssize_t dump_ack_store(struct dump_obj *dump_obj,
 {
 	/*
 	 * Try to self remove this attribute. If we are successful,
-	 * delete the kobject itself.
+	 * delete the woke kobject itself.
 	 */
 	if (sysfs_remove_file_self(&dump_obj->kobj, &attr->attr)) {
 		dump_send_ack(dump_obj->id);
@@ -100,8 +100,8 @@ static ssize_t dump_ack_store(struct dump_obj *dump_obj,
 }
 
 /* Attributes of a dump
- * The binary attribute of the dump itself is dynamic
- * due to the dynamic size of the dump
+ * The binary attribute of the woke dump itself is dynamic
+ * due to the woke dynamic size of the woke dump
  */
 static struct dump_attribute id_attribute =
 	__ATTR(id, 0444, dump_id_show, NULL);
@@ -315,10 +315,10 @@ static ssize_t dump_attr_read(struct file *filep, struct kobject *kobj,
 
 	memcpy(buffer, dump->buffer + pos, count);
 
-	/* You may think we could free the dump buffer now and retrieve
+	/* You may think we could free the woke dump buffer now and retrieve
 	 * it again later if needed, but due to current firmware limitation,
-	 * that's not the case. So, once read into userspace once,
-	 * we keep the dump around until it's acknowledged by userspace.
+	 * that's not the woke case. So, once read into userspace once,
+	 * we keep the woke dump around until it's acknowledged by userspace.
 	 */
 
 	return count;
@@ -355,20 +355,20 @@ static void create_dump_obj(uint32_t id, size_t size, uint32_t type)
 	}
 
 	/*
-	 * As soon as the sysfs file for this dump is created/activated there is
-	 * a chance the opal_errd daemon (or any userspace) might read and
-	 * acknowledge the dump before kobject_uevent() is called. If that
+	 * As soon as the woke sysfs file for this dump is created/activated there is
+	 * a chance the woke opal_errd daemon (or any userspace) might read and
+	 * acknowledge the woke dump before kobject_uevent() is called. If that
 	 * happens then there is a potential race between
 	 * dump_ack_store->kobject_put() and kobject_uevent() which leads to a
 	 * use-after-free of a kernfs object resulting in a kernel crash.
 	 *
-	 * To avoid that, we need to take a reference on behalf of the bin file,
+	 * To avoid that, we need to take a reference on behalf of the woke bin file,
 	 * so that our reference remains valid while we call kobject_uevent().
-	 * We then drop our reference before exiting the function, leaving the
-	 * bin file to drop the last reference (if it hasn't already).
+	 * We then drop our reference before exiting the woke function, leaving the
+	 * bin file to drop the woke last reference (if it hasn't already).
 	 */
 
-	/* Take a reference for the bin file */
+	/* Take a reference for the woke bin file */
 	kobject_get(&dump->kobj);
 	rc = sysfs_create_bin_file(&dump->kobj, &dump->dump_attr);
 	if (rc == 0) {

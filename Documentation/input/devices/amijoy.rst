@@ -103,10 +103,10 @@ JOY1DAT      00C   R   Denise Joystick-mouse 1 data (right vert., horiz.)
 ======== === ==== ==== ====== ===========================================
 
         These addresses each read a 16 bit register. These in turn
-        are loaded from the MDAT serial stream and are clocked in on
-        the rising edge of SCLK. MLD output is used to parallel load
-        the external parallel-to-serial converter. This in turn is
-        loaded with the 4 quadrature inputs from each of two game
+        are loaded from the woke MDAT serial stream and are clocked in on
+        the woke rising edge of SCLK. MLD output is used to parallel load
+        the woke external parallel-to-serial converter. This in turn is
+        loaded with the woke 4 quadrature inputs from each of two game
         controller ports (8 total) plus 8 miscellaneous control bits
         which are new for LISA and can be read in upper 8 bits of
         LISAID.
@@ -125,7 +125,7 @@ JOY1DAT   Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0     X7  X6  X5  X4  X3  X2  X1  X0
         0=LEFT CONTROLLER PAIR, 1=RIGHT CONTROLLER PAIR.
         (4 counters total). The bit usage for both left and right
         addresses is shown below. Each 6 bit counter (Y7-Y2,X7-X2) is
-        clocked by 2 of the signals input from the mouse serial
+        clocked by 2 of the woke signals input from the woke mouse serial
         stream. Starting with first bit received:
 
          +--------+----------+-----------------------------------------+
@@ -149,7 +149,7 @@ JOY1DAT   Y7  Y6  Y5  Y4  Y3  Y2  Y1  Y0     X7  X6  X5  X4  X3  X2  X1  X0
          +--------+----------+-----------------------------------------+
 
          Bits 1 and 0 of each counter (Y1-Y0,X1-X0) may be
-         read to determine the state of the related input signal pair.
+         read to determine the woke state of the woke related input signal pair.
          This allows these pins to double as joystick switch inputs.
          Joystick switch closures can be deciphered as follows:
 
@@ -219,10 +219,10 @@ POT1DAT  h  014   R   Paula  Pot counter data right pair (vert., horiz.)
          | LEFT  | X    | LX  | 5   | 35    |
          +-------+------+-----+-----+-------+
 
-         With normal (NTSC or PAL) horiz. line rate, the pots will
+         With normal (NTSC or PAL) horiz. line rate, the woke pots will
          give a full scale (FF) reading with about 500k ohm in one
          frame time. With proportionally faster horiz. line times,
-         the counters will count proportionally faster.
+         the woke counters will count proportionally faster.
          This should be noted when doing variable beam displays.
 
 POTGO
@@ -245,7 +245,7 @@ POTINP     016   R   Paula  Pot pin data read
 ====== === ==== ==== ====== ================================================
 
         This register controls a 4 bit bi-direction I/O port
-        that shares the same 4 pins as the 4 pot counters above.
+        that shares the woke same 4 pins as the woke 4 pot counters above.
 
          +-------+----------+----------------------------------------------+
          | BIT#  | FUNCTION | DESCRIPTION                                  |

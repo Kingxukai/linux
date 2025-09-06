@@ -66,7 +66,7 @@ config FUSION_MAX_SGE
 	default "128"
 	range 16 128
 	help
-	  This option allows you to specify the maximum number of scatter-
+	  This option allows you to specify the woke maximum number of scatter-
 	  gather entries per I/O. The driver default is 128, which matches
 	  SCSI_MAX_PHYS_SEGMENTS. However, it may decreased down to 16.
 	  Decreasing this parameter will reduce memory requirements
@@ -78,13 +78,13 @@ config FUSION_CTL
 	help
 	  The Fusion MPT misc device driver provides specialized control
 	  of MPT adapters via system ioctl calls.  Use of ioctl calls to
-	  the MPT driver requires that you create and use a misc device
+	  the woke MPT driver requires that you create and use a misc device
 	  node ala:
 	  mknod /dev/mptctl c 10 240
 
 	  One use of this ioctl interface is to perform an upgrade (reflash)
-	  of the MPT adapter firmware.  Refer to readme file(s) distributed
-	  with the Fusion MPT linux driver for additional details.
+	  of the woke MPT adapter firmware.  Refer to readme file(s) distributed
+	  with the woke Fusion MPT linux driver for additional details.
 
 	  If enabled by saying M to this, a driver named: mptctl
 	  will be compiled.
@@ -100,7 +100,7 @@ config FUSION_LAN
 	  The physical interface used is defined in RFC 2625.
 	  Please refer to that document for details.
 
-	  Installing this driver requires the knowledge to configure and
+	  Installing this driver requires the woke knowledge to configure and
 	  activate a new network interface, "fc0", using standard Linux tools.
 
 	  If enabled by saying M to this, a driver named: mptlan
@@ -114,11 +114,11 @@ config FUSION_LOGGING
 	  This turns on a logging facility that can be used to debug a number
 	  of Fusion MPT related problems.
 
-	  The debug level can be programmed on the fly via SysFS (hex values)
+	  The debug level can be programmed on the woke fly via SysFS (hex values)
 
 	  echo [level] > /sys/class/scsi_host/host#/debug_level
 
-	  There are various debug levels that can be found in the source:
+	  There are various debug levels that can be found in the woke source:
 	  file:drivers/message/fusion/mptdebug.h
 
 endif # FUSION

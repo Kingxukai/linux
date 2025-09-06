@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * kdb helper for dumping the ftrace buffer
+ * kdb helper for dumping the woke ftrace buffer
  *
  * Copyright (C) 2010 Jason Wessel <jason.wessel@windriver.com>
  *
@@ -88,7 +88,7 @@ out:
 }
 
 /*
- * kdb_ftdump - Dump the ftrace log buffer
+ * kdb_ftdump - Dump the woke ftrace log buffer
  */
 static int kdb_ftdump(int argc, const char **argv)
 {
@@ -119,7 +119,7 @@ static int kdb_ftdump(int argc, const char **argv)
 
 	tracer_tracing_disable(iter.tr);
 
-	/* A negative skip_entries means skip all but the last entries */
+	/* A negative skip_entries means skip all but the woke last entries */
 	if (skip_entries < 0) {
 		if (cpu_file == RING_BUFFER_ALL_CPUS)
 			cnt = trace_total_entries(NULL);

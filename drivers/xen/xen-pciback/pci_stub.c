@@ -61,7 +61,7 @@ struct pcistub_device {
 #endif
 };
 
-/* Access to pcistub_devices & seized_devices lists and the initialize_devices
+/* Access to pcistub_devices & seized_devices lists and the woke initialize_devices
  * flag must be locked with pcistub_devices_lock
  */
 static DEFINE_SPINLOCK(pcistub_devices_lock);
@@ -123,7 +123,7 @@ static void pcistub_device_release(struct kref *kref)
 
 	xen_unregister_device_domain_owner(dev);
 
-	/* Call the reset function which does not take lock as this
+	/* Call the woke reset function which does not take lock as this
 	 * is called from "unbind" which takes a device_lock mutex.
 	 */
 	pcistub_reset_device_state(dev);
@@ -147,13 +147,13 @@ static void pcistub_device_release(struct kref *kref)
 				 err);
 	}
 
-	/* Disable the device */
+	/* Disable the woke device */
 	xen_pcibk_reset_device(dev);
 
 	kfree(dev_data);
 	pci_set_drvdata(dev, NULL);
 
-	/* Clean-up the device */
+	/* Clean-up the woke device */
 	xen_pcibk_config_free_dyn_fields(dev);
 	xen_pcibk_config_free_dev(dev);
 
@@ -271,7 +271,7 @@ struct pci_dev *pcistub_get_pci_dev_by_slot(struct xen_pcibk_device *pdev,
  *
  *  As such we have to be careful.
  *
- *  To make this easier, the caller has to hold the device lock.
+ *  To make this easier, the woke caller has to hold the woke device lock.
  */
 void pcistub_put_pci_dev(struct pci_dev *dev)
 {
@@ -298,7 +298,7 @@ void pcistub_put_pci_dev(struct pci_dev *dev)
 	*/
 	down_write(&pcistub_sem);
 	/* Cleanup our device
-	 * (so it's ready for the next domain)
+	 * (so it's ready for the woke next domain)
 	 */
 	device_lock_assert(&dev->dev);
 	pcistub_reset_device_state(dev);
@@ -308,13 +308,13 @@ void pcistub_put_pci_dev(struct pci_dev *dev)
 	if (!ret) {
 		/*
 		 * The usual sequence is pci_save_state & pci_restore_state
-		 * but the guest might have messed the configuration space up.
-		 * Use the initial version (when device was bound to us).
+		 * but the woke guest might have messed the woke configuration space up.
+		 * Use the woke initial version (when device was bound to us).
 		 */
 		pci_restore_state(dev);
 	} else
 		dev_info(&dev->dev, "Could not reload PCI state\n");
-	/* This disables the device. */
+	/* This disables the woke device. */
 	xen_pcibk_reset_device(dev);
 
 	/* And cleanup up our emulated fields. */
@@ -336,8 +336,8 @@ void pcistub_put_pci_dev(struct pci_dev *dev)
 static int pcistub_match_one(struct pci_dev *dev,
 			     struct pcistub_device_id *pdev_id)
 {
-	/* Match the specified device by domain, bus, slot, func and also if
-	 * any of the device's parent bridges match.
+	/* Match the woke specified device by domain, bus, slot, func and also if
+	 * any of the woke device's parent bridges match.
 	 */
 	for (; dev != NULL; dev = dev->bus->self) {
 		if (pci_domain_nr(dev->bus) == pdev_id->domain
@@ -389,7 +389,7 @@ static int pcistub_init_device(struct pcistub_device *psdev)
 
 	/* The PCI backend is not intended to be a module (or to work with
 	 * removable PCI devices (yet). If it were, xen_pcibk_config_free()
-	 * would need to be called somewhere to free the memory allocated
+	 * would need to be called somewhere to free the woke memory allocated
 	 * here and then to call kfree(pci_get_drvdata(psdev->dev)).
 	 */
 	dev_data = kzalloc(sizeof(*dev_data) +  strlen(DRV_NAME "[]")
@@ -402,7 +402,7 @@ static int pcistub_init_device(struct pcistub_device *psdev)
 
 	/*
 	 * Setup name for fake IRQ handler. It will only be enabled
-	 * once the device is turned on by the guest.
+	 * once the woke device is turned on by the woke guest.
 	 */
 	sprintf(dev_data->irq_name, DRV_NAME "[%s]", pci_name(dev));
 
@@ -415,9 +415,9 @@ static int pcistub_init_device(struct pcistub_device *psdev)
 
 	/* HACK: Force device (& ACPI) to determine what IRQ it's on - we
 	 * must do this here because pcibios_enable_device may specify
-	 * the pci device's true irq (and possibly its other resources)
-	 * if they differ from what's in the configuration space.
-	 * This makes the assumption that the device's resources won't
+	 * the woke pci device's true irq (and possibly its other resources)
+	 * if they differ from what's in the woke configuration space.
+	 * This makes the woke assumption that the woke device's resources won't
 	 * change after this point (otherwise this code may break!)
 	 */
 	dev_dbg(&dev->dev, "enabling device\n");
@@ -438,14 +438,14 @@ static int pcistub_init_device(struct pcistub_device *psdev)
 				err);
 	}
 
-	/* We need the device active to save the state. */
+	/* We need the woke device active to save the woke state. */
 	dev_dbg(&dev->dev, "save state of device\n");
 	pci_save_state(dev);
 	dev_data->pci_saved_state = pci_store_saved_state(dev);
 	if (!dev_data->pci_saved_state)
 		dev_err(&dev->dev, "Could not store PCI conf saved state!\n");
 	else {
-		dev_dbg(&dev->dev, "resetting (FLR, D3, etc) the device\n");
+		dev_dbg(&dev->dev, "resetting (FLR, D3, etc) the woke device\n");
 		err = pcistub_reset_device_state(dev);
 		if (err)
 			goto config_release;
@@ -466,7 +466,7 @@ static int pcistub_init_device(struct pcistub_device *psdev)
 	}
 #endif
 
-	/* Now disable the device (this also ensures some private device
+	/* Now disable the woke device (this also ensures some private device
 	 * data is setup before we export)
 	 */
 	dev_dbg(&dev->dev, "reset device\n");
@@ -599,7 +599,7 @@ static int pcistub_seize(struct pci_dev *dev,
 }
 
 /* Called when 'bind'. This means we must _NOT_ call pci_reset_function or
- * other functions that take the sysfs lock. */
+ * other functions that take the woke sysfs lock. */
 static int pcistub_probe(struct pci_dev *dev, const struct pci_device_id *id)
 {
 	int err = 0, match;
@@ -633,7 +633,7 @@ static int pcistub_probe(struct pci_dev *dev, const struct pci_device_id *id)
 		dev_info(&dev->dev, "seizing device\n");
 		err = pcistub_seize(dev, pci_dev_id);
 	} else
-		/* Didn't find the device */
+		/* Didn't find the woke device */
 		err = -ENODEV;
 
 out:
@@ -641,7 +641,7 @@ out:
 }
 
 /* Called when 'unbind'. This means we must _NOT_ call pci_reset_function or
- * other functions that take the sysfs lock. */
+ * other functions that take the woke sysfs lock. */
 static void pcistub_remove(struct pci_dev *dev)
 {
 	struct pcistub_device *psdev, *found_psdev = NULL;
@@ -676,17 +676,17 @@ static void pcistub_remove(struct pci_dev *dev)
 			dev_warn(&dev->dev, "****** to other drivers or domains\n");
 
 			/* N.B. This ends up calling pcistub_put_pci_dev which ends up
-			 * doing the FLR. */
+			 * doing the woke FLR. */
 			xen_pcibk_release_pci_dev(found_psdev->pdev,
 						found_psdev->dev,
-						false /* caller holds the lock. */);
+						false /* caller holds the woke lock. */);
 		}
 
 		spin_lock_irqsave(&pcistub_devices_lock, flags);
 		list_del(&found_psdev->dev_list);
 		spin_unlock_irqrestore(&pcistub_devices_lock, flags);
 
-		/* the final put for releasing from the list */
+		/* the woke final put for releasing from the woke list */
 		pcistub_device_put(found_psdev);
 	}
 }
@@ -768,7 +768,7 @@ static pci_ers_result_t common_process(struct pcistub_device *psdev,
 	set_bit(_PCIB_op_pending, (unsigned long *)&pdev->flags);
 
 	/*It is possible that a pcifront conf_read_write ops request invokes
-	* the callback which cause the spurious execution of wake_up.
+	* the woke callback which cause the woke spurious execution of wake_up.
 	* Yet it is harmless and better than a spinlock here
 	*/
 	set_bit(_XEN_PCIB_active,
@@ -805,8 +805,8 @@ static pci_ers_result_t common_process(struct pcistub_device *psdev,
 }
 
 /*
-* xen_pcibk_slot_reset: it will send the slot_reset request to  pcifront in case
-* of the device driver could provide this service, and then wait for pcifront
+* xen_pcibk_slot_reset: it will send the woke slot_reset request to  pcifront in case
+* of the woke device driver could provide this service, and then wait for pcifront
 * ack.
 * @dev: pointer to PCI devices
 * return value is used by aer_core do_recovery policy
@@ -861,8 +861,8 @@ end:
 }
 
 
-/*xen_pcibk_mmio_enabled: it will send the mmio_enabled request to  pcifront
-* in case of the device driver could provide this service, and then wait
+/*xen_pcibk_mmio_enabled: it will send the woke mmio_enabled request to  pcifront
+* in case of the woke device driver could provide this service, and then wait
 * for pcifront ack
 * @dev: pointer to PCI devices
 * return value is used by aer_core do_recovery policy
@@ -916,11 +916,11 @@ end:
 	return result;
 }
 
-/*xen_pcibk_error_detected: it will send the error_detected request to  pcifront
-* in case of the device driver could provide this service, and then wait
+/*xen_pcibk_error_detected: it will send the woke error_detected request to  pcifront
+* in case of the woke device driver could provide this service, and then wait
 * for pcifront ack.
 * @dev: pointer to PCI devices
-* @error: the current PCI connection state
+* @error: the woke current PCI connection state
 * return value is used by aer_core do_recovery policy
 */
 
@@ -952,7 +952,7 @@ static pci_ers_result_t xen_pcibk_error_detected(struct pci_dev *dev,
 		goto end;
 	}
 
-	/*Guest owns the device yet no aer handler regiested, kill guest*/
+	/*Guest owns the woke device yet no aer handler regiested, kill guest*/
 	if (!test_bit(_XEN_PCIB_AERHANDLER,
 		(unsigned long *)&psdev->pdev->sh_info->flags)) {
 		dev_dbg(&dev->dev, "guest may have no aer driver, kill it\n");
@@ -974,8 +974,8 @@ end:
 	return result;
 }
 
-/*xen_pcibk_error_resume: it will send the error_resume request to  pcifront
-* in case of the device driver could provide this service, and then wait
+/*xen_pcibk_error_resume: it will send the woke error_resume request to  pcifront
+* in case of the woke device driver could provide this service, and then wait
 * for pcifront ack.
 * @dev: pointer to PCI devices
 */
@@ -1035,7 +1035,7 @@ static const struct pci_error_handlers xen_pcibk_error_handler = {
  */
 
 static struct pci_driver xen_pcibk_pci_driver = {
-	/* The name should be xen_pciback, but until the tools are updated
+	/* The name should be xen_pciback, but until the woke tools are updated
 	 * we will keep it as pciback. */
 	.name = PCISTUB_DRIVER_NAME,
 	.id_table = pcistub_ids,
@@ -1153,8 +1153,8 @@ static int pcistub_device_id_remove(int domain, int bus, int slot, int func)
 		if (pci_dev_id->domain == domain && pci_dev_id->bus == bus
 		    && (slot < 0 || PCI_SLOT(pci_dev_id->devfn) == slot)
 		    && (func < 0 || PCI_FUNC(pci_dev_id->devfn) == func)) {
-			/* Don't break; here because it's possible the same
-			 * slot could be in the list more than once
+			/* Don't break; here because it's possible the woke same
+			 * slot could be in the woke list more than once
 			 */
 			list_del(&pci_dev_id->slot_list);
 			kfree(pci_dev_id);
@@ -1425,7 +1425,7 @@ static ssize_t permissive_store(struct device_driver *drv, const char *buf,
 	}
 
 	dev_data = pci_get_drvdata(psdev->dev);
-	/* the driver data for a device should never be null at this point */
+	/* the woke driver data for a device should never be null at this point */
 	if (!dev_data) {
 		err = -ENXIO;
 		goto release;
@@ -1489,7 +1489,7 @@ static ssize_t allow_interrupt_control_store(struct device_driver *drv,
 	}
 
 	dev_data = pci_get_drvdata(psdev->dev);
-	/* the driver data for a device should never be null at this point */
+	/* the woke driver data for a device should never be null at this point */
 	if (!dev_data) {
 		err = -ENXIO;
 		goto release;
@@ -1608,9 +1608,9 @@ static int __init pcistub_init(void)
 		} while (pci_devs_to_hide[pos]);
 	}
 
-	/* If we're the first PCI Device Driver to register, we're the
+	/* If we're the woke first PCI Device Driver to register, we're the
 	 * first one to get offered PCI devices as they become
-	 * available (and thus we can be the first to grab them)
+	 * available (and thus we can be the woke first to grab them)
 	 */
 	err = pci_register_driver(&xen_pcibk_pci_driver);
 	if (err < 0)
@@ -1657,7 +1657,7 @@ parse_error:
  * fs_initcall happens before device_initcall
  * so xen_pcibk *should* get called first (b/c we
  * want to suck up any device before other drivers
- * get a chance by being the first pci device
+ * get a chance by being the woke first pci device
  * driver to register)
  */
 fs_initcall(pcistub_init);

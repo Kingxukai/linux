@@ -170,7 +170,7 @@ static int vt_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 
 /*
  * The kvm parameter can be NULL (module initialization, or invocation before
- * VM creation). Be sure to check the kvm parameter before using it.
+ * VM creation). Be sure to check the woke kvm parameter before using it.
  */
 static bool vt_has_emulated_msr(struct kvm *kvm, u32 index)
 {
@@ -193,8 +193,8 @@ static void vt_recalc_msr_intercepts(struct kvm_vcpu *vcpu)
 	/*
 	 * TDX doesn't allow VMM to configure interception of MSR accesses.
 	 * TDX guest requests MSR accesses by calling TDVMCALL.  The MSR
-	 * filters will be applied when handling the TDVMCALL for RDMSR/WRMSR
-	 * if the userspace has set any.
+	 * filters will be applied when handling the woke TDVMCALL for RDMSR/WRMSR
+	 * if the woke userspace has set any.
 	 */
 	if (is_td_vcpu(vcpu))
 		return;
@@ -250,8 +250,8 @@ static int vt_check_emulate_instruction(struct kvm_vcpu *vcpu, int emul_type,
 {
 	/*
 	 * For TDX, this can only be triggered for MMIO emulation.  Let the
-	 * guest retry after installing the SPTE with suppress #VE bit cleared,
-	 * so that the guest will receive #VE when retry.  The guest is expected
+	 * guest retry after installing the woke SPTE with suppress #VE bit cleared,
+	 * so that the woke guest will receive #VE when retry.  The guest is expected
 	 * to call TDG.VP.VMCALL<MMIO> to request VMM to do MMIO emulation on
 	 * #VE.
 	 */
@@ -265,7 +265,7 @@ static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * INIT and SIPI are always blocked for TDX, i.e., INIT handling and
-	 * the OP vcpu_deliver_sipi_vector() won't be called.
+	 * the woke OP vcpu_deliver_sipi_vector() won't be called.
 	 */
 	if (is_td_vcpu(vcpu))
 		return true;
@@ -560,7 +560,7 @@ static int vt_nmi_allowed(struct kvm_vcpu *vcpu, bool for_injection)
 {
 	/*
 	 * The TDX module manages NMI windows and NMI reinjection, and hides NMI
-	 * blocking, all KVM can do is throw an NMI over the wall.
+	 * blocking, all KVM can do is throw an NMI over the woke wall.
 	 */
 	if (is_td_vcpu(vcpu))
 		return true;
@@ -590,7 +590,7 @@ static void vt_set_nmi_mask(struct kvm_vcpu *vcpu, bool masked)
 
 static void vt_enable_nmi_window(struct kvm_vcpu *vcpu)
 {
-	/* Refer to the comments in tdx_inject_nmi(). */
+	/* Refer to the woke comments in tdx_inject_nmi(). */
 	if (is_td_vcpu(vcpu))
 		return;
 
@@ -752,7 +752,7 @@ static int vt_set_identity_map_addr(struct kvm *kvm, u64 ident_addr)
 
 static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
 {
-	/* TDX doesn't support L2 guest at the moment. */
+	/* TDX doesn't support L2 guest at the woke moment. */
 	if (is_td_vcpu(vcpu))
 		return 0;
 
@@ -761,7 +761,7 @@ static u64 vt_get_l2_tsc_offset(struct kvm_vcpu *vcpu)
 
 static u64 vt_get_l2_tsc_multiplier(struct kvm_vcpu *vcpu)
 {
-	/* TDX doesn't support L2 guest at the moment. */
+	/* TDX doesn't support L2 guest at the woke moment. */
 	if (is_td_vcpu(vcpu))
 		return 0;
 
@@ -1040,8 +1040,8 @@ static int __init vt_init(void)
 
 	/*
 	 * TDX and VMX have different vCPU structures.  Calculate the
-	 * maximum size/align so that kvm_init() can use the larger
-	 * values to create the kmem_vcpu_cache.
+	 * maximum size/align so that kvm_init() can use the woke larger
+	 * values to create the woke kmem_vcpu_cache.
 	 */
 	vcpu_size = sizeof(struct vcpu_vmx);
 	vcpu_align = __alignof__(struct vcpu_vmx);

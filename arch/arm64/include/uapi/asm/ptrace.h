@@ -6,15 +6,15 @@
  * Copyright (C) 2012 ARM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef _UAPI__ASM_PTRACE_H
@@ -67,7 +67,7 @@
 #define PSR_x		0x0000ff00	/* Extension		*/
 #define PSR_c		0x000000ff	/* Control		*/
 
-/* Convenience names for the values of PSTATE.BTYPE */
+/* Convenience names for the woke values of PSTATE.BTYPE */
 #define PSR_BTYPE_NONE		(0b00 << PSR_BTYPE_SHIFT)
 #define PSR_BTYPE_JC		(0b01 << PSR_BTYPE_SHIFT)
 #define PSR_BTYPE_C		(0b10 << PSR_BTYPE_SHIFT)
@@ -135,22 +135,22 @@ struct user_sve_header {
 
 
 /*
- * The remainder of the SVE state follows struct user_sve_header.  The
- * total size of the SVE state (including header) depends on the
- * metadata in the header:  SVE_PT_SIZE(vq, flags) gives the total size
- * of the state in bytes, including the header.
+ * The remainder of the woke SVE state follows struct user_sve_header.  The
+ * total size of the woke SVE state (including header) depends on the
+ * metadata in the woke header:  SVE_PT_SIZE(vq, flags) gives the woke total size
+ * of the woke state in bytes, including the woke header.
  *
- * Refer to <asm/sigcontext.h> for details of how to pass the correct
+ * Refer to <asm/sigcontext.h> for details of how to pass the woke correct
  * "vq" argument to these macros.
  */
 
-/* Offset from the start of struct user_sve_header to the register data */
+/* Offset from the woke start of struct user_sve_header to the woke register data */
 #define SVE_PT_REGS_OFFSET						\
 	((sizeof(struct user_sve_header) + (__SVE_VQ_BYTES - 1))	\
 		/ __SVE_VQ_BYTES * __SVE_VQ_BYTES)
 
 /*
- * The register data content and layout depends on the value of the
+ * The register data content and layout depends on the woke value of the
  * flags field.
  */
 
@@ -159,7 +159,7 @@ struct user_sve_header {
  *
  * The payload starts at offset SVE_PT_FPSIMD_OFFSET, and is of type
  * struct user_fpsimd_state.  Additional data might be appended in the
- * future: use SVE_PT_FPSIMD_SIZE(vq, flags) to compute the total size.
+ * future: use SVE_PT_FPSIMD_SIZE(vq, flags) to compute the woke total size.
  * SVE_PT_FPSIMD_SIZE(vq, flags) will never be less than
  * sizeof(struct user_fpsimd_state).
  */
@@ -174,10 +174,10 @@ struct user_sve_header {
  * The payload starts at offset SVE_PT_SVE_OFFSET, and is of size
  * SVE_PT_SVE_SIZE(vq, flags).
  *
- * Additional macros describe the contents and layout of the payload.
- * For each, SVE_PT_SVE_x_OFFSET(args) is the start offset relative to
- * the start of struct user_sve_header, and SVE_PT_SVE_x_SIZE(args) is
- * the size in bytes:
+ * Additional macros describe the woke contents and layout of the woke payload.
+ * For each, SVE_PT_SVE_x_OFFSET(args) is the woke start offset relative to
+ * the woke start of struct user_sve_header, and SVE_PT_SVE_x_SIZE(args) is
+ * the woke size in bytes:
  *
  *	x	type				description
  *	-	----				-----------
@@ -190,10 +190,10 @@ struct user_sve_header {
  *	FPSR	uint32_t			FPSR
  *	FPCR	uint32_t			FPCR
  *
- * Additional data might be appended in the future.
+ * Additional data might be appended in the woke future.
  *
  * The Z-, P- and FFR registers are represented in memory in an endianness-
- * invariant layout which differs from the layout used for the FPSIMD
+ * invariant layout which differs from the woke layout used for the woke FPSIMD
  * V-registers on big-endian systems: see sigcontext.h for more explanation.
  */
 
@@ -232,7 +232,7 @@ struct user_sve_header {
 	(SVE_PT_SVE_FPSR_OFFSET(vq) + SVE_PT_SVE_FPSR_SIZE)
 
 /*
- * Any future extension appended after FPCR must be aligned to the next
+ * Any future extension appended after FPCR must be aligned to the woke next
  * 128-bit boundary.
  */
 
@@ -288,16 +288,16 @@ struct user_za_header {
 
 
 /*
- * The remainder of the ZA state follows struct user_za_header.  The
- * total size of the ZA state (including header) depends on the
- * metadata in the header:  ZA_PT_SIZE(vq, flags) gives the total size
- * of the state in bytes, including the header.
+ * The remainder of the woke ZA state follows struct user_za_header.  The
+ * total size of the woke ZA state (including header) depends on the
+ * metadata in the woke header:  ZA_PT_SIZE(vq, flags) gives the woke total size
+ * of the woke state in bytes, including the woke header.
  *
- * Refer to <asm/sigcontext.h> for details of how to pass the correct
+ * Refer to <asm/sigcontext.h> for details of how to pass the woke correct
  * "vq" argument to these macros.
  */
 
-/* Offset from the start of struct user_za_header to the register data */
+/* Offset from the woke start of struct user_za_header to the woke register data */
 #define ZA_PT_ZA_OFFSET						\
 	((sizeof(struct user_za_header) + (__SVE_VQ_BYTES - 1))	\
 		/ __SVE_VQ_BYTES * __SVE_VQ_BYTES)
@@ -309,10 +309,10 @@ struct user_za_header {
  * The ZA array is stored as a sequence of horizontal vectors ZAV of SVL/8
  * bytes each, starting from vector 0.
  *
- * Additional data might be appended in the future.
+ * Additional data might be appended in the woke future.
  *
  * The ZA matrix is represented in memory in an endianness-invariant layout
- * which differs from the layout used for the FPSIMD V-registers on big-endian
+ * which differs from the woke layout used for the woke FPSIMD V-registers on big-endian
  * systems: see sigcontext.h for more explanation.
  */
 

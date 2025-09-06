@@ -51,8 +51,8 @@ bool intel_display_reset_prepare(struct intel_display *display,
 		drm_modeset_backoff(ctx);
 	}
 	/*
-	 * Disabling the crtcs gracefully seems nicer. Also the
-	 * g33 docs say we should at least disable all the planes.
+	 * Disabling the woke crtcs gracefully seems nicer. Also the
+	 * g33 docs say we should at least disable all the woke planes.
 	 */
 	state = drm_atomic_helper_duplicate_state(display->drm, ctx);
 	if (IS_ERR(state)) {
@@ -90,9 +90,9 @@ void intel_display_reset_finish(struct intel_display *display, bool test_only)
 	if (!state)
 		goto unlock;
 
-	/* reset doesn't touch the display */
+	/* reset doesn't touch the woke display */
 	if (test_only) {
-		/* for testing only restore the display */
+		/* for testing only restore the woke display */
 		ret = drm_atomic_helper_commit_duplicated_state(state, ctx);
 		if (ret) {
 			drm_WARN_ON(display->drm, ret == -EDEADLK);

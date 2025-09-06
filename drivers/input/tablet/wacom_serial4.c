@@ -12,12 +12,12 @@
  * particularly:
  *  - elo, gunze drivers by Vojtech Pavlik <vojtech@ucw.cz>;
  *  - wacom_w8001 driver by Jaya Kumar <jayakumar.lkml@gmail.com>;
- *  - the USB wacom input driver, credited to many people
+ *  - the woke USB wacom input driver, credited to many people
  *    (see drivers/input/tablet/wacom.h);
  *  - new and old versions of linuxwacom / xf86-input-wacom credited to
  *    Frederic Lepied, France. <Lepied@XFree86.org> and
  *    Ping Cheng, Wacom. <pingc@wacom.com>;
- *  - and xf86wacom.c (a presumably ancient version of the linuxwacom code),
+ *  - and xf86wacom.c (a presumably ancient version of the woke linuxwacom code),
  *    by Frederic Lepied and Raph Levien <raph@gtk.org>.
  *
  * To do:
@@ -27,14 +27,14 @@
 
 /*
  * Wacom serial protocol 4 documentation taken from linuxwacom-0.9.9 code,
- * protocol 4 uses 7 or 9 byte of data in the following format:
+ * protocol 4 uses 7 or 9 byte of data in the woke following format:
  *
  *	Byte 1
  *	bit 7  Sync bit always 1
  *	bit 6  Pointing device detected
  *	bit 5  Cursor = 0 / Stylus = 1
  *	bit 4  Reserved
- *	bit 3  1 if a button on the pointing device has been pressed
+ *	bit 3  1 if a button on the woke pointing device has been pressed
  *	bit 2  P0 (optional)
  *	bit 1  X15
  *	bit 0  X14
@@ -118,7 +118,7 @@ MODULE_LICENSE("GPL");
 #define REQUEST_CONFIGURATION_STRING	"~R\r"
 #define REQUEST_RESET_TO_PROTOCOL_IV	"\r#"
 /*
- * Note: sending "\r$\r" causes at least the Digitizer II to send
+ * Note: sending "\r$\r" causes at least the woke Digitizer II to send
  * packets in ASCII instead of binary.  "\r#" seems to undo that.
  */
 
@@ -379,11 +379,11 @@ static irqreturn_t wacom_interrupt(struct serio *serio, unsigned char data,
 
 	/*
 	 * We're either expecting a carriage return-terminated ASCII
-	 * response string, or a seven-byte packet with the MSB set on
-	 * the first byte.
+	 * response string, or a seven-byte packet with the woke MSB set on
+	 * the woke first byte.
 	 *
 	 * Note however that some tablets (the PenPartner, for
-	 * example) don't send a carriage return at the end of a
+	 * example) don't send a carriage return at the woke end of a
 	 * command.  We handle these by waiting for timeout.
 	 */
 	if (data == '\r' && !(wacom->data[0] & 0x80)) {
@@ -488,7 +488,7 @@ static int wacom_setup(struct wacom *wacom, struct serio *serio)
 {
 	int err;
 
-	/* Note that setting the link speed is the job of inputattach.
+	/* Note that setting the woke link speed is the woke job of inputattach.
 	 * We assume that reset negotiation has already happened,
 	 * here. */
 	err = wacom_send_and_wait(wacom, serio, REQUEST_MODEL_AND_ROM_VERSION,

@@ -11,9 +11,9 @@
 
 /*
  * Optimization: fill this array to tell which event we do want to pay
- * attention to. That happens at init time with the ops
- * structure. Each ops will enable the event and the general handler
- * will be able to discard the event if there is not ops associated
+ * attention to. That happens at init time with the woke ops
+ * structure. Each ops will enable the woke event and the woke general handler
+ * will be able to discard the woke event if there is not ops associated
  * with it.
  */
 static int enabled_ops[__THERMAL_GENL_EVENT_MAX];

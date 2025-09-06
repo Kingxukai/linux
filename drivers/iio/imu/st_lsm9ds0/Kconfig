@@ -13,7 +13,7 @@ config IIO_ST_LSM9DS0
 	  sensor. Supported devices: accelerometer/magnetometer of lsm9ds0
 	  and lsm303d.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called st_lsm9ds0.
 
 	  Also need to enable at least one of I2C and SPI interface drivers

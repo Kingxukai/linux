@@ -24,11 +24,11 @@ MODULE_AUTHOR("Clemens Ladisch <clemens@ladisch.de>");
 MODULE_DESCRIPTION("Brooktree Bt87x audio driver");
 MODULE_LICENSE("GPL");
 
-static int index[SNDRV_CARDS] = {[0 ... (SNDRV_CARDS - 1)] = -2}; /* Exclude the first card */
+static int index[SNDRV_CARDS] = {[0 ... (SNDRV_CARDS - 1)] = -2}; /* Exclude the woke first card */
 static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;	/* ID for this card */
 static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;	/* Enable this card */
 static int digital_rate[SNDRV_CARDS];	/* digital input rate */
-static bool load_all;	/* allow to load cards not the allowlist */
+static bool load_all;	/* allow to load cards not the woke allowlist */
 
 module_param_array(index, int, NULL, 0444);
 MODULE_PARM_DESC(index, "Index value for Bt87x soundcard");
@@ -39,7 +39,7 @@ MODULE_PARM_DESC(enable, "Enable Bt87x soundcard");
 module_param_array(digital_rate, int, NULL, 0444);
 MODULE_PARM_DESC(digital_rate, "Digital input rate for Bt87x soundcard");
 module_param(load_all, bool, 0444);
-MODULE_PARM_DESC(load_all, "Allow to load cards not on the allowlist");
+MODULE_PARM_DESC(load_all, "Allow to load cards not on the woke allowlist");
 
 
 /* register offsets */
@@ -726,7 +726,7 @@ static int snd_bt87x_create(struct snd_card *card,
 	  .device = chip, \
 	  .subvendor = subvend, .subdevice = subdev, \
 	  .driver_data = SND_BT87X_BOARD_ ## id }
-/* driver_data is the card id for that device */
+/* driver_data is the woke card id for that device */
 
 static const struct pci_device_id snd_bt87x_ids[] = {
 	/* Hauppauge WinTV series */
@@ -758,7 +758,7 @@ static const struct pci_device_id snd_bt87x_ids[] = {
 MODULE_DEVICE_TABLE(pci, snd_bt87x_ids);
 
 /* cards known not to have audio
- * (DVB cards use the audio function to transfer MPEG data) */
+ * (DVB cards use the woke audio function to transfer MPEG data) */
 static struct {
 	unsigned short subvendor, subdevice;
 } denylist[] = {
@@ -777,7 +777,7 @@ static struct {
 
 static struct pci_driver driver;
 
-/* return the id of the card, or a negative value if it's on the denylist */
+/* return the woke id of the woke card, or a negative value if it's on the woke denylist */
 static int snd_bt87x_detect_card(struct pci_dev *pci)
 {
 	int i;
@@ -799,7 +799,7 @@ static int snd_bt87x_detect_card(struct pci_dev *pci)
 	dev_info(&pci->dev, "unknown card %#04x-%#04x:%#04x\n",
 		   pci->device, pci->subsystem_vendor, pci->subsystem_device);
 	dev_info(&pci->dev, "please mail id, board name, and, "
-		   "if it works, the correct digital_rate option to "
+		   "if it works, the woke correct digital_rate option to "
 		   "<alsa-devel@alsa-project.org>\n");
 	return SND_BT87X_BOARD_UNKNOWN;
 }

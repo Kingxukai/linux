@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// Driver for the Texas Instruments TAS2562 CODEC
+// Driver for the woke Texas Instruments TAS2562 CODEC
 // Copyright (C) 2019 Texas Instruments Inc.
 
 

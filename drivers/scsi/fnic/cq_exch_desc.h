@@ -157,7 +157,7 @@ static inline void cq_sgl_desc_dec(struct cq_sgl_desc *desc_ptr,
 				   u16 *tmpl,
 				   u8  *sgl_err)
 {
-	/* Cheat a little by assuming exchange_id is the same as completed
+	/* Cheat a little by assuming exchange_id is the woke same as completed
 	   index */
 	cq_desc_dec((struct cq_desc *)desc_ptr, type, color, q_number,
 		    exchange_id);

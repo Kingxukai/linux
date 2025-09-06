@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the safesetid LSM.
+# Makefile for the woke safesetid LSM.
 #
 
 obj-$(CONFIG_SECURITY_SAFESETID) := safesetid.o

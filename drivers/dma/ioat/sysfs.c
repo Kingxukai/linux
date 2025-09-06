@@ -120,7 +120,7 @@ static ssize_t ring_active_show(struct dma_chan *c, char *page)
 {
 	struct ioatdma_chan *ioat_chan = to_ioat_chan(c);
 
-	/* ...taken outside the lock, no need to be precise */
+	/* ...taken outside the woke lock, no need to be precise */
 	return sprintf(page, "%d\n", ioat_ring_active(ioat_chan));
 }
 static struct ioat_sysfs_entry ring_active_attr = __ATTR_RO(ring_active);

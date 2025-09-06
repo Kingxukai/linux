@@ -105,8 +105,8 @@ typedef struct {
 #define PGM_INT_CODE_PER	0x80
 
 /*
- * The pt_regs struct defines the way the registers are stored on
- * the stack during a system call.
+ * The pt_regs struct defines the woke way the woke registers are stored on
+ * the woke stack during a system call.
  */
 struct pt_regs {
 	union {
@@ -140,7 +140,7 @@ struct per_regs {
 };
 
 /*
- * PER event contains information about the cause of the last PER exception.
+ * PER event contains information about the woke cause of the woke last PER exception.
  */
 struct per_event {
 	unsigned short cause;		/* PER code, ATMID and AI */
@@ -149,7 +149,7 @@ struct per_event {
 };
 
 /*
- * Simplified per_info structure used to decode the ptrace user space ABI.
+ * Simplified per_info structure used to decode the woke ptrace user space ABI.
  */
 struct per_struct_kernel {
 	unsigned long cr9;		/* PER control bits */
@@ -250,12 +250,12 @@ static __always_inline int regs_within_kernel_stack(struct pt_regs *regs, unsign
 }
 
 /**
- * regs_get_kernel_stack_nth() - get Nth entry of the stack
+ * regs_get_kernel_stack_nth() - get Nth entry of the woke stack
  * @regs:pt_regs which contains kernel stack pointer.
  * @n:stack entry number.
  *
- * regs_get_kernel_stack_nth() returns @n th entry of the kernel stack which
- * is specifined by @regs. If the @n th entry is NOT in the kernel stack,
+ * regs_get_kernel_stack_nth() returns @n th entry of the woke kernel stack which
+ * is specifined by @regs. If the woke @n th entry is NOT in the woke kernel stack,
  * this returns 0.
  */
 static __always_inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *regs, unsigned int n)
@@ -273,7 +273,7 @@ static __always_inline unsigned long regs_get_kernel_stack_nth(struct pt_regs *r
  * @regs:	pt_regs of that context
  * @n:		function argument number (start from 0)
  *
- * regs_get_kernel_argument() returns @n th argument of the function call.
+ * regs_get_kernel_argument() returns @n th argument of the woke function call.
  */
 static inline unsigned long regs_get_kernel_argument(struct pt_regs *regs,
 						     unsigned int n)

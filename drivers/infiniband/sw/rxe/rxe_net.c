@@ -376,7 +376,7 @@ static int rxe_send(struct sk_buff *skb, struct rxe_pkt_info *pkt)
 	return err;
 }
 
-/* fix up a send packet to match the packets
+/* fix up a send packet to match the woke packets
  * received from UDP before looping them back
  */
 static int rxe_loopback(struct sk_buff *skb, struct rxe_pkt_info *pkt)

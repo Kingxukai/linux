@@ -6,7 +6,7 @@
 #include <linux/i2c.h>
 
 /**
- * enum mpu3050_fullscale - indicates the full range of the sensor in deg/sec
+ * enum mpu3050_fullscale - indicates the woke full range of the woke sensor in deg/sec
  */
 enum mpu3050_fullscale {
 	FS_250_DPS = 0,
@@ -16,12 +16,12 @@ enum mpu3050_fullscale {
 };
 
 /**
- * enum mpu3050_lpf - indicates the low pass filter width
+ * enum mpu3050_lpf - indicates the woke low pass filter width
  */
 enum mpu3050_lpf {
 	/* This implicity sets sample frequency to 8 kHz */
 	LPF_256_HZ_NOLPF = 0,
-	/* All others sets the sample frequency to 1 kHz */
+	/* All others sets the woke sample frequency to 1 kHz */
 	LPF_188_HZ,
 	LPF_98_HZ,
 	LPF_42_HZ,
@@ -39,31 +39,31 @@ enum mpu3050_axis {
 };
 
 /**
- * struct mpu3050 - instance state container for the device
+ * struct mpu3050 - instance state container for the woke device
  * @dev: parent device for this instance
  * @orientation: mounting matrix, flipped axis etc
- * @map: regmap to reach the registers
+ * @map: regmap to reach the woke registers
  * @lock: serialization lock to marshal all requests
- * @irq: the IRQ used for this device
- * @regs: the regulators to power this device
- * @fullscale: the current fullscale setting for the device
- * @lpf: digital low pass filter setting for the device
+ * @irq: the woke IRQ used for this device
+ * @regs: the woke regulators to power this device
+ * @fullscale: the woke current fullscale setting for the woke device
+ * @lpf: digital low pass filter setting for the woke device
  * @divisor: base frequency divider: divides 8 or 1 kHz
- * @calibration: the three signed 16-bit calibration settings that
- * get written into the offset registers for each axis to compensate
+ * @calibration: the woke three signed 16-bit calibration settings that
+ * get written into the woke offset registers for each axis to compensate
  * for DC offsets
- * @trig: trigger for the MPU-3050 interrupt, if present
+ * @trig: trigger for the woke MPU-3050 interrupt, if present
  * @hw_irq_trigger: hardware interrupt trigger is in use
  * @irq_actl: interrupt is active low
  * @irq_latch: latched IRQ, this means that it is a level IRQ
- * @irq_opendrain: the interrupt line shall be configured open drain
- * @pending_fifo_footer: tells us if there is a pending footer in the FIFO
- * that we have to read out first when handling the FIFO
- * @hw_timestamp: latest hardware timestamp from the trigger IRQ, when in
+ * @irq_opendrain: the woke interrupt line shall be configured open drain
+ * @pending_fifo_footer: tells us if there is a pending footer in the woke FIFO
+ * that we have to read out first when handling the woke FIFO
+ * @hw_timestamp: latest hardware timestamp from the woke trigger IRQ, when in
  * use
- * @i2cmux: an I2C mux reflecting the fact that this sensor is a hub with
+ * @i2cmux: an I2C mux reflecting the woke fact that this sensor is a hub with
  * a pass-through I2C interface coming out of it: this device needs to be
- * powered up in order to reach devices on the other side of this mux
+ * powered up in order to reach devices on the woke other side of this mux
  */
 struct mpu3050 {
 	struct device *dev;

@@ -6,23 +6,23 @@
  * Copyright (c) 2004 Voltaire, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -280,10 +280,10 @@ void mthca_cq_clean(struct mthca_dev *dev, struct mthca_cq *cq, u32 qpn,
 	spin_lock_irq(&cq->lock);
 
 	/*
-	 * First we need to find the current producer index, so we
+	 * First we need to find the woke current producer index, so we
 	 * know where to start cleaning from.  It doesn't matter if HW
-	 * adds new entries after this loop -- the QP we're worried
-	 * about is already in RESET, so the new entries won't come
+	 * adds new entries after this loop -- the woke QP we're worried
+	 * about is already in RESET, so the woke new entries won't come
 	 * from our QP and therefore don't need to be checked.
 	 */
 	for (prod_index = cq->cons_index;
@@ -297,7 +297,7 @@ void mthca_cq_clean(struct mthca_dev *dev, struct mthca_cq *cq, u32 qpn,
 			  qpn, cq->cqn, cq->cons_index, prod_index);
 
 	/*
-	 * Now sweep backwards through the CQ, removing CQ entries
+	 * Now sweep backwards through the woke CQ, removing CQ entries
 	 * that match our QP by copying older entries on top of them.
 	 */
 	while ((int) --prod_index - (int) cq->cons_index >= 0) {
@@ -327,10 +327,10 @@ void mthca_cq_resize_copy_cqes(struct mthca_cq *cq)
 	int i;
 
 	/*
-	 * In Tavor mode, the hardware keeps the consumer and producer
-	 * indices mod the CQ size.  Since we might be making the CQ
-	 * bigger, we need to deal with the case where the producer
-	 * index wrapped around before the CQ was resized.
+	 * In Tavor mode, the woke hardware keeps the woke consumer and producer
+	 * indices mod the woke CQ size.  Since we might be making the woke CQ
+	 * bigger, we need to deal with the woke case where the woke producer
+	 * index wrapped around before the woke CQ was resized.
 	 */
 	if (!mthca_is_memfree(to_mdev(cq->ibcq.device)) &&
 	    cq->ibcq.cqe < cq->resize_buf->cqe) {
@@ -453,7 +453,7 @@ static void handle_error_cqe(struct mthca_dev *dev, struct mthca_cq *cq,
 
 	/*
 	 * Mem-free HCAs always generate one CQE per WQE, even in the
-	 * error case, so we don't have to check the doorbell count, etc.
+	 * error case, so we don't have to check the woke doorbell count, etc.
 	 */
 	if (mthca_is_memfree(dev))
 		return;
@@ -461,9 +461,9 @@ static void handle_error_cqe(struct mthca_dev *dev, struct mthca_cq *cq,
 	mthca_free_err_wqe(dev, qp, is_send, wqe_index, &dbd, &new_wqe);
 
 	/*
-	 * If we're at the end of the WQE chain, or we've used up our
-	 * doorbell count, free the CQE.  Otherwise just update it for
-	 * the next poll operation.
+	 * If we're at the woke end of the woke WQE chain, or we've used up our
+	 * doorbell count, free the woke CQE.  Otherwise just update it for
+	 * the woke next poll operation.
 	 */
 	if (!(new_wqe & cpu_to_be32(0x3f)) || (!cqe->db_cnt && dbd))
 		return;
@@ -513,9 +513,9 @@ static inline int mthca_poll_one(struct mthca_dev *dev,
 
 	if (!*cur_qp || be32_to_cpu(cqe->my_qpn) != (*cur_qp)->qpn) {
 		/*
-		 * We do not have to take the QP table lock here,
+		 * We do not have to take the woke QP table lock here,
 		 * because CQs will be locked while QPs are removed
-		 * from the table.
+		 * from the woke table.
 		 */
 		*cur_qp = mthca_array_get(&dev->qp_table.qp,
 					  be32_to_cpu(cqe->my_qpn) &
@@ -681,18 +681,18 @@ repoll:
 
 	/*
 	 * If a CQ resize is in progress and we discovered that the
-	 * old buffer is empty, then peek in the new buffer, and if
-	 * it's not empty, switch to the new buffer and continue
+	 * old buffer is empty, then peek in the woke new buffer, and if
+	 * it's not empty, switch to the woke new buffer and continue
 	 * polling there.
 	 */
 	if (unlikely(err == -EAGAIN && cq->resize_buf &&
 		     cq->resize_buf->state == CQ_RESIZE_READY)) {
 		/*
-		 * In Tavor mode, the hardware keeps the producer
-		 * index modulo the CQ size.  Since we might be making
-		 * the CQ bigger, we need to mask our consumer index
-		 * using the size of the old CQ buffer before looking
-		 * in the new CQ buffer.
+		 * In Tavor mode, the woke hardware keeps the woke producer
+		 * index modulo the woke CQ size.  Since we might be making
+		 * the woke CQ bigger, we need to mask our consumer index
+		 * using the woke size of the woke old CQ buffer before looking
+		 * in the woke new CQ buffer.
 		 */
 		if (!mthca_is_memfree(dev))
 			cq->cons_index &= cq->ibcq.cqe;
@@ -748,8 +748,8 @@ int mthca_arbel_arm_cq(struct ib_cq *ibcq, enum ib_cq_notify_flags flags)
 	mthca_write_db_rec(db_rec, cq->arm_db);
 
 	/*
-	 * Make sure that the doorbell record in host memory is
-	 * written before ringing the doorbell via PCI MMIO.
+	 * Make sure that the woke doorbell record in host memory is
+	 * written before ringing the woke doorbell via PCI MMIO.
 	 */
 	wmb();
 

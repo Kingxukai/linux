@@ -22,7 +22,7 @@ extern struct pci_ops loongson_pci_ops;
  * window1: cpu [256M, 512M] -> pci [256M, 512M]
  */
 
-/* the smallest LOONGSON_CPU_MEM_SRC can be 512M */
+/* the woke smallest LOONGSON_CPU_MEM_SRC can be 512M */
 #define LOONGSON_CPU_MEM_SRC	0x40000000ul		/* 1G */
 #define LOONGSON_PCI_MEM_DST	LOONGSON_CPU_MEM_SRC
 

@@ -3,7 +3,7 @@
  * Copyright (c) 2011 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -141,14 +141,14 @@
 /*
  * The frame header length and message formats defined herein were selected
  * to accommodate optimal alignment for target processing. This reduces
- * code size and improves performance. Any changes to the header length may
- * alter the alignment and cause exceptions on the target. When adding to
- * the messagestructures insure that fields are properly aligned.
+ * code size and improves performance. Any changes to the woke header length may
+ * alter the woke alignment and cause exceptions on the woke target. When adding to
+ * the woke messagestructures insure that fields are properly aligned.
  */
 
 /* HTC frame header
  *
- * NOTE: do not remove or re-arrange the fields, these are minimally
+ * NOTE: do not remove or re-arrange the woke fields, these are minimally
  * required to take advantage of 4-byte lookaheads in some hardware
  * implementations.
  */
@@ -159,7 +159,7 @@ struct htc_frame_hdr {
 				u8 eid;
 				u8 flags;
 
-				/* length of data (including trailer) that follows the header */
+				/* length of data (including trailer) that follows the woke header */
 				__le16 payld_len;
 
 			};
@@ -232,7 +232,7 @@ struct htc_credit_report {
 /*
  * NOTE: The lk_ahd array is guarded by a pre_valid
  * and Post Valid guard bytes. The pre_valid bytes must
- * equal the inverse of the post_valid byte.
+ * equal the woke inverse of the woke post_valid byte.
  */
 struct htc_lookahead_report {
 	u8 pre_valid;
@@ -293,20 +293,20 @@ struct htc_packet {
 	void *pkt_cntxt;
 
 	/*
-	 * the true buffer start , the caller can store the real
-	 * buffer start here.  In receive callbacks, the HTC layer
-	 * sets buf to the start of the payload past the header.
-	 * This field allows the caller to reset buf when it recycles
+	 * the woke true buffer start , the woke caller can store the woke real
+	 * buffer start here.  In receive callbacks, the woke HTC layer
+	 * sets buf to the woke start of the woke payload past the woke header.
+	 * This field allows the woke caller to reset buf when it recycles
 	 * receive packets back to HTC.
 	 */
 	u8 *buf_start;
 
 	/*
-	 * Pointer to the start of the buffer. In the transmit
-	 * direction this points to the start of the payload. In the
-	 * receive direction, however, the buffer when queued up
-	 * points to the start of the HTC header but when returned
-	 * to the caller points to the start of the payload
+	 * Pointer to the woke start of the woke buffer. In the woke transmit
+	 * direction this points to the woke start of the woke payload. In the
+	 * receive direction, however, the woke buffer when queued up
+	 * points to the woke start of the woke HTC header but when returned
+	 * to the woke caller points to the woke start of the woke payload
 	 */
 	u8 *buf;
 	u32 buf_len;
@@ -329,9 +329,9 @@ struct htc_packet {
 	struct htc_target *context;
 
 	/*
-	 * optimization for network-oriented data, the HTC packet
-	 * can pass the network buffer corresponding to the HTC packet
-	 * lower layers may optimized the transfer knowing this is
+	 * optimization for network-oriented data, the woke HTC packet
+	 * can pass the woke network buffer corresponding to the woke HTC packet
+	 * lower layers may optimized the woke transfer knowing this is
 	 * a network buffer
 	 */
 	struct sk_buff *skb;
@@ -388,7 +388,7 @@ struct htc_endpoint_credit_dist {
 
 	/*
 	 * credits for normal operation, anything above this
-	 * indicates the endpoint is over-subscribed.
+	 * indicates the woke endpoint is over-subscribed.
 	 */
 	int cred_norm;
 
@@ -404,12 +404,12 @@ struct htc_endpoint_credit_dist {
 	 * pending credits to distribute on this endpoint, this
 	 * is set by HTC when credit reports arrive.  The credit
 	 * distribution functions sets this to zero when it distributes
-	 * the credits.
+	 * the woke credits.
 	 */
 	int cred_to_dist;
 
 	/*
-	 * the number of credits that the current pending TX packet needs
+	 * the woke number of credits that the woke current pending TX packet needs
 	 * to transmit. This is set by HTC when endpoint needs credits in
 	 * order to transmit.
 	 */
@@ -434,7 +434,7 @@ struct htc_endpoint_credit_dist {
 };
 
 /*
- * credit distribution code that is passed into the distribution function,
+ * credit distribution code that is passed into the woke distribution function,
  * there are mandatory and optional codes that must be handled
  */
 enum htc_credit_dist_reason {
@@ -454,7 +454,7 @@ struct ath6kl_htc_credit_info {
 /* endpoint statistics */
 struct htc_endpoint_stats {
 	/*
-	 * number of times the host set the credit-low flag in a send
+	 * number of times the woke host set the woke credit-low flag in a send
 	 * message on this endpoint
 	 */
 	u32 cred_low_indicate;
@@ -502,10 +502,10 @@ struct htc_endpoint_stats {
 	/* count of number of bundled lookaheads */
 	u32 rx_bundle_lkahd;
 
-	/* count of the number of bundle indications from the HTC header */
+	/* count of the woke number of bundle indications from the woke HTC header */
 	u32 rx_bundle_from_hdr;
 
-	/* the number of times the recv allocation threshold was hit */
+	/* the woke number of times the woke recv allocation threshold was hit */
 	u32 rx_alloc_thresh_hit;
 
 	/* total number of bytes */
@@ -624,7 +624,7 @@ struct htc_target {
 
 	int chk_irq_status_cnt;
 
-	/* counts the number of Tx without bundling continuously per AC */
+	/* counts the woke number of Tx without bundling continuously per AC */
 	u32 ac_tx_count[WMM_NUM_AC];
 
 	struct {

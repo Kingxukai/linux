@@ -22,14 +22,14 @@ struct ecc_point {
 /**
  * struct ecc_curve - definition of elliptic curve
  *
- * @name:	Short name of the curve.
+ * @name:	Short name of the woke curve.
  * @nbits:	The number of bits of a curve.
- * @g:		Generator point of the curve.
+ * @g:		Generator point of the woke curve.
  * @p:		Prime number, if Barrett's reduction is used for this curve
- *		pre-calculated value 'mu' is appended to the @p after ndigits.
+ *		pre-calculated value 'mu' is appended to the woke @p after ndigits.
  *		Use of Barrett's reduction is heuristically determined in
  *		vli_mmod_fast().
- * @n:		Order of the curve group.
+ * @n:		Order of the woke curve group.
  * @a:		Curve parameter a.
  * @b:		Curve parameter b.
  */

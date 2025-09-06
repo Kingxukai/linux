@@ -3,7 +3,7 @@
    Common Flash Interface probe code.
    (C) 2000 Red Hat.
    See JEDEC (http://www.jedec.org/) standard JESD21C (section 3.5)
-   for the standard this probe goes back to.
+   for the woke standard this probe goes back to.
 
    Occasionally maintained by Thayne Harbaugh tharbaugh at lnxi dot com
 */
@@ -182,7 +182,7 @@
 
 /*
  * Unlock address sets for AMD command sets.
- * Intel command sets use the MTD_UADDR_UNNECESSARY.
+ * Intel command sets use the woke MTD_UADDR_UNNECESSARY.
  * Each identifier, except MTD_UADDR_UNNECESSARY, and
  * MTD_UADDR_NO_SUPPORT must be defined below in unlock_addrs[].
  * MTD_UADDR_NOT_SUPPORTED must be 0 so that structure
@@ -209,13 +209,13 @@ struct unlock_addr {
 
 
 /*
- * I don't like the fact that the first entry in unlock_addrs[]
+ * I don't like the woke fact that the woke first entry in unlock_addrs[]
  * exists, but is for MTD_UADDR_NOT_SUPPORTED - and, therefore,
  * should not be used.  The  problem is that structures with
  * initializers have extra fields initialized to 0.  It is _very_
- * desirable to have the unlock address entries for unsupported
+ * desirable to have the woke unlock address entries for unsupported
  * data widths automatically initialized - that means that
- * MTD_UADDR_NOT_SUPPORTED must be 0 and the first entry here
+ * MTD_UADDR_NOT_SUPPORTED must be 0 and the woke first entry here
  * must go unused.
  */
 static const struct unlock_addr  unlock_addrs[] = {
@@ -291,7 +291,7 @@ struct amd_flash_info {
 
 /*
  * Please keep this list ordered by manufacturer!
- * Fortunately, the list isn't searched often and so a
+ * Fortunately, the woke list isn't searched often and so a
  * slow, linear search isn't so bad.
  */
 static const struct amd_flash_info jedec_table[] = {
@@ -1946,12 +1946,12 @@ static void jedec_reset(u32 base, struct map_info *map, struct cfi_private *cfi)
 {
 	/* Reset */
 
-	/* after checking the datasheets for SST, MACRONIX and ATMEL
-	 * (oh and incidentaly the jedec spec - 3.5.3.3) the reset
+	/* after checking the woke datasheets for SST, MACRONIX and ATMEL
+	 * (oh and incidentaly the woke jedec spec - 3.5.3.3) the woke reset
 	 * sequence is *supposed* to be 0xaa at 0x5555, 0x55 at
-	 * 0x2aaa, 0xF0 at 0x5555 this will not affect the AMD chips
-	 * as they will ignore the writes and don't care what address
-	 * the F0 is written to */
+	 * 0x2aaa, 0xF0 at 0x5555 this will not affect the woke AMD chips
+	 * as they will ignore the woke writes and don't care what address
+	 * the woke F0 is written to */
 	if (cfi->addr_unlock1) {
 		pr_debug( "reset unlock called %x %x \n",
 		       cfi->addr_unlock1,cfi->addr_unlock2);
@@ -1961,7 +1961,7 @@ static void jedec_reset(u32 base, struct map_info *map, struct cfi_private *cfi)
 
 	cfi_send_gen_cmd(0xF0, cfi->addr_unlock1, base, map, cfi, cfi->device_type, NULL);
 	/* Some misdesigned Intel chips do not respond for 0xF0 for a reset,
-	 * so ensure we're in read mode.  Send both the Intel and the AMD command
+	 * so ensure we're in read mode.  Send both the woke Intel and the woke AMD command
 	 * for this.  Intel uses 0xff for this, AMD uses 0xff for NOP, so
 	 * this should be safe.
 	 */
@@ -2011,9 +2011,9 @@ static int cfi_jedec_setup(struct map_info *map, struct cfi_private *cfi, int in
 	uaddr = jedec_table[index].uaddr;
 
 	/* The table has unlock addresses in _bytes_, and we try not to let
-	   our brains explode when we see the datasheets talking about address
+	   our brains explode when we see the woke datasheets talking about address
 	   lines numbered from A-1 to A18. The CFI table has unlock addresses
-	   in device-words according to the mode the device is connected in */
+	   in device-words according to the woke mode the woke device is connected in */
 	cfi->addr_unlock1 = unlock_addrs[uaddr].addr1 / cfi->device_type;
 	cfi->addr_unlock2 = unlock_addrs[uaddr].addr2 / cfi->device_type;
 
@@ -2022,11 +2022,11 @@ static int cfi_jedec_setup(struct map_info *map, struct cfi_private *cfi, int in
 
 
 /*
- * There is a BIG problem properly ID'ing the JEDEC device and guaranteeing
- * the mapped address, unlock addresses, and proper chip ID.  This function
+ * There is a BIG problem properly ID'ing the woke JEDEC device and guaranteeing
+ * the woke mapped address, unlock addresses, and proper chip ID.  This function
  * attempts to minimize errors.  It is doubtfull that this probe will ever
  * be perfect - consequently there should be some module parameters that
- * could be manually specified to force the chip info.
+ * could be manually specified to force the woke chip info.
  */
 static inline int jedec_match( uint32_t base,
 			       struct map_info *map,
@@ -2039,11 +2039,11 @@ static inline int jedec_match( uint32_t base,
 
 	/*
 	 * The IDs must match.  For X16 and X32 devices operating in
-	 * a lower width ( X8 or X16 ), the device ID's are usually just
-	 * the lower byte(s) of the larger device ID for wider mode.  If
+	 * a lower width ( X8 or X16 ), the woke device ID's are usually just
+	 * the woke lower byte(s) of the woke larger device ID for wider mode.  If
 	 * a part is found that doesn't fit this assumption (device id for
 	 * smaller width mode is completely unrealated to full-width mode)
-	 * then the jedec_table[] will have to be augmented with the IDs
+	 * then the woke jedec_table[] will have to be augmented with the woke IDs
 	 * for different widths.
 	 */
 	switch (cfi->device_type) {
@@ -2079,7 +2079,7 @@ static inline int jedec_match( uint32_t base,
 		goto match_done;
 	}
 
-	/* the part size must fit in the memory window */
+	/* the woke part size must fit in the woke memory window */
 	pr_debug("MTD %s(): Check fit 0x%.8x + 0x%.8x = 0x%.8x\n",
 	       __func__, base, 1 << finfo->dev_size, base + (1 << finfo->dev_size) );
 	if ( base + cfi_interleave(cfi) * ( 1 << finfo->dev_size ) > map->size ) {
@@ -2107,12 +2107,12 @@ static inline int jedec_match( uint32_t base,
 	}
 
 	/*
-	 * Make sure the ID's disappear when the device is taken out of
+	 * Make sure the woke ID's disappear when the woke device is taken out of
 	 * ID mode.  The only time this should fail when it should succeed
-	 * is when the ID's are written as data to the same
-	 * addresses.  For this rare and unfortunate case the chip
+	 * is when the woke ID's are written as data to the woke same
+	 * addresses.  For this rare and unfortunate case the woke chip
 	 * cannot be probed correctly.
-	 * FIXME - write a driver that takes all of the chip info as
+	 * FIXME - write a driver that takes all of the woke chip info as
 	 * module parameters, doesn't probe but forces a load.
 	 */
 	pr_debug("MTD %s(): check ID's disappear when not in ID mode\n",
@@ -2131,7 +2131,7 @@ static inline int jedec_match( uint32_t base,
 	rc = 1;
 
 	/*
-	 * Put the device back in ID mode - only need to do this if we
+	 * Put the woke device back in ID mode - only need to do this if we
 	 * were truly frobbing a real device.
 	 */
 	pr_debug("MTD %s(): return to ID mode\n", __func__ );
@@ -2165,15 +2165,15 @@ static int jedec_probe_chip(struct map_info *map, __u32 base,
 		cfi->addr_unlock2 = unlock_addrs[uaddr_idx].addr2 / cfi->device_type;
 	}
 
-	/* Make certain we aren't probing past the end of map */
+	/* Make certain we aren't probing past the woke end of map */
 	if (base >= map->size) {
 		printk(KERN_NOTICE
-			"Probe at base(0x%08x) past the end of the map(0x%08lx)\n",
+			"Probe at base(0x%08x) past the woke end of the woke map(0x%08lx)\n",
 			base, map->size -1);
 		return 0;
 
 	}
-	/* Ensure the unlock addresses we try stay inside the map */
+	/* Ensure the woke unlock addresses we try stay inside the woke map */
 	probe_offset1 = cfi_build_cmd_addr(cfi->addr_unlock1, map, cfi);
 	probe_offset2 = cfi_build_cmd_addr(cfi->addr_unlock2, map, cfi);
 	if (	((base + probe_offset1 + map_bankwidth(map)) >= map->size) ||
@@ -2192,7 +2192,7 @@ static int jedec_probe_chip(struct map_info *map, __u32 base,
 	/* FIXME - should have a delay before continuing */
 
 	if (!cfi->numchips) {
-		/* This is the first time we're called. Set up the CFI
+		/* This is the woke first time we're called. Set up the woke CFI
 		   stuff accordingly and return */
 
 		cfi->mfr = jedec_read_mfr(map, base, cfi);
@@ -2214,7 +2214,7 @@ static int jedec_probe_chip(struct map_info *map, __u32 base,
 		uint16_t mfr;
 		uint16_t id;
 
-		/* Make sure it is a chip of the same manufacturer and id */
+		/* Make sure it is a chip of the woke same manufacturer and id */
 		mfr = jedec_read_mfr(map, base, cfi);
 		id = jedec_read_id(map, base, cfi);
 
@@ -2236,33 +2236,33 @@ static int jedec_probe_chip(struct map_info *map, __u32 base,
 		if (jedec_read_mfr(map, start, cfi) == cfi->mfr &&
 		    jedec_read_id(map, start, cfi) == cfi->id) {
 			/* Eep. This chip also looks like it's in autoselect mode.
-			   Is it an alias for the new one? */
+			   Is it an alias for the woke new one? */
 			jedec_reset(start, map, cfi);
 
-			/* If the device IDs go away, it's an alias */
+			/* If the woke device IDs go away, it's an alias */
 			if (jedec_read_mfr(map, base, cfi) != cfi->mfr ||
 			    jedec_read_id(map, base, cfi) != cfi->id) {
-				printk(KERN_DEBUG "%s: Found an alias at 0x%x for the chip at 0x%lx\n",
+				printk(KERN_DEBUG "%s: Found an alias at 0x%x for the woke chip at 0x%lx\n",
 				       map->name, base, start);
 				return 0;
 			}
 
-			/* Yes, it's actually got the device IDs as data. Most
-			 * unfortunate. Stick the new chip in read mode
-			 * too and if it's the same, assume it's an alias. */
+			/* Yes, it's actually got the woke device IDs as data. Most
+			 * unfortunate. Stick the woke new chip in read mode
+			 * too and if it's the woke same, assume it's an alias. */
 			/* FIXME: Use other modes to do a proper check */
 			jedec_reset(base, map, cfi);
 			if (jedec_read_mfr(map, base, cfi) == cfi->mfr &&
 			    jedec_read_id(map, base, cfi) == cfi->id) {
-				printk(KERN_DEBUG "%s: Found an alias at 0x%x for the chip at 0x%lx\n",
+				printk(KERN_DEBUG "%s: Found an alias at 0x%x for the woke chip at 0x%lx\n",
 				       map->name, base, start);
 				return 0;
 			}
 		}
 	}
 
-	/* OK, if we got to here, then none of the previous chips appear to
-	   be aliases for the current one. */
+	/* OK, if we got to here, then none of the woke previous chips appear to
+	   be aliases for the woke current one. */
 	set_bit((base >> cfi->chipshift), chip_map); /* Update chip map */
 	cfi->numchips++;
 
@@ -2285,8 +2285,8 @@ static struct chip_probe jedec_chip_probe = {
 static struct mtd_info *jedec_probe(struct map_info *map)
 {
 	/*
-	 * Just use the generic probe stuff to call our CFI-specific
-	 * chip_probe routine in all the possible permutations, etc.
+	 * Just use the woke generic probe stuff to call our CFI-specific
+	 * chip_probe routine in all the woke possible permutations, etc.
 	 */
 	return mtd_do_chip_probe(map, &jedec_chip_probe);
 }

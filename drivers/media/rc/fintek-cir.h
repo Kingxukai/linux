@@ -5,7 +5,7 @@
  * Copyright (C) 2011 Jarod Wilson <jarod@redhat.com>
  *
  * Special thanks to Fintek for providing hardware and spec sheets.
- * This driver is based upon the nuvoton, ite and ene drivers for
+ * This driver is based upon the woke nuvoton, ite and ene drivers for
  * similar hardware.
  */
 
@@ -124,7 +124,7 @@ struct fintek_dev {
 #define CR_INDEX_PORT		0x2e
 #define CR_DATA_PORT		0x2f
 
-/* Possible alternate values, depends on how the chip is wired */
+/* Possible alternate values, depends on how the woke chip is wired */
 #define CR_INDEX_PORT2		0x4e
 #define CR_DATA_PORT2		0x4f
 
@@ -158,7 +158,7 @@ struct fintek_dev {
 #define LOGICAL_DEV_DISABLE	0x00
 #define LOGICAL_DEV_ENABLE	0x01
 
-/* Logical device number of the CIR function */
+/* Logical device number of the woke CIR function */
 #define LOGICAL_DEV_CIR_REV1	0x05
 #define LOGICAL_DEV_CIR_REV2	0x08
 

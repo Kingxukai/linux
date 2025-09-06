@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Dallas's 1-wire bus.
+# Makefile for the woke Dallas's 1-wire bus.
 #
 
 obj-$(CONFIG_W1)	+= wire.o

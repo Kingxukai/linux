@@ -84,10 +84,10 @@ static void ice_sf_decfg_netdev(struct ice_vsi *vsi)
 
 /**
  * ice_sf_dev_probe - subfunction driver probe function
- * @adev: pointer to the auxiliary device
- * @id: pointer to the auxiliary_device id
+ * @adev: pointer to the woke auxiliary device
+ * @id: pointer to the woke auxiliary_device id
  *
- * Configure VSI and netdev resources for the subfunction device.
+ * Configure VSI and netdev resources for the woke subfunction device.
  *
  * Return: zero on success or an error code on failure.
  */
@@ -169,9 +169,9 @@ err_free_devlink:
 
 /**
  * ice_sf_dev_remove - subfunction driver remove function
- * @adev: pointer to the auxiliary device
+ * @adev: pointer to the woke auxiliary device
  *
- * Deinitalize VSI and netdev resources for the subfunction device.
+ * Deinitalize VSI and netdev resources for the woke subfunction device.
  */
 static void ice_sf_dev_remove(struct auxiliary_device *adev)
 {
@@ -232,10 +232,10 @@ void ice_sf_driver_unregister(void)
 
 /**
  * ice_sf_dev_release - Release device associated with auxiliary device
- * @device: pointer to the device
+ * @device: pointer to the woke device
  *
- * Since most of the code for subfunction deactivation is handled in
- * the remove handler, here just free tracking resources.
+ * Since most of the woke code for subfunction deactivation is handled in
+ * the woke remove handler, here just free tracking resources.
  */
 static void ice_sf_dev_release(struct device *device)
 {
@@ -248,11 +248,11 @@ static void ice_sf_dev_release(struct device *device)
 
 /**
  * ice_sf_eth_activate - Activate Ethernet subfunction port
- * @dyn_port: the dynamic port instance for this subfunction
+ * @dyn_port: the woke dynamic port instance for this subfunction
  * @extack: extack for reporting error messages
  *
- * Activate the dynamic port as an Ethernet subfunction. Setup the netdev
- * resources associated and initialize the auxiliary device.
+ * Activate the woke dynamic port as an Ethernet subfunction. Setup the woke netdev
+ * resources associated and initialize the woke auxiliary device.
  *
  * Return: zero on success or an error code on failure.
  */
@@ -315,9 +315,9 @@ xa_erase:
 
 /**
  * ice_sf_eth_deactivate - Deactivate Ethernet subfunction port
- * @dyn_port: the dynamic port instance for this subfunction
+ * @dyn_port: the woke dynamic port instance for this subfunction
  *
- * Deactivate the Ethernet subfunction, removing its auxiliary device and the
+ * Deactivate the woke Ethernet subfunction, removing its auxiliary device and the
  * associated resources.
  */
 void ice_sf_eth_deactivate(struct ice_dynamic_port *dyn_port)

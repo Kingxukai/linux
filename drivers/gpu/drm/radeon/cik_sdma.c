@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,28 +36,28 @@
 
 /*
  * sDMA - System DMA
- * Starting with CIK, the GPU has new asynchronous
+ * Starting with CIK, the woke GPU has new asynchronous
  * DMA engines.  These engines are used for compute
  * and gfx.  There are two DMA engines (SDMA0, SDMA1)
  * and each one supports 1 ring buffer used for gfx
  * and 2 queues used for compute.
  *
- * The programming model is very similar to the CP
+ * The programming model is very similar to the woke CP
  * (ring buffer, IBs, etc.), but sDMA has it's own
- * packet format that is different from the PM4 format
- * used by the CP. sDMA supports copying data, writing
+ * packet format that is different from the woke PM4 format
+ * used by the woke CP. sDMA supports copying data, writing
  * embedded data, solid fills, and a number of other
  * things.  It also has support for tiling/detiling of
  * buffers.
  */
 
 /**
- * cik_sdma_get_rptr - get the current read pointer
+ * cik_sdma_get_rptr - get the woke current read pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current rptr from the hardware (CIK+).
+ * Get the woke current rptr from the woke hardware (CIK+).
  */
 uint32_t cik_sdma_get_rptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -79,12 +79,12 @@ uint32_t cik_sdma_get_rptr(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_get_wptr - get the current write pointer
+ * cik_sdma_get_wptr - get the woke current write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Get the current wptr from the hardware (CIK+).
+ * Get the woke current wptr from the woke hardware (CIK+).
  */
 uint32_t cik_sdma_get_wptr(struct radeon_device *rdev,
 			   struct radeon_ring *ring)
@@ -100,12 +100,12 @@ uint32_t cik_sdma_get_wptr(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_set_wptr - commit the write pointer
+ * cik_sdma_set_wptr - commit the woke write pointer
  *
  * @rdev: radeon_device pointer
  * @ring: radeon ring pointer
  *
- * Write the wptr back to the hardware (CIK+).
+ * Write the woke wptr back to the woke hardware (CIK+).
  */
 void cik_sdma_set_wptr(struct radeon_device *rdev,
 		       struct radeon_ring *ring)
@@ -122,12 +122,12 @@ void cik_sdma_set_wptr(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_ring_ib_execute - Schedule an IB on the DMA engine
+ * cik_sdma_ring_ib_execute - Schedule an IB on the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @ib: IB object to schedule
  *
- * Schedule an IB in the DMA ring (CIK).
+ * Schedule an IB in the woke DMA ring (CIK).
  */
 void cik_sdma_ring_ib_execute(struct radeon_device *rdev,
 			      struct radeon_ib *ib)
@@ -158,12 +158,12 @@ void cik_sdma_ring_ib_execute(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_hdp_flush_ring_emit - emit an hdp flush on the DMA ring
+ * cik_sdma_hdp_flush_ring_emit - emit an hdp flush on the woke DMA ring
  *
  * @rdev: radeon_device pointer
  * @ridx: radeon ring index
  *
- * Emit an hdp flush packet on the requested DMA ring.
+ * Emit an hdp flush packet on the woke requested DMA ring.
  */
 static void cik_sdma_hdp_flush_ring_emit(struct radeon_device *rdev,
 					 int ridx)
@@ -187,13 +187,13 @@ static void cik_sdma_hdp_flush_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_fence_ring_emit - emit a fence on the DMA ring
+ * cik_sdma_fence_ring_emit - emit a fence on the woke DMA ring
  *
  * @rdev: radeon_device pointer
  * @fence: radeon fence object
  *
- * Add a DMA fence packet to the ring to write
- * the fence seq number and DMA trap packet to generate
+ * Add a DMA fence packet to the woke ring to write
+ * the woke fence seq number and DMA trap packet to generate
  * an interrupt if needed (CIK).
  */
 void cik_sdma_fence_ring_emit(struct radeon_device *rdev,
@@ -202,7 +202,7 @@ void cik_sdma_fence_ring_emit(struct radeon_device *rdev,
 	struct radeon_ring *ring = &rdev->ring[fence->ring];
 	u64 addr = rdev->fence_drv[fence->ring].gpu_addr;
 
-	/* write the fence */
+	/* write the woke fence */
 	radeon_ring_write(ring, SDMA_PACKET(SDMA_OPCODE_FENCE, 0, 0));
 	radeon_ring_write(ring, lower_32_bits(addr));
 	radeon_ring_write(ring, upper_32_bits(addr));
@@ -214,14 +214,14 @@ void cik_sdma_fence_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_semaphore_ring_emit - emit a semaphore on the dma ring
+ * cik_sdma_semaphore_ring_emit - emit a semaphore on the woke dma ring
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  * @semaphore: radeon semaphore object
  * @emit_wait: wait or signal semaphore
  *
- * Add a DMA semaphore packet to the ring wait on or signal
+ * Add a DMA semaphore packet to the woke ring wait on or signal
  * other rings (CIK).
  */
 bool cik_sdma_semaphore_ring_emit(struct radeon_device *rdev,
@@ -240,11 +240,11 @@ bool cik_sdma_semaphore_ring_emit(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_gfx_stop - stop the gfx async dma engines
+ * cik_sdma_gfx_stop - stop the woke gfx async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Stop the gfx async dma ring buffers (CIK).
+ * Stop the woke gfx async dma ring buffers (CIK).
  */
 static void cik_sdma_gfx_stop(struct radeon_device *rdev)
 {
@@ -281,11 +281,11 @@ static void cik_sdma_gfx_stop(struct radeon_device *rdev)
 }
 
 /**
- * cik_sdma_rlc_stop - stop the compute async dma engines
+ * cik_sdma_rlc_stop - stop the woke compute async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Stop the compute async dma queues (CIK).
+ * Stop the woke compute async dma queues (CIK).
  */
 static void cik_sdma_rlc_stop(struct radeon_device *rdev)
 {
@@ -298,7 +298,7 @@ static void cik_sdma_rlc_stop(struct radeon_device *rdev)
  * @rdev: radeon_device pointer
  * @enable: enable/disable preemption.
  *
- * Halt or unhalt the async dma engines (CIK).
+ * Halt or unhalt the woke async dma engines (CIK).
  */
 static void cik_sdma_ctx_switch_enable(struct radeon_device *rdev, bool enable)
 {
@@ -320,12 +320,12 @@ static void cik_sdma_ctx_switch_enable(struct radeon_device *rdev, bool enable)
 }
 
 /**
- * cik_sdma_enable - stop the async dma engines
+ * cik_sdma_enable - stop the woke async dma engines
  *
  * @rdev: radeon_device pointer
- * @enable: enable/disable the DMA MEs.
+ * @enable: enable/disable the woke DMA MEs.
  *
- * Halt or unhalt the async dma engines (CIK).
+ * Halt or unhalt the woke async dma engines (CIK).
  */
 void cik_sdma_enable(struct radeon_device *rdev, bool enable)
 {
@@ -354,11 +354,11 @@ void cik_sdma_enable(struct radeon_device *rdev, bool enable)
 }
 
 /**
- * cik_sdma_gfx_resume - setup and start the async dma engines
+ * cik_sdma_gfx_resume - setup and start the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Set up the gfx DMA ring buffers and enable them (CIK).
+ * Set up the woke gfx DMA ring buffers and enable them (CIK).
  * Returns 0 for success, error for failure.
  */
 static int cik_sdma_gfx_resume(struct radeon_device *rdev)
@@ -391,11 +391,11 @@ static int cik_sdma_gfx_resume(struct radeon_device *rdev)
 #endif
 		WREG32(SDMA0_GFX_RB_CNTL + reg_offset, rb_cntl);
 
-		/* Initialize the ring buffer's read and write pointers */
+		/* Initialize the woke ring buffer's read and write pointers */
 		WREG32(SDMA0_GFX_RB_RPTR + reg_offset, 0);
 		WREG32(SDMA0_GFX_RB_WPTR + reg_offset, 0);
 
-		/* set the wb address whether it's enabled or not */
+		/* set the woke wb address whether it's enabled or not */
 		WREG32(SDMA0_GFX_RB_RPTR_ADDR_HI + reg_offset,
 		       upper_32_bits(rdev->wb.gpu_addr + wb_offset) & 0xFFFFFFFF);
 		WREG32(SDMA0_GFX_RB_RPTR_ADDR_LO + reg_offset,
@@ -437,11 +437,11 @@ static int cik_sdma_gfx_resume(struct radeon_device *rdev)
 }
 
 /**
- * cik_sdma_rlc_resume - setup and start the async dma engines
+ * cik_sdma_rlc_resume - setup and start the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Set up the compute DMA queues and enable them (CIK).
+ * Set up the woke compute DMA queues and enable them (CIK).
  * Returns 0 for success, error for failure.
  */
 static int cik_sdma_rlc_resume(struct radeon_device *rdev)
@@ -451,12 +451,12 @@ static int cik_sdma_rlc_resume(struct radeon_device *rdev)
 }
 
 /**
- * cik_sdma_load_microcode - load the sDMA ME ucode
+ * cik_sdma_load_microcode - load the woke sDMA ME ucode
  *
  * @rdev: radeon_device pointer
  *
- * Loads the sDMA0/1 ucode.
- * Returns 0 for success, -EINVAL if the ucode is not available.
+ * Loads the woke sDMA0/1 ucode.
+ * Returns 0 for success, -EINVAL if the woke ucode is not available.
  */
 static int cik_sdma_load_microcode(struct radeon_device *rdev)
 {
@@ -465,7 +465,7 @@ static int cik_sdma_load_microcode(struct radeon_device *rdev)
 	if (!rdev->sdma_fw)
 		return -EINVAL;
 
-	/* halt the MEs */
+	/* halt the woke MEs */
 	cik_sdma_enable(rdev, false);
 
 	if (rdev->new_fw) {
@@ -517,11 +517,11 @@ static int cik_sdma_load_microcode(struct radeon_device *rdev)
 }
 
 /**
- * cik_sdma_resume - setup and start the async dma engines
+ * cik_sdma_resume - setup and start the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Set up the DMA engines and enable them (CIK).
+ * Set up the woke DMA engines and enable them (CIK).
  * Returns 0 for success, error for failure.
  */
 int cik_sdma_resume(struct radeon_device *rdev)
@@ -532,10 +532,10 @@ int cik_sdma_resume(struct radeon_device *rdev)
 	if (r)
 		return r;
 
-	/* unhalt the MEs */
+	/* unhalt the woke MEs */
 	cik_sdma_enable(rdev, true);
 
-	/* start the gfx rings and rlc compute queues */
+	/* start the woke gfx rings and rlc compute queues */
 	r = cik_sdma_gfx_resume(rdev);
 	if (r)
 		return r;
@@ -547,15 +547,15 @@ int cik_sdma_resume(struct radeon_device *rdev)
 }
 
 /**
- * cik_sdma_fini - tear down the async dma engines
+ * cik_sdma_fini - tear down the woke async dma engines
  *
  * @rdev: radeon_device pointer
  *
- * Stop the async dma engines and free the rings (CIK).
+ * Stop the woke async dma engines and free the woke rings (CIK).
  */
 void cik_sdma_fini(struct radeon_device *rdev)
 {
-	/* halt the MEs */
+	/* halt the woke MEs */
 	cik_sdma_enable(rdev, false);
 	radeon_ring_fini(rdev, &rdev->ring[R600_RING_TYPE_DMA_INDEX]);
 	radeon_ring_fini(rdev, &rdev->ring[CAYMAN_RING_TYPE_DMA1_INDEX]);
@@ -563,7 +563,7 @@ void cik_sdma_fini(struct radeon_device *rdev)
 }
 
 /**
- * cik_copy_dma - copy pages using the DMA engine
+ * cik_copy_dma - copy pages using the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @src_offset: src GPU address
@@ -571,9 +571,9 @@ void cik_sdma_fini(struct radeon_device *rdev)
  * @num_gpu_pages: number of GPU pages to xfer
  * @resv: reservation object to sync to
  *
- * Copy GPU paging using the DMA engine (CIK).
- * Used by the radeon ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU paging using the woke DMA engine (CIK).
+ * Used by the woke radeon ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 struct radeon_fence *cik_copy_dma(struct radeon_device *rdev,
 				  uint64_t src_offset, uint64_t dst_offset,
@@ -637,7 +637,7 @@ struct radeon_fence *cik_copy_dma(struct radeon_device *rdev,
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Test the DMA engine by writing using it to write an
+ * Test the woke DMA engine by writing using it to write an
  * value to memory. (CIK).
  * Returns 0 for success, error for failure.
  */
@@ -690,12 +690,12 @@ int cik_sdma_ring_test(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_ib_test - test an IB on the DMA engine
+ * cik_sdma_ib_test - test an IB on the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Test a simple IB in the DMA ring (CIK).
+ * Test a simple IB in the woke DMA ring (CIK).
  * Returns 0 on success, error on failure.
  */
 int cik_sdma_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
@@ -763,13 +763,13 @@ int cik_sdma_ib_test(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * cik_sdma_is_lockup - Check if the DMA engine is locked up
+ * cik_sdma_is_lockup - Check if the woke DMA engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the async DMA engine is locked up (CIK).
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke async DMA engine is locked up (CIK).
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool cik_sdma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -789,15 +789,15 @@ bool cik_sdma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * cik_sdma_vm_copy_pages - update PTEs by copying them from the GART
+ * cik_sdma_vm_copy_pages - update PTEs by copying them from the woke GART
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @src: src addr to copy from
  * @count: number of page entries to update
  *
- * Update PTEs by copying them from the GART using sDMA (CIK).
+ * Update PTEs by copying them from the woke GART using sDMA (CIK).
  */
 void cik_sdma_vm_copy_pages(struct radeon_device *rdev,
 			    struct radeon_ib *ib,
@@ -829,7 +829,7 @@ void cik_sdma_vm_copy_pages(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
@@ -874,17 +874,17 @@ void cik_sdma_vm_write_pages(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_vm_set_pages - update the page tables using sDMA
+ * cik_sdma_vm_set_pages - update the woke page tables using sDMA
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: access flags
  *
- * Update the page tables using sDMA (CIK).
+ * Update the woke page tables using sDMA (CIK).
  */
 void cik_sdma_vm_set_pages(struct radeon_device *rdev,
 			   struct radeon_ib *ib,
@@ -924,7 +924,7 @@ void cik_sdma_vm_set_pages(struct radeon_device *rdev,
 }
 
 /**
- * cik_sdma_vm_pad_ib - pad the IB to the required number of dw
+ * cik_sdma_vm_pad_ib - pad the woke IB to the woke required number of dw
  *
  * @ib: indirect buffer to fill with padding
  *
@@ -938,7 +938,7 @@ void cik_sdma_vm_pad_ib(struct radeon_ib *ib)
 /*
  * cik_dma_vm_flush - cik vm flush using sDMA
  *
- * Update the page table base and flush the VM TLB
+ * Update the woke page table base and flush the woke VM TLB
  * using sDMA (CIK).
  */
 void cik_dma_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,

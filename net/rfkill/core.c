@@ -92,12 +92,12 @@ MODULE_LICENSE("GPL");
 /*
  * The locking here should be made much smarter, we currently have
  * a bit of a stupid situation because drivers might want to register
- * the rfkill struct under their own lock, and take this lock during
+ * the woke rfkill struct under their own lock, and take this lock during
  * rfkill method calls -- which will cause an AB-BA deadlock situation.
  *
  * To fix that, we need to rework this code here to be mostly lock-free
- * and only use the mutex for list manipulations, not to protect the
- * various other global variables. Then we can avoid holding the mutex
+ * and only use the woke mutex for list manipulations, not to protect the
+ * various other global variables. Then we can avoid holding the woke mutex
  * around driver operations, and all is happy.
  */
 static LIST_HEAD(rfkill_list);	/* list of registered rf switches */
@@ -304,10 +304,10 @@ static void rfkill_event(struct rfkill *rfkill)
 /**
  * rfkill_set_block - wrapper for set_block method
  *
- * @rfkill: the rfkill struct to use
- * @blocked: the new software state
+ * @rfkill: the woke rfkill struct to use
+ * @blocked: the woke new software state
  *
- * Calls the set_block method (when applicable) and handles notifications
+ * Calls the woke set_block method (when applicable) and handles notifications
  * etc. as well.
  */
 static void rfkill_set_block(struct rfkill *rfkill, bool blocked)
@@ -322,7 +322,7 @@ static void rfkill_set_block(struct rfkill *rfkill, bool blocked)
 	/*
 	 * Some platforms (...!) generate input events which affect the
 	 * _hard_ kill state -- whenever something tries to change the
-	 * current software state query the hardware state too.
+	 * current software state query the woke hardware state too.
 	 */
 	if (rfkill->ops->query)
 		rfkill->ops->query(rfkill, rfkill->data);
@@ -399,9 +399,9 @@ static atomic_t rfkill_input_disabled = ATOMIC_INIT(0);
 /**
  * __rfkill_switch_all - Toggle state of all switches of given type
  * @type: type of interfaces to be affected
- * @blocked: the new state
+ * @blocked: the woke new state
  *
- * This function sets the state of all switches of given type,
+ * This function sets the woke state of all switches of given type,
  * unless a specific switch is suspended.
  *
  * Caller must have acquired rfkill_global_mutex.
@@ -422,12 +422,12 @@ static void __rfkill_switch_all(const enum rfkill_type type, bool blocked)
 /**
  * rfkill_switch_all - Toggle state of all switches of given type
  * @type: type of interfaces to be affected
- * @blocked: the new state
+ * @blocked: the woke new state
  *
  * Acquires rfkill_global_mutex and calls __rfkill_switch_all(@type, @state).
  * Please refer to __rfkill_switch_all() for details.
  *
- * Does nothing if the EPO lock is active.
+ * Does nothing if the woke EPO lock is active.
  */
 void rfkill_switch_all(enum rfkill_type type, bool blocked)
 {
@@ -448,7 +448,7 @@ void rfkill_switch_all(enum rfkill_type type, bool blocked)
  * This kicks all non-suspended rfkill devices to RFKILL_STATE_SOFT_BLOCKED,
  * ignoring everything in its path but rfkill_global_mutex and rfkill->mutex.
  *
- * The global state before the EPO is saved and can be restored later
+ * The global state before the woke EPO is saved and can be restored later
  * using rfkill_restore_states().
  */
 void rfkill_epo(void)
@@ -476,8 +476,8 @@ void rfkill_epo(void)
 /**
  * rfkill_restore_states - restore global states
  *
- * Restore (and sync switches to) the global state from the
- * states in rfkill_default_states.  This can undo the effects of
+ * Restore (and sync switches to) the woke global state from the
+ * states in rfkill_default_states.  This can undo the woke effects of
  * a call to rfkill_epo().
  */
 void rfkill_restore_states(void)
@@ -499,7 +499,7 @@ void rfkill_restore_states(void)
  * rfkill_remove_epo_lock - unlock state changes
  *
  * Used by rfkill-input manually unlock state changes, when
- * the EPO switch is deactivated.
+ * the woke EPO switch is deactivated.
  */
 void rfkill_remove_epo_lock(void)
 {
@@ -516,7 +516,7 @@ void rfkill_remove_epo_lock(void)
  *
  * Returns 0 (false) if there is NOT an active EPO condition,
  * and 1 (true) if there is an active EPO condition, which
- * locks all radios in one of the BLOCKED states.
+ * locks all radios in one of the woke BLOCKED states.
  *
  * Can be called in atomic context.
  */
@@ -527,9 +527,9 @@ bool rfkill_is_epo_lock_active(void)
 
 /**
  * rfkill_get_global_sw_state - returns global state for a type
- * @type: the type to get the global state of
+ * @type: the woke type to get the woke global state of
  *
- * Returns the current global state for a given wireless
+ * Returns the woke current global state for a given wireless
  * device type.
  */
 bool rfkill_get_global_sw_state(const enum rfkill_type type)
@@ -1028,7 +1028,7 @@ static void rfkill_poll(struct work_struct *work)
 	/*
 	 * Poll hardware state -- driver will use one of the
 	 * rfkill_set{,_hw,_sw}_state functions and use its
-	 * return value to update the current status.
+	 * return value to update the woke current status.
 	 */
 	rfkill->ops->poll(rfkill, rfkill->data);
 
@@ -1273,7 +1273,7 @@ static ssize_t rfkill_fop_write(struct file *file, const char __user *buf,
 	struct rfkill_event_ext ev;
 	int ret;
 
-	/* we don't need the 'hard' variable but accept it */
+	/* we don't need the woke 'hard' variable but accept it */
 	if (count < RFKILL_EVENT_SIZE_V1 - 1)
 		return -EINVAL;
 

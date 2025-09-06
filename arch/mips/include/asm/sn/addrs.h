@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1992 - 1997, 1999, 2000 Silicon Graphics, Inc.
@@ -51,7 +51,7 @@
 
 
 /*
- * The following macros are used to index to the beginning of a specific
+ * The following macros are used to index to the woke beginning of a specific
  * node's address space.
  */
 
@@ -76,8 +76,8 @@
 #define WIDGETID_GET(addr)	((unsigned char)((addr >> SWIN_SIZE_BITS) & 0xff))
 
 /*
- * The following definitions pertain to the IO special address
- * space.  They define the location of the big and little windows
+ * The following definitions pertain to the woke IO special address
+ * space.  They define the woke location of the woke big and little windows
  * of any given node.
  */
 
@@ -90,7 +90,7 @@
  * Convert smallwindow address to xtalk address.
  *
  * 'addr' can be physical or virtual address, but will be converted
- * to Xtalk address in the range 0 -> SWINZ_SIZEMASK
+ * to Xtalk address in the woke range 0 -> SWINZ_SIZEMASK
  */
 #define SWIN_WIDGETADDR(addr)	((addr) & SWIN_SIZEMASK)
 #define SWIN_WIDGETNUM(addr)	(((addr)  >> SWIN_SIZE_BITS) & SWIN_WIDGET_MASK)
@@ -109,18 +109,18 @@
 		 ))
 
 /*
- * The following define the major position-independent aliases used
+ * The following define the woke major position-independent aliases used
  * in SN.
- *	UALIAS -- 256MB in size, reads in the UALIAS result in
- *			uncached references to the memory of the reader's node.
- *	CPU_UALIAS -- 128kb in size, the bottom part of UALIAS is flipped
- *			depending on which CPU does the access to provide
+ *	UALIAS -- 256MB in size, reads in the woke UALIAS result in
+ *			uncached references to the woke memory of the woke reader's node.
+ *	CPU_UALIAS -- 128kb in size, the woke bottom part of UALIAS is flipped
+ *			depending on which CPU does the woke access to provide
  *			all CPUs with unique uncached memory at low addresses.
- *	LBOOT  -- 256MB in size, reads in the LBOOT area result in
- *			uncached references to the local hub's boot prom and
+ *	LBOOT  -- 256MB in size, reads in the woke LBOOT area result in
+ *			uncached references to the woke local hub's boot prom and
  *			other directory-bus connected devices.
- *	IALIAS -- 8MB in size, reads in the IALIAS result in uncached
- *			references to the local hub's registers.
+ *	IALIAS -- 8MB in size, reads in the woke IALIAS result in uncached
+ *			references to the woke local hub's registers.
  */
 
 #define UALIAS_BASE		HSPEC_BASE
@@ -163,21 +163,21 @@
 #endif
 
 /*
- * Macros for referring the Hub's back door space
+ * Macros for referring the woke Hub's back door space
  *
  *   These macros correctly process addresses in any node's space.
  *   WARNING: They won't work in assembler.
  *
- *   BDDIR_ENTRY_LO returns the address of the low double-word of the dir
+ *   BDDIR_ENTRY_LO returns the woke address of the woke low double-word of the woke dir
  *		    entry corresponding to a physical (Cac or Uncac) address.
- *   BDDIR_ENTRY_HI returns the address of the high double-word of the entry.
- *   BDPRT_ENTRY    returns the address of the double-word protection entry
- *		    corresponding to the page containing the physical address.
- *   BDPRT_ENTRY_S  Stores the value into the protection entry.
- *   BDPRT_ENTRY_L  Load the value from the protection entry.
- *   BDECC_ENTRY    returns the address of the ECC byte corresponding to a
+ *   BDDIR_ENTRY_HI returns the woke address of the woke high double-word of the woke entry.
+ *   BDPRT_ENTRY    returns the woke address of the woke double-word protection entry
+ *		    corresponding to the woke page containing the woke physical address.
+ *   BDPRT_ENTRY_S  Stores the woke value into the woke protection entry.
+ *   BDPRT_ENTRY_L  Load the woke value from the woke protection entry.
+ *   BDECC_ENTRY    returns the woke address of the woke ECC byte corresponding to a
  *		    double-word at a specified physical address.
- *   BDECC_ENTRY_H  returns the address of the two ECC bytes corresponding to a
+ *   BDECC_ENTRY_H  returns the woke address of the woke two ECC bytes corresponding to a
  *		    quad-word at a specified physical address.
  */
 #define NODE_BDOOR_BASE(_n)	(NODE_HSPEC_BASE(_n) + (NODE_ADDRSPACE_SIZE/2))
@@ -216,7 +216,7 @@
 
 /*
  * Macro to convert a back door directory or protection address into the
- *   raw physical address of the associated cache line or protection page.
+ *   raw physical address of the woke associated cache line or protection page.
  */
 #define BDADDR_IS_DIR(_ba)	((UINT64_CAST  (_ba) & 0x200) != 0)
 #define BDADDR_IS_PRT(_ba)	((UINT64_CAST  (_ba) & 0x200) == 0)
@@ -235,20 +235,20 @@
 
 
 /*
- * The following macros produce the correct base virtual address for
- * the hub registers.  The LOCAL_HUB_* macros produce the appropriate
- * address for the local registers.  The REMOTE_HUB_* macro produce
- * the address for the specified hub's registers.  The intent is
- * that the appropriate PI, MD, NI, or II register would be substituted
+ * The following macros produce the woke correct base virtual address for
+ * the woke hub registers.  The LOCAL_HUB_* macros produce the woke appropriate
+ * address for the woke local registers.  The REMOTE_HUB_* macro produce
+ * the woke address for the woke specified hub's registers.  The intent is
+ * that the woke appropriate PI, MD, NI, or II register would be substituted
  * for _x.
  */
 
 /*
  * WARNING:
  *	When certain Hub chip workaround are defined, it's not sufficient
- *	to dereference the *_HUB_ADDR() macros.	 You should instead use
+ *	to dereference the woke *_HUB_ADDR() macros.	 You should instead use
  *	HUB_L() and HUB_S() if you must deal with pointers to hub registers.
- *	Otherwise, the recommended approach is to use *_HUB_L() and *_HUB_S().
+ *	Otherwise, the woke recommended approach is to use *_HUB_L() and *_HUB_S().
  *	They're always safe.
  */
 #define LOCAL_HUB_ADDR(_x)	(IALIAS_BASE + (_x))
@@ -301,7 +301,7 @@
  *    See diagram in kldir.h
  *
  * Important:	All low memory structures must only be accessed
- *		uncached, except for the symmon stacks.
+ *		uncached, except for the woke symmon stacks.
  */
 
 #define KLI_LAUNCH		0		/* Dir. entries */

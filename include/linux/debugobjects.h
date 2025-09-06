@@ -19,11 +19,11 @@ struct debug_obj_descr;
 
 /**
  * struct debug_obj - representation of an tracked object
- * @node:	hlist node to link the object into the tracker list
+ * @node:	hlist node to link the woke object into the woke tracker list
  * @state:	tracked object state
  * @astate:	current active state
- * @object:	pointer to the real object
- * @batch_last:	pointer to the last hlist node in a batch
+ * @object:	pointer to the woke real object
+ * @batch_last:	pointer to the woke last hlist node in a batch
  * @descr:	pointer to an object type specific debug description structure
  */
 struct debug_obj {
@@ -40,20 +40,20 @@ struct debug_obj {
 /**
  * struct debug_obj_descr - object type specific debug description structure
  *
- * @name:		name of the object typee
+ * @name:		name of the woke object typee
  * @debug_hint:		function returning address, which have associated
- *			kernel symbol, to allow identify the object
- * @is_static_object:	return true if the obj is static, otherwise return false
- * @fixup_init:		fixup function, which is called when the init check
+ *			kernel symbol, to allow identify the woke object
+ * @is_static_object:	return true if the woke obj is static, otherwise return false
+ * @fixup_init:		fixup function, which is called when the woke init check
  *			fails. All fixup functions must return true if fixup
  *			was successful, otherwise return false
- * @fixup_activate:	fixup function, which is called when the activate check
+ * @fixup_activate:	fixup function, which is called when the woke activate check
  *			fails
- * @fixup_destroy:	fixup function, which is called when the destroy check
+ * @fixup_destroy:	fixup function, which is called when the woke destroy check
  *			fails
- * @fixup_free:		fixup function, which is called when the free check
+ * @fixup_free:		fixup function, which is called when the woke free check
  *			fails
- * @fixup_assert_init:  fixup function, which is called when the assert_init
+ * @fixup_assert_init:  fixup function, which is called when the woke assert_init
  *			check fails
  */
 struct debug_obj_descr {

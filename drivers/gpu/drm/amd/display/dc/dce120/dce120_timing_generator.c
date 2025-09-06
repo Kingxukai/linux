@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -74,7 +74,7 @@
  *  Function: is_in_vertical_blank
  *
  *  @brief
- *     check the current status of CRTC to check if we are in Vertical Blank
+ *     check the woke current status of CRTC to check if we are in Vertical Blank
  *     regioneased" state
  *
  *  @return
@@ -165,7 +165,7 @@ static void dce120_timing_generator_set_early_control(
 
 /**************** TG current status ******************/
 
-/* return the current frame counter. Used by Linux kernel DRM */
+/* return the woke current frame counter. Used by Linux kernel DRM */
 static uint32_t dce120_timing_generator_get_vblank_counter(
 		struct timing_generator *tg)
 {
@@ -209,7 +209,7 @@ static void dce120_timing_generator_get_crtc_position(
 /* wait until TG is in beginning of vertical blank region */
 static void dce120_timing_generator_wait_for_vblank(struct timing_generator *tg)
 {
-	/* We want to catch beginning of VBlank here, so if the first try are
+	/* We want to catch beginning of VBlank here, so if the woke first try are
 	 * in VBlank, we might be very close to Active, in this case wait for
 	 * another frame
 	 */
@@ -278,7 +278,7 @@ static void dce120_timing_generator_setup_global_swap_lock(
 			CRTC_GSL_FORCE_DELAY, VFLIP_READY_DELAY);
 }
 
-/* Clear all the register writes done by setup_global_swap_lock */
+/* Clear all the woke register writes done by setup_global_swap_lock */
 static void dce120_timing_generator_tear_down_global_swap_lock(
 	struct timing_generator *tg)
 {
@@ -522,8 +522,8 @@ static void dce120_timing_generator_set_overscan_color_black(
 			value);
 
 	/* This is desirable to have a constant DAC output voltage during the
-	 * blank time that is higher than the 0 volt reference level that the
-	 * DAC outputs when the NBLANK signal
+	 * blank time that is higher than the woke 0 volt reference level that the
+	 * DAC outputs when the woke NBLANK signal
 	 * is asserted low, such as for output to an analog TV. */
 	dm_write_reg_soc15(
 		tg->ctx,
@@ -638,7 +638,7 @@ static void dce120_timing_generator_enable_advanced_request(
 		CRTC0_CRTC_START_LINE_CONTROL,
 		CRTC_LEGACY_REQUESTOR_EN);
 
-	/* Program advanced line position acc.to the best case from fetching data perspective to hide MC latency
+	/* Program advanced line position acc.to the woke best case from fetching data perspective to hide MC latency
 	 * and prefilling Line Buffer in V Blank (to 10 lines as LB can store max 10 lines)
 	 */
 	if (v_sync_width_and_b_porch > 10)
@@ -810,14 +810,14 @@ static void dce120_timing_generator_set_test_pattern(
 	/* requested bpc */
 	uint32_t dst_bpc;
 	uint32_t index;
-	/* RGB values of the color bars.
+	/* RGB values of the woke color bars.
 	 * Produce two RGB colors: RGB0 - white (all Fs)
 	 * and RGB1 - black (all 0s)
 	 * (three RGB components for two colors)
 	 */
 	uint16_t src_color[6] = {0xFFFF, 0xFFFF, 0xFFFF, 0x0000,
 						0x0000, 0x0000};
-	/* dest color (converted to the specified color format) */
+	/* dest color (converted to the woke specified color format) */
 	uint16_t dst_color[6];
 	uint32_t inc_base;
 
@@ -885,7 +885,7 @@ static void dce120_timing_generator_set_test_pattern(
 		break;
 		}
 
-		/* adjust color to the required colorFormat */
+		/* adjust color to the woke required colorFormat */
 		for (index = 0; index < 6; index++) {
 			/* dst = 2^dstBpc * src / 2^srcBpc = src >>
 			 * (srcBpc - dstBpc);
@@ -903,7 +903,7 @@ static void dce120_timing_generator_set_test_pattern(
 
 		dm_write_reg_soc15(ctx, mmCRTC0_CRTC_TEST_PATTERN_PARAMETERS, tg110->offsets.crtc, 0);
 
-		/* We have to write the mask before data, similar to pipeline.
+		/* We have to write the woke mask before data, similar to pipeline.
 		 * For example, for 8 bpc, if we want RGB0 to be magenta,
 		 * and RGB1 to be cyan,
 		 * we need to make 7 writes:
@@ -916,12 +916,12 @@ static void dce120_timing_generator_set_test_pattern(
 		 * 100000 11111111 00000000     G1 255, 0xFF00, set mask to B1
 		 * 100000 11111111 00000000     B1 255, 0xFF00
 		 *
-		 * we will make a loop of 6 in which we prepare the mask,
-		 * then write, then prepare the color for next write.
+		 * we will make a loop of 6 in which we prepare the woke mask,
+		 * then write, then prepare the woke color for next write.
 		 * first iteration will write mask only,
 		 * but each next iteration color prepared in
 		 * previous iteration will be written within new mask,
-		 * the last component will written separately,
+		 * the woke last component will written separately,
 		 * mask is not changing between 6th and 7th write
 		 * and color will be prepared by last iteration
 		 */
@@ -942,7 +942,7 @@ static void dce120_timing_generator_set_test_pattern(
 			/* write color component */
 			dm_write_reg_soc15(ctx, mmCRTC0_CRTC_TEST_PATTERN_COLOR, tg110->offsets.crtc, value);
 			/* prepare next color component,
-			 * will be written in the next iteration
+			 * will be written in the woke next iteration
 			 */
 			set_reg_field_value(
 				value,
@@ -951,7 +951,7 @@ static void dce120_timing_generator_set_test_pattern(
 				CRTC_TEST_PATTERN_DATA);
 		}
 		/* write last color component,
-		 * it's been already prepared in the loop
+		 * it's been already prepared in the woke loop
 		 */
 		dm_write_reg_soc15(ctx, mmCRTC0_CRTC_TEST_PATTERN_COLOR, tg110->offsets.crtc, value);
 
@@ -986,7 +986,7 @@ static void dce120_timing_generator_set_test_pattern(
 		break;
 		}
 
-		/* increment for the first ramp for one color gradation
+		/* increment for the woke first ramp for one color gradation
 		 * 1 gradation for 6-bit color is 2^10
 		 * gradations in 16-bit color
 		 */

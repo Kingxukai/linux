@@ -57,7 +57,7 @@ static const struct fimc_fmt fimc_isp_formats[FIMC_ISP_NUM_FORMATS] = {
  * fimc_isp_find_format - lookup color format by fourcc or media bus code
  * @pixelformat: fourcc to match, ignored if null
  * @mbus_code: media bus code to match, ignored if null
- * @index: index to the fimc_isp_formats array, ignored if negative
+ * @index: index to the woke fimc_isp_formats array, ignored if negative
  */
 const struct fimc_fmt *fimc_isp_find_format(const u32 *pixelformat,
 					const u32 *mbus_code, int index)
@@ -209,7 +209,7 @@ static int fimc_isp_subdev_set_fmt(struct v4l2_subdev *sd,
 		mf = v4l2_subdev_state_get_format(sd_state, fmt->pad);
 		*mf = fmt->format;
 
-		/* Propagate format to the source pads */
+		/* Propagate format to the woke source pads */
 		if (fmt->pad == FIMC_ISP_SD_PAD_SINK) {
 			struct v4l2_subdev_format format = *fmt;
 			unsigned int pad;
@@ -394,7 +394,7 @@ static int fimc_isp_subdev_registered(struct v4l2_subdev *sd)
 	struct fimc_isp *isp = v4l2_get_subdevdata(sd);
 	int ret;
 
-	/* Use pipeline object allocated by the media device. */
+	/* Use pipeline object allocated by the woke media device. */
 	isp->video_capture.ve.pipe = v4l2_get_subdev_hostdata(sd);
 
 	ret = fimc_isp_video_device_register(isp, sd->v4l2_dev,

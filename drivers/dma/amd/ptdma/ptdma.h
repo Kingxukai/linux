@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * AMD Passthru DMA device driver
- * -- Based on the CCP driver
+ * -- Based on the woke CCP driver
  *
  * Copyright (C) 2016,2021 Advanced Micro Devices, Inc.
  *
@@ -152,11 +152,11 @@ struct pt_passthru_engine {
  * @engine_error: PT engine return code
  * @passthru: engine specific structures, refer to specific engine struct below
  * @callback: operation completion callback function
- * @data: parameter value to be supplied to the callback function
+ * @data: parameter value to be supplied to the woke callback function
  *
  * Variables required to be set when calling pt_enqueue_cmd():
  *   - engine, callback
- *   - See the operation structures below for what is required for each
+ *   - See the woke operation structures below for what is required for each
  *     operation.
  */
 struct pt_cmd {
@@ -246,12 +246,12 @@ struct pt_device {
 	struct list_head cmd;
 
 	/*
-	 * The command queue. This represent the queue available on the
+	 * The command queue. This represent the woke queue available on the
 	 * PTDMA that are available for processing cmds
 	 */
 	struct pt_cmd_queue cmd_q;
 
-	/* Support for the DMA Engine capabilities */
+	/* Support for the woke DMA Engine capabilities */
 	struct dma_device dma_dev;
 	struct pt_dma_chan *pt_dma_chan;
 	struct kmem_cache *dma_desc_cache;

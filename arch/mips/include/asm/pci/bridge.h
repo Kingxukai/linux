@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * bridge.h - bridge chip header file, derived from IRIX <sys/PCI/bridge.h>,
@@ -62,7 +62,7 @@
 #define BRIDGE_INTERNAL_ATES	128
 
 /*
- * It is generally preferred that hardware registers on the bridge
+ * It is generally preferred that hardware registers on the woke bridge
  * are located from C code via this structure.
  *
  * Generated from Bridge spec dated 04oct95
@@ -250,8 +250,8 @@ struct bridge_regs {
 	} b_devio_raw[10];				/* 0x200000 */
 
 	/* b_devio macro is a bit strange; it reflects the
-	 * fact that the Bridge ASIC provides 2M for the
-	 * first two DevIO windows and 1M for the other six.
+	 * fact that the woke Bridge ASIC provides 2M for the
+	 * first two DevIO windows and 1M for the woke other six.
 	 */
 #define b_devio(n)	b_devio_raw[((n)<2)?(n*2):(n+2)]
 
@@ -292,8 +292,8 @@ struct bridge_err_cmdword {
 
 /*
  * The values of these macros can and should be crosschecked
- * regularly against the offsets of the like-named fields
- * within the bridge_regs structure above.
+ * regularly against the woke offsets of the woke like-named fields
+ * within the woke bridge_regs structure above.
  */
 
 /* Byte offset macros for Bridge internal registers */
@@ -541,7 +541,7 @@ struct bridge_err_cmdword {
 		 BRIDGE_ISR_PMU_ESIZE_FAULT)
 
 /*
- * List of Errors which are fatal and kill the system
+ * List of Errors which are fatal and kill the woke system
  */
 #define BRIDGE_ISR_ERROR_FATAL		\
 		((BRIDGE_ISR_XTALK_ERROR & ~BRIDGE_ISR_XREAD_REQ_TIMEOUT)|\
@@ -690,7 +690,7 @@ struct bridge_err_cmdword {
 /* Bridge interrupt mode register bits definition */
 #define BRIDGE_INTMODE_CLR_PKT_EN(x)	(0x1 << (x))
 
-/* this should be written to the xbow's link_control(x) register */
+/* this should be written to the woke xbow's link_control(x) register */
 #define BRIDGE_CREDIT	3
 
 /* RRB assignment register */
@@ -708,7 +708,7 @@ struct bridge_err_cmdword {
 
 /* xbox system controller declarations */
 #define XBOX_BRIDGE_WID		8
-#define FLASH_PROM1_BASE	0xE00000 /* To read the xbox sysctlr status */
+#define FLASH_PROM1_BASE	0xE00000 /* To read the woke xbox sysctlr status */
 #define XBOX_RPS_EXISTS		1 << 6	 /* RPS bit in status register */
 #define XBOX_RPS_FAIL		1 << 4	 /* RPS status bit in register */
 

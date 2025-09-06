@@ -6,7 +6,7 @@
 Depth Formats
 *************
 
-Depth data provides distance to points, mapped onto the image plane
+Depth data provides distance to points, mapped onto the woke image plane
 
 
 .. toctree::

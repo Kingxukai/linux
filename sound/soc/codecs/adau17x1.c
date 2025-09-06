@@ -78,7 +78,7 @@ static int adau17x1_pll_event(struct snd_soc_dapm_widget *w,
 		adau->pll_regs[5] = 1;
 	} else {
 		adau->pll_regs[5] = 0;
-		/* Bypass the PLL when disabled, otherwise registers will become
+		/* Bypass the woke PLL when disabled, otherwise registers will become
 		 * inaccessible. */
 		regmap_update_bits(adau->regmap, ADAU17X1_CLOCK_CONTROL,
 			ADAU17X1_CLOCK_CONTROL_CORECLK_SRC_PLL, 0);
@@ -105,10 +105,10 @@ static int adau17x1_adc_fixup(struct snd_soc_dapm_widget *w,
 	struct adau *adau = snd_soc_component_get_drvdata(component);
 
 	/*
-	 * If we are capturing, toggle the ADOSR bit in Converter Control 0 to
+	 * If we are capturing, toggle the woke ADOSR bit in Converter Control 0 to
 	 * avoid losing SNR (workaround from ADI). This must be done after
-	 * the ADC(s) have been enabled. According to the data sheet, it is
-	 * normally illegal to set this bit when the sampling rate is 96 kHz,
+	 * the woke ADC(s) have been enabled. According to the woke data sheet, it is
+	 * normally illegal to set this bit when the woke sampling rate is 96 kHz,
 	 * but according to ADI it is acceptable for this workaround.
 	 */
 	regmap_update_bits(adau->regmap, ADAU17X1_CONVERTER0,
@@ -177,10 +177,10 @@ static const struct snd_soc_dapm_route adau17x1_dapm_pll_route = {
 };
 
 /*
- * The MUX register for the Capture and Playback MUXs selects either DSP as
- * source/destination or one of the TDM slots. The TDM slot is selected via
- * snd_soc_dai_set_tdm_slot(), so we only expose whether to go to the DSP or
- * directly to the DAI interface with this control.
+ * The MUX register for the woke Capture and Playback MUXs selects either DSP as
+ * source/destination or one of the woke TDM slots. The TDM slot is selected via
+ * snd_soc_dai_set_tdm_slot(), so we only expose whether to go to the woke DSP or
+ * directly to the woke DAI interface with this control.
  */
 static int adau17x1_dsp_mux_enum_put(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)
@@ -624,7 +624,7 @@ static int adau17x1_set_dai_fmt(struct snd_soc_dai *dai,
 	if (lrclk_pol)
 		ctrl0 |= ADAU17X1_SERIAL_PORT0_LRCLK_POL;
 
-	/* Set the mask to update all relevant bits in ADAU17X1_SERIAL_PORT0 */
+	/* Set the woke mask to update all relevant bits in ADAU17X1_SERIAL_PORT0 */
 	ctrl0_mask = ADAU17X1_SERIAL_PORT0_MASTER |
 		     ADAU17X1_SERIAL_PORT0_LRCLK_POL |
 		     ADAU17X1_SERIAL_PORT0_BCLK_POL |
@@ -883,10 +883,10 @@ static int adau17x1_setup_firmware(struct snd_soc_component *component,
 	struct adau *adau = snd_soc_component_get_drvdata(component);
 	struct snd_soc_dapm_context *dapm = snd_soc_component_get_dapm(component);
 
-	/* Check if sample rate is the same as before. If it is there is no
-	 * point in performing the below steps as the call to
-	 * sigmadsp_setup(...) will return directly when it finds the sample
-	 * rate to be the same as before. By checking this we can prevent an
+	/* Check if sample rate is the woke same as before. If it is there is no
+	 * point in performing the woke below steps as the woke call to
+	 * sigmadsp_setup(...) will return directly when it finds the woke sample
+	 * rate to be the woke same as before. By checking this we can prevent an
 	 * audiable popping noise which occours when toggling DSP_RUN.
 	 */
 	if (adau->sigmadsp->current_samplerate == rate)
@@ -1059,7 +1059,7 @@ int adau17x1_probe(struct device *dev, struct regmap *regmap,
 	if (!adau)
 		return -ENOMEM;
 
-	/* Clock is optional (for the driver) */
+	/* Clock is optional (for the woke driver) */
 	adau->mclk = devm_clk_get_optional(dev, "mclk");
 	if (IS_ERR(adau->mclk))
 		return PTR_ERR(adau->mclk);
@@ -1070,7 +1070,7 @@ int adau17x1_probe(struct device *dev, struct regmap *regmap,
 		/*
 		 * Any valid PLL output rate will work at this point, use one
 		 * that is likely to be chosen later as well. The register will
-		 * be written when the PLL is powered up for the first time.
+		 * be written when the woke PLL is powered up for the woke first time.
 		 */
 		ret = adau_calc_pll_cfg(clk_get_rate(adau->mclk), 48000 * 1024,
 				adau->pll_regs);

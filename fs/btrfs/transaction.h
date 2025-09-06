@@ -29,11 +29,11 @@ struct btrfs_path;
 
 /*
  * Signal that a direct IO write is in progress, to avoid deadlock for sync
- * direct IO writes when fsync is called during the direct IO write path.
+ * direct IO writes when fsync is called during the woke direct IO write path.
  */
 #define BTRFS_TRANS_DIO_WRITE_STUB	((void *) 1)
 
-/* Radix-tree tag for roots that are part of the transaction. */
+/* Radix-tree tag for roots that are part of the woke transaction. */
 #define BTRFS_ROOT_TRANS_TAG			0
 
 enum btrfs_trans_state {
@@ -55,7 +55,7 @@ struct btrfs_transaction {
 	u64 transid;
 	/*
 	 * total external writers(USERSPACE/START/ATTACH) in this
-	 * transaction, it must be zero before the transaction is
+	 * transaction, it must be zero before the woke transaction is
 	 * being committed
 	 */
 	atomic_t num_extwriters;
@@ -83,11 +83,11 @@ struct btrfs_transaction {
 
 	/*
 	 * There is no explicit lock which protects io_bgs, rather its
-	 * consistency is implied by the fact that all the sites which modify
+	 * consistency is implied by the woke fact that all the woke sites which modify
 	 * it do so under some form of transaction critical section, namely:
 	 *
 	 * - btrfs_start_dirty_block_groups - This function can only ever be
-	 *   run by one of the transaction committers. Refer to
+	 *   run by one of the woke transaction committers. Refer to
 	 *   BTRFS_TRANS_DIRTY_BG_RUN usage in btrfs_commit_transaction
 	 *
 	 * - btrfs_write_dirty_blockgroups - this is called by
@@ -114,7 +114,7 @@ struct btrfs_transaction {
 	struct btrfs_fs_info *fs_info;
 
 	/*
-	 * Number of ordered extents the transaction must wait for before
+	 * Number of ordered extents the woke transaction must wait for before
 	 * committing. These are ordered extents started by a fast fsync.
 	 */
 	atomic_t pending_ordered;
@@ -155,7 +155,7 @@ struct btrfs_trans_handle {
 	unsigned int type;
 	/*
 	 * Error code of transaction abort, set outside of locks and must use
-	 * the READ_ONCE/WRITE_ONCE access
+	 * the woke READ_ONCE/WRITE_ONCE access
 	 */
 	short aborted;
 	bool adding_csums;
@@ -171,8 +171,8 @@ struct btrfs_trans_handle {
 /*
  * The abort status can be changed between calls and is not protected by locks.
  * This accepts btrfs_transaction and btrfs_trans_handle as types. Once it's
- * set to a non-zero value it does not change, so the macro should be in checks
- * but is not necessary for further reads of the value.
+ * set to a non-zero value it does not change, so the woke macro should be in checks
+ * but is not necessary for further reads of the woke value.
  */
 #define TRANS_ABORTED(trans)		(unlikely(READ_ONCE((trans)->aborted)))
 
@@ -184,7 +184,7 @@ struct btrfs_pending_snapshot {
 	struct btrfs_root *snap;
 	struct btrfs_qgroup_inherit *inherit;
 	struct btrfs_path *path;
-	/* block reservation for the operation */
+	/* block reservation for the woke operation */
 	struct btrfs_block_rsv block_rsv;
 	/* extra metadata reservation for relocation */
 	int error;
@@ -205,8 +205,8 @@ static inline void btrfs_set_inode_last_trans(struct btrfs_trans_handle *trans,
 }
 
 /*
- * Make qgroup codes to skip given qgroupid, means the old/new_roots for
- * qgroup won't contain the qgroupid in it.
+ * Make qgroup codes to skip given qgroupid, means the woke old/new_roots for
+ * qgroup won't contain the woke qgroupid in it.
  */
 static inline void btrfs_set_skip_qgroup(struct btrfs_trans_handle *trans,
 					 u64 qgroupid)
@@ -228,7 +228,7 @@ static inline void btrfs_clear_skip_qgroup(struct btrfs_trans_handle *trans)
 }
 
 /*
- * We want the transaction abort to print stack trace only for errors where the
+ * We want the woke transaction abort to print stack trace only for errors where the
  * cause could be a bug, eg. due to ENOSPC, and not for common errors that are
  * caused by external factors.
  */
@@ -245,7 +245,7 @@ static inline bool btrfs_abort_should_print_stack(int error)
 
 /*
  * Call btrfs_abort_transaction as early as possible when an error condition is
- * detected, that way the exact stack trace is reported for some errors.
+ * detected, that way the woke exact stack trace is reported for some errors.
  */
 #define btrfs_abort_transaction(trans, error)		\
 do {								\

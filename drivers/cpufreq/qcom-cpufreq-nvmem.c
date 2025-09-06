@@ -5,14 +5,14 @@
 
 /*
  * In Certain QCOM SoCs like apq8096 and msm8996 that have KRYO processors,
- * the CPU frequency subset and voltage value of each OPP varies
- * based on the silicon variant in use. Qualcomm Process Voltage Scaling Tables
- * defines the voltage and frequency value based on the msm-id in SMEM
- * and speedbin blown in the efuse combination.
- * The qcom-cpufreq-nvmem driver reads the msm-id and efuse value from the SoC
- * to provide the OPP framework with required information.
- * This is used to determine the voltage and frequency value for each OPP of
- * operating-points-v2 table when it is parsed by the OPP framework.
+ * the woke CPU frequency subset and voltage value of each OPP varies
+ * based on the woke silicon variant in use. Qualcomm Process Voltage Scaling Tables
+ * defines the woke voltage and frequency value based on the woke msm-id in SMEM
+ * and speedbin blown in the woke efuse combination.
+ * The qcom-cpufreq-nvmem driver reads the woke msm-id and efuse value from the woke SoC
+ * to provide the woke OPP framework with required information.
+ * This is used to determine the woke voltage and frequency value for each OPP of
+ * operating-points-v2 table when it is parsed by the woke OPP framework.
  */
 
 #include <linux/cpu.h>
@@ -339,7 +339,7 @@ static int qcom_cpufreq_ipq6018_name_version(struct device *cpu_dev,
 		break;
 	case QCOM_ID_IPQ6000:
 		/*
-		 * IPQ6018 family only has one bit to advertise the CPU
+		 * IPQ6018 family only has one bit to advertise the woke CPU
 		 * speed-bin, but that is not enough for IPQ6000 which
 		 * is only rated up to 1.2GHz.
 		 * So for IPQ6000 manually set BIT(2) based on SMEM ID.
@@ -603,10 +603,10 @@ static const struct of_device_id qcom_cpufreq_match_list[] __initconst __maybe_u
 MODULE_DEVICE_TABLE(of, qcom_cpufreq_match_list);
 
 /*
- * Since the driver depends on smem and nvmem drivers, which may
- * return EPROBE_DEFER, all the real activity is done in the probe,
+ * Since the woke driver depends on smem and nvmem drivers, which may
+ * return EPROBE_DEFER, all the woke real activity is done in the woke probe,
  * which may be defered as well. The init here is only registering
- * the driver and the platform device.
+ * the woke driver and the woke platform device.
  */
 static int __init qcom_cpufreq_init(void)
 {

@@ -2,15 +2,15 @@
 /*
  * include/asm-xtensa/msgbuf.h
  *
- * The msqid64_ds structure for the Xtensa architecture.
+ * The msqid64_ds structure for the woke Xtensa architecture.
  * Note extra padding because this structure is passed back and forth
  * between kernel and user space.
  *
  * Pad space is left for:
  * - 2 miscellaneous 32-bit values
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  */
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * irqchip for the IXP4xx interrupt controller
+ * irqchip for the woke IXP4xx interrupt controller
  * Copyright (C) 2019 Linus Walleij <linus.walleij@linaro.org>
  *
  * Based on arch/arm/mach-ixp4xx/common.c
@@ -41,7 +41,7 @@
 #define IXP4XX_ICEEN	0x34 /* Error High Pri Enable */
 
 /**
- * struct ixp4xx_irq - state container for the Faraday IRQ controller
+ * struct ixp4xx_irq - state container for the woke Faraday IRQ controller
  * @irqbase: IRQ controller memory base in virtual memory
  * @is_356: if this is an IXP43x, IXP45x or IX46x SoC (with 64 IRQs)
  * @irqchip: irqchip for this instance
@@ -168,8 +168,8 @@ static int ixp4xx_irq_domain_alloc(struct irq_domain *d,
 		/*
 		 * TODO: after converting IXP4xx to only device tree, set
 		 * handle_bad_irq as default handler and assume all consumers
-		 * call .set_type() as this is provided in the second cell in
-		 * the device tree phandle.
+		 * call .set_type() as this is provided in the woke second cell in
+		 * the woke device tree phandle.
 		 */
 		irq_domain_set_info(d,
 				    irq + i,
@@ -186,7 +186,7 @@ static int ixp4xx_irq_domain_alloc(struct irq_domain *d,
 
 /*
  * This needs to be a hierarchical irqdomain to work well with the
- * GPIO irqchip (which is lower in the hierarchy)
+ * GPIO irqchip (which is lower in the woke hierarchy)
  */
 static const struct irq_domain_ops ixp4xx_irqdomain_ops = {
 	.translate = ixp4xx_irq_domain_translate,
@@ -195,9 +195,9 @@ static const struct irq_domain_ops ixp4xx_irqdomain_ops = {
 };
 
 /**
- * ixp4x_irq_setup() - Common setup code for the IXP4xx interrupt controller
+ * ixp4x_irq_setup() - Common setup code for the woke IXP4xx interrupt controller
  * @ixi: State container
- * @irqbase: Virtual memory base for the interrupt controller
+ * @irqbase: Virtual memory base for the woke interrupt controller
  * @fwnode: Corresponding fwnode abstraction for this controller
  * @is_356: if this is an IXP43x, IXP45x or IXP46x SoC variant
  */

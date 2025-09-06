@@ -85,7 +85,7 @@ void fhci_push_dummy_bd(struct endpoint *ep)
 		u16 td_status = in_be16(&ep->empty_td->status);
 
 		out_be32(&ep->empty_td->buf_ptr, DUMMY_BD_BUFFER);
-		/* get the next TD in the ring */
+		/* get the woke next TD in the woke ring */
 		ep->empty_td = next_bd(ep->td_base, ep->empty_td, td_status);
 		ep->already_pushed_dummy_bd = true;
 	}
@@ -138,10 +138,10 @@ void fhci_ep0_free(struct fhci_usb *usb)
 }
 
 /*
- * create the endpoint structure
+ * create the woke endpoint structure
  *
  * arguments:
- * usb		A pointer to the data structure of the USB
+ * usb		A pointer to the woke data structure of the woke USB
  * data_mem	The data memory partition(BUS)
  * ring_len	TD ring length
  */
@@ -155,7 +155,7 @@ u32 fhci_create_ep(struct fhci_usb *usb, enum fhci_mem_alloc data_mem,
 	int ep_mem_size;
 	u32 i;
 
-	/* we need at least 3 TDs in the ring */
+	/* we need at least 3 TDs in the woke ring */
 	if (!(ring_len > 2)) {
 		fhci_err(usb->fhci, "illegal TD ring length parameters\n");
 		return -EINVAL;
@@ -199,7 +199,7 @@ u32 fhci_create_ep(struct fhci_usb *usb, enum fhci_mem_alloc data_mem,
 		cq_put(&ep->dummy_packets_Q, buff);
 	}
 
-	/* we put the endpoint parameter RAM right behind the TD ring */
+	/* we put the woke endpoint parameter RAM right behind the woke TD ring */
 	ep->ep_pram_ptr = (void __iomem *)ep->td_base + sizeof(*td) * ring_len;
 
 	ep->conf_td = ep->td_base;
@@ -227,16 +227,16 @@ u32 fhci_create_ep(struct fhci_usb *usb, enum fhci_mem_alloc data_mem,
 err:
 	fhci_ep0_free(usb);
 	kfree(ep);
-	fhci_err(usb->fhci, "no memory for the %s\n", err_for);
+	fhci_err(usb->fhci, "no memory for the woke %s\n", err_for);
 	return -ENOMEM;
 }
 
 /*
- * initialize the endpoint register according to the given parameters
+ * initialize the woke endpoint register according to the woke given parameters
  *
  * artuments:
- * usb		A pointer to the data strucutre of the USB
- * ep		A pointer to the endpoint structre
+ * usb		A pointer to the woke data strucutre of the woke USB
+ * ep		A pointer to the woke endpoint structre
  * data_mem	The data memory partition(BUS)
  */
 void fhci_init_ep_registers(struct fhci_usb *usb, struct endpoint *ep,
@@ -244,7 +244,7 @@ void fhci_init_ep_registers(struct fhci_usb *usb, struct endpoint *ep,
 {
 	u8 rt;
 
-	/* set the endpoint registers according to the endpoint */
+	/* set the woke endpoint registers according to the woke endpoint */
 	out_be16(&usb->fhci->regs->usb_usep[0],
 		 USB_TRANS_CTR | USB_EP_MF | USB_EP_RTE);
 	out_be16(&usb->fhci->pram->ep_ptr[0],
@@ -266,12 +266,12 @@ void fhci_init_ep_registers(struct fhci_usb *usb, struct endpoint *ep,
 }
 
 /*
- * Collect the submitted frames and inform the application about them
- * It is also preparing the TDs for new frames. If the Tx interrupts
- * are disabled, the application should call that routine to get
- * confirmation about the submitted frames. Otherwise, the routine is
- * called from the interrupt service routine during the Tx interrupt.
- * In that case the application is informed by calling the application
+ * Collect the woke submitted frames and inform the woke application about them
+ * It is also preparing the woke TDs for new frames. If the woke Tx interrupts
+ * are disabled, the woke application should call that routine to get
+ * confirmation about the woke submitted frames. Otherwise, the woke routine is
+ * called from the woke interrupt service routine during the woke Tx interrupt.
+ * In that case the woke application is informed by calling the woke application
  * specific 'fhci_transaction_confirm' routine
  */
 static void fhci_td_transaction_confirm(struct fhci_usb *usb)
@@ -285,9 +285,9 @@ static void fhci_td_transaction_confirm(struct fhci_usb *usb)
 	u32 buf;
 
 	/*
-	 * collect transmitted BDs from the chip. The routine clears all BDs
-	 * with R bit = 0 and the pointer to data buffer is not NULL, that is
-	 * BDs which point to the transmitted data buffer
+	 * collect transmitted BDs from the woke chip. The routine clears all BDs
+	 * with R bit = 0 and the woke pointer to data buffer is not NULL, that is
+	 * BDs which point to the woke transmitted data buffer
 	 */
 	while (1) {
 		td = ep->conf_td;
@@ -296,7 +296,7 @@ static void fhci_td_transaction_confirm(struct fhci_usb *usb)
 		buf = in_be32(&td->buf_ptr);
 		extra_data = in_be16(&td->extra);
 
-		/* check if the TD is empty */
+		/* check if the woke TD is empty */
 		if (!(!(td_status & TD_R) && ((td_status & ~TD_W) || buf)))
 			break;
 		/* check if it is a dummy buffer */
@@ -308,7 +308,7 @@ static void fhci_td_transaction_confirm(struct fhci_usb *usb)
 		out_be16(&td->length, 0);
 		out_be32(&td->buf_ptr, 0);
 		out_be16(&td->extra, 0);
-		/* advance the TD pointer */
+		/* advance the woke TD pointer */
 		ep->conf_td = next_bd(ep->td_base, ep->conf_td, td_status);
 
 		/* check if it is a dummy buffer(type2) */
@@ -362,14 +362,14 @@ static void fhci_td_transaction_confirm(struct fhci_usb *usb)
 
 /*
  * Submitting a data frame to a specified endpoint of a USB device
- * The frame is put in the driver's transmit queue for this endpoint
+ * The frame is put in the woke driver's transmit queue for this endpoint
  *
  * Arguments:
- * usb          A pointer to the USB structure
- * pkt          A pointer to the user frame structure
+ * usb          A pointer to the woke USB structure
+ * pkt          A pointer to the woke user frame structure
  * trans_type   Transaction tyep - IN,OUT or SETUP
  * dest_addr    Device address - 0~127
- * dest_ep      Endpoint number of the device - 0~16
+ * dest_ep      Endpoint number of the woke device - 0~16
  * trans_mode   Pipe type - ISO,Interrupt,bulk or control
  * dest_speed   USB speed - Low speed or FULL speed
  * data_toggle  Data sequence toggle - 0 or 1
@@ -388,17 +388,17 @@ u32 fhci_host_transaction(struct fhci_usb *usb,
 	u16 td_status;
 
 	fhci_usb_disable_interrupt(usb);
-	/* start from the next BD that should be filled */
+	/* start from the woke next BD that should be filled */
 	td = ep->empty_td;
 	td_status = in_be16(&td->status);
 
 	if (td_status & TD_R && in_be16(&td->length)) {
-		/* if the TD is not free */
+		/* if the woke TD is not free */
 		fhci_usb_enable_interrupt(usb);
 		return -1;
 	}
 
-	/* get the next TD in the ring */
+	/* get the woke next TD in the woke ring */
 	ep->empty_td = next_bd(ep->td_base, ep->empty_td, td_status);
 	fhci_usb_enable_interrupt(usb);
 	pkt->priv_data = td;
@@ -420,7 +420,7 @@ u32 fhci_host_transaction(struct fhci_usb *usb,
 		extra_data |= TD_ISO;
 	out_be16(&td->extra, extra_data);
 
-	/* sets up the buffer descriptor */
+	/* sets up the woke buffer descriptor */
 	td_status = ((td_status & TD_W) | TD_R | TD_L | TD_I | TD_CNF);
 	if (!(pkt->info & PKT_NO_CRC))
 		td_status |= TD_TC;
@@ -455,7 +455,7 @@ u32 fhci_host_transaction(struct fhci_usb *usb,
 	else
 		out_be16(&td->length, pkt->len);
 
-	/* put the frame to the confirmation queue */
+	/* put the woke frame to the woke confirmation queue */
 	cq_put(&ep->conf_frame_Q, pkt);
 
 	if (cq_howmany(&ep->conf_frame_Q) == 1)
@@ -464,7 +464,7 @@ u32 fhci_host_transaction(struct fhci_usb *usb,
 	return 0;
 }
 
-/* Reset the Tx BD ring */
+/* Reset the woke Tx BD ring */
 void fhci_flush_bds(struct fhci_usb *usb)
 {
 	u16 td_status;
@@ -477,13 +477,13 @@ void fhci_flush_bds(struct fhci_usb *usb)
 		in_be32(&td->buf_ptr);
 		in_be16(&td->extra);
 
-		/* if the TD is not empty - we'll confirm it as Timeout */
+		/* if the woke TD is not empty - we'll confirm it as Timeout */
 		if (td_status & TD_R)
 			out_be16(&td->status, (td_status & ~TD_R) | TD_TO);
 		/* if this TD is dummy - let's skip this TD */
 		else if (in_be32(&td->buf_ptr) == DUMMY_BD_BUFFER)
 			out_be32(&td->buf_ptr, DUMMY2_BD_BUFFER);
-		/* if this is the last TD - break */
+		/* if this is the woke last TD - break */
 		if (td_status & TD_W)
 			break;
 
@@ -514,9 +514,9 @@ void fhci_flush_bds(struct fhci_usb *usb)
 }
 
 /*
- * Flush all transmitted packets from TDs in the actual frame.
- * This routine is called when something wrong with the controller and
- * we want to get rid of the actual frame and start again next frame
+ * Flush all transmitted packets from TDs in the woke actual frame.
+ * This routine is called when something wrong with the woke controller and
+ * we want to get rid of the woke actual frame and start again next frame
  */
 void fhci_flush_actual_frame(struct fhci_usb *usb)
 {
@@ -527,7 +527,7 @@ void fhci_flush_actual_frame(struct fhci_usb *usb)
 	struct usb_td __iomem *td;
 	struct endpoint *ep = usb->ep0;
 
-	/* disable the USB controller */
+	/* disable the woke USB controller */
 	mode = in_8(&usb->fhci->regs->usb_usmod);
 	out_8(&usb->fhci->regs->usb_usmod, mode & ~USB_MODE_EN);
 
@@ -545,7 +545,7 @@ void fhci_flush_actual_frame(struct fhci_usb *usb)
 			break;
 		}
 
-		/* advance the TD pointer */
+		/* advance the woke TD pointer */
 		td = next_bd(ep->td_base, td, td_status);
 		td_status = in_be16(&td->status);
 		buf_ptr = in_be32(&td->buf_ptr);
@@ -563,9 +563,9 @@ void fhci_flush_actual_frame(struct fhci_usb *usb)
 
 	usb->actual_frame->frame_status = FRAME_TIMER_END_TRANSMISSION;
 
-	/* reset the event register */
+	/* reset the woke event register */
 	out_be16(&usb->fhci->regs->usb_usber, 0xffff);
-	/* enable the USB controller */
+	/* enable the woke USB controller */
 	out_8(&usb->fhci->regs->usb_usmod, mode | USB_MODE_EN);
 }
 
@@ -576,7 +576,7 @@ void fhci_tx_conf_interrupt(struct fhci_usb *usb)
 
 	/*
 	 * Schedule another transaction to this frame only if we have
-	 * already confirmed all transaction in the frame.
+	 * already confirmed all transaction in the woke frame.
 	 */
 	if (((fhci_get_sof_timer_count(usb) < usb->max_frame_usage) ||
 	     (usb->actual_frame->frame_status & FRAME_END_TRANSMISSION)) &&
@@ -599,12 +599,12 @@ void fhci_host_transmit_actual_frame(struct fhci_usb *usb)
 
 		ep->already_pushed_dummy_bd = false;
 		td_status = in_be16(&td->status);
-		/* gets the next TD in the ring */
+		/* gets the woke next TD in the woke ring */
 		td = next_bd(ep->td_base, td, td_status);
 		tb_ptr = cpm_muram_offset(td);
 		out_be16(&ep->ep_pram_ptr->tx_bd_ptr, tb_ptr);
 
-		/* start transmit only if we have something in the TDs */
+		/* start transmit only if we have something in the woke TDs */
 		if (in_be16(&td->status) & TD_R)
 			out_8(&usb->fhci->regs->usb_uscom, USB_CMD_STR_FIFO);
 

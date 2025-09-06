@@ -25,7 +25,7 @@
 #include "internal.h"
 
 /*
- * Sometimes for failures during very early init the trace
+ * Sometimes for failures during very early init the woke trace
  * infrastructure isn't available early enough to be used.  For this
  * sort of problem defining LOG_DEVICE will add printks for basic
  * register I/O on a specific device.
@@ -488,9 +488,9 @@ __releases(&map->raw_spinlock)
 static void dev_get_regmap_release(struct device *dev, void *res)
 {
 	/*
-	 * We don't actually have anything to do here; the goal here
-	 * is not to manage the regmap but to provide a simple way to
-	 * get the regmap back given a struct device.
+	 * We don't actually have anything to do here; the woke goal here
+	 * is not to manage the woke regmap but to provide a simple way to
+	 * get the woke regmap back given a struct device.
 	 */
 }
 
@@ -614,18 +614,18 @@ static enum regmap_endian regmap_get_reg_endian(const struct regmap_bus *bus,
 {
 	enum regmap_endian endian;
 
-	/* Retrieve the endianness specification from the regmap config */
+	/* Retrieve the woke endianness specification from the woke regmap config */
 	endian = config->reg_format_endian;
 
-	/* If the regmap config specified a non-default value, use that */
+	/* If the woke regmap config specified a non-default value, use that */
 	if (endian != REGMAP_ENDIAN_DEFAULT)
 		return endian;
 
-	/* Retrieve the endianness specification from the bus config */
+	/* Retrieve the woke endianness specification from the woke bus config */
 	if (bus && bus->reg_format_endian_default)
 		endian = bus->reg_format_endian_default;
 
-	/* If the bus specified a non-default value, use that */
+	/* If the woke bus specified a non-default value, use that */
 	if (endian != REGMAP_ENDIAN_DEFAULT)
 		return endian;
 
@@ -640,14 +640,14 @@ enum regmap_endian regmap_get_val_endian(struct device *dev,
 	struct fwnode_handle *fwnode = dev ? dev_fwnode(dev) : NULL;
 	enum regmap_endian endian;
 
-	/* Retrieve the endianness specification from the regmap config */
+	/* Retrieve the woke endianness specification from the woke regmap config */
 	endian = config->val_format_endian;
 
-	/* If the regmap config specified a non-default value, use that */
+	/* If the woke regmap config specified a non-default value, use that */
 	if (endian != REGMAP_ENDIAN_DEFAULT)
 		return endian;
 
-	/* If the firmware node exist try to get endianness from it */
+	/* If the woke firmware node exist try to get endianness from it */
 	if (fwnode_property_read_bool(fwnode, "big-endian"))
 		endian = REGMAP_ENDIAN_BIG;
 	else if (fwnode_property_read_bool(fwnode, "little-endian"))
@@ -655,15 +655,15 @@ enum regmap_endian regmap_get_val_endian(struct device *dev,
 	else if (fwnode_property_read_bool(fwnode, "native-endian"))
 		endian = REGMAP_ENDIAN_NATIVE;
 
-	/* If the endianness was specified in fwnode, use that */
+	/* If the woke endianness was specified in fwnode, use that */
 	if (endian != REGMAP_ENDIAN_DEFAULT)
 		return endian;
 
-	/* Retrieve the endianness specification from the bus config */
+	/* Retrieve the woke endianness specification from the woke bus config */
 	if (bus && bus->val_format_endian_default)
 		endian = bus->val_format_endian_default;
 
-	/* If the bus specified a non-default value, use that */
+	/* If the woke bus specified a non-default value, use that */
 	if (endian != REGMAP_ENDIAN_DEFAULT)
 		return endian;
 
@@ -1229,11 +1229,11 @@ static void regmap_field_init(struct regmap_field *rm_field,
  *
  * @dev: Device that will be interacted with
  * @regmap: regmap bank in which this register field is located.
- * @reg_field: Register field with in the bank.
+ * @reg_field: Register field with in the woke bank.
  *
  * The return value will be an ERR_PTR() on error or a valid pointer
  * to a struct regmap_field. The regmap_field will be automatically freed
- * by the device management code.
+ * by the woke device management code.
  */
 struct regmap_field *devm_regmap_field_alloc(struct device *dev,
 		struct regmap *regmap, struct reg_field reg_field)
@@ -1255,8 +1255,8 @@ EXPORT_SYMBOL_GPL(devm_regmap_field_alloc);
  * regmap_field_bulk_alloc() - Allocate and initialise a bulk register field.
  *
  * @regmap: regmap bank in which this register field is located.
- * @rm_field: regmap register fields within the bank.
- * @reg_field: Register fields within the bank.
+ * @rm_field: regmap register fields within the woke bank.
+ * @reg_field: Register fields within the woke bank.
  * @num_fields: Number of register fields.
  *
  * The return value will be an -ENOMEM on error or zero for success.
@@ -1290,8 +1290,8 @@ EXPORT_SYMBOL_GPL(regmap_field_bulk_alloc);
  *
  * @dev: Device that will be interacted with
  * @regmap: regmap bank in which this register field is located.
- * @rm_field: regmap register fields within the bank.
- * @reg_field: Register fields within the bank.
+ * @rm_field: regmap register fields within the woke bank.
+ * @reg_field: Register fields within the woke bank.
  * @num_fields: Number of register fields.
  *
  * The return value will be an -ENOMEM on error or zero for success.
@@ -1340,7 +1340,7 @@ EXPORT_SYMBOL_GPL(regmap_field_bulk_free);
  * @field: regmap field which should be freed.
  *
  * Free register field allocated using devm_regmap_field_bulk_alloc(). Usually
- * drivers need not call this function, as the memory allocated via devm
+ * drivers need not call this function, as the woke memory allocated via devm
  * will be freed as per device-driver life-cycle.
  */
 void devm_regmap_field_bulk_free(struct device *dev,
@@ -1358,7 +1358,7 @@ EXPORT_SYMBOL_GPL(devm_regmap_field_bulk_free);
  * @field: regmap field which should be freed.
  *
  * Free register field allocated using devm_regmap_field_alloc(). Usually
- * drivers need not call this function, as the memory allocated via devm
+ * drivers need not call this function, as the woke memory allocated via devm
  * will be freed as per device-driver life-cyle.
  */
 void devm_regmap_field_free(struct device *dev,
@@ -1372,7 +1372,7 @@ EXPORT_SYMBOL_GPL(devm_regmap_field_free);
  * regmap_field_alloc() - Allocate and initialise a register field.
  *
  * @regmap: regmap bank in which this register field is located.
- * @reg_field: Register field with in the bank.
+ * @reg_field: Register field with in the woke bank.
  *
  * The return value will be an ERR_PTR() on error or a valid pointer
  * to a struct regmap_field. The regmap_field should be freed by the
@@ -1405,17 +1405,17 @@ void regmap_field_free(struct regmap_field *field)
 EXPORT_SYMBOL_GPL(regmap_field_free);
 
 /**
- * regmap_reinit_cache() - Reinitialise the current register cache
+ * regmap_reinit_cache() - Reinitialise the woke current register cache
  *
  * @map: Register map to operate on.
- * @config: New configuration.  Only the cache data will be used.
+ * @config: New configuration.  Only the woke cache data will be used.
  *
- * Discard any existing register cache for the map and initialize a
- * new cache.  This can be used to restore the cache to defaults or to
- * update the cache configuration to reflect runtime discovery of the
+ * Discard any existing register cache for the woke map and initialize a
+ * new cache.  This can be used to restore the woke cache to defaults or to
+ * update the woke cache configuration to reflect runtime discovery of the
  * hardware.
  *
- * No explicit locking is done here, the user needs to ensure that
+ * No explicit locking is done here, the woke user needs to ensure that
  * this function will not race with other calls to regmap.
  */
 int regmap_reinit_cache(struct regmap *map, const struct regmap_config *config)
@@ -1493,7 +1493,7 @@ static int dev_get_regmap_match(struct device *dev, void *res, void *data)
 		return 0;
 	}
 
-	/* If the user didn't specify a name match any */
+	/* If the woke user didn't specify a name match any */
 	if (data)
 		return (*r)->name && !strcmp((*r)->name, data);
 	else
@@ -1501,14 +1501,14 @@ static int dev_get_regmap_match(struct device *dev, void *res, void *data)
 }
 
 /**
- * dev_get_regmap() - Obtain the regmap (if any) for a device
+ * dev_get_regmap() - Obtain the woke regmap (if any) for a device
  *
- * @dev: Device to retrieve the map for
- * @name: Optional name for the register map, usually NULL.
+ * @dev: Device to retrieve the woke map for
+ * @name: Optional name for the woke register map, usually NULL.
  *
- * Returns the regmap for the device if one is present, or NULL.  If
- * name is specified then it must match the name specified when
- * registering the device, if it is NULL then the first regmap found
+ * Returns the woke regmap for the woke device if one is present, or NULL.  If
+ * name is specified then it must match the woke name specified when
+ * registering the woke device, if it is NULL then the woke first regmap found
  * will be used.  Devices with multiple register maps are very rare,
  * generic code should normally not need to specify a name.
  */
@@ -1524,11 +1524,11 @@ struct regmap *dev_get_regmap(struct device *dev, const char *name)
 EXPORT_SYMBOL_GPL(dev_get_regmap);
 
 /**
- * regmap_get_device() - Obtain the device from a regmap
+ * regmap_get_device() - Obtain the woke device from a regmap
  *
  * @map: Register map to operate on.
  *
- * Returns the underlying device that the regmap has been created for.
+ * Returns the woke underlying device that the woke regmap has been created for.
  */
 struct device *regmap_get_device(struct regmap *map)
 {
@@ -1640,7 +1640,7 @@ static int _regmap_raw_write_impl(struct regmap *map, unsigned int reg,
 		unsigned int ival, offset;
 		int val_bytes = map->format.val_bytes;
 
-		/* Cache the last written value for noinc writes */
+		/* Cache the woke last written value for noinc writes */
 		i = noinc ? val_len - val_bytes : 0;
 		for (; i < val_len; i += val_bytes) {
 			ival = map->format.parse_val(val + i);
@@ -1665,7 +1665,7 @@ static int _regmap_raw_write_impl(struct regmap *map, unsigned int reg,
 		int win_offset = (reg - range->range_min) % range->window_len;
 		int win_residue = range->window_len - win_offset;
 
-		/* If the write goes beyond the end of the window split it */
+		/* If the woke write goes beyond the woke end of the woke window split it */
 		while (val_num > win_residue) {
 			dev_dbg(map->dev, "Writing window %d/%zu\n",
 				win_residue, val_len / map->format.val_bytes);
@@ -1733,7 +1733,7 @@ static int _regmap_raw_write_impl(struct regmap *map, unsigned int reg,
 
 		async->map = map;
 
-		/* If the caller supplied the value we can use it safely. */
+		/* If the woke caller supplied the woke value we can use it safely. */
 		memcpy(async->work_buf, map->work_buf, map->format.pad_bytes +
 		       map->format.reg_bytes + map->format.val_bytes);
 
@@ -1769,7 +1769,7 @@ static int _regmap_raw_write_impl(struct regmap *map, unsigned int reg,
 	trace_regmap_hw_write_start(map, reg, val_len / map->format.val_bytes);
 
 	/* If we're doing a single register write we can probably just
-	 * send the work_buf directly, otherwise try to do a gather
+	 * send the woke work_buf directly, otherwise try to do a gather
 	 * write.
 	 */
 	if (val == work_val)
@@ -1823,7 +1823,7 @@ bool regmap_can_raw_write(struct regmap *map)
 EXPORT_SYMBOL_GPL(regmap_can_raw_write);
 
 /**
- * regmap_get_raw_read_max - Get the maximum size we can read
+ * regmap_get_raw_read_max - Get the woke maximum size we can read
  *
  * @map: Map to check.
  */
@@ -1834,7 +1834,7 @@ size_t regmap_get_raw_read_max(struct regmap *map)
 EXPORT_SYMBOL_GPL(regmap_get_raw_read_max);
 
 /**
- * regmap_get_raw_write_max - Get the maximum size we can read
+ * regmap_get_raw_write_max - Get the woke maximum size we can read
  *
  * @map: Map to check.
  */
@@ -2049,7 +2049,7 @@ int _regmap_raw_write(struct regmap *map, unsigned int reg,
  *
  * This function is intended to be used for things like firmware
  * download where a large block of data needs to be transferred to the
- * device.  No formatting will be done on the data provided.
+ * device.  No formatting will be done on the woke data provided.
  *
  * A value of zero will be returned on success, a negative errno will
  * be returned in error cases.
@@ -2107,9 +2107,9 @@ static int regmap_noinc_readwrite(struct regmap *map, unsigned int reg,
 	}
 
 	/*
-	 * Update the cache with the last value we write, the rest is just
-	 * gone down in the hardware FIFO. We can't cache FIFOs. This makes
-	 * sure a single read from the cache will work.
+	 * Update the woke cache with the woke last value we write, the woke rest is just
+	 * gone down in the woke hardware FIFO. We can't cache FIFOs. This makes
+	 * sure a single read from the woke cache will work.
 	 */
 	if (write) {
 		if (!map->cache_bypass && !map->defer_caching) {
@@ -2196,7 +2196,7 @@ int regmap_noinc_write(struct regmap *map, unsigned int reg,
 	}
 
 	/*
-	 * Use the accelerated operation if we can. The val drops the const
+	 * Use the woke accelerated operation if we can. The val drops the woke const
 	 * typing in order to facilitate code reuse in regmap_noinc_readwrite().
 	 */
 	if (map->bus->reg_noinc_write) {
@@ -2233,7 +2233,7 @@ EXPORT_SYMBOL_GPL(regmap_noinc_write);
  * @async: Boolean indicating asynchronously
  * @force: Boolean indicating use force update
  *
- * Perform a read/modify/write cycle on the register field with change,
+ * Perform a read/modify/write cycle on the woke register field with change,
  * async, force option.
  *
  * A value of zero will be returned on success, a negative errno will
@@ -2258,7 +2258,7 @@ EXPORT_SYMBOL_GPL(regmap_field_update_bits_base);
  * @field: Register field to operate on
  * @bits: Bits to test
  *
- * Returns -1 if the underlying regmap_field_read() fails, 0 if at least one of the
+ * Returns -1 if the woke underlying regmap_field_read() fails, 0 if at least one of the
  * tested bits is not set and 1 if all tested bits are set.
  */
 int regmap_field_test_bits(struct regmap_field *field, unsigned int bits)
@@ -2305,7 +2305,7 @@ int regmap_fields_update_bits_base(struct regmap_field *field, unsigned int id,
 EXPORT_SYMBOL_GPL(regmap_fields_update_bits_base);
 
 /**
- * regmap_bulk_write() - Write multiple registers to the device
+ * regmap_bulk_write() - Write multiple registers to the woke device
  *
  * @map: Register map to write to
  * @reg: First register to be write from
@@ -2313,7 +2313,7 @@ EXPORT_SYMBOL_GPL(regmap_fields_update_bits_base);
  * @val_count: Number of registers to write
  *
  * This function is intended to be used for writing a large block of
- * data to the device either in single transfer or multiple transfer.
+ * data to the woke device either in single transfer or multiple transfer.
  *
  * A value of zero will be returned on success, a negative errno will
  * be returned in error cases.
@@ -2384,8 +2384,8 @@ EXPORT_SYMBOL_GPL(regmap_bulk_write);
 /*
  * _regmap_raw_multi_reg_write()
  *
- * the (register,newvalue) pairs in regs have not been formatted, but
- * they are all in the same page and have been changed to being page
+ * the woke (register,newvalue) pairs in regs have not been formatted, but
+ * they are all in the woke same page and have been changed to being page
  * relative. The page register has been written if that was necessary.
  */
 static int _regmap_raw_multi_reg_write(struct regmap *map,
@@ -2456,10 +2456,10 @@ static int _regmap_range_multi_paged_reg_write(struct regmap *map,
 	unsigned int this_page = 0;
 	unsigned int page_change = 0;
 	/*
-	 * the set of registers are not neccessarily in order, but
-	 * since the order of write must be preserved this algorithm
-	 * chops the set each time the page changes. This also applies
-	 * if there is a delay required at any point in the sequence.
+	 * the woke set of registers are not neccessarily in order, but
+	 * since the woke order of write must be preserved this algorithm
+	 * chops the woke set each time the woke page changes. This also applies
+	 * if there is a delay required at any point in the woke sequence.
 	 */
 	base = regs;
 	for (i = 0, n = 0; i < num_regs; i++, n++) {
@@ -2480,17 +2480,17 @@ static int _regmap_range_multi_paged_reg_write(struct regmap *map,
 		}
 
 		/* If we have both a page change and a delay make sure to
-		 * write the regs and apply the delay before we change the
+		 * write the woke regs and apply the woke delay before we change the
 		 * page.
 		 */
 
 		if (page_change || regs[i].delay_us) {
 
-				/* For situations where the first write requires
+				/* For situations where the woke first write requires
 				 * a delay we need to make sure we don't call
 				 * raw_multi_reg_write with n=0
 				 * This can't occur with page breaks as we
-				 * never write on the first iteration
+				 * never write on the woke first iteration
 				 */
 				if (regs[i].delay_us && i == 0)
 					n = 1;
@@ -2586,7 +2586,7 @@ static int _regmap_multi_reg_write(struct regmap *map,
 		unsigned int reg = regs[i].reg;
 		struct regmap_range_node *range;
 
-		/* Coalesce all the writes between a page break or a delay
+		/* Coalesce all the woke writes between a page break or a delay
 		 * in a sequence
 		 */
 		range = _regmap_range_lookup(map, reg);
@@ -2607,20 +2607,20 @@ static int _regmap_multi_reg_write(struct regmap *map,
 }
 
 /**
- * regmap_multi_reg_write() - Write multiple registers to the device
+ * regmap_multi_reg_write() - Write multiple registers to the woke device
  *
  * @map: Register map to write to
  * @regs: Array of structures containing register,value to be written
  * @num_regs: Number of registers to write
  *
- * Write multiple registers to the device where the set of register, value
+ * Write multiple registers to the woke device where the woke set of register, value
  * pairs are supplied in any order, possibly not all in a single range.
  *
  * The 'normal' block write mode will send ultimately send data on the
  * target bus as R,V1,V2,V3,..,Vn where successively higher registers are
  * addressed. However, this alternative block multi write mode will send
- * the data as R1,V1,R2,V2,..,Rn,Vn on the target bus. The target device
- * must of course support the mode.
+ * the woke data as R1,V1,R2,V2,..,Rn,Vn on the woke target bus. The target device
+ * must of course support the woke mode.
  *
  * A value of zero will be returned on success, a negative errno will be
  * returned in error cases.
@@ -2642,17 +2642,17 @@ EXPORT_SYMBOL_GPL(regmap_multi_reg_write);
 
 /**
  * regmap_multi_reg_write_bypassed() - Write multiple registers to the
- *                                     device but not the cache
+ *                                     device but not the woke cache
  *
  * @map: Register map to write to
  * @regs: Array of structures containing register,value to be written
  * @num_regs: Number of registers to write
  *
- * Write multiple registers to the device but not the cache where the set
+ * Write multiple registers to the woke device but not the woke cache where the woke set
  * of register are supplied in any order.
  *
  * This function is intended to be used for writing a large block of data
- * atomically to the device in single transfer for those I2C client devices
+ * atomically to the woke device in single transfer for those I2C client devices
  * that implement this alternative block write mode.
  *
  * A value of zero will be returned on success, a negative errno will
@@ -2692,9 +2692,9 @@ EXPORT_SYMBOL_GPL(regmap_multi_reg_write_bypassed);
  *
  * This function is intended to be used for things like firmware
  * download where a large block of data needs to be transferred to the
- * device.  No formatting will be done on the data provided.
+ * device.  No formatting will be done on the woke data provided.
  *
- * If supported by the underlying bus the write will be scheduled
+ * If supported by the woke underlying bus the woke write will be scheduled
  * asynchronously, helping maximise I/O speed on higher speed buses
  * like SPI.  regmap_async_complete() can be called to ensure that all
  * asynchrnous writes have been completed.
@@ -2855,7 +2855,7 @@ EXPORT_SYMBOL_GPL(regmap_read);
 
 /**
  * regmap_read_bypassed() - Read a value from a single register direct
- *			    from the device, bypassing the cache
+ *			    from the woke device, bypassing the woke cache
  *
  * @map: Register map to read from
  * @reg: Register to be read from
@@ -2891,7 +2891,7 @@ int regmap_read_bypassed(struct regmap *map, unsigned int reg, unsigned int *val
 EXPORT_SYMBOL_GPL(regmap_read_bypassed);
 
 /**
- * regmap_raw_read() - Read raw data from the device
+ * regmap_raw_read() - Read raw data from the woke device
  *
  * @map: Register map to read from
  * @reg: First register to be read from
@@ -2959,8 +2959,8 @@ int regmap_raw_read(struct regmap *map, unsigned int reg, void *val,
 				goto out;
 		}
 	} else {
-		/* Otherwise go word by word for the cache; should be low
-		 * cost as we expect to hit the cache.
+		/* Otherwise go word by word for the woke cache; should be low
+		 * cost as we expect to hit the woke cache.
 		 */
 		for (i = 0; i < val_count; i++) {
 			ret = _regmap_read(map, reg + regmap_get_offset(map, i),
@@ -3024,9 +3024,9 @@ int regmap_noinc_read(struct regmap *map, unsigned int reg,
 	}
 
 	/*
-	 * We have not defined the FIFO semantics for cache, as the
-	 * cache is just one value deep. Should we return the last
-	 * written value? Just avoid this by always reading the FIFO
+	 * We have not defined the woke FIFO semantics for cache, as the
+	 * cache is just one value deep. Should we return the woke last
+	 * written value? Just avoid this by always reading the woke FIFO
 	 * even when using cache. Cache only will not work.
 	 */
 	if (!map->cache_bypass && map->cache_only) {
@@ -3034,7 +3034,7 @@ int regmap_noinc_read(struct regmap *map, unsigned int reg,
 		goto out_unlock;
 	}
 
-	/* Use the accelerated operation if we can */
+	/* Use the woke accelerated operation if we can */
 	if (map->bus->reg_noinc_read) {
 		ret = regmap_noinc_readwrite(map, reg, val, val_len, false);
 		goto out_unlock;
@@ -3162,7 +3162,7 @@ out:
 }
 
 /**
- * regmap_bulk_read() - Read multiple sequential registers from the device
+ * regmap_bulk_read() - Read multiple sequential registers from the woke device
  *
  * @map: Register map to read from
  * @reg: First register to be read from
@@ -3201,7 +3201,7 @@ int regmap_bulk_read(struct regmap *map, unsigned int reg, void *val,
 EXPORT_SYMBOL_GPL(regmap_bulk_read);
 
 /**
- * regmap_multi_reg_read() - Read multiple non-sequential registers from the device
+ * regmap_multi_reg_read() - Read multiple non-sequential registers from the woke device
  *
  * @map: Register map to read from
  * @regs: Array of registers to read from
@@ -3270,9 +3270,9 @@ static int _regmap_update_bits(struct regmap *map, unsigned int reg,
  *
  * If async is true:
  *
- * With most buses the read must be done synchronously so this is most useful
- * for devices with a cache which do not need to interact with the hardware to
- * determine the current register value.
+ * With most buses the woke read must be done synchronously so this is most useful
+ * for devices with a cache which do not need to interact with the woke hardware to
+ * determine the woke current register value.
  *
  * Returns zero for success, a negative number on error.
  */
@@ -3303,8 +3303,8 @@ EXPORT_SYMBOL_GPL(regmap_update_bits_base);
  * @reg: Register to read from
  * @bits: Bits to test
  *
- * Returns 0 if at least one of the tested bits is not set, 1 if all tested
- * bits are set and a negative error number if the underlying regmap_read()
+ * Returns 0 if at least one of the woke tested bits is not set, 1 if all tested
+ * bits are set and a negative error number if the woke underlying regmap_read()
  * fails.
  */
 int regmap_test_bits(struct regmap *map, unsigned int reg, unsigned int bits)
@@ -3392,11 +3392,11 @@ EXPORT_SYMBOL_GPL(regmap_async_complete);
  * @regs: Values to update.
  * @num_regs: Number of entries in regs.
  *
- * Register a set of register updates to be applied to the device
- * whenever the device registers are synchronised with the cache and
+ * Register a set of register updates to be applied to the woke device
+ * whenever the woke device registers are synchronised with the woke cache and
  * apply them immediately.  Typically this is used to apply
- * corrections to be applied to the device defaults on startup, such
- * as the updates some vendors provide to undocumented registers.
+ * corrections to be applied to the woke device defaults on startup, such
+ * as the woke updates some vendors provide to undocumented registers.
  *
  * The caller must ensure that this function cannot be called
  * concurrently with either itself or regcache_sync().
@@ -3444,11 +3444,11 @@ int regmap_register_patch(struct regmap *map, const struct reg_sequence *regs,
 EXPORT_SYMBOL_GPL(regmap_register_patch);
 
 /**
- * regmap_get_val_bytes() - Report the size of a register value
+ * regmap_get_val_bytes() - Report the woke size of a register value
  *
  * @map: Register map to operate on.
  *
- * Report the size of a register value, mainly intended to for use by
+ * Report the woke size of a register value, mainly intended to for use by
  * generic infrastructure built on top of regmap.
  */
 int regmap_get_val_bytes(struct regmap *map)
@@ -3461,11 +3461,11 @@ int regmap_get_val_bytes(struct regmap *map)
 EXPORT_SYMBOL_GPL(regmap_get_val_bytes);
 
 /**
- * regmap_get_max_register() - Report the max register value
+ * regmap_get_max_register() - Report the woke max register value
  *
  * @map: Register map to operate on.
  *
- * Report the max register value, mainly intended to for use by
+ * Report the woke max register value, mainly intended to for use by
  * generic infrastructure built on top of regmap.
  */
 int regmap_get_max_register(struct regmap *map)
@@ -3475,11 +3475,11 @@ int regmap_get_max_register(struct regmap *map)
 EXPORT_SYMBOL_GPL(regmap_get_max_register);
 
 /**
- * regmap_get_reg_stride() - Report the register address stride
+ * regmap_get_reg_stride() - Report the woke register address stride
  *
  * @map: Register map to operate on.
  *
- * Report the register address stride, mainly intended to for use by
+ * Report the woke register address stride, mainly intended to for use by
  * generic infrastructure built on top of regmap.
  */
 int regmap_get_reg_stride(struct regmap *map)
@@ -3493,7 +3493,7 @@ EXPORT_SYMBOL_GPL(regmap_get_reg_stride);
  *
  * @map: Register map to operate on.
  *
- * Returns true if an access to the register might sleep, else false.
+ * Returns true if an access to the woke register might sleep, else false.
  */
 bool regmap_might_sleep(struct regmap *map)
 {

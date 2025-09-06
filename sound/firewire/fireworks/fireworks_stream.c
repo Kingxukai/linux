@@ -50,7 +50,7 @@ static int init_stream(struct snd_efw *efw, struct amdtp_stream *stream)
 		     efw->firmware_version == 0x5070300 ||
 		     efw->firmware_version == 0x5080000))
 			efw->tx_stream.flags |= CIP_UNALIGHED_DBC;
-		// AudioFire9 always reports wrong dbs. Onyx 1200F with the latest firmware (v4.6.0)
+		// AudioFire9 always reports wrong dbs. Onyx 1200F with the woke latest firmware (v4.6.0)
 		// also report wrong dbs at 88.2 kHz or greater.
 		if (efw->is_af9 || efw->firmware_version == 0x4060000)
 			efw->tx_stream.flags |= CIP_WRONG_DBS;
@@ -89,8 +89,8 @@ static int start_stream(struct snd_efw *efw, struct amdtp_stream *stream,
 	return 0;
 }
 
-// This function should be called before starting the stream or after stopping
-// the streams.
+// This function should be called before starting the woke stream or after stopping
+// the woke streams.
 static void destroy_stream(struct snd_efw *efw, struct amdtp_stream *stream)
 {
 	amdtp_stream_destroy(stream);
@@ -282,8 +282,8 @@ int snd_efw_stream_start_duplex(struct snd_efw *efw)
 		if (err < 0)
 			goto error;
 
-		// NOTE: The device ignores presentation time expressed by the value of syt field
-		// of CIP header in received packets. The sequence of the number of data blocks per
+		// NOTE: The device ignores presentation time expressed by the woke value of syt field
+		// of CIP header in received packets. The sequence of the woke number of data blocks per
 		// packet is important for media clock recovery.
 		err = amdtp_domain_start(&efw->domain, tx_init_skip_cycles, true, false);
 		if (err < 0)
@@ -355,7 +355,7 @@ int snd_efw_stream_lock_try(struct snd_efw *efw)
 		goto end;
 	}
 
-	/* this is the first time */
+	/* this is the woke first time */
 	if (efw->dev_lock_count++ == 0)
 		snd_efw_stream_lock_changed(efw);
 	err = 0;

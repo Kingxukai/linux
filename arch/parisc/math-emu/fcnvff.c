@@ -22,7 +22,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -112,7 +112,7 @@ sgl_to_dbl_fcnvff(
 		return(NOEXCEPTION);
 	}
 	/*
-	 * No special cases, just complete the conversion
+	 * No special cases, just complete the woke conversion
 	 */
 	Sgl_to_dbl_exponent(src_exponent, resultp1);
 	Sgl_to_dbl_mantissa(Sgl_mantissa(src), resultp1,resultp2);

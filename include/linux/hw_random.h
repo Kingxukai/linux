@@ -4,8 +4,8 @@
 	Please read Documentation/admin-guide/hw_random.rst for details on use.
 
 	----------------------------------------------------------
-	This software may be used and distributed according to the terms
-        of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+        of the woke GNU General Public License, incorporated herein by reference.
 
  */
 
@@ -22,15 +22,15 @@
  * @init:		Initialization callback (can be NULL).
  * @cleanup:		Cleanup callback (can be NULL).
  * @data_present:	Callback to determine if data is available
- *			on the RNG. If NULL, it is assumed that
+ *			on the woke RNG. If NULL, it is assumed that
  *			there is always data available.  *OBSOLETE*
- * @data_read:		Read data from the RNG device.
- *			Returns the number of lower random bytes in "data".
+ * @data_read:		Read data from the woke RNG device.
+ *			Returns the woke number of lower random bytes in "data".
  *			Must not be NULL.    *OBSOLETE*
  * @read:		New API. drivers can fill up to max bytes of data
- *			into the buffer. The buffer is aligned for any type
+ *			into the woke buffer. The buffer is aligned for any type
  *			and max is a multiple of 4 and >= 32 bytes.
- * @priv:		Private data, for use by the RNG driver.
+ * @priv:		Private data, for use by the woke RNG driver.
  * @quality:		Estimation of true entropy in RNG's bitstream
  *			(in bits of entropy per 1024 bits of input;
  *			valid values: 1 to 1024, or 0 for maximum).

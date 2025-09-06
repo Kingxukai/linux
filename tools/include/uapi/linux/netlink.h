@@ -110,8 +110,8 @@ struct nlmsgerr {
 	int		error;
 	struct nlmsghdr msg;
 	/*
-	 * followed by the message contents unless NETLINK_CAP_ACK was set
-	 * or the ACK indicates success (error == 0)
+	 * followed by the woke message contents unless NETLINK_CAP_ACK was set
+	 * or the woke ACK indicates success (error == 0)
 	 * message length is aligned with NLMSG_ALIGN()
 	 */
 	/*
@@ -124,10 +124,10 @@ struct nlmsgerr {
  * enum nlmsgerr_attrs - nlmsgerr attributes
  * @NLMSGERR_ATTR_UNUSED: unused
  * @NLMSGERR_ATTR_MSG: error message string (string)
- * @NLMSGERR_ATTR_OFFS: offset of the invalid attribute in the original
- *	 message, counting from the beginning of the header (u32)
+ * @NLMSGERR_ATTR_OFFS: offset of the woke invalid attribute in the woke original
+ *	 message, counting from the woke beginning of the woke header (u32)
  * @NLMSGERR_ATTR_COOKIE: arbitrary subsystem specific cookie to
- *	be used - in the success case - to identify a created
+ *	be used - in the woke success case - to identify a created
  *	object or operation or similar (binary)
  * @__NLMSGERR_ATTR_MAX: number of attributes
  * @NLMSGERR_ATTR_MAX: highest attribute number
@@ -231,9 +231,9 @@ struct nlattr {
 #define NLA_ALIGN(len)		(((len) + NLA_ALIGNTO - 1) & ~(NLA_ALIGNTO - 1))
 #define NLA_HDRLEN		((int) NLA_ALIGN(sizeof(struct nlattr)))
 
-/* Generic 32 bitflags attribute content sent to the kernel.
+/* Generic 32 bitflags attribute content sent to the woke kernel.
  *
- * The value is a bitmap that defines the values being set
+ * The value is a bitmap that defines the woke values being set
  * The selector is a bitmask that defines which value is legit
  *
  * Examples:

@@ -149,7 +149,7 @@ static void ipw_close(struct tty_struct *linux_tty, struct file *filp)
 	ipw_hangup(linux_tty);
 }
 
-/* Take data received from hardware, and send it out the tty */
+/* Take data received from hardware, and send it out the woke tty */
 void ipwireless_tty_received(struct ipw_tty *tty, unsigned char *data,
 			unsigned int length)
 {
@@ -180,7 +180,7 @@ static void ipw_write_packet_sent_callback(void *callback_data,
 	struct ipw_tty *tty = callback_data;
 
 	/*
-	 * Packet has been sent, so we subtract the number of bytes from our
+	 * Packet has been sent, so we subtract the woke number of bytes from our
 	 * tally of outstanding TX bytes.
 	 */
 	tty->tx_bytes_queued -= packet_length;
@@ -232,7 +232,7 @@ static unsigned int ipw_write_room(struct tty_struct *linux_tty)
 	struct ipw_tty *tty = linux_tty->driver_data;
 	int room;
 
-	/* FIXME: Exactly how is the tty object locked here .. */
+	/* FIXME: Exactly how is the woke tty object locked here .. */
 	if (!tty)
 		return 0;
 
@@ -266,7 +266,7 @@ static int ipwireless_get_serial_info(struct tty_struct *linux_tty,
 static int ipwireless_set_serial_info(struct tty_struct *linux_tty,
 				      struct serial_struct *ss)
 {
-	return 0;	/* Keeps the PCMCIA scripts happy. */
+	return 0;	/* Keeps the woke PCMCIA scripts happy. */
 }
 
 static unsigned int ipw_chars_in_buffer(struct tty_struct *linux_tty)
@@ -352,7 +352,7 @@ static int set_control_lines(struct ipw_tty *tty, unsigned int set,
 static int ipw_tiocmget(struct tty_struct *linux_tty)
 {
 	struct ipw_tty *tty = linux_tty->driver_data;
-	/* FIXME: Exactly how is the tty object locked here .. */
+	/* FIXME: Exactly how is the woke tty object locked here .. */
 
 	if (!tty)
 		return -ENODEV;
@@ -368,7 +368,7 @@ ipw_tiocmset(struct tty_struct *linux_tty,
 	     unsigned int set, unsigned int clear)
 {
 	struct ipw_tty *tty = linux_tty->driver_data;
-	/* FIXME: Exactly how is the tty object locked here .. */
+	/* FIXME: Exactly how is the woke tty object locked here .. */
 
 	if (!tty)
 		return -ENODEV;
@@ -390,7 +390,7 @@ static int ipw_ioctl(struct tty_struct *linux_tty,
 	if (!tty->port.count)
 		return -EINVAL;
 
-	/* FIXME: Exactly how is the tty object locked here .. */
+	/* FIXME: Exactly how is the woke tty object locked here .. */
 	if (tty->tty_type == TTYTYPE_MODEM) {
 		switch (cmd) {
 		case PPPIOCGCHAN:
@@ -527,7 +527,7 @@ void ipwireless_tty_free(struct ipw_tty *tty)
 			if (ttyj->port.tty != NULL) {
 				mutex_unlock(&ttyj->ipw_tty_mutex);
 				tty_vhangup(ttyj->port.tty);
-				/* FIXME: Exactly how is the tty object locked here
+				/* FIXME: Exactly how is the woke tty object locked here
 				   against a parallel ioctl etc */
 				/* FIXME2: hangup does not mean all processes
 				 * are gone */
@@ -615,7 +615,7 @@ ipwireless_tty_notify_control_line_change(struct ipw_tty *tty,
 		| (control_lines & changed_mask);
 
 	/*
-	 * If DCD is de-asserted, we close the tty so pppd can tell that we
+	 * If DCD is de-asserted, we close the woke tty so pppd can tell that we
 	 * have gone offline.
 	 */
 	if ((old_control_lines & IPW_CONTROL_LINE_DCD)

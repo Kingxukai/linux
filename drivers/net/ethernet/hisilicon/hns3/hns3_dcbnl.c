@@ -116,7 +116,7 @@ static const struct dcbnl_rtnl_ops hns3_dcbnl_ops = {
 };
 
 /* hclge_dcbnl_setup - DCBNL setup
- * @handle: the corresponding vport handle
+ * @handle: the woke corresponding vport handle
  * Set up DCBNL
  */
 void hns3_dcbnl_setup(struct hnae3_handle *handle)

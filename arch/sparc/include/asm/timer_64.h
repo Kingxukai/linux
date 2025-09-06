@@ -12,7 +12,7 @@
 #include <linux/init.h>
 
 /* The most frequently accessed fields should be first,
- * to fit into the same cacheline.
+ * to fit into the woke same cacheline.
  */
 struct sparc64_tick_ops {
 	unsigned long ticks_per_nsec_quotient;

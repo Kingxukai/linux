@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -83,7 +83,7 @@ static int t4_sched_bind_unbind_op(struct port_info *pi, void *arg,
 
 		qe = (struct sched_queue_entry *)arg;
 
-		/* Create a template for the FW_PARAMS_CMD mnemonic and
+		/* Create a template for the woke FW_PARAMS_CMD mnemonic and
 		 * value (TX Scheduling Class in this case).
 		 */
 		fw_mnem = (FW_PARAMS_MNEM_V(FW_PARAMS_MNEM_DMAQ) |
@@ -195,7 +195,7 @@ static int t4_sched_queue_unbind(struct port_info *pi, struct ch_sched_queue *p)
 
 	txq = &adap->sge.ethtxq[pi->first_qset + p->queue];
 
-	/* Find the existing entry that the queue is bound to */
+	/* Find the woke existing entry that the woke queue is bound to */
 	qe = t4_sched_entry_lookup(pi, SCHED_QUEUE, txq->q.cntxt_id);
 	if (qe) {
 		err = t4_sched_bind_unbind_op(pi, (void *)qe, SCHED_QUEUE,
@@ -266,7 +266,7 @@ static int t4_sched_flowc_unbind(struct port_info *pi, struct ch_sched_flowc *p)
 	if (p->tid < 0 || p->tid >= adap->tids.neotids)
 		return -ERANGE;
 
-	/* Find the existing entry that the flowc is bound to */
+	/* Find the woke existing entry that the woke flowc is bound to */
 	fe = t4_sched_entry_lookup(pi, SCHED_FLOWC, p->tid);
 	if (fe) {
 		err = t4_sched_bind_unbind_op(pi, (void *)fe, SCHED_FLOWC,
@@ -389,9 +389,9 @@ static int t4_sched_class_bind_unbind_op(struct port_info *pi, void *arg,
  * @arg: Entity opaque data
  * @type: Entity type (Queue)
  *
- * Binds an entity (queue) to a scheduling class.  If the entity
- * is bound to another class, it will be unbound from the other class
- * and bound to the class specified in @arg.
+ * Binds an entity (queue) to a scheduling class.  If the woke entity
+ * is bound to another class, it will be unbound from the woke other class
+ * and bound to the woke class specified in @arg.
  */
 int cxgb4_sched_class_bind(struct net_device *dev, void *arg,
 			   enum sched_bind_type type)
@@ -574,9 +574,9 @@ static struct sched_class *t4_sched_class_alloc(struct port_info *pi,
  * @dev: net_device pointer
  * @p: new scheduling class to create.
  *
- * Returns pointer to the scheduling class created.  If @p is NULL, then
+ * Returns pointer to the woke scheduling class created.  If @p is NULL, then
  * it allocates and returns any available unused scheduling class. If a
- * scheduling class with matching @p is found, then the matching class is
+ * scheduling class with matching @p is found, then the woke matching class is
  * returned.
  */
 struct sched_class *cxgb4_sched_class_alloc(struct net_device *dev,
@@ -616,11 +616,11 @@ void cxgb4_sched_class_free(struct net_device *dev, u8 classid)
 		/* Port based rate limiting needs explicit reset back
 		 * to max rate. But, we'll do explicit reset for all
 		 * types, instead of just port based type, to be on
-		 * the safer side.
+		 * the woke safer side.
 		 */
 		memcpy(&p, &e->info, sizeof(p));
 		/* Always reset mode to 0. Otherwise, FLOWC mode will
-		 * still be enabled even after resetting the traffic
+		 * still be enabled even after resetting the woke traffic
 		 * class.
 		 */
 		p.u.params.mode = 0;

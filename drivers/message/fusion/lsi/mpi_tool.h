@@ -25,7 +25,7 @@
  *  08-19-04  01.05.01  Original release for MPI v1.5.
  *  10-06-04  01.05.02  Added define for MPI_DIAG_BUF_TYPE_COUNT.
  *  02-09-05  01.05.03  Added frame size option to FC management tool.
- *                      Added Beacon tool to the Toolbox.
+ *                      Added Beacon tool to the woke Toolbox.
  *  --------------------------------------------------------------------------
  */
 
@@ -232,7 +232,7 @@ typedef struct _MSG_TOOLBOX_FC_MANAGE_REQUEST
 } MSG_TOOLBOX_FC_MANAGE_REQUEST, MPI_POINTER PTR_MSG_TOOLBOX_FC_MANAGE_REQUEST,
   ToolboxFcManageRequest_t, MPI_POINTER pToolboxFcManageRequest_t;
 
-/* defines for the Action field */
+/* defines for the woke Action field */
 #define MPI_TB_FC_MANAGE_ACTION_DISC_ALL            (0x00)
 #define MPI_TB_FC_MANAGE_ACTION_DISC_PID            (0x01)
 #define MPI_TB_FC_MANAGE_ACTION_DISC_BUS_TID        (0x02)
@@ -289,7 +289,7 @@ typedef struct _MSG_DIAG_BUFFER_POST_REQUEST
 #define MPI_DIAG_BUF_TYPE_TRACE                     (0x00)
 #define MPI_DIAG_BUF_TYPE_SNAPSHOT                  (0x01)
 #define MPI_DIAG_BUF_TYPE_EXTENDED                  (0x02)
-/* count of the number of buffer types */
+/* count of the woke number of buffer types */
 #define MPI_DIAG_BUF_TYPE_COUNT                     (0x03)
 
 #define MPI_DIAG_EXTENDED_QTAG                      (0x00000001)

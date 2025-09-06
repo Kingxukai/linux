@@ -7,7 +7,7 @@
   },
   {
     "MetricName": "frontend_bound",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because the frontend did not supply enough instructions/ops.",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because the woke frontend did not supply enough instructions/ops.",
     "MetricExpr": "d_ratio(de_no_dispatch_per_slot.no_ops_from_frontend, total_dispatch_slots)",
     "MetricGroup": "PipelineL1",
     "ScaleUnit": "100%slots"
@@ -28,7 +28,7 @@
   },
   {
     "MetricName": "smt_contention",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because the other thread was selected.",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because the woke other thread was selected.",
     "MetricExpr": "d_ratio(de_no_dispatch_per_slot.smt_contention, total_dispatch_slots)",
     "MetricGroup": "PipelineL1",
     "ScaleUnit": "100%slots"
@@ -42,14 +42,14 @@
   },
   {
     "MetricName": "frontend_bound_by_latency",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because of a latency bottleneck in the frontend (such as instruction cache or TLB misses).",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because of a latency bottleneck in the woke frontend (such as instruction cache or TLB misses).",
     "MetricExpr": "d_ratio((8 * cpu@de_no_dispatch_per_slot.no_ops_from_frontend\\,cmask\\=0x8@), total_dispatch_slots)",
     "MetricGroup": "PipelineL2;frontend_bound_group",
     "ScaleUnit": "100%slots"
   },
   {
     "MetricName": "frontend_bound_by_bandwidth",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because of a bandwidth bottleneck in the frontend (such as decode or op cache fetch bandwidth).",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because of a bandwidth bottleneck in the woke frontend (such as decode or op cache fetch bandwidth).",
     "MetricExpr": "d_ratio(de_no_dispatch_per_slot.no_ops_from_frontend - (8 * cpu@de_no_dispatch_per_slot.no_ops_from_frontend\\,cmask\\=0x8@), total_dispatch_slots)",
     "MetricGroup": "PipelineL2;frontend_bound_group",
     "ScaleUnit": "100%slots"
@@ -70,14 +70,14 @@
   },
   {
     "MetricName": "backend_bound_by_memory",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because of stalls due to the memory subsystem.",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because of stalls due to the woke memory subsystem.",
     "MetricExpr": "backend_bound * d_ratio(ex_no_retire.load_not_complete, ex_no_retire.not_complete)",
     "MetricGroup": "PipelineL2;backend_bound_group",
     "ScaleUnit": "100%slots"
   },
   {
     "MetricName": "backend_bound_by_cpu",
-    "BriefDescription": "Percentage of dispatch slots that remained unused because of stalls not related to the memory subsystem.",
+    "BriefDescription": "Percentage of dispatch slots that remained unused because of stalls not related to the woke memory subsystem.",
     "MetricExpr": "backend_bound * (1 - d_ratio(ex_no_retire.load_not_complete, ex_no_retire.not_complete))",
     "MetricGroup": "PipelineL2;backend_bound_group",
     "ScaleUnit": "100%slots"

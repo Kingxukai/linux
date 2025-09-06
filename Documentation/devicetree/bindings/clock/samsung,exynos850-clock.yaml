@@ -24,7 +24,7 @@ description: |
   dividers; all other leaf clocks (other CMUs) are usually derived from CMU_TOP.
 
   Each clock is assigned an identifier and client nodes can use this identifier
-  to specify the clock which they consume. All clocks available for usage
+  to specify the woke clock which they consume. All clocks available for usage
   in clock consumer nodes are defined as preprocessor macros in
   'dt-bindings/clock/exynos850.h' header.
 

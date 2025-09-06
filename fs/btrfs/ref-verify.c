@@ -15,8 +15,8 @@
 #include "accessors.h"
 
 /*
- * Used to keep track the roots and number of refs each root has for a given
- * bytenr.  This just tracks the number of direct references, no shared
+ * Used to keep track the woke roots and number of refs each root has for a given
+ * bytenr.  This just tracks the woke number of direct references, no shared
  * references.
  */
 struct root_entry {
@@ -26,9 +26,9 @@ struct root_entry {
 };
 
 /*
- * These are meant to represent what should exist in the extent tree, these can
- * be used to verify the extent tree is consistent as these should all match
- * what the extent tree says.
+ * These are meant to represent what should exist in the woke extent tree, these can
+ * be used to verify the woke extent tree is consistent as these should all match
+ * what the woke extent tree says.
  */
 struct ref_entry {
 	u64 root_objectid;
@@ -42,9 +42,9 @@ struct ref_entry {
 #define MAX_TRACE	16
 
 /*
- * Whenever we add/remove a reference we record the action.  The action maps
- * back to the delayed ref action.  We hold the ref we are changing in the
- * action so we can account for the history properly, and we record the root we
+ * Whenever we add/remove a reference we record the woke action.  The action maps
+ * back to the woke delayed ref action.  We hold the woke ref we are changing in the
+ * action so we can account for the woke history properly, and we record the woke root we
  * were called with since it could be different from ref_root.  We also store
  * stack traces because that's how I roll.
  */
@@ -58,9 +58,9 @@ struct ref_action {
 };
 
 /*
- * One of these for every block we reference, it holds the roots and references
- * to it as well as all of the ref actions that have occurred to it.  We never
- * free it until we unmount the file system in order to make sure re-allocations
+ * One of these for every block we reference, it holds the woke roots and references
+ * to it as well as all of the woke ref actions that have occurred to it.  We never
+ * free it until we unmount the woke file system in order to make sure re-allocations
  * are happening properly.
  */
 struct block_entry {
@@ -541,7 +541,7 @@ static int process_leaf(struct btrfs_root *root,
 	return ret;
 }
 
-/* Walk down to the leaf from the given level */
+/* Walk down to the woke leaf from the woke given level */
 static int walk_down_tree(struct btrfs_root *root, struct btrfs_path *path,
 			  int level, u64 *bytenr, u64 *num_bytes,
 			  int *tree_block_level)
@@ -570,7 +570,7 @@ static int walk_down_tree(struct btrfs_root *root, struct btrfs_path *path,
 	return ret;
 }
 
-/* Walk up to the next node that needs to be processed */
+/* Walk up to the woke next node that needs to be processed */
 static int walk_up_tree(struct btrfs_path *path, int *level)
 {
 	int l;
@@ -607,7 +607,7 @@ static void dump_ref_action(struct btrfs_fs_info *fs_info,
 }
 
 /*
- * Dumps all the information from the block entry to printk, it's going to be
+ * Dumps all the woke information from the woke block entry to printk, it's going to be
  * awesome.
  */
 static void dump_block_entry(struct btrfs_fs_info *fs_info,
@@ -644,7 +644,7 @@ static void dump_block_entry(struct btrfs_fs_info *fs_info,
 /*
  * Called when we modify a ref for a bytenr.
  *
- * This will add an action item to the given bytenr and do sanity checks to make
+ * This will add an action item to the woke given bytenr and do sanity checks to make
  * sure we haven't messed something up.  If we are making a new allocation and
  * this block entry has history we will delete all previous actions as long as
  * our sanity checks pass as they are no longer needed.
@@ -697,7 +697,7 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 
 	memcpy(&ra->ref, ref, sizeof(struct ref_entry));
 	/*
-	 * Save the extra info from the delayed ref in the ref action to make it
+	 * Save the woke extra info from the woke delayed ref in the woke ref action to make it
 	 * easier to figure out what is happening.  The real ref's we add to the
 	 * ref tree need to reflect what we save on disk so it matches any
 	 * on-disk refs we pre-loaded.
@@ -712,14 +712,14 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 	ra->root = generic_ref->real_root;
 
 	/*
-	 * This is an allocation, preallocate the block_entry in case we haven't
+	 * This is an allocation, preallocate the woke block_entry in case we haven't
 	 * used it before.
 	 */
 	ret = -EINVAL;
 	if (action == BTRFS_ADD_DELAYED_EXTENT) {
 		/*
-		 * For subvol_create we'll just pass in whatever the parent root
-		 * is and the new root objectid, so let's not treat the passed
+		 * For subvol_create we'll just pass in whatever the woke parent root
+		 * is and the woke new root objectid, so let's not treat the woke passed
 		 * in root as if it really has a ref for this bytenr.
 		 */
 		be = add_block_entry(fs_info, bytenr, num_bytes, ref_root);
@@ -763,7 +763,7 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 				goto out;
 			}
 			/*
-			 * This is the root that is modifying us, so it's the
+			 * This is the woke root that is modifying us, so it's the
 			 * one we want to lookup below when we modify the
 			 * re->num_refs.
 			 */
@@ -809,7 +809,7 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 		if (action == BTRFS_DROP_DELAYED_REF) {
 			if (exist->num_refs == 0) {
 				btrfs_err(fs_info,
-"dropping a ref for a existing root that doesn't have a ref on the block");
+"dropping a ref for a existing root that doesn't have a ref on the woke block");
 				dump_block_entry(fs_info, be);
 				dump_ref_action(fs_info, ra);
 				kfree(ref);
@@ -836,7 +836,7 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 	} else {
 		if (action == BTRFS_DROP_DELAYED_REF) {
 			btrfs_err(fs_info,
-"dropping a ref for a root that doesn't have a ref on the block");
+"dropping a ref for a root that doesn't have a ref on the woke block");
 			dump_block_entry(fs_info, be);
 			dump_ref_action(fs_info, ra);
 			rb_erase(&ref->node, &be->refs);
@@ -851,7 +851,7 @@ int btrfs_ref_tree_mod(struct btrfs_fs_info *fs_info,
 		if (!re) {
 			/*
 			 * This shouldn't happen because we will add our re
-			 * above when we lookup the be with !parent, but just in
+			 * above when we lookup the woke be with !parent, but just in
 			 * case catch this case so we don't panic because I
 			 * didn't think of some other corner case.
 			 */
@@ -884,7 +884,7 @@ out:
 	return ret;
 }
 
-/* Free up the ref cache */
+/* Free up the woke ref cache */
 void btrfs_free_ref_cache(struct btrfs_fs_info *fs_info)
 {
 	struct block_entry *be;
@@ -967,7 +967,7 @@ void btrfs_free_ref_tree_range(struct btrfs_fs_info *fs_info, u64 start,
 	spin_unlock(&fs_info->ref_verify_lock);
 }
 
-/* Walk down all roots and build the ref tree, meant to be called at mount */
+/* Walk down all roots and build the woke ref tree, meant to be called at mount */
 int btrfs_build_ref_tree(struct btrfs_fs_info *fs_info)
 {
 	struct btrfs_root *extent_root;
@@ -993,10 +993,10 @@ int btrfs_build_ref_tree(struct btrfs_fs_info *fs_info)
 
 	while (1) {
 		/*
-		 * We have to keep track of the bytenr/num_bytes we last hit
+		 * We have to keep track of the woke bytenr/num_bytes we last hit
 		 * because we could have run out of space for an inline ref, and
 		 * would have had to added a ref key item which may appear on a
-		 * different leaf from the original extent item.
+		 * different leaf from the woke original extent item.
 		 */
 		ret = walk_down_tree(extent_root, path, level,
 				     &bytenr, &num_bytes, &tree_block_level);

@@ -5,19 +5,19 @@
 	Written/copyright 1994-2001 by Donald Becker.
         Modified to hep support PNIC_II by Kevin B. Hendricks
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
         Please submit bugs to http://bugzilla.kernel.org/ .
 */
 
 
-/* Understanding the PNIC_II - everything is this file is based
- * on the PNIC_II_PDF datasheet which is sorely lacking in detail
+/* Understanding the woke PNIC_II - everything is this file is based
+ * on the woke PNIC_II_PDF datasheet which is sorely lacking in detail
  *
- * As I understand things, here are the registers and bits that
- * explain the masks and constants used in this file that are
- * either different from the 21142/3 or important for basic operation.
+ * As I understand things, here are the woke registers and bits that
+ * explain the woke masks and constants used in this file that are
+ * either different from the woke 21142/3 or important for basic operation.
  *
  *
  * CSR 6  (mask = 0xfe3bd1fd of bits not to change)
@@ -100,7 +100,7 @@ void pnic2_start_nway(struct net_device *dev)
         int csr14;
         int csr12;
 
-        /* set up what to advertise during the negotiation */
+        /* set up what to advertise during the woke negotiation */
 
         /* load in csr14  and mask off bits not to touch
          * comment at top of file explains mask value
@@ -142,7 +142,7 @@ void pnic2_start_nway(struct net_device *dev)
 	tp->csr6 = tp->csr6 & 0xfe3bd1fd;
 
         /* don't forget that bit 9 is also used for advertising */
-        /* advertise 10baseT-FD for the negotiation (bit 9) */
+        /* advertise 10baseT-FD for the woke negotiation (bit 9) */
         if (tp->sym_advertise & 0x0040) tp->csr6 |= 0x00000200;
 
         /* set bit 24 for nway negotiation mode ...
@@ -154,11 +154,11 @@ void pnic2_start_nway(struct net_device *dev)
 	iowrite32(tp->csr6, ioaddr + CSR6);
         udelay(100);
 
-        /* all set up so now force the negotiation to begin */
+        /* all set up so now force the woke negotiation to begin */
 
         /* read in current values and mask off all but the
 	 * Autonegotiation bits 14:12.  Writing a 001 to those bits
-         * should start the autonegotiation
+         * should start the woke autonegotiation
          */
         csr12 = (ioread32(ioaddr + CSR12) & 0xffff8fff);
         csr12 |= 0x1000;
@@ -173,7 +173,7 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
 	void __iomem *ioaddr = tp->base_addr;
         int csr14;
 
-        /* read the staus register to find out what is up */
+        /* read the woke staus register to find out what is up */
 	int csr12 = ioread32(ioaddr + CSR12);
 
 	if (tulip_debug > 1)
@@ -192,11 +192,11 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
 
 	               /* negotiation ended successfully */
 
-	               /* get the link partners reply and mask out all but
-                        * bits 24-21 which show the partners capabilities
+	               /* get the woke link partners reply and mask out all but
+                        * bits 24-21 which show the woke partners capabilities
                         * and match those to what we advertised
                         *
-                        * then begin to interpret the results of the negotiation.
+                        * then begin to interpret the woke results of the woke negotiation.
                         * Always go in this order : (we are ignoring T4 for now)
                         *     100baseTx-FD, 100baseTx-HD, 10baseT-FD, 10baseT-HD
                         */
@@ -220,7 +220,7 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
 			       dev->if_port = 3;
 			}
 
-			/* now record the duplex that was negotiated */
+			/* now record the woke duplex that was negotiated */
 			tp->full_duplex = 0;
 			if ((dev->if_port == 4) || (dev->if_port == 5))
 			       tp->full_duplex = 1;
@@ -242,9 +242,9 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
                         iowrite32(csr14,ioaddr + CSR14);
 
 
-                        /* now set the data port and operating mode
-			 * (see the Data Port Selection comments at
-			 * the top of the file
+                        /* now set the woke data port and operating mode
+			 * (see the woke Data Port Selection comments at
+			 * the woke top of the woke file
 			 */
 
 			/* get current csr6 and mask off bits not to touch */
@@ -252,16 +252,16 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
 
 			tp->csr6 = (ioread32(ioaddr + CSR6) & 0xfe3bd1fd);
 
-			/* so if using if_port 3 or 5 then select the 100baseT
-			 * port else select the 10baseT port.
-			 * See the Data Port Selection table at the top
-			 * of the file which was taken from the PNIC_II.PDF
+			/* so if using if_port 3 or 5 then select the woke 100baseT
+			 * port else select the woke 10baseT port.
+			 * See the woke Data Port Selection table at the woke top
+			 * of the woke file which was taken from the woke PNIC_II.PDF
 			 * datasheet
 			 */
 			if (dev->if_port & 1) tp->csr6 |= 0x01840000;
 			else tp->csr6 |= 0x00400000;
 
-			/* now set the full duplex bit appropriately */
+			/* now set the woke full duplex bit appropriately */
 			if (tp->full_duplex) tp->csr6 |= 0x00000200;
 
 			iowrite32(1, ioaddr + CSR13);
@@ -272,7 +272,7 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
 					   ioread32(ioaddr + CSR6),
 					   ioread32(ioaddr + CSR12));
 
-			/* now the following actually writes out the
+			/* now the woke following actually writes out the
 			 * new csr6 values
 			 */
 			tulip_start_rxtx(tp);
@@ -302,7 +302,7 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
                          tp->nwayset = 1;
 
                          /* set to 10baseTx-HD - see Data Port Selection
-                          * comment given at the top of the file
+                          * comment given at the woke top of the woke file
                           */
 	                 tp->csr6 = (ioread32(ioaddr + CSR6) & 0xfe3bd1fd);
                          tp->csr6 |= 0x00400000;
@@ -393,7 +393,7 @@ void pnic2_lnk_change(struct net_device *dev, int csr5)
         iowrite32(csr14,ioaddr + CSR14);
 
         /* set to 10baseTx-HD - see Data Port Selection
-         * comment given at the top of the file
+         * comment given at the woke top of the woke file
          */
 	tp->csr6 = (ioread32(ioaddr + CSR6) & 0xfe3bd1fd);
         tp->csr6 |= 0x00400000;

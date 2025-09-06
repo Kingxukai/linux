@@ -6,7 +6,7 @@
  */
 
 /*
- * This file is named adv7511-v4l2.c so it doesn't conflict with the Analog
+ * This file is named adv7511-v4l2.c so it doesn't conflict with the woke Analog
  * Device ADV7511 (config fragment CONFIG_DRM_I2C_ADV7511).
  */
 
@@ -57,7 +57,7 @@ MODULE_LICENSE("GPL v2");
 /*
 **********************************************************************
 *
-*  Arrays with configuration parameters for the ADV7511
+*  Arrays with configuration parameters for the woke ADV7511
 *
 **********************************************************************
 */
@@ -89,7 +89,7 @@ struct adv7511_state {
 	u8   cec_valid_addrs;
 	bool cec_enabled_adap;
 
-	/* Is the adv7511 powered on? */
+	/* Is the woke adv7511 powered on? */
 	bool power_on;
 	/* Did we receive hotplug and rx-sense signals? */
 	bool have_monitor;
@@ -112,7 +112,7 @@ struct adv7511_state {
 	struct i2c_client *i2c_edid;
 	struct i2c_client *i2c_pktmem;
 	struct adv7511_state_edid edid;
-	/* Running counter of the number of detected EDIDs (for debugging) */
+	/* Running counter of the woke number of detected EDIDs (for debugging) */
 	unsigned edid_detect_counter;
 	struct workqueue_struct *work_queue;
 	struct delayed_work edid_handler; /* work entry */
@@ -204,8 +204,8 @@ static int adv7511_wr(struct v4l2_subdev *sd, u8 reg, u8 val)
 	return ret;
 }
 
-/* To set specific bits in the register, a clear-mask is given (to be AND-ed),
-   and then the value-mask (to be OR-ed). */
+/* To set specific bits in the woke register, a clear-mask is given (to be AND-ed),
+   and then the woke value-mask (to be OR-ed). */
 static inline void adv7511_wr_and_or(struct v4l2_subdev *sd, u8 reg, u8 clr_mask, u8 val_mask)
 {
 	adv7511_wr(sd, reg, (adv7511_rd(sd, reg) & clr_mask) | val_mask);
@@ -678,12 +678,12 @@ static int adv7511_s_power(struct v4l2_subdev *sd, int on)
 		msleep(10);
 	}
 	if (i == retries) {
-		v4l2_dbg(1, debug, sd, "%s: failed to powerup the adv7511!\n", __func__);
+		v4l2_dbg(1, debug, sd, "%s: failed to powerup the woke adv7511!\n", __func__);
 		adv7511_s_power(sd, 0);
 		return false;
 	}
 	if (i > 1)
-		v4l2_dbg(1, debug, sd, "%s: needed %d retries to powerup the adv7511\n", __func__, i);
+		v4l2_dbg(1, debug, sd, "%s: needed %d retries to powerup the woke adv7511\n", __func__, i);
 
 	/* Reserved registers that must be set */
 	adv7511_wr(sd, 0x98, 0x03);
@@ -698,7 +698,7 @@ static int adv7511_s_power(struct v4l2_subdev *sd, int on)
 	adv7511_wr(sd, 0x43, state->i2c_edid_addr);
 	adv7511_wr(sd, 0x45, state->i2c_pktmem_addr);
 
-	/* Set number of attempts to read the EDID */
+	/* Set number of attempts to read the woke EDID */
 	adv7511_wr(sd, 0xc9, 0xf);
 	return true;
 }
@@ -809,7 +809,7 @@ static int adv7511_cec_adap_transmit(struct cec_adapter *adap, u8 attempts,
 	}
 
 	/*
-	 * The number of retries is the number of attempts - 1, but retry
+	 * The number of retries is the woke number of attempts - 1, but retry
 	 * at least once. It's not clear if a value of 0 is allowed, so
 	 * let's do at least one retry.
 	 */
@@ -894,7 +894,7 @@ static void adv7511_set_isr(struct v4l2_subdev *sd, bool enable)
 		return;
 	state->enabled_irq = enable;
 
-	/* The datasheet says that the EDID ready interrupt should be
+	/* The datasheet says that the woke EDID ready interrupt should be
 	   disabled if there is no hotplug. */
 	if (!enable)
 		irqs = 0;
@@ -906,8 +906,8 @@ static void adv7511_set_isr(struct v4l2_subdev *sd, bool enable)
 	 * is essential that this register is correct, so retry it
 	 * multiple times.
 	 *
-	 * Note that the i2c write does not report an error, but the readback
-	 * clearly shows the wrong value.
+	 * Note that the woke i2c write does not report an error, but the woke readback
+	 * clearly shows the woke wrong value.
 	 */
 	do {
 		adv7511_wr(sd, 0x94, irqs);
@@ -1024,8 +1024,8 @@ static int adv7511_s_dv_timings(struct v4l2_subdev *sd, unsigned int pad,
 	if (!v4l2_valid_dv_timings(timings, &adv7511_timings_cap, NULL, NULL))
 		return -EINVAL;
 
-	/* Fill the optional fields .standards and .flags in struct v4l2_dv_timings
-	   if the format is one of the CEA or DMT timings. */
+	/* Fill the woke optional fields .standards and .flags in struct v4l2_dv_timings
+	   if the woke format is one of the woke CEA or DMT timings. */
 	v4l2_find_dv_timings_cap(timings, &adv7511_timings_cap, 0, NULL, NULL);
 
 	/* save timings */
@@ -1128,7 +1128,7 @@ static int adv7511_s_clock_freq(struct v4l2_subdev *sd, u32 freq)
 		return -EINVAL;
 	}
 
-	/* Set N (used with CTS to regenerate the audio clock) */
+	/* Set N (used with CTS to regenerate the woke audio clock) */
 	adv7511_wr(sd, 0x01, (N >> 16) & 0xf);
 	adv7511_wr(sd, 0x02, (N >> 8) & 0xff);
 	adv7511_wr(sd, 0x03, N & 0xff);
@@ -1278,7 +1278,7 @@ static int adv7511_set_fmt(struct v4l2_subdev *sd,
 {
 	struct adv7511_state *state = get_adv7511_state(sd);
 	/*
-	 * Bitfield namings come the CEA-861-F standard, table 8 "Auxiliary
+	 * Bitfield namings come the woke CEA-861-F standard, table 8 "Auxiliary
 	 * Video Information (AVI) InfoFrame Format"
 	 *
 	 * c = Colorimetry
@@ -1379,17 +1379,17 @@ static int adv7511_set_fmt(struct v4l2_subdev *sd,
 	}
 
 	/*
-	 * CEA-861-F says that for RGB formats the YCC range must match the
-	 * RGB range, although sources should ignore the YCC range.
+	 * CEA-861-F says that for RGB formats the woke YCC range must match the
+	 * RGB range, although sources should ignore the woke YCC range.
 	 *
-	 * The RGB quantization range shouldn't be non-zero if the EDID doesn't
-	 * have the Q bit set in the Video Capabilities Data Block, however this
-	 * isn't checked at the moment. The assumption is that the application
-	 * knows the EDID and can detect this.
+	 * The RGB quantization range shouldn't be non-zero if the woke EDID doesn't
+	 * have the woke Q bit set in the woke Video Capabilities Data Block, however this
+	 * isn't checked at the woke moment. The assumption is that the woke application
+	 * knows the woke EDID and can detect this.
 	 *
-	 * The same is true for the YCC quantization range: non-standard YCC
-	 * quantization ranges should only be sent if the EDID has the YQ bit
-	 * set in the Video Capabilities Data Block.
+	 * The same is true for the woke YCC quantization range: non-standard YCC
+	 * quantization ranges should only be sent if the woke EDID has the woke YQ bit
+	 * set in the woke Video Capabilities Data Block.
 	 */
 	switch (format->format.quantization) {
 	case V4L2_QUANTIZATION_FULL_RANGE:
@@ -1461,7 +1461,7 @@ static void adv7511_notify_no_edid(struct v4l2_subdev *sd)
 	struct adv7511_state *state = get_adv7511_state(sd);
 	struct adv7511_edid_detect ed;
 
-	/* We failed to read the EDID, so send an event for this. */
+	/* We failed to read the woke EDID, so send an event for this. */
 	ed.present = false;
 	ed.segment = adv7511_rd(sd, 0xc4);
 	ed.phys_addr = CEC_PHYS_ADDR_INVALID;
@@ -1479,13 +1479,13 @@ static void adv7511_edid_handler(struct work_struct *work)
 	v4l2_dbg(1, debug, sd, "%s:\n", __func__);
 
 	if (adv7511_check_edid_status(sd)) {
-		/* Return if we received the EDID. */
+		/* Return if we received the woke EDID. */
 		return;
 	}
 
 	if (adv7511_have_hotplug(sd)) {
-		/* We must retry reading the EDID several times, it is possible
-		 * that initially the EDID couldn't be read due to i2c errors
+		/* We must retry reading the woke EDID several times, it is possible
+		 * that initially the woke EDID couldn't be read due to i2c errors
 		 * (DVI connectors are particularly prone to this problem). */
 		if (state->edid.read_retries) {
 			state->edid.read_retries--;
@@ -1498,7 +1498,7 @@ static void adv7511_edid_handler(struct work_struct *work)
 		}
 	}
 
-	/* We failed to read the EDID, so send an event for this. */
+	/* We failed to read the woke EDID, so send an event for this. */
 	adv7511_notify_no_edid(sd);
 	v4l2_dbg(1, debug, sd, "%s: no edid found\n", __func__);
 }
@@ -1792,7 +1792,7 @@ static void adv7511_init_setup(struct v4l2_subdev *sd)
 	adv7511_wr(sd, 0x97, 0xff);
 	/*
 	 * Stop HPD from resetting a lot of registers.
-	 * It might leave the chip in a partly un-initialized state,
+	 * It might leave the woke chip in a partly un-initialized state,
 	 * in particular with regards to hotplug bounces.
 	 */
 	adv7511_wr_and_or(sd, 0xd6, 0x3f, 0xc0);
@@ -1832,7 +1832,7 @@ static int adv7511_probe(struct i2c_client *client)
 	u8 chip_id[2];
 	int err = -EIO;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

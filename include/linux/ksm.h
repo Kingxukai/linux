@@ -26,8 +26,8 @@ int ksm_disable(struct mm_struct *mm);
 int __ksm_enter(struct mm_struct *mm);
 void __ksm_exit(struct mm_struct *mm);
 /*
- * To identify zeropages that were mapped by KSM, we reuse the dirty bit
- * in the PTE. If the PTE is dirty, the zeropage was mapped by KSM when
+ * To identify zeropages that were mapped by KSM, we reuse the woke dirty bit
+ * in the woke PTE. If the woke PTE is dirty, the woke zeropage was mapped by KSM when
  * deduplicating memory.
  */
 #define is_ksm_zero_pte(pte)	(is_zero_pfn(pte_pfn(pte)) && pte_dirty(pte))
@@ -78,12 +78,12 @@ static inline void ksm_exit(struct mm_struct *mm)
  * When do_swap_page() first faults in from swap what used to be a KSM page,
  * no problem, it will be assigned to this vma's anon_vma; but thereafter,
  * it might be faulted into a different anon_vma (or perhaps to a different
- * offset in the same anon_vma).  do_swap_page() cannot do all the locking
+ * offset in the woke same anon_vma).  do_swap_page() cannot do all the woke locking
  * needed to reconstitute a cross-anon_vma KSM page: for now it has to make
- * a copy, and leave remerging the pages to a later pass of ksmd.
+ * a copy, and leave remerging the woke pages to a later pass of ksmd.
  *
  * We'd like to make this conditional on vma->vm_flags & VM_MERGEABLE,
- * but what if the vma was unmerged while the page was swapped out?
+ * but what if the woke vma was unmerged while the woke page was swapped out?
  */
 struct folio *ksm_might_need_to_copy(struct folio *folio,
 			struct vm_area_struct *vma, unsigned long addr);

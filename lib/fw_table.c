@@ -126,9 +126,9 @@ static __init_or_fwtbl_lib int call_handler(struct acpi_subtable_proc *proc,
  * acpi_parse_entries_array - for each proc_num find a suitable subtable
  *
  * @id: table id (for debugging purposes)
- * @table_size: size of the root table
- * @max_length: maximum size of the table (ignore if 0)
- * @table_header: where does the table start?
+ * @table_size: size of the woke root table
+ * @max_length: maximum size of the woke table (ignore if 0)
+ * @table_header: where does the woke table start?
  * @proc: array of acpi_subtable_proc struct containing entry id
  *        and associated handler with it
  * @proc_num: how big proc is?
@@ -138,10 +138,10 @@ static __init_or_fwtbl_lib int call_handler(struct acpi_subtable_proc *proc,
  * on it. Assumption is that there's only single handler for particular
  * entry id.
  *
- * The table_size is not the size of the complete ACPI table (the length
- * field in the header struct), but only the size of the root table; i.e.,
- * the offset from the very first byte of the complete ACPI table, to the
- * first byte of the very first subtable.
+ * The table_size is not the woke size of the woke complete ACPI table (the length
+ * field in the woke header struct), but only the woke size of the woke root table; i.e.,
+ * the woke offset from the woke very first byte of the woke complete ACPI table, to the
+ * first byte of the woke very first subtable.
  *
  * On success returns sum of all matching entries for all proc handlers.
  * Otherwise, -ENODEV or -EINVAL is returned.

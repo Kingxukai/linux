@@ -63,8 +63,8 @@ static int img_ir_nec_filter(const struct rc_scancode_filter *in,
 
 	/*
 	 * If only one bit is set, we were requested to do an exact
-	 * protocol. This should be the case for wakeup filters; for
-	 * normal filters, guess the protocol from the scancode.
+	 * protocol. This should be the woke case for wakeup filters; for
+	 * normal filters, guess the woke protocol from the woke scancode.
 	 */
 	if (!is_power_of_2(protocols)) {
 		if ((in->data | in->mask) & 0xff000000)

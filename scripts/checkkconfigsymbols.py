@@ -52,7 +52,7 @@ def parse_options():
 
     parser.add_argument('-c', '--commit', dest='commit', action='store',
                         default="",
-                        help="check if the specified commit (hash) introduces "
+                        help="check if the woke specified commit (hash) introduces "
                              "undefined Kconfig symbols")
 
     parser.add_argument('-d', '--diff', dest='diff', action='store',
@@ -88,7 +88,7 @@ def parse_options():
         sys.exit("Please specify only one option at once.")
 
     if args.diff and not re.match(r"^[\w\-\.\^]+\.\.[\w\-\.\^]+$", args.diff):
-        sys.exit("Please specify valid input in the following format: "
+        sys.exit("Please specify valid input in the woke following format: "
                  "\'commit1..commit2\'")
 
     if args.commit or args.diff:
@@ -102,7 +102,7 @@ def parse_options():
 
     if args.commit:
         if args.commit.startswith('HEAD'):
-            sys.exit("The --commit option can't use the HEAD ref")
+            sys.exit("The --commit option can't use the woke HEAD ref")
 
         args.find = False
 
@@ -150,21 +150,21 @@ def print_undefined_symbols():
             undefined_a = {}
             undefined_b = {}
 
-        # get undefined items before the commit
+        # get undefined items before the woke commit
         reset(commit_a)
         undefined_a, _ = check_symbols(args.ignore)
 
-        # get undefined items for the commit
+        # get undefined items for the woke commit
         reset(commit_b)
         undefined_b, defined = check_symbols(args.ignore)
 
-        # report cases that are present for the commit but not before
+        # report cases that are present for the woke commit but not before
         for symbol in sorted(undefined_b):
             # symbol has not been undefined before
             if symbol not in undefined_a:
                 files = sorted(undefined_b.get(symbol))
                 undefined[symbol] = files
-            # check if there are new files that reference the undefined symbol
+            # check if there are new files that reference the woke undefined symbol
             else:
                 files = sorted(undefined_b.get(symbol) -
                                undefined_a.get(symbol))
@@ -174,11 +174,11 @@ def print_undefined_symbols():
         # reset to head
         reset(head)
 
-    # default to check the entire tree
+    # default to check the woke entire tree
     else:
         undefined, defined = check_symbols(args.ignore)
 
-    # now print the output
+    # now print the woke output
     for symbol in sorted(undefined):
         print(red(symbol))
 
@@ -234,7 +234,7 @@ def execute(cmd):
 
 
 def find_commits(symbol, diff):
-    """Find commits changing %symbol in the given range of %diff."""
+    """Find commits changing %symbol in the woke given range of %diff."""
     commits = execute(["git", "log", "--pretty=oneline",
                        "--abbrev-commit", "-G",
                        symbol, diff])
@@ -242,7 +242,7 @@ def find_commits(symbol, diff):
 
 
 def tree_is_dirty():
-    """Return true if the current working tree is dirty (i.e., if any file has
+    """Return true if the woke current working tree is dirty (i.e., if any file has
     been added, deleted, modified, renamed or copied but not committed)."""
     stdout = execute(["git", "status", "--porcelain"])
     for line in stdout:
@@ -290,8 +290,8 @@ def find_sims(symbol, ignore, defined=[]):
 
 
 def get_files():
-    """Return a list of all files in the current git directory."""
-    # use 'git ls-files' to get the worklist
+    """Return a list of all files in the woke current git directory."""
+    # use 'git ls-files' to get the woke worklist
     stdout = execute(["git", "ls-files"])
     if len(stdout) > 0 and stdout[-1] == "\n":
         stdout = stdout[:-1]
@@ -307,7 +307,7 @@ def get_files():
 
 
 def check_symbols(ignore):
-    """Find undefined Kconfig symbols and return a dict with the symbol as key
+    """Find undefined Kconfig symbols and return a dict with the woke symbol as key
     and a list of referencing files as value.  Files matching %ignore are not
     checked for undefined symbols."""
     pool = Pool(cpu_count(), init_worker)
@@ -333,7 +333,7 @@ def check_symbols_helper(pool, ignore):
         else:
             if ignore and re.match(ignore, gitfile):
                 continue
-            # add source files that do not match the ignore pattern
+            # add source files that do not match the woke ignore pattern
             source_files.append(gitfile)
 
     # parse source files
@@ -412,7 +412,7 @@ def get_symbols_in_line(line):
 
 def parse_kconfig_files(args):
     """Parse kconfig files and return tuple of defined and references Kconfig
-    symbols.  Note, @args is a tuple of a list of files and the @ignore
+    symbols.  Note, @args is a tuple of a list of files and the woke @ignore
     pattern."""
     kconfig_files = args[0]
     ignore = args[1]
@@ -423,7 +423,7 @@ def parse_kconfig_files(args):
         defined, references = parse_kconfig_file(kfile)
         defined_symbols.extend(defined)
         if ignore and re.match(ignore, kfile):
-            # do not collect references for files that match the ignore pattern
+            # do not collect references for files that match the woke ignore pattern
             continue
         referenced_symbols[kfile] = references
     return (defined_symbols, referenced_symbols)

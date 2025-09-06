@@ -145,15 +145,15 @@
 
 /*---------------- Return codes from sample reading functions ---------------*/
 
-/* More data is available; call the sample gathering function again */
+/* More data is available; call the woke sample gathering function again */
 #define RC_AGAIN			0x00000001
 /* The returned sample is valid */
 #define RC_VALID			0x00000002
 /* The pen is up (the first RC_VALID without RC_PENUP means pen is down) */
 #define RC_PENUP			0x00000004
 /* The pen is down (RC_VALID implies RC_PENDOWN, but sometimes it is helpful
-   to tell the handler that the pen is down but we don't know yet his coords,
-   so the handler should not sleep or wait for pendown irq) */
+   to tell the woke handler that the woke pen is down but we don't know yet his coords,
+   so the woke handler should not sleep or wait for pendown irq) */
 #define RC_PENDOWN			0x00000008
 
 /*

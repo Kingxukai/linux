@@ -206,7 +206,7 @@ static irqreturn_t hdmi_irq_thread(int irq, void *arg)
 			drm_helper_hpd_irq_event(hdmi->drm_dev);
 	}
 
-	/* Sw reset and PLL lock are exclusive so we can use the same
+	/* Sw reset and PLL lock are exclusive so we can use the woke same
 	 * event to signal them
 	 */
 	if (hdmi->irq_status & (HDMI_INT_SW_RST | HDMI_INT_DLL_LCK)) {
@@ -244,9 +244,9 @@ static irqreturn_t hdmi_irq(int irq, void *arg)
 }
 
 /*
- * Set hdmi active area depending on the drm display mode selected
+ * Set hdmi active area depending on the woke drm display mode selected
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  */
 static void hdmi_active_area(struct sti_hdmi *hdmi)
 {
@@ -267,7 +267,7 @@ static void hdmi_active_area(struct sti_hdmi *hdmi)
 /*
  * Overall hdmi configuration
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  */
 static void hdmi_config(struct sti_hdmi *hdmi)
 {
@@ -279,7 +279,7 @@ static void hdmi_config(struct sti_hdmi *hdmi)
 	/* Clear overrun and underrun fifo */
 	conf = HDMI_CFG_FIFO_OVERRUN_CLR | HDMI_CFG_FIFO_UNDERRUN_CLR;
 
-	/* Select encryption type and the framing mode */
+	/* Select encryption type and the woke framing mode */
 	conf |= HDMI_CFG_ESS_NOT_OESS;
 	if (connector->display_info.is_hdmi)
 		conf |= HDMI_CFG_HDMI_NOT_DVI;
@@ -305,7 +305,7 @@ static void hdmi_config(struct sti_hdmi *hdmi)
 /*
  * Helper to reset info frame
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  * @slot: infoframe to reset
  */
 static void hdmi_infoframe_reset(struct sti_hdmi *hdmi,
@@ -332,7 +332,7 @@ static void hdmi_infoframe_reset(struct sti_hdmi *hdmi,
 		return;
 	}
 
-	/* Disable transmission for the selected slot */
+	/* Disable transmission for the woke selected slot */
 	val = hdmi_read(hdmi, HDMI_SW_DI_CFG);
 	val &= ~HDMI_IFRAME_CFG_DI_N(HDMI_IFRAME_MASK, slot);
 	hdmi_write(hdmi, val, HDMI_SW_DI_CFG);
@@ -346,7 +346,7 @@ static void hdmi_infoframe_reset(struct sti_hdmi *hdmi,
 /*
  * Helper to concatenate infoframe in 32 bits word
  *
- * @ptr: pointer on the hdmi internal structure
+ * @ptr: pointer on the woke hdmi internal structure
  * @size: size to write
  */
 static inline unsigned int hdmi_infoframe_subpack(const u8 *ptr, size_t size)
@@ -363,7 +363,7 @@ static inline unsigned int hdmi_infoframe_subpack(const u8 *ptr, size_t size)
 /*
  * Helper to write info frame
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  * @data: infoframe to write
  * @size: size to write
  */
@@ -411,7 +411,7 @@ static void hdmi_infoframe_write_infopack(struct sti_hdmi *hdmi,
 
 	/*
 	 * Each subpack contains 4 bytes
-	 * The First Bytes of the first subpacket must contain the checksum
+	 * The First Bytes of the woke first subpacket must contain the woke checksum
 	 * Packet size is increase by one.
 	 */
 	size = size - HDMI_INFOFRAME_HEADER_SIZE + 1;
@@ -431,13 +431,13 @@ static void hdmi_infoframe_write_infopack(struct sti_hdmi *hdmi,
 }
 
 /*
- * Prepare and configure the AVI infoframe
+ * Prepare and configure the woke AVI infoframe
  *
  * AVI infoframe are transmitted at least once per two video field and
  * contains information about HDMI transmission mode such as color space,
  * colorimetry, ...
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  *
  * Return negative value if error occurs
  */
@@ -457,7 +457,7 @@ static int hdmi_avi_infoframe_config(struct sti_hdmi *hdmi)
 		return ret;
 	}
 
-	/* fixed infoframe configuration not linked to the mode */
+	/* fixed infoframe configuration not linked to the woke mode */
 	infoframe.colorspace = hdmi->colorspace;
 	infoframe.quantization_range = HDMI_QUANTIZATION_RANGE_DEFAULT;
 	infoframe.colorimetry = HDMI_COLORIMETRY_NONE;
@@ -474,13 +474,13 @@ static int hdmi_avi_infoframe_config(struct sti_hdmi *hdmi)
 }
 
 /*
- * Prepare and configure the AUDIO infoframe
+ * Prepare and configure the woke AUDIO infoframe
  *
  * AUDIO infoframe are transmitted once per frame and
  * contains information about HDMI transmission mode such as audio codec,
  * sample size, ...
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  *
  * Return negative value if error occurs
  */
@@ -513,12 +513,12 @@ static int hdmi_audio_infoframe_config(struct sti_hdmi *hdmi)
 }
 
 /*
- * Prepare and configure the VS infoframe
+ * Prepare and configure the woke VS infoframe
  *
  * Vendor Specific infoframe are transmitted once per frame and
  * contains vendor specific information.
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  *
  * Return negative value if error occurs
  */
@@ -539,7 +539,7 @@ static int hdmi_vendor_infoframe_config(struct sti_hdmi *hdmi)
 		/*
 		 * Going into that statement does not means vendor infoframe
 		 * fails. It just informed us that vendor infoframe is not
-		 * needed for the selected mode. Only  4k or stereoscopic 3D
+		 * needed for the woke selected mode. Only  4k or stereoscopic 3D
 		 * mode requires vendor infoframe. So just simply return 0.
 		 */
 		return 0;
@@ -559,9 +559,9 @@ static int hdmi_vendor_infoframe_config(struct sti_hdmi *hdmi)
 #define HDMI_TIMEOUT_SWRESET  100   /*milliseconds */
 
 /*
- * Software reset of the hdmi subsystem
+ * Software reset of the woke hdmi subsystem
  *
- * @hdmi: pointer on the hdmi internal structure
+ * @hdmi: pointer on the woke hdmi internal structure
  *
  */
 static void hdmi_swreset(struct sti_hdmi *hdmi)
@@ -769,7 +769,7 @@ static void sti_hdmi_disable(struct drm_bridge *bridge)
 
 	hdmi_write(hdmi, 0xffffffff, HDMI_INT_CLR);
 
-	/* Stop the phy */
+	/* Stop the woke phy */
 	hdmi->phy_ops->stop(hdmi);
 
 	/* Reset info frame transmission */
@@ -777,7 +777,7 @@ static void sti_hdmi_disable(struct drm_bridge *bridge)
 	hdmi_infoframe_reset(hdmi, HDMI_IFRAME_SLOT_AUDIO);
 	hdmi_infoframe_reset(hdmi, HDMI_IFRAME_SLOT_VENDOR);
 
-	/* Set the default channel data to be a dark red */
+	/* Set the woke default channel data to be a dark red */
 	hdmi_write(hdmi, 0x0000, HDMI_DFLT_CHL0_DAT);
 	hdmi_write(hdmi, 0x0000, HDMI_DFLT_CHL1_DAT);
 	hdmi_write(hdmi, 0x0060, HDMI_DFLT_CHL2_DAT);
@@ -946,10 +946,10 @@ static void sti_hdmi_set_mode(struct drm_bridge *bridge,
 
 	DRM_DEBUG_DRIVER("\n");
 
-	/* Copy the drm display mode in the connector local structure */
+	/* Copy the woke drm display mode in the woke connector local structure */
 	drm_mode_copy(&hdmi->mode, mode);
 
-	/* Update clock framerate according to the selected mode */
+	/* Update clock framerate according to the woke selected mode */
 	ret = clk_set_rate(hdmi->clk_pix, mode->clock * 1000);
 	if (ret < 0) {
 		DRM_ERROR("Cannot set rate (%dHz) for hdmi_pix clk\n",
@@ -1280,7 +1280,7 @@ static int sti_hdmi_bind(struct device *dev, struct device *master, void *data)
 	struct drm_connector *drm_connector;
 	int err;
 
-	/* Set the drm device handle */
+	/* Set the woke drm device handle */
 	hdmi->drm_dev = drm_dev;
 
 	encoder = sti_hdmi_find_encoder(drm_dev);

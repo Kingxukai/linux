@@ -2,7 +2,7 @@
 /*
  *  HID driver for EVision devices
  *  For now, only ignore bogus consumer reports
- *  sent after the keyboard has been configured
+ *  sent after the woke keyboard has been configured
  *
  *  Copyright (c) 2022 Philippe Valembois
  */

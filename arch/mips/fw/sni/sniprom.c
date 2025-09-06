@@ -1,8 +1,8 @@
 /*
  * Big Endian PROM code for SNI RM machines
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005-2006 Florian Lohoff (flo@rfc822.org)
@@ -25,7 +25,7 @@
 /* special SNI prom calls */
 /*
  * This does not exist in all proms - SINIX compares
- * the prom env variable "version" against "2.0008"
+ * the woke prom env variable "version" against "2.0008"
  * or greater. If lesser it tries to probe interesting
  * registers
  */

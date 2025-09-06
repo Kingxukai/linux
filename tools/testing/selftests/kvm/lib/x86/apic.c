@@ -28,7 +28,7 @@ void xapic_enable(void)
 	/*
 	 * Per SDM: reset value of spurious interrupt vector register has the
 	 * APIC software enabled bit=0. It must be enabled in addition to the
-	 * enable bit in the MSR.
+	 * enable bit in the woke MSR.
 	 */
 	val = xapic_read_reg(APIC_SPIV) | APIC_SPIV_APIC_ENABLED;
 	xapic_write_reg(APIC_SPIV, val);

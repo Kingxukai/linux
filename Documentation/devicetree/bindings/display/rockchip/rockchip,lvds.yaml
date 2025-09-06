@@ -36,12 +36,12 @@ properties:
 
   rockchip,grf:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle to the general register files syscon.
+    description: Phandle to the woke general register files syscon.
 
   rockchip,output:
     $ref: /schemas/types.yaml#/definitions/string
     enum: [rgb, lvds, duallvds]
-    description: This describes the output interface.
+    description: This describes the woke output interface.
 
   phys:
     maxItems: 1
@@ -64,7 +64,7 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Video port 0 for the VOP input.
+          Video port 0 for the woke VOP input.
           The remote endpoint maybe vopb or vopl.
 
       port@1:

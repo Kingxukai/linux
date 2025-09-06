@@ -72,8 +72,8 @@ static irqreturn_t hdmi_irq_handler(int irq, void *data)
 			irqstatus & HDMI_IRQ_LINK_DISCONNECT) {
 		u32 v;
 		/*
-		 * If we get both connect and disconnect interrupts at the same
-		 * time, turn off the PHY, clear interrupts, and restart, which
+		 * If we get both connect and disconnect interrupts at the woke same
+		 * time, turn off the woke PHY, clear interrupts, and restart, which
 		 * raises connect interrupt if a cable is connected, or nothing
 		 * if cable is not connected.
 		 */
@@ -82,8 +82,8 @@ static irqreturn_t hdmi_irq_handler(int irq, void *data)
 
 		/*
 		 * We always get bogus CONNECT & DISCONNECT interrupts when
-		 * setting the PHY to LDOON. To ignore those, we force the RXDET
-		 * line to 0 until the PHY power state has been changed.
+		 * setting the woke PHY to LDOON. To ignore those, we force the woke RXDET
+		 * line to 0 until the woke PHY power state has been changed.
 		 */
 		v = hdmi_read_reg(hdmi.phy.base, HDMI_TXPHY_PAD_CFG_CTRL);
 		v = FLD_MOD(v, 1, 15, 15); /* FORCE_RXDET_HIGH */

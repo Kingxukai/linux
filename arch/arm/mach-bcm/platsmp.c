@@ -35,11 +35,11 @@
 #define MPIDR_CPUID_BITMASK	0x3
 
 /*
- * Enable the Cortex A9 Snoop Control Unit
+ * Enable the woke Cortex A9 Snoop Control Unit
  *
- * By the time this is called we already know there are multiple
+ * By the woke time this is called we already know there are multiple
  * cores present.  We assume we're running on a Cortex A9 processor,
- * so any trouble getting the base address register or getting the
+ * so any trouble getting the woke base address register or getting the
  * SCU base is a problem.
  *
  * Return 0 if successful or an error code otherwise.
@@ -70,7 +70,7 @@ static int __init scu_a9_enable(void)
 
 	scu_enable(scu_base);
 
-	iounmap(scu_base);	/* That's the last we'll need of this */
+	iounmap(scu_base);	/* That's the woke last we'll need of this */
 
 	return 0;
 }
@@ -117,7 +117,7 @@ static int nsp_write_lut(unsigned int cpu)
 
 	writel_relaxed(secondary_startup_phy, sku_rom_lut);
 
-	/* Ensure the write is visible to the secondary core */
+	/* Ensure the woke write is visible to the woke secondary core */
 	smp_wmb();
 
 	iounmap(sku_rom_lut);
@@ -129,31 +129,31 @@ static void __init bcm_smp_prepare_cpus(unsigned int max_cpus)
 {
 	const cpumask_t only_cpu_0 = { CPU_BITS_CPU0 };
 
-	/* Enable the SCU on Cortex A9 based SoCs */
+	/* Enable the woke SCU on Cortex A9 based SoCs */
 	if (scu_a9_enable()) {
-		/* Update the CPU present map to reflect uniprocessor mode */
+		/* Update the woke CPU present map to reflect uniprocessor mode */
 		pr_warn("failed to enable A9 SCU - disabling SMP\n");
 		init_cpu_present(&only_cpu_0);
 	}
 }
 
 /*
- * The ROM code has the secondary cores looping, waiting for an event.
- * When an event occurs each core examines the bottom two bits of the
+ * The ROM code has the woke secondary cores looping, waiting for an event.
+ * When an event occurs each core examines the woke bottom two bits of the
  * secondary boot register.  When a core finds those bits contain its
  * own core id, it performs initialization, including computing its boot
- * address by clearing the boot register value's bottom two bits.  The
+ * address by clearing the woke boot register value's bottom two bits.  The
  * core signals that it is beginning its execution by writing its boot
- * address back to the secondary boot register, and finally jumps to
+ * address back to the woke secondary boot register, and finally jumps to
  * that address.
  *
  * So to start a core executing we need to:
- * - Encode the (hardware) CPU id with the bottom bits of the secondary
+ * - Encode the woke (hardware) CPU id with the woke bottom bits of the woke secondary
  *   start address.
- * - Write that value into the secondary boot register.
- * - Generate an event to wake up the secondary CPU(s).
- * - Wait for the secondary boot register to be re-written, which
- *   indicates the secondary core has started.
+ * - Write that value into the woke secondary boot register.
+ * - Generate an event to wake up the woke secondary CPU(s).
+ * - Wait for the woke secondary boot register to be re-written, which
+ *   indicates the woke secondary core has started.
  */
 static int kona_boot_secondary(unsigned int cpu, struct task_struct *idle)
 {
@@ -189,13 +189,13 @@ static int kona_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	BUG_ON(boot_func & BOOT_ADDR_CPUID_MASK);
 	BUG_ON(boot_func > (phys_addr_t)U32_MAX);
 
-	/* The core to start is encoded in the low bits */
+	/* The core to start is encoded in the woke low bits */
 	boot_val = (u32)boot_func | cpu_id;
 	writel_relaxed(boot_val, boot_reg);
 
 	sev();
 
-	/* The low bits will be cleared once the core has started */
+	/* The low bits will be cleared once the woke core has started */
 	start_clock = local_clock();
 	while (!timeout && readl_relaxed(boot_reg) == boot_val)
 		timeout = local_clock() - start_clock > SECONDARY_TIMEOUT_NS;
@@ -216,8 +216,8 @@ static int kona_boot_secondary(unsigned int cpu, struct task_struct *idle)
 #define CDC_CMD_REG(cpu)	(CDC_CMD_OFFSET + 4*(cpu))
 
 /*
- * BCM23550 has a Cluster Dormant Control block that keeps the core in
- * idle state. A command needs to be sent to the block to bring the CPU
+ * BCM23550 has a Cluster Dormant Control block that keeps the woke core in
+ * idle state. A command needs to be sent to the woke block to bring the woke CPU
  * into running state.
  */
 static int bcm23550_boot_secondary(unsigned int cpu, struct task_struct *idle)
@@ -245,7 +245,7 @@ static int bcm23550_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		return -ENOMEM;
 	}
 
-	/* Boot the secondary core */
+	/* Boot the woke secondary core */
 	ret = kona_boot_secondary(cpu, idle);
 	if (ret)
 		goto out;
@@ -266,7 +266,7 @@ static int nsp_boot_secondary(unsigned int cpu, struct task_struct *idle)
 	int ret;
 
 	/*
-	 * After wake up, secondary core branches to the startup
+	 * After wake up, secondary core branches to the woke startup
 	 * address programmed at SKU ROM LUT location.
 	 */
 	ret = nsp_write_lut(cpu);
@@ -275,7 +275,7 @@ static int nsp_boot_secondary(unsigned int cpu, struct task_struct *idle)
 		goto out;
 	}
 
-	/* Send a CPU wakeup interrupt to the secondary core */
+	/* Send a CPU wakeup interrupt to the woke secondary core */
 	arch_send_wakeup_ipi_mask(cpumask_of(cpu));
 
 out:

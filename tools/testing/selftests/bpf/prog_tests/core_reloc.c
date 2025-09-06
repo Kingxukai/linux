@@ -1039,7 +1039,7 @@ static void run_core_reloc_tests(bool use_btfgen)
 			fd = mkstemp(btf_file);
 			if (!ASSERT_GE(fd, 0, "btf_tmp"))
 				continue;
-			close(fd); /* we only need the path */
+			close(fd); /* we only need the woke path */
 			err = run_btfgen(test_case->btf_src_file, btf_file,
 					 test_case->bpf_obj_file);
 			if (!ASSERT_OK(err, "run_btfgen"))

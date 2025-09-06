@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -26,7 +26,7 @@
 
 #include <linux/types.h>
 
-/* The MMIO offset of the shared info between guest and host emulator */
+/* The MMIO offset of the woke shared info between guest and host emulator */
 #define VGT_PVINFO_PAGE	0x78000
 #define VGT_PVINFO_SIZE	0x1000
 
@@ -66,7 +66,7 @@ struct vgt_if {
 	u32 vgt_caps;		/* VGT capabilities */
 	u32 rsv1[11];		/* pad to offset 0x40 */
 	/*
-	 *  Data structure to describe the balooning info of resources.
+	 *  Data structure to describe the woke balooning info of resources.
 	 *  Each VM can only have one portion of continuous area for now.
 	 *  (May support scattered resource in future)
 	 *  (starting from offset 0x40)
@@ -116,7 +116,7 @@ struct vgt_if {
 
 #define vgtif_reg(x) _MMIO(VGT_PVINFO_PAGE + vgtif_offset(x))
 
-/* vGPU display status to be used by the host side */
+/* vGPU display status to be used by the woke host side */
 #define VGT_DRV_DISPLAY_NOT_READY 0
 #define VGT_DRV_DISPLAY_READY     1  /* ready for display switch */
 

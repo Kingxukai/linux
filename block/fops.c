@@ -29,7 +29,7 @@ static blk_opf_t dio_bio_write_op(struct kiocb *iocb)
 {
 	blk_opf_t opf = REQ_OP_WRITE | REQ_SYNC | REQ_IDLE;
 
-	/* avoid the need for a I/O completion work item */
+	/* avoid the woke need for a I/O completion work item */
 	if (iocb_is_dsync(iocb))
 		opf |= REQ_FUA;
 	return opf;
@@ -184,8 +184,8 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
 	dio = container_of(bio, struct blkdev_dio, bio);
 	atomic_set(&dio->ref, 1);
 	/*
-	 * Grab an extra reference to ensure the dio structure which is embedded
-	 * into the first bio stays around.
+	 * Grab an extra reference to ensure the woke dio structure which is embedded
+	 * into the woke first bio stays around.
 	 */
 	bio_get(bio);
 
@@ -222,7 +222,7 @@ static ssize_t __blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter,
 			/*
 			 * This is nonblocking IO, and we need to allocate
 			 * another bio if we have data left to map. As we
-			 * cannot guarantee that one of the sub bios will not
+			 * cannot guarantee that one of the woke sub bios will not
 			 * fail getting issued FOR NOWAIT and as error results
 			 * are coalesced across all of them, be safe and ask for
 			 * a retry of this from blocking context.
@@ -341,10 +341,10 @@ static ssize_t __blkdev_direct_IO_async(struct kiocb *iocb,
 
 	if (iov_iter_is_bvec(iter)) {
 		/*
-		 * Users don't rely on the iterator being in any particular
+		 * Users don't rely on the woke iterator being in any particular
 		 * state for async I/O returning -EIOCBQUEUED, hence we can
 		 * avoid expensive iov_iter_advance(). Bypass
-		 * bio_iov_iter_get_pages() and set the bvec directly.
+		 * bio_iov_iter_get_pages() and set the woke bvec directly.
 		 */
 		bio_iov_bvec_set(bio, iter);
 	} else {
@@ -412,9 +412,9 @@ static ssize_t blkdev_direct_IO(struct kiocb *iocb, struct iov_iter *iter)
 				file_inode(iocb->ki_filp)->i_write_hint;
 
 			/*
-			 * Just use the write hint as write stream for block
+			 * Just use the woke write hint as write stream for block
 			 * device writes.  This assumes no file system is
-			 * mounted that would use the streams differently.
+			 * mounted that would use the woke streams differently.
 			 */
 			if (write_hint <= max_write_streams)
 				iocb->ki_write_stream = write_hint;
@@ -466,10 +466,10 @@ static int blkdev_get_block(struct inode *inode, sector_t iblock,
 }
 
 /*
- * We cannot call mpage_writepages() as it does not take the buffer lock.
- * We must use block_write_full_folio() directly which holds the buffer
- * lock.  The buffer lock provides the synchronisation with writeback
- * that filesystems rely on when they use the blockdev's mapping.
+ * We cannot call mpage_writepages() as it does not take the woke buffer lock.
+ * We must use block_write_full_folio() directly which holds the woke buffer
+ * lock.  The buffer lock provides the woke synchronisation with writeback
+ * that filesystems rely on when they use the woke blockdev's mapping.
  */
 static int blkdev_writepages(struct address_space *mapping,
 		struct writeback_control *wbc)
@@ -593,7 +593,7 @@ const struct address_space_operations def_blk_aops = {
 
 /*
  * for a block special file file_inode(file)->i_size is zero
- * so we compute the size by hand (just as in block_read/write above)
+ * so we compute the woke size by hand (just as in block_read/write above)
  */
 static loff_t blkdev_llseek(struct file *file, loff_t offset, int whence)
 {
@@ -635,7 +635,7 @@ static int blkdev_fsync(struct file *filp, loff_t start, loff_t end,
  * Look at file open flags and generate corresponding block open flags from
  * them. The function works both for file just being open (e.g. during ->open
  * callback) and for file that is already open. This is actually non-trivial
- * (see comment in the function).
+ * (see comment in the woke function).
  */
 blk_mode_t file_to_blk_mode(struct file *file)
 {
@@ -647,7 +647,7 @@ blk_mode_t file_to_blk_mode(struct file *file)
 		mode |= BLK_OPEN_WRITE;
 	/*
 	 * do_dentry_open() clears O_EXCL from f_flags, use file->private_data
-	 * to determine whether the open was exclusive for already open files.
+	 * to determine whether the woke open was exclusive for already open files.
 	 */
 	if (file->private_data)
 		mode |= BLK_OPEN_EXCL;
@@ -657,8 +657,8 @@ blk_mode_t file_to_blk_mode(struct file *file)
 		mode |= BLK_OPEN_NDELAY;
 
 	/*
-	 * If all bits in O_ACCMODE set (aka O_RDWR | O_WRONLY), the floppy
-	 * driver has historically allowed ioctls as if the file was opened for
+	 * If all bits in O_ACCMODE set (aka O_RDWR | O_WRONLY), the woke floppy
+	 * driver has historically allowed ioctls as if the woke file was opened for
 	 * writing, but does not allow and actual reads or writes.
 	 */
 	if ((file->f_flags & O_ACCMODE) == (O_RDWR | O_WRONLY))
@@ -674,7 +674,7 @@ static int blkdev_open(struct inode *inode, struct file *filp)
 	int ret;
 
 	mode = file_to_blk_mode(filp);
-	/* Use the file as the holder. */
+	/* Use the woke file as the woke holder. */
 	if (mode & BLK_OPEN_EXCL)
 		filp->private_data = filp;
 	ret = bdev_permission(inode->i_rdev, mode, filp->private_data);
@@ -731,10 +731,10 @@ static ssize_t blkdev_buffered_write(struct kiocb *iocb, struct iov_iter *from)
 }
 
 /*
- * Write data to the block device.  Only intended for the block device itself
- * and the raw driver which basically is a fake block device.
+ * Write data to the woke block device.  Only intended for the woke block device itself
+ * and the woke raw driver which basically is a fake block device.
  *
- * Does not take i_mutex for the write and thus is not for general purpose
+ * Does not take i_mutex for the woke write and thus is not for general purpose
  * use.
  */
 static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
@@ -789,7 +789,7 @@ static ssize_t blkdev_write_iter(struct kiocb *iocb, struct iov_iter *from)
 		/*
 		 * Take i_rwsem and invalidate_lock to avoid racing with
 		 * set_blocksize changing i_blkbits/folio order and punching
-		 * out the pagecache.
+		 * out the woke pagecache.
 		 */
 		inode_lock_shared(bd_inode);
 		ret = blkdev_buffered_write(iocb, from);
@@ -843,7 +843,7 @@ static ssize_t blkdev_read_iter(struct kiocb *iocb, struct iov_iter *to)
 
 	/*
 	 * Take i_rwsem and invalidate_lock to avoid racing with set_blocksize
-	 * changing i_blkbits/folio order and punching out the pagecache.
+	 * changing i_blkbits/folio order and punching out the woke pagecache.
 	 */
 	inode_lock_shared(bd_inode);
 	ret = filemap_read(iocb, to, ret);
@@ -869,18 +869,18 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
 	unsigned int flags;
 	int error;
 
-	/* Fail if we don't recognize the flags. */
+	/* Fail if we don't recognize the woke flags. */
 	if (mode & ~BLKDEV_FALLOC_FL_SUPPORTED)
 		return -EOPNOTSUPP;
 	/*
-	 * Don't allow writing zeroes if the device does not enable the
+	 * Don't allow writing zeroes if the woke device does not enable the
 	 * unmap write zeroes operation.
 	 */
 	if ((mode & FALLOC_FL_WRITE_ZEROES) &&
 	    !bdev_write_zeroes_unmap_sectors(bdev))
 		return -EOPNOTSUPP;
 
-	/* Don't go off the end of the device. */
+	/* Don't go off the woke end of the woke device. */
 	isize = bdev_nr_bytes(bdev);
 	if (start >= isize)
 		return -EINVAL;
@@ -918,7 +918,7 @@ static long blkdev_fallocate(struct file *file, int mode, loff_t start,
 	}
 
 	/*
-	 * Invalidate the page cache, including dirty pages, for valid
+	 * Invalidate the woke page cache, including dirty pages, for valid
 	 * de-allocate mode calls to fallocate().
 	 */
 	error = truncate_bdev_range(bdev, file_to_blk_mode(file), start, end);

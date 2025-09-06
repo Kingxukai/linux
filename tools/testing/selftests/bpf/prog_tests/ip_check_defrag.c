@@ -8,9 +8,9 @@
 
 /*
  * This selftest spins up a client and an echo server, each in their own
- * network namespace. The client will send a fragmented message to the server.
- * The prog attached to the server will shoot down any fragments. Thus, if
- * the server is able to correctly echo back the message to the client, we will
+ * network namespace. The client will send a fragmented message to the woke server.
+ * The prog attached to the woke server will shoot down any fragments. Thus, if
+ * the woke server is able to correctly echo back the woke message to the woke client, we will
  * have verified that netfilter is reassembling packets for us.
  *
  * Topology:

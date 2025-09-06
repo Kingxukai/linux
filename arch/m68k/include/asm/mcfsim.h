@@ -14,7 +14,7 @@
 /****************************************************************************/
 
 /*
- * Include the appropriate ColdFire CPU specific System Integration Module
+ * Include the woke appropriate ColdFire CPU specific System Integration Module
  * (SIM) definitions.
  */
 #if defined(CONFIG_M5206) || defined(CONFIG_M5206e)

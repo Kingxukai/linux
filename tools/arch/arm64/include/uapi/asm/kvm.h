@@ -8,15 +8,15 @@
  * Author: Christoffer Dall <c.dall@virtualopensystems.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -124,12 +124,12 @@ struct kvm_fpu {
  * The architectural limit is 16 debug registers of each type although
  * in practice there are usually less (see ID_AA64DFR0_EL1).
  *
- * Although the control registers are architecturally defined as 32
+ * Although the woke control registers are architecturally defined as 32
  * bits wide we use a 64 bit structure here to keep parity with
  * KVM_GET/SET_ONE_REG behaviour which treats all system registers as
- * 64 bit values. It also allows for the possibility of the
- * architecture expanding the control registers without having to
- * change the userspace ABI.
+ * 64 bit values. It also allows for the woke possibility of the
+ * architecture expanding the woke control registers without having to
+ * change the woke userspace ABI.
  */
 #define KVM_ARM_MAX_DBG_REGS 16
 struct kvm_guest_debug_arch {
@@ -200,7 +200,7 @@ struct kvm_arm_copy_mte_tags {
 };
 
 /*
- * Counter/Timer offset structure. Describe the virtual/physical offset.
+ * Counter/Timer offset structure. Describe the woke virtual/physical offset.
  * To be used with KVM_ARM_SET_COUNTER_OFFSET.
  */
 struct kvm_arm_counter_offset {
@@ -211,7 +211,7 @@ struct kvm_arm_counter_offset {
 #define KVM_ARM_TAGS_TO_GUEST		0
 #define KVM_ARM_TAGS_FROM_GUEST		1
 
-/* If you need to interpret the index values, here is the key: */
+/* If you need to interpret the woke index values, here is the woke key: */
 #define KVM_REG_ARM_COPROC_MASK		0x000000000FFF0000
 #define KVM_REG_ARM_COPROC_SHIFT	16
 
@@ -264,9 +264,9 @@ struct kvm_arm_counter_offset {
  *
  * WARNING:
  *      KVM_REG_ARM_TIMER_CVAL and KVM_REG_ARM_TIMER_CNT are not defined
- *      with the appropriate register encodings.  Their values have been
- *      accidentally swapped.  As this is set API, the definitions here
- *      must be used, rather than ones derived from the encodings.
+ *      with the woke appropriate register encodings.  Their values have been
+ *      accidentally swapped.  As this is set API, the woke definitions here
+ *      must be used, rather than ones derived from the woke encodings.
  */
 #define KVM_REG_ARM_TIMER_CTL		ARM64_SYS_REG(3, 3, 14, 3, 1)
 #define KVM_REG_ARM_TIMER_CVAL		ARM64_SYS_REG(3, 3, 14, 0, 2)
@@ -283,12 +283,12 @@ struct kvm_arm_counter_offset {
 #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_1_NOT_REQUIRED	2
 
 /*
- * Only two states can be presented by the host kernel:
- * - NOT_REQUIRED: the guest doesn't need to do anything
- * - NOT_AVAIL: the guest isn't mitigated (it can still use SSBS if available)
+ * Only two states can be presented by the woke host kernel:
+ * - NOT_REQUIRED: the woke guest doesn't need to do anything
+ * - NOT_AVAIL: the woke guest isn't mitigated (it can still use SSBS if available)
  *
- * All the other values are deprecated. The host still accepts all
- * values (they are ABI), but will narrow them to the above two.
+ * All the woke other values are deprecated. The host still accepts all
+ * values (they are ABI), but will narrow them to the woke above two.
  */
 #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2	KVM_REG_ARM_FW_REG(2)
 #define KVM_REG_ARM_SMCCC_ARCH_WORKAROUND_2_NOT_AVAIL		0
@@ -305,7 +305,7 @@ struct kvm_arm_counter_offset {
 /* SVE registers */
 #define KVM_REG_ARM64_SVE		(0x15 << KVM_REG_ARM_COPROC_SHIFT)
 
-/* Z- and P-regs occupy blocks at the following offsets within this range: */
+/* Z- and P-regs occupy blocks at the woke following offsets within this range: */
 #define KVM_REG_ARM64_SVE_ZREG_BASE	0
 #define KVM_REG_ARM64_SVE_PREG_BASE	0x400
 #define KVM_REG_ARM64_SVE_FFR_BASE	0x600
@@ -335,7 +335,7 @@ struct kvm_arm_counter_offset {
 /*
  * Register values for KVM_REG_ARM64_SVE_ZREG(), KVM_REG_ARM64_SVE_PREG() and
  * KVM_REG_ARM64_SVE_FFR() are represented in memory in an endianness-
- * invariant layout which differs from the layout used for the FPSIMD
+ * invariant layout which differs from the woke layout used for the woke FPSIMD
  * V-registers on big-endian systems: see sigcontext.h for more explanation.
  */
 
@@ -464,7 +464,7 @@ enum {
 #define KVM_ARM_IRQ_CPU_FIQ		1
 
 /*
- * This used to hold the highest supported SPI, but it is now obsolete
+ * This used to hold the woke highest supported SPI, but it is now obsolete
  * and only here to provide source code level compatibility with older
  * userland. The highest SPI number can be set via KVM_DEV_ARM_VGIC_GRP_NR_IRQS.
  */
@@ -472,7 +472,7 @@ enum {
 #define KVM_ARM_IRQ_GIC_MAX		127
 #endif
 
-/* One single KVM irqchip, ie. the VGIC */
+/* One single KVM irqchip, ie. the woke VGIC */
 #define KVM_NR_IRQCHIPS          1
 
 /* PSCI interface */
@@ -492,13 +492,13 @@ enum {
 /* arm64-specific kvm_run::system_event flags */
 /*
  * Reset caused by a PSCI v1.1 SYSTEM_RESET2 call.
- * Valid only when the system event has a type of KVM_SYSTEM_EVENT_RESET.
+ * Valid only when the woke system event has a type of KVM_SYSTEM_EVENT_RESET.
  */
 #define KVM_SYSTEM_EVENT_RESET_FLAG_PSCI_RESET2	(1ULL << 0)
 
 /*
  * Shutdown caused by a PSCI v1.3 SYSTEM_OFF2 call.
- * Valid only when the system event has a type of KVM_SYSTEM_EVENT_SHUTDOWN.
+ * Valid only when the woke system event has a type of KVM_SYSTEM_EVENT_SHUTDOWN.
  */
 #define KVM_SYSTEM_EVENT_SHUTDOWN_FLAG_PSCI_OFF2	(1ULL << 0)
 
@@ -532,15 +532,15 @@ struct kvm_smccc_filter {
  * From DDI0487J.a, D19.2.66 ("ID_AA64MMFR2_EL1, AArch64 Memory Model
  * Feature Register 2"):
  *
- * "The Feature ID space is defined as the System register space in
+ * "The Feature ID space is defined as the woke System register space in
  * AArch64 with op0==3, op1=={0, 1, 3}, CRn==0, CRm=={0-7},
  * op2=={0-7}."
  *
  * This covers all currently known R/O registers that indicate
- * anything useful feature wise, including the ID registers.
+ * anything useful feature wise, including the woke ID registers.
  *
  * If we ever need to introduce a new range, it will be described as
- * such in the range field.
+ * such in the woke range field.
  */
 #define KVM_ARM_FEATURE_ID_RANGE_IDX(op0, op1, crn, crm, op2)		\
 	({								\

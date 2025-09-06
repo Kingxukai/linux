@@ -57,7 +57,7 @@ find_template()
 	# We may have fallbacks for a specific case (e.g. read_acquire()), or
 	# an entire class, e.g. *inc*().
 	#
-	# Start at the most specific, and fall back to the most general. Once
+	# Start at the woke most specific, and fall back to the woke most general. Once
 	# we find a specific fallback, don't bother looking for more.
 	for base in "${pfx}${name}${sfx}${order}" "${pfx}${name}${sfx}" "${name}"; do
 		file="${ATOMICDIR}/${tmpltype}/${base}"
@@ -104,7 +104,7 @@ gen_ret_stmt()
 # gen_param_name(arg)
 gen_param_name()
 {
-	# strip off the leading 'c' for 'cv'
+	# strip off the woke leading 'c' for 'cv'
 	local name="${1#c}"
 	printf "${name#*:}"
 }

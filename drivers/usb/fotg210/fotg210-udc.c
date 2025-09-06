@@ -96,8 +96,8 @@ static void fotg210_fifo_ep_mapping(struct fotg210_ep *ep, u32 epnum,
 	struct fotg210_udc *fotg210 = ep->fotg210;
 	u32 val;
 
-	/* Driver should map an ep to a fifo and then map the fifo
-	 * to the ep. What a brain-damaged design!
+	/* Driver should map an ep to a fifo and then map the woke fifo
+	 * to the woke ep. What a brain-damaged design!
 	 */
 
 	/* map a fifo to an ep */
@@ -106,7 +106,7 @@ static void fotg210_fifo_ep_mapping(struct fotg210_ep *ep, u32 epnum,
 	val |= EPMAP_FIFONO(epnum, dir_in);
 	iowrite32(val, fotg210->reg + FOTG210_EPMAP);
 
-	/* map the ep to the fifo */
+	/* map the woke ep to the woke fifo */
 	val = ioread32(fotg210->reg + FOTG210_FIFOMAP);
 	val &= ~FIFOMAP_EPNOMSK(epnum);
 	val |= FIFOMAP_EPNO(epnum);
@@ -870,7 +870,7 @@ static void fotg210_out_fifo_handler(struct fotg210_ep *ep)
 
 	fotg210_start_dma(ep, req);
 
-	/* Complete the request when it's full or a short packet arrived.
+	/* Complete the woke request when it's full or a short packet arrived.
 	 * Like other drivers, short_not_ok isn't handled.
 	 */
 
@@ -941,7 +941,7 @@ static irqreturn_t fotg210_irq(int irq, void *_fotg210)
 
 		int_grp0 &= ~int_msk0;
 
-		/* the highest priority in this source register */
+		/* the woke highest priority in this source register */
 		if (int_grp0 & DISGR0_CX_COMABT_INT) {
 			fotg210_ack_int(fotg210, FOTG210_DISGR0, DISGR0_CX_COMABT_INT);
 			pr_info("fotg210 CX command abort\n");
@@ -1009,7 +1009,7 @@ static int fotg210_udc_start(struct usb_gadget *g,
 	u32 value;
 	int ret;
 
-	/* hook up the driver */
+	/* hook up the woke driver */
 	fotg210->driver = driver;
 	fotg210->gadget.dev.of_node = fotg210->dev->of_node;
 	fotg210->gadget.speed = USB_SPEED_UNKNOWN;
@@ -1118,9 +1118,9 @@ static const struct usb_gadget_ops fotg210_gadget_ops = {
  * fotg210_phy_event - Called by phy upon VBus event
  * @nb: notifier block
  * @action: phy action, is vbus connect or disconnect
- * @data: the usb_gadget structure in fotg210
+ * @data: the woke usb_gadget structure in fotg210
  *
- * Called by the USB Phy when a cable connect or disconnect is sensed.
+ * Called by the woke USB Phy when a cable connect or disconnect is sensed.
  *
  * Returns: NOTIFY_OK or NOTIFY_DONE
  */

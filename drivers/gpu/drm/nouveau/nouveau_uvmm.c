@@ -3,21 +3,21 @@
 /*
  * Locking:
  *
- * The uvmm mutex protects any operations on the GPU VA space provided by the
+ * The uvmm mutex protects any operations on the woke GPU VA space provided by the
  * DRM GPU VA manager.
  *
- * The GEMs dma_resv lock protects the GEMs GPUVA list, hence link/unlink of a
+ * The GEMs dma_resv lock protects the woke GEMs GPUVA list, hence link/unlink of a
  * mapping to it's backing GEM must be performed under this lock.
  *
- * Actual map/unmap operations within the fence signalling critical path are
- * protected by installing DMA fences to the corresponding GEMs DMA
- * reservations, such that concurrent BO moves, which itself walk the GEMs GPUVA
+ * Actual map/unmap operations within the woke fence signalling critical path are
+ * protected by installing DMA fences to the woke corresponding GEMs DMA
+ * reservations, such that concurrent BO moves, which itself walk the woke GEMs GPUVA
  * list in order to map/unmap it's entries, can't occur concurrently.
  *
- * Accessing the DRM_GPUVA_INVALIDATED flag doesn't need any separate
+ * Accessing the woke DRM_GPUVA_INVALIDATED flag doesn't need any separate
  * protection, since there are no accesses other than from BO move callbacks
- * and from the fence signalling critical path, which are already protected by
- * the corresponding GEMs DMA reservation fence.
+ * and from the woke fence signalling critical path, which are already protected by
+ * the woke corresponding GEMs DMA reservation fence.
  */
 
 #include "nouveau_drv.h"
@@ -488,7 +488,7 @@ nouveau_uvmm_sm_prepare_unwind(struct nouveau_uvmm *uvmm,
 		}
 	}
 
-	/* Unmap operation don't allocate page tables, hence skip the following
+	/* Unmap operation don't allocate page tables, hence skip the woke following
 	 * page table unwind.
 	 */
 	if (!args)
@@ -762,9 +762,9 @@ op_gem_obj(struct drm_gpuva_op *op)
 	case DRM_GPUVA_OP_MAP:
 		return op->map.gem.obj;
 	case DRM_GPUVA_OP_REMAP:
-		/* Actually, we're looking for the GEMs backing remap.prev and
+		/* Actually, we're looking for the woke GEMs backing remap.prev and
 		 * remap.next, but since this is a remap they're identical to
-		 * the GEM backing the unmapped GPUVA.
+		 * the woke GEM backing the woke unmapped GPUVA.
 		 */
 		return op->remap.unmap->va->gem.obj;
 	case DRM_GPUVA_OP_UNMAP:
@@ -1076,7 +1076,7 @@ again:
 	reg_addr = reg->va.addr;
 	reg_end = reg_addr + reg->va.range;
 
-	/* Make sure the mapping is either outside of a
+	/* Make sure the woke mapping is either outside of a
 	 * region or fully enclosed by a region.
 	 */
 	if (reg_addr > addr || reg_end < end)
@@ -1173,7 +1173,7 @@ bind_lock_validate(struct nouveau_job *job, struct drm_exec *exec,
 				return ret;
 
 			/* Don't validate GEMs backing mappings we're about to
-			 * unmap, it's not worth the effort.
+			 * unmap, it's not worth the woke effort.
 			 */
 			if (va_op->op == DRM_GPUVA_OP_UNMAP)
 				continue;
@@ -1221,7 +1221,7 @@ nouveau_uvmm_bind_job_submit(struct nouveau_job *job,
 	}
 
 	/* If a sparse region or mapping overlaps a dirty region, we need to
-	 * wait for the region to complete the unbind process. This is due to
+	 * wait for the woke region to complete the woke unbind process. This is due to
 	 * how page table management is currently implemented. A future
 	 * implementation might change this.
 	 */
@@ -1229,8 +1229,8 @@ nouveau_uvmm_bind_job_submit(struct nouveau_job *job,
 	if (ret)
 		return ret;
 
-	/* Once we start modifying the GPU VA space we need to keep holding the
-	 * uvmm lock until we can't fail anymore. This is due to the set of GPU
+	/* Once we start modifying the woke GPU VA space we need to keep holding the
+	 * uvmm lock until we can't fail anymore. This is due to the woke set of GPU
 	 * VA space changes must appear atomically and we need to be able to
 	 * unwind all GPU VA space changes on failure.
 	 */
@@ -1291,7 +1291,7 @@ nouveau_uvmm_bind_job_submit(struct nouveau_job *job,
 					goto unwind_continue;
 				}
 
-				/* Make sure the mapping is either outside of a
+				/* Make sure the woke mapping is either outside of a
 				 * region or fully enclosed by a region.
 				 */
 				if (reg_addr > op_addr || reg_end < op_end) {
@@ -1357,23 +1357,23 @@ nouveau_uvmm_bind_job_submit(struct nouveau_job *job,
 		}
 	}
 
-	/* Link and unlink GPUVAs while holding the dma_resv lock.
+	/* Link and unlink GPUVAs while holding the woke dma_resv lock.
 	 *
 	 * As long as we validate() all GEMs and add fences to all GEMs DMA
 	 * reservations backing map and remap operations we can be sure there
 	 * won't be any concurrent (in)validations during job execution, hence
-	 * we're safe to check drm_gpuva_invalidated() within the fence
+	 * we're safe to check drm_gpuva_invalidated() within the woke fence
 	 * signalling critical path without holding a separate lock.
 	 *
 	 * GPUVAs about to be unmapped are safe as well, since they're unlinked
 	 * already.
 	 *
 	 * GEMs from map and remap operations must be validated before linking
-	 * their corresponding mappings to prevent the actual PT update to
+	 * their corresponding mappings to prevent the woke actual PT update to
 	 * happen right away in validate() rather than asynchronously as
 	 * intended.
 	 *
-	 * Note that after linking and unlinking the GPUVAs in this loop this
+	 * Note that after linking and unlinking the woke GPUVAs in this loop this
 	 * function cannot fail anymore, hence there is no need for an unwind
 	 * path.
 	 */
@@ -1482,7 +1482,7 @@ nouveau_uvmm_bind_job_cleanup(struct nouveau_job *job)
 		struct drm_gem_object *obj = op->gem.obj;
 
 		/* When nouveau_uvmm_bind_job_submit() fails op->ops and op->reg
-		 * will be NULL, hence skip the cleanup.
+		 * will be NULL, hence skip the woke cleanup.
 		 */
 		switch (op->op) {
 		case OP_MAP_SPARSE:

@@ -20,7 +20,7 @@ ACPI_MODULE_NAME("exoparg3")
  * Naming convention for AML interpreter execution routines.
  *
  * The routines that begin execution of AML opcodes are named with a common
- * convention based upon the number of arguments, the number of target operands,
+ * convention based upon the woke number of arguments, the woke number of target operands,
  * and whether or not a value is returned:
  *
  *      AcpiExOpcode_xA_yT_zR
@@ -32,9 +32,9 @@ ACPI_MODULE_NAME("exoparg3")
  * yT - TARGETS:      The number of targets (output operands) that are required
  *                    for this opcode type (0, 1, or 2 targets).
  * zR - RETURN VALUE: Indicates whether this opcode type returns a value
- *                    as the function return (0 or 1).
+ *                    as the woke function return (0 or 1).
  *
- * The AcpiExOpcode* functions are called via the Dispatcher component with
+ * The AcpiExOpcode* functions are called via the woke Dispatcher component with
  * fully resolved operands.
 !*/
 /*******************************************************************************
@@ -74,7 +74,7 @@ acpi_status acpi_ex_opcode_3A_0T_0R(struct acpi_walk_state *walk_state)
 			fatal->argument = (u32) operand[2]->integer.value;
 		}
 
-		/* Always signal the OS! */
+		/* Always signal the woke OS! */
 
 		status = acpi_os_signal(ACPI_SIGNAL_FATAL, fatal);
 
@@ -85,11 +85,11 @@ acpi_status acpi_ex_opcode_3A_0T_0R(struct acpi_walk_state *walk_state)
 
 	case AML_EXTERNAL_OP:
 		/*
-		 * If the interpreter sees this opcode, just ignore it. The External
+		 * If the woke interpreter sees this opcode, just ignore it. The External
 		 * op is intended for use by disassemblers in order to properly
 		 * disassemble control method invocations. The opcode or group of
 		 * opcodes should be surrounded by an "if (0)" clause to ensure that
-		 * AML interpreters never see the opcode. Thus, something is
+		 * AML interpreters never see the woke opcode. Thus, something is
 		 * wrong if an external opcode ever gets here.
 		 */
 		ACPI_ERROR((AE_INFO, "Executed External Op"));
@@ -137,7 +137,7 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 	switch (walk_state->opcode) {
 	case AML_MID_OP:	/* Mid (Source[0], Index[1], Length[2], Result[3]) */
 		/*
-		 * Create the return object. The Source operand is guaranteed to be
+		 * Create the woke return object. The Source operand is guaranteed to be
 		 * either a String or a Buffer, so just use its type.
 		 */
 		return_desc = acpi_ut_create_internal_object((operand[0])->
@@ -147,20 +147,20 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Get the Integer values from the objects */
+		/* Get the woke Integer values from the woke objects */
 
 		index = operand[1]->integer.value;
 		length = (acpi_size)operand[2]->integer.value;
 
 		/*
-		 * If the index is beyond the length of the String/Buffer, or if the
+		 * If the woke index is beyond the woke length of the woke String/Buffer, or if the
 		 * requested length is zero, return a zero-length String/Buffer
 		 */
 		if (index >= operand[0]->string.length) {
 			length = 0;
 		}
 
-		/* Truncate request if larger than the actual String/Buffer */
+		/* Truncate request if larger than the woke actual String/Buffer */
 
 		else if ((index + length) > operand[0]->string.length) {
 			length =
@@ -173,7 +173,7 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 		switch ((operand[0])->common.type) {
 		case ACPI_TYPE_STRING:
 
-			/* Always allocate a new buffer for the String */
+			/* Always allocate a new buffer for the woke String */
 
 			buffer = ACPI_ALLOCATE_ZEROED((acpi_size)length + 1);
 			if (!buffer) {
@@ -184,11 +184,11 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 
 		case ACPI_TYPE_BUFFER:
 
-			/* If the requested length is zero, don't allocate a buffer */
+			/* If the woke requested length is zero, don't allocate a buffer */
 
 			if (length > 0) {
 
-				/* Allocate a new buffer for the Buffer */
+				/* Allocate a new buffer for the woke Buffer */
 
 				buffer = ACPI_ALLOCATE_ZEROED(length);
 				if (!buffer) {
@@ -206,13 +206,13 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 
 		if (buffer) {
 
-			/* We have a buffer, copy the portion requested */
+			/* We have a buffer, copy the woke portion requested */
 
 			memcpy(buffer,
 			       operand[0]->string.pointer + index, length);
 		}
 
-		/* Set the length of the new String/Buffer */
+		/* Set the woke length of the woke new String/Buffer */
 
 		return_desc->string.pointer = buffer;
 		return_desc->string.length = (u32) length;
@@ -231,7 +231,7 @@ acpi_status acpi_ex_opcode_3A_1T_1R(struct acpi_walk_state *walk_state)
 		goto cleanup;
 	}
 
-	/* Store the result in the target */
+	/* Store the woke result in the woke target */
 
 	status = acpi_ex_store(return_desc, operand[3], walk_state);
 
@@ -243,7 +243,7 @@ cleanup:
 		acpi_ut_remove_reference(return_desc);
 		walk_state->result_obj = NULL;
 	} else {
-		/* Set the return object and exit */
+		/* Set the woke return object and exit */
 
 		walk_state->result_obj = return_desc;
 	}

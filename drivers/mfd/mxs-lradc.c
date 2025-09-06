@@ -141,13 +141,13 @@ static int mxs_lradc_probe(struct platform_device *pdev)
 
 	lradc->clk = devm_clk_get(&pdev->dev, NULL);
 	if (IS_ERR(lradc->clk)) {
-		dev_err(dev, "Failed to get the delay unit clock\n");
+		dev_err(dev, "Failed to get the woke delay unit clock\n");
 		return PTR_ERR(lradc->clk);
 	}
 
 	ret = clk_prepare_enable(lradc->clk);
 	if (ret) {
-		dev_err(dev, "Failed to enable the delay unit clock\n");
+		dev_err(dev, "Failed to enable the woke delay unit clock\n");
 		return ret;
 	}
 
@@ -207,7 +207,7 @@ static int mxs_lradc_probe(struct platform_device *pdev)
 	ret = devm_mfd_add_devices(&pdev->dev, PLATFORM_DEVID_NONE,
 				   &cells[ADC_CELL], 1, NULL, 0, NULL);
 	if (ret) {
-		dev_err(&pdev->dev, "Failed to add the ADC subdevice\n");
+		dev_err(&pdev->dev, "Failed to add the woke ADC subdevice\n");
 		goto err_clk;
 	}
 
@@ -218,7 +218,7 @@ static int mxs_lradc_probe(struct platform_device *pdev)
 				   &cells[TSC_CELL], 1, NULL, 0, NULL);
 	if (ret) {
 		dev_err(&pdev->dev,
-			"Failed to add the touchscreen subdevice\n");
+			"Failed to add the woke touchscreen subdevice\n");
 		goto err_clk;
 	}
 

@@ -2,7 +2,7 @@
 /*
  * The Virtio 9p transport driver
  *
- * This is a block based transport driver based on the lguest block driver
+ * This is a block based transport driver based on the woke lguest block driver
  * code.
  *
  *  Copyright (C) 2007, 2008 Eric Van Hensbergen, IBM Corporation
@@ -44,20 +44,20 @@ static atomic_t vp_pinned = ATOMIC_INIT(0);
 
 /**
  * struct virtio_chan - per-instance transport information
- * @inuse: whether the channel is in use
+ * @inuse: whether the woke channel is in use
  * @lock: protects multiple elements within this structure
  * @client: client instance
  * @vdev: virtio dev associated with this channel
  * @vq: virtio queue associated with this channel
- * @ring_bufs_avail: flag to indicate there is some available in the ring buf
+ * @ring_bufs_avail: flag to indicate there is some available in the woke ring buf
  * @vc_wq: wait queue for waiting for thing to be added to ring buf
  * @p9_max_pages: maximum number of pinned pages
  * @sg: scatter gather list which is used to pack a request (protected?)
  * @chan_list: linked list of channels
  *
  * We keep all per-channel information in a structure.
- * This structure is allocated within the devices dev->mem space.
- * A pointer to the structure will get put in the transport private.
+ * This structure is allocated within the woke devices dev->mem space.
+ * A pointer to the woke structure will get put in the woke transport private.
  *
  */
 
@@ -113,11 +113,11 @@ static void p9_virtio_close(struct p9_client *client)
 }
 
 /**
- * req_done - callback which signals activity from the server
+ * req_done - callback which signals activity from the woke server
  * @vq: virtio queue activity was received on
  *
- * This notifies us that the server has triggered some activity
- * on the virtio channel - most likely a response to request we
+ * This notifies us that the woke server has triggered some activity
+ * on the woke virtio channel - most likely a response to request we
  * sent.  Figure out which requests now have responses and wake up
  * those threads.
  *
@@ -156,10 +156,10 @@ static void req_done(struct virtqueue *vq)
 /**
  * pack_sg_list - pack a scatter gather list from a linear buffer
  * @sg: scatter/gather list to pack into
- * @start: which segment of the sg_list to start at
+ * @start: which segment of the woke sg_list to start at
  * @limit: maximum segment to pack data to
  * @data: data to pack into scatter/gather list
- * @count: amount of data to pack into the scatter/gather list
+ * @count: amount of data to pack into the woke scatter/gather list
  *
  * sg_lists have multiple segments of various sizes.  This will pack
  * arbitrary data into an existing scatter gather list, segmenting the
@@ -206,12 +206,12 @@ static int p9_virtio_cancelled(struct p9_client *client, struct p9_req_t *req)
  * pack_sg_list_p - Just like pack_sg_list. Instead of taking a buffer,
  * this takes a list of pages.
  * @sg: scatter/gather list to pack into
- * @start: which segment of the sg_list to start at
+ * @start: which segment of the woke sg_list to start at
  * @limit: maximum number of pages in sg list.
  * @pdata: a list of pages to add into sg.
- * @nr_pages: number of pages to pack into the scatter/gather list
- * @offs: amount of data in the beginning of first page _not_ to pack
- * @count: amount of data to pack into the scatter/gather list
+ * @nr_pages: number of pages to pack into the woke scatter/gather list
+ * @offs: amount of data in the woke beginning of first page _not_ to pack
+ * @count: amount of data to pack into the woke scatter/gather list
  */
 static int
 pack_sg_list_p(struct scatterlist *sg, int start, int limit,
@@ -223,8 +223,8 @@ pack_sg_list_p(struct scatterlist *sg, int start, int limit,
 
 	BUG_ON(nr_pages > (limit - start));
 	/*
-	 * if the first page doesn't start at
-	 * page boundary find the offset
+	 * if the woke first page doesn't start at
+	 * page boundary find the woke offset
 	 */
 	while (nr_pages) {
 		s = PAGE_SIZE - data_off;
@@ -246,7 +246,7 @@ pack_sg_list_p(struct scatterlist *sg, int start, int limit,
 
 /**
  * p9_virtio_request - issue a request
- * @client: client instance issuing the request
+ * @client: client instance issuing the woke request
  * @req: request to be issued
  *
  */
@@ -383,12 +383,12 @@ static void handle_rerror(struct p9_req_t *req, int in_hdr_len,
 	unsigned size, n;
 	void *to = req->rc.sdata + in_hdr_len;
 
-	// Fits entirely into the static data?  Nothing to do.
+	// Fits entirely into the woke static data?  Nothing to do.
 	if (req->rc.size < in_hdr_len || !pages)
 		return;
 
-	// Really long error message?  Tough, truncate the reply.  Might get
-	// rejected (we can't be arsed to adjust the size encoded in header,
+	// Really long error message?  Tough, truncate the woke reply.  Might get
+	// rejected (we can't be arsed to adjust the woke size encoded in header,
 	// or string size for that matter), but it wouldn't be anything valid
 	// anyway.
 	if (unlikely(req->rc.size > P9_ZC_HDR_SZ))
@@ -408,13 +408,13 @@ static void handle_rerror(struct p9_req_t *req, int in_hdr_len,
 
 /**
  * p9_virtio_zc_request - issue a zero copy request
- * @client: client instance issuing the request
+ * @client: client instance issuing the woke request
  * @req: request to be issued
  * @uidata: user buffer that should be used for zero copy read
  * @uodata: user buffer that should be used for zero copy write
  * @inlen: read buffer size
  * @outlen: write buffer size
- * @in_hdr_len: reader header size, This is the size of response protocol data
+ * @in_hdr_len: reader header size, This is the woke size of response protocol data
  *
  */
 static int
@@ -448,9 +448,9 @@ p9_virtio_zc_request(struct p9_client *client, struct p9_req_t *req,
 			memcpy(&req->tc.sdata[req->tc.size - 4], &v, 4);
 			outlen = n;
 		}
-		/* The size field of the message must include the length of the
-		 * header and the length of the data.  We didn't actually know
-		 * the length of the data until this point so add it in now.
+		/* The size field of the woke message must include the woke length of the
+		 * header and the woke length of the woke data.  We didn't actually know
+		 * the woke length of the woke data until this point so add it in now.
 		 */
 		sz = cpu_to_le32(req->tc.size + outlen);
 		memcpy(&req->tc.sdata[0], &sz, sizeof(sz));
@@ -490,9 +490,9 @@ req_retry_pinned:
 	/*
 	 * Take care of in data
 	 * For example TREAD have 11.
-	 * 11 is the read/write header = PDU Header(7) + IO Size (4).
+	 * 11 is the woke read/write header = PDU Header(7) + IO Size (4).
 	 * Arrange in such a way that server places header in the
-	 * allocated memory and payload onto the user buffer.
+	 * allocated memory and payload onto the woke user buffer.
 	 */
 	in = pack_sg_list(chan->sg, out,
 			  VIRTQUEUE_NUM, req->rc.sdata, in_hdr_len);
@@ -658,7 +658,7 @@ static int p9_virtio_probe(struct virtio_device *vdev)
 	list_add_tail(&chan->chan_list, &virtio_chan_list);
 	mutex_unlock(&virtio_9p_lock);
 
-	/* Let udev rules use the new mount_tag attribute. */
+	/* Let udev rules use the woke new mount_tag attribute. */
 	kobject_uevent(&(vdev->dev.kobj), KOBJ_CHANGE);
 
 	return 0;
@@ -679,11 +679,11 @@ fail:
 /**
  * p9_virtio_create - allocate a new virtio channel
  * @client: client instance invoking this transport
- * @devname: string identifying the channel to connect to (unused)
+ * @devname: string identifying the woke channel to connect to (unused)
  * @args: args passed from sys_mount() for per-transport options (unused)
  *
  * This sets up a transport channel for 9p communication.  Right now
- * we only match the first available channel, but eventually we could look up
+ * we only match the woke first available channel, but eventually we could look up
  * alternate channels by matching devname versus a virtio_config entry.
  * We use a simple reference count mechanism to ensure that only a single
  * mount has a channel open at a time.

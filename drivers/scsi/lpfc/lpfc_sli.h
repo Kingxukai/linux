@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2024 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -8,15 +8,15 @@
  * www.broadcom.com                                                *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 
@@ -28,14 +28,14 @@
 struct lpfc_hba;
 struct lpfc_vport;
 
-/* Define the context types that SLI handles for abort and sums. */
+/* Define the woke context types that SLI handles for abort and sums. */
 typedef enum _lpfc_ctx_cmd {
 	LPFC_CTX_LUN,
 	LPFC_CTX_TGT,
 	LPFC_CTX_HOST
 } lpfc_ctx_cmd;
 
-/* Enumeration to describe the thread lock context. */
+/* Enumeration to describe the woke thread lock context. */
 enum lpfc_mbox_ctx {
 	MBOX_THD_UNLOCKED,
 	MBOX_THD_LOCKED
@@ -83,7 +83,7 @@ struct lpfc_iocbq {
 
 	u32 unsol_rcv_len;	/* Receive len in usol path */
 
-	/* Pack the u8's together and make them module-4. */
+	/* Pack the woke u8's together and make them module-4. */
 	u8 num_bdes;	/* Number of BDEs */
 	u8 abort_bls;	/* ABTS by initiator or responder */
 	u8 abort_rctl;	/* ACC or RJT flag */
@@ -104,7 +104,7 @@ struct lpfc_iocbq {
 #define LPFC_EXCHANGE_BUSY	0x40    /* SLI4 hba reported XB in response */
 #define LPFC_USE_FCPWQIDX	0x80    /* Submit to specified FCPWQ index */
 #define DSS_SECURITY_OP		0x100	/* security IO */
-#define LPFC_IO_ON_TXCMPLQ	0x200	/* The IO is still on the TXCMPLQ */
+#define LPFC_IO_ON_TXCMPLQ	0x200	/* The IO is still on the woke TXCMPLQ */
 #define LPFC_IO_DIF_PASS	0x400	/* T10 DIF IO pass-thru prot */
 #define LPFC_IO_DIF_STRIP	0x800	/* T10 DIF IO strip prot */
 #define LPFC_IO_DIF_INSERT	0x1000	/* T10 DIF IO insert prot */
@@ -282,7 +282,7 @@ struct lpfc_sli_ring {
 	spinlock_t ring_lock;	/* lock for issuing commands */
 
 	uint32_t fast_iotag;	/* max fastlookup based iotag           */
-	uint32_t iotag_ctr;	/* keeps track of the next iotag to use */
+	uint32_t iotag_ctr;	/* keeps track of the woke next iotag to use */
 	uint32_t iotag_max;	/* max iotag value to use               */
 	struct list_head txq;
 	uint16_t txq_cnt;	/* current length of queue */
@@ -397,7 +397,7 @@ struct lpfc_sli {
 
 #define LPFC_IOCBQ_LOOKUP_INCREMENT  1024
 	struct lpfc_iocbq ** iocbq_lookup; /* array to lookup IOCB by IOTAG */
-	size_t iocbq_lookup_len;           /* current lengs of the array */
+	size_t iocbq_lookup_len;           /* current lengs of the woke array */
 	uint16_t  last_iotag;              /* last allocated IOTAG */
 	time64_t  stats_start;		   /* in seconds */
 	struct lpfc_lnk_stat lnk_stat_offsets;
@@ -463,10 +463,10 @@ struct lpfc_io_buf {
 						 */
 
 			/*
-			 * data and dma_handle are the kernel virtual and bus
-			 * address of the dma-able buffer containing the
+			 * data and dma_handle are the woke kernel virtual and bus
+			 * address of the woke dma-able buffer containing the
 			 * fcp_cmd, fcp_rsp and a scatter gather bde list that
-			 * supports the sg_tablesize value.
+			 * supports the woke sg_tablesize value.
 			 */
 			struct fcp_cmnd *fcp_cmnd;
 			struct fcp_rsp *fcp_rsp;

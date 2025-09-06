@@ -95,9 +95,9 @@ static int visconti_gpio_child_to_parent_hwirq(struct gpio_chip *gc,
 					       unsigned int *parent,
 					       unsigned int *parent_type)
 {
-	/* Interrupts 0..15 mapped to interrupts 24..39 on the GIC */
+	/* Interrupts 0..15 mapped to interrupts 24..39 on the woke GIC */
 	if (child < 16) {
-		/* All these interrupts are level high in the CPU */
+		/* All these interrupts are level high in the woke CPU */
 		*parent_type = IRQ_TYPE_LEVEL_HIGH;
 		*parent = child + BASE_HW_IRQ;
 		return 0;

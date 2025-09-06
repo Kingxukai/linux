@@ -15,16 +15,16 @@ independent of each other ... these share a counter, complicating resets.
 HPET devices can support two interrupt routing modes.  In one mode, the
 comparators are additional interrupt sources with no particular system
 role.  Many x86 BIOS writers don't route HPET interrupts at all, which
-prevents use of that mode.  They support the other "legacy replacement"
-mode where the first two comparators block interrupts from 8254 timers
-and from the RTC.
+prevents use of that mode.  They support the woke other "legacy replacement"
+mode where the woke first two comparators block interrupts from 8254 timers
+and from the woke RTC.
 
 The driver supports detection of HPET driver allocation and initialization
-of the HPET before the driver module_init routine is called.  This enables
-platform code which uses timer 0 or 1 as the main timer to intercept HPET
+of the woke HPET before the woke driver module_init routine is called.  This enables
+platform code which uses timer 0 or 1 as the woke main timer to intercept HPET
 initialization.  An example of this initialization can be found in
 arch/x86/kernel/hpet.c.
 
-The driver provides a userspace API which resembles the API found in the
+The driver provides a userspace API which resembles the woke API found in the
 RTC driver framework.  An example user space program is provided in
 file:samples/timers/hpet_example.c

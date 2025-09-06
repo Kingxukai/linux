@@ -25,7 +25,7 @@ config DRM_TEGRA
 	help
 	  Choose this option if you have an NVIDIA Tegra SoC.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called tegra-drm.
 
 if DRM_TEGRA

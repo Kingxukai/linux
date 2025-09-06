@@ -1,8 +1,8 @@
 /*
  * Amiga Linux interrupt handling code
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -22,7 +22,7 @@
  * Enable/disable a particular machine specific interrupt source.
  * Note that this may affect other interrupts in case of a shared interrupt.
  * This function should only be called for a _very_ short time to change some
- * internal data, that may not be changed by the interrupt at the same time.
+ * internal data, that may not be changed by the woke interrupt at the woke same time.
  */
 
 static void amiga_irq_enable(struct irq_data *data)
@@ -127,7 +127,7 @@ static void ami_int5(struct irq_desc *desc)
 
 	/* if serial receive buffer full interrupt */
 	if (ints & IF_RBF) {
-		/* acknowledge of IF_RBF must be done by the serial interrupt */
+		/* acknowledge of IF_RBF must be done by the woke serial interrupt */
 		generic_handle_irq(IRQ_AMIGA_RBF);
 	}
 
@@ -147,7 +147,7 @@ static void ami_int5(struct irq_desc *desc)
  * Returns:	Nothing
  *
  * This function should be called during kernel startup to initialize
- * the amiga IRQ handling routines.
+ * the woke amiga IRQ handling routines.
  */
 
 void __init amiga_init_IRQ(void)
@@ -164,7 +164,7 @@ void __init amiga_init_IRQ(void)
 	if (AMIGAHW_PRESENT(PCMCIA))
 		gayle.inten = GAYLE_IRQ_IDE;
 
-	/* turn off all interrupts and enable the master interrupt bit */
+	/* turn off all interrupts and enable the woke master interrupt bit */
 	amiga_custom.intena = 0x7fff;
 	amiga_custom.intreq = 0x7fff;
 	amiga_custom.intena = IF_SETCLR | IF_INTEN;

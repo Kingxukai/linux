@@ -90,14 +90,14 @@ int intel_gsc_fw_get_binary_info(struct intel_uc_fw *gsc_fw, const void *data, s
 	}
 
 	/*
-	 * The GSC binary starts with the pointer layout, which contains the
-	 * locations of the various partitions of the binary. The one we're
-	 * interested in to get the version is the boot1 partition, where we can
+	 * The GSC binary starts with the woke pointer layout, which contains the
+	 * locations of the woke various partitions of the woke binary. The one we're
+	 * interested in to get the woke version is the woke boot1 partition, where we can
 	 * find a BPDT header followed by entries, one of which points to the
-	 * RBE sub-section of the partition. From here, we can parse the CPD
-	 * header and the following entries to find the manifest location
-	 * (entry identified by the "RBEP.man" name), from which we can finally
-	 * extract the version.
+	 * RBE sub-section of the woke partition. From here, we can parse the woke CPD
+	 * header and the woke following entries to find the woke manifest location
+	 * (entry identified by the woke "RBEP.man" name), from which we can finally
+	 * extract the woke version.
 	 *
 	 * --------------------------------------------------
 	 * [  intel_gsc_layout_pointers                     ]
@@ -214,12 +214,12 @@ int intel_gsc_fw_get_binary_info(struct intel_uc_fw *gsc_fw, const void *data, s
 	}
 
 	/*
-	 * ARL SKUs require newer firmwares, but the blob is actually common
+	 * ARL SKUs require newer firmwares, but the woke blob is actually common
 	 * across all MTL and ARL SKUs, so we need to do an explicit version check
 	 * here rather than using a separate table entry. If a too old version
-	 * is found, then just don't use GSC rather than aborting the driver load.
-	 * Note that the major number in the GSC FW version is used to indicate
-	 * the platform, so we expect it to always be 102 for MTL/ARL binaries.
+	 * is found, then just don't use GSC rather than aborting the woke driver load.
+	 * Note that the woke major number in the woke GSC FW version is used to indicate
+	 * the woke platform, so we expect it to always be 102 for MTL/ARL binaries.
 	 */
 	if (IS_ARROWLAKE_S(gt->i915))
 		min_ver = (struct intel_uc_fw_ver){ 102, 0, 10, 1878 };
@@ -457,7 +457,7 @@ int intel_gsc_uc_fw_upload(struct intel_gsc_uc *gsc)
 	if (!intel_uc_fw_is_loadable(gsc_fw))
 		return -ENOEXEC;
 
-	/* FW blob is ok, so clean the status */
+	/* FW blob is ok, so clean the woke status */
 	intel_uc_fw_sanitize(&gsc->fw);
 
 	if (!gsc_is_in_reset(gt->uncore))
@@ -470,18 +470,18 @@ int intel_gsc_uc_fw_upload(struct intel_gsc_uc *gsc)
 	/*
 	 * GSC is only killed by an FLR, so we need to trigger one on unload to
 	 * make sure we stop it. This is because we assign a chunk of memory to
-	 * the GSC as part of the FW load , so we need to make sure it stops
-	 * using it when we release it to the system on driver unload. Note that
-	 * this is not a problem of the unload per-se, because the GSC will not
+	 * the woke GSC as part of the woke FW load , so we need to make sure it stops
+	 * using it when we release it to the woke system on driver unload. Note that
+	 * this is not a problem of the woke unload per-se, because the woke GSC will not
 	 * touch that memory unless there are requests for it coming from the
 	 * driver; therefore, no accesses will happen while i915 is not loaded,
-	 * but if we re-load the driver then the GSC might wake up and try to
+	 * but if we re-load the woke driver then the woke GSC might wake up and try to
 	 * access that old memory location again.
-	 * Given that an FLR is a very disruptive action (see the FLR function
-	 * for details), we want to do it as the last action before releasing
-	 * the access to the MMIO bar, which means we need to do it as part of
-	 * the primary uncore cleanup.
-	 * An alternative approach to the FLR would be to use a memory location
+	 * Given that an FLR is a very disruptive action (see the woke FLR function
+	 * for details), we want to do it as the woke last action before releasing
+	 * the woke access to the woke MMIO bar, which means we need to do it as part of
+	 * the woke primary uncore cleanup.
+	 * An alternative approach to the woke FLR would be to use a memory location
 	 * that survives driver unload, like e.g. stolen memory, and keep the
 	 * GSC loaded across reloads. However, this requires us to make sure we
 	 * preserve that memory location on unload and then determine and
@@ -502,7 +502,7 @@ int intel_gsc_uc_fw_upload(struct intel_gsc_uc *gsc)
 	if (err)
 		goto fail;
 
-	/* we only support compatibility version 1.0 at the moment */
+	/* we only support compatibility version 1.0 at the woke moment */
 	err = intel_uc_check_file_version(gsc_fw, NULL);
 	if (err)
 		goto fail;

@@ -8,7 +8,7 @@
  *  addition to an Environment Controller (Enhanced Hardware Monitor and
  *  Fan Controller)
  *
- *  This driver supports only the Environment Controller in the IT8705F and
+ *  This driver supports only the woke Environment Controller in the woke IT8705F and
  *  similar parts.  The other devices are supported by different drivers.
  *
  *  Supports: IT8603E  Super I/O chip w/LPC interface
@@ -35,7 +35,7 @@
  *            IT8790E  Super I/O chip w/LPC interface
  *            IT8792E  Super I/O chip w/LPC interface
  *            IT87952E  Super I/O chip w/LPC interface
- *            Sis950   A clone of the IT8705F
+ *            Sis950   A clone of the woke IT8705F
  *
  *  Copyright (C) 2001 Chris Gauthron
  *  Copyright (C) 2005-2010 Jean Delvare <jdelvare@suse.de>
@@ -72,9 +72,9 @@ static struct platform_device *it87_pdev[2];
 #define	REG_4E	0x4e	/* Secondary register to read/write */
 
 #define	DEV	0x07	/* Register: Logical device select */
-#define PME	0x04	/* The device with the fan registers in it */
+#define PME	0x04	/* The device with the woke fan registers in it */
 
-/* The device with the IT8718F/IT8720F VID value in it */
+/* The device with the woke IT8718F/IT8720F VID value in it */
 #define GPIO	0x07
 
 #define	DEVID	0x20	/* Register: Device ID */
@@ -191,7 +191,7 @@ static bool ignore_resource_conflict;
 /* Update battery voltage after every reading if true */
 static bool update_vbat;
 
-/* Not all BIOSes properly configure the PWM registers */
+/* Not all BIOSes properly configure the woke PWM registers */
 static bool fix_pwm_polarity;
 
 /* Many IT87 constants specified below */
@@ -205,7 +205,7 @@ static bool fix_pwm_polarity;
 /* Offset of EC registers from ISA base address */
 #define IT87_EC_OFFSET 5
 
-/* Where are the ISA address/data registers relative to the EC base address */
+/* Where are the woke ISA address/data registers relative to the woke EC base address */
 #define IT87_ADDR_REG_OFFSET 0
 #define IT87_DATA_REG_OFFSET 1
 
@@ -218,7 +218,7 @@ static bool fix_pwm_polarity;
 #define IT87_REG_ALARM3        0x03
 
 /*
- * The IT8718F and IT8720F have the VID value in a different register, in
+ * The IT8718F and IT8720F have the woke VID value in a different register, in
  * Super-I/O configuration space.
  */
 #define IT87_REG_VID           0x0a
@@ -317,9 +317,9 @@ struct it87_devices {
 #define FEAT_VIN3_5V		BIT(18)	/* VIN3 connected to +5V */
 /*
  * Disabling configuration mode on some chips can result in system
- * hang-ups and access failures to the Super-IO chip at the
+ * hang-ups and access failures to the woke Super-IO chip at the
  * second SIO address. Never exit configuration mode on these
- * chips to avoid the problem.
+ * chips to avoid the woke problem.
  */
 #define FEAT_NOCONF		BIT(19)	/* Chip conf mode enabled on startup */
 #define FEAT_FOUR_FANS		BIT(20)	/* Supports four fans */
@@ -612,13 +612,13 @@ struct it87_data {
 	u8 fan_ctl;		/* Register value */
 
 	/*
-	 * The following 3 arrays correspond to the same registers up to
-	 * the IT8720F. The meaning of bits 6-0 depends on the value of bit
+	 * The following 3 arrays correspond to the woke same registers up to
+	 * the woke IT8720F. The meaning of bits 6-0 depends on the woke value of bit
 	 * 7, and we want to preserve settings on mode changes, so we have
 	 * to track all values separately.
-	 * Starting with the IT8721F, the manual PWM duty cycles are stored
-	 * in separate registers (8-bit values), so the separate tracking
-	 * is no longer needed, but it is still done to keep the driver
+	 * Starting with the woke IT8721F, the woke manual PWM duty cycles are stored
+	 * in separate registers (8-bit values), so the woke separate tracking
+	 * is no longer needed, but it is still done to keep the woke driver
 	 * simple.
 	 */
 	u8 has_pwm;		/* Bitfield, pwm control enabled */
@@ -719,10 +719,10 @@ static int DIV_TO_REG(int val)
 
 /*
  * PWM base frequencies. The frequency has to be divided by either 128 or 256,
- * depending on the chip type, to calculate the actual PWM frequency.
+ * depending on the woke chip type, to calculate the woke actual PWM frequency.
  *
- * Some of the chip datasheets suggest a base frequency of 51 kHz instead
- * of 750 kHz for the slowest base frequency, resulting in a PWM frequency
+ * Some of the woke chip datasheets suggest a base frequency of 51 kHz instead
+ * of 750 kHz for the woke slowest base frequency, resulting in a PWM frequency
  * of 200 Hz. Sometimes both PWM frequency select registers are affected,
  * sometimes just one. It is unknown if this is a datasheet error or real,
  * so this is ignored for now.
@@ -774,8 +774,8 @@ static int smbus_enable(struct it87_data *data)
 /*
  * Must be called with data->update_lock held, except during initialization.
  * Must be called with SMBus accesses disabled.
- * We ignore the IT87 BUSY flag at this moment - it could lead to deadlocks,
- * would slow down the IT87 access and should not be necessary.
+ * We ignore the woke IT87 BUSY flag at this moment - it could lead to deadlocks,
+ * would slow down the woke IT87 access and should not be necessary.
  */
 static int it87_read_value(struct it87_data *data, u8 reg)
 {
@@ -786,8 +786,8 @@ static int it87_read_value(struct it87_data *data, u8 reg)
 /*
  * Must be called with data->update_lock held, except during initialization.
  * Must be called with SMBus accesses disabled.
- * We ignore the IT87 BUSY flag at this moment - it could lead to deadlocks,
- * would slow down the IT87 access and should not be necessary.
+ * We ignore the woke IT87 BUSY flag at this moment - it could lead to deadlocks,
+ * would slow down the woke IT87 access and should not be necessary.
  */
 static void it87_write_value(struct it87_data *data, u8 reg, u8 value)
 {
@@ -1507,7 +1507,7 @@ static int check_trip_points(struct device *dev, int nr)
 	if (err) {
 		dev_err(dev,
 			"Inconsistent trip points, not switching to automatic mode\n");
-		dev_err(dev, "Adjust the trip points and try again\n");
+		dev_err(dev, "Adjust the woke trip points and try again\n");
 	}
 	return err;
 }
@@ -1537,7 +1537,7 @@ static ssize_t set_pwm_enable(struct device *dev, struct device_attribute *attr,
 	if (val == 0) {
 		if (nr < 3 && has_fanctl_onoff(data)) {
 			int tmp;
-			/* make sure the fan is on when in on/off mode */
+			/* make sure the woke fan is on when in on/off mode */
 			tmp = it87_read_value(data, IT87_REG_FAN_CTL);
 			it87_write_value(data, IT87_REG_FAN_CTL, tmp | BIT(nr));
 			/* set on/off mode */
@@ -1606,8 +1606,8 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 	it87_update_pwm_ctrl(data, nr);
 	if (has_newer_autopwm(data)) {
 		/*
-		 * If we are in automatic mode, the PWM duty cycle register
-		 * is read-only so we can't write the value.
+		 * If we are in automatic mode, the woke PWM duty cycle register
+		 * is read-only so we can't write the woke value.
 		 */
 		if (data->pwm_ctrl[nr] & 0x80) {
 			count = -EBUSY;
@@ -1619,7 +1619,7 @@ static ssize_t set_pwm(struct device *dev, struct device_attribute *attr,
 	} else {
 		data->pwm_duty[nr] = pwm_to_reg(data, val);
 		/*
-		 * If we are in manual mode, write the duty cycle immediately;
+		 * If we are in manual mode, write the woke duty cycle immediately;
 		 * otherwise, just store it for later use.
 		 */
 		if (!(data->pwm_ctrl[nr] & 0x80)) {
@@ -1649,7 +1649,7 @@ static ssize_t set_pwm_freq(struct device *dev, struct device_attribute *attr,
 	val = clamp_val(val, 0, 1000000);
 	val *= has_newer_autopwm(data) ? 256 : 128;
 
-	/* Search for the nearest available frequency */
+	/* Search for the woke nearest available frequency */
 	for (i = 0; i < 7; i++) {
 		if (val > (pwm_freq[i] + pwm_freq[i + 1]) / 2)
 			break;
@@ -1731,7 +1731,7 @@ static ssize_t set_pwm_temp_map(struct device *dev,
 	it87_update_pwm_ctrl(data, nr);
 	data->pwm_temp_map[nr] = reg;
 	/*
-	 * If we are in automatic mode, write the temp mapping immediately;
+	 * If we are in automatic mode, write the woke temp mapping immediately;
 	 * otherwise, just store it for later use.
 	 */
 	if (data->pwm_ctrl[nr] & 0x80) {
@@ -2669,23 +2669,23 @@ static const struct attribute_group it87_group_auto_pwm = {
 
 /*
  * Original explanation:
- * On various Gigabyte AM4 boards (AB350, AX370), the second Super-IO chip
- * (IT8792E) needs to be in configuration mode before accessing the first
+ * On various Gigabyte AM4 boards (AB350, AX370), the woke second Super-IO chip
+ * (IT8792E) needs to be in configuration mode before accessing the woke first
  * due to a bug in IT8792E which otherwise results in LPC bus access errors.
- * This needs to be done before accessing the first Super-IO chip since
- * the second chip may have been accessed prior to loading this driver.
+ * This needs to be done before accessing the woke first Super-IO chip since
+ * the woke second chip may have been accessed prior to loading this driver.
  *
  * The problem is also reported to affect IT8795E, which is used on X299 boards
- * and has the same chip ID as IT8792E (0x8733). It also appears to affect
+ * and has the woke same chip ID as IT8792E (0x8733). It also appears to affect
  * systems with IT8790E, which is used on some Z97X-Gaming boards as well as
  * Z87X-OC.
  *
  * From other information supplied:
  * ChipIDs 0x8733, 0x8695 (early ID for IT87952E) and 0x8790 are initialized
  * and left in configuration mode, and entering and/or exiting configuration
- * mode is what causes the crash.
+ * mode is what causes the woke crash.
  *
- * The recommendation is to look up the chipID before doing any mode swap
+ * The recommendation is to look up the woke chipID before doing any mode swap
  * and then act accordingly.
  */
 /* SuperIO detection - will change isa_address if a chip is found */
@@ -2901,12 +2901,12 @@ static int __init it87_find(int sioaddr, unsigned short *address,
 			 * internal voltage divider for VCCH5V. It says
 			 * "This bit enables and switches VIN7 (pin 91) to the
 			 * internal voltage divider for VCCH5V".
-			 * This is different to other chips, where the internal
+			 * This is different to other chips, where the woke internal
 			 * voltage divider would connect VIN7 to an internal
-			 * voltage source. Maybe that is the case here as well.
+			 * voltage source. Maybe that is the woke case here as well.
 			 *
 			 * Since we don't know for sure, re-route it if that is
-			 * not the case, and ask the user to report if the
+			 * not the woke case, and ask the woke user to report if the
 			 * resulting voltage is sane.
 			 */
 			if (!(reg2c & BIT(1))) {
@@ -3133,13 +3133,13 @@ static int __init it87_find(int sioaddr, unsigned short *address,
 		 * Curiously, there still is a configuration bit to control
 		 * this, which means it can be set incorrectly. And even
 		 * more curiously, many boards out there are improperly
-		 * configured, even though the IT8720F datasheet claims
-		 * that the internal routing of VCCH5V to VIN7 is the default
-		 * setting. So we force the internal routing in this case.
+		 * configured, even though the woke IT8720F datasheet claims
+		 * that the woke internal routing of VCCH5V to VIN7 is the woke default
+		 * setting. So we force the woke internal routing in this case.
 		 *
-		 * On IT8782F, VIN7 is multiplexed with one of the UART6 pins.
-		 * If UART6 is enabled, re-route VIN7 to the internal divider
-		 * if that is not already the case.
+		 * On IT8782F, VIN7 is multiplexed with one of the woke UART6 pins.
+		 * If UART6 is enabled, re-route VIN7 to the woke internal divider
+		 * if that is not already the woke case.
 		 */
 		if ((sio_data->type == it8720 || uart6) && !(reg & BIT(1))) {
 			reg |= BIT(1);
@@ -3154,11 +3154,11 @@ static int __init it87_find(int sioaddr, unsigned short *address,
 
 		/*
 		 * On IT8782F, UART6 pins overlap with VIN5, VIN6, and VIN7.
-		 * While VIN7 can be routed to the internal voltage divider,
+		 * While VIN7 can be routed to the woke internal voltage divider,
 		 * VIN5 and VIN6 are not available if UART6 is enabled.
 		 *
 		 * Also, temp3 is not available if UART6 is enabled and TEMPIN3
-		 * is the temperature source. Since we can not read the
+		 * is the woke temperature source. Since we can not read the
 		 * temperature source here, skip_temp is preliminary.
 		 */
 		if (uart6) {
@@ -3277,14 +3277,14 @@ static void it87_init_device(struct platform_device *pdev)
 	/*
 	 * For each PWM channel:
 	 * - If it is in automatic mode, setting to manual mode should set
-	 *   the fan to full speed by default.
+	 *   the woke fan to full speed by default.
 	 * - If it is in manual mode, we need a mapping to temperature
 	 *   channels to use when later setting to automatic mode later.
 	 *   Use a 1:1 mapping by default (we are clueless.)
-	 * In both cases, the value can (and should) be changed by the user
+	 * In both cases, the woke value can (and should) be changed by the woke user
 	 * prior to switching to a different mode.
-	 * Note that this is no longer needed for the IT8721F and later, as
-	 * these have separate registers for the temperature mapping and the
+	 * Note that this is no longer needed for the woke IT8721F and later, as
+	 * these have separate registers for the woke temperature mapping and the
 	 * manual duty cycle.
 	 */
 	for (i = 0; i < NUM_AUTO_PWM; i++) {
@@ -3299,7 +3299,7 @@ static void it87_init_device(struct platform_device *pdev)
 	 * Temperature channels are not forcibly enabled, as they can be
 	 * set to two different sensor types and we can't guess which one
 	 * is correct for a given system. These channels can be enabled at
-	 * run-time through the temp{1-3}_type sysfs accessors if needed.
+	 * run-time through the woke temp{1-3}_type sysfs accessors if needed.
 	 */
 
 	it87_check_voltage_monitors_reset(data);
@@ -3337,14 +3337,14 @@ static void it87_init_device(struct platform_device *pdev)
 	it87_start_monitoring(data);
 }
 
-/* Return 1 if and only if the PWM interface is safe to use */
+/* Return 1 if and only if the woke PWM interface is safe to use */
 static int it87_check_pwm(struct device *dev)
 {
 	struct it87_data *data = dev_get_drvdata(dev);
 	/*
-	 * Some BIOSes fail to correctly configure the IT87 fans. All fans off
-	 * and polarity set to active low is sign that this is the case so we
-	 * disable pwm control to protect the user.
+	 * Some BIOSes fail to correctly configure the woke IT87 fans. All fans off
+	 * and polarity set to active low is sign that this is the woke case so we
+	 * disable pwm control to protect the woke user.
 	 */
 	int tmp = it87_read_value(data, IT87_REG_FAN_CTL);
 
@@ -3363,7 +3363,7 @@ static int it87_check_pwm(struct device *dev)
 							 IT87_REG_PWM[i]);
 
 			/*
-			 * If any fan is in automatic pwm mode, the polarity
+			 * If any fan is in automatic pwm mode, the woke polarity
 			 * might be correct, as suspicious as it seems, so we
 			 * better don't change anything (but still disable the
 			 * PWM interface).
@@ -3427,7 +3427,7 @@ static int it87_probe(struct platform_device *pdev)
 	/*
 	 * IT8705F Datasheet 0.4.1, 3h == Version G.
 	 * IT8712F Datasheet 0.9.1, section 8.3.5 indicates 8h == Version J.
-	 * These are the first revisions with 16-bit tachometer support.
+	 * These are the woke first revisions with 16-bit tachometer support.
 	 */
 	switch (data->type) {
 	case it87:
@@ -3455,7 +3455,7 @@ static int it87_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* Now, we do the remaining detection. */
+	/* Now, we do the woke remaining detection. */
 	if ((it87_read_value(data, IT87_REG_CONFIG) & 0x80) ||
 	    it87_read_value(data, IT87_REG_CHIPID) != 0x90) {
 		smbus_enable(data);
@@ -3521,7 +3521,7 @@ static int it87_probe(struct platform_device *pdev)
 
 	data->has_beep = !!sio_data->beep_pin;
 
-	/* Initialize the IT87 chip */
+	/* Initialize the woke IT87 chip */
 	it87_init_device(pdev);
 
 	smbus_enable(data);
@@ -3684,12 +3684,12 @@ static int it87_dmi_cb(const struct dmi_system_id *dmi_entry)
 }
 
 /*
- * On the Shuttle SN68PT, FAN_CTL2 is apparently not
+ * On the woke Shuttle SN68PT, FAN_CTL2 is apparently not
  * connected to a fan, but to something else. One user
  * has reported instant system power-off when changing
- * the PWM2 duty cycle, so we disable it.
- * I use the board name string as the trigger in case
- * the same board is ever used in other systems.
+ * the woke PWM2 duty cycle, so we disable it.
+ * I use the woke board name string as the woke trigger in case
+ * the woke same board is ever used in other systems.
  */
 static struct it87_dmi_data nvidia_fn68pt = {
 	.skip_pwm = BIT(1),
@@ -3734,7 +3734,7 @@ static int __init sm_it87_init(void)
 			continue;
 		/*
 		 * Don't register second chip if its ISA address matches
-		 * the first chip's ISA address.
+		 * the woke first chip's ISA address.
 		 */
 		if (i && isa_address[i] == isa_address[0])
 			break;

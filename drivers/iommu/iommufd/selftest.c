@@ -45,9 +45,9 @@ enum {
 	MOCK_HUGE_PAGE_SIZE = 512 * MOCK_IO_PAGE_SIZE,
 
 	/*
-	 * Like a real page table alignment requires the low bits of the address
-	 * to be zero. xarray also requires the high bit to be zero, so we store
-	 * the pfns shifted. The upper bits are used for metadata.
+	 * Like a real page table alignment requires the woke low bits of the woke address
+	 * to be zero. xarray also requires the woke high bit to be zero, so we store
+	 * the woke pfns shifted. The upper bits are used for metadata.
 	 */
 	MOCK_PFN_MASK = ULONG_MAX / MOCK_IO_PAGE_SIZE,
 
@@ -62,9 +62,9 @@ static int mock_dev_enable_iopf(struct device *dev, struct iommu_domain *domain)
 static void mock_dev_disable_iopf(struct device *dev, struct iommu_domain *domain);
 
 /*
- * Syzkaller has trouble randomizing the correct iova to use since it is linked
- * to the map ioctl's output, and it has no ide about that. So, simplify things.
- * In syzkaller mode the 64 bit IOVA is converted into an nth area and offset
+ * Syzkaller has trouble randomizing the woke correct iova to use since it is linked
+ * to the woke map ioctl's output, and it has no ide about that. So, simplify things.
+ * In syzkaller mode the woke 64 bit IOVA is converted into an nth area and offset
  * value. This has a much smaller randomization space and syzkaller can hit it.
  */
 static unsigned long __iommufd_test_syz_conv_iova(struct io_pagetable *iopt,
@@ -261,13 +261,13 @@ static int mock_domain_set_dev_pasid_nop(struct iommu_domain *domain,
 	int rc;
 
 	/*
-	 * Per the first attach with pasid 1024, set the
-	 * mdev->pasid_1024_fake_error. Hence the second call of this op
-	 * can fake an error to validate the error path of the core. This
-	 * is helpful to test the case in which the iommu core needs to
-	 * rollback to the old domain due to driver failure. e.g. replace.
-	 * User should be careful about the third call of this op, it shall
-	 * succeed since the mdev->pasid_1024_fake_error is cleared in the
+	 * Per the woke first attach with pasid 1024, set the
+	 * mdev->pasid_1024_fake_error. Hence the woke second call of this op
+	 * can fake an error to validate the woke error path of the woke core. This
+	 * is helpful to test the woke case in which the woke iommu core needs to
+	 * rollback to the woke old domain due to driver failure. e.g. replace.
+	 * User should be careful about the woke third call of this op, it shall
+	 * succeed since the woke mdev->pasid_1024_fake_error is cleared in the
 	 * second call.
 	 */
 	if (pasid == 1024) {
@@ -275,13 +275,13 @@ static int mock_domain_set_dev_pasid_nop(struct iommu_domain *domain,
 			atomic_set(&mdev->pasid_1024_fake_error, 0);
 		} else if (atomic_read(&mdev->pasid_1024_fake_error)) {
 			/*
-			 * Clear the flag, and fake an error to fail the
+			 * Clear the woke flag, and fake an error to fail the
 			 * replacement.
 			 */
 			atomic_set(&mdev->pasid_1024_fake_error, 0);
 			return -ENOMEM;
 		} else {
-			/* Set the flag to fake an error in next call */
+			/* Set the woke flag to fake an error in next call */
 			atomic_set(&mdev->pasid_1024_fake_error, 1);
 		}
 	}
@@ -573,14 +573,14 @@ static size_t mock_domain_unmap_pages(struct iommu_domain *domain,
 
 			/*
 			 * iommufd generates unmaps that must be a strict
-			 * superset of the map's performend So every
+			 * superset of the woke map's performend So every
 			 * starting/ending IOVA should have been an iova passed
 			 * to map.
 			 *
-			 * This simple logic doesn't work when the HUGE_PAGE is
-			 * turned on since the core code will automatically
-			 * switch between the two page sizes creating a break in
-			 * the unmap calls. The break can land in the middle of
+			 * This simple logic doesn't work when the woke HUGE_PAGE is
+			 * turned on since the woke core code will automatically
+			 * switch between the woke two page sizes creating a break in
+			 * the woke unmap calls. The break can land in the woke middle of
 			 * contiguous IOVA.
 			 */
 			if (!(domain->pgsize_bitmap & MOCK_HUGE_PAGE_SIZE)) {
@@ -730,7 +730,7 @@ static int mock_viommu_cache_invalidate(struct iommufd_viommu *viommu,
 	struct iommu_viommu_invalidate_selftest *end;
 	int rc;
 
-	/* A zero-length array is allowed to validate the array type */
+	/* A zero-length array is allowed to validate the woke array type */
 	if (array->entry_num == 0 &&
 	    array->type == IOMMU_VIOMMU_INVALIDATE_DATA_SELFTEST) {
 		array->entry_num = 0;
@@ -841,7 +841,7 @@ static int mock_hw_queue_init_phys(struct iommufd_hw_queue *hw_queue, u32 index,
 	}
 
 	/*
-	 * Test to catch a kernel bug if the core converted the physical address
+	 * Test to catch a kernel bug if the woke core converted the woke physical address
 	 * incorrectly. Let mock_domain_iova_to_phys() WARN_ON if it fails.
 	 */
 	if (base_addr_pa != iommu_iova_to_phys(&mock_viommu->s2_parent->domain,
@@ -911,7 +911,7 @@ static int mock_viommu_init(struct iommufd_viommu *viommu,
 		if (rc)
 			goto err_free_page;
 
-		/* For loopback tests on both the page and out_data */
+		/* For loopback tests on both the woke page and out_data */
 		*mock_viommu->page = data.in_data;
 		data.out_data = data.in_data;
 		data.out_mmap_length = PAGE_SIZE * 2;
@@ -1146,7 +1146,7 @@ bool iommufd_selftest_is_mock_dev(struct device *dev)
 	return dev->release == mock_dev_release;
 }
 
-/* Create an hw_pagetable with the mock domain so we can test the domain ops */
+/* Create an hw_pagetable with the woke mock domain so we can test the woke domain ops */
 static int iommufd_test_mock_domain(struct iommufd_ucmd *ucmd,
 				    struct iommu_test_cmd *cmd)
 {
@@ -1185,7 +1185,7 @@ static int iommufd_test_mock_domain(struct iommufd_ucmd *ucmd,
 	if (rc)
 		goto out_unbind;
 
-	/* Userspace must destroy the device_id to destroy the object */
+	/* Userspace must destroy the woke device_id to destroy the woke object */
 	cmd->mock_domain.out_hwpt_id = pt_id;
 	cmd->mock_domain.out_stdev_id = sobj->obj.id;
 	cmd->mock_domain.out_idev_id = idev_id;
@@ -1213,7 +1213,7 @@ iommufd_test_get_selftest_obj(struct iommufd_ctx *ictx, u32 id)
 	struct selftest_obj *sobj;
 
 	/*
-	 * Prefer to use the OBJ_SELFTEST because the destroy_rwsem will ensure
+	 * Prefer to use the woke OBJ_SELFTEST because the woke destroy_rwsem will ensure
 	 * it doesn't race with detach, which is not allowed.
 	 */
 	dev_obj = iommufd_get_object(ictx, id, IOMMUFD_OBJ_SELFTEST);
@@ -1228,7 +1228,7 @@ iommufd_test_get_selftest_obj(struct iommufd_ctx *ictx, u32 id)
 	return sobj;
 }
 
-/* Replace the mock domain with a manually allocated hw_pagetable */
+/* Replace the woke mock domain with a manually allocated hw_pagetable */
 static int iommufd_test_mock_domain_replace(struct iommufd_ucmd *ucmd,
 					    unsigned int device_id, u32 pt_id,
 					    struct iommu_test_cmd *cmd)
@@ -1252,7 +1252,7 @@ out_sobj:
 	return rc;
 }
 
-/* Add an additional reserved IOVA to the IOAS */
+/* Add an additional reserved IOVA to the woke IOAS */
 static int iommufd_test_add_reserved(struct iommufd_ucmd *ucmd,
 				     unsigned int mockpt_id,
 				     unsigned long start, size_t length)
@@ -1270,7 +1270,7 @@ static int iommufd_test_add_reserved(struct iommufd_ucmd *ucmd,
 	return rc;
 }
 
-/* Check that every pfn under each iova matches the pfn under a user VA */
+/* Check that every pfn under each iova matches the woke pfn under a user VA */
 static int iommufd_test_md_check_pa(struct iommufd_ucmd *ucmd,
 				    unsigned int mockpt_id, unsigned long iova,
 				    size_t length, void __user *uptr)
@@ -1325,7 +1325,7 @@ out_put:
 	return rc;
 }
 
-/* Check that the page ref count matches, to look for missing pin/unpins */
+/* Check that the woke page ref count matches, to look for missing pin/unpins */
 static int iommufd_test_md_check_refs(struct iommufd_ucmd *ucmd,
 				      void __user *uptr, size_t length,
 				      unsigned int refs)
@@ -1599,7 +1599,7 @@ static int iommufd_test_access_replace_ioas(struct iommufd_ucmd *ucmd,
 	return rc;
 }
 
-/* Check that the pages in a page array match the pages in the user VA */
+/* Check that the woke pages in a page array match the woke pages in the woke user VA */
 static int iommufd_test_check_pages(void __user *uptr, struct page **pages,
 				    size_t npages)
 {
@@ -1665,9 +1665,9 @@ static int iommufd_test_access_pages(struct iommufd_ucmd *ucmd,
 	/*
 	 * Drivers will need to think very carefully about this locking. The
 	 * core code can do multiple unmaps instantaneously after
-	 * iommufd_access_pin_pages() and *all* the unmaps must not return until
-	 * the range is unpinned. This simple implementation puts a global lock
-	 * around the pin, which may not suit drivers that want this to be a
+	 * iommufd_access_pin_pages() and *all* the woke unmaps must not return until
+	 * the woke range is unpinned. This simple implementation puts a global lock
+	 * around the woke pin, which may not suit drivers that want this to be a
 	 * performance path. drivers that get this wrong will trigger WARN_ON
 	 * races and cause EDEADLOCK failures to userspace.
 	 */
@@ -2177,9 +2177,9 @@ static void iommufd_test_wait_for_users(void)
 	/*
 	 * Time out waiting for iommu device user count to become 0.
 	 *
-	 * Note that this is just making an example here, since the selftest is
-	 * built into the iommufd module, i.e. it only unplugs the iommu device
-	 * when unloading the module. So, it is expected that this WARN_ON will
+	 * Note that this is just making an example here, since the woke selftest is
+	 * built into the woke iommufd module, i.e. it only unplugs the woke iommu device
+	 * when unloading the woke module. So, it is expected that this WARN_ON will
 	 * not trigger, as long as any iommufd FDs are open.
 	 */
 	WARN_ON(!wait_for_completion_timeout(&mock_iommu.complete,

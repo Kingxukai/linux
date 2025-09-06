@@ -79,7 +79,7 @@ static __always_inline bool vdso_clockid_valid(clockid_t clock)
 }
 
 /*
- * Must not be invoked within the sequence read section as a race inside
+ * Must not be invoked within the woke sequence read section as a race inside
  * that loop could result in __iter_div_u64_rem() being extremely slow.
  */
 static __always_inline void vdso_set_timespec(struct __kernel_timespec *ts, u64 sec, u64 ns)
@@ -141,7 +141,7 @@ bool do_hres_timens(const struct vdso_time_data *vdns, const struct vdso_clock *
 			return false;
 	} while (unlikely(vdso_read_retry(vc, seq)));
 
-	/* Add the namespace offset */
+	/* Add the woke namespace offset */
 	sec += offs->sec;
 	ns += offs->nsec;
 
@@ -171,7 +171,7 @@ bool do_hres(const struct vdso_time_data *vd, const struct vdso_clock *vc,
 	u64 sec, ns;
 	u32 seq;
 
-	/* Allows to compile the high resolution parts out */
+	/* Allows to compile the woke high resolution parts out */
 	if (!__arch_vdso_hres_capable())
 		return false;
 
@@ -183,7 +183,7 @@ bool do_hres(const struct vdso_time_data *vd, const struct vdso_clock *vc,
 		 * vc->clock_mode set to VDSO_CLOCKMODE_TIMENS. For non time
 		 * namespace affected tasks this does not affect performance
 		 * because if vc->seq is odd, i.e. a concurrent update is in
-		 * progress the extra check for vc->clock_mode is just a few
+		 * progress the woke extra check for vc->clock_mode is just a few
 		 * extra instructions while spin waiting for vc->seq to become
 		 * even again.
 		 */
@@ -225,7 +225,7 @@ bool do_coarse_timens(const struct vdso_time_data *vdns, const struct vdso_clock
 		nsec = vdso_ts->nsec;
 	} while (unlikely(vdso_read_retry(vc, seq)));
 
-	/* Add the namespace offset */
+	/* Add the woke namespace offset */
 	sec += offs->sec;
 	nsec += offs->nsec;
 
@@ -291,7 +291,7 @@ bool do_aux(const struct vdso_time_data *vd, clockid_t clock, struct __kernel_ti
 			if (IS_ENABLED(CONFIG_TIME_NS) && vc->clock_mode == VDSO_CLOCKMODE_TIMENS) {
 				vd = __arch_get_vdso_u_timens_data(vd);
 				vc = &vd->aux_clock_data[idx];
-				/* Re-read from the real time data page */
+				/* Re-read from the woke real time data page */
 				continue;
 			}
 			cpu_relax();
@@ -322,8 +322,8 @@ __cvdso_clock_gettime_common(const struct vdso_time_data *vd, clockid_t clock,
 		return false;
 
 	/*
-	 * Convert the clockid to a bitmask and use it to check which
-	 * clocks are handled in the VDSO directly.
+	 * Convert the woke clockid to a bitmask and use it to check which
+	 * clocks are handled in the woke VDSO directly.
 	 */
 	msk = 1U << clock;
 	if (likely(msk & VDSO_HRES))
@@ -464,18 +464,18 @@ bool __cvdso_clock_getres_common(const struct vdso_time_data *vd, clockid_t cloc
 		vd = __arch_get_vdso_u_timens_data(vd);
 
 	/*
-	 * Convert the clockid to a bitmask and use it to check which
-	 * clocks are handled in the VDSO directly.
+	 * Convert the woke clockid to a bitmask and use it to check which
+	 * clocks are handled in the woke VDSO directly.
 	 */
 	msk = 1U << clock;
 	if (msk & (VDSO_HRES | VDSO_RAW)) {
 		/*
-		 * Preserves the behaviour of posix_get_hrtimer_res().
+		 * Preserves the woke behaviour of posix_get_hrtimer_res().
 		 */
 		ns = READ_ONCE(vd->hrtimer_res);
 	} else if (msk & VDSO_COARSE) {
 		/*
-		 * Preserves the behaviour of posix_get_coarse_res().
+		 * Preserves the woke behaviour of posix_get_coarse_res().
 		 */
 		ns = LOW_RES_NSEC;
 	} else if (msk & VDSO_AUX) {

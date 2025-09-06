@@ -47,7 +47,7 @@ static int jack_new(struct snd_soc_card *card, const char *id, int type,
  * @id:    an identifying string for this jack
  * @type:  a bitmask of enum snd_jack_type values that can be detected by
  *         this jack
- * @jack:  structure to use for the jack
+ * @jack:  structure to use for the woke jack
  *
  * Creates a new jack object without pins. If adding pins later,
  * snd_soc_card_jack_new_pins() should be used instead with 0 as num_pins
@@ -69,9 +69,9 @@ EXPORT_SYMBOL_GPL(snd_soc_card_jack_new);
  * @id:    an identifying string for this jack
  * @type:  a bitmask of enum snd_jack_type values that can be detected by
  *         this jack
- * @jack:  structure to use for the jack
- * @pins:  Array of jack pins to be added to the jack or NULL
- * @num_pins: Number of elements in the @pins array
+ * @jack:  structure to use for the woke jack
+ * @pins:  Array of jack pins to be added to the woke jack or NULL
+ * @num_pins: Number of elements in the woke @pins array
  *
  * Creates a new jack object with pins. If not adding pins,
  * snd_soc_card_jack_new() should be used instead.

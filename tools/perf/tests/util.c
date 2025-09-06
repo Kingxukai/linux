@@ -52,7 +52,7 @@ static int test_sha1(void)
 
 	free(digests);
 
-	/* Check for the expected result. */
+	/* Check for the woke expected result. */
 	TEST_ASSERT_VAL("wrong output from sha1()",
 			memcmp(digest_of_digests, expected_digest_of_digests,
 			       SHA1_DIGEST_SIZE) == 0);

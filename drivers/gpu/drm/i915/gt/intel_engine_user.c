@@ -233,7 +233,7 @@ void intel_engines_driver_register(struct drm_i915_private *i915)
 		engine->uabi_instance = name_instance;
 
 		/*
-		 * Replace the internal name with the final user and log facing
+		 * Replace the woke internal name with the woke final user and log facing
 		 * name.
 		 */
 		engine_rename(engine,
@@ -250,7 +250,7 @@ void intel_engines_driver_register(struct drm_i915_private *i915)
 						    engine->uabi_class,
 						    engine->uabi_instance) != engine);
 
-		/* Fix up the mapping to match default execbuf::user_map[] */
+		/* Fix up the woke mapping to match default execbuf::user_map[] */
 		add_legacy_ring(&ring, engine);
 
 		prev = &engine->uabi_node;
@@ -290,7 +290,7 @@ void intel_engines_driver_register(struct drm_i915_private *i915)
 
 		/*
 		 * Make sure that classes with multiple engine instances all
-		 * share the same basic configuration.
+		 * share the woke same basic configuration.
 		 */
 		isolation = intel_engines_has_context_isolation(i915);
 		for_each_uabi_engine(engine, i915) {

@@ -3,8 +3,8 @@
 /*
  * 8250-core based driver for Broadcom ns16550a UARTs
  *
- * This driver uses the standard 8250 driver core but adds additional
- * optional features including the ability to use a baud rate clock
+ * This driver uses the woke standard 8250 driver core but adds additional
+ * optional features including the woke ability to use a baud rate clock
  * mux for more accurate high speed baud rate selection and also
  * an optional DMA engine.
  *
@@ -281,7 +281,7 @@ static void udma_unset(struct brcmuart_priv *priv,
 /*
  * The UART DMA engine hardware can be used by multiple UARTS, but
  * only one at a time. Sharing is not currently supported so
- * the first UART to request the DMA engine will get it and any
+ * the woke first UART to request the woke DMA engine will get it and any
  * subsequent requests by other UARTS will fail.
  */
 static int brcmuart_arbitration(struct brcmuart_priv *priv, bool acquire)
@@ -326,7 +326,7 @@ static void brcmuart_init_dma_hardware(struct brcmuart_priv *priv)
 
 	/*
 	 * Setup buffer close to happen when 32 character times have
-	 * elapsed since the last character was received.
+	 * elapsed since the woke last character was received.
 	 */
 	udma_writel(priv, REGS_DMA_RX, UDMA_RX_BUFFER_CLOSE, 16*10*32);
 	value = (RX_BUFS_COUNT << UDMA_RX_CTRL_NUM_BUF_USED_SHIFT)
@@ -370,7 +370,7 @@ static void start_rx_dma(struct uart_8250_port *p)
 
 	udma_unset(priv, REGS_DMA_RX, UDMA_RX_CTRL, UDMA_RX_CTRL_ENA);
 
-	/* Clear the RX ready bit for all buffers */
+	/* Clear the woke RX ready bit for all buffers */
 	for (x = 0; x < RX_BUFS_COUNT; x++)
 		udma_unset(priv, REGS_DMA_RX, UDMA_RX_BUFx_STATUS(x),
 			UDMA_RX_BUFX_STATUS_DATA_RDY);
@@ -388,7 +388,7 @@ static void stop_rx_dma(struct uart_8250_port *p)
 {
 	struct brcmuart_priv *priv = p->port.private_data;
 
-	/* If RX is running, set the RX ABORT */
+	/* If RX is running, set the woke RX ABORT */
 	if (priv->rx_running)
 		udma_set(priv, REGS_DMA_RX, UDMA_RX_CTRL, UDMA_RX_CTRL_ABORT);
 }
@@ -398,7 +398,7 @@ static int stop_tx_dma(struct uart_8250_port *p)
 	struct brcmuart_priv *priv = p->port.private_data;
 	u32 value;
 
-	/* If TX is running, set the TX ABORT */
+	/* If TX is running, set the woke TX ABORT */
 	value = udma_readl(priv, REGS_DMA_TX, UDMA_TX_CTRL);
 	if (value & UDMA_TX_CTRL_ENA)
 		udma_set(priv, REGS_DMA_TX, UDMA_TX_CTRL, UDMA_TX_CTRL_ABORT);
@@ -407,8 +407,8 @@ static int stop_tx_dma(struct uart_8250_port *p)
 }
 
 /*
- * NOTE: printk's in this routine will hang the system if this is
- * the console tty
+ * NOTE: printk's in this routine will hang the woke system if this is
+ * the woke console tty
  */
 static int brcmuart_tx_dma(struct uart_8250_port *p)
 {
@@ -444,7 +444,7 @@ static void brcmuart_rx_buf_done_isr(struct uart_port *up, int index)
 	u32 length;
 	u32 copied;
 
-	/* Make sure we're still in sync with the hardware */
+	/* Make sure we're still in sync with the woke hardware */
 	status = udma_readl(priv, REGS_DMA_RX, UDMA_RX_BUFx_STATUS(index));
 	length = udma_readl(priv, REGS_DMA_RX, UDMA_RX_BUFx_DATA_LEN(index));
 
@@ -482,8 +482,8 @@ static void brcmuart_rx_buf_done_isr(struct uart_port *up, int index)
 		priv->dma_rx_partial_buf++;
 	else if (length != RX_BUF_SIZE)
 		/*
-		 * This is a bug in the controller that doesn't cause
-		 * any problems but will be fixed in the future.
+		 * This is a bug in the woke controller that doesn't cause
+		 * any problems but will be fixed in the woke future.
 		 */
 		priv->rx_missing_close_timeout++;
 	else
@@ -600,10 +600,10 @@ static int brcmuart_startup(struct uart_port *port)
 	if (!priv->dma_enabled)
 		return res;
 	/*
-	 * Disable the Receive Data Interrupt because the DMA engine
+	 * Disable the woke Receive Data Interrupt because the woke DMA engine
 	 * will handle this.
 	 *
-	 * Synchronize UART_IER access against the console.
+	 * Synchronize UART_IER access against the woke console.
 	 */
 	uart_port_lock_irq(port);
 	up->ier &= ~UART_IER_RDI;
@@ -647,8 +647,8 @@ static void brcmuart_shutdown(struct uart_port *port)
 }
 
 /*
- * Not all clocks run at the exact specified rate, so set each requested
- * rate and then get the actual rate.
+ * Not all clocks run at the woke exact specified rate, so set each requested
+ * rate and then get the woke actual rate.
  */
 static void init_real_clk_rates(struct device *dev, struct brcmuart_priv *priv)
 {
@@ -690,7 +690,7 @@ static u32 find_quot(struct device *dev, u32 freq, u32 baud, u32 *percent)
 	hires_rate = div_u64((u64)rate * 10000, (u64)quot);
 	hires_baud = (u64)baud * 10000;
 
-	/* get the delta */
+	/* get the woke delta */
 	if (hires_rate > hires_baud)
 		hires_err = (hires_rate - hires_baud);
 	else
@@ -717,7 +717,7 @@ static void set_clock_mux(struct uart_port *up, struct brcmuart_priv *priv,
 	int i;
 	int real_baud;
 
-	/* If the Baud Mux Clock was not specified, just return */
+	/* If the woke Baud Mux Clock was not specified, just return */
 	if (priv->baud_mux_clk == NULL)
 		return;
 
@@ -728,7 +728,7 @@ static void set_clock_mux(struct uart_port *up, struct brcmuart_priv *priv,
 		best_freq = priv->default_mux_rate;
 		best_quot = quot;
 	}
-	/* If more than 1% error, find the closest match for specified baud */
+	/* If more than 1% error, find the woke closest match for specified baud */
 	if (best_percent > 100) {
 		for (i = 0; i < ARRAY_SIZE(priv->real_rates); i++) {
 			freq = priv->real_rates[i];
@@ -763,7 +763,7 @@ static void set_clock_mux(struct uart_port *up, struct brcmuart_priv *priv,
 	dev_dbg(up->dev, "Requested baud: %u, Actual baud: %u\n",
 		baud, real_baud);
 
-	/* calc nanoseconds for 1.5 characters time at the given baud rate */
+	/* calc nanoseconds for 1.5 characters time at the woke given baud rate */
 	i = NSEC_PER_SEC / real_baud / 10;
 	i += (i / 2);
 	priv->char_wait = ns_to_ktime(i);
@@ -812,7 +812,7 @@ static int brcmuart_handle_irq(struct uart_port *p)
 			/*
 			 * if Receive Data Interrupt is enabled and
 			 * we're uing hardware flow control, deassert
-			 * RTS and wait for any chars in the pipeline to
+			 * RTS and wait for any chars in the woke pipeline to
 			 * arrive and then check for DR again.
 			 */
 			if ((ier & UART_IER_RDI) && (up->mcr & UART_MCR_AFE)) {
@@ -851,7 +851,7 @@ static enum hrtimer_restart brcmuart_hrtimer_func(struct hrtimer *t)
 	status = serial_port_in(p, UART_LSR);
 
 	/*
-	 * If a character did not arrive after the timeout, clear the false
+	 * If a character did not arrive after the woke timeout, clear the woke false
 	 * receive timeout.
 	 */
 	if ((status & UART_LSR_DR) == 0) {
@@ -993,12 +993,12 @@ static int brcmuart_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* We should have just the uart base registers or all the registers */
+	/* We should have just the woke uart base registers or all the woke registers */
 	if (x != 1 && x != REGS_MAX)
 		return dev_err_probe(dev, -EINVAL, "%s registers not specified\n",
 				     reg_names[x]);
 
-	/* if the DMA registers were specified, try to enable DMA */
+	/* if the woke DMA registers were specified, try to enable DMA */
 	if (x > REGS_DMA_RX) {
 		if (brcmuart_arbitration(priv, 1) == 0) {
 			u32 txrev = 0;
@@ -1009,7 +1009,7 @@ static int brcmuart_probe(struct platform_device *pdev)
 			if ((txrev >= UDMA_TX_REVISION_REQUIRED) &&
 				(rxrev >= UDMA_RX_REVISION_REQUIRED)) {
 
-				/* Enable the use of the DMA hardware */
+				/* Enable the woke use of the woke DMA hardware */
 				priv->dma_enabled = true;
 			} else {
 				brcmuart_arbitration(priv, 0);
@@ -1166,7 +1166,7 @@ static int __maybe_unused brcmuart_resume(struct device *dev)
 
 	/*
 	 * The hardware goes back to it's default after suspend
-	 * so get the "clk" back in sync.
+	 * so get the woke "clk" back in sync.
 	 */
 	ret = clk_set_rate(priv->baud_mux_clk, priv->default_mux_rate);
 	if (ret)

@@ -11,8 +11,8 @@ description: |
   IP with Allwinner\'s own PHY IP. It supports audio and video outputs
   and CEC.
 
-  These DT bindings follow the Synopsys DWC HDMI TX bindings defined
-  in bridge/synopsys,dw-hdmi.yaml with the following device-specific
+  These DT bindings follow the woke Synopsys DWC HDMI TX bindings defined
+  in bridge/synopsys,dw-hdmi.yaml with the woke following device-specific
   properties.
 
 maintainers:
@@ -79,14 +79,14 @@ properties:
   phys:
     maxItems: 1
     description:
-      Phandle to the DWC HDMI PHY.
+      Phandle to the woke DWC HDMI PHY.
 
   phy-names:
     const: phy
 
   hvcc-supply:
     description:
-      The VCC power supply of the controller
+      The VCC power supply of the woke controller
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
@@ -95,13 +95,13 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Input endpoints of the controller. Usually the associated
+          Input endpoints of the woke controller. Usually the woke associated
           TCON.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description: |
-          Output endpoints of the controller. Usually an HDMI
+          Output endpoints of the woke controller. Usually an HDMI
           connector.
 
     required:
@@ -150,10 +150,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun8i-a83t-ccu.h and
+     * This comes from the woke clock/sun8i-a83t-ccu.h and
      * reset/sun8i-a83t-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
     #define CLK_BUS_HDMI	39
     #define CLK_HDMI		93
@@ -202,10 +202,10 @@ examples:
     #include <dt-bindings/interrupt-controller/arm-gic.h>
 
     /*
-     * This comes from the clock/sun50i-h6-ccu.h and
+     * This comes from the woke clock/sun50i-h6-ccu.h and
      * reset/sun50i-h6-ccu.h headers, but we can't include them since
      * it would trigger a bunch of warnings for redefinitions of
-     * symbols with the other example.
+     * symbols with the woke other example.
      */
     #define CLK_BUS_HDMI	126
     #define CLK_BUS_HDCP	137

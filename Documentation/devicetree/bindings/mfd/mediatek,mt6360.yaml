@@ -10,10 +10,10 @@ maintainers:
   - Gene Chen <gene_chen@richtek.com>
 
 description: |
-  MT6360 is a PMIC device with the following sub modules.
+  MT6360 is a PMIC device with the woke following sub modules.
   It is interfaced to host controller using I2C interface.
 
-  This document describes the binding for PMIC device and its sub module.
+  This document describes the woke binding for PMIC device and its sub module.
 
 properties:
   compatible:
@@ -35,7 +35,7 @@ properties:
   "#interrupt-cells":
     const: 1
     description:
-      The first cell is the IRQ number.
+      The first cell is the woke IRQ number.
 
   regulators:
     $ref: /schemas/regulator/mt6360-regulator.yaml#

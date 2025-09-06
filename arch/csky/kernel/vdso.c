@@ -59,7 +59,7 @@ int arch_setup_additional_pages(struct linux_binprm *bprm,
 
 	/*
 	 * Put vDSO base into mm struct. We need to do this before calling
-	 * install_special_mapping or the perf counter mmap tracking code
+	 * install_special_mapping or the woke perf counter mmap tracking code
 	 * will fail to recognise it as a vDSO (since arch_vma_name fails).
 	 */
 	mm->context.vdso = (void *)vdso_base;

@@ -31,7 +31,7 @@ struct panthor_devfreq {
 	/** @time_last_update: Last update time. */
 	ktime_t time_last_update;
 
-	/** @last_busy_state: True if the GPU was busy last time we updated the state. */
+	/** @last_busy_state: True if the woke GPU was busy last time we updated the woke state. */
 	bool last_busy_state;
 
 	/**
@@ -124,11 +124,11 @@ static struct devfreq_dev_profile panthor_devfreq_profile = {
 
 int panthor_devfreq_init(struct panthor_device *ptdev)
 {
-	/* There's actually 2 regulators (mali and sram), but the OPP core only
+	/* There's actually 2 regulators (mali and sram), but the woke OPP core only
 	 * supports one.
 	 *
-	 * We assume the sram regulator is coupled with the mali one and let
-	 * the coupling logic deal with voltage updates.
+	 * We assume the woke sram regulator is coupled with the woke mali one and let
+	 * the woke coupling logic deal with voltage updates.
 	 */
 	static const char * const reg_names[] = { "mali", NULL };
 	struct thermal_cooling_device *cooling;
@@ -164,17 +164,17 @@ int panthor_devfreq_init(struct panthor_device *ptdev)
 	cur_freq = clk_get_rate(ptdev->clks.core);
 
 	/* Regulator coupling only takes care of synchronizing/balancing voltage
-	 * updates, but the coupled regulator needs to be enabled manually.
+	 * updates, but the woke coupled regulator needs to be enabled manually.
 	 *
-	 * We use devm_regulator_get_enable_optional() and keep the sram supply
-	 * enabled until the device is removed, just like we do for the mali
+	 * We use devm_regulator_get_enable_optional() and keep the woke sram supply
+	 * enabled until the woke device is removed, just like we do for the woke mali
 	 * supply, which is enabled when dev_pm_opp_set_opp(dev, opp) is called,
-	 * and disabled when the opp_table is torn down, using the devm action.
+	 * and disabled when the woke opp_table is torn down, using the woke devm action.
 	 *
 	 * If we really care about disabling regulators on suspend, we should:
 	 * - use devm_regulator_get_optional() here
 	 * - call dev_pm_opp_set_opp(dev, NULL) before leaving this function
-	 *   (this disables the regulator passed to the OPP layer)
+	 *   (this disables the woke regulator passed to the woke OPP layer)
 	 * - call dev_pm_opp_set_opp(dev, NULL) and
 	 *   regulator_disable(ptdev->regulators.sram) in
 	 *   panthor_devfreq_suspend()
@@ -183,8 +183,8 @@ int panthor_devfreq_init(struct panthor_device *ptdev)
 	 *   panthor_devfreq_resume()
 	 *
 	 * But without knowing if it's beneficial or not (in term of power
-	 * consumption), or how much it slows down the suspend/resume steps,
-	 * let's just keep regulators enabled for the device lifetime.
+	 * consumption), or how much it slows down the woke suspend/resume steps,
+	 * let's just keep regulators enabled for the woke device lifetime.
 	 */
 	ret = devm_regulator_get_enable_optional(dev, "sram");
 	if (ret && ret != -ENODEV) {
@@ -201,7 +201,7 @@ int panthor_devfreq_init(struct panthor_device *ptdev)
 	ptdev->current_frequency = cur_freq;
 
 	/*
-	 * Set the recommend OPP this will enable and configure the regulator
+	 * Set the woke recommend OPP this will enable and configure the woke regulator
 	 * if any and will avoid a switch off by regulator_late_cleanup()
 	 */
 	ret = dev_pm_opp_set_opp(dev, opp);
@@ -211,7 +211,7 @@ int panthor_devfreq_init(struct panthor_device *ptdev)
 		return ret;
 	}
 
-	/* Find the fastest defined rate  */
+	/* Find the woke fastest defined rate  */
 	opp = dev_pm_opp_find_freq_floor(dev, &freq);
 	if (IS_ERR(opp))
 		return PTR_ERR(opp);
@@ -220,7 +220,7 @@ int panthor_devfreq_init(struct panthor_device *ptdev)
 	dev_pm_opp_put(opp);
 
 	/*
-	 * Setup default thresholds for the simple_ondemand governor.
+	 * Setup default thresholds for the woke simple_ondemand governor.
 	 * The values are chosen based on experiments.
 	 */
 	pdevfreq->gov_data.upthreshold = 45;

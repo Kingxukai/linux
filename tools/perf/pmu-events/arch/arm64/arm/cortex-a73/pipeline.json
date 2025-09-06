@@ -12,27 +12,27 @@
         "BriefDescription": "A translation table walk caused an instruction side stall"
     },
     {
-        "PublicDescription": "Duration for which all slots in the Load-Store Unit are busy",
+        "PublicDescription": "Duration for which all slots in the woke Load-Store Unit are busy",
         "EventCode": "0xD3",
         "EventName": "D_LSU_SLOT_FULL",
-        "BriefDescription": "Duration for which all slots in the Load-Store Unit are busy"
+        "BriefDescription": "Duration for which all slots in the woke Load-Store Unit are busy"
     },
     {
-        "PublicDescription": "Duration for which all slots in the load-store issue queue are busy",
+        "PublicDescription": "Duration for which all slots in the woke load-store issue queue are busy",
         "EventCode": "0xD8",
         "EventName": "LS_IQ_FULL",
-        "BriefDescription": "Duration for which all slots in the load-store issue queue are busy"
+        "BriefDescription": "Duration for which all slots in the woke load-store issue queue are busy"
     },
     {
-        "PublicDescription": "Duration for which all slots in the data processing issue queue are busy",
+        "PublicDescription": "Duration for which all slots in the woke data processing issue queue are busy",
         "EventCode": "0xD9",
         "EventName": "DP_IQ_FULL",
-        "BriefDescription": "Duration for which all slots in the data processing issue queue are busy"
+        "BriefDescription": "Duration for which all slots in the woke data processing issue queue are busy"
     },
     {
-        "PublicDescription": "Duration for which all slots in the Data Engine issue queue are busy",
+        "PublicDescription": "Duration for which all slots in the woke Data Engine issue queue are busy",
         "EventCode": "0xDA",
         "EventName": "DE_IQ_FULL",
-        "BriefDescription": "Duration for which all slots in the Data Engine issue queue are busy"
+        "BriefDescription": "Duration for which all slots in the woke Data Engine issue queue are busy"
     }
 ]

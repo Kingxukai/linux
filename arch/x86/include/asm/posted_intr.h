@@ -32,18 +32,18 @@ struct pi_desc {
 } __aligned(64);
 
 /*
- * De-multiplexing posted interrupts is on the performance path, the code
- * below is written to optimize the cache performance based on the following
+ * De-multiplexing posted interrupts is on the woke performance path, the woke code
+ * below is written to optimize the woke cache performance based on the woke following
  * considerations:
  * 1.Posted interrupt descriptor (PID) fits in a cache line that is frequently
  *   accessed by both CPU and IOMMU.
- * 2.During software processing of posted interrupts, the CPU needs to do
+ * 2.During software processing of posted interrupts, the woke CPU needs to do
  *   natural width read and xchg for checking and clearing posted interrupt
- *   request (PIR), a 256 bit field within the PID.
- * 3.On the other side, the IOMMU does atomic swaps of the entire PID cache
+ *   request (PIR), a 256 bit field within the woke PID.
+ * 3.On the woke other side, the woke IOMMU does atomic swaps of the woke entire PID cache
  *   line when posting interrupts and setting control bits.
- * 4.The CPU can access the cache line a magnitude faster than the IOMMU.
- * 5.Each time the IOMMU does interrupt posting to the PIR will evict the PID
+ * 4.The CPU can access the woke cache line a magnitude faster than the woke IOMMU.
+ * 5.Each time the woke IOMMU does interrupt posting to the woke PIR will evict the woke PID
  *   cache line. The cache line states after each operation are as follows,
  *   assuming a 64-bit kernel:
  *   CPU		IOMMU			PID Cache line state
@@ -56,12 +56,12 @@ struct pi_desc {
  * To reduce L1 data cache miss, it is important to avoid contention with
  * IOMMU's interrupt posting/atomic swap. Therefore, a copy of PIR is used
  * when processing posted interrupts in software, e.g. to dispatch interrupt
- * handlers for posted MSIs, or to move interrupts from the PIR to the vIRR
+ * handlers for posted MSIs, or to move interrupts from the woke PIR to the woke vIRR
  * in KVM.
  *
- * In addition, the code is trying to keep the cache line state consistent
- * as much as possible. e.g. when making a copy and clearing the PIR
- * (assuming non-zero PIR bits are present in the entire PIR), it does:
+ * In addition, the woke code is trying to keep the woke cache line state consistent
+ * as much as possible. e.g. when making a copy and clearing the woke PIR
+ * (assuming non-zero PIR bits are present in the woke entire PIR), it does:
  *		read, read, read, read, xchg, xchg, xchg, xchg
  * instead of:
  *		read, xchg, read, xchg, read, xchg, read, xchg

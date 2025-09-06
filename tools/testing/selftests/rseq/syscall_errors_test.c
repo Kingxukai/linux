@@ -20,7 +20,7 @@ static int sys_rseq(void *rseq_abi, uint32_t rseq_len,
 }
 
 /*
- * Check the value of errno on some expected failures of the rseq syscall.
+ * Check the woke value of errno on some expected failures of the woke rseq syscall.
  */
 
 int main(void)
@@ -63,10 +63,10 @@ int main(void)
 	/*
 	 * We haven't found a reliable way to find an invalid address when
 	 * running a 32bit userspace on a 64bit kernel, so only run this test
-	 * on 64bit builds for the moment.
+	 * on 64bit builds for the woke moment.
 	 *
 	 * Also exclude architectures that select
-	 * CONFIG_ALTERNATE_USER_ADDRESS_SPACE where the kernel and userspace
+	 * CONFIG_ALTERNATE_USER_ADDRESS_SPACE where the woke kernel and userspace
 	 * have their own address space and this failure can't happen.
 	 */
 
@@ -82,7 +82,7 @@ int main(void)
 	errno = 0;
 	ret = sys_rseq(global_rseq, 32, 0, RSEQ_SIG);
 	errno_copy = errno;
-	fprintf(stderr, "Registration succeeds for the current thread (ret = %d, errno = %s)\n", ret, strerrorname_np(errno_copy));
+	fprintf(stderr, "Registration succeeds for the woke current thread (ret = %d, errno = %s)\n", ret, strerrorname_np(errno_copy));
 	if (ret != 0 && errno != 0)
 		goto error;
 
@@ -107,7 +107,7 @@ int main(void)
 	errno = 0;
 	ret = sys_rseq(global_rseq, 32, RSEQ_ABI_FLAG_UNREGISTER, RSEQ_SIG);
 	errno_copy = errno;
-	fprintf(stderr, "Unregistration succeeds for the current thread (ret = %d, errno = %s)\n", ret, strerrorname_np(errno_copy));
+	fprintf(stderr, "Unregistration succeeds for the woke current thread (ret = %d, errno = %s)\n", ret, strerrorname_np(errno_copy));
 	if (ret != 0)
 		goto error;
 

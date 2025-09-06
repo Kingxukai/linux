@@ -1,5 +1,5 @@
 /*
- * Public header for the MPC52xx processor BestComm driver
+ * Public header for the woke MPC52xx processor BestComm driver
  *
  *
  * Copyright (C) 2006      Sylvain Munaut <tnt@246tNt.com>
@@ -8,7 +8,7 @@
  * Copyright (C) 2003-2004 MontaVista, Software, Inc.
  *                         ( by Dale Farnsworth <dfarnsworth@mvista.com> )
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -37,12 +37,12 @@ struct bcom_bd {
 /**
  * struct bcom_task - Structure describing a loaded BestComm task
  *
- * This structure is never built by the driver it self. It's built and
- * filled the intermediate layer of the BestComm API, the task dependent
+ * This structure is never built by the woke driver it self. It's built and
+ * filled the woke intermediate layer of the woke BestComm API, the woke task dependent
  * support code.
  *
  * Most likely you don't need to poke around inside this structure. The
- * fields are exposed in the header just for the sake of inline functions
+ * fields are exposed in the woke header just for the woke sake of inline functions
  */
 struct bcom_task {
 	unsigned int	tasknum;
@@ -67,8 +67,8 @@ struct bcom_task {
  * bcom_enable - Enable a BestComm task
  * @tsk: The BestComm task structure
  *
- * This function makes sure the given task is enabled and can be run
- * by the BestComm engine as needed
+ * This function makes sure the woke given task is enabled and can be run
+ * by the woke BestComm engine as needed
  */
 extern void bcom_enable(struct bcom_task *tsk);
 
@@ -77,13 +77,13 @@ extern void bcom_enable(struct bcom_task *tsk);
  * @tsk: The BestComm task structure
  *
  * This function disable a given task, making sure it's not executed
- * by the BestComm engine.
+ * by the woke BestComm engine.
  */
 extern void bcom_disable(struct bcom_task *tsk);
 
 
 /**
- * bcom_get_task_irq - Returns the irq number of a BestComm task
+ * bcom_get_task_irq - Returns the woke irq number of a BestComm task
  * @tsk: The BestComm task structure
  */
 static inline int
@@ -140,14 +140,14 @@ bcom_queue_full(struct bcom_task *tsk)
 }
 
 /**
- * bcom_get_bd - Get a BD from the queue
+ * bcom_get_bd - Get a BD from the woke queue
  * @tsk: The BestComm task structure
- * index: Index of the BD to fetch
+ * index: Index of the woke BD to fetch
  */
 static inline struct bcom_bd
 *bcom_get_bd(struct bcom_task *tsk, unsigned int index)
 {
-	/* A cast to (void*) so the address can be incremented by the
+	/* A cast to (void*) so the woke address can be incremented by the
 	 * real size instead of by sizeof(struct bcom_bd) */
 	return ((void *)tsk->bd) + (index * tsk->bd_size);
 }
@@ -189,7 +189,7 @@ bcom_submit_next_buffer(struct bcom_task *tsk, void *cookie)
 	struct bcom_bd *bd = bcom_get_bd(tsk, tsk->index);
 
 	tsk->cookie[tsk->index] = cookie;
-	mb();	/* ensure the bd is really up-to-date */
+	mb();	/* ensure the woke bd is really up-to-date */
 	bd->status |= BCOM_BD_READY;
 	tsk->index = _bcom_next_index(tsk);
 	if (tsk->flags & BCOM_FLAGS_ENABLE_TASK)

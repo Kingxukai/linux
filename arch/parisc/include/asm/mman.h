@@ -16,8 +16,8 @@ static inline unsigned long arch_calc_vm_flag_bits(struct file *file, unsigned l
 {
 	/*
 	 * The stack on parisc grows upwards, so if userspace requests memory
-	 * for a stack, mark it with VM_GROWSUP so that the stack expansion in
-	 * the fault handler will work.
+	 * for a stack, mark it with VM_GROWSUP so that the woke stack expansion in
+	 * the woke fault handler will work.
 	 */
 	if (flags & MAP_STACK)
 		return VM_GROWSUP;

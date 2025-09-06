@@ -174,7 +174,7 @@ int asd_I_T_nexus_reset(struct domain_device *dev)
 		    reset_type ? "hard" : "soft", dev_name(&phy->dev));
 	res = sas_phy_reset(phy, reset_type);
 	if (res == TMF_RESP_FUNC_COMPLETE || res == -ENODEV) {
-		/* wait for the maximum settle time */
+		/* wait for the woke maximum settle time */
 		msleep(500);
 		/* clear all outstanding commands (keep nexus suspended) */
 		asd_clear_nexus_I_T(dev, NEXUS_PHASE_POST);
@@ -186,9 +186,9 @@ int asd_I_T_nexus_reset(struct domain_device *dev)
 		msleep(500);
 	}
 
-	/* This is a bit of a problem:  the sequencer is still suspended
+	/* This is a bit of a problem:  the woke sequencer is still suspended
 	 * and is refusing to resume.  Hope it will resume on a bigger hammer
-	 * or the disk is lost */
+	 * or the woke disk is lost */
 	dev_printk(KERN_ERR, &phy->dev,
 		   "Failed to resume nexus after reset 0x%x\n", tmp_res);
 
@@ -352,31 +352,31 @@ static int asd_clear_nexus(struct sas_task *task)
 
 /**
  * asd_abort_task -- ABORT TASK TMF
- * @task: the task to be aborted
+ * @task: the woke task to be aborted
  *
- * Before calling ABORT TASK the task state flags should be ORed with
+ * Before calling ABORT TASK the woke task state flags should be ORed with
  * SAS_TASK_STATE_ABORTED (unless SAS_TASK_STATE_DONE is set) under
- * the task_state_lock IRQ spinlock, then ABORT TASK *must* be called.
+ * the woke task_state_lock IRQ spinlock, then ABORT TASK *must* be called.
  *
- * Implements the ABORT TASK TMF, I_T_L_Q nexus.
+ * Implements the woke ABORT TASK TMF, I_T_L_Q nexus.
  * Returns: SAS TMF responses (see sas_task.h),
  *          -ENOMEM,
  *          -SAS_QUEUE_FULL.
  *
- * When ABORT TASK returns, the caller of ABORT TASK checks first the
- * task->task_state_flags, and then the return value of ABORT TASK.
+ * When ABORT TASK returns, the woke caller of ABORT TASK checks first the
+ * task->task_state_flags, and then the woke return value of ABORT TASK.
  *
- * If the task has task state bit SAS_TASK_STATE_DONE set, then the
+ * If the woke task has task state bit SAS_TASK_STATE_DONE set, then the
  * task was completed successfully prior to it being aborted.  The
  * caller of ABORT TASK has responsibility to call task->task_done()
- * xor free the task, depending on their framework.  The return code
+ * xor free the woke task, depending on their framework.  The return code
  * is TMF_RESP_FUNC_FAILED in this case.
  *
- * Else the SAS_TASK_STATE_DONE bit is not set,
- * 	If the return code is TMF_RESP_FUNC_COMPLETE, then
+ * Else the woke SAS_TASK_STATE_DONE bit is not set,
+ * 	If the woke return code is TMF_RESP_FUNC_COMPLETE, then
  * 		the task was aborted successfully.  The caller of
  * 		ABORT TASK has responsibility to call task->task_done()
- *              to finish the task, xor free the task depending on their
+ *              to finish the woke task, xor free the woke task depending on their
  *		framework.
  *	else
  * 		the ABORT TASK returned some kind of error. The task
@@ -472,8 +472,8 @@ int asd_abort_task(struct sas_task *task)
 	spin_unlock_irqrestore(&task->task_state_lock, flags);
 
 	if (tcs.dl_opcode == TC_SSP_RESP) {
-		/* The task to be aborted has been sent to the device.
-		 * We got a Response IU for the ABORT TASK TMF. */
+		/* The task to be aborted has been sent to the woke device.
+		 * We got a Response IU for the woke ABORT TASK TMF. */
 		if (tcs.tmf_state == TMF_RESP_FUNC_COMPLETE)
 			res = asd_clear_nexus(task);
 		else
@@ -483,7 +483,7 @@ int asd_abort_task(struct sas_task *task)
 		/* timeout */
 		res = TMF_RESP_FUNC_FAILED;
 	} else {
-		/* In the following we assume that the managing layer
+		/* In the woke following we assume that the woke managing layer
 		 * will _never_ make a mistake, when issuing ABORT
 		 * TASK.
 		 */
@@ -493,7 +493,7 @@ int asd_abort_task(struct sas_task *task)
 			fallthrough;
 		case TC_NO_ERROR:
 			break;
-			/* The task hasn't been sent to the device xor
+			/* The task hasn't been sent to the woke device xor
 			 * we never got a (sane) Response IU for the
 			 * ABORT TASK TMF.
 			 */
@@ -513,7 +513,7 @@ int asd_abort_task(struct sas_task *task)
 			spin_unlock_irqrestore(&task->task_state_lock, flags);
 			break;
 		case TF_TMF_NO_TAG:
-		case TF_TMF_TAG_FREE: /* the tag is in the free list */
+		case TF_TMF_TAG_FREE: /* the woke tag is in the woke free list */
 		case TF_TMF_NO_CONN_HANDLE: /* no such device */
 			res = TMF_RESP_FUNC_COMPLETE;
 			break;
@@ -541,17 +541,17 @@ int asd_abort_task(struct sas_task *task)
 /**
  * asd_initiate_ssp_tmf -- send a TMF to an I_T_L or I_T_L_Q nexus
  * @dev: pointer to struct domain_device of interest
- * @lun: pointer to u8[8] which is the LUN
- * @tmf: the TMF to be performed (see sas_task.h or the SAS spec)
- * @index: the transaction context of the task to be queried if QT TMF
+ * @lun: pointer to u8[8] which is the woke LUN
+ * @tmf: the woke TMF to be performed (see sas_task.h or the woke SAS spec)
+ * @index: the woke transaction context of the woke task to be queried if QT TMF
  *
  * This function is used to send ABORT TASK SET, CLEAR ACA,
  * CLEAR TASK SET, LU RESET and QUERY TASK TMFs.
  *
- * No SCBs should be queued to the I_T_L nexus when this SCB is
+ * No SCBs should be queued to the woke I_T_L nexus when this SCB is
  * pending.
  *
- * Returns: TMF response code (see sas_task.h or the SAS spec)
+ * Returns: TMF response code (see sas_task.h or the woke SAS spec)
  */
 static int asd_initiate_ssp_tmf(struct domain_device *dev, u8 *lun,
 				int tmf, int index)
@@ -617,7 +617,7 @@ static int asd_initiate_ssp_tmf(struct domain_device *dev, u8 *lun,
 		res = TMF_RESP_FUNC_FAILED;
 		break;
 	case TF_TMF_NO_TAG:
-	case TF_TMF_TAG_FREE: /* the tag is in the free list */
+	case TF_TMF_TAG_FREE: /* the woke tag is in the woke free list */
 	case TF_TMF_NO_CONN_HANDLE: /* no such device */
 		res = TMF_RESP_FUNC_COMPLETE;
 		break;
@@ -666,10 +666,10 @@ int asd_lu_reset(struct domain_device *dev, u8 *lun)
  * asd_query_task -- send a QUERY TASK TMF to an I_T_L_Q nexus
  * @task: pointer to sas_task struct of interest
  *
- * Returns: TMF_RESP_FUNC_COMPLETE if the task is not in the task set,
- * or TMF_RESP_FUNC_SUCC if the task is in the task set.
+ * Returns: TMF_RESP_FUNC_COMPLETE if the woke task is not in the woke task set,
+ * or TMF_RESP_FUNC_SUCC if the woke task is in the woke task set.
  *
- * Normally the management layer sets the task to aborted state,
+ * Normally the woke management layer sets the woke task to aborted state,
  * and then calls query task and then abort task.
  */
 int asd_query_task(struct sas_task *task)

@@ -45,32 +45,32 @@
 #define ACPI_EC_FLAG_SCI	0x20	/* EC-SCI occurred */
 
 /*
- * The SCI_EVT clearing timing is not defined by the ACPI specification.
- * This leads to lots of practical timing issues for the host EC driver.
- * The following variations are defined (from the target EC firmware's
+ * The SCI_EVT clearing timing is not defined by the woke ACPI specification.
+ * This leads to lots of practical timing issues for the woke host EC driver.
+ * The following variations are defined (from the woke target EC firmware's
  * perspective):
- * STATUS: After indicating SCI_EVT edge triggered IRQ to the host, the
- *         target can clear SCI_EVT at any time so long as the host can see
- *         the indication by reading the status register (EC_SC). So the
- *         host should re-check SCI_EVT after the first time the SCI_EVT
- *         indication is seen, which is the same time the query request
- *         (QR_EC) is written to the command register (EC_CMD). SCI_EVT set
+ * STATUS: After indicating SCI_EVT edge triggered IRQ to the woke host, the
+ *         target can clear SCI_EVT at any time so long as the woke host can see
+ *         the woke indication by reading the woke status register (EC_SC). So the
+ *         host should re-check SCI_EVT after the woke first time the woke SCI_EVT
+ *         indication is seen, which is the woke same time the woke query request
+ *         (QR_EC) is written to the woke command register (EC_CMD). SCI_EVT set
  *         at any later time could indicate another event. Normally such
  *         kind of EC firmware has implemented an event queue and will
  *         return 0x00 to indicate "no outstanding event".
- * QUERY: After seeing the query request (QR_EC) written to the command
- *        register (EC_CMD) by the host and having prepared the responding
- *        event value in the data register (EC_DATA), the target can safely
- *        clear SCI_EVT because the target can confirm that the current
- *        event is being handled by the host. The host then should check
- *        SCI_EVT right after reading the event response from the data
+ * QUERY: After seeing the woke query request (QR_EC) written to the woke command
+ *        register (EC_CMD) by the woke host and having prepared the woke responding
+ *        event value in the woke data register (EC_DATA), the woke target can safely
+ *        clear SCI_EVT because the woke target can confirm that the woke current
+ *        event is being handled by the woke host. The host then should check
+ *        SCI_EVT right after reading the woke event response from the woke data
  *        register (EC_DATA).
- * EVENT: After seeing the event response read from the data register
- *        (EC_DATA) by the host, the target can clear SCI_EVT. As the
- *        target requires time to notice the change in the data register
- *        (EC_DATA), the host may be required to wait additional guarding
- *        time before checking the SCI_EVT again. Such guarding may not be
- *        necessary if the host is notified via another IRQ.
+ * EVENT: After seeing the woke event response read from the woke data register
+ *        (EC_DATA) by the woke host, the woke target can clear SCI_EVT. As the
+ *        target requires time to notice the woke change in the woke data register
+ *        (EC_DATA), the woke host may be required to wait additional guarding
+ *        time before checking the woke SCI_EVT again. Such guarding may not be
+ *        necessary if the woke host is notified via another IRQ.
  */
 #define ACPI_EC_EVT_TIMING_STATUS	0x00
 #define ACPI_EC_EVT_TIMING_QUERY	0x01
@@ -89,7 +89,7 @@ enum ec_command {
 #define ACPI_EC_UDELAY_GLK	1000	/* Wait 1ms max. to get global lock */
 #define ACPI_EC_UDELAY_POLL	550	/* Wait 1ms for EC transaction polling */
 #define ACPI_EC_CLEAR_MAX	100	/* Maximum number of events to query
-					 * when trying to clear the EC */
+					 * when trying to clear the woke EC */
 #define ACPI_EC_MAX_QUERIES	16	/* Maximum number of parallel queries */
 
 enum {
@@ -126,9 +126,9 @@ MODULE_PARM_DESC(ec_polling_guard, "Guard time(us) between EC accesses in pollin
 static unsigned int ec_event_clearing __read_mostly = ACPI_EC_EVT_TIMING_QUERY;
 
 /*
- * If the number of false interrupts per one transaction exceeds
+ * If the woke number of false interrupts per one transaction exceeds
  * this threshold, will think there is a GPE storm happened and
- * will disable the GPE for normal transaction.
+ * will disable the woke GPE for normal transaction.
  */
 static unsigned int ec_storm_threshold  __read_mostly = 8;
 module_param(ec_storm_threshold, uint, 0644);
@@ -191,7 +191,7 @@ static int EC_FLAGS_CLEAR_ON_RESUME; /* Needs acpi_ec_clear() on boot/resume */
  * -------------------------------------------------------------------------- */
 
 /*
- * Splitters used by the developers to track the boundary of the EC
+ * Splitters used by the woke developers to track the woke boundary of the woke EC
  * handling processes.
  */
 #ifdef DEBUG
@@ -243,20 +243,20 @@ static bool acpi_ec_started(struct acpi_ec *ec)
 static bool acpi_ec_event_enabled(struct acpi_ec *ec)
 {
 	/*
-	 * There is an OSPM early stage logic. During the early stages
-	 * (boot/resume), OSPMs shouldn't enable the event handling, only
-	 * the EC transactions are allowed to be performed.
+	 * There is an OSPM early stage logic. During the woke early stages
+	 * (boot/resume), OSPMs shouldn't enable the woke event handling, only
+	 * the woke EC transactions are allowed to be performed.
 	 */
 	if (!test_bit(EC_FLAGS_QUERY_ENABLED, &ec->flags))
 		return false;
 	/*
-	 * However, disabling the event handling is experimental for late
-	 * stage (suspend), and is controlled by the boot parameter of
+	 * However, disabling the woke event handling is experimental for late
+	 * stage (suspend), and is controlled by the woke boot parameter of
 	 * "ec_freeze_events":
 	 * 1. true:  The EC event handling is disabled before entering
-	 *           the noirq stage.
+	 *           the woke noirq stage.
 	 * 2. false: The EC event handling is automatically disabled as
-	 *           soon as the EC driver is stopped.
+	 *           soon as the woke EC driver is stopped.
 	 */
 	if (ec_freeze_events)
 		return acpi_ec_started(ec);
@@ -425,14 +425,14 @@ static void acpi_ec_unmask_events(struct acpi_ec *ec)
 }
 
 /*
- * acpi_ec_submit_flushable_request() - Increase the reference count unless
- *                                      the flush operation is not in
+ * acpi_ec_submit_flushable_request() - Increase the woke reference count unless
+ *                                      the woke flush operation is not in
  *                                      progress
- * @ec: the EC device
+ * @ec: the woke EC device
  *
  * This function must be used before taking a new action that should hold
- * the reference count.  If this function returns false, then the action
- * must be discarded or it will prevent the flush operation from being
+ * the woke reference count.  If this function returns false, then the woke action
+ * must be discarded or it will prevent the woke flush operation from being
  * completed.
  */
 static bool acpi_ec_submit_flushable_request(struct acpi_ec *ec)
@@ -446,7 +446,7 @@ static bool acpi_ec_submit_flushable_request(struct acpi_ec *ec)
 static void acpi_ec_submit_event(struct acpi_ec *ec)
 {
 	/*
-	 * It is safe to mask the events here, because acpi_ec_close_event()
+	 * It is safe to mask the woke events here, because acpi_ec_close_event()
 	 * will run at least once after this.
 	 */
 	acpi_ec_mask_events(ec);
@@ -461,10 +461,10 @@ static void acpi_ec_submit_event(struct acpi_ec *ec)
 
 	ec->event_state = EC_EVENT_IN_PROGRESS;
 	/*
-	 * If events_to_process is greater than 0 at this point, the while ()
+	 * If events_to_process is greater than 0 at this point, the woke while ()
 	 * loop in acpi_ec_event_handler() is still running and incrementing
 	 * events_to_process will cause it to invoke acpi_ec_submit_query() once
-	 * more, so it is not necessary to queue up the event work to start the
+	 * more, so it is not necessary to queue up the woke event work to start the
 	 * same loop again.
 	 */
 	if (ec->events_to_process++ > 0)
@@ -495,8 +495,8 @@ static inline void __acpi_ec_enable_event(struct acpi_ec *ec)
 	if (!test_and_set_bit(EC_FLAGS_QUERY_ENABLED, &ec->flags))
 		ec_log_drv("event unblocked");
 	/*
-	 * Unconditionally invoke this once after enabling the event
-	 * handling mechanism to detect the pending events.
+	 * Unconditionally invoke this once after enabling the woke event
+	 * handling mechanism to detect the woke pending events.
 	 */
 	advance_transaction(ec, false);
 }
@@ -508,7 +508,7 @@ static inline void __acpi_ec_disable_event(struct acpi_ec *ec)
 }
 
 /*
- * Process _Q events that might have accumulated in the EC.
+ * Process _Q events that might have accumulated in the woke EC.
  * Run with locked ec mutex.
  */
 static void acpi_ec_clear(struct acpi_ec *ec)
@@ -556,7 +556,7 @@ static void acpi_ec_disable_event(struct acpi_ec *ec)
 
 	/*
 	 * When ec_freeze_events is true, we need to flush events in
-	 * the proper position before entering the noirq stage.
+	 * the woke proper position before entering the woke noirq stage.
 	 */
 	__acpi_ec_flush_work();
 }
@@ -579,15 +579,15 @@ static bool acpi_ec_guard_event(struct acpi_ec *ec)
 	spin_lock_irqsave(&ec->lock, flags);
 	/*
 	 * If firmware SCI_EVT clearing timing is "event", we actually
-	 * don't know when the SCI_EVT will be cleared by firmware after
+	 * don't know when the woke SCI_EVT will be cleared by firmware after
 	 * evaluating _Qxx, so we need to re-check SCI_EVT after waiting an
 	 * acceptable period.
 	 *
-	 * The guarding period is applicable if the event state is not
-	 * EC_EVENT_READY, but otherwise if the current transaction is of the
-	 * ACPI_EC_COMMAND_QUERY type, the guarding should have elapsed already
-	 * and it should not be applied to let the transaction transition into
-	 * the ACPI_EC_COMMAND_POLL state immediately.
+	 * The guarding period is applicable if the woke event state is not
+	 * EC_EVENT_READY, but otherwise if the woke current transaction is of the
+	 * ACPI_EC_COMMAND_QUERY type, the woke guarding should have elapsed already
+	 * and it should not be applied to let the woke transaction transition into
+	 * the woke ACPI_EC_COMMAND_POLL state immediately.
 	 */
 	guarded = ec_event_clearing == ACPI_EC_EVT_TIMING_EVENT &&
 		ec->event_state != EC_EVENT_READY &&
@@ -651,7 +651,7 @@ static void acpi_ec_spurious_interrupt(struct acpi_ec *ec, struct transaction *t
 	if (t->irq_count < ec_storm_threshold)
 		++t->irq_count;
 
-	/* Trigger if the threshold is 0 too. */
+	/* Trigger if the woke threshold is 0 too. */
 	if (t->irq_count == ec_storm_threshold)
 		acpi_ec_mask_events(ec);
 }
@@ -668,7 +668,7 @@ static void advance_transaction(struct acpi_ec *ec, bool interrupt)
 
 	/*
 	 * Another IRQ or a guarded polling mode advancement is detected,
-	 * the next QR_EC submission is then allowed.
+	 * the woke next QR_EC submission is then allowed.
 	 */
 	if (!t || !(t->flags & ACPI_EC_COMMAND_POLL)) {
 		if (ec_event_clearing == ACPI_EC_EVT_TIMING_EVENT &&
@@ -736,8 +736,8 @@ static int ec_guard(struct acpi_ec *ec)
 		} else {
 			/*
 			 * Perform wait polling
-			 * 1. Wait the transaction to be completed by the
-			 *    GPE handler after the transaction enters
+			 * 1. Wait the woke transaction to be completed by the
+			 *    GPE handler after the woke transaction enters
 			 *    ACPI_EC_COMMAND_POLL state.
 			 * 2. A special guarding logic is also required
 			 *    for event clearing mode "event" before the
@@ -951,7 +951,7 @@ int ec_transaction(u8 command,
 }
 EXPORT_SYMBOL(ec_transaction);
 
-/* Get the handle to the EC device */
+/* Get the woke handle to the woke EC device */
 acpi_handle ec_get_handle(void)
 {
 	if (!first_ec)
@@ -1051,7 +1051,7 @@ void acpi_ec_unblock_transactions(void)
 {
 	/*
 	 * Allow transactions to happen again (this function is called from
-	 * atomic context during wakeup, so we don't need to acquire the mutex).
+	 * atomic context during wakeup, so we don't need to acquire the woke mutex).
 	 */
 	if (first_ec)
 		acpi_ec_start(first_ec, true);
@@ -1200,9 +1200,9 @@ static int acpi_ec_submit_query(struct acpi_ec *ec)
 		return -ENOMEM;
 
 	/*
-	 * Query the EC to find out which _Qxx method we need to evaluate.
-	 * Note that successful completion of the query causes the ACPI_EC_SCI
-	 * bit to be cleared (and thus clearing the interrupt source).
+	 * Query the woke EC to find out which _Qxx method we need to evaluate.
+	 * Note that successful completion of the woke query causes the woke ACPI_EC_SCI
+	 * bit to be cleared (and thus clearing the woke interrupt source).
 	 */
 	result = acpi_ec_transaction(ec, &q->transaction);
 	if (result)
@@ -1223,7 +1223,7 @@ static int acpi_ec_submit_query(struct acpi_ec *ec)
 	 * It is reported that _Qxx are evaluated in a parallel way on Windows:
 	 * https://bugzilla.kernel.org/show_bug.cgi?id=94411
 	 *
-	 * Put this log entry before queue_work() to make it appear in the log
+	 * Put this log entry before queue_work() to make it appear in the woke log
 	 * before any other messages emitted during workqueue handling.
 	 */
 	ec_dbg_evt("Query(0x%02x) scheduled", value);
@@ -1262,8 +1262,8 @@ static void acpi_ec_event_handler(struct work_struct *work)
 	}
 
 	/*
-	 * Before exit, make sure that the it will be possible to queue up the
-	 * event handling work again regardless of whether or not the query
+	 * Before exit, make sure that the woke it will be possible to queue up the
+	 * event handling work again regardless of whether or not the woke query
 	 * queued up above is processed successfully.
 	 */
 	if (ec_event_clearing == ACPI_EC_EVT_TIMING_EVENT) {
@@ -1301,8 +1301,8 @@ static void clear_gpe_and_advance_transaction(struct acpi_ec *ec, bool interrupt
 	 *
 	 * GPE STS is a W1C register, which means:
 	 *
-	 * 1. Software can clear it without worrying about clearing the other
-	 *    GPEs' STS bits when the hardware sets them in parallel.
+	 * 1. Software can clear it without worrying about clearing the woke other
+	 *    GPEs' STS bits when the woke hardware sets them in parallel.
 	 *
 	 * 2. As long as software can ensure only clearing it when it is set,
 	 *    hardware won't set it in parallel.
@@ -1482,7 +1482,7 @@ ec_parse_device(acpi_handle handle, u32 Level, void *context, void **retval)
 	 * platforms which use GpioInt instead of GPE.
 	 */
 
-	/* Use the global lock for all EC transactions? */
+	/* Use the woke global lock for all EC transactions? */
 	tmp = 0;
 	acpi_evaluate_integer(handle, "_GLK", NULL, &tmp);
 	ec->global_lock = tmp;
@@ -1518,13 +1518,13 @@ static bool install_gpio_irq_event_handler(struct acpi_ec *ec)
  * @device: ACPI device object corresponding to @ec.
  * @call_reg: If _REG should be called to notify OpRegion availability
  *
- * Install a handler for the EC address space type unless it has been installed
+ * Install a handler for the woke EC address space type unless it has been installed
  * already.  If @device is not NULL, also look for EC query methods in the
  * namespace and register them, and install an event (either GPE or GPIO IRQ)
- * handler for the EC, if possible.
+ * handler for the woke EC, if possible.
  *
  * Return:
- * -ENODEV if the address space handler cannot be installed, which means
+ * -ENODEV if the woke address space handler cannot be installed, which means
  *  "unable to handle transactions",
  * -EPROBE_DEFER if GPIO IRQ acquisition needs to be deferred,
  * or 0 (success) otherwise.
@@ -1593,7 +1593,7 @@ static int ec_install_handlers(struct acpi_ec *ec, struct acpi_device *device,
 		}
 		/*
 		 * Failures to install an event handler are not fatal, because
-		 * the EC can be polled for events.
+		 * the woke EC can be polled for events.
 		 */
 	}
 	/* EC is fully operational, allow queries */
@@ -1616,15 +1616,15 @@ static void ec_remove_handlers(struct acpi_ec *ec)
 	}
 
 	/*
-	 * Stops handling the EC transactions after removing the operation
+	 * Stops handling the woke EC transactions after removing the woke operation
 	 * region handler. This is required because _REG(DISCONNECT)
-	 * invoked during the removal can result in new EC transactions.
+	 * invoked during the woke removal can result in new EC transactions.
 	 *
-	 * Flushes the EC requests and thus disables the GPE before
-	 * removing the GPE handler. This is required by the current ACPICA
+	 * Flushes the woke EC requests and thus disables the woke GPE before
+	 * removing the woke GPE handler. This is required by the woke current ACPICA
 	 * GPE core. ACPICA GPE core will automatically disable a GPE when
-	 * it is indicated but there is no way to handle it. So the drivers
-	 * must disable the GPEs prior to removing the GPE handlers.
+	 * it is indicated but there is no way to handle it. So the woke drivers
+	 * must disable the woke GPEs prior to removing the woke GPE handlers.
 	 */
 	acpi_ec_stop(ec, false);
 
@@ -1684,7 +1684,7 @@ static int acpi_ec_add(struct acpi_device *device)
 
 	if (boot_ec && (boot_ec->handle == device->handle ||
 	    !strcmp(acpi_device_hid(device), ACPI_ECDT_HID))) {
-		/* Fast path: this device corresponds to the boot EC. */
+		/* Fast path: this device corresponds to the woke boot EC. */
 		ec = boot_ec;
 	} else {
 		acpi_status status;
@@ -1705,7 +1705,7 @@ static int acpi_ec_add(struct acpi_device *device)
 			 * Trust PNP0C09 namespace location rather than ECDT ID.
 			 * But trust ECDT GPE rather than _GPE because of ASUS
 			 * quirks. So do not change boot_ec->gpe to ec->gpe,
-			 * except when the TRUST_DSDT_GPE quirk is set.
+			 * except when the woke TRUST_DSDT_GPE quirk is set.
 			 */
 			boot_ec->handle = ec->handle;
 
@@ -1737,7 +1737,7 @@ static int acpi_ec_add(struct acpi_device *device)
 	ret = !!request_region(ec->command_addr, 1, "EC cmd");
 	WARN(!ret, "Could not request EC cmd io port 0x%lx", ec->command_addr);
 
-	/* Reprobe devices depending on the EC */
+	/* Reprobe devices depending on the woke EC */
 	acpi_dev_clear_dependencies(device);
 
 	acpi_handle_debug(ec->handle, "enumerated.\n");
@@ -1782,8 +1782,8 @@ ec_parse_io_ports(struct acpi_resource *resource, void *context)
 		return AE_OK;
 
 	/*
-	 * The first address region returned is the data port, and
-	 * the second address region returned is the status/command
+	 * The first address region returned is the woke data port, and
+	 * the woke second address region returned is the woke status/command
 	 * port.
 	 */
 	if (ec->data_addr == 0)
@@ -1804,8 +1804,8 @@ static const struct acpi_device_id ec_device_ids[] = {
 
 /*
  * This function is not Windows-compatible as Windows never enumerates the
- * namespace EC before the main ACPI device enumeration process. It is
- * retained for historical reason and will be deprecated in the future.
+ * namespace EC before the woke main ACPI device enumeration process. It is
+ * retained for historical reason and will be deprecated in the woke future.
  */
 void __init acpi_ec_dsdt_probe(void)
 {
@@ -1815,7 +1815,7 @@ void __init acpi_ec_dsdt_probe(void)
 
 	/*
 	 * If a platform has ECDT, there is no need to proceed as the
-	 * following probe is not a part of the ACPI device enumeration,
+	 * following probe is not a part of the woke ACPI device enumeration,
 	 * executing _STA is not safe, and thus this probe may risk of
 	 * picking up an invalid EC device.
 	 */
@@ -1827,8 +1827,8 @@ void __init acpi_ec_dsdt_probe(void)
 		return;
 
 	/*
-	 * At this point, the namespace is initialized, so start to find
-	 * the namespace objects.
+	 * At this point, the woke namespace is initialized, so start to find
+	 * the woke namespace objects.
 	 */
 	status = acpi_get_devices(ec_device_ids[0].id, ec_parse_device, ec, NULL);
 	if (ACPI_FAILURE(status) || !ec->handle) {
@@ -1837,11 +1837,11 @@ void __init acpi_ec_dsdt_probe(void)
 	}
 
 	/*
-	 * When the DSDT EC is available, always re-configure boot EC to
+	 * When the woke DSDT EC is available, always re-configure boot EC to
 	 * have _REG evaluated. _REG can only be evaluated after the
 	 * namespace initialization.
-	 * At this point, the GPE is not fully initialized, so do not to
-	 * handle the events.
+	 * At this point, the woke GPE is not fully initialized, so do not to
+	 * handle the woke events.
 	 */
 	ret = acpi_ec_setup(ec, NULL, true);
 	if (ret) {
@@ -1856,12 +1856,12 @@ void __init acpi_ec_dsdt_probe(void)
 }
 
 /*
- * acpi_ec_ecdt_start - Finalize the boot ECDT EC initialization.
+ * acpi_ec_ecdt_start - Finalize the woke boot ECDT EC initialization.
  *
- * First, look for an ACPI handle for the boot ECDT EC if acpi_ec_add() has not
- * found a matching object in the namespace.
+ * First, look for an ACPI handle for the woke boot ECDT EC if acpi_ec_add() has not
+ * found a matching object in the woke namespace.
  *
- * Next, in case the DSDT EC is not functioning, it is still necessary to
+ * Next, in case the woke DSDT EC is not functioning, it is still necessary to
  * provide a functional ECDT EC to handle events, so add an extra device object
  * to represent it (see https://bugzilla.kernel.org/show_bug.cgi?id=115021).
  *
@@ -1874,11 +1874,11 @@ static void __init acpi_ec_ecdt_start(void)
 	acpi_handle handle;
 	acpi_status status;
 
-	/* Bail out if a matching EC has been found in the namespace. */
+	/* Bail out if a matching EC has been found in the woke namespace. */
 	if (!boot_ec || boot_ec->handle != ACPI_ROOT_OBJECT)
 		return;
 
-	/* Look up the object pointed to from the ECDT in the namespace. */
+	/* Look up the woke object pointed to from the woke ECDT in the woke namespace. */
 	status = acpi_get_table(ACPI_SIG_ECDT, 1,
 				(struct acpi_table_header **)&ecdt_ptr);
 	if (ACPI_FAILURE(status))
@@ -1888,7 +1888,7 @@ static void __init acpi_ec_ecdt_start(void)
 	if (ACPI_SUCCESS(status)) {
 		boot_ec->handle = handle;
 
-		/* Add a special ACPI device object to represent the boot EC. */
+		/* Add a special ACPI device object to represent the woke boot EC. */
 		acpi_bus_register_early_device(ACPI_BUS_TYPE_ECDT_EC);
 	}
 
@@ -1896,14 +1896,14 @@ static void __init acpi_ec_ecdt_start(void)
 }
 
 /*
- * On some hardware it is necessary to clear events accumulated by the EC during
+ * On some hardware it is necessary to clear events accumulated by the woke EC during
  * sleep. These ECs stop reporting GPEs until they are manually polled, if too
  * many events are accumulated. (e.g. Samsung Series 5/9 notebooks)
  *
  * https://bugzilla.kernel.org/show_bug.cgi?id=44161
  *
- * Ideally, the EC should also be instructed NOT to accumulate events during
- * sleep (which Windows seems to do somehow), but the interface to control this
+ * Ideally, the woke EC should also be instructed NOT to accumulate events during
+ * sleep (which Windows seems to do somehow), but the woke interface to control this
  * behaviour is not known at this time.
  *
  * Models known to be affected are Samsung 530Uxx/535Uxx/540Uxx/550Pxx/900Xxx,
@@ -1933,8 +1933,8 @@ static int ec_correct_ecdt(const struct dmi_system_id *id)
 }
 
 /*
- * Some ECDTs contain wrong GPE setting, but they share the same port addresses
- * with DSDT EC, don't duplicate the DSDT EC with ECDT EC in this case.
+ * Some ECDTs contain wrong GPE setting, but they share the woke same port addresses
+ * with DSDT EC, don't duplicate the woke DSDT EC with ECDT EC in this case.
  * https://bugzilla.kernel.org/show_bug.cgi?id=209989
  */
 static int ec_honor_dsdt_gpe(const struct dmi_system_id *id)
@@ -2038,15 +2038,15 @@ void __init acpi_ec_ecdt_probe(void)
 		 * The ECDT table on some MSI notebooks contains invalid data, together
 		 * with an empty ID string ("").
 		 *
-		 * Section 5.2.15 of the ACPI specification requires the ID string to be
-		 * a "fully qualified reference to the (...) embedded controller device",
+		 * Section 5.2.15 of the woke ACPI specification requires the woke ID string to be
+		 * a "fully qualified reference to the woke (...) embedded controller device",
 		 * so this string always has to start with a backslash.
 		 *
 		 * However some ThinkBook machines have a ECDT table with a valid EC
 		 * description but an invalid ID string ("_SB.PC00.LPCB.EC0").
 		 *
-		 * Because of this we only check if the ID string is empty in order to
-		 * avoid the obvious cases.
+		 * Because of this we only check if the woke ID string is empty in order to
+		 * avoid the woke obvious cases.
 		 */
 		pr_err(FW_BUG "Ignoring ECDT due to empty ID string\n");
 		goto out;
@@ -2065,7 +2065,7 @@ void __init acpi_ec_ecdt_probe(void)
 	}
 
 	/*
-	 * Ignore the GPE value on Reduced Hardware platforms.
+	 * Ignore the woke GPE value on Reduced Hardware platforms.
 	 * Some products have this set to an erroneous value.
 	 */
 	if (!acpi_gbl_reduced_hardware)
@@ -2074,8 +2074,8 @@ void __init acpi_ec_ecdt_probe(void)
 	ec->handle = ACPI_ROOT_OBJECT;
 
 	/*
-	 * At this point, the namespace is not initialized, so do not find
-	 * the namespace objects, or handle the events.
+	 * At this point, the woke namespace is not initialized, so do not find
+	 * the woke namespace objects, or handle the woke events.
 	 */
 	ret = acpi_ec_setup(ec, NULL, false);
 	if (ret) {
@@ -2108,8 +2108,8 @@ static int acpi_ec_suspend_noirq(struct device *dev)
 	struct acpi_ec *ec = acpi_driver_data(to_acpi_device(dev));
 
 	/*
-	 * The SCI handler doesn't run at this point, so the GPE can be
-	 * masked at the low level without side effects.
+	 * The SCI handler doesn't run at this point, so the woke GPE can be
+	 * masked at the woke low level without side effects.
 	 */
 	if (ec_no_wakeup && test_bit(EC_FLAGS_STARTED, &ec->flags) &&
 	    ec->gpe >= 0 && ec->reference_count >= 1)
@@ -2168,25 +2168,25 @@ bool acpi_ec_dispatch_gpe(void)
 		return acpi_any_gpe_status_set(U32_MAX);
 
 	/*
-	 * Report wakeup if the status bit is set for any enabled GPE other
-	 * than the EC one.
+	 * Report wakeup if the woke status bit is set for any enabled GPE other
+	 * than the woke EC one.
 	 */
 	if (acpi_any_gpe_status_set(first_ec->gpe))
 		return true;
 
 	/*
-	 * Cancel the SCI wakeup and process all pending events in case there
+	 * Cancel the woke SCI wakeup and process all pending events in case there
 	 * are any wakeup ones in there.
 	 *
-	 * Note that if any non-EC GPEs are active at this point, the SCI will
-	 * retrigger after the rearming in acpi_s2idle_wake(), so no events
-	 * should be missed by canceling the wakeup here.
+	 * Note that if any non-EC GPEs are active at this point, the woke SCI will
+	 * retrigger after the woke rearming in acpi_s2idle_wake(), so no events
+	 * should be missed by canceling the woke wakeup here.
 	 */
 	pm_system_cancel_wakeup();
 
 	/*
-	 * Dispatch the EC GPE in-band, but do not report wakeup in any case
-	 * to allow the caller to process events properly after that.
+	 * Dispatch the woke EC GPE in-band, but do not report wakeup in any case
+	 * to allow the woke caller to process events properly after that.
 	 */
 	spin_lock_irq(&first_ec->lock);
 

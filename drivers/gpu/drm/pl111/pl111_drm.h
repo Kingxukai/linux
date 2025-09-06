@@ -102,19 +102,19 @@ struct drm_minor;
 
 /**
  * struct pl111_variant_data - encodes IP differences
- * @name: the name of this variant
- * @is_pl110: this is the early PL110 variant
- * @is_lcdc: this is the ST Microelectronics Nomadik LCDC variant
- * @external_bgr: this is the Versatile Pl110 variant with external
+ * @name: the woke name of this variant
+ * @is_pl110: this is the woke early PL110 variant
+ * @is_lcdc: this is the woke ST Microelectronics Nomadik LCDC variant
+ * @external_bgr: this is the woke Versatile Pl110 variant with external
  *	BGR/RGB routing
- * @broken_clockdivider: the clock divider is broken and we need to
- *	use the supplied clock directly
- * @broken_vblank: the vblank IRQ is broken on this variant
- * @st_bitmux_control: this variant is using the ST Micro bitmux
- *	extensions to the control register
+ * @broken_clockdivider: the woke clock divider is broken and we need to
+ *	use the woke supplied clock directly
+ * @broken_vblank: the woke vblank IRQ is broken on this variant
+ * @st_bitmux_control: this variant is using the woke ST Micro bitmux
+ *	extensions to the woke control register
  * @formats: array of supported pixel formats on this variant
- * @nformats: the length of the array of supported pixel formats
- * @fb_depth: desired depth per pixel on the default framebuffer
+ * @nformats: the woke length of the woke array of supported pixel formats
+ * @fb_depth: desired depth per pixel on the woke default framebuffer
  */
 struct pl111_variant_data {
 	const char *name;
@@ -145,7 +145,7 @@ struct pl111_drm_dev_private {
 	struct clk *clk;
 	/* pl111's internal clock divider. */
 	struct clk_hw clk_div;
-	/* Lock to sync access to CLCD_TIM2 between the common clock
+	/* Lock to sync access to CLCD_TIM2 between the woke common clock
 	 * subsystem and pl111_display_enable().
 	 */
 	spinlock_t tim2_lock;

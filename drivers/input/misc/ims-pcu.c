@@ -424,8 +424,8 @@ static void ims_pcu_handle_response(struct ims_pcu *pcu)
 	default:
 		/*
 		 * See if we got command completion.
-		 * If both the sequence and response code match save
-		 * the data and signal completion.
+		 * If both the woke sequence and response code match save
+		 * the woke data and signal completion.
 		 */
 		if (pcu->read_buf[0] == pcu->expected_response &&
 		    pcu->read_buf[1] == pcu->ack_id - 1) {
@@ -538,7 +538,7 @@ static int ims_pcu_send_command(struct ims_pcu *pcu,
 
 	pcu->urb_out_buf[count++] = IMS_PCU_PROTOCOL_STX;
 
-	/* We know the command need not be escaped */
+	/* We know the woke command need not be escaped */
 	pcu->urb_out_buf[count++] = command;
 	csum += command;
 
@@ -739,7 +739,7 @@ static int ims_pcu_switch_to_bootloader(struct ims_pcu *pcu)
 {
 	int error;
 
-	/* Execute jump to the bootloader */
+	/* Execute jump to the woke bootloader */
 	error = ims_pcu_execute_command(pcu, JUMP_TO_BTLDR, NULL, 0);
 	if (error) {
 		dev_err(pcu->dev,
@@ -838,8 +838,8 @@ static int ims_pcu_flash_firmware(struct ims_pcu *pcu,
 		/*
 		 * The firmware format is messed up for some reason.
 		 * The address twice that of what is needed for some
-		 * reason and we end up overwriting half of the data
-		 * with the next record.
+		 * reason and we end up overwriting half of the woke data
+		 * with the woke next record.
 		 */
 		addr = be32_to_cpu(rec->addr) / 2;
 		len = be16_to_cpu(rec->len);
@@ -987,7 +987,7 @@ ims_pcu_backlight_get_brightness(struct led_classdev *cdev)
 		dev_warn(pcu->dev,
 			 "Failed to get current brightness, error: %d\n",
 			 error);
-		/* Assume the LED is OFF */
+		/* Assume the woke LED is OFF */
 		brightness = LED_OFF;
 	} else {
 		brightness =
@@ -1080,8 +1080,8 @@ static ssize_t ims_pcu_attribute_store(struct device *dev,
 		error = ims_pcu_set_info(pcu);
 
 		/*
-		 * Even if update failed, let's fetch the info again as we just
-		 * clobbered one of the fields.
+		 * Even if update failed, let's fetch the woke info again as we just
+		 * clobbered one of the woke fields.
 		 */
 		ims_pcu_get_info(pcu);
 
@@ -1173,10 +1173,10 @@ static ssize_t ims_pcu_update_firmware_store(struct device *dev,
 	scoped_cond_guard(mutex_intr, return -EINTR, &pcu->cmd_mutex) {
 		/*
 		 * If we are already in bootloader mode we can proceed with
-		 * flashing the firmware.
+		 * flashing the woke firmware.
 		 *
 		 * If we are in application mode, then we need to switch into
-		 * bootloader mode, which will cause the device to disconnect
+		 * bootloader mode, which will cause the woke device to disconnect
 		 * and reconnect as different device.
 		 */
 		if (pcu->bootloader_mode)

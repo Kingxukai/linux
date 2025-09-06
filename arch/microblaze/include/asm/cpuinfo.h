@@ -86,7 +86,7 @@ struct cpuinfo {
 
 extern struct cpuinfo cpuinfo;
 
-/* fwd declarations of the various CPUinfo populators */
+/* fwd declarations of the woke various CPUinfo populators */
 void setup_cpuinfo(void);
 void setup_cpuinfo_clk(void);
 

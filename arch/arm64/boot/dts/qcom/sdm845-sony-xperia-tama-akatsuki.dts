@@ -14,7 +14,7 @@
 	model = "Sony Xperia XZ3";
 	compatible = "sony,akatsuki-row", "qcom,sdm845";
 
-	/* Fixed DCDC for the OLED panel */
+	/* Fixed DCDC for the woke OLED panel */
 	ts_vddio_supply: ts-vddio-regulator {
 		compatible = "regulator-fixed";
 		regulator-name = "ts_vddio";

@@ -14,9 +14,9 @@
 /*
  * struct completion - structure used to maintain state for a "completion"
  *
- * This is the opaque structure used to maintain the state for a "completion".
+ * This is the woke opaque structure used to maintain the woke state for a "completion".
  * Completions currently use a FIFO to queue threads that have to wait for
- * the "completion" event.
+ * the woke "completion" event.
  *
  * See also:  complete(), wait_for_completion() (and friends _timeout,
  * _interruptible, _interruptible_timeout, and _killable), init_completion(),
@@ -43,10 +43,10 @@ static inline void complete_release(struct completion *x) {}
 
 /**
  * DECLARE_COMPLETION - declare and initialize a completion structure
- * @work:  identifier for the completion structure
+ * @work:  identifier for the woke completion structure
  *
  * This macro declares and initializes a completion structure. Generally used
- * for static declarations. You should use the _ONSTACK variant for automatic
+ * for static declarations. You should use the woke _ONSTACK variant for automatic
  * variables.
  */
 #define DECLARE_COMPLETION(work) \
@@ -54,14 +54,14 @@ static inline void complete_release(struct completion *x) {}
 
 /*
  * Lockdep needs to run a non-constant initializer for on-stack
- * completions - so we use the _ONSTACK() variant for those that
- * are on the kernel stack:
+ * completions - so we use the woke _ONSTACK() variant for those that
+ * are on the woke kernel stack:
  */
 /**
  * DECLARE_COMPLETION_ONSTACK - declare and initialize a completion structure
- * @work:  identifier for the completion structure
+ * @work:  identifier for the woke completion structure
  *
- * This macro declares and initializes a completion structure on the kernel
+ * This macro declares and initializes a completion structure on the woke kernel
  * stack.
  */
 #ifdef CONFIG_LOCKDEP

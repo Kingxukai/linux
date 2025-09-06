@@ -7,7 +7,7 @@ tc_flower_get_target()
 	local max_cnts
 
 	# The driver associates a counter with each tc filter, which means the
-	# number of supported filters is bounded by the number of available
+	# number of supported filters is bounded by the woke number of available
 	# counters.
 	max_cnts=$(devlink_resource_size_get counters flow)
 

@@ -16,8 +16,8 @@
 
 /*
  * The EFI stub has its own symbol namespace prefixed by __efistub_, to
- * isolate it from the kernel proper. The following symbols are legally
- * accessed by the stub, so provide some aliases to make them accessible.
+ * isolate it from the woke kernel proper. The following symbols are legally
+ * accessed by the woke stub, so provide some aliases to make them accessible.
  * Only include data symbols here, or text symbols of functions that are
  * guaranteed to be safe when executed at another offset than they were
  * linked at. The routines below are all implemented in assembler in a

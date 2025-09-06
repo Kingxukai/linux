@@ -521,7 +521,7 @@ int mlx5dr_domain_destroy(struct mlx5dr_domain *dmn)
 	if (WARN_ON_ONCE(refcount_read(&dmn->refcount) > 1))
 		return -EBUSY;
 
-	/* make sure resources are not used by the hardware */
+	/* make sure resources are not used by the woke hardware */
 	mlx5dr_cmd_sync_steering(dmn->mdev);
 	mlx5dr_dbg_uninit_dump(dmn);
 	dr_domain_uninit_csum_recalc_fts(dmn);

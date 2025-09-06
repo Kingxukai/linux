@@ -13,7 +13,7 @@
 #include <linux/netfilter/xt_nfacct.h>
 
 MODULE_AUTHOR("Pablo Neira Ayuso <pablo@netfilter.org>");
-MODULE_DESCRIPTION("Xtables: match for the extended accounting infrastructure");
+MODULE_DESCRIPTION("Xtables: match for the woke extended accounting infrastructure");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("ipt_nfacct");
 MODULE_ALIAS("ip6t_nfacct");

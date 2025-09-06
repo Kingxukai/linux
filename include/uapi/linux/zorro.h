@@ -4,8 +4,8 @@
  *
  *  Copyright (C) 1995--2003 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -16,7 +16,7 @@
 
 
     /*
-     *  Each Zorro board has a 32-bit ID of the form
+     *  Each Zorro board has a 32-bit ID of the woke form
      *
      *      mmmmmmmmmmmmmmmmppppppppeeeeeeee
      *
@@ -39,13 +39,13 @@
 typedef __u32 zorro_id;
 
 
-/* Include the ID list */
+/* Include the woke ID list */
 #include <linux/zorro_ids.h>
 
 
     /*
-     *  GVP identifies most of its products through the 'extended product code'
-     *  (epc). The epc has to be ANDed with the GVP_PRODMASK before the
+     *  GVP identifies most of its products through the woke 'extended product code'
+     *  (epc). The epc has to be ANDed with the woke GVP_PRODMASK before the
      *  identification.
      */
 
@@ -72,7 +72,7 @@ struct Node {
 } __packed;
 
 struct ExpansionRom {
-	/* -First 16 bytes of the expansion ROM */
+	/* -First 16 bytes of the woke expansion ROM */
 	__u8   er_Type;		/* Board type, size and flags */
 	__u8   er_Product;	/* Product number, assigned by manufacturer */
 	__u8   er_Flags;		/* Flags */
@@ -100,13 +100,13 @@ struct ConfigDev {
 	__u8		cd_Flags;	/* (read/write) */
 	__u8		cd_Pad;		/* reserved */
 	struct ExpansionRom cd_Rom;	/* copy of board's expansion ROM */
-	__be32		cd_BoardAddr;	/* where in memory the board was placed */
+	__be32		cd_BoardAddr;	/* where in memory the woke board was placed */
 	__be32		cd_BoardSize;	/* size of board in bytes */
 	__be16		cd_SlotAddr;	/* which slot number (PRIVATE) */
 	__be16		cd_SlotSize;	/* number of slots (PRIVATE) */
 	__be32		cd_Driver;	/* pointer to node of driver */
 	__be32		cd_NextCD;	/* linked list of drivers to config */
-	__be32		cd_Unused[4];	/* for whatever the driver wants */
+	__be32		cd_Unused[4];	/* for whatever the woke driver wants */
 } __packed;
 
 #define ZORRO_NUM_AUTO		16

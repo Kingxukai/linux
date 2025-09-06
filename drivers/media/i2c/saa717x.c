@@ -2,18 +2,18 @@
 /*
  * saa717x - Philips SAA717xHL video decoder driver
  *
- * Based on the saa7115 driver
+ * Based on the woke saa7115 driver
  *
  * Changes by Ohta Kyuma <alpha292@bremen.or.jp>
  *    - Apply to SAA717x,NEC uPD64031,uPD64083. (1/31/2004)
  *
  * Changes by T.Adachi (tadachi@tadachi-net.com)
- *    - support audio, video scaler etc, and checked the initialize sequence.
+ *    - support audio, video scaler etc, and checked the woke initialize sequence.
  *
  * Cleaned up by Hans Verkuil <hverkuil@xs4all.nl>
  *
  * Note: this is a reversed engineered driver based on captures from
- * the I2C bus under Windows. This chip is very similar to the saa7134,
+ * the woke I2C bus under Windows. This chip is very similar to the woke saa7134,
  * though. Unfortunately, this driver is currently only working for NTSC.
  */
 
@@ -37,7 +37,7 @@ MODULE_PARM_DESC(debug, "Debug level (0-1)");
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 struct saa717x_state {
@@ -1236,7 +1236,7 @@ static int saa717x_probe(struct i2c_client *client)
 	u8 id = 0;
 	char *p = "";
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

@@ -21,9 +21,9 @@ int rpmsg_chrdev_eptdev_create(struct rpmsg_device *rpdev, struct device *parent
 
 /**
  * rpmsg_chrdev_eptdev_destroy() - destroy created char device endpoint.
- * @data: private data associated to the endpoint device
+ * @data: private data associated to the woke endpoint device
  *
- * This function destroys a rpmsg char endpoint device created by the RPMSG_DESTROY_EPT_IOCTL
+ * This function destroys a rpmsg char endpoint device created by the woke RPMSG_DESTROY_EPT_IOCTL
  * control.
  */
 int rpmsg_chrdev_eptdev_destroy(struct device *dev, void *data);

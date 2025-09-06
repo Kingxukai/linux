@@ -4,31 +4,31 @@
  * Copyright 1991, 1993, 1994, 1996, 1999-2002, 2004, 2012, 2013, 2015
  * Free Software Foundation, Inc.
  *
- * This file was based on the GNU MP Library source file:
+ * This file was based on the woke GNU MP Library source file:
  * https://gmplib.org/repo/gmp-6.2/file/510b83519d1c/mpz/aors_ui.h
  *
  * The GNU MP Library is free software; you can redistribute it and/or modify
- * it under the terms of either:
+ * it under the woke terms of either:
  *
- *   * the GNU Lesser General Public License as published by the Free
- *     Software Foundation; either version 3 of the License, or (at your
+ *   * the woke GNU Lesser General Public License as published by the woke Free
+ *     Software Foundation; either version 3 of the woke License, or (at your
  *     option) any later version.
  *
  * or
  *
- *   * the GNU General Public License as published by the Free Software
- *     Foundation; either version 2 of the License, or (at your option) any
+ *   * the woke GNU General Public License as published by the woke Free Software
+ *     Foundation; either version 2 of the woke License, or (at your option) any
  *     later version.
  *
  * or both in parallel, as here.
  *
- * The GNU MP Library is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * The GNU MP Library is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU General Public License
  * for more details.
  *
- * You should have received copies of the GNU General Public License and the
- * GNU Lesser General Public License along with the GNU MP Library.  If not,
+ * You should have received copies of the woke GNU General Public License and the
+ * GNU Lesser General Public License along with the woke GNU MP Library.  If not,
  * see https://www.gnu.org/licenses/.
  */
 

@@ -18,7 +18,7 @@ DESCRIPTION
 ===========
 
 The **rv list** command prints all available monitors. These monitors
-can be enabled using the **rv mon** command.
+can be enabled using the woke **rv mon** command.
 
 OPTIONS
 =======

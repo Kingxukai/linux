@@ -7,37 +7,37 @@ CPU capacity bindings
 ==========================================
 
 Some systems may be configured to have cpus with different power/performance
-characteristics within the same chip. In this case, additional information has
-to be made available to the kernel for it to be aware of such differences and
+characteristics within the woke same chip. In this case, additional information has
+to be made available to the woke kernel for it to be aware of such differences and
 take decisions accordingly.
 
 ==========================================
 2 - CPU capacity definition
 ==========================================
 
-CPU capacity is a number that provides the scheduler information about CPUs
+CPU capacity is a number that provides the woke scheduler information about CPUs
 heterogeneity. Such heterogeneity can come from micro-architectural differences
 (e.g., ARM big.LITTLE systems) or maximum frequency at which CPUs can run
 (e.g., SMP systems with multiple frequency domains). Heterogeneity in this
 context is about differing performance characteristics; this binding tries to
-capture a first-order approximation of the relative performance of CPUs.
+capture a first-order approximation of the woke relative performance of CPUs.
 
 CPU capacities are obtained by running a suitable benchmark. This binding makes
-no guarantees on the validity or suitability of any particular benchmark, the
+no guarantees on the woke validity or suitability of any particular benchmark, the
 final capacity should, however, be:
 
 * A "single-threaded" or CPU affine benchmark
-* Divided by the running frequency of the CPU executing the benchmark
-* Not subject to dynamic frequency scaling of the CPU
+* Divided by the woke running frequency of the woke CPU executing the woke benchmark
+* Not subject to dynamic frequency scaling of the woke CPU
 
-For the time being we however advise usage of the Dhrystone benchmark. What
+For the woke time being we however advise usage of the woke Dhrystone benchmark. What
 above thus becomes:
 
-CPU capacities are obtained by running the Dhrystone benchmark on each CPU at
+CPU capacities are obtained by running the woke Dhrystone benchmark on each CPU at
 max frequency (with caches enabled). The obtained DMIPS score is then divided
-by the frequency (in MHz) at which the benchmark has been run, so that
-DMIPS/MHz are obtained.  Such values are then normalized w.r.t. the highest
-score obtained in the system.
+by the woke frequency (in MHz) at which the woke benchmark has been run, so that
+DMIPS/MHz are obtained.  Such values are then normalized w.r.t. the woke highest
+score obtained in the woke system.
 
 ==========================================
 3 - capacity-dmips-mhz
@@ -45,14 +45,14 @@ score obtained in the system.
 
 capacity-dmips-mhz is an optional cpu node [1] property: u32 value
 representing CPU capacity expressed in normalized DMIPS/MHz. At boot time, the
-maximum frequency available to the cpu is then used to calculate the capacity
-value internally used by the kernel.
+maximum frequency available to the woke cpu is then used to calculate the woke capacity
+value internally used by the woke kernel.
 
 capacity-dmips-mhz property is all-or-nothing: if it is specified for a cpu
-node, it has to be specified for every other cpu nodes, or the system will
-fall back to the default capacity value for every CPU. If cpufreq is not
+node, it has to be specified for every other cpu nodes, or the woke system will
+fall back to the woke default capacity value for every CPU. If cpufreq is not
 available, final capacities are calculated by directly using capacity-dmips-
-mhz values (normalized w.r.t. the highest value found while parsing the DT).
+mhz values (normalized w.r.t. the woke highest value found while parsing the woke DT).
 
 ===========================================
 4 - Examples
@@ -61,7 +61,7 @@ mhz values (normalized w.r.t. the highest value found while parsing the DT).
 Example 1 (ARM 64-bit, 6-cpu system, two clusters):
 The capacities-dmips-mhz or DMIPS/MHz values (scaled to 1024)
 are 1024 and 578 for cluster0 and cluster1. Further normalization
-is done by the operating system based on cluster0@max-freq=1100 and
+is done by the woke operating system based on cluster0@max-freq=1100 and
 cluster1@max-freq=850, final capacities are 1024 for cluster0 and
 446 for cluster1 (578*850/1100).
 
@@ -195,7 +195,7 @@ cpus {
 Example 2 (ARM 32-bit, 4-cpu system, two clusters,
 	   cpus 0,1@1GHz, cpus 2,3@500MHz):
 capacities-dmips-mhz are scaled w.r.t. 2 (cpu@0 and cpu@1), this means that first
-cpu@0 and cpu@1 are twice fast than cpu@2 and cpu@3 (at the same frequency)
+cpu@0 and cpu@1 are twice fast than cpu@2 and cpu@3 (at the woke same frequency)
 
 cpus {
 	#address-cells = <1>;

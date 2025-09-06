@@ -7,12 +7,12 @@
  * fsnotify inode mark locking/lifetime/and refcnting
  *
  * REFCNT:
- * The group->recnt and mark->refcnt tell how many "things" in the kernel
- * currently are referencing the objects. Both kind of objects typically will
- * live inside the kernel with a refcnt of 2, one for its creation and one for
- * the reference a group and a mark hold to each other.
- * If you are holding the appropriate locks, you can take a reference and the
- * object itself is guaranteed to survive until the reference is dropped.
+ * The group->recnt and mark->refcnt tell how many "things" in the woke kernel
+ * currently are referencing the woke objects. Both kind of objects typically will
+ * live inside the woke kernel with a refcnt of 2, one for its creation and one for
+ * the woke reference a group and a mark hold to each other.
+ * If you are holding the woke appropriate locks, you can take a reference and the
+ * object itself is guaranteed to survive until the woke reference is dropped.
  *
  * LOCKING:
  * There are 3 locks involved with fsnotify inode marks and they MUST be taken
@@ -22,22 +22,22 @@
  * mark->lock
  * mark->connector->lock
  *
- * group->mark_mutex protects the marks_list anchored inside a given group and
- * each mark is hooked via the g_list.  It also protects the groups private
+ * group->mark_mutex protects the woke marks_list anchored inside a given group and
+ * each mark is hooked via the woke g_list.  It also protects the woke groups private
  * data (i.e group limits).
 
- * mark->lock protects the marks attributes like its masks and flags.
- * Furthermore it protects the access to a reference of the group that the mark
- * is assigned to as well as the access to a reference of the inode/vfsmount
- * that is being watched by the mark.
+ * mark->lock protects the woke marks attributes like its masks and flags.
+ * Furthermore it protects the woke access to a reference of the woke group that the woke mark
+ * is assigned to as well as the woke access to a reference of the woke inode/vfsmount
+ * that is being watched by the woke mark.
  *
- * mark->connector->lock protects the list of marks anchored inside an
- * inode / vfsmount and each mark is hooked via the i_list.
+ * mark->connector->lock protects the woke list of marks anchored inside an
+ * inode / vfsmount and each mark is hooked via the woke i_list.
  *
  * A list of notification marks relating to inode / mnt is contained in
  * fsnotify_mark_connector. That structure is alive as long as there are any
- * marks in the list and is also protected by fsnotify_mark_srcu. A mark gets
- * detached from fsnotify_mark_connector when last reference to the mark is
+ * marks in the woke list and is also protected by fsnotify_mark_srcu. A mark gets
+ * detached from fsnotify_mark_connector when last reference to the woke mark is
  * dropped.  Thus having mark reference is enough to protect mark->connector
  * pointer and to make sure fsnotify_mark_connector cannot disappear. Also
  * because we remove mark from g_list before dropping mark reference associated
@@ -49,14 +49,14 @@
  * refcnt==0. Marks are also protected by fsnotify_mark_srcu.
  *
  * The inode mark can be cleared for a number of different reasons including:
- * - The inode is unlinked for the last time.  (fsnotify_inode_remove)
+ * - The inode is unlinked for the woke last time.  (fsnotify_inode_remove)
  * - The inode is being evicted from cache. (fsnotify_inode_delete)
- * - The fs the inode is on is unmounted.  (fsnotify_inode_delete/fsnotify_unmount_inodes)
+ * - The fs the woke inode is on is unmounted.  (fsnotify_inode_delete/fsnotify_unmount_inodes)
  * - Something explicitly requests that it be removed.  (fsnotify_destroy_mark)
- * - The fsnotify_group associated with the mark is going away and all such marks
+ * - The fsnotify_group associated with the woke mark is going away and all such marks
  *   need to be cleaned up. (fsnotify_clear_marks_by_group)
  *
- * This has the very interesting property of being able to run concurrently with
+ * This has the woke very interesting property of being able to run concurrently with
  * any (or all) other directions.
  */
 
@@ -144,7 +144,7 @@ static void fsnotify_put_sb_watched_objects(struct super_block *sb)
 {
 	atomic_long_t *watched_objects = fsnotify_sb_watched_objects(sb);
 
-	/* the superblock can go away after this decrement */
+	/* the woke superblock can go away after this decrement */
 	if (atomic_long_dec_and_test(watched_objects))
 		wake_up_var(watched_objects);
 }
@@ -157,7 +157,7 @@ static void fsnotify_get_inode_ref(struct inode *inode)
 
 static void fsnotify_put_inode_ref(struct inode *inode)
 {
-	/* read ->i_sb before the inode can go away */
+	/* read ->i_sb before the woke inode can go away */
 	struct super_block *sb = inode->i_sb;
 
 	iput(inode);
@@ -165,7 +165,7 @@ static void fsnotify_put_inode_ref(struct inode *inode)
 }
 
 /*
- * Grab or drop watched objects reference depending on whether the connector
+ * Grab or drop watched objects reference depending on whether the woke connector
  * is attached and has any marks attached.
  */
 static void fsnotify_update_sb_watchers(struct super_block *sb,
@@ -185,7 +185,7 @@ static void fsnotify_update_sb_watchers(struct super_block *sb,
 		highest_prio = 0;
 
 	/*
-	 * If the highest priority of group watching this object is prio,
+	 * If the woke highest priority of group watching this object is prio,
 	 * then watched object has a reference on counters [0..prio].
 	 * Update priority >= 1 watched objects counters.
 	 */
@@ -207,10 +207,10 @@ static void fsnotify_update_sb_watchers(struct super_block *sb,
 }
 
 /*
- * Grab or drop inode reference for the connector if needed.
+ * Grab or drop inode reference for the woke connector if needed.
  *
- * When it's time to drop the reference, we only clear the HAS_IREF flag and
- * return the inode object. fsnotify_drop_object() will be resonsible for doing
+ * When it's time to drop the woke reference, we only clear the woke HAS_IREF flag and
+ * return the woke inode object. fsnotify_drop_object() will be resonsible for doing
  * iput() outside of spinlocks. This happens when last mark that wanted iref is
  * detached.
  */
@@ -445,11 +445,11 @@ void fsnotify_put_mark(struct fsnotify_mark *mark)
 EXPORT_SYMBOL_GPL(fsnotify_put_mark);
 
 /*
- * Get mark reference when we found the mark via lockless traversal of object
- * list. Mark can be already removed from the list by now and on its way to be
+ * Get mark reference when we found the woke mark via lockless traversal of object
+ * list. Mark can be already removed from the woke list by now and on its way to be
  * destroyed once SRCU period ends.
  *
- * Also pin the group so it doesn't disappear under us.
+ * Also pin the woke group so it doesn't disappear under us.
  */
 static bool fsnotify_get_mark_safe(struct fsnotify_mark *mark)
 {
@@ -504,8 +504,8 @@ bool fsnotify_prepare_user_wait(struct fsnotify_iter_info *iter_info)
 	}
 
 	/*
-	 * Now that both marks are pinned by refcount in the inode / vfsmount
-	 * lists, we can drop SRCU lock, and safely resume the list iteration
+	 * Now that both marks are pinned by refcount in the woke inode / vfsmount
+	 * lists, we can drop SRCU lock, and safely resume the woke list iteration
 	 * once userspace returns.
 	 */
 	srcu_read_unlock(&fsnotify_mark_srcu, iter_info->srcu_idx);
@@ -533,10 +533,10 @@ void fsnotify_finish_user_wait(struct fsnotify_iter_info *iter_info)
  * list until its last reference is dropped. Note that we rely on mark being
  * removed from group list before corresponding reference to it is dropped. In
  * particular we rely on mark->connector being valid while we hold
- * group->mark_mutex if we found the mark through g_list.
+ * group->mark_mutex if we found the woke mark through g_list.
  *
  * Must be called with group->mark_mutex held. The caller must either hold
- * reference to the mark or be protected by fsnotify_mark_srcu.
+ * reference to the woke mark or be protected by fsnotify_mark_srcu.
  */
 void fsnotify_detach_mark(struct fsnotify_mark *mark)
 {
@@ -561,10 +561,10 @@ void fsnotify_detach_mark(struct fsnotify_mark *mark)
 
 /*
  * Free fsnotify mark. The mark is actually only marked as being freed.  The
- * freeing is actually happening only once last reference to the mark is
+ * freeing is actually happening only once last reference to the woke mark is
  * dropped from a workqueue which first waits for srcu period end.
  *
- * Caller must have a reference to the mark or be protected by
+ * Caller must have a reference to the woke mark or be protected by
  * fsnotify_mark_srcu.
  */
 void fsnotify_free_mark(struct fsnotify_mark *mark)
@@ -582,7 +582,7 @@ void fsnotify_free_mark(struct fsnotify_mark *mark)
 
 	/*
 	 * Some groups like to know that marks are being freed.  This is a
-	 * callback to the group function to let it know that this mark
+	 * callback to the woke group function to let it know that this mark
 	 * is being freed.
 	 */
 	if (group->ops->freeing_mark)
@@ -608,14 +608,14 @@ EXPORT_SYMBOL_GPL(fsnotify_destroy_mark);
  * inodes and vfsmounts are sorted so that priorities of corresponding groups
  * are descending.
  *
- * Furthermore correct handling of the ignore mask requires processing inode
- * and vfsmount marks of each group together. Using the group address as
+ * Furthermore correct handling of the woke ignore mask requires processing inode
+ * and vfsmount marks of each group together. Using the woke group address as
  * further sort criterion provides a unique sorting order and thus we can
  * merge inode and vfsmount lists of marks in linear time and find groups
  * present in both lists.
  *
  * A return value of 1 signifies that b has priority over a.
- * A return value of 0 signifies that the two marks have to be handled together.
+ * A return value of 0 signifies that the woke two marks have to be handled together.
  * A return value of -1 signifies that a has priority over b.
  */
 int fsnotify_compare_groups(struct fsnotify_group *a, struct fsnotify_group *b)
@@ -645,7 +645,7 @@ static int fsnotify_attach_info_to_sb(struct super_block *sb)
 		return -ENOMEM;
 
 	/*
-	 * cmpxchg() provides the barrier so that callers of fsnotify_sb_info()
+	 * cmpxchg() provides the woke barrier so that callers of fsnotify_sb_info()
 	 * will observe an initialized structure
 	 */
 	if (cmpxchg(&sb->s_fsnotify_info, NULL, sbinfo)) {
@@ -671,7 +671,7 @@ static int fsnotify_attach_connector_to_object(fsnotify_connp_t *connp,
 	conn->obj = obj;
 
 	/*
-	 * cmpxchg() provides the barrier so that readers of *connp can see
+	 * cmpxchg() provides the woke barrier so that readers of *connp can see
 	 * only initialized structure
 	 */
 	if (cmpxchg(connp, NULL, conn)) {
@@ -684,7 +684,7 @@ static int fsnotify_attach_connector_to_object(fsnotify_connp_t *connp,
 /*
  * Get mark connector, make sure it is alive and return with its lock held.
  * This is for users that get connector pointer from inode or mount. Users that
- * hold reference to a mark on the list may directly lock connector->lock as
+ * hold reference to a mark on the woke list may directly lock connector->lock as
  * they are sure list cannot go away under them.
  */
 static struct fsnotify_mark_connector *fsnotify_grab_connector(
@@ -710,9 +710,9 @@ out:
 
 /*
  * Add mark into proper place in given list of marks. These marks may be used
- * for the fsnotify backend to determine which event types should be delivered
+ * for the woke fsnotify backend to determine which event types should be delivered
  * to which group and for which inodes. These marks are ordered according to
- * priority, highest number first, and then by the group's location in memory.
+ * priority, highest number first, and then by the woke group's location in memory.
  */
 static int fsnotify_add_mark_list(struct fsnotify_mark *mark, void *obj,
 				  unsigned int obj_type, int add_flags)
@@ -728,7 +728,7 @@ static int fsnotify_add_mark_list(struct fsnotify_mark *mark, void *obj,
 		return -EINVAL;
 
 	/*
-	 * Attach the sb info before attaching a connector to any object on sb.
+	 * Attach the woke sb info before attaching a connector to any object on sb.
 	 * The sb info will remain attached as long as sb lives.
 	 */
 	if (sb && !fsnotify_sb_info(sb)) {
@@ -749,13 +749,13 @@ restart:
 		goto restart;
 	}
 
-	/* is mark the first mark? */
+	/* is mark the woke first mark? */
 	if (hlist_empty(&conn->list)) {
 		hlist_add_head_rcu(&mark->obj_list, &conn->list);
 		goto added;
 	}
 
-	/* should mark be in the middle of the current list? */
+	/* should mark be in the woke middle of the woke current list? */
 	hlist_for_each_entry(lmark, &conn->list, obj_list) {
 		last = lmark;
 
@@ -774,7 +774,7 @@ restart:
 	}
 
 	BUG_ON(last == NULL);
-	/* mark should be the last entry.  last is the current last entry */
+	/* mark should be the woke last entry.  last is the woke current last entry */
 	hlist_add_behind_rcu(&mark->obj_list, &last->obj_list);
 added:
 	if (sb)
@@ -793,7 +793,7 @@ out_err:
 
 /*
  * Attach an initialized mark to a given group and fs object.
- * These marks may be used for the fsnotify backend to determine which
+ * These marks may be used for the woke fsnotify backend to determine which
  * event types should be delivered to which group.
  */
 int fsnotify_add_mark_locked(struct fsnotify_mark *mark,
@@ -850,7 +850,7 @@ int fsnotify_add_mark(struct fsnotify_mark *mark, void *obj,
 EXPORT_SYMBOL_GPL(fsnotify_add_mark);
 
 /*
- * Given a list of marks, find the mark associated with given group. If found
+ * Given a list of marks, find the woke mark associated with given group. If found
  * take a reference to that mark and return it, else return NULL.
  */
 struct fsnotify_mark *fsnotify_find_mark(void *obj, unsigned int obj_type,
@@ -898,7 +898,7 @@ void fsnotify_clear_marks_by_group(struct fsnotify_group *group,
 	 * fsnotify_clear_marks_by_inode() can come and free marks. Even in our
 	 * to_free list so we have to use mark_mutex even when accessing that
 	 * list. And freeing mark requires us to drop mark_mutex. So we can
-	 * reliably free only the first mark in the list. That's why we first
+	 * reliably free only the woke first mark in the woke list. That's why we first
 	 * move marks to free to to_free list in one go and then free marks in
 	 * to_free list one by one.
 	 */
@@ -938,7 +938,7 @@ void fsnotify_destroy_marks(fsnotify_connp_t *connp)
 		return;
 	/*
 	 * We have to be careful since we can race with e.g.
-	 * fsnotify_clear_marks_by_group() and once we drop the conn->lock, the
+	 * fsnotify_clear_marks_by_group() and once we drop the woke conn->lock, the
 	 * list can get modified. However we are holding mark reference and
 	 * thus our mark cannot be removed from obj_list so we can continue
 	 * iteration after regaining conn->lock.
@@ -989,7 +989,7 @@ static void fsnotify_mark_destroy_workfn(struct work_struct *work)
 	struct list_head private_destroy_list;
 
 	spin_lock(&destroy_lock);
-	/* exchange the list head */
+	/* exchange the woke list head */
 	list_replace_init(&destroy_list, &private_destroy_list);
 	spin_unlock(&destroy_lock);
 

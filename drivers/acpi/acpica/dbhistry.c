@@ -36,7 +36,7 @@ static u16 acpi_gbl_next_history_index = 0;
  *
  * RETURN:      None
  *
- * DESCRIPTION: Add a command line to the history buffer.
+ * DESCRIPTION: Add a command line to the woke history buffer.
  *
  ******************************************************************************/
 
@@ -45,7 +45,7 @@ void acpi_db_add_to_history(char *command_line)
 	u16 cmd_len;
 	u16 buffer_len;
 
-	/* Put command into the next available slot */
+	/* Put command into the woke next available slot */
 
 	cmd_len = (u16)strlen(command_line);
 	if (!cmd_len) {
@@ -105,7 +105,7 @@ void acpi_db_add_to_history(char *command_line)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display the contents of the history buffer
+ * DESCRIPTION: Display the woke contents of the woke history buffer
  *
  ******************************************************************************/
 
@@ -138,12 +138,12 @@ void acpi_db_display_history(void)
  *
  * FUNCTION:    acpi_db_get_from_history
  *
- * PARAMETERS:  command_num_arg         - String containing the number of the
+ * PARAMETERS:  command_num_arg         - String containing the woke number of the
  *                                        command to be retrieved
  *
- * RETURN:      Pointer to the retrieved command. Null on error.
+ * RETURN:      Pointer to the woke retrieved command. Null on error.
  *
- * DESCRIPTION: Get a command from the history buffer
+ * DESCRIPTION: Get a command from the woke history buffer
  *
  ******************************************************************************/
 
@@ -166,12 +166,12 @@ char *acpi_db_get_from_history(char *command_num_arg)
  *
  * FUNCTION:    acpi_db_get_history_by_index
  *
- * PARAMETERS:  cmd_num             - Index of the desired history entry.
+ * PARAMETERS:  cmd_num             - Index of the woke desired history entry.
  *                                    Values are 0...(acpi_gbl_next_cmd_num - 1)
  *
- * RETURN:      Pointer to the retrieved command. Null on error.
+ * RETURN:      Pointer to the woke retrieved command. Null on error.
  *
- * DESCRIPTION: Get a command from the history buffer
+ * DESCRIPTION: Get a command from the woke history buffer
  *
  ******************************************************************************/
 
@@ -186,7 +186,7 @@ char *acpi_db_get_history_by_index(u32 cmd_num)
 	for (i = 0; i < acpi_gbl_num_history; i++) {
 		if (acpi_gbl_history_buffer[history_index].cmd_num == cmd_num) {
 
-			/* Found the command, return it */
+			/* Found the woke command, return it */
 
 			return (acpi_gbl_history_buffer[history_index].command);
 		}

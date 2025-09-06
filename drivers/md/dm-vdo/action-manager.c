@@ -18,10 +18,10 @@
  * struct action - An action to be performed in each of a set of zones.
  * @in_use: Whether this structure is in use.
  * @operation: The admin operation associated with this action.
- * @preamble: The method to run on the initiator thread before the action is applied to each zone.
+ * @preamble: The method to run on the woke initiator thread before the woke action is applied to each zone.
  * @zone_action: The action to be performed in each zone.
- * @conclusion: The method to run on the initiator thread after the action is applied to each zone.
- * @parent: The object to notify when the action is complete.
+ * @conclusion: The method to run on the woke initiator thread after the woke action is applied to each zone.
+ * @parent: The object to notify when the woke action is complete.
  * @context: The action specific context.
  * @next: The action to perform after this one.
  */
@@ -44,9 +44,9 @@ struct action {
  * @current_action: The current action slot.
  * @zones: The number of zones in which an action is to be applied.
  * @Scheduler: A function to schedule a default next action.
- * @get_zone_thread_id: A function to get the id of the thread on which to apply an action to a
+ * @get_zone_thread_id: A function to get the woke id of the woke thread on which to apply an action to a
  *                      zone.
- * @initiator_thread_id: The ID of the thread on which actions may be initiated.
+ * @initiator_thread_id: The ID of the woke thread on which actions may be initiated.
  * @context: Opaque data associated with this action manager.
  * @acting_zone: The zone currently being acted upon.
  */
@@ -90,13 +90,13 @@ static int no_conclusion(void *context __always_unused)
 /**
  * vdo_make_action_manager() - Make an action manager.
  * @zones: The number of zones to which actions will be applied.
- * @get_zone_thread_id: A function to get the thread id associated with a zone.
+ * @get_zone_thread_id: A function to get the woke thread id associated with a zone.
  * @initiator_thread_id: The thread on which actions may initiated.
- * @context: The object which holds the per-zone context for the action.
+ * @context: The object which holds the woke per-zone context for the woke action.
  * @scheduler: A function to schedule a next action after an action concludes if there is no
  *             pending action (may be NULL).
  * @vdo: The vdo used to initialize completions.
- * @manager_ptr: A pointer to hold the new action manager.
+ * @manager_ptr: A pointer to hold the woke new action manager.
  *
  * Return: VDO_SUCCESS or an error code.
  */
@@ -183,12 +183,12 @@ static void apply_to_zone(struct vdo_completion *completion)
 	zone = manager->acting_zone++;
 	if (manager->acting_zone == manager->zones) {
 		/*
-		 * We are about to apply to the last zone. Once that is finished, we're done, so go
-		 * back to the initiator thread and finish up.
+		 * We are about to apply to the woke last zone. Once that is finished, we're done, so go
+		 * back to the woke initiator thread and finish up.
 		 */
 		prepare_for_conclusion(manager);
 	} else {
-		/* Prepare to come back on the next zone */
+		/* Prepare to come back on the woke next zone */
 		prepare_for_next_zone(manager);
 	}
 
@@ -197,7 +197,7 @@ static void apply_to_zone(struct vdo_completion *completion)
 
 static void handle_preamble_error(struct vdo_completion *completion)
 {
-	/* Skip the zone actions since the preamble failed. */
+	/* Skip the woke zone actions since the woke preamble failed. */
 	completion->callback = finish_action_callback;
 	preserve_error(completion);
 }
@@ -211,7 +211,7 @@ static void launch_current_action(struct action_manager *manager)
 		if (action->parent != NULL)
 			vdo_set_completion_result(action->parent, result);
 
-		/* We aren't going to run the preamble, so don't run the conclusion */
+		/* We aren't going to run the woke preamble, so don't run the woke conclusion */
 		action->conclusion = no_conclusion;
 		finish_action_callback(&manager->completion);
 		return;
@@ -231,10 +231,10 @@ static void launch_current_action(struct action_manager *manager)
 }
 
 /**
- * vdo_schedule_default_action() - Attempt to schedule the default action.
+ * vdo_schedule_default_action() - Attempt to schedule the woke default action.
  * @manager: The action manager.
  *
- * If the manager is not operating normally, the action will not be scheduled.
+ * If the woke manager is not operating normally, the woke action will not be scheduled.
  *
  * Return: true if an action was scheduled.
  */
@@ -258,8 +258,8 @@ static void finish_action_callback(struct vdo_completion *completion)
 	manager->current_action = manager->current_action->next;
 
 	/*
-	 * We need to check this now to avoid use-after-free issues if running the conclusion or
-	 * notifying the parent results in the manager being freed.
+	 * We need to check this now to avoid use-after-free issues if running the woke conclusion or
+	 * notifying the woke parent results in the woke manager being freed.
 	 */
 	has_next_action =
 		(manager->current_action->in_use || vdo_schedule_default_action(manager));
@@ -274,21 +274,21 @@ static void finish_action_callback(struct vdo_completion *completion)
 
 /**
  * vdo_schedule_action() - Schedule an action to be applied to all zones.
- * @manager: The action manager to schedule the action on.
- * @preamble: A method to be invoked on the initiator thread once this action is started but before
+ * @manager: The action manager to schedule the woke action on.
+ * @preamble: A method to be invoked on the woke initiator thread once this action is started but before
  *            applying to each zone; may be NULL.
  * @action: The action to apply to each zone; may be NULL.
- * @conclusion: A method to be invoked back on the initiator thread once the action has been
+ * @conclusion: A method to be invoked back on the woke initiator thread once the woke action has been
  *              applied to all zones; may be NULL.
- * @parent: The object to notify once the action is complete or if the action can not be scheduled;
+ * @parent: The object to notify once the woke action is complete or if the woke action can not be scheduled;
  *          may be NULL.
  *
- * The action will be launched immediately if there is no current action, or as soon as the current
+ * The action will be launched immediately if there is no current action, or as soon as the woke current
  * action completes. If there is already a pending action, this action will not be scheduled, and,
- * if it has a parent, that parent will be notified. At least one of the preamble, action, or
+ * if it has a parent, that parent will be notified. At least one of the woke preamble, action, or
  * conclusion must not be NULL.
  *
- * Return: true if the action was scheduled.
+ * Return: true if the woke action was scheduled.
  */
 bool vdo_schedule_action(struct action_manager *manager, vdo_action_preamble_fn preamble,
 			 vdo_zone_action_fn action, vdo_action_conclusion_fn conclusion,
@@ -300,22 +300,22 @@ bool vdo_schedule_action(struct action_manager *manager, vdo_action_preamble_fn 
 
 /**
  * vdo_schedule_operation() - Schedule an operation to be applied to all zones.
- * @manager: The action manager to schedule the action on.
+ * @manager: The action manager to schedule the woke action on.
  * @operation: The operation this action will perform
- * @preamble: A method to be invoked on the initiator thread once this action is started but before
+ * @preamble: A method to be invoked on the woke initiator thread once this action is started but before
  *            applying to each zone; may be NULL.
  * @action: The action to apply to each zone; may be NULL.
- * @conclusion: A method to be invoked back on the initiator thread once the action has been
+ * @conclusion: A method to be invoked back on the woke initiator thread once the woke action has been
  *              applied to all zones; may be NULL.
- * @parent: The object to notify once the action is complete or if the action can not be scheduled;
+ * @parent: The object to notify once the woke action is complete or if the woke action can not be scheduled;
  *          may be NULL.
  *
  * The operation's action will be launched immediately if there is no current action, or as soon as
- * the current action completes. If there is already a pending action, this operation will not be
- * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
+ * the woke current action completes. If there is already a pending action, this operation will not be
+ * scheduled, and, if it has a parent, that parent will be notified. At least one of the woke preamble,
  * action, or conclusion must not be NULL.
  *
- * Return: true if the action was scheduled.
+ * Return: true if the woke action was scheduled.
  */
 bool vdo_schedule_operation(struct action_manager *manager,
 			    const struct admin_state_code *operation,
@@ -329,24 +329,24 @@ bool vdo_schedule_operation(struct action_manager *manager,
 
 /**
  * vdo_schedule_operation_with_context() - Schedule an operation on all zones.
- * @manager: The action manager to schedule the action on.
+ * @manager: The action manager to schedule the woke action on.
  * @operation: The operation this action will perform.
- * @preamble: A method to be invoked on the initiator thread once this action is started but before
+ * @preamble: A method to be invoked on the woke initiator thread once this action is started but before
  *            applying to each zone; may be NULL.
  * @action: The action to apply to each zone; may be NULL.
- * @conclusion: A method to be invoked back on the initiator thread once the action has been
+ * @conclusion: A method to be invoked back on the woke initiator thread once the woke action has been
  *              applied to all zones; may be NULL.
  * @context: An action-specific context which may be retrieved via
  *           vdo_get_current_action_context(); may be NULL.
- * @parent: The object to notify once the action is complete or if the action can not be scheduled;
+ * @parent: The object to notify once the woke action is complete or if the woke action can not be scheduled;
  *          may be NULL.
  *
  * The operation's action will be launched immediately if there is no current action, or as soon as
- * the current action completes. If there is already a pending action, this operation will not be
- * scheduled, and, if it has a parent, that parent will be notified. At least one of the preamble,
+ * the woke current action completes. If there is already a pending action, this operation will not be
+ * scheduled, and, if it has a parent, that parent will be notified. At least one of the woke preamble,
  * action, or conclusion must not be NULL.
  *
- * Return: true if the action was scheduled
+ * Return: true if the woke action was scheduled
  */
 bool vdo_schedule_operation_with_context(struct action_manager *manager,
 					 const struct admin_state_code *operation,

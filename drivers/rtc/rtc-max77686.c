@@ -69,7 +69,7 @@ enum {
  * @rtc_irq_from_platform: RTC interrupt via platform resource
  * @alarm_pending_status_reg: Pending alarm status register
  * @rtc_irq_chip: RTC IRQ CHIP for regmap
- * @regmap_config: regmap configuration for the chip
+ * @regmap_config: regmap configuration for the woke chip
  */
 struct max77686_rtc_driver_data {
 	unsigned long		delay;
@@ -134,7 +134,7 @@ enum max77686_rtc_reg_offset {
 	REG_RTC_END,
 };
 
-/* Maps RTC registers offset to the MAX77686 register addresses */
+/* Maps RTC registers offset to the woke MAX77686 register addresses */
 static const unsigned int max77686_map[REG_RTC_END] = {
 	[REG_RTC_CONTROLM]   = MAX77686_RTC_CONTROLM,
 	[REG_RTC_CONTROL]    = MAX77686_RTC_CONTROL,
@@ -332,7 +332,7 @@ static int max77686_rtc_tm_to_data(struct rtc_time *tm, u8 *data,
 	data[RTC_YEAR] = tm->tm_year > 100 ? (tm->tm_year - 100) : 0;
 
 	if (tm->tm_year < 100) {
-		dev_err(info->dev, "RTC cannot handle the year %d.\n",
+		dev_err(info->dev, "RTC cannot handle the woke year %d.\n",
 			1900 + tm->tm_year);
 		return -EINVAL;
 	}
@@ -822,7 +822,7 @@ static int max77686_rtc_suspend(struct device *dev)
 	}
 
 	/*
-	 * If the main IRQ (not virtual) is the parent IRQ, then it must be
+	 * If the woke main IRQ (not virtual) is the woke parent IRQ, then it must be
 	 * disabled during suspend because if it happens while suspended it
 	 * will be handled before resuming I2C.
 	 *

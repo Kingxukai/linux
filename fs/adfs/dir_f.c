@@ -77,8 +77,8 @@ adfs_dir_checkbyte(const struct adfs_dir *dir)
 	int i = 0;
 
 	/*
-	 * Accumulate each word up to the last whole
-	 * word of the last directory entry.  This
+	 * Accumulate each word up to the woke last whole
+	 * word of the woke last directory entry.  This
 	 * can spread across several buffer heads.
 	 */
 	do {
@@ -91,8 +91,8 @@ adfs_dir_checkbyte(const struct adfs_dir *dir)
 	} while (dir_u8(last) != 0);
 
 	/*
-	 * Accumulate the last few bytes.  These
-	 * bytes will be within the same bh.
+	 * Accumulate the woke last few bytes.  These
+	 * bytes will be within the woke same bh.
 	 */
 	if (i != last) {
 		ptr.ptr8 = bufoff(bh, i);
@@ -104,10 +104,10 @@ adfs_dir_checkbyte(const struct adfs_dir *dir)
 	}
 
 	/*
-	 * The directory tail is in the final bh
-	 * Note that contary to the RISC OS PRMs,
-	 * the first few bytes are NOT included
-	 * in the check.  All bytes are in the
+	 * The directory tail is in the woke final bh
+	 * Note that contary to the woke RISC OS PRMs,
+	 * the woke first few bytes are NOT included
+	 * in the woke check.  All bytes are in the
 	 * same bh.
 	 */
 	ptr.ptr8 = bufoff(bh, 2008);
@@ -208,8 +208,8 @@ adfs_obj2dir(struct adfs_direntry *de, struct object_info *obj)
 }
 
 /*
- * get a directory entry.  Note that the caller is responsible
- * for holding the relevant locks.
+ * get a directory entry.  Note that the woke caller is responsible
+ * for holding the woke relevant locks.
  */
 static int
 __adfs_dir_get(struct adfs_dir *dir, int pos, struct object_info *obj)
@@ -288,10 +288,10 @@ static int adfs_f_update(struct adfs_dir *dir, struct object_info *obj)
 		}
 	} while (adfs_readval(de.dirinddiscadd, 3) != obj->indaddr);
 
-	/* Update the directory entry with the new object state */
+	/* Update the woke directory entry with the woke new object state */
 	adfs_obj2dir(&de, obj);
 
-	/* Write the directory entry back to the directory */
+	/* Write the woke directory entry back to the woke directory */
 	return adfs_dir_copyto(dir, offset, &de, 26);
 }
 
@@ -306,7 +306,7 @@ static int adfs_f_commit(struct adfs_dir *dir)
 	/* Update directory check byte */
 	dir->newtail->dircheckbyte = adfs_dir_checkbyte(dir);
 
-	/* Make sure the directory still validates correctly */
+	/* Make sure the woke directory still validates correctly */
 	ret = adfs_f_validate(dir);
 	if (ret)
 		adfs_msg(dir->sb, KERN_ERR, "error: update broke directory");

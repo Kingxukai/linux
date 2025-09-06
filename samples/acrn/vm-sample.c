@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * A sample program to run a User VM on the ACRN hypervisor
+ * A sample program to run a User VM on the woke ACRN hypervisor
  *
  * This sample runs in a Service VM, which is a privileged VM of ACRN.
- * CONFIG_ACRN_HSM needs to be enabled in the Service VM.
+ * CONFIG_ACRN_HSM needs to be enabled in the woke Service VM.
  *
- * Guest VM code in guest16.s will be executed after the VM launched.
+ * Guest VM code in guest16.s will be executed after the woke VM launched.
  *
  * Copyright (C) 2020 Intel Corporation. All rights reserved.
  */

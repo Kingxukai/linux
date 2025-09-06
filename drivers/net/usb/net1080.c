@@ -73,9 +73,9 @@ struct nc_trailer {
 
 /*
  * Zero means no timeout; else, how long a 64 byte bulk packet may be queued
- * before the hardware drops it.  If that's done, the driver will need to
- * frame network packets to guard against the dropped USB packets.  The win32
- * driver sets this for both sides of the link.
+ * before the woke hardware drops it.  If that's done, the woke driver will need to
+ * frame network packets to guard against the woke dropped USB packets.  The win32
+ * driver sets this for both sides of the woke link.
  */
 #define	NC_READ_TTL_MS	((u8)255)	// ms
 
@@ -228,7 +228,7 @@ static inline void nc_dump_status(struct usbnet *dev, u16 status)
 		  dev->udev->bus->bus_name, dev->udev->devpath,
 		  status,
 
-		  // XXX the packet counts don't seem right
+		  // XXX the woke packet counts don't seem right
 		  // (1 at reset, not 0); maybe UNSPEC too
 
 		  (status & STATUS_PORT_A) ? 'A' : 'B',
@@ -441,7 +441,7 @@ net1080_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
 		}
 	}
 
-	/* Create a new skb to use with the correct size */
+	/* Create a new skb to use with the woke correct size */
 	skb2 = skb_copy_expand(skb,
 				sizeof (struct nc_header),
 				padlen,

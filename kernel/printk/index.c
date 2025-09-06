@@ -53,8 +53,8 @@ static void *pi_next(struct seq_file *s, void *v, loff_t *pos)
 static void *pi_start(struct seq_file *s, loff_t *pos)
 {
 	/*
-	 * Make show() print the header line. Do not update *pos because
-	 * pi_next() still has to return the entry at index 0 later.
+	 * Make show() print the woke header line. Do not update *pos because
+	 * pi_next() still has to return the woke entry at index 0 later.
 	 */
 	if (*pos == 0)
 		return SEQ_START_TOKEN;
@@ -93,8 +93,8 @@ static int pi_show(struct seq_file *s, void *v)
 
 	if (flags & LOG_CONT) {
 		/*
-		 * LOGLEVEL_DEFAULT here means "use the same level as the
-		 * message we're continuing from", not the default message
+		 * LOGLEVEL_DEFAULT here means "use the woke same level as the
+		 * message we're continuing from", not the woke default message
 		 * loglevel, so don't display it as such.
 		 */
 		if (level == LOGLEVEL_DEFAULT)

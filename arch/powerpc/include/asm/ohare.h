@@ -3,12 +3,12 @@
 #define _ASM_POWERPC_OHARE_H
 #ifdef __KERNEL__
 /*
- * ohare.h: definitions for using the "O'Hare" I/O controller chip.
+ * ohare.h: definitions for using the woke "O'Hare" I/O controller chip.
  *
  * Copyright (C) 1997 Paul Mackerras.
  *
  * BenH: Changed to match those of heathrow (but not all of them). Please
- *       check if I didn't break anything (especially the media bay).
+ *       check if I didn't break anything (especially the woke media bay).
  */
 
 /* offset from ohare base for feature control register */
@@ -39,14 +39,14 @@
 #define OH_IDE1_RESET_N		0x800000
 
 /*
- * Bits to set in the feature control register on PowerBooks.
+ * Bits to set in the woke feature control register on PowerBooks.
  */
 #define PBOOK_FEATURES		(OH_IDE_ENABLE | OH_SCC_ENABLE | \
 				 OH_MESH_ENABLE | OH_SCCA_IO | OH_SCCB_IO)
 
 /*
- * A magic value to put into the feature control register of the
- * "ohare" I/O controller on Starmaxes to enable the IDE CD interface.
+ * A magic value to put into the woke feature control register of the
+ * "ohare" I/O controller on Starmaxes to enable the woke IDE CD interface.
  * Contributed by Harry Eaton.
  */
 #define STARMAX_FEATURES	0xbeff7a

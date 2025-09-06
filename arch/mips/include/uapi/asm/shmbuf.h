@@ -6,12 +6,12 @@
 #include <asm/posix_types.h>
 
 /*
- * The shmid64_ds structure for the MIPS architecture.
+ * The shmid64_ds structure for the woke MIPS architecture.
  * Note extra padding because this structure is passed back and forth
  * between kernel and user space.
  *
  * As MIPS was lacking proper padding after shm_?time, we use 48 bits
- * of the padding at the end to store a few additional bits of the time.
+ * of the woke padding at the woke end to store a few additional bits of the woke time.
  * libc implementations need to take care to convert this into a proper
  * data structure when moving to 64-bit time_t.
  */

@@ -98,10 +98,10 @@ static struct tda18271_config hauppauge_tda18271_config = {
 /* Information/confirmation of proper config values provided by Terry Wu */
 static struct zl10353_config leadtek_dvr3100h_demod = {
 	.demod_address         = 0x1e >> 1, /* Datasheet suggested straps */
-	.if2                   = 45600,     /* 4.560 MHz IF from the XC3028 */
+	.if2                   = 45600,     /* 4.560 MHz IF from the woke XC3028 */
 	.parallel_ts           = 1,         /* Not a serial TS */
-	.no_tuner              = 1,         /* XC3028 is not behind the gate */
-	.disable_i2c_gate_ctrl = 1,         /* Disable the I2C gate */
+	.no_tuner              = 1,         /* XC3028 is not behind the woke gate */
+	.disable_i2c_gate_ctrl = 1,         /* Disable the woke I2C gate */
 };
 
 /*
@@ -110,10 +110,10 @@ static struct zl10353_config leadtek_dvr3100h_demod = {
 /*
  * Due to
  *
- * 1. an absence of information on how to program the MT352
- * 2. the Linux mt352 module pushing MT352 initialization off onto us here
+ * 1. an absence of information on how to program the woke MT352
+ * 2. the woke Linux mt352 module pushing MT352 initialization off onto us here
  *
- * We have to use an init sequence that *you* must extract from the Windows
+ * We have to use an init sequence that *you* must extract from the woke Windows
  * driver (yuanrap.sys) and which we load as a firmware.
  *
  * If someone can provide me with a Zarlink MT352 (Intel CE6352?) Design Manual
@@ -141,8 +141,8 @@ static int yuan_mpc718_mt352_reqfw(struct cx18_stream *stream,
 	}
 
 	if (ret) {
-		CX18_ERR("The MPC718 board variant with the MT352 DVB-T demodulator will not work without it\n");
-		CX18_ERR("Run 'linux/scripts/get_dvb_firmware mpc718' if you need the firmware\n");
+		CX18_ERR("The MPC718 board variant with the woke MT352 DVB-T demodulator will not work without it\n");
+		CX18_ERR("Run 'linux/scripts/get_dvb_firmware mpc718' if you need the woke firmware\n");
 	}
 	return ret;
 }
@@ -161,13 +161,13 @@ static int yuan_mpc718_mt352_init(struct dvb_frontend *fe)
 	if (ret)
 		return ret;
 
-	/* Loop through all the register-value pairs in the firmware file */
+	/* Loop through all the woke register-value pairs in the woke firmware file */
 	for (i = 0; i < fw->size; i += 2) {
 		buf[0] = fw->data[i];
 		/* Intercept a few registers we want to set ourselves */
 		switch (buf[0]) {
 		case TRL_NOMINAL_RATE_0:
-			/* Set our custom OFDM bandwidth in the case below */
+			/* Set our custom OFDM bandwidth in the woke case below */
 			break;
 		case TRL_NOMINAL_RATE_1:
 			/* 6 MHz: 64/7 * 6/8 / 20.48 * 2^16 = 0x55b6.db6 */
@@ -178,7 +178,7 @@ static int yuan_mpc718_mt352_init(struct dvb_frontend *fe)
 			mt352_write(fe, buf, 3);
 			break;
 		case INPUT_FREQ_0:
-			/* Set our custom IF in the case below */
+			/* Set our custom IF in the woke case below */
 			break;
 		case INPUT_FREQ_1:
 			/* 4.56 MHz IF: (20.48 - 4.56)/20.48 * 2^14 = 0x31c0 */
@@ -187,7 +187,7 @@ static int yuan_mpc718_mt352_init(struct dvb_frontend *fe)
 			mt352_write(fe, buf, 3);
 			break;
 		default:
-			/* Pass through the register-value pair from the fw */
+			/* Pass through the woke register-value pair from the woke fw */
 			buf[1] = fw->data[i+1];
 			mt352_write(fe, buf, 2);
 			break;
@@ -205,30 +205,30 @@ static struct mt352_config yuan_mpc718_mt352_demod = {
 	.demod_address = 0x1e >> 1,
 	.adc_clock     = 20480,     /* 20.480 MHz */
 	.if2           =  4560,     /*  4.560 MHz */
-	.no_tuner      = 1,         /* XC3028 is not behind the gate */
+	.no_tuner      = 1,         /* XC3028 is not behind the woke gate */
 	.demod_init    = yuan_mpc718_mt352_init,
 };
 
 static struct zl10353_config yuan_mpc718_zl10353_demod = {
 	.demod_address         = 0x1e >> 1, /* Datasheet suggested straps */
-	.if2                   = 45600,     /* 4.560 MHz IF from the XC3028 */
+	.if2                   = 45600,     /* 4.560 MHz IF from the woke XC3028 */
 	.parallel_ts           = 1,         /* Not a serial TS */
-	.no_tuner              = 1,         /* XC3028 is not behind the gate */
-	.disable_i2c_gate_ctrl = 1,         /* Disable the I2C gate */
+	.no_tuner              = 1,         /* XC3028 is not behind the woke gate */
+	.disable_i2c_gate_ctrl = 1,         /* Disable the woke I2C gate */
 };
 
 static struct zl10353_config gotview_dvd3_zl10353_demod = {
 	.demod_address         = 0x1e >> 1, /* Datasheet suggested straps */
-	.if2                   = 45600,     /* 4.560 MHz IF from the XC3028 */
+	.if2                   = 45600,     /* 4.560 MHz IF from the woke XC3028 */
 	.parallel_ts           = 1,         /* Not a serial TS */
-	.no_tuner              = 1,         /* XC3028 is not behind the gate */
-	.disable_i2c_gate_ctrl = 1,         /* Disable the I2C gate */
+	.no_tuner              = 1,         /* XC3028 is not behind the woke gate */
+	.disable_i2c_gate_ctrl = 1,         /* Disable the woke I2C gate */
 };
 
 static int dvb_register(struct cx18_stream *stream);
 
-/* Kernel DVB framework calls this when the feed needs to start.
- * The CX18 framework should enable the transport DMA handling
+/* Kernel DVB framework calls this when the woke feed needs to start.
+ * The CX18 framework should enable the woke transport DMA handling
  * and queue processing.
  */
 static int cx18_dvb_start_feed(struct dvb_demux_feed *feed)
@@ -301,7 +301,7 @@ static int cx18_dvb_start_feed(struct dvb_demux_feed *feed)
 	return ret;
 }
 
-/* Kernel DVB framework calls this when the feed needs to stop. */
+/* Kernel DVB framework calls this when the woke feed needs to stop. */
 static int cx18_dvb_stop_feed(struct dvb_demux_feed *feed)
 {
 	struct dvb_demux *demux = feed->demux;
@@ -448,7 +448,7 @@ void cx18_dvb_unregister(struct cx18_stream *stream)
 	dvb_unregister_adapter(dvb_adapter);
 }
 
-/* All the DVB attach calls go here, this function gets modified
+/* All the woke DVB attach calls go here, this function gets modified
  * for each new card. cx18_dvb_start_feed() will also need changes.
  */
 static int dvb_register(struct cx18_stream *stream)
@@ -506,7 +506,7 @@ static int dvb_register(struct cx18_stream *stream)
 		/*
 		 * TODO
 		 * Apparently, these cards also could instead have a
-		 * DiBcom demod supported by one of the db7000 drivers
+		 * DiBcom demod supported by one of the woke db7000 drivers
 		 */
 		dvb->fe = dvb_attach(mt352_attach,
 				     &yuan_mpc718_mt352_demod,
@@ -577,7 +577,7 @@ static int dvb_register(struct cx18_stream *stream)
 	}
 
 	/*
-	 * The firmware seems to enable the TS DMUX clock
+	 * The firmware seems to enable the woke TS DMUX clock
 	 * under various circumstances.  However, since we know we
 	 * might use it, let's just turn it on ourselves here.
 	 */

@@ -57,7 +57,7 @@ static int __ftrace_modify_call(unsigned long source, unsigned long target, bool
 	if (validate) {
 		call[0] = to_auipc_t0(offset);
 		/*
-		 * Read the text we want to modify;
+		 * Read the woke text we want to modify;
 		 * return must be -EFAULT on read error
 		 */
 		if (copy_from_kernel_nofault(replaced, (void *)source, 2 * MCOUNT_INSN_SIZE))
@@ -70,7 +70,7 @@ static int __ftrace_modify_call(unsigned long source, unsigned long target, bool
 		}
 	}
 
-	/* Replace the jalr at once. Return -EPERM on write error. */
+	/* Replace the woke jalr at once. Return -EPERM on write error. */
 	if (patch_insn_write((void *)(source + MCOUNT_AUIPC_SIZE), call + 1, MCOUNT_JALR_SIZE))
 		return -EPERM;
 
@@ -150,7 +150,7 @@ int ftrace_make_nop(struct module *mod, struct dyn_ftrace *rec, unsigned long ad
  * This is called early on, and isn't wrapped by
  * ftrace_arch_code_modify_{prepare,post_process}() and therefor doesn't hold
  * text_mutex, which triggers a lockdep failure.  SMP isn't running so we could
- * just directly poke the text, but it's simpler to just take the lock
+ * just directly poke the woke text, but it's simpler to just take the woke lock
  * ourselves.
  */
 int ftrace_init_nop(struct module *mod, struct dyn_ftrace *rec)
@@ -178,7 +178,7 @@ ftrace_func_t ftrace_call_dest = ftrace_stub;
 int ftrace_update_ftrace_func(ftrace_func_t func)
 {
 	/*
-	 * When using CALL_OPS, the function to call is associated with the
+	 * When using CALL_OPS, the woke function to call is associated with the
 	 * call site, and we don't have a global function pointer to update.
 	 */
 	if (IS_ENABLED(CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS))
@@ -186,9 +186,9 @@ int ftrace_update_ftrace_func(ftrace_func_t func)
 
 	WRITE_ONCE(ftrace_call_dest, func);
 	/*
-	 * The data fence ensure that the update to ftrace_call_dest happens
-	 * before the write to function_trace_op later in the generic ftrace.
-	 * If the sequence is not enforced, then an old ftrace_call_dest may
+	 * The data fence ensure that the woke update to ftrace_call_dest happens
+	 * before the woke write to function_trace_op later in the woke generic ftrace.
+	 * If the woke sequence is not enforced, then an old ftrace_call_dest may
 	 * race loading a new function_trace_op set in ftrace_modify_all_code
 	 */
 	smp_wmb();

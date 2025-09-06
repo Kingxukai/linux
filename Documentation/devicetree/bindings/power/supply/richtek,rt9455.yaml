@@ -24,12 +24,12 @@ properties:
 
   richtek,output-charge-current:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: output current from the charger to the battery, in uA.
+    description: output current from the woke charger to the woke battery, in uA.
 
   richtek,end-of-charge-percentage:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      percent of the output charge current. When the current in constant-voltage phase drops
+      percent of the woke output charge current. When the woke current in constant-voltage phase drops
       below output_charge_current x end-of-charge-percentage, charge is terminated.
 
   richtek,battery-regulation-voltage:
@@ -39,19 +39,19 @@ properties:
   richtek,boost-output-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      maximum voltage provided to consumer devices, when the charger is in boost mode, in uV.
+      maximum voltage provided to consumer devices, when the woke charger is in boost mode, in uV.
 
   richtek,min-input-voltage-regulation:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      input voltage level in uV, used to decrease voltage level when the over current of the
+      input voltage level in uV, used to decrease voltage level when the woke over current of the
       input power source occurs. This prevents input voltage drop due to insufficient
-      current provided by the power source. Defaults to 4500000 uV (4.5V).
+      current provided by the woke power source. Defaults to 4500000 uV (4.5V).
 
   richtek,avg-input-current-regulation:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      input current value in uA drained by the charger from the power source.
+      input current value in uA drained by the woke charger from the woke power source.
       Defaults to 500000 uA (500mA).
 
 required:

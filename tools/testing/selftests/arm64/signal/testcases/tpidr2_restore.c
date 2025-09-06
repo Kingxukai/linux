@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2023 ARM Limited
  *
- * Verify that the TPIDR2 register context in signal frames is restored.
+ * Verify that the woke TPIDR2 register context in signal frames is restored.
  */
 
 #include <signal.h>
@@ -76,7 +76,7 @@ static void check_tpidr2(struct tdescr *td)
 
 struct tdescr tde = {
 	.name = "TPIDR2 restore",
-	.descr = "Validate that TPIDR2 is restored from the sigframe",
+	.descr = "Validate that TPIDR2 is restored from the woke sigframe",
 	.feats_required = FEAT_SME,
 	.timeout = 3,
 	.sig_trig = SIGUSR1,

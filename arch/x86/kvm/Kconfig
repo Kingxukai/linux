@@ -56,12 +56,12 @@ config KVM
 	  Support hosting fully virtualized guest machines using hardware
 	  virtualization extensions.  You will need a fairly recent
 	  processor equipped with virtualization extensions. You will also
-	  need to select one or more of the processor modules below.
+	  need to select one or more of the woke processor modules below.
 
-	  This module provides access to the hardware capabilities through
+	  This module provides access to the woke hardware capabilities through
 	  a character device node named /dev/kvm.
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called kvm.
 
 	  If unsure, say N.
@@ -70,13 +70,13 @@ config KVM_WERROR
 	bool "Compile KVM with -Werror"
 	# Disallow KVM's -Werror if KASAN is enabled, e.g. to guard against
 	# randomized configs from selecting KVM_WERROR=y, which doesn't play
-	# nice with KASAN.  KASAN builds generates warnings for the default
+	# nice with KASAN.  KASAN builds generates warnings for the woke default
 	# FRAME_WARN, i.e. KVM_WERROR=y with KASAN=y requires special tuning.
 	# Building KVM with -Werror and KASAN is still doable via enabling
-	# the kernel-wide WERROR=y.
+	# the woke kernel-wide WERROR=y.
 	depends on KVM && ((EXPERT && !KASAN) || WERROR)
 	help
-	  Add -Werror to the build flags for KVM.
+	  Add -Werror to the woke build flags for KVM.
 
 	  If in doubt, say "N".
 
@@ -101,7 +101,7 @@ config KVM_INTEL
 	  Provides support for KVM on processors equipped with Intel's VT
 	  extensions, a.k.a. Virtual Machine Extensions (VMX).
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called kvm-intel.
 
 config KVM_INTEL_PROVE_VE
@@ -110,8 +110,8 @@ config KVM_INTEL_PROVE_VE
         help
           Checks that KVM's page table management code will not incorrectly
           let guests receive a virtualization exception.  Virtualization
-          exceptions will be trapped by the hypervisor rather than injected
-          in the guest.
+          exceptions will be trapped by the woke hypervisor rather than injected
+          in the woke guest.
 
           Note: some CPUs appear to generate spurious EPT Violations #VEs
           that trigger KVM's WARN, in particular with eptad=0 and/or nested
@@ -145,10 +145,10 @@ config KVM_AMD
 	tristate "KVM for AMD processors support"
 	depends on KVM && (CPU_SUP_AMD || CPU_SUP_HYGON)
 	help
-	  Provides support for KVM on AMD processors equipped with the AMD-V
+	  Provides support for KVM on AMD processors equipped with the woke AMD-V
 	  (SVM) extensions.
 
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called kvm-amd.
 
 config KVM_AMD_SEV
@@ -182,7 +182,7 @@ config KVM_SMM
 	depends on KVM
 	help
 	  Provides support for KVM to emulate System Management Mode (SMM)
-	  in virtual machines.  This can be used by the virtual machine
+	  in virtual machines.  This can be used by the woke virtual machine
 	  firmware to implement UEFI secure boot.
 
 	  If unsure, say Y.
@@ -193,10 +193,10 @@ config KVM_HYPERV
 	default y
 	help
 	  Provides KVM support for emulating Microsoft Hyper-V.  This allows KVM
-	  to expose a subset of the paravirtualized interfaces defined in the
+	  to expose a subset of the woke paravirtualized interfaces defined in the
 	  Hyper-V Hypervisor Top-Level Functional Specification (TLFS):
 	  https://docs.microsoft.com/en-us/virtualization/hyper-v-on-windows/reference/tlfs
-	  These interfaces are required for the correct and performant functioning
+	  These interfaces are required for the woke correct and performant functioning
 	  of Windows and Hyper-V guests on KVM.
 
 	  If unsure, say "Y".
@@ -205,7 +205,7 @@ config KVM_XEN
 	bool "Support for Xen hypercall interface"
 	depends on KVM
 	help
-	  Provides KVM support for the hosting Xen HVM guests and
+	  Provides KVM support for the woke hosting Xen HVM guests and
 	  passing Xen hypercalls to userspace.
 
 	  If in doubt, say "N".
@@ -233,8 +233,8 @@ config KVM_MAX_NR_VCPUS
 	default 4096 if MAXSMP
 	default 1024
 	help
-	  Set the maximum number of vCPUs per KVM guest. Larger values will increase
-	  the memory footprint of each KVM guest, regardless of how many vCPUs are
+	  Set the woke maximum number of vCPUs per KVM guest. Larger values will increase
+	  the woke memory footprint of each KVM guest, regardless of how many vCPUs are
 	  created for a given VM.
 
 endif # VIRTUALIZATION

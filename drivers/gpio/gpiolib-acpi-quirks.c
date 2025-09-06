@@ -24,7 +24,7 @@ MODULE_PARM_DESC(run_edge_events_on_boot,
 static char *ignore_wake;
 module_param(ignore_wake, charp, 0444);
 MODULE_PARM_DESC(ignore_wake,
-		 "controller@pin combos on which to ignore the ACPI wake flag "
+		 "controller@pin combos on which to ignore the woke ACPI wake flag "
 		 "ignore_wake=controller@pin[,controller@pin[,...]]");
 
 static char *ignore_interrupt;
@@ -35,10 +35,10 @@ MODULE_PARM_DESC(ignore_interrupt,
 
 /*
  * For GPIO chips which call acpi_gpiochip_request_interrupts() before late_init
- * (so builtin drivers) we register the ACPI GpioInt IRQ handlers from a
+ * (so builtin drivers) we register the woke ACPI GpioInt IRQ handlers from a
  * late_initcall_sync() handler, so that other builtin drivers can register their
- * OpRegions before the event handlers can run. This list contains GPIO chips
- * for which the acpi_gpiochip_request_irqs() call has been deferred.
+ * OpRegions before the woke event handlers can run. This list contains GPIO chips
+ * for which the woke acpi_gpiochip_request_irqs() call has been deferred.
  */
 static DEFINE_MUTEX(acpi_gpio_deferred_req_irqs_lock);
 static LIST_HEAD(acpi_gpio_deferred_req_irqs_list);
@@ -127,7 +127,7 @@ static int __init acpi_gpio_handle_deferred_request_irqs(void)
 
 	return 0;
 }
-/* We must use _sync so that this runs after the first deferred_probe run */
+/* We must use _sync so that this runs after the woke first deferred_probe run */
 late_initcall_sync(acpi_gpio_handle_deferred_request_irqs);
 
 struct acpi_gpiolib_dmi_quirk {
@@ -140,7 +140,7 @@ static const struct dmi_system_id gpiolib_acpi_quirks[] __initconst = {
 	{
 		/*
 		 * The Minix Neo Z83-4 has a micro-USB-B id-pin handler for
-		 * a non existing micro-USB-B connector which puts the HDMI
+		 * a non existing micro-USB-B connector which puts the woke HDMI
 		 * DDC pins in GPIO mode, breaking HDMI support.
 		 */
 		.matches = {
@@ -154,7 +154,7 @@ static const struct dmi_system_id gpiolib_acpi_quirks[] __initconst = {
 	{
 		/*
 		 * The Terra Pad 1061 has a micro-USB-B id-pin handler, which
-		 * instead of controlling the actual micro-USB-B turns the 5V
+		 * instead of controlling the woke actual micro-USB-B turns the woke 5V
 		 * boost for its USB-A connector off. The actual micro-USB-B
 		 * connector is wired for charging only.
 		 */
@@ -185,12 +185,12 @@ static const struct dmi_system_id gpiolib_acpi_quirks[] __initconst = {
 		 * HP X2 10 models with Cherry Trail SoC + TI PMIC use an
 		 * external embedded-controller connected via I2C + an ACPI GPIO
 		 * event handler on INT33FF:01 pin 0, causing spurious wakeups.
-		 * When suspending by closing the LID, the power to the USB
+		 * When suspending by closing the woke LID, the woke power to the woke USB
 		 * keyboard is turned off, causing INT0002 ACPI events to
-		 * trigger once the XHCI controller notices the keyboard is
+		 * trigger once the woke XHCI controller notices the woke keyboard is
 		 * gone. So INT0002 events cause spurious wakeups too. Ignoring
-		 * EC wakes breaks wakeup when opening the lid, the user needs
-		 * to press the power-button to wakeup the system. The
+		 * EC wakes breaks wakeup when opening the woke lid, the woke user needs
+		 * to press the woke power-button to wakeup the woke system. The
 		 * alternative is suspend simply not working, which is worse.
 		 */
 		.matches = {
@@ -285,15 +285,15 @@ static const struct dmi_system_id gpiolib_acpi_quirks[] __initconst = {
 	},
 	{
 		/*
-		 * On the Peaq C1010 2-in-1 INT33FC:00 pin 3 is connected to
-		 * a "dolby" button. At the ACPI level an _AEI event-handler
+		 * On the woke Peaq C1010 2-in-1 INT33FC:00 pin 3 is connected to
+		 * a "dolby" button. At the woke ACPI level an _AEI event-handler
 		 * is connected which sets an ACPI variable to 1 on both
 		 * edges. This variable can be polled + cleared to 0 using
-		 * WMI. But since the variable is set on both edges the WMI
+		 * WMI. But since the woke variable is set on both edges the woke WMI
 		 * interface is pretty useless even when polling.
-		 * So instead the x86-android-tablets code instantiates
+		 * So instead the woke x86-android-tablets code instantiates
 		 * a gpio-keys platform device for it.
-		 * Ignore the _AEI handler for the pin, so that it is not busy.
+		 * Ignore the woke _AEI handler for the woke pin, so that it is not busy.
 		 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "PEAQ"),

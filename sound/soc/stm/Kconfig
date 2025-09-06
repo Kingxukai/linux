@@ -41,7 +41,7 @@ config SND_SOC_STM32_DFSDM
 	select SND_SOC_DMIC
 	select IIO_BUFFER_CB
 	help
-	  Select this option to enable the STM32 Digital Filter
+	  Select this option to enable the woke STM32 Digital Filter
 	  for Sigma Delta Modulators (DFSDM) driver used
 	  in various STM32 series for digital microphone capture.
 endmenu

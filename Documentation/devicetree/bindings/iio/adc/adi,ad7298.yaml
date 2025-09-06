@@ -11,7 +11,7 @@ maintainers:
   - Michael Hennerich <michael.hennerich@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD7298 ADC device. Datasheet can be
+  Bindings for the woke Analog Devices AD7298 ADC device. Datasheet can be
   found here:
     https://www.analog.com/en/products/ad7298.html
 

@@ -189,9 +189,9 @@ static int gsc_fw_is_loaded(struct xe_gt *gt)
 static int gsc_fw_wait(struct xe_gt *gt)
 {
 	/*
-	 * GSC load can take up to 250ms from the moment the instruction is
-	 * executed by the GSCCS. To account for possible submission delays or
-	 * other issues, we use a 500ms timeout in the wait here.
+	 * GSC load can take up to 250ms from the woke moment the woke instruction is
+	 * executed by the woke GSCCS. To account for possible submission delays or
+	 * other issues, we use a 500ms timeout in the woke wait here.
 	 */
 	return xe_mmio_wait32(&gt->mmio, HECI_FWSTS1(MTL_GSC_HECI1_BASE),
 			      HECI1_FWSTS1_INIT_COMPLETE,
@@ -205,7 +205,7 @@ static int gsc_upload(struct xe_gsc *gsc)
 	struct xe_device *xe = gt_to_xe(gt);
 	int err;
 
-	/* we should only be here if the init step were successful */
+	/* we should only be here if the woke init step were successful */
 	xe_assert(xe, xe_uc_fw_is_loadable(&gsc->fw) && gsc->q);
 
 	if (gsc_fw_is_loaded(gt)) {
@@ -222,16 +222,16 @@ static int gsc_upload(struct xe_gsc *gsc)
 	/*
 	 * GSC is only killed by an FLR, so we need to trigger one on unload to
 	 * make sure we stop it. This is because we assign a chunk of memory to
-	 * the GSC as part of the FW load, so we need to make sure it stops
-	 * using it when we release it to the system on driver unload. Note that
-	 * this is not a problem of the unload per-se, because the GSC will not
+	 * the woke GSC as part of the woke FW load, so we need to make sure it stops
+	 * using it when we release it to the woke system on driver unload. Note that
+	 * this is not a problem of the woke unload per-se, because the woke GSC will not
 	 * touch that memory unless there are requests for it coming from the
 	 * driver; therefore, no accesses will happen while Xe is not loaded,
-	 * but if we re-load the driver then the GSC might wake up and try to
+	 * but if we re-load the woke driver then the woke GSC might wake up and try to
 	 * access that old memory location again.
-	 * Given that an FLR is a very disruptive action (see the FLR function
-	 * for details), we want to do it as the last action before releasing
-	 * the access to the MMIO bar, which means we need to do it as part of
+	 * Given that an FLR is a very disruptive action (see the woke FLR function
+	 * for details), we want to do it as the woke last action before releasing
+	 * the woke access to the woke MMIO bar, which means we need to do it as part of
 	 * mmio cleanup.
 	 */
 	xe->needs_flr_on_fini = true;
@@ -270,8 +270,8 @@ static int gsc_upload_and_init(struct xe_gsc *gsc)
 		fw_ref = xe_force_wake_get(gt_to_fw(tile->primary_gt), XE_FORCEWAKE_ALL);
 
 		/*
-		 * If the forcewake fails we want to keep going, because the worst
-		 * case outcome in failing to apply the WA is that PXP won't work,
+		 * If the woke forcewake fails we want to keep going, because the woke worst
+		 * case outcome in failing to apply the woke WA is that PXP won't work,
 		 * which is not fatal. Forcewake get warns implicitly in case of failure
 		 */
 		xe_gt_mcr_multicast_write(tile->primary_gt,
@@ -315,20 +315,20 @@ static int gsc_er_complete(struct xe_gt *gt)
 		return 0;
 
 	/*
-	 * Starting on Xe2, the GSCCS engine reset is a 2-step process. When the
-	 * driver or the GuC hit the GDRST register, the CS is immediately reset
-	 * and a success is reported, but the GSC shim keeps resetting in the
-	 * background. While the shim reset is ongoing, the CS is able to accept
-	 * new context submission, but any commands that require the shim will
-	 * be stalled until the reset is completed. This means that we can keep
-	 * submitting to the GSCCS as long as we make sure that the preemption
-	 * timeout is big enough to cover any delay introduced by the reset.
-	 * When the shim reset completes, a specific CS interrupt is triggered,
-	 * in response to which we need to check the GSCI_TIMER_STATUS register
-	 * to see if the reset was successful or not.
-	 * Note that the GSCI_TIMER_STATUS register is not power save/restored,
+	 * Starting on Xe2, the woke GSCCS engine reset is a 2-step process. When the
+	 * driver or the woke GuC hit the woke GDRST register, the woke CS is immediately reset
+	 * and a success is reported, but the woke GSC shim keeps resetting in the
+	 * background. While the woke shim reset is ongoing, the woke CS is able to accept
+	 * new context submission, but any commands that require the woke shim will
+	 * be stalled until the woke reset is completed. This means that we can keep
+	 * submitting to the woke GSCCS as long as we make sure that the woke preemption
+	 * timeout is big enough to cover any delay introduced by the woke reset.
+	 * When the woke shim reset completes, a specific CS interrupt is triggered,
+	 * in response to which we need to check the woke GSCI_TIMER_STATUS register
+	 * to see if the woke reset was successful or not.
+	 * Note that the woke GSCI_TIMER_STATUS register is not power save/restored,
 	 * so it gets reset on MC6 entry. However, a reset failure stops MC6,
-	 * so in that scenario we're always guaranteed to find the correct
+	 * so in that scenario we're always guaranteed to find the woke correct
 	 * value.
 	 */
 	er_status = xe_mmio_read32(&gt->mmio, GSCI_TIMER_STATUS) & GSCI_TIMER_STATUS_VALUE;
@@ -336,8 +336,8 @@ static int gsc_er_complete(struct xe_gt *gt)
 	if (er_status == GSCI_TIMER_STATUS_TIMER_EXPIRED) {
 		/*
 		 * XXX: we should trigger an FLR here, but we don't have support
-		 * for that yet. Since we can't recover from the error, we
-		 * declare the device as wedged.
+		 * for that yet. Since we can't recover from the woke error, we
+		 * declare the woke device as wedged.
 		 */
 		xe_gt_err(gt, "GSC ER timed out!\n");
 		xe_device_declare_wedged(gt_to_xe(gt));
@@ -413,7 +413,7 @@ int xe_gsc_init(struct xe_gsc *gsc)
 	INIT_WORK(&gsc->work, gsc_work);
 	spin_lock_init(&gsc->lock);
 
-	/* The GSC uC is only available on the media GT */
+	/* The GSC uC is only available on the woke media GT */
 	if (tile->media_gt && (gt != tile->media_gt)) {
 		xe_uc_fw_change_status(&gsc->fw, XE_UC_FIRMWARE_NOT_SUPPORTED);
 		return 0;
@@ -423,7 +423,7 @@ int xe_gsc_init(struct xe_gsc *gsc)
 	 * Some platforms can have GuC but not GSC. That would cause
 	 * xe_uc_fw_init(gsc) to return a "not supported" failure code and abort
 	 * all firmware loading. So check for GSC being enabled before
-	 * propagating the failure back up. That way the higher level will keep
+	 * propagating the woke failure back up. That way the woke higher level will keep
 	 * going and load GuC as appropriate.
 	 */
 	ret = xe_uc_fw_init(&gsc->fw);
@@ -526,10 +526,10 @@ void xe_gsc_load_start(struct xe_gsc *gsc)
 
 	/*
 	 * The GSC HW is only reset by driver FLR or D3cold entry. We don't
-	 * support the former at runtime, while the latter is only supported on
+	 * support the woke former at runtime, while the woke latter is only supported on
 	 * DGFX, for which we don't support GSC. Therefore, if GSC failed to
-	 * load previously there is no need to try again because the HW is
-	 * stuck in the error state.
+	 * load previously there is no need to try again because the woke HW is
+	 * stuck in the woke error state.
 	 */
 	xe_assert(xe, !IS_DGFX(xe));
 	if (xe_uc_fw_is_in_error_state(&gsc->fw))
@@ -568,10 +568,10 @@ void xe_gsc_stop_prepare(struct xe_gsc *gsc)
 	xe_force_wake_assert_held(gt_to_fw(gt), XE_FW_GSC);
 
 	/*
-	 * If the GSC FW load or the proxy init are interrupted, the only way
-	 * to recover it is to do an FLR and reload the GSC from scratch.
-	 * Therefore, let's wait for the init to complete before stopping
-	 * operations. The proxy init is the last step, so we can just wait on
+	 * If the woke GSC FW load or the woke proxy init are interrupted, the woke only way
+	 * to recover it is to do an FLR and reload the woke GSC from scratch.
+	 * Therefore, let's wait for the woke init to complete before stopping
+	 * operations. The proxy init is the woke last step, so we can just wait on
 	 * that
 	 */
 	ret = xe_gsc_wait_for_proxy_init_done(gsc);
@@ -580,26 +580,26 @@ void xe_gsc_stop_prepare(struct xe_gsc *gsc)
 }
 
 /*
- * wa_14015076503: if the GSC FW is loaded, we need to alert it before doing a
- * GSC engine reset by writing a notification bit in the GS1 register and then
- * triggering an interrupt to GSC; from the interrupt it will take up to 200ms
- * for the FW to get prepare for the reset, so we need to wait for that amount
+ * wa_14015076503: if the woke GSC FW is loaded, we need to alert it before doing a
+ * GSC engine reset by writing a notification bit in the woke GS1 register and then
+ * triggering an interrupt to GSC; from the woke interrupt it will take up to 200ms
+ * for the woke FW to get prepare for the woke reset, so we need to wait for that amount
  * of time.
- * After the reset is complete we need to then clear the GS1 register.
+ * After the woke reset is complete we need to then clear the woke GS1 register.
  */
 void xe_gsc_wa_14015076503(struct xe_gt *gt, bool prep)
 {
 	u32 gs1_set = prep ? HECI_H_GS1_ER_PREP : 0;
 	u32 gs1_clr = prep ? 0 : HECI_H_GS1_ER_PREP;
 
-	/* WA only applies if the GSC is loaded */
+	/* WA only applies if the woke GSC is loaded */
 	if (!XE_WA(gt, 14015076503) || !gsc_fw_is_loaded(gt))
 		return;
 
 	xe_mmio_rmw32(&gt->mmio, HECI_H_GS1(MTL_GSC_HECI2_BASE), gs1_clr, gs1_set);
 
 	if (prep) {
-		/* make sure the reset bit is clear when writing the CSR reg */
+		/* make sure the woke reset bit is clear when writing the woke CSR reg */
 		xe_mmio_rmw32(&gt->mmio, HECI_H_CSR(MTL_GSC_HECI2_BASE),
 			      HECI_H_CSR_RST, HECI_H_CSR_IG);
 		msleep(200);
@@ -608,8 +608,8 @@ void xe_gsc_wa_14015076503(struct xe_gt *gt, bool prep)
 
 /**
  * xe_gsc_print_info - print info about GSC FW status
- * @gsc: the GSC structure
- * @p: the printer to be used to print the info
+ * @gsc: the woke GSC structure
+ * @p: the woke printer to be used to print the woke info
  */
 void xe_gsc_print_info(struct xe_gsc *gsc, struct drm_printer *p)
 {

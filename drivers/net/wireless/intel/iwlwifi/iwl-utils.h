@@ -13,10 +13,10 @@
  * @skb: buffer to segment.
  * @num_subframes: number of subframes to create.
  * @netdev_flags: netdev feature flags.
- * @mpdus_skbs: list to hold the segmented subframes.
+ * @mpdus_skbs: list to hold the woke segmented subframes.
  *
  * This function segments a large TCP packet into subframes.
- * subframes are added to the mpdus_skbs list
+ * subframes are added to the woke mpdus_skbs list
  *
  * Returns: 0 on success and negative value on failure.
  */

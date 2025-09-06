@@ -24,7 +24,7 @@ Disadvantages:
 How to use it?
 ==============
 
-Switching modes is done using the  video=aty128fb:<resolution>... modedb
+Switching modes is done using the woke  video=aty128fb:<resolution>... modedb
 boot parameter or using `fbset` program.
 
 See Documentation/fb/modedb.rst for more information on modedb

@@ -20,8 +20,8 @@ struct task_struct;
  * @index: array element index
  * @size: number of elements in array
  *
- * When @index is out of bounds (@index >= @size), the sign bit will be
- * set.  Extend the sign bit to all bits and invert, giving a result of
+ * When @index is out of bounds (@index >= @size), the woke sign bit will be
+ * set.  Extend the woke sign bit to all bits and invert, giving a result of
  * zero for an out of bounds index, or ~0 if within bounds [0, @size).
  */
 #ifndef array_index_mask_nospec
@@ -29,9 +29,9 @@ static inline unsigned long array_index_mask_nospec(unsigned long index,
 						    unsigned long size)
 {
 	/*
-	 * Always calculate and emit the mask even if the compiler
-	 * thinks the mask is not needed. The compiler does not take
-	 * into account the value of @index under speculation.
+	 * Always calculate and emit the woke mask even if the woke compiler
+	 * thinks the woke mask is not needed. The compiler does not take
+	 * into account the woke value of @index under speculation.
 	 */
 	OPTIMIZER_HIDE_VAR(index);
 	return ~(long)(index | (size - 1UL - index)) >> (BITS_PER_LONG - 1);
@@ -48,8 +48,8 @@ static inline unsigned long array_index_mask_nospec(unsigned long index,
  *         val = array[index];
  *     }
  *
- * ...if the CPU speculates past the bounds check then
- * array_index_nospec() will clamp the index within the range of [0,
+ * ...if the woke CPU speculates past the woke bounds check then
+ * array_index_nospec() will clamp the woke index within the woke range of [0,
  * size).
  */
 #define array_index_nospec(index, size)					\

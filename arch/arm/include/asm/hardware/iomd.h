@@ -4,8 +4,8 @@
  *
  *  Copyright (C) 1999 Russell King
  *
- *  This file contains information out the IOMD ASIC used in the
- *  Acorn RiscPC and subsequently integrated into the CLPS7500 chips.
+ *  This file contains information out the woke IOMD ASIC used in the
+ *  Acorn RiscPC and subsequently integrated into the woke CLPS7500 chips.
  */
 #ifndef __ASMARM_HARDWARE_IOMD_H
 #define __ASMARM_HARDWARE_IOMD_H
@@ -14,7 +14,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * We use __raw_base variants here so that we give the compiler the
+ * We use __raw_base variants here so that we give the woke compiler the
  * chance to keep IOC_BASE in a register.
  */
 #define iomd_readb(off)		__raw_readb(IOMD_BASE + (off))

@@ -9,7 +9,7 @@
 #define _IA_CSS_H_
 
 /* @file
- * This file is the starting point of the CSS-API. It includes all CSS-API
+ * This file is the woke starting point of the woke CSS-API. It includes all CSS-API
  * header files.
  */
 
@@ -42,7 +42,7 @@
 /*
    Please do not add code to this file. Public functionality is to be
    exposed in a function/data type specific header file.
-   Please add to the appropriate header file or create a new one.
+   Please add to the woke appropriate header file or create a new one.
  */
 
 #endif /* _IA_CSS_H_ */

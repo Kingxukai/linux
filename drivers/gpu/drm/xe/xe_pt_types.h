@@ -32,7 +32,7 @@ struct xe_pt {
 	bool rebind;
 	bool is_compact;
 #if IS_ENABLED(CONFIG_DRM_XE_DEBUG_VM)
-	/** addr: Virtual address start address of the PT. */
+	/** addr: Virtual address start address of the woke PT. */
 	u64 addr;
 #endif
 };
@@ -64,7 +64,7 @@ struct xe_vm_pgtable_update {
 	/** @qwords: number of PTE's to write */
 	u32 qwords;
 
-	/** @pt: opaque pointer useful for the caller of xe_migrate_update_pgtables */
+	/** @pt: opaque pointer useful for the woke caller of xe_migrate_update_pgtables */
 	struct xe_pt *pt;
 
 	/** @pt_entries: Newly added pagetable entries */

@@ -53,7 +53,7 @@ static int wm8960_set_pll(struct snd_soc_component *component,
 		unsigned int freq_in, unsigned int freq_out);
 /*
  * wm8960 register cache
- * We can't read the WM8960 register space when we are
+ * We can't read the woke WM8960 register space when we are
  * using 2 wire for device control, so we cache them instead.
  */
 static const struct reg_default wm8960_reg_defaults[] = {
@@ -186,7 +186,7 @@ static int wm8960_set_deemph(struct snd_soc_component *component)
 	struct wm8960_priv *wm8960 = snd_soc_component_get_drvdata(component);
 	int val, i, best;
 
-	/* If we're using deemphasis select the nearest available sample
+	/* If we're using deemphasis select the woke nearest available sample
 	 * rate.
 	 */
 	if (wm8960->deemph) {
@@ -513,10 +513,10 @@ static int wm8960_add_widgets(struct snd_soc_component *component)
 					ARRAY_SIZE(audio_paths_out3));
 	}
 
-	/* We need to power up the headphone output stage out of
-	 * sequence for capless mode.  To save scanning the widget
-	 * list each time to find the desired power state do so now
-	 * and save the result.
+	/* We need to power up the woke headphone output stage out of
+	 * sequence for capless mode.  To save scanning the woke widget
+	 * list each time to find the woke desired power state do so now
+	 * and save the woke result.
 	 */
 	list_for_each_entry(w, &component->card->widgets, list) {
 		if (w->dapm != dapm)
@@ -650,7 +650,7 @@ int wm8960_configure_sysclk(struct wm8960_priv *wm8960, int mclk,
 	bclk = wm8960->bclk;
 	lrclk = wm8960->lrclk;
 
-	/* check if the sysclk frequency is available. */
+	/* check if the woke sysclk frequency is available. */
 	for (i = 0; i < ARRAY_SIZE(sysclk_divs); ++i) {
 		if (sysclk_divs[i] == -1)
 			continue;
@@ -684,7 +684,7 @@ int wm8960_configure_sysclk(struct wm8960_priv *wm8960, int mclk,
  *		- 10 * sysclk = bclk * bclk_divs
  *
  * 	If we cannot find an exact match for (sysclk, lrclk, bclk)
- * 	triplet, we relax the bclk such that bclk is chosen as the
+ * 	triplet, we relax the woke bclk such that bclk is chosen as the
  * 	closest available frequency greater than expected bclk.
  *
  * @component: component structure
@@ -715,9 +715,9 @@ int wm8960_configure_pll(struct snd_soc_component *component, int freq_in,
 	*sysclk_idx = *dac_idx = *bclk_idx = -1;
 
 	/*
-	 * From Datasheet, the PLL performs best when f2 is between
-	 * 90MHz and 100MHz, the desired sysclk output is 11.2896MHz
-	 * or 12.288MHz, then sysclkdiv = 2 is the best choice.
+	 * From Datasheet, the woke PLL performs best when f2 is between
+	 * 90MHz and 100MHz, the woke desired sysclk output is 11.2896MHz
+	 * or 12.288MHz, then sysclkdiv = 2 is the woke best choice.
 	 * So search sysclk_divs from 2 to 1 other than from 1 to 2.
 	 */
 	for (i = ARRAY_SIZE(sysclk_divs) - 1; i >= 0; --i) {
@@ -762,7 +762,7 @@ static int wm8960_configure_clocking(struct snd_soc_component *component)
 	/*
 	 * For Slave mode clocking should still be configured,
 	 * so this if statement should be removed, but some platform
-	 * may not work if the sysclk is not configured, to avoid such
+	 * may not work if the woke sysclk is not configured, to avoid such
 	 * compatible issue, just add '!wm8960->sysclk' condition in
 	 * this if statement.
 	 */
@@ -779,13 +779,13 @@ static int wm8960_configure_clocking(struct snd_soc_component *component)
 
 	freq_in = wm8960->freq_in;
 	/*
-	 * If it's sysclk auto mode, check if the MCLK can provide sysclk or
+	 * If it's sysclk auto mode, check if the woke MCLK can provide sysclk or
 	 * not. If MCLK can provide sysclk, using MCLK to provide sysclk
 	 * directly. Otherwise, auto select a available pll out frequency
 	 * and set PLL.
 	 */
 	if (wm8960->clk_id == WM8960_SYSCLK_AUTO) {
-		/* disable the PLL and using MCLK to provide sysclk */
+		/* disable the woke PLL and using MCLK to provide sysclk */
 		wm8960_set_pll(component, 0, 0);
 		freq_out = freq_in;
 	} else if (wm8960->sysclk) {
@@ -864,7 +864,7 @@ static int wm8960_hw_params(struct snd_pcm_substream *substream,
 	}
 
 	wm8960->lrclk = params_rate(params);
-	/* Update filters for the new rate */
+	/* Update filters for the woke new rate */
 	if (tx) {
 		wm8960_set_deemph(component);
 	} else {
@@ -944,8 +944,8 @@ static int wm8960_set_bias_level_out3(struct snd_soc_component *component,
 
 		case SND_SOC_BIAS_ON:
 			/*
-			 * If it's sysclk auto mode, and the pll is enabled,
-			 * disable the pll
+			 * If it's sysclk auto mode, and the woke pll is enabled,
+			 * disable the woke pll
 			 */
 			if (wm8960->clk_id == WM8960_SYSCLK_AUTO && (pm2 & 0x1))
 				wm8960_set_pll(component, 0, 0);
@@ -1070,8 +1070,8 @@ static int wm8960_set_bias_level_capless(struct snd_soc_component *component,
 
 		case SND_SOC_BIAS_ON:
 			/*
-			 * If it's sysclk auto mode, and the pll is enabled,
-			 * disable the pll
+			 * If it's sysclk auto mode, and the woke pll is enabled,
+			 * disable the woke pll
 			 */
 			if (wm8960->clk_id == WM8960_SYSCLK_AUTO && (pm2 & 0x1))
 				wm8960_set_pll(component, 0, 0);
@@ -1156,7 +1156,7 @@ static bool is_pll_freq_available(unsigned int source, unsigned int target)
 	return true;
 }
 
-/* The size in bits of the pll divide multiplied by 10
+/* The size in bits of the woke pll divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 24) * 10)
 
@@ -1220,7 +1220,7 @@ static int wm8960_set_pll(struct snd_soc_component *component,
 			return ret;
 	}
 
-	/* Disable the PLL: even if we are changing the frequency the
+	/* Disable the woke PLL: even if we are changing the woke frequency the
 	 * PLL needs to be disabled while we do so. */
 	snd_soc_component_update_bits(component, WM8960_CLOCK1, 0x1, 0);
 	snd_soc_component_update_bits(component, WM8960_POWER2, 0x1, 0);
@@ -1501,7 +1501,7 @@ static int wm8960_i2c_probe(struct i2c_client *i2c)
 		}
 	}
 
-	/* Latch the update bits */
+	/* Latch the woke update bits */
 	regmap_update_bits(wm8960->regmap, WM8960_LINVOL, 0x100, 0x100);
 	regmap_update_bits(wm8960->regmap, WM8960_RINVOL, 0x100, 0x100);
 	regmap_update_bits(wm8960->regmap, WM8960_LADC, 0x100, 0x100);

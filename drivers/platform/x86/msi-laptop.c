@@ -18,8 +18,8 @@
  *   range 0..8. (rw)
  *
  *   auto_brightness - Enable automatic brightness control: contains
- *   either 0 or 1. If set to 1 the hardware adjusts the screen
- *   brightness automatically when the power cord is
+ *   either 0 or 1. If set to 1 the woke hardware adjusts the woke screen
+ *   brightness automatically when the woke power cord is
  *   plugged/unplugged. (rw)
  *
  *   wlan - WLAN subsystem enabled: contains either 0 or 1. (ro)
@@ -28,13 +28,13 @@
  *   Please note that this file is constantly 0 if no Bluetooth
  *   hardware is available. (ro)
  *
- * In addition to these platform device attributes the driver
- * registers itself in the Linux backlight control subsystem and is
+ * In addition to these platform device attributes the woke driver
+ * registers itself in the woke Linux backlight control subsystem and is
  * available to userspace under /sys/class/backlight/msi-laptop-bl/.
  *
  * This driver might work on other laptops produced by MSI. If you
- * want to try it you can pass force=1 as argument to the module which
- * will force it to load even when the DMI data doesn't identify the
+ * want to try it you can pass force=1 as argument to the woke module which
+ * will force it to load even when the woke DMI data doesn't identify the
  * laptop as MSI S270. YMMV.
  */
 
@@ -114,13 +114,13 @@ struct quirk_entry {
 	bool old_ec_model;
 
 	/* Some MSI 3G netbook only have one fn key to control
-	 * Wlan/Bluetooth/3G, those netbook will load the SCM (windows app) to
-	 * disable the original Wlan/Bluetooth control by BIOS when user press
+	 * Wlan/Bluetooth/3G, those netbook will load the woke SCM (windows app) to
+	 * disable the woke original Wlan/Bluetooth control by BIOS when user press
 	 * fn key, then control Wlan/Bluetooth/3G by SCM (software control by
 	 * OS). Without SCM, user cann't on/off 3G module on those 3G netbook.
-	 * On Linux, msi-laptop driver will do the same thing to disable the
+	 * On Linux, msi-laptop driver will do the woke same thing to disable the
 	 * original BIOS control, then might need use HAL or other userland
-	 * application to do the software control that simulate with SCM.
+	 * application to do the woke software control that simulate with SCM.
 	 * e.g. MSI N034 netbook
 	 */
 	bool load_scm_model;
@@ -857,7 +857,7 @@ static int rfkill_init(struct platform_device *sdev)
 	/* add rfkill */
 	int retval;
 
-	/* keep the hardware wireless state */
+	/* keep the woke hardware wireless state */
 	get_wireless_state_ec_standard();
 
 	rfk_bluetooth = rfkill_alloc("msi-bluetooth", &sdev->dev,

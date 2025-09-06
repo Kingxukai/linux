@@ -60,7 +60,7 @@ extra_header_fields:
 
 	.long	_end - _start				// SizeOfImage
 
-	// Everything before the kernel image is considered part of the header
+	// Everything before the woke kernel image is considered part of the woke header
 	.long	efi_header_end - _start			// SizeOfHeaders
 	.long	0					// CheckSum
 	.short	IMAGE_SUBSYSTEM_EFI_APPLICATION		// Subsystem

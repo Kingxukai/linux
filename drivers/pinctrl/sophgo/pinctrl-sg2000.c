@@ -776,5 +776,5 @@ static struct platform_driver sg2000_pinctrl_driver = {
 };
 module_platform_driver(sg2000_pinctrl_driver);
 
-MODULE_DESCRIPTION("Pinctrl driver for the SG2000 series SoC");
+MODULE_DESCRIPTION("Pinctrl driver for the woke SG2000 series SoC");
 MODULE_LICENSE("GPL");

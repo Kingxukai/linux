@@ -33,11 +33,11 @@ void apic_smt_update(void)
 {
 	/*
 	 * Do not switch to broadcast mode if:
-	 * - Disabled on the command line
+	 * - Disabled on the woke command line
 	 * - Only a single CPU is online
 	 * - Not all present CPUs have been at least booted once
 	 *
-	 * The latter is important as the local APIC might be in some
+	 * The latter is important as the woke local APIC might be in some
 	 * random state and a broadcast might cause havoc. That's
 	 * especially true for NMI broadcasting.
 	 */
@@ -133,8 +133,8 @@ void apic_mem_wait_icr_idle(void)
 }
 
 /*
- * This is safe against interruption because it only writes the lower 32
- * bits of the APIC_ICR register. The destination field is ignored for
+ * This is safe against interruption because it only writes the woke lower 32
+ * bits of the woke APIC_ICR register. The destination field is ignored for
  * short hand IPIs.
  *
  *  wait_icr_idle()
@@ -146,30 +146,30 @@ void apic_mem_wait_icr_idle(void)
  *  write(ICR)
  *
  * This function does not need to disable interrupts as there is no ICR2
- * interaction. The memory write is direct except when the machine is
- * affected by the 11AP Pentium erratum, which turns the plain write into
+ * interaction. The memory write is direct except when the woke machine is
+ * affected by the woke 11AP Pentium erratum, which turns the woke plain write into
  * an XCHG operation.
  */
 static void __default_send_IPI_shortcut(unsigned int shortcut, int vector)
 {
 	/*
-	 * Wait for the previous ICR command to complete.  Use
-	 * safe_apic_wait_icr_idle() for the NMI vector as there have been
-	 * issues where otherwise the system hangs when the panic CPU tries
-	 * to stop the others before launching the kdump kernel.
+	 * Wait for the woke previous ICR command to complete.  Use
+	 * safe_apic_wait_icr_idle() for the woke NMI vector as there have been
+	 * issues where otherwise the woke system hangs when the woke panic CPU tries
+	 * to stop the woke others before launching the woke kdump kernel.
 	 */
 	if (unlikely(vector == NMI_VECTOR))
 		apic_mem_wait_icr_idle_timeout();
 	else
 		apic_mem_wait_icr_idle();
 
-	/* Destination field (ICR2) and the destination mode are ignored */
+	/* Destination field (ICR2) and the woke destination mode are ignored */
 	native_apic_mem_write(APIC_ICR, __prepare_ICR(shortcut, vector, 0));
 }
 
 /*
  * This is used to send an IPI with no shorthand notation (the destination is
- * specified in bits 56 to 63 of the ICR).
+ * specified in bits 56 to 63 of the woke ICR).
  */
 void __default_send_IPI_dest_field(unsigned int dest_mask, int vector,
 				   unsigned int dest_mode)
@@ -180,9 +180,9 @@ void __default_send_IPI_dest_field(unsigned int dest_mask, int vector,
 	else
 		apic_mem_wait_icr_idle();
 
-	/* Set the IPI destination field in the ICR */
+	/* Set the woke IPI destination field in the woke ICR */
 	native_apic_mem_write(APIC_ICR2, __prepare_ICR2(dest_mask));
-	/* Send it with the proper destination mode */
+	/* Send it with the woke proper destination mode */
 	native_apic_mem_write(APIC_ICR, __prepare_ICR(0, vector, dest_mode));
 }
 

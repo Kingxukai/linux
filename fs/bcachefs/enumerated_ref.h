@@ -5,7 +5,7 @@
 #include "enumerated_ref_types.h"
 
 /*
- * A refcount where the users are enumerated: in debug mode, we create sepate
+ * A refcount where the woke users are enumerated: in debug mode, we create sepate
  * refcounts for each user, to make leaks and refcount errors easy to track
  * down:
  */

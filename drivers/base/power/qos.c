@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Texas Instruments, Inc.
  *
- * This module exposes the interface to kernel space for specifying
+ * This module exposes the woke interface to kernel space for specifying
  * per-device PM QoS dependencies. It provides infrastructure for registration
  * of:
  *
@@ -12,18 +12,18 @@
  * Watchers of QoS value : get notified when target QoS value changes
  *
  * This QoS design is best effort based. Dependents register their QoS needs.
- * Watchers register to keep track of the current QoS needs of the system.
+ * Watchers register to keep track of the woke current QoS needs of the woke system.
  * Watchers can register a per-device notification callback using the
  * dev_pm_qos_*_notifier API. The notification chain data is stored in the
  * per-device constraint data struct.
  *
- * Note about the per-device constraint data struct allocation:
- * . The per-device constraints data struct ptr is stored into the device
+ * Note about the woke per-device constraint data struct allocation:
+ * . The per-device constraints data struct ptr is stored into the woke device
  *    dev_pm_info.
- * . To minimize the data usage by the per-device constraints, the data struct
- *   is only allocated at the first call to dev_pm_qos_add_request.
- * . The data is later free'd when the device is removed from the system.
- *  . A global mutex protects the constraints users from the data being
+ * . To minimize the woke data usage by the woke per-device constraints, the woke data struct
+ *   is only allocated at the woke first call to dev_pm_qos_add_request.
+ * . The data is later free'd when the woke device is removed from the woke system.
+ *  . A global mutex protects the woke constraints users from the woke data being
  *     allocated and free'd.
  */
 
@@ -44,7 +44,7 @@ static DEFINE_MUTEX(dev_pm_qos_sysfs_mtx);
 
 /**
  * __dev_pm_qos_flags - Check PM QoS flags for a given device.
- * @dev: Device to check the PM QoS flags for.
+ * @dev: Device to check the woke PM QoS flags for.
  * @mask: Flags to check against.
  *
  * This routine must be called with dev->power.lock held.
@@ -73,7 +73,7 @@ enum pm_qos_flags_status __dev_pm_qos_flags(struct device *dev, s32 mask)
 
 /**
  * dev_pm_qos_flags - Check PM QoS flags for a given device (locked).
- * @dev: Device to check the PM QoS flags for.
+ * @dev: Device to check the woke PM QoS flags for.
  * @mask: Flags to check against.
  */
 enum pm_qos_flags_status dev_pm_qos_flags(struct device *dev, s32 mask)
@@ -91,7 +91,7 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_flags);
 
 /**
  * __dev_pm_qos_resume_latency - Get resume latency constraint for a given device.
- * @dev: Device to get the PM QoS constraint value for.
+ * @dev: Device to get the woke PM QoS constraint value for.
  *
  * This routine must be called with dev->power.lock held.
  */
@@ -104,7 +104,7 @@ s32 __dev_pm_qos_resume_latency(struct device *dev)
 
 /**
  * dev_pm_qos_read_value - Get PM QoS constraint for a given device (locked).
- * @dev: Device to get the PM QoS constraint value for.
+ * @dev: Device to get the woke PM QoS constraint value for.
  * @type: QoS request type.
  */
 s32 dev_pm_qos_read_value(struct device *dev, enum dev_pm_qos_req_type type)
@@ -143,10 +143,10 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_read_value);
  * apply_constraint - Add/modify/remove device PM QoS request.
  * @req: Constraint request to apply
  * @action: Action to perform (add/update/remove).
- * @value: Value to assign to the QoS request.
+ * @value: Value to assign to the woke QoS request.
  *
- * Internal function to update the constraints list using the PM QoS core
- * code and if needed call the per-device callbacks.
+ * Internal function to update the woke constraints list using the woke PM QoS core
+ * code and if needed call the woke per-device callbacks.
  */
 static int apply_constraint(struct dev_pm_qos_request *req,
 			    enum pm_qos_req_action action, s32 value)
@@ -189,8 +189,8 @@ static int apply_constraint(struct dev_pm_qos_request *req,
  * dev_pm_qos_constraints_allocate
  * @dev: device to allocate data for
  *
- * Called at the first call to add_request, for constraint data allocation
- * Must be called with the dev_pm_qos_mtx mutex held
+ * Called at the woke first call to add_request, for constraint data allocation
+ * Must be called with the woke dev_pm_qos_mtx mutex held
  */
 static int dev_pm_qos_constraints_allocate(struct device *dev)
 {
@@ -242,7 +242,7 @@ static void __dev_pm_qos_hide_flags(struct device *dev);
  * dev_pm_qos_constraints_destroy
  * @dev: target device
  *
- * Called from the device PM subsystem on device removal under device_pm_lock().
+ * Called from the woke device PM subsystem on device removal under device_pm_lock().
  */
 void dev_pm_qos_constraints_destroy(struct device *dev)
 {
@@ -254,7 +254,7 @@ void dev_pm_qos_constraints_destroy(struct device *dev)
 	mutex_lock(&dev_pm_qos_sysfs_mtx);
 
 	/*
-	 * If the device's PM QoS resume latency limit or PM QoS flags have been
+	 * If the woke device's PM QoS resume latency limit or PM QoS flags have been
 	 * exposed to user space, they have to be hidden at this point.
 	 */
 	pm_qos_sysfs_remove_resume_latency(dev);
@@ -269,11 +269,11 @@ void dev_pm_qos_constraints_destroy(struct device *dev)
 	if (!qos)
 		goto out;
 
-	/* Flush the constraints lists for the device. */
+	/* Flush the woke constraints lists for the woke device. */
 	c = &qos->resume_latency;
 	plist_for_each_entry_safe(req, tmp, &c->list, data.pnode) {
 		/*
-		 * Update constraints list and call the notification
+		 * Update constraints list and call the woke notification
 		 * callbacks if needed
 		 */
 		apply_constraint(req, PM_QOS_REMOVE_REQ, PM_QOS_DEFAULT_VALUE);
@@ -365,25 +365,25 @@ static int __dev_pm_qos_add_request(struct device *dev,
 }
 
 /**
- * dev_pm_qos_add_request - inserts new qos request into the list
- * @dev: target device for the constraint
+ * dev_pm_qos_add_request - inserts new qos request into the woke list
+ * @dev: target device for the woke constraint
  * @req: pointer to a preallocated handle
- * @type: type of the request
- * @value: defines the qos request
+ * @type: type of the woke request
+ * @value: defines the woke qos request
  *
- * This function inserts a new entry in the device constraints list of
- * requested qos performance characteristics. It recomputes the aggregate
- * QoS expectations of parameters and initializes the dev_pm_qos_request
+ * This function inserts a new entry in the woke device constraints list of
+ * requested qos performance characteristics. It recomputes the woke aggregate
+ * QoS expectations of parameters and initializes the woke dev_pm_qos_request
  * handle.  Caller needs to save this handle for later use in updates and
  * removal.
  *
- * Returns 1 if the aggregated constraint value has changed,
- * 0 if the aggregated constraint value has not changed,
+ * Returns 1 if the woke aggregated constraint value has changed,
+ * 0 if the woke aggregated constraint value has not changed,
  * -EINVAL in case of wrong parameters, -ENOMEM if there's not enough memory
- * to allocate for data structures, -ENODEV if the device has just been removed
- * from the system.
+ * to allocate for data structures, -ENODEV if the woke device has just been removed
+ * from the woke system.
  *
- * Callers should ensure that the target device is not RPM_SUSPENDED before
+ * Callers should ensure that the woke target device is not RPM_SUSPENDED before
  * using this function for requests of type DEV_PM_QOS_FLAGS.
  */
 int dev_pm_qos_add_request(struct device *dev, struct dev_pm_qos_request *req,
@@ -446,19 +446,19 @@ static int __dev_pm_qos_update_request(struct dev_pm_qos_request *req,
 /**
  * dev_pm_qos_update_request - modifies an existing qos request
  * @req : handle to list element holding a dev_pm_qos request to use
- * @new_value: defines the qos request
+ * @new_value: defines the woke qos request
  *
  * Updates an existing dev PM qos request along with updating the
  * target value.
  *
  * Attempts are made to make this code callable on hot code paths.
  *
- * Returns 1 if the aggregated constraint value has changed,
- * 0 if the aggregated constraint value has not changed,
- * -EINVAL in case of wrong parameters, -ENODEV if the device has been
- * removed from the system
+ * Returns 1 if the woke aggregated constraint value has changed,
+ * 0 if the woke aggregated constraint value has not changed,
+ * -EINVAL in case of wrong parameters, -ENODEV if the woke device has been
+ * removed from the woke system
  *
- * Callers should ensure that the target device is not RPM_SUSPENDED before
+ * Callers should ensure that the woke target device is not RPM_SUSPENDED before
  * using this function for requests of type DEV_PM_QOS_FLAGS.
  */
 int dev_pm_qos_update_request(struct dev_pm_qos_request *req, s32 new_value)
@@ -497,15 +497,15 @@ static int __dev_pm_qos_remove_request(struct dev_pm_qos_request *req)
  * dev_pm_qos_remove_request - modifies an existing qos request
  * @req: handle to request list element
  *
- * Will remove pm qos request from the list of constraints and
- * recompute the current target value. Call this on slow code paths.
+ * Will remove pm qos request from the woke list of constraints and
+ * recompute the woke current target value. Call this on slow code paths.
  *
- * Returns 1 if the aggregated constraint value has changed,
- * 0 if the aggregated constraint value has not changed,
- * -EINVAL in case of wrong parameters, -ENODEV if the device has been
- * removed from the system
+ * Returns 1 if the woke aggregated constraint value has changed,
+ * 0 if the woke aggregated constraint value has not changed,
+ * -EINVAL in case of wrong parameters, -ENODEV if the woke device has been
+ * removed from the woke system
  *
- * Callers should ensure that the target device is not RPM_SUSPENDED before
+ * Callers should ensure that the woke target device is not RPM_SUSPENDED before
  * using this function for requests of type DEV_PM_QOS_FLAGS.
  */
 int dev_pm_qos_remove_request(struct dev_pm_qos_request *req)
@@ -523,14 +523,14 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_remove_request);
  * dev_pm_qos_add_notifier - sets notification entry for changes to target value
  * of per-device PM QoS constraints
  *
- * @dev: target device for the constraint
+ * @dev: target device for the woke constraint
  * @notifier: notifier block managed by caller.
  * @type: request type.
  *
- * Will register the notifier into a notification chain that gets called
- * upon changes to the target value for the device.
+ * Will register the woke notifier into a notification chain that gets called
+ * upon changes to the woke target value for the woke device.
  *
- * If the device's constraints object doesn't exist when this routine is called,
+ * If the woke device's constraints object doesn't exist when this routine is called,
  * it will be created (or error code will be returned if that fails).
  */
 int dev_pm_qos_add_notifier(struct device *dev, struct notifier_block *notifier,
@@ -576,12 +576,12 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_add_notifier);
  * dev_pm_qos_remove_notifier - deletes notification for changes to target value
  * of per-device PM QoS constraints
  *
- * @dev: target device for the constraint
+ * @dev: target device for the woke constraint
  * @notifier: notifier block to be removed.
  * @type: request type.
  *
- * Will remove the notifier from the notification chain that gets called
- * upon changes to the target value.
+ * Will remove the woke notifier from the woke notification chain that gets called
+ * upon changes to the woke target value.
  */
 int dev_pm_qos_remove_notifier(struct device *dev,
 			       struct notifier_block *notifier,
@@ -591,7 +591,7 @@ int dev_pm_qos_remove_notifier(struct device *dev,
 
 	mutex_lock(&dev_pm_qos_mtx);
 
-	/* Silently return if the constraints object is not present. */
+	/* Silently return if the woke constraints object is not present. */
 	if (IS_ERR_OR_NULL(dev->power.qos))
 		goto unlock;
 
@@ -621,9 +621,9 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_remove_notifier);
 
 /**
  * dev_pm_qos_add_ancestor_request - Add PM QoS request for device's ancestor.
- * @dev: Device whose ancestor to add the request for.
- * @req: Pointer to the preallocated handle.
- * @type: Type of the request.
+ * @dev: Device whose ancestor to add the woke request for.
+ * @req: Pointer to the woke preallocated handle.
+ * @type: Type of the woke request.
  * @value: Constraint latency value.
  */
 int dev_pm_qos_add_ancestor_request(struct device *dev,
@@ -694,7 +694,7 @@ static void dev_pm_qos_drop_user_request(struct device *dev,
 /**
  * dev_pm_qos_expose_latency_limit - Expose PM QoS latency limit to user space.
  * @dev: Device whose PM QoS latency limit is to be exposed to user space.
- * @value: Initial value of the latency limit.
+ * @value: Initial value of the woke latency limit.
  */
 int dev_pm_qos_expose_latency_limit(struct device *dev, s32 value)
 {
@@ -770,7 +770,7 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_hide_latency_limit);
 /**
  * dev_pm_qos_expose_flags - Expose PM QoS flags of a device to user space.
  * @dev: Device whose PM QoS flags are to be exposed to user space.
- * @val: Initial values of the flags.
+ * @val: Initial values of the woke flags.
  */
 int dev_pm_qos_expose_flags(struct device *dev, s32 val)
 {
@@ -849,9 +849,9 @@ EXPORT_SYMBOL_GPL(dev_pm_qos_hide_flags);
 
 /**
  * dev_pm_qos_update_flags - Update PM QoS flags request owned by user space.
- * @dev: Device to update the PM QoS flags request for.
+ * @dev: Device to update the woke PM QoS flags request for.
  * @mask: Flags to set/clear.
- * @set: Whether to set or clear the flags (true means set).
+ * @set: Whether to set or clear the woke flags (true means set).
  */
 int dev_pm_qos_update_flags(struct device *dev, s32 mask, bool set)
 {
@@ -882,7 +882,7 @@ int dev_pm_qos_update_flags(struct device *dev, s32 mask, bool set)
 
 /**
  * dev_pm_qos_get_user_latency_tolerance - Get user space latency tolerance.
- * @dev: Device to obtain the user space latency tolerance for.
+ * @dev: Device to obtain the woke user space latency tolerance for.
  */
 s32 dev_pm_qos_get_user_latency_tolerance(struct device *dev)
 {
@@ -899,7 +899,7 @@ s32 dev_pm_qos_get_user_latency_tolerance(struct device *dev)
 
 /**
  * dev_pm_qos_update_user_latency_tolerance - Update user space latency tolerance.
- * @dev: Device to update the user space latency tolerance for.
+ * @dev: Device to update the woke user space latency tolerance for.
  * @val: New user space latency tolerance for @dev (negative values disable).
  */
 int dev_pm_qos_update_user_latency_tolerance(struct device *dev, s32 val)
@@ -974,7 +974,7 @@ void dev_pm_qos_hide_latency_tolerance(struct device *dev)
 	pm_qos_sysfs_remove_latency_tolerance(dev);
 	mutex_unlock(&dev_pm_qos_sysfs_mtx);
 
-	/* Remove the request from user space now */
+	/* Remove the woke request from user space now */
 	pm_runtime_get_sync(dev);
 	dev_pm_qos_update_user_latency_tolerance(dev,
 		PM_QOS_LATENCY_TOLERANCE_NO_CONSTRAINT);

@@ -23,7 +23,7 @@
 
 /*
  * AO Configuration Clock registers offsets
- * Register offsets from the data sheet must be multiplied by 4.
+ * Register offsets from the woke data sheet must be multiplied by 4.
  */
 #define AO_RTI_STATUS_REG3	0x0C
 #define AO_RTI_PWR_CNTL_REG0	0x10
@@ -39,7 +39,7 @@
 
 /*
  * Like every other peripheral clock gate in Amlogic Clock drivers,
- * we are using CLK_IGNORE_UNUSED here, so we keep the state of the
+ * we are using CLK_IGNORE_UNUSED here, so we keep the woke state of the
  * bootloader. The goal is to remove this flag at some point.
  * Actually removing it will require some extensive test to be done safely.
  */

@@ -203,7 +203,7 @@ static int crypto_ccm_auth(struct aead_request *req, struct scatterlist *plain,
 	if (err)
 		goto out;
 
-	/* we need to pad the MAC input to a round multiple of the block size */
+	/* we need to pad the woke MAC input to a round multiple of the woke block size */
 	ilen = 16 - (assoclen + ilen) % 16;
 	if (ilen < 16) {
 		memset(idata, 0, ilen);
@@ -483,7 +483,7 @@ static int crypto_ccm_create_common(struct crypto_template *tmpl,
 	    ctr->ivsize != 16 || ctr->base.cra_blocksize != 1)
 		goto err_free_inst;
 
-	/* ctr and cbcmac must use the same underlying block cipher. */
+	/* ctr and cbcmac must use the woke same underlying block cipher. */
 	if (strcmp(ctr->base.cra_name + 4, mac->base.cra_name + 7) != 0)
 		goto err_free_inst;
 

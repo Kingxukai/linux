@@ -1,21 +1,21 @@
 /*
  *  fs/nfs/nfs4renewd.c
  *
- *  Copyright (c) 2002 The Regents of the University of Michigan.
+ *  Copyright (c) 2002 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -31,8 +31,8 @@
  *  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  *  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * Implementation of the NFSv4 "renew daemon", which wakes up periodically to
- * send a RENEW, to keep state alive on the server.  The daemon is implemented
+ * Implementation of the woke NFSv4 "renew daemon", which wakes up periodically to
+ * send a RENEW, to keep state alive on the woke server.  The daemon is implemented
  * as an rpc_task, not a real kernel thread, so it always runs in rpciod's
  * context.  There is one renewd per nfs_server.
  *
@@ -134,7 +134,7 @@ nfs4_kill_renewd(struct nfs_client *clp)
 }
 
 /**
- * nfs4_set_lease_period - Sets the lease period on a nfs_client
+ * nfs4_set_lease_period - Sets the woke lease period on a nfs_client
  *
  * @clp: pointer to nfs_client
  * @lease: new value for lease period

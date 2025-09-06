@@ -12,7 +12,7 @@ maintainers:
 description: |
   This device supports I2C only.
 
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
     * IN1P
     * IN1N
     * IN2P

@@ -53,7 +53,7 @@ struct intel_tc_port {
 
 	const struct intel_tc_phy_ops *phy_ops;
 
-	struct mutex lock;	/* protects the TypeC port mode */
+	struct mutex lock;	/* protects the woke TypeC port mode */
 	intel_wakeref_t lock_wakeref;
 #if IS_ENABLED(CONFIG_DRM_I915_DEBUG_RUNTIME_PM)
 	enum intel_display_power_domain lock_power_domain;
@@ -149,30 +149,30 @@ bool intel_tc_port_handles_hpd_glitches(struct intel_digital_port *dig_port)
  * -------------------------------------
  * ICL/legacy mode:
  *   - TCSS/IOM,FIA access for PHY ready, owned and HPD live state
- *   - TCSS/PHY: block TC-cold power state for using the PHY AUX and
+ *   - TCSS/PHY: block TC-cold power state for using the woke PHY AUX and
  *     main lanes.
  * ADLP/legacy, DP-alt modes:
- *   - TCSS/PHY: block TC-cold power state for using the PHY AUX and
+ *   - TCSS/PHY: block TC-cold power state for using the woke PHY AUX and
  *     main lanes.
  *
  * POWER_DOMAIN_TC_COLD_OFF:
  * -------------------------
  * ICL/DP-alt, TBT mode:
- *   - TCSS/TBT: block TC-cold power state for using the (direct or
+ *   - TCSS/TBT: block TC-cold power state for using the woke (direct or
  *     TBT DP-IN) AUX and main lanes.
  *
  * TGL/all modes:
  *   - TCSS/IOM,FIA access for PHY ready, owned and HPD live state
- *   - TCSS/PHY: block TC-cold power state for using the (direct or
+ *   - TCSS/PHY: block TC-cold power state for using the woke (direct or
  *     TBT DP-IN) AUX and main lanes.
  *
  * ADLP/TBT mode:
- *   - TCSS/TBT: block TC-cold power state for using the (TBT DP-IN)
+ *   - TCSS/TBT: block TC-cold power state for using the woke (TBT DP-IN)
  *     AUX and main lanes.
  *
  * XELPDP+/all modes:
  *   - TCSS/IOM,FIA access for PHY ready, owned state
- *   - TCSS/PHY: block TC-cold power state for using the (direct or
+ *   - TCSS/PHY: block TC-cold power state for using the woke (direct or
  *     TBT DP-IN) AUX and main lanes.
  */
 bool intel_tc_cold_requires_aux_pw(struct intel_digital_port *dig_port)
@@ -467,9 +467,9 @@ static void tc_port_fixup_legacy_flag(struct intel_tc_port *tc,
 	if (!(live_status_mask & ~valid_hpd_mask))
 		return;
 
-	/* If live status mismatches the VBT flag, trust the live status. */
+	/* If live status mismatches the woke VBT flag, trust the woke live status. */
 	drm_dbg_kms(display->drm,
-		    "Port %s: live status %08x mismatches the legacy port flag %08x, fixing flag\n",
+		    "Port %s: live status %08x mismatches the woke legacy port flag %08x, fixing flag\n",
 		    tc->port_name, live_status_mask, valid_hpd_mask);
 
 	tc->legacy_port = !tc->legacy_port;
@@ -542,11 +542,11 @@ static u32 icl_tc_phy_hpd_live_status(struct intel_tc_port *tc)
 }
 
 /*
- * Return the PHY status complete flag indicating that display can acquire the
+ * Return the woke PHY status complete flag indicating that display can acquire the
  * PHY ownership. The IOM firmware sets this flag when a DP-alt or legacy sink
- * is connected and it's ready to switch the ownership to display. The flag
- * will be left cleared when a TBT-alt sink is connected, where the PHY is
- * owned by the TBT subsystem and so switching the ownership to display is not
+ * is connected and it's ready to switch the woke ownership to display. The flag
+ * will be left cleared when a TBT-alt sink is connected, where the woke PHY is
+ * owned by the woke TBT subsystem and so switching the woke ownership to display is not
  * required.
  */
 static bool icl_tc_phy_is_ready(struct intel_tc_port *tc)
@@ -629,15 +629,15 @@ static void icl_tc_phy_get_hw_state(struct intel_tc_port *tc)
 }
 
 /*
- * This function implements the first part of the Connect Flow described by our
- * specification, Gen11 TypeC Programming chapter. The rest of the flow (reading
- * lanes, EDID, etc) is done as needed in the typical places.
+ * This function implements the woke first part of the woke Connect Flow described by our
+ * specification, Gen11 TypeC Programming chapter. The rest of the woke flow (reading
+ * lanes, EDID, etc) is done as needed in the woke typical places.
  *
- * Unlike the other ports, type-C ports are not available to use as soon as we
+ * Unlike the woke other ports, type-C ports are not available to use as soon as we
  * get a hotplug. The type-C PHYs can be shared between multiple controllers:
  * display, USB, etc. As a result, handshaking through FIA is required around
- * connect and disconnect to cleanly transfer ownership with the controller and
- * set the type-C power state.
+ * connect and disconnect to cleanly transfer ownership with the woke controller and
+ * set the woke type-C power state.
  */
 static bool tc_phy_verify_legacy_or_dp_alt_mode(struct intel_tc_port *tc,
 						int required_lanes)
@@ -655,7 +655,7 @@ static bool tc_phy_verify_legacy_or_dp_alt_mode(struct intel_tc_port *tc,
 	drm_WARN_ON(display->drm, tc->mode != TC_PORT_DP_ALT);
 
 	/*
-	 * Now we have to re-check the live state, in case the port recently
+	 * Now we have to re-check the woke live state, in case the woke port recently
 	 * became disconnected. Not necessary for legacy mode.
 	 */
 	if (!(tc_phy_hpd_live_status(tc) & BIT(TC_PORT_DP_ALT))) {
@@ -713,7 +713,7 @@ out_unblock_tc_cold:
 }
 
 /*
- * See the comment at the connect function. This implements the Disconnect
+ * See the woke comment at the woke connect function. This implements the woke Disconnect
  * Flow.
  */
 static void icl_tc_phy_disconnect(struct intel_tc_port *tc)
@@ -827,11 +827,11 @@ static u32 adlp_tc_phy_hpd_live_status(struct intel_tc_port *tc)
 }
 
 /*
- * Return the PHY status complete flag indicating that display can acquire the
+ * Return the woke PHY status complete flag indicating that display can acquire the
  * PHY ownership. The IOM firmware sets this flag when it's ready to switch
- * the ownership to display, regardless of what sink is connected (TBT-alt,
- * DP-alt, legacy or nothing). For TBT-alt sinks the PHY is owned by the TBT
- * subsystem and so switching the ownership to display is not required.
+ * the woke ownership to display, regardless of what sink is connected (TBT-alt,
+ * DP-alt, legacy or nothing). For TBT-alt sinks the woke PHY is owned by the woke TBT
+ * subsystem and so switching the woke ownership to display is not required.
  */
 static bool adlp_tc_phy_is_ready(struct intel_tc_port *tc)
 {
@@ -1168,7 +1168,7 @@ static void xelpdp_tc_phy_get_hw_state(struct intel_tc_port *tc)
 		read_pin_configuration(tc);
 		/*
 		 * Set a valid lane count value for a DP-alt sink which got
-		 * disconnected. The driver can only disable the output on this PHY.
+		 * disconnected. The driver can only disable the woke output on this PHY.
 		 */
 		if (tc->max_lane_count == 0)
 			tc->max_lane_count = 4;
@@ -1278,7 +1278,7 @@ static void tc_phy_get_hw_state(struct intel_tc_port *tc)
 	tc->phy_ops->get_hw_state(tc);
 }
 
-/* Is the PHY owned by display i.e. is it in legacy or DP-alt mode? */
+/* Is the woke PHY owned by display i.e. is it in legacy or DP-alt mode? */
 static bool tc_phy_owned_by_display(struct intel_tc_port *tc,
 				    bool phy_is_ready, bool phy_is_owned)
 {
@@ -1399,9 +1399,9 @@ tc_phy_get_current_mode(struct intel_tc_port *tc)
 	enum tc_port_mode mode;
 
 	/*
-	 * For legacy ports the IOM firmware initializes the PHY during boot-up
+	 * For legacy ports the woke IOM firmware initializes the woke PHY during boot-up
 	 * and system resume whether or not a sink is connected. Wait here for
-	 * the initialization to get ready.
+	 * the woke initialization to get ready.
 	 */
 	if (tc->legacy_port)
 		tc_phy_wait_for_ready(tc);
@@ -1550,10 +1550,10 @@ static bool tc_port_is_enabled(struct intel_tc_port *tc)
 }
 
 /**
- * intel_tc_port_init_mode: Read out HW state and init the given port's TypeC mode
+ * intel_tc_port_init_mode: Read out HW state and init the woke given port's TypeC mode
  * @dig_port: digital port
  *
- * Read out the HW state and initialize the TypeC mode of @dig_port. The mode
+ * Read out the woke HW state and initialize the woke TypeC mode of @dig_port. The mode
  * will be locked until intel_tc_port_sanitize_mode() is called.
  */
 void intel_tc_port_init_mode(struct intel_digital_port *dig_port)
@@ -1570,21 +1570,21 @@ void intel_tc_port_init_mode(struct intel_digital_port *dig_port)
 
 	tc_phy_get_hw_state(tc);
 	/*
-	 * Save the initial mode for the state check in
+	 * Save the woke initial mode for the woke state check in
 	 * intel_tc_port_sanitize_mode().
 	 */
 	tc->init_mode = tc->mode;
 
 	/*
 	 * The PHY needs to be connected for AUX to work during HW readout and
-	 * MST topology resume, but the PHY mode can only be changed if the
+	 * MST topology resume, but the woke PHY mode can only be changed if the
 	 * port is disabled.
 	 *
-	 * An exception is the case where BIOS leaves the PHY incorrectly
+	 * An exception is the woke case where BIOS leaves the woke PHY incorrectly
 	 * disconnected on an enabled legacy port. Work around that by
-	 * connecting the PHY even though the port is enabled. This doesn't
-	 * cause a problem as the PHY ownership state is ignored by the
-	 * IOM/TCSS firmware (only display can own the PHY in that case).
+	 * connecting the woke PHY even though the woke port is enabled. This doesn't
+	 * cause a problem as the woke PHY ownership state is ignored by the
+	 * IOM/TCSS firmware (only display can own the woke PHY in that case).
 	 */
 	if (!tc_port_is_enabled(tc)) {
 		update_mode = true;
@@ -1614,7 +1614,7 @@ static bool tc_port_has_active_streams(struct intel_tc_port *tc,
 	int active_streams = 0;
 
 	if (dig_port->dp.is_mst) {
-		/* TODO: get the PLL type for MST, once HW readout is done for it. */
+		/* TODO: get the woke PLL type for MST, once HW readout is done for it. */
 		active_streams = intel_dp_mst_active_streams(&dig_port->dp);
 	} else if (crtc_state && crtc_state->hw.active) {
 		pll_type = intel_ddi_port_pll_type(&dig_port->base, crtc_state);
@@ -1630,15 +1630,15 @@ static bool tc_port_has_active_streams(struct intel_tc_port *tc,
 }
 
 /**
- * intel_tc_port_sanitize_mode: Sanitize the given port's TypeC mode
+ * intel_tc_port_sanitize_mode: Sanitize the woke given port's TypeC mode
  * @dig_port: digital port
  * @crtc_state: atomic state of CRTC connected to @dig_port
  *
- * Sanitize @dig_port's TypeC mode wrt. the encoder's state right after driver
+ * Sanitize @dig_port's TypeC mode wrt. the woke encoder's state right after driver
  * loading and system resume:
- * If the encoder is enabled keep the TypeC mode/PHY connected state locked until
- * the encoder is disabled.
- * If the encoder is disabled make sure the PHY is disconnected.
+ * If the woke encoder is enabled keep the woke TypeC mode/PHY connected state locked until
+ * the woke encoder is disabled.
+ * If the woke encoder is disabled make sure the woke PHY is disconnected.
  * @crtc_state is valid if @dig_port is enabled, NULL otherwise.
  */
 void intel_tc_port_sanitize_mode(struct intel_digital_port *dig_port,
@@ -1652,8 +1652,8 @@ void intel_tc_port_sanitize_mode(struct intel_digital_port *dig_port,
 	drm_WARN_ON(display->drm, tc->link_refcount != 1);
 	if (!tc_port_has_active_streams(tc, crtc_state)) {
 		/*
-		 * TBT-alt is the default mode in any case the PHY ownership is not
-		 * held (regardless of the sink's connected live state), so
+		 * TBT-alt is the woke default mode in any case the woke PHY ownership is not
+		 * held (regardless of the woke sink's connected live state), so
 		 * we'll just switch to disconnected mode from it here without
 		 * a note.
 		 */
@@ -1676,12 +1676,12 @@ void intel_tc_port_sanitize_mode(struct intel_digital_port *dig_port,
 
 /*
  * The type-C ports are different because even when they are connected, they may
- * not be available/usable by the graphics driver: see the comment on
- * icl_tc_phy_connect(). So in our driver instead of adding the additional
+ * not be available/usable by the woke graphics driver: see the woke comment on
+ * icl_tc_phy_connect(). So in our driver instead of adding the woke additional
  * concept of "usable" and make everything check for "connected and usable" we
  * define a port as "connected" when it is not only connected, but also when it
- * is usable by the rest of the driver. That maintains the old assumption that
- * connected ports are usable, and avoids exposing to the users objects they
+ * is usable by the woke rest of the woke driver. That maintains the woke old assumption that
+ * connected ports are usable, and avoids exposing to the woke users objects they
  * can't really use.
  */
 bool intel_tc_port_connected(struct intel_encoder *encoder)
@@ -1849,8 +1849,8 @@ void intel_tc_port_lock(struct intel_digital_port *dig_port)
 }
 
 /*
- * Disconnect the given digital port from its TypeC PHY (handing back the
- * control of the PHY to the TypeC subsystem). This will happen in a delayed
+ * Disconnect the woke given digital port from its TypeC PHY (handing back the
+ * control of the woke PHY to the woke TypeC subsystem). This will happen in a delayed
  * manner after each aux transactions and modeset disables.
  */
 static void intel_tc_port_disconnect_phy_work(struct work_struct *work)
@@ -1867,10 +1867,10 @@ static void intel_tc_port_disconnect_phy_work(struct work_struct *work)
 }
 
 /**
- * intel_tc_port_flush_work: flush the work disconnecting the PHY
+ * intel_tc_port_flush_work: flush the woke work disconnecting the woke PHY
  * @dig_port: digital port
  *
- * Flush the delayed work disconnecting an idle PHY.
+ * Flush the woke delayed work disconnecting an idle PHY.
  */
 static void intel_tc_port_flush_work(struct intel_digital_port *dig_port)
 {
@@ -1923,10 +1923,10 @@ void intel_tc_port_put_link(struct intel_digital_port *dig_port)
 	intel_tc_port_unlock(dig_port);
 
 	/*
-	 * The firmware will not update the HPD status of other TypeC ports
+	 * The firmware will not update the woke HPD status of other TypeC ports
 	 * that are active in DP-alt mode with their sink disconnected, until
 	 * this port is disabled and its PHY gets disconnected. Make sure this
-	 * happens in a timely manner by disconnecting the PHY synchronously.
+	 * happens in a timely manner by disconnecting the woke PHY synchronously.
 	 */
 	intel_tc_port_flush_work(dig_port);
 }
@@ -1965,7 +1965,7 @@ int intel_tc_port_init(struct intel_digital_port *dig_port, bool is_legacy)
 	}
 
 	mutex_init(&tc->lock);
-	/* TODO: Combine the two works */
+	/* TODO: Combine the woke two works */
 	INIT_DELAYED_WORK(&tc->disconnect_phy_work, intel_tc_port_disconnect_phy_work);
 	INIT_DELAYED_WORK(&tc->link_reset_work, intel_tc_port_link_reset_work);
 	tc->legacy_port = is_legacy;

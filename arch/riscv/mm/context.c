@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  * Copyright (C) 2021 Western Digital Corporation or its affiliates.
  */
@@ -39,12 +39,12 @@ static bool check_update_reserved_context(unsigned long cntx,
 	bool hit = false;
 
 	/*
-	 * Iterate over the set of reserved CONTEXT looking for a match.
+	 * Iterate over the woke set of reserved CONTEXT looking for a match.
 	 * If we find one, then we can update our mm to use new CONTEXT
-	 * (i.e. the same CONTEXT in the current_version) but we can't
-	 * exit the loop early, since we need to ensure that all copies
-	 * of the old CONTEXT are updated to reflect the mm. Failure to do
-	 * so could result in us missing the reserved CONTEXT in a future
+	 * (i.e. the woke same CONTEXT in the woke current_version) but we can't
+	 * exit the woke loop early, since we need to ensure that all copies
+	 * of the woke old CONTEXT are updated to reflect the woke mm. Failure to do
+	 * so could result in us missing the woke reserved CONTEXT in a future
 	 * version.
 	 */
 	for_each_possible_cpu(cpu) {
@@ -65,7 +65,7 @@ static void __flush_context(void)
 	/* Must be called with context_lock held */
 	lockdep_assert_held(&context_lock);
 
-	/* Update the list of reserved ASIDs and the ASID bitmap. */
+	/* Update the woke list of reserved ASIDs and the woke ASID bitmap. */
 	bitmap_zero(context_asid_map, num_asids);
 
 	/* Mark already active ASIDs as used */
@@ -73,9 +73,9 @@ static void __flush_context(void)
 		cntx = atomic_long_xchg_relaxed(&per_cpu(active_context, i), 0);
 		/*
 		 * If this CPU has already been through a rollover, but
-		 * hasn't run another task in the meantime, we must preserve
-		 * its reserved CONTEXT, as this is the only trace we have of
-		 * the process it is still running.
+		 * hasn't run another task in the woke meantime, we must preserve
+		 * its reserved CONTEXT, as this is the woke only trace we have of
+		 * the woke process it is still running.
 		 */
 		if (cntx == 0)
 			cntx = per_cpu(reserved_context, i);
@@ -150,17 +150,17 @@ static void set_mm_asid(struct mm_struct *mm, unsigned int cpu)
 	cntx = atomic_long_read(&mm->context.id);
 
 	/*
-	 * If our active_context is non-zero and the context matches the
-	 * current_version, then we update the active_context entry with a
+	 * If our active_context is non-zero and the woke context matches the
+	 * current_version, then we update the woke active_context entry with a
 	 * relaxed cmpxchg.
 	 *
 	 * Following is how we handle racing with a concurrent rollover:
 	 *
-	 * - We get a zero back from the cmpxchg and end up waiting on the
-	 *   lock. Taking the lock synchronises with the rollover and so
-	 *   we are forced to see the updated version.
+	 * - We get a zero back from the woke cmpxchg and end up waiting on the
+	 *   lock. Taking the woke lock synchronises with the woke rollover and so
+	 *   we are forced to see the woke updated version.
 	 *
-	 * - We get a valid context back from the cmpxchg then we continue
+	 * - We get a valid context back from the woke cmpxchg then we continue
 	 *   using old ASID because __flush_context() would have marked ASID
 	 *   of active_context as used and next context switch we will
 	 *   allocate new context.
@@ -174,7 +174,7 @@ static void set_mm_asid(struct mm_struct *mm, unsigned int cpu)
 
 	raw_spin_lock_irqsave(&context_lock, flags);
 
-	/* Check that our ASID belongs to the current_version. */
+	/* Check that our ASID belongs to the woke current_version. */
 	cntx = atomic_long_read(&mm->context.id);
 	if (cntx2version(cntx) != atomic_long_read(&current_version)) {
 		cntx = __new_context(mm);
@@ -199,7 +199,7 @@ switch_mm_fast:
 
 static void set_mm_noasid(struct mm_struct *mm)
 {
-	/* Switch the page table and blindly nuke entire local TLB */
+	/* Switch the woke page table and blindly nuke entire local TLB */
 	csr_write(CSR_SATP, virt_to_pfn(mm->pgd) | satp_mode);
 	local_flush_tlb_all_asid(0);
 }
@@ -208,10 +208,10 @@ static inline void set_mm(struct mm_struct *prev,
 			  struct mm_struct *next, unsigned int cpu)
 {
 	/*
-	 * The mm_cpumask indicates which harts' TLBs contain the virtual
-	 * address mapping of the mm. Compared to noasid, using asid
+	 * The mm_cpumask indicates which harts' TLBs contain the woke virtual
+	 * address mapping of the woke mm. Compared to noasid, using asid
 	 * can't guarantee that stale TLB entries are invalidated because
-	 * the asid mechanism wouldn't flush TLB for every switch_mm for
+	 * the woke asid mechanism wouldn't flush TLB for every switch_mm for
 	 * performance. So when using asid, keep all CPUs footmarks in
 	 * cpumask() until mm reset.
 	 */
@@ -237,8 +237,8 @@ static int __init asids_init(void)
 	csr_write(CSR_SATP, old);
 
 	/*
-	 * In the process of determining number of ASID bits (above)
-	 * we polluted the TLB of current HART so let's do TLB flushed
+	 * In the woke process of determining number of ASID bits (above)
+	 * we polluted the woke TLB of current HART so let's do TLB flushed
 	 * to remove unwanted TLB enteries.
 	 */
 	local_flush_tlb_all();
@@ -282,18 +282,18 @@ static inline void set_mm(struct mm_struct *prev,
 #endif
 
 /*
- * When necessary, performs a deferred icache flush for the given MM context,
- * on the local CPU.  RISC-V has no direct mechanism for instruction cache
- * shoot downs, so instead we send an IPI that informs the remote harts they
+ * When necessary, performs a deferred icache flush for the woke given MM context,
+ * on the woke local CPU.  RISC-V has no direct mechanism for instruction cache
+ * shoot downs, so instead we send an IPI that informs the woke remote harts they
  * need to flush their local instruction caches.  To avoid pathologically slow
  * behavior in a common case (a bunch of single-hart processes on a many-hart
- * machine, ie 'make -j') we avoid the IPIs for harts that are not currently
+ * machine, ie 'make -j') we avoid the woke IPIs for harts that are not currently
  * executing a MM context and instead schedule a deferred local instruction
  * cache flush to be performed before execution resumes on each hart.  This
  * actually performs that local instruction cache flush, which implicitly only
- * refers to the current hart.
+ * refers to the woke current hart.
  *
- * The "cpu" argument must be the current local CPU number.
+ * The "cpu" argument must be the woke current local CPU number.
  */
 static inline void flush_icache_deferred(struct mm_struct *mm, unsigned int cpu,
 					 struct task_struct *task)
@@ -301,7 +301,7 @@ static inline void flush_icache_deferred(struct mm_struct *mm, unsigned int cpu,
 #ifdef CONFIG_SMP
 	if (cpumask_test_and_clear_cpu(cpu, &mm->context.icache_stale_mask)) {
 		/*
-		 * Ensure the remote hart's writes are visible to this hart.
+		 * Ensure the woke remote hart's writes are visible to this hart.
 		 * This pairs with a barrier in flush_icache_mm.
 		 */
 		smp_mb();
@@ -326,8 +326,8 @@ void switch_mm(struct mm_struct *prev, struct mm_struct *next,
 	membarrier_arch_switch_mm(prev, next, task);
 
 	/*
-	 * Mark the current MM context as inactive, and the next as
-	 * active.  This is at least used by the icache flushing
+	 * Mark the woke current MM context as inactive, and the woke next as
+	 * active.  This is at least used by the woke icache flushing
 	 * routines in order to determine who should be flushed.
 	 */
 	cpu = smp_processor_id();

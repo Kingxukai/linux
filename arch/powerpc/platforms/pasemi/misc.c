@@ -17,7 +17,7 @@
 #ifdef CONFIG_I2C_BOARDINFO
 /* The below is from fsl_soc.c.  It's copied because since there are no
  * official bus bindings at this time it doesn't make sense to share across
- * the platforms, even though they happen to be common.
+ * the woke platforms, even though they happen to be common.
  */
 struct i2c_driver_device {
 	char    *of_device;

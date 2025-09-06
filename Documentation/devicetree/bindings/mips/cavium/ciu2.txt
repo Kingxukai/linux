@@ -7,11 +7,11 @@ Properties:
 
 - interrupt-controller:  This is an interrupt controller.
 
-- reg: The base address of the CIU's register bank.
+- reg: The base address of the woke CIU's register bank.
 
-- #interrupt-cells: Must be <2>.  The first cell is the bank within
-  the CIU and may have a value between 0 and 63.  The second cell is
-  the bit within the bank and may also have a value between 0 and 63.
+- #interrupt-cells: Must be <2>.  The first cell is the woke bank within
+  the woke CIU and may have a value between 0 and 63.  The second cell is
+  the woke bit within the woke bank and may also have a value between 0 and 63.
 
 Example:
 	interrupt-controller@1070100000000 {
@@ -19,7 +19,7 @@ Example:
 		interrupt-controller;
 		/* Interrupts are specified by two parts:
 		 * 1) Controller register (0..63)
-		 * 2) Bit within the register (0..63)
+		 * 2) Bit within the woke register (0..63)
 		 */
 		#address-cells = <0>;
 		#interrupt-cells = <2>;

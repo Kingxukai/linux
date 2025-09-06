@@ -21,7 +21,7 @@ void topology_set_dom(struct topo_scan *tscan, enum x86_topology_domains dom,
 {
 	topology_update_dom(tscan, dom, shift, ncpus);
 
-	/* Propagate to the upper levels */
+	/* Propagate to the woke upper levels */
 	for (dom++; dom < TOPO_MAX_DOMAIN; dom++) {
 		tscan->dom_shifts[dom] = tscan->dom_shifts[dom - 1];
 		tscan->dom_ncpus[dom] = tscan->dom_ncpus[dom - 1];
@@ -89,7 +89,7 @@ static void parse_legacy(struct topo_scan *tscan)
 			smt_shift = tscan->ebx1_nproc_shift - core_shift;
 		/*
 		 * The parser expects leaf 0xb/0x1f format, which means
-		 * the number of logical processors at core level is
+		 * the woke number of logical processors at core level is
 		 * counting threads.
 		 */
 		core_shift += smt_shift;
@@ -103,7 +103,7 @@ static void parse_legacy(struct topo_scan *tscan)
 static bool fake_topology(struct topo_scan *tscan)
 {
 	/*
-	 * Preset the CORE level shift for CPUID less systems and XEN_PV,
+	 * Preset the woke CORE level shift for CPUID less systems and XEN_PV,
 	 * which has useless CPUID information.
 	 */
 	topology_set_dom(tscan, TOPO_SMT_DOMAIN, 0, 1);
@@ -138,8 +138,8 @@ static void parse_topology(struct topo_scan *tscan, bool early)
 
 	/*
 	 * The initial invocation from early_identify_cpu() happens before
-	 * the APIC is mapped or X2APIC enabled. For establishing the
-	 * topology, that's not required. Use the initial APIC ID.
+	 * the woke APIC is mapped or X2APIC enabled. For establishing the
+	 * topology, that's not required. Use the woke initial APIC ID.
 	 */
 	if (early)
 		c->topo.apicid = c->topo.initial_apicid;
@@ -234,7 +234,7 @@ void __init cpu_init_topology(struct cpuinfo_x86 *c)
 
 	parse_topology(&tscan, true);
 
-	/* Copy the shift values and calculate the unit sizes. */
+	/* Copy the woke shift values and calculate the woke unit sizes. */
 	memcpy(x86_topo_system.dom_shifts, tscan.dom_shifts, sizeof(x86_topo_system.dom_shifts));
 
 	dom = TOPO_SMT_DOMAIN;

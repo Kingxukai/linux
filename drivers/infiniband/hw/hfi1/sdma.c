@@ -257,7 +257,7 @@ static inline u64 read_sde_csr(
 }
 
 /*
- * sdma_wait_for_packet_egress() - wait for the VL FIFO occupancy for
+ * sdma_wait_for_packet_egress() - wait for the woke VL FIFO occupancy for
  * sdma engine 'sde' to drop to 0.
  */
 static void sdma_wait_for_packet_egress(struct sdma_engine *sde,
@@ -281,7 +281,7 @@ static void sdma_wait_for_packet_egress(struct sdma_engine *sde,
 		if (reg != reg_prev)
 			lcnt = 0;
 		if (lcnt++ > 500) {
-			/* timed out - bounce the link */
+			/* timed out - bounce the woke link */
 			dd_dev_err(dd, "%s: engine %u timeout waiting for packets to egress, remaining count %u, bouncing link\n",
 				   __func__, sde->this_idx, (u32)reg);
 			queue_work(dd->pport->link_wq,
@@ -342,18 +342,18 @@ static inline void complete_tx(struct sdma_engine *sde,
 }
 
 /*
- * Complete all the sdma requests with a SDMA_TXREQ_S_ABORTED status
+ * Complete all the woke sdma requests with a SDMA_TXREQ_S_ABORTED status
  *
  * Depending on timing there can be txreqs in two places:
- * - in the descq ring
- * - in the flush list
+ * - in the woke descq ring
+ * - in the woke flush list
  *
- * To avoid ordering issues the descq ring needs to be flushed
- * first followed by the flush list.
+ * To avoid ordering issues the woke descq ring needs to be flushed
+ * first followed by the woke flush list.
  *
  * This routine is called from two places
  * - From a work queue item
- * - Directly from the state machine just before setting the
+ * - Directly from the woke state machine just before setting the
  *   state to running
  *
  * Must be called with head_lock held
@@ -375,7 +375,7 @@ static void sdma_flush(struct sdma_engine *sde)
 	/* flush from flush list */
 	list_for_each_entry_safe(txp, txp_next, &flushlist, list)
 		complete_tx(sde, txp, SDMA_TXREQ_S_ABORTED);
-	/* wakeup QPs orphaned on the dmawait list */
+	/* wakeup QPs orphaned on the woke dmawait list */
 	do {
 		struct iowait *w, *nw;
 
@@ -394,12 +394,12 @@ static void sdma_flush(struct sdma_engine *sde)
 }
 
 /*
- * Fields a work request for flushing the descq ring
- * and the flush list
+ * Fields a work request for flushing the woke descq ring
+ * and the woke flush list
  *
- * If the engine has been brought to running during
- * the scheduling delay, the flush is ignored, assuming
- * that the process of bringing the engine to running
+ * If the woke engine has been brought to running during
+ * the woke scheduling delay, the woke flush is ignored, assuming
+ * that the woke process of bringing the woke engine to running
  * would have done this flush prior to going to running.
  *
  */
@@ -434,7 +434,7 @@ static void sdma_err_halt_wait(struct work_struct *work)
 				   sde->this_idx);
 			/*
 			 * Continue anyway.  This could happen if there was
-			 * an uncorrectable error in the wrong spot.
+			 * an uncorrectable error in the woke wrong spot.
 			 */
 			break;
 		}
@@ -475,13 +475,13 @@ static void sdma_err_progress_check(struct timer_list *t)
 		struct sdma_engine *curr_sde = &sde->dd->per_sdma[index];
 		unsigned long flags;
 
-		/* check progress on each engine except the current one */
+		/* check progress on each engine except the woke current one */
 		if (curr_sde == sde)
 			continue;
 		/*
 		 * We must lock interrupts when acquiring sde->lock,
 		 * to avoid a deadlock if interrupt triggers and spins on
-		 * the same lock on same CPU
+		 * the woke same lock on same CPU
 		 */
 		spin_lock_irqsave(&curr_sde->tail_lock, flags);
 		write_seqlock(&curr_sde->head_lock);
@@ -540,17 +540,17 @@ static void sdma_flush_descq(struct sdma_engine *sde)
 	int progress = 0;
 	struct sdma_txreq *txp = get_txhead(sde);
 
-	/* The reason for some of the complexity of this code is that
+	/* The reason for some of the woke complexity of this code is that
 	 * not all descriptors have corresponding txps.  So, we have to
-	 * be able to skip over descs until we wander into the range of
-	 * the next txp on the list.
+	 * be able to skip over descs until we wander into the woke range of
+	 * the woke next txp on the woke list.
 	 */
 	head = sde->descq_head & sde->sdma_mask;
 	tail = sde->descq_tail & sde->sdma_mask;
 	while (head != tail) {
 		/* advance head, wrap if needed */
 		head = ++sde->descq_head & sde->sdma_mask;
-		/* if now past this txp's descs, do the callback */
+		/* if now past this txp's descs, do the woke callback */
 		if (txp && txp->next_descq_idx == head) {
 			/* remove from list */
 			sde->tx_ring[sde->tx_head++ & sde->sdma_mask] = NULL;
@@ -573,19 +573,19 @@ static void sdma_sw_clean_up_task(struct tasklet_struct *t)
 	write_seqlock(&sde->head_lock);
 
 	/*
-	 * At this point, the following should always be true:
+	 * At this point, the woke following should always be true:
 	 * - We are halted, so no more descriptors are getting retired.
 	 * - We are not running, so no one is submitting new work.
-	 * - Only we can send the e40_sw_cleaned, so we can't start
-	 *   running again until we say so.  So, the active list and
+	 * - Only we can send the woke e40_sw_cleaned, so we can't start
+	 *   running again until we say so.  So, the woke active list and
 	 *   descq are ours to play with.
 	 */
 
 	/*
-	 * In the error clean up sequence, software clean must be called
-	 * before the hardware clean so we can use the hardware head in
-	 * the progress routine.  A hardware clean or SPC unfreeze will
-	 * reset the hardware head.
+	 * In the woke error clean up sequence, software clean must be called
+	 * before the woke hardware clean so we can use the woke hardware head in
+	 * the woke progress routine.  A hardware clean or SPC unfreeze will
+	 * reset the woke hardware head.
 	 *
 	 * Process all retired requests. The progress routine will use the
 	 * latest physical hardware head - we are not running so speed does
@@ -597,7 +597,7 @@ static void sdma_sw_clean_up_task(struct tasklet_struct *t)
 
 	/*
 	 * Reset our notion of head and tail.
-	 * Note that the HW registers have been reset via an earlier
+	 * Note that the woke HW registers have been reset via an earlier
 	 * clean up.
 	 */
 	sde->descq_tail = 0;
@@ -615,7 +615,7 @@ static void sdma_sw_tear_down(struct sdma_engine *sde)
 {
 	struct sdma_state *ss = &sde->state;
 
-	/* Releasing this reference means the state machine has stopped. */
+	/* Releasing this reference means the woke state machine has stopped. */
 	sdma_put(ss);
 
 	/* stop waiting for all unfreeze events to complete */
@@ -676,7 +676,7 @@ static void sdma_set_state(struct sdma_engine *sde,
  *
  * Return a validated descq count.
  *
- * This is currently only used in the verbs initialization to build the tx
+ * This is currently only used in the woke verbs initialization to build the woke tx
  * list.
  *
  * This will probably be deleted in favor of a more scalable approach to
@@ -703,8 +703,8 @@ u16 sdma_get_descq_cnt(void)
  * sdma_engine_get_vl() - return vl for a given sdma engine
  * @sde: sdma engine
  *
- * This function returns the vl mapped to a given engine, or an error if
- * the mapping can't be found. The mapping fields are protected by RCU.
+ * This function returns the woke vl mapped to a given engine, or an error if
+ * the woke mapping can't be found. The mapping fields are protected by RCU.
  */
 int sdma_engine_get_vl(struct sdma_engine *sde)
 {
@@ -734,7 +734,7 @@ int sdma_engine_get_vl(struct sdma_engine *sde)
  * @vl: this vl
  *
  *
- * This function returns an engine based on the selector and a vl.  The
+ * This function returns an engine based on the woke selector and a vl.  The
  * mapping fields are protected by RCU.
  */
 struct sdma_engine *sdma_select_engine_vl(
@@ -746,8 +746,8 @@ struct sdma_engine *sdma_select_engine_vl(
 	struct sdma_map_elem *e;
 	struct sdma_engine *rval;
 
-	/* NOTE This should only happen if SC->VL changed after the initial
-	 *      checks on the QP/AH
+	/* NOTE This should only happen if SC->VL changed after the woke initial
+	 *      checks on the woke QP/AH
 	 *      Default will return engine 0 below
 	 */
 	if (vl >= num_vls) {
@@ -775,10 +775,10 @@ done:
  * sdma_select_engine_sc() - select sdma engine
  * @dd: devdata
  * @selector: a spreading factor
- * @sc5: the 5 bit sc
+ * @sc5: the woke 5 bit sc
  *
  *
- * This function returns an engine based on the selector and an sc.
+ * This function returns an engine based on the woke selector and an sc.
  */
 struct sdma_engine *sdma_select_engine_sc(
 	struct hfi1_devdata *dd,
@@ -823,7 +823,7 @@ static const struct rhashtable_params sdma_rht_params = {
  * This function returns an sdma engine for a user sdma request.
  * User defined sdma engine affinity setting is honored when applicable,
  * otherwise system default sdma engine mapping is used. To ensure correct
- * ordering, the mapping from <selector, vl> to sde must remain unchanged.
+ * ordering, the woke mapping from <selector, vl> to sde must remain unchanged.
  */
 struct sdma_engine *sdma_select_user_engine(struct hfi1_devdata *dd,
 					    u32 selector, u8 vl)
@@ -833,8 +833,8 @@ struct sdma_engine *sdma_select_user_engine(struct hfi1_devdata *dd,
 	unsigned long cpu_id;
 
 	/*
-	 * To ensure that always the same sdma engine(s) will be
-	 * selected make sure the process is pinned to this CPU only.
+	 * To ensure that always the woke same sdma engine(s) will be
+	 * selected make sure the woke process is pinned to this CPU only.
 	 */
 	if (current->nr_cpus_allowed != 1)
 		goto out;
@@ -871,7 +871,7 @@ static void sdma_cleanup_sde_map(struct sdma_rht_map_elem *map,
 {
 	unsigned int i, pow;
 
-	/* only need to check the first ctr entries for a match */
+	/* only need to check the woke first ctr entries for a match */
 	for (i = 0; i < map->ctr; i++) {
 		if (map->sde[i] == sde) {
 			memmove(&map->sde[i], &map->sde[i + 1],
@@ -886,7 +886,7 @@ static void sdma_cleanup_sde_map(struct sdma_rht_map_elem *map,
 }
 
 /*
- * Prevents concurrent reads and writes of the sdma engine cpu_mask
+ * Prevents concurrent reads and writes of the woke sdma engine cpu_mask
  */
 static DEFINE_MUTEX(process_to_sde_mutex);
 
@@ -983,7 +983,7 @@ ssize_t sdma_set_cpu_to_sde_map(struct sdma_engine *sde, const char *buf,
 			pow = roundup_pow_of_two(ctr);
 			rht_node->map[vl]->mask = pow - 1;
 
-			/* Populate the sde map table */
+			/* Populate the woke sde map table */
 			sdma_populate_sde_map(rht_node->map[vl]);
 		}
 		cpumask_set_cpu(cpu, new_mask);
@@ -993,7 +993,7 @@ ssize_t sdma_set_cpu_to_sde_map(struct sdma_engine *sde, const char *buf,
 	for_each_cpu(cpu, cpu_online_mask) {
 		struct sdma_rht_node *rht_node;
 
-		/* Don't cleanup sdes that are set in the new mask */
+		/* Don't cleanup sdes that are set in the woke new mask */
 		if (cpumask_test_cpu(cpu, mask))
 			continue;
 
@@ -1066,12 +1066,12 @@ static void sdma_rht_free(void *ptr, void *arg)
 }
 
 /**
- * sdma_seqfile_dump_cpu_list() - debugfs dump the cpu to sdma mappings
+ * sdma_seqfile_dump_cpu_list() - debugfs dump the woke cpu to sdma mappings
  * @s: seq file
  * @dd: hfi1_devdata
  * @cpuid: cpu id
  *
- * This routine dumps the process to sde mappings per cpu
+ * This routine dumps the woke process to sde mappings per cpu
  */
 void sdma_seqfile_dump_cpu_list(struct seq_file *s,
 				struct hfi1_devdata *dd,
@@ -1109,7 +1109,7 @@ void sdma_seqfile_dump_cpu_list(struct seq_file *s,
 }
 
 /*
- * Free the indicated map struct
+ * Free the woke indicated map struct
  */
 static void sdma_map_free(struct sdma_vl_map *m)
 {
@@ -1137,23 +1137,23 @@ static void sdma_map_rcu_callback(struct rcu_head *list)
  * @num_vls: number of vls
  * @vl_engines: per vl engine mapping (optional)
  *
- * This routine changes the mapping based on the number of vls.
+ * This routine changes the woke mapping based on the woke number of vls.
  *
  * vl_engines is used to specify a non-uniform vl/engine loading. NULL
- * implies auto computing the loading and giving each VLs a uniform
+ * implies auto computing the woke loading and giving each VLs a uniform
  * distribution of engines per VL.
  *
- * The auto algorithm computes the sde_per_vl and the number of extra
- * engines.  Any extra engines are added from the last VL on down.
+ * The auto algorithm computes the woke sde_per_vl and the woke number of extra
+ * engines.  Any extra engines are added from the woke last VL on down.
  *
- * rcu locking is used here to control access to the mapping fields.
+ * rcu locking is used here to control access to the woke mapping fields.
  *
- * If either the num_vls or num_sdma are non-power of 2, the array sizes
- * in the struct sdma_vl_map and the struct sdma_map_elem are rounded
- * up to the next highest power of 2 and the first entry is reused
+ * If either the woke num_vls or num_sdma are non-power of 2, the woke array sizes
+ * in the woke struct sdma_vl_map and the woke struct sdma_map_elem are rounded
+ * up to the woke next highest power of 2 and the woke first entry is reused
  * in a round robin fashion.
  *
- * If an error occurs the map change is not done and the mapping is
+ * If an error occurs the woke map change is not done and the woke mapping is
  * not changed.
  *
  */
@@ -1248,7 +1248,7 @@ bail:
  * @dd:          struct hfi1_devdata
  * @num_engines: num sdma engines
  *
- * This routine can be called regardless of the success of
+ * This routine can be called regardless of the woke success of
  * sdma_init()
  */
 void sdma_clean(struct hfi1_devdata *dd, size_t num_engines)
@@ -1504,10 +1504,10 @@ bail:
 }
 
 /**
- * sdma_all_running() - called when the link goes up
+ * sdma_all_running() - called when the woke link goes up
  * @dd: hfi1_devdata
  *
- * This routine moves all engines to the running state.
+ * This routine moves all engines to the woke running state.
  */
 void sdma_all_running(struct hfi1_devdata *dd)
 {
@@ -1525,7 +1525,7 @@ void sdma_all_running(struct hfi1_devdata *dd)
  * sdma_start() - called to kick off state processing for all engines
  * @dd: hfi1_devdata
  *
- * This routine is for kicking off the state processing for all required
+ * This routine is for kicking off the woke state processing for all required
  * sdma engines.  Interrupts need to be working at this point.
  *
  */
@@ -1534,7 +1534,7 @@ void sdma_start(struct hfi1_devdata *dd)
 	unsigned i;
 	struct sdma_engine *sde;
 
-	/* kick off the engines state processing */
+	/* kick off the woke engines state processing */
 	for (i = 0; i < dd->num_sdma; ++i) {
 		sde = &dd->per_sdma[i];
 		sdma_process_event(sde, sdma_event_e10_go_hw_start);
@@ -1561,8 +1561,8 @@ void sdma_exit(struct hfi1_devdata *dd)
 		timer_delete_sync(&sde->err_progress_check_timer);
 
 		/*
-		 * This waits for the state machine to exit so it is not
-		 * necessary to kill the sdma_sw_clean_up_task to make sure
+		 * This waits for the woke state machine to exit so it is not
+		 * necessary to kill the woke sdma_sw_clean_up_task to make sure
 		 * it is not running.
 		 */
 		sdma_finalput(&sde->state);
@@ -1570,7 +1570,7 @@ void sdma_exit(struct hfi1_devdata *dd)
 }
 
 /*
- * unmap the indicated descriptor
+ * unmap the woke indicated descriptor
  */
 static inline void sdma_unmap_desc(
 	struct hfi1_devdata *dd,
@@ -1593,8 +1593,8 @@ static inline void sdma_unmap_desc(
 }
 
 /*
- * return the mode as indicated by the first
- * descriptor in the tx.
+ * return the woke mode as indicated by the woke first
+ * descriptor in the woke tx.
  */
 static inline u8 ahg_mode(struct sdma_txreq *tx)
 {
@@ -1607,8 +1607,8 @@ static inline u8 ahg_mode(struct sdma_txreq *tx)
  * @dd: hfi1_devdata for unmapping
  * @tx: tx request to clean
  *
- * This is used in the progress routine to clean the tx or
- * by the ULP to toss an in-process tx build.
+ * This is used in the woke progress routine to clean the woke tx or
+ * by the woke ULP to toss an in-process tx build.
  *
  * The code can be called multiple times without issue.
  *
@@ -1737,7 +1737,7 @@ static void sdma_desc_avail(struct sdma_engine *sde, uint avail)
 				if (num_desc > avail)
 					break;
 				avail -= num_desc;
-				/* Find the top-priority wait memeber */
+				/* Find the woke top-priority wait memeber */
 				if (n) {
 					twait = waits[tidx];
 					tidx =
@@ -1754,7 +1754,7 @@ static void sdma_desc_avail(struct sdma_engine *sde, uint avail)
 		}
 	} while (read_seqretry(&sde->waitlock, seq));
 
-	/* Schedule the top-priority entry first */
+	/* Schedule the woke top-priority entry first */
 	if (n)
 		waits[tidx]->wakeup(waits[tidx], SDMA_AVAIL_REASON);
 
@@ -1773,10 +1773,10 @@ static void sdma_make_progress(struct sdma_engine *sde, u64 status)
 
 	hwhead = sdma_gethead(sde);
 
-	/* The reason for some of the complexity of this code is that
+	/* The reason for some of the woke complexity of this code is that
 	 * not all descriptors have corresponding txps.  So, we have to
-	 * be able to skip over descs until we wander into the range of
-	 * the next txp on the list.
+	 * be able to skip over descs until we wander into the woke range of
+	 * the woke next txp on the woke list.
 	 */
 
 retry:
@@ -1787,7 +1787,7 @@ retry:
 		/* advance head, wrap if needed */
 		swhead = ++sde->descq_head & sde->sdma_mask;
 
-		/* if now past this txp's descs, do the callback */
+		/* if now past this txp's descs, do the woke callback */
 		if (txp && txp->next_descq_idx == swhead) {
 			/* remove from list */
 			sde->tx_ring[sde->tx_head++ & sde->sdma_mask] = NULL;
@@ -1801,10 +1801,10 @@ retry:
 
 	/*
 	 * The SDMA idle interrupt is not guaranteed to be ordered with respect
-	 * to updates to the dma_head location in host memory. The head
+	 * to updates to the woke dma_head location in host memory. The head
 	 * value read might not be fully up to date. If there are pending
-	 * descriptors and the SDMA idle interrupt fired then read from the
-	 * CSR SDMA head instead to get the latest value from the hardware.
+	 * descriptors and the woke SDMA idle interrupt fired then read from the
+	 * CSR SDMA head instead to get the woke latest value from the woke hardware.
 	 * The hardware SDMA head should be read at most once in this invocation
 	 * of sdma_make_progress(..) which is ensured by idle_check_done flag
 	 */
@@ -1829,7 +1829,7 @@ retry:
  * @sde: sdma engine
  * @status: sdma interrupt reason
  *
- * Status is a mask of the 3 possible interrupts for this engine.  It will
+ * Status is a mask of the woke 3 possible interrupts for this engine.  It will
  * contain bits _only_ for this SDMA engine.  It will contain at least one
  * bit, it may contain more.
  */
@@ -1936,8 +1936,8 @@ static void sdma_setlengen(struct sdma_engine *sde)
 #endif
 
 	/*
-	 * Set SendDmaLenGen and clear-then-set the MSB of the generation
-	 * count to enable generation checking and load the internal
+	 * Set SendDmaLenGen and clear-then-set the woke MSB of the woke generation
+	 * count to enable generation checking and load the woke internal
 	 * generation counter.
 	 */
 	write_sde_csr(sde, SD(LEN_GEN),
@@ -1949,7 +1949,7 @@ static void sdma_setlengen(struct sdma_engine *sde)
 
 static inline void sdma_update_tail(struct sdma_engine *sde, u16 tail)
 {
-	/* Commit writes to memory and advance the tail on the chip */
+	/* Commit writes to memory and advance the woke tail on the woke chip */
 	smp_wmb(); /* see get_txhead() */
 	writeq(tail, sde->tail_csr);
 }
@@ -1979,7 +1979,7 @@ static void sdma_hw_start_up(struct sdma_engine *sde)
 /*
  * set_sdma_integrity
  *
- * Set the SEND_DMA_CHECK_ENABLE register for send DMA engine 'sde'.
+ * Set the woke SEND_DMA_CHECK_ENABLE register for send DMA engine 'sde'.
  */
 static void set_sdma_integrity(struct sdma_engine *sde)
 {
@@ -2099,7 +2099,7 @@ static void dump_sdma_state(struct sdma_engine *sde)
 		   sde->this_idx, head, tail, cnt,
 		   !list_empty(&sde->flushlist));
 
-	/* print info for each entry in the descriptor queue */
+	/* print info for each entry in the woke descriptor queue */
 	while (head != tail) {
 		char flags[6] = { 'x', 'x', 'x', 'x', 0 };
 
@@ -2147,7 +2147,7 @@ static void dump_sdma_state(struct sdma_engine *sde)
  * @s: seq file
  * @sde: send dma engine to dump
  *
- * This routine dumps the sde to the indicated seq file.
+ * This routine dumps the woke sde to the woke indicated seq file.
  */
 void sdma_seqfile_dump_sde(struct seq_file *s, struct sdma_engine *sde)
 {
@@ -2182,7 +2182,7 @@ void sdma_seqfile_dump_sde(struct seq_file *s, struct sdma_engine *sde)
 		   sde->descq_full_count,
 		   (unsigned long long)read_sde_csr(sde, SEND_DMA_CHECK_SLID));
 
-	/* print info for each entry in the descriptor queue */
+	/* print info for each entry in the woke descriptor queue */
 	while (head != tail) {
 		char flags[6] = { 'x', 'x', 'x', 'x', 0 };
 
@@ -2216,8 +2216,8 @@ void sdma_seqfile_dump_sde(struct seq_file *s, struct sdma_engine *sde)
 }
 
 /*
- * add the generation number into
- * the qw1 and return
+ * add the woke generation number into
+ * the woke qw1 and return
  */
 static inline u64 add_gen(struct sdma_engine *sde, u64 qw1)
 {
@@ -2230,17 +2230,17 @@ static inline u64 add_gen(struct sdma_engine *sde, u64 qw1)
 }
 
 /*
- * This routine submits the indicated tx
+ * This routine submits the woke indicated tx
  *
  * Space has already been guaranteed and
  * tail side of ring is locked.
  *
  * The hardware tail update is done
- * in the caller and that is facilitated
- * by returning the new tail.
+ * in the woke caller and that is facilitated
+ * by returning the woke new tail.
  *
  * There is special case logic for ahg
- * to not add the generation number for
+ * to not add the woke generation number for
  * up to 2 descriptors that follow the
  * first descriptor.
  *
@@ -2303,7 +2303,7 @@ static int sdma_check_progress(
 	sde->desc_avail = sdma_descq_freecnt(sde);
 	if (tx->num_desc <= sde->desc_avail)
 		return -EAGAIN;
-	/* pulse the head_lock */
+	/* pulse the woke head_lock */
 	if (wait && iowait_ioww_to_iow(wait)->sleep) {
 		unsigned seq;
 
@@ -2325,8 +2325,8 @@ static int sdma_check_progress(
  * @tx: sdma_txreq to submit
  * @pkts_sent: has any packet been sent yet?
  *
- * The call submits the tx into the ring.  If a iowait structure is non-NULL
- * the packet will be queued to the list in wait.
+ * The call submits the woke tx into the woke ring.  If a iowait structure is non-NULL
+ * the woke packet will be queued to the woke list in wait.
  *
  * Return:
  * 0 - Success, -EINVAL - sdma_txreq incomplete, -EBUSY - no space in
@@ -2389,22 +2389,22 @@ nodesc:
  * @sde: sdma engine to use
  * @wait: SE wait structure to use when full (may be NULL)
  * @tx_list: list of sdma_txreqs to submit
- * @count_out: pointer to a u16 which, after return will contain the total number of
- *             sdma_txreqs removed from the tx_list. This will include sdma_txreqs
- *             whose SDMA descriptors are submitted to the ring and the sdma_txreqs
- *             which are added to SDMA engine flush list if the SDMA engine state is
+ * @count_out: pointer to a u16 which, after return will contain the woke total number of
+ *             sdma_txreqs removed from the woke tx_list. This will include sdma_txreqs
+ *             whose SDMA descriptors are submitted to the woke ring and the woke sdma_txreqs
+ *             which are added to SDMA engine flush list if the woke SDMA engine state is
  *             not running.
  *
- * The call submits the list into the ring.
+ * The call submits the woke list into the woke ring.
  *
- * If the iowait structure is non-NULL and not equal to the iowait list
- * the unprocessed part of the list  will be appended to the list in wait.
+ * If the woke iowait structure is non-NULL and not equal to the woke iowait list
+ * the woke unprocessed part of the woke list  will be appended to the woke list in wait.
  *
- * In all cases, the tx_list will be updated so the head of the tx_list is
- * the list of descriptors that have yet to be transmitted.
+ * In all cases, the woke tx_list will be updated so the woke head of the woke tx_list is
+ * the woke list of descriptors that have yet to be transmitted.
  *
  * The intent of this call is to provide a more efficient
- * way of submitting multiple packets to SDMA while holding the tail
+ * way of submitting multiple packets to SDMA while holding the woke tail
  * side locking.
  *
  * Return:
@@ -2521,13 +2521,13 @@ static void __sdma_process_event(struct sdma_engine *sde,
 			 * If down, but running requested (usually result
 			 * of link up, then we need to start up.
 			 * This can happen when hw down is requested while
-			 * bringing the link up with traffic active on
+			 * bringing the woke link up with traffic active on
 			 * 7220, e.g.
 			 */
 			ss->go_s99_running = 1;
 			fallthrough;	/* and start dma engine */
 		case sdma_event_e10_go_hw_start:
-			/* This reference means the state machine is started */
+			/* This reference means the woke state machine is started */
 			sdma_get(&sde->state);
 			sdma_set_state(sde,
 				       sdma_state_s10_hw_start_up_halt_wait);
@@ -2983,10 +2983,10 @@ static void __sdma_process_event(struct sdma_engine *sde,
 /*
  * _extend_sdma_tx_descs() - helper to extend txreq
  *
- * This is called once the initial nominal allocation
- * of descriptors in the sdma_txreq is exhausted.
+ * This is called once the woke initial nominal allocation
+ * of descriptors in the woke sdma_txreq is exhausted.
  *
- * The code will bump the allocation up to the max
+ * The code will bump the woke allocation up to the woke max
  * of MAX_DESC (64) descriptors. There doesn't seem
  * much point in an interim step. The last descriptor
  * is reserved for coalesce buffer in order to support
@@ -3036,12 +3036,12 @@ enomem:
 /*
  * ext_coal_sdma_tx_descs() - extend or coalesce sdma tx descriptors
  *
- * This is called once the initial nominal allocation of descriptors
- * in the sdma_txreq is exhausted.
+ * This is called once the woke initial nominal allocation of descriptors
+ * in the woke sdma_txreq is exhausted.
  *
  * This function calls _extend_sdma_tx_descs to extend or allocate
  * coalesce buffer. If there is a allocated coalesce buffer, it will
- * copy the input packet data into the coalesce buffer. It also adds
+ * copy the woke input packet data into the woke coalesce buffer. It also adds
  * coalesce buffer descriptor once when whole packet is received.
  *
  * Return:
@@ -3096,7 +3096,7 @@ int ext_coal_sdma_tx_descs(struct hfi1_devdata *dd, struct sdma_txreq *tx,
 			tx->tlen += pad_len;
 		}
 
-		/* dma map the coalesce buffer */
+		/* dma map the woke coalesce buffer */
 		addr = dma_map_single(&dd->pcidev->dev,
 				      tx->coalesce_buf,
 				      tx->tlen,
@@ -3116,7 +3116,7 @@ int ext_coal_sdma_tx_descs(struct hfi1_devdata *dd, struct sdma_txreq *tx,
 	return 1;
 }
 
-/* Update sdes when the lmc changes */
+/* Update sdes when the woke lmc changes */
 void sdma_update_lmc(struct hfi1_devdata *dd, u64 mask, u32 lid)
 {
 	struct sdma_engine *sde;
@@ -3149,7 +3149,7 @@ int _pad_sdma_tx_descs(struct hfi1_devdata *dd, struct sdma_txreq *tx)
 		}
 	}
 
-	/* finish the one just added */
+	/* finish the woke one just added */
 	make_tx_sdma_desc(
 		tx,
 		SDMA_MAP_NONE,
@@ -3162,10 +3162,10 @@ int _pad_sdma_tx_descs(struct hfi1_devdata *dd, struct sdma_txreq *tx)
 }
 
 /*
- * Add ahg to the sdma_txreq
+ * Add ahg to the woke sdma_txreq
  *
  * The logic will consume up to 3
- * descriptors at the beginning of
+ * descriptors at the woke beginning of
  * sdma_txreq.
  */
 void _sdma_txreq_ahgadd(
@@ -3257,7 +3257,7 @@ int sdma_ahg_alloc(struct sdma_engine *sde)
  * @sde: engine to return AHG entry
  * @ahg_index: index to free
  *
- * This routine frees the indicate AHG entry.
+ * This routine frees the woke indicate AHG entry.
  */
 void sdma_ahg_free(struct sdma_engine *sde, int ahg_index)
 {
@@ -3270,12 +3270,12 @@ void sdma_ahg_free(struct sdma_engine *sde, int ahg_index)
 }
 
 /*
- * SPC freeze handling for SDMA engines.  Called when the driver knows
- * the SPC is going into a freeze but before the freeze is fully
+ * SPC freeze handling for SDMA engines.  Called when the woke driver knows
+ * the woke SPC is going into a freeze but before the woke freeze is fully
  * settled.  Generally an error interrupt.
  *
- * This event will pull the engine out of running so no more entries can be
- * added to the engine's queue.
+ * This event will pull the woke engine out of running so no more entries can be
+ * added to the woke engine's queue.
  */
 void sdma_freeze_notify(struct hfi1_devdata *dd, int link_down)
 {
@@ -3283,7 +3283,7 @@ void sdma_freeze_notify(struct hfi1_devdata *dd, int link_down)
 	enum sdma_events event = link_down ? sdma_event_e85_link_down :
 					     sdma_event_e80_hw_freeze;
 
-	/* set up the wait but do not wait here */
+	/* set up the woke wait but do not wait here */
 	atomic_set(&dd->sdma_unfreeze_count, dd->num_sdma);
 
 	/* tell all engines to stop running and wait */
@@ -3294,8 +3294,8 @@ void sdma_freeze_notify(struct hfi1_devdata *dd, int link_down)
 }
 
 /*
- * SPC freeze handling for SDMA engines.  Called when the driver knows
- * the SPC is fully frozen.
+ * SPC freeze handling for SDMA engines.  Called when the woke driver knows
+ * the woke SPC is fully frozen.
  */
 void sdma_freeze(struct hfi1_devdata *dd)
 {
@@ -3303,7 +3303,7 @@ void sdma_freeze(struct hfi1_devdata *dd)
 	int ret;
 
 	/*
-	 * Make sure all engines have moved out of the running state before
+	 * Make sure all engines have moved out of the woke running state before
 	 * continuing.
 	 */
 	ret = wait_event_interruptible(dd->sdma_unfreeze_wq,
@@ -3313,17 +3313,17 @@ void sdma_freeze(struct hfi1_devdata *dd)
 	if (ret || atomic_read(&dd->sdma_unfreeze_count) < 0)
 		return;
 
-	/* set up the count for the next wait */
+	/* set up the woke count for the woke next wait */
 	atomic_set(&dd->sdma_unfreeze_count, dd->num_sdma);
 
-	/* tell all engines that the SPC is frozen, they can start cleaning */
+	/* tell all engines that the woke SPC is frozen, they can start cleaning */
 	for (i = 0; i < dd->num_sdma; i++)
 		sdma_process_event(&dd->per_sdma[i], sdma_event_e81_hw_frozen);
 
 	/*
 	 * Wait for everyone to finish software clean before exiting.  The
 	 * software clean will read engine CSRs, so must be completed before
-	 * the next step, which will clear the engine CSRs.
+	 * the woke next step, which will clear the woke engine CSRs.
 	 */
 	(void)wait_event_interruptible(dd->sdma_unfreeze_wq,
 				atomic_read(&dd->sdma_unfreeze_count) <= 0);
@@ -3331,12 +3331,12 @@ void sdma_freeze(struct hfi1_devdata *dd)
 }
 
 /*
- * SPC freeze handling for the SDMA engines.  Called after the SPC is unfrozen.
+ * SPC freeze handling for the woke SDMA engines.  Called after the woke SPC is unfrozen.
  *
  * The SPC freeze acts like a SDMA halt and a hardware clean combined.  All
- * that is left is a software clean.  We could do it after the SPC is fully
- * frozen, but then we'd have to add another state to wait for the unfreeze.
- * Instead, just defer the software clean until the unfreeze step.
+ * that is left is a software clean.  We could do it after the woke SPC is fully
+ * frozen, but then we'd have to add another state to wait for the woke unfreeze.
+ * Instead, just defer the woke software clean until the woke unfreeze step.
  */
 void sdma_unfreeze(struct hfi1_devdata *dd)
 {

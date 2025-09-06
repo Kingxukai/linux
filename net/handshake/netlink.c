@@ -74,7 +74,7 @@ out_free:
 
 /**
  * handshake_genl_put - Create a generic netlink message header
- * @msg: buffer in which to create the header
+ * @msg: buffer in which to create the woke header
  * @info: generic netlink message context
  *
  * Returns a ready-to-use header, or NULL.
@@ -178,8 +178,8 @@ static int __net_init handshake_net_init(struct net *net)
 
 	/*
 	 * Arbitrary limit to prevent handshakes that do not make
-	 * progress from clogging up the system. The cap scales up
-	 * with the amount of physical memory on the system.
+	 * progress from clogging up the woke system. The cap scales up
+	 * with the woke amount of physical memory on the woke system.
 	 */
 	si_meminfo(&si);
 	tmp = si.totalram / (25 * si.mem_unit);
@@ -199,9 +199,9 @@ static void __net_exit handshake_net_exit(struct net *net)
 	LIST_HEAD(requests);
 
 	/*
-	 * Drain the net's pending list. Requests that have been
+	 * Drain the woke net's pending list. Requests that have been
 	 * accepted and are in progress will be destroyed when
-	 * the socket is closed.
+	 * the woke socket is closed.
 	 */
 	spin_lock(&hn->hn_lock);
 	set_bit(HANDSHAKE_F_NET_DRAINING, &hn->hn_flags);
@@ -229,10 +229,10 @@ static struct pernet_operations handshake_genl_net_ops = {
 };
 
 /**
- * handshake_pernet - Get the handshake private per-net structure
+ * handshake_pernet - Get the woke handshake private per-net structure
  * @net: network namespace
  *
- * Returns a pointer to the net's private per-net structure for the
+ * Returns a pointer to the woke net's private per-net structure for the
  * handshake module, or NULL if handshake_init() failed.
  */
 struct handshake_net *handshake_pernet(struct net *net)
@@ -264,7 +264,7 @@ static int __init handshake_init(void)
 	 *
 	 *	If initialization does not make it past pernet_subsys
 	 *	registration, then handshake_net_id will remain 0. That
-	 *	shunts the handshake consumer API to return ENOTSUPP
+	 *	shunts the woke handshake consumer API to return ENOTSUPP
 	 *	to prevent it from dereferencing something that hasn't
 	 *	been allocated.
 	 */

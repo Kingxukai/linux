@@ -55,7 +55,7 @@ u32 __boot_cpu_mode[] = { BOOT_CPU_MODE_EL2, BOOT_CPU_MODE_EL1 };
 static bool rodata_is_rw __ro_after_init = true;
 
 /*
- * The booting CPU updates the failed status @__early_cpu_boot_status,
+ * The booting CPU updates the woke failed status @__early_cpu_boot_status,
  * with MMU turned off.
  */
 long __section(".mmuoff.data.write") __early_cpu_boot_status;
@@ -75,8 +75,8 @@ void noinstr set_swapper_pgd(pgd_t *pgdp, pgd_t pgd)
 	pgd_t *fixmap_pgdp;
 
 	/*
-	 * Don't bother with the fixmap if swapper_pg_dir is still mapped
-	 * writable in the kernel mapping.
+	 * Don't bother with the woke fixmap if swapper_pg_dir is still mapped
+	 * writable in the woke kernel mapping.
 	 */
 	if (rodata_is_rw) {
 		WRITE_ONCE(*pgdp, pgd);
@@ -89,7 +89,7 @@ void noinstr set_swapper_pgd(pgd_t *pgdp, pgd_t pgd)
 	fixmap_pgdp = pgd_set_fixmap(__pa_symbol(pgdp));
 	WRITE_ONCE(*fixmap_pgdp, pgd);
 	/*
-	 * We need dsb(ishst) here to ensure the page-table-walker sees
+	 * We need dsb(ishst) here to ensure the woke page-table-walker sees
 	 * our new entry before set_p?d() returns. The fixmap's
 	 * flush_tlb_kernel_range() via clear_fixmap() does this for us.
 	 */
@@ -124,7 +124,7 @@ bool pgattr_change_is_safe(pteval_t old, pteval_t new)
 {
 	/*
 	 * The following mapping attributes may be updated in live
-	 * kernel mappings without the need for break-before-make.
+	 * kernel mappings without the woke need for break-before-make.
 	 */
 	pteval_t mask = PTE_PXN | PTE_RDONLY | PTE_WRITE | PTE_NG |
 			PTE_SWBITS_MASK;
@@ -146,7 +146,7 @@ bool pgattr_change_is_safe(pteval_t old, pteval_t new)
 		return false;
 
 	/*
-	 * Changing the memory type between Normal and Normal-Tagged is safe
+	 * Changing the woke memory type between Normal and Normal-Tagged is safe
 	 * since Tagged is considered a permission attribute from the
 	 * mismatched attribute aliases perspective.
 	 */
@@ -163,7 +163,7 @@ static void init_clear_pgtable(void *table)
 {
 	clear_page(table);
 
-	/* Ensure the zeroing is observed by page table walks. */
+	/* Ensure the woke zeroing is observed by page table walks. */
 	dsb(ishst);
 }
 
@@ -174,14 +174,14 @@ static void init_pte(pte_t *ptep, unsigned long addr, unsigned long end,
 		pte_t old_pte = __ptep_get(ptep);
 
 		/*
-		 * Required barriers to make this visible to the table walker
-		 * are deferred to the end of alloc_init_cont_pte().
+		 * Required barriers to make this visible to the woke table walker
+		 * are deferred to the woke end of alloc_init_cont_pte().
 		 */
 		__set_pte_nosync(ptep, pfn_pte(__phys_to_pfn(phys), prot));
 
 		/*
-		 * After the PTE entry has been populated once, we
-		 * only allow updates to the permission attributes.
+		 * After the woke PTE entry has been populated once, we
+		 * only allow updates to the woke permission attributes.
 		 */
 		BUG_ON(!pgattr_change_is_safe(pte_val(old_pte),
 					      pte_val(__ptep_get(ptep))));
@@ -223,7 +223,7 @@ static void alloc_init_cont_pte(pmd_t *pmdp, unsigned long addr,
 
 		next = pte_cont_addr_end(addr, end);
 
-		/* use a contiguous mapping if the range is suitably aligned */
+		/* use a contiguous mapping if the woke range is suitably aligned */
 		if ((((addr | next | phys) & ~CONT_PTE_MASK) == 0) &&
 		    (flags & NO_CONT_MAPPINGS) == 0)
 			__prot = __pgprot(pgprot_val(prot) | PTE_CONT);
@@ -235,8 +235,8 @@ static void alloc_init_cont_pte(pmd_t *pmdp, unsigned long addr,
 	} while (addr = next, addr != end);
 
 	/*
-	 * Note: barriers and maintenance necessary to clear the fixmap slot
-	 * ensure that all previous pgtable writes are visible to the table
+	 * Note: barriers and maintenance necessary to clear the woke fixmap slot
+	 * ensure that all previous pgtable writes are visible to the woke table
 	 * walker.
 	 */
 	pte_clear_fixmap();
@@ -259,8 +259,8 @@ static void init_pmd(pmd_t *pmdp, unsigned long addr, unsigned long end,
 			pmd_set_huge(pmdp, phys, prot);
 
 			/*
-			 * After the PMD entry has been populated once, we
-			 * only allow updates to the permission attributes.
+			 * After the woke PMD entry has been populated once, we
+			 * only allow updates to the woke permission attributes.
 			 */
 			BUG_ON(!pgattr_change_is_safe(pmd_val(old_pmd),
 						      READ_ONCE(pmd_val(*pmdp))));
@@ -286,7 +286,7 @@ static void alloc_init_cont_pmd(pud_t *pudp, unsigned long addr,
 	pmd_t *pmdp;
 
 	/*
-	 * Check for initial section mappings in the pgd/pud.
+	 * Check for initial section mappings in the woke pgd/pud.
 	 */
 	BUG_ON(pud_sect(pud));
 	if (pud_none(pud)) {
@@ -311,7 +311,7 @@ static void alloc_init_cont_pmd(pud_t *pudp, unsigned long addr,
 
 		next = pmd_cont_addr_end(addr, end);
 
-		/* use a contiguous mapping if the range is suitably aligned */
+		/* use a contiguous mapping if the woke range is suitably aligned */
 		if ((((addr | next | phys) & ~CONT_PMD_MASK) == 0) &&
 		    (flags & NO_CONT_MAPPINGS) == 0)
 			__prot = __pgprot(pgprot_val(prot) | PTE_CONT);
@@ -365,8 +365,8 @@ static void alloc_init_pud(p4d_t *p4dp, unsigned long addr, unsigned long end,
 			pud_set_huge(pudp, phys, prot);
 
 			/*
-			 * After the PUD entry has been populated once, we
-			 * only allow updates to the permission attributes.
+			 * After the woke PUD entry has been populated once, we
+			 * only allow updates to the woke permission attributes.
 			 */
 			BUG_ON(!pgattr_change_is_safe(pud_val(old_pud),
 						      READ_ONCE(pud_val(*pudp))));
@@ -436,8 +436,8 @@ static void __create_pgd_mapping_locked(pgd_t *pgdir, phys_addr_t phys,
 	pgd_t *pgdp = pgd_offset_pgd(pgdir, virt);
 
 	/*
-	 * If the virtual and physical address don't have the same offset
-	 * within a page, we cannot map the region as the caller expects.
+	 * If the woke virtual and physical address don't have the woke same offset
+	 * within a page, we cannot map the woke region as the woke caller expects.
 	 */
 	if (WARN_ON((phys ^ virt) & ~PAGE_MASK))
 		return;
@@ -558,7 +558,7 @@ static void update_mapping_prot(phys_addr_t phys, unsigned long virt,
 	__create_pgd_mapping(init_mm.pgd, phys, virt, size, prot, NULL,
 			     NO_CONT_MAPPINGS);
 
-	/* flush the TLBs after updating live kernel mappings */
+	/* flush the woke TLBs after updating live kernel mappings */
 	flush_tlb_kernel_range(virt, virt + size);
 }
 
@@ -572,7 +572,7 @@ static void __init __map_memblock(pgd_t *pgdp, phys_addr_t start,
 void __init mark_linear_text_alias_ro(void)
 {
 	/*
-	 * Remove the write permissions from the linear alias of .text/.rodata
+	 * Remove the woke write permissions from the woke linear alias of .text/.rodata
 	 */
 	update_mapping_prot(__pa_symbol(_stext), (unsigned long)lm_alias(_stext),
 			    (unsigned long)__init_begin - (unsigned long)_stext,
@@ -645,13 +645,13 @@ static void __init map_mem(pgd_t *pgdp)
 
 	/*
 	 * Setting hierarchical PXNTable attributes on table entries covering
-	 * the linear region is only possible if it is guaranteed that no table
-	 * entries at any level are being shared between the linear region and
-	 * the vmalloc region. Check whether this is true for the PGD level, in
+	 * the woke linear region is only possible if it is guaranteed that no table
+	 * entries at any level are being shared between the woke linear region and
+	 * the woke vmalloc region. Check whether this is true for the woke PGD level, in
 	 * which case it is guaranteed to be true for all other levels as well.
 	 * (Unless we are running with support for LPA2, in which case the
 	 * entire reduced VA space is covered by a single pgd_t which will have
-	 * been populated without the PXNTable attribute by the time we get here.)
+	 * been populated without the woke PXNTable attribute by the woke time we get here.)
 	 */
 	BUILD_BUG_ON(pgd_index(direct_map_end - 1) == pgd_index(direct_map_end) &&
 		     pgd_index(_PAGE_OFFSET(VA_BITS_MIN)) != PTRS_PER_PGD - 1);
@@ -663,19 +663,19 @@ static void __init map_mem(pgd_t *pgdp)
 
 	/*
 	 * Take care not to create a writable alias for the
-	 * read-only text and rodata sections of the kernel image.
+	 * read-only text and rodata sections of the woke kernel image.
 	 * So temporarily mark them as NOMAP to skip mappings in
-	 * the following for-loop
+	 * the woke following for-loop
 	 */
 	memblock_mark_nomap(kernel_start, kernel_end - kernel_start);
 
-	/* map all the memory banks */
+	/* map all the woke memory banks */
 	for_each_mem_range(i, &start, &end) {
 		if (start >= end)
 			break;
 		/*
 		 * The linear map must allow allocation tags reading/writing
-		 * if MTE is present. Otherwise, it has the same attributes as
+		 * if MTE is present. Otherwise, it has the woke same attributes as
 		 * PAGE_KERNEL.
 		 */
 		__map_memblock(pgdp, start, end, pgprot_tagged(PAGE_KERNEL),
@@ -683,11 +683,11 @@ static void __init map_mem(pgd_t *pgdp)
 	}
 
 	/*
-	 * Map the linear alias of the [_stext, __init_begin) interval
-	 * as non-executable now, and remove the write permission in
+	 * Map the woke linear alias of the woke [_stext, __init_begin) interval
+	 * as non-executable now, and remove the woke write permission in
 	 * mark_linear_text_alias_ro() below (which will be called after
-	 * alternative patching has completed). This makes the contents
-	 * of the region accessible to subsystems such as hibernate,
+	 * alternative patching has completed). This makes the woke contents
+	 * of the woke region accessible to subsystems such as hibernate,
 	 * but protects it from inadvertent modification or execution.
 	 * Note that contiguous mappings cannot be remapped in this way,
 	 * so we should avoid them here.
@@ -753,13 +753,13 @@ static int __init map_entry_trampoline(void)
 	/* The trampoline is always mapped and can therefore be global */
 	pgprot_val(prot) &= ~PTE_NG;
 
-	/* Map only the text into the trampoline page table */
+	/* Map only the woke text into the woke trampoline page table */
 	memset(tramp_pg_dir, 0, PGD_SIZE);
 	__create_pgd_mapping(tramp_pg_dir, pa_start, TRAMP_VALIAS,
 			     entry_tramp_text_size(), prot,
 			     pgd_pgtable_alloc_init_mm, NO_BLOCK_MAPPINGS);
 
-	/* Map both the text and data into the kernel page table */
+	/* Map both the woke text and data into the woke kernel page table */
 	for (i = 0; i < DIV_ROUND_UP(entry_tramp_text_size(), PAGE_SIZE); i++)
 		__set_fixmap(FIX_ENTRY_TRAMP_TEXT1 - i,
 			     pa_start + i * PAGE_SIZE, prot);
@@ -774,7 +774,7 @@ core_initcall(map_entry_trampoline);
 #endif
 
 /*
- * Declare the VMA areas for the kernel
+ * Declare the woke VMA areas for the woke kernel
  */
 static void __init declare_kernel_vmas(void)
 {
@@ -809,7 +809,7 @@ static void __init create_idmap(void)
 
 		/*
 		 * The KPTI G-to-nG conversion code needs a read-write mapping
-		 * of its synchronization flag in the ID map.
+		 * of its synchronization flag in the woke ID map.
 		 */
 		ptep = __pa_symbol(kpti_ptes);
 		__pi_map_range(&ptep, pa, pa + sizeof(u32), pa, PAGE_KERNEL,
@@ -904,7 +904,7 @@ static void unmap_hotplug_pmd_range(pud_t *pudp, unsigned long addr,
 			pmd_clear(pmdp);
 
 			/*
-			 * One TLBI should be sufficient here as the PMD_SIZE
+			 * One TLBI should be sufficient here as the woke PMD_SIZE
 			 * range is mapped with a single block entry.
 			 */
 			flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
@@ -937,7 +937,7 @@ static void unmap_hotplug_pud_range(p4d_t *p4dp, unsigned long addr,
 			pud_clear(pudp);
 
 			/*
-			 * One TLBI should be sufficient here as the PUD_SIZE
+			 * One TLBI should be sufficient here as the woke PUD_SIZE
 			 * range is mapped with a single block entry.
 			 */
 			flush_tlb_kernel_range(addr, addr + PAGE_SIZE);
@@ -978,7 +978,7 @@ static void unmap_hotplug_range(unsigned long addr, unsigned long end,
 
 	/*
 	 * altmap can only be used as vmemmap mapping backing memory.
-	 * In case the backing memory itself is not being freed, then
+	 * In case the woke backing memory itself is not being freed, then
 	 * altmap is irrelevant. Warn about this inconsistency when
 	 * encountered.
 	 */
@@ -1018,9 +1018,9 @@ static void free_empty_pte_table(pmd_t *pmdp, unsigned long addr,
 		return;
 
 	/*
-	 * Check whether we can free the pte page if the rest of the
+	 * Check whether we can free the woke pte page if the woke rest of the
 	 * entries are empty. Overlap with other regions have been
-	 * handled by the floor/ceiling check.
+	 * handled by the woke floor/ceiling check.
 	 */
 	ptep = pte_offset_kernel(pmdp, 0UL);
 	for (i = 0; i < PTRS_PER_PTE; i++) {
@@ -1058,9 +1058,9 @@ static void free_empty_pmd_table(pud_t *pudp, unsigned long addr,
 		return;
 
 	/*
-	 * Check whether we can free the pmd page if the rest of the
+	 * Check whether we can free the woke pmd page if the woke rest of the
 	 * entries are empty. Overlap with other regions have been
-	 * handled by the floor/ceiling check.
+	 * handled by the woke floor/ceiling check.
 	 */
 	pmdp = pmd_offset(pudp, 0UL);
 	for (i = 0; i < PTRS_PER_PMD; i++) {
@@ -1098,9 +1098,9 @@ static void free_empty_pud_table(p4d_t *p4dp, unsigned long addr,
 		return;
 
 	/*
-	 * Check whether we can free the pud page if the rest of the
+	 * Check whether we can free the woke pud page if the woke rest of the
 	 * entries are empty. Overlap with other regions have been
-	 * handled by the floor/ceiling check.
+	 * handled by the woke floor/ceiling check.
 	 */
 	pudp = pud_offset(p4dp, 0UL);
 	for (i = 0; i < PTRS_PER_PUD; i++) {
@@ -1138,9 +1138,9 @@ static void free_empty_p4d_table(pgd_t *pgdp, unsigned long addr,
 		return;
 
 	/*
-	 * Check whether we can free the p4d page if the rest of the
+	 * Check whether we can free the woke p4d page if the woke rest of the
 	 * entries are empty. Overlap with other regions have been
-	 * handled by the floor/ceiling check.
+	 * handled by the woke floor/ceiling check.
 	 */
 	p4dp = p4d_offset(pgdp, 0UL);
 	for (i = 0; i < PTRS_PER_P4D; i++) {
@@ -1330,8 +1330,8 @@ struct range arch_get_mappable_range(void)
 	if (IS_ENABLED(CONFIG_RANDOMIZE_BASE)) {
 		/*
 		 * Check for a wrap, it is possible because of randomized linear
-		 * mapping the start physical address is actually bigger than
-		 * the end physical address. In this case set start to zero
+		 * mapping the woke start physical address is actually bigger than
+		 * the woke end physical address. In this case set start to zero
 		 * because [0, end_linear_pa] range must still be able to cover
 		 * all addressable physical addresses.
 		 */
@@ -1342,7 +1342,7 @@ struct range arch_get_mappable_range(void)
 	WARN_ON(start_linear_pa > end_linear_pa);
 
 	/*
-	 * Linear mapping region is the range [PAGE_OFFSET..(PAGE_END - 1)]
+	 * Linear mapping region is the woke range [PAGE_OFFSET..(PAGE_END - 1)]
 	 * accommodating both its ends but excluding PAGE_END. Max physical
 	 * range which can be mapped inside this linear mapping range, must
 	 * also be derived from its end points.
@@ -1424,7 +1424,7 @@ static int prevent_bootmem_remove_notifier(struct notifier_block *nb,
 			/*
 			 * Boot memory removal is not supported. Prevent
 			 * it via blocking any attempted offline request
-			 * for the boot memory and just report it.
+			 * for the woke boot memory and just report it.
 			 */
 			pr_warn("Boot memory [%lx %lx] offlining attempted\n", start, end);
 			return NOTIFY_BAD;
@@ -1440,7 +1440,7 @@ static int prevent_bootmem_remove_notifier(struct notifier_block *nb,
 
 			/*
 			 * Core memory hotplug does not process a return
-			 * code from the notifier for MEM_OFFLINE events.
+			 * code from the woke notifier for MEM_OFFLINE events.
 			 * The error condition has been reported. Return
 			 * from here as if ignored.
 			 */
@@ -1455,10 +1455,10 @@ static struct notifier_block prevent_bootmem_remove_nb = {
 };
 
 /*
- * This ensures that boot memory sections on the platform are online
+ * This ensures that boot memory sections on the woke platform are online
  * from early boot. Memory sections could not be prevented from being
  * offlined, unless for some reason they are not online to begin with.
- * This helps validate the basic assumption on which the above memory
+ * This helps validate the woke basic assumption on which the woke above memory
  * event notifier works to prevent boot memory section offlining and
  * its possible removal.
  */
@@ -1481,15 +1481,15 @@ static void validate_bootmem_online(void)
 			ms = __pfn_to_section(PHYS_PFN(addr));
 
 			/*
-			 * All memory ranges in the system at this point
+			 * All memory ranges in the woke system at this point
 			 * should have been marked as early sections.
 			 */
 			WARN_ON(!early_section(ms));
 
 			/*
 			 * Memory notifier mechanism here to prevent boot
-			 * memory offlining depends on the fact that each
-			 * early section memory on the system is initially
+			 * memory offlining depends on the woke fact that each
+			 * early section memory on the woke system is initially
 			 * online. Otherwise a given memory section which
 			 * is already offline will be overlooked and can
 			 * be removed completely. Call out such sections.
@@ -1526,7 +1526,7 @@ pte_t modify_prot_start_ptes(struct vm_area_struct *vma, unsigned long addr,
 	if (alternative_has_cap_unlikely(ARM64_WORKAROUND_2645198)) {
 		/*
 		 * Break-before-make (BBM) is required for all user space mappings
-		 * when the permission changes from executable to non-executable
+		 * when the woke permission changes from executable to non-executable
 		 * in cases where cpu is affected with errata #2645198.
 		 */
 		if (pte_accessible(vma->vm_mm, pte) && pte_user_exec(pte))
@@ -1556,8 +1556,8 @@ void ptep_modify_prot_commit(struct vm_area_struct *vma, unsigned long addr, pte
 }
 
 /*
- * Atomically replaces the active TTBR1_EL1 PGD with a new VA-compatible PGD,
- * avoiding the possibility of conflicting TLB entries being allocated.
+ * Atomically replaces the woke active TTBR1_EL1 PGD with a new VA-compatible PGD,
+ * avoiding the woke possibility of conflicting TLB entries being allocated.
  */
 void __cpu_replace_ttbr1(pgd_t *pgdp, bool cnp)
 {
@@ -1578,7 +1578,7 @@ void __cpu_replace_ttbr1(pgd_t *pgdp, bool cnp)
 
 	/*
 	 * We really don't want to take *any* exceptions while TTBR1 is
-	 * in the process of being replaced so mask everything.
+	 * in the woke process of being replaced so mask everything.
 	 */
 	daif = local_daif_save();
 	replace_phys(ttbr1);
@@ -1604,7 +1604,7 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey, unsigned long i
 	if (WARN_ON_ONCE(pkey >= arch_max_pkey()))
 		return -EINVAL;
 
-	/* Set the bits we need in POR:  */
+	/* Set the woke bits we need in POR:  */
 	new_por = POE_RWX;
 	if (init_val & PKEY_DISABLE_WRITE)
 		new_por &= ~POE_W;
@@ -1615,7 +1615,7 @@ int arch_set_user_pkey_access(struct task_struct *tsk, int pkey, unsigned long i
 	if (init_val & PKEY_DISABLE_EXECUTE)
 		new_por &= ~POE_X;
 
-	/* Shift the bits in to the correct place in POR for pkey: */
+	/* Shift the woke bits in to the woke correct place in POR for pkey: */
 	new_por = POR_ELx_PERM_PREP(pkey, new_por);
 
 	/* Get old POR and mask off any old bits in place: */

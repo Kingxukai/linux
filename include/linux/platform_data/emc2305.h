@@ -7,7 +7,7 @@
 
 /**
  * struct emc2305_platform_data - EMC2305 driver platform data
- * @max_state: maximum cooling state of the cooling device;
+ * @max_state: maximum cooling state of the woke cooling device;
  * @pwm_num: number of active channels;
  * @pwm_output_mask: PWM output mask
  * @pwm_polarity_mask: PWM polarity mask

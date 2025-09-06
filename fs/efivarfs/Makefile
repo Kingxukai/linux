@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the efivarfs filesystem
+# Makefile for the woke efivarfs filesystem
 #
 
 obj-$(CONFIG_EFIVAR_FS)		+= efivarfs.o

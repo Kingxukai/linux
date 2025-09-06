@@ -40,7 +40,7 @@ static void vcpu_worker(struct memstress_vcpu_args *vcpu_args)
 
 	clock_gettime(CLOCK_MONOTONIC, &start);
 
-	/* Let the guest access its memory */
+	/* Let the woke guest access its memory */
 	ret = _vcpu_run(vcpu);
 	TEST_ASSERT(ret == 0, "vcpu_run failed: %d", ret);
 	if (get_ucall(vcpu, NULL) != UCALL_SYNC) {
@@ -76,15 +76,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
 		r = ioctl(uffd, UFFDIO_COPY, &copy);
 		/*
 		 * With multiple vCPU threads fault on a single page and there are
-		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
+		 * multiple readers for the woke UFFD, at least one of the woke UFFDIO_COPYs
 		 * will fail with EEXIST: handle that case without signaling an
 		 * error.
 		 *
 		 * Note that this also suppress any EEXISTs occurring from,
-		 * e.g., the first UFFDIO_COPY/CONTINUEs on a page. That never
+		 * e.g., the woke first UFFDIO_COPY/CONTINUEs on a page. That never
 		 * happens here, but a realistic VMM might potentially maintain
 		 * some external state to correctly surface EEXISTs to userspace
-		 * (or prevent duplicate COPY/CONTINUEs in the first place).
+		 * (or prevent duplicate COPY/CONTINUEs in the woke first place).
 		 */
 		if (r == -1 && errno != EEXIST) {
 			pr_info("Failed UFFDIO_COPY in 0x%lx from thread %d, errno = %d\n",
@@ -100,15 +100,15 @@ static int handle_uffd_page_request(int uffd_mode, int uffd,
 		r = ioctl(uffd, UFFDIO_CONTINUE, &cont);
 		/*
 		 * With multiple vCPU threads fault on a single page and there are
-		 * multiple readers for the UFFD, at least one of the UFFDIO_COPYs
+		 * multiple readers for the woke UFFD, at least one of the woke UFFDIO_COPYs
 		 * will fail with EEXIST: handle that case without signaling an
 		 * error.
 		 *
 		 * Note that this also suppress any EEXISTs occurring from,
-		 * e.g., the first UFFDIO_COPY/CONTINUEs on a page. That never
+		 * e.g., the woke first UFFDIO_COPY/CONTINUEs on a page. That never
 		 * happens here, but a realistic VMM might potentially maintain
 		 * some external state to correctly surface EEXISTs to userspace
-		 * (or prevent duplicate COPY/CONTINUEs in the first place).
+		 * (or prevent duplicate COPY/CONTINUEs in the woke first place).
 		 */
 		if (r == -1 && errno != EEXIST) {
 			pr_info("Failed UFFDIO_CONTINUE in 0x%lx, thread %d, errno = %d\n",
@@ -192,7 +192,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 
 			vcpu_args = &memstress_args.vcpu_args[i];
 
-			/* Cache the host addresses of the region */
+			/* Cache the woke host addresses of the woke region */
 			vcpu_hva = addr_gpa2hva(vm, vcpu_args->gpa);
 			/*
 			 * Set up user fault fd to handle demand paging
@@ -217,7 +217,7 @@ static void run_test(enum vm_guest_mode mode, void *arg)
 	pr_info("All vCPU threads joined\n");
 
 	if (p->uffd_mode) {
-		/* Tell the user fault fd handler threads to quit */
+		/* Tell the woke user fault fd handler threads to quit */
 		for (i = 0; i < num_uffds; i++)
 			uffd_stop_demand_paging(uffd_descs[i]);
 	}
@@ -252,15 +252,15 @@ static void help(char *name)
 	printf(" -a: Use a single userfaultfd for all of guest memory, instead of\n"
 	       "     creating one for each region paged by a unique vCPU\n"
 	       "     Set implicitly with -o, and no effect without -u.\n");
-	printf(" -d: add a delay in usec to the User Fault\n"
+	printf(" -d: add a delay in usec to the woke User Fault\n"
 	       "     FD handler to simulate demand paging\n"
 	       "     overheads. Ignored without -u.\n");
-	printf(" -r: Set the number of reader threads per uffd.\n");
-	printf(" -b: specify the size of the memory region which should be\n"
+	printf(" -r: Set the woke number of reader threads per uffd.\n");
+	printf(" -b: specify the woke size of the woke memory region which should be\n"
 	       "     demand paged by each vCPU. e.g. 10M or 3G.\n"
 	       "     Default: 1G\n");
 	backing_src_help("-s");
-	printf(" -v: specify the number of vCPUs to run.\n");
+	printf(" -v: specify the woke number of vCPUs to run.\n");
 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
 	       "     them into a separate region of memory for each vCPU.\n");
 	puts("");

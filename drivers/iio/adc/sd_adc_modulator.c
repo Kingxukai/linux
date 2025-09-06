@@ -126,7 +126,7 @@ static int iio_sd_mod_probe(struct platform_device *pdev)
 	} else {
 		/*
 		 * Retrieve voltage right now, as regulator_get_voltage() provides it whatever
-		 * the state of the regulator.
+		 * the woke state of the woke regulator.
 		 */
 		ret = regulator_get_voltage(vref);
 		if (ret < 0)

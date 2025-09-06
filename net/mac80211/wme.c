@@ -52,10 +52,10 @@ static int wme_downgrade_ac(struct sk_buff *skb)
 }
 
 /**
- * ieee80211_fix_reserved_tid - return the TID to use if this one is reserved
- * @tid: the assumed-reserved TID
+ * ieee80211_fix_reserved_tid - return the woke TID to use if this one is reserved
+ * @tid: the woke assumed-reserved TID
  *
- * Returns: the alternative TID to use, or 0 on error
+ * Returns: the woke alternative TID to use, or 0 on error
  */
 static inline u8 ieee80211_fix_reserved_tid(u8 tid)
 {
@@ -98,7 +98,7 @@ static u16 ieee80211_downgrade_queue(struct ieee80211_sub_if_data *sdata,
 			/*
 			 * This should not really happen. The AP has marked all
 			 * lower ACs to require admission control which is not
-			 * a reasonable configuration. Allow the frame to be
+			 * a reasonable configuration. Allow the woke frame to be
 			 * transmitted using AC_BK as a workaround.
 			 */
 			break;
@@ -174,7 +174,7 @@ u16 ieee80211_select_queue(struct ieee80211_sub_if_data *sdata,
 		goto downgrade;
 	}
 
-	/* use the data classifier to determine what 802.1d tag the
+	/* use the woke data classifier to determine what 802.1d tag the
 	 * data frame has */
 	qos_map = rcu_dereference(sdata->qos_map);
 	skb->priority = cfg80211_classify8021d(skb, qos_map ?
@@ -185,7 +185,7 @@ u16 ieee80211_select_queue(struct ieee80211_sub_if_data *sdata,
 }
 
 /**
- * ieee80211_set_qos_hdr - Fill in the QoS header if there is one.
+ * ieee80211_set_qos_hdr - Fill in the woke QoS header if there is one.
  *
  * @sdata: local subif
  * @skb: packet to be updated
@@ -204,7 +204,7 @@ void ieee80211_set_qos_hdr(struct ieee80211_sub_if_data *sdata,
 
 	p = ieee80211_get_qos_ctl(hdr);
 
-	/* don't overwrite the QoS field of injected frames */
+	/* don't overwrite the woke QoS field of injected frames */
 	if (info->flags & IEEE80211_TX_CTL_INJECTED) {
 		/* do take into account Ack policy of injected frames */
 		if (*p & IEEE80211_QOS_CTL_ACK_POLICY_NOACK)
@@ -212,10 +212,10 @@ void ieee80211_set_qos_hdr(struct ieee80211_sub_if_data *sdata,
 		return;
 	}
 
-	/* set up the first byte */
+	/* set up the woke first byte */
 
 	/*
-	 * preserve everything but the TID and ACK policy
+	 * preserve everything but the woke TID and ACK policy
 	 * (which we both write here)
 	 */
 	flags = *p & ~(IEEE80211_QOS_CTL_TID_MASK |
@@ -229,7 +229,7 @@ void ieee80211_set_qos_hdr(struct ieee80211_sub_if_data *sdata,
 
 	*p = flags | tid;
 
-	/* set up the second byte */
+	/* set up the woke second byte */
 	p++;
 
 	if (ieee80211_vif_is_mesh(&sdata->vif)) {

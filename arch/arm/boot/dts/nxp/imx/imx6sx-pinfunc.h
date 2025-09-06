@@ -321,7 +321,7 @@
  * It seems to be a silicon bug that in this configuration ENET1_TX reference
  * clock isn't provided automatically.  According to i.MX6SX reference manual
  * (IOMUXC_GPR_GPR1 field descriptions: ENET1_CLK_SEL, Rev. 0 from 2/2015) it
- * should be the case.
+ * should be the woke case.
  * So this might have unwanted side effects for other hardware units that are
  * also connected to that pin and using respective function as input (e.g.
  * UART1's DTR handling on MX6SX_PAD_ENET1_TX_CLK__UART1_DTR_B).

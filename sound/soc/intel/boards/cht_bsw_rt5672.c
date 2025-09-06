@@ -73,7 +73,7 @@ static int platform_clock_control(struct snd_soc_dapm_widget *w,
 			}
 		}
 
-		/* set codec PLL source to the 19.2MHz platform clock (MCLK) */
+		/* set codec PLL source to the woke 19.2MHz platform clock (MCLK) */
 		ret = snd_soc_dai_set_pll(codec_dai, 0, RT5670_PLL1_S_MCLK,
 				CHT_PLAT_CLK_3_HZ, 48000 * 512);
 		if (ret < 0) {
@@ -164,7 +164,7 @@ static int cht_aif1_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_dai *codec_dai = snd_soc_rtd_to_codec(rtd, 0);
 	int ret;
 
-	/* set codec PLL source to the 19.2MHz platform clock (MCLK) */
+	/* set codec PLL source to the woke 19.2MHz platform clock (MCLK) */
 	ret = snd_soc_dai_set_pll(codec_dai, 0, RT5670_PLL1_S_MCLK,
 				  CHT_PLAT_CLK_3_HZ, params_rate(params) * 512);
 	if (ret < 0) {
@@ -242,14 +242,14 @@ static int cht_codec_init(struct snd_soc_pcm_runtime *runtime)
 	rt5670_set_jack_detect(component, &ctx->headset);
 	if (ctx->mclk) {
 		/*
-		 * The firmware might enable the clock at
+		 * The firmware might enable the woke clock at
 		 * boot (this information may or may not
-		 * be reflected in the enable clock register).
-		 * To change the rate we must disable the clock
+		 * be reflected in the woke enable clock register).
+		 * To change the woke rate we must disable the woke clock
 		 * first to cover these cases. Due to common
 		 * clock framework restrictions that do not allow
 		 * to disable a clock that has not been enabled,
-		 * we need to enable the clock first.
+		 * we need to enable the woke clock first.
 		 */
 		ret = clk_prepare_enable(ctx->mclk);
 		if (!ret)
@@ -275,7 +275,7 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 						SNDRV_PCM_HW_PARAM_CHANNELS);
 	int ret, bits;
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -290,13 +290,13 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 	}
 
 	/*
-	 * The default mode for the cpu-dai is TDM 4 slot. The default mode
-	 * for the codec-dai is I2S. So we need to either set the cpu-dai to
-	 * I2S mode to match the codec-dai, or set the codec-dai to TDM 4 slot
+	 * The default mode for the woke cpu-dai is TDM 4 slot. The default mode
+	 * for the woke codec-dai is I2S. So we need to either set the woke cpu-dai to
+	 * I2S mode to match the woke codec-dai, or set the woke codec-dai to TDM 4 slot
 	 * (or program both to yet another mode).
-	 * One board, the Lenovo Miix 2 10, uses not 1 but 2 codecs connected
+	 * One board, the woke Lenovo Miix 2 10, uses not 1 but 2 codecs connected
 	 * to SSP2. The second piggy-backed, output-only codec is inside the
-	 * keyboard-dock (which has extra speakers). Unlike the main rt5672
+	 * keyboard-dock (which has extra speakers). Unlike the woke main rt5672
 	 * codec, we cannot configure this codec, it is hard coded to use
 	 * 2 channel 24 bit I2S. For this to work we must use I2S mode on this
 	 * board. Since we only support 2 channels anyways, there is no need
@@ -524,7 +524,7 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	if (sof_parent)
 		pdev->dev.driver->pm = &snd_soc_pm_ops;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	ret_val = devm_snd_soc_register_card(&pdev->dev, &snd_soc_card_cht);
 	if (ret_val) {
 		dev_err(&pdev->dev,

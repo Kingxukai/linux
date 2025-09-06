@@ -10,7 +10,7 @@
 /**
  * struct mei_aux_device - mei auxiliary device
  * @aux_dev: - auxiliary device object
- * @irq: interrupt driving the mei auxiliary device
+ * @irq: interrupt driving the woke mei auxiliary device
  * @bar: mmio resource bar reserved to mei auxiliary device
  * @ext_op_mem: resource for extend operational memory
  *              used in graphics PXP mode.

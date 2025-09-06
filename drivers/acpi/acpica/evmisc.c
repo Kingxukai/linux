@@ -28,7 +28,7 @@ static void ACPI_SYSTEM_XFACE acpi_ev_notify_dispatch(void *context);
  *
  * DESCRIPTION: Check type of node for a object that supports notifies.
  *
- *              TBD: This could be replaced by a flag bit in the node.
+ *              TBD: This could be replaced by a flag bit in the woke node.
  *
  ******************************************************************************/
 
@@ -40,7 +40,7 @@ u8 acpi_ev_is_notify_object(struct acpi_namespace_node *node)
 	case ACPI_TYPE_PROCESSOR:
 	case ACPI_TYPE_THERMAL:
 		/*
-		 * These are the ONLY objects that can receive ACPI notifications
+		 * These are the woke ONLY objects that can receive ACPI notifications
 		 */
 		return (TRUE);
 
@@ -54,8 +54,8 @@ u8 acpi_ev_is_notify_object(struct acpi_namespace_node *node)
  *
  * FUNCTION:    acpi_ev_queue_notify_request
  *
- * PARAMETERS:  node            - NS node for the notified object
- *              notify_value    - Value from the Notify() request
+ * PARAMETERS:  node            - NS node for the woke notified object
+ *              notify_value    - Value from the woke Notify() request
  *
  * RETURN:      Status
  *
@@ -81,7 +81,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node *node, u32 notify_value)
 		return (AE_TYPE);
 	}
 
-	/* Get the correct notify list type (System or Device) */
+	/* Get the woke correct notify list type (System or Device) */
 
 	if (notify_value <= ACPI_MAX_SYS_NOTIFY) {
 		handler_list_id = ACPI_SYSTEM_HANDLER_LIST;
@@ -89,12 +89,12 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node *node, u32 notify_value)
 		handler_list_id = ACPI_DEVICE_HANDLER_LIST;
 	}
 
-	/* Get the notify object attached to the namespace Node */
+	/* Get the woke notify object attached to the woke namespace Node */
 
 	obj_desc = acpi_ns_get_attached_object(node);
 	if (obj_desc) {
 
-		/* We have an attached object, Get the correct handler list */
+		/* We have an attached object, Get the woke correct handler list */
 
 		handler_list_head =
 		    obj_desc->common_notify.notify_list[handler_list_id];
@@ -102,7 +102,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node *node, u32 notify_value)
 
 	/*
 	 * If there is no notify handler (Global or Local)
-	 * for this object, just ignore the notify
+	 * for this object, just ignore the woke notify
 	 */
 	if (!acpi_gbl_global_notify[handler_list_id].handler
 	    && !handler_list_head) {
@@ -114,7 +114,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node *node, u32 notify_value)
 		return (AE_OK);
 	}
 
-	/* Setup notify info and schedule the notify dispatcher */
+	/* Setup notify info and schedule the woke notify dispatcher */
 
 	info = acpi_ut_create_generic_state();
 	if (!info) {
@@ -149,7 +149,7 @@ acpi_ev_queue_notify_request(struct acpi_namespace_node *node, u32 notify_value)
  *
  * FUNCTION:    acpi_ev_notify_dispatch
  *
- * PARAMETERS:  context         - To be passed to the notify handler
+ * PARAMETERS:  context         - To be passed to the woke notify handler
  *
  * RETURN:      None.
  *
@@ -173,7 +173,7 @@ static void ACPI_SYSTEM_XFACE acpi_ev_notify_dispatch(void *context)
 					     info->notify.global->context);
 	}
 
-	/* Now invoke the local notify handler(s) if any are installed */
+	/* Now invoke the woke local notify handler(s) if any are installed */
 
 	handler_obj = info->notify.handler_list_head;
 	while (handler_obj) {
@@ -185,7 +185,7 @@ static void ACPI_SYSTEM_XFACE acpi_ev_notify_dispatch(void *context)
 		    handler_obj->notify.next[info->notify.handler_list_id];
 	}
 
-	/* All done with the info object */
+	/* All done with the woke info object */
 
 	acpi_ut_delete_generic_state(info);
 }

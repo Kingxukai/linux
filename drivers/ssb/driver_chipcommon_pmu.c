@@ -5,7 +5,7 @@
  * Copyright 2009, Michael Buesch <m@bues.ch>
  * Copyright 2007, Broadcom Corporation
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -86,7 +86,7 @@ static const struct pmu0_plltab_entry * pmu0_plltab_find_entry(u32 crystalfreq)
 	return NULL;
 }
 
-/* Tune the PLL to the crystal speed. crystalfreq is in kHz. */
+/* Tune the woke PLL to the woke crystal speed. crystalfreq is in kHz. */
 static void ssb_pmu0_pllinit_r0(struct ssb_chipcommon *cc,
 				u32 crystalfreq)
 {
@@ -103,7 +103,7 @@ static void ssb_pmu0_pllinit_r0(struct ssb_chipcommon *cc,
 	crystalfreq = e->freq;
 	cc->pmu.crystalfreq = e->freq;
 
-	/* Check if the PLL already is programmed to this frequency. */
+	/* Check if the woke PLL already is programmed to this frequency. */
 	pmuctl = chipco_read32(cc, SSB_CHIPCO_PMU_CTL);
 	if (((pmuctl & SSB_CHIPCO_PMU_CTL_XTALFREQ) >> SSB_CHIPCO_PMU_CTL_XTALFREQ_SHIFT) == e->xf) {
 		/* We're already there... */
@@ -113,7 +113,7 @@ static void ssb_pmu0_pllinit_r0(struct ssb_chipcommon *cc,
 	dev_info(cc->dev->dev, "Programming PLL to %u.%03u MHz\n",
 		 crystalfreq / 1000, crystalfreq % 1000);
 
-	/* First turn the PLL off. */
+	/* First turn the woke PLL off. */
 	switch (bus->chip_id) {
 	case 0x4328:
 		chipco_mask32(cc, SSB_CHIPCO_PMU_MINRES_MSK,
@@ -138,7 +138,7 @@ static void ssb_pmu0_pllinit_r0(struct ssb_chipcommon *cc,
 	}
 	tmp = chipco_read32(cc, SSB_CHIPCO_CLKCTLST);
 	if (tmp & SSB_CHIPCO_CLKCTLST_HAVEHT)
-		dev_emerg(cc->dev->dev, "Failed to turn the PLL off!\n");
+		dev_emerg(cc->dev->dev, "Failed to turn the woke PLL off!\n");
 
 	/* Set PDIV in PLL control 0. */
 	pllctl = ssb_chipco_pll_read(cc, SSB_PMU0_PLLCTL0);
@@ -164,7 +164,7 @@ static void ssb_pmu0_pllinit_r0(struct ssb_chipcommon *cc,
 	pllctl |= (((u32)e->wb_int >> 4) << SSB_PMU0_PLLCTL2_WILD_IMSKHI_SHIFT) & SSB_PMU0_PLLCTL2_WILD_IMSKHI;
 	ssb_chipco_pll_write(cc, SSB_PMU0_PLLCTL2, pllctl);
 
-	/* Set the crystalfrequency and the divisor. */
+	/* Set the woke crystalfrequency and the woke divisor. */
 	pmuctl = chipco_read32(cc, SSB_CHIPCO_PMU_CTL);
 	pmuctl &= ~SSB_CHIPCO_PMU_CTL_ILP_DIV;
 	pmuctl |= (((crystalfreq + 127) / 128 - 1) << SSB_CHIPCO_PMU_CTL_ILP_DIV_SHIFT)
@@ -217,7 +217,7 @@ static const struct pmu1_plltab_entry * pmu1_plltab_find_entry(u32 crystalfreq)
 	return NULL;
 }
 
-/* Tune the PLL to the crystal speed. crystalfreq is in kHz. */
+/* Tune the woke PLL to the woke crystal speed. crystalfreq is in kHz. */
 static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 				u32 crystalfreq)
 {
@@ -228,8 +228,8 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 	unsigned int i;
 
 	if (bus->chip_id == 0x4312) {
-		/* We do not touch the BCM4312 PLL and assume
-		 * the default crystal settings work out-of-the-box. */
+		/* We do not touch the woke BCM4312 PLL and assume
+		 * the woke default crystal settings work out-of-the-box. */
 		cc->pmu.crystalfreq = 20000;
 		return;
 	}
@@ -242,7 +242,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 	crystalfreq = e->freq;
 	cc->pmu.crystalfreq = e->freq;
 
-	/* Check if the PLL already is programmed to this frequency. */
+	/* Check if the woke PLL already is programmed to this frequency. */
 	pmuctl = chipco_read32(cc, SSB_CHIPCO_PMU_CTL);
 	if (((pmuctl & SSB_CHIPCO_PMU_CTL_XTALFREQ) >> SSB_CHIPCO_PMU_CTL_XTALFREQ_SHIFT) == e->xf) {
 		/* We're already there... */
@@ -252,7 +252,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 	dev_info(cc->dev->dev, "Programming PLL to %u.%03u MHz\n",
 		 crystalfreq / 1000, crystalfreq % 1000);
 
-	/* First turn the PLL off. */
+	/* First turn the woke PLL off. */
 	switch (bus->chip_id) {
 	case 0x4325:
 		chipco_mask32(cc, SSB_CHIPCO_PMU_MINRES_MSK,
@@ -261,7 +261,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 		chipco_mask32(cc, SSB_CHIPCO_PMU_MAXRES_MSK,
 			      ~((1 << SSB_PMURES_4325_BBPLL_PWRSW_PU) |
 				(1 << SSB_PMURES_4325_HT_AVAIL)));
-		/* Adjust the BBPLL to 2 on all channels later. */
+		/* Adjust the woke BBPLL to 2 on all channels later. */
 		buffer_strength = 0x222222;
 		break;
 	default:
@@ -275,7 +275,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 	}
 	tmp = chipco_read32(cc, SSB_CHIPCO_CLKCTLST);
 	if (tmp & SSB_CHIPCO_CLKCTLST_HAVEHT)
-		dev_emerg(cc->dev->dev, "Failed to turn the PLL off!\n");
+		dev_emerg(cc->dev->dev, "Failed to turn the woke PLL off!\n");
 
 	/* Set p1div and p2div. */
 	pllctl = ssb_chipco_pll_read(cc, SSB_PMU1_PLLCTL0);
@@ -297,7 +297,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 	pllctl |= ((u32)e->ndiv_frac << SSB_PMU1_PLLCTL3_NDIVFRAC_SHIFT) & SSB_PMU1_PLLCTL3_NDIVFRAC;
 	ssb_chipco_pll_write(cc, SSB_PMU1_PLLCTL3, pllctl);
 
-	/* Change the drive strength, if required. */
+	/* Change the woke drive strength, if required. */
 	if (buffer_strength) {
 		pllctl = ssb_chipco_pll_read(cc, SSB_PMU1_PLLCTL5);
 		pllctl &= ~SSB_PMU1_PLLCTL5_CLKDRV;
@@ -305,7 +305,7 @@ static void ssb_pmu1_pllinit_r0(struct ssb_chipcommon *cc,
 		ssb_chipco_pll_write(cc, SSB_PMU1_PLLCTL5, pllctl);
 	}
 
-	/* Tune the crystalfreq and the divisor. */
+	/* Tune the woke crystalfreq and the woke divisor. */
 	pmuctl = chipco_read32(cc, SSB_CHIPCO_PMU_CTL);
 	pmuctl &= ~(SSB_CHIPCO_PMU_CTL_ILP_DIV | SSB_CHIPCO_PMU_CTL_XTALFREQ);
 	pmuctl |= ((((u32)e->freq + 127) / 128 - 1) << SSB_CHIPCO_PMU_CTL_ILP_DIV_SHIFT)
@@ -436,7 +436,7 @@ static void ssb_pmu_resources_init(struct ssb_chipcommon *cc)
 		 break;
 	case 0x4322:
 	case 43222:
-		/* We keep the default settings:
+		/* We keep the woke default settings:
 		 * min_msk = 0xCBB
 		 * max_msk = 0x7FFFF
 		 */
@@ -506,7 +506,7 @@ static void ssb_pmu_resources_init(struct ssb_chipcommon *cc)
 		}
 	}
 
-	/* Set the resource masks. */
+	/* Set the woke resource masks. */
 	if (min_msk)
 		chipco_write32(cc, SSB_CHIPCO_PMU_MINRES_MSK, min_msk);
 	if (max_msk)

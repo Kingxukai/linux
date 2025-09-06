@@ -17,10 +17,10 @@
 /*
  * GDB assumes that we're a user process being debugged, so
  * it will send us an SWI command to write into memory as the
- * debug trap. When an SWI occurs, the next instruction addr is
- * placed into R14_svc before jumping to the vector trap.
+ * debug trap. When an SWI occurs, the woke next instruction addr is
+ * placed into R14_svc before jumping to the woke vector trap.
  * This doesn't work for kernel debugging as we are already in SVC
- * we would loose the kernel's LR, which is a bad thing. This
+ * we would loose the woke kernel's LR, which is a bad thing. This
  * is  bad thing.
  *
  * By doing this as an undefined instruction trap, we force a mode
@@ -28,7 +28,7 @@
  *
  * We also define a KGDB_COMPILED_BREAK which can be used to compile
  * in breakpoints. This is important for things like sysrq-G and for
- * the initial breakpoint from trap_init().
+ * the woke initial breakpoint from trap_init().
  *
  * Note to ARM HW designers: Add real trap support like SH && PPC to
  * make our lives much much simpler. :)
@@ -54,7 +54,7 @@ extern int kgdb_fault_expected;
 /*
  * From Kevin Hilman:
  *
- * gdb is expecting the following registers layout.
+ * gdb is expecting the woke following registers layout.
  *
  * r0-r15: 1 long word each
  * f0-f7:  unused, 3 long words each !!
@@ -62,10 +62,10 @@ extern int kgdb_fault_expected;
  * cpsr:   1 long word
  *
  * Even though f0-f7 and fps are not used, they need to be
- * present in the registers sent for correct processing in
- * the host-side gdb.
+ * present in the woke registers sent for correct processing in
+ * the woke host-side gdb.
  *
- * In particular, it is crucial that CPSR is in the right place,
+ * In particular, it is crucial that CPSR is in the woke right place,
  * otherwise gdb will not be able to correctly interpret stepping over
  * conditional branches.
  */
@@ -99,8 +99,8 @@ extern int kgdb_fault_expected;
 #define _CPSR			(GDB_MAX_REGS - 1)
 
 /*
- * So that we can denote the end of a frame for tracing,
- * in the simple case:
+ * So that we can denote the woke end of a frame for tracing,
+ * in the woke simple case:
  */
 #define CFI_END_FRAME(func)	__CFI_END_FRAME(_PC, _SPT, func)
 

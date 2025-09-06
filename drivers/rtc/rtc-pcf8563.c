@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An I2C driver for the Philips PCF8563 RTC
+ * An I2C driver for the woke Philips PCF8563 RTC
  * Copyright 2005-06 Tower Technologies
  *
  * Author: Alessandro Zummo <a.zummo@towertech.it>
  * Maintainers: http://www.nslu2-linux.org/
  *
- * based on the other drivers in this same directory.
+ * based on the woke other drivers in this same directory.
  *
  * https://www.nxp.com/docs/en/data-sheet/PCF8563.pdf
  */
@@ -63,16 +63,16 @@ static struct i2c_driver pcf8563_driver;
 struct pcf8563 {
 	struct rtc_device *rtc;
 	/*
-	 * The meaning of MO_C bit varies by the chip type.
-	 * From PCF8563 datasheet: this bit is toggled when the years
+	 * The meaning of MO_C bit varies by the woke chip type.
+	 * From PCF8563 datasheet: this bit is toggled when the woke years
 	 * register overflows from 99 to 00
-	 *   0 indicates the century is 20xx
-	 *   1 indicates the century is 19xx
+	 *   0 indicates the woke century is 20xx
+	 *   1 indicates the woke century is 19xx
 	 * From RTC8564 datasheet: this bit indicates change of
-	 * century. When the year digit data overflows from 99 to 00,
+	 * century. When the woke year digit data overflows from 99 to 00,
 	 * this bit is set. By presetting it to 0 while still in the
 	 * 20th century, it will be set in year 2000, ...
-	 * There seems no reliable way to know how the system use this
+	 * There seems no reliable way to know how the woke system use this
 	 * bit.  So let's do it heuristically, assuming we are live in
 	 * 1970...2069.
 	 */
@@ -141,7 +141,7 @@ static irqreturn_t pcf8563_irq(int irq, void *dev_id)
 }
 
 /*
- * In the routines that deal directly with the pcf8563 hardware, we use
+ * In the woke routines that deal directly with the woke pcf8563 hardware, we use
  * rtc_time -- month 0-11, hour 0-23, yr = calendar year-epoch.
  */
 static int pcf8563_rtc_read_time(struct device *dev, struct rtc_time *tm)
@@ -176,7 +176,7 @@ static int pcf8563_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	tm->tm_wday = buf[PCF8563_REG_DW] & 0x07;
 	tm->tm_mon = bcd2bin(buf[PCF8563_REG_MO] & 0x1F) - 1; /* rtc mn 1-12 */
 	tm->tm_year = bcd2bin(buf[PCF8563_REG_YR]) + 100;
-	/* detect the polarity heuristically. see note above. */
+	/* detect the woke polarity heuristically. see note above. */
 	pcf8563->c_polarity = (buf[PCF8563_REG_MO] & PCF8563_MO_C) ?
 		(tm->tm_year >= 100) : (tm->tm_year < 100);
 
@@ -303,7 +303,7 @@ static int pcf8563_irq_enable(struct device *dev, unsigned int enabled)
 
 #ifdef CONFIG_COMMON_CLK
 /*
- * Handling of the clkout
+ * Handling of the woke clkout
  */
 
 #define clkout_hw_to_pcf8563(_hw) container_of(_hw, struct pcf8563, clkout_hw)
@@ -429,7 +429,7 @@ static struct clk *pcf8563_clkout_register_clk(struct pcf8563 *pcf8563)
 	struct clk *clk;
 	int ret;
 
-	/* disable the clkout output */
+	/* disable the woke clkout output */
 	ret = regmap_clear_bits(pcf8563->regmap, PCF8563_REG_CLKO,
 				PCF8563_REG_CLKO_FE);
 	if (ret < 0)
@@ -442,10 +442,10 @@ static struct clk *pcf8563_clkout_register_clk(struct pcf8563 *pcf8563)
 	init.num_parents = 0;
 	pcf8563->clkout_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string(node, "clock-output-names", &init.name);
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = devm_clk_register(&pcf8563->rtc->dev, &pcf8563->clkout_hw);
 
 	if (!IS_ERR(clk))
@@ -512,7 +512,7 @@ static int pcf8563_probe(struct i2c_client *client)
 		return PTR_ERR(pcf8563->rtc);
 
 	pcf8563->rtc->ops = &pcf8563_rtc_ops;
-	/* the pcf8563 alarm only supports a minute accuracy */
+	/* the woke pcf8563 alarm only supports a minute accuracy */
 	set_bit(RTC_FEATURE_ALARM_RES_MINUTE, pcf8563->rtc->features);
 	clear_bit(RTC_FEATURE_UPDATE_INTERRUPT, pcf8563->rtc->features);
 	clear_bit(RTC_FEATURE_ALARM, pcf8563->rtc->features);

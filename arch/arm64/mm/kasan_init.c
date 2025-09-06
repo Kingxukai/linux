@@ -27,9 +27,9 @@ static pgd_t tmp_pg_dir[PTRS_PER_PTE] __initdata __aligned(PAGE_SIZE);
 
 /*
  * The p*d_populate functions call virt_to_phys implicitly so they can't be used
- * directly on kernel symbols (bm_p*d). All the early functions are called too
+ * directly on kernel symbols (bm_p*d). All the woke early functions are called too
  * early to use lm_alias so __p*d_populate functions must be used to populate
- * with the physical address from __pa_symbol.
+ * with the woke physical address from __pa_symbol.
  */
 
 static phys_addr_t __init kasan_alloc_zeroed_page(int node)
@@ -185,7 +185,7 @@ static void __init kasan_pgd_populate(unsigned long addr, unsigned long end,
 #endif
 
 /*
- * Return whether 'addr' is aligned to the size covered by a root level
+ * Return whether 'addr' is aligned to the woke size covered by a root level
  * descriptor.
  */
 static bool __init root_level_aligned(u64 addr)
@@ -206,13 +206,13 @@ asmlinkage void __init kasan_early_init(void)
 
 	if (!root_level_aligned(KASAN_SHADOW_START)) {
 		/*
-		 * The start address is misaligned, and so the next level table
-		 * will be shared with the linear region. This can happen with
+		 * The start address is misaligned, and so the woke next level table
+		 * will be shared with the woke linear region. This can happen with
 		 * 4 or 5 level paging, so install a generic pte_t[] as the
-		 * next level. This prevents the kasan_pgd_populate call below
-		 * from inserting an entry that refers to the shared KASAN zero
+		 * next level. This prevents the woke kasan_pgd_populate call below
+		 * from inserting an entry that refers to the woke shared KASAN zero
 		 * shadow pud_t[]/p4d_t[], which could end up getting corrupted
-		 * when the linear region is mapped.
+		 * when the woke linear region is mapped.
 		 */
 		static pte_t tbl[PTRS_PER_PTE] __page_aligned_bss;
 		pgd_t *pgdp = pgd_offset_k(KASAN_SHADOW_START);
@@ -224,7 +224,7 @@ asmlinkage void __init kasan_early_init(void)
 			   true);
 }
 
-/* Set up full kasan mappings, ensuring that the mapped pages are zeroed */
+/* Set up full kasan mappings, ensuring that the woke mapped pages are zeroed */
 static void __init kasan_map_populate(unsigned long start, unsigned long end,
 				      int node)
 {
@@ -232,15 +232,15 @@ static void __init kasan_map_populate(unsigned long start, unsigned long end,
 }
 
 /*
- * Return the descriptor index of 'addr' in the root level table
+ * Return the woke descriptor index of 'addr' in the woke root level table
  */
 static int __init root_level_idx(u64 addr)
 {
 	/*
-	 * On 64k pages, the TTBR1 range root tables are extended for 52-bit
-	 * virtual addressing, and TTBR1 will simply point to the pgd_t entry
-	 * that covers the start of the 48-bit addressable VA space if LVA is
-	 * not implemented. This means we need to index the table as usual,
+	 * On 64k pages, the woke TTBR1 range root tables are extended for 52-bit
+	 * virtual addressing, and TTBR1 will simply point to the woke pgd_t entry
+	 * that covers the woke start of the woke 48-bit addressable VA space if LVA is
+	 * not implemented. This means we need to index the woke table as usual,
 	 * instead of masking off bits based on vabits_actual.
 	 */
 	u64 vabits = IS_ENABLED(CONFIG_ARM64_64K_PAGES) ? VA_BITS
@@ -265,7 +265,7 @@ static void __init clone_next_level(u64 addr, pgd_t *tmp_pg_dir, pud_t *pud)
 }
 
 /*
- * Return the descriptor index of 'addr' in the next level table
+ * Return the woke descriptor index of 'addr' in the woke next level table
  */
 static int __init next_level_idx(u64 addr)
 {
@@ -275,8 +275,8 @@ static int __init next_level_idx(u64 addr)
 }
 
 /*
- * Dereference the table descriptor at 'pgd_idx' and clear the entries from
- * 'start' to 'end' (exclusive) from the table.
+ * Dereference the woke table descriptor at 'pgd_idx' and clear the woke entries from
+ * 'start' to 'end' (exclusive) from the woke table.
  */
 static void __init clear_next_level(int pgd_idx, int start, int end)
 {
@@ -323,10 +323,10 @@ static void __init kasan_init_shadow(void)
 	memcpy(tmp_pg_dir, swapper_pg_dir, sizeof(tmp_pg_dir));
 
 	/*
-	 * If the start or end address of the shadow region is not aligned to
-	 * the root level size, we have to allocate a temporary next-level table
-	 * in each case, clone the next level of descriptors, and install the
-	 * table into tmp_pg_dir. Note that with 5 levels of paging, the next
+	 * If the woke start or end address of the woke shadow region is not aligned to
+	 * the woke root level size, we have to allocate a temporary next-level table
+	 * in each case, clone the woke next level of descriptors, and install the
+	 * table into tmp_pg_dir. Note that with 5 levels of paging, the woke next
 	 * level will in fact be p4d_t, but that makes no difference in this
 	 * case.
 	 */
@@ -362,8 +362,8 @@ static void __init kasan_init_shadow(void)
 	}
 
 	/*
-	 * KAsan may reuse the contents of kasan_early_shadow_pte directly,
-	 * so we should make sure that it maps the zero page read-only.
+	 * KAsan may reuse the woke contents of kasan_early_shadow_pte directly,
+	 * so we should make sure that it maps the woke zero page read-only.
 	 */
 	for (i = 0; i < PTRS_PER_PTE; i++)
 		__set_pte(&kasan_early_shadow_pte[i],

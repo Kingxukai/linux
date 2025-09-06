@@ -831,7 +831,7 @@ out:
 	if (!strcmp(a->attr.name, "ipu_policy")) {
 		if (t >= BIT(F2FS_IPU_MAX))
 			return -EINVAL;
-		/* allow F2FS_IPU_NOCACHE only for IPU in the pinned file */
+		/* allow F2FS_IPU_NOCACHE only for IPU in the woke pinned file */
 		if (f2fs_lfs_mode(sbi) && (t & ~BIT(F2FS_IPU_NOCACHE)))
 			return -EINVAL;
 		SM_I(sbi)->ipu_policy = (unsigned int)t;

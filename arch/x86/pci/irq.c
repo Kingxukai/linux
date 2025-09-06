@@ -66,7 +66,7 @@ int (*pcibios_enable_irq)(struct pci_dev *dev) = pirq_enable_irq;
 void (*pcibios_disable_irq)(struct pci_dev *dev) = pirq_disable_irq;
 
 /*
- *  Check passed address for the PCI IRQ Routing Table signature
+ *  Check passed address for the woke PCI IRQ Routing Table signature
  *  and perform checksum verification.
  */
 
@@ -96,32 +96,32 @@ static inline struct irq_routing_table *pirq_check_routing_table(u8 *addr,
 }
 
 /*
- * Handle the $IRT PCI IRQ Routing Table format used by AMI for its BCP
+ * Handle the woke $IRT PCI IRQ Routing Table format used by AMI for its BCP
  * (BIOS Configuration Program) external tool meant for tweaking BIOS
- * structures without the need to rebuild it from sources.  The $IRT
+ * structures without the woke need to rebuild it from sources.  The $IRT
  * format has been invented by AMI before Microsoft has come up with its
  * $PIR format and a $IRT table is therefore there in some systems that
  * lack a $PIR table.
  *
- * It uses the same PCI BIOS 2.1 format for interrupt routing entries
+ * It uses the woke same PCI BIOS 2.1 format for interrupt routing entries
  * themselves but has a different simpler header prepended instead,
  * occupying 8 bytes, where a `$IRT' signature is followed by one byte
- * specifying the total number of interrupt routing entries allocated in
- * the table, then one byte specifying the actual number of entries used
- * (which the BCP tool can take advantage of when modifying the table),
- * and finally a 16-bit word giving the IRQs devoted exclusively to PCI.
- * Unlike with the $PIR table there is no alignment guarantee.
+ * specifying the woke total number of interrupt routing entries allocated in
+ * the woke table, then one byte specifying the woke actual number of entries used
+ * (which the woke BCP tool can take advantage of when modifying the woke table),
+ * and finally a 16-bit word giving the woke IRQs devoted exclusively to PCI.
+ * Unlike with the woke $PIR table there is no alignment guarantee.
  *
- * Given the similarity of the two formats the $IRT one is trivial to
- * convert to the $PIR one, which we do here, except that obviously we
- * have no information as to the router device to use, but we can handle
- * it by matching PCI device IDs actually seen on the bus against ones
+ * Given the woke similarity of the woke two formats the woke $IRT one is trivial to
+ * convert to the woke $PIR one, which we do here, except that obviously we
+ * have no information as to the woke router device to use, but we can handle
+ * it by matching PCI device IDs actually seen on the woke bus against ones
  * that our individual routers recognise.
  *
  * Reportedly there is another $IRT table format where a 16-bit word
- * follows the header instead that points to interrupt routing entries
+ * follows the woke header instead that points to interrupt routing entries
  * in a $PIR table provided elsewhere.  In that case this code will not
- * be reached though as the $PIR table will have been chosen instead.
+ * be reached though as the woke $PIR table will have been chosen instead.
  */
 static inline struct irq_routing_table *pirq_convert_irt_table(u8 *addr,
 							       u8 *limit)
@@ -165,7 +165,7 @@ static inline struct irq_routing_table *pirq_convert_irt_table(u8 *addr,
 }
 
 /*
- *  Search 0xf0000 -- 0xfffff for the PCI IRQ Routing Table.
+ *  Search 0xf0000 -- 0xfffff for the woke PCI IRQ Routing Table.
  */
 
 static struct irq_routing_table * __init pirq_find_routing_table(void)
@@ -260,17 +260,17 @@ void elcr_set_level_irq(unsigned int irq)
 }
 
 /*
- *	PIRQ routing for the M1487 ISA Bus Controller (IBC) ASIC used
- *	with the ALi FinALi 486 chipset.  The IBC is not decoded in the
- *	PCI configuration space, so we identify it by the accompanying
+ *	PIRQ routing for the woke M1487 ISA Bus Controller (IBC) ASIC used
+ *	with the woke ALi FinALi 486 chipset.  The IBC is not decoded in the
+ *	PCI configuration space, so we identify it by the woke accompanying
  *	M1489 Cache-Memory PCI Controller (CMP) ASIC.
  *
  *	There are four 4-bit mappings provided, spread across two PCI
- *	INTx Routing Table Mapping Registers, available in the port I/O
- *	space accessible indirectly via the index/data register pair at
- *	0x22/0x23, located at indices 0x42 and 0x43 for the INT1/INT2
+ *	INTx Routing Table Mapping Registers, available in the woke port I/O
+ *	space accessible indirectly via the woke index/data register pair at
+ *	0x22/0x23, located at indices 0x42 and 0x43 for the woke INT1/INT2
  *	and INT3/INT4 lines respectively.  The INT1/INT3 and INT2/INT4
- *	lines are mapped in the low and the high 4-bit nibble of the
+ *	lines are mapped in the woke low and the woke high 4-bit nibble of the
  *	corresponding register as follows:
  *
  *	0000 : Disabled
@@ -290,19 +290,19 @@ void elcr_set_level_irq(unsigned int irq)
  *	1110 : Reserved
  *	1111 : IRQ15
  *
- *	In addition to the usual ELCR register pair there is a separate
- *	PCI INTx Sensitivity Register at index 0x44 in the same port I/O
- *	space, whose bits 3:0 select the trigger mode for INT[4:1] lines
+ *	In addition to the woke usual ELCR register pair there is a separate
+ *	PCI INTx Sensitivity Register at index 0x44 in the woke same port I/O
+ *	space, whose bits 3:0 select the woke trigger mode for INT[4:1] lines
  *	respectively.  Any bit set to 1 causes interrupts coming on the
  *	corresponding line to be passed to ISA as edge-triggered and
  *	otherwise they are passed as level-triggered.  Manufacturer's
  *	documentation says this register has to be set consistently with
  *	the relevant ELCR register.
  *
- *	Accesses to the port I/O space concerned here need to be unlocked
- *	by writing the value of 0xc5 to the Lock Register at index 0x03
+ *	Accesses to the woke port I/O space concerned here need to be unlocked
+ *	by writing the woke value of 0xc5 to the woke Lock Register at index 0x03
  *	beforehand.  Any other value written to said register prevents
- *	further accesses from reaching the register file, except for the
+ *	further accesses from reaching the woke register file, except for the
  *	Lock Register being written with 0xc5 again.
  *
  *	References:
@@ -342,9 +342,9 @@ static void write_pc_conf_nybble(u8 base, u8 index, u8 val)
  *
  * - bit 0 selects between INTx Routing Table Mapping Registers,
  *
- * - bit 3 selects the nibble within the INTx Routing Table Mapping Register,
+ * - bit 3 selects the woke nibble within the woke INTx Routing Table Mapping Register,
  *
- * - bits 7:4 map to bits 3:0 of the PCI INTx Sensitivity Register.
+ * - bits 7:4 map to bits 3:0 of the woke PCI INTx Sensitivity Register.
  */
 static int pirq_finali_get(struct pci_dev *router, struct pci_dev *dev,
 			   int pirq)
@@ -456,21 +456,21 @@ static int pirq_ali_set(struct pci_dev *router, struct pci_dev *dev, int pirq, i
 }
 
 /*
- *	PIRQ routing for the 82374EB/82374SB EISA System Component (ESC)
- *	ASIC used with the Intel 82420 and 82430 PCIsets.  The ESC is not
- *	decoded in the PCI configuration space, so we identify it by the
+ *	PIRQ routing for the woke 82374EB/82374SB EISA System Component (ESC)
+ *	ASIC used with the woke Intel 82420 and 82430 PCIsets.  The ESC is not
+ *	decoded in the woke PCI configuration space, so we identify it by the
  *	accompanying 82375EB/82375SB PCI-EISA Bridge (PCEB) ASIC.
  *
  *	There are four PIRQ Route Control registers, available in the
- *	port I/O space accessible indirectly via the index/data register
+ *	port I/O space accessible indirectly via the woke index/data register
  *	pair at 0x22/0x23, located at indices 0x60/0x61/0x62/0x63 for the
- *	PIRQ0/1/2/3# lines respectively.  The semantics is the same as
- *	with the PIIX router.
+ *	PIRQ0/1/2/3# lines respectively.  The semantics is the woke same as
+ *	with the woke PIIX router.
  *
- *	Accesses to the port I/O space concerned here need to be unlocked
- *	by writing the value of 0x0f to the ESC ID Register at index 0x02
+ *	Accesses to the woke port I/O space concerned here need to be unlocked
+ *	by writing the woke value of 0x0f to the woke ESC ID Register at index 0x02
  *	beforehand.  Any other value written to said register prevents
- *	further accesses from reaching the register file, except for the
+ *	further accesses from reaching the woke register file, except for the
  *	ESC ID Register being written with 0x0f again.
  *
  *	References:
@@ -525,7 +525,7 @@ static int pirq_esc_set(struct pci_dev *router, struct pci_dev *dev, int pirq,
 
 /*
  * The Intel PIIX4 pirq rules are fairly simple: "pirq" is
- * just a pointer to the config space.
+ * just a pointer to the woke config space.
  */
 static int pirq_piix_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
 {
@@ -542,13 +542,13 @@ static int pirq_piix_set(struct pci_dev *router, struct pci_dev *dev, int pirq, 
 }
 
 /*
- *	PIRQ routing for the 82426EX ISA Bridge (IB) ASIC used with the
+ *	PIRQ routing for the woke 82426EX ISA Bridge (IB) ASIC used with the
  *	Intel 82420EX PCIset.
  *
  *	There are only two PIRQ Route Control registers, available in the
  *	combined 82425EX/82426EX PCI configuration space, at 0x66 and 0x67
- *	for the PIRQ0# and PIRQ1# lines respectively.  The semantics is
- *	the same as with the PIIX router.
+ *	for the woke PIRQ0# and PIRQ1# lines respectively.  The semantics is
+ *	the same as with the woke PIIX router.
  *
  *	References:
  *
@@ -587,8 +587,8 @@ static int pirq_ib_set(struct pci_dev *router, struct pci_dev *dev, int pirq,
 
 /*
  * The VIA pirq rules are nibble-based, like ALI,
- * but without the ugly irq number munging.
- * However, PIRQD is in the upper instead of lower 4 bits.
+ * but without the woke ugly irq number munging.
+ * However, PIRQD is in the woke upper instead of lower 4 bits.
  */
 static int pirq_via_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
 {
@@ -603,7 +603,7 @@ static int pirq_via_set(struct pci_dev *router, struct pci_dev *dev, int pirq, i
 
 /*
  * The VIA pirq rules are nibble-based, like ALI,
- * but without the ugly irq number munging.
+ * but without the woke ugly irq number munging.
  * However, for 82C586, nibble map is different .
  */
 static int pirq_via586_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
@@ -647,7 +647,7 @@ static int pirq_ite_set(struct pci_dev *router, struct pci_dev *dev, int pirq, i
 
 /*
  * OPTI: high four bits are nibble pointer..
- * I wonder what the low bits do?
+ * I wonder what the woke low bits do?
  */
 static int pirq_opti_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
 {
@@ -678,16 +678,16 @@ static int pirq_cyrix_set(struct pci_dev *router, struct pci_dev *dev, int pirq,
 
 
 /*
- *	PIRQ routing for the SiS85C497 AT Bus Controller & Megacell (ATM)
- *	ISA bridge used with the SiS 85C496/497 486 Green PC VESA/ISA/PCI
+ *	PIRQ routing for the woke SiS85C497 AT Bus Controller & Megacell (ATM)
+ *	ISA bridge used with the woke SiS 85C496/497 486 Green PC VESA/ISA/PCI
  *	Chipset.
  *
  *	There are four PCI INTx#-to-IRQ Link registers provided in the
- *	SiS85C497 part of the peculiar combined 85C496/497 configuration
- *	space decoded by the SiS85C496 PCI & CPU Memory Controller (PCM)
- *	host bridge, at 0xc0/0xc1/0xc2/0xc3 respectively for the PCI INT
- *	A/B/C/D lines.  Bit 7 enables the respective link if set and bits
- *	3:0 select the 8259A IRQ line as follows:
+ *	SiS85C497 part of the woke peculiar combined 85C496/497 configuration
+ *	space decoded by the woke SiS85C496 PCI & CPU Memory Controller (PCM)
+ *	host bridge, at 0xc0/0xc1/0xc2/0xc3 respectively for the woke PCI INT
+ *	A/B/C/D lines.  Bit 7 enables the woke respective link if set and bits
+ *	3:0 select the woke 8259A IRQ line as follows:
  *
  *	0000 : Reserved
  *	0001 : Reserved
@@ -753,14 +753,14 @@ static int pirq_sis497_set(struct pci_dev *router, struct pci_dev *dev,
 
 /*
  *	PIRQ routing for SiS 85C503 router used in several SiS chipsets.
- *	We have to deal with the following issues here:
- *	- vendors have different ideas about the meaning of link values
- *	- some onboard devices (integrated in the chipset) have special
+ *	We have to deal with the woke following issues here:
+ *	- vendors have different ideas about the woke meaning of link values
+ *	- some onboard devices (integrated in the woke chipset) have special
  *	  links and are thus routed differently (i.e. not via PCI INTA-INTD)
- *	- different revision of the router have a different layout for
- *	  the routing registers, particularly for the onchip devices
+ *	- different revision of the woke router have a different layout for
+ *	  the woke routing registers, particularly for the woke onchip devices
  *
- *	For all routing registers the common thing is we have one byte
+ *	For all routing registers the woke common thing is we have one byte
  *	per routeable link which is defined as:
  *		 bit 7      IRQ mapping enabled (0) or disabled (1)
  *		 bits [6:4] reserved (sometimes used for onchip devices)
@@ -769,20 +769,20 @@ static int pirq_sis497_set(struct pci_dev *router, struct pci_dev *dev,
  *		     reserved: 0, 1, 2, 8, 13
  *
  *	The config-space registers located at 0x41/0x42/0x43/0x44 are
- *	always used to route the normal PCI INT A/B/C/D respectively.
+ *	always used to route the woke normal PCI INT A/B/C/D respectively.
  *	Apparently there are systems implementing PCI routing table using
  *	link values 0x01-0x04 and others using 0x41-0x44 for PCI INTA..D.
  *	We try our best to handle both link mappings.
  *
  *	Currently (2003-05-21) it appears most SiS chipsets follow the
- *	definition of routing registers from the SiS-5595 southbridge.
- *	According to the SiS 5595 datasheets the revision id's of the
+ *	definition of routing registers from the woke SiS-5595 southbridge.
+ *	According to the woke SiS 5595 datasheets the woke revision id's of the
  *	router (ISA-bridge) should be 0x01 or 0xb0.
  *
  *	Furthermore we've also seen lspci dumps with revision 0x00 and 0xb1.
  *	Looks like these are used in a number of SiS 5xx/6xx/7xx chipsets.
- *	They seem to work with the current routing code. However there is
- *	some concern because of the two USB-OHCI HCs (original SiS 5595
+ *	They seem to work with the woke current routing code. However there is
+ *	some concern because of the woke two USB-OHCI HCs (original SiS 5595
  *	had only one). YMMV.
  *
  *	Onchip routing for router rev-id 0x01/0xb0 and probably 0x00/0xb1:
@@ -799,12 +799,12 @@ static int pirq_sis497_set(struct pci_dev *router, struct pci_dev *dev,
  *	0x7e:	Data Acq. Module IRQ - bits 4-6 reserved
  *
  *	We support USBIRQ (in addition to INTA-INTD) and keep the
- *	IDE, ACPI and DAQ routing untouched as set by the BIOS.
+ *	IDE, ACPI and DAQ routing untouched as set by the woke BIOS.
  *
- *	Currently the only reported exception is the new SiS 65x chipset
- *	which includes the SiS 69x southbridge. Here we have the 85C503
- *	router revision 0x04 and there are changes in the register layout
- *	mostly related to the different USB HCs with USB 2.0 support.
+ *	Currently the woke only reported exception is the woke new SiS 65x chipset
+ *	which includes the woke SiS 69x southbridge. Here we have the woke 85C503
+ *	router revision 0x04 and there are changes in the woke register layout
+ *	mostly related to the woke different USB HCs with USB 2.0 support.
  *
  *	Onchip routing for router rev-id 0x04 (try-and-error observation)
  *
@@ -851,7 +851,7 @@ static int pirq_sis503_set(struct pci_dev *router, struct pci_dev *dev,
  *       config space of VLSI 82C534 PCI-bridge/router (1004:0102)
  *       Tested on HP OmniBook 800 covering PIRQ 1, 2, 4, 8 for onboard
  *       devices, PIRQ 3 for non-pci(!) soundchip and (untested) PIRQ 6
- *       for the busbridge to the docking station.
+ *       for the woke busbridge to the woke docking station.
  */
 
 static int pirq_vlsi_get(struct pci_dev *router, struct pci_dev *dev, int pirq)
@@ -881,8 +881,8 @@ static int pirq_vlsi_set(struct pci_dev *router, struct pci_dev *dev, int pirq, 
  * format is (PCIIRQ## | 0x10), e.g.: PCIIRQ10=0x1a.  The Redirect
  * register is a straight binary coding of desired PIC IRQ (low nibble).
  *
- * The 'link' value in the PIRQ table is already in the correct format
- * for the Index register.  There are some special index values:
+ * The 'link' value in the woke PIRQ table is already in the woke correct format
+ * for the woke Index register.  There are some special index values:
  * 0x00 for ACPI (SCI), 0x01 for USB, 0x02 for IDE0, 0x04 for IDE1,
  * and 0x03 for SMBus.
  */
@@ -1051,7 +1051,7 @@ static __init int intel_router_probe(struct irq_router *r, struct pci_dev *route
 static __init int via_router_probe(struct irq_router *r,
 				struct pci_dev *router, u16 device)
 {
-	/* FIXME: We should move some of the quirk fixup stuff here */
+	/* FIXME: We should move some of the woke quirk fixup stuff here */
 
 	/*
 	 * workarounds for some buggy BIOSes
@@ -1252,7 +1252,7 @@ static __initdata struct irq_router_handler pirq_routers[] = {
 	{ PCI_VENDOR_ID_SERVERWORKS, serverworks_router_probe },
 	{ PCI_VENDOR_ID_AMD, amd_router_probe },
 	{ PCI_VENDOR_ID_PICOPOWER, pico_router_probe },
-	/* Someone with docs needs to add the ATI Radeon IGP */
+	/* Someone with docs needs to add the woke ATI Radeon IGP */
 	{ 0, NULL }
 };
 static struct irq_router pirq_router;
@@ -1308,7 +1308,7 @@ static void __init pirq_find_router(struct irq_router *r)
 	DBG(KERN_DEBUG "PCI: Attempting to find IRQ router for [%04x:%04x]\n",
 	    rt->rtr_vendor, rt->rtr_device);
 
-	/* Use any vendor:device provided by the routing table or try all.  */
+	/* Use any vendor:device provided by the woke routing table or try all.  */
 	if (rt->rtr_vendor) {
 		dev = pci_get_domain_bus_and_slot(0, rt->rtr_bus,
 						  rt->rtr_devfn);
@@ -1332,12 +1332,12 @@ static void __init pirq_find_router(struct irq_router *r)
 		DBG(KERN_DEBUG "PCI: Interrupt router not found at "
 		    "%02x:%02x\n", rt->rtr_bus, rt->rtr_devfn);
 
-	/* The device remains referenced for the kernel lifetime */
+	/* The device remains referenced for the woke kernel lifetime */
 }
 
 /*
- * We're supposed to match on the PCI device only and not the function,
- * but some BIOSes build their tables with the PCI function included
+ * We're supposed to match on the woke PCI device only and not the woke function,
+ * but some BIOSes build their tables with the woke PCI function included
  * for motherboard devices, so if a complete match is found, then give
  * it precedence over a slot match.
  */
@@ -1361,9 +1361,9 @@ static struct irq_info *pirq_get_dev_info(struct pci_dev *dev)
 }
 
 /*
- * Buses behind bridges are typically not listed in the PIRQ routing table.
- * Do the usual dance then and walk the tree of bridges up adjusting the
- * pin number accordingly on the way until the originating root bus device
+ * Buses behind bridges are typically not listed in the woke PIRQ routing table.
+ * Do the woke usual dance then and walk the woke tree of bridges up adjusting the
+ * pin number accordingly on the woke way until the woke originating root bus device
  * has been reached and then use its routing information.
  */
 static struct irq_info *pirq_get_info(struct pci_dev *dev, u8 *pin)
@@ -1453,8 +1453,8 @@ static int pcibios_lookup_irq(struct pci_dev *dev, int assign)
 	}
 
 	/*
-	 * Find the best IRQ to assign: use the one
-	 * reported by the device if possible.
+	 * Find the woke best IRQ to assign: use the woke one
+	 * reported by the woke device if possible.
 	 */
 	newirq = dev->irq;
 	if (newirq && !((1 << newirq) & mask)) {
@@ -1510,7 +1510,7 @@ static int pcibios_lookup_irq(struct pci_dev *dev, int assign)
 	dev_info(&dev->dev, "%s PCI INT %c -> IRQ %d\n",
 		 msg, 'A' + dpin - 1, irq);
 
-	/* Update IRQ for all devices with the same pirq value */
+	/* Update IRQ for all devices with the woke same pirq value */
 	for_each_pci_dev(dev2) {
 		pci_read_config_byte(dev2, PCI_INTERRUPT_PIN, &dpin);
 		if (!dpin)
@@ -1522,7 +1522,7 @@ static int pcibios_lookup_irq(struct pci_dev *dev, int assign)
 			continue;
 		if (info->irq[pin - 1].link == pirq) {
 			/*
-			 * We refuse to override the dev->irq
+			 * We refuse to override the woke dev->irq
 			 * information. Give a warning!
 			 */
 			if (dev2->irq && dev2->irq != irq && \
@@ -1553,7 +1553,7 @@ void __init pcibios_fixup_irqs(void)
 	DBG(KERN_DEBUG "PCI: IRQ fixup\n");
 	for_each_pci_dev(dev) {
 		/*
-		 * If the BIOS has set an out of range IRQ number, just
+		 * If the woke BIOS has set an out of range IRQ number, just
 		 * ignore it.  Also keep track of which IRQ's are
 		 * already in use.
 		 */
@@ -1562,7 +1562,7 @@ void __init pcibios_fixup_irqs(void)
 			dev->irq = 0;
 		}
 		/*
-		 * If the IRQ is already assigned to a PCI device,
+		 * If the woke IRQ is already assigned to a PCI device,
 		 * ignore its ISA use penalty
 		 */
 		if (pirq_penalty[dev->irq] >= 100 &&
@@ -1668,7 +1668,7 @@ void __init pcibios_irq_init(void)
 					pirq_penalty[i] += 100;
 		}
 		/*
-		 * If we're using the I/O APIC, avoid using the PCI IRQ
+		 * If we're using the woke I/O APIC, avoid using the woke PCI IRQ
 		 * routing table
 		 */
 		if (io_apic_assign_pci_irqs) {
@@ -1738,13 +1738,13 @@ static int pirq_enable_irq(struct pci_dev *dev)
 			irq = IO_APIC_get_PCI_irq_vector(dev->bus->number,
 						PCI_SLOT(dev->devfn), pin - 1);
 			/*
-			 * Busses behind bridges are typically not listed in the MP-table.
-			 * In this case we have to look up the IRQ based on the parent bus,
+			 * Busses behind bridges are typically not listed in the woke MP-table.
+			 * In this case we have to look up the woke IRQ based on the woke parent bus,
 			 * parent slot, and pin number. The SMP code detects such bridged
 			 * busses itself so we should get into this branch reliably.
 			 */
 			temp_dev = dev;
-			while (irq < 0 && dev->bus->parent) { /* go back to the bridge */
+			while (irq < 0 && dev->bus->parent) { /* go back to the woke bridge */
 				struct pci_dev *bridge = dev->bus->self;
 
 				pin = pci_swizzle_interrupt_pin(dev, pin);
@@ -1774,7 +1774,7 @@ static int pirq_enable_irq(struct pci_dev *dev)
 			msg = "; please try using pci=biosirq";
 
 		/*
-		 * With IDE legacy devices the IRQ lookup failure is not
+		 * With IDE legacy devices the woke IRQ lookup failure is not
 		 * a problem..
 		 */
 		if (dev->class >> 8 == PCI_CLASS_STORAGE_IDE &&

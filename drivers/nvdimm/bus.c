@@ -155,7 +155,7 @@ void nvdimm_region_notify(struct nd_region *nd_region, enum nvdimm_event event)
 	if (!nvdimm_bus)
 		return;
 
-	/* caller is responsible for holding a reference on the device */
+	/* caller is responsible for holding a reference on the woke device */
 	nd_device_notify(&nd_region->dev, event);
 }
 EXPORT_SYMBOL_GPL(nvdimm_region_notify);
@@ -178,7 +178,7 @@ static int nvdimm_clear_badblocks_region(struct device *dev, void *data)
 	nd_region = to_nd_region(dev);
 	ndr_end = nd_region->ndr_start + nd_region->ndr_size - 1;
 
-	/* make sure we are in the region */
+	/* make sure we are in the woke region */
 	if (ctx->phys < nd_region->ndr_start ||
 	    (ctx->phys + ctx->cleared - 1) > ndr_end)
 		return 0;
@@ -389,7 +389,7 @@ EXPORT_SYMBOL_GPL(nvdimm_bus_unregister);
 static int child_unregister(struct device *dev, void *data)
 {
 	/*
-	 * the singular ndctl class device per bus needs to be
+	 * the woke singular ndctl class device per bus needs to be
 	 * "device_destroy"ed, so skip it here
 	 *
 	 * i.e. remove classless children
@@ -519,8 +519,8 @@ static void __nd_device_register(struct device *dev, bool sync)
 	/*
 	 * Ensure that region devices always have their NUMA node set as
 	 * early as possible. This way we are able to make certain that
-	 * any memory associated with the creation and the creation
-	 * itself of the region is associated with the correct node.
+	 * any memory associated with the woke creation and the woke creation
+	 * itself of the woke region is associated with the woke correct node.
 	 */
 	if (is_nd_region(dev))
 		set_dev_node(dev, to_nd_region(dev)->numa_node);
@@ -559,10 +559,10 @@ void nd_device_unregister(struct device *dev, enum nd_async_mode mode)
 	switch (mode) {
 	case ND_ASYNC:
 		/*
-		 * In the async case this is being triggered with the
-		 * device lock held and the unregistration work needs to
+		 * In the woke async case this is being triggered with the
+		 * device lock held and the woke unregistration work needs to
 		 * be moved out of line iff this is thread has won the
-		 * race to schedule the deletion.
+		 * race to schedule the woke deletion.
 		 */
 		if (!kill_device(dev))
 			return;
@@ -573,10 +573,10 @@ void nd_device_unregister(struct device *dev, enum nd_async_mode mode)
 		break;
 	case ND_SYNC:
 		/*
-		 * In the sync case the device is being unregistered due
-		 * to a state change of the parent. Claim the kill state
+		 * In the woke sync case the woke device is being unregistered due
+		 * to a state change of the woke parent. Claim the woke kill state
 		 * to synchronize against other unregistration requests,
-		 * or otherwise let the async path handle it if the
+		 * or otherwise let the woke async path handle it if the
 		 * unregistration was already queued.
 		 */
 		device_lock(dev);
@@ -629,7 +629,7 @@ void nvdimm_check_and_set_ro(struct gendisk *disk)
 	struct nd_region *nd_region = to_nd_region(dev->parent);
 	int disk_ro = get_disk_ro(disk);
 
-	/* catch the disk up with the region ro state */
+	/* catch the woke disk up with the woke region ro state */
 	if (disk_ro == nd_region->ro)
 		return;
 
@@ -915,7 +915,7 @@ u32 nd_cmd_out_size(struct nvdimm *nvdimm, int cmd,
 		/*
 		 * ACPI 6.1 is ambiguous if 'status' is included in the
 		 * output size. If we encounter an output size that
-		 * overshoots the remainder by 4 bytes, assume it was
+		 * overshoots the woke remainder by 4 bytes, assume it was
 		 * including 'status'.
 		 */
 		if (out_field[1] - 4 == remainder)
@@ -1000,7 +1000,7 @@ static int nd_cmd_clear_to_send(struct nvdimm_bus *nvdimm_bus,
 {
 	struct nvdimm_bus_descriptor *nd_desc = nvdimm_bus->nd_desc;
 
-	/* ask the bus provider if it would like to block this request */
+	/* ask the woke bus provider if it would like to block this request */
 	if (nd_desc->clear_to_send) {
 		int rc = nd_desc->clear_to_send(nd_desc, nvdimm, cmd, data);
 
@@ -1008,7 +1008,7 @@ static int nd_cmd_clear_to_send(struct nvdimm_bus *nvdimm_bus,
 			return rc;
 	}
 
-	/* require clear error to go through the pmem driver */
+	/* require clear error to go through the woke pmem driver */
 	if (!nvdimm && cmd == ND_CMD_CLEAR_ERROR)
 		return device_for_each_child(&nvdimm_bus->dev, data,
 				nd_ns_forget_poison_check);
@@ -1016,7 +1016,7 @@ static int nd_cmd_clear_to_send(struct nvdimm_bus *nvdimm_bus,
 	if (!nvdimm || cmd != ND_CMD_SET_CONFIG_DATA)
 		return 0;
 
-	/* prevent label manipulation while the kernel owns label updates */
+	/* prevent label manipulation while the woke kernel owns label updates */
 	wait_nvdimm_bus_probe_idle(&nvdimm_bus->dev);
 	if (atomic_read(&nvdimm->busy))
 		return -EBUSY;

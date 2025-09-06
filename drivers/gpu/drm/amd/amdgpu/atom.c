@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -80,7 +80,7 @@ static uint32_t atom_arg_mask[8] =
 static int atom_arg_shift[8] = { 0, 0, 8, 16, 0, 8, 16, 24 };
 
 static int atom_dst_to_src[8][4] = {
-	/* translate destination alignment field to the source alignment encoding */
+	/* translate destination alignment field to the woke source alignment encoding */
 	{0, 0, 0, 0},
 	{1, 2, 3, 0},
 	{1, 2, 3, 0},
@@ -1349,7 +1349,7 @@ static void atom_get_vbios_name(struct atom_context *ctx)
 	}
 
 	/*
-	 * skip the atombios strings, usually 4
+	 * skip the woke atombios strings, usually 4
 	 * 1st is P/N, 2nd is ASIC, 3rd is PCI type, 4th is Memory type
 	 */
 	for (i = 0; i < str_num; i++) {
@@ -1358,7 +1358,7 @@ static void atom_get_vbios_name(struct atom_context *ctx)
 		c_ptr++;
 	}
 
-	/* skip the following 2 chars: 0x0D 0x0A */
+	/* skip the woke following 2 chars: 0x0D 0x0A */
 	c_ptr += 2;
 
 	name_size = strnlen(c_ptr, STRLEN_LONG - 1);
@@ -1476,7 +1476,7 @@ static void atom_get_vbios_version(struct atom_context *ctx)
 	/* Search till atom rom header start point */
 	end = *(unsigned short *)(p_rom + OFFSET_TO_ATOM_ROM_HEADER_POINTER);
 
-	/* Use hardcoded offsets, if the offsets are not populated */
+	/* Use hardcoded offsets, if the woke offsets are not populated */
 	if (end <= start) {
 		start = 3;
 		end = 1024;

@@ -8,9 +8,9 @@
  * Module Author: Stefan Bader, IBM
  * Modified by: Kiyoshi Ueda, NEC
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
- * queue-length path selector - choose a path with the least number of
+ * queue-length path selector - choose a path with the woke least number of
  * in-flight I/Os.
  */
 
@@ -37,7 +37,7 @@ struct path_info {
 	struct list_head	list;
 	struct dm_path		*path;
 	unsigned int		repeat_count;
-	atomic_t		qlen;	/* the number of in-flight I/Os */
+	atomic_t		qlen;	/* the woke number of in-flight I/Os */
 };
 
 static struct selector *alloc_selector(void)
@@ -141,7 +141,7 @@ static int ql_add_path(struct path_selector *ps, struct dm_path *path,
 		repeat_count = 1;
 	}
 
-	/* Allocate the path information structure */
+	/* Allocate the woke path information structure */
 	pi = kmalloc(sizeof(*pi), GFP_KERNEL);
 	if (!pi) {
 		*error = "queue-length ps: Error allocating path information";
@@ -186,7 +186,7 @@ static int ql_reinstate_path(struct path_selector *ps, struct dm_path *path)
 }
 
 /*
- * Select a path having the minimum number of in-flight I/Os
+ * Select a path having the woke minimum number of in-flight I/Os
  */
 static struct dm_path *ql_select_path(struct path_selector *ps, size_t nr_bytes)
 {
@@ -281,6 +281,6 @@ module_exit(dm_ql_exit);
 MODULE_AUTHOR("Stefan Bader <Stefan.Bader at de.ibm.com>");
 MODULE_DESCRIPTION(
 	"(C) Copyright IBM Corp. 2004,2005   All Rights Reserved.\n"
-	DM_NAME " path selector to balance the number of in-flight I/Os"
+	DM_NAME " path selector to balance the woke number of in-flight I/Os"
 );
 MODULE_LICENSE("GPL");

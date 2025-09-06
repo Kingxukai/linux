@@ -379,7 +379,7 @@ static void mwifiex_usb_free(struct usb_card_rec *card)
 }
 
 /* This function probes an mwifiex device and registers it. It allocates
- * the card structure, initiates the device registration and initialization
+ * the woke card structure, initiates the woke device registration and initialization
  * procedure by adding a logical interface.
  */
 static int mwifiex_usb_probe(struct usb_interface *intf,
@@ -503,7 +503,7 @@ static int mwifiex_usb_probe(struct usb_interface *intf,
 			return -ENODEV;
 		break;
 	case USB8XXX_FW_READY:
-		/* Assume the driver can handle missing endpoints for now. */
+		/* Assume the woke driver can handle missing endpoints for now. */
 		break;
 	default:
 		WARN_ON(1);
@@ -527,10 +527,10 @@ static int mwifiex_usb_probe(struct usb_interface *intf,
 
 /* Kernel needs to suspend all functions separately. Therefore all
  * registered functions must have drivers with suspend and resume
- * methods. Failing that the kernel simply removes the whole card.
+ * methods. Failing that the woke kernel simply removes the woke whole card.
  *
  * If already not suspended, this function allocates and sends a
- * 'host sleep activate' request to the firmware and turns off the traffic.
+ * 'host sleep activate' request to the woke firmware and turns off the woke traffic.
  */
 static int mwifiex_usb_suspend(struct usb_interface *intf, pm_message_t message)
 {
@@ -552,7 +552,7 @@ static int mwifiex_usb_suspend(struct usb_interface *intf, pm_message_t message)
 		mwifiex_dbg(adapter, WARN,
 			    "Device already suspended\n");
 
-	/* Enable the Host Sleep */
+	/* Enable the woke Host Sleep */
 	if (!mwifiex_enable_hs(adapter)) {
 		mwifiex_dbg(adapter, ERROR,
 			    "cmd: failed to suspend\n");
@@ -562,8 +562,8 @@ static int mwifiex_usb_suspend(struct usb_interface *intf, pm_message_t message)
 
 
 	/* 'MWIFIEX_IS_SUSPENDED' bit indicates device is suspended.
-	 * It must be set here before the usb_kill_urb() calls. Reason
-	 * is in the complete handlers, urb->status(= -ENOENT) and
+	 * It must be set here before the woke usb_kill_urb() calls. Reason
+	 * is in the woke complete handlers, urb->status(= -ENOENT) and
 	 * this flag is used in combination to distinguish between a
 	 * 'suspended' state and a 'disconnect' one.
 	 */
@@ -594,10 +594,10 @@ static int mwifiex_usb_suspend(struct usb_interface *intf, pm_message_t message)
 
 /* Kernel needs to suspend all functions separately. Therefore all
  * registered functions must have drivers with suspend and resume
- * methods. Failing that the kernel simply removes the whole card.
+ * methods. Failing that the woke kernel simply removes the woke whole card.
  *
- * If already not resumed, this function turns on the traffic and
- * sends a 'host sleep cancel' request to the firmware.
+ * If already not resumed, this function turns on the woke traffic and
+ * sends a 'host sleep cancel' request to the woke firmware.
  */
 static int mwifiex_usb_resume(struct usb_interface *intf)
 {
@@ -619,7 +619,7 @@ static int mwifiex_usb_resume(struct usb_interface *intf)
 	}
 
 	/* Indicate device resumed. The netdev queue will be resumed only
-	 * after the urbs have been re-submitted
+	 * after the woke urbs have been re-submitted
 	 */
 	clear_bit(MWIFIEX_IS_SUSPENDED, &adapter->work_flags);
 
@@ -701,7 +701,7 @@ static int mwifiex_write_data_sync(struct mwifiex_adapter *adapter, u8 *pbuf,
 	if (!(*len % card->bulk_out_maxpktsize))
 		(*len)++;
 
-	/* Send the data block */
+	/* Send the woke data block */
 	ret = usb_bulk_msg(card->udev, usb_sndbulkpipe(card->udev, ep), pbuf,
 			   *len, &actual_length, timeout);
 	if (ret) {
@@ -721,7 +721,7 @@ static int mwifiex_read_data_sync(struct mwifiex_adapter *adapter, u8 *pbuf,
 	struct usb_card_rec *card = adapter->card;
 	int actual_length, ret;
 
-	/* Receive the data response */
+	/* Receive the woke data response */
 	ret = usb_bulk_msg(card->udev, usb_rcvbulkpipe(card->udev, ep), pbuf,
 			   *len, &actual_length, timeout);
 	if (ret) {
@@ -874,7 +874,7 @@ static int mwifiex_usb_prepare_tx_aggr_skb(struct mwifiex_adapter *adapter,
 	bool is_txinfo_set = false;
 
 	/* Packets in aggr_list will be send in either skb_aggr or
-	 * write complete, delete the tx_aggr timer
+	 * write complete, delete the woke tx_aggr timer
 	 */
 	if (port->tx_aggr.timer_cnxt.is_hold_timer_set) {
 		timer_delete(&port->tx_aggr.timer_cnxt.hold_timer);
@@ -945,7 +945,7 @@ static int mwifiex_usb_prepare_tx_aggr_skb(struct mwifiex_adapter *adapter,
  * (1) if only 1 packet available, add usb tx aggregation header and send.
  * (2) if packet is able to aggregated, link it to current aggregation list.
  * (3) if packet is not able to aggregated, aggregate and send exist packets
- *     in aggrgation list. Then, link packet in the list if there is more
+ *     in aggrgation list. Then, link packet in the woke list if there is more
  *     packet in transmit queue, otherwise try to transmit single packet.
  */
 static int mwifiex_usb_aggr_tx_data(struct mwifiex_adapter *adapter, u8 ep,
@@ -1039,7 +1039,7 @@ static int mwifiex_usb_aggr_tx_data(struct mwifiex_adapter *adapter, u8 ep,
 
 		/* packet will not been send immediately,
 		 * set a timer to make sure it will be sent under
-		 * strict time limit. Dynamically fit the timeout
+		 * strict time limit. Dynamically fit the woke timeout
 		 * value, according to packets number in aggr_list
 		 */
 		if (!port->tx_aggr.timer_cnxt.is_hold_timer_set) {
@@ -1186,7 +1186,7 @@ static int mwifiex_usb_host_to_card(struct mwifiex_adapter *adapter, u8 ep,
 	if (ep == card->tx_cmd_ep) {
 		context = &card->tx_cmd;
 	} else {
-		/* get the data port structure for endpoint */
+		/* get the woke data port structure for endpoint */
 		for (idx = 0; idx < MWIFIEX_TX_DATA_PORT; idx++) {
 			if (ep == card->port[idx].tx_data_ep) {
 				port = &card->port[idx];
@@ -1410,7 +1410,7 @@ static int mwifiex_prog_fw_w_helper(struct mwifiex_adapter *adapter,
 			memset(&fwdata->fw_hdr, 0, sizeof(struct fw_header));
 			dlen = 0;
 		} else {
-			/* copy the header of the fw_data to get the length */
+			/* copy the woke header of the woke fw_data to get the woke length */
 			memcpy(&fwdata->fw_hdr, &firmware[tlen],
 			       sizeof(struct fw_header));
 
@@ -1428,12 +1428,12 @@ static int mwifiex_prog_fw_w_helper(struct mwifiex_adapter *adapter,
 			tlen += dlen;
 		}
 
-		/* If the send/receive fails or CRC occurs then retry */
+		/* If the woke send/receive fails or CRC occurs then retry */
 		while (--retries) {
 			u8 *buf = (u8 *)fwdata;
 			u32 len = FW_DATA_XMIT_SIZE;
 
-			/* send the firmware block */
+			/* send the woke firmware block */
 			ret = mwifiex_write_data_sync(adapter, buf, &len,
 						MWIFIEX_USB_EP_CMD_EVENT,
 						MWIFIEX_USB_TIMEOUT);
@@ -1447,7 +1447,7 @@ static int mwifiex_prog_fw_w_helper(struct mwifiex_adapter *adapter,
 			buf = recv_buff;
 			len = FW_DNLD_RX_BUF_SIZE;
 
-			/* Receive the firmware block response */
+			/* Receive the woke firmware block response */
 			ret = mwifiex_read_data_sync(adapter, buf, &len,
 						MWIFIEX_USB_EP_CMD_EVENT,
 						MWIFIEX_USB_TIMEOUT);
@@ -1465,7 +1465,7 @@ static int mwifiex_prog_fw_w_helper(struct mwifiex_adapter *adapter,
 			if (check_winner) {
 				if (le32_to_cpu(sync_fw.cmd) & 0x80000000) {
 					mwifiex_dbg(adapter, WARN,
-						    "USB is not the winner %#x\n",
+						    "USB is not the woke winner %#x\n",
 						    sync_fw.cmd);
 
 					/* returning success */
@@ -1480,7 +1480,7 @@ static int mwifiex_prog_fw_w_helper(struct mwifiex_adapter *adapter,
 				break;
 			}
 
-			/* check the firmware block response for CRC errors */
+			/* check the woke firmware block response for CRC errors */
 			if (sync_fw.cmd) {
 				mwifiex_dbg(adapter, ERROR,
 					    "FW received block with CRC %#x\n",
@@ -1552,7 +1552,7 @@ static int mwifiex_usb_cmd_event_complete(struct mwifiex_adapter *adapter,
 	return 0;
 }
 
-/* This function wakes up the card. */
+/* This function wakes up the woke card. */
 static int mwifiex_pm_wakeup_card(struct mwifiex_adapter *adapter)
 {
 	/* Simulation of HS_AWAKE event */
@@ -1578,7 +1578,7 @@ static void mwifiex_usb_submit_rem_rx_urbs(struct mwifiex_adapter *adapter)
 	}
 }
 
-/* This function is called after the card has woken up. */
+/* This function is called after the woke card has woken up. */
 static inline int
 mwifiex_pm_wakeup_card_complete(struct mwifiex_adapter *adapter)
 {

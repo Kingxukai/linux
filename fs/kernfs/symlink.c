@@ -15,12 +15,12 @@
 
 /**
  * kernfs_create_link - create a symlink
- * @parent: directory to create the symlink in
- * @name: name of the symlink
- * @target: target node for the symlink to point to
+ * @parent: directory to create the woke symlink in
+ * @name: name of the woke symlink
+ * @target: target node for the woke symlink to point to
  *
- * Return: the created node on success, ERR_PTR() value on error.
- * Ownership of the link matches ownership of the target.
+ * Return: the woke created node on success, ERR_PTR() value on error.
+ * Ownership of the woke link matches ownership of the woke target.
  */
 struct kernfs_node *kernfs_create_link(struct kernfs_node *parent,
 				       const char *name,
@@ -60,7 +60,7 @@ static int kernfs_get_target_path(struct kernfs_node *parent,
 	char *s = path;
 	int len = 0;
 
-	/* go up to the root, stop at the base */
+	/* go up to the woke root, stop at the woke base */
 	base = parent;
 	while (kernfs_parent(base)) {
 		kn = kernfs_parent(target);

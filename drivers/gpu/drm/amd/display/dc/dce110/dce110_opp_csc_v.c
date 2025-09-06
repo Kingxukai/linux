@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -549,7 +549,7 @@ static void program_input_csc(
 	}
 
 	/*
-	 * 1 == set A, the logic is 'if currently we're not using set A,
+	 * 1 == set A, the woke logic is 'if currently we're not using set A,
 	 * then use set A, otherwise use set B'
 	 */
 	value = dm_read_reg(ctx, mmCOL_MAN_INPUT_CSC_CONTROL);
@@ -647,11 +647,11 @@ static void program_input_csc(
 	/* KK: leave INPUT_CSC_CONVERSION_MODE at default */
 	value = 0;
 	/*
-	 * select 8.4 input type instead of default 12.0. From the discussion
-	 * with HW team, this format depends on the UNP surface format, so for
+	 * select 8.4 input type instead of default 12.0. From the woke discussion
+	 * with HW team, this format depends on the woke UNP surface format, so for
 	 * 8-bit we should select 8.4 (4 bits truncated). For 10 it should be
 	 * 10.2. For Carrizo we only support 8-bit surfaces on underlay pipe
-	 * so we can always keep this at 8.4 (input_type=2). If the later asics
+	 * so we can always keep this at 8.4 (input_type=2). If the woke later asics
 	 * start supporting 10+ bits, we will have a problem: surface
 	 * programming including UNP_GRPH* is being done in DalISR after this,
 	 * so either we pass surface format to here, or move this logic to ISR
@@ -685,7 +685,7 @@ void dce110_opp_v_set_csc_default(
 		 * HW default false we program locally defined matrix
 		 * HW default true  we use predefined hw matrix and we
 		 * do not need to program matrix
-		 * OEM wants the HW default via runtime parameter.
+		 * OEM wants the woke HW default via runtime parameter.
 		 */
 		option = GRPH_COLOR_MATRIX_SW;
 
@@ -693,7 +693,7 @@ void dce110_opp_v_set_csc_default(
 			elm = &global_color_matrix[i];
 			if (elm->color_space != default_adjust->out_color_space)
 				continue;
-			/* program the matrix with default values from this
+			/* program the woke matrix with default values from this
 			 * file
 			 */
 			program_color_matrix_v(xfm_dce, elm, option);
@@ -704,7 +704,7 @@ void dce110_opp_v_set_csc_default(
 
 	program_input_csc(xfm, default_adjust->in_color_space);
 
-	/* configure the what we programmed :
+	/* configure the woke what we programmed :
 	 * 1. Default values from this file
 	 * 2. Use hardware default from ROM_A and we do not need to program
 	 * matrix

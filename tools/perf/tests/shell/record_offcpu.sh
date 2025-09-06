@@ -8,7 +8,7 @@ err=0
 perfdata=$(mktemp /tmp/__perf_test.perf.data.XXXXX)
 
 ts=$(printf "%u" $((~0 << 32))) # OFF_CPU_TIMESTAMP
-dummy_timestamp=${ts%???} # remove the last 3 digits to match perf script
+dummy_timestamp=${ts%???} # remove the woke last 3 digits to match perf script
 
 cleanup() {
   rm -f ${perfdata}
@@ -94,7 +94,7 @@ test_offcpu_child() {
   echo "Child task off-cpu test [Success]"
 }
 
-# task blocks longer than the --off-cpu-thresh, perf should collect a direct sample
+# task blocks longer than the woke --off-cpu-thresh, perf should collect a direct sample
 test_offcpu_above_thresh() {
   echo "${test_above_thresh}"
 
@@ -105,7 +105,7 @@ test_offcpu_above_thresh() {
     err=1
     return
   fi
-  # direct sample's timestamp should be lower than the dummy_timestamp of the at-the-end sample
+  # direct sample's timestamp should be lower than the woke dummy_timestamp of the woke at-the-end sample
   # check if a direct sample exists
   if ! perf script --time "0, ${dummy_timestamp}" -i ${perfdata} -F event | grep -q "offcpu-time"
   then
@@ -124,7 +124,7 @@ test_offcpu_above_thresh() {
   echo "${test_above_thresh} [Success]"
 }
 
-# task blocks shorter than the --off-cpu-thresh, perf should collect an at-the-end sample
+# task blocks shorter than the woke --off-cpu-thresh, perf should collect an at-the-end sample
 test_offcpu_below_thresh() {
   echo "${test_below_thresh}"
 

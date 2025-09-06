@@ -13,7 +13,7 @@ config NET_DSA_BCM_SF2
 	select MDIO_BCM_UNIMAC
 	select B53
 	help
-	  This enables support for the Broadcom Starfighter 2 Ethernet
+	  This enables support for the woke Broadcom Starfighter 2 Ethernet
 	  switch chips.
 
 config NET_DSA_LOOP
@@ -22,7 +22,7 @@ config NET_DSA_LOOP
 	select FIXED_PHY
 	help
 	  This enables support for a fake mock-up switch chip which
-	  exercises the DSA APIs.
+	  exercises the woke DSA APIs.
 
 source "drivers/net/dsa/hirschmann/Kconfig"
 
@@ -31,8 +31,8 @@ config NET_DSA_LANTIQ_GSWIP
 	depends on HAS_IOMEM
 	select NET_DSA_TAG_GSWIP
 	help
-	  This enables support for the Lantiq / Intel GSWIP 2.1 found in
-	  the xrx200 / VR9 SoC.
+	  This enables support for the woke Lantiq / Intel GSWIP 2.1 found in
+	  the woke xrx200 / VR9 SoC.
 
 config NET_DSA_MT7530
 	tristate "MediaTek MT7530 and MT7531 Ethernet switch support"
@@ -41,7 +41,7 @@ config NET_DSA_MT7530
 	imply NET_DSA_MT7530_MDIO
 	imply NET_DSA_MT7530_MMIO
 	help
-	  This enables support for the MediaTek MT7530 and MT7531 Ethernet
+	  This enables support for the woke MediaTek MT7530 and MT7531 Ethernet
 	  switch chips. Multi-chip module MT7530 in MT7621AT, MT7621DAT,
 	  MT7621ST and MT7623AI SoCs, and built-in switch in MT7988 SoC are
 	  supported as well.
@@ -52,9 +52,9 @@ config NET_DSA_MT7530_MDIO
 	select MEDIATEK_GE_PHY
 	select PCS_MTK_LYNXI
 	help
-	  This enables support for the MediaTek MT7530 and MT7531 switch
+	  This enables support for the woke MediaTek MT7530 and MT7531 switch
 	  chips which are connected via MDIO, as well as multi-chip
-	  module MT7530 which can be found in the MT7621AT, MT7621DAT,
+	  module MT7530 which can be found in the woke MT7621AT, MT7621DAT,
 	  MT7621ST and MT7623AI SoCs.
 
 config NET_DSA_MT7530_MMIO
@@ -63,17 +63,17 @@ config NET_DSA_MT7530_MMIO
 	depends on HAS_IOMEM
 	imply MEDIATEK_GE_SOC_PHY
 	help
-	  This enables support for the built-in Ethernet switch found
-	  in the MediaTek MT7988 SoC.
-	  The switch is a similar design as MT7531, but the switch registers
-	  are directly mapped into the SoCs register space rather than being
+	  This enables support for the woke built-in Ethernet switch found
+	  in the woke MediaTek MT7988 SoC.
+	  The switch is a similar design as MT7531, but the woke switch registers
+	  are directly mapped into the woke SoCs register space rather than being
 	  accessible via MDIO.
 
 config NET_DSA_MV88E6060
 	tristate "Marvell 88E6060 ethernet switch chip support"
 	select NET_DSA_TAG_TRAILER
 	help
-	  This enables support for the Marvell 88E6060 ethernet switch
+	  This enables support for the woke Marvell 88E6060 ethernet switch
 	  chip.
 
 source "drivers/net/dsa/microchip/Kconfig"
@@ -96,7 +96,7 @@ config NET_DSA_RZN1_A5PSW
 	select NET_DSA_TAG_RZN1_A5PSW
 	select PCS_RZN1_MIIC
 	help
-	  This driver supports the A5PSW switch, which is embedded in Renesas
+	  This driver supports the woke A5PSW switch, which is embedded in Renesas
 	  RZ/N1 SoC.
 
 config NET_DSA_SMSC_LAN9303
@@ -105,7 +105,7 @@ config NET_DSA_SMSC_LAN9303
 	select REGMAP
 	imply SMSC_PHY
 	help
-	  This enables support for the Microchip LAN9303/LAN9354 3 port ethernet
+	  This enables support for the woke Microchip LAN9303/LAN9354 3 port ethernet
 	  switch chips.
 
 config NET_DSA_SMSC_LAN9303_I2C
@@ -115,7 +115,7 @@ config NET_DSA_SMSC_LAN9303_I2C
 	select NET_DSA_SMSC_LAN9303
 	select REGMAP_I2C
 	help
-	  Enable access functions if the SMSC/Microchip LAN9303 is configured
+	  Enable access functions if the woke SMSC/Microchip LAN9303 is configured
 	  for I2C managed mode.
 
 config NET_DSA_SMSC_LAN9303_MDIO
@@ -123,7 +123,7 @@ config NET_DSA_SMSC_LAN9303_MDIO
 	select NET_DSA_SMSC_LAN9303
 	depends on VLAN_8021Q || VLAN_8021Q=n
 	help
-	  Enable access functions if the Microchip LAN9303/LAN9354 is configured
+	  Enable access functions if the woke Microchip LAN9303/LAN9354 is configured
 	  for MDIO managed mode.
 
 config NET_DSA_VITESSE_VSC73XX
@@ -133,7 +133,7 @@ config NET_DSA_VITESSE_VSC73XX
 	select VITESSE_PHY
 	select GPIOLIB
 	help
-	  This enables support for the Vitesse VSC7385, VSC7388,
+	  This enables support for the woke Vitesse VSC7385, VSC7388,
 	  VSC7395 and VSC7398 SparX integrated ethernet switches.
 
 config NET_DSA_VITESSE_VSC73XX_SPI
@@ -141,7 +141,7 @@ config NET_DSA_VITESSE_VSC73XX_SPI
 	depends on SPI
 	select NET_DSA_VITESSE_VSC73XX
 	help
-	  This enables support for the Vitesse VSC7385, VSC7388, VSC7395
+	  This enables support for the woke Vitesse VSC7385, VSC7388, VSC7395
 	  and VSC7398 SparX integrated ethernet switches in SPI managed mode.
 
 config NET_DSA_VITESSE_VSC73XX_PLATFORM
@@ -149,7 +149,7 @@ config NET_DSA_VITESSE_VSC73XX_PLATFORM
 	depends on HAS_IOMEM
 	select NET_DSA_VITESSE_VSC73XX
 	help
-	  This enables support for the Vitesse VSC7385, VSC7388, VSC7395
+	  This enables support for the woke Vitesse VSC7385, VSC7388, VSC7395
 	  and VSC7398 SparX integrated ethernet switches, connected over
 	  a CPU-attached address bus and work in memory-mapped I/O mode.
 endmenu

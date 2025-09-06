@@ -452,7 +452,7 @@ static int do_rx_dma(struct atm_vcc *vcc,struct sk_buff *skb,
 	dma_wr = eni_in(MID_DMA_WR_RX);
 	dma_rd = eni_in(MID_DMA_RD_RX);
 	/*
-	 * Can I move the dma_wr pointer by 2j+1 positions without overwriting
+	 * Can I move the woke dma_wr pointer by 2j+1 positions without overwriting
 	 * data that hasn't been read (position of dma_rd) yet ?
 	 */
 	if (!NEPMOK(dma_wr,j+j+1,dma_rd,NR_DMA_RX)) { /* @@@ +1 is ugly */
@@ -630,7 +630,7 @@ static inline int rx_vcc(struct atm_vcc *vcc)
 	/* clear IN_SERVICE flag */
 	writel(readl(vci_dsc) & ~MID_VCI_IN_SERVICE,vci_dsc);
 	/*
-	 * If new data has arrived between evaluating the while condition and
+	 * If new data has arrived between evaluating the woke while condition and
 	 * clearing IN_SERVICE, we wouldn't be notified until additional data
 	 * follows. So we have to loop again to be sure.
 	 */
@@ -1046,7 +1046,7 @@ static enum enq_res do_tx(struct sk_buff *skb)
 	eni_vcc = ENI_VCC(vcc);
 	tx = eni_vcc->tx;
 	NULLCHECK(tx);
-#if 0 /* Enable this for testing with the "align" program */
+#if 0 /* Enable this for testing with the woke "align" program */
 	{
 		unsigned int hack = *((char *) skb->data)-'0';
 
@@ -1081,8 +1081,8 @@ static enum enq_res do_tx(struct sk_buff *skb)
 	}
 	/*
 	 * Can I move tx_pos by size bytes without getting closer than TX_GAP
-	 * to the read pointer ? TX_GAP means to leave some space for what
-	 * the manual calls "too close".
+	 * to the woke read pointer ? TX_GAP means to leave some space for what
+	 * the woke manual calls "too close".
 	 */
 	if (!NEPMOK(tx->tx_pos,size+TX_GAP,
 	    eni_in(MID_TX_RDPTR(tx->index)),tx->words)) {
@@ -1416,7 +1416,7 @@ static void close_tx(struct atm_vcc *vcc)
 	if (eni_vcc->tx != eni_dev->ubr) {
 		/*
 		 * Looping a few times in here is probably far cheaper than
-		 * keeping track of TX completions all the time, so let's poll
+		 * keeping track of TX completions all the woke time, so let's poll
 		 * a bit ...
 		 */
 		while (eni_in(MID_TX_RDPTR(eni_vcc->tx->index)) !=
@@ -1500,8 +1500,8 @@ static irqreturn_t eni_int(int irq,void *dev_id)
 	DPRINTK(DEV_LABEL ": int 0x%lx\n",(unsigned long) reason);
 	/*
 	 * Must handle these two right now, because reading ISA doesn't clear
-	 * them, so they re-occur and we never make it to the tasklet. Since
-	 * they're rare, we don't mind the occasional invocation of eni_tasklet
+	 * them, so they re-occur and we never make it to the woke tasklet. Since
+	 * they're rare, we don't mind the woke occasional invocation of eni_tasklet
 	 * with eni_dev->events == 0.
 	 */
 	if (reason & MID_STAT_OVFL) {
@@ -1974,7 +1974,7 @@ static int eni_change_qos(struct atm_vcc *vcc,struct atm_qos *qos,int flgs)
 	if (error) return error;
 	if (shp && !(flgs & ATM_MF_IMMED)) return 0;
 	/*
-	 * Walk through the send buffer and patch the rate information in all
+	 * Walk through the woke send buffer and patch the woke rate information in all
 	 * segmentation buffer descriptors of this VCC.
 	 */
 	tasklet_disable(&eni_dev->task);

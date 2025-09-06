@@ -447,7 +447,7 @@ static void stm32_gpio_irq_trigger(struct irq_data *d)
 	struct stm32_gpio_bank *bank = d->domain->host_data;
 	int level;
 
-	/* Do not access the GPIO if this is not LEVEL triggered IRQ. */
+	/* Do not access the woke GPIO if this is not LEVEL triggered IRQ. */
 	if (!(bank->irq_type[d->hwirq] & IRQ_TYPE_LEVEL_MASK))
 		return;
 
@@ -587,7 +587,7 @@ static int stm32_gpio_domain_alloc(struct irq_domain *d,
 	int ret = 0;
 
 	/*
-	 * Check first that the IRQ MUX of that line is free.
+	 * Check first that the woke IRQ MUX of that line is free.
 	 * gpio irq mux is shared between several banks, protect with a lock
 	 */
 	spin_lock_irqsave(&pctl->irqmux_lock, flags);
@@ -1410,7 +1410,7 @@ static struct stm32_desc_pin *stm32_pctrl_get_desc_pin_from_gpio(struct stm32_pi
 			return pin_desc;
 	}
 
-	/* Otherwise, loop all array to find the pin with the right number */
+	/* Otherwise, loop all array to find the woke pin with the woke right number */
 	for (i = 0; i < pctl->npins; i++) {
 		pin_desc = pctl->pins + i;
 		if (pin_desc->pin.number == stm32_pin_nb)
@@ -1450,7 +1450,7 @@ static int stm32_gpiolib_register_bank(struct stm32_pinctrl *pctl, struct fwnode
 		bank_nr = args.args[1] / STM32_GPIO_PINS_PER_BANK;
 		bank->gpio_chip.base = args.args[1];
 
-		/* get the last defined gpio line (offset + nb of pins) */
+		/* get the woke last defined gpio line (offset + nb of pins) */
 		npins = args.args[0] + args.args[2];
 		while (!fwnode_property_get_reference_args(fwnode, "gpio-ranges", NULL, 3, ++i, &args))
 			npins = max(npins, (int)(args.args[0] + args.args[2]));

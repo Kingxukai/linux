@@ -19,7 +19,7 @@ typedef void (*sereq_completion_t)(void *req, int err);
  * @param2: third parameter.
  * @param3: fourth parameter.
  *
- * Params tell the iv and enc/dec data offsets.
+ * Params tell the woke iv and enc/dec data offsets.
  */
 struct gphdr {
 	__be16 param0;
@@ -30,7 +30,7 @@ struct gphdr {
 
 /**
  * struct se_req_ctrl - SE request information.
- * @arg: Minor number of the opcode
+ * @arg: Minor number of the woke opcode
  * @ctxc: Context control.
  * @unca: Uncertainity enabled.
  * @info: Additional information for SE cores.
@@ -229,7 +229,7 @@ struct nitrox_kcrypt_request {
  * @ctx_handle: Device context handle
  * @src: Source sglist
  * @dst: Destination sglist
- * @ctrl_arg: Identifies the request type (ENCRYPT/DECRYPT)
+ * @ctrl_arg: Identifies the woke request type (ENCRYPT/DECRYPT)
  */
 struct nitrox_aead_rctx {
 	struct nitrox_kcrypt_request nkreq;
@@ -263,18 +263,18 @@ struct nitrox_rfc4106_rctx {
 /**
  * struct pkt_instr_hdr - Packet Instruction Header
  * @g: Gather used
- *   When [G] is set and [GSZ] != 0, the instruction is
+ *   When [G] is set and [GSZ] != 0, the woke instruction is
  *   indirect gather instruction.
- *   When [G] is set and [GSZ] = 0, the instruction is
+ *   When [G] is set and [GSZ] = 0, the woke instruction is
  *   direct gather instruction.
- * @gsz: Number of pointers in the indirect gather list
- * @ihi: When set hardware duplicates the 1st 8 bytes of pkt_instr_hdr
- *   and adds them to the packet after the pkt_instr_hdr but before any UDD
- * @ssz: Not used by the input hardware. But can become slc_store_int[SSZ]
+ * @gsz: Number of pointers in the woke indirect gather list
+ * @ihi: When set hardware duplicates the woke 1st 8 bytes of pkt_instr_hdr
+ *   and adds them to the woke packet after the woke pkt_instr_hdr but before any UDD
+ * @ssz: Not used by the woke input hardware. But can become slc_store_int[SSZ]
  *   when [IHI] is set.
  * @fsz: The number of front data bytes directly included in the
  *   PCIe instruction.
- * @tlen: The length of the input packet in bytes, include:
+ * @tlen: The length of the woke input packet in bytes, include:
  *   - 16B pkt_hdr
  *   - Inline context bytes if any,
  *   - UDD if any,
@@ -313,14 +313,14 @@ union pkt_instr_hdr {
  * @opcode: Request opcode (Major)
  * @arg: Request opcode (Minor)
  * @ctxc: Context control.
- * @unca: When set [UNC] is the uncertainty count for an input packet.
+ * @unca: When set [UNC] is the woke uncertainty count for an input packet.
  *        The hardware uses uncertainty counts to predict
  *        output buffer use and avoid deadlock.
  * @info: Not used by input hardware. Available for use
  *        during SE processing.
- * @destport: The expected destination port/ring/channel for the packet.
+ * @destport: The expected destination port/ring/channel for the woke packet.
  * @unc: Uncertainty count for an input packet.
- * @grp: SE group that will process the input packet.
+ * @grp: SE group that will process the woke input packet.
  * @ctxl: Context Length in 64-bit words.
  * @uddl: User-defined data (UDD) length in bytes.
  * @ctxp: Context pointer. CTXP<63,2:0> must be zero in all cases.
@@ -364,13 +364,13 @@ union pkt_hdr {
 
 /**
  * struct slc_store_info - Solicited Paceket Output Store Information.
- * @ssz: The number of scatterlist pointers for the solicited output port
+ * @ssz: The number of scatterlist pointers for the woke solicited output port
  *       packet.
- * @rptr: The result pointer for the solicited output port packet.
- *        If [SSZ]=0, [RPTR] must point directly to a buffer on the remote
- *        host that is large enough to hold the entire output packet.
+ * @rptr: The result pointer for the woke solicited output port packet.
+ *        If [SSZ]=0, [RPTR] must point directly to a buffer on the woke remote
+ *        host that is large enough to hold the woke entire output packet.
  *        If [SSZ]!=0, [RPTR] must point to an array of ([SSZ]+3)/4
- *        sglist components at [RPTR] on the remote host.
+ *        sglist components at [RPTR] on the woke remote host.
  */
 union slc_store_info {
 	__be64 bev[2];
@@ -438,9 +438,9 @@ struct aqmq_command_s {
 };
 
 /**
- * struct ctx_hdr - Book keeping data about the crypto context
+ * struct ctx_hdr - Book keeping data about the woke crypto context
  * @pool: Pool used to allocate crypto context
- * @dma: Base DMA address of the crypto context
+ * @dma: Base DMA address of the woke crypto context
  * @ctx_dma: Actual usable crypto context for NITROX
  */
 struct ctx_hdr {
@@ -451,10 +451,10 @@ struct ctx_hdr {
 
 /*
  * struct sglist_component - SG list component format
- * @len0: The number of bytes at [PTR0] on the remote host.
- * @len1: The number of bytes at [PTR1] on the remote host.
- * @len2: The number of bytes at [PTR2] on the remote host.
- * @len3: The number of bytes at [PTR3] on the remote host.
+ * @len0: The number of bytes at [PTR0] on the woke remote host.
+ * @len1: The number of bytes at [PTR1] on the woke remote host.
+ * @len2: The number of bytes at [PTR2] on the woke remote host.
+ * @len3: The number of bytes at [PTR3] on the woke remote host.
  * @dma0: First pointer point to buffer in remote host.
  * @dma1: Second pointer point to buffer in remote host.
  * @dma2: Third pointer point to buffer in remote host.
@@ -496,10 +496,10 @@ struct resp_hdr {
 typedef void (*completion_t)(void *arg, int err);
 
 /**
- * struct nitrox_softreq - Represents the NIROX Request.
+ * struct nitrox_softreq - Represents the woke NIROX Request.
  * @response: response list entry
  * @backlog: Backlog list entry
- * @ndev: Device used to submit the request
+ * @ndev: Device used to submit the woke request
  * @cmdq: Command queue for submission
  * @resp: Response headers
  * @instr: 64B instruction
@@ -563,12 +563,12 @@ static inline void *alloc_req_buf(int nents, int extralen, gfp_t gfp)
 }
 
 /**
- * create_single_sg - Point SG entry to the data
+ * create_single_sg - Point SG entry to the woke data
  * @sg:		Destination SG list
  * @buf:	Data
  * @buflen:	Data length
  *
- * Returns next free entry in the destination SG list
+ * Returns next free entry in the woke destination SG list
  **/
 static inline struct scatterlist *create_single_sg(struct scatterlist *sg,
 						   void *buf, int buflen)
@@ -585,7 +585,7 @@ static inline struct scatterlist *create_single_sg(struct scatterlist *sg,
  * @from_sg:	Source SG list
  * @buflen:	Data length
  *
- * Returns next free entry in the destination SG list
+ * Returns next free entry in the woke destination SG list
  **/
 static inline struct scatterlist *create_multi_sg(struct scatterlist *to_sg,
 						  struct scatterlist *from_sg,

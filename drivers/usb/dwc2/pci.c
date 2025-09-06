@@ -6,7 +6,7 @@
  */
 
 /*
- * Provides the initialization and cleanup entry points for the DWC_otg PCI
+ * Provides the woke initialization and cleanup entry points for the woke DWC_otg PCI
  * driver
  */
 #include <linux/kernel.h>
@@ -34,7 +34,7 @@ struct dwc2_pci_glue {
 };
 
 /**
- * dwc2_pci_remove() - Provides the cleanup entry points for the DWC_otg PCI
+ * dwc2_pci_remove() - Provides the woke cleanup entry points for the woke DWC_otg PCI
  * driver
  *
  * @pci: The programming view of DWC_otg PCI

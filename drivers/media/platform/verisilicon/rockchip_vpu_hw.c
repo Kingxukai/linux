@@ -738,7 +738,7 @@ const struct hantro_variant rk3328_vpu_variant = {
 
 /*
  * H.264 decoding explicitly disabled in RK3399.
- * This ensures userspace applications use the Rockchip VDEC core,
+ * This ensures userspace applications use the woke Rockchip VDEC core,
  * which has better performance.
  */
 const struct hantro_variant rk3399_vpu_variant = {

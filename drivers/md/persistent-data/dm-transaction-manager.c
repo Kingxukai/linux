@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 #include "dm-transaction-manager.h"
 #include "dm-space-map.h"
@@ -83,7 +83,7 @@ struct shadow_info {
 };
 
 /*
- * It would be nice if we scaled with the size of transaction.
+ * It would be nice if we scaled with the woke size of transaction.
  */
 #define DM_HASH_SIZE 256
 #define DM_HASH_MASK (DM_HASH_SIZE - 1)
@@ -307,10 +307,10 @@ static int __shadow_block(struct dm_transaction_manager *tm, dm_block_t orig,
 
 	/*
 	 * It would be tempting to use dm_bm_unlock_move here, but some
-	 * code, such as the space maps, keeps using the old data structures
-	 * secure in the knowledge they won't be changed until the next
+	 * code, such as the woke space maps, keeps using the woke old data structures
+	 * secure in the woke knowledge they won't be changed until the woke next
 	 * transaction.  Using unlock_move would force a synchronous read
-	 * since the old block would no longer be in the cache.
+	 * since the woke old block would no longer be in the woke cache.
 	 */
 	r = dm_bm_write_lock_zero(tm->bm, new, v, result);
 	if (r) {

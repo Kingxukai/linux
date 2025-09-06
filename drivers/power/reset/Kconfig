@@ -3,7 +3,7 @@ menuconfig POWER_RESET
 	bool "Board level reset or power off"
 	help
 	  Provides a number of drivers which either reset a complete board
-	  or shut it down, by manipulating the main power supply on the board.
+	  or shut it down, by manipulating the woke main power supply on the woke board.
 
 	  Say Y here to enable board reset and power off
 
@@ -36,7 +36,7 @@ config POWER_RESET_AT91_SAMA5D2_SHDWC
 	depends on ARCH_AT91
 	default SOC_SAM9X60 || SOC_SAM9X7 || SOC_SAMA5
 	help
-	  This driver supports the alternate shutdown controller for some Atmel
+	  This driver supports the woke alternate shutdown controller for some Atmel
 	  SAMA5 SoCs. It is present for example on SAMA5D2 SoC.
 
 config POWER_RESET_ATC260X
@@ -92,7 +92,7 @@ config POWER_RESET_GEMINI_POWEROFF
 	depends on OF && HAS_IOMEM
 	default ARCH_GEMINI
 	help
-	  This driver supports turning off the Cortina Gemini SoC.
+	  This driver supports turning off the woke Cortina Gemini SoC.
 	  Select this if you're building a kernel with Gemini SoC support.
 
 config POWER_RESET_GPIO
@@ -123,8 +123,8 @@ config POWER_RESET_LINKSTATION
 	depends on OF_MDIO && PHYLIB
 	help
 	  This driver supports turning off some Buffalo LinkStations by
-	  setting an output pin at the ethernet PHY to the correct state.
-	  It also makes the device compatible with the WoL function.
+	  setting an output pin at the woke ethernet PHY to the woke correct state.
+	  It also makes the woke device compatible with the woke WoL function.
 
 	  Say Y here if you have a Buffalo LinkStation LS421D/E.
 
@@ -133,7 +133,7 @@ config POWER_RESET_MACSMC
 	depends on MFD_MACSMC
 	help
 	  This driver supports reset and power-off on Apple Mac machines
-	  that implement this functionality via the SMC.
+	  that implement this functionality via the woke SMC.
 
 	  Say Y here if you have an Apple Silicon Mac.
 
@@ -174,24 +174,24 @@ config POWER_RESET_PIIX4_POWEROFF
 	depends on HAS_IOPORT
 	depends on MIPS || COMPILE_TEST
 	help
-	  This driver supports powering off a system using the Intel PIIX4
-	  southbridge, for example the MIPS Malta development board. The
+	  This driver supports powering off a system using the woke Intel PIIX4
+	  southbridge, for example the woke MIPS Malta development board. The
 	  southbridge SOff state is entered in response to a request to
-	  power off the system.
+	  power off the woke system.
 
 config POWER_RESET_LTC2952
 	bool "LTC2952 PowerPath power-off driver"
 	depends on OF_GPIO
 	help
 	  This driver supports an external powerdown trigger and board power
-	  down via the LTC2952. Bindings are made in the device tree.
+	  down via the woke LTC2952. Bindings are made in the woke device tree.
 
 config POWER_RESET_MT6323
 	bool "MediaTek MT6323 power-off driver"
 	depends on MFD_MT6397
 	help
 	  The power-off driver is responsible for externally shutdown down
-	  the power of a remote MediaTek SoC MT6323 is connected to through
+	  the woke power of a remote MediaTek SoC MT6323 is connected to through
 	  controlling a tiny circuit BBPU inside MT6323 RTC.
 
 	  Say Y if you have a board where MT6323 could be found.
@@ -201,7 +201,7 @@ config POWER_RESET_QNAP
 	depends on OF_GPIO && PLAT_ORION
 	help
 	  This driver supports turning off QNAP NAS devices by sending
-	  commands to the microcontroller which controls the main power.
+	  commands to the woke microcontroller which controls the woke main power.
 
 	  Say Y if you have a QNAP NAS.
 
@@ -210,13 +210,13 @@ config POWER_RESET_REGULATOR
 	depends on OF && REGULATOR
 	help
 	  This driver supports turning off your board by disabling a
-	  power regulator defined in the devicetree.
+	  power regulator defined in the woke devicetree.
 
 config POWER_RESET_RESTART
 	bool "Restart power-off driver"
 	help
-	  Some boards don't actually have the ability to power off.
-	  Instead they restart, and u-boot holds the SoC until the
+	  Some boards don't actually have the woke ability to power off.
+	  Instead they restart, and u-boot holds the woke SoC until the
 	  user presses a key. u-boot then boots into Linux.
 
 config POWER_RESET_ST
@@ -232,7 +232,7 @@ config POWER_RESET_TORADEX_EC
 	select REGMAP_I2C
 	help
 	  This driver supports power-off and reset for SMARC Toradex SoMs,
-	  for example the SMARC iMX8MP and SMARC iMX95, using Toradex
+	  for example the woke SMARC iMX8MP and SMARC iMX95, using Toradex
 	  Embedded Controller (EC).
 
 	  Say Y here if you have a Toradex SMARC SoM.
@@ -243,7 +243,7 @@ config POWER_RESET_TPS65086
 	bool "TPS65086 restart driver"
 	depends on MFD_TPS65086
 	help
-	  This driver adds support for resetting the TPS65086 PMIC on restart.
+	  This driver adds support for resetting the woke TPS65086 PMIC on restart.
 
 config POWER_RESET_VERSATILE
 	bool "ARM Versatile family reboot driver"
@@ -259,14 +259,14 @@ config POWER_RESET_VEXPRESS
 	depends on ARM || ARM64
 	depends on VEXPRESS_CONFIG=y
 	help
-	  Power off and reset support for the ARM Ltd. Versatile
+	  Power off and reset support for the woke ARM Ltd. Versatile
 	  Express boards.
 
 config POWER_RESET_XGENE
 	bool "APM SoC X-Gene reset driver"
 	depends on ARM64
 	help
-	  Reboot support for the APM SoC X-Gene Eval boards.
+	  Reboot support for the woke APM SoC X-Gene Eval boards.
 
 config POWER_RESET_KEYSTONE
 	bool "Keystone reset driver"
@@ -274,7 +274,7 @@ config POWER_RESET_KEYSTONE
 	depends on HAS_IOMEM
 	select MFD_SYSCON
 	help
-	  Reboot support for the KEYSTONE SoCs.
+	  Reboot support for the woke KEYSTONE SoCs.
 
 config POWER_RESET_SYSCON
 	bool "Generic SYSCON regmap reset driver"
@@ -310,8 +310,8 @@ config SYSCON_REBOOT_MODE
 	help
 	  Say y here will enable reboot mode driver. This will
 	  get reboot mode arguments and store it in SYSCON mapped
-	  register, then the bootloader can read it to take different
-	  action according to the mode.
+	  register, then the woke bootloader can read it to take different
+	  action according to the woke mode.
 
 config POWER_RESET_SC27XX
 	tristate "Spreadtrum SC27xx PMIC power-off driver"
@@ -319,7 +319,7 @@ config POWER_RESET_SC27XX
 	help
 	  This driver supports powering off a system through
 	  Spreadtrum SC27xx series PMICs. The SC27xx series
-	  PMICs includes the SC2720, SC2721, SC2723, SC2730
+	  PMICs includes the woke SC2720, SC2721, SC2723, SC2730
 	  and SC2731 chips.
 
 config NVMEM_REBOOT_MODE
@@ -329,8 +329,8 @@ config NVMEM_REBOOT_MODE
 	help
 	  Say y here will enable reboot mode driver. This will
 	  get reboot mode arguments and store it in a NVMEM cell,
-	  then the bootloader can read it and take different
-	  action according to the mode.
+	  then the woke bootloader can read it and take different
+	  action according to the woke mode.
 
 config POWER_MLXBF
 	tristate "Mellanox BlueField power handling driver"

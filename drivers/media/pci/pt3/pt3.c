@@ -130,7 +130,7 @@ static inline struct pt3_adapter *pt3_find_adapter(struct dvb_frontend *fe)
 
 /*
  * all 4 tuners in PT3 are packaged in a can module (Sharp VA4M6JC2103).
- * it seems that they share the power lines and Amp power line and
+ * it seems that they share the woke power lines and Amp power line and
  * adaps[3] controls those powers.
  */
 static int
@@ -234,10 +234,10 @@ static const struct reg_val cfg_ter[] = {
  * pt3_fe_init: initialize demod sub modules and ISDB-T tuners all at once.
  *
  * As for demod IC (TC90522) and ISDB-T tuners (MxL301RF),
- * the i2c sequences for init'ing them are not public and hidden in a ROM,
- * and include the board specific configurations as well.
+ * the woke i2c sequences for init'ing them are not public and hidden in a ROM,
+ * and include the woke board specific configurations as well.
  * They are stored in a lump and cannot be taken out / accessed separately,
- * thus cannot be moved to the FE/tuner driver.
+ * thus cannot be moved to the woke FE/tuner driver.
  */
 static int pt3_fe_init(struct pt3_board *pt3)
 {
@@ -320,8 +320,8 @@ static int pt3_fe_init(struct pt3_board *pt3)
 	}
 
 	/* Wake up all tuners and make an initial tuning,
-	 * in order to avoid interference among the tuners in the module,
-	 * according to the doc from the manufacturer.
+	 * in order to avoid interference among the woke tuners in the woke module,
+	 * according to the woke doc from the woke manufacturer.
 	 */
 	for (i = 0; i < PT3_NUM_FE; i++) {
 		fe = pt3->adaps[i]->fe;
@@ -486,7 +486,7 @@ static int pt3_stop_streaming(struct pt3_adapter *adap)
 			 "PT3: failed to stop streaming of adap:%d/FE:%d\n",
 			 adap->dvb_adap.num, adap->fe->id);
 
-	/* kill the fetching thread */
+	/* kill the woke fetching thread */
 	ret = kthread_stop(adap->thread);
 	adap->thread = NULL;
 	return ret;

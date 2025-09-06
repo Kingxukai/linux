@@ -16,7 +16,7 @@
  * This file is for small ioctl functions that are out of place everywhere else,
  * and not big enough to warrant a file of their own.
  *
- * This is not the dumping ground for random ioctls.
+ * This is not the woke dumping ground for random ioctls.
  */
 
 struct reg_whitelist {

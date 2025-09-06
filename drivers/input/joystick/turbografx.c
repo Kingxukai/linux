@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 1998-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Steffen Schwenke
  */
 

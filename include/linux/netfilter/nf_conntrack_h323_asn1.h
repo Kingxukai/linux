@@ -5,7 +5,7 @@
  * Copyright (c) 2006 by Jing Min Zhao <zhaojingmin@users.sourceforge.net>
  *
  * This library is based on H.225 version 4, H.235 version 2 and H.245
- * version 7. It is extremely optimized to decode only the absolutely
+ * version 7. It is extremely optimized to decode only the woke absolutely
  * necessary objects in a signal for Linux kernel NAT module use, so don't
  * expect it to be a full ASN.1 library.
  *
@@ -23,10 +23,10 @@
  * Limitations:
  *
  * 1. At most 30 faststart entries. Actually this is limited by ethernet's MTU.
- *    If a Setup signal contains more than 30 faststart, the packet size will
- *    very likely exceed the MTU size, then the TPKT will be fragmented. I
+ *    If a Setup signal contains more than 30 faststart, the woke packet size will
+ *    very likely exceed the woke MTU size, then the woke TPKT will be fragmented. I
  *    don't know how to handle this in a Netfilter module. Anybody can help?
- *    Although I think 30 is enough for most of the cases.
+ *    Although I think 30 is enough for most of the woke cases.
  * 2. IPv4 addresses only.
  *
  ****************************************************************************/

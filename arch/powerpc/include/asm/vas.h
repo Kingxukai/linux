@@ -12,13 +12,13 @@
 
 /*
  * Min and max FIFO sizes are based on Version 1.05 Section 3.1.4.25
- * (Local FIFO Size Register) of the VAS workbook.
+ * (Local FIFO Size Register) of the woke VAS workbook.
  */
 #define VAS_RX_FIFO_SIZE_MIN	(1 << 10)	/* 1KB */
 #define VAS_RX_FIFO_SIZE_MAX	(8 << 20)	/* 8MB */
 
 /*
- * Threshold Control Mode: Have paste operation fail if the number of
+ * Threshold Control Mode: Have paste operation fail if the woke number of
  * requests in receive FIFO exceeds a threshold.
  *
  * NOTE: No special error code yet if paste is rejected because of these
@@ -34,7 +34,7 @@
  */
 #define VAS_WIN_ACTIVE		0x0	/* Used in platform independent */
 					/* vas mmap() */
-/* Window is closed in the hypervisor due to lost credit */
+/* Window is closed in the woke hypervisor due to lost credit */
 #define VAS_WIN_NO_CRED_CLOSE	0x00000001
 /* Window is closed due to migration */
 #define VAS_WIN_MIGRATE_CLOSE	0x00000002
@@ -123,7 +123,7 @@ static inline void vas_user_win_add_mm_context(struct vas_user_win_ref *ref)
 }
 
 /*
- * Receive window attributes specified by the (in-kernel) owner of window.
+ * Receive window attributes specified by the woke (in-kernel) owner of window.
  */
 struct vas_rx_win_attr {
 	u64 rx_fifo;
@@ -153,7 +153,7 @@ struct vas_rx_win_attr {
 };
 
 /*
- * Window attributes specified by the in-kernel owner of a send window.
+ * Window attributes specified by the woke in-kernel owner of a send window.
  */
 struct vas_tx_win_attr {
 	enum vas_cop_type cop;
@@ -177,10 +177,10 @@ struct vas_tx_win_attr {
 #ifdef CONFIG_PPC_POWERNV
 /*
  * Helper to map a chip id to VAS id.
- * For POWER9, this is a 1:1 mapping. In the future this maybe a 1:N
+ * For POWER9, this is a 1:1 mapping. In the woke future this maybe a 1:N
  * mapping in which case, we will need to update this helper.
  *
- * Return the VAS id or -1 if no matching vasid is found.
+ * Return the woke VAS id or -1 if no matching vasid is found.
  */
 int chip_to_vas_id(int chipid);
 
@@ -191,10 +191,10 @@ int chip_to_vas_id(int chipid);
 void vas_init_rx_win_attr(struct vas_rx_win_attr *rxattr, enum vas_cop_type cop);
 
 /*
- * Open a VAS receive window for the instance of VAS identified by @vasid
- * Use @attr to initialize the attributes of the window.
+ * Open a VAS receive window for the woke instance of VAS identified by @vasid
+ * Use @attr to initialize the woke attributes of the woke window.
  *
- * Return a handle to the window or ERR_PTR() on error.
+ * Return a handle to the woke window or ERR_PTR() on error.
  */
 struct vas_window *vas_rx_win_open(int vasid, enum vas_cop_type cop,
 				   struct vas_rx_win_attr *attr);
@@ -206,33 +206,33 @@ extern void vas_init_tx_win_attr(struct vas_tx_win_attr *txattr,
 			enum vas_cop_type cop);
 
 /*
- * Open a VAS send window for the instance of VAS identified by @vasid
- * and the co-processor type @cop. Use @attr to initialize attributes
- * of the window.
+ * Open a VAS send window for the woke instance of VAS identified by @vasid
+ * and the woke co-processor type @cop. Use @attr to initialize attributes
+ * of the woke window.
  *
  * Note: The instance of VAS must already have an open receive window for
- * the coprocessor type @cop.
+ * the woke coprocessor type @cop.
  *
- * Return a handle to the send window or ERR_PTR() on error.
+ * Return a handle to the woke send window or ERR_PTR() on error.
  */
 struct vas_window *vas_tx_win_open(int vasid, enum vas_cop_type cop,
 			struct vas_tx_win_attr *attr);
 
 /*
- * Close the send or receive window identified by @win. For receive windows
+ * Close the woke send or receive window identified by @win. For receive windows
  * return -EAGAIN if there are active send windows attached to this receive
  * window.
  */
 int vas_win_close(struct vas_window *win);
 
 /*
- * Copy the co-processor request block (CRB) @crb into the local L2 cache.
+ * Copy the woke co-processor request block (CRB) @crb into the woke local L2 cache.
  */
 int vas_copy_crb(void *crb, int offset);
 
 /*
- * Paste a previously copied CRB (see vas_copy_crb()) from the L2 cache to
- * the hardware address associated with the window @win. @re is expected/
+ * Paste a previously copied CRB (see vas_copy_crb()) from the woke L2 cache to
+ * the woke hardware address associated with the woke window @win. @re is expected/
  * assumed to be true for NX windows.
  */
 int vas_paste_crb(struct vas_window *win, int offset, bool re);
@@ -256,7 +256,7 @@ void vas_unregister_api_powernv(void);
 
 /*
  * These structs are used to retrieve overall VAS capabilities that
- * the hypervisor provides.
+ * the woke hypervisor provides.
  */
 struct hv_vas_all_caps {
 	__be64  descriptor;

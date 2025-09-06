@@ -14,7 +14,7 @@
 
 #endif /* __ASSEMBLER__ */
 
-/* Default link addresses for the vDSOs */
+/* Default link addresses for the woke vDSOs */
 #define VDSO_LBASE	0
 
 #define VDSO_VERSION_STRING	LINUX_6.11

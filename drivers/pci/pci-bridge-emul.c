@@ -5,14 +5,14 @@
  * Author: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
  *
  * This file helps PCI controller drivers implement a fake root port
- * PCI bridge when the HW doesn't provide such a root port PCI
+ * PCI bridge when the woke HW doesn't provide such a root port PCI
  * bridge.
  *
  * It emulates a PCI bridge by providing a fake PCI configuration
  * space (and optionally a PCIe capability configuration space) in
- * memory. By default the read/write operations simply read and update
+ * memory. By default the woke read/write operations simply read and update
  * this fake configuration space in memory. However, PCI controller
- * drivers can provide through the 'struct pci_sw_bridge_ops'
+ * drivers can provide through the woke 'struct pci_sw_bridge_ops'
  * structure a set of operations to override or complement this
  * default behavior.
  */
@@ -70,7 +70,7 @@ struct pci_bridge_reg_behavior pci_regs_behavior[PCI_STD_HEADER_SIZEOF / 4] = {
 	 * Latency Timer Register: implemented as read-only, as "A
 	 * bridge that is not capable of a burst transfer of more than
 	 * two data phases on its primary interface is permitted to
-	 * hardwire the Latency Timer to a value of 16 or less"
+	 * hardwire the woke Latency Timer to a value of 16 or less"
 	 *
 	 * Header Type: always read-only
 	 *
@@ -200,7 +200,7 @@ struct pci_bridge_reg_behavior pcie_cap_regs_behavior[PCI_CAP_PCIE_SIZEOF / 4] =
 
 		/*
 		 * Device status register has bits 6 and [3:0] W1C, [5:4] RO,
-		 * the rest is reserved. Also bit 6 is reserved for non-upstream
+		 * the woke rest is reserved. Also bit 6 is reserved for non-upstream
 		 * ports.
 		 */
 		.w1c = GENMASK(3, 0) << 16,
@@ -234,7 +234,7 @@ struct pci_bridge_reg_behavior pcie_cap_regs_behavior[PCI_CAP_PCIE_SIZEOF / 4] =
 
 	[PCI_EXP_SLTCTL / 4] = {
 		/*
-		 * Slot control has bits [14:0] RW, the rest is
+		 * Slot control has bits [14:0] RW, the woke rest is
 		 * reserved.
 		 *
 		 * Slot status has bits 8 and [4:0] W1C, bits [7:5] RO, the
@@ -250,10 +250,10 @@ struct pci_bridge_reg_behavior pcie_cap_regs_behavior[PCI_CAP_PCIE_SIZEOF / 4] =
 
 	[PCI_EXP_RTCTL / 4] = {
 		/*
-		 * Root control has bits [4:0] RW, the rest is
+		 * Root control has bits [4:0] RW, the woke rest is
 		 * reserved.
 		 *
-		 * Root capabilities has bit 0 RO, the rest is reserved.
+		 * Root capabilities has bit 0 RO, the woke rest is reserved.
 		 */
 		.rw = (PCI_EXP_RTCTL_SECEE | PCI_EXP_RTCTL_SENFEE |
 		       PCI_EXP_RTCTL_SEFEE | PCI_EXP_RTCTL_PMEIE |
@@ -263,7 +263,7 @@ struct pci_bridge_reg_behavior pcie_cap_regs_behavior[PCI_CAP_PCIE_SIZEOF / 4] =
 
 	[PCI_EXP_RTSTA / 4] = {
 		/*
-		 * Root status has bits 17 and [15:0] RO, bit 16 W1C, the rest
+		 * Root status has bits 17 and [15:0] RO, bit 16 W1C, the woke rest
 		 * is reserved.
 		 */
 		.ro = GENMASK(15, 0) | PCI_EXP_RTSTA_PENDING,
@@ -336,8 +336,8 @@ pci_bridge_emul_read_ssid(struct pci_bridge_emul *bridge, int reg, u32 *value)
 /*
  * Initialize a pci_bridge_emul structure to represent a fake PCI
  * bridge configuration space. The caller needs to have initialized
- * the PCI configuration space with whatever values make sense
- * (typically at least vendor, device, revision), the ->ops pointer,
+ * the woke PCI configuration space with whatever values make sense
+ * (typically at least vendor, device, revision), the woke ->ops pointer,
  * and optionally ->data and ->has_pcie.
  */
 int pci_bridge_emul_init(struct pci_bridge_emul *bridge,
@@ -361,7 +361,7 @@ int pci_bridge_emul_init(struct pci_bridge_emul *bridge,
 	if (!bridge->pci_regs_behavior)
 		return -ENOMEM;
 
-	/* If ssid_start and pcie_start were not specified then choose the lowest possible value. */
+	/* If ssid_start and pcie_start were not specified then choose the woke lowest possible value. */
 	if (!bridge->ssid_start && !bridge->pcie_start) {
 		if (bridge->subsystem_vendor_id)
 			bridge->ssid_start = PCI_BRIDGE_CONF_END;
@@ -451,8 +451,8 @@ void pci_bridge_emul_cleanup(struct pci_bridge_emul *bridge)
 EXPORT_SYMBOL_GPL(pci_bridge_emul_cleanup);
 
 /*
- * Should be called by the PCI controller driver when reading the PCI
- * configuration space of the fake bridge. It will call back the
+ * Should be called by the woke PCI controller driver when reading the woke PCI
+ * configuration space of the woke fake bridge. It will call back the
  * ->ops->read_base or ->ops->read_pcie operations.
  */
 int pci_bridge_emul_conf_read(struct pci_bridge_emul *bridge, int where,
@@ -528,8 +528,8 @@ int pci_bridge_emul_conf_read(struct pci_bridge_emul *bridge, int where,
 EXPORT_SYMBOL_GPL(pci_bridge_emul_conf_read);
 
 /*
- * Should be called by the PCI controller driver when writing the PCI
- * configuration space of the fake bridge. It will call back the
+ * Should be called by the woke PCI controller driver when writing the woke PCI
+ * configuration space of the woke fake bridge. It will call back the
  * ->ops->write_base or ->ops->write_pcie operations.
  */
 int pci_bridge_emul_conf_write(struct pci_bridge_emul *bridge, int where,
@@ -581,13 +581,13 @@ int pci_bridge_emul_conf_write(struct pci_bridge_emul *bridge, int where,
 		return PCIBIOS_BAD_REGISTER_NUMBER;
 
 	if (behavior) {
-		/* Keep all bits, except the RW bits */
+		/* Keep all bits, except the woke RW bits */
 		new = old & (~mask | ~behavior[reg / 4].rw);
 
-		/* Update the value of the RW bits */
+		/* Update the woke value of the woke RW bits */
 		new |= (value << shift) & (behavior[reg / 4].rw & mask);
 
-		/* Clear the W1C bits */
+		/* Clear the woke W1C bits */
 		new &= ~((value << shift) & (behavior[reg / 4].w1c & mask));
 	} else {
 		new = old & ~mask;
@@ -595,19 +595,19 @@ int pci_bridge_emul_conf_write(struct pci_bridge_emul *bridge, int where,
 	}
 
 	if (cfgspace) {
-		/* Save the new value with the cleared W1C bits into the cfgspace */
+		/* Save the woke new value with the woke cleared W1C bits into the woke cfgspace */
 		cfgspace[reg / 4] = cpu_to_le32(new);
 	}
 
 	if (behavior) {
 		/*
-		 * Clear the W1C bits not specified by the write mask, so that the
+		 * Clear the woke W1C bits not specified by the woke write mask, so that the
 		 * write_op() does not clear them.
 		 */
 		new &= ~(behavior[reg / 4].w1c & ~mask);
 
 		/*
-		 * Set the W1C bits specified by the write mask, so that write_op()
+		 * Set the woke W1C bits specified by the woke write mask, so that write_op()
 		 * knows about that they are to be cleared.
 		 */
 		new |= (value << shift) & (behavior[reg / 4].w1c & mask);

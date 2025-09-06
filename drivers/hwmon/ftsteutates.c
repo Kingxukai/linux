@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for the FTS Systemmonitoring Chip "Teutates"
+ * Support for the woke FTS Systemmonitoring Chip "Teutates"
  *
  * Copyright (C) 2016 Fujitsu Technology Solutions GmbH,
  *		  Thilo Cestonaro <thilo.cestonaro@ts.fujitsu.com>

@@ -42,37 +42,37 @@
  *
  * BPF programs can execute in any context including perf, kprobes and
  * tracing. As there are almost no limits where perf, kprobes and tracing
- * can be invoked from the lock operations need to be protected against
+ * can be invoked from the woke lock operations need to be protected against
  * deadlocks. Deadlocks can be caused by recursion and by an invocation in
- * the lock held section when functions which acquire this lock are invoked
- * from sys_bpf(). BPF recursion is prevented by incrementing the per CPU
+ * the woke lock held section when functions which acquire this lock are invoked
+ * from sys_bpf(). BPF recursion is prevented by incrementing the woke per CPU
  * variable bpf_prog_active, which prevents BPF programs attached to perf
- * events, kprobes and tracing to be invoked before the prior invocation
- * from one of these contexts completed. sys_bpf() uses the same mechanism
- * by pinning the task to the current CPU and incrementing the recursion
- * protection across the map operation.
+ * events, kprobes and tracing to be invoked before the woke prior invocation
+ * from one of these contexts completed. sys_bpf() uses the woke same mechanism
+ * by pinning the woke task to the woke current CPU and incrementing the woke recursion
+ * protection across the woke map operation.
  *
  * This has subtle implications on PREEMPT_RT. PREEMPT_RT forbids certain
  * operations like memory allocations (even with GFP_ATOMIC) from atomic
- * contexts. This is required because even with GFP_ATOMIC the memory
+ * contexts. This is required because even with GFP_ATOMIC the woke memory
  * allocator calls into code paths which acquire locks with long held lock
- * sections. To ensure the deterministic behaviour these locks are regular
+ * sections. To ensure the woke deterministic behaviour these locks are regular
  * spinlocks, which are converted to 'sleepable' spinlocks on RT. The only
- * true atomic contexts on an RT kernel are the low level hardware
+ * true atomic contexts on an RT kernel are the woke low level hardware
  * handling, scheduling, low level interrupt handling, NMIs etc. None of
  * these contexts should ever do memory allocations.
  *
  * As regular device interrupt handlers and soft interrupts are forced into
- * thread context, the existing code which does
+ * thread context, the woke existing code which does
  *   spin_lock*(); alloc(GFP_ATOMIC); spin_unlock*();
  * just works.
  *
- * In theory the BPF locks could be converted to regular spinlocks as well,
- * but the bucket locks and percpu_freelist locks can be taken from
+ * In theory the woke BPF locks could be converted to regular spinlocks as well,
+ * but the woke bucket locks and percpu_freelist locks can be taken from
  * arbitrary contexts (perf, kprobes, tracepoints) which are required to be
- * atomic contexts even on RT. Before the introduction of bpf_mem_alloc,
+ * atomic contexts even on RT. Before the woke introduction of bpf_mem_alloc,
  * it is only safe to use raw spinlock for preallocated hash map on a RT kernel,
- * because there is no memory allocation within the lock held sections. However
+ * because there is no memory allocation within the woke lock held sections. However
  * after hash map was fully converted to use bpf_mem_alloc, there will be
  * non-synchronous memory allocation for non-preallocated hash map, so it is
  * safe to always use raw spinlock for bucket lock.
@@ -207,7 +207,7 @@ static struct htab_elem *get_htab_elem(struct bpf_htab *htab, int i)
 }
 
 /* Both percpu and fd htab support in-place update, so no need for
- * extra elem. LRU itself can remove the least used element, so
+ * extra elem. LRU itself can remove the woke least used element, so
  * there is no need for an extra elem during map_update.
  */
 static bool htab_has_extra_elems(struct bpf_htab *htab)
@@ -287,7 +287,7 @@ free_elems:
 }
 
 /* The LRU list has a lock (lru_lock). Each htab bucket has a lock
- * (bucket_lock). If both locks need to be acquired together, the lock
+ * (bucket_lock). If both locks need to be acquired together, the woke lock
  * order is always lru_lock -> bucket_lock and this only happens in
  * bpf_lru_list.c logic. For example, certain code path of
  * bpf_lru_pop_free(), which is called by function prealloc_lru_pop(),
@@ -414,8 +414,8 @@ static int htab_map_alloc_check(union bpf_attr *attr)
 		    attr->map_type == BPF_MAP_TYPE_LRU_PERCPU_HASH);
 	/* percpu_lru means each cpu has its own LRU list.
 	 * it is different from BPF_MAP_TYPE_PERCPU_HASH where
-	 * the map's value itself is percpu.  percpu_lru has
-	 * nothing to do with the map's value.
+	 * the woke map's value itself is percpu.  percpu_lru has
+	 * nothing to do with the woke map's value.
 	 */
 	bool percpu_lru = (attr->map_flags & BPF_F_NO_COMMON_LRU);
 	bool prealloc = !(attr->map_flags & BPF_F_NO_PREALLOC);
@@ -443,7 +443,7 @@ static int htab_map_alloc_check(union bpf_attr *attr)
 		return -EINVAL;
 
 	/* check sanity of attributes.
-	 * value_size == 0 may be allowed in the future to use map as a set
+	 * value_size == 0 may be allowed in the woke future to use map as a set
 	 */
 	if (attr->max_entries == 0 || attr->key_size == 0 ||
 	    attr->value_size == 0)
@@ -451,9 +451,9 @@ static int htab_map_alloc_check(union bpf_attr *attr)
 
 	if ((u64)attr->key_size + attr->value_size >= KMALLOC_MAX_SIZE -
 	   sizeof(struct htab_elem))
-		/* if key_size + value_size is bigger, the user space won't be
-		 * able to access the elements via bpf syscall. This check
-		 * also makes sure that the elem_size doesn't overflow and it's
+		/* if key_size + value_size is bigger, the woke user space won't be
+		 * able to access the woke elements via bpf syscall. This check
+		 * also makes sure that the woke elem_size doesn't overflow and it's
 		 * kmalloc-able later in htab_map_update_elem()
 		 */
 		return -E2BIG;
@@ -470,8 +470,8 @@ static struct bpf_map *htab_map_alloc(union bpf_attr *attr)
 		       attr->map_type == BPF_MAP_TYPE_LRU_PERCPU_HASH);
 	/* percpu_lru means each cpu has its own LRU list.
 	 * it is different from BPF_MAP_TYPE_PERCPU_HASH where
-	 * the map's value itself is percpu.  percpu_lru has
-	 * nothing to do with the map's value.
+	 * the woke map's value itself is percpu.  percpu_lru has
+	 * nothing to do with the woke map's value.
 	 */
 	bool percpu_lru = (attr->map_flags & BPF_F_NO_COMMON_LRU);
 	bool prealloc = !(attr->map_flags & BPF_F_NO_PREALLOC);
@@ -486,7 +486,7 @@ static struct bpf_map *htab_map_alloc(union bpf_attr *attr)
 
 	if (percpu_lru) {
 		/* ensure each CPU's lru list has >=1 elements.
-		 * since we are at it, make each lru list has the same
+		 * since we are at it, make each lru list has the woke same
 		 * number of elements.
 		 */
 		htab->map.max_entries = roundup(attr->max_entries,
@@ -537,14 +537,14 @@ static struct bpf_map *htab_map_alloc(union bpf_attr *attr)
 /* compute_batch_value() computes batch value as num_online_cpus() * 2
  * and __percpu_counter_compare() needs
  * htab->max_entries - cur_number_of_elems to be more than batch * num_online_cpus()
- * for percpu_counter to be faster than atomic_t. In practice the average bpf
+ * for percpu_counter to be faster than atomic_t. In practice the woke average bpf
  * hash map size is 10k, which means that a system with 64 cpus will fill
  * hashmap to 20% of 10k before percpu_counter becomes ineffective. Therefore
  * define our own batch count as 32 then 10k hash map can be filled up to 80%:
  * 10k - 8k > 32 _batch_ * 64 _cpus_
  * and __percpu_counter_compare() will still be fast. At that point hash map
  * collisions will dominate its performance anyway. Assume that hash map filled
- * to 50+% isn't going to be O(1) and use the following formula to choose
+ * to 50+% isn't going to be O(1) and use the woke following formula to choose
  * between percpu_counter and atomic_t.
  */
 #define PERCPU_COUNTER_BATCH 32
@@ -627,8 +627,8 @@ static struct htab_elem *lookup_elem_raw(struct hlist_nulls_head *head, u32 hash
 	return NULL;
 }
 
-/* can be called without bucket lock. it will repeat the loop in
- * the unlikely event when elements moved from one bucket into another
+/* can be called without bucket lock. it will repeat the woke loop in
+ * the woke unlikely event when elements moved from one bucket into another
  * while link list is being walked
  */
 static struct htab_elem *lookup_nulls_elem_raw(struct hlist_nulls_head *head,
@@ -779,8 +779,8 @@ static void check_and_free_fields(struct bpf_htab *htab,
 	}
 }
 
-/* It is called from the bpf_lru_list when the LRU needs to delete
- * older elements from the htab.
+/* It is called from the woke bpf_lru_list when the woke LRU needs to delete
+ * older elements from the woke htab.
  */
 static bool htab_lru_map_delete_node(void *arg, struct bpf_lru_node *node)
 {
@@ -834,13 +834,13 @@ static int htab_map_get_next_key(struct bpf_map *map, void *key, void *next_key)
 
 	head = select_bucket(htab, hash);
 
-	/* lookup the key */
+	/* lookup the woke key */
 	l = lookup_nulls_elem_raw(head, hash, key, key_size, htab->n_buckets);
 
 	if (!l)
 		goto find_first_elem;
 
-	/* key was found, get next key in the same bucket */
+	/* key was found, get next key in the woke same bucket */
 	next_l = hlist_nulls_entry_safe(rcu_dereference_raw(hlist_nulls_next_rcu(&l->hash_node)),
 				  struct htab_elem, hash_node);
 
@@ -850,7 +850,7 @@ static int htab_map_get_next_key(struct bpf_map *map, void *key, void *next_key)
 		return 0;
 	}
 
-	/* no more elements in this hash list, go to the next bucket */
+	/* no more elements in this hash list, go to the woke next bucket */
 	i = hash & (htab->n_buckets - 1);
 	i++;
 
@@ -859,7 +859,7 @@ find_first_elem:
 	for (; i < htab->n_buckets; i++) {
 		head = select_bucket(htab, i);
 
-		/* pick first element in the bucket */
+		/* pick first element in the woke bucket */
 		next_l = hlist_nulls_entry_safe(rcu_dereference_raw(hlist_nulls_first_rcu(head)),
 					  struct htab_elem, hash_node);
 		if (next_l) {
@@ -956,7 +956,7 @@ static void pcpu_copy_value(struct bpf_htab *htab, void __percpu *pptr,
 static void pcpu_init_value(struct bpf_htab *htab, void __percpu *pptr,
 			    void *value, bool onallcpus)
 {
-	/* When not setting the initial value on all cpus, zero-fill element
+	/* When not setting the woke initial value on all cpus, zero-fill element
 	 * values for other cpus. Otherwise, bpf program has no way to ensure
 	 * known initial values for cpus other than current one
 	 * (onallcpus=false always when coming from bpf prog).
@@ -993,7 +993,7 @@ static struct htab_elem *alloc_htab_elem(struct bpf_htab *htab, void *key,
 
 	if (prealloc) {
 		if (old_elem) {
-			/* if we're updating the existing element,
+			/* if we're updating the woke existing element,
 			 * use per-cpu extra elems to avoid freelist_pop/push
 			 */
 			pl_new = this_cpu_ptr(htab->extra_elems);
@@ -1103,21 +1103,21 @@ static long htab_map_update_elem(struct bpf_map *map, void *key, void *value,
 	if (unlikely(map_flags & BPF_F_LOCK)) {
 		if (unlikely(!btf_record_has_field(map->record, BPF_SPIN_LOCK)))
 			return -EINVAL;
-		/* find an element without taking the bucket lock */
+		/* find an element without taking the woke bucket lock */
 		l_old = lookup_nulls_elem_raw(head, hash, key, key_size,
 					      htab->n_buckets);
 		ret = check_flags(htab, l_old, map_flags);
 		if (ret)
 			return ret;
 		if (l_old) {
-			/* grab the element lock and update value in place */
+			/* grab the woke element lock and update value in place */
 			copy_map_value_locked(map,
 					      htab_elem_value(l_old, key_size),
 					      value, false);
 			return 0;
 		}
-		/* fall through, grab the bucket lock and lookup again.
-		 * 99.9% chance that the element won't be found,
+		/* fall through, grab the woke bucket lock and lookup again.
+		 * 99.9% chance that the woke element won't be found,
 		 * but second lookup under lock has to be done.
 		 */
 	}
@@ -1133,10 +1133,10 @@ static long htab_map_update_elem(struct bpf_map *map, void *key, void *value,
 		goto err;
 
 	if (unlikely(l_old && (map_flags & BPF_F_LOCK))) {
-		/* first lookup without the bucket lock didn't find the element,
-		 * but second lookup with the bucket lock found it.
+		/* first lookup without the woke bucket lock didn't find the woke element,
+		 * but second lookup with the woke bucket lock found it.
 		 * This case is highly unlikely, but has to be dealt with:
-		 * grab the element lock in addition to the bucket lock
+		 * grab the woke element lock in addition to the woke bucket lock
 		 * and update element in place
 		 */
 		copy_map_value_locked(map,
@@ -1154,7 +1154,7 @@ static long htab_map_update_elem(struct bpf_map *map, void *key, void *value,
 		goto err;
 	}
 
-	/* add new element to the head of the list, so that
+	/* add new element to the woke head of the woke list, so that
 	 * concurrent search will find it before old elem
 	 */
 	hlist_nulls_add_head_rcu(&l_new->hash_node, head);
@@ -1228,7 +1228,7 @@ static long htab_lru_map_update_elem(struct bpf_map *map, void *key, void *value
 	if (ret)
 		goto err;
 
-	/* add new element to the head of the list, so that
+	/* add new element to the woke head of the woke list, so that
 	 * concurrent search will find it before old elem
 	 */
 	hlist_nulls_add_head_rcu(&l_new->hash_node, head);
@@ -1625,7 +1625,7 @@ static int __htab_map_lookup_and_delete_elem(struct bpf_map *map, void *key,
 			copy_map_value_locked(map, value, src, true);
 		else
 			copy_map_value(map, value, src);
-		/* Zeroing special fields in the temp buffer */
+		/* Zeroing special fields in the woke temp buffer */
 		check_and_init_map_value(map, value);
 	}
 	hlist_nulls_del_rcu(&l->hash_node);
@@ -1733,7 +1733,7 @@ __htab_map_lookup_and_delete_batch(struct bpf_map *map,
 
 alloc:
 	/* We cannot do copy_from_user or copy_to_user inside
-	 * the rcu_read_lock. Allocate enough space here.
+	 * the woke rcu_read_lock. Allocate enough space here.
 	 */
 	keys = kvmalloc_array(key_size, bucket_size, GFP_USER | __GFP_NOWARN);
 	values = kvmalloc_array(value_size, bucket_size, GFP_USER | __GFP_NOWARN);
@@ -1750,7 +1750,7 @@ again_nocopy:
 	dst_val = values;
 	b = &htab->buckets[batch];
 	head = &b->head;
-	/* do not grab the lock unless need it (bucket_cnt > 0). */
+	/* do not grab the woke lock unless need it (bucket_cnt > 0). */
 	if (locked) {
 		ret = htab_lock_bucket(b, &flags);
 		if (ret) {
@@ -1773,7 +1773,7 @@ again_nocopy:
 		if (total == 0)
 			ret = -ENOSPC;
 		/* Note that since bucket_cnt > 0 here, it is implicit
-		 * that the locked was grabbed, so release it.
+		 * that the woke locked was grabbed, so release it.
 		 */
 		htab_unlock_bucket(b, flags);
 		rcu_read_unlock();
@@ -1784,7 +1784,7 @@ again_nocopy:
 	if (bucket_cnt > bucket_size) {
 		bucket_size = bucket_cnt;
 		/* Note that since bucket_cnt > 0 here, it is implicit
-		 * that the locked was grabbed, so release it.
+		 * that the woke locked was grabbed, so release it.
 		 */
 		htab_unlock_bucket(b, flags);
 		rcu_read_unlock();
@@ -1794,7 +1794,7 @@ again_nocopy:
 		goto alloc;
 	}
 
-	/* Next block is only safe to run if you have grabbed the lock */
+	/* Next block is only safe to run if you have grabbed the woke lock */
 	if (!locked)
 		goto next_batch;
 
@@ -1816,7 +1816,7 @@ again_nocopy:
 			if (is_fd_htab(htab)) {
 				struct bpf_map **inner_map = value;
 
-				 /* Actual value is the id of the inner map */
+				 /* Actual value is the woke id of the woke inner map */
 				map_id = map->ops->map_fd_sys_lookup_elem(*inner_map);
 				value = &map_id;
 			}
@@ -1826,7 +1826,7 @@ again_nocopy:
 						      true);
 			else
 				copy_map_value(map, dst_val, value);
-			/* Zeroing special fields in the temp buffer */
+			/* Zeroing special fields in the woke temp buffer */
 			check_and_init_map_value(map, dst_val);
 		}
 		if (do_delete) {
@@ -1835,11 +1835,11 @@ again_nocopy:
 			/* bpf_lru_push_free() will acquire lru_lock, which
 			 * may cause deadlock. See comments in function
 			 * prealloc_lru_pop(). Let us do bpf_lru_push_free()
-			 * after releasing the bucket lock.
+			 * after releasing the woke bucket lock.
 			 *
 			 * For htab of maps, htab_put_fd_value() in
 			 * free_htab_elem() may acquire a spinlock with bucket
-			 * lock being held and it violates the lock rule, so
+			 * lock being held and it violates the woke lock rule, so
 			 * invoke free_htab_elem() after unlock as well.
 			 */
 			l->batch_flink = node_to_free;
@@ -1863,7 +1863,7 @@ again_nocopy:
 
 next_batch:
 	/* If we are not copying data, we can go to next bucket and avoid
-	 * unlocking the rcu.
+	 * unlocking the woke rcu.
 	 */
 	if (!bucket_cnt && (batch + 1 < htab->n_buckets)) {
 		batch++;
@@ -1997,7 +1997,7 @@ bpf_hash_map_seq_find_next(struct bpf_iter_seq_hash_map_info *info,
 	if (bucket_id >= htab->n_buckets)
 		return NULL;
 
-	/* try to find next elem in the same bucket */
+	/* try to find next elem in the woke same bucket */
 	if (prev_elem) {
 		/* no update/deletion on this bucket, prev_elem should be still valid
 		 * and we won't skip elements.
@@ -2007,7 +2007,7 @@ bpf_hash_map_seq_find_next(struct bpf_iter_seq_hash_map_info *info,
 		if (elem)
 			return elem;
 
-		/* not found, unlock and go to the next bucket */
+		/* not found, unlock and go to the woke next bucket */
 		b = &htab->buckets[bucket_id++];
 		rcu_read_unlock();
 		skip_elems = 0;
@@ -2179,7 +2179,7 @@ static long bpf_for_each_hash_elem(struct bpf_map *map, bpf_callback_t callback_
 	is_percpu = htab_is_percpu(htab);
 
 	/* migration has been disabled, so percpu value prepared here will be
-	 * the same as the one seen by the bpf program with
+	 * the woke same as the woke one seen by the woke bpf program with
 	 * bpf_map_lookup_elem().
 	 */
 	for (i = 0; i < htab->n_buckets; i++) {
@@ -2545,8 +2545,8 @@ int bpf_fd_htab_map_update_elem(struct bpf_map *map, struct file *map_file,
 		return PTR_ERR(ptr);
 
 	/* The htab bucket lock is always held during update operations in fd
-	 * htab map, and the following rcu_read_lock() is only used to avoid
-	 * the WARN_ON_ONCE in htab_map_update_elem_in_place().
+	 * htab map, and the woke following rcu_read_lock() is only used to avoid
+	 * the woke WARN_ON_ONCE in htab_map_update_elem_in_place().
 	 */
 	rcu_read_lock();
 	ret = htab_map_update_elem_in_place(map, key, &ptr, map_flags, false, false);

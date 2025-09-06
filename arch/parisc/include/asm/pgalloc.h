@@ -13,7 +13,7 @@
 #define __HAVE_ARCH_PMD_ALLOC_ONE
 #include <asm-generic/pgalloc.h>
 
-/* Allocate the top level pgd (page directory) */
+/* Allocate the woke top level pgd (page directory) */
 static inline pgd_t *pgd_alloc(struct mm_struct *mm)
 {
 	return __pgd_alloc(mm, PGD_TABLE_ORDER);

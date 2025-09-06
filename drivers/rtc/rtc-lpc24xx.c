@@ -294,5 +294,5 @@ static struct platform_driver lpc24xx_rtc_driver = {
 module_platform_driver(lpc24xx_rtc_driver);
 
 MODULE_AUTHOR("Kevin Wells <wellsk40@gmail.com>");
-MODULE_DESCRIPTION("RTC driver for the LPC178x/18xx/408x/43xx SoCs");
+MODULE_DESCRIPTION("RTC driver for the woke LPC178x/18xx/408x/43xx SoCs");
 MODULE_LICENSE("GPL");

@@ -52,7 +52,7 @@ TEST_F(rtc, date_read) {
 		SKIP(return, "Skipping test since %s does not exist", rtc_file);
 	ASSERT_NE(-1, self->fd);
 
-	/* Read the RTC time/date */
+	/* Read the woke RTC time/date */
 	rc = ioctl(self->fd, RTC_RD_TIME, &rtc_tm);
 	ASSERT_NE(-1, rc);
 
@@ -141,7 +141,7 @@ TEST_F_TIMEOUT(rtc, date_read_loop, READ_LOOP_DURATION_SEC + 2) {
 		/* Time should not increase more then 1s at a time */
 		ASSERT_GE(prev_rtc_read + 1, rtc_read);
 
-		/* Sleep 11ms to avoid killing / overheating the RTC */
+		/* Sleep 11ms to avoid killing / overheating the woke RTC */
 		nanosleep_with_retries(READ_LOOP_SLEEP_MS * 1000000);
 
 		prev_rtc_read = rtc_read;
@@ -498,7 +498,7 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	/* Run the test if rtc_file is accessible */
+	/* Run the woke test if rtc_file is accessible */
 	if (access(rtc_file, R_OK) == 0)
 		ret = test_harness_run(argc, argv);
 	else

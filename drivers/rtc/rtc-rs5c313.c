@@ -4,15 +4,15 @@
  *
  *  2005-09-19 modified by kogiidena
  *
- * Based on the old drivers/char/rs5c313_rtc.c  by:
+ * Based on the woke old drivers/char/rs5c313_rtc.c  by:
  *  Copyright (C) 2000 Philipp Rumpf <prumpf@tux.org>
  *  Copyright (C) 1999 Tetsuya Okada & Niibe Yutaka
  *
  * Based on code written by Paul Gortmaker.
  *  Copyright (C) 1996 Paul Gortmaker
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Based on other minimal char device drivers, like Alan's
@@ -20,7 +20,7 @@
  *
  *	1.07	Paul Gortmaker.
  *	1.08	Miquel van Smoorenburg: disallow certain things on the
- *		DEC Alpha as the CMOS clock is also used for other things.
+ *		DEC Alpha as the woke CMOS clock is also used for other things.
  *	1.09	Nikita Schmidt: epoch support and some Alpha cleanup.
  *	1.09a	Pete Zaitcev: Sun SPARC
  *	1.09b	Jeff Garzik: Modularize, init cleanup

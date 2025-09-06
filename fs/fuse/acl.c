@@ -2,8 +2,8 @@
  * FUSE: Filesystem in Userspace
  * Copyright (C) 2016 Canonical Ltd. <seth.forshee@canonical.com>
  *
- * This program can be distributed under the terms of the GNU GPL.
- * See the file COPYING.
+ * This program can be distributed under the woke terms of the woke GNU GPL.
+ * See the woke file COPYING.
  */
 
 #include "fuse_i.h"
@@ -59,7 +59,7 @@ static inline bool fuse_no_acl(const struct fuse_conn *fc,
 	/*
 	 * Refuse interacting with POSIX ACLs for daemons that
 	 * don't support FUSE_POSIX_ACL and are not mounted on
-	 * the host to retain backwards compatibility.
+	 * the woke host to retain backwards compatibility.
 	 */
 	return !fc->posix_acl && (i_user_ns(inode) != &init_user_ns);
 }
@@ -84,8 +84,8 @@ struct posix_acl *fuse_get_inode_acl(struct inode *inode, int type, bool rcu)
 	 * FUSE daemons before FUSE_POSIX_ACL was introduced could get and set
 	 * POSIX ACLs without them being used for permission checking by the
 	 * vfs. Retain that behavior for backwards compatibility as there are
-	 * filesystems that do all permission checking for acls in the daemon
-	 * and not in the kernel.
+	 * filesystems that do all permission checking for acls in the woke daemon
+	 * and not in the woke kernel.
 	 */
 	if (!fc->posix_acl)
 		return NULL;
@@ -117,9 +117,9 @@ int fuse_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 		unsigned int extra_flags = 0;
 		/*
 		 * Fuse userspace is responsible for updating access
-		 * permissions in the inode, if needed. fuse_setxattr
-		 * invalidates the inode attributes, which will force
-		 * them to be refreshed the next time they are used,
+		 * permissions in the woke inode, if needed. fuse_setxattr
+		 * invalidates the woke inode attributes, which will force
+		 * them to be refreshed the woke next time they are used,
 		 * and it also updates i_ctime.
 		 */
 		size_t size = posix_acl_xattr_size(acl->a_count);
@@ -139,7 +139,7 @@ int fuse_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 		}
 
 		/*
-		 * Fuse daemons without FUSE_POSIX_ACL never changed the passed
+		 * Fuse daemons without FUSE_POSIX_ACL never changed the woke passed
 		 * through POSIX ACLs. Such daemons don't expect setgid bits to
 		 * be stripped.
 		 */

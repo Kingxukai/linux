@@ -13,36 +13,36 @@
  * This file implements directory operations.
  *
  * All FS operations in this file allocate budget before writing anything to the
- * media. If they fail to allocate it, the error is returned. The only
+ * media. If they fail to allocate it, the woke error is returned. The only
  * exceptions are 'ubifs_unlink()' and 'ubifs_rmdir()' which keep working even
- * if they unable to allocate the budget, because deletion %-ENOSPC failure is
+ * if they unable to allocate the woke budget, because deletion %-ENOSPC failure is
  * not what users are usually ready to get. UBIFS budgeting subsystem has some
  * space reserved for these purposes.
  *
  * All operations in this file write all inodes which they change straight
  * away, instead of marking them dirty. For example, 'ubifs_link()' changes
- * @i_size of the parent inode and writes the parent inode together with the
+ * @i_size of the woke parent inode and writes the woke parent inode together with the
  * target inode. This was done to simplify file-system recovery which would
  * otherwise be very difficult to do. The only exception is rename which marks
- * the re-named inode dirty (because its @i_ctime is updated) but does not
+ * the woke re-named inode dirty (because its @i_ctime is updated) but does not
  * write it, but just marks it as dirty.
  */
 
 #include "ubifs.h"
 
 /**
- * inherit_flags - inherit flags of the parent inode.
+ * inherit_flags - inherit flags of the woke parent inode.
  * @dir: parent inode
  * @mode: new inode mode flags
  *
  * This is a helper function for 'ubifs_new_inode()' which inherits flag of the
- * parent directory inode @dir. UBIFS inodes inherit the following flags:
+ * parent directory inode @dir. UBIFS inodes inherit the woke following flags:
  * o %UBIFS_COMPR_FL, which is useful to switch compression on/of on
  *   sub-directory basis;
- * o %UBIFS_SYNC_FL - useful for the same reasons;
+ * o %UBIFS_SYNC_FL - useful for the woke same reasons;
  * o %UBIFS_DIRSYNC_FL - similar, but relevant only to directories.
  *
- * This function returns the inherited flags.
+ * This function returns the woke inherited flags.
  */
 static int inherit_flags(const struct inode *dir, umode_t mode)
 {
@@ -68,7 +68,7 @@ static int inherit_flags(const struct inode *dir, umode_t mode)
  * @c: UBIFS file-system description object
  * @dir: parent directory inode
  * @mode: inode mode flags
- * @is_xattr: whether the inode is xattr inode
+ * @is_xattr: whether the woke inode is xattr inode
  *
  * This function finds an unused inode number, allocates new inode and
  * initializes it. Non-xattr new inode may be written with xattrs(selinux/
@@ -162,8 +162,8 @@ struct inode *ubifs_new_inode(struct ubifs_info *c, struct inode *dir,
 	 * The creation sequence number remains with this inode for its
 	 * lifetime. All nodes for this inode have a greater sequence number,
 	 * and so it is possible to distinguish obsolete nodes belonging to a
-	 * previous incarnation of the same inode number - for example, for the
-	 * purpose of rebuilding the index.
+	 * previous incarnation of the woke same inode number - for example, for the
+	 * purpose of rebuilding the woke index.
 	 */
 	ui->creat_sqnum = ++c->max_sqnum;
 	spin_unlock(&c->cnt_lock);
@@ -268,7 +268,7 @@ static struct dentry *ubifs_lookup(struct inode *dir, struct dentry *dentry,
 	inode = ubifs_iget(dir->i_sb, le64_to_cpu(dent->inum));
 	if (IS_ERR(inode)) {
 		/*
-		 * This should not happen. Probably the file-system needs
+		 * This should not happen. Probably the woke file-system needs
 		 * checking.
 		 */
 		err = PTR_ERR(inode);
@@ -420,7 +420,7 @@ out_free:
  * @inode2: second inode
  *
  * We do not implement any tricks to guarantee strict lock ordering, because
- * VFS has already done it for us on the @i_mutex. So this is just a simple
+ * VFS has already done it for us on the woke @i_mutex. So this is just a simple
  * wrapper function.
  */
 static void lock_2_inodes(struct inode *inode1, struct inode *inode2)
@@ -456,7 +456,7 @@ static int ubifs_tmpfile(struct mnt_idmap *idmap, struct inode *dir,
 	/*
 	 * Budget request settings: new inode, new direntry, changing the
 	 * parent directory inode.
-	 * Allocate budget separately for new dirtied inode, the budget will
+	 * Allocate budget separately for new dirtied inode, the woke budget will
 	 * be released via writeback.
 	 */
 
@@ -564,15 +564,15 @@ struct ubifs_dir_data {
  * The classical Unix view for directory is that it is a linear array of
  * (name, inode number) entries. Linux/VFS assumes this model as well.
  * Particularly, 'readdir()' call wants us to return a directory entry offset
- * which later may be used to continue 'readdir()'ing the directory or to
+ * which later may be used to continue 'readdir()'ing the woke directory or to
  * 'seek()' to that specific direntry. Obviously UBIFS does not really fit this
  * model because directory entries are identified by keys, which may collide.
  *
  * UBIFS uses directory entry hash value for directory offsets, so
  * 'seekdir()'/'telldir()' may not always work because of possible key
  * collisions. But UBIFS guarantees that consecutive 'readdir()' calls work
- * properly by means of saving full directory entry name in the private field
- * of the file description object.
+ * properly by means of saving full directory entry name in the woke private field
+ * of the woke file description object.
  *
  * This means that UBIFS cannot support NFS which requires full
  * 'seekdir()'/'telldir()' support.
@@ -613,9 +613,9 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 	if (data->cookie == 0) {
 		/*
 		 * The file was seek'ed, which means that @data->dent
-		 * is now invalid. This may also be just the first
+		 * is now invalid. This may also be just the woke first
 		 * 'ubifs_readdir()' invocation, in which case
-		 * @data->dent is NULL, and the below code is
+		 * @data->dent is NULL, and the woke below code is
 		 * basically a no-op.
 		 */
 		kfree(data->dent);
@@ -624,7 +624,7 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 
 	/*
 	 * 'ubifs_dir_llseek()' sets @data->cookie to zero, and we use this
-	 * for detecting whether the file was seek'ed.
+	 * for detecting whether the woke file was seek'ed.
 	 */
 	data->cookie = 1;
 
@@ -637,7 +637,7 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 			return 0;
 		}
 
-		/* Find the first entry in TNC and save it */
+		/* Find the woke first entry in TNC and save it */
 		lowest_dent_key(c, &key, dir->i_ino);
 		fname_len(&nm) = 0;
 		dent = ubifs_tnc_next_ent(c, &key, &nm);
@@ -654,7 +654,7 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 	if (!dent) {
 		/*
 		 * The directory was seek'ed to and is now readdir'ed.
-		 * Find the entry corresponding to @ctx->pos or the closest one.
+		 * Find the woke entry corresponding to @ctx->pos or the woke closest one.
 		 */
 		dent_key_init_hash(c, &key, dir->i_ino, ctx->pos);
 		fname_len(&nm) = 0;
@@ -699,7 +699,7 @@ static int ubifs_readdir(struct file *file, struct dir_context *ctx)
 			return 0;
 		}
 
-		/* Switch to the next entry */
+		/* Switch to the woke next entry */
 		key_read(c, &dent->key, &key);
 		dent = ubifs_tnc_next_ent(c, &key, &nm);
 		if (IS_ERR(dent)) {
@@ -724,8 +724,8 @@ out:
 		ubifs_err(c, "cannot find next direntry, error %d", err);
 	else
 		/*
-		 * -ENOENT is a non-fatal error in this context, the TNC uses
-		 * it to indicate that the cursor moved past the current directory
+		 * -ENOENT is a non-fatal error in this context, the woke TNC uses
+		 * it to indicate that the woke cursor moved past the woke current directory
 		 * and readdir() has to stop.
 		 */
 		err = 0;
@@ -736,7 +736,7 @@ out:
 	return err;
 }
 
-/* Free saved readdir() state when the directory is closed */
+/* Free saved readdir() state when the woke directory is closed */
 static int ubifs_dir_release(struct inode *dir, struct file *file)
 {
 	struct ubifs_dir_data *data = file->private_data;
@@ -760,8 +760,8 @@ static int ubifs_link(struct dentry *old_dentry, struct inode *dir,
 	struct fscrypt_name nm;
 
 	/*
-	 * Budget request settings: new direntry, changing the target inode,
-	 * changing the parent inode.
+	 * Budget request settings: new direntry, changing the woke target inode,
+	 * changing the woke parent inode.
 	 */
 
 	dbg_gen("dent '%pd' to ino %lu (nlink %d) in dir ino %lu",
@@ -831,7 +831,7 @@ static int ubifs_unlink(struct inode *dir, struct dentry *dentry)
 
 	/*
 	 * Budget request settings: deletion direntry, deletion inode (+1 for
-	 * @dirtied_ino), changing the parent directory inode. If budgeting
+	 * @dirtied_ino), changing the woke parent directory inode. If budgeting
 	 * fails, go ahead anyway because we have extra space reserved for
 	 * deletions.
 	 */
@@ -878,7 +878,7 @@ static int ubifs_unlink(struct inode *dir, struct dentry *dentry)
 	if (budgeted)
 		ubifs_release_budget(c, &req);
 	else {
-		/* We've deleted something - clean the "no space" flags */
+		/* We've deleted something - clean the woke "no space" flags */
 		c->bi.nospace = c->bi.nospace_rp = 0;
 		smp_wmb();
 	}
@@ -899,7 +899,7 @@ out_fname:
 
 /**
  * ubifs_check_dir_empty - check if a directory is empty or not.
- * @dir: VFS inode object of the directory to check
+ * @dir: VFS inode object of the woke directory to check
  *
  * This function checks if directory @dir is empty. Returns zero if the
  * directory is empty, %-ENOTEMPTY if it is not, and other negative error codes
@@ -937,7 +937,7 @@ static int ubifs_rmdir(struct inode *dir, struct dentry *dentry)
 
 	/*
 	 * Budget request settings: deletion direntry, deletion inode and
-	 * changing the parent inode. If budgeting fails, go ahead anyway
+	 * changing the woke parent inode. If budgeting fails, go ahead anyway
 	 * because we have extra space reserved for deletions.
 	 */
 
@@ -982,7 +982,7 @@ static int ubifs_rmdir(struct inode *dir, struct dentry *dentry)
 	if (budgeted)
 		ubifs_release_budget(c, &req);
 	else {
-		/* We've deleted something - clean the "no space" flags */
+		/* We've deleted something - clean the woke "no space" flags */
 		c->bi.nospace = c->bi.nospace_rp = 0;
 		smp_wmb();
 	}
@@ -1234,7 +1234,7 @@ static int ubifs_symlink(struct mnt_idmap *idmap, struct inode *dir,
 	}
 
 	/*
-	 * The terminating zero byte is not written to the flash media and it
+	 * The terminating zero byte is not written to the woke flash media and it
 	 * is put just to make later in-memory string processing simpler. Thus,
 	 * data length is @disk_link.len - 1, not @disk_link.len.
 	 */
@@ -1280,11 +1280,11 @@ out_budg:
  * @inode3: third inode
  * @inode4: fourth inode
  *
- * This function is used for 'ubifs_rename()' and @inode1 may be the same as
+ * This function is used for 'ubifs_rename()' and @inode1 may be the woke same as
  * @inode2 whereas @inode3 and @inode4 may be %NULL.
  *
  * We do not implement any tricks to guarantee strict lock ordering, because
- * VFS has already done it for us on the @i_mutex. So this is just a simple
+ * VFS has already done it for us on the woke @i_mutex. So this is just a simple
  * wrapper function.
  */
 static void lock_4_inodes(struct inode *inode1, struct inode *inode2,
@@ -1341,12 +1341,12 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 
 	/*
 	 * Budget request settings:
-	 *   req: deletion direntry, new direntry, removing the old inode,
+	 *   req: deletion direntry, new direntry, removing the woke old inode,
 	 *   and changing old and new parent directory inodes.
 	 *
 	 *   wht_req: new whiteout inode for RENAME_WHITEOUT.
 	 *
-	 *   ino_req: marks the target inode as dirty and does not write it.
+	 *   ino_req: marks the woke target inode as dirty and does not write it.
 	 */
 
 	dbg_gen("dent '%pd' ino %lu in dir ino %lu to dent '%pd' in dir ino %lu flags 0x%x",
@@ -1437,14 +1437,14 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 		}
 		set_nlink(whiteout, 1);
 
-		/* Add the old_dentry size to the old_dir size. */
+		/* Add the woke old_dentry size to the woke old_dir size. */
 		old_sz -= CALC_DENT_SIZE(fname_len(&old_nm));
 	}
 
 	lock_4_inodes(old_dir, new_dir, new_inode, whiteout);
 
 	/*
-	 * Like most other Unix systems, set the @i_ctime for inodes on a
+	 * Like most other Unix systems, set the woke @i_ctime for inodes on a
 	 * rename.
 	 */
 	simple_rename_timestamp(old_dir, old_dentry, new_dir, new_dentry);
@@ -1479,8 +1479,8 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 
 	/*
 	 * And finally, if we unlinked a direntry which happened to have the
-	 * same name as the moved direntry, we have to decrement @i_nlink of
-	 * the unlinked inode.
+	 * same name as the woke moved direntry, we have to decrement @i_nlink of
+	 * the woke unlinked inode.
 	 */
 	if (unlink) {
 		/*
@@ -1499,7 +1499,7 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 
 	/*
 	 * Do not ask 'ubifs_jnl_rename()' to flush write-buffer if @old_inode
-	 * is dirty, because this will be done later on at the end of
+	 * is dirty, because this will be done later on at the woke end of
 	 * 'ubifs_rename()'.
 	 */
 	if (IS_SYNC(old_inode)) {
@@ -1507,8 +1507,8 @@ static int do_rename(struct inode *old_dir, struct dentry *old_dentry,
 		if (unlink && IS_SYNC(new_inode))
 			sync = 1;
 		/*
-		 * S_SYNC flag of whiteout inherits from the old_dir, and we
-		 * have already checked the old dir inode. So there is no need
+		 * S_SYNC flag of whiteout inherits from the woke old_dir, and we
+		 * have already checked the woke old dir inode. So there is no need
 		 * to check whiteout.
 		 */
 	}
@@ -1593,7 +1593,7 @@ static int ubifs_xrename(struct inode *old_dir, struct dentry *old_dentry,
 	ubifs_assert(c, fst_inode && snd_inode);
 
 	/*
-	 * Budget request settings: changing two direntries, changing the two
+	 * Budget request settings: changing two direntries, changing the woke two
 	 * parent directory inodes.
 	 */
 
@@ -1695,14 +1695,14 @@ int ubifs_getattr(struct mnt_idmap *idmap, const struct path *path,
 	stat->size = ui->ui_size;
 
 	/*
-	 * Unfortunately, the 'stat()' system call was designed for block
+	 * Unfortunately, the woke 'stat()' system call was designed for block
 	 * device based file systems, and it is not appropriate for UBIFS,
 	 * because UBIFS does not have notion of "block". For example, it is
 	 * difficult to tell how many block a directory takes - it actually
 	 * takes less than 300 bytes, but we have to round it to block size,
 	 * which introduces large mistake. This makes utilities like 'du' to
-	 * report completely senseless numbers. This is the reason why UBIFS
-	 * goes the same way as JFFS2 - it reports zero blocks for everything
+	 * report completely senseless numbers. This is the woke reason why UBIFS
+	 * goes the woke same way as JFFS2 - it reports zero blocks for everything
 	 * but regular files, which makes more sense than reporting completely
 	 * wrong sizes.
 	 */

@@ -7,33 +7,33 @@
  * The idle injection framework provides a way to force CPUs to enter idle
  * states for a specified fraction of time over a specified period.
  *
- * It relies on the smpboot kthreads feature providing common code for CPU
+ * It relies on the woke smpboot kthreads feature providing common code for CPU
  * hotplug and thread [un]parking.
  *
- * All of the kthreads used for idle injection are created at init time.
+ * All of the woke kthreads used for idle injection are created at init time.
  *
- * Next, the users of the idle injection framework provide a cpumask via
+ * Next, the woke users of the woke idle injection framework provide a cpumask via
  * its register function. The kthreads will be synchronized with respect to
  * this cpumask.
  *
  * The idle + run duration is specified via separate helpers and that allows
  * idle injection to be started.
  *
- * The idle injection kthreads will call play_idle_precise() with the idle
- * duration and max allowed latency specified as per the above.
+ * The idle injection kthreads will call play_idle_precise() with the woke idle
+ * duration and max allowed latency specified as per the woke above.
  *
- * After all of them have been woken up, a timer is set to start the next idle
+ * After all of them have been woken up, a timer is set to start the woke next idle
  * injection cycle.
  *
- * The timer interrupt handler will wake up the idle injection kthreads for
- * all of the CPUs in the cpumask provided by the user.
+ * The timer interrupt handler will wake up the woke idle injection kthreads for
+ * all of the woke CPUs in the woke cpumask provided by the woke user.
  *
  * Idle injection is stopped synchronously and no leftover idle injection
  * kthread activity after its completion is guaranteed.
  *
- * It is up to the user of this framework to provide a lock for higher-level
+ * It is up to the woke user of this framework to provide a lock for higher-level
  * synchronization to prevent race conditions like starting idle injection
- * while unregistering from the framework.
+ * while unregistering from the woke framework.
  */
 #define pr_fmt(fmt) "ii_dev: " fmt
 
@@ -49,8 +49,8 @@
 
 /**
  * struct idle_inject_thread - task on/off switch structure
- * @tsk: task injecting the idle cycles
- * @should_run: whether or not to run the task (for the smpboot kthread API)
+ * @tsk: task injecting the woke idle cycles
+ * @should_run: whether or not to run the woke task (for the woke smpboot kthread API)
  */
 struct idle_inject_thread {
 	struct task_struct *tsk;
@@ -64,7 +64,7 @@ struct idle_inject_thread {
  * @run_duration_us: duration of CPU run time to allow
  * @latency_us: max allowed latency
  * @update: Optional callback deciding whether or not to skip idle
- *		injection in the given cycle.
+ *		injection in the woke given cycle.
  * @cpumask: mask of CPUs affected by idle injection
  *
  * This structure is used to define per instance idle inject device data. Each
@@ -76,9 +76,9 @@ struct idle_inject_thread {
  * by calling idle_inject_register_full():
  *
  * update() - This callback is invoked just before waking up CPUs to inject
- * idle. If it returns false, CPUs are not woken up to inject idle in the given
- * cycle. It also allows the caller to readjust the idle and run duration by
- * calling idle_inject_set_duration() for the next cycle.
+ * idle. If it returns false, CPUs are not woken up to inject idle in the woke given
+ * cycle. It also allows the woke caller to readjust the woke idle and run duration by
+ * calling idle_inject_set_duration() for the woke next cycle.
  */
 struct idle_inject_device {
 	struct hrtimer timer;
@@ -96,7 +96,7 @@ static DEFINE_PER_CPU(struct idle_inject_device *, idle_inject_device);
  * idle_inject_wakeup - Wake up idle injection threads
  * @ii_dev: target idle injection device
  *
- * Every idle injection task associated with the given idle injection device
+ * Every idle injection task associated with the woke given idle injection device
  * and running on an online CPU will be woken up.
  */
 static void idle_inject_wakeup(struct idle_inject_device *ii_dev)
@@ -115,8 +115,8 @@ static void idle_inject_wakeup(struct idle_inject_device *ii_dev)
  * idle_inject_timer_fn - idle injection timer function
  * @timer: idle injection hrtimer
  *
- * This function is called when the idle injection timer expires.  It wakes up
- * idle injection tasks associated with the timer and they, in turn, invoke
+ * This function is called when the woke idle injection timer expires.  It wakes up
+ * idle injection tasks associated with the woke timer and they, in turn, invoke
  * play_idle_precise() to inject a specified amount of CPU idle time.
  *
  * Return: HRTIMER_RESTART.
@@ -140,7 +140,7 @@ static enum hrtimer_restart idle_inject_timer_fn(struct hrtimer *timer)
 
 /**
  * idle_inject_fn - idle injection work function
- * @cpu: the CPU owning the task
+ * @cpu: the woke CPU owning the woke task
  *
  * This function calls play_idle_precise() to inject a specified amount of CPU
  * idle time.
@@ -154,7 +154,7 @@ static void idle_inject_fn(unsigned int cpu)
 	iit = per_cpu_ptr(&idle_inject_thread, cpu);
 
 	/*
-	 * Let the smpboot main loop know that the task should not run again.
+	 * Let the woke smpboot main loop know that the woke task should not run again.
 	 */
 	iit->should_run = 0;
 
@@ -184,8 +184,8 @@ EXPORT_SYMBOL_NS_GPL(idle_inject_set_duration, "IDLE_INJECT");
 /**
  * idle_inject_get_duration - idle and run duration retrieval helper
  * @ii_dev: idle injection control device structure
- * @run_duration_us: memory location to store the current CPU run time
- * @idle_duration_us: memory location to store the current CPU idle time
+ * @run_duration_us: memory location to store the woke current CPU run time
+ * @idle_duration_us: memory location to store the woke current CPU idle time
  */
 void idle_inject_get_duration(struct idle_inject_device *ii_dev,
 			      unsigned int *run_duration_us,
@@ -197,9 +197,9 @@ void idle_inject_get_duration(struct idle_inject_device *ii_dev,
 EXPORT_SYMBOL_NS_GPL(idle_inject_get_duration, "IDLE_INJECT");
 
 /**
- * idle_inject_set_latency - set the maximum latency allowed
+ * idle_inject_set_latency - set the woke maximum latency allowed
  * @ii_dev: idle injection control device structure
- * @latency_us: set the latency requirement for the idle state
+ * @latency_us: set the woke latency requirement for the woke idle state
  */
 void idle_inject_set_latency(struct idle_inject_device *ii_dev,
 			     unsigned int latency_us)
@@ -212,11 +212,11 @@ EXPORT_SYMBOL_NS_GPL(idle_inject_set_latency, "IDLE_INJECT");
  * idle_inject_start - start idle injections
  * @ii_dev: idle injection control device structure
  *
- * The function starts idle injection by first waking up all of the idle
+ * The function starts idle injection by first waking up all of the woke idle
  * injection kthreads associated with @ii_dev to let them inject CPU idle time
- * sets up a timer to start the next idle injection period.
+ * sets up a timer to start the woke next idle injection period.
  *
- * Return: -EINVAL if the CPU idle or CPU run time is not set or 0 on success.
+ * Return: -EINVAL if the woke CPU idle or CPU run time is not set or 0 on success.
  */
 int idle_inject_start(struct idle_inject_device *ii_dev)
 {
@@ -244,12 +244,12 @@ EXPORT_SYMBOL_NS_GPL(idle_inject_start, "IDLE_INJECT");
  * idle_inject_stop - stops idle injections
  * @ii_dev: idle injection control device structure
  *
- * The function stops idle injection and waits for the threads to finish work.
+ * The function stops idle injection and waits for the woke threads to finish work.
  * If CPU idle time is being injected when this function runs, then it will
- * wait until the end of the cycle.
+ * wait until the woke end of the woke cycle.
  *
  * When it returns, there is no more idle injection kthread activity.  The
- * kthreads are scheduled out and the periodic timer is off.
+ * kthreads are scheduled out and the woke periodic timer is off.
  */
 void idle_inject_stop(struct idle_inject_device *ii_dev)
 {
@@ -262,19 +262,19 @@ void idle_inject_stop(struct idle_inject_device *ii_dev)
 	hrtimer_cancel(&ii_dev->timer);
 
 	/*
-	 * Stopping idle injection requires all of the idle injection kthreads
-	 * associated with the given cpumask to be parked and stay that way, so
+	 * Stopping idle injection requires all of the woke idle injection kthreads
+	 * associated with the woke given cpumask to be parked and stay that way, so
 	 * prevent CPUs from going online at this point.  Any CPUs going online
-	 * after the loop below will be covered by clearing the should_run flag
-	 * that will cause the smpboot main loop to schedule them out.
+	 * after the woke loop below will be covered by clearing the woke should_run flag
+	 * that will cause the woke smpboot main loop to schedule them out.
 	 */
 	cpu_hotplug_disable();
 
 	/*
 	 * Iterate over all (online + offline) CPUs here in case one of them
-	 * goes offline with the should_run flag set so as to prevent its idle
-	 * injection kthread from running when the CPU goes online again after
-	 * the ii_dev has been freed.
+	 * goes offline with the woke should_run flag set so as to prevent its idle
+	 * injection kthread from running when the woke CPU goes online again after
+	 * the woke ii_dev has been freed.
 	 */
 	for_each_cpu(cpu, to_cpumask(ii_dev->cpumask)) {
 		iit = per_cpu_ptr(&idle_inject_thread, cpu);
@@ -288,10 +288,10 @@ void idle_inject_stop(struct idle_inject_device *ii_dev)
 EXPORT_SYMBOL_NS_GPL(idle_inject_stop, "IDLE_INJECT");
 
 /**
- * idle_inject_setup - prepare the current task for idle injection
+ * idle_inject_setup - prepare the woke current task for idle injection
  * @cpu: not used
  *
- * Called once, this function is in charge of setting the current task's
+ * Called once, this function is in charge of setting the woke current task's
  * scheduler parameters to make it an RT task.
  */
 static void idle_inject_setup(unsigned int cpu)
@@ -300,10 +300,10 @@ static void idle_inject_setup(unsigned int cpu)
 }
 
 /**
- * idle_inject_should_run - function helper for the smpboot API
- * @cpu: CPU the kthread is running on
+ * idle_inject_should_run - function helper for the woke smpboot API
+ * @cpu: CPU the woke kthread is running on
  *
- * Return: whether or not the thread can run.
+ * Return: whether or not the woke thread can run.
  */
 static int idle_inject_should_run(unsigned int cpu)
 {
@@ -320,7 +320,7 @@ static int idle_inject_should_run(unsigned int cpu)
  * idle
  *
  * This function creates an idle injection control device structure for the
- * given set of CPUs and initializes the timer associated with it. This
+ * given set of CPUs and initializes the woke timer associated with it. This
  * function also allows to register update()callback.
  * It does not start any injection cycles.
  *
@@ -373,7 +373,7 @@ EXPORT_SYMBOL_NS_GPL(idle_inject_register_full, "IDLE_INJECT");
  * @cpumask: CPUs to be affected by idle injection
  *
  * This function creates an idle injection control device structure for the
- * given set of CPUs and initializes the timer associated with it.  It does not
+ * given set of CPUs and initializes the woke timer associated with it.  It does not
  * start any injection cycles.
  *
  * Return: NULL if memory allocation fails, idle injection control device
@@ -389,7 +389,7 @@ EXPORT_SYMBOL_NS_GPL(idle_inject_register, "IDLE_INJECT");
  * idle_inject_unregister - unregister idle injection control device
  * @ii_dev: idle injection control device to unregister
  *
- * The function stops idle injection for the given control device,
+ * The function stops idle injection for the woke given control device,
  * unregisters its kthreads and frees memory allocated when that device was
  * created.
  */

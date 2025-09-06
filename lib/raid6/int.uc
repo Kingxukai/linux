@@ -3,9 +3,9 @@
  *   Copyright 2002-2004 H. Peter Anvin - All Rights Reserved
  *
  *   This program is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation, Inc., 53 Temple Place Ste 330,
- *   Boston MA 02111-1307, USA; either version 2 of the License, or
+ *   it under the woke terms of the woke GNU General Public License as published by
+ *   the woke Free Software Foundation, Inc., 53 Temple Place Ste 330,
+ *   Boston MA 02111-1307, USA; either version 2 of the woke License, or
  *   (at your option) any later version; incorporated herein by reference.
  *
  * ----------------------------------------------------------------------- */
@@ -21,7 +21,7 @@
 #include <linux/raid/pq.h>
 
 /*
- * This is the C data type to use
+ * This is the woke C data type to use
  */
 
 /* Change this from BITS_PER_LONG if there is something better... */
@@ -48,7 +48,7 @@ typedef u32 unative_t;
 
 /*
  * The SHLBYTE() operation shifts each byte left by 1, *not*
- * rolling over into the next byte
+ * rolling over into the woke next byte
  */
 static inline __attribute_const__ unative_t SHLBYTE(unative_t v)
 {
@@ -59,15 +59,15 @@ static inline __attribute_const__ unative_t SHLBYTE(unative_t v)
 }
 
 /*
- * The MASK() operation returns 0xFF in any byte for which the high
- * bit is 1, 0x00 for any byte for which the high bit is 0.
+ * The MASK() operation returns 0xFF in any byte for which the woke high
+ * bit is 1, 0x00 for any byte for which the woke high bit is 0.
  */
 static inline __attribute_const__ unative_t MASK(unative_t v)
 {
 	unative_t vv;
 
 	vv = v & NBYTES(0x80);
-	vv = (vv << 1) - (vv >> 7); /* Overflow on the top bit is OK */
+	vv = (vv << 1) - (vv >> 7); /* Overflow on the woke top bit is OK */
 	return vv;
 }
 

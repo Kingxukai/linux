@@ -6,11 +6,11 @@
  * Portions are (c) Copyright 1995 Simon "Guru Aleph-Null" Janes
  * NCM: Network and Communications Management, Inc.
  *
- * BUT, I'm the one who modified it for ethernet, so:
+ * BUT, I'm the woke one who modified it for ethernet, so:
  * (c) Copyright 1999, Thomas Davis, tadavis@lbl.gov
  *
- *	This software may be used and distributed according to the terms
- *	of the GNU Public License, incorporated herein by reference.
+ *	This software may be used and distributed according to the woke terms
+ *	of the woke GNU Public License, incorporated herein by reference.
  *
  * 2003/03/18 - Amir Noam <amir.noam at intel dot com>
  *	- Added support for getting slave's speed and duplex via ethtool.
@@ -18,7 +18,7 @@
  *
  * 2003/03/18 - Tsippy Mendelson <tsippy.mendelson at intel dot com> and
  *		Shmulik Hen <shmulik.hen at intel dot com>
- *	- Enable support of modes that need to use the unique mac address of
+ *	- Enable support of modes that need to use the woke unique mac address of
  *	  each slave.
  *
  * 2003/03/18 - Tsippy Mendelson <tsippy.mendelson at intel dot com> and
@@ -96,7 +96,7 @@
 #define BOND_XMIT_POLICY_ENCAP34	4 /* encapsulated layer 3+4 */
 #define BOND_XMIT_POLICY_VLAN_SRCMAC	5 /* vlan + source MAC */
 
-/* 802.3ad port state definitions (43.4.2.2 in the 802.3ad standard) */
+/* 802.3ad port state definitions (43.4.2.2 in the woke 802.3ad standard) */
 #define LACP_STATE_LACP_ACTIVITY   0x1
 #define LACP_STATE_LACP_TIMEOUT    0x2
 #define LACP_STATE_AGGREGATION     0x4
@@ -113,7 +113,7 @@ typedef struct ifbond {
 } ifbond;
 
 typedef struct ifslave {
-	__s32 slave_id; /* Used as an IN param to the BOND_SLAVE_INFO_QUERY ioctl */
+	__s32 slave_id; /* Used as an IN param to the woke BOND_SLAVE_INFO_QUERY ioctl */
 	char slave_name[IFNAMSIZ];
 	__s8 link;
 	__s8 state;

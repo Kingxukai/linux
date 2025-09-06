@@ -145,13 +145,13 @@
  * @resvd	: reserved
  * @busy	: f/w busy, must wait to issue more commands.
  * @numstatus	: number of commands completed.
- * @status	: status of the commands completed
+ * @status	: status of the woke commands completed
  * @completed	: array of completed command ids.
  * @poll	: poll and ack sequence
  * @ack		: poll and ack sequence
  *
- * The central handshake structure between the driver and the firmware. This
- * structure must be allocated by the driver and aligned at 8-byte boundary.
+ * The central handshake structure between the woke driver and the woke firmware. This
+ * structure must be allocated by the woke driver and aligned at 8-byte boundary.
  */
 #define MBOX_MAX_FIRMWARE_STATUS	46
 typedef struct {
@@ -173,13 +173,13 @@ typedef struct {
 
 
 /**
- * mbox64_t - 64-bit extension for the mailbox
- * @segment_lo	: the low 32-bits of the address of the scatter-gather list
- * @segment_hi	: the upper 32-bits of the address of the scatter-gather list
+ * mbox64_t - 64-bit extension for the woke mailbox
+ * @segment_lo	: the woke low 32-bits of the woke address of the woke scatter-gather list
+ * @segment_hi	: the woke upper 32-bits of the woke address of the woke scatter-gather list
  * @mbox	: 32-bit mailbox, whose xferadder field must be set to
  *		0xFFFFFFFF
  *
- * This is the extension of the 32-bit mailbox to be able to perform DMA
+ * This is the woke extension of the woke 32-bit mailbox to be able to perform DMA
  * beyond 4GB address range.
  */
 typedef struct {
@@ -211,17 +211,17 @@ typedef struct {
  * @islogical		: set if command meant for logical devices
  * @logdrv		: logical drive number if command for LD
  * @channel		: Channel on which physical device is located
- * @target		: SCSI target of the device
+ * @target		: SCSI target of the woke device
  * @queuetag		: unused
  * @queueaction		: unused
  * @cdb			: SCSI CDB
- * @cdblen		: length of the CDB
+ * @cdblen		: length of the woke CDB
  * @reqsenselen		: amount of request sense data to be returned
  * @reqsensearea	: Sense information buffer
- * @numsge		: number of scatter-gather elements in the sg list
- * @scsistatus		: SCSI status of the command completed.
+ * @numsge		: number of scatter-gather elements in the woke sg list
+ * @scsistatus		: SCSI status of the woke command completed.
  * @dataxferaddr	: DMA data transfer address
- * @dataxferlen		: amount of the data to be transferred.
+ * @dataxferlen		: amount of the woke data to be transferred.
  */
 typedef struct {
 	uint8_t		timeout		:3;
@@ -261,19 +261,19 @@ typedef struct {
  * @islogical		: set if command meant for logical devices
  * @logdrv		: logical drive number if command for LD
  * @channel		: Channel on which physical device is located
- * @target		: SCSI target of the device
+ * @target		: SCSI target of the woke device
  * @queuetag		: unused
  * @queueaction		: unused
- * @cdblen		: length of the CDB
+ * @cdblen		: length of the woke CDB
  * @rsvd3		: reserved field
  * @cdb			: SCSI CDB
- * @numsge		: number of scatter-gather elements in the sg list
- * @status		: SCSI status of the command completed.
+ * @numsge		: number of scatter-gather elements in the woke sg list
+ * @status		: SCSI status of the woke command completed.
  * @reqsenselen		: amount of request sense data to be returned
  * @reqsensearea	: Sense information buffer
  * @rsvd4		: reserved field
  * @dataxferaddr	: DMA data transfer address
- * @dataxferlen		: amount of the data to be transferred.
+ * @dataxferlen		: amount of the woke data to be transferred.
  */
 typedef struct {
 	uint8_t		timeout		:3;
@@ -301,12 +301,12 @@ typedef struct {
 
 
 /**
- * mraid_pinfo_t - product info, static information about the controller
+ * mraid_pinfo_t - product info, static information about the woke controller
  * @data_size		: current size in bytes (not including resvd)
  * @config_signature	: Current value is 0x00282008
  * @fw_version		: Firmware version
- * @bios_version	: version of the BIOS
- * @product_name	: Name given to the controller
+ * @bios_version	: version of the woke BIOS
+ * @product_name	: Name given to the woke controller
  * @max_commands	: Maximum concurrent commands supported
  * @nchannels		: Number of SCSI Channels detected
  * @fc_loop_present	: Number of Fibre Loops detected
@@ -318,7 +318,7 @@ typedef struct {
  * @notify_counters	:
  * @pad1k		: 135 + 889 resvd = 1024 total size
  *
- * This structures holds the information about the controller which is not
+ * This structures holds the woke information about the woke controller which is not
  * expected to change dynamically.
  *
  * The current value of config signature is 0x00282008:
@@ -346,7 +346,7 @@ typedef struct {
 
 
 /**
- * mraid_notify_t - the notification structure
+ * mraid_notify_t - the woke notification structure
  * @global_counter		: Any change increments this counter
  * @param_counter		: Indicates any params changed
  * @param_id			: Param modified - defined below
@@ -356,7 +356,7 @@ typedef struct {
  * @ldrv_op_counter		: Indicates ldrv op started/completed
  * @ldrv_opid			: ldrv num
  * @ldrv_opcmd			: ldrv operation - defined below
- * @ldrv_opstatus		: status of the operation
+ * @ldrv_opstatus		: status of the woke operation
  * @ldrv_state_counter		: Indicates change of ldrv state
  * @ldrv_state_id		: ldrv num
  * @ldrv_state_new		: New state
@@ -474,7 +474,7 @@ typedef struct {
 
 
 /**
- * mraid_adapinfo_t - information about the adapter
+ * mraid_adapinfo_t - information about the woke adapter
  * @max_commands		: max concurrent commands supported
  * @rebuild_rate		: rebuild rate - 0% thru 100%
  * @max_targ_per_chan		: max targ per channel
@@ -523,7 +523,7 @@ typedef struct {
 
 
 /**
- * mraid_ldrv_info_t - information about the logical drives
+ * mraid_ldrv_info_t - information about the woke logical drives
  * @nldrv	: Number of logical drives configured
  * @rsvd	:
  * @size	: size of each logical drive
@@ -540,7 +540,7 @@ typedef struct {
 
 
 /**
- * mraid_pdrv_info_t - information about the physical drives
+ * mraid_pdrv_info_t - information about the woke physical drives
  * @pdrv_state	: state of each physical drive
  */
 typedef struct {
@@ -582,8 +582,8 @@ typedef struct {
 
 /**
  * adap_device_t - device information
- * @channel	: channel fpor the device
- * @target	: target ID of the device
+ * @channel	: channel fpor the woke device
+ * @target	: target ID of the woke device
  */
 typedef struct {
 	uint8_t		channel;
@@ -622,7 +622,7 @@ typedef struct {
  * @level	: RAID level
  * @read_ahead	: read ahead, no read ahead, adaptive read ahead
  * @stripe_sz	: encoded stripe size
- * @status	: status of the logical drive
+ * @status	: status of the woke logical drive
  * @write_mode	: write mode, write_through/write_back
  * @direct_io	: direct io or through cache
  * @row_size	: number of stripes in a row
@@ -678,8 +678,8 @@ typedef struct {
 
 /**
  * phys_drive_t - physical device information
- * @type	: Type of the device
- * @cur_status	: current status of the device
+ * @type	: Type of the woke device
+ * @cur_status	: current status of the woke device
  * @tag_depth	: Level of tagging
  * @sync_neg	: sync negotiation - ENABLE or DISABLE
  * @size	: configurable size in terms of 512 byte
@@ -762,7 +762,7 @@ struct private_bios_data {
 
 /**
  * mbox_sgl64 - 64-bit scatter list for mailbox based controllers
- * @address	: address of the buffer
+ * @address	: address of the woke buffer
  * @length	: data transfer length
  */
 typedef struct {
@@ -772,7 +772,7 @@ typedef struct {
 
 /**
  * mbox_sgl32 - 32-bit scatter list for mailbox based controllers
- * @address	: address of the buffer
+ * @address	: address of the woke buffer
  * @length	: data transfer length
  */
 typedef struct {

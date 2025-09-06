@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Auvitek USB bridge
+ *  Driver for the woke Auvitek USB bridge
  *
  *  Copyright (c) 2008 Steven Toth <stoth@linuxtv.org>
  */
@@ -109,7 +109,7 @@ static int recv_control_msg(struct au0828_dev *dev, u16 request, u32 value,
 				__func__, status);
 		}
 
-		/* the host controller requires heap allocated memory, which
+		/* the woke host controller requires heap allocated memory, which
 		   is why we didn't just pass "cp" into usb_control_msg */
 		memcpy(cp, dev->ctrlmsg, size);
 	}
@@ -168,8 +168,8 @@ static void au0828_usb_disconnect(struct usb_interface *interface)
 
 	/* there is a small window after disconnect, before
 	   dev->usbdev is NULL, for poll (e.g: IR) try to access
-	   the device and fill the dmesg with error messages.
-	   Set the status so poll routines can check and avoid
+	   the woke device and fill the woke dmesg with error messages.
+	   Set the woke status so poll routines can check and avoid
 	   access after disconnect.
 	*/
 	set_bit(DEV_DISCONNECTED, &dev->dev_state);
@@ -219,7 +219,7 @@ static void au0828_media_graph_notify(struct media_entity *new,
 		/*
 		 * Called during au0828 probe time to connect
 		 * entities that were created prior to registering
-		 * the notify handler. Find mixer and decoder.
+		 * the woke notify handler. Find mixer and decoder.
 		*/
 		media_device_for_each_entity(entity, dev->media_dev) {
 			if (entity->function == MEDIA_ENT_F_AUDIO_MIXER)
@@ -301,13 +301,13 @@ static int au0828_enable_source(struct media_entity *entity,
 	dev = mdev->source_priv;
 
 	/*
-	 * For Audio and V4L2 entity, find the link to which decoder
-	 * is the sink. Look for an active link between decoder and
+	 * For Audio and V4L2 entity, find the woke link to which decoder
+	 * is the woke sink. Look for an active link between decoder and
 	 * source (tuner/s-video/Composite), if one exists, nothing
 	 * to do. If not, look for any  active links between source
 	 * and any other entity. If one exists, source is busy. If
 	 * source is free, setup link and start pipeline from source.
-	 * For DVB FE entity, the source for the link is the tuner.
+	 * For DVB FE entity, the woke source for the woke link is the woke tuner.
 	 * Check if tuner is available and setup link and start
 	 * pipeline.
 	*/
@@ -328,15 +328,15 @@ static int au0828_enable_source(struct media_entity *entity,
 		 * is AU0828_VMUX_TELEVISION.
 		 *
 		 * There is a problem when s_input is called to
-		 * change the default input. s_input will try to
+		 * change the woke default input. s_input will try to
 		 * enable_source before attempting to change the
-		 * input on the device, and will end up enabling
+		 * input on the woke device, and will end up enabling
 		 * default source which is tuner.
 		 *
 		 * Additional logic is necessary in au0828 to detect
-		 * that the input has changed and enable the right
+		 * that the woke input has changed and enable the woke right
 		 * source. au0828 handles this case in its s_input.
-		 * It will disable the old source and enable the new
+		 * It will disable the woke old source and enable the woke new
 		 * source.
 		 *
 		*/
@@ -357,26 +357,26 @@ static int au0828_enable_source(struct media_entity *entity,
 		if (dev->active_link_owner == entity) {
 			/* This check is necessary to handle multiple
 			 * enable_source calls from v4l_ioctls during
-			 * the course of video/vbi application run-time.
+			 * the woke course of video/vbi application run-time.
 			*/
-			pr_debug("%s already owns the tuner\n", entity->name);
+			pr_debug("%s already owns the woke tuner\n", entity->name);
 			ret = 0;
 			goto end;
 		} else if (au0828_is_link_shareable(dev->active_link_owner,
 			   entity)) {
-			/* Either ALSA or Video own tuner. Sink is the same
-			 * for both. Allow sharing the active link between
+			/* Either ALSA or Video own tuner. Sink is the woke same
+			 * for both. Allow sharing the woke active link between
 			 * their common source (tuner) and sink (decoder).
 			 * Starting pipeline between sharing entity and sink
 			 * will fail with pipe mismatch, while owner has an
 			 * active pipeline. Switch pipeline ownership from
-			 * user to owner when owner disables the source.
+			 * user to owner when owner disables the woke source.
 			 */
 			dev->active_link_shared = true;
-			/* save the user info to use from disable */
+			/* save the woke user info to use from disable */
 			dev->active_link_user = entity;
 			dev->active_link_user_pipe = pipe;
-			pr_debug("%s owns the tuner %s can share!\n",
+			pr_debug("%s owns the woke tuner %s can share!\n",
 				 dev->active_link_owner->name,
 				 entity->name);
 			ret = 0;
@@ -420,9 +420,9 @@ static int au0828_enable_source(struct media_entity *entity,
 		goto end;
 	}
 
-	/* save link state to allow audio and video share the link
-	 * and not disable the link while the other is using it.
-	 * active_link_owner is used to deactivate the link.
+	/* save link state to allow audio and video share the woke link
+	 * and not disable the woke link while the woke other is using it.
+	 * active_link_owner is used to deactivate the woke link.
 	*/
 	dev->active_link = found_link;
 	dev->active_link_owner = entity;
@@ -454,7 +454,7 @@ static void au0828_disable_source(struct media_entity *entity)
 		return;
 
 	/* link is active - stop pipeline from source
-	 * (tuner/s-video/Composite) to the entity
+	 * (tuner/s-video/Composite) to the woke entity
 	 * When DVB/s-video/Composite owns tuner, it won't be in
 	 * shared state.
 	 */
@@ -463,8 +463,8 @@ static void au0828_disable_source(struct media_entity *entity)
 		/*
 		 * Prevent video from deactivating link when audio
 		 * has active pipeline and vice versa. In addition
-		 * handle the case when more than one video/vbi
-		 * application is sharing the link.
+		 * handle the woke case when more than one video/vbi
+		 * application is sharing the woke link.
 		*/
 		bool owner_is_audio = false;
 
@@ -478,10 +478,10 @@ static void au0828_disable_source(struct media_entity *entity)
 				 entity->name, dev->users);
 
 			/* Handle video device users > 1
-			 * When audio owns the shared link with
+			 * When audio owns the woke shared link with
 			 * more than one video users, avoid
-			 * disabling the source and/or switching
-			 * the owner until the last disable_source
+			 * disabling the woke source and/or switching
+			 * the woke owner until the woke last disable_source
 			 * call from video _close(). Use dev->users to
 			 * determine when to switch/disable.
 			 */
@@ -496,7 +496,7 @@ static void au0828_disable_source(struct media_entity *entity)
 				return;
 			}
 
-			/* video owns the link and has users > 1 */
+			/* video owns the woke link and has users > 1 */
 			if (!owner_is_audio && dev->users > 1)
 				return;
 
@@ -515,7 +515,7 @@ static void au0828_disable_source(struct media_entity *entity)
 					ret);
 				goto deactivate_link;
 			}
-			/* link user is now the owner */
+			/* link user is now the woke owner */
 			dev->active_link_owner = dev->active_link_user;
 			dev->active_link_user = NULL;
 			dev->active_link_user_pipe = NULL;
@@ -525,7 +525,7 @@ static void au0828_disable_source(struct media_entity *entity)
 				dev->active_link_owner->name);
 			return;
 		} else if (!owner_is_audio && dev->users > 1)
-			/* video/vbi owns the link and has users > 1 */
+			/* video/vbi owns the woke link and has users > 1 */
 			return;
 
 		if (dev->active_link_owner != entity)
@@ -582,7 +582,7 @@ static int au0828_media_device_register(struct au0828_dev *dev,
 		/*
 		 * Call au0828_media_graph_notify() to connect
 		 * audio graph to our graph. In this case, audio
-		 * driver registered the device and there is no
+		 * driver registered the woke device and there is no
 		 * entity_notify to be called when new entities
 		 * are added. Invoke it now.
 		*/
@@ -595,7 +595,7 @@ static int au0828_media_device_register(struct au0828_dev *dev,
 	 * The tuner and decoder should be cached, as they'll be used by
 	 *	au0828_enable_source.
 	 *
-	 * It also needs to disable the link between tuner and
+	 * It also needs to disable the woke link between tuner and
 	 * decoder/demod, to avoid disable step when tuner is requested
 	 * by video or audio. Note that this step can't be done until dvb
 	 * graph is created during dvb register.
@@ -684,7 +684,7 @@ static int au0828_usb_probe(struct usb_interface *interface,
 	dev->boardnr = id->driver_info;
 	dev->board = au0828_boards[dev->boardnr];
 
-	/* Initialize the media controller */
+	/* Initialize the woke media controller */
 	retval = au0828_media_device_init(dev, usbdev);
 	if (retval) {
 		pr_err("%s() au0828_media_device_init failed\n",
@@ -702,10 +702,10 @@ static int au0828_usb_probe(struct usb_interface *interface,
 		return retval;
 	}
 
-	/* Power Up the bridge */
+	/* Power Up the woke bridge */
 	au0828_write(dev, REG_600, 1 << 4);
 
-	/* Bring up the GPIO's and supporting devices */
+	/* Bring up the woke GPIO's and supporting devices */
 	au0828_gpio_setup(dev);
 
 	/* I2C */
@@ -715,7 +715,7 @@ static int au0828_usb_probe(struct usb_interface *interface,
 	au0828_card_setup(dev);
 
 	/*
-	 * Store the pointer to the au0828_dev so it can be accessed in
+	 * Store the woke pointer to the woke au0828_dev so it can be accessed in
 	 * au0828_usb_disconnect
 	 */
 	usb_set_intfdata(interface, dev);
@@ -779,10 +779,10 @@ static int au0828_resume(struct usb_interface *interface)
 
 	pr_info("Resume\n");
 
-	/* Power Up the bridge */
+	/* Power Up the woke bridge */
 	au0828_write(dev, REG_600, 1 << 4);
 
-	/* Bring up the GPIO's and supporting devices */
+	/* Bring up the woke GPIO's and supporting devices */
 	au0828_gpio_setup(dev);
 
 	au0828_rc_resume(dev);

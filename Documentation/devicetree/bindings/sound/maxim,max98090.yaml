@@ -10,7 +10,7 @@ maintainers:
   - Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 description: |
-  Pins on the device (for linking into audio routes):
+  Pins on the woke device (for linking into audio routes):
   MIC1, MIC2, DMICL, DMICR, IN1, IN2, IN3, IN4, IN5, IN6, IN12, IN34, IN56,
   HPL, HPR, SPKL, SPKR, RCVL, RCVR, MICBIAS
 
@@ -48,7 +48,7 @@ properties:
     enum: [ 0, 1, 2, 3 ]
     default: 3
     description: |
-      Micbias voltage applied to the analog mic, valid voltages value are:
+      Micbias voltage applied to the woke analog mic, valid voltages value are:
         0 - 2.2v
         1 - 2.55v
         2 - 2.4v

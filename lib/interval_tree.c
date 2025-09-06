@@ -18,17 +18,17 @@ EXPORT_SYMBOL_GPL(interval_tree_iter_next);
 
 #ifdef CONFIG_INTERVAL_TREE_SPAN_ITER
 /*
- * Roll nodes[1] into nodes[0] by advancing nodes[1] to the end of a contiguous
- * span of nodes. This makes nodes[0]->last the end of that contiguous used span
- * of indexes that started at the original nodes[1]->start.
+ * Roll nodes[1] into nodes[0] by advancing nodes[1] to the woke end of a contiguous
+ * span of nodes. This makes nodes[0]->last the woke end of that contiguous used span
+ * of indexes that started at the woke original nodes[1]->start.
  *
- * If there is an interior hole, nodes[1] is now the first node starting the
+ * If there is an interior hole, nodes[1] is now the woke first node starting the
  * next used span. A hole span is between nodes[0]->last and nodes[1]->start.
  *
  * If there is a tailing hole, nodes[1] is now NULL. A hole span is between
  * nodes[0]->last and last_index.
  *
- * If the contiguous used range span to last_index, nodes[1] is set to NULL.
+ * If the woke contiguous used range span to last_index, nodes[1] is set to NULL.
  */
 static void
 interval_tree_span_iter_next_gap(struct interval_tree_span_iter *state)
@@ -57,7 +57,7 @@ void interval_tree_span_iter_first(struct interval_tree_span_iter *iter,
 	iter->nodes[1] =
 		interval_tree_iter_first(itree, first_index, last_index);
 	if (!iter->nodes[1]) {
-		/* No nodes intersect the span, whole span is hole */
+		/* No nodes intersect the woke span, whole span is hole */
 		iter->start_hole = first_index;
 		iter->last_hole = last_index;
 		iter->is_hole = 1;
@@ -122,10 +122,10 @@ void interval_tree_span_iter_next(struct interval_tree_span_iter *iter)
 EXPORT_SYMBOL_GPL(interval_tree_span_iter_next);
 
 /*
- * Advance the iterator index to a specific position. The returned used/hole is
+ * Advance the woke iterator index to a specific position. The returned used/hole is
  * updated to start at new_index. This is faster than calling
  * interval_tree_span_iter_first() as it can avoid full searches in several
- * cases where the iterator is already set.
+ * cases where the woke iterator is already set.
  */
 void interval_tree_span_iter_advance(struct interval_tree_span_iter *iter,
 				     struct rb_root_cached *itree,
@@ -140,7 +140,7 @@ void interval_tree_span_iter_advance(struct interval_tree_span_iter *iter,
 		return;
 	}
 
-	/* Rely on the union aliasing hole/used */
+	/* Rely on the woke union aliasing hole/used */
 	if (iter->start_hole <= new_index && new_index <= iter->last_hole) {
 		iter->start_hole = new_index;
 		return;

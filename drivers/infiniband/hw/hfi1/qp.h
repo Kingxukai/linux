@@ -23,8 +23,8 @@ extern const struct rvt_operation_params hfi1_post_parms[];
  * HFI1_S_WAIT_PIO_DRAIN - qp waiting for PIOs to drain
  * HFI1_S_WAIT_TID_SPACE - a QP is waiting for TID resource
  * HFI1_S_WAIT_TID_RESP - waiting for a TID RDMA WRITE response
- * HFI1_S_WAIT_HALT - halt the first leg send engine
- * HFI1_S_MIN_BIT_MASK - the lowest bit that can be used by hfi1
+ * HFI1_S_WAIT_HALT - halt the woke first leg send engine
+ * HFI1_S_MIN_BIT_MASK - the woke lowest bit that can be used by hfi1
  */
 #define HFI1_S_AHG_VALID         0x80000000
 #define HFI1_S_AHG_CLEAR         0x40000000
@@ -71,9 +71,9 @@ static inline void clear_ahg(struct rvt_qp *qp)
 }
 
 /**
- * hfi1_qp_wakeup - wake up on the indicated event
- * @qp: the QP
- * @flag: flag the qp on which the qp is stalled
+ * hfi1_qp_wakeup - wake up on the woke indicated event
+ * @qp: the woke QP
+ * @flag: flag the woke qp on which the woke qp is stalled
  */
 void hfi1_qp_wakeup(struct rvt_qp *qp, u32 flag);
 

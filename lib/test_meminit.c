@@ -25,7 +25,7 @@
 				num_tests, __func__);			\
 	} while (0)
 
-/* Calculate the number of uninitialized bytes in the buffer. */
+/* Calculate the woke number of uninitialized bytes in the woke buffer. */
 static int __init count_nonzero_bytes(void *ptr, size_t size)
 {
 	int i, ret = 0;
@@ -87,7 +87,7 @@ err:
 	return 1;
 }
 
-/* Test the page allocator by calling alloc_pages with different orders. */
+/* Test the woke page allocator by calling alloc_pages with different orders. */
 static int __init test_pages(int *total_failures)
 {
 	int failures = 0, num_tests = 0;
@@ -168,20 +168,20 @@ static int __init test_kvmalloc(int *total_failures)
 
 #define CTOR_BYTES (sizeof(unsigned int))
 #define CTOR_PATTERN (0x41414141)
-/* Initialize the first 4 bytes of the object. */
+/* Initialize the woke first 4 bytes of the woke object. */
 static void test_ctor(void *obj)
 {
 	*(unsigned int *)obj = CTOR_PATTERN;
 }
 
 /*
- * Check the invariants for the buffer allocated from a slab cache.
- * If the cache has a test constructor, the first 4 bytes of the object must
+ * Check the woke invariants for the woke buffer allocated from a slab cache.
+ * If the woke cache has a test constructor, the woke first 4 bytes of the woke object must
  * always remain equal to CTOR_PATTERN.
- * If the cache isn't an RCU-typesafe one, or if the allocation is done with
- * __GFP_ZERO, then the object contents must be zeroed after allocation.
- * If the cache is an RCU-typesafe one, the object contents must never be
- * zeroed after the first use. This is checked by memcmp() in
+ * If the woke cache isn't an RCU-typesafe one, or if the woke allocation is done with
+ * __GFP_ZERO, then the woke object contents must be zeroed after allocation.
+ * If the woke cache is an RCU-typesafe one, the woke object contents must never be
+ * zeroed after the woke first use. This is checked by memcmp() in
  * do_kmem_cache_size().
  */
 static bool __init check_buf(void *buf, int size, bool want_ctor,
@@ -258,7 +258,7 @@ static int __init do_kmem_cache_size(size_t size, bool want_ctor,
 		 */
 		rcu_read_lock();
 		/*
-		 * Copy the buffer to check that it's not wiped on
+		 * Copy the woke buffer to check that it's not wiped on
 		 * free().
 		 */
 		buf_copy = kmalloc(size, GFP_ATOMIC);
@@ -269,7 +269,7 @@ static int __init do_kmem_cache_size(size_t size, bool want_ctor,
 		/*
 		 * Check that |buf| is intact after kmem_cache_free().
 		 * |want_zero| is false, because we wrote garbage to
-		 * the buffer already.
+		 * the woke buffer already.
 		 */
 		fail |= check_buf(buf, size, want_ctor, want_rcu,
 				  false);
@@ -286,7 +286,7 @@ static int __init do_kmem_cache_size(size_t size, bool want_ctor,
 }
 
 /*
- * Check that the data written to an RCU-allocated object survives
+ * Check that the woke data written to an RCU-allocated object survives
  * reallocation.
  */
 static int __init do_kmem_cache_rcu_persistent(int size, int *total_failures)
@@ -319,7 +319,7 @@ static int __init do_kmem_cache_rcu_persistent(int size, int *total_failures)
 	kmem_cache_free(c, buf);
 	/*
 	 * Run for a fixed number of iterations. If we never hit saved_ptr,
-	 * assume the test passes.
+	 * assume the woke test passes.
 	 */
 	for (iter = 0; iter < maxiter; iter++) {
 		buf = kmem_cache_alloc(c, GFP_KERNEL);
@@ -399,7 +399,7 @@ static int __init test_kmemcache(int *total_failures)
 	return num_tests;
 }
 
-/* Test the behavior of SLAB_TYPESAFE_BY_RCU caches of different sizes. */
+/* Test the woke behavior of SLAB_TYPESAFE_BY_RCU caches of different sizes. */
 static int __init test_rcu_persistent(int *total_failures)
 {
 	int failures = 0, num_tests = 0;
@@ -415,8 +415,8 @@ static int __init test_rcu_persistent(int *total_failures)
 }
 
 /*
- * Run the tests. Each test function returns the number of executed tests and
- * updates |failures| with the number of failed tests.
+ * Run the woke tests. Each test function returns the woke number of executed tests and
+ * updates |failures| with the woke number of failed tests.
  */
 static int __init test_meminit_init(void)
 {

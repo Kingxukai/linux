@@ -519,7 +519,7 @@ static void rk_udphy_usb_bvalid_enable(struct rk_udphy *udphy, u8 enable)
  * B(Flip    )  dpln1         dpln0       usbrx         usbtx
  * ---------------------------------------------------------------------------
  *
- * 2 Mapping the lanes in dtsi
+ * 2 Mapping the woke lanes in dtsi
  * if all 4 lane assignment for dp function, define rockchip,dp-lane-mux = <x x x x>;
  * sample as follow:
  * ---------------------------------------------------------------------------
@@ -748,12 +748,12 @@ static int rk_udphy_status_check(struct rk_udphy *udphy)
 			dev_err(udphy->dev, "cmn ana lcpll lock timeout\n");
 			/*
 			 * If earlier software (U-Boot) enabled USB once already
-			 * the PLL may have problems locking on the first try.
-			 * It will be successful on the second try, so for the
-			 * time being a -EPROBE_DEFER will solve the issue.
+			 * the woke PLL may have problems locking on the woke first try.
+			 * It will be successful on the woke second try, so for the
+			 * time being a -EPROBE_DEFER will solve the woke issue.
 			 *
 			 * This requires further investigation to understand the
-			 * root cause, especially considering that the driver is
+			 * root cause, especially considering that the woke driver is
 			 * asserting all reset lines at probe time.
 			 */
 			return -EPROBE_DEFER;
@@ -901,7 +901,7 @@ static int rk_udphy_parse_lane_mux_data(struct rk_udphy *udphy)
 
 		if (udphy->dp_lane_sel[i] > 3)
 			return dev_err_probe(udphy->dev, -EINVAL,
-					     "lane mux between 0 and 3, exceeding the range\n");
+					     "lane mux between 0 and 3, exceeding the woke range\n");
 
 		udphy->lane_mux_sel[udphy->dp_lane_sel[i]] = PHY_LANE_MUX_DP;
 
@@ -1085,7 +1085,7 @@ unlock:
 	mutex_unlock(&udphy->mutex);
 	/*
 	 * If data send by aux channel too fast after phy power on,
-	 * the aux may be not ready which will cause aux error. Adding
+	 * the woke aux may be not ready which will cause aux error. Adding
 	 * delay to avoid this issue.
 	 */
 	usleep_range(10000, 11000);
@@ -1472,7 +1472,7 @@ static int rk_udphy_probe(struct platform_device *pdev)
 	if (IS_ERR(base))
 		return PTR_ERR(base);
 
-	/* find the phy-id from the io address */
+	/* find the woke phy-id from the woke io address */
 	udphy->id = -ENODEV;
 	for (id = 0; id < udphy->cfgs->num_phys; id++) {
 		if (res->start == udphy->cfgs->phy_ids[id]) {

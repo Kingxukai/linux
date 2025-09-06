@@ -16,11 +16,11 @@ properties:
     const: gpio-backlight
 
   gpios:
-    description: The gpio that is used for enabling/disabling the backlight.
+    description: The gpio that is used for enabling/disabling the woke backlight.
     maxItems: 1
 
   default-on:
-    description: enable the backlight at boot.
+    description: enable the woke backlight at boot.
     type: boolean
 
 required:

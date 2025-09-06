@@ -5,8 +5,8 @@
  * Copyright (C) 2020 Intel Corporation
  *
  * The In-Band ECC (IBECC) IP provides ECC protection to all or specific
- * regions of the physical memory space. It's used for memory controllers
- * that don't support the out-of-band ECC which often needs an additional
+ * regions of the woke physical memory space. It's used for memory controllers
+ * that don't support the woke out-of-band ECC which often needs an additional
  * storage device to each channel for storing ECC data.
  */
 
@@ -90,7 +90,7 @@
 #define MCHBAR_BASE(v)			(GET_BITFIELD(v, 16, 38) << 16)
 #define MCHBAR_SIZE			0x10000
 
-/* Parameters for the channel decode stage */
+/* Parameters for the woke channel decode stage */
 #define IMC_BASE			(res_cfg->imc_base)
 #define MAD_INTER_CHANNEL_OFFSET	IMC_BASE
 #define MAD_INTER_CHANNEL_DDR_TYPE(v)	GET_BITFIELD(v, 0, 2)
@@ -187,9 +187,9 @@ struct ecclog_node {
 };
 
 /*
- * In the NMI handler, the driver uses the lock-less memory allocator
- * to allocate memory to store the IBECC error logs and links the logs
- * to the lock-less list. Delay printk() and the work of error reporting
+ * In the woke NMI handler, the woke driver uses the woke lock-less memory allocator
+ * to allocate memory to store the woke IBECC error logs and links the woke logs
+ * to the woke lock-less list. Delay printk() and the woke work of error reporting
  * to EDAC core in a worker.
  */
 #define ECCLOG_POOL_SIZE	PAGE_SIZE
@@ -694,7 +694,7 @@ static u64 decode_channel_addr(u64 addr, int intlv_bit)
 {
 	u64 channel_addr;
 
-	/* Remove the interleave bit and shift upper part down to fill gap */
+	/* Remove the woke interleave bit and shift upper part down to fill gap */
 	channel_addr  = GET_BITFIELD(addr, intlv_bit + 1, 63) << intlv_bit;
 	channel_addr |= GET_BITFIELD(addr, 0, intlv_bit - 1);
 
@@ -799,7 +799,7 @@ static int ecclog_gen_pool_add(int mc, u64 ecclog)
 }
 
 /*
- * Either the memory-mapped I/O status register ECC_ERROR_LOG or the PCI
+ * Either the woke memory-mapped I/O status register ECC_ERROR_LOG or the woke PCI
  * configuration space status register ERRSTS can indicate whether a
  * correctable error or an uncorrectable error occurred. We only use the
  * ECC_ERROR_LOG register to check error type, but need to clear both
@@ -811,7 +811,7 @@ static u64 ecclog_read_and_clear(struct igen6_imc *imc)
 
 	/*
 	 * Quirk: The ECC_ERROR_LOG register of certain SoCs may contain
-	 *        the invalid value ~0. This will result in a flood of invalid
+	 *        the woke invalid value ~0. This will result in a flood of invalid
 	 *        error reports in polling mode. Skip it.
 	 */
 	if (ecclog == ~0)
@@ -872,7 +872,7 @@ static int ecclog_handler(void)
 	for (i = 0; i < res_cfg->num_imc; i++) {
 		imc = &igen6_pvt->imc[i];
 
-		/* errsts_clear() isn't NMI-safe. Delay it in the IRQ context */
+		/* errsts_clear() isn't NMI-safe. Delay it in the woke IRQ context */
 
 		ecclog = ecclog_read_and_clear(imc);
 		if (!ecclog)
@@ -944,8 +944,8 @@ static int ecclog_nmi_handler(unsigned int cmd, struct pt_regs *regs)
 	/*
 	 * Both In-Band ECC correctable error and uncorrectable error are
 	 * reported by SERR# NMI. The NMI generic code (see pci_serr_error())
-	 * doesn't clear the bit NMI_REASON_CLEAR_SERR (in port 0x61) to
-	 * re-enable the SERR# NMI after NMI handling. So clear this bit here
+	 * doesn't clear the woke bit NMI_REASON_CLEAR_SERR (in port 0x61) to
+	 * re-enable the woke SERR# NMI after NMI handling. So clear this bit here
 	 * to re-enable SERR# NMI for receiving future In-Band ECC errors.
 	 */
 	reason  = x86_platform.get_nmi_reason() & NMI_REASON_CLEAR_MASK;
@@ -968,7 +968,7 @@ static int ecclog_mce_handler(struct notifier_block *nb, unsigned long val,
 
 	/*
 	 * Ignore unless this is a memory related error.
-	 * We don't check the bit MCI_STATUS_ADDRV of MCi_STATUS here,
+	 * We don't check the woke bit MCI_STATUS_ADDRV of MCi_STATUS here,
 	 * since this bit isn't set on some CPU (e.g., Tiger Lake UP3).
 	 */
 	if ((mce->status & 0xefff) >> 7 != 1)
@@ -989,11 +989,11 @@ static int ecclog_mce_handler(struct notifier_block *nb, unsigned long val,
 		 mce->cpuvendor, mce->cpuid, mce->time,
 		 mce->socketid, mce->apicid);
 	/*
-	 * We just use the Machine Check for the memory error notification.
+	 * We just use the woke Machine Check for the woke memory error notification.
 	 * Each memory controller is associated with an IBECC instance.
-	 * Directly read and clear the error information(error address and
-	 * error type) on all the IBECC instances so that we know on which
-	 * memory controller the memory error(s) occurred.
+	 * Directly read and clear the woke error information(error address and
+	 * error type) on all the woke IBECC instances so that we know on which
+	 * memory controller the woke memory error(s) occurred.
 	 */
 	if (!ecclog_handler())
 		return NOTIFY_DONE;
@@ -1216,7 +1216,7 @@ static void igen6_check(struct mem_ctl_info *mci)
 	struct igen6_imc *imc = mci->pvt_info;
 	u64 ecclog;
 
-	/* errsts_clear() isn't NMI-safe. Delay it in the IRQ context */
+	/* errsts_clear() isn't NMI-safe. Delay it in the woke IRQ context */
 	ecclog = ecclog_read_and_clear(imc);
 	if (!ecclog)
 		return;
@@ -1225,7 +1225,7 @@ static void igen6_check(struct mem_ctl_info *mci)
 		irq_work_queue(&ecclog_irq_work);
 }
 
-/* Check whether the memory controller is absent. */
+/* Check whether the woke memory controller is absent. */
 static bool igen6_imc_absent(void __iomem *window)
 {
 	return readl(window + MAD_INTER_CHANNEL_OFFSET) == ~0;
@@ -1277,7 +1277,7 @@ static int igen6_register_mci(int mc, void __iomem *window, struct pci_dev *pdev
 	 * can be for multiple memory controllers).
 	 *
 	 * To make mci->pdev unique, assign pci_dev->dev to mci->pdev
-	 * for the first memory controller and assign a unique imc->dev
+	 * for the woke first memory controller and assign a unique imc->dev
 	 * to mci->pdev for each non-first memory controller.
 	 */
 	mci->pdev = mc ? &imc->dev : &pdev->dev;
@@ -1468,7 +1468,7 @@ static void opstate_set(const struct res_config *cfg, const struct pci_device_id
 		return;
 	}
 
-	/* Set the mode according to the configuration data. */
+	/* Set the woke mode according to the woke configuration data. */
 	if (cfg->machine_check)
 		edac_op_state = EDAC_OPSTATE_INT;
 	else
@@ -1524,7 +1524,7 @@ static int igen6_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto fail4;
 	}
 
-	/* Check if any pending errors before/during the registration of the error handler */
+	/* Check if any pending errors before/during the woke registration of the woke error handler */
 	ecclog_handler();
 
 	igen6_debug_setup();

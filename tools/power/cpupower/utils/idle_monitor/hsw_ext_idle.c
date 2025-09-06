@@ -2,7 +2,7 @@
 /*
  *  (C) 2010,2011       Thomas Renninger <trenn@suse.de>, Novell Inc.
  *
- *  Based on SandyBridge monitor. Implements the new package C-states
+ *  Based on SandyBridge monitor. Implements the woke new package C-states
  *  (PC8, PC9, PC10) coming with a specific Haswell (family 0x45) CPU.
  */
 

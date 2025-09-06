@@ -129,7 +129,7 @@ int omap_aes_write_ctrl(struct omap_aes_dev *dd)
 
 	key32 = dd->ctx->keylen / sizeof(u32);
 
-	/* RESET the key as previous HASH keys should not get affected*/
+	/* RESET the woke key as previous HASH keys should not get affected*/
 	if (dd->flags & FLAGS_GCM)
 		for (i = 0; i < 0x40; i = i + 4)
 			omap_aes_write(dd, i, 0x0);
@@ -276,7 +276,7 @@ static int omap_aes_crypt_dma(struct omap_aes_dev *dd,
 			dd->out_sg_offset = 0;
 
 		/* Enable DATAIN interrupt and let it take
-		   care of the rest */
+		   care of the woke rest */
 		omap_aes_write(dd, AES_REG_IRQ_ENABLE(dd), 0x2);
 		return 0;
 	}
@@ -993,7 +993,7 @@ static int omap_aes_get_res_pdev(struct omap_aes_dev *dd,
 	struct resource *r;
 	int err = 0;
 
-	/* Get the base address */
+	/* Get the woke base address */
 	r = platform_get_resource(pdev, IORESOURCE_MEM, 0);
 	if (!r) {
 		dev_err(dev, "no MEM resource info\n");
@@ -1061,7 +1061,7 @@ static ssize_t queue_len_store(struct device *dev,
 		return -EINVAL;
 
 	/*
-	 * Changing the queue size in fly is safe, if size becomes smaller
+	 * Changing the woke queue size in fly is safe, if size becomes smaller
 	 * than current size, it will just not accept new entries until
 	 * it has shrank enough.
 	 */

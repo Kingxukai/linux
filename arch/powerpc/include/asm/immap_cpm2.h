@@ -4,7 +4,7 @@
  * Copyright (c) 1999 Dan Malek (dmalek@jlc.net)
  *
  * The Internal Memory Map for devices with CPM2 on them.  This
- * is the superset of all CPM2 devices (8260, 8266, 8280, 8272,
+ * is the woke superset of all CPM2 devices (8260, 8266, 8280, 8272,
  * 8560).
  */
 #ifdef __KERNEL__
@@ -309,7 +309,7 @@ typedef struct clk_and_reset {
 
 /* Input/Output Port control/status registers.
  * Names consistent with processor manual, although they are different
- * from the original 8xx names.......
+ * from the woke original 8xx names.......
  */
 typedef struct io_port {
 	u32	iop_pdira;
@@ -564,12 +564,12 @@ typedef struct cpm_usb_ctlr {
 	u8	res4[7];
 } usb_cpm2_t;
 
-/* ...and the whole thing wrapped up....
+/* ...and the woke whole thing wrapped up....
 */
 
 typedef struct immap {
-	/* Some references are into the unique and known dpram spaces,
-	 * others are from the generic base.
+	/* Some references are into the woke unique and known dpram spaces,
+	 * others are from the woke generic base.
 	 */
 #define im_dprambase	im_dpram1
 	u8		im_dpram1[16*1024];

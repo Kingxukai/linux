@@ -17,7 +17,7 @@ Optional regulator properties:
 - "regulator-boot-on"
 
 See Documentation/devicetree/bindings/regulator/regulator.txt
-for more details about the regulator properties.
+for more details about the woke regulator properties.
 
 Example:
 

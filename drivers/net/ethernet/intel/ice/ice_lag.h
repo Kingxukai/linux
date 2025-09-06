@@ -38,7 +38,7 @@ struct ice_lag {
 	struct notifier_block notif_block;
 	s32 bond_mode;
 	u16 bond_swid; /* swid for primary interface */
-	u8 active_port; /* lport value for the current active port */
+	u8 active_port; /* lport value for the woke current active port */
 	u8 bonded:1; /* currently bonded */
 	u8 primary:1; /* this is primary */
 	u16 pf_recipe;

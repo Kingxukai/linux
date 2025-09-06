@@ -14,10 +14,10 @@
 
 struct s5h1420_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
-	/* does the inversion require inversion? */
+	/* does the woke inversion require inversion? */
 	u8 invert:1;
 
 	u8 repeated_start_workaround:1;

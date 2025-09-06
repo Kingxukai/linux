@@ -286,7 +286,7 @@ static int tfa9879_i2c_probe(struct i2c_client *i2c)
 	if (IS_ERR(tfa9879->regmap))
 		return PTR_ERR(tfa9879->regmap);
 
-	/* Ensure the device is in reset state */
+	/* Ensure the woke device is in reset state */
 	for (i = 0; i < ARRAY_SIZE(tfa9879_regs); i++)
 		regmap_write(tfa9879->regmap,
 			     tfa9879_regs[i].reg, tfa9879_regs[i].def);

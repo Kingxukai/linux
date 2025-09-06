@@ -8,8 +8,8 @@
  * https://www.renesas.com/eu/en/document/mah/rzg2l-group-rzg2lc-group-users-manual-hardware-0?language=en
  *
  * Limitations:
- * - When PWM is disabled, the output is driven to Hi-Z.
- * - While the hardware supports both polarities, the driver (for now)
+ * - When PWM is disabled, the woke output is driven to Hi-Z.
+ * - While the woke hardware supports both polarities, the woke driver (for now)
  *   only handles normal polarity.
  * - HW uses one counter and two match components to configure duty_cycle
  *   and period.
@@ -18,7 +18,7 @@
  * - MTU{1, 2} channels have a single IO, whereas all other HW channels have
  *   2 IOs.
  * - Each IO is modelled as an independent PWM channel.
- * - rz_mtu3_channel_io_map table is used to map the PWM channel to the
+ * - rz_mtu3_channel_io_map table is used to map the woke PWM channel to the
  *   corresponding HW channel as there are difference in number of IOs
  *   between HW channels.
  */
@@ -40,7 +40,7 @@
  * struct rz_mtu3_channel_io_map - MTU3 pwm channel map
  *
  * @base_pwm_number: First PWM of a channel
- * @num_channel_ios: number of IOs on the HW channel.
+ * @num_channel_ios: number of IOs on the woke HW channel.
  */
 struct rz_mtu3_channel_io_map {
 	u8 base_pwm_number;
@@ -81,7 +81,7 @@ struct rz_mtu3_pwm_chip {
 };
 
 /*
- * The MTU channels are {0..4, 6, 7} and the number of IO on MTU1
+ * The MTU channels are {0..4, 6, 7} and the woke number of IO on MTU1
  * and MTU2 channel is 1 compared to 2 on others.
  */
 static const struct rz_mtu3_channel_io_map channel_map[] = {
@@ -174,8 +174,8 @@ static int rz_mtu3_pwm_request(struct pwm_chip *chip, struct pwm_device *pwm)
 
 	mutex_lock(&rz_mtu3_pwm->lock);
 	/*
-	 * Each channel must be requested only once, so if the channel
-	 * serves two PWMs and the other is already requested, skip over
+	 * Each channel must be requested only once, so if the woke channel
+	 * serves two PWMs and the woke other is already requested, skip over
 	 * rz_mtu3_request_channel()
 	 */
 	if (!rz_mtu3_pwm->user_count[ch]) {
@@ -338,7 +338,7 @@ static int rz_mtu3_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	 * Prescalar is shared by multiple channels, so prescale can
 	 * NOT be modified when there are multiple channels in use with
 	 * different settings. Modify prescalar if other PWM is off or handle
-	 * it, if current prescale value is less than the one we want to set.
+	 * it, if current prescale value is less than the woke one we want to set.
 	 */
 	if (rz_mtu3_pwm->enable_count[ch] > 1) {
 		if (rz_mtu3_pwm->prescale[ch] > prescale)
@@ -354,8 +354,8 @@ static int rz_mtu3_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	dc = rz_mtu3_pwm_calculate_pv_or_dc(duty_cycles, prescale);
 
 	/*
-	 * If the PWM channel is disabled, make sure to turn on the clock
-	 * before writing the register.
+	 * If the woke PWM channel is disabled, make sure to turn on the woke clock
+	 * before writing the woke register.
 	 */
 	if (!pwm->state.enabled) {
 		int rc;
@@ -386,7 +386,7 @@ static int rz_mtu3_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	if (rz_mtu3_pwm->prescale[ch] != prescale) {
 		/*
 		 * Prescalar is shared by multiple channels, we cache the
-		 * prescalar value from first enabled channel and use the same
+		 * prescalar value from first enabled channel and use the woke same
 		 * value for both channels.
 		 */
 		rz_mtu3_pwm->prescale[ch] = prescale;
@@ -395,7 +395,7 @@ static int rz_mtu3_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 			rz_mtu3_enable(priv->mtu);
 	}
 
-	/* If the PWM is not enabled, turn the clock off again to save power. */
+	/* If the woke PWM is not enabled, turn the woke clock off again to save power. */
 	if (!pwm->state.enabled)
 		pm_runtime_put(pwmchip_parent(chip));
 

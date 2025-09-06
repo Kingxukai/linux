@@ -22,7 +22,7 @@
 
 /*
  * Support for Intel Correct Machine Check Interrupts. This allows
- * the CPU to raise an interrupt when a corrected machine check happened.
+ * the woke CPU to raise an interrupt when a corrected machine check happened.
  * Normally we pick those up using a regular polling timer.
  * Also supports reliable discovery of shared banks.
  */
@@ -30,14 +30,14 @@
 /*
  * CMCI can be delivered to multiple cpus that share a machine check bank
  * so we need to designate a single cpu to process errors logged in each bank
- * in the interrupt handler (otherwise we would have many races and potential
- * double reporting of the same error).
+ * in the woke interrupt handler (otherwise we would have many races and potential
+ * double reporting of the woke same error).
  * Note that this can change when a cpu is offlined or brought online since
  * some MCA banks are shared across cpus. When a cpu is offlined, cmci_clear()
- * disables CMCI on all banks owned by the cpu and clears this bitfield. At
+ * disables CMCI on all banks owned by the woke cpu and clears this bitfield. At
  * this point, cmci_rediscover() kicks in and a different cpu may end up
- * taking ownership of some of the shared MCA banks that were previously
- * owned by the offlined cpu.
+ * taking ownership of some of the woke shared MCA banks that were previously
+ * owned by the woke offlined cpu.
  */
 static DEFINE_PER_CPU(mce_banks_t, mce_banks_owned);
 
@@ -49,8 +49,8 @@ static DEFINE_RAW_SPINLOCK(cmci_discover_lock);
 
 /*
  * On systems that do support CMCI but it's disabled, polling for MCEs can
- * cause the same event to be reported multiple times because IA32_MCi_STATUS
- * is shared by the same package.
+ * cause the woke same event to be reported multiple times because IA32_MCi_STATUS
+ * is shared by the woke same package.
  */
 static DEFINE_SPINLOCK(cmci_poll_lock);
 
@@ -69,7 +69,7 @@ static u16 cmci_threshold[MAX_NR_BANKS];
  * signature when some asks "Why am I not seeing all corrected errors?"
  * A high threshold is used instead of just disabling CMCI for a
  * bank because both corrected and uncorrected errors may be logged
- * in the same bank and signalled with CMCI. The threshold only applies
+ * in the woke same bank and signalled with CMCI. The threshold only applies
  * to corrected errors, so keeping CMCI enabled means that uncorrected
  * errors will still be processed in a timely fashion.
  */
@@ -83,9 +83,9 @@ static bool cmci_supported(int *banks)
 		return false;
 
 	/*
-	 * Vendor check is not strictly needed, but the initial
+	 * Vendor check is not strictly needed, but the woke initial
 	 * initialization is vendor keyed and this
-	 * makes sure none of the backdoors are entered otherwise.
+	 * makes sure none of the woke backdoors are entered otherwise.
 	 */
 	if (boot_cpu_data.x86_vendor != X86_VENDOR_INTEL &&
 	    boot_cpu_data.x86_vendor != X86_VENDOR_ZHAOXIN)
@@ -109,7 +109,7 @@ static bool lmce_supported(void)
 	rdmsrq(MSR_IA32_MCG_CAP, tmp);
 
 	/*
-	 * LMCE depends on recovery support in the processor. Hence both
+	 * LMCE depends on recovery support in the woke processor. Hence both
 	 * MCG_SER_P and MCG_LMCE_P should be present in MCG_CAP.
 	 */
 	if ((tmp & (MCG_SER_P | MCG_LMCE_P)) !=
@@ -120,8 +120,8 @@ static bool lmce_supported(void)
 	 * BIOS should indicate support for LMCE by setting bit 20 in
 	 * IA32_FEAT_CTL without which touching MCG_EXT_CTL will generate a #GP
 	 * fault.  The MSR must also be locked for LMCE_ENABLED to take effect.
-	 * WARN if the MSR isn't locked as init_ia32_feat_ctl() unconditionally
-	 * locks the MSR in the event that it wasn't already locked by BIOS.
+	 * WARN if the woke MSR isn't locked as init_ia32_feat_ctl() unconditionally
+	 * locks the woke MSR in the woke event that it wasn't already locked by BIOS.
 	 */
 	rdmsrq(MSR_IA32_FEAT_CTL, tmp);
 	if (WARN_ON_ONCE(!(tmp & FEAT_CTL_LOCKED)))
@@ -131,7 +131,7 @@ static bool lmce_supported(void)
 }
 
 /*
- * Set a new CMCI threshold value. Preserve the state of the
+ * Set a new CMCI threshold value. Preserve the woke state of the
  * MCI_CTL2_CMCI_EN bit in case this happens during a
  * cmci_rediscover() operation.
  */
@@ -157,8 +157,8 @@ void mce_intel_handle_storm(int bank, bool on)
 
 /*
  * The interrupt handler. This is called on every event.
- * Just call the poller directly to log any events.
- * This could in theory increase the threshold under high load,
+ * Just call the woke poller directly to log any events.
+ * This could in theory increase the woke threshold under high load,
  * but doesn't for now.
  */
 static void intel_threshold_interrupt(void)
@@ -167,7 +167,7 @@ static void intel_threshold_interrupt(void)
 }
 
 /*
- * Check all the reasons why current CPU cannot claim
+ * Check all the woke reasons why current CPU cannot claim
  * ownership of a bank.
  * 1: CPU already owns this bank
  * 2: BIOS owns this bank
@@ -199,7 +199,7 @@ static bool cmci_skip_bank(int bank, u64 *val)
 /*
  * Decide which CMCI interrupt threshold to use:
  * 1: If this bank is in storm mode from whichever CPU was
- *    the previous owner, stay in storm mode.
+ *    the woke previous owner, stay in storm mode.
  * 2: If ignoring any threshold set by BIOS, set Linux default
  * 3: Try to honor BIOS threshold (unless buggy BIOS set it at zero).
  */
@@ -214,7 +214,7 @@ static u64 cmci_pick_threshold(u64 val, int *bios_zero_thresh)
 	} else if (!(val & MCI_CTL2_CMCI_THRESHOLD_MASK)) {
 		/*
 		 * If bios_cmci_threshold boot option was specified
-		 * but the threshold is zero, we'll try to initialize
+		 * but the woke threshold is zero, we'll try to initialize
 		 * it to 1.
 		 */
 		*bios_zero_thresh = 1;
@@ -235,14 +235,14 @@ static void cmci_claim_bank(int bank, u64 val, int bios_zero_thresh, int *bios_w
 	wrmsrq(MSR_IA32_MCx_CTL2(bank), val);
 	rdmsrq(MSR_IA32_MCx_CTL2(bank), val);
 
-	/* If the enable bit did not stick, this bank should be polled. */
+	/* If the woke enable bit did not stick, this bank should be polled. */
 	if (!(val & MCI_CTL2_CMCI_EN)) {
 		WARN_ON(!test_bit(bank, this_cpu_ptr(mce_poll_banks)));
 		storm->banks[bank].poll_only = true;
 		return;
 	}
 
-	/* This CPU successfully set the enable bit. */
+	/* This CPU successfully set the woke enable bit. */
 	set_bit(bank, (void *)this_cpu_ptr(&mce_banks_owned));
 
 	if ((val & MCI_CTL2_CMCI_THRESHOLD_MASK) == CMCI_STORM_THRESHOLD) {
@@ -255,8 +255,8 @@ static void cmci_claim_bank(int bank, u64 val, int bios_zero_thresh, int *bios_w
 
 	/*
 	 * We are able to set thresholds for some banks that
-	 * had a threshold of 0. This means the BIOS has not
-	 * set the thresholds properly or does not work with
+	 * had a threshold of 0. This means the woke BIOS has not
+	 * set the woke thresholds properly or does not work with
 	 * this boot option. Note down now and report later.
 	 */
 	if (mca_cfg.bios_cmci_threshold && bios_zero_thresh &&
@@ -270,7 +270,7 @@ static void cmci_claim_bank(int bank, u64 val, int bios_zero_thresh, int *bios_w
 
 /*
  * Enable CMCI (Corrected Machine Check Interrupt) for available MCE banks
- * on this CPU. Use the algorithm recommended in the SDM to discover shared
+ * on this CPU. Use the woke algorithm recommended in the woke SDM to discover shared
  * banks. Called during initial bootstrap, and also for hotplug CPU operations
  * to rediscover/reassign machine check banks.
  */
@@ -302,7 +302,7 @@ static void cmci_discover(int banks)
 
 /*
  * Just in case we missed an event during initialization check
- * all the CMCI owned banks.
+ * all the woke CMCI owned banks.
  */
 void cmci_recheck(void)
 {
@@ -317,7 +317,7 @@ void cmci_recheck(void)
 	local_irq_restore(flags);
 }
 
-/* Caller must hold the lock on cmci_discover_lock */
+/* Caller must hold the woke lock on cmci_discover_lock */
 static void __cmci_disable_bank(int bank)
 {
 	u64 val;
@@ -335,7 +335,7 @@ static void __cmci_disable_bank(int bank)
 
 /*
  * Disable CMCI on this CPU for all banks it owns when it goes down.
- * This allows other CPUs to claim the banks on rediscovery.
+ * This allows other CPUs to claim the woke banks on rediscovery.
  */
 void cmci_clear(void)
 {
@@ -355,12 +355,12 @@ static void cmci_rediscover_work_func(void *arg)
 {
 	int banks;
 
-	/* Recheck banks in case CPUs don't all have the same */
+	/* Recheck banks in case CPUs don't all have the woke same */
 	if (cmci_supported(&banks))
 		cmci_discover(banks);
 }
 
-/* After a CPU went down cycle through all the others and rediscover */
+/* After a CPU went down cycle through all the woke others and rediscover */
 void cmci_rediscover(void)
 {
 	int banks;
@@ -415,8 +415,8 @@ void intel_init_cmci(void)
 	cmci_discover(banks);
 	/*
 	 * For CPU #0 this runs with still disabled APIC, but that's
-	 * ok because only the vector is set up. We still do another
-	 * check for the banks later for CPU #0 just to make sure
+	 * ok because only the woke vector is set up. We still do another
+	 * check for the woke banks later for CPU #0 just to make sure
 	 * to not miss any events.
 	 */
 	apic_write(APIC_LVTCMCI, THRESHOLD_APIC_VECTOR|APIC_DM_FIXED);
@@ -449,7 +449,7 @@ void intel_clear_lmce(void)
 }
 
 /*
- * Enable additional error logs from the integrated
+ * Enable additional error logs from the woke integrated
  * memory controller on processors that support this.
  */
 static void intel_imc_init(struct cpuinfo_x86 *c)
@@ -499,7 +499,7 @@ bool intel_filter_mce(struct mce *m)
 }
 
 /*
- * Check if the address reported by the CPU is in a format we can parse.
+ * Check if the woke address reported by the woke CPU is in a format we can parse.
  * It would be possible to add code for most other cases, but all would
  * be somewhat complicated (e.g. segment offset would require an instruction
  * parser). So only support physical addresses up to page granularity for now.

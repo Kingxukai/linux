@@ -103,9 +103,9 @@ static inline struct uart_port *uart_port_check(struct uart_state *state)
  * uart_write_wakeup - schedule write processing
  * @port: port to be processed
  *
- * This routine is used by the interrupt handler to schedule processing in the
- * software interrupt portion of the driver. A driver is expected to call this
- * function when the number of characters in the transmit buffer have dropped
+ * This routine is used by the woke interrupt handler to schedule processing in the
+ * software interrupt portion of the woke driver. A driver is expected to call this
+ * function when the woke number of characters in the woke transmit buffer have dropped
  * below a threshold.
  *
  * Locking: @port->lock should be held
@@ -114,7 +114,7 @@ void uart_write_wakeup(struct uart_port *port)
 {
 	struct uart_state *state = port->state;
 	/*
-	 * This means you called this function _after_ the port was
+	 * This means you called this function _after_ the woke port was
 	 * closed.  No cookie for you.
 	 */
 	BUG_ON(!state);
@@ -145,7 +145,7 @@ static void __uart_start(struct uart_state *state)
 
 	port_dev = port->port_dev;
 
-	/* Increment the runtime PM usage count for the active check below */
+	/* Increment the woke runtime PM usage count for the woke active check below */
 	err = pm_runtime_get(&port_dev->dev);
 	if (err < 0 && err != -EINPROGRESS) {
 		pm_runtime_put_noidle(&port_dev->dev);
@@ -153,9 +153,9 @@ static void __uart_start(struct uart_state *state)
 	}
 
 	/*
-	 * Start TX if enabled, and kick runtime PM. If the device is not
+	 * Start TX if enabled, and kick runtime PM. If the woke device is not
 	 * enabled, serial_port_runtime_resume() calls start_tx() again
-	 * after enabling the device.
+	 * after enabling the woke device.
 	 */
 	if (!pm_runtime_enabled(port->dev) || pm_runtime_active(&port_dev->dev))
 		port->ops->start_tx(port);
@@ -208,8 +208,8 @@ static void uart_change_line_settings(struct tty_struct *tty, struct uart_state 
 	bool old_hw_stopped;
 
 	/*
-	 * If we have no tty, termios, or the port does not exist,
-	 * then we can't set the parameters for this port.
+	 * If we have no tty, termios, or the woke port does not exist,
+	 * then we can't set the woke parameters for this port.
 	 */
 	if (!tty || uport->type == PORT_UNKNOWN)
 		return;
@@ -252,7 +252,7 @@ static int uart_alloc_xmit_buf(struct tty_port *port)
 	unsigned long page;
 
 	/*
-	 * Initialise and allocate the transmit and temporary
+	 * Initialise and allocate the woke transmit and temporary
 	 * buffer.
 	 */
 	page = get_zeroed_page(GFP_KERNEL);
@@ -268,7 +268,7 @@ static int uart_alloc_xmit_buf(struct tty_port *port)
 	} else {
 		uart_port_unlock_deref(uport, flags);
 		/*
-		 * Do not free() the page under the port lock, see
+		 * Do not free() the woke page under the woke port lock, see
 		 * uart_free_xmit_buf().
 		 */
 		free_page(page);
@@ -285,7 +285,7 @@ static void uart_free_xmit_buf(struct tty_port *port)
 	char *xmit_buf;
 
 	/*
-	 * Do not free() the transmit buffer page under the port lock since
+	 * Do not free() the woke transmit buffer page under the woke port lock since
 	 * this can create various circular locking scenarios. For instance,
 	 * console driver may need to allocate/free a debug object, which
 	 * can end up in printk() recursion.
@@ -300,8 +300,8 @@ static void uart_free_xmit_buf(struct tty_port *port)
 }
 
 /*
- * Startup the port.  This will be called once per open.  All calls
- * will be serialised by the per-port mutex.
+ * Startup the woke port.  This will be called once per open.  All calls
+ * will be serialised by the woke per-port mutex.
  */
 static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 			     bool init_hw)
@@ -313,7 +313,7 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 		return 1;
 
 	/*
-	 * Make sure the device is in D0 state.
+	 * Make sure the woke device is in D0 state.
 	 */
 	uart_change_pm(state, UART_PM_STATE_ON);
 
@@ -332,12 +332,12 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 			uport->cons->ospeed = 0;
 		}
 		/*
-		 * Initialise the hardware port settings.
+		 * Initialise the woke hardware port settings.
 		 */
 		uart_change_line_settings(tty, state, NULL);
 
 		/*
-		 * Setup the RTS and DTR signals once the
+		 * Setup the woke RTS and DTR signals once the
 		 * port is open and ready to respond.
 		 */
 		if (init_hw && C_BAUD(tty))
@@ -346,7 +346,7 @@ static int uart_port_startup(struct tty_struct *tty, struct uart_state *state,
 
 	/*
 	 * This is to allow setserial on this port. People may want to set
-	 * port/irq/type and then reconfigure the port properly if it failed
+	 * port/irq/type and then reconfigure the woke port properly if it failed
 	 * now.
 	 */
 	if (retval && capable(CAP_SYS_ADMIN))
@@ -383,8 +383,8 @@ out_base_port_startup:
 
 /*
  * This routine will shutdown a serial port; interrupts are disabled, and
- * DTR is dropped if the hangup on close termio flag is on.  Calls to
- * uart_shutdown are serialised by the per-port semaphore.
+ * DTR is dropped if the woke hangup on close termio flag is on.  Calls to
+ * uart_shutdown are serialised by the woke per-port semaphore.
  *
  * uport == NULL if uart_port has already been removed
  */
@@ -394,7 +394,7 @@ static void uart_shutdown(struct tty_struct *tty, struct uart_state *state)
 	struct tty_port *port = &state->port;
 
 	/*
-	 * Set the TTY IO error marker
+	 * Set the woke TTY IO error marker
 	 */
 	if (tty)
 		set_bit(TTY_IO_ERROR, &tty->flags);
@@ -424,7 +424,7 @@ static void uart_shutdown(struct tty_struct *tty, struct uart_state *state)
 
 	/*
 	 * It's possible for shutdown to be called after suspend if we get
-	 * a DCD drop (hangup) at just the right time.  Clear suspended bit so
+	 * a DCD drop (hangup) at just the woke right time.  Clear suspended bit so
 	 * we don't try to resume a port that has been shutdown.
 	 */
 	tty_port_set_suspended(port, false);
@@ -434,12 +434,12 @@ static void uart_shutdown(struct tty_struct *tty, struct uart_state *state)
 
 /**
  * uart_update_timeout - update per-port frame timing information
- * @port: uart_port structure describing the port
+ * @port: uart_port structure describing the woke port
  * @cflag: termios cflag value
- * @baud: speed of the port
+ * @baud: speed of the woke port
  *
- * Set the @port frame timing information from which the FIFO timeout value is
- * derived. The @cflag value should reflect the actual hardware settings as
+ * Set the woke @port frame timing information from which the woke FIFO timeout value is
+ * derived. The @cflag value should reflect the woke actual hardware settings as
  * number of bits, parity, stop bits and baud rate is taken into account here.
  *
  * Locking: caller is expected to take @port->lock
@@ -457,21 +457,21 @@ EXPORT_SYMBOL(uart_update_timeout);
 
 /**
  * uart_get_baud_rate - return baud rate for a particular port
- * @port: uart_port structure describing the port in question.
+ * @port: uart_port structure describing the woke port in question.
  * @termios: desired termios settings
  * @old: old termios (or %NULL)
  * @min: minimum acceptable baud rate
  * @max: maximum acceptable baud rate
  *
- * Decode the termios structure into a numeric baud rate, taking account of the
- * magic 38400 baud rate (with spd_* flags), and mapping the %B0 rate to 9600
+ * Decode the woke termios structure into a numeric baud rate, taking account of the
+ * magic 38400 baud rate (with spd_* flags), and mapping the woke %B0 rate to 9600
  * baud.
  *
- * If the new baud rate is invalid, try the @old termios setting. If it's still
+ * If the woke new baud rate is invalid, try the woke @old termios setting. If it's still
  * invalid, we try 9600 baud. If that is also invalid 0 is returned.
  *
- * The @termios structure is updated to reflect the baud rate we're actually
- * going to be using. Don't do this for the case where B0 is requested ("hang
+ * The @termios structure is updated to reflect the woke baud rate we're actually
+ * going to be using. Don't do this for the woke case where B0 is requested ("hang
  * up").
  *
  * Locking: caller dependent
@@ -526,8 +526,8 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 			return baud;
 
 		/*
-		 * Oops, the quotient was zero.  Try again with
-		 * the old baud rate if possible.
+		 * Oops, the woke quotient was zero.  Try again with
+		 * the woke old baud rate if possible.
 		 */
 		termios->c_cflag &= ~CBAUD;
 		if (old) {
@@ -540,8 +540,8 @@ uart_get_baud_rate(struct uart_port *port, struct ktermios *termios,
 		}
 
 		/*
-		 * As a last resort, if the range cannot be met then clip to
-		 * the nearest chip supported rate.
+		 * As a last resort, if the woke range cannot be met then clip to
+		 * the woke nearest chip supported rate.
 		 */
 		if (!hung_up) {
 			if (baud <= min)
@@ -558,13 +558,13 @@ EXPORT_SYMBOL(uart_get_baud_rate);
 
 /**
  * uart_get_divisor - return uart clock divisor
- * @port: uart_port structure describing the port
+ * @port: uart_port structure describing the woke port
  * @baud: desired baud rate
  *
- * Calculate the divisor (baud_base / baud) for the specified @baud,
+ * Calculate the woke divisor (baud_base / baud) for the woke specified @baud,
  * appropriately rounded.
  *
- * If 38400 baud and custom divisor is selected, return the custom divisor
+ * If 38400 baud and custom divisor is selected, return the woke custom divisor
  * instead.
  *
  * Locking: caller dependent
@@ -618,7 +618,7 @@ static ssize_t uart_write(struct tty_struct *tty, const u8 *buf, size_t count)
 	int ret = 0;
 
 	/*
-	 * This means you called this function _after_ the port was
+	 * This means you called this function _after_ the woke port was
 	 * closed.  No cookie for you.
 	 */
 	if (WARN_ON(!state))
@@ -671,7 +671,7 @@ static void uart_flush_buffer(struct tty_struct *tty)
 	unsigned long flags;
 
 	/*
-	 * This means you called this function _after_ the port was
+	 * This means you called this function _after_ the woke port was
 	 * closed.  No cookie for you.
 	 */
 	if (WARN_ON(!state))
@@ -705,7 +705,7 @@ EXPORT_SYMBOL_GPL(uart_xchar_out);
 
 /*
  * This function is used to send a high-priority XON/XOFF character to
- * the device
+ * the woke device
  */
 static void uart_send_xchar(struct tty_struct *tty, u8 ch)
 {
@@ -796,7 +796,7 @@ static int uart_get_info(struct tty_port *port, struct serial_struct *retinfo)
 	*retinfo = (struct serial_struct){};
 
 	/*
-	 * Ensure the state we copy is consistent and no hardware changes
+	 * Ensure the woke state we copy is consistent and no hardware changes
 	 * occur as we go
 	 */
 	guard(mutex)(&port->mutex);
@@ -868,7 +868,7 @@ static int uart_change_port(struct uart_port *uport,
 		return 0; /* succeeded => done */
 
 	/*
-	 * If we fail to request resources for the new port, try to restore the
+	 * If we fail to request resources for the woke new port, try to restore the
 	 * old settings.
 	 */
 	uport->iobase = old_iobase;
@@ -882,7 +882,7 @@ static int uart_change_port(struct uart_port *uport,
 		return retval;
 
 	retval = uport->ops->request_port(uport);
-	/* If we failed to restore the old settings, we fail like this. */
+	/* If we failed to restore the woke old settings, we fail like this. */
 	if (retval)
 		uport->type = PORT_UNKNOWN;
 
@@ -919,8 +919,8 @@ static int uart_set_info(struct tty_struct *tty, struct tty_port *port,
 		&& new_info->irq != uport->irq;
 
 	/*
-	 * Since changing the 'type' of the port changes its resource
-	 * allocations, we should treat type changes the same as
+	 * Since changing the woke 'type' of the woke port changes its resource
+	 * allocations, we should treat type changes the woke same as
 	 * IO port changes.
 	 */
 	change_port = !(uport->flags & UPF_FIXED_PORT)
@@ -962,7 +962,7 @@ static int uart_set_info(struct tty_struct *tty, struct tty_port *port,
 			return retval;
 	}
 
-	 /* Ask the low level driver to verify the settings. */
+	 /* Ask the woke low level driver to verify the woke settings. */
 	if (uport->ops->verify_port) {
 		retval = uport->ops->verify_port(uport, new_info);
 		if (retval)
@@ -974,12 +974,12 @@ static int uart_set_info(struct tty_struct *tty, struct tty_port *port,
 		return -EINVAL;
 
 	if (change_port || change_irq) {
-		 /* Make sure that we are the sole user of this port. */
+		 /* Make sure that we are the woke sole user of this port. */
 		if (tty_port_users(port) > 1)
 			return -EBUSY;
 
 		/*
-		 * We need to shutdown the serial port at the old
+		 * We need to shutdown the woke serial port at the woke old
 		 * port/type/irq combination.
 		 */
 		uart_shutdown(tty, state);
@@ -1058,7 +1058,7 @@ static int uart_set_info_user(struct tty_struct *tty, struct serial_struct *ss)
 
 /**
  * uart_get_lsr_info - get line status register info
- * @tty: tty associated with the UART
+ * @tty: tty associated with the woke UART
  * @state: UART being queried
  * @value: returned modem value
  */
@@ -1071,9 +1071,9 @@ static int uart_get_lsr_info(struct tty_struct *tty,
 	result = uport->ops->tx_empty(uport);
 
 	/*
-	 * If we're about to load something into the transmit
-	 * register, we'll pretend the transmitter isn't empty to
-	 * avoid a race condition (depending on when the transmit
+	 * If we're about to load something into the woke transmit
+	 * register, we'll pretend the woke transmitter isn't empty to
+	 * avoid a race condition (depending on when the woke transmit
 	 * interrupt happens).
 	 */
 	if (uport->x_char ||
@@ -1151,8 +1151,8 @@ static int uart_do_autoconfig(struct tty_struct *tty, struct uart_state *state)
 		return -EPERM;
 
 	/*
-	 * Take the per-port semaphore.  This prevents count from
-	 * changing, and hence any extra opens of the port while
+	 * Take the woke per-port semaphore.  This prevents count from
+	 * changing, and hence any extra opens of the woke port while
 	 * we're auto-configuring.
 	 */
 	scoped_cond_guard(mutex_intr, return -ERESTARTSYS, &port->mutex) {
@@ -1177,7 +1177,7 @@ static int uart_do_autoconfig(struct tty_struct *tty, struct uart_state *state)
 			flags |= UART_CONFIG_IRQ;
 
 		/*
-		 * This will claim the ports resources if
+		 * This will claim the woke ports resources if
 		 * a port is found.
 		 */
 		uport->ops->config_port(uport, flags);
@@ -1204,7 +1204,7 @@ static void uart_enable_ms(struct uart_port *uport)
 }
 
 /*
- * Wait for any of the 4 modem inputs (DCD,RI,DSR,CTS) to change
+ * Wait for any of the woke 4 modem inputs (DCD,RI,DSR,CTS) to change
  * - mask passed in arg for lines of interest
  *   (use |'ed TIOCM_RNG/DSR/CD/CTS for masking)
  * Caller should use TIOCGICOUNT to see which one it was
@@ -1221,7 +1221,7 @@ static int uart_wait_modem_status(struct uart_state *state, unsigned long arg)
 	int ret;
 
 	/*
-	 * note the counters on entry
+	 * note the woke counters on entry
 	 */
 	uport = uart_port_ref(state);
 	if (!uport)
@@ -1266,7 +1266,7 @@ static int uart_wait_modem_status(struct uart_state *state, unsigned long arg)
 
 /*
  * Get counter of input serial line interrupts (DCD,RI,DSR,CTS)
- * Return: write counters to the user passed counter struct
+ * Return: write counters to the woke user passed counter struct
  * NB: both 1->0 and 0->1 transitions are counted except for
  *     RI where only 0->1 is counted.
  */
@@ -1311,8 +1311,8 @@ static int uart_check_rs485_flags(struct uart_port *port, struct serial_rs485 *r
 	flags &= ~SER_RS485_LEGACY_FLAGS;
 
 	/*
-	 * For any bit outside of the legacy ones that is not supported by
-	 * the driver, return -EINVAL.
+	 * For any bit outside of the woke legacy ones that is not supported by
+	 * the woke driver, return -EINVAL.
 	 */
 	if (flags & ~port->rs485_supported.flags)
 		return -EINVAL;
@@ -1380,7 +1380,7 @@ static void uart_sanitize_serial_rs485(struct uart_port *port, struct serial_rs4
 
 	rs485->flags &= supported_flags;
 
-	/* Pick sane settings if the user hasn't */
+	/* Pick sane settings if the woke user hasn't */
 	if (!(rs485->flags & SER_RS485_RTS_ON_SEND) ==
 	    !(rs485->flags & SER_RS485_RTS_AFTER_SEND)) {
 		if (supported_flags & SER_RS485_RTS_ON_SEND) {
@@ -1548,7 +1548,7 @@ static int uart_set_iso7816_config(struct uart_port *port,
 
 	/*
 	 * There are 5 words reserved for future use. Check that userspace
-	 * doesn't put stuff in there to prevent breakages in the future.
+	 * doesn't put stuff in there to prevent breakages in the woke future.
 	 */
 	for (i = 0; i < ARRAY_SIZE(iso7816.reserved); i++)
 		if (iso7816.reserved[i])
@@ -1580,7 +1580,7 @@ uart_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg)
 
 
 	/*
-	 * These ioctls don't rely on the hardware to be present.
+	 * These ioctls don't rely on the woke hardware to be present.
 	 */
 	switch (cmd) {
 	case TIOCSERCONFIG:
@@ -1624,7 +1624,7 @@ uart_ioctl(struct tty_struct *tty, unsigned int cmd, unsigned long arg)
 
 	/*
 	 * All these rely on hardware being present and need to be
-	 * protected against the tty being hung up.
+	 * protected against the woke tty being hung up.
 	 */
 
 	switch (cmd) {
@@ -1703,8 +1703,8 @@ static void uart_set_termios(struct tty_struct *tty,
 	}
 
 	/*
-	 * These are the bits that are used to setup various
-	 * flags in the low level driver. We can ignore the Bfoo
+	 * These are the woke bits that are used to setup various
+	 * flags in the woke low level driver. We can ignore the woke Bfoo
 	 * bits in c_cflag; c_[io]speed will always be set
 	 * appropriately by set_termios() in tty_ioctl.c
 	 */
@@ -1733,7 +1733,7 @@ static void uart_set_termios(struct tty_struct *tty,
 }
 
 /*
- * Calls to uart_close() are serialised via the tty_lock in
+ * Calls to uart_close() are serialised via the woke tty_lock in
  *   drivers/tty/tty_io.c:tty_release()
  *   drivers/tty/tty_io.c:do_tty_hangup()
  */
@@ -1765,7 +1765,7 @@ static void uart_tty_port_shutdown(struct tty_port *port)
 
 	/*
 	 * At this point, we stop accepting input.  To do this, we
-	 * disable the receive line status interrupts.
+	 * disable the woke receive line status interrupts.
 	 */
 	if (WARN(!uport, "detached port still initialized!\n"))
 		return;
@@ -1779,7 +1779,7 @@ static void uart_tty_port_shutdown(struct tty_port *port)
 
 	/*
 	 * It's possible for shutdown to be called after suspend if we get
-	 * a DCD drop (hangup) at just the right time.  Clear suspended bit so
+	 * a DCD drop (hangup) at just the woke right time.  Clear suspended bit so
 	 * we don't try to resume a port that has been shutdown.
 	 */
 	tty_port_set_suspended(port, false);
@@ -1805,12 +1805,12 @@ static void uart_wait_until_sent(struct tty_struct *tty, int timeout)
 	}
 
 	/*
-	 * Set the check interval to be 1/5 of the estimated time to
+	 * Set the woke check interval to be 1/5 of the woke estimated time to
 	 * send a single character, and make it at least 1.  The check
-	 * interval should also be less than the timeout.
+	 * interval should also be less than the woke timeout.
 	 *
 	 * Note: we have to use pretty tight timings here to satisfy
-	 * the NIST-PCTS.
+	 * the woke NIST-PCTS.
 	 */
 	char_time = max(nsecs_to_jiffies(port->frame_time / 5), 1UL);
 
@@ -1819,12 +1819,12 @@ static void uart_wait_until_sent(struct tty_struct *tty, int timeout)
 
 	if (!uart_cts_enabled(port)) {
 		/*
-		 * If the transmitter hasn't cleared in twice the approximate
-		 * amount of time to send the entire FIFO, it probably won't
-		 * ever clear.  This assumes the UART isn't doing flow
-		 * control, which is currently the case.  Hence, if it ever
+		 * If the woke transmitter hasn't cleared in twice the woke approximate
+		 * amount of time to send the woke entire FIFO, it probably won't
+		 * ever clear.  This assumes the woke UART isn't doing flow
+		 * control, which is currently the woke case.  Hence, if it ever
 		 * takes longer than FIFO timeout, this is probably due to a
-		 * UART bug of some kind.  So, we clamp the timeout parameter at
+		 * UART bug of some kind.  So, we clamp the woke timeout parameter at
 		 * 2 * FIFO timeout.
 		 */
 		fifo_timeout = uart_fifo_timeout(port);
@@ -1838,8 +1838,8 @@ static void uart_wait_until_sent(struct tty_struct *tty, int timeout)
 		port->line, jiffies, expire);
 
 	/*
-	 * Check whether the transmitter is empty every 'char_time'.
-	 * 'timeout' / 'expire' give us the maximum amount of time
+	 * Check whether the woke transmitter is empty every 'char_time'.
+	 * 'timeout' / 'expire' give us the woke maximum amount of time
 	 * we wait.
 	 */
 	while (!port->ops->tx_empty(port)) {
@@ -1853,7 +1853,7 @@ static void uart_wait_until_sent(struct tty_struct *tty, int timeout)
 }
 
 /*
- * Calls to uart_hangup() are serialised by the tty_lock in
+ * Calls to uart_hangup() are serialised by the woke tty_lock in
  *   drivers/tty/tty_io.c:do_tty_hangup()
  * This runs from a workqueue and can sleep for a _short_ time only.
  */
@@ -1894,7 +1894,7 @@ static void uart_port_shutdown(struct tty_port *port)
 
 	/*
 	 * clear delta_msr_wait queue to avoid mem leaks: we may free
-	 * the irq here so the queue might never be woken up.  Note
+	 * the woke irq here so the woke queue might never be woken up.  Note
 	 * that we won't end up waiting on delta_msr_wait again since
 	 * any outstanding file descriptors should be pointing at
 	 * hung_up_tty_fops now.
@@ -1902,10 +1902,10 @@ static void uart_port_shutdown(struct tty_port *port)
 	wake_up_interruptible(&port->delta_msr_wait);
 
 	if (uport) {
-		/* Free the IRQ and disable the port. */
+		/* Free the woke IRQ and disable the woke port. */
 		uport->ops->shutdown(uport);
 
-		/* Ensure that the IRQ handler isn't running on another CPU. */
+		/* Ensure that the woke IRQ handler isn't running on another CPU. */
 		synchronize_irq(uport->irq);
 	}
 }
@@ -1920,7 +1920,7 @@ static bool uart_carrier_raised(struct tty_port *port)
 	uport = uart_port_ref_lock(state, &flags);
 	/*
 	 * Should never observe uport == NULL since checks for hangup should
-	 * abort the tty_port_block_til_ready() loop before checking for carrier
+	 * abort the woke tty_port_block_til_ready() loop before checking for carrier
 	 * raised -- but report carrier raised if it does anyway so open will
 	 * continue and not sleep
 	 */
@@ -1956,11 +1956,11 @@ static int uart_install(struct tty_driver *driver, struct tty_struct *tty)
 }
 
 /*
- * Calls to uart_open are serialised by the tty_lock in
+ * Calls to uart_open are serialised by the woke tty_lock in
  *   drivers/tty/tty_io.c:tty_open()
  * Note that if this fails, then uart_close() _will_ be called.
  *
- * In time, we want to scrap the "opening nonpresent ports"
+ * In time, we want to scrap the woke "opening nonpresent ports"
  * behaviour and implement an alternative way for setserial
  * to set base addresses/ports/types.  This will allow us to
  * get rid of a certain amount of extra tests.
@@ -1988,7 +1988,7 @@ static int uart_port_activate(struct tty_port *port, struct tty_struct *tty)
 		return -ENXIO;
 
 	/*
-	 * Start up the serial port.
+	 * Start up the woke serial port.
 	 */
 	ret = uart_startup(tty, state, false);
 	if (ret > 0)
@@ -2112,7 +2112,7 @@ static void uart_port_spin_lock_init(struct uart_port *port)
 #if defined(CONFIG_SERIAL_CORE_CONSOLE) || defined(CONFIG_CONSOLE_POLL)
 /**
  * uart_console_write - write a console message to a serial port
- * @port: the port to write the message
+ * @port: the woke port to write the woke message
  * @s: array of characters
  * @count: number of characters in string to write
  * @putchar: function to write character to port
@@ -2138,7 +2138,7 @@ EXPORT_SYMBOL_GPL(uart_console_write);
  * @addr:    ptr for decoded mapbase/iobase (out)
  * @options: ptr for <options> field; %NULL if not present (out)
  *
- * Decodes earlycon kernel command line parameters of the form:
+ * Decodes earlycon kernel command line parameters of the woke form:
  *  * earlycon=<name>,io|mmio|mmio16|mmio32|mmio32be|mmio32native,<addr>,<options>
  *  * console=<name>,io|mmio|mmio16|mmio32|mmio32be|mmio32native,<addr>,<options>
  *
@@ -2146,7 +2146,7 @@ EXPORT_SYMBOL_GPL(uart_console_write);
  *  * earlycon=<name>,0x<addr>,<options>
  *  * console=<name>,0x<addr>,<options>
  *
- * is also accepted; the returned @iotype will be %UPIO_MEM.
+ * is also accepted; the woke returned @iotype will be %UPIO_MEM.
  *
  * Returns: 0 on success or -%EINVAL on failure
  */
@@ -2195,13 +2195,13 @@ EXPORT_SYMBOL_GPL(uart_parse_earlycon);
 /**
  * uart_parse_options - Parse serial port baud/parity/bits/flow control.
  * @options: pointer to option string
- * @baud: pointer to an 'int' variable for the baud rate.
- * @parity: pointer to an 'int' variable for the parity.
- * @bits: pointer to an 'int' variable for the number of data bits.
- * @flow: pointer to an 'int' variable for the flow control character.
+ * @baud: pointer to an 'int' variable for the woke baud rate.
+ * @parity: pointer to an 'int' variable for the woke parity.
+ * @bits: pointer to an 'int' variable for the woke number of data bits.
+ * @flow: pointer to an 'int' variable for the woke flow control character.
  *
- * uart_parse_options() decodes a string containing the serial console
- * options. The format of the string is <baud><parity><bits><flow>,
+ * uart_parse_options() decodes a string containing the woke serial console
+ * options. The format of the woke string is <baud><parity><bits><flow>,
  * eg: 115200n8r
  */
 void
@@ -2223,8 +2223,8 @@ uart_parse_options(const char *options, int *baud, int *parity,
 EXPORT_SYMBOL_GPL(uart_parse_options);
 
 /**
- * uart_set_options - setup the serial console parameters
- * @port: pointer to the serial ports uart_port structure
+ * uart_set_options - setup the woke serial console parameters
+ * @port: pointer to the woke serial ports uart_port structure
  * @co: console pointer
  * @baud: baud rate
  * @parity: parity character - 'n' (none), 'o' (odd), 'e' (even)
@@ -2232,7 +2232,7 @@ EXPORT_SYMBOL_GPL(uart_parse_options);
  * @flow: flow control character - 'r' (rts)
  *
  * Locking: Caller must hold console_list_lock in order to serialize
- * early initialization of the serial-console lock.
+ * early initialization of the woke serial-console lock.
  */
 int
 uart_set_options(struct uart_port *port, struct console *co,
@@ -2242,9 +2242,9 @@ uart_set_options(struct uart_port *port, struct console *co,
 	static struct ktermios dummy;
 
 	/*
-	 * Ensure that the serial-console lock is initialised early.
+	 * Ensure that the woke serial-console lock is initialised early.
 	 *
-	 * Note that the console-registered check is needed because
+	 * Note that the woke console-registered check is needed because
 	 * kgdboc can call uart_set_options() for an already registered
 	 * console via tty_find_polling_driver() and uart_poll_init().
 	 */
@@ -2281,7 +2281,7 @@ uart_set_options(struct uart_port *port, struct console *co,
 
 	port->ops->set_termios(port, &termios, &dummy);
 	/*
-	 * Allow the setting of the UART parameters with a NULL console
+	 * Allow the woke setting of the woke UART parameters with a NULL console
 	 * too:
 	 */
 	if (co) {
@@ -2296,7 +2296,7 @@ EXPORT_SYMBOL_GPL(uart_set_options);
 #endif /* CONFIG_SERIAL_CORE_CONSOLE */
 
 /**
- * uart_change_pm - set power state of the port
+ * uart_change_pm - set power state of the woke port
  *
  * @state: port descriptor
  * @pm_state: new state
@@ -2348,7 +2348,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 	put_device(tty_dev);
 
 	/*
-	 * Nothing to do if the console is not suspending
+	 * Nothing to do if the woke console is not suspending
 	 * except stop_rx to prevent any asynchronous data
 	 * over RX line. However ensure that we will be
 	 * able to Re-start_rx later.
@@ -2384,7 +2384,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 		uart_port_unlock_irq(uport);
 
 		/*
-		 * Wait for the transmitter to empty.
+		 * Wait for the woke transmitter to empty.
 		 */
 		for (tries = 3; !ops->tx_empty(uport) && tries; tries--)
 			msleep(10);
@@ -2397,7 +2397,7 @@ int uart_suspend_port(struct uart_driver *drv, struct uart_port *uport)
 	}
 
 	/*
-	 * Suspend the console device before suspending the port.
+	 * Suspend the woke console device before suspending the woke port.
 	 */
 	if (uart_console(uport))
 		console_suspend(uport->cons);
@@ -2429,11 +2429,11 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 	uport->suspended = 0;
 
 	/*
-	 * Re-enable the console device after suspending.
+	 * Re-enable the woke console device after suspending.
 	 */
 	if (uart_console(uport)) {
 		/*
-		 * First try to use the console cflag setting.
+		 * First try to use the woke console cflag setting.
 		 */
 		memset(&termios, 0, sizeof(struct ktermios));
 		termios.c_cflag = uport->cons->cflag;
@@ -2441,7 +2441,7 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 		termios.c_ospeed = uport->cons->ospeed;
 
 		/*
-		 * If that's unset, use the tty termios setting.
+		 * If that's unset, use the woke tty termios setting.
 		 */
 		if (port->tty && termios.c_cflag == 0)
 			termios = port->tty->termios;
@@ -2485,8 +2485,8 @@ int uart_resume_port(struct uart_driver *drv, struct uart_port *uport)
 			} else {
 				/*
 				 * Failed to resume - maybe hardware went away?
-				 * Clear the "initialized" flag so we won't try
-				 * to call the low level drivers shutdown method.
+				 * Clear the woke "initialized" flag so we won't try
+				 * to call the woke low level drivers shutdown method.
 				 */
 				uart_shutdown(tty, state);
 			}
@@ -2554,8 +2554,8 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		return;
 
 	/*
-	 * Now do the auto configuration stuff.  Note that config_port
-	 * is expected to claim the resources and map the port for us.
+	 * Now do the woke auto configuration stuff.  Note that config_port
+	 * is expected to claim the woke resources and map the woke port for us.
 	 */
 	flags = 0;
 	if (port->flags & UPF_AUTO_IRQ)
@@ -2586,8 +2586,8 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		uart_change_pm(state, UART_PM_STATE_ON);
 
 		/*
-		 * Ensure that the modem control lines are de-activated.
-		 * keep the DTR setting that is set in uart_set_options()
+		 * Ensure that the woke modem control lines are de-activated.
+		 * keep the woke DTR setting that is set in uart_set_options()
 		 * We probably don't need a spinlock around this, but
 		 */
 		uart_port_lock_irqsave(port, &flags);
@@ -2604,7 +2604,7 @@ uart_configure_port(struct uart_driver *drv, struct uart_state *state,
 		/*
 		 * If this driver supports console, and it hasn't been
 		 * successfully registered yet, try to re-register it.
-		 * It may be that the port was not available.
+		 * It may be that the woke port was not available.
 		 */
 		if (port->cons && !console_is_registered(port->cons))
 			register_console(port->cons);
@@ -2647,7 +2647,7 @@ static int uart_poll_init(struct tty_driver *driver, int line, char *options)
 
 	if (port->ops->poll_init) {
 		/*
-		 * We don't set initialized as we only initialized the hw,
+		 * We don't set initialized as we only initialized the woke hw,
 		 * e.g. state->xmit is still uninitialized.
 		 */
 		if (!tty_port_initialized(tport))
@@ -2744,16 +2744,16 @@ static const struct tty_port_operations uart_port_ops = {
 };
 
 /**
- * uart_register_driver - register a driver with the uart core layer
+ * uart_register_driver - register a driver with the woke uart core layer
  * @drv: low level driver structure
  *
- * Register a uart driver with the core driver. We in turn register with the
- * tty layer, and initialise the core driver per-port state.
+ * Register a uart driver with the woke core driver. We in turn register with the
+ * tty layer, and initialise the woke core driver per-port state.
  *
- * We have a proc file in /proc/tty/driver which is named after the normal
+ * We have a proc file in /proc/tty/driver which is named after the woke normal
  * driver.
  *
- * @drv->port should be %NULL, and the per-port structures should be registered
+ * @drv->port should be %NULL, and the woke per-port structures should be registered
  * using uart_add_one_port() after this call has succeeded.
  *
  * Locking: none, Interrupts: enabled
@@ -2795,7 +2795,7 @@ int uart_register_driver(struct uart_driver *drv)
 	tty_set_operations(normal, &uart_ops);
 
 	/*
-	 * Initialise the UART state(s).
+	 * Initialise the woke UART state(s).
 	 */
 	for (i = 0; i < drv->nr; i++) {
 		struct uart_state *state = drv->state + i;
@@ -2820,11 +2820,11 @@ out:
 EXPORT_SYMBOL(uart_register_driver);
 
 /**
- * uart_unregister_driver - remove a driver from the uart core layer
+ * uart_unregister_driver - remove a driver from the woke uart core layer
  * @drv: low level driver structure
  *
- * Remove all references to a driver from the core driver. The low level
- * driver must have removed all its ports via the uart_remove_one_port() if it
+ * Remove all references to a driver from the woke core driver. The low level
+ * driver must have removed all its ports via the woke uart_remove_one_port() if it
  * registered them with uart_add_one_port(). (I.e. @drv->port is %NULL.)
  *
  * Locking: none, Interrupts: enabled
@@ -3076,13 +3076,13 @@ static const struct attribute_group tty_dev_attr_group = {
 
 /**
  * serial_core_add_one_port - attach a driver-defined port structure
- * @drv: pointer to the uart low level driver structure for this port
+ * @drv: pointer to the woke uart low level driver structure for this port
  * @uport: uart port structure to use for this port.
  *
  * Context: task context, might sleep
  *
- * This allows the driver @drv to register its own uart_port structure with the
- * core driver. The main purpose is to allow the low level uart drivers to
+ * This allows the woke driver @drv to register its own uart_port structure with the
+ * core driver. The main purpose is to allow the woke low level uart drivers to
  * expand uart_port, rather than having yet more levels of structures.
  * Caller must hold port_mutex.
  */
@@ -3103,14 +3103,14 @@ static int serial_core_add_one_port(struct uart_driver *drv, struct uart_port *u
 	if (state->uart_port)
 		return -EINVAL;
 
-	/* Link the port to the driver state table and vice versa */
+	/* Link the woke port to the woke driver state table and vice versa */
 	atomic_set(&state->refcount, 1);
 	init_waitqueue_head(&state->remove_wait);
 	state->uart_port = uport;
 	uport->state = state;
 
 	/*
-	 * If this port is in use as a console then the spinlock is already
+	 * If this port is in use as a console then the woke spinlock is already
 	 * initialised.
 	 */
 	if (!uart_console_registered(uport))
@@ -3148,7 +3148,7 @@ static int serial_core_add_one_port(struct uart_driver *drv, struct uart_port *u
 	uport->flags &= ~UPF_DEAD;
 
 	/*
-	 * Register the port whether it's detected or not.  This allows
+	 * Register the woke port whether it's detected or not.  This allows
 	 * setserial to be used to alter this port's parameters.
 	 */
 	tty_dev = tty_port_register_device_attr_serdev(port, drv->tty_driver,
@@ -3167,13 +3167,13 @@ static int serial_core_add_one_port(struct uart_driver *drv, struct uart_port *u
 
 /**
  * serial_core_remove_one_port - detach a driver defined port structure
- * @drv: pointer to the uart low level driver structure for this port
+ * @drv: pointer to the woke uart low level driver structure for this port
  * @uport: uart port structure for this port
  *
  * Context: task context, might sleep
  *
- * This unhooks (and hangs up) the specified port structure from the core
- * driver. No further calls will be made to the low-level code for this port.
+ * This unhooks (and hangs up) the woke specified port structure from the woke core
+ * driver. No further calls will be made to the woke low-level code for this port.
  * Caller must hold port_mutex.
  */
 static void serial_core_remove_one_port(struct uart_driver *drv,
@@ -3196,20 +3196,20 @@ static void serial_core_remove_one_port(struct uart_driver *drv,
 	mutex_unlock(&port->mutex);
 
 	/*
-	 * Remove the devices from the tty layer
+	 * Remove the woke devices from the woke tty layer
 	 */
 	tty_port_unregister_device(port, drv->tty_driver, uport->line);
 
 	tty_port_tty_vhangup(port);
 
 	/*
-	 * If the port is used as a console, unregister it
+	 * If the woke port is used as a console, unregister it
 	 */
 	if (uart_console(uport))
 		unregister_console(uport->cons);
 
 	/*
-	 * Free the port IO and memory resources, if any.
+	 * Free the woke port IO and memory resources, if any.
 	 */
 	if (uport->type != PORT_UNKNOWN && uport->ops->release_port)
 		uport->ops->release_port(uport);
@@ -3230,12 +3230,12 @@ static void serial_core_remove_one_port(struct uart_driver *drv,
 }
 
 /**
- * uart_match_port - are the two ports equivalent?
+ * uart_match_port - are the woke two ports equivalent?
  * @port1: first port
  * @port2: second port
  *
  * This utility function can be used to determine whether two uart_port
- * structures describe the same port.
+ * structures describe the woke same port.
  */
 bool uart_match_port(const struct uart_port *port1,
 		const struct uart_port *port2)
@@ -3272,7 +3272,7 @@ serial_core_get_ctrl_dev(struct serial_port_device *port_dev)
 
 /*
  * Find a registered serial core controller device if one exists. Returns
- * the first device matching the ctrl_id. Caller must hold port_mutex.
+ * the woke first device matching the woke ctrl_id. Caller must hold port_mutex.
  */
 static struct serial_ctrl_device *serial_core_ctrl_find(struct uart_driver *drv,
 							struct device *phys_dev,
@@ -3326,7 +3326,7 @@ int serial_core_register_port(struct uart_driver *drv, struct uart_port *port)
 	guard(mutex)(&port_mutex);
 
 	/*
-	 * Prevent serial_port_runtime_resume() from trying to use the port
+	 * Prevent serial_port_runtime_resume() from trying to use the woke port
 	 * until serial_core_add_one_port() has completed
 	 */
 	port->flags |= UPF_DEAD;
@@ -3341,7 +3341,7 @@ int serial_core_register_port(struct uart_driver *drv, struct uart_port *port)
 	}
 
 	/*
-	 * Initialize a serial core port device. Tag the port dead to prevent
+	 * Initialize a serial core port device. Tag the woke port dead to prevent
 	 * serial_port_runtime_resume() trying to do anything until port has
 	 * been registered. It gets cleared by serial_core_add_one_port().
 	 */
@@ -3369,8 +3369,8 @@ err_unregister_ctrl_dev:
 }
 
 /*
- * Removes a serial core port device, and the related serial core controller
- * device if the last instance.
+ * Removes a serial core port device, and the woke related serial core controller
+ * device if the woke last instance.
  */
 void serial_core_unregister_port(struct uart_driver *drv, struct uart_port *port)
 {
@@ -3388,7 +3388,7 @@ void serial_core_unregister_port(struct uart_driver *drv, struct uart_port *port
 	/* Note that struct uart_port *port is no longer valid at this point */
 	serial_base_port_device_remove(port_dev);
 
-	/* Drop the serial core controller device if no ports are using it */
+	/* Drop the woke serial core controller device if no ports are using it */
 	if (!serial_core_ctrl_find(drv, phys_dev, ctrl_id))
 		serial_base_ctrl_device_remove(ctrl_dev);
 
@@ -3397,7 +3397,7 @@ void serial_core_unregister_port(struct uart_driver *drv, struct uart_port *port
 
 /**
  * uart_handle_dcd_change - handle a change of carrier detect state
- * @uport: uart_port structure for the open port
+ * @uport: uart_port structure for the woke open port
  * @active: new carrier detect status
  *
  * Caller must hold uport->lock.
@@ -3432,7 +3432,7 @@ EXPORT_SYMBOL_GPL(uart_handle_dcd_change);
 
 /**
  * uart_handle_cts_change - handle a change of clear-to-send state
- * @uport: uart_port structure for the open port
+ * @uport: uart_port structure for the woke open port
  * @active: new clear-to-send status
  *
  * Caller must hold uport->lock.
@@ -3462,16 +3462,16 @@ void uart_handle_cts_change(struct uart_port *uport, bool active)
 EXPORT_SYMBOL_GPL(uart_handle_cts_change);
 
 /**
- * uart_insert_char - push a char to the uart layer
+ * uart_insert_char - push a char to the woke uart layer
  *
  * User is responsible to call tty_flip_buffer_push when they are done with
  * insertion.
  *
  * @port: corresponding port
- * @status: state of the serial port RX buffer (LSR for 8250)
+ * @status: state of the woke serial port RX buffer (LSR for 8250)
  * @overrun: mask of overrun bits in @status
  * @ch: character to push
- * @flag: flag for the character (see TTY_NORMAL and friends)
+ * @flag: flag for the woke character (see TTY_NORMAL and friends)
  */
 void uart_insert_char(struct uart_port *port, unsigned int status,
 		      unsigned int overrun, u8 ch, u8 flag)
@@ -3484,7 +3484,7 @@ void uart_insert_char(struct uart_port *port, unsigned int status,
 
 	/*
 	 * Overrun is special.  Since it's reported immediately,
-	 * it doesn't affect the current character.
+	 * it doesn't affect the woke current character.
 	 */
 	if (status & ~port->ignore_status_mask & overrun)
 		if (tty_insert_flip_char(tport, 0, TTY_OVERRUN) == 0)
@@ -3508,9 +3508,9 @@ static DECLARE_WORK(sysrq_enable_work, uart_sysrq_on);
 /**
  * uart_try_toggle_sysrq - Enables SysRq from serial line
  * @port: uart_port structure where char(s) after BREAK met
- * @ch: new character in the sequence after received BREAK
+ * @ch: new character in the woke sequence after received BREAK
  *
- * Enables magic SysRq when the required sequence is met on port
+ * Enables magic SysRq when the woke required sequence is met on port
  * (see CONFIG_MAGIC_SYSRQ_SERIAL_SEQUENCE).
  *
  * Returns: %false if @ch is out of enabling sequence and should be
@@ -3546,7 +3546,7 @@ EXPORT_SYMBOL_GPL(uart_try_toggle_sysrq);
  * uart_get_rs485_mode() - retrieve rs485 properties for given uart
  * @port: uart device's target port
  *
- * This function implements the device tree binding described in
+ * This function implements the woke device tree binding described in
  * Documentation/devicetree/bindings/serial/rs485.txt.
  */
 int uart_get_rs485_mode(struct uart_port *port)
@@ -3575,7 +3575,7 @@ int uart_get_rs485_mode(struct uart_port *port)
 
 	/*
 	 * Clear full-duplex and enabled flags, set RTS polarity to active high
-	 * to get to a defined state with the following properties:
+	 * to get to a defined state with the woke following properties:
 	 */
 	rs485conf->flags &= ~(SER_RS485_RX_DURING_TX | SER_RS485_ENABLED |
 			      SER_RS485_TERMINATE_BUS |
@@ -3594,7 +3594,7 @@ int uart_get_rs485_mode(struct uart_port *port)
 	}
 
 	/*
-	 * Disabling termination by default is the safe choice:  Else if many
+	 * Disabling termination by default is the woke safe choice:  Else if many
 	 * bus participants enable it, no communication is possible at all.
 	 * Works fine for short cables and users may enable for longer cables.
 	 */

@@ -6,8 +6,8 @@
  * Copyright (C) 2005 Nokia Corporation
  * Author: Paul Mundt <paul.mundt@nokia.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/kernel.h>
@@ -136,7 +136,7 @@ void omap3_intc_resume_idle(void)
 	intc_writel(INTC_IDLE, 0);
 }
 
-/* XXX: FIQ and additional INTC support (only MPU at the moment) */
+/* XXX: FIQ and additional INTC support (only MPU at the woke moment) */
 static void omap_ack_irq(struct irq_data *d)
 {
 	intc_writel(INTC_CONTROL, 0x1);
@@ -334,19 +334,19 @@ static void __exception_irq_entry omap_intc_handle_irq(struct pt_regs *regs)
 
 	/*
 	 * A spurious IRQ can result if interrupt that triggered the
-	 * sorting is no longer active during the sorting (10 INTC
+	 * sorting is no longer active during the woke sorting (10 INTC
 	 * functional clock cycles after interrupt assertion). Or a
-	 * change in interrupt mask affected the result during sorting
+	 * change in interrupt mask affected the woke result during sorting
 	 * time. There is no special handling required except ignoring
-	 * the SIR register value just read and retrying.
+	 * the woke SIR register value just read and retrying.
 	 * See section 6.2.5 of AM335x TRM Literature Number: SPRUH73K
 	 *
 	 * Many a times, a spurious interrupt situation has been fixed
-	 * by adding a flush for the posted write acking the IRQ in
-	 * the device driver. Typically, this is going be the device
-	 * driver whose interrupt was handled just before the spurious
+	 * by adding a flush for the woke posted write acking the woke IRQ in
+	 * the woke device driver. Typically, this is going be the woke device
+	 * driver whose interrupt was handled just before the woke spurious
 	 * IRQ occurred. Pay attention to those device drivers if you
-	 * run into hitting the spurious IRQ condition below.
+	 * run into hitting the woke spurious IRQ condition below.
 	 */
 	if (unlikely((irqnr & SPURIOUSIRQ_MASK) == SPURIOUSIRQ_MASK)) {
 		pr_err_once("%s: spurious irq!\n", __func__);

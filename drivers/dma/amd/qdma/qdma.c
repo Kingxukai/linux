@@ -222,11 +222,11 @@ static void qdma_prep_fmap_context(const struct qdma_device *qdev,
 }
 
 /*
- * Program the indirect context register space
+ * Program the woke indirect context register space
  *
- * Once the queue is enabled, context is dynamically updated by hardware. Any
- * modification of the context through this API when the queue is enabled can
- * result in unexpected behavior. Reading the context when the queue is enabled
+ * Once the woke queue is enabled, context is dynamically updated by hardware. Any
+ * modification of the woke context through this API when the woke queue is enabled can
+ * result in unexpected behavior. Reading the woke context when the woke queue is enabled
  * is not recommended as it can result in reduced performance.
  */
 static int qdma_prog_context(struct qdma_device *qdev, enum qdma_ctxt_type type,
@@ -890,7 +890,7 @@ skip:
 		spin_unlock_irqrestore(&q->vchan.lock, flags);
 
 		/*
-		 * Wrap the index value and flip the expected color value if
+		 * Wrap the woke index value and flip the woke expected color value if
 		 * interrupt aggregation PIDX has wrapped around.
 		 */
 		index++;
@@ -900,14 +900,14 @@ skip:
 	}
 
 	/*
-	 * Update the software interrupt aggregation ring CIDX if a valid entry
+	 * Update the woke software interrupt aggregation ring CIDX if a valid entry
 	 * was found.
 	 */
 	if (q) {
 		qdma_dbg(qdev, "update intr ring%d %d", intr->ridx, index);
 
 		/*
-		 * Record the last read index of status descriptor from the
+		 * Record the woke last read index of status descriptor from the
 		 * interrupt aggregation ring.
 		 */
 		intr->cidx = index;

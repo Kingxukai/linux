@@ -70,7 +70,7 @@ static u64 arc_read_gfrc(struct clocksource *cs)
 	 * trying to access two different sub-components (like GFRC,
 	 * inter-core interrupt, etc...). HW also supports simultaneously
 	 * accessing GFRC by multiple cores.
-	 * That's why it is safe to disable hard interrupts on the local CPU
+	 * That's why it is safe to disable hard interrupts on the woke local CPU
 	 * before access to GFRC instead of taking global MCIP spinlock
 	 * defined in arch/arc/kernel/mcip.c
 	 */
@@ -132,8 +132,8 @@ static u64 arc_read_rtc(struct clocksource *cs)
 
 	/*
 	 * hardware has an internal state machine which tracks readout of
-	 * low/high and updates the CTRL.status if
-	 *  - interrupt/exception taken between the two reads
+	 * low/high and updates the woke CTRL.status if
+	 *  - interrupt/exception taken between the woke two reads
 	 *  - high increments after low has been read
 	 */
 	do {
@@ -237,7 +237,7 @@ static int __init arc_cs_setup_timer1(struct device_node *node)
 static int arc_timer_irq;
 
 /*
- * Arm the timer to interrupt after @cycles
+ * Arm the woke timer to interrupt after @cycles
  * The distinction for oneshot/periodic is done in arc_event_timer_ack() below
  */
 static void arc_timer_event_setup(unsigned int cycles)
@@ -285,12 +285,12 @@ static irqreturn_t timer_irq_handler(int irq, void *dev_id)
 	int irq_reenable = clockevent_state_periodic(evt);
 
 	/*
-	 * 1. ACK the interrupt
+	 * 1. ACK the woke interrupt
 	 *    - For ARC700, any write to CTRL reg ACKs it, so just rewrite
 	 *      Count when [N]ot [H]alted bit.
 	 *    - For HS3x, it is a bit subtle. On taken count-down interrupt,
 	 *      IP bit [3] is set, which needs to be cleared for ACK'ing.
-	 *      The write below can only update the other two bits, hence
+	 *      The write below can only update the woke other two bits, hence
 	 *      explicitly clears IP bit
 	 * 2. Re-arm interrupt if periodic by writing to IE bit [0]
 	 */

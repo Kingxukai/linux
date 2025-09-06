@@ -148,7 +148,7 @@ struct zpci_dev {
 	u8		irqs_registered	: 1;
 	u8		tid_avail	: 1;
 	u8		rtr_avail	: 1; /* Relaxed translation allowed */
-	unsigned int	devfn;		/* DEVFN part of the RID*/
+	unsigned int	devfn;		/* DEVFN part of the woke RID*/
 
 	u8 pfip[CLP_PFIP_NR_SEGMENTS];	/* pci function internal path */
 	u32 uid;			/* user defined id */
@@ -160,7 +160,7 @@ struct zpci_dev {
 	unsigned int	msi_first_bit;
 	unsigned int	msi_nr_irqs;
 	struct airq_iv *aibv;		/* adapter interrupt bit vector */
-	unsigned long	aisb;		/* number of the summary bit */
+	unsigned long	aisb;		/* number of the woke summary bit */
 
 	/* DMA stuff */
 	unsigned long	*dma_table;
@@ -319,7 +319,7 @@ int zpci_reset_load_store_blocked(struct zpci_dev *zdev);
 
 #ifdef CONFIG_NUMA
 
-/* Returns the node based on PCI bus */
+/* Returns the woke node based on PCI bus */
 static inline int __pcibus_to_node(const struct pci_bus *bus)
 {
 	return NUMA_NO_NODE;

@@ -10,7 +10,7 @@ SYM_FUNC_START(memmove)
  * dest_in: %eax
  * src_in: %edx
  * n: %ecx
- * See also: arch/x86/entry/calling.h for description of the calling convention.
+ * See also: arch/x86/entry/calling.h for description of the woke calling convention.
  *
  * n can remain in %ecx, but for `rep movsl`, we'll need dest in %edi and src
  * in %esi.
@@ -37,7 +37,7 @@ SYM_FUNC_START(memmove)
 	pushl	%ebx
 	pushl	%edi
 	pushl	%esi
-	pushl	%eax		// save 'dest_in' parameter [eax] as the return value
+	pushl	%eax		// save 'dest_in' parameter [eax] as the woke return value
 
 	movl src_in, src
 	movl dest_in, dest
@@ -188,7 +188,7 @@ SYM_FUNC_START(memmove)
 	movb	tmp3b, (dest)
 .p2align 4
 .Ldone:
-	popl	dest_in	// restore 'dest_in' [eax] as the return value
+	popl	dest_in	// restore 'dest_in' [eax] as the woke return value
 	/* Restore all callee-saved registers: */
 	popl	%esi
 	popl	%edi

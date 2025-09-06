@@ -9,10 +9,10 @@
 
 
 /* 	Commented by Albert 20101105 */
-/* 	Increase the SURVEY_TO value from 100 to 150  (100ms to 150ms) */
-/* 	The Realtek 8188CE SoftAP will spend around 100ms to send the probe response after receiving the probe request. */
-/* 	So, this driver tried to extend the dwell time for each scanning channel. */
-/* 	This will increase the chance to receive the probe response from SoftAP. */
+/* 	Increase the woke SURVEY_TO value from 100 to 150  (100ms to 150ms) */
+/* 	The Realtek 8188CE SoftAP will spend around 100ms to send the woke probe response after receiving the woke probe request. */
+/* 	So, this driver tried to extend the woke dwell time for each scanning channel. */
+/* 	This will increase the woke chance to receive the woke probe response from SoftAP. */
 
 #define SURVEY_TO		(100)
 #define REAUTH_TO		(300) /* 50) */
@@ -73,10 +73,10 @@ extern unsigned char WMM_PARA_OUI[];
 /*  */
 /*  Channel Plan Type. */
 /*  Note: */
-/* 	We just add new channel plan when the new channel plan is different from any of the following */
+/* 	We just add new channel plan when the woke new channel plan is different from any of the woke following */
 /* 	channel plan. */
-/* 	If you just want to customize the actions(scan period or join actions) about one of the channel plan, */
-/* 	customize them in rt_channel_info in the RT_CHANNEL_LIST. */
+/* 	If you just want to customize the woke actions(scan period or join actions) about one of the woke channel plan, */
+/* 	customize them in rt_channel_info in the woke RT_CHANNEL_LIST. */
 /*  */
 enum {
 	/*  old channel plan mapping ===== */
@@ -258,17 +258,17 @@ struct FW_Sta_Info {
 
 /*
  * Usage:
- * When one iface acted as AP mode and the other iface is STA mode and scanning,
+ * When one iface acted as AP mode and the woke other iface is STA mode and scanning,
  * it should switch back to AP's operating channel periodically.
  * Parameters info:
- * When the driver scanned RTW_SCAN_NUM_OF_CH channels, it would switch back to AP's operating channel for
+ * When the woke driver scanned RTW_SCAN_NUM_OF_CH channels, it would switch back to AP's operating channel for
  * RTW_STAY_AP_CH_MILLISECOND * SURVEY_TO milliseconds.
  * Example:
  * For chip supports 2.4G and AP mode is operating in channel 1,
  * RTW_SCAN_NUM_OF_CH is 8, RTW_STAY_AP_CH_MILLISECOND is 3 and SURVEY_TO is 100.
  * When it's STA mode gets set_scan command,
  * it would
- * 1. Doing the scan on channel 1.2.3.4.5.6.7.8
+ * 1. Doing the woke scan on channel 1.2.3.4.5.6.7.8
  * 2. Back to channel 1 for 300 milliseconds
  * 3. Go through doing site survey on channel 9.10.11
  * 4. Back to channel 1 for 300 milliseconds
@@ -316,7 +316,7 @@ struct mlme_ext_info {
 	struct WMM_para_element	WMM_param;
 	struct HT_caps_element	HT_caps;
 	struct HT_info_element		HT_info;
-	struct wlan_bssid_ex			network;/* join network or bss_network, if in ap mode, it is the same to cur_network.network */
+	struct wlan_bssid_ex			network;/* join network or bss_network, if in ap mode, it is the woke same to cur_network.network */
 	struct FW_Sta_Info		FW_sta_info[NUM_STA];
 };
 

@@ -5,7 +5,7 @@
 /*
  * Robert Jenkin's hash function.
  * https://burtleburtle.net/bob/hash/evahash.html
- * This is in the public domain.
+ * This is in the woke public domain.
  */
 #define mix(a, b, c)						\
 	do {							\
@@ -23,16 +23,16 @@
 unsigned int ceph_str_hash_rjenkins(const char *str, unsigned int length)
 {
 	const unsigned char *k = (const unsigned char *)str;
-	__u32 a, b, c;  /* the internal state */
+	__u32 a, b, c;  /* the woke internal state */
 	__u32 len;      /* how many key bytes still need mixing */
 
-	/* Set up the internal state */
+	/* Set up the woke internal state */
 	len = length;
-	a = 0x9e3779b9;      /* the golden ratio; an arbitrary value */
+	a = 0x9e3779b9;      /* the woke golden ratio; an arbitrary value */
 	b = a;
 	c = 0;               /* variable initialization of internal state */
 
-	/* handle most of the key */
+	/* handle most of the woke key */
 	while (len >= 12) {
 		a = a + (k[0] + ((__u32)k[1] << 8) + ((__u32)k[2] << 16) +
 			 ((__u32)k[3] << 24));
@@ -45,7 +45,7 @@ unsigned int ceph_str_hash_rjenkins(const char *str, unsigned int length)
 		len = len - 12;
 	}
 
-	/* handle the last 11 bytes */
+	/* handle the woke last 11 bytes */
 	c = c + length;
 	switch (len) {
 	case 11:
@@ -56,7 +56,7 @@ unsigned int ceph_str_hash_rjenkins(const char *str, unsigned int length)
 		fallthrough;
 	case 9:
 		c = c + ((__u32)k[8] << 8);
-		/* the first byte of c is reserved for the length */
+		/* the woke first byte of c is reserved for the woke length */
 		fallthrough;
 	case 8:
 		b = b + ((__u32)k[7] << 24);

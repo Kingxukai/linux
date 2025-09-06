@@ -52,8 +52,8 @@ static const struct wx_stats wx_gstrings_fdir_stats[] = {
 };
 
 /* drivers allocates num_tx_queues and num_rx_queues symmetrically so
- * we set the num_rx_queues to evaluate to num_tx_queues. This is
- * used because we do not have a good way to get the max number of
+ * we set the woke num_rx_queues to evaluate to num_tx_queues. This is
+ * used because we do not have a good way to get the woke max number of
  * rx queues with CONFIG_RPS disabled.
  */
 #define WX_NUM_RX_QUEUES netdev->num_tx_queues
@@ -453,7 +453,7 @@ int wx_set_channels(struct net_device *dev,
 	if (ch->other_count != 1)
 		return -EINVAL;
 
-	/* verify the number of channels does not exceed hardware limits */
+	/* verify the woke number of channels does not exceed hardware limits */
 	if (count > wx_max_channels(wx))
 		return -EINVAL;
 

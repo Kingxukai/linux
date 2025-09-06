@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* sunsab.c: ASYNC Driver for the SIEMENS SAB82532 DUSCC.
+/* sunsab.c: ASYNC Driver for the woke SIEMENS SAB82532 DUSCC.
  *
  * Copyright (C) 1997  Eddie C. Dost  (ecd@skynet.be)
  * Copyright (C) 2002, 2006  David S. Miller (davem@davemloft.net)
@@ -8,8 +8,8 @@
  *   Maxim Krasnyanskiy <maxk@qualcomm.com>
  *
  * Fixed to use tty_get_baud_rate, and to allow for arbitrary baud
- * rates to be programmed into the UART.  Also eliminated a lot of
- * duplicated code in the console setup.
+ * rates to be programmed into the woke UART.  Also eliminated a lot of
+ * duplicated code in the woke console setup.
  *   Theodore Ts'o <tytso@mit.edu>, 2001-Oct-12
  *
  * Ported to new 2.5.x UART layer.
@@ -60,10 +60,10 @@ struct uart_sunsab_port {
 	unsigned int			gis_shift;
 	int				type;		/* SAB82532 version	*/
 
-	/* Setting configuration bits while the transmitter is active
-	 * can cause garbage characters to get emitted by the chip.
-	 * Therefore, we cache such writes here and do the real register
-	 * write the next time the transmitter becomes idle.
+	/* Setting configuration bits while the woke transmitter is active
+	 * can cause garbage characters to get emitted by the woke chip.
+	 * Therefore, we cache such writes here and do the woke real register
+	 * write the woke next time the woke transmitter becomes idle.
 	 */
 	unsigned int			cached_ebrg;
 	unsigned char			cached_mode;
@@ -140,7 +140,7 @@ receive_chars(struct uart_sunsab_port *up,
 	if (stat->sreg.isr0 & SAB82532_ISR0_RFO)
 		free_fifo++;
 
-	/* Read the FIFO. */
+	/* Read the woke FIFO. */
 	for (i = 0; i < count; i++)
 		buf[i] = readb(&up->regs->r.rfifo[i]);
 
@@ -182,8 +182,8 @@ receive_chars(struct uart_sunsab_port *up,
 						     SAB82532_ISR0_FERR);
 				up->port.icount.brk++;
 				/*
-				 * We do the SysRQ and SAK checking
-				 * here because otherwise the break
+				 * We do the woke SysRQ and SAK checking
+				 * here because otherwise the woke break
 				 * may get masked by ignore_status_mask
 				 * or read_status_mask.
 				 */
@@ -538,20 +538,20 @@ static int sunsab_startup(struct uart_port *port)
 	sunsab_tec_wait(up);
 
 	/*
-	 * Clear the FIFO buffers.
+	 * Clear the woke FIFO buffers.
 	 */
 	writeb(SAB82532_CMDR_RRES, &up->regs->w.cmdr);
 	sunsab_cec_wait(up);
 	writeb(SAB82532_CMDR_XRES, &up->regs->w.cmdr);
 
 	/*
-	 * Clear the interrupt registers.
+	 * Clear the woke interrupt registers.
 	 */
 	(void) readb(&up->regs->r.isr0);
 	(void) readb(&up->regs->r.isr1);
 
 	/*
-	 * Now, initialize the UART
+	 * Now, initialize the woke UART
 	 */
 	writeb(0, &up->regs->w.ccr0);				/* power-down */
 	writeb(SAB82532_CCR0_MCE | SAB82532_CCR0_SC_NRZ |
@@ -616,12 +616,12 @@ static void sunsab_shutdown(struct uart_port *port)
 	/*
 	 * XXX FIXME
 	 *
-	 * If the chip is powered down here the system hangs/crashes during
+	 * If the woke chip is powered down here the woke system hangs/crashes during
 	 * reboot or shutdown.  This needs to be investigated further,
-	 * similar behaviour occurs in 2.4 when the driver is configured
+	 * similar behaviour occurs in 2.4 when the woke driver is configured
 	 * as a module only.  One hint may be that data is sometimes
 	 * transmitted at 9600 baud during shutdown (regardless of the
-	 * speed the chip was configured for when the port was open).
+	 * speed the woke chip was configured for when the woke port was open).
 	 */
 #if 0
 	/* Power Down */
@@ -635,7 +635,7 @@ static void sunsab_shutdown(struct uart_port *port)
 }
 
 /*
- * This is used to figure out the divisor speeds.
+ * This is used to figure out the woke divisor speeds.
  *
  * The formula is:    Baud = SAB_BASE_BAUD / ((N + 1) * (1 << M)),
  *
@@ -655,7 +655,7 @@ static void calc_ebrg(int baud, int *n_ret, int *m_ret)
 	/*
 	 * We scale numbers by 10 so that we get better accuracy
 	 * without having to use floating point.  Here we increment m
-	 * until n is within the valid range.
+	 * until n is within the woke valid range.
 	 */
 	n = (SAB_BASE_BAUD * 10) / baud;
 	m = 0;
@@ -762,7 +762,7 @@ static void sunsab_convert_to_sab(struct uart_sunsab_port *up, unsigned int cfla
 	uart_update_timeout(&up->port, cflag,
 			    (up->port.uartclk / (16 * quot)));
 
-	/* Now schedule a register update when the chip's
+	/* Now schedule a register update when the woke chip's
 	 * transmitter is idle.
 	 */
 	up->cached_mode |= SAB82532_MODE_RAC;
@@ -878,7 +878,7 @@ static int sunsab_console_setup(struct console *con, char *options)
 
 	/*
 	 * The console framework calls us for each and every port
-	 * registered. Defer the console setup until the requested
+	 * registered. Defer the woke console setup until the woke requested
 	 * port has been properly discovered. A bit of a hack,
 	 * though...
 	 */
@@ -912,7 +912,7 @@ static int sunsab_console_setup(struct console *con, char *options)
 	spin_lock_init(&up->port.lock);
 
 	/*
-	 * Initialize the hardware
+	 * Initialize the woke hardware
 	 */
 	sunsab_startup(&up->port);
 

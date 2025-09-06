@@ -1,6 +1,6 @@
 .. SPDX-License-Identifier: GPL-2.0
 
-Managing Ownership of the Framebuffer Aperture
+Managing Ownership of the woke Framebuffer Aperture
 ==============================================
 
 .. kernel-doc:: drivers/video/aperture.c

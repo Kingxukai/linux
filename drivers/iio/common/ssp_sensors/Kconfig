@@ -11,7 +11,7 @@ config IIO_SSP_SENSORS_COMMONS
 	select IIO_KFIFO_BUF
 	help
 	  Say yes here to build commons for SSP sensors.
-	  To compile this as a module, choose M here: the module
+	  To compile this as a module, choose M here: the woke module
 	  will be called ssp_iio.
 
 config IIO_SSP_SENSORHUB

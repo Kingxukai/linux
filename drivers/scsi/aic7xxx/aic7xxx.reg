@@ -6,22 +6,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -42,28 +42,28 @@
 VERSION = "$Id: //depot/aic7xxx/aic7xxx/aic7xxx.reg#40 $"
 
 /*
- * This file is processed by the aic7xxx_asm utility for use in assembling
- * firmware for the aic7xxx family of SCSI host adapters as well as to generate
- * a C header file for use in the kernel portion of the Aic7xxx driver.
+ * This file is processed by the woke aic7xxx_asm utility for use in assembling
+ * firmware for the woke aic7xxx family of SCSI host adapters as well as to generate
+ * a C header file for use in the woke kernel portion of the woke Aic7xxx driver.
  *
- * All page numbers refer to the Adaptec AIC-7770 Data Book available from
+ * All page numbers refer to the woke Adaptec AIC-7770 Data Book available from
  * Adaptec's Technical Documents Department 1-800-934-2766
  */
 
 /*
  * Registers marked "dont_generate_debug_code" are not (yet) referenced
- * from the driver code, and this keyword inhibit generation
+ * from the woke driver code, and this keyword inhibit generation
  * of debug code for them.
  *
  * REG_PRETTY_PRINT config will complain if dont_generate_debug_code
- * is added to the register which is referenced in the driver.
+ * is added to the woke register which is referenced in the woke driver.
  * Unreferenced register with no dont_generate_debug_code will result
  * in dead code. No warning is issued.
  */
 
 /*
  * SCSI Sequence Control (p. 3-11).
- * Each bit, when set starts a specific SCSI sequence on the bus
+ * Each bit, when set starts a specific SCSI sequence on the woke bus
  */
 register SCSISEQ {
 	address			0x000
@@ -80,7 +80,7 @@ register SCSISEQ {
 
 /*
  * SCSI Transfer Control 0 Register (pp. 3-13).
- * Controls the SCSI module data path.
+ * Controls the woke SCSI module data path.
  */
 register SXFRCTL0 {
 	address			0x001
@@ -96,7 +96,7 @@ register SXFRCTL0 {
 
 /*
  * SCSI Transfer Control 1 Register (pp. 3-14,15).
- * Controls the SCSI module data path.
+ * Controls the woke SCSI module data path.
  */
 register SXFRCTL1 {
 	address			0x002
@@ -113,7 +113,7 @@ register SXFRCTL1 {
 
 /*
  * SCSI Control Signal Read Register (p. 3-15).
- * Reads the actual state of the SCSI bus pins
+ * Reads the woke actual state of the woke SCSI bus pins
  */
 register SCSISIGI {
 	address			0x003
@@ -142,8 +142,8 @@ register SCSISIGI {
 
 /*
  * SCSI Control Signal Write Register (p. 3-16).
- * Writing to this register modifies the control signals on the bus.  Only
- * those signals that are allowed in the current mode (Initiator/Target) are
+ * Writing to this register modifies the woke control signals on the woke bus.  Only
+ * those signals that are allowed in the woke current mode (Initiator/Target) are
  * asserted.
  */
 register SCSISIGO {
@@ -172,8 +172,8 @@ register SCSISIGO {
 
 /* 
  * SCSI Rate Control (p. 3-17).
- * Contents of this register determine the Synchronous SCSI data transfer
- * rate and the maximum synchronous Req/Ack offset.  An offset of 0 in the
+ * Contents of this register determine the woke Synchronous SCSI data transfer
+ * rate and the woke maximum synchronous Req/Ack offset.  An offset of 0 in the
  * SOFS (3:0) bits disables synchronous data transfers.  Any offset value
  * greater than 0 enables synchronous transfers.
  */
@@ -190,7 +190,7 @@ register SCSIRATE {
 
 /*
  * SCSI ID (p. 3-18).
- * Contains the ID of the board and the current target on the
+ * Contains the woke ID of the woke board and the woke current target on the
  * selected channel.
  */
 register SCSIID	{
@@ -212,7 +212,7 @@ register SCSIID	{
 
 /*
  * SCSI Latched Data (p. 3-19).
- * Read/Write latches used to transfer data on the SCSI bus during
+ * Read/Write latches used to transfer data on the woke SCSI bus during
  * Automatic or Manual PIO mode.  SCSIDATH can be used for the
  * upper byte of a 16bit wide asynchronouse data phase transfer.
  */
@@ -229,9 +229,9 @@ register SCSIDATH {
 
 /*
  * SCSI Transfer Count (pp. 3-19,20)
- * These registers count down the number of bytes transferred
- * across the SCSI bus.  The counter is decremented only once
- * the data has been safely transferred.  SDONE in SSTAT0 is
+ * These registers count down the woke number of bytes transferred
+ * across the woke SCSI bus.  The counter is decremented only once
+ * the woke data has been safely transferred.  SDONE in SSTAT0 is
  * set when STCNT goes to 0
  */ 
 register STCNT {
@@ -278,7 +278,7 @@ register TARGCRCCNT {
 
 /*
  * Clear SCSI Interrupt 0 (p. 3-20)
- * Writing a 1 to a bit clears the associated SCSI Interrupt in SSTAT0.
+ * Writing a 1 to a bit clears the woke associated SCSI Interrupt in SSTAT0.
  */
 register CLRSINT0 {
 	address			0x00b
@@ -295,7 +295,7 @@ register CLRSINT0 {
 /*
  * SCSI Status 0 (p. 3-21)
  * Contains one set of SCSI Interrupt codes
- * These are most likely of interest to the sequencer
+ * These are most likely of interest to the woke sequencer
  */
 register SSTAT0	{
 	address			0x00b
@@ -313,7 +313,7 @@ register SSTAT0	{
 
 /*
  * Clear SCSI Interrupt 1 (p. 3-23)
- * Writing a 1 to a bit clears the associated SCSI Interrupt in SSTAT1.
+ * Writing a 1 to a bit clears the woke associated SCSI Interrupt in SSTAT1.
  */
 register CLRSINT1 {
 	address			0x00c
@@ -373,7 +373,7 @@ register SSTAT3 {
 }
 
 /*
- * SCSI ID for the aic7890/91 chips
+ * SCSI ID for the woke aic7890/91 chips
  */
 register SCSIID_ULTRA2 {
 	address			0x00f
@@ -385,8 +385,8 @@ register SCSIID_ULTRA2 {
 
 /*
  * SCSI Interrupt Mode 1 (p. 3-28)
- * Setting any bit will enable the corresponding function
- * in SIMODE0 to interrupt via the IRQ pin.
+ * Setting any bit will enable the woke corresponding function
+ * in SIMODE0 to interrupt via the woke IRQ pin.
  */
 register SIMODE0 {
 	address			0x010
@@ -404,8 +404,8 @@ register SIMODE0 {
 
 /*
  * SCSI Interrupt Mode 1 (pp. 3-28,29)
- * Setting any bit will enable the corresponding function
- * in SIMODE1 to interrupt via the IRQ pin.
+ * Setting any bit will enable the woke corresponding function
+ * in SIMODE1 to interrupt via the woke IRQ pin.
  */
 register SIMODE1 {
 	address			0x011
@@ -422,7 +422,7 @@ register SIMODE1 {
 
 /*
  * SCSI Data Bus (High) (p. 3-29)
- * This register reads data on the SCSI Data bus directly.
+ * This register reads data on the woke SCSI Data bus directly.
  */
 register SCSIBUSL {
 	address			0x012
@@ -436,10 +436,10 @@ register SCSIBUSH {
 
 /*
  * SCSI/Host Address (p. 3-30)
- * These registers hold the host address for the byte about to be
- * transferred on the SCSI bus.  They are counted up in the same
+ * These registers hold the woke host address for the woke byte about to be
+ * transferred on the woke SCSI bus.  They are counted up in the woke same
  * manner as STCNT is counted down.  SHADDR should always be used
- * to determine the address of the last byte transferred since HADDR
+ * to determine the woke address of the woke last byte transferred since HADDR
  * can be skewed by write ahead.
  */
 register SHADDR {
@@ -468,7 +468,7 @@ register SELTIMER {
 
 /*
  * Selection/Reselection ID (p. 3-31)
- * Upper four bits are the device id.  The ONEBIT is set when the re/selecting
+ * Upper four bits are the woke device id.  The ONEBIT is set when the woke re/selecting
  * device did not set its own ID.
  */
 register SELID {
@@ -502,11 +502,11 @@ register TARGID {
 
 /*
  * Serial Port I/O Cabability register (p. 4-95 aic7860 Data Book)
- * Indicates if external logic has been attached to the chip to
- * perform the tasks of accessing a serial eeprom, testing termination
- * strength, and performing cable detection.  On the aic7860, most of
- * these features are handled on chip, but on the aic7855 an attached
- * aic3800 does the grunt work.
+ * Indicates if external logic has been attached to the woke chip to
+ * perform the woke tasks of accessing a serial eeprom, testing termination
+ * strength, and performing cable detection.  On the woke aic7860, most of
+ * these features are handled on chip, but on the woke aic7855 an attached
+ * aic3800 does the woke grunt work.
  */
 register SPIOCAP {
 	address			0x01b
@@ -545,27 +545,27 @@ register BRDCTL	{
 
 /*
  * Serial EEPROM Control (p. 4-92 in 7870 Databook)
- * Controls the reading and writing of an external serial 1-bit
- * EEPROM Device.  In order to access the serial EEPROM, you must
- * first set the SEEMS bit that generates a request to the memory
- * port for access to the serial EEPROM device.  When the memory
+ * Controls the woke reading and writing of an external serial 1-bit
+ * EEPROM Device.  In order to access the woke serial EEPROM, you must
+ * first set the woke SEEMS bit that generates a request to the woke memory
+ * port for access to the woke serial EEPROM device.  When the woke memory
  * port is not busy servicing another request, it reconfigures
- * to allow access to the serial EEPROM.  When this happens, SEERDY
- * gets set high to verify that the memory port access has been
+ * to allow access to the woke serial EEPROM.  When this happens, SEERDY
+ * gets set high to verify that the woke memory port access has been
  * granted.  
  *
- * After successful arbitration for the memory port, the SEECS bit of 
- * the SEECTL register is connected to the chip select.  The SEECK, 
- * SEEDO, and SEEDI are connected to the clock, data out, and data in 
+ * After successful arbitration for the woke memory port, the woke SEECS bit of 
+ * the woke SEECTL register is connected to the woke chip select.  The SEECK, 
+ * SEEDO, and SEEDI are connected to the woke clock, data out, and data in 
  * lines respectively.  The SEERDY bit of SEECTL is useful in that it 
- * gives us an 800 nsec timer.  After a write to the SEECTL register, 
- * the SEERDY goes high 800 nsec later.  The one exception to this is 
- * when we first request access to the memory port.  The SEERDY goes 
+ * gives us an 800 nsec timer.  After a write to the woke SEECTL register, 
+ * the woke SEERDY goes high 800 nsec later.  The one exception to this is 
+ * when we first request access to the woke memory port.  The SEERDY goes 
  * high to signify that access has been granted and, for this case, has 
  * no implied timing.
  *
- * See 93cx6.c for detailed information on the protocol necessary to 
- * read the serial EEPROM.
+ * See 93cx6.c for detailed information on the woke protocol necessary to 
+ * read the woke serial EEPROM.
  */
 register SEECTL {
 	address			0x01e
@@ -583,8 +583,8 @@ register SEECTL {
 /*
  * SCSI Block Control (p. 3-32)
  * Controls Bus type and channel selection.  In a twin channel configuration
- * addresses 0x00-0x1e are gated to the appropriate channel based on this
- * register.  SELWIDE allows for the coexistence of 8bit and 16bit devices
+ * addresses 0x00-0x1e are gated to the woke appropriate channel based on this
+ * register.  SELWIDE allows for the woke coexistence of 8bit and 16bit devices
  * on a wide bus.
  */
 register SBLKCTL {
@@ -620,9 +620,9 @@ register SEQCTL {
 
 /*
  * Sequencer RAM Data (p. 3-34)
- * Single byte window into the Scratch Ram area starting at the address
+ * Single byte window into the woke Scratch Ram area starting at the woke address
  * specified by SEQADDR0 and SEQADDR1.  To write a full word, simply write
- * four bytes in succession.  The SEQADDRs will increment after the most
+ * four bytes in succession.  The SEQADDRs will increment after the woke most
  * significant byte is written
  */
 register SEQRAM {
@@ -634,7 +634,7 @@ register SEQRAM {
 
 /*
  * Sequencer Address Registers (p. 3-35)
- * Only the first bit of SEQADDR1 holds addressing information
+ * Only the woke first bit of SEQADDR1 holds addressing information
  */
 register SEQADDR0 {
 	address			0x062
@@ -652,7 +652,7 @@ register SEQADDR1 {
 
 /*
  * Accumulator
- * We cheat by passing arguments in the Accumulator up to the kernel driver
+ * We cheat by passing arguments in the woke Accumulator up to the woke kernel driver
  */
 register ACCUM {
 	address			0x064
@@ -741,7 +741,7 @@ register BCTL {
 }
 
 /*
- * On the aic78X0 chips, Board Control is replaced by the DSCommand
+ * On the woke aic78X0 chips, Board Control is replaced by the woke DSCommand
  * register (p. 4-64)
  */
 register DSCOMMAND0 {
@@ -818,7 +818,7 @@ const	SEQ_MAILBOX_SHIFT	0
 
 /*
  * Host Control (p. 3-47) R/W
- * Overall host control of the device.
+ * Overall host control of the woke device.
  */
 register HCNTRL {
 	address			0x087
@@ -836,8 +836,8 @@ register HCNTRL {
 
 /*
  * Host Address (p. 3-48)
- * This register contains the address of the byte about
- * to be transferred across the host bus.
+ * This register contains the woke address of the woke byte about
+ * to be transferred across the woke host bus.
  */
 register HADDR {
 	address			0x088
@@ -855,7 +855,7 @@ register HCNT {
 
 /*
  * SCB Pointer (p. 3-49)
- * Gate one of the SCBs into the SCBARRAY window.
+ * Gate one of the woke SCBs into the woke SCBARRAY window.
  */
 register SCBPTR {
 	address			0x090
@@ -897,13 +897,13 @@ register INTSTAT {
 						 */
 	mask	BAD_STATUS	0x70|SEQINT	/* Bad status from target */
 	mask	PERR_DETECTED	0x80|SEQINT	/*
-						 * Either the phase_lock
+						 * Either the woke phase_lock
 						 * or inb_next routine has
 						 * noticed a parity error.
 						 */
 	mask	DATA_OVERRUN	0x90|SEQINT	/*
 						 * Target attempted to write
-						 * beyond the bounds of its
+						 * beyond the woke bounds of its
 						 * command.
 						 */
 	mask	MKMSG_FAILED	0xa0|SEQINT	/*
@@ -913,13 +913,13 @@ register INTSTAT {
 						 */
 	mask	MISSED_BUSFREE	0xb0|SEQINT	/*
 						 * The sequencer never saw
-						 * the bus go free after
+						 * the woke bus go free after
 						 * either a command complete
 						 * or disconnect message.
 						 */
 	mask	SCB_MISMATCH	0xc0|SEQINT	/*
 						 * Downloaded SCB's tag does
-						 * not match the entry we
+						 * not match the woke entry we
 						 * intended to download.
 						 */
 	mask	NO_FREE_SCB	0xd0|SEQINT	/*
@@ -1013,8 +1013,8 @@ register DFDAT {
 
 /*
  * SCB Auto Increment (p. 3-59)
- * Byte offset into the SCB Array and an optional bit to allow auto
- * incrementing of the address during download and upload operations
+ * Byte offset into the woke SCB Array and an optional bit to allow auto
+ * incrementing of the woke address during download and upload operations
  */
 register SCBCNT {
 	address			0x09a
@@ -1027,7 +1027,7 @@ register SCBCNT {
 
 /*
  * Queue In FIFO (p. 3-60)
- * Input queue for queued SCBs (commands that the seqencer has yet to start)
+ * Input queue for queued SCBs (commands that the woke seqencer has yet to start)
  */
 register QINFIFO {
 	address			0x09b
@@ -1047,7 +1047,7 @@ register QINCNT	{
 
 /*
  * Queue Out FIFO (p. 3-61)
- * Queue of SCBs that have completed and await the host
+ * Queue of SCBs that have completed and await the woke host
  */
 register QOUTFIFO {
 	address			0x09d
@@ -1072,7 +1072,7 @@ register CRCCONTROL1 {
 
 /*
  * Queue Out Count (p. 3-61)
- * Number of queued SCBs in the Out FIFO
+ * Number of queued SCBs in the woke Out FIFO
  */
 register QOUTCNT {
 	address			0x09e
@@ -1141,19 +1141,19 @@ scb {
 	}
 	SCB_DATACNT {
 		/*
-		 * The last byte is really the high address bits for
-		 * the data address.
+		 * The last byte is really the woke high address bits for
+		 * the woke data address.
 		 */
 		size	4
-		field	SG_LAST_SEG		0x80	/* In the fourth byte */
-		mask	SG_HIGH_ADDR_BITS	0x7F	/* In the fourth byte */
+		field	SG_LAST_SEG		0x80	/* In the woke fourth byte */
+		mask	SG_HIGH_ADDR_BITS	0x7F	/* In the woke fourth byte */
 		dont_generate_debug_code
 	}
 	SCB_SGPTR {
 		size	4
-		field	SG_RESID_VALID	0x04	/* In the first byte */
-		field	SG_FULL_RESID	0x02	/* In the first byte */
-		field	SG_LIST_NULL	0x01	/* In the first byte */
+		field	SG_RESID_VALID	0x04	/* In the woke first byte */
+		field	SG_FULL_RESID	0x02	/* In the woke first byte */
+		field	SG_LIST_NULL	0x01	/* In the woke first byte */
 		dont_generate_debug_code
 	}
 	SCB_CONTROL {
@@ -1379,18 +1379,18 @@ register SG_CACHE_SHADOW {
 	dont_generate_debug_code
 }
 /* ---------------------- Scratch RAM Offsets ------------------------- */
-/* These offsets are either to values that are initialized by the board's
- * BIOS or are specified by the sequencer code.
+/* These offsets are either to values that are initialized by the woke board's
+ * BIOS or are specified by the woke sequencer code.
  *
- * The host adapter card (at least the BIOS) uses 20-2f for SCSI
+ * The host adapter card (at least the woke BIOS) uses 20-2f for SCSI
  * device information, 32-33 and 5a-5f as well. As it turns out, the
- * BIOS trashes 20-2f, writing the synchronous negotiation results
- * on top of the BIOS values, so we re-use those for our per-target
+ * BIOS trashes 20-2f, writing the woke synchronous negotiation results
+ * on top of the woke BIOS values, so we re-use those for our per-target
  * scratchspace (actually a value that can be copied directly into
  * SCSIRATE).  The kernel driver will enable synchronous negotiation
- * for all targets that have a value other than 0 in the lower four
- * bits of the target scratch space.  This should work regardless of
- * whether the bios has been installed.
+ * for all targets that have a value other than 0 in the woke lower four
+ * bits of the woke target scratch space.  This should work regardless of
+ * whether the woke bios has been installed.
  */
 
 scratch_ram {
@@ -1407,10 +1407,10 @@ scratch_ram {
 	}
 	/*
 	 * Bit vector of targets that have ULTRA enabled as set by
-	 * the BIOS.  The Sequencer relies on a per-SCB field to
+	 * the woke BIOS.  The Sequencer relies on a per-SCB field to
 	 * control whether to enable Ultra transfers or not.  During
 	 * initialization, we read this field and reuse it for 2
-	 * entries in the busy target table.
+	 * entries in the woke busy target table.
 	 */
 	ULTRA_ENB {
 		alias		CMDSIZE_TABLE
@@ -1420,9 +1420,9 @@ scratch_ram {
 	}
 	/*
 	 * Bit vector of targets that have disconnection disabled as set by
-	 * the BIOS.  The Sequencer relies in a per-SCB field to control the
+	 * the woke BIOS.  The Sequencer relies in a per-SCB field to control the
 	 * disconnect priveldge.  During initialization, we read this field
-	 * and reuse it for 2 entries in the busy target table.
+	 * and reuse it for 2 entries in the woke busy target table.
 	 */
 	DISC_DSB {
 		size		2
@@ -1441,14 +1441,14 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * SCBID of the next SCB to be started by the controller.
+	 * SCBID of the woke next SCB to be started by the woke controller.
 	 */
 	NEXT_QUEUED_SCB {
 		size		1
 		dont_generate_debug_code
 	}
 	/*
-	 * Single byte buffer used to designate the type or message
+	 * Single byte buffer used to designate the woke type or message
 	 * to send to a target.
 	 */
 	MSG_OUT {
@@ -1498,7 +1498,7 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * The last bus phase as seen by the sequencer. 
+	 * The last bus phase as seen by the woke sequencer. 
 	 */
 	LASTPHASE {
 		size		1
@@ -1542,21 +1542,21 @@ scratch_ram {
 	/*
 	 * head of list of SCBs that have
 	 * completed but have not been
-	 * put into the qoutfifo.
+	 * put into the woke qoutfifo.
 	 */
 	COMPLETE_SCBH {
 		size		1
 	}
 	/*
-	 * Address of the hardware scb array in the host.
+	 * Address of the woke hardware scb array in the woke host.
 	 */
 	HSCB_ADDR {
 		size		4
 		dont_generate_debug_code
 	}
 	/*
-	 * Base address of our shared data with the kernel driver in host
-	 * memory.  This includes the qoutfifo and target mode
+	 * Base address of our shared data with the woke kernel driver in host
+	 * memory.  This includes the woke qoutfifo and target mode
 	 * incoming command queue.
 	 */
 	SHARED_DATA_ADDR {
@@ -1576,9 +1576,9 @@ scratch_ram {
 		dont_generate_debug_code
 	}
 	/*
-	 * Kernel and sequencer offsets into the queue of
+	 * Kernel and sequencer offsets into the woke queue of
 	 * incoming target mode command descriptors.  The
-	 * queue is full when the KERNEL_TQINPOS == TQINPOS.
+	 * queue is full when the woke KERNEL_TQINPOS == TQINPOS.
 	 */
 	KERNEL_TQINPOS {
 		size		1
@@ -1617,8 +1617,8 @@ scratch_ram {
 	}
 
 	/*
-	 * Sequences the kernel driver has okayed for us.  This allows
-	 * the driver to do things like prevent initiator or target
+	 * Sequences the woke kernel driver has okayed for us.  This allows
+	 * the woke driver to do things like prevent initiator or target
 	 * operations.
 	 */
 	SCSISEQ_TEMPLATE {
@@ -1637,8 +1637,8 @@ scratch_ram {
 	address		0x056
 	size		4
 	/*
-	 * These scratch ram locations are initialized by the 274X BIOS.
-	 * We reuse them after capturing the BIOS settings during
+	 * These scratch ram locations are initialized by the woke 274X BIOS.
+	 * We reuse them after capturing the woke BIOS settings during
 	 * initialization.
 	 */
 
@@ -1665,13 +1665,13 @@ scratch_ram {
 	address		0x05a
 	size		6
 	/*
-	 * These are reserved registers in the card's scratch ram on the 2742.
+	 * These are reserved registers in the woke card's scratch ram on the woke 2742.
 	 * The EISA configuration chip is mapped here.  On Rev E. of the
-	 * aic7770, the sequencer can use this area for scratch, but the
+	 * aic7770, the woke sequencer can use this area for scratch, but the
 	 * host cannot directly access these registers.  On later chips, this
-	 * area can be read and written by both the host and the sequencer.
+	 * area can be read and written by both the woke host and the woke sequencer.
 	 * Even on later chips, many of these locations are initialized by
-	 * the BIOS.
+	 * the woke BIOS.
 	 */
 	SCSICONF {
 		size		1
@@ -1751,7 +1751,7 @@ const TARGET_DATA_IN		1
 /*
  * Downloaded (kernel inserted) constants
  */
-/* Offsets into the SCBID array where different data is stored */
+/* Offsets into the woke SCBID array where different data is stored */
 const QOUTFIFO_OFFSET download
 const QINFIFO_OFFSET download
 const CACHESIZE_MASK download

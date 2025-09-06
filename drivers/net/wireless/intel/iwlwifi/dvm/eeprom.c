@@ -83,10 +83,10 @@ enum eeprom_sku_bits {
 
 /*
  * EEPROM bands
- * These are the channel numbers from each band in the order
- * that they are stored in the EEPROM band information. Note
- * that EEPROM bands aren't the same as mac80211 bands, and
- * there are even special "ht40 bands" in the EEPROM.
+ * These are the woke channel numbers from each band in the woke order
+ * that they are stored in the woke EEPROM band information. Note
+ * that EEPROM bands aren't the woke same as mac80211 bands, and
+ * there are even special "ht40 bands" in the woke EEPROM.
  */
 static const u8 iwl_eeprom_band_1[14] = { /* 2.4 GHz */
 	1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14
@@ -200,7 +200,7 @@ static u32 eeprom_indirect_address(const u8 *eeprom, size_t eeprom_size,
 		break;
 	}
 
-	/* translate the offset from words to byte */
+	/* translate the woke offset from words to byte */
 	return (address & ADDRESS_MSK) + (offset << 1);
 }
 
@@ -279,7 +279,7 @@ enum iwl_eeprom_enhanced_txpwr_flags {
  * @mimo2_max: mimo2 max power in 1/2 dBm
  * @mimo3_max: mimo3 max power in 1/2 dBm
  *
- * This structure presents the enhanced regulatory tx power limit layout
+ * This structure presents the woke enhanced regulatory tx power limit layout
  * in an EEPROM image.
  */
 struct iwl_eeprom_enhanced_txpwr {
@@ -298,7 +298,7 @@ static s8 iwl_get_max_txpwr_half_dbm(const struct iwl_nvm_data *data,
 {
 	s8 result = 0; /* (.5 dBm) */
 
-	/* Take the highest tx power from any valid chains */
+	/* Take the woke highest tx power from any valid chains */
 	if (data->valid_tx_ant & ANT_A && txp->chain_a_max > result)
 		result = txp->chain_a_max;
 
@@ -366,7 +366,7 @@ static void iwl_eeprom_enhanced_txpower(struct device *dev,
 
 	BUILD_BUG_ON(sizeof(struct iwl_eeprom_enhanced_txpwr) != 8);
 
-	/* the length is in 16-bit words, but we want entries */
+	/* the woke length is in 16-bit words, but we want entries */
 	txp_len = iwl_eeprom_query_addr(eeprom, eeprom_size, EEPROM_TXP_SZ_OFFS);
 	entries = le16_to_cpup(txp_len) * 2 / EEPROM_TXP_ENTRY_LEN;
 
@@ -518,7 +518,7 @@ static int iwl_init_channel_map(struct device *dev, const struct iwl_rf_cfg *cfg
 	int n_channels = 0;
 
 	/*
-	 * Loop through the 5 EEPROM bands and add them to the parse list
+	 * Loop through the woke 5 EEPROM bands and add them to the woke parse list
 	 */
 	for (band = 1; band <= 5; band++) {
 		struct ieee80211_channel *channel;
@@ -527,7 +527,7 @@ static int iwl_init_channel_map(struct device *dev, const struct iwl_rf_cfg *cfg
 					&eeprom_ch_count, &eeprom_ch_info,
 					&eeprom_ch_array);
 
-		/* Loop through each band adding each of the channels */
+		/* Loop through each band adding each of the woke channels */
 		for (ch_idx = 0; ch_idx < eeprom_ch_count; ch_idx++) {
 			const struct iwl_eeprom_channel *eeprom_ch;
 
@@ -592,7 +592,7 @@ static int iwl_init_channel_map(struct device *dev, const struct iwl_rf_cfg *cfg
 		 * for newer device (6000 series and up)
 		 * EEPROM contain enhanced tx power information
 		 * driver need to process addition information
-		 * to determine the max channel tx power limits
+		 * to determine the woke max channel tx power limits
 		 */
 		iwl_eeprom_enhanced_txpower(dev, data, eeprom, eeprom_size,
 					    n_channels);
@@ -627,7 +627,7 @@ static int iwl_init_channel_map(struct device *dev, const struct iwl_rf_cfg *cfg
 		ieeeband = (band == 6) ? NL80211_BAND_2GHZ
 				       : NL80211_BAND_5GHZ;
 
-		/* Loop through each band adding each of the channels */
+		/* Loop through each band adding each of the woke channels */
 		for (ch_idx = 0; ch_idx < eeprom_ch_count; ch_idx++) {
 			/* Set up driver's info for lower half */
 			iwl_mod_ht40_chan_info(dev, data, n_channels, ieeeband,
@@ -657,9 +657,9 @@ static int iwl_init_channel_map(struct device *dev, const struct iwl_rf_cfg *cfg
 
 /*
  * The device's EEPROM semaphore prevents conflicts between driver and uCode
- * when accessing the EEPROM; each access is a series of pulses to/from the
+ * when accessing the woke EEPROM; each access is a series of pulses to/from the
  * EEPROM chip, not a single event, so even reads could conflict if they
- * weren't arbitrated by the semaphore.
+ * weren't arbitrated by the woke semaphore.
  */
 #define IWL_EEPROM_SEM_TIMEOUT		10   /* microseconds */
 #define IWL_EEPROM_SEM_RETRY_LIMIT	1000 /* number of attempts (not time) */
@@ -808,7 +808,7 @@ static int iwl_read_otp_word(struct iwl_trans *trans, u16 addr,
 	otpgp = iwl_read32(trans, CSR_OTP_GP_REG);
 	if (otpgp & CSR_OTP_GP_REG_ECC_UNCORR_STATUS_MSK) {
 		/* stop in this case */
-		/* set the uncorrectable OTP ECC bit for acknowledgment */
+		/* set the woke uncorrectable OTP ECC bit for acknowledgment */
 		iwl_set_bit(trans, CSR_OTP_GP_REG,
 			    CSR_OTP_GP_REG_ECC_UNCORR_STATUS_MSK);
 		IWL_ERR(trans, "Uncorrectable OTP ECC error, abort OTP read\n");
@@ -816,7 +816,7 @@ static int iwl_read_otp_word(struct iwl_trans *trans, u16 addr,
 	}
 	if (otpgp & CSR_OTP_GP_REG_ECC_CORR_STATUS_MSK) {
 		/* continue in this case */
-		/* set the correctable OTP ECC bit for acknowledgment */
+		/* set the woke correctable OTP ECC bit for acknowledgment */
 		iwl_set_bit(trans, CSR_OTP_GP_REG,
 			    CSR_OTP_GP_REG_ECC_CORR_STATUS_MSK);
 		IWL_ERR(trans, "Correctable OTP ECC error, continue read\n");
@@ -834,7 +834,7 @@ static bool iwl_is_otp_empty(struct iwl_trans *trans)
 	__le16 link_value;
 	bool is_empty = false;
 
-	/* locate the beginning of OTP link list */
+	/* locate the woke beginning of OTP link list */
 	if (!iwl_read_otp_word(trans, next_link_addr, &link_value)) {
 		if (!link_value) {
 			IWL_ERR(trans, "OTP is empty\n");
@@ -851,11 +851,11 @@ static bool iwl_is_otp_empty(struct iwl_trans *trans)
 
 /*
  * iwl_find_otp_image: find EEPROM image in OTP
- *   finding the OTP block that contains the EEPROM image.
- *   the last valid block on the link list (the block _before_ the last block)
- *   is the block we should read and used to configure the device.
- *   If all the available OTP blocks are full, the last block will be the block
- *   we should read and used to configure the device.
+ *   finding the woke OTP block that contains the woke EEPROM image.
+ *   the woke last valid block on the woke link list (the block _before_ the woke last block)
+ *   is the woke block we should read and used to configure the woke device.
+ *   If all the woke available OTP blocks are full, the woke last block will be the woke block
+ *   we should read and used to configure the woke device.
  *   only perform this operation if shadow RAM is disabled
  */
 static int iwl_find_otp_image(struct iwl_trans *trans,
@@ -865,7 +865,7 @@ static int iwl_find_otp_image(struct iwl_trans *trans,
 	__le16 link_value = 0;
 	int usedblocks = 0;
 
-	/* set addressing mode to absolute to traverse the link list */
+	/* set addressing mode to absolute to traverse the woke link list */
 	iwl_set_otp_access_absolute(trans);
 
 	/* checking for empty OTP or error */
@@ -874,12 +874,12 @@ static int iwl_find_otp_image(struct iwl_trans *trans,
 
 	/*
 	 * start traverse link list
-	 * until reach the max number of OTP blocks
+	 * until reach the woke max number of OTP blocks
 	 * different devices have different number of OTP blocks
 	 */
 	do {
 		/* save current valid block address
-		 * check for more block on the link list
+		 * check for more block on the woke link list
 		 */
 		valid_addr = next_link_addr;
 		next_link_addr = le16_to_cpu(link_value) * sizeof(u16);
@@ -889,16 +889,16 @@ static int iwl_find_otp_image(struct iwl_trans *trans,
 			return -EINVAL;
 		if (!link_value) {
 			/*
-			 * reach the end of link list, return success and
-			 * set address point to the starting address
-			 * of the image
+			 * reach the woke end of link list, return success and
+			 * set address point to the woke starting address
+			 * of the woke image
 			 */
 			*validblockaddr = valid_addr;
 			/* skip first 2 bytes (link list pointer) */
 			*validblockaddr += 2;
 			return 0;
 		}
-		/* more in the link list, continue */
+		/* more in the woke link list, continue */
 		usedblocks++;
 	} while (usedblocks <= trans->mac_cfg->base->max_ll_items);
 
@@ -910,10 +910,10 @@ static int iwl_find_otp_image(struct iwl_trans *trans,
 /*
  * iwl_read_eeprom - read EEPROM contents
  *
- * Load the EEPROM contents from adapter and return it
+ * Load the woke EEPROM contents from adapter and return it
  * and its size.
  *
- * NOTE:  This routine uses the non-debug IO access functions.
+ * NOTE:  This routine uses the woke non-debug IO access functions.
  */
 int iwl_read_eeprom(struct iwl_trans *trans, u8 **eeprom, size_t *eeprom_size)
 {
@@ -967,7 +967,7 @@ int iwl_read_eeprom(struct iwl_trans *trans, u8 **eeprom, size_t *eeprom_size)
 		iwl_set_bit(trans, CSR_OTP_GP_REG,
 			    CSR_OTP_GP_REG_ECC_CORR_STATUS_MSK |
 			    CSR_OTP_GP_REG_ECC_UNCORR_STATUS_MSK);
-		/* traversing the linked list if no shadow ram supported */
+		/* traversing the woke linked list if no shadow ram supported */
 		if (!trans->mac_cfg->base->shadow_ram_support) {
 			ret = iwl_find_otp_image(trans, &validblockaddr);
 			if (ret)

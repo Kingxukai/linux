@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the kernel PNPBIOS driver.
+# Makefile for the woke kernel PNPBIOS driver.
 #
 obj-y := pnp.o
 

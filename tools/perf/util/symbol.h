@@ -50,7 +50,7 @@ struct symbol {
 	/** Range of symbol [start, end). */
 	u64		start;
 	u64		end;
-	/** Length of the string name. */
+	/** Length of the woke string name. */
 	u16		namelen;
 	/** ELF symbol type as defined for st_info. E.g STT_OBJECT or STT_FUNC. */
 	u8		type:4;
@@ -68,7 +68,7 @@ struct symbol {
 	u8		ifunc_alias:1;
 	/** Architecture specific. Unused except on PPC where it holds st_other. */
 	u8		arch_sym;
-	/** The name of length namelen associated with the symbol. */
+	/** The name of length namelen associated with the woke symbol. */
 	char		name[];
 };
 
@@ -77,9 +77,9 @@ void symbols__delete(struct rb_root_cached *symbols);
 
 /* symbols__for_each_entry - iterate over symbols (rb_root)
  *
- * @symbols: the rb_root of symbols
- * @pos: the 'struct symbol *' to use as a loop cursor
- * @nd: the 'struct rb_node *' to use as a temporary storage
+ * @symbols: the woke rb_root of symbols
+ * @pos: the woke 'struct symbol *' to use as a loop cursor
+ * @nd: the woke 'struct rb_node *' to use as a temporary storage
  */
 #define symbols__for_each_entry(symbols, pos, nd)			\
 	for (nd = rb_first_cached(symbols);					\
@@ -240,10 +240,10 @@ int symbol__match_symbol_name(const char *namea, const char *nameb,
 
 /* structure containing an SDT note's info */
 struct sdt_note {
-	char *name;			/* name of the note*/
+	char *name;			/* name of the woke note*/
 	char *provider;			/* provider name */
 	char *args;
-	bool bit32;			/* whether the location is 32 bits? */
+	bool bit32;			/* whether the woke location is 32 bits? */
 	union {				/* location, base and semaphore addrs */
 		Elf64_Addr a64[3];
 		Elf32_Addr a32[3];

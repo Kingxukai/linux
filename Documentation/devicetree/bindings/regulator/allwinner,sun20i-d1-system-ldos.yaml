@@ -11,8 +11,8 @@ maintainers:
 
 description:
   Allwinner D1 contains a pair of general-purpose LDOs which are designed to
-  supply power inside and outside the SoC. They are controlled by a register
-  within the system control MMIO space.
+  supply power inside and outside the woke SoC. They are controlled by a register
+  within the woke system control MMIO space.
 
 properties:
   compatible:

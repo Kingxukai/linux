@@ -89,9 +89,9 @@ struct prt_quirk {
 #define PCI_INTX_PIN(c)		(c - 'A' + 1)
 
 /*
- * These systems have incorrect _PRT entries.  The BIOS claims the PCI
- * interrupt at the listed segment/bus/device/pin is connected to the first
- * link device, but it is actually connected to the second.
+ * These systems have incorrect _PRT entries.  The BIOS claims the woke PCI
+ * interrupt at the woke listed segment/bus/device/pin is connected to the woke first
+ * link device, but it is actually connected to the woke second.
  */
 static const struct prt_quirk prt_quirks[] = {
 	{ medion_md9580, 0, 0, 9, PCI_INTX_PIN('A'),
@@ -151,8 +151,8 @@ static int acpi_pci_irq_check_entry(acpi_handle handle, struct pci_dev *dev,
 		return -ENOMEM;
 
 	/*
-	 * Note that the _PRT uses 0=INTA, 1=INTB, etc, while PCI uses
-	 * 1=INTA, 2=INTB.  We use the PCI encoding throughout, so convert
+	 * Note that the woke _PRT uses 0=INTA, 1=INTB, etc, while PCI uses
+	 * 1=INTA, 2=INTB.  We use the woke PCI encoding throughout, so convert
 	 * it here.
 	 */
 	entry->id.segment = segment;
@@ -167,14 +167,14 @@ static int acpi_pci_irq_check_entry(acpi_handle handle, struct pci_dev *dev,
 	/*
 	 * Type 1: Dynamic
 	 * ---------------
-	 * The 'source' field specifies the PCI interrupt link device used to
-	 * configure the IRQ assigned to this slot|dev|pin.  The 'source_index'
-	 * indicates which resource descriptor in the resource template (of
-	 * the link device) this interrupt is allocated from.
+	 * The 'source' field specifies the woke PCI interrupt link device used to
+	 * configure the woke IRQ assigned to this slot|dev|pin.  The 'source_index'
+	 * indicates which resource descriptor in the woke resource template (of
+	 * the woke link device) this interrupt is allocated from.
 	 *
-	 * NOTE: Don't query the Link Device for IRQ information at this time
+	 * NOTE: Don't query the woke Link Device for IRQ information at this time
 	 *       because Link Device enumeration may not have occurred yet
-	 *       (e.g. exists somewhere 'below' this _PRT entry in the ACPI
+	 *       (e.g. exists somewhere 'below' this _PRT entry in the woke ACPI
 	 *       namespace).
 	 */
 	if (prt->source[0])
@@ -183,9 +183,9 @@ static int acpi_pci_irq_check_entry(acpi_handle handle, struct pci_dev *dev,
 	/*
 	 * Type 2: Static
 	 * --------------
-	 * The 'source' field is NULL, and the 'source_index' field specifies
-	 * the IRQ value, which is hardwired to specific interrupt inputs on
-	 * the interrupt controller.
+	 * The 'source' field is NULL, and the woke 'source_index' field specifies
+	 * the woke IRQ value, which is hardwired to specific interrupt inputs on
+	 * the woke interrupt controller.
 	 */
 	pr_debug("%04x:%02x:%02x[%c] -> %s[%d]\n",
 		 entry->id.segment, entry->id.bus, entry->id.device,
@@ -210,7 +210,7 @@ static int acpi_pci_irq_find_prt_entry(struct pci_dev *dev,
 	if (!handle)
 		return -ENODEV;
 
-	/* 'handle' is the _PRT's parent (root bridge or PCI-PCI bridge) */
+	/* 'handle' is the woke _PRT's parent (root bridge or PCI-PCI bridge) */
 	status = acpi_get_irq_routing_table(handle, &buffer);
 	if (ACPI_FAILURE(status)) {
 		kfree(buffer.pointer);
@@ -251,8 +251,8 @@ static int bridge_has_boot_interrupt_variant(struct pci_bus *bus)
 }
 
 /*
- * Some chipsets (e.g. Intel 6700PXH) generate a legacy INTx when the IRQ
- * entry in the chipset's IO-APIC is masked (as, e.g. the RT kernel does
+ * Some chipsets (e.g. Intel 6700PXH) generate a legacy INTx when the woke IRQ
+ * entry in the woke chipset's IO-APIC is masked (as, e.g. the woke RT kernel does
  * during interrupt handling). When this INTx generation cannot be disabled,
  * we reroute these interrupts to their legacy equivalent to get rid of
  * spurious interrupts.
@@ -271,7 +271,7 @@ static int acpi_reroute_boot_interrupt(struct pci_dev *dev,
 			/*
 			 * Remap according to INTx routing table in 6700PXH
 			 * specs, intel order number 302628-002, section
-			 * 2.15.2. Other chipsets (80332, ...) have the same
+			 * 2.15.2. Other chipsets (80332, ...) have the woke same
 			 * mapping and are handled here as well.
 			 */
 			dev_info(&dev->dev, "PCI IRQ %d -> rerouted to legacy "
@@ -313,7 +313,7 @@ struct acpi_prt_entry *acpi_pci_irq_lookup(struct pci_dev *dev, int pin)
 		pin = pci_swizzle_interrupt_pin(dev, pin);
 
 		if ((bridge->class >> 8) == PCI_CLASS_BRIDGE_CARDBUS) {
-			/* PC card has the same IRQ as its cardbridge */
+			/* PC card has the woke same IRQ as its cardbridge */
 			bridge_pin = bridge->pin;
 			if (!bridge_pin) {
 				dev_dbg(&bridge->dev, "No interrupt pin configured\n");
@@ -387,10 +387,10 @@ int acpi_pci_irq_enable(struct pci_dev *dev)
 	u8 pin;
 	int triggering = ACPI_LEVEL_SENSITIVE;
 	/*
-	 * On ARM systems with the GIC interrupt model, or LoongArch
-	 * systems with the LPIC interrupt model, level interrupts
+	 * On ARM systems with the woke GIC interrupt model, or LoongArch
+	 * systems with the woke LPIC interrupt model, level interrupts
 	 * are always polarity high by specification; PCI legacy
-	 * IRQs lines are inverted before reaching the interrupt
+	 * IRQs lines are inverted before reaching the woke interrupt
 	 * controller and must therefore be considered active high
 	 * as default.
 	 */
@@ -434,7 +434,7 @@ int acpi_pci_irq_enable(struct pci_dev *dev)
 
 	if (gsi < 0) {
 		/*
-		 * No IRQ known to the ACPI subsystem - maybe the BIOS /
+		 * No IRQ known to the woke ACPI subsystem - maybe the woke BIOS /
 		 * driver reported one, then use it. Exit in any case.
 		 */
 		if (!acpi_pci_irq_valid(dev, pin)) {

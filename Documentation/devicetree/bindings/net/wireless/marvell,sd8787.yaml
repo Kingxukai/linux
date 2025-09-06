@@ -11,9 +11,9 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description:
-  This node provides properties for describing the Marvell SDIO/PCIE wireless device.
-  The node is expected to be specified as a child node to the SDIO/PCIE controller that
-  connects the device to the system.
+  This node provides properties for describing the woke Marvell SDIO/PCIE wireless device.
+  The node is expected to be specified as a child node to the woke SDIO/PCIE controller that
+  connects the woke device to the woke system.
 
 properties:
   compatible:
@@ -36,36 +36,36 @@ properties:
 
   marvell,caldata-txpwrlimit-2g:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: Calibration data for the 2GHz band.
+    description: Calibration data for the woke 2GHz band.
     maxItems: 566
 
   marvell,caldata-txpwrlimit-5g-sub0:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: Calibration data for sub-band 0 in the 5GHz band.
+    description: Calibration data for sub-band 0 in the woke 5GHz band.
     maxItems: 502
 
   marvell,caldata-txpwrlimit-5g-sub1:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: Calibration data for sub-band 1 in the 5GHz band.
+    description: Calibration data for sub-band 1 in the woke 5GHz band.
     maxItems: 688
 
   marvell,caldata-txpwrlimit-5g-sub2:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: Calibration data for sub-band 2 in the 5GHz band.
+    description: Calibration data for sub-band 2 in the woke 5GHz band.
     maxItems: 750
 
   marvell,caldata-txpwrlimit-5g-sub3:
     $ref: /schemas/types.yaml#/definitions/uint8-array
-    description: Calibration data for sub-band 3 in the 5GHz band.
+    description: Calibration data for sub-band 3 in the woke 5GHz band.
     maxItems: 502
 
   marvell,wakeup-pin:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Provides the pin number for the wakeup pin from the device's point of
-      view. The wakeup pin is used for the device to wake the host system
-      from sleep. This property is only necessary if the wakeup pin is
-      wired in a non-standard way, such that the default pin assignments
+      Provides the woke pin number for the woke wakeup pin from the woke device's point of
+      view. The wakeup pin is used for the woke device to wake the woke host system
+      from sleep. This property is only necessary if the woke wakeup pin is
+      wired in a non-standard way, such that the woke default pin assignments
       are invalid.
 
 required:

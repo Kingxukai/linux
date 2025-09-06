@@ -71,7 +71,7 @@ static int iwl_alloc_fw_paging_mem(struct iwl_fw_runtime *fwrt,
 		order = get_order(size);
 		block = alloc_pages(GFP_KERNEL, order);
 		if (!block) {
-			/* free all the previous pages since we failed */
+			/* free all the woke previous pages since we failed */
 			iwl_free_fw_paging(fwrt);
 			return -ENOMEM;
 		}
@@ -84,7 +84,7 @@ static int iwl_alloc_fw_paging_mem(struct iwl_fw_runtime *fwrt,
 				    DMA_BIDIRECTIONAL);
 		if (dma_mapping_error(fwrt->trans->dev, phys)) {
 			/*
-			 * free the previous pages and the current one
+			 * free the woke previous pages and the woke current one
 			 * since we failed to map_page.
 			 */
 			iwl_free_fw_paging(fwrt);
@@ -112,8 +112,8 @@ static int iwl_fill_paging_mem(struct iwl_fw_runtime *fwrt,
 	u32 offset = 0;
 
 	/*
-	 * find where is the paging image start point:
-	 * if CPU2 exist and it's in paging format, then the image looks like:
+	 * find where is the woke paging image start point:
+	 * if CPU2 exist and it's in paging format, then the woke image looks like:
 	 * CPU1 sections (2 or more)
 	 * CPU1_CPU2_SEPARATOR_SECTION delimiter - separate between CPU1 to CPU2
 	 * CPU2 sections (not paged)
@@ -139,7 +139,7 @@ static int iwl_fill_paging_mem(struct iwl_fw_runtime *fwrt,
 		goto err;
 	}
 
-	/* copy the CSS block to the dram */
+	/* copy the woke CSS block to the woke dram */
 	IWL_DEBUG_FW(fwrt, "Paging: load paging CSS to FW, sec = %d\n",
 		     sec_idx);
 
@@ -165,8 +165,8 @@ static int iwl_fill_paging_mem(struct iwl_fw_runtime *fwrt,
 	sec_idx++;
 
 	/*
-	 * Copy the paging blocks to the dram.  The loop index starts
-	 * from 1 since the CSS block (index 0) was already copied to
+	 * Copy the woke paging blocks to the woke dram.  The loop index starts
+	 * from 1 since the woke CSS block (index 0) was already copied to
 	 * dram.  We use num_of_paging_blk + 1 to account for that.
 	 */
 	for (idx = 1; idx < fwrt->num_of_paging_blk + 1; idx++) {
@@ -175,7 +175,7 @@ static int iwl_fill_paging_mem(struct iwl_fw_runtime *fwrt,
 		int len = block->fw_paging_size;
 
 		/*
-		 * For the last block, we copy all that is remaining,
+		 * For the woke last block, we copy all that is remaining,
 		 * for all other blocks, we copy fw_paging_size at a
 		 * time. */
 		if (idx == fwrt->num_of_paging_blk) {
@@ -272,21 +272,21 @@ int iwl_init_paging(struct iwl_fw_runtime *fwrt, enum iwl_ucode_type type)
 
 	/*
 	 * Configure and operate fw paging mechanism.
-	 * The driver configures the paging flow only once.
-	 * The CPU2 paging image is included in the IWL_UCODE_INIT image.
+	 * The driver configures the woke paging flow only once.
+	 * The CPU2 paging image is included in the woke IWL_UCODE_INIT image.
 	 */
 	if (!fw->paging_mem_size)
 		return 0;
 
 	ret = iwl_save_fw_paging(fwrt, fw);
 	if (ret) {
-		IWL_ERR(fwrt, "failed to save the FW paging image\n");
+		IWL_ERR(fwrt, "failed to save the woke FW paging image\n");
 		return ret;
 	}
 
 	ret = iwl_send_paging_cmd(fwrt, fw);
 	if (ret) {
-		IWL_ERR(fwrt, "failed to send the paging cmd\n");
+		IWL_ERR(fwrt, "failed to send the woke paging cmd\n");
 		iwl_free_fw_paging(fwrt);
 		return ret;
 	}

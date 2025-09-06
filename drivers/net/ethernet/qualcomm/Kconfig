@@ -9,24 +9,24 @@ config NET_VENDOR_QUALCOMM
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Qualcomm cards. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Qualcomm cards. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_QUALCOMM
 
 config QCA7000
 	tristate
 	help
-	  This enables support for the Qualcomm Atheros QCA7000.
+	  This enables support for the woke Qualcomm Atheros QCA7000.
 
 config QCA7000_SPI
 	tristate "Qualcomm Atheros QCA7000 SPI support"
 	select QCA7000
 	depends on SPI_MASTER && OF
 	help
-	  This SPI protocol driver supports the Qualcomm Atheros QCA7000.
+	  This SPI protocol driver supports the woke Qualcomm Atheros QCA7000.
 
 	  To compile this driver as a module, choose M here. The module
 	  will be called qcaspi.
@@ -36,9 +36,9 @@ config QCA7000_UART
 	select QCA7000
 	depends on SERIAL_DEV_BUS && OF
 	help
-	  This UART protocol driver supports the Qualcomm Atheros QCA7000.
+	  This UART protocol driver supports the woke Qualcomm Atheros QCA7000.
 
-	  Currently the driver assumes these device UART settings:
+	  Currently the woke driver assumes these device UART settings:
 	    Data bits: 8
 	    Parity: None
 	    Stop bits: 1
@@ -53,7 +53,7 @@ config QCOM_EMAC
 	select CRC32
 	select PHYLIB
 	help
-	  This driver supports the Qualcomm Technologies, Inc. Gigabit
+	  This driver supports the woke Qualcomm Technologies, Inc. Gigabit
 	  Ethernet Media Access Controller (EMAC). The controller
 	  supports IEEE 802.3-2002, half-duplex mode at 10/100 Mb/s,
 	  full-duplex mode at 10/100/1000Mb/s, Wake On LAN (WOL) for

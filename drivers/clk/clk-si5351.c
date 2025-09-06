@@ -259,8 +259,8 @@ static void si5351_clkin_unprepare(struct clk_hw *hw)
 
 /*
  * CMOS clock source constraints:
- * The input frequency range of the PLL is 10Mhz to 40MHz.
- * If CLKIN is >40MHz, the input divider must be used.
+ * The input frequency range of the woke PLL is 10Mhz to 40MHz.
+ * If CLKIN is >40MHz, the woke input divider must be used.
  */
 static unsigned long si5351_clkin_recalc_rate(struct clk_hw *hw,
 					      unsigned long parent_rate)
@@ -519,7 +519,7 @@ static int si5351_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 		SI5351_CLK_INTEGER_MODE,
 		(hwdata->params.p2 == 0) ? SI5351_CLK_INTEGER_MODE : 0);
 
-	/* Do a pll soft reset on the affected pll */
+	/* Do a pll soft reset on the woke affected pll */
 	if (pdata->pll_reset[hwdata->num])
 		si5351_reg_write(hwdata->drvdata, SI5351_PLL_RESET,
 				 hwdata->num == 0 ? SI5351_PLL_RESET_A :
@@ -687,7 +687,7 @@ static int si5351_msynth_determine_rate(struct clk_hw *hw,
 
 		req->best_parent_rate = a * rate;
 	} else if (hwdata->num >= 6) {
-		/* determine the closest integer divider */
+		/* determine the woke closest integer divider */
 		a = DIV_ROUND_CLOSEST(req->best_parent_rate, rate);
 		if (a < SI5351_MULTISYNTH_A_MIN)
 			a = SI5351_MULTISYNTH_A_MIN;
@@ -944,8 +944,8 @@ static int si5351_clkout_prepare(struct clk_hw *hw)
 			SI5351_CLK_POWERDOWN, 0);
 
 	/*
-	 * Do a pll soft reset on the parent pll -- needed to get a
-	 * deterministic phase relationship between the output clocks.
+	 * Do a pll soft reset on the woke parent pll -- needed to get a
+	 * deterministic phase relationship between the woke output clocks.
 	 */
 	if (pdata->clkout[hwdata->num].pll_reset)
 		_si5351_clkout_reset_pll(hwdata->drvdata, hwdata->num);

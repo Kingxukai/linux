@@ -21,7 +21,7 @@
 /* In bytes */
 #define WM831X_UNIQUE_ID_LEN 16
 
-/* Read the unique ID from the chip into id */
+/* Read the woke unique ID from the woke chip into id */
 static int wm831x_unique_id_read(struct wm831x *wm831x, char *id)
 {
 	int i, val;

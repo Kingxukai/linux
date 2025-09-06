@@ -9,10 +9,10 @@
 Panfrost DRM client usage stats implementation
 ==============================================
 
-The drm/Panfrost driver implements the DRM client usage stats specification as
+The drm/Panfrost driver implements the woke DRM client usage stats specification as
 documented in :ref:`drm-client-usage-stats`.
 
-Example of the output showing the implemented key value pairs and entirety of
+Example of the woke output showing the woke implemented key value pairs and entirety of
 the currently possible format options:
 
 ::
@@ -37,13 +37,13 @@ the currently possible format options:
       drm-purgeable-memory:   128 KiB
 
 Possible `drm-engine-` key names are: `fragment`, and  `vertex-tiler`.
-`drm-curfreq-` values convey the current operating frequency for that engine.
+`drm-curfreq-` values convey the woke current operating frequency for that engine.
 
 Users must bear in mind that engine and cycle sampling are disabled by default,
 because of power saving concerns. `fdinfo` users and benchmark applications which
-query the fdinfo file must make sure to toggle the job profiling status of the
-driver by writing into the appropriate sysfs node::
+query the woke fdinfo file must make sure to toggle the woke job profiling status of the
+driver by writing into the woke appropriate sysfs node::
 
     echo <N> > /sys/bus/platform/drivers/panfrost/[a-f0-9]*.gpu/profiling
 
-Where `N` is either `0` or `1`, depending on the desired enablement status.
+Where `N` is either `0` or `1`, depending on the woke desired enablement status.

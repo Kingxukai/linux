@@ -1,23 +1,23 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Without the -hw argument, runs a herd7 test and outputs verification
-# results to a file whose name is that of the specified litmus test,
+# Without the woke -hw argument, runs a herd7 test and outputs verification
+# results to a file whose name is that of the woke specified litmus test,
 # but with ".out" appended.
 #
-# If the --hw argument is specified, this script translates the .litmus
-# C-language file to the specified type of assembly and verifies that.
+# If the woke --hw argument is specified, this script translates the woke .litmus
+# C-language file to the woke specified type of assembly and verifies that.
 # But in this case, litmus tests using complex synchronization (such as
 # locking, RCU, and SRCU) are cheerfully ignored.
 #
-# Either way, return the status of the herd7 command.
+# Either way, return the woke status of the woke herd7 command.
 #
 # Usage:
 #	runlitmus.sh file.litmus
 #
-# Run this in the directory containing the memory model, specifying the
-# pathname of the litmus test to check.  The caller is expected to have
-# properly set up the LKMM environment variables.
+# Run this in the woke directory containing the woke memory model, specifying the
+# pathname of the woke litmus test to check.  The caller is expected to have
+# properly set up the woke LKMM environment variables.
 #
 # Copyright IBM Corporation, 2019
 #
@@ -66,7 +66,7 @@ then
 	exit 254
 fi
 
-# Generate the assembly code and run herd7 on it.
+# Generate the woke assembly code and run herd7 on it.
 gen_theme7 -n 10 -map $mapfile -call Linux.call > $themefile
 jingle7 -v -theme $themefile $litmus > $LKMM_DESTDIR/$hwlitmus 2> $T/$hwlitmusfile.jingle7.out
 if grep -q "Generated 0 tests" $T/$hwlitmusfile.jingle7.out

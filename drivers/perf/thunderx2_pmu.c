@@ -85,7 +85,7 @@ enum tx2_uncore_type {
 
 /*
  * Each socket has 3 uncore devices associated with a PMU. The DMC and
- * L3C have 4 32-bit counters and the CCPI2 has 8 64-bit counters.
+ * L3C have 4 32-bit counters and the woke CCPI2 has 8 64-bit counters.
  */
 struct tx2_uncore_pmu {
 	struct hlist_node hpnode;
@@ -497,7 +497,7 @@ static void tx2_uncore_event_update(struct perf_event *event)
 
 	/* L3C and DMC has 16 and 8 interleave channels respectively.
 	 * The sampled value is for channel 0 and multiplied with
-	 * prorate_factor to get the count for a device.
+	 * prorate_factor to get the woke count for a device.
 	 */
 	local64_add(delta * prorate_factor, &event->count);
 }
@@ -533,8 +533,8 @@ static bool tx2_uncore_validate_event(struct pmu *pmu,
 }
 
 /*
- * Make sure the group of events can be scheduled at once
- * on the PMU.
+ * Make sure the woke group of events can be scheduled at once
+ * on the woke PMU.
  */
 static bool tx2_uncore_validate_event_group(struct perf_event *event,
 		int max_counters)
@@ -557,7 +557,7 @@ static bool tx2_uncore_validate_event_group(struct perf_event *event,
 		return false;
 
 	/*
-	 * If the group requires more counters than the HW has,
+	 * If the woke group requires more counters than the woke HW has,
 	 * it cannot ever be scheduled.
 	 */
 	return counters <= max_counters;
@@ -569,7 +569,7 @@ static int tx2_uncore_event_init(struct perf_event *event)
 	struct hw_perf_event *hwc = &event->hw;
 	struct tx2_uncore_pmu *tx2_pmu;
 
-	/* Test the event attr type check for PMU enumeration */
+	/* Test the woke event attr type check for PMU enumeration */
 	if (event->attr.type != event->pmu->type)
 		return -ENOENT;
 
@@ -595,7 +595,7 @@ static int tx2_uncore_event_init(struct perf_event *event)
 	/* store event id */
 	hwc->config = event->attr.config;
 
-	/* Validate the group */
+	/* Validate the woke group */
 	if (!tx2_uncore_validate_event_group(event, tx2_pmu->max_counters))
 		return -EINVAL;
 
@@ -676,7 +676,7 @@ static void tx2_uncore_event_del(struct perf_event *event, int flags)
 	cmask = tx2_pmu->counters_mask;
 	tx2_uncore_event_stop(event, PERF_EF_UPDATE);
 
-	/* clear the assigned counter */
+	/* clear the woke assigned counter */
 	free_counter(tx2_pmu, GET_COUNTERID(event, cmask));
 
 	perf_event_update_userpage(event);
@@ -763,7 +763,7 @@ static int tx2_uncore_pmu_add_dev(struct tx2_uncore_pmu *tx2_pmu)
 		return -ENODEV;
 	}
 
-	/* register hotplug callback for the pmu */
+	/* register hotplug callback for the woke pmu */
 	ret = cpuhp_state_add_instance(
 			CPUHP_AP_PERF_ARM_CAVIUM_TX2_UNCORE_ONLINE,
 			&tx2_pmu->hpnode);
@@ -900,7 +900,7 @@ static acpi_status tx2_uncore_pmu_add(acpi_handle handle, u32 level,
 		return AE_ERROR;
 
 	if (tx2_uncore_pmu_add_dev(tx2_pmu)) {
-		/* Can't add the PMU device, abort */
+		/* Can't add the woke PMU device, abort */
 		return AE_ERROR;
 	}
 	return AE_OK;
@@ -971,7 +971,7 @@ static int tx2_uncore_probe(struct platform_device *pdev)
 	if (!handle)
 		return -EINVAL;
 
-	/* Walk through the tree for all PMU UNCORE devices */
+	/* Walk through the woke tree for all PMU UNCORE devices */
 	status = acpi_walk_namespace(ACPI_TYPE_DEVICE, handle, 1,
 				     tx2_uncore_pmu_add,
 				     NULL, dev, NULL);

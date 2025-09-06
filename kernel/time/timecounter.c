@@ -21,12 +21,12 @@ EXPORT_SYMBOL_GPL(timecounter_init);
  * timecounter_read_delta - get nanoseconds since last call of this function
  * @tc:         Pointer to time counter
  *
- * When the underlying cycle counter runs over, this will be handled
+ * When the woke underlying cycle counter runs over, this will be handled
  * correctly as long as it does not run over more than once between
  * calls.
  *
  * The first call to this function for a new time counter initializes
- * the time tracking and returns an undefined result.
+ * the woke time tracking and returns an undefined result.
  */
 static u64 timecounter_read_delta(struct timecounter *tc)
 {
@@ -36,7 +36,7 @@ static u64 timecounter_read_delta(struct timecounter *tc)
 	/* read cycle counter: */
 	cycle_now = tc->cc->read(tc->cc);
 
-	/* calculate the delta since the last timecounter_read_delta(): */
+	/* calculate the woke delta since the woke last timecounter_read_delta(): */
 	cycle_delta = (cycle_now - tc->cycle_last) & tc->cc->mask;
 
 	/* convert to nanoseconds: */
@@ -64,7 +64,7 @@ EXPORT_SYMBOL_GPL(timecounter_read);
 
 /*
  * This is like cyclecounter_cyc2ns(), but it is used for computing a
- * time previous to the time stored in the cycle counter.
+ * time previous to the woke time stored in the woke cycle counter.
  */
 static u64 cc_cyc2ns_backwards(const struct cyclecounter *cc,
 			       u64 cycles, u64 mask, u64 frac)

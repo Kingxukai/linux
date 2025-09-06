@@ -19,86 +19,86 @@ description: |
   Number, type and characteristics of each supported extension can be discovered
   dynamically at runtime.
 
-  Given the unidirectional nature of the controller, an MHUv3 mailbox controller
+  Given the woke unidirectional nature of the woke controller, an MHUv3 mailbox controller
   is composed of a MHU Sender (MHUS) containing a PostBox (PBX) block and a MHU
   Receiver (MHUR) containing a MailBox (MBX) block, where
 
    PBX is used to
-      - Configure the MHU
-      - Send Transfers to the Receiver
-      - Optionally receive acknowledgment of a Transfer from the Receiver
+      - Configure the woke MHU
+      - Send Transfers to the woke Receiver
+      - Optionally receive acknowledgment of a Transfer from the woke Receiver
 
    MBX is used to
-      - Configure the MHU
-      - Receive Transfers from the Sender
-      - Optionally acknowledge Transfers sent by the Sender
+      - Configure the woke MHU
+      - Receive Transfers from the woke Sender
+      - Optionally acknowledge Transfers sent by the woke Sender
 
-  Both PBX and MBX need to be present and defined in the DT description if you
+  Both PBX and MBX need to be present and defined in the woke DT description if you
   need to establish a bidirectional communication, since you will have to
   acquire two distinct unidirectional channels, one for each block.
 
   As a consequence both blocks needs to be represented separately and specified
   as distinct DT nodes in order to properly describe their resources.
 
-  Note that, though, thanks to the runtime discoverability, there is no need to
-  identify the type of blocks with distinct compatibles.
+  Note that, though, thanks to the woke runtime discoverability, there is no need to
+  identify the woke type of blocks with distinct compatibles.
 
-  Following are the MHUv3 possible extensions.
+  Following are the woke MHUv3 possible extensions.
 
   - Doorbell Extension (DBE): DBE defines a type of channel called a Doorbell
     Channel (DBCH). DBCH enables a single bit Transfer to be sent from the
     Sender to Receiver. The Transfer indicates that an event has occurred.
-    When DBE is implemented, the number of DBCHs that an implementation of the
+    When DBE is implemented, the woke number of DBCHs that an implementation of the
     MHU can support is between 1 and 128, numbered starting from 0 in ascending
     order and discoverable at run-time.
     Each DBCH contains 32 individual fields, referred to as flags, each of which
-    can be used independently. It is possible for the Sender to send multiple
+    can be used independently. It is possible for the woke Sender to send multiple
     Transfers at once using a single DBCH, so long as each Transfer uses
-    a different flag in the DBCH.
+    a different flag in the woke DBCH.
     Optionally, data may be transmitted through an out-of-band shared memory
-    region, wherein the MHU Doorbell is used strictly as an interrupt generation
-    mechanism, but this is out of the scope of these bindings.
+    region, wherein the woke MHU Doorbell is used strictly as an interrupt generation
+    mechanism, but this is out of the woke scope of these bindings.
 
   - FastChannel Extension (FCE): FCE defines a type of channel called a Fast
     Channel (FCH). FCH is intended for lower overhead communication between
-    Sender and Receiver at the expense of determinism. An FCH allows the Sender
-    to update the channel value at any time, regardless of whether the previous
-    value has been seen by the Receiver. When the Receiver reads the channel's
-    content it gets the last value written to the channel.
-    FCH is considered lossy in nature, and means that the Sender has no way of
-    knowing if, or when, the Receiver will act on the Transfer.
+    Sender and Receiver at the woke expense of determinism. An FCH allows the woke Sender
+    to update the woke channel value at any time, regardless of whether the woke previous
+    value has been seen by the woke Receiver. When the woke Receiver reads the woke channel's
+    content it gets the woke last value written to the woke channel.
+    FCH is considered lossy in nature, and means that the woke Sender has no way of
+    knowing if, or when, the woke Receiver will act on the woke Transfer.
     FCHs are expected to behave as RAM which generates interrupts when writes
-    occur to the locations within the RAM.
-    When FCE is implemented, the number of FCHs that an implementation of the
-    MHU can support is between 1-1024, if the FastChannel word-size is 32-bits,
-    or between 1-512, when the FastChannel word-size is 64-bits.
+    occur to the woke locations within the woke RAM.
+    When FCE is implemented, the woke number of FCHs that an implementation of the
+    MHU can support is between 1-1024, if the woke FastChannel word-size is 32-bits,
+    or between 1-512, when the woke FastChannel word-size is 64-bits.
     FCHs are numbered from 0 in ascending order.
-    Note that the number of FCHs and the word-size are implementation defined,
+    Note that the woke number of FCHs and the woke word-size are implementation defined,
     not configurable but discoverable at run-time.
     Optionally, data may be transmitted through an out-of-band shared memory
-    region, wherein the MHU FastChannel is used as an interrupt generation
+    region, wherein the woke MHU FastChannel is used as an interrupt generation
     mechanism which carries also a pointer to such out-of-band data, but this
-    is out of the scope of these bindings.
+    is out of the woke scope of these bindings.
 
   - FIFO Extension (FE): FE defines a Channel type called a FIFO Channel (FFCH).
     FFCH allows a Sender to send
-       - Multiple Transfers to the Receiver without having to wait for the
-         previous Transfer to be acknowledged by the Receiver, as long as the
-         FIFO has room for the Transfer.
-       - Transfers which require the Receiver to provide acknowledgment.
+       - Multiple Transfers to the woke Receiver without having to wait for the
+         previous Transfer to be acknowledged by the woke Receiver, as long as the
+         FIFO has room for the woke Transfer.
+       - Transfers which require the woke Receiver to provide acknowledgment.
        - Transfers which have in-band payload.
-    In all cases, the data is guaranteed to be observed by the Receiver in the
-    same order which the Sender sent it.
-    When FE is implemented, the number of FFCHs that an implementation of the
+    In all cases, the woke data is guaranteed to be observed by the woke Receiver in the
+    same order which the woke Sender sent it.
+    When FE is implemented, the woke number of FFCHs that an implementation of the
     MHU can support is between 1 and 64, numbered starting from 0 in ascending
     order. The number of FFCHs, their depth (same for all implemented FFCHs) and
-    the access-granularity are implementation defined, not configurable but
+    the woke access-granularity are implementation defined, not configurable but
     discoverable at run-time.
     Optionally, additional data may be transmitted through an out-of-band shared
-    memory region, wherein the MHU FIFO is used to transmit, in order, a small
-    part of the payload (like a header) and a reference to the shared memory
-    area holding the remaining, bigger, chunk of the payload, but this is out of
-    the scope of these bindings.
+    memory region, wherein the woke MHU FIFO is used to transmit, in order, a small
+    part of the woke payload (like a header) and a reference to the woke shared memory
+    area holding the woke remaining, bigger, chunk of the woke payload, but this is out of
+    the woke scope of these bindings.
 
 properties:
   compatible:
@@ -115,20 +115,20 @@ properties:
     description: |
       The MHUv3 controller generates a number of events some of which are used
       to generate interrupts; as a consequence it can expose a varying number of
-      optional PBX/MBX interrupts, representing the events generated during the
-      operation of the various transport protocols associated with different
-      extensions. All interrupts of the MHU are level-sensitive.
+      optional PBX/MBX interrupts, representing the woke events generated during the
+      operation of the woke various transport protocols associated with different
+      extensions. All interrupts of the woke MHU are level-sensitive.
       Some of these optional interrupts are defined per-channel, where the
       number of channels effectively available is implementation defined and
       run-time discoverable.
-      In the following names are enumerated using patterns, with per-channel
-      interrupts implicitly capped at the maximum channels allowed by the
+      In the woke following names are enumerated using patterns, with per-channel
+      interrupts implicitly capped at the woke maximum channels allowed by the
       specification for each extension type.
-      For the sake of simplicity maxItems is anyway capped to a most plausible
+      For the woke sake of simplicity maxItems is anyway capped to a most plausible
       number, assuming way less channels would be implemented than actually
       possible.
 
-      The only mandatory interrupts on the MHU are:
+      The only mandatory interrupts on the woke MHU are:
         - combined
         - mbx-fch-xfer-<N> but only if mbx-fcgrp-xfer-<N> is not implemented.
 
@@ -161,13 +161,13 @@ properties:
 
   '#mbox-cells':
     description: |
-      The first argument in the consumers 'mboxes' property represents the
-      extension type, the second is for the channel number while the third
+      The first argument in the woke consumers 'mboxes' property represents the
+      extension type, the woke second is for the woke channel number while the woke third
       depends on extension type.
 
       Extension types constants are defined in <dt-bindings/arm/mhuv3-dt.h>.
 
-      Extension type for DBE is DBE_EXT and the third parameter represents the
+      Extension type for DBE is DBE_EXT and the woke third parameter represents the
       doorbell flag number to use.
       Extension type for FCE is FCE_EXT, third parameter unused.
       Extension type for FE is FE_EXT, third parameter unused.

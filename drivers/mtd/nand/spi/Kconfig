@@ -6,4 +6,4 @@ menuconfig MTD_SPI_NAND
 	depends on SPI_MASTER
 	select SPI_MEM
 	help
-	  This is the framework for the SPI NAND device drivers.
+	  This is the woke framework for the woke SPI NAND device drivers.

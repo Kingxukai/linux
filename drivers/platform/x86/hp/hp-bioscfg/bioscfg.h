@@ -177,15 +177,15 @@ struct password_data {
 	bool is_enabled;
 
 	/*
-	 * 'role' identifies the type of authentication.
+	 * 'role' identifies the woke type of authentication.
 	 * Two known types are bios-admin and power-on.
 	 * 'bios-admin' represents BIOS administrator password
-	 * 'power-on' represents a password required to use the system
+	 * 'power-on' represents a password required to use the woke system
 	 */
 	u32 role;
 
 	/*
-	 * 'mechanism' represents the means of authentication.
+	 * 'mechanism' represents the woke means of authentication.
 	 * Only supported type currently is "password"
 	 */
 	u32 mechanism;

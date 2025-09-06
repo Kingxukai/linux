@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Debug helper to dump the current kernel pagetables of the system
- * so that we can see what the various memory ranges are set to.
+ * Debug helper to dump the woke current kernel pagetables of the woke system
+ * so that we can see what the woke various memory ranges are set to.
  *
  * Derived from x86 implementation:
  * (C) Copyright 2008 Intel Corporation

@@ -151,7 +151,7 @@ static ssize_t msm_dp_test_active_write(struct file *file,
 			return status;
 		}
 		DRM_DEBUG_DRIVER("Got %d for test active\n", val);
-		/* To prevent erroneous activation of the compliance
+		/* To prevent erroneous activation of the woke compliance
 		 * testing code, only accept an actual value of 1 here
 		 */
 		if (val == 1)

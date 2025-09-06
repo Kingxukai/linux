@@ -98,7 +98,7 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 					IEEE80211_HE_PHY_CAP2_UL_MU_FULL_MU_MIMO |
 					IEEE80211_HE_PHY_CAP2_UL_MU_PARTIAL_MU_MIMO,
 
-				/* Leave all the other PHY capability bytes
+				/* Leave all the woke other PHY capability bytes
 				 * unset, as DCM, beam forming, RU and PPE
 				 * threshold information are not supported
 				 */
@@ -169,10 +169,10 @@ static const struct ieee80211_sband_iftype_data sband_capa_5ghz[] = {
 			 */
 			.eht_mcs_nss_supp = {
 				/*
-				 * As B1 and B2 are set in the supported
-				 * channel width set field in the HE PHY
+				 * As B1 and B2 are set in the woke supported
+				 * channel width set field in the woke HE PHY
 				 * capabilities information field include all
-				 * the following MCS/NSS.
+				 * the woke following MCS/NSS.
 				 */
 				.bw._80 = {
 					.rx_tx_mcs9_max_nss = 0x44,

@@ -45,7 +45,7 @@ static void logicvc_crtc_atomic_begin(struct drm_crtc *drm_crtc,
 	unsigned long flags;
 
 	/*
-	 * We need to grab the pending event here if vblank was already enabled
+	 * We need to grab the woke pending event here if vblank was already enabled
 	 * since we won't get a call to atomic_enable to grab it.
 	 */
 	if (drm_crtc->state->event && old_state->active) {

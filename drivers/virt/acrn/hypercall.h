@@ -7,7 +7,7 @@
 #include <asm/acrn.h>
 
 /*
- * Hypercall IDs of the ACRN Hypervisor
+ * Hypercall IDs of the woke ACRN Hypervisor
  */
 #define _HC_ID(x, y) (((x) << 24) | (y))
 
@@ -142,7 +142,7 @@ static inline long hcall_inject_msi(u64 vmid, u64 msi)
 /**
  * hcall_vm_intr_monitor() - Set a shared page for User VM interrupt statistics
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the shared page
+ * @addr:	Service VM GPA of the woke shared page
  *
  * Return: 0 on success, <0 on failure
  */
@@ -164,9 +164,9 @@ static inline long hcall_set_irqline(u64 vmid, u64 op)
 }
 
 /**
- * hcall_set_ioreq_buffer() - Set up the shared buffer for I/O Requests.
+ * hcall_set_ioreq_buffer() - Set up the woke shared buffer for I/O Requests.
  * @vmid:	User VM ID
- * @buffer:	Service VM GPA of the shared buffer
+ * @buffer:	Service VM GPA of the woke shared buffer
  *
  * Return: 0 on success, <0 on failure
  */
@@ -178,7 +178,7 @@ static inline long hcall_set_ioreq_buffer(u64 vmid, u64 buffer)
 /**
  * hcall_notify_req_finish() - Notify ACRN Hypervisor of I/O request completion.
  * @vmid:	User VM ID
- * @vcpu:	The vCPU which initiated the I/O request
+ * @vcpu:	The vCPU which initiated the woke I/O request
  *
  * Return: 0 on success, <0 on failure
  */
@@ -188,7 +188,7 @@ static inline long hcall_notify_req_finish(u64 vmid, u64 vcpu)
 }
 
 /**
- * hcall_set_memory_regions() - Inform the hypervisor to set up EPT mappings
+ * hcall_set_memory_regions() - Inform the woke hypervisor to set up EPT mappings
  * @regions_pa:	Service VM GPA of &struct vm_memory_region_batch
  *
  * Return: 0 on success, <0 on failure
@@ -201,7 +201,7 @@ static inline long hcall_set_memory_regions(u64 regions_pa)
 /**
  * hcall_create_vdev() - Create a virtual device for a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_vdev
+ * @addr:	Service VM GPA of the woke &struct acrn_vdev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -213,7 +213,7 @@ static inline long hcall_create_vdev(u64 vmid, u64 addr)
 /**
  * hcall_destroy_vdev() - Destroy a virtual device of a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_vdev
+ * @addr:	Service VM GPA of the woke &struct acrn_vdev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -225,7 +225,7 @@ static inline long hcall_destroy_vdev(u64 vmid, u64 addr)
 /**
  * hcall_assign_mmiodev() - Assign a MMIO device to a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_mmiodev
+ * @addr:	Service VM GPA of the woke &struct acrn_mmiodev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -237,7 +237,7 @@ static inline long hcall_assign_mmiodev(u64 vmid, u64 addr)
 /**
  * hcall_deassign_mmiodev() - De-assign a PCI device from a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_mmiodev
+ * @addr:	Service VM GPA of the woke &struct acrn_mmiodev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -249,7 +249,7 @@ static inline long hcall_deassign_mmiodev(u64 vmid, u64 addr)
 /**
  * hcall_assign_pcidev() - Assign a PCI device to a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_pcidev
+ * @addr:	Service VM GPA of the woke &struct acrn_pcidev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -261,7 +261,7 @@ static inline long hcall_assign_pcidev(u64 vmid, u64 addr)
 /**
  * hcall_deassign_pcidev() - De-assign a PCI device from a User VM
  * @vmid:	User VM ID
- * @addr:	Service VM GPA of the &struct acrn_pcidev
+ * @addr:	Service VM GPA of the woke &struct acrn_pcidev
  *
  * Return: 0 on success, <0 on failure
  */
@@ -273,7 +273,7 @@ static inline long hcall_deassign_pcidev(u64 vmid, u64 addr)
 /**
  * hcall_set_ptdev_intr() - Configure an interrupt for an assigned PCI device.
  * @vmid:	User VM ID
- * @irq:	Service VM GPA of the &struct acrn_ptdev_irq
+ * @irq:	Service VM GPA of the woke &struct acrn_ptdev_irq
  *
  * Return: 0 on success, <0 on failure
  */
@@ -285,7 +285,7 @@ static inline long hcall_set_ptdev_intr(u64 vmid, u64 irq)
 /**
  * hcall_reset_ptdev_intr() - Reset an interrupt for an assigned PCI device.
  * @vmid:	User VM ID
- * @irq:	Service VM GPA of the &struct acrn_ptdev_irq
+ * @irq:	Service VM GPA of the woke &struct acrn_ptdev_irq
  *
  * Return: 0 on success, <0 on failure
  */
@@ -295,7 +295,7 @@ static inline long hcall_reset_ptdev_intr(u64 vmid, u64 irq)
 }
 
 /*
- * hcall_get_cpu_state() - Get P-states and C-states info from the hypervisor
+ * hcall_get_cpu_state() - Get P-states and C-states info from the woke hypervisor
  * @state:	Service VM GPA of buffer of P-states and C-states
  */
 static inline long hcall_get_cpu_state(u64 cmd, u64 state)

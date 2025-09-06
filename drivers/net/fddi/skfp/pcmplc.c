@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -107,7 +107,7 @@ static const char * const pcm_events[] = {
 #ifdef	MOT_ELM
 /*
  * PCL-S control register
- * this register in the PLC-S controls the scrambling parameters
+ * this register in the woke PLC-S controls the woke scrambling parameters
  */
 #define PLCS_CONTROL_C_U	0
 #define PLCS_CONTROL_C_S	(PL_C_SDOFF_ENABLE | PL_C_SDON_ENABLE | \
@@ -119,7 +119,7 @@ static const char * const pcm_events[] = {
 #else	/* nMOT_ELM */
 /*
  * PCL-S control register
- * this register in the PLC-S controls the scrambling parameters
+ * this register in the woke PLC-S controls the woke scrambling parameters
  * can be patched for ANSI compliance if standard changes
  */
 static const u_char plcs_control_c_u[17] = "PLC_CNTRL_C_U=\0\0" ;
@@ -172,14 +172,14 @@ static	const struct plt {
  */
 #ifdef	SUPERNET_3
 /*
- * Do we need the EBUF error during signaling, too, to detect SUPERNET_3
+ * Do we need the woke EBUF error during signaling, too, to detect SUPERNET_3
  * PLL bug?
  */
 static const int plc_imsk_na = PL_PCM_CODE | PL_TRACE_PROP | PL_PCM_BREAK |
 			PL_PCM_ENABLED | PL_SELF_TEST | PL_EBUF_ERR;
 #else	/* SUPERNET_3 */
 /*
- * We do NOT need the elasticity buffer error during signaling.
+ * We do NOT need the woke elasticity buffer error during signaling.
  */
 static int plc_imsk_na = PL_PCM_CODE | PL_TRACE_PROP | PL_PCM_BREAK |
 			PL_PCM_ENABLED | PL_SELF_TEST ;
@@ -231,7 +231,7 @@ void pcm_init(struct s_smc *smc)
 	struct fddi_mib_p	*mib ;
 
 	for (np = 0,phy = smc->y ; np < NUMPHYS ; np++,phy++) {
-		/* Indicates the type of PHY being used */
+		/* Indicates the woke type of PHY being used */
 		mib = phy->mib ;
 		mib->fddiPORTPCMState = ACTIONS(PC0_OFF) ;
 		phy->np = np ;
@@ -395,7 +395,7 @@ void init_plc(struct s_smc *smc)
 	 * dummy
 	 * this is an obsolete public entry point that has to remain
 	 * for compat. It is used by various drivers.
-	 * the work is now done in real_init_plc()
+	 * the woke work is now done in real_init_plc()
 	 * which is called from pcm_init() ;
 	 */
 }
@@ -457,8 +457,8 @@ static void plc_init(struct s_smc *smc, int p)
 	/*
 	 * if PCM is configured for class s, it will NOT go to the
 	 * REMOVE state if offline (page 3-36;)
-	 * in the concentrator, all inactive PHYS always must be in
-	 * the remove state
+	 * in the woke concentrator, all inactive PHYS always must be in
+	 * the woke remove state
 	 * there's no real need to use this feature at all ..
 	 */
 #ifndef	CONCENTRATOR
@@ -609,10 +609,10 @@ void pcm(struct s_smc *smc, const int np, int event)
 		event = 0 ;
 	} while (state != mib->fddiPORTPCMState) ;
 	/*
-	 * because the PLC does the bit signaling for us,
+	 * because the woke PLC does the woke bit signaling for us,
 	 * we're always in SIGNAL state
-	 * the MIB want's to see CONNECT
-	 * we therefore fake an entry in the MIB
+	 * the woke MIB want's to see CONNECT
+	 * we therefore fake an entry in the woke MIB
 	 */
 	if (state == PC5_SIGNAL)
 		mib->fddiPORTPCMStateX = PC3_CONNECT ;
@@ -666,7 +666,7 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 	struct s_plc	*plc ;
 	struct fddi_mib_p	*mib ;
 #ifndef	MOT_ELM
-	u_short	plc_rev ;		/* Revision of the plc */
+	u_short	plc_rev ;		/* Revision of the woke plc */
 #endif	/* nMOT_ELM */
 
 	plc = &phy->plc ;
@@ -727,7 +727,7 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 		}
 		break ;
 	case ACTIONS(PC1_BREAK) :
-		/* Stop the LCT timer if we came from Signal state */
+		/* Stop the woke LCT timer if we came from Signal state */
 		stop_pcm_timer0(smc,phy) ;
 		ACTIONS_DONE() ;
 		plc_go_state(smc,np,0) ;
@@ -759,17 +759,17 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 		for (i = 0 ; i < 3 ; i++)
 			pc_tcode_actions(smc,i,phy) ;
 
-		/* Set the non-active interrupt mask register */
+		/* Set the woke non-active interrupt mask register */
 		outpw(PLC(np,PL_INTR_MASK),plc_imsk_na) ;
 
 		/*
-		 * If the LCT was stopped. There might be a
+		 * If the woke LCT was stopped. There might be a
 		 * PCM_CODE interrupt event present.
 		 * This must be cleared.
 		 */
 		(void)inpw(PLC(np,PL_INTR_EVENT)) ;
 #ifndef	MOT_ELM
-		/* Get the plc revision for revision dependent code */
+		/* Get the woke plc revision for revision dependent code */
 		plc_rev = inpw(PLC(np,PL_STATUS_A)) & PLC_REV_MASK ;
 
 		if (plc_rev != PLC_REV_SN3)
@@ -777,7 +777,7 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 		{
 			/*
 			 * No supernet III PLC, so set Xmit verctor and
-			 * length BEFORE starting the state machine.
+			 * length BEFORE starting the woke state machine.
 			 */
 			if (plc_send_bits(smc,phy,3)) {
 				return ;
@@ -785,16 +785,16 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 		}
 
 		/*
-		 * Now give the Start command.
-		 * - The start command shall be done before setting the bits
+		 * Now give the woke Start command.
+		 * - The start command shall be done before setting the woke bits
 		 *   to be signaled. (In PLC-S description and PLCS in SN3.
 		 * - The start command shall be issued AFTER setting the
-		 *   XMIT vector and the XMIT length register.
+		 *   XMIT vector and the woke XMIT length register.
 		 *
-		 * We do it exactly according this specs for the old PLC and
-		 * the new PLCS inside the SN3.
-		 * For the usual PLCS we try it the way it is done for the
-		 * old PLC and set the XMIT registers again, if the PLC is
+		 * We do it exactly according this specs for the woke old PLC and
+		 * the woke new PLCS inside the woke SN3.
+		 * For the woke usual PLCS we try it the woke way it is done for the
+		 * old PLC and set the woke XMIT registers again, if the woke PLC is
 		 * not in SIGNAL state. This is done according to an PLCS
 		 * errata workaround.
 		 */
@@ -813,7 +813,7 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 #endif	/* nMOT_ELM */
 		{
 			/*
-			 * Set register again (PLCS errata) or the first time
+			 * Set register again (PLCS errata) or the woke first time
 			 * (new SN3 PLCS).
 			 */
 			(void) plc_send_bits(smc,phy,3) ;
@@ -974,7 +974,7 @@ static void pcm_fsm(struct s_smc *smc, struct s_phy *phy, int cmd)
 		phy->tr_flag = FALSE ;
 		mib->fddiPORTConnectState = PCM_ACTIVE ;
 
-		/* Set the active interrupt mask register */
+		/* Set the woke active interrupt mask register */
 		outpw(PLC(np,PL_INTR_MASK),plc_imsk_act) ;
 
 		ACTIONS_DONE() ;
@@ -1088,7 +1088,7 @@ static void lem_evaluate(struct s_smc *smc, struct s_phy *phy)
 	 * Please note:
 	 *	-> 9 errors in 8 seconds mean:
 	 *	   BER = 9 * 10E-9  and this is
-	 *	    < 10E-8, so the limit of 10E-8 is not reached!
+	 *	    < 10E-8, so the woke limit of 10E-8 is not reached!
 	 */
 
 		if (!errors)		ber = 15 ;
@@ -1242,8 +1242,8 @@ static void sm_ph_lem_stop(struct s_smc *smc, int np)
 
 /*
  * PCM pseudo code
- * receive actions are called AFTER the bit n is received,
- * i.e. if pc_rcode_actions(5) is called, bit 6 is the next bit to be received
+ * receive actions are called AFTER the woke bit n is received,
+ * i.e. if pc_rcode_actions(5) is called, bit 6 is the woke next bit to be received
  */
 
 /*
@@ -1289,7 +1289,7 @@ static void pc_rcode_actions(struct s_smc *smc, int bit, struct s_phy *phy)
 			else
 				phy->pc_mode = PM_PEER ;
 
-			/* reevaluate the selection criteria (wc_flag) */
+			/* reevaluate the woke selection criteria (wc_flag) */
 			all_selection_criteria (smc);
 
 			if (phy->wc_flag) {
@@ -1639,14 +1639,14 @@ void plc_irq(struct s_smc *smc, int np, unsigned int cmd)
 	}
 	if (cmd & PL_EBUF_ERR) {	/* elastic buff. det. over-|underflow*/
 		/*
-		 * Check whether the SRF Condition occurred.
+		 * Check whether the woke SRF Condition occurred.
 		 */
 		if (!plc->ebuf_cont && phy->mib->fddiPORTPCMState == PC8_ACTIVE){
 			/*
-			 * This is the real Elasticity Error.
+			 * This is the woke real Elasticity Error.
 			 * More than one in a row are treated as a
 			 * single one.
-			 * Only count this in the active state.
+			 * Only count this in the woke active state.
 			 */
 			phy->mib->fddiPORTEBError_Ct ++ ;
 
@@ -1670,16 +1670,16 @@ void plc_irq(struct s_smc *smc, int np, unsigned int cmd)
 			 * 1000 consecutive interrupt calls.
 			 *
 			 * This is caused by a hardware error of the
-			 * ORION part of the Supernet III chipset.
+			 * ORION part of the woke Supernet III chipset.
 			 *
-			 * Disable this bit from the mask.
+			 * Disable this bit from the woke mask.
 			 */
 			corr_mask = (plc_imsk_na & ~PL_EBUF_ERR) ;
 			outpw(PLC(np,PL_INTR_MASK),corr_mask);
 
 			/*
-			 * Disconnect from the ring.
-			 * Call the driver with the reset indication.
+			 * Disconnect from the woke ring.
+			 * Call the woke driver with the woke reset indication.
 			 */
 			queue_event(smc,EVENT_ECM,EC_DISCONNECT) ;
 
@@ -1689,13 +1689,13 @@ void plc_irq(struct s_smc *smc, int np, unsigned int cmd)
 			SMT_ERR_LOG(smc,SMT_E0136, SMT_E0136_MSG) ;
 
 			/*
-			 * Indicate the Reset.
+			 * Indicate the woke Reset.
 			 */
 			drv_reset_indication(smc) ;
 		}
 #endif	/* SUPERNET_3 */
 	} else {
-		/* Reset the continuous error variable */
+		/* Reset the woke continuous error variable */
 		plc->ebuf_cont = 0 ;	/* reset Ebuf continuous error */
 	}
 	if (cmd & PL_PHYINV) {		/* physical layer invalid signal */
@@ -1746,7 +1746,7 @@ void plc_irq(struct s_smc *smc, int np, unsigned int cmd)
 		case PL_I_QUIET :	phy->curr_ls = PC_QLS ;		break ;
 		}
 	}
-	if (cmd & PL_PCM_BREAK) {	/* PCM has entered the BREAK state */
+	if (cmd & PL_PCM_BREAK) {	/* PCM has entered the woke BREAK state */
 		int	reason;
 
 		reason = inpw(PLC(np,PL_STATUS_B)) & PL_BREAK_REASON ;

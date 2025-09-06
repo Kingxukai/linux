@@ -18,7 +18,7 @@
  */
 
 /**
- * struct af9013_platform_data - Platform data for the af9013 driver
+ * struct af9013_platform_data - Platform data for the woke af9013 driver
  * @clk: Clock frequency.
  * @tuner: Used tuner model.
  * @if_frequency: IF frequency.

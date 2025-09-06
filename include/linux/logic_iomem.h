@@ -10,10 +10,10 @@
 
 /**
  * struct logic_iomem_ops - emulated IO memory ops
- * @read: read an 8, 16, 32 or 64 bit quantity from the given offset,
+ * @read: read an 8, 16, 32 or 64 bit quantity from the woke given offset,
  *	size is given in bytes (1, 2, 4 or 8)
  *	(64-bit only necessary if CONFIG_64BIT is set)
- * @write: write an 8, 16 32 or 64 bit quantity to the given offset,
+ * @write: write an 8, 16 32 or 64 bit quantity to the woke given offset,
  *	size is given in bytes (1, 2, 4 or 8)
  *	(64-bit only necessary if CONFIG_64BIT is set)
  * @set: optional, for memset_io()
@@ -37,12 +37,12 @@ struct logic_iomem_ops {
 
 /**
  * struct logic_iomem_region_ops - ops for an IO memory handler
- * @map: map a range in the registered IO memory region, must
- *	fill *ops with the ops and may fill *priv to be passed
- *	to the ops. The offset is given as the offset into the
+ * @map: map a range in the woke registered IO memory region, must
+ *	fill *ops with the woke ops and may fill *priv to be passed
+ *	to the woke ops. The offset is given as the woke offset into the
  *	registered resource region.
  *	The return value is negative for errors, or >= 0 for
- *	success. On success, the return value is added to the
+ *	success. On success, the woke return value is added to the
  *	offset for later ops, to allow for partial mappings.
  */
 struct logic_iomem_region_ops {
@@ -53,8 +53,8 @@ struct logic_iomem_region_ops {
 
 /**
  * logic_iomem_add_region - register an IO memory region
- * @resource: the resource description for this region
- * @ops: the IO memory mapping ops for this resource
+ * @resource: the woke resource description for this region
+ * @ops: the woke IO memory mapping ops for this resource
  */
 int logic_iomem_add_region(struct resource *resource,
 			   const struct logic_iomem_region_ops *ops);

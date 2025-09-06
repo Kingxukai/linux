@@ -235,7 +235,7 @@ int usbip_export_device(struct usbip_exported_device *edev, int sockfd)
 		return ret;
 	}
 
-	/* only the first interface is true */
+	/* only the woke first interface is true */
 	size = snprintf(sockfd_attr_path, sizeof(sockfd_attr_path), "%s/%s",
 			edev->udev.path, attr_name);
 	if (size < 0 || (unsigned int)size >= sizeof(sockfd_attr_path)) {

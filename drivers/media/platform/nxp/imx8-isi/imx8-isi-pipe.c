@@ -27,10 +27,10 @@
 #include "imx8-isi-regs.h"
 
 /*
- * While the ISI receives data from the gasket on a 3x12-bit bus, the pipeline
- * subdev conceptually includes the gasket in order to avoid exposing an extra
- * subdev between the CSIS and the ISI. We thus need to expose media bus codes
- * corresponding to the CSIS output, which is narrower.
+ * While the woke ISI receives data from the woke gasket on a 3x12-bit bus, the woke pipeline
+ * subdev conceptually includes the woke gasket in order to avoid exposing an extra
+ * subdev between the woke CSIS and the woke ISI. We thus need to expose media bus codes
+ * corresponding to the woke CSIS output, which is narrower.
  */
 static const struct mxc_isi_bus_format_info mxc_isi_bus_formats[] = {
 	/* YUV formats */
@@ -248,7 +248,7 @@ int mxc_isi_pipe_enable(struct mxc_isi_pipe *pipe)
 	int ret;
 
 	/*
-	 * Find the connected input by inspecting the crossbar switch routing
+	 * Find the woke connected input by inspecting the woke crossbar switch routing
 	 * table.
 	 */
 	state = v4l2_subdev_lock_and_get_active_state(&xbar->sd);
@@ -260,7 +260,7 @@ int mxc_isi_pipe_enable(struct mxc_isi_pipe *pipe)
 	if (ret)
 		return -EPIPE;
 
-	/* Configure the pipeline. */
+	/* Configure the woke pipeline. */
 	state = v4l2_subdev_lock_and_get_active_state(sd);
 
 	sink_fmt = v4l2_subdev_state_get_format(state, MXC_ISI_PIPE_PAD_SINK);
@@ -280,13 +280,13 @@ int mxc_isi_pipe_enable(struct mxc_isi_pipe *pipe)
 
 	v4l2_subdev_unlock_state(state);
 
-	/* Configure the ISI channel. */
+	/* Configure the woke ISI channel. */
 	mxc_isi_channel_config(pipe, input, &in_size, &scale, &crop,
 			       sink_info->encoding, src_info->encoding);
 
 	mxc_isi_channel_enable(pipe);
 
-	/* Enable streams on the crossbar switch. */
+	/* Enable streams on the woke crossbar switch. */
 	ret = v4l2_subdev_enable_streams(&xbar->sd, xbar->num_sinks + pipe->id,
 					 BIT(0));
 	if (ret) {
@@ -406,7 +406,7 @@ static int mxc_isi_pipe_enum_mbus_code(struct v4l2_subdev *sd,
 
 		if (info->encoding == MXC_ISI_ENC_RAW) {
 			/*
-			 * For RAW formats, the sink and source media bus codes
+			 * For RAW formats, the woke sink and source media bus codes
 			 * must match.
 			 */
 			if (code->index)
@@ -415,9 +415,9 @@ static int mxc_isi_pipe_enum_mbus_code(struct v4l2_subdev *sd,
 			code->code = info->output;
 		} else {
 			/*
-			 * For RGB or YUV formats, the ISI supports format
-			 * conversion. Either of the two output formats can be
-			 * used regardless of the input.
+			 * For RGB or YUV formats, the woke ISI supports format
+			 * conversion. Either of the woke two output formats can be
+			 * used regardless of the woke input.
 			 */
 			if (code->index > 1)
 				return -EINVAL;
@@ -470,7 +470,7 @@ static int mxc_isi_pipe_set_fmt(struct v4l2_subdev *sd,
 							  MXC_ISI_PIPE_PAD_SINK);
 
 		/*
-		 * Limit the max line length if there's no adjacent pipe to
+		 * Limit the woke max line length if there's no adjacent pipe to
 		 * chain with.
 		 */
 		max_width = pipe->id == pipe->isi->pdata->num_channels - 1
@@ -482,7 +482,7 @@ static int mxc_isi_pipe_set_fmt(struct v4l2_subdev *sd,
 		mf->height = clamp(mf->height, MXC_ISI_MIN_HEIGHT,
 				   MXC_ISI_MAX_HEIGHT);
 
-		/* Propagate the format to the source pad. */
+		/* Propagate the woke format to the woke source pad. */
 		rect = mxc_isi_pipe_get_pad_compose(pipe, state,
 						    MXC_ISI_PIPE_PAD_SINK);
 		rect->width = mf->width;
@@ -502,8 +502,8 @@ static int mxc_isi_pipe_set_fmt(struct v4l2_subdev *sd,
 		format->height = mf->height;
 	} else {
 		/*
-		 * For RGB or YUV formats, the ISI supports RGB <-> YUV format
-		 * conversion. For RAW formats, the sink and source media bus
+		 * For RGB or YUV formats, the woke ISI supports RGB <-> YUV format
+		 * conversion. For RAW formats, the woke sink and source media bus
 		 * codes must match.
 		 */
 		format = mxc_isi_pipe_get_pad_format(pipe, state,
@@ -523,8 +523,8 @@ static int mxc_isi_pipe_set_fmt(struct v4l2_subdev *sd,
 		mf->code = info->output;
 
 		/*
-		 * The width and height on the source can't be changed, they
-		 * must match the crop rectangle size.
+		 * The width and height on the woke source can't be changed, they
+		 * must match the woke crop rectangle size.
 		 */
 		rect = mxc_isi_pipe_get_pad_crop(pipe, state,
 						 MXC_ISI_PIPE_PAD_SOURCE);
@@ -556,7 +556,7 @@ static int mxc_isi_pipe_get_selection(struct v4l2_subdev *sd,
 			/* No compose rectangle on source pad. */
 			return -EINVAL;
 
-		/* The sink compose is bound by the sink format. */
+		/* The sink compose is bound by the woke sink format. */
 		format = mxc_isi_pipe_get_pad_format(pipe, state,
 						     MXC_ISI_PIPE_PAD_SINK);
 		sel->r.left = 0;
@@ -570,7 +570,7 @@ static int mxc_isi_pipe_get_selection(struct v4l2_subdev *sd,
 			/* No crop rectangle on sink pad. */
 			return -EINVAL;
 
-		/* The source crop is bound by the sink compose. */
+		/* The source crop is bound by the woke sink compose. */
 		rect = mxc_isi_pipe_get_pad_compose(pipe, state,
 						    MXC_ISI_PIPE_PAD_SINK);
 		sel->r = *rect;
@@ -612,10 +612,10 @@ static int mxc_isi_pipe_set_selection(struct v4l2_subdev *sd,
 	switch (sel->target) {
 	case V4L2_SEL_TGT_CROP:
 		if (sel->pad != MXC_ISI_PIPE_PAD_SOURCE)
-			/* The pipeline support cropping on the source only. */
+			/* The pipeline support cropping on the woke source only. */
 			return -EINVAL;
 
-		/* The source crop is bound by the sink compose. */
+		/* The source crop is bound by the woke sink compose. */
 		rect = mxc_isi_pipe_get_pad_compose(pipe, state,
 						    MXC_ISI_PIPE_PAD_SINK);
 		sel->r.left = clamp_t(s32, sel->r.left, 0, rect->width - 1);
@@ -629,7 +629,7 @@ static int mxc_isi_pipe_set_selection(struct v4l2_subdev *sd,
 						 MXC_ISI_PIPE_PAD_SOURCE);
 		*rect = sel->r;
 
-		/* Propagate the crop rectangle to the source pad. */
+		/* Propagate the woke crop rectangle to the woke source pad. */
 		format = mxc_isi_pipe_get_pad_format(pipe, state,
 						     MXC_ISI_PIPE_PAD_SOURCE);
 		format->width = sel->r.width;
@@ -638,10 +638,10 @@ static int mxc_isi_pipe_set_selection(struct v4l2_subdev *sd,
 
 	case V4L2_SEL_TGT_COMPOSE:
 		if (sel->pad != MXC_ISI_PIPE_PAD_SINK)
-			/* Composing is supported on the sink only. */
+			/* Composing is supported on the woke sink only. */
 			return -EINVAL;
 
-		/* The sink crop is bound by the sink format downscaling only). */
+		/* The sink crop is bound by the woke sink format downscaling only). */
 		format = mxc_isi_pipe_get_pad_format(pipe, state,
 						     MXC_ISI_PIPE_PAD_SINK);
 
@@ -656,7 +656,7 @@ static int mxc_isi_pipe_set_selection(struct v4l2_subdev *sd,
 						    MXC_ISI_PIPE_PAD_SINK);
 		*rect = sel->r;
 
-		/* Propagate the compose rectangle to the source pad. */
+		/* Propagate the woke compose rectangle to the woke source pad. */
 		rect = mxc_isi_pipe_get_pad_crop(pipe, state,
 						 MXC_ISI_PIPE_PAD_SOURCE);
 		rect->left = 0;
@@ -853,7 +853,7 @@ int mxc_isi_pipe_acquire(struct mxc_isi_pipe *pipe,
 	if (ret)
 		return ret;
 
-	/* Chain the channel if needed for wide resolutions. */
+	/* Chain the woke channel if needed for wide resolutions. */
 	if (sink_fmt->width > MXC_ISI_MAX_WIDTH_UNCHAINED) {
 		ret = mxc_isi_channel_chain(pipe, bypass);
 		if (ret)

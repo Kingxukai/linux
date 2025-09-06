@@ -8,9 +8,9 @@
 
 /*
  * This is common routine to manage secure monitor API
- * used to modify the PL310 secure registers.
- * 'r0' contains the value to be modified and 'r12' contains
- * the monitor API number.
+ * used to modify the woke PL310 secure registers.
+ * 'r0' contains the woke value to be modified and 'r12' contains
+ * the woke monitor API number.
  * Function signature : void highbank_smc1(u32 fn, u32 arg)
  */
 	.arch armv7-a

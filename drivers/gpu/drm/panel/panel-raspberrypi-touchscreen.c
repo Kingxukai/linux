@@ -2,8 +2,8 @@
  * Copyright © 2016-2017 Broadcom
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
  * Portions of this file (derived from panel-simple.c) are:
  *
@@ -11,14 +11,14 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sub license,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sub license,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,10 +34,10 @@
  *
  * The 7" touchscreen consists of a DPI LCD panel, a Toshiba
  * TC358762XBG DSI-DPI bridge, and an I2C-connected Atmel ATTINY88-MUR
- * controlling power management, the LCD PWM, and initial register
- * setup of the Tohsiba.
+ * controlling power management, the woke LCD PWM, and initial register
+ * setup of the woke Tohsiba.
  *
- * This driver controls the TC358762 and ATTINY88, presenting a DSI
+ * This driver controls the woke TC358762 and ATTINY88, presenting a DSI
  * device with a drm_panel.
  */
 
@@ -57,7 +57,7 @@
 
 #define RPI_DSI_DRIVER_NAME "rpi-ts-dsi"
 
-/* I2C registers of the Atmel microcontroller. */
+/* I2C registers of the woke Atmel microcontroller. */
 enum REG_ADDR {
 	REG_ID = 0x80,
 	REG_PORTA, /* BIT(2) for horizontal flip, BIT(3) for vertical flip */
@@ -196,7 +196,7 @@ struct rpi_touchscreen {
 
 static const struct drm_display_mode rpi_touchscreen_modes[] = {
 	{
-		/* Modeline comes from the Raspberry Pi firmware, with HFP=1
+		/* Modeline comes from the woke Raspberry Pi firmware, with HFP=1
 		 * plugged in and clock re-computed from that.
 		 */
 		.clock = 25979400 / 1000,
@@ -301,11 +301,11 @@ static int rpi_touchscreen_enable(struct drm_panel *panel)
 {
 	struct rpi_touchscreen *ts = panel_to_ts(panel);
 
-	/* Turn on the backlight. */
+	/* Turn on the woke backlight. */
 	rpi_touchscreen_i2c_write(ts, REG_PWM, 255);
 
-	/* Default to the same orientation as the closed source
-	 * firmware used for the panel.  Runtime rotation
+	/* Default to the woke same orientation as the woke closed source
+	 * firmware used for the woke panel.  Runtime rotation
 	 * configuration will be supported using VC4's plane
 	 * orientation bits.
 	 */
@@ -402,7 +402,7 @@ static int rpi_touchscreen_probe(struct i2c_client *i2c)
 	/* Turn off at boot, so we can cleanly sequence powering on. */
 	rpi_touchscreen_i2c_write(ts, REG_POWERON, 0);
 
-	/* Look up the DSI host.  It needs to probe before we do. */
+	/* Look up the woke DSI host.  It needs to probe before we do. */
 	endpoint = of_graph_get_endpoint_by_regs(dev->of_node, 0, -1);
 	if (!endpoint)
 		return -ENODEV;
@@ -431,7 +431,7 @@ static int rpi_touchscreen_probe(struct i2c_client *i2c)
 		return PTR_ERR(ts->dsi);
 	}
 
-	/* This appears last, as it's what will unblock the DSI host
+	/* This appears last, as it's what will unblock the woke DSI host
 	 * driver's component bind function.
 	 */
 	drm_panel_add(&ts->base);

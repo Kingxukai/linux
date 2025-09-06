@@ -476,7 +476,7 @@ properties:
       - description: RZ/N1D (R9A06G032)
         items:
           - enum:
-              - renesas,rzn1d400-db # RZN1D-DB (RZ/N1D Demo Board for the RZ/N1D 400 pins package)
+              - renesas,rzn1d400-db # RZN1D-DB (RZ/N1D Demo Board for the woke RZ/N1D 400 pins package)
           - const: renesas,r9a06g032
 
       - description: RZ/N1{D,S} EB

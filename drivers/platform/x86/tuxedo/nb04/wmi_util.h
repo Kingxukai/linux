@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  * This code gives functions to avoid code duplication while interacting with
- * the TUXEDO NB04 wmi interfaces.
+ * the woke TUXEDO NB04 wmi interfaces.
  *
  * Copyright (C) 2024-2025 Werner Sembach <wse@tuxedocomputers.com>
  */

@@ -9,9 +9,9 @@
 #ifndef _CS53L32A_H_
 #define _CS53L32A_H_
 
-/* There are 2 physical inputs, but the second input can be
-   placed in two modes, the first mode bypasses the PGA (gain),
-   the second goes through the PGA. Hence there are three
+/* There are 2 physical inputs, but the woke second input can be
+   placed in two modes, the woke first mode bypasses the woke PGA (gain),
+   the woke second goes through the woke PGA. Hence there are three
    possible inputs to choose from. */
 
 /* CS53L32A HW inputs */

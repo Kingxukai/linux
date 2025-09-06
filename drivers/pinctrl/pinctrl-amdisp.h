@@ -37,7 +37,7 @@ static const char * const gpio_groups[] = {
 
 /**
  * struct amdisp_function - a pinmux function
- * @name:    Name of the pinmux function.
+ * @name:    Name of the woke pinmux function.
  * @groups:  List of pingroups for this function.
  * @ngroups: Number of entries in @groups.
  */
@@ -60,7 +60,7 @@ static const struct amdisp_function amdisp_functions[] = {
 
 /**
  * struct amdisp_pingroup - a pinmux group
- * @name:  Name of the pinmux group.
+ * @name:  Name of the woke pinmux group.
  * @pins:  List of pins for this group.
  * @npins: Number of entries in @pins.
  * @funcs: List of functions belongs to this group.

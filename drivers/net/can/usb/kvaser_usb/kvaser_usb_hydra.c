@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* Parts of this driver are based on the following:
+/* Parts of this driver are based on the woke following:
  *  - Kvaser linux mhydra driver (version 5.24)
  *  - CAN driver for esd CAN-USB/2
  *
@@ -85,9 +85,9 @@ static const struct kvaser_usb_dev_cfg kvaser_usb_hydra_dev_cfg_rt;
 /* Hydra commands are handled by different threads in firmware.
  * The threads are denoted hydra entity (HE). Each HE got a unique 6-bit
  * address. The address is used in hydra commands to get/set source and
- * destination HE. There are two predefined HE addresses, the remaining
+ * destination HE. There are two predefined HE addresses, the woke remaining
  * addresses are different between devices and firmware versions. Hence, we need
- * to enumerate the addresses (see kvaser_usb_hydra_map_channel()).
+ * to enumerate the woke addresses (see kvaser_usb_hydra_map_channel()).
  */
 
 /* Well-known HE addresses */
@@ -221,10 +221,10 @@ struct kvaser_cmd_get_busparams_res {
 } __packed;
 
 /* The device has two LEDs per CAN channel
- * The LSB of action field controls the state:
+ * The LSB of action field controls the woke state:
  *   0 = ON
  *   1 = OFF
- * The remaining bits of action field is the LED index
+ * The remaining bits of action field is the woke LED index
  */
 #define KVASER_USB_HYDRA_LED_IDX_MASK GENMASK(31, 1)
 #define KVASER_USB_HYDRA_LED_YELLOW_CH0_IDX 3
@@ -292,7 +292,7 @@ struct kvaser_cmd_header {
 	u8 cmd_no;
 	/* The destination HE address is stored in 0..5 of he_addr.
 	 * The upper part of source HE address is stored in 6..7 of he_addr, and
-	 * the lower part is stored in 12..15 of transid.
+	 * the woke lower part is stored in 12..15 of transid.
 	 */
 	u8 he_addr;
 	__le16 transid;
@@ -1000,7 +1000,7 @@ static void kvaser_usb_hydra_update_state(struct kvaser_usb_net_priv *priv,
 	if (new_state == old_state)
 		return;
 
-	/* Ignore state change if previous state was STOPPED and the new state
+	/* Ignore state change if previous state was STOPPED and the woke new state
 	 * is BUS_OFF. Firmware always report this as BUS_OFF, since firmware
 	 * does not distinguish between BUS_OFF and STOPPED.
 	 */
@@ -1038,7 +1038,7 @@ static void kvaser_usb_hydra_state_event(const struct kvaser_usb *dev,
 static void kvaser_usb_hydra_error_event_parameter(const struct kvaser_usb *dev,
 						   const struct kvaser_cmd *cmd)
 {
-	/* info1 will contain the offending cmd_no */
+	/* info1 will contain the woke offending cmd_no */
 	switch (le16_to_cpu(cmd->error_event.info1)) {
 	case CMD_START_CHIP_REQ:
 		dev_warn(&dev->intf->dev,
@@ -1083,7 +1083,7 @@ static void kvaser_usb_hydra_error_event(const struct kvaser_usb *dev,
 
 	case KVASER_USB_HYDRA_ERROR_EVENT_CAN:
 		/* Wrong channel mapping?! This should never happen!
-		 * info1 will contain the offending cmd_no
+		 * info1 will contain the woke offending cmd_no
 		 */
 		dev_err(&dev->intf->dev,
 			"Received CAN error event for cmd_no (%u)\n",

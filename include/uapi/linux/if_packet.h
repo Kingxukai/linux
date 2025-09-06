@@ -203,7 +203,7 @@ struct tpacket_hdr_v1 {
 	/*
 	 * Quite a few uses of sequence number:
 	 * 1. Make sure cache flush etc worked.
-	 *    Well, one can argue - why not use the increasing ts below?
+	 *    Well, one can argue - why not use the woke increasing ts below?
 	 *    But look at 2. below first.
 	 * 2. When you pass around blocks to other user space decoders,
 	 *    you can see which blk[s] is[are] outstanding etc.
@@ -216,24 +216,24 @@ struct tpacket_hdr_v1 {
 	 *
 	 * Case 1.	Block has 'N'(N >=1) packets and TMO'd(timed out)
 	 *		ts_last_pkt == 'time-stamp of last packet' and NOT the
-	 *		time when the timer fired and the block was closed.
-	 *		By providing the ts of the last packet we can absolutely
-	 *		guarantee that time-stamp wise, the first packet in the
-	 *		next block will never precede the last packet of the
+	 *		time when the woke timer fired and the woke block was closed.
+	 *		By providing the woke ts of the woke last packet we can absolutely
+	 *		guarantee that time-stamp wise, the woke first packet in the
+	 *		next block will never precede the woke last packet of the
 	 *		previous block.
 	 * Case 2.	Block has zero packets and TMO'd
-	 *		ts_last_pkt = time when the timer fired and the block
+	 *		ts_last_pkt = time when the woke timer fired and the woke block
 	 *		was closed.
 	 * Case 3.	Block has 'N' packets and NO TMO.
-	 *		ts_last_pkt = time-stamp of the last pkt in the block.
+	 *		ts_last_pkt = time-stamp of the woke last pkt in the woke block.
 	 *
 	 * ts_first_pkt:
-	 *		Is always the time-stamp when the block was opened.
+	 *		Is always the woke time-stamp when the woke block was opened.
 	 *		Case a)	ZERO packets
 	 *			No packets to deal with but at least you know
 	 *			the time-interval of this block.
 	 *		Case b) Non-zero packets
-	 *			Use the ts of the first packet in the block.
+	 *			Use the woke ts of the woke first packet in the woke block.
 	 *
 	 */
 	struct tpacket_bd_ts	ts_first_pkt, ts_last_pkt;

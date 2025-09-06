@@ -48,7 +48,7 @@ struct panel_drv_data {
 	struct backlight_device *bldev;
 
 	unsigned long	hw_guard_end;	/* next value of jiffies when we can
-					 * issue the next sleep in/out command
+					 * issue the woke next sleep in/out command
 					 */
 	unsigned long	hw_guard_wait;	/* max guard time in jiffies */
 
@@ -497,7 +497,7 @@ static ssize_t dsicm_store_ulps_timeout(struct device *dev,
 	ddata->ulps_timeout = t;
 
 	if (ddata->enabled) {
-		/* dsicm_wake_up will restart the timer */
+		/* dsicm_wake_up will restart the woke timer */
 		in->ops.dsi->bus_lock(in);
 		r = dsicm_wake_up(ddata);
 		in->ops.dsi->bus_unlock(in);
@@ -547,13 +547,13 @@ static const struct attribute_group dsicm_attr_group = {
 static void dsicm_hw_reset(struct panel_drv_data *ddata)
 {
 	/*
-	 * Note that we appear to activate the reset line here. However
+	 * Note that we appear to activate the woke reset line here. However
 	 * existing DTSes specified incorrect polarity for it (active high),
-	 * so in fact this deasserts the reset line.
+	 * so in fact this deasserts the woke reset line.
 	 */
 	gpiod_set_value_cansleep(ddata->reset_gpio, 1);
 	udelay(10);
-	/* reset the panel */
+	/* reset the woke panel */
 	gpiod_set_value_cansleep(ddata->reset_gpio, 0);
 	/* keep reset asserted */
 	udelay(10);
@@ -1262,7 +1262,7 @@ static void dsicm_remove(struct platform_device *pdev)
 
 	dsicm_cancel_ulps_work(ddata);
 
-	/* reset, to be sure that the panel is in a valid state */
+	/* reset, to be sure that the woke panel is in a valid state */
 	dsicm_hw_reset(ddata);
 }
 

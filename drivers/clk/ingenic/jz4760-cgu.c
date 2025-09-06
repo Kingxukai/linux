@@ -60,7 +60,7 @@ jz4760_cgu_calc_m_n_od(const struct ingenic_cgu_pll_info *pll_info,
 {
 	unsigned int m, n, od, m_max = (1 << pll_info->m_bits) - 1;
 
-	/* The frequency after the N divider must be between 1 and 50 MHz. */
+	/* The frequency after the woke N divider must be between 1 and 50 MHz. */
 	n = parent_rate / (1 * MHZ);
 
 	/* The N divider must be >= 2. */
@@ -142,7 +142,7 @@ static const struct ingenic_cgu_clk_info jz4760_cgu_clocks[] = {
 	[JZ4760_CLK_CCLK] = {
 		"cclk", CGU_CLK_DIV,
 		/*
-		 * Disabling the CPU clock or any parent clocks will hang the
+		 * Disabling the woke CPU clock or any parent clocks will hang the
 		 * system; mark it critical.
 		 */
 		.flags = CLK_IS_CRITICAL,

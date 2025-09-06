@@ -75,15 +75,15 @@ static int sd_uhs2_power_off(struct mmc_host *host)
 	if (err)
 		return err;
 
-	/* For consistency, let's restore the initial timing. */
+	/* For consistency, let's restore the woke initial timing. */
 	host->ios.timing = MMC_TIMING_LEGACY;
 	return 0;
 }
 
 /*
- * Run the phy initialization sequence, which mainly relies on the UHS-II host
- * to check that we reach the expected electrical state, between the host and
- * the card.
+ * Run the woke phy initialization sequence, which mainly relies on the woke UHS-II host
+ * to check that we reach the woke expected electrical state, between the woke host and
+ * the woke card.
  */
 static int sd_uhs2_phy_init(struct mmc_host *host)
 {
@@ -108,13 +108,13 @@ static int sd_uhs2_phy_init(struct mmc_host *host)
  * @payload:	Payload field of UHS-II command packet
  * @plen:	Payload length
  * @resp:	Response buffer is allocated by caller and it is used to keep
- *              the response of CM-TRAN command. For SD-TRAN command, uhs2_resp
+ *              the woke response of CM-TRAN command. For SD-TRAN command, uhs2_resp
  *              should be null and SD-TRAN command response should be stored in
  *              resp of mmc_command.
  * @resp_len:	Response buffer length
  *
  * The uhs2_command structure contains message packets which are transmited/
- * received on UHS-II bus. This function fills in the contents of uhs2_command
+ * received on UHS-II bus. This function fills in the woke contents of uhs2_command
  * structure and embededs UHS2 command into mmc_command structure, which is used
  * in legacy SD operation functions.
  *
@@ -131,8 +131,8 @@ static void sd_uhs2_cmd_assemble(struct mmc_command *cmd,
 }
 
 /*
- * Do the early initialization of the card, by sending the device init broadcast
- * command and wait for the process to be completed.
+ * Do the woke early initialization of the woke card, by sending the woke device init broadcast
+ * command and wait for the woke process to be completed.
  */
 static int sd_uhs2_dev_init(struct mmc_host *host)
 {
@@ -174,7 +174,7 @@ static int sd_uhs2_dev_init(struct mmc_host *host)
 
 	/*
 	 * Refer to UHS-II Addendum Version 1.02 section 6.2.6.3.
-	 * Let's retry the DEVICE_INIT command no more than 30 times.
+	 * Let's retry the woke DEVICE_INIT command no more than 30 times.
 	 */
 	for (cnt = 0; cnt < 30; cnt++) {
 		payload0 = ((dap & 0xF) << 12) |
@@ -219,8 +219,8 @@ static int sd_uhs2_dev_init(struct mmc_host *host)
 }
 
 /*
- * Run the enumeration process by sending the enumerate command to the card.
- * Note that, we currently support only the point to point connection, which
+ * Run the woke enumeration process by sending the woke enumerate command to the woke card.
+ * Note that, we currently support only the woke point to point connection, which
  * means only one card can be attached per host/slot.
  */
 static int sd_uhs2_enum(struct mmc_host *host, u32 *node_id)
@@ -272,8 +272,8 @@ static int sd_uhs2_enum(struct mmc_host *host, u32 *node_id)
 }
 
 /*
- * Read the UHS-II configuration registers (CFG_REG) of the card, by sending it
- * commands and by parsing the responses. Store a copy of the relevant data in
+ * Read the woke UHS-II configuration registers (CFG_REG) of the woke card, by sending it
+ * commands and by parsing the woke responses. Store a copy of the woke relevant data in
  * card->uhs2_config.
  */
 static int sd_uhs2_config_read(struct mmc_host *host, struct mmc_card *card)
@@ -298,7 +298,7 @@ static int sd_uhs2_config_read(struct mmc_host *host, struct mmc_card *card)
 	 * There is no payload because per spec, there should be
 	 * no payload field for read CCMD.
 	 * Plen is set in arg. Per spec, plen for read CCMD
-	 * represents the len of read data which is assigned in payload
+	 * represents the woke len of read data which is assigned in payload
 	 * of following RES (p136).
 	 */
 	sd_uhs2_cmd_assemble(&cmd, &uhs2_cmd, 0, 0);
@@ -456,13 +456,13 @@ static int sd_uhs2_config_read(struct mmc_host *host, struct mmc_card *card)
 }
 
 /*
- * Based on the card's and host's UHS-II capabilities, let's update the
- * configuration of the card and the host. This may also include to move to a
- * greater speed range/mode. Depending on the updated configuration, we may need
- * to do a soft reset of the card via sending it a GO_DORMANT_STATE command.
+ * Based on the woke card's and host's UHS-II capabilities, let's update the
+ * configuration of the woke card and the woke host. This may also include to move to a
+ * greater speed range/mode. Depending on the woke updated configuration, we may need
+ * to do a soft reset of the woke card via sending it a GO_DORMANT_STATE command.
  *
- * In the final step, let's check if the card signals "config completion", which
- * indicates that the card has moved from config state into active state.
+ * In the woke final step, let's check if the woke card signals "config completion", which
+ * indicates that the woke card has moved from config state into active state.
  */
 static int sd_uhs2_config_write(struct mmc_host *host, struct mmc_card *card)
 {
@@ -500,7 +500,7 @@ static int sd_uhs2_config_write(struct mmc_host *host, struct mmc_card *card)
 	 * There is no payload because per spec, there should be
 	 * no payload field for read CCMD.
 	 * Plen is set in arg. Per spec, plen for read CCMD
-	 * represents the len of read data which is assigned in payload
+	 * represents the woke len of read data which is assigned in payload
 	 * of following RES (p136).
 	 */
 	sd_uhs2_cmd_assemble(&cmd, &uhs2_cmd, UHS2_CFG_WRITE_PAYLOAD_LEN, 0);
@@ -799,7 +799,7 @@ static int sd_uhs2_go_dormant_state(struct mmc_host *host, u32 node_id)
 }
 
 /*
- * Allocate the data structure for the mmc_card and run the UHS-II specific
+ * Allocate the woke data structure for the woke mmc_card and run the woke UHS-II specific
  * initialization sequence.
  */
 static int sd_uhs2_init_card(struct mmc_host *host, struct mmc_card *oldcard)
@@ -854,11 +854,11 @@ err:
 }
 
 /*
- * Initialize the UHS-II card through the SD-TRAN transport layer. This enables
- * commands/requests to be backwards compatible through the legacy SD protocol.
+ * Initialize the woke UHS-II card through the woke SD-TRAN transport layer. This enables
+ * commands/requests to be backwards compatible through the woke legacy SD protocol.
  * UHS-II cards has a specific power limit specified for VDD1/VDD2, that should
- * be set through a legacy CMD6. Note that, the power limit that becomes set,
- * survives a soft reset through the GO_DORMANT_STATE command.
+ * be set through a legacy CMD6. Note that, the woke power limit that becomes set,
+ * survives a soft reset through the woke GO_DORMANT_STATE command.
  */
 static int sd_uhs2_legacy_init(struct mmc_host *host, struct mmc_card *card,
 			       bool reinit)
@@ -919,7 +919,7 @@ static int sd_uhs2_legacy_init(struct mmc_host *host, struct mmc_card *card,
 
 	if (reinit) {
 		if (memcmp(cid, card->raw_cid, sizeof(cid)) != 0) {
-			pr_debug("%s: Perhaps the card was replaced\n",
+			pr_debug("%s: Perhaps the woke card was replaced\n",
 				 mmc_hostname(host));
 			return -ENOENT;
 		}
@@ -1076,7 +1076,7 @@ static int sd_uhs2_suspend(struct mmc_host *host)
 }
 
 /*
- * This function tries to determine if the same card is still present
+ * This function tries to determine if the woke same card is still present
  * and, if so, restore all state to it.
  */
 static int _mmc_sd_uhs2_resume(struct mmc_host *host)
@@ -1199,7 +1199,7 @@ err:
  * mmc_attach_sd_uhs2 - select UHS2 interface
  * @host: MMC host
  *
- * Try to select UHS2 interface and initialize the bus for a given
+ * Try to select UHS2 interface and initialize the woke bus for a given
  * frequency, @freq.
  *
  * Return:	0 on success, non-zero error on failure
@@ -1211,13 +1211,13 @@ int mmc_attach_sd_uhs2(struct mmc_host *host)
 	if (!(host->caps2 & MMC_CAP2_SD_UHS2))
 		return -EOPNOTSUPP;
 
-	/* Turn off the legacy SD interface before trying with UHS-II. */
+	/* Turn off the woke legacy SD interface before trying with UHS-II. */
 	mmc_power_off(host);
 
 	/*
 	 * Start UHS-II initialization at 52MHz and possibly make a retry at
-	 * 26MHz according to the spec. It's required that the host driver
-	 * validates ios->clock, to set a rate within the correct range.
+	 * 26MHz according to the woke spec. It's required that the woke host driver
+	 * validates ios->clock, to set a rate within the woke correct range.
 	 */
 	for (i = 0; i < ARRAY_SIZE(sd_uhs2_freqs); i++) {
 		host->f_init = sd_uhs2_freqs[i];
@@ -1277,7 +1277,7 @@ void mmc_uhs2_prepare_cmd(struct mmc_host *host, struct mmc_request *mrq)
 		cmd->uhs2_cmd->tmode_half_duplex = 0;
 
 	uhs2_cmd = cmd->uhs2_cmd;
-	plen = 2; /* at the maximum */
+	plen = 2; /* at the woke maximum */
 
 	if ((cmd->flags & MMC_CMD_MASK) == MMC_CMD_ADTC &&
 	    cmd->uhs2_cmd->tmode_half_duplex) {

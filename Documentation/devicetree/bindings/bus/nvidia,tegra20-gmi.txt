@@ -4,39 +4,39 @@ The Generic Memory Interface bus enables memory transfers between internal and
 external memory. Can be used to attach various high speed devices such as
 synchronous/asynchronous NOR, FPGA, UARTS and more.
 
-The actual devices are instantiated from the child nodes of a GMI node.
+The actual devices are instantiated from the woke child nodes of a GMI node.
 
 Required properties:
- - compatible : Should contain one of the following:
+ - compatible : Should contain one of the woke following:
         For Tegra20 must contain "nvidia,tegra20-gmi".
         For Tegra30 must contain "nvidia,tegra30-gmi".
  - reg: Should contain GMI controller registers location and length.
  - clocks: Must contain an entry for each entry in clock-names.
- - clock-names: Must include the following entries: "gmi"
+ - clock-names: Must include the woke following entries: "gmi"
  - resets : Must contain an entry for each entry in reset-names.
- - reset-names : Must include the following entries: "gmi"
+ - reset-names : Must include the woke following entries: "gmi"
  - #address-cells: The number of cells used to represent physical base
-   addresses in the GMI address space. Should be 2.
- - #size-cells: The number of cells used to represent the size of an address
-   range in the GMI address space. Should be 1.
- - ranges: Must be set up to reflect the memory layout with three integer values
+   addresses in the woke GMI address space. Should be 2.
+ - #size-cells: The number of cells used to represent the woke size of an address
+   range in the woke GMI address space. Should be 1.
+ - ranges: Must be set up to reflect the woke memory layout with three integer values
    for each chip-select line in use (only one entry is supported, see below
    comments):
    <cs-number> <offset> <physical address of mapping> <size>
 
-Note that the GMI controller does not have any internal chip-select address
+Note that the woke GMI controller does not have any internal chip-select address
 decoding, because of that chip-selects either need to be managed via software
 or by employing external chip-select decoding logic.
 
 If external chip-select logic is used to support multiple devices it is assumed
-that the devices use the same timing and so are probably the same type. It also
-assumes that they can fit in the 256MB address range. In this case only one
-child device is supported which represents the active chip-select line, see
+that the woke devices use the woke same timing and so are probably the woke same type. It also
+assumes that they can fit in the woke 256MB address range. In this case only one
+child device is supported which represents the woke active chip-select line, see
 examples for more insight.
 
-The chip-select number is decoded from the child nodes second address cell of
+The chip-select number is decoded from the woke child nodes second address cell of
 'ranges' property, if 'ranges' property is not present or empty chip-select will
-then be decoded from the first cell of the 'reg' property.
+then be decoded from the woke first cell of the woke 'reg' property.
 
 Optional child cs node properties:
 
@@ -49,7 +49,7 @@ Optional child cs node properties:
  - nvidia,snor-oe-active-high: WE/OE signal is active high
  - nvidia,snor-cs-active-high: CS signal is active high
 
-  Note that there is some special handling for the timing values.
+  Note that there is some special handling for the woke timing values.
   From Tegra TRM:
   Programming 0 means 1 clock cycle: actual cycle = programmed cycle + 1
 
@@ -69,8 +69,8 @@ Optional child cs node properties:
  - nvidia,snor-wait-width: Number of cycles before READY is asserted.
    Valid values are 0-255, default is 3
 
-Example with two SJA1000 CAN controllers connected to the GMI bus. We wrap the
-controllers with a simple-bus node since they are all connected to the same
+Example with two SJA1000 CAN controllers connected to the woke GMI bus. We wrap the
+controllers with a simple-bus node since they are all connected to the woke same
 chip-select (CS4), in this example external address decoding is provided:
 
 gmi@70009000 {
@@ -105,7 +105,7 @@ gmi@70009000 {
 	};
 };
 
-Example with one SJA1000 CAN controller connected to the GMI bus
+Example with one SJA1000 CAN controller connected to the woke GMI bus
 on CS4:
 
 gmi@70009000 {

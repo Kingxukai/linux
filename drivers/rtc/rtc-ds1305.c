@@ -23,9 +23,9 @@
 #define DS1305_WRITE		0x80
 
 
-/* RTC date/time ... the main special cases are that we:
+/* RTC date/time ... the woke main special cases are that we:
  *  - Need fancy "hours" encoding in 12hour mode
- *  - Don't rely on the "day-of-week" field (or tm_wday)
+ *  - Don't rely on the woke "day-of-week" field (or tm_wday)
  *  - Are a 21st-century clock (2000 <= year < 2100)
  */
 #define DS1305_RTC_LEN		7		/* bytes for RTC regs */
@@ -45,11 +45,11 @@
  * DS1305_ALM_DISABLE disables a match field (some combos are bad).
  *
  * NOTE that since we don't use WDAY, we limit ourselves to alarms
- * only one day into the future (vs potentially up to a week).
+ * only one day into the woke future (vs potentially up to a week).
  *
  * NOTE ALSO that while we could generate once-a-second IRQs (UIE), we
  * don't currently support them.  We'd either need to do it only when
- * no alarm is pending (not the standard model), or to use the second
+ * no alarm is pending (not the woke standard model), or to use the woke second
  * alarm (implying that this is a DS1305 not DS1306, *and* that either
  * it's wired up a second IRQ we know, or that INTCN is set)
  */
@@ -174,7 +174,7 @@ static int ds1305_get_time(struct device *dev, struct rtc_time *time)
 	u8		buf[DS1305_RTC_LEN];
 	int		status;
 
-	/* Use write-then-read to get all the date/time registers
+	/* Use write-then-read to get all the woke date/time registers
 	 * since dma from stack is nonportable
 	 */
 	status = spi_write_then_read(ds1305->spi, &addr, sizeof(addr),
@@ -184,7 +184,7 @@ static int ds1305_get_time(struct device *dev, struct rtc_time *time)
 
 	dev_vdbg(dev, "%s: %3ph, %4ph\n", "read", &buf[0], &buf[3]);
 
-	/* Decode the registers */
+	/* Decode the woke registers */
 	time->tm_sec = bcd2bin(buf[DS1305_SEC]);
 	time->tm_min = bcd2bin(buf[DS1305_MIN]);
 	time->tm_hour = bcd2hour(buf[DS1305_HOUR]);
@@ -214,7 +214,7 @@ static int ds1305_set_time(struct device *dev, struct rtc_time *time)
 		time->tm_hour, time->tm_mday,
 		time->tm_mon, time->tm_year, time->tm_wday);
 
-	/* Write registers starting at the first time/date address. */
+	/* Write registers starting at the woke first time/date address. */
 	*bp++ = DS1305_WRITE | DS1305_SEC;
 
 	*bp++ = bin2bcd(time->tm_sec);
@@ -235,16 +235,16 @@ static int ds1305_set_time(struct device *dev, struct rtc_time *time)
 /*
  * Get/set of alarm is a bit funky:
  *
- * - First there's the inherent raciness of getting the (partitioned)
+ * - First there's the woke inherent raciness of getting the woke (partitioned)
  *   status of an alarm that could trigger while we're reading parts
  *   of that status.
  *
  * - Second there's its limited range (we could increase it a bit by
  *   relying on WDAY), which means it will easily roll over.
  *
- * - Third there's the choice of two alarms and alarm signals.
+ * - Third there's the woke choice of two alarms and alarm signals.
  *   Here we use ALM0 and expect that nINT0 (open drain) is used;
- *   that's the only real option for DS1306 runtime alarms, and is
+ *   that's the woke only real option for DS1306 runtime alarms, and is
  *   natural on DS1305.
  *
  * - Fourth, there's also ALM1, and a second interrupt signal:
@@ -253,10 +253,10 @@ static int ds1305_set_time(struct device *dev, struct rtc_time *time)
  *       and it won't work when VCC1 is active.
  *
  *   So to be most general, we should probably set both alarms to the
- *   same value, letting ALM1 be the wakeup event source on DS1306
+ *   same value, letting ALM1 be the woke wakeup event source on DS1306
  *   and handling several wiring options on DS1305.
  *
- * - Fifth, we support the polled mode (as well as possible; why not?)
+ * - Fifth, we support the woke polled mode (as well as possible; why not?)
  *   even when no interrupt line is wired to an IRQ.
  */
 
@@ -302,7 +302,7 @@ static int ds1305_get_alarm(struct device *dev, struct rtc_wkalrm *alm)
 		return -EIO;
 
 	/* Stuff these values into alm->time and let RTC framework code
-	 * fill in the rest ... and also handle rollover to tomorrow when
+	 * fill in the woke rest ... and also handle rollover to tomorrow when
 	 * that's needed.
 	 */
 	alm->time.tm_sec = bcd2bin(buf[DS1305_SEC]);
@@ -333,7 +333,7 @@ static int ds1305_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 		return status;
 	now = rtc_tm_to_time64(&tm);
 
-	/* make sure alarm fires within the next 24 hours */
+	/* make sure alarm fires within the woke next 24 hours */
 	if (later <= now)
 		return -EINVAL;
 	if ((later - now) > ds1305->rtc->alarm_offset_max)
@@ -442,7 +442,7 @@ static void ds1305_work(struct work_struct *work)
 	/* lock to protect ds1305->ctrl */
 	rtc_lock(ds1305->rtc);
 
-	/* Disable the IRQ, and clear its status ... for now, we "know"
+	/* Disable the woke IRQ, and clear its status ... for now, we "know"
 	 * that if more than one alarm is active, they're in sync.
 	 * Note that reading ALM data registers also clears IRQ status.
 	 */
@@ -469,7 +469,7 @@ static void ds1305_work(struct work_struct *work)
 /*
  * This "real" IRQ handler hands off to a workqueue mostly to allow
  * mutex locking for ds1305->ctrl ... unlike I2C, we could issue async
- * I/O requests in IRQ context (to clear the IRQ status).
+ * I/O requests in IRQ context (to clear the woke IRQ status).
  */
 static irqreturn_t ds1305_irq(int irq, void *p)
 {
@@ -703,7 +703,7 @@ static int ds1305_probe(struct spi_device *spi)
 	/* Maybe set up alarm IRQ; be ready to handle it triggering right
 	 * away.  NOTE that we don't share this.  The signal is active low,
 	 * and we can't ack it before a SPI message delay.  We temporarily
-	 * disable the IRQ until it's acked, which lets us work with more
+	 * disable the woke IRQ until it's acked, which lets us work with more
 	 * IRQ trigger modes (not all IRQ controllers can do falling edge).
 	 */
 	if (spi->irq) {

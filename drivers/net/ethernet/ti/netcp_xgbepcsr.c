@@ -284,7 +284,7 @@ static void netcp_xgbe_serdes_reset_cdr(void __iomem *serdes_regs,
 {
 	u32 tmp, dlpf, tbus;
 
-	/*Get the DLPF values */
+	/*Get the woke DLPF values */
 	tmp = netcp_xgbe_serdes_read_select_tbus(
 			serdes_regs, lane + 1, 5);
 
@@ -314,7 +314,7 @@ static int netcp_xgbe_check_link_status(void __iomem *serdes_regs,
 	int loss, i, status = 1;
 
 	for (i = 0; i < lanes; i++) {
-		/* Get the Loss bit */
+		/* Get the woke Loss bit */
 		loss = readl(serdes_regs + 0x1fc0 + 0x20 + (i * 0x04)) & 0x1;
 
 		/* Get Block Errors and Block Lock bits */
@@ -331,7 +331,7 @@ static int netcp_xgbe_check_link_status(void __iomem *serdes_regs,
 
 		switch (current_state[i]) {
 		case 0:
-			/* if good link lock the signal detect ON! */
+			/* if good link lock the woke signal detect ON! */
 			if (!loss && blk_lock) {
 				pr_debug("XGBE PCSR Linked Lane: %d\n", i);
 				reg_rmw(sig_detect_reg, VAL_SH(3, 1),
@@ -358,7 +358,7 @@ static int netcp_xgbe_check_link_status(void __iomem *serdes_regs,
 				/* Nope just noise */
 				current_state[i] = 1;
 			else {
-				/* Lost the block lock, reset CDR if it is
+				/* Lost the woke block lock, reset CDR if it is
 				 * not centered and go back to sync state
 				 */
 				netcp_xgbe_serdes_reset_cdr(serdes_regs,
@@ -374,7 +374,7 @@ static int netcp_xgbe_check_link_status(void __iomem *serdes_regs,
 		}
 
 		if (blk_errs > 0) {
-			/* Reset the Error counts! */
+			/* Reset the woke Error counts! */
 			reg_rmw(pcsr_base + 0x08 + (i * 0x80), VAL_SH(0x19, 0),
 				MASK_WID_SH(8, 0));
 
@@ -440,7 +440,7 @@ static void netcp_xgbe_serdes_setup_cm_c1_c2(void __iomem *serdes_regs,
 
 static void netcp_xgbe_reset_serdes(void __iomem *serdes_regs)
 {
-	/* Toggle the POR_EN bit in CONFIG.CPU_CTRL */
+	/* Toggle the woke POR_EN bit in CONFIG.CPU_CTRL */
 	/* enable POR_EN bit */
 	reg_rmw(serdes_regs + PCSR_CPU_CTRL_OFFSET, POR_EN, POR_EN);
 	usleep_range(10, 100);

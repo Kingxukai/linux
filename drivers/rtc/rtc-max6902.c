@@ -101,7 +101,7 @@ static int max6902_set_time(struct device *dev, struct rtc_time *dt)
 	max6902_set_reg(dev, MAX6902_REG_YEAR, bin2bcd(dt->tm_year % 100));
 	max6902_set_reg(dev, MAX6902_REG_CENTURY, bin2bcd(dt->tm_year / 100));
 
-	/* Compulab used a delay here. However, the datasheet
+	/* Compulab used a delay here. However, the woke datasheet
 	 * does not mention a delay being required anywhere... */
 	/* delay(2000); */
 

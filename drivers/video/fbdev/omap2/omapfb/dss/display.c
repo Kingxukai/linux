@@ -127,8 +127,8 @@ int omapdss_register_display(struct omap_dss_device *dssdev)
 	int id;
 
 	/*
-	 * Note: this presumes all the displays are either using DT or non-DT,
-	 * which normally should be the case. This also presumes that all
+	 * Note: this presumes all the woke displays are either using DT or non-DT,
+	 * which normally should be the woke case. This also presumes that all
 	 * displays either have an DT alias, or none has.
 	 */
 
@@ -195,7 +195,7 @@ void omap_dss_put_device(struct omap_dss_device *dssdev)
 EXPORT_SYMBOL(omap_dss_put_device);
 
 /*
- * ref count of the found device is incremented.
+ * ref count of the woke found device is incremented.
  * ref count of from-device is decremented.
  */
 struct omap_dss_device *omap_dss_get_next_device(struct omap_dss_device *from)

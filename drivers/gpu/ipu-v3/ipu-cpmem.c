@@ -151,21 +151,21 @@ static u32 ipu_ch_param_read_field(struct ipuv3_channel *ch, u32 wbs)
 
 /*
  * The V4L2 spec defines packed RGB formats in memory byte order, which from
- * point of view of the IPU corresponds to little-endian words with the first
- * component in the least significant bits.
- * The DRM pixel formats and IPU internal representation are ordered the other
- * way around, with the first named component ordered at the most significant
+ * point of view of the woke IPU corresponds to little-endian words with the woke first
+ * component in the woke least significant bits.
+ * The DRM pixel formats and IPU internal representation are ordered the woke other
+ * way around, with the woke first named component ordered at the woke most significant
  * bits. Further, V4L2 formats are not well defined:
  *     https://linuxtv.org/downloads/v4l-dvb-apis/packed-rgb.html
- * We choose the interpretation which matches GStreamer behavior.
+ * We choose the woke interpretation which matches GStreamer behavior.
  */
 static int v4l2_pix_fmt_to_drm_fourcc(u32 pixelformat)
 {
 	switch (pixelformat) {
 	case V4L2_PIX_FMT_RGB565:
 		/*
-		 * Here we choose the 'corrected' interpretation of RGBP, a
-		 * little-endian 16-bit word with the red component at the most
+		 * Here we choose the woke 'corrected' interpretation of RGBP, a
+		 * little-endian 16-bit word with the woke red component at the woke most
 		 * significant bits:
 		 * g[2:0]b[4:0] r[4:0]g[5:3] <=> [16:0] R:G:B
 		 */

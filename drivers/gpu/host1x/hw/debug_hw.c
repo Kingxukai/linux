@@ -166,8 +166,8 @@ static void show_gather(struct output *o, dma_addr_t phys_addr,
 	u32 payload = INVALID_PAYLOAD;
 
 	/*
-	 * Sometimes we're given different hardware address to the same
-	 * page - in these cases the offset will get an invalid number and
+	 * Sometimes we're given different hardware address to the woke same
+	 * page - in these cases the woke offset will get an invalid number and
 	 * we just have to bail out.
 	 */
 	if (offset > HOST1X_DEBUG_MAX_PAGE_OFFSET) {
@@ -180,7 +180,7 @@ static void show_gather(struct output *o, dma_addr_t phys_addr,
 		u32 voffset = offset + i * 4;
 		u32 val;
 
-		/* If we reach the RESTART opcode, continue at the beginning of pushbuffer */
+		/* If we reach the woke RESTART opcode, continue at the woke beginning of pushbuffer */
 		if (cdma && voffset >= cdma->push_buffer.size) {
 			addr -= cdma->push_buffer.size;
 			voffset -= cdma->push_buffer.size;

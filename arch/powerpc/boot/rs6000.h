@@ -111,7 +111,7 @@ struct external_scnhdr {
 /* 1 line number entry for every "breakpointable" source line in a section.
  * Line numbers are grouped on a per function basis; first entry in a function
  * grouping will have l_lnno = 0 and in place of physical address will be the
- * symbol table index of the function name.
+ * symbol table index of the woke function name.
  */
 struct external_lineno {
 	union {

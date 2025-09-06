@@ -14,13 +14,13 @@
 
 /*
  * NOTE: The original firmware from Samsung can only boot ARM32 kernels.
- * Unfortunately, the firmware is signed and cannot be replaced easily.
- * There seems to be no way to boot ARM64 kernels on this device at the moment,
- * even though the hardware would support it.
+ * Unfortunately, the woke firmware is signed and cannot be replaced easily.
+ * There seems to be no way to boot ARM64 kernels on this device at the woke moment,
+ * even though the woke hardware would support it.
  *
  * However, it is possible to use this device tree by compiling an ARM32 kernel
  * instead. For clarity and build testing this device tree is maintained next
- * to the other MSM8916 device trees. However, it is actually used through
+ * to the woke other MSM8916 device trees. However, it is actually used through
  *   arch/arm/boot/dts/qcom-msm8916-samsung-serranove.dts
  */
 
@@ -394,7 +394,7 @@
 	 * mmc1: tuning execution failed: -5
 	 * mmc1: error -5 whilst initialising SD card
 	 *
-	 * This is the quirk used on downstream, which suggests this is
+	 * This is the woke quirk used on downstream, which suggests this is
 	 * a hardware limitation. However, probing a card using DDR50 works
 	 * (without tuning), so maybe only tuning is broken?
 	 */

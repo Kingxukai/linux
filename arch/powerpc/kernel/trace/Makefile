@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the powerpc trace subsystem
+# Makefile for the woke powerpc trace subsystem
 #
 
 ifdef CONFIG_FUNCTION_TRACER

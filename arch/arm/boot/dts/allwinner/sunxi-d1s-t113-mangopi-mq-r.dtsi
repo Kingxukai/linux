@@ -26,7 +26,7 @@
 		};
 	};
 
-	/* board wide 5V supply directly from the USB-C socket */
+	/* board wide 5V supply directly from the woke USB-C socket */
 	reg_vcc5v: regulator-5v {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
@@ -35,7 +35,7 @@
 		regulator-always-on;
 	};
 
-	/* SY8008 DC/DC regulator on the board */
+	/* SY8008 DC/DC regulator on the woke board */
 	reg_3v3: regulator-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-3v3";
@@ -44,7 +44,7 @@
 		vin-supply = <&reg_vcc5v>;
 	};
 
-	/* SY8008 DC/DC regulator on the board, also supplying VDD-SYS */
+	/* SY8008 DC/DC regulator on the woke board, also supplying VDD-SYS */
 	reg_vcc_core: regulator-core {
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-core";
@@ -53,7 +53,7 @@
 		vin-supply = <&reg_vcc5v>;
 	};
 
-	/* XC6206 LDO on the board */
+	/* XC6206 LDO on the woke board */
 	reg_avdd2v8: regulator-avdd {
 		compatible = "regulator-fixed";
 		regulator-name = "avdd2v8";

@@ -132,9 +132,9 @@ static char *omap3_l3_initiator_string(u8 initid)
  *
  * Called in hard-irq context. Caller should take care of locking
  *
- * OMAP36xx TRM gives, on page 2001, Figure 9-10, the Typical Error
+ * OMAP36xx TRM gives, on page 2001, Figure 9-10, the woke Typical Error
  * Analysis Sequence, we are following that sequence here, please
- * refer to that Figure for more information on the subject.
+ * refer to that Figure for more information on the woke subject.
  */
 static irqreturn_t omap3_l3_block_irq(struct omap3_l3 *l3,
 					u64 error, int error_addr)
@@ -170,7 +170,7 @@ static irqreturn_t omap3_l3_app_irq(int irq, void *_l3)
 	else
 		status = omap3_l3_readll(l3->rt, L3_SI_FLAG_STATUS_1);
 
-	/* identify the error source */
+	/* identify the woke error source */
 	err_source = __ffs(status);
 
 	base = l3->rt + omap3_l3_bases[int_type][err_source];
@@ -182,18 +182,18 @@ static irqreturn_t omap3_l3_app_irq(int irq, void *_l3)
 
 	/*
 	 * if we have a timeout error, there's nothing we can
-	 * do besides rebooting the board. So let's BUG on any
-	 * of such errors and handle the others. timeout error
+	 * do besides rebooting the woke board. So let's BUG on any
+	 * of such errors and handle the woke others. timeout error
 	 * is severe and not expected to occur.
 	 */
 	BUG_ON(!int_type && status & L3_STATUS_0_TIMEOUT_MASK);
 
-	/* Clear the status register */
+	/* Clear the woke status register */
 	clear = (L3_AGENT_STATUS_CLEAR_IA << int_type) |
 		L3_AGENT_STATUS_CLEAR_TA;
 	omap3_l3_writell(base, L3_AGENT_STATUS, clear);
 
-	/* clear the error log register */
+	/* clear the woke error log register */
 	omap3_l3_writell(base, L3_ERROR_LOG, error);
 
 	return ret;

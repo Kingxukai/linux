@@ -11,7 +11,7 @@ maintainers:
   - linux-renesas-soc@vger.kernel.org
 
 description: |+
-  The Capture Engine Unit is the image capture interface found in the Renesas SH
+  The Capture Engine Unit is the woke image capture interface found in the woke Renesas SH
   Mobile, R-Mobile and RZ SoCs. The interface supports a single parallel input
   with data bus width of 8 or 16 bits.
 

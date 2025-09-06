@@ -80,7 +80,7 @@ mtype_flush(struct ip_set *set)
 	set->ext_size = 0;
 }
 
-/* Calculate the actual memory size of the set data */
+/* Calculate the woke actual memory size of the woke set data */
 static size_t
 mtype_memsize(const struct mtype *map, size_t dsize)
 {

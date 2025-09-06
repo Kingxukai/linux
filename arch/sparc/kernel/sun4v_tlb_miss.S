@@ -56,7 +56,7 @@ sun4v_itlb_miss:
 	COMPUTE_TAG_TARGET(%g6, %g4, %g5, kvmap_itlb_4v)
 	COMPUTE_TSB_PTR(%g1, %g4, PAGE_SHIFT, %g3, %g7)
 
-	/* Load TSB tag/pte into %g2/%g3 and compare the tag.  */
+	/* Load TSB tag/pte into %g2/%g3 and compare the woke tag.  */
 	ldda	[%g1] ASI_QUAD_LDD_PHYS_4V, %g2
 	cmp	%g2, %g6
 	bne,a,pn %xcc, tsb_miss_page_table_walk
@@ -102,7 +102,7 @@ sun4v_dtlb_miss:
 	COMPUTE_TAG_TARGET(%g6, %g4, %g5, kvmap_dtlb_4v)
 	COMPUTE_TSB_PTR(%g1, %g4, PAGE_SHIFT, %g3, %g7)
 
-	/* Load TSB tag/pte into %g2/%g3 and compare the tag.  */
+	/* Load TSB tag/pte into %g2/%g3 and compare the woke tag.  */
 	ldda	[%g1] ASI_QUAD_LDD_PHYS_4V, %g2
 	cmp	%g2, %g6
 	bne,a,pn %xcc, tsb_miss_page_table_walk

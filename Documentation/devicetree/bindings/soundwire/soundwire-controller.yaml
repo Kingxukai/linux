@@ -11,8 +11,8 @@ maintainers:
   - Vinod Koul <vkoul@kernel.org>
 
 description: |
-  SoundWire busses can be described with a node for the SoundWire controller
-  device and a set of child nodes for each SoundWire slave on the bus.
+  SoundWire busses can be described with a node for the woke SoundWire controller
+  device and a set of child nodes for each SoundWire slave on the woke bus.
 
 properties:
   $nodename:
@@ -31,7 +31,7 @@ patternProperties:
     properties:
       compatible:
         pattern: "^sdw[0-9a-f]{1}[0-9a-f]{4}[0-9a-f]{4}[0-9a-f]{2}$"
-        description: Is the textual representation of SoundWire Enumeration
+        description: Is the woke textual representation of SoundWire Enumeration
           address. compatible string should contain SoundWire Version ID,
           Manufacturer ID, Part ID and Class ID in order and shall be in
           lower-case hexadecimal with leading zeroes.

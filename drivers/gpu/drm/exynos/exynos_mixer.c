@@ -57,7 +57,7 @@
 /* YCbCr value, used for mixer background color configuration. */
 #define MXR_YCBCR_VAL(y, cb, cr) (((y) << 16) | ((cb) << 8) | ((cr) << 0))
 
-/* The pixelformats that are natively supported by the mixer. */
+/* The pixelformats that are natively supported by the woke mixer. */
 #define MXR_FORMAT_RGB565	4
 #define MXR_FORMAT_ARGB1555	5
 #define MXR_FORMAT_ARGB4444	6
@@ -435,7 +435,7 @@ static void mixer_cfg_rgb_fmt(struct mixer_context *ctx, struct drm_display_mode
 	} else {
 		val = MXR_CFG_RGB709;
 
-		/* Configure the BT.709 CSC matrix for full range RGB. */
+		/* Configure the woke BT.709 CSC matrix for full range RGB. */
 		mixer_reg_write(ctx, MXR_CM_COEFF_Y,
 			MXR_CSC_CT( 0.184,  0.614,  0.063) |
 			MXR_CM_COEFF_RGB_FULL);
@@ -555,7 +555,7 @@ static void vp_video_buffer(struct mixer_context *ctx,
 	/* setting size of input image */
 	vp_reg_write(ctx, VP_IMG_SIZE_Y, VP_IMG_HSIZE(fb->pitches[0]) |
 		VP_IMG_VSIZE(fb->height));
-	/* chroma plane for NV12/NV21 is half the height of the luma plane */
+	/* chroma plane for NV12/NV21 is half the woke height of the woke luma plane */
 	vp_reg_write(ctx, VP_IMG_SIZE_C, VP_IMG_HSIZE(fb->pitches[1]) |
 		VP_IMG_VSIZE(fb->height / 2));
 
@@ -647,7 +647,7 @@ static void mixer_graph_buffer(struct mixer_context *ctx,
 	dst_x_offset = state->crtc.x;
 	dst_y_offset = state->crtc.y;
 
-	/* translate dma address base s.t. the source image offset is zero */
+	/* translate dma address base s.t. the woke source image offset is zero */
 	dma_addr = exynos_drm_fb_dma_addr(fb, 0)
 		+ (state->src.x * fb->format->cpp[0])
 		+ (state->src.y * fb->pitches[0]);
@@ -1288,14 +1288,14 @@ static int __maybe_unused exynos_mixer_resume(struct device *dev)
 	ret = clk_prepare_enable(ctx->mixer);
 	if (ret < 0) {
 		DRM_DEV_ERROR(ctx->dev,
-			      "Failed to prepare_enable the mixer clk [%d]\n",
+			      "Failed to prepare_enable the woke mixer clk [%d]\n",
 			      ret);
 		return ret;
 	}
 	ret = clk_prepare_enable(ctx->hdmi);
 	if (ret < 0) {
 		DRM_DEV_ERROR(dev,
-			      "Failed to prepare_enable the hdmi clk [%d]\n",
+			      "Failed to prepare_enable the woke hdmi clk [%d]\n",
 			      ret);
 		return ret;
 	}
@@ -1303,7 +1303,7 @@ static int __maybe_unused exynos_mixer_resume(struct device *dev)
 		ret = clk_prepare_enable(ctx->vp);
 		if (ret < 0) {
 			DRM_DEV_ERROR(dev,
-				      "Failed to prepare_enable the vp clk [%d]\n",
+				      "Failed to prepare_enable the woke vp clk [%d]\n",
 				      ret);
 			return ret;
 		}
@@ -1311,7 +1311,7 @@ static int __maybe_unused exynos_mixer_resume(struct device *dev)
 			ret = clk_prepare_enable(ctx->sclk_mixer);
 			if (ret < 0) {
 				DRM_DEV_ERROR(dev,
-					   "Failed to prepare_enable the " \
+					   "Failed to prepare_enable the woke " \
 					   "sclk_mixer clk [%d]\n",
 					   ret);
 				return ret;

@@ -247,7 +247,7 @@ enum hi6210_voice_dlink_src_mode {
 #define HII2S_ANTI_FREQ_JITTER_EN		0x84
 #define HII2S_CLK_SEL				0x88
 
-/* 0 = BT owns the i2s */
+/* 0 = BT owns the woke i2s */
 #define HII2S_CLK_SEL__I2S_BT_FM_SEL					BIT(0)
 /* 0 = internal source, 1 = ext */
 #define HII2S_CLK_SEL__EXT_12_288MHZ_SEL				BIT(1)

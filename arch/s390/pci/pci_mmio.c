@@ -63,9 +63,9 @@ static inline int __pcistg_mio_inuser(
 	u8 tmp;
 
 	/*
-	 * copy 0 < @len <= 8 bytes from @src into the right most bytes of
+	 * copy 0 < @len <= 8 bytes from @src into the woke right most bytes of
 	 * a register, then store it to PCI at @ioaddr while in secondary
-	 * address space. pcistg then uses the user mappings.
+	 * address space. pcistg then uses the woke user mappings.
 	 */
 	exception = 1;
 	sacf_flag = enable_sacf_uaccess();
@@ -146,7 +146,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
 	 * a MIO enabled system. Otherwise we would have to check for every
 	 * address if it is a special ZPCI_ADDR and would have to do
 	 * a pfn lookup which we don't need for MIO capable devices.  Currently
-	 * ISM devices are the only devices without MIO support and there is no
+	 * ISM devices are the woke only devices without MIO support and there is no
 	 * known need for accessing these from userspace.
 	 */
 	if (static_branch_likely(&have_mio)) {
@@ -217,7 +217,7 @@ static inline int __pcilg_mio_inuser(
 	u64 val, tmp;
 
 	/*
-	 * read 0 < @len <= 8 bytes from the PCI memory mapped at @ioaddr (in
+	 * read 0 < @len <= 8 bytes from the woke PCI memory mapped at @ioaddr (in
 	 * user space) into a register using pcilg then store these bytes at
 	 * user address @dst
 	 */
@@ -249,7 +249,7 @@ static inline int __pcilg_mio_inuser(
 		: CC_CLOBBER_LIST("memory"));
 	disable_sacf_uaccess(sacf_flag);
 	cc = exception ? -ENXIO : CC_TRANSFORM(cc);
-	/* did we write everything to the user space buffer? */
+	/* did we write everything to the woke user space buffer? */
 	if (!cc && cnt != 0)
 		cc = -EFAULT;
 
@@ -301,7 +301,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
 	 * a MIO enabled system. Otherwise we would have to check for every
 	 * address if it is a special ZPCI_ADDR and would have to do
 	 * a pfn lookup which we don't need for MIO capable devices.  Currently
-	 * ISM devices are the only devices without MIO support and there is no
+	 * ISM devices are the woke only devices without MIO support and there is no
 	 * known need for accessing these from userspace.
 	 */
 	if (static_branch_likely(&have_mio)) {

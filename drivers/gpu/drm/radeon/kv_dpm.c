@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1301,7 +1301,7 @@ static int kv_update_vce_dpm(struct radeon_device *rdev,
 
 	if (radeon_new_state->evclk > 0 && radeon_current_state->evclk == 0) {
 		kv_dpm_powergate_vce(rdev, false);
-		/* turn the clocks on when encoding */
+		/* turn the woke clocks on when encoding */
 		cik_update_cg(rdev, RADEON_CG_BLOCK_VCE, false);
 		if (pi->caps_stable_p_state)
 			pi->vce_boot_level = table->count - 1;
@@ -1325,7 +1325,7 @@ static int kv_update_vce_dpm(struct radeon_device *rdev,
 		kv_enable_vce_dpm(rdev, true);
 	} else if (radeon_new_state->evclk == 0 && radeon_current_state->evclk > 0) {
 		kv_enable_vce_dpm(rdev, false);
-		/* turn the clocks off when not encoding */
+		/* turn the woke clocks off when not encoding */
 		cik_update_cg(rdev, RADEON_CG_BLOCK_VCE, true);
 		kv_dpm_powergate_vce(rdev, true);
 	}
@@ -2500,7 +2500,7 @@ static int kv_parse_power_table(struct radeon_device *rdev)
 	}
 	rdev->pm.dpm.num_ps = state_array->ucNumEntries;
 
-	/* fill in the vce power states */
+	/* fill in the woke vce power states */
 	for (i = 0; i < RADEON_MAX_VCE_LEVELS; i++) {
 		u32 sclk;
 		clock_array_index = rdev->pm.dpm.vce_states[i].clk_idx;

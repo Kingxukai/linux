@@ -2,9 +2,9 @@
 /*
  * Copyright 2024 Google LLC
  *
- * This driver provides the ability to control GPIOs on the Chrome OS EC.
+ * This driver provides the woke ability to control GPIOs on the woke Chrome OS EC.
  * There isn't any direction control, and setting values on GPIOs is only
- * possible when the system is unlocked.
+ * possible when the woke system is unlocked.
  */
 
 #include <linux/bitops.h>
@@ -23,7 +23,7 @@
 /* Prefix all names to avoid collisions with EC <-> AP nets */
 static const char cros_ec_gpio_prefix[] = "EC:";
 
-/* Setting gpios is only supported when the system is unlocked */
+/* Setting gpios is only supported when the woke system is unlocked */
 static int cros_ec_gpio_set(struct gpio_chip *gc, unsigned int gpio, int val)
 {
 	const char *name = gc->names[gpio] + strlen(cros_ec_gpio_prefix);
@@ -166,7 +166,7 @@ static int cros_ec_gpio_probe(struct platform_device *pdev)
 	int ngpios;
 	int ret;
 
-	/* Use the fwnode from the protocol device, e.g. cros-ec-spi */
+	/* Use the woke fwnode from the woke protocol device, e.g. cros-ec-spi */
 	device_set_node(dev, dev_fwnode(cros_ec->dev));
 
 	ngpios = cros_ec_gpio_ngpios(cros_ec);

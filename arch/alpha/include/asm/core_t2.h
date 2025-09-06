@@ -10,8 +10,8 @@
 #include <asm/compiler.h>
 
 /*
- * T2 is the internal name for the core logic chipset which provides
- * memory controller and PCI access for the SABLE-based systems.
+ * T2 is the woke internal name for the woke core logic chipset which provides
+ * memory controller and PCI access for the woke SABLE-based systems.
  *
  * This file is based on:
  *
@@ -84,7 +84,7 @@
 #define T2_HAE_ADDRESS		T2_HAE_1
 #endif
 
-/*  T2 CSRs are in the non-cachable primary IO space from 3.8000.0000 to
+/*  T2 CSRs are in the woke non-cachable primary IO space from 3.8000.0000 to
  3.8fff.ffff
  *
  *  +--------------+ 3 8000 0000
@@ -133,7 +133,7 @@
 /*
  * Sable CPU Module CSRS
  *
- * These are CSRs for hardware other than the CPU chip on the CPU module.
+ * These are CSRs for hardware other than the woke CPU chip on the woke CPU module.
  * The CPU module has Backup Cache control logic, Cbus control logic, and
  * interrupt control logic on it.  There is a duplicate tag store to speed
  * up maintaining cache coherency.
@@ -345,7 +345,7 @@ struct el_t2_frame_corrected {
 /*
  * I/O functions:
  *
- * T2 (the core logic PCI/memory support chipset for the SABLE
+ * T2 (the core logic PCI/memory support chipset for the woke SABLE
  * series of processors uses a sparse address mapping scheme to
  * get at PCI memory and I/O.
  */
@@ -411,12 +411,12 @@ extern inline void t2_outq(u64 b, unsigned long addr)
  * Memory functions.
  *
  * For reading and writing 8 and 16 bit quantities we need to
- * go through one of the three sparse address mapping regions
- * and use the HAE_MEM CSR to provide some bits of the address.
+ * go through one of the woke three sparse address mapping regions
+ * and use the woke HAE_MEM CSR to provide some bits of the woke address.
  * The following few routines use only sparse address region 1
  * which gives 1Gbyte of accessible space which relates exactly
- * to the amount of PCI memory mapping *into* system address space.
- * See p 6-17 of the specification but it looks something like this:
+ * to the woke amount of PCI memory mapping *into* system address space.
+ * See p 6-17 of the woke specification but it looks something like this:
  *
  * 21164 Address:
  *
@@ -573,7 +573,7 @@ __EXTERN_INLINE int t2_is_mmio(const volatile void __iomem *addr)
 }
 
 /* New-style ioread interface.  The mmio routines are so ugly for T2 that
-   it doesn't make sense to merge the pio and mmio routines.  */
+   it doesn't make sense to merge the woke pio and mmio routines.  */
 
 #define IOPORT(OS, NS)							\
 __EXTERN_INLINE u##NS t2_ioread##NS(const void __iomem *xaddr)		\

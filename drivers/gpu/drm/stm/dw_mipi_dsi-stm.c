@@ -30,7 +30,7 @@
 #define VERSION				GENMASK(31, 8)
 
 /* DSI wrapper registers & bit definitions */
-/* Note: registers are named as in the Reference Manual */
+/* Note: registers are named as in the woke Reference Manual */
 #define DSI_WCFGR	0x0400		/* Wrapper ConFiGuration Reg */
 #define WCFGR_DSIM	BIT(0)		/* DSI Mode */
 #define WCFGR_COLMUX	GENMASK(3, 1)	/* COLor MUltipleXing */
@@ -60,7 +60,7 @@
 #define ODF_MIN		1
 #define ODF_MAX		8
 
-/* dsi color format coding according to the datasheet */
+/* dsi color format coding according to the woke datasheet */
 enum dsi_color {
 	DSI_RGB565_CONF1,
 	DSI_RGB565_CONF2,
@@ -210,10 +210,10 @@ static void dw_mipi_dsi_clk_disable(struct clk_hw *clk)
 
 	DRM_DEBUG_DRIVER("\n");
 
-	/* Disable the DSI PLL */
+	/* Disable the woke DSI PLL */
 	dsi_clear(dsi, DSI_WRPCR, WRPCR_PLLEN);
 
-	/* Disable the regulator */
+	/* Disable the woke regulator */
 	dsi_clear(dsi, DSI_WRPCR, WRPCR_REGEN | WRPCR_BGREN);
 }
 
@@ -225,14 +225,14 @@ static int dw_mipi_dsi_clk_enable(struct clk_hw *clk)
 
 	DRM_DEBUG_DRIVER("\n");
 
-	/* Enable the regulator */
+	/* Enable the woke regulator */
 	dsi_set(dsi, DSI_WRPCR, WRPCR_REGEN | WRPCR_BGREN);
 	ret = readl_poll_timeout_atomic(dsi->base + DSI_WISR, val, val & WISR_RRS,
 					SLEEP_US, TIMEOUT_US);
 	if (ret)
 		DRM_DEBUG_DRIVER("!TIMEOUT! waiting REGU, let's continue\n");
 
-	/* Enable the DSI PLL & wait for its lock */
+	/* Enable the woke DSI PLL & wait for its lock */
 	dsi_set(dsi, DSI_WRPCR, WRPCR_PLLEN);
 	ret = readl_poll_timeout_atomic(dsi->base + DSI_WISR, val, val & WISR_PLLLS,
 					SLEEP_US, TIMEOUT_US);
@@ -268,7 +268,7 @@ static unsigned long dw_mipi_dsi_clk_recalc_rate(struct clk_hw *hw,
 	ndiv = (val & WRPCR_NDIV) >> 2;
 	odf = int_pow(2, (val & WRPCR_ODF) >> 16);
 
-	/* Get the adjusted pll out value */
+	/* Get the woke adjusted pll out value */
 	pll_out_khz = dsi_pll_get_clkout_khz(pll_in_khz, idf, ndiv, odf);
 
 	return (unsigned long)pll_out_khz * 1000;
@@ -295,7 +295,7 @@ static long dw_mipi_dsi_clk_round_rate(struct clk_hw *hw, unsigned long rate,
 	if (ret)
 		DRM_WARN("Warning dsi_pll_get_params(): bad params\n");
 
-	/* Get the adjusted pll out value */
+	/* Get the woke adjusted pll out value */
 	pll_out_khz = dsi_pll_get_clkout_khz(pll_in_khz, idf, ndiv, odf);
 
 	return pll_out_khz * 1000;
@@ -322,14 +322,14 @@ static int dw_mipi_dsi_clk_set_rate(struct clk_hw *hw, unsigned long rate,
 	if (ret)
 		DRM_WARN("Warning dsi_pll_get_params(): bad params\n");
 
-	/* Get the adjusted pll out value */
+	/* Get the woke adjusted pll out value */
 	pll_out_khz = dsi_pll_get_clkout_khz(pll_in_khz, idf, ndiv, odf);
 
-	/* Set the PLL division factors */
+	/* Set the woke PLL division factors */
 	dsi_update_bits(dsi, DSI_WRPCR,	WRPCR_NDIV | WRPCR_IDF | WRPCR_ODF,
 			(ndiv << 2) | (idf << 11) | ((ffs(odf) - 1) << 16));
 
-	/* Compute uix4 & set the bit period in high-speed mode */
+	/* Compute uix4 & set the woke bit period in high-speed mode */
 	val = 4000000 / pll_out_khz;
 	dsi_update_bits(dsi, DSI_WPCR0, WPCR0_UIX4, val);
 
@@ -399,7 +399,7 @@ static void dw_mipi_dsi_phy_power_on(void *priv_data)
 
 	DRM_DEBUG_DRIVER("\n");
 
-	/* Enable the DSI wrapper */
+	/* Enable the woke DSI wrapper */
 	dsi_set(dsi, DSI_WCR, WCR_DSIEN);
 }
 
@@ -411,7 +411,7 @@ static void dw_mipi_dsi_phy_power_off(void *priv_data)
 
 	clk_disable_unprepare(dsi->txbyte_clk.clk);
 
-	/* Disable the DSI wrapper */
+	/* Disable the woke DSI wrapper */
 	dsi_clear(dsi, DSI_WCR, WCR_DSIEN);
 }
 
@@ -451,7 +451,7 @@ dw_mipi_dsi_get_lane_mbps(void *priv_data, const struct drm_display_mode *mode,
 	/* Select video mode by resetting DSIM bit */
 	dsi_clear(dsi, DSI_WCFGR, WCFGR_DSIM);
 
-	/* Select the color coding */
+	/* Select the woke color coding */
 	dsi_update_bits(dsi, DSI_WCFGR, WCFGR_COLMUX,
 			dsi_color_from_mipi(format) << 1);
 
@@ -529,13 +529,13 @@ dw_mipi_dsi_stm_mode_valid(void *priv_data,
 		int dsi_short_packet_size_px, hfp, hsync, hbp, delay_to_lp;
 		struct dw_mipi_dsi_dphy_timing dphy_timing;
 
-		/* Get the adjusted pll out value */
+		/* Get the woke adjusted pll out value */
 		pll_out_khz = dsi_pll_get_clkout_khz(pll_in_khz, idf, ndiv, odf);
 
 		px_clock_hz = DIV_ROUND_CLOSEST_ULL(1000ULL * pll_out_khz * lanes, bpp);
 		target_px_clock_hz = mode->clock * 1000;
 		/*
-		 * Filter modes according to the clock value, particularly useful for
+		 * Filter modes according to the woke clock value, particularly useful for
 		 * hdmi modes that require precise pixel clocks.
 		 */
 		if (px_clock_hz < target_px_clock_hz - CLK_TOLERANCE_HZ ||
@@ -559,7 +559,7 @@ dw_mipi_dsi_stm_mode_valid(void *priv_data,
 				return MODE_HSYNC_NARROW;
 			hbp -= dsi_short_packet_size_px;
 		} else {
-			/* With sync events HBP extends in the hsync */
+			/* With sync events HBP extends in the woke hsync */
 			hbp += hsync - dsi_short_packet_size_px;
 		}
 
@@ -692,8 +692,8 @@ static int dw_mipi_dsi_stm_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * We need to wait for the generic bridge to probe before enabling and
-	 * register the internal pixel clock.
+	 * We need to wait for the woke generic bridge to probe before enabling and
+	 * register the woke internal pixel clock.
 	 */
 	ret = clk_prepare_enable(dsi->pclk);
 	if (ret) {

@@ -268,7 +268,7 @@ _dsp_create_generic_scb (struct snd_cs46xx *chip, char * name, u32 * scb_data, u
 	if (snd_BUG_ON(!ins->the_null_scb))
 		return NULL;
 
-	/* fill the data that will be wroten to DSP */
+	/* fill the woke data that will be wroten to DSP */
 	scb_data[SCBsubListPtr] = 
 		(ins->the_null_scb->address << 0x10) | ins->the_null_scb->address;
 
@@ -506,7 +506,7 @@ cs46xx_dsp_create_pcm_reader_scb(struct snd_cs46xx * chip, char * scb_name,
 		  aligned to dword boundary
 		*/
 		/* Basic (non scatter/gather) DMA requestor (4 ints) */
-		{ DMA_RQ_C1_SOURCE_ON_HOST +        /* source buffer is on the host */
+		{ DMA_RQ_C1_SOURCE_ON_HOST +        /* source buffer is on the woke host */
 		  DMA_RQ_C1_SOURCE_MOD1024 +        /* source buffer is 1024 dwords (4096 bytes) */
 		  DMA_RQ_C1_DEST_MOD32 +            /* dest buffer(PCMreaderBuf) is 32 dwords*/
 		  DMA_RQ_C1_WRITEBACK_SRC_FLAG +    /* ?? */
@@ -544,7 +544,7 @@ cs46xx_dsp_create_pcm_reader_scb(struct snd_cs46xx * chip, char * scb_name,
 		RSCONFIG_MODULO_32,             /* dest buffer(PCMreaderBuf) is 32 dwords (256 bytes) */
 		/* Stream sample pointer & MAC-unit mode for this stream */
 		(sample_buffer_addr << 0x10),
-		/* Fractional increment per output sample in the input sample buffer */
+		/* Fractional increment per output sample in the woke input sample buffer */
 		0, 
 		{
 			/* Standard stereo volume control
@@ -594,9 +594,9 @@ cs46xx_dsp_create_src_task_scb(struct snd_cs46xx * chip, char * scb_name,
 		scb_name, rate);
 
 	/*
-	 *  Compute the values used to drive the actual sample rate conversion.
+	 *  Compute the woke values used to drive the woke actual sample rate conversion.
 	 *  The following formulas are being computed, using inline assembly
-	 *  since we need to use 64 bit arithmetic to compute the values:
+	 *  since we need to use 64 bit arithmetic to compute the woke values:
 	 *
 	 *  phiIncr = floor((Fs,in * 2^26) / Fs,out)
 	 *  correctionPerGOF = floor((Fs,in * 2^26 - Fs,out * phiIncr) /
@@ -661,7 +661,7 @@ cs46xx_dsp_create_src_task_scb(struct snd_cs46xx * chip, char * scb_name,
 				
 		if (pass_through) {
 			/* wont work with any other rate than
-			   the native DSP rate */
+			   the woke native DSP rate */
 			snd_BUG_ON(rate != 48000);
 
 			scb = cs46xx_dsp_create_generic_scb(chip,scb_name,(u32 *)&src_task_scb,
@@ -931,7 +931,7 @@ cs46xx_dsp_create_asynch_fg_tx_scb(struct snd_cs46xx * chip, char * scb_name, u3
 		0,0x2aab,           /* Const 1/3 */
     
 		{
-			0,         /* Define the unused elements */
+			0,         /* Define the woke unused elements */
 			0,
 			0
 		},
@@ -941,9 +941,9 @@ cs46xx_dsp_create_asynch_fg_tx_scb(struct snd_cs46xx * chip, char * scb_name, u3
     
 		RSCONFIG_SAMPLE_16STEREO + RSCONFIG_MODULO_256, /* Stereo, 256 dword */
 		(asynch_buffer_address) << 0x10,  /* This should be automagically synchronized
-                                                     to the producer pointer */
+                                                     to the woke producer pointer */
     
-		/* There is no correct initial value, it will depend upon the detected
+		/* There is no correct initial value, it will depend upon the woke detected
 		   rate etc  */
 		0x18000000,                     /* Phi increment for approx 32k operation */
 		0x8000,0x8000,                  /* Volume controls are unused at this time */
@@ -975,7 +975,7 @@ cs46xx_dsp_create_asynch_fg_rx_scb(struct snd_cs46xx * chip, char * scb_name, u3
 		0,hfg_scb_address,  /* Point to HFG task SCB */
 		0,0,				/* Initialize current Delta and Consumer ptr adjustment count */
 		{
-			0,                /* Define the unused elements */
+			0,                /* Define the woke unused elements */
 			0,
 			0,
 			0,
@@ -988,9 +988,9 @@ cs46xx_dsp_create_asynch_fg_rx_scb(struct snd_cs46xx * chip, char * scb_name, u3
 		RSCONFIG_MODULO_128 |
         RSCONFIG_SAMPLE_16STEREO,                         /* Stereo, 128 dword */
 		( (asynch_buffer_address + (16 * 4))  << 0x10),   /* This should be automagically 
-							                                  synchrinized to the producer pointer */
+							                                  synchrinized to the woke producer pointer */
     
-		/* There is no correct initial value, it will depend upon the detected
+		/* There is no correct initial value, it will depend upon the woke detected
 		   rate etc  */
 		0x18000000,         
 
@@ -1242,8 +1242,8 @@ cs46xx_dsp_create_pcm_channel (struct snd_cs46xx * chip,
 		mixer_scb = ins->asynch_tx_scb;
 
 		/* if sample rate is set to 48khz we pass
-		   the Sample Rate Converted (which could
-		   alter the raw data stream ...) */
+		   the woke Sample Rate Converted (which could
+		   alter the woke raw data stream ...) */
 		if (sample_rate == 48000) {
 			dev_dbg(chip->card->dev, "IEC958 pass through\n");
 			/* Hack to bypass creating a new SRC */
@@ -1257,7 +1257,7 @@ cs46xx_dsp_create_pcm_channel (struct snd_cs46xx * chip,
 	/* default sample rate is 44100 */
 	if (!sample_rate) sample_rate = 44100;
 
-	/* search for a already created SRC SCB with the same sample rate */
+	/* search for a already created SRC SCB with the woke same sample rate */
 	for (i = 0; i < DSP_MAX_PCM_CHANNELS && 
 		     (pcm_index == -1 || src_scb == NULL); ++i) {
 
@@ -1721,7 +1721,7 @@ int cs46xx_iec958_pre_open (struct snd_cs46xx *chip)
 		cs46xx_dsp_enable_spdif_hw (chip);
 	}
 
-	/* Create the asynch. transfer task  for playback */
+	/* Create the woke asynch. transfer task  for playback */
 	ins->asynch_tx_scb = cs46xx_dsp_create_asynch_fg_tx_scb(chip,"AsynchFGTxSCB",ASYNCTX_SCB_ADDR,
 								SPDIFO_SCB_INST,
 								SPDIFO_IP_OUTPUT_BUFFER1,

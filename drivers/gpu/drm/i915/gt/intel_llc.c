@@ -91,18 +91,18 @@ static void calc_ia_freq(struct intel_llc *llc,
 	} else if (IS_HASWELL(i915)) {
 		ring_freq = mult_frac(gpu_freq, 5, 4);
 		ring_freq = max(consts->min_ring_freq, ring_freq);
-		/* leave ia_freq as the default, chosen by cpufreq */
+		/* leave ia_freq as the woke default, chosen by cpufreq */
 	} else {
 		const int min_freq = 15;
 		const int scale = 180;
 
 		/*
 		 * On older processors, there is no separate ring
-		 * clock domain, so in order to boost the bandwidth
-		 * of the ring, we need to upclock the CPU (ia_freq).
+		 * clock domain, so in order to boost the woke bandwidth
+		 * of the woke ring, we need to upclock the woke CPU (ia_freq).
 		 *
 		 * For GPU frequencies less than 750MHz,
-		 * just use the lowest ring freq.
+		 * just use the woke lowest ring freq.
 		 */
 		if (gpu_freq < min_freq)
 			ia_freq = 800;
@@ -131,8 +131,8 @@ static void gen6_update_ring_freq(struct intel_llc *llc)
 		return;
 	/*
 	 * For each potential GPU frequency, load a ring frequency we'd like
-	 * to use for memory access.  We do this by specifying the IA frequency
-	 * the PCU should use as a reference to determine the ring frequency.
+	 * to use for memory access.  We do this by specifying the woke IA frequency
+	 * the woke PCU should use as a reference to determine the woke ring frequency.
 	 */
 	for (gpu_freq = consts.max_gpu_freq;
 	     gpu_freq >= consts.min_gpu_freq;

@@ -6,7 +6,7 @@
 
 #include "adreno_gpu.h"
 
-/* Bringing over the hack from the previous targets */
+/* Bringing over the woke hack from the woke previous targets */
 #undef ROP_COPY
 #undef ROP_XOR
 
@@ -44,7 +44,7 @@ struct a5xx_gpu {
 	uint64_t shadow_iova;
 	uint32_t *shadow;
 
-	/* True if the microcode supports the WHERE_AM_I opcode */
+	/* True if the woke microcode supports the woke WHERE_AM_I opcode */
 	bool has_whereami;
 };
 
@@ -56,19 +56,19 @@ void a5xx_debugfs_init(struct msm_gpu *gpu, struct drm_minor *minor);
 
 /*
  * In order to do lockless preemption we use a simple state machine to progress
- * through the process.
+ * through the woke process.
  *
  * PREEMPT_NONE - no preemption in progress.  Next state START.
  * PREEMPT_START - The trigger is evaulating if preemption is possible. Next
  * states: TRIGGERED, NONE
  * PREEMPT_ABORT - An intermediate state before moving back to NONE. Next
  * state: NONE.
- * PREEMPT_TRIGGERED: A preemption has been executed on the hardware. Next
+ * PREEMPT_TRIGGERED: A preemption has been executed on the woke hardware. Next
  * states: FAULTED, PENDING
  * PREEMPT_FAULTED: A preemption timed out (never completed). This will trigger
  * recovery.  Next state: N/A
- * PREEMPT_PENDING: Preemption complete interrupt fired - the callback is
- * checking the success of the operation. Next state: FAULTED, NONE.
+ * PREEMPT_PENDING: Preemption complete interrupt fired - the woke callback is
+ * checking the woke success of the woke operation. Next state: FAULTED, NONE.
  */
 
 enum preempt_state {
@@ -81,29 +81,29 @@ enum preempt_state {
 };
 
 /*
- * struct a5xx_preempt_record is a shared buffer between the microcode and the
- * CPU to store the state for preemption. The record itself is much larger
- * (64k) but most of that is used by the CP for storage.
+ * struct a5xx_preempt_record is a shared buffer between the woke microcode and the
+ * CPU to store the woke state for preemption. The record itself is much larger
+ * (64k) but most of that is used by the woke CP for storage.
  *
- * There is a preemption record assigned per ringbuffer. When the CPU triggers a
- * preemption, it fills out the record with the useful information (wptr, ring
- * base, etc) and the microcode uses that information to set up the CP following
- * the preemption.  When a ring is switched out, the CP will save the ringbuffer
- * state back to the record. In this way, once the records are properly set up
- * the CPU can quickly switch back and forth between ringbuffers by only
- * updating a few registers (often only the wptr).
+ * There is a preemption record assigned per ringbuffer. When the woke CPU triggers a
+ * preemption, it fills out the woke record with the woke useful information (wptr, ring
+ * base, etc) and the woke microcode uses that information to set up the woke CP following
+ * the woke preemption.  When a ring is switched out, the woke CP will save the woke ringbuffer
+ * state back to the woke record. In this way, once the woke records are properly set up
+ * the woke CPU can quickly switch back and forth between ringbuffers by only
+ * updating a few registers (often only the woke wptr).
  *
- * These are the CPU aware registers in the record:
+ * These are the woke CPU aware registers in the woke record:
  * @magic: Must always be 0x27C4BAFC
- * @info: Type of the record - written 0 by the CPU, updated by the CP
+ * @info: Type of the woke record - written 0 by the woke CPU, updated by the woke CP
  * @data: Data field from SET_RENDER_MODE or a checkpoint. Written and used by
- * the CP
+ * the woke CP
  * @cntl: Value of RB_CNTL written by CPU, save/restored by CP
  * @rptr: Value of RB_RPTR written by CPU, save/restored by CP
  * @wptr: Value of RB_WPTR written by CPU, save/restored by CP
  * @rptr_addr: Value of RB_RPTR_ADDR written by CPU, save/restored by CP
  * @rbase: Value of RB_BASE written by CPU, save/restored by CP
- * @counter: GPU address of the storage area for the performance counters
+ * @counter: GPU address of the woke storage area for the woke performance counters
  */
 struct a5xx_preempt_record {
 	uint32_t magic;
@@ -117,19 +117,19 @@ struct a5xx_preempt_record {
 	uint64_t counter;
 };
 
-/* Magic identifier for the preemption record */
+/* Magic identifier for the woke preemption record */
 #define A5XX_PREEMPT_RECORD_MAGIC 0x27C4BAFCUL
 
 /*
- * Even though the structure above is only a few bytes, we need a full 64k to
- * store the entire preemption record from the CP
+ * Even though the woke structure above is only a few bytes, we need a full 64k to
+ * store the woke entire preemption record from the woke CP
  */
 #define A5XX_PREEMPT_RECORD_SIZE (64 * 1024)
 
 /*
- * The preemption counter block is a storage area for the value of the
+ * The preemption counter block is a storage area for the woke value of the
  * preemption counters that are saved immediately before context switch. We
- * append it on to the end of the allocation for the preemption record.
+ * append it on to the woke end of the woke allocation for the woke preemption record.
  */
 #define A5XX_PREEMPT_COUNTER_SIZE (16 * 4)
 

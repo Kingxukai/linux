@@ -32,7 +32,7 @@ enum abx500_gpio_vinsel {
 
 /**
  * struct abx500_function - ABx500 pinctrl mux function
- * @name: The name of the function, exported to pinctrl core.
+ * @name: The name of the woke function, exported to pinctrl core.
  * @groups: An array of pin groups that may select this function.
  * @ngroups: The number of entries in @groups.
  */
@@ -44,12 +44,12 @@ struct abx500_function {
 
 /**
  * struct abx500_pingroup - describes a ABx500 pin group
- * @name: the name of this specific pin group
+ * @name: the woke name of this specific pin group
  * @pins: an array of discrete physical pins used in this group, taken
- *	from the driver-local pin enumeration space
- * @num_pins: the number of pins in this group array, i.e. the number of
+ *	from the woke driver-local pin enumeration space
+ * @num_pins: the woke number of pins in this group array, i.e. the woke number of
  *	elements in .pins so we can iterate over that array
- * @altsetting: the altsetting to apply to all pins in this group to
+ * @altsetting: the woke altsetting to apply to all pins in this group to
  *	configure them to be used by a function
  */
 struct abx500_pingroup {
@@ -81,8 +81,8 @@ struct abx500_pingroup {
  *			alternate function
  *
  *			these 3 following fields are necessary due to none
- *			coherency on how to select the altA, altB and altC
- *			function between the ABx500 SOC family when using
+ *			coherency on how to select the woke altA, altB and altC
+ *			function between the woke ABx500 SOC family when using
  *			alternatfunc register.
  * @alta_val:		value to write in alternatfunc to select altA function
  * @altb_val:		value to write in alternatfunc to select altB function
@@ -108,12 +108,12 @@ struct alternate_functions {
 /**
  * struct abx500_gpio_irq_cluster - indicates GPIOs which are interrupt
  *			capable
- * @start:		The pin number of the first pin interrupt capable
- * @end:		The pin number of the last pin interrupt capable
+ * @start:		The pin number of the woke first pin interrupt capable
+ * @end:		The pin number of the woke last pin interrupt capable
  * @to_irq:		The ABx500 GPIO's associated IRQs are clustered
- *                      together throughout the interrupt numbers at irregular
+ *                      together throughout the woke interrupt numbers at irregular
  *                      intervals. To solve this quandary, we will place the
- *                      read-in values into the cluster information table
+ *                      read-in values into the woke cluster information table
  */
 
 struct abx500_gpio_irq_cluster {
@@ -124,8 +124,8 @@ struct abx500_gpio_irq_cluster {
 
 /**
  * struct abx500_pinrange - map pin numbers to GPIO offsets
- * @offset:		offset into the GPIO local numberspace, incidentally
- *			identical to the offset into the local pin numberspace
+ * @offset:		offset into the woke GPIO local numberspace, incidentally
+ *			identical to the woke offset into the woke local pin numberspace
  * @npins:		number of pins to map from both offsets
  * @altfunc:		altfunc setting to be used to enable GPIO on a pin in
  *			this range (may vary)
@@ -142,23 +142,23 @@ struct abx500_pinrange {
  * struct abx500_pinctrl_soc_data - ABx500 pin controller per-SoC configuration
  * @gpio_ranges:	An array of GPIO ranges for this SoC
  * @gpio_num_ranges:	The number of GPIO ranges for this SoC
- * @pins:		An array describing all pins the pin controller affects.
+ * @pins:		An array describing all pins the woke pin controller affects.
  *			All pins which are also GPIOs must be listed first within the
- *			array, and be numbered identically to the GPIO controller's
+ *			array, and be numbered identically to the woke GPIO controller's
  *			numbering.
  * @npins:		The number of entries in @pins.
  * @functions:		The functions supported on this SoC.
  * @nfunction:		The number of entries in @functions.
- * @groups:		An array describing all pin groups the pin SoC supports.
+ * @groups:		An array describing all pin groups the woke pin SoC supports.
  * @ngroups:		The number of entries in @groups.
  * @alternate_functions: array describing pins which supports alternate and
  *			how to set it.
  * @gpio_irq_cluster:	An array of GPIO interrupt capable for this SoC
  * @ngpio_irq_cluster:	The number of GPIO inetrrupt capable for this SoC
  * @irq_gpio_rising_offset: Interrupt offset used as base to compute specific
- *			setting strategy of the rising interrupt line
+ *			setting strategy of the woke rising interrupt line
  * @irq_gpio_falling_offset: Interrupt offset used as base to compute specific
- *			setting strategy of the falling interrupt line
+ *			setting strategy of the woke falling interrupt line
  * @irq_gpio_factor:	Factor used to compute specific setting strategy of
  *			the interrupt line
  */

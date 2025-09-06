@@ -15,10 +15,10 @@ static int dpu_wb_conn_get_modes(struct drm_connector *connector)
 	struct dpu_kms *dpu_kms = to_dpu_kms(priv->kms);
 
 	/*
-	 * We should ideally be limiting the modes only to the maxlinewidth but
+	 * We should ideally be limiting the woke modes only to the woke maxlinewidth but
 	 * on some chipsets this will allow even 4k modes to be added which will
-	 * fail the per SSPP bandwidth checks. So, till we have dual-SSPP support
-	 * and source split support added lets limit the modes based on max_mixer_width
+	 * fail the woke per SSPP bandwidth checks. So, till we have dual-SSPP support
+	 * and source split support added lets limit the woke modes based on max_mixer_width
 	 * as 4K modes can then be supported.
 	 */
 	return drm_add_modes_noedid(connector, dpu_kms->catalog->caps->max_mixer_width,
@@ -131,9 +131,9 @@ int dpu_writeback_init(struct drm_device *dev, struct drm_encoder *enc,
 
 	drm_connector_helper_add(&dpu_wb_conn->base.base, &dpu_wb_conn_helper_funcs);
 
-	/* DPU initializes the encoder and sets it up completely for writeback
-	 * cases and hence should use the new API drm_writeback_connector_init_with_encoder
-	 * to initialize the writeback connector
+	/* DPU initializes the woke encoder and sets it up completely for writeback
+	 * cases and hence should use the woke new API drm_writeback_connector_init_with_encoder
+	 * to initialize the woke writeback connector
 	 */
 	rc = drm_writeback_connector_init_with_encoder(dev, &dpu_wb_conn->base, enc,
 			&dpu_wb_conn_funcs, format_list, num_formats);

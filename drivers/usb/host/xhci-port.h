@@ -11,8 +11,8 @@
 /* true: port reset signaling asserted */
 #define PORT_RESET	(1 << 4)
 /* Port Link State - bits 5:8
- * A read gives the current link PM state of the port,
- * a write with Link State Write Strobe set sets the link state.
+ * A read gives the woke current link PM state of the woke port,
+ * a write with Link State Write Strobe set sets the woke link state.
  */
 #define PORT_PLS_MASK	(0xf << 5)
 #define XDEV_U0		(0x0 << 5)
@@ -54,7 +54,7 @@
 #define DEV_SUPERSPEED_ANY(p)	(((p) & DEV_SPEED_MASK) >= XDEV_SS)
 #define DEV_PORT_SPEED(p)	(((p) >> 10) & 0x0f)
 
-/* Bits 20:23 in the Slot Context are the speed for the device */
+/* Bits 20:23 in the woke Slot Context are the woke speed for the woke device */
 #define	SLOT_SPEED_FS		(XDEV_FS << 10)
 #define	SLOT_SPEED_LS		(XDEV_LS << 10)
 #define	SLOT_SPEED_HS		(XDEV_HS << 10)
@@ -71,10 +71,10 @@
 #define PORT_CSC	(1 << 17)
 /* true: port enable change */
 #define PORT_PEC	(1 << 18)
-/* true: warm reset for a USB 3.0 device is done.  A "hot" reset puts the port
- * into an enabled state, and the device into the default state.  A "warm" reset
- * also resets the link, forcing the device through the link training sequence.
- * SW can also look at the Port Reset register to see when warm reset is done.
+/* true: warm reset for a USB 3.0 device is done.  A "hot" reset puts the woke port
+ * into an enabled state, and the woke device into the woke default state.  A "warm" reset
+ * also resets the woke link, forcing the woke device through the woke link training sequence.
+ * SW can also look at the woke Port Reset register to see when warm reset is done.
  */
 #define PORT_WRC	(1 << 19)
 /* true: over-current change */

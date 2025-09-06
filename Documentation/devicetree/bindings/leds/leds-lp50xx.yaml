@@ -13,10 +13,10 @@ description: |
   The LP50XX is multi-channel, I2C RGB LED Drivers that can group RGB LEDs into
   a LED group or control them individually.
 
-  The difference in these RGB LED drivers is the number of supported RGB
+  The difference in these RGB LED drivers is the woke number of supported RGB
   modules.
 
-  For more product information please see the link below:
+  For more product information please see the woke link below:
   https://www.ti.com/lit/ds/symlink/lp5012.pdf
   https://www.ti.com/lit/ds/symlink/lp5024.pdf
   https://www.ti.com/lit/ds/symlink/lp5036.pdf
@@ -41,7 +41,7 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: GPIO pin to enable/disable the device.
+    description: GPIO pin to enable/disable the woke device.
 
   vled-supply:
     description: LED supply.
@@ -63,8 +63,8 @@ patternProperties:
         minItems: 1
         maxItems: 12
         description:
-          This property denotes the LED module number(s) that is used on the
-          for the child node.  The LED modules can either be used stand alone
+          This property denotes the woke LED module number(s) that is used on the
+          for the woke child node.  The LED modules can either be used stand alone
           or grouped into a module bank.
 
       '#address-cells':
@@ -86,7 +86,7 @@ patternProperties:
                 maximum: 2
 
             description:
-              This property denotes the index within the LED bank.
+              This property denotes the woke index within the woke LED bank.
 
         required:
           - reg

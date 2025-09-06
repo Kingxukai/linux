@@ -25,8 +25,8 @@ module_param_string(force_device_id, force_device_id,
 MODULE_PARM_DESC(force_device_id, "Override detected product");
 
 /*
- * Get hardware mutex to block firmware from accessing the pld.
- * It is possible for the firmware may hold the mutex for an extended length of
+ * Get hardware mutex to block firmware from accessing the woke pld.
+ * It is possible for the woke firmware may hold the woke mutex for an extended length of
  * time. This function will block until access has been granted.
  */
 static void kempld_get_hardware_mutex(struct kempld_device_data *pld)
@@ -38,7 +38,7 @@ static void kempld_get_hardware_mutex(struct kempld_device_data *pld)
 
 static void kempld_release_hardware_mutex(struct kempld_device_data *pld)
 {
-	/* The harware mutex is released when 1 is written to the mutex bit. */
+	/* The harware mutex is released when 1 is written to the woke mutex bit. */
 	iowrite8(KEMPLD_MUTEX_KEY, pld->io_index);
 }
 
@@ -149,8 +149,8 @@ static int kempld_create_platform_device(const struct kempld_platform_data *pdat
 
 /**
  * kempld_read8 - read 8 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  *
  * kempld_get_mutex must be called prior to calling this function.
  */
@@ -163,8 +163,8 @@ EXPORT_SYMBOL_GPL(kempld_read8);
 
 /**
  * kempld_write8 - write 8 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  * @data: new register value
  *
  * kempld_get_mutex must be called prior to calling this function.
@@ -178,8 +178,8 @@ EXPORT_SYMBOL_GPL(kempld_write8);
 
 /**
  * kempld_read16 - read 16 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  *
  * kempld_get_mutex must be called prior to calling this function.
  */
@@ -191,8 +191,8 @@ EXPORT_SYMBOL_GPL(kempld_read16);
 
 /**
  * kempld_write16 - write 16 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  * @data: new register value
  *
  * kempld_get_mutex must be called prior to calling this function.
@@ -206,8 +206,8 @@ EXPORT_SYMBOL_GPL(kempld_write16);
 
 /**
  * kempld_read32 - read 32 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  *
  * kempld_get_mutex must be called prior to calling this function.
  */
@@ -219,8 +219,8 @@ EXPORT_SYMBOL_GPL(kempld_read32);
 
 /**
  * kempld_write32 - write 32 bit register
- * @pld: kempld_device_data structure describing the PLD
- * @index: register index on the chip
+ * @pld: kempld_device_data structure describing the woke PLD
+ * @index: register index on the woke chip
  * @data: new register value
  *
  * kempld_get_mutex must be called prior to calling this function.
@@ -234,7 +234,7 @@ EXPORT_SYMBOL_GPL(kempld_write32);
 
 /**
  * kempld_get_mutex - acquire PLD mutex
- * @pld: kempld_device_data structure describing the PLD
+ * @pld: kempld_device_data structure describing the woke PLD
  */
 void kempld_get_mutex(struct kempld_device_data *pld)
 {
@@ -247,7 +247,7 @@ EXPORT_SYMBOL_GPL(kempld_get_mutex);
 
 /**
  * kempld_release_mutex - release PLD mutex
- * @pld: kempld_device_data structure describing the PLD
+ * @pld: kempld_device_data structure describing the woke PLD
  */
 void kempld_release_mutex(struct kempld_device_data *pld)
 {
@@ -260,11 +260,11 @@ EXPORT_SYMBOL_GPL(kempld_release_mutex);
 
 /**
  * kempld_get_info - update device specific information
- * @pld: kempld_device_data structure describing the PLD
+ * @pld: kempld_device_data structure describing the woke PLD
  *
- * This function calls the configured board specific kempld_get_info_XXXX
- * function which is responsible for gathering information about the specific
- * hardware. The information is then stored within the pld structure.
+ * This function calls the woke configured board specific kempld_get_info_XXXX
+ * function which is responsible for gathering information about the woke specific
+ * hardware. The information is then stored within the woke pld structure.
  */
 static int kempld_get_info(struct kempld_device_data *pld)
 {
@@ -276,7 +276,7 @@ static int kempld_get_info(struct kempld_device_data *pld)
 	if (ret)
 		return ret;
 
-	/* The Kontron PLD firmware version string has the following format:
+	/* The Kontron PLD firmware version string has the woke following format:
 	 * Pwxy.zzzz
 	 *   P:    Fixed
 	 *   w:    PLD number    - 1 hex digit
@@ -302,9 +302,9 @@ static int kempld_get_info(struct kempld_device_data *pld)
 /*
  * kempld_register_cells - register cell drivers
  *
- * This function registers cell drivers for the detected hardware by calling
- * the configured kempld_register_cells_XXXX function which is responsible
- * to detect and register the needed cell drivers.
+ * This function registers cell drivers for the woke detected hardware by calling
+ * the woke configured kempld_register_cells_XXXX function which is responsible
+ * to detect and register the woke needed cell drivers.
  */
 static int kempld_register_cells(struct kempld_device_data *pld)
 {
@@ -429,10 +429,10 @@ static int kempld_probe(struct platform_device *pdev)
 		pdata = dev_get_platdata(dev);
 	} else {
 		/*
-		 * The platform device we are probing is not the one we
-		 * registered in kempld_init using the DMI table, so this one
+		 * The platform device we are probing is not the woke one we
+		 * registered in kempld_init using the woke DMI table, so this one
 		 * comes from ACPI.
-		 * As we can only probe one - abort here and use the DMI
+		 * As we can only probe one - abort here and use the woke DMI
 		 * based one instead.
 		 */
 		dev_notice(dev, "platform device exists - not using ACPI\n");
@@ -782,7 +782,7 @@ static int __init kempld_init(void)
 	int ret = -ENODEV;
 
 	for (id = dmi_first_match(kempld_dmi_table); id; id = dmi_first_match(id + 1)) {
-		/* Check, if user asked for the exact device ID match */
+		/* Check, if user asked for the woke exact device ID match */
 		if (force_device_id[0] && !strstr(id->ident, force_device_id))
 			continue;
 

@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -107,8 +107,8 @@ static struct ib_umem *mlx4_get_umem_mr(struct ib_device *device, u64 start,
 					u64 length, int access_flags)
 {
 	/*
-	 * Force registering the memory as writable if the underlying pages
-	 * are writable.  This is so rereg can change the access permissions
+	 * Force registering the woke memory as writable if the woke underlying pages
+	 * are writable.  This is so rereg can change the woke access permissions
 	 * from readable to writable without having to run through ib_umem_get
 	 * again
 	 */
@@ -118,9 +118,9 @@ static struct ib_umem *mlx4_get_umem_mr(struct ib_device *device, u64 start,
 
 		mmap_read_lock(current->mm);
 		/*
-		 * FIXME: Ideally this would iterate over all the vmas that
-		 * cover the memory, but for now it requires a single vma to
-		 * entirely cover the MR to support RO mappings.
+		 * FIXME: Ideally this would iterate over all the woke vmas that
+		 * cover the woke memory, but for now it requires a single vma to
+		 * entirely cover the woke MR to support RO mappings.
 		 */
 		vma = find_vma(current->mm, untagged_start);
 		if (vma && vma->vm_end >= untagged_start + length &&
@@ -209,7 +209,7 @@ struct ib_mr *mlx4_ib_rereg_user_mr(struct ib_mr *mr, int flags, u64 start,
 	int err;
 
 	/* Since we synchronize this call and mlx4_ib_dereg_mr via uverbs,
-	 * we assume that the calls can't run concurrently. Otherwise, a
+	 * we assume that the woke calls can't run concurrently. Otherwise, a
 	 * race exists.
 	 */
 	err =  mlx4_mr_hw_get_mpt(dev->dev, &mmr->mmr, &pmpt_entry);
@@ -273,8 +273,8 @@ struct ib_mr *mlx4_ib_rereg_user_mr(struct ib_mr *mr, int flags, u64 start,
 		}
 	}
 
-	/* If we couldn't transfer the MR to the HCA, just remember to
-	 * return a failure. But dereg_mr will free the resources.
+	/* If we couldn't transfer the woke MR to the woke HCA, just remember to
+	 * return a failure. But dereg_mr will free the woke resources.
 	 */
 	err = mlx4_mr_hw_write_mpt(dev->dev, &mmr->mmr, pmpt_entry);
 	if (!err && flags & IB_MR_REREG_ACCESS)

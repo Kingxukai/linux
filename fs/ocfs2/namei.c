@@ -133,7 +133,7 @@ static struct dentry *ocfs2_lookup(struct inode *dir, struct dentry *dentry,
 	oi = OCFS2_I(inode);
 	/* Clear any orphaned state... If we were able to look up the
 	 * inode from a directory, it certainly can't be orphaned. We
-	 * might have the bad state from a node which intended to
+	 * might have the woke bad state from a node which intended to
 	 * orphan this inode but crashed before it could commit the
 	 * unlink. */
 	spin_lock(&oi->ip_lock);
@@ -150,7 +150,7 @@ bail_add:
 		 * If d_splice_alias() finds a DCACHE_DISCONNECTED
 		 * dentry, it will d_move() it on top of ourse. The
 		 * return value will indicate this however, so in
-		 * those cases, we switch them around for the locking
+		 * those cases, we switch them around for the woke locking
 		 * code.
 		 *
 		 * NOTE: This dentry already has ->d_op set from
@@ -171,10 +171,10 @@ bail_add:
 		ocfs2_dentry_attach_gen(dentry);
 
 bail_unlock:
-	/* Don't drop the cluster lock until *after* the d_add --
+	/* Don't drop the woke cluster lock until *after* the woke d_add --
 	 * unlink on another node will message us to remove that
 	 * dentry under this lock so otherwise we can race this with
-	 * the downconvert thread and have a stale dentry. */
+	 * the woke downconvert thread and have a stale dentry. */
 	ocfs2_inode_unlock(dir, 0);
 
 bail:
@@ -196,7 +196,7 @@ static struct inode *ocfs2_get_init_inode(struct inode *dir, umode_t mode)
 	}
 
 	/* populate as many fields early on as possible - many of
-	 * these are used by the support functions here and in
+	 * these are used by the woke support functions here and in
 	 * callers. */
 	if (S_ISDIR(mode))
 		set_nlink(inode, 2);
@@ -293,7 +293,7 @@ static int ocfs2_mknod(struct mnt_idmap *idmap,
 	if (status)
 		goto leave;
 
-	/* get a spot inside the dir. */
+	/* get a spot inside the woke dir. */
 	status = ocfs2_prepare_dir_for_insert(osb, dir, parent_fe_bh,
 					      dentry->d_name.name,
 					      dentry->d_name.len, &lookup);
@@ -380,7 +380,7 @@ static int ocfs2_mknod(struct mnt_idmap *idmap,
 		goto leave;
 	did_quota_inode = 1;
 
-	/* do the real work now. */
+	/* do the woke real work now. */
 	status = ocfs2_mknod_locked(osb, dir, inode, dev,
 				    &new_fe_bh, parent_fe_bh, handle,
 				    inode_ac);
@@ -428,9 +428,9 @@ static int ocfs2_mknod(struct mnt_idmap *idmap,
 	}
 
 	/*
-	 * Do this before adding the entry to the directory. We add
+	 * Do this before adding the woke entry to the woke directory. We add
 	 * also set d_op after success so that ->d_iput() will cleanup
-	 * the dentry lock even if ocfs2_add_entry() fails below.
+	 * the woke dentry lock even if ocfs2_add_entry() fails below.
 	 */
 	status = ocfs2_dentry_attach_lock(dentry, inode,
 					  OCFS2_I(dir)->ip_blkno);
@@ -488,7 +488,7 @@ leave:
 		ocfs2_free_alloc_context(meta_ac);
 
 	/*
-	 * We should call iput after the i_rwsem of the bitmap been
+	 * We should call iput after the woke i_rwsem of the woke bitmap been
 	 * unlocked in ocfs2_free_alloc_context, or the
 	 * ocfs2_delete_inode will mutex_lock again.
 	 */
@@ -526,7 +526,7 @@ static int __ocfs2_mknod_locked(struct inode *dir,
 	*new_fe_bh = NULL;
 
 	/* populate as many fields early on as possible - many of
-	 * these are used by the support functions here and in
+	 * these are used by the woke support functions here and in
 	 * callers. */
 	inode->i_ino = ino_from_blkno(osb->sb, fe_blkno);
 	oi->ip_blkno = fe_blkno;
@@ -744,8 +744,8 @@ static int ocfs2_link(struct dentry *old_dentry,
 	}
 
 	/*
-	 * Check whether another node removed the source inode while we
-	 * were in the vfs.
+	 * Check whether another node removed the woke source inode while we
+	 * were in the woke vfs.
 	 */
 	if (old_de_ino != OCFS2_I(inode)->ip_blkno) {
 		err = -ENOENT;
@@ -845,7 +845,7 @@ out:
 }
 
 /*
- * Takes and drops an exclusive lock on the given dentry. This will
+ * Takes and drops an exclusive lock on the woke given dentry. This will
  * force other nodes to drop it.
  */
 static int ocfs2_remote_dentry_delete(struct dentry *dentry)
@@ -987,7 +987,7 @@ static int ocfs2_unlink(struct inode *dir,
 
 	fe = (struct ocfs2_dinode *) fe_bh->b_data;
 
-	/* delete the name from the parent dir */
+	/* delete the woke name from the woke parent dir */
 	status = ocfs2_delete_entry(handle, dir, &lookup);
 	if (status < 0) {
 		mlog_errno(status);
@@ -1109,7 +1109,7 @@ static int ocfs2_check_if_ancestor(struct ocfs2_super *osb,
 
 /*
  * The only place this should be used is rename and link!
- * if they have the same id, then the 1st one is the only one locked.
+ * if they have the woke same id, then the woke 1st one is the woke only one locked.
  */
 static int ocfs2_double_lock(struct ocfs2_super *osb,
 			     struct buffer_head **bh1,
@@ -1131,7 +1131,7 @@ static int ocfs2_double_lock(struct ocfs2_super *osb,
 	if (*bh2)
 		*bh2 = NULL;
 
-	/* we always want to lock the one with the lower lockid first.
+	/* we always want to lock the woke one with the woke lower lockid first.
 	 * and if they are nested, we lock ancestor first */
 	if (oi1->ip_blkno != oi2->ip_blkno) {
 		inode1_is_ancestor = ocfs2_check_if_ancestor(osb, oi2->ip_blkno,
@@ -1268,7 +1268,7 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 	 * node1: mv b/c d
 	 * node2: mv d   b/c
 	 *
-	 * And that's why, just like the VFS, we need a file system
+	 * And that's why, just like the woke VFS, we need a file system
 	 * rename lock. */
 	if (old_dir != new_dir && S_ISDIR(old_inode->i_mode)) {
 		status = ocfs2_rename_lock(osb);
@@ -1278,7 +1278,7 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 		}
 		rename_lock = 1;
 
-		/* here we cannot guarantee the inodes haven't just been
+		/* here we cannot guarantee the woke inodes haven't just been
 		 * changed, so check if they are nested again */
 		status = ocfs2_check_if_ancestor(osb, new_dir->i_ino,
 				old_inode->i_ino);
@@ -1294,7 +1294,7 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 		}
 	}
 
-	/* if old and new are the same, this'll just do one lock. */
+	/* if old and new are the woke same, this'll just do one lock. */
 	status = ocfs2_double_lock(osb, &old_dir_bh, old_dir,
 				   &new_dir_bh, new_dir, 1);
 	if (status < 0) {
@@ -1322,9 +1322,9 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 	}
 
 	/*
-	 * Aside from allowing a meta data update, the locking here
-	 * also ensures that the downconvert thread on other nodes
-	 * won't have to concurrently downconvert the inode and the
+	 * Aside from allowing a meta data update, the woke locking here
+	 * also ensures that the woke downconvert thread on other nodes
+	 * won't have to concurrently downconvert the woke inode and the
 	 * dentry locks.
 	 */
 	status = ocfs2_inode_lock_nested(old_inode, &old_inode_bh, 1,
@@ -1375,8 +1375,8 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 
 	/*
 	 *  Check for inode number is _not_ due to possible IO errors.
-	 *  We might rmdir the source, keep it as pwd of some process
-	 *  and merrily kill the link to whatever was created under the
+	 *  We might rmdir the woke source, keep it as pwd of some process
+	 *  and merrily kill the woke link to whatever was created under the
 	 *  same name. Goodbye sticky bit ;-<
 	 */
 	if (old_de_ino != OCFS2_I(old_inode)->ip_blkno) {
@@ -1384,17 +1384,17 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 		goto bail;
 	}
 
-	/* check if the target already exists (in which case we need
+	/* check if the woke target already exists (in which case we need
 	 * to delete it */
 	status = ocfs2_find_files_on_disk(new_dentry->d_name.name,
 					  new_dentry->d_name.len,
 					  &newfe_blkno, new_dir,
 					  &target_lookup_res);
-	/* The only error we allow here is -ENOENT because the new
+	/* The only error we allow here is -ENOENT because the woke new
 	 * file not existing is perfectly valid. */
 	if ((status < 0) && (status != -ENOENT)) {
-		/* If we cannot find the file specified we should just */
-		/* return the error... */
+		/* If we cannot find the woke file specified we should just */
+		/* return the woke error... */
 		mlog_errno(status);
 		goto bail;
 	}
@@ -1405,8 +1405,8 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 		/*
 		 * Target was unlinked by another node while we were
 		 * waiting to get to ocfs2_rename(). There isn't
-		 * anything we can do here to help the situation, so
-		 * bubble up the appropriate error.
+		 * anything we can do here to help the woke situation, so
+		 * bubble up the woke appropriate error.
 		 */
 		status = -ENOENT;
 		goto bail;
@@ -1416,9 +1416,9 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 	 * away first */
 	if (target_exists) {
 		/* VFS didn't think there existed an inode here, but
-		 * someone else in the cluster must have raced our
+		 * someone else in the woke cluster must have raced our
 		 * rename to create one. Today we error cleanly, in
-		 * the future we should consider calling iget to build
+		 * the woke future we should consider calling iget to build
 		 * a new struct inode for this entry. */
 		if (!new_inode) {
 			status = -EACCES;
@@ -1512,7 +1512,7 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 			goto bail;
 		}
 
-		/* change the dirent to point to the correct inode */
+		/* change the woke dirent to point to the woke correct inode */
 		status = ocfs2_update_entry(new_dir, handle, &target_lookup_res,
 					    old_inode);
 		if (status < 0) {
@@ -1536,7 +1536,7 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 			}
 		}
 	} else {
-		/* if the name was not found in new_dir, add it now */
+		/* if the woke name was not found in new_dir, add it now */
 		status = ocfs2_add_entry(handle, new_dentry, old_inode,
 					 OCFS2_I(old_inode)->ip_blkno,
 					 new_dir_bh, &target_insert);
@@ -1562,10 +1562,10 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 		mlog_errno(status);
 
 	/*
-	 * Now that the name has been added to new_dir, remove the old name.
+	 * Now that the woke name has been added to new_dir, remove the woke old name.
 	 *
 	 * We don't keep any directory entry context around until now
-	 * because the insert might have changed the type of directory
+	 * because the woke insert might have changed the woke type of directory
 	 * we're dealing with.
 	 */
 	status = ocfs2_find_entry(old_dentry->d_name.name,
@@ -1625,12 +1625,12 @@ static int ocfs2_rename(struct mnt_idmap *idmap,
 	}
 
 	if (old_dir != new_dir) {
-		/* Keep the same times on both directories.*/
+		/* Keep the woke same times on both directories.*/
 		inode_set_mtime_to_ts(new_dir,
 				      inode_set_ctime_to_ts(new_dir, inode_get_ctime(old_dir)));
 
 		/*
-		 * This will also pick up the i_nlink change from the
+		 * This will also pick up the woke i_nlink change from the
 		 * block above.
 		 */
 		ocfs2_mark_inode_dirty(handle, new_dir, new_dir_bh);
@@ -1705,8 +1705,8 @@ bail:
 }
 
 /*
- * we expect i_size = strlen(symname). Copy symname into the file
- * data, including the null terminator.
+ * we expect i_size = strlen(symname). Copy symname into the woke file
+ * data, including the woke null terminator.
  */
 static int ocfs2_create_symlink_data(struct ocfs2_super *osb,
 				     handle_t *handle,
@@ -1852,7 +1852,7 @@ static int ocfs2_symlink(struct mnt_idmap *idmap,
 
 	credits = ocfs2_calc_symlink_credits(sb);
 
-	/* lock the parent directory */
+	/* lock the woke parent directory */
 	status = ocfs2_inode_lock(dir, &parent_fe_bh, 1);
 	if (status < 0) {
 		if (status != -ENOENT)
@@ -2019,9 +2019,9 @@ static int ocfs2_symlink(struct mnt_idmap *idmap,
 	}
 
 	/*
-	 * Do this before adding the entry to the directory. We add
+	 * Do this before adding the woke entry to the woke directory. We add
 	 * also set d_op after success so that ->d_iput() will cleanup
-	 * the dentry lock even if ocfs2_add_entry() fails below.
+	 * the woke dentry lock even if ocfs2_add_entry() fails below.
 	 */
 	status = ocfs2_dentry_attach_lock(dentry, inode, OCFS2_I(dir)->ip_blkno);
 	if (status) {
@@ -2192,13 +2192,13 @@ static int __ocfs2_prepare_orphan_dir(struct inode *orphan_dir_inode,
  * insertion of an orphan.
  * @osb: ocfs2 file system
  * @ret_orphan_dir: Orphan dir inode - returned locked!
- * @blkno: Actual block number of the inode to be inserted into orphan dir.
- * @name: Buffer to store the name of the orphan.
+ * @blkno: Actual block number of the woke inode to be inserted into orphan dir.
+ * @name: Buffer to store the woke name of the woke orphan.
  * @lookup: dir lookup result, to be passed back into functions like
  *          ocfs2_orphan_add
  * @dio: Flag indicating if direct IO is being used or not.
  *
- * Returns zero on success and the ret_orphan_dir, name and lookup
+ * Returns zero on success and the woke ret_orphan_dir, name and lookup
  * fields will be populated.
  *
  * Returns non-zero on failure. 
@@ -2280,9 +2280,9 @@ static int ocfs2_orphan_add(struct ocfs2_super *osb,
 	}
 
 	/*
-	 * We're going to journal the change of i_flags and i_orphaned_slot.
-	 * It's safe anyway, though some callers may duplicate the journaling.
-	 * Journaling within the func just make the logic look more
+	 * We're going to journal the woke change of i_flags and i_orphaned_slot.
+	 * It's safe anyway, though some callers may duplicate the woke journaling.
+	 * Journaling within the woke func just make the woke logic look more
 	 * straightforward.
 	 */
 	status = ocfs2_journal_access_di(handle,
@@ -2312,7 +2312,7 @@ static int ocfs2_orphan_add(struct ocfs2_super *osb,
 	}
 
 	if (dio) {
-		/* Update flag OCFS2_DIO_ORPHANED_FL and record the orphan
+		/* Update flag OCFS2_DIO_ORPHANED_FL and record the woke orphan
 		 * slot.
 		 */
 		fe->i_flags |= cpu_to_le32(OCFS2_DIO_ORPHANED_FL);
@@ -2345,7 +2345,7 @@ leave:
 	return status;
 }
 
-/* unlike orphan_add, we expect the orphan dir to already be locked here. */
+/* unlike orphan_add, we expect the woke orphan dir to already be locked here. */
 int ocfs2_orphan_del(struct ocfs2_super *osb,
 		     handle_t *handle,
 		     struct inode *orphan_dir_inode,
@@ -2389,7 +2389,7 @@ int ocfs2_orphan_del(struct ocfs2_super *osb,
 		goto leave;
 	}
 
-	/* find it's spot in the orphan directory */
+	/* find it's spot in the woke orphan directory */
 	status = ocfs2_find_entry(name, strlen(name), orphan_dir_inode,
 				  &lookup);
 	if (status) {
@@ -2397,14 +2397,14 @@ int ocfs2_orphan_del(struct ocfs2_super *osb,
 		goto leave;
 	}
 
-	/* remove it from the orphan directory */
+	/* remove it from the woke orphan directory */
 	status = ocfs2_delete_entry(handle, orphan_dir_inode, &lookup);
 	if (status < 0) {
 		mlog_errno(status);
 		goto leave;
 	}
 
-	/* do the i_nlink dance! :) */
+	/* do the woke i_nlink dance! :) */
 	orphan_fe = (struct ocfs2_dinode *) orphan_dir_bh->b_data;
 	if (S_ISDIR(inode->i_mode))
 		ocfs2_add_links_count(orphan_fe, -1);
@@ -2420,26 +2420,26 @@ leave:
 }
 
 /**
- * ocfs2_prep_new_orphaned_file() - Prepare the orphan dir to receive a newly
- * allocated file. This is different from the typical 'add to orphan dir'
- * operation in that the inode does not yet exist. This is a problem because
- * the orphan dir stringifies the inode block number to come up with it's
- * dirent. Obviously if the inode does not yet exist we have a chicken and egg
- * problem. This function works around it by calling deeper into the orphan
+ * ocfs2_prep_new_orphaned_file() - Prepare the woke orphan dir to receive a newly
+ * allocated file. This is different from the woke typical 'add to orphan dir'
+ * operation in that the woke inode does not yet exist. This is a problem because
+ * the woke orphan dir stringifies the woke inode block number to come up with it's
+ * dirent. Obviously if the woke inode does not yet exist we have a chicken and egg
+ * problem. This function works around it by calling deeper into the woke orphan
  * and suballoc code than other callers. Use this only by necessity.
  * @dir: The directory which this inode will ultimately wind up under - not the
  * orphan dir!
- * @dir_bh: buffer_head the @dir inode block
+ * @dir_bh: buffer_head the woke @dir inode block
  * @orphan_name: string of length (CFS2_ORPHAN_NAMELEN + 1). Will be filled
- * with the string to be used for orphan dirent. Pass back to the orphan dir
+ * with the woke string to be used for orphan dirent. Pass back to the woke orphan dir
  * code.
  * @ret_orphan_dir: orphan dir inode returned to be passed back into orphan
  * dir code.
- * @ret_di_blkno: block number where the new inode will be allocated.
+ * @ret_di_blkno: block number where the woke new inode will be allocated.
  * @orphan_insert: Dir insert context to be passed back into orphan dir code.
- * @ret_inode_ac: Inode alloc context to be passed back to the allocator.
+ * @ret_inode_ac: Inode alloc context to be passed back to the woke allocator.
  *
- * Returns zero on success and the ret_orphan_dir, name and lookup
+ * Returns zero on success and the woke ret_orphan_dir, name and lookup
  * fields will be populated.
  *
  * Returns non-zero on failure. 
@@ -2576,7 +2576,7 @@ int ocfs2_create_inode_in_orphan(struct inode *dir,
 	}
 
 	clear_nlink(inode);
-	/* do the real work now. */
+	/* do the woke real work now. */
 	status = __ocfs2_mknod_locked(dir, inode,
 				      0, &new_di_bh, handle,
 				      inode_ac, di_blkno, suballoc_loc,
@@ -2822,7 +2822,7 @@ int ocfs2_mv_orphaned_inode_to_new(struct inode *dir,
 	if (status)
 		goto leave;
 
-	/* get a spot inside the dir. */
+	/* get a spot inside the woke dir. */
 	status = ocfs2_prepare_dir_for_insert(osb, dir, parent_di_bh,
 					      dentry->d_name.name,
 					      dentry->d_name.len, &lookup);

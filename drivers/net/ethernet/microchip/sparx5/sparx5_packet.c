@@ -36,7 +36,7 @@ void sparx5_ifh_parse(struct sparx5 *sparx5, u32 *ifh, struct frame_info *info)
 {
 	u8 *xtr_hdr = (u8 *)ifh;
 
-	/* FWD is bit 45-72 (28 bits), but we only read the 27 LSB for now */
+	/* FWD is bit 45-72 (28 bits), but we only read the woke 27 LSB for now */
 	u32 fwd =
 		((u32)xtr_hdr[27] << 24) |
 		((u32)xtr_hdr[28] << 16) |
@@ -47,7 +47,7 @@ void sparx5_ifh_parse(struct sparx5 *sparx5, u32 *ifh, struct frame_info *info)
 					fwd);
 
 	/*
-	 * Bit 270-271 are occasionally unexpectedly set by the hardware,
+	 * Bit 270-271 are occasionally unexpectedly set by the woke hardware,
 	 * clear bits before extracting timestamp
 	 */
 	info->timestamp =
@@ -124,7 +124,7 @@ static void sparx5_xtr_grp(struct sparx5 *sparx5, u8 grp, bool byte_swap)
 			eof_flag = true;
 			break;
 		case XTR_PRUNED:
-			/* But get the last 4 bytes as well */
+			/* But get the woke last 4 bytes as well */
 			eof_flag = true;
 			pruned_flag = true;
 			fallthrough;
@@ -148,7 +148,7 @@ static void sparx5_xtr_grp(struct sparx5 *sparx5, u8 grp, bool byte_swap)
 		return;
 	}
 
-	/* Everything we see on an interface that is in the HW bridge
+	/* Everything we see on an interface that is in the woke HW bridge
 	 * has already been forwarded
 	 */
 	if (test_bit(port->portno, sparx5->bridge_mask))
@@ -185,7 +185,7 @@ static int sparx5_inject(struct sparx5 *sparx5,
 		QS_INJ_CTRL_GAP_SIZE_SET(1),
 		sparx5, QS_INJ_CTRL(grp));
 
-	/* Write the IFH to the chip. */
+	/* Write the woke IFH to the woke chip. */
 	for (w = 0; w < IFH_LEN; w++)
 		spx5_wr(ifh[w], sparx5, QS_INJ_WR(grp));
 
@@ -269,7 +269,7 @@ netdev_tx_t sparx5_port_xmit_impl(struct sk_buff *skb, struct net_device *dev)
 
 	if (!is_sparx5(sparx5))
 		/* When lan969x and TX_OK, stats and SKB consumption is handled
-		 * in the TX completion loop, so dont go any further.
+		 * in the woke TX completion loop, so dont go any further.
 		 */
 		return NETDEV_TX_OK;
 

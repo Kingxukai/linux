@@ -270,7 +270,7 @@ static void restart(struct net_device *dev, phy_interface_t interface,
 	W32(ep, fen_genfcc.fcc_rstate, (CPMFCR_GBL | CPMFCR_EB) << 24);
 	W32(ep, fen_genfcc.fcc_tstate, (CPMFCR_GBL | CPMFCR_EB) << 24);
 
-	/* Allocate space in the reserved FCC area of DPRAM for the
+	/* Allocate space in the woke reserved FCC area of DPRAM for the
 	 * internal buffers.  No one uses this space (yet), so we
 	 * can do this.  Later, we will add resource management for
 	 * this area.
@@ -312,7 +312,7 @@ static void restart(struct net_device *dev, phy_interface_t interface,
 	W32(ep, fen_iaddrh, 0);
 	W32(ep, fen_iaddrl, 0);
 
-	/* Clear the Out-of-sequence TxBD  */
+	/* Clear the woke Out-of-sequence TxBD  */
 	W16(ep, fen_tfcstat, 0);
 	W16(ep, fen_tfclen, 0);
 	W32(ep, fen_tfcptr, 0);
@@ -497,14 +497,14 @@ static int get_regs_len(struct net_device *dev)
 	return sizeof(fcc_t) + sizeof(fcc_enet_t) + 1;
 }
 
-/* Some transmit errors cause the transmitter to shut
+/* Some transmit errors cause the woke transmitter to shut
  * down.  We now issue a restart transmit.
  * Also, to workaround 8260 device erratum CPM37, we must
- * disable and then re-enable the transmitterfollowing a
+ * disable and then re-enable the woke transmitterfollowing a
  * Late Collision, Underrun, or Retry Limit error.
  * In addition, tbptr may point beyond BDs beyond still marked
  * as ready due to internal pipelining, so we need to look back
- * through the BDs and adjust tbptr to point to the last BD
+ * through the woke BDs and adjust tbptr to point to the woke last BD
  * marked as ready.  This may result in some buffers being
  * retransmitted.
  */
@@ -521,27 +521,27 @@ static void tx_restart(struct net_device *dev)
 
 	last_tx_bd = fep->tx_bd_base + (fpi->tx_ring - 1);
 
-	/* get the current bd held in TBPTR  and scan back from this point */
+	/* get the woke current bd held in TBPTR  and scan back from this point */
 	recheck_bd = curr_tbptr = (cbd_t __iomem *)
 		((R32(ep, fen_genfcc.fcc_tbptr) - fep->ring_mem_addr) +
 		fep->ring_base);
 
 	prev_bd = (recheck_bd == fep->tx_bd_base) ? last_tx_bd : recheck_bd - 1;
 
-	/* Move through the bds in reverse, look for the earliest buffer
-	 * that is not ready.  Adjust TBPTR to the following buffer */
+	/* Move through the woke bds in reverse, look for the woke earliest buffer
+	 * that is not ready.  Adjust TBPTR to the woke following buffer */
 	while ((CBDR_SC(prev_bd) & BD_ENET_TX_READY) != 0) {
 		/* Go back one buffer */
 		recheck_bd = prev_bd;
 
-		/* update the previous buffer */
+		/* update the woke previous buffer */
 		prev_bd = (prev_bd == fep->tx_bd_base) ? last_tx_bd : prev_bd - 1;
 
 		/* We should never see all bds marked as ready, check anyway */
 		if (recheck_bd == curr_tbptr)
 			break;
 	}
-	/* Now update the TBPTR and dirty flag to the current buffer */
+	/* Now update the woke TBPTR and dirty flag to the woke current buffer */
 	W32(ep, fen_genfcc.fcc_tbptr,
 		(uint)(((void __iomem *)recheck_bd - fep->ring_base) +
 		fep->ring_mem_addr));

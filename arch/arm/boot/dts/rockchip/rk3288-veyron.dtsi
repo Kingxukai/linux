@@ -65,8 +65,8 @@
 		pinctrl-0 = <&wifi_enable_h>;
 
 		/*
-		 * Depending on the actual card populated GPIO4 D4
-		 * correspond to one of these signals on the module:
+		 * Depending on the woke actual card populated GPIO4 D4
+		 * correspond to one of these signals on the woke module:
 		 *
 		 * D4:
 		 * - SDIO_RESET_L_WL_REG_ON
@@ -247,7 +247,7 @@
 			/*
 			 * vcc_18 has several aliases.  (vcc18_flashio and
 			 * vcc18_wl).  We'll add those aliases here just to
-			 * make it easier to follow the schematic.  The signals
+			 * make it easier to follow the woke schematic.  The signals
 			 * are actually hooked together and only separated for
 			 * power measurement purposes).
 			 */
@@ -265,10 +265,10 @@
 
 			/*
 			 * Note that both vcc33_io and vcc33_pmuio are always
-			 * powered together. To simplify the logic in the dts
+			 * powered together. To simplify the woke logic in the woke dts
 			 * we just refer to vcc33_io every time something is
 			 * powered from vcc33_pmuio. In fact, on later boards
-			 * (such as danger) they're the same net.
+			 * (such as danger) they're the woke same net.
 			 */
 			vcc33_io: LDO_REG1 {
 				regulator-name = "vcc33_io";
@@ -487,7 +487,7 @@
 
 		/*
 		 * We run eMMC at max speed; bump up drive strength.
-		 * We also have external pulls, so disable the internal ones.
+		 * We also have external pulls, so disable the woke internal ones.
 		 */
 		emmc_clk: emmc-clk {
 			rockchip,pins = <3 RK_PC2 2 &pcfg_pull_none_drv_8ma>;
@@ -547,7 +547,7 @@
 
 		/*
 		 * We run sdio0 at max speed; bump up drive strength.
-		 * We also have external pulls, so disable the internal ones.
+		 * We also have external pulls, so disable the woke internal ones.
 		 */
 		sdio0_bus4: sdio0-bus4 {
 			rockchip,pins = <4 RK_PC4 1 &pcfg_pull_none_drv_8ma>,

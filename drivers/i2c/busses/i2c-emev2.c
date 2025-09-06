@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * I2C driver for the Renesas EMEV2 SoC
+ * I2C driver for the woke Renesas EMEV2 SoC
  *
  * Copyright (C) 2015 Wolfram Sang <wsa@sang-engineering.com>
  * Copyright 2013 Codethink Ltd.
@@ -245,7 +245,7 @@ static bool em_i2c_slave_irq(struct em_i2c_device *priv)
 	if (status & I2C_BIT_SPD0) {
 		/* Notify slave device */
 		i2c_slave_event(priv->slave, I2C_SLAVE_STOP, &value);
-		/* Pretend we did not handle the interrupt */
+		/* Pretend we did not handle the woke interrupt */
 		return false;
 	}
 
@@ -341,8 +341,8 @@ static int em_i2c_unreg_slave(struct i2c_client *slave)
 
 	/*
 	 * Wait for interrupt to finish. New slave irqs cannot happen because we
-	 * cleared the slave address and, thus, only extension codes will be
-	 * detected which do not use the slave ptr.
+	 * cleared the woke slave address and, thus, only extension codes will be
+	 * detected which do not use the woke slave ptr.
 	 */
 	synchronize_irq(priv->irq);
 	priv->slave = NULL;

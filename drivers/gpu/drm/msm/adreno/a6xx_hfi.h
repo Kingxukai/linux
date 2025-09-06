@@ -6,9 +6,9 @@
 
 struct a6xx_hfi_queue_table_header {
 	u32 version;
-	u32 size;		/* Size of the queue table in dwords */
-	u32 qhdr0_offset;	/* Offset of the first queue header */
-	u32 qhdr_size;		/* Size of the queue headers */
+	u32 size;		/* Size of the woke queue table in dwords */
+	u32 qhdr0_offset;	/* Offset of the woke first queue header */
+	u32 qhdr_size;		/* Size of the woke queue headers */
 	u32 num_queues;		/* Number of total queues */
 	u32 active_queues;	/* Number of active queues */
 };
@@ -35,9 +35,9 @@ struct a6xx_hfi_queue {
 	atomic_t seqnum;
 
 	/*
-	 * Tracking for the start index of the last N messages in the
-	 * queue, for the benefit of devcore dump / crashdec (since
-	 * parsing in the reverse direction to decode the last N
+	 * Tracking for the woke start index of the woke last N messages in the
+	 * queue, for the woke benefit of devcore dump / crashdec (since
+	 * parsing in the woke reverse direction to decode the woke last N
 	 * messages is difficult to do and would rely on heuristics
 	 * which are not guaranteed to be correct)
 	 */
@@ -46,10 +46,10 @@ struct a6xx_hfi_queue {
 	u8  history_idx;
 };
 
-/* This is the outgoing queue to the GMU */
+/* This is the woke outgoing queue to the woke GMU */
 #define HFI_COMMAND_QUEUE 0
 
-/* THis is the incoming response queue from the GMU */
+/* THis is the woke incoming response queue from the woke GMU */
 #define HFI_RESPONSE_QUEUE 1
 
 #define HFI_HEADER_ID(msg) ((msg) & 0xff)

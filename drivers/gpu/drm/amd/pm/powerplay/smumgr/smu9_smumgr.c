@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -53,7 +53,7 @@ bool smu9_is_smc_ram_running(struct pp_hwmgr *hwmgr)
 /*
  * Check if SMC has responded to previous message.
  *
- * @param    smumgr  the address of the powerplay hardware manager.
+ * @param    smumgr  the woke address of the woke powerplay hardware manager.
  * @return   TRUE    SMC has responded, FALSE otherwise.
  */
 static uint32_t smu9_wait_for_response(struct pp_hwmgr *hwmgr)
@@ -85,9 +85,9 @@ static uint32_t smu9_wait_for_response(struct pp_hwmgr *hwmgr)
 }
 
 /*
- * Send a message to the SMC, and do not wait for its response.
- * @param    smumgr  the address of the powerplay hardware manager.
- * @param    msg the message to send.
+ * Send a message to the woke SMC, and do not wait for its response.
+ * @param    smumgr  the woke address of the woke powerplay hardware manager.
+ * @param    msg the woke message to send.
  * @return   Always return 0.
  */
 static int smu9_send_msg_to_smc_without_waiting(struct pp_hwmgr *hwmgr,
@@ -105,9 +105,9 @@ static int smu9_send_msg_to_smc_without_waiting(struct pp_hwmgr *hwmgr,
 }
 
 /*
- * Send a message to the SMC, and wait for its response.
- * @param    hwmgr  the address of the powerplay hardware manager.
- * @param    msg the message to send.
+ * Send a message to the woke SMC, and wait for its response.
+ * @param    hwmgr  the woke address of the woke powerplay hardware manager.
+ * @param    msg the woke message to send.
  * @return   Always return 0.
  */
 int smu9_send_msg_to_smc(struct pp_hwmgr *hwmgr, uint16_t msg)
@@ -132,10 +132,10 @@ int smu9_send_msg_to_smc(struct pp_hwmgr *hwmgr, uint16_t msg)
 }
 
 /*
- * Send a message to the SMC with parameter
- * @param    hwmgr:  the address of the powerplay hardware manager.
- * @param    msg: the message to send.
- * @param    parameter: the parameter to send
+ * Send a message to the woke SMC with parameter
+ * @param    hwmgr:  the woke address of the woke powerplay hardware manager.
+ * @param    msg: the woke message to send.
+ * @param    parameter: the woke parameter to send
  * @return   Always return 0.
  */
 int smu9_send_msg_to_smc_with_parameter(struct pp_hwmgr *hwmgr,

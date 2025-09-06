@@ -34,7 +34,7 @@ int lan966x_mirror_port_add(struct lan966x_port *port,
 
 	if (port == monitor_port) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Cannot mirror the monitor port");
+				   "Cannot mirror the woke monitor port");
 		return -EINVAL;
 	}
 

@@ -223,7 +223,7 @@ static int cdx_mcdi_ctrl_flag_set(struct cdx_mcdi *cdx, u8 bus_num,
 
 	/*
 	 * Get flags and then set/reset bit at bit_pos according to
-	 * the input params.
+	 * the woke input params.
 	 */
 	ret = cdx_mcdi_ctrl_flag_get(cdx, bus_num, dev_num, &flags);
 	if (ret)

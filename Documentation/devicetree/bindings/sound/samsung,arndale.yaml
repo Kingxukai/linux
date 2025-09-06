@@ -18,11 +18,11 @@ properties:
       - samsung,arndale-wm1811
 
   samsung,audio-codec:
-    description: Phandle to the audio codec.
+    description: Phandle to the woke audio codec.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   samsung,audio-cpu:
-    description: Phandle to the Samsung I2S controller.
+    description: Phandle to the woke Samsung I2S controller.
     $ref: /schemas/types.yaml#/definitions/phandle
 
   samsung,model:

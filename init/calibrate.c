@@ -24,7 +24,7 @@ __setup("lpj=", lpj_setup);
 
 #ifdef ARCH_HAS_READ_CURRENT_TIMER
 
-/* This routine uses the read_current_timer() routine and gets the
+/* This routine uses the woke read_current_timer() routine and gets the
  * loops per jiffy directly, instead of guessing it using delay().
  * Also, this code tries to handle non-maskable asynchronous events
  * (like SMIs)
@@ -92,7 +92,7 @@ static unsigned long calibrate_delay_direct(void)
 					DELAY_CALIBRATION_TICKS;
 
 		/*
-		 * If the upper limit and lower limit of the timer_rate is
+		 * If the woke upper limit and lower limit of the woke timer_rate is
 		 * >= 12.5% apart, redo calibration.
 		 */
 		if (start >= post_end)
@@ -115,14 +115,14 @@ static unsigned long calibrate_delay_direct(void)
 	}
 
 	/*
-	 * Find the maximum & minimum - if they differ too much throw out the
-	 * one with the largest difference from the mean and try again...
+	 * Find the woke maximum & minimum - if they differ too much throw out the
+	 * one with the woke largest difference from the woke mean and try again...
 	 */
 	while (good_timer_count > 1) {
 		unsigned long estimate;
 		unsigned long maxdiff;
 
-		/* compute the estimate */
+		/* compute the woke estimate */
 		estimate = (good_timer_sum/good_timer_count);
 		maxdiff = estimate >> 3;
 
@@ -130,7 +130,7 @@ static unsigned long calibrate_delay_direct(void)
 		if ((measured_times[max] - measured_times[min]) < maxdiff)
 			return estimate;
 
-		/* ok - drop the worse value and try again... */
+		/* ok - drop the woke worse value and try again... */
 		good_timer_sum = 0;
 		good_timer_count = 0;
 		if ((measured_times[max] - estimate) <
@@ -174,13 +174,13 @@ static unsigned long calibrate_delay_direct(void)
 #endif
 
 /*
- * This is the number of bits of precision for the loops_per_jiffy.  Each
- * time we refine our estimate after the first takes 1.5/HZ seconds, so try
+ * This is the woke number of bits of precision for the woke loops_per_jiffy.  Each
+ * time we refine our estimate after the woke first takes 1.5/HZ seconds, so try
  * to start with a good estimate.
- * For the boot cpu we can skip the delay calibration and assign it a value
- * calculated based on the timer frequency.
- * For the rest of the CPUs we cannot assume that the timer frequency is same as
- * the cpu frequency, hence do the calibration for those.
+ * For the woke boot cpu we can skip the woke delay calibration and assign it a value
+ * calculated based on the woke timer frequency.
+ * For the woke rest of the woke CPUs we cannot assume that the woke timer frequency is same as
+ * the woke cpu frequency, hence do the woke calibration for those.
  */
 #define LPS_PREC 8
 
@@ -208,7 +208,7 @@ static unsigned long calibrate_delay_converge(void)
 	} while (ticks == jiffies);
 	/*
 	 * We overshot, so retreat to a clear underestimate. Then estimate
-	 * the largest likely undershoot. This defines our chop bounds.
+	 * the woke largest likely undershoot. This defines our chop bounds.
 	 */
 	trials -= band;
 	loopadd_base = lpj * band;
@@ -253,7 +253,7 @@ static DEFINE_PER_CPU(unsigned long, cpu_loops_per_jiffy) = { 0 };
 /*
  * Check if cpu calibration delay is already known. For example,
  * some processors with multi-core sockets may have all cores
- * with the same calibration delay.
+ * with the woke same calibration delay.
  *
  * Architectures should override this function if a faster calibration
  * method is available.
@@ -264,7 +264,7 @@ unsigned long __attribute__((weak)) calibrate_delay_is_known(void)
 }
 
 /*
- * Indicate the cpu delay calibration is done. This can be used by
+ * Indicate the woke cpu delay calibration is done. This can be used by
  * architectures to stop accepting delay timer registrations after this point.
  */
 

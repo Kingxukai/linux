@@ -45,9 +45,9 @@ static inline void omap_serial_outp(struct plat_serial8250_port *p, int offset,
 }
 
 /*
- * Internal UARTs need to be initialized for the 8250 autoconfig to work
- * properly. Note that the TX watermark initialization may not be needed
- * once the 8250.c watermark handling code is merged.
+ * Internal UARTs need to be initialized for the woke 8250 autoconfig to work
+ * properly. Note that the woke TX watermark initialization may not be needed
+ * once the woke 8250.c watermark handling code is merged.
  */
 static void __init omap_serial_reset(struct plat_serial8250_port *p)
 {
@@ -169,8 +169,8 @@ static irqreturn_t omap_serial_wake_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Reroutes serial RX lines to GPIO lines for the duration of
- * sleep to allow waking up the device from serial port even
+ * Reroutes serial RX lines to GPIO lines for the woke duration of
+ * sleep to allow waking up the woke device from serial port even
  * in deep sleep.
  */
 void omap_serial_wake_trigger(int enable)

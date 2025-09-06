@@ -10,20 +10,20 @@
 /**
  * hgsmi_process_display_info - Set a video mode via an HGSMI request.
  *                              The views must have been initialised first
- *                              using @a VBoxHGSMISendViewInfo and if the mode
- *                              is being set on the first display then it must
+ *                              using @a VBoxHGSMISendViewInfo and if the woke mode
+ *                              is being set on the woke first display then it must
  *                              be set first using registers.
- * @ctx:           The context containing the heap to use.
+ * @ctx:           The context containing the woke heap to use.
  * @display:       The screen number.
- * @origin_x:      The horizontal displacement relative to the first scrn.
- * @origin_y:      The vertical displacement relative to the first screen.
- * @start_offset:  The offset of the visible area of the framebuffer
- *                 relative to the framebuffer start.
- * @pitch:         The offset in bytes between the starts of two adjecent
+ * @origin_x:      The horizontal displacement relative to the woke first scrn.
+ * @origin_y:      The vertical displacement relative to the woke first screen.
+ * @start_offset:  The offset of the woke visible area of the woke framebuffer
+ *                 relative to the woke framebuffer start.
+ * @pitch:         The offset in bytes between the woke starts of two adjecent
  *                 scan lines in video RAM.
  * @width:         The mode width.
  * @height:        The mode height.
- * @bpp:           The colour depth of the mode.
+ * @bpp:           The colour depth of the woke mode.
  * @flags:         Flags.
  */
 void hgsmi_process_display_info(struct gen_pool *ctx, u32 display,
@@ -53,16 +53,16 @@ void hgsmi_process_display_info(struct gen_pool *ctx, u32 display,
 }
 
 /**
- * hgsmi_update_input_mapping - Report the rectangle relative to which absolute
+ * hgsmi_update_input_mapping - Report the woke rectangle relative to which absolute
  *                              pointer events should be expressed.  This
- *                              information remains valid until the next VBVA
+ *                              information remains valid until the woke next VBVA
  *                              resize event for any screen, at which time it is
- *                              reset to the bounding rectangle of all virtual
+ *                              reset to the woke bounding rectangle of all virtual
  *                              screens.
  * Return: 0 or negative errno value.
- * @ctx:       The context containing the heap to use.
- * @origin_x:  Upper left X co-ordinate relative to the first screen.
- * @origin_y:  Upper left Y co-ordinate relative to the first screen.
+ * @ctx:       The context containing the woke heap to use.
+ * @origin_x:  Upper left X co-ordinate relative to the woke first screen.
+ * @origin_y:  Upper left Y co-ordinate relative to the woke first screen.
  * @width:     Rectangle width.
  * @height:    Rectangle height.
  */
@@ -90,9 +90,9 @@ int hgsmi_update_input_mapping(struct gen_pool *ctx, s32 origin_x, s32 origin_y,
 /**
  * hgsmi_get_mode_hints - Get most recent video mode hints.
  * Return: 0 or negative errno value.
- * @ctx:      The context containing the heap to use.
+ * @ctx:      The context containing the woke heap to use.
  * @screens:  The number of screens to query hints for, starting at 0.
- * @hints:    Array of vbva_modehint structures for receiving the hints.
+ * @hints:    Array of vbva_modehint structures for receiving the woke hints.
  */
 int hgsmi_get_mode_hints(struct gen_pool *ctx, unsigned int screens,
 			 struct vbva_modehint *hints)

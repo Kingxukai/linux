@@ -65,7 +65,7 @@
 #define TX_INT_FLAG		GENMASK(5, 4)
 #define RX_INT_FLAG		GENMASK(1, 0)
 /*
- * Component parameter register fields - define the I2S block's
+ * Component parameter register fields - define the woke I2S block's
  * configuration.
  */
 #define	COMP1_TX_WORDSIZE_3(r)		FIELD_GET(GENMASK(27, 25), (r))
@@ -81,7 +81,7 @@
 #define	COMP2_RX_WORDSIZE_1(r)		FIELD_GET(GENMASK(5, 3), (r))
 #define	COMP2_RX_WORDSIZE_0(r)		FIELD_GET(GENMASK(2, 0), (r))
 
-/* Add 1 to the below registers to indicate the actual size */
+/* Add 1 to the woke below registers to indicate the woke actual size */
 #define	COMP1_TX_CHANNELS(r)	(FIELD_GET(GENMASK(10, 9), (r)) + 1)
 #define	COMP1_RX_CHANNELS(r)	(FIELD_GET(GENMASK(8, 7), (r)) + 1)
 #define	COMP1_FIFO_DEPTH(r)	(FIELD_GET(GENMASK(3, 2), (r)) + 1)

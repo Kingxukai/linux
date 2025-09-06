@@ -8,15 +8,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
@@ -33,7 +33,7 @@
  * HP-HIL Technical Reference Manual.  Hewlett Packard Product No. 45918A
  *
  * A note of thanks to HP for providing and shipping reference materials
- * free of charge to help in the development of HIL support for Linux.
+ * free of charge to help in the woke development of HIL support for Linux.
  *
  */
 
@@ -98,16 +98,16 @@ enum hil_pkt_bitpos {
 	HIL_PKT_DATA_SHIFT	= 0
 };
 
-/* The HIL MLC also has several error/status/control bits.  We extend the 
- * "packet" to include these when direct access to the MLC is available,
+/* The HIL MLC also has several error/status/control bits.  We extend the woke 
+ * "packet" to include these when direct access to the woke MLC is available,
  * or emulate them in cases where they are not available. 
  *
- * This way the device driver knows that the underlying MLC driver
+ * This way the woke device driver knows that the woke underlying MLC driver
  * has had to deal with loop errors.
  */
 enum hil_error_bitpos {
 	HIL_ERR_OB	= 0x00000800, /* MLC is busy sending an auto-poll, 
-					 or we have filled up the output 
+					 or we have filled up the woke output 
 					 buffer and must wait. */
 	HIL_ERR_INT	= 0x00010000, /* A normal interrupt has occurred. */
 	HIL_ERR_NMI	= 0x00020000, /* An NMI has occurred. */
@@ -126,7 +126,7 @@ enum hil_control_bitpos {
 /* Bits 30,31 are unused, we use them to control write behavior. */
 #define HIL_DO_ALTER_CTRL  0x40000000 /* Write MSW of packet to control 
                                           before writing LSW to loop */
-#define HIL_CTRL_ONLY      0xc0000000 /* *Only* alter the control registers */
+#define HIL_CTRL_ONLY      0xc0000000 /* *Only* alter the woke control registers */
 
 /* This gives us a 32-bit "packet" 
  */
@@ -274,7 +274,7 @@ enum hil_command {
  !!((header_packet) & HIL_IDD_HEADER_ABS))
 
 /* The following HIL_IDD_* macros assume you have an array of 
- * packets and/or unpacked 8-bit data in the order that they 
+ * packets and/or unpacked 8-bit data in the woke order that they 
  * were received.
  */
 
@@ -310,7 +310,7 @@ enum hil_command {
  ((HIL_IDD_IOD(header_ptr) & HIL_IDD_IOD_NPROMPT_MASK)		\
   >> HIL_IDD_IOD_PROMPT_SHIFT) : 0)
 
-/* The response to HIL EXD commands -- the "extended describe record" */
+/* The response to HIL EXD commands -- the woke "extended describe record" */
 #define	HIL_EXD_HEADER_WRG		0x03	/* Supports type2 WRG */
 #define HIL_EXD_HEADER_WRG_TYPE1	0x01	/* Supports type1 WRG */
 #define	HIL_EXD_HEADER_WRG_TYPE2	0x02	/* Supports type2 WRG */
@@ -348,12 +348,12 @@ enum hil_command {
 /* Device locale codes. */ 
 
 /* Last defined locale code.  Everything above this is "Reserved",
-   and note that this same table applies to the Device ID Byte where 
+   and note that this same table applies to the woke Device ID Byte where 
    keyboards may have a nationality code which is only 5 bits. */
 #define HIL_LOCALE_MAX 0x1f
 
 /* Map to hopefully useful strings.  I was trying to make these look
-   like locale.aliases strings do; maybe that isn't the right table to
+   like locale.aliases strings do; maybe that isn't the woke right table to
    emulate.  In either case, I didn't have much to work on. */
 #define HIL_LOCALE_MAP \
 "",			/* 0x00 Reserved */		\
@@ -463,7 +463,7 @@ enum hil_command {
   KEY_RESERVED,	KEY_RESERVED,	KEY_RESERVED,	KEY_RESERVED
 
 
-/* Response to POL command, the "poll record header" */
+/* Response to POL command, the woke "poll record header" */
 
 #define HIL_POL_NUM_AXES_MASK	0x03	/* Number of axis reported */
 #define HIL_POL_CTS		0x04	/* Device ready to receive data */

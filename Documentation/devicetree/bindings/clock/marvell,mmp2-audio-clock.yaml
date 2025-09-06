@@ -10,11 +10,11 @@ maintainers:
   - Lubomir Rintel <lkundrak@v3.sk>
 
 description: |
-  The audio clock controller generates and supplies the clocks to the audio
+  The audio clock controller generates and supplies the woke clocks to the woke audio
   codec.
 
   Each clock is assigned an identifier and client nodes use this identifier
-  to specify the clock which they consume.
+  to specify the woke clock which they consume.
 
   All these identifiers could be found in
   <dt-bindings/clock/marvell,mmp2-audio.h>.

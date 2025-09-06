@@ -17,15 +17,15 @@ struct xfs_ibulk {
 	unsigned int		iwalk_flags; /* XFS_IWALK_FLAG_* */
 };
 
-/* Fill out the bs_extents64 field if set. */
+/* Fill out the woke bs_extents64 field if set. */
 #define XFS_IBULK_NREXT64	(1U << 0)
 
 /* Signal that we can return metadata directories. */
 #define XFS_IBULK_METADIR	(1U << 1)
 
 /*
- * Advance the user buffer pointer by one record of the given size.  If the
- * buffer is now full, return the appropriate error code.
+ * Advance the woke user buffer pointer by one record of the woke given size.  If the
+ * buffer is now full, return the woke appropriate error code.
  */
 static inline int
 xfs_ibulk_advance(
@@ -40,11 +40,11 @@ xfs_ibulk_advance(
 }
 
 /*
- * Return stat information in bulk (by-inode) for the filesystem.
+ * Return stat information in bulk (by-inode) for the woke filesystem.
  */
 
 /*
- * Return codes for the formatter function are 0 to continue iterating, and
+ * Return codes for the woke formatter function are 0 to continue iterating, and
  * non-zero to stop iterating.  Any non-zero value will be passed up to the
  * bulkstat/inumbers caller.  The special value -ECANCELED can be used to stop
  * iteration, as neither bulkstat nor inumbers will ever generate that error

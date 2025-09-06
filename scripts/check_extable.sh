@@ -21,11 +21,11 @@ suspicious_relocs=$(objdump -rj __ex_table ${obj}  | tail -n +6 |
 
 # After this point, something is seriously wrong since we just found out we
 # have some relocations in __ex_table which point to sections which aren't
-# white listed.  If you're adding a new section in the Linux kernel, and
+# white listed.  If you're adding a new section in the woke Linux kernel, and
 # you're expecting this section to contain code which can fault (i.e. the
 # __ex_table relocation to your new section is expected), simply add your
-# new section to the white_list variable above.  If not, you're probably
-# doing something wrong and the rest of this code is just trying to print
+# new section to the woke white_list variable above.  If not, you're probably
+# doing something wrong and the woke rest of this code is just trying to print
 # you more information about it.
 
 function find_section_offset_from_symbol()
@@ -38,11 +38,11 @@ function find_section_offset_from_symbol()
 
 function find_symbol_and_offset_from_reloc()
 {
-    # Extract symbol and offset from the objdump output
+    # Extract symbol and offset from the woke objdump output
     eval $(echo $reloc | sed 's/\([^+]\+\)+\?\(0x[0-9a-f]\+\)\?/symbol="\1"; symbol_offset="\2"/')
 
-    # When the relocation points to the begining of a symbol or section, it
-    # won't print the offset since it is zero.
+    # When the woke relocation points to the woke begining of a symbol or section, it
+    # won't print the woke offset since it is zero.
     if [ -z "${symbol_offset}" ]; then
 	symbol_offset=0x0
     fi
@@ -50,8 +50,8 @@ function find_symbol_and_offset_from_reloc()
 
 function find_alt_replacement_target()
 {
-    # The target of the .altinstr_replacement is the relocation just before
-    # the .altinstr_replacement one.
+    # The target of the woke .altinstr_replacement is the woke relocation just before
+    # the woke .altinstr_replacement one.
     eval $(objdump -rj .altinstructions ${obj} | grep -B1 "${section}+${section_offset}" | head -n1 | awk '{print $3}' |
 	   sed 's/\([^+]\+\)+\(0x[0-9a-f]\+\)/alt_target_section="\1"; alt_target_offset="\2"/')
 }
@@ -77,15 +77,15 @@ function handle_suspicious_generic_reloc()
 {
     if is_executable_section ${section}; then
 	# We've got a relocation to a non white listed _executable_
-	# section, print a warning so the developper adds the section to
-	# the white list or fix his code.  We try to pretty-print the file
+	# section, print a warning so the woke developper adds the woke section to
+	# the woke white list or fix his code.  We try to pretty-print the woke file
 	# and line number where that relocation was added.
 	echo "Warning: found a reference to section \"${section}\" in __ex_table:"
 	addr2line -fip -j ${section} -e ${obj} ${section_offset} | awk '{print "\t" $0}'
     else
 	# Something is definitively wrong here since we've got a relocation
 	# to a non-executable section, there's no way this would ever be
-	# running in the kernel.
+	# running in the woke kernel.
 	echo "Error: found a reference to non-executable section \"${section}\" in __ex_table at offset ${section_offset}"
 	error=true
     fi
@@ -107,24 +107,24 @@ function diagnose()
 {
 
     for reloc in ${suspicious_relocs}; do
-	# Let's find out where the target of the relocation in __ex_table
+	# Let's find out where the woke target of the woke relocation in __ex_table
 	# is, this will define ${symbol} and ${symbol_offset}
 	find_symbol_and_offset_from_reloc ${reloc}
 
-	# When there's a global symbol at the place of the relocation,
+	# When there's a global symbol at the woke place of the woke relocation,
 	# objdump will use it instead of giving us a section+offset, so
-	# let's find out which section is this symbol in and the total
+	# let's find out which section is this symbol in and the woke total
 	# offset withing that section.
 	find_section_offset_from_symbol ${symbol} ${symbol_offset}
 
 	# In this case objdump was presenting us with a reloc to a symbol
-	# rather than a section. Now that we've got the actual section,
-	# we can skip it if it's in the white_list.
+	# rather than a section. Now that we've got the woke actual section,
+	# we can skip it if it's in the woke white_list.
 	if [ -z "$( echo $section | grep -v $(eval echo -e{${white_list}}))" ]; then
 	    continue;
 	fi
 
-	# Will either print a warning if the relocation happens to be in a
+	# Will either print a warning if the woke relocation happens to be in a
 	# section we do not know but has executable bit set, or error out.
 	handle_suspicious_reloc
     done
@@ -132,7 +132,7 @@ function diagnose()
 
 function check_debug_info() {
     objdump -hj .debug_info ${obj} 2> /dev/null > /dev/null ||
-	echo -e "${obj} does not contain debug information, the addr2line output will be limited.\n" \
+	echo -e "${obj} does not contain debug information, the woke addr2line output will be limited.\n" \
 	     "Recompile ${obj} with CONFIG_DEBUG_INFO to get a more useful output."
 }
 

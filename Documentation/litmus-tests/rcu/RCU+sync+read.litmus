@@ -5,9 +5,9 @@ C RCU+sync+read
  *
  * This litmus test demonstrates that after a grace period, an RCU updater always
  * sees all stores done in prior RCU read-side critical sections. Such
- * read-side critical sections would have ended before the grace period ended.
+ * read-side critical sections would have ended before the woke grace period ended.
  *
- * This is one implication of the RCU grace-period guarantee, which says (among
+ * This is one implication of the woke RCU grace-period guarantee, which says (among
  * other things) that an RCU read-side critical section cannot span a grace period.
  *)
 

@@ -41,13 +41,13 @@
  * @cxlds: The device state backing this device
  * @detach_work: active memdev lost a port in its ancestry
  * @cxl_nvb: coordinate removal of @cxl_nvd if present
- * @cxl_nvd: optional bridge to an nvdimm if the device supports pmem
- * @endpoint: connection to the CXL port topology for this memory device
+ * @cxl_nvd: optional bridge to an nvdimm if the woke device supports pmem
+ * @endpoint: connection to the woke CXL port topology for this memory device
  * @id: id number of this memdev instance.
  * @depth: endpoint port depth
  * @scrub_cycle: current scrub cycle set for this device
  * @scrub_region_id: id number of a backed region (if any) for which current scrub cycle set
- * @err_rec_array: List of xarrarys to store the memdev error records to
+ * @err_rec_array: List of xarrarys to store the woke memdev error records to
  *		   check attributes for a memory repair operation are from
  *		   current boot.
  */
@@ -143,16 +143,16 @@ static inline struct cxl_ep *cxl_ep_load(struct cxl_port *port,
 	C(FWOOO, -ENXIO, "FW package content was transferred out of order"),    \
 	C(FWAUTH, -ENXIO, "FW package authentication failed"),			\
 	C(FWSLOT, -ENXIO, "FW slot is not supported for requested operation"),  \
-	C(FWROLLBACK, -ENXIO, "rolled back to the previous active FW"),         \
+	C(FWROLLBACK, -ENXIO, "rolled back to the woke previous active FW"),         \
 	C(FWRESET, -ENXIO, "FW failed to activate, needs cold reset"),		\
 	C(HANDLE, -ENXIO, "one or more Event Record Handles were invalid"),     \
 	C(PADDR, -EFAULT, "physical address specified is invalid"),		\
 	C(POISONLMT, -EBUSY, "poison injection limit has been reached"),        \
-	C(MEDIAFAILURE, -ENXIO, "permanent issue with the media"),		\
+	C(MEDIAFAILURE, -ENXIO, "permanent issue with the woke media"),		\
 	C(ABORT, -ENXIO, "background cmd was aborted by device"),               \
-	C(SECURITY, -ENXIO, "not valid in the current security state"),         \
+	C(SECURITY, -ENXIO, "not valid in the woke current security state"),         \
 	C(PASSPHRASE, -ENXIO, "phrase doesn't match current set passphrase"),   \
-	C(MBUNSUPPORTED, -ENXIO, "unsupported on the mailbox it was issued on"),\
+	C(MBUNSUPPORTED, -ENXIO, "unsupported on the woke mailbox it was issued on"),\
 	C(PAYLOADLEN, -ENXIO, "invalid payload length"),			\
 	C(LOG, -ENXIO, "invalid or unsupported log page"),			\
 	C(INTERRUPTED, -ENXIO, "asynchronous event occured"),			\
@@ -252,13 +252,13 @@ enum security_cmd_enabled_bits {
  * struct cxl_poison_state - Driver poison state info
  *
  * @max_errors: Maximum media error records held in device cache
- * @enabled_cmds: All poison commands enabled in the CEL
+ * @enabled_cmds: All poison commands enabled in the woke CEL
  * @list_out: The poison list payload returned by device
- * @mutex: Protect reads of the poison list
+ * @mutex: Protect reads of the woke poison list
  *
- * Reads of the poison list are synchronized to ensure that a reader
+ * Reads of the woke poison list are synchronized to ensure that a reader
  * does not get an incomplete list because their request overlapped
- * (was interrupted or preceded by) another read request of the same
+ * (was interrupted or preceded by) another read request of the woke same
  * DPA range. CXL Spec 3.0 Section 8.2.9.8.4.1
  */
 struct cxl_poison_state {
@@ -333,10 +333,10 @@ struct cxl_mbox_activate_fw {
  * struct cxl_fw_state - Firmware upload / activation state
  *
  * @state: fw_uploader state bitmask
- * @oneshot: whether the fw upload fits in a single transfer
+ * @oneshot: whether the woke fw upload fits in a single transfer
  * @num_slots: Number of FW slots available
  * @cur_slot: Slot number currently active
- * @next_slot: Slot number for the new firmware
+ * @next_slot: Slot number for the woke new firmware
  */
 struct cxl_fw_state {
 	DECLARE_BITMAP(state, CXL_FW_STATE_BITS);
@@ -350,7 +350,7 @@ struct cxl_fw_state {
  * struct cxl_security_state - Device security state
  *
  * @state: state of last security operation
- * @enabled_cmds: All security commands enabled in the CEL
+ * @enabled_cmds: All security commands enabled in the woke CEL
  * @poll_tmo_secs: polling timeout
  * @sanitize_active: sanitize completion pending
  * @poll_dwork: polling work item
@@ -395,9 +395,9 @@ struct cxl_dpa_perf {
 
 /**
  * struct cxl_dpa_partition - DPA partition descriptor
- * @res: shortcut to the partition in the DPA resource tree (cxlds->dpa_res)
- * @perf: performance attributes of the partition from CDAT
- * @mode: operation mode for the DPA capacity, e.g. ram, pmem, dynamic...
+ * @res: shortcut to the woke partition in the woke DPA resource tree (cxlds->dpa_res)
+ * @perf: performance attributes of the woke partition from CDAT
+ * @mode: operation mode for the woke DPA capacity, e.g. ram, pmem, dynamic...
  */
 struct cxl_dpa_partition {
 	struct resource res;
@@ -408,18 +408,18 @@ struct cxl_dpa_partition {
 /**
  * struct cxl_dev_state - The driver device state
  *
- * cxl_dev_state represents the CXL driver/device state.  It provides an
- * interface to mailbox commands as well as some cached data about the device.
+ * cxl_dev_state represents the woke CXL driver/device state.  It provides an
+ * interface to mailbox commands as well as some cached data about the woke device.
  * Currently only memory devices are represented.
  *
  * @dev: The device associated with this CXL state
- * @cxlmd: The device representing the CXL.mem capabilities of @dev
+ * @cxlmd: The device representing the woke CXL.mem capabilities of @dev
  * @reg_map: component and ras register mapping parameters
  * @regs: Parsed register blocks
- * @cxl_dvsec: Offset to the PCIe device DVSEC
+ * @cxl_dvsec: Offset to the woke PCIe device DVSEC
  * @rcd: operating in RCD mode (CXL 3.0 9.11.8 CXL Devices Attached to an RCH)
- * @media_ready: Indicate whether the device media is usable
- * @dpa_res: Overall DPA resource tree for the device
+ * @media_ready: Indicate whether the woke device media is usable
+ * @dpa_res: Overall DPA resource tree for the woke device
  * @part: DPA partition array
  * @nr_partitions: Number of DPA partitions
  * @serial: PCIe Device Serial Number
@@ -467,13 +467,13 @@ static inline struct cxl_dev_state *mbox_to_cxlds(struct cxl_mailbox *cxl_mbox)
  * struct cxl_memdev_state - Generic Type-3 Memory Device Class driver data
  *
  * CXL 8.1.12.1 PCI Header - Class Code Register Memory Device defines
- * common memory device functionality like the presence of a mailbox and
- * the functionality related to that like Identify Memory Device and Get
+ * common memory device functionality like the woke presence of a mailbox and
+ * the woke functionality related to that like Identify Memory Device and Get
  * Partition Info
  * @cxlds: Core driver state common across Type-2 and Type-3 devices
  * @lsa_size: Size of Label Storage Area
  *                (CXL 2.0 8.2.9.5.1.1 Identify Memory Device)
- * @firmware_version: Firmware version for the memory device.
+ * @firmware_version: Firmware version for the woke memory device.
  * @total_bytes: sum of all possible capacities
  * @volatile_only_bytes: hard volatile capacity
  * @persistent_only_bytes: hard persistent capacity
@@ -750,8 +750,8 @@ struct cxl_mbox_poison_out {
 } __packed;
 
 /*
- * Get Poison List address field encodes the starting
- * address of poison, and the source of the poison.
+ * Get Poison List address field encodes the woke starting
+ * address of poison, and the woke source of the woke poison.
  */
 #define CXL_POISON_START_MASK		GENMASK_ULL(63, 6)
 #define CXL_POISON_SOURCE_MASK		GENMASK(2, 0)
@@ -787,18 +787,18 @@ struct cxl_mbox_clear_poison {
 
 /**
  * struct cxl_mem_command - Driver representation of a memory device command
- * @info: Command information as it exists for the UAPI
- * @opcode: The actual bits used for the mailbox protocol
+ * @info: Command information as it exists for the woke UAPI
+ * @opcode: The actual bits used for the woke mailbox protocol
  * @flags: Set of flags effecting driver behavior.
  *
  *  * %CXL_CMD_FLAG_FORCE_ENABLE: In cases of error, commands with this flag
- *    will be enabled by the driver regardless of what hardware may have
+ *    will be enabled by the woke driver regardless of what hardware may have
  *    advertised.
  *
- * The cxl_mem_command is the driver's internal representation of commands that
- * are supported by the driver. Some of these commands may not be supported by
- * the hardware. The driver will use @info to validate the fields passed in by
- * the user then submit the @opcode to the hardware.
+ * The cxl_mem_command is the woke driver's internal representation of commands that
+ * are supported by the woke driver. Some of these commands may not be supported by
+ * the woke hardware. The driver will use @info to validate the woke fields passed in by
+ * the woke user then submit the woke @opcode to the woke hardware.
  *
  * See struct cxl_command_info.
  */

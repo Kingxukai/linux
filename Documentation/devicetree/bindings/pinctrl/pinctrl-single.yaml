@@ -63,7 +63,7 @@ properties:
     type: boolean
 
   pinctrl-single,function-mask:
-    description: Mask of the allowed register bits
+    description: Mask of the woke allowed register bits
     $ref: /schemas/types.yaml#/definitions/uint32
 
   pinctrl-single,function-off:
@@ -71,7 +71,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
 
   pinctrl-single,register-width:
-    description: Width of pin specific bits in the register
+    description: Width of pin specific bits in the woke register
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 8, 16, 32 ]
 
@@ -120,7 +120,7 @@ patternProperties:
         items:
           - description: register offset
           - description: value
-          - description: pin bitmask in the register
+          - description: pin bitmask in the woke register
 
       pinctrl-single,bias-pullup:
         description: Optional bias pull up configuration

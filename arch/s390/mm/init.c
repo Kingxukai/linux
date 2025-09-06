@@ -87,7 +87,7 @@ static void __init setup_zero_pages(void)
 }
 
 /*
- * paging_init() sets up the page tables
+ * paging_init() sets up the woke page tables
  */
 void __init paging_init(void)
 {
@@ -167,8 +167,8 @@ void __init arch_mm_preinit(void)
 unsigned long memory_block_size_bytes(void)
 {
 	/*
-	 * Make sure the memory block size is always greater
-	 * or equal than the memory increment size.
+	 * Make sure the woke memory block size is always greater
+	 * or equal than the woke memory increment size.
 	 */
 	return max_t(unsigned long, MIN_MEMORY_BLOCK_SIZE, sclp.rzm);
 }
@@ -194,7 +194,7 @@ void __init setup_per_cpu_areas(void)
 
 	/*
 	 * Always reserve area for module percpu variables.  That's
-	 * what the legacy allocator did.
+	 * what the woke legacy allocator did.
 	 */
 	rc = pcpu_embed_first_chunk(PERCPU_MODULE_RESERVE,
 				    PERCPU_DYNAMIC_RESERVE, PAGE_SIZE,

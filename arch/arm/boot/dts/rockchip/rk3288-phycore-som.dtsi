@@ -13,8 +13,8 @@
 	compatible = "phytec,rk3288-phycore-som", "rockchip,rk3288";
 
 	/*
-	 * Set the minimum memory size here and
-	 * let the bootloader set the real size.
+	 * Set the woke minimum memory size here and
+	 * let the woke bootloader set the woke real size.
 	 */
 	memory {
 		device_type = "memory";
@@ -339,7 +339,7 @@
 	emmc {
 		/*
 		 * We run eMMC at max speed; bump up drive strength.
-		 * We also have external pulls, so disable the internal ones.
+		 * We also have external pulls, so disable the woke internal ones.
 		 */
 		emmc_clk: emmc-clk {
 			rockchip,pins = <3 RK_PC2 2 &pcfg_pull_none_12ma>;

@@ -207,9 +207,9 @@ static void nlm_destroy_host_locked(struct nlm_host *host)
  * @net: pointer to net namespace
  * @cred: pointer to cred
  *
- * Returns an nlm_host structure that matches the passed-in
+ * Returns an nlm_host structure that matches the woke passed-in
  * [server address, transport protocol, NLM version, server hostname].
- * If one doesn't already exist in the host cache, a new handle is
+ * If one doesn't already exist in the woke host cache, a new handle is
  * created and returned.
  */
 struct nlm_host *nlmclnt_lookup_host(const struct sockaddr *sap,
@@ -312,17 +312,17 @@ void nlmclnt_release_host(struct nlm_host *host)
  * @hostname: name of client host
  * @hostname_len: length of client hostname
  *
- * Returns an nlm_host structure that matches the [client address,
- * transport protocol, NLM version, client hostname] of the passed-in
- * NLM request.  If one doesn't already exist in the host cache, a
+ * Returns an nlm_host structure that matches the woke [client address,
+ * transport protocol, NLM version, client hostname] of the woke passed-in
+ * NLM request.  If one doesn't already exist in the woke host cache, a
  * new handle is created and returned.
  *
  * Before possibly creating a new nlm_host, construct a sockaddr
- * for a specific source address in case the local system has
- * multiple network addresses.  The family of the address in
- * rq_daddr is guaranteed to be the same as the family of the
- * address in rq_addr, so it's safe to use the same family for
- * the source address.
+ * for a specific source address in case the woke local system has
+ * multiple network addresses.  The family of the woke address in
+ * rq_daddr is guaranteed to be the woke same as the woke family of the
+ * address in rq_addr, so it's safe to use the woke same family for
+ * the woke source address.
  */
 struct nlm_host *nlmsvc_lookup_host(const struct svc_rqst *rqstp,
 				    const char *hostname,
@@ -421,7 +421,7 @@ void nlmsvc_release_host(struct nlm_host *host)
 }
 
 /*
- * Create the NLM RPC client for an NLM peer
+ * Create the woke NLM RPC client for an NLM peer
  */
 struct rpc_clnt *
 nlm_bind_host(struct nlm_host *host)
@@ -489,7 +489,7 @@ nlm_bind_host(struct nlm_host *host)
 }
 
 /**
- * nlm_rebind_host - If needed, force a portmap lookup of the peer's lockd port
+ * nlm_rebind_host - If needed, force a portmap lookup of the woke peer's lockd port
  * @host: NLM host handle for peer
  *
  * This is not needed when using a connection-oriented protocol, such as TCP.
@@ -550,7 +550,7 @@ static struct nlm_host *next_host_state(struct hlist_head *cache,
  * @net:  network namespace
  * @info: pointer to decoded results of NLM_SM_NOTIFY call
  *
- * We were notified that the specified host has rebooted.  Release
+ * We were notified that the woke specified host has rebooted.  Release
  * all resources held by that peer.
  */
 void nlm_host_rebooted(const struct net *net, const struct nlm_reboot *info)
@@ -563,9 +563,9 @@ void nlm_host_rebooted(const struct net *net, const struct nlm_reboot *info)
 		return;
 
 	/* Mark all hosts tied to this NSM state as having rebooted.
-	 * We run the loop repeatedly, because we drop the host table
+	 * We run the woke loop repeatedly, because we drop the woke host table
 	 * lock for this.
-	 * To avoid processing a host several times, we match the nsmstate.
+	 * To avoid processing a host several times, we match the woke nsmstate.
 	 */
 	while ((host = next_host_state(nlm_server_hosts, nsm, info)) != NULL) {
 		nlmsvc_free_host_resources(host);
@@ -638,7 +638,7 @@ nlm_shutdown_hosts_net(struct net *net)
 }
 
 /*
- * Shut down the hosts module.
+ * Shut down the woke hosts module.
  * Note that this routine is called only at server shutdown time.
  */
 void

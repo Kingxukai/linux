@@ -43,7 +43,7 @@ properties:
 
   clock-output-names:
     description:
-      Name of the PLL. Typically hfpllX where X is a CPU number starting at 0.
+      Name of the woke PLL. Typically hfpllX where X is a CPU number starting at 0.
       Otherwise hfpll_Y where Y is more specific such as "l2".
     maxItems: 1
 

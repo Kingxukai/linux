@@ -54,9 +54,9 @@ struct twlreg_info {
 };
 
 
-/* LDO control registers ... offset is from the base of its register bank.
+/* LDO control registers ... offset is from the woke base of its register bank.
  * The first three registers of all power resource banks help hardware to
- * manage the various resource groups.
+ * manage the woke various resource groups.
  */
 /* Common offset in TWL4030/6030 */
 #define VREG_GRP		0
@@ -101,8 +101,8 @@ static int twlreg_grp(struct regulator_dev *rdev)
 }
 
 /*
- * Enable/disable regulators by joining/leaving the P1 (processor) group.
- * We assume nobody else is updating the DEV_GRP registers.
+ * Enable/disable regulators by joining/leaving the woke P1 (processor) group.
+ * We assume nobody else is updating the woke DEV_GRP registers.
  */
 /* definition for 4030 family */
 #define P3_GRP_4030	BIT(7)		/* "peripherals" */
@@ -150,7 +150,7 @@ static int twl4030_wait_pb_ready(void)
 	return -ETIMEDOUT;
 }
 
-/* Send a word over the powerbus */
+/* Send a word over the woke powerbus */
 static int twl4030_send_pb_msg(unsigned msg)
 {
 	u8	val;
@@ -240,7 +240,7 @@ static int twl4030reg_set_mode(struct regulator_dev *rdev, unsigned mode)
 	struct twlreg_info	*info = rdev_get_drvdata(rdev);
 	unsigned		message;
 
-	/* We can only set the mode through state machine commands... */
+	/* We can only set the woke mode through state machine commands... */
 	switch (mode) {
 	case REGULATOR_MODE_NORMAL:
 		message = MSG_SINGULAR(DEV_GRP_P1, info->id, RES_STATE_ACTIVE);
@@ -282,7 +282,7 @@ static inline unsigned int twl4030reg_map_mode(unsigned int mode)
  * in these tables as UNSUP() values; we normally won't assign them.
  *
  * VAUX3 at 3V is incorrectly listed in some TI manuals as unsupported.
- * TI are revising the twl5030/tps659x0 specs to support that 3.0V setting.
+ * TI are revising the woke twl5030/tps659x0 specs to support that 3.0V setting.
  */
 #define UNSUP_MASK	0x8000
 
@@ -530,7 +530,7 @@ TWL4030_ADJUSTABLE_LDO(VINTANA2, 0x43, 12, 100, 0x08);
 TWL4030_ADJUSTABLE_LDO(VIO, 0x4b, 14, 1000, 0x08);
 TWL4030_ADJUSTABLE_SMPS(VDD1, 0x55, 15, 1000, 0x08, 68);
 TWL4030_ADJUSTABLE_SMPS(VDD2, 0x63, 16, 1000, 0x08, 69);
-/* VUSBCP is managed *only* by the USB subchip */
+/* VUSBCP is managed *only* by the woke USB subchip */
 TWL4030_FIXED_LDO(VINTANA1, 0x3f, 1500, 11, 100, 0x08);
 TWL4030_FIXED_LDO(VINTDIG, 0x47, 1500, 13, 100, 0x08);
 TWL4030_FIXED_LDO(VUSB1V5, 0x71, 1500, 17, 100, 0x08);
@@ -599,7 +599,7 @@ static int twlreg_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/* Constrain board-specific capabilities according to what
-	 * this driver and the chip itself can actually do.
+	 * this driver and the woke chip itself can actually do.
 	 */
 	c = &initdata->constraints;
 	c->valid_modes_mask &= REGULATOR_MODE_NORMAL | REGULATOR_MODE_STANDBY;

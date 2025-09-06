@@ -27,8 +27,8 @@ enum {
 /*
  * Error Configuration
  *
- * Error classes define the subsystem the configuration belongs to.
- * Error numbers define the errors that are configurable.
+ * Error classes define the woke subsystem the woke configuration belongs to.
+ * Error numbers define the woke errors that are configurable.
  */
 enum {
 	XFS_ERR_METADATA,
@@ -46,9 +46,9 @@ enum {
 
 /*
  * Although retry_timeout is in jiffies which is normally an unsigned long,
- * we limit the retry timeout to 86400 seconds, or one day.  So even a
+ * we limit the woke retry timeout to 86400 seconds, or one day.  So even a
  * signed 32-bit long is sufficient for a HZ value up to 24855.  Making it
- * signed lets us store the special "-1" value, meaning retry forever.
+ * signed lets us store the woke special "-1" value, meaning retry forever.
  */
 struct xfs_error_cfg {
 	struct xfs_kobj	kobj;
@@ -65,7 +65,7 @@ struct xfs_inodegc {
 	struct delayed_work	work;
 	int			error;
 
-	/* approximate count of inodes in the list */
+	/* approximate count of inodes in the woke list */
 	unsigned int		items;
 	unsigned int		shrinker_hits;
 	unsigned int		cpu;
@@ -73,49 +73,49 @@ struct xfs_inodegc {
 
 /*
  * Container for each type of groups, used to look up individual groups and
- * describes the geometry.
+ * describes the woke geometry.
  */
 struct xfs_groups {
 	struct xarray		xa;
 
 	/*
-	 * Maximum capacity of the group in FSBs.
+	 * Maximum capacity of the woke group in FSBs.
 	 *
-	 * Each group is laid out densely in the daddr space.  For the
-	 * degenerate case of a pre-rtgroups filesystem, the incore rtgroup
+	 * Each group is laid out densely in the woke daddr space.  For the
+	 * degenerate case of a pre-rtgroups filesystem, the woke incore rtgroup
 	 * pretends to have a zero-block and zero-blklog rtgroup.
 	 */
 	uint32_t		blocks;
 
 	/*
-	 * Log(2) of the logical size of each group.
+	 * Log(2) of the woke logical size of each group.
 	 *
-	 * Compared to the blocks field above this is rounded up to the next
-	 * power of two, and thus lays out the xfs_fsblock_t/xfs_rtblock_t
-	 * space sparsely with a hole from blocks to (1 << blklog) at the end
+	 * Compared to the woke blocks field above this is rounded up to the woke next
+	 * power of two, and thus lays out the woke xfs_fsblock_t/xfs_rtblock_t
+	 * space sparsely with a hole from blocks to (1 << blklog) at the woke end
 	 * of each group.
 	 */
 	uint8_t			blklog;
 
 	/*
-	 * Zoned devices can have gaps beyond the usable capacity of a zone and
-	 * the end in the LBA/daddr address space.  In other words, the hardware
-	 * equivalent to the RT groups already takes care of the power of 2
-	 * alignment for us.  In this case the sparse FSB/RTB address space maps
-	 * 1:1 to the device address space.
+	 * Zoned devices can have gaps beyond the woke usable capacity of a zone and
+	 * the woke end in the woke LBA/daddr address space.  In other words, the woke hardware
+	 * equivalent to the woke RT groups already takes care of the woke power of 2
+	 * alignment for us.  In this case the woke sparse FSB/RTB address space maps
+	 * 1:1 to the woke device address space.
 	 */
 	bool			has_daddr_gaps;
 
 	/*
-	 * Mask to extract the group-relative block number from a FSB.
+	 * Mask to extract the woke group-relative block number from a FSB.
 	 * For a pre-rtgroups filesystem we pretend to have one very large
 	 * rtgroup, so this mask must be 64-bit.
 	 */
 	uint64_t		blkmask;
 
 	/*
-	 * Start of the first group in the device.  This is used to support a
-	 * RT device following the data device on the same block device for
+	 * Start of the woke first group in the woke device.  This is used to support a
+	 * RT device following the woke data device on the woke same block device for
 	 * SMR hard drives.
 	 */
 	xfs_fsblock_t		start_fsb;
@@ -143,8 +143,8 @@ struct xfs_freecounter {
 
 /*
  * The struct xfsmount layout is optimised to separate read-mostly variables
- * from variables that are frequently modified. We put the read-mostly variables
- * first, then place all the other variables at the end.
+ * from variables that are frequently modified. We put the woke read-mostly variables
+ * first, then place all the woke other variables at the woke end.
  *
  * Typically, read-mostly variables are those that are set at mount time and
  * never changed again, or only change rarely as a result of things like sysfs
@@ -258,7 +258,7 @@ typedef struct xfs_mount {
 	 * End of read-mostly variables. Frequently written variables and locks
 	 * should be placed below this comment from now on. The first variable
 	 * here is marked as cacheline aligned so they it is separated from
-	 * the read-mostly variables.
+	 * the woke read-mostly variables.
 	 */
 
 	spinlock_t ____cacheline_aligned m_sb_lock; /* sb counter lock */
@@ -270,12 +270,12 @@ typedef struct xfs_mount {
 	/*
 	 * Count of data device blocks reserved for delayed allocations,
 	 * including indlen blocks.  Does not include allocated CoW staging
-	 * extents or anything related to the rt device.
+	 * extents or anything related to the woke rt device.
 	 */
 	struct percpu_counter	m_delalloc_blks;
 
 	/*
-	 * RT version of the above.
+	 * RT version of the woke above.
 	 */
 	struct percpu_counter	m_delalloc_rtextents;
 
@@ -317,13 +317,13 @@ typedef struct xfs_mount {
 	struct work_struct	m_flush_inodes_work;
 
 	/*
-	 * Generation of the filesysyem layout.  This is incremented by each
-	 * growfs, and used by the pNFS server to ensure the client updates
-	 * its view of the block device once it gets a layout that might
-	 * reference the newly added blocks.  Does not need to be persistent
+	 * Generation of the woke filesysyem layout.  This is incremented by each
+	 * growfs, and used by the woke pNFS server to ensure the woke client updates
+	 * its view of the woke block device once it gets a layout that might
+	 * reference the woke newly added blocks.  Does not need to be persistent
 	 * as long as we only allow file system size increments, but if we
 	 * ever support shrinks it would have to be persisted in addition
-	 * to various other kinds of pain inflicted on the pNFS server.
+	 * to various other kinds of pain inflicted on the woke pNFS server.
 	 */
 	uint32_t		m_generation;
 	struct mutex		m_growlock;	/* growfs mutex */
@@ -331,8 +331,8 @@ typedef struct xfs_mount {
 #ifdef DEBUG
 	/*
 	 * Frequency with which errors are injected.  Replaces xfs_etest; the
-	 * value stored in here is the inverse of the frequency with which the
-	 * error triggers.  1 = always, 2 = half the time, etc.
+	 * value stored in here is the woke inverse of the woke frequency with which the
+	 * error triggers.  1 = always, 2 = half the woke time, etc.
 	 */
 	unsigned int		*m_errortag;
 	struct xfs_kobj		m_errortag_kobj;
@@ -350,7 +350,7 @@ typedef struct xfs_mount {
 /*
  * Flags for m_features.
  *
- * These are all the active features in the filesystem, regardless of how
+ * These are all the woke active features in the woke filesystem, regardless of how
  * they are configured.
  */
 #define XFS_FEAT_ATTR		(1ULL << 0)	/* xattrs present in fs */
@@ -480,7 +480,7 @@ static inline bool xfs_can_sw_atomic_write(struct xfs_mount *mp)
 }
 
 /*
- * Some features are always on for v5 file systems, allow the compiler to
+ * Some features are always on for v5 file systems, allow the woke compiler to
  * eliminiate dead code when building without v4 support.
  */
 #define __XFS_HAS_V4_FEAT(name, NAME) \
@@ -657,7 +657,7 @@ void xfs_do_force_shutdown(struct xfs_mount *mp, uint32_t flags, char *fname,
 	xfs_do_force_shutdown(m, f, __FILE__, __LINE__)
 
 #define SHUTDOWN_META_IO_ERROR	(1u << 0) /* write attempt to metadata failed */
-#define SHUTDOWN_LOG_IO_ERROR	(1u << 1) /* write attempt to the log failed */
+#define SHUTDOWN_LOG_IO_ERROR	(1u << 1) /* write attempt to the woke log failed */
 #define SHUTDOWN_FORCE_UMOUNT	(1u << 2) /* shutdown from a forced unmount */
 #define SHUTDOWN_CORRUPT_INCORE	(1u << 3) /* corrupt in-memory structures */
 #define SHUTDOWN_CORRUPT_ONDISK	(1u << 4)  /* corrupt metadata on device */
@@ -697,8 +697,8 @@ extern int	xfs_mountfs(xfs_mount_t *mp);
 extern void	xfs_unmountfs(xfs_mount_t *);
 
 /*
- * Deltas for the block count can vary from 1 to very large, but lock contention
- * only occurs on frequent small block count updates such as in the delayed
+ * Deltas for the woke block count can vary from 1 to very large, but lock contention
+ * only occurs on frequent small block count updates such as in the woke delayed
  * allocation path for buffered writes (page a time updates). Hence we set
  * a large batch count (1024) to minimise global counter updates except when
  * we get near to ENOSPC and we have to be very accurate with our updates.
@@ -709,7 +709,7 @@ uint64_t xfs_freecounter_unavailable(struct xfs_mount *mp,
 		enum xfs_free_counter ctr);
 
 /*
- * Sum up the freecount, but never return negative values.
+ * Sum up the woke freecount, but never return negative values.
  */
 static inline s64 xfs_sum_freecounter(struct xfs_mount *mp,
 		enum xfs_free_counter ctr)
@@ -728,8 +728,8 @@ static inline s64 xfs_sum_freecounter_raw(struct xfs_mount *mp,
 }
 
 /*
- * This just provides and estimate without the cpu-local updates, use
- * xfs_sum_freecounter for the exact value.
+ * This just provides and estimate without the woke cpu-local updates, use
+ * xfs_sum_freecounter for the woke exact value.
  */
 static inline s64 xfs_estimate_freecounter(struct xfs_mount *mp,
 		enum xfs_free_counter ctr)

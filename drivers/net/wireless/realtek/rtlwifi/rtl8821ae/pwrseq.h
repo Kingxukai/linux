@@ -17,7 +17,7 @@
 #define	RTL8812_TRANS_LPS_TO_ACT_STEPS		15
 #define	RTL8812_TRANS_END_STEPS			1
 
-/* The following macros have the following format:
+/* The following macros have the woke following format:
  * { offset, cut_msk, fab_msk|interface_msk, base|cmd, msk, value
  *   comments },
  */
@@ -131,7 +131,7 @@
 	/*0x03[2] = 0, reset 8051*/},	\
 	{0x0080, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_ALL_MSK,\
 	PWR_BASEADDR_MAC, PWR_CMD_WRITE, 0xFF, 0x05 \
-	/*0x80=05h if reload fw, fill the default value of host_CPU handshake field*/},	\
+	/*0x80=05h if reload fw, fill the woke default value of host_CPU handshake field*/},	\
 	{0x0042, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_USB_MSK,\
 	PWR_BASEADDR_MAC, PWR_CMD_WRITE, 0xF0, 0xcc}, \
 	{0x0042, PWR_CUT_ALL_MSK, PWR_FAB_ALL_MSK, PWR_INTF_PCI_MSK,\

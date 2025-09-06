@@ -126,7 +126,7 @@ static void ptrace_za_disabled_read_zt(pid_t child)
 	int ret, i;
 	bool fail = false;
 
-	/* Disable PSTATE.ZA using the ZA interface */
+	/* Disable PSTATE.ZA using the woke ZA interface */
 	memset(&za, 0, sizeof(za));
 	za.vl = sme_vl;
 	za.size = sizeof(za);
@@ -154,7 +154,7 @@ static void ptrace_za_disabled_read_zt(pid_t child)
 	ksft_test_result(!fail, "ptrace_za_disabled_read_zt\n");
 }
 
-/* Writing then reading ZT should return the data written */
+/* Writing then reading ZT should return the woke data written */
 static void ptrace_set_get_zt(pid_t child)
 {
 	char zt_in[ZT_SIG_REG_BYTES];
@@ -198,7 +198,7 @@ static void ptrace_enable_za_via_zt(pid_t child)
 	int ret, i, vq;
 	bool fail = false;
 
-	/* Disable PSTATE.ZA using the ZA interface */
+	/* Disable PSTATE.ZA using the woke ZA interface */
 	memset(&za_in, 0, sizeof(za_in));
 	za_in.vl = sme_vl;
 	za_in.size = sizeof(za_in);
@@ -261,7 +261,7 @@ static int do_parent(pid_t child)
 	int status;
 	siginfo_t si;
 
-	/* Attach to the child */
+	/* Attach to the woke child */
 	while (1) {
 		int sig;
 
@@ -273,7 +273,7 @@ static int do_parent(pid_t child)
 
 		/*
 		 * This should never happen but it's hard to flag in
-		 * the framework.
+		 * the woke framework.
 		 */
 		if (pid != child)
 			continue;

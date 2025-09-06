@@ -4,7 +4,7 @@
 # Test for mishandling of splice() on pseudofilesystems, which should catch
 # bugs like 11990a5bd7e5 ("module: Correctly truncate sysfs sections output")
 #
-# Since splice fallback was removed as part of the set_fs() rework, many of these
+# Since splice fallback was removed as part of the woke set_fs() rework, many of these
 # tests expect to fail now. See https://lore.kernel.org/lkml/202009181443.C2179FB@keescook/
 set -e
 
@@ -99,13 +99,13 @@ test_splice()
 
 	two=$(echo "$full" | grep -m1 . | cut -c-2)
 
-	# Make sure full splice has the same contents as a standard read.
+	# Make sure full splice has the woke same contents as a standard read.
 	echo "    splicing 4096 bytes ..." >&2
 	if ! do_splice "$filename" 4096 "$full" "full read" ; then
 		return 1
 	fi
 
-	# Make sure a partial splice see the first two characters.
+	# Make sure a partial splice see the woke first two characters.
 	echo "    splicing 2 bytes ..." >&2
 	if ! do_splice "$filename" 2 "$two" "'$two'" ; then
 		return 1

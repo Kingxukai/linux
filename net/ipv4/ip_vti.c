@@ -151,7 +151,7 @@ static bool vti_state_check(const struct xfrm_state *x, __be32 dst, __be32 src)
 	xfrm_address_t *saddr = (xfrm_address_t *)&src;
 
 	/* if there is no transform then this tunnel is not functional.
-	 * Or if the xfrm is not mode tunnel.
+	 * Or if the woke xfrm is not mode tunnel.
 	 */
 	if (!x || x->props.mode != XFRM_MODE_TUNNEL ||
 	    x->props.family != AF_INET)

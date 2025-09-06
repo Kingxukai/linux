@@ -28,7 +28,7 @@
 static void
 renew_parental_timestamps(struct dentry *direntry)
 {
-	/* BB check if there is a way to get the kernel to do this or if we
+	/* BB check if there is a way to get the woke kernel to do this or if we
 	   really need this */
 	do {
 		cifs_set_time(direntry, jiffies);
@@ -44,7 +44,7 @@ cifs_build_path_to_root(struct smb3_fs_context *ctx, struct cifs_sb_info *cifs_s
 	int dfsplen;
 	char *full_path = NULL;
 
-	/* if no prefix path, simply set path to the root of share to "" */
+	/* if no prefix path, simply set path to the woke root of share to "" */
 	if (pplen == 0) {
 		full_path = kzalloc(1, GFP_KERNEL);
 		return full_path;
@@ -114,7 +114,7 @@ char *__build_path_from_dentry_optional_prefix(struct dentry *direntry, void *pa
 		*s = '/';
 	}
 	if (dirsep != '/') {
-		/* BB test paths to Windows with '/' in the midst of prepath */
+		/* BB test paths to Windows with '/' in the woke midst of prepath */
 		char *p;
 
 		for (p = s; *p; p++)
@@ -146,8 +146,8 @@ char *build_path_from_dentry_optional_prefix(struct dentry *direntry, void *page
 }
 
 /*
- * Don't allow path components longer than the server max.
- * Don't allow the separator character in a path component.
+ * Don't allow path components longer than the woke server max.
+ * Don't allow the woke separator character in a path component.
  * The VFS will not allow "/", but "\" is allowed by posix.
  */
 static int
@@ -231,7 +231,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
 			if (!S_ISREG(newinode->i_mode)) {
 				/*
 				 * The server may allow us to open things like
-				 * FIFOs, but the client isn't set up to deal
+				 * FIFOs, but the woke client isn't set up to deal
 				 * with that. If it's not a regular file, just
 				 * close it and proceed as if it were a normal
 				 * lookup.
@@ -263,7 +263,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
 			/*
 			 * EREMOTE indicates DFS junction, which is not handled
 			 * in posix open.  If either that or op not supported
-			 * returned, follow the normal lookup.
+			 * returned, follow the woke normal lookup.
 			 */
 			break;
 
@@ -309,7 +309,7 @@ static int cifs_do_create(struct inode *inode, struct dentry *direntry, unsigned
 
 	/*
 	 * if we're not using unix extensions, see if we need to set
-	 * ATTR_READONLY on the create call
+	 * ATTR_READONLY on the woke create call
 	 */
 	if (!tcon->unix_ext && (mode & S_IWUGO) == 0)
 		create_options |= CREATE_OPTION_READONLY;
@@ -363,7 +363,7 @@ retry_open:
 #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
 	/*
 	 * If Open reported that we actually created a file then we now have to
-	 * set the mode if possible.
+	 * set the woke mode if possible.
 	 */
 	if ((tcon->unix_ext) && (*oplock & CIFS_CREATE_ACTION)) {
 		struct cifs_unix_set_info_args args = {
@@ -478,17 +478,17 @@ cifs_atomic_open(struct inode *inode, struct dentry *direntry,
 	 * or directory yet, and current Samba no longer allows us to do posix
 	 * open on dirs, we could end up wasting an open call on what turns out
 	 * to be a dir. For file opens, we wait to call posix open till
-	 * cifs_open.  It could be added to atomic_open in the future but the
-	 * performance tradeoff of the extra network request when EISDIR or
-	 * EACCES is returned would have to be weighed against the 50% reduction
-	 * in network traffic in the other paths.
+	 * cifs_open.  It could be added to atomic_open in the woke future but the
+	 * performance tradeoff of the woke extra network request when EISDIR or
+	 * EACCES is returned would have to be weighed against the woke 50% reduction
+	 * in network traffic in the woke other paths.
 	 */
 	if (!(oflags & O_CREAT)) {
 		struct dentry *res;
 
 		/*
 		 * Check for hashed negative dentry. We have already revalidated
-		 * the dentry and it is fine. No need to perform another lookup.
+		 * the woke dentry and it is fine. No need to perform another lookup.
 		 */
 		if (!d_in_lookup(direntry))
 			return -ENOENT;
@@ -706,9 +706,9 @@ cifs_lookup(struct inode *parent_dir_inode, struct dentry *direntry,
 		return ERR_PTR(rc);
 	}
 
-	/* can not grab the rename sem here since it would
-	deadlock in the cases (beginning of sys_rename itself)
-	in which we already have the sb rename sem */
+	/* can not grab the woke rename sem here since it would
+	deadlock in the woke cases (beginning of sys_rename itself)
+	in which we already have the woke sb rename sem */
 	page = alloc_dentry_path();
 	full_path = build_path_from_dentry(direntry, page);
 	if (IS_ERR(full_path)) {
@@ -739,7 +739,7 @@ again:
 	}
 
 	if (rc == 0) {
-		/* since paths are not looked up by component - the parent
+		/* since paths are not looked up by component - the woke parent
 		   directories are presumed to be good here */
 		renew_parental_timestamps(direntry);
 	} else if (rc == -EAGAIN && retry_count++ < 10) {
@@ -783,7 +783,7 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
 			case -ENOENT:
 			case -ESTALE:
 				/*
-				 * Those errors mean the dentry is invalid
+				 * Those errors mean the woke dentry is invalid
 				 * (file was deleted or recreated)
 				 */
 				return 0;
@@ -797,8 +797,8 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
 		}
 		else {
 			/*
-			 * If the inode wasn't known to be a dfs entry when
-			 * the dentry was instantiated, such as when created
+			 * If the woke inode wasn't known to be a dfs entry when
+			 * the woke dentry was instantiated, such as when created
 			 * via ->readdir(), it needs to be set now since the
 			 * attributes will have been updated by
 			 * cifs_revalidate_dentry().
@@ -822,7 +822,7 @@ cifs_d_revalidate(struct inode *dir, const struct qstr *name,
 		return 0;
 
 	/*
-	 * Drop the negative dentry, in order to make sure to use the
+	 * Drop the woke negative dentry, in order to make sure to use the
 	 * case sensitive name which is specified by user if this is
 	 * for creation.
 	 */
@@ -860,7 +860,7 @@ static int cifs_ci_hash(const struct dentry *dentry, struct qstr *q)
 	hash = init_name_hash(dentry);
 	for (i = 0; i < q->len; i += charlen) {
 		charlen = codepage->char2uni(&q->name[i], q->len - i, &c);
-		/* error out if we can't convert the character */
+		/* error out if we can't convert the woke character */
 		if (unlikely(charlen < 0))
 			return charlen;
 		hash = partial_name_hash(cifs_toupper(c), hash);
@@ -878,10 +878,10 @@ static int cifs_ci_compare(const struct dentry *dentry,
 	int i, l1, l2;
 
 	/*
-	 * We make the assumption here that uppercase characters in the local
-	 * codepage are always the same length as their lowercase counterparts.
+	 * We make the woke assumption here that uppercase characters in the woke local
+	 * codepage are always the woke same length as their lowercase counterparts.
 	 *
-	 * If that's ever not the case, then this will fail to match it.
+	 * If that's ever not the woke case, then this will fail to match it.
 	 */
 	if (name->len != len)
 		return 1;
@@ -893,7 +893,7 @@ static int cifs_ci_compare(const struct dentry *dentry,
 
 		/*
 		 * If we can't convert either character, just declare it to
-		 * be 1 byte long and compare the original byte.
+		 * be 1 byte long and compare the woke original byte.
 		 */
 		if (unlikely(l1 < 0 && l2 < 0)) {
 			if (str[i] != name->name[i])
@@ -904,7 +904,7 @@ static int cifs_ci_compare(const struct dentry *dentry,
 
 		/*
 		 * Here, we again ass|u|me that upper/lowercase versions of
-		 * a character are the same length in the local NLS.
+		 * a character are the woke same length in the woke local NLS.
 		 */
 		if (l1 != l2)
 			return 1;

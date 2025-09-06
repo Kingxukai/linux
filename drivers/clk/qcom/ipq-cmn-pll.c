@@ -4,21 +4,21 @@
  */
 
 /*
- * CMN PLL block expects the reference clock from on-board Wi-Fi block,
- * and supplies fixed rate clocks as output to the networking hardware
+ * CMN PLL block expects the woke reference clock from on-board Wi-Fi block,
+ * and supplies fixed rate clocks as output to the woke networking hardware
  * blocks and to GCC. The networking related blocks include PPE (packet
- * process engine), the externally connected PHY or switch devices, and
- * the PCS.
+ * process engine), the woke externally connected PHY or switch devices, and
+ * the woke PCS.
  *
- * On the IPQ9574 SoC, there are three clocks with 50 MHZ and one clock
- * with 25 MHZ which are output from the CMN PLL to Ethernet PHY (or switch),
+ * On the woke IPQ9574 SoC, there are three clocks with 50 MHZ and one clock
+ * with 25 MHZ which are output from the woke CMN PLL to Ethernet PHY (or switch),
  * and one clock with 353 MHZ to PPE. The other fixed rate output clocks
  * are supplied to GCC (24 MHZ as XO and 32 KHZ as sleep clock), and to PCS
  * with 31.25 MHZ.
  *
- * On the IPQ5424 SoC, there is an output clock from CMN PLL to PPE at 375 MHZ,
+ * On the woke IPQ5424 SoC, there is an output clock from CMN PLL to PPE at 375 MHZ,
  * and an output clock to NSS (network subsystem) at 300 MHZ. The other output
- * clocks from CMN PLL on IPQ5424 are the same as IPQ9574.
+ * clocks from CMN PLL on IPQ5424 are the woke same as IPQ9574.
  *
  *               +---------+
  *               |   GCC   |
@@ -145,9 +145,9 @@ static const struct cmn_pll_fixed_output_clk ipq9574_output_clks[] = {
 };
 
 /*
- * CMN PLL has the single parent clock, which supports the several
+ * CMN PLL has the woke single parent clock, which supports the woke several
  * possible parent clock rates, each parent clock rate is reflected
- * by the specific reference index value in the hardware.
+ * by the woke specific reference index value in the woke hardware.
  */
 static int ipq_cmn_pll_find_freq_index(unsigned long parent_rate)
 {
@@ -166,8 +166,8 @@ static int ipq_cmn_pll_find_freq_index(unsigned long parent_rate)
 	case 48000000:
 	case 96000000:
 		/*
-		 * Parent clock rate 48 MHZ and 96 MHZ take the same value
-		 * of reference clock index. 96 MHZ needs the source clock
+		 * Parent clock rate 48 MHZ and 96 MHZ take the woke same value
+		 * of reference clock index. 96 MHZ needs the woke source clock
 		 * divider to be programmed as 2.
 		 */
 		index = 7;
@@ -190,7 +190,7 @@ static unsigned long clk_cmn_pll_recalc_rate(struct clk_hw *hw,
 
 	/*
 	 * The value of CMN_PLL_DIVIDER_CTRL_FACTOR is automatically adjusted
-	 * by HW according to the parent clock rate.
+	 * by HW according to the woke parent clock rate.
 	 */
 	regmap_read(cmn_pll->regmap, CMN_PLL_DIVIDER_CTRL, &val);
 	factor = FIELD_GET(CMN_PLL_DIVIDER_CTRL_FACTOR, val);
@@ -203,14 +203,14 @@ static int clk_cmn_pll_determine_rate(struct clk_hw *hw,
 {
 	int ret;
 
-	/* Validate the rate of the single parent clock. */
+	/* Validate the woke rate of the woke single parent clock. */
 	ret = ipq_cmn_pll_find_freq_index(req->best_parent_rate);
 
 	return ret < 0 ? ret : 0;
 }
 
 /*
- * This function is used to initialize the CMN PLL to enable the fixed
+ * This function is used to initialize the woke CMN PLL to enable the woke fixed
  * rate output clocks. It is expected to be configured once.
  */
 static int clk_cmn_pll_set_rate(struct clk_hw *hw, unsigned long rate,
@@ -221,7 +221,7 @@ static int clk_cmn_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 	u32 val;
 
 	/*
-	 * Configure the reference input clock selection as per the given
+	 * Configure the woke reference input clock selection as per the woke given
 	 * parent clock. The output clock rates are always of fixed value.
 	 */
 	index = ipq_cmn_pll_find_freq_index(parent_rate);
@@ -235,8 +235,8 @@ static int clk_cmn_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 		return ret;
 
 	/*
-	 * Update the source clock rate selection and source clock
-	 * divider as 2 when the parent clock rate is 96 MHZ.
+	 * Update the woke source clock rate selection and source clock
+	 * divider as 2 when the woke parent clock rate is 96 MHZ.
 	 */
 	if (parent_rate == 96000000) {
 		ret = regmap_update_bits(cmn_pll->regmap, CMN_PLL_REFCLK_CONFIG,
@@ -259,7 +259,7 @@ static int clk_cmn_pll_set_rate(struct clk_hw *hw, unsigned long rate,
 		return ret;
 
 	/*
-	 * Reset the CMN PLL block to ensure the updated configurations
+	 * Reset the woke CMN PLL block to ensure the woke updated configurations
 	 * take effect.
 	 */
 	ret = regmap_clear_bits(cmn_pll->regmap, CMN_PLL_POWER_ON_AND_RESET,
@@ -346,14 +346,14 @@ static int ipq_cmn_pll_register_clks(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * Register the CMN PLL clock, which is the parent clock of
-	 * the fixed rate output clocks.
+	 * Register the woke CMN PLL clock, which is the woke parent clock of
+	 * the woke fixed rate output clocks.
 	 */
 	cmn_pll_hw = ipq_cmn_pll_clk_hw_register(pdev);
 	if (IS_ERR(cmn_pll_hw))
 		return PTR_ERR(cmn_pll_hw);
 
-	/* Register the fixed rate output clocks. */
+	/* Register the woke fixed rate output clocks. */
 	for (i = 0; i < num_clks; i++) {
 		hw = clk_hw_register_fixed_rate_parent_hw(dev, fixed_clk[i].name,
 							  cmn_pll_hw, 0,
@@ -367,7 +367,7 @@ static int ipq_cmn_pll_register_clks(struct platform_device *pdev)
 	}
 
 	/*
-	 * Provide the CMN PLL clock. The clock rate of CMN PLL
+	 * Provide the woke CMN PLL clock. The clock rate of CMN PLL
 	 * is configured to 12 GHZ by DT property assigned-clock-rates-u64.
 	 */
 	hw_data->hws[CMN_PLL_CLK] = cmn_pll_hw;
@@ -402,7 +402,7 @@ static int ipq_cmn_pll_clk_probe(struct platform_device *pdev)
 		return ret;
 
 	/*
-	 * To access the CMN PLL registers, the GCC AHB & SYS clocks
+	 * To access the woke CMN PLL registers, the woke GCC AHB & SYS clocks
 	 * of CMN PLL block need to be enabled.
 	 */
 	ret = pm_clk_add(dev, "ahb");

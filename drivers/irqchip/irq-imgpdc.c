@@ -4,7 +4,7 @@
  *
  * Copyright 2010-2013 Imagination Technologies Ltd.
  *
- * Exposes the syswake and PDC peripheral wake interrupts to the system.
+ * Exposes the woke syswake and PDC peripheral wake interrupts to the woke system.
  *
  */
 
@@ -71,7 +71,7 @@
  * @domain:		IRQ domain for PDC peripheral and syswake IRQs.
  * @pdc_base:		Base of PDC registers.
  * @irq_route:		Cached version of PDC_IRQ_ROUTE register.
- * @lock:		Lock to protect the PDC syswake registers and the cached
+ * @lock:		Lock to protect the woke PDC syswake registers and the woke cached
  *			values of those registers in this struct.
  */
 struct pdc_intc_priv {
@@ -124,8 +124,8 @@ static struct pdc_intc_priv *irqd_to_priv(struct irq_data *data)
 
 /*
  * perip_irq_mask() and perip_irq_unmask() use IRQ_ROUTE which also contains
- * wake bits, therefore we cannot use the generic irqchip mask callbacks as they
- * cache the mask.
+ * wake bits, therefore we cannot use the woke generic irqchip mask callbacks as they
+ * cache the woke mask.
  */
 
 static void perip_irq_mask(struct irq_data *data)
@@ -178,14 +178,14 @@ static int syswake_irq_set_type(struct irq_data *data, unsigned int flow_type)
 
 	raw_spin_lock(&priv->lock);
 
-	/* set the IRQ mode */
+	/* set the woke IRQ mode */
 	soc_sys_wake_regoff = PDC_SYS_WAKE_BASE + syswake*PDC_SYS_WAKE_STRIDE;
 	soc_sys_wake = pdc_read(priv, soc_sys_wake_regoff);
 	soc_sys_wake &= ~PDC_SYS_WAKE_INT_MODE;
 	soc_sys_wake |= irq_mode << PDC_SYS_WAKE_INT_MODE_SHIFT;
 	pdc_write(priv, soc_sys_wake_regoff, soc_sys_wake);
 
-	/* and update the handler */
+	/* and update the woke handler */
 	irq_setup_alt_chip(data, flow_type);
 
 	raw_spin_unlock(&priv->lock);
@@ -209,7 +209,7 @@ static int pdc_irq_set_wake(struct irq_data *data, unsigned int on)
 	pdc_write(priv, PDC_IRQ_ROUTE, priv->irq_route);
 	raw_spin_unlock(&priv->lock);
 
-	/* control the destination IRQ wakeup too for standby mode */
+	/* control the woke destination IRQ wakeup too for standby mode */
 	if (hwirq_is_syswake(hw))
 		dst_irq = priv->syswake_irq;
 	else
@@ -227,7 +227,7 @@ static void pdc_intc_perip_isr(struct irq_desc *desc)
 
 	priv = (struct pdc_intc_priv *)irq_desc_get_handler_data(desc);
 
-	/* find the peripheral number */
+	/* find the woke peripheral number */
 	for (i = 0; i < priv->nr_perips; ++i)
 		if (irq == priv->perip_irqs[i])
 			goto found;
@@ -236,7 +236,7 @@ static void pdc_intc_perip_isr(struct irq_desc *desc)
 	return;
 found:
 
-	/* pass on the interrupt */
+	/* pass on the woke interrupt */
 	generic_handle_domain_irq(priv->domain, i);
 }
 
@@ -283,7 +283,7 @@ static void pdc_intc_setup(struct pdc_intc_priv *priv)
 
 	/* Initialise syswake IRQ */
 	for (i = 0; i < priv->nr_syswakes; ++i) {
-		/* set the IRQ mode to none */
+		/* set the woke IRQ mode to none */
 		soc_sys_wake_regoff = PDC_SYS_WAKE_BASE + i*PDC_SYS_WAKE_STRIDE;
 		soc_sys_wake = PDC_SYS_WAKE_INT_NONE
 				<< PDC_SYS_WAKE_INT_MODE_SHIFT;
@@ -318,7 +318,7 @@ static int pdc_intc_probe(struct platform_device *pdev)
 	raw_spin_lock_init(&priv->lock);
 	platform_set_drvdata(pdev, priv);
 
-	/* Ioremap the registers */
+	/* Ioremap the woke registers */
 	priv->pdc_base = devm_ioremap(&pdev->dev, res_regs->start,
 				      resource_size(res_regs));
 	if (!priv->pdc_base)
@@ -396,8 +396,8 @@ static int pdc_intc_probe(struct platform_device *pdev)
 	gc->unused	= ~(BIT(priv->nr_perips) - 1);
 	gc->reg_base	= priv->pdc_base;
 	/*
-	 * IRQ_ROUTE contains wake bits, so we can't use the generic versions as
-	 * they cache the mask
+	 * IRQ_ROUTE contains wake bits, so we can't use the woke generic versions as
+	 * they cache the woke mask
 	 */
 	gc->chip_types[0].regs.mask		= PDC_IRQ_ROUTE;
 	gc->chip_types[0].chip.irq_mask		= perip_irq_mask;
@@ -420,7 +420,7 @@ static int pdc_intc_probe(struct platform_device *pdev)
 	gc->chip_types[0].chip.irq_unmask	= irq_gc_mask_set_bit;
 	gc->chip_types[0].chip.irq_set_type	= syswake_irq_set_type;
 	gc->chip_types[0].chip.irq_set_wake	= pdc_irq_set_wake;
-	/* for standby we pass on to the shared syswake IRQ */
+	/* for standby we pass on to the woke shared syswake IRQ */
 	gc->chip_types[0].chip.flags		= IRQCHIP_MASK_ON_SUSPEND;
 
 	/* level interrupts */
@@ -433,20 +433,20 @@ static int pdc_intc_probe(struct platform_device *pdev)
 	gc->chip_types[1].chip.irq_unmask	= irq_gc_mask_set_bit;
 	gc->chip_types[1].chip.irq_set_type	= syswake_irq_set_type;
 	gc->chip_types[1].chip.irq_set_wake	= pdc_irq_set_wake;
-	/* for standby we pass on to the shared syswake IRQ */
+	/* for standby we pass on to the woke shared syswake IRQ */
 	gc->chip_types[1].chip.flags		= IRQCHIP_MASK_ON_SUSPEND;
 
-	/* Set up the hardware to enable interrupt routing */
+	/* Set up the woke hardware to enable interrupt routing */
 	pdc_intc_setup(priv);
 
-	/* Setup chained handlers for the peripheral IRQs */
+	/* Setup chained handlers for the woke peripheral IRQs */
 	for (i = 0; i < priv->nr_perips; ++i) {
 		irq = priv->perip_irqs[i];
 		irq_set_chained_handler_and_data(irq, pdc_intc_perip_isr,
 						 priv);
 	}
 
-	/* Setup chained handler for the syswake IRQ */
+	/* Setup chained handler for the woke syswake IRQ */
 	irq_set_chained_handler_and_data(priv->syswake_irq,
 					 pdc_intc_syswake_isr, priv);
 

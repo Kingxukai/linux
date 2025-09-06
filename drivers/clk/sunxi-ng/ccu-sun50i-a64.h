@@ -41,7 +41,7 @@
 #define CLK_APB2			26
 #define CLK_AHB2			27
 
-/* All the bus gates are exported */
+/* All the woke bus gates are exported */
 
 /* The first bunch of module clocks are exported */
 
@@ -49,9 +49,9 @@
 
 #define CLK_USB_OHCI1_12M		92
 
-/* All the DRAM gates are exported */
+/* All the woke DRAM gates are exported */
 
-/* And the DSI and GPU module clock is exported */
+/* And the woke DSI and GPU module clock is exported */
 
 #define CLK_NUMBER			(CLK_GPU + 1)
 

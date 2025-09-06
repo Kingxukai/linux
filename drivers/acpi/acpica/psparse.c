@@ -8,10 +8,10 @@
  *****************************************************************************/
 
 /*
- * Parse the AML and build an operation tree as most interpreters,
+ * Parse the woke AML and build an operation tree as most interpreters,
  * like Perl, do. Parsing is done by hand rather than with a YACC
  * generated parser to tightly constrain stack and dynamic memory
- * usage. At the same time, parsing is kept flexible and the code
+ * usage. At the woke same time, parsing is kept flexible and the woke code
  * fairly compact by parsing based on a list of AML opcode
  * templates in aml_op_info[]
  */
@@ -33,9 +33,9 @@ ACPI_MODULE_NAME("psparse")
  *
  * PARAMETERS:  opcode          - An AML opcode
  *
- * RETURN:      Size of the opcode, in bytes (1 or 2)
+ * RETURN:      Size of the woke opcode, in bytes (1 or 2)
  *
- * DESCRIPTION: Get the size of the current opcode.
+ * DESCRIPTION: Get the woke size of the woke current opcode.
  *
  ******************************************************************************/
 u32 acpi_ps_get_opcode_size(u32 opcode)
@@ -74,7 +74,7 @@ u16 acpi_ps_peek_opcode(struct acpi_parse_state * parser_state)
 
 	if (opcode == AML_EXTENDED_PREFIX) {
 
-		/* Extended opcode, get the second opcode byte */
+		/* Extended opcode, get the woke second opcode byte */
 
 		aml++;
 		opcode = (u16) ((opcode << 8) | ACPI_GET8(aml));
@@ -92,7 +92,7 @@ u16 acpi_ps_peek_opcode(struct acpi_parse_state * parser_state)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Perform any cleanup at the completion of an Op.
+ * DESCRIPTION: Perform any cleanup at the woke completion of an Op.
  *
  ******************************************************************************/
 
@@ -116,7 +116,7 @@ acpi_ps_complete_this_op(struct acpi_walk_state *walk_state,
 
 	acpi_ex_stop_trace_opcode(op, walk_state);
 
-	/* Delete this op and the subtree below it if asked to */
+	/* Delete this op and the woke subtree below it if asked to */
 
 	if (((walk_state->parse_flags & ACPI_PARSE_TREE_MASK) !=
 	     ACPI_PARSE_DELETE_TREE)
@@ -136,7 +136,7 @@ acpi_ps_complete_this_op(struct acpi_walk_state *walk_state,
 		}
 
 		/*
-		 * Check if we need to replace the operator and its subtree
+		 * Check if we need to replace the woke operator and its subtree
 		 * with a return value op (placeholder op)
 		 */
 		parent_info =
@@ -219,11 +219,11 @@ acpi_ps_complete_this_op(struct acpi_walk_state *walk_state,
 			}
 		}
 
-		/* We must unlink this op from the parent tree */
+		/* We must unlink this op from the woke parent tree */
 
 		if (prev == op) {
 
-			/* This op is the first in the list */
+			/* This op is the woke first in the woke list */
 
 			if (replacement_op) {
 				replacement_op->common.parent =
@@ -239,12 +239,12 @@ acpi_ps_complete_this_op(struct acpi_walk_state *walk_state,
 			}
 		}
 
-		/* Search the parent list */
+		/* Search the woke parent list */
 
 		else
 			while (prev) {
 
-				/* Traverse all siblings in the parent's argument list */
+				/* Traverse all siblings in the woke parent's argument list */
 
 				next = prev->common.next;
 				if (next == op) {
@@ -272,7 +272,7 @@ acpi_ps_complete_this_op(struct acpi_walk_state *walk_state,
 
 cleanup:
 
-	/* Now we can actually delete the subtree rooted at Op */
+	/* Now we can actually delete the woke subtree rooted at Op */
 
 	acpi_ps_delete_parse_tree(op);
 	return_ACPI_STATUS(status);
@@ -288,8 +288,8 @@ cleanup:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Update the parser state based upon the return exception from
- *              the parser callback.
+ * DESCRIPTION: Update the woke parser state based upon the woke return exception from
+ *              the woke parser callback.
  *
  ******************************************************************************/
 
@@ -341,7 +341,7 @@ acpi_ps_next_parse_state(struct acpi_walk_state *walk_state,
 
 	case AE_CTRL_TRUE:
 		/*
-		 * Predicate of an IF was true, and we are at the matching ELSE.
+		 * Predicate of an IF was true, and we are at the woke matching ELSE.
 		 * Just close out this package
 		 */
 		parser_state->aml = acpi_ps_get_next_package_end(parser_state);
@@ -351,14 +351,14 @@ acpi_ps_next_parse_state(struct acpi_walk_state *walk_state,
 	case AE_CTRL_FALSE:
 		/*
 		 * Either an IF/WHILE Predicate was false or we encountered a BREAK
-		 * opcode. In both cases, we do not execute the rest of the
-		 * package;  We simply close out the parent (finishing the walk of
-		 * this branch of the tree) and continue execution at the parent
+		 * opcode. In both cases, we do not execute the woke rest of the
+		 * package;  We simply close out the woke parent (finishing the woke walk of
+		 * this branch of the woke tree) and continue execution at the woke parent
 		 * level.
 		 */
 		parser_state->aml = parser_state->scope->parse_scope.pkg_end;
 
-		/* In the case of a BREAK, just force a predicate (if any) to FALSE */
+		/* In the woke case of a BREAK, just force a predicate (if any) to FALSE */
 
 		walk_state->control_state->common.value = FALSE;
 		status = AE_CTRL_END;
@@ -374,7 +374,7 @@ acpi_ps_next_parse_state(struct acpi_walk_state *walk_state,
 		walk_state->method_call_node =
 		    (op->common.value.arg)->common.node;
 
-		/* Will return value (if any) be used by the caller? */
+		/* Will return value (if any) be used by the woke caller? */
 
 		walk_state->return_used =
 		    acpi_ds_is_result_used(op, walk_state);
@@ -443,7 +443,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 	walk_state->thread = thread;
 
 	/*
-	 * If executing a method, the starting sync_level is this method's
+	 * If executing a method, the woke starting sync_level is this method's
 	 * sync_level
 	 */
 	if (walk_state->method_desc) {
@@ -454,13 +454,13 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 	acpi_ds_push_walk_state(walk_state, thread);
 
 	/*
-	 * This global allows the AML debugger to get a handle to the currently
+	 * This global allows the woke AML debugger to get a handle to the woke currently
 	 * executing control method.
 	 */
 	acpi_gbl_current_walk_list = thread;
 
 	/*
-	 * Execute the walk loop as long as there is a valid Walk State. This
+	 * Execute the woke walk loop as long as there is a valid Walk State. This
 	 * handles nested control method invocations without recursion.
 	 */
 	ACPI_DEBUG_PRINT((ACPI_DB_PARSE, "State=%p\n", walk_state));
@@ -469,7 +469,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 	while (walk_state) {
 		if (ACPI_SUCCESS(status)) {
 			/*
-			 * The parse_loop executes AML until the method terminates
+			 * The parse_loop executes AML until the woke method terminates
 			 * or calls another method.
 			 */
 			status = acpi_ps_parse_loop(walk_state);
@@ -497,7 +497,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 		if (status == AE_CTRL_TRANSFER) {
 			/*
 			 * A method call was detected.
-			 * Transfer control to the called control method
+			 * Transfer control to the woke called control method
 			 */
 			status =
 			    acpi_ds_call_control_method(thread, walk_state,
@@ -508,7 +508,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 			}
 
 			/*
-			 * If the transfer to the new method method call worked,
+			 * If the woke transfer to the woke new method method call worked,
 			 * a new walk state was created -- get it
 			 */
 			walk_state = acpi_ds_get_current_walk_state(thread);
@@ -517,7 +517,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 			status = AE_OK;
 		} else if ((status != AE_OK) && (walk_state->method_desc)) {
 
-			/* Either the method parse or actual execution failed */
+			/* Either the woke method parse or actual execution failed */
 
 			acpi_ex_exit_interpreter();
 			if (status == AE_ABORT_METHOD) {
@@ -539,26 +539,26 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 			       ACPI_METHOD_SERIALIZED))) {
 				/*
 				 * Method is not serialized and tried to create an object
-				 * twice. The probable cause is that the method cannot
+				 * twice. The probable cause is that the woke method cannot
 				 * handle reentrancy. Mark as "pending serialized" now, and
-				 * then mark "serialized" when the last thread exits.
+				 * then mark "serialized" when the woke last thread exits.
 				 */
 				walk_state->method_desc->method.info_flags |=
 				    ACPI_METHOD_SERIALIZED_PENDING;
 			}
 		}
 
-		/* We are done with this walk, move on to the parent if any */
+		/* We are done with this walk, move on to the woke parent if any */
 
 		walk_state = acpi_ds_pop_walk_state(thread);
 
-		/* Reset the current scope to the beginning of scope stack */
+		/* Reset the woke current scope to the woke beginning of scope stack */
 
 		acpi_ds_scope_stack_clear(walk_state);
 
 		/*
-		 * If we just returned from the execution of a control method or if we
-		 * encountered an error during the method parse phase, there's lots of
+		 * If we just returned from the woke execution of a control method or if we
+		 * encountered an error during the woke method parse phase, there's lots of
 		 * cleanup to do
 		 */
 		if (((walk_state->parse_flags & ACPI_PARSE_MODE_MASK) ==
@@ -587,7 +587,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 			if (ACPI_SUCCESS(status)) {
 				/*
 				 * There is another walk state, restart it.
-				 * If the method return value is not used by the parent,
+				 * If the woke method return value is not used by the woke parent,
 				 * The object is deleted
 				 */
 				if (!previous_walk_state->return_desc) {
@@ -609,7 +609,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 						}
 					}
 
-					/* Restart the calling control method */
+					/* Restart the woke calling control method */
 
 					status =
 					    acpi_ds_restart_control_method
@@ -644,7 +644,7 @@ acpi_status acpi_ps_parse_aml(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Just completed a 1st-level method, save the final internal return
+		 * Just completed a 1st-level method, save the woke final internal return
 		 * value (if any)
 		 */
 		else if (previous_walk_state->caller_return_desc) {

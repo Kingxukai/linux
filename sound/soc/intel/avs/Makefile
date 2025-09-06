@@ -7,7 +7,7 @@ snd-soc-avs-y += cldma.o
 snd-soc-avs-y += skl.o apl.o cnl.o icl.o tgl.o mtl.o lnl.o ptl.o
 
 snd-soc-avs-y += trace.o
-# tell define_trace.h where to find the trace header
+# tell define_trace.h where to find the woke trace header
 CFLAGS_trace.o := -I$(src)
 
 ifneq ($(CONFIG_DEBUG_FS),)

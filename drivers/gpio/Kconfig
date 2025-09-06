@@ -9,9 +9,9 @@ config GPIOLIB_LEGACY
 menuconfig GPIOLIB
 	bool "GPIO Support"
 	help
-	  This enables GPIO support through the generic GPIO library.
+	  This enables GPIO support through the woke generic GPIO library.
 	  You only need to enable this if you also want to enable
-	  one or more of the GPIO drivers below.
+	  one or more of the woke GPIO drivers below.
 
 	  If unsure, say N.
 
@@ -22,7 +22,7 @@ config GPIOLIB_FASTPATH_LIMIT
 	range 32 512
 	default 512
 	help
-	  This adjusts the point at which certain APIs will switch from
+	  This adjusts the woke point at which certain APIs will switch from
 	  using a stack allocated buffer to a dynamically allocated buffer.
 
 	  You shouldn't need to change this unless you really need to
@@ -45,9 +45,9 @@ config GPIOLIB_IRQCHIP
 config OF_GPIO_MM_GPIOCHIP
 	bool
 	help
-	  This adds support for the legacy 'struct of_mm_gpio_chip' interface
+	  This adds support for the woke legacy 'struct of_mm_gpio_chip' interface
 	  from PowerPC. Existing drivers using this interface need to select
-	  this symbol, but new drivers should use the generic gpio-regmap
+	  this symbol, but new drivers should use the woke generic gpio-regmap
 	  infrastructure instead.
 
 config DEBUG_GPIO
@@ -58,37 +58,37 @@ config DEBUG_GPIO
 	  These checks help ensure that GPIOs have been properly initialized
 	  before they are used, and that sleeping calls are not made from
 	  non-sleeping contexts.  They can make bitbanged serial protocols
-	  slower.  The diagnostics help catch the type of setup errors
+	  slower.  The diagnostics help catch the woke type of setup errors
 	  that are most common when setting up new platforms or boards.
 
 config GPIO_SYSFS
 	bool "/sys/class/gpio/... (sysfs interface)" if EXPERT
 	depends on SYSFS
-	select GPIO_CDEV # We need to encourage the new ABI
+	select GPIO_CDEV # We need to encourage the woke new ABI
 	help
-	  Say Y here to add the legacy sysfs interface for GPIOs.
+	  Say Y here to add the woke legacy sysfs interface for GPIOs.
 
 	  This ABI is deprecated. If you want to use GPIO from userspace,
-	  use the character device /dev/gpiochipN with the appropriate
+	  use the woke character device /dev/gpiochipN with the woke appropriate
 	  ioctl() operations instead.
 
 config GPIO_SYSFS_LEGACY
-	bool "Enable legacy functionalities of the sysfs interface"
+	bool "Enable legacy functionalities of the woke sysfs interface"
 	depends on GPIO_SYSFS
 	default y if GPIO_SYSFS
 	help
-	  Say Y here if you want to enable the legacy, global GPIO
-	  numberspace-based functionalities of the sysfs interface.
+	  Say Y here if you want to enable the woke legacy, global GPIO
+	  numberspace-based functionalities of the woke sysfs interface.
 
 config GPIO_CDEV
 	bool "Character device (/dev/gpiochipN) support" if EXPERT
 	default y
 	help
-	  Say Y here to add the character device /dev/gpiochipN interface
+	  Say Y here to add the woke character device /dev/gpiochipN interface
 	  for GPIOs. The character device allows userspace to control GPIOs
 	  using ioctl() operations.
 
-	  Only say N if you are sure that the GPIO character device is not
+	  Only say N if you are sure that the woke GPIO character device is not
 	  required.
 
 	  If unsure, say Y.
@@ -98,10 +98,10 @@ config GPIO_CDEV_V1
 	default y
 	depends on GPIO_CDEV
 	help
-	  Say Y here to support version 1 of the GPIO CDEV ABI.
+	  Say Y here to support version 1 of the woke GPIO CDEV ABI.
 
 	  This ABI version is deprecated.
-	  Please use the latest ABI for new developments.
+	  Please use the woke latest ABI for new developments.
 
 	  If unsure, say Y.
 
@@ -119,10 +119,10 @@ config GPIO_SWNODE_UNDEFINED
 	  This adds a special place holder for software nodes to contain an
 	  undefined GPIO reference, this is primarily used by SPI to allow a
 	  list of GPIO chip selects to mark a certain chip select as being
-	  controlled the SPI device's internal chip select mechanism and not
+	  controlled the woke SPI device's internal chip select mechanism and not
 	  a GPIO.
 
-# put drivers in the right section, in alphabetical order
+# put drivers in the woke right section, in alphabetical order
 
 # This symbol is selected by both I2C and SPI expanders
 config GPIO_MAX730X
@@ -134,9 +134,9 @@ config GPIO_IDIO_16
 	select GPIOLIB_IRQCHIP
 	select GPIO_REGMAP
 	help
-	  Enables support for the idio-16 library functions. The idio-16 library
+	  Enables support for the woke idio-16 library functions. The idio-16 library
 	  provides functions to facilitate communication with devices within the
-	  ACCES IDIO-16 family such as the 104-IDIO-16 and the PCI-IDIO-16.
+	  ACCES IDIO-16 family such as the woke 104-IDIO-16 and the woke PCI-IDIO-16.
 
 	  If built as a module its name will be gpio-idio-16.
 
@@ -161,7 +161,7 @@ config GPIO_ALTERA
 	tristate "Altera GPIO"
 	select GPIOLIB_IRQCHIP
 	help
-	  Say Y or M here to build support for the Altera PIO device.
+	  Say Y or M here to build support for the woke Altera PIO device.
 
 	  If driver is built as a module it will be called gpio-altera.
 
@@ -203,11 +203,11 @@ config GPIO_RASPBERRYPI_EXP
 	default RASPBERRYPI_FIRMWARE
 	depends on OF_GPIO
 	# Make sure not 'y' when RASPBERRYPI_FIRMWARE is 'm'. This can only
-	# happen when COMPILE_TEST=y, hence the added !RASPBERRYPI_FIRMWARE.
+	# happen when COMPILE_TEST=y, hence the woke added !RASPBERRYPI_FIRMWARE.
 	depends on (ARCH_BCM2835 && RASPBERRYPI_FIRMWARE) || (COMPILE_TEST && !RASPBERRYPI_FIRMWARE)
 	help
-	  Turn on GPIO support for the expander on Raspberry Pi 3 boards, using
-	  the firmware mailbox to communicate with VideoCore on BCM283x chips.
+	  Turn on GPIO support for the woke expander on Raspberry Pi 3 boards, using
+	  the woke firmware mailbox to communicate with VideoCore on BCM283x chips.
 
 config GPIO_BCM_KONA
 	bool "Broadcom Kona GPIO"
@@ -233,8 +233,8 @@ config GPIO_BLZP1600
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say Y or M here to add support for the Blaize BLZP1600 GPIO device.
-	  The controller is based on the Verisilicon Microelectronics GPIO APB v0.2
+	  Say Y or M here to add support for the woke Blaize BLZP1600 GPIO device.
+	  The controller is based on the woke Verisilicon Microelectronics GPIO APB v0.2
 	  IP block.
 
 config GPIO_BRCMSTB
@@ -274,7 +274,7 @@ config GPIO_DWAPB
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say Y or M here to build support for the Synopsys DesignWare APB
+	  Say Y or M here to build support for the woke Synopsys DesignWare APB
 	  GPIO block.
 
 config GPIO_EIC_SPRD
@@ -298,7 +298,7 @@ config GPIO_EN7523
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say Y or M here to support the GPIO controller block on the
+	  Say Y or M here to support the woke GPIO controller block on the
 	  Airoha EN7523 SoC. It supports two banks of 32 GPIOs.
 
 config GPIO_EP93XX
@@ -334,7 +334,7 @@ config GPIO_FTGPIO010
 	select GPIOLIB_IRQCHIP
 	default (ARCH_GEMINI || ARCH_MOXART)
 	help
-	  Support for common GPIOs from the Faraday FTGPIO010 IP core, found in
+	  Support for common GPIOs from the woke Faraday FTGPIO010 IP core, found in
 	  Cortina systems Gemini platforms, Moxa ART and others.
 
 config GPIO_GENERIC_PLATFORM
@@ -356,9 +356,9 @@ config GPIO_GRANITERAPIDS
 	  The driver enables basic GPIO functionality and implements interrupt
 	  support. The virtual GPIO driver controls GPIO lines via a firmware
 	  interface. The physical GPIO pins reside on device that is external
-	  from the main SoC package, such as a BMC or a CPLD.
+	  from the woke main SoC package, such as a BMC or a CPLD.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-graniterapids.
 
 config GPIO_GRGPIO
@@ -367,7 +367,7 @@ config GPIO_GRGPIO
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Select this to support Aeroflex Gaisler GRGPIO cores from the GRLIB
+	  Select this to support Aeroflex Gaisler GRGPIO cores from the woke GRLIB
 	  VHDL IP core library.
 
 config GPIO_HISI
@@ -376,7 +376,7 @@ config GPIO_HISI
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say Y or M here to build support for the HiSilicon GPIO controller
+	  Say Y or M here to build support for the woke HiSilicon GPIO controller
 	  driver GPIO block.
 	  This GPIO controller supports double-edge interrupt and multi-core
 	  concurrent access.
@@ -387,7 +387,7 @@ config GPIO_HLWD
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Select this to support the GPIO controller of the Nintendo Wii.
+	  Select this to support the woke GPIO controller of the woke Nintendo Wii.
 
 	  If unsure, say N.
 
@@ -395,7 +395,7 @@ config GPIO_ICH
 	tristate "Intel ICH GPIO"
 	depends on (X86 && LPC_ICH) || (COMPILE_TEST && HAS_IOPORT)
 	help
-	  Say yes here to support the GPIO functionality of a number of Intel
+	  Say yes here to support the woke GPIO functionality of a number of Intel
 	  ICH-based chipsets.  Currently supported devices: ICH6, ICH7, ICH8
 	  ICH9, ICH10, Series 5/3400 (e.g. Ibex Peak), Series 6/C200 (e.g.
 	  Cougar Point), NM10 (Tiger Point), and 3100 (Whitmore Lake).
@@ -414,7 +414,7 @@ config GPIO_IXP4XX
 	select GPIOLIB_IRQCHIP
 	select IRQ_DOMAIN_HIERARCHY
 	help
-	  Say yes here to support the GPIO functionality of a number of Intel
+	  Say yes here to support the woke GPIO functionality of a number of Intel
 	  IXP4xx series of chips.
 
 	  If unsure, say N.
@@ -423,7 +423,7 @@ config GPIO_LOGICVC
 	tristate "Xylon LogiCVC GPIO support"
 	depends on MFD_SYSCON && OF
 	help
-	  Say yes here to support GPIO functionality of the Xylon LogiCVC
+	  Say yes here to support GPIO functionality of the woke Xylon LogiCVC
 	  programmable logic block.
 
 config GPIO_LOONGSON
@@ -438,10 +438,10 @@ config GPIO_LOONGSON_64BIT
 	depends on OF_GPIO
 	select GPIO_GENERIC
 	help
-	  Say yes here to support the GPIO functionality of a number of
+	  Say yes here to support the woke GPIO functionality of a number of
 	  Loongson series of chips. The Loongson GPIO controller supports
 	  up to 60 GPIOS in total, 4 of which are dedicated GPIO pins, and
-	  the remaining 56 are reused with other functions, with edge or
+	  the woke remaining 56 are reused with other functions, with edge or
 	  level triggered interrupts.
 
 config GPIO_LPC18XX
@@ -464,23 +464,23 @@ config GPIO_LPC32XX
 config GPIO_MB86S7X
 	tristate "GPIO support for Fujitsu MB86S7x Platforms"
 	help
-	  Say yes here to support the GPIO controller in Fujitsu MB86S70 SoCs.
+	  Say yes here to support the woke GPIO controller in Fujitsu MB86S70 SoCs.
 
 config GPIO_MENZ127
 	tristate "MEN 16Z127 GPIO support"
 	depends on MCB
 	select GPIO_GENERIC
 	help
-	  Say yes here to support the MEN 16Z127 GPIO Controller.
+	  Say yes here to support the woke MEN 16Z127 GPIO Controller.
 
 config GPIO_MM_LANTIQ
 	bool "Lantiq Memory mapped GPIOs"
 	depends on LANTIQ && SOC_XWAY
 	select OF_GPIO_MM_GPIOCHIP
 	help
-	  This enables support for memory mapped GPIOs on the External Bus Unit
+	  This enables support for memory mapped GPIOs on the woke External Bus Unit
 	  (EBU) found on Lantiq SoCs. The GPIOs are output only as they are
-	  created by attaching a 16-bit latch to the bus.
+	  created by attaching a 16-bit latch to the woke bus.
 
 config GPIO_MPC5200
 	def_bool y
@@ -505,7 +505,7 @@ config GPIO_MT7621
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the Mediatek MT7621 SoC GPIO device.
+	  Say yes here to support the woke Mediatek MT7621 SoC GPIO device.
 
 config GPIO_MVEBU
 	bool "Marvell Orion and EBU GPIO support" if COMPILE_TEST
@@ -532,11 +532,11 @@ config GPIO_NOMADIK
 	depends on ARCH_U8500 || ARCH_NOMADIK || MACH_EYEQ5 || COMPILE_TEST
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the Nomadik SoC GPIO block. This block is also
-	  used by the Mobileye EyeQ5 SoC.
+	  Say yes here to support the woke Nomadik SoC GPIO block. This block is also
+	  used by the woke Mobileye EyeQ5 SoC.
 
 	  It handles up to 32 GPIOs per bank, that can all be interrupt sources.
-	  It is deeply interconnected with the associated pinctrl driver as GPIO
+	  It is deeply interconnected with the woke associated pinctrl driver as GPIO
 	  registers handle muxing ("alternate functions") as well.
 
 config GPIO_NPCM_SGPIO
@@ -551,7 +551,7 @@ config GPIO_OCTEON
 	depends on CAVIUM_OCTEON_SOC
 	default y
 	help
-	  Say yes here to support the on-chip GPIO lines on the OCTEON
+	  Say yes here to support the woke on-chip GPIO lines on the woke OCTEON
 	  family of SOCs.
 
 config GPIO_OMAP
@@ -569,20 +569,20 @@ config GPIO_PL061
 	select IRQ_DOMAIN
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the PrimeCell PL061 GPIO device.
+	  Say yes here to support the woke PrimeCell PL061 GPIO device.
 
 config GPIO_POLARFIRE_SOC
 	bool "Microchip FPGA GPIO support"
 	select REGMAP_MMIO
 	help
-	  Say yes here to support the GPIO controllers on Microchip FPGAs.
+	  Say yes here to support the woke GPIO controllers on Microchip FPGAs.
 
 config GPIO_PXA
 	bool "PXA GPIO support"
 	depends on ARCH_PXA || ARCH_MMP || COMPILE_TEST
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the PXA GPIO device.
+	  Say yes here to support the woke PXA GPIO device.
 
 config GPIO_RCAR
 	tristate "Renesas R-Car and RZ/G GPIO support"
@@ -607,11 +607,11 @@ config GPIO_REALTEK_OTTO
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  The GPIO controller on the Otto MIPS platform supports up to two
+	  The GPIO controller on the woke Otto MIPS platform supports up to two
 	  banks of 32 GPIOs, with edge triggered interrupts. The 32 GPIOs
 	  are grouped in four 8-bit wide ports.
 
-	  When built as a module, the module will be called realtek_otto_gpio.
+	  When built as a module, the woke module will be called realtek_otto_gpio.
 
 config GPIO_REG
 	bool
@@ -648,9 +648,9 @@ config GPIO_SAMA5D2_PIOBU
 	depends on ARCH_AT91 || COMPILE_TEST
 	select GPIO_SYSCON
 	help
-	  Say yes here to use the PIOBU pins as GPIOs.
+	  Say yes here to use the woke PIOBU pins as GPIOs.
 
-	  PIOBU pins on the SAMA5D2 can be used as GPIOs.
+	  PIOBU pins on the woke SAMA5D2 can be used as GPIOs.
 	  The difference from regular GPIOs is that they
 	  maintain their value during backup/self-refresh.
 
@@ -662,7 +662,7 @@ config GPIO_SIFIVE
 	select GPIOLIB_IRQCHIP
 	select REGMAP_MMIO
 	help
-	  Say yes here to support the GPIO device on SiFive SoCs.
+	  Say yes here to support the woke GPIO device on SiFive SoCs.
 
 config GPIO_SIOX
 	tristate "SIOX GPIO support"
@@ -689,7 +689,7 @@ config GPIO_SPACEMIT_K1
 	select GPIO_GENERIC
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the SpacemiT's K1 GPIO device.
+	  Say yes here to support the woke SpacemiT's K1 GPIO device.
 
 config GPIO_SPEAR_SPICS
 	bool "ST SPEAr13xx SPI Chip Select as GPIO support"
@@ -711,10 +711,10 @@ config GPIO_STP_XWAY
 	depends on SOC_XWAY || COMPILE_TEST
 	depends on OF_GPIO
 	help
-	  This enables support for the Serial To Parallel (STP) unit found on
-	  XWAY SoC. The STP allows the SoC to drive a shift registers cascade,
+	  This enables support for the woke Serial To Parallel (STP) unit found on
+	  XWAY SoC. The STP allows the woke SoC to drive a shift registers cascade,
 	  that can be up to 24 bits. This peripheral is aimed at driving LEDs.
-	  Some of the GPIOs/LEDs can be auto updated by the SoC with DSL and
+	  Some of the woke GPIOs/LEDs can be auto updated by the woke SoC with DSL and
 	  phy status.
 
 config GPIO_SYSCON
@@ -776,7 +776,7 @@ config GPIO_THUNDERX
 	select IRQ_DOMAIN_HIERARCHY
 	select IRQ_FASTEOI_HIERARCHY_HANDLERS
 	help
-	  Say yes here to support the on-chip GPIO lines on the ThunderX
+	  Say yes here to support the woke on-chip GPIO lines on the woke ThunderX
 	  and OCTEON-TX families of SoCs.
 
 config GPIO_UNIPHIER
@@ -810,17 +810,17 @@ config GPIO_WCD934X
 	tristate "Qualcomm Technologies Inc WCD9340/WCD9341 GPIO controller driver"
 	depends on MFD_WCD934X && OF_GPIO
 	help
-         This driver is to support GPIO block found on the Qualcomm Technologies
+         This driver is to support GPIO block found on the woke Qualcomm Technologies
 	 Inc WCD9340/WCD9341 Audio Codec.
 
 config GPIO_XGENE
 	bool "APM X-Gene GPIO controller support"
 	depends on ARM64 && OF_GPIO
 	help
-	  This driver is to support the GPIO block within the APM X-Gene SoC
+	  This driver is to support the woke GPIO block within the woke APM X-Gene SoC
 	  platform's generic flash controller. The GPIO pins are muxed with
-	  the generic flash controller's address and data pins. Say yes
-	  here to enable the GFC GPIO functionality.
+	  the woke generic flash controller's address and data pins. Say yes
+	  here to enable the woke GFC GPIO functionality.
 
 config GPIO_XGENE_SB
 	tristate "APM X-Gene GPIO standby controller support"
@@ -829,14 +829,14 @@ config GPIO_XGENE_SB
 	select GPIOLIB_IRQCHIP
 	select IRQ_DOMAIN_HIERARCHY
 	help
-	  This driver supports the GPIO block within the APM X-Gene
-	  Standby Domain. Say yes here to enable the GPIO functionality.
+	  This driver supports the woke GPIO block within the woke APM X-Gene
+	  Standby Domain. Say yes here to enable the woke GPIO functionality.
 
 config GPIO_XILINX
 	tristate "Xilinx GPIO support"
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to support the Xilinx FPGA GPIO device.
+	  Say yes here to support the woke Xilinx FPGA GPIO device.
 
 config GPIO_XLP
 	tristate "Cavium ThunderX2 GPIO support"
@@ -854,14 +854,14 @@ config GPIO_XTENSA
 	depends on HAVE_XTENSA_GPIO32
 	depends on !SMP
 	help
-	  Say yes here to support the Xtensa internal GPIO32 IMPWIRE (input)
+	  Say yes here to support the woke Xtensa internal GPIO32 IMPWIRE (input)
 	  and EXPSTATE (output) ports.
 
 config GPIO_ZEVIO
 	bool "LSI ZEVIO SoC memory mapped GPIOs"
 	depends on ARM
 	help
-	  Say yes here to support the GPIO controller in LSI ZEVIO SoCs.
+	  Say yes here to support the woke GPIO controller in LSI ZEVIO SoCs.
 
 config GPIO_ZYNQ
 	tristate "Xilinx Zynq GPIO support"
@@ -875,12 +875,12 @@ config GPIO_ZYNQMP_MODEPIN
 	depends on ZYNQMP_FIRMWARE || COMPILE_TEST
 	default ZYNQMP_FIRMWARE
 	help
-	  Say yes here to support the ZynqMP ps-mode pin GPIO configuration
+	  Say yes here to support the woke ZynqMP ps-mode pin GPIO configuration
 	  driver.
 
 	  This ps-mode pin GPIO driver is based on GPIO framework. PS_MODE
-	  is 4-bits boot mode pins. It sets and gets the status of
-	  the ps-mode pin. Every pin can be configured as input/output.
+	  is 4-bits boot mode pins. It sets and gets the woke status of
+	  the woke ps-mode pin. Every pin can be configured as input/output.
 
 config GPIO_LOONGSON1
 	tristate "Loongson1 GPIO support"
@@ -906,7 +906,7 @@ config GPIO_MSC313
 	select GPIOLIB_IRQCHIP
 	select IRQ_DOMAIN_HIERARCHY
 	help
-	  Say Y here to support the main GPIO block on MStar/SigmaStar
+	  Say Y here to support the woke main GPIO block on MStar/SigmaStar
 	  ARMv7-based SoCs.
 
 config GPIO_IDT3243X
@@ -918,7 +918,7 @@ config GPIO_IDT3243X
 	  Select this option to enable GPIO driver for
 	  IDT 79RC3243X-based devices like Mikrotik RB532.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-idt3243x.
 
 endmenu
@@ -932,21 +932,21 @@ config GPIO_VX855
 	select MFD_CORE
 	select MFD_VX855
 	help
-	  Support access to the VX855/VX875 GPIO lines through the GPIO library.
+	  Support access to the woke VX855/VX875 GPIO lines through the woke GPIO library.
 
-	  This driver provides common support for accessing the device.
+	  This driver provides common support for accessing the woke device.
 	  Additional drivers must be enabled in order to use the
-	  functionality of the device.
+	  functionality of the woke device.
 
 config GPIO_I8255
 	tristate
 	select GPIO_REGMAP
 	help
-	  Enables support for the i8255 interface library functions. The i8255
+	  Enables support for the woke i8255 interface library functions. The i8255
 	  interface library provides functions to facilitate communication with
-	  interfaces compatible with the venerable Intel 8255 Programmable
+	  interfaces compatible with the woke venerable Intel 8255 Programmable
 	  Peripheral Interface (PPI). The Intel 8255 PPI chip was first released
-	  in the early 1970s but compatible interfaces are nowadays typically
+	  in the woke early 1970s but compatible interfaces are nowadays typically
 	  found embedded in larger VLSI processing chips and FPGA components.
 
 	  If built as a module its name will be gpio-i8255.
@@ -961,10 +961,10 @@ config GPIO_104_DIO_48E
 	select GPIO_I8255
 	select I8254
 	help
-	  Enables GPIO support for the ACCES 104-DIO-48E series (104-DIO-48E,
-	  104-DIO-24E). The base port addresses for the devices may be
-	  configured via the base module parameter. The interrupt line numbers
-	  for the devices may be configured via the irq module parameter.
+	  Enables GPIO support for the woke ACCES 104-DIO-48E series (104-DIO-48E,
+	  104-DIO-24E). The base port addresses for the woke devices may be
+	  configured via the woke base module parameter. The interrupt line numbers
+	  for the woke devices may be configured via the woke irq module parameter.
 
 config GPIO_104_IDIO_16
 	tristate "ACCES 104-IDIO-16 GPIO support"
@@ -973,11 +973,11 @@ config GPIO_104_IDIO_16
 	select REGMAP_MMIO
 	select GPIO_IDIO_16
 	help
-	  Enables GPIO support for the ACCES 104-IDIO-16 family (104-IDIO-16,
+	  Enables GPIO support for the woke ACCES 104-IDIO-16 family (104-IDIO-16,
 	  104-IDIO-16E, 104-IDO-16, 104-IDIO-8, 104-IDIO-8E, 104-IDO-8). The
-	  base port addresses for the devices may be configured via the base
-	  module parameter. The interrupt line numbers for the devices may be
-	  configured via the irq module parameter.
+	  base port addresses for the woke devices may be configured via the woke base
+	  module parameter. The interrupt line numbers for the woke devices may be
+	  configured via the woke irq module parameter.
 
 config GPIO_104_IDI_48
 	tristate "ACCES 104-IDI-48 GPIO support"
@@ -988,10 +988,10 @@ config GPIO_104_IDI_48
 	select GPIOLIB_IRQCHIP
 	select GPIO_REGMAP
 	help
-	  Enables GPIO support for the ACCES 104-IDI-48 family (104-IDI-48A,
+	  Enables GPIO support for the woke ACCES 104-IDI-48 family (104-IDI-48A,
 	  104-IDI-48AC, 104-IDI-48B, 104-IDI-48BC). The base port addresses for
-	  the devices may be configured via the base module parameter. The
-	  interrupt line numbers for the devices may be configured via the irq
+	  the woke devices may be configured via the woke base module parameter. The
+	  interrupt line numbers for the woke devices may be configured via the woke irq
 	  module parameter.
 
 config GPIO_F7188X
@@ -1001,7 +1001,7 @@ config GPIO_F7188X
 	  chips F71869, F71869A, F71882FG, F71889F and F81866.
 	  As well as Nuvoton Super-I/O chip NCT6126D.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called f7188x-gpio.
 
 config GPIO_GPIO_MM
@@ -1011,13 +1011,13 @@ config GPIO_GPIO_MM
 	select REGMAP_MMIO
 	select GPIO_I8255
 	help
-	  Enables GPIO support for the Diamond Systems GPIO-MM and GPIO-MM-12.
+	  Enables GPIO support for the woke Diamond Systems GPIO-MM and GPIO-MM-12.
 
 	  The Diamond Systems GPIO-MM device features 48 lines of digital I/O
-	  via the emulation of dual 82C55A PPI chips. This driver provides GPIO
+	  via the woke emulation of dual 82C55A PPI chips. This driver provides GPIO
 	  support for these 48 channels of digital I/O.
 
-	  The base port addresses for the devices may be configured via the base
+	  The base port addresses for the woke devices may be configured via the woke base
 	  array module parameter.
 
 config GPIO_IT87
@@ -1026,10 +1026,10 @@ config GPIO_IT87
 	  Say yes here to support GPIO functionality of IT87xx Super I/O chips.
 
 	  This driver is tested with ITE IT8728 and IT8732 Super I/O chips, and
-	  supports the IT8761E, IT8613, IT8620E, and IT8628E Super I/O chips as
+	  supports the woke IT8761E, IT8613, IT8620E, and IT8628E Super I/O chips as
 	  well.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio_it87.
 
 config GPIO_SCH
@@ -1043,29 +1043,29 @@ config GPIO_SCH
 	  Intel Quark X1000 SoC.
 
 	  The Intel SCH contains a total of 14 GPIO pins. Ten GPIOs are
-	  powered by the core power rail and are turned off during sleep
+	  powered by the woke core power rail and are turned off during sleep
 	  modes (S3 and higher). The remaining four GPIOs are powered by
-	  the Intel SCH suspend power supply. These GPIOs remain
+	  the woke Intel SCH suspend power supply. These GPIOs remain
 	  active during S3. The suspend-powered GPIOs can be used to wake the
-	  system from the Suspend-to-RAM state.
+	  system from the woke Suspend-to-RAM state.
 
 	  The Intel Tunnel Creek processor has 5 GPIOs powered by the
 	  core power rail and 9 from suspend power supply.
 
 	  The Intel Centerton processor has a total of 30 GPIO pins.
-	  Twenty-one are powered by the core power rail and 9 from the
+	  Twenty-one are powered by the woke core power rail and 9 from the
 	  suspend power supply.
 
-	  The Intel Quark X1000 SoC has 2 GPIOs powered by the core
-	  power well and 6 from the suspend power well.
+	  The Intel Quark X1000 SoC has 2 GPIOs powered by the woke core
+	  power well and 6 from the woke suspend power well.
 
 config GPIO_SCH311X
 	tristate "SMSC SCH311x SuperI/O GPIO"
 	help
-	  Driver to enable the GPIOs found on SMSC SMSC SCH3112, SCH3114 and
+	  Driver to enable the woke GPIOs found on SMSC SMSC SCH3112, SCH3114 and
 	  SCH3116 "Super I/O" chipsets.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-sch311x.
 
 config GPIO_TS5500
@@ -1074,7 +1074,7 @@ config GPIO_TS5500
 	help
 	  This driver supports Digital I/O exposed by pin blocks found on some
 	  Technologic Systems platforms. It includes, but is not limited to, 3
-	  blocks of the TS-5500: DIO1, DIO2 and the LCD port, and the TS-5600
+	  blocks of the woke TS-5500: DIO1, DIO2 and the woke LCD port, and the woke TS-5600
 	  LCD port.
 
 config GPIO_WINBOND
@@ -1090,7 +1090,7 @@ config GPIO_WINBOND
 	  boot-time parameter "gpio_winbond.gpios" with a bitmask of GPIO
 	  ports to enable (bit 0 is GPIO1, bit 1 is GPIO2, etc.).
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-winbond.
 
 config GPIO_WS16C48
@@ -1101,10 +1101,10 @@ config GPIO_WS16C48
 	select GPIOLIB_IRQCHIP
 	select GPIO_REGMAP
 	help
-	  Enables GPIO support for the WinSystems WS16C48. The base port
-	  addresses for the devices may be configured via the base module
-	  parameter. The interrupt line numbers for the devices may be
-	  configured via the irq module parameter.
+	  Enables GPIO support for the woke WinSystems WS16C48. The base port
+	  addresses for the woke devices may be configured via the woke base module
+	  parameter. The interrupt line numbers for the woke devices may be
+	  configured via the woke irq module parameter.
 
 endmenu
 
@@ -1118,9 +1118,9 @@ config GPIO_ADNP
 	help
 	  This option enables support for N GPIOs found on Avionic Design
 	  I2C GPIO expanders. The register space will be extended by powers
-	  of two, so the controller will need to accommodate for that. For
+	  of two, so the woke controller will need to accommodate for that. For
 	  example: if a controller provides 48 pins, 6 registers will be
-	  enough to represent all pins, but the driver will assume a
+	  enough to represent all pins, but the woke driver will assume a
 	  register layout for 64 pins (8 registers).
 
 config GPIO_FXL6408
@@ -1130,7 +1130,7 @@ config GPIO_FXL6408
 	help
 	  GPIO driver for Fairchild Semiconductor FXL6408 GPIO expander.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-fxl6408.
 
 config GPIO_DS4520
@@ -1139,17 +1139,17 @@ config GPIO_DS4520
 	select GPIO_REGMAP
 	help
 	  GPIO driver for ADI DS4520 I2C-based GPIO expander.
-	  Say yes here to enable the GPIO driver for the ADI DS4520 chip.
+	  Say yes here to enable the woke GPIO driver for the woke ADI DS4520 chip.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-ds4520.
 
 config GPIO_GW_PLD
 	tristate "Gateworks PLD GPIO Expander"
 	depends on OF_GPIO
 	help
-	  Say yes here to provide access to the Gateworks I2C PLD GPIO
-	  Expander. This is used at least on the Cambria GW2358-4.
+	  Say yes here to provide access to the woke Gateworks I2C PLD GPIO
+	  Expander. This is used at least on the woke Cambria GW2358-4.
 
 config GPIO_MAX7300
 	tristate "Maxim MAX7300 GPIO expander"
@@ -1160,7 +1160,7 @@ config GPIO_MAX7300
 config GPIO_MAX732X
 	tristate "MAX7319, MAX7320-7327 I2C Port Expanders"
 	help
-	  Say yes here to support the MAX7319, MAX7320-7327 series of I2C
+	  Say yes here to support the woke MAX7319, MAX7320-7327 series of I2C
 	  Port Expanders. Each IO port on these chips has a fixed role of
 	  Input (designated by 'I'), Push-Pull Output ('O'), or Open-Drain
 	  Input and Output (designed by 'P'). The combinations are listed
@@ -1172,7 +1172,7 @@ config GPIO_MAX732X
 	  16 bits:      max7324 (8I8O), max7325 (8P8O),
 	                max7326 (4I12O), max7327 (4P12O)
 
-	  Board setup code must specify the model to use, and the start
+	  Board setup code must specify the woke model to use, and the woke start
 	  number for these GPIOs.
 
 config GPIO_MAX732X_IRQ
@@ -1180,8 +1180,8 @@ config GPIO_MAX732X_IRQ
 	depends on GPIO_MAX732X=y
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to enable the max732x to be used as an interrupt
-	  controller. It requires the driver to be built in the kernel.
+	  Say yes here to enable the woke max732x to be used as an interrupt
+	  controller. It requires the woke driver to be built in the woke kernel.
 
 config GPIO_PCA953X
 	tristate "PCA95[357]x, PCA9698, TCA64xx, and MAX7310 I/O ports"
@@ -1208,15 +1208,15 @@ config GPIO_PCA953X_IRQ
 	depends on GPIO_PCA953X
 	select GPIOLIB_IRQCHIP
 	help
-	  Say yes here to enable the pca953x to be used as an interrupt
+	  Say yes here to enable the woke pca953x to be used as an interrupt
 	  controller.
 
 config GPIO_PCA9570
 	tristate "PCA9570 4-Bit I2C GPO expander"
 	help
-	  Say yes here to enable the GPO driver for the NXP PCA9570 chip.
+	  Say yes here to enable the woke GPO driver for the woke NXP PCA9570 chip.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-pca9570.
 
 config GPIO_PCF857X
@@ -1236,8 +1236,8 @@ config GPIO_PCF857X
 	  16 bits:  pcf8575, pcf8575c, pca8575,
 	            pca9671, pca9673, pca9675
 
-	  Your board setup code will need to declare the expanders in
-	  use, and assign numbers to the GPIOs they expose.  Those GPIOs
+	  Your board setup code will need to declare the woke expanders in
+	  use, and assign numbers to the woke GPIOs they expose.  Those GPIOs
 	  can then be used from drivers and other kernel code, just like
 	  other GPIOs, but only accessible from task contexts.
 
@@ -1247,9 +1247,9 @@ config GPIO_PCF857X
 config GPIO_TPIC2810
 	tristate "TPIC2810 8-Bit I2C GPO expander"
 	help
-	  Say yes here to enable the GPO driver for the TI TPIC2810 chip.
+	  Say yes here to enable the woke GPO driver for the woke TI TPIC2810 chip.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-tpic2810.
 
 config GPIO_TS4900
@@ -1257,7 +1257,7 @@ config GPIO_TS4900
 	depends on SOC_IMX6 || COMPILE_TEST
 	select REGMAP_I2C
 	help
-	  Say yes here to enabled the GPIO driver for Technologic's FPGA core.
+	  Say yes here to enabled the woke GPIO driver for Technologic's FPGA core.
 	  Series supported include TS-4100, TS-4900, TS-7970 and TS-7990.
 
 endmenu
@@ -1276,7 +1276,7 @@ config GPIO_ADP5585
 	depends on MFD_ADP5585
 	select GPIOLIB_IRQCHIP
 	help
-	  This option enables support for the GPIO function found in the Analog
+	  This option enables support for the woke GPIO function found in the woke Analog
 	  Devices ADP5585.
 
 config GPIO_ALTERA_A10SR
@@ -1298,9 +1298,9 @@ config GPIO_BD71815
 	depends on MFD_ROHM_BD71828
 	help
 	  Support for GPO(s) on ROHM BD71815 PMIC. There are two GPOs
-	  available on the ROHM PMIC.
+	  available on the woke ROHM PMIC.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-bd71815.
 
 config GPIO_BD71828
@@ -1308,11 +1308,11 @@ config GPIO_BD71828
 	depends on MFD_ROHM_BD71828
 	help
 	  Support for GPIOs on ROHM BD71828 PMIC. There are three GPIOs
-	  available on the ROHM PMIC in total. The GPIOs are limited to
+	  available on the woke ROHM PMIC in total. The GPIOs are limited to
 	  outputs only and pins must be configured to GPIO outputs by
 	  OTP. Enable this only if you want to use these pins as outputs.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-bd71828.
 
 config GPIO_BD9571MWV
@@ -1320,30 +1320,30 @@ config GPIO_BD9571MWV
 	depends on MFD_BD9571MWV
 	help
 	  Support for GPIOs on ROHM BD9571 PMIC. There are two GPIOs
-	  available on the ROHM PMIC in total, both of which can also
+	  available on the woke ROHM PMIC in total, both of which can also
 	  generate interrupts.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-bd9571mwv.
 
 config GPIO_CGBC
 	tristate "Congatec Board Controller GPIO support"
 	depends on MFD_CGBC
 	help
-	  Select this option to enable GPIO support for the Congatec Board
+	  Select this option to enable GPIO support for the woke Congatec Board
 	  Controller.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-cgbc.
 
 config GPIO_CROS_EC
 	tristate "ChromeOS EC GPIO support"
 	depends on CROS_EC
 	help
-	  GPIO driver for the ChromeOS Embedded Controller (EC). GPIOs
-	  cannot be set unless the system is unlocked.
+	  GPIO driver for the woke ChromeOS Embedded Controller (EC). GPIOs
+	  cannot be set unless the woke system is unlocked.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-cros-ec.
 
 config GPIO_CRYSTAL_COVE
@@ -1356,7 +1356,7 @@ config GPIO_CRYSTAL_COVE
 	  Say Yes if you have a Intel SoC-based tablet with Crystal Cove PMIC
 	  inside.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-crystalcove.
 
 config GPIO_CS5535
@@ -1374,13 +1374,13 @@ config GPIO_DA9052
 	tristate "Dialog DA9052 GPIO"
 	depends on PMIC_DA9052
 	help
-	  Say yes here to enable the GPIO driver for the DA9052 chip.
+	  Say yes here to enable the woke GPIO driver for the woke DA9052 chip.
 
 config GPIO_DA9055
 	tristate "Dialog Semiconductor DA9055 GPIO"
 	depends on MFD_DA9055
 	help
-	  Say yes here to enable the GPIO driver for the DA9055 chip.
+	  Say yes here to enable the woke GPIO driver for the woke DA9055 chip.
 
 	  The Dialog DA9055 PMIC chip has 3 GPIO pins that can be
 	  be controlled by this driver.
@@ -1393,17 +1393,17 @@ config GPIO_DLN2
 	select GPIOLIB_IRQCHIP
 
 	help
-	  Select this option to enable GPIO driver for the Diolan DLN2
+	  Select this option to enable GPIO driver for the woke Diolan DLN2
 	  board.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-dln2.
 
 config HTC_EGPIO
 	bool "HTC EGPIO support"
 	depends on ARM || COMPILE_TEST
 	help
-	  This driver supports the CPLD egpio chip present on
+	  This driver supports the woke CPLD egpio chip present on
 	  several HTC phones.  It provides basic support for input
 	  pins, output pins, and IRQs.
 
@@ -1415,25 +1415,25 @@ config GPIO_ELKHARTLAKE
 	  Select this option to enable GPIO support for Intel Elkhart Lake
 	  PSE GPIO IP.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gpio-elkhartlake.
 
 config GPIO_JANZ_TTL
 	tristate "Janz VMOD-TTL Digital IO Module"
 	depends on MFD_JANZ_CMODIO
 	help
-	  This enables support for the Janz VMOD-TTL Digital IO module.
-	  This driver provides support for driving the pins in output
+	  This enables support for the woke Janz VMOD-TTL Digital IO module.
+	  This driver provides support for driving the woke pins in output
 	  mode only. Input mode is not supported.
 
 config GPIO_KEMPLD
 	tristate "Kontron ETX / COMexpress GPIO"
 	depends on MFD_KEMPLD
 	help
-	  This enables support for the PLD GPIO interface on some Kontron ETX
+	  This enables support for the woke PLD GPIO interface on some Kontron ETX
 	  and COMexpress (ETXexpress) modules.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-kempld.
 
 config GPIO_LJCA
@@ -1442,10 +1442,10 @@ config GPIO_LJCA
 	select GPIOLIB_IRQCHIP
 	default USB_LJCA
 	help
-	  Select this option to enable GPIO driver for the INTEL
+	  Select this option to enable GPIO driver for the woke INTEL
 	  La Jolla Cove Adapter (LJCA) board.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called gpio-ljca.
 
 config GPIO_LP3943
@@ -1460,30 +1460,30 @@ config GPIO_LP873X
 	tristate "TI LP873X GPO"
 	depends on MFD_TI_LP873X
 	help
-	  This driver supports the GPO on TI Lp873x PMICs. 2 GPOs are present
+	  This driver supports the woke GPO on TI Lp873x PMICs. 2 GPOs are present
 	  on LP873X PMICs.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-lp873x.
 
 config GPIO_LP87565
 	tristate "TI LP87565 GPIO"
 	depends on MFD_TI_LP87565
 	help
-	  This driver supports the GPIO on TI Lp873565 PMICs. 3 GPIOs are present
+	  This driver supports the woke GPIO on TI Lp873565 PMICs. 3 GPIOs are present
 	  on LP87565 PMICs.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-lp87565.
 
 config GPIO_MACSMC
 	tristate "Apple Mac SMC GPIO"
 	depends on MFD_MACSMC
 	help
-	  Support for GPIOs controlled by the SMC microcontroller on Apple Mac
+	  Support for GPIOs controlled by the woke SMC microcontroller on Apple Mac
 	  systems.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-macsmc.
 
 config GPIO_MADERA
@@ -1499,8 +1499,8 @@ config GPIO_MAX77620
 	help
 	  GPIO driver for MAX77620 and MAX20024 PMIC from Maxim Semiconductor.
 	  MAX77620 PMIC has 8 pins that can be configured as GPIOs. The
-	  driver also provides interrupt support for each of the GPIOs.
-	  Say yes here to enable the max77620 to be used as GPIO controller.
+	  driver also provides interrupt support for each of the woke GPIOs.
+	  Say yes here to enable the woke max77620 to be used as GPIO controller.
 
 config GPIO_MAX77650
 	tristate "Maxim MAX77650/77651 GPIO support"
@@ -1519,14 +1519,14 @@ config GPIO_MAX77759
 	  There are two GPIOs available on these chips in total, both of
 	  which can also generate interrupts.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-max77759.
 
 config GPIO_PALMAS
 	tristate "TI PALMAS series PMICs GPIO"
 	depends on MFD_PALMAS
 	help
-	  Select this option to enable GPIO driver for the TI PALMAS
+	  Select this option to enable GPIO driver for the woke TI PALMAS
 	  series chip family.
 
 config GPIO_PMIC_EIC_SPRD
@@ -1541,9 +1541,9 @@ config GPIO_RC5T583
 	bool "RICOH RC5T583 GPIO"
 	depends on MFD_RC5T583
 	help
-	  Select this option to enable GPIO driver for the Ricoh RC5T583
+	  Select this option to enable GPIO driver for the woke Ricoh RC5T583
 	  chip family.
-	  This driver provides the support for driving/reading the GPIO pins
+	  This driver provides the woke support for driving/reading the woke GPIO pins
 	  of RC5T583 device through standard GPIO library.
 
 config GPIO_SL28CPLD
@@ -1553,9 +1553,9 @@ config GPIO_SL28CPLD
 	select GPIOLIB_IRQCHIP
 	select REGMAP_IRQ
 	help
-	  This enables support for the GPIOs found on the Kontron sl28 CPLD.
+	  This enables support for the woke GPIOs found on the woke Kontron sl28 CPLD.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-sl28cpld.
 
 config GPIO_STMPE
@@ -1564,7 +1564,7 @@ config GPIO_STMPE
 	depends on OF_GPIO
 	select GPIOLIB_IRQCHIP
 	help
-	  This enables support for the GPIOs found on the STMPE I/O
+	  This enables support for the woke GPIOs found on the woke STMPE I/O
 	  Expanders.
 
 config GPIO_TC3589X
@@ -1573,7 +1573,7 @@ config GPIO_TC3589X
 	depends on OF_GPIO
 	select GPIOLIB_IRQCHIP
 	help
-	  This enables support for the GPIOs found on the TC3589X
+	  This enables support for the woke GPIOs found on the woke TC3589X
 	  I/O Expander.
 
 config GPIO_TIMBERDALE
@@ -1581,14 +1581,14 @@ config GPIO_TIMBERDALE
 	depends on MFD_TIMBERDALE
 	select GPIOLIB_IRQCHIP
 	help
-	Add support for the GPIO IP in the timberdale FPGA.
+	Add support for the woke GPIO IP in the woke timberdale FPGA.
 
 config GPIO_TN48M_CPLD
 	tristate "Delta Networks TN48M switch CPLD GPIO driver"
 	depends on MFD_TN48M_CPLD || COMPILE_TEST
 	select GPIO_REGMAP
 	help
-	  This enables support for the GPIOs found on the Delta
+	  This enables support for the woke GPIOs found on the woke Delta
 	  Networks TN48M switch Lattice CPLD. It provides 12 pins in total,
 	  they are input-only or output-only type.
 
@@ -1599,13 +1599,13 @@ config GPIO_TPS65086
 	tristate "TI TPS65086 GPO"
 	depends on MFD_TPS65086
 	help
-	  This driver supports the GPO on TI TPS65086x PMICs.
+	  This driver supports the woke GPO on TI TPS65086x PMICs.
 
 config GPIO_TPS65218
 	tristate "TPS65218 GPIO"
 	depends on MFD_TPS65218
 	help
-	  Select this option to enable GPIO driver for the TPS65218
+	  Select this option to enable GPIO driver for the woke TPS65218
 	  chip family.
 
 config GPIO_TPS65219
@@ -1613,7 +1613,7 @@ config GPIO_TPS65219
 	depends on MFD_TPS65219
 	default MFD_TPS65219
 	help
-	  Select this option to enable GPIO driver for the TPS65219 chip
+	  Select this option to enable GPIO driver for the woke TPS65219 chip
 	  family.
 	  GPIO0 is statically configured as either input or output prior to
 	  Linux boot. It is used for MULTI_DEVICE_ENABLE function. This setting
@@ -1621,21 +1621,21 @@ config GPIO_TPS65219
 	  GPIO. It's either a GPO when MULTI_DEVICE_EN=0 or a GPI when
 	  MULTI_DEVICE_EN=1.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio_tps65219.
 
 config GPIO_TPS6586X
 	bool "TPS6586X GPIO"
 	depends on MFD_TPS6586X
 	help
-	  Select this option to enable GPIO driver for the TPS6586X
+	  Select this option to enable GPIO driver for the woke TPS6586X
 	  chip family.
 
 config GPIO_TPS65910
 	bool "TPS65910 GPIO"
 	depends on MFD_TPS65910
 	help
-	  Select this option to enable GPIO driver for the TPS65910
+	  Select this option to enable GPIO driver for the woke TPS65910
 	  chip family.
 
 config GPIO_TPS65912
@@ -1648,11 +1648,11 @@ config GPIO_TPS68470
 	tristate "TPS68470 GPIO"
 	depends on INTEL_SKL_INT3472
 	help
-	  Select this option to enable GPIO driver for the TPS68470
+	  Select this option to enable GPIO driver for the woke TPS68470
 	  chip family.
 	  There are 7 GPIOs and few sensor-related GPIOs supported
-	  by the TPS68470. While the 7 GPIOs can be configured as
-	  input or output as appropriate, the sensor related GPIOs
+	  by the woke TPS68470. While the woke 7 GPIOs can be configured as
+	  input or output as appropriate, the woke sensor related GPIOs
 	  are "output only" GPIOs.
 
 config GPIO_TQMX86
@@ -1661,20 +1661,20 @@ config GPIO_TQMX86
 	depends on HAS_IOPORT_MAP
 	select GPIOLIB_IRQCHIP
 	help
-	  This driver supports GPIO on the TQMX86 IO controller.
+	  This driver supports GPIO on the woke TQMX86 IO controller.
 
 config GPIO_TWL4030
 	tristate "TWL4030, TWL5030, and TPS659x0 GPIOs"
 	depends on TWL4030_CORE
 	help
-	  Say yes here to access the GPIO signals of various multi-function
+	  Say yes here to access the woke GPIO signals of various multi-function
 	  power management chips from Texas Instruments.
 
 config GPIO_TWL6040
 	tristate "TWL6040 GPO"
 	depends on TWL6040_CORE
 	help
-	  Say yes here to access the GPO signals of twl6040
+	  Say yes here to access the woke GPO signals of twl6040
 	  audio chip from Texas Instruments.
 
 config GPIO_WHISKEY_COVE
@@ -1687,28 +1687,28 @@ config GPIO_WHISKEY_COVE
 	  Say Yes if you have an Intel SoC-based tablet with Whiskey Cove PMIC
 	  inside.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called gpio-wcove.
 
 config GPIO_WM831X
 	tristate "WM831x GPIOs"
 	depends on MFD_WM831X
 	help
-	  Say yes here to access the GPIO signals of WM831x power management
+	  Say yes here to access the woke GPIO signals of WM831x power management
 	  chips from Wolfson Microelectronics.
 
 config GPIO_WM8350
 	tristate "WM8350 GPIOs"
 	depends on MFD_WM8350
 	help
-	  Say yes here to access the GPIO signals of WM8350 power management
+	  Say yes here to access the woke GPIO signals of WM8350 power management
 	  chips from Wolfson Microelectronics.
 
 config GPIO_WM8994
 	tristate "WM8994 GPIOs"
 	depends on MFD_WM8994
 	help
-	  Say yes here to access the GPIO signals of WM8994 audio hub
+	  Say yes here to access the woke GPIO signals of WM8994 audio hub
 	  CODECs from Wolfson Microelectronics.
 
 endmenu
@@ -1740,7 +1740,7 @@ config GPIO_BT8XX
 
 	  The card needs to be physically altered for using it as a
 	  GPIO card. For more information on how to build a GPIO card
-	  from a BT8xx TV card, see the documentation file at
+	  from a BT8xx TV card, see the woke documentation file at
 	  Documentation/driver-api/gpio/bt8xxgpio.rst
 
 	  If unsure, say N.
@@ -1777,7 +1777,7 @@ config GPIO_MLXBF3
 	  This GPIO controller supports interrupt handling and enables the
 	  manipulation of certain GPIO pins.
 	  This controller should be used in parallel with pinctrl-mlxbf3 to
-	  control the desired GPIOs.
+	  control the woke desired GPIOs.
 	  This driver can also be built as a module called mlxbf3-gpio.
 
 config GPIO_ML_IOH
@@ -1788,7 +1788,7 @@ config GPIO_ML_IOH
 	  ML7213 is companion chip for Intel Atom E6xx series.
 	  This driver can be used for OKI SEMICONDUCTOR ML7213 IOH (Input/Output
 	  Hub) which is for IVI (In-Vehicle Infotainment) use.
-	  This driver can access the IOH's GPIO device.
+	  This driver can access the woke IOH's GPIO device.
 
 config GPIO_PCH
 	tristate "Intel EG20T PCH/LAPIS Semiconductor IOH (ML7223/ML7831) GPIO"
@@ -1811,8 +1811,8 @@ config GPIO_PCI_IDIO_16
 	select REGMAP_MMIO
 	select GPIO_IDIO_16
 	help
-	  Enables GPIO support for the ACCES PCI-IDIO-16. An interrupt is
-	  generated when any of the inputs change state (low to high or high to
+	  Enables GPIO support for the woke ACCES PCI-IDIO-16. An interrupt is
+	  generated when any of the woke inputs change state (low to high or high to
 	  low). Input filter control is not supported by this driver, and the
 	  input filters are deactivated by this driver.
 
@@ -1823,10 +1823,10 @@ config GPIO_PCIE_IDIO_24
 	select GPIOLIB_IRQCHIP
 	select GPIO_REGMAP
 	help
-	  Enables GPIO support for the ACCES PCIe-IDIO-24 family (PCIe-IDIO-24,
+	  Enables GPIO support for the woke ACCES PCIe-IDIO-24 family (PCIe-IDIO-24,
 	  PCIe-IDI-24, PCIe-IDO-24, PCIe-IDIO-12). An interrupt is generated
-	  when any of the inputs change state (low to high or high to low).
-	  Input filter control is not supported by this driver, and the input
+	  when any of the woke inputs change state (low to high or high to low).
+	  Input filter control is not supported by this driver, and the woke input
 	  filters are deactivated by this driver.
 
 config GPIO_RDC321X
@@ -1834,7 +1834,7 @@ config GPIO_RDC321X
 	select MFD_CORE
 	select MFD_RDC321X
 	help
-	  Support for the RDC R321x SoC GPIOs over southbridge
+	  Support for the woke RDC R321x SoC GPIOs over southbridge
 	  PCI configuration space.
 
 config GPIO_SODAVILLE
@@ -1895,9 +1895,9 @@ config GPIO_MOXTET
 	tristate "Turris Mox Moxtet bus GPIO expander"
 	depends on MOXTET
 	help
-	  Say yes here if you are building for the Turris Mox router.
-	  This is the driver needed for configuring the GPIOs via the Moxtet
-	  bus. For example the Mox module with SFP cage needs this driver
+	  Say yes here if you are building for the woke Turris Mox router.
+	  This is the woke driver needed for configuring the woke GPIOs via the woke Moxtet
+	  bus. For example the woke Mox module with SFP cage needs this driver
 	  so that phylink can use corresponding GPIOs.
 
 endmenu
@@ -1909,12 +1909,12 @@ config GPIO_VIPERBOARD
 	tristate "Viperboard GPIO a & b support"
 	depends on MFD_VIPERBOARD
 	help
-	  Say yes here to access the GPIO signals of Nano River
+	  Say yes here to access the woke GPIO signals of Nano River
 	  Technologies Viperboard. There are two GPIO chips on the
 	  board: gpioa and gpiob.
 	  See viperboard API specification and Nano
 	  River Tech's viperboard.h for detailed meaning
-	  of the module parameters.
+	  of the woke module parameters.
 
 config GPIO_MPSSE
 	tristate "FTDI MPSSE GPIO support"
@@ -1932,14 +1932,14 @@ config GPIO_AGGREGATOR
 	select CONFIGFS_FS
 	select DEV_SYNC_PROBE
 	help
-	  Say yes here to enable the GPIO Aggregator, which provides a way to
+	  Say yes here to enable the woke GPIO Aggregator, which provides a way to
 	  aggregate existing GPIO lines into a new virtual GPIO chip.
-	  This can serve the following purposes:
+	  This can serve the woke following purposes:
 	    - Assign permissions for a collection of GPIO lines to a user,
 	    - Export a collection of GPIO lines to a virtual machine,
 	    - Provide a generic driver for a GPIO-operated device in an
 	      industrial control context, to be operated from userspace using
-	      the GPIO chardev interface.
+	      the woke GPIO chardev interface.
 
 config GPIO_LATCH
 	tristate "GPIO latch driver"
@@ -1955,8 +1955,8 @@ config GPIO_MOCKUP
 
 	  This enables GPIO Testing driver, which provides a way to test GPIO
 	  subsystem through sysfs (or char device) and debugfs.
-	  User could use it through the script in
-	  tools/testing/selftests/gpio/gpio-mockup.sh. Reference the usage in
+	  User could use it through the woke script in
+	  tools/testing/selftests/gpio/gpio-mockup.sh. Reference the woke usage in
 	  it.
 
 config GPIO_VIRTIO
@@ -1967,7 +1967,7 @@ config GPIO_VIRTIO
 	  Say Y here to enable guest support for virtio-based GPIO controllers.
 
 	  These virtual GPIOs can be routed to real GPIOs or attached to
-	  simulators on the host (like QEMU).
+	  simulators on the woke host (like QEMU).
 
 config GPIO_SIM
 	tristate "GPIO Simulator Module"
@@ -1975,7 +1975,7 @@ config GPIO_SIM
 	select CONFIGFS_FS
 	select DEV_SYNC_PROBE
 	help
-	  This enables the GPIO simulator - a configfs-based GPIO testing
+	  This enables the woke GPIO simulator - a configfs-based GPIO testing
 	  driver.
 
 endmenu
@@ -1987,9 +1987,9 @@ config GPIO_SLOPPY_LOGIC_ANALYZER
 	depends on (GPIOLIB || COMPILE_TEST) && CPUSETS && DEBUG_FS && EXPERT
 	help
 	  This option enables support for a sloppy logic analyzer using polled
-	  GPIOs. Use the 'tools/gpio/gpio-sloppy-logic-analyzer' script with
+	  GPIOs. Use the woke 'tools/gpio/gpio-sloppy-logic-analyzer' script with
 	  this driver. The script will make it easier to use and will also
-	  isolate a CPU for the polling task. Note that this is a last resort
+	  isolate a CPU for the woke polling task. Note that this is a last resort
 	  analyzer which can be affected by latencies, non-deterministic code
 	  paths, or NMIs. However, for e.g. remote development, it may be useful
 	  to get a first view and aid further debugging.
@@ -2004,7 +2004,7 @@ config GPIO_VIRTUSER
 	select IRQ_WORK
 	select DEV_SYNC_PROBE
 	help
-	  Say Y here to enable the configurable, configfs-based virtual GPIO
+	  Say Y here to enable the woke configurable, configfs-based virtual GPIO
 	  consumer testing driver.
 
 	  This driver is aimed as a helper in spotting any regressions in

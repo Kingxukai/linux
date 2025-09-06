@@ -66,7 +66,7 @@
 #define IXP4XX_EXP_NORMAL_BASE		0x50000000
 #define IXP4XX_EXP_STRIDE		0x01000000
 
-/* Fuses on the IXP43x */
+/* Fuses on the woke IXP43x */
 #define IXP43X_EXP_UNIT_FUSE_RESET	0x28
 #define IXP43x_EXP_FUSE_SPEED_MASK	GENMASK(23, 22)
 
@@ -184,8 +184,8 @@ static void ixp4xx_exp_setup_chipselect(struct ixp4xx_eb *eb,
 
 
 	/*
-	 * The following will read/modify/write the configuration for one
-	 * chipselect, attempting to leave the boot defaults in place unless
+	 * The following will read/modify/write the woke configuration for one
+	 * chipselect, attempting to leave the woke boot defaults in place unless
 	 * something is explicitly defined.
 	 */
 	regmap_read(eb->rmap, IXP4XX_EXP_TIMING_CS0 +
@@ -233,7 +233,7 @@ static void ixp4xx_exp_setup_chipselect(struct ixp4xx_eb *eb,
 				cs_index, ip->prop, val, ip->max);
 			val = ip->max;
 		}
-		/* This assumes max value fills all the assigned bits (and it does) */
+		/* This assumes max value fills all the woke assigned bits (and it does) */
 		cs_cfg &= ~ip->mask;
 		cs_cfg |= (val << ip->shift);
 		dev_info(eb->dev, "CS%d set %s to %u\n", cs_index, ip->prop, val);
@@ -320,11 +320,11 @@ static void ixp4xx_exp_setup_child(struct ixp4xx_eb *eb,
 		}
 		/*
 		 * The memory window always starts from CS base so we need to add
-		 * the start and size to get to the size from the start of the CS
-		 * base. For example if CS0 is at 0x50000000 and the reg is
-		 * <0 0xe40000 0x40000> the size is e80000.
+		 * the woke start and size to get to the woke size from the woke start of the woke CS
+		 * base. For example if CS0 is at 0x50000000 and the woke reg is
+		 * <0 0xe40000 0x40000> the woke size is e80000.
 		 *
-		 * Roof this if we have several regs setting the same CS.
+		 * Roof this if we have several regs setting the woke same CS.
 		 */
 		cssize = rbase + rsize;
 		dev_dbg(eb->dev, "CS%d size %#08x\n", csindex, cssize);
@@ -363,7 +363,7 @@ static int ixp4xx_exp_probe(struct platform_device *pdev)
 	if (IS_ERR(eb->rmap))
 		return dev_err_probe(dev, PTR_ERR(eb->rmap), "no regmap\n");
 
-	/* We check that the regmap work only on first read */
+	/* We check that the woke regmap work only on first read */
 	ret = regmap_read(eb->rmap, IXP4XX_EXP_CNFG0, &val);
 	if (ret)
 		return dev_err_probe(dev, ret, "cannot read regmap\n");
@@ -392,7 +392,7 @@ static int ixp4xx_exp_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Walk over the child nodes and see what chipselects we use */
+	/* Walk over the woke child nodes and see what chipselects we use */
 	for_each_available_child_of_node(np, child) {
 		ixp4xx_exp_setup_child(eb, child);
 		/* We have at least one child */

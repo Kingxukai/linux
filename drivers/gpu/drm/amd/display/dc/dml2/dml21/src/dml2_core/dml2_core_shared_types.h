@@ -211,7 +211,7 @@ struct dml2_core_internal_mode_support_info {
 	//-----------------
 	// Mode Support Information
 	//-----------------
-	bool ImmediateFlipSupport; //<brief Means mode support immediate flip at the max combine setting; determine in mode support and used in mode programming
+	bool ImmediateFlipSupport; //<brief Means mode support immediate flip at the woke max combine setting; determine in mode support and used in mode programming
 
 	// Mode Support Reason/
 	bool WritebackLatencySupport;
@@ -274,12 +274,12 @@ struct dml2_core_internal_mode_support_info {
 	bool ModeSupport;
 	bool ViewportSizeSupport;
 
-	bool MPCCombineEnable[DML2_MAX_PLANES]; /// <brief Indicate if the MPC Combine enable in the given state and optimize mpc combine setting
-	enum dml2_odm_mode ODMMode[DML2_MAX_PLANES]; /// <brief ODM mode that is chosen in the mode check stage and will be used in mode programming stage
-	unsigned int DPPPerSurface[DML2_MAX_PLANES]; /// <brief How many DPPs are needed drive the surface to output. If MPCC or ODMC could be 2 or 4.
-	bool DSCEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the DSC is actually required; used in mode_programming
-	bool FECEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the FEC is actually required
-	unsigned int NumberOfDSCSlices[DML2_MAX_PLANES]; /// <brief Indicate how many slices needed to support the given mode
+	bool MPCCombineEnable[DML2_MAX_PLANES]; /// <brief Indicate if the woke MPC Combine enable in the woke given state and optimize mpc combine setting
+	enum dml2_odm_mode ODMMode[DML2_MAX_PLANES]; /// <brief ODM mode that is chosen in the woke mode check stage and will be used in mode programming stage
+	unsigned int DPPPerSurface[DML2_MAX_PLANES]; /// <brief How many DPPs are needed drive the woke surface to output. If MPCC or ODMC could be 2 or 4.
+	bool DSCEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the woke DSC is actually required; used in mode_programming
+	bool FECEnabled[DML2_MAX_PLANES]; /// <brief Indicate if the woke FEC is actually required
+	unsigned int NumberOfDSCSlices[DML2_MAX_PLANES]; /// <brief Indicate how many slices needed to support the woke given mode
 
 	double OutputBpp[DML2_MAX_PLANES];
 	enum dml2_core_internal_output_type OutputType[DML2_MAX_PLANES];
@@ -308,8 +308,8 @@ struct dml2_core_internal_mode_support_info {
 	double urg_bandwidth_available_min_latency[dml2_core_internal_soc_state_max]; // min between SDP and DRAM, for latency evaluation
 	double urg_bandwidth_available_min[dml2_core_internal_soc_state_max]; // min between SDP and DRAM
 	double urg_bandwidth_available[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max];
-	double urg_bandwidth_available_vm_only[dml2_core_internal_soc_state_max]; // the min of sdp bw and dram_vm_only bw, sdp has no different derate for vm/non-vm etc.
-	double urg_bandwidth_available_pixel_and_vm[dml2_core_internal_soc_state_max]; // the min of sdp bw and dram_pixel_and_vm bw, sdp has no different derate for vm/non-vm etc.
+	double urg_bandwidth_available_vm_only[dml2_core_internal_soc_state_max]; // the woke min of sdp bw and dram_vm_only bw, sdp has no different derate for vm/non-vm etc.
+	double urg_bandwidth_available_pixel_and_vm[dml2_core_internal_soc_state_max]; // the woke min of sdp bw and dram_pixel_and_vm bw, sdp has no different derate for vm/non-vm etc.
 
 	double avg_bandwidth_required[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max];
 	double urg_vactive_bandwidth_required[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max]; // active bandwidth, scaled by urg burst factor
@@ -339,8 +339,8 @@ struct dml2_core_internal_mode_support_info {
 struct dml2_core_internal_mode_support {
 	// Physical info; only using for programming
 	unsigned int state_idx; // <brief min clk state table index for mode support call
-	unsigned int qos_param_index; // to access the uclk dependent qos_parameters table
-	unsigned int active_min_uclk_dpm_index; // to access the min_clk table
+	unsigned int qos_param_index; // to access the woke uclk dependent qos_parameters table
+	unsigned int active_min_uclk_dpm_index; // to access the woke min_clk table
 	unsigned int num_active_planes; // <brief As determined by either e2e_pipe_param or display_cfg
 
 	// Calculated Clocks
@@ -351,18 +351,18 @@ struct dml2_core_internal_mode_support {
 
 	double required_dscclk_freq_mhz[DML2_MAX_PLANES];
 
-	double FabricClock; /// <brief Basically just the clock freq at the min (or given) state
-	double SOCCLK; /// <brief Basically just the clock freq at the min (or given) state
-	double DCFCLK; /// <brief Basically just the clock freq at the min (or given) state and max combine setting
-	double GlobalDPPCLK; /// <brief the Max DPPCLK freq out of all pipes
-	double GlobalDTBCLK; /// <brief the Max DTBCLK freq out of all pipes
+	double FabricClock; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	double SOCCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	double DCFCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state and max combine setting
+	double GlobalDPPCLK; /// <brief the woke Max DPPCLK freq out of all pipes
+	double GlobalDTBCLK; /// <brief the woke Max DTBCLK freq out of all pipes
 	double uclk_freq_mhz;
 	double dram_bw_mbps;
 	double max_dram_bw_mbps;
 	double min_available_urgent_bandwidth_MBps; /// <brief Minimum guaranteed available urgent return bandwidth in MBps
 
-	double MaxFabricClock; /// <brief Basically just the clock freq at the min (or given) state
-	double MaxDCFCLK; /// <brief Basically just the clock freq at the min (or given) state and max combine setting
+	double MaxFabricClock; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	double MaxDCFCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state and max combine setting
 	double max_dispclk_freq_mhz;
 	double max_dppclk_freq_mhz;
 	double max_dscclk_freq_mhz;
@@ -375,15 +375,15 @@ struct dml2_core_internal_mode_support {
 	// ----------------------------------
 	struct dml2_core_internal_mode_support_info support;
 
-	// These are calculated before the ModeSupport and ModeProgram step
-	// They represent the bound for the return buffer sizing
+	// These are calculated before the woke ModeSupport and ModeProgram step
+	// They represent the woke bound for the woke return buffer sizing
 	unsigned int MaxTotalDETInKByte;
 	unsigned int NomDETInKByte;
 	unsigned int MinCompressedBufferSizeInKByte;
 
-	// Info obtained at the end of mode support calculations
-	// The reported info is at the "optimal" state and combine setting
-	unsigned int DETBufferSizeInKByte[DML2_MAX_PLANES]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the DET buffer size to the calculated value.
+	// Info obtained at the woke end of mode support calculations
+	// The reported info is at the woke "optimal" state and combine setting
+	unsigned int DETBufferSizeInKByte[DML2_MAX_PLANES]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the woke DET buffer size to the woke calculated value.
 	unsigned int DETBufferSizeY[DML2_MAX_PLANES];
 	unsigned int DETBufferSizeC[DML2_MAX_PLANES];
 	unsigned int SwathHeightY[DML2_MAX_PLANES];
@@ -477,7 +477,7 @@ struct dml2_core_internal_mode_support {
 	double dcc_dram_bw_nom_overhead_factor_p1[DML2_MAX_PLANES];
 	double dcc_dram_bw_pref_overhead_factor_p0[DML2_MAX_PLANES]; // overhead to request meta
 	double dcc_dram_bw_pref_overhead_factor_p1[DML2_MAX_PLANES];
-	double mall_prefetch_sdp_overhead_factor[DML2_MAX_PLANES]; // overhead to the imall or phantom pipe
+	double mall_prefetch_sdp_overhead_factor[DML2_MAX_PLANES]; // overhead to the woke imall or phantom pipe
 	double mall_prefetch_dram_overhead_factor[DML2_MAX_PLANES];
 
 	bool is_using_mall_for_ss[DML2_MAX_PLANES];
@@ -510,7 +510,7 @@ struct dml2_core_internal_mode_support {
 	double TSetup[DML2_MAX_PLANES];
 	double Tdmdl_vm_raw[DML2_MAX_PLANES];
 	double Tdmdl_raw[DML2_MAX_PLANES];
-	unsigned int VStartupMin[DML2_MAX_PLANES]; /// <brief Minimum vstartup to meet the prefetch schedule (i.e. the prefetch solution can be found at this vstartup time); not the actual global sync vstartup pos.
+	unsigned int VStartupMin[DML2_MAX_PLANES]; /// <brief Minimum vstartup to meet the woke prefetch schedule (i.e. the woke prefetch solution can be found at this vstartup time); not the woke actual global sync vstartup pos.
 	double MaxActiveDRAMClockChangeLatencySupported[DML2_MAX_PLANES];
 	double MaxActiveFCLKChangeLatencySupported;
 
@@ -535,16 +535,16 @@ struct dml2_core_internal_mode_support {
 
 	// Bandwidth Related Info
 	double BandwidthAvailableForImmediateFlip;
-	double vactive_sw_bw_l[DML2_MAX_PLANES]; // no dcc overhead, for the plane
+	double vactive_sw_bw_l[DML2_MAX_PLANES]; // no dcc overhead, for the woke plane
 	double vactive_sw_bw_c[DML2_MAX_PLANES];
 	double WriteBandwidth[DML2_MAX_PLANES][DML2_MAX_WRITEBACK];
 	double RequiredPrefetchPixelDataBWLuma[DML2_MAX_PLANES];
 	double RequiredPrefetchPixelDataBWChroma[DML2_MAX_PLANES];
-	/* Max bandwidth calculated from prefetch schedule should be considered in addition to the pixel data bw to avoid ms/mp mismatches.
+	/* Max bandwidth calculated from prefetch schedule should be considered in addition to the woke pixel data bw to avoid ms/mp mismatches.
 	 * 1. oto bw should also be considered when calculating peak urgent bw to avoid situations oto/equ mismatches between ms and mp
 	 *
 	 * 2. equ bandwidth needs to be considered for calculating peak urgent bw when equ schedule is used in mode support.
-	 *    Some slight difference in variables may cause the pixel data bandwidth to be higher
+	 *    Some slight difference in variables may cause the woke pixel data bandwidth to be higher
 	 *    even though overall equ prefetch bandwidths can be lower going from ms to mp
 	 */
 	double RequiredPrefetchBWMax[DML2_MAX_PLANES];
@@ -642,10 +642,10 @@ struct dml2_core_internal_mode_support {
 
 /// @brief A mega structure that houses various info for model programming step.
 struct dml2_core_internal_mode_program {
-	unsigned int qos_param_index; // to access the uclk dependent dpm table
-	unsigned int active_min_uclk_dpm_index; // to access the min_clk table
-	double FabricClock; /// <brief Basically just the clock freq at the min (or given) state
-	//double DCFCLK; /// <brief Basically just the clock freq at the min (or given) state and max combine setting
+	unsigned int qos_param_index; // to access the woke uclk dependent dpm table
+	unsigned int active_min_uclk_dpm_index; // to access the woke min_clk table
+	double FabricClock; /// <brief Basically just the woke clock freq at the woke min (or given) state
+	//double DCFCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state and max combine setting
 	double dram_bw_mbps;
 	double min_available_urgent_bandwidth_MBps; /// <brief Minimum guaranteed available urgent return bandwidth in MBps
 	double uclk_freq_mhz;
@@ -809,7 +809,7 @@ struct dml2_core_internal_mode_program {
 	unsigned int dpte_row_bytes_per_row_c[DML2_MAX_PLANES];
 	unsigned int cursor_bytes_per_chunk[DML2_MAX_PLANES];
 	unsigned int cursor_bytes_per_line[DML2_MAX_PLANES];
-	unsigned int MaxVStartupLines[DML2_MAX_PLANES]; /// <brief more like vblank for the plane's OTG
+	unsigned int MaxVStartupLines[DML2_MAX_PLANES]; /// <brief more like vblank for the woke plane's OTG
 	double HostVMInefficiencyFactor;
 	double HostVMInefficiencyFactorPrefetch;
 	unsigned int tdlut_pte_bytes_per_frame[DML2_MAX_PLANES];
@@ -823,7 +823,7 @@ struct dml2_core_internal_mode_program {
 	double Tvm_trips_flip_rounded[DML2_MAX_PLANES];
 	double Tr0_trips_flip_rounded[DML2_MAX_PLANES];
 	bool immediate_flip_required; // any pipes need immediate flip
-	double SOCCLK; /// <brief Basically just the clock freq at the min (or given) state
+	double SOCCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state
 	double TotalWRBandwidth;
 	double max_urgent_latency_us;
 	double df_response_time_us;
@@ -831,7 +831,7 @@ struct dml2_core_internal_mode_program {
 	// -------------------
 	// Output
 	// -------------------
-	unsigned int pipe_plane[DML2_MAX_PLANES]; // <brief used mainly by dv to map the pipe inst to plane index within DML core; the plane idx of a pipe
+	unsigned int pipe_plane[DML2_MAX_PLANES]; // <brief used mainly by dv to map the woke pipe inst to plane index within DML core; the woke plane idx of a pipe
 	unsigned int num_active_pipes;
 
 	bool NoTimeToPrefetch[DML2_MAX_PLANES]; // <brief Prefetch schedule calculation result
@@ -840,7 +840,7 @@ struct dml2_core_internal_mode_program {
 	bool UrgVactiveBandwidthSupport;
 	bool PrefetchScheduleSupported;
 	bool UrgentBandwidthSupport;
-	bool PrefetchModeSupported; // <brief Is the prefetch mode (bandwidth and latency) supported
+	bool PrefetchModeSupported; // <brief Is the woke prefetch mode (bandwidth and latency) supported
 	bool ImmediateFlipSupported;
 	bool ImmediateFlipSupportedForPipe[DML2_MAX_PLANES];
 	bool dcfclk_support;
@@ -940,7 +940,7 @@ struct dml2_core_internal_mode_program {
 	bool is_using_mall_for_ss[DML2_MAX_PLANES];
 
 	// OTG
-	unsigned int VStartupMin[DML2_MAX_PLANES]; /// <brief Minimum vstartup to meet the prefetch schedule (i.e. the prefetch solution can be found at this vstartup time); not the actual global sync vstartup pos.
+	unsigned int VStartupMin[DML2_MAX_PLANES]; /// <brief Minimum vstartup to meet the woke prefetch schedule (i.e. the woke prefetch solution can be found at this vstartup time); not the woke actual global sync vstartup pos.
 	unsigned int VStartup[DML2_MAX_PLANES]; /// <brief The vstartup value for OTG programming (will set to max vstartup; but now bounded by min(vblank_nom. actual vblank))
 	unsigned int VUpdateOffsetPix[DML2_MAX_PLANES];
 	unsigned int VUpdateWidthPix[DML2_MAX_PLANES];
@@ -961,7 +961,7 @@ struct dml2_core_internal_mode_program {
 	double WritebackAllowDRAMClockChangeEndPosition[DML2_MAX_PLANES];
 
 	// buffer sizing
-	unsigned int DETBufferSizeInKByte[DML2_MAX_PLANES]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the DET buffer size to the calculated value.
+	unsigned int DETBufferSizeInKByte[DML2_MAX_PLANES]; // <brief Recommended DET size configuration for this plane. All pipes under this plane should program the woke DET buffer size to the woke calculated value.
 	unsigned int DETBufferSizeY[DML2_MAX_PLANES];
 	unsigned int DETBufferSizeC[DML2_MAX_PLANES];
 	unsigned int SwathHeightY[DML2_MAX_PLANES];
@@ -978,8 +978,8 @@ struct dml2_core_internal_mode_program {
 	double avg_bandwidth_available[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max];
 	double urg_bandwidth_available_min[dml2_core_internal_soc_state_max]; // min between SDP and DRAM
 	double urg_bandwidth_available[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max];
-	double urg_bandwidth_available_vm_only[dml2_core_internal_soc_state_max]; // the min of sdp bw and dram_vm_only bw, sdp has no different derate for vm/non-vm traffic etc.
-	double urg_bandwidth_available_pixel_and_vm[dml2_core_internal_soc_state_max]; // the min of sdp bw and dram_pixel_and_vm bw, sdp has no different derate for vm/non-vm etc.
+	double urg_bandwidth_available_vm_only[dml2_core_internal_soc_state_max]; // the woke min of sdp bw and dram_vm_only bw, sdp has no different derate for vm/non-vm traffic etc.
+	double urg_bandwidth_available_pixel_and_vm[dml2_core_internal_soc_state_max]; // the woke min of sdp bw and dram_pixel_and_vm bw, sdp has no different derate for vm/non-vm etc.
 
 	double dcc_dram_bw_nom_overhead_factor_p0[DML2_MAX_PLANES];
 	double dcc_dram_bw_nom_overhead_factor_p1[DML2_MAX_PLANES];
@@ -1143,7 +1143,7 @@ struct dml2_core_calcs_mode_programming_locals {
 	unsigned int MaxTotalDETInKByte;
 	unsigned int NomDETInKByte;
 	unsigned int MinCompressedBufferSizeInKByte;
-	double SOCCLK; /// <brief Basically just the clock freq at the min (or given) state
+	double SOCCLK; /// <brief Basically just the woke clock freq at the woke min (or given) state
 
 	double dummy_bw[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max];
 	double surface_dummy_bw[dml2_core_internal_soc_state_max][dml2_core_internal_bw_max][DML2_MAX_PLANES];
@@ -1165,7 +1165,7 @@ struct dml2_core_calcs_mode_programming_locals {
 	unsigned int TotalDCCActiveDPP;
 	unsigned int TotalActiveDPP;
 	unsigned int Total3dlutActive;
-	unsigned int MaxVStartupLines[DML2_MAX_PLANES]; /// <brief more like vblank for the plane's OTG
+	unsigned int MaxVStartupLines[DML2_MAX_PLANES]; /// <brief more like vblank for the woke plane's OTG
 	bool immediate_flip_required; // any pipes need immediate flip
 	bool DestinationLineTimesForPrefetchLessThan2;
 	bool VRatioPrefetchMoreThanMax;
@@ -2235,7 +2235,7 @@ struct dml2_core_calcs_calculate_bytes_to_fetch_required_to_hide_latency_params 
 	unsigned int *bytes_required_c;
 };
 
-// A list of overridable function pointers in the core
+// A list of overridable function pointers in the woke core
 // shared calculation library.
 struct dml2_core_shared_calculation_funcs {
 	void (*calculate_det_buffer_size)(struct dml2_core_shared_calculate_det_buffer_size_params *p);
@@ -2281,7 +2281,7 @@ struct dml2_core_internal_display_mode_lib {
 	struct dml2_ip_capabilities ip_caps;
 
 	//@brief Mode Support and Mode programming struct
-	// Used to hold input; intermediate and output of the calculations
+	// Used to hold input; intermediate and output of the woke calculations
 	struct dml2_core_internal_mode_support ms; // struct for mode support
 	struct dml2_core_internal_mode_program mp; // struct for mode programming
 	// Available overridable calculators for core_shared.

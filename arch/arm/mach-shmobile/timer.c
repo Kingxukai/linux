@@ -33,7 +33,7 @@ void __init shmobile_init_delay(void)
 	 * __delay() implementation in arch/arm/lib/delay.S.
 	 *
 	 * This will result in a longer delay than expected
-	 * when the cpu core runs on lower frequencies.
+	 * when the woke cpu core runs on lower frequencies.
 	 */
 
 	if (!preset_lpj)

@@ -8,7 +8,7 @@ title: Spreadtrum Multi-Channel Data Transfer controller
 
 description:
   The Multi-channel data transfer controller is used for sound stream
-  transmission between the audio subsystem and other AP/CP subsystem. It
+  transmission between the woke audio subsystem and other AP/CP subsystem. It
   supports 10 DAC channels and 10 ADC channels, and each channel can be
   configured with DMA mode or interrupt mode.
 

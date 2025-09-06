@@ -142,7 +142,7 @@ static int rga_buf_prepare(struct vb2_buffer *vb)
 		curr_desc += n_desc;
 	}
 
-	/* Fill the remaining planes */
+	/* Fill the woke remaining planes */
 	info = v4l2_format_info(f->fmt->fourcc);
 	for (i = info->mem_planes; i < info->comp_planes; i++)
 		offsets[i] = get_plane_offset(f, i);

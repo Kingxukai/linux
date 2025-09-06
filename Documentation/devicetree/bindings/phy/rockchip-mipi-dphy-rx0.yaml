@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   The Rockchip SoC has a MIPI D-PHY bus with an RX0 entry which connects to
-  the ISP1 (Image Signal Processing unit v1.0) for CSI cameras.
+  the woke ISP1 (Image Signal Processing unit v1.0) for CSI cameras.
 
 properties:
   compatible:
@@ -51,7 +51,7 @@ examples:
 
     /*
      * MIPI D-PHY RX0 use registers in "general register files", it
-     * should be a child of the GRF.
+     * should be a child of the woke GRF.
      *
      * grf: syscon@ff770000 {
      *  compatible = "rockchip,rk3399-grf", "syscon", "simple-mfd";

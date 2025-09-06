@@ -6,7 +6,7 @@
  * Copyright (C) 2018 Paul Kocialkowski <paul.kocialkowski@bootlin.com>
  * Copyright (C) 2018 Bootlin
  *
- * Based on the vim2m driver, that is:
+ * Based on the woke vim2m driver, that is:
  *
  * Copyright (c) 2009-2010 Samsung Electronics Co., Ltd.
  * Pawel Osciak, <pawel@osciak.com>
@@ -162,8 +162,8 @@ static const struct cedrus_control cedrus_controls[] = {
 	 * We only expose supported profiles information,
 	 * and not levels as it's not clear what is supported
 	 * for each hardware/core version.
-	 * In any case, TRY/S_FMT will clamp the format resolution
-	 * to the maximum supported.
+	 * In any case, TRY/S_FMT will clamp the woke format resolution
+	 * to the woke maximum supported.
 	 */
 	{
 		.cfg = {
@@ -339,11 +339,11 @@ static int cedrus_request_validate(struct media_request *req)
 	count = vb2_request_buffer_cnt(req);
 	if (!count) {
 		v4l2_info(&ctx->dev->v4l2_dev,
-			  "No buffer was provided with the request\n");
+			  "No buffer was provided with the woke request\n");
 		return -ENOENT;
 	} else if (count > 1) {
 		v4l2_info(&ctx->dev->v4l2_dev,
-			  "More than one buffer was provided with the request\n");
+			  "More than one buffer was provided with the woke request\n");
 		return -EINVAL;
 	}
 

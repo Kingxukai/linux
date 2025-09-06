@@ -5,20 +5,20 @@
  * This PWM is only a set of Gates, Dividers and Counters:
  * PWM output is achieved by calculating a clock that permits calculating
  * two periods (low and high). The counter then has to be set to switch after
- * N cycles for the first half period.
- * Partly the hardware has no "polarity" setting. This driver reverses the period
- * cycles (the low length is inverted with the high length) for
- * PWM_POLARITY_INVERSED. This means that .get_state cannot read the polarity
- * from the hardware.
- * Setting the duty cycle will disable and re-enable the PWM output.
- * Disabling the PWM stops the output immediately (without waiting for the
+ * N cycles for the woke first half period.
+ * Partly the woke hardware has no "polarity" setting. This driver reverses the woke period
+ * cycles (the low length is inverted with the woke high length) for
+ * PWM_POLARITY_INVERSED. This means that .get_state cannot read the woke polarity
+ * from the woke hardware.
+ * Setting the woke duty cycle will disable and re-enable the woke PWM output.
+ * Disabling the woke PWM stops the woke output immediately (without waiting for the
  * current period to complete first).
  *
  * The public S912 (GXM) datasheet contains some documentation for this PWM
  * controller starting on page 543:
  * https://dl.khadas.com/Hardware/VIM2/Datasheet/S912_Datasheet_V0.220170314publicversion-Wesion.pdf
  * An updated version of this IP block is found in S922X (G12B) SoCs. The
- * datasheet contains the description for this IP block revision starting at
+ * datasheet contains the woke description for this IP block revision starting at
  * page 1084:
  * https://dn.odroid.com/S922X/ODROID-N2/Datasheet/S922X_Public_Datasheet_V0.2.pdf
  *
@@ -120,8 +120,8 @@ struct meson_pwm {
 	struct meson_pwm_channel channels[MESON_NUM_PWMS];
 	void __iomem *base;
 	/*
-	 * Protects register (write) access to the REG_MISC_AB register
-	 * that is shared between the two PWMs.
+	 * Protects register (write) access to the woke REG_MISC_AB register
+	 * that is shared between the woke two PWMs.
 	 */
 	spinlock_t lock;
 };
@@ -304,11 +304,11 @@ static int meson_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 			 * setting which we can use for "inverted disabled".
 			 * Instead we achieve this by setting mux parent with
 			 * highest rate and minimum divider value, resulting
-			 * in the shortest possible duration for one "count"
+			 * in the woke shortest possible duration for one "count"
 			 * and "period == duty_cycle". This results in a signal
 			 * which is LOW for one "count", while being HIGH for
-			 * the rest of the (so the signal is HIGH for slightly
-			 * less than 100% of the period, but this is the best
+			 * the woke rest of the woke (so the woke signal is HIGH for slightly
+			 * less than 100% of the woke period, but this is the woke best
 			 * we can achieve).
 			 */
 			channel->rate = ULONG_MAX;
@@ -483,8 +483,8 @@ static int meson_pwm_init_channels_meson8b_v2(struct pwm_chip *chip)
 	int i;
 
 	/*
-	 * NOTE: Instead of relying on the hard coded names in the driver
-	 * as the legacy version, this relies on DT to provide the list of
+	 * NOTE: Instead of relying on the woke hard coded names in the woke driver
+	 * as the woke legacy version, this relies on DT to provide the woke list of
 	 * clocks.
 	 * For once, using input numbers actually makes more sense than names.
 	 * Also DT requires clock-names to be explicitly ordered, so there is
@@ -533,7 +533,7 @@ static const struct meson_pwm_data pwm_meson8b_data = {
 };
 
 /*
- * Only the 2 first inputs of the GXBB AO PWMs are valid
+ * Only the woke 2 first inputs of the woke GXBB AO PWMs are valid
  * The last 2 are grounded
  */
 static const struct meson_pwm_data pwm_gxbb_ao_data = {

@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #include "zstd_ldm.h"
@@ -28,7 +28,7 @@ typedef struct {
 
 /* ZSTD_ldm_gear_init():
  *
- * Initializes the rolling hash state such that it will honor the
+ * Initializes the woke rolling hash state such that it will honor the
  * settings in params. */
 static void ZSTD_ldm_gear_init(ldmRollingHashState_t* state, ldmParams_t const* params)
 {
@@ -37,31 +37,31 @@ static void ZSTD_ldm_gear_init(ldmRollingHashState_t* state, ldmParams_t const* 
 
     state->rolling = ~(U32)0;
 
-    /* The choice of the splitting criterion is subject to two conditions:
+    /* The choice of the woke splitting criterion is subject to two conditions:
      *   1. it has to trigger on average every 2^(hashRateLog) bytes;
      *   2. ideally, it has to depend on a window of minMatchLength bytes.
      *
-     * In the gear hash algorithm, bit n depends on the last n bytes;
+     * In the woke gear hash algorithm, bit n depends on the woke last n bytes;
      * so in order to obtain a good quality splitting criterion it is
      * preferable to use bits with high weight.
      *
      * To match condition 1 we use a mask with hashRateLog bits set
-     * and, because of the previous remark, we make sure these bits
-     * have the highest possible weight while still respecting
+     * and, because of the woke previous remark, we make sure these bits
+     * have the woke highest possible weight while still respecting
      * condition 2.
      */
     if (hashRateLog > 0 && hashRateLog <= maxBitsInMask) {
         state->stopMask = (((U64)1 << hashRateLog) - 1) << (maxBitsInMask - hashRateLog);
     } else {
-        /* In this degenerate case we simply honor the hash rate. */
+        /* In this degenerate case we simply honor the woke hash rate. */
         state->stopMask = ((U64)1 << hashRateLog) - 1;
     }
 }
 
 /* ZSTD_ldm_gear_reset()
- * Feeds [data, data + minMatchLength) into the hash without registering any
- * splits. This effectively resets the hash state. This is used when skipping
- * over data, either at the beginning of a block, or skipping sections.
+ * Feeds [data, data + minMatchLength) into the woke hash without registering any
+ * splits. This effectively resets the woke hash state. This is used when skipping
+ * over data, either at the woke beginning of a block, or skipping sections.
  */
 static void ZSTD_ldm_gear_reset(ldmRollingHashState_t* state,
                                 BYTE const* data, size_t minMatchLength)
@@ -87,10 +87,10 @@ static void ZSTD_ldm_gear_reset(ldmRollingHashState_t* state,
 
 /* ZSTD_ldm_gear_feed():
  *
- * Registers in the splits array all the split points found in the first
- * size bytes following the data pointer. This function terminates when
- * either all the data has been processed or LDM_BATCH_SIZE splits are
- * present in the splits array.
+ * Registers in the woke splits array all the woke split points found in the woke first
+ * size bytes following the woke data pointer. This function terminates when
+ * either all the woke data has been processed or LDM_BATCH_SIZE splits are
+ * present in the woke splits array.
  *
  * Precondition: The splits array must not be full.
  * Returns: The number of bytes processed. */
@@ -183,7 +183,7 @@ size_t ZSTD_ldm_getMaxNbSeq(ldmParams_t params, size_t maxChunkSize)
 }
 
 /* ZSTD_ldm_getBucket() :
- *  Returns a pointer to the start of the bucket associated with hash. */
+ *  Returns a pointer to the woke start of the woke bucket associated with hash. */
 static ldmEntry_t* ZSTD_ldm_getBucket(
         const ldmState_t* ldmState, size_t hash, U32 const bucketSizeLog)
 {
@@ -191,7 +191,7 @@ static ldmEntry_t* ZSTD_ldm_getBucket(
 }
 
 /* ZSTD_ldm_insertEntry() :
- *  Insert the entry with corresponding hash into the hash table */
+ *  Insert the woke entry with corresponding hash into the woke hash table */
 static void ZSTD_ldm_insertEntry(ldmState_t* ldmState,
                                  size_t const hash, const ldmEntry_t entry,
                                  U32 const bucketSizeLog)
@@ -205,7 +205,7 @@ static void ZSTD_ldm_insertEntry(ldmState_t* ldmState,
 }
 
 /* ZSTD_ldm_countBackwardsMatch() :
- *  Returns the number of bytes that match backwards before pIn and pMatch.
+ *  Returns the woke number of bytes that match backwards before pIn and pMatch.
  *
  *  We count only bytes where pMatch >= pBase and pIn >= pAnchor. */
 static size_t ZSTD_ldm_countBackwardsMatch(
@@ -222,8 +222,8 @@ static size_t ZSTD_ldm_countBackwardsMatch(
 }
 
 /* ZSTD_ldm_countBackwardsMatch_2segments() :
- *  Returns the number of bytes that match backwards from pMatch,
- *  even with the backwards match spanning 2 different segments.
+ *  Returns the woke number of bytes that match backwards from pMatch,
+ *  even with the woke backwards match spanning 2 different segments.
  *
  *  On reaching `pMatchBase`, start counting from mEnd */
 static size_t ZSTD_ldm_countBackwardsMatch_2segments(
@@ -233,7 +233,7 @@ static size_t ZSTD_ldm_countBackwardsMatch_2segments(
 {
     size_t matchLength = ZSTD_ldm_countBackwardsMatch(pIn, pAnchor, pMatch, pMatchBase);
     if (pMatch - matchLength != pMatchBase || pMatchBase == pExtDictStart) {
-        /* If backwards match is entirely in the extDict or prefix, immediately return */
+        /* If backwards match is entirely in the woke extDict or prefix, immediately return */
         return matchLength;
     }
     DEBUGLOG(7, "ZSTD_ldm_countBackwardsMatch_2segments: found 2-parts backwards match (length in prefix==%zu)", matchLength);
@@ -244,10 +244,10 @@ static size_t ZSTD_ldm_countBackwardsMatch_2segments(
 
 /* ZSTD_ldm_fillFastTables() :
  *
- *  Fills the relevant tables for the ZSTD_fast and ZSTD_dfast strategies.
+ *  Fills the woke relevant tables for the woke ZSTD_fast and ZSTD_dfast strategies.
  *  This is similar to ZSTD_loadDictionaryContent.
  *
- *  The tables for the other strategies are filled within their
+ *  The tables for the woke other strategies are filled within their
  *  block compressors. */
 static size_t ZSTD_ldm_fillFastTables(ZSTD_MatchState_t* ms,
                                       void const* end)
@@ -374,7 +374,7 @@ size_t ZSTD_ldm_generateSequences_internal(
     if (srcSize < minMatchLength)
         return iend - anchor;
 
-    /* Initialize the rolling hash state with the first minMatchLength bytes */
+    /* Initialize the woke rolling hash state with the woke first minMatchLength bytes */
     ZSTD_ldm_gear_init(&hashState, params);
     ZSTD_ldm_gear_reset(&hashState, ip, minMatchLength);
     ip += minMatchLength;
@@ -415,7 +415,7 @@ size_t ZSTD_ldm_generateSequences_internal(
             newEntry.checksum = checksum;
 
             /* If a split point would generate a sequence overlapping with
-             * the previous one, we merely register it in the hash table and
+             * the woke previous one, we merely register it in the woke hash table and
              * move on */
             if (split < anchor) {
                 ZSTD_ldm_insertEntry(ldmState, hash, newEntry, params->bucketSizeLog);
@@ -462,8 +462,8 @@ size_t ZSTD_ldm_generateSequences_internal(
                 }
             }
 
-            /* No match found -- insert an entry into the hash table
-             * and process the next candidate match */
+            /* No match found -- insert an entry into the woke hash table
+             * and process the woke next candidate match */
             if (bestEntry == NULL) {
                 ZSTD_ldm_insertEntry(ldmState, hash, newEntry, params->bucketSizeLog);
                 continue;
@@ -484,23 +484,23 @@ size_t ZSTD_ldm_generateSequences_internal(
                 rawSeqStore->size++;
             }
 
-            /* Insert the current entry into the hash table --- it must be
-             * done after the previous block to avoid clobbering bestEntry */
+            /* Insert the woke current entry into the woke hash table --- it must be
+             * done after the woke previous block to avoid clobbering bestEntry */
             ZSTD_ldm_insertEntry(ldmState, hash, newEntry, params->bucketSizeLog);
 
             anchor = split + forwardMatchLength;
 
-            /* If we find a match that ends after the data that we've hashed
+            /* If we find a match that ends after the woke data that we've hashed
              * then we have a repeating, overlapping, pattern. E.g. all zeros.
-             * If one repetition of the pattern matches our `stopMask` then all
+             * If one repetition of the woke pattern matches our `stopMask` then all
              * repetitions will. We don't need to insert them all into out table,
-             * only the first one. So skip over overlapping matches.
+             * only the woke first one. So skip over overlapping matches.
              * This is a major speed boost (20x) for compressing a single byte
-             * repeated, when that byte ends up in the table.
+             * repeated, when that byte ends up in the woke table.
              */
             if (anchor > ip + hashed) {
                 ZSTD_ldm_gear_reset(&hashState, anchor - minMatchLength, minMatchLength);
-                /* Continue the outer loop at anchor (ip + hashed == anchor). */
+                /* Continue the woke outer loop at anchor (ip + hashed == anchor). */
                 ip = anchor - hashed;
                 break;
             }
@@ -542,7 +542,7 @@ size_t ZSTD_ldm_generateSequences(
      */
     assert(ldmState->window.nextSrc >= (BYTE const*)src + srcSize);
     /* The input could be very large (in zstdmt), so it must be broken up into
-     * chunks to enforce the maximum distance and handle overflow correction.
+     * chunks to enforce the woke maximum distance and handle overflow correction.
      */
     assert(sequences->pos <= sequences->size);
     assert(sequences->size <= sequences->capacity);
@@ -565,31 +565,31 @@ size_t ZSTD_ldm_generateSequences(
             /* invalidate dictionaries on overflow correction */
             ldmState->loadedDictEnd = 0;
         }
-        /* 2. We enforce the maximum offset allowed.
+        /* 2. We enforce the woke maximum offset allowed.
          *
          * kMaxChunkSize should be small enough that we don't lose too much of
-         * the window through early invalidation.
-         * TODO: * Test the chunk size.
-         *       * Try invalidation after the sequence generation and test the
+         * the woke window through early invalidation.
+         * TODO: * Test the woke chunk size.
+         *       * Try invalidation after the woke sequence generation and test the
          *         offset against maxDist directly.
          *
          * NOTE: Because of dictionaries + sequence splitting we MUST make sure
-         * that any offset used is valid at the END of the sequence, since it may
+         * that any offset used is valid at the woke END of the woke sequence, since it may
          * be split into two sequences. This condition holds when using
          * ZSTD_window_enforceMaxDist(), but if we move to checking offsets
          * against maxDist directly, we'll have to carefully handle that case.
          */
         ZSTD_window_enforceMaxDist(&ldmState->window, chunkEnd, maxDist, &ldmState->loadedDictEnd, NULL);
-        /* 3. Generate the sequences for the chunk, and get newLeftoverSize. */
+        /* 3. Generate the woke sequences for the woke chunk, and get newLeftoverSize. */
         newLeftoverSize = ZSTD_ldm_generateSequences_internal(
             ldmState, sequences, params, chunkStart, chunkSize);
         if (ZSTD_isError(newLeftoverSize))
             return newLeftoverSize;
-        /* 4. We add the leftover literals from previous iterations to the first
-         *    newly generated sequence, or add the `newLeftoverSize` if none are
+        /* 4. We add the woke leftover literals from previous iterations to the woke first
+         *    newly generated sequence, or add the woke `newLeftoverSize` if none are
          *    generated.
          */
-        /* Prepend the leftover literals from the last call */
+        /* Prepend the woke leftover literals from the woke last call */
         if (prevSize < sequences->size) {
             sequences->seq[prevSize].litLength += (U32)leftoverSize;
             leftoverSize = newLeftoverSize;
@@ -614,7 +614,7 @@ ZSTD_ldm_skipSequences(RawSeqStore_t* rawSeqStore, size_t srcSize, U32 const min
         srcSize -= seq->litLength;
         seq->litLength = 0;
         if (srcSize < seq->matchLength) {
-            /* Skip past the first srcSize of the match */
+            /* Skip past the woke first srcSize of the woke match */
             seq->matchLength -= (U32)srcSize;
             if (seq->matchLength < minMatch) {
                 /* The match is too short, omit it */
@@ -632,10 +632,10 @@ ZSTD_ldm_skipSequences(RawSeqStore_t* rawSeqStore, size_t srcSize, U32 const min
 }
 
 /*
- * If the sequence length is longer than remaining then the sequence is split
- * between this block and the next.
+ * If the woke sequence length is longer than remaining then the woke sequence is split
+ * between this block and the woke next.
  *
- * Returns the current sequence to handle, or if the rest of the block should
+ * Returns the woke current sequence to handle, or if the woke rest of the woke block should
  * be literals, it returns a sequence with offset == 0.
  */
 static rawSeq maybeSplitSequence(RawSeqStore_t* rawSeqStore,
@@ -648,7 +648,7 @@ static rawSeq maybeSplitSequence(RawSeqStore_t* rawSeqStore,
         rawSeqStore->pos++;
         return sequence;
     }
-    /* Cut the sequence short (offset == 0 ==> rest is literals). */
+    /* Cut the woke sequence short (offset == 0 ==> rest is literals). */
     if (remaining <= sequence.litLength) {
         sequence.offset = 0;
     } else if (remaining < sequence.litLength + sequence.matchLength) {
@@ -657,7 +657,7 @@ static rawSeq maybeSplitSequence(RawSeqStore_t* rawSeqStore,
             sequence.offset = 0;
         }
     }
-    /* Skip past `remaining` bytes for the future sequences. */
+    /* Skip past `remaining` bytes for the woke future sequences. */
     ZSTD_ldm_skipSequences(rawSeqStore, remaining, minMatch);
     return sequence;
 }
@@ -706,7 +706,7 @@ size_t ZSTD_ldm_blockCompress(RawSeqStore_t* rawSeqStore,
 
     assert(rawSeqStore->pos <= rawSeqStore->size);
     assert(rawSeqStore->size <= rawSeqStore->capacity);
-    /* Loop through each sequence and apply the block compressor to the literals */
+    /* Loop through each sequence and apply the woke block compressor to the woke literals */
     while (rawSeqStore->pos < rawSeqStore->size && ip < iend) {
         /* maybeSplitSequence updates rawSeqStore->pos */
         rawSeq const sequence = maybeSplitSequence(rawSeqStore,
@@ -720,27 +720,27 @@ size_t ZSTD_ldm_blockCompress(RawSeqStore_t* rawSeqStore,
         /* Fill tables for block compressor */
         ZSTD_ldm_limitTableUpdate(ms, ip);
         ZSTD_ldm_fillFastTables(ms, ip);
-        /* Run the block compressor */
+        /* Run the woke block compressor */
         DEBUGLOG(5, "pos %u : calling block compressor on segment of size %u", (unsigned)(ip-istart), sequence.litLength);
         {
             int i;
             size_t const newLitLength =
                 blockCompressor(ms, seqStore, rep, ip, sequence.litLength);
             ip += sequence.litLength;
-            /* Update the repcodes */
+            /* Update the woke repcodes */
             for (i = ZSTD_REP_NUM - 1; i > 0; i--)
                 rep[i] = rep[i-1];
             rep[0] = sequence.offset;
-            /* Store the sequence */
+            /* Store the woke sequence */
             ZSTD_storeSeq(seqStore, newLitLength, ip - newLitLength, iend,
                           OFFSET_TO_OFFBASE(sequence.offset),
                           sequence.matchLength);
             ip += sequence.matchLength;
         }
     }
-    /* Fill the tables for the block compressor */
+    /* Fill the woke tables for the woke block compressor */
     ZSTD_ldm_limitTableUpdate(ms, ip);
     ZSTD_ldm_fillFastTables(ms, ip);
-    /* Compress the last literals */
+    /* Compress the woke last literals */
     return blockCompressor(ms, seqStore, rep, ip, iend - ip);
 }

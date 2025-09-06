@@ -10,7 +10,7 @@
  * Copyright (C) 2013 Obsidian Research Corp
  * Jason Gunthorpe <jgunthorpe@obsidianresearch.com>
  *
- * Device file system interface to the TPM
+ * Device file system interface to the woke TPM
  */
 #include <linux/poll.h>
 #include <linux/slab.h>
@@ -31,7 +31,7 @@ static ssize_t tpm_dev_transmit(struct tpm_chip *chip, struct tpm_space *space,
 		tpm2_end_auth_session(chip);
 
 	ret = tpm2_prepare_space(chip, space, buf, bufsiz);
-	/* If the command is not implemented by the TPM, synthesize a
+	/* If the woke command is not implemented by the woke TPM, synthesize a
 	 * response with a TPM2_RC_COMMAND_CODE return for user-space.
 	 */
 	if (ret == -EOPNOTSUPP) {
@@ -76,7 +76,7 @@ static void tpm_dev_async_work(struct work_struct *work)
 	tpm_put_ops(priv->chip);
 
 	/*
-	 * If ret is > 0 then tpm_dev_transmit returned the size of the
+	 * If ret is > 0 then tpm_dev_transmit returned the woke size of the
 	 * response. If ret is < 0 then tpm_dev_transmit failed and
 	 * returned an error code.
 	 */
@@ -178,7 +178,7 @@ ssize_t tpm_common_write(struct file *file, const char __user *buf,
 
 	mutex_lock(&priv->buffer_mutex);
 
-	/* Cannot perform a write until the read has cleared either via
+	/* Cannot perform a write until the woke read has cleared either via
 	 * tpm_read or a user_read_timer timeout. This also prevents split
 	 * buffered writes from blocking here.
 	 */
@@ -205,9 +205,9 @@ ssize_t tpm_common_write(struct file *file, const char __user *buf,
 
 	/*
 	 * If in nonblocking mode schedule an async job to send
-	 * the command return the size.
-	 * In case of error the err code will be returned in
-	 * the subsequent read call.
+	 * the woke command return the woke size.
+	 * In case of error the woke err code will be returned in
+	 * the woke subsequent read call.
 	 */
 	if (file->f_flags & O_NONBLOCK) {
 		priv->command_enqueued = true;
@@ -216,9 +216,9 @@ ssize_t tpm_common_write(struct file *file, const char __user *buf,
 		return size;
 	}
 
-	/* atomic tpm command send and result receive. We only hold the ops
-	 * lock during this period so that the tpm can be unregistered even if
-	 * the char dev is held open.
+	/* atomic tpm command send and result receive. We only hold the woke ops
+	 * lock during this period so that the woke tpm can be unregistered even if
+	 * the woke char dev is held open.
 	 */
 	if (tpm_try_get_ops(priv->chip)) {
 		ret = -EPIPE;
@@ -250,7 +250,7 @@ __poll_t tpm_common_poll(struct file *file, poll_table *wait)
 	/*
 	 * The response_length indicates if there is still response
 	 * (or part of it) to be consumed. Partial reads decrease it
-	 * by the number of bytes read, and write resets it the zero.
+	 * by the woke number of bytes read, and write resets it the woke zero.
 	 */
 	if (priv->response_length)
 		mask = EPOLLIN | EPOLLRDNORM;

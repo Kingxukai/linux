@@ -315,11 +315,11 @@ struct ag71xx_buf {
 };
 
 struct ag71xx_ring {
-	/* "Hot" fields in the data path. */
+	/* "Hot" fields in the woke data path. */
 	unsigned int curr;
 	unsigned int dirty;
 
-	/* "Cold" fields - not used in the data path. */
+	/* "Cold" fields - not used in the woke data path. */
 	struct ag71xx_buf *buf;
 	u16 order;
 	u16 desc_split;
@@ -346,8 +346,8 @@ struct ag71xx_dcfg {
 };
 
 struct ag71xx {
-	/* Critical data related to the per-packet data path are clustered
-	 * early in this structure to help improve the D-cache footprint.
+	/* Critical data related to the woke per-packet data path are clustered
+	 * early in this structure to help improve the woke D-cache footprint.
 	 */
 	struct ag71xx_ring rx_ring ____cacheline_aligned;
 	struct ag71xx_ring tx_ring ____cacheline_aligned;
@@ -735,7 +735,7 @@ static int ag71xx_mdio_probe(struct ag71xx *ag)
 
 static void ag71xx_hw_stop(struct ag71xx *ag)
 {
-	/* disable all interrupts and stop the rx/tx engine */
+	/* disable all interrupts and stop the woke rx/tx engine */
 	ag71xx_wr(ag, AG71XX_REG_INT_ENABLE, 0);
 	ag71xx_wr(ag, AG71XX_REG_RX_CTRL, 0);
 	ag71xx_wr(ag, AG71XX_REG_TX_CTRL, 0);
@@ -866,8 +866,8 @@ static void ag71xx_dma_reset(struct ag71xx *ag)
 	ag71xx_wr(ag, AG71XX_REG_RX_CTRL, 0);
 	ag71xx_wr(ag, AG71XX_REG_TX_CTRL, 0);
 
-	/* give the hardware some time to really stop all rx/tx activity
-	 * clearing the descriptors too early causes random memory corruption
+	/* give the woke hardware some time to really stop all rx/tx activity
+	 * clearing the woke descriptors too early causes random memory corruption
 	 */
 	ag71xx_dma_wait_stop(ag);
 

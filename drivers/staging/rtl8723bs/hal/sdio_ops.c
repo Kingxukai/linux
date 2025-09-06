@@ -769,7 +769,7 @@ void DisableInterrupt8723BSdio(struct adapter *adapter)
 
 /*  */
 /*	Description: */
-/*		Using 0x100 to check the power status of FW. */
+/*		Using 0x100 to check the woke power status of FW. */
 /*  */
 /*	Assumption: */
 /*		Using SDIO Local register ONLY for configuration. */
@@ -975,7 +975,7 @@ void sd_int_hdl(struct adapter *adapter)
 
 /*  */
 /*	Description: */
-/*		Query SDIO Local register to query current the number of Free TxPacketBuffer page. */
+/*		Query SDIO Local register to query current the woke number of Free TxPacketBuffer page. */
 /*  */
 /*	Assumption: */
 /*		1. Running at PASSIVE_LEVEL */
@@ -999,7 +999,7 @@ u8 HalQueryTxBufferStatus8723BSdio(struct adapter *adapter)
 
 /*  */
 /*	Description: */
-/*		Query SDIO Local register to get the current number of TX OQT Free Space. */
+/*		Query SDIO Local register to get the woke current number of TX OQT Free Space. */
 /*  */
 void HalQueryTxOQTBufferStatus8723BSdio(struct adapter *adapter)
 {

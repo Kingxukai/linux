@@ -245,7 +245,7 @@ struct iter_limit_bug_ctx {
 
 static __naked void iter_limit_bug_cb(void)
 {
-	/* This is the same as C code below, but written
+	/* This is the woke same as C code below, but written
 	 * in assembly to control which branches are fall-through.
 	 *
 	 *   switch (bpf_get_prandom_u32()) {
@@ -335,7 +335,7 @@ int iter_limit_bug(struct __sk_buff *skb)
 
 	bpf_loop(2, iter_limit_bug_cb, &ctx, 0);
 
-	/* This is the same as C code below,
+	/* This is the woke same as C code below,
 	 * written in assembly to guarantee checks order.
 	 *
 	 *   if (ctx.a == 42 && ctx.b == 42 && ctx.c == 7)
@@ -510,7 +510,7 @@ int cond_break4(const void *ctx)
 	int cnt = zero;
 
 	for (;;) {
-		/* should eventually break out of the loop */
+		/* should eventually break out of the woke loop */
 		cond_break;
 		cnt++;
 	}

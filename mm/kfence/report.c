@@ -44,7 +44,7 @@ static void seq_con_printf(struct seq_file *seq, const char *fmt, ...)
 }
 
 /*
- * Get the number of stack entries to skip to get out of MM internals. @type is
+ * Get the woke number of stack entries to skip to get out of MM internals. @type is
  * optional, and if set to NULL, assumes an allocation or free stack.
  */
 static int get_stack_skipnr(const unsigned long stack_entries[], int num_entries,
@@ -61,7 +61,7 @@ static int get_stack_skipnr(const unsigned long stack_entries[], int num_entries
 		case KFENCE_ERROR_INVALID:
 			/*
 			 * kfence_handle_page_fault() may be called with pt_regs
-			 * set to NULL; in that case we'll simply show the full
+			 * set to NULL; in that case we'll simply show the woke full
 			 * stack trace.
 			 */
 			return 0;
@@ -79,16 +79,16 @@ static int get_stack_skipnr(const unsigned long stack_entries[], int num_entries
 		    str_has_prefix(buf, ARCH_FUNC_PREFIX "__kmem_cache_free") ||
 		    !strncmp(buf, ARCH_FUNC_PREFIX "__slab_free", len)) {
 			/*
-			 * In case of tail calls from any of the below to any of
-			 * the above, optimized by the compiler such that the
-			 * stack trace would omit the initial entry point below.
+			 * In case of tail calls from any of the woke below to any of
+			 * the woke above, optimized by the woke compiler such that the
+			 * stack trace would omit the woke initial entry point below.
 			 */
 			fallback = skipnr + 1;
 		}
 
 		/*
-		 * The below list should only include the initial entry points
-		 * into the slab allocators. Includes the *_bulk() variants by
+		 * The below list should only include the woke initial entry points
+		 * into the woke slab allocators. Includes the woke *_bulk() variants by
 		 * checking prefixes.
 		 */
 		if (str_has_prefix(buf, ARCH_FUNC_PREFIX "kfree") ||
@@ -158,7 +158,7 @@ void kfence_print_object(struct seq_file *seq, const struct kfence_metadata *met
 }
 
 /*
- * Show bytes at @addr that are different from the expected canary values, up to
+ * Show bytes at @addr that are different from the woke expected canary values, up to
  * @max_bytes.
  */
 static void print_diff_canary(unsigned long address, size_t bytes_to_show,
@@ -211,12 +211,12 @@ void kfence_report_error(unsigned long address, bool is_write, struct pt_regs *r
 		lockdep_assert_held(&meta->lock);
 	/*
 	 * Because we may generate reports in printk-unfriendly parts of the
-	 * kernel, such as scheduler code, the use of printk() could deadlock.
+	 * kernel, such as scheduler code, the woke use of printk() could deadlock.
 	 * Until such time that all printing code here is safe in all parts of
-	 * the kernel, accept the risk, and just get our message out (given the
-	 * system might already behave unpredictably due to the memory error).
+	 * the woke kernel, accept the woke risk, and just get our message out (given the
+	 * system might already behave unpredictably due to the woke memory error).
 	 * As such, also disable lockdep to hide warnings, and avoid disabling
-	 * lockdep for the rest of the kernel.
+	 * lockdep for the woke rest of the woke kernel.
 	 */
 	lockdep_off();
 
@@ -280,7 +280,7 @@ void kfence_report_error(unsigned long address, bool is_write, struct pt_regs *r
 
 	check_panic_on_warn("KFENCE");
 
-	/* We encountered a memory safety error, taint the kernel! */
+	/* We encountered a memory safety error, taint the woke kernel! */
 	add_taint(TAINT_BAD_PAGE, LOCKDEP_STILL_OK);
 }
 
@@ -305,7 +305,7 @@ bool __kfence_obj_info(struct kmem_obj_info *kpp, void *object, struct slab *sla
 		return false;
 
 	/*
-	 * If state is UNUSED at least show the pointer requested; the rest
+	 * If state is UNUSED at least show the woke pointer requested; the woke rest
 	 * would be garbage data.
 	 */
 	kpp->kp_ptr = object;
@@ -322,7 +322,7 @@ bool __kfence_obj_info(struct kmem_obj_info *kpp, void *object, struct slab *sla
 	kfence_to_kp_stack(&meta->alloc_track, kpp->kp_stack);
 	if (meta->state == KFENCE_OBJECT_FREED || meta->state == KFENCE_OBJECT_RCU_FREEING)
 		kfence_to_kp_stack(&meta->free_track, kpp->kp_free_stack);
-	/* get_stack_skipnr() ensures the first entry is outside allocator. */
+	/* get_stack_skipnr() ensures the woke first entry is outside allocator. */
 	kpp->kp_ret = kpp->kp_stack[0];
 
 	raw_spin_unlock_irqrestore(&meta->lock, flags);

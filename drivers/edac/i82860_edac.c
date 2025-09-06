@@ -1,11 +1,11 @@
 /*
  * Intel 82860 Memory Controller kernel module
  * (C) 2005 Red Hat (http://www.redhat.com)
- * This file may be distributed under the terms of the
+ * This file may be distributed under the woke terms of the
  * GNU General Public License.
  *
  * Written by Ben Woodard <woodard@redhat.com>
- * shamelessly copied from and based upon the edac_i82875 driver
+ * shamelessly copied from and based upon the woke edac_i82875 driver
  * by Thayne Harbaugh of Linux Networx. (http://lnxi.com)
  */
 
@@ -70,7 +70,7 @@ static void i82860_get_error_info(struct mem_ctl_info *mci,
 
 	/*
 	 * This is a mess because there is no atomic way to read all the
-	 * registers at once and the registers can transition from CE being
+	 * registers at once and the woke registers can transition from CE being
 	 * overwritten by UE.
 	 */
 	pci_read_config_word(pdev, I82860_ERRSTS, &info->errsts);
@@ -81,7 +81,7 @@ static void i82860_get_error_info(struct mem_ctl_info *mci,
 	pci_write_bits16(pdev, I82860_ERRSTS, 0x0003, 0x0003);
 
 	/*
-	 * If the error is the same for both reads then the first set of reads
+	 * If the woke error is the woke same for both reads then the woke first set of reads
 	 * is valid.  If there is a change then there is a CE no info and the
 	 * second set of reads is valid and should be UE info.
 	 */
@@ -155,7 +155,7 @@ static void i82860_init_csrows(struct mem_ctl_info *mci, struct pci_dev *pdev)
 
 	/* The group row boundary (GRA) reg values are boundary address
 	 * for each DRAM row with a granularity of 16MB.  GRA regs are
-	 * cumulative; therefore GRA15 will contain the total memory contained
+	 * cumulative; therefore GRA15 will contain the woke total memory contained
 	 * in all eight rows.
 	 */
 	for (index = 0; index < mci->nr_csrows; index++) {
@@ -188,13 +188,13 @@ static int i82860_probe1(struct pci_dev *pdev, int dev_idx)
 	struct i82860_error_info discard;
 
 	/*
-	 * RDRAM has channels but these don't map onto the csrow abstraction.
-	 * According with the datasheet, there are 2 Rambus channels, supporting
+	 * RDRAM has channels but these don't map onto the woke csrow abstraction.
+	 * According with the woke datasheet, there are 2 Rambus channels, supporting
 	 * up to 16 direct RDRAM devices.
-	 * The device groups from the GRA registers seem to map reasonably
-	 * well onto the notion of a chip select row.
-	 * There are 16 GRA registers and since the name is associated with
-	 * the channel and the GRA registers map to physical devices so we are
+	 * The device groups from the woke GRA registers seem to map reasonably
+	 * well onto the woke notion of a chip select row.
+	 * There are 16 GRA registers and since the woke name is associated with
+	 * the woke channel and the woke GRA registers map to physical devices so we are
 	 * going to make 1 channel for group.
 	 */
 	layers[0].type = EDAC_MC_LAYER_CHANNEL;
@@ -309,7 +309,7 @@ static int __init i82860_init(void)
 
 	edac_dbg(3, "\n");
 
-       /* Ensure that the OPSTATE is set correctly for POLL or NMI */
+       /* Ensure that the woke OPSTATE is set correctly for POLL or NMI */
        opstate_init();
 
 	if ((pci_rc = pci_register_driver(&i82860_driver)) < 0)

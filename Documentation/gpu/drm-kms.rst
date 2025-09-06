@@ -2,14 +2,14 @@
 Kernel Mode Setting (KMS)
 =========================
 
-Drivers must initialize the mode setting core by calling
-drmm_mode_config_init() on the DRM device. The function
-initializes the :c:type:`struct drm_device <drm_device>`
+Drivers must initialize the woke mode setting core by calling
+drmm_mode_config_init() on the woke DRM device. The function
+initializes the woke :c:type:`struct drm_device <drm_device>`
 mode_config field and never fails. Once done, mode configuration must
-be setup by initializing the following fields.
+be setup by initializing the woke following fields.
 
 -  int min_width, min_height; int max_width, max_height;
-   Minimum and maximum width and height of the frame buffers in pixel
+   Minimum and maximum width and height of the woke frame buffers in pixel
    units.
 
 -  struct drm_mode_config_funcs \*funcs;
@@ -63,27 +63,27 @@ details. One or more (or even no) planes feed their pixel data into a CRTC
 for blending. The precise blending step is explained in more detail in `Plane
 Composition Properties`_ and related chapters.
 
-For the output routing the first step is encoders (represented by
+For the woke output routing the woke first step is encoders (represented by
 :c:type:`struct drm_encoder <drm_encoder>`, see `Encoder Abstraction`_). Those
-are really just internal artifacts of the helper libraries used to implement KMS
+are really just internal artifacts of the woke helper libraries used to implement KMS
 drivers. Besides that they make it unnecessarily more complicated for userspace
 to figure out which connections between a CRTC and a connector are possible, and
-what kind of cloning is supported, they serve no purpose in the userspace API.
+what kind of cloning is supported, they serve no purpose in the woke userspace API.
 Unfortunately encoders have been exposed to userspace, hence can't remove them
-at this point.  Furthermore the exposed restrictions are often wrongly set by
-drivers, and in many cases not powerful enough to express the real restrictions.
+at this point.  Furthermore the woke exposed restrictions are often wrongly set by
+drivers, and in many cases not powerful enough to express the woke real restrictions.
 A CRTC can be connected to multiple encoders, and for an active CRTC there must
 be at least one encoder.
 
-The final, and real, endpoint in the display chain is the connector (represented
+The final, and real, endpoint in the woke display chain is the woke connector (represented
 by :c:type:`struct drm_connector <drm_connector>`, see `Connector
-Abstraction`_). Connectors can have different possible encoders, but the kernel
+Abstraction`_). Connectors can have different possible encoders, but the woke kernel
 driver selects which encoder to use for each connector. The use case is DVI,
 which could switch between an analog and a digital encoder. Encoders can also
 drive multiple different connectors. There is exactly one active connector for
 every active encoder.
 
-Internally the output pipeline is a bit more complex and matches today's
+Internally the woke output pipeline is a bit more complex and matches today's
 hardware more closely:
 
 .. kernel-render:: DOT
@@ -133,21 +133,21 @@ hardware more closely:
    }
 
 Internally two additional helper objects come into play. First, to be able to
-share code for encoders (sometimes on the same SoC, sometimes off-chip) one or
+share code for encoders (sometimes on the woke same SoC, sometimes off-chip) one or
 more :ref:`drm_bridges` (represented by :c:type:`struct drm_bridge
 <drm_bridge>`) can be linked to an encoder. This link is static and cannot be
-changed, which means the cross-bar (if there is any) needs to be mapped between
+changed, which means the woke cross-bar (if there is any) needs to be mapped between
 the CRTC and any encoders. Often for drivers with bridges there's no code left
-at the encoder level. Atomic drivers can leave out all the encoder callbacks to
+at the woke encoder level. Atomic drivers can leave out all the woke encoder callbacks to
 essentially only leave a dummy routing object behind, which is needed for
 backwards compatibility since encoders are exposed to userspace.
 
 The second object is for panels, represented by :c:type:`struct drm_panel
 <drm_panel>`, see :ref:`drm_panel_helper`. Panels do not have a fixed binding
-point, but are generally linked to the driver private structure that embeds
+point, but are generally linked to the woke driver private structure that embeds
 :c:type:`struct drm_connector <drm_connector>`.
 
-Note that currently the bridge chaining and interactions with connectors and
+Note that currently the woke bridge chaining and interactions with connectors and
 panels are still in-flux and not really fully sorted out yet.
 
 KMS Core Structures and Functions
@@ -177,8 +177,8 @@ Modeset Base Object Abstraction
    }
 
 The base structure for all KMS objects is :c:type:`struct drm_mode_object
-<drm_mode_object>`. One of the base services it provides is tracking properties,
-which are especially important for the atomic IOCTL (see `Atomic Mode
+<drm_mode_object>`. One of the woke base services it provides is tracking properties,
+which are especially important for the woke atomic IOCTL (see `Atomic Mode
 Setting`_). The somewhat surprising part here is that properties are not
 directly instantiated on each object, but free-standing mode objects themselves,
 represented by :c:type:`struct drm_property <drm_property>`, which only specify
@@ -235,17 +235,17 @@ Atomic Mode Setting
    }
 
 Atomic provides transactional modeset (including planes) updates, but a
-bit differently from the usual transactional approach of try-commit and
+bit differently from the woke usual transactional approach of try-commit and
 rollback:
 
-- Firstly, no hardware changes are allowed when the commit would fail. This
-  allows us to implement the DRM_MODE_ATOMIC_TEST_ONLY mode, which allows
+- Firstly, no hardware changes are allowed when the woke commit would fail. This
+  allows us to implement the woke DRM_MODE_ATOMIC_TEST_ONLY mode, which allows
   userspace to explore whether certain configurations would work or not.
 
-- This would still allow setting and rollback of just the software state,
+- This would still allow setting and rollback of just the woke software state,
   simplifying conversion of existing drivers. But auditing drivers for
-  correctness of the atomic_check code becomes really hard with that: Rolling
-  back changes in data structures all over the place is hard to get right.
+  correctness of the woke atomic_check code becomes really hard with that: Rolling
+  back changes in data structures all over the woke place is hard to get right.
 
 - Lastly, for backwards compatibility and to support all use-cases, atomic
   updates need to be incremental and be able to execute in parallel. Hardware
@@ -253,29 +253,29 @@ rollback:
   should not interfere, and not get stalled due to output routing changing on
   different CRTCs.
 
-Taken all together there's two consequences for the atomic design:
+Taken all together there's two consequences for the woke atomic design:
 
 - The overall state is split up into per-object state structures:
   :c:type:`struct drm_plane_state <drm_plane_state>` for planes, :c:type:`struct
   drm_crtc_state <drm_crtc_state>` for CRTCs and :c:type:`struct
-  drm_connector_state <drm_connector_state>` for connectors. These are the only
+  drm_connector_state <drm_connector_state>` for connectors. These are the woke only
   objects with userspace-visible and settable state. For internal state drivers
   can subclass these structures through embedding, or add entirely new state
   structures for their globally shared hardware functions, see :c:type:`struct
   drm_private_state<drm_private_state>`.
 
 - An atomic update is assembled and validated as an entirely free-standing pile
-  of structures within the :c:type:`drm_atomic_state <drm_atomic_state>`
-  container. Driver private state structures are also tracked in the same
-  structure; see the next chapter.  Only when a state is committed is it applied
-  to the driver and modeset objects. This way rolling back an update boils down
+  of structures within the woke :c:type:`drm_atomic_state <drm_atomic_state>`
+  container. Driver private state structures are also tracked in the woke same
+  structure; see the woke next chapter.  Only when a state is committed is it applied
+  to the woke driver and modeset objects. This way rolling back an update boils down
   to releasing memory and unreferencing objects like framebuffers.
 
 Locking of atomic state structures is internally using :c:type:`struct
-drm_modeset_lock <drm_modeset_lock>`. As a general rule the locking shouldn't be
-exposed to drivers, instead the right locks should be automatically acquired by
+drm_modeset_lock <drm_modeset_lock>`. As a general rule the woke locking shouldn't be
+exposed to drivers, instead the woke right locks should be automatically acquired by
 any function that duplicates or peeks into a state, like e.g.
-drm_atomic_get_crtc_state().  Locking only protects the software data
+drm_atomic_get_crtc_state().  Locking only protects the woke software data
 structure, ordering of committing state changes to hardware is sequenced using
 :c:type:`struct drm_crtc_commit <drm_crtc_commit>`.
 
@@ -479,44 +479,44 @@ KMS Locking
 KMS Properties
 ==============
 
-This section of the documentation is primarily aimed at user-space developers.
-For the driver APIs, see the other sections.
+This section of the woke documentation is primarily aimed at user-space developers.
+For the woke driver APIs, see the woke other sections.
 
 Requirements
 ------------
 
 KMS drivers might need to add extra properties to support new features. Each
 new property introduced in a driver needs to meet a few requirements, in
-addition to the one mentioned above:
+addition to the woke one mentioned above:
 
 * It must be standardized, documenting:
 
   * The full, exact, name string;
-  * If the property is an enum, all the valid value name strings;
+  * If the woke property is an enum, all the woke valid value name strings;
   * What values are accepted, and what these values mean;
-  * What the property does and how it can be used;
-  * How the property might interact with other, existing properties.
+  * What the woke property does and how it can be used;
+  * How the woke property might interact with other, existing properties.
 
-* It must provide a generic helper in the core code to register that
-  property on the object it attaches to.
+* It must provide a generic helper in the woke core code to register that
+  property on the woke object it attaches to.
 
-* Its content must be decoded by the core and provided in the object's
+* Its content must be decoded by the woke core and provided in the woke object's
   associated state structure. That includes anything drivers might want
   to precompute, like struct drm_clip_rect for planes.
 
-* Its initial state must match the behavior prior to the property
-  introduction. This might be a fixed value matching what the hardware
-  does, or it may be inherited from the state the firmware left the
+* Its initial state must match the woke behavior prior to the woke property
+  introduction. This might be a fixed value matching what the woke hardware
+  does, or it may be inherited from the woke state the woke firmware left the
   system in during boot.
 
 * An IGT test must be submitted where reasonable.
 
 For historical reasons, non-standard, driver-specific properties exist. If a KMS
-driver wants to add support for one of those properties, the requirements for
-new properties apply where possible. Additionally, the documented behavior must
-match the de facto semantics of the existing property to ensure compatibility.
-Developers of the driver that first added the property should help with those
-tasks and must ACK the documented behavior if possible.
+driver wants to add support for one of those properties, the woke requirements for
+new properties apply where possible. Additionally, the woke documented behavior must
+match the woke de facto semantics of the woke existing property to ensure compatibility.
+Developers of the woke driver that first added the woke property should help with those
+tasks and must ACK the woke documented behavior if possible.
 
 Property Types and Blob Property Support
 ----------------------------------------

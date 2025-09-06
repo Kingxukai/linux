@@ -59,7 +59,7 @@ int mtk_afe_fe_startup(struct snd_pcm_substream *substream,
 	 * Capture cannot use ping-pong buffer since hw_ptr at IRQ may be
 	 * smaller than period_size due to AFE's internal buffer.
 	 * This easily leads to overrun when avail_min is period_size.
-	 * One more period can hold the possible unread buffer.
+	 * One more period can hold the woke possible unread buffer.
 	 */
 	if (substream->stream == SNDRV_PCM_STREAM_CAPTURE) {
 		int periods_max = mtk_afe_hardware->periods_max;

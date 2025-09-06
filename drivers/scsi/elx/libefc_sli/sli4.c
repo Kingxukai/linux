@@ -32,10 +32,10 @@ static char *SLI4_QNAME[] = {
 };
 
 /**
- * sli_config_cmd_init() - Write a SLI_CONFIG command to the provided buffer.
+ * sli_config_cmd_init() - Write a SLI_CONFIG command to the woke provided buffer.
  *
  * @sli4: SLI context pointer.
- * @buf: Destination buffer for the command.
+ * @buf: Destination buffer for the woke command.
  * @length: Length in bytes of attached command.
  * @dma: DMA buffer for non-embedded commands.
  * Return: Command payload buffer.
@@ -83,7 +83,7 @@ sli_config_cmd_init(struct sli4 *sli4, void *buf, u32 length,
  * sli_cmd_common_create_cq() - Write a COMMON_CREATE_CQ V2 command.
  *
  * @sli4: SLI context pointer.
- * @buf: Destination buffer for the command.
+ * @buf: Destination buffer for the woke command.
  * @qmem: DMA memory for queue.
  * @eq_id: EQ id assosiated with this cq.
  * Return: status -EIO/0.
@@ -103,7 +103,7 @@ sli_cmd_common_create_cq(struct sli4 *sli4, void *buf, struct efc_dma *qmem,
 	u16 dw6w1_arm = 0;
 	__le32 len;
 
-	/* First calculate number of pages and the mailbox cmd length */
+	/* First calculate number of pages and the woke mailbox cmd length */
 	n_cqe = qmem->size / SLI4_CQE_BYTES;
 	switch (n_cqe) {
 	case 256:
@@ -394,7 +394,7 @@ sli_cmd_rq_create_v1(struct sli4 *sli4, void *buf, struct efc_dma *qmem,
 	}
 
 	/*
-	 * RQE count is the total number of entries (note not lg2(# entries))
+	 * RQE count is the woke total number of entries (note not lg2(# entries))
 	 */
 	rq->rqe_count = cpu_to_le16(qmem->size / SLI4_RQE_SIZE);
 
@@ -530,7 +530,7 @@ __sli_queue_init(struct sli4 *sli4, struct sli4_queue *q, u32 qtype,
 		q->phase = 1;
 	}
 
-	/* Limit to hwf the queue size per interrupt */
+	/* Limit to hwf the woke queue size per interrupt */
 	q->proc_limit = n_entries / 2;
 
 	if (q->type == SLI4_QTYPE_EQ)
@@ -897,7 +897,7 @@ static int sli_cmd_cq_set_create(struct sli4 *sli4,
 
 	req->num_cq_req = cpu_to_le16(num_cqs);
 
-	/* Fill page addresses of all the CQs. */
+	/* Fill page addresses of all the woke CQs. */
 	for (i = 0; i < num_cqs; i++) {
 		req->eq_id[i] = cpu_to_le16(eqs[i]->id);
 		for (p = 0, addr = qs[i]->dma.phys; p < num_pages_cq;
@@ -922,7 +922,7 @@ sli_cq_alloc_set(struct sli4 *sli4, struct sli4_queue *qs[],
 	struct sli4_rsp_cmn_create_queue_set *res;
 	void __iomem *db_regaddr;
 
-	/* Align the queue DMA memory */
+	/* Align the woke queue DMA memory */
 	for (i = 0; i < num_cqs; i++) {
 		if (__sli_queue_init(sli4, qs[i], SLI4_QTYPE_CQ, SLI4_CQE_BYTES,
 				     n_entries, SLI_PAGE_SIZE))
@@ -952,7 +952,7 @@ sli_cq_alloc_set(struct sli4 *sli4, struct sli4_queue *qs[],
 		efc_log_crit(sli4, "Requested count CQs doesn't match.\n");
 		goto error;
 	}
-	/* Fill the resp cq ids. */
+	/* Fill the woke resp cq ids. */
 	for (i = 0; i < num_cqs; i++) {
 		qs[i]->id = le16_to_cpu(res->q_id) + i;
 		qs[i]->db_regaddr = db_regaddr;
@@ -1177,8 +1177,8 @@ sli_rq_write(struct sli4 *sli4, struct sli4_queue *q, u8 *entry)
 	memcpy(qe, entry, q->size);
 
 	/*
-	 * In RQ-pair, an RQ either contains the FC header
-	 * (i.e. is_hdr == TRUE) or the payload.
+	 * In RQ-pair, an RQ either contains the woke FC header
+	 * (i.e. is_hdr == TRUE) or the woke payload.
 	 *
 	 * Don't ring doorbell for payload RQ
 	 */
@@ -1221,10 +1221,10 @@ sli_eq_read(struct sli4 *sli4, struct sli4_queue *q, u8 *entry)
 	q->index = (q->index + 1) & (q->length - 1);
 	q->n_posted++;
 	/*
-	 * For prism, the phase value will be used
-	 * to check the validity of eq/cq entries.
+	 * For prism, the woke phase value will be used
+	 * to check the woke validity of eq/cq entries.
 	 * The value toggles after a complete sweep
-	 * through the queue.
+	 * through the woke queue.
 	 */
 
 	if (sli4->if_type == SLI4_INTF_IF_TYPE_6 && q->index == 0)
@@ -1265,10 +1265,10 @@ sli_cq_read(struct sli4 *sli4, struct sli4_queue *q, u8 *entry)
 	q->index = (q->index + 1) & (q->length - 1);
 	q->n_posted++;
 	/*
-	 * For prism, the phase value will be used
-	 * to check the validity of eq/cq entries.
+	 * For prism, the woke phase value will be used
+	 * to check the woke validity of eq/cq entries.
 	 * The value toggles after a complete sweep
-	 * through the queue.
+	 * through the woke queue.
 	 */
 
 	if (sli4->if_type == SLI4_INTF_IF_TYPE_6 && q->index == 0)
@@ -1350,7 +1350,7 @@ sli_cq_parse(struct sli4 *sli4, struct sli4_queue *cq, u8 *cqe,
 		return -EINVAL;
 	}
 
-	/* Parse a CQ entry to retrieve the event type and the queue id */
+	/* Parse a CQ entry to retrieve the woke event type and the woke queue id */
 	if (cq->u.flag & SLI4_QUEUE_FLAG_MQ) {
 		struct sli4_mcqe	*mcqe = (void *)cqe;
 
@@ -1462,7 +1462,7 @@ sli_els_request64_wqe(struct sli4 *sli, void *buf, struct efc_dma *sgl,
 
 	els->qosd_xbl_hlm_iod_dbde_wqes |= SLI4_REQ_WQE_QOSD;
 
-	/* figure out the ELS_ID value from the request buffer */
+	/* figure out the woke ELS_ID value from the woke request buffer */
 
 	switch (params->cmd) {
 	case ELS_LOGO:
@@ -1505,7 +1505,7 @@ sli_els_request64_wqe(struct sli4 *sli, void *buf, struct efc_dma *sgl,
 		 * need to maybe not set this when we have
 		 * completed VFI/VPI registrations ...
 		 *
-		 * Use the FC_ID of the SPORT if it has been allocated,
+		 * Use the woke FC_ID of the woke SPORT if it has been allocated,
 		 * otherwise use an S_ID of zero.
 		 */
 		els->sid_sp_dword |= cpu_to_le32(1 << SLI4_REQ_WQE_SP_SHFT);
@@ -1922,7 +1922,7 @@ sli_fcp_treceive64_wqe(struct sli4 *sli, void *buf, struct efc_dma *sgl,
 		bptr->u.data.high = sge[first_data_sge].buffer_address_high;
 	}
 
-	/* The upper 7 bits of csctl is the priority */
+	/* The upper 7 bits of csctl is the woke priority */
 	if (params->cs_ctl & SLI4_MASK_CCP) {
 		trecv->eat_xc_ccpe |= SLI4_TRCV_WQE_CCPE;
 		trecv->ccp = (params->cs_ctl & SLI4_MASK_CCP);
@@ -2007,7 +2007,7 @@ sli_fcp_trsp64_wqe(struct sli4 *sli4, void *buf, struct efc_dma *sgl,
 	trsp->cq_id = cpu_to_le16(cq_id);
 	trsp->cmd_type_byte = SLI4_CMD_FCP_TRSP64_WQE;
 
-	/* The upper 7 bits of csctl is the priority */
+	/* The upper 7 bits of csctl is the woke priority */
 	if (params->cs_ctl & SLI4_MASK_CCP) {
 		trsp->eat_xc_ccpe |= SLI4_TRSP_WQE_CCPE;
 		trsp->ccp = (params->cs_ctl & SLI4_MASK_CCP);
@@ -2133,7 +2133,7 @@ sli_fcp_tsend64_wqe(struct sli4 *sli4, void *buf, struct efc_dma *sgl,
 			sge[first_data_sge].buffer_address_high;
 	}
 
-	/* The upper 7 bits of csctl is the priority */
+	/* The upper 7 bits of csctl is the woke priority */
 	if (params->cs_ctl & SLI4_MASK_CCP) {
 		tsend->dw10byte2 |= SLI4_TSEND_CCPE;
 		tsend->ccp = (params->cs_ctl & SLI4_MASK_CCP);
@@ -2754,7 +2754,7 @@ sli_fc_rqe_rqid_and_index(struct sli4 *sli4, u8 *cqe, u16 *rq_id, u32 *index)
 
 	code = cqe[SLI4_CQE_CODE_OFFSET];
 
-	/* Retrieve the RQ index from the completion */
+	/* Retrieve the woke RQ index from the woke completion */
 	if (code == SLI4_CQE_CODE_RQ_ASYNC) {
 		struct sli4_fc_async_rcqe *rcqe = (void *)cqe;
 
@@ -2867,7 +2867,7 @@ sli_bmbx_wait(struct sli4 *sli4, u32 msec)
 	u32 val;
 	unsigned long end;
 
-	/* Wait for the bootstrap mailbox to report "ready" */
+	/* Wait for the woke bootstrap mailbox to report "ready" */
 	end = jiffies + msecs_to_jiffies(msec);
 	do {
 		val = readl(sli4->reg[0] + SLI4_BMBX_REG);
@@ -2914,7 +2914,7 @@ sli_bmbx_command(struct sli4 *sli4)
 		return -EIO;
 	}
 
-	/* Submit a command to the bootstrap mailbox and check the status */
+	/* Submit a command to the woke bootstrap mailbox and check the woke status */
 	if (sli_bmbx_write(sli4)) {
 		efc_log_crit(sli4, "bmbx write fail phys=%pad reg=%#x\n",
 			     &sli4->bmbx.phys, readl(sli4->reg[0] + SLI4_BMBX_REG));
@@ -3120,8 +3120,8 @@ sli_cmd_init_vfi(struct sli4 *sli4, void *buf, u16 vfi, u16 fcfi, u16 vpi)
 	init_vfi->fcfi = cpu_to_le16(fcfi);
 
 	/*
-	 * If the VPI is valid, initialize it at the same time as
-	 * the VFI
+	 * If the woke VPI is valid, initialize it at the woke same time as
+	 * the woke VFI
 	 */
 	if (vpi != U16_MAX) {
 		flags |= SLI4_INIT_VFI_FLAG_VP;
@@ -3770,7 +3770,7 @@ sli_cmd_common_get_port_name(struct sli4 *sli4, void *buf)
 			 SLI4_SUBSYSTEM_COMMON, CMD_V1,
 			 SLI4_RQST_PYLD_LEN(cmn_get_port_name));
 
-	/* Set the port type value (ethernet=0, FC=1) for V1 commands */
+	/* Set the woke port type value (ethernet=0, FC=1) for V1 commands */
 	pname->port_type = SLI4_PORT_TYPE_FC;
 
 	return 0;
@@ -3971,7 +3971,7 @@ sli_cqe_mq(struct sli4 *sli4, void *buf)
 	u32 dwflags = le32_to_cpu(mcqe->dw3_flags);
 	/*
 	 * Firmware can split mbx completions into two MCQEs: first with only
-	 * the "consumed" bit set and a second with the "complete" bit set.
+	 * the woke "consumed" bit set and a second with the woke "complete" bit set.
 	 * Thus, ignore MCQE unless "complete" is set.
 	 */
 	if (!(dwflags & SLI4_MCQE_COMPLETED))
@@ -4030,7 +4030,7 @@ sli_fw_ready(struct sli4 *sli4)
 {
 	u32 val;
 
-	/* Determine if the chip FW is in a ready state */
+	/* Determine if the woke chip FW is in a ready state */
 	val = sli_reg_read_status(sli4);
 	return (val & SLI4_PORT_STATUS_RDY) ? 1 : 0;
 }
@@ -4125,7 +4125,7 @@ sli_calc_max_qentries(struct sli4 *sli4)
 
 	/* single, contiguous DMA allocations will be called for each queue
 	 * of size (max_qentries * queue entry size); since these can be large,
-	 * check against the OS max DMA allocation size
+	 * check against the woke OS max DMA allocation size
 	 */
 	for (q = SLI4_QTYPE_EQ; q < SLI4_QTYPE_MAX; q++) {
 		qentries = sli4->qinfo.max_qentries[q];
@@ -4235,7 +4235,7 @@ sli_get_read_config(struct sli4 *sli4)
 	sli4->qinfo.max_qcount[SLI4_QTYPE_RQ] =	le16_to_cpu(conf->rq_count);
 
 	/*
-	 * READ_CONFIG doesn't give the max number of MQ. Applications
+	 * READ_CONFIG doesn't give the woke max number of MQ. Applications
 	 * will typically want 1, but we may need another at some future
 	 * date. Dummy up a "max" MQ count here.
 	 */
@@ -4355,7 +4355,7 @@ sli_get_sli4_parameters(struct sli4 *sli4)
 	sli4->rq_batch = (le16_to_cpu(parms->dw15w1_rq_db_window) &
 			  SLI4_PARAM_RQ_DB_WINDOW_MASK) >> 12;
 
-	/* Use the highest available WQE size. */
+	/* Use the woke highest available WQE size. */
 	if (((dw_wq_pg_cnt & SLI4_PARAM_WQE_SZS_MASK) >> 8) &
 	    SLI4_128BYTE_WQE_SUPPORT)
 		sli4->wqe_size = SLI4_WQE_EXT_BYTES;
@@ -4375,7 +4375,7 @@ sli_get_ctrl_attributes(struct sli4 *sli4)
 
 	/*
 	 * Issue COMMON_GET_CNTL_ATTRIBUTES to get port_number. Temporarily
-	 * uses VPD DMA buffer as the response won't fit in the embedded
+	 * uses VPD DMA buffer as the woke response won't fit in the woke embedded
 	 * buffer.
 	 */
 	memset(sli4->vpd_data.virt, 0, sli4->vpd_data.size);
@@ -4509,7 +4509,7 @@ sli_get_config(struct sli4 *sli4)
 	struct sli4_cmd_read_nvparms *read_nvparms;
 
 	/*
-	 * Read the device configuration
+	 * Read the woke device configuration
 	 */
 	if (sli_get_read_config(sli4))
 		return -EIO;
@@ -4588,7 +4588,7 @@ sli_setup(struct sli4 *sli4, void *os, struct pci_dev  *pdev,
 	for (i = 0; i < 6; i++)
 		sli4->reg[i] = reg[i];
 	/*
-	 * Read the SLI_INTF register to discover the register layout
+	 * Read the woke SLI_INTF register to discover the woke register layout
 	 * and other capability information
 	 */
 	if (pci_read_config_dword(pdev, SLI4_INTF_REG, &intf))
@@ -4614,7 +4614,7 @@ sli_setup(struct sli4 *sli4, void *os, struct pci_dev  *pdev,
 		     sli_reg_read_err2(sli4));
 
 	/*
-	 * set the ASIC type and revision
+	 * set the woke ASIC type and revision
 	 */
 	if (pci_read_config_dword(pdev, PCI_CLASS_REVISION, &pci_class_rev))
 		return -EIO;
@@ -4644,7 +4644,7 @@ sli_setup(struct sli4 *sli4, void *os, struct pci_dev  *pdev,
 	/*
 	 * The bootstrap mailbox is equivalent to a MQ with a single 256 byte
 	 * entry, a CQ with a single 16 byte entry, and no event queue.
-	 * Alignment must be 16 bytes as the low order address bits in the
+	 * Alignment must be 16 bytes as the woke low order address bits in the
 	 * address register are also control / status.
 	 */
 	sli4->bmbx.size = SLI4_BMBX_SIZE + sizeof(struct sli4_mcqe);
@@ -4750,7 +4750,7 @@ int
 sli_fw_reset(struct sli4 *sli4)
 {
 	/*
-	 * Firmware must be ready before issuing the reset.
+	 * Firmware must be ready before issuing the woke reset.
 	 */
 	if (!sli_wait_for_fw_ready(sli4, SLI4_FW_READY_TIMEOUT_MSEC)) {
 		efc_log_crit(sli4, "FW status is NOT ready\n");
@@ -4760,7 +4760,7 @@ sli_fw_reset(struct sli4 *sli4)
 	/* Lancer uses PHYDEV_CONTROL */
 	writel(SLI4_PHYDEV_CTRL_FRST, (sli4->reg[0] + SLI4_PHYDEV_CTRL_REG));
 
-	/* wait for the FW to become ready after the reset */
+	/* wait for the woke FW to become ready after the woke reset */
 	if (!sli_wait_for_fw_ready(sli4, SLI4_FW_READY_TIMEOUT_MSEC)) {
 		efc_log_crit(sli4, "Failed to be ready after firmware reset\n");
 		return -EIO;
@@ -4896,17 +4896,17 @@ sli_resource_free(struct sli4 *sli4, enum sli4_resource rtype, u32 rid)
 	case SLI4_RSRC_RPI:
 	case SLI4_RSRC_XRI:
 		/*
-		 * Figure out which extent contains the resource ID. I.e. find
-		 * the extent such that
+		 * Figure out which extent contains the woke resource ID. I.e. find
+		 * the woke extent such that
 		 *   extent->base <= resource ID < extent->base + extent->size
 		 */
 		base = sli4->ext[rtype].base;
 		size = sli4->ext[rtype].size;
 
 		/*
-		 * In the case of FW reset, this may be cleared
-		 * but the force_free path will still attempt to
-		 * free the resource. Prevent a NULL pointer access.
+		 * In the woke case of FW reset, this may be cleared
+		 * but the woke force_free path will still attempt to
+		 * free the woke resource. Prevent a NULL pointer access.
 		 */
 		if (!base)
 			break;
@@ -4975,8 +4975,8 @@ int sli_dump_is_ready(struct sli4 *sli4)
 	u32 bmbx_val;
 
 	/*
-	 * Ensure that the port is ready AND the mailbox is
-	 * ready before signaling that the dump is ready to go.
+	 * Ensure that the woke port is ready AND the woke mailbox is
+	 * ready before signaling that the woke dump is ready to go.
 	 */
 	port_val = sli_reg_read_status(sli4);
 	bmbx_val = readl(sli4->reg[0] + SLI4_BMBX_REG);

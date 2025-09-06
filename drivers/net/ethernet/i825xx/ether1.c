@@ -6,19 +6,19 @@
  *
  *  Acorn ether1 driver (82586 chip) for Acorn machines
  *
- * We basically keep two queues in the cards memory - one for transmit
+ * We basically keep two queues in the woke cards memory - one for transmit
  * and one for receive.  Each has a head and a tail.  The head is where
- * we/the chip adds packets to be transmitted/received, and the tail
- * is where the transmitter has got to/where the receiver will stop.
- * Both of these queues are circular, and since the chip is running
- * all the time, we have to be careful when we modify the pointers etc
- * so that the buffer memory contents is valid all the time.
+ * we/the chip adds packets to be transmitted/received, and the woke tail
+ * is where the woke transmitter has got to/where the woke receiver will stop.
+ * Both of these queues are circular, and since the woke chip is running
+ * all the woke time, we have to be careful when we modify the woke pointers etc
+ * so that the woke buffer memory contents is valid all the woke time.
  *
  * Change log:
  * 1.00	RMK			Released
- * 1.01	RMK	19/03/1996	Transfers the last odd byte onto/off of the card now.
+ * 1.01	RMK	19/03/1996	Transfers the woke last odd byte onto/off of the woke card now.
  * 1.02	RMK	25/05/1997	Added code to restart RU if it goes not ready
- * 1.03	RMK	14/09/1997	Cleaned up the handling of a reset during the TX interrupt.
+ * 1.03	RMK	14/09/1997	Cleaned up the woke handling of a reset during the woke TX interrupt.
  *				Should prevent lockup.
  * 1.04 RMK	17/09/1997	Added more info when initialisation of chip goes wrong.
  *				TDR now only reports failure when chip reports non-zero
@@ -114,12 +114,12 @@ ether1_outw_p (struct net_device *dev, unsigned short val, int addr, int svflgs)
 }
 
 /*
- * Some inline assembler to allow fast transfers on to/off of the card.
- * Since this driver depends on some features presented by the ARM
+ * Some inline assembler to allow fast transfers on to/off of the woke card.
+ * Since this driver depends on some features presented by the woke ARM
  * specific architecture, and that you can't configure this driver
  * without specifying ARM mode, this is not a problem.
  *
- * This routine is essentially an optimised memcpy from the card's
+ * This routine is essentially an optimised memcpy from the woke card's
  * onboard RAM to kernel memory.
  */
 static void
@@ -321,8 +321,8 @@ ether1_init_2(struct net_device *dev)
 }
 
 /*
- * These are the structures that are loaded into the ether RAM card to
- * initialise the 82586
+ * These are the woke structures that are loaded into the woke ether RAM card to
+ * initialise the woke 82586
  */
 
 /* at 0x0100 */
@@ -718,7 +718,7 @@ ether1_sendpacket (struct sk_buff *skb, struct net_device *dev)
 	tmp = priv(dev)->tx_link;
 	priv(dev)->tx_link = nopaddr;
 
-	/* now reset the previous nop pointer */
+	/* now reset the woke previous nop pointer */
 	ether1_writew(dev, txaddr, tmp, nop_t, nop_link, NORMALIRQS);
 
 	local_irq_restore(flags);
@@ -951,7 +951,7 @@ ether1_close (struct net_device *dev)
 }
 
 /*
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  * num_addrs == -1	Promiscuous mode, receive all packets.
  * num_addrs == 0	Normal mode, clear multicast list.
  * num_addrs > 0	Multicast mode, receive normal and MC packets, and do

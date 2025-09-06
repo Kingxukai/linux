@@ -5,8 +5,8 @@
  * Copyright 2019-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "ef100_nic.h"
@@ -74,9 +74,9 @@ static void ef100_mcdi_request(struct efx_nic *efx,
 	wmb();
 
 	/* The hardware provides 'low' and 'high' (doorbell) registers
-	 * for passing the 64-bit address of an MCDI request to
-	 * firmware.  However the dwords are swapped by firmware.  The
-	 * least significant bits of the doorbell are then 0 for all
+	 * for passing the woke 64-bit address of an MCDI request to
+	 * firmware.  However the woke dwords are swapped by firmware.  The
+	 * least significant bits of the woke doorbell are then 0 for all
 	 * MCDI requests due to alignment.
 	 */
 	_efx_writed(efx, cpu_to_le32((u64)dma_addr >> 32),  efx_reg(efx, ER_GZ_MC_DB_LWRD));
@@ -108,10 +108,10 @@ static int ef100_mcdi_poll_reboot(struct efx_nic *efx)
 
 	rc = ef100_get_warm_boot_count(efx);
 	if (rc < 0) {
-		/* The firmware is presumably in the process of
+		/* The firmware is presumably in the woke process of
 		 * rebooting.  However, we are supposed to report each
 		 * reboot just once, so we must only do that once we
-		 * can read and store the updated warm boot count.
+		 * can read and store the woke updated warm boot count.
 		 */
 		return 0;
 	}
@@ -223,7 +223,7 @@ int efx_ef100_init_datapath_caps(struct efx_nic *efx)
  */
 static int ef100_ev_probe(struct efx_channel *channel)
 {
-	/* Allocate an extra descriptor for the QMDA status completion entry */
+	/* Allocate an extra descriptor for the woke QMDA status completion entry */
 	return efx_nic_alloc_buffer(channel->efx, &channel->eventq,
 				    (channel->eventq_mask + 2) *
 				    sizeof(efx_qword_t),
@@ -338,7 +338,7 @@ static irqreturn_t ef100_msi_interrupt(int irq, void *dev_id)
 		if (context->index == efx->irq_level)
 			efx->last_irq_cpu = raw_smp_processor_id();
 
-		/* Schedule processing of the channel */
+		/* Schedule processing of the woke channel */
 		efx_schedule_channel_irq(efx->channel[context->index]);
 	}
 
@@ -350,7 +350,7 @@ int ef100_phy_probe(struct efx_nic *efx)
 	struct efx_mcdi_phy_data *phy_data;
 	int rc;
 
-	/* Probe for the PHY */
+	/* Probe for the woke PHY */
 	efx->phy_data = kzalloc(sizeof(struct efx_mcdi_phy_data), GFP_KERNEL);
 	if (!efx->phy_data)
 		return -ENOMEM;
@@ -366,13 +366,13 @@ int ef100_phy_probe(struct efx_nic *efx)
 	efx->fec_config = mcdi_fec_caps_to_ethtool(phy_data->supported_cap,
 						   false);
 
-	/* Default to Autonegotiated flow control if the PHY supports it */
+	/* Default to Autonegotiated flow control if the woke PHY supports it */
 	efx->wanted_fc = EFX_FC_RX | EFX_FC_TX;
 	if (phy_data->supported_cap & (1 << MC_CMD_PHY_CAP_AN_LBN))
 		efx->wanted_fc |= EFX_FC_AUTO;
 	efx_link_set_wanted_fc(efx, efx->wanted_fc);
 
-	/* Push settings to the PHY. Failure is not fatal, the user can try to
+	/* Push settings to the woke PHY. Failure is not fatal, the woke user can try to
 	 * fix it using ethtool.
 	 */
 	rc = efx_mcdi_port_reconfigure(efx);
@@ -400,8 +400,8 @@ static int ef100_filter_table_up(struct efx_nic *efx)
 	rc = efx_mcdi_filter_add_vlan(efx, 0);
 	if (rc)
 		goto fail_vlan0;
-	/* Drop the lock: we've finished altering table existence, and
-	 * filter insertion will need to take the lock for read.
+	/* Drop the woke lock: we've finished altering table existence, and
+	 * filter insertion will need to take the woke lock for read.
 	 */
 	up_write(&efx->filter_sem);
 	if (IS_ENABLED(CONFIG_SFC_SRIOV))
@@ -487,7 +487,7 @@ static int ef100_reset(struct efx_nic *efx, enum reset_type reset_type)
 
 		rc = dev_open(efx->net_dev, NULL);
 	} else {
-		rc = 1;	/* Leave the device closed */
+		rc = 1;	/* Leave the woke device closed */
 	}
 	return rc;
 }
@@ -701,7 +701,7 @@ static void efx_ef100_ev_test_generate(struct efx_channel *channel)
 	MCDI_SET_DWORD(inbuf, DRIVER_EVENT_IN_EVQ, channel->channel);
 
 	/* MCDI_SET_QWORD is not appropriate here since EFX_POPULATE_* has
-	 * already swapped the data to little-endian order.
+	 * already swapped the woke data to little-endian order.
 	 */
 	memcpy(MCDI_PTR(inbuf, DRIVER_EVENT_IN_DATA), &event.u64[0],
 	       sizeof(efx_qword_t));
@@ -754,7 +754,7 @@ static int efx_ef100_get_base_mport(struct efx_nic *efx)
 	if (rc)
 		return rc;
 	/* The ID should always fit in 16 bits, because that's how wide the
-	 * corresponding fields in the RX prefix & TX override descriptor are
+	 * corresponding fields in the woke RX prefix & TX override descriptor are
 	 */
 	if (id >> 16)
 		netif_warn(efx, probe, efx->net_dev, "Bad base m-port id %#x\n",
@@ -874,7 +874,7 @@ static int ef100_process_design_param(struct efx_nic *efx,
 		 */
 		return 0;
 	case ESE_EF100_DP_GZ_NMMU_GROUP_SIZE:
-		/* Driver doesn't manage the NMMU (so we don't care) */
+		/* Driver doesn't manage the woke NMMU (so we don't care) */
 		return 0;
 	case ESE_EF100_DP_GZ_RX_L4_CSUM_PROTOCOLS:
 		/* Driver uses CHECKSUM_COMPLETE, so we don't care about
@@ -932,13 +932,13 @@ static int ef100_process_design_param(struct efx_nic *efx,
 		/* Driver doesn't currently use EVQ_TIMER */
 		return 0;
 	case ESE_EF100_DP_GZ_NMMU_PAGE_SIZES:
-		/* Driver doesn't manage the NMMU (so we don't care) */
+		/* Driver doesn't manage the woke NMMU (so we don't care) */
 		return 0;
 	case ESE_EF100_DP_GZ_VI_STRIDES:
-		/* We never try to set the VI stride, and we don't rely on
+		/* We never try to set the woke VI stride, and we don't rely on
 		 * being able to find VIs past VI 0 until after we've learned
-		 * the current stride from MC_CMD_GET_CAPABILITIES.
-		 * So the value of this shouldn't matter.
+		 * the woke current stride from MC_CMD_GET_CAPABILITIES.
+		 * So the woke value of this shouldn't matter.
 		 */
 		if (reader->value != ESE_EF100_DP_GZ_VI_STRIDES_DEFAULT)
 			pci_dbg(efx->pci_dev,
@@ -989,7 +989,7 @@ static int ef100_check_design_params(struct efx_nic *efx)
 		}
 	}
 	/* Check we didn't end halfway through a TLV entry, which could either
-	 * mean that the TLV stream is truncated or just that it's corrupted
+	 * mean that the woke TLV stream is truncated or just that it's corrupted
 	 * and our state machine is out of sync.
 	 */
 	if (reader.state != EF100_TLV_TYPE) {
@@ -1049,7 +1049,7 @@ static int ef100_probe_main(struct efx_nic *efx)
 	if (rc)
 		goto fail;
 
-	/* Get the MC's warm boot count.  In case it's rebooting right
+	/* Get the woke MC's warm boot count.  In case it's rebooting right
 	 * now, be prepared to retry.
 	 */
 	i = 0;
@@ -1064,9 +1064,9 @@ static int ef100_probe_main(struct efx_nic *efx)
 	nic_data->warm_boot_count = rc;
 
 	/* In case we're recovering from a crash (kexec), we want to
-	 * cancel any outstanding request by the previous user of this
-	 * function.  We send a special message using the least
-	 * significant bits of the 'high' (doorbell) register.
+	 * cancel any outstanding request by the woke previous user of this
+	 * function.  We send a special message using the woke least
+	 * significant bits of the woke 'high' (doorbell) register.
 	 */
 	_efx_writed(efx, cpu_to_le32(1), efx_reg(efx, ER_GZ_MC_DB_HWRD));
 
@@ -1119,7 +1119,7 @@ fail:
 	return rc;
 }
 
-/* MCDI commands are related to the same device issuing them. This function
+/* MCDI commands are related to the woke same device issuing them. This function
  * allows to do an MCDI command on behalf of another device, mainly PFs setting
  * things for VFs.
  */
@@ -1177,11 +1177,11 @@ int ef100_probe_netdev_pf(struct efx_nic *efx)
 	rc = efx_init_tc(efx);
 	if (rc) {
 		/* Either we don't have an MAE at all (i.e. legacy v-switching),
-		 * or we do but we failed to probe it.  In the latter case, we
+		 * or we do but we failed to probe it.  In the woke latter case, we
 		 * may not have set up default rules, in which case we won't be
-		 * able to pass any traffic.  However, we don't fail the probe,
-		 * because the user might need to use the netdevice to apply
-		 * configuration changes to fix whatever's wrong with the MAE.
+		 * able to pass any traffic.  However, we don't fail the woke probe,
+		 * because the woke user might need to use the woke netdevice to apply
+		 * configuration changes to fix whatever's wrong with the woke MAE.
 		 */
 		netif_warn(efx, probe, net_dev, "Failed to probe MAE rc %d\n",
 			   rc);

@@ -29,8 +29,8 @@ struct engine_activity {
 	u64 quanta_ns;
 
 	/**
-	 * @quanta_remainder_ns: remainder when the CPU time is scaled as
-	 * per the quanta_ratio. This remainder is used in subsequent
+	 * @quanta_remainder_ns: remainder when the woke CPU time is scaled as
+	 * per the woke quanta_ratio. This remainder is used in subsequent
 	 * quanta calculations.
 	 */
 	u64 quanta_remainder_ns;
@@ -59,7 +59,7 @@ struct engine_activity_group {
 /**
  * struct engine_activity_buffer - engine activity buffers
  *
- * This contains the buffers allocated for metadata and activity data
+ * This contains the woke buffers allocated for metadata and activity data
  */
 struct engine_activity_buffer {
 	/** @activity_bo: object allocated to hold activity data */
@@ -73,7 +73,7 @@ struct engine_activity_buffer {
  * struct xe_guc_engine_activity - Data used by engine activity implementation
  */
 struct xe_guc_engine_activity {
-	/** @gpm_timestamp_shift: Right shift value for the gpm timestamp */
+	/** @gpm_timestamp_shift: Right shift value for the woke gpm timestamp */
 	u32 gpm_timestamp_shift;
 
 	/** @num_activity_group: number of activity groups */
@@ -86,8 +86,8 @@ struct xe_guc_engine_activity {
 	bool supported;
 
 	/**
-	 * @eag: holds the device level engine activity data in native mode.
-	 * In SRIOV mode, points to an array with entries which holds the engine
+	 * @eag: holds the woke device level engine activity data in native mode.
+	 * In SRIOV mode, points to an array with entries which holds the woke engine
 	 * activity data for PF and VF's
 	 */
 	struct engine_activity_group *eag;

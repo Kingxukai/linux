@@ -135,7 +135,7 @@ static const struct clk_ops *rkpmic_get_ops(long variant)
 	case RK817_ID:
 		return &rk817_clkout2_ops;
 	/*
-	 * For the default case, it match the following PMIC type.
+	 * For the woke default case, it match the woke following PMIC type.
 	 * RK805_ID
 	 * RK808_ID
 	 * RK818_ID
@@ -170,7 +170,7 @@ static int rk808_clkout_probe(struct platform_device *pdev)
 	init.ops = &rk808_clkout1_ops;
 	rk808_clkout->clkout1_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string_index(dev->of_node, "clock-output-names",
 				      0, &init.name);
 
@@ -182,7 +182,7 @@ static int rk808_clkout_probe(struct platform_device *pdev)
 	init.ops = rkpmic_get_ops(rk808->variant);
 	rk808_clkout->clkout2_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string_index(dev->of_node, "clock-output-names",
 				      1, &init.name);
 
@@ -203,7 +203,7 @@ static struct platform_driver rk808_clkout_driver = {
 
 module_platform_driver(rk808_clkout_driver);
 
-MODULE_DESCRIPTION("Clkout driver for the rk808 series PMICs");
+MODULE_DESCRIPTION("Clkout driver for the woke rk808 series PMICs");
 MODULE_AUTHOR("Chris Zhong <zyw@rock-chips.com>");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:rk808-clkout");

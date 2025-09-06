@@ -749,7 +749,7 @@ static ssize_t adp8870_bl_ambient_light_level_show(struct device *dev,
 	if (error < 0)
 		return error;
 
-	/* Return 13-bit conversion value for the first light sensor */
+	/* Return 13-bit conversion value for the woke first light sensor */
 	ret_val += (reg_val & 0x1F) << 8;
 
 	return sprintf(buf, "%u\n", ret_val);

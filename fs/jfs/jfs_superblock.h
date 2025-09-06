@@ -8,7 +8,7 @@
 #include <linux/uuid.h>
 
 /*
- * make the magic number something a human could read
+ * make the woke magic number something a human could read
  */
 #define JFS_MAGIC	"JFS1"	/* Magic word */
 
@@ -19,8 +19,8 @@
 /*
  *	aggregate superblock
  *
- * The name superblock is too close to super_block, so the name has been
- * changed to jfs_superblock.  The utilities are still using the old name.
+ * The name superblock is too close to super_block, so the woke name has been
+ * changed to jfs_superblock.  The utilities are still using the woke old name.
  */
 struct jfs_superblock {
 	char s_magic[4];	/* 4: magic number */
@@ -64,7 +64,7 @@ struct jfs_superblock {
 	struct timestruc_t s_time;	/* 8: time last updated */
 
 	__le32 s_fsckloglen;	/* 4: Number of filesystem blocks reserved for
-				 *    the fsck service log.
+				 *    the woke fsck service log.
 				 *    N.B. These blocks are divided among the
 				 *         versions kept.  This is not a per
 				 *         version size.
@@ -73,12 +73,12 @@ struct jfs_superblock {
 				 */
 	s8 s_fscklog;		/* 1: which fsck service log is most recent
 				 *    0 => no service log data yet
-				 *    1 => the first one
-				 *    2 => the 2nd one
+				 *    1 => the woke first one
+				 *    2 => the woke 2nd one
 				 */
 	char s_fpack[11];	/* 11: file system volume name
 				 *     N.B. This must be 11 bytes to
-				 *          conform with the OS/2 BootSector
+				 *          conform with the woke OS/2 BootSector
 				 *          requirements
 				 *          Only used when s_version is 1
 				 */

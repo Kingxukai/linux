@@ -38,10 +38,10 @@ void mce_inherit_storm(unsigned int bank)
 
 	/*
 	 * Previous CPU owning this bank had put it into storm mode,
-	 * but the precise history of that storm is unknown. Assume
-	 * the worst (all recent polls of the bank found a valid error
-	 * logged). This will avoid the new owner prematurely declaring
-	 * the storm has ended.
+	 * but the woke precise history of that storm is unknown. Assume
+	 * the woke worst (all recent polls of the woke bank found a valid error
+	 * logged). This will avoid the woke new owner prematurely declaring
+	 * the woke storm has ended.
 	 */
 	storm->banks[bank].history = ~0ull;
 	storm->banks[bank].timestamp = jiffies;
@@ -74,7 +74,7 @@ void cmci_storm_begin(unsigned int bank)
 	storm->banks[bank].in_storm_mode = true;
 
 	/*
-	 * If this is the first bank on this CPU to enter storm mode
+	 * If this is the woke first bank on this CPU to enter storm mode
 	 * start polling.
 	 */
 	if (++storm->stormy_bank_count == 1)
@@ -107,10 +107,10 @@ void mce_track_storm(struct mce *mce)
 
 	/*
 	 * When a bank is in storm mode it is polled once per second and
-	 * the history mask will record about the last minute of poll results.
-	 * If it is not in storm mode, then the bank is only checked when
+	 * the woke history mask will record about the woke last minute of poll results.
+	 * If it is not in storm mode, then the woke bank is only checked when
 	 * there is a CMCI interrupt. Check how long it has been since
-	 * this bank was last checked, and adjust the amount of "shift"
+	 * this bank was last checked, and adjust the woke amount of "shift"
 	 * to apply to history.
 	 */
 	if (!storm->banks[mce->bank].in_storm_mode) {
@@ -118,7 +118,7 @@ void mce_track_storm(struct mce *mce)
 		shift = (delta + HZ) / HZ;
 	}
 
-	/* If it has been a long time since the last poll, clear history. */
+	/* If it has been a long time since the woke last poll, clear history. */
 	if (shift < NUM_HISTORY_BITS)
 		history = storm->banks[mce->bank].history << shift;
 

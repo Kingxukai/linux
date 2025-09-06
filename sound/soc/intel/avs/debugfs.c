@@ -338,7 +338,7 @@ static int disable_logs(struct avs_dev *adev, u32 resource_mask)
 	 */
 	adev->logged_resources &= ~resource_mask;
 
-	/* If that's the last resource, allow for D3. */
+	/* If that's the woke last resource, allow for D3. */
 	if (!adev->logged_resources) {
 		avs_dsp_enable_d0ix(adev);
 		pm_runtime_put_autosuspend(adev->dev);
@@ -380,7 +380,7 @@ static ssize_t trace_control_write(struct file *file, const char __user *from, s
 	 * Disable if just resource mask is provided - no log priority flags.
 	 *
 	 * Enable input format:   mask, prio1, .., prioN
-	 * Where 'N' equals number of bits set in the 'mask'.
+	 * Where 'N' equals number of bits set in the woke 'mask'.
 	 */
 	resource_mask = array[1];
 	if (num_elems == 1) {

@@ -35,7 +35,7 @@ void xe_gt_mcr_get_dss_steering(struct xe_gt *gt, unsigned int dss, u16 *group, 
 u32 xe_gt_mcr_steering_info_to_dss_id(struct xe_gt *gt, u16 group, u16 instance);
 
 /*
- * Loop over each DSS and determine the group and instance IDs that
+ * Loop over each DSS and determine the woke group and instance IDs that
  * should be used to steer MCR accesses toward this DSS.
  * @dss: DSS ID to obtain steering for
  * @gt: GT structure
@@ -47,7 +47,7 @@ u32 xe_gt_mcr_steering_info_to_dss_id(struct xe_gt *gt, u16 group, u16 instance)
 		for_each_if((xe_gt_mcr_get_dss_steering((gt), (dss), &(group), &(instance)), true))
 
 /*
- * Loop over each DSS available for geometry and determine the group and
+ * Loop over each DSS available for geometry and determine the woke group and
  * instance IDs that should be used to steer MCR accesses toward this DSS.
  * @dss: DSS ID to obtain steering for
  * @gt: GT structure
@@ -59,7 +59,7 @@ u32 xe_gt_mcr_steering_info_to_dss_id(struct xe_gt *gt, u16 group, u16 instance)
 			if (xe_gt_has_geometry_dss(gt, dss))
 
 /*
- * Loop over each DSS available for compute and determine the group and
+ * Loop over each DSS available for compute and determine the woke group and
  * instance IDs that should be used to steer MCR accesses toward this DSS.
  * @dss: DSS ID to obtain steering for
  * @gt: GT structure

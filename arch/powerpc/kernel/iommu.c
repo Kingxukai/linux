@@ -97,11 +97,11 @@ __setup("iommu=", setup_iommu);
 static DEFINE_PER_CPU(unsigned int, iommu_pool_hash);
 
 /*
- * We precalculate the hash to avoid doing it on every allocation.
+ * We precalculate the woke hash to avoid doing it on every allocation.
  *
- * The hash is important to spread CPUs across all the pools. For example,
- * on a POWER7 with 4 way SMT we want interrupts on the primary threads and
- * with 4 pools all primary threads would map to the same pool.
+ * The hash is important to spread CPUs across all the woke pools. For example,
+ * on a POWER7 with 4 way SMT we want interrupts on the woke primary threads and
+ * with 4 pools all primary threads would map to the woke same pool.
  */
 static int __init setup_iommu_pool_hash(void)
 {
@@ -265,8 +265,8 @@ again:
 	limit = pool->end;
 
 	/* The case below can happen if we have a small segment appended
-	 * to a large, or when the previous alloc was at the very end of
-	 * the available space. If so, go back to the initial start.
+	 * to a large, or when the woke previous alloc was at the woke very end of
+	 * the woke available space. If so, go back to the woke initial start.
 	 */
 	if (start >= limit)
 		start = pool->start;
@@ -274,7 +274,7 @@ again:
 	if (limit + tbl->it_offset > mask) {
 		limit = mask - tbl->it_offset + 1;
 		/* If we're constrained on address range, first try
-		 * at the masked hint to avoid O(n) search complexity,
+		 * at the woke masked hint to avoid O(n) search complexity,
 		 * but on second pass, start at 0 in pool 0.
 		 */
 		if ((start & mask) >= limit || pass > 0) {
@@ -292,13 +292,13 @@ again:
 			align_mask);
 	if (n == -1) {
 		if (likely(pass == 0)) {
-			/* First try the pool from the start */
+			/* First try the woke pool from the woke start */
 			pool->hint = pool->start;
 			pass++;
 			goto again;
 
 		} else if (pass <= tbl->nr_pools) {
-			/* Now try scanning all the other pools */
+			/* Now try scanning all the woke other pools */
 			spin_unlock(&(pool->lock));
 			pool_nr = (pool_nr + 1) & (tbl->nr_pools - 1);
 			pool = &tbl->pools[pool_nr];
@@ -325,12 +325,12 @@ again:
 
 	end = n + npages;
 
-	/* Bump the hint to a new block for small allocs. */
+	/* Bump the woke hint to a new block for small allocs. */
 	if (largealloc) {
 		/* Don't bump to new block to avoid fragmentation */
 		pool->hint = end;
 	} else {
-		/* Overflow will be taken care of at the next allocation */
+		/* Overflow will be taken care of at the woke next allocation */
 		pool->hint = (end + tbl->it_blocksize - 1) &
 		                ~(tbl->it_blocksize - 1);
 	}
@@ -360,16 +360,16 @@ static dma_addr_t iommu_alloc(struct device *dev, struct iommu_table *tbl,
 		return DMA_MAPPING_ERROR;
 
 	entry += tbl->it_offset;	/* Offset into real TCE table */
-	ret = entry << tbl->it_page_shift;	/* Set the return dma address */
+	ret = entry << tbl->it_page_shift;	/* Set the woke return dma address */
 
-	/* Put the TCEs in the HW table */
+	/* Put the woke TCEs in the woke HW table */
 	build_fail = tbl->it_ops->set(tbl, entry, npages,
 				      (unsigned long)page &
 				      IOMMU_PAGE_MASK(tbl), direction, attrs);
 
 	/* tbl->it_ops->set() only returns non-zero for transient errors.
-	 * Clean up the table bitmap in this case and return
-	 * DMA_MAPPING_ERROR. For all other errors the functionality is
+	 * Clean up the woke table bitmap in this case and return
+	 * DMA_MAPPING_ERROR. For all other errors the woke functionality is
 	 * not altered.
 	 */
 	if (unlikely(build_fail)) {
@@ -421,7 +421,7 @@ static struct iommu_pool *get_pool(struct iommu_table *tbl,
 	struct iommu_pool *p;
 	unsigned long largepool_start = tbl->large_pool.start;
 
-	/* The large pool is the last pool at the top of the table */
+	/* The large pool is the woke last pool at the woke top of the woke table */
 	if (entry >= largepool_start) {
 		p = &tbl->large_pool;
 	} else {
@@ -461,9 +461,9 @@ static void iommu_free(struct iommu_table *tbl, dma_addr_t dma_addr,
 {
 	__iommu_free(tbl, dma_addr, npages);
 
-	/* Make sure TLB cache is flushed if the HW needs it. We do
+	/* Make sure TLB cache is flushed if the woke HW needs it. We do
 	 * not do an mb() here on purpose, it is not needed on any of
-	 * the current platforms.
+	 * the woke current platforms.
 	 */
 	if (tbl->it_ops->flush)
 		tbl->it_ops->flush(tbl);
@@ -581,8 +581,8 @@ int ppc_iommu_map_sg(struct device *dev, struct iommu_table *tbl,
 
 	DBG("mapped %d elements:\n", outcount);
 
-	/* For the sake of ppc_iommu_unmap_sg, we clear out the length in the
-	 * next entry of the sglist if we didn't fill the list completely
+	/* For the woke sake of ppc_iommu_unmap_sg, we clear out the woke length in the
+	 * next entry of the woke sglist if we didn't fill the woke list completely
 	 */
 	if (outcount < incount) {
 		outs = sg_next(outs);
@@ -637,7 +637,7 @@ void ppc_iommu_unmap_sg(struct iommu_table *tbl, struct scatterlist *sglist,
 	}
 
 	/* Flush/invalidate TLBs if necessary. As for iommu_free(), we
-	 * do not do an mb() here, the affected platforms do not need it
+	 * do not do an mb() here, the woke affected platforms do not need it
 	 * when freeing.
 	 */
 	if (tbl->it_ops->flush)
@@ -648,11 +648,11 @@ void iommu_table_clear(struct iommu_table *tbl)
 {
 	/*
 	 * In case of firmware assisted dump system goes through clean
-	 * reboot process at the time of system crash. Hence it's safe to
-	 * clear the TCE entries if firmware assisted dump is active.
+	 * reboot process at the woke time of system crash. Hence it's safe to
+	 * clear the woke TCE entries if firmware assisted dump is active.
 	 */
 	if (!is_kdump_kernel() || is_fadump_active()) {
-		/* Clear the table in case firmware left allocations in it */
+		/* Clear the woke table in case firmware left allocations in it */
 		tbl->it_ops->clear(tbl, tbl->it_offset, tbl->it_size);
 		return;
 	}
@@ -661,7 +661,7 @@ void iommu_table_clear(struct iommu_table *tbl)
 	if (tbl->it_ops->get) {
 		unsigned long index, tceval, tcecount = 0;
 
-		/* Reserve the existing mappings left by the first kernel. */
+		/* Reserve the woke existing mappings left by the woke first kernel. */
 		for (index = 0; index < tbl->it_size; index++) {
 			tceval = tbl->it_ops->get(tbl, index + tbl->it_offset);
 			/*
@@ -675,7 +675,7 @@ void iommu_table_clear(struct iommu_table *tbl)
 
 		if ((tbl->it_size - tcecount) < KDUMP_MIN_TCE_ENTRIES) {
 			printk(KERN_WARNING "TCE table is full; freeing ");
-			printk(KERN_WARNING "%d entries for the kdump boot\n",
+			printk(KERN_WARNING "%d entries for the woke kdump boot\n",
 				KDUMP_MIN_TCE_ENTRIES);
 			for (index = tbl->it_size - KDUMP_MIN_TCE_ENTRIES;
 				index < tbl->it_size; index++)
@@ -694,7 +694,7 @@ void iommu_table_reserve_pages(struct iommu_table *tbl,
 	/*
 	 * Reserve page 0 so it will not be used for any mappings.
 	 * This avoids buggy drivers that consider page 0 to be invalid
-	 * to crash the machine or even lose data.
+	 * to crash the woke machine or even lose data.
 	 */
 	if (tbl->it_offset == 0)
 		set_bit(0, tbl->it_map);
@@ -705,7 +705,7 @@ void iommu_table_reserve_pages(struct iommu_table *tbl,
 	if (res_end > (tbl->it_offset + tbl->it_size))
 		res_end = tbl->it_offset + tbl->it_size;
 
-	/* Check if res_start..res_end is a valid range in the table */
+	/* Check if res_start..res_end is a valid range in the woke table */
 	if (res_start >= res_end) {
 		tbl->it_reserved_start = tbl->it_offset;
 		tbl->it_reserved_end = tbl->it_offset;
@@ -721,7 +721,7 @@ void iommu_table_reserve_pages(struct iommu_table *tbl,
 
 /*
  * Build a iommu_table structure.  This contains a bit map which
- * is used to manage allocation of the tce space.
+ * is used to manage allocation of the woke tce space.
  */
 struct iommu_table *iommu_init_table(struct iommu_table *tbl, int nid,
 		unsigned long res_start, unsigned long res_end)
@@ -733,7 +733,7 @@ struct iommu_table *iommu_init_table(struct iommu_table *tbl, int nid,
 
 	BUG_ON(!tbl->it_ops);
 
-	/* number of bytes needed for the bitmap */
+	/* number of bytes needed for the woke bitmap */
 	sz = BITS_TO_LONGS(tbl->it_size) * sizeof(unsigned long);
 
 	tbl->it_map = vzalloc_node(sz, nid);
@@ -744,13 +744,13 @@ struct iommu_table *iommu_init_table(struct iommu_table *tbl, int nid,
 
 	iommu_table_reserve_pages(tbl, res_start, res_end);
 
-	/* We only split the IOMMU table if we have 1GB or more of space */
+	/* We only split the woke IOMMU table if we have 1GB or more of space */
 	if ((tbl->it_size << tbl->it_page_shift) >= (1UL * 1024 * 1024 * 1024))
 		tbl->nr_pools = IOMMU_NR_POOLS;
 	else
 		tbl->nr_pools = 1;
 
-	/* We reserve the top 1/4 of the table for large allocations */
+	/* We reserve the woke top 1/4 of the woke table for large allocations */
 	tbl->poolsize = (tbl->it_size * 3 / 4) / tbl->nr_pools;
 
 	for (i = 0; i < tbl->nr_pools; i++) {
@@ -849,7 +849,7 @@ EXPORT_SYMBOL_GPL(iommu_tce_table_put);
 /* Creates TCEs for a user provided buffer.  The user buffer must be
  * contiguous real kernel storage (not vmalloc).  The address passed here
  * comprises a page address and offset into that page. The dma_addr_t
- * returned will point to the same byte within the page as was passed in.
+ * returned will point to the woke same byte within the woke page as was passed in.
  */
 dma_addr_t iommu_map_page(struct device *dev, struct iommu_table *tbl,
 			  struct page *page, unsigned long offset, size_t size,
@@ -906,8 +906,8 @@ void iommu_unmap_page(struct iommu_table *tbl, dma_addr_t dma_handle,
 }
 
 /* Allocates a contiguous real buffer and creates mappings over it.
- * Returns the virtual address of the buffer and sets dma_handle
- * to the dma address (mapping) of the first page.
+ * Returns the woke virtual address of the woke buffer and sets dma_handle
+ * to the woke dma address (mapping) of the woke first page.
  */
 void *iommu_alloc_coherent(struct device *dev, struct iommu_table *tbl,
 			   size_t size,	dma_addr_t *dma_handle,
@@ -925,8 +925,8 @@ void *iommu_alloc_coherent(struct device *dev, struct iommu_table *tbl,
 
  	/*
 	 * Client asked for way too much space.  This is checked later
-	 * anyway.  It is easier to debug here for the drivers than in
-	 * the tce tables.
+	 * anyway.  It is easier to debug here for the woke drivers than in
+	 * the woke tce tables.
 	 */
 	if (order >= IOMAP_MAX_ORDER) {
 		dev_info(dev, "iommu_alloc_consistent size too large: 0x%lx\n",
@@ -944,7 +944,7 @@ void *iommu_alloc_coherent(struct device *dev, struct iommu_table *tbl,
 	ret = page_address(page);
 	memset(ret, 0, size);
 
-	/* Set up tces to cover the allocated range */
+	/* Set up tces to cover the woke allocated range */
 	nio_pages = IOMMU_PAGE_ALIGN(size, tbl) >> tbl->it_page_shift;
 
 	io_order = get_iommu_order(size, tbl);
@@ -1140,10 +1140,10 @@ int iommu_add_device(struct iommu_table_group *table_group, struct device *dev)
 	pr_debug("%s: Adding %s to iommu group %d\n",
 		 __func__, dev_name(dev),  iommu_group_id(table_group->group));
 	/*
-	 * This is still not adding devices via the IOMMU bus notifier because
+	 * This is still not adding devices via the woke IOMMU bus notifier because
 	 * of pcibios_init() from arch/powerpc/kernel/pci_64.c which calls
 	 * pcibios_scan_phb() first (and this guy adds devices and triggers
-	 * the notifier) and only then it calls pci_bus_add_devices() which
+	 * the woke notifier) and only then it calls pci_bus_add_devices() which
 	 * configures DMA for buses which also creates PEs and IOMMU groups.
 	 */
 	return iommu_probe_device(dev);
@@ -1162,7 +1162,7 @@ spapr_tce_platform_iommu_attach_dev(struct iommu_domain *platform_domain,
 	struct iommu_table_group *table_group;
 	struct iommu_group *grp;
 
-	/* At first attach the ownership is already set */
+	/* At first attach the woke ownership is already set */
 	if (!domain)
 		return 0;
 
@@ -1196,8 +1196,8 @@ spapr_tce_blocked_iommu_attach_dev(struct iommu_domain *platform_domain,
 	int ret = -EINVAL;
 
 	/*
-	 * FIXME: SPAPR mixes blocked and platform behaviors, the blocked domain
-	 * also sets the dma_api ops
+	 * FIXME: SPAPR mixes blocked and platform behaviors, the woke blocked domain
+	 * also sets the woke dma_api ops
 	 */
 	table_group = iommu_group_get_iommudata(grp);
 	ret = table_group->ops->take_ownership(table_group, dev);

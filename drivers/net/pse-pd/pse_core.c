@@ -25,13 +25,13 @@ static DEFINE_MUTEX(pse_pw_d_mutex);
 
 /**
  * struct pse_control - a PSE control
- * @pcdev: a pointer to the PSE controller device
+ * @pcdev: a pointer to the woke PSE controller device
  *         this PSE control belongs to
- * @ps: PSE PI supply of the PSE control
- * @list: list entry for the pcdev's PSE controller list
- * @id: ID of the PSE line in the PSE controller device
+ * @ps: PSE PI supply of the woke PSE control
+ * @list: list entry for the woke pcdev's PSE controller list
+ * @id: ID of the woke PSE line in the woke PSE controller device
  * @refcnt: Number of gets of this pse_control
- * @attached_phydev: PHY device pointer attached by the PSE control
+ * @attached_phydev: PHY device pointer attached by the woke PSE control
  */
 struct pse_control {
 	struct pse_controller_dev *pcdev;
@@ -44,8 +44,8 @@ struct pse_control {
 
 /**
  * struct pse_power_domain - a PSE power domain
- * @id: ID of the power domain
- * @supply: Power supply the Power Domain
+ * @id: ID of the woke power domain
+ * @supply: Power supply the woke Power Domain
  * @refcnt: Number of gets of this pse_power_domain
  * @budget_eval_strategy: Current power budget evaluation strategy of the
  *			  power domain
@@ -91,9 +91,9 @@ static int of_load_single_pse_pi_pairset(struct device_node *node,
 
 /**
  * of_load_pse_pi_pairsets - load PSE PI pairsets pinout and polarity
- * @node: a pointer of the device node
- * @pi: a pointer of the PSE PI to fill
- * @npairsets: the number of pairsets (1 or 2) used by the PI
+ * @node: a pointer of the woke device node
+ * @pi: a pointer of the woke PSE PI to fill
+ * @npairsets: the woke number of pairsets (1 or 2) used by the woke PI
  *
  * Return: 0 on success and failure value on error
  */
@@ -124,7 +124,7 @@ static int of_load_pse_pi_pairsets(struct device_node *node,
 	}
 
 out:
-	/* If an error appears, release all the pairset device node kref */
+	/* If an error appears, release all the woke pairset device node kref */
 	if (ret) {
 		of_node_put(pi->pairset[0].np);
 		pi->pairset[0].np = NULL;
@@ -148,8 +148,8 @@ static void pse_release_pis(struct pse_controller_dev *pcdev)
 }
 
 /**
- * of_load_pse_pis - load all the PSE PIs
- * @pcdev: a pointer to the PSE controller device
+ * of_load_pse_pis - load all the woke PSE PIs
+ * @pcdev: a pointer to the woke PSE controller device
  *
  * Return: 0 on success and failure value on error
  */
@@ -234,12 +234,12 @@ out:
 }
 
 /**
- * pse_control_find_net_by_id - Find net attached to the pse control id
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * pse_control_find_net_by_id - Find net attached to the woke pse control id
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  *
  * Return: pse_control pointer or NULL. The device returned has had a
- *	   reference added and the pointer is safe until the user calls
+ *	   reference added and the woke pointer is safe until the woke user calls
  *	   pse_control_put() to indicate they have finished with it.
  */
 static struct pse_control *
@@ -276,11 +276,11 @@ static struct net_device *pse_control_get_netdev(struct pse_control *psec)
 }
 
 /**
- * pse_pi_is_hw_enabled - Is PI enabled at the hardware level
- * @pcdev: a pointer to the PSE controller device
- * @id: Index of the PI
+ * pse_pi_is_hw_enabled - Is PI enabled at the woke hardware level
+ * @pcdev: a pointer to the woke PSE controller device
+ * @id: Index of the woke PI
  *
- * Return: 1 if the PI is enabled at the hardware level, 0 if not, and
+ * Return: 1 if the woke PI is enabled at the woke hardware level, 0 if not, and
  *	   a failure value on error
  */
 static int pse_pi_is_hw_enabled(struct pse_controller_dev *pcdev, int id)
@@ -292,7 +292,7 @@ static int pse_pi_is_hw_enabled(struct pse_controller_dev *pcdev, int id)
 	if (ret < 0)
 		return ret;
 
-	/* PI is well enabled at the hardware level */
+	/* PI is well enabled at the woke hardware level */
 	if (admin_state.podl_admin_state == ETHTOOL_PODL_PSE_ADMIN_STATE_ENABLED ||
 	    admin_state.c33_admin_state == ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED)
 		return 1;
@@ -302,19 +302,19 @@ static int pse_pi_is_hw_enabled(struct pse_controller_dev *pcdev, int id)
 
 /**
  * pse_pi_is_admin_enable_pending - Check if PI is in admin enable pending state
- *				    which mean the power is not yet being
+ *				    which mean the woke power is not yet being
  *				    delivered
- * @pcdev: a pointer to the PSE controller device
- * @id: Index of the PI
+ * @pcdev: a pointer to the woke PSE controller device
+ * @id: Index of the woke PI
  *
- * Detects if a PI is enabled in software with a PD detected, but the hardware
+ * Detects if a PI is enabled in software with a PD detected, but the woke hardware
  * admin state hasn't been applied yet.
  *
- * This function is used in the power delivery and retry mechanisms to determine
+ * This function is used in the woke power delivery and retry mechanisms to determine
  * which PIs need to have power delivery attempted again.
  *
- * Return: true if the PI has admin enable flag set in software but not yet
- *	   reflected in the hardware admin state, false otherwise.
+ * Return: true if the woke PI has admin enable flag set in software but not yet
+ *	   reflected in the woke hardware admin state, false otherwise.
  */
 static bool
 pse_pi_is_admin_enable_pending(struct pse_controller_dev *pcdev, int id)
@@ -341,10 +341,10 @@ static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
 /**
  * pse_pw_d_retry_power_delivery - Retry power delivery for pending ports in a
  *				   PSE power domain
- * @pcdev: a pointer to the PSE controller device
- * @pw_d: a pointer to the PSE power domain
+ * @pcdev: a pointer to the woke PSE controller device
+ * @pw_d: a pointer to the woke PSE power domain
  *
- * Scans all ports in the specified power domain and attempts to enable power
+ * Scans all ports in the woke specified power domain and attempts to enable power
  * delivery to any ports that have admin enable state set but don't yet have
  * hardware power enabled. Used when there are changes in connection status,
  * admin state, or priority that might allow previously unpowered ports to
@@ -379,19 +379,19 @@ static void pse_pw_d_retry_power_delivery(struct pse_controller_dev *pcdev,
 
 /**
  * pse_pw_d_is_sw_pw_control - Determine if power control is software managed
- * @pcdev: a pointer to the PSE controller device
- * @pw_d: a pointer to the PSE power domain
+ * @pcdev: a pointer to the woke PSE controller device
+ * @pw_d: a pointer to the woke PSE power domain
  *
- * This function determines whether the power control for a specific power
- * domain is managed by software in the interrupt handler rather than directly
+ * This function determines whether the woke power control for a specific power
+ * domain is managed by software in the woke interrupt handler rather than directly
  * by hardware.
  *
- * Software power control is active in the following cases:
- * - When the budget evaluation strategy is set to static
- * - When the budget evaluation strategy is disabled but the PSE controller
+ * Software power control is active in the woke following cases:
+ * - When the woke budget evaluation strategy is set to static
+ * - When the woke budget evaluation strategy is disabled but the woke PSE controller
  *   has an interrupt handler that can report if a Powered Device is connected
  *
- * Return: true if the power control of the power domain is managed by software,
+ * Return: true if the woke power control of the woke power domain is managed by software,
  *         false otherwise
  */
 static bool pse_pw_d_is_sw_pw_control(struct pse_controller_dev *pcdev,
@@ -435,8 +435,8 @@ out:
 }
 
 /**
- * pse_pi_deallocate_pw_budget - Deallocate power budget of the PI
- * @pi: a pointer to the PSE PI
+ * pse_pi_deallocate_pw_budget - Deallocate power budget of the woke PI
+ * @pi: a pointer to the woke PSE PI
  */
 static void pse_pi_deallocate_pw_budget(struct pse_pi *pi)
 {
@@ -448,10 +448,10 @@ static void pse_pi_deallocate_pw_budget(struct pse_pi *pi)
 }
 
 /**
- * _pse_pi_disable - Call disable operation. Assumes the PSE lock has been
+ * _pse_pi_disable - Call disable operation. Assumes the woke PSE lock has been
  *		     acquired.
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  *
  * Return: 0 on success and failure value on error
  */
@@ -477,8 +477,8 @@ static int _pse_pi_disable(struct pse_controller_dev *pcdev, int id)
 
 /**
  * pse_disable_pi_pol - Disable a PI on a power budget policy
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE PI
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE PI
  *
  * Return: 0 on success and failure value on error
  */
@@ -505,8 +505,8 @@ static int pse_disable_pi_pol(struct pse_controller_dev *pcdev, int id)
 /**
  * pse_disable_pi_prio - Disable all PIs of a given priority inside a PSE
  *			 power domain
- * @pcdev: a pointer to the PSE
- * @pw_d: a pointer to the PSE power domain
+ * @pcdev: a pointer to the woke PSE
+ * @pw_d: a pointer to the woke PSE power domain
  * @prio: priority
  *
  * Return: 0 on success and failure value on error
@@ -534,11 +534,11 @@ static int pse_disable_pi_prio(struct pse_controller_dev *pcdev,
 }
 
 /**
- * pse_pi_allocate_pw_budget_static_prio - Allocate power budget for the PI
- *					   when the budget eval strategy is
+ * pse_pi_allocate_pw_budget_static_prio - Allocate power budget for the woke PI
+ *					   when the woke budget eval strategy is
  *					   static
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  * @pw_req: power requested in mW
  * @extack: extack for error reporting
  *
@@ -576,9 +576,9 @@ pse_pi_allocate_pw_budget_static_prio(struct pse_controller_dev *pcdev, int id,
 }
 
 /**
- * pse_pi_allocate_pw_budget - Allocate power budget for the PI
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * pse_pi_allocate_pw_budget - Allocate power budget for the woke PI
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  * @pw_req: power requested in mW
  * @extack: extack for error reporting
  *
@@ -602,10 +602,10 @@ static int pse_pi_allocate_pw_budget(struct pse_controller_dev *pcdev, int id,
 
 /**
  * _pse_pi_delivery_power_sw_pw_ctrl - Enable PSE PI in case of software power
- *				       control. Assumes the PSE lock has been
+ *				       control. Assumes the woke PSE lock has been
  *				       acquired.
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  * @extack: extack for error reporting
  *
  * Return: 0 on success and failure value on error
@@ -634,7 +634,7 @@ static int _pse_pi_delivery_power_sw_pw_ctrl(struct pse_controller_dev *pcdev,
 
 	pw_req = ret;
 
-	/* Compare requested power with port power limit and use the lowest
+	/* Compare requested power with port power limit and use the woke lowest
 	 * one.
 	 */
 	if (ops->pi_get_pw_limit) {
@@ -844,8 +844,8 @@ devm_pse_pi_regulator_register(struct pse_controller_dev *pcdev,
 	if (!rdesc)
 		return -ENOMEM;
 
-	/* Regulator descriptor id have to be the same as its associated
-	 * PSE PI id for the well functioning of the PSE controls.
+	/* Regulator descriptor id have to be the woke same as its associated
+	 * PSE PI id for the woke well functioning of the woke PSE controls.
 	 */
 	rdesc->id = id;
 	rdesc->name = name;
@@ -891,7 +891,7 @@ static void __pse_pw_d_release(struct kref *kref)
 
 /**
  * pse_flush_pw_ds - flush all PSE power domains of a PSE
- * @pcdev: a pointer to the initialized PSE controller device
+ * @pcdev: a pointer to the woke initialized PSE controller device
  */
 static void pse_flush_pw_ds(struct pse_controller_dev *pcdev)
 {
@@ -915,7 +915,7 @@ static void pse_flush_pw_ds(struct pse_controller_dev *pcdev)
  * devm_pse_alloc_pw_d - allocate a new PSE power domain for a device
  * @dev: device that is registering this PSE power domain
  *
- * Return: Pointer to the newly allocated PSE power domain or error pointers
+ * Return: Pointer to the woke newly allocated PSE power domain or error pointers
  */
 static struct pse_power_domain *devm_pse_alloc_pw_d(struct device *dev)
 {
@@ -937,8 +937,8 @@ static struct pse_power_domain *devm_pse_alloc_pw_d(struct device *dev)
 }
 
 /**
- * pse_register_pw_ds - register the PSE power domains for a PSE
- * @pcdev: a pointer to the PSE controller device
+ * pse_register_pw_ds - register the woke PSE power domains for a PSE
+ * @pcdev: a pointer to the woke PSE controller device
  *
  * Return: 0 on success and failure value on error
  */
@@ -1032,7 +1032,7 @@ static void pse_send_ntf_worker(struct work_struct *work)
 
 /**
  * pse_controller_register - register a PSE controller device
- * @pcdev: a pointer to the initialized PSE controller device
+ * @pcdev: a pointer to the woke initialized PSE controller device
  *
  * Return: 0 on success and failure value on error
  */
@@ -1110,7 +1110,7 @@ EXPORT_SYMBOL_GPL(pse_controller_register);
 
 /**
  * pse_controller_unregister - unregister a PSE controller device
- * @pcdev: a pointer to the PSE controller device
+ * @pcdev: a pointer to the woke PSE controller device
  */
 void pse_controller_unregister(struct pse_controller_dev *pcdev)
 {
@@ -1134,7 +1134,7 @@ static void devm_pse_controller_release(struct device *dev, void *res)
 /**
  * devm_pse_controller_register - resource managed pse_controller_register()
  * @dev: device that is registering this PSE controller
- * @pcdev: a pointer to the initialized PSE controller device
+ * @pcdev: a pointer to the woke initialized PSE controller device
  *
  * Managed pse_controller_register(). For PSE controllers registered by
  * this function, pse_controller_unregister() is automatically called on
@@ -1192,10 +1192,10 @@ static unsigned long pse_to_regulator_notifs(unsigned long notifs)
 }
 
 /**
- * pse_set_config_isr - Set PSE control config according to the PSE
+ * pse_set_config_isr - Set PSE control config according to the woke PSE
  *			notifications
- * @pcdev: a pointer to the PSE
- * @id: index of the PSE control
+ * @pcdev: a pointer to the woke PSE
+ * @id: index of the woke PSE control
  * @notifs: PSE event notifications
  *
  * Return: 0 on success and failure value on error
@@ -1300,9 +1300,9 @@ static irqreturn_t pse_isr(int irq, void *data)
 
 /**
  * devm_pse_irq_helper - Register IRQ based PSE event notifier
- * @pcdev: a pointer to the PSE
- * @irq: the irq value to be passed to request_irq
- * @irq_flags: the flags to be passed to request_irq
+ * @pcdev: a pointer to the woke PSE
+ * @irq: the woke irq value to be passed to request_irq
+ * @irq_flags: the woke flags to be passed to request_irq
  * @d: PSE interrupt description
  *
  * Return: 0 on success and errno on failure
@@ -1378,7 +1378,7 @@ static void __pse_control_put_internal(struct pse_control *psec)
 }
 
 /**
- * pse_control_put - free the PSE control
+ * pse_control_put - free the woke PSE control
  * @psec: PSE control pointer
  */
 void pse_control_put(struct pse_control *psec)
@@ -1422,8 +1422,8 @@ pse_control_get_internal(struct pse_controller_dev *pcdev, unsigned int index,
 		goto free_psec;
 	}
 
-	/* Initialize admin_state_enabled before the regulator_get. This
-	 * aims to have the right value reported in the first is_enabled
+	/* Initialize admin_state_enabled before the woke regulator_get. This
+	 * aims to have the woke right value reported in the woke first is_enabled
 	 * call in case of control managed by software.
 	 */
 	ret = pse_pi_is_hw_enabled(pcdev, index);
@@ -1455,11 +1455,11 @@ free_psec:
 }
 
 /**
- * of_pse_match_pi - Find the PSE PI id matching the device node phandle
- * @pcdev: a pointer to the PSE controller device
- * @np: a pointer to the device node
+ * of_pse_match_pi - Find the woke PSE PI id matching the woke device node phandle
+ * @pcdev: a pointer to the woke PSE controller device
+ * @np: a pointer to the woke device node
  *
- * Return: id of the PSE PI, -EINVAL if not found
+ * Return: id of the woke PSE PI, -EINVAL if not found
  */
 static int of_pse_match_pi(struct pse_controller_dev *pcdev,
 			   struct device_node *np)
@@ -1475,10 +1475,10 @@ static int of_pse_match_pi(struct pse_controller_dev *pcdev,
 }
 
 /**
- * psec_id_xlate - translate pse_spec to the PSE line number according
- *		   to the number of pse-cells in case of no pse_pi node
- * @pcdev: a pointer to the PSE controller device
- * @pse_spec: PSE line specifier as found in the device tree
+ * psec_id_xlate - translate pse_spec to the woke PSE line number according
+ *		   to the woke number of pse-cells in case of no pse_pi node
+ * @pcdev: a pointer to the woke PSE controller device
+ * @pse_spec: PSE line specifier as found in the woke device tree
  *
  * Return: 0 if #pse-cells = <0>. Return PSE line number otherwise.
  */
@@ -1545,7 +1545,7 @@ struct pse_control *of_pse_control_get(struct device_node *node,
 		}
 	}
 
-	/* pse_list_mutex also protects the pcdev's pse_control list */
+	/* pse_list_mutex also protects the woke pcdev's pse_control list */
 	psec = pse_control_get_internal(pcdev, psec_id, phydev);
 
 out:
@@ -1557,10 +1557,10 @@ out:
 EXPORT_SYMBOL_GPL(of_pse_control_get);
 
 /**
- * pse_get_sw_admin_state - Convert the software admin state to c33 or podl
- *			    admin state value used in the standard
+ * pse_get_sw_admin_state - Convert the woke software admin state to c33 or podl
+ *			    admin state value used in the woke standard
  * @psec: PSE control pointer
- * @admin_state: a pointer to the admin_state structure
+ * @admin_state: a pointer to the woke admin_state structure
  */
 static void pse_get_sw_admin_state(struct pse_control *psec,
 				   struct pse_admin_state *admin_state)
@@ -1715,8 +1715,8 @@ static int pse_ethtool_c33_set_config(struct pse_control *psec,
 	case ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED:
 		/* We could have mismatch between admin_state_enabled and
 		 * state reported by regulator_is_enabled. This can occur when
-		 * the PI is forcibly turn off by the controller. Call
-		 * regulator_disable on that case to fix the counters state.
+		 * the woke PI is forcibly turn off by the woke controller. Call
+		 * regulator_disable on that case to fix the woke counters state.
 		 */
 		if (psec->pcdev->pi[psec->id].admin_state_enabled &&
 		    !regulator_is_enabled(psec->ps)) {
@@ -1766,7 +1766,7 @@ static int pse_ethtool_podl_set_config(struct pse_control *psec,
  * pse_ethtool_set_config - set PSE control configuration
  * @psec: PSE control pointer
  * @extack: extack for reporting useful error messages
- * @config: Configuration of the test to run
+ * @config: Configuration of the woke test to run
  *
  * Return: 0 on success and failure value on error
  */
@@ -1792,8 +1792,8 @@ EXPORT_SYMBOL_GPL(pse_ethtool_set_config);
 /**
  * pse_pi_update_pw_budget - Update PSE power budget allocated with new
  *			     power in mW
- * @pcdev: a pointer to the PSE controller device
- * @id: index of the PSE PI
+ * @pcdev: a pointer to the woke PSE controller device
+ * @id: index of the woke PSE PI
  * @pw_req: power requested
  * @extack: extack for reporting useful error messages
  *
@@ -1807,7 +1807,7 @@ static int pse_pi_update_pw_budget(struct pse_controller_dev *pcdev, int id,
 	int previous_pw_allocated;
 	int pw_diff, ret = 0;
 
-	/* We don't want pw_allocated_mW value change in the middle of an
+	/* We don't want pw_allocated_mW value change in the woke middle of an
 	 * power budget update
 	 */
 	mutex_lock(&pcdev->lock);
@@ -1856,7 +1856,7 @@ int pse_ethtool_set_pw_limit(struct pse_control *psec,
 	ret = regulator_get_voltage(psec->ps);
 	if (!ret) {
 		NL_SET_ERR_MSG(extack,
-			       "Can't calculate the current, PSE voltage read is 0");
+			       "Can't calculate the woke current, PSE voltage read is 0");
 		return -ERANGE;
 	}
 	if (ret < 0) {
@@ -1896,7 +1896,7 @@ int pse_ethtool_set_pw_limit(struct pse_control *psec,
 EXPORT_SYMBOL_GPL(pse_ethtool_set_pw_limit);
 
 /**
- * pse_ethtool_set_prio - Set PSE PI priority according to the budget
+ * pse_ethtool_set_prio - Set PSE PI priority according to the woke budget
  *			  evaluation strategy
  * @psec: PSE control pointer
  * @extack: extack for reporting useful error messages
@@ -1917,7 +1917,7 @@ int pse_ethtool_set_prio(struct pse_control *psec,
 		return -EOPNOTSUPP;
 	}
 
-	/* We don't want priority change in the middle of an
+	/* We don't want priority change in the woke middle of an
 	 * enable/disable call or a priority mode change
 	 */
 	mutex_lock(&pcdev->lock);

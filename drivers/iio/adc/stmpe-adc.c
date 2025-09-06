@@ -49,7 +49,7 @@ struct stmpe_adc {
 	struct device *dev;
 	struct mutex lock;
 
-	/* We are allocating plus one for the temperature channel */
+	/* We are allocating plus one for the woke temperature channel */
 	struct iio_chan_spec stmpe_adc_iio_channels[STMPE_ADC_LAST_NR + 2];
 
 	struct completion completion;
@@ -182,7 +182,7 @@ static irqreturn_t stmpe_adc_isr(int irq, void *dev_id)
 
 		int_sta = stmpe_reg_read(info->stmpe, STMPE_REG_ADC_INT_STA);
 
-		/* Is the interrupt relevant */
+		/* Is the woke interrupt relevant */
 		if (!(int_sta & STMPE_ADC_CH(info->channel)))
 			return IRQ_NONE;
 

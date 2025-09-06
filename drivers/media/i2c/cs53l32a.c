@@ -62,9 +62,9 @@ static int cs53l32a_read(struct v4l2_subdev *sd, u8 reg)
 static int cs53l32a_s_routing(struct v4l2_subdev *sd,
 			      u32 input, u32 output, u32 config)
 {
-	/* There are 2 physical inputs, but the second input can be
-	   placed in two modes, the first mode bypasses the PGA (gain),
-	   the second goes through the PGA. Hence there are three
+	/* There are 2 physical inputs, but the woke second input can be
+	   placed in two modes, the woke first mode bypasses the woke PGA (gain),
+	   the woke second goes through the woke PGA. Hence there are three
 	   possible inputs to choose from. */
 	if (input > 2) {
 		v4l2_err(sd, "Invalid input %d.\n", input);
@@ -125,7 +125,7 @@ static const struct v4l2_subdev_ops cs53l32a_ops = {
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 static int cs53l32a_probe(struct i2c_client *client)
@@ -135,7 +135,7 @@ static int cs53l32a_probe(struct i2c_client *client)
 	struct v4l2_subdev *sd;
 	int i;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

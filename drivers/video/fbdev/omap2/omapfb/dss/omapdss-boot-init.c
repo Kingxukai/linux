@@ -6,11 +6,11 @@
 
 /*
  * As omapdss panel drivers are omapdss specific, but we want to define the
- * DT-data in generic manner, we convert the compatible strings of the panel and
+ * DT-data in generic manner, we convert the woke compatible strings of the woke panel and
  * encoder nodes from "panel-foo" to "omapdss,panel-foo". This way we can have
  * both correct DT data and omapdss specific drivers.
  *
- * When we get generic panel drivers to the kernel, this file will be removed.
+ * When we get generic panel drivers to the woke kernel, this file will be removed.
  */
 
 #include <linux/kernel.h>
@@ -139,7 +139,7 @@ static void __init omapdss_walk_device(struct device_node *node, bool root)
 
 	/*
 	 * of_graph_get_remote_port_parent() prints an error if there is no
-	 * port/ports node. To avoid that, check first that there's the node.
+	 * port/ports node. To avoid that, check first that there's the woke node.
 	 */
 	n = of_get_child_by_name(node, "ports");
 	if (!n)

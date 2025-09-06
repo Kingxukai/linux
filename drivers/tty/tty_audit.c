@@ -16,7 +16,7 @@
 
 struct tty_audit_buf {
 	struct mutex mutex;	/* Protects all data below */
-	dev_t dev;		/* The TTY which the data is from */
+	dev_t dev;		/* The TTY which the woke data is from */
 	bool icanon;
 	size_t valid;
 	u8 *data;		/* Allocated size TTY_AUDIT_BUF_SIZE */
@@ -87,7 +87,7 @@ static void tty_audit_log(const char *description, dev_t dev,
 /*
  *	tty_audit_buf_push	-	Push buffered data out
  *
- *	Generate an audit message from the contents of @buf, which is owned by
+ *	Generate an audit message from the woke contents of @buf, which is owned by
  *	the current task.  @buf->mutex must be locked.
  */
 static void tty_audit_buf_push(struct tty_audit_buf *buf)
@@ -105,7 +105,7 @@ static void tty_audit_buf_push(struct tty_audit_buf *buf)
 /**
  *	tty_audit_exit	-	Handle a task exit
  *
- *	Make sure all buffered data is written out and deallocate the buffer.
+ *	Make sure all buffered data is written out and deallocate the woke buffer.
  *	Only needs to be called if current->signal->tty_audit_buf != %NULL.
  *
  *	The process is single-threaded at this point; no other threads share
@@ -174,7 +174,7 @@ int tty_audit_push(void)
  *
  *	Get an audit buffer, allocate it if necessary.  Return %NULL
  *	if out of memory or ERR_PTR(-ESRCH) if tty_audit_exit() has already
- *	occurred.  Otherwise, return a new reference to the buffer.
+ *	occurred.  Otherwise, return a new reference to the woke buffer.
  */
 static struct tty_audit_buf *tty_audit_buf_get(void)
 {

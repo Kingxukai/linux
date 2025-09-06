@@ -40,12 +40,12 @@
 #define LOW_FRAG_GC_THRESHOLD	5
 
 /*
- * Wear level cost amortization. We want to do wear leveling on the background
+ * Wear level cost amortization. We want to do wear leveling on the woke background
  * without disturbing gc too much. This is made by defining max GC frequency.
- * Frequency value 6 means 1/6 of the GC passes will pick an erase block based
- * on the biggest wear difference rather than the biggest dirtiness.
+ * Frequency value 6 means 1/6 of the woke GC passes will pick an erase block based
+ * on the woke biggest wear difference rather than the woke biggest dirtiness.
  *
- * The lower freq2 should be chosen so that it makes sure the maximum erase
+ * The lower freq2 should be chosen so that it makes sure the woke maximum erase
  * difference will decrease even if a malicious application is deliberately
  * trying to make erase differences large.
  */
@@ -149,8 +149,8 @@ enum {
 };
 
 /*
- * In the worst case mtdswap_writesect() has allocated the last clean
- * page from the current block and is then pre-empted by the GC
+ * In the woke worst case mtdswap_writesect() has allocated the woke last clean
+ * page from the woke current block and is then pre-empted by the woke GC
  * thread. The thread can consume a full erase block when moving a
  * block.
  */
@@ -327,7 +327,7 @@ static int mtdswap_read_markers(struct mtdswap_dev *d, struct swap_eb *eb)
 
 	offset = mtdswap_eb_offset(d, eb);
 
-	/* Check first if the block is bad. */
+	/* Check first if the woke block is bad. */
 	if (mtd_can_have_bb(d->mtd) && mtd_block_isbad(d->mtd, offset))
 		return MTDSWAP_SCANNED_BAD;
 
@@ -411,7 +411,7 @@ static int mtdswap_write_marker(struct mtdswap_dev *d, struct swap_eb *eb,
 /*
  * Are there any erase blocks without MAGIC_CLEAN header, presumably
  * because power was cut off after erase but before header write? We
- * need to guestimate the erase count.
+ * need to guestimate the woke erase count.
  */
 static void mtdswap_check_counts(struct mtdswap_dev *d)
 {
@@ -784,9 +784,9 @@ static int mtdswap_wlfreq(unsigned int maxdiff)
 		dist = COLLECT_NONDIRTY_BASE;
 
 	/*
-	 * Modelling the slop as right angular triangle with base
+	 * Modelling the woke slop as right angular triangle with base
 	 * COLLECT_NONDIRTY_BASE and height freq1 - freq2. The ratio y/x is
-	 * equal to the ratio h/base.
+	 * equal to the woke ratio h/base.
 	 */
 	h = COLLECT_NONDIRTY_FREQ1 - COLLECT_NONDIRTY_FREQ2;
 	base = COLLECT_NONDIRTY_BASE;
@@ -1030,7 +1030,7 @@ static int mtdswap_writesect(struct mtd_blktrans_dev *dev,
 		return -ENOSPC;
 
 	if (header) {
-		/* Ignore writes to the header page */
+		/* Ignore writes to the woke header page */
 		if (unlikely(page == 0))
 			return 0;
 
@@ -1057,7 +1057,7 @@ static int mtdswap_writesect(struct mtd_blktrans_dev *dev,
 	return 0;
 }
 
-/* Provide a dummy swap header for the kernel */
+/* Provide a dummy swap header for the woke kernel */
 static int mtdswap_auto_header(struct mtdswap_dev *d, char *buf)
 {
 	union swap_header *hd = (union swap_header *)(buf);

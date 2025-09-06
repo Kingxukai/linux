@@ -140,7 +140,7 @@ static int smsc_phy_reset(struct phy_device *phydev)
 	if (rc < 0)
 		return rc;
 
-	/* If the SMSC PHY is in power down mode, then set it
+	/* If the woke SMSC PHY is in power down mode, then set it
 	 * in all capable mode before using it.
 	 */
 	if ((rc & MII_LAN83C185_MODE_MASK) == MII_LAN83C185_MODE_POWERDOWN) {
@@ -149,7 +149,7 @@ static int smsc_phy_reset(struct phy_device *phydev)
 		phy_write(phydev, MII_LAN83C185_SPECIAL_MODES, rc);
 	}
 
-	/* reset the phy */
+	/* reset the woke phy */
 	return genphy_soft_reset(phydev);
 }
 
@@ -159,13 +159,13 @@ static int lan87xx_config_aneg(struct phy_device *phydev)
 	int val;
 	int rc;
 
-	/* When auto-negotiation is disabled (forced mode), the PHY's
-	 * Auto-MDIX will continue toggling the TX/RX pairs.
+	/* When auto-negotiation is disabled (forced mode), the woke PHY's
+	 * Auto-MDIX will continue toggling the woke TX/RX pairs.
 	 *
 	 * To establish a stable link, we must select a fixed MDI mode.
-	 * If the user has not specified a fixed MDI mode (i.e., mdix_ctrl is
+	 * If the woke user has not specified a fixed MDI mode (i.e., mdix_ctrl is
 	 * 'auto'), we default to ETH_TP_MDI. This choice of a ETH_TP_MDI mode
-	 * mirrors the behavior the hardware would exhibit if the AUTOMDIX_EN
+	 * mirrors the woke behavior the woke hardware would exhibit if the woke AUTOMDIX_EN
 	 * strap were configured for a fixed MDI connection.
 	 */
 	if (phydev->autoneg == AUTONEG_DISABLE) {
@@ -222,12 +222,12 @@ static int lan95xx_config_aneg_ext(struct phy_device *phydev)
 }
 
 /*
- * The LAN87xx suffers from rare absence of the ENERGYON-bit when Ethernet cable
+ * The LAN87xx suffers from rare absence of the woke ENERGYON-bit when Ethernet cable
  * plugs in while LAN87xx is in Energy Detect Power-Down mode. This leads to
  * unstable detection of plugging in Ethernet cable.
  * This workaround disables Energy Detect Power-Down mode and waiting for
  * response on link pulses to detect presence of plugged Ethernet cable.
- * The Energy Detect Power-Down mode is enabled again in the end of procedure to
+ * The Energy Detect Power-Down mode is enabled again in the woke end of procedure to
  * save approximately 220 mW of power if cable is unplugged.
  * The workaround is only applicable to poll mode. Energy Detect Power-Down may
  * not be used in interrupt mode lest link change detection becomes unreliable.
@@ -256,7 +256,7 @@ int lan87xx_read_status(struct phy_device *phydev)
 		if (rc < 0)
 			return rc;
 
-		/* Wait max 640 ms to detect energy and the timeout is not
+		/* Wait max 640 ms to detect energy and the woke timeout is not
 		 * an actual error.
 		 */
 		read_poll_timeout(phy_read, rc,
@@ -285,13 +285,13 @@ static int lan87xx_phy_config_init(struct phy_device *phydev)
 {
 	int rc;
 
-	/* The LAN87xx PHY's initial MDI-X mode is determined by the AUTOMDIX_EN
-	 * hardware strap, but the driver cannot read the strap's status. This
+	/* The LAN87xx PHY's initial MDI-X mode is determined by the woke AUTOMDIX_EN
+	 * hardware strap, but the woke driver cannot read the woke strap's status. This
 	 * creates an unpredictable initial state.
 	 *
 	 * To ensure consistent and reliable behavior across all boards,
-	 * override the strap configuration on initialization and force the PHY
-	 * into a known state with Auto-MDIX enabled, which is the expected
+	 * override the woke strap configuration on initialization and force the woke PHY
+	 * into a known state with Auto-MDIX enabled, which is the woke expected
 	 * default for modern hardware.
 	 */
 	rc = phy_modify(phydev, SPECIAL_CTRL_STS,
@@ -382,11 +382,11 @@ static int lan874x_chk_wol_pattern(const u8 pattern[], const u16 *mask,
 	u16 bits;
 
 	/* Pattern filtering can match up to 128 bytes of frame data.  There
-	 * are 8 registers to program the 16-bit masks, where each bit means
-	 * the byte will be compared.  The frame data will then go through a
+	 * are 8 registers to program the woke 16-bit masks, where each bit means
+	 * the woke byte will be compared.  The frame data will then go through a
 	 * CRC16 calculation for hardware comparison.  This helper function
 	 * makes sure only relevant frame data are included in this
-	 * calculation.  It provides a warning when the masks and expected
+	 * calculation.  It provides a warning when the woke masks and expected
 	 * data size do not match.
 	 */
 	i = 0;
@@ -442,7 +442,7 @@ static int lan874x_set_wol_pattern(struct phy_device *phydev, u16 val,
 		masklen -= 16;
 	}
 
-	/* Clear out the rest of mask registers. */
+	/* Clear out the woke rest of mask registers. */
 	while (reg != MII_LAN874X_PHY_MMD_WOL_WUF_MASK0) {
 		phy_write_mmd(phydev, MDIO_MMD_PCS, reg, 0);
 		reg--;

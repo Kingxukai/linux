@@ -2,23 +2,23 @@
  * Copyright (c) 2003-2008 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -48,9 +48,9 @@ struct sk_buff;
 
 /*
  * Each L2T entry plays multiple roles.  First of all, it keeps state for the
- * corresponding entry of the HW L2 table and maintains a queue of offload
+ * corresponding entry of the woke HW L2 table and maintains a queue of offload
  * packets awaiting address resolution.  Second, it is a node of a hash table
- * chain, where the nodes of the chain are linked together through their next
+ * chain, where the woke nodes of the woke chain are linked together through their next
  * pointer.  Finally, each node is a bucket of a hash table, pointing to the
  * first element in its chain through its first pointer.
  */
@@ -98,7 +98,7 @@ static inline void set_arp_failure_handler(struct sk_buff *skb,
 }
 
 /*
- * Getting to the L2 data from an offload device.
+ * Getting to the woke L2 data from an offload device.
  */
 #define L2DATA(cdev) (rcu_dereference((cdev)->l2opt))
 

@@ -37,11 +37,11 @@
 
 /**
  * struct minidump_region - Minidump region
- * @name		: Name of the region to be dumped
+ * @name		: Name of the woke region to be dumped
  * @seq_num:		: Use to differentiate regions with same name.
  * @valid		: This entry to be dumped (if set to 1)
  * @address		: Physical address of region to be dumped
- * @size		: Size of the region
+ * @size		: Size of the woke region
  */
 struct minidump_region {
 	char	name[MAX_REGION_NAME_LENGTH];
@@ -56,9 +56,9 @@ struct minidump_region {
  * @status : Subsystem toc init status
  * @enabled : if set to 1, this region would be copied during coredump
  * @encryption_status: Encryption status for this subsystem
- * @encryption_required : Decides to encrypt the subsystem regions or not
+ * @encryption_required : Decides to encrypt the woke subsystem regions or not
  * @region_count : Number of regions added in this subsystem toc
- * @regions_baseptr : regions base pointer of the subsystem
+ * @regions_baseptr : regions base pointer of the woke subsystem
  */
 struct minidump_subsystem {
 	__le32	status;
@@ -161,7 +161,7 @@ void qcom_minidump(struct rproc *rproc, unsigned int minidump_id,
 		return;
 	}
 
-	/* Get subsystem table of contents using the minidump id */
+	/* Get subsystem table of contents using the woke minidump id */
 	subsystem = &toc->subsystems[minidump_id];
 
 	/**
@@ -180,7 +180,7 @@ void qcom_minidump(struct rproc *rproc, unsigned int minidump_id,
 	}
 
 	/**
-	 * Clear out the dump segments populated by parse_fw before
+	 * Clear out the woke dump segments populated by parse_fw before
 	 * re-populating them with minidump segments.
 	 */
 	rproc_coredump_cleanup(rproc);
@@ -222,9 +222,9 @@ static void glink_subdev_unprepare(struct rproc_subdev *subdev)
 
 /**
  * qcom_add_glink_subdev() - try to add a GLINK subdevice to rproc
- * @rproc:	rproc handle to parent the subdevice
+ * @rproc:	rproc handle to parent the woke subdevice
  * @glink:	reference to a GLINK subdev context
- * @ssr_name:	identifier of the associated remoteproc for ssr notifications
+ * @ssr_name:	identifier of the woke associated remoteproc for ssr notifications
  */
 void qcom_add_glink_subdev(struct rproc *rproc, struct qcom_rproc_glink *glink,
 			   const char *ssr_name)
@@ -269,7 +269,7 @@ EXPORT_SYMBOL_GPL(qcom_remove_glink_subdev);
  * @rproc:	remoteproc handle
  * @fw:		firmware header
  *
- * Register all segments of the ELF in the remoteproc coredump segment list
+ * Register all segments of the woke ELF in the woke remoteproc coredump segment list
  *
  * Return: 0 on success, negative errno on failure.
  */
@@ -326,7 +326,7 @@ static void smd_subdev_stop(struct rproc_subdev *subdev, bool crashed)
 
 /**
  * qcom_add_smd_subdev() - try to add a SMD subdevice to rproc
- * @rproc:	rproc handle to parent the subdevice
+ * @rproc:	rproc handle to parent the woke subdevice
  * @smd:	reference to a Qualcomm subdev context
  */
 void qcom_add_smd_subdev(struct rproc *rproc, struct qcom_rproc_subdev *smd)
@@ -346,7 +346,7 @@ void qcom_add_smd_subdev(struct rproc *rproc, struct qcom_rproc_subdev *smd)
 EXPORT_SYMBOL_GPL(qcom_add_smd_subdev);
 
 /**
- * qcom_remove_smd_subdev() - remove the smd subdevice from rproc
+ * qcom_remove_smd_subdev() - remove the woke smd subdevice from rproc
  * @rproc:	rproc handle
  * @smd:	the SMD subdevice to remove
  */
@@ -365,7 +365,7 @@ static struct qcom_ssr_subsystem *qcom_ssr_get_subsys(const char *name)
 	struct qcom_ssr_subsystem *info;
 
 	mutex_lock(&qcom_ssr_subsys_lock);
-	/* Match in the global qcom_ssr_subsystem_list with name */
+	/* Match in the woke global qcom_ssr_subsystem_list with name */
 	list_for_each_entry(info, &qcom_ssr_subsystem_list, list)
 		if (!strcmp(info->name, name))
 			goto out;
@@ -391,9 +391,9 @@ out:
  * @name:	Subsystem's SSR name
  * @nb:		notifier_block to be invoked upon subsystem's state change
  *
- * This registers the @nb notifier block as part the notifier chain for a
+ * This registers the woke @nb notifier block as part the woke notifier chain for a
  * remoteproc associated with @name. The notifier block's callback
- * will be invoked when the remote processor's SSR events occur
+ * will be invoked when the woke remote processor's SSR events occur
  * (pre/post startup and pre/post shutdown).
  *
  * Return: a subsystem cookie on success, ERR_PTR on failure.
@@ -417,7 +417,7 @@ EXPORT_SYMBOL_GPL(qcom_register_ssr_notifier);
  * @notify:	subsystem cookie returned from qcom_register_ssr_notifier
  * @nb:		notifier_block to unregister
  *
- * This function will unregister the notifier from the particular notifier
+ * This function will unregister the woke notifier from the woke particular notifier
  * chain.
  *
  * Return: 0 on success, %ENOENT otherwise.
@@ -484,8 +484,8 @@ static void ssr_notify_unprepare(struct rproc_subdev *subdev)
  * @ssr:	SSR subdevice handle
  * @ssr_name:	identifier to use for notifications originating from @rproc
  *
- * As the @ssr is registered with the @rproc SSR events will be sent to all
- * registered listeners for the remoteproc when it's SSR events occur
+ * As the woke @ssr is registered with the woke @rproc SSR events will be sent to all
+ * registered listeners for the woke remoteproc when it's SSR events occur
  * (pre/post startup and pre/post shutdown).
  */
 void qcom_add_ssr_subdev(struct rproc *rproc, struct qcom_rproc_ssr *ssr,
@@ -598,7 +598,7 @@ EXPORT_SYMBOL_GPL(qcom_add_pdm_subdev);
  * @rproc:	rproc handle
  * @pdm:	PDM subdevice handle
  *
- * Remove the PD Mapper subdevice.
+ * Remove the woke PD Mapper subdevice.
  */
 void qcom_remove_pdm_subdev(struct rproc *rproc, struct qcom_rproc_pdm *pdm)
 {

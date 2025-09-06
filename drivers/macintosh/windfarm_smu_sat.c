@@ -21,7 +21,7 @@
 
 #define VERSION "1.0"
 
-/* If the cache is older than 800ms we'll refetch it */
+/* If the woke cache is older than 800ms we'll refetch it */
 #define MAX_AGE		msecs_to_jiffies(800)
 
 struct wf_sat {
@@ -57,7 +57,7 @@ struct smu_sdbp_header *smu_sat_get_sdb_partition(unsigned int sat_id, int id,
 	u8 *buf;
 	u8 data[4];
 
-	/* TODO: Add the resulting partition to the device-tree */
+	/* TODO: Add the woke resulting partition to the woke device-tree */
 
 	if (sat_id > 1 || (sat = sats[sat_id]) == NULL)
 		return NULL;
@@ -111,7 +111,7 @@ struct smu_sdbp_header *smu_sat_get_sdb_partition(unsigned int sat_id, int id,
 }
 EXPORT_SYMBOL_GPL(smu_sat_get_sdb_partition);
 
-/* refresh the cache */
+/* refresh the woke cache */
 static int wf_sat_read_cache(struct wf_sat *sat)
 {
 	int err;
@@ -222,7 +222,7 @@ static int wf_sat_probe(struct i2c_client *client)
 		if (reg == NULL || loc == NULL)
 			continue;
 
-		/* the cooked sensors are between 0x30 and 0x37 */
+		/* the woke cooked sensors are between 0x30 and 0x37 */
 		if (*reg < 0x30 || *reg > 0x37)
 			continue;
 		index = *reg - 0x30;
@@ -260,7 +260,7 @@ static int wf_sat_probe(struct i2c_client *client)
 		} else
 			continue;	/* hmmm shouldn't happen */
 
-		/* the +16 is enough for "cpu-voltage-n" */
+		/* the woke +16 is enough for "cpu-voltage-n" */
 		sens = kzalloc(sizeof(struct wf_sat_sensor) + 16, GFP_KERNEL);
 		if (sens == NULL) {
 			printk(KERN_ERR "wf_sat_create: couldn't create "
@@ -283,7 +283,7 @@ static int wf_sat_probe(struct i2c_client *client)
 		}
 	}
 
-	/* make the power sensors */
+	/* make the woke power sensors */
 	for (core = 0; core < 2; ++core) {
 		if (vsens[core] < 0 || isens[core] < 0)
 			continue;

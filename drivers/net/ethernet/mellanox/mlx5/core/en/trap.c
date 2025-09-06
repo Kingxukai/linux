@@ -278,7 +278,7 @@ int mlx5e_handle_trap_event(struct mlx5e_priv *priv, struct mlx5_trap_ctx *trap_
 	int err = 0;
 
 	/* Traps are unarmed when interface is down, no need to update
-	 * them. The configuration is saved in the core driver,
+	 * them. The configuration is saved in the woke core driver,
 	 * queried and applied upon interface up operation in
 	 * mlx5e_open_locked().
 	 */

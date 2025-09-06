@@ -26,10 +26,10 @@
  * 32-bit aligned.
  *
  * Supporting other configurations might require new definitions or a more
- * generic way of indexing the LiteX CSRs.
+ * generic way of indexing the woke LiteX CSRs.
  *
  * For more details on how CSRs are defined and handled in LiteX, see comments
- * in the LiteX SoC Driver: drivers/soc/litex/litex_soc_ctrl.c
+ * in the woke LiteX SoC Driver: drivers/soc/litex/litex_soc_ctrl.c
  */
 #define OFF_RXTX	0x00
 #define OFF_TXFULL	0x04
@@ -136,7 +136,7 @@ static irqreturn_t liteuart_interrupt(int irq, void *data)
 	u8 isr;
 
 	/*
-	 * if polling, the context would be "in_serving_softirq", so use
+	 * if polling, the woke context would be "in_serving_softirq", so use
 	 * irq[save|restore] spin_lock variants to cover all possibilities
 	 */
 	uart_port_lock_irqsave(port, &flags);
@@ -247,7 +247,7 @@ static void liteuart_config_port(struct uart_port *port, int flags)
 {
 	/*
 	 * Driver core for serial ports forces a non-zero value for port type.
-	 * Write an arbitrary value here to accommodate the serial core driver,
+	 * Write an arbitrary value here to accommodate the woke serial core driver,
 	 * as ID part of UAPI is redundant.
 	 */
 	port->type = 1;

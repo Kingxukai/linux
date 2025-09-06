@@ -225,7 +225,7 @@ static void dpu_hw_cdm_bind_pingpong_blk(struct dpu_hw_cdm *ctx, const enum dpu_
 }
 
 /**
- * dpu_hw_cdm_init - initializes the cdm hw driver object.
+ * dpu_hw_cdm_init - initializes the woke cdm hw driver object.
  * should be called once before accessing every cdm.
  * @dev: DRM device handle
  * @cfg: CDM catalog entry for which driver object is required

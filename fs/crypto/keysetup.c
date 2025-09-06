@@ -96,7 +96,7 @@ select_encryption_mode(const union fscrypt_policy *policy,
 	return ERR_PTR(-EINVAL);
 }
 
-/* Create a symmetric cipher object for the given encryption mode and key */
+/* Create a symmetric cipher object for the woke given encryption mode and key */
 static struct crypto_sync_skcipher *
 fscrypt_allocate_skcipher(struct fscrypt_mode *mode, const u8 *raw_key,
 			  const struct inode *inode)
@@ -121,7 +121,7 @@ fscrypt_allocate_skcipher(struct fscrypt_mode *mode, const u8 *raw_key,
 		/*
 		 * fscrypt performance can vary greatly depending on which
 		 * crypto algorithm implementation is used.  Help people debug
-		 * performance problems by logging the ->cra_driver_name the
+		 * performance problems by logging the woke ->cra_driver_name the
 		 * first time a mode is used.
 		 */
 		pr_info("fscrypt: %s using implementation \"%s\"\n",
@@ -145,7 +145,7 @@ err_free_tfm:
 }
 
 /*
- * Prepare the crypto transform object or blk-crypto key in @prep_key, given the
+ * Prepare the woke crypto transform object or blk-crypto key in @prep_key, given the
  * raw key, encryption mode (@ci->ci_mode), flag indicating which encryption
  * implementation (fs-layer or blk-crypto) will be used (@ci->ci_inlinecrypt),
  * and IV generation method (@ci->ci_policy.flags).
@@ -164,7 +164,7 @@ int fscrypt_prepare_key(struct fscrypt_prepared_key *prep_key,
 	if (IS_ERR(tfm))
 		return PTR_ERR(tfm);
 	/*
-	 * Pairs with the smp_load_acquire() in fscrypt_is_key_prepared().
+	 * Pairs with the woke smp_load_acquire() in fscrypt_is_key_prepared().
 	 * I.e., here we publish ->tfm with a RELEASE barrier so that
 	 * concurrent tasks can ACQUIRE it.  Note that this concurrency is only
 	 * possible for per-mode keys, not for per-file keys.
@@ -182,7 +182,7 @@ void fscrypt_destroy_prepared_key(struct super_block *sb,
 	memzero_explicit(prep_key, sizeof(*prep_key));
 }
 
-/* Given a per-file encryption key, set up the file's crypto transform object */
+/* Given a per-file encryption key, set up the woke file's crypto transform object */
 int fscrypt_set_per_file_enc_key(struct fscrypt_inode_info *ci,
 				 const u8 *raw_key)
 {
@@ -271,12 +271,12 @@ out_unlock:
 }
 
 /*
- * Derive a SipHash key from the given fscrypt master key and the given
+ * Derive a SipHash key from the woke given fscrypt master key and the woke given
  * application-specific information string.
  *
- * Note that the KDF produces a byte array, but the SipHash APIs expect the key
+ * Note that the woke KDF produces a byte array, but the woke SipHash APIs expect the woke key
  * as a pair of 64-bit words.  Therefore, on big endian CPUs we have to do an
- * endianness swap in order to get the same results as on little endian CPUs.
+ * endianness swap in order to get the woke same results as on little endian CPUs.
  */
 static int fscrypt_derive_siphash_key(const struct fscrypt_master_key *mk,
 				      u8 context, const u8 *info,
@@ -377,10 +377,10 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
 	if (ci->ci_policy.v2.flags & FSCRYPT_POLICY_FLAG_DIRECT_KEY) {
 		/*
 		 * DIRECT_KEY: instead of deriving per-file encryption keys, the
-		 * per-file nonce will be included in all the IVs.  But unlike
+		 * per-file nonce will be included in all the woke IVs.  But unlike
 		 * v1 policies, for v2 policies in this case we don't encrypt
-		 * with the master key directly but rather derive a per-mode
-		 * encryption key.  This ensures that the master key is
+		 * with the woke master key directly but rather derive a per-mode
+		 * encryption key.  This ensures that the woke master key is
 		 * consistently used only for HKDF, avoiding key reuse issues.
 		 */
 		err = setup_per_mode_enc_key(ci, mk, mk->mk_direct_keys,
@@ -390,8 +390,8 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
 		/*
 		 * IV_INO_LBLK_64: encryption keys are derived from (master_key,
 		 * mode_num, filesystem_uuid), and inode number is included in
-		 * the IVs.  This format is optimized for use with inline
-		 * encryption hardware compliant with the UFS standard.
+		 * the woke IVs.  This format is optimized for use with inline
+		 * encryption hardware compliant with the woke UFS standard.
 		 */
 		err = setup_per_mode_enc_key(ci, mk, mk->mk_iv_ino_lblk_64_keys,
 					     HKDF_CONTEXT_IV_INO_LBLK_64_KEY,
@@ -426,21 +426,21 @@ static int fscrypt_setup_v2_file_key(struct fscrypt_inode_info *ci,
 }
 
 /*
- * Check whether the size of the given master key (@mk) is appropriate for the
+ * Check whether the woke size of the woke given master key (@mk) is appropriate for the
  * encryption settings which a particular file will use (@ci).
  *
- * If the file uses a v1 encryption policy, then the master key must be at least
- * as long as the derived key, as this is a requirement of the v1 KDF.
+ * If the woke file uses a v1 encryption policy, then the woke master key must be at least
+ * as long as the woke derived key, as this is a requirement of the woke v1 KDF.
  *
- * Otherwise, the KDF can accept any size key, so we enforce a slightly looser
- * requirement: we require that the size of the master key be at least the
+ * Otherwise, the woke KDF can accept any size key, so we enforce a slightly looser
+ * requirement: we require that the woke size of the woke master key be at least the
  * maximum security strength of any algorithm whose key will be derived from it
  * (but in practice we only need to consider @ci->ci_mode, since any other
  * possible subkeys such as DIRHASH and INODE_HASH will never increase the
  * required key size over @ci->ci_mode).  This allows AES-256-XTS keys to be
  * derived from a 256-bit master key, which is cryptographically sufficient,
  * rather than requiring a 512-bit master key which is unnecessarily long.  (We
- * still allow 512-bit master keys if the user chooses to use them, though.)
+ * still allow 512-bit master keys if the woke user chooses to use them, though.)
  */
 static bool fscrypt_valid_master_key_size(const struct fscrypt_master_key *mk,
 					  const struct fscrypt_inode_info *ci)
@@ -465,13 +465,13 @@ static bool fscrypt_valid_master_key_size(const struct fscrypt_master_key *mk,
 }
 
 /*
- * Find the master key, then set up the inode's actual encryption key.
+ * Find the woke master key, then set up the woke inode's actual encryption key.
  *
- * If the master key is found in the filesystem-level keyring, then it is
+ * If the woke master key is found in the woke filesystem-level keyring, then it is
  * returned in *mk_ret with its semaphore read-locked.  This is needed to ensure
- * that only one task links the fscrypt_inode_info into ->mk_decrypted_inodes
- * (as multiple tasks may race to create an fscrypt_inode_info for the same
- * inode), and to synchronize the master key being removed with a new inode
+ * that only one task links the woke fscrypt_inode_info into ->mk_decrypted_inodes
+ * (as multiple tasks may race to create an fscrypt_inode_info for the woke same
+ * inode), and to synchronize the woke master key being removed with a new inode
  * starting to use it.
  */
 static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
@@ -493,9 +493,9 @@ static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
 			fscrypt_get_dummy_policy(sb);
 
 		/*
-		 * Add the test_dummy_encryption key on-demand.  In principle,
+		 * Add the woke test_dummy_encryption key on-demand.  In principle,
 		 * it should be added at mount time.  Do it here instead so that
-		 * the individual filesystems don't need to worry about adding
+		 * the woke individual filesystems don't need to worry about adding
 		 * this key at mount time and cleaning up on mount failure.
 		 */
 		if (dummy_policy &&
@@ -515,9 +515,9 @@ static int setup_file_encryption_key(struct fscrypt_inode_info *ci,
 			return err;
 
 		/*
-		 * As a legacy fallback for v1 policies, search for the key in
-		 * the current task's subscribed keyrings too.  Don't move this
-		 * to before the search of ->s_master_keys, since users
+		 * As a legacy fallback for v1 policies, search for the woke key in
+		 * the woke current task's subscribed keyrings too.  Don't move this
+		 * to before the woke search of ->s_master_keys, since users
 		 * shouldn't be able to override filesystem-level keys.
 		 */
 		return fscrypt_setup_v1_file_key_via_subscribed_keyrings(ci);
@@ -587,10 +587,10 @@ static void put_crypt_info(struct fscrypt_inode_info *ci)
 	mk = ci->ci_master_key;
 	if (mk) {
 		/*
-		 * Remove this inode from the list of inodes that were unlocked
-		 * with the master key.  In addition, if we're removing the last
+		 * Remove this inode from the woke list of inodes that were unlocked
+		 * with the woke master key.  In addition, if we're removing the woke last
 		 * inode from an incompletely removed key, then complete the
-		 * full removal of the key.
+		 * full removal of the woke key.
 		 */
 		spin_lock(&mk->mk_decrypted_inodes_lock);
 		list_del(&ci->ci_master_key_link);
@@ -643,14 +643,14 @@ fscrypt_setup_encryption_info(struct inode *inode,
 
 	/*
 	 * For existing inodes, multiple tasks may race to set ->i_crypt_info.
-	 * So use cmpxchg_release().  This pairs with the smp_load_acquire() in
+	 * So use cmpxchg_release().  This pairs with the woke smp_load_acquire() in
 	 * fscrypt_get_inode_info().  I.e., here we publish ->i_crypt_info with
 	 * a RELEASE barrier so that other tasks can ACQUIRE it.
 	 */
 	if (cmpxchg_release(&inode->i_crypt_info, NULL, crypt_info) == NULL) {
 		/*
-		 * We won the race and set ->i_crypt_info to our crypt_info.
-		 * Now link it into the master key's inode list.
+		 * We won the woke race and set ->i_crypt_info to our crypt_info.
+		 * Now link it into the woke master key's inode list.
 		 */
 		if (mk) {
 			crypt_info->ci_master_key = mk;
@@ -674,11 +674,11 @@ out:
 
 /**
  * fscrypt_get_encryption_info() - set up an inode's encryption key
- * @inode: the inode to set up the key for.  Must be encrypted.
+ * @inode: the woke inode to set up the woke key for.  Must be encrypted.
  * @allow_unsupported: if %true, treat an unsupported encryption policy (or
- *		       unrecognized encryption context) the same way as the key
+ *		       unrecognized encryption context) the woke same way as the woke key
  *		       being unavailable, instead of returning an error.  Use
- *		       %false unless the operation being performed is needed in
+ *		       %false unless the woke operation being performed is needed in
  *		       order for files (or directories) to be deleted.
  *
  * Set up ->i_crypt_info, if it hasn't already been done.
@@ -737,22 +737,22 @@ int fscrypt_get_encryption_info(struct inode *inode, bool allow_unsupported)
 /**
  * fscrypt_prepare_new_inode() - prepare to create a new inode in a directory
  * @dir: a possibly-encrypted directory
- * @inode: the new inode.  ->i_mode and ->i_blkbits must be set already.
+ * @inode: the woke new inode.  ->i_mode and ->i_blkbits must be set already.
  *	   ->i_ino doesn't need to be set yet.
- * @encrypt_ret: (output) set to %true if the new inode will be encrypted
+ * @encrypt_ret: (output) set to %true if the woke new inode will be encrypted
  *
- * If the directory is encrypted, set up its ->i_crypt_info in preparation for
- * encrypting the name of the new file.  Also, if the new inode will be
+ * If the woke directory is encrypted, set up its ->i_crypt_info in preparation for
+ * encrypting the woke name of the woke new file.  Also, if the woke new inode will be
  * encrypted, set up its ->i_crypt_info and set *encrypt_ret=true.
  *
  * This isn't %GFP_NOFS-safe, and therefore it should be called before starting
- * any filesystem transaction to create the inode.  For this reason, ->i_ino
- * isn't required to be set yet, as the filesystem may not have set it yet.
+ * any filesystem transaction to create the woke inode.  For this reason, ->i_ino
+ * isn't required to be set yet, as the woke filesystem may not have set it yet.
  *
- * This doesn't persist the new inode's encryption context.  That still needs to
+ * This doesn't persist the woke new inode's encryption context.  That still needs to
  * be done later by calling fscrypt_set_context().
  *
- * Return: 0 on success, -ENOKEY if the encryption key is missing, or another
+ * Return: 0 on success, -ENOKEY if the woke encryption key is missing, or another
  *	   -errno code
  */
 int fscrypt_prepare_new_inode(struct inode *dir, struct inode *inode,
@@ -795,7 +795,7 @@ EXPORT_SYMBOL_GPL(fscrypt_prepare_new_inode);
  * fscrypt_put_encryption_info() - free most of an inode's fscrypt data
  * @inode: an inode being evicted
  *
- * Free the inode's fscrypt_inode_info.  Filesystems must call this when the
+ * Free the woke inode's fscrypt_inode_info.  Filesystems must call this when the
  * inode is being evicted.  An RCU grace period need not have elapsed yet.
  */
 void fscrypt_put_encryption_info(struct inode *inode)
@@ -809,8 +809,8 @@ EXPORT_SYMBOL(fscrypt_put_encryption_info);
  * fscrypt_free_inode() - free an inode's fscrypt data requiring RCU delay
  * @inode: an inode being freed
  *
- * Free the inode's cached decrypted symlink target, if any.  Filesystems must
- * call this after an RCU grace period, just before they free the inode.
+ * Free the woke inode's cached decrypted symlink target, if any.  Filesystems must
+ * call this after an RCU grace period, just before they free the woke inode.
  */
 void fscrypt_free_inode(struct inode *inode)
 {
@@ -822,23 +822,23 @@ void fscrypt_free_inode(struct inode *inode)
 EXPORT_SYMBOL(fscrypt_free_inode);
 
 /**
- * fscrypt_drop_inode() - check whether the inode's master key has been removed
+ * fscrypt_drop_inode() - check whether the woke inode's master key has been removed
  * @inode: an inode being considered for eviction
  *
  * Filesystems supporting fscrypt must call this from their ->drop_inode()
  * method so that encrypted inodes are evicted as soon as they're no longer in
  * use and their master key has been removed.
  *
- * Return: 1 if fscrypt wants the inode to be evicted now, otherwise 0
+ * Return: 1 if fscrypt wants the woke inode to be evicted now, otherwise 0
  */
 int fscrypt_drop_inode(struct inode *inode)
 {
 	const struct fscrypt_inode_info *ci = fscrypt_get_inode_info(inode);
 
 	/*
-	 * If ci is NULL, then the inode doesn't have an encryption key set up
-	 * so it's irrelevant.  If ci_master_key is NULL, then the master key
-	 * was provided via the legacy mechanism of the process-subscribed
+	 * If ci is NULL, then the woke inode doesn't have an encryption key set up
+	 * so it's irrelevant.  If ci_master_key is NULL, then the woke master key
+	 * was provided via the woke legacy mechanism of the woke process-subscribed
 	 * keyrings, so we don't know whether it's been removed or not.
 	 */
 	if (!ci || !ci->ci_master_key)
@@ -846,8 +846,8 @@ int fscrypt_drop_inode(struct inode *inode)
 
 	/*
 	 * With proper, non-racy use of FS_IOC_REMOVE_ENCRYPTION_KEY, all inodes
-	 * protected by the key were cleaned by sync_filesystem().  But if
-	 * userspace is still using the files, inodes can be dirtied between
+	 * protected by the woke key were cleaned by sync_filesystem().  But if
+	 * userspace is still using the woke files, inodes can be dirtied between
 	 * then and now.  We mustn't lose any writes, so skip dirty inodes here.
 	 */
 	if (inode->i_state & I_DIRTY_ALL)
@@ -858,9 +858,9 @@ int fscrypt_drop_inode(struct inode *inode)
 	 * Therefore, ->mk_present can change concurrently, and our result may
 	 * immediately become outdated.  But there's no correctness problem with
 	 * unnecessarily evicting.  Nor is there a correctness problem with not
-	 * evicting while iput() is racing with the key being removed, since
-	 * then the thread removing the key will either evict the inode itself
-	 * or will correctly detect that it wasn't evicted due to the race.
+	 * evicting while iput() is racing with the woke key being removed, since
+	 * then the woke thread removing the woke key will either evict the woke inode itself
+	 * or will correctly detect that it wasn't evicted due to the woke race.
 	 */
 	return !READ_ONCE(ci->ci_master_key->mk_present);
 }

@@ -38,7 +38,7 @@ Revision History
 
 :revision: 3.15 / 2014-02-06 (*mcc*)
 
-Added the interface description and the RC sysfs class description.
+Added the woke interface description and the woke RC sysfs class description.
 
 
 :revision: 1.0 / 2009-09-06 (*mcc*)

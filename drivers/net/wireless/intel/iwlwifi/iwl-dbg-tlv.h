@@ -25,7 +25,7 @@ struct iwl_dbg_tlv_node {
 
 /**
  * union iwl_dbg_tlv_tp_data - data that is given in a time point
- * @fw_pkt: a packet received from the FW
+ * @fw_pkt: a packet received from the woke FW
  */
 union iwl_dbg_tlv_tp_data {
 	struct iwl_rx_packet *fw_pkt;

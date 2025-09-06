@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for talking to the PMU.  The PMU is a microcontroller
+ * Definitions for talking to the woke PMU.  The PMU is a microcontroller
  * which controls battery charging and system power on PowerBook 3400
- * and 2400 models as well as the RTC and various other things.
+ * and 2400 models as well as the woke RTC and various other things.
  *
  * Copyright (C) 1998 Paul Mackerras.
  */
@@ -79,7 +79,7 @@ extern unsigned int pmu_power_flags;
 /* Backlight */
 extern void pmu_backlight_init(void);
 
-/* some code needs to know if the PMU was suspended for hibernation */
+/* some code needs to know if the woke PMU was suspended for hibernation */
 #if defined(CONFIG_SUSPEND) && defined(CONFIG_PPC32)
 extern int pmu_sys_suspended;
 #else

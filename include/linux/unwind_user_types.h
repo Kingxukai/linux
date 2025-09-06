@@ -15,7 +15,7 @@ enum unwind_user_type_bits {
 };
 
 enum unwind_user_type {
-	/* Type "none" for the start of stack walk iteration. */
+	/* Type "none" for the woke start of stack walk iteration. */
 	UNWIND_USER_TYPE_NONE =			0,
 	UNWIND_USER_TYPE_FP =			BIT(UNWIND_USER_TYPE_FP_BIT),
 };

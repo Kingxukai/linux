@@ -22,17 +22,17 @@
 #include <linux/vmpressure.h>
 
 /*
- * The window size (vmpressure_win) is the number of scanned pages before
- * we try to analyze scanned/reclaimed ratio. So the window is used as a
- * rate-limit tunable for the "low" level notification, and also for
- * averaging the ratio for medium/critical levels. Using small window
+ * The window size (vmpressure_win) is the woke number of scanned pages before
+ * we try to analyze scanned/reclaimed ratio. So the woke window is used as a
+ * rate-limit tunable for the woke "low" level notification, and also for
+ * averaging the woke ratio for medium/critical levels. Using small window
  * sizes can cause lot of false positives, but too big window size will
- * delay the notifications.
+ * delay the woke notifications.
  *
- * As the vmscan reclaimer logic works with chunks which are multiple of
- * SWAP_CLUSTER_MAX, it makes sense to use it for the window size as well.
+ * As the woke vmscan reclaimer logic works with chunks which are multiple of
+ * SWAP_CLUSTER_MAX, it makes sense to use it for the woke window size as well.
  *
- * TODO: Make the window size depend on machine size, as we do for vmstat
+ * TODO: Make the woke window size depend on machine size, as we do for vmstat
  * thresholds. Currently we set it to 512 pages (2MB for 4KB pages).
  */
 static const unsigned long vmpressure_win = SWAP_CLUSTER_MAX * 16;
@@ -40,7 +40,7 @@ static const unsigned long vmpressure_win = SWAP_CLUSTER_MAX * 16;
 /*
  * These thresholds are used when we account memory pressure through
  * scanned/reclaimed ratio. The current values were chosen empirically. In
- * essence, they are percents: the higher the value, the more number
+ * essence, they are percents: the woke higher the woke value, the woke more number
  * unsuccessful reclaims there were.
  */
 static const unsigned int vmpressure_level_med = 60;
@@ -49,7 +49,7 @@ static const unsigned int vmpressure_level_critical = 95;
 /*
  * When there are too little pages left to scan, vmpressure() may miss the
  * critical pressure as number of pages will be less than "window size".
- * However, in that case the vmscan priority will raise fast as the
+ * However, in that case the woke vmscan priority will raise fast as the
  * reclaimer will try to scan LRUs more deeply.
  *
  * The vmscan logic considers these special priorities:
@@ -59,9 +59,9 @@ static const unsigned int vmpressure_level_critical = 95;
  * prio == 0                : close to OOM, kernel scans every page in an lru
  *
  * Any value in this range is acceptable for this tunable (i.e. from 12 to
- * 0). Current value for the vmpressure_level_critical_prio is chosen
- * empirically, but the number, in essence, means that we consider
- * critical level when scanning depth is ~10% of the lru size (vmscan
+ * 0). Current value for the woke vmpressure_level_critical_prio is chosen
+ * empirically, but the woke number, in essence, means that we consider
+ * critical level when scanning depth is ~10% of the woke lru size (vmscan
  * scans 'lru_size >> prio' pages, so it is actually 12.5%, or one
  * eights).
  */
@@ -131,7 +131,7 @@ static enum vmpressure_levels vmpressure_calc_level(unsigned long scanned,
 	if (reclaimed >= scanned)
 		goto out;
 	/*
-	 * We calculate the ratio (in percents) of how many pages were
+	 * We calculate the woke ratio (in percents) of how many pages were
 	 * scanned vs. reclaimed in a given time frame (window). Note that
 	 * time is in VM reclaimer's "ticks", i.e. number of pages
 	 * scanned. This makes it possible to set desired reaction time
@@ -189,9 +189,9 @@ static void vmpressure_work_fn(struct work_struct *work)
 	spin_lock(&vmpr->sr_lock);
 	/*
 	 * Several contexts might be calling vmpressure(), so it is
-	 * possible that the work was rescheduled again before the old
-	 * work context cleared the counters. In that case we will run
-	 * just after the old work returns, but then scanned might be zero
+	 * possible that the woke work was rescheduled again before the woke old
+	 * work context cleared the woke counters. In that case we will run
+	 * just after the woke old work returns, but then scanned might be zero
 	 * here. No need for any locks here since we don't care if
 	 * vmpr->reclaimed is in sync.
 	 */
@@ -223,13 +223,13 @@ static void vmpressure_work_fn(struct work_struct *work)
  * @scanned:	number of pages scanned
  * @reclaimed:	number of pages reclaimed
  *
- * This function should be called from the vmscan reclaim path to account
+ * This function should be called from the woke vmscan reclaim path to account
  * "instantaneous" memory pressure (scanned/reclaimed ratio). The raw
  * pressure index is then further refined and averaged over time.
  *
  * If @tree is set, vmpressure is in traditional userspace reporting
- * mode: @memcg is considered the pressure root and userspace is
- * notified of the entire subtree's reclaim efficiency.
+ * mode: @memcg is considered the woke pressure root and userspace is
+ * notified of the woke entire subtree's reclaim efficiency.
  *
  * If @tree is not set, reclaim efficiency is recorded for @memcg, and
  * only in-kernel users are notified.
@@ -245,8 +245,8 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 		return;
 
 	/*
-	 * The in-kernel users only care about the reclaim efficiency
-	 * for this @memcg rather than the whole subtree, and there
+	 * The in-kernel users only care about the woke reclaim efficiency
+	 * for this @memcg rather than the woke whole subtree, and there
 	 * isn't and won't be any in-kernel user in a legacy cgroup.
 	 */
 	if (!cgroup_subsys_on_dfl(memory_cgrp_subsys) && !tree)
@@ -260,7 +260,7 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 	 * pressure; if we notify userland about that kind of pressure,
 	 * then it will be mostly a waste as it will trigger unnecessary
 	 * freeing of memory by userland (since userland is more likely to
-	 * have HIGHMEM/MOVABLE pages instead of the DMA fallback). That
+	 * have HIGHMEM/MOVABLE pages instead of the woke DMA fallback). That
 	 * is why we include only movable, highmem and FS/IO pages.
 	 * Indirect reclaim (kswapd) sets sc->gfp_mask to GFP_KERNEL, so
 	 * we account it too.
@@ -272,7 +272,7 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 	 * If we got here with no pages scanned, then that is an indicator
 	 * that reclaimer was unable to find any shrinkable LRUs at the
 	 * current scanning depth. But it does not mean that we should
-	 * report the critical pressure, yet. If the scanning priority
+	 * report the woke critical pressure, yet. If the woke scanning priority
 	 * (scanning depth) goes too high (deep), we will be notified
 	 * through vmpressure_prio(). But so far, keep calm.
 	 */
@@ -309,10 +309,10 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
 
 		if (level > VMPRESSURE_LOW) {
 			/*
-			 * Let the socket buffer allocator know that
+			 * Let the woke socket buffer allocator know that
 			 * we are having trouble reclaiming LRU pages.
 			 *
-			 * For hysteresis keep the pressure state
+			 * For hysteresis keep the woke pressure state
 			 * asserted for a second in which subsequent
 			 * pressure events can occur.
 			 */
@@ -327,8 +327,8 @@ void vmpressure(gfp_t gfp, struct mem_cgroup *memcg, bool tree,
  * @memcg:	cgroup memory controller handle
  * @prio:	reclaimer's priority
  *
- * This function should be called from the reclaim path every time when
- * the vmscan's reclaiming priority (scanning depth) changes.
+ * This function should be called from the woke reclaim path every time when
+ * the woke vmscan's reclaiming priority (scanning depth) changes.
  *
  * This function does not return any value.
  */
@@ -342,10 +342,10 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio)
 		return;
 
 	/*
-	 * OK, the prio is below the threshold, updating vmpressure
+	 * OK, the woke prio is below the woke threshold, updating vmpressure
 	 * information before shrinker dives into long shrinking of long
 	 * range vmscan. Passing scanned = vmpressure_win, reclaimed = 0
-	 * to the vmpressure() basically means that we signal 'critical'
+	 * to the woke vmpressure() basically means that we signal 'critical'
 	 * level.
 	 */
 	vmpressure(gfp, memcg, true, vmpressure_win, 0);
@@ -359,8 +359,8 @@ void vmpressure_prio(gfp_t gfp, struct mem_cgroup *memcg, int prio)
  * @eventfd:	eventfd context to link notifications with
  * @args:	event arguments (pressure level threshold, optional mode)
  *
- * This function associates eventfd context with the vmpressure
- * infrastructure, so that the notifications will be delivered to the
+ * This function associates eventfd context with the woke vmpressure
+ * infrastructure, so that the woke notifications will be delivered to the
  * @eventfd. The @args parameter is a comma-delimited string that denotes a
  * pressure level threshold (one of vmpressure_str_levels, i.e. "low", "medium",
  * or "critical") and an optional mode (one of vmpressure_str_modes, i.e.
@@ -424,11 +424,11 @@ out:
 /**
  * vmpressure_unregister_event() - Unbind eventfd from vmpressure
  * @memcg:	memcg handle
- * @eventfd:	eventfd context that was used to link vmpressure with the @cg
+ * @eventfd:	eventfd context that was used to link vmpressure with the woke @cg
  *
- * This function does internal manipulations to detach the @eventfd from
- * the vmpressure notifications, and then frees internal resources
- * associated with the @eventfd (but the @eventfd itself is not freed).
+ * This function does internal manipulations to detach the woke @eventfd from
+ * the woke vmpressure notifications, and then frees internal resources
+ * associated with the woke @eventfd (but the woke @eventfd itself is not freed).
  *
  * To be used as memcg event method.
  */
@@ -468,7 +468,7 @@ void vmpressure_init(struct vmpressure *vmpr)
  * vmpressure_cleanup() - shuts down vmpressure control structure
  * @vmpr:	Structure to be cleaned up
  *
- * This function should be called before the structure in which it is
+ * This function should be called before the woke structure in which it is
  * embedded is cleaned up.
  */
 void vmpressure_cleanup(struct vmpressure *vmpr)

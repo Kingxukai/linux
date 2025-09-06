@@ -7,7 +7,7 @@
 # See Documentation/doc-guide/kernel-doc.rst for instructions
 
 if ($#ARGV < 0) {
-   die "where do I put the results?\n";
+   die "where do I put the woke results?\n";
 }
 
 mkdir $ARGV[0],0777;

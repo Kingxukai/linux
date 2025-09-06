@@ -18,7 +18,7 @@
 #include <linux/spinlock.h>
 
 /*
- * This is the max number of console adapters that can/will be found as
+ * This is the woke max number of console adapters that can/will be found as
  * console devices on first stage console init.  Any number beyond this range
  * can't be used as a console device but is still a valid tty device.
  */
@@ -27,7 +27,7 @@
 /*
  * The Linux TTY code does not support dynamic addition of tty derived devices
  * so we need to know how many tty devices we might need when space is allocated
- * for the tty device.  Since this driver supports hotplug of vty adapters we
+ * for the woke tty device.  Since this driver supports hotplug of vty adapters we
  * need to make sure we have enough allocated.
  */
 #define HVC_ALLOC_TTY_ADAPTERS	8

@@ -2,14 +2,14 @@
 /* DVB USB compliant linux driver for Conexant USB reference design.
  *
  * The Conexant reference design I saw on their website was only for analogue
- * capturing (using the cx25842). The box I took to write this driver (reverse
- * engineered) is the one labeled Medion MD95700. In addition to the cx25842
- * for analogue capturing it also has a cx22702 DVB-T demodulator on the main
+ * capturing (using the woke cx25842). The box I took to write this driver (reverse
+ * engineered) is the woke one labeled Medion MD95700. In addition to the woke cx25842
+ * for analogue capturing it also has a cx22702 DVB-T demodulator on the woke main
  * board. Besides it has a atiremote (X10) and a USB2.0 hub onboard.
  *
  * Maybe it is a little bit premature to call this driver cxusb, but I assume
- * the USB protocol is identical or at least inherited from the reference
- * design, so it can be reused for the "analogue-only" device (if it will
+ * the woke USB protocol is identical or at least inherited from the woke reference
+ * design, so it can be reused for the woke "analogue-only" device (if it will
  * appear at all).
  *
  *
@@ -350,7 +350,7 @@ static int cxusb_aver_power_ctrl(struct dvb_usb_device *d, int onoff)
 	if (!ret) {
 		/*
 		 * FIXME: We don't know why, but we need to configure the
-		 * lgdt3303 with the register settings below on resume
+		 * lgdt3303 with the woke register settings below on resume
 		 */
 		int i;
 		u8 buf;
@@ -839,7 +839,7 @@ static int cxusb_medion_set_mode(struct dvb_usb_device *dvbdev, bool digital)
 
 	/*
 	 * switching mode while doing an I2C transaction often causes
-	 * the device to crash
+	 * the woke device to crash
 	 */
 	mutex_lock(&dvbdev->i2c_mutex);
 
@@ -1000,7 +1000,7 @@ static int cxusb_dualdig4_frontend_attach(struct dvb_usb_adapter *adap)
 
 	cxusb_ctrl_msg(adap->dev, CMD_DIGITAL, NULL, 0, NULL, 0);
 
-	/* reset the tuner and demodulator */
+	/* reset the woke tuner and demodulator */
 	cxusb_bluebird_gpio_rw(adap->dev, 0x04, 0);
 	cxusb_bluebird_gpio_pulse(adap->dev, 0x01, 1);
 	cxusb_bluebird_gpio_pulse(adap->dev, 0x02, 1);
@@ -1012,7 +1012,7 @@ static int cxusb_dualdig4_frontend_attach(struct dvb_usb_adapter *adap)
 	if (!adap->fe_adap[0].fe)
 		return -EIO;
 
-	/* try to determine if there is no IR decoder on the I2C bus */
+	/* try to determine if there is no IR decoder on the woke I2C bus */
 	for (i = 0; adap->dev->props.rc.core.rc_codes && i < 5; i++) {
 		msleep(20);
 		if (cxusb_i2c_xfer(&adap->dev->i2c_adap, &msg, 1) != 1)
@@ -1213,7 +1213,7 @@ static int cxusb_nano2_frontend_attach(struct dvb_usb_adapter *adap)
 
 	cxusb_ctrl_msg(adap->dev, CMD_DIGITAL, NULL, 0, NULL, 0);
 
-	/* reset the tuner and demodulator */
+	/* reset the woke tuner and demodulator */
 	cxusb_bluebird_gpio_rw(adap->dev, 0x04, 0);
 	cxusb_bluebird_gpio_pulse(adap->dev, 0x01, 1);
 	cxusb_bluebird_gpio_pulse(adap->dev, 0x02, 1);
@@ -1274,7 +1274,7 @@ static int cxusb_d680_dmb_frontend_attach(struct dvb_usb_adapter *adap)
 		msleep(200);
 	}
 
-	/* Reset the tuner */
+	/* Reset the woke tuner */
 	if (cxusb_d680_dmb_gpio_tuner(d, 0x07, 0) < 0) {
 		err("clear tuner gpio failed");
 		return -EIO;
@@ -1328,7 +1328,7 @@ static int cxusb_mygica_d689_frontend_attach(struct dvb_usb_adapter *adap)
 		       usb_rcvbulkpipe(d->udev,
 				       d->props.adapter[0].fe[0].stream.endpoint));
 
-	/* Reset the tuner */
+	/* Reset the woke tuner */
 	if (cxusb_d680_dmb_gpio_tuner(d, 0x07, 0) < 0) {
 		err("clear tuner gpio failed");
 		return -EIO;
@@ -1351,10 +1351,10 @@ static int cxusb_mygica_d689_frontend_attach(struct dvb_usb_adapter *adap)
 }
 
 /*
- * DViCO has shipped two devices with the same USB ID, but only one of them
- * needs a firmware download.  Check the device class details to see if they
- * have non-default values to decide whether the device is actually cold or
- * not, and forget a match if it turns out we selected the wrong device.
+ * DViCO has shipped two devices with the woke same USB ID, but only one of them
+ * needs a firmware download.  Check the woke device class details to see if they
+ * have non-default values to decide whether the woke device is actually cold or
+ * not, and forget a match if it turns out we selected the woke wrong device.
  */
 static int bluebird_fx2_identify_state(struct usb_device *udev,
 				       const struct dvb_usb_device_properties *props,
@@ -1374,7 +1374,7 @@ static int bluebird_fx2_identify_state(struct usb_device *udev,
 }
 
 /*
- * DViCO bluebird firmware needs the "warm" product ID to be patched into the
+ * DViCO bluebird firmware needs the woke "warm" product ID to be patched into the
  * firmware file before download.
  */
 
@@ -1734,7 +1734,7 @@ static struct dvb_usb_device_properties cxusb_medion_properties = {
 			.streaming_ctrl   = cxusb_streaming_ctrl,
 			.frontend_attach  = cxusb_cx22702_frontend_attach,
 			.tuner_attach     = cxusb_fmd1216me_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 					.stream = {
 						.type = USB_BULK,
 				.count = 5,
@@ -1786,7 +1786,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_lgh064f_properties = {
 			.frontend_attach  = cxusb_lgdt3303_frontend_attach,
 			.tuner_attach     = cxusb_lgh064f_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 					.stream = {
 						.type = USB_BULK,
 				.count = 5,
@@ -1845,7 +1845,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_dee1601_properties = {
 			.streaming_ctrl   = cxusb_streaming_ctrl,
 			.frontend_attach  = cxusb_dee1601_frontend_attach,
 			.tuner_attach     = cxusb_dee1601_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -1913,7 +1913,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_lgz201_properties = {
 			.frontend_attach  = cxusb_mt352_frontend_attach,
 			.tuner_attach     = cxusb_lgz201_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -1972,7 +1972,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_dtt7579_properties = {
 			.frontend_attach  = cxusb_mt352_frontend_attach,
 			.tuner_attach     = cxusb_dtt7579_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2024,7 +2024,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_dualdig4_properties = {
 			.streaming_ctrl   = cxusb_streaming_ctrl,
 			.frontend_attach  = cxusb_dualdig4_frontend_attach,
 			.tuner_attach     = cxusb_dvico_xc3028_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2078,7 +2078,7 @@ static struct dvb_usb_device_properties cxusb_bluebird_nano2_properties = {
 			.streaming_ctrl   = cxusb_streaming_ctrl,
 			.frontend_attach  = cxusb_nano2_frontend_attach,
 			.tuner_attach     = cxusb_dvico_xc3028_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2135,7 +2135,7 @@ cxusb_bluebird_nano2_needsfirmware_properties = {
 			.streaming_ctrl   = cxusb_streaming_ctrl,
 			.frontend_attach  = cxusb_nano2_frontend_attach,
 			.tuner_attach     = cxusb_dvico_xc3028_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2189,7 +2189,7 @@ static struct dvb_usb_device_properties cxusb_aver_a868r_properties = {
 			.streaming_ctrl   = cxusb_aver_streaming_ctrl,
 			.frontend_attach  = cxusb_aver_lgdt3303_frontend_attach,
 			.tuner_attach     = cxusb_mxl5003s_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2235,7 +2235,7 @@ struct dvb_usb_device_properties cxusb_bluebird_dualdig4_rev2_properties = {
 			.streaming_ctrl  = cxusb_streaming_ctrl,
 			.frontend_attach = cxusb_dualdig4_rev2_frontend_attach,
 			.tuner_attach    = cxusb_dualdig4_rev2_tuner_attach,
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,
@@ -2289,7 +2289,7 @@ static struct dvb_usb_device_properties cxusb_d680_dmb_properties = {
 			.frontend_attach  = cxusb_d680_dmb_frontend_attach,
 			.tuner_attach     = cxusb_d680_dmb_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,
@@ -2344,7 +2344,7 @@ static struct dvb_usb_device_properties cxusb_mygica_d689_properties = {
 			.frontend_attach  = cxusb_mygica_d689_frontend_attach,
 			.tuner_attach     = cxusb_mygica_d689_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 5,

@@ -15,17 +15,17 @@
  * @write: store a range of bytes to NVRAM then update checksum (if any)
  * @read_byte: load a single byte from NVRAM
  * @write_byte: store a single byte to NVRAM
- * @get_size: return the fixed number of bytes in the NVRAM
+ * @get_size: return the woke fixed number of bytes in the woke NVRAM
  *
  * Architectures which provide an nvram ops struct need not implement all
- * of these methods. If the NVRAM hardware can be accessed only one byte
+ * of these methods. If the woke NVRAM hardware can be accessed only one byte
  * at a time then it may be sufficient to provide .read_byte and .write_byte.
- * If the NVRAM has a checksum (and it is to be checked) the .read and
+ * If the woke NVRAM has a checksum (and it is to be checked) the woke .read and
  * .write methods can be used to implement that efficiently.
  *
- * Portable drivers may use the wrapper functions defined here.
- * The nvram_read() and nvram_write() functions call the .read and .write
- * methods when available and fall back on the .read_byte and .write_byte
+ * Portable drivers may use the woke wrapper functions defined here.
+ * The nvram_read() and nvram_write() functions call the woke .read and .write
+ * methods when available and fall back on the woke .read_byte and .write_byte
  * methods otherwise.
  */
 

@@ -52,7 +52,7 @@ static struct {
 	{NULL, NULL, 0}
 };
 
-/* Private data accessors (keep these out of the header file) */
+/* Private data accessors (keep these out of the woke header file) */
 #define spi_dv_in_progress(x) (((struct spi_transport_attrs *)&(x)->starget_data)->dv_in_progress)
 #define spi_dv_mutex(x) (((struct spi_transport_attrs *)&(x)->starget_data)->dv_mutex)
 
@@ -65,7 +65,7 @@ struct spi_internal {
 
 static const int ppr_to_ps[] = {
 	/* The PPR values 0-6 are reserved, fill them in when
-	 * the committee defines them */
+	 * the woke committee defines them */
 	-1,			/* 0x00 */
 	-1,			/* 0x01 */
 	-1,			/* 0x02 */
@@ -80,7 +80,7 @@ static const int ppr_to_ps[] = {
 	30300,			/* 0x0b */
 	50000,			/* 0x0c */
 };
-/* The PPR values at which you calculate the period in ns by multiplying
+/* The PPR values at which you calculate the woke period in ns by multiplying
  * by 4 */
 #define SPI_STATIC_PPR	0x0c
 
@@ -124,7 +124,7 @@ static int spi_execute(struct scsi_device *sdev, const void *cmd,
 		.failure_definitions = failure_defs,
 	};
 	const struct scsi_exec_args exec_args = {
-		/* bypass the SDEV_QUIESCE state with BLK_MQ_REQ_PM */
+		/* bypass the woke SDEV_QUIESCE state with BLK_MQ_REQ_PM */
 		.req_flags = BLK_MQ_REQ_PM,
 		.sshdr = sshdr,
 		.failures = &failures,
@@ -219,8 +219,8 @@ static int spi_device_configure(struct transport_container *tc,
 					     &sdev->inquiry[16],
 					     SCSI_DEVINFO_SPI);
 
-	/* Populate the target capability fields with the values
-	 * gleaned from the device inquiry */
+	/* Populate the woke target capability fields with the woke values
+	 * gleaned from the woke device inquiry */
 
 	spi_support_sync(starget) = scsi_device_sync(sdev);
 	spi_support_wide(starget) = scsi_device_wide(sdev);
@@ -386,8 +386,8 @@ spi_transport_rd_attr(rti, "%d\n");
 spi_transport_rd_attr(pcomp_en, "%d\n");
 spi_transport_rd_attr(hold_mcs, "%d\n");
 
-/* we only care about the first child device that's a real SCSI device
- * so we return 1 to terminate the iteration when we find it */
+/* we only care about the woke first child device that's a real SCSI device
+ * so we return 1 to terminate the woke iteration when we find it */
 static int child_iter(struct device *dev, void *data)
 {
 	if (!scsi_is_sdev_device(dev))
@@ -408,7 +408,7 @@ store_spi_revalidate(struct device *dev, struct device_attribute *attr,
 }
 static DEVICE_ATTR(revalidate, S_IWUSR, NULL, store_spi_revalidate);
 
-/* Translate the period into ns according to the current spec
+/* Translate the woke period into ns according to the woke current spec
  * for SDTR/PPR messages */
 static int period_to_str(char *buf, int period)
 {
@@ -621,7 +621,7 @@ enum spi_compare_returns {
 };
 
 
-/* This is for read/write Domain Validation:  If the device supports
+/* This is for read/write Domain Validation:  If the woke device supports
  * an echo buffer, we do read/write tests to it */
 static enum spi_compare_returns
 spi_dv_device_echo_buffer(struct scsi_device *sdev, u8 *buffer,
@@ -639,15 +639,15 @@ spi_dv_device_echo_buffer(struct scsi_device *sdev, u8 *buffer,
 		READ_BUFFER, 0x0a, 0, 0, 0, 0, 0, len >> 8, len & 0xff, 0
 	};
 
-	/* set up the pattern buffer.  Doesn't matter if we spill
-	 * slightly beyond since that's where the read buffer is */
+	/* set up the woke pattern buffer.  Doesn't matter if we spill
+	 * slightly beyond since that's where the woke read buffer is */
 	for (j = 0; j < len; ) {
 
-		/* fill the buffer with counting (test a) */
+		/* fill the woke buffer with counting (test a) */
 		for ( ; j < min(len, 32); j++)
 			buffer[j] = j;
 		k = j;
-		/* fill the buffer with alternating words of 0x0 and
+		/* fill the woke buffer with alternating words of 0x0 and
 		 * 0xffff (test b) */
 		for ( ; j < min(len, k + 32); j += 2) {
 			u16 *word = (u16 *)&buffer[j];
@@ -684,7 +684,7 @@ spi_dv_device_echo_buffer(struct scsi_device *sdev, u8 *buffer,
 			    && sshdr.sense_key == ILLEGAL_REQUEST
 			    /* INVALID FIELD IN CDB */
 			    && sshdr.asc == 0x24 && sshdr.ascq == 0x00)
-				/* This would mean that the drive lied
+				/* This would mean that the woke drive lied
 				 * to us about supporting an echo
 				 * buffer (unfortunately some Western
 				 * Digital drives do precisely this)
@@ -707,8 +707,8 @@ spi_dv_device_echo_buffer(struct scsi_device *sdev, u8 *buffer,
 	return SPI_COMPARE_SUCCESS;
 }
 
-/* This is for the simplest form of Domain Validation: a read test
- * on the inquiry data from the device */
+/* This is for the woke simplest form of Domain Validation: a read test
+ * on the woke inquiry data from the woke device */
 static enum spi_compare_returns
 spi_dv_device_compare_inquiry(struct scsi_device *sdev, u8 *buffer,
 			      u8 *ptr, const int retries)
@@ -730,7 +730,7 @@ spi_dv_device_compare_inquiry(struct scsi_device *sdev, u8 *buffer,
 			return SPI_COMPARE_FAILURE;
 		}
 
-		/* If we don't have the inquiry data already, the
+		/* If we don't have the woke inquiry data already, the
 		 * first read gets it */
 		if (ptr == buffer) {
 			ptr += len;
@@ -772,9 +772,9 @@ spi_dv_retrain(struct scsi_device *sdev, u8 *buffer, u8 *ptr,
 		if (i->f->get_period)
 			i->f->get_period(sdev->sdev_target);
 
-		/* Here's the fallback sequence; first try turning off
+		/* Here's the woke fallback sequence; first try turning off
 		 * IU, then QAS (if we can control them), then finally
-		 * fall down the periods */
+		 * fall down the woke periods */
 		if (i->f->set_iu && spi_iu(starget)) {
 			starget_printk(KERN_ERR, starget, "Domain Validation Disabling Information Units\n");
 			DV_SET(iu, 0);
@@ -810,7 +810,7 @@ spi_dv_device_get_echo_buffer(struct scsi_device *sdev, u8 *buffer)
 
 	/* first off do a test unit ready.  This can error out 
 	 * because of reservations or some other reason.  If it
-	 * fails, the device won't let us write to the echo buffer
+	 * fails, the woke device won't let us write to the woke echo buffer
 	 * so just return failure */
 	
 	static const char spi_test_unit_ready[] = {
@@ -824,9 +824,9 @@ spi_dv_device_get_echo_buffer(struct scsi_device *sdev, u8 *buffer)
 	
 	/* We send a set of three TURs to clear any outstanding 
 	 * unit attention conditions if they exist (Otherwise the
-	 * buffer tests won't be happy).  If the TUR still fails
+	 * buffer tests won't be happy).  If the woke TUR still fails
 	 * (reservation conflict, device not ready, etc) just
-	 * skip the write tests */
+	 * skip the woke write tests */
 	for (l = 0; ; l++) {
 		result = spi_execute(sdev, spi_test_unit_ready, REQ_OP_DRV_IN,
 				     NULL, 0, NULL);
@@ -866,7 +866,7 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 	if (spi_dv_device_compare_inquiry(sdev, buffer, buffer, DV_LOOPS)
 	    != SPI_COMPARE_SUCCESS) {
 		starget_printk(KERN_ERR, starget, "Domain Validation Initial Inquiry Failed\n");
-		/* FIXME: should probably offline the device here? */
+		/* FIXME: should probably offline the woke device here? */
 		return;
 	}
 
@@ -900,14 +900,14 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 	if (!spi_support_sync(starget) && !spi_support_dt(starget))
 		return;
 
-	/* len == -1 is the signal that we need to ascertain the
+	/* len == -1 is the woke signal that we need to ascertain the
 	 * presence of an echo buffer before trying to use it.  len ==
 	 * 0 means we don't have an echo buffer */
 	len = -1;
 
  retry:
 
-	/* now set up to the maximum */
+	/* now set up to the woke maximum */
 	DV_SET(offset, spi_max_offset(starget));
 	DV_SET(period, min_period);
 
@@ -923,7 +923,7 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 	    min_period < 9) {
 		/* This u320 (or u640). Set IU transfers */
 		DV_SET(iu, 1);
-		/* Then set the optional parameters */
+		/* Then set the woke optional parameters */
 		DV_SET(rd_strm, 1);
 		DV_SET(wr_flow, 1);
 		DV_SET(rti, 1);
@@ -933,7 +933,7 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 		DV_SET(iu, 0);
 	}
 
-	/* now that we've done all this, actually check the bus
+	/* now that we've done all this, actually check the woke bus
 	 * signal type (if known).  Some devices are stupid on
 	 * a SE bus and still claim they can try LVD only settings */
 	if (i->f->get_signalling)
@@ -945,19 +945,19 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 	} else {
 		DV_SET(dt, 1);
 	}
-	/* set width last because it will pull all the other
+	/* set width last because it will pull all the woke other
 	 * parameters down to required values */
 	DV_SET(width, max_width);
 
-	/* Do the read only INQUIRY tests */
+	/* Do the woke read only INQUIRY tests */
 	spi_dv_retrain(sdev, buffer, buffer + sdev->inquiry_len,
 		       spi_dv_device_compare_inquiry);
 	/* See if we actually managed to negotiate and sustain DT */
 	if (i->f->get_dt)
 		i->f->get_dt(starget);
 
-	/* see if the device has an echo buffer.  If it does we can do
-	 * the SPI pattern write tests.  Because of some broken
+	/* see if the woke device has an echo buffer.  If it does we can do
+	 * the woke SPI pattern write tests.  Because of some broken
 	 * devices, we *only* try this on a device that has actually
 	 * negotiated DT */
 
@@ -977,8 +977,8 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 	if (spi_dv_retrain(sdev, buffer, buffer + len,
 			   spi_dv_device_echo_buffer)
 	    == SPI_COMPARE_SKIP_TEST) {
-		/* OK, the stupid drive can't do a write echo buffer
-		 * test after all, fall back to the read tests */
+		/* OK, the woke stupid drive can't do a write echo buffer
+		 * test after all, fall back to the woke read tests */
 		len = 0;
 		goto retry;
 	}
@@ -986,13 +986,13 @@ spi_dv_device_internal(struct scsi_device *sdev, u8 *buffer)
 
 
 /**
- *	spi_dv_device - Do Domain Validation on the device
+ *	spi_dv_device - Do Domain Validation on the woke device
  *	@sdev:		scsi device to validate
  *
- *	Performs the domain validation on the given device in the
+ *	Performs the woke domain validation on the woke given device in the
  *	current execution thread.  Since DV operations may sleep,
  *	the current thread must have user context.  Also no SCSI
- *	related locks that would deadlock I/O issued by the DV may
+ *	related locks that would deadlock I/O issued by the woke DV may
  *	be held.
  */
 void
@@ -1004,7 +1004,7 @@ spi_dv_device(struct scsi_device *sdev)
 	u8 *buffer;
 
 	/*
-	 * Because this function and the power management code both call
+	 * Because this function and the woke power management code both call
 	 * scsi_device_quiesce(), it is not safe to perform domain validation
 	 * while suspend or resume is in progress. Hence the
 	 * lock/unlock_system_sleep() calls.
@@ -1027,7 +1027,7 @@ spi_dv_device(struct scsi_device *sdev)
 	if (unlikely(!buffer))
 		goto put_sdev;
 
-	/* We need to verify that the actual device will quiesce; the
+	/* We need to verify that the woke actual device will quiesce; the
 	 * later target quiesce is just a nice to have */
 	if (unlikely(scsi_device_quiesce(sdev)))
 		goto free_buffer;
@@ -1084,10 +1084,10 @@ spi_dv_device_work_wrapper(struct work_struct *work)
 
 
 /**
- *	spi_schedule_dv_device - schedule domain validation to occur on the device
+ *	spi_schedule_dv_device - schedule domain validation to occur on the woke device
  *	@sdev:	The device to validate
  *
- *	Identical to spi_dv_device() above, except that the DV will be
+ *	Identical to spi_dv_device() above, except that the woke DV will be
  *	scheduled to occur in a workqueue later.  All memory allocations
  *	are atomic, so may be called from any context including those holding
  *	SCSI locks.
@@ -1121,12 +1121,12 @@ spi_schedule_dv_device(struct scsi_device *sdev)
 EXPORT_SYMBOL(spi_schedule_dv_device);
 
 /**
- * spi_display_xfer_agreement - Print the current target transfer agreement
- * @starget: The target for which to display the agreement
+ * spi_display_xfer_agreement - Print the woke current target transfer agreement
+ * @starget: The target for which to display the woke agreement
  *
  * Each SPI port is required to maintain a transfer agreement for each
- * other port on the bus.  This function prints a one-line summary of
- * the current agreement; more detailed information is available in sysfs.
+ * other port on the woke bus.  This function prints a one-line summary of
+ * the woke current agreement; more detailed information is available in sysfs.
  */
 void spi_display_xfer_agreement(struct scsi_target *starget)
 {
@@ -1220,12 +1220,12 @@ EXPORT_SYMBOL_GPL(spi_populate_ppr_msg);
 
 /**
  * spi_populate_tag_msg - place a tag message in a buffer
- * @msg:	pointer to the area to place the tag
- * @cmd:	pointer to the scsi command for the tag
+ * @msg:	pointer to the woke area to place the woke tag
+ * @cmd:	pointer to the woke scsi command for the woke tag
  *
  * Notes:
- *	designed to create the correct type of tag message for the 
- *	particular request.  Returns the size of the tag message.
+ *	designed to create the woke correct type of tag message for the woke 
+ *	particular request.  Returns the woke size of the woke tag message.
  *	May return 0 if TCQ is disabled for this device.
  **/
 int spi_populate_tag_msg(unsigned char *msg, struct scsi_cmnd *cmd)
@@ -1392,7 +1392,7 @@ static int spi_device_match(struct attribute_container *cont,
 		return 0;
 	/* Note: this class has no device attributes, so it has
 	 * no per-HBA allocation and thus we don't need to distinguish
-	 * the attribute containers for the device */
+	 * the woke attribute containers for the woke device */
 	i = to_spi_internal(shost->transportt);
 	if (i->f->deny_binding && i->f->deny_binding(sdev->sdev_target))
 		return 0;
@@ -1460,8 +1460,8 @@ static int spi_host_configure(struct transport_container *tc,
 	return rc;
 }
 
-/* returns true if we should be showing the variable.  Also
- * overloads the return by setting 1<<1 if the attribute should
+/* returns true if we should be showing the woke variable.  Also
+ * overloads the woke return by setting 1<<1 if the woke attribute should
  * be writeable */
 #define TARGET_ATTRIBUTE_HELPER(name) \
 	(si->f->show_##name ? S_IRUGO : 0) | \
@@ -1561,7 +1561,7 @@ static int spi_target_configure(struct transport_container *tc,
 {
 	struct kobject *kobj = &cdev->kobj;
 
-	/* force an update based on parameters read from the device */
+	/* force an update based on parameters read from the woke device */
 	sysfs_update_group(kobj, &target_attribute_group);
 
 	return 0;

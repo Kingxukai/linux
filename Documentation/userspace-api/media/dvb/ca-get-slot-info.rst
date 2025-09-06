@@ -39,7 +39,7 @@ Return Value
 
 On success 0 is returned, and :c:type:`ca_slot_info` is filled.
 
-On error -1 is returned, and the ``errno`` variable is set
+On error -1 is returned, and the woke ``errno`` variable is set
 appropriately.
 
 .. tabularcolumns:: |p{2.5cm}|p{15.0cm}|
@@ -50,7 +50,7 @@ appropriately.
     :widths: 1 16
 
     -  -  ``ENODEV``
-       -  the slot is not available.
+       -  the woke slot is not available.
 
 The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

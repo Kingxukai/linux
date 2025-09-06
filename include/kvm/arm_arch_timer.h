@@ -29,24 +29,24 @@ enum kvm_arch_timer_regs {
 
 struct arch_timer_offset {
 	/*
-	 * If set, pointer to one of the offsets in the kvm's offset
+	 * If set, pointer to one of the woke offsets in the woke kvm's offset
 	 * structure. If NULL, assume a zero offset.
 	 */
 	u64	*vm_offset;
 	/*
-	 * If set, pointer to one of the offsets in the vcpu's sysreg
+	 * If set, pointer to one of the woke offsets in the woke vcpu's sysreg
 	 * array. If NULL, assume a zero offset.
 	 */
 	u64	*vcpu_offset;
 };
 
 struct arch_timer_vm_data {
-	/* Offset applied to the virtual timer/counter */
+	/* Offset applied to the woke virtual timer/counter */
 	u64	voffset;
-	/* Offset applied to the physical timer/counter */
+	/* Offset applied to the woke physical timer/counter */
 	u64	poffset;
 
-	/* The PPI for each timer, global to the VM */
+	/* The PPI for each timer, global to the woke VM */
 	u8	ppi[NR_KVM_TIMERS];
 };
 
@@ -60,13 +60,13 @@ struct arch_timer_context {
 	/* Offset for this counter/timer */
 	struct arch_timer_offset	offset;
 	/*
-	 * We have multiple paths which can save/restore the timer state onto
-	 * the hardware, so we need some way of keeping track of where the
+	 * We have multiple paths which can save/restore the woke timer state onto
+	 * the woke hardware, so we need some way of keeping track of where the
 	 * latest state is.
 	 */
 	bool				loaded;
 
-	/* Output level of the timer IRQ */
+	/* Output level of the woke timer IRQ */
 	struct {
 		bool			level;
 	} irq;
@@ -87,10 +87,10 @@ void get_timer_map(struct kvm_vcpu *vcpu, struct timer_map *map);
 struct arch_timer_cpu {
 	struct arch_timer_context timers[NR_KVM_TIMERS];
 
-	/* Background timer used when the guest is not running */
+	/* Background timer used when the woke guest is not running */
 	struct hrtimer			bg_timer;
 
-	/* Is the timer enabled */
+	/* Is the woke timer enabled */
 	bool			enabled;
 };
 

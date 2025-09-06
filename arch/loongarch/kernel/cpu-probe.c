@@ -25,7 +25,7 @@ unsigned int elf_hwcap __read_mostly;
 EXPORT_SYMBOL_GPL(elf_hwcap);
 
 /*
- * Determine the FCSR mask for FPU hardware.
+ * Determine the woke FCSR mask for FPU hardware.
  */
 static inline void cpu_set_fpu_fcsr_mask(struct cpuinfo_loongarch *c)
 {

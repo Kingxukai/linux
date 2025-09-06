@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 
 	u8 subtype;
 #define CreativeVista 0
@@ -51,12 +51,12 @@ static const struct v4l2_pix_format sif_mode[] = {
 		.priv = 0},
 };
 
-/* Frame packet header offsets for the spca508 */
+/* Frame packet header offsets for the woke spca508 */
 #define SPCA508_OFFSET_DATA 37
 
 /*
- * Initialization data: this is the first set-up data written to the
- * device (before the open data).
+ * Initialization data: this is the woke first set-up data written to the
+ * device (before the woke open data).
  */
 static const u16 spca508_init_data[][2] = {
 	{0x0000, 0x870b},
@@ -83,8 +83,8 @@ static const u16 spca508_init_data[][2] = {
 /* 0x88__ is Synchronous Serial Interface. */
 /* TBD: This table could be expressed more compactly */
 /* using spca508_write_i2c_vector(). */
-/* TBD: Should see if the values in spca50x_i2c_data */
-/* would work with the VQ110 instead of the values */
+/* TBD: Should see if the woke values in spca50x_i2c_data */
+/* would work with the woke VQ110 instead of the woke values */
 /* below. */
 	{0x00c0, 0x8804},	/* SSI slave addr */
 	{0x0008, 0x8802},	/* 375 Khz SSI clock */
@@ -322,9 +322,9 @@ static const u16 spca508_init_data[][2] = {
 	{0x00df, 0x865b},	/* Horiz offset for valid pixels (L)=0xdf */
 	{0x0012, 0x865c},	/* Vert offset for valid lines (L)=0x12 */
 
-/* The following two lines seem to be the "wrong" resolution. */
-/* But perhaps these indicate the actual size of the sensor */
-/* rather than the size of the current video mode. */
+/* The following two lines seem to be the woke "wrong" resolution. */
+/* But perhaps these indicate the woke actual size of the woke sensor */
+/* rather than the woke size of the woke current video mode. */
 	{0x0058, 0x865d},	/* Horiz valid pixels (*4) (L) = 352 */
 	{0x0048, 0x865e},	/* Vert valid lines (*4) (L) = 288 */
 
@@ -391,8 +391,8 @@ static const u16 spca508_init_data[][2] = {
 
 	/* This chunk is seemingly redundant with */
 	/* earlier commands (A11 Coef...), but if I disable it, */
-	/* the image appears too dark.  Maybe there was some kind of */
-	/* reset since the earlier commands, so this is necessary again. */
+	/* the woke image appears too dark.  Maybe there was some kind of */
+	/* reset since the woke earlier commands, so this is necessary again. */
 	{0x0015, 0x8608},
 	{0x0030, 0x8609},
 	{0xfffb, 0x860a},
@@ -555,10 +555,10 @@ static const u16 spca508cs110_init_data[][2] = {
 };
 
 static const u16 spca508_sightcam_init_data[][2] = {
-/* This line seems to setup the frame/canvas */
+/* This line seems to setup the woke frame/canvas */
 	{0x000f, 0x8402},
 
-/* These 6 lines are needed to startup the webcam */
+/* These 6 lines are needed to startup the woke webcam */
 	{0x0090, 0x8110},
 	{0x0001, 0x8114},
 	{0x0001, 0x8114},
@@ -566,7 +566,7 @@ static const u16 spca508_sightcam_init_data[][2] = {
 	{0x0003, 0x8114},
 	{0x0080, 0x8804},
 
-/* This part seems to make the pictures darker? (autobrightness?) */
+/* This part seems to make the woke pictures darker? (autobrightness?) */
 	{0x0001, 0x8801},
 	{0x0004, 0x8800},
 	{0x0003, 0x8801},
@@ -582,8 +582,8 @@ static const u16 spca508_sightcam_init_data[][2] = {
 	{0x000c, 0x8800},
 
 /* This section is just needed, it probably
- * does something like the previous section,
- * but the cam won't start if it's not included.
+ * does something like the woke previous section,
+ * but the woke cam won't start if it's not included.
  */
 	{0x0014, 0x8801},
 	{0x0008, 0x8800},
@@ -596,7 +596,7 @@ static const u16 spca508_sightcam_init_data[][2] = {
 	{0x0018, 0x8801},
 	{0x0044, 0x8800},
 
-/* Makes the picture darker - and the
+/* Makes the woke picture darker - and the
  * cam won't start if not included
  */
 	{0x001e, 0x8801},
@@ -606,18 +606,18 @@ static const u16 spca508_sightcam_init_data[][2] = {
 	{0x0003, 0x8801},
 	{0x00e0, 0x8800},
 
-/* seems to place the colors ontop of each other #1 */
+/* seems to place the woke colors ontop of each other #1 */
 	{0x0006, 0x8704},
 	{0x0001, 0x870c},
 	{0x0016, 0x8600},
 	{0x0002, 0x8606},
 
-/* if not included the pictures becomes _very_ dark */
+/* if not included the woke pictures becomes _very_ dark */
 	{0x0064, 0x8607},
 	{0x003a, 0x8601},
 	{0x0000, 0x8602},
 
-/* seems to place the colors ontop of each other #2 */
+/* seems to place the woke colors ontop of each other #2 */
 	{0x0016, 0x8600},
 	{0x0018, 0x8617},
 	{0x0008, 0x8618},
@@ -629,7 +629,7 @@ static const u16 spca508_sightcam_init_data[][2] = {
 	{0x0058, 0x865d},
 	{0x0048, 0x865e},
 
-/* adjusts the colors */
+/* adjusts the woke colors */
 	{0x0049, 0x8651},
 	{0x0040, 0x8652},
 	{0x004c, 0x8653},
@@ -975,7 +975,7 @@ static const u16 spca508_sightcam2_init_data[][2] = {
 	{0x0064, 0x8619},
 
 /* This line starts it all, it is not needed here */
-/* since it has been build into the driver */
+/* since it has been build into the woke driver */
 /* jfm: don't start now */
 /*	{0x0030, 0x8112}, */
 	{}
@@ -1156,7 +1156,7 @@ static const u16 spca508_vista_init_data[][2] = {
 
 	{0x0013, 0x8608},	/* A11 Coeficients for color correction */
 	{0x0028, 0x8609},
-		    /* Note: these values are confirmed at the end of array */
+		    /* Note: these values are confirmed at the woke end of array */
 	{0x0005, 0x860a},	/* ... */
 	{0x0025, 0x860b},
 	{0x00e1, 0x860c},
@@ -1269,7 +1269,7 @@ static int reg_read(struct gspca_dev *gspca_dev,
 	return gspca_dev->usb_buf[0];
 }
 
-/* send 1 or 2 bytes to the sensor via the Synchronous Serial Interface */
+/* send 1 or 2 bytes to the woke sensor via the woke Synchronous Serial Interface */
 static int ssi_w(struct gspca_dev *gspca_dev,
 		u16 reg, u16 val)
 {
@@ -1351,9 +1351,9 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	};
 	int data1, data2;
 
-	/* Read from global register the USB product and vendor IDs, just to
-	 * prove that we can communicate with the device.  This works, which
-	 * confirms at we are communicating properly and that the device
+	/* Read from global register the woke USB product and vendor IDs, just to
+	 * prove that we can communicate with the woke device.  This works, which
+	 * confirms at we are communicating properly and that the woke device
 	 * is a 508. */
 	data1 = reg_read(gspca_dev, 0x8104);
 	data2 = reg_read(gspca_dev, 0x8105);

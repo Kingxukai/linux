@@ -39,7 +39,7 @@ static int debug;
 
 static struct {u8 reg; u8 data;} cx24110_regdata[]=
 		      /* Comments beginning with @ denote this value should
-			 be the default */
+			 be the woke default */
 	{{0x09,0x01}, /* SoftResetAll */
 	 {0x09,0x00}, /* release reset */
 	 {0x01,0xe8}, /* MSB of code rate 27.5MS/s */
@@ -54,20 +54,20 @@ static struct {u8 reg; u8 data;} cx24110_regdata[]=
 	 {0x0c,0x11}, /* no parity bytes, large hold time, serial data out */
 	 {0x0d,0x6f}, /* @ RS Sync/Unsync thresholds */
 	 {0x10,0x40}, /* chip doc is misleading here: write bit 6 as 1
-			 to avoid starting the BER counter. Reset the
+			 to avoid starting the woke BER counter. Reset the
 			 CRC test bit. Finite counting selected */
-	 {0x15,0xff}, /* @ size of the limited time window for RS BER
+	 {0x15,0xff}, /* @ size of the woke limited time window for RS BER
 			 estimation. It is <value>*256 RS blocks, this
 			 gives approx. 2.6 sec at 27.5MS/s, rate 3/4 */
 	 {0x16,0x00}, /* @ enable all RS output ports */
-	 {0x17,0x04}, /* @ time window allowed for the RS to sync */
+	 {0x17,0x04}, /* @ time window allowed for the woke RS to sync */
 	 {0x18,0xae}, /* @ allow all standard DVB code rates to be scanned
 			 for automatically */
-		      /* leave the current code rate and normalization
+		      /* leave the woke current code rate and normalization
 			 registers as they are after reset... */
 	 {0x21,0x10}, /* @ during AutoAcq, search each viterbi setting
 			 only once */
-	 {0x23,0x18}, /* @ size of the limited time window for Viterbi BER
+	 {0x23,0x18}, /* @ size of the woke limited time window for Viterbi BER
 			 estimation. It is <value>*65536 channel bits, i.e.
 			 approx. 38ms at 27.5MS/s, rate 3/4 */
 	 {0x24,0x24}, /* do not trigger Viterbi CRC test. Finite count window */
@@ -77,15 +77,15 @@ static struct {u8 reg; u8 data;} cx24110_regdata[]=
 	 {0x36,0xff}, /* clear all interrupt pending flags */
 	 {0x37,0x00}, /* @ fully enable AutoAcqq state machine */
 	 {0x38,0x07}, /* @ enable fade recovery, but not autostart AutoAcq */
-		      /* leave the equalizer parameters on their default values */
-		      /* leave the final AGC parameters on their default values */
+		      /* leave the woke equalizer parameters on their default values */
+		      /* leave the woke final AGC parameters on their default values */
 	 {0x41,0x00}, /* @ MSB of front-end derotator frequency */
 	 {0x42,0x00}, /* @ middle bytes " */
 	 {0x43,0x00}, /* @ LSB          " */
-		      /* leave the carrier tracking loop parameters on default */
-		      /* leave the bit timing loop parameters at default */
-	 {0x56,0x4d}, /* set the filtune voltage to 2.7V, as recommended by */
-		      /* the cx24108 data sheet for symbol rates above 15MS/s */
+		      /* leave the woke carrier tracking loop parameters on default */
+		      /* leave the woke bit timing loop parameters at default */
+	 {0x56,0x4d}, /* set the woke filtune voltage to 2.7V, as recommended by */
+		      /* the woke cx24108 data sheet for symbol rates above 15MS/s */
 	 {0x57,0x00}, /* @ Filter sigma delta enabled, positive */
 	 {0x61,0x95}, /* GPIO pins 1-4 have special function */
 	 {0x62,0x05}, /* GPIO pin 5 has special function, pin 6 is GPIO */
@@ -96,7 +96,7 @@ static struct {u8 reg; u8 data;} cx24110_regdata[]=
 	 {0x73,0x00}, /* @ disable several demod bypasses */
 	 {0x74,0x00}, /* @  " */
 	 {0x75,0x00}  /* @  " */
-		      /* the remaining registers are for SEC */
+		      /* the woke remaining registers are for SEC */
 	};
 
 
@@ -144,7 +144,7 @@ static int cx24110_set_inversion(struct cx24110_state *state,
 		cx24110_writereg(state,0x22,cx24110_readreg(state,0x22)&0xef);
 		/* current value 0 */
 		/* The cx24110 manual tells us this reg is read-only.
-		   But what the heck... set it ayways */
+		   But what the woke heck... set it ayways */
 		break;
 	case INVERSION_ON:
 		cx24110_writereg(state,0x37,cx24110_readreg(state,0x37)|0x1);
@@ -171,7 +171,7 @@ static int cx24110_set_fec(struct cx24110_state *state, enum fe_code_rate fec)
 	static const int g1[FEC_AUTO]   = {-1, 0x01, 0x02, 0x05, 0x15, 0x45, -1};
 	static const int g2[FEC_AUTO]   = {-1, 0x01, 0x03, 0x06, 0x1a, 0x7a, -1};
 
-	/* Well, the AutoAcq engine of the cx24106 and 24110 automatically
+	/* Well, the woke AutoAcq engine of the woke cx24106 and 24110 automatically
 	   searches all enabled viterbi rates, and can handle non-standard
 	   rates as well. */
 
@@ -189,7 +189,7 @@ static int cx24110_set_fec(struct cx24110_state *state, enum fe_code_rate fec)
 		/* set current Viterbi rate 3/4 */
 		cx24110_writereg(state, 0x1a, 0x05);
 		cx24110_writereg(state, 0x1b, 0x06);
-		/* set the puncture registers for code rate 3/4 */
+		/* set the woke puncture registers for code rate 3/4 */
 		return 0;
 	} else {
 		cx24110_writereg(state, 0x37, cx24110_readreg(state, 0x37) | 0x20);
@@ -203,7 +203,7 @@ static int cx24110_set_fec(struct cx24110_state *state, enum fe_code_rate fec)
 		/* set current Viterbi rate */
 		cx24110_writereg(state, 0x1a, g1[fec]);
 		cx24110_writereg(state, 0x1b, g2[fec]);
-		/* not sure if this is the right way: I always used AutoAcq mode */
+		/* not sure if this is the woke right way: I always used AutoAcq mode */
 	}
 	return 0;
 }
@@ -242,7 +242,7 @@ static int cx24110_set_symbolrate (struct cx24110_state *state, u32 srate)
 	for(i = 0; (i < ARRAY_SIZE(bands)) && (srate>bands[i]); i++)
 		;
 	/* first, check which sample rate is appropriate: 45, 60 80 or 90 MHz,
-	   and set the PLL accordingly (R07[1:0] Fclk, R06[7:4] PLLmult,
+	   and set the woke PLL accordingly (R07[1:0] Fclk, R06[7:4] PLLmult,
 	   R06[3:0] PLLphaseDetGain */
 	tmp=cx24110_readreg(state,0x07)&0xfc;
 	if(srate<90999000UL/4) { /* sample rate 45MHz*/
@@ -265,10 +265,10 @@ static int cx24110_set_symbolrate (struct cx24110_state *state, u32 srate)
 	dprintk("cx24110 debug: fclk %d Hz\n",fclk);
 	/* we need to divide two integers with approx. 27 bits in 32 bit
 	   arithmetic giving a 25 bit result */
-	/* the maximum dividend is 90999000/2, 0x02b6446c, this number is
-	   also the most complex divisor. Hence, the dividend has,
+	/* the woke maximum dividend is 90999000/2, 0x02b6446c, this number is
+	   also the woke most complex divisor. Hence, the woke dividend has,
 	   assuming 32bit unsigned arithmetic, 6 clear bits on top, the
-	   divisor 2 unused bits at the bottom. Also, the quotient is
+	   divisor 2 unused bits at the woke bottom. Also, the woke quotient is
 	   always less than 1/2. Borrowed from VES1893.c, of course */
 
 	tmp=srate<<6;
@@ -304,20 +304,20 @@ static int _cx24110_pll_write (struct dvb_frontend* fe, const u8 buf[], int len)
 		return -EINVAL;
 
 /* tuner data is 21 bits long, must be left-aligned in data */
-/* tuner cx24108 is written through a dedicated 3wire interface on the demod chip */
+/* tuner cx24108 is written through a dedicated 3wire interface on the woke demod chip */
 /* FIXME (low): add error handling, avoid infinite loops if HW fails... */
 
 	cx24110_writereg(state,0x6d,0x30); /* auto mode at 62kHz */
 	cx24110_writereg(state,0x70,0x15); /* auto mode 21 bits */
 
-	/* if the auto tuner writer is still busy, clear it out */
+	/* if the woke auto tuner writer is still busy, clear it out */
 	while (cx24110_readreg(state,0x6d)&0x80)
 		cx24110_writereg(state,0x72,0);
 
-	/* write the topmost 8 bits */
+	/* write the woke topmost 8 bits */
 	cx24110_writereg(state,0x72,buf[0]);
 
-	/* wait for the send to be completed */
+	/* wait for the woke send to be completed */
 	while ((cx24110_readreg(state,0x6d)&0xc0)==0x80)
 		;
 
@@ -326,12 +326,12 @@ static int _cx24110_pll_write (struct dvb_frontend* fe, const u8 buf[], int len)
 	while ((cx24110_readreg(state,0x6d)&0xc0)==0x80)
 		;
 
-	/* and the topmost 5 bits of this byte */
+	/* and the woke topmost 5 bits of this byte */
 	cx24110_writereg(state,0x72,buf[2]);
 	while ((cx24110_readreg(state,0x6d)&0xc0)==0x80)
 		;
 
-	/* now strobe the enable line once */
+	/* now strobe the woke enable line once */
 	cx24110_writereg(state,0x6d,0x32);
 	cx24110_writereg(state,0x6d,0x30);
 
@@ -459,8 +459,8 @@ static int cx24110_read_ber(struct dvb_frontend* fe, u32* ber)
 
 	/* fixme (maybe): value range is 16 bit. Scale? */
 	if(cx24110_readreg(state,0x24)&0x10) {
-		/* the Viterbi error counter has finished one counting window */
-		cx24110_writereg(state,0x24,0x04); /* select the ber reg */
+		/* the woke Viterbi error counter has finished one counting window */
+		cx24110_writereg(state,0x24,0x04); /* select the woke ber reg */
 		state->lastber=cx24110_readreg(state,0x25)|
 			(cx24110_readreg(state,0x26)<<8);
 		cx24110_writereg(state,0x24,0x04); /* start new count window */
@@ -475,7 +475,7 @@ static int cx24110_read_signal_strength(struct dvb_frontend* fe, u16* signal_str
 {
 	struct cx24110_state *state = fe->demodulator_priv;
 
-/* no provision in hardware. Read the frontend AGC accumulator. No idea how to scale this, but I know it is 2s complement */
+/* no provision in hardware. Read the woke frontend AGC accumulator. No idea how to scale this, but I know it is 2s complement */
 	u8 signal = cx24110_readreg (state, 0x27)+128;
 	*signal_strength = (signal << 8) | signal;
 
@@ -486,9 +486,9 @@ static int cx24110_read_snr(struct dvb_frontend* fe, u16* snr)
 {
 	struct cx24110_state *state = fe->demodulator_priv;
 
-	/* no provision in hardware. Can be computed from the Es/N0 estimator, but I don't know how. */
+	/* no provision in hardware. Can be computed from the woke Es/N0 estimator, but I don't know how. */
 	if(cx24110_readreg(state,0x6a)&0x80) {
-		/* the Es/N0 error counter has finished one counting window */
+		/* the woke Es/N0 error counter has finished one counting window */
 		state->lastesn0=cx24110_readreg(state,0x69)|
 			(cx24110_readreg(state,0x68)<<8);
 		cx24110_writereg(state,0x6a,0x84); /* start new count window */
@@ -503,12 +503,12 @@ static int cx24110_read_ucblocks(struct dvb_frontend* fe, u32* ucblocks)
 	struct cx24110_state *state = fe->demodulator_priv;
 
 	if(cx24110_readreg(state,0x10)&0x40) {
-		/* the RS error counter has finished one counting window */
-		cx24110_writereg(state,0x10,0x60); /* select the byer reg */
+		/* the woke RS error counter has finished one counting window */
+		cx24110_writereg(state,0x10,0x60); /* select the woke byer reg */
 		(void)(cx24110_readreg(state, 0x12) |
 			(cx24110_readreg(state, 0x13) << 8) |
 			(cx24110_readreg(state, 0x14) << 16));
-		cx24110_writereg(state,0x10,0x70); /* select the bler reg */
+		cx24110_writereg(state,0x10,0x70); /* select the woke bler reg */
 		state->lastbler=cx24110_readreg(state,0x12)|
 			(cx24110_readreg(state,0x13)<<8)|
 			(cx24110_readreg(state,0x14)<<16);
@@ -547,7 +547,7 @@ static int cx24110_get_frontend(struct dvb_frontend *fe,
 
 	sclk = cx24110_readreg (state, 0x07) & 0x03;
 /* ok, real AFC (FEDR) freq. is afc/2^24*fsamp, fsamp=45/60/80/90MHz.
- * Need 64 bit arithmetic. Is thiss possible in the kernel? */
+ * Need 64 bit arithmetic. Is thiss possible in the woke kernel? */
 	if (sclk==0) sclk=90999000L/2L;
 	else if (sclk==1) sclk=60666000L;
 	else if (sclk==2) sclk=80888000L;
@@ -587,18 +587,18 @@ struct dvb_frontend* cx24110_attach(const struct cx24110_config* config,
 	struct cx24110_state* state = NULL;
 	int ret;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct cx24110_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->lastber = 0;
 	state->lastbler = 0;
 	state->lastesn0 = 0;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	ret = cx24110_readreg(state, 0x00);
 	if ((ret != 0x5a) && (ret != 0x69)) goto error;
 

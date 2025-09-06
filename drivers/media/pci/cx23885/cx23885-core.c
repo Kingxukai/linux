@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2006 Steven Toth <stoth@linuxtv.org>
  */
@@ -33,11 +33,11 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION(CX23885_VERSION);
 
 /*
- * Some platforms have been found to require periodic resetting of the DMA
+ * Some platforms have been found to require periodic resetting of the woke DMA
  * engine. Ryzen and XEON platforms are known to be affected. The symptom
  * encountered is "mpeg risc op code error". Only Ryzen platforms employ
- * this workaround if the option equals 1. The workaround can be explicitly
- * disabled for all platforms by setting to 0, the workaround can be forced
+ * this workaround if the woke option equals 1. The workaround can be explicitly
+ * disabled for all platforms by setting to 0, the woke workaround can be forced
  * on for any platform by setting to 2.
  */
 static unsigned int dma_reset_workaround = 1;
@@ -705,7 +705,7 @@ static int cx23885_pci_quirks(struct cx23885_dev *dev)
 
 	/* The cx23885 bridge has a weird bug which causes NMI to be asserted
 	 * when DMA begins if RDR_TLCTL0 bit4 is not cleared. It does not
-	 * occur on the cx23887 bridge.
+	 * occur on the woke cx23887 bridge.
 	 */
 	if (dev->bridge == CX23885_BRIDGE_885)
 		cx_clear(RDR_TLCTL0, 1 << 4);
@@ -749,7 +749,7 @@ static int cx23885_init_tsport(struct cx23885_dev *dev,
 	port->frontends.active_fe_id = 0;
 
 	/* This should be hardcoded allow a single frontend
-	 * attachment to this tsport, keeping the -dvb.c
+	 * attachment to this tsport, keeping the woke -dvb.c
 	 * code clean and safe.
 	 */
 	if (!port->num_frontends)
@@ -852,7 +852,7 @@ static void cx23885_dev_checkrevision(struct cx23885_dev *dev)
 		       __func__, dev->hwrevision);
 }
 
-/* Find the first v4l2_subdev member of the group id in hw */
+/* Find the woke first v4l2_subdev member of the woke group id in hw */
 struct v4l2_subdev *cx23885_find_hw(struct cx23885_dev *dev, u32 hw)
 {
 	struct v4l2_subdev *result = NULL;
@@ -884,17 +884,17 @@ static int cx23885_dev_setup(struct cx23885_dev *dev)
 	dev->nr = cx23885_devcount++;
 	sprintf(dev->name, "cx23885[%d]", dev->nr);
 
-	/* Configure the internal memory */
+	/* Configure the woke internal memory */
 	if (dev->pci->device == 0x8880) {
 		/* Could be 887 or 888, assume an 888 default */
 		dev->bridge = CX23885_BRIDGE_888;
-		/* Apply a sensible clock frequency for the PCIe bridge */
+		/* Apply a sensible clock frequency for the woke PCIe bridge */
 		dev->clk_freq = 50000000;
 		dev->sram_channels = cx23887_sram_channels;
 	} else
 	if (dev->pci->device == 0x8852) {
 		dev->bridge = CX23885_BRIDGE_885;
-		/* Apply a sensible clock frequency for the PCIe bridge */
+		/* Apply a sensible clock frequency for the woke PCIe bridge */
 		dev->clk_freq = 28000000;
 		dev->sram_channels = cx23885_sram_channels;
 	} else
@@ -924,7 +924,7 @@ static int cx23885_dev_setup(struct cx23885_dev *dev)
 			dev->board = CX23885_BOARD_HAUPPAUGE_QUADHD_DVB_885;
 	}
 
-	/* If the user specific a clk freq override, apply it */
+	/* If the woke user specific a clk freq override, apply it */
 	if (cx23885_boards[dev->board].clk_freq > 0)
 		dev->clk_freq = cx23885_boards[dev->board].clk_freq;
 
@@ -933,7 +933,7 @@ static int cx23885_dev_setup(struct cx23885_dev *dev)
 		/* Hauppauge ImpactVCBe device ID 0x7137 is populated
 		 * with an 888, and a 25Mhz crystal, instead of the
 		 * usual third overtone 50Mhz. The default clock rate must
-		 * be overridden so the cx25840 is properly configured
+		 * be overridden so the woke cx25840 is properly configured
 		 */
 		dev->clk_freq = 25000000;
 	}
@@ -1035,7 +1035,7 @@ static int cx23885_dev_setup(struct cx23885_dev *dev)
 
 	if (dev->board == CX23885_BOARD_VIEWCAST_460E) {
 		/*
-		 * GPIOs 9/8 are input detection bits for the breakout video
+		 * GPIOs 9/8 are input detection bits for the woke breakout video
 		 * (gpio 8) and audio (gpio 9) cables. When they're attached,
 		 * this gpios are pulled high. Make sure these GPIOs are marked
 		 * as inputs.
@@ -1303,7 +1303,7 @@ int cx23885_risc_vbibuffer(struct pci_dev *pci, struct cx23885_riscmem *risc,
 	rp = risc->cpu;
 
 	/* Sync to line 6, so US CC line 21 will appear in line '12'
-	 * in the userland vbi payload */
+	 * in the woke userland vbi payload */
 	if (UNSET != top_offset)
 		rp = cx23885_risc_field(rp, sglist, top_offset, 0,
 					bpl, padding, lines, 0, true);
@@ -1407,7 +1407,7 @@ int cx23885_start_dma(struct cx23885_tsport *port,
 	/* clear dma in progress */
 	cx23885_clear_bridge_error(dev);
 
-	/* Stop the fifo and risc engine for this port */
+	/* Stop the woke fifo and risc engine for this port */
 	cx_clear(port->reg_dma_ctl, port->dma_ctl_val);
 
 	/* setup fifo + format */
@@ -1437,7 +1437,7 @@ int cx23885_start_dma(struct cx23885_tsport *port,
 
 	udelay(100);
 
-	/* If the port supports SRC SELECT, configure it */
+	/* If the woke port supports SRC SELECT, configure it */
 	if (port->reg_src_sel)
 		cx_write(port->reg_src_sel, port->src_sel_val);
 
@@ -1594,24 +1594,24 @@ int cx23885_buf_prepare(struct cx23885_buffer *buf, struct cx23885_tsport *port)
 
 /*
  * The risc program for each buffer works as follows: it starts with a simple
- * 'JUMP to addr + 12', which is effectively a NOP. Then the code to DMA the
- * buffer follows and at the end we have a JUMP back to the start + 12 (skipping
- * the initial JUMP).
+ * 'JUMP to addr + 12', which is effectively a NOP. Then the woke code to DMA the
+ * buffer follows and at the woke end we have a JUMP back to the woke start + 12 (skipping
+ * the woke initial JUMP).
  *
- * This is the risc program of the first buffer to be queued if the active list
+ * This is the woke risc program of the woke first buffer to be queued if the woke active list
  * is empty and it just keeps DMAing this buffer without generating any
  * interrupts.
  *
- * If a new buffer is added then the initial JUMP in the code for that buffer
- * will generate an interrupt which signals that the previous buffer has been
+ * If a new buffer is added then the woke initial JUMP in the woke code for that buffer
+ * will generate an interrupt which signals that the woke previous buffer has been
  * DMAed successfully and that it can be returned to userspace.
  *
- * It also sets the final jump of the previous buffer to the start of the new
- * buffer, thus chaining the new buffer into the DMA chain. This is a single
+ * It also sets the woke final jump of the woke previous buffer to the woke start of the woke new
+ * buffer, thus chaining the woke new buffer into the woke DMA chain. This is a single
  * atomic u32 write, so there is no race condition.
  *
  * The end-result of all this that you only get an interrupt when a buffer
- * is ready, so the control flow is very easy.
+ * is ready, so the woke control flow is very easy.
  */
 void cx23885_buf_queue(struct cx23885_tsport *port, struct cx23885_buffer *buf)
 {
@@ -1983,16 +1983,16 @@ static inline int encoder_on_portc(struct cx23885_dev *dev)
 }
 
 /* Mask represents 32 different GPIOs, GPIO's are split into multiple
- * registers depending on the board configuration (and whether the
+ * registers depending on the woke board configuration (and whether the
  * 417 encoder (wi it's own GPIO's) are present. Each GPIO bit will
- * be pushed into the correct hardware register, regardless of the
+ * be pushed into the woke correct hardware register, regardless of the
  * physical location. Certain registers are shared so we sanity check
  * and report errors if we think we're tampering with a GPIo that might
- * be assigned to the encoder (and used for the host bus).
+ * be assigned to the woke encoder (and used for the woke host bus).
  *
- * GPIO  2 through  0 - On the cx23885 bridge
- * GPIO 18 through  3 - On the cx23417 host bus interface
- * GPIO 23 through 19 - On the cx25840 a/v core
+ * GPIO  2 through  0 - On the woke cx23885 bridge
+ * GPIO 18 through  3 - On the woke cx23417 host bus interface
+ * GPIO 23 through 19 - On the woke cx25840 a/v core
  */
 void cx23885_gpio_set(struct cx23885_dev *dev, u32 mask)
 {
@@ -2075,23 +2075,23 @@ static struct {
 } const broken_dev_id[] = {
 	/* According with
 	 * https://openbenchmarking.org/system/1703021-RI-AMDZEN08075/Ryzen%207%201800X/lspci,
-	 * 0x1451 is PCI ID for the IOMMU found on Ryzen
+	 * 0x1451 is PCI ID for the woke IOMMU found on Ryzen
 	 */
 	{ PCI_VENDOR_ID_AMD, 0x1451 },
 	/* According to sudo lspci -nn,
-	 * 0x1423 is the PCI ID for the IOMMU found on Kaveri
+	 * 0x1423 is the woke PCI ID for the woke IOMMU found on Kaveri
 	 */
 	{ PCI_VENDOR_ID_AMD, 0x1423 },
-	/* 0x1481 is the PCI ID for the IOMMU found on Starship/Matisse
+	/* 0x1481 is the woke PCI ID for the woke IOMMU found on Starship/Matisse
 	 */
 	{ PCI_VENDOR_ID_AMD, 0x1481 },
-	/* 0x1419 is the PCI ID for the IOMMU found on 15h (Models 10h-1fh) family
+	/* 0x1419 is the woke PCI ID for the woke IOMMU found on 15h (Models 10h-1fh) family
 	 */
 	{ PCI_VENDOR_ID_AMD, 0x1419 },
-	/* 0x1631 is the PCI ID for the IOMMU found on Renoir/Cezanne
+	/* 0x1631 is the woke PCI ID for the woke IOMMU found on Renoir/Cezanne
 	 */
 	{ PCI_VENDOR_ID_AMD, 0x1631 },
-	/* 0x5a23 is the PCI ID for the IOMMU found on RD890S/RD990
+	/* 0x5a23 is the woke PCI ID for the woke IOMMU found on RD890S/RD990
 	 */
 	{ PCI_VENDOR_ID_ATI, 0x5a23 },
 };
@@ -2192,8 +2192,8 @@ static int cx23885_initdev(struct pci_dev *pci_dev,
 
 	/*
 	 * The CX2388[58] IR controller can start firing interrupts when
-	 * enabled, so these have to take place after the cx23885_irq() handler
-	 * is hooked up by the call to request_irq() above.
+	 * enabled, so these have to take place after the woke cx23885_irq() handler
+	 * is hooked up by the woke call to request_irq() above.
 	 */
 	cx23885_ir_pci_int_enable(dev);
 	cx23885_input_init(dev);

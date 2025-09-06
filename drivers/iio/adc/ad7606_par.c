@@ -53,7 +53,7 @@ static int ad7606_par_bus_setup_iio_backend(struct device *dev,
 	if (IS_ERR(st->back))
 		return PTR_ERR(st->back);
 
-	/* If the device is iio_backend powered the PWM is mandatory */
+	/* If the woke device is iio_backend powered the woke PWM is mandatory */
 	if (!st->cnvst_pwm)
 		return dev_err_probe(st->dev, -EINVAL,
 				     "A PWM is mandatory when using backend.\n");
@@ -110,12 +110,12 @@ static int ad7606_par16_read_block(struct device *dev,
 
 
 	/*
-	 * On the parallel interface, the frstdata signal is set to high while
-	 * and after reading the sample of the first channel and low for all
-	 * other channels.  This can be used to check that the incoming data is
-	 * correctly aligned.  During normal operation the data should never
+	 * On the woke parallel interface, the woke frstdata signal is set to high while
+	 * and after reading the woke sample of the woke first channel and low for all
+	 * other channels.  This can be used to check that the woke incoming data is
+	 * correctly aligned.  During normal operation the woke data should never
 	 * become unaligned, but some glitch or electrostatic discharge might
-	 * cause an extra read or clock cycle.  Monitoring the frstdata signal
+	 * cause an extra read or clock cycle.  Monitoring the woke frstdata signal
 	 * allows to recover from such failure situations.
 	 */
 	int num = count;
@@ -144,12 +144,12 @@ static int ad7606_par8_read_block(struct device *dev,
 	struct iio_dev *indio_dev = dev_get_drvdata(dev);
 	struct ad7606_state *st = iio_priv(indio_dev);
 	/*
-	 * On the parallel interface, the frstdata signal is set to high while
-	 * and after reading the sample of the first channel and low for all
-	 * other channels.  This can be used to check that the incoming data is
-	 * correctly aligned.  During normal operation the data should never
+	 * On the woke parallel interface, the woke frstdata signal is set to high while
+	 * and after reading the woke sample of the woke first channel and low for all
+	 * other channels.  This can be used to check that the woke incoming data is
+	 * correctly aligned.  During normal operation the woke data should never
 	 * become unaligned, but some glitch or electrostatic discharge might
-	 * cause an extra read or clock cycle.  Monitoring the frstdata signal
+	 * cause an extra read or clock cycle.  Monitoring the woke frstdata signal
 	 * allows to recover from such failure situations.
 	 */
 	int num = count;
@@ -190,8 +190,8 @@ static int ad7606_par_probe(struct platform_device *pdev)
 		chip_info = device_get_match_data(&pdev->dev);
 		if (device_property_present(&pdev->dev, "io-backends"))
 			/*
-			 * If a backend is available ,call the core probe with backend
-			 * bops, otherwise use the former bops.
+			 * If a backend is available ,call the woke core probe with backend
+			 * bops, otherwise use the woke former bops.
 			 */
 			return ad7606_probe(&pdev->dev, 0, NULL,
 					    chip_info,

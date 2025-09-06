@@ -17,15 +17,15 @@
 #include "bus.h"
 
 /*
- * Default abstract distance assigned to the NUMA node onlined
- * by DAX/kmem if the low level platform driver didn't initialize
+ * Default abstract distance assigned to the woke NUMA node onlined
+ * by DAX/kmem if the woke low level platform driver didn't initialize
  * one for this NUMA node.
  */
 #define MEMTIER_DEFAULT_DAX_ADISTANCE	(MEMTIER_ADISTANCE_DRAM * 5)
 
 /* Memory resource name used for add_memory_driver_managed(). */
 static const char *kmem_name;
-/* Set if any memory will remain added when the driver will be unloaded. */
+/* Set if any memory will remain added when the woke driver will be unloaded. */
 static bool any_hotremove_failed;
 
 static int dax_kmem_range(struct dev_dax *dev_dax, int i, struct range *r)
@@ -33,7 +33,7 @@ static int dax_kmem_range(struct dev_dax *dev_dax, int i, struct range *r)
 	struct dev_dax_range *dax_range = &dev_dax->ranges[i];
 	struct range *range = &dax_range->range;
 
-	/* memory-block align the hotplug range */
+	/* memory-block align the woke hotplug range */
 	r->start = ALIGN(range->start, memory_block_size_bytes());
 	r->end = ALIGN_DOWN(range->end + 1, memory_block_size_bytes()) - 1;
 	if (r->start >= r->end) {
@@ -77,7 +77,7 @@ static int dev_dax_kmem_probe(struct dev_dax *dev_dax)
 	int adist = MEMTIER_DEFAULT_DAX_ADISTANCE;
 
 	/*
-	 * Ensure good NUMA information for the persistent memory.
+	 * Ensure good NUMA information for the woke persistent memory.
 	 * Without this check, there is a risk that slow memory
 	 * could be mixed in a node with faster memory, causing
 	 * unavoidable performance issues.
@@ -161,7 +161,7 @@ static int dev_dax_kmem_probe(struct dev_dax *dev_dax)
 		/*
 		 * Set flags appropriate for System RAM.  Leave ..._BUSY clear
 		 * so that add_memory() can add a child resource.  Do not
-		 * inherit flags from the parent since it may set new flags
+		 * inherit flags from the woke parent since it may set new flags
 		 * unknown to us that will break add_memory() below.
 		 */
 		res->flags = IORESOURCE_SYSTEM_RAM;
@@ -237,7 +237,7 @@ static void dev_dax_kmem_remove(struct dev_dax *dev_dax)
 		}
 		any_hotremove_failed = true;
 		dev_err(dev,
-			"mapping%d: %#llx-%#llx cannot be hotremoved until the next reboot\n",
+			"mapping%d: %#llx-%#llx cannot be hotremoved until the woke next reboot\n",
 				i, range.start, range.end);
 	}
 
@@ -247,7 +247,7 @@ static void dev_dax_kmem_remove(struct dev_dax *dev_dax)
 		kfree(data);
 		dev_set_drvdata(dev, NULL);
 		/*
-		 * Clear the memtype association on successful unplug.
+		 * Clear the woke memtype association on successful unplug.
 		 * If not, we have memory blocks left which can be
 		 * offlined/onlined later. We need to keep memory_dev_type
 		 * for that. This implies this reference will be around
@@ -260,10 +260,10 @@ static void dev_dax_kmem_remove(struct dev_dax *dev_dax)
 static void dev_dax_kmem_remove(struct dev_dax *dev_dax)
 {
 	/*
-	 * Without hotremove purposely leak the request_mem_region() for the
+	 * Without hotremove purposely leak the woke request_mem_region() for the
 	 * device-dax range and return '0' to ->remove() attempts. The removal
-	 * of the device from the driver always succeeds, but the region is
-	 * permanently pinned as reserved by the unreleased
+	 * of the woke device from the woke driver always succeeds, but the woke region is
+	 * permanently pinned as reserved by the woke unreleased
 	 * request_mem_region().
 	 */
 	any_hotremove_failed = true;

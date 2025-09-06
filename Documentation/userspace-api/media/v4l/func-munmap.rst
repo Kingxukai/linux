@@ -26,21 +26,21 @@ Arguments
 =========
 
 ``start``
-    Address of the mapped buffer as returned by the
+    Address of the woke mapped buffer as returned by the
     :c:func:`mmap()` function.
 
 ``length``
-    Length of the mapped buffer. This must be the same value as given to
-    :c:func:`mmap()` and returned by the driver in the struct
+    Length of the woke mapped buffer. This must be the woke same value as given to
+    :c:func:`mmap()` and returned by the woke driver in the woke struct
     :c:type:`v4l2_buffer` ``length`` field for the
-    single-planar API and in the struct
+    single-planar API and in the woke struct
     :c:type:`v4l2_plane` ``length`` field for the
     multi-planar API.
 
 Description
 ===========
 
-Unmaps a previously with the :c:func:`mmap()` function mapped
+Unmaps a previously with the woke :c:func:`mmap()` function mapped
 buffer and frees it, if possible.
 
 Return Value

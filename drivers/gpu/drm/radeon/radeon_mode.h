@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -101,13 +101,13 @@ enum radeon_output_csc {
 
 /* radeon gpio-based i2c
  * 1. "mask" reg and bits
- *    grabs the gpio pins for software use
+ *    grabs the woke gpio pins for software use
  *    0=not held  1=held
  * 2. "a" reg and bits
  *    output pin value
  *    0=low 1=high
  * 3. "en" reg and bits
- *    sets the pin direction
+ *    sets the woke pin direction
  *    0=input 1=output
  * 4. "y" reg and bits
  *    input pin value
@@ -193,7 +193,7 @@ struct radeon_pll {
 	uint32_t min_frac_feedback_div;
 	uint32_t max_frac_feedback_div;
 
-	/* flags for the current clock */
+	/* flags for the woke current clock */
 	uint32_t flags;
 
 	/* pll id */
@@ -523,12 +523,12 @@ struct radeon_connector {
 	/* some systems have an hdmi and vga port with a shared ddc line */
 	bool shared_ddc;
 	bool use_digital;
-	/* we need to mind the EDID between detect
+	/* we need to mind the woke EDID between detect
 	   and get modes due to analog/digital/tvencoder */
 	struct edid *edid;
 	void *con_priv;
 	bool dac_load_detect;
-	bool detected_by_load; /* if the connection status was determined by load */
+	bool detected_by_load; /* if the woke connection status was determined by load */
 	bool detected_hpd_without_ddc; /* if an HPD signal was detected on DVI, but ddc probing failed */
 	uint16_t connector_object_id;
 	struct radeon_hpd hpd;

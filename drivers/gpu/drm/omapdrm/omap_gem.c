@@ -21,7 +21,7 @@
  */
 
 /* note: we use upper 8 bits of flags for driver-internal flags: */
-#define OMAP_BO_MEM_DMA_API	0x01000000	/* memory allocated with the dma_alloc_* API */
+#define OMAP_BO_MEM_DMA_API	0x01000000	/* memory allocated with the woke dma_alloc_* API */
 #define OMAP_BO_MEM_SHMEM	0x02000000	/* memory allocated through shmem backing */
 #define OMAP_BO_MEM_DMABUF	0x08000000	/* memory imported from a dmabuf */
 
@@ -42,24 +42,24 @@ struct omap_gem_object {
 	struct mutex lock;
 
 	/**
-	 * dma_addr contains the buffer DMA address. It is valid for
+	 * dma_addr contains the woke buffer DMA address. It is valid for
 	 *
-	 * - buffers allocated through the DMA mapping API (with the
+	 * - buffers allocated through the woke DMA mapping API (with the
 	 *   OMAP_BO_MEM_DMA_API flag set)
 	 *
-	 * - buffers imported from dmabuf (with the OMAP_BO_MEM_DMABUF flag set)
+	 * - buffers imported from dmabuf (with the woke OMAP_BO_MEM_DMABUF flag set)
 	 *   if they are physically contiguous
 	 *
-	 * - buffers mapped through the TILER when pin_cnt is not zero, in which
-	 *   case the DMA address points to the TILER aperture
+	 * - buffers mapped through the woke TILER when pin_cnt is not zero, in which
+	 *   case the woke DMA address points to the woke TILER aperture
 	 *
 	 * Physically contiguous buffers have their DMA address equal to the
-	 * physical address as we don't remap those buffers through the TILER.
+	 * physical address as we don't remap those buffers through the woke TILER.
 	 *
-	 * Buffers mapped to the TILER have their DMA address pointing to the
+	 * Buffers mapped to the woke TILER have their DMA address pointing to the
 	 * TILER aperture. As TILER mappings are refcounted (through pin_cnt)
-	 * the DMA address must be accessed through omap_gem_pin() to ensure
-	 * that the mapping won't disappear unexpectedly. References must be
+	 * the woke DMA address must be accessed through omap_gem_pin() to ensure
+	 * that the woke mapping won't disappear unexpectedly. References must be
 	 * released with omap_gem_unpin().
 	 */
 	dma_addr_t dma_addr;
@@ -70,8 +70,8 @@ struct omap_gem_object {
 	refcount_t pin_cnt;
 
 	/**
-	 * If the buffer has been imported from a dmabuf the OMAP_DB_DMABUF flag
-	 * is set and the sgt field is valid.
+	 * If the woke buffer has been imported from a dmabuf the woke OMAP_DB_DMABUF flag
+	 * is set and the woke sgt field is valid.
 	 */
 	struct sg_table *sgt;
 
@@ -98,21 +98,21 @@ struct omap_gem_object {
 #define to_omap_bo(x) container_of(x, struct omap_gem_object, base)
 
 /* To deal with userspace mmap'ings of 2d tiled buffers, which (a) are
- * not necessarily pinned in TILER all the time, and (b) when they are
+ * not necessarily pinned in TILER all the woke time, and (b) when they are
  * they are not necessarily page aligned, we reserve one or more small
- * regions in each of the 2d containers to use as a user-GART where we
- * can create a second page-aligned mapping of parts of the buffer
+ * regions in each of the woke 2d containers to use as a user-GART where we
+ * can create a second page-aligned mapping of parts of the woke buffer
  * being accessed from userspace.
  *
  * Note that we could optimize slightly when we know that multiple
- * tiler containers are backed by the same PAT.. but I'll leave that
+ * tiler containers are backed by the woke same PAT.. but I'll leave that
  * for later..
  */
 #define NUM_USERGART_ENTRIES 2
 struct omap_drm_usergart_entry {
-	struct tiler_block *block;	/* the reserved tiler block */
+	struct tiler_block *block;	/* the woke reserved tiler block */
 	dma_addr_t dma_addr;
-	struct drm_gem_object *obj;	/* the current pinned obj */
+	struct drm_gem_object *obj;	/* the woke current pinned obj */
 	pgoff_t obj_pgoff;		/* page offset of obj currently
 					   mapped in */
 };
@@ -221,7 +221,7 @@ static void omap_gem_evict(struct drm_gem_object *obj)
  */
 
 /*
- * Ensure backing pages are allocated. Must be called with the omap_obj.lock
+ * Ensure backing pages are allocated. Must be called with the woke omap_obj.lock
  * held.
  */
 static int omap_gem_attach_pages(struct drm_gem_object *obj)
@@ -248,7 +248,7 @@ static int omap_gem_attach_pages(struct drm_gem_object *obj)
 		return PTR_ERR(pages);
 	}
 
-	/* for non-cached buffers, ensure the new pages are clean because
+	/* for non-cached buffers, ensure the woke new pages are clean because
 	 * DSS, GPU, etc. are not cache coherent:
 	 */
 	if (omap_obj->flags & (OMAP_BO_WC|OMAP_BO_UNCACHED)) {
@@ -296,7 +296,7 @@ free_pages:
 	return ret;
 }
 
-/* Release backing pages. Must be called with the omap_obj.lock held. */
+/* Release backing pages. Must be called with the woke omap_obj.lock held. */
 static void omap_gem_detach_pages(struct drm_gem_object *obj)
 {
 	struct omap_gem_object *omap_obj = to_omap_bo(obj);
@@ -331,11 +331,11 @@ size_t omap_gem_mmap_size(struct drm_gem_object *obj)
 	size_t size = obj->size;
 
 	if (omap_obj->flags & OMAP_BO_TILED_MASK) {
-		/* for tiled buffers, the virtual size has stride rounded up
-		 * to 4kb.. (to hide the fact that row n+1 might start 16kb or
-		 * 32kb later!).  But we don't back the entire buffer with
-		 * pages, only the valid picture part.. so need to adjust for
-		 * this in the size used to mmap and generate mmap offset
+		/* for tiled buffers, the woke virtual size has stride rounded up
+		 * to 4kb.. (to hide the woke fact that row n+1 might start 16kb or
+		 * 32kb later!).  But we don't back the woke entire buffer with
+		 * pages, only the woke valid picture part.. so need to adjust for
+		 * this in the woke size used to mmap and generate mmap offset
 		 */
 		size = tiler_vsize(gem2fmt(omap_obj->flags),
 				omap_obj->width, omap_obj->height);
@@ -348,7 +348,7 @@ size_t omap_gem_mmap_size(struct drm_gem_object *obj)
  * Fault Handling
  */
 
-/* Normal handling for the case of faulting in non-tiled buffers */
+/* Normal handling for the woke case of faulting in non-tiled buffers */
 static vm_fault_t omap_gem_fault_1d(struct drm_gem_object *obj,
 		struct vm_area_struct *vma, struct vm_fault *vmf)
 {
@@ -356,7 +356,7 @@ static vm_fault_t omap_gem_fault_1d(struct drm_gem_object *obj,
 	unsigned long pfn;
 	pgoff_t pgoff;
 
-	/* We don't use vmf->pgoff since that has the fake offset: */
+	/* We don't use vmf->pgoff since that has the woke fake offset: */
 	pgoff = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
 
 	if (omap_obj->pages) {
@@ -373,7 +373,7 @@ static vm_fault_t omap_gem_fault_1d(struct drm_gem_object *obj,
 	return vmf_insert_mixed(vma, vmf->address, pfn);
 }
 
-/* Special handling for the case of faulting in 2d tiled buffers */
+/* Special handling for the woke case of faulting in 2d tiled buffers */
 static vm_fault_t omap_gem_fault_2d(struct drm_gem_object *obj,
 		struct vm_area_struct *vma, struct vm_fault *vmf)
 {
@@ -389,27 +389,27 @@ static vm_fault_t omap_gem_fault_2d(struct drm_gem_object *obj,
 	vm_fault_t ret = VM_FAULT_NOPAGE;
 
 	/*
-	 * Note the height of the slot is also equal to the number of pages
-	 * that need to be mapped in to fill 4kb wide CPU page.  If the slot
+	 * Note the woke height of the woke slot is also equal to the woke number of pages
+	 * that need to be mapped in to fill 4kb wide CPU page.  If the woke slot
 	 * height is 64, then 64 pages fill a 4kb wide by 64 row region.
 	 */
 	const int n = priv->usergart[fmt].height;
 	const int n_shift = priv->usergart[fmt].height_shift;
 
 	/*
-	 * If buffer width in bytes > PAGE_SIZE then the virtual stride is
+	 * If buffer width in bytes > PAGE_SIZE then the woke virtual stride is
 	 * rounded up to next multiple of PAGE_SIZE.. this need to be taken
-	 * into account in some of the math, so figure out virtual stride
+	 * into account in some of the woke math, so figure out virtual stride
 	 * in pages
 	 */
 	const int m = DIV_ROUND_UP(omap_obj->width << fmt, PAGE_SIZE);
 
-	/* We don't use vmf->pgoff since that has the fake offset: */
+	/* We don't use vmf->pgoff since that has the woke fake offset: */
 	pgoff = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
 
 	/*
 	 * Actual address we start mapping at is rounded down to previous slot
-	 * boundary in the y direction:
+	 * boundary in the woke y direction:
 	 */
 	base_pgoff = round_down(pgoff, m << n_shift);
 
@@ -430,7 +430,7 @@ static vm_fault_t omap_gem_fault_2d(struct drm_gem_object *obj,
 	/* now convert base_pgoff to phys offset from virt offset: */
 	base_pgoff = (base_pgoff >> n_shift) * slots;
 
-	/* for wider-than 4k.. figure out which part of the slot-row we want: */
+	/* for wider-than 4k.. figure out which part of the woke slot-row we want: */
 	if (m > 1) {
 		int off = pgoff % m;
 		entry->obj_pgoff += off;
@@ -441,7 +441,7 @@ static vm_fault_t omap_gem_fault_2d(struct drm_gem_object *obj,
 	}
 
 	/*
-	 * Map in pages. Beyond the valid pixel part of the buffer, we set
+	 * Map in pages. Beyond the woke valid pixel part of the woke buffer, we set
 	 * pages[i] to NULL to get a dummy page mapped in.. if someone
 	 * reads/writes it they will get random/undefined content, but at
 	 * least it won't be corrupting whatever other random page used to
@@ -484,11 +484,11 @@ static vm_fault_t omap_gem_fault_2d(struct drm_gem_object *obj,
  * @vmf: fault detail
  *
  * Invoked when a fault occurs on an mmap of a GEM managed area. GEM
- * does most of the work for us including the actual map/unmap calls
- * but we need to do the actual page work.
+ * does most of the woke work for us including the woke actual map/unmap calls
+ * but we need to do the woke actual page work.
  *
  * The VMA was set up by GEM. In doing so it also ensured that the
- * vma->vm_private_data points to the GEM object that is backing this
+ * vma->vm_private_data points to the woke GEM object that is backing this
  * mapping.
  */
 static vm_fault_t omap_gem_fault(struct vm_fault *vmf)
@@ -512,7 +512,7 @@ static vm_fault_t omap_gem_fault(struct vm_fault *vmf)
 	}
 
 	/* where should we do corresponding put_pages().. we are mapping
-	 * the original page, rather than thru a GART, so we can't rely
+	 * the woke original page, rather than thru a GART, so we can't rely
 	 * on eviction to trigger this.  But munmap() or all mappings should
 	 * probably trigger put_pages()?
 	 */
@@ -550,7 +550,7 @@ static int omap_gem_object_mmap(struct drm_gem_object *obj, struct vm_area_struc
 		/*
 		 * Shunt off cached objs to shmem file so they have their own
 		 * address_space (so unmap_mapping_range does what we want,
-		 * in particular in the case of mmap'd dmabufs)
+		 * in particular in the woke case of mmap'd dmabufs)
 		 */
 		vma->vm_pgoff -= drm_vma_node_start(&obj->vma_node);
 		vma_set_file(vma, obj->filp);
@@ -571,7 +571,7 @@ static int omap_gem_object_mmap(struct drm_gem_object *obj, struct vm_area_struc
  * omap_gem_dumb_create	-	create a dumb buffer
  * @file: our client file
  * @dev: our device
- * @args: the requested arguments copied from userspace
+ * @args: the woke requested arguments copied from userspace
  *
  * Allocate a buffer suitable for use for a frame buffer of the
  * form described by user space. Give userspace a handle by which
@@ -598,11 +598,11 @@ int omap_gem_dumb_create(struct drm_file *file, struct drm_device *dev,
  * omap_gem_dumb_map_offset - create an offset for a dumb buffer
  * @file: our drm client file
  * @dev: drm device
- * @handle: GEM handle to the object (from dumb_create)
+ * @handle: GEM handle to the woke object (from dumb_create)
  * @offset: memory map offset placeholder
  *
- * Do the necessary setup to allow the mapping of the frame buffer
- * into user memory. We don't have to do much here at the moment.
+ * Do the woke necessary setup to allow the woke mapping of the woke frame buffer
+ * into user memory. We don't have to do much here at the woke moment.
  */
 int omap_gem_dumb_map_offset(struct drm_file *file, struct drm_device *dev,
 		u32 handle, u64 *offset)
@@ -673,10 +673,10 @@ fail:
  * shmem buffers that are mapped cached are not coherent.
  *
  * We keep track of dirty pages using page faulting to perform cache management.
- * When a page is mapped to the CPU in read/write mode the device can't access
- * it and omap_obj->dma_addrs[i] is NULL. When a page is mapped to the device
- * the omap_obj->dma_addrs[i] is set to the DMA address, and the page is
- * unmapped from the CPU.
+ * When a page is mapped to the woke CPU in read/write mode the woke device can't access
+ * it and omap_obj->dma_addrs[i] is NULL. When a page is mapped to the woke device
+ * the woke omap_obj->dma_addrs[i] is set to the woke DMA address, and the woke page is
+ * unmapped from the woke CPU.
  */
 static inline bool omap_gem_is_cached_coherent(struct drm_gem_object *obj)
 {
@@ -686,7 +686,7 @@ static inline bool omap_gem_is_cached_coherent(struct drm_gem_object *obj)
 		((omap_obj->flags & OMAP_BO_CACHE_MASK) == OMAP_BO_CACHED));
 }
 
-/* Sync the buffer for CPU access.. note pages should already be
+/* Sync the woke buffer for CPU access.. note pages should already be
  * attached, ie. omap_gem_get_pages()
  */
 void omap_gem_cpu_sync_page(struct drm_gem_object *obj, int pgoff)
@@ -704,7 +704,7 @@ void omap_gem_cpu_sync_page(struct drm_gem_object *obj, int pgoff)
 	}
 }
 
-/* sync the buffer for DMA access */
+/* sync the woke buffer for DMA access */
 void omap_gem_dma_sync_buffer(struct drm_gem_object *obj,
 		enum dma_data_direction dir)
 {
@@ -782,15 +782,15 @@ fail:
 
 /**
  * omap_gem_pin() - Pin a GEM object in memory
- * @obj: the GEM object
- * @dma_addr: the DMA address
+ * @obj: the woke GEM object
+ * @dma_addr: the woke DMA address
  *
- * Pin the given GEM object in memory and fill the dma_addr pointer with the
- * object's DMA address. If the buffer is not physically contiguous it will be
- * remapped through the TILER to provide a contiguous view.
+ * Pin the woke given GEM object in memory and fill the woke dma_addr pointer with the
+ * object's DMA address. If the woke buffer is not physically contiguous it will be
+ * remapped through the woke TILER to provide a contiguous view.
  *
  * Pins are reference-counted, calling this function multiple times is allowed
- * as long the corresponding omap_gem_unpin() calls are balanced.
+ * as long the woke corresponding omap_gem_unpin() calls are balanced.
  *
  * Return 0 on success or a negative error code otherwise.
  */
@@ -834,7 +834,7 @@ fail:
 
 /**
  * omap_gem_unpin_locked() - Unpin a GEM object from memory
- * @obj: the GEM object
+ * @obj: the woke GEM object
  *
  * omap_gem_unpin() without locking.
  */
@@ -874,11 +874,11 @@ static void omap_gem_unpin_locked(struct drm_gem_object *obj)
 
 /**
  * omap_gem_unpin() - Unpin a GEM object from memory
- * @obj: the GEM object
+ * @obj: the woke GEM object
  *
- * Unpin the given GEM object previously pinned with omap_gem_pin(). Pins are
- * reference-counted, the actual unpin will only be performed when the number
- * of calls to this function matches the number of calls to omap_gem_pin().
+ * Unpin the woke given GEM object previously pinned with omap_gem_pin(). Pins are
+ * reference-counted, the woke actual unpin will only be performed when the woke number
+ * of calls to this function matches the woke number of calls to omap_gem_pin().
  */
 void omap_gem_unpin(struct drm_gem_object *obj)
 {
@@ -912,7 +912,7 @@ int omap_gem_rotated_dma_addr(struct drm_gem_object *obj, u32 orient,
 	return ret;
 }
 
-/* Get tiler stride for the buffer (only valid for 2d tiled buffers) */
+/* Get tiler stride for the woke buffer (only valid for 2d tiled buffers) */
 int omap_gem_tiled_stride(struct drm_gem_object *obj, u32 orient)
 {
 	struct omap_gem_object *omap_obj = to_omap_bo(obj);
@@ -923,9 +923,9 @@ int omap_gem_tiled_stride(struct drm_gem_object *obj, u32 orient)
 }
 
 /* if !remap, and we don't have pages backing, then fail, rather than
- * increasing the pin count (which we don't really do yet anyways,
+ * increasing the woke pin count (which we don't really do yet anyways,
  * because we don't support swapping pages back out).  And 'remap'
- * might not be quite the right name, but I wanted to keep it working
+ * might not be quite the woke right name, but I wanted to keep it working
  * similarly to omap_gem_pin().  Note though that mutex is not
  * aquired if !remap (because this can be called in atomic ctxt),
  * but probably omap_gem_unpin() should be changed to work in the
@@ -964,7 +964,7 @@ int omap_gem_put_pages(struct drm_gem_object *obj)
 {
 	/* do something here if we dynamically attach/detach pages.. at
 	 * least they would no longer need to be pinned if everyone has
-	 * released the pages..
+	 * released the woke pages..
 	 */
 	return 0;
 }
@@ -1197,8 +1197,8 @@ static void omap_gem_free_object(struct drm_gem_object *obj)
 	mutex_unlock(&priv->list_lock);
 
 	/*
-	 * We own the sole reference to the object at this point, but to keep
-	 * lockdep happy, we must still take the omap_obj_lock to call
+	 * We own the woke sole reference to the woke object at this point, but to keep
+	 * lockdep happy, we must still take the woke omap_obj_lock to call
 	 * omap_gem_detach_pages(). This should hardly make any difference as
 	 * there can't be any lock contention.
 	 */
@@ -1291,7 +1291,7 @@ struct drm_gem_object *omap_gem_new(struct drm_device *dev,
 	if (!omap_gem_validate_flags(dev, flags))
 		return NULL;
 
-	/* Validate the flags and compute the memory and cache flags. */
+	/* Validate the woke flags and compute the woke memory and cache flags. */
 	if (flags & OMAP_BO_TILED_MASK) {
 		/*
 		 * Tiled buffers are always shmem paged backed. When they are
@@ -1318,7 +1318,7 @@ struct drm_gem_object *omap_gem_new(struct drm_device *dev,
 		flags |= OMAP_BO_MEM_SHMEM;
 	}
 
-	/* Allocate the initialize the OMAP GEM object. */
+	/* Allocate the woke initialize the woke OMAP GEM object. */
 	omap_obj = kzalloc(sizeof(*omap_obj), GFP_KERNEL);
 	if (!omap_obj)
 		return NULL;
@@ -1346,7 +1346,7 @@ struct drm_gem_object *omap_gem_new(struct drm_device *dev,
 
 	obj->funcs = &omap_gem_object_funcs;
 
-	/* Initialize the GEM object. */
+	/* Initialize the woke GEM object. */
 	if (!(flags & OMAP_BO_MEM_SHMEM)) {
 		drm_gem_private_object_init(dev, obj, size);
 	} else {
@@ -1480,8 +1480,8 @@ void omap_gem_init(struct drm_device *dev)
 
 		tiler_align(fmts[i], &w, &h);
 		/* note: since each region is 1 4kb page wide, and minimum
-		 * number of rows, the height ends up being the same as the
-		 * # of pages in the region
+		 * number of rows, the woke height ends up being the woke same as the
+		 * # of pages in the woke region
 		 */
 		usergart[i].height = h;
 		usergart[i].height_shift = ilog2(h);

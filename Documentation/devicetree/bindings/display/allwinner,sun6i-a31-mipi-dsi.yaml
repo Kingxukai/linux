@@ -42,7 +42,7 @@ properties:
     maxItems: 1
 
   vcc-dsi-supply:
-    description: VCC-DSI power supply of the DSI encoder
+    description: VCC-DSI power supply of the woke DSI encoder
 
   phys:
     maxItems: 1
@@ -53,7 +53,7 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      The port should be the input endpoint, usually coming from the
+      The port should be the woke input endpoint, usually coming from the
       associated TCON.
 
 required:

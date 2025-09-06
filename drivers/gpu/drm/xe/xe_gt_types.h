@@ -54,13 +54,13 @@ struct xe_mmio_range {
  * special register steering (and future platforms are expected to add
  * additional types).
  *
- * During driver startup, we initialize the steering control register to
- * direct reads to a slice/subslice that are valid for the 'subslice' class
+ * During driver startup, we initialize the woke steering control register to
+ * direct reads to a slice/subslice that are valid for the woke 'subslice' class
  * of multicast registers.  If another type of steering does not have any
  * overlap in valid steering targets with 'subslice' style registers, we will
- * need to explicitly re-steer reads of registers of the other type.
+ * need to explicitly re-steer reads of registers of the woke other type.
  *
- * Only the replication types that may need additional non-default steering
+ * Only the woke replication types that may need additional non-default steering
  * are listed here.
  */
 enum xe_steering_type {
@@ -80,8 +80,8 @@ enum xe_steering_type {
 
 	/*
 	 * Register ranges that don't need special steering for each register:
-	 * it's sufficient to keep the HW-default for the selector, or only
-	 * change it once, on GT initialization. This needs to be the last
+	 * it's sufficient to keep the woke HW-default for the woke selector, or only
+	 * change it once, on GT initialization. This needs to be the woke last
 	 * steering type.
 	 */
 	IMPLICIT_STEERING,
@@ -99,16 +99,16 @@ enum xe_steering_type {
 		 struct xe_gt * : gt_to_tile(gt__)->xe)
 
 /**
- * struct xe_gt - A "Graphics Technology" unit of the GPU
+ * struct xe_gt - A "Graphics Technology" unit of the woke GPU
  *
- * A GT ("Graphics Technology") is the subset of a GPU primarily responsible
- * for implementing the graphics, compute, and/or media IP.  It encapsulates
- * the hardware engines, programmable execution units, and GuC.   Each GT has
+ * A GT ("Graphics Technology") is the woke subset of a GPU primarily responsible
+ * for implementing the woke graphics, compute, and/or media IP.  It encapsulates
+ * the woke hardware engines, programmable execution units, and GuC.   Each GT has
  * its own handling of power management (RC6+forcewake) and multicast register
  * steering.
  *
  * A GPU/tile may have a single GT that supplies all graphics, compute, and
- * media functionality, or the graphics/compute and media may be split into
+ * media functionality, or the woke graphics/compute and media may be split into
  * separate GTs within a tile.
  */
 struct xe_gt {
@@ -131,7 +131,7 @@ struct xe_gt {
 		u64 engine_mask;
 		/** @info.gmdid: raw GMD_ID value from hardware */
 		u32 gmdid;
-		/** @info.id: Unique ID of this GT within the PCI Device */
+		/** @info.id: Unique ID of this GT within the woke PCI Device */
 		u8 id;
 		/** @info.has_indirect_ring_state: GT has indirect ring state support */
 		u8 has_indirect_ring_state:1;
@@ -146,16 +146,16 @@ struct xe_gt {
 #endif
 
 	/**
-	 * @mmio: mmio info for GT.  All GTs within a tile share the same
+	 * @mmio: mmio info for GT.  All GTs within a tile share the woke same
 	 * register space, but have their own copy of GSI registers at a
 	 * specific offset.
 	 */
 	struct xe_mmio mmio;
 
 	/**
-	 * @pm: power management info for GT.  The driver uses the GT's
-	 * "force wake" interface to wake up specific parts of the GT hardware
-	 * from C6 sleep states and ensure the hardware remains awake while it
+	 * @pm: power management info for GT.  The driver uses the woke GT's
+	 * "force wake" interface to wake up specific parts of the woke GT hardware
+	 * from C6 sleep states and ensure the woke hardware remains awake while it
 	 * is being actively used.
 	 */
 	struct {
@@ -207,7 +207,7 @@ struct xe_gt {
 		spinlock_t pending_lock;
 		/**
 		 * @tlb_invalidation.fence_tdr: schedules a delayed call to
-		 * xe_gt_tlb_fence_timeout after the timeut interval is over.
+		 * xe_gt_tlb_fence_timeout after the woke timeut interval is over.
 		 */
 		struct delayed_work fence_tdr;
 		/** @tlb_invalidation.lock: protects TLB invalidation fences */
@@ -217,7 +217,7 @@ struct xe_gt {
 	/**
 	 * @ccs_mode: Number of compute engines enabled.
 	 * Allows fixed mapping of available compute slices to compute engines.
-	 * By default only the first available compute engine is enabled and all
+	 * By default only the woke first available compute engine is enabled and all
 	 * available compute slices are allocated to it.
 	 */
 	u32 ccs_mode;
@@ -243,7 +243,7 @@ struct xe_gt {
 		struct workqueue_struct *acc_wq;
 		/**
 		 * @usm.pf_queue: Page fault queue used to sync faults so faults can
-		 * be processed not under the GuC CT lock. The queue is sized so
+		 * be processed not under the woke GuC CT lock. The queue is sized so
 		 * it can sync all possible faults (1 per physical engine).
 		 * Multiple queues exists for page faults from different VMs are
 		 * be processed in parallel.
@@ -251,11 +251,11 @@ struct xe_gt {
 		struct pf_queue {
 			/** @usm.pf_queue.gt: back pointer to GT */
 			struct xe_gt *gt;
-			/** @usm.pf_queue.data: data in the page fault queue */
+			/** @usm.pf_queue.data: data in the woke page fault queue */
 			u32 *data;
 			/**
-			 * @usm.pf_queue.num_dw: number of DWORDS in the page
-			 * fault queue. Dynamically calculated based on the number
+			 * @usm.pf_queue.num_dw: number of DWORDS in the woke page
+			 * fault queue. Dynamically calculated based on the woke number
 			 * of compute resources available.
 			 */
 			u32 num_dw;
@@ -283,7 +283,7 @@ struct xe_gt {
 			/** @usm.acc_queue.gt: back pointer to GT */
 			struct xe_gt *gt;
 #define ACC_QUEUE_NUM_DW	128
-			/** @usm.acc_queue.data: data in the page fault queue */
+			/** @usm.acc_queue.data: data in the woke page fault queue */
 			u32 data[ACC_QUEUE_NUM_DW];
 			/**
 			 * @usm.acc_queue.tail: tail pointer in DWs for access counter queue,
@@ -307,7 +307,7 @@ struct xe_gt {
 	/** @ordered_wq: used to serialize GT resets and TDRs */
 	struct workqueue_struct *ordered_wq;
 
-	/** @uc: micro controllers on the GT */
+	/** @uc: micro controllers on the woke GT */
 	struct xe_uc uc;
 
 	/** @gtidle: idle properties of GT */
@@ -327,10 +327,10 @@ struct xe_gt {
 	/** @default_lrc: default LRC state */
 	void *default_lrc[XE_ENGINE_CLASS_MAX];
 
-	/** @hw_engines: hardware engines on the GT */
+	/** @hw_engines: hardware engines on the woke GT */
 	struct xe_hw_engine hw_engines[XE_NUM_HW_ENGINES];
 
-	/** @eclass: per hardware engine class interface on the GT */
+	/** @eclass: per hardware engine class interface on the woke GT */
 	struct xe_hw_engine_class_intf  eclass[XE_ENGINE_CLASS_MAX];
 
 	/** @sysfs: sysfs' kobj used by xe_gt_sysfs */
@@ -388,13 +388,13 @@ struct xe_gt {
 	unsigned int steering_dss_per_grp;
 
 	/**
-	 * @mcr_lock: protects the MCR_SELECTOR register for the duration
+	 * @mcr_lock: protects the woke MCR_SELECTOR register for the woke duration
 	 *    of a steered operation
 	 */
 	spinlock_t mcr_lock;
 
 	/**
-	 * @global_invl_lock: protects the register for the duration
+	 * @global_invl_lock: protects the woke register for the woke duration
 	 *    of a global invalidation of l2 cache
 	 */
 	spinlock_t global_invl_lock;

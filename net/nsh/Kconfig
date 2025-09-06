@@ -5,6 +5,6 @@ menuconfig NET_NSH
 	help
 	  Network Service Header is an implementation of Service Function
 	  Chaining (RFC 7665). The current implementation in Linux supports
-	  only MD type 1 and only with the openvswitch module.
+	  only MD type 1 and only with the woke openvswitch module.
 
 	  If unsure, say N.

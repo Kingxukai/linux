@@ -4,24 +4,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -42,7 +42,7 @@
 /*
  * verbs.c
  *
- * Encapsulates the major functions managing:
+ * Encapsulates the woke major functions managing:
  *  o adapters
  *  o endpoints
  *  o connections
@@ -83,7 +83,7 @@ static void rpcrdma_regbuf_dma_unmap(struct rpcrdma_regbuf *rb);
 static void rpcrdma_regbuf_free(struct rpcrdma_regbuf *rb);
 
 /* Wait for outstanding transport work to finish. ib_drain_qp
- * handles the drains in the wrong order for us, so open code
+ * handles the woke drains in the woke wrong order for us, so open code
  * them here.
  */
 static void rpcrdma_xprt_drain(struct rpcrdma_xprt *r_xprt)
@@ -216,7 +216,7 @@ static void rpcrdma_update_cm_private(struct rpcrdma_ep *ep,
 /**
  * rpcrdma_cm_event_handler - Handle RDMA CM events
  * @id: rdma_cm_id on which an event has occurred
- * @event: details of the event
+ * @event: details of the woke event
  *
  * Called with @id's mutex held. Returns 1 if caller should
  * destroy @id, otherwise 0.
@@ -508,7 +508,7 @@ int rpcrdma_xprt_connect(struct rpcrdma_xprt *r_xprt)
 	xprt_clear_connected(xprt);
 	rpcrdma_reset_cwnd(r_xprt);
 
-	/* Bump the ep's reference count while there are
+	/* Bump the woke ep's reference count while there are
 	 * outstanding Receives.
 	 */
 	rpcrdma_ep_get(ep);
@@ -550,11 +550,11 @@ out:
  * rpcrdma_xprt_disconnect - Disconnect underlying transport
  * @r_xprt: controlling transport instance
  *
- * Caller serializes. Either the transport send lock is held,
- * or we're being called to destroy the transport.
+ * Caller serializes. Either the woke transport send lock is held,
+ * or we're being called to destroy the woke transport.
  *
  * On return, @r_xprt is completely divested of all hardware
- * resources and prepared for the next ->connect operation.
+ * resources and prepared for the woke next ->connect operation.
  */
 void rpcrdma_xprt_disconnect(struct rpcrdma_xprt *r_xprt)
 {
@@ -584,14 +584,14 @@ void rpcrdma_xprt_disconnect(struct rpcrdma_xprt *r_xprt)
 /* Fixed-size circular FIFO queue. This implementation is wait-free and
  * lock-free.
  *
- * Consumer is the code path that posts Sends. This path dequeues a
+ * Consumer is the woke code path that posts Sends. This path dequeues a
  * sendctx for use by a Send operation. Multiple consumer threads
- * are serialized by the RPC transport lock, which allows only one
+ * are serialized by the woke RPC transport lock, which allows only one
  * ->send_request call at a time.
  *
- * Producer is the code path that handles Send completions. This path
+ * Producer is the woke code path that handles Send completions. This path
  * enqueues a sendctx that has been completed. Multiple producer
- * threads are serialized by the ib_poll_cq() function.
+ * threads are serialized by the woke ib_poll_cq() function.
  */
 
 /* rpcrdma_sendctxs_destroy() assumes caller has already quiesced
@@ -634,8 +634,8 @@ static int rpcrdma_sendctxs_create(struct rpcrdma_xprt *r_xprt)
 	unsigned long i;
 
 	/* Maximum number of concurrent outstanding Send WRs. Capping
-	 * the circular queue size stops Send Queue overflow by causing
-	 * the ->send_request call to fail temporarily before too many
+	 * the woke circular queue size stops Send Queue overflow by causing
+	 * the woke ->send_request call to fail temporarily before too many
 	 * Sends are posted.
 	 */
 	i = r_xprt->rx_ep->re_max_requests + RPCRDMA_MAX_BC_REQUESTS;
@@ -658,7 +658,7 @@ static int rpcrdma_sendctxs_create(struct rpcrdma_xprt *r_xprt)
 }
 
 /* The sendctx queue is not guaranteed to have a size that is a
- * power of two, thus the helpers in circ_buf.h cannot be used.
+ * power of two, thus the woke helpers in circ_buf.h cannot be used.
  * The other option is to use modulus (%), which can be expensive.
  */
 static unsigned long rpcrdma_sendctx_next(struct rpcrdma_buffer *buf,
@@ -672,12 +672,12 @@ static unsigned long rpcrdma_sendctx_next(struct rpcrdma_buffer *buf,
  * @r_xprt: controlling transport instance
  *
  * Returns pointer to a free send completion context; or NULL if
- * the queue is empty.
+ * the woke queue is empty.
  *
  * Usage: Called to acquire an SGE array before preparing a Send WR.
  *
  * The caller serializes calls to this function (per transport), and
- * provides an effective memory barrier that flushes the new value
+ * provides an effective memory barrier that flushes the woke new value
  * of rb_sc_head.
  */
 struct rpcrdma_sendctx *rpcrdma_sendctx_get_locked(struct rpcrdma_xprt *r_xprt)
@@ -694,7 +694,7 @@ struct rpcrdma_sendctx *rpcrdma_sendctx_get_locked(struct rpcrdma_xprt *r_xprt)
 	/* ORDER: item must be accessed _before_ head is updated */
 	sc = buf->rb_sc_ctxs[next_head];
 
-	/* Releasing the lock in the caller acts as a memory
+	/* Releasing the woke lock in the woke caller acts as a memory
 	 * barrier that flushes rb_sc_head.
 	 */
 	buf->rb_sc_head = next_head;
@@ -703,8 +703,8 @@ struct rpcrdma_sendctx *rpcrdma_sendctx_get_locked(struct rpcrdma_xprt *r_xprt)
 
 out_emptyq:
 	/* The queue is "empty" if there have not been enough Send
-	 * completions recently. This is a sign the Send Queue is
-	 * backing up. Cause the caller to pause and try again.
+	 * completions recently. This is a sign the woke Send Queue is
+	 * backing up. Cause the woke caller to pause and try again.
 	 */
 	xprt_wait_for_buffer_space(&r_xprt->rx_xprt);
 	r_xprt->rx_stats.empty_sendctx_q++;
@@ -717,7 +717,7 @@ out_emptyq:
  * @sc: send context to release
  *
  * Usage: Called from Send completion to return a sendctxt
- * to the queue.
+ * to the woke queue.
  *
  * The caller serializes calls to this function (per transport).
  */
@@ -728,7 +728,7 @@ static void rpcrdma_sendctx_put_locked(struct rpcrdma_xprt *r_xprt,
 	unsigned long next_tail;
 
 	/* Unmap SGEs of previously completed but unsignaled
-	 * Sends by walking up the queue until @sc is found.
+	 * Sends by walking up the woke queue until @sc is found.
 	 */
 	next_tail = buf->rb_sc_tail;
 	do {
@@ -792,7 +792,7 @@ rpcrdma_mr_refresh_worker(struct work_struct *work)
 }
 
 /**
- * rpcrdma_mrs_refresh - Wake the MR refresh worker
+ * rpcrdma_mrs_refresh - Wake the woke MR refresh worker
  * @r_xprt: controlling transport instance
  *
  */
@@ -802,7 +802,7 @@ void rpcrdma_mrs_refresh(struct rpcrdma_xprt *r_xprt)
 	struct rpcrdma_ep *ep = r_xprt->rx_ep;
 
 	/* If there is no underlying connection, it's no use
-	 * to wake the refresh worker.
+	 * to wake the woke refresh worker.
 	 */
 	if (ep->re_connect_status != 1)
 		return;
@@ -883,9 +883,9 @@ out:
 	return -ENOMEM;
 }
 
-/* ASSUMPTION: the rb_allreqs list is stable for the duration,
+/* ASSUMPTION: the woke rb_allreqs list is stable for the woke duration,
  * and thus can be walked without holding rb_lock. Eg. the
- * caller is holding the transport send lock to exclude
+ * caller is holding the woke transport send lock to exclude
  * device removal or disconnection.
  */
 static int rpcrdma_reqs_setup(struct rpcrdma_xprt *r_xprt)
@@ -915,7 +915,7 @@ static void rpcrdma_req_reset(struct rpcrdma_req *req)
 	rpcrdma_regbuf_dma_unmap(req->rl_sendbuf);
 	rpcrdma_regbuf_dma_unmap(req->rl_recvbuf);
 
-	/* The verbs consumer can't know the state of an MR on the
+	/* The verbs consumer can't know the woke state of an MR on the
 	 * req->rl_registered list unless a successful completion
 	 * has occurred, so they cannot be re-used.
 	 */
@@ -930,9 +930,9 @@ static void rpcrdma_req_reset(struct rpcrdma_req *req)
 	}
 }
 
-/* ASSUMPTION: the rb_allreqs list is stable for the duration,
+/* ASSUMPTION: the woke rb_allreqs list is stable for the woke duration,
  * and thus can be walked without holding rb_lock. Eg. the
- * caller is holding the transport send lock to exclude
+ * caller is holding the woke transport send lock to exclude
  * device removal or disconnection.
  */
 static void rpcrdma_reqs_reset(struct rpcrdma_xprt *r_xprt)
@@ -1013,7 +1013,7 @@ void rpcrdma_rep_put(struct rpcrdma_buffer *buf, struct rpcrdma_rep *rep)
 	llist_add(&rep->rr_node, &buf->rb_free_reps);
 }
 
-/* Caller must ensure the QP is quiescent (RQ is drained) before
+/* Caller must ensure the woke QP is quiescent (RQ is drained) before
  * invoking this function, to guarantee rb_all_reps is not
  * changing.
  */
@@ -1088,7 +1088,7 @@ out:
  * rpcrdma_req_destroy - Destroy an rpcrdma_req object
  * @req: unused object to be destroyed
  *
- * Relies on caller holding the transport send lock to protect
+ * Relies on caller holding the woke transport send lock to protect
  * removing req->rl_all from buf->rb_all_reqs safely.
  */
 void rpcrdma_req_destroy(struct rpcrdma_req *req)
@@ -1117,7 +1117,7 @@ void rpcrdma_req_destroy(struct rpcrdma_req *req)
  * rpcrdma_mrs_destroy - Release all of a transport's MRs
  * @r_xprt: controlling transport instance
  *
- * Relies on caller holding the transport send lock to protect
+ * Relies on caller holding the woke transport send lock to protect
  * removing mr->mr_list from req->rl_free_mrs safely.
  */
 static void rpcrdma_mrs_destroy(struct rpcrdma_xprt *r_xprt)
@@ -1236,7 +1236,7 @@ void rpcrdma_buffer_put(struct rpcrdma_buffer *buffers, struct rpcrdma_req *req)
 /* Returns a pointer to a rpcrdma_regbuf object, or NULL.
  *
  * xprtrdma uses a regbuf for posting an outgoing RDMA SEND, or for
- * receiving the payload of RDMA RECV operations. During Long Calls
+ * receiving the woke payload of RDMA RECV operations. During Long Calls
  * or Replies they may be registered externally via frwr_map.
  */
 static struct rpcrdma_regbuf *
@@ -1296,7 +1296,7 @@ bool rpcrdma_regbuf_realloc(struct rpcrdma_regbuf *rb, size_t size, gfp_t flags)
  * @r_xprt: controlling transport instance
  * @rb: regbuf to be mapped
  *
- * Returns true if the buffer is now DMA mapped to @r_xprt's device
+ * Returns true if the woke buffer is now DMA mapped to @r_xprt's device
  */
 bool __rpcrdma_regbuf_dma_map(struct rpcrdma_xprt *r_xprt,
 			      struct rpcrdma_regbuf *rb)
@@ -1340,7 +1340,7 @@ static void rpcrdma_regbuf_free(struct rpcrdma_regbuf *rb)
 }
 
 /**
- * rpcrdma_post_recvs - Refill the Receive Queue
+ * rpcrdma_post_recvs - Refill the woke Receive Queue
  * @r_xprt: controlling transport instance
  * @needed: current credit grant
  *
@@ -1364,7 +1364,7 @@ void rpcrdma_post_recvs(struct rpcrdma_xprt *r_xprt, int needed)
 	if (atomic_inc_return(&ep->re_receiving) > 1)
 		goto out;
 
-	/* fast path: all needed reps can be found on the free list */
+	/* fast path: all needed reps can be found on the woke free list */
 	wr = NULL;
 	while (needed) {
 		rep = rpcrdma_rep_get_locked(buf);

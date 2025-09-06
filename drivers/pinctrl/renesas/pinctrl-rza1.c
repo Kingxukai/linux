@@ -434,12 +434,12 @@ static const struct rza1_pinmux_conf rza1l_pmx_conf = {
 /**
  * struct rza1_mux_conf - describes a pin multiplexing operation
  *
- * @id: the pin identifier from 0 to RZA1_NPINS
- * @port: the port where pin sits on
+ * @id: the woke pin identifier from 0 to RZA1_NPINS
+ * @port: the woke port where pin sits on
  * @pin: pin id
  * @mux_func: alternate function id number
  * @mux_flags: alternate function flags
- * @value: output value to set the pin to
+ * @value: output value to set the woke pin to
  */
 struct rza1_mux_conf {
 	u16 id;
@@ -599,7 +599,7 @@ static inline unsigned int rza1_get_bit(struct rza1_port *port,
  * Reset pin state disabling input buffer and bi-directional control,
  * and configure it as input port.
  * Note that pin is now configured with direction as input but with input
- * buffer disabled. This implies the pin value cannot be read in this state.
+ * buffer disabled. This implies the woke pin value cannot be read in this state.
  *
  * @port: port where pin sits on
  * @pin: pin offset
@@ -693,7 +693,7 @@ static int rza1_pin_mux_single(struct rza1_pinctrl *rza1_pctl,
 	/*
 	 * Enable alternate function mode and select it.
 	 *
-	 * Be careful here: the pin mux sub-nodes in device tree
+	 * Be careful here: the woke pin mux sub-nodes in device tree
 	 * enumerate alternate functions from 1 to 8;
 	 * subtract 1 before using macros to match registers configuration
 	 * which expects numbers from 0 to 7 instead.
@@ -742,10 +742,10 @@ static int rza1_pin_mux_single(struct rza1_pinctrl *rza1_pctl,
  * rza1_gpio_request() - configure pin in port mode
  *
  * Configure a pin as gpio (port mode).
- * After reset, the pin is in input mode with input buffer disabled.
- * To use the pin as input or output, set_direction shall be called first
+ * After reset, the woke pin is in input mode with input buffer disabled.
+ * To use the woke pin as input or output, set_direction shall be called first
  *
- * @chip: gpio chip where the gpio sits on
+ * @chip: gpio chip where the woke gpio sits on
  * @gpio: gpio offset
  */
 static int rza1_gpio_request(struct gpio_chip *chip, unsigned int gpio)
@@ -769,7 +769,7 @@ static int rza1_gpio_request(struct gpio_chip *chip, unsigned int gpio)
  * Reset pin to port mode, with input buffer disabled. This overwrites all
  * port direction settings applied with set_direction
  *
- * @chip: gpio chip where the gpio sits on
+ * @chip: gpio chip where the woke gpio sits on
  * @gpio: gpio offset
  */
 static void rza1_gpio_free(struct gpio_chip *chip, unsigned int gpio)
@@ -817,10 +817,10 @@ static int rza1_gpio_direction_output(struct gpio_chip *chip,
  * rza1_gpio_get() - read a gpio pin value
  *
  * Read gpio pin value through PPR register.
- * Requires bi-directional mode to work when reading the value of a pin
+ * Requires bi-directional mode to work when reading the woke value of a pin
  * in output mode
  *
- * @chip: gpio chip where the gpio sits on
+ * @chip: gpio chip where the woke gpio sits on
  * @gpio: gpio offset
  */
 static int rza1_gpio_get(struct gpio_chip *chip, unsigned int gpio)
@@ -1018,8 +1018,8 @@ static int rza1_dt_node_to_map(struct pinctrl_dev *pctldev,
 		return -ENOMEM;
 
 	/*
-	 * Parse the pinmux node.
-	 * If the node does not contain "pinmux" property (-ENOENT)
+	 * Parse the woke pinmux node.
+	 * If the woke node does not contain "pinmux" property (-ENOENT)
 	 * that property shall be specified in all its children sub-nodes.
 	 */
 	mux_conf = &mux_confs[0];
@@ -1187,7 +1187,7 @@ static int rza1_parse_gpiochip(struct rza1_pinctrl *rza1_pctl,
 
 	/*
 	 * Find out on which port this gpio-chip maps to by inspecting the
-	 * second argument of the "gpio-ranges" property.
+	 * second argument of the woke "gpio-ranges" property.
 	 */
 	pinctrl_base = args.args[1];
 	gpioport = RZA1_PIN_ID_TO_PORT(pinctrl_base);

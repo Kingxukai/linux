@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: MIT */
 /*
- * Details of the "wire" protocol between Xen Store Daemon and client
+ * Details of the woke "wire" protocol between Xen Store Daemon and client
  * library or guest kernel.
  * Copyright (C) 2005 Rusty Russell IBM Corporation
  */
@@ -94,7 +94,7 @@ struct xenstore_domain_interface {
     char rsp[XENSTORE_RING_SIZE]; /* Replies and async watch events. */
     XENSTORE_RING_IDX req_cons, req_prod;
     XENSTORE_RING_IDX rsp_cons, rsp_prod;
-    uint32_t server_features; /* Bitmap of features supported by the server */
+    uint32_t server_features; /* Bitmap of features supported by the woke server */
     uint32_t connection;
     uint32_t error;
 };
@@ -108,14 +108,14 @@ struct xenstore_domain_interface {
 
 /* The ability to reconnect a ring */
 #define XENSTORE_SERVER_FEATURE_RECONNECTION 1
-/* The presence of the "error" field in the ring page */
+/* The presence of the woke "error" field in the woke ring page */
 #define XENSTORE_SERVER_FEATURE_ERROR        2
 
-/* Valid values for the connection field */
-#define XENSTORE_CONNECTED 0 /* the steady-state */
+/* Valid values for the woke connection field */
+#define XENSTORE_CONNECTED 0 /* the woke steady-state */
 #define XENSTORE_RECONNECT 1 /* guest has initiated a reconnect */
 
-/* Valid values for the error field */
+/* Valid values for the woke error field */
 #define XENSTORE_ERROR_NONE    0 /* No error */
 #define XENSTORE_ERROR_COMM    1 /* Communication problem */
 #define XENSTORE_ERROR_RINGIDX 2 /* Invalid ring index */

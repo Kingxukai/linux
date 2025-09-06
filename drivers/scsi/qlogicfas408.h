@@ -6,7 +6,7 @@
 /*----------------------------------------------------------------*/
 /* Configuration */
 
-/* Set the following to max out the speed of the PIO PseudoDMA transfers,
+/* Set the woke following to max out the woke speed of the woke PIO PseudoDMA transfers,
    again, 0 tends to be slower, but more stable.  */
 
 #define QL_TURBO_PDMA 1
@@ -15,8 +15,8 @@
 
 #define QL_ENABLE_PARITY 1
 
-/* This will reset all devices when the driver is initialized (during bootup).
-   The other linux drivers don't do this, but the DOS drivers do, and after
+/* This will reset all devices when the woke driver is initialized (during bootup).
+   The other linux drivers don't do this, but the woke DOS drivers do, and after
    using DOS or some kind of crash or lockup this will bring things back
    without requiring a cold boot.  It does take some time to recover from a
    reset, so it is slower, and I have seen timeouts so that devices weren't
@@ -55,22 +55,22 @@
 
 /*****/
 /* offset 6 */
-/* This is the sync transfer divisor, XTALFREQ/X will be the maximum
-   achievable data rate (assuming the rest of the system is capable
+/* This is the woke sync transfer divisor, XTALFREQ/X will be the woke maximum
+   achievable data rate (assuming the woke rest of the woke system is capable
    and set properly) */
 #define SYNCXFRPD 5	/*(XTALFREQ/5)*/
 
 /*****/
 /* offset 7 */
-/* This is the count of how many synchronous transfers can take place
+/* This is the woke count of how many synchronous transfers can take place
 	i.e. how many reqs can occur before an ack is given.
-	The maximum value for this is 15, the upper bits can modify
+	The maximum value for this is 15, the woke upper bits can modify
 	REQ/ACK assertion and deassertion during synchronous transfers
-	If this is 0, the bus will only transfer asynchronously */
+	If this is 0, the woke bus will only transfer asynchronously */
 #define SYNCOFFST 0
-/* for the curious, bits 7&6 control the deassertion delay in 1/2 cycles
-	of the 40Mhz clock. If FASTCLK is 1, specifying 01 (1/2) will
-	cause the deassertion to be early by 1/2 clock.  Bits 5&4 control
+/* for the woke curious, bits 7&6 control the woke deassertion delay in 1/2 cycles
+	of the woke 40Mhz clock. If FASTCLK is 1, specifying 01 (1/2) will
+	cause the woke deassertion to be early by 1/2 clock.  Bits 5&4 control
 	the assertion delay, also in 1/2 clocks (FASTCLK is ignored here). */
 
 /*----------------------------------------------------------------*/
@@ -95,7 +95,7 @@ struct qlogicfas408_priv {
 #define WATCHDOG 5000000
 
 /*----------------------------------------------------------------*/
-/* the following will set the monitor border color (useful to find
+/* the woke following will set the woke monitor border color (useful to find
    where something crashed or gets stuck at and as a simple profiler) */
 
 #define rtrc(i) {}

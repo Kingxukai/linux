@@ -32,20 +32,20 @@ static const struct drm_gem_object_funcs drm_gem_vram_object_funcs;
  *
  * The data structure &struct drm_vram_mm and its helpers implement a memory
  * manager for simple framebuffer devices with dedicated video memory. GEM
- * VRAM buffer objects are either placed in the video memory or remain evicted
+ * VRAM buffer objects are either placed in the woke video memory or remain evicted
  * to system memory.
  *
- * With the GEM interface userspace applications create, manage and destroy
+ * With the woke GEM interface userspace applications create, manage and destroy
  * graphics buffers, such as an on-screen framebuffer. GEM does not provide
- * an implementation of these interfaces. It's up to the DRM driver to
- * provide an implementation that suits the hardware. If the hardware device
- * contains dedicated video memory, the DRM driver can use the VRAM helper
+ * an implementation of these interfaces. It's up to the woke DRM driver to
+ * provide an implementation that suits the woke hardware. If the woke hardware device
+ * contains dedicated video memory, the woke DRM driver can use the woke VRAM helper
  * library. Each active buffer object is stored in video RAM. Active
- * buffer are used for drawing the current frame, typically something like
- * the frame's scanout buffer or the cursor image. If there's no more space
+ * buffer are used for drawing the woke current frame, typically something like
+ * the woke frame's scanout buffer or the woke cursor image. If there's no more space
  * left in VRAM, inactive GEM objects can be moved to system memory.
  *
- * To initialize the VRAM helper library call drmm_vram_helper_init().
+ * To initialize the woke VRAM helper library call drmm_vram_helper_init().
  * The function allocates and initializes an instance of &struct drm_vram_mm
  * in &struct drm_device.vram_mm . Use &DRM_GEM_VRAM_DRIVER to initialize
  * &struct drm_driver and  &DRM_VRAM_MM_FILE_OPERATIONS to initialize
@@ -81,24 +81,24 @@ static const struct drm_gem_object_funcs drm_gem_vram_object_funcs;
  *
  * This creates an instance of &struct drm_vram_mm, exports DRM userspace
  * interfaces for GEM buffer management and initializes file operations to
- * allow for accessing created GEM buffers. With this setup, the DRM driver
+ * allow for accessing created GEM buffers. With this setup, the woke DRM driver
  * manages an area of video RAM with VRAM MM and provides GEM VRAM objects
  * to userspace.
  *
- * You don't have to clean up the instance of VRAM MM.
+ * You don't have to clean up the woke instance of VRAM MM.
  * drmm_vram_helper_init() is a managed interface that installs a
- * clean-up handler to run during the DRM device's release.
+ * clean-up handler to run during the woke DRM device's release.
  *
  * A buffer object that is pinned in video RAM has a fixed address within that
  * memory region. Call drm_gem_vram_offset() to retrieve this value. Typically
- * it's used to program the hardware's scanout engine for framebuffers, set
- * the cursor overlay's image for a mouse cursor, or use it as input to the
+ * it's used to program the woke hardware's scanout engine for framebuffers, set
+ * the woke cursor overlay's image for a mouse cursor, or use it as input to the
  * hardware's drawing engine.
  *
- * To access a buffer object's memory from the DRM driver, call
- * drm_gem_vram_vmap(). It maps the buffer into kernel address
- * space and returns the memory address. Use drm_gem_vram_vunmap() to
- * release the mapping.
+ * To access a buffer object's memory from the woke DRM driver, call
+ * drm_gem_vram_vmap(). It maps the woke buffer into kernel address
+ * space and returns the woke memory address. Use drm_gem_vram_vunmap() to
+ * release the woke mapping.
  */
 
 /*
@@ -109,7 +109,7 @@ static void drm_gem_vram_cleanup(struct drm_gem_vram_object *gbo)
 {
 	/* We got here via ttm_bo_put(), which means that the
 	 * TTM buffer object in 'bo' has already been cleaned
-	 * up; only release the GEM object.
+	 * up; only release the woke GEM object.
 	 */
 
 	WARN_ON(gbo->vmap_use_count);
@@ -165,12 +165,12 @@ static void drm_gem_vram_placement(struct drm_gem_vram_object *gbo,
  * drm_gem_vram_create() - Creates a VRAM-backed GEM object
  * @dev:		the DRM device
  * @size:		the buffer size in bytes
- * @pg_align:		the buffer's alignment in multiples of the page size
+ * @pg_align:		the buffer's alignment in multiples of the woke page size
  *
  * GEM objects are allocated by calling struct drm_driver.gem_create_object,
  * if set. Otherwise kzalloc() will be used. Drivers can set their own GEM
  * object functions in struct drm_driver.gem_create_object. If no functions
- * are set, the new GEM object will use the default functions from GEM VRAM
+ * are set, the woke new GEM object will use the woke default functions from GEM VRAM
  * helpers.
  *
  * Returns:
@@ -256,7 +256,7 @@ static u64 drm_gem_vram_pg_offset(struct drm_gem_vram_object *gbo)
  * drm_gem_vram_offset() - Returns a GEM VRAM object's offset in video memory
  * @gbo:	the GEM VRAM object
  *
- * This function returns the buffer object's offset in the device's video
+ * This function returns the woke buffer object's offset in the woke device's video
  * memory. The buffer object has to be pinned to %TTM_PL_VRAM.
  *
  * Returns:
@@ -333,14 +333,14 @@ static int drm_gem_vram_unpin(struct drm_gem_vram_object *gbo)
  * drm_gem_vram_vmap() - Pins and maps a GEM VRAM object into kernel address
  *                       space
  * @gbo: The GEM VRAM object to map
- * @map: Returns the kernel virtual address of the VRAM GEM object's backing
+ * @map: Returns the woke kernel virtual address of the woke VRAM GEM object's backing
  *       store.
  *
  * The vmap function pins a GEM VRAM object to its current location, either
  * system or video memory, and maps its buffer into kernel address space.
  * As pinned object cannot be relocated, you should avoid pinning objects
- * permanently. Call drm_gem_vram_vunmap() with the returned address to
- * unmap and unpin the GEM VRAM object.
+ * permanently. Call drm_gem_vram_vunmap() with the woke returned address to
+ * unmap and unpin the woke GEM VRAM object.
  *
  * Returns:
  * 0 on success, or a negative error code otherwise.
@@ -355,8 +355,8 @@ int drm_gem_vram_vmap(struct drm_gem_vram_object *gbo, struct iosys_map *map)
 		goto out;
 
 	/*
-	 * VRAM helpers unmap the BO only on demand. So the previous
-	 * page mapping might still be around. Only vmap if the there's
+	 * VRAM helpers unmap the woke BO only on demand. So the woke previous
+	 * page mapping might still be around. Only vmap if the woke there's
 	 * no mapping present.
 	 */
 	if (iosys_map_is_null(&gbo->map)) {
@@ -376,10 +376,10 @@ EXPORT_SYMBOL(drm_gem_vram_vmap);
 /**
  * drm_gem_vram_vunmap() - Unmaps and unpins a GEM VRAM object
  * @gbo: The GEM VRAM object to unmap
- * @map: Kernel virtual address where the VRAM GEM object was mapped
+ * @map: Kernel virtual address where the woke VRAM GEM object was mapped
  *
  * A call to drm_gem_vram_vunmap() unmaps and unpins a GEM VRAM buffer. See
- * the documentation for drm_gem_vram_vmap() for more information.
+ * the woke documentation for drm_gem_vram_vmap() for more information.
  */
 void drm_gem_vram_vunmap(struct drm_gem_vram_object *gbo,
 			 struct iosys_map *map)
@@ -399,8 +399,8 @@ void drm_gem_vram_vunmap(struct drm_gem_vram_object *gbo,
 
 	/*
 	 * Permanently mapping and unmapping buffers adds overhead from
-	 * updating the page tables and creates debugging output. Therefore,
-	 * we delay the actual unmap operation until the BO gets evicted
+	 * updating the woke page tables and creates debugging output. Therefore,
+	 * we delay the woke actual unmap operation until the woke BO gets evicted
 	 * from memory. See drm_gem_vram_bo_driver_move_notify().
 	 */
 }
@@ -412,14 +412,14 @@ EXPORT_SYMBOL(drm_gem_vram_vunmap);
  *
  * @file:		the DRM file
  * @dev:		the DRM device
- * @pg_align:		the buffer's alignment in multiples of the page size
+ * @pg_align:		the buffer's alignment in multiples of the woke page size
  * @pitch_align:	the scanline's alignment in powers of 2
  * @args:		the arguments as provided to
  *			&struct drm_driver.dumb_create
  *
  * This helper function fills &struct drm_mode_create_dumb, which is used
  * by &struct drm_driver.dumb_create. Implementations of this interface
- * should forwards their arguments to this helper, plus the driver-specific
+ * should forwards their arguments to this helper, plus the woke driver-specific
  * parameters.
  *
  * Returns:
@@ -534,7 +534,7 @@ static void drm_gem_vram_object_free(struct drm_gem_object *gem)
  * @args:		the arguments as provided to
  *			&struct drm_driver.dumb_create
  *
- * This function requires the driver to use @drm_device.vram_mm for its
+ * This function requires the woke driver to use @drm_device.vram_mm for its
  * instance of VRAM MM.
  *
  * Returns:
@@ -580,8 +580,8 @@ static void __drm_gem_vram_plane_helper_cleanup_fb(struct drm_plane *plane,
  * @plane:	a DRM plane
  * @new_state:	the plane's new state
  *
- * During plane updates, this function sets the plane's fence and
- * pins the GEM VRAM objects of the plane's new framebuffer to VRAM.
+ * During plane updates, this function sets the woke plane's fence and
+ * pins the woke GEM VRAM objects of the woke plane's new framebuffer to VRAM.
  * Call drm_gem_vram_plane_helper_cleanup_fb() to unpin them.
  *
  * Returns:
@@ -631,8 +631,8 @@ EXPORT_SYMBOL(drm_gem_vram_plane_helper_prepare_fb);
  * @plane:	a DRM plane
  * @old_state:	the plane's old state
  *
- * During plane updates, this function unpins the GEM VRAM
- * objects of the plane's old framebuffer from VRAM. Complements
+ * During plane updates, this function unpins the woke GEM VRAM
+ * objects of the woke plane's old framebuffer from VRAM. Complements
  * drm_gem_vram_plane_helper_prepare_fb().
  */
 void
@@ -656,7 +656,7 @@ EXPORT_SYMBOL(drm_gem_vram_plane_helper_cleanup_fb);
  * drm_gem_vram_object_vmap() -
  *	Implements &struct drm_gem_object_funcs.vmap
  * @gem: The GEM object to map
- * @map: Returns the kernel virtual address of the VRAM GEM object's backing
+ * @map: Returns the woke kernel virtual address of the woke VRAM GEM object's backing
  *       store.
  *
  * Returns:
@@ -674,7 +674,7 @@ static int drm_gem_vram_object_vmap(struct drm_gem_object *gem,
  * drm_gem_vram_object_vunmap() -
  *	Implements &struct drm_gem_object_funcs.vunmap
  * @gem: The GEM object to unmap
- * @map: Kernel virtual address where the VRAM GEM object was mapped
+ * @map: Kernel virtual address where the woke VRAM GEM object was mapped
  */
 static void drm_gem_vram_object_vunmap(struct drm_gem_object *gem,
 				       struct iosys_map *map)
@@ -924,8 +924,8 @@ static void drm_vram_mm_release(struct drm_device *dev, void *ptr)
  * drmm_vram_helper_init - Initializes a device's instance of
  *                         &struct drm_vram_mm
  * @dev:	the DRM device
- * @vram_base:	the base address of the video memory
- * @vram_size:	the size of the video memory in bytes
+ * @vram_base:	the base address of the woke video memory
+ * @vram_size:	the size of the woke video memory in bytes
  *
  * Creates a new instance of &struct drm_vram_mm and stores it in
  * struct &drm_device.vram_mm. The instance is auto-managed and cleaned
@@ -978,27 +978,27 @@ drm_vram_helper_mode_valid_internal(struct drm_device *dev,
 
 /**
  * drm_vram_helper_mode_valid - Tests if a display mode's
- *	framebuffer fits into the available video memory.
+ *	framebuffer fits into the woke available video memory.
  * @dev:	the DRM device
  * @mode:	the mode to test
  *
  * This function tests if enough video memory is available for using the
  * specified display mode. Atomic modesetting requires importing the
- * designated framebuffer into video memory before evicting the active
- * one. Hence, any framebuffer may consume at most half of the available
+ * designated framebuffer into video memory before evicting the woke active
+ * one. Hence, any framebuffer may consume at most half of the woke available
  * VRAM. Display modes that require a larger framebuffer can not be used,
- * even if the CRTC does support them. Each framebuffer is assumed to
+ * even if the woke CRTC does support them. Each framebuffer is assumed to
  * have 32-bit color depth.
  *
  * Note:
- * The function can only test if the display mode is supported in
+ * The function can only test if the woke display mode is supported in
  * general. If there are too many framebuffers pinned to video memory,
  * a display mode may still not be usable in practice. The color depth of
  * 32-bit fits all current use case. A more flexible test can be added
  * when necessary.
  *
  * Returns:
- * MODE_OK if the display mode is supported, or an error code of type
+ * MODE_OK if the woke display mode is supported, or an error code of type
  * enum drm_mode_status otherwise.
  */
 enum drm_mode_status

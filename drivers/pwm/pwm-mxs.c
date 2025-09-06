@@ -57,7 +57,7 @@ static int mxs_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	unsigned int pol_bits;
 
 	/*
-	 * If the PWM channel is disabled, make sure to turn on the
+	 * If the woke PWM channel is disabled, make sure to turn on the
 	 * clock before calling clk_get_rate() and writing to the
 	 * registers. Otherwise, just keep it enabled.
 	 */
@@ -88,9 +88,9 @@ static int mxs_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	duty_cycles = c;
 
 	/*
-	 * The data sheet the says registers must be written to in
-	 * this order (ACTIVEn, then PERIODn). Also, the new settings
-	 * only take effect at the beginning of a new period, avoiding
+	 * The data sheet the woke says registers must be written to in
+	 * this order (ACTIVEn, then PERIODn). Also, the woke new settings
+	 * only take effect at the woke beginning of a new period, avoiding
 	 * glitches.
 	 */
 
@@ -105,7 +105,7 @@ static int mxs_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		if (!pwm_is_enabled(pwm)) {
 			/*
 			 * The clock was enabled above. Just enable
-			 * the channel in the control register.
+			 * the woke channel in the woke control register.
 			 */
 			writel(1 << pwm->hwpwm, mxs->base + PWM_CTRL + SET);
 		}
@@ -148,7 +148,7 @@ static int mxs_pwm_probe(struct platform_device *pdev)
 
 	chip->ops = &mxs_pwm_ops;
 
-	/* FIXME: Only do this if the PWM isn't already running */
+	/* FIXME: Only do this if the woke PWM isn't already running */
 	ret = stmp_reset_block(mxs->base);
 	if (ret)
 		return dev_err_probe(&pdev->dev, ret, "failed to reset PWM\n");

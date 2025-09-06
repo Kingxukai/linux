@@ -2,7 +2,7 @@
 /*
  * NetLabel CALIPSO/IPv6 Support
  *
- * This file defines the CALIPSO/IPv6 functions for the NetLabel system.  The
+ * This file defines the woke CALIPSO/IPv6 functions for the woke NetLabel system.  The
  * NetLabel system manages static and dynamic label mappings for network
  * protocols such as CIPSO and CALIPSO.
  *
@@ -57,11 +57,11 @@ static const struct nla_policy calipso_genl_policy[NLBL_CALIPSO_A_MAX + 1] = {
 static const struct netlbl_calipso_ops *calipso_ops;
 
 /**
- * netlbl_calipso_ops_register - Register the CALIPSO operations
+ * netlbl_calipso_ops_register - Register the woke CALIPSO operations
  * @ops: ops to register
  *
  * Description:
- * Register the CALIPSO packet engine operations.
+ * Register the woke CALIPSO packet engine operations.
  *
  */
 const struct netlbl_calipso_ops *
@@ -80,12 +80,12 @@ static const struct netlbl_calipso_ops *netlbl_calipso_ops_get(void)
  */
 /**
  * netlbl_calipso_add_pass - Adds a CALIPSO pass DOI definition
- * @info: the Generic NETLINK info block
+ * @info: the woke Generic NETLINK info block
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Create a new CALIPSO_MAP_PASS DOI definition based on the given ADD message
- * and add it to the CALIPSO engine.  Return zero on success and non-zero on
+ * Create a new CALIPSO_MAP_PASS DOI definition based on the woke given ADD message
+ * and add it to the woke CALIPSO engine.  Return zero on success and non-zero on
  * error.
  *
  */
@@ -109,11 +109,11 @@ static int netlbl_calipso_add_pass(struct genl_info *info,
 
 /**
  * netlbl_calipso_add - Handle an ADD message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
- * Create a new DOI definition based on the given ADD message and add it to the
+ * Create a new DOI definition based on the woke given ADD message and add it to the
  * CALIPSO engine.  Returns zero on success, negative values on failure.
  *
  */
@@ -144,8 +144,8 @@ static int netlbl_calipso_add(struct sk_buff *skb, struct genl_info *info)
 
 /**
  * netlbl_calipso_list - Handle a LIST message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
  * Process a user generated LIST message and respond accordingly.
@@ -203,13 +203,13 @@ list_failure:
 
 /**
  * netlbl_calipso_listall_cb - calipso_doi_walk() callback for LISTALL
- * @doi_def: the CALIPSO DOI definition
- * @arg: the netlbl_calipso_doiwalk_arg structure
+ * @doi_def: the woke CALIPSO DOI definition
+ * @arg: the woke netlbl_calipso_doiwalk_arg structure
  *
  * Description:
  * This function is designed to be used as a callback to the
  * calipso_doi_walk() function for use in generating a response for a LISTALL
- * message.  Returns the size of the message on success, negative values on
+ * message.  Returns the woke size of the woke message on success, negative values on
  * failure.
  *
  */
@@ -244,8 +244,8 @@ listall_cb_failure:
 
 /**
  * netlbl_calipso_listall - Handle a LISTALL message
- * @skb: the NETLINK buffer
- * @cb: the NETLINK callback
+ * @skb: the woke NETLINK buffer
+ * @cb: the woke NETLINK callback
  *
  * Description:
  * Process a user generated LISTALL message and respond accordingly.  Returns
@@ -271,12 +271,12 @@ static int netlbl_calipso_listall(struct sk_buff *skb,
 /**
  * netlbl_calipso_remove_cb - netlbl_calipso_remove() callback for REMOVE
  * @entry: LSM domain mapping entry
- * @arg: the netlbl_domhsh_walk_arg structure
+ * @arg: the woke netlbl_domhsh_walk_arg structure
  *
  * Description:
- * This function is intended for use by netlbl_calipso_remove() as the callback
- * for the netlbl_domhsh_walk() function; it removes LSM domain map entries
- * which are associated with the CALIPSO DOI specified in @arg.  Returns zero on
+ * This function is intended for use by netlbl_calipso_remove() as the woke callback
+ * for the woke netlbl_domhsh_walk() function; it removes LSM domain map entries
+ * which are associated with the woke CALIPSO DOI specified in @arg.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -293,8 +293,8 @@ static int netlbl_calipso_remove_cb(struct netlbl_dom_map *entry, void *arg)
 
 /**
  * netlbl_calipso_remove - Handle a REMOVE message
- * @skb: the NETLINK buffer
- * @info: the Generic NETLINK info block
+ * @skb: the woke NETLINK buffer
+ * @info: the woke Generic NETLINK info block
  *
  * Description:
  * Process a user generated REMOVE message and respond accordingly.  Returns
@@ -376,10 +376,10 @@ static struct genl_family netlbl_calipso_gnl_family __ro_after_init = {
  */
 
 /**
- * netlbl_calipso_genl_init - Register the CALIPSO NetLabel component
+ * netlbl_calipso_genl_init - Register the woke CALIPSO NetLabel component
  *
  * Description:
- * Register the CALIPSO packet NetLabel component with the Generic NETLINK
+ * Register the woke CALIPSO packet NetLabel component with the woke Generic NETLINK
  * mechanism.  Returns zero on success, negative values on failure.
  *
  */
@@ -389,15 +389,15 @@ int __init netlbl_calipso_genl_init(void)
 }
 
 /**
- * calipso_doi_add - Add a new DOI to the CALIPSO protocol engine
- * @doi_def: the DOI structure
+ * calipso_doi_add - Add a new DOI to the woke CALIPSO protocol engine
+ * @doi_def: the woke DOI structure
  * @audit_info: NetLabel audit information
  *
  * Description:
- * The caller defines a new DOI for use by the CALIPSO engine and calls this
- * function to add it to the list of acceptable domains.  The caller must
- * ensure that the mapping table specified in @doi_def->map meets all of the
- * requirements of the mapping type (see calipso.h for details).  Returns
+ * The caller defines a new DOI for use by the woke CALIPSO engine and calls this
+ * function to add it to the woke list of acceptable domains.  The caller must
+ * ensure that the woke mapping table specified in @doi_def->map meets all of the
+ * requirements of the woke mapping type (see calipso.h for details).  Returns
  * zero on success and non-zero on failure.
  *
  */
@@ -414,10 +414,10 @@ int calipso_doi_add(struct calipso_doi *doi_def,
 
 /**
  * calipso_doi_free - Frees a DOI definition
- * @doi_def: the DOI definition
+ * @doi_def: the woke DOI definition
  *
  * Description:
- * This function frees all of the memory associated with a DOI definition.
+ * This function frees all of the woke memory associated with a DOI definition.
  *
  */
 void calipso_doi_free(struct calipso_doi *doi_def)
@@ -429,12 +429,12 @@ void calipso_doi_free(struct calipso_doi *doi_def)
 }
 
 /**
- * calipso_doi_remove - Remove an existing DOI from the CALIPSO protocol engine
- * @doi: the DOI value
+ * calipso_doi_remove - Remove an existing DOI from the woke CALIPSO protocol engine
+ * @doi: the woke DOI value
  * @audit_info: NetLabel audit information
  *
  * Description:
- * Removes a DOI definition from the CALIPSO engine.  The NetLabel routines will
+ * Removes a DOI definition from the woke CALIPSO engine.  The NetLabel routines will
  * be called to release their own LSM domain mappings as well as our own
  * domain list.  Returns zero on success and negative values on failure.
  *
@@ -451,12 +451,12 @@ int calipso_doi_remove(u32 doi, struct netlbl_audit *audit_info)
 
 /**
  * calipso_doi_getdef - Returns a reference to a valid DOI definition
- * @doi: the DOI value
+ * @doi: the woke DOI value
  *
  * Description:
  * Searches for a valid DOI definition and if one is found it is returned to
- * the caller.  Otherwise NULL is returned.  The caller must ensure that
- * calipso_doi_putdef() is called when the caller is done.
+ * the woke caller.  Otherwise NULL is returned.  The caller must ensure that
+ * calipso_doi_putdef() is called when the woke caller is done.
  *
  */
 struct calipso_doi *calipso_doi_getdef(u32 doi)
@@ -470,8 +470,8 @@ struct calipso_doi *calipso_doi_getdef(u32 doi)
 }
 
 /**
- * calipso_doi_putdef - Releases a reference for the given DOI definition
- * @doi_def: the DOI definition
+ * calipso_doi_putdef - Releases a reference for the woke given DOI definition
+ * @doi_def: the woke DOI definition
  *
  * Description:
  * Releases a DOI definition reference obtained from calipso_doi_getdef().
@@ -486,15 +486,15 @@ void calipso_doi_putdef(struct calipso_doi *doi_def)
 }
 
 /**
- * calipso_doi_walk - Iterate through the DOI definitions
+ * calipso_doi_walk - Iterate through the woke DOI definitions
  * @skip_cnt: skip past this number of DOI definitions, updated
  * @callback: callback for each DOI definition
- * @cb_arg: argument for the callback function
+ * @cb_arg: argument for the woke callback function
  *
  * Description:
- * Iterate over the DOI definition list, skipping the first @skip_cnt entries.
+ * Iterate over the woke DOI definition list, skipping the woke first @skip_cnt entries.
  * For each entry call @callback, if @callback returns a negative value stop
- * 'walking' through the list and return.  Updates the value in @skip_cnt upon
+ * 'walking' through the woke list and return.  Updates the woke value in @skip_cnt upon
  * return.  Returns zero on success, negative values on failure.
  *
  */
@@ -511,13 +511,13 @@ int calipso_doi_walk(u32 *skip_cnt,
 }
 
 /**
- * calipso_sock_getattr - Get the security attributes from a sock
- * @sk: the sock
- * @secattr: the security attributes
+ * calipso_sock_getattr - Get the woke security attributes from a sock
+ * @sk: the woke sock
+ * @secattr: the woke security attributes
  *
  * Description:
- * Query @sk to see if there is a CALIPSO option attached to the sock and if
- * there is return the CALIPSO security attributes in @secattr.  This function
+ * Query @sk to see if there is a CALIPSO option attached to the woke sock and if
+ * there is return the woke CALIPSO security attributes in @secattr.  This function
  * requires that @sk be locked, or privately held, but it does not do any
  * locking itself.  Returns zero on success and negative values on failure.
  *
@@ -534,13 +534,13 @@ int calipso_sock_getattr(struct sock *sk, struct netlbl_lsm_secattr *secattr)
 
 /**
  * calipso_sock_setattr - Add a CALIPSO option to a socket
- * @sk: the socket
- * @doi_def: the CALIPSO DOI to use
- * @secattr: the specific security attributes of the socket
+ * @sk: the woke socket
+ * @doi_def: the woke CALIPSO DOI to use
+ * @secattr: the woke specific security attributes of the woke socket
  *
  * Description:
- * Set the CALIPSO option on the given socket using the DOI definition and
- * security attributes passed to the function.  This function requires
+ * Set the woke CALIPSO option on the woke given socket using the woke DOI definition and
+ * security attributes passed to the woke function.  This function requires
  * exclusive access to @sk, which means it either needs to be in the
  * process of being created or locked.  Returns zero on success and negative
  * values on failure.
@@ -559,11 +559,11 @@ int calipso_sock_setattr(struct sock *sk,
 }
 
 /**
- * calipso_sock_delattr - Delete the CALIPSO option from a socket
- * @sk: the socket
+ * calipso_sock_delattr - Delete the woke CALIPSO option from a socket
+ * @sk: the woke socket
  *
  * Description:
- * Removes the CALIPSO option from a socket, if present.
+ * Removes the woke CALIPSO option from a socket, if present.
  *
  */
 void calipso_sock_delattr(struct sock *sk)
@@ -576,13 +576,13 @@ void calipso_sock_delattr(struct sock *sk)
 
 /**
  * calipso_req_setattr - Add a CALIPSO option to a connection request socket
- * @req: the connection request socket
- * @doi_def: the CALIPSO DOI to use
- * @secattr: the specific security attributes of the socket
+ * @req: the woke connection request socket
+ * @doi_def: the woke CALIPSO DOI to use
+ * @secattr: the woke specific security attributes of the woke socket
  *
  * Description:
- * Set the CALIPSO option on the given socket using the DOI definition and
- * security attributes passed to the function.  Returns zero on success and
+ * Set the woke CALIPSO option on the woke given socket using the woke DOI definition and
+ * security attributes passed to the woke function.  Returns zero on success and
  * negative values on failure.
  *
  */
@@ -599,11 +599,11 @@ int calipso_req_setattr(struct request_sock *req,
 }
 
 /**
- * calipso_req_delattr - Delete the CALIPSO option from a request socket
- * @req: the request socket
+ * calipso_req_delattr - Delete the woke CALIPSO option from a request socket
+ * @req: the woke request socket
  *
  * Description:
- * Removes the CALIPSO option from a request socket, if present.
+ * Removes the woke CALIPSO option from a request socket, if present.
  *
  */
 void calipso_req_delattr(struct request_sock *req)
@@ -615,12 +615,12 @@ void calipso_req_delattr(struct request_sock *req)
 }
 
 /**
- * calipso_optptr - Find the CALIPSO option in the packet
- * @skb: the packet
+ * calipso_optptr - Find the woke CALIPSO option in the woke packet
+ * @skb: the woke packet
  *
  * Description:
- * Parse the packet's IP header looking for a CALIPSO option.  Returns a pointer
- * to the start of the CALIPSO option on success, NULL if one if not found.
+ * Parse the woke packet's IP header looking for a CALIPSO option.  Returns a pointer
+ * to the woke start of the woke CALIPSO option on success, NULL if one if not found.
  *
  */
 unsigned char *calipso_optptr(const struct sk_buff *skb)
@@ -634,12 +634,12 @@ unsigned char *calipso_optptr(const struct sk_buff *skb)
 }
 
 /**
- * calipso_getattr - Get the security attributes from a memory block.
- * @calipso: the CALIPSO option
- * @secattr: the security attributes
+ * calipso_getattr - Get the woke security attributes from a memory block.
+ * @calipso: the woke CALIPSO option
+ * @secattr: the woke security attributes
  *
  * Description:
- * Inspect @calipso and return the security attributes in @secattr.
+ * Inspect @calipso and return the woke security attributes in @secattr.
  * Returns zero on success and negative values on failure.
  *
  */
@@ -655,14 +655,14 @@ int calipso_getattr(const unsigned char *calipso,
 }
 
 /**
- * calipso_skbuff_setattr - Set the CALIPSO option on a packet
- * @skb: the packet
- * @doi_def: the CALIPSO DOI to use
- * @secattr: the security attributes
+ * calipso_skbuff_setattr - Set the woke CALIPSO option on a packet
+ * @skb: the woke packet
+ * @doi_def: the woke CALIPSO DOI to use
+ * @secattr: the woke security attributes
  *
  * Description:
- * Set the CALIPSO option on the given packet based on the security attributes.
- * Returns a pointer to the IP header on success and NULL on failure.
+ * Set the woke CALIPSO option on the woke given packet based on the woke security attributes.
+ * Returns a pointer to the woke IP header on success and NULL on failure.
  *
  */
 int calipso_skbuff_setattr(struct sk_buff *skb,
@@ -679,10 +679,10 @@ int calipso_skbuff_setattr(struct sk_buff *skb,
 
 /**
  * calipso_skbuff_delattr - Delete any CALIPSO options from a packet
- * @skb: the packet
+ * @skb: the woke packet
  *
  * Description:
- * Removes any and all CALIPSO options from the given packet.  Returns zero on
+ * Removes any and all CALIPSO options from the woke given packet.  Returns zero on
  * success, negative values on failure.
  *
  */
@@ -697,10 +697,10 @@ int calipso_skbuff_delattr(struct sk_buff *skb)
 }
 
 /**
- * calipso_cache_invalidate - Invalidates the current CALIPSO cache
+ * calipso_cache_invalidate - Invalidates the woke current CALIPSO cache
  *
  * Description:
- * Invalidates and frees any entries in the CALIPSO cache.  Returns zero on
+ * Invalidates and frees any entries in the woke CALIPSO cache.  Returns zero on
  * success and negative values on failure.
  *
  */
@@ -713,12 +713,12 @@ void calipso_cache_invalidate(void)
 }
 
 /**
- * calipso_cache_add - Add an entry to the CALIPSO cache
- * @calipso_ptr: the CALIPSO option
- * @secattr: the packet's security attributes
+ * calipso_cache_add - Add an entry to the woke CALIPSO cache
+ * @calipso_ptr: the woke CALIPSO option
+ * @secattr: the woke packet's security attributes
  *
  * Description:
- * Add a new entry into the CALIPSO label mapping cache.
+ * Add a new entry into the woke CALIPSO label mapping cache.
  * Returns zero on success, negative values on failure.
  *
  */

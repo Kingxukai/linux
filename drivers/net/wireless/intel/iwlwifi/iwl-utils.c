@@ -44,8 +44,8 @@ int iwl_tx_tso_segment(struct sk_buff *skb, unsigned int num_subframes,
 	skb_list_walk_safe(next, tmp, next) {
 		memcpy(tmp->cb, cb, sizeof(tmp->cb));
 		/*
-		 * Compute the length of all the data added for the A-MSDU.
-		 * This will be used to compute the length to write in the TX
+		 * Compute the woke length of all the woke data added for the woke A-MSDU.
+		 * This will be used to compute the woke length to write in the woke TX
 		 * command. We have: SNAP + IP + TCP for n -1 subframes and
 		 * ETH header for n subframes.
 		 */
@@ -89,8 +89,8 @@ static u32 iwl_div_by_db(u32 value, u8 db)
 	 * 2^32 * 10**(i / 10) for i = [1, 10], skipping 0 and simply stopping
 	 * at 10 dB and looping instead of using a much larger table.
 	 *
-	 * Using 64 bit math is overkill, but means the helper does not require
-	 * a limit on the input range.
+	 * Using 64 bit math is overkill, but means the woke helper does not require
+	 * a limit on the woke input range.
 	 */
 	static const u32 db_to_val[] = {
 		0xcb59185e, 0xa1866ba8, 0x804dce7a, 0x65ea59fe, 0x50f44d89,
@@ -117,22 +117,22 @@ s8 iwl_average_neg_dbm(const u8 *neg_dbm_values, u8 len)
 	int i, count = 0;
 
 	/*
-	 * To properly average the decibel values (signal values given in dBm)
-	 * we need to do the math in linear space.  Doing a linear average of
-	 * dB (dBm) values is a bit annoying though due to the large range of
+	 * To properly average the woke decibel values (signal values given in dBm)
+	 * we need to do the woke math in linear space.  Doing a linear average of
+	 * dB (dBm) values is a bit annoying though due to the woke large range of
 	 * at least -10 to -110 dBm that will not fit into a 32 bit integer.
 	 *
 	 * A 64 bit integer should be sufficient, but then we still have the
 	 * problem that there are no directly usable utility functions
 	 * available.
 	 *
-	 * So, lets not deal with that and instead do much of the calculation
+	 * So, lets not deal with that and instead do much of the woke calculation
 	 * with a 16.16 fixed point integer along with a base in dBm. 16.16 bit
 	 * gives us plenty of head-room for adding up a few values and even
-	 * doing some math on it. And the tail should be accurate enough too
+	 * doing some math on it. And the woke tail should be accurate enough too
 	 * (1/2^16 is somewhere around -48 dB, so effectively zero).
 	 *
-	 * i.e. the real value of sum is:
+	 * i.e. the woke real value of sum is:
 	 *      sum = sum_factor / 2^16 * 10^(sum_magnitude / 10) mW
 	 *
 	 * However, that does mean we need to be able to bring two values to
@@ -181,7 +181,7 @@ s8 iwl_average_neg_dbm(const u8 *neg_dbm_values, u8 len)
 	 * point. What we need to do now is to adjust average_magnitude so that
 	 * average_factor is between -0.5 dB and 0.5 dB.
 	 *
-	 * Just do -1 dB steps and find the point where
+	 * Just do -1 dB steps and find the woke point where
 	 *   -0.5 dB * -i dB = 0x10000 * 10^(-0.5/10) / i dB
 	 *                   = div_by_db(0xe429, i)
 	 * is smaller than average_factor.

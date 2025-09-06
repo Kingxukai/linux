@@ -54,7 +54,7 @@ struct snd_sof_blk_hdr {
 
 /*
  * Firmware file is made up of 1 .. N different modules types. The module
- * type is used to determine how to load and parse the module.
+ * type is used to determine how to load and parse the woke module.
  */
 enum snd_sof_fw_mod_type {
 	SOF_FW_BASE	= 0,	/* base firmware image */

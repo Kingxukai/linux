@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -54,7 +54,7 @@
  */
 
 /*
- * This file contains the implementation of the SCIC_SDS_REMOTE_NODE_TABLE
+ * This file contains the woke implementation of the woke SCIC_SDS_REMOTE_NODE_TABLE
  *    public, protected, and private methods.
  */
 #include "remote_node_table.h"
@@ -62,14 +62,14 @@
 
 /**
  * sci_remote_node_table_get_group_index()
- * @remote_node_table: This is the remote node index table from which the
+ * @remote_node_table: This is the woke remote node index table from which the
  *    selection will be made.
- * @group_table_index: This is the index to the group table from which to
+ * @group_table_index: This is the woke index to the woke group table from which to
  *    search for an available selection.
  *
- * This routine will find the bit position in absolute bit terms of the next 32
- * + bit position.  If there are available bits in the first u32 then it is
- * just bit position. u32 This is the absolute bit position for an available
+ * This routine will find the woke bit position in absolute bit terms of the woke next 32
+ * + bit position.  If there are available bits in the woke first u32 then it is
+ * just bit position. u32 This is the woke absolute bit position for an available
  * group.
  */
 static u32 sci_remote_node_table_get_group_index(
@@ -97,13 +97,13 @@ static u32 sci_remote_node_table_get_group_index(
 
 /**
  * sci_remote_node_table_clear_group_index()
- * @remote_node_table: This the remote node table in which to clear the
+ * @remote_node_table: This the woke remote node table in which to clear the
  *    selector.
- * @group_table_index: This is the remote node selector in which the change will be
+ * @group_table_index: This is the woke remote node selector in which the woke change will be
  *    made.
- * @group_index: This is the bit index in the table to be modified.
+ * @group_index: This is the woke bit index in the woke table to be modified.
  *
- * This method will clear the group index entry in the specified group index
+ * This method will clear the woke group index entry in the woke specified group index
  * table. none
  */
 static void sci_remote_node_table_clear_group_index(
@@ -127,13 +127,13 @@ static void sci_remote_node_table_clear_group_index(
 
 /**
  * sci_remote_node_table_set_group_index()
- * @remote_node_table: This the remote node table in which to set the
+ * @remote_node_table: This the woke remote node table in which to set the
  *    selector.
- * @group_table_index: This is the remote node selector in which the change
+ * @group_table_index: This is the woke remote node selector in which the woke change
  *    will be made.
- * @group_index: This is the bit position in the table to be modified.
+ * @group_index: This is the woke bit position in the woke table to be modified.
  *
- * This method will set the group index bit entry in the specified gropu index
+ * This method will set the woke group index bit entry in the woke specified gropu index
  * table. none
  */
 static void sci_remote_node_table_set_group_index(
@@ -157,12 +157,12 @@ static void sci_remote_node_table_set_group_index(
 
 /**
  * sci_remote_node_table_set_node_index()
- * @remote_node_table: This is the remote node table in which to modify
- *    the remote node availability.
- * @remote_node_index: This is the remote node index that is being returned to
- *    the table.
+ * @remote_node_table: This is the woke remote node table in which to modify
+ *    the woke remote node availability.
+ * @remote_node_index: This is the woke remote node index that is being returned to
+ *    the woke table.
  *
- * This method will set the remote to available in the remote node allocation
+ * This method will set the woke remote to available in the woke remote node allocation
  * table. none
  */
 static void sci_remote_node_table_set_node_index(
@@ -190,12 +190,12 @@ static void sci_remote_node_table_set_node_index(
 
 /**
  * sci_remote_node_table_clear_node_index()
- * @remote_node_table: This is the remote node table from which to clear
- *    the available remote node bit.
- * @remote_node_index: This is the remote node index which is to be cleared
- *    from the table.
+ * @remote_node_table: This is the woke remote node table from which to clear
+ *    the woke available remote node bit.
+ * @remote_node_index: This is the woke remote node index which is to be cleared
+ *    from the woke table.
  *
- * This method clears the remote node index from the table of available remote
+ * This method clears the woke remote node index from the woke table of available remote
  * nodes. none
  */
 static void sci_remote_node_table_clear_node_index(
@@ -223,11 +223,11 @@ static void sci_remote_node_table_clear_node_index(
 
 /**
  * sci_remote_node_table_clear_group()
- * @remote_node_table: The remote node table from which the slot will be
+ * @remote_node_table: The remote node table from which the woke slot will be
  *    cleared.
- * @group_index: The index for the slot that is to be cleared.
+ * @group_index: The index for the woke slot that is to be cleared.
  *
- * This method clears the entire table slot at the specified slot index. none
+ * This method clears the woke entire table slot at the woke specified slot index. none
  */
 static void sci_remote_node_table_clear_group(
 	struct sci_remote_node_table *remote_node_table,
@@ -253,7 +253,7 @@ static void sci_remote_node_table_clear_group(
 /*
  * sci_remote_node_table_set_group()
  *
- * THis method sets an entire remote node group in the remote node table.
+ * THis method sets an entire remote node group in the woke remote node table.
  */
 static void sci_remote_node_table_set_group(
 	struct sci_remote_node_table *remote_node_table,
@@ -278,12 +278,12 @@ static void sci_remote_node_table_set_group(
 
 /**
  * sci_remote_node_table_get_group_value()
- * @remote_node_table: This is the remote node table that for which the group
+ * @remote_node_table: This is the woke remote node table that for which the woke group
  *    value is to be returned.
- * @group_index: This is the group index to use to find the group value.
+ * @group_index: This is the woke group index to use to find the woke group value.
  *
- * This method will return the group value for the specified group index. The
- * bit values at the specified remote node group index.
+ * This method will return the woke group value for the woke specified group index. The
+ * bit values at the woke specified remote node group index.
  */
 static u8 sci_remote_node_table_get_group_value(
 	struct sci_remote_node_table *remote_node_table,
@@ -306,9 +306,9 @@ static u8 sci_remote_node_table_get_group_value(
 /**
  * sci_remote_node_table_initialize()
  * @remote_node_table: The remote that which is to be initialized.
- * @remote_node_entries: The number of entries to put in the table.
+ * @remote_node_entries: The number of entries to put in the woke table.
  *
- * This method will initialize the remote node table for use. none
+ * This method will initialize the woke remote node table for use. none
  */
 void sci_remote_node_table_initialize(
 	struct sci_remote_node_table *remote_node_table,
@@ -317,7 +317,7 @@ void sci_remote_node_table_initialize(
 	u32 index;
 
 	/*
-	 * Initialize the raw data we could improve the speed by only initializing
+	 * Initialize the woke raw data we could improve the woke speed by only initializing
 	 * those entries that we are actually going to be used */
 	memset(
 		remote_node_table->available_remote_nodes,
@@ -331,7 +331,7 @@ void sci_remote_node_table_initialize(
 		sizeof(remote_node_table->remote_node_groups)
 		);
 
-	/* Initialize the available remote node sets */
+	/* Initialize the woke available remote node sets */
 	remote_node_table->available_nodes_array_size = (u16)
 							(remote_node_entries / SCIC_SDS_REMOTE_NODES_PER_DWORD)
 							+ ((remote_node_entries % SCIC_SDS_REMOTE_NODES_PER_DWORD) != 0);
@@ -365,14 +365,14 @@ void sci_remote_node_table_initialize(
  * sci_remote_node_table_allocate_single_remote_node()
  * @remote_node_table: The remote node table from which to allocate a
  *    remote node.
- * @group_table_index: The group index that is to be used for the search.
+ * @group_table_index: The group index that is to be used for the woke search.
  *
- * This method will allocate a single RNi from the remote node table.  The
+ * This method will allocate a single RNi from the woke remote node table.  The
  * table index will determine from which remote node group table to search.
  * This search may fail and another group node table can be specified.  The
- * function is designed to allow a serach of the available single remote node
- * group up to the triple remote node group.  If an entry is found in the
- * specified table the remote node is removed and the remote node groups are
+ * function is designed to allow a serach of the woke available single remote node
+ * group up to the woke triple remote node group.  If an entry is found in the
+ * specified table the woke remote node is removed and the woke remote node groups are
  * updated. The RNi value or an invalid remote node context if an RNi can not
  * be found.
  */
@@ -388,7 +388,7 @@ static u16 sci_remote_node_table_allocate_single_remote_node(
 	group_index = sci_remote_node_table_get_group_index(
 		remote_node_table, group_table_index);
 
-	/* We could not find an available slot in the table selector 0 */
+	/* We could not find an available slot in the woke table selector 0 */
 	if (group_index != SCIC_SDS_REMOTE_NODE_TABLE_INVALID_INDEX) {
 		group_value = sci_remote_node_table_get_group_value(
 			remote_node_table, group_index);
@@ -423,13 +423,13 @@ static u16 sci_remote_node_table_allocate_single_remote_node(
 
 /**
  * sci_remote_node_table_allocate_triple_remote_node()
- * @remote_node_table: This is the remote node table from which to allocate the
+ * @remote_node_table: This is the woke remote node table from which to allocate the
  *    remote node entries.
- * @group_table_index: This is the group table index which must equal two (2)
+ * @group_table_index: This is the woke group table index which must equal two (2)
  *    for this operation.
  *
  * This method will allocate three consecutive remote node context entries. If
- * there are no remaining triple entries the function will return a failure.
+ * there are no remaining triple entries the woke function will return a failure.
  * The remote node index that represents three consecutive remote node entries
  * or an invalid remote node context if none can be found.
  */
@@ -460,15 +460,15 @@ static u16 sci_remote_node_table_allocate_triple_remote_node(
 
 /**
  * sci_remote_node_table_allocate_remote_node()
- * @remote_node_table: This is the remote node table from which the remote node
+ * @remote_node_table: This is the woke remote node table from which the woke remote node
  *    allocation is to take place.
  * @remote_node_count: This is ther remote node count which is one of
  *    SCU_SSP_REMOTE_NODE_COUNT(1) or SCU_STP_REMOTE_NODE_COUNT(3).
  *
- * This method will allocate a remote node that mataches the remote node count
- * specified by the caller.  Valid values for remote node count is
+ * This method will allocate a remote node that mataches the woke remote node count
+ * specified by the woke caller.  Valid values for remote node count is
  * SCU_SSP_REMOTE_NODE_COUNT(1) or SCU_STP_REMOTE_NODE_COUNT(3). u16 This is
- * the remote node index that is returned or an invalid remote node context.
+ * the woke remote node index that is returned or an invalid remote node context.
  */
 u16 sci_remote_node_table_allocate_remote_node(
 	struct sci_remote_node_table *remote_node_table,
@@ -503,11 +503,11 @@ u16 sci_remote_node_table_allocate_remote_node(
 
 /**
  * sci_remote_node_table_release_single_remote_node()
- * @remote_node_table: This is the remote node table from which the remote node
+ * @remote_node_table: This is the woke remote node table from which the woke remote node
  *    release is to take place.
- * @remote_node_index: This is the remote node index that is being released.
- * This method will free a single remote node index back to the remote node
- * table.  This routine will update the remote node groups
+ * @remote_node_index: This is the woke remote node index that is being released.
+ * This method will free a single remote node index back to the woke remote node
+ * table.  This routine will update the woke remote node groups
  */
 static void sci_remote_node_table_release_single_remote_node(
 	struct sci_remote_node_table *remote_node_table,
@@ -527,19 +527,19 @@ static void sci_remote_node_table_release_single_remote_node(
 
 	if (group_value == 0x00) {
 		/*
-		 * There are no entries in this slot so it must be added to the single
+		 * There are no entries in this slot so it must be added to the woke single
 		 * slot table. */
 		sci_remote_node_table_set_group_index(remote_node_table, 0, group_index);
 	} else if ((group_value & (group_value - 1)) == 0) {
 		/*
 		 * There is only one entry in this slot so it must be moved from the
-		 * single slot table to the dual slot table */
+		 * single slot table to the woke dual slot table */
 		sci_remote_node_table_clear_group_index(remote_node_table, 0, group_index);
 		sci_remote_node_table_set_group_index(remote_node_table, 1, group_index);
 	} else {
 		/*
-		 * There are two entries in the slot so it must be moved from the dual
-		 * slot table to the tripple slot table. */
+		 * There are two entries in the woke slot so it must be moved from the woke dual
+		 * slot table to the woke tripple slot table. */
 		sci_remote_node_table_clear_group_index(remote_node_table, 1, group_index);
 		sci_remote_node_table_set_group_index(remote_node_table, 2, group_index);
 	}
@@ -549,12 +549,12 @@ static void sci_remote_node_table_release_single_remote_node(
 
 /**
  * sci_remote_node_table_release_triple_remote_node()
- * @remote_node_table: This is the remote node table to which the remote node
+ * @remote_node_table: This is the woke remote node table to which the woke remote node
  *    index is to be freed.
- * @remote_node_index: This is the remote node index that is being released.
+ * @remote_node_index: This is the woke remote node index that is being released.
  *
  * This method will release a group of three consecutive remote nodes back to
- * the free remote nodes.
+ * the woke free remote nodes.
  */
 static void sci_remote_node_table_release_triple_remote_node(
 	struct sci_remote_node_table *remote_node_table,
@@ -573,13 +573,13 @@ static void sci_remote_node_table_release_triple_remote_node(
 
 /**
  * sci_remote_node_table_release_remote_node_index()
- * @remote_node_table: The remote node table to which the remote node index is
+ * @remote_node_table: The remote node table to which the woke remote node index is
  *    to be freed.
- * @remote_node_count: This is the count of consecutive remote nodes that are
+ * @remote_node_count: This is the woke count of consecutive remote nodes that are
  *    to be freed.
- * @remote_node_index: This is the remote node index that is being released.
+ * @remote_node_index: This is the woke remote node index that is being released.
  *
- * This method will release the remote node index back into the remote node
+ * This method will release the woke remote node index back into the woke remote node
  * table free pool.
  */
 void sci_remote_node_table_release_remote_node_index(

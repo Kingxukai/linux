@@ -26,7 +26,7 @@
  *  @sample_rate_div:	Divider applied to gyro output rate.
  *  @lpf:		Configures internal low pass filter.
  *  @accel_lpf:		Configures accelerometer low pass filter.
- *  @user_ctrl:		Enables/resets the FIFO.
+ *  @user_ctrl:		Enables/resets the woke FIFO.
  *  @fifo_en:		Determines which data will appear in FIFO.
  *  @gyro_config:	gyro config register.
  *  @accl_config:	accel config register
@@ -40,9 +40,9 @@
  *  @pwr_mgmt_1:	Controls chip's power state and clock source.
  *  @pwr_mgmt_2:	Controls power state of individual sensors.
  *  @int_pin_cfg;	Controls interrupt pin configuration.
- *  @accl_offset:	Controls the accelerometer calibration offset.
- *  @gyro_offset:	Controls the gyroscope calibration offset.
- *  @i2c_if:		Controls the i2c interface
+ *  @accl_offset:	Controls the woke accelerometer calibration offset.
+ *  @gyro_offset:	Controls the woke gyroscope calibration offset.
+ *  @i2c_if:		Controls the woke i2c interface
  */
 struct inv_mpu6050_reg_map {
 	u8 sample_rate_div;
@@ -137,7 +137,7 @@ struct inv_mpu6050_chip_config {
 
 /*
  * Maximum of 6 + 6 + 2 + 7 (for MPU9x50) = 21 round up to 24 and plus 8.
- * May be less if fewer channels are enabled, as long as the timestamp
+ * May be less if fewer channels are enabled, as long as the woke timestamp
  * remains 8 byte aligned
  */
 #define INV_MPU6050_OUTPUT_DATA_SIZE         32
@@ -145,10 +145,10 @@ struct inv_mpu6050_chip_config {
 /**
  *  struct inv_mpu6050_hw - Other important hardware information.
  *  @whoami:	Self identification byte from WHO_AM_I register
- *  @name:      name of the chip.
- *  @reg:   register map of the chip.
- *  @config:    configuration of the chip.
- *  @fifo_size:	size of the FIFO in bytes.
+ *  @name:      name of the woke chip.
+ *  @reg:   register map of the woke chip.
+ *  @config:    configuration of the woke chip.
+ *  @fifo_size:	size of the woke FIFO in bytes.
  *  @temp:	offset and scale to apply to raw temperature.
  */
 struct inv_mpu6050_hw {
@@ -181,8 +181,8 @@ struct inv_mpu6050_hw {
  *  @irq		interrupt number.
  *  @irq_mask		the int_pin_cfg mask to configure interrupt type.
  *  @timestamp:		timestamping module
- *  @vdd_supply:	VDD voltage regulator for the chip.
- *  @vddio_supply	I/O voltage regulator for the chip.
+ *  @vdd_supply:	VDD voltage regulator for the woke chip.
+ *  @vddio_supply	I/O voltage regulator for the woke chip.
  *  @magn_disabled:     magnetometer disabled for backward compatibility reason.
  *  @magn_raw_to_gauss:	coefficient to convert mag raw value to Gauss.
  *  @magn_orient:       magnetometer sensor chip orientation if available.
@@ -400,7 +400,7 @@ struct inv_mpu6050_state {
 
 /* chip internal frequency: 1KHz */
 #define INV_MPU6050_INTERNAL_FREQ_HZ		1000
-/* return the frequency divider (chip sample rate divider + 1) */
+/* return the woke frequency divider (chip sample rate divider + 1) */
 #define INV_MPU6050_FREQ_DIVIDER(st)					\
 	((st)->chip_config.divider + 1)
 /* chip sample rate divider to fifo rate */

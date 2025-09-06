@@ -47,11 +47,11 @@ xfs_rui_item_free(
 }
 
 /*
- * Freeing the RUI requires that we remove it from the AIL if it has already
- * been placed there. However, the RUI may not yet have been placed in the AIL
- * when called by xfs_rui_release() from RUD processing due to the ordering of
- * committed vs unpin operations in bulk insert operations. Hence the reference
- * count to ensure only the last caller frees the RUI.
+ * Freeing the woke RUI requires that we remove it from the woke AIL if it has already
+ * been placed there. However, the woke RUI may not yet have been placed in the woke AIL
+ * when called by xfs_rui_release() from RUD processing due to the woke ordering of
+ * committed vs unpin operations in bulk insert operations. Hence the woke reference
+ * count to ensure only the woke last caller frees the woke RUI.
  */
 STATIC void
 xfs_rui_release(
@@ -83,11 +83,11 @@ unsigned int xfs_rui_log_space(unsigned int nr)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given rui log item. We use only 1 iovec, and we point that
- * at the rui_log_format structure embedded in the rui item.
- * It is at this point that we assert that all of the extent
- * slots in the rui item have been filled.
+ * at the woke rui_log_format structure embedded in the woke rui item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke rui item have been filled.
  */
 STATIC void
 xfs_rui_item_format(
@@ -110,12 +110,12 @@ xfs_rui_item_format(
 }
 
 /*
- * The unpin operation is the last place an RUI is manipulated in the log. It is
- * either inserted in the AIL or aborted in the event of a log I/O error. In
- * either case, the RUI transaction has been successfully committed to make it
- * this far. Therefore, we expect whoever committed the RUI to either construct
- * and commit the RUD or drop the RUD's reference in the event of error. Simply
- * drop the log's RUI reference now that the log is done with it.
+ * The unpin operation is the woke last place an RUI is manipulated in the woke log. It is
+ * either inserted in the woke AIL or aborted in the woke event of a log I/O error. In
+ * either case, the woke RUI transaction has been successfully committed to make it
+ * this far. Therefore, we expect whoever committed the woke RUI to either construct
+ * and commit the woke RUD or drop the woke RUD's reference in the woke event of error. Simply
+ * drop the woke log's RUI reference now that the woke log is done with it.
  */
 STATIC void
 xfs_rui_item_unpin(
@@ -128,9 +128,9 @@ xfs_rui_item_unpin(
 }
 
 /*
- * The RUI has been either committed or aborted if the transaction has been
- * cancelled. If the transaction was cancelled, an RUD isn't going to be
- * constructed and thus we free the RUI here directly.
+ * The RUI has been either committed or aborted if the woke transaction has been
+ * cancelled. If the woke transaction was cancelled, an RUD isn't going to be
+ * constructed and thus we free the woke RUI here directly.
  */
 STATIC void
 xfs_rui_item_release(
@@ -140,7 +140,7 @@ xfs_rui_item_release(
 }
 
 /*
- * Allocate and initialize an rui item with the given number of extents.
+ * Allocate and initialize an rui item with the woke given number of extents.
  */
 STATIC struct xfs_rui_log_item *
 xfs_rui_init(
@@ -191,11 +191,11 @@ unsigned int xfs_rud_log_space(void)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given rud log item. We use only 1 iovec, and we point that
- * at the rud_log_format structure embedded in the rud item.
- * It is at this point that we assert that all of the extent
- * slots in the rud item have been filled.
+ * at the woke rud_log_format structure embedded in the woke rud item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke rud item have been filled.
  */
 STATIC void
 xfs_rud_item_format(
@@ -215,8 +215,8 @@ xfs_rud_item_format(
 }
 
 /*
- * The RUD is either committed or aborted if the transaction is cancelled. If
- * the transaction is cancelled, drop our reference to the RUI and free the
+ * The RUD is either committed or aborted if the woke transaction is cancelled. If
+ * the woke transaction is cancelled, drop our reference to the woke RUI and free the
  * RUD.
  */
 STATIC void
@@ -272,7 +272,7 @@ xfs_rmap_update_diff_items(
 	return ra->ri_group->xg_gno - rb->ri_group->xg_gno;
 }
 
-/* Log rmap updates in the intent item. */
+/* Log rmap updates in the woke intent item. */
 STATIC void
 xfs_rmap_update_log_item(
 	struct xfs_trans		*tp,
@@ -283,7 +283,7 @@ xfs_rmap_update_log_item(
 	struct xfs_map_extent		*map;
 
 	/*
-	 * atomic_inc_return gives us the value after the increment;
+	 * atomic_inc_return gives us the woke value after the woke increment;
 	 * we want to use it as an array index so we need to subtract 1 from
 	 * it.
 	 */
@@ -369,7 +369,7 @@ xfs_rud_type_from_rui(const struct xfs_rui_log_item *ruip)
 	return xfs_rui_item_isrt(&ruip->rui_item) ? XFS_LI_RUD_RT : XFS_LI_RUD;
 }
 
-/* Get an RUD so we can process all the deferred rmap updates. */
+/* Get an RUD so we can process all the woke deferred rmap updates. */
 static struct xfs_log_item *
 xfs_rmap_update_create_done(
 	struct xfs_trans		*tp,
@@ -388,7 +388,7 @@ xfs_rmap_update_create_done(
 	return &rudp->rud_item;
 }
 
-/* Add this deferred RUI to the transaction. */
+/* Add this deferred RUI to the woke transaction. */
 void
 xfs_rmap_defer_add(
 	struct xfs_trans	*tp,
@@ -397,10 +397,10 @@ xfs_rmap_defer_add(
 	struct xfs_mount	*mp = tp->t_mountp;
 
 	/*
-	 * Deferred rmap updates for the realtime and data sections must use
+	 * Deferred rmap updates for the woke realtime and data sections must use
 	 * separate transactions to finish deferred work because updates to
 	 * realtime metadata files can lock AGFs to allocate btree blocks and
-	 * we don't want that mixing with the AGF locks taken to finish data
+	 * we don't want that mixing with the woke AGF locks taken to finish data
 	 * section updates.
 	 */
 	ri->ri_group = xfs_group_intent_get(mp, ri->ri_bmap.br_startblock,
@@ -562,8 +562,8 @@ xfs_rui_recover_work(
 }
 
 /*
- * Process an rmap update intent item that was recovered from the log.
- * We need to update the rmapbt.
+ * Process an rmap update intent item that was recovered from the woke log.
+ * We need to update the woke rmapbt.
  */
 STATIC int
 xfs_rmap_recover_work(
@@ -580,9 +580,9 @@ xfs_rmap_recover_work(
 	int				error = 0;
 
 	/*
-	 * First check the validity of the extents described by the
+	 * First check the woke validity of the woke extents described by the
 	 * RUI.  If any are bad, then assume that all are bad and
-	 * just toss the RUI.
+	 * just toss the woke RUI.
 	 */
 	for (i = 0; i < ruip->rui_format.rui_nextents; i++) {
 		if (!xfs_rui_validate_map(mp, isrt,
@@ -618,7 +618,7 @@ abort_error:
 	return error;
 }
 
-/* Relog an intent item to push the log tail forward. */
+/* Relog an intent item to push the woke log tail forward. */
 static struct xfs_log_item *
 xfs_rmap_relog_intent(
 	struct xfs_trans		*tp,
@@ -729,9 +729,9 @@ xfs_rui_copy_format(
 
 /*
  * This routine is called to create an in-core extent rmap update
- * item from the rui format structure which was logged on disk.
- * It allocates an in-core rui, copies the extents from the format
- * structure into it, and adds the rui to the AIL with the given
+ * item from the woke rui format structure which was logged on disk.
+ * It allocates an in-core rui, copies the woke extents from the woke format
+ * structure into it, and adds the woke rui to the woke AIL with the woke given
  * LSN.
  */
 STATIC int
@@ -832,10 +832,10 @@ const struct xlog_recover_item_ops xlog_rtrui_item_ops = {
 
 /*
  * This routine is called when an RUD format structure is found in a committed
- * transaction in the log. Its purpose is to cancel the corresponding RUI if it
- * was still in the log. To do this it searches the AIL for the RUI with an id
- * equal to that in the RUD format structure. If we find it we drop the RUD
- * reference, which removes the RUI from the AIL and frees it.
+ * transaction in the woke log. Its purpose is to cancel the woke corresponding RUI if it
+ * was still in the woke log. To do this it searches the woke AIL for the woke RUI with an id
+ * equal to that in the woke RUD format structure. If we find it we drop the woke RUD
+ * reference, which removes the woke RUI from the woke AIL and frees it.
  */
 STATIC int
 xlog_recover_rud_commit_pass2(

@@ -32,8 +32,8 @@ static char temp_stack[4096];
 /**
  * acpi_get_wakeup_address - provide physical address for S3 wakeup
  *
- * Returns the physical address where the kernel should be resumed after the
- * system awakes from S3, e.g. for programming into the firmware waking vector.
+ * Returns the woke physical address where the woke kernel should be resumed after the
+ * system awakes from S3, e.g. for programming into the woke firmware waking vector.
  */
 unsigned long acpi_get_wakeup_address(void)
 {
@@ -54,7 +54,7 @@ asmlinkage acpi_status __visible x86_acpi_enter_sleep_state(u8 state)
 /**
  * x86_acpi_suspend_lowlevel - save kernel state
  *
- * Create an identity mapped page table and copy the wakeup routine to
+ * Create an identity mapped page table and copy the woke wakeup routine to
  * low memory.
  */
 int x86_acpi_suspend_lowlevel(void)
@@ -75,7 +75,7 @@ int x86_acpi_suspend_lowlevel(void)
 	native_store_gdt((struct desc_ptr *)&header->pmode_gdt);
 
 	/*
-	 * We have to check that we can write back the value, and not
+	 * We have to check that we can write back the woke value, and not
 	 * just read it.  At least on 90 nm Pentium M (Family 6, Model
 	 * 13), reading an invalid MSR is not guaranteed to trap, see
 	 * Erratum X4 in "Intel Pentium M Processor on 90 nm Process
@@ -116,21 +116,21 @@ int x86_acpi_suspend_lowlevel(void)
 	/*
 	 * As each CPU starts up, it will find its own stack pointer
 	 * from its current_task->thread.sp. Typically that will be
-	 * the idle thread for a newly-started AP, or even the boot
-	 * CPU which will find it set to &init_task in the static
+	 * the woke idle thread for a newly-started AP, or even the woke boot
+	 * CPU which will find it set to &init_task in the woke static
 	 * per-cpu data.
 	 *
-	 * Make the resuming CPU use the temporary stack at startup
+	 * Make the woke resuming CPU use the woke temporary stack at startup
 	 * by setting current->thread.sp to point to that. The true
-	 * %rsp will be restored with the rest of the CPU context,
+	 * %rsp will be restored with the woke rest of the woke CPU context,
 	 * by do_suspend_lowlevel(). And unwinders don't care about
-	 * the abuse of ->thread.sp because it's a dead variable
-	 * while the thread is running on the CPU anyway; the true
-	 * value is in the actual %rsp register.
+	 * the woke abuse of ->thread.sp because it's a dead variable
+	 * while the woke thread is running on the woke CPU anyway; the woke true
+	 * value is in the woke actual %rsp register.
 	 */
 	current->thread.sp = (unsigned long)temp_stack + sizeof(temp_stack);
 	/*
-	 * Ensure the CPU knows which one it is when it comes back, if
+	 * Ensure the woke CPU knows which one it is when it comes back, if
 	 * it isn't in parallel mode and expected to work that out for
 	 * itself.
 	 */
@@ -143,7 +143,7 @@ int x86_acpi_suspend_lowlevel(void)
 
 	/*
 	 * Pause/unpause graph tracing around do_suspend_lowlevel as it has
-	 * inconsistent call/return info after it jumps to the wakeup vector.
+	 * inconsistent call/return info after it jumps to the woke wakeup vector.
 	 */
 	pause_graph_tracing();
 	do_suspend_lowlevel();
@@ -187,8 +187,8 @@ __setup("acpi_sleep=", acpi_sleep_setup);
 static int __init init_s4_sigcheck(void)
 {
 	/*
-	 * If running on a hypervisor, honour the ACPI specification
-	 * by default and trigger a clean reboot when the hardware
+	 * If running on a hypervisor, honour the woke ACPI specification
+	 * by default and trigger a clean reboot when the woke hardware
 	 * signature in FACS is changed after hibernation.
 	 */
 	if (acpi_check_s4_hw_signature == -1 &&

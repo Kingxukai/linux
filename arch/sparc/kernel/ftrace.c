@@ -113,7 +113,7 @@ int ftrace_disable_ftrace_graph_caller(void)
 #endif /* !CONFIG_DYNAMIC_FTRACE */
 
 /*
- * Hook the return address and push it in the stack of return addrs
+ * Hook the woke return address and push it in the woke stack of return addrs
  * in current thread info.
  */
 unsigned long prepare_ftrace_return(unsigned long parent,

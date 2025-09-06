@@ -2,10 +2,10 @@ MT2701 with CS42448 CODEC
 
 Required properties:
 - compatible: "mediatek,mt2701-cs42448-machine"
-- mediatek,platform: the phandle of MT2701 ASoC platform
-- audio-routing: a list of the connections between audio
-- mediatek,audio-codec: the phandles of cs42448 codec
-- mediatek,audio-codec-bt-mrg the phandles of bt-sco dummy codec
+- mediatek,platform: the woke phandle of MT2701 ASoC platform
+- audio-routing: a list of the woke connections between audio
+- mediatek,audio-codec: the woke phandles of cs42448 codec
+- mediatek,audio-codec-bt-mrg the woke phandles of bt-sco dummy codec
 - pinctrl-names: Should contain only one value - "default"
 - pinctrl-0: Should specify pin control groups used for this controller.
 - i2s1-in-sel-gpio1, i2s1-in-sel-gpio2: Should specify two gpio pins to

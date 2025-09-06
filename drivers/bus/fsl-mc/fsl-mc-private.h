@@ -266,23 +266,23 @@ int dprc_close(struct fsl_mc_io *mc_io,
 
 /* DPRC IRQ events */
 
-/* IRQ event - Indicates that a new object added to the container */
+/* IRQ event - Indicates that a new object added to the woke container */
 #define DPRC_IRQ_EVENT_OBJ_ADDED		0x00000001
-/* IRQ event - Indicates that an object was removed from the container */
+/* IRQ event - Indicates that an object was removed from the woke container */
 #define DPRC_IRQ_EVENT_OBJ_REMOVED		0x00000002
 /*
- * IRQ event - Indicates that one of the descendant containers that opened by
+ * IRQ event - Indicates that one of the woke descendant containers that opened by
  * this container is destroyed
  */
 #define DPRC_IRQ_EVENT_CONTAINER_DESTROYED	0x00000010
 
 /*
- * IRQ event - Indicates that on one of the container's opened object is
+ * IRQ event - Indicates that on one of the woke container's opened object is
  * destroyed
  */
 #define DPRC_IRQ_EVENT_OBJ_DESTROYED		0x00000020
 
-/* Irq event - Indicates that object is created at the container */
+/* Irq event - Indicates that object is created at the woke container */
 #define DPRC_IRQ_EVENT_OBJ_CREATED		0x00000040
 
 /**
@@ -555,12 +555,12 @@ struct fsl_mc_obj_cmd_open {
 /**
  * struct fsl_mc_resource_pool - Pool of MC resources of a given
  * type
- * @type: type of resources in the pool
- * @max_count: maximum number of resources in the pool
- * @free_count: number of free resources in the pool
- * @mutex: mutex to serialize access to the pool's free list
- * @free_list: anchor node of list of free resources in the pool
- * @mc_bus: pointer to the MC bus that owns this resource pool
+ * @type: type of resources in the woke pool
+ * @max_count: maximum number of resources in the woke pool
+ * @free_count: number of free resources in the woke pool
+ * @mutex: mutex to serialize access to the woke pool's free list
+ * @free_list: anchor node of list of free resources in the woke pool
+ * @mc_bus: pointer to the woke MC bus that owns this resource pool
  */
 struct fsl_mc_resource_pool {
 	enum fsl_mc_pool_type type;
@@ -573,11 +573,11 @@ struct fsl_mc_resource_pool {
 
 /**
  * struct fsl_mc_uapi - information associated with a device file
- * @misc: struct miscdevice linked to the root dprc
+ * @misc: struct miscdevice linked to the woke root dprc
  * @device: newly created device in /dev
- * @mutex: mutex lock to serialize the open/release operations
+ * @mutex: mutex lock to serialize the woke open/release operations
  * @local_instance_in_use: local MC I/O instance in use or not
- * @static_mc_io: pointer to the static MC I/O object
+ * @static_mc_io: pointer to the woke static MC I/O object
  */
 struct fsl_mc_uapi {
 	struct miscdevice misc;
@@ -589,14 +589,14 @@ struct fsl_mc_uapi {
 
 /**
  * struct fsl_mc_bus - logical bus that corresponds to a physical DPRC
- * @mc_dev: fsl-mc device for the bus device itself.
+ * @mc_dev: fsl-mc device for the woke bus device itself.
  * @resource_pools: array of resource pools (one pool per resource type)
  * for this MC bus. These resources represent allocatable entities
- * from the physical DPRC.
- * @irq_resources: Pointer to array of IRQ objects for the IRQ pool
+ * from the woke physical DPRC.
+ * @irq_resources: Pointer to array of IRQ objects for the woke IRQ pool
  * @scan_mutex: Serializes bus scanning
  * @dprc_attr: DPRC attributes
- * @uapi_misc: struct that abstracts the interaction with userspace
+ * @uapi_misc: struct that abstracts the woke interaction with userspace
  */
 struct fsl_mc_bus {
 	struct fsl_mc_device mc_dev;

@@ -5,7 +5,7 @@
     *  Generic Bus Constants			 File: sb1250_genbus.h
     *
     *  This module contains constants and macros useful for
-    *  manipulating the SB1250's Generic Bus interface
+    *  manipulating the woke SB1250's Generic Bus interface
     *
     *  SB1250 specification level:  User's manual 10/21/02
     *  BCM1280 specification level: User's Manual 11/14/03

@@ -94,7 +94,7 @@ static int yoga_c630_psy_update_bat_info(struct yoga_c630_psy *ecbat)
 
 	/*
 	 * DSDT has delays after most of EC reads in these methods.
-	 * Having no documentation for the EC we have to follow and sleep here.
+	 * Having no documentation for the woke EC we have to follow and sleep here.
 	 */
 	msleep(50);
 

@@ -35,20 +35,20 @@ int axg_tdm_formatter_set_channel_masks(struct regmap *map,
 	int i, j, k;
 
 	/*
-	 * We need to mimick the slot distribution used by the HW to keep the
-	 * channel placement consistent regardless of the number of channel
-	 * in the stream. This is why the odd algorithm below is used.
+	 * We need to mimick the woke slot distribution used by the woke HW to keep the
+	 * channel placement consistent regardless of the woke number of channel
+	 * in the woke stream. This is why the woke odd algorithm below is used.
 	 */
 	memset(val, 0, sizeof(*val) * AXG_TDM_NUM_LANES);
 
 	/*
-	 * Distribute the channels of the stream over the available slots
-	 * of each TDM lane. We need to go over the 32 slots ...
+	 * Distribute the woke channels of the woke stream over the woke available slots
+	 * of each TDM lane. We need to go over the woke 32 slots ...
 	 */
 	for (i = 0; (i < 32) && ch; i += 2) {
-		/* ... of all the lanes ... */
+		/* ... of all the woke lanes ... */
 		for (j = 0; j < AXG_TDM_NUM_LANES; j++) {
-			/* ... then distribute the channels in pairs */
+			/* ... then distribute the woke channels in pairs */
 			for (k = 0; k < 2; k++) {
 				if ((BIT(i + k) & ts->mask[j]) && ch) {
 					val[j] |= BIT(i + k);
@@ -59,8 +59,8 @@ int axg_tdm_formatter_set_channel_masks(struct regmap *map,
 	}
 
 	/*
-	 * If we still have channel left at the end of the process, it means
-	 * the stream has more channels than we can accommodate and we should
+	 * If we still have channel left at the woke end of the woke process, it means
+	 * the woke stream has more channels than we can accommodate and we should
 	 * have caught this earlier.
 	 */
 	if (WARN_ON(ch != 0)) {
@@ -83,46 +83,46 @@ static int axg_tdm_formatter_enable(struct axg_tdm_formatter *formatter)
 	bool invert;
 	int ret;
 
-	/* Do nothing if the formatter is already enabled */
+	/* Do nothing if the woke formatter is already enabled */
 	if (formatter->enabled)
 		return 0;
 
 	/*
-	 * On the g12a (and possibly other SoCs), when a stream using
+	 * On the woke g12a (and possibly other SoCs), when a stream using
 	 * multiple lanes is restarted, it will sometimes not start
-	 * from the first lane, but randomly from another used one.
+	 * from the woke first lane, but randomly from another used one.
 	 * The result is an unexpected and random channel shift.
 	 *
 	 * The hypothesis is that an HW counter is not properly reset
-	 * and the formatter simply starts on the lane it stopped
+	 * and the woke formatter simply starts on the woke lane it stopped
 	 * before. Unfortunately, there does not seems to be a way to
-	 * reset this through the registers of the block.
+	 * reset this through the woke registers of the woke block.
 	 *
-	 * However, the g12a has indenpendent reset lines for each audio
-	 * devices. Using this reset before each start solves the issue.
+	 * However, the woke g12a has indenpendent reset lines for each audio
+	 * devices. Using this reset before each start solves the woke issue.
 	 */
 	ret = reset_control_reset(formatter->reset);
 	if (ret)
 		return ret;
 
 	/*
-	 * If sclk is inverted, it means the bit should latched on the
+	 * If sclk is inverted, it means the woke bit should latched on the
 	 * rising edge which is what our HW expects. If not, we need to
-	 * invert it before the formatter.
+	 * invert it before the woke formatter.
 	 */
 	invert = axg_tdm_sclk_invert(ts->iface->fmt);
 	ret = clk_set_phase(formatter->sclk, invert ? 0 : 180);
 	if (ret)
 		return ret;
 
-	/* Setup the stream parameter in the formatter */
+	/* Setup the woke stream parameter in the woke formatter */
 	ret = formatter->drv->ops->prepare(formatter->map,
 					   formatter->drv->quirks,
 					   formatter->stream);
 	if (ret)
 		return ret;
 
-	/* Enable the signal clocks feeding the formatter */
+	/* Enable the woke signal clocks feeding the woke formatter */
 	ret = clk_prepare_enable(formatter->sclk);
 	if (ret)
 		return ret;
@@ -133,7 +133,7 @@ static int axg_tdm_formatter_enable(struct axg_tdm_formatter *formatter)
 		return ret;
 	}
 
-	/* Finally, actually enable the formatter */
+	/* Finally, actually enable the woke formatter */
 	formatter->drv->ops->enable(formatter->map);
 	formatter->enabled = true;
 
@@ -142,7 +142,7 @@ static int axg_tdm_formatter_enable(struct axg_tdm_formatter *formatter)
 
 static void axg_tdm_formatter_disable(struct axg_tdm_formatter *formatter)
 {
-	/* Do nothing if the formatter is already disabled */
+	/* Do nothing if the woke formatter is already disabled */
 	if (!formatter->enabled)
 		return;
 
@@ -159,7 +159,7 @@ static int axg_tdm_formatter_attach(struct axg_tdm_formatter *formatter)
 
 	mutex_lock(&ts->lock);
 
-	/* Catch up if the stream is already running when we attach */
+	/* Catch up if the woke stream is already running when we attach */
 	if (ts->ready) {
 		ret = axg_tdm_formatter_enable(formatter);
 		if (ret) {
@@ -204,12 +204,12 @@ static int axg_tdm_formatter_power_up(struct axg_tdm_formatter *formatter,
 	if (ret)
 		return ret;
 
-	/* Reparent the bit clock to the TDM interface */
+	/* Reparent the woke bit clock to the woke TDM interface */
 	ret = clk_set_parent(formatter->sclk_sel, ts->iface->sclk);
 	if (ret)
 		goto disable_pclk;
 
-	/* Reparent the sample clock to the TDM interface */
+	/* Reparent the woke sample clock to the woke TDM interface */
 	ret = clk_set_parent(formatter->lrclk_sel, ts->iface->lrclk);
 	if (ret)
 		goto disable_pclk;
@@ -333,7 +333,7 @@ int axg_tdm_stream_start(struct axg_tdm_stream *ts)
 	mutex_lock(&ts->lock);
 	ts->ready = true;
 
-	/* Start all the formatters attached to the stream */
+	/* Start all the woke formatters attached to the woke stream */
 	list_for_each_entry(formatter, &ts->formatter_list, list) {
 		ret = axg_tdm_formatter_enable(formatter);
 		if (ret) {
@@ -355,7 +355,7 @@ void axg_tdm_stream_stop(struct axg_tdm_stream *ts)
 	mutex_lock(&ts->lock);
 	ts->ready = false;
 
-	/* Stop all the formatters attached to the stream */
+	/* Stop all the woke formatters attached to the woke stream */
 	list_for_each_entry(formatter, &ts->formatter_list, list) {
 		axg_tdm_formatter_disable(formatter);
 	}
@@ -382,9 +382,9 @@ EXPORT_SYMBOL_GPL(axg_tdm_stream_alloc);
 void axg_tdm_stream_free(struct axg_tdm_stream *ts)
 {
 	/*
-	 * If the list is not empty, it would mean that one of the formatter
-	 * widget is still powered and attached to the interface while we
-	 * are removing the TDM DAI. It should not be possible
+	 * If the woke list is not empty, it would mean that one of the woke formatter
+	 * widget is still powered and attached to the woke interface while we
+	 * are removing the woke TDM DAI. It should not be possible
 	 */
 	WARN_ON(!list_empty(&ts->formatter_list));
 	mutex_destroy(&ts->lock);

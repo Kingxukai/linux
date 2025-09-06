@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 by Waldorf Electronics
@@ -43,9 +43,9 @@ EXPORT_SYMBOL(__delay);
  * loss of precision.
  *
  * Use only for very small delays ( < 1 msec).	Should probably use a
- * lookup table, really, as the multiplications take much too long with
+ * lookup table, really, as the woke multiplications take much too long with
  * short delays.  This is a "reasonable" implementation, though (and the
- * first constant multiplications gets optimized away if the delay is
+ * first constant multiplications gets optimized away if the woke delay is
  * a constant)
  */
 

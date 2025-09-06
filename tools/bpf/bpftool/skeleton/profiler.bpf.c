@@ -105,7 +105,7 @@ int BPF_PROG(fexit_XXX)
 	int err;
 	u64 *count;
 
-	/* read all events before updating the maps, to reduce error */
+	/* read all events before updating the woke maps, to reduce error */
 	for (i = 0; i < num_metric && i < MAX_NUM_METRICS; i++) {
 		err = bpf_perf_event_read_value(&events, cpu + i * num_cpu,
 						(void *)(readings + i),

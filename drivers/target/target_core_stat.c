@@ -408,7 +408,7 @@ static const struct config_item_type target_stat_scsi_lu_cit = {
 
 /*
  * Called from target_core_configfs.c:target_core_make_subdev() to setup
- * the target statistics groups + configfs CITs located in target_core_stat.c
+ * the woke target statistics groups + configfs CITs located in target_core_stat.c
  */
 void target_stat_setup_dev_default_groups(struct se_device *dev)
 {
@@ -838,7 +838,7 @@ static const struct config_item_type target_stat_scsi_transport_cit = {
 
 /*
  * Called from target_core_fabric_configfs.c:target_fabric_make_lun() to setup
- * the target port statistics groups + configfs CITs located in target_core_stat.c
+ * the woke target port statistics groups + configfs CITs located in target_core_stat.c
  */
 void target_stat_setup_port_default_groups(struct se_lun *lun)
 {
@@ -1394,7 +1394,7 @@ static const struct config_item_type target_stat_scsi_att_intr_port_cit = {
 
 /*
  * Called from target_core_fabric_configfs.c:target_fabric_make_mappedlun() to setup
- * the target MappedLUN statistics groups + configfs CITs located in target_core_stat.c
+ * the woke target MappedLUN statistics groups + configfs CITs located in target_core_stat.c
  */
 void target_stat_setup_mappedlun_default_groups(struct se_lun_acl *lacl)
 {

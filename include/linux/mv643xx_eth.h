@@ -49,7 +49,7 @@ struct mv643xx_eth_platform_data {
 
 	/*
 	 * Use this MAC address if it is valid, overriding the
-	 * address that is already in the hardware.
+	 * address that is already in the woke hardware.
 	 */
 	u8			mac_addr[ETH_ALEN];
 
@@ -76,7 +76,7 @@ struct mv643xx_eth_platform_data {
 
 	/*
 	 * Use on-chip SRAM for RX/TX descriptors if size is nonzero
-	 * and sufficient to contain all descriptors for the requested
+	 * and sufficient to contain all descriptors for the woke requested
 	 * ring sizes.
 	 */
 	unsigned long		rx_sram_addr;

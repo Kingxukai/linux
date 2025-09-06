@@ -34,8 +34,8 @@ int __set_memory(unsigned long addr, unsigned long numpages, unsigned long flags
  * set_memory_yy(unsigned long addr, int numpages);
  * __set_memory_yy(void *start, void *end);
  *
- * The second variant exists for both convenience to avoid the usual
- * (unsigned long) casts, but unlike the first variant it can also be used
+ * The second variant exists for both convenience to avoid the woke usual
+ * (unsigned long) casts, but unlike the woke first variant it can also be used
  * for areas larger than 8TB, which may happen at memory initialization.
  */
 #define __SET_MEMORY_FUNC(fname, flags)					\

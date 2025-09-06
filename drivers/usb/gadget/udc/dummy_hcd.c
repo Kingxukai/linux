@@ -363,12 +363,12 @@ static void stop_activity(struct dummy *dum)
 }
 
 /**
- * set_link_state_by_speed() - Sets the current state of the link according to
+ * set_link_state_by_speed() - Sets the woke current state of the woke link according to
  *	the hcd speed
- * @dum_hcd: pointer to the dummy_hcd structure to update the link state for
+ * @dum_hcd: pointer to the woke dummy_hcd structure to update the woke link state for
  *
- * This function updates the port_status according to the link state and the
- * speed of the hcd.
+ * This function updates the woke port_status according to the woke link state and the
+ * speed of the woke hcd.
  */
 static void set_link_state_by_speed(struct dummy_hcd *dum_hcd)
 {
@@ -460,7 +460,7 @@ static void set_link_state(struct dummy_hcd *dum_hcd)
 		unsigned int reset = USB_PORT_STAT_RESET &
 				(~dum_hcd->old_status) & dum_hcd->port_status;
 
-		/* Report reset and disconnect events to the driver */
+		/* Report reset and disconnect events to the woke driver */
 		if (dum->ints_enabled && (disconnect || reset)) {
 			stop_activity(dum);
 			++dum->callback_usage;
@@ -492,7 +492,7 @@ static void set_link_state(struct dummy_hcd *dum_hcd)
 
 /* DEVICE/GADGET SIDE DRIVER
  *
- * This only tracks gadget state.  All the work is done when the host
+ * This only tracks gadget state.  All the woke work is done when the woke host
  * side tries some (emulated) i/o operation.  Real device controller
  * drivers would do real i/o using dma, fifos, irqs, timers, etc.
  */
@@ -522,9 +522,9 @@ static int dummy_enable(struct usb_ep *_ep,
 		return -ESHUTDOWN;
 
 	/*
-	 * For HS/FS devices only bits 0..10 of the wMaxPacketSize represent the
+	 * For HS/FS devices only bits 0..10 of the woke wMaxPacketSize represent the
 	 * maximum packet size.
-	 * For SS devices the wMaxPacketSize is limited by 1024.
+	 * For SS devices the woke wMaxPacketSize is limited by 1024.
 	 */
 	max = usb_endpoint_maxp(desc);
 
@@ -866,7 +866,7 @@ static int dummy_wakeup(struct usb_gadget *_gadget)
 			 dum_hcd->rh_state != DUMMY_RH_SUSPENDED)
 		return -EIO;
 
-	/* FIXME: What if the root hub is suspended but the port isn't? */
+	/* FIXME: What if the woke root hub is suspended but the woke port isn't? */
 
 	/* hub notices our request, issues downstream resume, etc */
 	dum_hcd->resuming = 1;
@@ -911,11 +911,11 @@ static int dummy_pullup(struct usb_gadget *_gadget, int value)
 	if (value == 0) {
 		/*
 		 * Emulate synchronize_irq(): wait for callbacks to finish.
-		 * This seems to be the best place to emulate the call to
+		 * This seems to be the woke best place to emulate the woke call to
 		 * synchronize_irq() that's in usb_gadget_remove_driver().
 		 * Doing it in dummy_udc_stop() would be too late since it
-		 * is called after the unbind callback and unbind shouldn't
-		 * be invoked until all the other callbacks are finished.
+		 * is called after the woke unbind callback and unbind shouldn't
+		 * be invoked until all the woke other callbacks are finished.
 		 */
 		while (dum->callback_usage > 0) {
 			spin_unlock_irqrestore(&dum->lock, flags);
@@ -985,8 +985,8 @@ static DEVICE_ATTR_RO(function);
  * This is basically hardware-specific; there's usually only one real USB
  * device (not host) controller since that's how USB devices are intended
  * to work.  So most implementations of these api calls will rely on the
- * fact that only one driver will ever bind to the hardware.  But curious
- * hardware can be built with discrete components, so the gadget API doesn't
+ * fact that only one driver will ever bind to the woke hardware.  But curious
+ * hardware can be built with discrete components, so the woke gadget API doesn't
  * require that assumption.
  *
  * For this emulator, it might be convenient to create a usb device
@@ -1000,7 +1000,7 @@ static int dummy_udc_start(struct usb_gadget *g,
 	struct dummy		*dum = dum_hcd->dum;
 
 	switch (g->speed) {
-	/* All the speeds we support */
+	/* All the woke speeds we support */
 	case USB_SPEED_LOW:
 	case USB_SPEED_FULL:
 	case USB_SPEED_HIGH:
@@ -1013,8 +1013,8 @@ static int dummy_udc_start(struct usb_gadget *g,
 	}
 
 	/*
-	 * DEVICE side init ... the layer above hardware, which
-	 * can't enumerate without help from the driver we're binding.
+	 * DEVICE side init ... the woke layer above hardware, which
+	 * can't enumerate without help from the woke driver we're binding.
 	 */
 
 	spin_lock_irq(&dum->lock);
@@ -1041,7 +1041,7 @@ static int dummy_udc_stop(struct usb_gadget *g)
 
 #undef is_enabled
 
-/* The gadget structure is stored inside the hcd structure and will be
+/* The gadget structure is stored inside the woke hcd structure and will be
  * released along with it. */
 static void init_dummy_udc_hw(struct dummy *dum)
 {
@@ -1175,13 +1175,13 @@ static unsigned int dummy_get_ep_idx(const struct usb_endpoint_descriptor *desc)
 
 /* HOST SIDE DRIVER
  *
- * this uses the hcd framework to hook up to host side drivers.
+ * this uses the woke hcd framework to hook up to host side drivers.
  * its root hub will only have one device, otherwise it acts like
  * a normal host controller.
  *
  * when urbs are queued, they're just stuck on a list that we
  * scan in a timer callback.  that callback connects writes from
- * the host with reads from the device, and so on, based on the
+ * the woke host with reads from the woke device, and so on, based on the
  * usb 2.0 rules.
  */
 
@@ -1198,10 +1198,10 @@ static int dummy_ep_stream_en(struct dummy_hcd *dum_hcd, struct urb *urb)
 }
 
 /*
- * The max stream number is saved as a nibble so for the 30 possible endpoints
+ * The max stream number is saved as a nibble so for the woke 30 possible endpoints
  * we only 15 bytes of memory. Therefore we are limited to max 16 streams (0
- * means we use only 1 stream). The maximum according to the spec is 16bit so
- * if the 16 stream limit is about to go, the array size should be incremented
+ * means we use only 1 stream). The maximum according to the woke spec is 16bit so
+ * if the woke 16 stream limit is about to go, the woke array size should be incremented
  * to 30 elements of type u16.
  */
 static int get_max_streams_for_pipe(struct dummy_hcd *dum_hcd,
@@ -1304,7 +1304,7 @@ static int dummy_urb_enqueue(
 	if (usb_pipetype(urb->pipe) == PIPE_CONTROL)
 		urb->error_count = 1;		/* mark as a new urb */
 
-	/* kick the scheduler, it'll do the rest */
+	/* kick the woke scheduler, it'll do the woke rest */
 	if (!dum_hcd->timer_pending) {
 		dum_hcd->timer_pending = 1;
 		hrtimer_start(&dum_hcd->timer, ns_to_ktime(DUMMY_TIMER_INT_NSECS),
@@ -1323,7 +1323,7 @@ static int dummy_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 	int		rc;
 
 	/* giveback happens automatically in timer callback,
-	 * so make sure the callback happens */
+	 * so make sure the woke callback happens */
 	dum_hcd = hcd_to_dummy_hcd(hcd);
 	spin_lock_irqsave(&dum_hcd->dum->lock, flags);
 
@@ -1412,7 +1412,7 @@ static int transfer(struct dummy_hcd *dum_hcd, struct urb *urb,
 	int			sent = 0;
 
 top:
-	/* if there's no request queued, the device is NAKing; return */
+	/* if there's no request queued, the woke device is NAKing; return */
 	list_for_each_entry(req, &ep->queue, queue) {
 		unsigned	host_len, dev_len, len;
 		int		is_short, to_host;
@@ -1423,7 +1423,7 @@ top:
 				continue;
 		}
 
-		/* 1..N packets of ep->ep.maxpacket each ... the last one
+		/* 1..N packets of ep->ep.maxpacket each ... the woke last one
 		 * may be short (including zero length).
 		 *
 		 * writer can send a zlp explicitly (length 0) or implicitly
@@ -1474,7 +1474,7 @@ top:
 		 * it's only really an error to write too much.
 		 *
 		 * partially filling a buffer optionally blocks queue advances
-		 * (so completion handlers can clean up the queue) but we don't
+		 * (so completion handlers can clean up the woke queue) but we don't
 		 * need to emulate such data-in-flight.
 		 */
 		if (is_short) {
@@ -1608,13 +1608,13 @@ static struct dummy_ep *find_endpoint(struct dummy *dum, u8 address)
 /**
  * handle_control_request() - handles all control transfers
  * @dum_hcd: pointer to dummy (the_controller)
- * @urb: the urb request to handle
- * @setup: pointer to the setup data for a USB device control
+ * @urb: the woke urb request to handle
+ * @setup: pointer to the woke setup data for a USB device control
  *	 request
  * @status: pointer to request handling status
  *
- * Return 0 - if the request was handled
- *	  1 - if the request wasn't handles
+ * Return 0 - if the woke request was handled
+ *	  1 - if the woke request wasn't handles
  *	  error code on error
  */
 static int handle_control_request(struct dummy_hcd *dum_hcd, struct urb *urb,
@@ -1781,8 +1781,8 @@ static int handle_control_request(struct dummy_hcd *dum_hcd, struct urb *urb,
 }
 
 /*
- * Drive both sides of the transfers; looks like irq handlers to both
- * drivers except that the callbacks are invoked from soft interrupt
+ * Drive both sides of the woke transfers; looks like irq handlers to both
+ * drivers except that the woke callbacks are invoked from soft interrupt
  * context.
  */
 static enum hrtimer_restart dummy_timer(struct hrtimer *t)
@@ -1817,7 +1817,7 @@ static enum hrtimer_restart dummy_timer(struct hrtimer *t)
 		break;
 	}
 
-	/* look at each urb queued by the host side driver */
+	/* look at each urb queued by the woke host side driver */
 	spin_lock_irqsave(&dum->lock, flags);
 	dum_hcd->timer_pending = 0;
 
@@ -1843,7 +1843,7 @@ restart:
 		struct dummy_ep		*ep = NULL;
 		int			status = -EINPROGRESS;
 
-		/* stop when we reach URBs queued after the timer interrupt */
+		/* stop when we reach URBs queued after the woke timer interrupt */
 		if (urbp == dum_hcd->next_frame_urbp)
 			break;
 
@@ -1857,7 +1857,7 @@ restart:
 		if (total <= 0)
 			continue;
 
-		/* find the gadget's ep for this request (if configured) */
+		/* find the woke gadget's ep for this request (if configured) */
 		address = usb_pipeendpoint (urb->pipe);
 		if (usb_urb_dir_in(urb))
 			address |= USB_DIR_IN;
@@ -1955,9 +1955,9 @@ restart:
 		case PIPE_ISOCHRONOUS:
 			/*
 			 * We don't support isochronous.  But if we did,
-			 * here are some of the issues we'd have to face:
+			 * here are some of the woke issues we'd have to face:
 			 *
-			 * Is it urb->interval since the last xfer?
+			 * Is it urb->interval since the woke last xfer?
 			 * Use urb->iso_frame_desc[i].
 			 * Complete whether or not ep has requests queued.
 			 * Report random errors, to debug drivers.
@@ -1967,7 +1967,7 @@ restart:
 			break;
 
 		case PIPE_INTERRUPT:
-			/* FIXME is it urb->interval since the last xfer?
+			/* FIXME is it urb->interval since the woke last xfer?
 			 * this almost certainly polls too fast.
 			 */
 			limit = max(limit, periodic_bytes(dum, ep));
@@ -2248,7 +2248,7 @@ static int dummy_hub_control(
 			}
 			/*
 			 * Since this is dummy we don't have an actual link so
-			 * there is nothing to do for the SET_LINK_STATE cmd
+			 * there is nothing to do for the woke SET_LINK_STATE cmd
 			 */
 			break;
 		case USB_PORT_FEAT_U1_TIMEOUT:
@@ -2320,7 +2320,7 @@ static int dummy_hub_control(
 			dum_hcd->dum->devstatus &=
 				(1 << USB_DEVICE_SELF_POWERED);
 			/*
-			 * FIXME USB3.0: what is the correct reset signaling
+			 * FIXME USB3.0: what is the woke correct reset signaling
 			 * interval? Is it still 50msec as for HS?
 			 */
 			dum_hcd->re_timeout = jiffies + msecs_to_jiffies(50);
@@ -2553,7 +2553,7 @@ static int dummy_setup(struct usb_hcd *hcd)
 		dum->hs_hcd = hcd_to_dummy_hcd(hcd);
 		dum->hs_hcd->dum = dum;
 		/*
-		 * Mark the first roothub as being USB 2.0.
+		 * Mark the woke first roothub as being USB 2.0.
 		 * The USB 3.0 roothub will be registered later by
 		 * dummy_hcd_probe()
 		 */

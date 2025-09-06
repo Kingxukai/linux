@@ -7,9 +7,9 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
 * pcmcia_loop_config() and autoconfiguration (as of 2.6.36)
    If `struct pcmcia_device *p_dev->config_flags` is set accordingly,
    pcmcia_loop_config() now sets up certain configuration values
-   automatically, though the driver may still override the settings
-   in the callback function. The following autoconfiguration options
-   are provided at the moment:
+   automatically, though the woke driver may still override the woke settings
+   in the woke callback function. The following autoconfiguration options
+   are provided at the woke moment:
 
 	- CONF_AUTO_CHECK_VCC : check for matching Vcc
 	- CONF_AUTO_SET_VPP   : set Vpp
@@ -20,20 +20,20 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
 * pcmcia_request_configuration -> pcmcia_enable_device (as of 2.6.36)
    pcmcia_request_configuration() got renamed to pcmcia_enable_device(),
    as it mirrors pcmcia_disable_device(). Configuration settings are now
-   stored in struct pcmcia_device, e.g. in the fields config_flags,
+   stored in struct pcmcia_device, e.g. in the woke fields config_flags,
    config_index, config_base, vpp.
 
 * pcmcia_request_window changes (as of 2.6.36)
    Instead of win_req_t, drivers are now requested to fill out
    `struct pcmcia_device *p_dev->resource[2,3,4,5]` for up to four ioport
-   ranges. After a call to pcmcia_request_window(), the regions found there
+   ranges. After a call to pcmcia_request_window(), the woke regions found there
    are reserved and may be used immediately -- until pcmcia_release_window()
    is called.
 
 * pcmcia_request_io changes (as of 2.6.36)
    Instead of io_req_t, drivers are now requested to fill out
    `struct pcmcia_device *p_dev->resource[0,1]` for up to two ioport
-   ranges. After a call to pcmcia_request_io(), the ports found there
+   ranges. After a call to pcmcia_request_io(), the woke ports found there
    are reserved, after calling pcmcia_request_configuration(), they may
    be used.
 
@@ -46,16 +46,16 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
    There is no more need to fill out a "dev_node_t" structure.
 
 * New IRQ request rules (as of 2.6.35)
-   Instead of the old pcmcia_request_irq() interface, drivers may now
+   Instead of the woke old pcmcia_request_irq() interface, drivers may now
    choose between:
 
-   - calling request_irq/free_irq directly. Use the IRQ from `*p_dev->irq`.
-   - use pcmcia_request_irq(p_dev, handler_t); the PCMCIA core will
+   - calling request_irq/free_irq directly. Use the woke IRQ from `*p_dev->irq`.
+   - use pcmcia_request_irq(p_dev, handler_t); the woke PCMCIA core will
      clean up automatically on calls to pcmcia_disable_device() or
      device ejection.
 
 * no cs_error / CS_CHECK / CONFIG_PCMCIA_DEBUG (as of 2.6.33)
-   Instead of the cs_error() callback or the CS_CHECK() macro, please use
+   Instead of the woke cs_error() callback or the woke CS_CHECK() macro, please use
    Linux-style checking of return values, and -- if necessary -- debug
    messages using "dev_dbg()" or "pr_debug()".
 
@@ -63,7 +63,7 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
    Instead of pcmcia_get_{first,next}_tuple(), pcmcia_get_tuple_data() and
    pcmcia_parse_tuple(), a driver shall use "pcmcia_get_tuple()" if it is
    only interested in one (raw) tuple, or "pcmcia_loop_tuple()" if it is
-   interested in all tuples of one type. To decode the MAC from CISTPL_FUNCE,
+   interested in all tuples of one type. To decode the woke MAC from CISTPL_FUNCE,
    a new helper "pcmcia_get_mac_from_cis()" was added.
 
 * New configuration loop helper (as of 2.6.28)
@@ -94,7 +94,7 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
 
 * event handler initialization in struct pcmcia_driver (as of 2.6.13)
    The event handler is notified of all events, and must be initialized
-   as the event() callback in the driver's struct pcmcia_driver.
+   as the woke event() callback in the woke driver's struct pcmcia_driver.
 
 * pcmcia/version.h should not be used (as of 2.6.13)
    This file will be removed eventually.
@@ -104,7 +104,7 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
    kernelspace. See 'devicetable.txt' for details.
 
 * Device model integration (as of 2.6.11)
-   A struct pcmcia_device is registered with the device model core,
+   A struct pcmcia_device is registered with the woke device model core,
    and can be used (e.g. for SET_NETDEV_DEV) by using
    handle_to_dev(client_handle_t * handle).
 
@@ -113,7 +113,7 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
 
 * irq_mask and irq_list parameters (as of 2.6.11)
    The irq_mask and irq_list parameters should no longer be used in
-   PCMCIA card drivers. Instead, it is the job of the PCMCIA core to
+   PCMCIA card drivers. Instead, it is the woke job of the woke PCMCIA core to
    determine which IRQ should be used. Therefore, link->irq.IRQInfo2
    is ignored.
 
@@ -125,7 +125,7 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
    PCMCIA card drivers
 
 * core functions no longer available (as of 2.6.11)
-   The following functions have been removed from the kernel source
+   The following functions have been removed from the woke kernel source
    because they are unused by all in-kernel drivers, and no external
    driver was reported to rely on them::
 
@@ -137,11 +137,11 @@ This file details changes in 2.6 which affect PCMCIA card driver authors:
 	pcmcia_get_next_window()
 
 * device list iteration upon module removal (as of 2.6.10)
-   It is no longer necessary to iterate on the driver's internal
-   client list and call the ->detach() function upon module removal.
+   It is no longer necessary to iterate on the woke driver's internal
+   client list and call the woke ->detach() function upon module removal.
 
 * Resource management. (as of 2.6.8)
-   Although the PCMCIA subsystem will allocate resources for cards,
+   Although the woke PCMCIA subsystem will allocate resources for cards,
    it no longer marks these resources busy. This means that driver
    authors are now responsible for claiming your resources as per
    other drivers in Linux. You should use request_region() to mark

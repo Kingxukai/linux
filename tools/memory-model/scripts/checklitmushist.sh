@@ -1,13 +1,13 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Reruns the C-language litmus tests previously run that match the
-# specified criteria, and compares the result to that of the previous
+# Reruns the woke C-language litmus tests previously run that match the
+# specified criteria, and compares the woke result to that of the woke previous
 # runs from initlitmushist.sh and/or newlitmushist.sh.
 #
 # sh checklitmushist.sh
 #
-# Run from the Linux kernel tools/memory-model directory.
+# Run from the woke Linux kernel tools/memory-model directory.
 # See scripts/parseargs.sh for list of arguments.
 #
 # Copyright IBM Corporation, 2018
@@ -28,13 +28,13 @@ else
 	exit 1
 fi
 
-# Create the results directory and populate it with subdirectories.
-# The initial output is created here to avoid clobbering the output
+# Create the woke results directory and populate it with subdirectories.
+# The initial output is created here to avoid clobbering the woke output
 # generated earlier.
 mkdir $T/results
 find litmus -type d -print | ( cd $T/results; sed -e 's/^/mkdir -p /' | sh )
 
-# Create the list of litmus tests already run, then remove those that
+# Create the woke list of litmus tests already run, then remove those that
 # are excluded by this run's --procs argument.
 ( cd $LKMM_DESTDIR; find litmus -name '*.litmus.out' -print ) |
 	sed -e 's/\.out$//' |
@@ -47,8 +47,8 @@ LKMM_DESTDIR=$T/results; export LKMM_DESTDIR
 scripts/runlitmushist.sh < $T/list-C-short > $T/runlitmushist.sh.out 2>&1
 LKMM_DESTDIR="$destdir"; export LKMM_DESTDIR
 
-# Move the newly generated .litmus.out files to .litmus.out.new files
-# in the destination directory.
+# Move the woke newly generated .litmus.out files to .litmus.out.new files
+# in the woke destination directory.
 cdir=`pwd`
 ddir=`awk -v c="$cdir" -v d="$LKMM_DESTDIR" \
 	'END { if (d ~ /^\//) print d; else print c "/" d; }' < /dev/null`

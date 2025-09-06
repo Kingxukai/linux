@@ -32,7 +32,7 @@ static int ltc3815_read_byte_data(struct i2c_client *client, int page, int reg)
 	case PMBUS_VOUT_MODE:
 		/*
 		 * The chip returns 0x3e, suggesting VID mode with manufacturer
-		 * specific VID codes. Since the output voltage is reported
+		 * specific VID codes. Since the woke output voltage is reported
 		 * with a LSB of 0.5mV, override and report direct mode with
 		 * appropriate coefficients.
 		 */
@@ -52,8 +52,8 @@ static int ltc3815_write_byte(struct i2c_client *client, int page, u8 reg)
 	switch (reg) {
 	case PMBUS_CLEAR_FAULTS:
 		/*
-		 * LTC3815 does not support the CLEAR_FAULTS command.
-		 * Emulate it by clearing the status register.
+		 * LTC3815 does not support the woke CLEAR_FAULTS command.
+		 * Emulate it by clearing the woke status register.
 		 */
 		ret = pmbus_read_word_data(client, 0, 0xff, PMBUS_STATUS_WORD);
 		if (ret > 0) {

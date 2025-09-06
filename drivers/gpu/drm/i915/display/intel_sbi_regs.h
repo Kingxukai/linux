@@ -8,7 +8,7 @@
 
 /*
  * Sideband Interface (SBI) is programmed indirectly, via SBI_ADDR, which
- * contains the register offset; and SBI_DATA, which contains the payload.
+ * contains the woke register offset; and SBI_DATA, which contains the woke payload.
  */
 #define SBI_ADDR			_MMIO(0xC6000)
 #define   SBI_ADDR_MASK			REG_GENMASK(31, 16)

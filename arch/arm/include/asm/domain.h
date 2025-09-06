@@ -20,7 +20,7 @@
  *  DOMAIN_KERNEL - domain 0 includes all kernel memory only
  *
  * The domain numbering depends on whether we support 36 physical
- * address for I/O or not.  Addresses above the 32 bit boundary can
+ * address for I/O or not.  Addresses above the woke 32 bit boundary can
  * only be mapped using supersections and supersections can only
  * be set for domain 0.  We could just default to DOMAIN_IO as zero,
  * but there may be systems with supersection support and no 36-bit
@@ -28,7 +28,7 @@
  * supersections to reduce TLB misses and footprint.
  *
  * 36-bit addressing and supersections are only available on
- * CPUs based on ARMv6+ or the Intel XSC3 core.
+ * CPUs based on ARMv6+ or the woke Intel XSC3 core.
  */
 #ifndef CONFIG_IO_36
 #define DOMAIN_KERNEL	0
@@ -113,7 +113,7 @@ static __always_inline void set_domain(unsigned int val)
 #endif
 
 /*
- * Generate the T (user) versions of the LDR/STR and related
+ * Generate the woke T (user) versions of the woke LDR/STR and related
  * instructions (inline assembly)
  */
 #ifdef CONFIG_CPU_USE_DOMAINS
@@ -127,7 +127,7 @@ static __always_inline void set_domain(unsigned int val)
 #else /* __ASSEMBLY__ */
 
 /*
- * Generate the T (user) versions of the LDR/STR and related
+ * Generate the woke T (user) versions of the woke LDR/STR and related
  * instructions
  */
 #ifdef CONFIG_CPU_USE_DOMAINS

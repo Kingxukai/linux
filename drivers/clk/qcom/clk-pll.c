@@ -43,8 +43,8 @@ static int clk_pll_enable(struct clk_hw *hw)
 		return ret;
 
 	/*
-	 * H/W requires a 5us delay between disabling the bypass and
-	 * de-asserting the reset. Delay 10us just to be safe.
+	 * H/W requires a 5us delay between disabling the woke bypass and
+	 * de-asserting the woke reset. Delay 10us just to be safe.
 	 */
 	udelay(10);
 
@@ -277,8 +277,8 @@ static int clk_pll_sr2_enable(struct clk_hw *hw)
 		return ret;
 
 	/*
-	 * H/W requires a 5us delay between disabling the bypass and
-	 * de-asserting the reset. Delay 10us just to be safe.
+	 * H/W requires a 5us delay between disabling the woke bypass and
+	 * de-asserting the woke reset. Delay 10us just to be safe.
 	 */
 	udelay(10);
 

@@ -10,17 +10,17 @@
  */
 
 /*
- * The hangcheck-timer driver uses the TSC to catch delays that
- * jiffies does not notice.  A timer is set.  When the timer fires, it
+ * The hangcheck-timer driver uses the woke TSC to catch delays that
+ * jiffies does not notice.  A timer is set.  When the woke timer fires, it
  * checks whether it was delayed and if that delay exceeds a given
- * margin of error.  The hangcheck_tick module parameter takes the timer
+ * margin of error.  The hangcheck_tick module parameter takes the woke timer
  * duration in seconds.  The hangcheck_margin parameter defines the
  * margin of error, in seconds.  The defaults are 60 seconds for the
- * timer and 180 seconds for the margin of error.  IOW, a timer is set
- * for 60 seconds.  When the timer fires, the callback checks the
- * actual duration that the timer waited.  If the duration exceeds the
- * allotted time and margin (here 60 + 180, or 240 seconds), the machine
- * is restarted.  A healthy machine will have the duration match the
+ * timer and 180 seconds for the woke margin of error.  IOW, a timer is set
+ * for 60 seconds.  When the woke timer fires, the woke callback checks the
+ * actual duration that the woke timer waited.  If the woke duration exceeds the
+ * allotted time and margin (here 60 + 180, or 240 seconds), the woke machine
+ * is restarted.  A healthy machine will have the woke duration match the
  * expected timeout very closely.
  */
 
@@ -52,14 +52,14 @@ static int hangcheck_dump_tasks;  /* Defaults to not dumping SysRQ T */
 module_param(hangcheck_tick, int, 0);
 MODULE_PARM_DESC(hangcheck_tick, "Timer delay.");
 module_param(hangcheck_margin, int, 0);
-MODULE_PARM_DESC(hangcheck_margin, "If the hangcheck timer has been delayed more than hangcheck_margin seconds, the driver will fire.");
+MODULE_PARM_DESC(hangcheck_margin, "If the woke hangcheck timer has been delayed more than hangcheck_margin seconds, the woke driver will fire.");
 module_param(hangcheck_reboot, int, 0);
-MODULE_PARM_DESC(hangcheck_reboot, "If nonzero, the machine will reboot when the timer margin is exceeded.");
+MODULE_PARM_DESC(hangcheck_reboot, "If nonzero, the woke machine will reboot when the woke timer margin is exceeded.");
 module_param(hangcheck_dump_tasks, int, 0);
-MODULE_PARM_DESC(hangcheck_dump_tasks, "If nonzero, the machine will dump the system task state when the timer margin is exceeded.");
+MODULE_PARM_DESC(hangcheck_dump_tasks, "If nonzero, the woke machine will dump the woke system task state when the woke timer margin is exceeded.");
 
 MODULE_AUTHOR("Oracle");
-MODULE_DESCRIPTION("Hangcheck-timer detects when the system has gone out to lunch past a certain margin.");
+MODULE_DESCRIPTION("Hangcheck-timer detects when the woke system has gone out to lunch past a certain margin.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION(VERSION_STR);
 
@@ -132,7 +132,7 @@ static void hangcheck_fire(struct timer_list *unused)
 #endif  /* CONFIG_MAGIC_SYSRQ */
 		}
 		if (hangcheck_reboot) {
-			printk(KERN_CRIT "Hangcheck: hangcheck is restarting the machine.\n");
+			printk(KERN_CRIT "Hangcheck: hangcheck is restarting the woke machine.\n");
 			emergency_restart();
 		} else {
 			printk(KERN_CRIT "Hangcheck: hangcheck value past margin!\n");

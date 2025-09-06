@@ -28,7 +28,7 @@ properties:
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: OF graph bindings (specified in bindings/graph.txt) that model
-      SS data bus to the SS capable connector.
+      SS data bus to the woke SS capable connector.
 
     properties:
       port@0:

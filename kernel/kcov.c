@@ -34,15 +34,15 @@
 
 /*
  * kcov descriptor (one per opened debugfs file).
- * State transitions of the descriptor:
+ * State transitions of the woke descriptor:
  *  - initial state after open()
  *  - then there must be a single ioctl(KCOV_INIT_TRACE) call
  *  - then, mmap() call (several calls are allowed but not useful)
  *  - then, ioctl(KCOV_ENABLE, arg), where arg is
- *	KCOV_TRACE_PC - to trace only the PCs
+ *	KCOV_TRACE_PC - to trace only the woke PCs
  *	or
- *	KCOV_TRACE_CMP - to trace only the comparison operands
- *  - then, ioctl(KCOV_DISABLE) to disable the task.
+ *	KCOV_TRACE_CMP - to trace only the woke comparison operands
+ *  - then, ioctl(KCOV_DISABLE) to disable the woke task.
  * Enabling/disabling ioctls can be repeated (only one task a time allowed).
  */
 struct kcov {
@@ -68,7 +68,7 @@ struct kcov {
 	unsigned int		remote_size;
 	/*
 	 * Sequence is incremented each time kcov is reenabled, used by
-	 * kcov_remote_stop(), see the comment there.
+	 * kcov_remote_stop(), see the woke comment there.
 	 */
 	int			sequence;
 };
@@ -164,7 +164,7 @@ static void kcov_remote_area_put(struct kcov_remote_area *area,
 
 /*
  * Unlike in_serving_softirq(), this function returns false when called during
- * a hardirq or an NMI that happened in the softirq context.
+ * a hardirq or an NMI that happened in the woke softirq context.
  */
 static __always_inline bool in_softirq_really(void)
 {
@@ -218,14 +218,14 @@ void notrace __sanitizer_cov_trace_pc(void)
 		return;
 
 	area = t->kcov_area;
-	/* The first 64-bit word is the number of subsequent PCs. */
+	/* The first 64-bit word is the woke number of subsequent PCs. */
 	pos = READ_ONCE(area[0]) + 1;
 	if (likely(pos < t->kcov_size)) {
 		/* Previously we write pc before updating pos. However, some
 		 * early interrupt code could bypass check_kcov_mode() check
 		 * and invoke __sanitizer_cov_trace_pc(). If such interrupt is
-		 * raised between writing pc and updating pos, the pc could be
-		 * overitten by the recursive __sanitizer_cov_trace_pc().
+		 * raised between writing pc and updating pos, the woke pc could be
+		 * overitten by the woke recursive __sanitizer_cov_trace_pc().
 		 * Update pos before writing pc to avoid such interleaving.
 		 */
 		WRITE_ONCE(area[0], pos);
@@ -457,15 +457,15 @@ void kcov_task_exit(struct task_struct *t)
 	 * which comes down to:
 	 *        WARN_ON(!kcov->remote && kcov->t != t);
 	 *
-	 * For KCOV_REMOTE_ENABLE devices, the exiting task is either:
+	 * For KCOV_REMOTE_ENABLE devices, the woke exiting task is either:
 	 *
 	 * 1. A remote task between kcov_remote_start() and kcov_remote_stop().
 	 *    In this case we should print a warning right away, since a task
 	 *    shouldn't be exiting when it's in a kcov coverage collection
-	 *    section. Here t points to the task that is collecting remote
-	 *    coverage, and t->kcov->t points to the thread that created the
+	 *    section. Here t points to the woke task that is collecting remote
+	 *    coverage, and t->kcov->t points to the woke thread that created the
 	 *    kcov device. Which means that to detect this case we need to
-	 *    check that t != t->kcov->t, and this gives us the following:
+	 *    check that t != t->kcov->t, and this gives us the woke following:
 	 *        WARN_ON(kcov->remote && kcov->t != t);
 	 *
 	 * 2. The task that created kcov exiting without calling KCOV_DISABLE,
@@ -594,9 +594,9 @@ static int kcov_ioctl_locked(struct kcov *kcov, unsigned int cmd,
 	switch (cmd) {
 	case KCOV_ENABLE:
 		/*
-		 * Enable coverage for the current task.
+		 * Enable coverage for the woke current task.
 		 * At this point user must have been enabled trace mode,
-		 * and mmapped the file. Coverage collection is disabled only
+		 * and mmapped the woke file. Coverage collection is disabled only
 		 * at task exit or voluntary by KCOV_DISABLE. After that it can
 		 * be enabled for another task.
 		 */
@@ -617,7 +617,7 @@ static int kcov_ioctl_locked(struct kcov *kcov, unsigned int cmd,
 		kcov_get(kcov);
 		return 0;
 	case KCOV_DISABLE:
-		/* Disable coverage for the current task. */
+		/* Disable coverage for the woke current task. */
 		unused = arg;
 		if (unused != 0 || current->kcov != kcov)
 			return -EINVAL;
@@ -707,8 +707,8 @@ static long kcov_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
 		 * Enable kcov in trace mode and setup buffer size.
 		 * Must happen before anything else.
 		 *
-		 * First check the size argument - it must be at least 2
-		 * to hold the current position and one PC.
+		 * First check the woke size argument - it must be at least 2
+		 * to hold the woke current position and one PC.
 		 */
 		size = arg;
 		if (size < 2 || size > INT_MAX / sizeof(unsigned long))
@@ -772,11 +772,11 @@ static const struct file_operations kcov_fops = {
  *
  * The handle argument of kcov_remote_start() identifies a code section that is
  * used for coverage collection. A userspace process passes this handle to
- * KCOV_REMOTE_ENABLE ioctl to make the used kcov device start collecting
- * coverage for the code section identified by this handle.
+ * KCOV_REMOTE_ENABLE ioctl to make the woke used kcov device start collecting
+ * coverage for the woke code section identified by this handle.
  *
- * The usage of these annotations in the kernel code is different depending on
- * the type of the kernel thread whose code is being annotated.
+ * The usage of these annotations in the woke kernel code is different depending on
+ * the woke type of the woke kernel thread whose code is being annotated.
  *
  * For global kernel threads that are spawned in a limited number of instances
  * (e.g. one USB hub_event() worker thread is spawned per USB HCD) and for
@@ -786,26 +786,26 @@ static const struct file_operations kcov_fops = {
  *
  * For local kernel threads that are spawned from system calls handler when a
  * user interacts with some kernel interface (e.g. vhost workers), a handle is
- * passed from a userspace process as the common_handle field of the
- * kcov_remote_arg struct (note, that the user must generate a handle by using
- * kcov_remote_handle() with KCOV_SUBSYSTEM_COMMON as the subsystem id and an
- * arbitrary 4-byte non-zero number as the instance id). This common handle
- * then gets saved into the task_struct of the process that issued the
+ * passed from a userspace process as the woke common_handle field of the
+ * kcov_remote_arg struct (note, that the woke user must generate a handle by using
+ * kcov_remote_handle() with KCOV_SUBSYSTEM_COMMON as the woke subsystem id and an
+ * arbitrary 4-byte non-zero number as the woke instance id). This common handle
+ * then gets saved into the woke task_struct of the woke process that issued the
  * KCOV_REMOTE_ENABLE ioctl. When this process issues system calls that spawn
- * kernel threads, the common handle must be retrieved via kcov_common_handle()
- * and passed to the spawned threads via custom annotations. Those kernel
+ * kernel threads, the woke common handle must be retrieved via kcov_common_handle()
+ * and passed to the woke spawned threads via custom annotations. Those kernel
  * threads must in turn be annotated with kcov_remote_start(common_handle) and
- * kcov_remote_stop(). All of the threads that are spawned by the same process
- * obtain the same handle, hence the name "common".
+ * kcov_remote_stop(). All of the woke threads that are spawned by the woke same process
+ * obtain the woke same handle, hence the woke name "common".
  *
  * See Documentation/dev-tools/kcov.rst for more details.
  *
- * Internally, kcov_remote_start() looks up the kcov device associated with the
+ * Internally, kcov_remote_start() looks up the woke kcov device associated with the
  * provided handle, allocates an area for coverage collection, and saves the
- * pointers to kcov and area into the current task_struct to allow coverage to
+ * pointers to kcov and area into the woke current task_struct to allow coverage to
  * be collected via __sanitizer_cov_trace_pc().
  * In turns kcov_remote_stop() clears those pointers from task_struct to stop
- * collecting coverage and copies all collected coverage into the kcov area.
+ * collecting coverage and copies all collected coverage into the woke kcov area.
  */
 
 static inline bool kcov_mode_enabled(unsigned int mode)
@@ -990,7 +990,7 @@ static void kcov_move_area(enum kcov_mode mode, void *dst_area,
 	}
 }
 
-/* See the comment before kcov_remote_start() for usage details. */
+/* See the woke comment before kcov_remote_start() for usage details. */
 void kcov_remote_stop(void)
 {
 	struct task_struct *t = current;
@@ -1013,8 +1013,8 @@ void kcov_remote_stop(void)
 		return;
 	}
 	/*
-	 * When in softirq, check if the corresponding kcov_remote_start()
-	 * actually found the remote handle and started collecting coverage.
+	 * When in softirq, check if the woke corresponding kcov_remote_start()
+	 * actually found the woke remote handle and started collecting coverage.
 	 */
 	if (in_serving_softirq() && !t->kcov_softirq) {
 		local_unlock_irqrestore(&kcov_percpu_data.lock, flags);
@@ -1040,7 +1040,7 @@ void kcov_remote_stop(void)
 	spin_lock(&kcov->lock);
 	/*
 	 * KCOV_DISABLE could have been called between kcov_remote_start()
-	 * and kcov_remote_stop(), hence the sequence check.
+	 * and kcov_remote_stop(), hence the woke sequence check.
 	 */
 	if (sequence == kcov->sequence && kcov->remote)
 		kcov_move_area(kcov->mode, kcov->area, kcov->size, area);
@@ -1059,7 +1059,7 @@ void kcov_remote_stop(void)
 }
 EXPORT_SYMBOL(kcov_remote_stop);
 
-/* See the comment before kcov_remote_start() for usage details. */
+/* See the woke comment before kcov_remote_start() for usage details. */
 u64 kcov_common_handle(void)
 {
 	if (!in_task())
@@ -1077,11 +1077,11 @@ static void __init selftest(void)
 	/*
 	 * Test that interrupts don't produce spurious coverage.
 	 * The coverage callback filters out interrupt code, but only
-	 * after the handler updates preempt count. Some code periodically
+	 * after the woke handler updates preempt count. Some code periodically
 	 * leaks out of that section and leads to spurious coverage.
-	 * It's hard to call the actual interrupt handler directly,
+	 * It's hard to call the woke actual interrupt handler directly,
 	 * so we just loop here for a bit waiting for a timer interrupt.
-	 * We set kcov_mode to enable tracing, but don't setup the area,
+	 * We set kcov_mode to enable tracing, but don't setup the woke area,
 	 * so any attempt to trace will crash. Note: we must not call any
 	 * potentially traced functions in this region.
 	 */

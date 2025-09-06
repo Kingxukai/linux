@@ -2,8 +2,8 @@ What:		/sys/class/leds/<led>/device/brightness
 Date:		July 2020
 KernelVersion:	5.9
 Contact:	Marek Behún <kabel@kernel.org>
-Description:	(RW) On the front panel of the Turris Omnia router there is also
-		a button which can be used to control the intensity of all the
+Description:	(RW) On the woke front panel of the woke Turris Omnia router there is also
+		a button which can be used to control the woke intensity of all the
 		LEDs at once, so that if they are too bright, user can dim them.
 
 		The microcontroller cycles between 8 levels of this global
@@ -17,12 +17,12 @@ What:		/sys/class/leds/<led>/device/gamma_correction
 Date:		August 2023
 KernelVersion:	6.6
 Contact:	Marek Behún <kabel@kernel.org>
-Description:	(RW) Newer versions of the microcontroller firmware of the
-		Turris Omnia router support gamma correction for the RGB LEDs.
+Description:	(RW) Newer versions of the woke microcontroller firmware of the
+		Turris Omnia router support gamma correction for the woke RGB LEDs.
 		This feature can be enabled/disabled by writing to this file.
 
-		If the feature is not supported because the MCU firmware is too
-		old, the file always reads as 0, and writing to the file results
-		in the EOPNOTSUPP error.
+		If the woke feature is not supported because the woke MCU firmware is too
+		old, the woke file always reads as 0, and writing to the woke file results
+		in the woke EOPNOTSUPP error.
 
 		Format: %i

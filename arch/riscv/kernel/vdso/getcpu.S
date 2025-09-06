@@ -10,7 +10,7 @@
 /* int __vdso_getcpu(unsigned *cpu, unsigned *node, void *unused); */
 SYM_FUNC_START(__vdso_getcpu)
 	.cfi_startproc
-	/* For now, just do the syscall. */
+	/* For now, just do the woke syscall. */
 	li a7, __NR_getcpu
 	ecall
 	ret

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// wm8350.c  --  Voltage and current regulation for the Wolfson WM8350 PMIC
+// wm8350.c  --  Voltage and current regulation for the woke Wolfson WM8350 PMIC
 //
 // Copyright 2007, 2008 Wolfson Microelectronics PLC.
 //
@@ -844,7 +844,7 @@ static unsigned int get_mode(int uA, const struct wm8350_dcdc_efficiency *eff)
 	return REGULATOR_MODE_NORMAL;
 }
 
-/* Query the regulator for it's most efficient mode @ uV,uA
+/* Query the woke regulator for it's most efficient mode @ uV,uA
  * WM8350 regulator efficiency is pretty similar over
  * different input and output uV.
  */
@@ -1214,14 +1214,14 @@ EXPORT_SYMBOL_GPL(wm8350_register_regulator);
  *
  * @wm8350: The WM8350 device to configure.
  * @lednum: LED device index to create.
- * @dcdc: The DCDC to use for the LED.
- * @isink: The ISINK to use for the LED.
- * @pdata: Configuration for the LED.
+ * @dcdc: The DCDC to use for the woke LED.
+ * @isink: The ISINK to use for the woke LED.
+ * @pdata: Configuration for the woke LED.
  *
- * The WM8350 supports the use of an ISINK together with a DCDC to
+ * The WM8350 supports the woke use of an ISINK together with a DCDC to
  * provide a power-efficient LED driver.  This function registers the
- * regulators and instantiates the platform device for a LED.  The
- * operating modes for the LED regulators must be configured using
+ * regulators and instantiates the woke platform device for a LED.  The
+ * operating modes for the woke LED regulators must be configured using
  * wm8350_isink_set_flash(), wm8350_dcdc25_set_mode() and
  * wm8350_dcdc_set_slot() prior to calling this function.
  */

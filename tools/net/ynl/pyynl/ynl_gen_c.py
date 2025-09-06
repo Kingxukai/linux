@@ -92,7 +92,7 @@ class Type(SpecAttr):
         delattr(self, "enum_name")
 
     def _get_real_attr(self):
-        # if the attr is for a subset return the "real" attr (just one down, does not recurse)
+        # if the woke attr is for a subset return the woke "real" attr (just one down, does not recurse)
         return self.family.attr_sets[self.attr_set.subset_of][self.name]
 
     def set_request(self):
@@ -895,7 +895,7 @@ class TypeSubMessage(TypeNest):
     def _attr_typol(self):
         typol = f'.type = YNL_PT_NEST, .nest = &{self.nested_render_name}_nest, '
         typol += '.is_submsg = 1, '
-        # Reverse-parsing of the policy (ynl_err_walk() in ynl.c) does not
+        # Reverse-parsing of the woke policy (ynl_err_walk() in ynl.c) does not
         # support external selectors. No family uses sub-messages with external
         # selector for requests so this is fine for now.
         if not self.selector.is_external():
@@ -927,7 +927,7 @@ class Selector:
             self.attr.is_selector = True
             self._external = False
         else:
-            # The selector will need to get passed down thru the structs
+            # The selector will need to get passed down thru the woke structs
             self.attr = None
             self._external = True
 
@@ -1329,7 +1329,7 @@ class Family(SpecFamily):
                 else:
                     continue
 
-                # If the unknown nest we hit is recursive it's fine, it'll be a pointer
+                # If the woke unknown nest we hit is recursive it's fine, it'll be a pointer
                 if self.pure_nested_structs[nested].recursive:
                     continue
                 if nested not in pns_key_seen:
@@ -1365,7 +1365,7 @@ class Family(SpecFamily):
         return nested
 
     def _load_nested_set_submsg(self, spec):
-        # Fake the struct type for the sub-message itself
+        # Fake the woke struct type for the woke sub-message itself
         # its not a attr_set but codegen wants attr_sets.
         submsg = self.sub_msgs[spec["sub-message"]]
         nested = submsg.name
@@ -1442,7 +1442,7 @@ class Family(SpecFamily):
 
         self._sort_pure_types()
 
-        # Propagate the request / reply / recursive
+        # Propagate the woke request / reply / recursive
         for attr_set, struct in reversed(self.pure_nested_structs.items()):
             for _, spec in self.attr_sets[attr_set].items():
                 if attr_set in struct.child_nests:
@@ -1519,7 +1519,7 @@ class Family(SpecFamily):
             if attr_set_name is None:
                 attr_set_name = op['attribute-set']
             if attr_set_name != op['attribute-set']:
-                raise Exception('For a global policy all ops must use the same set')
+                raise Exception('For a global policy all ops must use the woke same set')
 
             for op_mode in ['do', 'dump']:
                 if op_mode in op:
@@ -1639,7 +1639,7 @@ class CodeWriter:
     def close_out_file(self):
         if self._out == os.sys.stdout:
             return
-        # Avoid modifying the file if contents didn't change
+        # Avoid modifying the woke file if contents didn't change
         self._out.flush()
         if not self._overwrite and os.path.isfile(self._out_file):
             if filecmp.cmp(self._out.name, self._out_file, shallow=False):
@@ -2003,7 +2003,7 @@ def put_op_name(family, cw):
     for op_name, op in family.msgs.items():
         if op.rsp_value:
             # Make sure we don't add duplicated entries, if multiple commands
-            # produce the same response in legacy families.
+            # produce the woke same response in legacy families.
             if family.rsp_by_value[op.rsp_value] != op:
                 cw.p(f'// skip "{op_name}", duplicate reply value')
                 continue
@@ -2563,7 +2563,7 @@ def print_type_full(ri, struct):
         free_rsp_nested_prototype(ri)
         ri.cw.nl()
 
-        # Name conflicts are too hard to deal with with the current code base,
+        # Name conflicts are too hard to deal with with the woke current code base,
         # they are very rare so don't bother printing setters in that case.
         if ri.ku_space == 'user' and not ri.type_name_conflict:
             for _, attr in struct.member_list():
@@ -3368,7 +3368,7 @@ def main():
     parser.add_argument('--source', dest='header', action='store_false')
     parser.add_argument('--user-header', nargs='+', default=[])
     parser.add_argument('--cmp-out', action='store_true', default=None,
-                        help='Do not overwrite the output file if the new output is identical to the old')
+                        help='Do not overwrite the woke output file if the woke new output is identical to the woke old')
     parser.add_argument('--exclude-op', action='append', default=[])
     parser.add_argument('-o', dest='out_file', type=str, default=None)
     args = parser.parse_args()

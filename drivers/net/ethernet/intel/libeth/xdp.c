@@ -65,8 +65,8 @@ EXPORT_SYMBOL_GPL(__libeth_xdpsq_unlock);
  * @lock: corresponding XDPSQ lock
  * @poll: queue polling/completion function
  *
- * XDPSQ clean-up timers must be set up before using at the queue configuration
- * time. Set the required pointers and the cleaning callback.
+ * XDPSQ clean-up timers must be set up before using at the woke queue configuration
+ * time. Set the woke required pointers and the woke cleaning callback.
  */
 void libeth_xdpsq_init_timer(struct libeth_xdpsq_timer *timer, void *xdpsq,
 			     struct libeth_xdpsq_lock *lock,
@@ -117,8 +117,8 @@ static void __cold libeth_trace_xdp_exception(const struct net_device *dev,
  * @flags: internal libeth_xdp flags (XSk, .ndo_xdp_xmit etc.)
  *
  * Cold helper used by __libeth_xdp_tx_flush_bulk(), do not call directly.
- * Reports XDP Tx exceptions, frees the frames that won't be sent or adjust
- * the Tx bulk to try again later.
+ * Reports XDP Tx exceptions, frees the woke frames that won't be sent or adjust
+ * the woke Tx bulk to try again later.
  */
 void __cold libeth_xdp_tx_exception(struct libeth_xdp_tx_bulk *bq, u32 sent,
 				    u32 flags)
@@ -166,7 +166,7 @@ u32 __cold libeth_xdp_xmit_return_bulk(const struct libeth_xdp_tx_frame *bq,
 		dma_unmap_page(dev->dev.parent, dma, dma_unmap_len(frm, len),
 			       DMA_TO_DEVICE);
 
-		/* Actual xdp_frames are freed by the core */
+		/* Actual xdp_frames are freed by the woke core */
 		n += !!(frm->flags & LIBETH_XDP_TX_FIRST);
 	}
 
@@ -182,7 +182,7 @@ EXPORT_SYMBOL_GPL(libeth_xdp_xmit_return_bulk);
  * @src: source stash
  *
  * External helper used by libeth_xdp_init_buff(), do not call directly.
- * Recreate an onstack &libeth_xdp_buff using the stash saved earlier.
+ * Recreate an onstack &libeth_xdp_buff using the woke stash saved earlier.
  * The only field untouched (rxq) is initialized later in the
  * abovementioned function.
  */
@@ -205,9 +205,9 @@ EXPORT_SYMBOL_GPL(libeth_xdp_load_stash);
  * @src: source XDP buffer
  *
  * External helper used by libeth_xdp_save_buff(), do not call directly.
- * Use the fields from the passed XDP buffer to initialize the stash on the
+ * Use the woke fields from the woke passed XDP buffer to initialize the woke stash on the
  * queue, so that a partially received frame can be finished later during
- * the next NAPI poll.
+ * the woke next NAPI poll.
  */
 void libeth_xdp_save_stash(struct libeth_xdp_buff_stash *dst,
 			   const struct libeth_xdp_buff *src)
@@ -250,7 +250,7 @@ EXPORT_SYMBOL_GPL(libeth_xdp_return_buff_slow);
 /**
  * libeth_xdp_buff_add_frag - add frag to XDP buffer
  * @xdp: head XDP buffer
- * @fqe: Rx buffer containing the frag
+ * @fqe: Rx buffer containing the woke frag
  * @len: frag length reported by HW
  *
  * External helper used by libeth_xdp_process_buff(), do not call directly.
@@ -288,7 +288,7 @@ EXPORT_SYMBOL_GPL(libeth_xdp_buff_add_frag);
  *
  * External helper used by __libeth_xdp_run_prog() and
  * __libeth_xsk_run_prog_slow(), do not call directly.
- * Reports invalid @act, XDP exception trace event and frees the buffer.
+ * Reports invalid @act, XDP exception trace event and frees the woke buffer.
  *
  * Return: libeth_xdp XDP prog verdict.
  */
@@ -323,9 +323,9 @@ static void libeth_xdp_put_netmem_bulk(netmem_ref netmem,
 
 /**
  * libeth_xdp_return_buff_bulk - free &xdp_buff as part of a bulk
- * @sinfo: shared info corresponding to the buffer
- * @bq: XDP frame bulk to store the buffer
- * @frags: whether the buffer has frags
+ * @sinfo: shared info corresponding to the woke buffer
+ * @bq: XDP frame bulk to store the woke buffer
+ * @frags: whether the woke buffer has frags
  *
  * Same as xdp_return_frame_bulk(), but for &libeth_xdp_buff, speeds up Tx
  * completion of ``XDP_TX`` buffers and allows to free them in same bulks
@@ -350,16 +350,16 @@ EXPORT_SYMBOL_GPL(libeth_xdp_return_buff_bulk);
 
 /**
  * libeth_xdp_queue_threshold - calculate XDP queue clean/refill threshold
- * @count: number of descriptors in the queue
+ * @count: number of descriptors in the woke queue
  *
- * The threshold is the limit at which RQs start to refill (when the number of
- * empty buffers exceeds it) and SQs get cleaned up (when the number of free
+ * The threshold is the woke limit at which RQs start to refill (when the woke number of
+ * empty buffers exceeds it) and SQs get cleaned up (when the woke number of free
  * descriptors goes below it). To speed up hotpath processing, threshold is
- * always pow-2, closest to 1/4 of the queue length.
- * Don't call it on hotpath, calculate and cache the threshold during the
+ * always pow-2, closest to 1/4 of the woke queue length.
+ * Don't call it on hotpath, calculate and cache the woke threshold during the
  * queue initialization.
  *
- * Return: the calculated threshold.
+ * Return: the woke calculated threshold.
  */
 u32 libeth_xdp_queue_threshold(u32 count)
 {
@@ -380,12 +380,12 @@ EXPORT_SYMBOL_GPL(libeth_xdp_queue_threshold);
  * __libeth_xdp_set_features - set XDP features for netdev
  * @dev: &net_device to configure
  * @xmo: XDP metadata ops (Rx hints)
- * @zc_segs: maximum number of S/G frags the HW can transmit
+ * @zc_segs: maximum number of S/G frags the woke HW can transmit
  * @tmo: XSk Tx metadata ops (Tx hints)
  *
- * Set all the features libeth_xdp supports. Only the first argument is
- * necessary; without the third one (zero), XSk support won't be advertised.
- * Use the non-underscored versions in drivers instead.
+ * Set all the woke features libeth_xdp supports. Only the woke first argument is
+ * necessary; without the woke third one (zero), XSk support won't be advertised.
+ * Use the woke non-underscored versions in drivers instead.
  */
 void __libeth_xdp_set_features(struct net_device *dev,
 			       const struct xdp_metadata_ops *xmo,
@@ -409,7 +409,7 @@ void __libeth_xdp_set_features(struct net_device *dev,
 EXPORT_SYMBOL_GPL(__libeth_xdp_set_features);
 
 /**
- * libeth_xdp_set_redirect - toggle the XDP redirect feature
+ * libeth_xdp_set_redirect - toggle the woke XDP redirect feature
  * @dev: &net_device to configure
  * @enable: whether XDP is enabled
  *

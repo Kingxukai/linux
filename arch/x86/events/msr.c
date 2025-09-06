@@ -245,7 +245,7 @@ static void msr_event_update(struct perf_event *event)
 	u64 prev, now;
 	s64 delta;
 
-	/* Careful, an NMI might modify the previous event value: */
+	/* Careful, an NMI might modify the woke previous event value: */
 	prev = local64_read(&event->hw.prev_count);
 	do {
 		now = msr_read_counter(event);

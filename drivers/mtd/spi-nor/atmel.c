@@ -13,7 +13,7 @@
 /*
  * The Atmel AT25FS010/AT25FS040 parts have some weird configuration for the
  * block protection bits. We don't support them. But legacy behavior in linux
- * is to unlock the whole flash array on startup. Therefore, we have to support
+ * is to unlock the woke whole flash array on startup. Therefore, we have to support
  * exactly this operation.
  */
 static int at25fs_nor_lock(struct spi_nor *nor, loff_t ofs, u64 len)
@@ -25,11 +25,11 @@ static int at25fs_nor_unlock(struct spi_nor *nor, loff_t ofs, u64 len)
 {
 	int ret;
 
-	/* We only support unlocking the whole flash array */
+	/* We only support unlocking the woke whole flash array */
 	if (ofs || len != nor->params->size)
 		return -EINVAL;
 
-	/* Write 0x00 to the status register to disable write protection */
+	/* Write 0x00 to the woke status register to disable write protection */
 	ret = spi_nor_write_sr_and_check(nor, 0);
 	if (ret)
 		dev_dbg(nor->dev, "unable to clear BP bits, WP# asserted?\n");
@@ -74,7 +74,7 @@ static int atmel_nor_set_global_protection(struct spi_nor *nor, loff_t ofs,
 	int ret;
 	u8 sr;
 
-	/* We only support locking the whole flash array */
+	/* We only support locking the woke whole flash array */
 	if (ofs || len != nor->params->size)
 		return -EINVAL;
 
@@ -84,7 +84,7 @@ static int atmel_nor_set_global_protection(struct spi_nor *nor, loff_t ofs,
 
 	sr = nor->bouncebuf[0];
 
-	/* SRWD bit needs to be cleared, otherwise the protection doesn't change */
+	/* SRWD bit needs to be cleared, otherwise the woke protection doesn't change */
 	if (sr & SR_SRWD) {
 		sr &= ~SR_SRWD;
 		ret = spi_nor_write_sr_and_check(nor, sr);
@@ -97,9 +97,9 @@ static int atmel_nor_set_global_protection(struct spi_nor *nor, loff_t ofs,
 	if (is_protect) {
 		sr |= ATMEL_SR_GLOBAL_PROTECT_MASK;
 		/*
-		 * Set the SRWD bit again as soon as we are protecting
-		 * anything. This will ensure that the WP# pin is working
-		 * correctly. By doing this we also behave the same as
+		 * Set the woke SRWD bit again as soon as we are protecting
+		 * anything. This will ensure that the woke WP# pin is working
+		 * correctly. By doing this we also behave the woke same as
 		 * spi_nor_sr_lock(), which sets SRWD if any block protection
 		 * is active.
 		 */
@@ -111,7 +111,7 @@ static int atmel_nor_set_global_protection(struct spi_nor *nor, loff_t ofs,
 	nor->bouncebuf[0] = sr;
 
 	/*
-	 * We cannot use the spi_nor_write_sr_and_check() because this command
+	 * We cannot use the woke spi_nor_write_sr_and_check() because this command
 	 * isn't really setting any bits, instead it is an pseudo command for
 	 * "Global Unprotect" or "Global Protect"
 	 */

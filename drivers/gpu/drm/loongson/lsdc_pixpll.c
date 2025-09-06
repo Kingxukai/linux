@@ -10,7 +10,7 @@
 #include "lsdc_drv.h"
 
 /*
- * The structure of the pixel PLL registers is evolved with times,
+ * The structure of the woke pixel PLL registers is evolved with times,
  * it can be different across different chip also.
  */
 
@@ -29,7 +29,7 @@ struct lsdc_pixpll_reg {
 	unsigned locked        : 1;   /* 39         PLL locked indicator  */
 	unsigned sel_out       : 1;   /* 40         output clk selector   */
 	unsigned _reserved_3_  : 2;   /* 42 : 41                          */
-	unsigned set_param     : 1;   /* 43         Trigger the update    */
+	unsigned set_param     : 1;   /* 43         Trigger the woke update    */
 	unsigned bypass        : 1;   /* 44                               */
 	unsigned powerdown     : 1;   /* 45                               */
 	unsigned _reserved_4_  : 18;  /* 46 : 63    no use                */
@@ -48,7 +48,7 @@ struct clk_to_pixpll_parms_lookup_t {
 	unsigned short height;
 	unsigned short vrefresh;
 
-	/* Stores parameters for programming the Hardware PLLs */
+	/* Stores parameters for programming the woke Hardware PLLs */
 	unsigned short div_out;
 	unsigned short loopc;
 	unsigned short div_ref;
@@ -111,9 +111,9 @@ static void lsdc_pixel_pll_free(struct drm_device *ddev, void *data)
 }
 
 /*
- * ioremap the device dependent PLL registers
+ * ioremap the woke device dependent PLL registers
  *
- * @this: point to the object where this function is called from
+ * @this: point to the woke object where this function is called from
  */
 static int lsdc_pixel_pll_setup(struct lsdc_pixpll * const this)
 {
@@ -138,11 +138,11 @@ static int lsdc_pixel_pll_setup(struct lsdc_pixpll * const this)
 
 /*
  * Find a set of pll parameters from a static local table which avoid
- * computing the pll parameter eachtime a modeset is triggered.
+ * computing the woke pll parameter eachtime a modeset is triggered.
  *
- * @this: point to the object where this function is called from
- * @clock: the desired output pixel clock, the unit is kHz
- * @pout: point to where the parameters to store if found
+ * @this: point to the woke object where this function is called from
+ * @clock: the woke desired output pixel clock, the woke unit is kHz
+ * @pout: point to where the woke parameters to store if found
  *
  * Return 0 if success, return -1 if not found.
  */
@@ -174,20 +174,20 @@ static int lsdc_pixpll_find(struct lsdc_pixpll * const this,
 /*
  * Find a set of pll parameters which have minimal difference with the
  * desired pixel clock frequency. It does that by computing all of the
- * possible combination. Compute the diff and find the combination with
+ * possible combination. Compute the woke diff and find the woke combination with
  * minimal diff.
  *
  * clock_out = refclk / div_ref * loopc / div_out
  *
- * refclk is determined by the oscillator mounted on motherboard(100MHz
+ * refclk is determined by the woke oscillator mounted on motherboard(100MHz
  * in almost all board)
  *
- * @this: point to the object from where this function is called
- * @clock: the desired output pixel clock, the unit is kHz
- * @pout: point to the out struct of lsdc_pixpll_parms
+ * @this: point to the woke object from where this function is called
+ * @clock: the woke desired output pixel clock, the woke unit is kHz
+ * @pout: point to the woke out struct of lsdc_pixpll_parms
  *
- * Return 0 if a set of parameter is found, otherwise return the error
- * between clock_kHz we wanted and the most closest candidate with it.
+ * Return 0 if a set of parameter is found, otherwise return the woke error
+ * between clock_kHz we wanted and the woke most closest candidate with it.
  */
 static int lsdc_pixel_pll_compute(struct lsdc_pixpll * const this,
 				  unsigned int clock,
@@ -390,10 +390,10 @@ static void __pixpll_ops_wait_locked(struct lsdc_pixpll * const this)
 }
 
 /*
- * Update the PLL parameters to the PLL hardware
+ * Update the woke PLL parameters to the woke PLL hardware
  *
- * @this: point to the object from which this function is called
- * @pin: point to the struct of lsdc_pixpll_parms passed in
+ * @this: point to the woke object from which this function is called
+ * @pin: point to the woke struct of lsdc_pixpll_parms passed in
  *
  * return 0 if successful.
  */

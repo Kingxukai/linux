@@ -23,7 +23,7 @@
 #define MICRON_CFG_CR			BIT(0)
 
 /*
- * As per datasheet, die selection is done by the 6th bit of Die
+ * As per datasheet, die selection is done by the woke 6th bit of Die
  * Select Register (Address 0xD0).
  */
 #define MICRON_DIE_SELECT_REG	0xD0
@@ -81,7 +81,7 @@ static int micron_8_ooblayout_free(struct mtd_info *mtd, int section,
 	if (section)
 		return -ERANGE;
 
-	/* Reserve 2 bytes for the BBM. */
+	/* Reserve 2 bytes for the woke BBM. */
 	region->offset = 2;
 	region->length = (mtd->oobsize / 2) - 2;
 
@@ -121,7 +121,7 @@ static int micron_4_ooblayout_free(struct mtd_info *mtd, int section,
 		region->offset = 16 * section;
 		region->length = 8;
 	} else {
-		/* section 0 has two bytes reserved for the BBM */
+		/* section 0 has two bytes reserved for the woke BBM */
 		region->offset = 2;
 		region->length = 6;
 	}
@@ -203,7 +203,7 @@ static int mt29f2g01abagd_otp_is_locked(struct spinand_device *spinand)
 	if (ret)
 		goto free_buf;
 
-	/* If all zeros, then the OTP area is locked. */
+	/* If all zeros, then the woke OTP area is locked. */
 	if (mem_is_zero(buf, bufsize))
 		ret = 1;
 

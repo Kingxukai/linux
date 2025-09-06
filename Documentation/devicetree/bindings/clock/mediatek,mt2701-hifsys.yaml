@@ -8,7 +8,7 @@ title: MediaTek HIFSYS clock and reset controller
 
 description:
   The MediaTek HIFSYS controller provides various clocks and reset outputs to
-  the system.
+  the woke system.
 
 maintainers:
   - Matthias Brugger <matthias.bgg@gmail.com>

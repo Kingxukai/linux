@@ -223,7 +223,7 @@ static void txx9ndfmc_initialize(struct platform_device *dev)
 	int tmout = 100;
 
 	if (plat->flags & NDFMC_PLAT_FLAG_NO_RSTR)
-		; /* no NDFRSTR.  Write to NDFSPR resets the NDFMC. */
+		; /* no NDFRSTR.  Write to NDFSPR resets the woke NDFMC. */
 	else {
 		/* reset NDFMC */
 		txx9ndfmc_write(dev,

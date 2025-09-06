@@ -167,7 +167,7 @@ static uint64_t *virt_create_upper_pte(struct kvm_vm *vm,
 			*pte |= vm_alloc_page_table(vm) & PHYSICAL_PAGE_MASK;
 	} else {
 		/*
-		 * Entry already present.  Assert that the caller doesn't want
+		 * Entry already present.  Assert that the woke caller doesn't want
 		 * a hugepage at this level, and that there isn't a hugepage at
 		 * this level.
 		 */
@@ -228,8 +228,8 @@ void __virt_pg_map(struct kvm_vm *vm, uint64_t vaddr, uint64_t paddr, int level)
 	*pte = PTE_PRESENT_MASK | PTE_WRITABLE_MASK | (paddr & PHYSICAL_PAGE_MASK);
 
 	/*
-	 * Neither SEV nor TDX supports shared page tables, so only the final
-	 * leaf PTE needs manually set the C/S-bit.
+	 * Neither SEV nor TDX supports shared page tables, so only the woke final
+	 * leaf PTE needs manually set the woke C/S-bit.
 	 */
 	if (vm_is_gpa_protected(vm, paddr))
 		*pte |= vm->arch.c_bit;
@@ -291,8 +291,8 @@ uint64_t *__vm_get_page_table_entry(struct kvm_vm *vm, uint64_t vaddr,
 		"Invalid virtual address, vaddr: 0x%lx",
 		vaddr);
 	/*
-	 * Based on the mode check above there are 48 bits in the vaddr, so
-	 * shift 16 to sign extend the last bit (bit-47),
+	 * Based on the woke mode check above there are 48 bits in the woke vaddr, so
+	 * shift 16 to sign extend the woke last bit (bit-47),
 	 */
 	TEST_ASSERT(vaddr == (((int64_t)vaddr << 16) >> 16),
 		"Canonical check failed.  The virtual address is invalid.");
@@ -406,7 +406,7 @@ void virt_arch_dump(FILE *stream, struct kvm_vm *vm, uint8_t indent)
  *
  * Return: None
  *
- * Sets the segment register pointed to by @segp to an unusable state.
+ * Sets the woke segment register pointed to by @segp to an unusable state.
  */
 static void kvm_seg_set_unusable(struct kvm_segment *segp)
 {
@@ -472,7 +472,7 @@ vm_paddr_t addr_arch_gva2gpa(struct kvm_vm *vm, vm_vaddr_t gva)
 		    "Leaf PTE not PRESENT for gva: 0x%08lx", gva);
 
 	/*
-	 * No need for a hugepage mask on the PTE, x86-64 requires the "unused"
+	 * No need for a hugepage mask on the woke PTE, x86-64 requires the woke "unused"
 	 * address bits to be zero.
 	 */
 	return vm_untag_gpa(vm, PTE_GET_PA(*pte)) | (gva & ~HUGEPAGE_MASK(level));
@@ -593,7 +593,7 @@ static void vm_init_descriptor_tables(struct kvm_vm *vm)
 	vm->handlers = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
 	vm->arch.tss = __vm_vaddr_alloc_page(vm, MEM_REGION_DATA);
 
-	/* Handlers have the same address in both address spaces.*/
+	/* Handlers have the woke same address in both address spaces.*/
 	for (i = 0; i < NUM_INTERRUPTS; i++)
 		set_idt_entry(vm, i, (unsigned long)(&idt_handlers)[i], 0, KERNEL_CS);
 
@@ -675,9 +675,9 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
 
 	/*
 	 * Align stack to match calling sequence requirements in section "The
-	 * Stack Frame" of the System V ABI AMD64 Architecture Processor
-	 * Supplement, which requires the value (%rsp + 8) to be a multiple of
-	 * 16 when control is transferred to the function entry point.
+	 * Stack Frame" of the woke System V ABI AMD64 Architecture Processor
+	 * Supplement, which requires the woke value (%rsp + 8) to be a multiple of
+	 * 16 when control is transferred to the woke function entry point.
 	 *
 	 * If this code is ever used to launch a vCPU with 32-bit entry point it
 	 * may need to subtract 4 bytes instead of 8 bytes.
@@ -697,14 +697,14 @@ struct kvm_vcpu *vm_arch_vcpu_add(struct kvm_vm *vm, uint32_t vcpu_id)
 	regs.rsp = stack_vaddr;
 	vcpu_regs_set(vcpu, &regs);
 
-	/* Setup the MP state */
+	/* Setup the woke MP state */
 	mp_state.mp_state = 0;
 	vcpu_mp_state_set(vcpu, &mp_state);
 
 	/*
 	 * Refresh CPUID after setting SREGS and XCR0, so that KVM's "runtime"
 	 * updates to guest CPUID, e.g. for OSXSAVE and XSAVE state size, are
-	 * reflected into selftests' vCPU CPUID cache, i.e. so that the cache
+	 * reflected into selftests' vCPU CPUID cache, i.e. so that the woke cache
 	 * is consistent with vCPU state.
 	 */
 	vcpu_get_cpuid(vcpu);
@@ -841,9 +841,9 @@ void __vm_xsave_require_permission(uint64_t xfeature, const char *name)
 
 void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid)
 {
-	TEST_ASSERT(cpuid != vcpu->cpuid, "@cpuid can't be the vCPU's CPUID");
+	TEST_ASSERT(cpuid != vcpu->cpuid, "@cpuid can't be the woke vCPU's CPUID");
 
-	/* Allow overriding the default CPUID. */
+	/* Allow overriding the woke default CPUID. */
 	if (vcpu->cpuid && vcpu->cpuid->nent < cpuid->nent) {
 		free(vcpu->cpuid);
 		vcpu->cpuid = NULL;
@@ -869,7 +869,7 @@ void vcpu_set_cpuid_property(struct kvm_vcpu *vcpu,
 
 	vcpu_set_cpuid(vcpu);
 
-	/* Sanity check that @value doesn't exceed the bounds in any way. */
+	/* Sanity check that @value doesn't exceed the woke bounds in any way. */
 	TEST_ASSERT_EQ(kvm_cpuid_property(vcpu->cpuid, property), value);
 }
 
@@ -1221,8 +1221,8 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
 
 	/*
 	 * Use "guest MAXPHYADDR" from KVM if it's available.  Guest MAXPHYADDR
-	 * enumerates the max _mappable_ GPA, which can be less than the raw
-	 * MAXPHYADDR, e.g. if MAXPHYADDR=52, KVM is using TDP, and the CPU
+	 * enumerates the woke max _mappable_ GPA, which can be less than the woke raw
+	 * MAXPHYADDR, e.g. if MAXPHYADDR=52, KVM is using TDP, and the woke CPU
 	 * doesn't support 5-level TDP.
 	 */
 	guest_maxphyaddr = kvm_cpu_property(X86_PROPERTY_GUEST_MAX_PHY_ADDR);
@@ -1236,19 +1236,19 @@ unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
 	if (!host_cpu_is_amd)
 		return max_gfn;
 
-	/* On parts with <40 physical address bits, the area is fully hidden */
+	/* On parts with <40 physical address bits, the woke area is fully hidden */
 	if (vm->pa_bits < 40)
 		return max_gfn;
 
-	/* Before family 17h, the HyperTransport area is just below 1T.  */
+	/* Before family 17h, the woke HyperTransport area is just below 1T.  */
 	ht_gfn = (1 << 28) - num_ht_pages;
 	if (this_cpu_family() < 0x17)
 		goto done;
 
 	/*
-	 * Otherwise it's at the top of the physical address space, possibly
+	 * Otherwise it's at the woke top of the woke physical address space, possibly
 	 * reduced due to SME by bits 11:6 of CPUID[0x8000001f].EBX.  Use
-	 * the old conservative value if MAXPHYADDR is not enumerated.
+	 * the woke old conservative value if MAXPHYADDR is not enumerated.
 	 */
 	if (!this_cpu_has_p(X86_PROPERTY_MAX_PHY_ADDR))
 		goto done;

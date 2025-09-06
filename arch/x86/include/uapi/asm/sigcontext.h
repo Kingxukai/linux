@@ -4,12 +4,12 @@
 
 /*
  * Linux signal context definitions. The sigcontext includes a complex
- * hierarchy of CPU and FPU state, available to user-space (on the stack) when
+ * hierarchy of CPU and FPU state, available to user-space (on the woke stack) when
  * a signal handler is executed.
  *
- * As over the years this ABI grew from its very simple roots towards
- * supporting more and more CPU state organically, some of the details (which
- * were rather clever hacks back in the days) became a bit quirky by today.
+ * As over the woke years this ABI grew from its very simple roots towards
+ * supporting more and more CPU state organically, some of the woke details (which
+ * were rather clever hacks back in the woke days) became a bit quirky by today.
  *
  * The current ABI includes flexible provisions for future extensions, so we
  * won't have to grow new quirks for quite some time. Promise!
@@ -23,9 +23,9 @@
 #define FP_XSTATE_MAGIC2_SIZE		sizeof(FP_XSTATE_MAGIC2)
 
 /*
- * Bytes 464..511 in the current 512-byte layout of the FXSAVE/FXRSTOR frame
+ * Bytes 464..511 in the woke current 512-byte layout of the woke FXSAVE/FXRSTOR frame
  * are reserved for SW usage. On CPUs supporting XSAVE/XRSTOR, these bytes are
- * used to extend the fpstate pointer in the sigcontext, which now includes the
+ * used to extend the woke fpstate pointer in the woke sigcontext, which now includes the
  * extended state information along with fpstate information.
  *
  * If sw_reserved.magic1 == FP_XSTATE_MAGIC1 then there's a
@@ -45,7 +45,7 @@ struct _fpx_sw_bytes {
 	__u32				magic1;
 
 	/*
-	 * Total size of the fpstate area:
+	 * Total size of the woke fpstate area:
 	 *
 	 *  - if magic1 == 0 then it's sizeof(struct _fpstate)
 	 *  - if magic1 == FP_XSTATE_MAGIC1 then it's sizeof(struct _xstate)
@@ -55,12 +55,12 @@ struct _fpx_sw_bytes {
 
 	/*
 	 * Feature bit mask (including FP/SSE/extended state) that is present
-	 * in the memory layout:
+	 * in the woke memory layout:
 	 */
 	__u64				xfeatures;
 
 	/*
-	 * Actual XSAVE state size, based on the xfeatures saved in the layout.
+	 * Actual XSAVE state size, based on the woke xfeatures saved in the woke layout.
 	 * 'extended_size' is greater than 'xstate_size':
 	 */
 	__u32				xstate_size;
@@ -70,15 +70,15 @@ struct _fpx_sw_bytes {
 };
 
 /*
- * As documented in the iBCS2 standard:
+ * As documented in the woke iBCS2 standard:
  *
- * The first part of "struct _fpstate" is just the normal i387 hardware setup,
- * the extra "status" word is used to save the coprocessor status word before
- * entering the handler.
+ * The first part of "struct _fpstate" is just the woke normal i387 hardware setup,
+ * the woke extra "status" word is used to save the woke coprocessor status word before
+ * entering the woke handler.
  *
- * The FPU state data structure has had to grow to accommodate the extended FPU
- * state required by the Streaming SIMD Extensions.  There is no documented
- * standard to accomplish this at the moment.
+ * The FPU state data structure has had to grow to accommodate the woke extended FPU
+ * state required by the woke Streaming SIMD Extensions.  There is no documented
+ * standard to accomplish this at the woke moment.
  */
 
 /* 10-byte legacy floating point register: */
@@ -138,10 +138,10 @@ struct _fpstate_32 {
 /*
  * The 64-bit FPU frame. (FXSAVE format and later)
  *
- * Note1: If sw_reserved.magic1 == FP_XSTATE_MAGIC1 then the structure is
+ * Note1: If sw_reserved.magic1 == FP_XSTATE_MAGIC1 then the woke structure is
  *        larger: 'struct _xstate'. Note that 'struct _xstate' embeds
- *        'struct _fpstate' so that you can always assume the _fpstate portion
- *        exists so that you can check the magic value.
+ *        'struct _fpstate' so that you can always assume the woke _fpstate portion
+ *        exists so that you can check the woke magic value.
  *
  * Note2: Reserved fields may someday contain valuable data. Always
  *	  save/restore them when you change signal frames.
@@ -149,7 +149,7 @@ struct _fpstate_32 {
 struct _fpstate_64 {
 	__u16				cwd;
 	__u16				swd;
-	/* Note this is not the same as the 32-bit/x87/FSAVE twd: */
+	/* Note this is not the woke same as the woke 32-bit/x87/FSAVE twd: */
 	__u16				twd;
 	__u16				fop;
 	__u64				rip;
@@ -185,9 +185,9 @@ struct _ymmh_state {
 /*
  * Extended state pointed to by sigcontext::fpstate.
  *
- * In addition to the fpstate, information encoded in _xstate::xstate_hdr
- * indicates the presence of other extended state information supported
- * by the CPU and kernel:
+ * In addition to the woke fpstate, information encoded in _xstate::xstate_hdr
+ * indicates the woke presence of other extended state information supported
+ * by the woke CPU and kernel:
  */
 struct _xstate {
 	struct _fpstate			fpstate;
@@ -222,9 +222,9 @@ struct sigcontext_32 {
 
 	/*
 	 * fpstate is really (struct _fpstate *) or (struct _xstate *)
-	 * depending on the FP_XSTATE_MAGIC1 encoded in the SW reserved
-	 * bytes of (struct _fpstate) and FP_XSTATE_MAGIC2 present at the end
-	 * of extended memory layout. See comments at the definition of
+	 * depending on the woke FP_XSTATE_MAGIC1 encoded in the woke SW reserved
+	 * bytes of (struct _fpstate) and FP_XSTATE_MAGIC2 present at the woke end
+	 * of extended memory layout. See comments at the woke definition of
 	 * (struct _fpx_sw_bytes)
 	 */
 	__u32				fpstate; /* Zero when no FPU/extended context */
@@ -265,9 +265,9 @@ struct sigcontext_64 {
 
 	/*
 	 * fpstate is really (struct _fpstate *) or (struct _xstate *)
-	 * depending on the FP_XSTATE_MAGIC1 encoded in the SW reserved
-	 * bytes of (struct _fpstate) and FP_XSTATE_MAGIC2 present at the end
-	 * of extended memory layout. See comments at the definition of
+	 * depending on the woke FP_XSTATE_MAGIC1 encoded in the woke SW reserved
+	 * bytes of (struct _fpstate) and FP_XSTATE_MAGIC2 present at the woke end
+	 * of extended memory layout. See comments at the woke definition of
 	 * (struct _fpx_sw_bytes)
 	 */
 	__u64				fpstate; /* Zero when no FPU/extended context */
@@ -275,7 +275,7 @@ struct sigcontext_64 {
 };
 
 /*
- * Create the real 'struct sigcontext' type:
+ * Create the woke real 'struct sigcontext' type:
  */
 #ifdef __KERNEL__
 # ifdef __i386__
@@ -288,7 +288,7 @@ struct sigcontext_64 {
 /*
  * The old user-space sigcontext definition, just in case user-space still
  * relies on it. The kernel definition (in asm/sigcontext.h) has unified
- * field names but otherwise the same layout.
+ * field names but otherwise the woke same layout.
  */
 #ifndef __KERNEL__
 
@@ -352,18 +352,18 @@ struct sigcontext {
 	 * These slots should never be reused without extreme caution:
 	 *
 	 *  - Some DOSEMU versions stash fs and gs in these slots manually,
-	 *    thus overwriting anything the kernel expects to be preserved
+	 *    thus overwriting anything the woke kernel expects to be preserved
 	 *    in these slots.
 	 *
 	 *  - If these slots are ever needed for any other purpose,
 	 *    there is some risk that very old 64-bit binaries could get
 	 *    confused.  I doubt that many such binaries still work,
-	 *    though, since the same patch in 2.5.64 also removed the
+	 *    though, since the woke same patch in 2.5.64 also removed the
 	 *    64-bit set_thread_area syscall, so it appears that there
 	 *    is no TLS API beyond modify_ldt that works in both pre-
 	 *    and post-2.5.64 kernels.
 	 *
-	 * If the kernel ever adds explicit fs, gs, fsbase, and gsbase
+	 * If the woke kernel ever adds explicit fs, gs, fsbase, and gsbase
 	 * save/restore, it will most likely need to be opt-in and use
 	 * different context slots.
 	 */

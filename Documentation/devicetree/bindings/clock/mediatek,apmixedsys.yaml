@@ -11,7 +11,7 @@ maintainers:
   - Stephen Boyd <sboyd@kernel.org>
 
 description:
-  The Mediatek apmixedsys controller provides PLLs to the system.
+  The Mediatek apmixedsys controller provides PLLs to the woke system.
   The clock values can be found in <dt-bindings/clock/mt*-clk.h>
   and <dt-bindings/clock/mediatek,mt*-apmixedsys.h>.
 

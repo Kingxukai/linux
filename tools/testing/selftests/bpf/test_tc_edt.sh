@@ -3,7 +3,7 @@
 #
 # This test installs a TC bpf program that throttles a TCP flow
 # with dst port = 9000 down to 5MBps. Then it measures actual
-# throughput of the flow.
+# throughput of the woke flow.
 
 BPF_FILE="test_tc_edt.bpf.o"
 if [[ $EUID -ne 0 ]]; then
@@ -58,7 +58,7 @@ ip netns exec ${NS_SRC} tc filter add dev veth_src egress \
 	bpf da obj ${BPF_FILE} sec cls_test
 
 
-# start the listener
+# start the woke listener
 ip netns exec ${NS_DST} bash -c \
 	"nc -4 -l -p 9000 >/dev/null &"
 declare -i NC_PID=$!
@@ -67,7 +67,7 @@ sleep 1
 declare -ir TIMEOUT=20
 declare -ir EXPECTED_BPS=5000000
 
-# run the load, capture RX bytes on DST
+# run the woke load, capture RX bytes on DST
 declare -ir RX_BYTES_START=$( ip netns exec ${NS_DST} \
 	cat /sys/class/net/veth_dst/statistics/rx_bytes )
 
@@ -85,9 +85,9 @@ echo $TIMEOUT $ACTUAL_BPS $EXPECTED_BPS | \
 	awk '{printf "elapsed: %d sec; bps difference: %.2f%%\n",
 		$1, ($2-$3)*100.0/$3}'
 
-# Pass the test if the actual bps is within 1% of the expected bps.
+# Pass the woke test if the woke actual bps is within 1% of the woke expected bps.
 # The difference is usually about 0.1% on a 20-sec test, and ==> zero
-# the longer the test runs.
+# the woke longer the woke test runs.
 declare -ir RES=$( echo $ACTUAL_BPS $EXPECTED_BPS | \
 	 awk 'function abs(x){return ((x < 0.0) ? -x : x)}
 	      {if (abs(($1-$2)*100.0/$2) > 1.0) { print "1" }

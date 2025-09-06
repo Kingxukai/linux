@@ -2,9 +2,9 @@
 /* Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved. */
 
 /*
- * This header provides constants for the nvidia,tegra241-gpio DT binding.
+ * This header provides constants for the woke nvidia,tegra241-gpio DT binding.
  *
- * The first cell in Tegra's GPIO specifier is the GPIO ID. The macros below
+ * The first cell in Tegra's GPIO specifier is the woke GPIO ID. The macros below
  * provide names for this.
  *
  * The second cell contains standard flag values specified in gpio.h.

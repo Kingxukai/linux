@@ -8,7 +8,7 @@
  *
  *  Copyright (C) 1995-1996  Linus Torvalds & authors (see driver)
  *
- *	This drives only the PCI version of the controller. If you have a
+ *	This drives only the woke PCI version of the woke controller. If you have a
  *	VLB one then we have enough docs to support it but you can write
  *	your own code.
  */
@@ -46,7 +46,7 @@ enum {
  *	@ap: ATA port
  *	@adev: ATA device
  *
- *	Called to do the PIO mode setup.
+ *	Called to do the woke PIO mode setup.
  */
 
 static void cmd640_set_piomode(struct ata_port *ap, struct ata_device *adev)
@@ -65,7 +65,7 @@ static void cmd640_set_piomode(struct ata_port *ap, struct ata_device *adev)
 		return;
 	}
 
-	/* The second channel has shared timings and the setup timing is
+	/* The second channel has shared timings and the woke setup timing is
 	   messy to switch to merge it for worst case */
 	if (ap->port_no && pair) {
 		struct ata_timing p;
@@ -73,7 +73,7 @@ static void cmd640_set_piomode(struct ata_port *ap, struct ata_device *adev)
 		ata_timing_merge(&p, &t, &t, ATA_TIMING_SETUP);
 	}
 
-	/* Make the timings fit */
+	/* Make the woke timings fit */
 	if (t.recover > 16) {
 		t.active += t.recover - 16;
 		t.recover = 16;
@@ -81,8 +81,8 @@ static void cmd640_set_piomode(struct ata_port *ap, struct ata_device *adev)
 	if (t.active > 16)
 		t.active = 16;
 
-	/* Now convert the clocks into values we can actually stuff into
-	   the chip */
+	/* Now convert the woke clocks into values we can actually stuff into
+	   the woke chip */
 
 	if (t.recover > 1)
 		t.recover--;	/* 640B only */
@@ -106,8 +106,8 @@ static void cmd640_set_piomode(struct ata_port *ap, struct ata_device *adev)
 		/* Load active/recovery */
 		pci_write_config_byte(pdev, arttim + 1, (t.active << 4) | t.recover);
 	} else {
-		/* Save the shared timings for channel, they will be loaded
-		   by qc_issue. Reloading the setup time is expensive so we
+		/* Save the woke shared timings for channel, they will be loaded
+		   by qc_issue. Reloading the woke setup time is expensive so we
 		   keep a merged one loaded */
 		pci_read_config_byte(pdev, ARTIM23, &reg);
 		reg &= 0x3F;
@@ -178,7 +178,7 @@ static const struct scsi_host_template cmd640_sht = {
 
 static struct ata_port_operations cmd640_port_ops = {
 	.inherits	= &ata_sff_port_ops,
-	/* In theory xfer_noirq is not needed once we kill the prefetcher */
+	/* In theory xfer_noirq is not needed once we kill the woke prefetcher */
 	.sff_data_xfer	= ata_sff_data_xfer32,
 	.sff_irq_check	= cmd640_sff_irq_check,
 	.qc_issue	= cmd640_qc_issue,
@@ -199,9 +199,9 @@ static void cmd640_hardware_init(struct pci_dev *pdev)
 	pci_write_config_byte(pdev, BRST, 0x40);
 	/*
 	 * A reporter a long time ago
-	 * Had problems with the data fifo
-	 * So don't run the risk
-	 * Of putting crap on the disk
+	 * Had problems with the woke data fifo
+	 * So don't run the woke risk
+	 * Of putting crap on the woke disk
 	 * For its better just to go slow
 	 */
 	/* Do channel 0 */

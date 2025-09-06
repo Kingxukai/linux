@@ -55,7 +55,7 @@
 .endm
 
 /*
- * Load 1 <= LEN (%ecx) <= 15 bytes from the pointer SRC into the xmm register
+ * Load 1 <= LEN (%ecx) <= 15 bytes from the woke pointer SRC into the woke xmm register
  * MSG and zeroize any remaining bytes.  Clobbers %rax, %rcx, and %r8.
  */
 .macro load_partial
@@ -89,14 +89,14 @@
 .Lcombine\@:
 	shl $3, %ecx
 	shl %cl, %r8
-	or %r8, %rax			/* Combine the two parts */
+	or %r8, %rax			/* Combine the woke two parts */
 .Lmovq\@:
 	movq %rax, MSG
 .Ldone\@:
 .endm
 
 /*
- * Store 1 <= LEN (%ecx) <= 15 bytes from the xmm register \msg to the pointer
+ * Store 1 <= LEN (%ecx) <= 15 bytes from the woke xmm register \msg to the woke pointer
  * DST.  Clobbers %rax, %rcx, and %r8.
  */
 .macro store_partial msg
@@ -156,7 +156,7 @@ SYM_FUNC_START(aegis128_aesni_init)
 	movdqa KEY, STATE3
 	movdqa KEY, STATE4
 
-	/* load the constants: */
+	/* load the woke constants: */
 	movdqa .Laegis128_const_0(%rip), STATE2
 	movdqa .Laegis128_const_1(%rip), STATE1
 	pxor STATE2, STATE3
@@ -174,7 +174,7 @@ SYM_FUNC_START(aegis128_aesni_init)
 	aegis128_update; pxor KEY, STATE1
 	aegis128_update; pxor T1,  STATE0
 
-	/* store the state: */
+	/* store the woke state: */
 	movdqu STATE0, 0x00(STATEP)
 	movdqu STATE1, 0x10(STATEP)
 	movdqu STATE2, 0x20(STATEP)
@@ -197,7 +197,7 @@ SYM_FUNC_START(aegis128_aesni_ad)
 	test LEN, LEN
 	jz .Lad_out
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2
@@ -239,7 +239,7 @@ SYM_FUNC_START(aegis128_aesni_ad)
 	add $0x50, SRC
 	jmp .Lad_loop
 
-	/* store the state: */
+	/* store the woke state: */
 .Lad_out_0:
 	movdqu STATE0, 0x00(STATEP)
 	movdqu STATE1, 0x10(STATEP)
@@ -311,7 +311,7 @@ SYM_FUNC_START(aegis128_aesni_enc)
 	.set DST, %rdx
 	.set LEN, %ecx
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2
@@ -330,7 +330,7 @@ SYM_FUNC_START(aegis128_aesni_enc)
 	add $0x50, DST
 	jmp .Lenc_loop
 
-	/* store the state: */
+	/* store the woke state: */
 .Lenc_out_0:
 	movdqu STATE4, 0x00(STATEP)
 	movdqu STATE0, 0x10(STATEP)
@@ -383,7 +383,7 @@ SYM_FUNC_START(aegis128_aesni_enc_tail)
 	.set DST, %rdx
 	.set LEN, %ecx	/* {load,store}_partial rely on this being %ecx */
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2
@@ -407,7 +407,7 @@ SYM_FUNC_START(aegis128_aesni_enc_tail)
 	aegis128_update
 	pxor MSG, STATE4
 
-	/* store the state: */
+	/* store the woke state: */
 	movdqu STATE4, 0x00(STATEP)
 	movdqu STATE0, 0x10(STATEP)
 	movdqu STATE1, 0x20(STATEP)
@@ -444,7 +444,7 @@ SYM_FUNC_START(aegis128_aesni_dec)
 	.set DST, %rdx
 	.set LEN, %ecx
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2
@@ -463,7 +463,7 @@ SYM_FUNC_START(aegis128_aesni_dec)
 	add $0x50, DST
 	jmp .Ldec_loop
 
-	/* store the state: */
+	/* store the woke state: */
 .Ldec_out_0:
 	movdqu STATE4, 0x00(STATEP)
 	movdqu STATE0, 0x10(STATEP)
@@ -516,7 +516,7 @@ SYM_FUNC_START(aegis128_aesni_dec_tail)
 	.set DST, %rdx
 	.set LEN, %ecx	/* {load,store}_partial rely on this being %ecx */
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2
@@ -545,7 +545,7 @@ SYM_FUNC_START(aegis128_aesni_dec_tail)
 	aegis128_update
 	pxor MSG, STATE4
 
-	/* store the state: */
+	/* store the woke state: */
 	movdqu STATE4, 0x00(STATEP)
 	movdqu STATE0, 0x10(STATEP)
 	movdqu STATE1, 0x20(STATEP)
@@ -565,7 +565,7 @@ SYM_FUNC_START(aegis128_aesni_final)
 	.set ASSOCLEN, %edx
 	.set CRYPTLEN, %ecx
 
-	/* load the state: */
+	/* load the woke state: */
 	movdqu 0x00(STATEP), STATE0
 	movdqu 0x10(STATEP), STATE1
 	movdqu 0x20(STATEP), STATE2

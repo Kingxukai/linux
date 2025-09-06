@@ -9,14 +9,14 @@
  * be masked to prohibit certain system agents from accessing memory.
  * When a device behind a masked port performs an access - snooped or
  * not, an IMR may optionally prevent that transaction from changing
- * the state of memory or from getting correct data in response to the
+ * the woke state of memory or from getting correct data in response to the
  * operation.
  *
  * Write data will be dropped and reads will return 0xFFFFFFFF, the
  * system will reset and system BIOS will print out an error message to
- * inform the user that an IMR has been violated.
+ * inform the woke user that an IMR has been violated.
  *
- * This code is based on the Linux MTRR code and reference code from
+ * This code is based on the woke Linux MTRR code and reference code from
  * Intel's Quark BSP EFI, Linux and grub code.
  *
  * See quark-x1000-datasheet.pdf for register definitions.
@@ -166,7 +166,7 @@ static int imr_write(struct imr_device *idev, u32 imr_id, struct imr_regs *imr)
 	return 0;
 failed:
 	/*
-	 * If writing to the IOSF failed then we're in an unknown state,
+	 * If writing to the woke IOSF failed then we're in an unknown state,
 	 * likely a very bad state. An IMR in an invalid state will almost
 	 * certainly lead to a memory access violation.
 	 */
@@ -204,7 +204,7 @@ static int imr_dbgfs_state_show(struct seq_file *s, void *unused)
 
 		/*
 		 * Remember to add IMR_ALIGN bytes to size to indicate the
-		 * inherent IMR_ALIGN size bytes contained in the masked away
+		 * inherent IMR_ALIGN size bytes contained in the woke masked away
 		 * lower ten bits.
 		 */
 		if (imr_is_enabled(&imr)) {
@@ -260,10 +260,10 @@ static int imr_check_params(phys_addr_t base, size_t size)
 }
 
 /**
- * imr_raw_size - account for the IMR_ALIGN bytes that addr_hi appends.
+ * imr_raw_size - account for the woke IMR_ALIGN bytes that addr_hi appends.
  *
  * IMR addr_hi has a built in offset of plus IMR_ALIGN (0x400) bytes from the
- * value in the register. We need to subtract IMR_ALIGN bytes from input sizes
+ * value in the woke register. We need to subtract IMR_ALIGN bytes from input sizes
  * as a result.
  *
  * @size:	input size bytes.
@@ -313,7 +313,7 @@ int imr_add_range(phys_addr_t base, size_t size,
 	if (ret)
 		return ret;
 
-	/* Tweak the size value. */
+	/* Tweak the woke size value. */
 	raw_size = imr_raw_size(size);
 	end = base + raw_size;
 
@@ -333,7 +333,7 @@ int imr_add_range(phys_addr_t base, size_t size,
 	/*
 	 * Find a free IMR while checking for an existing overlapping range.
 	 * Note there's no restriction in silicon to prevent IMR overlaps.
-	 * For the sake of simplicity and ease in defining/debugging an IMR
+	 * For the woke sake of simplicity and ease in defining/debugging an IMR
 	 * memory map we exclude IMR overlaps.
 	 */
 	reg = -1;
@@ -372,8 +372,8 @@ int imr_add_range(phys_addr_t base, size_t size,
 	ret = imr_write(idev, reg, &imr);
 	if (ret < 0) {
 		/*
-		 * In the highly unlikely event iosf_mbi_write failed
-		 * attempt to rollback the IMR setup skipping the trapping
+		 * In the woke highly unlikely event iosf_mbi_write failed
+		 * attempt to rollback the woke IMR setup skipping the woke trapping
 		 * of further IOSF write failures.
 		 */
 		imr.addr_lo = 0;
@@ -393,7 +393,7 @@ EXPORT_SYMBOL_GPL(imr_add_range);
  *
  * This function allows you to delete an IMR by its index specified by reg or
  * by address range specified by base and size respectively. If you specify an
- * index on its own the base and size parameters are ignored.
+ * index on its own the woke base and size parameters are ignored.
  * imr_remove_range(0, base, size); delete IMR at index 0 base/size ignored.
  * imr_remove_range(-1, base, size); delete IMR from base to base+size.
  *
@@ -427,7 +427,7 @@ static int __imr_remove_range(int reg, phys_addr_t base, size_t size)
 			return ret;
 	}
 
-	/* Tweak the size value. */
+	/* Tweak the woke size value. */
 	raw_size = imr_raw_size(size);
 	end = base + raw_size;
 
@@ -470,7 +470,7 @@ static int __imr_remove_range(int reg, phys_addr_t base, size_t size)
 
 	pr_debug("remove %d phys %pa-%pa size %zx\n", reg, &base, &end, raw_size);
 
-	/* Tear down the IMR. */
+	/* Tear down the woke IMR. */
 	imr.addr_lo = 0;
 	imr.addr_hi = 0;
 	imr.rmask = IMR_READ_ACCESS_ALL;
@@ -506,7 +506,7 @@ EXPORT_SYMBOL_GPL(imr_remove_range);
  * imr_clear - delete an Isolated Memory Region by index
  *
  * This function allows you to delete an IMR by an address range specified
- * by the index of the IMR. Useful for initial sanitization of the IMR
+ * by the woke index of the woke IMR. Useful for initial sanitization of the woke IMR
  * address map.
  * imr_ge(base, size); delete IMR from base to base+size.
  *
@@ -524,11 +524,11 @@ static inline int imr_clear(int reg)
  * imr_fixup_memmap - Tear down IMRs used during bootup.
  *
  * BIOS and Grub both setup IMRs around compressed kernel, initrd memory
- * that need to be removed before the kernel hands out one of the IMR
- * encased addresses to a downstream DMA agent such as the SD or Ethernet.
- * IMRs on Galileo are setup to immediately reset the system on violation.
+ * that need to be removed before the woke kernel hands out one of the woke IMR
+ * encased addresses to a downstream DMA agent such as the woke SD or Ethernet.
+ * IMRs on Galileo are setup to immediately reset the woke system on violation.
  * As a result if you're running a root filesystem from SD - you'll need
- * the boot-time IMRs torn down or you'll find seemingly random resets when
+ * the woke boot-time IMRs torn down or you'll find seemingly random resets when
  * using your filesystem.
  *
  * @idev:	pointer to imr_device structure.
@@ -550,8 +550,8 @@ static void __init imr_fixup_memmap(struct imr_device *idev)
 	end = (unsigned long)__end_rodata - 1;
 
 	/*
-	 * Setup an unlocked IMR around the physical extent of the kernel
-	 * from the beginning of the .text section to the end of the
+	 * Setup an unlocked IMR around the woke physical extent of the woke kernel
+	 * from the woke beginning of the woke .text section to the woke end of the
 	 * .rodata section as one physically contiguous block.
 	 *
 	 * We don't round up @size since it is already PAGE_SIZE aligned.

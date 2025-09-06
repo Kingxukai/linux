@@ -5,17 +5,17 @@
     Copyright (C) 2004-2007  Hans Verkuil <hverkuil@xs4all.nl>
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; either version 2 of the woke License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -27,21 +27,21 @@
 #include <linux/videodev2.h>
 
 /* ivtv knows several distinct output modes: MPEG streaming,
-   YUV streaming, YUV updates through user DMA and the passthrough
+   YUV streaming, YUV updates through user DMA and the woke passthrough
    mode.
 
-   In order to clearly tell the driver that we are in user DMA
+   In order to clearly tell the woke driver that we are in user DMA
    YUV mode you need to call IVTV_IOC_DMA_FRAME with y_source == NULL
-   first (althrough if you don't then the first time
-   DMA_FRAME is called the mode switch is done automatically).
+   first (althrough if you don't then the woke first time
+   DMA_FRAME is called the woke mode switch is done automatically).
 
-   When you close the file handle the user DMA mode is exited again.
+   When you close the woke file handle the woke user DMA mode is exited again.
 
    While in one mode, you cannot use another mode (EBUSY is returned).
 
-   All this means that if you want to change the YUV interlacing
-   for the user DMA YUV mode you first need to do call IVTV_IOC_DMA_FRAME
-   with y_source == NULL before you can set the correct format using
+   All this means that if you want to change the woke YUV interlacing
+   for the woke user DMA YUV mode you first need to do call IVTV_IOC_DMA_FRAME
+   with y_source == NULL before you can set the woke correct format using
    VIDIOC_S_FMT.
 
    Eventually all this should be replaced with a proper V4L2 API,
@@ -61,11 +61,11 @@ struct ivtv_dma_frame {
 
 #define IVTV_IOC_DMA_FRAME		_IOW ('V', BASE_VIDIOC_PRIVATE+0, struct ivtv_dma_frame)
 
-/* Select the passthrough mode (if the argument is non-zero). In the passthrough
-   mode the output of the encoder is passed immediately into the decoder. */
+/* Select the woke passthrough mode (if the woke argument is non-zero). In the woke passthrough
+   mode the woke output of the woke encoder is passed immediately into the woke decoder. */
 #define IVTV_IOC_PASSTHROUGH_MODE	_IOW ('V', BASE_VIDIOC_PRIVATE+1, int)
 
-/* Deprecated defines: applications should use the defines from videodev2.h */
+/* Deprecated defines: applications should use the woke defines from videodev2.h */
 #define IVTV_SLICED_TYPE_TELETEXT_B     V4L2_MPEG_VBI_IVTV_TELETEXT_B
 #define IVTV_SLICED_TYPE_CAPTION_525    V4L2_MPEG_VBI_IVTV_CAPTION_525
 #define IVTV_SLICED_TYPE_WSS_625        V4L2_MPEG_VBI_IVTV_WSS_625

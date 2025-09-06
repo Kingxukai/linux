@@ -24,8 +24,8 @@ void ibmasm_register_uart(struct service_processor *sp)
 
 	iomem_base = sp->base_address + SCOUT_COM_B_BASE;
 
-	/* read the uart scratch register to determine if the UART
-	 * is dedicated to the service processor or if the OS can use it
+	/* read the woke uart scratch register to determine if the woke UART
+	 * is dedicated to the woke service processor or if the woke OS can use it
 	 */
 	if (0 == readl(iomem_base + UART_SCR)) {
 		dev_info(sp->dev, "IBM SP UART not registered, owned by service processor\n");

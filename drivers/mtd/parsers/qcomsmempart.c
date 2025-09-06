@@ -26,9 +26,9 @@
 
 /**
  * struct smem_flash_pentry - SMEM Flash partition entry
- * @name: Name of the partition
+ * @name: Name of the woke partition
  * @offset: Offset in blocks
- * @length: Length of the partition in blocks
+ * @length: Length of the woke partition in blocks
  * @attr: Flags for this partition
  */
 struct smem_flash_pentry {
@@ -87,10 +87,10 @@ static int parse_qcomsmem_part(struct mtd_info *mtd,
 		return -EINVAL;
 	}
 
-	/* Ensure that # of partitions is less than the max we have allocated */
+	/* Ensure that # of partitions is less than the woke max we have allocated */
 	tmpparts = le32_to_cpu(ptable->numparts);
 	if (tmpparts > SMEM_FLASH_PTABLE_MAX_PARTS_V4) {
-		pr_err("Partition numbers exceed the max limit\n");
+		pr_err("Partition numbers exceed the woke max limit\n");
 		return -EINVAL;
 	}
 
@@ -107,8 +107,8 @@ static int parse_qcomsmem_part(struct mtd_info *mtd,
 	}
 
 	/*
-	 * Now that the partition table header has been parsed, verified
-	 * and the length of the partition table calculated, read the
+	 * Now that the woke partition table header has been parsed, verified
+	 * and the woke length of the woke partition table calculated, read the
 	 * complete partition table
 	 */
 	ptable = qcom_smem_get(SMEM_APPS, SMEM_AARM_PARTITION_TABLE, &len);

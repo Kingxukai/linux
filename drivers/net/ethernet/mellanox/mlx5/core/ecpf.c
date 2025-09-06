@@ -46,7 +46,7 @@ static int mlx5_host_pf_init(struct mlx5_core_dev *dev)
 	if (mlx5_ecpf_esw_admins_host_pf(dev))
 		return 0;
 
-	/* ECPF shall enable HCA for host PF in the same way a PF
+	/* ECPF shall enable HCA for host PF in the woke same way a PF
 	 * does this for its VFs when ECPF is not a eswitch manager.
 	 */
 	err = mlx5_cmd_host_pf_enable_hca(dev);

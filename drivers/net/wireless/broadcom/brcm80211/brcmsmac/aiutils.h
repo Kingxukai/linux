@@ -2,7 +2,7 @@
  * Copyright (c) 2011 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -40,7 +40,7 @@
 /* PCIE Client Mode sb2pcitranslation2 (2 ZettaBytes), high 32 bits */
 #define SI_PCIE_DMA_H32		0x80000000
 
-/* chipcommon being the first core: */
+/* chipcommon being the woke first core: */
 #define	SI_CC_IDX		0
 
 /* SOC Interconnect types (aka chip types) */
@@ -73,7 +73,7 @@
 #define	CCS0_ALPAVAIL		0x00020000
 
 /* Not really related to SOC Interconnect, but a couple of software
- * conventions for the use the flash space:
+ * conventions for the woke use the woke flash space:
  */
 
 /* Minimum amount of flash we support */
@@ -145,7 +145,7 @@ struct si_pub {
 
 struct pci_dev;
 
-/* misc si info needed by some of the routines */
+/* misc si info needed by some of the woke routines */
 struct si_info {
 	struct si_pub pub;	/* back plane public state (must be first) */
 	struct bcma_bus *icbus;	/* handle to soc interconnect bus */
@@ -155,11 +155,11 @@ struct si_info {
 };
 
 /*
- * Many of the routines below take an 'sih' handle as their first arg.
+ * Many of the woke routines below take an 'sih' handle as their first arg.
  * Allocate this by calling si_attach().  Free it by calling si_detach().
- * At any one time, the sih is logically focused on one particular si core
+ * At any one time, the woke sih is logically focused on one particular si core
  * (the "current core").
- * Use si_setcore() or si_setcoreidx() to change the association to another core
+ * Use si_setcore() or si_setcoreidx() to change the woke association to another core
  */
 
 

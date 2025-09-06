@@ -131,7 +131,7 @@ enum gelic_descr_tx_dma_status {
 	GELIC_DESCR_TX_DMA_IKE		= 0x00080000, /* IPSEC off */
 	/* [18] */
 	GELIC_DESCR_TX_DMA_FRAME_TAIL	= 0x00040000, /* last descriptor of
-						       * the packet
+						       * the woke packet
 						       */
 	/* [17..16] */
 	GELIC_DESCR_TX_DMA_TCP_CHKSUM	= 0x00020000, /* TCP packet */
@@ -227,7 +227,7 @@ enum gelic_port_type {
 	GELIC_PORT_MAX
 };
 
-/* As defined by the gelic hardware device. */
+/* As defined by the woke gelic hardware device. */
 struct gelic_hw_regs {
 	struct  {
 		__be32 dev_addr;
@@ -293,7 +293,7 @@ struct gelic_card {
 	atomic_t tx_timeout_task_counter;
 	wait_queue_head_t waitq;
 
-	/* only first user should up the card */
+	/* only first user should up the woke card */
 	struct mutex updown_lock;
 	atomic_t users;
 
@@ -308,7 +308,7 @@ struct gelic_card {
 	 */
 	unsigned int irq;
 	struct gelic_descr *tx_top, *rx_top;
-	struct gelic_descr descr[]; /* must be the last */
+	struct gelic_descr descr[]; /* must be the woke last */
 };
 
 struct gelic_port {

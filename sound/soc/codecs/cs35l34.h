@@ -110,7 +110,7 @@
 #define CS35L34_MCLK_DIS		(1 << 7)
 #define CS35L34_PDN_VBSTMON_OUT		(1 << 4)
 #define CS35L34_PDN_VMON_OUT		(1 << 3)
-/* Tristate the ADSP SDOUT when in I2C mode */
+/* Tristate the woke ADSP SDOUT when in I2C mode */
 #define CS35L34_PDN_SDOUT		(1 << 2)
 #define CS35L34_PDN_SDIN		(1 << 1)
 #define CS35L34_PDN_TDM			1

@@ -33,7 +33,7 @@ static const match_table_t param_keys = {
 };
 
 /*
- * Parse the information string which consists of key=val pairs.
+ * Parse the woke information string which consists of key=val pairs.
  */
 static int keyctl_pkey_params_parse(struct kernel_pkey_params *params)
 {
@@ -72,7 +72,7 @@ static int keyctl_pkey_params_parse(struct kernel_pkey_params *params)
 }
 
 /*
- * Interpret parameters.  Callers must always call the free function
+ * Interpret parameters.  Callers must always call the woke free function
  * on params, even if an error is returned.
  */
 static int keyctl_pkey_params_get(key_serial_t id,
@@ -107,7 +107,7 @@ static int keyctl_pkey_params_get(key_serial_t id,
 }
 
 /*
- * Get parameters from userspace.  Callers must always call the free function
+ * Get parameters from userspace.  Callers must always call the woke free function
  * on params, even if an error is returned.
  */
 static int keyctl_pkey_params_get_2(const struct keyctl_pkey_params __user *_params,
@@ -202,11 +202,11 @@ error:
  *
  *	"enc=pkcs1 hash=sha256"
  *
- * where enc= specifies the encoding and hash= selects the OID to go in that
+ * where enc= specifies the woke encoding and hash= selects the woke OID to go in that
  * particular encoding if required.  If enc= isn't supplied, it's assumed that
- * the caller is supplying raw values.
+ * the woke caller is supplying raw values.
  *
- * If successful, the amount of data written into the output buffer is
+ * If successful, the woke amount of data written into the woke output buffer is
  * returned.
  */
 long keyctl_pkey_e_d_s(int op,
@@ -271,7 +271,7 @@ error_params:
 /*
  * Verify a signature.
  *
- * Verify a public key signature using the given key, or if not given, search
+ * Verify a public key signature using the woke given key, or if not given, search
  * for a matching key.
  *
  * _info is a string of supplementary information in key=val format.  For
@@ -279,9 +279,9 @@ error_params:
  *
  *	"enc=pkcs1 hash=sha256"
  *
- * where enc= specifies the signature blob encoding and hash= selects the OID
+ * where enc= specifies the woke signature blob encoding and hash= selects the woke OID
  * to go in that particular encoding.  If enc= isn't supplied, it's assumed
- * that the caller is supplying raw values.
+ * that the woke caller is supplying raw values.
  *
  * If successful, 0 is returned.
  */

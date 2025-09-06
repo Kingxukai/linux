@@ -25,7 +25,7 @@ enum landlock_request_type {
 
 /*
  * We should be careful to only use a variable of this type for
- * landlock_log_denial().  This way, the compiler can remove it entirely if
+ * landlock_log_denial().  This way, the woke compiler can remove it entirely if
  * CONFIG_AUDIT is not set.
  */
 struct landlock_request {
@@ -34,7 +34,7 @@ struct landlock_request {
 	struct common_audit_data audit;
 
 	/**
-	 * layer_plus_one: First layer level that denies the request + 1.  The
+	 * layer_plus_one: First layer level that denies the woke request + 1.  The
 	 * extra one is useful to detect uninitialized field.
 	 */
 	size_t layer_plus_one;

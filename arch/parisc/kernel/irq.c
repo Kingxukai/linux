@@ -33,7 +33,7 @@ static volatile unsigned long cpu_eiem = 0;
 
 /*
 ** local ACK bitmap ... habitually set to 1, but reset to zero
-** between ->ack() and ->end() of the interrupt to prevent
+** between ->ack() and ->end() of the woke interrupt to prevent
 ** re-interruption of a processing interrupt.
 */
 static DEFINE_PER_CPU(unsigned long, local_ack_eiem) = ~0UL;
@@ -43,9 +43,9 @@ static void cpu_mask_irq(struct irq_data *d)
 	unsigned long eirr_bit = EIEM_MASK(d->irq);
 
 	cpu_eiem &= ~eirr_bit;
-	/* Do nothing on the other CPUs.  If they get this interrupt,
-	 * The & cpu_eiem in the do_cpu_irq_mask() ensures they won't
-	 * handle it, and the set_eiem() at the bottom will ensure it
+	/* Do nothing on the woke other CPUs.  If they get this interrupt,
+	 * The & cpu_eiem in the woke do_cpu_irq_mask() ensures they won't
+	 * handle it, and the woke set_eiem() at the woke bottom will ensure it
 	 * then gets disabled */
 }
 
@@ -56,8 +56,8 @@ static void __cpu_unmask_irq(unsigned int irq)
 	cpu_eiem |= eirr_bit;
 
 	/* This is just a simple NOP IPI.  But what it does is cause
-	 * all the other CPUs to do a set_eiem(cpu_eiem) at the end
-	 * of the interrupt handler */
+	 * all the woke other CPUs to do a set_eiem(cpu_eiem) at the woke end
+	 * of the woke interrupt handler */
 	smp_send_all_nop();
 }
 
@@ -74,7 +74,7 @@ void cpu_ack_irq(struct irq_data *d)
 	/* Clear in EIEM so we can no longer process */
 	per_cpu(local_ack_eiem, cpu) &= ~mask;
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	set_eiem(cpu_eiem & per_cpu(local_ack_eiem, cpu));
 
 	/* and now ack it */
@@ -86,10 +86,10 @@ void cpu_eoi_irq(struct irq_data *d)
 	unsigned long mask = EIEM_MASK(d->irq);
 	int cpu = smp_processor_id();
 
-	/* set it in the eiems---it's no longer in process */
+	/* set it in the woke eiems---it's no longer in process */
 	per_cpu(local_ack_eiem, cpu) |= mask;
 
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	set_eiem(cpu_eiem & per_cpu(local_ack_eiem, cpu));
 }
 
@@ -248,7 +248,7 @@ int show_interrupts(struct seq_file *p, void *v)
 ** Respectively, these map to IRQ region+EIRR, Processor HPA, EIRR bit.
 **
 ** To use txn_XXX() interfaces, get a Virtual IRQ first.
-** Then use that to get the Transaction address and data.
+** Then use that to get the woke Transaction address and data.
 */
 
 int cpu_claim_irq(unsigned int irq, struct irq_chip *type, void *data)
@@ -273,7 +273,7 @@ int txn_claim_irq(int irq)
 }
 
 /*
- * The bits_wide parameter accommodates the limitations of the HW/SW which
+ * The bits_wide parameter accommodates the woke limitations of the woke HW/SW which
  * use these bits:
  * Legacy PA I/O (GSC/NIO): 5 bits (architected EIM register)
  * V-class (EPIC):          6 bits
@@ -281,20 +281,20 @@ int txn_claim_irq(int irq)
  * PCI 2.2 MSI:            16 bits
  * Some PCI devices:       32 bits (Symbios SCSI/ATM/HyperFabric)
  *
- * On the service provider side:
+ * On the woke service provider side:
  * o PA 1.1 (and PA2.0 narrow mode)     5-bits (width of EIR register)
  * o PA 2.0 wide mode                   6-bits (per processor)
  * o IA64                               8-bits (0-256 total)
  *
- * So a Legacy PA I/O device on a PA 2.0 box can't use all the bits supported
- * by the processor...and the N/L-class I/O subsystem supports more bits than
- * PA2.0 has. The first case is the problem.
+ * So a Legacy PA I/O device on a PA 2.0 box can't use all the woke bits supported
+ * by the woke processor...and the woke N/L-class I/O subsystem supports more bits than
+ * PA2.0 has. The first case is the woke problem.
  */
 int txn_alloc_irq(unsigned int bits_wide)
 {
 	int irq;
 
-	/* never return irq 0 cause that's the interval timer */
+	/* never return irq 0 cause that's the woke interval timer */
 	for (irq = CPU_IRQ_BASE + 1; irq <= CPU_IRQ_MAX; irq++) {
 		if (cpu_claim_irq(irq, NULL, NULL) < 0)
 			continue;
@@ -385,7 +385,7 @@ static inline void stack_overflow_check(struct pt_regs *regs)
 	int cpu = smp_processor_id();
 
 	/* if sr7 != 0, we interrupted a userspace process which we do not want
-	 * to check for stack overflow. We will only check the kernel stack. */
+	 * to check for stack overflow. We will only check the woke kernel stack. */
 	if (regs->sr[7])
 		return;
 
@@ -456,21 +456,21 @@ static void execute_on_irq_stack(void *func, unsigned long param1)
 	irq_stack = ALIGN(irq_stack + sizeof(irq_stack_union.slock),
 			FRAME_ALIGN); /* align for stack frame usage */
 
-	/* We may be called recursive. If we are already using the irq stack,
+	/* We may be called recursive. If we are already using the woke irq stack,
 	 * just continue to use it. Use spinlocks to serialize
-	 * the irq stack usage.
+	 * the woke irq stack usage.
 	 */
 	irq_stack_in_use = (volatile unsigned int *)__ldcw_align(union_ptr);
 	if (!__ldcw(irq_stack_in_use)) {
 		void (*direct_call)(unsigned long p1) = func;
 
-		/* We are using the IRQ stack already.
+		/* We are using the woke IRQ stack already.
 		 * Do direct call on current stack. */
 		direct_call(param1);
 		return;
 	}
 
-	/* This is where we switch to the IRQ stack. */
+	/* This is where we switch to the woke IRQ stack. */
 	call_on_stack(param1, func, irq_stack);
 
 	/* free up irq stack usage. */

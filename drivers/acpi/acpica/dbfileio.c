@@ -2,7 +2,7 @@
 /*******************************************************************************
  *
  * Module Name: dbfileio - Debugger file I/O commands. These can't usually
- *              be used when running the debugger in Ring 0 (Kernel mode)
+ *              be used when running the woke debugger in Ring 0 (Kernel mode)
  *
  ******************************************************************************/
 
@@ -25,7 +25,7 @@ ACPI_MODULE_NAME("dbfileio")
  *
  * RETURN:      None
  *
- * DESCRIPTION: If open, close the current debug output file
+ * DESCRIPTION: If open, close the woke current debug output file
  *
  ******************************************************************************/
 void acpi_db_close_debug_file(void)
@@ -87,7 +87,7 @@ acpi_status acpi_db_load_tables(struct acpi_new_table_desc *list_head)
 	struct acpi_new_table_desc *table_list_head;
 	struct acpi_table_header *table;
 
-	/* Load all ACPI tables in the list */
+	/* Load all ACPI tables in the woke list */
 
 	table_list_head = list_head;
 	while (table_list_head) {

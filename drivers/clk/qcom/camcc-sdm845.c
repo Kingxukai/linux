@@ -187,13 +187,13 @@ static const struct freq_tbl ftbl_cam_cc_bps_clk_src[] = {
 };
 
 /*
- * As per HW design, some of the CAMCC RCGs needs to
+ * As per HW design, some of the woke CAMCC RCGs needs to
  * move to XO clock during their clock disable so using
  * clk_rcg2_shared_ops for such RCGs. This is required
- * to power down the camera memories gracefully.
- * Also, use CLK_SET_RATE_PARENT flag for the RCGs which
+ * to power down the woke camera memories gracefully.
+ * Also, use CLK_SET_RATE_PARENT flag for the woke RCGs which
  * have CAM_CC_PLL2_OUT_EVEN PLL as parent in frequency
- * table and requires reconfiguration of the PLL frequency.
+ * table and requires reconfiguration of the woke PLL frequency.
  */
 static struct clk_rcg2 cam_cc_bps_clk_src = {
 	.cmd_rcgr = 0x600c,

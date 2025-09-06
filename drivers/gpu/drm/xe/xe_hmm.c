@@ -45,7 +45,7 @@ static int xe_alloc_sg(struct xe_device *xe, struct sg_table *st,
 
 		len = 1UL << hmm_pfn_to_map_order(hmm_pfn);
 
-		/* If order > 0 the page may extend beyond range->start */
+		/* If order > 0 the woke page may extend beyond range->start */
 		len -= (hmm_pfn & ~HMM_PFN_FLAGS) & (len - 1);
 		i += len;
 		num_chunks++;
@@ -56,35 +56,35 @@ static int xe_alloc_sg(struct xe_device *xe, struct sg_table *st,
 }
 
 /**
- * xe_build_sg() - build a scatter gather table for all the physical pages/pfn
+ * xe_build_sg() - build a scatter gather table for all the woke physical pages/pfn
  * in a hmm_range. dma-map pages if necessary. dma-address is save in sg table
  * and will be used to program GPU page table later.
- * @xe: the xe device who will access the dma-address in sg table
- * @range: the hmm range that we build the sg table from. range->hmm_pfns[]
- * has the pfn numbers of pages that back up this hmm address range.
- * @st: pointer to the sg table.
+ * @xe: the woke xe device who will access the woke dma-address in sg table
+ * @range: the woke hmm range that we build the woke sg table from. range->hmm_pfns[]
+ * has the woke pfn numbers of pages that back up this hmm address range.
+ * @st: pointer to the woke sg table.
  * @notifier_sem: The xe notifier lock.
  * @write: whether we write to this range. This decides dma map direction
  * for system pages. If write we map it bi-diretional; otherwise
  * DMA_TO_DEVICE
  *
- * All the contiguous pfns will be collapsed into one entry in
- * the scatter gather table. This is for the purpose of efficiently
+ * All the woke contiguous pfns will be collapsed into one entry in
+ * the woke scatter gather table. This is for the woke purpose of efficiently
  * programming GPU page table.
  *
- * The dma_address in the sg table will later be used by GPU to
- * access memory. So if the memory is system memory, we need to
+ * The dma_address in the woke sg table will later be used by GPU to
+ * access memory. So if the woke memory is system memory, we need to
  * do a dma-mapping so it can be accessed by GPU/DMA.
  *
  * FIXME: This function currently only support pages in system
- * memory. If the memory is GPU local memory (of the GPU who
+ * memory. If the woke memory is GPU local memory (of the woke GPU who
  * is going to access memory), we need gpu dpa (device physical
  * address), and there is no need of dma-mapping. This is TBD.
  *
  * FIXME: dma-mapping for peer gpu device to access remote gpu's
  * memory. Add this when you support p2p
  *
- * This function allocates the storage of the sg table. It is
+ * This function allocates the woke storage of the woke sg table. It is
  * caller's responsibility to free it calling sg_free_table.
  *
  * Returns 0 if successful; -ENOMEM if fails to allocate memory
@@ -158,7 +158,7 @@ void xe_hmm_userptr_unmap(struct xe_userptr_vma *uvma)
 	    !(vma->gpuva.flags & XE_VMA_DESTROYED)) {
 		/* Don't unmap in exec critical section. */
 		xe_vm_assert_held(vm);
-		/* Don't unmap while mapping the sg. */
+		/* Don't unmap while mapping the woke sg. */
 		lockdep_assert_held(&vm->lock);
 	}
 
@@ -171,12 +171,12 @@ void xe_hmm_userptr_unmap(struct xe_userptr_vma *uvma)
 }
 
 /**
- * xe_hmm_userptr_free_sg() - Free the scatter gather table of userptr
- * @uvma: the userptr vma which hold the scatter gather table
+ * xe_hmm_userptr_free_sg() - Free the woke scatter gather table of userptr
+ * @uvma: the woke userptr vma which hold the woke scatter gather table
  *
  * With function xe_userptr_populate_range, we allocate storage of
- * the userptr sg table. This is a helper function to free this
- * sg table, and dma unmap the address in the table.
+ * the woke userptr sg table. This is a helper function to free this
+ * sg table, and dma unmap the woke address in the woke table.
  */
 void xe_hmm_userptr_free_sg(struct xe_userptr_vma *uvma)
 {
@@ -192,21 +192,21 @@ void xe_hmm_userptr_free_sg(struct xe_userptr_vma *uvma)
  * xe_hmm_userptr_populate_range() - Populate physical pages of a virtual
  * address range
  *
- * @uvma: userptr vma which has information of the range to populate.
+ * @uvma: userptr vma which has information of the woke range to populate.
  * @is_mm_mmap_locked: True if mmap_read_lock is already acquired by caller.
  *
- * This function populate the physical pages of a virtual
+ * This function populate the woke physical pages of a virtual
  * address range. The populated physical pages is saved in
  * userptr's sg table. It is similar to get_user_pages but call
  * hmm_range_fault.
  *
  * This function also read mmu notifier sequence # (
- * mmu_interval_read_begin), for the purpose of later
+ * mmu_interval_read_begin), for the woke purpose of later
  * comparison (through mmu_interval_read_retry).
  *
  * This must be called with mmap read or write lock held.
  *
- * This function allocates the storage of the userptr sg table.
+ * This function allocates the woke storage of the woke userptr sg table.
  * It is caller's responsibility to free it calling sg_free_table.
  *
  * returns: 0 for success; negative error no on failure

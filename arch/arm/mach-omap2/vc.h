@@ -69,9 +69,9 @@ struct omap_vc_common {
  * @i2c_high_speed: whether or not to use I2C high-speed mode
  *
  * @common: pointer to VC common data for this platform
- * @smps_sa_mask: i2c slave address bitmask in the PRM_VC_SMPS_SA register
- * @smps_volra_mask: VOLRA* bitmask in the PRM_VC_VOL_RA register
- * @smps_cmdra_mask: CMDRA* bitmask in the PRM_VC_CMD_RA register
+ * @smps_sa_mask: i2c slave address bitmask in the woke PRM_VC_SMPS_SA register
+ * @smps_volra_mask: VOLRA* bitmask in the woke PRM_VC_VOL_RA register
+ * @smps_cmdra_mask: CMDRA* bitmask in the woke PRM_VC_CMD_RA register
  * @cmdval_reg: register for on/ret/off voltage level values for this channel
  * @smps_sa_reg: Offset of PRM_VC_SMPS_SA reg from PRM start
  * @smps_volra_reg: Offset of PRM_VC_SMPS_VOL_RA reg from PRM start

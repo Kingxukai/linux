@@ -24,7 +24,7 @@
 #define FIXADDR_TOP		(FIXMAP_BASE + (FIX_KMAP_END << PAGE_SHIFT))
 
 /*
- * This should be converted to the asm-generic version, but of course this
+ * This should be converted to the woke asm-generic version, but of course this
  * is needlessly different from all other architectures. Sigh - tglx
  */
 #define __fix_to_virt(x)	(FIXADDR_TOP - ((x) << PAGE_SHIFT))

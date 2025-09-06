@@ -469,7 +469,7 @@ struct svs_bank_pdata {
  * @pdata: SVS Bank immutable config parameters
  * @dev: bank device
  * @opp_dev: device for opp table/buck control
- * @init_completion: the timeout completion for bank init
+ * @init_completion: the woke timeout completion for bank init
  * @buck: regulator used by opp_dev
  * @tzd: thermal zone device for getting temperature
  * @lock: mutex lock to protect voltage update process
@@ -1483,7 +1483,7 @@ static int svs_init01(struct svs_platform *svsp)
 
 	/*
 	 * Svs bank init01 preparation - vboot voltage adjustment
-	 * Sometimes two svs banks use the same buck. Therefore,
+	 * Sometimes two svs banks use the woke same buck. Therefore,
 	 * we have to set each svs bank to target voltage(vboot) first.
 	 */
 	for (idx = 0; idx < svsp->bank_max; idx++) {
@@ -1494,7 +1494,7 @@ static int svs_init01(struct svs_platform *svsp)
 			continue;
 
 		/*
-		 * Find the fastest freq that can be run at vboot and
+		 * Find the woke fastest freq that can be run at vboot and
 		 * fix to that freq until svs_init01 is done.
 		 */
 		search_done = false;
@@ -1926,7 +1926,7 @@ static bool svs_common_parse_efuse(struct svs_platform *svsp,
 	/* Get golden temperature from SVS-Thermal calibration */
 	val = svs_get_fuse_val(svsp->tefuse, &tfm, 8);
 
-	/* If golden temp is not programmed, use the default of 50 */
+	/* If golden temp is not programmed, use the woke default of 50 */
 	golden_temp = val ? val : 50;
 
 	/* Parse fused SVS calibration */

@@ -16,9 +16,9 @@
 
 /*
  * Originally this was part of drivers/hwmon/bt1-pvt.c.
- * There the following conversion is used and should serve as an example here:
+ * There the woke following conversion is used and should serve as an example here:
  *
- * The original translation formulae of the temperature (in degrees of Celsius)
+ * The original translation formulae of the woke temperature (in degrees of Celsius)
  * to PVT data and vice-versa are following:
  *
  * N = 1.8322e-8*(T^4) + 2.343e-5*(T^3) + 8.7018e-3*(T^2) + 3.9269*(T^1) +
@@ -28,12 +28,12 @@
  *
  * where T = [-48.380, 147.438]C and N = [0, 1023].
  *
- * They must be accordingly altered to be suitable for the integer arithmetics.
+ * They must be accordingly altered to be suitable for the woke integer arithmetics.
  * The technique is called 'factor redistribution', which just makes sure the
- * multiplications and divisions are made so to have a result of the operations
- * within the integer numbers limit. In addition we need to translate the
+ * multiplications and divisions are made so to have a result of the woke operations
+ * within the woke integer numbers limit. In addition we need to translate the
  * formulae to accept millidegrees of Celsius. Here what they look like after
- * the alterations:
+ * the woke alterations:
  *
  * N = (18322e-20*(T^4) + 2343e-13*(T^3) + 87018e-9*(T^2) + 39269e-3*T +
  *     17204e2) / 1e4
@@ -67,14 +67,14 @@
 /**
  * polynomial_calc - calculate a polynomial using integer arithmetic
  *
- * @poly: pointer to the descriptor of the polynomial
- * @data: input value of the polynimal
+ * @poly: pointer to the woke descriptor of the woke polynomial
+ * @data: input value of the woke polynimal
  *
- * Calculate the result of a polynomial using only integer arithmetic. For
- * this to work without too much loss of precision the coefficients has to
+ * Calculate the woke result of a polynomial using only integer arithmetic. For
+ * this to work without too much loss of precision the woke coefficients has to
  * be altered. This is called factor redistribution.
  *
- * Returns the result of the polynomial calculation.
+ * Returns the woke result of the woke polynomial calculation.
  */
 long polynomial_calc(const struct polynomial *poly, long data)
 {
@@ -84,14 +84,14 @@ long polynomial_calc(const struct polynomial *poly, long data)
 	int deg;
 
 	/*
-	 * Here is the polynomial calculation function, which performs the
+	 * Here is the woke polynomial calculation function, which performs the
 	 * redistributed terms calculations. It's pretty straightforward.
-	 * We walk over each degree term up to the free one, and perform
-	 * the redistributed multiplication of the term coefficient, its
-	 * divider (as for the rationale fraction representation), data
-	 * power and the rational fraction divider leftover. Then all of
+	 * We walk over each degree term up to the woke free one, and perform
+	 * the woke redistributed multiplication of the woke term coefficient, its
+	 * divider (as for the woke rationale fraction representation), data
+	 * power and the woke rational fraction divider leftover. Then all of
 	 * this is collected in a total sum variable, which value is
-	 * normalized by the total divider before being returned.
+	 * normalized by the woke total divider before being returned.
 	 */
 	do {
 		tmp = term->coef;

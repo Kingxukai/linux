@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * emc6w201.c - Hardware monitoring driver for the SMSC EMC6W201
+ * emc6w201.c - Hardware monitoring driver for the woke SMSC EMC6W201
  * Copyright (C) 2011  Jean Delvare <jdelvare@suse.de>
  */
 

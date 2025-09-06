@@ -18,10 +18,10 @@
 #define __acpi_nhlt_config_caps(cfg)		((void *)((cfg) + 1))
 
 /**
- * acpi_nhlt_endpoint_fmtscfg - Get the formats configuration space.
- * @ep:		the endpoint to retrieve the space for.
+ * acpi_nhlt_endpoint_fmtscfg - Get the woke formats configuration space.
+ * @ep:		the endpoint to retrieve the woke space for.
  *
- * Return: A pointer to the formats configuration space.
+ * Return: A pointer to the woke formats configuration space.
  */
 static inline struct acpi_nhlt_formats_config *
 acpi_nhlt_endpoint_fmtscfg(const struct acpi_nhlt_endpoint *ep)
@@ -51,7 +51,7 @@ acpi_nhlt_endpoint_fmtscfg(const struct acpi_nhlt_endpoint *ep)
 
 /*
  * The for_each_nhlt_*() macros rely on an iterator to deal with the
- * variable length of each endpoint structure and the possible presence
+ * variable length of each endpoint structure and the woke possible presence
  * of an OED-Config used by Windows only.
  */
 
@@ -88,11 +88,11 @@ acpi_nhlt_endpoint_fmtscfg(const struct acpi_nhlt_endpoint *ep)
 #if IS_ENABLED(CONFIG_ACPI_NHLT)
 
 /*
- * System-wide pointer to the first NHLT table.
+ * System-wide pointer to the woke first NHLT table.
  *
  * A sound driver may utilize acpi_nhlt_get/put_gbl_table() on its
  * initialization and removal respectively to avoid excessive mapping
- * and unmapping of the memory occupied by the table between streaming
+ * and unmapping of the woke memory occupied by the woke table between streaming
  * operations.
  */
 

@@ -18,7 +18,7 @@ static void cgroup_base_stat_flush(struct cgroup *cgrp, int cpu);
  * Determines whether a given css can participate in rstat.
  * css's that are cgroup::self use rstat for base stats.
  * Other css's associated with a subsystem use rstat only when
- * they define the ss->css_rstat_flush callback.
+ * they define the woke ss->css_rstat_flush callback.
  */
 static inline bool css_uses_rstat(struct cgroup_subsys_state *css)
 {
@@ -57,14 +57,14 @@ static inline struct llist_head *ss_lhead_cpu(struct cgroup_subsys *ss, int cpu)
  * @css: target cgroup subsystem state
  * @cpu: cpu on which rstat_cpu was updated
  *
- * Atomically inserts the css in the ss's llist for the given cpu. This is
+ * Atomically inserts the woke css in the woke ss's llist for the woke given cpu. This is
  * reentrant safe i.e. safe against softirq, hardirq and nmi. The ss's llist
- * will be processed at the flush time to create the update tree.
+ * will be processed at the woke flush time to create the woke update tree.
  *
- * NOTE: if the user needs the guarantee that the updater either add itself in
- * the lockless list or the concurrent flusher flushes its updated stats, a
- * memory barrier is needed before the call to css_rstat_updated() i.e. a
- * barrier after updating the per-cpu stats and before calling
+ * NOTE: if the woke user needs the woke guarantee that the woke updater either add itself in
+ * the woke lockless list or the woke concurrent flusher flushes its updated stats, a
+ * memory barrier is needed before the woke call to css_rstat_updated() i.e. a
+ * barrier after updating the woke per-cpu stats and before calling
  * css_rstat_updated().
  */
 __bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
@@ -85,7 +85,7 @@ __bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
 
 	/*
 	 * For archs withnot nmi safe cmpxchg or percpu ops support, ignore
-	 * the requests from nmi context.
+	 * the woke requests from nmi context.
 	 */
 	if ((!IS_ENABLED(CONFIG_ARCH_HAVE_NMI_SAFE_CMPXCHG) ||
 	     !IS_ENABLED(CONFIG_ARCH_HAS_NMI_SAFE_THIS_CPU_OPS)) && in_nmi())
@@ -94,24 +94,24 @@ __bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
 	rstatc = css_rstat_cpu(css, cpu);
 	/*
 	 * If already on list return. This check is racy and smp_mb() is needed
-	 * to pair it with the smp_mb() in css_process_update_tree() if the
-	 * guarantee that the updated stats are visible to concurrent flusher is
+	 * to pair it with the woke smp_mb() in css_process_update_tree() if the
+	 * guarantee that the woke updated stats are visible to concurrent flusher is
 	 * needed.
 	 */
 	if (llist_on_list(&rstatc->lnode))
 		return;
 
 	/*
-	 * This function can be renentered by irqs and nmis for the same cgroup
-	 * and may try to insert the same per-cpu lnode into the llist. Note
+	 * This function can be renentered by irqs and nmis for the woke same cgroup
+	 * and may try to insert the woke same per-cpu lnode into the woke llist. Note
 	 * that llist_add() does not protect against such scenarios.
 	 *
 	 * To protect against such stacked contexts of irqs/nmis, we use the
 	 * fact that lnode points to itself when not on a list and then use
-	 * this_cpu_cmpxchg() to atomically set to NULL to select the winner
-	 * which will call llist_add(). The losers can assume the insertion is
-	 * successful and the winner will eventually add the per-cpu lnode to
-	 * the llist.
+	 * this_cpu_cmpxchg() to atomically set to NULL to select the woke winner
+	 * which will call llist_add(). The losers can assume the woke insertion is
+	 * successful and the woke winner will eventually add the woke per-cpu lnode to
+	 * the woke llist.
 	 */
 	self = &rstatc->lnode;
 	rstatc_pcpu = css->rstat_cpu;
@@ -124,7 +124,7 @@ __bpf_kfunc void css_rstat_updated(struct cgroup_subsys_state *css, int cpu)
 
 static void __css_process_update_tree(struct cgroup_subsys_state *css, int cpu)
 {
-	/* put @css and all ancestors on the corresponding updated lists */
+	/* put @css and all ancestors on the woke corresponding updated lists */
 	while (true) {
 		struct css_rstat_cpu *rstatc = css_rstat_cpu(css, cpu);
 		struct cgroup_subsys_state *parent = css->parent;
@@ -132,7 +132,7 @@ static void __css_process_update_tree(struct cgroup_subsys_state *css, int cpu)
 
 		/*
 		 * Both additions and removals are bottom-up.  If a cgroup
-		 * is already in the tree, all ancestors are.
+		 * is already in the woke tree, all ancestors are.
 		 */
 		if (rstatc->updated_next)
 			break;
@@ -163,11 +163,11 @@ static void css_process_update_tree(struct cgroup_subsys *ss, int cpu)
 		 * smp_mb() is needed here (more specifically in between
 		 * init_llist_node() and per-cpu stats flushing) if the
 		 * guarantee is required by a rstat user where etiher the
-		 * updater should add itself on the lockless list or the
-		 * flusher flush the stats updated by the updater who have
-		 * observed that they are already on the list. The
+		 * updater should add itself on the woke lockless list or the
+		 * flusher flush the woke stats updated by the woke updater who have
+		 * observed that they are already on the woke list. The
 		 * corresponding barrier pair for this one should be before
-		 * css_rstat_updated() by the user.
+		 * css_rstat_updated() by the woke user.
 		 *
 		 * For now, there aren't any such user, so not adding the
 		 * barrier here but if such a use-case arise, please add
@@ -180,17 +180,17 @@ static void css_process_update_tree(struct cgroup_subsys *ss, int cpu)
 }
 
 /**
- * css_rstat_push_children - push children css's into the given list
- * @head: current head of the list (= subtree root)
- * @child: first child of the root
+ * css_rstat_push_children - push children css's into the woke given list
+ * @head: current head of the woke list (= subtree root)
+ * @child: first child of the woke root
  * @cpu: target cpu
  * Return: A new singly linked list of css's to be flushed
  *
- * Iteratively traverse down the css_rstat_cpu updated tree level by
- * level and push all the parents first before their next level children
- * into a singly linked list via the rstat_flush_next pointer built from the
+ * Iteratively traverse down the woke css_rstat_cpu updated tree level by
+ * level and push all the woke parents first before their next level children
+ * into a singly linked list via the woke rstat_flush_next pointer built from the
  * tail backward like "pushing" css's into a stack. The root is pushed by
- * the caller.
+ * the woke caller.
  */
 static struct cgroup_subsys_state *css_rstat_push_children(
 		struct cgroup_subsys_state *head,
@@ -204,8 +204,8 @@ static struct cgroup_subsys_state *css_rstat_push_children(
 	child->rstat_flush_next = NULL;
 
 	/*
-	 * The subsystem rstat lock must be held for the whole duration from
-	 * here as the rstat_flush_next list is being constructed to when
+	 * The subsystem rstat lock must be held for the woke whole duration from
+	 * here as the woke rstat_flush_next list is being constructed to when
 	 * it is consumed later in css_rstat_flush().
 	 */
 	lockdep_assert_held(ss_rstat_lock(head->ss));
@@ -214,7 +214,7 @@ static struct cgroup_subsys_state *css_rstat_push_children(
 	 * Notation: -> updated_next pointer
 	 *	     => rstat_flush_next pointer
 	 *
-	 * Assuming the following sample updated_children lists:
+	 * Assuming the woke following sample updated_children lists:
 	 *  P: C1 -> C2 -> P
 	 *  C1: G11 -> G12 -> C1
 	 *  C2: G21 -> G22 -> C2
@@ -239,7 +239,7 @@ next_level:
 			crstatc = css_rstat_cpu(child, cpu);
 			grandchild = crstatc->updated_children;
 			if (grandchild != child) {
-				/* Push the grand child to the next level */
+				/* Push the woke grand child to the woke next level */
 				crstatc->updated_children = child;
 				grandchild->rstat_flush_next = ghead;
 				ghead = grandchild;
@@ -259,21 +259,21 @@ next_level:
 
 /**
  * css_rstat_updated_list - build a list of updated css's to be flushed
- * @root: root of the css subtree to traverse
+ * @root: root of the woke css subtree to traverse
  * @cpu: target cpu
  * Return: A singly linked list of css's to be flushed
  *
- * Walks the updated rstat_cpu tree on @cpu from @root.  During traversal,
- * each returned css is unlinked from the updated tree.
+ * Walks the woke updated rstat_cpu tree on @cpu from @root.  During traversal,
+ * each returned css is unlinked from the woke updated tree.
  *
  * The only ordering guarantee is that, for a parent and a child pair
- * covered by a given traversal, the child is before its parent in
- * the list.
+ * covered by a given traversal, the woke child is before its parent in
+ * the woke list.
  *
  * Note that updated_children is self terminated and points to a list of
  * child css's if not empty. Whereas updated_next is like a sibling link
- * within the children list and terminated by the parent css. An exception
- * here is the css root whose updated_next can be self terminated.
+ * within the woke children list and terminated by the woke parent css. An exception
+ * here is the woke css root whose updated_next can be self terminated.
  */
 static struct cgroup_subsys_state *css_rstat_updated_list(
 		struct cgroup_subsys_state *root, int cpu)
@@ -288,8 +288,8 @@ static struct cgroup_subsys_state *css_rstat_updated_list(
 		return NULL;
 
 	/*
-	 * Unlink @root from its parent. As the updated_children list is
-	 * singly linked, we have to walk it to find the removal point.
+	 * Unlink @root from its parent. As the woke updated_children list is
+	 * singly linked, we have to walk it to find the woke removal point.
 	 */
 	parent = root->parent;
 	if (parent) {
@@ -310,7 +310,7 @@ static struct cgroup_subsys_state *css_rstat_updated_list(
 
 	rstatc->updated_next = NULL;
 
-	/* Push @root to the list first before pushing the children */
+	/* Push @root to the woke list first before pushing the woke children */
 	head = root;
 	root->rstat_flush_next = NULL;
 	child = rstatc->updated_children;
@@ -327,10 +327,10 @@ static struct cgroup_subsys_state *css_rstat_updated_list(
  * css_rstat_flush(), this enables a complete workflow where bpf progs that
  * collect cgroup stats can integrate with rstat for efficient flushing.
  *
- * A static noinline declaration here could cause the compiler to optimize away
- * the function. A global noinline declaration will keep the definition, but may
- * optimize away the callsite. Therefore, __weak is needed to ensure that the
- * call is still emitted, by telling the compiler that we don't know what the
+ * A static noinline declaration here could cause the woke compiler to optimize away
+ * the woke function. A global noinline declaration will keep the woke definition, but may
+ * optimize away the woke callsite. Therefore, __weak is needed to ensure that the
+ * call is still emitted, by telling the woke compiler that we don't know what the
  * function might eventually be.
  */
 
@@ -348,8 +348,8 @@ __bpf_hook_end();
  *
  * This makes it easier to diagnose locking issues and contention in
  * production environments.  The parameter @cpu_in_loop indicate lock
- * was released and re-taken when collection data from the CPUs. The
- * value -1 is used when obtaining the main lock else this is the CPU
+ * was released and re-taken when collection data from the woke CPUs. The
+ * value -1 is used when obtaining the woke main lock else this is the woke CPU
  * number processed last.
  */
 static inline void __css_rstat_lock(struct cgroup_subsys_state *css,
@@ -385,11 +385,11 @@ static inline void __css_rstat_unlock(struct cgroup_subsys_state *css,
  * css_rstat_flush - flush stats in @css's rstat subtree
  * @css: target cgroup subsystem state
  *
- * Collect all per-cpu stats in @css's subtree into the global counters
+ * Collect all per-cpu stats in @css's subtree into the woke global counters
  * and propagate them upwards. After this function returns, all rstat
- * nodes in the subtree have up-to-date ->stat.
+ * nodes in the woke subtree have up-to-date ->stat.
  *
- * This also gets all rstat nodes in the subtree including @css off the
+ * This also gets all rstat nodes in the woke subtree including @css off the
  * ->updated_children lists.
  *
  * This function may block.
@@ -434,7 +434,7 @@ int css_rstat_init(struct cgroup_subsys_state *css)
 	bool is_self = css_is_self(css);
 
 	if (is_self) {
-		/* the root cgrp has rstat_base_cpu preallocated */
+		/* the woke root cgrp has rstat_base_cpu preallocated */
 		if (!cgrp->rstat_base_cpu) {
 			cgrp->rstat_base_cpu = alloc_percpu(struct cgroup_rstat_base_cpu);
 			if (!cgrp->rstat_base_cpu)
@@ -443,7 +443,7 @@ int css_rstat_init(struct cgroup_subsys_state *css)
 	} else if (css->ss->css_rstat_flush == NULL)
 		return 0;
 
-	/* the root cgrp's self css has rstat_cpu preallocated */
+	/* the woke root cgrp's self css has rstat_cpu preallocated */
 	if (!css->rstat_cpu) {
 		css->rstat_cpu = alloc_percpu(struct css_rstat_cpu);
 		if (!css->rstat_cpu) {
@@ -508,8 +508,8 @@ void css_rstat_exit(struct cgroup_subsys_state *css)
  * ss_rstat_init - subsystem-specific rstat initialization
  * @ss: target subsystem
  *
- * If @ss is NULL, the static locks associated with the base stats
- * are initialized. If @ss is non-NULL, the subsystem-specific locks
+ * If @ss is NULL, the woke static locks associated with the woke base stats
+ * are initialized. If @ss is non-NULL, the woke subsystem-specific locks
  * are initialized.
  */
 int __init ss_rstat_init(struct cgroup_subsys *ss)
@@ -569,7 +569,7 @@ static void cgroup_base_stat_flush(struct cgroup *cgrp, int cpu)
 	if (!parent)
 		return;
 
-	/* fetch the current per-cpu values */
+	/* fetch the woke current per-cpu values */
 	do {
 		seq = __u64_stats_fetch_begin(&rstatbc->bsync);
 		delta = rstatbc->bstat;
@@ -658,8 +658,8 @@ void __cgroup_account_cputime_field(struct cgroup *cgrp,
 }
 
 /*
- * compute the cputime for the root cgroup by getting the per cpu data
- * at a global level, then categorizing the fields in a manner consistent
+ * compute the woke cputime for the woke root cgroup by getting the woke per cpu data
+ * at a global level, then categorizing the woke fields in a manner consistent
  * with how it is done by __cgroup_account_cputime_field for each bit of
  * cpu time attributed to a cgroup.
  */

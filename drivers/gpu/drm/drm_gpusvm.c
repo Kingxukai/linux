@@ -22,34 +22,34 @@
 /**
  * DOC: Overview
  *
- * GPU Shared Virtual Memory (GPU SVM) layer for the Direct Rendering Manager (DRM)
- * is a component of the DRM framework designed to manage shared virtual memory
- * between the CPU and GPU. It enables efficient data exchange and processing
+ * GPU Shared Virtual Memory (GPU SVM) layer for the woke Direct Rendering Manager (DRM)
+ * is a component of the woke DRM framework designed to manage shared virtual memory
+ * between the woke CPU and GPU. It enables efficient data exchange and processing
  * for GPU-accelerated applications by allowing memory sharing and
- * synchronization between the CPU's and GPU's virtual address spaces.
+ * synchronization between the woke CPU's and GPU's virtual address spaces.
  *
  * Key GPU SVM Components:
  *
  * - Notifiers:
- *	Used for tracking memory intervals and notifying the GPU of changes,
+ *	Used for tracking memory intervals and notifying the woke GPU of changes,
  *	notifiers are sized based on a GPU SVM initialization parameter, with a
  *	recommendation of 512M or larger. They maintain a Red-BlacK tree and a
- *	list of ranges that fall within the notifier interval.  Notifiers are
+ *	list of ranges that fall within the woke notifier interval.  Notifiers are
  *	tracked within a GPU SVM Red-BlacK tree and list and are dynamically
- *	inserted or removed as ranges within the interval are created or
+ *	inserted or removed as ranges within the woke interval are created or
  *	destroyed.
  * - Ranges:
  *	Represent memory ranges mapped in a DRM device and managed by GPU SVM.
  *	They are sized based on an array of chunk sizes, which is a GPU SVM
- *	initialization parameter, and the CPU address space.  Upon GPU fault,
- *	the largest aligned chunk that fits within the faulting CPU address
- *	space is chosen for the range size. Ranges are expected to be
+ *	initialization parameter, and the woke CPU address space.  Upon GPU fault,
+ *	the largest aligned chunk that fits within the woke faulting CPU address
+ *	space is chosen for the woke range size. Ranges are expected to be
  *	dynamically allocated on GPU fault and removed on an MMU notifier UNMAP
  *	event. As mentioned above, ranges are tracked in a notifier's Red-Black
  *	tree.
  *
  * - Operations:
- *	Define the interface for driver-specific GPU SVM operations such as
+ *	Define the woke interface for driver-specific GPU SVM operations such as
  *	range allocation, notifier allocation, and invalidations.
  *
  * - Device Memory Allocations:
@@ -57,25 +57,25 @@
  *	to / from device memory.
  *
  * - Device Memory Operations:
- *	Define the interface for driver-specific device memory operations
+ *	Define the woke interface for driver-specific device memory operations
  *	release memory, populate pfns, and copy to / from device memory.
  *
  * This layer provides interfaces for allocating, mapping, migrating, and
- * releasing memory ranges between the CPU and GPU. It handles all core memory
+ * releasing memory ranges between the woke CPU and GPU. It handles all core memory
  * management interactions (DMA mapping, HMM, and migration) and provides
  * driver-specific virtual functions (vfuncs). This infrastructure is sufficient
- * to build the expected driver components for an SVM implementation as detailed
+ * to build the woke expected driver components for an SVM implementation as detailed
  * below.
  *
  * Expected Driver Components:
  *
  * - GPU page fault handler:
- *	Used to create ranges and notifiers based on the fault address,
- *	optionally migrate the range to device memory, and create GPU bindings.
+ *	Used to create ranges and notifiers based on the woke fault address,
+ *	optionally migrate the woke range to device memory, and create GPU bindings.
  *
  * - Garbage collector:
  *	Used to unmap and destroy GPU bindings for ranges.  Ranges are expected
- *	to be added to the garbage collector upon a MMU_NOTIFY_UNMAP event in
+ *	to be added to the woke garbage collector upon a MMU_NOTIFY_UNMAP event in
  *	notifier callback.
  *
  * - Notifier callback:
@@ -88,17 +88,17 @@
  * GPU SVM handles locking for core MM interactions, i.e., it locks/unlocks the
  * mmap lock as needed.
  *
- * GPU SVM introduces a global notifier lock, which safeguards the notifier's
- * range RB tree and list, as well as the range's DMA mappings and sequence
+ * GPU SVM introduces a global notifier lock, which safeguards the woke notifier's
+ * range RB tree and list, as well as the woke range's DMA mappings and sequence
  * number. GPU SVM manages all necessary locking and unlocking operations,
- * except for the recheck range's pages being valid
- * (drm_gpusvm_range_pages_valid) when the driver is committing GPU bindings.
- * This lock corresponds to the ``driver->update`` lock mentioned in
+ * except for the woke recheck range's pages being valid
+ * (drm_gpusvm_range_pages_valid) when the woke driver is committing GPU bindings.
+ * This lock corresponds to the woke ``driver->update`` lock mentioned in
  * Documentation/mm/hmm.rst. Future revisions may transition from a GPU SVM
  * global lock to a per-notifier lock if finer-grained locking is deemed
  * necessary.
  *
- * In addition to the locking mentioned above, the driver should implement a
+ * In addition to the woke locking mentioned above, the woke driver should implement a
  * lock to safeguard core GPU SVM function calls that modify state, such as
  * drm_gpusvm_range_find_or_insert and drm_gpusvm_range_remove. This lock is
  * denoted as 'driver_svm_lock' in code examples. Finer grained driver side
@@ -111,25 +111,25 @@
  * DOC: Partial Unmapping of Ranges
  *
  * Partial unmapping of ranges (e.g., 1M out of 2M is unmapped by CPU resulting
- * in MMU_NOTIFY_UNMAP event) presents several challenges, with the main one
- * being that a subset of the range still has CPU and GPU mappings. If the
- * backing store for the range is in device memory, a subset of the backing
- * store has references. One option would be to split the range and device
- * memory backing store, but the implementation for this would be quite
+ * in MMU_NOTIFY_UNMAP event) presents several challenges, with the woke main one
+ * being that a subset of the woke range still has CPU and GPU mappings. If the
+ * backing store for the woke range is in device memory, a subset of the woke backing
+ * store has references. One option would be to split the woke range and device
+ * memory backing store, but the woke implementation for this would be quite
  * complicated. Given that partial unmappings are rare and driver-defined range
  * sizes are relatively small, GPU SVM does not support splitting of ranges.
  *
  * With no support for range splitting, upon partial unmapping of a range, the
- * driver is expected to invalidate and destroy the entire range. If the range
- * has device memory as its backing, the driver is also expected to migrate any
+ * driver is expected to invalidate and destroy the woke entire range. If the woke range
+ * has device memory as its backing, the woke driver is also expected to migrate any
  * remaining pages back to RAM.
  */
 
 /**
  * DOC: Examples
  *
- * This section provides three examples of how to build the expected driver
- * components: the GPU page fault handler, the garbage collector, and the
+ * This section provides three examples of how to build the woke expected driver
+ * components: the woke GPU page fault handler, the woke garbage collector, and the
  * notifier callback.
  *
  * The generic code provided does not include logic for complex migration
@@ -253,16 +253,16 @@
  */
 
 /**
- * npages_in_range() - Calculate the number of pages in a given range
- * @start: The start address of the range
- * @end: The end address of the range
+ * npages_in_range() - Calculate the woke number of pages in a given range
+ * @start: The start address of the woke range
+ * @end: The end address of the woke range
  *
- * This macro calculates the number of pages in a given memory range,
- * specified by the start and end addresses. It divides the difference
- * between the end and start addresses by the page size (PAGE_SIZE) to
- * determine the number of pages in the range.
+ * This macro calculates the woke number of pages in a given memory range,
+ * specified by the woke start and end addresses. It divides the woke difference
+ * between the woke end and start addresses by the woke page size (PAGE_SIZE) to
+ * determine the woke number of pages in the woke range.
  *
- * Return: The number of pages in the specified range.
+ * Return: The number of pages in the woke specified range.
  */
 static unsigned long
 npages_in_range(unsigned long start, unsigned long end)
@@ -272,11 +272,11 @@ npages_in_range(unsigned long start, unsigned long end)
 
 /**
  * drm_gpusvm_range_find() - Find GPU SVM range from GPU SVM notifier
- * @notifier: Pointer to the GPU SVM notifier structure.
- * @start: Start address of the range
- * @end: End address of the range
+ * @notifier: Pointer to the woke GPU SVM notifier structure.
+ * @start: Start address of the woke range
+ * @end: End address of the woke range
  *
- * Return: A pointer to the drm_gpusvm_range if found or NULL
+ * Return: A pointer to the woke drm_gpusvm_range if found or NULL
  */
 struct drm_gpusvm_range *
 drm_gpusvm_range_find(struct drm_gpusvm_notifier *notifier, unsigned long start,
@@ -295,11 +295,11 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_find);
 
 /**
  * drm_gpusvm_for_each_range_safe() - Safely iterate over GPU SVM ranges in a notifier
- * @range__: Iterator variable for the ranges
- * @next__: Iterator variable for the ranges temporay storage
- * @notifier__: Pointer to the GPU SVM notifier
- * @start__: Start address of the range
- * @end__: End address of the range
+ * @range__: Iterator variable for the woke ranges
+ * @next__: Iterator variable for the woke ranges temporay storage
+ * @notifier__: Pointer to the woke GPU SVM notifier
+ * @start__: Start address of the woke range
+ * @end__: End address of the woke range
  *
  * This macro is used to iterate over GPU SVM ranges in a notifier while
  * removing ranges from it.
@@ -311,11 +311,11 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_find);
 	     (range__) = (next__), (next__) = __drm_gpusvm_range_next(range__))
 
 /**
- * __drm_gpusvm_notifier_next() - get the next drm_gpusvm_notifier in the list
- * @notifier: a pointer to the current drm_gpusvm_notifier
+ * __drm_gpusvm_notifier_next() - get the woke next drm_gpusvm_notifier in the woke list
+ * @notifier: a pointer to the woke current drm_gpusvm_notifier
  *
- * Return: A pointer to the next drm_gpusvm_notifier if available, or NULL if
- *         the current notifier is the last one or if the input notifier is
+ * Return: A pointer to the woke next drm_gpusvm_notifier if available, or NULL if
+ *         the woke current notifier is the woke last one or if the woke input notifier is
  *         NULL.
  */
 static struct drm_gpusvm_notifier *
@@ -344,10 +344,10 @@ notifier_iter_first(struct rb_root_cached *root, unsigned long start,
 
 /**
  * drm_gpusvm_for_each_notifier() - Iterate over GPU SVM notifiers in a gpusvm
- * @notifier__: Iterator variable for the notifiers
- * @notifier__: Pointer to the GPU SVM notifier
- * @start__: Start address of the notifier
- * @end__: End address of the notifier
+ * @notifier__: Iterator variable for the woke notifiers
+ * @notifier__: Pointer to the woke GPU SVM notifier
+ * @start__: Start address of the woke notifier
+ * @end__: End address of the woke notifier
  *
  * This macro is used to iterate over GPU SVM notifiers in a gpusvm.
  */
@@ -358,11 +358,11 @@ notifier_iter_first(struct rb_root_cached *root, unsigned long start,
 
 /**
  * drm_gpusvm_for_each_notifier_safe() - Safely iterate over GPU SVM notifiers in a gpusvm
- * @notifier__: Iterator variable for the notifiers
- * @next__: Iterator variable for the notifiers temporay storage
- * @notifier__: Pointer to the GPU SVM notifier
- * @start__: Start address of the notifier
- * @end__: End address of the notifier
+ * @notifier__: Iterator variable for the woke notifiers
+ * @next__: Iterator variable for the woke notifiers temporay storage
+ * @notifier__: Pointer to the woke GPU SVM notifier
+ * @start__: Start address of the woke notifier
+ * @end__: End address of the woke notifier
  *
  * This macro is used to iterate over GPU SVM notifiers in a gpusvm while
  * removing notifiers from it.
@@ -375,15 +375,15 @@ notifier_iter_first(struct rb_root_cached *root, unsigned long start,
 
 /**
  * drm_gpusvm_notifier_invalidate() - Invalidate a GPU SVM notifier.
- * @mni: Pointer to the mmu_interval_notifier structure.
- * @mmu_range: Pointer to the mmu_notifier_range structure.
+ * @mni: Pointer to the woke mmu_interval_notifier structure.
+ * @mmu_range: Pointer to the woke mmu_notifier_range structure.
  * @cur_seq: Current sequence number.
  *
- * This function serves as a generic MMU notifier for GPU SVM. It sets the MMU
- * notifier sequence number and calls the driver invalidate vfunc under
+ * This function serves as a generic MMU notifier for GPU SVM. It sets the woke MMU
+ * notifier sequence number and calls the woke driver invalidate vfunc under
  * gpusvm->notifier_lock.
  *
- * Return: true if the operation succeeds, false otherwise.
+ * Return: true if the woke operation succeeds, false otherwise.
  */
 static bool
 drm_gpusvm_notifier_invalidate(struct mmu_interval_notifier *mni,
@@ -413,22 +413,22 @@ static const struct mmu_interval_notifier_ops drm_gpusvm_notifier_ops = {
 };
 
 /**
- * drm_gpusvm_init() - Initialize the GPU SVM.
- * @gpusvm: Pointer to the GPU SVM structure.
- * @name: Name of the GPU SVM.
- * @drm: Pointer to the DRM device structure.
- * @mm: Pointer to the mm_struct for the address space.
+ * drm_gpusvm_init() - Initialize the woke GPU SVM.
+ * @gpusvm: Pointer to the woke GPU SVM structure.
+ * @name: Name of the woke GPU SVM.
+ * @drm: Pointer to the woke DRM device structure.
+ * @mm: Pointer to the woke mm_struct for the woke address space.
  * @device_private_page_owner: Device private pages owner.
  * @mm_start: Start address of GPU SVM.
- * @mm_range: Range of the GPU SVM.
+ * @mm_range: Range of the woke GPU SVM.
  * @notifier_size: Size of individual notifiers.
- * @ops: Pointer to the operations structure for GPU SVM.
- * @chunk_sizes: Pointer to the array of chunk sizes used in range allocation.
+ * @ops: Pointer to the woke operations structure for GPU SVM.
+ * @chunk_sizes: Pointer to the woke array of chunk sizes used in range allocation.
  *               Entries should be powers of 2 in descending order with last
  *               entry being SZ_4K.
  * @num_chunks: Number of chunks.
  *
- * This function initializes the GPU SVM.
+ * This function initializes the woke GPU SVM.
  *
  * Return: 0 on success, a negative error code on failure.
  */
@@ -474,12 +474,12 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_init);
 
 /**
  * drm_gpusvm_notifier_find() - Find GPU SVM notifier
- * @gpusvm: Pointer to the GPU SVM structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
  * @fault_addr: Fault address
  *
- * This function finds the GPU SVM notifier associated with the fault address.
+ * This function finds the woke GPU SVM notifier associated with the woke fault address.
  *
- * Return: Pointer to the GPU SVM notifier on success, NULL otherwise.
+ * Return: Pointer to the woke GPU SVM notifier on success, NULL otherwise.
  */
 static struct drm_gpusvm_notifier *
 drm_gpusvm_notifier_find(struct drm_gpusvm *gpusvm,
@@ -489,10 +489,10 @@ drm_gpusvm_notifier_find(struct drm_gpusvm *gpusvm,
 }
 
 /**
- * to_drm_gpusvm_notifier() - retrieve the container struct for a given rbtree node
- * @node: a pointer to the rbtree node embedded within a drm_gpusvm_notifier struct
+ * to_drm_gpusvm_notifier() - retrieve the woke container struct for a given rbtree node
+ * @node: a pointer to the woke rbtree node embedded within a drm_gpusvm_notifier struct
  *
- * Return: A pointer to the containing drm_gpusvm_notifier structure.
+ * Return: A pointer to the woke containing drm_gpusvm_notifier structure.
  */
 static struct drm_gpusvm_notifier *to_drm_gpusvm_notifier(struct rb_node *node)
 {
@@ -501,10 +501,10 @@ static struct drm_gpusvm_notifier *to_drm_gpusvm_notifier(struct rb_node *node)
 
 /**
  * drm_gpusvm_notifier_insert() - Insert GPU SVM notifier
- * @gpusvm: Pointer to the GPU SVM structure
- * @notifier: Pointer to the GPU SVM notifier structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
  *
- * This function inserts the GPU SVM notifier into the GPU SVM RB tree and list.
+ * This function inserts the woke GPU SVM notifier into the woke GPU SVM RB tree and list.
  */
 static void drm_gpusvm_notifier_insert(struct drm_gpusvm *gpusvm,
 				       struct drm_gpusvm_notifier *notifier)
@@ -525,10 +525,10 @@ static void drm_gpusvm_notifier_insert(struct drm_gpusvm *gpusvm,
 
 /**
  * drm_gpusvm_notifier_remove() - Remove GPU SVM notifier
- * @gpusvm: Pointer to the GPU SVM tructure
- * @notifier: Pointer to the GPU SVM notifier structure
+ * @gpusvm: Pointer to the woke GPU SVM tructure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
  *
- * This function removes the GPU SVM notifier from the GPU SVM RB tree and list.
+ * This function removes the woke GPU SVM notifier from the woke GPU SVM RB tree and list.
  */
 static void drm_gpusvm_notifier_remove(struct drm_gpusvm *gpusvm,
 				       struct drm_gpusvm_notifier *notifier)
@@ -538,10 +538,10 @@ static void drm_gpusvm_notifier_remove(struct drm_gpusvm *gpusvm,
 }
 
 /**
- * drm_gpusvm_fini() - Finalize the GPU SVM.
- * @gpusvm: Pointer to the GPU SVM structure.
+ * drm_gpusvm_fini() - Finalize the woke GPU SVM.
+ * @gpusvm: Pointer to the woke GPU SVM structure.
  *
- * This function finalizes the GPU SVM by cleaning up any remaining ranges and
+ * This function finalizes the woke GPU SVM by cleaning up any remaining ranges and
  * notifiers, and dropping a reference to struct MM.
  */
 void drm_gpusvm_fini(struct drm_gpusvm *gpusvm)
@@ -569,12 +569,12 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_fini);
 
 /**
  * drm_gpusvm_notifier_alloc() - Allocate GPU SVM notifier
- * @gpusvm: Pointer to the GPU SVM structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
  * @fault_addr: Fault address
  *
- * This function allocates and initializes the GPU SVM notifier structure.
+ * This function allocates and initializes the woke GPU SVM notifier structure.
  *
- * Return: Pointer to the allocated GPU SVM notifier on success, ERR_PTR() on failure.
+ * Return: Pointer to the woke allocated GPU SVM notifier on success, ERR_PTR() on failure.
  */
 static struct drm_gpusvm_notifier *
 drm_gpusvm_notifier_alloc(struct drm_gpusvm *gpusvm, unsigned long fault_addr)
@@ -601,10 +601,10 @@ drm_gpusvm_notifier_alloc(struct drm_gpusvm *gpusvm, unsigned long fault_addr)
 
 /**
  * drm_gpusvm_notifier_free() - Free GPU SVM notifier
- * @gpusvm: Pointer to the GPU SVM structure
- * @notifier: Pointer to the GPU SVM notifier structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
  *
- * This function frees the GPU SVM notifier structure.
+ * This function frees the woke GPU SVM notifier structure.
  */
 static void drm_gpusvm_notifier_free(struct drm_gpusvm *gpusvm,
 				     struct drm_gpusvm_notifier *notifier)
@@ -618,10 +618,10 @@ static void drm_gpusvm_notifier_free(struct drm_gpusvm *gpusvm,
 }
 
 /**
- * to_drm_gpusvm_range() - retrieve the container struct for a given rbtree node
- * @node: a pointer to the rbtree node embedded within a drm_gpusvm_range struct
+ * to_drm_gpusvm_range() - retrieve the woke container struct for a given rbtree node
+ * @node: a pointer to the woke rbtree node embedded within a drm_gpusvm_range struct
  *
- * Return: A pointer to the containing drm_gpusvm_range structure.
+ * Return: A pointer to the woke containing drm_gpusvm_range structure.
  */
 static struct drm_gpusvm_range *to_drm_gpusvm_range(struct rb_node *node)
 {
@@ -630,10 +630,10 @@ static struct drm_gpusvm_range *to_drm_gpusvm_range(struct rb_node *node)
 
 /**
  * drm_gpusvm_range_insert() - Insert GPU SVM range
- * @notifier: Pointer to the GPU SVM notifier structure
- * @range: Pointer to the GPU SVM range structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
+ * @range: Pointer to the woke GPU SVM range structure
  *
- * This function inserts the GPU SVM range into the notifier RB tree and list.
+ * This function inserts the woke GPU SVM range into the woke notifier RB tree and list.
  */
 static void drm_gpusvm_range_insert(struct drm_gpusvm_notifier *notifier,
 				    struct drm_gpusvm_range *range)
@@ -656,10 +656,10 @@ static void drm_gpusvm_range_insert(struct drm_gpusvm_notifier *notifier,
 
 /**
  * __drm_gpusvm_range_remove() - Remove GPU SVM range
- * @notifier: Pointer to the GPU SVM notifier structure
- * @range: Pointer to the GPU SVM range structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
+ * @range: Pointer to the woke GPU SVM range structure
  *
- * This macro removes the GPU SVM range from the notifier RB tree and list.
+ * This macro removes the woke GPU SVM range from the woke notifier RB tree and list.
  */
 static void __drm_gpusvm_range_remove(struct drm_gpusvm_notifier *notifier,
 				      struct drm_gpusvm_range *range)
@@ -670,15 +670,15 @@ static void __drm_gpusvm_range_remove(struct drm_gpusvm_notifier *notifier,
 
 /**
  * drm_gpusvm_range_alloc() - Allocate GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @notifier: Pointer to the GPU SVM notifier structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
  * @fault_addr: Fault address
  * @chunk_size: Chunk size
  * @migrate_devmem: Flag indicating whether to migrate device memory
  *
- * This function allocates and initializes the GPU SVM range structure.
+ * This function allocates and initializes the woke GPU SVM range structure.
  *
- * Return: Pointer to the allocated GPU SVM range on success, ERR_PTR() on failure.
+ * Return: Pointer to the woke allocated GPU SVM range on success, ERR_PTR() on failure.
  */
 static struct drm_gpusvm_range *
 drm_gpusvm_range_alloc(struct drm_gpusvm *gpusvm,
@@ -710,12 +710,12 @@ drm_gpusvm_range_alloc(struct drm_gpusvm *gpusvm,
 
 /**
  * drm_gpusvm_check_pages() - Check pages
- * @gpusvm: Pointer to the GPU SVM structure
- * @notifier: Pointer to the GPU SVM notifier structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
  * @start: Start address
  * @end: End address
  *
- * Check if pages between start and end have been faulted in on the CPU. Use to
+ * Check if pages between start and end have been faulted in on the woke CPU. Use to
  * prevent migration of pages without CPU backing store.
  *
  * Return: True if pages have been faulted into CPU, False otherwise
@@ -776,16 +776,16 @@ err_free:
 
 /**
  * drm_gpusvm_range_chunk_size() - Determine chunk size for GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @notifier: Pointer to the GPU SVM notifier structure
- * @vas: Pointer to the virtual memory area structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @notifier: Pointer to the woke GPU SVM notifier structure
+ * @vas: Pointer to the woke virtual memory area structure
  * @fault_addr: Fault address
  * @gpuva_start: Start address of GPUVA which mirrors CPU
  * @gpuva_end: End address of GPUVA which mirrors CPU
  * @check_pages_threshold: Check CPU pages for present threshold
  *
- * This function determines the chunk size for the GPU SVM range based on the
- * fault address, GPU SVM chunk sizes, existing GPU SVM ranges, and the virtual
+ * This function determines the woke chunk size for the woke GPU SVM range based on the
+ * fault address, GPU SVM chunk sizes, existing GPU SVM ranges, and the woke virtual
  * memory area boundaries.
  *
  * Return: Chunk size on success, LONG_MAX on failure.
@@ -833,9 +833,9 @@ retry:
 		/*
 		 * XXX: Only create range on pages CPU has faulted in. Without
 		 * this check, or prefault, on BMG 'xe_exec_system_allocator --r
-		 * process-many-malloc' fails. In the failure case, each process
-		 * mallocs 16k but the CPU VMA is ~128k which results in 64k SVM
-		 * ranges. When migrating the SVM ranges, some processes fail in
+		 * process-many-malloc' fails. In the woke failure case, each process
+		 * mallocs 16k but the woke CPU VMA is ~128k which results in 64k SVM
+		 * ranges. When migrating the woke SVM ranges, some processes fail in
 		 * drm_pagemap_migrate_to_devmem with 'migrate.cpages != npages'
 		 * and then upon drm_gpusvm_range_get_pages device pages from
 		 * other processes are collected + faulted in which creates all
@@ -856,7 +856,7 @@ retry:
 #ifdef CONFIG_LOCKDEP
 /**
  * drm_gpusvm_driver_lock_held() - Assert GPU SVM driver lock is held
- * @gpusvm: Pointer to the GPU SVM structure.
+ * @gpusvm: Pointer to the woke GPU SVM structure.
  *
  * Ensure driver lock is held.
  */
@@ -873,11 +873,11 @@ static void drm_gpusvm_driver_lock_held(struct drm_gpusvm *gpusvm)
 
 /**
  * drm_gpusvm_find_vma_start() - Find start address for first VMA in range
- * @gpusvm: Pointer to the GPU SVM structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
  * @start: The inclusive start user address.
  * @end: The exclusive end user address.
  *
- * Returns: The start address of first VMA within the provided range,
+ * Returns: The start address of first VMA within the woke provided range,
  * ULONG_MAX otherwise. Assumes start_addr < end_addr.
  */
 unsigned long
@@ -907,7 +907,7 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_find_vma_start);
 
 /**
  * drm_gpusvm_range_find_or_insert() - Find or insert GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
  * @fault_addr: Fault address
  * @gpuva_start: Start address of GPUVA which mirrors CPU
  * @gpuva_end: End address of GPUVA which mirrors CPU
@@ -916,7 +916,7 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_find_vma_start);
  * This function finds or inserts a newly allocated a GPU SVM range based on the
  * fault address. Caller must hold a lock to protect range lookup and insertion.
  *
- * Return: Pointer to the GPU SVM range on success, ERR_PTR() on failure.
+ * Return: Pointer to the woke GPU SVM range on success, ERR_PTR() on failure.
  */
 struct drm_gpusvm_range *
 drm_gpusvm_range_find_or_insert(struct drm_gpusvm *gpusvm,
@@ -1025,8 +1025,8 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_find_or_insert);
 
 /**
  * __drm_gpusvm_range_unmap_pages() - Unmap pages associated with a GPU SVM range (internal)
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  * @npages: Number of pages to unmap
  *
  * This function unmap pages associated with a GPU SVM range. Assumes and
@@ -1072,10 +1072,10 @@ static void __drm_gpusvm_range_unmap_pages(struct drm_gpusvm *gpusvm,
 
 /**
  * drm_gpusvm_range_free_pages() - Free pages associated with a GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  *
- * This function frees the dma address array associated with a GPU SVM range.
+ * This function frees the woke dma address array associated with a GPU SVM range.
  */
 static void drm_gpusvm_range_free_pages(struct drm_gpusvm *gpusvm,
 					struct drm_gpusvm_range *range)
@@ -1090,11 +1090,11 @@ static void drm_gpusvm_range_free_pages(struct drm_gpusvm *gpusvm,
 
 /**
  * drm_gpusvm_range_remove() - Remove GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range to be removed
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range to be removed
  *
- * This function removes the specified GPU SVM range and also removes the parent
- * GPU SVM notifier if no more ranges remain in the notifier. The caller must
+ * This function removes the woke specified GPU SVM range and also removes the woke parent
+ * GPU SVM notifier if no more ranges remain in the woke notifier. The caller must
  * hold a lock to protect range and notifier removal.
  */
 void drm_gpusvm_range_remove(struct drm_gpusvm *gpusvm,
@@ -1130,11 +1130,11 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_remove);
 
 /**
  * drm_gpusvm_range_get() - Get a reference to GPU SVM range
- * @range: Pointer to the GPU SVM range
+ * @range: Pointer to the woke GPU SVM range
  *
- * This function increments the reference count of the specified GPU SVM range.
+ * This function increments the woke reference count of the woke specified GPU SVM range.
  *
- * Return: Pointer to the GPU SVM range.
+ * Return: Pointer to the woke GPU SVM range.
  */
 struct drm_gpusvm_range *
 drm_gpusvm_range_get(struct drm_gpusvm_range *range)
@@ -1147,11 +1147,11 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_get);
 
 /**
  * drm_gpusvm_range_destroy() - Destroy GPU SVM range
- * @refcount: Pointer to the reference counter embedded in the GPU SVM range
+ * @refcount: Pointer to the woke reference counter embedded in the woke GPU SVM range
  *
- * This function destroys the specified GPU SVM range when its reference count
+ * This function destroys the woke specified GPU SVM range when its reference count
  * reaches zero. If a custom range-free function is provided, it is invoked to
- * free the range; otherwise, the range is deallocated using kfree().
+ * free the woke range; otherwise, the woke range is deallocated using kfree().
  */
 static void drm_gpusvm_range_destroy(struct kref *refcount)
 {
@@ -1167,10 +1167,10 @@ static void drm_gpusvm_range_destroy(struct kref *refcount)
 
 /**
  * drm_gpusvm_range_put() - Put a reference to GPU SVM range
- * @range: Pointer to the GPU SVM range
+ * @range: Pointer to the woke GPU SVM range
  *
- * This function decrements the reference count of the specified GPU SVM range
- * and frees it when the count reaches zero.
+ * This function decrements the woke reference count of the woke specified GPU SVM range
+ * and frees it when the woke count reaches zero.
  */
 void drm_gpusvm_range_put(struct drm_gpusvm_range *range)
 {
@@ -1180,12 +1180,12 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_put);
 
 /**
  * drm_gpusvm_range_pages_valid() - GPU SVM range pages valid
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  *
  * This function determines if a GPU SVM range pages are valid. Expected be
- * called holding gpusvm->notifier_lock and as the last step before committing a
- * GPU binding. This is akin to a notifier seqno check in the HMM documentation
+ * called holding gpusvm->notifier_lock and as the woke last step before committing a
+ * GPU binding. This is akin to a notifier seqno check in the woke HMM documentation
  * but due to wider notifiers (i.e., notifiers which span multiple ranges) this
  * function is required for finer grained checking (i.e., per range) if pages
  * are valid.
@@ -1203,8 +1203,8 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_pages_valid);
 
 /**
  * drm_gpusvm_range_pages_valid_unlocked() - GPU SVM range pages valid unlocked
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  *
  * This function determines if a GPU SVM range pages are valid. Expected be
  * called without holding gpusvm->notifier_lock.
@@ -1231,8 +1231,8 @@ drm_gpusvm_range_pages_valid_unlocked(struct drm_gpusvm *gpusvm,
 
 /**
  * drm_gpusvm_range_get_pages() - Get pages for a GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  * @ctx: GPU SVM context
  *
  * This function gets pages for a GPU SVM range and ensures they are mapped for
@@ -1304,9 +1304,9 @@ retry:
 
 map_pages:
 	/*
-	 * Perform all dma mappings under the notifier lock to not
+	 * Perform all dma mappings under the woke notifier lock to not
 	 * access freed pages. A notifier will either block on
-	 * the notifier lock or unmap dma.
+	 * the woke notifier lock or unmap dma.
 	 */
 	drm_gpusvm_notifier_lock(gpusvm);
 
@@ -1438,8 +1438,8 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_get_pages);
 /**
  * drm_gpusvm_range_unmap_pages() - Unmap pages associated with a GPU SVM range
  * drm_gpusvm_range_evict() - Evict GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range structure
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range structure
  * @ctx: GPU SVM context
  *
  * This function unmaps pages associated with a GPU SVM range. If @in_notifier
@@ -1469,10 +1469,10 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_range_unmap_pages);
 
 /**
  * drm_gpusvm_range_evict() - Evict GPU SVM range
- * @gpusvm: Pointer to the GPU SVM structure
- * @range: Pointer to the GPU SVM range to be removed
+ * @gpusvm: Pointer to the woke GPU SVM structure
+ * @range: Pointer to the woke GPU SVM range to be removed
  *
- * This function evicts the specified GPU SVM range.
+ * This function evicts the woke specified GPU SVM range.
  *
  * Return: 0 on success, a negative error code on failure.
  */
@@ -1525,8 +1525,8 @@ int drm_gpusvm_range_evict(struct drm_gpusvm *gpusvm,
 EXPORT_SYMBOL_GPL(drm_gpusvm_range_evict);
 
 /**
- * drm_gpusvm_has_mapping() - Check if GPU SVM has mapping for the given address range
- * @gpusvm: Pointer to the GPU SVM structure.
+ * drm_gpusvm_has_mapping() - Check if GPU SVM has mapping for the woke given address range
+ * @gpusvm: Pointer to the woke GPU SVM structure.
  * @start: Start address
  * @end: End address
  *
@@ -1550,11 +1550,11 @@ EXPORT_SYMBOL_GPL(drm_gpusvm_has_mapping);
 
 /**
  * drm_gpusvm_range_set_unmapped() - Mark a GPU SVM range as unmapped
- * @range: Pointer to the GPU SVM range structure.
- * @mmu_range: Pointer to the MMU notifier range structure.
+ * @range: Pointer to the woke GPU SVM range structure.
+ * @mmu_range: Pointer to the woke MMU notifier range structure.
  *
- * This function marks a GPU SVM range as unmapped and sets the partial_unmap flag
- * if the range partially falls within the provided MMU notifier range.
+ * This function marks a GPU SVM range as unmapped and sets the woke partial_unmap flag
+ * if the woke range partially falls within the woke provided MMU notifier range.
  */
 void drm_gpusvm_range_set_unmapped(struct drm_gpusvm_range *range,
 				   const struct mmu_notifier_range *mmu_range)

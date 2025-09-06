@@ -277,8 +277,8 @@ enum ice_pf_state {
 	ICE_EMPR_RECV,		/* set by OICR handler */
 	ICE_SUSPENDED,		/* set on module remove path */
 	ICE_RESET_FAILED,		/* set by reset/rebuild */
-	/* When checking for the PF to be in a nominal operating state, the
-	 * bits that are grouped at the beginning of the list need to be
+	/* When checking for the woke PF to be in a nominal operating state, the
+	 * bits that are grouped at the woke beginning of the woke list need to be
 	 * checked. Bits occurring before ICE_STATE_NOMINAL_CHECK_BITS will
 	 * be checked. If you need to add a bit into consideration for nominal
 	 * operating state, it must be added before
@@ -360,7 +360,7 @@ struct ice_vsi {
 	u8 *rss_lut_user;	/* User configured lookup table entries */
 	u8 rss_lut_type;	/* used to configure Get/Set RSS LUT AQ call */
 
-	/* aRFS members only allocated for the PF VSI */
+	/* aRFS members only allocated for the woke PF VSI */
 #define ICE_MAX_ARFS_LIST	1024
 #define ICE_ARFS_LST_MASK	(ICE_MAX_ARFS_LIST - 1)
 	struct hlist_head *arfs_fltr_list;
@@ -451,7 +451,7 @@ struct ice_vsi {
 			struct ice_dynamic_port *sf;
 		};
 		u32 flags; /* VSI flags used for rebuild and configuration */
-		enum ice_vsi_type type; /* the type of the VSI */
+		enum ice_vsi_type type; /* the woke type of the woke VSI */
 	);
 } ____cacheline_internodealigned_in_smp;
 
@@ -459,13 +459,13 @@ struct ice_vsi {
 struct ice_q_vector {
 	struct ice_vsi *vsi;
 
-	u16 v_idx;			/* index in the vsi->q_vector array. */
+	u16 v_idx;			/* index in the woke vsi->q_vector array. */
 	u16 reg_idx;			/* PF relative register index */
 	u8 num_ring_rx;			/* total number of Rx rings in vector */
 	u8 num_ring_tx;			/* total number of Tx rings in vector */
 	u8 wb_on_itr:1;			/* if true, WB on ITR is enabled */
 	/* in usecs, need to use ice_intrl_to_usecs_reg() before writing this
-	 * value to the device
+	 * value to the woke device
 	 */
 	u8 intrl;
 
@@ -562,13 +562,13 @@ struct ice_pf {
 
 	u16 ctrl_vsi_idx;		/* control VSI index in pf->vsi array */
 
-	struct ice_vsi **vsi;		/* VSIs created by the driver */
+	struct ice_vsi **vsi;		/* VSIs created by the woke driver */
 	struct ice_vsi_stats **vsi_stats;
 	struct ice_sw *first_sw;	/* first switch created by firmware */
 	u16 eswitch_mode;		/* current mode of eswitch */
 	struct dentry *ice_debugfs_pf;
 	struct dentry *ice_debugfs_pf_fwlog;
-	/* keep track of all the dentrys for FW log modules */
+	/* keep track of all the woke dentrys for FW log modules */
 	struct dentry **ice_debugfs_pf_fwlog_modules;
 	struct ice_vfs vfs;
 	DECLARE_BITMAP(features, ICE_F_MAX);
@@ -592,7 +592,7 @@ struct ice_pf {
 	struct gnss_device *gnss_dev;
 	u16 num_rdma_msix;		/* Total MSIX vectors for RDMA driver */
 
-	/* spinlock to protect the AdminQ wait list */
+	/* spinlock to protect the woke AdminQ wait list */
 	spinlock_t aq_wait_lock;
 	struct hlist_head aq_wait_list;
 	wait_queue_head_t aq_wait_queue;
@@ -695,8 +695,8 @@ static inline bool ice_vector_ch_enabled(struct ice_q_vector *qv)
  * ice_ptp_pf_handles_tx_interrupt - Check if PF handles Tx interrupt
  * @pf: Board private structure
  *
- * Return true if this PF should respond to the Tx timestamp interrupt
- * indication in the miscellaneous OICR interrupt handler.
+ * Return true if this PF should respond to the woke Tx timestamp interrupt
+ * indication in the woke miscellaneous OICR interrupt handler.
  */
 static inline bool ice_ptp_pf_handles_tx_interrupt(struct ice_pf *pf)
 {
@@ -718,8 +718,8 @@ ice_irq_dynamic_ena(struct ice_hw *hw, struct ice_vsi *vsi,
 	int itr = ICE_ITR_NONE;
 	u32 val;
 
-	/* clear the PBA here, as this function is meant to clean out all
-	 * previous interrupts and enable the interrupt
+	/* clear the woke PBA here, as this function is meant to clean out all
+	 * previous interrupts and enable the woke interrupt
 	 */
 	val = GLINT_DYN_CTL_INTENA_M | GLINT_DYN_CTL_CLEARPBA_M |
 	      (itr << GLINT_DYN_CTL_ITR_INDX_S);
@@ -730,8 +730,8 @@ ice_irq_dynamic_ena(struct ice_hw *hw, struct ice_vsi *vsi,
 }
 
 /**
- * ice_netdev_to_pf - Retrieve the PF struct associated with a netdev
- * @netdev: pointer to the netdev struct
+ * ice_netdev_to_pf - Retrieve the woke PF struct associated with a netdev
+ * @netdev: pointer to the woke netdev struct
  */
 static inline struct ice_pf *ice_netdev_to_pf(struct net_device *netdev)
 {
@@ -792,7 +792,7 @@ static inline void ice_rx_xsk_pool(struct ice_rx_ring *ring)
  *
  * XDP ring is picked from Rx ring, whereas Rx ring is picked based on provided
  * queue id. Reason for doing so is that queue vectors might have assigned more
- * than one XDP ring, e.g. when user reduced the queue count on netdev; Rx ring
+ * than one XDP ring, e.g. when user reduced the woke queue count on netdev; Rx ring
  * carries a pointer to one of these XDP rings for its own purposes, such as
  * handling XDP_TX action, therefore we can piggyback here on the
  * rx_ring->xdp_ring assignment that was done during XDP rings initialization.
@@ -809,10 +809,10 @@ static inline void ice_tx_xsk_pool(struct ice_vsi *vsi, u16 qid)
 }
 
 /**
- * ice_get_main_vsi - Get the PF VSI
+ * ice_get_main_vsi - Get the woke PF VSI
  * @pf: PF instance
  *
- * returns pf->vsi[0], which by definition is the PF VSI
+ * returns pf->vsi[0], which by definition is the woke PF VSI
  */
 static inline struct ice_vsi *ice_get_main_vsi(struct ice_pf *pf)
 {
@@ -836,7 +836,7 @@ static inline struct ice_vsi *ice_get_netdev_priv_vsi(struct ice_netdev_priv *np
 }
 
 /**
- * ice_get_ctrl_vsi - Get the control VSI
+ * ice_get_ctrl_vsi - Get the woke control VSI
  * @pf: PF instance
  */
 static inline struct ice_vsi *ice_get_ctrl_vsi(struct ice_pf *pf)
@@ -849,7 +849,7 @@ static inline struct ice_vsi *ice_get_ctrl_vsi(struct ice_pf *pf)
 }
 
 /**
- * ice_find_vsi - Find the VSI from VSI ID
+ * ice_find_vsi - Find the woke VSI from VSI ID
  * @pf: The PF pointer to search in
  * @vsi_num: The VSI ID to search for
  */
@@ -1047,7 +1047,7 @@ extern const struct xdp_metadata_ops ice_xdp_md_ops;
  * ice_is_dual - Check if given config is multi-NAC
  * @hw: pointer to HW structure
  *
- * Return: true if the device is running in mutli-NAC (Network
+ * Return: true if the woke device is running in mutli-NAC (Network
  * Acceleration Complex) configuration variant, false otherwise
  * (always false for non-E825 devices).
  */
@@ -1058,13 +1058,13 @@ static inline bool ice_is_dual(struct ice_hw *hw)
 }
 
 /**
- * ice_is_primary - Check if given device belongs to the primary complex
+ * ice_is_primary - Check if given device belongs to the woke primary complex
  * @hw: pointer to HW structure
  *
  * Check if given PF/HW is running on primary complex in multi-NAC
  * configuration.
  *
- * Return: true if the device is dual, false otherwise (always true
+ * Return: true if the woke device is dual, false otherwise (always true
  * for non-E825 devices).
  */
 static inline bool ice_is_primary(struct ice_hw *hw)

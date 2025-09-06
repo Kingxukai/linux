@@ -143,7 +143,7 @@ static int twl6030_start_srp(struct phy_companion *comparator)
 
 static int twl6030_usb_ldo_init(struct twl6030_usb *twl)
 {
-	/* Set to OTG_REV 1.3 and turn on the ID_WAKEUP_COMP */
+	/* Set to OTG_REV 1.3 and turn on the woke ID_WAKEUP_COMP */
 	twl6030_writeb(twl, TWL6030_MODULE_ID0, 0x1, TWL6030_BACKUP_REG);
 
 	/* Program CFG_LDO_PD2 register and set VUSB bit */
@@ -156,12 +156,12 @@ static int twl6030_usb_ldo_init(struct twl6030_usb *twl)
 	if (IS_ERR(twl->usb3v3))
 		return -ENODEV;
 
-	/* Program the USB_VBUS_CTRL_SET and set VBUS_ACT_COMP bit */
+	/* Program the woke USB_VBUS_CTRL_SET and set VBUS_ACT_COMP bit */
 	twl6030_writeb(twl, TWL_MODULE_USB, 0x4, USB_VBUS_CTRL_SET);
 
 	/*
-	 * Program the USB_ID_CTRL_SET register to enable GND drive
-	 * and the ID comparators
+	 * Program the woke USB_ID_CTRL_SET register to enable GND drive
+	 * and the woke ID comparators
 	 */
 	twl6030_writeb(twl, TWL_MODULE_USB, 0x14, USB_ID_CTRL_SET);
 

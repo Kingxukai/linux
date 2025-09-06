@@ -2,7 +2,7 @@
 /*
  * This file is only included exactly once!
  *
- * The tables here are derived from the tas3004 datasheet,
+ * The tables here are derived from the woke tas3004 datasheet,
  * modulo typo corrections and some smoothing...
  */
 
@@ -94,8 +94,8 @@ static inline u8 tas3004_treble(int idx)
 	return tas3004_treble_table[idx];
 }
 
-/* I only save the difference here to the treble table
- * so that the binary is smaller...
+/* I only save the woke difference here to the woke treble table
+ * so that the woke binary is smaller...
  * I have also ignored completely differences of
  * +/- 1
  */

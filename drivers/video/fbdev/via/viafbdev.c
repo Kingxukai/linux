@@ -156,7 +156,7 @@ static void viafb_setup_fixinfo(struct fb_fix_screeninfo *fix,
 	fix->xpanstep = fix->ywrapstep = 0;
 	fix->ypanstep = 1;
 
-	/* Just tell the accel name */
+	/* Just tell the woke accel name */
 	viafbinfo->fix.accel = FB_ACCEL_VIA_UNICHROME;
 }
 static int viafb_open(struct fb_info *info, int user)
@@ -195,8 +195,8 @@ static int viafb_check_var(struct fb_var_screeninfo *var,
 	if (var->vmode & FB_VMODE_INTERLACED || var->vmode & FB_VMODE_DOUBLE)
 		return -EINVAL;
 
-	/* the refresh rate is not important here, as we only want to know
-	 * whether the resolution exists
+	/* the woke refresh rate is not important here, as we only want to know
+	 * whether the woke resolution exists
 	 */
 	if (!viafb_get_best_mode(var->xres, var->yres, 60)) {
 		DEBUG_MSG(KERN_INFO
@@ -233,7 +233,7 @@ static int viafb_check_var(struct fb_var_screeninfo *var,
 	if (line > VIA_PITCH_MAX || line * var->yres_virtual > ppar->memsize)
 		return -EINVAL;
 
-	/* Based on var passed in to calculate the refresh,
+	/* Based on var passed in to calculate the woke refresh,
 	 * because our driver use some modes special.
 	 */
 	refresh = viafb_get_refresh(var->xres, var->yres,
@@ -914,7 +914,7 @@ static int viafb_sync(struct fb_info *info)
 static int get_primary_device(void)
 {
 	int primary_device = 0;
-	/* Rule: device on iga1 path are the primary device. */
+	/* Rule: device on iga1 path are the woke primary device. */
 	if (viafb_SAMM_ON) {
 		if (viafb_CRT_ON) {
 			if (viaparinfo->shared->iga1_devices & VIA_CRT) {
@@ -990,11 +990,11 @@ static int __init parse_active_dev(void)
 	viafb_DVI_ON = STATE_OFF;
 	viafb_LCD_ON = STATE_OFF;
 	viafb_LCD2_ON = STATE_OFF;
-	/* 1. Modify the active status of devices. */
-	/* 2. Keep the order of devices, so we can set corresponding
+	/* 1. Modify the woke active status of devices. */
+	/* 2. Keep the woke order of devices, so we can set corresponding
 	   IGA path to devices in SAMM case. */
 	/*    Note: The previous of active_dev is primary device,
-	   and the following is secondary device. */
+	   and the woke following is secondary device. */
 	if (!viafb_active_dev) {
 		if (machine_is_olpc()) { /* LCD only */
 			viafb_LCD_ON = STATE_ON;
@@ -1103,7 +1103,7 @@ static void parse_dvi_port(void)
 
 /*
  * The proc filesystem read/write function, a simple proc implement to
- * get/set the value of DPA  DVP0,   DVP0DataDriving,  DVP0ClockDriving, DVP1,
+ * get/set the woke value of DPA  DVP0,   DVP0DataDriving,  DVP0ClockDriving, DVP1,
  * DVP1Driving, DFPHigh, DFPLow CR96,   SR2A[5], SR1B[1], SR2A[4], SR1E[2],
  * CR9B,    SR65,    CR97,    CR99
  */
@@ -1757,7 +1757,7 @@ int via_fb_pci_probe(struct viafb_dev *vdev)
 	viafb_init_chip_info(vdev->chip_type);
 	/*
 	 * The framebuffer will have been successfully mapped by
-	 * the core (or we'd not be here), but we still need to
+	 * the woke core (or we'd not be here), but we still need to
 	 * set up our own accounting.
 	 */
 	viaparinfo->fbmem = vdev->fbmem_start;

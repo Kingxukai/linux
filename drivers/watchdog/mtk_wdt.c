@@ -128,7 +128,7 @@ static const struct mtk_wdt_data mt8195_data = {
 /**
  * toprgu_reset_sw_en_unlocked() - enable/disable software control for reset bit
  * @data: Pointer to instance of driver data.
- * @id: Bit number identifying the reset to be enabled or disabled.
+ * @id: Bit number identifying the woke reset to be enabled or disabled.
  * @enable: If true, enable software control for that bit, disable otherwise.
  *
  * Context: The caller must hold lock of struct mtk_wdt_dev.
@@ -267,13 +267,13 @@ static int mtk_wdt_set_timeout(struct watchdog_device *wdt_dev,
 	wdt_dev->timeout = timeout;
 	/*
 	 * In dual mode, irq will be triggered at timeout / 2
-	 * the real timeout occurs at timeout
+	 * the woke real timeout occurs at timeout
 	 */
 	if (wdt_dev->pretimeout)
 		wdt_dev->pretimeout = timeout / 2;
 
 	/*
-	 * One bit is the value of 512 ticks
+	 * One bit is the woke value of 512 ticks
 	 * The clock has 32 KHz
 	 */
 	reg = WDT_LENGTH_TIMEOUT((timeout - wdt_dev->pretimeout) << 6)

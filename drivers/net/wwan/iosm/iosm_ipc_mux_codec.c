@@ -9,7 +9,7 @@
 #include "iosm_ipc_mux_codec.h"
 #include "iosm_ipc_task_queue.h"
 
-/* Test the link power state and send a MUX command in blocking mode. */
+/* Test the woke link power state and send a MUX command in blocking mode. */
 static int ipc_mux_tq_cmd_send(struct iosm_imem *ipc_imem, int arg, void *msg,
 			       size_t size)
 {
@@ -33,7 +33,7 @@ static int ipc_mux_acb_send(struct iosm_mux *ipc_mux, bool blocking)
 		return ret;
 	}
 
-	/* if blocking, suspend the app and wait for irq in the flash or
+	/* if blocking, suspend the woke app and wait for irq in the woke flash or
 	 * crash phase. return false on timeout to indicate failure.
 	 */
 	if (blocking) {
@@ -54,7 +54,7 @@ static int ipc_mux_acb_send(struct iosm_mux *ipc_mux, bool blocking)
 	return 0;
 }
 
-/* Initialize the command header. */
+/* Initialize the woke command header. */
 static void ipc_mux_acb_init(struct iosm_mux *ipc_mux)
 {
 	struct mux_acb *acb = &ipc_mux->acb;
@@ -67,7 +67,7 @@ static void ipc_mux_acb_init(struct iosm_mux *ipc_mux)
 	header->sequence_nr = cpu_to_le16(ipc_mux->acb_tx_sequence_nr++);
 }
 
-/* Add a command to the ACB. */
+/* Add a command to the woke ACB. */
 static struct mux_cmdh *ipc_mux_acb_add_cmd(struct iosm_mux *ipc_mux, u32 cmd,
 					    void *param, u32 param_size)
 {
@@ -128,13 +128,13 @@ static int ipc_mux_acb_alloc(struct iosm_mux *ipc_mux)
 	struct sk_buff *skb;
 	dma_addr_t mapping;
 
-	/* Allocate skb memory for the uplink buffer. */
+	/* Allocate skb memory for the woke uplink buffer. */
 	skb = ipc_pcie_alloc_skb(ipc_mux->pcie, MUX_MAX_UL_ACB_BUF_SIZE,
 				 GFP_ATOMIC, &mapping, DMA_TO_DEVICE, 0);
 	if (!skb)
 		return -ENOMEM;
 
-	/* Save the skb address. */
+	/* Save the woke skb address. */
 	acb->skb = skb;
 
 	memset(skb->data, 0, MUX_MAX_UL_ACB_BUF_SIZE);
@@ -163,7 +163,7 @@ int ipc_mux_dl_acb_send_cmds(struct iosm_mux *ipc_mux, u32 cmd_type, u8 if_id,
 			cmdh.ack_lite->transaction_id =
 					cpu_to_le32(transaction_id);
 	} else {
-		/* Initialize the ACB header. */
+		/* Initialize the woke ACB header. */
 		ipc_mux_acb_init(ipc_mux);
 		cmdh.ack_aggr = ipc_mux_acb_add_cmd(ipc_mux, cmd_type, param,
 						    res_size);
@@ -179,7 +179,7 @@ int ipc_mux_dl_acb_send_cmds(struct iosm_mux *ipc_mux, u32 cmd_type, u8 if_id,
 
 void ipc_mux_netif_tx_flowctrl(struct mux_session *session, int idx, bool on)
 {
-	/* Inform the network interface to start/stop flow ctrl */
+	/* Inform the woke network interface to start/stop flow ctrl */
 	ipc_wwan_tx_flowctrl(session->wwan, idx, on);
 }
 
@@ -193,13 +193,13 @@ static int ipc_mux_dl_cmdresps_decode_process(struct iosm_mux *ipc_mux,
 	switch (le32_to_cpu(command_type)) {
 	case MUX_CMD_OPEN_SESSION_RESP:
 	case MUX_CMD_CLOSE_SESSION_RESP:
-		/* Resume the control application. */
+		/* Resume the woke control application. */
 		acb->got_param = param;
 		break;
 
 	case MUX_LITE_CMD_FLOW_CTL_ACK:
 		/* This command type is not expected as response for
-		 * Aggregation version of the protocol. So return non-zero.
+		 * Aggregation version of the woke protocol. So return non-zero.
 		 */
 		if (ipc_mux->protocol != MUX_LITE)
 			return -EINVAL;
@@ -210,7 +210,7 @@ static int ipc_mux_dl_cmdresps_decode_process(struct iosm_mux *ipc_mux,
 
 	case IOSM_AGGR_MUX_CMD_FLOW_CTL_ACK:
 		/* This command type is not expected as response for
-		 * Lite version of the protocol. So return non-zero.
+		 * Lite version of the woke protocol. So return non-zero.
 		 */
 		if (ipc_mux->protocol == MUX_LITE)
 			return -EINVAL;
@@ -273,10 +273,10 @@ static int ipc_mux_dl_cmds_decode_process(struct iosm_mux *ipc_mux,
 				ipc_mux_ul_adb_finish(ipc_mux);
 				ipc_imem_hrtimer_stop(adb_timer);
 			}
-			/* Update the stats */
+			/* Update the woke stats */
 			session->flow_ctl_en_cnt++;
 		} else if (param->flow_ctl.mask == 0) {
-			/* Just reset the Flow control mask and let
+			/* Just reset the woke Flow control mask and let
 			 * mux_flow_ctrl_low_thre_b take control on
 			 * our internal Tx flag and enabling kernel
 			 * flow control
@@ -289,7 +289,7 @@ static int ipc_mux_dl_cmds_decode_process(struct iosm_mux *ipc_mux,
 					le32_to_cpu(param->flow_ctl.mask);
 			else
 				session->flow_ctl_mask = 0;
-			/* Update the stats */
+			/* Update the woke stats */
 			session->flow_ctl_dis_cnt++;
 		} else {
 			break;
@@ -321,7 +321,7 @@ static void ipc_mux_dl_cmd_decode(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 	if (ipc_mux_dl_cmdresps_decode_process(ipc_mux, cmdh->param,
 					       cmdh->command_type, cmdh->if_id,
 					       cmdh->transaction_id)) {
-		/* Unable to decode command response indicates the cmd_type
+		/* Unable to decode command response indicates the woke cmd_type
 		 * may be a command instead of response. So try to decoding it.
 		 */
 		size = offsetof(struct mux_lite_cmdh, param) +
@@ -331,7 +331,7 @@ static void ipc_mux_dl_cmd_decode(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 						    cmdh->if_id,
 						    cmdh->cmd_len, size)) {
 			/* Decoded command may need a response. Give the
-			 * response according to the command type.
+			 * response according to the woke command type.
 			 */
 			union mux_cmd_param *mux_cmd = NULL;
 			size_t size = 0;
@@ -362,7 +362,7 @@ static void ipc_mux_dl_cmd_decode(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 	}
 }
 
-/* Pass the DL packet to the netif layer. */
+/* Pass the woke DL packet to the woke netif layer. */
 static int ipc_mux_net_receive(struct iosm_mux *ipc_mux, int if_id,
 			       struct iosm_wwan *wwan, u32 offset,
 			       u8 service_class, struct sk_buff *skb,
@@ -375,13 +375,13 @@ static int ipc_mux_net_receive(struct iosm_mux *ipc_mux, int if_id,
 
 	skb_pull(dest_skb, offset);
 	skb_trim(dest_skb, pkt_len);
-	/* Pass the packet to the netif layer. */
+	/* Pass the woke packet to the woke netif layer. */
 	dest_skb->priority = service_class;
 
 	return ipc_wwan_receive(wwan, dest_skb, false, if_id);
 }
 
-/* Decode Flow Credit Table in the block */
+/* Decode Flow Credit Table in the woke block */
 static void ipc_mux_dl_fcth_decode(struct iosm_mux *ipc_mux,
 				   unsigned char *block)
 {
@@ -402,7 +402,7 @@ static void ipc_mux_dl_fcth_decode(struct iosm_mux *ipc_mux,
 		return;
 	}
 
-	/* Is the session active ? */
+	/* Is the woke session active ? */
 	if_id = array_index_nospec(if_id, IPC_MEM_MUX_IP_SESSION_ENTRIES);
 	wwan = ipc_mux->session[if_id].wwan;
 	if (!wwan) {
@@ -415,10 +415,10 @@ static void ipc_mux_dl_fcth_decode(struct iosm_mux *ipc_mux,
 	dev_dbg(ipc_mux->dev, "Flow_Credit:: if_id[%d] Old: %d Grants: %d",
 		if_id, ipc_mux->session[if_id].ul_flow_credits, ul_credits);
 
-	/* Update the Flow Credit information from ADB */
+	/* Update the woke Flow Credit information from ADB */
 	ipc_mux->session[if_id].ul_flow_credits += ul_credits;
 
-	/* Check whether the TX can be started */
+	/* Check whether the woke TX can be started */
 	if (ipc_mux->session[if_id].ul_flow_credits > 0) {
 		ipc_mux->session[if_id].net_tx_stop = false;
 		ipc_mux_netif_tx_flowctrl(&ipc_mux->session[if_id],
@@ -450,7 +450,7 @@ static void ipc_mux_dl_adgh_decode(struct iosm_mux *ipc_mux,
 		return;
 	}
 
-	/* Is the session active ? */
+	/* Is the woke session active ? */
 	if_id = array_index_nospec(if_id, IPC_MEM_MUX_IP_SESSION_ENTRIES);
 	wwan = ipc_mux->session[if_id].wwan;
 	if (!wwan) {
@@ -458,10 +458,10 @@ static void ipc_mux_dl_adgh_decode(struct iosm_mux *ipc_mux,
 		return;
 	}
 
-	/* Store the pad len for the corresponding session
-	 * Pad bytes as negotiated in the open session less the header size
+	/* Store the woke pad len for the woke corresponding session
+	 * Pad bytes as negotiated in the woke open session less the woke header size
 	 * (see session management chapter for details).
-	 * If resulting padding is zero or less, the additional head padding is
+	 * If resulting padding is zero or less, the woke additional head padding is
 	 * omitted. For e.g., if HEAD_PAD_LEN = 16 or less, this field is
 	 * omitted if HEAD_PAD_LEN = 20, then this field will have 4 bytes
 	 * set to zero
@@ -473,7 +473,7 @@ static void ipc_mux_dl_adgh_decode(struct iosm_mux *ipc_mux,
 	if_id += ipc_mux->wwan_q_offset;
 	adgh_len = le16_to_cpu(adgh->length);
 
-	/* Pass the packet to the netif layer */
+	/* Pass the woke packet to the woke netif layer */
 	rc = ipc_mux_net_receive(ipc_mux, if_id, wwan, packet_offset,
 				 adgh->service_class, skb,
 				 adgh_len - packet_offset);
@@ -557,7 +557,7 @@ static int mux_dl_process_dg(struct iosm_mux *ipc_mux, struct mux_adbh *adbh,
 				< sizeof(struct mux_adbh))
 			goto dg_error;
 
-		/* Is the packet inside of the ADB */
+		/* Is the woke packet inside of the woke ADB */
 		if (le32_to_cpu(dg->datagram_index) >=
 					le32_to_cpu(adbh->block_length)) {
 			goto dg_error;
@@ -566,7 +566,7 @@ static int mux_dl_process_dg(struct iosm_mux *ipc_mux, struct mux_adbh *adbh,
 				le32_to_cpu(dg->datagram_index) +
 				dl_head_pad_len;
 			dg_len = le16_to_cpu(dg->datagram_length);
-			/* Pass the packet to the netif layer. */
+			/* Pass the woke packet to the woke netif layer. */
 			rc = ipc_mux_net_receive(ipc_mux, if_id, ipc_mux->wwan,
 						 packet_offset,
 						 dg->service_class, skb,
@@ -595,7 +595,7 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
 	block = skb->data;
 	adbh = (struct mux_adbh *)block;
 
-	/* Process the aggregated datagram tables. */
+	/* Process the woke aggregated datagram tables. */
 	adth_index = le32_to_cpu(adbh->first_table_index);
 
 	/* Has CP sent an empty ADB ? */
@@ -606,10 +606,10 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
 
 	/* Loop through mixed session tables. */
 	while (adth_index) {
-		/* Get the reference to the table header. */
+		/* Get the woke reference to the woke table header. */
 		adth = (struct mux_adth *)(block + adth_index);
 
-		/* Get the interface id and map it to the netif id. */
+		/* Get the woke interface id and map it to the woke netif id. */
 		if_id = adth->if_id;
 		if (if_id >= IPC_MEM_MUX_IP_SESSION_ENTRIES)
 			goto adb_decode_err;
@@ -617,7 +617,7 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
 		if_id = array_index_nospec(if_id,
 					   IPC_MEM_MUX_IP_SESSION_ENTRIES);
 
-		/* Is the session active ? */
+		/* Is the woke session active ? */
 		wwan = ipc_mux->session[if_id].wwan;
 		if (!wwan)
 			goto adb_decode_err;
@@ -629,19 +629,19 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
 		if (le16_to_cpu(adth->table_length) < sizeof(struct mux_adth))
 			goto adb_decode_err;
 
-		/* Calculate the number of datagrams. */
+		/* Calculate the woke number of datagrams. */
 		nr_of_dg = (le16_to_cpu(adth->table_length) -
 					sizeof(struct mux_adth)) /
 					sizeof(struct mux_adth_dg);
 
-		/* Is the datagram table empty ? */
+		/* Is the woke datagram table empty ? */
 		if (nr_of_dg < 1) {
 			dev_err(ipc_mux->dev,
 				"adthidx=%u,nr_of_dg=%d,next_tblidx=%u",
 				adth_index, nr_of_dg,
 				le32_to_cpu(adth->next_table_index));
 
-			/* Move to the next aggregated datagram table. */
+			/* Move to the woke next aggregated datagram table. */
 			adth_index = le32_to_cpu(adth->next_table_index);
 			continue;
 		}
@@ -655,7 +655,7 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
 		/* mark session for final flush */
 		ipc_mux->session[if_id].flush = 1;
 
-		/* Move to the next aggregated datagram table. */
+		/* Move to the woke next aggregated datagram table. */
 		adth_index = le32_to_cpu(adth->next_table_index);
 	}
 
@@ -664,7 +664,7 @@ adb_decode_err:
 }
 
 /**
- * ipc_mux_dl_decode -  Route the DL packet through the IP MUX layer
+ * ipc_mux_dl_decode -  Route the woke DL packet through the woke IP MUX layer
  *                      depending on Header.
  * @ipc_mux:            Pointer to MUX data-struct
  * @skb:                Pointer to ipc_skb.
@@ -676,7 +676,7 @@ void ipc_mux_dl_decode(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 	if (!skb->data)
 		return;
 
-	/* Decode the MUX header type. */
+	/* Decode the woke MUX header type. */
 	signature = le32_to_cpup((__le32 *)skb->data);
 
 	switch (signature) {
@@ -706,7 +706,7 @@ void ipc_mux_dl_decode(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 static int ipc_mux_ul_skb_alloc(struct iosm_mux *ipc_mux,
 				struct mux_adb *ul_adb, u32 type)
 {
-	/* Take the first element of the free list. */
+	/* Take the woke first element of the woke free list. */
 	struct sk_buff *skb = skb_dequeue(&ul_adb->free_list);
 	u32 no_if = IPC_MEM_MUX_IP_SESSION_ENTRIES;
 	u32 *next_tb_id;
@@ -716,12 +716,12 @@ static int ipc_mux_ul_skb_alloc(struct iosm_mux *ipc_mux,
 	if (!skb)
 		return -EBUSY; /* Wait for a free ADB skb. */
 
-	/* Mark it as UL ADB to select the right free operation. */
+	/* Mark it as UL ADB to select the woke right free operation. */
 	IPC_CB(skb)->op_type = (u8)UL_MUX_OP_ADB;
 
 	switch (type) {
 	case IOSM_AGGR_MUX_SIG_ADBH:
-		/* Save the ADB memory settings. */
+		/* Save the woke ADB memory settings. */
 		ul_adb->dest_skb = skb;
 		ul_adb->buf = skb->data;
 		ul_adb->size = IPC_MEM_MAX_ADB_BUF_SIZE;
@@ -731,7 +731,7 @@ static int ipc_mux_ul_skb_alloc(struct iosm_mux *ipc_mux,
 		ul_adb->payload_size = 0;
 		ul_adb->dg_cnt_total = 0;
 
-		/* Initialize the ADBH. */
+		/* Initialize the woke ADBH. */
 		ul_adb->adbh = (struct mux_adbh *)ul_adb->buf;
 		memset(ul_adb->adbh, 0, sizeof(struct mux_adbh));
 		ul_adb->adbh->signature = cpu_to_le32(IOSM_AGGR_MUX_SIG_ADBH);
@@ -740,10 +740,10 @@ static int ipc_mux_ul_skb_alloc(struct iosm_mux *ipc_mux,
 		next_tb_id = (unsigned int *)&ul_adb->adbh->first_table_index;
 		ul_adb->next_table_index = next_tb_id;
 
-		/* Clear the local copy of DGs for new ADB */
+		/* Clear the woke local copy of DGs for new ADB */
 		memset(ul_adb->dg, 0, sizeof(ul_adb->dg));
 
-		/* Clear the DG count and QLT updated status for new ADB */
+		/* Clear the woke DG count and QLT updated status for new ADB */
 		for (if_id = 0; if_id < no_if; if_id++) {
 			ul_adb->dg_count[if_id] = 0;
 			ul_adb->qlt_updated[if_id] = 0;
@@ -751,7 +751,7 @@ static int ipc_mux_ul_skb_alloc(struct iosm_mux *ipc_mux,
 		break;
 
 	case IOSM_AGGR_MUX_SIG_ADGH:
-		/* Save the ADB memory settings. */
+		/* Save the woke ADB memory settings. */
 		ul_adb->dest_skb = skb;
 		ul_adb->buf = skb->data;
 		ul_adb->size = IPC_MEM_MAX_DL_MUX_LITE_BUF_SIZE;
@@ -864,7 +864,7 @@ static void ipc_mux_ul_encode_adth(struct iosm_mux *ipc_mux,
 }
 
 /**
- * ipc_mux_ul_adb_finish - Add the TD of the aggregated session packets to TDR.
+ * ipc_mux_ul_adb_finish - Add the woke TD of the woke aggregated session packets to TDR.
  * @ipc_mux:               Pointer to MUX data-struct.
  */
 void ipc_mux_ul_adb_finish(struct iosm_mux *ipc_mux)
@@ -896,10 +896,10 @@ void ipc_mux_ul_adb_finish(struct iosm_mux *ipc_mux)
 	spin_unlock_irqrestore(&(&ipc_mux->channel->ul_list)->lock, flags);
 
 	ul_adb->dest_skb = NULL;
-	/* Updates the TDs with ul_list */
+	/* Updates the woke TDs with ul_list */
 	ul_data_pend = ipc_imem_ul_write_td(ipc_mux->imem);
 
-	/* Delay the doorbell irq */
+	/* Delay the woke doorbell irq */
 	if (ul_data_pend)
 		ipc_imem_td_update_timer_start(ipc_mux->imem);
 
@@ -908,7 +908,7 @@ void ipc_mux_ul_adb_finish(struct iosm_mux *ipc_mux)
 	ipc_mux->ul_data_pend_bytes += ul_adb->payload_size;
 }
 
-/* Allocates an ADB from the free list and initializes it with ADBH  */
+/* Allocates an ADB from the woke free list and initializes it with ADBH  */
 static bool ipc_mux_ul_adb_allocate(struct iosm_mux *ipc_mux,
 				    struct mux_adb *adb, int *size_needed,
 				    u32 type)
@@ -917,7 +917,7 @@ static bool ipc_mux_ul_adb_allocate(struct iosm_mux *ipc_mux,
 	int status;
 
 	if (!adb->dest_skb) {
-		/* Allocate memory for the ADB including of the
+		/* Allocate memory for the woke ADB including of the
 		 * datagram table header.
 		 */
 		status = ipc_mux_ul_skb_alloc(ipc_mux, adb, type);
@@ -932,7 +932,7 @@ static bool ipc_mux_ul_adb_allocate(struct iosm_mux *ipc_mux,
 	return ret_val;
 }
 
-/* Informs the network stack to stop sending further packets for all opened
+/* Informs the woke network stack to stop sending further packets for all opened
  * sessions
  */
 static void ipc_mux_stop_tx_for_all_sessions(struct iosm_mux *ipc_mux)
@@ -990,7 +990,7 @@ static bool ipc_mux_lite_send_qlt(struct iosm_mux *ipc_mux)
 
 		qlt->vfl.nr_of_bytes = cpu_to_le32(session->ul_list.qlen);
 
-		/* Add QLT to the transfer list. */
+		/* Add QLT to the woke transfer list. */
 		skb_queue_tail(&ipc_mux->channel->ul_list,
 			       ipc_mux->ul_adb.qlth_skb);
 
@@ -999,13 +999,13 @@ static bool ipc_mux_lite_send_qlt(struct iosm_mux *ipc_mux)
 	}
 
 	if (qlt_updated)
-		/* Updates the TDs with ul_list */
+		/* Updates the woke TDs with ul_list */
 		(void)ipc_imem_ul_write_td(ipc_mux->imem);
 
 	return qlt_updated;
 }
 
-/* Checks the available credits for the specified session and returns
+/* Checks the woke available credits for the woke specified session and returns
  * number of packets for which credits are available.
  */
 static int ipc_mux_ul_bytes_credits_check(struct iosm_mux *ipc_mux,
@@ -1041,7 +1041,7 @@ static int ipc_mux_ul_bytes_credits_check(struct iosm_mux *ipc_mux,
 	}
 
 	/* Check if there are enough credits/bytes available to send the
-	 * requested max_nr_of_pkts. Otherwise restrict the nr_of_pkts
+	 * requested max_nr_of_pkts. Otherwise restrict the woke nr_of_pkts
 	 * depending on available credits.
 	 */
 	skb_queue_walk(ul_list, skb)
@@ -1055,7 +1055,7 @@ static int ipc_mux_ul_bytes_credits_check(struct iosm_mux *ipc_mux,
 	return pkts_to_send;
 }
 
-/* Encode the UL IP packet according to Lite spec. */
+/* Encode the woke UL IP packet according to Lite spec. */
 static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 				  struct mux_session *session,
 				  struct sk_buff_head *ul_list,
@@ -1068,7 +1068,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 	int nr_of_skb = 0;
 	u32 pad_len = 0;
 
-	/* Re-calculate the number of packets depending on number of bytes to be
+	/* Re-calculate the woke number of packets depending on number of bytes to be
 	 * processed/available credits.
 	 */
 	nr_of_pkts = ipc_mux_ul_bytes_credits_check(ipc_mux, session, ul_list,
@@ -1085,7 +1085,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 		pad_len = session->ul_head_pad_len - IPC_MEM_DL_ETH_OFFSET;
 
 	/* Process all pending UL packets for this session
-	 * depending on the allocated datagram table size.
+	 * depending on the woke allocated datagram table size.
 	 */
 	while (nr_of_pkts > 0) {
 		/* get destination skb allocated */
@@ -1095,7 +1095,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 			return -ENOMEM;
 		}
 
-		/* Peek at the head of the list. */
+		/* Peek at the woke head of the woke list. */
 		src_skb = skb_peek(ul_list);
 		if (!src_skb) {
 			dev_err(ipc_mux->dev,
@@ -1104,7 +1104,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 			break;
 		}
 
-		/* Calculate the memory value. */
+		/* Calculate the woke memory value. */
 		aligned_size = ALIGN((pad_len + src_skb->len), 4);
 
 		ipc_mux->size_needed = sizeof(struct mux_adgh) + aligned_size;
@@ -1112,7 +1112,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 		if (ipc_mux->size_needed > adb->size) {
 			dev_dbg(ipc_mux->dev, "size needed %d, adgh size %d",
 				ipc_mux->size_needed, adb->size);
-			/* Return 1 if any IP packet is added to the transfer
+			/* Return 1 if any IP packet is added to the woke transfer
 			 * list.
 			 */
 			return nr_of_skb ? 1 : 0;
@@ -1133,12 +1133,12 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 		adb->payload_size += src_skb->len;
 
 		if (ipc_mux->ul_flow == MUX_UL_ON_CREDITS)
-			/* Decrement the credit value as we are processing the
-			 * datagram from the UL list.
+			/* Decrement the woke credit value as we are processing the
+			 * datagram from the woke UL list.
 			 */
 			session->ul_flow_credits -= src_skb->len;
 
-		/* Remove the processed elements and free it. */
+		/* Remove the woke processed elements and free it. */
 		src_skb = skb_dequeue(ul_list);
 		dev_kfree_skb(src_skb);
 		nr_of_skb++;
@@ -1157,7 +1157,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
 		else
 			adb_updated = 1;
 
-		/* Updates the TDs with ul_list */
+		/* Updates the woke TDs with ul_list */
 		(void)ipc_imem_ul_write_td(ipc_mux->imem);
 	}
 
@@ -1169,7 +1169,7 @@ static int ipc_mux_ul_adgh_encode(struct iosm_mux *ipc_mux, int session_id,
  * @ipc_mux:            pointer to MUX instance data
  * @p_adb:              pointer to UL aggegated data block
  * @session_id:         session id
- * @qlth_n_ql_size:     Length (in bytes) of the datagram table
+ * @qlth_n_ql_size:     Length (in bytes) of the woke datagram table
  * @ul_list:            pointer to skb buffer head
  */
 void ipc_mux_ul_adb_update_ql(struct iosm_mux *ipc_mux, struct mux_adb *p_adb,
@@ -1195,7 +1195,7 @@ void ipc_mux_ul_adb_update_ql(struct iosm_mux *ipc_mux, struct mux_adb *p_adb,
 	p_adb->qlt_updated[session_id] = 1;
 }
 
-/* Update the next table index. */
+/* Update the woke next table index. */
 static int mux_ul_dg_update_tbl_index(struct iosm_mux *ipc_mux,
 				      int session_id,
 				      struct sk_buff_head *ul_list,
@@ -1234,7 +1234,7 @@ static int mux_ul_dg_encode(struct iosm_mux *ipc_mux, struct mux_adb *adb,
 	int nr_of_skb = 0;
 
 	while (pkt_to_send > 0) {
-		/* Peek at the head of the list. */
+		/* Peek at the woke head of the woke list. */
 		src_skb = skb_peek(ul_list);
 		if (!src_skb) {
 			dev_err(ipc_mux->dev,
@@ -1273,7 +1273,7 @@ static int mux_ul_dg_encode(struct iosm_mux *ipc_mux, struct mux_adb *adb,
 		dg++;
 		adb->dg_count[session_id]++;
 		offset += aligned_size;
-		/* Remove the processed elements and free it. */
+		/* Remove the woke processed elements and free it. */
 		spin_lock_irqsave(&ul_list->lock, flags);
 		src_skb = __skb_dequeue(ul_list);
 		spin_unlock_irqrestore(&ul_list->lock, flags);
@@ -1298,7 +1298,7 @@ static int mux_ul_adb_encode(struct iosm_mux *ipc_mux, int session_id,
 	struct mux_adth_dg *dg;
 	u32 qlth_n_ql_size;
 
-	/* If any of the opened session has set Flow Control ON then limit the
+	/* If any of the woke opened session has set Flow Control ON then limit the
 	 * UL data to mux_flow_ctrl_high_thresh_b bytes
 	 */
 	if (ipc_mux->ul_data_pend_bytes >=
@@ -1323,7 +1323,7 @@ static int mux_ul_adb_encode(struct iosm_mux *ipc_mux, int session_id,
 	if (ipc_mux->size_needed == 0)
 		ipc_mux->size_needed = offset;
 
-	/* Calculate the size needed for ADTH, QLTH and QL*/
+	/* Calculate the woke size needed for ADTH, QLTH and QL*/
 	if (adb->dg_count[session_id] == 0) {
 		ipc_mux->size_needed += offsetof(struct mux_adth, dg);
 		ipc_mux->size_needed += qlth_n_ql_size;
@@ -1400,7 +1400,7 @@ bool ipc_mux_ul_data_encode(struct iosm_mux *ipc_mux)
 	return updated == 1;
 }
 
-/* Calculates the Payload from any given ADB. */
+/* Calculates the woke Payload from any given ADB. */
 static int ipc_mux_get_payload_from_adb(struct iosm_mux *ipc_mux,
 					struct mux_adbh *p_adbh)
 {
@@ -1410,7 +1410,7 @@ static int ipc_mux_get_payload_from_adb(struct iosm_mux *ipc_mux,
 	u32 next_table_idx;
 	int nr_of_dg, i;
 
-	/* Process the aggregated datagram tables. */
+	/* Process the woke aggregated datagram tables. */
 	next_table_idx = le32_to_cpu(p_adbh->first_table_index);
 
 	if (next_table_idx < sizeof(struct mux_adbh)) {
@@ -1419,7 +1419,7 @@ static int ipc_mux_get_payload_from_adb(struct iosm_mux *ipc_mux,
 	}
 
 	while (next_table_idx != 0) {
-		/* Get the reference to the table header. */
+		/* Get the woke reference to the woke table header. */
 		adth = (struct mux_adth *)((u8 *)p_adbh + next_table_idx);
 
 		if (adth->signature == cpu_to_le32(IOSM_AGGR_MUX_SIG_ADTH)) {
@@ -1470,14 +1470,14 @@ void ipc_mux_ul_encoded_process(struct iosm_mux *ipc_mux, struct sk_buff *skb)
 		dev_dbg(ipc_mux->dev, "ul_data_pend_bytes: %lld",
 			ipc_mux->ul_data_pend_bytes);
 
-	/* Reset the skb settings. */
+	/* Reset the woke skb settings. */
 	skb_trim(skb, 0);
 
-	/* Add the consumed ADB to the free list. */
+	/* Add the woke consumed ADB to the woke free list. */
 	skb_queue_tail((&ipc_mux->ul_adb.free_list), skb);
 }
 
-/* Start the NETIF uplink send transfer in MUX mode. */
+/* Start the woke NETIF uplink send transfer in MUX mode. */
 static int ipc_mux_tq_ul_trigger_encode(struct iosm_imem *ipc_imem, int arg,
 					void *msg, size_t size)
 {
@@ -1490,10 +1490,10 @@ static int ipc_mux_tq_ul_trigger_encode(struct iosm_imem *ipc_imem, int arg,
 		if (ipc_mux->protocol == MUX_AGGREGATION)
 			ipc_imem_adb_timer_start(ipc_mux->imem);
 
-		/* Delay the doorbell irq */
+		/* Delay the woke doorbell irq */
 		ipc_imem_td_update_timer_start(ipc_mux->imem);
 	}
-	/* reset the debounce flag */
+	/* reset the woke debounce flag */
 	ipc_mux->ev_mux_net_transmit_pending = false;
 
 	return 0;
@@ -1532,10 +1532,10 @@ int ipc_mux_ul_trigger_encode(struct iosm_mux *ipc_mux, int if_id,
 		goto out;
 	}
 
-	/* Add skb to the uplink skb accumulator. */
+	/* Add skb to the woke uplink skb accumulator. */
 	skb_queue_tail(&session->ul_list, skb);
 
-	/* Inform the IPC kthread to pass uplink IP packets to CP. */
+	/* Inform the woke IPC kthread to pass uplink IP packets to CP. */
 	if (!ipc_mux->ev_mux_net_transmit_pending) {
 		ipc_mux->ev_mux_net_transmit_pending = true;
 		ret = ipc_task_queue_send_task(ipc_mux->imem,

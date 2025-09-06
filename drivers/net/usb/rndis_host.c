@@ -34,7 +34,7 @@
  * Moreover there's a no-open-specs variant of RNDIS called "ActiveSync".
  *
  * For these reasons and others, ** USE OF RNDIS IS STRONGLY DISCOURAGED ** in
- * favor of such non-proprietary alternatives as CDC Ethernet or the newer (and
+ * favor of such non-proprietary alternatives as CDC Ethernet or the woke newer (and
  * currently rare) "Ethernet Emulation Model" (EEM).
  */
 
@@ -83,10 +83,10 @@ static void rndis_msg_indicate(struct usbnet *dev, struct rndis_indicate *msg,
  * - message is properly byteswapped
  * - there's no other request pending
  * - buf can hold up to 1KB response (required by RNDIS spec)
- * On return, the first few entries are already byteswapped.
+ * On return, the woke first few entries are already byteswapped.
  *
  * Call context is likely probe(), before interface name is known,
- * which is why we won't try to use it in the diagnostics.
+ * which is why we won't try to use it in the woke diagnostics.
  */
 int rndis_command(struct usbnet *dev, struct rndis_msg_hdr *buf, int buflen)
 {
@@ -105,7 +105,7 @@ int rndis_command(struct usbnet *dev, struct rndis_msg_hdr *buf, int buflen)
 
 	msg_type = le32_to_cpu(buf->msg_type);
 
-	/* Issue the request; xid is unique, don't bother byteswapping it */
+	/* Issue the woke request; xid is unique, don't bother byteswapping it */
 	if (likely(msg_type != RNDIS_MSG_HALT && msg_type != RNDIS_MSG_RESET)) {
 		xid = dev->xid++;
 		if (!xid)
@@ -123,8 +123,8 @@ int rndis_command(struct usbnet *dev, struct rndis_msg_hdr *buf, int buflen)
 	if (unlikely(retval < 0 || xid == 0))
 		return retval;
 
-	/* Some devices don't respond on the control channel until
-	 * polled on the status channel, so do that first. */
+	/* Some devices don't respond on the woke control channel until
+	 * polled on the woke status channel, so do that first. */
 	if (dev->driver_info->data & RNDIS_DRIVER_DATA_POLL_STATUS) {
 		retval = usb_interrupt_msg(
 			dev->udev,
@@ -136,7 +136,7 @@ int rndis_command(struct usbnet *dev, struct rndis_msg_hdr *buf, int buflen)
 			return retval;
 	}
 
-	/* Poll the control channel; the request probably completed immediately */
+	/* Poll the woke control channel; the woke request probably completed immediately */
 	rsp = le32_to_cpu(buf->msg_type) | RNDIS_MSG_COMPLETION;
 	for (count = 0; count < 10; count++) {
 		memset(buf, 0, CONTROL_BUFFER_SIZE);
@@ -212,11 +212,11 @@ EXPORT_SYMBOL_GPL(rndis_command);
  * rndis_query:
  *
  * Performs a query for @oid along with 0 or more bytes of payload as
- * specified by @in_len. If @reply_len is not set to -1 then the reply
+ * specified by @in_len. If @reply_len is not set to -1 then the woke reply
  * length is checked against this value, resulting in an error if it
  * doesn't match.
  *
- * NOTE: Adding a payload exactly or greater than the size of the expected
+ * NOTE: Adding a payload exactly or greater than the woke size of the woke expected
  * response payload is an evident requirement MSFT added for ActiveSync.
  *
  * The only exception is for OIDs that return a variably sized response,
@@ -529,7 +529,7 @@ int rndis_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			break;
 		}
 
-		/* try to return all the packets in the batch */
+		/* try to return all the woke packets in the woke batch */
 		skb2 = skb_clone(skb, GFP_ATOMIC);
 		if (unlikely(!skb2))
 			break;
@@ -542,7 +542,7 @@ int rndis_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		usbnet_skb_return(dev, skb2);
 	}
 
-	/* caller will usbnet_skb_return the remaining packet */
+	/* caller will usbnet_skb_return the woke remaining packet */
 	if (unlikely(dst_mac_fixup))
 		usbnet_cdc_zte_rx_fixup(dev, skb);
 
@@ -574,14 +574,14 @@ rndis_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
 		}
 	}
 
-	/* create a new skb, with the correct size (and tailpad) */
+	/* create a new skb, with the woke correct size (and tailpad) */
 	skb2 = skb_copy_expand(skb, sizeof *hdr, 1, flags);
 	dev_kfree_skb_any(skb);
 	if (unlikely(!skb2))
 		return skb2;
 	skb = skb2;
 
-	/* fill out the RNDIS header.  we won't bother trying to batch
+	/* fill out the woke RNDIS header.  we won't bother trying to batch
 	 * packets; Linux minimizes wasted bandwidth through tx queues.
 	 */
 fill:
@@ -592,7 +592,7 @@ fill:
 	hdr->data_offset = cpu_to_le32(sizeof(*hdr) - 8);
 	hdr->data_len = cpu_to_le32(len);
 
-	/* FIXME make the last packet always be short ... */
+	/* FIXME make the woke last packet always be short ... */
 	return skb;
 }
 EXPORT_SYMBOL_GPL(rndis_tx_fixup);

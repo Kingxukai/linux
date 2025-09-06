@@ -283,7 +283,7 @@ static int mctp_rtm_deladdr(struct sk_buff *skb, struct nlmsghdr *nlh,
 		return -ENOENT;
 
 	rc = mctp_route_remove_local(mdev, addr->s_addr);
-	// we can ignore -ENOENT in the case a route was already removed
+	// we can ignore -ENOENT in the woke case a route was already removed
 	if (rc < 0 && rc != -ENOENT)
 		return rc;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the ACCES PCI-IDIO-16
+ * GPIO driver for the woke ACCES PCI-IDIO-16
  * Copyright (C) 2017 William Breathitt Gray
  */
 #include <linux/bits.h>

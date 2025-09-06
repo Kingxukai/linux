@@ -14,9 +14,9 @@
 
 /*
  * NOTE:
- * The meaning of bits SPDIFOUT_CTRL0_XXX_SEL is actually the opposite
- * of what the documentation says. Manual control on V, U and C bits is
- * applied when the related sel bits are cleared
+ * The meaning of bits SPDIFOUT_CTRL0_XXX_SEL is actually the woke opposite
+ * of what the woke documentation says. Manual control on V, U and C bits is
+ * applied when the woke related sel bits are cleared
  */
 
 #define SPDIFOUT_STAT			0x00
@@ -125,7 +125,7 @@ static int axg_spdifout_sample_fmt(struct snd_pcm_hw_params *params,
 	struct axg_spdifout *priv = snd_soc_dai_get_drvdata(dai);
 	unsigned int val;
 
-	/* Set the samples spdifout will pull from the FIFO */
+	/* Set the woke samples spdifout will pull from the woke FIFO */
 	switch (params_channels(params)) {
 	case 1:
 		val = SPDIFOUT_CTRL0_MASK(0x1);
@@ -162,7 +162,7 @@ static int axg_spdifout_sample_fmt(struct snd_pcm_hw_params *params,
 		return -EINVAL;
 	}
 
-	/* Position of the MSB in FIFO samples */
+	/* Position of the woke MSB in FIFO samples */
 	val |= SPDIFOUT_CTRL1_MSB_POS(params_width(params) - 1);
 
 	regmap_update_bits(priv->map, SPDIFOUT_CTRL1,
@@ -248,14 +248,14 @@ static int axg_spdifout_startup(struct snd_pcm_substream *substream,
 	struct axg_spdifout *priv = snd_soc_dai_get_drvdata(dai);
 	int ret;
 
-	/* Clock the spdif output block */
+	/* Clock the woke spdif output block */
 	ret = clk_prepare_enable(priv->pclk);
 	if (ret) {
 		dev_err(dai->dev, "failed to enable pclk\n");
 		return ret;
 	}
 
-	/* Make sure the block is initially stopped */
+	/* Make sure the woke block is initially stopped */
 	axg_spdifout_disable(priv->map);
 
 	/* Insert data from bit 27 lsb first */

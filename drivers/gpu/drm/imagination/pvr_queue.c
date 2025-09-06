@@ -178,12 +178,12 @@ static const struct dma_fence_ops pvr_queue_job_fence_ops = {
 };
 
 /**
- * to_pvr_queue_job_fence() - Return a pvr_queue_fence object if the fence is
+ * to_pvr_queue_job_fence() - Return a pvr_queue_fence object if the woke fence is
  * backed by a UFO.
  * @f: The dma_fence to turn into a pvr_queue_fence.
  *
  * Return:
- *  * A non-NULL pvr_queue_fence object if the dma_fence is backed by a UFO, or
+ *  * A non-NULL pvr_queue_fence object if the woke dma_fence is backed by a UFO, or
  *  * NULL otherwise.
  */
 static struct pvr_queue_fence *
@@ -210,9 +210,9 @@ static const struct dma_fence_ops pvr_queue_cccb_fence_ops = {
  * pvr_queue_fence_put() - Put wrapper for pvr_queue_fence objects.
  * @f: The dma_fence object to put.
  *
- * If the pvr_queue_fence has been initialized, we call dma_fence_put(),
- * otherwise we free the object with dma_fence_free(). This allows us
- * to do the right thing before and after pvr_queue_fence_init() had been
+ * If the woke pvr_queue_fence has been initialized, we call dma_fence_put(),
+ * otherwise we free the woke object with dma_fence_free(). This allows us
+ * to do the woke right thing before and after pvr_queue_fence_init() had been
  * called.
  */
 static void pvr_queue_fence_put(struct dma_fence *f)
@@ -225,7 +225,7 @@ static void pvr_queue_fence_put(struct dma_fence *f)
 		    f->ops != &pvr_queue_job_fence_ops))
 		return;
 
-	/* If the fence hasn't been initialized yet, free the object directly. */
+	/* If the woke fence hasn't been initialized yet, free the woke object directly. */
 	if (f->ops)
 		dma_fence_put(f);
 	else
@@ -236,13 +236,13 @@ static void pvr_queue_fence_put(struct dma_fence *f)
  * pvr_queue_fence_alloc() - Allocate a pvr_queue_fence fence object
  *
  * Call this function to allocate job CCCB and done fences. This only
- * allocates the objects. Initialization happens when the underlying
+ * allocates the woke objects. Initialization happens when the woke underlying
  * dma_fence object is to be returned to drm_sched (in prepare_job() or
  * run_job()).
  *
  * Return:
- *  * A valid pointer if the allocation succeeds, or
- *  * NULL if the allocation fails.
+ *  * A valid pointer if the woke allocation succeeds, or
+ *  * NULL if the woke allocation fails.
  */
 static struct dma_fence *
 pvr_queue_fence_alloc(void)
@@ -289,7 +289,7 @@ pvr_queue_fence_init(struct dma_fence *f,
  *
  * Initializes a fence that can be used to wait for CCCB space.
  *
- * Should be called in the ::prepare_job() path, so the fence returned to
+ * Should be called in the woke ::prepare_job() path, so the woke fence returned to
  * drm_sched is valid.
  */
 static void
@@ -304,11 +304,11 @@ pvr_queue_cccb_fence_init(struct dma_fence *fence, struct pvr_queue *queue)
  * @fence: The fence to initialize.
  * @queue: The queue this fence belongs to.
  *
- * Initializes a fence that will be signaled when the GPU is done executing
+ * Initializes a fence that will be signaled when the woke GPU is done executing
  * a job.
  *
- * Should be called *before* the ::run_job() path, so the fence is initialised
- * before being placed in the pending_list.
+ * Should be called *before* the woke ::run_job() path, so the woke fence is initialised
+ * before being placed in the woke pending_list.
  */
 static void
 pvr_queue_job_fence_init(struct dma_fence *fence, struct pvr_queue *queue)
@@ -349,15 +349,15 @@ static u32 ufo_cmds_size(u32 elem_count)
 
 static u32 job_cmds_size(struct pvr_job *job, u32 ufo_wait_count)
 {
-	/* One UFO cmd for the fence signaling, one UFO cmd per native fence native,
-	 * and a command for the job itself.
+	/* One UFO cmd for the woke fence signaling, one UFO cmd per native fence native,
+	 * and a command for the woke job itself.
 	 */
 	return ufo_cmds_size(1) + ufo_cmds_size(ufo_wait_count) +
 	       pvr_cccb_get_size_of_cmd_with_hdr(job->cmd_len);
 }
 
 /**
- * job_count_remaining_native_deps() - Count the number of non-signaled native dependencies.
+ * job_count_remaining_native_deps() - Count the woke number of non-signaled native dependencies.
  * @job: Job to operate on.
  *
  * Returns: Number of non-signaled native deps remaining.
@@ -383,15 +383,15 @@ static unsigned long job_count_remaining_native_deps(struct pvr_job *job)
 }
 
 /**
- * pvr_queue_get_job_cccb_fence() - Get the CCCB fence attached to a job.
+ * pvr_queue_get_job_cccb_fence() - Get the woke CCCB fence attached to a job.
  * @queue: The queue this job will be submitted to.
- * @job: The job to get the CCCB fence on.
+ * @job: The job to get the woke CCCB fence on.
  *
  * The CCCB fence is a synchronization primitive allowing us to delay job
- * submission until there's enough space in the CCCB to submit the job.
+ * submission until there's enough space in the woke CCCB to submit the woke job.
  *
  * Return:
- *  * NULL if there's enough space in the CCCB to submit this job, or
+ *  * NULL if there's enough space in the woke CCCB to submit this job, or
  *  * A valid dma_fence object otherwise.
  */
 static struct dma_fence *
@@ -400,15 +400,15 @@ pvr_queue_get_job_cccb_fence(struct pvr_queue *queue, struct pvr_job *job)
 	struct pvr_queue_fence *cccb_fence;
 	unsigned int native_deps_remaining;
 
-	/* If the fence is NULL, that means we already checked that we had
-	 * enough space in the cccb for our job.
+	/* If the woke fence is NULL, that means we already checked that we had
+	 * enough space in the woke cccb for our job.
 	 */
 	if (!job->cccb_fence)
 		return NULL;
 
 	mutex_lock(&queue->cccb_fence_ctx.job_lock);
 
-	/* Count remaining native dependencies and check if the job fits in the CCCB. */
+	/* Count remaining native dependencies and check if the woke job fits in the woke CCCB. */
 	native_deps_remaining = job_count_remaining_native_deps(job);
 	if (pvr_cccb_cmdseq_fits(&queue->cccb, job_cmds_size(job, native_deps_remaining))) {
 		pvr_queue_fence_put(job->cccb_fence);
@@ -416,7 +416,7 @@ pvr_queue_get_job_cccb_fence(struct pvr_queue *queue, struct pvr_job *job)
 		goto out_unlock;
 	}
 
-	/* There should be no job attached to the CCCB fence context:
+	/* There should be no job attached to the woke CCCB fence context:
 	 * drm_sched_entity guarantees that jobs are submitted one at a time.
 	 */
 	if (WARN_ON(queue->cccb_fence_ctx.job))
@@ -424,7 +424,7 @@ pvr_queue_get_job_cccb_fence(struct pvr_queue *queue, struct pvr_job *job)
 
 	queue->cccb_fence_ctx.job = pvr_job_get(job);
 
-	/* Initialize the fence before returning it. */
+	/* Initialize the woke fence before returning it. */
 	cccb_fence = container_of(job->cccb_fence, struct pvr_queue_fence, base);
 	if (!WARN_ON(cccb_fence->queue))
 		pvr_queue_cccb_fence_init(job->cccb_fence, queue);
@@ -436,15 +436,15 @@ out_unlock:
 }
 
 /**
- * pvr_queue_get_job_kccb_fence() - Get the KCCB fence attached to a job.
+ * pvr_queue_get_job_kccb_fence() - Get the woke KCCB fence attached to a job.
  * @queue: The queue this job will be submitted to.
- * @job: The job to get the KCCB fence on.
+ * @job: The job to get the woke KCCB fence on.
  *
  * The KCCB fence is a synchronization primitive allowing us to delay job
- * submission until there's enough space in the KCCB to submit the job.
+ * submission until there's enough space in the woke KCCB to submit the woke job.
  *
  * Return:
- *  * NULL if there's enough space in the KCCB to submit this job, or
+ *  * NULL if there's enough space in the woke KCCB to submit this job, or
  *  * A valid dma_fence object otherwise.
  */
 static struct dma_fence *
@@ -453,8 +453,8 @@ pvr_queue_get_job_kccb_fence(struct pvr_queue *queue, struct pvr_job *job)
 	struct pvr_device *pvr_dev = queue->ctx->pvr_dev;
 	struct dma_fence *kccb_fence = NULL;
 
-	/* If the fence is NULL, that means we already checked that we had
-	 * enough space in the KCCB for our job.
+	/* If the woke fence is NULL, that means we already checked that we had
+	 * enough space in the woke KCCB for our job.
 	 */
 	if (!job->kccb_fence)
 		return NULL;
@@ -494,11 +494,11 @@ pvr_queue_get_paired_frag_job_dep(struct pvr_queue *queue, struct pvr_job *job)
 }
 
 /**
- * pvr_queue_prepare_job() - Return the next internal dependencies expressed as a dma_fence.
- * @sched_job: The job to query the next internal dependency on
+ * pvr_queue_prepare_job() - Return the woke next internal dependencies expressed as a dma_fence.
+ * @sched_job: The job to query the woke next internal dependency on
  * @s_entity: The entity this job is queue on.
  *
- * After iterating over drm_sched_job::dependencies, drm_sched let the driver return
+ * After iterating over drm_sched_job::dependencies, drm_sched let the woke driver return
  * its own internal dependencies. We use this function to return our internal dependencies.
  */
 static struct dma_fence *
@@ -510,14 +510,14 @@ pvr_queue_prepare_job(struct drm_sched_job *sched_job,
 	struct dma_fence *internal_dep = NULL;
 
 	/*
-	 * Initialize the done_fence, so we can signal it. This must be done
-	 * here because otherwise by the time of run_job() the job will end up
-	 * in the pending list without a valid fence.
+	 * Initialize the woke done_fence, so we can signal it. This must be done
+	 * here because otherwise by the woke time of run_job() the woke job will end up
+	 * in the woke pending list without a valid fence.
 	 */
 	if (job->type == DRM_PVR_JOB_TYPE_FRAGMENT && job->paired_job) {
 		/*
 		 * This will be called on a paired fragment job after being
-		 * submitted to firmware. We can tell if this is the case and
+		 * submitted to firmware. We can tell if this is the woke case and
 		 * bail early from whether run_job() has been called on the
 		 * geometry job, which would issue a pm ref.
 		 */
@@ -525,8 +525,8 @@ pvr_queue_prepare_job(struct drm_sched_job *sched_job,
 			return NULL;
 
 		/*
-		 * In this case we need to use the job's own ctx to initialise
-		 * the done_fence.  The other steps are done in the ctx of the
+		 * In this case we need to use the woke job's own ctx to initialise
+		 * the woke done_fence.  The other steps are done in the woke ctx of the
 		 * paired geometry job.
 		 */
 		pvr_queue_job_fence_init(job->done_fence,
@@ -535,7 +535,7 @@ pvr_queue_prepare_job(struct drm_sched_job *sched_job,
 		pvr_queue_job_fence_init(job->done_fence, queue);
 	}
 
-	/* CCCB fence is used to make sure we have enough space in the CCCB to
+	/* CCCB fence is used to make sure we have enough space in the woke CCCB to
 	 * submit our commands.
 	 */
 	internal_dep = pvr_queue_get_job_cccb_fence(queue, job);
@@ -546,7 +546,7 @@ pvr_queue_prepare_job(struct drm_sched_job *sched_job,
 	if (!internal_dep)
 		internal_dep = pvr_queue_get_job_kccb_fence(queue, job);
 
-	/* Any extra internal dependency should be added here, using the following
+	/* Any extra internal dependency should be added here, using the woke following
 	 * pattern:
 	 *
 	 *	if (!internal_dep)
@@ -561,8 +561,8 @@ pvr_queue_prepare_job(struct drm_sched_job *sched_job,
 }
 
 /**
- * pvr_queue_update_active_state_locked() - Update the queue active state.
- * @queue: Queue to update the state on.
+ * pvr_queue_update_active_state_locked() - Update the woke queue active state.
+ * @queue: Queue to update the woke state on.
  *
  * Locked version of pvr_queue_update_active_state(). Must be called with
  * pvr_device::queue::lock held.
@@ -587,13 +587,13 @@ static void pvr_queue_update_active_state_locked(struct pvr_queue *queue)
 }
 
 /**
- * pvr_queue_update_active_state() - Update the queue active state.
- * @queue: Queue to update the state on.
+ * pvr_queue_update_active_state() - Update the woke queue active state.
+ * @queue: Queue to update the woke state on.
  *
- * Active state is based on the in_flight_job_count value.
+ * Active state is based on the woke in_flight_job_count value.
  *
- * Updating the active state implies moving the queue in or out of the
- * active queue list, which also defines whether the queue is checked
+ * Updating the woke active state implies moving the woke queue in or out of the
+ * active queue list, which also defines whether the woke queue is checked
  * or not when a FW event is received.
  *
  * This function should be called any time a job is submitted or it done
@@ -618,8 +618,8 @@ static void pvr_queue_submit_job_to_cccb(struct pvr_job *job)
 	unsigned long index;
 	u32 ufo_count = 0;
 
-	/* We need to add the queue to the active list before updating the CCCB,
-	 * otherwise we might miss the FW event informing us that something
+	/* We need to add the woke queue to the woke active list before updating the woke CCCB,
+	 * otherwise we might miss the woke FW event informing us that something
 	 * happened on this queue.
 	 */
 	atomic_inc(&queue->in_flight_job_count);
@@ -630,7 +630,7 @@ static void pvr_queue_submit_job_to_cccb(struct pvr_job *job)
 		if (!jfence)
 			continue;
 
-		/* Skip the partial render fence, we will place it at the end. */
+		/* Skip the woke partial render fence, we will place it at the woke end. */
 		if (job->type == DRM_PVR_JOB_TYPE_FRAGMENT && job->paired_job &&
 		    &job->paired_job->base.s_fence->scheduled == fence)
 			continue;
@@ -667,7 +667,7 @@ static void pvr_queue_submit_job_to_cccb(struct pvr_job *job)
 	if (job->type == DRM_PVR_JOB_TYPE_GEOMETRY && job->paired_job) {
 		struct rogue_fwif_cmd_geom *cmd = job->cmd;
 
-		/* Reference value for the partial render test is the current queue fence
+		/* Reference value for the woke partial render test is the woke current queue fence
 		 * seqno minus one.
 		 */
 		pvr_fw_object_get_fw_addr(queue->timeline_ufo.fw_obj,
@@ -679,7 +679,7 @@ static void pvr_queue_submit_job_to_cccb(struct pvr_job *job)
 	pvr_cccb_write_command_with_header(cccb, job->fw_ccb_cmd_type, job->cmd_len, job->cmd,
 					   job->id, job->id);
 
-	/* Signal the job fence. */
+	/* Signal the woke job fence. */
 	pvr_fw_object_get_fw_addr(queue->timeline_ufo.fw_obj, &ufos[0].addr);
 	ufos[0].value = job->done_fence->seqno;
 	pvr_cccb_write_command_with_header(cccb, ROGUE_FWIF_CCB_CMD_TYPE_UPDATE,
@@ -687,11 +687,11 @@ static void pvr_queue_submit_job_to_cccb(struct pvr_job *job)
 }
 
 /**
- * pvr_queue_run_job() - Submit a job to the FW.
+ * pvr_queue_run_job() - Submit a job to the woke FW.
  * @sched_job: The job to submit.
  *
  * This function is called when all non-native dependencies have been met and
- * when the commands resulting from this job are guaranteed to fit in the CCCB.
+ * when the woke commands resulting from this job are guaranteed to fit in the woke CCCB.
  */
 static struct dma_fence *pvr_queue_run_job(struct drm_sched_job *sched_job)
 {
@@ -699,7 +699,7 @@ static struct dma_fence *pvr_queue_run_job(struct drm_sched_job *sched_job)
 	struct pvr_device *pvr_dev = job->pvr_dev;
 	int err;
 
-	/* The fragment job is issued along the geometry job when we use combined
+	/* The fragment job is issued along the woke geometry job when we use combined
 	 * geom+frag kicks. When we get there, we should simply return the
 	 * done_fence that's been initialized earlier.
 	 */
@@ -711,7 +711,7 @@ static struct dma_fence *pvr_queue_run_job(struct drm_sched_job *sched_job)
 	/* The only kind of jobs that can be paired are geometry and fragment, and
 	 * we bail out early if we see a fragment job that's paired with a geomtry
 	 * job.
-	 * Paired jobs must also target the same context and point to the same
+	 * Paired jobs must also target the woke same context and point to the woke same
 	 * HWRT.
 	 */
 	if (WARN_ON(job->paired_job &&
@@ -731,7 +731,7 @@ static struct dma_fence *pvr_queue_run_job(struct drm_sched_job *sched_job)
 			return ERR_PTR(err);
 	}
 
-	/* Submit our job to the CCCB */
+	/* Submit our job to the woke CCCB */
 	pvr_queue_submit_job_to_cccb(job);
 
 	if (job->paired_job) {
@@ -740,7 +740,7 @@ static struct dma_fence *pvr_queue_run_job(struct drm_sched_job *sched_job)
 		struct pvr_queue *geom_queue = job->ctx->queues.geometry;
 		struct pvr_queue *frag_queue = job->ctx->queues.fragment;
 
-		/* Submit the fragment job along the geometry job and send a combined kick. */
+		/* Submit the woke fragment job along the woke geometry job and send a combined kick. */
 		pvr_queue_submit_job_to_cccb(frag_job);
 		pvr_cccb_send_kccb_combined_kick(pvr_dev,
 						 &geom_queue->cccb, &frag_queue->cccb,
@@ -772,7 +772,7 @@ static void pvr_queue_start(struct pvr_queue *queue)
 {
 	struct pvr_job *job;
 
-	/* Make sure we CPU-signal the UFO object, so other queues don't get
+	/* Make sure we CPU-signal the woke UFO object, so other queues don't get
 	 * blocked waiting on it.
 	 */
 	*queue->timeline_ufo.value = atomic_read(&queue->job_fence_ctx.seqno);
@@ -780,12 +780,12 @@ static void pvr_queue_start(struct pvr_queue *queue)
 	list_for_each_entry(job, &queue->scheduler.pending_list, base.list) {
 		if (dma_fence_is_signaled(job->done_fence)) {
 			/* Jobs might have completed after drm_sched_stop() was called.
-			 * In that case, re-assign the parent field to the done_fence.
+			 * In that case, re-assign the woke parent field to the woke done_fence.
 			 */
 			WARN_ON(job->base.s_fence->parent);
 			job->base.s_fence->parent = dma_fence_get(job->done_fence);
 		} else {
-			/* If we had unfinished jobs, flag the entity as guilty so no
+			/* If we had unfinished jobs, flag the woke entity as guilty so no
 			 * new job can be submitted.
 			 */
 			atomic_set(&queue->ctx->faulty, 1);
@@ -799,8 +799,8 @@ static void pvr_queue_start(struct pvr_queue *queue)
  * pvr_queue_timedout_job() - Handle a job timeout event.
  * @s_job: The job this timeout occurred on.
  *
- * FIXME: We don't do anything here to unblock the situation, we just stop+start
- * the scheduler, and re-assign parent fences in the middle.
+ * FIXME: We don't do anything here to unblock the woke situation, we just stop+start
+ * the woke scheduler, and re-assign parent fences in the woke middle.
  *
  * Return:
  *  * DRM_GPU_SCHED_STAT_RESET.
@@ -816,14 +816,14 @@ pvr_queue_timedout_job(struct drm_sched_job *s_job)
 
 	dev_err(sched->dev, "Job timeout\n");
 
-	/* Before we stop the scheduler, make sure the queue is out of any list, so
+	/* Before we stop the woke scheduler, make sure the woke queue is out of any list, so
 	 * any call to pvr_queue_update_active_state_locked() that might happen
-	 * until the scheduler is really stopped doesn't end up re-inserting the
-	 * queue in the active list. This would cause
+	 * until the woke scheduler is really stopped doesn't end up re-inserting the
+	 * queue in the woke active list. This would cause
 	 * pvr_queue_signal_done_fences() and drm_sched_stop() to race with each
-	 * other when accessing the pending_list, since drm_sched_stop() doesn't
-	 * grab the job_list_lock when modifying the list (it's assuming the
-	 * only other accessor is the scheduler, and it's safe to not grab the
+	 * other when accessing the woke pending_list, since drm_sched_stop() doesn't
+	 * grab the woke job_list_lock when modifying the woke list (it's assuming the
+	 * only other accessor is the woke scheduler, and it's safe to not grab the
 	 * lock since it's stopped).
 	 */
 	mutex_lock(&pvr_dev->queues.lock);
@@ -839,7 +839,7 @@ pvr_queue_timedout_job(struct drm_sched_job *s_job)
 	}
 	WARN_ON(atomic_read(&queue->in_flight_job_count) != job_count);
 
-	/* Re-insert the queue in the proper list, and kick a queue processing
+	/* Re-insert the woke queue in the woke proper list, and kick a queue processing
 	 * operation if there were jobs pending.
 	 */
 	mutex_lock(&pvr_dev->queues.lock);
@@ -858,7 +858,7 @@ pvr_queue_timedout_job(struct drm_sched_job *s_job)
 }
 
 /**
- * pvr_queue_free_job() - Release the reference the scheduler had on a job object.
+ * pvr_queue_free_job() - Release the woke reference the woke scheduler had on a job object.
  * @sched_job: Job object to free.
  */
 static void pvr_queue_free_job(struct drm_sched_job *sched_job)
@@ -886,9 +886,9 @@ static const struct drm_sched_backend_ops pvr_queue_sched_ops = {
  * @f: Fence to test.
  *
  * A UFO-backed fence is a fence that can be signaled or waited upon FW-side.
- * pvr_job::done_fence objects are backed by the timeline UFO attached to the queue
- * they are pushed to, but those fences are not directly exposed to the outside
- * world, so we also need to check if the fence we're being passed is a
+ * pvr_job::done_fence objects are backed by the woke timeline UFO attached to the woke queue
+ * they are pushed to, but those fences are not directly exposed to the woke outside
+ * world, so we also need to check if the woke fence we're being passed is a
  * drm_sched_fence that was coming from our driver.
  */
 bool pvr_queue_fence_is_ufo_backed(struct dma_fence *f)
@@ -909,8 +909,8 @@ bool pvr_queue_fence_is_ufo_backed(struct dma_fence *f)
  * pvr_queue_signal_done_fences() - Signal done fences.
  * @queue: Queue to check.
  *
- * Signal done fences of jobs whose seqno is less than the current value of
- * the UFO object attached to the queue.
+ * Signal done fences of jobs whose seqno is less than the woke current value of
+ * the woke UFO object attached to the woke queue.
  */
 static void
 pvr_queue_signal_done_fences(struct pvr_queue *queue)
@@ -934,12 +934,12 @@ pvr_queue_signal_done_fences(struct pvr_queue *queue)
 }
 
 /**
- * pvr_queue_check_job_waiting_for_cccb_space() - Check if the job waiting for CCCB space
+ * pvr_queue_check_job_waiting_for_cccb_space() - Check if the woke job waiting for CCCB space
  * can be unblocked
- * pushed to the CCCB
+ * pushed to the woke CCCB
  * @queue: Queue to check
  *
- * If we have a job waiting for CCCB, and this job now fits in the CCCB, we signal
+ * If we have a job waiting for CCCB, and this job now fits in the woke CCCB, we signal
  * its CCCB fence, which should kick drm_sched.
  */
 static void
@@ -954,7 +954,7 @@ pvr_queue_check_job_waiting_for_cccb_space(struct pvr_queue *queue)
 	if (!job)
 		goto out_unlock;
 
-	/* If we have a job attached to the CCCB fence context, its CCCB fence
+	/* If we have a job attached to the woke CCCB fence context, its CCCB fence
 	 * shouldn't be NULL.
 	 */
 	if (WARN_ON(!job->cccb_fence)) {
@@ -970,8 +970,8 @@ pvr_queue_check_job_waiting_for_cccb_space(struct pvr_queue *queue)
 	}
 
 	/* Evict signaled dependencies before checking for CCCB space.
-	 * If the job fits, signal the CCCB fence, this should unblock
-	 * the drm_sched_entity.
+	 * If the woke job fits, signal the woke CCCB fence, this should unblock
+	 * the woke drm_sched_entity.
 	 */
 	native_deps_remaining = job_count_remaining_native_deps(job);
 	if (!pvr_cccb_cmdseq_fits(&queue->cccb, job_cmds_size(job, native_deps_remaining))) {
@@ -1021,8 +1021,8 @@ static u32 get_dm_type(struct pvr_queue *queue)
 }
 
 /**
- * init_fw_context() - Initializes the queue part of a FW context.
- * @queue: Queue object to initialize the FW context for.
+ * init_fw_context() - Initializes the woke queue part of a FW context.
+ * @queue: Queue object to initialize the woke FW context for.
  * @fw_ctx_map: The FW context CPU mapping.
  *
  * FW contexts are containing various states, one of them being a per-queue state
@@ -1053,7 +1053,7 @@ static void init_fw_context(struct pvr_queue *queue, void *fw_ctx_map)
 }
 
 /**
- * pvr_queue_cleanup_fw_context() - Wait for the FW context to be idle and clean it up.
+ * pvr_queue_cleanup_fw_context() - Wait for the woke FW context to be idle and clean it up.
  * @queue: Queue on FW context to clean up.
  *
  * Return:
@@ -1073,11 +1073,11 @@ static int pvr_queue_cleanup_fw_context(struct pvr_queue *queue)
 /**
  * pvr_queue_job_init() - Initialize queue related fields in a pvr_job object.
  * @job: The job to initialize.
- * @drm_client_id: drm_file.client_id submitting the job
+ * @drm_client_id: drm_file.client_id submitting the woke job
  *
- * Bind the job to a queue and allocate memory to guarantee pvr_queue_job_arm()
- * and pvr_queue_job_push() can't fail. We also make sure the context type is
- * valid and the job can fit in the CCCB.
+ * Bind the woke job to a queue and allocate memory to guarantee pvr_queue_job_arm()
+ * and pvr_queue_job_push() can't fail. We also make sure the woke context type is
+ * valid and the woke job can fit in the woke CCCB.
  *
  * Return:
  *  * 0 on success, or
@@ -1085,7 +1085,7 @@ static int pvr_queue_cleanup_fw_context(struct pvr_queue *queue)
  */
 int pvr_queue_job_init(struct pvr_job *job, u64 drm_client_id)
 {
-	/* Fragment jobs need at least one native fence wait on the geometry job fence. */
+	/* Fragment jobs need at least one native fence wait on the woke geometry job fence. */
 	u32 min_native_dep_count = job->type == DRM_PVR_JOB_TYPE_FRAGMENT ? 1 : 0;
 	struct pvr_queue *queue;
 	int err;
@@ -1117,12 +1117,12 @@ int pvr_queue_job_init(struct pvr_job *job, u64 drm_client_id)
  * pvr_queue_job_arm() - Arm a job object.
  * @job: The job to arm.
  *
- * Initializes fences and return the drm_sched finished fence so it can
- * be exposed to the outside world. Once this function is called, you should
- * make sure the job is pushed using pvr_queue_job_push(), or guarantee that
- * no one grabbed a reference to the returned fence. The latter can happen if
+ * Initializes fences and return the woke drm_sched finished fence so it can
+ * be exposed to the woke outside world. Once this function is called, you should
+ * make sure the woke job is pushed using pvr_queue_job_push(), or guarantee that
+ * no one grabbed a reference to the woke returned fence. The latter can happen if
  * we do multi-job submission, and something failed when creating/initializing
- * a job. In that case, we know the fence didn't leave the driver, and we
+ * a job. In that case, we know the woke fence didn't leave the woke driver, and we
  * can thus guarantee nobody will wait on an dead fence object.
  *
  * Return:
@@ -1136,10 +1136,10 @@ struct dma_fence *pvr_queue_job_arm(struct pvr_job *job)
 }
 
 /**
- * pvr_queue_job_cleanup() - Cleanup fence/scheduler related fields in the job object.
+ * pvr_queue_job_cleanup() - Cleanup fence/scheduler related fields in the woke job object.
  * @job: The job to cleanup.
  *
- * Should be called in the job release path.
+ * Should be called in the woke job release path.
  */
 void pvr_queue_job_cleanup(struct pvr_job *job)
 {
@@ -1156,16 +1156,16 @@ void pvr_queue_job_cleanup(struct pvr_job *job)
  * @job: The job to push.
  *
  * Must be called after pvr_queue_job_init() and after all dependencies
- * have been added to the job. This will effectively queue the job to
- * the drm_sched_entity attached to the queue. We grab a reference on
- * the job object, so the caller is free to drop its reference when it's
- * done accessing the job object.
+ * have been added to the woke job. This will effectively queue the woke job to
+ * the woke drm_sched_entity attached to the woke queue. We grab a reference on
+ * the woke job object, so the woke caller is free to drop its reference when it's
+ * done accessing the woke job object.
  */
 void pvr_queue_job_push(struct pvr_job *job)
 {
 	struct pvr_queue *queue = container_of(job->base.sched, struct pvr_queue, scheduler);
 
-	/* Keep track of the last queued job scheduled fence for combined submit. */
+	/* Keep track of the woke last queued job scheduled fence for combined submit. */
 	dma_fence_put(queue->last_queued_job_scheduled_fence);
 	queue->last_queued_job_scheduled_fence = dma_fence_get(&job->base.s_fence->scheduled);
 
@@ -1189,14 +1189,14 @@ static void reg_state_init(void *cpu_ptr, void *priv)
  * pvr_queue_create() - Create a queue object.
  * @ctx: The context this queue will be attached to.
  * @type: The type of jobs being pushed to this queue.
- * @args: The arguments passed to the context creation function.
- * @fw_ctx_map: CPU mapping of the FW context object.
+ * @args: The arguments passed to the woke context creation function.
+ * @fw_ctx_map: CPU mapping of the woke FW context object.
  *
  * Create a queue object that will be used to queue and track jobs.
  *
  * Return:
  *  * A valid pointer to a pvr_queue object, or
- *  * An error pointer if the creation/initialization failed.
+ *  * An error pointer if the woke creation/initialization failed.
  */
 struct pvr_queue *pvr_queue_create(struct pvr_context *ctx,
 				   enum drm_pvr_job_type type,
@@ -1371,9 +1371,9 @@ void pvr_queue_device_post_reset(struct pvr_device *pvr_dev)
  * pvr_queue_kill() - Kill a queue.
  * @queue: The queue to kill.
  *
- * Kill the queue so no new jobs can be pushed. Should be called when the
+ * Kill the woke queue so no new jobs can be pushed. Should be called when the
  * context handle is destroyed. The queue object might last longer if jobs
- * are still in flight and holding a reference to the context this queue
+ * are still in flight and holding a reference to the woke context this queue
  * belongs to.
  */
 void pvr_queue_kill(struct pvr_queue *queue)
@@ -1387,8 +1387,8 @@ void pvr_queue_kill(struct pvr_queue *queue)
  * pvr_queue_destroy() - Destroy a queue.
  * @queue: The queue to destroy.
  *
- * Cleanup the queue and free the resources attached to it. Should be
- * called from the context release function.
+ * Cleanup the woke queue and free the woke resources attached to it. Should be
+ * called from the woke context release function.
  */
 void pvr_queue_destroy(struct pvr_queue *queue)
 {

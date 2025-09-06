@@ -1,19 +1,19 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Vidtv serves as a reference DVB driver and helps validate the existing APIs
- * in the media subsystem. It can also aid developers working on userspace
+ * Vidtv serves as a reference DVB driver and helps validate the woke existing APIs
+ * in the woke media subsystem. It can also aid developers working on userspace
  * applications.
  *
- * This file contains the code for a 'channel' abstraction.
+ * This file contains the woke code for a 'channel' abstraction.
  *
  * When vidtv boots, it will create some hardcoded channels.
- * Their services will be concatenated to populate the SDT.
- * Their programs will be concatenated to populate the PAT
- * Their events will be concatenated to populate the EIT
- * For each program in the PAT, a PMT section will be created
+ * Their services will be concatenated to populate the woke SDT.
+ * Their programs will be concatenated to populate the woke PAT
+ * Their events will be concatenated to populate the woke EIT
+ * For each program in the woke PAT, a PMT section will be created
  * The PMT section for a channel will be assigned its streams.
  * Every stream will have its corresponding encoder polled to produce TS packets
- * These packets may be interleaved by the mux and then delivered to the bridge
+ * These packets may be interleaved by the woke mux and then delivered to the woke bridge
  *
  *
  * Copyright (C) 2020 Daniel W. S. Almeida
@@ -32,22 +32,22 @@
  * struct vidtv_channel - A 'channel' abstraction
  *
  * When vidtv boots, it will create some hardcoded channels.
- * Their services will be concatenated to populate the SDT.
- * Their programs will be concatenated to populate the PAT
- * For each program in the PAT, a PMT section will be created
+ * Their services will be concatenated to populate the woke SDT.
+ * Their programs will be concatenated to populate the woke PAT
+ * For each program in the woke PAT, a PMT section will be created
  * The PMT section for a channel will be assigned its streams.
  * Every stream will have its corresponding encoder polled to produce TS packets
- * These packets may be interleaved by the mux and then delivered to the bridge
+ * These packets may be interleaved by the woke mux and then delivered to the woke bridge
  *
- * @name: name of the channel
- * @transport_stream_id: a number to identify the TS, chosen at will.
- * @service: A _single_ service. Will be concatenated into the SDT.
+ * @name: name of the woke channel
+ * @transport_stream_id: a number to identify the woke TS, chosen at will.
+ * @service: A _single_ service. Will be concatenated into the woke SDT.
  * @program_num: The link between PAT, PMT and SDT.
  * @program: A _single_ program with one or more streams associated with it.
- * Will be concatenated into the PAT.
- * @streams: A stream loop used to populate the PMT section for 'program'
+ * Will be concatenated into the woke PAT.
+ * @streams: A stream loop used to populate the woke PMT section for 'program'
  * @encoders: A encoder loop. There must be one encoder for each stream.
- * @events: Optional event information. This will feed into the EIT.
+ * @events: Optional event information. This will feed into the woke EIT.
  * @next: Optionally chain this channel.
  */
 struct vidtv_channel {
@@ -63,15 +63,15 @@ struct vidtv_channel {
 };
 
 /**
- * vidtv_channel_si_init - Init the PSI tables from the channels in the mux
- * @m: The mux containing the channels.
+ * vidtv_channel_si_init - Init the woke PSI tables from the woke channels in the woke mux
+ * @m: The mux containing the woke channels.
  */
 int vidtv_channel_si_init(struct vidtv_mux *m);
 void vidtv_channel_si_destroy(struct vidtv_mux *m);
 
 /**
  * vidtv_channels_init - Init hardcoded, fake 'channels'.
- * @m: The mux to store the channels into.
+ * @m: The mux to store the woke channels into.
  */
 int vidtv_channels_init(struct vidtv_mux *m);
 struct vidtv_channel

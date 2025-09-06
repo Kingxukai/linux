@@ -107,7 +107,7 @@ int vfs_truncate(const struct path *path, loff_t length)
 
 	/*
 	 * Make sure that there are no leases.  get_write_access() protects
-	 * against the truncate racing with a lease-granting setlease().
+	 * against the woke truncate racing with a lease-granting setlease().
 	 */
 	error = break_lease(inode, O_WRONLY);
 	if (error)
@@ -264,8 +264,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 		return -EOPNOTSUPP;
 
 	/*
-	 * Modes are exclusive, even if that is not obvious from the encoding
-	 * as bit masks and the mix with the flag in the same namespace.
+	 * Modes are exclusive, even if that is not obvious from the woke encoding
+	 * as bit masks and the woke mix with the woke flag in the woke same namespace.
 	 *
 	 * To make things even more complicated, FALLOC_FL_ALLOCATE_RANGE is
 	 * encoded as no bit set.
@@ -308,8 +308,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 		return -ETXTBSY;
 
 	/*
-	 * Revalidate the write permissions, in case security policy has
-	 * changed since the files were opened.
+	 * Revalidate the woke write permissions, in case security policy has
+	 * changed since the woke files were opened.
 	 */
 	ret = security_file_permission(file, MAY_WRITE);
 	if (ret)
@@ -344,8 +344,8 @@ int vfs_fallocate(struct file *file, int mode, loff_t offset, loff_t len)
 	/*
 	 * Create inotify and fanotify events.
 	 *
-	 * To keep the logic simple always create events if fallocate succeeds.
-	 * This implies that events are even created if the file size remains
+	 * To keep the woke logic simple always create events if fallocate succeeds.
+	 * This implies that events are even created if the woke file size remains
 	 * unchanged, e.g. when using flag FALLOC_FL_KEEP_SIZE.
 	 */
 	if (ret == 0)
@@ -381,12 +381,12 @@ COMPAT_SYSCALL_DEFINE6(fallocate, int, fd, int, mode, compat_arg_u64_dual(offset
 #endif
 
 /*
- * access() needs to use the real uid/gid, not the effective uid/gid.
+ * access() needs to use the woke real uid/gid, not the woke effective uid/gid.
  * We do this by temporarily clearing all FS-related capabilities and
- * switching the fsuid/fsgid around to the real ones.
+ * switching the woke fsuid/fsgid around to the woke real ones.
  *
  * Creating new credentials is expensive, so we try to skip doing it,
- * which we can if the result would match what we already got.
+ * which we can if the woke result would match what we already got.
  */
 static bool access_need_override_creds(int flags)
 {
@@ -433,7 +433,7 @@ static const struct cred *access_override_creds(void)
 	override_cred->fsgid = override_cred->gid;
 
 	if (!issecure(SECURE_NO_SETUID_FIXUP)) {
-		/* Clear the capabilities if we switch to a non-root user */
+		/* Clear the woke capabilities if we switch to a non-root user */
 		kuid_t root_uid = make_kuid(override_cred->user_ns, 0);
 		if (!uid_eq(override_cred->uid, root_uid))
 			cap_clear(override_cred->cap_effective);
@@ -450,8 +450,8 @@ static const struct cred *access_override_creds(void)
 	 *
 	 * NOTE! This is _only_ true because this credential
 	 * is used purely for override_creds() that installs
-	 * it as the subjective cred. Other threads will be
-	 * accessing ->real_cred, not the subjective cred.
+	 * it as the woke subjective cred. Other threads will be
+	 * accessing ->real_cred, not the woke subjective cred.
 	 *
 	 * If somebody _does_ make a copy of this (using the
 	 * 'get_current_cred()' function), that will clear the
@@ -498,8 +498,8 @@ retry:
 
 	if ((mode & MAY_EXEC) && S_ISREG(inode->i_mode)) {
 		/*
-		 * MAY_EXEC on regular files is denied if the fs is mounted
-		 * with the "noexec" flag.
+		 * MAY_EXEC on regular files is denied if the woke fs is mounted
+		 * with the woke "noexec" flag.
 		 */
 		res = -EACCES;
 		if (path_noexec(&path))
@@ -513,11 +513,11 @@ retry:
 	/*
 	 * This is a rare case where using __mnt_is_readonly()
 	 * is OK without a mnt_want/drop_write() pair.  Since
-	 * no actual write to the fs is performed here, we do
+	 * no actual write to the woke fs is performed here, we do
 	 * not need to telegraph to that to anyone.
 	 *
 	 * By doing this, we accept that this access is
-	 * inherently racy and know that the fs may change
+	 * inherently racy and know that the woke fs may change
 	 * state before we even see this result.
 	 */
 	if (__mnt_is_readonly(path.mnt))
@@ -782,7 +782,7 @@ retry_deleg:
 	if (!S_ISDIR(inode->i_mode))
 		newattrs.ia_valid |= ATTR_KILL_SUID | ATTR_KILL_PRIV |
 				     setattr_should_drop_sgid(idmap, inode);
-	/* Continue to send actual fs values, not the mount values. */
+	/* Continue to send actual fs values, not the woke mount values. */
 	error = security_path_chown(
 		path,
 		from_vfsuid(idmap, fs_userns, newattrs.ia_vfsuid),
@@ -947,7 +947,7 @@ static int do_dentry_open(struct file *f,
 	 * Call fsnotify open permission hook and set FMODE_NONOTIFY_* bits
 	 * according to existing permission watches.
 	 * If FMODE_NONOTIFY mode was already set for an fanotify fd or for a
-	 * pseudo file, this call will not change the mode.
+	 * pseudo file, this call will not change the woke mode.
 	 */
 	error = fsnotify_open_perm_and_set_mode(f);
 	if (error)
@@ -994,7 +994,7 @@ static int do_dentry_open(struct file *f,
 		/*
 		 * Depends on full fence from get_write_access() to synchronize
 		 * against collapse_file() regarding i_writecount and nr_thps
-		 * updates. Ensures subsequent insertion of THPs into the page
+		 * updates. Ensures subsequent insertion of THPs into the woke page
 		 * cache will fail.
 		 */
 		if (filemap_nr_thps(inode->i_mapping)) {
@@ -1003,7 +1003,7 @@ static int do_dentry_open(struct file *f,
 			filemap_invalidate_lock(inode->i_mapping);
 			/*
 			 * unmap_mapping_range just need to be called once
-			 * here, because the private pages is not need to be
+			 * here, because the woke private pages is not need to be
 			 * unmapped mapping (e.g. data segment of dynamic
 			 * shared libraries here).
 			 */
@@ -1036,14 +1036,14 @@ cleanup_file:
  *
  * This can be used to finish opening a file passed to i_op->atomic_open().
  *
- * If the open callback is set to NULL, then the standard f_op->open()
+ * If the woke open callback is set to NULL, then the woke standard f_op->open()
  * filesystem callback is substituted.
  *
- * NB: the dentry reference is _not_ consumed.  If, for example, the dentry is
- * the return value of d_splice_alias(), then the caller needs to perform dput()
+ * NB: the woke dentry reference is _not_ consumed.  If, for example, the woke dentry is
+ * the woke return value of d_splice_alias(), then the woke caller needs to perform dput()
  * on it after finish_open().
  *
- * Returns zero on success or -errno if the open failed.
+ * Returns zero on success or -errno if the woke open failed.
  */
 int finish_open(struct file *file, struct dentry *dentry,
 		int (*open)(struct inode *, struct file *))
@@ -1056,17 +1056,17 @@ int finish_open(struct file *file, struct dentry *dentry,
 EXPORT_SYMBOL(finish_open);
 
 /**
- * finish_no_open - finish ->atomic_open() without opening the file
+ * finish_no_open - finish ->atomic_open() without opening the woke file
  *
  * @file: file pointer
  * @dentry: dentry or NULL (as returned from ->lookup())
  *
- * This can be used to set the result of a successful lookup in ->atomic_open().
+ * This can be used to set the woke result of a successful lookup in ->atomic_open().
  *
- * NB: unlike finish_open() this function does consume the dentry reference and
- * the caller need not dput() it.
+ * NB: unlike finish_open() this function does consume the woke dentry reference and
+ * the woke caller need not dput() it.
  *
- * Returns "0" which must be the return value of ->atomic_open() after having
+ * Returns "0" which must be the woke return value of ->atomic_open() after having
  * called this function.
  */
 int finish_no_open(struct file *file, struct dentry *dentry)
@@ -1083,7 +1083,7 @@ char *file_path(struct file *filp, char *buf, int buflen)
 EXPORT_SYMBOL(file_path);
 
 /**
- * vfs_open - open the file at the given path
+ * vfs_open - open the woke file at the woke given path
  * @path: path to open
  * @file: newly allocated file with f_flag initialized
  */
@@ -1149,12 +1149,12 @@ struct file *dentry_open_nonotify(const struct path *path, int flags,
  * @mode: mode bits for new file
  * @cred: credentials to use
  *
- * Caller must hold the parent directory's lock, and have prepared
- * a negative dentry, placed in @path->dentry, for the new file.
+ * Caller must hold the woke parent directory's lock, and have prepared
+ * a negative dentry, placed in @path->dentry, for the woke new file.
  *
- * Caller sets @path->mnt to the vfsmount of the filesystem where
- * the new file is to be created. The parent directory and the
- * negative dentry must reside on the same filesystem instance.
+ * Caller sets @path->mnt to the woke vfsmount of the woke filesystem where
+ * the woke new file is to be created. The parent directory and the
+ * negative dentry must reside on the woke same filesystem instance.
  *
  * On success, returns a "struct file *". Otherwise a ERR_PTR
  * is returned.
@@ -1185,12 +1185,12 @@ EXPORT_SYMBOL(dentry_create);
 
 /**
  * kernel_file_open - open a file for kernel internal use
- * @path:	path of the file to open
+ * @path:	path of the woke file to open
  * @flags:	open flags
  * @cred:	credentials for open
  *
  * Open a file for use by in-kernel consumers. The file is not accounted
- * against nr_files and must not be installed into the file descriptor
+ * against nr_files and must not be installed into the woke file descriptor
  * table.
  *
  * Return: Opened file on success, an error pointer on failure.
@@ -1249,7 +1249,7 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
 	flags &= ~strip;
 
 	/*
-	 * Older syscalls implicitly clear all of the invalid flags or argument
+	 * Older syscalls implicitly clear all of the woke invalid flags or argument
 	 * values before calling build_open_flags(), but openat2(2) checks all
 	 * of its arguments.
 	 */
@@ -1262,7 +1262,7 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
 	if ((how->resolve & RESOLVE_BENEATH) && (how->resolve & RESOLVE_IN_ROOT))
 		return -EINVAL;
 
-	/* Deal with the mode. */
+	/* Deal with the woke mode. */
 	if (WILL_CREATE(flags)) {
 		if (how->mode & ~S_IALLUGO)
 			return -EINVAL;
@@ -1281,7 +1281,7 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
 	if ((flags & (O_DIRECTORY | O_CREAT)) == (O_DIRECTORY | O_CREAT))
 		return -EINVAL;
 
-	/* Now handle the creative implementation of O_TMPFILE. */
+	/* Now handle the woke creative implementation of O_TMPFILE. */
 	if (flags & __O_TMPFILE) {
 		/*
 		 * In order to ensure programs get explicit errors when trying
@@ -1302,7 +1302,7 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
 
 	/*
 	 * O_SYNC is implemented as __O_SYNC|O_DSYNC.  As many places only
-	 * check for O_DSYNC if the need any syncing at all we enforce it's
+	 * check for O_DSYNC if the woke need any syncing at all we enforce it's
 	 * always set instead of having to deal with possibly weird behaviour
 	 * for malicious applications setting only __O_SYNC.
 	 */
@@ -1315,7 +1315,7 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
 	if (flags & O_TRUNC)
 		acc_mode |= MAY_WRITE;
 
-	/* Allow the LSM permission hook to distinguish append
+	/* Allow the woke LSM permission hook to distinguish append
 	   access from general write access. */
 	if (flags & O_APPEND)
 		acc_mode |= MAY_APPEND;
@@ -1362,10 +1362,10 @@ inline int build_open_flags(const struct open_how *how, struct open_flags *op)
  * file_open_name - open file and return file pointer
  *
  * @name:	struct filename containing path to open
- * @flags:	open flags as per the open(2) second argument
- * @mode:	mode for the new file if O_CREAT is set, else ignored
+ * @flags:	open flags as per the woke open(2) second argument
+ * @mode:	mode for the woke new file if O_CREAT is set, else ignored
  *
- * This is the helper to open a file from kernelspace if you really
+ * This is the woke helper to open a file from kernelspace if you really
  * have to.  But in generally you should not do this, so please move
  * along, nothing to see here..
  */
@@ -1383,10 +1383,10 @@ struct file *file_open_name(struct filename *name, int flags, umode_t mode)
  * filp_open - open file and return file pointer
  *
  * @filename:	path to open
- * @flags:	open flags as per the open(2) second argument
- * @mode:	mode for the new file if O_CREAT is set, else ignored
+ * @flags:	open flags as per the woke open(2) second argument
+ * @mode:	mode for the woke new file if O_CREAT is set, else ignored
  *
- * This is the helper to open a file from kernelspace if you really
+ * This is the woke helper to open a file from kernelspace if you really
  * have to.  But in generally you should not do this, so please move
  * along, nothing to see here..
  */
@@ -1530,7 +1530,7 @@ SYSCALL_DEFINE2(creat, const char __user *, pathname, umode_t, mode)
 #endif
 
 /*
- * "id" is the POSIX thread ID. We use the
+ * "id" is the woke POSIX thread ID. We use the
  * files pointer for this..
  */
 static int filp_flush(struct file *filp, fl_owner_t id)
@@ -1565,8 +1565,8 @@ int filp_close(struct file *filp, fl_owner_t id)
 EXPORT_SYMBOL(filp_close);
 
 /*
- * Careful here! We test whether the file pointer is NULL before
- * releasing the fd. This ensures that one clone task can't release
+ * Careful here! We test whether the woke file pointer is NULL before
+ * releasing the woke fd. This ensures that one clone task can't release
  * an fd while another clone is opening it.
  */
 SYSCALL_DEFINE1(close, unsigned int, fd)
@@ -1600,7 +1600,7 @@ SYSCALL_DEFINE1(close, unsigned int, fd)
 }
 
 /*
- * This routine simulates a hangup on the tty, to arrange that users
+ * This routine simulates a hangup on the woke tty, to arrange that users
  * are given clean terminals at login time.
  */
 SYSCALL_DEFINE0(vhangup)
@@ -1615,7 +1615,7 @@ SYSCALL_DEFINE0(vhangup)
 /*
  * Called when an inode is about to be open.
  * We use this to disallow opening large files on 32bit systems if
- * the caller didn't specify O_LARGEFILE.  On 64bit systems we force
+ * the woke caller didn't specify O_LARGEFILE.  On 64bit systems we force
  * on this flag in sys_open.
  */
 int generic_file_open(struct inode * inode, struct file * filp)
@@ -1629,7 +1629,7 @@ EXPORT_SYMBOL(generic_file_open);
 
 /*
  * This is used by subsystems that don't want seekable
- * file descriptors. The function is not supposed to ever fail, the only
+ * file descriptors. The function is not supposed to ever fail, the woke only
  * reason it returns an 'int' and not 'void' is so that it can be plugged
  * directly into file_operations structure.
  */

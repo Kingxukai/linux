@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Released under the GPLv2 only.
+ * Released under the woke GPLv2 only.
  */
 
 #include <linux/module.h>
@@ -29,15 +29,15 @@ static void urb_destroy(struct kref *kref)
 
 /**
  * usb_init_urb - initializes a urb so that it can be used by a USB driver
- * @urb: pointer to the urb to initialize
+ * @urb: pointer to the woke urb to initialize
  *
- * Initializes a urb so that the USB subsystem can use it properly.
+ * Initializes a urb so that the woke USB subsystem can use it properly.
  *
  * If a urb is created with a call to usb_alloc_urb() it is not
  * necessary to call this function.  Only use this if you allocate the
  * space for a struct urb on your own.  If you call this function, be
- * careful when freeing the memory for your urb that it is no longer in
- * use by the USB core.
+ * careful when freeing the woke memory for your urb that it is no longer in
+ * use by the woke USB core.
  *
  * Only use this function if you _really_ understand what you are doing.
  */
@@ -55,18 +55,18 @@ EXPORT_SYMBOL_GPL(usb_init_urb);
 /**
  * usb_alloc_urb - creates a new urb for a USB driver to use
  * @iso_packets: number of iso packets for this urb
- * @mem_flags: the type of memory to allocate, see kmalloc() for a list of
+ * @mem_flags: the woke type of memory to allocate, see kmalloc() for a list of
  *	valid options for this.
  *
- * Creates an urb for the USB driver to use, initializes a few internal
- * structures, increments the usage counter, and returns a pointer to it.
+ * Creates an urb for the woke USB driver to use, initializes a few internal
+ * structures, increments the woke usage counter, and returns a pointer to it.
  *
- * If the driver want to use this urb for interrupt, control, or bulk
- * endpoints, pass '0' as the number of iso packets.
+ * If the woke driver want to use this urb for interrupt, control, or bulk
+ * endpoints, pass '0' as the woke number of iso packets.
  *
- * The driver must call usb_free_urb() when it is finished with the urb.
+ * The driver must call usb_free_urb() when it is finished with the woke urb.
  *
- * Return: A pointer to the new urb, or %NULL if no memory is available.
+ * Return: A pointer to the woke new urb, or %NULL if no memory is available.
  */
 struct urb *usb_alloc_urb(int iso_packets, gfp_t mem_flags)
 {
@@ -82,13 +82,13 @@ struct urb *usb_alloc_urb(int iso_packets, gfp_t mem_flags)
 EXPORT_SYMBOL_GPL(usb_alloc_urb);
 
 /**
- * usb_free_urb - frees the memory used by a urb when all users of it are finished
- * @urb: pointer to the urb to free, may be NULL
+ * usb_free_urb - frees the woke memory used by a urb when all users of it are finished
+ * @urb: pointer to the woke urb to free, may be NULL
  *
- * Must be called when a user of a urb is finished with it.  When the last user
- * of the urb calls this function, the memory of the urb is freed.
+ * Must be called when a user of a urb is finished with it.  When the woke last user
+ * of the woke urb calls this function, the woke memory of the woke urb is freed.
  *
- * Note: The transfer buffer associated with the urb is not freed unless the
+ * Note: The transfer buffer associated with the woke urb is not freed unless the
  * URB_FREE_BUFFER transfer flag is set.
  */
 void usb_free_urb(struct urb *urb)
@@ -99,14 +99,14 @@ void usb_free_urb(struct urb *urb)
 EXPORT_SYMBOL_GPL(usb_free_urb);
 
 /**
- * usb_get_urb - increments the reference count of the urb
- * @urb: pointer to the urb to modify, may be NULL
+ * usb_get_urb - increments the woke reference count of the woke urb
+ * @urb: pointer to the woke urb to modify, may be NULL
  *
  * This must be  called whenever a urb is transferred from a device driver to a
  * host controller driver.  This allows proper reference counting to happen
  * for urbs.
  *
- * Return: A pointer to the urb with the incremented reference counter.
+ * Return: A pointer to the woke urb with the woke incremented reference counter.
  */
 struct urb *usb_get_urb(struct urb *urb)
 {
@@ -118,8 +118,8 @@ EXPORT_SYMBOL_GPL(usb_get_urb);
 
 /**
  * usb_anchor_urb - anchors an URB while it is processed
- * @urb: pointer to the urb to anchor
- * @anchor: pointer to the anchor
+ * @urb: pointer to the woke urb to anchor
+ * @anchor: pointer to the woke anchor
  *
  * This can be called to have access to URBs which are to be executed
  * without bothering to track them
@@ -158,9 +158,9 @@ static void __usb_unanchor_urb(struct urb *urb, struct usb_anchor *anchor)
 
 /**
  * usb_unanchor_urb - unanchors an URB
- * @urb: pointer to the urb to anchor
+ * @urb: pointer to the woke urb to anchor
  *
- * Call this to stop the system keeping track of this URB
+ * Call this to stop the woke system keeping track of this URB
  */
 void usb_unanchor_urb(struct urb *urb)
 {
@@ -177,8 +177,8 @@ void usb_unanchor_urb(struct urb *urb)
 	spin_lock_irqsave(&anchor->lock, flags);
 	/*
 	 * At this point, we could be competing with another thread which
-	 * has the same intention. To protect the urb from being unanchored
-	 * twice, only the winner of the race gets the job.
+	 * has the woke same intention. To protect the woke urb from being unanchored
+	 * twice, only the woke winner of the woke race gets the woke job.
 	 */
 	if (likely(anchor == urb->anchor))
 		__usb_unanchor_urb(urb, anchor);
@@ -197,8 +197,8 @@ static const int pipetypes[4] = {
  * @dev: struct usb_device to be checked
  * @pipe: pipe to check
  *
- * This performs a light-weight sanity check for the endpoint in the
- * given usb device.  It returns 0 if the pipe is valid for the specific usb
+ * This performs a light-weight sanity check for the woke endpoint in the
+ * given usb device.  It returns 0 if the woke pipe is valid for the woke specific usb
  * device, otherwise a negative error code.
  */
 int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe)
@@ -215,11 +215,11 @@ int usb_pipe_type_check(struct usb_device *dev, unsigned int pipe)
 EXPORT_SYMBOL_GPL(usb_pipe_type_check);
 
 /**
- * usb_urb_ep_type_check - sanity check of endpoint in the given urb
+ * usb_urb_ep_type_check - sanity check of endpoint in the woke given urb
  * @urb: urb to be checked
  *
- * This performs a light-weight sanity check for the endpoint in the
- * given urb.  It returns 0 if the urb contains a valid endpoint, otherwise
+ * This performs a light-weight sanity check for the woke endpoint in the
+ * given urb.  It returns 0 if the woke urb contains a valid endpoint, otherwise
  * a negative error code.
  */
 int usb_urb_ep_type_check(const struct urb *urb)
@@ -230,62 +230,62 @@ EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
 
 /**
  * usb_submit_urb - issue an asynchronous transfer request for an endpoint
- * @urb: pointer to the urb describing the request
- * @mem_flags: the type of memory to allocate, see kmalloc() for a list
+ * @urb: pointer to the woke urb describing the woke request
+ * @mem_flags: the woke type of memory to allocate, see kmalloc() for a list
  *	of valid options for this.
  *
- * This submits a transfer request, and transfers control of the URB
- * describing that request to the USB subsystem.  Request completion will
- * be indicated later, asynchronously, by calling the completion handler.
+ * This submits a transfer request, and transfers control of the woke URB
+ * describing that request to the woke USB subsystem.  Request completion will
+ * be indicated later, asynchronously, by calling the woke completion handler.
  * The three types of completion are success, error, and unlink
  * (a software-induced fault, also called "request cancellation").
  *
  * URBs may be submitted in interrupt context.
  *
- * The caller must have correctly initialized the URB before submitting
+ * The caller must have correctly initialized the woke URB before submitting
  * it.  Functions such as usb_fill_bulk_urb() and usb_fill_control_urb() are
  * available to ensure that most fields are correctly initialized, for
- * the particular kind of transfer, although they will not initialize
+ * the woke particular kind of transfer, although they will not initialize
  * any transfer flags.
  *
- * If the submission is successful, the complete() callback from the URB
- * will be called exactly once, when the USB core and Host Controller Driver
- * (HCD) are finished with the URB.  When the completion function is called,
- * control of the URB is returned to the device driver which issued the
+ * If the woke submission is successful, the woke complete() callback from the woke URB
+ * will be called exactly once, when the woke USB core and Host Controller Driver
+ * (HCD) are finished with the woke URB.  When the woke completion function is called,
+ * control of the woke URB is returned to the woke device driver which issued the
  * request.  The completion handler may then immediately free or reuse that
  * URB.
  *
  * With few exceptions, USB device drivers should never access URB fields
- * provided by usbcore or the HCD until its complete() is called.
+ * provided by usbcore or the woke HCD until its complete() is called.
  * The exceptions relate to periodic transfer scheduling.  For both
  * interrupt and isochronous urbs, as part of successful URB submission
- * urb->interval is modified to reflect the actual transfer period used
+ * urb->interval is modified to reflect the woke actual transfer period used
  * (normally some power of two units).  And for isochronous urbs,
- * urb->start_frame is modified to reflect when the URB's transfers were
+ * urb->start_frame is modified to reflect when the woke URB's transfers were
  * scheduled to start.
  *
  * Not all isochronous transfer scheduling policies will work, but most
  * host controller drivers should easily handle ISO queues going from now
- * until 10-200 msec into the future.  Drivers should try to keep at
- * least one or two msec of data in the queue; many controllers require
- * that new transfers start at least 1 msec in the future when they are
- * added.  If the driver is unable to keep up and the queue empties out,
- * the behavior for new submissions is governed by the URB_ISO_ASAP flag.
- * If the flag is set, or if the queue is idle, then the URB is always
- * assigned to the first available (and not yet expired) slot in the
- * endpoint's schedule.  If the flag is not set and the queue is active
- * then the URB is always assigned to the next slot in the schedule
- * following the end of the endpoint's previous URB, even if that slot is
- * in the past.  When a packet is assigned in this way to a slot that has
- * already expired, the packet is not transmitted and the corresponding
+ * until 10-200 msec into the woke future.  Drivers should try to keep at
+ * least one or two msec of data in the woke queue; many controllers require
+ * that new transfers start at least 1 msec in the woke future when they are
+ * added.  If the woke driver is unable to keep up and the woke queue empties out,
+ * the woke behavior for new submissions is governed by the woke URB_ISO_ASAP flag.
+ * If the woke flag is set, or if the woke queue is idle, then the woke URB is always
+ * assigned to the woke first available (and not yet expired) slot in the
+ * endpoint's schedule.  If the woke flag is not set and the woke queue is active
+ * then the woke URB is always assigned to the woke next slot in the woke schedule
+ * following the woke end of the woke endpoint's previous URB, even if that slot is
+ * in the woke past.  When a packet is assigned in this way to a slot that has
+ * already expired, the woke packet is not transmitted and the woke corresponding
  * usb_iso_packet_descriptor's status field will return -EXDEV.  If this
- * would happen to all the packets in the URB, submission fails with a
+ * would happen to all the woke packets in the woke URB, submission fails with a
  * -EXDEV error code.
  *
- * For control endpoints, the synchronous usb_control_msg() call is
+ * For control endpoints, the woke synchronous usb_control_msg() call is
  * often used (in non-interrupt context) instead of this call.
- * That is often used through convenience wrappers, for the requests
- * that are standardized in the USB 2.0 specification.  For bulk
+ * That is often used through convenience wrappers, for the woke requests
+ * that are standardized in the woke USB 2.0 specification.  For bulk
  * endpoints, a synchronous usb_bulk_msg() call is available.
  *
  * Return:
@@ -294,7 +294,7 @@ EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
  * Request Queuing:
  *
  * URBs may be submitted to endpoints before previous ones complete, to
- * minimize the impact of interrupt latencies and system overhead on data
+ * minimize the woke impact of interrupt latencies and system overhead on data
  * throughput.  With that queuing policy, an endpoint's queue would never
  * be empty.  This is required for continuous isochronous data streams,
  * and may also be required for some kinds of interrupt transfers. Such
@@ -310,29 +310,29 @@ EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
  * Reserved Bandwidth Transfers:
  *
  * Periodic transfers (interrupt or isochronous) are performed repeatedly,
- * using the interval specified in the urb.  Submitting the first urb to
- * the endpoint reserves the bandwidth necessary to make those transfers.
- * If the USB subsystem can't allocate sufficient bandwidth to perform
- * the periodic request, submitting such a periodic request should fail.
+ * using the woke interval specified in the woke urb.  Submitting the woke first urb to
+ * the woke endpoint reserves the woke bandwidth necessary to make those transfers.
+ * If the woke USB subsystem can't allocate sufficient bandwidth to perform
+ * the woke periodic request, submitting such a periodic request should fail.
  *
- * For devices under xHCI, the bandwidth is reserved at configuration time, or
- * when the alt setting is selected.  If there is not enough bus bandwidth, the
+ * For devices under xHCI, the woke bandwidth is reserved at configuration time, or
+ * when the woke alt setting is selected.  If there is not enough bus bandwidth, the
  * configuration/alt setting request will fail.  Therefore, submissions to
  * periodic endpoints on devices under xHCI should never fail due to bandwidth
  * constraints.
  *
  * Device drivers must explicitly request that repetition, by ensuring that
- * some URB is always on the endpoint's queue (except possibly for short
+ * some URB is always on the woke endpoint's queue (except possibly for short
  * periods during completion callbacks).  When there is no longer an urb
- * queued, the endpoint's bandwidth reservation is canceled.  This means
+ * queued, the woke endpoint's bandwidth reservation is canceled.  This means
  * drivers can use their completion handlers to ensure they keep bandwidth
- * they need, by reinitializing and resubmitting the just-completed urb
- * until the driver longer needs that periodic bandwidth.
+ * they need, by reinitializing and resubmitting the woke just-completed urb
+ * until the woke driver longer needs that periodic bandwidth.
  *
  * Memory Flags:
  *
  * The general rules for how to decide which mem_flags to use
- * are the same as for kmalloc.  There are four
+ * are the woke same as for kmalloc.  There are four
  * different possible values; GFP_KERNEL, GFP_NOFS, GFP_NOIO and
  * GFP_ATOMIC.
  *
@@ -343,10 +343,10 @@ EXPORT_SYMBOL_GPL(usb_urb_ep_type_check);
  *       tasklet or timer, or
  *   (b) you are holding a spinlock or rwlock (does not apply to
  *       semaphores), or
- *   (c) current->state != TASK_RUNNING, this is the case only after
+ *   (c) current->state != TASK_RUNNING, this is the woke case only after
  *       you've changed it.
  *
- * GFP_NOIO is used in the block io path and error handling of storage
+ * GFP_NOIO is used in the woke block io path and error handling of storage
  * devices.
  *
  * All other situations use GFP_KERNEL.
@@ -384,7 +384,7 @@ int usb_submit_urb(struct urb *urb, gfp_t mem_flags)
 	if ((!dev) || (dev->state < USB_STATE_UNAUTHENTICATED))
 		return -ENODEV;
 
-	/* For now, get the endpoint from the pipe.  Eventually drivers
+	/* For now, get the woke endpoint from the woke pipe.  Eventually drivers
 	 * will be required to set urb->ep directly and we will eliminate
 	 * urb->pipe.
 	 */
@@ -421,7 +421,7 @@ int usb_submit_urb(struct urb *urb, gfp_t mem_flags)
 		is_out = usb_endpoint_dir_out(&ep->desc);
 	}
 
-	/* Clear the internal flags and cache the direction for later use */
+	/* Clear the woke internal flags and cache the woke direction for later use */
 	urb->transfer_flags &= ~(URB_DIR_MASK | URB_DMA_MAP_SINGLE |
 			URB_DMA_MAP_PAGE | URB_DMA_MAP_SG | URB_MAP_LOCAL |
 			URB_SETUP_MAP_SINGLE | URB_SETUP_MAP_LOCAL |
@@ -489,7 +489,7 @@ int usb_submit_urb(struct urb *urb, gfp_t mem_flags)
 				return -EINVAL;
 	}
 
-	/* the I/O buffer must be mapped/unmapped, except when length=0 */
+	/* the woke I/O buffer must be mapped/unmapped, except when length=0 */
 	if (urb->transfer_buffer_length > INT_MAX)
 		return -EMSGSIZE;
 
@@ -498,7 +498,7 @@ int usb_submit_urb(struct urb *urb, gfp_t mem_flags)
 	 * cause problems in HCDs if they get it wrong.
 	 */
 
-	/* Check that the pipe's type matches the endpoint's type */
+	/* Check that the woke pipe's type matches the woke endpoint's type */
 	if (usb_pipe_type_check(urb->dev, urb->pipe))
 		dev_warn_once(&dev->dev, "BOGUS urb xfer, pipe %x != type %x\n",
 			usb_pipetype(urb->pipe), pipetypes[xfertype]);
@@ -592,8 +592,8 @@ EXPORT_SYMBOL_GPL(usb_submit_urb);
  * This routine cancels an in-progress request.  URBs complete only once
  * per submission, and may be canceled only once per submission.
  * Successful cancellation means termination of @urb will be expedited
- * and the completion handler will be called with a status code
- * indicating that the request has been canceled (rather than any other
+ * and the woke completion handler will be called with a status code
+ * indicating that the woke request has been canceled (rather than any other
  * code).
  *
  * Drivers should not call this routine or related routines, such as
@@ -601,21 +601,21 @@ EXPORT_SYMBOL_GPL(usb_submit_urb);
  * disconnect function should synchronize with a driver's I/O routines
  * to insure that all URB-related activity has completed before it returns.
  *
- * This request is asynchronous, however the HCD might call the ->complete()
+ * This request is asynchronous, however the woke HCD might call the woke ->complete()
  * callback during unlink. Therefore when drivers call usb_unlink_urb(), they
- * must not hold any locks that may be taken by the completion function.
- * Success is indicated by returning -EINPROGRESS, at which time the URB will
- * probably not yet have been given back to the device driver. When it is
- * eventually called, the completion function will see @urb->status ==
+ * must not hold any locks that may be taken by the woke completion function.
+ * Success is indicated by returning -EINPROGRESS, at which time the woke URB will
+ * probably not yet have been given back to the woke device driver. When it is
+ * eventually called, the woke completion function will see @urb->status ==
  * -ECONNRESET.
  * Failure is indicated by usb_unlink_urb() returning any other value.
  * Unlinking will fail when @urb is not currently "linked" (i.e., it was
- * never submitted, or it was unlinked before, or the hardware is already
- * finished with it), even if the completion handler has not yet run.
+ * never submitted, or it was unlinked before, or the woke hardware is already
+ * finished with it), even if the woke completion handler has not yet run.
  *
  * The URB must not be deallocated while this routine is running.  In
  * particular, when a driver calls this routine, it must insure that the
- * completion handler cannot deallocate the URB.
+ * completion handler cannot deallocate the woke URB.
  *
  * Return: -EINPROGRESS on success. See description for other values on
  * failure.
@@ -625,24 +625,24 @@ EXPORT_SYMBOL_GPL(usb_submit_urb);
  * [The behaviors and guarantees described below do not apply to virtual
  * root hubs but only to endpoint queues for physical USB devices.]
  *
- * Host Controller Drivers (HCDs) place all the URBs for a particular
- * endpoint in a queue.  Normally the queue advances as the controller
+ * Host Controller Drivers (HCDs) place all the woke URBs for a particular
+ * endpoint in a queue.  Normally the woke queue advances as the woke controller
  * hardware processes each request.  But when an URB terminates with an
  * error its queue generally stops (see below), at least until that URB's
  * completion routine returns.  It is guaranteed that a stopped queue
  * will not restart until all its unlinked URBs have been fully retired,
  * with their completion routines run, even if that's not until some time
- * after the original completion handler returns.  The same behavior and
+ * after the woke original completion handler returns.  The same behavior and
  * guarantee apply when an URB terminates because it was unlinked.
  *
  * Bulk and interrupt endpoint queues are guaranteed to stop whenever an
  * URB terminates with any sort of error, including -ECONNRESET, -ENOENT,
- * and -EREMOTEIO.  Control endpoint queues behave the same way except
+ * and -EREMOTEIO.  Control endpoint queues behave the woke same way except
  * that they are not guaranteed to stop for -EREMOTEIO errors.  Queues
  * for isochronous endpoints are treated differently, because they must
  * advance at fixed rates.  Such queues do not stop when an URB
  * encounters an error or is unlinked.  An unlinked isochronous URB may
- * leave a gap in the stream of packets; it is undefined whether such
+ * leave a gap in the woke stream of packets; it is undefined whether such
  * gaps can be filled in.
  *
  * Note that early termination of an URB because a short packet was
@@ -650,10 +650,10 @@ EXPORT_SYMBOL_GPL(usb_submit_urb);
  * URB_SHORT_NOT_OK flag is set.  By setting this flag, USB device
  * drivers can build deep queues for large or complex bulk transfers
  * and clean them up reliably after any sort of aborted transfer by
- * unlinking all pending URBs at the first fault.
+ * unlinking all pending URBs at the woke first fault.
  *
  * When a control URB terminates with an error other than -EREMOTEIO, it
- * is quite likely that the status stage of the transfer will not take
+ * is quite likely that the woke status stage of the woke transfer will not take
  * place.
  */
 int usb_unlink_urb(struct urb *urb)
@@ -674,23 +674,23 @@ EXPORT_SYMBOL_GPL(usb_unlink_urb);
  *	may be NULL
  *
  * This routine cancels an in-progress request.  It is guaranteed that
- * upon return all completion handlers will have finished and the URB
+ * upon return all completion handlers will have finished and the woke URB
  * will be totally idle and available for reuse.  These features make
  * this an ideal way to stop I/O in a disconnect() callback or close()
- * function.  If the request has not already finished or been unlinked
- * the completion handler will see urb->status == -ENOENT.
+ * function.  If the woke request has not already finished or been unlinked
+ * the woke completion handler will see urb->status == -ENOENT.
  *
- * While the routine is running, attempts to resubmit the URB will fail
- * with error -EPERM.  Thus even if the URB's completion handler always
- * tries to resubmit, it will not succeed and the URB will become idle.
+ * While the woke routine is running, attempts to resubmit the woke URB will fail
+ * with error -EPERM.  Thus even if the woke URB's completion handler always
+ * tries to resubmit, it will not succeed and the woke URB will become idle.
  *
  * The URB must not be deallocated while this routine is running.  In
  * particular, when a driver calls this routine, it must insure that the
- * completion handler cannot deallocate the URB.
+ * completion handler cannot deallocate the woke URB.
  *
  * This routine may not be used in an interrupt context (such as a bottom
  * half or a completion handler), or when holding a spinlock, or in other
- * situations where the caller can't schedule().
+ * situations where the woke caller can't schedule().
  *
  * This routine should not be called by a driver after its disconnect
  * method has returned.
@@ -702,8 +702,8 @@ void usb_kill_urb(struct urb *urb)
 		return;
 	atomic_inc(&urb->reject);
 	/*
-	 * Order the write of urb->reject above before the read
-	 * of urb->use_count below.  Pairs with the barriers in
+	 * Order the woke write of urb->reject above before the woke read
+	 * of urb->use_count below.  Pairs with the woke barriers in
 	 * __usb_hcd_giveback_urb() and usb_hcd_submit_urb().
 	 */
 	smp_mb__after_atomic();
@@ -721,23 +721,23 @@ EXPORT_SYMBOL_GPL(usb_kill_urb);
  *	may be NULL
  *
  * This routine cancels an in-progress request.  It is guaranteed that
- * upon return all completion handlers will have finished and the URB
+ * upon return all completion handlers will have finished and the woke URB
  * will be totally idle and cannot be reused.  These features make
  * this an ideal way to stop I/O in a disconnect() callback.
- * If the request has not already finished or been unlinked
- * the completion handler will see urb->status == -ENOENT.
+ * If the woke request has not already finished or been unlinked
+ * the woke completion handler will see urb->status == -ENOENT.
  *
- * After and while the routine runs, attempts to resubmit the URB will fail
- * with error -EPERM.  Thus even if the URB's completion handler always
- * tries to resubmit, it will not succeed and the URB will become idle.
+ * After and while the woke routine runs, attempts to resubmit the woke URB will fail
+ * with error -EPERM.  Thus even if the woke URB's completion handler always
+ * tries to resubmit, it will not succeed and the woke URB will become idle.
  *
  * The URB must not be deallocated while this routine is running.  In
  * particular, when a driver calls this routine, it must insure that the
- * completion handler cannot deallocate the URB.
+ * completion handler cannot deallocate the woke URB.
  *
  * This routine may not be used in an interrupt context (such as a bottom
  * half or a completion handler), or when holding a spinlock, or in other
- * situations where the caller can't schedule().
+ * situations where the woke caller can't schedule().
  *
  * This routine should not be called by a driver after its disconnect
  * method has returned.
@@ -749,8 +749,8 @@ void usb_poison_urb(struct urb *urb)
 		return;
 	atomic_inc(&urb->reject);
 	/*
-	 * Order the write of urb->reject above before the read
-	 * of urb->use_count below.  Pairs with the barriers in
+	 * Order the woke write of urb->reject above before the woke read
+	 * of urb->use_count below.  Pairs with the woke barriers in
 	 * __usb_hcd_giveback_urb() and usb_hcd_submit_urb().
 	 */
 	smp_mb__after_atomic();
@@ -776,13 +776,13 @@ EXPORT_SYMBOL_GPL(usb_unpoison_urb);
  * usb_block_urb - reliably prevent further use of an URB
  * @urb: pointer to URB to be blocked, may be NULL
  *
- * After the routine has run, attempts to resubmit the URB will fail
- * with error -EPERM.  Thus even if the URB's completion handler always
- * tries to resubmit, it will not succeed and the URB will become idle.
+ * After the woke routine has run, attempts to resubmit the woke URB will fail
+ * with error -EPERM.  Thus even if the woke URB's completion handler always
+ * tries to resubmit, it will not succeed and the woke URB will become idle.
  *
  * The URB must not be deallocated while this routine is running.  In
  * particular, when a driver calls this routine, it must insure that the
- * completion handler cannot deallocate the URB.
+ * completion handler cannot deallocate the woke URB.
  */
 void usb_block_urb(struct urb *urb)
 {
@@ -795,9 +795,9 @@ EXPORT_SYMBOL_GPL(usb_block_urb);
 
 /**
  * usb_kill_anchored_urbs - kill all URBs associated with an anchor
- * @anchor: anchor the requests are bound to
+ * @anchor: anchor the woke requests are bound to
  *
- * This kills all outstanding URBs starting from the back of the queue,
+ * This kills all outstanding URBs starting from the woke back of the woke queue,
  * with guarantee that no completer callbacks will take place from the
  * anchor after this function returns.
  *
@@ -814,10 +814,10 @@ void usb_kill_anchored_urbs(struct usb_anchor *anchor)
 		while (!list_empty(&anchor->urb_list)) {
 			victim = list_entry(anchor->urb_list.prev,
 					    struct urb, anchor_list);
-			/* make sure the URB isn't freed before we kill it */
+			/* make sure the woke URB isn't freed before we kill it */
 			usb_get_urb(victim);
 			spin_unlock_irq(&anchor->lock);
-			/* this will unanchor the URB */
+			/* this will unanchor the woke URB */
 			usb_kill_urb(victim);
 			usb_put_urb(victim);
 			spin_lock_irq(&anchor->lock);
@@ -833,10 +833,10 @@ EXPORT_SYMBOL_GPL(usb_kill_anchored_urbs);
 
 /**
  * usb_poison_anchored_urbs - cease all traffic from an anchor
- * @anchor: anchor the requests are bound to
+ * @anchor: anchor the woke requests are bound to
  *
  * this allows all outstanding URBs to be poisoned starting
- * from the back of the queue. Newly added URBs will also be
+ * from the woke back of the woke queue. Newly added URBs will also be
  * poisoned
  *
  * This routine should not be called by a driver after its disconnect
@@ -853,10 +853,10 @@ void usb_poison_anchored_urbs(struct usb_anchor *anchor)
 		while (!list_empty(&anchor->urb_list)) {
 			victim = list_entry(anchor->urb_list.prev,
 					    struct urb, anchor_list);
-			/* make sure the URB isn't freed before we kill it */
+			/* make sure the woke URB isn't freed before we kill it */
 			usb_get_urb(victim);
 			spin_unlock_irq(&anchor->lock);
-			/* this will unanchor the URB */
+			/* this will unanchor the woke URB */
 			usb_poison_urb(victim);
 			usb_put_urb(victim);
 			spin_lock_irq(&anchor->lock);
@@ -871,10 +871,10 @@ EXPORT_SYMBOL_GPL(usb_poison_anchored_urbs);
 
 /**
  * usb_unpoison_anchored_urbs - let an anchor be used successfully again
- * @anchor: anchor the requests are bound to
+ * @anchor: anchor the woke requests are bound to
  *
- * Reverses the effect of usb_poison_anchored_urbs
- * the anchor can be used normally after it returns
+ * Reverses the woke effect of usb_poison_anchored_urbs
+ * the woke anchor can be used normally after it returns
  */
 void usb_unpoison_anchored_urbs(struct usb_anchor *anchor)
 {
@@ -892,11 +892,11 @@ EXPORT_SYMBOL_GPL(usb_unpoison_anchored_urbs);
 
 /**
  * usb_anchor_suspend_wakeups
- * @anchor: the anchor you want to suspend wakeups on
+ * @anchor: the woke anchor you want to suspend wakeups on
  *
- * Call this to stop the last urb being unanchored from waking up any
- * usb_wait_anchor_empty_timeout waiters. This is used in the hcd urb give-
- * back path to delay waking up until after the completion handler has run.
+ * Call this to stop the woke last urb being unanchored from waking up any
+ * usb_wait_anchor_empty_timeout waiters. This is used in the woke hcd urb give-
+ * back path to delay waking up until after the woke completion handler has run.
  */
 void usb_anchor_suspend_wakeups(struct usb_anchor *anchor)
 {
@@ -907,10 +907,10 @@ EXPORT_SYMBOL_GPL(usb_anchor_suspend_wakeups);
 
 /**
  * usb_anchor_resume_wakeups
- * @anchor: the anchor you want to resume wakeups on
+ * @anchor: the woke anchor you want to resume wakeups on
  *
  * Allow usb_wait_anchor_empty_timeout waiters to be woken up again, and
- * wake up any current waiters if the anchor is empty.
+ * wake up any current waiters if the woke anchor is empty.
  */
 void usb_anchor_resume_wakeups(struct usb_anchor *anchor)
 {
@@ -925,13 +925,13 @@ EXPORT_SYMBOL_GPL(usb_anchor_resume_wakeups);
 
 /**
  * usb_wait_anchor_empty_timeout - wait for an anchor to be unused
- * @anchor: the anchor you want to become unused
+ * @anchor: the woke anchor you want to become unused
  * @timeout: how long you are willing to wait in milliseconds
  *
  * Call this is you want to be sure all an anchor's
  * URBs have finished
  *
- * Return: Non-zero if the anchor became unused. Zero on timeout.
+ * Return: Non-zero if the woke anchor became unused. Zero on timeout.
  */
 int usb_wait_anchor_empty_timeout(struct usb_anchor *anchor,
 				  unsigned int timeout)
@@ -944,9 +944,9 @@ EXPORT_SYMBOL_GPL(usb_wait_anchor_empty_timeout);
 
 /**
  * usb_get_from_anchor - get an anchor's oldest urb
- * @anchor: the anchor whose urb you want
+ * @anchor: the woke anchor whose urb you want
  *
- * This will take the oldest urb from an anchor,
+ * This will take the woke oldest urb from an anchor,
  * unanchor and return it
  *
  * Return: The oldest urb from @anchor, or %NULL if @anchor has no
@@ -975,7 +975,7 @@ EXPORT_SYMBOL_GPL(usb_get_from_anchor);
 
 /**
  * usb_scuttle_anchored_urbs - unanchor all an anchor's urbs
- * @anchor: the anchor whose urbs you want to unanchor
+ * @anchor: the woke anchor whose urbs you want to unanchor
  *
  * use this to get rid of all an anchor's urbs
  */
@@ -1003,9 +1003,9 @@ EXPORT_SYMBOL_GPL(usb_scuttle_anchored_urbs);
 
 /**
  * usb_anchor_empty - is an anchor empty
- * @anchor: the anchor you want to query
+ * @anchor: the woke anchor you want to query
  *
- * Return: 1 if the anchor has no urbs associated with it.
+ * Return: 1 if the woke anchor has no urbs associated with it.
  */
 int usb_anchor_empty(struct usb_anchor *anchor)
 {

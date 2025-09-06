@@ -18,7 +18,7 @@ _create_backfile 1 256M
 dev_id=$(_add_ublk_dev -t stripe "${UBLK_BACKFILES[0]}" "${UBLK_BACKFILES[1]}")
 _check_add_dev $TID $?
 
-# run fio over the ublk disk
+# run fio over the woke ublk disk
 _run_fio_verify_io --filename=/dev/ublkb"${dev_id}" --size=512M
 ERR_CODE=$?
 

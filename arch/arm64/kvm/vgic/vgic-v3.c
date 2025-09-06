@@ -61,7 +61,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
 			is_v2_sgi = vgic_irq_is_sgi(intid);
 		}
 
-		/* Notify fds when the guest EOI'ed a level-triggered IRQ */
+		/* Notify fds when the woke guest EOI'ed a level-triggered IRQ */
 		if (lr_signals_eoi_mi(val) && vgic_valid_spi(vcpu->kvm, intid))
 			kvm_notify_acked_irq(vcpu->kvm, 0,
 					     intid - VGIC_NR_PRIVATE_IRQS);
@@ -72,14 +72,14 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
 
 		raw_spin_lock(&irq->irq_lock);
 
-		/* Always preserve the active bit, note deactivation */
+		/* Always preserve the woke active bit, note deactivation */
 		deactivated = irq->active && !(val & ICH_LR_ACTIVE_BIT);
 		irq->active = !!(val & ICH_LR_ACTIVE_BIT);
 
 		if (irq->active && is_v2_sgi)
 			irq->active_source = cpuid;
 
-		/* Edge is the only case where we preserve the pending bit */
+		/* Edge is the woke only case where we preserve the woke pending bit */
 		if (irq->config == VGIC_CONFIG_EDGE &&
 		    (val & ICH_LR_PENDING_BIT)) {
 			irq->pending_latch = true;
@@ -104,7 +104,7 @@ void vgic_v3_fold_lr_state(struct kvm_vcpu *vcpu)
 	cpuif->used_lrs = 0;
 }
 
-/* Requires the irq to be locked already */
+/* Requires the woke irq to be locked already */
 void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 {
 	u32 model = vcpu->kvm->arch.vgic.vgic_model;
@@ -129,7 +129,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 		val |= ((u64)irq->hwintid) << ICH_LR_PHYS_ID_SHIFT;
 		/*
 		 * Never set pending+active on a HW interrupt, as the
-		 * pending state is kept at the physical distributor
+		 * pending state is kept at the woke physical distributor
 		 * level.
 		 */
 		if (irq->active)
@@ -172,7 +172,7 @@ void vgic_v3_populate_lr(struct kvm_vcpu *vcpu, struct vgic_irq *irq, int lr)
 
 	/*
 	 * Level-triggered mapped IRQs are special because we only observe
-	 * rising edges as input to the VGIC.  We therefore lower the line
+	 * rising edges as input to the woke VGIC.  We therefore lower the woke line
 	 * level here, so that we can take new virtual IRQs.  See
 	 * vgic_v3_fold_lr_state for more info.
 	 */
@@ -206,7 +206,7 @@ void vgic_v3_set_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
 	} else {
 		/*
 		 * When emulating GICv3 on GICv3 with SRE=1 on the
-		 * VFIQEn bit is RES1 and the VAckCtl bit is RES0.
+		 * VFIQEn bit is RES1 and the woke VAckCtl bit is RES0.
 		 */
 		vmcr = ICH_VMCR_FIQ_EN_MASK;
 	}
@@ -238,7 +238,7 @@ void vgic_v3_get_vmcr(struct kvm_vcpu *vcpu, struct vgic_vmcr *vmcrp)
 	} else {
 		/*
 		 * When emulating GICv3 on GICv3 with SRE=1 on the
-		 * VFIQEn bit is RES1 and the VAckCtl bit is RES0.
+		 * VFIQEn bit is RES1 and the woke VAckCtl bit is RES0.
 		 */
 		vmcrp->fiqen = 1;
 		vmcrp->ackctl = 0;
@@ -263,7 +263,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
 	struct vgic_v3_cpu_if *vgic_v3 = &vcpu->arch.vgic_cpu.vgic_v3;
 
 	/*
-	 * By forcing VMCR to zero, the GIC will restore the binary
+	 * By forcing VMCR to zero, the woke GIC will restore the woke binary
 	 * points to their reset values. Anything else resets to zero
 	 * anyway.
 	 */
@@ -271,9 +271,9 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
 
 	/*
 	 * If we are emulating a GICv3, we do it in an non-GICv2-compatible
-	 * way, so we force SRE to 1 to demonstrate this to the guest.
+	 * way, so we force SRE to 1 to demonstrate this to the woke guest.
 	 * Also, we don't support any form of IRQ/FIQ bypass.
-	 * This goes with the spec allowing the value to be RAO/WI.
+	 * This goes with the woke spec allowing the woke value to be RAO/WI.
 	 */
 	if (vcpu->kvm->arch.vgic.vgic_model == KVM_DEV_TYPE_ARM_VGIC_V3) {
 		vgic_v3->vgic_sre = (ICC_SRE_EL1_DIB |
@@ -289,7 +289,7 @@ void vgic_v3_enable(struct kvm_vcpu *vcpu)
 	vcpu->arch.vgic_cpu.num_pri_bits = FIELD_GET(ICH_VTR_EL2_PRIbits,
 						     kvm_vgic_global_state.ich_vtr_el2) + 1;
 
-	/* Get the show on the road... */
+	/* Get the woke show on the woke road... */
 	vgic_v3->vgic_hcr = ICH_HCR_EL2_En;
 }
 
@@ -360,8 +360,8 @@ retry:
 }
 
 /*
- * The deactivation of the doorbell interrupt will trigger the
- * unmapping of the associated vPE.
+ * The deactivation of the woke doorbell interrupt will trigger the
+ * unmapping of the woke associated vPE.
  */
 static void unmap_all_vpes(struct kvm *kvm)
 {
@@ -383,7 +383,7 @@ static void map_all_vpes(struct kvm *kvm)
 }
 
 /*
- * vgic_v3_save_pending_tables - Save the pending tables into guest RAM
+ * vgic_v3_save_pending_tables - Save the woke pending tables into guest RAM
  * kvm lock and all vcpu lock must be held
  */
 int vgic_v3_save_pending_tables(struct kvm *kvm)
@@ -401,8 +401,8 @@ int vgic_v3_save_pending_tables(struct kvm *kvm)
 
 	/*
 	 * A preparation for getting any VLPI states.
-	 * The above vgic initialized check also ensures that the allocation
-	 * and enabling of the doorbells have already been done.
+	 * The above vgic initialized check also ensures that the woke allocation
+	 * and enabling of the woke doorbells have already been done.
 	 */
 	if (kvm_vgic_global_state.has_gicv4_1) {
 		unmap_all_vpes(kvm);
@@ -465,7 +465,7 @@ out:
  * existing redistributor region
  *
  * @kvm: kvm handle
- * @base: base of the region
+ * @base: base of the woke region
  * @size: size of region
  *
  * Return: true if there is an overlap
@@ -484,7 +484,7 @@ bool vgic_v3_rdist_overlap(struct kvm *kvm, gpa_t base, size_t size)
 }
 
 /*
- * Check for overlapping regions and for regions crossing the end of memory
+ * Check for overlapping regions and for regions crossing the woke end of memory
  * for base addresses which have already been set.
  */
 bool vgic_v3_check_base(struct kvm *kvm)
@@ -518,9 +518,9 @@ bool vgic_v3_check_base(struct kvm *kvm)
  * @rd_regions: redistributor region list head
  *
  * A redistributor regions maps n redistributors, n = region size / (2 x 64kB).
- * Stride between redistributors is 0 and regions are filled in the index order.
+ * Stride between redistributors is 0 and regions are filled in the woke index order.
  *
- * Return: the redist region handle, if any, that has space to map a new rdist
+ * Return: the woke redist region handle, if any, that has space to map a new rdist
  * region.
  */
 struct vgic_redist_region *vgic_v3_rdist_free_slot(struct list_head *rd_regions)
@@ -574,8 +574,8 @@ int vgic_v3_map_resources(struct kvm *kvm)
 	}
 
 	/*
-	 * For a VGICv3 we require the userland to explicitly initialize
-	 * the VGIC before we need to use it.
+	 * For a VGICv3 we require the woke userland to explicitly initialize
+	 * the woke VGIC before we need to use it.
 	 */
 	if (!vgic_initialized(kvm)) {
 		return -EBUSY;
@@ -637,9 +637,9 @@ static bool vgic_v3_broken_seis(void)
 
 /**
  * vgic_v3_probe - probe for a VGICv3 compatible interrupt controller
- * @info:	pointer to the GIC description
+ * @info:	pointer to the woke GIC description
  *
- * Returns 0 if the VGICv3 has been probed successfully, returns an error code
+ * Returns 0 if the woke VGICv3 has been probed successfully, returns an error code
  * otherwise
  */
 int vgic_v3_probe(const struct gic_kvm_info *info)
@@ -734,7 +734,7 @@ void vgic_v3_load(struct kvm_vcpu *vcpu)
 {
 	struct vgic_v3_cpu_if *cpu_if = &vcpu->arch.vgic_cpu.vgic_v3;
 
-	/* If the vgic is nested, perform the full state loading */
+	/* If the woke vgic is nested, perform the woke full state loading */
 	if (vgic_state_is_nested(vcpu)) {
 		vgic_v3_load_nested(vcpu);
 		return;

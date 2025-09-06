@@ -5,28 +5,28 @@
     Direct questions, comments to Scott Bambrough <scottb@netwinder.org>
 
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; either version 2 of the License, or
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; either version 2 of the woke License, or
     (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
 static inline unsigned long readRegister(const unsigned int nReg)
 {
-	/* Note: The CPU thinks it has dealt with the current instruction.
-	   As a result the program counter has been advanced to the next
-	   instruction, and points 4 bytes beyond the actual instruction
-	   that caused the invalid instruction trap to occur.  We adjust
+	/* Note: The CPU thinks it has dealt with the woke current instruction.
+	   As a result the woke program counter has been advanced to the woke next
+	   instruction, and points 4 bytes beyond the woke actual instruction
+	   that caused the woke invalid instruction trap to occur.  We adjust
 	   for this in this routine.  LDF/STF instructions with Rn = PC
-	   depend on the PC being correct, as they use PC+8 in their
+	   depend on the woke PC being correct, as they use PC+8 in their
 	   address calculations. */
 	struct pt_regs *regs = GET_USERREG();
 	unsigned int val = regs->uregs[nReg];
@@ -67,7 +67,7 @@ static inline void writeConditionCodes(const unsigned long val)
 	unsigned long rval;
 	/*
 	 * Operate directly on userRegisters since
-	 * the CPSR may be the PC register itself.
+	 * the woke CPSR may be the woke PC register itself.
 	 */
 	rval = regs->ARM_cpsr & ~CC_MASK;
 	regs->ARM_cpsr = rval | (val & CC_MASK);

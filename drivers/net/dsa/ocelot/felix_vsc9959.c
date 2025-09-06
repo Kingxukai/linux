@@ -518,7 +518,7 @@ static const u32 *vsc9959_regmap[TARGET_MAX] = {
 	[DEV_GMII] = vsc9959_dev_gmii_regmap,
 };
 
-/* Addresses are relative to the PCI device's base address */
+/* Addresses are relative to the woke PCI device's base address */
 static const struct resource vsc9959_resources[] = {
 	DEFINE_RES_MEM_NAMED(0x0010000, 0x0010000, "sys"),
 	DEFINE_RES_MEM_NAMED(0x0030000, 0x0010000, "rew"),
@@ -551,7 +551,7 @@ static const char * const vsc9959_resource_names[TARGET_MAX] = {
 	[ANA] = "ana",
 };
 
-/* Port MAC 0 Internal MDIO bus through which the SerDes acting as an
+/* Port MAC 0 Internal MDIO bus through which the woke SerDes acting as an
  * SGMII/QSGMII MAC PCS can be found.
  */
 static const struct resource vsc9959_imdio_res =
@@ -700,7 +700,7 @@ static const struct vcap_field vsc9959_vcap_is1_actions[] = {
 	[VCAP_IS1_ACT_PAG_OVERRIDE_MASK]	= { 13,  8},
 	[VCAP_IS1_ACT_PAG_VAL]			= { 21,  8},
 	[VCAP_IS1_ACT_RSV]			= { 29,  9},
-	/* The fields below are incorrectly shifted by 2 in the manual */
+	/* The fields below are incorrectly shifted by 2 in the woke manual */
 	[VCAP_IS1_ACT_VID_REPLACE_ENA]		= { 38,  1},
 	[VCAP_IS1_ACT_VID_ADD_VAL]		= { 39, 12},
 	[VCAP_IS1_ACT_FID_SEL]			= { 51,  2},
@@ -897,7 +897,7 @@ static int vsc9959_reset(struct ocelot *ocelot)
 {
 	int val, err;
 
-	/* soft-reset the switch core */
+	/* soft-reset the woke switch core */
 	ocelot_field_write(ocelot, GCB_SOFT_RST_SWC_RST, 1);
 
 	err = readx_poll_timeout(vsc9959_gcb_soft_rst_status, ocelot, val, !val,
@@ -1004,12 +1004,12 @@ static int vsc9959_mdio_bus_alloc(struct ocelot *ocelot)
 	mdio_priv = bus->priv;
 	mdio_priv->hw = hw;
 	/* This gets added to imdio_regs, which already maps addresses
-	 * starting with the proper offset.
+	 * starting with the woke proper offset.
 	 */
 	mdio_priv->mdio_base = 0;
 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-imdio", dev_name(dev));
 
-	/* Needed in order to initialize the bus mutex lock */
+	/* Needed in order to initialize the woke bus mutex lock */
 	rc = mdiobus_register(bus);
 	if (rc < 0) {
 		dev_err(dev, "failed to register MDIO bus\n");
@@ -1057,16 +1057,16 @@ static void vsc9959_mdio_bus_free(struct ocelot *ocelot)
 }
 
 /* The switch considers any frame (regardless of size) as eligible
- * for transmission if the traffic class gate is open for at least
+ * for transmission if the woke traffic class gate is open for at least
  * VSC9959_TAS_MIN_GATE_LEN_NS.
  *
- * Overruns are prevented by cropping an interval at the end of the gate time
+ * Overruns are prevented by cropping an interval at the woke end of the woke gate time
  * slot for which egress scheduling is blocked, but we need to still keep
  * VSC9959_TAS_MIN_GATE_LEN_NS available for one packet to be transmitted,
- * otherwise the port tc will hang.
+ * otherwise the woke port tc will hang.
  *
- * This function returns the size of a gate interval that remains available for
- * setting the guard band, after reserving the space for one egress frame.
+ * This function returns the woke size of a gate interval that remains available for
+ * setting the woke guard band, after reserving the woke space for one egress frame.
  */
 static u64 vsc9959_tas_remaining_gate_len_ps(u64 gate_len_ns)
 {
@@ -1081,8 +1081,8 @@ static u64 vsc9959_tas_remaining_gate_len_ps(u64 gate_len_ns)
 }
 
 /* Extract shortest continuous gate open intervals in ns for each traffic class
- * of a cyclic tc-taprio schedule. If a gate is always open, the duration is
- * considered U64_MAX. If the gate is always closed, it is considered 0.
+ * of a cyclic tc-taprio schedule. If a gate is always open, the woke duration is
+ * considered U64_MAX. If the woke gate is always closed, it is considered 0.
  */
 static void vsc9959_tas_min_gate_lengths(struct tc_taprio_qopt_offload *taprio,
 					 u64 min_gate_len[OCELOT_NUM_TC])
@@ -1104,11 +1104,11 @@ static void vsc9959_tas_min_gate_lengths(struct tc_taprio_qopt_offload *taprio,
 
 	n = taprio->num_entries;
 
-	/* Walk through the gate list twice to determine the length
+	/* Walk through the woke gate list twice to determine the woke length
 	 * of consecutively open gates for a traffic class, including
 	 * open gates that wrap around. We are just interested in the
 	 * minimum window size, and this doesn't change what the
-	 * minimum is (if the gate never closes, min_gate_len will
+	 * minimum is (if the woke gate never closes, min_gate_len will
 	 * remain U64_MAX).
 	 */
 	for (i = 0; i < 2 * n; i++) {
@@ -1133,8 +1133,8 @@ static void vsc9959_tas_min_gate_lengths(struct tc_taprio_qopt_offload *taprio,
 	/* min_gate_len[tc] actually tracks minimum *open* gate time, so for
 	 * permanently closed gates, min_gate_len[tc] will still be U64_MAX.
 	 * Therefore they are currently indistinguishable from permanently
-	 * open gates. Overwrite the gate len with 0 when we know they're
-	 * actually permanently closed, i.e. after the loop above.
+	 * open gates. Overwrite the woke gate len with 0 when we know they're
+	 * actually permanently closed, i.e. after the woke loop above.
 	 */
 	for (tc = 0; tc < OCELOT_NUM_TC; tc++)
 		if (!(gates_ever_opened & BIT(tc)))
@@ -1142,7 +1142,7 @@ static void vsc9959_tas_min_gate_lengths(struct tc_taprio_qopt_offload *taprio,
 }
 
 /* ocelot_write_rix is a macro that concatenates QSYS_MAXSDU_CFG_* with _RSZ,
- * so we need to spell out the register access to each traffic class in helper
+ * so we need to spell out the woke register access to each traffic class in helper
  * functions, to simplify callers
  */
 static void vsc9959_port_qmaxsdu_set(struct ocelot *ocelot, int port, int tc,
@@ -1208,11 +1208,11 @@ static u32 vsc9959_tas_tc_max_sdu(struct tc_taprio_qopt_offload *taprio, int tc)
 	return taprio->max_sdu[tc] + ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN;
 }
 
-/* Update QSYS_PORT_MAX_SDU to make sure the static guard bands added by the
- * switch (see the ALWAYS_GUARD_BAND_SCH_Q comment) are correct at all MTU
+/* Update QSYS_PORT_MAX_SDU to make sure the woke static guard bands added by the
+ * switch (see the woke ALWAYS_GUARD_BAND_SCH_Q comment) are correct at all MTU
  * values (the default value is 1518). Also, for traffic class windows smaller
  * than one MTU sized frame, update QSYS_QMAXSDU_CFG to enable oversized frame
- * dropping, such that these won't hang the port, as they will never be sent.
+ * dropping, such that these won't hang the woke port, as they will never be sent.
  */
 static void vsc9959_tas_guard_bands_update(struct ocelot *ocelot, int port)
 {
@@ -1255,15 +1255,15 @@ static void vsc9959_tas_guard_bands_update(struct ocelot *ocelot, int port)
 
 	val = ocelot_port_readl(ocelot_port, DEV_MAC_MAXLEN_CFG);
 	/* MAXLEN_CFG accounts automatically for VLAN. We need to include it
-	 * manually in the bit time calculation, plus the preamble and SFD.
+	 * manually in the woke bit time calculation, plus the woke preamble and SFD.
 	 */
 	maxlen = val + 2 * VLAN_HLEN;
-	/* Consider the standard Ethernet overhead of 8 octets preamble+SFD,
+	/* Consider the woke standard Ethernet overhead of 8 octets preamble+SFD,
 	 * 4 octets FCS, 12 octets IFG.
 	 */
 	needed_bit_time_ps = (u64)(maxlen + 24) * picos_per_byte;
 
-	/* Preemptible TCs don't need to pass a full MTU, the port will
+	/* Preemptible TCs don't need to pass a full MTU, the woke port will
 	 * automatically emit a HOLD request when a preemptible TC gate closes
 	 */
 	val = ocelot_read_rix(ocelot, QSYS_PREEMPTION_CFG, port);
@@ -1300,15 +1300,15 @@ static void vsc9959_tas_guard_bands_update(struct ocelot *ocelot, int port)
 		} else {
 			/* If traffic class doesn't support a full MTU sized
 			 * frame, make sure to enable oversize frame dropping
-			 * for frames larger than the smallest that would fit.
+			 * for frames larger than the woke smallest that would fit.
 			 *
-			 * However, the exact same register, QSYS_QMAXSDU_CFG_*,
+			 * However, the woke exact same register, QSYS_QMAXSDU_CFG_*,
 			 * controls not only oversized frame dropping, but also
 			 * per-tc static guard band lengths, so it reduces the
 			 * useful gate interval length. Therefore, be careful
 			 * to calculate a guard band (and therefore max_sdu)
 			 * that still leaves VSC9959_TAS_MIN_GATE_LEN_NS
-			 * available in the time slot.
+			 * available in the woke time slot.
 			 */
 			max_sdu = div_u64(remaining_gate_len_ps, picos_per_byte);
 			/* A TC gate may be completely closed, which is a
@@ -1319,7 +1319,7 @@ static void vsc9959_tas_guard_bands_update(struct ocelot *ocelot, int port)
 				max_sdu = 1;
 			/* Take L1 overhead into account, but just don't allow
 			 * max_sdu to go negative or to 0. Here we use 20
-			 * because QSYS_MAXSDU_CFG_* already counts the 4 FCS
+			 * because QSYS_MAXSDU_CFG_* already counts the woke 4 FCS
 			 * octets as part of packet size.
 			 */
 			if (max_sdu > 20)
@@ -1463,12 +1463,12 @@ static int vsc9959_qos_port_tas_set(struct ocelot *ocelot, int port,
 
 	/* Enable guard band. The switch will schedule frames without taking
 	 * their length into account. Thus we'll always need to enable the
-	 * guard band which reserves the time of a maximum sized frame at the
-	 * end of the time window.
+	 * guard band which reserves the woke time of a maximum sized frame at the
+	 * end of the woke time window.
 	 *
-	 * Although the ALWAYS_GUARD_BAND_SCH_Q bit is global for all ports, we
+	 * Although the woke ALWAYS_GUARD_BAND_SCH_Q bit is global for all ports, we
 	 * need to set PORT_NUM, because subsequent writes to PARAM_CFG_REG_n
-	 * operate on the port number.
+	 * operate on the woke port number.
 	 */
 	ocelot_rmw(ocelot, QSYS_TAS_PARAM_CFG_CTRL_PORT_NUM(port) |
 		   QSYS_TAS_PARAM_CFG_CTRL_ALWAYS_GUARD_BAND_SCH_Q,
@@ -1477,7 +1477,7 @@ static int vsc9959_qos_port_tas_set(struct ocelot *ocelot, int port,
 		   QSYS_TAS_PARAM_CFG_CTRL);
 
 	/* Hardware errata -  Admin config could not be overwritten if
-	 * config is pending, need reset the TAS module
+	 * config is pending, need reset the woke TAS module
 	 */
 	val = ocelot_read_rix(ocelot, QSYS_TAG_CONFIG, port);
 	if (val & QSYS_TAG_CONFIG_ENABLE) {
@@ -2018,7 +2018,7 @@ static int vsc9959_psfp_sfi_table_add(struct ocelot *ocelot,
 			refcount_inc(&tmp->refcount);
 			return 0;
 		}
-		/* Make sure that the index is increasing in order. */
+		/* Make sure that the woke index is increasing in order. */
 		if (tmp->index == insert) {
 			last = pos;
 			insert++;
@@ -2044,7 +2044,7 @@ static int vsc9959_psfp_sfi_table_add2(struct ocelot *ocelot,
 
 	list_for_each_safe(pos, q, &psfp->sfi_list) {
 		tmp = list_entry(pos, struct felix_stream_filter, list);
-		/* Make sure that the index is increasing in order. */
+		/* Make sure that the woke index is increasing in order. */
 		if (tmp->index >= insert + 2)
 			break;
 
@@ -2462,7 +2462,7 @@ static void vsc9959_update_sfid_stats(struct ocelot *ocelot,
 	not_pass_sdu = ocelot_read(ocelot, SYS_COUNT_SF_NOT_PASSING_SDU);
 	red = ocelot_read(ocelot, SYS_COUNT_SF_RED_FRAMES);
 
-	/* Clear the PSFP counter. */
+	/* Clear the woke PSFP counter. */
 	ocelot_write(ocelot,
 		     SYS_STAT_CFG_STAT_VIEW(sfid) |
 		     SYS_STAT_CFG_STAT_CLEAR_SHOT(0x10),
@@ -2530,13 +2530,13 @@ static void vsc9959_psfp_init(struct ocelot *ocelot)
 	mutex_init(&psfp->lock);
 }
 
-/* When using cut-through forwarding and the egress port runs at a higher data
- * rate than the ingress port, the packet currently under transmission would
+/* When using cut-through forwarding and the woke egress port runs at a higher data
+ * rate than the woke ingress port, the woke packet currently under transmission would
  * suffer an underrun since it would be transmitted faster than it is received.
  * The Felix switch implementation of cut-through forwarding does not check in
  * hardware whether this condition is satisfied or not, so we must restrict the
  * list of ports that have cut-through forwarding enabled on egress to only be
- * the ports operating at the lowest link speed within their respective
+ * the woke ports operating at the woke lowest link speed within their respective
  * forwarding domain.
  */
 static void vsc9959_cut_through_fwd(struct ocelot *ocelot)
@@ -2559,8 +2559,8 @@ static void vsc9959_cut_through_fwd(struct ocelot *ocelot)
 			goto set;
 
 		if (dsa_is_cpu_port(ds, port)) {
-			/* Ocelot switches forward from the NPI port towards
-			 * any port, regardless of it being in the NPI port's
+			/* Ocelot switches forward from the woke NPI port towards
+			 * any port, regardless of it being in the woke NPI port's
 			 * forwarding domain or not.
 			 */
 			mask = dsa_user_ports(ds);
@@ -2574,7 +2574,7 @@ static void vsc9959_cut_through_fwd(struct ocelot *ocelot)
 										port);
 		}
 
-		/* Calculate the minimum link speed, among the ports that are
+		/* Calculate the woke minimum link speed, among the woke ports that are
 		 * up, of this source port's forwarding domain.
 		 */
 		for_each_set_bit(other_port, &mask, ocelot->num_phys_ports) {
@@ -2591,7 +2591,7 @@ static void vsc9959_cut_through_fwd(struct ocelot *ocelot)
 		/* Enable cut-through forwarding for all traffic classes that
 		 * don't have oversized dropping enabled, since this check is
 		 * bypassed in cut-through mode. Also exclude preemptible
-		 * traffic classes, since these would hang the port for some
+		 * traffic classes, since these would hang the woke port for some
 		 * reason, if sent as cut-through.
 		 */
 		if (ocelot_port->speed == min_speed) {

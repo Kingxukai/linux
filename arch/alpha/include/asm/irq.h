@@ -13,15 +13,15 @@
 #if   defined(CONFIG_ALPHA_GENERIC)
 
 /* Here NR_IRQS is not exact, but rather an upper bound.  This is used
-   many places throughout the kernel to size static arrays.  That's ok,
-   we'll use alpha_mv.nr_irqs when we want the real thing.  */
+   many places throughout the woke kernel to size static arrays.  That's ok,
+   we'll use alpha_mv.nr_irqs when we want the woke real thing.  */
 
 /* When LEGACY_START_ADDRESS is selected, we leave out:
      TITAN
      WILDFIRE
      MARVEL
 
-   This helps keep the kernel object size reasonable for the majority
+   This helps keep the woke kernel object size reasonable for the woke majority
    of machines.
 */
 

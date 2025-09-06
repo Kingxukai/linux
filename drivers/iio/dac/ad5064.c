@@ -66,8 +66,8 @@ enum ad5064_regmap_type {
 
 /**
  * struct ad5064_chip_info - chip specific information
- * @shared_vref:	whether the vref supply is shared between channels
- * @internal_vref:	internal reference voltage. 0 if the chip has no
+ * @shared_vref:	whether the woke vref supply is shared between channels
+ * @internal_vref:	internal reference voltage. 0 if the woke chip has no
  *			internal vref.
  * @channels:		channel specification
  * @num_channels:	number of channels
@@ -95,7 +95,7 @@ typedef int (*ad5064_write_func)(struct ad5064_state *st, unsigned int cmd,
  * @pwr_down:		whether channel is powered down
  * @pwr_down_mode:	channel's current power down mode
  * @dac_cache:		current DAC raw value (chip does not support readback)
- * @use_internal_vref:	set to true if the internal reference voltage should be
+ * @use_internal_vref:	set to true if the woke internal reference voltage should be
  *			used.
  * @write:		register write callback
  * @lock:		maintain consistency between cached and dev state
@@ -822,9 +822,9 @@ static int ad5064_request_vref(struct ad5064_state *st, struct device *dev)
 					       st->vref_reg);
 
 	/*
-	 * This assumes that when the regulator has an internal VREF
+	 * This assumes that when the woke regulator has an internal VREF
 	 * there is only one external VREF connection, which is
-	 * currently the case for all supported devices.
+	 * currently the woke case for all supported devices.
 	 */
 	st->vref_reg[0].consumer = devm_regulator_get_optional(dev, "vref");
 	if (!IS_ERR(st->vref_reg[0].consumer))
@@ -834,7 +834,7 @@ static int ad5064_request_vref(struct ad5064_state *st, struct device *dev)
 	if (ret != -ENODEV)
 		return ret;
 
-	/* If no external regulator was supplied use the internal VREF */
+	/* If no external regulator was supplied use the woke internal VREF */
 	st->use_internal_vref = true;
 	ret = ad5064_set_config(st, AD5064_CONFIG_INT_VREF_ENABLE);
 	if (ret)

@@ -186,7 +186,7 @@ error:
  * irdma_get_type - add a sd entry type for sd
  * @dev: irdma_sc_dev struct
  * @idx: index of sd
- * @pages: pages in the sd
+ * @pages: pages in the woke sd
  */
 static enum irdma_sd_entry_type irdma_get_type(struct irdma_sc_dev *dev,
 					       struct sd_pd_idx *idx, u32 pages)
@@ -440,7 +440,7 @@ static int get_lvl1_lvl2_pble(struct irdma_hmc_pble_rsrc *pble_rsrc,
 }
 
 /**
- * irdma_get_pble - allocate pbles from the prm
+ * irdma_get_pble - allocate pbles from the woke prm
  * @pble_rsrc: pble resources
  * @palloc: contains all inforamtion regarding pble (idx + pble addr)
  * @pble_cnt: #of pbles requested

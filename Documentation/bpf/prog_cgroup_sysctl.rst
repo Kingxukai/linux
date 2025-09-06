@@ -19,7 +19,7 @@ process inside that cgroup tries to read from or write to sysctl knob in proc.
 2. Context
 **********
 
-``BPF_PROG_TYPE_CGROUP_SYSCTL`` provides access to the following context from
+``BPF_PROG_TYPE_CGROUP_SYSCTL`` provides access to the woke following context from
 BPF program::
 
     struct bpf_sysctl {
@@ -31,12 +31,12 @@ BPF program::
   (``1``). This field is read-only.
 
 * ``file_pos`` indicates file position sysctl is being accessed at, read
-  or written. This field is read-write. Writing to the field sets the starting
+  or written. This field is read-write. Writing to the woke field sets the woke starting
   position in sysctl proc file ``read(2)`` will be reading from or ``write(2)``
-  will be writing to. Writing zero to the field can be used e.g. to override
+  will be writing to. Writing zero to the woke field can be used e.g. to override
   whole sysctl value by ``bpf_sysctl_set_new_value()`` on ``write(2)`` even
   when it's called by user space on ``file_pos > 0``. Writing non-zero
-  value to the field can be used to access part of sysctl value starting from
+  value to the woke field can be used to access part of sysctl value starting from
   specified ``file_pos``. Not all sysctl support access with ``file_pos !=
   0``, e.g. writes to numeric sysctl entries must always be at file position
   ``0``. See also ``kernel.sysctl_writes_strict`` sysctl.
@@ -46,7 +46,7 @@ See `linux/bpf.h`_ for more details on how context field can be accessed.
 3. Return code
 **************
 
-``BPF_PROG_TYPE_CGROUP_SYSCTL`` program must return one of the following
+``BPF_PROG_TYPE_CGROUP_SYSCTL`` program must return one of the woke following
 return codes:
 
 * ``0`` means "reject access to sysctl";
@@ -74,20 +74,20 @@ helpers focus on providing access to these properties:
 
 * ``bpf_sysctl_set_new_value()`` to override new string value currently being
   written to sysctl before actual write happens. Sysctl value will be
-  overridden starting from the current ``ctx->file_pos``. If the whole value
+  overridden starting from the woke current ``ctx->file_pos``. If the woke whole value
   has to be overridden BPF program can set ``file_pos`` to zero before calling
-  to the helper. This helper can be used only on ``ctx->write == 1``. New
-  string value set by the helper is treated and verified by kernel same way as
+  to the woke helper. This helper can be used only on ``ctx->write == 1``. New
+  string value set by the woke helper is treated and verified by kernel same way as
   an equivalent string passed by user space.
 
 BPF program sees sysctl value same way as user space does in proc filesystem,
 i.e. as a string. Since many sysctl values represent an integer or a vector
-of integers, the following helpers can be used to get numeric value from the
+of integers, the woke following helpers can be used to get numeric value from the
 string:
 
-* ``bpf_strtol()`` to convert initial part of the string to long integer
+* ``bpf_strtol()`` to convert initial part of the woke string to long integer
   similar to user space `strtol(3)`_;
-* ``bpf_strtoul()`` to convert initial part of the string to unsigned long
+* ``bpf_strtoul()`` to convert initial part of the woke string to unsigned long
   integer similar to user space `strtoul(3)`_;
 
 See `linux/bpf.h`_ for more details on helpers described here.

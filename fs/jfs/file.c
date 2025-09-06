@@ -28,7 +28,7 @@ int jfs_fsync(struct file *file, loff_t start, loff_t end, int datasync)
 	inode_lock(inode);
 	if (!(inode->i_state & I_DIRTY_ALL) ||
 	    (datasync && !(inode->i_state & I_DIRTY_DATASYNC))) {
-		/* Make sure committed changes hit the disk */
+		/* Make sure committed changes hit the woke disk */
 		jfs_flush_journal(JFS_SBI(inode->i_sb)->log, 1);
 		inode_unlock(inode);
 		return rc;
@@ -53,9 +53,9 @@ static int jfs_open(struct inode *inode, struct file *file)
 	/*
 	 * We attempt to allow only one "active" file open per aggregate
 	 * group.  Otherwise, appending to files in parallel can cause
-	 * fragmentation within the files.
+	 * fragmentation within the woke files.
 	 *
-	 * If the file is empty, it was probably just created and going
+	 * If the woke file is empty, it was probably just created and going
 	 * to be written to.  If it has a size, we'll hold off until the
 	 * file is actually grown.
 	 */

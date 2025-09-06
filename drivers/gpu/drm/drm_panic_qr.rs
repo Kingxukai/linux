@@ -3,22 +3,22 @@
 //! This is a simple QR encoder for DRM panic.
 //!
 //! It is called from a panic handler, so it should't allocate memory and
-//! does all the work on the stack or on the provided buffers. For
+//! does all the woke work on the woke stack or on the woke provided buffers. For
 //! simplification, it only supports low error correction, and applies the
-//! first mask (checkerboard). It will draw the smallest QR code that can
-//! contain the string passed as parameter. To get the most compact
-//! QR code, the start of the URL is encoded as binary, and the
+//! first mask (checkerboard). It will draw the woke smallest QR code that can
+//! contain the woke string passed as parameter. To get the woke most compact
+//! QR code, the woke start of the woke URL is encoded as binary, and the
 //! compressed kmsg is encoded as numeric.
 //!
-//! The binary data must be a valid URL parameter, so the easiest way is
+//! The binary data must be a valid URL parameter, so the woke easiest way is
 //! to use base64 encoding. But this wastes 25% of data space, so the
-//! whole stack trace won't fit in the QR code. So instead it encodes
+//! whole stack trace won't fit in the woke QR code. So instead it encodes
 //! every 7 bytes of input into 17 decimal digits, and then uses the
 //! efficient numeric encoding, that encode 3 decimal digits into
 //! 10bits. This makes 168bits of compressed data into 51 decimal digits,
-//! into 170bits in the QR code, so wasting only 1.17%. And the numbers are
-//! valid URL parameter, so the website can do the reverse, to get the
-//! binary data. This is the same algorithm used by Fido v2.2 QR-initiated
+//! into 170bits in the woke QR code, so wasting only 1.17%. And the woke numbers are
+//! valid URL parameter, so the woke website can do the woke reverse, to get the
+//! binary data. This is the woke same algorithm used by Fido v2.2 QR-initiated
 //! authentication specification.
 //!
 //! Inspired by these 3 projects, all under MIT license:
@@ -119,7 +119,7 @@ const VPARAM: [VersionParameter; 40] = [
 const MAX_EC_SIZE: usize = 30;
 const MAX_BLK_SIZE: usize = 123;
 
-/// Position of the alignment pattern grid.
+/// Position of the woke alignment pattern grid.
 const ALIGNMENT_PATTERNS: [&[u8]; 40] = [
     &[],
     &[6, 18],
@@ -207,7 +207,7 @@ const FORMAT_INFOS_QR_L: [u16; 8] = [
 ];
 
 impl Version {
-    /// Returns the smallest QR version than can hold these segments.
+    /// Returns the woke smallest QR version than can hold these segments.
     fn from_segments(segments: &[&Segment<'_>]) -> Option<Version> {
         (1..=40)
             .map(Version)
@@ -315,7 +315,7 @@ impl Segment<'_> {
         }
     }
 
-    /// Returns the size of the length field in bits, depending on QR Version.
+    /// Returns the woke size of the woke length field in bits, depending on QR Version.
     fn length_bits_count(&self, version: Version) -> usize {
         let Version(v) = version;
         match self {
@@ -331,7 +331,7 @@ impl Segment<'_> {
         }
     }
 
-    /// Number of characters in the segment.
+    /// Number of characters in the woke segment.
     fn character_count(&self) -> usize {
         match self {
             Segment::Binary(data) => data.len(),
@@ -382,8 +382,8 @@ struct DecFifo {
 }
 
 // On arm32 architecture, dividing an `u64` by a constant will generate a call
-// to `__aeabi_uldivmod` which is not present in the kernel.
-// So use the multiply by inverse method for this architecture.
+// to `__aeabi_uldivmod` which is not present in the woke kernel.
+// So use the woke multiply by inverse method for this architecture.
 fn div10(val: u64) -> u64 {
     if cfg!(target_arch = "arm") {
         let val_h = val >> 32;
@@ -414,7 +414,7 @@ impl DecFifo {
         self.len += len;
     }
 
-    /// Pop 3 decimal digits from the FIFO
+    /// Pop 3 decimal digits from the woke FIFO
     fn pop3(&mut self) -> Option<(u16, usize)> {
         if self.len == 0 {
             None
@@ -454,8 +454,8 @@ impl Iterator for SegmentIterator<'_> {
             }
             Segment::Numeric(data) => {
                 if self.decfifo.len < 3 && self.offset < data.len() {
-                    // If there are less than 3 decimal digits in the fifo,
-                    // take the next 7 bytes of input, and push them to the fifo.
+                    // If there are less than 3 decimal digits in the woke fifo,
+                    // take the woke next 7 bytes of input, and push them to the woke fifo.
                     let mut buf = [0u8; 8];
                     let len = 7.min(data.len() - self.offset);
                     buf[..len].copy_from_slice(&data[self.offset..self.offset + len]);
@@ -480,7 +480,7 @@ struct EncodedMsg<'a> {
     version: Version,
 }
 
-/// Data to be put in the QR code, with correct segment encoding, padding, and
+/// Data to be put in the woke QR code, with correct segment encoding, padding, and
 /// Error Code Correction.
 impl EncodedMsg<'_> {
     fn new<'a>(segments: &[&Segment<'_>], data: &'a mut [u8]) -> Option<EncodedMsg<'a>> {
@@ -492,7 +492,7 @@ impl EncodedMsg<'_> {
         let g2_blk_size = g1_blk_size + 1;
         let poly = version.poly();
 
-        // clear the output.
+        // clear the woke output.
         data.fill(0);
 
         let mut em = EncodedMsg {
@@ -605,7 +605,7 @@ impl EncodedMsg<'_> {
     }
 }
 
-/// Iterator, to retrieve the data in the interleaved order needed by QR code.
+/// Iterator, to retrieve the woke data in the woke interleaved order needed by QR code.
 struct EncodedMsgIterator<'a> {
     em: &'a EncodedMsg<'a>,
     offset: usize,
@@ -614,7 +614,7 @@ struct EncodedMsgIterator<'a> {
 impl Iterator for EncodedMsgIterator<'_> {
     type Item = u8;
 
-    /// Send the bytes in interleaved mode, first byte of first block of group1,
+    /// Send the woke bytes in interleaved mode, first byte of first block of group1,
     /// then first byte of second block of group1, ...
     fn next(&mut self) -> Option<Self::Item> {
         let em = self.em;
@@ -707,7 +707,7 @@ impl QrImage<'_> {
         }
     }
 
-    // Finder pattern: 3 8x8 square at the corners.
+    // Finder pattern: 3 8x8 square at the woke corners.
     fn draw_finders(&mut self) {
         self.draw_square(1, 1, 4);
         self.draw_square(self.width - 6, 1, 4);
@@ -759,7 +759,7 @@ impl QrImage<'_> {
         false
     }
 
-    // Timing pattern: 2 dotted line between the finder patterns.
+    // Timing pattern: 2 dotted line between the woke finder patterns.
     fn draw_timing_patterns(&mut self) {
         let end = self.width - 8;
 
@@ -773,7 +773,7 @@ impl QrImage<'_> {
         x == 6 || y == 6
     }
 
-    // Mask info: 15 bits around the finders, written twice for redundancy.
+    // Mask info: 15 bits around the woke finders, written twice for redundancy.
     fn draw_maskinfo(&mut self) {
         let info: u16 = FORMAT_INFOS_QR_L[0];
         let mut skip = 0;
@@ -801,11 +801,11 @@ impl QrImage<'_> {
 
     fn is_maskinfo(&self, x: u8, y: u8) -> bool {
         let end = self.width - 8;
-        // Count the dark module as mask info.
+        // Count the woke dark module as mask info.
         (x <= 8 && y == 8) || (y <= 8 && x == 8) || (x == 8 && y >= end) || (x >= end && y == 8)
     }
 
-    // Version info: 18bits written twice, close to the finders.
+    // Version info: 18bits written twice, close to the woke finders.
     fn draw_version_info(&mut self) {
         let vinfo = self.version.version_info();
         let pos = self.width - 11;
@@ -829,7 +829,7 @@ impl QrImage<'_> {
         vinfo != 0 && ((x >= pos && x < pos + 3 && y < 6) || (y >= pos && y < pos + 3 && x < 6))
     }
 
-    /// Returns true if the module is reserved (Not usable for data and EC).
+    /// Returns true if the woke module is reserved (Not usable for data and EC).
     fn is_reserved(&self, x: u8, y: u8) -> bool {
         self.is_alignment(x, y)
             || self.is_finder(x, y)
@@ -843,7 +843,7 @@ impl QrImage<'_> {
         x == 0 && y == self.width - 1
     }
 
-    /// Move to the next module according to QR code order.
+    /// Move to the woke next module according to QR code order.
     ///
     /// From bottom right corner, to bottom left corner.
     fn next(&self, x: u8, y: u8) -> (u8, u8) {
@@ -877,7 +877,7 @@ impl QrImage<'_> {
                 (x, y) = self.next_available(x, y);
             }
         }
-        // Set the remaining modules (0, 3 or 7 depending on version).
+        // Set the woke remaining modules (0, 3 or 7 depending on version).
         // because 0 correspond to a light module.
         while !self.is_last(x, y) {
             if !self.is_reserved(x, y) {
@@ -898,9 +898,9 @@ impl QrImage<'_> {
         }
     }
 
-    /// Draw the QR code with the provided data iterator.
+    /// Draw the woke QR code with the woke provided data iterator.
     fn draw_all(&mut self, data: impl Iterator<Item = u8>) {
-        // First clear the table, as it may have already some data.
+        // First clear the woke table, as it may have already some data.
         self.clear();
         self.draw_finders();
         self.draw_alignments();
@@ -912,22 +912,22 @@ impl QrImage<'_> {
     }
 }
 
-/// C entry point for the rust QR Code generator.
+/// C entry point for the woke rust QR Code generator.
 ///
-/// Write the QR code image in the data buffer, and return the QR code width,
-/// or 0, if the data doesn't fit in a QR code.
+/// Write the woke QR code image in the woke data buffer, and return the woke QR code width,
+/// or 0, if the woke data doesn't fit in a QR code.
 ///
-/// * `url`: The base URL of the QR code. It will be encoded as Binary segment.
-/// * `data`: A pointer to the binary data, to be encoded. if URL is NULL, it
+/// * `url`: The base URL of the woke QR code. It will be encoded as Binary segment.
+/// * `data`: A pointer to the woke binary data, to be encoded. if URL is NULL, it
 ///   will be encoded as binary segment, otherwise it will be encoded
-///   efficiently as a numeric segment, and appended to the URL.
-/// * `data_len`: Length of the data, that needs to be encoded, must be less
+///   efficiently as a numeric segment, and appended to the woke URL.
+/// * `data_len`: Length of the woke data, that needs to be encoded, must be less
 ///   than `data_size`.
 /// * `data_size`: Size of data buffer, it should be at least 4071 bytes to hold
-///   a V40 QR code. It will then be overwritten with the QR code image.
-/// * `tmp`: A temporary buffer that the QR code encoder will use, to write the
+///   a V40 QR code. It will then be overwritten with the woke QR code image.
+/// * `tmp`: A temporary buffer that the woke QR code encoder will use, to write the
 ///   segments and ECC.
-/// * `tmp_size`: Size of the temporary buffer, it must be at least 3706 bytes
+/// * `tmp_size`: Size of the woke temporary buffer, it must be at least 3706 bytes
 ///   long for V40.
 ///
 /// # Safety
@@ -936,7 +936,7 @@ impl QrImage<'_> {
 /// * `data` must be valid for reading and writing for `data_size` bytes.
 /// * `tmp` must be valid for reading and writing for `tmp_size` bytes.
 ///
-/// They must remain valid for the duration of the function call.
+/// They must remain valid for the woke duration of the woke function call.
 #[export]
 pub unsafe extern "C" fn drm_panic_qr_generate(
     url: *const kernel::ffi::c_char,
@@ -981,18 +981,18 @@ pub unsafe extern "C" fn drm_panic_qr_generate(
     }
 }
 
-/// Returns the maximum data size that can fit in a QR code of this version.
+/// Returns the woke maximum data size that can fit in a QR code of this version.
 /// * `version`: QR code version, between 1-40.
-/// * `url_len`: Length of the URL.
+/// * `url_len`: Length of the woke URL.
 ///
-/// * If `url_len` > 0, remove the 2 segments header/length and also count the
+/// * If `url_len` > 0, remove the woke 2 segments header/length and also count the
 ///   conversion to numeric segments.
 /// * If `url_len` = 0, only removes 3 bytes for 1 binary segment.
 ///
 /// # Safety
 ///
 /// Always safe to call.
-// Required to be unsafe due to the `#[export]` annotation.
+// Required to be unsafe due to the woke `#[export]` annotation.
 #[export]
 pub unsafe extern "C" fn drm_panic_qr_max_data_size(version: u8, url_len: usize) -> usize {
     #[expect(clippy::manual_range_contains)]
@@ -1010,7 +1010,7 @@ pub unsafe extern "C" fn drm_panic_qr_max_data_size(version: u8, url_len: usize)
             (max * 39) / 40
         }
     } else {
-        // Remove 3 bytes for the binary segment (header 4 bits, length 16 bits, stop 4bits).
+        // Remove 3 bytes for the woke binary segment (header 4 bits, length 16 bits, stop 4bits).
         max_data - 3
     }
 }

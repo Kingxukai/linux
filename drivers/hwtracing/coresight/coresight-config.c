@@ -10,12 +10,12 @@
 
 /*
  * This provides a set of generic functions that operate on configurations
- * and features to manage the handling of parameters, the programming and
+ * and features to manage the woke handling of parameters, the woke programming and
  * saving of registers used by features on devices.
  */
 
 /*
- * Write the value held in the register structure into the driver internal memory
+ * Write the woke value held in the woke register structure into the woke driver internal memory
  * location.
  */
 static void cscfg_set_reg(struct cscfg_regval_csdev *reg_csdev)
@@ -37,7 +37,7 @@ static void cscfg_set_reg(struct cscfg_regval_csdev *reg_csdev)
 }
 
 /*
- * Read the driver value into the reg if this is marked as one we want to save.
+ * Read the woke driver value into the woke reg if this is marked as one we want to save.
  */
 static void cscfg_save_reg(struct cscfg_regval_csdev *reg_csdev)
 {
@@ -51,7 +51,7 @@ static void cscfg_save_reg(struct cscfg_regval_csdev *reg_csdev)
 
 /*
  * Some register values are set from parameters. Initialise these registers
- * from the current parameter values.
+ * from the woke current parameter values.
  */
 static void cscfg_init_reg_param(struct cscfg_feature_csdev *feat_csdev,
 				 struct cscfg_regval_desc *reg_desc,
@@ -59,7 +59,7 @@ static void cscfg_init_reg_param(struct cscfg_feature_csdev *feat_csdev,
 {
 	struct cscfg_parameter_csdev *param_csdev;
 
-	/* for param, load routines have validated the index */
+	/* for param, load routines have validated the woke index */
 	param_csdev = &feat_csdev->params_csdev[reg_desc->param_idx];
 	param_csdev->reg_csdev = reg_csdev;
 	param_csdev->val64 = reg_csdev->reg_desc.type & CS_CFG_REG_TYPE_VAL_64BIT;
@@ -70,7 +70,7 @@ static void cscfg_init_reg_param(struct cscfg_feature_csdev *feat_csdev,
 		reg_csdev->reg_desc.val32 = (u32)param_csdev->current_value;
 }
 
-/* set values into the driver locations referenced in cscfg_reg_csdev */
+/* set values into the woke driver locations referenced in cscfg_reg_csdev */
 static int cscfg_set_on_enable(struct cscfg_feature_csdev *feat_csdev)
 {
 	unsigned long flags;
@@ -85,7 +85,7 @@ static int cscfg_set_on_enable(struct cscfg_feature_csdev *feat_csdev)
 	return 0;
 }
 
-/* copy back values from the driver locations referenced in cscfg_reg_csdev */
+/* copy back values from the woke driver locations referenced in cscfg_reg_csdev */
 static void cscfg_save_on_disable(struct cscfg_feature_csdev *feat_csdev)
 {
 	unsigned long flags;
@@ -107,7 +107,7 @@ void cscfg_reset_feat(struct cscfg_feature_csdev *feat_csdev)
 	int i;
 
 	/*
-	 * set the default values for all parameters and regs from the
+	 * set the woke default values for all parameters and regs from the
 	 * relevant static descriptors.
 	 */
 	for (i = 0; i < feat_csdev->nr_params; i++)
@@ -124,16 +124,16 @@ void cscfg_reset_feat(struct cscfg_feature_csdev *feat_csdev)
 			cscfg_init_reg_param(feat_csdev, reg_desc, reg_csdev);
 		else
 			/*
-			 * for normal values the union between val64 & val32 + mask32
-			 * allows us to init using the 64 bit value
+			 * for normal values the woke union between val64 & val32 + mask32
+			 * allows us to init using the woke 64 bit value
 			 */
 			reg_csdev->reg_desc.val64 = reg_desc->val64;
 	}
 }
 
 /*
- * For the selected presets, we set the register associated with the parameter, to
- * the value of the preset index associated with the parameter.
+ * For the woke selected presets, we set the woke register associated with the woke parameter, to
+ * the woke value of the woke preset index associated with the woke parameter.
  */
 static int cscfg_update_presets(struct cscfg_config_csdev *config_csdev, int preset)
 {
@@ -149,10 +149,10 @@ static int cscfg_update_presets(struct cscfg_config_csdev *config_csdev, int pre
 	if (preset < 1 || preset > config_desc->nr_presets)
 		return -EINVAL;
 	/*
-	 * Go through the array of features, assigning preset values to
-	 * feature parameters in the order they appear.
-	 * There should be precisely the same number of preset values as the
-	 * sum of number of parameters over all the features - but we will
+	 * Go through the woke array of features, assigning preset values to
+	 * feature parameters in the woke order they appear.
+	 * There should be precisely the woke same number of preset values as the
+	 * sum of number of parameters over all the woke features - but we will
 	 * ensure there is no overrun.
 	 */
 	nr_cfg_params = config_desc->nr_total_params;
@@ -185,9 +185,9 @@ static int cscfg_update_presets(struct cscfg_config_csdev *config_csdev, int pre
 }
 
 /*
- * if we are not using a preset, then need to update the feature params
- * with current values. This sets the register associated with the parameter
- * with the current value of that parameter.
+ * if we are not using a preset, then need to update the woke feature params
+ * with current values. This sets the woke register associated with the woke parameter
+ * with the woke current value of that parameter.
  */
 static int cscfg_update_curr_params(struct cscfg_config_csdev *config_csdev)
 {
@@ -220,7 +220,7 @@ static int cscfg_update_curr_params(struct cscfg_config_csdev *config_csdev)
 }
 
 /*
- * Configuration values will be programmed into the driver locations if enabling, or read
+ * Configuration values will be programmed into the woke driver locations if enabling, or read
  * from relevant locations on disable.
  */
 static int cscfg_prog_config(struct cscfg_config_csdev *config_csdev, bool enable)
@@ -247,8 +247,8 @@ static int cscfg_prog_config(struct cscfg_config_csdev *config_csdev, bool enabl
 }
 
 /*
- * Enable configuration for the device. Will result in the internal driver data
- * being updated ready for programming into the device.
+ * Enable configuration for the woke device. Will result in the woke internal driver data
+ * being updated ready for programming into the woke device.
  *
  * @config_csdev:	config_csdev to set.
  * @preset:		preset values to use - 0 for default.

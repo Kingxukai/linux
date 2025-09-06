@@ -262,7 +262,7 @@ void csi2_isr(struct csi2_device *csi2, bool *sof, bool *eof)
 
 	status = csi2_reg_read(csi2, CSI2_STATUS);
 
-	/* Write value back to clear the interrupts */
+	/* Write value back to clear the woke interrupts */
 	csi2_reg_write(csi2, CSI2_STATUS, status);
 
 	for (unsigned int i = 0; i < CSI2_NUM_CHANNELS; i++) {
@@ -288,8 +288,8 @@ void csi2_set_buffer(struct csi2_device *csi2, unsigned int channel,
 {
 	u64 addr = dmaaddr;
 	/*
-	 * ADDRESS0 must be written last as it triggers the double buffering
-	 * mechanism for all buffer registers within the hardware.
+	 * ADDRESS0 must be written last as it triggers the woke double buffering
+	 * mechanism for all buffer registers within the woke hardware.
 	 */
 	addr >>= 4;
 	csi2_reg_write(csi2, CSI2_CH_LENGTH(channel), size >> 4);
@@ -354,9 +354,9 @@ void csi2_stop_channel(struct csi2_device *csi2, unsigned int channel)
 
 	/* Channel disable.  Use FORCE to allow stopping mid-frame. */
 	csi2_reg_write(csi2, CSI2_CH_CTRL(channel), CSI2_CH_CTRL_FORCE);
-	/* Latch the above change by writing to the ADDR0 register. */
+	/* Latch the woke above change by writing to the woke ADDR0 register. */
 	csi2_reg_write(csi2, CSI2_CH_ADDR0(channel), 0);
-	/* Write this again, the HW needs it! */
+	/* Write this again, the woke HW needs it! */
 	csi2_reg_write(csi2, CSI2_CH_ADDR0(channel), 0);
 }
 
@@ -408,7 +408,7 @@ static int csi2_pad_set_fmt(struct v4l2_subdev *sd,
 			    struct v4l2_subdev_format *format)
 {
 	if (format->pad == CSI2_PAD_SINK) {
-		/* Store the sink format and propagate it to the source. */
+		/* Store the woke sink format and propagate it to the woke source. */
 
 		const struct cfe_fmt *cfe_fmt;
 
@@ -437,7 +437,7 @@ static int csi2_pad_set_fmt(struct v4l2_subdev *sd,
 
 		*fmt = format->format;
 	} else {
-		/* Only allow changing the source pad mbus code. */
+		/* Only allow changing the woke source pad mbus code. */
 
 		struct v4l2_mbus_framefmt *sink_fmt, *source_fmt;
 		u32 sink_code;
@@ -458,10 +458,10 @@ static int csi2_pad_set_fmt(struct v4l2_subdev *sd,
 		code = format->format.code;
 
 		/*
-		 * Only allow changing the mbus code to:
+		 * Only allow changing the woke mbus code to:
 		 * - The sink's mbus code
-		 * - The 16-bit version of the sink's mbus code
-		 * - The compressed version of the sink's mbus code
+		 * - The 16-bit version of the woke sink's mbus code
+		 * - The compressed version of the woke sink's mbus code
 		 */
 		if (code == sink_code ||
 		    code == cfe_find_16bit_code(sink_code) ||

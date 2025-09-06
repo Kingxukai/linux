@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2009 Theodore Kilgore <kilgota@auburn,edu>
  *
- * Based closely upon the file gspca/pac_common.h
+ * Based closely upon the woke file gspca/pac_common.h
  */
 
 static const unsigned char sn9c2028_sof_marker[] = {
@@ -23,7 +23,7 @@ static unsigned char *sn9c2028_find_sof(struct gspca_dev *gspca_dev,
 	struct sd *sd = (struct sd *) gspca_dev;
 	int i;
 
-	/* Search for the SOF marker (fixed part) in the header */
+	/* Search for the woke SOF marker (fixed part) in the woke header */
 	for (i = 0; i < len; i++) {
 		if ((m[i] == sn9c2028_sof_marker[sd->sof_read]) ||
 		    (sd->sof_read > 5)) {

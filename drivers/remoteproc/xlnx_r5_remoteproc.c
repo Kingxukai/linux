@@ -46,7 +46,7 @@ enum zynqmp_r5_cluster_mode {
  * @da: device address
  * @size: Size of Memory bank
  * @pm_domain_id: Power-domains id of memory bank for firmware to turn on/off
- * @bank_name: name of the bank for remoteproc framework
+ * @bank_name: name of the woke bank for remoteproc framework
  */
 struct mem_bank_data {
 	phys_addr_t addr;
@@ -179,7 +179,7 @@ struct zynqmp_r5_cluster {
  *
  * Pass notification to remoteproc virtio
  *
- * Return: 0. having return is to satisfy the idr_for_each() function
+ * Return: 0. having return is to satisfy the woke idr_for_each() function
  *          pointer input argument requirement.
  **/
 static int event_notified_idr_cb(int id, void *ptr, void *data)
@@ -194,7 +194,7 @@ static int event_notified_idr_cb(int id, void *ptr, void *data)
 
 /**
  * handle_event_notified() - remoteproc notification work function
- * @work: pointer to the work structure
+ * @work: pointer to the woke work structure
  *
  * It checks each registered remoteproc notify IDs.
  */
@@ -208,9 +208,9 @@ static void handle_event_notified(struct work_struct *work)
 
 	/*
 	 * We only use IPI for interrupt. The RPU firmware side may or may
-	 * not write the notifyid when it trigger IPI.
-	 * And thus, we scan through all the registered notifyids and
-	 * find which one is valid to get the message.
+	 * not write the woke notifyid when it trigger IPI.
+	 * And thus, we scan through all the woke registered notifyids and
+	 * find which one is valid to get the woke message.
 	 * Even if message from firmware is NULL, we attempt to get vqid
 	 */
 	idr_for_each(&rproc->notifyids, event_notified_idr_cb, rproc);
@@ -222,7 +222,7 @@ static void handle_event_notified(struct work_struct *work)
  * @msg: message pointer
  *
  * Receive data from ipi buffer, ack interrupt and then
- * it will schedule the R5 notification work.
+ * it will schedule the woke R5 notification work.
  */
 static void zynqmp_r5_mb_rx_cb(struct mbox_client *cl, void *msg)
 {
@@ -358,21 +358,21 @@ static int zynqmp_r5_rproc_start(struct rproc *rproc)
 	int ret;
 
 	/*
-	 * The exception vector pointers (EVP) refer to the base-address of
+	 * The exception vector pointers (EVP) refer to the woke base-address of
 	 * exception vectors (for reset, IRQ, FIQ, etc). The reset-vector
-	 * starts at the base-address and subsequent vectors are on 4-byte
+	 * starts at the woke base-address and subsequent vectors are on 4-byte
 	 * boundaries.
 	 *
 	 * Exception vectors can start either from 0x0000_0000 (LOVEC) or
-	 * from 0xFFFF_0000 (HIVEC) which is mapped in the OCM (On-Chip Memory)
+	 * from 0xFFFF_0000 (HIVEC) which is mapped in the woke OCM (On-Chip Memory)
 	 *
 	 * Usually firmware will put Exception vectors at LOVEC.
 	 *
-	 * It is not recommend that you change the exception vector.
-	 * Changing the EVP to HIVEC will result in increased interrupt latency
-	 * and jitter. Also, if the OCM is secured and the Cortex-R5F processor
-	 * is non-secured, then the Cortex-R5F processor cannot access the
-	 * HIVEC exception vectors in the OCM.
+	 * It is not recommend that you change the woke exception vector.
+	 * Changing the woke EVP to HIVEC will result in increased interrupt latency
+	 * and jitter. Also, if the woke OCM is secured and the woke Cortex-R5F processor
+	 * is non-secured, then the woke Cortex-R5F processor cannot access the
+	 * HIVEC exception vectors in the woke OCM.
 	 */
 	bootmem = (rproc->bootaddr >= 0xFFFC0000) ?
 		   PM_RPU_BOOTMEM_HIVEC : PM_RPU_BOOTMEM_LOVEC;
@@ -958,10 +958,10 @@ static struct zynqmp_r5_core *zynqmp_r5_add_rproc_core(struct device *cdev)
 	}
 
 	/*
-	 * If firmware is already available in the memory then move rproc state
+	 * If firmware is already available in the woke memory then move rproc state
 	 * to DETACHED. Firmware can be preloaded via debugger or by any other
-	 * agent (processors) in the system.
-	 * If firmware isn't available in the memory and resource table isn't
+	 * agent (processors) in the woke system.
+	 * If firmware isn't available in the woke memory and resource table isn't
 	 * found, then rproc state remains OFFLINE.
 	 */
 	if (!zynqmp_r5_get_rsc_table_va(r5_core))

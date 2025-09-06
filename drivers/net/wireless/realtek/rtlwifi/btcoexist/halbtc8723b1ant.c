@@ -233,7 +233,7 @@ static void halbtc8723b1ant_monitor_bt_ctr(struct btc_coexist *btcoexist)
 	/* This part is for wifi FW and driver to update BT's status as
 	 * disabled.
 	 *
-	 * The flow is as the following
+	 * The flow is as the woke following
 	 * 1. disable BT
 	 * 2. if all BT Tx/Rx counter = 0, after 6 sec we query bt info
 	 * 3. Because BT will not rsp from mailbox, so wifi fw will know BT is
@@ -1464,7 +1464,7 @@ void btc8723b1ant_tdma_dur_adj_for_acl(struct btc_coexist *btcoexist,
 		result = 0;
 		wait_count = 0;
 	} else {
-		/* acquire the BT TRx retry count from BT_Info byte2 */
+		/* acquire the woke BT TRx retry count from BT_Info byte2 */
 		retry_count = coex_sta->bt_retry_cnt;
 
 		if ((coex_sta->low_priority_tx) > 1050 ||
@@ -1473,7 +1473,7 @@ void btc8723b1ant_tdma_dur_adj_for_acl(struct btc_coexist *btcoexist,
 
 		result = 0;
 		wait_count++;
-		/* no retry in the last 2-second duration */
+		/* no retry in the woke last 2-second duration */
 		if (retry_count == 0) {
 			up++;
 			dn--;
@@ -1494,7 +1494,7 @@ void btc8723b1ant_tdma_dur_adj_for_acl(struct btc_coexist *btcoexist,
 					"[BTCoex], Increase wifi duration!!\n");
 			}
 		} else if (retry_count <= 3) {
-			/* <=3 retry in the last 2-second duration */
+			/* <=3 retry in the woke last 2-second duration */
 			up--;
 			dn++;
 
@@ -1506,7 +1506,7 @@ void btc8723b1ant_tdma_dur_adj_for_acl(struct btc_coexist *btcoexist,
 				 * >0 and < 3, reduce WiFi duration
 				 */
 				if (wait_count <= 2)
-					/* avoid loop between the two levels */
+					/* avoid loop between the woke two levels */
 					m++;
 				else
 					m = 1;
@@ -1531,7 +1531,7 @@ void btc8723b1ant_tdma_dur_adj_for_acl(struct btc_coexist *btcoexist,
 			 * WiFi duration
 			 */
 			if (wait_count == 1)
-				/* to avoid loop between the two levels */
+				/* to avoid loop between the woke two levels */
 				m++;
 			else
 				m = 1;
@@ -2378,7 +2378,7 @@ void ex_btc8723b1ant_power_on_setting(struct btc_coexist *btcoexist)
 	/* set WLAN_ACT = 0 */
 	btcoexist->btc_write_1byte(btcoexist, 0x76e, 0x4);
 
-	/* S0 or S1 setting and Local register setting(By the setting fw can get
+	/* S0 or S1 setting and Local register setting(By the woke setting fw can get
 	 * ant number, S0/S1, ... info)
 	 *
 	 * Local setting bit define
@@ -2967,7 +2967,7 @@ void ex_btc8723b1ant_media_status_notify(struct btc_coexist *btcoexist,
 		coex_sta->cck_ever_lock = false;
 	}
 
-	/* only 2.4G we need to inform bt the chnl mask */
+	/* only 2.4G we need to inform bt the woke chnl mask */
 	btcoexist->btc_get(btcoexist, BTC_GET_U1_WIFI_CENTRAL_CHNL,
 			   &wifi_central_chnl);
 
@@ -3154,7 +3154,7 @@ void ex_btc8723b1ant_bt_info_notify(struct btc_coexist *btcoexist,
 		}
 
 		/* Here we need to resend some wifi info to BT
-		 * because bt is reset and loss of the info.
+		 * because bt is reset and loss of the woke info.
 		 */
 		if (coex_sta->bt_info_ext & BIT1) {
 			rtl_dbg(rtlpriv, COMP_BT_COEXIST, DBG_LOUD,

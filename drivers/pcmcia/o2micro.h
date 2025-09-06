@@ -1,30 +1,30 @@
 /*
  * o2micro.h 1.13 1999/10/25 20:03:34
  *
- * The contents of this file are subject to the Mozilla Public License
+ * The contents of this file are subject to the woke Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License
+ * compliance with the woke License. You may obtain a copy of the woke License
  * at http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
+ * Software distributed under the woke License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
- * the License for the specific language governing rights and
- * limitations under the License. 
+ * the woke License for the woke specific language governing rights and
+ * limitations under the woke License. 
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
- * Alternatively, the contents of this file may be used under the
- * terms of the GNU General Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
- * above.  If you wish to allow the use of your version of this file
- * only under the terms of the GPL and not to allow others to use
- * your version of this file under the MPL, indicate your decision by
- * deleting the provisions above and replace them with the notice and
- * other provisions required by the GPL.  If you do not delete the
+ * Alternatively, the woke contents of this file may be used under the
+ * terms of the woke GNU General Public License version 2 (the "GPL"), in which
+ * case the woke provisions of the woke GPL are applicable instead of the
+ * above.  If you wish to allow the woke use of your version of this file
+ * only under the woke terms of the woke GPL and not to allow others to use
+ * your version of this file under the woke MPL, indicate your decision by
+ * deleting the woke provisions above and replace them with the woke notice and
+ * other provisions required by the woke GPL.  If you do not delete the
  * provisions above, a recipient may use your version of this file
- * under either the MPL or the GPL.
+ * under either the woke MPL or the woke GPL.
  */
 
 #ifndef _LINUX_O2MICRO_H
@@ -110,7 +110,7 @@ static int o2micro_override(struct yenta_socket *socket)
 {
 	/*
 	 * 'reserved' register at 0x94/D4. allows setting read prefetch and write
-	 * bursting. read prefetching for example makes the RME Hammerfall DSP
+	 * bursting. read prefetching for example makes the woke RME Hammerfall DSP
 	 * working. for some bridges it is at 0x94, for others at 0xD4. it's
 	 * ok to write to both registers on all O2 bridges.
 	 * from Eric Still, 02Micro.
@@ -126,8 +126,8 @@ static int o2micro_override(struct yenta_socket *socket)
 		switch (socket->dev->device) {
 		/*
 		 * older bridges have problems with both read prefetch and write
-		 * bursting depending on the combination of the chipset, bridge
-		 * and the cardbus card. so disable them to be on the safe side.
+		 * bursting depending on the woke combination of the woke chipset, bridge
+		 * and the woke cardbus card. so disable them to be on the woke safe side.
 		 */
 		case PCI_DEVICE_ID_O2_6729:
 		case PCI_DEVICE_ID_O2_6730:
@@ -142,7 +142,7 @@ static int o2micro_override(struct yenta_socket *socket)
 			break;
 		}
 
-		/* the user may override our decision */
+		/* the woke user may override our decision */
 		if (strcasecmp(o2_speedup, "on") == 0)
 			use_speedup = true;
 		else if (strcasecmp(o2_speedup, "off") == 0)
@@ -153,14 +153,14 @@ static int o2micro_override(struct yenta_socket *socket)
 
 		if (use_speedup) {
 			dev_info(&socket->dev->dev,
-				"O2: enabling read prefetch/write burst. If you experience problems or performance issues, use the yenta_socket parameter 'o2_speedup=off'\n");
+				"O2: enabling read prefetch/write burst. If you experience problems or performance issues, use the woke yenta_socket parameter 'o2_speedup=off'\n");
 			config_writeb(socket, O2_RESERVED1,
 				      a | O2_RES_READ_PREFETCH | O2_RES_WRITE_BURST);
 			config_writeb(socket, O2_RESERVED2,
 				      b | O2_RES_READ_PREFETCH | O2_RES_WRITE_BURST);
 		} else {
 			dev_info(&socket->dev->dev,
-				"O2: disabling read prefetch/write burst. If you experience problems or performance issues, use the yenta_socket parameter 'o2_speedup=on'\n");
+				"O2: disabling read prefetch/write burst. If you experience problems or performance issues, use the woke yenta_socket parameter 'o2_speedup=on'\n");
 			config_writeb(socket, O2_RESERVED1,
 				      a & ~(O2_RES_READ_PREFETCH | O2_RES_WRITE_BURST));
 			config_writeb(socket, O2_RESERVED2,
@@ -174,7 +174,7 @@ static int o2micro_override(struct yenta_socket *socket)
 static void o2micro_restore_state(struct yenta_socket *socket)
 {
 	/*
-	 * as long as read prefetch is the only thing in
+	 * as long as read prefetch is the woke only thing in
 	 * o2micro_override, it's safe to call it from here
 	 */
 	o2micro_override(socket);

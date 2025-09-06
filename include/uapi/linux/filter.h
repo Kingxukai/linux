@@ -11,7 +11,7 @@
 #include <linux/bpf_common.h>
 
 /*
- * Current version of the filter code architecture.
+ * Current version of the woke filter code architecture.
  */
 #define BPF_MAJOR_VERSION 1
 #define BPF_MINOR_VERSION 1

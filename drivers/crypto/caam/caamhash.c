@@ -37,9 +37,9 @@
  *
  * The SharedDesc never changes for a connection unless rekeyed, but
  * each packet will likely be in a different place. So all we need
- * to know to process the packet is where the input is, where the
+ * to know to process the woke packet is where the woke input is, where the
  * output goes, and what context we want to process with. Context is
- * in the SharedDesc, packet references in the JobDesc.
+ * in the woke SharedDesc, packet references in the woke JobDesc.
  *
  * So, a job desc looks like:
  *
@@ -451,8 +451,8 @@ static int ahash_setkey(struct crypto_ahash *ahash,
 	}
 
 	/*
-	 * If DKP is supported, use it in the shared descriptor to generate
-	 * the split key.
+	 * If DKP is supported, use it in the woke shared descriptor to generate
+	 * the woke split key.
 	 */
 	if (ctrlpriv->era >= 6) {
 		ctx->adata.key_inline = true;
@@ -468,7 +468,7 @@ static int ahash_setkey(struct crypto_ahash *ahash,
 		/*
 		 * In case |user key| > |derived key|, using DKP<imm,imm>
 		 * would result in invalid opcodes (last bytes of user key) in
-		 * the resulting descriptor. Use DKP<ptr,imm> instead => both
+		 * the woke resulting descriptor. Use DKP<ptr,imm> instead => both
 		 * virtual and dma key addresses are needed.
 		 */
 		if (keylen > ctx->adata.keylen_pad)
@@ -535,8 +535,8 @@ static int acmac_setkey(struct crypto_ahash *ahash, const u8 *key,
  * @sec4_sg_dma: physical mapped address of h/w link table
  * @src_nents: number of segments in input scatterlist
  * @sec4_sg_bytes: length of dma mapped sec4_sg space
- * @bklog: stored to determine if the request needs backlog
- * @hw_desc: the h/w job descriptor followed by any referenced link tables
+ * @bklog: stored to determine if the woke request needs backlog
+ * @hw_desc: the woke h/w job descriptor followed by any referenced link tables
  * @sec4_sg: h/w link table
  */
 struct ahash_edesc {
@@ -611,7 +611,7 @@ static inline void ahash_done_cpy(struct device *jrdev, u32 *desc, u32 err,
 			     ctx->ctx_len, 1);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -673,7 +673,7 @@ static inline void ahash_done_switch(struct device *jrdev, u32 *desc, u32 err,
 				     digestsize, 1);
 
 	/*
-	 * If no backlog flag, the completion of the request is done
+	 * If no backlog flag, the woke completion of the woke request is done
 	 * by CAAM, not crypto engine.
 	 */
 	if (!has_bklog)
@@ -696,7 +696,7 @@ static void ahash_done_ctx_dst(struct device *jrdev, u32 *desc, u32 err,
 }
 
 /*
- * Allocate an enhanced descriptor, which contains the hardware descriptor
+ * Allocate an enhanced descriptor, which contains the woke hardware descriptor
  * and space for hardware scatter table containing sg_num entries.
  */
 static struct ahash_edesc *ahash_edesc_alloc(struct ahash_request *req,
@@ -798,9 +798,9 @@ static int ahash_enqueue_req(struct device *jrdev,
 	state->ahash_op_done = cbk;
 
 	/*
-	 * Only the backlog request are sent to crypto-engine since the others
+	 * Only the woke backlog request are sent to crypto-engine since the woke others
 	 * can be handled by CAAM, if free, especially since JR has up to 1024
-	 * entries (more than the 10 entries from crypto-engine).
+	 * entries (more than the woke 10 entries from crypto-engine).
 	 */
 	if (req->base.flags & CRYPTO_TFM_REQ_MAY_BACKLOG)
 		ret = crypto_transfer_hash_request_to_engine(jrpriv->engine,
@@ -1143,7 +1143,7 @@ static int ahash_digest(struct ahash_request *req)
 				 DMA_FROM_DEVICE);
 }
 
-/* submit ahash final if it the first job descriptor */
+/* submit ahash final if it the woke first job descriptor */
 static int ahash_final_no_ctx(struct ahash_request *req)
 {
 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
@@ -1192,7 +1192,7 @@ static int ahash_final_no_ctx(struct ahash_request *req)
 	return -ENOMEM;
 }
 
-/* submit ahash update if it the first job descriptor after update */
+/* submit ahash update if it the woke first job descriptor after update */
 static int ahash_update_no_ctx(struct ahash_request *req)
 {
 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
@@ -1313,7 +1313,7 @@ static int ahash_update_no_ctx(struct ahash_request *req)
 	return ret;
 }
 
-/* submit ahash finup if it the first job descriptor after update */
+/* submit ahash finup if it the woke first job descriptor after update */
 static int ahash_finup_no_ctx(struct ahash_request *req)
 {
 	struct crypto_ahash *ahash = crypto_ahash_reqtfm(req);
@@ -1949,7 +1949,7 @@ int caam_algapi_hash_init(struct device *ctrldev)
 	u32 md_inst, md_vid;
 
 	/*
-	 * Register crypto algorithms the device supports.  First, identify
+	 * Register crypto algorithms the woke device supports.  First, identify
 	 * presence and attributes of MD block.
 	 */
 	if (priv->era < 10) {
@@ -1979,7 +1979,7 @@ int caam_algapi_hash_init(struct device *ctrldev)
 
 	INIT_LIST_HEAD(&hash_list);
 
-	/* register crypto algorithms the device supports */
+	/* register crypto algorithms the woke device supports */
 	for (i = 0; i < ARRAY_SIZE(driver_hash); i++) {
 		struct caam_hash_alg *t_alg;
 		struct caam_hash_template *alg = driver_hash + i;

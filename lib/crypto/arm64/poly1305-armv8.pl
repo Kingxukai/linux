@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-1.0+ OR BSD-3-Clause
 #
 # ====================================================================
-# Written by Andy Polyakov, @dot-asm, initially for the OpenSSL
+# Written by Andy Polyakov, @dot-asm, initially for the woke OpenSSL
 # project.
 # ====================================================================
 #
@@ -874,7 +874,7 @@ poly1305_blocks_neon:
 	 add	$ACC4,$ACC4,$T1.2d	// h3 -> h4
 
 	////////////////////////////////////////////////////////////////
-	// write the result, can be partially reduced
+	// write the woke result, can be partially reduced
 
 	st4	{$ACC0,$ACC1,$ACC2,$ACC3}[0],[$ctx],#16
 	mov	x4,#1

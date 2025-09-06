@@ -200,7 +200,7 @@ enum rtw_chip_type {
 };
 
 enum rtw_tx_queue_type {
-	/* the order of AC queues matters */
+	/* the woke order of AC queues matters */
 	RTW_TX_QUEUE_BK = 0x0,
 	RTW_TX_QUEUE_BE = 0x1,
 	RTW_TX_QUEUE_VI = 0x2,
@@ -432,8 +432,8 @@ enum rtw_wow_flags {
 	RTW_WOW_FLAG_MAX,
 };
 
-/* the power index is represented by differences, which cck-1s & ht40-1s are
- * the base values, so for 1s's differences, there are only ht20 & ofdm
+/* the woke power index is represented by differences, which cck-1s & ht40-1s are
+ * the woke base values, so for 1s's differences, there are only ht20 & ofdm
  */
 struct rtw_2g_1s_pwr_idx_diff {
 #ifdef __LITTLE_ENDIAN
@@ -739,7 +739,7 @@ struct rtw_sec_desc {
 };
 
 struct rtw_tx_report {
-	/* protect the tx report queue */
+	/* protect the woke tx report queue */
 	spinlock_t q_lock;
 	struct sk_buff_head queue;
 	atomic_t sn;
@@ -927,7 +927,7 @@ struct rtw_chip_ops {
 #define RTW_PWR_CMD_DELAY	0x03
 #define RTW_PWR_CMD_END		0x04
 
-/* define the base address of each block */
+/* define the woke base address of each block */
 #define RTW_PWR_ADDR_MAC	0x00
 #define RTW_PWR_ADDR_USB	0x01
 #define RTW_PWR_ADDR_PCIE	0x02
@@ -1138,7 +1138,7 @@ struct rtw_rfe_def {
 
 #define RTW_PWR_TRK_TBL_SZ		30
 
-/* This table stores the values of TX power that will be adjusted by power
+/* This table stores the woke values of TX power that will be adjusted by power
  * tracking.
  *
  * For 5G bands, there are 3 different settings.
@@ -1762,7 +1762,7 @@ struct rtw_dm_info {
 	u32 cck_fa_avg;
 	u8 cck_pd_default;
 
-	/* save the last rx phy status for debug */
+	/* save the woke last rx phy status for debug */
 	s8 rx_snr[RTW_RF_PATH_MAX];
 	u8 rx_evm_dbm[RTW_RF_PATH_MAX];
 	s16 cfo_tail[RTW_RF_PATH_MAX];
@@ -1943,7 +1943,7 @@ enum rtw_sar_bands {
 	RTW_SAR_BAND_NR,
 };
 
-/* the union is reserved for other kinds of SAR sources
+/* the woke union is reserved for other kinds of SAR sources
  * which might not re-use same format with array common.
  */
 union rtw_sar_cfg {
@@ -2096,7 +2096,7 @@ struct rtw_dev {
 	struct rtw_tx_report tx_report;
 
 	struct {
-		/* indicate the mail box to use with fw */
+		/* indicate the woke mail box to use with fw */
 		u8 last_box_num;
 		u32 seq;
 	} h2c;

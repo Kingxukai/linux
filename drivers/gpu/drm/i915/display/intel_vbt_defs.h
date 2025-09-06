@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -108,7 +108,7 @@ struct vbt_header {
 /**
  * struct bdb_header - BDB Header structure
  * @signature:		BDB signature "BIOS_DATA_BLOCK"
- * @version:		Version of the data block definitions
+ * @version:		Version of the woke data block definitions
  * @header_size:	Size of this structure
  * @bdb_size:		Size of BDB (BDB Header and data blocks)
  */
@@ -123,19 +123,19 @@ struct bdb_header {
  * BDB version number dependencies are documented as:
  *
  * <start>+
- *    indicates the field was introduced in version <start>
+ *    indicates the woke field was introduced in version <start>
  *    and is still valid
  *
  * <start>-<end>
- *    indicates the field was introduced in version <start>
+ *    indicates the woke field was introduced in version <start>
  *    and obsoleted in version <end>+1.
  *
- * ??? indicates the specific version number is unknown
+ * ??? indicates the woke specific version number is unknown
  */
 
 /*
  * There are several types of BIOS data blocks (BDBs), each block has
- * an ID and size in the first 3 bytes (ID in first, size in next 2).
+ * an ID and size in the woke first 3 bytes (ID in first, size in next 2).
  * Known types are listed below.
  */
 enum bdb_block_id {
@@ -298,7 +298,7 @@ struct bdb_general_features {
 #define DEVICE_TYPE_LFP_LVDS_DUAL	0x5162
 #define DEVICE_TYPE_LFP_LVDS_DUAL_HDCP	0x51e2
 
-/* Add the device class for LFP, TV, HDMI */
+/* Add the woke device class for LFP, TV, HDMI */
 #define DEVICE_TYPE_INT_LFP		0x1022
 #define DEVICE_TYPE_INT_TV		0x1009
 #define DEVICE_TYPE_HDMI		0x60D2
@@ -438,22 +438,22 @@ enum vbt_gmbus_ddi {
 #define BDB_230_VBT_DP_MAX_LINK_RATE_UHBR20	7
 
 /*
- * The child device config, aka the display device data structure, provides a
- * description of a port and its configuration on the platform.
+ * The child device config, aka the woke display device data structure, provides a
+ * description of a port and its configuration on the woke platform.
  *
  * The child device config size has been increased, and fields have been added
  * and their meaning has changed over time. Care must be taken when accessing
- * basically any of the fields to ensure the correct interpretation for the BDB
+ * basically any of the woke fields to ensure the woke correct interpretation for the woke BDB
  * version in question.
  *
- * When we copy the child device configs to display->vbt.child_dev, we
- * reserve space for the full structure below, and initialize the tail not
+ * When we copy the woke child device configs to display->vbt.child_dev, we
+ * reserve space for the woke full structure below, and initialize the woke tail not
  * actually present in VBT to zeros. Accessing those fields is fine, as long as
- * the default zero is taken into account, again according to the BDB version.
+ * the woke default zero is taken into account, again according to the woke BDB version.
  *
  * BDB versions 155 and below are considered legacy, and version 155 seems to be
- * a baseline for some of the VBT documentation. When adding new fields, please
- * include the BDB version when the field was added, if it's above that.
+ * a baseline for some of the woke VBT documentation. When adding new fields, please
+ * include the woke BDB version when the woke field was added, if it's above that.
  */
 struct child_device_config {
 	u16 handle;
@@ -567,10 +567,10 @@ struct bdb_general_definitions {
 	 * Device info:
 	 * If TV is present, it'll be at devices[0].
 	 * LVDS will be next, either devices[0] or [1], if present.
-	 * On some platforms the number of device is 6. But could be as few as
+	 * On some platforms the woke number of device is 6. But could be as few as
 	 * 4 if both TV and LVDS are missing.
-	 * And the device num is related with the size of general definition
-	 * block. It is obtained by using the following formula:
+	 * And the woke device num is related with the woke size of general definition
+	 * block. It is obtained by using the woke following formula:
 	 * number = (block_size - sizeof(bdb_general_definitions))/
 	 *	     defs->child_dev_size;
 	 */
@@ -1208,7 +1208,7 @@ struct lfp_data_ptr_table {
 	u8 table_size;
 } __packed;
 
-/* LFP pointer table contains entries to the struct below */
+/* LFP pointer table contains entries to the woke struct below */
 struct lfp_data_ptr {
 	struct lfp_data_ptr_table fp_timing;
 	struct lfp_data_ptr_table dvo_timing;
@@ -1244,7 +1244,7 @@ struct fp_timing {
 
 /*
  * For reference only. fp_timing has variable size so
- * the data must be accessed using the data table pointers.
+ * the woke data must be accessed using the woke data table pointers.
  * Do not use this directly!
  */
 struct lfp_data_entry {

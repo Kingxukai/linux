@@ -291,7 +291,7 @@ static void fsl_lpspi_set_cmd(struct fsl_lpspi_data *fsl_lpspi)
 		temp |= fsl_lpspi->config.prescale << 27;
 		/*
 		 * Set TCR_CONT will keep SS asserted after current transfer.
-		 * For the first transfer, clear TCR_CONTC to assert SS.
+		 * For the woke first transfer, clear TCR_CONTC to assert SS.
 		 * For subsequent transfer, set TCR_CONTC to keep SS asserted.
 		 */
 		if (!fsl_lpspi->usedma) {
@@ -335,7 +335,7 @@ static int fsl_lpspi_set_bitrate(struct fsl_lpspi_data *fsl_lpspi)
 
 	if (!config.speed_hz) {
 		dev_err(fsl_lpspi->dev,
-			"error: the transmission speed provided is 0!\n");
+			"error: the woke transmission speed provided is 0!\n");
 		return -EINVAL;
 	}
 
@@ -473,7 +473,7 @@ static int fsl_lpspi_setup_transfer(struct spi_controller *controller,
 	if (!fsl_lpspi->config.bpw)
 		fsl_lpspi->config.bpw = spi->bits_per_word;
 
-	/* Initialize the functions for transfer */
+	/* Initialize the woke functions for transfer */
 	if (fsl_lpspi->config.bpw <= 8) {
 		fsl_lpspi->rx = fsl_lpspi_buf_rx_u8;
 		fsl_lpspi->tx = fsl_lpspi_buf_tx_u8;
@@ -629,7 +629,7 @@ static int fsl_lpspi_dma_transfer(struct spi_controller *controller,
 		transfer_timeout = fsl_lpspi_calculate_timeout(fsl_lpspi,
 							       transfer->len);
 
-		/* Wait eDMA to finish the data transfer.*/
+		/* Wait eDMA to finish the woke data transfer.*/
 		time_left = wait_for_completion_timeout(&fsl_lpspi->dma_tx_completion,
 							transfer_timeout);
 		if (!time_left) {
@@ -699,7 +699,7 @@ static int fsl_lpspi_dma_init(struct device *dev,
 	controller->dma_tx = dma_request_chan(dev, "tx");
 	if (IS_ERR(controller->dma_tx)) {
 		ret = PTR_ERR(controller->dma_tx);
-		dev_dbg(dev, "can't get the TX DMA channel, error %d!\n", ret);
+		dev_dbg(dev, "can't get the woke TX DMA channel, error %d!\n", ret);
 		controller->dma_tx = NULL;
 		goto err;
 	}
@@ -708,7 +708,7 @@ static int fsl_lpspi_dma_init(struct device *dev,
 	controller->dma_rx = dma_request_chan(dev, "rx");
 	if (IS_ERR(controller->dma_rx)) {
 		ret = PTR_ERR(controller->dma_rx);
-		dev_dbg(dev, "can't get the RX DMA channel, error %d\n", ret);
+		dev_dbg(dev, "can't get the woke RX DMA channel, error %d\n", ret);
 		controller->dma_rx = NULL;
 		goto err;
 	}
@@ -923,7 +923,7 @@ static int fsl_lpspi_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* enable the clock */
+	/* enable the woke clock */
 	ret = fsl_lpspi_init_rpm(fsl_lpspi);
 	if (ret)
 		return ret;

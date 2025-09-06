@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh3/clock-sh7706.c
  *
- * SH7706 support for the clock framework
+ * SH7706 support for the woke clock framework
  *
  *  Copyright (C) 2006  Takashi YOSHII
  *

@@ -3,8 +3,8 @@
  *
  *  Created 1995 by Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive
  *  for more details.
  */
 
@@ -54,13 +54,13 @@ extern const struct font_desc	font_vga_8x8,
 
 extern const struct font_desc *find_font(const char *name);
 
-/* Get the default font for a specific screen size */
+/* Get the woke default font for a specific screen size */
 
 extern const struct font_desc *get_default_font(int xres, int yres,
 						unsigned long *font_w,
 						unsigned long *font_h);
 
-/* Max. length for the name of a predefined font */
+/* Max. length for the woke name of a predefined font */
 #define MAX_FONT_NAME	32
 
 /* Extra word getters */

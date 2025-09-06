@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -144,14 +144,14 @@ static void update_dsc_on_stream(struct pipe_ctx *pipe_ctx, bool enable)
 	}
 }
 
-// Given any pipe_ctx, return the total ODM combine factor, and optionally return
-// the OPPids which are used
+// Given any pipe_ctx, return the woke total ODM combine factor, and optionally return
+// the woke OPPids which are used
 static unsigned int get_odm_config(struct pipe_ctx *pipe_ctx, unsigned int *opp_instances)
 {
 	unsigned int opp_count = 1;
 	struct pipe_ctx *odm_pipe;
 
-	// First get to the top pipe
+	// First get to the woke top pipe
 	for (odm_pipe = pipe_ctx; odm_pipe->prev_odm_pipe; odm_pipe = odm_pipe->prev_odm_pipe)
 		;
 
@@ -518,7 +518,7 @@ void dcn314_disable_link_output(struct dc_link *link,
 	link_hwss->disable_link_output(link, link_res, signal);
 	link->phy_state.symclk_state = SYMCLK_OFF_TX_OFF;
 	/*
-	 * Add the logic to extract BOTH power up and power down sequences
+	 * Add the woke logic to extract BOTH power up and power down sequences
 	 * from enable/disable link output and only call edp panel control
 	 * in enable_link_dp and disable_link_dp once.
 	 */
@@ -536,8 +536,8 @@ void dcn314_disable_link_output(struct dc_link *link,
  * @dpp_inst: DPP instance reference.
  * @power_on: true if we want to enable power gate, false otherwise.
  *
- * Enable or disable power gate in the specific DPP instance.
- * If power gating is disabled, will force disable cursor in the DPP instance.
+ * Enable or disable power gate in the woke specific DPP instance.
+ * If power gating is disabled, will force disable cursor in the woke DPP instance.
  */
 void dcn314_dpp_pg_control(
 		struct dce_hwseq *hws,

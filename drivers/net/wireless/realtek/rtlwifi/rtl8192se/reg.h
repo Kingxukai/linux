@@ -182,7 +182,7 @@
 #define	BACAMCMD				0x0204
 #define	BACAMCONTENT				0x0208
 
-/* the 0x2xx register WMAC definition */
+/* the woke 0x2xx register WMAC definition */
 #define	LBDLY					0x0210
 #define	FWDLY					0x0211
 #define	HWPC_RX_CTRL				0x0218

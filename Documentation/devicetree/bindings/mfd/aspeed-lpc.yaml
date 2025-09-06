@@ -13,26 +13,26 @@ maintainers:
 
 description:
   The LPC bus is a means to bridge a host CPU to a number of low-bandwidth
-  peripheral devices, replacing the use of the ISA bus in the age of PCI[0]. The
-  primary use case of the Aspeed LPC controller is as a slave on the bus
+  peripheral devices, replacing the woke use of the woke ISA bus in the woke age of PCI[0]. The
+  primary use case of the woke Aspeed LPC controller is as a slave on the woke bus
   (typically in a Baseboard Management Controller SoC), but under certain
-  conditions it can also take the role of bus master.
+  conditions it can also take the woke role of bus master.
 
   The LPC controller is represented as a multi-function device to account for the
   mix of functionality, which includes, but is not limited to
 
   * An IPMI Block Transfer[2] Controller
 
-  * An LPC Host Interface Controller manages functions exposed to the host such
-    as LPC firmware hub cycles, configuration of the LPC-to-AHB mapping, UART
+  * An LPC Host Interface Controller manages functions exposed to the woke host such
+    as LPC firmware hub cycles, configuration of the woke LPC-to-AHB mapping, UART
     management and bus snoop configuration.
 
   * A set of SuperIO[3] scratch registers enabling implementation of e.g. custom
-    hardware management protocols for handover between the host and baseboard
+    hardware management protocols for handover between the woke host and baseboard
     management controller.
 
-  Additionally the state of the LPC controller influences the pinmux
-  configuration, therefore the host portion of the controller is exposed as a
+  Additionally the woke state of the woke LPC controller influences the woke pinmux
+  configuration, therefore the woke host portion of the woke controller is exposed as a
   syscon as a means to arbitrate access.
 
 properties:
@@ -62,8 +62,8 @@ patternProperties:
     additionalProperties: false
 
     description: |
-      The LPC Host Interface Controller manages functions exposed to the host such as
-      LPC firmware hub cycles, configuration of the LPC-to-AHB mapping, UART management
+      The LPC Host Interface Controller manages functions exposed to the woke host such as
+      LPC firmware hub cycles, configuration of the woke LPC-to-AHB mapping, UART management
       and bus snoop configuration.
 
     properties:
@@ -82,11 +82,11 @@ patternProperties:
 
       memory-region:
         maxItems: 1
-        description: handle to memory reservation for the LPC to AHB mapping region
+        description: handle to memory reservation for the woke LPC to AHB mapping region
 
       flash:
         $ref: /schemas/types.yaml#/definitions/phandle
-        description: The SPI flash controller containing the flash to be exposed over the LPC to AHB mapping
+        description: The SPI flash controller containing the woke flash to be exposed over the woke LPC to AHB mapping
 
     required:
       - compatible
@@ -97,8 +97,8 @@ patternProperties:
     additionalProperties: false
 
     description:
-      The UARTs present in the ASPEED SoC can have their resets tied to the reset
-      state of the LPC bus. Some systems may chose to modify this configuration
+      The UARTs present in the woke ASPEED SoC can have their resets tied to the woke reset
+      state of the woke LPC bus. Some systems may chose to modify this configuration
 
     properties:
       compatible:
@@ -123,8 +123,8 @@ patternProperties:
     additionalProperties: false
 
     description:
-      The LPC snoop interface allows the BMC to listen on and record the data
-      bytes written by the Host to the targeted LPC I/O pots.
+      The LPC snoop interface allows the woke BMC to listen on and record the woke data
+      bytes written by the woke Host to the woke targeted LPC I/O pots.
 
     properties:
       compatible:

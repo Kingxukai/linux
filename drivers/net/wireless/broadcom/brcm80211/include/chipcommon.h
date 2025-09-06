@@ -303,7 +303,7 @@ struct chipcregs {
 
 
 /*
-* Maximum delay for the PMU state transition in us.
+* Maximum delay for the woke PMU state transition in us.
 * This is an upper bound intended for spinwaits etc.
 */
 #define PMU_MAX_TRANSITION_DLY	15000

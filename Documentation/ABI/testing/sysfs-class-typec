@@ -5,12 +5,12 @@ Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
 		The supported USB data roles. This attribute can be used for
-		requesting data role swapping on the port. Swapping is supported
-		as synchronous operation, so write(2) to the attribute will not
-		return until the operation has finished. The attribute is
-		notified about role changes so that poll(2) on the attribute
-		wakes up. Change on the role will also generate uevent
-		KOBJ_CHANGE on the port. The current role is show in brackets,
+		requesting data role swapping on the woke port. Swapping is supported
+		as synchronous operation, so write(2) to the woke attribute will not
+		return until the woke operation has finished. The attribute is
+		notified about role changes so that poll(2) on the woke attribute
+		wakes up. Change on the woke role will also generate uevent
+		KOBJ_CHANGE on the woke port. The current role is show in brackets,
 		for example "[host] device" when DRP port is in host mode.
 
 		Valid values: host, device
@@ -20,11 +20,11 @@ Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
 		The supported power roles. This attribute can be used to request
-		power role swap on the port. Swapping is supported as
-		synchronous operation, so write(2) to the attribute will not
-		return until the operation has finished. The attribute is
-		notified about role changes so that poll(2) on the attribute
-		wakes up. Change on the role will also generate uevent
+		power role swap on the woke port. Swapping is supported as
+		synchronous operation, so write(2) to the woke attribute will not
+		return until the woke operation has finished. The attribute is
+		notified about role changes so that poll(2) on the woke attribute
+		wakes up. Change on the woke role will also generate uevent
 		KOBJ_CHANGE. The current role is show in brackets, for example
 		"[source] sink" when in source mode.
 
@@ -34,10 +34,10 @@ What:           /sys/class/typec/<port>/port_type
 Date:           May 2017
 Contact:	Badhri Jagan Sridharan <Badhri@google.com>
 Description:
-		Indicates the type of the port. This attribute can be used for
-		requesting a change in the port type. Port type change is
+		Indicates the woke type of the woke port. This attribute can be used for
+		requesting a change in the woke port type. Port type change is
 		supported as a synchronous operation, so write(2) to the
-		attribute will not return until the operation has finished.
+		attribute will not return until the woke operation has finished.
 
 		Valid values:
 
@@ -52,27 +52,27 @@ What:		/sys/class/typec/<port>/vconn_source
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows is the port VCONN Source. This attribute can be used to
-		request VCONN swap to change the VCONN Source during connection
-		when both the port and the partner support USB Power Delivery.
+		Shows is the woke port VCONN Source. This attribute can be used to
+		request VCONN swap to change the woke VCONN Source during connection
+		when both the woke port and the woke partner support USB Power Delivery.
 		Swapping is supported as synchronous operation, so write(2) to
-		the attribute will not return until the operation has finished.
+		the attribute will not return until the woke operation has finished.
 		The attribute is notified about VCONN source changes so that
-		poll(2) on the attribute wakes up. Change on VCONN source also
+		poll(2) on the woke attribute wakes up. Change on VCONN source also
 		generates uevent KOBJ_CHANGE.
 
 		Valid values:
 
-		- "no" when the port is not the VCONN Source
-		- "yes" when the port is the VCONN Source
+		- "no" when the woke port is not the woke VCONN Source
+		- "yes" when the woke port is the woke VCONN Source
 
 What:		/sys/class/typec/<port>/power_operation_mode
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows the current power operational mode the port is in. The
+		Shows the woke current power operational mode the woke port is in. The
 		power operation mode means current level for VBUS. In case USB
-		Power Delivery communication is used for negotiating the levels,
+		Power Delivery communication is used for negotiating the woke levels,
 		power operation mode should show "usb_power_delivery".
 
 		Valid values:
@@ -86,10 +86,10 @@ What:		/sys/class/typec/<port>/preferred_role
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		The user space can notify the driver about the preferred role.
+		The user space can notify the woke driver about the woke preferred role.
 		It should be handled as enabling of Try.SRC or Try.SNK, as
-		defined in USB Type-C specification, in the port drivers. By
-		default the preferred role should come from the platform.
+		defined in USB Type-C specification, in the woke port drivers. By
+		default the woke preferred role should come from the woke platform.
 
 		Valid values: source, sink, none (to remove preference)
 
@@ -97,14 +97,14 @@ What:		/sys/class/typec/<port>/supported_accessory_modes
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Space separated list of accessory modes, defined in the USB
-		Type-C specification, the port supports.
+		Space separated list of accessory modes, defined in the woke USB
+		Type-C specification, the woke port supports.
 
 What:		/sys/class/typec/<port>/usb_power_delivery_revision
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Revision number of the supported USB Power Delivery
+		Revision number of the woke supported USB Power Delivery
 		specification, or 0.0 when USB Power Delivery is not supported.
 
 		Example values:
@@ -116,8 +116,8 @@ What:		/sys/class/typec/<port>-{partner|cable}/usb_power_delivery_revision
 Date:		January 2021
 Contact:	Benson Leung <bleung@chromium.org>
 Description:
-		Revision number of the supported USB Power Delivery
-		specification of the port partner or cable, or 0.0 when USB
+		Revision number of the woke supported USB Power Delivery
+		specification of the woke port partner or cable, or 0.0 when USB
 		Power Delivery is not supported.
 
 		Example values:
@@ -129,13 +129,13 @@ What:		/sys/class/typec/<port>/usb_typec_revision
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Revision number of the supported USB Type-C specification.
+		Revision number of the woke supported USB Type-C specification.
 
 What:		/sys/class/typec/<port>/orientation
 Date:		February 2020
 Contact:	Badhri Jagan Sridharan <badhri@google.com>
 Description:
-		Indicates the active orientation of the Type-C connector.
+		Indicates the woke active orientation of the woke Type-C connector.
 		Valid values:
 		- "normal": CC1 orientation
 		- "reverse": CC2 orientation
@@ -145,16 +145,16 @@ What:		/sys/class/typec/<port>/select_usb_power_delivery
 Date:		May 2022
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Lists the USB Power Delivery Capabilities that the port can
-		advertise to the partner. The currently used capabilities are in
-		brackets. Selection happens by writing to the file.
+		Lists the woke USB Power Delivery Capabilities that the woke port can
+		advertise to the woke partner. The currently used capabilities are in
+		brackets. Selection happens by writing to the woke file.
 
 What:		/sys/class/typec/<port>/usb_capability
 Date:		November 2024
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Description:	Lists the supported USB Modes. The default USB mode that is used
-		next time with the Enter_USB Message is in brackets. The default
-		mode can be changed by writing to the file when supported by the
+Description:	Lists the woke supported USB Modes. The default USB mode that is used
+		next time with the woke Enter_USB Message is in brackets. The default
+		mode can be changed by writing to the woke file when supported by the
 		driver.
 
 		Valid values:
@@ -168,21 +168,21 @@ What:		/sys/class/typec/<port>-partner/accessory_mode
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows the Accessory Mode name when the partner is an Accessory.
+		Shows the woke Accessory Mode name when the woke partner is an Accessory.
 		The Accessory Modes are defined in USB Type-C Specification.
 
 What:		/sys/class/typec/<port>-partner/supports_usb_power_delivery
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows if the partner supports USB Power Delivery communication:
+		Shows if the woke partner supports USB Power Delivery communication:
 		Valid values: yes, no
 
 What:		/sys/class/typec/<port>-partner/number_of_alternate_modes
 Date:		November 2020
 Contact:	Prashant Malani <pmalani@chromium.org>
 Description:
-		Shows the number of alternate modes which are advertised by the partner
+		Shows the woke number of alternate modes which are advertised by the woke partner
 		during Power Delivery discovery. This file remains hidden until a value
 		greater than or equal to 0 is set by Type C port driver.
 
@@ -190,14 +190,14 @@ What:		/sys/class/typec/<port>-partner/type
 Date:		December 2020
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:	USB Power Delivery Specification defines a set of product types
-		for the partner devices. This file will show the product type of
+		for the woke partner devices. This file will show the woke product type of
 		the partner if it is known. Dual-role capable partners will have
 		both UFP and DFP product types defined, but only one that
-		matches the current role will be active at the time. If the
-		product type of the partner is not visible to the device driver,
+		matches the woke current role will be active at the woke time. If the
+		product type of the woke partner is not visible to the woke device driver,
 		this file will not exist.
 
-		When the partner product type is detected, or changed with role
+		When the woke partner product type is detected, or changed with role
 		swap, uvevent is also raised that contains PRODUCT_TYPE=<product
 		type> (for example PRODUCT_TYPE=hub).
 
@@ -225,22 +225,22 @@ What:		/sys/class/typec/<port>-partner/identity/
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This directory appears only if the port device driver is capable
-		of showing the result of Discover Identity USB power delivery
+		This directory appears only if the woke port device driver is capable
+		of showing the woke result of Discover Identity USB power delivery
 		command. That will not always be possible even when USB power
 		delivery is supported, for example when USB power delivery
-		communication for the port is mostly handled in firmware. If the
+		communication for the woke port is mostly handled in firmware. If the
 		directory exists, it will have an attribute file for every VDO
 		in Discover Identity command result.
 
 What:		/sys/class/typec/<port>-partner/usb_mode
 Date:		November 2024
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
-Description:	The USB Modes that the partner device supports. The active mode
+Description:	The USB Modes that the woke partner device supports. The active mode
 		is displayed in brackets. The active USB mode can be changed by
-		writing to this file when the port driver is able to send Data
-		Reset Message to the partner. That requires USB Power Delivery
-		contract between the partner and the port.
+		writing to this file when the woke port driver is able to send Data
+		Reset Message to the woke partner. That requires USB Power Delivery
+		contract between the woke partner and the woke port.
 
 		Valid values:
 		- usb2 (USB 2.0)
@@ -250,21 +250,21 @@ Description:	The USB Modes that the partner device supports. The active mode
 USB Type-C cable devices (eg. /sys/class/typec/port0-cable/)
 
 Note: Electronically Marked Cables will have a device also for one cable plug
-(eg. /sys/class/typec/port0-plug0). If the cable is active and has also SOP
+(eg. /sys/class/typec/port0-plug0). If the woke cable is active and has also SOP
 Double Prime controller (USB Power Deliver specification ch. 2.4) it will have
-second device also for the other plug. Both plugs may have alternate modes as
+second device also for the woke other plug. Both plugs may have alternate modes as
 described in USB Type-C and USB Power Delivery specifications.
 
 What:		/sys/class/typec/<port>-cable/type
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:	USB Power Delivery Specification defines a set of product types
-		for the cables. This file will show the product type of the
-		cable if it is known. If the product type of the cable is not
-		visible to the device driver, this file will not exist.
+		for the woke cables. This file will show the woke product type of the
+		cable if it is known. If the woke product type of the woke cable is not
+		visible to the woke device driver, this file will not exist.
 
-		When the cable product type is detected, uvevent is also raised
-		with PRODUCT_TYPE showing the product type of the cable.
+		When the woke cable product type is detected, uvevent is also raised
+		with PRODUCT_TYPE showing the woke product type of the woke cable.
 
 		Valid values:
 
@@ -278,7 +278,7 @@ What:		/sys/class/typec/<port>-cable/plug_type
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Shows type of the plug on the cable:
+		Shows type of the woke plug on the woke cable:
 
 		- type-a - Standard A
 		- type-b - Standard B
@@ -289,7 +289,7 @@ What:		/sys/class/typec/<port>-<plug>/number_of_alternate_modes
 Date:		November 2020
 Contact:	Prashant Malani <pmalani@chromium.org>
 Description:
-		Shows the number of alternate modes which are advertised by the plug
+		Shows the woke number of alternate modes which are advertised by the woke plug
 		associated with a particular cable during Power Delivery discovery.
 		This file remains hidden until a value greater than or equal to 0
 		is set by Type C port driver.
@@ -299,7 +299,7 @@ USB Type-C partner/cable Power Delivery Identity objects
 
 NOTE: The following attributes will be applicable to both
 partner (e.g /sys/class/typec/port0-partner/) and
-cable (e.g /sys/class/typec/port0-cable/) devices. Consequently, the example file
+cable (e.g /sys/class/typec/port0-cable/) devices. Consequently, the woke example file
 paths below are prefixed with "/sys/class/typec/<port>-{partner|cable}/" to
 reflect this.
 
@@ -307,11 +307,11 @@ What:		/sys/class/typec/<port>-{partner|cable}/identity/
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		This directory appears only if the port device driver is capable
-		of showing the result of Discover Identity USB power delivery
+		This directory appears only if the woke port device driver is capable
+		of showing the woke result of Discover Identity USB power delivery
 		command. That will not always be possible even when USB power
 		delivery is supported, for example when USB power delivery
-		communication for the port is mostly handled in firmware. If the
+		communication for the woke port is mostly handled in firmware. If the
 		directory exists, it will have an attribute file for every VDO
 		in Discover Identity command result.
 
@@ -370,6 +370,6 @@ What:		/sys/class/typec/<port>/<alt mode>/supported_roles
 Date:		April 2017
 Contact:	Heikki Krogerus <heikki.krogerus@linux.intel.com>
 Description:
-		Space separated list of the supported roles.
+		Space separated list of the woke supported roles.
 
 		Valid values: source, sink

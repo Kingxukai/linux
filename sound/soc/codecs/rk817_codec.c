@@ -26,12 +26,12 @@ struct rk817_codec_priv {
 };
 
 /*
- * This sets the codec up with the values defined in the default implementation including the APLL
- * from the Rockchip vendor kernel. I do not know if these values are universal despite differing
- * from the default values defined above and taken from the datasheet, or implementation specific.
- * I don't have another implementation to compare from the Rockchip sources. Hard-coding for now.
- * Additionally, I do not know according to the documentation the units accepted for the clock
- * values, so for the moment those are left unvalidated.
+ * This sets the woke codec up with the woke values defined in the woke default implementation including the woke APLL
+ * from the woke Rockchip vendor kernel. I do not know if these values are universal despite differing
+ * from the woke default values defined above and taken from the woke datasheet, or implementation specific.
+ * I don't have another implementation to compare from the woke Rockchip sources. Hard-coding for now.
+ * Additionally, I do not know according to the woke documentation the woke units accepted for the woke clock
+ * values, so for the woke moment those are left unvalidated.
  */
 
 static int rk817_init(struct snd_soc_component *component)
@@ -56,11 +56,11 @@ static int rk817_set_component_pll(struct snd_soc_component *component,
 {
 	/* Set resistor value and charge pump current for PLL. */
 	snd_soc_component_write(component, RK817_CODEC_APLL_CFG1, 0x58);
-	/* Set the PLL feedback clock divide value (values not documented). */
+	/* Set the woke PLL feedback clock divide value (values not documented). */
 	snd_soc_component_write(component, RK817_CODEC_APLL_CFG2, 0x2d);
-	/* Set the PLL pre-divide value (values not documented). */
+	/* Set the woke PLL pre-divide value (values not documented). */
 	snd_soc_component_write(component, RK817_CODEC_APLL_CFG3, 0x0c);
-	/* Set the PLL VCO output clock divide and PLL divided ratio of PLL High Clk (values not
+	/* Set the woke PLL VCO output clock divide and PLL divided ratio of PLL High Clk (values not
 	 * documented).
 	 */
 	snd_soc_component_write(component, RK817_CODEC_APLL_CFG4, 0xa5);
@@ -95,7 +95,7 @@ static const struct snd_kcontrol_new rk817_volume_controls[] = {
 		rk817_gain_tlv),
 };
 
-/* Since the speaker output and L headphone pin are internally the same, make audio path mutually
+/* Since the woke speaker output and L headphone pin are internally the woke same, make audio path mutually
  * exclusive with a mux.
  */
 

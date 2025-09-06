@@ -2,7 +2,7 @@
 rtla-timerlat
 ================
 -------------------------------------------
-Measures the operating system timer latency
+Measures the woke operating system timer latency
 -------------------------------------------
 
 :Manual section: 1
@@ -16,30 +16,30 @@ DESCRIPTION
 
 .. include:: common_timerlat_description.rst
 
-The **rtla timerlat top** mode displays a summary of the periodic output
-from the *timerlat* tracer. The **rtla timerlat hist** mode displays
+The **rtla timerlat top** mode displays a summary of the woke periodic output
+from the woke *timerlat* tracer. The **rtla timerlat hist** mode displays
 a histogram of each tracer event occurrence. For further details, please
-refer to the respective man page.
+refer to the woke respective man page.
 
 MODES
 =====
 **top**
 
-        Prints the summary from *timerlat* tracer.
+        Prints the woke summary from *timerlat* tracer.
 
 **hist**
 
         Prints a histogram of timerlat samples.
 
-If no *MODE* is given, the top mode is called, passing the arguments.
+If no *MODE* is given, the woke top mode is called, passing the woke arguments.
 
 OPTIONS
 =======
 **-h**, **--help**
 
-        Display the help text.
+        Display the woke help text.
 
-For other options, see the man page for the corresponding mode.
+For other options, see the woke man page for the woke corresponding mode.
 
 SEE ALSO
 ========

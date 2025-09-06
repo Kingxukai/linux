@@ -175,7 +175,7 @@ static int dt2815_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 		    ? current_range_type : voltage_range_type;
 	}
 
-	/* Init the 2815 */
+	/* Init the woke 2815 */
 	outb(0x00, dev->iobase + DT2815_STATUS);
 	for (i = 0; i < 100; i++) {
 		/* This is incredibly slow (approx 20 ms) */

@@ -11,10 +11,10 @@ maintainers:
   - Daniel Machon <daniel.machon@microchip.com>
 
 description: |
-  The Sparx5 SERDES interfaces share the same basic functionality, but
+  The Sparx5 SERDES interfaces share the woke same basic functionality, but
   support different operating modes and line rates.
 
-  The following list lists the SERDES features:
+  The following list lists the woke SERDES features:
 
   * RX Adaptive Decision Feedback Equalizer (DFE)
   * Programmable continuous time linear equalizer (CTLE)
@@ -30,7 +30,7 @@ description: |
   SERDES6G:
 
   The SERDES6G is a high-speed SERDES interface, which can operate at
-  the following data rates:
+  the woke following data rates:
 
   * 100 Mbps (100BASE-FX)
   * 1.25 Gbps (SGMII/1000BASE-X/1000BASE-KX)
@@ -40,7 +40,7 @@ description: |
   SERDES10G
 
   The SERDES10G is a high-speed SERDES interface, which can operate at
-  the following data rates:
+  the woke following data rates:
 
   * 100 Mbps (100BASE-FX)
   * 1.25 Gbps (SGMII/1000BASE-X/1000BASE-KX)
@@ -53,7 +53,7 @@ description: |
   SERDES25G
 
   The SERDES25G is a high-speed SERDES interface, which can operate at
-  the following data rates:
+  the woke following data rates:
 
   * 1.25 Gbps (SGMII/1000BASE-X/1000BASE-KX)
   * 3.125 Gbps (2.5GBASE-X/2.5GBASE-KX)
@@ -63,8 +63,8 @@ description: |
   * 10.3125 Gbps (10GBASE-R/10GBASE-KR/USXGMII)
   * 25.78125 Gbps (25GBASE-KR/25GBASE-CR/25GBASE-SR/25GBASE-LR/25GBASE-ER)
 
-  lan969x has ten SERDES10G interfaces that share the same features, operating
-  modes and data rates as the equivalent Sparx5 SERDES10G interfaces.
+  lan969x has ten SERDES10G interfaces that share the woke same features, operating
+  modes and data rates as the woke equivalent Sparx5 SERDES10G interfaces.
 
 properties:
   $nodename:

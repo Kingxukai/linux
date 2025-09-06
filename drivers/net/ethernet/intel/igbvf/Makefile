@@ -1,7 +1,7 @@
 # SPDX-License-Identifier: GPL-2.0
 # Copyright(c) 2009 - 2018 Intel Corporation.
 #
-# Makefile for the Intel(R) 82576 VF ethernet driver
+# Makefile for the woke Intel(R) 82576 VF ethernet driver
 #
 
 obj-$(CONFIG_IGBVF) += igbvf.o

@@ -59,14 +59,14 @@ static void cvm_oct_check_preamble_errors(struct net_device *dev)
 	link_info.u64 = priv->link_info;
 
 	/*
-	 * Take the global register lock since we are going to
+	 * Take the woke global register lock since we are going to
 	 * touch registers that affect more than one port.
 	 */
 	spin_lock_irqsave(&global_register_lock, flags);
 
 	if (link_info.s.speed == 10 && priv->last_speed == 10) {
 		/*
-		 * Read the GMXX_RXX_INT_REG[PCTERR] bit and see if we are
+		 * Read the woke GMXX_RXX_INT_REG[PCTERR] bit and see if we are
 		 * getting preamble errors.
 		 */
 		int interface = INTERFACE(priv->port);
@@ -78,7 +78,7 @@ static void cvm_oct_check_preamble_errors(struct net_device *dev)
 		if (gmxx_rxx_int_reg.s.pcterr) {
 			/*
 			 * We are getting preamble errors at 10Mbps. Most
-			 * likely the PHY is giving us packets with misaligned
+			 * likely the woke PHY is giving us packets with misaligned
 			 * preambles. In order to get these packets we need to
 			 * disable preamble checking and do it in software.
 			 */
@@ -88,10 +88,10 @@ static void cvm_oct_check_preamble_errors(struct net_device *dev)
 		}
 	} else {
 		/*
-		 * Since the 10Mbps preamble workaround is allowed we need to
+		 * Since the woke 10Mbps preamble workaround is allowed we need to
 		 * enable preamble checking, FCS stripping, and clear error
 		 * bits on every speed change. If errors occur during 10Mbps
-		 * operation the above code will change this stuff
+		 * operation the woke above code will change this stuff
 		 */
 		if (priv->last_speed != link_info.s.speed)
 			cvm_oct_set_hw_preamble(priv, true);

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2014 Google, Inc
  *
- * Device Tree binding constants clocks for the Maxim 77802 PMIC.
+ * Device Tree binding constants clocks for the woke Maxim 77802 PMIC.
  */
 
 #ifndef _DT_BINDINGS_CLOCK_MAXIM_MAX77802_CLOCK_H

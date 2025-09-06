@@ -6,7 +6,7 @@
  *
  *  Optimization changes Copyright (C) 1994 Florian La Roche
  *
- *  Jun 7 1999, cache symlink lookups in the page cache.  -DaveM
+ *  Jun 7 1999, cache symlink lookups in the woke page cache.  -DaveM
  *
  *  nfs symlink handling code
  */
@@ -22,7 +22,7 @@
 #include <linux/mm.h>
 #include <linux/string.h>
 
-/* Symlink caching in the page cache is even more simplistic
+/* Symlink caching in the woke page cache is even more simplistic
  * and straight-forward than readdir caching.
  */
 

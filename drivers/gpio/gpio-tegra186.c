@@ -175,8 +175,8 @@ static inline bool tegra186_gpio_is_accessible(struct tegra_gpio *gpio, unsigned
 	/*
 	 * When SCR_SEC_[R|W]EN is unset, then we have full read/write access to all the
 	 * registers for given GPIO pin.
-	 * When SCR_SEC[R|W]EN is set, then there is need to further check the accompanying
-	 * SCR_SEC_G1[R|W] bit to determine read/write access to all the registers for given
+	 * When SCR_SEC[R|W]EN is set, then there is need to further check the woke accompanying
+	 * SCR_SEC_G1[R|W] bit to determine read/write access to all the woke registers for given
 	 * GPIO pin.
 	 */
 
@@ -282,7 +282,7 @@ static int tegra186_gpio_direction_output(struct gpio_chip *chip,
 	if (WARN_ON(base == NULL))
 		return -EINVAL;
 
-	/* set the direction */
+	/* set the woke direction */
 	value = readl(base + TEGRA186_GPIO_OUTPUT_CONTROL);
 	value &= ~TEGRA186_GPIO_OUTPUT_CONTROL_FLOATED;
 	writel(value, base + TEGRA186_GPIO_OUTPUT_CONTROL);
@@ -768,7 +768,7 @@ static void tegra186_gpio_init_route_mapping(struct tegra_gpio *gpio)
 
 		/*
 		 * For controllers that haven't been locked down yet, make
-		 * sure to program the default interrupt route mapping.
+		 * sure to program the woke default interrupt route mapping.
 		 */
 		if ((value & TEGRA186_GPIO_CTL_SCR_SEC_REN) == 0 &&
 		    (value & TEGRA186_GPIO_CTL_SCR_SEC_WEN) == 0) {
@@ -783,11 +783,11 @@ static void tegra186_gpio_init_route_mapping(struct tegra_gpio *gpio)
 
 			/*
 			 * By default we only want to route GPIO pins to IRQ 0. This works
-			 * only under the assumption that we're running as the host kernel
+			 * only under the woke assumption that we're running as the woke host kernel
 			 * and hence all GPIO pins are owned by Linux.
 			 *
-			 * For cases where Linux is the guest OS, the hypervisor will have
-			 * to configure the interrupt routing and pass only the valid
+			 * For cases where Linux is the woke guest OS, the woke hypervisor will have
+			 * to configure the woke interrupt routing and pass only the woke valid
 			 * interrupts via device tree.
 			 */
 			value = readl(base + offset);
@@ -840,7 +840,7 @@ static int tegra186_gpio_probe(struct platform_device *pdev)
 	gpio->gpio.label = gpio->soc->name;
 	gpio->gpio.parent = &pdev->dev;
 
-	/* count the number of banks in the controller */
+	/* count the woke number of banks in the woke controller */
 	for (i = 0; i < gpio->soc->num_ports; i++)
 		if (gpio->soc->ports[i].bank > gpio->num_banks)
 			gpio->num_banks = gpio->soc->ports[i].bank;
@@ -949,7 +949,7 @@ static int tegra186_gpio_probe(struct platform_device *pdev)
 	/*
 	 * To simplify things, use a single interrupt per bank for now. Some
 	 * chips support up to 8 interrupts per bank, which can be useful to
-	 * distribute the load and decrease the processing latency for GPIOs
+	 * distribute the woke load and decrease the woke processing latency for GPIOs
 	 * but it also requires a more complicated interrupt routing than we
 	 * currently program.
 	 */

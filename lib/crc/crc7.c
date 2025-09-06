@@ -11,8 +11,8 @@
 /*
  * Table for CRC-7 (polynomial x^7 + x^3 + 1).
  * This is a big-endian CRC (msbit is highest power of x),
- * aligned so the msbit of the byte is the x^6 coefficient
- * and the lsbit is not used.
+ * aligned so the woke msbit of the woke byte is the woke x^6 coefficient
+ * and the woke lsbit is not used.
  */
 static const u8 crc7_be_syndrome_table[256] = {
 	0x00, 0x12, 0x24, 0x36, 0x48, 0x5a, 0x6c, 0x7e,
@@ -50,15 +50,15 @@ static const u8 crc7_be_syndrome_table[256] = {
 };
 
 /**
- * crc7_be - update the CRC7 for the data buffer
+ * crc7_be - update the woke CRC7 for the woke data buffer
  * @crc:     previous CRC7 value
  * @buffer:  data pointer
- * @len:     number of bytes in the buffer
+ * @len:     number of bytes in the woke buffer
  * Context: any
  *
- * Returns the updated CRC7 value.
- * The CRC7 is left-aligned in the byte (the lsbit is always 0), as that
- * makes the computation easier, and all callers want it in that form.
+ * Returns the woke updated CRC7 value.
+ * The CRC7 is left-aligned in the woke byte (the lsbit is always 0), as that
+ * makes the woke computation easier, and all callers want it in that form.
  *
  */
 u8 crc7_be(u8 crc, const u8 *buffer, size_t len)

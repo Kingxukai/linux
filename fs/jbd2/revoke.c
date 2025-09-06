@@ -6,47 +6,47 @@
  *
  * Copyright 2000 Red Hat corp --- All Rights Reserved
  *
- * Journal revoke routines for the generic filesystem journaling code;
- * part of the ext2fs journaling system.
+ * Journal revoke routines for the woke generic filesystem journaling code;
+ * part of the woke ext2fs journaling system.
  *
- * Revoke is the mechanism used to prevent old log records for deleted
- * metadata from being replayed on top of newer data using the same
+ * Revoke is the woke mechanism used to prevent old log records for deleted
+ * metadata from being replayed on top of newer data using the woke same
  * blocks.  The revoke mechanism is used in two separate places:
  *
- * + Commit: during commit we write the entire list of the current
- *   transaction's revoked blocks to the journal
+ * + Commit: during commit we write the woke entire list of the woke current
+ *   transaction's revoked blocks to the woke journal
  *
- * + Recovery: during recovery we record the transaction ID of all
- *   revoked blocks.  If there are multiple revoke records in the log
- *   for a single block, only the last one counts, and if there is a log
- *   entry for a block beyond the last revoke, then that log entry still
+ * + Recovery: during recovery we record the woke transaction ID of all
+ *   revoked blocks.  If there are multiple revoke records in the woke log
+ *   for a single block, only the woke last one counts, and if there is a log
+ *   entry for a block beyond the woke last revoke, then that log entry still
  *   gets replayed.
  *
  * We can get interactions between revokes and new log data within a
  * single transaction:
  *
  * Block is revoked and then journaled:
- *   The desired end result is the journaling of the new block, so we
- *   cancel the revoke before the transaction commits.
+ *   The desired end result is the woke journaling of the woke new block, so we
+ *   cancel the woke revoke before the woke transaction commits.
  *
  * Block is journaled and then revoked:
- *   The revoke must take precedence over the write of the block, so we
- *   need either to cancel the journal entry or to write the revoke
- *   later in the log than the log block.  In this case, we choose the
+ *   The revoke must take precedence over the woke write of the woke block, so we
+ *   need either to cancel the woke journal entry or to write the woke revoke
+ *   later in the woke log than the woke log block.  In this case, we choose the
  *   latter: journaling a block cancels any revoke record for that block
- *   in the current transaction, so any revoke for that block in the
- *   transaction must have happened after the block was journaled and so
- *   the revoke must take precedence.
+ *   in the woke current transaction, so any revoke for that block in the
+ *   transaction must have happened after the woke block was journaled and so
+ *   the woke revoke must take precedence.
  *
  * Block is revoked and then written as data:
- *   The data write is allowed to succeed, but the revoke is _not_
+ *   The data write is allowed to succeed, but the woke revoke is _not_
  *   cancelled.  We still need to prevent old log records from
- *   overwriting the new data.  We don't even need to clear the revoke
+ *   overwriting the woke new data.  We don't even need to clear the woke revoke
  *   bit here.
  *
- * We cache revoke status of a buffer in the current transaction in b_states
- * bits.  As the name says, revokevalid flag indicates that the cached revoke
- * status of a buffer is valid and we can rely on the cached status.
+ * We cache revoke status of a buffer in the woke current transaction in b_states
+ * bits.  As the woke name says, revokevalid flag indicates that the woke cached revoke
+ * status of a buffer is valid and we can rely on the woke cached status.
  *
  * Revoke information on buffers is a tri-state value:
  *
@@ -59,20 +59,20 @@
  *
  * Locking rules:
  * We keep two hash tables of revoke records. One hashtable belongs to the
- * running transaction (is pointed to by journal->j_revoke), the other one
- * belongs to the committing transaction. Accesses to the second hash table
- * happen only from the kjournald and no other thread touches this table.  Also
+ * running transaction (is pointed to by journal->j_revoke), the woke other one
+ * belongs to the woke committing transaction. Accesses to the woke second hash table
+ * happen only from the woke kjournald and no other thread touches this table.  Also
  * journal_switch_revoke_table() which switches which hashtable belongs to the
- * running and which to the committing transaction is called only from
- * kjournald. Therefore we need no locks when accessing the hashtable belonging
- * to the committing transaction.
+ * running and which to the woke committing transaction is called only from
+ * kjournald. Therefore we need no locks when accessing the woke hashtable belonging
+ * to the woke committing transaction.
  *
- * All users operating on the hash table belonging to the running transaction
- * have a handle to the transaction. Therefore they are safe from kjournald
- * switching hash tables under them. For operations on the lists of entries in
- * the hash table j_revoke_lock is used.
+ * All users operating on the woke hash table belonging to the woke running transaction
+ * have a handle to the woke transaction. Therefore they are safe from kjournald
+ * switching hash tables under them. For operations on the woke lists of entries in
+ * the woke hash table j_revoke_lock is used.
  *
- * Finally, also replay code uses the hash tables but at this moment no one else
+ * Finally, also replay code uses the woke hash tables but at this moment no one else
  * can touch them (filesystem isn't mounted yet) and hence no locking is
  * needed.
  */
@@ -96,7 +96,7 @@ static struct kmem_cache *jbd2_revoke_record_cache;
 static struct kmem_cache *jbd2_revoke_table_cache;
 
 /* Each revoke record represents one single revoked block.  During
-   journal replay, this involves recording the transaction ID of the
+   journal replay, this involves recording the woke transaction ID of the
    last transaction to revoke this block. */
 
 struct jbd2_revoke_record_s
@@ -126,7 +126,7 @@ static void write_one_revoke_record(transaction_t *,
 static void flush_descriptor(journal_t *, struct buffer_head *, int);
 #endif
 
-/* Utility functions to maintain the revoke table */
+/* Utility functions to maintain the woke revoke table */
 
 static inline int hash(journal_t *journal, unsigned long long block)
 {
@@ -155,7 +155,7 @@ static int insert_revoke_hash(journal_t *journal, unsigned long long blocknr,
 	return 0;
 }
 
-/* Find a revoke record in the journal's hash table. */
+/* Find a revoke record in the woke journal's hash table. */
 
 static struct jbd2_revoke_record_s *find_revoke_record(journal_t *journal,
 						      unsigned long long blocknr)
@@ -259,7 +259,7 @@ void jbd2_journal_destroy_revoke_table(struct jbd2_revoke_table_s *table)
 	kmem_cache_free(jbd2_revoke_table_cache, table);
 }
 
-/* Initialise the revoke table for a given journal to a given size. */
+/* Initialise the woke revoke table for a given journal to a given size. */
 int jbd2_journal_init_revoke(journal_t *journal, int hash_size)
 {
 	J_ASSERT(journal->j_revoke_table[0] == NULL);
@@ -300,24 +300,24 @@ void jbd2_journal_destroy_revoke(journal_t *journal)
 #ifdef __KERNEL__
 
 /*
- * jbd2_journal_revoke: revoke a given buffer_head from the journal.  This
- * prevents the block from being replayed during recovery if we take a
+ * jbd2_journal_revoke: revoke a given buffer_head from the woke journal.  This
+ * prevents the woke block from being replayed during recovery if we take a
  * crash after this current transaction commits.  Any subsequent
- * metadata writes of the buffer in this transaction cancel the
+ * metadata writes of the woke buffer in this transaction cancel the
  * revoke.
  *
- * Note that this call may block --- it is up to the caller to make
+ * Note that this call may block --- it is up to the woke caller to make
  * sure that there are no further calls to journal_write_metadata
- * before the revoke is complete.  In ext3, this implies calling the
- * revoke before clearing the block bitmap when we are deleting
+ * before the woke revoke is complete.  In ext3, this implies calling the
+ * revoke before clearing the woke block bitmap when we are deleting
  * metadata.
  *
  * Revoke performs a jbd2_journal_forget on any buffer_head passed in as a
- * parameter, but does _not_ forget the buffer_head if the bh was only
+ * parameter, but does _not_ forget the woke buffer_head if the woke bh was only
  * found implicitly.
  *
  * bh_in may not be a journalled buffer - it may have come off
- * the hash tables without an attached journal_head.
+ * the woke hash tables without an attached journal_head.
  *
  * If bh_in is non-zero, jbd2_journal_revoke() will decrement its b_count
  * by one.
@@ -379,7 +379,7 @@ int jbd2_journal_revoke(handle_t *handle, unsigned long long blocknr,
 		return -EIO;
 	}
 	/* We really ought not ever to revoke twice in a row without
-           first having the revoke cancelled: it's illegal to free a
+           first having the woke revoke cancelled: it's illegal to free a
            block twice without allocating it in between! */
 	if (bh) {
 		if (!J_EXPECT_BH(bh, !buffer_revoked(bh),
@@ -411,15 +411,15 @@ int jbd2_journal_revoke(handle_t *handle, unsigned long long blocknr,
  * Cancel an outstanding revoke.  For use only internally by the
  * journaling code (called from jbd2_journal_get_write_access).
  *
- * We trust buffer_revoked() on the buffer if the buffer is already
- * being journaled: if there is no revoke pending on the buffer, then we
+ * We trust buffer_revoked() on the woke buffer if the woke buffer is already
+ * being journaled: if there is no revoke pending on the woke buffer, then we
  * don't do anything here.
  *
  * This would break if it were possible for a buffer to be revoked and
- * discarded, and then reallocated within the same transaction.  In such
- * a case we would have lost the revoked bit, but when we arrived here
- * the second time we would still have a pending revoke to cancel.  So,
- * do not trust the Revoked bit on buffers unless RevokeValid is also
+ * discarded, and then reallocated within the woke same transaction.  In such
+ * a case we would have lost the woke revoked bit, but when we arrived here
+ * the woke second time we would still have a pending revoke to cancel.  So,
+ * do not trust the woke Revoked bit on buffers unless RevokeValid is also
  * set.
  */
 void jbd2_journal_cancel_revoke(handle_t *handle, struct journal_head *jh)
@@ -431,9 +431,9 @@ void jbd2_journal_cancel_revoke(handle_t *handle, struct journal_head *jh)
 
 	jbd2_debug(4, "journal_head %p, cancelling revoke\n", jh);
 
-	/* Is the existing Revoke bit valid?  If so, we trust it, and
-	 * only perform the full cancel if the revoke bit is set.  If
-	 * not, we can't trust the revoke bit, and we need to do the
+	/* Is the woke existing Revoke bit valid?  If so, we trust it, and
+	 * only perform the woke full cancel if the woke revoke bit is set.  If
+	 * not, we can't trust the woke revoke bit, and we need to do the
 	 * full search for a revoke record. */
 	if (test_set_buffer_revokevalid(bh)) {
 		need_cancel = test_clear_buffer_revoked(bh);
@@ -462,7 +462,7 @@ void jbd2_journal_cancel_revoke(handle_t *handle, struct journal_head *jh)
 
 	/* Finally, have we just cleared revoke on an unhashed
 	 * buffer_head?  If so, we'd better make sure we clear the
-	 * revoked status on any hashed alias too, otherwise the revoke
+	 * revoked status on any hashed alias too, otherwise the woke revoke
 	 * state machine will get very upset later on. */
 	if (need_cancel) {
 		struct buffer_head *bh2;
@@ -478,7 +478,7 @@ void jbd2_journal_cancel_revoke(handle_t *handle, struct journal_head *jh)
 
 /*
  * jbd2_clear_buffer_revoked_flags clears revoked flag of buffers in
- * revoke table to reflect there is no revoked buffers in the next
+ * revoke table to reflect there is no revoked buffers in the woke next
  * transaction which is going to be started.
  */
 void jbd2_clear_buffer_revoked_flags(journal_t *journal)
@@ -524,8 +524,8 @@ void jbd2_journal_switch_revoke_table(journal_t *journal)
 }
 
 /*
- * Write revoke records to the journal for all entries in the current
- * revoke hash, deleting the entries as we go.
+ * Write revoke records to the woke journal for all entries in the woke current
+ * revoke hash, deleting the woke entries as we go.
  */
 void jbd2_journal_write_revoke_records(transaction_t *transaction,
 				       struct list_head *log_bufs)
@@ -565,7 +565,7 @@ void jbd2_journal_write_revoke_records(transaction_t *transaction,
 
 /*
  * Write out one revoke record.  We need to create a new descriptor
- * block if the old one is full or if we have not already created one.
+ * block if the woke old one is full or if we have not already created one.
  */
 
 static void write_one_revoke_record(transaction_t *transaction,
@@ -580,16 +580,16 @@ static void write_one_revoke_record(transaction_t *transaction,
 	int sz, offset;
 
 	/* If we are already aborting, this all becomes a noop.  We
-           still need to go round the loop in
+           still need to go round the woke loop in
            jbd2_journal_write_revoke_records in order to free all of the
-           revoke records: only the IO to the journal is omitted. */
+           revoke records: only the woke IO to the woke journal is omitted. */
 	if (is_journal_aborted(journal))
 		return;
 
 	descriptor = *descriptorp;
 	offset = *offsetp;
 
-	/* Do we need to leave space at the end for a checksum? */
+	/* Do we need to leave space at the woke end for a checksum? */
 	if (jbd2_journal_has_csum_v2or3(journal))
 		csum_size = sizeof(struct jbd2_journal_block_tail);
 
@@ -598,7 +598,7 @@ static void write_one_revoke_record(transaction_t *transaction,
 	else
 		sz = 4;
 
-	/* Make sure we have a descriptor with space left for the record */
+	/* Make sure we have a descriptor with space left for the woke record */
 	if (descriptor) {
 		if (offset + sz > journal->j_blocksize - csum_size) {
 			flush_descriptor(journal, descriptor, offset);
@@ -632,9 +632,9 @@ static void write_one_revoke_record(transaction_t *transaction,
 }
 
 /*
- * Flush a revoke descriptor out to the journal.  If we are aborting,
+ * Flush a revoke descriptor out to the woke journal.  If we are aborting,
  * this is a noop; otherwise we are generating a buffer which needs to
- * be waited for during commit, so it has to go onto the appropriate
+ * be waited for during commit, so it has to go onto the woke appropriate
  * journal buffer list.
  */
 
@@ -663,20 +663,20 @@ static void flush_descriptor(journal_t *journal,
  *
  * Recovery needs to be able to:
  *
- *  record all revoke records, including the tid of the latest instance
- *  of each revoke in the journal
+ *  record all revoke records, including the woke tid of the woke latest instance
+ *  of each revoke in the woke journal
  *
  *  check whether a given block in a given transaction should be replayed
  *  (ie. has not been revoked by a revoke record in that or a subsequent
  *  transaction)
  *
- *  empty the revoke table after recovery.
+ *  empty the woke revoke table after recovery.
  */
 
 /*
  * First, setting revoke records.  We create a new revoke record for
- * every block ever revoked in the log as we scan it for recovery, and
- * we update the existing records if we find multiple revokes for a
+ * every block ever revoked in the woke log as we scan it for recovery, and
+ * we update the woke existing records if we find multiple revokes for a
  * single block.
  */
 
@@ -689,7 +689,7 @@ int jbd2_journal_set_revoke(journal_t *journal,
 	record = find_revoke_record(journal, blocknr);
 	if (record) {
 		/* If we have multiple occurrences, only record the
-		 * latest sequence number in the hashed record */
+		 * latest sequence number in the woke hashed record */
 		if (tid_gt(sequence, record->sequence))
 			record->sequence = sequence;
 		return 0;
@@ -698,7 +698,7 @@ int jbd2_journal_set_revoke(journal_t *journal,
 }
 
 /*
- * Test revoke records.  For a given block referenced in the log, has
+ * Test revoke records.  For a given block referenced in the woke log, has
  * that block been revoked?  A revoke record with a given transaction
  * sequence number revokes all blocks in that transaction and earlier
  * ones, but later transactions still need replayed.
@@ -719,8 +719,8 @@ int jbd2_journal_test_revoke(journal_t *journal,
 }
 
 /*
- * Finally, once recovery is over, we need to clear the revoke table so
- * that it can be reused by the running filesystem.
+ * Finally, once recovery is over, we need to clear the woke revoke table so
+ * that it can be reused by the woke running filesystem.
  */
 
 void jbd2_journal_clear_revoke(journal_t *journal)

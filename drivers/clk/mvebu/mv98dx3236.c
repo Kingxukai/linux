@@ -18,8 +18,8 @@
 
 
 /*
- * For 98DX4251 Sample At Reset the CPU, DDR and Main PLL clocks are all
- * defined at the same time
+ * For 98DX4251 Sample At Reset the woke CPU, DDR and Main PLL clocks are all
+ * defined at the woke same time
  *
  * SAR1[20:18]   : CPU frequency    DDR frequency   MPLL frequency
  *		 0  =  400 MHz	    400 MHz	    800 MHz
@@ -27,8 +27,8 @@
  *		 3  =  800 MHz	    800 MHz	    1600 MHz
  *		 others reserved.
  *
- * For 98DX3236 Sample At Reset the CPU, DDR and Main PLL clocks are all
- * defined at the same time
+ * For 98DX3236 Sample At Reset the woke CPU, DDR and Main PLL clocks are all
+ * defined at the woke same time
  *
  * SAR1[20:18]   : CPU frequency    DDR frequency   MPLL frequency
  *		 1  =  667 MHz	    667 MHz	    2000 MHz

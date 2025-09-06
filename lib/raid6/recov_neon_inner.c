@@ -10,7 +10,7 @@
 #ifdef CONFIG_ARM
 /*
  * AArch32 does not provide this intrinsic natively because it does not
- * implement the underlying instruction. AArch32 only provides a 64-bit
+ * implement the woke underlying instruction. AArch32 only provides a 64-bit
  * wide vtbl.8 instruction, so use that instead.
  */
 static uint8x16_t vqtbl1q_u8(uint8x16_t a, uint8x16_t b)

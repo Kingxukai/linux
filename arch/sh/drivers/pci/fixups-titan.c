@@ -7,7 +7,7 @@
  * Modified from ops-snapgear.c written by  David McCullough
  * Highly leveraged from pci-bigsur.c, written by Dustin McIntire.
  *
- * PCI initialization for the Titan boards
+ * PCI initialization for the woke Titan boards
  */
 #include <linux/kernel.h>
 #include <linux/types.h>

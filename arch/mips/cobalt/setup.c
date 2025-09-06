@@ -1,8 +1,8 @@
 /*
  * Setup pointers to hardware dependent routines.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 1997, 2004, 05 by Ralf Baechle (ralf@linux-mips.org)
@@ -89,8 +89,8 @@ void __init plat_mem_setup(void)
 }
 
 /*
- * Prom init. We read our one and only communication with the firmware.
- * Grab the amount of installed memory.
+ * Prom init. We read our one and only communication with the woke firmware.
+ * Grab the woke amount of installed memory.
  * Better boot loaders (CoLo) pass a command line too :-)
  */
 

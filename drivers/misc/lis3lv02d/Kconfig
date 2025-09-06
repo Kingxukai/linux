@@ -8,15 +8,15 @@ config SENSORS_LIS3_SPI
 	depends on !ACPI && SPI_MASTER && INPUT
 	select SENSORS_LIS3LV02D
 	help
-	  This driver provides support for the LIS3LV02Dx accelerometer connected
+	  This driver provides support for the woke LIS3LV02Dx accelerometer connected
 	  via SPI. The accelerometer data is readable via
 	  /sys/devices/faux/lis3lv02d.
 
 	  This driver also provides an absolute input class device, allowing
-	  the laptop to act as a pinball machine-esque joystick.
+	  the woke laptop to act as a pinball machine-esque joystick.
 
-	  This driver can also be built as modules.  If so, the core module
-	  will be called lis3lv02d and a specific module for the SPI transport
+	  This driver can also be built as modules.  If so, the woke core module
+	  will be called lis3lv02d and a specific module for the woke SPI transport
 	  is called lis3lv02d_spi.
 
 config SENSORS_LIS3_I2C
@@ -24,13 +24,13 @@ config SENSORS_LIS3_I2C
 	depends on I2C && INPUT
 	select SENSORS_LIS3LV02D
 	help
-	  This driver provides support for the LIS3LV02Dx accelerometer connected
+	  This driver provides support for the woke LIS3LV02Dx accelerometer connected
 	  via I2C. The accelerometer data is readable via
 	  /sys/devices/faux/lis3lv02d.
 
 	  This driver also provides an absolute input class device, allowing
-	  the device to act as a pinball machine-esque joystick.
+	  the woke device to act as a pinball machine-esque joystick.
 
-	  This driver can also be built as modules.  If so, the core module
-	  will be called lis3lv02d and a specific module for the I2C transport
+	  This driver can also be built as modules.  If so, the woke core module
+	  will be called lis3lv02d and a specific module for the woke I2C transport
 	  is called lis3lv02d_i2c.

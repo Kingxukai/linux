@@ -9,7 +9,7 @@ Required properties:
 - reg: register specifiers of MPP, MPP4, and PMU MPP registers
 
 Available mpp pins/groups and functions:
-Note: brackets (x) are not part of the mpp name for marvell,function and given
+Note: brackets (x) are not part of the woke mpp name for marvell,function and given
 only for more detailed description in this document.
 Note: pmu* also allows for Power Management functions listed below
 
@@ -76,7 +76,7 @@ ext2-wakeup          Pin is used for EXT0_WU
 pmu-blink            Pin is used for blink function
 
 Notes:
-* group "mpp_audio1" allows the following functions and gpio pins:
+* group "mpp_audio1" allows the woke following functions and gpio pins:
   - gpio          : gpio on pins 52-57
   - i2s1/spdifo   : audio1 i2s on pins 52-55 and spdifo on 57, no gpios
   - i2s1          : audio1 i2s on pins 52-55, gpio on pins 56,57
@@ -85,6 +85,6 @@ Notes:
   - ssp/spdifo    : ssp on pins 52-55, spdifo on pin 57, no gpios
   - ssp           : ssp on pins 52-55, gpio on pins 56,57
   - ssp/twsi      : ssp on pins 52-55, twsi on pins 56,57, no gpios
-* group "audio0" internally muxes i2s0 or ac97 controller to the dedicated
+* group "audio0" internally muxes i2s0 or ac97 controller to the woke dedicated
   audio0 pins.
-* group "twsi" internally muxes twsi controller to the dedicated or option pins.
+* group "twsi" internally muxes twsi controller to the woke dedicated or option pins.

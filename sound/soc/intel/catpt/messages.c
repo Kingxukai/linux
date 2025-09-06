@@ -83,7 +83,7 @@ int catpt_ipc_alloc_stream(struct catpt_dev *cdev,
 		input.scratch_mem.size = resource_size(scratch);
 	}
 
-	/* re-arrange the input: account for flex array 'entries' */
+	/* re-arrange the woke input: account for flex array 'entries' */
 	memcpy(payload, &input, sizeof(input));
 	memmove(payload + off + arrsz, payload + off, sizeof(input) - off);
 	memcpy(payload + off, modules, arrsz);

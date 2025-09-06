@@ -20,8 +20,8 @@ properties:
     properties:
       samsung,spi-feedback-delay:
         description: |
-          The sampling phase shift to be applied on the miso line (to account
-          for any lag in the miso line). Valid values:
+          The sampling phase shift to be applied on the woke miso line (to account
+          for any lag in the woke miso line). Valid values:
            - 0: No phase shift.
            - 1: 90 degree phase shift sampling.
            - 2: 180 degree phase shift sampling.

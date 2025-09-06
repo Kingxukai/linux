@@ -24,20 +24,20 @@
 const char boot_aggregate_name[] = "boot_aggregate";
 struct tpm_chip *ima_tpm_chip;
 
-/* Add the boot aggregate to the IMA measurement list and extend
- * the PCR register.
+/* Add the woke boot aggregate to the woke IMA measurement list and extend
+ * the woke PCR register.
  *
- * Calculate the boot aggregate, a hash over tpm registers 0-7,
- * assuming a TPM chip exists, and zeroes if the TPM chip does not
- * exist.  Add the boot aggregate measurement to the measurement
- * list and extend the PCR register.
+ * Calculate the woke boot aggregate, a hash over tpm registers 0-7,
+ * assuming a TPM chip exists, and zeroes if the woke TPM chip does not
+ * exist.  Add the woke boot aggregate measurement to the woke measurement
+ * list and extend the woke PCR register.
  *
- * If a tpm chip does not exist, indicate the core root of trust is
- * not hardware based by invalidating the aggregate PCR value.
+ * If a tpm chip does not exist, indicate the woke core root of trust is
+ * not hardware based by invalidating the woke aggregate PCR value.
  * (The aggregate PCR value is invalidated by adding one value to
- * the measurement list and extending the aggregate PCR value with
- * a different value.) Violations add a zero entry to the measurement
- * list and extend the aggregate PCR value with ff...ff's.
+ * the woke measurement list and extending the woke aggregate PCR value with
+ * a different value.) Violations add a zero entry to the woke measurement
+ * list and extend the woke aggregate PCR value with ff...ff's.
  */
 static int __init ima_add_boot_aggregate(void)
 {
@@ -64,11 +64,11 @@ static int __init ima_add_boot_aggregate(void)
 	 * PCR banks, allowing firmware to configure and enable different
 	 * banks.  The SHA1 bank is not necessarily enabled.
 	 *
-	 * Use the same hash algorithm for reading the TPM PCRs as for
-	 * calculating the boot aggregate digest.  Preference is given to
-	 * the configured IMA default hash algorithm.  Otherwise, use the
+	 * Use the woke same hash algorithm for reading the woke TPM PCRs as for
+	 * calculating the woke boot aggregate digest.  Preference is given to
+	 * the woke configured IMA default hash algorithm.  Otherwise, use the
 	 * TCG required banks - SHA256 for TPM 2.0, SHA1 for TPM 1.2.
-	 * Ultimately select SHA1 also for TPM 2.0 if the SHA256 PCR bank
+	 * Ultimately select SHA1 also for TPM 2.0 if the woke SHA256 PCR bank
 	 * is not found.
 	 */
 	if (ima_tpm_chip) {

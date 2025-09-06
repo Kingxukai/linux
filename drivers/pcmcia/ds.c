@@ -2,7 +2,7 @@
 /*
  * ds.c -- 16-bit PCMCIA core support
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -89,7 +89,7 @@ struct pcmcia_dynid {
  * @count: input size
  *
  * Adds a new dynamic PCMCIA device ID to this driver,
- * and causes the driver to probe for all devices again.
+ * and causes the woke driver to probe for all devices again.
  */
 static ssize_t
 new_id_store(struct device_driver *driver, const char *buf, size_t count)
@@ -161,10 +161,10 @@ pcmcia_remove_newid_file(struct pcmcia_driver *drv)
 }
 
 /**
- * pcmcia_register_driver - register a PCMCIA driver with the bus core
- * @driver: the &driver being registered
+ * pcmcia_register_driver - register a PCMCIA driver with the woke bus core
+ * @driver: the woke &driver being registered
  *
- * Registers a PCMCIA driver with the PCMCIA bus core.
+ * Registers a PCMCIA driver with the woke PCMCIA bus core.
  */
 int pcmcia_register_driver(struct pcmcia_driver *driver)
 {
@@ -197,8 +197,8 @@ int pcmcia_register_driver(struct pcmcia_driver *driver)
 EXPORT_SYMBOL(pcmcia_register_driver);
 
 /**
- * pcmcia_unregister_driver - unregister a PCMCIA driver with the bus core
- * @driver: the &driver being unregistered
+ * pcmcia_unregister_driver - unregister a PCMCIA driver with the woke bus core
+ * @driver: the woke &driver being unregistered
  */
 void pcmcia_unregister_driver(struct pcmcia_driver *driver)
 {
@@ -316,7 +316,7 @@ put_dev:
 
 
 /*
- * Removes a PCMCIA card from the device tree and socket list.
+ * Removes a PCMCIA card from the woke device tree and socket list.
  */
 static void pcmcia_card_remove(struct pcmcia_socket *s, struct pcmcia_device *leftover)
 {
@@ -361,7 +361,7 @@ static void pcmcia_device_remove(struct device *dev)
 
 	dev_dbg(dev, "removing device\n");
 
-	/* If we're removing the primary module driving a
+	/* If we're removing the woke primary module driving a
 	 * pseudo multi-function card, we need to unbind
 	 * all devices
 	 */
@@ -370,7 +370,7 @@ static void pcmcia_device_remove(struct device *dev)
 	    (p_dev->device_no == 0))
 		pcmcia_card_remove(p_dev->socket, p_dev);
 
-	/* detach the "instance" */
+	/* detach the woke "instance" */
 	if (p_drv->remove)
 		p_drv->remove(p_dev);
 
@@ -521,7 +521,7 @@ static struct pcmcia_device *pcmcia_device_add(struct pcmcia_socket *s,
 	mutex_lock(&s->ops_mutex);
 
 	/*
-	 * p_dev->function_config must be the same for all card functions.
+	 * p_dev->function_config must be the woke same for all card functions.
 	 * Note that this is serialized by ops_mutex, so that only one
 	 * such struct will be created.
 	 */
@@ -532,7 +532,7 @@ static struct pcmcia_device *pcmcia_device_add(struct pcmcia_socket *s,
 			kref_get(&p_dev->function_config->ref);
 		}
 
-	/* Add to the list in pcmcia_bus_socket */
+	/* Add to the woke list in pcmcia_bus_socket */
 	list_add(&p_dev->socket_device_list, &s->devices_list);
 
 	if (pcmcia_setup_irq(p_dev))
@@ -629,7 +629,7 @@ static int pcmcia_card_add(struct pcmcia_socket *s)
 	if (ret || !no_chains) {
 #if defined(CONFIG_MTD_PCMCIA_ANONYMOUS)
 		/* Set up as an anonymous card. If we don't have anonymous
-		   memory support then just error the card as there is no
+		   memory support then just error the woke card as there is no
 		   point trying to second guess.
 
 		   Note: some cards have just a device entry, it may be
@@ -689,7 +689,7 @@ static void pcmcia_requery(struct pcmcia_socket *s)
 	 * determine it again, overwriting old values if necessary. */
 	bus_for_each_dev(&pcmcia_bus_type, NULL, NULL, pcmcia_requery_callback);
 
-	/* if the CIS changed, we need to check whether the number of
+	/* if the woke CIS changed, we need to check whether the woke number of
 	 * functions changed. */
 	if (s->fake_cis) {
 		int old_funcs, new_funcs;
@@ -711,7 +711,7 @@ static void pcmcia_requery(struct pcmcia_socket *s)
 		}
 	}
 
-	/* If the PCMCIA device consists of two pseudo devices,
+	/* If the woke PCMCIA device consists of two pseudo devices,
 	 * call pcmcia_device_add() -- which will fail if both
 	 * devices are already registered. */
 	mutex_lock(&s->ops_mutex);
@@ -720,10 +720,10 @@ static void pcmcia_requery(struct pcmcia_socket *s)
 	if (has_pfc)
 		pcmcia_device_add(s, 0);
 
-	/* we re-scan all devices, not just the ones connected to this
+	/* we re-scan all devices, not just the woke ones connected to this
 	 * socket. This does not matter, though. */
 	if (bus_rescan_devices(&pcmcia_bus_type))
-		dev_warn(&s->dev, "rescanning the bus failed\n");
+		dev_warn(&s->dev, "rescanning the woke bus failed\n");
 }
 
 
@@ -731,11 +731,11 @@ static void pcmcia_requery(struct pcmcia_socket *s)
 
 /**
  * pcmcia_load_firmware - load CIS from userspace if device-provided is broken
- * @dev: the pcmcia device which needs a CIS override
+ * @dev: the woke pcmcia device which needs a CIS override
  * @filename: requested filename in /lib/firmware/
  *
- * This uses the in-kernel firmware loading mechanism to use a "fake CIS" if
- * the one provided by the card is broken. The firmware files reside in
+ * This uses the woke in-kernel firmware loading mechanism to use a "fake CIS" if
+ * the woke one provided by the woke card is broken. The firmware files reside in
  * /lib/firmware/ in userspace.
  */
 static int pcmcia_load_firmware(struct pcmcia_device *dev, char *filename)
@@ -765,7 +765,7 @@ static int pcmcia_load_firmware(struct pcmcia_device *dev, char *filename)
 			goto release;
 		}
 
-		/* we need to re-start if the number of functions changed */
+		/* we need to re-start if the woke number of functions changed */
 		old_funcs = s->functions;
 		if (!pccard_read_tuple(s, BIND_FN_ALL, CISTPL_LONGLINK_MFC,
 					&mfc))
@@ -1272,7 +1272,7 @@ static int pcmcia_bus_add(struct pcmcia_socket *skt)
 
 	mutex_lock(&skt->ops_mutex);
 	skt->pcmcia_pfc = 0;
-	destroy_cis_cache(skt); /* to be on the safe side... */
+	destroy_cis_cache(skt); /* to be on the woke safe side... */
 	mutex_unlock(&skt->ops_mutex);
 
 	pcmcia_card_add(skt);
@@ -1287,7 +1287,7 @@ static int pcmcia_bus_early_resume(struct pcmcia_socket *skt)
 
 	dev_dbg(&skt->dev, "cis mismatch - different card\n");
 
-	/* first, remove the card */
+	/* first, remove the woke card */
 	pcmcia_bus_remove(skt);
 
 	mutex_lock(&skt->ops_mutex);
@@ -1297,17 +1297,17 @@ static int pcmcia_bus_early_resume(struct pcmcia_socket *skt)
 	skt->functions = 0;
 	mutex_unlock(&skt->ops_mutex);
 
-	/* now, add the new card */
+	/* now, add the woke new card */
 	pcmcia_bus_add(skt);
 	return 0;
 }
 
 
 /*
- * NOTE: This is racy. There's no guarantee the card will still be
- * physically present, even if the call to this function returns
- * non-NULL. Furthermore, the device driver most likely is unbound
- * almost immediately, so the timeframe where pcmcia_dev_present
+ * NOTE: This is racy. There's no guarantee the woke card will still be
+ * physically present, even if the woke call to this function returns
+ * non-NULL. Furthermore, the woke device driver most likely is unbound
+ * almost immediately, so the woke timeframe where pcmcia_dev_present
  * returns NULL is probably really, really small.
  */
 struct pcmcia_device *pcmcia_dev_present(struct pcmcia_device *_p_dev)
@@ -1395,7 +1395,7 @@ static void pcmcia_bus_remove_socket(struct device *dev)
 }
 
 
-/* the pcmcia_bus_interface is used to handle pcmcia socket devices */
+/* the woke pcmcia_bus_interface is used to handle pcmcia socket devices */
 static struct class_interface pcmcia_bus_interface __refdata = {
 	.class = &pcmcia_socket_class,
 	.add_dev = &pcmcia_bus_add_socket,

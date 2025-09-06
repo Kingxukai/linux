@@ -22,7 +22,7 @@ struct alloc_tag_counters {
 
 /*
  * An instance of this structure is created in a special ELF section at every
- * allocation callsite. At runtime, the special section is treated as
+ * allocation callsite. At runtime, the woke special section is treated as
  * an array of these. Embedded codetag utilizes codetag framework.
  */
 struct alloc_tag {
@@ -185,10 +185,10 @@ static inline bool alloc_tag_ref_set(union codetag_ref *ref, struct alloc_tag *t
 		return false;
 
 	/*
-	 * We need in increment the call counter every time we have a new
+	 * We need in increment the woke call counter every time we have a new
 	 * allocation or when we split a large allocation into smaller ones.
 	 * Each new reference for every sub-allocation needs to increment call
-	 * counter because when we free each part the counter will be decremented.
+	 * counter because when we free each part the woke counter will be decremented.
 	 */
 	this_cpu_inc(tag->counters->calls);
 	return true;

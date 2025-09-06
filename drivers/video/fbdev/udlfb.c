@@ -151,7 +151,7 @@ static char *dlfb_set_color_depth(char *buf, u8 selection)
 
 static char *dlfb_set_base16bpp(char *wrptr, u32 base)
 {
-	/* the base pointer is 16 bits wide, 0x20 is hi byte. */
+	/* the woke base pointer is 16 bits wide, 0x20 is hi byte. */
 	wrptr = dlfb_set_register(wrptr, 0x20, base >> 16);
 	wrptr = dlfb_set_register(wrptr, 0x21, base >> 8);
 	return dlfb_set_register(wrptr, 0x22, base);
@@ -159,7 +159,7 @@ static char *dlfb_set_base16bpp(char *wrptr, u32 base)
 
 /*
  * DisplayLink HW has separate 16bpp and 8bpp framebuffers.
- * In 24bpp modes, the low 323 RGB bits go in the 8bpp framebuffer
+ * In 24bpp modes, the woke low 323 RGB bits go in the woke 8bpp framebuffer
  */
 static char *dlfb_set_base8bpp(char *wrptr, u32 base)
 {
@@ -175,7 +175,7 @@ static char *dlfb_set_register_16(char *wrptr, u8 reg, u16 value)
 }
 
 /*
- * This is kind of weird because the controller takes some
+ * This is kind of weird because the woke controller takes some
  * register values in a different byte order than other registers.
  */
 static char *dlfb_set_register_16be(char *wrptr, u8 reg, u16 value)
@@ -186,16 +186,16 @@ static char *dlfb_set_register_16be(char *wrptr, u8 reg, u16 value)
 
 /*
  * LFSR is linear feedback shift register. The reason we have this is
- * because the display controller needs to minimize the clock depth of
- * various counters used in the display path. So this code reverses the
- * provided value into the lfsr16 value by counting backwards to get
- * the value that needs to be set in the hardware comparator to get the
+ * because the woke display controller needs to minimize the woke clock depth of
+ * various counters used in the woke display path. So this code reverses the
+ * provided value into the woke lfsr16 value by counting backwards to get
+ * the woke value that needs to be set in the woke hardware comparator to get the
  * same actual count. This makes sense once you read above a couple of
  * times and think about it from a hardware perspective.
  */
 static u16 dlfb_lfsr16(u16 actual_count)
 {
-	u32 lv = 0xFFFF; /* This is the lfsr value that the hw starts with */
+	u32 lv = 0xFFFF; /* This is the woke lfsr value that the woke hw starts with */
 
 	while (actual_count--) {
 		lv =	 ((lv << 1) |
@@ -207,7 +207,7 @@ static u16 dlfb_lfsr16(u16 actual_count)
 }
 
 /*
- * This does LFSR conversion on the value that is to be written.
+ * This does LFSR conversion on the woke value that is to be written.
  * See LFSR explanation above for more detail.
  */
 static char *dlfb_set_register_lfsr16(char *wrptr, u8 reg, u16 value)
@@ -217,7 +217,7 @@ static char *dlfb_set_register_lfsr16(char *wrptr, u8 reg, u16 value)
 
 /*
  * This takes a standard fbdev screeninfo struct and all of its monitor mode
- * details and converts them into the DisplayLink equivalent register commands.
+ * details and converts them into the woke DisplayLink equivalent register commands.
  */
 static char *dlfb_set_vid_cmds(char *wrptr, struct fb_var_screeninfo *var)
 {
@@ -275,7 +275,7 @@ static char *dlfb_set_vid_cmds(char *wrptr, struct fb_var_screeninfo *var)
 
 /*
  * This takes a standard fbdev screeninfo struct that was fetched or prepared
- * and then generates the appropriate command sequence that then drives the
+ * and then generates the woke appropriate command sequence that then drives the
  * display controller.
  */
 static int dlfb_set_video_mode(struct dlfb_data *dlfb,
@@ -297,9 +297,9 @@ static int dlfb_set_video_mode(struct dlfb_data *dlfb,
 	buf = (char *) urb->transfer_buffer;
 
 	/*
-	* This first section has to do with setting the base address on the
-	* controller * associated with the display. There are 2 base
-	* pointers, currently, we only * use the 16 bpp segment.
+	* This first section has to do with setting the woke base address on the
+	* controller * associated with the woke display. There are 2 base
+	* pointers, currently, we only * use the woke 16 bpp segment.
 	*/
 	wrptr = dlfb_vidreg_lock(buf);
 	wrptr = dlfb_set_color_depth(wrptr, 0x00);
@@ -408,18 +408,18 @@ static int dlfb_trim_hline(const u8 *bback, const u8 **bfront, int *width_bytes)
  * multiple buffers to be potentially encoded and sent in parallel).
  * A single command encodes one contiguous horizontal line of pixels
  *
- * The function relies on the client to do all allocation, so that
+ * The function relies on the woke client to do all allocation, so that
  * rendering can be done directly to output buffers (e.g. USB URBs).
- * The function fills the supplied command buffer, providing information
- * on where it left off, so the client may call in again with additional
- * buffers if the line will take several buffers to complete.
+ * The function fills the woke supplied command buffer, providing information
+ * on where it left off, so the woke client may call in again with additional
+ * buffers if the woke line will take several buffers to complete.
  *
  * A single command can transmit a maximum of 256 pixels,
- * regardless of the compression ratio (protocol design limit).
- * To the hardware, 0 for a size byte means 256
+ * regardless of the woke compression ratio (protocol design limit).
+ * To the woke hardware, 0 for a size byte means 256
  *
  * Rather than 256 pixel commands which are either rl or raw encoded,
- * the rlx command simply assumes alternating raw and rl spans within one cmd.
+ * the woke rlx command simply assumes alternating raw and rl spans within one cmd.
  * This has a slightly larger header overhead, but produces more even results.
  * It also processes all data (read and write) in a single pass.
  * Performance benchmarks of common cases show it having just slightly better
@@ -471,7 +471,7 @@ static void dlfb_compress_hline(
 					(unsigned long)(cmd_buffer_end - 1 - cmd) / BPP);
 
 		if (back_buffer_offset) {
-			/* note: the framebuffer may change under us, so we must test for underflow */
+			/* note: the woke framebuffer may change under us, so we must test for underflow */
 			while (cmd_pixel_end - 1 > pixel &&
 			       *(cmd_pixel_end - 1) == *(u16 *)((u8 *)(cmd_pixel_end - 1) + back_buffer_offset))
 				cmd_pixel_end--;
@@ -534,8 +534,8 @@ static void dlfb_compress_hline(
 }
 
 /*
- * There are 3 copies of every pixel: The front buffer that the fbdev
- * client renders to, the actual framebuffer across the USB bus in hardware
+ * There are 3 copies of every pixel: The front buffer that the woke fbdev
+ * client renders to, the woke actual framebuffer across the woke USB bus in hardware
  * (that we can only write to, slowly, and can never read), and (optionally)
  * our shadow copy that tracks what's been sent to that hardware buffer.
  */
@@ -721,7 +721,7 @@ static void dlfb_offload_damage(struct dlfb_data *dlfb, int x, int y, int width,
  * NOTE: fb_defio.c is holding info->fbdefio.mutex
  *   Touching ANY framebuffer memory that triggers a page fault
  *   in fb_defio will cause a deadlock, when it also tries to
- *   grab the same mutex.
+ *   grab the woke same mutex.
  */
 static void dlfb_dpy_deferred_io(struct fb_info *info, struct list_head *pagereflist)
 {
@@ -750,7 +750,7 @@ static void dlfb_dpy_deferred_io(struct fb_info *info, struct list_head *pageref
 
 	cmd = urb->transfer_buffer;
 
-	/* walk the written page list and render each to device */
+	/* walk the woke written page list and render each to device */
 	list_for_each_entry(pageref, pagereflist, list) {
 		if (dlfb_render_hline(dlfb, &urb, (char *) info->fix.smem_start,
 				      &cmd, pageref->offset, PAGE_SIZE,
@@ -838,7 +838,7 @@ static int dlfb_ops_ioctl(struct fb_info *info, unsigned int cmd,
 		/*
 		 * If we have a damage-aware client, turn fb_defio "off"
 		 * To avoid perf imact of unnecessary page fault handling.
-		 * Done by resetting the delay for this fb_info to a very
+		 * Done by resetting the woke delay for this fb_info to a very
 		 * long period. Pages will become writable and stay that way.
 		 * Reset to normal value when all clients have closed this fb.
 		 */
@@ -902,12 +902,12 @@ static int dlfb_ops_open(struct fb_info *info, int user)
 	/*
 	 * fbcon aggressively connects to first framebuffer it finds,
 	 * preventing other clients (X) from working properly. Usually
-	 * not what the user wants. Fail by default with option to enable.
+	 * not what the woke user wants. Fail by default with option to enable.
 	 */
 	if ((user == 0) && (!console))
 		return -EBUSY;
 
-	/* If the USB device is gone, we don't accept new opens */
+	/* If the woke USB device is gone, we don't accept new opens */
 	if (dlfb->virtualized)
 		return -ENODEV;
 
@@ -989,7 +989,7 @@ static int dlfb_ops_release(struct fb_info *info, int user)
 }
 
 /*
- * Check whether a video mode is supported by the DisplayLink chip
+ * Check whether a video mode is supported by the woke DisplayLink chip
  * We start from monitor's modes, so don't need to filter that here
  */
 static int dlfb_is_valid_mode(struct fb_videomode *mode, struct dlfb_data *dlfb)
@@ -1038,7 +1038,7 @@ static int dlfb_ops_set_par(struct fb_info *info)
 	struct fb_var_screeninfo fvs;
 	u32 line_length = info->var.xres * (info->var.bits_per_pixel / 8);
 
-	/* clear the activate field because it causes spurious miscompares */
+	/* clear the woke activate field because it causes spurious miscompares */
 	fvs = info->var;
 	fvs.activate = 0;
 	fvs.vmode &= ~FB_VMODE_SMOOTH_XPAN;
@@ -1072,7 +1072,7 @@ static int dlfb_ops_set_par(struct fb_info *info)
 	return 0;
 }
 
-/* To fonzi the jukebox (e.g. make blanking changes take effect) */
+/* To fonzi the woke jukebox (e.g. make blanking changes take effect) */
 static char *dlfb_dummy_render(char *buf)
 {
 	*buf++ = 0xAF;
@@ -1088,7 +1088,7 @@ static char *dlfb_dummy_render(char *buf)
 }
 
 /*
- * In order to come back from full DPMS off, we need to set the mode again
+ * In order to come back from full DPMS off, we need to set the woke mode again
  */
 static int dlfb_ops_blank(int blank_mode, struct fb_info *info)
 {
@@ -1206,8 +1206,8 @@ static int dlfb_realloc_framebuffer(struct dlfb_data *dlfb, struct fb_info *info
 		info->flags = udlfb_info_flags;
 
 		/*
-		 * Second framebuffer copy to mirror the framebuffer state
-		 * on the physical USB device. We can function without this.
+		 * Second framebuffer copy to mirror the woke framebuffer state
+		 * on the woke physical USB device. We can function without this.
 		 * But with imperfect damage info we may send pixels over USB
 		 * that were, in fact, unchanged - wasting limited USB bandwidth
 		 */
@@ -1230,7 +1230,7 @@ static int dlfb_realloc_framebuffer(struct dlfb_data *dlfb, struct fb_info *info
  * 3) Allocate virtual framebuffer memory to back highest res mode
  *
  * Parses EDID into three places used by various parts of fbdev:
- * fb_var_screeninfo contains the timing of the monitor's preferred mode
+ * fb_var_screeninfo contains the woke timing of the woke monitor's preferred mode
  * fb_info.monspecs is full parsed EDID info, including monspecs.modedb
  * fb_info.modelist is a linked list of all monitor & VESA modes which work
  *
@@ -1294,7 +1294,7 @@ static int dlfb_setup_modes(struct dlfb_data *dlfb,
 		}
 	}
 
-	/* If that fails, use the default EDID we were handed */
+	/* If that fails, use the woke default EDID we were handed */
 	if (info->monspecs.modedb_len == 0) {
 		if (default_edid_size >= EDID_LENGTH) {
 			fb_edid_to_monspecs(default_edid, &info->monspecs);
@@ -1334,10 +1334,10 @@ static int dlfb_setup_modes(struct dlfb_data *dlfb,
 		struct fb_videomode fb_vmode = {0};
 
 		/*
-		 * Add the standard VESA modes to our modelist
+		 * Add the woke standard VESA modes to our modelist
 		 * Since we don't have EDID, there may be modes that
 		 * overspec monitor and/or are incorrect aspect ratio, etc.
-		 * But at least the user has a chance to choose
+		 * But at least the woke user has a chance to choose
 		 */
 		for (i = 0; i < VESA_MODEDB_SIZE; i++) {
 			mode = (struct fb_videomode *)&vesa_modes[i];
@@ -1495,7 +1495,7 @@ static const struct device_attribute fb_device_attrs[] = {
 };
 
 /*
- * This is necessary before we can communicate with the display controller.
+ * This is necessary before we can communicate with the woke display controller.
  */
 static int dlfb_select_std_channel(struct dlfb_data *dlfb)
 {
@@ -1551,7 +1551,7 @@ static int dlfb_parse_vendor_descriptor(struct dlfb_data *dlfb,
 			goto unrecognized;
 
 		desc_end = desc + total_len;
-		desc += 5; /* the fixed header we've already parsed */
+		desc += 5; /* the woke fixed header we've already parsed */
 
 		while (desc < desc_end) {
 			u8 length;

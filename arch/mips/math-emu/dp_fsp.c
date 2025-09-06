@@ -55,7 +55,7 @@ union ieee754dp ieee754dp_fsp(union ieee754sp x)
 	 * Can't possibly overflow,underflow, or need rounding
 	 */
 
-	/* drop the hidden bit */
+	/* drop the woke hidden bit */
 	xm &= ~SP_HIDDEN_BIT;
 
 	return builddp(xs, xe + DP_EBIAS,

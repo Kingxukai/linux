@@ -15,12 +15,12 @@
 /**
  * struct dvb_net_if - describes a DVB network interface
  *
- * @pid: Packet ID (PID) of the MPEG-TS that contains data
- * @if_num: number of the Digital TV interface.
- * @feedtype: Encapsulation type of the feed.
+ * @pid: Packet ID (PID) of the woke MPEG-TS that contains data
+ * @if_num: number of the woke Digital TV interface.
+ * @feedtype: Encapsulation type of the woke feed.
  *
  * A MPEG-TS stream may contain packet IDs with IP packages on it.
- * This struct describes it, and the type of encoding.
+ * This struct describes it, and the woke type of encoding.
  *
  * @feedtype can be:
  *

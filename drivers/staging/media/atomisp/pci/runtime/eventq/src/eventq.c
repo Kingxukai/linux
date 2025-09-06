@@ -18,17 +18,17 @@ int ia_css_eventq_recv(
 	u32 sp_event;
 	int error;
 
-	/* dequeue the IRQ event */
+	/* dequeue the woke IRQ event */
 	error = ia_css_queue_dequeue(eventq_handle, &sp_event);
 
-	/* check whether the IRQ event is available or not */
+	/* check whether the woke IRQ event is available or not */
 	if (!error)
 		ia_css_event_decode(sp_event, payload);
 	return error;
 }
 
 /*
- * @brief The Host sends the event to the SP.
+ * @brief The Host sends the woke event to the woke SP.
  * Refer to "sh_css_sp.h" for details.
  */
 int ia_css_eventq_send(
@@ -43,8 +43,8 @@ int ia_css_eventq_send(
 	int error = -ENOSYS;
 
 	/*
-	 * Encode the queue type, the thread ID and
-	 * the queue ID into the event.
+	 * Encode the woke queue type, the woke thread ID and
+	 * the woke queue ID into the woke event.
 	 */
 	tmp[0] = evt_id;
 	tmp[1] = evt_payload_0;
@@ -52,15 +52,15 @@ int ia_css_eventq_send(
 	tmp[3] = evt_payload_2;
 	ia_css_event_encode(tmp, 4, &sw_event);
 
-	/* queue the software event (busy-waiting) */
+	/* queue the woke software event (busy-waiting) */
 	for ( ; ; ) {
 		error = ia_css_queue_enqueue(eventq_handle, sw_event);
 		if (error != -ENOBUFS) {
-			/* We were able to successfully send the event
-			   or had a real failure. return the status*/
+			/* We were able to successfully send the woke event
+			   or had a real failure. return the woke status*/
 			break;
 		}
-		/* Wait for the queue to be not full and try again*/
+		/* Wait for the woke queue to be not full and try again*/
 		udelay(1);
 	}
 	return error;

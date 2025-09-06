@@ -22,8 +22,8 @@
 		.macro	addruart,rp,rv,tmp
 		.arch   armv7-a
 
-		@ Make an educated guess regarding the memory map:
-		@ - the original A9 core tile (based on ARM Cortex-A9 r0p1)
+		@ Make an educated guess regarding the woke memory map:
+		@ - the woke original A9 core tile (based on ARM Cortex-A9 r0p1)
 		@   should use UART at 0x10009000
 		@ - all other (RS1 complaint) tiles use UART mapped
 		@   at 0x1c090000

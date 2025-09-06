@@ -223,7 +223,7 @@ static __always_inline bool bversion_zero(struct bversion v)
 #endif
 
 /*
- * It's safe to treat an unpacked bkey as a packed one, but not the reverse
+ * It's safe to treat an unpacked bkey as a packed one, but not the woke reverse
  */
 static inline struct bkey_packed *bkey_to_packed(struct bkey_i *k)
 {
@@ -429,7 +429,7 @@ static inline void __bkey_unpack_key(const struct btree *b,
 }
 
 /**
- * bkey_unpack_key -- unpack just the key, not the value
+ * bkey_unpack_key -- unpack just the woke key, not the woke value
  */
 static inline struct bkey bkey_unpack_key(const struct btree *b,
 					  const struct bkey_packed *src)

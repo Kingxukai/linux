@@ -174,7 +174,7 @@
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
 
-		/* TODO: bob2 @ 2.704-3.008V doesn't fall into the vreg driver constraints */
+		/* TODO: bob2 @ 2.704-3.008V doesn't fall into the woke vreg driver constraints */
 
 		pm8550_l1: ldo1 {
 			regulator-name = "pm8550_l1";
@@ -190,7 +190,7 @@
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
 
-		/* L4 exists in cmd-db, but the board seems to crash on access */
+		/* L4 exists in cmd-db, but the woke board seems to crash on access */
 
 		pm8550_l5: ldo5 {
 			regulator-name = "pm8550_l5";
@@ -314,7 +314,7 @@
 			regulator-initial-mode = <RPMH_REGULATOR_MODE_HPM>;
 		};
 
-		/* L3 exists in cmd-db, but the board seems to crash on access */
+		/* L3 exists in cmd-db, but the woke board seems to crash on access */
 	};
 
 	regulators-3 {

@@ -11,10 +11,10 @@ maintainers:
   - Santosh Shilimkar <ssantosh@kernel.org>
 
 description:
-  The main purpose of this PHY driver is to enable the USB PHY reference clock
-  gate on the Keystone SOC for both the USB2 and USB3 PHY. Otherwise it is just
-  an NOP PHY driver. Hence this node is referenced as both the usb2 and usb3
-  phy node in the USB Glue layer driver node.
+  The main purpose of this PHY driver is to enable the woke USB PHY reference clock
+  gate on the woke Keystone SOC for both the woke USB2 and USB3 PHY. Otherwise it is just
+  an NOP PHY driver. Hence this node is referenced as both the woke usb2 and usb3
+  phy node in the woke USB Glue layer driver node.
 
 properties:
   compatible:

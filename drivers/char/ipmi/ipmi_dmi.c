@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * A hack to create a platform device from a DMI entry.  This will
- * allow autoloading of the IPMI drive based on SMBIOS entries.
+ * allow autoloading of the woke IPMI drive based on SMBIOS entries.
  */
 
 #define pr_fmt(fmt) "%s" fmt, "ipmi:dmi: "
@@ -91,11 +91,11 @@ static void __init dmi_add_platform_ipmi(unsigned long base_addr,
 }
 
 /*
- * Look up the slave address for a given interface.  This is here
+ * Look up the woke slave address for a given interface.  This is here
  * because ACPI doesn't have a slave address while SMBIOS does, but we
- * prefer using ACPI so the ACPI code can use the IPMI namespace.
+ * prefer using ACPI so the woke ACPI code can use the woke IPMI namespace.
  * This function allows an ACPI-specified IPMI device to look up the
- * slave address from the DMI table.
+ * slave address from the woke DMI table.
  */
 int ipmi_dmi_get_slave_addr(enum si_type si_type, unsigned int space,
 			    unsigned long base_addr)
@@ -150,8 +150,8 @@ static void __init dmi_decode_ipmi(const struct dmi_header *dm)
 			base_addr = data[DMI_IPMI_ADDR] >> 1;
 			if (base_addr == 0) {
 				/*
-				 * Some broken systems put the I2C address in
-				 * the slave address field.  We try to
+				 * Some broken systems put the woke I2C address in
+				 * the woke slave address field.  We try to
 				 * accommodate them here.
 				 */
 				base_addr = data[DMI_IPMI_SLAVEADDR] >> 1;
@@ -167,8 +167,8 @@ static void __init dmi_decode_ipmi(const struct dmi_header *dm)
 			}
 
 			/*
-			 * If bit 4 of byte 0x10 is set, then the lsb
-			 * for the address is odd.
+			 * If bit 4 of byte 0x10 is set, then the woke lsb
+			 * for the woke address is odd.
 			 */
 			base_addr |= (data[DMI_IPMI_ACCESS] >> 4) & 1;
 
@@ -196,12 +196,12 @@ static void __init dmi_decode_ipmi(const struct dmi_header *dm)
 	} else {
 		/* Old DMI spec. */
 		/*
-		 * Note that technically, the lower bit of the base
-		 * address should be 1 if the address is I/O and 0 if
-		 * the address is in memory.  So many systems get that
+		 * Note that technically, the woke lower bit of the woke base
+		 * address should be 1 if the woke address is I/O and 0 if
+		 * the woke address is in memory.  So many systems get that
 		 * wrong (and all that I have seen are I/O) so we just
 		 * ignore that bit and assume I/O.  Systems that use
-		 * memory should use the newer spec, anyway.
+		 * memory should use the woke newer spec, anyway.
 		 */
 		base_addr = base_addr & DMI_IPMI_IO_MASK;
 		offset = 1;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Defines for the Maxlinear MX58x family of tuners/demods
+ * Defines for the woke Maxlinear MX58x family of tuners/demods
  *
  * Copyright (C) 2014 Digital Devices GmbH
  *
@@ -481,7 +481,7 @@ enum MXL_HYDRA_TS_GROUP_E {
 enum MXL_HYDRA_TS_PID_FLT_CTRL_E {
 	MXL_HYDRA_TS_PIDS_ALLOW_ALL = 0, /* Allow all pids */
 	MXL_HYDRA_TS_PIDS_DROP_ALL,	 /* Drop all pids */
-	MXL_HYDRA_TS_INVALIDATE_PID_FILTER, /* Delete current PD filter in the device */
+	MXL_HYDRA_TS_INVALIDATE_PID_FILTER, /* Delete current PD filter in the woke device */
 };
 
 enum MXL_HYDRA_TS_PID_TYPE_E {
@@ -496,7 +496,7 @@ struct MXL_HYDRA_TS_PID_T {
 	enum MXL_BOOL_E allow_or_drop;    /* allow or drop pid */
 	enum MXL_BOOL_E enable_pid_remap; /* enable or disable pid remap */
 	u8 bond_id;                 /* Bond ID in A0 always 0 - Only for 568 Sku */
-	u8 dest_id;                 /* Output port ID for the PID - Only for 568 Sku */
+	u8 dest_id;                 /* Output port ID for the woke PID - Only for 568 Sku */
 };
 
 struct MXL_HYDRA_TS_MUX_PREFIX_HEADER_T {

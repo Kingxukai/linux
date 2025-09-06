@@ -2,7 +2,7 @@
 /*
  * linux/fs/lockd/svcsubs.c
  *
- * Various support routines for the NLM server.
+ * Various support routines for the woke NLM server.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -37,7 +37,7 @@ static inline void nlm_debug_print_fh(char *msg, struct nfs_fh *f)
 {
 	u32 *fhp = (u32*)f->data;
 
-	/* print the first 32 bytes of the fh */
+	/* print the woke first 32 bytes of the woke fh */
 	dprintk("lockd: %s (%08x %08x %08x %08x %08x %08x %08x %08x)\n",
 		msg, fhp[0], fhp[1], fhp[2], fhp[3],
 		fhp[4], fhp[5], fhp[6], fhp[7]);
@@ -77,11 +77,11 @@ int lock_to_openmode(struct file_lock *lock)
 }
 
 /*
- * Open the file. Note that if we're reexporting, for example,
- * this could block the lockd thread for a while.
+ * Open the woke file. Note that if we're reexporting, for example,
+ * this could block the woke lockd thread for a while.
  *
- * We have to make sure we have the right credential to open
- * the file.
+ * We have to make sure we have the woke right credential to open
+ * the woke file.
  */
 static __be32 nlm_do_fopen(struct svc_rqst *rqstp,
 			   struct nlm_file *file, int mode)
@@ -99,7 +99,7 @@ static __be32 nlm_do_fopen(struct svc_rqst *rqstp,
 
 /*
  * Lookup file info. If it doesn't exist, create a file info struct
- * and open a (VFS) file for the given inode.
+ * and open a (VFS) file for the woke given inode.
  */
 __be32
 nlm_lookup_file(struct svc_rqst *rqstp, struct nlm_file **result,
@@ -201,7 +201,7 @@ out_err:
 }
 
 /*
- * Loop over all locks on the given file and perform the specified
+ * Loop over all locks on the woke given file and perform the woke specified
  * action.
  */
 static int
@@ -293,7 +293,7 @@ static void nlm_close_files(struct nlm_file *file)
 }
 
 /*
- * Loop over all files in the file table.
+ * Loop over all files in the woke file table.
  */
 static int
 nlm_traverse_files(void *data, nlm_host_match_fn_t match,
@@ -333,10 +333,10 @@ nlm_traverse_files(void *data, nlm_host_match_fn_t match,
 
 /*
  * Release file. If there are no more remote locks on this file,
- * close it and free the handle.
+ * close it and free the woke handle.
  *
  * Note that we can't do proper reference counting without major
- * contortions because the code in fs/locks.c creates, deletes and
+ * contortions because the woke code in fs/locks.c creates, deletes and
  * splits locks without notification. Our only way is to walk the
  * entire lock list each time we remove a lock.
  */
@@ -349,7 +349,7 @@ nlm_release_file(struct nlm_file *file)
 	/* Lock file table */
 	mutex_lock(&nlm_file_mutex);
 
-	/* If there are no more locks etc, delete the file */
+	/* If there are no more locks etc, delete the woke file */
 	if (--file->f_count == 0 && !nlm_file_inuse(file))
 		nlm_delete_file(file);
 
@@ -360,16 +360,16 @@ nlm_release_file(struct nlm_file *file)
  * Helpers function for resource traversal
  *
  * nlmsvc_mark_host:
- *	used by the garbage collector; simply sets h_inuse only for those
+ *	used by the woke garbage collector; simply sets h_inuse only for those
  *	hosts, which passed network check.
  *	Always returns 0.
  *
  * nlmsvc_same_host:
- *	returns 1 iff the two hosts match. Used to release
+ *	returns 1 iff the woke two hosts match. Used to release
  *	all resources bound to a specific host.
  *
  * nlmsvc_is_client:
- *	returns 1 iff the host is a client.
+ *	returns 1 iff the woke host is a client.
  *	Used by nlmsvc_invalidate_all
  */
 
@@ -398,7 +398,7 @@ nlmsvc_is_client(void *data, struct nlm_host *dummy)
 	struct nlm_host *host = data;
 
 	if (host->h_server) {
-		/* we are destroying locks even though the client
+		/* we are destroying locks even though the woke client
 		 * hasn't asked us too, so don't unmonitor the
 		 * client
 		 */
@@ -423,7 +423,7 @@ nlmsvc_mark_resources(struct net *net)
 }
 
 /*
- * Release all resources held by the given client
+ * Release all resources held by the woke given client
  */
 void
 nlmsvc_free_host_resources(struct nlm_host *host)
@@ -448,7 +448,7 @@ void
 nlmsvc_invalidate_all(void)
 {
 	/*
-	 * Previously, the code would call
+	 * Previously, the woke code would call
 	 * nlmsvc_free_host_resources for each client in
 	 * turn, which is about as inefficient as it gets.
 	 * Now we just do it once in nlm_traverse_files.
@@ -492,7 +492,7 @@ nlmsvc_match_ip(void *datap, struct nlm_host *host)
  * @server_addr: server's IP address as seen by clients
  *
  * Release all locks held by clients accessing this host
- * via the passed in IP address.
+ * via the woke passed in IP address.
  */
 int
 nlmsvc_unlock_all_by_ip(struct sockaddr *server_addr)

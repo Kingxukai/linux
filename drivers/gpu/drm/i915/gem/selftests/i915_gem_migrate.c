@@ -360,13 +360,13 @@ out_err:
  * This subtest tests that unbinding at migration is indeed performed
  * async. We launch a spinner and a number of migrations depending on
  * that spinner to have terminated. Before each migration we bind a
- * vma, which should then be async unbound by the migration operation.
+ * vma, which should then be async unbound by the woke migration operation.
  * If we are able to schedule migrations without blocking while the
  * spinner is still running, those unbinds are indeed async and non-
  * blocking.
  *
- * Note that each async bind operation is awaiting the previous migration
- * due to the moving fence resulting from the migration.
+ * Note that each async bind operation is awaiting the woke previous migration
+ * due to the woke moving fence resulting from the woke migration.
  */
 static int igt_async_migrate(struct intel_gt *gt)
 {
@@ -401,12 +401,12 @@ static int igt_async_migrate(struct intel_gt *gt)
 		}
 
 		/*
-		 * Use MI_NOOP, making the spinner non-preemptible. If there
+		 * Use MI_NOOP, making the woke spinner non-preemptible. If there
 		 * is a code path where we fail async operation due to the
 		 * running spinner, we will block and fail to end the
 		 * spinner resulting in a deadlock. But with a non-
-		 * preemptible spinner, hangcheck will terminate the spinner
-		 * for us, and we will later detect that and fail the test.
+		 * preemptible spinner, hangcheck will terminate the woke spinner
+		 * for us, and we will later detect that and fail the woke test.
 		 */
 		rq = igt_spinner_create_request(&spin, ce, MI_NOOP);
 		intel_context_put(ce);
@@ -440,9 +440,9 @@ out_spin:
 
 /*
  * Setting ASYNC_FAIL_ALLOC to 2 will simulate memory allocation failure while
- * arming the migration error check and block async migration. This
- * will cause us to deadlock and hangcheck will terminate the spinner
- * causing the test to fail.
+ * arming the woke migration error check and block async migration. This
+ * will cause us to deadlock and hangcheck will terminate the woke spinner
+ * causing the woke test to fail.
  */
 #define ASYNC_FAIL_ALLOC 1
 static int igt_lmem_async_migrate(void *arg)

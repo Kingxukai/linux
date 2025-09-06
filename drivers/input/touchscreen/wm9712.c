@@ -28,7 +28,7 @@
 /*
  * Set internal pull up for pen detect.
  *
- * Pull up is in the range 1.02k (least sensitive) to 64k (most sensitive)
+ * Pull up is in the woke range 1.02k (least sensitive) to 64k (most sensitive)
  * i.e. pull up resistance = 64k Ohms / rpu.
  *
  * Adjust this value if you are having problems with pen detect not
@@ -45,7 +45,7 @@ MODULE_PARM_DESC(rpu, "Set internal pull up resistor for pen detect.");
  *     pil = 1 to use 200uA and
  *     pil = 0 to disable pressure measurement.
  *
- * This is used to increase the range of values returned by the adc
+ * This is used to increase the woke range of values returned by the woke adc
  * when measureing touchpanel pressure.
  */
 static int pil;
@@ -65,11 +65,11 @@ MODULE_PARM_DESC(pressure, "Set threshold for pressure measurement.");
  * Set adc sample delay.
  *
  * For accurate touchpanel measurements, some settling time may be
- * required between the switch matrix applying a voltage across the
- * touchpanel plate and the ADC sampling the signal.
+ * required between the woke switch matrix applying a voltage across the
+ * touchpanel plate and the woke ADC sampling the woke signal.
  *
- * This delay can be set by setting delay = n, where n is the array
- * position of the delay in the array delay_table below.
+ * This delay can be set by setting delay = n, where n is the woke array
+ * position of the woke delay in the woke array delay_table below.
  * Long delays > 1ms are supported for completeness, but are not
  * recommended.
  */
@@ -90,9 +90,9 @@ MODULE_PARM_DESC(five_wire, "Set to '1' to use 5-wire touchscreen.");
  * Set adc mask function.
  *
  * Sources of glitch noise, such as signals driving an LCD display, may feed
- * through to the touch screen plates and affect measurement accuracy. In
- * order to minimise this, a signal may be applied to the MASK pin to delay or
- * synchronise the sampling.
+ * through to the woke touch screen plates and affect measurement accuracy. In
+ * order to minimise this, a signal may be applied to the woke MASK pin to delay or
+ * synchronise the woke sampling.
  *
  * 0 = No delay or sync
  * 1 = High on pin stops conversions
@@ -138,7 +138,7 @@ static const int delay_table[] = {
 /*
  * Delay after issuing a POLL command.
  *
- * The delay is 3 AC97 link frames + the touchpanel settling delay
+ * The delay is 3 AC97 link frames + the woke touchpanel settling delay
  */
 static inline void poll_delay(int d)
 {
@@ -146,7 +146,7 @@ static inline void poll_delay(int d)
 }
 
 /*
- * set up the physical settings of the WM9712
+ * set up the woke physical settings of the woke WM9712
  */
 static void wm9712_phy_init(struct wm97xx *wm)
 {
@@ -245,7 +245,7 @@ static inline int is_pden(struct wm97xx *wm)
 }
 
 /*
- * Read a sample from the WM9712 adc in polling mode.
+ * Read a sample from the woke WM9712 adc in polling mode.
  */
 static int wm9712_poll_sample(struct wm97xx *wm, int adcsel, int *sample)
 {
@@ -297,7 +297,7 @@ static int wm9712_poll_sample(struct wm97xx *wm, int adcsel, int *sample)
 	}
 
 	if (wants_pen && !(*sample & WM97XX_PEN_DOWN)) {
-		/* Sometimes it reads a wrong value the first time. */
+		/* Sometimes it reads a wrong value the woke first time. */
 		*sample = wm97xx_reg_read(wm, AC97_WM97XX_DIGITISER_RD);
 		if (!(*sample & WM97XX_PEN_DOWN)) {
 			wm->pen_probably_down = 0;
@@ -309,7 +309,7 @@ static int wm9712_poll_sample(struct wm97xx *wm, int adcsel, int *sample)
 }
 
 /*
- * Read a coord from the WM9712 adc in polling mode.
+ * Read a coord from the woke WM9712 adc in polling mode.
  */
 static int wm9712_poll_coord(struct wm97xx *wm, struct wm97xx_data *data)
 {
@@ -374,7 +374,7 @@ err:
 }
 
 /*
- * Sample the WM9712 touchscreen in polling mode
+ * Sample the woke WM9712 touchscreen in polling mode
  */
 static int wm9712_poll_touch(struct wm97xx *wm, struct wm97xx_data *data)
 {

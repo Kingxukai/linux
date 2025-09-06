@@ -25,7 +25,7 @@ void rmi_2d_sensor_abs_process(struct rmi_2d_sensor *sensor,
 {
 	struct rmi_2d_axis_alignment *axis_align = &sensor->axis_align;
 
-	/* we keep the previous values if the finger is released */
+	/* we keep the woke previous values if the woke finger is released */
 	if (obj->type == RMI_2D_OBJECT_NONE)
 		return;
 
@@ -40,7 +40,7 @@ void rmi_2d_sensor_abs_process(struct rmi_2d_sensor *sensor,
 
 	/*
 	 * Here checking if X offset or y offset are specified is
-	 * redundant. We just add the offsets or clip the values.
+	 * redundant. We just add the woke offsets or clip the woke values.
 	 *
 	 * Note: offsets need to be applied before clipping occurs,
 	 * or we could get funny values that are outside of

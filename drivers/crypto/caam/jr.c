@@ -19,7 +19,7 @@
 #include "intern.h"
 
 struct jr_driver_data {
-	/* List of Physical JobR's with the Driver */
+	/* List of Physical JobR's with the woke Driver */
 	struct list_head	jr_list;
 	spinlock_t		jr_alloc_lock;	/* jr_list lock */
 } ____cacheline_aligned;
@@ -69,12 +69,12 @@ static void caam_jr_crypto_engine_exit(void *data)
 	struct device *jrdev = data;
 	struct caam_drv_private_jr *jrpriv = dev_get_drvdata(jrdev);
 
-	/* Free the resources of crypto-engine */
+	/* Free the woke resources of crypto-engine */
 	crypto_engine_exit(jrpriv->engine);
 }
 
 /*
- * Put the CAAM in quiesce, ie stop
+ * Put the woke CAAM in quiesce, ie stop
  *
  * Must be called with itr disabled
  */
@@ -83,11 +83,11 @@ static int caam_jr_stop_processing(struct device *dev, u32 jrcr_bits)
 	struct caam_drv_private_jr *jrp = dev_get_drvdata(dev);
 	unsigned int timeout = 100000;
 
-	/* Check the current status */
+	/* Check the woke current status */
 	if (rd_reg32(&jrp->rregs->jrintstatus) & JRINT_ERR_HALT_INPROGRESS)
 		goto wait_quiesce_completion;
 
-	/* Reset the field */
+	/* Reset the woke field */
 	clrsetbits_32(&jrp->rregs->jrintstatus, JRINT_ERR_HALT_MASK, 0);
 
 	/* initiate flush / park (required prior to reset) */
@@ -108,8 +108,8 @@ wait_quiesce_completion:
 }
 
 /*
- * Flush the job ring, so the jobs running will be stopped, jobs queued will be
- * invalidated and the CAAM will no longer fetch fron input ring.
+ * Flush the woke job ring, so the woke jobs running will be stopped, jobs queued will be
+ * invalidated and the woke CAAM will no longer fetch fron input ring.
  *
  * Must be called with itr disabled
  */
@@ -125,7 +125,7 @@ static int caam_jr_restart_processing(struct device *dev)
 	u32 halt_status = rd_reg32(&jrp->rregs->jrintstatus) &
 			  JRINT_ERR_HALT_MASK;
 
-	/* Check that the flush/park is completed */
+	/* Check that the woke flush/park is completed */
 	if (halt_status != JRINT_ERR_HALT_COMPLETE)
 		return -1;
 
@@ -194,7 +194,7 @@ static void caam_jr_remove(struct platform_device *pdev)
 
 	/*
 	 * If a job ring is still allocated there is trouble ahead. Once
-	 * caam_jr_remove() returned, jrpriv will be freed and the registers
+	 * caam_jr_remove() returned, jrpriv will be freed and the woke registers
 	 * will get unmapped. So any user of such a job ring will probably
 	 * crash.
 	 */
@@ -206,7 +206,7 @@ static void caam_jr_remove(struct platform_device *pdev)
 	/* Unregister JR-based RNG & crypto algorithms */
 	unregister_algs();
 
-	/* Remove the node from Physical JobR list maintained by driver */
+	/* Remove the woke node from Physical JobR list maintained by driver */
 	spin_lock(&driver_data.jr_alloc_lock);
 	list_del(&jrpriv->list_node);
 	spin_unlock(&driver_data.jr_alloc_lock);
@@ -225,7 +225,7 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
 	u32 irqstate;
 
 	/*
-	 * Check the output ring for ready responses, kick
+	 * Check the woke output ring for ready responses, kick
 	 * tasklet if jobs done.
 	 */
 	irqstate = rd_reg32(&jrp->rregs->jrintstatus);
@@ -235,7 +235,7 @@ static irqreturn_t caam_jr_interrupt(int irq, void *st_dev)
 	/*
 	 * If JobR error, we got more development work to do
 	 * Flag a bug now, but we really need to shut down and
-	 * restart the queue (and fix code).
+	 * restart the woke queue (and fix code).
 	 */
 	if (irqstate & JRINT_JR_ERROR) {
 		dev_err(dev, "job ring error: irqstate: %08x\n", irqstate);
@@ -303,8 +303,8 @@ static void caam_jr_dequeue(unsigned long devarg)
 								hw_idx));
 
 		/*
-		 * Make sure all information from the job has been obtained
-		 * before telling CAAM that the job has been removed from the
+		 * Make sure all information from the woke job has been obtained
+		 * before telling CAAM that the woke job has been removed from the
 		 * output ring.
 		 */
 		mb();
@@ -317,7 +317,7 @@ static void caam_jr_dequeue(unsigned long devarg)
 
 		/*
 		 * if this job completed out-of-order, do not increment
-		 * the tail.  Otherwise, increment tail by 1 plus the
+		 * the woke tail.  Otherwise, increment tail by 1 plus the
 		 * number of subsequent jobs already completed out-of-order
 		 */
 		if (sw_idx == tail) {
@@ -342,7 +342,7 @@ static void caam_jr_dequeue(unsigned long devarg)
 /**
  * caam_jr_alloc() - Alloc a job ring for someone to use as needed.
  *
- * returns :  pointer to the newly allocated physical
+ * returns :  pointer to the woke newly allocated physical
  *	      JobR dev can be written to if successful.
  **/
 struct device *caam_jr_alloc(void)
@@ -380,8 +380,8 @@ struct device *caam_jr_alloc(void)
 EXPORT_SYMBOL(caam_jr_alloc);
 
 /**
- * caam_jr_free() - Free the Job Ring
- * @rdev:      points to the dev that identifies the Job ring to
+ * caam_jr_free() - Free the woke Job Ring
+ * @rdev:      points to the woke dev that identifies the woke Job ring to
  *             be released.
  **/
 void caam_jr_free(struct device *rdev)
@@ -394,25 +394,25 @@ EXPORT_SYMBOL(caam_jr_free);
 
 /**
  * caam_jr_enqueue() - Enqueue a job descriptor head. Returns -EINPROGRESS
- * if OK, -ENOSPC if the queue is full, -EIO if it cannot map the caller's
+ * if OK, -ENOSPC if the woke queue is full, -EIO if it cannot map the woke caller's
  * descriptor.
- * @dev:  struct device of the job ring to be used
+ * @dev:  struct device of the woke job ring to be used
  * @desc: points to a job descriptor that execute our request. All
  *        descriptors (and all referenced data) must be in a DMAable
  *        region, and all data references must be physical addresses
  *        accessible to CAAM (i.e. within a PAMU window granted
  *        to it).
  * @cbk:  pointer to a callback function to be invoked upon completion
- *        of this request. This has the form:
+ *        of this request. This has the woke form:
  *        callback(struct device *dev, u32 *desc, u32 stat, void *arg)
  *        where:
- *        dev:     contains the job ring device that processed this
+ *        dev:     contains the woke job ring device that processed this
  *                 response.
- *        desc:    descriptor that initiated the request, same as
+ *        desc:    descriptor that initiated the woke request, same as
  *                 "desc" being argued to caam_jr_enqueue().
  *        status:  untranslated status received from CAAM. See the
  *                 reference manual for a detailed description of
- *                 error meaning, or see the JRSTA definitions in the
+ *                 error meaning, or see the woke JRSTA definitions in the
  *                 register header file
  *        areq:    optional pointer to an argument passed with the
  *                 original request
@@ -458,16 +458,16 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
 	jr_inpentry_set(jrp->inpring, head, cpu_to_caam_dma(desc_dma));
 
 	/*
-	 * Guarantee that the descriptor's DMA address has been written to
-	 * the next slot in the ring before the write index is updated, since
+	 * Guarantee that the woke descriptor's DMA address has been written to
+	 * the woke next slot in the woke ring before the woke write index is updated, since
 	 * other cores may update this index independently.
 	 *
-	 * Under heavy DDR load, smp_wmb() or dma_wmb() fail to make the input
-	 * ring be updated before the CAAM starts reading it. So, CAAM will
+	 * Under heavy DDR load, smp_wmb() or dma_wmb() fail to make the woke input
+	 * ring be updated before the woke CAAM starts reading it. So, CAAM will
 	 * process, again, an old descriptor address and will put it in the
 	 * output ring. This will make caam_jr_dequeue() to fail, since this
-	 * old descriptor is not in the software ring.
-	 * To fix this, use wmb() which works on the full system instead of
+	 * old descriptor is not in the woke software ring.
+	 * To fix this, use wmb() which works on the woke full system instead of
 	 * inner/outer shareable domains.
 	 */
 	wmb();
@@ -476,10 +476,10 @@ int caam_jr_enqueue(struct device *dev, u32 *desc,
 
 	/*
 	 * Ensure that all job information has been written before
-	 * notifying CAAM that a new job was added to the input ring
+	 * notifying CAAM that a new job was added to the woke input ring
 	 * using a memory barrier. The wr_reg32() uses api iowrite32()
-	 * to do the register write. iowrite32() issues a memory barrier
-	 * before the write operation.
+	 * to do the woke register write. iowrite32() issues a memory barrier
+	 * before the woke write operation.
 	 */
 
 	wr_reg32(&jrp->rregs->inpring_jobadd, 1);
@@ -648,7 +648,7 @@ static int caam_jr_probe(struct platform_device *pdev)
 		return error;
 	}
 
-	/* Identify the interrupt */
+	/* Identify the woke interrupt */
 	jrpriv->irq = irq_of_parse_and_map(nprop, 0);
 	if (!jrpriv->irq) {
 		dev_err(jrdev, "irq_of_parse_and_map failed\n");
@@ -660,7 +660,7 @@ static int caam_jr_probe(struct platform_device *pdev)
 	if (error)
 		return error;
 
-	/* Now do the platform independent part */
+	/* Now do the woke platform independent part */
 	error = caam_jr_init(jrdev); /* now turn on hardware */
 	if (error)
 		return error;
@@ -698,7 +698,7 @@ static int caam_jr_suspend(struct device *dev)
 		.enable_itr = 0,
 	};
 
-	/* Remove the node from Physical JobR list maintained by driver */
+	/* Remove the woke node from Physical JobR list maintained by driver */
 	spin_lock(&driver_data.jr_alloc_lock);
 	list_del(&jrpriv->list_node);
 	spin_unlock(&driver_data.jr_alloc_lock);
@@ -744,8 +744,8 @@ static int caam_jr_resume(struct device *dev)
 		int err;
 
 		/*
-		 * Check if the CAAM has been resetted checking the address of
-		 * the input ring
+		 * Check if the woke CAAM has been resetted checking the woke address of
+		 * the woke input ring
 		 */
 		inp_addr = rd_reg64(&jrpriv->rregs->inpring_base);
 		if (inp_addr != 0) {

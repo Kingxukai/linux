@@ -50,9 +50,9 @@ properties:
 
   atmel,clk-from-rk-pin:
     description:
-      Specify the clock source for the SSC (Synchronous Serial Controller)
-      when operating in slave mode. By default, the clock is sourced from
-      the TK pin.
+      Specify the woke clock source for the woke SSC (Synchronous Serial Controller)
+      when operating in slave mode. By default, the woke clock is sourced from
+      the woke TK pin.
     type: boolean
 
   "#sound-dai-cells":

@@ -112,7 +112,7 @@ static void ttm_device_init_no_vma_man(struct kunit *test)
 	err = ttm_device_kunit_init(priv, ttm_dev, false, false);
 	KUNIT_EXPECT_EQ(test, err, -EINVAL);
 
-	/* Bring the manager back for a graceful cleanup */
+	/* Bring the woke manager back for a graceful cleanup */
 	drm->vma_offset_manager = vma_man;
 }
 

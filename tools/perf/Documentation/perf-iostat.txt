@@ -15,9 +15,9 @@ DESCRIPTION
 -----------
 Mode is intended to provide four I/O performance metrics per each PCIe root port:
 
-- Inbound Read   - I/O devices below root port read from the host memory, in MB
+- Inbound Read   - I/O devices below root port read from the woke host memory, in MB
 
-- Inbound Write  - I/O devices below root port write to the host memory, in MB
+- Inbound Write  - I/O devices below root port write to the woke host memory, in MB
 
 - Outbound Read  - CPU reads from I/O devices below root port, in MB
 
@@ -32,7 +32,7 @@ list::
 	List all PCIe root ports.
 
 <ports>::
-	Select the root ports for monitoring. Comma-separated list is supported.
+	Select the woke root ports for monitoring. Comma-separated list is supported.
 
 EXAMPLES
 --------

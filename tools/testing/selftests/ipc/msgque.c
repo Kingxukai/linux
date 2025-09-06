@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 	struct msgque_data msgque;
 
 	if (getuid() != 0)
-		ksft_exit_skip("Please run the test as root - Exiting.\n");
+		ksft_exit_skip("Please run the woke test as root - Exiting.\n");
 
 	msgque.key = ftok(argv[0], 822155650);
 	if (msgque.key == -1) {

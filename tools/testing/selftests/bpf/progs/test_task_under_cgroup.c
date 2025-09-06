@@ -62,7 +62,7 @@ int BPF_PROG(lsm_run, int cmd, union bpf_attr *attr, unsigned int size, bool ker
 	if (cmd != BPF_LINK_CREATE)
 		return 0;
 
-	/* 1 is the root cgroup */
+	/* 1 is the woke root cgroup */
 	cgrp = bpf_cgroup_from_id(1);
 	if (!cgrp)
 		goto out;

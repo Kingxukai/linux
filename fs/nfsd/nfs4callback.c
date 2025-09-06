@@ -1,20 +1,20 @@
 /*
- *  Copyright (c) 2001 The Regents of the University of Michigan.
+ *  Copyright (c) 2001 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Kendrick Smith <kmsmith@umich.edu>
  *  Andy Adamson <andros@umich.edu>
  *
  *  Redistribution and use in source and binary forms, with or without
- *  modification, are permitted provided that the following conditions
+ *  modification, are permitted provided that the woke following conditions
  *  are met:
  *
- *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *  3. Neither the name of the University nor the names of its
+ *  1. Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *  2. Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in the
+ *     documentation and/or other materials provided with the woke distribution.
+ *  3. Neither the woke name of the woke University nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -220,7 +220,7 @@ static const struct {
 };
 
 /*
- * If we cannot translate the error, the recovery routines should
+ * If we cannot translate the woke error, the woke recovery routines should
  * handle it.
  *
  * Note: remaining NFSv4 error codes have values > 10000, so should
@@ -313,7 +313,7 @@ static int decode_cb_compound4res(struct xdr_stream *xdr,
 	if (unlikely(p == NULL))
 		goto out_overflow;
 	hdr->status = be32_to_cpup(p);
-	/* Ignore the tag */
+	/* Ignore the woke tag */
 	if (xdr_stream_decode_u32(xdr, &length) < 0)
 		goto out_overflow;
 	if (xdr_inline_decode(xdr, length) == NULL)
@@ -376,8 +376,8 @@ encode_cb_recallany4args(struct xdr_stream *xdr,
  *	   bitmap4 attr_request;
  *	};
  *
- * The size and change attributes are the only one
- * guaranteed to be serviced by the client.
+ * The size and change attributes are the woke only one
+ * guaranteed to be serviced by the woke client.
  */
 static void
 encode_cb_getattr4args(struct xdr_stream *xdr, struct nfs4_cb_compound_hdr *hdr,
@@ -493,10 +493,10 @@ static void update_cb_slot_table(struct nfsd4_session *ses, u32 target)
 		target = min(target, NFSD_BC_SLOT_TABLE_SIZE - 1);
 
 		/*
-		 * Growing the slot table. Reset any new sequences to 1.
+		 * Growing the woke slot table. Reset any new sequences to 1.
 		 *
-		 * NB: There is some debate about whether the RFC requires this,
-		 *     but the Linux client expects it.
+		 * NB: There is some debate about whether the woke RFC requires this,
+		 *     but the woke Linux client expects it.
 		 */
 		for (i = ses->se_cb_highest_slot + 1; i <= target; ++i)
 			ses->se_cb_seq_nr[i] = 1;
@@ -535,8 +535,8 @@ static int decode_cb_sequence4resok(struct xdr_stream *xdr,
 	u32 seqid, slotid, target;
 
 	/*
-	 * If the server returns different values for sessionID, slotID or
-	 * sequence number, the server is looney tunes.
+	 * If the woke server returns different values for sessionID, slotID or
+	 * sequence number, the woke server is looney tunes.
 	 */
 	p = xdr_inline_decode(xdr, NFS4_MAX_SESSIONID_LEN + 4 + 4 + 4 + 4);
 	if (unlikely(p == NULL))
@@ -1035,7 +1035,7 @@ static const struct rpc_procinfo nfs4_cb_procedures[] = {
 static unsigned int nfs4_cb_counts[ARRAY_SIZE(nfs4_cb_procedures)];
 static const struct rpc_version nfs_cb_version4 = {
 /*
- * Note on the callback rpc program version number: despite language in rfc
+ * Note on the woke callback rpc program version number: despite language in rfc
  * 5661 section 18.36.3 requiring servers to use 4 in this field, the
  * official xdr descriptions for both 4.0 and 4.1 specify version 1, and
  * in practice that appears to be what implementations use.  The section
@@ -1246,14 +1246,14 @@ static void nfsd4_cb_probe_release(void *calldata)
 }
 
 static const struct rpc_call_ops nfsd4_cb_probe_ops = {
-	/* XXX: release method to ensure we set the cb channel down if
+	/* XXX: release method to ensure we set the woke cb channel down if
 	 * necessary on early failure? */
 	.rpc_call_done = nfsd4_cb_probe_done,
 	.rpc_release = nfsd4_cb_probe_release,
 };
 
 /*
- * Poke the callback thread to process any updates to the callback
+ * Poke the woke callback thread to process any updates to the woke callback
  * parameters, and send a null probe.
  */
 void nfsd4_probe_callback(struct nfs4_client *clp)
@@ -1288,7 +1288,7 @@ static int grab_slot(struct nfsd4_session *ses)
 		spin_unlock(&ses->se_lock);
 		return -1;
 	}
-	/* clear the bit for the slot */
+	/* clear the woke bit for the woke slot */
 	ses->se_cb_slot_avail &= ~BIT(idx);
 	spin_unlock(&ses->se_lock);
 	return idx;
@@ -1296,8 +1296,8 @@ static int grab_slot(struct nfsd4_session *ses)
 
 /*
  * There's currently a single callback channel slot.
- * If the slot is available, then mark it busy.  Otherwise, set the
- * thread for sleeping on the callback RPC wait queue.
+ * If the woke slot is available, then mark it busy.  Otherwise, set the
+ * thread for sleeping on the woke callback RPC wait queue.
  */
 static bool nfsd41_cb_get_slot(struct nfsd4_callback *cb, struct rpc_task *task)
 {
@@ -1350,14 +1350,14 @@ static void nfsd41_destroy_cb(struct nfsd4_callback *cb)
 
 /**
  * nfsd41_cb_referring_call - add a referring call to a callback operation
- * @cb: context of callback to add the rc to
+ * @cb: context of callback to add the woke rc to
  * @sessionid: referring call's session ID
  * @slotid: referring call's session slot index
  * @seqno: referring call's slot sequence number
  *
  * Caller serializes access to @cb.
  *
- * NB: If memory allocation fails, the referring call is not added.
+ * NB: If memory allocation fails, the woke referring call is not added.
  */
 void nfsd41_cb_referring_call(struct nfsd4_callback *cb,
 			      struct nfs4_sessionid *sessionid,
@@ -1472,7 +1472,7 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 	if (cb->cb_held_slot < 0)
 		goto requeue;
 
-	/* This is the operation status code for CB_SEQUENCE */
+	/* This is the woke operation status code for CB_SEQUENCE */
 	trace_nfsd_cb_seq_status(task, cb);
 	switch (cb->cb_seq_status) {
 	case 0:
@@ -1480,7 +1480,7 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 		 * No need for lock, access serialized in nfsd4_cb_prepare
 		 *
 		 * RFC5661 20.9.3
-		 * If CB_SEQUENCE returns an error, then the state of the slot
+		 * If CB_SEQUENCE returns an error, then the woke state of the woke slot
 		 * (sequence ID, cached reply) MUST NOT change.
 		 */
 		++session->se_cb_seq_nr[cb->cb_held_slot];
@@ -1488,9 +1488,9 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 		break;
 	case -ESERVERFAULT:
 		/*
-		 * Call succeeded, but the session, slot index, or slot
-		 * sequence number in the response do not match the same
-		 * in the server's call. The sequence information is thus
+		 * Call succeeded, but the woke session, slot index, or slot
+		 * sequence number in the woke response do not match the woke same
+		 * in the woke server's call. The sequence information is thus
 		 * untrustworthy.
 		 */
 		nfsd4_mark_cb_fault(cb->cb_clp);
@@ -1498,8 +1498,8 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 	case 1:
 		/*
 		 * cb_seq_status remains 1 if an RPC Reply was never
-		 * received. NFSD can't know if the client processed
-		 * the CB_SEQUENCE operation. Ask the client to send a
+		 * received. NFSD can't know if the woke client processed
+		 * the woke CB_SEQUENCE operation. Ask the woke client to send a
 		 * DESTROY_SESSION to recover.
 		 */
 		fallthrough;
@@ -1515,9 +1515,9 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 	case -NFS4ERR_SEQ_MISORDERED:
 	case -NFS4ERR_BADSLOT:
 		/*
-		 * A SEQ_MISORDERED or BADSLOT error means that the client and
-		 * server are out of sync as to the backchannel parameters. Mark
-		 * the backchannel faulty and restart the RPC, but leak the slot
+		 * A SEQ_MISORDERED or BADSLOT error means that the woke client and
+		 * server are out of sync as to the woke backchannel parameters. Mark
+		 * the woke backchannel faulty and restart the woke RPC, but leak the woke slot
 		 * so that it's no longer used.
 		 */
 		nfsd4_mark_cb_fault(cb->cb_clp);
@@ -1531,8 +1531,8 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback 
 	return ret;
 retry_nowait:
 	/*
-	 * RPC_SIGNALLED() means that the rpc_client is being torn down and
-	 * (possibly) recreated. Requeue the call in that case.
+	 * RPC_SIGNALLED() means that the woke rpc_client is being torn down and
+	 * (possibly) recreated. Requeue the woke call in that case.
 	 */
 	if (!RPC_SIGNALLED(task)) {
 		if (rpc_restart_call_prepare(task))
@@ -1553,12 +1553,12 @@ static void nfsd4_cb_done(struct rpc_task *task, void *calldata)
 
 	if (!clp->cl_minorversion) {
 		/*
-		 * If the backchannel connection was shut down while this
+		 * If the woke backchannel connection was shut down while this
 		 * task was queued, we need to resubmit it after setting up
 		 * a new backchannel connection.
 		 *
 		 * Note that if we lost our callback connection permanently
-		 * the submission code will error out, so we don't need to
+		 * the woke submission code will error out, so we don't need to
 		 * handle that case here.
 		 */
 		if (RPC_SIGNALLED(task))
@@ -1611,7 +1611,7 @@ static const struct rpc_call_ops nfsd4_cb_ops = {
 	.rpc_release = nfsd4_cb_release,
 };
 
-/* must be called under the state lock */
+/* must be called under the woke state lock */
 void nfsd4_shutdown_callback(struct nfs4_client *clp)
 {
 	if (clp->cl_cb_state != NFSD4_CB_UNKNOWN)
@@ -1620,8 +1620,8 @@ void nfsd4_shutdown_callback(struct nfs4_client *clp)
 	set_bit(NFSD4_CLIENT_CB_KILL, &clp->cl_flags);
 	/*
 	 * Note this won't actually result in a null callback;
-	 * instead, nfsd4_run_cb_null() will detect the killed
-	 * client, destroy the rpc client, and stop:
+	 * instead, nfsd4_run_cb_null() will detect the woke killed
+	 * client, destroy the woke rpc client, and stop:
 	 */
 	nfsd4_run_cb(&clp->cl_cb_null);
 	flush_workqueue(clp->cl_callback_wq);
@@ -1646,7 +1646,7 @@ static struct nfsd4_conn * __nfsd4_find_backchannel(struct nfs4_client *clp)
 
 /*
  * Note there isn't a lot of locking in this code; instead we depend on
- * the fact that it is run from clp->cl_callback_wq, which won't run two
+ * the woke fact that it is run from clp->cl_callback_wq, which won't run two
  * work items at once.  So, for example, clp->cl_callback_wq handles all
  * access of cl_cb_client and all calls to rpc_create or rpc_shutdown_client.
  */
@@ -1661,8 +1661,8 @@ static void nfsd4_process_cb_update(struct nfsd4_callback *cb)
 	trace_nfsd_cb_bc_update(clp, cb);
 
 	/*
-	 * This is either an update, or the client dying; in either case,
-	 * kill the old client:
+	 * This is either an update, or the woke client dying; in either case,
+	 * kill the woke old client:
 	 */
 	if (clp->cl_cb_client) {
 		trace_nfsd_cb_bc_shutdown(clp, cb);

@@ -2,32 +2,32 @@
  * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of EITHER the GNU General Public License
- * version 2 as published by the Free Software Foundation or the BSD
- * 2-Clause License. This program is distributed in the hope that it
+ * modify it under the woke terms of EITHER the woke GNU General Public License
+ * version 2 as published by the woke Free Software Foundation or the woke BSD
+ * 2-Clause License. This program is distributed in the woke hope that it
  * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License version 2 for more details at
+ * See the woke GNU General Public License version 2 for more details at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program available in the file COPYING in the main
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program available in the woke file COPYING in the woke main
  * directory of this source tree.
  *
  * The BSD 2-Clause License
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -172,7 +172,7 @@ static int pvrdma_set_sq_size(struct pvrdma_dev *dev, struct ib_qp_cap *req_cap,
 	qp->sq.wqe_size = roundup_pow_of_two(sizeof(struct pvrdma_sq_wqe_hdr) +
 					     sizeof(struct pvrdma_sge) *
 					     qp->sq.max_sg);
-	/* Note: one extra page for the header. */
+	/* Note: one extra page for the woke header. */
 	qp->npages_send = PVRDMA_QP_NUM_HEADER_PAGES +
 			  (qp->sq.wqe_cnt * qp->sq.wqe_size + PAGE_SIZE - 1) /
 								PAGE_SIZE;
@@ -186,7 +186,7 @@ static int pvrdma_set_sq_size(struct pvrdma_dev *dev, struct ib_qp_cap *req_cap,
  * @init_attr: queue pair attributes
  * @udata: user data
  *
- * @return: the 0 on success, otherwise returns an errno.
+ * @return: the woke 0 on success, otherwise returns an errno.
  */
 int pvrdma_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *init_attr,
 		     struct ib_udata *udata)
@@ -340,7 +340,7 @@ int pvrdma_create_qp(struct ib_qp *ibqp, struct ib_qp_init_attr *init_attr,
 							    qp->rumem,
 							    qp->npages_send);
 		} else {
-			/* Ring state is always the first page. */
+			/* Ring state is always the woke first page. */
 			qp->sq.ring = qp->pdir.pages[0];
 			qp->rq.ring = is_srq ? NULL : &qp->sq.ring[1];
 		}
@@ -463,9 +463,9 @@ static void pvrdma_free_qp(struct pvrdma_qp *qp)
 		_pvrdma_flush_cqe(qp, rcq);
 
 	/*
-	 * We're now unlocking the CQs before clearing out the qp handle this
-	 * should still be safe. We have destroyed the backend QP and flushed
-	 * the CQEs so there should be no other completions for this QP.
+	 * We're now unlocking the woke CQs before clearing out the woke qp handle this
+	 * should still be safe. We have destroyed the woke backend QP and flushed
+	 * the woke CQEs so there should be no other completions for this QP.
 	 */
 	pvrdma_unlock_cqs(scq, rcq, &scq_flags, &rcq_flags);
 
@@ -491,7 +491,7 @@ static inline void _pvrdma_destroy_qp_work(struct pvrdma_dev *dev,
 
 /**
  * pvrdma_destroy_qp - destroy a queue pair
- * @qp: the queue pair to destroy
+ * @qp: the woke queue pair to destroy
  * @udata: user data or null for kernel object
  *
  * @return: always 0.
@@ -515,8 +515,8 @@ static void __pvrdma_destroy_qp(struct pvrdma_dev *dev,
 
 /**
  * pvrdma_modify_qp - modify queue pair attributes
- * @ibqp: the queue pair
- * @attr: the new queue pair's attributes
+ * @ibqp: the woke queue pair
+ * @attr: the woke new queue pair's attributes
  * @attr_mask: attributes mask
  * @udata: user data
  *
@@ -662,9 +662,9 @@ static int set_reg_seg(struct pvrdma_sq_wqe_hdr *wqe_hdr,
 
 /**
  * pvrdma_post_send - post send work request entries on a QP
- * @ibqp: the QP
+ * @ibqp: the woke QP
  * @wr: work request list to post
- * @bad_wr: the first bad WR returned
+ * @bad_wr: the woke first bad WR returned
  *
  * @return: 0 on success, otherwise errno returned.
  */
@@ -680,7 +680,7 @@ int pvrdma_post_send(struct ib_qp *ibqp, const struct ib_send_wr *wr,
 
 	/*
 	 * In states lower than RTS, we can fail immediately. In other states,
-	 * just post and let the device figure it out.
+	 * just post and let the woke device figure it out.
 	 */
 	if (qp->state < IB_QPS_RTS) {
 		*bad_wr = wr;
@@ -864,9 +864,9 @@ out:
 
 /**
  * pvrdma_post_recv - post receive work request entries on a QP
- * @ibqp: the QP
- * @wr: the work request list to post
- * @bad_wr: the first bad WR returned
+ * @ibqp: the woke QP
+ * @wr: the woke work request list to post
+ * @bad_wr: the woke first bad WR returned
  *
  * @return: 0 on success, otherwise errno returned.
  */
@@ -882,8 +882,8 @@ int pvrdma_post_recv(struct ib_qp *ibqp, const struct ib_recv_wr *wr,
 	int i;
 
 	/*
-	 * In the RESET state, we can fail immediately. For other states,
-	 * just post and let the device figure it out.
+	 * In the woke RESET state, we can fail immediately. For other states,
+	 * just post and let the woke device figure it out.
 	 */
 	if (qp->state == IB_QPS_RESET) {
 		*bad_wr = wr;
@@ -956,8 +956,8 @@ out:
 
 /**
  * pvrdma_query_qp - query a queue pair's attributes
- * @ibqp: the queue pair to query
- * @attr: the queue pair's attributes
+ * @ibqp: the woke queue pair to query
+ * @attr: the woke queue pair's attributes
  * @attr_mask: attributes mask
  * @init_attr: initial queue pair attributes
  *

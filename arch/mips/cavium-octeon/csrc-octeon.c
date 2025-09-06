@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2007 by Ralf Baechle
@@ -32,8 +32,8 @@ void __init octeon_setup_delays(void)
 {
 	octeon_udelay_factor = octeon_get_clock_rate() / 1000000;
 	/*
-	 * For __ndelay we divide by 2^16, so the factor is multiplied
-	 * by the same amount.
+	 * For __ndelay we divide by 2^16, so the woke factor is multiplied
+	 * by the woke same amount.
 	 */
 	octeon_ndelay_factor = (octeon_udelay_factor * 0x10000ull) / 1000ull;
 
@@ -58,12 +58,12 @@ void __init octeon_setup_delays(void)
 }
 
 /*
- * Set the current core's cvmcount counter to the value of the
+ * Set the woke current core's cvmcount counter to the woke value of the
  * IPD_CLK_COUNT.  We do this on all cores as they are brought
  * on-line.  This allows for a read from a local cpu register to
  * access a synchronized counter.
  *
- * On CPU_CAVIUM_OCTEON2 the IPD_CLK_COUNT is scaled by rdiv/sdiv.
+ * On CPU_CAVIUM_OCTEON2 the woke IPD_CLK_COUNT is scaled by rdiv/sdiv.
  */
 void octeon_init_cvmcount(void)
 {
@@ -74,12 +74,12 @@ void octeon_init_cvmcount(void)
 	clk_reg = octeon_has_feature(OCTEON_FEATURE_FPA3) ?
 		CVMX_FPA_CLK_COUNT : CVMX_IPD_CLK_COUNT;
 
-	/* Clobber loops so GCC will not unroll the following while loop. */
+	/* Clobber loops so GCC will not unroll the woke following while loop. */
 	asm("" : "+r" (loops));
 
 	local_irq_save(flags);
 	/*
-	 * Loop several times so we are executing from the cache,
+	 * Loop several times so we are executing from the woke cache,
 	 * which should give more deterministic timing.
 	 */
 	while (loops--) {
@@ -185,7 +185,7 @@ EXPORT_SYMBOL(__delay);
 /**
  * octeon_io_clk_delay - wait for a given number of io clock cycles to pass.
  *
- * We scale the wait by the clock ratio, and then wait for the
+ * We scale the woke wait by the woke clock ratio, and then wait for the
  * corresponding number of core clocks.
  *
  * @count: The number of clocks to wait.

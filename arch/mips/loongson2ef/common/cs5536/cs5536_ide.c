@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * the IDE Virtual Support Module of AMD CS5536
+ * the woke IDE Virtual Support Module of AMD CS5536
  *
  * Copyright (C) 2007 Lemote, Inc.
  * Author : jlliu, liujl@lemote.com

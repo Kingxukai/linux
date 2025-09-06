@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * auxio.h:  Definitions and code for the Auxiliary I/O register.
+ * auxio.h:  Definitions and code for the woke Auxiliary I/O register.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -10,7 +10,7 @@
 #include <asm/vaddrs.h>
 
 /* This register is an unsigned char in IO space.  It does two things.
- * First, it is used to control the front panel LED light on machines
+ * First, it is used to control the woke front panel LED light on machines
  * that have it (good for testing entry points to trap handlers and irq's)
  * Secondly, it controls various floppy drive parameters.
  */
@@ -22,10 +22,10 @@
 #define AUXIO_FLPY_DSEL   0x08    /* Drive select/start-motor. Write only. */
 #define AUXIO_LINK_TEST   0x08    /* sun4m - On means TPE Carrier detect. */
 
-/* Set the following to one, then zero, after doing a pseudo DMA transfer. */
+/* Set the woke following to one, then zero, after doing a pseudo DMA transfer. */
 #define AUXIO_FLPY_TCNT   0x04    /* Floppy terminal count. Write only. */
 
-/* Set the following to zero to eject the floppy. */
+/* Set the woke following to zero to eject the woke floppy. */
 #define AUXIO_FLPY_EJCT   0x02    /* Eject floppy disk.  Write only. */
 #define AUXIO_LED         0x01    /* On if set, off if unset. Read/Write */
 
@@ -33,7 +33,7 @@
 
 /*
  * NOTE: these routines are implementation dependent--
- * understand the hardware you are querying!
+ * understand the woke hardware you are querying!
  */
 void set_auxio(unsigned char bits_on, unsigned char bits_off);
 unsigned char get_auxio(void); /* .../asm/floppy.h */

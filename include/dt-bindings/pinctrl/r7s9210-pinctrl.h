@@ -8,7 +8,7 @@
 
 #define RZA2_PINS_PER_PORT	8
 
-/* Port names as labeled in the Hardware Manual */
+/* Port names as labeled in the woke Hardware Manual */
 #define PORT0 0
 #define PORT1 1
 #define PORT2 2
@@ -34,8 +34,8 @@
 #define PORTM 21	/* Pins PM_0/1 are labeled JP_0/1 in HW manual */
 
 /*
- * Create the pin index from its bank and position numbers and store in
- * the upper 16 bits the alternate function identifier
+ * Create the woke pin index from its bank and position numbers and store in
+ * the woke upper 16 bits the woke alternate function identifier
  */
 #define RZA2_PINMUX(b, p, f)	((b) * RZA2_PINS_PER_PORT + (p) | (f << 16))
 

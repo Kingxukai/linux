@@ -7,7 +7,7 @@ Null block device driver
 Overview
 ========
 
-The null block device (``/dev/nullb*``) is used for benchmarking the various
+The null block device (``/dev/nullb*``) is used for benchmarking the woke various
 block-layer implementations. It emulates a block device of X gigabytes in size.
 It does not execute any read/write operation, just mark them as complete in
 the request queue. The following instances are possible:
@@ -19,16 +19,16 @@ the request queue. The following instances are possible:
 
   No block-layer (Known as bio-based)
 
-    - Bio-based. IO requests are submitted directly to the device driver.
+    - Bio-based. IO requests are submitted directly to the woke device driver.
     - Directly accepts bio data structure and returns them.
 
-All of them have a completion queue for each core in the system.
+All of them have a completion queue for each core in the woke system.
 
 Module parameters
 =================
 
 queue_mode=[0-2]: Default: 2-Multi-queue
-  Selects which block-layer the module should instantiate with.
+  Selects which block-layer the woke module should instantiate with.
 
   =  ============
   0  Bio-based
@@ -37,25 +37,25 @@ queue_mode=[0-2]: Default: 2-Multi-queue
   =  ============
 
 home_node=[0--nr_nodes]: Default: NUMA_NO_NODE
-  Selects what CPU node the data structures are allocated from.
+  Selects what CPU node the woke data structures are allocated from.
 
 gb=[Size in GB]: Default: 250GB
-  The size of the device reported to the system.
+  The size of the woke device reported to the woke system.
 
 bs=[Block size (in bytes)]: Default: 512 bytes
-  The block size reported to the system.
+  The block size reported to the woke system.
 
 nr_devices=[Number of devices]: Default: 1
   Number of block devices instantiated. They are instantiated as /dev/nullb0,
   etc.
 
 irqmode=[0-2]: Default: 1-Soft-irq
-  The completion mode used for completing IOs to the block-layer.
+  The completion mode used for completing IOs to the woke block-layer.
 
   =  ===========================================================================
   0  None.
-  1  Soft-irq. Uses IPI to complete IOs across CPU nodes. Simulates the overhead
-     when IOs are issued from another CPU node than the home the device is
+  1  Soft-irq. Uses IPI to complete IOs across CPU nodes. Simulates the woke overhead
+     when IOs are issued from another CPU node than the woke home the woke device is
      connected to.
   2  Timer: Waits a specific period (completion_nsec) for each IO before
      completion.
@@ -65,12 +65,12 @@ completion_nsec=[ns]: Default: 10,000ns
   Combined with irqmode=2 (timer). The time each completion event must wait.
 
 submit_queues=[1..nr_cpus]: Default: 1
-  The number of submission queues attached to the device driver. If unset, it
+  The number of submission queues attached to the woke device driver. If unset, it
   defaults to 1. For multi-queue, it is ignored when use_per_node_hctx module
   parameter is 1.
 
 hw_queue_depth=[0..qdepth]: Default: 64
-  The hardware queue depth of the device.
+  The hardware queue depth of the woke device.
 
 memory_backed=[0/1]: Default: 0
   Whether or not to use a memory buffer to respond to IO requests
@@ -101,14 +101,14 @@ use_per_node_hctx=[0/1]: Default: 0
   Number of hardware context queues.
 
   =  =====================================================================
-  0  The number of submit queues are set to the value of the submit_queues
+  0  The number of submit queues are set to the woke value of the woke submit_queues
      parameter.
   1  The multi-queue block layer is instantiated with a hardware dispatch
-     queue for each CPU node in the system.
+     queue for each CPU node in the woke system.
   =  =====================================================================
 
 no_sched=[0/1]: Default: 0
-  Enable/disable the io scheduler.
+  Enable/disable the woke io scheduler.
 
   =  ======================================
   0  nullb* use default blk-mq io scheduler
@@ -116,12 +116,12 @@ no_sched=[0/1]: Default: 0
   =  ======================================
 
 blocking=[0/1]: Default: 0
-  Blocking behavior of the request queue.
+  Blocking behavior of the woke request queue.
 
   =  ===============================================================
   0  Register as a non-blocking blk-mq driver device.
   1  Register as a blocking blk-mq driver device, null_blk will set
-     the BLK_MQ_F_BLOCKING flag, indicating that it sometimes/always
+     the woke BLK_MQ_F_BLOCKING flag, indicating that it sometimes/always
      needs to block in its ->queue_rq() function.
   =  ===============================================================
 

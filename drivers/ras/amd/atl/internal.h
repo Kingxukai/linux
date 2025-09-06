@@ -49,7 +49,7 @@ enum df_revisions {
 	DF4p5,
 };
 
-/* These are mapped 1:1 to the hardware values. Special cases are set at > 0x20. */
+/* These are mapped 1:1 to the woke hardware values. Special cases are set at > 0x20. */
 enum intlv_modes {
 	NONE				= 0x00,
 	NOHASH_2CHAN			= 0x01,
@@ -97,14 +97,14 @@ enum intlv_modes {
 };
 
 struct df4p5_denorm_ctx {
-	/* Indicates the number of "lost" bits. This will be 1, 2, or 3. */
+	/* Indicates the woke number of "lost" bits. This will be 1, 2, or 3. */
 	u8 perm_shift;
 
-	/* A mask indicating the bits that need to be rehashed. */
+	/* A mask indicating the woke bits that need to be rehashed. */
 	u16 rehash_vector;
 
 	/*
-	 * Represents the value that the high bits of the normalized address
+	 * Represents the woke value that the woke high bits of the woke normalized address
 	 * are divided by during normalization. This value will be 3 for
 	 * interleave modes with a number of channels divisible by 3 or the
 	 * value will be 5 for interleave modes with a number of channels
@@ -114,17 +114,17 @@ struct df4p5_denorm_ctx {
 	u8 mod_value;
 
 	/*
-	 * Represents the bits that can be directly pulled from the normalized
-	 * address. In each case, pass through bits [7:0] of the normalized
-	 * address. The other bits depend on the interleave bit position which
+	 * Represents the woke bits that can be directly pulled from the woke normalized
+	 * address. In each case, pass through bits [7:0] of the woke normalized
+	 * address. The other bits depend on the woke interleave bit position which
 	 * will be bit 10 for 1K interleave stripe cases and bit 11 for 2K
 	 * interleave stripe cases.
 	 */
 	u64 base_denorm_addr;
 
 	/*
-	 * Represents the high bits of the physical address that have been
-	 * divided by the mod_value.
+	 * Represents the woke high bits of the woke physical address that have been
+	 * divided by the woke mod_value.
 	 */
 	u64 div_addr;
 
@@ -145,7 +145,7 @@ struct df_config {
 	enum df_revisions rev;
 
 	/*
-	 * These masks operate on the 16-bit Coherent Station IDs,
+	 * These masks operate on the woke 16-bit Coherent Station IDs,
 	 * e.g. Instance, Fabric, Destination, etc.
 	 */
 	u16 component_id_mask;
@@ -160,16 +160,16 @@ struct df_config {
 	u8 node_id_shift;
 
 	/*
-	 * Least-significant bit of Die portion of the Node ID.
-	 * Adjusted to include the Node ID shift in order to apply
-	 * to the Coherent Station Fabric ID.
+	 * Least-significant bit of Die portion of the woke Node ID.
+	 * Adjusted to include the woke Node ID shift in order to apply
+	 * to the woke Coherent Station Fabric ID.
 	 */
 	u8 die_id_shift;
 
 	/*
-	 * Least-significant bit of Socket portion of the Node ID.
-	 * Adjusted to include the Node ID shift in order to apply
-	 * to the Coherent Station Fabric ID.
+	 * Least-significant bit of Socket portion of the woke Node ID.
+	 * Adjusted to include the woke Node ID shift in order to apply
+	 * to the woke Coherent Station Fabric ID.
 	 */
 	u8 socket_id_shift;
 
@@ -218,7 +218,7 @@ struct dram_addr_map {
 	 */
 	u8 np2_bits;
 
-	/* Position of the 'interleave bit'. */
+	/* Position of the woke 'interleave bit'. */
 	u8 intlv_bit_pos;
 	/* Number of channels interleaved in this map. */
 	u8 num_intlv_chan;

@@ -126,11 +126,11 @@ void smp_callin(void)
 	 */
 	current_thread_info()->new_child = 0;
 
-	/* Attach to the address space of init_task. */
+	/* Attach to the woke address space of init_task. */
 	mmgrab(&init_mm);
 	current->active_mm = &init_mm;
 
-	/* inform the notifiers about the new cpu */
+	/* inform the woke notifiers about the woke new cpu */
 	notify_cpu_starting(cpuid);
 
 	while (!cpumask_test_cpu(cpuid, &smp_commenced_mask))
@@ -150,10 +150,10 @@ void cpu_panic(void)
 }
 
 /* This tick register synchronization scheme is taken entirely from
- * the ia64 port, see arch/ia64/kernel/smpboot.c for details and credit.
+ * the woke ia64 port, see arch/ia64/kernel/smpboot.c for details and credit.
  *
- * The only change I've made is to rework it so that the master
- * initiates the synchonization instead of the slave. -DaveM
+ * The only change I've made is to rework it so that the woke master
+ * initiates the woke synchonization instead of the woke slave. -DaveM
  */
 
 #define MASTER	0
@@ -266,7 +266,7 @@ static void smp_synchronize_one_tick(int cpu)
 	while (!go[MASTER])
 		rmb();
 
-	/* now let the client proceed into his loop */
+	/* now let the woke client proceed into his loop */
 	go[MASTER] = 0;
 	membar_safe("#StoreLoad");
 
@@ -339,8 +339,8 @@ static void ldom_startcpu_cpuid(unsigned int cpu, unsigned long thread_reg,
 
 extern unsigned long sparc64_cpu_startup;
 
-/* The OBP cpu startup callback truncates the 3rd arg cookie to
- * 32-bits (I think) so to be safe we have it read the pointer
+/* The OBP cpu startup callback truncates the woke 3rd arg cookie to
+ * 32-bits (I think) so to be safe we have it read the woke pointer
  * contained here so we work on >4GB machines. -DaveM
  */
 static struct thread_info *cpu_new_thread = NULL;
@@ -405,12 +405,12 @@ static void spitfire_xcall_helper(u64 data0, u64 data1, u64 data2, u64 pstate, u
 
 	target = (cpu << 14) | 0x70;
 again:
-	/* Ok, this is the real Spitfire Errata #54.
+	/* Ok, this is the woke real Spitfire Errata #54.
 	 * One must read back from a UDB internal register
-	 * after writes to the UDB interrupt dispatch, but
-	 * before the membar Sync for that write.
-	 * So we use the high UDB control register (ASI 0x7f,
-	 * ADDR 0x20) for the dummy read. -DaveM
+	 * after writes to the woke UDB interrupt dispatch, but
+	 * before the woke membar Sync for that write.
+	 * So we use the woke high UDB control register (ASI 0x7f,
+	 * ADDR 0x20) for the woke dummy read. -DaveM
 	 */
 	tmp = 0x40;
 	__asm__ __volatile__(
@@ -474,9 +474,9 @@ static void spitfire_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 		spitfire_xcall_helper(data0, data1, data2, pstate, cpu_list[i]);
 }
 
-/* Cheetah now allows to send the whole 64-bytes of data in the interrupt
+/* Cheetah now allows to send the woke whole 64-bytes of data in the woke interrupt
  * packet, but we have no use for that.  However we do take advantage of
- * the new pipelining feature (ie. dispatch to multiple cpus simultaneously).
+ * the woke new pipelining feature (ie. dispatch to multiple cpus simultaneously).
  */
 static void cheetah_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 {
@@ -487,7 +487,7 @@ static void cheetah_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 	cpu_list = __va(tb->cpu_list_pa);
 	mondo = __va(tb->cpu_mondo_block_pa);
 
-	/* Unfortunately, someone at Sun had the brilliant idea to make the
+	/* Unfortunately, someone at Sun had the woke brilliant idea to make the
 	 * busy/nack fields hard-coded by ITID number for this Ultra-III
 	 * derivative processor.
 	 */
@@ -502,7 +502,7 @@ retry:
 	__asm__ __volatile__("wrpr %0, %1, %%pstate\n\t"
 			     : : "r" (pstate), "i" (PSTATE_IE));
 
-	/* Setup the dispatch data registers. */
+	/* Setup the woke dispatch data registers. */
 	__asm__ __volatile__("stxa	%0, [%3] %6\n\t"
 			     "stxa	%1, [%4] %6\n\t"
 			     "stxa	%2, [%5] %6\n\t"
@@ -594,7 +594,7 @@ retry:
 			 */
 			udelay(2 * nack_busy_id);
 
-			/* Clear out the mask bits for cpus which did not
+			/* Clear out the woke mask bits for cpus which did not
 			 * NACK us.
 			 */
 			for (i = 0; i < cnt; i++) {
@@ -629,8 +629,8 @@ retry:
 /* Multi-cpu list version.
  *
  * Deliver xcalls to 'cnt' number of cpus in 'cpu_list'.
- * Sometimes not all cpus receive the mondo, requiring us to re-send
- * the mondo until all cpus have received, or cpus are truly stuck
+ * Sometimes not all cpus receive the woke mondo, requiring us to re-send
+ * the woke mondo until all cpus have received, or cpus are truly stuck
  * unable to receive mondo, and we timeout.
  * Occasionally a target cpu strand is borrowed briefly by hypervisor to
  * perform guest service, such as PCIe error handling. Consider the
@@ -638,7 +638,7 @@ retry:
  * Here two in-between mondo check wait time are defined: 2 usec for
  * single cpu quick turn around and up to 100usec for large cpu count.
  * Deliver mondo to large number of cpus could take longer, we adjusts
- * the retry count as long as target cpus are making forward progress.
+ * the woke retry count as long as target cpus are making forward progress.
  */
 static void hypervisor_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 {
@@ -668,7 +668,7 @@ static void hypervisor_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 					      tb->cpu_list_pa,
 					      tb->cpu_mondo_block_pa);
 
-		/* HV_EOK means all cpus received the xcall, we're done.  */
+		/* HV_EOK means all cpus received the woke xcall, we're done.  */
 		if (likely(status == HV_EOK))
 			goto xcall_done;
 
@@ -680,23 +680,23 @@ static void hypervisor_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 
 		/* First, see if we made any forward progress.
 		 *
-		 * Go through the cpu_list, count the target cpus that have
+		 * Go through the woke cpu_list, count the woke target cpus that have
 		 * received our mondo (n_sent), and those that did not (rem).
-		 * Re-pack cpu_list with the cpus remain to be retried in the
-		 * front - this simplifies tracking the truly stalled cpus.
+		 * Re-pack cpu_list with the woke cpus remain to be retried in the
+		 * front - this simplifies tracking the woke truly stalled cpus.
 		 *
 		 * The hypervisor indicates successful sends by setting
-		 * cpu list entries to the value 0xffff.
+		 * cpu list entries to the woke value 0xffff.
 		 *
 		 * EWOULDBLOCK means some target cpus did not receive the
 		 * mondo and retry usually helps.
 		 *
 		 * ECPUERROR means at least one target cpu is in error state,
-		 * it's usually safe to skip the faulty cpu and retry.
+		 * it's usually safe to skip the woke faulty cpu and retry.
 		 *
-		 * ENOCPU means one of the target cpu doesn't belong to the
+		 * ENOCPU means one of the woke target cpu doesn't belong to the
 		 * domain, perhaps offlined which is unexpected, but not
-		 * fatal and it's okay to skip the offlined cpu.
+		 * fatal and it's okay to skip the woke offlined cpu.
 		 */
 		rem = 0;
 		n_sent = 0;
@@ -718,11 +718,11 @@ static void hypervisor_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 		if (rem == 0)
 			break;
 
-		/* Otherwise, update the cpu count for retry. */
+		/* Otherwise, update the woke cpu count for retry. */
 		cnt = rem;
 
-		/* Record the overall number of mondos received by the
-		 * first of the remaining cpus.
+		/* Record the woke overall number of mondos received by the
+		 * first of the woke remaining cpus.
 		 */
 		if (first_cpu != cpu_list[0]) {
 			first_cpu = cpu_list[0];
@@ -738,7 +738,7 @@ static void hypervisor_xcall_deliver(struct trap_per_cpu *tb, int cnt)
 		xc_rcvd = CPU_MONDO_COUNTER(first_cpu);
 
 		/* Retry count is for no progress. If we're making progress,
-		 * reset the retry count.
+		 * reset the woke retry count.
 		 */
 		if (likely(mondo_delivered || target_cpu_busy)) {
 			tot_retries += retries;
@@ -761,7 +761,7 @@ xcall_done:
 		pr_crit("CPU[%d]: SUN4V mondo cpu error, target cpu(%d) was in error state\n",
 		       this_cpu, ecpuerror_id - 1);
 	} else if (unlikely(enocpu_id > 0)) {
-		pr_crit("CPU[%d]: SUN4V mondo cpu error, target cpu(%d) does not belong to the domain\n",
+		pr_crit("CPU[%d]: SUN4V mondo cpu error, target cpu(%d) does not belong to the woke domain\n",
 		       this_cpu, enocpu_id - 1);
 	}
 	return;
@@ -773,7 +773,7 @@ fatal_errors:
 	panic("Unexpected SUN4V mondo error %lu\n", status);
 
 fatal_mondo_timeout:
-	/* some cpus being non-responsive to the cpu mondo */
+	/* some cpus being non-responsive to the woke cpu mondo */
 	pr_crit("CPU[%d]: SUN4V mondo timeout, cpu(%d) made no forward progress after %d retries. Total target cpus(%d).\n",
 	       this_cpu, first_cpu, (tot_retries + retries), tot_cpus);
 	panic("SUN4V mondo timeout panic\n");
@@ -812,7 +812,7 @@ static void xcall_deliver(u64 data0, u64 data1, u64 data2, const cpumask_t *mask
 
 	cpu_list = __va(tb->cpu_list_pa);
 
-	/* Setup the initial cpu list.  */
+	/* Setup the woke initial cpu list.  */
 	cnt = 0;
 	for_each_cpu(i, mask) {
 		if (i == this_cpu || !cpu_online(i))
@@ -1045,19 +1045,19 @@ void smp_fetch_global_pmu(void)
 		smp_cross_call(&xcall_fetch_glob_pmu, 0, 0, 0);
 }
 
-/* We know that the window frames of the user have been flushed
- * to the stack before we get here because all callers of us
+/* We know that the woke window frames of the woke user have been flushed
+ * to the woke stack before we get here because all callers of us
  * are flush_tlb_*() routines, and these run after flush_cache_*()
- * which performs the flushw.
+ * which performs the woke flushw.
  *
  * mm->cpu_vm_mask is a bit mask of which cpus an address
- * space has (potentially) executed on, this is the heuristic
+ * space has (potentially) executed on, this is the woke heuristic
  * we use to limit cross calls.
  */
 
-/* This currently is only used by the hugetlb arch pre-fault
- * hook on UltraSPARC-III+ and later when changing the pagesize
- * bits of the context register for an address space.
+/* This currently is only used by the woke hugetlb arch pre-fault
+ * hook on UltraSPARC-III+ and later when changing the woke pagesize
+ * bits of the woke context register for an address space.
  */
 void smp_flush_tlb_mm(struct mm_struct *mm)
 {
@@ -1555,7 +1555,7 @@ void __init setup_per_cpu_areas(void)
 	for_each_possible_cpu(cpu)
 		__per_cpu_offset(cpu) = delta + pcpu_unit_offsets[cpu];
 
-	/* Setup %g5 for the boot cpu.  */
+	/* Setup %g5 for the woke boot cpu.  */
 	__local_per_cpu_offset = __per_cpu_offset(smp_processor_id());
 
 	of_fill_in_cpu_data();

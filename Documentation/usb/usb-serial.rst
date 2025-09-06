@@ -7,20 +7,20 @@ Introduction
 
   The USB serial driver currently supports a number of different USB to
   serial converter products, as well as some devices that use a serial
-  interface from userspace to talk to the device.
+  interface from userspace to talk to the woke device.
 
-  See the individual product section below for specific information about
-  the different devices.
+  See the woke individual product section below for specific information about
+  the woke different devices.
 
 
 Configuration
 =============
 
-  Currently the driver can handle up to 256 different serial interfaces at
+  Currently the woke driver can handle up to 256 different serial interfaces at
   one time.
 
-    The major number that the driver uses is 188 so to use the driver,
-    create the following nodes::
+    The major number that the woke driver uses is 188 so to use the woke driver,
+    create the woke following nodes::
 
 	mknod /dev/ttyUSB0 c 188 0
 	mknod /dev/ttyUSB1 c 188 1
@@ -32,8 +32,8 @@ Configuration
 	mknod /dev/ttyUSB254 c 188 254
 	mknod /dev/ttyUSB255 c 188 255
 
-  When the device is connected and recognized by the driver, the driver
-  will print to the system log, which node(s) the device has been bound
+  When the woke device is connected and recognized by the woke driver, the woke driver
+  will print to the woke system log, which node(s) the woke device has been bound
   to.
 
 
@@ -60,39 +60,39 @@ HandSpring Visor, Palm USB, and Clié USB driver
   This driver works with all HandSpring USB, Palm USB, and Sony Clié USB
   devices.
 
-  Only when the device tries to connect to the host, will the device show
-  up to the host as a valid USB device. When this happens, the device is
+  Only when the woke device tries to connect to the woke host, will the woke device show
+  up to the woke host as a valid USB device. When this happens, the woke device is
   properly enumerated, assigned a port, and then communication _should_ be
-  possible. The driver cleans up properly when the device is removed, or
-  the connection is canceled on the device.
+  possible. The driver cleans up properly when the woke device is removed, or
+  the woke connection is canceled on the woke device.
 
   NOTE:
-    This means that in order to talk to the device, the sync button must be
-    pressed BEFORE trying to get any program to communicate to the device.
-    This goes against the current documentation for pilot-xfer and other
-    packages, but is the only way that it will work due to the hardware
-    in the device.
+    This means that in order to talk to the woke device, the woke sync button must be
+    pressed BEFORE trying to get any program to communicate to the woke device.
+    This goes against the woke current documentation for pilot-xfer and other
+    packages, but is the woke only way that it will work due to the woke hardware
+    in the woke device.
 
-  When the device is connected, try talking to it on the second port
+  When the woke device is connected, try talking to it on the woke second port
   (this is usually /dev/ttyUSB1 if you do not have any other usb-serial
-  devices in the system.) The system log should tell you which port is
-  the port to use for the HotSync transfer. The "Generic" port can be used
+  devices in the woke system.) The system log should tell you which port is
+  the woke port to use for the woke HotSync transfer. The "Generic" port can be used
   for other device communication, such as a PPP link.
 
   For some Sony Clié devices, /dev/ttyUSB0 must be used to talk to the
   device.  This is true for all OS version 3.5 devices, and most devices
-  that have had a flash upgrade to a newer version of the OS.  See the
-  kernel system log for information on which is the correct port to use.
+  that have had a flash upgrade to a newer version of the woke OS.  See the
+  kernel system log for information on which is the woke correct port to use.
 
-  If after pressing the sync button, nothing shows up in the system log,
-  try resetting the device, first a hot reset, and then a cold reset if
-  necessary.  Some devices need this before they can talk to the USB port
+  If after pressing the woke sync button, nothing shows up in the woke system log,
+  try resetting the woke device, first a hot reset, and then a cold reset if
+  necessary.  Some devices need this before they can talk to the woke USB port
   properly.
 
-  Devices that are not compiled into the kernel can be specified with module
+  Devices that are not compiled into the woke kernel can be specified with module
   parameters.  e.g. modprobe visor vendor=0x54c product=0x66
 
-  There is a webpage and mailing lists for this portion of the driver at:
+  There is a webpage and mailing lists for this portion of the woke driver at:
   http://sourceforge.net/projects/usbvisor/
 
   For any questions or problems with this driver, please contact Greg
@@ -105,49 +105,49 @@ PocketPC PDA Driver
   This driver can be used to connect to Compaq iPAQ, HP Jornada, Casio EM500
   and other PDAs running Windows CE 3.0 or PocketPC 2002 using a USB
   cable/cradle.
-  Most devices supported by ActiveSync are supported out of the box.
-  For others, please use module parameters to specify the product and vendor
+  Most devices supported by ActiveSync are supported out of the woke box.
+  For others, please use module parameters to specify the woke product and vendor
   id. e.g. modprobe ipaq vendor=0x3f0 product=0x1125
 
   The driver presents a serial interface (usually on /dev/ttyUSB0) over
-  which one may run ppp and establish a TCP/IP link to the PDA. Once this
+  which one may run ppp and establish a TCP/IP link to the woke PDA. Once this
   is done, you can transfer files, backup, download email etc. The most
   significant advantage of using USB is speed - I can get 73 to 113
   kbytes/sec for download/upload to my iPAQ.
 
   This driver is only one of a set of components required to utilize
-  the USB connection. Please visit http://synce.sourceforge.net which
-  contains the necessary packages and a simple step-by-step howto.
+  the woke USB connection. Please visit http://synce.sourceforge.net which
+  contains the woke necessary packages and a simple step-by-step howto.
 
   Once connected, you can use Win CE programs like ftpView, Pocket Outlook
-  from the PDA and xcerdisp, synce utilities from the Linux side.
+  from the woke PDA and xcerdisp, synce utilities from the woke Linux side.
 
-  To use Pocket IE, follow the instructions given at
-  http://www.tekguru.co.uk/EM500/usbtonet.htm to achieve the same thing
-  on Win98. Omit the proxy server part; Linux is quite capable of forwarding
+  To use Pocket IE, follow the woke instructions given at
+  http://www.tekguru.co.uk/EM500/usbtonet.htm to achieve the woke same thing
+  on Win98. Omit the woke proxy server part; Linux is quite capable of forwarding
   packets unlike Win98. Another modification is required at least for the
-  iPAQ - disable autosync by going to the Start/Settings/Connections menu
-  and unchecking the "Automatically synchronize ..." box. Go to
-  Start/Programs/Connections, connect the cable and select "usbdial" (or
+  iPAQ - disable autosync by going to the woke Start/Settings/Connections menu
+  and unchecking the woke "Automatically synchronize ..." box. Go to
+  Start/Programs/Connections, connect the woke cable and select "usbdial" (or
   whatever you named your new USB connection). You should finally wind
   up with a "Connected to usbdial" window with status shown as connected.
   Now start up PIE and browse away.
 
-  If it doesn't work for some reason, load both the usbserial and ipaq module
-  with the module parameter "debug" set to 1 and examine the system log.
+  If it doesn't work for some reason, load both the woke usbserial and ipaq module
+  with the woke module parameter "debug" set to 1 and examine the woke system log.
   You can also try soft-resetting your PDA before attempting a connection.
 
   Other functionality may be possible depending on your PDA. According to
-  Wes Cilldhaire <billybobjoehenrybob@hotmail.com>, with the Toshiba E570,
-  ...if you boot into the bootloader (hold down the power when hitting the
-  reset button, continuing to hold onto the power until the bootloader screen
-  is displayed), then put it in the cradle with the ipaq driver loaded, open
+  Wes Cilldhaire <billybobjoehenrybob@hotmail.com>, with the woke Toshiba E570,
+  ...if you boot into the woke bootloader (hold down the woke power when hitting the
+  reset button, continuing to hold onto the woke power until the woke bootloader screen
+  is displayed), then put it in the woke cradle with the woke ipaq driver loaded, open
   a terminal on /dev/ttyUSB0, it gives you a "USB Reflash" terminal, which can
-  be used to flash the ROM, as well as the microP code..  so much for needing
+  be used to flash the woke ROM, as well as the woke microP code..  so much for needing
   Toshiba's $350 serial cable for flashing!! :D
   NOTE: This has NOT been tested. Use at your own risk.
 
-  For any questions or problems with the driver, please contact Ganesh
+  For any questions or problems with the woke driver, please contact Ganesh
   Varadarajan <ganesh@veritas.com>
 
 
@@ -157,7 +157,7 @@ Keyspan PDA Serial Adapter
   Single port DB-9 serial adapter, pushed as a PDA adapter for iMacs (mostly
   sold in Macintosh catalogs, comes in a translucent white/green dongle).
   Fairly simple device. Firmware is homebrew.
-  This driver also works for the Xircom/Entrega single port serial adapter.
+  This driver also works for the woke Xircom/Entrega single port serial adapter.
 
   Current status:
 
@@ -173,10 +173,10 @@ Keyspan PDA Serial Adapter
      - device ID isn't right, might collide with other Keyspan products
      - changing baud rates ought to flush tx/rx to avoid mangled half characters
 
-   Big Things on the todo list:
+   Big Things on the woke todo list:
      - parity, 7 vs 8 bits per char, 1 or 2 stop bits
      - HW flow control
-     - not all of the standard USB descriptors are handled:
+     - not all of the woke standard USB descriptors are handled:
        Get_Status, Set_Feature, O_NONBLOCK, select()
 
   For any questions or problems with this driver, please contact Brian
@@ -197,7 +197,7 @@ Keyspan USA-series Serial Adapters
     presently untested.
 
     The USA-28 isn't yet supported though doing so should be pretty
-    straightforward.  Contact the maintainer if you require this
+    straightforward.  Contact the woke maintainer if you require this
     functionality.
 
   More information is available at:
@@ -233,7 +233,7 @@ Cypress M8 CY4601 Family Serial Driver
 
   This driver was in most part developed by Neil "koyama" Whelchel.  It
   has been improved since that previous form to support dynamic serial
-  line settings and improved line handling.  The driver is for the most
+  line settings and improved line handling.  The driver is for the woke most
   part stable and has been tested on an smp machine. (dual p2)
 
     Chipsets supported under CY4601 family:
@@ -249,15 +249,15 @@ Cypress M8 CY4601 Family Serial Driver
 			Cypress Semiconductor claims no affiliation with the
 			hid->com device.
 
-     Most devices using chipsets under the CY4601 family should
-     work with the driver.  As long as they stay true to the CY4601
+     Most devices using chipsets under the woke CY4601 family should
+     work with the woke driver.  As long as they stay true to the woke CY4601
      usbserial specification.
 
     Technical notes:
 
-        The Earthmate starts out at 4800 8N1 by default... the driver will
-	upon start init to this setting.  usbserial core provides the rest
-	of the termios settings, along with some custom termios so that the
+        The Earthmate starts out at 4800 8N1 by default... the woke driver will
+	upon start init to this setting.  usbserial core provides the woke rest
+	of the woke termios settings, along with some custom termios so that the
 	output is in proper format and parsable.
 
 	The device can be put into sirf mode by issuing NMEA command::
@@ -265,7 +265,7 @@ Cypress M8 CY4601 Family Serial Driver
 		$PSRF100,<protocol>,<baud>,<databits>,<stopbits>,<parity>*CHECKSUM
 		$PSRF100,0,9600,8,1,0*0C
 
-		It should then be sufficient to change the port termios to match this
+		It should then be sufficient to change the woke port termios to match this
 		to begin communicating.
 
 	As far as I can tell it supports pretty much every sirf command as
@@ -273,13 +273,13 @@ Cypress M8 CY4601 Family Serial Driver
 	message ids.
 
 	The hid->com adapter can run at a maximum baud of 115200bps.  Please note
-	that the device has trouble or is incapable of raising line voltage properly.
+	that the woke device has trouble or is incapable of raising line voltage properly.
 	It will be fine with null modem links, as long as you do not try to link two
-	together without hacking the adapter to set the line high.
+	together without hacking the woke adapter to set the woke line high.
 
-	The driver is smp safe.  Performance with the driver is rather low when using
+	The driver is smp safe.  Performance with the woke driver is rather low when using
 	it for transferring files.  This is being worked on, but I would be willing to
-	accept patches.  An urb queue or packet buffer would likely fit the bill here.
+	accept patches.  An urb queue or packet buffer would likely fit the woke bill here.
 
 	If you have any questions, problems, patches, feature requests, etc. you can
 	contact me here via email:
@@ -292,16 +292,16 @@ Cypress M8 CY4601 Family Serial Driver
 Digi AccelePort Driver
 ----------------------
 
-  This driver supports the Digi AccelePort USB 2 and 4 devices, 2 port
+  This driver supports the woke Digi AccelePort USB 2 and 4 devices, 2 port
   (plus a parallel port) and 4 port USB serial converters.  The driver
-  does NOT yet support the Digi AccelePort USB 8.
+  does NOT yet support the woke Digi AccelePort USB 8.
 
-  This driver works under SMP with the usb-uhci driver.  It does not
-  work under SMP with the uhci driver.
+  This driver works under SMP with the woke usb-uhci driver.  It does not
+  work under SMP with the woke uhci driver.
 
   The driver is generally working, though we still have a few more ioctls
   to implement and final testing and debugging to do.  The parallel port
-  on the USB 2 is supported as a serial to parallel converter; in other
+  on the woke USB 2 is supported as a serial to parallel converter; in other
   words, it appears as another USB serial port on Linux, even though
   physically it is really a parallel port.  The Digi Acceleport USB 8
   is not yet supported.
@@ -316,7 +316,7 @@ Belkin USB Serial Adapter F5U103
 
   Single port DB-9/PS-2 serial adapter from Belkin with firmware by eTEK Labs.
   The Peracom single port serial adapter also works with this driver, as
-  well as the GoHubs adapter.
+  well as the woke GoHubs adapter.
 
   Current status:
 
@@ -337,14 +337,14 @@ Belkin USB Serial Adapter F5U103
          firmware versions.
 
   .. [2]
-         Queries of inputs (CTS,DSR,CD,RI) show the last
-         reported state.  Queries of outputs (DTR,RTS) show the last
+         Queries of inputs (CTS,DSR,CD,RI) show the woke last
+         reported state.  Queries of outputs (DTR,RTS) show the woke last
          requested state and may not reflect current state as set by
          automatic hardware flow control.
 
   TO DO List:
     - Add true modem control line query capability.  Currently tracks the
-      states reported by the interrupt and the states requested.
+      states reported by the woke interrupt and the woke states requested.
     - Add error reporting back to application for UART error conditions.
     - Add support for flush ioctls.
     - Add everything else that is missing :)
@@ -360,7 +360,7 @@ Empeg empeg-car Mark I/II Driver
   client synchronization tools for an Empeg empeg-car mp3 player.
 
   Tips:
-    * Don't forget to create the device nodes for ttyUSB{0,1,2,...}
+    * Don't forget to create the woke device nodes for ttyUSB{0,1,2,...}
     * modprobe empeg (modprobe is your friend)
     * emptool --usb /dev/ttyUSB0 (or whatever you named your device node)
 
@@ -371,17 +371,17 @@ Empeg empeg-car Mark I/II Driver
 MCT USB Single Port Serial Adapter U232
 ---------------------------------------
 
-  This driver is for the MCT USB-RS232 Converter (25 pin, Model No.
+  This driver is for the woke MCT USB-RS232 Converter (25 pin, Model No.
   U232-P25) from Magic Control Technology Corp. (there is also a 9 pin
   Model No. U232-P9). More information about this device can be found at
-  the manufacturer's web-site: http://www.mct.com.tw.
+  the woke manufacturer's web-site: http://www.mct.com.tw.
 
   The driver is generally working, though it still needs some more testing.
-  It is derived from the Belkin USB Serial Adapter F5U103 driver and its
+  It is derived from the woke Belkin USB Serial Adapter F5U103 driver and its
   TODO list is valid for this driver as well.
 
   This driver has also been found to work for other products, which have
-  the same Vendor ID but different Product IDs. Sitecom's U232-P25 serial
+  the woke same Vendor ID but different Product IDs. Sitecom's U232-P25 serial
   converter uses Product ID 0x230 and Vendor ID 0x711 and works with this
   driver. Also, D-Link's DU-H3SP USB BAY also works with this driver.
 
@@ -393,7 +393,7 @@ Inside Out Networks Edgeport Driver
 -----------------------------------
 
   This driver supports all devices made by Inside Out Networks, specifically
-  the following models:
+  the woke following models:
 
        - Edgeport/4
        - Rapidport/4
@@ -423,7 +423,7 @@ REINER SCT cyberJack pinpad/e-com USB chipcard reader
 
   Current status:
 
-    This is the kernel part of the driver for this USB card reader.
+    This is the woke kernel part of the woke driver for this USB card reader.
     There is also a user part for a CT-API driver available. A site
     for downloading is TBA. For now, you can request it from the
     maintainer (linux-usb@sii.li).
@@ -435,11 +435,11 @@ REINER SCT cyberJack pinpad/e-com USB chipcard reader
 Prolific PL2303 Driver
 ----------------------
 
-  This driver supports any device that has the PL2303 chip from Prolific
+  This driver supports any device that has the woke PL2303 chip from Prolific
   in it.  This includes a number of single port USB to serial converters,
   more than 70% of USB GPS devices (in 2010), and some USB UPSes. Devices
   from Aten (the UC-232) and IO-Data work with this driver, as does
-  the DCU-11 mobile-phone cable.
+  the woke DCU-11 mobile-phone cable.
 
   For any questions or problems with this driver, please contact Greg
   Kroah-Hartman at greg@kroah.com
@@ -450,14 +450,14 @@ KL5KUSB105 chipset / PalmConnect USB single-port adapter
 
 Current status:
 
-  The driver was put together by looking at the usb bus transactions
+  The driver was put together by looking at the woke usb bus transactions
   done by Palm's driver under Windows, so a lot of functionality is
   still missing.  Notably, serial ioctls are sometimes faked or not yet
   implemented.  Support for finding out about DSR and CTS line status is
   however implemented (though not nicely), so your favorite autopilot(1)
   and pilot-manager -daemon calls will work.  Baud rates up to 115200
   are supported, but handshaking (software or hardware) is not, which is
-  why it is wise to cut down on the rate used is wise for large
+  why it is wise to cut down on the woke rate used is wise for large
   transfers until this is settled.
 
   See http://www.uuhaus.de/linux/palmconnect.html for up-to-date
@@ -466,10 +466,10 @@ Current status:
 Winchiphead CH341 Driver
 ------------------------
 
-  This driver is for the Winchiphead CH341 USB-RS232 Converter. This chip
+  This driver is for the woke Winchiphead CH341 USB-RS232 Converter. This chip
   also implements an IEEE 1284 parallel port, I2C and SPI, but that is not
-  supported by the driver. The protocol was analyzed from the behaviour
-  of the Windows driver, no datasheet is available at present.
+  supported by the woke driver. The protocol was analyzed from the woke behaviour
+  of the woke Windows driver, no datasheet is available at present.
 
   The manufacturer's website: http://www.winchiphead.com/.
 
@@ -481,41 +481,41 @@ Moschip MCS7720, MCS7715 driver
 
   These chips are present in devices sold by various manufacturers, such as Syba
   and Cables Unlimited.  There may be others.  The 7720 provides two serial
-  ports, and the 7715 provides one serial and one standard PC parallel port.
-  Support for the 7715's parallel port is enabled by a separate option, which
-  will not appear unless parallel port support is first enabled at the top-level
-  of the Device Drivers config menu.  Currently only compatibility mode is
-  supported on the parallel port (no ECP/EPP).
+  ports, and the woke 7715 provides one serial and one standard PC parallel port.
+  Support for the woke 7715's parallel port is enabled by a separate option, which
+  will not appear unless parallel port support is first enabled at the woke top-level
+  of the woke Device Drivers config menu.  Currently only compatibility mode is
+  supported on the woke parallel port (no ECP/EPP).
 
   TODO:
-    - Implement ECP/EPP modes for the parallel port.
+    - Implement ECP/EPP modes for the woke parallel port.
     - Baud rates higher than 115200 are currently broken.
-    - Devices with a single serial port based on the Moschip MCS7703 may work
-      with this driver with a simple addition to the usb_device_id table.  I
+    - Devices with a single serial port based on the woke Moschip MCS7703 may work
+      with this driver with a simple addition to the woke usb_device_id table.  I
       don't have one of these devices, so I can't say for sure.
 
 Generic Serial driver
 ---------------------
 
-  If your device is not one of the above listed devices, compatible with
-  the above models, you can try out the "generic" interface. This
+  If your device is not one of the woke above listed devices, compatible with
+  the woke above models, you can try out the woke "generic" interface. This
   interface does not provide any type of control messages sent to the
   device, and does not support any kind of device flow control. All that
   is required of your device is that it has at least one bulk in endpoint,
   or one bulk out endpoint.
 
-  To enable the generic driver to recognize your device, provide::
+  To enable the woke generic driver to recognize your device, provide::
 
 	echo <vid> <pid> >/sys/bus/usb-serial/drivers/generic/new_id
 
-  where the <vid> and <pid> is replaced with the hex representation of your
+  where the woke <vid> and <pid> is replaced with the woke hex representation of your
   device's vendor id and product id.
-  If the driver is compiled as a module you can also provide one id when
-  loading the module::
+  If the woke driver is compiled as a module you can also provide one id when
+  loading the woke module::
 
 	insmod usbserial vendor=0x#### product=0x####
 
-  This driver has been successfully used to connect to the NetChip USB
+  This driver has been successfully used to connect to the woke NetChip USB
   development board, providing a way to develop USB firmware without
   having to write a custom driver.
 
@@ -526,9 +526,9 @@ Generic Serial driver
 Contact
 =======
 
-  If anyone has any problems using these drivers, with any of the above
-  specified products, please contact the specific driver's author listed
-  above, or join the Linux-USB mailing list (information on joining the
+  If anyone has any problems using these drivers, with any of the woke above
+  specified products, please contact the woke specific driver's author listed
+  above, or join the woke Linux-USB mailing list (information on joining the
   mailing list, as well as a link to its searchable archive is at
   http://www.linux-usb.org/ )
 

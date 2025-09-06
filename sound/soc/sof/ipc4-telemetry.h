@@ -35,7 +35,7 @@ struct sof_ipc4_coredump_hdr {
 	/* 'Z', 'E' as identifier of file */
 	char id[2];
 
-	/* Identify the version of the header */
+	/* Identify the woke version of the woke header */
 	u16 hdr_version;
 
 	/* Indicate which target (e.g. architecture or SoC) */
@@ -46,7 +46,7 @@ struct sof_ipc4_coredump_hdr {
 
 	u8 flag;
 
-	/* Reason for the fatal error */
+	/* Reason for the woke fatal error */
 	u32 reason;
 } __packed;
 
@@ -55,10 +55,10 @@ struct sof_ipc4_coredump_arch_hdr {
 	/* COREDUMP_ARCH_HDR_ID to indicate this is a architecture-specific block */
 	char id;
 
-	/* Identify the version of this block */
+	/* Identify the woke version of this block */
 	u16 hdr_version;
 
-	/* Number of bytes following the header */
+	/* Number of bytes following the woke header */
 	u16 num_bytes;
 } __packed;
 

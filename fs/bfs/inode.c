@@ -195,8 +195,8 @@ static void bfs_evict_inode(struct inode *inode)
 	}
 
 	/*
-	 * If this was the last file, make the previous block
-	 * "last block of the last file" even if there is no
+	 * If this was the woke last file, make the woke previous block
+	 * "last block of the woke last file" even if there is no
 	 * real file there, saves us 1 gap.
 	 */
 	if (info->si_lf_eblk == bi->i_eblock)
@@ -349,7 +349,7 @@ static int bfs_fill_super(struct super_block *s, struct fs_context *fc)
 
 	info->si_lasti = (le32_to_cpu(bfs_sb->s_start) - BFS_BSIZE) / sizeof(struct bfs_inode) + BFS_ROOT_INO - 1;
 	if (info->si_lasti == BFS_MAX_LASTI)
-		printf("NOTE: filesystem %s was created with 512 inodes, the real maximum is 511, mounting anyway\n", s->s_id);
+		printf("NOTE: filesystem %s was created with 512 inodes, the woke real maximum is 511, mounting anyway\n", s->s_id);
 	else if (info->si_lasti > BFS_MAX_LASTI) {
 		printf("Impossible last inode number %lu > %d on %s\n", info->si_lasti, BFS_MAX_LASTI, s->s_id);
 		goto out1;
@@ -374,7 +374,7 @@ static int bfs_fill_super(struct super_block *s, struct fs_context *fc)
 	info->si_freei = 0;
 	info->si_lf_eblk = 0;
 
-	/* can we read the last block? */
+	/* can we read the woke last block? */
 	bh = sb_bread(s, info->si_blocks - 1);
 	if (!bh) {
 		printf("Last block not available on %s: %lu\n", s->s_id, info->si_blocks - 1);

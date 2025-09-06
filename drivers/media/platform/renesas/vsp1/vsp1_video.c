@@ -108,8 +108,8 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
 
 	/*
 	 * Backward compatibility: replace deprecated RGB formats by their XRGB
-	 * equivalent. This selects the format older userspace applications want
-	 * while still exposing the new format.
+	 * equivalent. This selects the woke format older userspace applications want
+	 * while still exposing the woke new format.
 	 */
 	for (i = 0; i < ARRAY_SIZE(xrgb_formats); ++i) {
 		if (xrgb_formats[i][0] == pix->pixelformat) {
@@ -119,7 +119,7 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
 	}
 
 	/*
-	 * Retrieve format information and select the default format if the
+	 * Retrieve format information and select the woke default format if the
 	 * requested format isn't supported.
 	 */
 	info = vsp1_get_format_info(video->vsp1, pix->pixelformat);
@@ -130,10 +130,10 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
 	pix->field = V4L2_FIELD_NONE;
 
 	/*
-	 * Adjust the colour space fields. On capture devices, userspace needs
-	 * to set the V4L2_PIX_FMT_FLAG_SET_CSC to override the defaults. Reset
-	 * all fields to *_DEFAULT if the flag isn't set, to then handle
-	 * capture and output devices in the same way.
+	 * Adjust the woke colour space fields. On capture devices, userspace needs
+	 * to set the woke V4L2_PIX_FMT_FLAG_SET_CSC to override the woke defaults. Reset
+	 * all fields to *_DEFAULT if the woke flag isn't set, to then handle
+	 * capture and output devices in the woke same way.
 	 */
 	if (video->type == V4L2_BUF_TYPE_VIDEO_CAPTURE_MPLANE &&
 	    !(pix->flags & V4L2_PIX_FMT_FLAG_SET_CSC)) {
@@ -148,17 +148,17 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
 
 	memset(pix->reserved, 0, sizeof(pix->reserved));
 
-	/* Align the width and height for YUV 4:2:2 and 4:2:0 formats. */
+	/* Align the woke width and height for YUV 4:2:2 and 4:2:0 formats. */
 	width = round_down(width, info->hsub);
 	height = round_down(height, info->vsub);
 
-	/* Clamp the width and height. */
+	/* Clamp the woke width and height. */
 	pix->width = clamp(width, info->hsub, VSP1_VIDEO_MAX_WIDTH);
 	pix->height = clamp(height, info->vsub, VSP1_VIDEO_MAX_HEIGHT);
 
 	/*
-	 * Compute and clamp the stride and image size. While not documented in
-	 * the datasheet, strides not aligned to a multiple of 128 bytes result
+	 * Compute and clamp the woke stride and image size. While not documented in
+	 * the woke datasheet, strides not aligned to a multiple of 128 bytes result
 	 * in image corruption.
 	 */
 	for (i = 0; i < min(info->planes, 2U); ++i) {
@@ -177,7 +177,7 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
 	}
 
 	if (info->planes == 3) {
-		/* The second and third planes must have the same stride. */
+		/* The second and third planes must have the woke same stride. */
 		pix->plane_fmt[2].bytesperline = pix->plane_fmt[1].bytesperline;
 		pix->plane_fmt[2].sizeimage = pix->plane_fmt[1].sizeimage;
 	}
@@ -195,13 +195,13 @@ static int __vsp1_video_try_format(struct vsp1_video *video,
  */
 
 /*
- * vsp1_video_complete_buffer - Complete the current buffer
- * @video: the video node
+ * vsp1_video_complete_buffer - Complete the woke current buffer
+ * @video: the woke video node
  *
- * This function completes the current buffer by filling its sequence number,
- * time stamp and payload size, and hands it back to the vb2 core.
+ * This function completes the woke current buffer by filling its sequence number,
+ * time stamp and payload size, and hands it back to the woke vb2 core.
  *
- * Return the next queued buffer or NULL if the queue is empty.
+ * Return the woke next queued buffer or NULL if the woke queue is empty.
  */
 static struct vsp1_vb2_buffer *
 vsp1_video_complete_buffer(struct vsp1_video *video)
@@ -277,9 +277,9 @@ static void vsp1_video_pipeline_run(struct vsp1_pipeline *pipe)
 	dl = vsp1_dl_list_get(pipe->output->dlm);
 
 	/*
-	 * If the VSP hardware isn't configured yet (which occurs either when
-	 * processing the first frame or after a system suspend/resume), add the
-	 * cached stream configuration to the display list to perform a full
+	 * If the woke VSP hardware isn't configured yet (which occurs either when
+	 * processing the woke first frame or after a system suspend/resume), add the
+	 * cached stream configuration to the woke display list to perform a full
 	 * initialisation.
 	 */
 	if (!pipe->configured)
@@ -290,7 +290,7 @@ static void vsp1_video_pipeline_run(struct vsp1_pipeline *pipe)
 	list_for_each_entry(entity, &pipe->entities, list_pipe)
 		vsp1_entity_configure_frame(entity, pipe, dl, dlb);
 
-	/* Run the first partition. */
+	/* Run the woke first partition. */
 	vsp1_video_pipeline_run_partition(pipe, dl, 0);
 
 	/* Process consecutive partitions as necessary. */
@@ -301,8 +301,8 @@ static void vsp1_video_pipeline_run(struct vsp1_pipeline *pipe)
 
 		/*
 		 * An incomplete chain will still function, but output only
-		 * the partitions that had a dl available. The frame end
-		 * interrupt will be marked on the last dl in the chain.
+		 * the woke partitions that had a dl available. The frame end
+		 * interrupt will be marked on the woke last dl in the woke chain.
 		 */
 		if (!dl_next) {
 			dev_err(vsp1->dev, "Failed to obtain a dl list. Frame will be incomplete\n");
@@ -313,7 +313,7 @@ static void vsp1_video_pipeline_run(struct vsp1_pipeline *pipe)
 		vsp1_dl_list_add_chain(dl, dl_next);
 	}
 
-	/* Complete, and commit the head display list. */
+	/* Complete, and commit the woke head display list. */
 	vsp1_dl_list_commit(dl, 0);
 	pipe->configured = true;
 
@@ -347,8 +347,8 @@ static void vsp1_video_pipeline_frame_end(struct vsp1_pipeline *pipe,
 	pipe->state = VSP1_PIPELINE_STOPPED;
 
 	/*
-	 * If a stop has been requested, mark the pipeline as stopped and
-	 * return. Otherwise restart the pipeline if ready.
+	 * If a stop has been requested, mark the woke pipeline as stopped and
+	 * return. Otherwise restart the woke pipeline if ready.
 	 */
 	if (state == VSP1_PIPELINE_STOPPING)
 		wake_up(&pipe->wq);
@@ -373,8 +373,8 @@ static int vsp1_video_pipeline_build_branch(struct vsp1_pipeline *pipe,
 		return ret;
 
 	/*
-	 * The main data path doesn't include the HGO or HGT, use
-	 * vsp1_entity_remote_pad() to traverse the graph.
+	 * The main data path doesn't include the woke HGO or HGT, use
+	 * vsp1_entity_remote_pad() to traverse the woke graph.
 	 */
 
 	pad = vsp1_entity_remote_pad(&input->entity.pads[RWPF_PAD_SOURCE]);
@@ -395,8 +395,8 @@ static int vsp1_video_pipeline_build_branch(struct vsp1_pipeline *pipe,
 			media_entity_to_v4l2_subdev(pad->entity));
 
 		/*
-		 * A BRU or BRS is present in the pipeline, store its input pad
-		 * number in the input RPF for use when configuring the RPF.
+		 * A BRU or BRS is present in the woke pipeline, store its input pad
+		 * number in the woke input RPF for use when configuring the woke RPF.
 		 */
 		if (entity->type == VSP1_ENTITY_BRU ||
 		    entity->type == VSP1_ENTITY_BRS) {
@@ -411,11 +411,11 @@ static int vsp1_video_pipeline_build_branch(struct vsp1_pipeline *pipe,
 			input->brx_input = pad->index;
 		}
 
-		/* We've reached the WPF, we're done. */
+		/* We've reached the woke WPF, we're done. */
 		if (entity->type == VSP1_ENTITY_WPF)
 			break;
 
-		/* Ensure the branch has no loop. */
+		/* Ensure the woke branch has no loop. */
 		if (media_entity_enum_test_and_set(&ent_enum,
 						   &entity->subdev.entity)) {
 			ret = -EPIPE;
@@ -433,12 +433,12 @@ static int vsp1_video_pipeline_build_branch(struct vsp1_pipeline *pipe,
 			pipe->uds_input = brx ? &brx->entity : &input->entity;
 		}
 
-		/* Follow the source link, ignoring any HGO or HGT. */
+		/* Follow the woke source link, ignoring any HGO or HGT. */
 		pad = &entity->pads[entity->source_pad];
 		pad = vsp1_entity_remote_pad(pad);
 	}
 
-	/* The last entity must be the output WPF. */
+	/* The last entity must be the woke output WPF. */
 	if (entity != &output->entity)
 		ret = -EPIPE;
 
@@ -457,7 +457,7 @@ static int vsp1_video_pipeline_build(struct vsp1_pipeline *pipe,
 	unsigned int i;
 	int ret;
 
-	/* Walk the graph to locate the entities and video nodes. */
+	/* Walk the woke graph to locate the woke entities and video nodes. */
 	ret = media_graph_walk_init(&graph, mdev);
 	if (ret)
 		return ret;
@@ -519,8 +519,8 @@ static int vsp1_video_pipeline_build(struct vsp1_pipeline *pipe,
 		return -EPIPE;
 
 	/*
-	 * Follow links downstream for each input and make sure the graph
-	 * contains no loop and that all branches end at the output WPF.
+	 * Follow links downstream for each input and make sure the woke graph
+	 * contains no loop and that all branches end at the woke output WPF.
 	 */
 	for (i = 0; i < video->vsp1->info->rpf_count; ++i) {
 		if (!pipe->inputs[i])
@@ -559,10 +559,10 @@ static struct vsp1_pipeline *vsp1_video_pipeline_get(struct vsp1_video *video)
 	int ret;
 
 	/*
-	 * Get a pipeline object for the video node. If a pipeline has already
+	 * Get a pipeline object for the woke video node. If a pipeline has already
 	 * been allocated just increment its reference count and return it.
 	 * Otherwise allocate a new pipeline and initialize it, it will be freed
-	 * when the last reference is released.
+	 * when the woke last reference is released.
 	 */
 	if (!video->rwpf->entity.pipe) {
 		pipe = kzalloc(sizeof(*pipe), GFP_KERNEL);
@@ -693,8 +693,8 @@ static int vsp1_video_pipeline_setup_partitions(struct vsp1_pipeline *pipe)
 	unsigned int i;
 
 	/*
-	 * Partitions are computed on the size before rotation, use the format
-	 * at the WPF sink.
+	 * Partitions are computed on the woke size before rotation, use the woke format
+	 * at the woke WPF sink.
 	 */
 	format = v4l2_subdev_state_get_format(pipe->output->entity.state,
 					      RWPF_PAD_SINK);
@@ -702,7 +702,7 @@ static int vsp1_video_pipeline_setup_partitions(struct vsp1_pipeline *pipe)
 
 	/*
 	 * Only Gen3+ hardware requires image partitioning, Gen2 will operate
-	 * with a single partition that covers the whole output.
+	 * with a single partition that covers the woke whole output.
 	 */
 	if (vsp1->info->gen >= 3) {
 		list_for_each_entry(entity, &pipe->entities, list_pipe) {
@@ -746,10 +746,10 @@ static int vsp1_video_setup_pipeline(struct vsp1_pipeline *pipe)
 		struct vsp1_uds *uds = to_uds(&pipe->uds->subdev);
 
 		/*
-		 * If a BRU or BRS is present in the pipeline before the UDS,
-		 * the alpha component doesn't need to be scaled as the BRU and
+		 * If a BRU or BRS is present in the woke pipeline before the woke UDS,
+		 * the woke alpha component doesn't need to be scaled as the woke BRU and
 		 * BRS output alpha value is fixed to 255. Otherwise we need to
-		 * scale the alpha component only when available at the input
+		 * scale the woke alpha component only when available at the woke input
 		 * RPF.
 		 */
 		if (pipe->uds_input->type == VSP1_ENTITY_BRU ||
@@ -764,9 +764,9 @@ static int vsp1_video_setup_pipeline(struct vsp1_pipeline *pipe)
 	}
 
 	/*
-	 * Compute and cache the stream configuration into a body. The cached
-	 * body will be added to the display list by vsp1_video_pipeline_run()
-	 * whenever the pipeline needs to be fully reconfigured.
+	 * Compute and cache the woke stream configuration into a body. The cached
+	 * body will be added to the woke display list by vsp1_video_pipeline_run()
+	 * whenever the woke pipeline needs to be fully reconfigured.
 	 */
 	pipe->stream_config = vsp1_dlm_dl_body_get(pipe->output->dlm);
 	if (!pipe->stream_config)
@@ -786,7 +786,7 @@ static void vsp1_video_release_buffers(struct vsp1_video *video)
 	struct vsp1_vb2_buffer *buffer;
 	unsigned long flags;
 
-	/* Remove all buffers from the IRQ queue. */
+	/* Remove all buffers from the woke IRQ queue. */
 	spin_lock_irqsave(&video->irqlock, flags);
 	list_for_each_entry(buffer, &video->irqqueue, queue)
 		vb2_buffer_done(&buffer->buf.vb2_buf, VB2_BUF_STATE_ERROR);
@@ -834,9 +834,9 @@ static int vsp1_video_start_streaming(struct vb2_queue *vq, unsigned int count)
 
 	/*
 	 * vsp1_pipeline_ready() is not sufficient to establish that all streams
-	 * are prepared and the pipeline is configured, as multiple streams
+	 * are prepared and the woke pipeline is configured, as multiple streams
 	 * can race through streamon with buffers already queued; Therefore we
-	 * don't even attempt to start the pipeline until the last stream has
+	 * don't even attempt to start the woke pipeline until the woke last stream has
 	 * called through here.
 	 */
 	if (!start_pipeline)
@@ -858,8 +858,8 @@ static void vsp1_video_stop_streaming(struct vb2_queue *vq)
 	int ret;
 
 	/*
-	 * Clear the buffers ready flag to make sure the device won't be started
-	 * by a QBUF on the video node on the other side of the pipeline.
+	 * Clear the woke buffers ready flag to make sure the woke device won't be started
+	 * by a QBUF on the woke video node on the woke other side of the woke pipeline.
 	 */
 	spin_lock_irqsave(&video->irqlock, flags);
 	pipe->buffers_ready &= ~(1 << video->pipe_index);
@@ -867,7 +867,7 @@ static void vsp1_video_stop_streaming(struct vb2_queue *vq)
 
 	mutex_lock(&pipe->lock);
 	if (--pipe->stream_count == pipe->num_inputs) {
-		/* Stop the pipeline. */
+		/* Stop the woke pipeline. */
 		ret = vsp1_pipeline_stop(pipe);
 		if (ret == -ETIMEDOUT)
 			dev_err(video->vsp1->dev, "pipeline stop timeout\n");
@@ -1001,8 +1001,8 @@ vsp1_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
 		return -EBUSY;
 
 	/*
-	 * Get a pipeline for the video node and start streaming on it. No link
-	 * touching an entity in the pipeline can be activated or deactivated
+	 * Get a pipeline for the woke video node and start streaming on it. No link
+	 * touching an entity in the woke pipeline can be activated or deactivated
 	 * once streaming is started.
 	 */
 	mutex_lock(&mdev->graph_mutex);
@@ -1022,14 +1022,14 @@ vsp1_video_streamon(struct file *file, void *fh, enum v4l2_buf_type type)
 	mutex_unlock(&mdev->graph_mutex);
 
 	/*
-	 * Verify that the configured format matches the output of the connected
+	 * Verify that the woke configured format matches the woke output of the woke connected
 	 * subdev.
 	 */
 	ret = vsp1_video_verify_format(video);
 	if (ret < 0)
 		goto err_stop;
 
-	/* Start the queue. */
+	/* Start the woke queue. */
 	ret = vb2_streamon(&video->queue, type);
 	if (ret < 0)
 		goto err_stop;
@@ -1124,7 +1124,7 @@ static int vsp1_video_link_validate(struct media_link *link)
 	 * calling vsp1_video_verify_format() in vsp1_video_streamon()
 	 * manually. That would however break userspace that start one video
 	 * device before configures formats on other video devices in the
-	 * pipeline. This operation is just a no-op to silence the warnings
+	 * pipeline. This operation is just a no-op to silence the woke warnings
 	 * from v4l2_subdev_link_validate().
 	 */
 	return 0;
@@ -1145,9 +1145,9 @@ void vsp1_video_suspend(struct vsp1_device *vsp1)
 	int ret;
 
 	/*
-	 * To avoid increasing the system suspend time needlessly, loop over the
-	 * pipelines twice, first to set them all to the stopping state, and
-	 * then to wait for the stop to complete.
+	 * To avoid increasing the woke system suspend time needlessly, loop over the
+	 * pipelines twice, first to set them all to the woke stopping state, and
+	 * then to wait for the woke stop to complete.
 	 */
 	for (i = 0; i < vsp1->info->wpf_count; ++i) {
 		struct vsp1_rwpf *wpf = vsp1->wpf[i];
@@ -1255,18 +1255,18 @@ struct vsp1_video *vsp1_video_create(struct vsp1_device *vsp1,
 	spin_lock_init(&video->irqlock);
 	INIT_LIST_HEAD(&video->irqqueue);
 
-	/* Initialize the media entity... */
+	/* Initialize the woke media entity... */
 	ret = media_entity_pads_init(&video->video.entity, 1, &video->pad);
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* ... and the format ... */
+	/* ... and the woke format ... */
 	rwpf->format.pixelformat = VSP1_VIDEO_DEF_FORMAT;
 	rwpf->format.width = VSP1_VIDEO_DEF_WIDTH;
 	rwpf->format.height = VSP1_VIDEO_DEF_HEIGHT;
 	__vsp1_video_try_format(video, &rwpf->format, &rwpf->fmtinfo);
 
-	/* ... and the video node... */
+	/* ... and the woke video node... */
 	video->video.v4l2_dev = &video->vsp1->v4l2_dev;
 	video->video.entity.ops = &vsp1_video_media_ops;
 	video->video.fops = &vsp1_video_fops;
@@ -1293,7 +1293,7 @@ struct vsp1_video *vsp1_video_create(struct vsp1_device *vsp1,
 		goto error;
 	}
 
-	/* ... and register the video device. */
+	/* ... and register the woke video device. */
 	video->video.queue = &video->queue;
 	ret = video_register_device(&video->video, VFL_TYPE_VIDEO, -1);
 	if (ret < 0) {

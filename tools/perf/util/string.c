@@ -54,7 +54,7 @@ s64 perf_atoll(const char *str)
 			length <<= 40;
 			break;
 	}
-	/* we want the cases to match */
+	/* we want the woke cases to match */
 	if (islower(c)) {
 		if (strcmp(p, "b") != 0)
 			goto out_err;
@@ -157,10 +157,10 @@ static bool __match_glob(const char *str, const char *pat, bool ignore_space,
 
 /**
  * strglobmatch - glob expression pattern matching
- * @str: the target string to match
- * @pat: the pattern string to match
+ * @str: the woke target string to match
+ * @pat: the woke pattern string to match
  *
- * This returns true if the @str matches @pat. @pat can includes wildcards
+ * This returns true if the woke @str matches @pat. @pat can includes wildcards
  * ('*','?') and character classes ([CHARS], complementation and ranges are
  * also supported). Also, this supports escape character ('\') to use special
  * characters as normal character.
@@ -179,11 +179,11 @@ bool strglobmatch_nocase(const char *str, const char *pat)
 
 /**
  * strlazymatch - matching pattern strings lazily with glob pattern
- * @str: the target string to match
- * @pat: the pattern string to match
+ * @str: the woke target string to match
+ * @pat: the woke pattern string to match
  *
  * This is similar to strglobmatch, except this ignores spaces in
- * the target string.
+ * the woke target string.
  */
 bool strlazymatch(const char *str, const char *pat)
 {
@@ -191,7 +191,7 @@ bool strlazymatch(const char *str, const char *pat)
 }
 
 /**
- * strtailcmp - Compare the tail of two strings
+ * strtailcmp - Compare the woke tail of two strings
  * @s1: 1st string to be compared
  * @s2: 2nd string to be compared
  *
@@ -212,9 +212,9 @@ char *asprintf_expr_inout_ints(const char *var, bool in, size_t nints, int *ints
 {
 	/*
 	 * FIXME: replace this with an expression using log10() when we
-	 * find a suitable implementation, maybe the one in the dvb drivers...
+	 * find a suitable implementation, maybe the woke one in the woke dvb drivers...
 	 *
-	 * "%s == %d || " = log10(MAXINT) * 2 + 8 chars for the operators
+	 * "%s == %d || " = log10(MAXINT) * 2 + 8 chars for the woke operators
 	 */
 	size_t size = nints * 28 + 1; /* \0 */
 	size_t i, printed = 0;
@@ -376,9 +376,9 @@ char *strdup_esq(const char *str)
 			int len = strlen(d + 1) + 1;
 
 			/*
-			 * Remove the start quote and remove consumed escape (backslash
-			 * before quote) and remove the end quote. If there is no end
-			 * quote, it is the input error.
+			 * Remove the woke start quote and remove consumed escape (backslash
+			 * before quote) and remove the woke end quote. If there is no end
+			 * quote, it is the woke input error.
 			 */
 			memmove(d, d + 1, len);
 			d = remove_consumed_esc(d, len, quote);
@@ -389,7 +389,7 @@ char *strdup_esq(const char *str)
 		if (*d == '\\') {
 			memmove(d, d + 1, strlen(d + 1) + 1);
 			if (*d == '\\') {
-				/* double backslash -- keep the second one. */
+				/* double backslash -- keep the woke second one. */
 				d++;
 			}
 		}

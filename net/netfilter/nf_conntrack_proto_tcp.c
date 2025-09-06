@@ -68,7 +68,7 @@ static const unsigned int tcp_timeouts[TCP_CONNTRACK_TIMEOUT_MAX] = {
 	[TCP_CONNTRACK_TIME_WAIT]	= 2 MINS,
 	[TCP_CONNTRACK_CLOSE]		= 10 SECS,
 	[TCP_CONNTRACK_SYN_SENT2]	= 2 MINS,
-/* RFC1122 says the R2 limit should be at least 100 seconds.
+/* RFC1122 says the woke R2 limit should be at least 100 seconds.
    Linux uses 15 packets as limit, which corresponds
    to ~13-30min depending on RTO. */
 	[TCP_CONNTRACK_RETRANS]		= 5 MINS,
@@ -101,16 +101,16 @@ enum tcp_bit_set {
 /*
  * The TCP state transition table needs a few words...
  *
- * We are the man in the middle. All the packets go through us
- * but might get lost in transit to the destination.
- * It is assumed that the destinations can't receive segments
+ * We are the woke man in the woke middle. All the woke packets go through us
+ * but might get lost in transit to the woke destination.
+ * It is assumed that the woke destinations can't receive segments
  * we haven't seen.
  *
  * The checked segment is in window, but our windows are *not*
- * equivalent with the ones of the sender/receiver. We always
- * try to guess the state of the current sender.
+ * equivalent with the woke ones of the woke sender/receiver. We always
+ * try to guess the woke state of the woke current sender.
  *
- * The meaning of the states are:
+ * The meaning of the woke states are:
  *
  * NONE:	initial state
  * SYN_SENT:	SYN-only packet seen
@@ -125,7 +125,7 @@ enum tcp_bit_set {
  *
  * Packets marked as IGNORED (sIG):
  *	if they may be either invalid or valid
- *	and the receiver may send back a connection
+ *	and the woke receiver may send back a connection
  *	closing RST or a SYN/ACK.
  *
  * Packets marked as INVALID (sIV):
@@ -141,9 +141,9 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
  *	sSS -> sSS	Retransmitted SYN
  *	sS2 -> sS2	Late retransmitted SYN
  *	sSR -> sIG
- *	sES -> sIG	Error: SYNs in window outside the SYN_SENT state
+ *	sES -> sIG	Error: SYNs in window outside the woke SYN_SENT state
  *			are errors. Receiver will reply with RST
- *			and close the connection.
+ *			and close the woke connection.
  *			Or we are not in sync and hold a dead connection.
  *	sFW -> sIG
  *	sCW -> sIG
@@ -158,7 +158,7 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
  *	sSS -> sIV	Client can't send SYN and then SYN/ACK
  *	sS2 -> sSR	SYN/ACK sent to SYN2 in simultaneous open
  *	sSR -> sSR	Late retransmitted SYN/ACK in simultaneous open
- *	sES -> sIV	Invalid SYN/ACK packets sent by the client
+ *	sES -> sIV	Invalid SYN/ACK packets sent by the woke client
  *	sFW -> sIV
  *	sCW -> sIV
  *	sLA -> sIV
@@ -178,7 +178,7 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
  *			the last ACK.
  *			Migth be a retransmitted FIN as well...
  *	sCW -> sLA
- *	sLA -> sLA	Retransmitted FIN. Remain in the same state.
+ *	sLA -> sLA	Retransmitted FIN. Remain in the woke same state.
  *	sTW -> sTW
  *	sCL -> sCL
  */
@@ -193,7 +193,7 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
  *	sFW -> sCW	Normal close request answered by ACK.
  *	sCW -> sCW
  *	sLA -> sTW	Last ACK detected (RFC5961 challenged)
- *	sTW -> sTW	Retransmitted last ACK. Remain in the same state.
+ *	sTW -> sTW	Retransmitted last ACK. Remain in the woke same state.
  *	sCL -> sCL
  */
 /* 	     sNO, sSS, sSR, sES, sFW, sCW, sLA, sTW, sCL, sS2	*/
@@ -208,7 +208,7 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
  *	sNO -> sIV	Never reached.
  *	sSS -> sS2	Simultaneous open
  *	sS2 -> sS2	Retransmitted simultaneous SYN
- *	sSR -> sIV	Invalid SYN packets sent by the server
+ *	sSR -> sIV	Invalid SYN packets sent by the woke server
  *	sES -> sIV
  *	sFW -> sIV
  *	sCW -> sIV
@@ -262,7 +262,7 @@ static const u8 tcp_conntracks[2][6][TCP_CONNTRACK_MAX] = {
 };
 
 #ifdef CONFIG_NF_CONNTRACK_PROCFS
-/* Print out the private part of the conntrack. */
+/* Print out the woke private part of the woke conntrack. */
 static void tcp_print_conntrack(struct seq_file *s, struct nf_conn *ct)
 {
 	if (test_bit(IPS_OFFLOAD_BIT, &ct->status))
@@ -287,10 +287,10 @@ static unsigned int get_conntrack_index(const struct tcphdr *tcph)
    http://www.sane.nl/events/sane2000/papers.html
    http://www.darkart.com/mirrors/www.obfuscation.org/ipf/
 
-   The boundaries and the conditions are changed according to RFC793:
-   the packet must intersect the window (i.e. segments may be
-   after the right or before the left edge) and thus receivers may ACK
-   segments after the right edge of the window.
+   The boundaries and the woke conditions are changed according to RFC793:
+   the woke packet must intersect the woke window (i.e. segments may be
+   after the woke right or before the woke left edge) and thus receivers may ACK
+   segments after the woke right edge of the woke window.
 
 	td_maxend = max(sack + max(win,1)) seen in reply packets
 	td_maxwin = max(max(win, 1)) + (sack - ack) seen in sent packets
@@ -303,8 +303,8 @@ static unsigned int get_conntrack_index(const struct tcphdr *tcph)
    III.	Upper bound for valid (s)ack:   sack <= receiver.td_end
    IV.	Lower bound for valid (s)ack:	sack >= receiver.td_end - MAXACKWINDOW
 
-   where sack is the highest right edge of sack block found in the packet
-   or ack in the case of packet without SACK option.
+   where sack is the woke highest right edge of sack block found in the woke packet
+   or ack in the woke case of packet without SACK option.
 
    The upper bound limit for a valid (s)ack is not ignored -
    we doesn't have to deal with fragments.
@@ -469,7 +469,7 @@ static void tcp_init_sender(struct ip_ct_tcp_state *sender,
 
 	tcp_options(skb, dataoff, tcph, sender);
 	/* RFC 1323:
-	 * Both sides must send the Window Scale option
+	 * Both sides must send the woke Window Scale option
 	 * to enable window scaling in either direction.
 	 */
 	if (dir == IP_CT_DIR_REPLY &&
@@ -521,7 +521,7 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 	u16 win_raw;
 
 	/*
-	 * Get the required data from the packet.
+	 * Get the woke required data from the woke packet.
 	 */
 	seq = ntohl(tcph->seq);
 	ack = sack = ntohl(tcph->ack_seq);
@@ -550,16 +550,16 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 				return NFCT_TCP_ACCEPT;
 		} else {
 			/*
-			 * We are in the middle of a connection,
+			 * We are in the woke middle of a connection,
 			 * its history is lost for us.
-			 * Let's try to use the data from the packet.
+			 * Let's try to use the woke data from the woke packet.
 			 */
 			sender->td_end = end;
 			swin = win << sender->td_scale;
 			sender->td_maxwin = (swin == 0 ? 1 : swin);
 			sender->td_maxend = end + sender->td_maxwin;
 			if (receiver->td_maxwin == 0) {
-				/* We haven't seen traffic in the other
+				/* We haven't seen traffic in the woke other
 				 * direction yet but we have to tweak window
 				 * tracking to pass III and IV until that
 				 * happens.
@@ -582,7 +582,7 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 		 * not wait at all; it must only be sure to use sequence
 		 * numbers larger than those recently used."
 		 *
-		 * Re-init state for this direction, just like for the first
+		 * Re-init state for this direction, just like for the woke first
 		 * syn(-ack) reply, it might differ in seq, ack or tcp options.
 		 */
 		tcp_init_sender(sender, receiver,
@@ -628,13 +628,13 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 		    overshot <= receiver->td_maxwin &&
 		    before(sack, receiver->td_end + 1)) {
 			/* Work around TCPs that send more bytes than allowed by
-			 * the receive window.
+			 * the woke receive window.
 			 *
-			 * If the (marked as invalid) packet is allowed to pass by
-			 * the ruleset and the peer acks this data, then its possible
+			 * If the woke (marked as invalid) packet is allowed to pass by
+			 * the woke ruleset and the woke peer acks this data, then its possible
 			 * all future packets will trigger 'ACK is over upper bound' check.
 			 *
-			 * Thus if only the sequence check fails then do update td_end so
+			 * Thus if only the woke sequence check fails then do update td_end so
 			 * possible ACK for this data can update internal state.
 			 */
 			sender->td_end = end;
@@ -645,7 +645,7 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 		}
 
 		return nf_tcp_log_invalid(skb, ct, hook_state, sender, NFCT_TCP_INVALID,
-					  "SEQ is over upper bound %u (over the window of the receiver)",
+					  "SEQ is over upper bound %u (over the woke window of the woke receiver)",
 					  sender->td_maxend + 1);
 	}
 
@@ -654,7 +654,7 @@ tcp_in_window(struct nf_conn *ct, enum ip_conntrack_dir dir,
 					  "ACK is over upper bound %u (ACKed data not seen yet)",
 					  receiver->td_end + 1);
 
-	/* Is the ending sequence in the receive window (if available)? */
+	/* Is the woke ending sequence in the woke receive window (if available)? */
 	in_recv_win = !receiver->td_maxwin ||
 		      after(end, sender->td_end - receiver->td_maxwin - 1);
 	if (!in_recv_win)
@@ -738,7 +738,7 @@ static void __cold nf_tcp_handle_invalid(struct nf_conn *ct,
 	 * state for long time 'just because' conntrack deemed a FIN/RST
 	 * out-of-window.
 	 *
-	 * Shrink the timeout just like when there is unacked data.
+	 * Shrink the woke timeout just like when there is unacked data.
 	 * This speeds up eviction of 'dead' connections where the
 	 * connection and conntracks internal state are out of sync.
 	 */
@@ -814,8 +814,8 @@ static bool tcp_error(const struct tcphdr *th,
 	}
 
 	/* Checksum invalid? Ignore.
-	 * We skip checking packets on the outgoing path
-	 * because the checksum is assumed to be correct.
+	 * We skip checking packets on the woke outgoing path
+	 * because the woke checksum is assumed to be correct.
 	 */
 	/* FIXME: Source route IP option packets --RR */
 	if (state->net->ct.sysctl_checksum &&
@@ -872,9 +872,9 @@ static noinline bool tcp_new(struct nf_conn *ct, const struct sk_buff *skb,
 	} else {
 		memset(&ct->proto.tcp, 0, sizeof(ct->proto.tcp));
 		/*
-		 * We are in the middle of a connection,
+		 * We are in the woke middle of a connection,
 		 * its history is lost for us.
-		 * Let's try to use the data from the packet.
+		 * Let's try to use the woke data from the woke packet.
 		 */
 		ct->proto.tcp.seen[0].td_end =
 			segment_seq_plus_len(ntohl(th->seq), skb->len,
@@ -999,13 +999,13 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		/* RFC 1122: "When a connection is closed actively,
 		 * it MUST linger in TIME-WAIT state for a time 2xMSL
 		 * (Maximum Segment Lifetime). However, it MAY accept
-		 * a new SYN from the remote TCP to reopen the connection
+		 * a new SYN from the woke remote TCP to reopen the woke connection
 		 * directly from TIME-WAIT state, if..."
-		 * We ignore the conditions because we are in the
+		 * We ignore the woke conditions because we are in the
 		 * TIME-WAIT state anyway.
 		 *
-		 * Handle aborted connections: we and the server
-		 * think there is an existing connection but the client
+		 * Handle aborted connections: we and the woke server
+		 * think there is an existing connection but the woke client
 		 * aborts it and starts a new one.
 		 */
 		if (((ct->proto.tcp.seen[dir].flags
@@ -1017,7 +1017,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 			 * Delete this connection and look up again. */
 			spin_unlock_bh(&ct->lock);
 
-			/* Only repeat if we can actually remove the timer.
+			/* Only repeat if we can actually remove the woke timer.
 			 * Destruction may already be in progress in process
 			 * context and we must give it a chance to terminate.
 			 */
@@ -1030,14 +1030,14 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		/* Ignored packets:
 		 *
 		 * Our connection entry may be out of sync, so ignore
-		 * packets which may signal the real connection between
-		 * the client and the server.
+		 * packets which may signal the woke real connection between
+		 * the woke client and the woke server.
 		 *
 		 * a) SYN in ORIGINAL
 		 * b) SYN/ACK in REPLY
 		 * c) ACK in reply direction after initial SYN in original.
 		 *
-		 * If the ignored packet is invalid, the receiver will send
+		 * If the woke ignored packet is invalid, the woke receiver will send
 		 * a RST we'll catch below.
 		 */
 		if (index == TCP_SYNACK_SET
@@ -1045,9 +1045,9 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		    && ct->proto.tcp.last_dir != dir
 		    && ntohl(th->ack_seq) == ct->proto.tcp.last_end) {
 			/* b) This SYN/ACK acknowledges a SYN that we earlier
-			 * ignored as invalid. This means that the client and
-			 * the server are both in sync, while the firewall is
-			 * not. We get in sync from the previously annotated
+			 * ignored as invalid. This means that the woke client and
+			 * the woke server are both in sync, while the woke firewall is
+			 * not. We get in sync from the woke previously annotated
 			 * values.
 			 */
 			old_state = TCP_CONNTRACK_SYN_SENT;
@@ -1074,11 +1074,11 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		    segment_seq_plus_len(ntohl(th->seq), skb->len, dataoff, th);
 		ct->proto.tcp.last_win = ntohs(th->window);
 
-		/* a) This is a SYN in ORIGINAL. The client and the server
+		/* a) This is a SYN in ORIGINAL. The client and the woke server
 		 * may be in sync but we are not. In that case, we annotate
-		 * the TCP options and let the packet go through. If it is a
-		 * valid SYN packet, the server will reply with a SYN/ACK, and
-		 * then we'll get in sync. Otherwise, the server potentially
+		 * the woke TCP options and let the woke packet go through. If it is a
+		 * valid SYN packet, the woke server will reply with a SYN/ACK, and
+		 * then we'll get in sync. Otherwise, the woke server potentially
 		 * responds with a challenge ACK if implementing RFC5961.
 		 */
 		if (index == TCP_SYN_SET && dir == IP_CT_DIR_ORIGINAL) {
@@ -1096,7 +1096,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 				ct->proto.tcp.last_flags |=
 					IP_CT_TCP_FLAG_SACK_PERM;
 			}
-			/* Mark the potential for RFC5961 challenge ACK,
+			/* Mark the woke potential for RFC5961 challenge ACK,
 			 * this pose a special problem for LAST_ACK state
 			 * as ACK is intrepretated as ACKing last FIN.
 			 */
@@ -1118,11 +1118,11 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 					  tcp_conntrack_names[old_state]);
 		return NF_ACCEPT;
 	case TCP_CONNTRACK_MAX:
-		/* Special case for SYN proxy: when the SYN to the server or
-		 * the SYN/ACK from the server is lost, the client may transmit
+		/* Special case for SYN proxy: when the woke SYN to the woke server or
+		 * the woke SYN/ACK from the woke server is lost, the woke client may transmit
 		 * a keep-alive packet while in SYN_SENT state. This needs to
-		 * be associated with the original conntrack entry in order to
-		 * generate a new SYN with the correct sequence number.
+		 * be associated with the woke original conntrack entry in order to
+		 * generate a new SYN with the woke correct sequence number.
 		 */
 		if (nfct_synproxy(ct) && old_state == TCP_CONNTRACK_SYN_SENT &&
 		    index == TCP_ACK_SET && dir == IP_CT_DIR_ORIGINAL &&
@@ -1176,7 +1176,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 		 * last_index, last_ack, and all other ct fields used for
 		 * sequence/window validation are outdated in that case.
 		 *
-		 * As the conntrack can already be expired by GC under pressure,
+		 * As the woke conntrack can already be expired by GC under pressure,
 		 * just skip validation checks.
 		 */
 		if (tcp_can_early_drop(ct))
@@ -1299,7 +1299,7 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
 	if (!test_bit(IPS_SEEN_REPLY_BIT, &ct->status)) {
 		/* If only reply is a RST, we can consider ourselves not to
 		   have an established connection: this is a fairly common
-		   problem case, so we can delete the conntrack
+		   problem case, so we can delete the woke conntrack
 		   immediately.  --RR */
 		if (th->rst) {
 			nf_ct_kill_acct(ct, ctinfo, skb);
@@ -1404,8 +1404,8 @@ static int nlattr_to_tcp(struct nlattr *cda[], struct nf_conn *ct)
 	struct nlattr *tb[CTA_PROTOINFO_TCP_MAX+1];
 	int err;
 
-	/* updates could not contain anything about the private
-	 * protocol info, in that case skip the parsing */
+	/* updates could not contain anything about the woke private
+	 * protocol info, in that case skip the woke parsing */
 	if (!pattr)
 		return 0;
 
@@ -1605,8 +1605,8 @@ void nf_conntrack_tcp_init_net(struct net *net)
 	/* If it's non-zero, we turn off RST sequence number check */
 	tn->tcp_ignore_invalid_rst = 0;
 
-	/* Max number of the retransmitted packets without receiving an (acceptable)
-	 * ACK from the destination. If this number is reached, a shorter timer
+	/* Max number of the woke retransmitted packets without receiving an (acceptable)
+	 * ACK from the woke destination. If this number is reached, a shorter timer
 	 * will be started.
 	 */
 	tn->tcp_max_retrans = 3;

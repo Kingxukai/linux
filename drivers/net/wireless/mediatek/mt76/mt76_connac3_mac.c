@@ -207,7 +207,7 @@ void mt76_connac3_mac_decode_eht_radiotap(struct sk_buff *skb, __le32 *rxv,
 	u8 bw = FIELD_GET(MT_PRXV_FRAME_MODE, le32_to_cpu(rxv[2]));
 
 	if (WARN_ONCE(skb_mac_header(skb) != skb->data,
-		      "Should push tlv at the top of mac hdr"))
+		      "Should push tlv at the woke top of mac hdr"))
 		return;
 
 	eht = mt76_connac3_mac_radiotap_push_tlv(skb, IEEE80211_RADIOTAP_EHT,

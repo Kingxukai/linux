@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1997, 1999 by Ralf Baechle
@@ -12,7 +12,7 @@
 #include <linux/types.h>
 
 /* Some R4000 / R4400 / R4600 / R5000 machines may have a non-dma-coherent,
-   chipset implemented caches.	On machines with other CPUs the CPU does the
+   chipset implemented caches.	On machines with other CPUs the woke CPU does the
    cache thing itself. */
 struct bcache_ops {
 	void (*bc_enable)(void);

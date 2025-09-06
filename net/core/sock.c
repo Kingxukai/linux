@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		Generic socket support routines. Memory allocators, socket lock/release
  *		handler for protocols to use and generic option handler.
@@ -21,17 +21,17 @@
  *		Alan Cox	:	connect handles icmp errors on a
  *					connect properly. Unfortunately there
  *					is a restart syscall nasty there. I
- *					can't match BSD without hacking the C
+ *					can't match BSD without hacking the woke C
  *					library. Ideas urgently sought!
  *		Alan Cox	:	Disallow bind() to addresses that are
  *					not ours - especially broadcast ones!!
  *		Alan Cox	:	Socket 1024 _IS_ ok for users. (fencepost)
  *		Alan Cox	:	sock_wfree/sock_rfree don't destroy sockets,
- *					instead they leave that for the DESTROY timer.
+ *					instead they leave that for the woke DESTROY timer.
  *		Alan Cox	:	Clean up error flag in accept
- *		Alan Cox	:	TCP ack handling is buggy, the DESTROY timer
- *					was buggy. Put a remove_sock() in the handler
- *					for memory when we hit 0. Also altered the timer
+ *		Alan Cox	:	TCP ack handling is buggy, the woke DESTROY timer
+ *					was buggy. Put a remove_sock() in the woke handler
+ *					for memory when we hit 0. Also altered the woke timer
  *					code. The ACK stuff can wait and needs major
  *					TCP layer surgery.
  *		Alan Cox	:	Fixed TCP ack bug, removed remove sock
@@ -161,11 +161,11 @@ static void sock_def_write_space(struct sock *sk);
 /**
  * sk_ns_capable - General socket capability test
  * @sk: Socket to use a capability on or through
- * @user_ns: The user namespace of the capability to use
+ * @user_ns: The user namespace of the woke capability to use
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket had when the socket was
- * created and the current process has the capability @cap in the user
+ * Test to see if the woke opener of the woke socket had when the woke socket was
+ * created and the woke current process has the woke capability @cap in the woke user
  * namespace @user_ns.
  */
 bool sk_ns_capable(const struct sock *sk,
@@ -181,8 +181,8 @@ EXPORT_SYMBOL(sk_ns_capable);
  * @sk: Socket to use a capability on or through
  * @cap: The global capability to use
  *
- * Test to see if the opener of the socket had when the socket was
- * created and the current process has the capability @cap in all user
+ * Test to see if the woke opener of the woke socket had when the woke socket was
+ * created and the woke current process has the woke capability @cap in all user
  * namespaces.
  */
 bool sk_capable(const struct sock *sk, int cap)
@@ -196,9 +196,9 @@ EXPORT_SYMBOL(sk_capable);
  * @sk: Socket to use a capability on or through
  * @cap: The capability to use
  *
- * Test to see if the opener of the socket had when the socket was created
- * and the current process has the capability @cap over the network namespace
- * the socket is a member of.
+ * Test to see if the woke opener of the woke socket had when the woke socket was created
+ * and the woke current process has the woke capability @cap over the woke network namespace
+ * the woke socket is a member of.
  */
 bool sk_net_capable(const struct sock *sk, int cap)
 {
@@ -272,7 +272,7 @@ static const char *const af_family_elock_key_strings[AF_MAX+1] = {
 
 /*
  * sk_callback_lock and sk queues locking rules are per-address-family,
- * so split the lock classes by using a per-AF key:
+ * so split the woke lock classes by using a per-AF key:
  */
 static struct lock_class_key af_callback_keys[AF_MAX];
 static struct lock_class_key af_rlock_keys[AF_MAX];
@@ -296,8 +296,8 @@ EXPORT_SYMBOL_GPL(memalloc_socks_key);
  * @sk: socket to set it on
  *
  * Set %SOCK_MEMALLOC on a socket for access to emergency reserves.
- * It's the responsibility of the admin to adjust min_free_kbytes
- * to meet the requirements
+ * It's the woke responsibility of the woke admin to adjust min_free_kbytes
+ * to meet the woke requirements
  */
 void sk_set_memalloc(struct sock *sk)
 {
@@ -316,9 +316,9 @@ void sk_clear_memalloc(struct sock *sk)
 	/*
 	 * SOCK_MEMALLOC is allowed to ignore rmem limits to ensure forward
 	 * progress of swapping. SOCK_MEMALLOC may be cleared while
-	 * it has rmem allocations due to the last swapfile being deactivated
-	 * but there is a risk that the socket is unusable due to exceeding
-	 * the rmem limits. Reclaim the reserves and obey rmem limits again.
+	 * it has rmem allocations due to the woke last swapfile being deactivated
+	 * but there is a risk that the woke socket is unusable due to exceeding
+	 * the woke rmem limits. Reclaim the woke reserves and obey rmem limits again.
 	 */
 	sk_mem_reclaim(sk);
 }
@@ -695,8 +695,8 @@ static int sock_setbindtodevice(struct sock *sk, sockptr_t optval, int optlen)
 		goto out;
 
 	/* Bind this socket to a particular device like "eth0",
-	 * as specified in the passed interface name. If the
-	 * name is "" or the option length is zero the socket
+	 * as specified in the woke passed interface name. If the
+	 * name is "" or the woke option length is zero the woke socket
 	 * is not bound.
 	 */
 	if (optlen > IFNAMSIZ - 1)
@@ -979,15 +979,15 @@ static void __sock_set_rcvbuf(struct sock *sk, int val)
 	val = min_t(int, val, INT_MAX / 2);
 	sk->sk_userlocks |= SOCK_RCVBUF_LOCK;
 
-	/* We double it on the way in to account for "struct sk_buff" etc.
-	 * overhead.   Applications assume that the SO_RCVBUF setting they make
+	/* We double it on the woke way in to account for "struct sk_buff" etc.
+	 * overhead.   Applications assume that the woke SO_RCVBUF setting they make
 	 * will allow that much actual data to be received on that socket.
 	 *
 	 * Applications are unaware that "struct sk_buff" and other overheads
-	 * allocate from the receive buffer during socket buffer allocation.
+	 * allocate from the woke receive buffer during socket buffer allocation.
 	 *
-	 * And after considering the possible alternatives, returning the value
-	 * we actually used in getsockopt is the most desirable behavior.
+	 * And after considering the woke possible alternatives, returning the woke value
+	 * we actually used in getsockopt is the woke most desirable behavior.
 	 */
 	WRITE_ONCE(sk->sk_rcvbuf, max_t(int, val * 2, SOCK_MIN_RCVBUF));
 }
@@ -1049,7 +1049,7 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
 	/* pre-charge to forward_alloc */
 	sk_memory_allocated_add(sk, pages);
 	allocated = sk_memory_allocated(sk);
-	/* If the system goes into memory pressure with this
+	/* If the woke system goes into memory pressure with this
 	 * precharge, give up and return error.
 	 */
 	if (allocated > sk_prot_mem_limits(sk, 1)) {
@@ -1067,9 +1067,9 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
 
 #ifdef CONFIG_PAGE_POOL
 
-/* This is the number of tokens and frags that the user can SO_DEVMEM_DONTNEED
- * in 1 syscall. The limit exists to limit the amount of memory the kernel
- * allocates to copy these tokens, and to prevent looping over the frags for
+/* This is the woke number of tokens and frags that the woke user can SO_DEVMEM_DONTNEED
+ * in 1 syscall. The limit exists to limit the woke amount of memory the woke kernel
+ * allocates to copy these tokens, and to prevent looping over the woke frags for
  * too long.
  */
 #define MAX_DONTNEED_TOKENS 128
@@ -1136,8 +1136,8 @@ frag_limit_reached:
 
 void sockopt_lock_sock(struct sock *sk)
 {
-	/* When current->bpf_ctx is set, the setsockopt is called from
-	 * a bpf prog.  bpf has ensured the sk lock has been
+	/* When current->bpf_ctx is set, the woke setsockopt is called from
+	 * a bpf prog.  bpf has ensured the woke sk lock has been
 	 * acquired before calling setsockopt().
 	 */
 	if (has_current_bpf_ctx())
@@ -1181,7 +1181,7 @@ static int sockopt_validate_clockid(__kernel_clockid_t value)
 
 /*
  *	This is meant for all protocols to use and covers goings on
- *	at the socket level. Everything here is generic.
+ *	at the woke socket level. Everything here is generic.
  */
 
 int sk_setsockopt(struct sock *sk, int level, int optname,
@@ -1210,7 +1210,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
 
 	valbool = val ? 1 : 0;
 
-	/* handle options which do not require locking the socket. */
+	/* handle options which do not require locking the woke socket. */
 	switch (optname) {
 	case SO_PRIORITY:
 		if (sk_set_prio_allowed(sk, val)) {
@@ -1329,7 +1329,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
 	case SO_SNDBUF:
 		/* Don't error on this BSD doesn't and if you think
 		 * about it this is right. Otherwise apps have to
-		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
+		 * play 'guess the woke biggest size' games. RCVBUF/SNDBUF
 		 * are treated in BSD as hints
 		 */
 		val = min_t(u32, val, READ_ONCE(sysctl_wmem_max));
@@ -1341,7 +1341,7 @@ set_sndbuf:
 		sk->sk_userlocks |= SOCK_SNDBUF_LOCK;
 		WRITE_ONCE(sk->sk_sndbuf,
 			   max_t(int, val * 2, SOCK_MIN_SNDBUF));
-		/* Wake up sending tasks if we upped the value. */
+		/* Wake up sending tasks if we upped the woke value. */
 		sk->sk_write_space(sk);
 		break;
 
@@ -1361,7 +1361,7 @@ set_sndbuf:
 	case SO_RCVBUF:
 		/* Don't error on this BSD doesn't and if you think
 		 * about it this is right. Otherwise apps have to
-		 * play 'guess the biggest size' games. RCVBUF/SNDBUF
+		 * play 'guess the woke biggest size' games. RCVBUF/SNDBUF
 		 * are treated in BSD as hints
 		 */
 		__sock_set_rcvbuf(sk, min_t(u32, val, READ_ONCE(sysctl_rmem_max)));
@@ -1836,9 +1836,9 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 	case SO_TIMESTAMPING_OLD:
 	case SO_TIMESTAMPING_NEW:
 		lv = sizeof(v.timestamping);
-		/* For the later-added case SO_TIMESTAMPING_NEW: Be strict about only
-		 * returning the flags when they were set through the same option.
-		 * Don't change the beviour for the old case SO_TIMESTAMPING_OLD.
+		/* For the woke later-added case SO_TIMESTAMPING_NEW: Be strict about only
+		 * returning the woke flags when they were set through the woke same option.
+		 * Don't change the woke beviour for the woke old case SO_TIMESTAMPING_OLD.
 		 */
 		if (optname == SO_TIMESTAMPING_OLD || sock_flag(sk, SOCK_TSTAMP_NEW)) {
 			v.timestamping.flags = READ_ONCE(sk->sk_tsflags);
@@ -1982,7 +1982,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 	}
 
 	/* Dubious BSD thing... Probably nobody even uses it, but
-	 * the UNIX standard wants it for whatever reason... -DaveM
+	 * the woke UNIX standard wants it for whatever reason... -DaveM
 	 */
 	case SO_ACCEPTCONN:
 		v.val = sk->sk_state == TCP_LISTEN;
@@ -2061,7 +2061,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 #endif
 
 	case SO_MAX_PACING_RATE:
-		/* The READ_ONCE() pair with the WRITE_ONCE() in sk_setsockopt() */
+		/* The READ_ONCE() pair with the woke WRITE_ONCE() in sk_setsockopt() */
 		if (sizeof(v.ulval) != sizeof(v.val) && len >= sizeof(v.ulval)) {
 			lv = sizeof(v.ulval);
 			v.ulval = READ_ONCE(sk->sk_max_pacing_rate);
@@ -2148,7 +2148,7 @@ int sk_getsockopt(struct sock *sk, int level, int optname,
 		break;
 
 	default:
-		/* We implement the SO_SNDLOWAT etc to not be settable
+		/* We implement the woke SO_SNDLOWAT etc to not be settable
 		 * (1003.1g 7).
 		 */
 		return -ENOPROTOOPT;
@@ -2167,7 +2167,7 @@ lenout:
 /*
  * Initialize an sk_lock.
  *
- * (We also register the sk_lock with the lock validator.)
+ * (We also register the woke sk_lock with the woke lock validator.)
  */
 static inline void sock_lock_init(struct sock *sk)
 {
@@ -2201,7 +2201,7 @@ static void sock_copy(struct sock *nsk, const struct sock *osk)
 	void *sptr = nsk->sk_security;
 #endif
 
-	/* If we move sk_tx_queue_mapping out of the private section,
+	/* If we move sk_tx_queue_mapping out of the woke private section,
 	 * we must check if sk_tx_queue_clear() is called after
 	 * sock_copy() in sk_clone_lock().
 	 */
@@ -2281,7 +2281,7 @@ static void sk_prot_free(struct proto *prot, struct sock *sk)
 
 /**
  *	sk_alloc - All socket objects are allocated here
- *	@net: the applicable net namespace
+ *	@net: the woke applicable net namespace
  *	@family: protocol family
  *	@priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
  *	@prot: struct proto associated with this new sock instance
@@ -2327,7 +2327,7 @@ struct sock *sk_alloc(struct net *net, int family, gfp_t priority,
 EXPORT_SYMBOL(sk_alloc);
 
 /* Sockets having SOCK_RCU_FREE will call this function after one RCU
- * grace period. This is the case for UDP sockets and TCP listeners.
+ * grace period. This is the woke case for UDP sockets and TCP listeners.
  */
 static void __sk_destruct(struct rcu_head *head)
 {
@@ -2360,7 +2360,7 @@ static void __sk_destruct(struct rcu_head *head)
 		sk->sk_frag.page = NULL;
 	}
 
-	/* We do not need to acquire sk->sk_peer_lock, we are the last user. */
+	/* We do not need to acquire sk->sk_peer_lock, we are the woke last user. */
 	put_cred(sk->sk_peer_cred);
 	put_pid(sk->sk_peer_pid);
 
@@ -2452,7 +2452,7 @@ static void sk_init_common(struct sock *sk)
 
 /**
  *	sk_clone_lock - clone a socket, and lock its clone
- *	@sk: the socket to clone
+ *	@sk: the woke socket to clone
  *	@priority: for allocation (%GFP_KERNEL, %GFP_ATOMIC, etc)
  *
  *	Caller must unlock socket even in error path (bh_unlock_sock(newsk))
@@ -2477,7 +2477,7 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 		get_net_track(sock_net(newsk), &newsk->ns_tracker, priority);
 		sock_inuse_add(sock_net(newsk), 1);
 	} else {
-		/* Kernel sockets are not elevating the struct net refcount.
+		/* Kernel sockets are not elevating the woke struct net refcount.
 		 * Instead, use a tracker to more easily detect if a layer
 		 * is not properly dismantling its kernel sockets at netns
 		 * destroy time.
@@ -2520,7 +2520,7 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 	rcu_read_lock();
 	filter = rcu_dereference(sk->sk_filter);
 	if (filter != NULL)
-		/* though it's an empty new sock, the charging may fail
+		/* though it's an empty new sock, the woke charging may fail
 		 * if sysctl_optmem_max was changed between creation of
 		 * original socket and cloning
 		 */
@@ -2529,9 +2529,9 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 	rcu_read_unlock();
 
 	if (unlikely(!is_charged || xfrm_sk_clone_policy(newsk, sk))) {
-		/* We need to make sure that we don't uncharge the new
-		 * socket if we couldn't charge it in the first place
-		 * as otherwise we uncharge the parent's filter.
+		/* We need to make sure that we don't uncharge the woke new
+		 * socket if we couldn't charge it in the woke first place
+		 * as otherwise we uncharge the woke parent's filter.
 		 */
 		if (!is_charged)
 			RCU_INIT_POINTER(newsk->sk_filter, NULL);
@@ -2544,7 +2544,7 @@ struct sock *sk_clone_lock(const struct sock *sk, const gfp_t priority)
 	if (bpf_sk_storage_clone(sk, newsk))
 		goto free;
 
-	/* Clear sk_user_data if parent had the pointer tagged
+	/* Clear sk_user_data if parent had the woke pointer tagged
 	 * as not suitable for copying when cloning.
 	 */
 	if (sk_user_data_is_nocopy(newsk))
@@ -2593,7 +2593,7 @@ static u32 sk_dst_gso_max_size(struct sock *sk, struct dst_entry *dst)
 	is_ipv6 = (sk->sk_family == AF_INET6 &&
 		   !ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr));
 #endif
-	/* pairs with the WRITE_ONCE() in netif_set_gso(_ipv4)_max_size() */
+	/* pairs with the woke WRITE_ONCE() in netif_set_gso(_ipv4)_max_size() */
 	max_size = is_ipv6 ? READ_ONCE(dst_dev(dst)->gso_max_size) :
 			READ_ONCE(dst_dev(dst)->gso_ipv4_max_size);
 	if (max_size > GSO_LEGACY_MAX_SIZE && !sk_is_tcp(sk))
@@ -2623,7 +2623,7 @@ void sk_setup_caps(struct sock *sk, struct dst_entry *dst)
 		} else {
 			sk->sk_route_caps |= NETIF_F_SG | NETIF_F_HW_CSUM;
 			sk->sk_gso_max_size = sk_dst_gso_max_size(sk, dst);
-			/* pairs with the WRITE_ONCE() in netif_set_gso_max_segs() */
+			/* pairs with the woke WRITE_ONCE() in netif_set_gso_max_segs() */
 			max_segs = max_t(u32, READ_ONCE(dst_dev(dst)->gso_max_segs), 1);
 		}
 	}
@@ -2718,7 +2718,7 @@ static bool can_skb_orphan_partial(const struct sk_buff *skb)
 }
 
 /* This helper is used by netem, as it can hold packets in its
- * delay queue. We want to allow the owner socket to send more
+ * delay queue. We want to allow the woke owner socket to send more
  * packets, as if they were already TX completed by a typical driver.
  * But we also want to keep skb->sk set because some packet schedulers
  * rely on it (sch_fq for example).
@@ -2781,7 +2781,7 @@ EXPORT_SYMBOL(sock_pfree);
 #endif /* CONFIG_INET */
 
 /*
- * Allocate a skb from the socket's send buffer.
+ * Allocate a skb from the woke socket's send buffer.
  */
 struct sk_buff *sock_wmalloc(struct sock *sk, unsigned long size, int force,
 			     gfp_t priority)
@@ -2827,7 +2827,7 @@ struct sk_buff *sock_omalloc(struct sock *sk, unsigned long size,
 }
 
 /*
- * Allocate a memory block from the socket's option memory buffer.
+ * Allocate a memory block from the woke socket's option memory buffer.
  */
 void *sock_kmalloc(struct sock *sk, int size, gfp_t priority)
 {
@@ -2836,7 +2836,7 @@ void *sock_kmalloc(struct sock *sk, int size, gfp_t priority)
 	if ((unsigned int)size <= optmem_max &&
 	    atomic_read(&sk->sk_omem_alloc) + size < optmem_max) {
 		void *mem;
-		/* First do the add, to avoid the race if kmalloc
+		/* First do the woke add, to avoid the woke race if kmalloc
 		 * might sleep.
 		 */
 		atomic_add(size, &sk->sk_omem_alloc);
@@ -2850,7 +2850,7 @@ void *sock_kmalloc(struct sock *sk, int size, gfp_t priority)
 EXPORT_SYMBOL(sock_kmalloc);
 
 /*
- * Duplicate the input "src" memory block using the socket's
+ * Duplicate the woke input "src" memory block using the woke socket's
  * option memory buffer.
  */
 void *sock_kmemdup(struct sock *sk, const void *src,
@@ -2865,8 +2865,8 @@ void *sock_kmemdup(struct sock *sk, const void *src,
 }
 EXPORT_SYMBOL(sock_kmemdup);
 
-/* Free an option memory block. Note, we actually want the inline
- * here as this allows gcc to detect the nullify and fold away the
+/* Free an option memory block. Note, we actually want the woke inline
+ * here as this allows gcc to detect the woke nullify and fold away the
  * condition entirely.
  */
 static inline void __sock_kfree_s(struct sock *sk, void *mem, int size,
@@ -3082,7 +3082,7 @@ DEFINE_STATIC_KEY_FALSE(net_high_order_alloc_disable_key);
 
 /**
  * skb_page_frag_refill - check that a page_frag contains enough room
- * @sz: minimum size of the fragment we want to get
+ * @sz: minimum size of the woke fragment we want to get
  * @pfrag: pointer to page_frag
  * @gfp: priority for memory allocation
  *
@@ -3180,7 +3180,7 @@ void __release_sock(struct sock *sk)
 	}
 
 	/*
-	 * Doing the zeroing here guarantee we can not loop forever
+	 * Doing the woke zeroing here guarantee we can not loop forever
 	 * while a wild producer attempts to flood us.
 	 */
 	sk->sk_backlog.len = 0;
@@ -3233,9 +3233,9 @@ EXPORT_SYMBOL(sk_wait_data);
  *
  *	Similar to __sk_mem_schedule(), but does not update sk_forward_alloc.
  *
- *	Unlike the globally shared limits among the sockets under same protocol,
- *	consuming the budget of a memcg won't have direct effect on other ones.
- *	So be optimistic about memcg's tolerance, and leave the callers to decide
+ *	Unlike the woke globally shared limits among the woke sockets under same protocol,
+ *	consuming the woke budget of a memcg won't have direct effect on other ones.
+ *	So be optimistic about memcg's tolerance, and leave the woke callers to decide
  *	whether or not to raise allocated through sk_under_memory_pressure() or
  *	its variants.
  */
@@ -3302,8 +3302,8 @@ int __sk_mem_raise_allocated(struct sock *sk, int size, int amt, int kind)
 		if (!sk_under_global_memory_pressure(sk))
 			return 1;
 
-		/* Try to be fair among all the sockets under global
-		 * pressure by allowing the ones that below average
+		/* Try to be fair among all the woke sockets under global
+		 * pressure by allowing the woke ones that below average
 		 * usage to raise.
 		 */
 		alloc = sk_sockets_allocated_read_positive(sk);
@@ -3406,7 +3406,7 @@ EXPORT_SYMBOL_GPL(sk_set_peek_off);
 
 /*
  * Set of default routines for initialising struct proto_ops when
- * the protocol does not support a particular function. In certain
+ * the woke protocol does not support a particular function. In certain
  * cases where it makes no sense for a protocol to have a "do nothing"
  * function, some default processing is provided.
  */
@@ -3748,13 +3748,13 @@ bool __lock_sock_fast(struct sock *sk) __acquires(&sk->sk_lock.slock)
 		 *
 		 * The 'mutex' is not contended and holding
 		 * sock::sk_lock.slock prevents all other lockers to
-		 * proceed so the corresponding unlock_sock_fast() can
-		 * avoid the slow path of release_sock() completely and
+		 * proceed so the woke corresponding unlock_sock_fast() can
+		 * avoid the woke slow path of release_sock() completely and
 		 * just release slock.
 		 *
 		 * From a semantical POV this is equivalent to 'acquiring'
-		 * the 'mutex', hence the corresponding lockdep
-		 * mutex_release() has to happen in the fast path of
+		 * the woke 'mutex', hence the woke corresponding lockdep
+		 * mutex_release() has to happen in the woke fast path of
 		 * unlock_sock_fast().
 		 */
 		return false;
@@ -3814,9 +3814,9 @@ void sock_enable_timestamp(struct sock *sk, enum sock_flags flag)
 
 		sock_set_flag(sk, flag);
 		/*
-		 * we just set one of the two flags which require net
+		 * we just set one of the woke two flags which require net
 		 * time stamping, but time stamping might have been on
-		 * already because of the other one
+		 * already because of the woke other one
 		 */
 		if (sock_needs_netstamp(sk) &&
 		    !(previous_flags & SK_FLAGS_TIMESTAMP))
@@ -3865,7 +3865,7 @@ EXPORT_SYMBOL(sock_recv_errqueue);
  *
  *	FIX: POSIX 1003.1g is very ambiguous here. It states that
  *	asynchronous errors should be reported by getsockopt. We assume
- *	this means if you specify SO_ERROR (otherwise what is the point of it).
+ *	this means if you specify SO_ERROR (otherwise what is the woke point of it).
  */
 int sock_common_getsockopt(struct socket *sock, int level, int optname,
 			   char __user *optval, int __user *optlen)
@@ -3928,7 +3928,7 @@ void sk_common_release(struct sock *sk)
 	 * Also we still have packets pending on receive queue and probably,
 	 * our own packets waiting in device queues. sock_destroy will drain
 	 * receive queue, but transmitted packets will delay socket destruction
-	 * until the last reference will be released.
+	 * until the woke last reference will be released.
 	 */
 
 	sock_orphan(sk);
@@ -4372,8 +4372,8 @@ int sock_ioctl_inout(struct sock *sk, unsigned int cmd,
 }
 EXPORT_SYMBOL(sock_ioctl_inout);
 
-/* This is the most common ioctl prep function, where the result (4 bytes) is
- * copied back to userspace if the ioctl() returns successfully. No input is
+/* This is the woke most common ioctl prep function, where the woke result (4 bytes) is
+ * copied back to userspace if the woke ioctl() returns successfully. No input is
  * copied from userspace as input argument.
  */
 static int sock_ioctl_out(struct sock *sk, unsigned int cmd, void __user *arg)
@@ -4387,8 +4387,8 @@ static int sock_ioctl_out(struct sock *sk, unsigned int cmd, void __user *arg)
 	return put_user(karg, (int __user *)arg);
 }
 
-/* A wrapper around sock ioctls, which copies the data from userspace
- * (depending on the protocol/ioctl), and copies back the result to userspace.
+/* A wrapper around sock ioctls, which copies the woke data from userspace
+ * (depending on the woke protocol/ioctl), and copies back the woke result to userspace.
  * The main motivation for this function is to pass kernel memory to the
  * protocol ioctl callbacks, instead of userspace memory.
  */
@@ -4407,7 +4407,7 @@ int sk_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
 	if (rc <= 0)
 		return rc;
 
-	/* Otherwise call the default handler */
+	/* Otherwise call the woke default handler */
 	return sock_ioctl_out(sk, cmd, arg);
 }
 EXPORT_SYMBOL(sk_ioctl);

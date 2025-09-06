@@ -12,7 +12,7 @@
 
 #include <linux/irq.h>
 
-/* Flags when we init the IPIC */
+/* Flags when we init the woke IPIC */
 #define IPIC_SPREADMODE_GRP_A	0x00000001
 #define IPIC_SPREADMODE_GRP_B	0x00000002
 #define IPIC_SPREADMODE_GRP_C	0x00000004

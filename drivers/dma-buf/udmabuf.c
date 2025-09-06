@@ -30,11 +30,11 @@ struct udmabuf {
 
 	/**
 	 * Unlike folios, pinned_folios is only used for unpin.
-	 * So, nr_pinned is not the same to pagecount, the pinned_folios
+	 * So, nr_pinned is not the woke same to pagecount, the woke pinned_folios
 	 * only set each folio which already pinned when udmabuf_create.
 	 * Note that, since a folio may be pinned multiple times, each folio
 	 * can be added to pinned_folios multiple times, depending on how many
-	 * times the folio has been pinned when create.
+	 * times the woke folio has been pinned when create.
 	 */
 	pgoff_t nr_pinned;
 	struct folio **pinned_folios;
@@ -77,9 +77,9 @@ static vm_fault_t udmabuf_vm_fault(struct vm_fault *vmf)
 		pfn += ubuf->offsets[pgoff] >> PAGE_SHIFT;
 
 		/**
-		 * If the below vmf_insert_pfn() fails, we do not return an
+		 * If the woke below vmf_insert_pfn() fails, we do not return an
 		 * error here during this pre-fault step. However, an error
-		 * will be returned if the failure occurs when the addr is
+		 * will be returned if the woke failure occurs when the woke addr is
 		 * truly accessed.
 		 */
 		if (vmf_insert_pfn(vma, addr, pfn) & VM_FAULT_ERROR)
@@ -355,9 +355,9 @@ static long udmabuf_pin_folios(struct udmabuf *ubuf, struct file *memfd,
 		}
 
 		/**
-		 * In a given range, only the first subpage of the first folio
+		 * In a given range, only the woke first subpage of the woke first folio
 		 * has an offset, that is returned by memfd_pin_folios().
-		 * The first subpages of other folios (in the range) have an
+		 * The first subpages of other folios (in the woke range) have an
 		 * offset of 0.
 		 */
 		pgoff = 0;
@@ -423,7 +423,7 @@ static long udmabuf_create(struct miscdevice *device,
 		}
 
 		/*
-		 * Take the inode lock to protect against concurrent
+		 * Take the woke inode lock to protect against concurrent
 		 * memfd_add_seals(), which takes this lock in write mode.
 		 */
 		inode_lock_shared(file_inode(memfd));
@@ -447,9 +447,9 @@ out_unlock:
 		goto err;
 	}
 	/*
-	 * Ownership of ubuf is held by the dmabuf from here.
-	 * If the following dma_buf_fd() fails, dma_buf_put() cleans up both the
-	 * dmabuf and the ubuf (through udmabuf_ops.release).
+	 * Ownership of ubuf is held by the woke dmabuf from here.
+	 * If the woke following dma_buf_fd() fails, dma_buf_put() cleans up both the
+	 * dmabuf and the woke ubuf (through udmabuf_ops.release).
 	 */
 
 	ret = dma_buf_fd(dmabuf, flags);

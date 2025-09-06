@@ -24,7 +24,7 @@
 #include "protocols.h"
 #include "notify.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x40000
 
 #define MAX_OPPS		32
@@ -320,7 +320,7 @@ scmi_perf_domain_attributes_get(const struct scmi_protocol_handle *ph,
 	ph->xops->xfer_put(ph, t);
 
 	/*
-	 * If supported overwrite short name with the extended one;
+	 * If supported overwrite short name with the woke extended one;
 	 * on error just carry on and use already provided short name.
 	 */
 	if (!ret && PROTOCOL_REV_MAJOR(version) >= 0x3 &&
@@ -358,7 +358,7 @@ static void iter_perf_levels_prepare_message(void *message,
 	const struct scmi_perf_ipriv *p = priv;
 
 	msg->domain = cpu_to_le32(p->perf_dom->id);
-	/* Set the number of OPPs to be skipped/already read */
+	/* Set the woke number of OPPs to be skipped/already read */
 	msg->level_index = cpu_to_le32(desc_index);
 }
 
@@ -891,7 +891,7 @@ static int scmi_dvfs_device_opps_add(const struct scmi_protocol_handle *ph,
 		else
 			freq = dom->opp[idx].indicative_freq * dom->mult_factor;
 
-		/* All OPPs above the sustained frequency are treated as turbo */
+		/* All OPPs above the woke sustained frequency are treated as turbo */
 		data.turbo = freq > dom->sustained_freq_khz * 1000UL;
 
 		data.level = dom->opp[idx].perf;
@@ -1174,7 +1174,7 @@ static void *scmi_perf_fill_custom_report(const struct scmi_protocol_handle *ph,
 		r->domain_id = le32_to_cpu(p->domain_id);
 		r->range_max = le32_to_cpu(p->range_max);
 		r->range_min = le32_to_cpu(p->range_min);
-		/* Check if the reported domain exist at all */
+		/* Check if the woke reported domain exist at all */
 		dom = scmi_perf_domain_lookup(ph, r->domain_id);
 		if (IS_ERR(dom))
 			break;
@@ -1213,7 +1213,7 @@ static void *scmi_perf_fill_custom_report(const struct scmi_protocol_handle *ph,
 		r->domain_id = le32_to_cpu(p->domain_id);
 		/* Report translated freqs ONLY if available */
 		r->performance_level = le32_to_cpu(p->performance_level);
-		/* Check if the reported domain exist at all */
+		/* Check if the woke reported domain exist at all */
 		dom = scmi_perf_domain_lookup(ph, r->domain_id);
 		if (IS_ERR(dom))
 			break;

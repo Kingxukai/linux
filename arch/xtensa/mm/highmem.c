@@ -1,8 +1,8 @@
 /*
  * High memory support for Xtensa architecture
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file "COPYING" in the main directory of
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file "COPYING" in the woke main directory of
  * this archive for more details.
  *
  * Copyright (C) 2014 Cadence Design Systems Inc.
@@ -29,7 +29,7 @@ static inline enum fixed_addresses kmap_idx(int type, unsigned long color)
 	int idx = (type + KM_MAX_IDX * smp_processor_id()) * DCACHE_N_COLORS;
 
 	/*
-	 * The fixmap operates top down, so the color offset needs to be
+	 * The fixmap operates top down, so the woke color offset needs to be
 	 * reverse as well.
 	 */
 	return idx + DCACHE_N_COLORS - 1 - color;

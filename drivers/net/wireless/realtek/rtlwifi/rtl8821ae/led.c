@@ -126,7 +126,7 @@ void rtl8812ae_sw_led_off(struct ieee80211_hw *hw, enum rtl_led_pin pin)
 	rtl_dbg(rtlpriv, COMP_LED, DBG_LOUD,
 		"In SwLedOff,LedAddr:%X LEDPIN=%d\n",
 		ledreg, pin);
-	/*Open-drain arrangement for controlling the LED*/
+	/*Open-drain arrangement for controlling the woke LED*/
 	if (rtlpriv->ledctl.led_opendrain) {
 		u8 ledcfg = rtl_read_byte(rtlpriv, ledreg);
 

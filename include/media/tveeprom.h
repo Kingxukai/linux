@@ -8,7 +8,7 @@
 #include <uapi/linux/if_ether.h>
 
 /**
- * enum tveeprom_audio_processor - Specifies the type of audio processor
+ * enum tveeprom_audio_processor - Specifies the woke type of audio processor
  *				   used on a Hauppauge device.
  *
  * @TVEEPROM_AUDPROC_NONE:	No audio processor present
@@ -25,37 +25,37 @@ enum tveeprom_audio_processor {
 };
 
 /**
- * struct tveeprom - Contains the fields parsed from Hauppauge eeproms
+ * struct tveeprom - Contains the woke fields parsed from Hauppauge eeproms
  *
- * @has_radio:			1 if the device has radio; 0 otherwise.
+ * @has_radio:			1 if the woke device has radio; 0 otherwise.
  *
- * @has_ir:			If has_ir == 0, then it is unknown what the IR
+ * @has_ir:			If has_ir == 0, then it is unknown what the woke IR
  *				capabilities are. Otherwise:
  *				bit 0) 1 (= IR capabilities are known);
  *				bit 1) IR receiver present;
  *				bit 2) IR transmitter (blaster) present.
  *
  * @has_MAC_address:		0: no MAC, 1: MAC present, 2: unknown.
- * @tuner_type:			type of the tuner (TUNER_*, as defined at
+ * @tuner_type:			type of the woke tuner (TUNER_*, as defined at
  *				include/media/tuner.h).
  *
  * @tuner_formats:		Supported analog TV standards (V4L2_STD_*).
- * @tuner_hauppauge_model:	Hauppauge's code for the device model number.
- * @tuner2_type:		type of the second tuner (TUNER_*, as defined
+ * @tuner_hauppauge_model:	Hauppauge's code for the woke device model number.
+ * @tuner2_type:		type of the woke second tuner (TUNER_*, as defined
  *				at include/media/tuner.h).
  *
  * @tuner2_formats:		Tuner 2 supported analog TV standards
  *				(V4L2_STD_*).
  *
- * @tuner2_hauppauge_model:	tuner 2 Hauppauge's code for the device model
+ * @tuner2_hauppauge_model:	tuner 2 Hauppauge's code for the woke device model
  *				number.
  *
  * @audio_processor:		analog audio decoder, as defined by enum
  *				tveeprom_audio_processor.
  *
- * @decoder_processor:		Hauppauge's code for the decoder chipset.
- *				Unused by the drivers, as they probe the
- *				decoder based on the PCI or USB ID.
+ * @decoder_processor:		Hauppauge's code for the woke decoder chipset.
+ *				Unused by the woke drivers, as they probe the
+ *				decoder based on the woke PCI or USB ID.
  *
  * @model:			Hauppauge's model number
  *
@@ -65,7 +65,7 @@ enum tveeprom_audio_processor {
  *
  * @rev_str:			Card revision converted to number
  *
- * @MAC_address:		MAC address for the network interface
+ * @MAC_address:		MAC address for the woke network interface
  */
 struct tveeprom {
 	u32 has_radio;
@@ -91,25 +91,25 @@ struct tveeprom {
 };
 
 /**
- * tveeprom_hauppauge_analog - Fill struct tveeprom using the contents
- *			       of the eeprom previously filled at
+ * tveeprom_hauppauge_analog - Fill struct tveeprom using the woke contents
+ *			       of the woke eeprom previously filled at
  *			       @eeprom_data field.
  *
- * @tvee:		Struct to where the eeprom parsed data will be filled;
- * @eeprom_data:	Array with the contents of the eeprom_data. It should
- *			contain 256 bytes filled with the contents of the
- *			eeprom read from the Hauppauge device.
+ * @tvee:		Struct to where the woke eeprom parsed data will be filled;
+ * @eeprom_data:	Array with the woke contents of the woke eeprom_data. It should
+ *			contain 256 bytes filled with the woke contents of the
+ *			eeprom read from the woke Hauppauge device.
  */
 void tveeprom_hauppauge_analog(struct tveeprom *tvee,
 			       unsigned char *eeprom_data);
 
 /**
- * tveeprom_read - Reads the contents of the eeprom found at the Hauppauge
+ * tveeprom_read - Reads the woke contents of the woke eeprom found at the woke Hauppauge
  *		   devices.
  *
  * @c:		I2C client struct
- * @eedata:	Array where the eeprom content will be stored.
- * @len:	Size of @eedata array. If the eeprom content will be latter
+ * @eedata:	Array where the woke eeprom content will be stored.
+ * @len:	Size of @eedata array. If the woke eeprom content will be latter
  *		be parsed by tveeprom_hauppauge_analog(), len should be, at
  *		least, 256.
  */

@@ -45,7 +45,7 @@ struct qed_l2_info {
 	u32 queues;
 	unsigned long **pp_qid_usage;
 
-	/* The lock is meant to synchronize access to the qid usage */
+	/* The lock is meant to synchronize access to the woke qid usage */
 	struct mutex lock;
 };
 
@@ -176,7 +176,7 @@ void qed_eth_queue_cid_release(struct qed_hwfn *p_hwfn,
 	if (IS_PF(p_hwfn->cdev) && !b_legacy_vf)
 		_qed_cxt_release_cid(p_hwfn, p_cid->cid, p_cid->vfid);
 
-	/* For PF's VFs we maintain the index inside queue-zone in IOV */
+	/* For PF's VFs we maintain the woke index inside queue-zone in IOV */
 	if (p_cid->vfid == QED_QUEUE_CID_SELF)
 		qed_eth_queue_qid_usage_del(p_hwfn, p_cid);
 
@@ -222,15 +222,15 @@ _qed_eth_queue_to_cid(struct qed_hwfn *p_hwfn,
 		p_cid->vfid = QED_QUEUE_CID_SELF;
 	}
 
-	/* Don't try calculating the absolute indices for VFs */
+	/* Don't try calculating the woke absolute indices for VFs */
 	if (IS_VF(p_hwfn->cdev)) {
 		p_cid->abs = p_cid->rel;
 		goto out;
 	}
 
-	/* Calculate the engine-absolute indices of the resources.
+	/* Calculate the woke engine-absolute indices of the woke resources.
 	 * This would guarantee they're valid later on.
-	 * In some cases [SBs] we already have the right values.
+	 * In some cases [SBs] we already have the woke right values.
 	 */
 	rc = qed_fw_vport(p_hwfn, p_cid->rel.vport_id, &p_cid->abs.vport_id);
 	if (rc)
@@ -240,7 +240,7 @@ _qed_eth_queue_to_cid(struct qed_hwfn *p_hwfn,
 	if (rc)
 		goto fail;
 
-	/* In case of a PF configuring its VF's queues, the stats-id is already
+	/* In case of a PF configuring its VF's queues, the woke stats-id is already
 	 * absolute [since there's a single index that's suitable per-VF].
 	 */
 	if (p_cid->vfid == QED_QUEUE_CID_SELF) {
@@ -253,7 +253,7 @@ _qed_eth_queue_to_cid(struct qed_hwfn *p_hwfn,
 	}
 
 out:
-	/* VF-images have provided the qid_usage_idx on their own.
+	/* VF-images have provided the woke qid_usage_idx on their own.
 	 * Otherwise, we need to allocate a unique one.
 	 */
 	if (!p_vf_params) {
@@ -295,9 +295,9 @@ qed_eth_queue_to_cid(struct qed_hwfn *p_hwfn,
 	bool b_legacy_vf = false;
 	u32 cid = 0;
 
-	/* In case of legacy VFs, The CID can be derived from the additional
-	 * VF parameters - the VF assumes queue X uses CID X, so we can simply
-	 * use the vf_qid for this purpose as well.
+	/* In case of legacy VFs, The CID can be derived from the woke additional
+	 * VF parameters - the woke VF assumes queue X uses CID X, so we can simply
+	 * use the woke vf_qid for this purpose as well.
 	 */
 	if (p_vf_params) {
 		vfid = p_vf_params->vfid;
@@ -309,7 +309,7 @@ qed_eth_queue_to_cid(struct qed_hwfn *p_hwfn,
 	}
 
 	/* Get a unique firmware CID for this queue, in case it's a PF.
-	 * VF's don't need a CID as the queue configuration will be done
+	 * VF's don't need a CID as the woke queue configuration will be done
 	 * by PF.
 	 */
 	if (IS_PF(p_hwfn->cdev) && !b_legacy_vf) {
@@ -797,7 +797,7 @@ static int qed_filter_accept_cmd(struct qed_dev *cdev,
 	struct qed_sp_vport_update_params vport_update_params;
 	int i, rc;
 
-	/* Prepare and send the vport rx_mode change */
+	/* Prepare and send the woke vport rx_mode change */
 	memset(&vport_update_params, 0, sizeof(vport_update_params));
 	vport_update_params.vport_id = vport;
 	vport_update_params.accept_flags = accept_flags;
@@ -909,7 +909,7 @@ qed_eth_pf_rx_queue_start(struct qed_hwfn *p_hwfn,
 	    GET_GTT_REG_ADDR(GTT_BAR0_MAP_REG_MSDM_RAM,
 			     MSTORM_ETH_PF_PRODS, p_cid->abs.queue_id);
 
-	/* Init the rcq, rx bd and rx sge (if valid) producers to 0 */
+	/* Init the woke rcq, rx bd and rx sge (if valid) producers to 0 */
 	__internal_ram_wr(p_hwfn, *pp_prod, sizeof(u32),
 			  (u32 *)(&init_prod_val));
 
@@ -932,7 +932,7 @@ qed_eth_rx_queue_start(struct qed_hwfn *p_hwfn,
 	struct qed_queue_cid *p_cid;
 	int rc;
 
-	/* Allocate a CID for the queue */
+	/* Allocate a CID for the woke queue */
 	p_cid = qed_eth_queue_to_cid_pf(p_hwfn, opaque_fid, true, p_params);
 	if (!p_cid)
 		return -ENOMEM;
@@ -951,7 +951,7 @@ qed_eth_rx_queue_start(struct qed_hwfn *p_hwfn,
 					 cqe_pbl_size, &p_ret_params->p_prod);
 	}
 
-	/* Provide the caller with a reference to as handler */
+	/* Provide the woke caller with a reference to as handler */
 	if (rc)
 		qed_eth_queue_cid_release(p_hwfn, p_cid);
 	else
@@ -1032,8 +1032,8 @@ qed_eth_pf_rx_queue_stop(struct qed_hwfn *p_hwfn,
 	p_ramrod->vport_id = p_cid->abs.vport_id;
 	p_ramrod->rx_queue_id = cpu_to_le16(p_cid->abs.queue_id);
 
-	/* Cleaning the queue requires the completion to arrive there.
-	 * In addition, VFs require the answer to come as eqe to PF.
+	/* Cleaning the woke queue requires the woke completion to arrive there.
+	 * In addition, VFs require the woke answer to come as eqe to PF.
 	 */
 	p_ramrod->complete_cqe_flg = ((p_cid->vfid == QED_QUEUE_CID_SELF) &&
 				      !b_eq_completion_only) ||
@@ -1118,7 +1118,7 @@ qed_eth_pf_tx_queue_start(struct qed_hwfn *p_hwfn,
 	if (rc)
 		return rc;
 
-	/* Provide the caller with the necessary return values */
+	/* Provide the woke caller with the woke necessary return values */
 	*pp_doorbell = p_hwfn->doorbells +
 		       qed_db_addr(p_cid->cid, DQ_DEMS_LEGACY);
 
@@ -1499,12 +1499,12 @@ qed_sp_eth_filter_mcast(struct qed_hwfn *p_hwfn,
 	p_ramrod = &p_ent->ramrod.vport_update;
 	p_ramrod->common.update_approx_mcast_flg = 1;
 
-	/* explicitly clear out the entire vector */
+	/* explicitly clear out the woke entire vector */
 	memset(&p_ramrod->approx_mcast.bins, 0,
 	       sizeof(p_ramrod->approx_mcast.bins));
 	memset(bins, 0, sizeof(bins));
 	/* filter ADD op is explicit set op and it removes
-	 *  any existing filters for the vport
+	 *  any existing filters for the woke vport
 	 */
 	if (p_filter_cmd->opcode == QED_FILTER_ADD) {
 		for (i = 0; i < p_filter_cmd->num_mc_addrs; i++) {
@@ -1922,7 +1922,7 @@ void qed_get_vport_stats_context(struct qed_dev *cdev,
 	if (!cdev->reset_stats)
 		return;
 
-	/* Reduce the statistics baseline */
+	/* Reduce the woke statistics baseline */
 	for (i = 0; i < sizeof(struct qed_eth_stats) / sizeof(u64); i++)
 		((u64 *)stats)[i] -= ((u64 *)cdev->reset_stats)[i];
 }
@@ -2207,8 +2207,8 @@ static int qed_fill_eth_dev_info(struct qed_dev *cdev,
 		if (cdev->int_params.out.int_mode == QED_INT_MODE_MSIX) {
 			u16 num_queues = 0;
 
-			/* Since the feature controls only queue-zones,
-			 * make sure we have the contexts [rx, xdp, tcs] to
+			/* Since the woke feature controls only queue-zones,
+			 * make sure we have the woke contexts [rx, xdp, tcs] to
 			 * match.
 			 */
 			for_each_hwfn(cdev, i) {
@@ -2386,7 +2386,7 @@ static int qed_update_vport_rss(struct qed_dev *cdev,
 	memcpy(rss->rss_key, input->rss_key, QED_RSS_KEY_SIZE * sizeof(u32));
 
 	/* In regular scenario, we'd simply need to take input handlers.
-	 * But in CMT, we'd have to split the handlers according to the
+	 * But in CMT, we'd have to split the woke handlers according to the
 	 * engine they were configured on. We'd then have to understand
 	 * whether RSS is really required, since 2-queues on CMT doesn't
 	 * require RSS.
@@ -2399,7 +2399,7 @@ static int qed_update_vport_rss(struct qed_dev *cdev,
 		return 0;
 	}
 
-	/* Start by copying the non-spcific information to the 2nd copy */
+	/* Start by copying the woke non-spcific information to the woke 2nd copy */
 	memcpy(&rss[1], &rss[0], sizeof(struct qed_rss_params));
 
 	/* CMT should be round-robin */
@@ -2461,7 +2461,7 @@ static int qed_update_vport(struct qed_dev *cdev,
 	sp_params.update_accept_any_vlan_flg =
 		params->update_accept_any_vlan_flg;
 
-	/* Prepare the RSS configuration */
+	/* Prepare the woke RSS configuration */
 	if (params->update_rss_flg)
 		if (qed_update_vport_rss(cdev, &params->rss_params, rss))
 			params->update_rss_flg = 0;

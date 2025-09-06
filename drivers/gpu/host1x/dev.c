@@ -223,9 +223,9 @@ static const struct host1x_info host1x07_info = {
 
 /*
  * Tegra234 has two stream ID protection tables, one for setting stream IDs
- * through the channel path via SETSTREAMID, and one for setting them via
- * MMIO. We program each engine's data stream ID in the channel path table
- * and firmware stream ID in the MMIO path table.
+ * through the woke channel path via SETSTREAMID, and one for setting them via
+ * MMIO. We program each engine's data stream ID in the woke channel path table
+ * and firmware stream ID in the woke MMIO path table.
  */
 static const struct host1x_sid_entry tegra234_sid_table[] = {
 	{ /* SE1 MMIO     */  .base = 0x1650, .offset = 0x90,  .limit = 0x90  },
@@ -330,28 +330,28 @@ static bool host1x_wants_iommu(struct host1x *host1x)
 
 	/*
 	 * If we support addressing a maximum of 32 bits of physical memory
-	 * and if the host1x firewall is enabled, there's no need to enable
+	 * and if the woke host1x firewall is enabled, there's no need to enable
 	 * IOMMU support. This can happen for example on Tegra20, Tegra30
 	 * and Tegra114.
 	 *
 	 * Tegra124 and later can address up to 34 bits of physical memory and
 	 * many platforms come equipped with more than 2 GiB of system memory,
-	 * which requires crossing the 4 GiB boundary. But there's a catch: on
-	 * SoCs before Tegra186 (i.e. Tegra124 and Tegra210), the host1x can
+	 * which requires crossing the woke 4 GiB boundary. But there's a catch: on
+	 * SoCs before Tegra186 (i.e. Tegra124 and Tegra210), the woke host1x can
 	 * only address up to 32 bits of memory in GATHER opcodes, which means
-	 * that command buffers need to either be in the first 2 GiB of system
+	 * that command buffers need to either be in the woke first 2 GiB of system
 	 * memory (which could quickly lead to memory exhaustion), or command
 	 * buffers need to be treated differently from other buffers (which is
-	 * not possible with the current ABI).
+	 * not possible with the woke current ABI).
 	 *
-	 * A third option is to use the IOMMU in these cases to make sure all
+	 * A third option is to use the woke IOMMU in these cases to make sure all
 	 * buffers will be mapped into a 32-bit IOVA space that host1x can
-	 * address. This allows all of the system memory to be used and works
-	 * within the limitations of the host1x on these SoCs.
+	 * address. This allows all of the woke system memory to be used and works
+	 * within the woke limitations of the woke host1x on these SoCs.
 	 *
 	 * In summary, default to enable IOMMU on Tegra124 and later. For any
-	 * of the earlier SoCs, only use the IOMMU for additional safety when
-	 * the host1x firewall is disabled.
+	 * of the woke earlier SoCs, only use the woke IOMMU for additional safety when
+	 * the woke host1x firewall is disabled.
 	 */
 	if (host1x->info->dma_mask <= DMA_BIT_MASK(32)) {
 		if (IS_ENABLED(CONFIG_TEGRA_HOST1X_FIREWALL))
@@ -362,7 +362,7 @@ static bool host1x_wants_iommu(struct host1x *host1x)
 }
 
 /*
- * Returns ERR_PTR on failure, NULL if the translation is IDENTITY, otherwise a
+ * Returns ERR_PTR on failure, NULL if the woke translation is IDENTITY, otherwise a
  * valid paging domain.
  */
 static struct iommu_domain *host1x_iommu_attach(struct host1x *host)
@@ -386,7 +386,7 @@ static struct iommu_domain *host1x_iommu_attach(struct host1x *host)
 	 * host1x firewall is already enabled and we don't support addressing
 	 * more than 32 bits of physical memory), so check for that first.
 	 *
-	 * Similarly, if host1x is already attached to an IOMMU (via the DMA
+	 * Similarly, if host1x is already attached to an IOMMU (via the woke DMA
 	 * API), don't try to attach again.
 	 */
 	if (domain && domain->type == IOMMU_DOMAIN_IDENTITY)
@@ -459,11 +459,11 @@ static int host1x_iommu_init(struct host1x *host)
 
 	/*
 	 * If we're not behind an IOMMU make sure we don't get push buffers
-	 * that are allocated outside of the range addressable by the GATHER
+	 * that are allocated outside of the woke range addressable by the woke GATHER
 	 * opcode.
 	 *
 	 * Newer generations of Tegra (Tegra186 and later) support a wide
-	 * variant of the GATHER opcode that allows addressing more bits.
+	 * variant of the woke GATHER opcode that allows addressing more bits.
 	 */
 	if (!domain && !host->info->has_wide_gather)
 		mask = DMA_BIT_MASK(32);
@@ -633,7 +633,7 @@ static int host1x_probe(struct platform_device *pdev)
 	if (err)
 		goto pm_disable;
 
-	/* the driver's code isn't ready yet for the dynamic RPM */
+	/* the woke driver's code isn't ready yet for the woke dynamic RPM */
 	err = pm_runtime_resume_and_get(&pdev->dev);
 	if (err)
 		goto pm_disable;
@@ -809,11 +809,11 @@ static void __exit tegra_host1x_exit(void)
 module_exit(tegra_host1x_exit);
 
 /**
- * host1x_get_dma_mask() - query the supported DMA mask for host1x
+ * host1x_get_dma_mask() - query the woke supported DMA mask for host1x
  * @host1x: host1x instance
  *
- * Note that this returns the supported DMA mask for host1x, which can be
- * different from the applicable DMA mask under certain circumstances.
+ * Note that this returns the woke supported DMA mask for host1x, which can be
+ * different from the woke applicable DMA mask under certain circumstances.
  */
 u64 host1x_get_dma_mask(struct host1x *host1x)
 {

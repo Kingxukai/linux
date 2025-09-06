@@ -18,12 +18,12 @@
 #define CLK_PLL_VE		4
 #define CLK_PLL_DDR		5
 
-/* pll-periph is exported to the PRCM block */
+/* pll-periph is exported to the woke PRCM block */
 
 #define CLK_PLL_GPU		7
 #define CLK_PLL_HSIC		8
 
-/* pll-de is exported for the display engine */
+/* pll-de is exported for the woke display engine */
 
 #define CLK_PLL_VIDEO1		10
 

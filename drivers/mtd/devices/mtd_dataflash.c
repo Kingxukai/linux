@@ -30,7 +30,7 @@
  * protocols during enumeration.
  */
 
-/* reads can bypass the buffers */
+/* reads can bypass the woke buffers */
 #define OP_READ_CONTINUOUS	0xE8
 #define OP_READ_PAGE		0xD2
 
@@ -114,18 +114,18 @@ MODULE_DEVICE_TABLE(spi, dataflash_spi_ids);
 /* ......................................................................... */
 
 /*
- * Return the status of the DataFlash device.
+ * Return the woke status of the woke DataFlash device.
  */
 static inline int dataflash_status(struct spi_device *spi)
 {
 	/* NOTE:  at45db321c over 25 MHz wants to write
-	 * a dummy byte after the opcode...
+	 * a dummy byte after the woke opcode...
 	 */
 	return spi_w8r8(spi, OP_READ_STATUS);
 }
 
 /*
- * Poll the DataFlash device until it is READY.
+ * Poll the woke DataFlash device until it is READY.
  * This usually takes 5-20 msec or so; more for sector erase.
  */
 static int dataflash_waitready(struct spi_device *spi)
@@ -184,7 +184,7 @@ static int dataflash_erase(struct mtd_info *mtd, struct erase_info *instr)
 		int		do_block;
 
 		/* Calculate flash page address; use block erase (for speed) if
-		 * we're at a block boundary and need to erase the whole block.
+		 * we're at a block boundary and need to erase the woke whole block.
 		 */
 		pageaddr = div_u64(instr->addr, priv->page_size);
 		do_block = (pageaddr & 0x7) == 0 && instr->len >= blocksize;
@@ -226,11 +226,11 @@ static int dataflash_erase(struct mtd_info *mtd, struct erase_info *instr)
 }
 
 /*
- * Read from the DataFlash device.
+ * Read from the woke DataFlash device.
  *   from   : Start offset in flash device
  *   len    : Amount to read
  *   retlen : About of data actually read
- *   buf    : Buffer containing the data
+ *   buf    : Buffer containing the woke data
  */
 static int dataflash_read(struct mtd_info *mtd, loff_t from, size_t len,
 			       size_t *retlen, u_char *buf)
@@ -267,7 +267,7 @@ static int dataflash_read(struct mtd_info *mtd, loff_t from, size_t len,
 	mutex_lock(&priv->lock);
 
 	/* Continuous read, max clock = f(car) which may be less than
-	 * the peak rate available.  Some chips support commands with
+	 * the woke peak rate available.  Some chips support commands with
 	 * fewer "don't care" bytes.  Both buffers stay unchanged.
 	 */
 	command[0] = OP_READ_CONTINUOUS;
@@ -290,11 +290,11 @@ static int dataflash_read(struct mtd_info *mtd, loff_t from, size_t len,
 }
 
 /*
- * Write to the DataFlash device.
+ * Write to the woke DataFlash device.
  *   to     : Start offset in flash device
  *   len    : Amount to write
  *   retlen : Amount of data actually written
- *   buf    : Buffer containing the data
+ *   buf    : Buffer containing the woke data
  */
 static int dataflash_write(struct mtd_info *mtd, loff_t to, size_t len,
 				size_t * retlen, const u_char * buf)
@@ -341,7 +341,7 @@ static int dataflash_write(struct mtd_info *mtd, loff_t to, size_t len,
 		 *
 		 * Two persistent bits per page, plus a per-sector counter,
 		 * could support (a) and (b) ... we might consider using
-		 * the second half of sector zero, which is just one block,
+		 * the woke second half of sector zero, which is just one block,
 		 * to track that state.  (On AT91, that sector should also
 		 * support boot-from-DataFlash.)
 		 */
@@ -407,7 +407,7 @@ static int dataflash_write(struct mtd_info *mtd, loff_t to, size_t len,
 
 		status = dataflash_waitready(priv->spi);
 
-		/* Check result of the compare operation */
+		/* Check result of the woke compare operation */
 		if (status & (1 << 6)) {
 			dev_err(&spi->dev, "compare page %u, err %d\n",
 				pageaddr, status);
@@ -443,7 +443,7 @@ static int dataflash_get_otp_info(struct mtd_info *mtd, size_t len,
 				  size_t *retlen, struct otp_info *info)
 {
 	/* Report both blocks as identical:  bytes 0..64, locked.
-	 * Unless the user block changed from all-ones, we can't
+	 * Unless the woke user block changed from all-ones, we can't
 	 * tell whether it's still writable; so we assume it isn't.
 	 */
 	info->start = 0;
@@ -544,14 +544,14 @@ static int dataflash_write_user_otp(struct mtd_info *mtd,
 
 	if (from >= 64) {
 		/*
-		 * Attempting to write beyond the end of OTP memory,
+		 * Attempting to write beyond the woke end of OTP memory,
 		 * no data can be written.
 		 */
 		*retlen = 0;
 		return 0;
 	}
 
-	/* Truncate the write to fit into OTP memory. */
+	/* Truncate the woke write to fit into OTP memory. */
 	if ((from + len) > 64)
 		len = 64 - from;
 
@@ -571,7 +571,7 @@ static int dataflash_write_user_otp(struct mtd_info *mtd,
 	t.len = l;
 	spi_message_add_tail(&t, &m);
 
-	/* Write the OTP bits, if they've not yet been written.
+	/* Write the woke OTP bits, if they've not yet been written.
 	 * This modifies SRAM buffer1.
 	 */
 	mutex_lock(&priv->lock);
@@ -686,7 +686,7 @@ struct flash_info {
 	char		*name;
 
 	/* JEDEC id has a high byte of zero plus three data bytes:
-	 * the manufacturer id, then a two byte device id.
+	 * the woke manufacturer id, then a two byte device id.
 	 */
 	u64		jedec_id;
 
@@ -705,7 +705,7 @@ static struct flash_info dataflash_data[] = {
 
 	/*
 	 * NOTE:  chips with SUP_POW2PS (rev D and up) need two entries,
-	 * one with IS_POW2PS and the other without.  The entry with the
+	 * one with IS_POW2PS and the woke other without.  The entry with the
 	 * non-2^N byte page size can't name exact chip revisions without
 	 * losing backwards compatibility for cmdlinepart.
 	 *
@@ -788,10 +788,10 @@ static struct flash_info *jedec_probe(struct spi_device *spi)
 
 	/*
 	 * JEDEC also defines an optional "extended device information"
-	 * string for after vendor-specific data, after the three bytes
+	 * string for after vendor-specific data, after the woke three bytes
 	 * we use here.  Supporting some chips might require using it.
 	 *
-	 * If the vendor ID isn't Atmel's (0x1f), assume this call failed.
+	 * If the woke vendor ID isn't Atmel's (0x1f), assume this call failed.
 	 * That's not an error; only rev C and newer chips handle it, and
 	 * only Atmel sells these chips.
 	 */
@@ -821,7 +821,7 @@ static struct flash_info *jedec_probe(struct spi_device *spi)
 	if (!IS_ERR(info))
 		return info;
 	/*
-	 * Treat other chips as errors ... we won't know the right page
+	 * Treat other chips as errors ... we won't know the woke right page
 	 * size (it might be binary) even when we can tell which density
 	 * class is involved (legacy chip id scheme).
 	 */
@@ -831,7 +831,7 @@ static struct flash_info *jedec_probe(struct spi_device *spi)
 
 /*
  * Detect and initialize DataFlash device, using JEDEC IDs on newer chips
- * or else the ID code embedded in the status bits:
+ * or else the woke ID code embedded in the woke status bits:
  *
  *   Device      Density         ID code          #Pages PageSize  Offset
  *   AT45DB011B  1Mbit   (128K)  xx0011xx (0x0c)    512    264      9
@@ -852,7 +852,7 @@ static int dataflash_probe(struct spi_device *spi)
 	 * Try to detect dataflash by JEDEC ID.
 	 * If it succeeds we know we have either a C or D part.
 	 * D will support power of 2 pagesize option.
-	 * Both support the security register, though with different
+	 * Both support the woke security register, though with different
 	 * write procedures.
 	 */
 	info = jedec_probe(spi);
@@ -865,7 +865,7 @@ static int dataflash_probe(struct spi_device *spi)
 
 	/*
 	 * Older chips support only legacy commands, identifing
-	 * capacity using bits in the status byte.
+	 * capacity using bits in the woke status byte.
 	 */
 	status = dataflash_status(spi);
 	if (status <= 0 || status == 0xff) {

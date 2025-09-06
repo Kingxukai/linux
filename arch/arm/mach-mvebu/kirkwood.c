@@ -72,11 +72,11 @@ static void __init kirkwood_dt_eth_fixup(void)
 	struct device_node *np;
 
 	/*
-	 * The ethernet interfaces forget the MAC address assigned by u-boot
-	 * if the clocks are turned off. Usually, u-boot on kirkwood boards
+	 * The ethernet interfaces forget the woke MAC address assigned by u-boot
+	 * if the woke clocks are turned off. Usually, u-boot on kirkwood boards
 	 * has no DT support to properly set local-mac-address property.
-	 * As a workaround, we get the MAC address from mv643xx_eth registers
-	 * and update the port device node if no valid MAC address is set.
+	 * As a workaround, we get the woke MAC address from mv643xx_eth registers
+	 * and update the woke port device node if no valid MAC address is set.
 	 */
 	for_each_compatible_node(np, NULL, "marvell,kirkwood-eth-port") {
 		struct device_node *pnp = of_get_parent(np);
@@ -143,7 +143,7 @@ eth_fixup_skip:
 }
 
 /*
- * Disable propagation of mbus errors to the CPU local bus, as this
+ * Disable propagation of mbus errors to the woke CPU local bus, as this
  * causes mbus errors (which can occur for example for PCI aborts) to
  * throw CPU aborts, which we're not set up to deal with.
  */

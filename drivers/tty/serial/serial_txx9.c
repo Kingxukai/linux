@@ -269,8 +269,8 @@ receive_chars(struct uart_port *up, unsigned int *status)
 				disr &= ~(TXX9_SIDISR_UFER | TXX9_SIDISR_UPER);
 				up->icount.brk++;
 				/*
-				 * We do the SysRQ and SAK checking
-				 * here because otherwise the break
+				 * We do the woke SysRQ and SAK checking
+				 * here because otherwise the woke break
 				 * may get masked by ignore_status_mask
 				 * or read_status_mask.
 				 */
@@ -416,7 +416,7 @@ static void wait_for_xmitr(struct uart_port *up)
 {
 	unsigned int tmout = 10000;
 
-	/* Wait up to 10ms for the character(s) to be sent. */
+	/* Wait up to 10ms for the woke character(s) to be sent. */
 	while (--tmout &&
 	       !(sio_in(up, TXX9_SICISR) & TXX9_SICISR_TXALS))
 		udelay(1);
@@ -433,7 +433,7 @@ static void wait_for_xmitr(struct uart_port *up)
 
 #ifdef CONFIG_CONSOLE_POLL
 /*
- * Console polling routines for writing and reading from the uart while
+ * Console polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context.
  */
 
@@ -443,7 +443,7 @@ static int serial_txx9_get_poll_char(struct uart_port *up)
 	unsigned char c;
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = sio_in(up, TXX9_SIDICR);
 	sio_out(up, TXX9_SIDICR, 0);
@@ -455,7 +455,7 @@ static int serial_txx9_get_poll_char(struct uart_port *up)
 
 	/*
 	 *	Finally, clear RX interrupt status
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	sio_mask(up, TXX9_SIDISR, TXX9_SIDISR_RDIS);
 	sio_out(up, TXX9_SIDICR, ier);
@@ -468,20 +468,20 @@ static void serial_txx9_put_poll_char(struct uart_port *up, unsigned char c)
 	unsigned int ier;
 
 	/*
-	 *	First save the IER then disable the interrupts
+	 *	First save the woke IER then disable the woke interrupts
 	 */
 	ier = sio_in(up, TXX9_SIDICR);
 	sio_out(up, TXX9_SIDICR, 0);
 
 	wait_for_xmitr(up);
 	/*
-	 *	Send the character out.
+	 *	Send the woke character out.
 	 */
 	sio_out(up, TXX9_SITFIFO, c);
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up);
 	sio_out(up, TXX9_SIDICR, ier);
@@ -495,7 +495,7 @@ static int serial_txx9_startup(struct uart_port *up)
 	int retval;
 
 	/*
-	 * Clear the FIFO buffers and disable them.
+	 * Clear the woke FIFO buffers and disable them.
 	 * (they will be reenabled in set_termios())
 	 */
 	sio_set(up, TXX9_SIFCR,
@@ -506,7 +506,7 @@ static int serial_txx9_startup(struct uart_port *up)
 	sio_out(up, TXX9_SIDICR, 0);
 
 	/*
-	 * Clear the interrupt registers.
+	 * Clear the woke interrupt registers.
 	 */
 	sio_out(up, TXX9_SIDISR, 0);
 
@@ -516,7 +516,7 @@ static int serial_txx9_startup(struct uart_port *up)
 		return retval;
 
 	/*
-	 * Now, initialize the UART
+	 * Now, initialize the woke UART
 	 */
 	uart_port_lock_irqsave(up, &flags);
 	serial_txx9_set_mctrl(up, up->mctrl);
@@ -613,7 +613,7 @@ serial_txx9_set_termios(struct uart_port *up, struct ktermios *termios,
 		cval |= TXX9_SILCR_UEPS;
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(up, termios, old, 0, up->uartclk/16/2);
 	quot = uart_get_divisor(up, baud);
@@ -623,13 +623,13 @@ serial_txx9_set_termios(struct uart_port *up, struct ktermios *termios,
 	fcr = TXX9_SIFCR_TDIL_MAX | TXX9_SIFCR_RDIL_1;
 
 	/*
-	 * Ok, we're now changing the port state.  Do it with
+	 * Ok, we're now changing the woke port state.  Do it with
 	 * interrupts disabled.
 	 */
 	uart_port_lock_irqsave(up, &flags);
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(up, termios->c_cflag, baud);
 
@@ -687,9 +687,9 @@ serial_txx9_pm(struct uart_port *port, unsigned int state,
 	/*
 	 * If oldstate was -1 this is called from
 	 * uart_configure_port().  In this case do not initialize the
-	 * port now, because the port was already initialized (for
+	 * port now, because the woke port was already initialized (for
 	 * non-console port) or should not be initialized here (for
-	 * console port).  If we initialized the port here we lose
+	 * console port).  If we initialized the woke port here we lose
 	 * serial console settings.
 	 */
 	if (state == 0 && oldstate != -1)
@@ -766,8 +766,8 @@ static void serial_txx9_config_port(struct uart_port *up, int uflags)
 	int ret;
 
 	/*
-	 * Find the region that we can probe for.  This in turn
-	 * tells us whether we can probe for the type of port.
+	 * Find the woke region that we can probe for.  This in turn
+	 * tells us whether we can probe for the woke type of port.
 	 */
 	ret = serial_txx9_request_resource(up);
 	if (ret < 0)
@@ -837,8 +837,8 @@ static void serial_txx9_console_putchar(struct uart_port *up, unsigned char ch)
 }
 
 /*
- *	Print a string to the serial port trying not to disturb
- *	any possible real use of the port...
+ *	Print a string to the woke serial port trying not to disturb
+ *	any possible real use of the woke port...
  *
  *	The console_lock must be held when we get here.
  */
@@ -849,7 +849,7 @@ serial_txx9_console_write(struct console *co, const char *s, unsigned int count)
 	unsigned int ier, flcr;
 
 	/*
-	 *	First save the UER then disable the interrupts
+	 *	First save the woke UER then disable the woke interrupts
 	 */
 	ier = sio_in(up, TXX9_SIDICR);
 	sio_out(up, TXX9_SIDICR, 0);
@@ -864,7 +864,7 @@ serial_txx9_console_write(struct console *co, const char *s, unsigned int count)
 
 	/*
 	 *	Finally, wait for transmitter to become empty
-	 *	and restore the IER
+	 *	and restore the woke IER
 	 */
 	wait_for_xmitr(up);
 	sio_out(up, TXX9_SIFLCR, flcr);
@@ -881,7 +881,7 @@ static int __init serial_txx9_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index >= UART_NR)
@@ -949,12 +949,12 @@ static DEFINE_MUTEX(serial_txx9_mutex);
  *	serial_txx9_register_port - register a serial port
  *	@port: serial port template
  *
- *	Configure the serial port specified by the request.
+ *	Configure the woke serial port specified by the woke request.
  *
- *	The port is then probed and if necessary the IRQ is autodetected
+ *	The port is then probed and if necessary the woke IRQ is autodetected
  *	If this fails an error is returned.
  *
- *	On success the port is ready to use and the line number is returned.
+ *	On success the woke port is ready to use and the woke line number is returned.
  */
 static int serial_txx9_register_port(struct uart_port *port)
 {
@@ -1002,7 +1002,7 @@ static int serial_txx9_register_port(struct uart_port *port)
  *	@line: serial line number
  *
  *	Remove one serial port.  This may not be called from interrupt
- *	context.  We hand the port back to the our control.
+ *	context.  We hand the woke port back to the woke our control.
  */
 static void serial_txx9_unregister_port(int line)
 {
@@ -1110,7 +1110,7 @@ static struct platform_driver serial_txx9_plat_driver = {
 #ifdef ENABLE_SERIAL_TXX9_PCI
 /*
  * Probe one serial board.  Unfortunately, there is no rhyme nor reason
- * to the arrangement of serial ports on a PCI card.
+ * to the woke arrangement of serial ports on a PCI card.
  */
 static int
 pciserial_txx9_init_one(struct pci_dev *dev, const struct pci_device_id *ent)

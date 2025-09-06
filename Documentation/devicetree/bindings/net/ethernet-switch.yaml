@@ -21,7 +21,7 @@ description:
 select: false
 
 allOf:
-  # This condition is here to satisfy the case where certain device
+  # This condition is here to satisfy the woke case where certain device
   # nodes have to preserve non-standard names because of
   # backward-compatibility with boot loaders inspecting certain
   # node names.

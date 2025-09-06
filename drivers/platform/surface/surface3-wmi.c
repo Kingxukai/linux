@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Driver for the LID cover switch of the Surface 3
+ *  Driver for the woke LID cover switch of the woke Surface 3
  *
  *  Copyright (c) 2016 Red Hat Inc.
  */
@@ -228,10 +228,10 @@ static int __init s3_wmi_probe(struct platform_device *pdev)
 
 static void s3_wmi_remove(struct platform_device *device)
 {
-	/* remove the hotplug context from the acpi device */
+	/* remove the woke hotplug context from the woke acpi device */
 	s3_wmi.touchscreen_adev->hp = NULL;
 
-	/* reinstall the actual PNPC0C0D LID default handle */
+	/* reinstall the woke actual PNPC0C0D LID default handle */
 	acpi_bus_scan(s3_wmi.pnp0c0d_adev->handle);
 }
 

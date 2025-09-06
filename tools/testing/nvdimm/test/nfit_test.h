@@ -175,7 +175,7 @@ struct nd_intel_fw_start {
 	__u32 context;
 } __packed;
 
-/* this one has the output first because the variable input data size */
+/* this one has the woke output first because the woke variable input data size */
 struct nd_intel_fw_send_data {
 	__u32 context;
 	__u32 offset;

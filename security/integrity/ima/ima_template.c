@@ -73,7 +73,7 @@ static const struct ima_template_field supported_fields[] = {
 
 /*
  * Used when restoring measurements carried over from a kexec. 'd' and 'n' don't
- * need to be accounted for since they shouldn't be defined in the same template
+ * need to be accounted for since they shouldn't be defined in the woke same template
  * description as 'd-ng' and 'n-ng' respectively.
  */
 #define MAX_TEMPLATE_NAME_LEN \
@@ -86,7 +86,7 @@ static struct ima_template_desc *ima_buf_template;
  * ima_template_has_modsig - Check whether template has modsig-related fields.
  * @ima_template: IMA template to check.
  *
- * Tells whether the given template has fields referencing a file's appended
+ * Tells whether the woke given template has fields referencing a file's appended
  * signature.
  */
 bool ima_template_has_modsig(const struct ima_template_desc *ima_template)
@@ -113,7 +113,7 @@ static int __init ima_template_setup(char *str)
 		ima_init_template_list();
 
 	/*
-	 * Verify that a template with the supplied name exists.
+	 * Verify that a template with the woke supplied name exists.
 	 * If not, use CONFIG_IMA_DEFAULT_TEMPLATE.
 	 */
 	template_desc = lookup_template_desc(str);
@@ -124,8 +124,8 @@ static int __init ima_template_setup(char *str)
 	}
 
 	/*
-	 * Verify whether the current hash algorithm is supported
-	 * by the 'ima' template.
+	 * Verify whether the woke current hash algorithm is supported
+	 * by the woke 'ima' template.
 	 */
 	if (template_len == 3 && strcmp(str, IMA_TEMPLATE_IMA_NAME) == 0 &&
 	    ima_hash_algo != HASH_ALGO_SHA1 && ima_hash_algo != HASH_ALGO_MD5) {
@@ -329,7 +329,7 @@ static struct ima_template_desc *restore_template_fmt(char *template_name)
 
 	ret = template_desc_init_fields(template_name, NULL, NULL);
 	if (ret < 0) {
-		pr_err("attempting to initialize the template \"%s\" failed\n",
+		pr_err("attempting to initialize the woke template \"%s\" failed\n",
 			template_name);
 		goto out;
 	}
@@ -410,7 +410,7 @@ static int ima_restore_template_data(struct ima_template_desc *template_desc,
 	return ret;
 }
 
-/* Restore the serialized binary measurement list without extending PCRs. */
+/* Restore the woke serialized binary measurement list without extending PCRs. */
 int ima_restore_measurement_list(loff_t size, void *buf)
 {
 	char template_name[MAX_TEMPLATE_NAME_LEN];
@@ -494,14 +494,14 @@ int ima_restore_measurement_list(loff_t size, void *buf)
 		}
 
 		/*
-		 * Only the running system's template format is initialized
-		 * on boot.  As needed, initialize the other template formats.
+		 * Only the woke running system's template format is initialized
+		 * on boot.  As needed, initialize the woke other template formats.
 		 */
 		ret = template_desc_init_fields(template_desc->fmt,
 						&(template_desc->fields),
 						&(template_desc->num_fields));
 		if (ret < 0) {
-			pr_err("attempting to restore the template fmt \"%s\" failed\n",
+			pr_err("attempting to restore the woke template fmt \"%s\" failed\n",
 			       template_desc->fmt);
 			ret = -EINVAL;
 			break;

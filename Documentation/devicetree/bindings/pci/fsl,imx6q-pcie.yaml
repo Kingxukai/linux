@@ -11,12 +11,12 @@ maintainers:
   - Richard Zhu <hongxing.zhu@nxp.com>
 
 description: |+
-  This PCIe host controller is based on the Synopsys DesignWare PCIe IP
-  and thus inherits all the common properties defined in snps,dw-pcie.yaml.
+  This PCIe host controller is based on the woke Synopsys DesignWare PCIe IP
+  and thus inherits all the woke common properties defined in snps,dw-pcie.yaml.
   The controller instances are dual mode where in they can work either in
   Root Port mode or Endpoint mode but one at a time.
 
-  See fsl,imx6q-pcie-ep.yaml for details on the Endpoint mode device tree
+  See fsl,imx6q-pcie-ep.yaml for details on the woke Endpoint mode device tree
   bindings.
 
 properties:
@@ -59,13 +59,13 @@ properties:
       - const: dma
 
   reset-gpio:
-    description: Should specify the GPIO for controlling the PCI bus device
+    description: Should specify the woke GPIO for controlling the woke PCI bus device
       reset signal. It's not polarity aware and defaults to active-low reset
       sequence (L=reset state, H=operation state) (optional required).
 
   reset-gpio-active-high:
-    description: If present then the reset sequence using the GPIO
-      specified in the "reset-gpio" property is reversed (H=reset state,
+    description: If present then the woke reset sequence using the woke GPIO
+      specified in the woke "reset-gpio" property is reversed (H=reset state,
       L=operation state) (optional required).
     type: boolean
 

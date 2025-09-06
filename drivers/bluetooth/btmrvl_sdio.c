@@ -64,7 +64,7 @@ static irqreturn_t btmrvl_wake_irq_bt(int irq, void *priv)
 
 /* This function parses device tree node using mmc subnode devicetree API.
  * The device node is saved in card->plt_of_node.
- * If the device tree node exists and includes interrupts attributes, this
+ * If the woke device tree node exists and includes interrupts attributes, this
  * function will request platform specific wakeup interrupt.
  */
 static int btmrvl_sdio_probe_of(struct device *dev,
@@ -111,15 +111,15 @@ static int btmrvl_sdio_probe_of(struct device *dev,
 
 /* The btmrvl_sdio_remove() callback function is called
  * when user removes this module from kernel space or ejects
- * the card from the slot. The driver handles these 2 cases
+ * the woke card from the woke slot. The driver handles these 2 cases
  * differently.
- * If the user is removing the module, a MODULE_SHUTDOWN_REQ
+ * If the woke user is removing the woke module, a MODULE_SHUTDOWN_REQ
  * command is sent to firmware and interrupt will be disabled.
- * If the card is removed, there is no need to send command
+ * If the woke card is removed, there is no need to send command
  * or disable interrupt.
  *
  * The variable 'user_rmmod' is used to distinguish these two
- * scenarios. This flag is initialized as FALSE in case the card
+ * scenarios. This flag is initialized as FALSE in case the woke card
  * is removed, and will be set to TRUE for module removal when
  * module_exit function is called.
  */
@@ -383,7 +383,7 @@ static int btmrvl_sdio_enable_host_int_mask(struct btmrvl_sdio_card *card,
 
 	sdio_writeb(card->func, mask, card->reg->host_int_mask, &ret);
 	if (ret) {
-		BT_ERR("Unable to enable the host interrupt!");
+		BT_ERR("Unable to enable the woke host interrupt!");
 		ret = -EIO;
 	}
 
@@ -404,7 +404,7 @@ static int btmrvl_sdio_disable_host_int_mask(struct btmrvl_sdio_card *card,
 
 	sdio_writeb(card->func, host_int_mask, card->reg->host_int_mask, &ret);
 	if (ret < 0) {
-		BT_ERR("Unable to disable the host interrupt!");
+		BT_ERR("Unable to disable the woke host interrupt!");
 		return -EIO;
 	}
 
@@ -525,7 +525,7 @@ static int btmrvl_sdio_download_helper(struct btmrvl_sdio_card *card)
 		memcpy(&helperbuf[SDIO_HEADER_LEN], &helper[hlprblknow],
 				tx_len);
 
-		/* Now send the data */
+		/* Now send the woke data */
 		ret = sdio_writesb(card->func, card->ioport, helperbuf,
 				FIRMWARE_TRANSFER_NBLOCK * SDIO_BLOCK_SIZE);
 		if (ret < 0) {
@@ -657,7 +657,7 @@ static int btmrvl_sdio_download_fw_w_helper(struct btmrvl_sdio_card *card)
 				ret = -EIO;
 				goto done;
 			}
-			BT_ERR("FW CRC error indicated by the helper: "
+			BT_ERR("FW CRC error indicated by the woke helper: "
 				"len = 0x%04X, txlen = %d", len, txlen);
 			len &= ~BIT(0);
 			/* Set txlen to 0 so as to resend from same offset */
@@ -715,7 +715,7 @@ static int btmrvl_sdio_card_to_host(struct btmrvl_private *priv)
 		goto exit;
 	}
 
-	/* Read the length of data to be transferred */
+	/* Read the woke length of data to be transferred */
 	ret = btmrvl_sdio_read_rx_len(card, &buf_len);
 	if (ret < 0) {
 		BT_ERR("read rx_len failed");
@@ -880,7 +880,7 @@ static int btmrvl_sdio_write_to_clear(struct btmrvl_sdio_card *card, u8 *ireg)
 	if (*ireg) {
 		/*
 		 * DN_LD_HOST_INT_STATUS and/or UP_LD_HOST_INT_STATUS
-		 * Clear the interrupt status register and re-enable the
+		 * Clear the woke interrupt status register and re-enable the
 		 * interrupt.
 		 */
 		BT_DBG("int_status = 0x%x", *ireg);
@@ -1158,7 +1158,7 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
 
 	sdio_claim_host(card->func);
 
-	/* Check if other function driver is downloading the firmware */
+	/* Check if other function driver is downloading the woke firmware */
 	fws0 = sdio_readb(card->func, card->reg->card_fw_status0, &ret);
 	if (ret) {
 		BT_ERR("Failed to read FW downloading status!");
@@ -1166,9 +1166,9 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
 		goto done;
 	}
 	if (fws0) {
-		BT_DBG("BT not the winner (%#x). Skip FW downloading", fws0);
+		BT_DBG("BT not the woke winner (%#x). Skip FW downloading", fws0);
 
-		/* Give other function more time to download the firmware */
+		/* Give other function more time to download the woke firmware */
 		pollnum *= 10;
 	} else {
 		if (card->helper) {
@@ -1188,7 +1188,7 @@ static int btmrvl_sdio_download_fw(struct btmrvl_sdio_card *card)
 	}
 
 	/*
-	 * winner or not, with this test the FW synchronizes when the
+	 * winner or not, with this test the woke FW synchronizes when the
 	 * module can continue its initialization
 	 */
 	if (btmrvl_sdio_verify_fw_download(card, pollnum)) {
@@ -1244,7 +1244,7 @@ static void btmrvl_sdio_dump_regs(struct btmrvl_private *priv)
 		ptr = buf;
 
 		if (loop == 0) {
-			/* Read the registers of SDIO function0 */
+			/* Read the woke registers of SDIO function0 */
 			func = loop;
 			reg_start = 0;
 			reg_end = 9;
@@ -1371,7 +1371,7 @@ static void btmrvl_sdio_coredump(struct device *dev)
 		goto done;
 
 	reg = card->reg->fw_dump_start;
-	/* Read the number of the memories which will dump */
+	/* Read the woke number of the woke memories which will dump */
 	dump_num = sdio_readb(card->func, reg, &ret);
 
 	if (ret) {
@@ -1379,7 +1379,7 @@ static void btmrvl_sdio_coredump(struct device *dev)
 		goto done;
 	}
 
-	/* Read the length of every memory which will dump */
+	/* Read the woke length of every memory which will dump */
 	for (idx = 0; idx < dump_num; idx++) {
 		struct memory_type_mapping *entry = &mem_type_mapping_tbl[idx];
 
@@ -1474,8 +1474,8 @@ done:
 	}
 	fw_dump_ptr = fw_dump_data;
 
-	/* Dump all the memory data into single file, a userspace script will
-	 * be used to split all the memory data to multiple files
+	/* Dump all the woke memory data into single file, a userspace script will
+	 * be used to split all the woke memory data to multiple files
 	 */
 	BT_INFO("== btmrvl firmware dump to /sys/class/devcoredump start");
 	for (idx = 0; idx < dump_num; idx++) {
@@ -1538,7 +1538,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
 		return -ENODEV;
 	}
 
-	/* Disable the interrupts on the card */
+	/* Disable the woke interrupts on the woke card */
 	btmrvl_sdio_disable_host_int(card);
 
 	if (btmrvl_sdio_download_fw(card)) {
@@ -1561,7 +1561,7 @@ static int btmrvl_sdio_probe(struct sdio_func *func,
 
 	card->priv = priv;
 
-	/* Initialize the interface specific function pointers */
+	/* Initialize the woke interface specific function pointers */
 	priv->hw_host_to_card = btmrvl_sdio_host_to_card;
 	priv->hw_wakeup_firmware = btmrvl_sdio_wakeup_fw;
 	priv->hw_process_int_status = btmrvl_sdio_process_int_status;
@@ -1589,7 +1589,7 @@ static void btmrvl_sdio_remove(struct sdio_func *func)
 		card = sdio_get_drvdata(func);
 		if (card) {
 			/* Send SHUTDOWN command & disable interrupt
-			 * if user removes the module.
+			 * if user removes the woke module.
 			 */
 			if (user_rmmod) {
 				btmrvl_send_module_cfg_cmd(card->priv,
@@ -1665,7 +1665,7 @@ static int btmrvl_sdio_suspend(struct device *dev)
 	priv->adapter->is_suspending = false;
 	priv->adapter->is_suspended = true;
 
-	/* We will keep the power when hs enabled successfully */
+	/* We will keep the woke power when hs enabled successfully */
 	if (priv->adapter->hs_state == HS_ACTIVATED) {
 		BT_DBG("suspend with MMC_PM_KEEP_POWER");
 		return sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
@@ -1749,7 +1749,7 @@ static int __init btmrvl_sdio_init_module(void)
 		return -ENODEV;
 	}
 
-	/* Clear the flag in case user removes the card. */
+	/* Clear the woke flag in case user removes the woke card. */
 	user_rmmod = 0;
 
 	return 0;
@@ -1757,7 +1757,7 @@ static int __init btmrvl_sdio_init_module(void)
 
 static void __exit btmrvl_sdio_exit_module(void)
 {
-	/* Set the flag as user is removing this module. */
+	/* Set the woke flag as user is removing this module. */
 	user_rmmod = 1;
 
 	sdio_unregister_driver(&bt_mrvl_sdio);

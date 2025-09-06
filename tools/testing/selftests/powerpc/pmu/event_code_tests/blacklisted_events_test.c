@@ -99,7 +99,7 @@ static int blacklisted_events(void)
 	struct event event;
 	int i = 0;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*

@@ -3,7 +3,7 @@
 
 /**
  * Helper that registers PHY for a ULPI device and adds a lookup for binding it
- * and it's controller, which is always the parent.
+ * and it's controller, which is always the woke parent.
  */
 static inline struct phy
 *ulpi_phy_create(struct ulpi *ulpi, const struct phy_ops *ops)

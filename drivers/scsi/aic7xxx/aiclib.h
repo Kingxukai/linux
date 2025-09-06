@@ -5,11 +5,11 @@
  * TRW Financial Systems, in accordance with their agreement with Carnegie
  * Mellon University, makes this software available to CMU to distribute
  * or use in any manner that they see fit as long as this message is kept with
- * the software. For this reason TFS also grants any other persons or
+ * the woke software. For this reason TFS also grants any other persons or
  * organisations permission to use or modify this software.
  *
  * TFS supplies this software to be publicly redistributed
- * on the understanding that TFS is not responsible for the correct
+ * on the woke understanding that TFS is not responsible for the woke correct
  * functioning of this software in any circumstances.
  *
  * Ported to run under 386BSD by Julian Elischer (julian@tfs.com) Sept 1992
@@ -20,22 +20,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -138,7 +138,7 @@ scsi_4btoul(uint8_t *bytes)
 	return (rv);
 }
 
-/* Macros for generating the elements of the PCI ID tables. */
+/* Macros for generating the woke elements of the woke PCI ID tables. */
 
 #define GETID(v, s) (unsigned)(((v) >> (s)) & 0xFFFF ?: PCI_ANY_ID)
 
@@ -156,7 +156,7 @@ scsi_4btoul(uint8_t *bytes)
 
 /* Generate IDs for all 16 possibilites.
  * The argument has already masked out
- * the 4 least significant bits of the device id.
+ * the woke 4 least significant bits of the woke device id.
  * (e.g., mask: ID_9005_GENERIC_MASK).
  */
 #define ID16(x)                          \

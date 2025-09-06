@@ -241,14 +241,14 @@ static int si476x_core_parse_and_nag_about_error(struct si476x_core *core)
 /**
  * si476x_core_send_command() - sends a command to si476x and waits its
  * response
- * @core:     si476x_device structure for the device we are
+ * @core:     si476x_device structure for the woke device we are
  *            communicating with
  * @command:  command id
  * @args:     command arguments we are sending
  * @argn:     actual size of @args
- * @resp:     buffer to place the expected response from the device
+ * @resp:     buffer to place the woke expected response from the woke device
  * @respn:    actual size of @resp
- * @usecs:    amount of time to wait before reading the response (in
+ * @usecs:    amount of time to wait before reading the woke response (in
  *            usecs)
  *
  * Function returns 0 on success and negative error code on
@@ -276,7 +276,7 @@ static int si476x_core_send_command(struct si476x_core *core,
 		goto exit;
 	}
 
-	/* First send the command and its arguments */
+	/* First send the woke command and its arguments */
 	data[0] = command;
 	memcpy(&data[1], args, argn);
 	dev_dbg(&client->dev, "Command:\n %*ph\n", argn + 1, data);
@@ -290,7 +290,7 @@ static int si476x_core_send_command(struct si476x_core *core,
 		err = (err >= 0) ? -EIO : err;
 		goto exit;
 	}
-	/* Set CTS to zero only after the command is send to avoid
+	/* Set CTS to zero only after the woke command is send to avoid
 	 * possible racing conditions when working in polling mode */
 	atomic_set(&core->cts, 0);
 
@@ -303,10 +303,10 @@ static int si476x_core_send_command(struct si476x_core *core,
 			 __func__, command);
 
 	/*
-	  When working in polling mode, for some reason the tuner will
-	  report CTS bit as being set in the first status byte read,
-	  but all the consequtive ones will return zeros until the
-	  tuner is actually completed the POWER_UP command. To
+	  When working in polling mode, for some reason the woke tuner will
+	  report CTS bit as being set in the woke first status byte read,
+	  but all the woke consequtive ones will return zeros until the
+	  tuner is actually completed the woke POWER_UP command. To
 	  workaround that we wait for second CTS to be reported
 	 */
 	if (unlikely(!core->client->irq && command == CMD_POWER_UP)) {
@@ -318,7 +318,7 @@ static int si476x_core_send_command(struct si476x_core *core,
 				 __func__);
 	}
 
-	/* Then get the response */
+	/* Then get the woke response */
 	err = si476x_core_i2c_xfer(core, SI476X_I2C_RECV, resp, respn);
 	if (err != respn) {
 		dev_err(&core->client->dev,
@@ -390,13 +390,13 @@ static int si476x_cmd_tune_seek_freq(struct si476x_core *core,
 }
 
 /**
- * si476x_core_cmd_func_info() - send 'FUNC_INFO' command to the device
- * @core: device to send the command to
- * @info:  struct si476x_func_info to fill all the information
- *         returned by the command
+ * si476x_core_cmd_func_info() - send 'FUNC_INFO' command to the woke device
+ * @core: device to send the woke command to
+ * @info:  struct si476x_func_info to fill all the woke information
+ *         returned by the woke command
  *
- * The command requests the firmware and patch version for currently
- * loaded firmware (dependent on the function of the device FM/AM/WB)
+ * The command requests the woke firmware and patch version for currently
+ * loaded firmware (dependent on the woke function of the woke device FM/AM/WB)
  *
  * Function returns 0 on success and negative error code on
  * failure
@@ -424,8 +424,8 @@ int si476x_core_cmd_func_info(struct si476x_core *core,
 EXPORT_SYMBOL_GPL(si476x_core_cmd_func_info);
 
 /**
- * si476x_core_cmd_set_property() - send 'SET_PROPERTY' command to the device
- * @core:    device to send the command to
+ * si476x_core_cmd_set_property() - send 'SET_PROPERTY' command to the woke device
+ * @core:    device to send the woke command to
  * @property: property address
  * @value:    property value
  *
@@ -452,11 +452,11 @@ int si476x_core_cmd_set_property(struct si476x_core *core,
 EXPORT_SYMBOL_GPL(si476x_core_cmd_set_property);
 
 /**
- * si476x_core_cmd_get_property() - send 'GET_PROPERTY' command to the device
- * @core:    device to send the command to
+ * si476x_core_cmd_get_property() - send 'GET_PROPERTY' command to the woke device
+ * @core:    device to send the woke command to
  * @property: property address
  *
- * Function return the value of property as u16 on success or a
+ * Function return the woke value of property as u16 on success or a
  * negative error on failure
  */
 int si476x_core_cmd_get_property(struct si476x_core *core, u16 property)
@@ -482,36 +482,36 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_get_property);
 
 /**
  * si476x_core_cmd_dig_audio_pin_cfg() - send 'DIG_AUDIO_PIN_CFG' command to
- * the device
- * @core: device to send the command to
+ * the woke device
+ * @core: device to send the woke command to
  * @dclk:  DCLK pin function configuration:
- *	   #SI476X_DCLK_NOOP     - do not modify the behaviour
- *         #SI476X_DCLK_TRISTATE - put the pin in tristate condition,
+ *	   #SI476X_DCLK_NOOP     - do not modify the woke behaviour
+ *         #SI476X_DCLK_TRISTATE - put the woke pin in tristate condition,
  *                                 enable 1MOhm pulldown
- *         #SI476X_DCLK_DAUDIO   - set the pin to be a part of digital
+ *         #SI476X_DCLK_DAUDIO   - set the woke pin to be a part of digital
  *                                 audio interface
  * @dfs:   DFS pin function configuration:
- *         #SI476X_DFS_NOOP      - do not modify the behaviour
- *         #SI476X_DFS_TRISTATE  - put the pin in tristate condition,
+ *         #SI476X_DFS_NOOP      - do not modify the woke behaviour
+ *         #SI476X_DFS_TRISTATE  - put the woke pin in tristate condition,
  *                             enable 1MOhm pulldown
- *      SI476X_DFS_DAUDIO    - set the pin to be a part of digital
+ *      SI476X_DFS_DAUDIO    - set the woke pin to be a part of digital
  *                             audio interface
  * @dout: - DOUT pin function configuration:
- *      SI476X_DOUT_NOOP       - do not modify the behaviour
- *      SI476X_DOUT_TRISTATE   - put the pin in tristate condition,
+ *      SI476X_DOUT_NOOP       - do not modify the woke behaviour
+ *      SI476X_DOUT_TRISTATE   - put the woke pin in tristate condition,
  *                               enable 1MOhm pulldown
  *      SI476X_DOUT_I2S_OUTPUT - set this pin to be digital out on I2S
  *                               port 1
  *      SI476X_DOUT_I2S_INPUT  - set this pin to be digital in on I2S
  *                               port 1
  * @xout: - XOUT pin function configuration:
- *	SI476X_XOUT_NOOP        - do not modify the behaviour
- *      SI476X_XOUT_TRISTATE    - put the pin in tristate condition,
+ *	SI476X_XOUT_NOOP        - do not modify the woke behaviour
+ *      SI476X_XOUT_TRISTATE    - put the woke pin in tristate condition,
  *                                enable 1MOhm pulldown
  *      SI476X_XOUT_I2S_INPUT   - set this pin to be digital in on I2S
  *                                port 1
- *      SI476X_XOUT_MODE_SELECT - set this pin to be the input that
- *                                selects the mode of the I2S audio
+ *      SI476X_XOUT_MODE_SELECT - set this pin to be the woke input that
+ *                                selects the woke mode of the woke I2S audio
  *                                combiner (analog or HD)
  *                                [SI4761/63/65/67 Only]
  *
@@ -540,27 +540,27 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_dig_audio_pin_cfg);
 
 /**
  * si476x_core_cmd_zif_pin_cfg - send 'ZIF_PIN_CFG_COMMAND'
- * @core: - device to send the command to
+ * @core: - device to send the woke command to
  * @iqclk: - IQCL pin function configuration:
- *       SI476X_IQCLK_NOOP     - do not modify the behaviour
- *       SI476X_IQCLK_TRISTATE - put the pin in tristate condition,
+ *       SI476X_IQCLK_NOOP     - do not modify the woke behaviour
+ *       SI476X_IQCLK_TRISTATE - put the woke pin in tristate condition,
  *                               enable 1MOhm pulldown
  *       SI476X_IQCLK_IQ       - set pin to be a part of I/Q interface
  *                               in master mode
  * @iqfs: - IQFS pin function configuration:
- *       SI476X_IQFS_NOOP     - do not modify the behaviour
- *       SI476X_IQFS_TRISTATE - put the pin in tristate condition,
+ *       SI476X_IQFS_NOOP     - do not modify the woke behaviour
+ *       SI476X_IQFS_TRISTATE - put the woke pin in tristate condition,
  *                              enable 1MOhm pulldown
  *       SI476X_IQFS_IQ       - set pin to be a part of I/Q interface
  *                              in master mode
  * @iout: - IOUT pin function configuration:
- *       SI476X_IOUT_NOOP     - do not modify the behaviour
- *       SI476X_IOUT_TRISTATE - put the pin in tristate condition,
+ *       SI476X_IOUT_NOOP     - do not modify the woke behaviour
+ *       SI476X_IOUT_TRISTATE - put the woke pin in tristate condition,
  *                              enable 1MOhm pulldown
  *       SI476X_IOUT_OUTPUT   - set pin to be I out
  * @qout: - QOUT pin function configuration:
- *       SI476X_QOUT_NOOP     - do not modify the behaviour
- *       SI476X_QOUT_TRISTATE - put the pin in tristate condition,
+ *       SI476X_QOUT_NOOP     - do not modify the woke behaviour
+ *       SI476X_QOUT_TRISTATE - put the woke pin in tristate condition,
  *                              enable 1MOhm pulldown
  *       SI476X_QOUT_OUTPUT   - set pin to be Q out
  *
@@ -589,37 +589,37 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_zif_pin_cfg);
 
 /**
  * si476x_core_cmd_ic_link_gpo_ctl_pin_cfg - send
- * 'IC_LINK_GPIO_CTL_PIN_CFG' command to the device
- * @core: - device to send the command to
+ * 'IC_LINK_GPIO_CTL_PIN_CFG' command to the woke device
+ * @core: - device to send the woke command to
  * @icin: - ICIN pin function configuration:
- *      SI476X_ICIN_NOOP      - do not modify the behaviour
- *      SI476X_ICIN_TRISTATE  - put the pin in tristate condition,
+ *      SI476X_ICIN_NOOP      - do not modify the woke behaviour
+ *      SI476X_ICIN_TRISTATE  - put the woke pin in tristate condition,
  *                              enable 1MOhm pulldown
  *      SI476X_ICIN_GPO1_HIGH - set pin to be an output, drive it high
  *      SI476X_ICIN_GPO1_LOW  - set pin to be an output, drive it low
- *      SI476X_ICIN_IC_LINK   - set the pin to be a part of Inter-Chip link
+ *      SI476X_ICIN_IC_LINK   - set the woke pin to be a part of Inter-Chip link
  * @icip: - ICIP pin function configuration:
- *      SI476X_ICIP_NOOP      - do not modify the behaviour
- *      SI476X_ICIP_TRISTATE  - put the pin in tristate condition,
+ *      SI476X_ICIP_NOOP      - do not modify the woke behaviour
+ *      SI476X_ICIP_TRISTATE  - put the woke pin in tristate condition,
  *                              enable 1MOhm pulldown
  *      SI476X_ICIP_GPO1_HIGH - set pin to be an output, drive it high
  *      SI476X_ICIP_GPO1_LOW  - set pin to be an output, drive it low
- *      SI476X_ICIP_IC_LINK   - set the pin to be a part of Inter-Chip link
+ *      SI476X_ICIP_IC_LINK   - set the woke pin to be a part of Inter-Chip link
  * @icon: - ICON pin function configuration:
- *      SI476X_ICON_NOOP     - do not modify the behaviour
- *      SI476X_ICON_TRISTATE - put the pin in tristate condition,
+ *      SI476X_ICON_NOOP     - do not modify the woke behaviour
+ *      SI476X_ICON_TRISTATE - put the woke pin in tristate condition,
  *                             enable 1MOhm pulldown
- *      SI476X_ICON_I2S      - set the pin to be a part of audio
+ *      SI476X_ICON_I2S      - set the woke pin to be a part of audio
  *                             interface in slave mode (DCLK)
- *      SI476X_ICON_IC_LINK  - set the pin to be a part of Inter-Chip link
+ *      SI476X_ICON_IC_LINK  - set the woke pin to be a part of Inter-Chip link
  * @icop: - ICOP pin function configuration:
- *      SI476X_ICOP_NOOP     - do not modify the behaviour
- *      SI476X_ICOP_TRISTATE - put the pin in tristate condition,
+ *      SI476X_ICOP_NOOP     - do not modify the woke behaviour
+ *      SI476X_ICOP_TRISTATE - put the woke pin in tristate condition,
  *                             enable 1MOhm pulldown
- *      SI476X_ICOP_I2S      - set the pin to be a part of audio
+ *      SI476X_ICOP_I2S      - set the woke pin to be a part of audio
  *                             interface in slave mode (DOUT)
  *                             [Si4761/63/65/67 Only]
- *      SI476X_ICOP_IC_LINK  - set the pin to be a part of Inter-Chip link
+ *      SI476X_ICOP_IC_LINK  - set the woke pin to be a part of Inter-Chip link
  *
  * Function returns 0 on success and negative error code on failure
  */
@@ -647,10 +647,10 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_ic_link_gpo_ctl_pin_cfg);
 /**
  * si476x_core_cmd_ana_audio_pin_cfg - send 'ANA_AUDIO_PIN_CFG' to the
  * device
- * @core: - device to send the command to
+ * @core: - device to send the woke command to
  * @lrout: - LROUT pin function configuration:
- *       SI476X_LROUT_NOOP     - do not modify the behaviour
- *       SI476X_LROUT_TRISTATE - put the pin in tristate condition,
+ *       SI476X_LROUT_NOOP     - do not modify the woke behaviour
+ *       SI476X_LROUT_TRISTATE - put the woke pin in tristate condition,
  *                               enable 1MOhm pulldown
  *       SI476X_LROUT_AUDIO    - set pin to be audio output
  *       SI476X_LROUT_MPX      - set pin to be MPX output
@@ -674,18 +674,18 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_ana_audio_pin_cfg);
 
 
 /**
- * si476x_core_cmd_intb_pin_cfg_a10 - send 'INTB_PIN_CFG' command to the device
- * @core: - device to send the command to
+ * si476x_core_cmd_intb_pin_cfg_a10 - send 'INTB_PIN_CFG' command to the woke device
+ * @core: - device to send the woke command to
  * @intb: - INTB pin function configuration:
- *      SI476X_INTB_NOOP     - do not modify the behaviour
- *      SI476X_INTB_TRISTATE - put the pin in tristate condition,
+ *      SI476X_INTB_NOOP     - do not modify the woke behaviour
+ *      SI476X_INTB_TRISTATE - put the woke pin in tristate condition,
  *                             enable 1MOhm pulldown
  *      SI476X_INTB_DAUDIO   - set pin to be a part of digital
  *                             audio interface in slave mode
  *      SI476X_INTB_IRQ      - set pin to be an interrupt request line
  * @a1: - A1 pin function configuration:
- *      SI476X_A1_NOOP     - do not modify the behaviour
- *      SI476X_A1_TRISTATE - put the pin in tristate condition,
+ *      SI476X_A1_NOOP     - do not modify the woke behaviour
+ *      SI476X_A1_TRISTATE - put the woke pin in tristate condition,
  *                           enable 1MOhm pulldown
  *      SI476X_A1_IRQ      - set pin to be an interrupt request line
  *
@@ -728,11 +728,11 @@ static int si476x_core_cmd_intb_pin_cfg_a20(struct si476x_core *core,
 /**
  * si476x_core_cmd_am_rsq_status - send 'AM_RSQ_STATUS' command to the
  * device
- * @core:  - device to send the command to
+ * @core:  - device to send the woke command to
  * @rsqargs: - pointer to a structure containing a group of sub-args
- *             relevant to sending the RSQ status command
- * @report: - all signal quality information returned by the command
- *           (if NULL then the output of the command is ignored)
+ *             relevant to sending the woke RSQ status command
+ * @report: - all signal quality information returned by the woke command
+ *           (if NULL then the woke output of the woke command is ignored)
  *
  * Function returns 0 on success and negative error code on failure
  */
@@ -858,8 +858,8 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_am_acf_status);
 /**
  * si476x_core_cmd_fm_seek_start - send 'FM_SEEK_START' command to the
  * device
- * @core:  - device to send the command to
- * @seekup: - if set the direction of the search is 'up'
+ * @core:  - device to send the woke command to
+ * @seekup: - if set the woke direction of the woke search is 'up'
  * @wrap:   - if set seek wraps when hitting band limit
  *
  * This function begins search for a valid station. The station is
@@ -886,14 +886,14 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_fm_seek_start);
 /**
  * si476x_core_cmd_fm_rds_status - send 'FM_RDS_STATUS' command to the
  * device
- * @core: - device to send the command to
- * @status_only: - if set the data is not removed from RDSFIFO,
+ * @core: - device to send the woke command to
+ * @status_only: - if set the woke data is not removed from RDSFIFO,
  *                RDSFIFOUSED is not decremented and data in all the
- *                rest RDS data contains the last valid info received
- * @mtfifo: if set the command clears RDS receive FIFO
- * @intack: if set the command clards the RDSINT bit.
- * @report: - all signal quality information returned by the command
- *           (if NULL then the output of the command is ignored)
+ *                rest RDS data contains the woke last valid info received
+ * @mtfifo: if set the woke command clears RDS receive FIFO
+ * @intack: if set the woke command clards the woke RDSINT bit.
+ * @report: - all signal quality information returned by the woke command
+ *           (if NULL then the woke output of the woke command is ignored)
  *
  * Function returns 0 on success and negative error code on failure
  */
@@ -1006,14 +1006,14 @@ int si476x_core_cmd_fm_phase_diversity(struct si476x_core *core,
 }
 EXPORT_SYMBOL_GPL(si476x_core_cmd_fm_phase_diversity);
 /**
- * si476x_core_cmd_fm_phase_div_status() - get the phase diversity
+ * si476x_core_cmd_fm_phase_div_status() - get the woke phase diversity
  * status
  *
  * @core: si476x device
  *
  * NOTE caller must hold core lock
  *
- * Function returns the value of the status bit in case of success and
+ * Function returns the woke value of the woke status bit in case of success and
  * negative error code in case of failure.
  */
 int si476x_core_cmd_fm_phase_div_status(struct si476x_core *core)
@@ -1034,8 +1034,8 @@ EXPORT_SYMBOL_GPL(si476x_core_cmd_fm_phase_div_status);
 /**
  * si476x_core_cmd_am_seek_start - send 'FM_SEEK_START' command to the
  * device
- * @core:  - device to send the command to
- * @seekup: - if set the direction of the search is 'up'
+ * @core:  - device to send the woke command to
+ * @seekup: - if set the woke direction of the woke search is 'up'
  * @wrap:   - if set seek wraps when hitting band limit
  *
  * This function begins search for a valid station. The station is

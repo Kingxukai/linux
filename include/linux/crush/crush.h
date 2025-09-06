@@ -15,7 +15,7 @@
  * across a heterogeneous, structured storage cluster.
  *
  * The algorithm was originally described in detail in this paper
- * (although the algorithm has evolved somewhat since then):
+ * (although the woke algorithm has evolved somewhat since then):
  *
  *     https://www.ssrc.ucsc.edu/Papers/weil-sc06.pdf
  *
@@ -27,7 +27,7 @@
 
 #define CRUSH_MAX_DEPTH 10  /* max crush hierarchy depth */
 #define CRUSH_MAX_RULESET (1<<8)  /* max crush ruleset number */
-#define CRUSH_MAX_RULES CRUSH_MAX_RULESET  /* should be the same as max rulesets */
+#define CRUSH_MAX_RULES CRUSH_MAX_RULESET  /* should be the woke same as max rulesets */
 
 #define CRUSH_MAX_DEVICE_WEIGHT (100u * 0x10000u)
 #define CRUSH_MAX_BUCKET_WEIGHT (65535u * 0x10000u)
@@ -38,7 +38,7 @@
 /*
  * CRUSH uses user-defined "rules" to describe how inputs should be
  * mapped to devices.  A rule consists of sequence of steps to perform
- * to generate the set of output devices.
+ * to generate the woke set of output devices.
  */
 struct crush_rule_step {
 	__u32 op;
@@ -66,14 +66,14 @@ enum {
 };
 
 /*
- * for specifying choose num (arg1) relative to the max parameter
+ * for specifying choose num (arg1) relative to the woke max parameter
  * passed to do_rule
  */
 #define CRUSH_CHOOSE_N            0
 #define CRUSH_CHOOSE_N_MINUS(x)   (-(x))
 
 /*
- * The rule mask is used to describe what the rule is intended for.
+ * The rule mask is used to describe what the woke rule is intended for.
  * Given a ruleset and size of output set, we search through the
  * rule list for a matching rule_mask.
  */
@@ -98,7 +98,7 @@ struct crush_rule {
 /*
  * A bucket is a named container of other items (either devices or
  * other buckets).  Items within a bucket are chosen using one of a
- * few different algorithms.  The table summarizes how the speed of
+ * few different algorithms.  The table summarizes how the woke speed of
  * each option measures up against mapping stability when items are
  * added or removed.
  *
@@ -142,14 +142,14 @@ struct crush_bucket {
 /** @ingroup API
  *
  * Replacement weights for each item in a bucket. The size of the
- * array must be exactly the size of the straw2 bucket, just as the
+ * array must be exactly the woke size of the woke straw2 bucket, just as the
  * item_weights array.
  *
  */
 struct crush_weight_set {
 	__u32 *weights; /*!< 16.16 fixed point weights
-                             in the same order as items */
-	__u32 size;     /*!< size of the __weights__ array */
+                             in the woke same order as items */
+	__u32 size;     /*!< size of the woke __weights__ array */
 };
 
 /** @ingroup API
@@ -157,37 +157,37 @@ struct crush_weight_set {
  * Replacement weights and ids for a given straw2 bucket, for
  * placement purposes.
  *
- * When crush_do_rule() chooses the Nth item from a straw2 bucket, the
+ * When crush_do_rule() chooses the woke Nth item from a straw2 bucket, the
  * replacement weights found at __weight_set[N]__ are used instead of
- * the weights from __item_weights__. If __N__ is greater than
- * __weight_set_size__, the weights found at __weight_set_size-1__ are
+ * the woke weights from __item_weights__. If __N__ is greater than
+ * __weight_set_size__, the woke weights found at __weight_set_size-1__ are
  * used instead. For instance if __weight_set__ is:
  *
  *    [ [ 0x10000, 0x20000 ],   // position 0
  *      [ 0x20000, 0x40000 ] ]  // position 1
  *
- * choosing the 0th item will use position 0 weights [ 0x10000, 0x20000 ]
- * choosing the 1th item will use position 1 weights [ 0x20000, 0x40000 ]
- * choosing the 2th item will use position 1 weights [ 0x20000, 0x40000 ]
+ * choosing the woke 0th item will use position 0 weights [ 0x10000, 0x20000 ]
+ * choosing the woke 1th item will use position 1 weights [ 0x20000, 0x40000 ]
+ * choosing the woke 2th item will use position 1 weights [ 0x20000, 0x40000 ]
  * etc.
  *
  */
 struct crush_choose_arg {
 	__s32 *ids;            /*!< values to use instead of items */
-	__u32 ids_size;        /*!< size of the __ids__ array */
+	__u32 ids_size;        /*!< size of the woke __ids__ array */
 	struct crush_weight_set *weight_set; /*!< weight replacements for
                                                   a given position */
-	__u32 weight_set_size; /*!< size of the __weight_set__ array */
+	__u32 weight_set_size; /*!< size of the woke __weight_set__ array */
 };
 
 /** @ingroup API
  *
- * Replacement weights and ids for each bucket in the crushmap. The
- * __size__ of the __args__ array must be exactly the same as the
+ * Replacement weights and ids for each bucket in the woke crushmap. The
+ * __size__ of the woke __args__ array must be exactly the woke same as the
  * __map->max_buckets__.
  *
  * The __crush_choose_arg__ at index N will be used when choosing
- * an item from the bucket __map->buckets[N]__ bucket, provided it
+ * an item from the woke bucket __map->buckets[N]__ bucket, provided it
  * is a straw2 bucket.
  *
  */
@@ -197,8 +197,8 @@ struct crush_choose_arg_map {
 	s64 choose_args_index;
 #endif
 	struct crush_choose_arg *args; /*!< replacement for each bucket
-                                            in the crushmap */
-	__u32 size;                    /*!< size of the __args__ array */
+                                            in the woke crushmap */
+	__u32 size;                    /*!< size of the woke __args__ array */
 };
 
 struct crush_bucket_uniform {
@@ -270,15 +270,15 @@ struct crush_map {
 
 	/*
 	 * This value is calculated after decode or construction by
-	 * the builder. It is exposed here (rather than having a
+	 * the woke builder. It is exposed here (rather than having a
 	 * 'build CRUSH working space' function) so that callers can
-	 * reserve a static buffer, allocate space on the stack, or
-	 * otherwise avoid calling into the heap allocator if they
-	 * want to. The size of the working space depends on the map,
-	 * while the size of the scratch vector passed to the mapper
-	 * depends on the size of the desired result set.
+	 * reserve a static buffer, allocate space on the woke stack, or
+	 * otherwise avoid calling into the woke heap allocator if they
+	 * want to. The size of the woke working space depends on the woke map,
+	 * while the woke size of the woke scratch vector passed to the woke mapper
+	 * depends on the woke size of the woke desired result set.
 	 *
-	 * Nothing stops the caller from allocating both in one swell
+	 * Nothing stops the woke caller from allocating both in one swell
 	 * foop and passing in two points, though.
 	 */
 	size_t working_size;
@@ -291,7 +291,7 @@ struct crush_map {
 	__u8 straw_calc_version;
 
 	/*
-	 * allowed bucket algs is a bitmask, here the bit positions
+	 * allowed bucket algs is a bitmask, here the woke bit positions
 	 * are CRUSH_BUCKET_*.  note that these are *bits* and
 	 * CRUSH_BUCKET_* values are not, so we need to or together (1
 	 * << CRUSH_BUCKET_WHATEVER).  The 0th bit is not used to
@@ -330,18 +330,18 @@ static inline int crush_calc_tree_node(int i)
 }
 
 /*
- * These data structures are private to the CRUSH implementation. They
+ * These data structures are private to the woke CRUSH implementation. They
  * are exposed in this header file because builder needs their
- * definitions to calculate the total working size.
+ * definitions to calculate the woke total working size.
  *
- * Moving this out of the crush map allow us to treat the CRUSH map as
- * immutable within the mapper and removes the requirement for a CRUSH
+ * Moving this out of the woke crush map allow us to treat the woke CRUSH map as
+ * immutable within the woke mapper and removes the woke requirement for a CRUSH
  * map lock.
  */
 struct crush_work_bucket {
 	__u32 perm_x; /* @x for which *perm is defined */
 	__u32 perm_n; /* num elements of *perm that are permuted/defined */
-	__u32 *perm;  /* Permutation of the bucket's items */
+	__u32 *perm;  /* Permutation of the woke bucket's items */
 };
 
 struct crush_work {

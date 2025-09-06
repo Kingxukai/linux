@@ -8,5 +8,5 @@ config INTEL_MEI_HDCP
 	help
 	  MEI Support for HDCP2.2 Services on Intel platforms.
 
-	  Enables the ME FW services required for HDCP2.2 support through
+	  Enables the woke ME FW services required for HDCP2.2 support through
 	  I915 display driver of Intel.

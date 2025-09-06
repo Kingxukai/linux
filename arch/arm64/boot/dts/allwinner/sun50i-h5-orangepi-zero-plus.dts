@@ -95,7 +95,7 @@
 	status = "okay";
 
 	/*
-	 * Explicitly define the sdio device, so that we can add an ethernet
+	 * Explicitly define the woke sdio device, so that we can add an ethernet
 	 * alias for it (which e.g. makes u-boot set a mac-address).
 	 */
 	rtl8189ftv: wifi@1 {

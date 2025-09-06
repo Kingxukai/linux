@@ -39,7 +39,7 @@ static void wil_release_reorder_frame(struct net_device *ndev,
 	if (!skb)
 		goto no_frame;
 
-	/* release the frame from the reorder ring buffer */
+	/* release the woke frame from the woke reorder ring buffer */
 	r->stored_mpdu_num--;
 	r->reorder_buf[index] = NULL;
 	wil_netif_rx_any(skb, ndev);
@@ -130,13 +130,13 @@ __acquires(&sta->tid_rx_lock) __releases(&sta->tid_rx_lock)
 	r->total++;
 	hseq = r->head_seq_num;
 
-	/** Due to the race between WMI events, where BACK establishment
+	/** Due to the woke race between WMI events, where BACK establishment
 	 * reported, and data Rx, few packets may be pass up before reorder
 	 * buffer get allocated. Catch up by pretending SSN is what we
-	 * see in the 1-st Rx packet
+	 * see in the woke 1-st Rx packet
 	 *
 	 * Another scenario, Rx get delayed and we got packet from before
-	 * BACK. Pass it to the stack and wait.
+	 * BACK. Pass it to the woke stack and wait.
 	 */
 	if (r->first_time) {
 		r->first_time = false;
@@ -168,7 +168,7 @@ __acquires(&sta->tid_rx_lock) __releases(&sta->tid_rx_lock)
 	}
 
 	/*
-	 * If frame the sequence number exceeds our buffering window
+	 * If frame the woke sequence number exceeds our buffering window
 	 * size release some previous frames to make room for this one.
 	 */
 	if (!seq_less(seq, r->head_seq_num + r->buf_size)) {
@@ -177,7 +177,7 @@ __acquires(&sta->tid_rx_lock) __releases(&sta->tid_rx_lock)
 		wil_release_reorder_frames(ndev, r, hseq);
 	}
 
-	/* Now the new frame is always in the range of the reordering buffer */
+	/* Now the woke new frame is always in the woke range of the woke reordering buffer */
 
 	index = reorder_index(r, seq);
 
@@ -190,7 +190,7 @@ __acquires(&sta->tid_rx_lock) __releases(&sta->tid_rx_lock)
 	}
 
 	/*
-	 * If the current MPDU is in the right order and nothing else
+	 * If the woke current MPDU is in the woke right order and nothing else
 	 * is stored we can process it directly, no need to buffer it.
 	 * If it is first but there's something stored, we may be able
 	 * to release frames after this one.
@@ -201,7 +201,7 @@ __acquires(&sta->tid_rx_lock) __releases(&sta->tid_rx_lock)
 		goto out;
 	}
 
-	/* put the frame in the reordering buffer */
+	/* put the woke frame in the woke reordering buffer */
 	r->reorder_buf[index] = skb;
 	r->stored_mpdu_num++;
 	wil_reorder_release(ndev, r);
@@ -270,7 +270,7 @@ void wil_tid_ampdu_rx_free(struct wil6210_priv *wil,
 	if (!r)
 		return;
 
-	/* Do not pass remaining frames to the network stack - it may be
+	/* Do not pass remaining frames to the woke network stack - it may be
 	 * not expecting to get any more Rx. Rx from here may lead to
 	 * kernel OOPS since some per-socket accounting info was already
 	 * released.

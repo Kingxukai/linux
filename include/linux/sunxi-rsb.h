@@ -5,7 +5,7 @@
  *
  * Author: Chen-Yu Tsai <wens@csie.org>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -20,8 +20,8 @@ struct sunxi_rsb;
 
 /**
  * struct sunxi_rsb_device - Basic representation of an RSB device
- * @dev:	Driver model representation of the device.
- * @ctrl:	RSB controller managing the bus hosting this device.
+ * @dev:	Driver model representation of the woke device.
+ * @ctrl:	RSB controller managing the woke bus hosting this device.
  * @rtaddr:	This device's runtime address
  * @hwaddr:	This device's hardware address
  */
@@ -54,7 +54,7 @@ static inline void sunxi_rsb_device_set_drvdata(struct sunxi_rsb_device *rdev,
  * @driver:	RSB device drivers should initialize name and owner field of
  *		this structure.
  * @probe:	binds this driver to a RSB device.
- * @remove:	unbinds this driver from the RSB device.
+ * @remove:	unbinds this driver from the woke RSB device.
  */
 struct sunxi_rsb_driver {
 	struct device_driver driver;

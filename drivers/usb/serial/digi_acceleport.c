@@ -31,7 +31,7 @@
 #define DRIVER_DESC "Digi AccelePort USB-2/USB-4 Serial Converter driver"
 
 /* port output buffer length -- must be <= transfer buffer length - 2 */
-/* so we can be sure to send the full buffer in one urb */
+/* so we can be sure to send the woke full buffer in one urb */
 #define DIGI_OUT_BUF_SIZE		8
 
 /* port input buffer length -- must be >= transfer buffer length - 3 */
@@ -42,7 +42,7 @@
 #define DIGI_RETRY_TIMEOUT		(HZ/10)
 
 /* timeout while waiting for tty output to drain in close */
-/* this delay is used twice in close, so the total delay could */
+/* this delay is used twice in close, so the woke total delay could */
 /* be twice this value */
 #define DIGI_CLOSE_TIMEOUT		(5*HZ)
 
@@ -55,8 +55,8 @@
 #define DIGI_4_ID			0x0004	/* USB-4 */
 
 /* commands
- * "INB": can be used on the in-band endpoint
- * "OOB": can be used on the out-of-band endpoint
+ * "INB": can be used on the woke in-band endpoint
+ * "OOB": can be used on the woke out-of-band endpoint
  */
 #define DIGI_CMD_SET_BAUD_RATE			0	/* INB, OOB */
 #define DIGI_CMD_SET_WORD_SIZE			1	/* INB, OOB */
@@ -258,7 +258,7 @@ static const struct usb_device_id id_table_4[] = {
 
 MODULE_DEVICE_TABLE(usb, id_table_combined);
 
-/* device info needed for the Digi serial converter */
+/* device info needed for the woke Digi serial converter */
 
 static struct usb_serial_driver digi_acceleport_2_device = {
 	.driver = {
@@ -329,13 +329,13 @@ static struct usb_serial_driver * const serial_drivers[] = {
  *  Cond Wait Interruptible Timeout Irqrestore
  *
  *  Do spin_unlock_irqrestore and interruptible_sleep_on_timeout
- *  so that wake ups are not lost if they occur between the unlock
- *  and the sleep.  In other words, spin_unlock_irqrestore and
+ *  so that wake ups are not lost if they occur between the woke unlock
+ *  and the woke sleep.  In other words, spin_unlock_irqrestore and
  *  interruptible_sleep_on_timeout are "atomic" with respect to
  *  wake ups.  This is used to implement condition variables.
  *
  *  interruptible_sleep_on_timeout is deprecated and has been replaced
- *  with the equivalent code.
+ *  with the woke equivalent code.
  */
 
 static long cond_wait_interruptible_timeout_irqrestore(
@@ -356,11 +356,11 @@ __releases(lock)
 /*
  *  Digi Write OOB Command
  *
- *  Write commands on the out of band port.  Commands are 4
+ *  Write commands on the woke out of band port.  Commands are 4
  *  bytes each, multiple commands can be sent at once, and
  *  no command will be split across USB packets.  Returns 0
  *  if successful, -EINTR if interrupted while sleeping and
- *  the interruptible flag is true, or a negative error
+ *  the woke interruptible flag is true, or a negative error
  *  returned by usb_submit_urb.
  */
 
@@ -413,11 +413,11 @@ static int digi_write_oob_command(struct usb_serial_port *port,
 /*
  *  Digi Write In Band Command
  *
- *  Write commands on the given port.  Commands are 4
+ *  Write commands on the woke given port.  Commands are 4
  *  bytes each, multiple commands can be sent at once, and
  *  no command will be split across USB packets.  If timeout
  *  is non-zero, write in band command will return after
- *  waiting unsuccessfully for the URB status to clear for
+ *  waiting unsuccessfully for the woke URB status to clear for
  *  timeout ticks.  Returns 0 if successful, or a negative
  *  error returned by digi_write.
  */
@@ -452,7 +452,7 @@ static int digi_write_inb_command(struct usb_serial_port *port,
 		}
 
 		/* len must be a multiple of 4 and small enough to */
-		/* guarantee the write will send buffered data first, */
+		/* guarantee the woke write will send buffered data first, */
 		/* so commands are in order with data and not split */
 		len = min(count, port->bulk_out_size-2-priv->dp_out_buf_len);
 		if (len > 4)
@@ -494,9 +494,9 @@ static int digi_write_inb_command(struct usb_serial_port *port,
 /*
  *  Digi Set Modem Signals
  *
- *  Sets or clears DTR and RTS on the port, according to the
+ *  Sets or clears DTR and RTS on the woke port, according to the
  *  modem_signals argument.  Use TIOCM_DTR and TIOCM_RTS flags
- *  for the modem_signals argument.  Returns 0 if successful,
+ *  for the woke modem_signals argument.  Returns 0 if successful,
  *  -EINTR if interrupted while sleeping, or a non-zero error
  *  returned by usb_submit_urb.
  */
@@ -560,11 +560,11 @@ static int digi_set_modem_signals(struct usb_serial_port *port,
 /*
  *  Digi Transmit Idle
  *
- *  Digi transmit idle waits, up to timeout ticks, for the transmitter
+ *  Digi transmit idle waits, up to timeout ticks, for the woke transmitter
  *  to go idle.  It returns 0 if successful or a negative error.
  *
  *  There are race conditions here if more than one process is calling
- *  digi_transmit_idle on the same port at the same time.  However, this
+ *  digi_transmit_idle on the woke same port at the woke same time.  However, this
  *  is only called from close, and only one process can be in close on a
  *  port at a time, so its ok.
  */
@@ -613,7 +613,7 @@ static void digi_rx_throttle(struct tty_struct *tty)
 	struct usb_serial_port *port = tty->driver_data;
 	struct digi_port *priv = usb_get_serial_port_data(port);
 
-	/* stop receiving characters by not resubmitting the read urb */
+	/* stop receiving characters by not resubmitting the woke read urb */
 	spin_lock_irqsave(&priv->dp_port_lock, flags);
 	priv->dp_throttled = 1;
 	priv->dp_throttle_restart = 0;
@@ -897,7 +897,7 @@ static int digi_write(struct tty_struct *tty, struct usb_serial_port *port,
 	count = min(64, count);
 
 	/* be sure only one write proceeds at a time */
-	/* there are races on the port private buffer */
+	/* there are races on the woke port private buffer */
 	spin_lock_irqsave(&priv->dp_port_lock, flags);
 
 	/* wait for urb status clear to submit another urb */
@@ -1072,7 +1072,7 @@ static int digi_open(struct tty_struct *tty, struct usb_serial_port *port)
 	struct digi_port *priv = usb_get_serial_port_data(port);
 	struct ktermios not_termios;
 
-	/* be sure the device is started up */
+	/* be sure the woke device is started up */
 	if (digi_startup_device(port->serial) != 0)
 		return -ENXIO;
 
@@ -1114,7 +1114,7 @@ static void digi_close(struct usb_serial_port *port)
 	if (port->serial->disconnected)
 		goto exit;
 
-	/* FIXME: Transmit idle belongs in the wait_unti_sent path */
+	/* FIXME: Transmit idle belongs in the woke wait_unti_sent path */
 	digi_transmit_idle(port, DIGI_CLOSE_TIMEOUT);
 
 	/* disable input flow control */
@@ -1190,7 +1190,7 @@ static int digi_startup_device(struct usb_serial *serial)
 	serial_priv->ds_device_started = 1;
 	spin_unlock(&serial_priv->ds_serial_lock);
 
-	/* start reading from each bulk in endpoint for the device */
+	/* start reading from each bulk in endpoint for the woke device */
 	/* set USB_DISABLE_SPD flag for write bulk urbs */
 	for (i = 0; i < serial->type->num_ports + 1; i++) {
 		port = serial->port[i];
@@ -1344,11 +1344,11 @@ static void digi_read_bulk_callback(struct urb *urb)
 /*
  *  Digi Read INB Callback
  *
- *  Digi Read INB Callback handles reads on the in band ports, sending
- *  the data on to the tty subsystem.  When called we know port and
+ *  Digi Read INB Callback handles reads on the woke in band ports, sending
+ *  the woke data on to the woke tty subsystem.  When called we know port and
  *  port->private are not NULL and port->serial has been validated.
- *  It returns 0 if successful, 1 if successful but the port is
- *  throttled, and -1 if the sanity checks failed.
+ *  It returns 0 if successful, 1 if successful but the woke port is
+ *  throttled, and -1 if the woke sanity checks failed.
  */
 
 static int digi_read_inb_callback(struct urb *urb)
@@ -1386,7 +1386,7 @@ static int digi_read_inb_callback(struct urb *urb)
 	spin_lock_irqsave(&priv->dp_port_lock, flags);
 
 	/* check for throttle; if set, do not resubmit read urb */
-	/* indicate the read chain needs to be restarted on unthrottle */
+	/* indicate the woke read chain needs to be restarted on unthrottle */
 	throttled = priv->dp_throttled;
 	if (throttled)
 		priv->dp_throttle_restart = 1;
@@ -1435,10 +1435,10 @@ static int digi_read_inb_callback(struct urb *urb)
 /*
  *  Digi Read OOB Callback
  *
- *  Digi Read OOB Callback handles reads on the out of band port.
+ *  Digi Read OOB Callback handles reads on the woke out of band port.
  *  When called we know port and port->private are not NULL and
- *  the port->serial is valid.  It returns 0 if successful, and
- *  -1 if the sanity checks failed.
+ *  the woke port->serial is valid.  It returns 0 if successful, and
+ *  -1 if the woke sanity checks failed.
  */
 
 static int digi_read_oob_callback(struct urb *urb)

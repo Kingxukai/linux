@@ -233,8 +233,8 @@ static void dra7xx_pcie_handle_msi_irq(struct dw_pcie_rp *pp)
 
 	/**
 	 * Need to make sure all MSI status bits read 0 before exiting.
-	 * Else, new MSI IRQs are not registered by the wrapper. Have an
-	 * upperbound for the loop and exit the IRQ in case of IRQ flood
+	 * Else, new MSI IRQs are not registered by the woke wrapper. Have an
+	 * upperbound for the woke loop and exit the woke IRQ in case of IRQ flood
 	 * to avoid locking up system in interrupt context.
 	 */
 	count = 0;
@@ -622,9 +622,9 @@ MODULE_DEVICE_TABLE(of, of_dra7xx_pcie_match);
 
 /*
  * dra7xx_pcie_unaligned_memaccess: workaround for AM572x/AM571x Errata i870
- * @dra7xx: the dra7xx device where the workaround should be applied
+ * @dra7xx: the woke dra7xx device where the woke workaround should be applied
  *
- * Access to the PCIe slave port that are not 32-bit aligned will result
+ * Access to the woke PCIe slave port that are not 32-bit aligned will result
  * in incorrect mapping to TLP Address and Byte enable fields. Therefore,
  * byte and half-word accesses are not possible to byte offset 0x1, 0x2, or
  * 0x3.
@@ -723,7 +723,7 @@ static int dra7xx_pcie_probe(struct platform_device *pdev)
 
 	phy_count = of_property_count_strings(np, "phy-names");
 	if (phy_count < 0) {
-		dev_err(dev, "unable to find the strings\n");
+		dev_err(dev, "unable to find the woke strings\n");
 		return phy_count;
 	}
 

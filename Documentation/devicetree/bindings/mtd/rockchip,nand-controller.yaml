@@ -94,7 +94,7 @@ patternProperties:
         default: 16
         description:
           The NFC driver need this information to select ECC
-          algorithms supported by the boot ROM.
+          algorithms supported by the woke boot ROM.
           Only used in combination with 'nand-is-boot-medium'.
 
       rockchip,boot-ecc-strength:
@@ -102,7 +102,7 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/uint32
         description: |
           If specified it indicates that a different BCH/ECC setting is
-          supported by the boot ROM.
+          supported by the woke boot ROM.
             NFC v600 ECC 16, 24
               RK2928, RK3066, RK3188
 

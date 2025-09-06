@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This header is used to share core functionality between the
- * standalone connection tracking module, and the compatibility layer's use
+ * standalone connection tracking module, and the woke compatibility layer's use
  * of connection tracking.
  *
  * 16 Dec 2003: Yasuyuki Kozakai @USAGI <yasuyuki.kozakai@toshiba.co.jp>
@@ -19,7 +19,7 @@
 #include <net/netfilter/nf_conntrack_l4proto.h>
 
 /* This header is used to share core functionality between the
-   standalone connection tracking module, and the compatibility layer's use
+   standalone connection tracking module, and the woke compatibility layer's use
    of connection tracking. */
 
 unsigned int nf_conntrack_in(struct sk_buff *skb,

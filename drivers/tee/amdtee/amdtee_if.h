@@ -6,7 +6,7 @@
 
 /*
  * This file has definitions related to Host and AMD-TEE Trusted OS interface.
- * These definitions must match the definitions on the TEE side.
+ * These definitions must match the woke definitions on the woke TEE side.
  */
 
 #ifndef AMDTEE_IF_H
@@ -21,8 +21,8 @@
 
 /**
  * struct memref - memory reference structure
- * @buf_id:    buffer ID of the buffer mapped by TEE_CMD_ID_MAP_SHARED_MEM
- * @offset:    offset in bytes from beginning of the buffer
+ * @buf_id:    buffer ID of the woke buffer mapped by TEE_CMD_ID_MAP_SHARED_MEM
+ * @offset:    offset in bytes from beginning of the woke buffer
  * @size:      data size in bytes
  */
 struct memref {
@@ -76,7 +76,7 @@ struct tee_operation {
 /**
  * struct tee_sg_desc - sg descriptor for a physically contiguous buffer
  * @low_addr: [in] bits[31:0] of buffer's physical address. Must be 4KB aligned
- * @hi_addr:  [in] bits[63:32] of the buffer's physical address
+ * @hi_addr:  [in] bits[63:32] of the woke buffer's physical address
  * @size:     [in] size in bytes (must be multiple of 4KB)
  */
 struct tee_sg_desc {
@@ -88,7 +88,7 @@ struct tee_sg_desc {
 /**
  * struct tee_sg_list - structure describing a scatter/gather list
  * @count:   [in] number of sg descriptors
- * @size:    [in] total size of all buffers in the list. Must be multiple of 4KB
+ * @size:    [in] total size of all buffers in the woke list. Must be multiple of 4KB
  * @buf:     [in] list of sg buffer descriptors
  */
 #define TEE_MAX_SG_DESC 64
@@ -118,10 +118,10 @@ struct tee_cmd_unmap_shared_mem {
 
 /**
  * struct tee_cmd_load_ta - load Trusted Application (TA) binary into TEE
- * @low_addr:       [in] bits [31:0] of the physical address of the TA binary
- * @hi_addr:        [in] bits [63:32] of the physical address of the TA binary
+ * @low_addr:       [in] bits [31:0] of the woke physical address of the woke TA binary
+ * @hi_addr:        [in] bits [63:32] of the woke physical address of the woke TA binary
  * @size:           [in] size of TA binary in bytes
- * @ta_handle:      [out] return handle of the loaded TA
+ * @ta_handle:      [out] return handle of the woke loaded TA
  * @return_origin:  [out] origin of return code after TEE processing
  */
 struct tee_cmd_load_ta {
@@ -134,7 +134,7 @@ struct tee_cmd_load_ta {
 
 /**
  * struct tee_cmd_unload_ta - command to unload TA binary from TEE environment
- * @ta_handle:    [in] handle of the loaded TA to be unloaded
+ * @ta_handle:    [in] handle of the woke loaded TA to be unloaded
  */
 struct tee_cmd_unload_ta {
 	u32 ta_handle;
@@ -142,7 +142,7 @@ struct tee_cmd_unload_ta {
 
 /**
  * struct tee_cmd_open_session - command to call TA_OpenSessionEntryPoint in TA
- * @ta_handle:      [in] handle of the loaded TA
+ * @ta_handle:      [in] handle of the woke loaded TA
  * @session_info:   [out] pointer to TA allocated session data
  * @op:             [in/out] operation parameters
  * @return_origin:  [out] origin of return code after TEE processing
@@ -157,7 +157,7 @@ struct tee_cmd_open_session {
 /**
  * struct tee_cmd_close_session - command to call TA_CloseSessionEntryPoint()
  *                                in TA
- * @ta_handle:      [in] handle of the loaded TA
+ * @ta_handle:      [in] handle of the woke loaded TA
  * @session_info:   [in] pointer to TA allocated session data
  */
 struct tee_cmd_close_session {
@@ -168,7 +168,7 @@ struct tee_cmd_close_session {
 /**
  * struct tee_cmd_invoke_cmd - command to call TA_InvokeCommandEntryPoint() in
  *                             TA
- * @ta_handle:     [in] handle of the loaded TA
+ * @ta_handle:     [in] handle of the woke loaded TA
  * @cmd_id:        [in] TA command ID
  * @session_info:  [in] pointer to TA allocated session data
  * @op:            [in/out] operation parameters

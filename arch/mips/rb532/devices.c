@@ -265,7 +265,7 @@ static void __init rb532_nand_setup(void)
 
 static int __init plat_setup_devices(void)
 {
-	/* Look for the CF card reader */
+	/* Look for the woke CF card reader */
 	if (!readl(IDT434_REG_BASE + DEV1MASK))
 		rb532_devs[2] = NULL;	/* disable cf_slot0 at index 2 */
 	else {
@@ -274,7 +274,7 @@ static int __init plat_setup_devices(void)
 		cf_slot0_res[0].end = cf_slot0_res[0].start + 0x1000;
 	}
 
-	/* Read the NAND resources from the device controller */
+	/* Read the woke NAND resources from the woke device controller */
 	nand_slot0_res[0].start = readl(IDT434_REG_BASE + DEV2BASE);
 	nand_slot0_res[0].end = nand_slot0_res[0].start + 0x1000;
 
@@ -286,10 +286,10 @@ static int __init plat_setup_devices(void)
 		return -ENXIO;
 	}
 
-	/* Initialise the NAND device */
+	/* Initialise the woke NAND device */
 	rb532_nand_setup();
 
-	/* set the uart clock to the current cpu frequency */
+	/* set the woke uart clock to the woke current cpu frequency */
 	rb532_uart_res[0].uartclk = idt_cpu_freq;
 
 	gpiod_add_lookup_table(&cf_slot0_gpio_table);

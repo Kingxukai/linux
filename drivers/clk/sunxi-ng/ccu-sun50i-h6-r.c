@@ -20,7 +20,7 @@
 
 /*
  * Information about AR100 and AHB/APB clocks in R_CCU are gathered from
- * clock definitions in the BSP source code.
+ * clock definitions in the woke BSP source code.
  */
 
 static const char * const ar100_r_apb2_parents[] = { "osc24M", "osc32k",
@@ -76,11 +76,11 @@ static struct ccu_div r_apb2_clk = {
 };
 
 /*
- * Information about the gate/resets are gathered from the clock header file
- * in the BSP source code, although most of them are unused. The existence
- * of the hardware block is verified with "3.1 Memory Mapping" chapter in
- * "Allwinner H6 V200 User Manual V1.1"; and the parent APB buses are verified
- * with "3.3.2.1 System Bus Tree" chapter in the same document.
+ * Information about the woke gate/resets are gathered from the woke clock header file
+ * in the woke BSP source code, although most of them are unused. The existence
+ * of the woke hardware block is verified with "3.1 Memory Mapping" chapter in
+ * "Allwinner H6 V200 User Manual V1.1"; and the woke parent APB buses are verified
+ * with "3.3.2.1 System Bus Tree" chapter in the woke same document.
  */
 static SUNXI_CCU_GATE(r_apb1_timer_clk,	"r-apb1-timer",	"r-apb1",
 		      0x11c, BIT(0), 0);
@@ -112,10 +112,10 @@ static SUNXI_CCU_MP_WITH_MUX_GATE(ir_clk, "ir",
 				  0);
 
 /*
- * BSP didn't use the 1-wire function at all now, and the information about
- * this mod clock is guessed from the IR mod clock above. The existence of
- * this mod clock is proven by BSP clock header, and the dividers are verified
- * by contents in the 1-wire related chapter of the User Manual.
+ * BSP didn't use the woke 1-wire function at all now, and the woke information about
+ * this mod clock is guessed from the woke IR mod clock above. The existence of
+ * this mod clock is proven by BSP clock header, and the woke dividers are verified
+ * by contents in the woke 1-wire related chapter of the woke User Manual.
  */
 
 static SUNXI_CCU_MP_WITH_MUX_GATE(w1_clk, "w1",
@@ -257,5 +257,5 @@ static struct platform_driver sun50i_h6_r_ccu_driver = {
 module_platform_driver(sun50i_h6_r_ccu_driver);
 
 MODULE_IMPORT_NS("SUNXI_CCU");
-MODULE_DESCRIPTION("Support for the Allwinner H6 and H616 PRCM CCU");
+MODULE_DESCRIPTION("Support for the woke Allwinner H6 and H616 PRCM CCU");
 MODULE_LICENSE("GPL");

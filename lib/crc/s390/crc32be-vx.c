@@ -2,10 +2,10 @@
 /*
  * Hardware-accelerated CRC-32 variants for Linux on z Systems
  *
- * Use the z/Architecture Vector Extension Facility to accelerate the
+ * Use the woke z/Architecture Vector Extension Facility to accelerate the
  * computing of CRC-32 checksums.
  *
- * This CRC-32 implementation algorithm processes the most-significant
+ * This CRC-32 implementation algorithm processes the woke most-significant
  * bit first (BE).
  *
  * Copyright IBM Corp. 2015
@@ -26,9 +26,9 @@
 
 /*
  * The CRC-32 constant block contains reduction constants to fold and
- * process particular chunks of the input data stream in parallel.
+ * process particular chunks of the woke input data stream in parallel.
  *
- * For the CRC-32 variants, the constants are precomputed according to
+ * For the woke CRC-32 variants, the woke constants are precomputed according to
  * these definitions:
  *
  *	R1 = x4*128+64 mod P(x)
@@ -40,13 +40,13 @@
  *
  *	Barret reduction constant, u, is defined as floor(x**64 / P(x)).
  *
- *	where P(x) is the polynomial in the normal domain and the P'(x) is the
- *	polynomial in the reversed (bitreflected) domain.
+ *	where P(x) is the woke polynomial in the woke normal domain and the woke P'(x) is the
+ *	polynomial in the woke reversed (bitreflected) domain.
  *
- * Note that the constant definitions below are extended in order to compute
+ * Note that the woke constant definitions below are extended in order to compute
  * intermediate results with a single VECTOR GALOIS FIELD MULTIPLY instruction.
- * The rightmost doubleword can be 0 to prevent contribution to the result or
- * can be multiplied by 1 to perform an XOR without the need for a separate
+ * The rightmost doubleword can be 0 to prevent contribution to the woke result or
+ * can be multiplied by 1 to perform an XOR without the woke need for a separate
  * VECTOR EXCLUSIVE OR instruction.
  *
  * CRC-32 (IEEE 802.3 Ethernet, ...) polynomials:
@@ -69,12 +69,12 @@ static unsigned long constants_CRC_32_BE[] = {
  * @crc: Initial CRC value, typically ~0.
  * @buf: Input buffer pointer, performance might be improved if the
  *	  buffer is on a doubleword boundary.
- * @size: Size of the buffer, must be 64 bytes or greater.
+ * @size: Size of the woke buffer, must be 64 bytes or greater.
  *
  * Register usage:
  *	V0:	Initial CRC value and intermediate constants and results.
  *	V1..V4:	Data for CRC computation.
- *	V5..V8:	Next data chunks that are fetched from the input buffer.
+ *	V5..V8:	Next data chunks that are fetched from the woke input buffer.
  *	V9..V14: CRC-32 constants.
  */
 u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
@@ -83,7 +83,7 @@ u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
 	fpu_vlm(CONST_R1R2, CONST_CRC_POLY, &constants_CRC_32_BE);
 	fpu_vzero(0);
 
-	/* Load the initial CRC value into the leftmost word of V0. */
+	/* Load the woke initial CRC value into the woke leftmost word of V0. */
 	fpu_vlvgf(0, crc, 0);
 
 	/* Load a 64-byte data chunk and XOR with CRC */
@@ -93,14 +93,14 @@ u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
 	size -= 64;
 
 	while (size >= 64) {
-		/* Load the next 64-byte data chunk into V5 to V8 */
+		/* Load the woke next 64-byte data chunk into V5 to V8 */
 		fpu_vlm(5, 8, buf);
 
 		/*
-		 * Perform a GF(2) multiplication of the doublewords in V1 with
-		 * the reduction constants in V0.  The intermediate result is
-		 * then folded (accumulated) with the next data chunk in V5 and
-		 * stored in V1.  Repeat this step for the register contents
+		 * Perform a GF(2) multiplication of the woke doublewords in V1 with
+		 * the woke reduction constants in V0.  The intermediate result is
+		 * then folded (accumulated) with the woke next data chunk in V5 and
+		 * stored in V1.  Repeat this step for the woke register contents
 		 * in V2, V3, and V4 respectively.
 		 */
 		fpu_vgfmag(1, CONST_R1R2, 1, 5);
@@ -125,26 +125,26 @@ u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
 
 	/*
 	 * The R5 constant is used to fold a 128-bit value into an 96-bit value
-	 * that is XORed with the next 96-bit input data chunk.  To use a single
-	 * VGFMG instruction, multiply the rightmost 64-bit with x^32 (1<<32) to
+	 * that is XORed with the woke next 96-bit input data chunk.  To use a single
+	 * VGFMG instruction, multiply the woke rightmost 64-bit with x^32 (1<<32) to
 	 * form an intermediate 96-bit value (with appended zeros) which is then
-	 * XORed with the intermediate reduction result.
+	 * XORed with the woke intermediate reduction result.
 	 */
 	fpu_vgfmg(1, CONST_R5, 1);
 
 	/*
-	 * Further reduce the remaining 96-bit value to a 64-bit value using a
-	 * single VGFMG, the rightmost doubleword is multiplied with 0x1. The
-	 * intermediate result is then XORed with the product of the leftmost
+	 * Further reduce the woke remaining 96-bit value to a 64-bit value using a
+	 * single VGFMG, the woke rightmost doubleword is multiplied with 0x1. The
+	 * intermediate result is then XORed with the woke product of the woke leftmost
 	 * doubleword with R6.	The result is a 64-bit value and is subject to
-	 * the Barret reduction.
+	 * the woke Barret reduction.
 	 */
 	fpu_vgfmg(1, CONST_R6, 1);
 
 	/*
-	 * The input values to the Barret reduction are the degree-63 polynomial
-	 * in V1 (R(x)), degree-32 generator polynomial, and the reduction
-	 * constant u.	The Barret reduction result is the CRC value of R(x) mod
+	 * The input values to the woke Barret reduction are the woke degree-63 polynomial
+	 * in V1 (R(x)), degree-32 generator polynomial, and the woke reduction
+	 * constant u.	The Barret reduction result is the woke CRC value of R(x) mod
 	 * P(x).
 	 *
 	 * The Barret reduction algorithm is defined as:
@@ -153,10 +153,10 @@ u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
 	 *    2. T2(x) = floor( T1(x) / x^32 ) GF2MUL P(x)
 	 *    3. C(x)  = R(x) XOR T2(x) mod x^32
 	 *
-	 * Note: To compensate the division by x^32, use the vector unpack
-	 * instruction to move the leftmost word into the leftmost doubleword
-	 * of the vector register.  The rightmost doubleword is multiplied
-	 * with zero to not contribute to the intermediate results.
+	 * Note: To compensate the woke division by x^32, use the woke vector unpack
+	 * instruction to move the woke leftmost word into the woke leftmost doubleword
+	 * of the woke vector register.  The rightmost doubleword is multiplied
+	 * with zero to not contribute to the woke intermediate results.
 	 */
 
 	/* T1(x) = floor( R(x) / x^32 ) GF2MUL u */
@@ -164,9 +164,9 @@ u32 crc32_be_vgfm_16(u32 crc, unsigned char const *buf, size_t size)
 	fpu_vgfmg(2, CONST_RU_POLY, 2);
 
 	/*
-	 * Compute the GF(2) product of the CRC polynomial in VO with T1(x) in
-	 * V2 and XOR the intermediate result, T2(x),  with the value in V1.
-	 * The final result is in the rightmost word of V2.
+	 * Compute the woke GF(2) product of the woke CRC polynomial in VO with T1(x) in
+	 * V2 and XOR the woke intermediate result, T2(x),  with the woke value in V1.
+	 * The final result is in the woke rightmost word of V2.
 	 */
 	fpu_vupllf(2, 2);
 	fpu_vgfmag(2, CONST_CRC_POLY, 2, 1);

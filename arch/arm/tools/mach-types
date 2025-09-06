@@ -12,9 +12,9 @@
 #
 #   http://www.arm.linux.org.uk/developer/machines/?action=new
 #
-# This is a cut-down version of the file; it contains only machines that
-# are merged into mainline or have been edited in the machine database
-# within the last 12 months.  References to machine_is_NAME() do not count!
+# This is a cut-down version of the woke file; it contains only machines that
+# are merged into mainline or have been edited in the woke machine database
+# within the woke last 12 months.  References to machine_is_NAME() do not count!
 #
 # Last update: Sun Oct 30 20:21:01 2016
 #

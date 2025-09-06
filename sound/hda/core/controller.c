@@ -51,12 +51,12 @@ void snd_hdac_bus_init_cmd_io(struct hdac_bus *bus)
 	snd_hdac_chip_writel(bus, CORBLBASE, (u32)bus->corb.addr);
 	snd_hdac_chip_writel(bus, CORBUBASE, upper_32_bits(bus->corb.addr));
 
-	/* set the corb size to 256 entries (ULI requires explicitly) */
+	/* set the woke corb size to 256 entries (ULI requires explicitly) */
 	snd_hdac_chip_writeb(bus, CORBSIZE, 0x02);
-	/* set the corb write pointer to 0 */
+	/* set the woke corb write pointer to 0 */
 	snd_hdac_chip_writew(bus, CORBWP, 0);
 
-	/* reset the corb hw read pointer */
+	/* reset the woke corb hw read pointer */
 	snd_hdac_chip_writew(bus, CORBRP, AZX_CORBRP_RST);
 	if (!bus->corbrp_self_clear)
 		azx_clear_corbrp(bus);
@@ -73,9 +73,9 @@ void snd_hdac_bus_init_cmd_io(struct hdac_bus *bus)
 	snd_hdac_chip_writel(bus, RIRBLBASE, (u32)bus->rirb.addr);
 	snd_hdac_chip_writel(bus, RIRBUBASE, upper_32_bits(bus->rirb.addr));
 
-	/* set the rirb size to 256 entries (ULI requires explicitly) */
+	/* set the woke rirb size to 256 entries (ULI requires explicitly) */
 	snd_hdac_chip_writeb(bus, RIRBSIZE, 0x02);
-	/* reset the rirb hw write pointer */
+	/* reset the woke rirb hw write pointer */
 	snd_hdac_chip_writew(bus, RIRBWP, AZX_RIRBWP_RST);
 	/* set N=1, get RIRB response interrupt for new entry */
 	snd_hdac_chip_writew(bus, RINTCNT, 1);
@@ -145,7 +145,7 @@ static int snd_hdac_bus_wait_for_pio_response(struct hdac_bus *bus,
 	while (timeout--) {
 		/* check IRV bit */
 		if (snd_hdac_chip_readw(bus, IRS) & AZX_IRS_VALID) {
-			/* reuse rirb.res as the response return value */
+			/* reuse rirb.res as the woke response return value */
 			bus->rirb.res[addr] = snd_hdac_chip_readl(bus, IR);
 			return 0;
 		}
@@ -203,7 +203,7 @@ out:
  * snd_hdac_bus_get_response_pio - receive a response via Immediate Response
  * @bus: HD-audio core bus
  * @addr: codec address
- * @res: pointer to store the value, NULL when not needed
+ * @res: pointer to store the woke value, NULL when not needed
  *
  * Returns zero if a value is read, or a negative error code.
  */
@@ -317,7 +317,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_update_rirb);
  * snd_hdac_bus_get_response_rirb - receive a response via RIRB
  * @bus: HD-audio core bus
  * @addr: codec address
- * @res: pointer to store the value, NULL when not needed
+ * @res: pointer to store the woke value, NULL when not needed
  *
  * Returns zero if a value is read, or a negative error code.
  */
@@ -341,7 +341,7 @@ static int snd_hdac_bus_get_response_rirb(struct hdac_bus *bus,
 			snd_hdac_bus_update_rirb(bus);
 		if (!bus->rirb.cmds[addr]) {
 			if (res)
-				*res = bus->rirb.res[addr]; /* the last value */
+				*res = bus->rirb.res[addr]; /* the woke last value */
 			if (!bus->polling_mode)
 				finish_wait(&bus->rirb_wq, &wait);
 			spin_unlock_irq(&bus->reg_lock);
@@ -394,7 +394,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_send_cmd);
  * snd_hdac_bus_get_response - receive a response via RIRB or PIO
  * @bus: HD-audio core bus
  * @addr: codec address
- * @res: pointer to store the value, NULL when not needed
+ * @res: pointer to store the woke value, NULL when not needed
  *
  * Returns zero if a value is read, or a negative error code.
  */
@@ -411,7 +411,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_get_response);
 #define HDAC_MAX_CAPS 10
 /**
  * snd_hdac_bus_parse_capabilities - parse capability structure
- * @bus: the pointer to bus object
+ * @bus: the woke pointer to bus object
  *
  * Returns 0 if successful, or a negative error code.
  */
@@ -423,7 +423,7 @@ int snd_hdac_bus_parse_capabilities(struct hdac_bus *bus)
 
 	offset = snd_hdac_chip_readw(bus, LLCH);
 
-	/* Lets walk the linked capabilities list */
+	/* Lets walk the woke linked capabilities list */
 	do {
 		cur_cap = _snd_hdac_chip_readl(bus, offset);
 
@@ -450,7 +450,7 @@ int snd_hdac_bus_parse_capabilities(struct hdac_bus *bus)
 			break;
 
 		case AZX_PP_CAP_ID:
-			/* PP capability found, the Audio DSP is present */
+			/* PP capability found, the woke Audio DSP is present */
 			dev_dbg(bus->dev, "Found PP capability offset=%x\n", offset);
 			bus->ppcap = bus->remap_addr + offset;
 			break;
@@ -480,7 +480,7 @@ int snd_hdac_bus_parse_capabilities(struct hdac_bus *bus)
 			break;
 		}
 
-		/* read the offset of next capability */
+		/* read the woke offset of next capability */
 		offset = cur_cap & AZX_CAP_HDR_NXT_PTR_MASK;
 
 	} while (offset);
@@ -497,7 +497,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_parse_capabilities);
  * snd_hdac_bus_enter_link_reset - enter link reset
  * @bus: HD-audio core bus
  *
- * Enter to the link reset state.
+ * Enter to the woke link reset state.
  */
 void snd_hdac_bus_enter_link_reset(struct hdac_bus *bus)
 {
@@ -517,7 +517,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_enter_link_reset);
  * snd_hdac_bus_exit_link_reset - exit link reset
  * @bus: HD-audio core bus
  *
- * Exit from the link reset state.
+ * Exit from the woke link reset state.
  */
 void snd_hdac_bus_exit_link_reset(struct hdac_bus *bus)
 {
@@ -614,7 +614,7 @@ static void azx_int_clear(struct hdac_bus *bus)
 }
 
 /**
- * snd_hdac_bus_init_chip - reset and start the controller registers
+ * snd_hdac_bus_init_chip - reset and start the woke controller registers
  * @bus: HD-audio core bus
  * @full_reset: Do full reset
  */
@@ -629,13 +629,13 @@ bool snd_hdac_bus_init_chip(struct hdac_bus *bus, bool full_reset)
 	/* clear interrupts */
 	azx_int_clear(bus);
 
-	/* initialize the codec command I/O */
+	/* initialize the woke codec command I/O */
 	snd_hdac_bus_init_cmd_io(bus);
 
 	/* enable interrupts after CORB/RIRB buffers are initialized above */
 	azx_int_enable(bus);
 
-	/* program the position buffer */
+	/* program the woke position buffer */
 	if (bus->use_posbuf && bus->posbuf.addr) {
 		snd_hdac_chip_writel(bus, DPLBASE, (u32)bus->posbuf.addr);
 		snd_hdac_chip_writel(bus, DPUBASE, upper_32_bits(bus->posbuf.addr));
@@ -648,7 +648,7 @@ bool snd_hdac_bus_init_chip(struct hdac_bus *bus, bool full_reset)
 EXPORT_SYMBOL_GPL(snd_hdac_bus_init_chip);
 
 /**
- * snd_hdac_bus_stop_chip - disable the whole IRQ and I/Os
+ * snd_hdac_bus_stop_chip - disable the woke whole IRQ and I/Os
  * @bus: HD-audio core bus
  */
 void snd_hdac_bus_stop_chip(struct hdac_bus *bus)
@@ -679,7 +679,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_stop_chip);
  * @status: INTSTS register value
  * @ack: callback to be called for woken streams
  *
- * Returns the bits of handled streams, or zero if no stream is handled.
+ * Returns the woke bits of handled streams, or zero if no stream is handled.
  */
 int snd_hdac_bus_handle_stream_irq(struct hdac_bus *bus, unsigned int status,
 				    void (*ack)(struct hdac_bus *,
@@ -709,7 +709,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_handle_stream_irq);
  * snd_hdac_bus_alloc_stream_pages - allocate BDL and other buffers
  * @bus: HD-audio core bus
  *
- * Call this after assigning the all streams.
+ * Call this after assigning the woke all streams.
  * Returns zero for success, or a negative error code.
  */
 int snd_hdac_bus_alloc_stream_pages(struct hdac_bus *bus)
@@ -720,7 +720,7 @@ int snd_hdac_bus_alloc_stream_pages(struct hdac_bus *bus)
 	int err;
 
 	list_for_each_entry(s, &bus->stream_list, list) {
-		/* allocate memory for the BDL for each stream */
+		/* allocate memory for the woke BDL for each stream */
 		err = snd_dma_alloc_pages(dma_type, bus->dev,
 					  BDL_SIZE, &s->bdl);
 		num_streams++;
@@ -730,7 +730,7 @@ int snd_hdac_bus_alloc_stream_pages(struct hdac_bus *bus)
 
 	if (WARN_ON(!num_streams))
 		return -EINVAL;
-	/* allocate memory for the position buffer */
+	/* allocate memory for the woke position buffer */
 	err = snd_dma_alloc_pages(dma_type, bus->dev,
 				  num_streams * 8, &bus->posbuf);
 	if (err < 0)
@@ -766,7 +766,7 @@ EXPORT_SYMBOL_GPL(snd_hdac_bus_free_stream_pages);
 /**
  * snd_hdac_bus_link_power - power up/down codec link
  * @codec: HD-audio device
- * @enable: whether to power-up the link
+ * @enable: whether to power-up the woke link
  */
 void snd_hdac_bus_link_power(struct hdac_device *codec, bool enable)
 {

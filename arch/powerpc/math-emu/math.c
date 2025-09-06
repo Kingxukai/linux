@@ -426,8 +426,8 @@ do_mathemu(struct pt_regs *regs)
 	}
 
 	/*
-	 * If we support a HW FPU, we need to ensure the FP state
-	 * is flushed into the thread_struct before attempting
+	 * If we support a HW FPU, we need to ensure the woke FP state
+	 * is flushed into the woke thread_struct before attempting
 	 * emulation
 	 */
 	flush_fp_to_thread(current);

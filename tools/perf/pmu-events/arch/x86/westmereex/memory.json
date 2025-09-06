@@ -18,7 +18,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads that missed the LLC",
+        "BriefDescription": "Offcore data reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.ANY_LLC_MISS",
@@ -28,7 +28,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore data reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_DATA.LOCAL_DRAM",
@@ -58,7 +58,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads that missed the LLC",
+        "BriefDescription": "Offcore code reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.ANY_LLC_MISS",
@@ -68,7 +68,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore code reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_IFETCH.LOCAL_DRAM",
@@ -98,7 +98,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests that missed the LLC",
+        "BriefDescription": "Offcore requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.ANY_LLC_MISS",
@@ -108,7 +108,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_REQUEST.LOCAL_DRAM",
@@ -138,7 +138,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests that missed the LLC",
+        "BriefDescription": "Offcore RFO requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.ANY_LLC_MISS",
@@ -148,7 +148,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore RFO requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore RFO requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.ANY_RFO.LOCAL_DRAM",
@@ -178,7 +178,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks that missed the LLC",
+        "BriefDescription": "Offcore writebacks that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.ANY_LLC_MISS",
@@ -188,7 +188,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore writebacks to the local DRAM",
+        "BriefDescription": "Offcore writebacks to the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.COREWB.LOCAL_DRAM",
@@ -218,7 +218,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests that missed the LLC",
+        "BriefDescription": "Offcore code or data read requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.ANY_LLC_MISS",
@@ -228,7 +228,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore code or data read requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore code or data read requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IFETCH.LOCAL_DRAM",
@@ -268,7 +268,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the local DRAM.",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke local DRAM.",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.LOCAL_DRAM",
@@ -278,7 +278,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the remote DRAM",
+        "BriefDescription": "Offcore data reads, RFOs, and prefetches satisfied by the woke remote DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DATA_IN.REMOTE_DRAM",
@@ -298,7 +298,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests that missed the LLC",
+        "BriefDescription": "Offcore demand data requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.ANY_LLC_MISS",
@@ -308,7 +308,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore demand data requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA.LOCAL_DRAM",
@@ -338,7 +338,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads that missed the LLC",
+        "BriefDescription": "Offcore demand data reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.ANY_LLC_MISS",
@@ -348,7 +348,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand data reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore demand data reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_DATA_RD.LOCAL_DRAM",
@@ -378,7 +378,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads that missed the LLC",
+        "BriefDescription": "Offcore demand code reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.ANY_LLC_MISS",
@@ -388,7 +388,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand code reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore demand code reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_IFETCH.LOCAL_DRAM",
@@ -418,7 +418,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests that missed the LLC",
+        "BriefDescription": "Offcore demand RFO requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.ANY_LLC_MISS",
@@ -428,7 +428,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore demand RFO requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore demand RFO requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LOCAL_DRAM",
@@ -458,7 +458,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore other requests that missed the LLC",
+        "BriefDescription": "Offcore other requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.OTHER.ANY_LLC_MISS",
@@ -488,7 +488,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests that missed the LLC",
+        "BriefDescription": "Offcore prefetch data requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.ANY_LLC_MISS",
@@ -498,7 +498,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore prefetch data requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA.LOCAL_DRAM",
@@ -528,7 +528,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads that missed the LLC",
+        "BriefDescription": "Offcore prefetch data reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.ANY_LLC_MISS",
@@ -538,7 +538,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch data reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore prefetch data reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_DATA_RD.LOCAL_DRAM",
@@ -568,7 +568,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads that missed the LLC",
+        "BriefDescription": "Offcore prefetch code reads that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.ANY_LLC_MISS",
@@ -578,7 +578,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch code reads satisfied by the local DRAM",
+        "BriefDescription": "Offcore prefetch code reads satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_IFETCH.LOCAL_DRAM",
@@ -608,7 +608,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests that missed the LLC",
+        "BriefDescription": "Offcore prefetch RFO requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.ANY_LLC_MISS",
@@ -618,7 +618,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch RFO requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore prefetch RFO requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PF_RFO.LOCAL_DRAM",
@@ -648,7 +648,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests that missed the LLC",
+        "BriefDescription": "Offcore prefetch requests that missed the woke LLC",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.ANY_LLC_MISS",
@@ -658,7 +658,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Offcore prefetch requests satisfied by the local DRAM",
+        "BriefDescription": "Offcore prefetch requests satisfied by the woke local DRAM",
         "Counter": "2",
         "EventCode": "0xB7",
         "EventName": "OFFCORE_RESPONSE.PREFETCH.LOCAL_DRAM",

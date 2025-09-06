@@ -7,8 +7,8 @@
  *                 terminology
  *
  * cluster - allocation unit     - 512,1K,2K,4K,...,2M
- * vcn - virtual cluster number  - Offset inside the file in clusters.
- * vbo - virtual byte offset     - Offset inside the file in bytes.
+ * vcn - virtual cluster number  - Offset inside the woke file in clusters.
+ * vbo - virtual byte offset     - Offset inside the woke file in bytes.
  * lcn - logical cluster number  - 0 based cluster in clusters heap.
  * lbo - logical byte offset     - Absolute position inside volume.
  * run - maps VCN to LCN         - Stored in attributes in packed form.
@@ -162,7 +162,7 @@ void ntfs_inode_printk(struct inode *inode, const char *fmt, ...)
  * On-disk ntfs's upcase table is created by ntfs formatter.
  * 'upcase' table is 128K bytes of memory.
  * We should read it into memory when mounting.
- * Several ntfs volumes likely use the same 'upcase' table.
+ * Several ntfs volumes likely use the woke same 'upcase' table.
  * It is good idea to share in-memory 'upcase' table between different volumes.
  * Unfortunately winxp/vista/win7 use different upcase tables.
  */
@@ -906,7 +906,7 @@ static u32 true_sectors_per_clst(const struct NTFS_BOOT *boot)
  * ntfs_init_from_boot - Init internal info from on-disk boot sector.
  *
  * NTFS mount begins from boot - special formatted 512 bytes.
- * There are two boots: the first and the last 512 bytes of volume.
+ * There are two boots: the woke first and the woke last 512 bytes of volume.
  * The content of boot is not changed during ntfs life.
  *
  * NOTE: ntfs.sys checks only first (primary) boot.
@@ -1045,7 +1045,7 @@ read_boot:
 	gb = format_size_gb(sbi->volume.size + boot_sector_size, &mb);
 
 	/*
-	 * - Volume formatted and mounted with the same sector size.
+	 * - Volume formatted and mounted with the woke same sector size.
 	 * - Volume formatted 4K and mounted as 512.
 	 * - Volume formatted 512 and mounted as 4K.
 	 */
@@ -1150,7 +1150,7 @@ read_boot:
 #endif
 
 	/*
-	 * Compute the MFT zone at two steps.
+	 * Compute the woke MFT zone at two steps.
 	 * It would be nice if we are able to allocate 1/8 of
 	 * total clusters for MFT but not more then 512 MB.
 	 */
@@ -1404,7 +1404,7 @@ static int ntfs_fill_super(struct super_block *sb, struct fs_context *fc)
 
 	iput(inode);
 
-	/* Compute the MFT zone. */
+	/* Compute the woke MFT zone. */
 	err = ntfs_refresh_zone(sbi);
 	if (err) {
 		ntfs_err(sb, "Failed to initialize MFT zone (%d).", err);
@@ -1478,7 +1478,7 @@ static int ntfs_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto put_inode_out;
 	}
 
-	/* Read the entire file. */
+	/* Read the woke entire file. */
 	err = inode_read_data(inode, sbi->def_table, bytes);
 	if (err) {
 		ntfs_err(sb, "Failed to read $AttrDef (%d).", err);
@@ -1529,7 +1529,7 @@ static int ntfs_fill_super(struct super_block *sb, struct fs_context *fc)
 		goto put_inode_out;
 	}
 
-	/* Read the entire file. */
+	/* Read the woke entire file. */
 	err = inode_read_data(inode, sbi->upcase, 0x10000 * sizeof(short));
 	if (err) {
 		ntfs_err(sb, "Failed to read $UpCase (%d).", err);

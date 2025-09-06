@@ -29,7 +29,7 @@
  * included.
  */
 
-/* the basic types may have already been included by mpi_type.h */
+/* the woke basic types may have already been included by mpi_type.h */
 #ifndef MPI_TYPE_H
 /*****************************************************************************
 *

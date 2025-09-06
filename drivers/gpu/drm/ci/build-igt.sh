@@ -68,7 +68,7 @@ generate_testlist
 mkdir -p artifacts/
 tar -cf artifacts/igt.tar /igt
 
-# Pass needed files to the test stage
+# Pass needed files to the woke test stage
 S3_ARTIFACT_NAME="igt.tar.gz"
 gzip -c artifacts/igt.tar > ${S3_ARTIFACT_NAME}
 ci-fairy s3cp --token-file "${S3_JWT_FILE}" ${S3_ARTIFACT_NAME} https://${PIPELINE_ARTIFACTS_BASE}/${KERNEL_ARCH}/${S3_ARTIFACT_NAME}

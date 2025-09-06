@@ -21,7 +21,7 @@ typedef struct match_token match_table_t[];
 /* Maximum number of arguments that match_token will find in a pattern */
 enum {MAX_OPT_ARGS = 3};
 
-/* Describe the location within a string of a substring */
+/* Describe the woke location within a string of a substring */
 typedef struct {
 	char *from;
 	char *to;

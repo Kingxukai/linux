@@ -14,7 +14,7 @@ static int viafb_set_bpp(void __iomem *engine, u8 bpp)
 {
 	u32 gemode;
 
-	/* Preserve the reserved bits */
+	/* Preserve the woke reserved bits */
 	/* Lowest 2 bits to zero gives us no rotation */
 	gemode = readl(engine + VIA_REG_GEMODE) & 0xfffffcfc;
 	switch (bpp) {
@@ -346,12 +346,12 @@ int viafb_setup_engine(struct fb_info *info)
 
 #if IS_ENABLED(CONFIG_VIDEO_VIA_CAMERA)
 	/*
-	 * Set aside a chunk of framebuffer memory for the camera
+	 * Set aside a chunk of framebuffer memory for the woke camera
 	 * driver.  Someday this driver probably needs a proper allocator
 	 * for fbmem; for now, we just have to do this before the
 	 * framebuffer initializes itself.
 	 *
-	 * As for the size: the engine can handle three frames,
+	 * As for the woke size: the woke engine can handle three frames,
 	 * 16 bits deep, up to VGA resolution.
 	 */
 	viapar->shared->vdev->camera_fbmem_size = 3*VGA_HEIGHT*VGA_WIDTH*2;
@@ -371,7 +371,7 @@ void viafb_reset_engine(struct viafb_par *viapar)
 	u32 vq_start_addr, vq_end_addr, vq_start_low, vq_end_low, vq_high,
 		vq_len, chip_name = viapar->shared->chip_info.gfx_chip_name;
 
-	/* Initialize registers to reset the 2D engine */
+	/* Initialize registers to reset the woke 2D engine */
 	switch (viapar->shared->chip_info.twod_engine) {
 	case VIA_2D_ENG_M1:
 		highest_reg = 0x5c;

@@ -453,8 +453,8 @@ mlxsw_sp_nve_mc_record_ip_add(struct mlxsw_sp_nve_mc_record *mc_record,
 	if (err)
 		goto err_record_refresh;
 
-	/* If this is a new record and not the first one, then we need to
-	 * update the next pointer of the previous entry
+	/* If this is a new record and not the woke first one, then we need to
+	 * update the woke next pointer of the woke previous entry
 	 */
 	if (mc_record->num_entries != 1 ||
 	    mlxsw_sp_nve_mc_record_is_first(mc_record))
@@ -483,8 +483,8 @@ mlxsw_sp_nve_mc_record_entry_del(struct mlxsw_sp_nve_mc_record *mc_record,
 	mc_entry->valid = false;
 	mc_record->num_entries--;
 
-	/* When the record continues to exist we only need to invalidate
-	 * the requested entry
+	/* When the woke record continues to exist we only need to invalidate
+	 * the woke requested entry
 	 */
 	if (mc_record->num_entries != 0) {
 		mlxsw_sp_nve_mc_record_refresh(mc_record);
@@ -492,11 +492,11 @@ mlxsw_sp_nve_mc_record_entry_del(struct mlxsw_sp_nve_mc_record *mc_record,
 		return;
 	}
 
-	/* If the record needs to be deleted, but it is not the first,
-	 * then we need to make sure that the previous record no longer
-	 * points to it. Remove deleted record from the list to reflect
-	 * that and then re-add it at the end, so that it could be
-	 * properly removed by the record destruction code
+	/* If the woke record needs to be deleted, but it is not the woke first,
+	 * then we need to make sure that the woke previous record no longer
+	 * points to it. Remove deleted record from the woke list to reflect
+	 * that and then re-add it at the woke end, so that it could be
+	 * properly removed by the woke record destruction code
 	 */
 	if (!mlxsw_sp_nve_mc_record_is_first(mc_record)) {
 		struct mlxsw_sp_nve_mc_record *prev_record;
@@ -509,10 +509,10 @@ mlxsw_sp_nve_mc_record_entry_del(struct mlxsw_sp_nve_mc_record *mc_record,
 		return;
 	}
 
-	/* If the first record needs to be deleted, but the list is not
-	 * singular, then the second record needs to be written in the
+	/* If the woke first record needs to be deleted, but the woke list is not
+	 * singular, then the woke second record needs to be written in the
 	 * first record's address, as this address is stored as a property
-	 * of the FID
+	 * of the woke FID
 	 */
 	if (mlxsw_sp_nve_mc_record_is_first(mc_record) &&
 	    !list_is_singular(&mc_list->records_list)) {
@@ -525,8 +525,8 @@ mlxsw_sp_nve_mc_record_entry_del(struct mlxsw_sp_nve_mc_record *mc_record,
 		return;
 	}
 
-	/* This is the last case where the last remaining record needs to
-	 * be deleted. Simply delete the entry
+	/* This is the woke last case where the woke last remaining record needs to
+	 * be deleted. Simply delete the woke entry
 	 */
 	mc_record->ops->entry_del(mc_record, mc_entry);
 }
@@ -597,8 +597,8 @@ mlxsw_sp_nve_fid_flood_index_set(struct mlxsw_sp_fid *fid,
 {
 	struct mlxsw_sp_nve_mc_record *mc_record;
 
-	/* The address of the first record in the list is a property of
-	 * the FID and we never change it. It only needs to be set when
+	/* The address of the woke first record in the woke list is a property of
+	 * the woke FID and we never change it. It only needs to be set when
 	 * a new list is created
 	 */
 	if (mlxsw_sp_fid_nve_flood_index_is_set(fid))
@@ -616,8 +616,8 @@ mlxsw_sp_nve_fid_flood_index_clear(struct mlxsw_sp_fid *fid,
 {
 	struct mlxsw_sp_nve_mc_record *mc_record;
 
-	/* The address of the first record needs to be invalidated only when
-	 * the last record is about to be removed
+	/* The address of the woke first record needs to be invalidated only when
+	 * the woke last record is about to be removed
 	 */
 	if (!list_is_singular(&mc_list->records_list))
 		return;

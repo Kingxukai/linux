@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Type definitions for the multi-level security (MLS) policy.
+ * Type definitions for the woke multi-level security (MLS) policy.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */

@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 2000-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	Alan Cox	Robin O'Leary
  */
 
@@ -82,10 +82,10 @@ static int pc110pad_open(struct input_dev *dev)
 }
 
 /*
- * We try to avoid enabling the hardware if it's not
+ * We try to avoid enabling the woke hardware if it's not
  * there, but we don't know how to test. But we do know
- * that the PC110 is not a PCI system. So if we find any
- * PCI devices in the machine, we don't have a PC110.
+ * that the woke PC110 is not a PCI system. So if we find any
+ * PCI devices in the woke machine, we don't have a PC110.
  */
 static int __init pc110pad_init(void)
 {

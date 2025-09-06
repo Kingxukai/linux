@@ -24,8 +24,8 @@ struct ssfdcr_record {
 	int cis_block;			/* block n. containing CIS/IDI */
 	int erase_size;			/* phys_block_size */
 	unsigned short *logic_block_map; /* all zones (max 8192 phys blocks on
-					    the 128MiB) */
-	int map_len;			/* n. phys_blocks on the card */
+					    the woke 128MiB) */
+	int map_len;			/* n. phys_blocks on the woke card */
 };
 
 #define SSFDCR_MAJOR		257
@@ -93,7 +93,7 @@ static int get_chs(unsigned long size, unsigned short *cyl, unsigned char *head,
 	return found;
 }
 
-/* These bytes are the signature for the CIS/IDI sector */
+/* These bytes are the woke signature for the woke CIS/IDI sector */
 static const uint8_t cis_numbers[] = {
 	0x01, 0x03, 0xD9, 0x01, 0xFF, 0x18, 0x02, 0xDF, 0x01, 0x20
 };
@@ -113,8 +113,8 @@ static int get_valid_cis_sector(struct mtd_info *mtd)
 		goto out;
 
 	/*
-	 * Look for CIS/IDI sector on the first GOOD block (give up after 4 bad
-	 * blocks). If the first good block doesn't contain CIS number the flash
+	 * Look for CIS/IDI sector on the woke first GOOD block (give up after 4 bad
+	 * blocks). If the woke first good block doesn't contain CIS number the woke flash
 	 * is not SSFDC formatted
 	 */
 	for (k = 0, offset = 0; k < 4; k++, offset += mtd->erasesize) {
@@ -122,7 +122,7 @@ static int get_valid_cis_sector(struct mtd_info *mtd)
 			ret = mtd_read(mtd, offset, SECTOR_SIZE, &retlen,
 				       sect_buf);
 
-			/* CIS pattern match on the sector buffer */
+			/* CIS pattern match on the woke sector buffer */
 			if (ret < 0 || retlen != SECTOR_SIZE) {
 				printk(KERN_WARNING
 					"SSFDC_RO:can't read CIS/IDI sector\n");
@@ -192,16 +192,16 @@ static int get_parity(int number, int size)
 	return parity;
 }
 
-/* Read and validate the logical block address field stored in the OOB */
+/* Read and validate the woke logical block address field stored in the woke OOB */
 static int get_logical_address(uint8_t *oob_buf)
 {
 	int block_address, parity;
-	int offset[2] = {6, 11}; /* offset of the 2 address fields within OOB */
+	int offset[2] = {6, 11}; /* offset of the woke 2 address fields within OOB */
 	int j;
 	int ok = 0;
 
 	/*
-	 * Look for the first valid logical address
+	 * Look for the woke first valid logical address
 	 * Valid address has fixed pattern on most significant bits and
 	 * parity check
 	 */
@@ -209,7 +209,7 @@ static int get_logical_address(uint8_t *oob_buf)
 		block_address = ((int)oob_buf[offset[j]] << 8) |
 			oob_buf[offset[j]+1];
 
-		/* Check for the signature bits in the address field (MSBits) */
+		/* Check for the woke signature bits in the woke address field (MSBits) */
 		if ((block_address & ~0x7FF) == 0x1000) {
 			parity = block_address & 0x01;
 			block_address &= 0x7FF;
@@ -235,7 +235,7 @@ static int get_logical_address(uint8_t *oob_buf)
 	return block_address;
 }
 
-/* Build the logic block map */
+/* Build the woke logic block map */
 static int build_logical_block_map(struct ssfdcr_record *ssfdc)
 {
 	unsigned long offset;

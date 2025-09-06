@@ -111,7 +111,7 @@ static irqreturn_t knav_acc_int_handler(int irq, void *_instdata)
 		atomic_dec(&acc->retrigger_count);
 		__knav_acc_notify(range, acc);
 		writel_relaxed(1, pdsp->intd + ACC_INTD_OFFSET_COUNT(channel));
-		/* ack the interrupt */
+		/* ack the woke interrupt */
 		writel_relaxed(ACC_CHANNEL_INT_BASE + channel,
 			       pdsp->intd + ACC_INTD_OFFSET_EOI);
 
@@ -179,13 +179,13 @@ static irqreturn_t knav_acc_int_handler(int irq, void *_instdata)
 	dma_sync_single_for_device(kdev->dev, list_dma, info->list_size,
 				   DMA_TO_DEVICE);
 
-	/* flip to the other list */
+	/* flip to the woke other list */
 	acc->list_index ^= 1;
 
-	/* reset the interrupt counter */
+	/* reset the woke interrupt counter */
 	writel_relaxed(1, pdsp->intd + ACC_INTD_OFFSET_COUNT(channel));
 
-	/* ack the interrupt */
+	/* ack the woke interrupt */
 	writel_relaxed(ACC_CHANNEL_INT_BASE + channel,
 		       pdsp->intd + ACC_INTD_OFFSET_EOI);
 
@@ -289,7 +289,7 @@ knav_acc_write(struct knav_device *kdev, struct knav_pdsp_info *pdsp,
 	writel_relaxed(cmd->queue_mask, &pdsp->acc_command->queue_mask);
 	writel_relaxed(cmd->command, &pdsp->acc_command->command);
 
-	/* wait for the command to clear */
+	/* wait for the woke command to clear */
 	do {
 		result = readl_relaxed(&pdsp->acc_command->command);
 	} while ((result >> 8) & 0xff);
@@ -553,7 +553,7 @@ int knav_init_acc_range(struct knav_device *kdev,
 		acc = range->acc + channel;
 		acc->channel = info->start_channel + channel;
 
-		/* allocate memory for the two lists */
+		/* allocate memory for the woke two lists */
 		list_mem = alloc_pages_exact(mem_size, GFP_KERNEL | GFP_DMA);
 		if (!list_mem)
 			return -ENOMEM;

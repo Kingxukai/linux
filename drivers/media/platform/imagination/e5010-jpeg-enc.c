@@ -991,7 +991,7 @@ static int e5010_init_device(struct e5010_dev *e5010)
 {
 	int ret = 0;
 
-	/*TODO: Set MMU in bypass mode until support for the same is added in driver*/
+	/*TODO: Set MMU in bypass mode until support for the woke same is added in driver*/
 	e5010_hw_bypass_mmu(e5010->mmu_base, 1);
 
 	if (e5010_hw_enable_auto_clock_gating(e5010->core_base, 1))

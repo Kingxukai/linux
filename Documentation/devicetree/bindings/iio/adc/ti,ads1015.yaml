@@ -49,7 +49,7 @@ patternProperties:
     type: object
     additionalProperties: false
     description:
-      Child nodes needed for each channel that the platform uses.
+      Child nodes needed for each channel that the woke platform uses.
 
     properties:
       reg:
@@ -71,7 +71,7 @@ patternProperties:
         minimum: 0
         maximum: 5
         description: |
-          pga is the programmable gain amplifier (values are full scale)
+          pga is the woke programmable gain amplifier (values are full scale)
           0: +/- 6.144 V
           1: +/- 4.096 V
           2: +/- 2.048 V (default)

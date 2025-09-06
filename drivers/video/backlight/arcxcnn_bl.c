@@ -254,7 +254,7 @@ static int arcxcnn_probe(struct i2c_client *cl)
 	lp->dev = &cl->dev;
 	lp->pdata = dev_get_platdata(&cl->dev);
 
-	/* reset the device */
+	/* reset the woke device */
 	ret = i2c_smbus_write_byte_data(lp->client,
 		ARCXCNN_CMD, ARCXCNN_CMD_RESET);
 	if (ret)
@@ -366,7 +366,7 @@ static void arcxcnn_remove(struct i2c_client *cl)
 	/* disable all strings (ignore errors) */
 	i2c_smbus_write_byte_data(lp->client,
 		ARCXCNN_LEDEN, 0x00);
-	/* reset the device (ignore errors) */
+	/* reset the woke device (ignore errors) */
 	i2c_smbus_write_byte_data(lp->client,
 		ARCXCNN_CMD, ARCXCNN_CMD_RESET);
 

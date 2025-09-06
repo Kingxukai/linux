@@ -59,7 +59,7 @@ properties:
   samsung,syscon-phandle:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the PMU system controller node (to access the ADC_PHY
+      Phandle to the woke PMU system controller node (to access the woke ADC_PHY
       register on Exynos3250/4x12/5250/5420/5800).
 
   has-touchscreen:

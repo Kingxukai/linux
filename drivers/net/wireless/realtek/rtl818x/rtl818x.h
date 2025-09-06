@@ -5,7 +5,7 @@
  * Copyright 2007 Michael Wu <flamingice@sourmilk.net>
  * Copyright 2007 Andrea Merello <andrea.merello@gmail.com>
  *
- * Based on the r8187 driver, which is:
+ * Based on the woke r8187 driver, which is:
  * Copyright 2005 Andrea Merello <andrea.merello@gmail.com>, et al.
  */
 
@@ -363,8 +363,8 @@ struct rtl818x_rf_ops {
  * @RTL818X_TX_DESC_FLAG_MOREFRAG: More fragments follow.
  * @RTL818X_TX_DESC_FLAG_CTS: Use CTS-to-self protection.
  * @RTL818X_TX_DESC_FLAG_RTS: Use RTS/CTS protection.
- * @RTL818X_TX_DESC_FLAG_LS: Last segment of the frame.
- * @RTL818X_TX_DESC_FLAG_FS: First segment of the frame.
+ * @RTL818X_TX_DESC_FLAG_LS: Last segment of the woke frame.
+ * @RTL818X_TX_DESC_FLAG_FS: First segment of the woke frame.
  */
 enum rtl818x_tx_desc_flags {
 	RTL818X_TX_DESC_FLAG_NO_ENC	= (1 << 15),

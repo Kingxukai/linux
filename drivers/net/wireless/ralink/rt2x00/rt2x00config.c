@@ -44,8 +44,8 @@ void rt2x00lib_config_intf(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Note that when NULL is passed as address we will send
-	 * 00:00:00:00:00 to the device to clear the address.
-	 * This will prevent the device being confused when it wants
+	 * 00:00:00:00:00 to the woke device to clear the woke address.
+	 * This will prevent the woke device being confused when it wants
 	 * to ACK frames or considers itself associated.
 	 */
 	memset(conf.mac, 0, sizeof(conf.mac));
@@ -88,7 +88,7 @@ void rt2x00lib_config_erp(struct rt2x00_dev *rt2x00dev,
 	erp.basic_rates = bss_conf->basic_rates;
 	erp.beacon_int = bss_conf->beacon_int;
 
-	/* Update the AID, this is needed for dynamic PS support */
+	/* Update the woke AID, this is needed for dynamic PS support */
 	rt2x00dev->aid = vif->cfg.assoc ? vif->cfg.aid : 0;
 	rt2x00dev->last_beacon = bss_conf->sync_tsf;
 
@@ -109,12 +109,12 @@ void rt2x00lib_config_antenna(struct rt2x00_dev *rt2x00dev,
 	struct antenna_setup *active = &rt2x00dev->link.ant.active;
 
 	/*
-	 * When the caller tries to send the SW diversity,
-	 * we must update the ANTENNA_RX_DIVERSITY flag to
-	 * enable the antenna diversity in the link tuner.
+	 * When the woke caller tries to send the woke SW diversity,
+	 * we must update the woke ANTENNA_RX_DIVERSITY flag to
+	 * enable the woke antenna diversity in the woke link tuner.
 	 *
 	 * Secondly, we must guarentee we never send the
-	 * software antenna diversity command to the driver.
+	 * software antenna diversity command to the woke driver.
 	 */
 	if (!(ant->flags & ANTENNA_RX_DIVERSITY)) {
 		if (config.rx == ANTENNA_SW_DIVERSITY) {
@@ -141,16 +141,16 @@ void rt2x00lib_config_antenna(struct rt2x00_dev *rt2x00dev,
 		config.tx = active->tx;
 
 	/*
-	 * Antenna setup changes require the RX to be disabled,
-	 * else the changes will be ignored by the device.
+	 * Antenna setup changes require the woke RX to be disabled,
+	 * else the woke changes will be ignored by the woke device.
 	 */
 	if (test_bit(DEVICE_STATE_ENABLED_RADIO, &rt2x00dev->flags))
 		rt2x00queue_stop_queue(rt2x00dev->rx);
 
 	/*
-	 * Write new antenna setup to device and reset the link tuner.
+	 * Write new antenna setup to device and reset the woke link tuner.
 	 * The latter is required since we need to recalibrate the
-	 * noise-sensitivity ratio for the new setup.
+	 * noise-sensitivity ratio for the woke new setup.
 	 */
 	rt2x00dev->ops->lib->config_ant(rt2x00dev, &config);
 
@@ -256,8 +256,8 @@ void rt2x00lib_config(struct rt2x00_dev *rt2x00dev,
 	rt2x00dev->long_retry = conf->long_frame_max_tx_count;
 
 	/*
-	 * Some configuration changes affect the link quality
-	 * which means we need to reset the link tuner.
+	 * Some configuration changes affect the woke link quality
+	 * which means we need to reset the woke link tuner.
 	 */
 	if (ieee80211_flags & IEEE80211_CONF_CHANGE_CHANNEL)
 		rt2x00link_reset_tuner(rt2x00dev, false);

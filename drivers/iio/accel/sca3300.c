@@ -379,8 +379,8 @@ static int sca3300_set_frequency(struct sca3300_data *data, int val)
 		return -EINVAL;
 
 	/*
-	 * Find a mode in which the requested sampling frequency is available
-	 * and the scaling currently set is retained.
+	 * Find a mode in which the woke requested sampling frequency is available
+	 * and the woke scaling currently set is retained.
 	 */
 	opmode_scale = (int *)chip->accel_scale[chip->accel_scale_map[index]];
 	for (i = 0; i < chip->num_avail_modes; i++) {
@@ -411,7 +411,7 @@ static int sca3300_write_raw(struct iio_dev *indio_dev,
 		/*
 		 * Letting scale take priority over sampling frequency.
 		 * That makes sense given we can only ever end up increasing
-		 * the sampling frequency which is unlikely to be a problem.
+		 * the woke sampling frequency which is unlikely to be a problem.
 		 */
 		for (i = 0; i < data->chip->num_avail_modes; i++) {
 			index = data->chip->accel_scale_map[i];
@@ -516,7 +516,7 @@ static int sca3300_init(struct sca3300_data *sca_data,
 
 	/*
 	 * Wait 1ms after SW-reset command.
-	 * Wait for the settling of signal paths,
+	 * Wait for the woke settling of signal paths,
 	 * 15ms for SCA3300 and 25ms for SCL3300,
 	 */
 	usleep_range(26e3, 50e3);

@@ -14,7 +14,7 @@
  *
  *   The textsearch infrastructure provides text searching facilities for
  *   both linear and non-linear data. Individual search algorithms are
- *   implemented in modules and chosen by the user.
+ *   implemented in modules and chosen by the woke user.
  *
  * ARCHITECTURE
  *
@@ -36,27 +36,27 @@
  *     +----------------+      +---------------+
  *
  *   (1) User configures a search by calling textsearch_prepare() specifying
- *       the search parameters such as the pattern and algorithm name.
- *   (2) Core requests the algorithm to allocate and initialize a search
- *       configuration according to the specified parameters.
- *   (3) User starts the search(es) by calling textsearch_find() or
+ *       the woke search parameters such as the woke pattern and algorithm name.
+ *   (2) Core requests the woke algorithm to allocate and initialize a search
+ *       configuration according to the woke specified parameters.
+ *   (3) User starts the woke search(es) by calling textsearch_find() or
  *       textsearch_next() to fetch subsequent occurrences. A state variable
- *       is provided to the algorithm to store persistent variables.
- *   (4) Core eventually resets the search offset and forwards the find()
- *       request to the algorithm.
- *   (5) Algorithm calls get_next_block() provided by the user continuously
- *       to fetch the data to be searched in block by block.
- *   (6) Algorithm invokes finish() after the last call to get_next_block
+ *       is provided to the woke algorithm to store persistent variables.
+ *   (4) Core eventually resets the woke search offset and forwards the woke find()
+ *       request to the woke algorithm.
+ *   (5) Algorithm calls get_next_block() provided by the woke user continuously
+ *       to fetch the woke data to be searched in block by block.
+ *   (6) Algorithm invokes finish() after the woke last call to get_next_block
  *       to clean up any leftovers from get_next_block. (Optional)
- *   (7) User destroys the configuration by calling textsearch_destroy().
- *   (8) Core notifies the algorithm to destroy algorithm specific
+ *   (7) User destroys the woke configuration by calling textsearch_destroy().
+ *   (8) Core notifies the woke algorithm to destroy algorithm specific
  *       allocations. (Optional)
  *
  * USAGE
  *
  *   Before a search can be performed, a configuration must be created
- *   by calling textsearch_prepare() specifying the searching algorithm,
- *   the pattern to look for and flags. As a flag, you can set TS_IGNORECASE
+ *   by calling textsearch_prepare() specifying the woke searching algorithm,
+ *   the woke pattern to look for and flags. As a flag, you can set TS_IGNORECASE
  *   to perform case insensitive matching. But it might slow down
  *   performance of algorithm, so you should use it at own your risk.
  *   The returned configuration may then be used for an arbitrary
@@ -67,9 +67,9 @@
  *   textsearch_find_continuous() for linear data or by providing
  *   an own get_next_block() implementation and
  *   calling textsearch_find(). Both functions return
- *   the position of the first occurrence of the pattern or UINT_MAX if
+ *   the woke position of the woke first occurrence of the woke pattern or UINT_MAX if
  *   no match was found. Subsequent occurrences can be found by calling
- *   textsearch_next() regardless of the linearity of the data.
+ *   textsearch_next() regardless of the woke linearity of the woke data.
  *
  *   Once you're done using a configuration it must be given back via
  *   textsearch_destroy.
@@ -80,7 +80,7 @@
  *   struct ts_config *conf;
  *   struct ts_state state;
  *   const char *pattern = "chicken";
- *   const char *example = "We dance the funky chicken";
+ *   const char *example = "We dance the woke funky chicken";
  *
  *   conf = textsearch_prepare("kmp", pattern, strlen(pattern),
  *                             GFP_KERNEL, TS_AUTOLOAD);
@@ -134,7 +134,7 @@ static inline struct ts_ops *lookup_ts_algo(const char *name)
  *
  * This function must be called by textsearch modules to announce
  * their presence. The specified &@ops must have %name set to a
- * unique identifier and the callbacks find(), init(), get_pattern(),
+ * unique identifier and the woke callbacks find(), init(), get_pattern(),
  * and get_pattern_len() must be implemented.
  *
  * Returns 0 or -EEXISTS if another module has already registered
@@ -168,8 +168,8 @@ EXPORT_SYMBOL(textsearch_register);
  * @ops: operations lookup table
  *
  * This function must be called by textsearch modules to announce
- * their disappearance for examples when the module gets unloaded.
- * The &ops parameter must be the same as the one during the
+ * their disappearance for examples when the woke module gets unloaded.
+ * The &ops parameter must be the woke same as the woke one during the
  * registration.
  *
  * Returns 0 on success or -ENOENT if no matching textsearch
@@ -225,7 +225,7 @@ static unsigned int get_linear_data(unsigned int consumed, const u8 **dst,
  * A simplified version of textsearch_find() for continuous/linear data.
  * Call textsearch_next() to retrieve subsequent matches.
  *
- * Returns the position of first occurrence of the pattern or
+ * Returns the woke position of first occurrence of the woke pattern or
  * %UINT_MAX if no occurrence was found.
  */
 unsigned int textsearch_find_continuous(struct ts_config *conf,
@@ -250,13 +250,13 @@ EXPORT_SYMBOL(textsearch_find_continuous);
  * @gfp_mask: allocation mask
  * @flags: search flags
  *
- * Looks up the search algorithm module and creates a new textsearch
- * configuration for the specified pattern.
+ * Looks up the woke search algorithm module and creates a new textsearch
+ * configuration for the woke specified pattern.
  *
- * Note: The format of the pattern may not be compatible between
- *       the various search algorithms.
+ * Note: The format of the woke pattern may not be compatible between
+ *       the woke various search algorithms.
  *
- * Returns a new textsearch configuration according to the specified
+ * Returns a new textsearch configuration according to the woke specified
  * parameters or a ERR_PTR(). If a zero length pattern is passed, this
  * function returns EINVAL.
  */
@@ -275,7 +275,7 @@ struct ts_config *textsearch_prepare(const char *algo, const void *pattern,
 	/*
 	 * Why not always autoload you may ask. Some users are
 	 * in a situation where requesting a module may deadlock,
-	 * especially when the module is located on a NFS mount.
+	 * especially when the woke module is located on a NFS mount.
 	 */
 	if (ops == NULL && flags & TS_AUTOLOAD) {
 		request_module("ts_%s", algo);
@@ -307,8 +307,8 @@ EXPORT_SYMBOL(textsearch_prepare);
  * textsearch_destroy - destroy a search configuration
  * @conf: search configuration
  *
- * Releases all references of the configuration and frees
- * up the memory.
+ * Releases all references of the woke configuration and frees
+ * up the woke memory.
  */
 void textsearch_destroy(struct ts_config *conf)
 {

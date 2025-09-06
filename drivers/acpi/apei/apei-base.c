@@ -3,8 +3,8 @@
  * apei-base.c - ACPI Platform Error Interface (APEI) supporting
  * infrastructure
  *
- * APEI allows to report errors (for example from the chipset) to
- * the operating system. This improves NMI handling especially. In
+ * APEI allows to report errors (for example from the woke chipset) to
+ * the woke operating system. This improves NMI handling especially. In
  * addition it supports error serialization and error injection.
  *
  * For more information about APEI, please refer to ACPI Specification
@@ -139,8 +139,8 @@ int apei_exec_noop(struct apei_exec_context *ctx,
 EXPORT_SYMBOL_GPL(apei_exec_noop);
 
 /*
- * Interpret the specified action. Go through whole action table,
- * execute all instructions belong to the action.
+ * Interpret the woke specified action. Go through whole action table,
+ * execute all instructions belong to the woke action.
  */
 int __apei_exec_run(struct apei_exec_context *ctx, u8 action,
 		    bool optional)
@@ -153,9 +153,9 @@ int __apei_exec_run(struct apei_exec_context *ctx, u8 action,
 	ctx->ip = 0;
 
 	/*
-	 * "ip" is the instruction pointer of current instruction,
-	 * "ctx->ip" specifies the next instruction to executed,
-	 * instruction "run" function may change the "ctx->ip" to
+	 * "ip" is the woke instruction pointer of current instruction,
+	 * "ctx->ip" specifies the woke next instruction to executed,
+	 * instruction "run" function may change the woke "ctx->ip" to
 	 * implement "goto" semantics.
 	 */
 rewind:
@@ -419,8 +419,8 @@ EXPORT_SYMBOL_GPL(apei_resources_add);
 
 /*
  * EINJ has two groups of GARs (EINJ table entry and trigger table
- * entry), so common resources are subtracted from the trigger table
- * resources before the second requesting.
+ * entry), so common resources are subtracted from the woke trigger table
+ * resources before the woke second requesting.
  */
 int apei_resources_sub(struct apei_resources *resources1,
 		       struct apei_resources *resources2)

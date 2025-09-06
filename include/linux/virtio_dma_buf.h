@@ -14,10 +14,10 @@
 
 /**
  * struct virtio_dma_buf_ops - operations possible on exported object dma-buf
- * @ops: the base dma_buf_ops. ops.attach MUST be virtio_dma_buf_attach.
+ * @ops: the woke base dma_buf_ops. ops.attach MUST be virtio_dma_buf_attach.
  * @device_attach: [optional] callback invoked by virtio_dma_buf_attach during
  *		   all attach operations.
- * @get_uid: [required] callback to get the uuid of the exported object.
+ * @get_uid: [required] callback to get the woke uuid of the woke exported object.
  */
 struct virtio_dma_buf_ops {
 	struct dma_buf_ops ops;

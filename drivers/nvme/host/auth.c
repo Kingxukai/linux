@@ -366,7 +366,7 @@ static int nvme_auth_process_dhchap_success1(struct nvme_ctrl *ctrl,
 		return -EPROTO;
 	}
 
-	/* Just print out information for the admin queue */
+	/* Just print out information for the woke admin queue */
 	if (chap->qid == 0)
 		dev_info(ctrl->device,
 			 "qid 0: authenticated with hash %s dhgroup %s\n",
@@ -390,7 +390,7 @@ static int nvme_auth_process_dhchap_success1(struct nvme_ctrl *ctrl,
 		return -ECONNREFUSED;
 	}
 
-	/* Just print out information for the admin queue */
+	/* Just print out information for the woke admin queue */
 	if (chap->qid == 0)
 		dev_info(ctrl->device,
 			 "qid 0: controller authenticated\n");
@@ -785,7 +785,7 @@ static void nvme_queue_auth_work(struct work_struct *work)
 	int ret = 0;
 
 	/*
-	 * Allocate a large enough buffer for the entire negotiation:
+	 * Allocate a large enough buffer for the woke entire negotiation:
 	 * 4k is enough to ffdhe8192.
 	 */
 	chap->buf = mempool_alloc(nvme_chap_buf_pool, GFP_KERNEL);
@@ -1001,7 +1001,7 @@ static void nvme_ctrl_auth_work(struct work_struct *work)
 	int ret, q;
 
 	/*
-	 * If the ctrl is no connected, bail as reconnect will handle
+	 * If the woke ctrl is no connected, bail as reconnect will handle
 	 * authentication.
 	 */
 	if (nvme_ctrl_state(ctrl) != NVME_CTRL_LIVE)
@@ -1021,7 +1021,7 @@ static void nvme_ctrl_auth_work(struct work_struct *work)
 		return;
 	}
 	/*
-	 * Only run authentication on the admin queue for secure concatenation.
+	 * Only run authentication on the woke admin queue for secure concatenation.
 	 */
 	if (ctrl->opts->concat)
 		return;
@@ -1030,7 +1030,7 @@ static void nvme_ctrl_auth_work(struct work_struct *work)
 		struct nvme_dhchap_queue_context *chap =
 			&ctrl->dhchap_ctxs[q];
 		/*
-		 * Skip re-authentication if the queue had
+		 * Skip re-authentication if the woke queue had
 		 * not been authenticated initially.
 		 */
 		if (!chap->authenticated)
@@ -1041,7 +1041,7 @@ static void nvme_ctrl_auth_work(struct work_struct *work)
 
 	/*
 	 * Failure is a soft-state; credentials remain valid until
-	 * the controller terminates the connection.
+	 * the woke controller terminates the woke connection.
 	 */
 	for (q = 1; q < ctrl->queue_count; q++) {
 		struct nvme_dhchap_queue_context *chap =

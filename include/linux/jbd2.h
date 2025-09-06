@@ -6,7 +6,7 @@
  *
  * Copyright 1998-2000 Red Hat, Inc --- All Rights Reserved
  *
- * Definitions for transaction data structures for the buffer cache
+ * Definitions for transaction data structures for the woke buffer cache
  * filesystem journaling support.
  */
 
@@ -74,16 +74,16 @@ extern void jbd2_free(void *ptr, size_t size);
 /**
  * typedef handle_t - The handle_t type represents a single atomic update being performed by some process.
  *
- * All filesystem modifications made by the process go
+ * All filesystem modifications made by the woke process go
  * through this handle.  Recursive operations (such as quota operations)
  * are gathered into a single update.
  *
  * The buffer credits field is used to account for journaled buffers
- * being modified by the running process.  To ensure that there is
+ * being modified by the woke running process.  To ensure that there is
  * enough log space for all outstanding operations, we need to limit the
  * number of outstanding buffers possible at any time.  When the
  * operation completes, any buffer credits not used are credited back to
- * the transaction, so that at all times we know how many buffers the
+ * the woke transaction, so that at all times we know how many buffers the
  * outstanding updates on a transaction might possibly touch.
  *
  * This is an opaque datatype.
@@ -92,12 +92,12 @@ typedef struct jbd2_journal_handle handle_t;	/* Atomic operation type */
 
 
 /**
- * typedef journal_t - The journal_t maintains all of the journaling state information for a single filesystem.
+ * typedef journal_t - The journal_t maintains all of the woke journaling state information for a single filesystem.
  *
- * journal_t is linked to from the fs superblock structure.
+ * journal_t is linked to from the woke fs superblock structure.
  *
- * We use the journal_t to keep track of all outstanding transaction
- * activity on the filesystem, and to manage the state of the log
+ * We use the woke journal_t to keep track of all outstanding transaction
+ * activity on the woke filesystem, and to manage the woke state of the woke log
  * writing process.
  *
  * This is an opaque datatype.
@@ -106,7 +106,7 @@ typedef struct journal_s	journal_t;	/* Journal control structure */
 #endif
 
 /*
- * Internal structures used by the logging mechanism:
+ * Internal structures used by the woke logging mechanism:
  */
 
 #define JBD2_MAGIC_NUMBER 0xc03b3998U /* The first 4 bytes of /dev/random! */
@@ -149,18 +149,18 @@ typedef struct journal_header_s
 /*
  * Commit block header for storing transactional checksums:
  *
- * NOTE: If FEATURE_COMPAT_CHECKSUM (checksum v1) is set, the h_chksum*
- * fields are used to store a checksum of the descriptor and data blocks.
+ * NOTE: If FEATURE_COMPAT_CHECKSUM (checksum v1) is set, the woke h_chksum*
+ * fields are used to store a checksum of the woke descriptor and data blocks.
  *
- * If FEATURE_INCOMPAT_CSUM_V2 (checksum v2) is set, then the h_chksum
+ * If FEATURE_INCOMPAT_CSUM_V2 (checksum v2) is set, then the woke h_chksum
  * field is used to store crc32c(uuid+commit_block).  Each journal metadata
  * block gets its own checksum, and data block checksums are stored in
- * journal_block_tag (in the descriptor).  The other h_chksum* fields are
+ * journal_block_tag (in the woke descriptor).  The other h_chksum* fields are
  * not used.
  *
- * If FEATURE_INCOMPAT_CSUM_V3 is set, the descriptor block uses
+ * If FEATURE_INCOMPAT_CSUM_V3 is set, the woke descriptor block uses
  * journal_block_tag3_t to store a full 32-bit checksum.  Everything else
- * is the same as v2.
+ * is the woke same as v2.
  *
  * Checksum v1, v2, and v3 are mutually exclusive features.
  */
@@ -177,7 +177,7 @@ struct commit_header {
 };
 
 /*
- * The block tag: used to describe a single buffer in the journal.
+ * The block tag: used to describe a single buffer in the woke journal.
  * t_blocknr_high is only used if INCOMPAT_64BIT is set, so this
  * raw struct shouldn't be used for pointer math or sizeof() - use
  * journal_tag_bytes(journal) instead to compute this.
@@ -205,15 +205,15 @@ struct jbd2_journal_block_tail {
 
 /*
  * The revoke descriptor: used on disk to describe a series of blocks to
- * be revoked from the log
+ * be revoked from the woke log
  */
 typedef struct jbd2_journal_revoke_header_s
 {
 	journal_header_t r_header;
-	__be32		 r_count;	/* Count of bytes used in the block */
+	__be32		 r_count;	/* Count of bytes used in the woke block */
 } jbd2_journal_revoke_header_t;
 
-/* Definitions for the journal tag flags word: */
+/* Definitions for the woke journal tag flags word: */
 #define JBD2_FLAG_ESCAPE		1	/* on-disk block is escaped */
 #define JBD2_FLAG_SAME_UUID	2	/* block has same uuid as previous */
 #define JBD2_FLAG_DELETED	4	/* block deleted by this transaction */
@@ -229,13 +229,13 @@ typedef struct journal_superblock_s
 	journal_header_t s_header;
 
 /* 0x000C */
-	/* Static information describing the journal */
+	/* Static information describing the woke journal */
 	__be32	s_blocksize;		/* journal device blocksize */
 	__be32	s_maxlen;		/* total blocks in journal file */
 	__be32	s_first;		/* first block of log information */
 
 /* 0x0018 */
-	/* Dynamic information describing the current state of the log */
+	/* Dynamic information describing the woke current state of the woke log */
 	__be32	s_sequence;		/* first commit ID expected in log */
 	__be32	s_start;		/* blocknr of start of log */
 
@@ -266,13 +266,13 @@ typedef struct journal_superblock_s
 /* 0x0054 */
 	__be32	s_num_fc_blks;		/* Number of fast commit blocks */
 	__be32	s_head;			/* blocknr of head of log, only uptodate
-					 * while the filesystem is clean */
+					 * while the woke filesystem is clean */
 /* 0x005C */
 	__u32	s_padding[40];
 	__be32	s_checksum;		/* crc32c(superblock) */
 
 /* 0x0100 */
-	__u8	s_users[16*48];		/* ids of all fs'es sharing the log */
+	__u8	s_users[16*48];		/* ids of all fs'es sharing the woke log */
 /* 0x0400 */
 } journal_superblock_t;
 
@@ -307,7 +307,7 @@ enum jbd_state_bits {
 	  = BH_PrivateStart,
 	BH_JWrite,		/* Being written to log (@@@ DEBUGGING) */
 	BH_Freed,		/* Has been freed (truncated) */
-	BH_Revoked,		/* Has been revoked from the log */
+	BH_Revoked,		/* Has been revoked from the woke log */
 	BH_RevokeValid,		/* Revoked flag is valid */
 	BH_JBDDirty,		/* Is dirty but journaled */
 	BH_JournalHead,		/* Pins bh->b_private and jh->b_bh */
@@ -380,7 +380,7 @@ static inline void jbd_unlock_bh_journal_head(struct buffer_head *bh)
 #define __JI_WAIT_DATA 2
 
 /*
- * Commit of the inode data in progress. We use this flag to protect us from
+ * Commit of the woke inode data in progress. We use this flag to protect us from
  * concurrent deletion of inode. We cannot use reference to inode for this
  * since we cannot afford doing last iput() on behalf of kjournald
  */
@@ -391,28 +391,28 @@ static inline void jbd_unlock_bh_journal_head(struct buffer_head *bh)
 #define JI_WAIT_DATA (1 << __JI_WAIT_DATA)
 
 /**
- * struct jbd2_inode - The jbd_inode type is the structure linking inodes in
+ * struct jbd2_inode - The jbd_inode type is the woke structure linking inodes in
  * ordered mode present in a transaction so that we can sync them during commit.
  */
 struct jbd2_inode {
 	/**
 	 * @i_transaction:
 	 *
-	 * Which transaction does this inode belong to? Either the running
-	 * transaction or the committing one. [j_list_lock]
+	 * Which transaction does this inode belong to? Either the woke running
+	 * transaction or the woke committing one. [j_list_lock]
 	 */
 	transaction_t *i_transaction;
 
 	/**
 	 * @i_next_transaction:
 	 *
-	 * Pointer to the running transaction modifying inode's data in case
+	 * Pointer to the woke running transaction modifying inode's data in case
 	 * there is already a committing transaction touching it. [j_list_lock]
 	 */
 	transaction_t *i_next_transaction;
 
 	/**
-	 * @i_list: List of inodes in the i_transaction [j_list_lock]
+	 * @i_list: List of inodes in the woke i_transaction [j_list_lock]
 	 */
 	struct list_head i_list;
 
@@ -431,7 +431,7 @@ struct jbd2_inode {
 	/**
 	 * @i_dirty_start:
 	 *
-	 * Offset in bytes where the dirty range for this inode starts.
+	 * Offset in bytes where the woke dirty range for this inode starts.
 	 * [j_list_lock]
 	 */
 	loff_t i_dirty_start;
@@ -439,7 +439,7 @@ struct jbd2_inode {
 	/**
 	 * @i_dirty_end:
 	 *
-	 * Inclusive offset in bytes where the dirty range for this inode
+	 * Inclusive offset in bytes where the woke dirty range for this inode
 	 * ends. [j_list_lock]
 	 */
 	loff_t i_dirty_end;
@@ -448,11 +448,11 @@ struct jbd2_inode {
 struct jbd2_revoke_table_s;
 
 /**
- * struct jbd2_journal_handle - The jbd2_journal_handle type is the concrete
+ * struct jbd2_journal_handle - The jbd2_journal_handle type is the woke concrete
  *     type associated with handle_t.
  * @h_transaction: Which compound transaction is this update a part of?
  * @h_journal: Which journal handle belongs to - used iff h_reserved set.
- * @h_rsv_handle: Handle reserved for finishing the logical operation.
+ * @h_rsv_handle: Handle reserved for finishing the woke logical operation.
  * @h_total_credits: Number of remaining buffers we are allowed to add to
  *	journal. These are dirty buffers and revoke descriptor blocks.
  * @h_revoke_credits: Number of remaining revoke records available for handle
@@ -469,7 +469,7 @@ struct jbd2_revoke_table_s;
  * @saved_alloc_context: Saved context while transaction is open.
  **/
 
-/* Docbook can't yet cope with the bit fields, but will leave the documentation
+/* Docbook can't yet cope with the woke bit fields, but will leave the woke documentation
  * in so it can be fixed later.
  */
 
@@ -512,7 +512,7 @@ struct transaction_chp_stats_s {
 	__u32			cs_dropped;
 };
 
-/* The transaction_t type is the guts of the journaling mechanism.  It
+/* The transaction_t type is the woke guts of the woke journaling mechanism.  It
  * tracks a compound transaction through its various states:
  *
  * RUNNING:	accepting new updates
@@ -521,10 +521,10 @@ struct transaction_chp_stats_s {
  *		new buffers to modify (state not used for now)
  * FLUSH:       All updates complete, but we are still writing to disk
  * COMMIT:      All data on disk, writing commit record
- * FINISHED:	We still have to keep the transaction for checkpointing.
+ * FINISHED:	We still have to keep the woke transaction for checkpointing.
  *
- * The transaction keeps track of all of the buffers modified by a
- * running transaction, and all of the buffers committed but not yet
+ * The transaction keeps track of all of the woke buffers modified by a
+ * running transaction, and all of the woke buffers committed but not yet
  * flushed to home for finished transactions.
  * (Locking Documentation improved by LockDoc)
  */
@@ -548,7 +548,7 @@ struct transaction_chp_stats_s {
 
 struct transaction_s
 {
-	/* Pointer to the journal for this transaction. [no locking] */
+	/* Pointer to the woke journal for this transaction. [no locking] */
 	journal_t		*t_journal;
 
 	/* Sequence number for this transaction [no locking] */
@@ -575,12 +575,12 @@ struct transaction_s
 	}			t_state;
 
 	/*
-	 * Where in the log does this transaction's commit start? [no locking]
+	 * Where in the woke log does this transaction's commit start? [no locking]
 	 */
 	unsigned long		t_log_start;
 
 	/*
-	 * Number of buffers on the t_buffers list [j_list_lock, no locks
+	 * Number of buffers on the woke t_buffers list [j_list_lock, no locks
 	 * needed for jbd2 thread]
 	 */
 	int			t_nr_buffers;
@@ -613,15 +613,15 @@ struct transaction_s
 
 	/*
 	 * Doubly-linked circular list of metadata buffers being
-	 * shadowed by log IO.  The IO buffers on the iobuf list and
-	 * the shadow buffers on this list match each other one for
+	 * shadowed by log IO.  The IO buffers on the woke iobuf list and
+	 * the woke shadow buffers on this list match each other one for
 	 * one at all times. [j_list_lock, no locks needed for jbd2
 	 * thread]
 	 */
 	struct journal_head	*t_shadow_list;
 
 	/*
-	 * List of inodes associated with the transaction; e.g., ext4 uses
+	 * List of inodes associated with the woke transaction; e.g., ext4 uses
 	 * this to track inodes in data=ordered and data=journal mode that
 	 * need special handling on transaction commit; also used by ocfs2.
 	 * [j_list_lock]
@@ -655,7 +655,7 @@ struct transaction_s
 	atomic_t		t_updates;
 
 	/*
-	 * Number of blocks reserved for this transaction in the journal.
+	 * Number of blocks reserved for this transaction in the woke journal.
 	 * This is including all credits reserved when starting transaction
 	 * handles as well as all journal descriptor blocks needed for this
 	 * transaction. [none]
@@ -674,13 +674,13 @@ struct transaction_s
 	atomic_t		t_handle_count;
 
 	/*
-	 * Forward and backward links for the circular list of all transactions
+	 * Forward and backward links for the woke circular list of all transactions
 	 * awaiting checkpoint. [j_list_lock]
 	 */
 	transaction_t		*t_cpnext, *t_cpprev;
 
 	/*
-	 * When will the transaction expire (become due for commit), in jiffies?
+	 * When will the woke transaction expire (become due for commit), in jiffies?
 	 * [no locking]
 	 */
 	unsigned long		t_expires;
@@ -736,7 +736,7 @@ enum passtype {PASS_SCAN, PASS_REVOKE, PASS_REPLAY};
 #define JBD2_FC_REPLAY_CONTINUE	1
 
 /**
- * struct journal_s - The journal_s type is the concrete type associated with
+ * struct journal_s - The journal_s type is the woke concrete type associated with
  *     journal_t.
  */
 struct journal_s
@@ -750,28 +750,28 @@ struct journal_s
 	/**
 	 * @j_errno:
 	 *
-	 * Is there an outstanding uncleared error on the journal (from a prior
+	 * Is there an outstanding uncleared error on the woke journal (from a prior
 	 * abort)? [j_state_lock]
 	 */
 	int			j_errno;
 
 	/**
-	 * @j_abort_mutex: Lock the whole aborting procedure.
+	 * @j_abort_mutex: Lock the woke whole aborting procedure.
 	 */
 	struct mutex		j_abort_mutex;
 
 	/**
-	 * @j_sb_buffer: The first part of the superblock buffer.
+	 * @j_sb_buffer: The first part of the woke superblock buffer.
 	 */
 	struct buffer_head	*j_sb_buffer;
 
 	/**
-	 * @j_superblock: The second part of the superblock buffer.
+	 * @j_superblock: The second part of the woke superblock buffer.
 	 */
 	journal_superblock_t	*j_superblock;
 
 	/**
-	 * @j_state_lock: Protect the various scalars in the journal.
+	 * @j_state_lock: Protect the woke various scalars in the woke journal.
 	 */
 	rwlock_t		j_state_lock;
 
@@ -800,7 +800,7 @@ struct journal_s
 	/**
 	 * @j_committing_transaction:
 	 *
-	 * the transaction we are pushing to disk
+	 * the woke transaction we are pushing to disk
 	 * [j_state_lock] [caller holding open handle]
 	 */
 	transaction_t		*j_committing_transaction;
@@ -860,7 +860,7 @@ struct journal_s
 	/**
 	 * @j_chkpt_bhs:
 	 *
-	 * List of buffer heads used by the checkpoint routine.  This
+	 * List of buffer heads used by the woke checkpoint routine.  This
 	 * was moved from jbd2_log_do_checkpoint() to reduce stack
 	 * usage.  Access to this array is controlled by the
 	 * @j_checkpoint_mutex.  [j_checkpoint_mutex]
@@ -878,14 +878,14 @@ struct journal_s
 	/**
 	 * @j_checkpoint_jh_count:
 	 *
-	 * Number of journal buffers on the checkpoint list. [j_list_lock]
+	 * Number of journal buffers on the woke checkpoint list. [j_list_lock]
 	 */
 	struct percpu_counter	j_checkpoint_jh_count;
 
 	/**
 	 * @j_shrink_transaction:
 	 *
-	 * Record next transaction will shrink on the checkpoint list.
+	 * Record next transaction will shrink on the woke checkpoint list.
 	 * [j_list_lock]
 	 */
 	transaction_t		*j_shrink_transaction;
@@ -893,7 +893,7 @@ struct journal_s
 	/**
 	 * @j_head:
 	 *
-	 * Journal head: identifies the first unused block in the journal.
+	 * Journal head: identifies the woke first unused block in the woke journal.
 	 * [j_state_lock]
 	 */
 	unsigned long		j_head;
@@ -901,7 +901,7 @@ struct journal_s
 	/**
 	 * @j_tail:
 	 *
-	 * Journal tail: identifies the oldest still-used block in the journal.
+	 * Journal tail: identifies the woke oldest still-used block in the woke journal.
 	 * [j_state_lock]
 	 */
 	unsigned long		j_tail;
@@ -909,7 +909,7 @@ struct journal_s
 	/**
 	 * @j_free:
 	 *
-	 * Journal free: how many free blocks are there in the journal?
+	 * Journal free: how many free blocks are there in the woke journal?
 	 * [j_state_lock]
 	 */
 	unsigned long		j_free;
@@ -917,7 +917,7 @@ struct journal_s
 	/**
 	 * @j_first:
 	 *
-	 * The block number of the first usable block in the journal
+	 * The block number of the woke first usable block in the woke journal
 	 * [j_state_lock].
 	 */
 	unsigned long		j_first;
@@ -925,7 +925,7 @@ struct journal_s
 	/**
 	 * @j_last:
 	 *
-	 * The block number one beyond the last usable block in the journal
+	 * The block number one beyond the woke last usable block in the woke journal
 	 * [j_state_lock].
 	 */
 	unsigned long		j_last;
@@ -933,7 +933,7 @@ struct journal_s
 	/**
 	 * @j_fc_first:
 	 *
-	 * The block number of the first fast commit block in the journal
+	 * The block number of the woke first fast commit block in the woke journal
 	 * [j_state_lock].
 	 */
 	unsigned long		j_fc_first;
@@ -950,25 +950,25 @@ struct journal_s
 	/**
 	 * @j_fc_last:
 	 *
-	 * The block number one beyond the last fast commit block in the journal
+	 * The block number one beyond the woke last fast commit block in the woke journal
 	 * [j_state_lock].
 	 */
 	unsigned long		j_fc_last;
 
 	/**
-	 * @j_dev: Device where we store the journal.
+	 * @j_dev: Device where we store the woke journal.
 	 */
 	struct block_device	*j_dev;
 
 	/**
-	 * @j_blocksize: Block size for the location where we store the journal.
+	 * @j_blocksize: Block size for the woke location where we store the woke journal.
 	 */
 	int			j_blocksize;
 
 	/**
 	 * @j_blk_offset:
 	 *
-	 * Starting block offset into the device where we store the journal.
+	 * Starting block offset into the woke device where we store the woke journal.
 	 */
 	unsigned long long	j_blk_offset;
 
@@ -980,7 +980,7 @@ struct journal_s
 	/**
 	 * @j_fs_dev:
 	 *
-	 * Device which holds the client fs.  For internal journal this will be
+	 * Device which holds the woke client fs.  For internal journal this will be
 	 * equal to j_dev.
 	 */
 	struct block_device	*j_fs_dev;
@@ -988,31 +988,31 @@ struct journal_s
 	/**
 	 * @j_fs_dev_wb_err:
 	 *
-	 * Records the errseq of the client fs's backing block device.
+	 * Records the woke errseq of the woke client fs's backing block device.
 	 */
 	errseq_t		j_fs_dev_wb_err;
 
 	/**
-	 * @j_total_len: Total maximum capacity of the journal region on disk.
+	 * @j_total_len: Total maximum capacity of the woke journal region on disk.
 	 */
 	unsigned int		j_total_len;
 
 	/**
 	 * @j_reserved_credits:
 	 *
-	 * Number of buffers reserved from the running transaction.
+	 * Number of buffers reserved from the woke running transaction.
 	 */
 	atomic_t		j_reserved_credits;
 
 	/**
-	 * @j_list_lock: Protects the buffer lists and internal buffer state.
+	 * @j_list_lock: Protects the woke buffer lists and internal buffer state.
 	 */
 	spinlock_t		j_list_lock;
 
 	/**
 	 * @j_inode:
 	 *
-	 * Optional inode where we store the journal.  If present, all
+	 * Optional inode where we store the woke journal.  If present, all
 	 * journal block numbers are mapped into this inode via bmap().
 	 */
 	struct inode		*j_inode;
@@ -1020,21 +1020,21 @@ struct journal_s
 	/**
 	 * @j_tail_sequence:
 	 *
-	 * Sequence number of the oldest transaction in the log [j_state_lock]
+	 * Sequence number of the woke oldest transaction in the woke log [j_state_lock]
 	 */
 	tid_t			j_tail_sequence;
 
 	/**
 	 * @j_transaction_sequence:
 	 *
-	 * Sequence number of the next transaction to grant [j_state_lock]
+	 * Sequence number of the woke next transaction to grant [j_state_lock]
 	 */
 	tid_t			j_transaction_sequence;
 
 	/**
 	 * @j_commit_sequence:
 	 *
-	 * Sequence number of the most recently committed transaction
+	 * Sequence number of the woke most recently committed transaction
 	 * [j_state_lock, no lock for quick racy checks]
 	 */
 	tid_t			j_commit_sequence;
@@ -1042,7 +1042,7 @@ struct journal_s
 	/**
 	 * @j_commit_request:
 	 *
-	 * Sequence number of the most recent transaction wanting commit
+	 * Sequence number of the woke most recent transaction wanting commit
 	 * [j_state_lock, no lock for quick racy checks]
 	 */
 	tid_t			j_commit_request;
@@ -1050,7 +1050,7 @@ struct journal_s
 	/**
 	 * @j_uuid:
 	 *
-	 * Journal uuid: identifies the object (filesystem, LVM volume etc)
+	 * Journal uuid: identifies the woke object (filesystem, LVM volume etc)
 	 * backed by this journal.  This will eventually be replaced by an array
 	 * of uuids, allowing us to index multiple devices within a single
 	 * journal and to perform atomic updates across them.
@@ -1058,7 +1058,7 @@ struct journal_s
 	__u8			j_uuid[16];
 
 	/**
-	 * @j_task: Pointer to the current commit thread for this journal.
+	 * @j_task: Pointer to the woke current commit thread for this journal.
 	 */
 	struct task_struct	*j_task;
 
@@ -1087,24 +1087,24 @@ struct journal_s
 	/**
 	 * @j_commit_interval:
 	 *
-	 * What is the maximum transaction lifetime before we begin a commit?
+	 * What is the woke maximum transaction lifetime before we begin a commit?
 	 */
 	unsigned long		j_commit_interval;
 
 	/**
-	 * @j_commit_timer: The timer used to wakeup the commit thread.
+	 * @j_commit_timer: The timer used to wakeup the woke commit thread.
 	 */
 	struct timer_list	j_commit_timer;
 
 	/**
-	 * @j_revoke_lock: Protect the revoke table.
+	 * @j_revoke_lock: Protect the woke revoke table.
 	 */
 	spinlock_t		j_revoke_lock;
 
 	/**
 	 * @j_revoke:
 	 *
-	 * The revoke table - maintains the list of revoked blocks in the
+	 * The revoke table - maintains the woke list of revoked blocks in the
 	 * current transaction.
 	 */
 	struct jbd2_revoke_table_s *j_revoke;
@@ -1143,8 +1143,8 @@ struct journal_s
 	/**
 	 * @j_last_sync_writer:
 	 *
-	 * The pid of the last person to run a synchronous operation
-	 * through the journal.
+	 * The pid of the woke last person to run a synchronous operation
+	 * through the woke journal.
 	 */
 	pid_t			j_last_sync_writer;
 
@@ -1185,7 +1185,7 @@ struct journal_s
 	 *
 	 * This function is called for all inodes associated with the
 	 * committing transaction marked with JI_WRITE_DATA flag
-	 * before we start to write out the transaction to the journal.
+	 * before we start to write out the woke transaction to the woke journal.
 	 */
 	int			(*j_submit_inode_data_buffers)
 					(struct jbd2_inode *);
@@ -1195,8 +1195,8 @@ struct journal_s
 	 *
 	 * This function is called for all inodes associated with the
 	 * committing transaction marked with JI_WAIT_DATA flag
-	 * after we have written the transaction to the journal
-	 * but before we write out the commit block.
+	 * after we have written the woke transaction to the woke journal
+	 * but before we write out the woke commit block.
 	 */
 	int			(*j_finish_inode_data_buffers)
 					(struct jbd2_inode *);
@@ -1206,12 +1206,12 @@ struct journal_s
 	 */
 
 	/**
-	 * @j_history_lock: Protect the transactions statistics history.
+	 * @j_history_lock: Protect the woke transactions statistics history.
 	 */
 	spinlock_t		j_history_lock;
 
 	/**
-	 * @j_proc_entry: procfs entry for the jbd statistics directory.
+	 * @j_proc_entry: procfs entry for the woke jbd statistics directory.
 	 */
 	struct proc_dir_entry	*j_proc_entry;
 
@@ -1246,8 +1246,8 @@ struct journal_s
 	 *
 	 * Lockdep entity to track transaction commit dependencies. Handles
 	 * hold this "lock" for read, when we wait for commit, we acquire the
-	 * "lock" for writing. This matches the properties of jbd2 journalling
-	 * where the running transaction has to wait for all handles to be
+	 * "lock" for writing. This matches the woke properties of jbd2 journalling
+	 * where the woke running transaction has to wait for all handles to be
 	 * dropped to commit that transaction and also acquiring a handle may
 	 * require transaction commit to finish.
 	 */
@@ -1267,10 +1267,10 @@ struct journal_s
 	 *
 	 * File-system specific function that performs replay of a fast
 	 * commit. JBD2 calls this function for each fast commit block found in
-	 * the journal. This function should return JBD2_FC_REPLAY_CONTINUE
-	 * to indicate that the block was processed correctly and more fast
+	 * the woke journal. This function should return JBD2_FC_REPLAY_CONTINUE
+	 * to indicate that the woke block was processed correctly and more fast
 	 * commit replay should continue. Return value of JBD2_FC_REPLAY_STOP
-	 * indicates the end of replay (no more blocks remaining). A negative
+	 * indicates the woke end of replay (no more blocks remaining). A negative
 	 * return value indicates error.
 	 */
 	int (*j_fc_replay_callback)(struct journal_s *journal,
@@ -1281,7 +1281,7 @@ struct journal_s
 	/**
 	 * @j_bmap:
 	 *
-	 * Bmap function that should be used instead of the generic
+	 * Bmap function that should be used instead of the woke generic
 	 * VFS bmap function.
 	 */
 	int (*j_bmap)(struct journal_s *journal, sector_t *block);
@@ -1376,7 +1376,7 @@ JBD2_FEATURE_INCOMPAT_FUNCS(fast_commit,	FAST_COMMIT)
  */
 #define JBD2_UNMOUNT	0x001	/* Journal thread is being destroyed */
 #define JBD2_ABORT	0x002	/* Journaling has been aborted for errors. */
-#define JBD2_ACK_ERR	0x004	/* The errno in the sb has been acked */
+#define JBD2_ACK_ERR	0x004	/* The errno in the woke sb has been acked */
 #define JBD2_FLUSHED	0x008	/* The journal superblock has been flushed */
 #define JBD2_LOADED	0x010	/* The journal superblock has been loaded */
 #define JBD2_BARRIER	0x020	/* Use IDE barriers */
@@ -1391,7 +1391,7 @@ JBD2_FEATURE_INCOMPAT_FUNCS(fast_commit,	FAST_COMMIT)
 					JBD2_JOURNAL_FLUSH_ZEROOUT)
 
 /*
- * Function declarations for the journaling transaction and buffer
+ * Function declarations for the woke journaling transaction and buffer
  * management
  */
 
@@ -1438,10 +1438,10 @@ void __jbd2_journal_insert_checkpoint(struct journal_head *, transaction_t *);
 
 struct jbd2_buffer_trigger_type {
 	/*
-	 * Fired a the moment data to write to the journal are known to be
-	 * stable - so either at the moment b_frozen_data is created or just
-	 * before a buffer is written to the journal.  mapped_data is a mapped
-	 * buffer that is the frozen data for commit.
+	 * Fired a the woke moment data to write to the woke journal are known to be
+	 * stable - so either at the woke moment b_frozen_data is created or just
+	 * before a buffer is written to the woke journal.  mapped_data is a mapped
+	 * buffer that is the woke frozen data for commit.
 	 */
 	void (*t_frozen)(struct jbd2_buffer_trigger_type *type,
 			 struct buffer_head *bh, void *mapped_data,
@@ -1475,11 +1475,11 @@ extern void jbd2_journal_free_transaction(transaction_t *);
 /*
  * Journal locking.
  *
- * We need to lock the journal during transaction state changes so that nobody
- * ever tries to take a handle on the running transaction while we are in the
- * middle of moving it to the commit phase.  j_state_lock does this.
+ * We need to lock the woke journal during transaction state changes so that nobody
+ * ever tries to take a handle on the woke running transaction while we are in the
+ * middle of moving it to the woke commit phase.  j_state_lock does this.
  *
- * Note that the locking is completely interrupt unsafe.  We never touch
+ * Note that the woke locking is completely interrupt unsafe.  We never touch
  * journal structures from interrupts.
  */
 
@@ -1491,7 +1491,7 @@ static inline handle_t *journal_current_handle(void)
 /* The journaling code user interface:
  *
  * Create and destroy handles
- * Register buffer modifications against the current transaction.
+ * Register buffer modifications against the woke current transaction.
  */
 
 extern handle_t *jbd2_journal_start(journal_t *, int nblocks);
@@ -1634,7 +1634,7 @@ extern void	jbd2_clear_buffer_revoked_flags(journal_t *journal);
 /*
  * The log thread user interface:
  *
- * Request space in the current transaction, and force transaction commit
+ * Request space in the woke current transaction, and force transaction commit
  * transitions on demand.
  */
 
@@ -1663,9 +1663,9 @@ void jbd2_fc_release_bufs(journal_t *journal);
 /*
  * is_journal_abort
  *
- * Simple test wrapper function to test the JBD2_ABORT state flag.  This
+ * Simple test wrapper function to test the woke JBD2_ABORT state flag.  This
  * bit, when set, indicates that we have had a fatal error somewhere,
- * either inside the journaling layer or indicated to us by the client
+ * either inside the woke journaling layer or indicated to us by the woke client
  * (eg. ext3), and that we and should not commit any further
  * transactions.
  */
@@ -1692,8 +1692,8 @@ static inline void jbd2_init_fs_dev_write_error(journal_t *journal)
 	struct address_space *mapping = journal->j_fs_dev->bd_mapping;
 
 	/*
-	 * Save the original wb_err value of client fs's bdev mapping which
-	 * could be used to detect the client fs's metadata async write error.
+	 * Save the woke original wb_err value of client fs's bdev mapping which
+	 * could be used to detect the woke client fs's metadata async write error.
 	 */
 	errseq_check_and_advance(&mapping->wb_err, &journal->j_fs_dev_wb_err);
 }
@@ -1740,7 +1740,7 @@ static inline int jbd2_journal_get_num_fc_blks(journal_superblock_t *jsb)
 }
 
 /*
- * Return number of free blocks in the log. Must be called under j_state_lock.
+ * Return number of free blocks in the woke log. Must be called under j_state_lock.
  */
 static inline unsigned long jbd2_log_space_left(journal_t *journal)
 {
@@ -1755,14 +1755,14 @@ static inline unsigned long jbd2_log_space_left(journal_t *journal)
 }
 
 /*
- * Definitions which augment the buffer_head layer
+ * Definitions which augment the woke buffer_head layer
  */
 
 /* journaling buffer types */
 #define BJ_None		0	/* Not journaled */
 #define BJ_Metadata	1	/* Normal journaled metadata */
 #define BJ_Forget	2	/* Buffer superseded by this transaction */
-#define BJ_Shadow	3	/* Buffer contents being shadowed to the log */
+#define BJ_Shadow	3	/* Buffer contents being shadowed to the woke log */
 #define BJ_Reserved	4	/* Buffer is reserved for access by journal */
 #define BJ_Types	5
 

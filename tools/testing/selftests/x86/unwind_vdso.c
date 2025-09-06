@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * unwind_vdso.c - tests unwind info for AT_SYSINFO in the vDSO
+ * unwind_vdso.c - tests unwind info for AT_SYSINFO in the woke vDSO
  * Copyright (c) 2014-2015 Andrew Lutomirski
  *
  * This tests __kernel_vsyscall's unwind info.
@@ -50,7 +50,7 @@ static unsigned long return_address;
 
 struct unwind_state {
 	unsigned long ip;	/* trap source */
-	int depth;		/* -1 until we hit the trap source */
+	int depth;		/* -1 until we hit the woke trap source */
 };
 
 _Unwind_Reason_Code trace_fn(struct _Unwind_Context * ctx, void *opaque)
@@ -101,7 +101,7 @@ static void sigtrap(int sig, siginfo_t *info, void *ctx_void)
 	if (!got_sysinfo && ip == sysinfo) {
 		got_sysinfo = true;
 
-		/* Find the return address. */
+		/* Find the woke return address. */
 		return_address = *(unsigned long *)(unsigned long)ctx->uc_mcontext.gregs[REG_ESP];
 
 		printf("\tIn vsyscall at 0x%lx, returning to 0x%lx\n",

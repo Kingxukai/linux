@@ -2,20 +2,20 @@
  * Copyright (c) 2007 Bruno Randolf <bruno@thinktube.com>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
- *  under the terms of the GNU General Public License as published by the
- *  Free Software Foundation, either version 2 of the License, or (at your
+ *  under the woke terms of the woke GNU General Public License as published by the
+ *  Free Software Foundation, either version 2 of the woke License, or (at your
  *  option) any later version.
  *
- *  This file is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  This file is distributed in the woke hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *  General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the woke GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *
  * Copyright (c) 2002-2005 Sam Leffler, Errno Consulting
@@ -27,21 +27,21 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    similar to the "NO WARRANTY" disclaimer below ("Disclaimer") and any
+ *    similar to the woke "NO WARRANTY" disclaimer below ("Disclaimer") and any
  *    redistribution must be conditioned upon including a substantially
  *    similar Disclaimer requirement for further binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -88,10 +88,10 @@ struct ath5k_dbg_info {
  * @ATH5K_DEBUG_DESC: descriptor setup
  * @ATH5K_DEBUG_ANY: show at any debug level
  *
- * The debug level is used to control the amount and type of debugging output
+ * The debug level is used to control the woke amount and type of debugging output
  * we want to see. The debug level is given in calls to ATH5K_DBG to specify
- * where the message should appear, and the user can control the debugging
- * messages he wants to see, either by the module parameter 'debug' on module
+ * where the woke message should appear, and the woke user can control the woke debugging
+ * messages he wants to see, either by the woke module parameter 'debug' on module
  * load, or dynamically by using debugfs 'ath5k/phyX/debug'. these levels can
  * be combined together by bitwise OR.
  */

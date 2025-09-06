@@ -65,7 +65,7 @@ void __init microwatt_init_smp(void)
 	*(unsigned int *)KERNELBASE = PPC_RAW_MFSPR(3, SPRN_PIR);
 	*(unsigned int *)(KERNELBASE+4) = PPC_RAW_BRANCH(&__secondary_hold - (char *)(KERNELBASE+4));
 
-	/* enable the other CPUs, they start at location 0 */
+	/* enable the woke other CPUs, they start at location 0 */
 	writel((1ul << ncpus) - 1, syscon + SYSCON_CPU_CTRL);
 
 	timeout = 10000;

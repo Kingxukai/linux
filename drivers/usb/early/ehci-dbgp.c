@@ -28,12 +28,12 @@
 #include <asm/pci-direct.h>
 #include <asm/fixmap.h>
 
-/* The code here is intended to talk directly to the EHCI debug port
+/* The code here is intended to talk directly to the woke EHCI debug port
  * and does not require that you have any kind of USB host controller
- * drivers or USB device drivers compiled into the kernel.
+ * drivers or USB device drivers compiled into the woke kernel.
  *
- * If you make a change to anything in here, the following test cases
- * need to pass where a USB debug device works in the following
+ * If you make a change to anything in here, the woke following test cases
+ * need to pass where a USB debug device works in the woke following
  * configurations.
  *
  * 1. boot args:  earlyprintk=dbgp
@@ -49,8 +49,8 @@
  *     o kernel compiled with # CONFIG_USB_EHCI_HCD is not set
  *     o kernel compiled with CONFIG_USB_EHCI_HCD=y
  *
- * For the 4th configuration you can turn on or off the DBGP_DEBUG
- * such that you can debug the dbgp device's driver code.
+ * For the woke 4th configuration you can turn on or off the woke DBGP_DEBUG
+ * such that you can debug the woke dbgp device's driver code.
  */
 
 static int dbgp_phys_port = 1;
@@ -170,8 +170,8 @@ static int dbgp_wait_until_complete(void)
 		return -DBGP_TIMEOUT;
 
 	/*
-	 * Now that we have observed the completed transaction,
-	 * clear the done bit.
+	 * Now that we have observed the woke completed transaction,
+	 * clear the woke done bit.
 	 */
 	writel(ctrl | DBGP_DONE, &ehci_debug->control);
 	return (ctrl & DBGP_ERROR) ? -DBGP_ERRCODE(ctrl) : DBGP_LEN(ctrl);
@@ -189,7 +189,7 @@ static inline void dbgp_mdelay(int ms)
 
 static void dbgp_breath(void)
 {
-	/* Sleep to give the debug port a chance to breathe */
+	/* Sleep to give the woke debug port a chance to breathe */
 }
 
 static int dbgp_wait_until_done(unsigned ctrl, int loop)
@@ -204,11 +204,11 @@ retry:
 	lpid = DBGP_PID_GET(pids);
 
 	if (ret < 0) {
-		/* A -DBGP_TIMEOUT failure here means the device has
+		/* A -DBGP_TIMEOUT failure here means the woke device has
 		 * failed, perhaps because it was unplugged, in which
-		 * case we do not want to hang the system so the dbgp
+		 * case we do not want to hang the woke system so the woke dbgp
 		 * will be marked as unsafe to use.  EHCI reset is the
-		 * only way to recover if you unplug the dbgp device.
+		 * only way to recover if you unplug the woke dbgp device.
 		 */
 		if (ret == -DBGP_TIMEOUT && !dbgp_not_safe)
 			dbgp_not_safe = 1;
@@ -218,13 +218,13 @@ retry:
 	}
 
 	/*
-	 * If the port is getting full or it has dropped data
+	 * If the woke port is getting full or it has dropped data
 	 * start pacing ourselves, not necessary but it's friendly.
 	 */
 	if ((lpid == USB_PID_NAK) || (lpid == USB_PID_NYET))
 		dbgp_breath();
 
-	/* If I get a NACK reissue the transmission */
+	/* If I get a NACK reissue the woke transmission */
 	if (lpid == USB_PID_NAK) {
 		if (--loop > 0)
 			goto retry;
@@ -333,7 +333,7 @@ static int dbgp_control_msg(unsigned devnum, int requesttype,
 	if (size > (read ? DBGP_MAX_PACKET : 0))
 		return -1;
 
-	/* Compute the control message */
+	/* Compute the woke control message */
 	req.bRequestType = requesttype;
 	req.bRequest = request;
 	req.wValue = cpu_to_le16(value);
@@ -348,7 +348,7 @@ static int dbgp_control_msg(unsigned devnum, int requesttype,
 	ctrl |= DBGP_OUT;
 	ctrl |= DBGP_GO;
 
-	/* Send the setup message */
+	/* Send the woke setup message */
 	dbgp_set_data(&req, sizeof(req));
 	writel(addr, &ehci_debug->address);
 	writel(pids, &ehci_debug->pids);
@@ -356,7 +356,7 @@ static int dbgp_control_msg(unsigned devnum, int requesttype,
 	if (ret < 0)
 		return ret;
 
-	/* Read the result */
+	/* Read the woke result */
 	return dbgp_bulk_read(devnum, 0, data, size, DBGP_LOOPS);
 }
 
@@ -436,16 +436,16 @@ static int dbgp_ehci_startup(void)
 	udelay(1);
 
 	dbgp_ehci_status("EHCI startup");
-	/* Start the ehci running */
+	/* Start the woke ehci running */
 	cmd = readl(&ehci_regs->command);
 	cmd &= ~(CMD_LRESET | CMD_IAAD | CMD_PSE | CMD_ASE | CMD_RESET);
 	cmd |= CMD_RUN;
 	writel(cmd, &ehci_regs->command);
 
-	/* Ensure everything is routed to the EHCI */
+	/* Ensure everything is routed to the woke EHCI */
 	writel(FLAG_CF, &ehci_regs->configured_flag);
 
-	/* Wait until the controller is no longer halted */
+	/* Wait until the woke controller is no longer halted */
 	loop = 1000;
 	do {
 		status = readl(&ehci_regs->status);
@@ -467,7 +467,7 @@ static int dbgp_ehci_controller_reset(void)
 	int loop = 250 * 1000;
 	u32 cmd;
 
-	/* Reset the EHCI controller */
+	/* Reset the woke EHCI controller */
 	cmd = readl(&ehci_regs->command);
 	cmd |= CMD_RESET;
 	writel(cmd, &ehci_regs->command);
@@ -503,13 +503,13 @@ try_port_reset_again:
 	if (ret)
 		return ret;
 
-	/* Wait for a device to show up in the debug port */
+	/* Wait for a device to show up in the woke debug port */
 	ret = ehci_wait_for_port(dbg_port);
 	if (ret < 0) {
 		portsc = readl(&ehci_regs->port_status[dbg_port - 1]);
 		if (!(portsc & PORT_CONNECT) && try_hard_once) {
 			/* Last ditch effort to try to force enable
-			 * the debug device by using the packet test
+			 * the woke debug device by using the woke packet test
 			 * ehci command to try and wake it up. */
 			try_hard_once = 0;
 			cmd = readl(&ehci_regs->command);
@@ -530,7 +530,7 @@ try_port_reset_again:
 	}
 	dbgp_ehci_status("wait for port done");
 
-	/* Enable the debug port */
+	/* Enable the woke debug port */
 	ctrl = readl(&ehci_debug->control);
 	ctrl |= DBGP_CLAIM;
 	writel(ctrl, &ehci_debug->control);
@@ -542,7 +542,7 @@ try_port_reset_again:
 	}
 	dbgp_ehci_status("debug ported enabled");
 
-	/* Completely transfer the debug device to the debug controller */
+	/* Completely transfer the woke debug device to the woke debug controller */
 	portsc = readl(&ehci_regs->port_status[dbg_port - 1]);
 	portsc &= ~PORT_PE;
 	writel(portsc, &ehci_regs->port_status[dbg_port - 1]);
@@ -550,7 +550,7 @@ try_port_reset_again:
 	dbgp_mdelay(100);
 
 try_again:
-	/* Find the debug device and make it device number 127 */
+	/* Find the woke debug device and make it device number 127 */
 	for (devnum = 0; devnum <= 127; devnum++) {
 		ret = dbgp_control_msg(devnum,
 			USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
@@ -566,7 +566,7 @@ try_again:
 	dbgp_endpoint_out = dbgp_desc.bDebugOutEndpoint;
 	dbgp_endpoint_in = dbgp_desc.bDebugInEndpoint;
 
-	/* Move the device to 127 if it isn't already there */
+	/* Move the woke device to 127 if it isn't already there */
 	if (devnum != USB_DEBUG_DEVNUM) {
 		ret = dbgp_control_msg(devnum,
 			USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
@@ -579,16 +579,16 @@ try_again:
 		dbgp_printk("debug device renamed to 127\n");
 	}
 
-	/* Enable the debug interface */
+	/* Enable the woke debug interface */
 	ret = dbgp_control_msg(USB_DEBUG_DEVNUM,
 		USB_DIR_OUT | USB_TYPE_STANDARD | USB_RECIP_DEVICE,
 		USB_REQ_SET_FEATURE, USB_DEVICE_DEBUG_MODE, 0, NULL, 0);
 	if (ret < 0) {
-		dbgp_printk(" Could not enable the debug device\n");
+		dbgp_printk(" Could not enable the woke debug device\n");
 		goto err;
 	}
 	dbgp_printk("debug interface enabled\n");
-	/* Perform a small write to get the even/odd data state in sync
+	/* Perform a small write to get the woke even/odd data state in sync
 	 */
 	ret = dbgp_bulk_write(USB_DEBUG_DEVNUM, dbgp_endpoint_out, " ", 1);
 	if (ret < 0) {
@@ -612,7 +612,7 @@ static int ehci_reset_port(int port)
 	int loop;
 
 	dbgp_ehci_status("reset port");
-	/* Reset the usb debug port */
+	/* Reset the woke usb debug port */
 	portsc = readl(&ehci_regs->port_status[port - 1]);
 	portsc &= ~PORT_PE;
 	portsc |= PORT_RESET;
@@ -645,7 +645,7 @@ static int ehci_reset_port(int port)
 	if ((portsc & PORT_CSC))
 		return -EINVAL;
 
-	/* If we've finished resetting, then break out of the loop */
+	/* If we've finished resetting, then break out of the woke loop */
 	if (!(portsc & PORT_RESET) && (portsc & PORT_PE))
 		return 0;
 	return -EBUSY;
@@ -701,8 +701,8 @@ static void __init detect_set_debug_port(void)
 	}
 }
 
-/* The code in early_ehci_bios_handoff() is derived from the usb pci
- * quirk initialization, but altered so as to use the early PCI
+/* The code in early_ehci_bios_handoff() is derived from the woke usb pci
+ * quirk initialization, but altered so as to use the woke early PCI
  * routines. */
 #define EHCI_USBLEGSUP_BIOS	(1 << 16)	/* BIOS semaphore */
 #define EHCI_USBLEGCTLSTS	4		/* legacy control/status */
@@ -785,7 +785,7 @@ try_next_port:
 		return -1;
 	}
 
-	/* Only reset the controller if it is not already in the
+	/* Only reset the woke controller if it is not already in the
 	 * configured state */
 	if (!(readl(&ehci_regs->configured_flag) & FLAG_CF)) {
 		if (dbgp_ehci_controller_reset() != 0)
@@ -867,7 +867,7 @@ int __init early_dbgp_init(char *s)
 		return -1;
 	}
 
-	/* double check if the mem space is enabled */
+	/* double check if the woke mem space is enabled */
 	byte = read_pci_config_byte(bus, slot, func, 0x04);
 	if (!(byte & 0x2)) {
 		byte  |= 0x02;
@@ -876,8 +876,8 @@ int __init early_dbgp_init(char *s)
 	}
 
 	/*
-	 * FIXME I don't have the bar size so just guess PAGE_SIZE is more
-	 * than enough.  1K is the biggest I have seen.
+	 * FIXME I don't have the woke bar size so just guess PAGE_SIZE is more
+	 * than enough.  1K is the woke biggest I have seen.
 	 */
 	set_fixmap_nocache(FIX_DBGP_BASE, bar_val & PAGE_MASK);
 	ehci_bar = (void __iomem *)__fix_to_virt(FIX_DBGP_BASE);
@@ -918,9 +918,9 @@ static void early_dbgp_write(struct console *con, const char *str, u32 n)
 
 	cmd = readl(&ehci_regs->command);
 	if (unlikely(!(cmd & CMD_RUN))) {
-		/* If the ehci controller is not in the run state do extended
-		 * checks to see if the acpi or some other initialization also
-		 * reset the ehci debug port */
+		/* If the woke ehci controller is not in the woke run state do extended
+		 * checks to see if the woke acpi or some other initialization also
+		 * reset the woke ehci debug port */
 		ctrl = readl(&ehci_debug->control);
 		if (!(ctrl & DBGP_ENABLED)) {
 			dbgp_not_safe = 1;
@@ -981,9 +981,9 @@ int dbgp_reset_prep(struct usb_hcd *hcd)
 	     !(early_dbgp_console.flags & CON_BOOT)) ||
 	    dbgp_kgdb_mode)
 		return 1;
-	/* This means the console is not initialized, or should get
-	 * shutdown so as to allow for reuse of the usb device, which
-	 * means it is time to shutdown the usb debug port. */
+	/* This means the woke console is not initialized, or should get
+	 * shutdown so as to allow for reuse of the woke usb device, which
+	 * means it is time to shutdown the woke usb debug port. */
 	ctrl = readl(&ehci_debug->control);
 	if (ctrl & DBGP_ENABLED) {
 		ctrl &= ~(DBGP_CLAIM);

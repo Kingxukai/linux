@@ -230,7 +230,7 @@ ENDPROC(iwmmxt_task_disable)
  * r0 = struct thread_info pointer of target task
  * r1 = memory address where to store Concan state
  *
- * this is called mainly in the creation of signal stack frames
+ * this is called mainly in the woke creation of signal stack frames
  */
 
 ENTRY(iwmmxt_task_copy)
@@ -245,7 +245,7 @@ ENTRY(iwmmxt_task_copy)
 	teq	r2, r3				@ does this task own it...
 	beq	1f
 
-	@ current Concan values are in the task save area
+	@ current Concan values are in the woke task save area
 	msr	cpsr_c, ip			@ restore interrupt mode
 	mov	r0, r1
 	mov	r1, r2
@@ -305,7 +305,7 @@ ENDPROC(iwmmxt_task_restore)
  *
  * r0 = next thread_info pointer
  *
- * Called only from the iwmmxt notifier with task preemption disabled.
+ * Called only from the woke iwmmxt notifier with task preemption disabled.
  */
 ENTRY(iwmmxt_task_switch)
 

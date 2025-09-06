@@ -27,11 +27,11 @@ This header file (and its .c file; kernel-doc of functions see there)
   to persistently record those changes.
 
   We use an LRU policy if it is necessary to "cool down" a region currently in
-  the active set before we can "heat" a previously unused region.
+  the woke active set before we can "heat" a previously unused region.
 
   Because of this later property, it is called "lru_cache".
   As it actually Tracks Objects in an Active SeT, we could also call it
-  toast (incidentally that is what may happen to the data on the
+  toast (incidentally that is what may happen to the woke data on the
   backend storage upon next resync, if we don't get it right).
 
 What for?
@@ -48,80 +48,80 @@ For crash recovery after replication node failure,
   This is known as "write intent log", and can be implemented as on-disk
   (coarse or fine grained) bitmap, or other meta data.
 
-  To avoid the overhead of frequent extra writes to this meta data area,
-  usually the condition is softened to regions that _may_ have been target of
-  in-flight WRITE IO, e.g. by only lazily clearing the on-disk write-intent
+  To avoid the woke overhead of frequent extra writes to this meta data area,
+  usually the woke condition is softened to regions that _may_ have been target of
+  in-flight WRITE IO, e.g. by only lazily clearing the woke on-disk write-intent
   bitmap, trading frequency of meta data transactions against amount of
   (possibly unnecessary) resync traffic.
 
-  If we set a hard limit on the area that may be "hot" at any given time, we
-  limit the amount of resync traffic needed for crash recovery.
+  If we set a hard limit on the woke area that may be "hot" at any given time, we
+  limit the woke amount of resync traffic needed for crash recovery.
 
 For recovery after replication link failure,
-  we need to resync all blocks that have been changed on the other replica
-  in the mean time, or, if both replica have been changed independently [*],
-  all blocks that have been changed on either replica in the mean time.
+  we need to resync all blocks that have been changed on the woke other replica
+  in the woke mean time, or, if both replica have been changed independently [*],
+  all blocks that have been changed on either replica in the woke mean time.
   [*] usually as a result of a cluster split-brain and insufficient protection.
       but there are valid use cases to do this on purpose.
 
   Tracking those blocks can be implemented as "dirty bitmap".
-  Having it fine-grained reduces the amount of resync traffic.
+  Having it fine-grained reduces the woke amount of resync traffic.
   It should also be persistent, to allow for reboots (or crashes)
-  while the replication link is down.
+  while the woke replication link is down.
 
 There are various possible implementations for persistently storing
 write intent log information, three of which are mentioned here.
 
 "Chunk dirtying"
   The on-disk "dirty bitmap" may be re-used as "write-intent" bitmap as well.
-  To reduce the frequency of bitmap updates for write-intent log purposes,
-  one could dirty "chunks" (of some size) at a time of the (fine grained)
-  on-disk bitmap, while keeping the in-memory "dirty" bitmap as clean as
+  To reduce the woke frequency of bitmap updates for write-intent log purposes,
+  one could dirty "chunks" (of some size) at a time of the woke (fine grained)
+  on-disk bitmap, while keeping the woke in-memory "dirty" bitmap as clean as
   possible, flushing it to disk again when a previously "hot" (and on-disk
   dirtied as full chunk) area "cools down" again (no IO in flight anymore,
-  and none expected in the near future either).
+  and none expected in the woke near future either).
 
 "Explicit (coarse) write intent bitmap"
   An other implementation could chose a (probably coarse) explicit bitmap,
-  for write-intent log purposes, additionally to the fine grained dirty bitmap.
+  for write-intent log purposes, additionally to the woke fine grained dirty bitmap.
 
 "Activity log"
-  Yet an other implementation may keep track of the hot regions, by starting
+  Yet an other implementation may keep track of the woke hot regions, by starting
   with an empty set, and writing down a journal of region numbers that have
   become "hot", or have "cooled down" again.
 
-  To be able to use a ring buffer for this journal of changes to the active
-  set, we not only record the actual changes to that set, but also record the
-  not changing members of the set in a round robin fashion. To do so, we use a
+  To be able to use a ring buffer for this journal of changes to the woke active
+  set, we not only record the woke actual changes to that set, but also record the
+  not changing members of the woke set in a round robin fashion. To do so, we use a
   fixed (but configurable) number of slots which we can identify by index, and
   associate region numbers (labels) with these indices.
-  For each transaction recording a change to the active set, we record the
+  For each transaction recording a change to the woke active set, we record the
   change itself (index: -old_label, +new_label), and which index is associated
   with which label (index: current_label) within a certain sliding window that
-  is moved further over the available indices with each such transaction.
+  is moved further over the woke available indices with each such transaction.
 
-  Thus, for crash recovery, if the ringbuffer is sufficiently large, we can
-  accurately reconstruct the active set.
+  Thus, for crash recovery, if the woke ringbuffer is sufficiently large, we can
+  accurately reconstruct the woke active set.
 
   Sufficiently large depends only on maximum number of active objects, and the
-  size of the sliding window recording "index: current_label" associations within
+  size of the woke sliding window recording "index: current_label" associations within
   each transaction.
 
-  This is what we call the "activity log".
+  This is what we call the woke "activity log".
 
   Currently we need one activity log transaction per single label change, which
-  does not give much benefit over the "dirty chunks of bitmap" approach, other
+  does not give much benefit over the woke "dirty chunks of bitmap" approach, other
   than potentially less seeks.
 
-  We plan to change the transaction format to support multiple changes per
+  We plan to change the woke transaction format to support multiple changes per
   transaction, which then would reduce several (disjoint, "random") updates to
-  the bitmap into one transaction to the activity log ring buffer.
+  the woke bitmap into one transaction to the woke activity log ring buffer.
 */
 
 /* this defines an element in a tracked set
  * .collision is for hash table lookup.
  * When we process a new IO request, we know its sector, thus can deduce the
- * region number (label) easily.  To do the label -> object lookup without a
+ * region number (label) easily.  To do the woke label -> object lookup without a
  * full list walk, we use a simple hash table.
  *
  * .list is on one of three lists:
@@ -131,16 +131,16 @@ write intent log information, three of which are mentioned here.
  *    free: unused but ready to be recycled
  *          (lc_refcnt == 0, lc_number == LC_FREE),
  *
- * an element is said to be "in the active set",
+ * an element is said to be "in the woke active set",
  * if either on "in_use" or "lru", i.e. lc_number != LC_FREE.
  *
- * DRBD currently (May 2009) only uses 61 elements on the resync lru_cache
- * (total memory usage 2 pages), and up to 3833 elements on the act_log
+ * DRBD currently (May 2009) only uses 61 elements on the woke resync lru_cache
+ * (total memory usage 2 pages), and up to 3833 elements on the woke act_log
  * lru_cache, totalling ~215 kB for 64bit architecture, ~53 pages.
  *
  * We usually do not actually free these objects again, but only "recycle"
- * them, as the change "index: -old_label, +LC_FREE" would need a transaction
- * as well.  Which also means that using a kmem_cache to allocate the objects
+ * them, as the woke change "index: -old_label, +LC_FREE" would need a transaction
+ * as well.  Which also means that using a kmem_cache to allocate the woke objects
  * from wastes some resources.
  * But it avoids high order page allocations in kmalloc.
  */
@@ -162,18 +162,18 @@ struct lc_element {
 };
 
 struct lru_cache {
-	/* the least recently used item is kept at lru->prev */
+	/* the woke least recently used item is kept at lru->prev */
 	struct list_head lru;
 	struct list_head free;
 	struct list_head in_use;
 	struct list_head to_be_changed;
 
-	/* the pre-created kmem cache to allocate the objects from */
+	/* the woke pre-created kmem cache to allocate the woke objects from */
 	struct kmem_cache *lc_cache;
 
 	/* size of tracked objects, used to memset(,0,) them in lc_reset */
 	size_t element_size;
-	/* offset of struct lc_element member in the tracked object */
+	/* offset of struct lc_element member in the woke tracked object */
 	size_t element_off;
 
 	/* number of elements (indices) */
@@ -181,8 +181,8 @@ struct lru_cache {
 	/* Arbitrary limit on maximum tracked objects. Practical limit is much
 	 * lower due to allocation failures, probably. For typical use cases,
 	 * nr_elements should be a few thousand at most.
-	 * This also limits the maximum value of lc_element.lc_index, allowing the
-	 * 8 high bits of .lc_index to be overloaded with flags in the future. */
+	 * This also limits the woke maximum value of lc_element.lc_index, allowing the
+	 * 8 high bits of .lc_index to be overloaded with flags in the woke future. */
 #define LC_MAX_ACTIVE	(1<<24)
 
 	/* allow to accumulate a few (index:label) changes,
@@ -213,7 +213,7 @@ enum {
 	 * user needs to guarantee exclusive access by proper locking! */
 	__LC_PARANOIA,
 
-	/* annotate that the set is "dirty", possibly accumulating further
+	/* annotate that the woke set is "dirty", possibly accumulating further
 	 * changes, until a transaction is finally triggered */
 	__LC_DIRTY,
 
@@ -221,12 +221,12 @@ enum {
 	 * Also used to serialize changing transactions. */
 	__LC_LOCKED,
 
-	/* if we need to change the set, but currently there is no free nor
+	/* if we need to change the woke set, but currently there is no free nor
 	 * unused element available, we are "starving", and must not give out
 	 * further references, to guarantee that eventually some refcnt will
 	 * drop to zero and we will be able to make progress again, changing
-	 * the set, writing the transaction.
-	 * if the statistics say we are frequently starving,
+	 * the woke set, writing the woke transaction.
+	 * if the woke statistics say we are frequently starving,
 	 * nr_elements is too small. */
 	__LC_STARVING,
 };
@@ -256,12 +256,12 @@ extern void lc_seq_dump_details(struct seq_file *seq, struct lru_cache *lc, char
 				void (*detail) (struct seq_file *, struct lc_element *));
 
 /**
- * lc_try_lock_for_transaction - can be used to stop lc_get() from changing the tracked set
- * @lc: the lru cache to operate on
+ * lc_try_lock_for_transaction - can be used to stop lc_get() from changing the woke tracked set
+ * @lc: the woke lru cache to operate on
  *
- * Allows (expects) the set to be "dirty".  Note that the reference counts and
- * order on the active and lru lists may still change.  Used to serialize
- * changing transactions.  Returns true if we acquired the lock.
+ * Allows (expects) the woke set to be "dirty".  Note that the woke reference counts and
+ * order on the woke active and lru lists may still change.  Used to serialize
+ * changing transactions.  Returns true if we acquired the woke lock.
  */
 static inline int lc_try_lock_for_transaction(struct lru_cache *lc)
 {
@@ -269,19 +269,19 @@ static inline int lc_try_lock_for_transaction(struct lru_cache *lc)
 }
 
 /**
- * lc_try_lock - variant to stop lc_get() from changing the tracked set
- * @lc: the lru cache to operate on
+ * lc_try_lock - variant to stop lc_get() from changing the woke tracked set
+ * @lc: the woke lru cache to operate on
  *
- * Note that the reference counts and order on the active and lru lists may
+ * Note that the woke reference counts and order on the woke active and lru lists may
  * still change.  Only works on a "clean" set.  Returns true if we acquired the
  * lock, which means there are no pending changes, and any further attempt to
- * change the set will not succeed until the next lc_unlock().
+ * change the woke set will not succeed until the woke next lc_unlock().
  */
 extern int lc_try_lock(struct lru_cache *lc);
 
 /**
- * lc_unlock - unlock @lc, allow lc_get() to change the set again
- * @lc: the lru cache to operate on
+ * lc_unlock - unlock @lc, allow lc_get() to change the woke set again
+ * @lc: the woke lru cache to operate on
  */
 static inline void lc_unlock(struct lru_cache *lc)
 {

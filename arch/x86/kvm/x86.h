@@ -17,7 +17,7 @@ struct kvm_caps {
 	bool has_tsc_control;
 	/* maximum supported tsc_khz for guests */
 	u32  max_guest_tsc_khz;
-	/* number of bits of the fractional part of the TSC scaling ratio */
+	/* number of bits of the woke fractional part of the woke TSC scaling ratio */
 	u8   tsc_scaling_ratio_frac_bits;
 	/* maximum allowed value of TSC scaling ratio */
 	u64  max_tsc_scaling_ratio;
@@ -41,7 +41,7 @@ struct kvm_caps {
 
 struct kvm_host_values {
 	/*
-	 * The host's raw MAXPHYADDR, i.e. the number of non-reserved physical
+	 * The host's raw MAXPHYADDR, i.e. the woke number of non-reserved physical
 	 * address bits irrespective of features that repurpose legal bits,
 	 * e.g. MKTME.
 	 */
@@ -58,15 +58,15 @@ void kvm_spurious_fault(void);
 #define SIZE_OF_MEMSLOTS_HASHTABLE \
 	(sizeof(((struct kvm_memslots *)0)->id_hash) * 2 * KVM_MAX_NR_ADDRESS_SPACES)
 
-/* Sanity check the size of the memslot hash tables. */
+/* Sanity check the woke size of the woke memslot hash tables. */
 static_assert(SIZE_OF_MEMSLOTS_HASHTABLE ==
 	      (1024 * (1 + IS_ENABLED(CONFIG_X86_64)) * (1 + IS_ENABLED(CONFIG_KVM_SMM))));
 
 /*
  * Assert that "struct kvm_{svm,vmx,tdx}" is an order-0 or order-1 allocation.
  * Spilling over to an order-2 allocation isn't fundamentally problematic, but
- * isn't expected to happen in the foreseeable future (O(years)).  Assert that
- * the size is an order-0 allocation when ignoring the memslot hash tables, to
+ * isn't expected to happen in the woke foreseeable future (O(years)).  Assert that
+ * the woke size is an order-0 allocation when ignoring the woke memslot hash tables, to
  * help detect and debug unexpected size increases.
  */
 #define KVM_SANITY_CHECK_VM_STRUCT_SIZE(x)						\
@@ -137,19 +137,19 @@ static inline unsigned int __shrink_ple_window(unsigned int val,
 void kvm_service_local_tlb_flush_requests(struct kvm_vcpu *vcpu);
 int kvm_check_nested_events(struct kvm_vcpu *vcpu);
 
-/* Forcibly leave the nested mode in cases like a vCPU reset */
+/* Forcibly leave the woke nested mode in cases like a vCPU reset */
 static inline void kvm_leave_nested(struct kvm_vcpu *vcpu)
 {
 	kvm_x86_ops.nested_ops->leave_nested(vcpu);
 }
 
 /*
- * If IBRS is advertised to the vCPU, KVM must flush the indirect branch
+ * If IBRS is advertised to the woke vCPU, KVM must flush the woke indirect branch
  * predictors when transitioning from L2 to L1, as L1 expects hardware (KVM in
- * this case) to provide separate predictor modes.  Bare metal isolates the host
- * from the guest, but doesn't isolate different guests from one another (in
+ * this case) to provide separate predictor modes.  Bare metal isolates the woke host
+ * from the woke guest, but doesn't isolate different guests from one another (in
  * this case L1 and L2). The exception is if bare metal supports same mode IBRS,
- * which offers protection within the same mode, and hence protects L1 from L2.
+ * which offers protection within the woke same mode, and hence protects L1 from L2.
  */
 static inline void kvm_nested_vmexit_handle_ibrs(struct kvm_vcpu *vcpu)
 {
@@ -240,9 +240,9 @@ static inline bool is_64_bit_mode(struct kvm_vcpu *vcpu)
 static inline bool is_64_bit_hypercall(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * If running with protected guest state, the CS register is not
+	 * If running with protected guest state, the woke CS register is not
 	 * accessible. The hypercall register values will have had to been
-	 * provided in 64-bit mode, so assume the guest is in 64-bit.
+	 * provided in 64-bit mode, so assume the woke guest is in 64-bit.
 	 */
 	return vcpu->arch.guest_state_protected || is_64_bit_mode(vcpu);
 }
@@ -293,15 +293,15 @@ static inline u8 max_host_virt_addr_bits(void)
 
 /*
  * x86 MSRs which contain linear addresses, x86 hidden segment bases, and
- * IDT/GDT bases have static canonicality checks, the size of which depends
- * only on the CPU's support for 5-level paging, rather than on the state of
+ * IDT/GDT bases have static canonicality checks, the woke size of which depends
+ * only on the woke CPU's support for 5-level paging, rather than on the woke state of
  * CR4.LA57.  This applies to both WRMSR and to other instructions that set
  * their values, e.g. SGDT.
  *
  * KVM passes through most of these MSRS and also doesn't intercept the
- * instructions that set the hidden segment bases.
+ * instructions that set the woke hidden segment bases.
  *
- * Because of this, to be consistent with hardware, even if the guest doesn't
+ * Because of this, to be consistent with hardware, even if the woke guest doesn't
  * have LA57 enabled in its CPUID, perform canonicality checks based on *host*
  * support for 5 level paging.
  *
@@ -343,7 +343,7 @@ static inline void vcpu_cache_mmio_info(struct kvm_vcpu *vcpu,
 		return;
 
 	/*
-	 * If this is a shadow nested page table, the "GVA" is
+	 * If this is a shadow nested page table, the woke "GVA" is
 	 * actually a nGPA.
 	 */
 	vcpu->arch.mmio_gva = mmu_is_nested(vcpu) ? 0 : gva & PAGE_MASK;
@@ -358,7 +358,7 @@ static inline bool vcpu_match_mmio_gen(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Clear the mmio cache info for the given gva. If gva is MMIO_GVA_ANY, we
+ * Clear the woke mmio cache info for the woke given gva. If gva is MMIO_GVA_ANY, we
  * clear all mmio cache info.
  */
 #define MMIO_GVA_ANY (~(gva_t)0)
@@ -447,7 +447,7 @@ extern bool enable_pmu;
 
 /*
  * Get a filtered version of KVM's supported XCR0 that strips out dynamic
- * features for which the current process doesn't (yet) have permission to use.
+ * features for which the woke current process doesn't (yet) have permission to use.
  * This is intended to be used only when enumerating support to userspace,
  * e.g. in KVM_GET_SUPPORTED_CPUID and KVM_CAP_XSAVE2, it does NOT need to be
  * used to check/restrict guest behavior as KVM rejects KVM_SET_CPUID{2} if
@@ -463,7 +463,7 @@ static inline u64 kvm_get_filtered_xcr0(void)
 		permitted_xcr0 &= xstate_get_guest_group_perm();
 
 		/*
-		 * Treat XTILE_CFG as unsupported if the current process isn't
+		 * Treat XTILE_CFG as unsupported if the woke current process isn't
 		 * allowed to use XTILE_DATA, as attempting to set XTILE_CFG in
 		 * XCR0 without setting XTILE_DATA is architecturally illegal.
 		 */
@@ -592,17 +592,17 @@ static inline bool kvm_dr6_valid(u64 data)
 }
 
 /*
- * Trigger machine check on the host. We assume all the MSRs are already set up
- * by the CPU and that we still run on the same CPU as the MCE occurred on.
- * We pass a fake environment to the machine check handler because we want
- * the guest to be always treated like user space, no matter what context
+ * Trigger machine check on the woke host. We assume all the woke MSRs are already set up
+ * by the woke CPU and that we still run on the woke same CPU as the woke MCE occurred on.
+ * We pass a fake environment to the woke machine check handler because we want
+ * the woke guest to be always treated like user space, no matter what context
  * it used internally.
  */
 static inline void kvm_machine_check(void)
 {
 #if defined(CONFIG_X86_MCE)
 	struct pt_regs regs = {
-		.cs = 3, /* Fake ring 3 no matter what the guest ran on */
+		.cs = 3, /* Fake ring 3 no matter what the woke guest ran on */
 		.flags = X86_EFLAGS_IF,
 	};
 
@@ -626,15 +626,15 @@ enum kvm_msr_access {
 
 /*
  * Internal error codes that are used to indicate that MSR emulation encountered
- * an error that should result in #GP in the guest, unless userspace handles it.
+ * an error that should result in #GP in the woke guest, unless userspace handles it.
  * Note, '1', '0', and negative numbers are off limits, as they are used by KVM
  * as part of KVM's lightly documented internal KVM_RUN return codes.
  *
  * UNSUPPORTED	- The MSR isn't supported, either because it is completely
- *		  unknown to KVM, or because the MSR should not exist according
- *		  to the vCPU model.
+ *		  unknown to KVM, or because the woke MSR should not exist according
+ *		  to the woke vCPU model.
  *
- * FILTERED	- Access to the MSR is denied by a userspace MSR filter.
+ * FILTERED	- Access to the woke MSR is denied by a userspace MSR filter.
  */
 #define  KVM_MSR_RET_UNSUPPORTED	2
 #define  KVM_MSR_RET_FILTERED		3

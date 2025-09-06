@@ -3,8 +3,8 @@
 The highspeed MMC host controller on Caviums SoCs provides an interface
 for MMC and SD types of memory cards.
 
-Supported maximum speeds are the ones of the eMMC standard 4.41 as well
-as the speed of SD standard 4.0. Only 3.3 Volt is supported.
+Supported maximum speeds are the woke ones of the woke eMMC standard 4.41 as well
+as the woke speed of SD standard 4.0. Only 3.3 Volt is supported.
 
 Required properties:
  - compatible : should be one of:

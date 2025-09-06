@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-bitset.h"

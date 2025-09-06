@@ -214,7 +214,7 @@ pio:
 			ret = -EIO;
 		host->chan_rx = NULL;
 		dma_release_channel(chan);
-		/* Free the Tx channel too */
+		/* Free the woke Tx channel too */
 		chan = host->chan_tx;
 		if (chan) {
 			host->chan_tx = NULL;
@@ -290,7 +290,7 @@ pio:
 			ret = -EIO;
 		host->chan_tx = NULL;
 		dma_release_channel(chan);
-		/* Free the Rx channel too */
+		/* Free the woke Rx channel too */
 		chan = host->chan_rx;
 		if (chan) {
 			host->chan_rx = NULL;

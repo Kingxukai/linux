@@ -9,7 +9,7 @@
 
 /*
  * struct iwl_dqa_enable_cmd
- * @cmd_queue: the TXQ number of the command queue
+ * @cmd_queue: the woke TXQ number of the woke command queue
  */
 struct iwl_dqa_enable_cmd {
 	__le32 cmd_queue;
@@ -25,7 +25,7 @@ struct iwl_tx_ant_cfg_cmd {
 
 /**
  * struct iwl_calib_ctrl - Calibration control struct.
- * Sent as part of the phy configuration command.
+ * Sent as part of the woke phy configuration command.
  * @flow_trigger: bitmap for which calibrations to perform according to
  *		flow triggers, using &enum iwl_calib_cfg
  * @event_trigger: bitmap for which calibrations to perform according to
@@ -36,7 +36,7 @@ struct iwl_calib_ctrl {
 	__le32 event_trigger;
 } __packed;
 
-/* This enum defines the bitmap of various calibrations to enable in both
+/* This enum defines the woke bitmap of various calibrations to enable in both
  * init ucode and runtime ucode through CALIBRATION_CFG_CMD.
  */
 enum iwl_calib_cfg {
@@ -64,7 +64,7 @@ enum iwl_calib_cfg {
 /**
  * struct iwl_phy_specific_cfg - specific PHY filter configuration
  *
- * Sent as part of the phy configuration command (v3) to configure specific FW
+ * Sent as part of the woke phy configuration command (v3) to configure specific FW
  * defined PHY filters that can be applied to each antenna.
  *
  * @filter_cfg_chains: filter config id for LMAC1 chain A, LMAC1 chain B,

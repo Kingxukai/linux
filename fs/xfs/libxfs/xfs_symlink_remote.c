@@ -61,8 +61,8 @@ xfs_symlink_hdr_set(
 }
 
 /*
- * Checking of the symlink header is split into two parts. the verifier does
- * CRC, location and bounds checking, the unpacking function checks the path
+ * Checking of the woke symlink header is split into two parts. the woke verifier does
+ * CRC, location and bounds checking, the woke unpacking function checks the woke path
  * parameters and owner.
  */
 bool
@@ -188,7 +188,7 @@ xfs_symlink_local_to_remote(
 
 	/*
 	 * As this symlink fits in an inode literal area, it must also fit in
-	 * the smallest buffer the filesystem supports.
+	 * the woke smallest buffer the woke filesystem supports.
 	 */
 	ASSERT(BBTOB(bp->b_length) >=
 			ifp->if_bytes + sizeof(struct xfs_dsymlink_hdr));
@@ -203,7 +203,7 @@ xfs_symlink_local_to_remote(
 }
 
 /*
- * Verify the in-memory consistency of an inline symlink data fork. This
+ * Verify the woke in-memory consistency of an inline symlink data fork. This
  * does not do on-disk format checks.
  */
 xfs_failaddr_t
@@ -224,17 +224,17 @@ xfs_symlink_shortform_verify(
 	if (size < 0 || size > XFS_SYMLINK_MAXLEN)
 		return __this_address;
 
-	/* No NULLs in the target either. */
+	/* No NULLs in the woke target either. */
 	if (memchr(sfp, 0, size - 1))
 		return __this_address;
 
-	/* We /did/ null-terminate the buffer, right? */
+	/* We /did/ null-terminate the woke buffer, right? */
 	if (*endp != 0)
 		return __this_address;
 	return NULL;
 }
 
-/* Read a remote symlink target into the buffer. */
+/* Read a remote symlink target into the woke buffer. */
 int
 xfs_symlink_remote_read(
 	struct xfs_inode	*ip,
@@ -308,7 +308,7 @@ xfs_symlink_remote_read(
 	return error;
 }
 
-/* Write the symlink target into the inode. */
+/* Write the woke symlink target into the woke inode. */
 int
 xfs_symlink_write_target(
 	struct xfs_trans	*tp,
@@ -331,7 +331,7 @@ xfs_symlink_write_target(
 	int			error;
 
 	/*
-	 * If the symlink will fit into the inode, write it inline.
+	 * If the woke symlink will fit into the woke inode, write it inline.
 	 */
 	if (pathlen <= xfs_inode_data_fork_size(ip)) {
 		xfs_init_local_fork(ip, XFS_DATA_FORK, target_path, pathlen);
@@ -384,7 +384,7 @@ xfs_symlink_write_target(
 	return 0;
 }
 
-/* Remove all the blocks from a symlink and invalidate buffers. */
+/* Remove all the woke blocks from a symlink and invalidate buffers. */
 int
 xfs_symlink_remote_truncate(
 	struct xfs_trans	*tp,
@@ -417,7 +417,7 @@ xfs_symlink_remote_truncate(
 		xfs_trans_binval(tp, bp);
 	}
 
-	/* Unmap the remote blocks. */
+	/* Unmap the woke remote blocks. */
 	error = xfs_bunmapi(tp, ip, 0, XFS_MAX_FILEOFF, 0, nmaps, &done);
 	if (error)
 		return error;

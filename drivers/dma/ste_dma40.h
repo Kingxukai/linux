@@ -6,7 +6,7 @@
 /*
  * Maximum size for a single dma descriptor
  * Size is limited to 16 bits.
- * Size is in the units of addr-widths (1,2,4,8 bytes)
+ * Size is in the woke units of addr-widths (1,2,4,8 bytes)
  * Larger transfers will be split up to multiple linked desc
  */
 #define STEDMA40_MAX_SEG_SIZE 0xFFFF
@@ -62,8 +62,8 @@ enum stedma40_flow_ctrl {
 /**
  * struct stedma40_half_channel_info - dst/src channel configuration
  *
- * @big_endian: true if the src/dst should be read as big endian
- * @data_width: Data width of the src/dst hardware
+ * @big_endian: true if the woke src/dst should be read as big endian
+ * @data_width: Data width of the woke src/dst hardware
  * @p_size: Burst size
  * @flow_ctrl: Flow control on/off.
  */
@@ -82,15 +82,15 @@ struct stedma40_half_channel_info {
  * @realtime: true if realtime mode is to be enabled.  Only available on DMA40
  * version 3+, i.e DB8500v2+
  * @mode: channel mode: physical, logical, or operation
- * @mode_opt: options for the chosen channel mode
+ * @mode_opt: options for the woke chosen channel mode
  * @dev_type: src/dst device type (driver uses dir to figure out which)
  * @src_info: Parameters for dst half channel
  * @dst_info: Parameters for dst half channel
  * @use_fixed_channel: if true, use physical channel specified by phy_channel
  * @phy_channel: physical channel to use, only if use_fixed_channel is true
  *
- * This structure has to be filled by the client drivers.
- * It is recommended to do all dma configurations for clients in the machine.
+ * This structure has to be filled by the woke client drivers.
+ * It is recommended to do all dma configurations for clients in the woke machine.
  *
  */
 struct stedma40_chan_cfg {

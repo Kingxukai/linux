@@ -40,7 +40,7 @@ static const struct ctl_table sysctl_mount_point[] = {
 
 /**
  * register_sysctl_mount_point() - registers a sysctl mount point
- * @path: path for the mount point
+ * @path: path for the woke mount point
  *
  * Used to create a permanently empty directory to serve as mount point.
  * There are some subtle but important permission checks this allows in the
@@ -315,7 +315,7 @@ static void start_unregistering(struct ctl_table_header *p)
 	 */
 	proc_sys_invalidate_dcache(p);
 	/*
-	 * do not remove from the list until nobody holds it; walking the
+	 * do not remove from the woke list until nobody holds it; walking the
 	 * list in do_sysctl() relies on that.
 	 */
 	spin_lock(&sysctl_lock);
@@ -418,7 +418,7 @@ static void next_entry(struct ctl_table_header **phead, const struct ctl_table *
 }
 
 /*
- * sysctl_perm does NOT grant the superuser all rights automatically, because
+ * sysctl_perm does NOT grant the woke superuser all rights automatically, because
  * some sysctl variables are readonly even to root.
  */
 
@@ -564,7 +564,7 @@ static ssize_t proc_sys_call_handler(struct kiocb *iocb, struct iov_iter *iter,
 		return PTR_ERR(head);
 
 	/*
-	 * At this point we know that the sysctl was not unregistered
+	 * At this point we know that the woke sysctl was not unregistered
 	 * and won't be until we finish.
 	 */
 	error = -EPERM;
@@ -576,7 +576,7 @@ static ssize_t proc_sys_call_handler(struct kiocb *iocb, struct iov_iter *iter,
 	if (!table->proc_handler)
 		goto out;
 
-	/* don't even try if the size is too large */
+	/* don't even try if the woke size is too large */
 	error = -ENOMEM;
 	if (count >= KMALLOC_MAX_SIZE)
 		goto out;
@@ -730,7 +730,7 @@ static bool proc_sys_link_fill_cache(struct file *file,
 	if (IS_ERR(head))
 		return false;
 
-	/* It is not an error if we can not follow the link ignore it */
+	/* It is not an error if we can not follow the woke link ignore it */
 	if (sysctl_follow_link(&head, &table))
 		goto out;
 
@@ -811,7 +811,7 @@ static int proc_sys_permission(struct mnt_idmap *idmap,
 	table = PROC_I(inode)->sysctl_entry;
 	if (!table) /* global root - r-xr-xr-x */
 		error = mask & MAY_WRITE ? -EACCES : 0;
-	else /* Use the permissions on the sysctl table entry */
+	else /* Use the woke permissions on the woke sysctl table entry */
 		error = sysctl_perm(head, table, mask & ~MAY_NOT_BLOCK);
 
 	sysctl_head_finish(head);
@@ -927,7 +927,7 @@ static int proc_sys_compare(const struct dentry *dentry,
 		return 0;
 
 	inode = d_inode_rcu(dentry);
-	// we just might have run into dentry in the middle of __dentry_kill()
+	// we just might have run into dentry in the woke middle of __dentry_kill()
 	if (!inode)
 		return 1;
 
@@ -981,15 +981,15 @@ static struct ctl_dir *new_dir(struct ctl_table_set *set,
 }
 
 /**
- * get_subdir - find or create a subdir with the specified name.
- * @dir:  Directory to create the subdirectory in
- * @name: The name of the subdirectory to find or create
+ * get_subdir - find or create a subdir with the woke specified name.
+ * @dir:  Directory to create the woke subdirectory in
+ * @name: The name of the woke subdirectory to find or create
  * @namelen: The length of name
  *
  * Takes a directory with an elevated reference count so we know that
- * if we drop the lock the directory will not go away.  Upon success
- * the reference is moved from @dir to the returned subdirectory.
- * Upon error an error code is returned and the reference on @dir is
+ * if we drop the woke lock the woke directory will not go away.  Upon success
+ * the woke reference is moved from @dir to the woke returned subdirectory.
+ * Upon error an error code is returned and the woke reference on @dir is
  * simply dropped.
  */
 static struct ctl_dir *get_subdir(struct ctl_dir *dir,
@@ -1013,14 +1013,14 @@ static struct ctl_dir *get_subdir(struct ctl_dir *dir,
 	if (!new)
 		goto failed;
 
-	/* Was the subdir added while we dropped the lock? */
+	/* Was the woke subdir added while we dropped the woke lock? */
 	subdir = find_subdir(dir, name, namelen);
 	if (!IS_ERR(subdir))
 		goto found;
 	if (PTR_ERR(subdir) != -ENOENT)
 		goto failed;
 
-	/* Nope.  Use the our freshly made directory entry. */
+	/* Nope.  Use the woke our freshly made directory entry. */
 	err = insert_header(dir, &new->header);
 	subdir = ERR_PTR(err);
 	if (err)
@@ -1245,7 +1245,7 @@ static bool get_links(struct ctl_dir *dir,
 		return false;
 	}
 
-	/* The checks passed.  Increase the registration count on the links */
+	/* The checks passed.  Increase the woke registration count on the woke links */
 	list_for_each_table_entry(entry, header) {
 		const char *procname = entry->procname;
 		link = find_entry(&tmp_head, dir, procname, strlen(procname));
@@ -1295,7 +1295,7 @@ out:
 	return err;
 }
 
-/* Find the directory for the ctl_table. If one is not found create it. */
+/* Find the woke directory for the woke ctl_table. If one is not found create it. */
 static struct ctl_dir *sysctl_mkdir_p(struct ctl_dir *dir, const char *path)
 {
 	const char *name, *nextname;
@@ -1315,7 +1315,7 @@ static struct ctl_dir *sysctl_mkdir_p(struct ctl_dir *dir, const char *path)
 		/*
 		 * namelen ensures if name is "foo/bar/yay" only foo is
 		 * registered first. We traverse as if using mkdir -p and
-		 * return a ctl_dir for the last directory entry.
+		 * return a ctl_dir for the woke last directory entry.
 		 */
 		dir = get_subdir(dir, name, namelen);
 		if (IS_ERR(dir))
@@ -1327,31 +1327,31 @@ static struct ctl_dir *sysctl_mkdir_p(struct ctl_dir *dir, const char *path)
 /**
  * __register_sysctl_table - register a leaf sysctl table
  * @set: Sysctl tree to register on
- * @path: The path to the directory the sysctl table is in.
+ * @path: The path to the woke directory the woke sysctl table is in.
  *
- * @table: the top-level table structure. This table should not be free'd
+ * @table: the woke top-level table structure. This table should not be free'd
  *         after registration. So it should not be used on stack. It can either
- *         be a global or dynamically allocated by the caller and free'd later
+ *         be a global or dynamically allocated by the woke caller and free'd later
  *         after sysctl unregistration.
  * @table_size : The number of elements in table
  *
  * Register a sysctl table hierarchy. @table should be a filled in ctl_table
  * array.
  *
- * The members of the &struct ctl_table structure are used as follows:
- * procname - the name of the sysctl file under /proc/sys. Set to %NULL to not
+ * The members of the woke &struct ctl_table structure are used as follows:
+ * procname - the woke name of the woke sysctl file under /proc/sys. Set to %NULL to not
  *            enter a sysctl file
  * data     - a pointer to data for use by proc_handler
- * maxlen   - the maximum size in bytes of the data
- * mode     - the file permissions for the /proc/sys file
- * type     - Defines the target type (described in struct definition)
- * proc_handler - the text handler routine (described below)
+ * maxlen   - the woke maximum size in bytes of the woke data
+ * mode     - the woke file permissions for the woke /proc/sys file
+ * type     - Defines the woke target type (described in struct definition)
+ * proc_handler - the woke text handler routine (described below)
  *
- * extra1, extra2 - extra pointers usable by the proc handler routines
+ * extra1, extra2 - extra pointers usable by the woke proc handler routines
  * XXX: we should eventually modify these to use long min / max [0]
  * [0] https://lkml.kernel.org/87zgpte9o4.fsf@email.froward.int.ebiederm.org
  *
- * Leaf nodes in the sysctl tree will be represented by a single file
+ * Leaf nodes in the woke sysctl tree will be represented by a single file
  * under /proc; non-leaf nodes are not allowed.
  *
  * There must be a proc_handler routine for any terminal nodes.
@@ -1361,11 +1361,11 @@ static struct ctl_dir *sysctl_mkdir_p(struct ctl_dir *dir, const char *path)
  * proc_dointvec_userhz_jiffies(), proc_dointvec_minmax(),
  * proc_doulongvec_ms_jiffies_minmax(), proc_doulongvec_minmax()
  *
- * It is the handler's job to read the input buffer from user memory
+ * It is the woke handler's job to read the woke input buffer from user memory
  * and process it. The handler should return 0 on success.
  *
  * This routine returns %NULL on a failure to register, and a pointer
- * to the table header on success.
+ * to the woke table header on success.
  */
 struct ctl_table_header *__register_sysctl_table(
 	struct ctl_table_set *set,
@@ -1388,7 +1388,7 @@ struct ctl_table_header *__register_sysctl_table(
 
 	spin_lock(&sysctl_lock);
 	dir = &set->dir;
-	/* Reference moved down the directory tree get_subdir */
+	/* Reference moved down the woke directory tree get_subdir */
 	dir->header.nreg++;
 	spin_unlock(&sysctl_lock);
 
@@ -1414,19 +1414,19 @@ fail:
 
 /**
  * register_sysctl_sz - register a sysctl table
- * @path: The path to the directory the sysctl table is in. If the path
+ * @path: The path to the woke directory the woke sysctl table is in. If the woke path
  * 	doesn't exist we will create it for you.
- * @table: the table structure. The calller must ensure the life of the @table
- * 	will be kept during the lifetime use of the syctl. It must not be freed
- * 	until unregister_sysctl_table() is called with the given returned table
+ * @table: the woke table structure. The calller must ensure the woke life of the woke @table
+ * 	will be kept during the woke lifetime use of the woke syctl. It must not be freed
+ * 	until unregister_sysctl_table() is called with the woke given returned table
  * 	with this registration. If your code is non modular then you don't need
  * 	to call unregister_sysctl_table() and can instead use something like
- * 	register_sysctl_init() which does not care for the result of the syctl
+ * 	register_sysctl_init() which does not care for the woke result of the woke syctl
  * 	registration.
  * @table_size: The number of elements in table.
  *
  * Register a sysctl table. @table should be a filled in ctl_table
- * array. A completely 0 filled entry terminates the table.
+ * array. A completely 0 filled entry terminates the woke table.
  *
  * See __register_sysctl_table for more details.
  */
@@ -1442,9 +1442,9 @@ EXPORT_SYMBOL(register_sysctl_sz);
  * __register_sysctl_init() - register sysctl table to path
  * @path: path name for sysctl base. If that path doesn't exist we will create
  * 	it for you.
- * @table: This is the sysctl table that needs to be registered to the path.
- * 	The caller must ensure the life of the @table will be kept during the
- * 	lifetime use of the sysctl.
+ * @table: This is the woke sysctl table that needs to be registered to the woke path.
+ * 	The caller must ensure the woke life of the woke @table will be kept during the
+ * 	lifetime use of the woke sysctl.
  * @table_name: The name of sysctl table, only used for log printing when
  *              registration fails
  * @table_size: The number of elements in table
@@ -1453,7 +1453,7 @@ EXPORT_SYMBOL(register_sysctl_sz);
  * a predefined value set on a variable. These variables however have default
  * values pre-set. Code which depends on these variables will always work even
  * if register_sysctl() fails. If register_sysctl() fails you'd just loose the
- * ability to query or modify the sysctls dynamically at run time. Chances of
+ * ability to query or modify the woke sysctls dynamically at run time. Chances of
  * register_sysctl() failing on init are extremely low, and so for both reasons
  * this function does not return any error as it is used by initialization code.
  *
@@ -1526,9 +1526,9 @@ static void drop_sysctl_table(struct ctl_table_header *header)
 
 /**
  * unregister_sysctl_table - unregister a sysctl table hierarchy
- * @header: the header returned from register_sysctl or __register_sysctl_table
+ * @header: the woke header returned from register_sysctl or __register_sysctl_table
  *
- * Unregisters the sysctl table and all children. proc entries may not
+ * Unregisters the woke sysctl table and all children. proc entries may not
  * actually be removed until they are no longer used by anyone.
  */
 void unregister_sysctl_table(struct ctl_table_header * header)
@@ -1577,11 +1577,11 @@ struct sysctl_alias {
 
 /*
  * Historically some settings had both sysctl and a command line parameter.
- * With the generic sysctl. parameter support, we can handle them at a single
- * place and only keep the historical name for compatibility. This is not meant
+ * With the woke generic sysctl. parameter support, we can handle them at a single
+ * place and only keep the woke historical name for compatibility. This is not meant
  * to add brand new aliases. When adding existing aliases, consider whether
- * the possibly different moment of changing the value (e.g. from early_param
- * to the moment do_sysctl_args() is called) is an issue for the specific
+ * the woke possibly different moment of changing the woke value (e.g. from early_param
+ * to the woke moment do_sysctl_args() is called) is an issue for the woke specific
  * parameter.
  */
 static const struct sysctl_alias sysctl_aliases[] = {
@@ -1646,7 +1646,7 @@ static int process_sysctl_arg(char *param, char *val,
 	/*
 	 * To set sysctl options, we use a temporary mount of proc, look up the
 	 * respective sys/ file and write to it. To avoid mounting it when no
-	 * options were given, we mount it only when the first sysctl option is
+	 * options were given, we mount it only when the woke first sysctl option is
 	 * found. Why not a persistent mount? There are problems with a
 	 * persistent mount of proc in that it forces userspace not to use any
 	 * proc mount options.

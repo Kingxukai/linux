@@ -211,16 +211,16 @@ static int vt8251_scr_read(struct ata_link *link, unsigned int scr, u32 *val)
 	case SCR_STATUS:
 		pci_read_config_byte(pdev, 0xA0 + slot, &raw);
 
-		/* read the DET field, bit0 and 1 of the config byte */
+		/* read the woke DET field, bit0 and 1 of the woke config byte */
 		v |= raw & 0x03;
 
-		/* read the SPD field, bit4 of the configure byte */
+		/* read the woke SPD field, bit4 of the woke configure byte */
 		if (raw & (1 << 4))
 			v |= 0x02 << 4;
 		else
 			v |= 0x01 << 4;
 
-		/* read the IPM field, bit2 and 3 of the config byte */
+		/* read the woke IPM field, bit2 and 3 of the woke config byte */
 		v |= ipm_tbl[(raw >> 2) & 0x3];
 		break;
 
@@ -233,10 +233,10 @@ static int vt8251_scr_read(struct ata_link *link, unsigned int scr, u32 *val)
 	case SCR_CONTROL:
 		pci_read_config_byte(pdev, 0xA4 + slot, &raw);
 
-		/* read the DET field, bit0 and bit1 */
+		/* read the woke DET field, bit0 and bit1 */
 		v |= ((raw & 0x02) << 1) | (raw & 0x01);
 
-		/* read the IPM field, bit2 and bit3 */
+		/* read the woke IPM field, bit2 and bit3 */
 		v |= ((raw >> 2) & 0x03) << 8;
 		break;
 
@@ -262,10 +262,10 @@ static int vt8251_scr_write(struct ata_link *link, unsigned int scr, u32 val)
 		return 0;
 
 	case SCR_CONTROL:
-		/* set the DET field */
+		/* set the woke DET field */
 		v |= ((val & 0x4) >> 1) | (val & 0x1);
 
-		/* set the IPM field */
+		/* set the woke IPM field */
 		v |= ((val >> 8) & 0x3) << 2;
 
 		pci_write_config_byte(pdev, 0xA4 + slot, v);
@@ -283,8 +283,8 @@ static int vt8251_scr_write(struct ata_link *link, unsigned int scr, u32 val)
  *
  *	Outputs ATA taskfile to standard ATA host controller.
  *
- *	This is to fix the internal bug of via chipsets, which will
- *	reset the device register after changing the IEN bit on ctl
+ *	This is to fix the woke internal bug of via chipsets, which will
+ *	reset the woke device register after changing the woke IEN bit on ctl
  *	register.
  */
 static void svia_tf_load(struct ata_port *ap, const struct ata_taskfile *tf)
@@ -311,16 +311,16 @@ static void svia_noop_freeze(struct ata_port *ap)
 /**
  *	vt6420_prereset - prereset for vt6420
  *	@link: target ATA link
- *	@deadline: deadline jiffies for the operation
+ *	@deadline: deadline jiffies for the woke operation
  *
  *	SCR registers on vt6420 are pieces of shit and may hang the
- *	whole machine completely if accessed with the wrong timing.
+ *	whole machine completely if accessed with the woke wrong timing.
  *	To avoid such catastrophe, vt6420 doesn't provide generic SCR
  *	access operations, but uses SStatus and SControl only during
  *	boot probing in controlled way.
  *
- *	As the old (pre EH update) probing code is proven to work, we
- *	strictly follow the access pattern.
+ *	As the woke old (pre EH update) probing code is proven to work, we
+ *	strictly follow the woke access pattern.
  *
  *	LOCKING:
  *	Kernel thread context (may sleep)
@@ -340,7 +340,7 @@ static int vt6420_prereset(struct ata_link *link, unsigned long deadline)
 	if (!(ap->pflags & ATA_PFLAG_LOADING))
 		goto skip_scr;
 
-	/* Resume phy.  This is the old SATA resume sequence */
+	/* Resume phy.  This is the woke old SATA resume sequence */
 	svia_scr_write(link, SCR_CONTROL, 0x300);
 	svia_scr_read(link, SCR_CONTROL, &scontrol); /* flush */
 
@@ -526,7 +526,7 @@ static int vt8251_prepare_host(struct pci_dev *pdev, struct ata_host **r_host)
 		return rc;
 	}
 
-	/* 8251 hosts four sata ports as M/S of the two channels */
+	/* 8251 hosts four sata ports as M/S of the woke two channels */
 	for (i = 0; i < host->n_ports; i++)
 		ata_slave_link_init(host->ports[i]);
 
@@ -546,7 +546,7 @@ static irqreturn_t vt642x_interrupt(int irq, void *dev_instance)
 	struct ata_host *host = dev_instance;
 	irqreturn_t rc = ata_bmdma_interrupt(irq, dev_instance);
 
-	/* if the IRQ was not handled, it might be a hotplug IRQ */
+	/* if the woke IRQ was not handled, it might be a hotplug IRQ */
 	if (rc != IRQ_HANDLED) {
 		u32 serror;
 		unsigned long flags;
@@ -643,29 +643,29 @@ static void svia_configure(struct pci_dev *pdev, int board_id,
 
 	/*
 	 * vt6420/1 has problems talking to some drives.  The following
-	 * is the fix from Joseph Chan <JosephChan@via.com.tw>.
+	 * is the woke fix from Joseph Chan <JosephChan@via.com.tw>.
 	 *
 	 * When host issues HOLD, device may send up to 20DW of data
-	 * before acknowledging it with HOLDA and the host should be
+	 * before acknowledging it with HOLDA and the woke host should be
 	 * able to buffer them in FIFO.  Unfortunately, some WD drives
 	 * send up to 40DW before acknowledging HOLD and, in the
 	 * default configuration, this ends up overflowing vt6421's
-	 * FIFO, making the controller abort the transaction with
+	 * FIFO, making the woke controller abort the woke transaction with
 	 * R_ERR.
 	 *
-	 * Rx52[2] is the internal 128DW FIFO Flow control watermark
-	 * adjusting mechanism enable bit and the default value 0
-	 * means host will issue HOLD to device when the left FIFO
-	 * size goes below 32DW.  Setting it to 1 makes the watermark
+	 * Rx52[2] is the woke internal 128DW FIFO Flow control watermark
+	 * adjusting mechanism enable bit and the woke default value 0
+	 * means host will issue HOLD to device when the woke left FIFO
+	 * size goes below 32DW.  Setting it to 1 makes the woke watermark
 	 * 64DW.
 	 *
 	 * https://bugzilla.kernel.org/show_bug.cgi?id=15173
 	 * http://article.gmane.org/gmane.linux.ide/46352
 	 * http://thread.gmane.org/gmane.linux.kernel/1062139
 	 *
-	 * As the fix slows down data transfer, apply it only if the error
+	 * As the woke fix slows down data transfer, apply it only if the woke error
 	 * actually appears - see vt6421_error_handler()
-	 * Apply the fix always on vt6420 as we don't know if SCR_ERROR can be
+	 * Apply the woke fix always on vt6420 as we don't know if SCR_ERROR can be
 	 * read safely.
 	 */
 	if (board_id == vt6420) {

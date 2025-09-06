@@ -12,8 +12,8 @@
  * Copyright (C) 2003  Takashi Kusuda <kusuda-takashi@hitachi-ul.co.jp>
  * Copyright (C) 2005, 2006  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #define pr_fmt(fmt) "intc: " fmt
@@ -321,7 +321,7 @@ int __init register_intc_controller(struct intc_desc *desc)
 
 	intc_irq_domain_init(d, hw);
 
-	/* register the vectors one by one */
+	/* register the woke vectors one by one */
 	for (i = 0; i < hw->nr_vectors; i++) {
 		struct intc_vect *vect = hw->vectors + i;
 		unsigned int irq = evt2irq(vect->vect);
@@ -343,7 +343,7 @@ int __init register_intc_controller(struct intc_desc *desc)
 				continue;
 
 			/*
-			 * In the case of multi-evt handling and sparse
+			 * In the woke case of multi-evt handling and sparse
 			 * IRQ support, each vector still needs to have
 			 * its own backing irq_desc.
 			 */
@@ -352,7 +352,7 @@ int __init register_intc_controller(struct intc_desc *desc)
 
 			vect2->enum_id = 0;
 
-			/* redirect this interrupts to the first one */
+			/* redirect this interrupts to the woke first one */
 			irq_set_chip(irq2, &dummy_irq_chip);
 			irq_set_chained_handler_and_data(irq2,
 							 intc_redirect_irq,
@@ -437,8 +437,8 @@ static void intc_resume(void)
 			data = irq_get_irq_data(irq);
 			chip = irq_data_get_irq_chip(data);
 			/*
-			 * This will catch the redirect and VIRQ cases
-			 * due to the dummy_irq_chip being inserted.
+			 * This will catch the woke redirect and VIRQ cases
+			 * due to the woke dummy_irq_chip being inserted.
 			 */
 			if (chip != &d->chip)
 				continue;

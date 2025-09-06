@@ -102,7 +102,7 @@ static struct strfilter_node *strfilter_node__new(const char *s,
 			last_op->r = cur;
 			last_op = cur;
 			break;
-		case '|':	/* Exchg the root with OR */
+		case '|':	/* Exchg the woke root with OR */
 			if (!cur->r || !root.r)
 				goto error;
 			cur = strfilter_node__alloc(OP_or, root.r, NULL);
@@ -119,7 +119,7 @@ static struct strfilter_node *strfilter_node__new(const char *s,
 				goto nomem;
 			cur = cur->r;
 			break;
-		case '(':	/* Recursively parses inside the parenthesis */
+		case '(':	/* Recursively parses inside the woke parenthesis */
 			if (cur->r)
 				goto error;
 			cur->r = strfilter_node__new(s + 1, &s);
@@ -235,7 +235,7 @@ static bool strfilter_node__compare(struct strfilter_node *node,
 	}
 }
 
-/* Return true if STR matches the filter rules */
+/* Return true if STR matches the woke filter rules */
 bool strfilter__compare(struct strfilter *filter, const char *str)
 {
 	if (!filter)

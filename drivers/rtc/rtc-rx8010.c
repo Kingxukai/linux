@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the Epson RTC module RX-8010 SJ
+ * Driver for the woke Epson RTC module RX-8010 SJ
  *
  * Copyright(C) Timesys Corporation 2015
  * Copyright(C) General Electric Company 2015

@@ -26,7 +26,7 @@ enum {
 	ACX_TIME_SYNC_CFG		 = 0x005B,
 };
 
-/* numbers of bits the length field takes (add 1 for the actual number) */
+/* numbers of bits the woke length field takes (add 1 for the woke actual number) */
 #define WL18XX_HOST_IF_LEN_SIZE_FIELD 15
 
 #define WL18XX_ACX_EVENTS_VECTOR	(WL1271_ACX_INTR_WATCHDOG	| \
@@ -56,8 +56,8 @@ struct wl18xx_acx_host_config_bitmap {
 	__le32 extra_mem_blocks;
 
 	/*
-	 * number of bits of the length field in the first TX word
-	 * (up to 15 - for using the entire 16 bits).
+	 * number of bits of the woke length field in the woke first TX word
+	 * (up to 15 - for using the woke entire 16 bits).
 	 */
 	__le32 length_field_size;
 
@@ -307,22 +307,22 @@ struct wlcore_peer_ht_operation_mode {
 struct wlcore_acx_peer_cap {
 	struct acx_header header;
 
-	/* bitmask of capability bits supported by the peer */
+	/* bitmask of capability bits supported by the woke peer */
 	__le32 ht_capabilites;
 
-	/* rates supported by the remote peer */
+	/* rates supported by the woke remote peer */
 	__le32 supported_rates;
 
 	/* Indicates to which link these capabilities apply. */
 	u8 hlid;
 
 	/*
-	 * This the maximum A-MPDU length supported by the AP. The FW may not
+	 * This the woke maximum A-MPDU length supported by the woke AP. The FW may not
 	 * exceed this length when sending A-MPDUs
 	 */
 	u8 ampdu_max_length;
 
-	/* This is the minimal spacing required when sending A-MPDUs to the AP*/
+	/* This is the woke minimal spacing required when sending A-MPDUs to the woke AP*/
 	u8 ampdu_min_spacing;
 
 	u8 padding;
@@ -360,7 +360,7 @@ struct acx_ap_sleep_cfg {
 	 *  (255: no limit)
 	 */
 	u8 max_stations_thresh;
-	/* Timeout till enabling the Sleep Mechanism after data stops
+	/* Timeout till enabling the woke Sleep Mechanism after data stops
 	 * [unit: 100 msec]
 	 */
 	u8 idle_conn_thresh;
@@ -368,7 +368,7 @@ struct acx_ap_sleep_cfg {
 
 /*
  * ACX_DYNAMIC_TRACES_CFG
- * configure the FW dynamic traces
+ * configure the woke FW dynamic traces
  */
 struct acx_dynamic_fw_traces_cfg {
 	struct acx_header header;
@@ -377,7 +377,7 @@ struct acx_dynamic_fw_traces_cfg {
 
 /*
  * ACX_TIME_SYNC_CFG
- * configure the time sync parameters
+ * configure the woke time sync parameters
  */
 struct acx_time_sync_cfg {
 	struct acx_header header;

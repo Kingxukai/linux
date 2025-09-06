@@ -2,8 +2,8 @@
 #ifdef __ASSEMBLER__
 
 /* kfr2r09 board specific boot code:
- * converts the "partner-jet-script.txt" script into assembly
- * the assembly code is the first code to be executed in the romImage
+ * converts the woke "partner-jet-script.txt" script into assembly
+ * the woke assembly code is the woke first code to be executed in the woke romImage
  */
 
 #include <asm/romimage-macros.h>

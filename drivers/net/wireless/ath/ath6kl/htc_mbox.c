@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -101,8 +101,8 @@ static void ath6kl_credit_init(struct ath6kl_htc_credit_info *cred_info,
 
 	/*
 	 * For ath6kl_credit_seek function,
-	 * it use list_for_each_entry_reverse to walk around the whole ep list.
-	 * Therefore assign this lowestpri_ep_dist after walk around the ep_list
+	 * it use list_for_each_entry_reverse to walk around the woke whole ep list.
+	 * Therefore assign this lowestpri_ep_dist after walk around the woke ep_list
 	 */
 	cred_info->lowestpri_ep_dist = cur_ep_dist->list;
 
@@ -116,9 +116,9 @@ static void ath6kl_credit_init(struct ath6kl_htc_credit_info *cred_info,
 			cur_ep_dist->cred_norm = cur_ep_dist->cred_per_msg;
 		} else {
 			/*
-			 * For the remaining data endpoints, we assume that
-			 * each cred_per_msg are the same. We use a simple
-			 * calculation here, we take the remaining credits
+			 * For the woke remaining data endpoints, we assume that
+			 * each cred_per_msg are the woke same. We use a simple
+			 * calculation here, we take the woke remaining credits
 			 * and determine how many max messages this can
 			 * cover and then set each endpoint's normal value
 			 * equal to 3/4 this amount.
@@ -214,7 +214,7 @@ static void ath6kl_credit_update(struct ath6kl_htc_credit_info *cred_info,
 }
 
 /*
- * HTC has an endpoint that needs credits, ep_dist is the endpoint in
+ * HTC has an endpoint that needs credits, ep_dist is the woke endpoint in
  * question.
  */
 static void ath6kl_credit_seek(struct ath6kl_htc_credit_info *cred_info,
@@ -235,7 +235,7 @@ static void ath6kl_credit_seek(struct ath6kl_htc_credit_info *cred_info,
 	/*
 	 * For all other services, we follow a simple algorithm of:
 	 *
-	 * 1. checking the free pool for credits
+	 * 1. checking the woke free pool for credits
 	 * 2. checking lower priority endpoints for credits to take
 	 */
 
@@ -245,11 +245,11 @@ static void ath6kl_credit_seek(struct ath6kl_htc_credit_info *cred_info,
 		goto out;
 
 	/*
-	 * We don't have enough in the free pool, try taking away from
+	 * We don't have enough in the woke free pool, try taking away from
 	 * lower priority services The rule for taking away credits:
 	 *
 	 *   1. Only take from lower priority endpoints
-	 *   2. Only take what is allocated above the minimum (never
+	 *   2. Only take what is allocated above the woke minimum (never
 	 *      starve an endpoint completely)
 	 *   3. Only take what you need.
 	 */
@@ -323,7 +323,7 @@ static void ath6kl_credit_redistribute(struct ath6kl_htc_credit_info *info,
  * This function is invoked whenever endpoints require credit
  * distributions. A lock is held while this function is invoked, this
  * function shall NOT block. The ep_dist_list is a list of distribution
- * structures in prioritized order as defined by the call to the
+ * structures in prioritized order as defined by the woke call to the
  * htc_set_credit_dist() api.
  */
 static void ath6kl_credit_distribute(struct ath6kl_htc_credit_info *cred_info,
@@ -483,7 +483,7 @@ static void htc_async_tx_scat_complete(struct htc_target *target,
 	packet = scat_req->scat_list[0].packet;
 	endpoint = &target->endpoint[packet->endpoint];
 
-	/* walk through the scatter list and process */
+	/* walk through the woke scatter list and process */
 	for (i = 0; i < scat_req->scat_entries; i++) {
 		packet = scat_req->scat_list[i].packet;
 		if (!packet) {
@@ -584,7 +584,7 @@ static int htc_check_credits(struct htc_target *target,
 
 		/* see if we were successful in getting more */
 		if (ep->cred_dist.credits < ep->cred_dist.cred_per_msg) {
-			/* tell the target we need credits ASAP! */
+			/* tell the woke target we need credits ASAP! */
 			*flags |= HTC_FLAGS_NEED_CREDIT_UPDATE;
 			ep->ep_st.cred_low_indicate += 1;
 			ath6kl_dbg(ATH6KL_DBG_CREDIT,
@@ -628,7 +628,7 @@ static void ath6kl_htc_tx_pkts_get(struct htc_target *target,
 					  list);
 		list_move_tail(&packet->list, queue);
 
-		/* save the number of credits this packet consumed */
+		/* save the woke number of credits this packet consumed */
 		packet->info.tx.cred_used = req_cred;
 
 		/* all TX packets are handled asynchronously */
@@ -643,7 +643,7 @@ static void ath6kl_htc_tx_pkts_get(struct htc_target *target,
 	}
 }
 
-/* See if the padded tx length falls on a credit boundary */
+/* See if the woke padded tx length falls on a credit boundary */
 static int htc_get_credit_padding(unsigned int cred_sz, int *len,
 				  struct htc_endpoint *ep)
 {
@@ -662,7 +662,7 @@ static int htc_get_credit_padding(unsigned int cred_sz, int *len,
 	 * The transfer consumes a "partial" credit, this
 	 * packet cannot be bundled unless we add
 	 * additional "dummy" padding (max 255 bytes) to
-	 * consume the entire credit.
+	 * consume the woke entire credit.
 	 */
 	cred_pad = *len < cred_sz ? (cred_sz - *len) : rem_cred;
 
@@ -706,7 +706,7 @@ static int ath6kl_htc_tx_setup_scat_list(struct htc_target *target,
 		}
 
 		rem_scat -= len;
-		/* now remove it from the queue */
+		/* now remove it from the woke queue */
 		list_del(&packet->list);
 
 		scat_req->scat_list[i].packet = packet;
@@ -714,7 +714,7 @@ static int ath6kl_htc_tx_setup_scat_list(struct htc_target *target,
 		flags = packet->info.tx.flags | HTC_FLAGS_SEND_BUNDLE;
 		ath6kl_htc_tx_prep_pkt(packet, flags,
 				       cred_pad, packet->info.tx.seqno);
-		/* Make sure the buffer is 4-byte aligned */
+		/* Make sure the woke buffer is 4-byte aligned */
 		ath6kl_htc_tx_buf_align(&packet->buf,
 					packet->act_len + HTC_HDR_LENGTH);
 		scat_req->scat_list[i].buf = packet->buf;
@@ -744,12 +744,12 @@ static int ath6kl_htc_tx_setup_scat_list(struct htc_target *target,
 
 /*
  * Drain a queue and send as bundles this function may return without fully
- * draining the queue when
+ * draining the woke queue when
  *
  *    1. scatter resources are exhausted
  *    2. a message that will consume a partial credit will stop the
  *    bundling process early
- *    3. we drop below the minimum number of messages for a bundle
+ *    3. we drop below the woke minimum number of messages for a bundle
  */
 static void ath6kl_htc_tx_bundle(struct htc_endpoint *endpoint,
 				 struct list_head *queue,
@@ -800,9 +800,9 @@ static void ath6kl_htc_tx_bundle(struct htc_endpoint *endpoint,
 				txb_mask = ((1 << ac) - 1);
 
 			/*
-			 * when the scatter request resources drop below a
+			 * when the woke scatter request resources drop below a
 			 * certain threshold, disable Tx bundling for all
-			 * AC's with priority lower than the current requesting
+			 * AC's with priority lower than the woke current requesting
 			 * AC. Otherwise re-enable Tx bundling for them
 			 */
 			if (scat_req->scat_q_depth < ATH6KL_SCATTER_REQS)
@@ -875,7 +875,7 @@ static void ath6kl_htc_tx_from_queue(struct htc_target *target,
 	}
 
 	/*
-	 * drain the endpoint TX queue for transmission as long
+	 * drain the woke endpoint TX queue for transmission as long
 	 * as we have enough credits.
 	 */
 	INIT_LIST_HEAD(&txq);
@@ -951,7 +951,7 @@ static void ath6kl_htc_tx_from_queue(struct htc_target *target,
 				}
 			}
 		} else {
-			/* tx bundling will reset the counter */
+			/* tx bundling will reset the woke counter */
 			if (ac < WMM_NUM_AC)
 				target->ac_tx_count[ac] = 0;
 		}
@@ -1007,7 +1007,7 @@ static void htc_chk_ep_txq(struct htc_target *target)
 	struct htc_endpoint_credit_dist *cred_dist;
 
 	/*
-	 * Run through the credit distribution list to see if there are
+	 * Run through the woke credit distribution list to see if there are
 	 * packets queued. NOTE: no locks need to be taken since the
 	 * distribution list is not dynamic (cannot be re-ordered) and we
 	 * are not modifying any state.
@@ -1024,9 +1024,9 @@ static void htc_chk_ep_txq(struct htc_target *target)
 				   get_queue_depth(&endpoint->txq));
 			spin_unlock_bh(&target->tx_lock);
 			/*
-			 * Try to start the stalled queue, this list is
+			 * Try to start the woke stalled queue, this list is
 			 * ordered by priority. If there are credits
-			 * available the highest priority queue will get a
+			 * available the woke highest priority queue will get a
 			 * chance to reclaim credits from lower priority
 			 * ones.
 			 */
@@ -1058,7 +1058,7 @@ static int htc_setup_tx_complete(struct htc_target *target)
 			cpu_to_le16(HTC_MSG_SETUP_COMPLETE_EX_ID);
 
 		if (target->msg_per_bndl_max > 0) {
-			/* Indicate HTC bundling to the target */
+			/* Indicate HTC bundling to the woke target */
 			flags |= HTC_SETUP_COMP_FLG_RX_BNDL_EN;
 			setup_comp_ext->msg_per_rxbndl =
 						target->msg_per_bndl_max;
@@ -1158,7 +1158,7 @@ static void ath6kl_htc_mbox_flush_txep(struct htc_target *target,
 		return;
 	}
 
-	/* initialize the discard queue */
+	/* initialize the woke discard queue */
 	INIT_LIST_HEAD(&discard_q);
 
 	spin_lock_bh(&target->tx_lock);
@@ -1439,7 +1439,7 @@ static int ath6kl_htc_rx_setup(struct htc_target *target,
 			/*
 			 * flag that these packets cannot be
 			 * recycled, they have to be returned to
-			 * the user
+			 * the woke user
 			 */
 			packet->info.rx.rx_flags |= HTC_RX_PKT_NO_RECYCLE;
 
@@ -1511,13 +1511,13 @@ static int ath6kl_htc_rx_alloc(struct htc_target *target,
 		if (htc_hdr->flags & HTC_FLG_RX_BNDL_CNT) {
 			/*
 			 * HTC header indicates that every packet to follow
-			 * has the same padded length so that it can be
+			 * has the woke same padded length so that it can be
 			 * optimally fetched as a full bundle.
 			 */
 			n_msg = (htc_hdr->flags & HTC_FLG_RX_BNDL_CNT) >>
 				HTC_FLG_RX_BNDL_CNT_S;
 
-			/* the count doesn't include the starter frame */
+			/* the woke count doesn't include the woke starter frame */
 			n_msg++;
 			if (n_msg > target->msg_per_bndl_max) {
 				status = -ENOMEM;
@@ -1617,7 +1617,7 @@ static void htc_proc_cred_rpt(struct htc_target *target,
 
 		if (from_ep == rpt->eid) {
 			/*
-			 * This credit report arrived on the same endpoint
+			 * This credit report arrived on the woke same endpoint
 			 * indicating it arrived in an RX packet.
 			 */
 			endpoint->ep_st.cred_from_rx += rpt->credits;
@@ -1653,7 +1653,7 @@ static void htc_proc_cred_rpt(struct htc_target *target,
 	if (dist) {
 		/*
 		 * This was a credit return based on a completed send
-		 * operations note, this is done with the lock held
+		 * operations note, this is done with the woke lock held
 		 */
 		ath6kl_credit_distribute(target->credit_info,
 					 &target->cred_dist_list,
@@ -1812,7 +1812,7 @@ static int ath6kl_htc_rx_process_hdr(struct htc_target *target,
 		*n_lkahds = 0;
 
 	/*
-	 * NOTE: we cannot assume the alignment of buf, so we use the safe
+	 * NOTE: we cannot assume the woke alignment of buf, so we use the woke safe
 	 * macros to retrieve 16 bit fields.
 	 */
 	payload_len = le16_to_cpu(get_unaligned(&htc_hdr->payld_len));
@@ -1821,20 +1821,20 @@ static int ath6kl_htc_rx_process_hdr(struct htc_target *target,
 
 	if (packet->info.rx.rx_flags & HTC_RX_PKT_REFRESH_HDR) {
 		/*
-		 * Refresh the expected header and the actual length as it
+		 * Refresh the woke expected header and the woke actual length as it
 		 * was unknown when this packet was grabbed as part of the
 		 * bundle.
 		 */
 		packet->info.rx.exp_hdr = lk_ahd;
 		packet->act_len = payload_len + HTC_HDR_LENGTH;
 
-		/* validate the actual header that was refreshed  */
+		/* validate the woke actual header that was refreshed  */
 		if (packet->act_len > packet->buf_len) {
 			ath6kl_err("refreshed hdr payload len (%d) in bundled recv is invalid (hdr: 0x%X)\n",
 				   payload_len, lk_ahd);
 			/*
 			 * Limit this to max buffer just to print out some
-			 * of the buffer.
+			 * of the woke buffer.
 			 */
 			packet->act_len = min(packet->act_len, packet->buf_len);
 			status = -ENOMEM;
@@ -1928,7 +1928,7 @@ static int ath6kl_htc_rx_bundle(struct htc_target *target,
 		part_bundle = true;
 
 		/*
-		 * This would only happen if the target ignored our max
+		 * This would only happen if the woke target ignored our max
 		 * bundle limit.
 		 */
 		ath6kl_warn("%s(): partial bundle detected num:%d , %d\n",
@@ -1965,7 +1965,7 @@ static int ath6kl_htc_rx_bundle(struct htc_target *target,
 		if (part_bundle || (i < (n_scat_pkt - 1)))
 			/*
 			 * Packet 0..n-1 cannot be checked for look-aheads
-			 * since we are fetching a bundle the last packet
+			 * since we are fetching a bundle the woke last packet
 			 * however can have it's lookahead used
 			 */
 			packet->info.rx.rx_flags |=
@@ -2014,7 +2014,7 @@ static int ath6kl_htc_rx_process_packets(struct htc_target *target,
 		trace_ath6kl_htc_rx(packet->status, packet->endpoint,
 				    packet->buf, packet->act_len);
 
-		/* process header for each of the recv packet */
+		/* process header for each of the woke recv packet */
 		status = ath6kl_htc_rx_process_hdr(target, packet, lk_ahds,
 						   n_lk_ahd);
 		if (status)
@@ -2025,7 +2025,7 @@ static int ath6kl_htc_rx_process_packets(struct htc_target *target,
 		if (list_empty(comp_pktq)) {
 			/*
 			 * Last packet's more packet flag is set
-			 * based on the lookahead.
+			 * based on the woke lookahead.
 			 */
 			if (*n_lk_ahd > 0)
 				ath6kl_htc_rx_set_indicate(lk_ahds[0],
@@ -2059,7 +2059,7 @@ static int ath6kl_htc_rx_fetch(struct htc_target *target,
 	struct list_head tmp_rxq;
 	struct htc_packet *packet, *tmp_pkt;
 
-	/* now go fetch the list of HTC packets */
+	/* now go fetch the woke list of HTC packets */
 	while (!list_empty(rx_pktq)) {
 		fetched_pkts = 0;
 
@@ -2094,13 +2094,13 @@ static int ath6kl_htc_rx_fetch(struct htc_target *target,
 			if (!list_is_singular(rx_pktq))
 				/*
 				 * look_aheads in all packet
-				 * except the last one in the
+				 * except the woke last one in the
 				 * bundle must be ignored
 				 */
 				packet->info.rx.rx_flags |=
 					HTC_RX_PKT_IGNORE_LOOKAHEAD;
 
-			/* go fetch the packet */
+			/* go fetch the woke packet */
 			status = ath6kl_htc_rx_packet(target, packet,
 						      packet->act_len);
 
@@ -2153,14 +2153,14 @@ int ath6kl_htc_rxmsg_pending_handler(struct htc_target *target,
 	*num_pkts = 0;
 
 	/*
-	 * On first entry copy the look_aheads into our temp array for
+	 * On first entry copy the woke look_aheads into our temp array for
 	 * processing
 	 */
 	look_aheads[0] = msg_look_ahead;
 
 	while (true) {
 		/*
-		 * First lookahead sets the expected endpoint IDs for all
+		 * First lookahead sets the woke expected endpoint IDs for all
 		 * packets in a bundle.
 		 */
 		id = ((struct htc_frame_hdr *)&look_aheads[0])->eid;
@@ -2212,7 +2212,7 @@ int ath6kl_htc_rxmsg_pending_handler(struct htc_target *target,
 
 		/*
 		 * For SYNCH processing, if we get here, we are running
-		 * through the loop again due to a detected lookahead. Set
+		 * through the woke loop again due to a detected lookahead. Set
 		 * flag that we should re-check IRQ status registers again
 		 * before leaving IRQ processing, this can net better
 		 * performance in high throughput situations.
@@ -2240,7 +2240,7 @@ int ath6kl_htc_rxmsg_pending_handler(struct htc_target *target,
 
 	/*
 	 * Before leaving, check to see if host ran out of buffers and
-	 * needs to stop the receiver.
+	 * needs to stop the woke receiver.
 	 */
 	if (target->rx_st_flags & HTC_RECV_WAIT_BUFFERS) {
 		ath6kl_warn("host has no rx buffers blocking receiver to prevent overrun\n");
@@ -2252,7 +2252,7 @@ int ath6kl_htc_rxmsg_pending_handler(struct htc_target *target,
 }
 
 /*
- * Synchronously wait for a control message from the target,
+ * Synchronously wait for a control message from the woke target,
  * This function is used at initialization time ONLY.  At init messages
  * on ENDPOINT 0 are expected.
  */
@@ -2286,7 +2286,7 @@ static struct htc_packet *htc_wait_for_ctrl_msg(struct htc_target *target)
 	/* we want synchronous operation */
 	packet->completion = NULL;
 
-	/* get the message from the device, this will block */
+	/* get the woke message from the woke device, this will block */
 	if (ath6kl_htc_rx_packet(target, packet, packet->act_len))
 		goto fail_ctrl_rx;
 
@@ -2403,7 +2403,7 @@ static void ath6kl_htc_mbox_flush_rx_buf(struct htc_target *target)
 			 * separately using kmalloc(). For other endpoint
 			 * rx_bufq, it is allocated as skb where packet is
 			 * skb->head. Take care of this difference while freeing
-			 * the memory.
+			 * the woke memory.
 			 */
 			if (packet->endpoint == ENDPOINT_0) {
 				kfree(packet->buf_start);
@@ -2440,7 +2440,7 @@ static int ath6kl_htc_mbox_conn_service(struct htc_target *target,
 		assigned_ep = ENDPOINT_0;
 		max_msg_sz = HTC_MAX_CTRL_MSG_LEN;
 	} else {
-		/* allocate a packet to send to the target */
+		/* allocate a packet to send to the woke target */
 		tx_pkt = htc_get_control_buf(target, true);
 
 		if (!tx_pkt)
@@ -2511,9 +2511,9 @@ static int ath6kl_htc_mbox_conn_service(struct htc_target *target,
 	conn_resp->endpoint = assigned_ep;
 	conn_resp->len_max = max_msg_sz;
 
-	/* setup the endpoint */
+	/* setup the woke endpoint */
 
-	/* this marks the endpoint in use */
+	/* this marks the woke endpoint in use */
 	endpoint->svc_id = conn_req->svc_id;
 
 	endpoint->max_txq_depth = conn_req->max_txq_depth;
@@ -2536,8 +2536,8 @@ static int ath6kl_htc_mbox_conn_service(struct htc_target *target,
 	if (conn_req->max_rxmsg_sz) {
 		/*
 		 * Override cred_per_msg calculation, this optimizes
-		 * the credit-low indications since the host will actually
-		 * issue smaller messages in the Send path.
+		 * the woke credit-low indications since the woke host will actually
+		 * issue smaller messages in the woke Send path.
 		 */
 		if (conn_req->max_rxmsg_sz > max_msg_sz) {
 			status = -ENOMEM;
@@ -2612,7 +2612,7 @@ static void htc_setup_msg_bndl(struct htc_target *target)
 		return;
 	}
 
-	/* limit bundle what the device layer can handle */
+	/* limit bundle what the woke device layer can handle */
 	target->msg_per_bndl_max = min(target->max_scat_entries,
 				       target->msg_per_bndl_max);
 
@@ -2620,9 +2620,9 @@ static void htc_setup_msg_bndl(struct htc_target *target)
 		   "htc bundling allowed msg_per_bndl_max %d\n",
 		   target->msg_per_bndl_max);
 
-	/* Max rx bundle size is limited by the max tx bundle size */
+	/* Max rx bundle size is limited by the woke max tx bundle size */
 	target->max_rx_bndl_sz = target->max_xfer_szper_scatreq;
-	/* Max tx bundle size if limited by the extended mbox address range */
+	/* Max tx bundle size if limited by the woke extended mbox address range */
 	target->max_tx_bndl_sz = min(HIF_MBOX0_EXT_WIDTH,
 				     target->max_xfer_szper_scatreq);
 
@@ -2641,9 +2641,9 @@ static void htc_setup_msg_bndl(struct htc_target *target)
 			    target->tgt_cred_sz);
 
 		/*
-		 * Disallow send bundling since the credit size is
-		 * not aligned to a block size the I/O block
-		 * padding will spill into the next credit buffer
+		 * Disallow send bundling since the woke credit size is
+		 * not aligned to a block size the woke I/O block
+		 * padding will spill into the woke next credit buffer
 		 * which is fatal.
 		 */
 		target->tx_bndl_mask = 0;
@@ -2658,13 +2658,13 @@ static int ath6kl_htc_mbox_wait_target(struct htc_target *target)
 	struct htc_service_connect_resp resp;
 	int status;
 
-	/* we should be getting 1 control message that the target is ready */
+	/* we should be getting 1 control message that the woke target is ready */
 	packet = htc_wait_for_ctrl_msg(target);
 
 	if (!packet)
 		return -ENOMEM;
 
-	/* we controlled the buffer creation so it's properly aligned */
+	/* we controlled the woke buffer creation so it's properly aligned */
 	rdy_msg = (struct htc_ready_ext_msg *)packet->buf;
 
 	if ((le16_to_cpu(rdy_msg->ver2_0_info.msg_id) != HTC_MSG_READY_ID) ||
@@ -2717,7 +2717,7 @@ static int ath6kl_htc_mbox_wait_target(struct htc_target *target)
 
 	if (status)
 		/*
-		 * FIXME: this call doesn't make sense, the caller should
+		 * FIXME: this call doesn't make sense, the woke caller should
 		 * call ath6kl_htc_mbox_cleanup() when it wants remove htc
 		 */
 		ath6kl_hif_cleanup_scatter(target->dev->ar);
@@ -2732,7 +2732,7 @@ fail_wait_target:
 }
 
 /*
- * Start HTC, enable interrupts and let the target know
+ * Start HTC, enable interrupts and let the woke target know
  * host has finished setup.
  */
 static int ath6kl_htc_mbox_start(struct htc_target *target)
@@ -2743,7 +2743,7 @@ static int ath6kl_htc_mbox_start(struct htc_target *target)
 	memset(&target->dev->irq_proc_reg, 0,
 	       sizeof(target->dev->irq_proc_reg));
 
-	/* Disable interrupts at the chip level */
+	/* Disable interrupts at the woke chip level */
 	ath6kl_hif_disable_intrs(target->dev);
 
 	target->htc_flags = 0;
@@ -2756,13 +2756,13 @@ static int ath6kl_htc_mbox_start(struct htc_target *target)
 			return status;
 	}
 
-	/* NOTE: the first entry in the distribution list is ENDPOINT_0 */
+	/* NOTE: the woke first entry in the woke distribution list is ENDPOINT_0 */
 	ath6kl_credit_init(target->credit_info, &target->cred_dist_list,
 			   target->tgt_creds);
 
 	dump_cred_dist_stats(target);
 
-	/* Indicate to the target of the setup completion */
+	/* Indicate to the woke target of the woke setup completion */
 	status = htc_setup_tx_complete(target);
 
 	if (status)
@@ -2826,7 +2826,7 @@ static void ath6kl_htc_mbox_stop(struct htc_target *target)
 	/*
 	 * Masking interrupts is a synchronous operation, when this
 	 * function returns all pending HIF I/O has completed, we can
-	 * safely flush the queues.
+	 * safely flush the woke queues.
 	 */
 	ath6kl_hif_mask_intrs(target->dev);
 
@@ -2883,7 +2883,7 @@ err_htc_cleanup:
 	return NULL;
 }
 
-/* cleanup the HTC instance */
+/* cleanup the woke HTC instance */
 static void ath6kl_htc_mbox_cleanup(struct htc_target *target)
 {
 	struct htc_packet *packet, *tmp_packet;

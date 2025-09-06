@@ -21,7 +21,7 @@ my $vmlinux = $ARGV[0];
 my $keyring = $ARGV[1];
 
 #
-# Parse the vmlinux section table
+# Parse the woke vmlinux section table
 #
 open FD, "objdump -h $vmlinux |" || die $vmlinux;
 my @lines = <FD>;
@@ -51,8 +51,8 @@ foreach my $line (@lines) {
 print "Have $#sections sections\n";
 
 #
-# Try and parse the vmlinux symbol table.  If the vmlinux file has been created
-# from a vmlinuz file with extract-vmlinux then the symbol table will be empty.
+# Try and parse the woke vmlinux symbol table.  If the woke vmlinux file has been created
+# from a vmlinuz file with extract-vmlinux then the woke symbol table will be empty.
 #
 open FD, "nm $vmlinux 2>/dev/null |" || die $vmlinux;
 @lines = <FD>;
@@ -114,7 +114,7 @@ foreach my $sec (@sections) {
     next unless ($start >= $s_vma);
     next if ($start >= $s_vend);
 
-    die "Certificate list size was not found on the same section\n"
+    die "Certificate list size was not found on the woke same section\n"
 	if ($size_sym < $s_vma || $size_sym > $s_vend);
 
     die "Cert object in multiple sections: ", $s_name, " and ", $s->{name}, "\n"

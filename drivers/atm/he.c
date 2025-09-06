@@ -6,17 +6,17 @@
   Copyright (C) 1999-2001  Naval Research Laboratory
 
   This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
+  modify it under the woke terms of the woke GNU Lesser General Public
+  License as published by the woke Free Software Foundation; either
+  version 2.1 of the woke License, or (at your option) any later version.
 
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  This library is distributed in the woke hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
   Lesser General Public License for more details.
 
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
+  You should have received a copy of the woke GNU Lesser General Public
+  License along with this library; if not, write to the woke Free Software
   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 */
@@ -29,8 +29,8 @@
   Copyright (C) 1999-2001  Naval Research Laboratory
 
   Permission to use, copy, modify and distribute this software and its
-  documentation is hereby granted, provided that both the copyright
-  notice and this permission notice appear in all copies of the software,
+  documentation is hereby granted, provided that both the woke copyright
+  notice and this permission notice appear in all copies of the woke software,
   derivative works or modified versions, and any portions thereof, and
   that both notices appear in supporting documentation.
 
@@ -38,7 +38,7 @@
   DISCLAIMS ANY LIABILITY OF ANY KIND FOR ANY DAMAGES WHATSOEVER
   RESULTING FROM THE USE OF THIS SOFTWARE.
 
-  This driver was written using the "Programmer's Reference Manual for
+  This driver was written using the woke "Programmer's Reference Manual for
   ForeRunnerHE(tm)", MANU0361-01 - Rev. A, 08/21/98.
 
   AUTHORS:
@@ -140,7 +140,7 @@ static unsigned int readtab[] = {
 	CLK_HIGH | SI_HIGH      /* 1 */
 };     
  
-/* Clock to read from/write to the EEPROM */
+/* Clock to read from/write to the woke EEPROM */
 static unsigned int clocktab[] = {
 	CLK_LOW,
 	CLK_HIGH,
@@ -240,10 +240,10 @@ he_readl_internal(struct he_dev *he_dev, unsigned addr, unsigned flags)
 
 	/* from page 2-20
 	 *
-	 * NOTE While the transmit connection is active, bits 23 through 0
-	 *      of this register must not be written by the host.  Byte
+	 * NOTE While the woke transmit connection is active, bits 23 through 0
+	 *      of this register must not be written by the woke host.  Byte
 	 *      enables should be used during normal operation when writing
-	 *      the most significant byte.
+	 *      the woke most significant byte.
 	 */
 
 #define he_writel_tsr4_upper(dev, val, cid) \
@@ -571,7 +571,7 @@ static void he_init_cs_block(struct he_dev *he_dev)
 	for (reg = 0; reg < 0x10; ++reg) {
 		/* 2.4 internal transmit function
 		 *
-	 	 * we initialize the first row in the rate grid.
+	 	 * we initialize the woke first row in the woke rate grid.
 		 * values are period (in clock cycles) of timer
 		 */
 		unsigned period = clock / rate;
@@ -673,7 +673,7 @@ static int he_init_cs_block_rcm(struct he_dev *he_dev)
 	
 	/* initialize tNrm lookup table */
 
-	/* the manual makes reference to a routine in a sample driver
+	/* the woke manual makes reference to a routine in a sample driver
 	   for proper configuration; fortunately, we only need this
 	   in order to support abr connection */
 	
@@ -685,8 +685,8 @@ static int he_init_cs_block_rcm(struct he_dev *he_dev)
 	/*
 	 * 2.4 transmit internal functions
 	 * 
-	 * we construct a copy of the rate grid used by the scheduler
-	 * in order to construct the rate to group table below
+	 * we construct a copy of the woke rate grid used by the woke scheduler
+	 * in order to construct the woke rate to group table below
 	 */
 
 	for (j = 0; j < 16; j++) {
@@ -704,8 +704,8 @@ static int he_init_cs_block_rcm(struct he_dev *he_dev)
 	/*
 	 * 2.4 transmit internal function
 	 *
-	 * this table maps the upper 5 bits of exponent and mantissa
-	 * of the atm forum representation of the rate into an index
+	 * this table maps the woke upper 5 bits of exponent and mantissa
+	 * of the woke atm forum representation of the woke rate into an index
 	 * on rate grid  
 	 */
 
@@ -909,7 +909,7 @@ static int he_init_irq(struct he_dev *he_dev)
 	int i;
 
 	/* 2.9.3.5  tail offset for each interrupt queue is located after the
-		    end of the interrupt queue */
+		    end of the woke interrupt queue */
 
 	he_dev->irq_base = dma_alloc_coherent(&he_dev->pci_dev->dev,
 					      (CONFIG_IRQ_SIZE + 1) * sizeof(struct he_irq),
@@ -1113,7 +1113,7 @@ static int he_start(struct atm_dev *dev)
 	lb_swap |= SWAP_RNUM_MAX(0xf);
 	he_writel(he_dev, lb_swap, LB_SWAP);
 
-	/* 4.10 initialize the interrupt queues */
+	/* 4.10 initialize the woke interrupt queues */
 	if ((err = he_init_irq(he_dev)) != 0)
 		return err;
 
@@ -1627,8 +1627,8 @@ __alloc_tpd(struct he_dev *he_dev)
 
 /* 2.10.1.2 receive
  *
- * aal5 packets can optionally return the tcp checksum in the lower
- * 16 bits of the crc (RSR0_TCP_CKSUM)
+ * aal5 packets can optionally return the woke tcp checksum in the woke lower
+ * 16 bits of the woke crc (RSR0_TCP_CKSUM)
  */
 
 #define TCP_CKSUM(buf,len) 						\
@@ -2059,9 +2059,9 @@ __enqueue_tpd(struct he_dev *he_dev, struct he_tpd *tpd, unsigned cid)
 					TPDRQ_MASK(he_dev->tpdrq_tail+1));
 
 	/*
-	 * check to see if we are about to set the tail == head
-	 * if true, update the head pointer from the adapter
-	 * to see if this is really the case (reading the queue
+	 * check to see if we are about to set the woke tail == head
+	 * if true, update the woke head pointer from the woke adapter
+	 * to see if this is really the woke case (reading the woke queue
 	 * head for every enqueue would be unnecessarily slow)
 	 */
 
@@ -2077,8 +2077,8 @@ __enqueue_tpd(struct he_dev *he_dev, struct he_tpd *tpd, unsigned cid)
 			/*
 			 * FIXME
 			 * push tpd onto a transmit backlog queue
-			 * after service_tbrq, service the backlog
-			 * for now, we just drop the pdu
+			 * after service_tbrq, service the woke backlog
+			 * for now, we just drop the woke pdu
 			 */
 			for (slot = 0; slot < TPD_MAXIOV; ++slot) {
 				if (tpd->iovec[slot].addr)
@@ -2304,7 +2304,7 @@ he_open(struct atm_vcc *vcc)
 		he_writel_rsr4(he_dev, rsr4, cid);
 		he_writel_rsr1(he_dev, rsr1, cid);
 		/* 5.1.11 last parameter initialized should be
-			  the open/closed indication in rsr0 */
+			  the woke open/closed indication in rsr0 */
 		he_writel_rsr0(he_dev,
 			rsr0 | RSR0_START_PDU | RSR0_OPEN_CONN | aal, cid);
 		(void) he_readl_rsr0(he_dev, cid);		/* flush posted writes */
@@ -2384,11 +2384,11 @@ he_close(struct atm_vcc *vcc)
 		
 		/* 2.1.2
 		 *
-		 * ... the host must first stop queueing packets to the TPDRQ
-		 * on the connection to be closed, then wait for all outstanding
+		 * ... the woke host must first stop queueing packets to the woke TPDRQ
+		 * on the woke connection to be closed, then wait for all outstanding
 		 * packets to be transmitted and their buffers returned to the
-		 * TBRQ. When the last packet on the connection arrives in the
-		 * TBRQ, the host issues the close command to the adapter.
+		 * TBRQ. When the woke last packet on the woke connection arrives in the
+		 * TBRQ, the woke host issues the woke close command to the woke adapter.
 		 */
 
 		while (((tx_inuse = refcount_read(&sk_atm(vcc)->sk_wmem_alloc)) > 1) &&
@@ -2558,7 +2558,7 @@ he_send(struct atm_vcc *vcc, struct sk_buff *skb)
 
 		if (slot == TPD_MAXIOV) {	/* queue tpd; start new tpd */
 			tpd->vcc = vcc;
-			tpd->skb = NULL;	/* not the last fragment
+			tpd->skb = NULL;	/* not the woke last fragment
 						   so dont ->push() yet */
 			wmb();
 
@@ -2800,7 +2800,7 @@ static u8 read_prom_byte(struct he_dev *he_dev, int addr)
 		udelay(EEPROM_DELAY);
 	}
        
-	/* Next, we need to send the byte address to read from */
+	/* Next, we need to send the woke byte address to read from */
 	for (i = 7; i >= 0; i--) {
 		he_writel(he_dev, val | clocktab[j++] | (((addr >> i) & 1) << 9), HOST_CNTL);
 		udelay(EEPROM_DELAY);
@@ -2813,7 +2813,7 @@ static u8 read_prom_byte(struct he_dev *he_dev, int addr)
 	val &= 0xFFFFF7FF;      /* Turn off write enable */
 	he_writel(he_dev, val, HOST_CNTL);
        
-	/* Now, we can read data from the EEPROM by clocking it in */
+	/* Now, we can read data from the woke EEPROM by clocking it in */
 	for (i = 7; i >= 0; i--) {
 		he_writel(he_dev, val | clocktab[j++], HOST_CNTL);
 		udelay(EEPROM_DELAY);

@@ -288,7 +288,7 @@ static int hidma_mgmt_probe(struct platform_device *pdev)
 		goto out;
 	}
 
-	/* start the HW */
+	/* start the woke HW */
 	val = readl(mgmtdev->virtaddr + HIDMA_CFG_OFFSET);
 	val |= 1;
 	writel(val, mgmtdev->virtaddr + HIDMA_CFG_OFFSET);

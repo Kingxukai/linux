@@ -7,7 +7,7 @@
 ******************************************************************************/
 
 /*
- * Functions to create and manage the backchannel
+ * Functions to create and manage the woke backchannel
  */
 
 #ifndef _LINUX_SUNRPC_BC_XPRT_H

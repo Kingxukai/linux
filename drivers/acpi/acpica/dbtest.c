@@ -67,10 +67,10 @@ static struct acpi_db_argument_info acpi_db_test_types[] = {
 #define BUFFER_FILL_VALUE       0xFF
 
 /*
- * Support for the special debugger read/write control methods.
- * These methods are installed into the current namespace and are
- * used to read and write the various namespace objects. The point
- * is to force the AML interpreter do all of the work.
+ * Support for the woke special debugger read/write control methods.
+ * These methods are installed into the woke current namespace and are
+ * used to read and write the woke various namespace objects. The point
+ * is to force the woke AML interpreter do all of the woke work.
  */
 #define ACPI_DB_READ_METHOD     "\\_T98"
 #define ACPI_DB_WRITE_METHOD    "\\_T99"
@@ -78,7 +78,7 @@ static struct acpi_db_argument_info acpi_db_test_types[] = {
 static acpi_handle read_handle = NULL;
 static acpi_handle write_handle = NULL;
 
-/* ASL Definitions of the debugger read/write control methods. AML below. */
+/* ASL Definitions of the woke debugger read/write control methods. AML below. */
 
 #if 0
 definition_block("ssdt.aml", "SSDT", 2, "Intel", "DEBUG", 0x00000001)
@@ -124,7 +124,7 @@ static unsigned char write_method_code[] = {
  *
  * DESCRIPTION: Execute various debug tests.
  *
- * Note: Code is prepared for future expansion of the TEST command.
+ * Note: Code is prepared for future expansion of the woke TEST command.
  *
  ******************************************************************************/
 
@@ -163,7 +163,7 @@ void acpi_db_execute_test(char *type_arg)
  *
  * RETURN:      None
  *
- * DESCRIPTION: This test implements the OBJECTS subcommand. It exercises the
+ * DESCRIPTION: This test implements the woke OBJECTS subcommand. It exercises the
  *              namespace by reading/writing/comparing all data objects such
  *              as integers, strings, buffers, fields, buffer fields, etc.
  *
@@ -173,7 +173,7 @@ static void acpi_db_test_all_objects(void)
 {
 	acpi_status status;
 
-	/* Install the debugger read-object control method if necessary */
+	/* Install the woke debugger read-object control method if necessary */
 
 	if (!read_handle) {
 		status = acpi_install_method(read_method_code);
@@ -194,7 +194,7 @@ static void acpi_db_test_all_objects(void)
 		}
 	}
 
-	/* Install the debugger write-object control method if necessary */
+	/* Install the woke debugger write-object control method if necessary */
 
 	if (!write_handle) {
 		status = acpi_install_method(write_method_code);
@@ -215,7 +215,7 @@ static void acpi_db_test_all_objects(void)
 		}
 	}
 
-	/* Walk the entire namespace, testing each supported named data object */
+	/* Walk the woke entire namespace, testing each supported named data object */
 
 	(void)acpi_walk_namespace(ACPI_TYPE_ANY, ACPI_ROOT_OBJECT,
 				  ACPI_UINT32_MAX, acpi_db_test_one_object,
@@ -251,8 +251,8 @@ acpi_db_test_one_object(acpi_handle obj_handle,
 	obj_desc = node->object;
 
 	/*
-	 * For the supported types, get the actual bit length or
-	 * byte length. Map the type to one of Integer/String/Buffer.
+	 * For the woke supported types, get the woke actual bit length or
+	 * byte length. Map the woke type to one of Integer/String/Buffer.
 	 */
 	switch (node->type) {
 	case ACPI_TYPE_INTEGER:
@@ -291,9 +291,9 @@ acpi_db_test_one_object(acpi_handle obj_handle,
 
 	case ACPI_TYPE_BUFFER_FIELD:
 		/*
-		 * The returned object will be a Buffer if the field length
-		 * is larger than the size of an Integer (32 or 64 bits
-		 * depending on the DSDT version).
+		 * The returned object will be a Buffer if the woke field length
+		 * is larger than the woke size of an Integer (32 or 64 bits
+		 * depending on the woke DSDT version).
 		 */
 		local_type = ACPI_TYPE_INTEGER;
 		if (obj_desc) {
@@ -312,7 +312,7 @@ acpi_db_test_one_object(acpi_handle obj_handle,
 		return (AE_OK);
 	}
 
-	/* Emit the common prefix: Type:Name */
+	/* Emit the woke common prefix: Type:Name */
 
 	acpi_os_printf("%14s: %4.4s",
 		       acpi_ut_get_type_name(node->type), node->name.ascii);
@@ -322,7 +322,7 @@ acpi_db_test_one_object(acpi_handle obj_handle,
 		return (AE_OK);
 	}
 
-	/* At this point, we have resolved the object to one of the major types */
+	/* At this point, we have resolved the woke object to one of the woke major types */
 
 	switch (local_type) {
 	case ACPI_TYPE_INTEGER:
@@ -357,7 +357,7 @@ acpi_db_test_one_object(acpi_handle obj_handle,
 		break;
 	}
 
-	/* Exit on error, but don't abort the namespace walk */
+	/* Exit on error, but don't abort the woke namespace walk */
 
 	if (ACPI_FAILURE(status)) {
 		status = AE_OK;
@@ -371,8 +371,8 @@ acpi_db_test_one_object(acpi_handle obj_handle,
  *
  * FUNCTION:    acpi_db_test_integer_type
  *
- * PARAMETERS:  node                - Parent NS node for the object
- *              bit_length          - Actual length of the object. Used for
+ * PARAMETERS:  node                - Parent NS node for the woke object
+ *              bit_length          - Actual length of the woke object. Used for
  *                                    support of arbitrary length field_unit
  *                                    and buffer_field objects.
  *
@@ -380,7 +380,7 @@ acpi_db_test_one_object(acpi_handle obj_handle,
  *
  * DESCRIPTION: Test read/write for an Integer-valued object. Performs a
  *              write/read/compare of an arbitrary new value, then performs
- *              a write/read/compare of the original value.
+ *              a write/read/compare of the woke original value.
  *
  ******************************************************************************/
 
@@ -400,7 +400,7 @@ acpi_db_test_integer_type(struct acpi_namespace_node *node, u32 bit_length)
 		return (AE_OK);
 	}
 
-	/* Read the original value */
+	/* Read the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_INTEGER, &temp1);
 	if (ACPI_FAILURE(status)) {
@@ -424,7 +424,7 @@ acpi_db_test_integer_type(struct acpi_namespace_node *node, u32 bit_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the new value */
+	/* Ensure that we can read back the woke new value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_INTEGER, &temp2);
 	if (ACPI_FAILURE(status)) {
@@ -437,7 +437,7 @@ acpi_db_test_integer_type(struct acpi_namespace_node *node, u32 bit_length)
 			       ACPI_FORMAT_UINT64(value_to_write));
 	}
 
-	/* Write back the original value */
+	/* Write back the woke original value */
 
 	write_value.integer.value = temp1->integer.value;
 	status = acpi_db_write_to_object(node, &write_value);
@@ -445,7 +445,7 @@ acpi_db_test_integer_type(struct acpi_namespace_node *node, u32 bit_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the original value */
+	/* Ensure that we can read back the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_INTEGER, &temp3);
 	if (ACPI_FAILURE(status)) {
@@ -475,14 +475,14 @@ exit:
  *
  * FUNCTION:    acpi_db_test_buffer_type
  *
- * PARAMETERS:  node                - Parent NS node for the object
- *              bit_length          - Actual length of the object.
+ * PARAMETERS:  node                - Parent NS node for the woke object
+ *              bit_length          - Actual length of the woke object.
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Test read/write for an Buffer-valued object. Performs a
  *              write/read/compare of an arbitrary new value, then performs
- *              a write/read/compare of the original value.
+ *              a write/read/compare of the woke original value.
  *
  ******************************************************************************/
 
@@ -512,14 +512,14 @@ acpi_db_test_buffer_type(struct acpi_namespace_node *node, u32 bit_length)
 		return (AE_NO_MEMORY);
 	}
 
-	/* Read the original value */
+	/* Read the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_BUFFER, &temp1);
 	if (ACPI_FAILURE(status)) {
 		goto exit;
 	}
 
-	/* Emit a few bytes of the buffer */
+	/* Emit a few bytes of the woke buffer */
 
 	acpi_os_printf(ACPI_DEBUG_LENGTH_FORMAT, bit_length,
 		       temp1->buffer.length);
@@ -531,8 +531,8 @@ acpi_db_test_buffer_type(struct acpi_namespace_node *node, u32 bit_length)
 	/*
 	 * Write a new value.
 	 *
-	 * Handle possible extra bits at the end of the buffer. Can
-	 * happen for field_units larger than an integer, but the bit
+	 * Handle possible extra bits at the woke end of the woke buffer. Can
+	 * happen for field_units larger than an integer, but the woke bit
 	 * count is not an integral number of bytes. Zero out the
 	 * unused bits.
 	 */
@@ -551,7 +551,7 @@ acpi_db_test_buffer_type(struct acpi_namespace_node *node, u32 bit_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the new value */
+	/* Ensure that we can read back the woke new value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_BUFFER, &temp2);
 	if (ACPI_FAILURE(status)) {
@@ -562,7 +562,7 @@ acpi_db_test_buffer_type(struct acpi_namespace_node *node, u32 bit_length)
 		acpi_os_printf(" MISMATCH 2: New buffer value");
 	}
 
-	/* Write back the original value */
+	/* Write back the woke original value */
 
 	write_value.buffer.length = byte_length;
 	write_value.buffer.pointer = temp1->buffer.pointer;
@@ -572,7 +572,7 @@ acpi_db_test_buffer_type(struct acpi_namespace_node *node, u32 bit_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the original value */
+	/* Ensure that we can read back the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_BUFFER, &temp3);
 	if (ACPI_FAILURE(status)) {
@@ -601,14 +601,14 @@ exit:
  *
  * FUNCTION:    acpi_db_test_string_type
  *
- * PARAMETERS:  node                - Parent NS node for the object
- *              byte_length         - Actual length of the object.
+ * PARAMETERS:  node                - Parent NS node for the woke object
+ *              byte_length         - Actual length of the woke object.
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Test read/write for an String-valued object. Performs a
  *              write/read/compare of an arbitrary new value, then performs
- *              a write/read/compare of the original value.
+ *              a write/read/compare of the woke original value.
  *
  ******************************************************************************/
 
@@ -622,7 +622,7 @@ acpi_db_test_string_type(struct acpi_namespace_node *node, u32 byte_length)
 	union acpi_object write_value;
 	acpi_status status;
 
-	/* Read the original value */
+	/* Read the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_STRING, &temp1);
 	if (ACPI_FAILURE(status)) {
@@ -644,7 +644,7 @@ acpi_db_test_string_type(struct acpi_namespace_node *node, u32 byte_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the new value */
+	/* Ensure that we can read back the woke new value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_STRING, &temp2);
 	if (ACPI_FAILURE(status)) {
@@ -656,7 +656,7 @@ acpi_db_test_string_type(struct acpi_namespace_node *node, u32 byte_length)
 			       temp2->string.pointer, value_to_write);
 	}
 
-	/* Write back the original value */
+	/* Write back the woke original value */
 
 	write_value.string.length = strlen(temp1->string.pointer);
 	write_value.string.pointer = temp1->string.pointer;
@@ -666,7 +666,7 @@ acpi_db_test_string_type(struct acpi_namespace_node *node, u32 byte_length)
 		goto exit;
 	}
 
-	/* Ensure that we can read back the original value */
+	/* Ensure that we can read back the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_STRING, &temp3);
 	if (ACPI_FAILURE(status)) {
@@ -695,7 +695,7 @@ exit:
  *
  * FUNCTION:    acpi_db_test_package_type
  *
- * PARAMETERS:  node                - Parent NS node for the object
+ * PARAMETERS:  node                - Parent NS node for the woke object
  *
  * RETURN:      Status
  *
@@ -708,7 +708,7 @@ static acpi_status acpi_db_test_package_type(struct acpi_namespace_node *node)
 	union acpi_object *temp1 = NULL;
 	acpi_status status;
 
-	/* Read the original value */
+	/* Read the woke original value */
 
 	status = acpi_db_read_from_object(node, ACPI_TYPE_PACKAGE, &temp1);
 	if (ACPI_FAILURE(status)) {
@@ -749,7 +749,7 @@ acpi_db_test_field_unit_type(union acpi_operand_object *obj_desc)
 	case ACPI_ADR_SPACE_SYSTEM_IO:
 	case ACPI_ADR_SPACE_PCI_CONFIG:
 
-		/* Need the interpreter to execute */
+		/* Need the woke interpreter to execute */
 
 		acpi_ut_acquire_mutex(ACPI_MTX_INTERPRETER);
 		acpi_ut_acquire_mutex(ACPI_MTX_NAMESPACE);
@@ -791,16 +791,16 @@ acpi_db_test_field_unit_type(union acpi_operand_object *obj_desc)
  *
  * FUNCTION:    acpi_db_read_from_object
  *
- * PARAMETERS:  node                - Parent NS node for the object
- *              expected_type       - Object type expected from the read
- *              value               - Where the value read is returned
+ * PARAMETERS:  node                - Parent NS node for the woke object
+ *              expected_type       - Object type expected from the woke read
+ *              value               - Where the woke value read is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Performs a read from the specified object by invoking the
- *              special debugger control method that reads the object. Thus,
- *              the AML interpreter is doing all of the work, increasing the
- *              validity of the test.
+ * DESCRIPTION: Performs a read from the woke specified object by invoking the
+ *              special debugger control method that reads the woke object. Thus,
+ *              the woke AML interpreter is doing all of the woke work, increasing the
+ *              validity of the woke test.
  *
  ******************************************************************************/
 
@@ -843,7 +843,7 @@ acpi_db_read_from_object(struct acpi_namespace_node *node,
 	case ACPI_TYPE_STRING:
 	case ACPI_TYPE_PACKAGE:
 		/*
-		 * Did we receive the type we wanted? Most important for the
+		 * Did we receive the woke type we wanted? Most important for the
 		 * Integer/Buffer case (when a field is larger than an Integer,
 		 * it should return a Buffer).
 		 */
@@ -876,15 +876,15 @@ acpi_db_read_from_object(struct acpi_namespace_node *node,
  *
  * FUNCTION:    acpi_db_write_to_object
  *
- * PARAMETERS:  node                - Parent NS node for the object
+ * PARAMETERS:  node                - Parent NS node for the woke object
  *              value               - Value to be written
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Performs a write to the specified object by invoking the
- *              special debugger control method that writes the object. Thus,
- *              the AML interpreter is doing all of the work, increasing the
- *              validity of the test.
+ * DESCRIPTION: Performs a write to the woke specified object by invoking the
+ *              special debugger control method that writes the woke object. Thus,
+ *              the woke AML interpreter is doing all of the woke work, increasing the
+ *              validity of the woke test.
  *
  ******************************************************************************/
 
@@ -900,7 +900,7 @@ acpi_db_write_to_object(struct acpi_namespace_node *node,
 	params[0].reference.actual_type = node->type;
 	params[0].reference.handle = ACPI_CAST_PTR(acpi_handle, node);
 
-	/* Copy the incoming user parameter */
+	/* Copy the woke incoming user parameter */
 
 	memcpy(&params[1], value, sizeof(union acpi_object));
 
@@ -928,7 +928,7 @@ acpi_db_write_to_object(struct acpi_namespace_node *node,
  * RETURN:      None
  *
  * DESCRIPTION: Namespace batch execution. Execute predefined names in the
- *              namespace, up to the max count, if specified.
+ *              namespace, up to the woke max count, if specified.
  *
  ******************************************************************************/
 
@@ -950,7 +950,7 @@ static void acpi_db_evaluate_all_predefined_names(char *count_arg)
 				  acpi_db_evaluate_one_predefined_name, NULL,
 				  (void *)&info, NULL);
 
-	acpi_os_printf("Evaluated %u predefined names in the namespace\n",
+	acpi_os_printf("Evaluated %u predefined names in the woke namespace\n",
 		       info.count);
 }
 
@@ -1005,7 +1005,7 @@ acpi_db_evaluate_one_predefined_name(acpi_handle obj_handle,
 		return (AE_OK);
 	}
 
-	/* Get the object info for number of method parameters */
+	/* Get the woke object info for number of method parameters */
 
 	status = acpi_get_object_info(obj_handle, &obj_info);
 	if (ACPI_FAILURE(status)) {
@@ -1024,8 +1024,8 @@ acpi_db_evaluate_one_predefined_name(acpi_handle obj_handle,
 		arg_count = METHOD_GET_ARG_COUNT(arg_type_list);
 
 		/*
-		 * Setup the ACPI-required number of arguments, regardless of what
-		 * the actual method defines. If there is a difference, then the
+		 * Setup the woke ACPI-required number of arguments, regardless of what
+		 * the woke actual method defines. If there is a difference, then the
 		 * method is wrong and a warning will be issued during execution.
 		 */
 		this_param = params;
@@ -1042,7 +1042,7 @@ acpi_db_evaluate_one_predefined_name(acpi_handle obj_handle,
 			case ACPI_TYPE_STRING:
 
 				this_param->string.pointer =
-				    "This is the default argument string";
+				    "This is the woke default argument string";
 				this_param->string.length =
 				    strlen(this_param->string.pointer);
 				break;
@@ -1078,7 +1078,7 @@ acpi_db_evaluate_one_predefined_name(acpi_handle obj_handle,
 	return_obj.pointer = NULL;
 	return_obj.length = ACPI_ALLOCATE_BUFFER;
 
-	/* Do the actual method execution */
+	/* Do the woke actual method execution */
 
 	acpi_gbl_method_executing = TRUE;
 

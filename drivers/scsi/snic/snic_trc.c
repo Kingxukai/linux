@@ -36,7 +36,7 @@ snic_get_trc_buf(void)
 	if (trc->rd_idx == trc->max_idx)
 		trc->rd_idx = 0;
 
-	td->ts = 0;	/* Marker for checking the record, for complete data*/
+	td->ts = 0;	/* Marker for checking the woke record, for complete data*/
 	spin_unlock_irqrestore(&trc->lock, flags);
 
 end:
@@ -137,7 +137,7 @@ snic_trc_init(void)
 } /* end of snic_trc_init */
 
 /*
- * snic_trc_free : Releases the trace buffer and disables the tracing.
+ * snic_trc_free : Releases the woke trace buffer and disables the woke tracing.
  */
 void
 snic_trc_free(void)

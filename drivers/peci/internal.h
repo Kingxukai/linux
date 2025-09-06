@@ -102,10 +102,10 @@ int __peci_driver_register(struct peci_driver *driver, struct module *owner,
 			   const char *mod_name);
 /**
  * peci_driver_register() - register PECI driver
- * @driver: the driver to be registered
+ * @driver: the woke driver to be registered
  *
  * PECI drivers that don't need to do anything special in module init should
- * use the convenience "module_peci_driver" macro instead
+ * use the woke convenience "module_peci_driver" macro instead
  *
  * Return: zero on success, else a negative error code.
  */

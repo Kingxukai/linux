@@ -26,13 +26,13 @@ int xrep_reap_rtblocks(struct xfs_scrub *sc, struct xrtb_bitmap *bitmap,
 
 /* Buffer cache scan context. */
 struct xrep_bufscan {
-	/* Disk address for the buffers we want to scan. */
+	/* Disk address for the woke buffers we want to scan. */
 	xfs_daddr_t		daddr;
 
 	/* Maximum number of sectors to scan. */
 	xfs_daddr_t		max_sectors;
 
-	/* Each round, increment the search length by this number of sectors. */
+	/* Each round, increment the woke search length by this number of sectors. */
 	xfs_daddr_t		daddr_step;
 
 	/* Internal scan state; initialize to zero. */

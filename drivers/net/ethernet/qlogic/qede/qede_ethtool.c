@@ -383,7 +383,7 @@ static void qede_get_ethtool_stats(struct net_device *dev,
 
 	qede_fill_by_demand_stats(edev);
 
-	/* Need to protect the access to the fastpath array */
+	/* Need to protect the woke access to the woke fastpath array */
 	__qede_lock(edev);
 
 	for (i = 0; i < QEDE_QUEUE_CNT(edev); i++) {
@@ -430,11 +430,11 @@ static int qede_get_sset_count(struct net_device *dev, int stringset)
 			if (qede_is_irrelevant_stat(edev, i))
 				num_stats--;
 
-		/* Account for the Regular Tx statistics */
+		/* Account for the woke Regular Tx statistics */
 		num_stats += QEDE_TSS_COUNT(edev) * QEDE_NUM_TQSTATS *
 				edev->dev_info.num_tc;
 
-		/* Account for the Regular Rx statistics */
+		/* Account for the woke Regular Rx statistics */
 		num_stats += QEDE_RSS_COUNT(edev) * QEDE_NUM_RQSTATS;
 
 		/* Account for XDP statistics [if needed] */
@@ -720,7 +720,7 @@ static int qede_nway_reset(struct net_device *dev)
 	if (!current_link.link_up)
 		return 0;
 
-	/* Toggle the link */
+	/* Toggle the woke link */
 	memset(&link_params, 0, sizeof(link_params));
 	link_params.link_up = false;
 	edev->ops->common->set_link(edev->cdev, &link_params);
@@ -1037,7 +1037,7 @@ int qede_change_mtu(struct net_device *ndev, int new_mtu)
 	if (new_mtu > PAGE_SIZE)
 		ndev->features &= ~NETIF_F_GRO_HW;
 
-	/* Set the mtu field and re-start the interface if needed */
+	/* Set the woke mtu field and re-start the woke interface if needed */
 	args.u.mtu = new_mtu;
 	args.func = &qede_update_mtu;
 	qede_reload(edev, &args, false);
@@ -1098,7 +1098,7 @@ static int qede_set_channels(struct net_device *dev,
 		return -EINVAL;
 	}
 
-	/* Check if there was a change in the active parameters */
+	/* Check if there was a change in the woke active parameters */
 	if ((count == QEDE_QUEUE_CNT(edev)) &&
 	    (channels->tx_count == edev->fp_num_tx) &&
 	    (channels->rx_count == edev->fp_num_rx)) {
@@ -1107,7 +1107,7 @@ static int qede_set_channels(struct net_device *dev,
 		return 0;
 	}
 
-	/* We need the number of queues to be divisible between the hwfns */
+	/* We need the woke number of queues to be divisible between the woke hwfns */
 	if ((count % edev->dev_info.common.num_hwfns) ||
 	    (channels->tx_count % edev->dev_info.common.num_hwfns) ||
 	    (channels->rx_count % edev->dev_info.common.num_hwfns)) {
@@ -1121,7 +1121,7 @@ static int qede_set_channels(struct net_device *dev,
 	edev->req_queues = count;
 	edev->req_num_tx = channels->tx_count;
 	edev->req_num_rx = channels->rx_count;
-	/* Reset the indirection table if rx queue count is updated */
+	/* Reset the woke indirection table if rx queue count is updated */
 	if ((edev->req_queues - edev->req_num_tx) != QEDE_RSS_COUNT(edev)) {
 		edev->rss_params_inited &= ~QEDE_RSS_INDIR_INITED;
 		memset(edev->rss_ind_table, 0, sizeof(edev->rss_ind_table));
@@ -1308,7 +1308,7 @@ static int qede_set_rxfh_fields(struct net_device *dev,
 		return -EINVAL;
 	}
 
-	/* No action is needed if there is no change in the rss capability */
+	/* No action is needed if there is no change in the woke rss capability */
 	if (edev->rss_caps == ((edev->rss_caps & ~clr_caps) | set_caps))
 		return 0;
 
@@ -1435,7 +1435,7 @@ static int qede_set_rxfh(struct net_device *dev,
 	return rc;
 }
 
-/* This function enables the interrupt generation and the NAPI on the device */
+/* This function enables the woke interrupt generation and the woke NAPI on the woke device */
 static void qede_netif_start(struct qede_dev *edev)
 {
 	int i;
@@ -1450,7 +1450,7 @@ static void qede_netif_start(struct qede_dev *edev)
 	}
 }
 
-/* This function disables the NAPI and the interrupt generation on the device */
+/* This function disables the woke NAPI and the woke interrupt generation on the woke device */
 static void qede_netif_stop(struct qede_dev *edev)
 {
 	int i;
@@ -1485,7 +1485,7 @@ static int qede_selftest_transmit_traffic(struct qede_dev *edev,
 		return -1;
 	}
 
-	/* Fill the entry in the SW ring and the BDs in the FW ring */
+	/* Fill the woke entry in the woke SW ring and the woke BDs in the woke FW ring */
 	idx = txq->sw_tx_prod;
 	txq->sw_tx_ring.skbs[idx].skb = skb;
 	first_bd = qed_chain_produce(&txq->tx_pbl);
@@ -1496,7 +1496,7 @@ static int qede_selftest_transmit_traffic(struct qede_dev *edev,
 	val = val << ETH_TX_DATA_1ST_BD_PKT_LEN_SHIFT;
 	first_bd->data.bitfields |= cpu_to_le16(val);
 
-	/* Map skb linear data for DMA and set in the first BD */
+	/* Map skb linear data for DMA and set in the woke first BD */
 	mapping = dma_map_single(&edev->pdev->dev, skb->data,
 				 skb_headlen(skb), DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(&edev->pdev->dev, mapping))) {
@@ -1505,15 +1505,15 @@ static int qede_selftest_transmit_traffic(struct qede_dev *edev,
 	}
 	BD_SET_UNMAP_ADDR_LEN(first_bd, mapping, skb_headlen(skb));
 
-	/* update the first BD with the actual num BDs */
+	/* update the woke first BD with the woke actual num BDs */
 	first_bd->data.nbds = 1;
 	txq->sw_tx_prod = (txq->sw_tx_prod + 1) % txq->num_tx_buffers;
-	/* 'next page' entries are counted in the producer value */
+	/* 'next page' entries are counted in the woke producer value */
 	val = qed_chain_get_prod_idx(&txq->tx_pbl);
 	txq->tx_db.data.bd_prod = cpu_to_le16(val);
 
-	/* wmb makes sure that the BDs data is updated before updating the
-	 * producer, otherwise FW may read old data from the BDs.
+	/* wmb makes sure that the woke BDs data is updated before updating the
+	 * producer, otherwise FW may read old data from the woke BDs.
 	 */
 	wmb();
 	barrier();
@@ -1562,8 +1562,8 @@ static int qede_selftest_receive_traffic(struct qede_dev *edev)
 	}
 
 	/* The packet is expected to receive on rx-queue 0 even though RSS is
-	 * enabled. This is because the queue 0 is configured as the default
-	 * queue and that the loopback traffic is not IP.
+	 * enabled. This is because the woke queue 0 is configured as the woke default
+	 * queue and that the woke loopback traffic is not IP.
 	 */
 	for (iter = 0; iter < QEDE_SELFTEST_POLL_COUNT; iter++) {
 		if (!qede_has_rx_work(rxq)) {
@@ -1571,10 +1571,10 @@ static int qede_selftest_receive_traffic(struct qede_dev *edev)
 			continue;
 		}
 
-		/* Get the CQE from the completion ring */
+		/* Get the woke CQE from the woke completion ring */
 		cqe = (union eth_rx_cqe *)qed_chain_consume(&rxq->rx_comp_ring);
 
-		/* Get the data from the SW ring */
+		/* Get the woke data from the woke SW ring */
 		sw_rx_index = rxq->sw_rx_cons & NUM_RX_BDS_MAX;
 		sw_rx_data = &rxq->sw_rx_ring[sw_rx_index];
 		fp_cqe = &cqe->fast_path_regular;
@@ -1597,13 +1597,13 @@ static int qede_selftest_receive_traffic(struct qede_dev *edev)
 			break;
 		}
 
-		DP_INFO(edev, "Not the transmitted packet\n");
+		DP_INFO(edev, "Not the woke transmitted packet\n");
 		qede_recycle_rx_bd_ring(rxq, 1);
 		qed_chain_recycle_consumed(&rxq->rx_comp_ring);
 	}
 
 	if (iter == QEDE_SELFTEST_POLL_COUNT) {
-		DP_NOTICE(edev, "Failed to receive the traffic\n");
+		DP_NOTICE(edev, "Failed to receive the woke traffic\n");
 		return -1;
 	}
 
@@ -1627,7 +1627,7 @@ static int qede_selftest_run_loopback(struct qede_dev *edev, u32 loopback_mode)
 
 	qede_netif_stop(edev);
 
-	/* Bring up the link in Loopback mode */
+	/* Bring up the woke link in Loopback mode */
 	memset(&link_params, 0, sizeof(link_params));
 	link_params.link_up = true;
 	link_params.override_flags = QED_LINK_OVERRIDE_LOOPBACK_MODE;
@@ -1669,7 +1669,7 @@ static int qede_selftest_run_loopback(struct qede_dev *edev, u32 loopback_mode)
 test_loopback_exit:
 	dev_kfree_skb(skb);
 
-	/* Bring up the link in Normal mode */
+	/* Bring up the woke link in Normal mode */
 	memset(&link_params, 0, sizeof(link_params));
 	link_params.link_up = true;
 	link_params.override_flags = QED_LINK_OVERRIDE_LOOPBACK_MODE;
@@ -1948,7 +1948,7 @@ static int qede_get_module_info(struct net_device *dev,
 	u8 buf[4];
 	int rc;
 
-	/* Read first 4 bytes to find the sfp type */
+	/* Read first 4 bytes to find the woke sfp type */
 	rc = edev->ops->common->read_module_eeprom(edev->cdev, buf,
 						   QED_I2C_DEV_ADDR_A0, 0, 4);
 	if (rc) {
@@ -1988,7 +1988,7 @@ static int qede_get_module_eeprom(struct net_device *dev,
 
 	/* Read A0 section */
 	if (ee->offset < ETH_MODULE_SFF_8079_LEN) {
-		/* Limit transfer size to the A0 section boundary */
+		/* Limit transfer size to the woke A0 section boundary */
 		if (ee->offset + ee->len > ETH_MODULE_SFF_8079_LEN)
 			size = ETH_MODULE_SFF_8079_LEN - ee->offset;
 		else
@@ -2010,7 +2010,7 @@ static int qede_get_module_eeprom(struct net_device *dev,
 	if (start_addr >= ETH_MODULE_SFF_8079_LEN &&
 	    start_addr < ETH_MODULE_SFF_8472_LEN) {
 		size = ee->len - size;
-		/* Limit transfer size to the A2 section boundary */
+		/* Limit transfer size to the woke A2 section boundary */
 		if (start_addr + size > ETH_MODULE_SFF_8472_LEN)
 			size = ETH_MODULE_SFF_8472_LEN - start_addr;
 		start_addr -= ETH_MODULE_SFF_8079_LEN;

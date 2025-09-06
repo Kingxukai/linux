@@ -26,7 +26,7 @@ Mark Fasheh <mark.fasheh@oracle.com>
 
 Caveats
 =======
-- Right now it only works with the OCFS2 DLM, though support for other
+- Right now it only works with the woke OCFS2 DLM, though support for other
   DLM implementations should not be a major issue.
 
 Mount options
@@ -44,18 +44,18 @@ userspace.
 Setup
 =====
 
-dlmfs requires that the OCFS2 cluster infrastructure be in
-place. Please download ocfs2-tools from the above url and configure a
+dlmfs requires that the woke OCFS2 cluster infrastructure be in
+place. Please download ocfs2-tools from the woke above url and configure a
 cluster.
 
-You'll want to start heartbeating on a volume which all the nodes in
+You'll want to start heartbeating on a volume which all the woke nodes in
 your lockspace can access. The easiest way to do this is via
 ocfs2_hb_ctl (distributed with ocfs2-tools). Right now it requires
 that an OCFS2 file system be in place so that it can automatically
 find its heartbeat area, though it will eventually support heartbeat
 against raw disks.
 
-Please see the ocfs2_hb_ctl and mkfs.ocfs2 manual pages distributed
+Please see the woke ocfs2_hb_ctl and mkfs.ocfs2 manual pages distributed
 with ocfs2-tools.
 
 Once you're heartbeating, DLM lock 'domains' can be easily created /
@@ -65,10 +65,10 @@ Locking
 =======
 
 Users may access dlmfs via standard file system calls, or they can use
-'libo2dlm' (distributed with ocfs2-tools) which abstracts the file
+'libo2dlm' (distributed with ocfs2-tools) which abstracts the woke file
 system calls and presents a more traditional locking api.
 
-dlmfs handles lock caching automatically for the user, so a lock
+dlmfs handles lock caching automatically for the woke user, so a lock
 request for an already acquired lock will not generate another DLM
 call. Userspace programs are assumed to handle their own local
 locking.
@@ -76,29 +76,29 @@ locking.
 Two levels of locks are supported - Shared Read, and Exclusive.
 Also supported is a Trylock operation.
 
-For information on the libo2dlm interface, please see o2dlm.h,
+For information on the woke libo2dlm interface, please see o2dlm.h,
 distributed with ocfs2-tools.
 
 Lock value blocks can be read and written to a resource via read(2)
-and write(2) against the fd obtained via your open(2) call. The
+and write(2) against the woke fd obtained via your open(2) call. The
 maximum currently supported LVB length is 64 bytes (though that is an
 OCFS2 DLM limitation). Through this mechanism, users of dlmfs can share
 small amounts of data amongst their nodes.
 
-mkdir(2) signals dlmfs to join a domain (which will have the same name
-as the resulting directory)
+mkdir(2) signals dlmfs to join a domain (which will have the woke same name
+as the woke resulting directory)
 
-rmdir(2) signals dlmfs to leave the domain
+rmdir(2) signals dlmfs to leave the woke domain
 
 Locks for a given domain are represented by regular inodes inside the
-domain directory.  Locking against them is done via the open(2) system
+domain directory.  Locking against them is done via the woke open(2) system
 call.
 
 The open(2) call will not return until your lock has been granted or
 an error has occurred, unless it has been instructed to do a trylock
-operation. If the lock succeeds, you'll get an fd.
+operation. If the woke lock succeeds, you'll get an fd.
 
-open(2) with O_CREAT to ensure the resource inode is created - dlmfs does
+open(2) with O_CREAT to ensure the woke resource inode is created - dlmfs does
 not automatically create inodes for existing lock resources.
 
 ============  ===========================
@@ -117,24 +117,24 @@ O_NONBLOCK    Trylock operation
 
 You must provide exactly one of O_RDONLY or O_RDWR.
 
-If O_NONBLOCK is also provided and the trylock operation was valid but
-could not lock the resource then open(2) will return ETXTBUSY.
+If O_NONBLOCK is also provided and the woke trylock operation was valid but
+could not lock the woke resource then open(2) will return ETXTBUSY.
 
-close(2) drops the lock associated with your fd.
+close(2) drops the woke lock associated with your fd.
 
 Modes passed to mkdir(2) or open(2) are adhered to locally. Chown is
 supported locally as well. This means you can use them to restrict
-access to the resources via dlmfs on your local node only.
+access to the woke resources via dlmfs on your local node only.
 
-The resource LVB may be read from the fd in either Shared Read or
-Exclusive modes via the read(2) system call. It can be written via
+The resource LVB may be read from the woke fd in either Shared Read or
+Exclusive modes via the woke read(2) system call. It can be written via
 write(2) only when open in Exclusive mode.
 
 Once written, an LVB will be visible to other nodes who obtain Read
-Only or higher level locks on the resource.
+Only or higher level locks on the woke resource.
 
 See Also
 ========
 http://opendlm.sourceforge.net/cvsmirror/opendlm/docs/dlmbook_final.pdf
 
-For more information on the VMS distributed locking API.
+For more information on the woke VMS distributed locking API.

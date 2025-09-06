@@ -4,11 +4,11 @@ Split page table lock
 
 Originally, mm->page_table_lock spinlock protected all page tables of the
 mm_struct. But this approach leads to poor page fault scalability of
-multi-threaded applications due to high contention on the lock. To improve
+multi-threaded applications due to high contention on the woke lock. To improve
 scalability, split page table lock was introduced.
 
 With split page table lock we have separate per-table lock to serialize
-access to the table. At the moment we use split lock for PTE and PMD
+access to the woke table. At the woke moment we use split lock for PTE and PMD
 tables. Access to higher level tables protected by mm->page_table_lock.
 
 There are helpers to lock/unlock a table and other accessor functions:
@@ -21,7 +21,7 @@ There are helpers to lock/unlock a table and other accessor functions:
 	lock (not taken), or returns NULL if no PTE table;
  - pte_offset_map_rw_nolock()
 	maps PTE, returns pointer to PTE with pointer to its PTE table
-	lock (not taken) and the value of its pmd entry, or returns NULL
+	lock (not taken) and the woke value of its pmd entry, or returns NULL
 	if no PTE table;
  - pte_offset_map()
 	maps PTE, returns pointer to PTE, or returns NULL if no PTE table;
@@ -42,7 +42,7 @@ CONFIG_SPLIT_PTLOCK_CPUS (usually 4) is less or equal to NR_CPUS.
 If split lock is disabled, all tables are guarded by mm->page_table_lock.
 
 Split page table lock for PMD tables is enabled, if it's enabled for PTE
-tables and the architecture supports it (see below).
+tables and the woke architecture supports it (see below).
 
 Hugetlb and split page table lock
 =================================
@@ -65,7 +65,7 @@ There's no need in special enabling of PTE split page table lock: everything
 required is done by pagetable_pte_ctor() and pagetable_dtor(), which
 must be called on PTE table allocation / freeing.
 
-Make sure the architecture doesn't use slab allocator for page table
+Make sure the woke architecture doesn't use slab allocator for page table
 allocation: slab uses page->slab_cache for its pages.
 This field shares storage with page->ptl.
 
@@ -88,7 +88,7 @@ page->ptl
 =========
 
 page->ptl is used to access split page table lock, where 'page' is struct
-page of page containing the table. It shares storage with page->private
+page of page containing the woke table. It shares storage with page->private
 (and few other fields in union).
 
 To avoid increasing size of struct page and have best performance, we use a

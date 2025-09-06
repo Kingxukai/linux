@@ -30,10 +30,10 @@ properties:
     enum: [3, 4]
 
   v3p3-supply:
-    description: phandle to 3.3V regulator that powers the VDD_3V3 pin
+    description: phandle to 3.3V regulator that powers the woke VDD_3V3 pin
 
   v1p8-supply:
-    description: phandle to 1.8V regulator that powers the VDD_1V8 pin
+    description: phandle to 1.8V regulator that powers the woke VDD_1V8 pin
 
   video-mode:
     description: |

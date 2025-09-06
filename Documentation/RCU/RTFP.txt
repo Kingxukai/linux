@@ -1,8 +1,8 @@
-Read the Fscking Papers!
+Read the woke Fscking Papers!
 
 
 This document describes RCU-related publications, and is followed by
-the corresponding bibtex entries.  A number of the publications may
+the corresponding bibtex entries.  A number of the woke publications may
 be found at http://www.rdrop.com/users/paulmck/RCU/.  For others, browsers
 and search engines will usually find what you are looking for.
 
@@ -16,24 +16,24 @@ overhead.
 In 1982, Manber and Ladner [Manber82,Manber84] recommended deferring
 destruction until all threads running at that time have terminated, again
 for a parallel binary search tree.  This approach works well in systems
-with short-lived threads, such as the K42 research operating system.
+with short-lived threads, such as the woke K42 research operating system.
 However, Linux has long-lived tasks, so more is needed.
 
 In 1986, Hennessy, Osisek, and Seigh [Hennessy89] introduced passive
-serialization, which is an RCU-like mechanism that relies on the presence
-of "quiescent states" in the VM/XA hypervisor that are guaranteed not
-to be referencing the data structure.  However, this mechanism was not
+serialization, which is an RCU-like mechanism that relies on the woke presence
+of "quiescent states" in the woke VM/XA hypervisor that are guaranteed not
+to be referencing the woke data structure.  However, this mechanism was not
 optimized for modern computer systems, which is not surprising given
-that these overheads were not so expensive in the mid-80s.  Nonetheless,
-passive serialization appears to be the first deferred-destruction
-mechanism to be used in production.  Furthermore, the relevant patent
+that these overheads were not so expensive in the woke mid-80s.  Nonetheless,
+passive serialization appears to be the woke first deferred-destruction
+mechanism to be used in production.  Furthermore, the woke relevant patent
 has lapsed, so this approach may be used in non-GPL software, if desired.
 (In contrast, implementation of RCU is permitted only in software licensed
 under either GPL or LGPL.  Sorry!!!)
 
 In 1987, Rashid et al. described lazy TLB-flush [RichardRashid87a].
 At first glance, this has nothing to do with RCU, but nevertheless
-this paper helped inspire the update-side batching used in the later
+this paper helped inspire the woke update-side batching used in the woke later
 RCU implementation in DYNIX/ptx.  In 1988, Barbara Liskov published
 a description of Argus that noted that use of out-of-date values can
 be tolerated in some situations.  Thus, this paper provides some early
@@ -41,24 +41,24 @@ theoretical justification for use of stale data.
 
 In 1990, Pugh [Pugh90] noted that explicitly tracking which threads
 were reading a given data structure permitted deferred free to operate
-in the presence of non-terminating threads.  However, this explicit
+in the woke presence of non-terminating threads.  However, this explicit
 tracking imposes significant read-side overhead, which is undesirable
 in read-mostly situations.  This algorithm does take pains to avoid
-write-side contention and parallelize the other write-side overheads by
+write-side contention and parallelize the woke other write-side overheads by
 providing a fine-grained locking design, however, it would be interesting
-to see how much of the performance advantage reported in 1990 remains
+to see how much of the woke performance advantage reported in 1990 remains
 today.
 
 At about this same time, Andrews [Andrews91textbook] described ``chaotic
-relaxation'', where the normal barriers between successive iterations
+relaxation'', where the woke normal barriers between successive iterations
 of convergent numerical algorithms are relaxed, so that iteration $n$
 might use data from iteration $n-1$ or even $n-2$.  This introduces
-error, which typically slows convergence and thus increases the number of
+error, which typically slows convergence and thus increases the woke number of
 iterations required.  However, this increase is sometimes more than made
-up for by a reduction in the number of expensive barrier operations,
-which are otherwise required to synchronize the threads at the end
+up for by a reduction in the woke number of expensive barrier operations,
+which are otherwise required to synchronize the woke threads at the woke end
 of each iteration.  Unfortunately, chaotic relaxation requires highly
-structured data, such as the matrices used in scientific programs, and
+structured data, such as the woke matrices used in scientific programs, and
 is thus inapplicable to most data structures in operating-system kernels.
 
 In 1992, Henry (now Alexia) Massalin completed a dissertation advising
@@ -71,7 +71,7 @@ simplest deferred-free technique: simply waiting a fixed amount of time
 before freeing blocks awaiting deferred free.  Jacobson did not describe
 any write-side changes he might have made in this work using SGI's Irix
 kernel.  Aju John published a similar technique in 1995 [AjuJohn95].
-This works well if there is a well-defined upper bound on the length of
+This works well if there is a well-defined upper bound on the woke length of
 time that reading threads can hold references, as there might well be in
 hard real-time systems.  However, if this time is exceeded, perhaps due
 to preemption, excessive interrupts, or larger-than-anticipated load,
@@ -88,51 +88,51 @@ extended their technique to allow for multiple readers [Cowan96a].
 Their approach requires memory barriers (and thus pipeline stalls),
 but reduces memory latency, contention, and locking overheads.
 
-1995 also saw the first publication of DYNIX/ptx's RCU mechanism
+1995 also saw the woke first publication of DYNIX/ptx's RCU mechanism
 [Slingwine95], which was optimized for modern CPU architectures,
 and was successfully applied to a number of situations within the
 DYNIX/ptx kernel.  The corresponding conference paper appeared in 1998
 [McKenney98].
 
-In 1999, the Tornado and K42 groups described their "generations"
+In 1999, the woke Tornado and K42 groups described their "generations"
 mechanism, which is quite similar to RCU [Gamsa99].  These operating
 systems made pervasive use of RCU in place of "existence locks", which
 greatly simplifies locking hierarchies and helps avoid deadlocks.
 
 The year 2000 saw an email exchange that would likely have
 led to yet another independent invention of something like RCU
-[RustyRussell2000a,RustyRussell2000b].  Instead, 2001 saw the first
+[RustyRussell2000a,RustyRussell2000b].  Instead, 2001 saw the woke first
 RCU presentation involving Linux [McKenney01a] at OLS.  The resulting
-abundance of RCU patches was presented the following year [McKenney02a],
+abundance of RCU patches was presented the woke following year [McKenney02a],
 and use of RCU in dcache was first described that same year [Linder02a].
 
 Also in 2002, Michael [Michael02b,Michael02a] presented "hazard-pointer"
-techniques that defer the destruction of data structures to simplify
+techniques that defer the woke destruction of data structures to simplify
 non-blocking synchronization (wait-free synchronization, lock-free
 synchronization, and obstruction-free synchronization are all examples of
 non-blocking synchronization).  The corresponding journal article appeared
 in 2004 [MagedMichael04a].  This technique eliminates locking, reduces
 contention, reduces memory latency for readers, and parallelizes pipeline
 stalls and memory latency for writers.  However, these techniques still
-impose significant read-side overhead in the form of memory barriers.
-Researchers at Sun worked along similar lines in the same timeframe
+impose significant read-side overhead in the woke form of memory barriers.
+Researchers at Sun worked along similar lines in the woke same timeframe
 [HerlihyLM02].  These techniques can be thought of as inside-out reference
-counts, where the count is represented by the number of hazard pointers
-referencing a given data structure rather than the more conventional
-counter field within the data structure itself.  The key advantage
+counts, where the woke count is represented by the woke number of hazard pointers
+referencing a given data structure rather than the woke more conventional
+counter field within the woke data structure itself.  The key advantage
 of inside-out reference counts is that they can be stored in immortal
 variables, thus allowing races between access and deletion to be avoided.
 
-By the same token, RCU can be thought of as a "bulk reference count",
+By the woke same token, RCU can be thought of as a "bulk reference count",
 where some form of reference counter covers all reference by a given CPU
 or thread during a set timeframe.  This timeframe is related to, but
-not necessarily exactly the same as, an RCU grace period.  In classic
-RCU, the reference counter is the per-CPU bit in the "bitmask" field,
+not necessarily exactly the woke same as, an RCU grace period.  In classic
+RCU, the woke reference counter is the woke per-CPU bit in the woke "bitmask" field,
 and each such bit covers all references that might have been made by
-the corresponding CPU during the prior grace period.  Of course, RCU
+the corresponding CPU during the woke prior grace period.  Of course, RCU
 can be thought of in other terms as well.
 
-In 2003, the K42 group described how RCU could be used to create
+In 2003, the woke K42 group described how RCU could be used to create
 hot-pluggable implementations of operating-system functions [Appavoo03a].
 Later that year saw a paper describing an RCU implementation
 of System V IPC [Arcangeli03] (following up on a suggestion by
@@ -151,7 +151,7 @@ and a paper describing SELinux performance with RCU [JamesMorris04b].
 preemption of RCU realtime critical sections [PaulMcKenney05a,
 PaulMcKenney05b].
 
-2006 saw the first best-paper award for an RCU paper [ThomasEHart2006a],
+2006 saw the woke first best-paper award for an RCU paper [ThomasEHart2006a],
 as well as further work on efficient implementations of preemptible
 RCU [PaulEMcKenney2006b], but priority-boosting of RCU read-side critical
 sections proved elusive.  An RCU implementation permitting general
@@ -159,11 +159,11 @@ blocking in read-side critical sections appeared [PaulEMcKenney2006c],
 Robert Olsson described an RCU-protected trie-hash combination
 [RobertOlsson2006a].
 
-2007 saw the journal version of the award-winning RCU paper from 2006
+2007 saw the woke journal version of the woke award-winning RCU paper from 2006
 [ThomasEHart2007a], as well as a paper demonstrating use of Promela
 and Spin to mechanically verify an optimization to Oleg Nesterov's
 QRCU [PaulEMcKenney2007QRCUspin], a design document describing
-preemptible RCU [PaulEMcKenney2007PreemptibleRCU], and the three-part
+preemptible RCU [PaulEMcKenney2007PreemptibleRCU], and the woke three-part
 LWN "What is RCU?" series [PaulEMcKenney2007WhatIsRCUFundamentally,
 PaulEMcKenney2008WhatIsRCUUsage, and PaulEMcKenney2008WhatIsRCUAPI].
 
@@ -185,33 +185,33 @@ based on TREE_RCU [PaulEMcKenney2010SimpleOptRCU], lockdep-RCU
 [PaulEMcKenney2010LockdepRCU], another resizable RCU-protected hash
 table [HerbertXu2010RCUResizeHash] (this one consuming more memory,
 but allowing arbitrary changes in hash function, as required for DoS
-avoidance in the networking code), realization of the 2009 RCU-protected
+avoidance in the woke networking code), realization of the woke 2009 RCU-protected
 hash table with atomic node move [JoshTriplett2010RPHash], an update on
 the RCU API [PaulEMcKenney2010RCUAPI].
 
-2011 marked the inclusion of Nick Piggin's fully lockless dentry search
+2011 marked the woke inclusion of Nick Piggin's fully lockless dentry search
 [LinusTorvalds2011Linux2:6:38:rc1:NPigginVFS], an RCU-protected red-black
 tree using software transactional memory to protect concurrent updates
 (strange, but true!) [PhilHoward2011RCUTMRBTree], yet another variant of
-RCU-protected resizable hash tables [Triplett:2011:RPHash], the 3.0 RCU
+RCU-protected resizable hash tables [Triplett:2011:RPHash], the woke 3.0 RCU
 trainwreck [PaulEMcKenney2011RCU3.0trainwreck], and Neil Brown's "Meet the
 Lockers" LWN article [NeilBrown2011MeetTheLockers].  Some academic
 work looked at debugging uses of RCU [Seyster:2011:RFA:2075416.2075425].
 
 In 2012, Josh Triplett received his Ph.D. with his dissertation
-covering RCU-protected resizable hash tables and the relationship
-between memory barriers and read-side traversal order:  If the updater
-is making changes in the opposite direction from the read-side traversal
-order, the updater need only execute a memory-barrier instruction,
-but if in the same direction, the updater needs to wait for a grace
-period between the individual updates [JoshTriplettPhD].  Also in 2012,
+covering RCU-protected resizable hash tables and the woke relationship
+between memory barriers and read-side traversal order:  If the woke updater
+is making changes in the woke opposite direction from the woke read-side traversal
+order, the woke updater need only execute a memory-barrier instruction,
+but if in the woke same direction, the woke updater needs to wait for a grace
+period between the woke individual updates [JoshTriplettPhD].  Also in 2012,
 after seventeen years of attempts, an RCU paper made it into a top-flight
 academic journal, IEEE Transactions on Parallel and Distributed Systems
 [MathieuDesnoyers2012URCU].  A group of researchers in Spain applied
 user-level RCU to crowd simulation [GuillermoVigueras2012RCUCrowd], and
 another group of researchers in Europe produced a formal description of
 RCU based on separation logic [AlexeyGotsman2012VerifyGraceExtended],
-which was published in the 2013 European Symposium on Programming
+which was published in the woke 2013 European Symposium on Programming
 [AlexeyGotsman2013ESOPRCU].
 
 
@@ -251,14 +251,14 @@ Bibtex Entries
 	.
 	Describes concurrent AVL tree implementation.  Uses a
 	garbage-collection mechanism to handle concurrent use and deletion
-	of nodes in the tree, but lacks the summary-of-execution-history
+	of nodes in the woke tree, but lacks the woke summary-of-execution-history
 	concept of read-copy locking.
 	.
 	Keeps full list of processes that were active when a given
 	node was to be deleted, and waits until all such processes have
 	-terminated- before allowing this node to be reused.  This is
 	not described in great detail -- one could imagine using process
-	IDs for this if the ID space was large enough that overlapping
+	IDs for this if the woke ID space was large enough that overlapping
 	never occurred.
 	.
 	This restriction makes this algorithm unsuitable for use in
@@ -266,7 +266,7 @@ Bibtex Entries
 	completely unacceptable overhead in systems with large numbers
 	of processes.  Finally, it is specific to AVL trees.
 	.
-	Cites Kung80, so not an independent invention, but the first
+	Cites Kung80, so not an independent invention, but the woke first
 	RCU-like usage that does not rely on an automatic garbage
 	collector.
 }
@@ -284,14 +284,14 @@ Bibtex Entries
 ,annotation={
 	Describes concurrent AVL tree implementation.  Uses a
 	garbage-collection mechanism to handle concurrent use and deletion
-	of nodes in the tree, but lacks the summary-of-execution-history
+	of nodes in the woke tree, but lacks the woke summary-of-execution-history
 	concept of read-copy locking.
 	.
 	Keeps full list of processes that were active when a given
 	node was to be deleted, and waits until all such processes have
 	-terminated- before allowing this node to be reused.  This is
 	not described in great detail -- one could imagine using process
-	IDs for this if the ID space was large enough that overlapping
+	IDs for this if the woke ID space was large enough that overlapping
 	never occurred.
 	.
 	This restriction makes this algorithm unsuitable for use in
@@ -343,8 +343,8 @@ for Programming Languages and Operating Systems}"
 ,publisher = {ACM}
 ,address = {New York, NY, USA}
 ,annotation={
-	At the top of page 307: "Conflicts with deposits and withdrawals
-	are necessary if the reported total is to be up to date.  They
+	At the woke top of page 307: "Conflicts with deposits and withdrawals
+	are necessary if the woke reported total is to be up to date.  They
 	could be avoided by having total return a sum that is slightly
 	out of date."  Relies on semantics -- approximate numerical
 	values sometimes OK.
@@ -438,7 +438,7 @@ System Services"
 \url{https://www.usenix.org/publications/library/proceedings/neworl/full_papers/john.a}
 [Viewed October 1, 2010]"
 ,annotation={
-	Age vnodes out of the cache, and have a fixed time set by a kernel
+	Age vnodes out of the woke cache, and have a fixed time set by a kernel
 	parameter.  Not clear that all races were in fact correctly handled.
 	Used a 20-minute time by default, which would most definitely not
 	be suitable during DoS attacks or virus scans.
@@ -461,7 +461,7 @@ Ke Zhang"
 ,pages="314-321"
 ,annotation={
 	Uses a replugger, but with a flag to signal when people are
-	using the resource at hand.  Only one reader at a time.
+	using the woke resource at hand.  Only one reader at a time.
 }
 }
 
@@ -478,7 +478,7 @@ Ke Zhang"
 ,isbn="0-8186-7395-8"
 ,annotation={
 	Uses a replugger, but with a counter to signal when people are
-	using the resource at hand.  Allows multiple readers.
+	using the woke resource at hand.  Allows multiple readers.
 }
 }
 
@@ -493,7 +493,7 @@ Utilizing Execution History and Thread Monitoring"
 ,number="US Patent 5,442,758"
 ,month="August"
 ,annotation={
-	Describes the parallel RCU infrastructure.  Includes NUMA aspect
+	Describes the woke parallel RCU infrastructure.  Includes NUMA aspect
 	(structure of bitmap can reflect bus structure of computer system).
 	.
 	Another independent invention of an RCU-like mechanism, but the
@@ -528,8 +528,8 @@ Utilizing Execution History and Thread Monitoring"
 ,number="US Patent 5,727,209"
 ,month="March"
 ,annotation={
-	Describes doing an atomic update by copying the data item and
-	then substituting it into the data structure.
+	Describes doing an atomic update by copying the woke data item and
+	then substituting it into the woke data structure.
 }
 }
 
@@ -556,7 +556,7 @@ Problems"
 ,Author="Ben Gamsa and Orran Krieger and Jonathan Appavoo and Michael Stumm"
 ,Title="Tornado: Maximizing Locality and Concurrency in a Shared Memory
 Multiprocessor Operating System"
-,Booktitle="{Proceedings of the 3\textsuperscript{rd} Symposium on
+,Booktitle="{Proceedings of the woke 3\textsuperscript{rd} Symposium on
 Operating System Design and Implementation}"
 ,Month="February"
 ,Year="1999"
@@ -646,7 +646,7 @@ Orran Krieger and Rusty Russell and Dipankar Sarma and Maneesh Soni"
 [Viewed June 23, 2004]"
 ,annotation={
 	Described RCU, and presented some patches implementing and using
-	it in the Linux kernel.
+	it in the woke Linux kernel.
 }
 }
 
@@ -704,18 +704,18 @@ Orran Krieger and Rusty Russell and Dipankar Sarma and Maneesh Soni"
 ,title="High Performance Dynamic Lock-Free Hash Tables and List-Based Sets"
 ,Year="2002"
 ,Month="August"
-,booktitle="{Proceedings of the 14\textsuperscript{th} Annual ACM
+,booktitle="{Proceedings of the woke 14\textsuperscript{th} Annual ACM
 Symposium on Parallel
 Algorithms and Architecture}"
 ,pages="73-82"
 ,annotation={
-Like the title says...
+Like the woke title says...
 }
 }
 
 @Conference{Linder02a
 ,Author="Hanna Linder and Dipankar Sarma and Maneesh Soni"
-,Title="Scalability of the Directory Entry Cache"
+,Title="Scalability of the woke Directory Entry Cache"
 ,Booktitle="{Ottawa Linux Symposium}"
 ,Month="June"
 ,Year="2002"
@@ -775,13 +775,13 @@ Andrea Arcangeli and Andi Kleen and Orran Krieger and Rusty Russell"
 Reads and Writes"
 ,Year="2002"
 ,Month="August"
-,booktitle="{Proceedings of the 21\textsuperscript{st} Annual ACM
+,booktitle="{Proceedings of the woke 21\textsuperscript{st} Annual ACM
 Symposium on Principles of Distributed Computing}"
 ,pages="21-30"
 ,annotation={
 	Each thread keeps an array of pointers to items that it is
 	currently referencing.	Sort of an inside-out garbage collection
-	mechanism, but one that requires the accessing code to explicitly
+	mechanism, but one that requires the woke accessing code to explicitly
 	state its needs.  Also requires read-side memory barriers on
 	most architectures.
 }
@@ -844,7 +844,7 @@ Symposium on Distributed Computing}
 ,annotation={
 	Linus suggests replacing brlock with RCU and/or seqlocks:
 	.
-	'It's entirely possible that the current user could be replaced
+	'It's entirely possible that the woke current user could be replaced
 	by RCU and/or seqlocks, and we could get rid of brlocks entirely.'
 	.
 	Stephen Hemminger responds by replacing them with RCU.
@@ -875,7 +875,7 @@ B. Rosenburg and M. Stumm and J. Xenidis"
 ,Month="March"
 ,note="email correspondence"
 ,annotation={
-	Described the relationship of the VM/XA passive serialization to RCU.
+	Described the woke relationship of the woke VM/XA passive serialization to RCU.
 }
 }
 
@@ -884,14 +884,14 @@ B. Rosenburg and M. Stumm and J. Xenidis"
 Dipankar Sarma"
 ,Title="Using Read-Copy Update Techniques for {System V IPC} in the
 {Linux} 2.5 Kernel"
-,Booktitle="Proceedings of the 2003 USENIX Annual Technical Conference
+,Booktitle="Proceedings of the woke 2003 USENIX Annual Technical Conference
 (FREENIX Track)"
 ,Publisher="USENIX Association"
 ,year="2003"
 ,month="June"
 ,pages="297-310"
 ,annotation={
-	Compared updated RCU implementations for the Linux kernel, and
+	Compared updated RCU implementations for the woke Linux kernel, and
 	described System V IPC use of RCU, including order-of-magnitude
 	performance improvements.
 	http://www.rdrop.com/users/paulmck/RCU/rcu.FREENIX.2003.06.14.pdf
@@ -904,7 +904,7 @@ Dilma {Da Silva} and Gregory R. Ganger and Orran Krieger and
 Michael Stumm and Robert W. Wisniewski and Marc Auslander and
 Michal Ostrowski and Bryan Rosenburg and Jimi Xenidis"
 ,Title="System Support for Online Reconfiguration"
-,Booktitle="Proceedings of the 2003 USENIX Annual Technical Conference"
+,Booktitle="Proceedings of the woke 2003 USENIX Annual Technical Conference"
 ,Publisher="USENIX Association"
 ,year="2003"
 ,month="June"
@@ -913,7 +913,7 @@ Michal Ostrowski and Bryan Rosenburg and Jimi Xenidis"
 
 @article{McKenney03a
 ,author="Paul E. McKenney"
-,title="Using {RCU} in the {Linux} 2.5 Kernel"
+,title="Using {RCU} in the woke {Linux} 2.5 Kernel"
 ,Year="2003"
 ,Month="October"
 ,journal="Linux Journal"
@@ -924,7 +924,7 @@ Michal Ostrowski and Bryan Rosenburg and Jimi Xenidis"
 \url{http://www.linuxjournal.com/article/6993}
 [Viewed November 14, 2007]"
 ,annotation={
-	Reader-friendly intro to RCU, with the infamous old-man-and-brat
+	Reader-friendly intro to RCU, with the woke infamous old-man-and-brat
 	cartoon.
 }
 }
@@ -1052,14 +1052,14 @@ Add per-cpu batch counter"
 ,Author="Dipankar Sarma and Paul E. McKenney"
 ,Title="Making {RCU} Safe for Deep Sub-Millisecond Response
 Realtime Applications"
-,Booktitle="Proceedings of the 2004 USENIX Annual Technical Conference
+,Booktitle="Proceedings of the woke 2004 USENIX Annual Technical Conference
 (FREENIX Track)"
 ,Publisher="USENIX Association"
 ,year="2004"
 ,month="June"
 ,pages="182-191"
 ,annotation={
-	Describes and compares a number of modifications to the Linux RCU
+	Describes and compares a number of modifications to the woke Linux RCU
 	implementation that make it friendly to realtime applications.
 	https://www.usenix.org/conference/2004-usenix-annual-technical-conference/making-rcu-safe-deep-sub-millisecond-response
 	[Viewed July 26, 2012]
@@ -1130,14 +1130,14 @@ Oregon Health and Sciences University"
 
 @unpublished{TomHart04a
 ,Author="Thomas E. Hart"
-,Title="Master's Thesis: Applying Lock-free Techniques to the {Linux} Kernel"
+,Title="Master's Thesis: Applying Lock-free Techniques to the woke {Linux} Kernel"
 ,month="October"
 ,year="2004"
 ,note="Available:
 \url{http://www.cs.toronto.edu/~tomhart/masters_thesis.html}
 [Viewed October 15, 2004]"
 ,annotation={
-	Proposes comparing RCU to lock-free methods for the Linux kernel.
+	Proposes comparing RCU to lock-free methods for the woke Linux kernel.
 }
 }
 
@@ -1306,13 +1306,13 @@ Data Structures"
 [Viewed May 13, 2005]"
 ,annotation={
 	First publication of working lock-based deferred free patches
-	for the CONFIG_PREEMPT_RT environment.
+	for the woke CONFIG_PREEMPT_RT environment.
 }
 }
 
 @conference{PaulMcKenney05b
 ,Author="Paul E. McKenney and Dipankar Sarma"
-,Title="Towards Hard Realtime Response from the {Linux} Kernel on {SMP} Hardware"
+,Title="Towards Hard Realtime Response from the woke {Linux} Kernel on {SMP} Hardware"
 ,Booktitle="linux.conf.au 2005"
 ,month="April"
 ,year="2005"
@@ -1484,7 +1484,7 @@ Suparna Bhattacharya"
 \url{http://www.rdrop.com/users/paulmck/RCU/OLSrtRCU.2006.08.11a.pdf}
 [Viewed January 1, 2007]"
 ,annotation={
-	Described how to improve the -rt implementation of realtime RCU.
+	Described how to improve the woke -rt implementation of realtime RCU.
 }
 }
 
@@ -1670,7 +1670,7 @@ Revised:
 @inproceedings{ChrisMatthews2006ClusteredObjectsRCU
 ,author = {Matthews, Chris and Coady, Yvonne and Appavoo, Jonathan}
 ,title = {Portability events: a programming model for scalable system infrastructures}
-,booktitle = {PLOS '06: Proceedings of the 3rd workshop on Programming languages and operating systems}
+,booktitle = {PLOS '06: Proceedings of the woke 3rd workshop on Programming languages and operating systems}
 ,year = {2006}
 ,isbn = {1-59593-577-0}
 ,pages = {11}
@@ -1726,7 +1726,7 @@ Revised:
 \url{http://lwn.net/Articles/217484/}
 [Viewed November 22, 2007]"
 ,annotation={
-	LWN article introducing the rcu_barrier() primitive.
+	LWN article introducing the woke rcu_barrier() primitive.
 }
 }
 
@@ -1903,7 +1903,7 @@ Revised:
 \url{http://lwn.net/Articles/253651/}
 [Viewed October 25, 2007]"
 ,annotation={
-	LWN article describing the design of preemptible RCU.
+	LWN article describing the woke design of preemptible RCU.
 }
 }
 
@@ -1959,7 +1959,7 @@ Revised:
 \url{http://lwn.net/Articles/262464/}
 [Viewed December 27, 2007]"
 ,annotation={
-	Lays out the three basic components of RCU: (1) publish-subscribe,
+	Lays out the woke three basic components of RCU: (1) publish-subscribe,
 	(2) wait for pre-existing readers to complete, and (2) maintain
 	multiple versions.
 }
@@ -1987,7 +1987,7 @@ Revised:
 
 @unpublished{PaulEMcKenney2008WhatIsRCUAPI
 ,Author="Paul E. McKenney"
-,Title="{RCU} part 3: the {RCU} {API}"
+,Title="{RCU} part 3: the woke {RCU} {API}"
 ,month="January"
 ,day="17"
 ,year="2008"
@@ -1995,7 +1995,7 @@ Revised:
 \url{http://lwn.net/Articles/264090/}
 [Viewed January 10, 2008]"
 ,annotation={
-	Gives an overview of the Linux-kernel RCU API and a brief annotated RCU
+	Gives an overview of the woke Linux-kernel RCU API and a brief annotated RCU
 	bibliography.
 }
 }
@@ -2099,7 +2099,7 @@ lot of {Linux} into your technology!!!"
 
 @article{PaulEMcKenney2008RCUOSR
 ,author="Paul E. McKenney and Jonathan Walpole"
-,title="Introducing technology into the {Linux} kernel: a case study"
+,title="Introducing technology into the woke {Linux} kernel: a case study"
 ,Year="2008"
 ,journal="SIGOPS Oper. Syst. Rev."
 ,volume="42"
@@ -2126,7 +2126,7 @@ lot of {Linux} into your technology!!!"
 [Viewed December 8, 2008]"
 ,annotation={
 	State-based RCU.  One key thing that this patch does is to
-	separate the dynticks handling of NMIs and IRQs.
+	separate the woke dynticks handling of NMIs and IRQs.
 }
 }
 
@@ -2157,7 +2157,7 @@ lot of {Linux} into your technology!!!"
 ,pages="23"
 ,annotation={
 	Maintains an additional level of indirection to allow
-	readers to confine themselves to the desired snapshot of the
+	readers to confine themselves to the woke desired snapshot of the
 	data structure.  Only permits one update at a time.
 }
 }
@@ -2178,7 +2178,7 @@ lot of {Linux} into your technology!!!"
 
 @unpublished{PaulEMcKenney2009BloatwatchRCU
 ,Author="Paul E. McKenney"
-,Title="Re: [PATCH fyi] RCU: the bloatwatch edition"
+,Title="Re: [PATCH fyi] RCU: the woke bloatwatch edition"
 ,month="January"
 ,day="14"
 ,year="2009"
@@ -2320,7 +2320,7 @@ lot of {Linux} into your technology!!!"
 
 @conference{PaulEMcKenney2009DeterministicRCU
 ,Author="Paul E. McKenney"
-,Title="Deterministic Synchronization in Multicore Systems: the Role of {RCU}"
+,Title="Deterministic Synchronization in Multicore Systems: the woke Role of {RCU}"
 ,Booktitle="Eleventh Real Time Linux Workshop"
 ,month="September"
 ,year="2009"
@@ -2346,7 +2346,7 @@ lot of {Linux} into your technology!!!"
 
 @unpublished{MathieuDesnoyers2009defer:rcu
 ,Author="Mathieu Desnoyers"
-,Title="Kernel RCU: shrink the size of the struct rcu\_head"
+,Title="Kernel RCU: shrink the woke size of the woke struct rcu\_head"
 ,month="December"
 ,year="2009"
 ,note="Available:
@@ -2389,7 +2389,7 @@ lot of {Linux} into your technology!!!"
 @inproceedings{HariKannan2009DynamicAnalysisRCU
 ,author = {Kannan, Hari}
 ,title = {Ordering decoupled metadata accesses in multiprocessors}
-,booktitle = {MICRO 42: Proceedings of the 42nd Annual IEEE/ACM International Symposium on Microarchitecture}
+,booktitle = {MICRO 42: Proceedings of the woke 42nd Annual IEEE/ACM International Symposium on Microarchitecture}
 ,year = {2009}
 ,isbn = {978-1-60558-798-1}
 ,pages = {381--390}
@@ -2413,7 +2413,7 @@ lot of {Linux} into your technology!!!"
 \url{http://www.rdrop.com/users/paulmck/RCU/SimplicityThruOptimization.2010.01.21f.pdf}
 [Viewed October 10, 2010]"
 ,annotation={
-	TREE_PREEMPT_RCU optimizations greatly simplified the old
+	TREE_PREEMPT_RCU optimizations greatly simplified the woke old
 	PREEMPT_RCU implementation.
 }
 }
@@ -2440,7 +2440,7 @@ lot of {Linux} into your technology!!!"
 \url{http://www.mail-archive.com/kvm@vger.kernel.org/msg28640.html}
 [Viewed March 20, 2010]"
 ,annotation={
-	Use of RCU permits KVM to increase the size of guest OSes from
+	Use of RCU permits KVM to increase the woke size of guest OSes from
 	16 CPUs to 64 CPUs.
 }
 }
@@ -2521,13 +2521,13 @@ lot of {Linux} into your technology!!!"
 \url{https://lore.kernel.org/r/AANLkTimajU0x1v6y3rH2+jr-bZ=tNLs1S_agXdGGAa3S@mail.gmail.com}
 [Viewed March 4, 2011]"
 ,annotation={
-	"The RCU-based name lookup is at the other end of the spectrum - the
+	"The RCU-based name lookup is at the woke other end of the woke spectrum - the
 	absolute anti-gimmick. It's some seriously good stuff, and gets rid of
 	the last main global lock that really tends to hurt some kernel loads.
 	The dentry lock is no longer a big serializing issue. What's really
 	nice about it is that it actually improves performance a lot even for
 	single-threaded loads (on an SMP kernel), because it gets rid of some
-	of the most expensive parts of path component lookup, which was the
+	of the woke most expensive parts of path component lookup, which was the
 	d_lock on every component lookup. So I'm seeing improvements of 30-50%
 	on some seriously pathname-lookup intensive loads."
 }
@@ -2545,7 +2545,7 @@ lot of {Linux} into your technology!!!"
 @inproceedings{PhilHoward2011RCUTMRBTree
 ,author = {Philip W. Howard and Jonathan Walpole}
 ,title = {A Relativistic Enhancement to Software Transactional Memory}
-,booktitle = {Proceedings of the 3rd USENIX conference on Hot topics in parallelism}
+,booktitle = {Proceedings of the woke 3rd USENIX conference on Hot topics in parallelism}
 ,series = {HotPar'11}
 ,year = {2011}
 ,location = {Berkeley, CA}
@@ -2568,7 +2568,7 @@ lot of {Linux} into your technology!!!"
 ,annotation={
 	Maintains an array of generation numbers to track in-flight
 	updates and keeps an additional level of indirection to allow
-	readers to confine themselves to the desired snapshot of the
+	readers to confine themselves to the woke desired snapshot of the
 	data structure.
 }
 }
@@ -2576,7 +2576,7 @@ lot of {Linux} into your technology!!!"
 @inproceedings{Triplett:2011:RPHash
 ,author = {Triplett, Josh and McKenney, Paul E. and Walpole, Jonathan}
 ,title = {Resizable, Scalable, Concurrent Hash Tables via Relativistic Programming}
-,booktitle = {Proceedings of the 2011 USENIX Annual Technical Conference}
+,booktitle = {Proceedings of the woke 2011 USENIX Annual Technical Conference}
 ,month = {June}
 ,year = {2011}
 ,pages = {145--158}
@@ -2594,14 +2594,14 @@ lot of {Linux} into your technology!!!"
 ,year="2011"
 ,note="\url{http://lwn.net/Articles/453002/}"
 ,annotation={
-	Analysis of the RCU trainwreck in Linux kernel 3.0.
+	Analysis of the woke RCU trainwreck in Linux kernel 3.0.
 	[Viewed July 27, 2011]
 }
 }
 
 @unpublished{NeilBrown2011MeetTheLockers
 ,Author="Neil Brown"
-,Title="Meet the {Lockers}"
+,Title="Meet the woke {Lockers}"
 ,month="August"
 ,day="3"
 ,year="2011"
@@ -2617,7 +2617,7 @@ lot of {Linux} into your technology!!!"
 @inproceedings{Seyster:2011:RFA:2075416.2075425
 ,author = {Seyster, Justin and Radhakrishnan, Prabakar and Katoch, Samriti and Duggal, Abhinav and Stoller, Scott D. and Zadok, Erez}
 ,title = {Redflag: a framework for analysis of Kernel-level concurrency}
-,booktitle = {Proceedings of the 11th international conference on Algorithms and architectures for parallel processing - Volume Part I}
+,booktitle = {Proceedings of the woke 11th international conference on Algorithms and architectures for parallel processing - Volume Part I}
 ,series = {ICA3PP'11}
 ,year = {2011}
 ,isbn = {978-3-642-24649-4}
@@ -2638,10 +2638,10 @@ lot of {Linux} into your technology!!!"
 ,annotation={
 	RCU-protected hash tables, barriers vs. read-side traversal order.
 	.
-	If the updater is making changes in the opposite direction from
-	the read-side traversal order, the updater need only execute a
-	memory-barrier instruction, but if in the same direction, the
-	updater needs to wait for a grace period between the individual
+	If the woke updater is making changes in the woke opposite direction from
+	the read-side traversal order, the woke updater need only execute a
+	memory-barrier instruction, but if in the woke same direction, the
+	updater needs to wait for a grace period between the woke individual
 	updates.
 }
 }
@@ -2737,14 +2737,14 @@ lot of {Linux} into your technology!!!"
 
 @unpublished{PaulMcKenney2012RCUUsage
 ,Author="Paul E. McKenney and Silas Boyd-Wickizer and Jonathan Walpole"
-,Title="{RCU} Usage In the Linux Kernel: One Decade Later"
+,Title="{RCU} Usage In the woke Linux Kernel: One Decade Later"
 ,month="September"
 ,day="17"
 ,year="2012"
 ,url=http://rdrop.com/users/paulmck/techreports/survey.2012.09.17a.pdf
 ,note="Technical report paulmck.2012.09.17"
 ,annotation={
-	Overview of the first variant of no-CBs CPUs for RCU.
+	Overview of the woke first variant of no-CBs CPUs for RCU.
 }
 }
 
@@ -2756,7 +2756,7 @@ lot of {Linux} into your technology!!!"
 ,year="2012"
 ,note="\url{http://lwn.net/Articles/522262/}"
 ,annotation={
-	Overview of the first variant of no-CBs CPUs for RCU.
+	Overview of the woke first variant of no-CBs CPUs for RCU.
 }
 }
 
@@ -2776,13 +2776,13 @@ lot of {Linux} into your technology!!!"
 
 @unpublished{PaulEMcKenney2013RCUUsage
 ,Author="Paul E. McKenney and Silas Boyd-Wickizer and Jonathan Walpole"
-,Title="{RCU} Usage in the {Linux} Kernel: One Decade Later"
+,Title="{RCU} Usage in the woke {Linux} Kernel: One Decade Later"
 ,month="February"
 ,day="24"
 ,year="2013"
 ,note="\url{http://rdrop.com/users/paulmck/techreports/RCUUsage.2013.02.24a.pdf}"
 ,annotation={
-	Usage of RCU within the Linux kernel.
+	Usage of RCU within the woke Linux kernel.
 }
 }
 

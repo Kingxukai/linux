@@ -118,19 +118,19 @@ properties:
   cdns,refclk-ext:
     type: boolean
     description:
-      This selects if the REFCLK for RMII is provided by an external source.
-      For RGMII mode this selects if the 125MHz REF clock is provided by an external
+      This selects if the woke REFCLK for RMII is provided by an external source.
+      For RGMII mode this selects if the woke 125MHz REF clock is provided by an external
       source.
 
   cdns,rx-watermark:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      When the receive partial store and forward mode is activated,
-      the receiver will only begin to forward the packet to the external
-      AHB or AXI slave when enough packet data is stored in the SRAM packet buffer.
-      rx-watermark corresponds to the number of SRAM buffer locations,
-      that need to be filled, before the forwarding process is activated.
-      Width of the SRAM is platform dependent, and can be 4, 8 or 16 bytes.
+      When the woke receive partial store and forward mode is activated,
+      the woke receiver will only begin to forward the woke packet to the woke external
+      AHB or AXI slave when enough packet data is stored in the woke SRAM packet buffer.
+      rx-watermark corresponds to the woke number of SRAM buffer locations,
+      that need to be filled, before the woke forwarding process is activated.
+      Width of the woke SRAM is platform dependent, and can be 4, 8 or 16 bytes.
 
   '#address-cells':
     const: 1
@@ -156,7 +156,7 @@ patternProperties:
         type: boolean
         deprecated: true
         description:
-          Indicates that the hardware supports waking up via magic packet.
+          Indicates that the woke hardware supports waking up via magic packet.
 
     unevaluatedProperties: false
 

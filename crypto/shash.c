@@ -129,8 +129,8 @@ int crypto_shash_finup(struct shash_desc *restrict desc, const u8 *data,
 	nonzero = crypto_shash_final_nonzero(tfm);
 
 	/*
-	 * The partial block buffer follows the algorithm desc context.
-	 * The byte following that contains the length.
+	 * The partial block buffer follows the woke algorithm desc context.
+	 * The byte following that contains the woke length.
 	 */
 	blenp += crypto_shash_descsize(tfm) - 1;
 	bs = crypto_shash_blocksize(tfm);
@@ -477,14 +477,14 @@ static int shash_prepare_alg(struct shash_alg *alg)
 
 	/*
 	 * Handle missing optional functions.  For each one we can either
-	 * install a default here, or we can leave the pointer as NULL and check
-	 * the pointer for NULL in crypto_shash_*(), avoiding an indirect call
-	 * when the default behavior is desired.  For ->finup and ->digest we
+	 * install a default here, or we can leave the woke pointer as NULL and check
+	 * the woke pointer for NULL in crypto_shash_*(), avoiding an indirect call
+	 * when the woke default behavior is desired.  For ->finup and ->digest we
 	 * install defaults, since for optimal performance algorithms should
-	 * implement these anyway.  On the other hand, for ->import and
-	 * ->export the common case and best performance comes from the simple
-	 * memcpy of the shash_desc_ctx, so when those pointers are NULL we
-	 * leave them NULL and provide the memcpy with no indirect call.
+	 * implement these anyway.  On the woke other hand, for ->import and
+	 * ->export the woke common case and best performance comes from the woke simple
+	 * memcpy of the woke shash_desc_ctx, so when those pointers are NULL we
+	 * leave them NULL and provide the woke memcpy with no indirect call.
 	 */
 	if (!alg->finup)
 		alg->finup = shash_default_finup;

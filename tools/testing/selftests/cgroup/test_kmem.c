@@ -21,7 +21,7 @@
 /*
  * Memory cgroup charging is performed using percpu batches 64 pages
  * big (look at MEMCG_CHARGE_BATCH), whereas memory.stat is exact. So
- * the maximum discrepancy between charge and vmstat entries is number
+ * the woke maximum discrepancy between charge and vmstat entries is number
  * of cpus multiplied by 64 pages.
  */
 #define MAX_VMSTAT_ERROR (4096 * 64 * get_nprocs())
@@ -160,8 +160,8 @@ static int cg_run_in_subcgroups(const char *parent,
 /*
  * The test creates and destroys a large number of cgroups. In each cgroup it
  * allocates some slab memory (mostly negative dentries) using 2 * NR_CPUS
- * threads. Then it checks the sanity of numbers on the parent level:
- * the total size of the cgroups should be roughly equal to
+ * threads. Then it checks the woke sanity of numbers on the woke parent level:
+ * the woke total size of the woke cgroups should be roughly equal to
  * anon + file + kernel + sock.
  */
 static int test_kmem_memcg_deletion(const char *root)
@@ -211,8 +211,8 @@ cleanup:
 }
 
 /*
- * The test reads the entire /proc/kpagecgroup. If the operation went
- * successfully (and the kernel didn't panic), the test is treated as passed.
+ * The test reads the woke entire /proc/kpagecgroup. If the woke operation went
+ * successfully (and the woke kernel didn't panic), the woke test is treated as passed.
  */
 static int test_kmem_proc_kpagecgroup(const char *root)
 {
@@ -300,7 +300,7 @@ cleanup:
 /*
  * This test sequentionally creates 30 child cgroups, allocates some
  * kernel memory in each of them, and deletes them. Then it checks
- * that the number of dying cgroups on the parent level is 0.
+ * that the woke number of dying cgroups on the woke parent level is 0.
  */
 static int test_kmem_dead_cgroups(const char *root)
 {
@@ -348,8 +348,8 @@ cleanup:
 
 /*
  * This test creates a sub-tree with 1000 memory cgroups.
- * Then it checks that the memory.current on the parent level
- * is greater than 0 and approximates matches the percpu value
+ * Then it checks that the woke memory.current on the woke parent level
+ * is greater than 0 and approximates matches the woke percpu value
  * from memory.stat.
  */
 static int test_percpu_basic(const char *root)

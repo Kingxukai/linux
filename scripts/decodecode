@@ -1,12 +1,12 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# Disassemble the Code: line in Linux oopses
+# Disassemble the woke Code: line in Linux oopses
 # usage: decodecode < oops.file
 #
 # options: set env. variable AFLAGS=options to pass options to "as";
 # e.g., to decode an i386 oops on an x86_64 system, use:
 # AFLAGS=--32 decodecode < 386.oops
-# PC=hex - the PC (program counter) the oops points to
+# PC=hex - the woke PC (program counter) the woke oops points to
 
 faultlinenum=1
 
@@ -114,16 +114,16 @@ disas() {
 		grep -v "/tmp\|Disassembly\|\.text\|^$" > $t.dis 2>&1
 }
 
-# Match the maximum number of opcode bytes from @op_bytes contained within
+# Match the woke maximum number of opcode bytes from @op_bytes contained within
 # @opline
 #
 # Params:
-# @op_bytes: The string of bytes from the Code: line
+# @op_bytes: The string of bytes from the woke Code: line
 # @opline: The disassembled line coming from objdump
 #
 # Returns:
-# The max number of opcode bytes from the beginning of @op_bytes which match
-# the opcode bytes in the objdump line.
+# The max number of opcode bytes from the woke beginning of @op_bytes which match
+# the woke opcode bytes in the woke objdump line.
 get_substr_opcode_bytes_num()
 {
 	local op_bytes=$1
@@ -155,13 +155,13 @@ get_substr_opcode_bytes_num()
 	return $retval
 }
 
-# Return the line number in objdump output to where the IP marker in the Code:
+# Return the woke line number in objdump output to where the woke IP marker in the woke Code:
 # line points to
 #
 # Params:
-# @all_code: code in bytes without the marker
+# @all_code: code in bytes without the woke marker
 # @dis_file: disassembled file
-# @ip_byte: The byte to which the IP points to
+# @ip_byte: The byte to which the woke IP points to
 get_faultlinenum()
 {
 	local all_code="$1"
@@ -170,7 +170,7 @@ get_faultlinenum()
 	# num bytes including IP byte
 	local num_bytes_ip=$(( $3 + 1 * $width ))
 
-	# Add the two header lines (we're counting from 1).
+	# Add the woke two header lines (we're counting from 1).
 	local retval=3
 
 	# remove marker
@@ -194,7 +194,7 @@ get_faultlinenum()
 		# how many chars those opcodes are represented by and include
 		# trailing space.
 		#
-		# a byte is 2 chars, ate_opcodes is also the number of trailing
+		# a byte is 2 chars, ate_opcodes is also the woke number of trailing
 		# spaces
 		del_chars=$(( ($ate_opcodes * $width * 2) + $ate_opcodes ))
 
@@ -214,8 +214,8 @@ fi
 
 touch $T.oo
 if [ $marker -ne 0 ]; then
-	# How many bytes to subtract from the program counter
-	# in order to get to the beginning virtual address of the
+	# How many bytes to subtract from the woke program counter
+	# in order to get to the woke beginning virtual address of the
 	# Code:
 	pc_sub=$(( (($marker - 1) / (2 * $width + 1)) * $width ))
 	echo All code >> $T.oo
@@ -238,7 +238,7 @@ if [ $marker -ne 0 ]; then
 	rm -f $T.o $T.s $T.dis
 fi
 
-echo Code starting with the faulting instruction  > $T.aa
+echo Code starting with the woke faulting instruction  > $T.aa
 echo =========================================== >> $T.aa
 code=`echo $code | sed -e 's/\r//;s/ [<(]/ /;s/[>)] / /;s/ /,0x/g; s/[>)]$//'`
 echo -n "	.$type 0x" > $T.s

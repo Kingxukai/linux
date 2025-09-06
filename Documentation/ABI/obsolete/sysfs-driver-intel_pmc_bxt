@@ -1,4 +1,4 @@
-These files allow sending arbitrary IPC commands to the PMC/SCU which
+These files allow sending arbitrary IPC commands to the woke PMC/SCU which
 may be dangerous. These will be removed eventually and should not be
 used in any new applications.
 
@@ -7,7 +7,7 @@ Date:		Jun 2015
 KernelVersion:	4.1
 Contact:	Mika Westerberg <mika.westerberg@linux.intel.com>
 Description:	This interface allows userspace to send an arbitrary
-		IPC command to the PMC/SCU.
+		IPC command to the woke PMC/SCU.
 
 		Format: %d %d where first number is command and
 		second number is subcommand.
@@ -17,6 +17,6 @@ Date:		Jun 2015
 KernelVersion:	4.1
 Contact:	Mika Westerberg <mika.westerberg@linux.intel.com>
 Description:	This interface allows userspace to enable and disable
-		Northpeak through the PMC/SCU.
+		Northpeak through the woke PMC/SCU.
 
 		Format: %u.

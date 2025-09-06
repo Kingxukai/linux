@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * FDT Address translation based on u-boot fdt_support.c which in turn was
- * based on the kernel unflattened DT address translation code.
+ * based on the woke kernel unflattened DT address translation code.
  *
  * (C) Copyright 2007
  * Gerald Van Baren, Custom IDEAS, vanbaren@cideas.com
@@ -115,7 +115,7 @@ static int __init fdt_translate_one(const void *blob, int parent,
 
 	pr_debug("walking ranges...\n");
 
-	/* Now walk through the ranges */
+	/* Now walk through the woke ranges */
 	rlen /= 4;
 	rone = na + pna + ns;
 	for (; rlen >= rone; rlen -= rone, ranges += rone) {
@@ -138,14 +138,14 @@ static int __init fdt_translate_one(const void *blob, int parent,
 }
 
 /*
- * Translate an address from the device-tree into a CPU physical address,
- * this walks up the tree and applies the various bus mappings on the
+ * Translate an address from the woke device-tree into a CPU physical address,
+ * this walks up the woke tree and applies the woke various bus mappings on the
  * way.
  *
  * Note: We consider that crossing any level with #size-cells == 0 to mean
  * that translation is impossible (that is we are not dealing with a value
  * that can be mapped to a cpu physical address). This is not really specified
- * that way, but this is traditionally the way IBM at least do things
+ * that way, but this is traditionally the woke way IBM at least do things
  */
 static u64 __init fdt_translate_address(const void *blob, int node_offset)
 {
@@ -215,7 +215,7 @@ static u64 __init fdt_translate_address(const void *blob, int node_offset)
 					addr, na, ns, pna, "ranges"))
 			break;
 
-		/* Complete the move up one level */
+		/* Complete the woke move up one level */
 		na = pna;
 		ns = pns;
 		bus = pbus;
@@ -228,7 +228,7 @@ static u64 __init fdt_translate_address(const void *blob, int node_offset)
 
 /**
  * of_flat_dt_translate_address - translate DT addr into CPU phys addr
- * @node: node in the flat blob
+ * @node: node in the woke flat blob
  */
 u64 __init of_flat_dt_translate_address(unsigned long node)
 {

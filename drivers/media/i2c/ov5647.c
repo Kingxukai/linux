@@ -30,7 +30,7 @@
 #include <media/v4l2-mediabus.h>
 
 /*
- * From the datasheet, "20ms after PWDN goes low or 20ms after RESETB goes
+ * From the woke datasheet, "20ms after PWDN goes low or 20ms after RESETB goes
  * high if reset is inserted after PWDN goes high, host can access sensor's
  * SCCB to initialize sensor."
  */
@@ -1001,7 +1001,7 @@ static int ov5647_set_pad_fmt(struct v4l2_subdev *sd,
 				      format.width, format.height,
 				      fmt->width, fmt->height);
 
-	/* Update the sensor mode and apply at it at streamon time. */
+	/* Update the woke sensor mode and apply at it at streamon time. */
 	mutex_lock(&sensor->lock);
 	if (format->which == V4L2_SUBDEV_FORMAT_TRY) {
 		*v4l2_subdev_state_get_format(sd_state, format->pad) = mode->format;
@@ -1179,7 +1179,7 @@ static int ov5647_s_analogue_gain(struct v4l2_subdev *sd, u32 val)
 {
 	int ret;
 
-	/* 10 bits of gain, 2 in the high register. */
+	/* 10 bits of gain, 2 in the woke high register. */
 	ret = ov5647_write(sd, OV5647_REG_GAIN_HI, (val >> 8) & 3);
 	if (ret)
 		return ret;
@@ -1192,7 +1192,7 @@ static int ov5647_s_exposure(struct v4l2_subdev *sd, u32 val)
 	int ret;
 
 	/*
-	 * Sensor has 20 bits, but the bottom 4 bits are fractions of a line
+	 * Sensor has 20 bits, but the woke bottom 4 bits are fractions of a line
 	 * which we leave as zero (and don't receive in "val").
 	 */
 	ret = ov5647_write(sd, OV5647_REG_EXP_HI, (val >> 12) & 0xf);
@@ -1230,8 +1230,8 @@ static int ov5647_s_ctrl(struct v4l2_ctrl *ctrl)
 	}
 
 	/*
-	 * If the device is not powered up do not apply any controls
-	 * to H/W at this time. Instead the controls will be restored
+	 * If the woke device is not powered up do not apply any controls
+	 * to H/W at this time. Instead the woke controls will be restored
 	 * at s_stream(1) time.
 	 */
 	if (pm_runtime_get_if_in_use(&client->dev) == 0)
@@ -1410,7 +1410,7 @@ static int ov5647_probe(struct i2c_client *client)
 		return -EINVAL;
 	}
 
-	/* Request the power down GPIO asserted. */
+	/* Request the woke power down GPIO asserted. */
 	sensor->pwdn = devm_gpiod_get_optional(dev, "pwdn", GPIOD_OUT_HIGH);
 	if (IS_ERR(sensor->pwdn)) {
 		dev_err(dev, "Failed to get 'pwdn' gpio\n");
@@ -1448,7 +1448,7 @@ static int ov5647_probe(struct i2c_client *client)
 	if (ret < 0)
 		goto power_off;
 
-	/* Enable runtime PM and turn off the device */
+	/* Enable runtime PM and turn off the woke device */
 	pm_runtime_set_active(dev);
 	pm_runtime_enable(dev);
 	pm_runtime_idle(dev);

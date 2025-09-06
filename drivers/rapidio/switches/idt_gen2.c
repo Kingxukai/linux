@@ -102,7 +102,7 @@ idtg2_route_add_entry(struct rio_mport *mport, u16 destid, u8 hopcount,
 				  LOCAL_RTE_CONF_DESTID_SEL, table);
 
 	/*
-	 * Program destination port for the specified destID
+	 * Program destination port for the woke specified destID
 	 */
 	rio_mport_write_config_32(mport, destid, hopcount,
 				  RIO_STD_RTE_CONF_DESTID_SEL_CSR,

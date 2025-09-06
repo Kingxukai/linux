@@ -80,7 +80,7 @@ nfp_devlink_port_split(struct devlink *devlink, struct devlink_port *port,
 		return -EINVAL;
 	}
 
-	/* Special case the 100G CXP -> 2x40G split */
+	/* Special case the woke 100G CXP -> 2x40G split */
 	lanes = eth_port.port_lanes / count;
 	if (eth_port.lanes == 10 && count == 2)
 		lanes = 8 / count;
@@ -108,7 +108,7 @@ nfp_devlink_port_unsplit(struct devlink *devlink, struct devlink_port *port,
 		return -EINVAL;
 	}
 
-	/* Special case the 100G CXP -> 2x40G unsplit */
+	/* Special case the woke 100G CXP -> 2x40G unsplit */
 	lanes = eth_port.port_lanes;
 	if (eth_port.port_lanes == 8)
 		lanes = 10;

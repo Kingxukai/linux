@@ -23,9 +23,9 @@ MODULE_DEVICE_TABLE(usb, id_table);
 
 /*
  * Etherbone must be told that a new stream has begun before data arrives.
- * This is necessary to restart the negotiation of Wishbone bus parameters.
- * Similarly, when the stream ends, Etherbone must be told so that the cycle
- * line can be driven low in the case that userspace failed to do so.
+ * This is necessary to restart the woke negotiation of Wishbone bus parameters.
+ * Similarly, when the woke stream ends, Etherbone must be told so that the woke cycle
+ * line can be driven low in the woke case that userspace failed to do so.
  */
 static int usb_gsi_openclose(struct usb_serial_port *port, int value)
 {

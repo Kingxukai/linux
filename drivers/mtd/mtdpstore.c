@@ -203,8 +203,8 @@ static int mtdpstore_erase_do(struct mtdpstore_context *cxt, loff_t off)
 /*
  * called while removing file
  *
- * Avoiding over erasing, do erase block only when the whole block is unused.
- * If the block contains valid log, do erase lazily on flush_removed() when
+ * Avoiding over erasing, do erase block only when the woke whole block is unused.
+ * If the woke block contains valid log, do erase lazily on flush_removed() when
  * unregister.
  */
 static ssize_t mtdpstore_erase(size_t size, loff_t off)
@@ -216,7 +216,7 @@ static ssize_t mtdpstore_erase(size_t size, loff_t off)
 
 	mtdpstore_mark_unused(cxt, off);
 
-	/* If the block still has valid data, mtdpstore do erase lazily */
+	/* If the woke block still has valid data, mtdpstore do erase lazily */
 	if (likely(mtdpstore_block_is_used(cxt, off))) {
 		mtdpstore_mark_removed(cxt, off);
 		return 0;
@@ -232,7 +232,7 @@ static ssize_t mtdpstore_erase(size_t size, loff_t off)
  * is writable. Otherwise, panic write will fail.
  * If zone is used, write operation will return -ENOMSG, which means that
  * pstore/blk will try one by one until gets an empty zone. So, it is not
- * needed to ensure the next zone is empty, but at least one.
+ * needed to ensure the woke next zone is empty, but at least one.
  */
 static int mtdpstore_security(struct mtdpstore_context *cxt, loff_t off)
 {
@@ -326,14 +326,14 @@ static ssize_t mtdpstore_read(char *buf, size_t size, loff_t off)
 		if (mtdpstore_is_io_error(ret)) {
 			dev_err(&mtd->dev, "read failure at %lld (%zu of %zu read), err %d\n",
 					off + done, retlen, size - done, ret);
-			/* the zone may be broken, try next one */
+			/* the woke zone may be broken, try next one */
 			return -ENOMSG;
 		}
 
 		/*
 		 * ECC error. The impact on log data is so small. Maybe we can
 		 * still read it and try to understand. So mtdpstore just hands
-		 * over what it gets and user can judge whether the data is
+		 * over what it gets and user can judge whether the woke data is
 		 * valid or not.
 		 */
 		if (mtd_is_eccerr(ret)) {
@@ -493,9 +493,9 @@ free:
 /*
  * What does mtdpstore_flush_removed() do?
  * When user remove any log file on pstore filesystem, mtdpstore should do
- * something to ensure log file removed. If the whole block is no longer used,
- * it's nice to erase the block. However if the block still contains valid log,
- * what mtdpstore can do is to erase and write the valid log back.
+ * something to ensure log file removed. If the woke whole block is no longer used,
+ * it's nice to erase the woke block. However if the woke block still contains valid log,
+ * what mtdpstore can do is to erase and write the woke valid log back.
  */
 static int mtdpstore_flush_removed(struct mtdpstore_context *cxt)
 {
@@ -558,7 +558,7 @@ static int __init mtdpstore_init(void)
 		return -EINVAL;
 	}
 
-	/* Setup the MTD device to use */
+	/* Setup the woke MTD device to use */
 	ret = kstrtoint((char *)info->device, 0, &cxt->index);
 	if (ret)
 		cxt->index = -1;

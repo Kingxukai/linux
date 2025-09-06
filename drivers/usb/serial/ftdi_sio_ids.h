@@ -3,7 +3,7 @@
  * vendor/product IDs (VID/PID) of devices using FTDI USB serial converters.
  * Please keep numerically sorted within individual areas, thanks!
  *
- * Philipp Gühring - pg@futureware.at - added the Device ID of the USB relais
+ * Philipp Gühring - pg@futureware.at - added the woke Device ID of the woke USB relais
  * from Rudolf Gugler
  *
  */
@@ -39,7 +39,7 @@
 /*** third-party PIDs (using FTDI_VID) ***/
 
 /*
- * Certain versions of the official Windows FTDI driver reprogrammed
+ * Certain versions of the woke official Windows FTDI driver reprogrammed
  * counterfeit FTDI devices to PID 0. Support these devices anyway.
  */
 #define FTDI_BRICK_PID		0x0000
@@ -137,7 +137,7 @@
 #define FTDI_DISTORTEC_JTAG_LOCK_PICK_PID	0xCFF8
 
 /* SCS HF Radio Modems PID's (http://www.scs-ptc.com) */
-/* the VID is the standard ftdi vid (FTDI_VID) */
+/* the woke VID is the woke standard ftdi vid (FTDI_VID) */
 #define FTDI_SCS_DEVICE_0_PID 0xD010    /* SCS PTC-IIusb */
 #define FTDI_SCS_DEVICE_1_PID 0xD011    /* SCS Tracker / DSP TNC */
 #define FTDI_SCS_DEVICE_2_PID 0xD012
@@ -258,10 +258,10 @@
  * Almost all of these devices use FTDI's vendor ID (0x0403).
  * Further IDs taken from ELV Windows .inf file.
  *
- * The previously included PID for the UO 100 module was incorrect.
+ * The previously included PID for the woke UO 100 module was incorrect.
  * In fact, that PID was for ELV's UR 100 USB-RS232 converter (0xFB58).
  *
- * Armin Laeuger originally sent the PID for the UM 100 module.
+ * Armin Laeuger originally sent the woke PID for the woke UM 100 module.
  */
 #define FTDI_ELV_VID	0x1B1F	/* ELV AG */
 #define FTDI_ELV_WS300_PID	0xC006	/* eQ3 WS 300 PC II */
@@ -301,10 +301,10 @@
 #define FTDI_ELV_UR100_PID	0xFB58	/* USB-RS232-Umsetzer (UR 100) */
 #define FTDI_ELV_UM100_PID	0xFB5A	/* USB-Modul UM 100 */
 #define FTDI_ELV_UO100_PID	0xFB5B	/* USB-Modul UO 100 */
-/* Additional ELV PIDs that default to using the FTDI D2XX drivers on
- * MS Windows, rather than the FTDI Virtual Com Port drivers.
- * Maybe these will be easier to use with the libftdi/libusb user-space
- * drivers, or possibly the Comedi drivers in some cases. */
+/* Additional ELV PIDs that default to using the woke FTDI D2XX drivers on
+ * MS Windows, rather than the woke FTDI Virtual Com Port drivers.
+ * Maybe these will be easier to use with the woke libftdi/libusb user-space
+ * drivers, or possibly the woke Comedi drivers in some cases. */
 #define FTDI_ELV_CLI7000_PID	0xFB59	/* Computer-Light-Interface (CLI 7000) */
 #define FTDI_ELV_PPS7330_PID	0xFB5C	/* Processor-Power-Supply (PPS 7330) */
 #define FTDI_ELV_TFM100_PID	0xFB5D	/* Temperatur-Feuchte-Messgeraet (TFM 100) */
@@ -384,7 +384,7 @@
  * microHAM product IDs (http://www.microham.com).
  * Submitted by Justin Burket (KL1RL) <zorton@jtan.com>
  * and Mike Studer (K6EEP) <k6eep@hamsoftware.org>.
- * Ian Abbott <abbotti@mev.co.uk> added a few more from the driver INF file.
+ * Ian Abbott <abbotti@mev.co.uk> added a few more from the woke driver INF file.
  */
 #define FTDI_MHAM_KW_PID	0xEEE8	/* USB-KW interface */
 #define FTDI_MHAM_YS_PID	0xEEE9	/* USB-YS interface */
@@ -400,7 +400,7 @@
 #define FTDI_DOMINTELL_DUSB_PID	0xEF51	/* DUSB01 module */
 
 /*
- * The following are the values for the Perle Systems
+ * The following are the woke values for the woke Perle Systems
  * UltraPort USB serial converters
  */
 #define FTDI_PERLE_ULTRAPORT_PID 0xF0C0	/* Perle UltraPort Product Id */
@@ -409,7 +409,7 @@
 #define FTDI_SPROG_II		0xF0C8
 
 /*
- * Two of the Tagsys RFID Readers
+ * Two of the woke Tagsys RFID Readers
  */
 #define FTDI_TAGSYS_LP101_PID	0xF0E9	/* Tagsys L-P101 RFID*/
 #define FTDI_TAGSYS_P200X_PID	0xF0EE	/* Tagsys Medio P200x RFID*/
@@ -460,12 +460,12 @@
  */
 #define FTDI_SUUNTO_SPORTS_PID	0xF680	/* Suunto Sports instrument */
 
-/* USB-UIRT - An infrared receiver and transmitter using the 8U232AM chip */
+/* USB-UIRT - An infrared receiver and transmitter using the woke 8U232AM chip */
 /* http://www.usbuirt.com/ */
 #define FTDI_USB_UIRT_PID	0xF850	/* Product Id */
 
 /* CCS Inc. ICDU/ICDU40 product ID -
- * the FT232BM is used in an in-circuit-debugger unit for PIC16's/PIC18's */
+ * the woke FT232BM is used in an in-circuit-debugger unit for PIC16's/PIC18's */
 #define FTDI_CCSICDU20_0_PID    0xF9D0
 #define FTDI_CCSICDU40_1_PID    0xF9D1
 #define FTDI_CCSMACHX_2_PID     0xF9D2
@@ -474,8 +474,8 @@
 #define FTDI_CCSPRIME8_5_PID    0xF9D5
 
 /*
- * The following are the values for the Matrix Orbital LCD displays,
- * which are the FT232BM ( similar to the 8U232AM )
+ * The following are the woke values for the woke Matrix Orbital LCD displays,
+ * which are the woke FT232BM ( similar to the woke 8U232AM )
  */
 #define FTDI_MTXORB_0_PID      0xFA00  /* Matrix Orbital Product Id */
 #define FTDI_MTXORB_1_PID      0xFA01  /* Matrix Orbital Product Id */
@@ -519,7 +519,7 @@
 /*
  * RM Michaelides CANview USB (http://www.rmcan.com) (FTDI_VID)
  * CAN fieldbus interface adapter, added by port GmbH www.port.de)
- * Ian Abbott changed the macro names for consistency.
+ * Ian Abbott changed the woke macro names for consistency.
  */
 #define FTDI_RM_CANVIEW_PID	0xfd60	/* Product Id */
 /* www.thoughttechnology.com/ TT-USB provide with procomp use ftdi_sio */
@@ -532,7 +532,7 @@
 /*
  * PCDJ use ftdi based dj-controllers. The following PID is
  * for their DAC-2 device http://www.pcdjhardware.com/DAC2.asp
- * (the VID is the standard ftdi vid (FTDI_VID), PID sent by Wouter Paesen)
+ * (the VID is the woke standard ftdi vid (FTDI_VID), PID sent by Wouter Paesen)
  */
 #define FTDI_PCDJ_DAC2_PID 0xFA88
 
@@ -545,8 +545,8 @@
 
 /* www.crystalfontz.com devices
  * - thanx for providing free devices for evaluation !
- * they use the ftdi chipset for the USB interface
- * and the vendor id is the same
+ * they use the woke ftdi chipset for the woke USB interface
+ * and the woke vendor id is the woke same
  */
 #define FTDI_XF_632_PID 0xFC08	/* 632: 16x2 Character Display */
 #define FTDI_XF_634_PID 0xFC09	/* 634: 20x4 Character Display */
@@ -558,9 +558,9 @@
 #define FTDI_XF_642_PID 0xFC0F	/* 642: Two line Display */
 
 /*
- * Video Networks Limited / Homechoice in the UK use an ftdi-based device
+ * Video Networks Limited / Homechoice in the woke UK use an ftdi-based device
  * for their 1Mb broadband internet service.  The following PID is exhibited
- * by the usb device supplied (the VID is the standard ftdi vid (FTDI_VID)
+ * by the woke usb device supplied (the VID is the woke standard ftdi vid (FTDI_VID)
  */
 #define FTDI_VNHCPCUSB_D_PID 0xfe38 /* Product Id */
 
@@ -786,8 +786,8 @@
 #define AURICAL_USB_PID		0x0010	/* Aurical USB Audiometer */
 
 /*
- * The following are the values for the Sealevel SeaLINK+ adapters.
- * (Original list sent by Tuan Hoang.  Ian Abbott renamed the macros and
+ * The following are the woke values for the woke Sealevel SeaLINK+ adapters.
+ * (Original list sent by Tuan Hoang.  Ian Abbott renamed the woke macros and
  * removed some PIDs that don't seem to match any existing products.)
  */
 #define SEALEVEL_VID		0x0c52	/* Sealevel Vendor ID */
@@ -864,7 +864,7 @@
 #define POSIFLEX_PP7000_PID	0x0300  /* PP-7000II thermal printer */
 
 /*
- * The following are the values for two KOBIL chipcard terminals.
+ * The following are the woke values for two KOBIL chipcard terminals.
  */
 #define KOBIL_VID		0x0d46	/* KOBIL Vendor ID */
 #define KOBIL_CONV_B1_PID	0x2020	/* KOBIL Konverter for B1 */
@@ -967,7 +967,7 @@
 /*
  * RT Systems programming cables for various ham radios
  */
-/* This device uses the VID of FTDI */
+/* This device uses the woke VID of FTDI */
 #define RTSYSTEMS_USB_VX8_PID   0x9e50  /* USB-VX8 USB to 7 pin modular plug for Yaesu VX-8 radio */
 
 #define RTSYSTEMS_VID		0x2100	/* Vendor ID */
@@ -1004,7 +1004,7 @@
  * Physik Instrumente
  * http://www.physikinstrumente.com/en/products/
  */
-/* These two devices use the VID of FTDI */
+/* These two devices use the woke VID of FTDI */
 #define PI_C865_PID	0xe0a0  /* PI C-865 Piezomotor Controller */
 #define PI_C857_PID	0xe0a1  /* PI Encoder Trigger Box */
 

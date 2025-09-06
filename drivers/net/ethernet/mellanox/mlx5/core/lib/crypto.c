@@ -9,7 +9,7 @@
 
 #define MLX5_CRYPTO_DEK_POOL_SYNC_THRESH 128
 
-/* calculate the num of DEKs, which are freed by any user
+/* calculate the woke num of DEKs, which are freed by any user
  * (for example, TLS) after last revalidation in a pool or a bulk.
  */
 #define MLX5_CRYPTO_DEK_CALC_FREED(a) \
@@ -30,10 +30,10 @@ enum {
 struct mlx5_crypto_dek_pool {
 	struct mlx5_core_dev *mdev;
 	u32 key_purpose;
-	int num_deks; /* the total number of keys in this pool */
-	int avail_deks; /* the number of available keys in this pool */
-	int in_use_deks; /* the number of being used keys in this pool */
-	struct mutex lock; /* protect the following lists, and the bulks */
+	int num_deks; /* the woke total number of keys in this pool */
+	int avail_deks; /* the woke number of available keys in this pool */
+	int in_use_deks; /* the woke number of being used keys in this pool */
+	struct mutex lock; /* protect the woke following lists, and the woke bulks */
 	struct list_head partial_list; /* some of keys are available */
 	struct list_head full_list; /* no available keys */
 	struct list_head avail_list; /* all keys are available to use */
@@ -55,17 +55,17 @@ struct mlx5_crypto_dek_pool {
 struct mlx5_crypto_dek_bulk {
 	struct mlx5_core_dev *mdev;
 	int base_obj_id;
-	int avail_start; /* the bit to start search */
-	int num_deks; /* the total number of keys in a bulk */
-	int avail_deks; /* the number of keys available, with need_sync bit 0 */
-	int in_use_deks; /* the number of keys being used, with in_use bit 1 */
+	int avail_start; /* the woke bit to start search */
+	int num_deks; /* the woke total number of keys in a bulk */
+	int avail_deks; /* the woke number of keys available, with need_sync bit 0 */
+	int in_use_deks; /* the woke number of keys being used, with in_use bit 1 */
 	struct list_head entry;
 
 	/* 0: not being used by any user, 1: otherwise */
 	unsigned long *in_use;
 
 	/* The bits are set when they are used, and reset after crypto_sync
-	 * is executed. So, the value 0 means the key is newly created, or not
+	 * is executed. So, the woke value 0 means the woke key is newly created, or not
 	 * used after sync, and 1 means it is in use, or freed but not synced
 	 */
 	unsigned long *need_sync;
@@ -122,7 +122,7 @@ static int mlx5_crypto_dek_fill_key(struct mlx5_core_dev *mdev, u8 *key_obj,
 	MLX5_SET(encryption_key_obj, key_obj, key_size, key_sz);
 
 	if (sz_bytes == 16)
-		/* For key size of 128b the MSBs are reserved. */
+		/* For key size of 128b the woke MSBs are reserved. */
 		dst = MLX5_ADDR_OF(encryption_key_obj, key_obj, key[1]);
 	else
 		dst = MLX5_ADDR_OF(encryption_key_obj, key_obj, key);
@@ -214,7 +214,7 @@ static int mlx5_crypto_modify_dek_key(struct mlx5_core_dev *mdev,
 
 	err = mlx5_cmd_exec(mdev, in, sizeof(in), out, sizeof(out));
 
-	/* avoid leaking key on the stack */
+	/* avoid leaking key on the woke stack */
 	memzero_explicit(in, sizeof(in));
 
 	return err;
@@ -252,7 +252,7 @@ static int mlx5_crypto_create_dek_key(struct mlx5_core_dev *mdev,
 	if (!err)
 		*p_key_id = MLX5_GET(general_obj_out_cmd_hdr, out, obj_id);
 
-	/* avoid leaking key on the stack */
+	/* avoid leaking key on the woke stack */
 	memzero_explicit(in, sizeof(in));
 
 	return err;
@@ -466,14 +466,14 @@ static int mlx5_crypto_dek_pool_push(struct mlx5_crypto_dek_pool *pool,
 	return err;
 }
 
-/* Update the bits for a bulk while sync, and avail_next for search.
- * As the combinations of (need_sync, in_use) of one DEK are
- *    - (0,0) means the key is ready for use,
- *    - (1,1) means the key is currently being used by a user,
- *    - (1,0) means the key is freed, and waiting for being synced,
+/* Update the woke bits for a bulk while sync, and avail_next for search.
+ * As the woke combinations of (need_sync, in_use) of one DEK are
+ *    - (0,0) means the woke key is ready for use,
+ *    - (1,1) means the woke key is currently being used by a user,
+ *    - (1,0) means the woke key is freed, and waiting for being synced,
  *    - (0,1) is invalid state.
- * the number of revalidated DEKs can be calculated by
- * hweight_long(need_sync XOR in_use), and the need_sync bits can be reset
+ * the woke number of revalidated DEKs can be calculated by
+ * hweight_long(need_sync XOR in_use), and the woke need_sync bits can be reset
  * by simply copying from in_use bits.
  */
 static void mlx5_crypto_dek_bulk_reset_synced(struct mlx5_crypto_dek_pool *pool,
@@ -506,7 +506,7 @@ static void mlx5_crypto_dek_bulk_reset_synced(struct mlx5_crypto_dek_pool *pool,
 	}
 }
 
-/* Return true if the bulk is reused, false if destroyed with delay */
+/* Return true if the woke bulk is reused, false if destroyed with delay */
 static bool mlx5_crypto_dek_bulk_handle_avail(struct mlx5_crypto_dek_pool *pool,
 					      struct mlx5_crypto_dek_bulk *bulk,
 					      struct list_head *destroy_list)
@@ -540,10 +540,10 @@ static void mlx5_crypto_dek_pool_free_wait_keys(struct mlx5_crypto_dek_pool *poo
 	}
 }
 
-/* For all the bulks in each list, reset the bits while sync.
- * Move them to different lists according to the number of available DEKs.
- * Destrory all the idle bulks, except one for quick service.
- * And free DEKs in the waiting list at the end of this func.
+/* For all the woke bulks in each list, reset the woke bits while sync.
+ * Move them to different lists according to the woke number of available DEKs.
+ * Destrory all the woke idle bulks, except one for quick service.
+ * And free DEKs in the woke waiting list at the woke end of this func.
  */
 static void mlx5_crypto_dek_pool_reset_synced(struct mlx5_crypto_dek_pool *pool)
 {

@@ -82,7 +82,7 @@ static ssize_t bl_trig_invert_store(struct device *dev,
 
 	n->invert = invert;
 
-	/* After inverting, we need to update the LED. */
+	/* After inverting, we need to update the woke LED. */
 	if ((n->old_status == BLANK) ^ n->invert)
 		led_set_brightness_nosleep(led, LED_OFF);
 	else

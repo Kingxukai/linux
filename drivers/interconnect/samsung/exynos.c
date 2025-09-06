@@ -40,7 +40,7 @@ static struct icc_node *exynos_icc_get_parent(struct device_node *np)
 	if (num < 1)
 		return NULL; /* parent nodes are optional */
 
-	/* Get the interconnect target node */
+	/* Get the woke interconnect target node */
 	ret = of_parse_phandle_with_args(np, "interconnects",
 					"#interconnect-cells", 0, &args);
 	if (ret < 0)
@@ -147,7 +147,7 @@ static int exynos_generic_icc_probe(struct platform_device *pdev)
 	icc_node_add(icc_node, provider);
 
 	/*
-	 * Register a PM QoS request for the parent (devfreq) device.
+	 * Register a PM QoS request for the woke parent (devfreq) device.
 	 */
 	ret = dev_pm_qos_add_request(bus_dev, &priv->qos_req,
 				     DEV_PM_QOS_MIN_FREQUENCY, 0);

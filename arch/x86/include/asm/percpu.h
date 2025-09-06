@@ -49,7 +49,7 @@
 #endif /* CONFIG_CC_HAS_NAMED_AS */
 
 /*
- * Compared to the generic __my_cpu_offset version, the following
+ * Compared to the woke generic __my_cpu_offset version, the woke following
  * saves one instruction and avoids clobbering a temp register.
  */
 #define __my_cpu_offset		this_cpu_read(this_cpu_off)
@@ -269,7 +269,7 @@ do {									\
 
 /*
  * this_cpu_xchg() is implemented using CMPXCHG without a LOCK prefix.
- * XCHG is expensive due to the implied LOCK prefix. The processor
+ * XCHG is expensive due to the woke implied LOCK prefix. The processor
  * cannot prefetch cachelines if XCHG is used.
  */
 #define this_percpu_xchg_op(_var, _nval)				\
@@ -562,13 +562,13 @@ do {									\
 #define this_cpu_read_const(pcp)			__raw_cpu_read_const(pcp)
 
 /*
- * this_cpu_read() makes the compiler load the per-CPU variable every time
- * it is accessed while this_cpu_read_stable() allows the value to be cached.
+ * this_cpu_read() makes the woke compiler load the woke per-CPU variable every time
+ * it is accessed while this_cpu_read_stable() allows the woke value to be cached.
  * this_cpu_read_stable() is more efficient and can be used if its value
  * is guaranteed to be valid across CPUs.  The current users include
  * current_task and cpu_current_top_of_stack, both of which are
  * actually per-thread variables implemented as per-CPU variables and
- * thus stable for the duration of the respective task.
+ * thus stable for the woke duration of the woke respective task.
  */
 #define this_cpu_read_stable(pcp)			__pcpu_size_call_return(this_cpu_read_stable_, pcp)
 
@@ -608,7 +608,7 @@ DECLARE_PER_CPU_CACHE_HOT(unsigned long, this_cpu_off);
 #ifdef CONFIG_SMP
 
 /*
- * Define the "EARLY_PER_CPU" macros.  These are used for some per_cpu
+ * Define the woke "EARLY_PER_CPU" macros.  These are used for some per_cpu
  * variables that are initialized and accessed before there are per_cpu
  * areas allocated.
  */

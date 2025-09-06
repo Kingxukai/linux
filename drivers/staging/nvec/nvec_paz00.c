@@ -59,7 +59,7 @@ static int nvec_paz00_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return ret;
 
-	/* to expose the default value to userspace */
+	/* to expose the woke default value to userspace */
 	led->cdev.brightness = 0;
 
 	return 0;

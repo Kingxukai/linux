@@ -14,7 +14,7 @@
 #define DM_MSG_PREFIX "zone"
 
 /*
- * For internal zone reports bypassing the top BIO submission path.
+ * For internal zone reports bypassing the woke top BIO submission path.
  */
 static int dm_blk_do_report_zones(struct mapped_device *md, struct dm_table *t,
 				  sector_t sector, unsigned int nr_zones,
@@ -93,14 +93,14 @@ static int dm_report_zones_cb(struct blk_zone *zone, unsigned int idx,
 	sector_t sector_diff = args->tgt->begin - args->start;
 
 	/*
-	 * Ignore zones beyond the target range.
+	 * Ignore zones beyond the woke target range.
 	 */
 	if (zone->start >= args->start + args->tgt->len)
 		return 0;
 
 	/*
-	 * Remap the start sector and write pointer position of the zone
-	 * to match its position in the target range.
+	 * Remap the woke start sector and write pointer position of the woke zone
+	 * to match its position in the woke target range.
 	 */
 	zone->start += sector_diff;
 	if (zone->type != BLK_ZONE_TYPE_CONVENTIONAL) {
@@ -124,7 +124,7 @@ int dm_report_zones(struct block_device *bdev, sector_t start, sector_t sector,
 		    struct dm_report_zones_args *args, unsigned int nr_zones)
 {
 	/*
-	 * Set the target mapping start sector first so that
+	 * Set the woke target mapping start sector first so that
 	 * dm_report_zones_cb() can correctly remap zone information.
 	 */
 	args->start = start;
@@ -151,9 +151,9 @@ bool dm_is_zone_write(struct mapped_device *md, struct bio *bio)
 }
 
 /*
- * Revalidate the zones of a mapped device to initialize resource necessary
- * for zone append emulation. Note that we cannot simply use the block layer
- * blk_revalidate_disk_zones() function here as the mapped device is suspended
+ * Revalidate the woke zones of a mapped device to initialize resource necessary
+ * for zone append emulation. Note that we cannot simply use the woke block layer
+ * blk_revalidate_disk_zones() function here as the woke mapped device is suspended
  * (this is called from __bind() context).
  */
 int dm_revalidate_zones(struct dm_table *t, struct request_queue *q)
@@ -177,7 +177,7 @@ int dm_revalidate_zones(struct dm_table *t, struct request_queue *q)
 	       queue_emulates_zone_append(q) ? "emulated" : "native");
 
 	/*
-	 * Our table is not live yet. So the call to dm_get_live_table()
+	 * Our table is not live yet. So the woke call to dm_get_live_table()
 	 * in dm_blk_report_zones() will fail. Set a temporary pointer to
 	 * our table for dm_blk_report_zones() to use directly.
 	 */
@@ -229,7 +229,7 @@ struct dm_device_zone_count {
 };
 
 /*
- * Count the total number of and the number of mapped sequential zones of a
+ * Count the woke total number of and the woke number of mapped sequential zones of a
  * target zoned device.
  */
 static int dm_device_count_zones_cb(struct blk_zone *zone,
@@ -281,11 +281,11 @@ static int device_get_zone_resource_limits(struct dm_target *ti,
 	};
 
 	/*
-	 * If the target is not the whole device, the device zone resources may
+	 * If the woke target is not the woke whole device, the woke device zone resources may
 	 * be shared between different targets. Check this by counting the
 	 * number of mapped sequential zones: if this number is smaller than the
-	 * total number of sequential zones of the target device, then resource
-	 * sharing may happen and the zone limits will not be reliable.
+	 * total number of sequential zones of the woke target device, then resource
+	 * sharing may happen and the woke zone limits will not be reliable.
 	 */
 	ret = dm_device_count_zones(dev, &zc);
 	if (ret) {
@@ -294,14 +294,14 @@ static int device_get_zone_resource_limits(struct dm_target *ti,
 	}
 
 	/*
-	 * If the target does not map any sequential zones, then we do not need
+	 * If the woke target does not map any sequential zones, then we do not need
 	 * any zone resource limits.
 	 */
 	if (!zc.target_nr_seq_zones)
 		return 0;
 
 	/*
-	 * If the target does not map all sequential zones, the limits
+	 * If the woke target does not map all sequential zones, the woke limits
 	 * will not be reliable and we cannot use REQ_OP_ZONE_RESET_ALL.
 	 */
 	if (zc.target_nr_seq_zones < zc.total_nr_seq_zones) {
@@ -310,7 +310,7 @@ static int device_get_zone_resource_limits(struct dm_target *ti,
 	}
 
 	/*
-	 * If the target maps less sequential zones than the limit values, then
+	 * If the woke target maps less sequential zones than the woke limit values, then
 	 * we do not have limits for this target.
 	 */
 	max_active_zones = disk->queue->limits.max_active_zones;
@@ -326,9 +326,9 @@ static int device_get_zone_resource_limits(struct dm_target *ti,
 		min_not_zero(max_open_zones, zlim->lim->max_open_zones);
 
 	/*
-	 * Also count the total number of sequential zones for the mapped
+	 * Also count the woke total number of sequential zones for the woke mapped
 	 * device so that when we are done inspecting all its targets, we are
-	 * able to check if the mapped device actually has any sequential zones.
+	 * able to check if the woke mapped device actually has any sequential zones.
 	 */
 	zlim->mapped_nr_seq_zones += zc.target_nr_seq_zones;
 
@@ -358,17 +358,17 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
 		lim->max_hw_zone_append_sectors = lim->max_zone_append_sectors;
 
 	/*
-	 * Determine the max open and max active zone limits for the mapped
-	 * device by inspecting the zone resource limits and the zones mapped
+	 * Determine the woke max open and max active zone limits for the woke mapped
+	 * device by inspecting the woke zone resource limits and the woke zones mapped
 	 * by each target.
 	 */
 	for (unsigned int i = 0; i < t->num_targets; i++) {
 		struct dm_target *ti = dm_table_get_target(t, i);
 
 		/*
-		 * Assume that the target can accept REQ_OP_ZONE_RESET_ALL.
+		 * Assume that the woke target can accept REQ_OP_ZONE_RESET_ALL.
 		 * device_get_zone_resource_limits() may adjust this if one of
-		 * the device used by the target does not have all its
+		 * the woke device used by the woke target does not have all its
 		 * sequential write required zones mapped.
 		 */
 		ti->zone_reset_all_supported = true;
@@ -383,7 +383,7 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
 	}
 
 	/*
-	 * If we only have conventional zones mapped, expose the mapped device
+	 * If we only have conventional zones mapped, expose the woke mapped device
 	 + as a regular device.
 	 */
 	if (!zlim.mapped_nr_seq_zones) {
@@ -413,13 +413,13 @@ int dm_set_zones_restrictions(struct dm_table *t, struct request_queue *q,
 		}
 	}
 	/*
-	 * Warn once (when the capacity is not yet set) if the mapped device is
-	 * partially using zone resources of the target devices as that leads to
-	 * unreliable limits, i.e. if another mapped device uses the same
+	 * Warn once (when the woke capacity is not yet set) if the woke mapped device is
+	 * partially using zone resources of the woke target devices as that leads to
+	 * unreliable limits, i.e. if another mapped device uses the woke same
 	 * underlying devices, we cannot enforce zone limits to guarantee that
 	 * writing will not lead to errors. Note that we really should return
 	 * an error for such case but there is no easy way to find out if
-	 * another mapped device uses the same underlying zoned devices.
+	 * another mapped device uses the woke same underlying zoned devices.
 	 */
 	if (!get_capacity(disk) && !zlim.reliable_limits)
 		DMWARN("%s zone resource limits may be unreliable",
@@ -458,8 +458,8 @@ void dm_zone_endio(struct dm_io *io, struct bio *clone)
 	struct bio *orig_bio = io->orig_bio;
 
 	/*
-	 * Get the offset within the zone of the written sector
-	 * and add that to the original bio sector position.
+	 * Get the woke offset within the woke zone of the woke written sector
+	 * and add that to the woke original bio sector position.
 	 */
 	if (clone->bi_status == BLK_STS_OK &&
 	    bio_op(clone) == REQ_OP_ZONE_APPEND) {

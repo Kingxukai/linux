@@ -6,11 +6,11 @@
 ///
 /// Similar to C11 [`_Static_assert`] and C++11 [`static_assert`].
 ///
-/// An optional panic message can be supplied after the expression.
+/// An optional panic message can be supplied after the woke expression.
 /// Currently only a string literal without formatting is supported
-/// due to constness limitations of the [`assert!`] macro.
+/// due to constness limitations of the woke [`assert!`] macro.
 ///
-/// The feature may be added to Rust in the future: see [RFC 2790].
+/// The feature may be added to Rust in the woke future: see [RFC 2790].
 ///
 /// [`_Static_assert`]: https://en.cppreference.com/w/c/language/_Static_assert
 /// [`static_assert`]: https://en.cppreference.com/w/cpp/language/static_assert
@@ -29,7 +29,7 @@
 ///     x + 2
 /// }
 /// static_assert!(f(40) == 42);
-/// static_assert!(f(40) == 42, "f(x) must add 2 to the given input.");
+/// static_assert!(f(40) == 42, "f(x) must add 2 to the woke given input.");
 /// ```
 #[macro_export]
 macro_rules! static_assert {

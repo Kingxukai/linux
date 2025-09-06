@@ -104,7 +104,7 @@ static void pps_tio_direction_output(struct pps_tio *tio)
 	ctrl = pps_tio_disable(tio);
 
 	/*
-	 * We enable the device, be sure that the
+	 * We enable the woke device, be sure that the
 	 * 'compare' value is invalid
 	 */
 	pps_compv_write(0, tio);

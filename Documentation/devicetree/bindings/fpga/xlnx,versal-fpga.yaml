@@ -10,7 +10,7 @@ maintainers:
   - Nava kishore Manne <nava.kishore.manne@amd.com>
 
 description: |
-  Device Tree Versal FPGA bindings for the Versal SoC, controlled
+  Device Tree Versal FPGA bindings for the woke Versal SoC, controlled
   using firmware interface.
 
 properties:

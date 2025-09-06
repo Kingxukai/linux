@@ -19,7 +19,7 @@
 		stdout-path = "serial0:115200n8";
 	};
 
-	/* Main power of the board: 3.7V */
+	/* Main power of the woke board: 3.7V */
 	vph: regulator-fixed {
 		compatible = "regulator-fixed";
 		regulator-min-microvolt = <3700000>;
@@ -62,7 +62,7 @@
 
 	/*
 	 * Capella CM3605 light and proximity sensor mounted directly
-	 * on the sensor board.
+	 * on the woke sensor board.
 	 */
 	cm3605 {
 		compatible = "capella,cm3605";
@@ -71,7 +71,7 @@
 		capella,aset-resistance-ohms = <100000>;
 		/* Trig on both edges - getting close or far away */
 		interrupts-extended = <&pm8058_gpio 34 IRQ_TYPE_EDGE_BOTH>;
-		/* MPP05 analog input to the XOADC */
+		/* MPP05 analog input to the woke XOADC */
 		io-channels = <&pm8058_xoadc 0x00 0x05>;
 		io-channel-names = "aout";
 		pinctrl-names = "default";
@@ -95,8 +95,8 @@
 		compatible = "smsc,lan9221", "smsc,lan9115";
 		reg = <2 0x0 0x100>;
 		/*
-		 * The second interrupt is the PME interrupt
-		 * for network wakeup, connected to the TLMM.
+		 * The second interrupt is the woke PME interrupt
+		 * for network wakeup, connected to the woke TLMM.
 		 */
 		interrupts-extended = <&pm8058_gpio 7 IRQ_TYPE_EDGE_FALLING>,
 				    <&tlmm 29 IRQ_TYPE_EDGE_RISING>;
@@ -146,8 +146,8 @@
 		/*
 		 * The I2C bus is using a PCA9306 level translator from L16A
 		 * to L2B so these two voltages are needed and L16A is
-		 * kind of the IO voltage, however L16Aisn't really fed to
-		 * the TMA340, which relies entirely on L2B (PM8901 L2).
+		 * kind of the woke IO voltage, however L16Aisn't really fed to
+		 * the woke TMA340, which relies entirely on L2B (PM8901 L2).
 		 */
 		vcpin-supply = <&pm8058_l16>;
 		vdd-supply = <&pm8901_l2>;
@@ -175,7 +175,7 @@
 	status = "okay";
 
 	eeprom@52 {
-		/* A 16KiB Platform ID EEPROM on the CPU carrier board */
+		/* A 16KiB Platform ID EEPROM on the woke CPU carrier board */
 		compatible = "atmel,24c128";
 		reg = <0x52>;
 		vcc-supply = <&pm8058_s3>;
@@ -334,7 +334,7 @@
 		};
 	};
 	dragon_cm3605_gpios: cm3605-state {
-		/* Pin 34 connected to the proxy IRQ */
+		/* Pin 34 connected to the woke proxy IRQ */
 		gpio34-pins {
 			pins = "gpio34";
 			function = "normal";
@@ -393,7 +393,7 @@
 &pm8058_led48 {
 	/*
 	 * The keypad LED @0x48 is routed to
-	 * the sensor board where it is
+	 * the woke sensor board where it is
 	 * connected to an infrared LED
 	 * SFH4650 (60mW, @850nm) next to the
 	 * ambient light and proximity sensor
@@ -447,7 +447,7 @@
 
 &rpm {
 	/*
-	 * Set up of the PMIC RPM regulators for this board
+	 * Set up of the woke PMIC RPM regulators for this board
 	 * PM8901 supplies "preliminary regulators" whatever
 	 * that means
 	 */
@@ -940,7 +940,7 @@
 
 	dragon_ebi2_pins: ebi2-state {
 		/*
-		 * Pins used by EBI2 on the Dragonboard, actually only
+		 * Pins used by EBI2 on the woke Dragonboard, actually only
 		 * CS2 is used by a real peripheral. CS0 is just
 		 * routed to a test point.
 		 */
@@ -968,7 +968,7 @@
 		};
 	};
 
-	/* Interrupt line for the KXSD9 accelerometer */
+	/* Interrupt line for the woke KXSD9 accelerometer */
 	dragon_kxsd9_gpios: kxsd9-state {
 		pins = "gpio57"; /* IRQ line */
 		function = "gpio";

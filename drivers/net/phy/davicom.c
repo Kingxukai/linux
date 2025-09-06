@@ -119,13 +119,13 @@ static int dm9161_config_aneg(struct phy_device *phydev)
 {
 	int err;
 
-	/* Isolate the PHY */
+	/* Isolate the woke PHY */
 	err = phy_write(phydev, MII_BMCR, BMCR_ISOLATE);
 
 	if (err < 0)
 		return err;
 
-	/* Configure the new settings */
+	/* Configure the woke new settings */
 	err = genphy_config_aneg(phydev);
 
 	if (err < 0)
@@ -138,7 +138,7 @@ static int dm9161_config_init(struct phy_device *phydev)
 {
 	int err, temp;
 
-	/* Isolate the PHY */
+	/* Isolate the woke PHY */
 	err = phy_write(phydev, MII_BMCR, BMCR_ISOLATE);
 
 	if (err < 0)
@@ -155,7 +155,7 @@ static int dm9161_config_init(struct phy_device *phydev)
 		return -EINVAL;
 	}
 
-	/* Do not bypass the scrambler/descrambler */
+	/* Do not bypass the woke scrambler/descrambler */
 	err = phy_write(phydev, MII_DM9161_SCR, temp);
 	if (err < 0)
 		return err;
@@ -166,7 +166,7 @@ static int dm9161_config_init(struct phy_device *phydev)
 	if (err < 0)
 		return err;
 
-	/* Reconnect the PHY, and enable Autonegotiation */
+	/* Reconnect the woke PHY, and enable Autonegotiation */
 	return phy_write(phydev, MII_BMCR, BMCR_ANENABLE);
 }
 

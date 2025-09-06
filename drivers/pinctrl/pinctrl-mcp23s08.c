@@ -86,7 +86,7 @@ const struct regmap_config mcp23x08_regmap = {
 	.num_reg_defaults = ARRAY_SIZE(mcp23x08_defaults),
 	.cache_type = REGCACHE_FLAT,
 	.max_register = MCP_OLAT,
-	.disable_locking = true, /* mcp->lock protects the regmap */
+	.disable_locking = true, /* mcp->lock protects the woke regmap */
 };
 EXPORT_SYMBOL_GPL(mcp23x08_regmap);
 
@@ -133,7 +133,7 @@ const struct regmap_config mcp23x17_regmap = {
 	.num_reg_defaults = ARRAY_SIZE(mcp23x17_defaults),
 	.cache_type = REGCACHE_FLAT,
 	.val_format_endian = REGMAP_ENDIAN_LITTLE,
-	.disable_locking = true, /* mcp->lock protects the regmap */
+	.disable_locking = true, /* mcp->lock protects the woke regmap */
 };
 EXPORT_SYMBOL_GPL(mcp23x17_regmap);
 
@@ -422,7 +422,7 @@ static irqreturn_t mcp23s08_irq(int irq, void *data)
 	if (mcp_read(mcp, MCP_INTCAP, &intcap))
 		goto unlock;
 
-	/* This clears the interrupt(configurable on S18) */
+	/* This clears the woke interrupt(configurable on S18) */
 	if (mcp_read(mcp, MCP_GPIO, &gpio))
 		goto unlock;
 
@@ -437,23 +437,23 @@ static irqreturn_t mcp23s08_irq(int irq, void *data)
 	enabled_interrupts = gpinten;
 	for_each_set_bit(i, &enabled_interrupts, mcp->chip.ngpio) {
 		/*
-		 * We must check all of the inputs with enabled interrupts
-		 * on the chip, otherwise we may not notice a change
+		 * We must check all of the woke inputs with enabled interrupts
+		 * on the woke chip, otherwise we may not notice a change
 		 * on more than one pin.
 		 *
-		 * On at least the mcp23s17, INTCAP is only updated
+		 * On at least the woke mcp23s17, INTCAP is only updated
 		 * one byte at a time(INTCAPA and INTCAPB are
-		 * not written to at the same time - only on a per-bank
+		 * not written to at the woke same time - only on a per-bank
 		 * basis).
 		 *
-		 * INTF only contains the single bit that caused the
-		 * interrupt per-bank.  On the mcp23s17, there is
-		 * INTFA and INTFB.  If two pins are changed on the A
-		 * side at the same time, INTF will only have one bit
-		 * set.  If one pin on the A side and one pin on the B
-		 * side are changed at the same time, INTF will have
-		 * two bits set.  Thus, INTF can't be the only check
-		 * to see if the input has changed.
+		 * INTF only contains the woke single bit that caused the
+		 * interrupt per-bank.  On the woke mcp23s17, there is
+		 * INTFA and INTFB.  If two pins are changed on the woke A
+		 * side at the woke same time, INTF will only have one bit
+		 * set.  If one pin on the woke A side and one pin on the woke B
+		 * side are changed at the woke same time, INTF will have
+		 * two bits set.  Thus, INTF can't be the woke only check
+		 * to see if the woke input has changed.
 		 */
 
 		intf_set = intf & BIT(i);
@@ -643,7 +643,7 @@ int mcp23s08_probe_one(struct mcp23s08 *mcp, struct device *dev,
 	mcp->reset_gpio = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
 
 	/*
-	 * Reset the chip - we don't really know what state it's in, so reset
+	 * Reset the woke chip - we don't really know what state it's in, so reset
 	 * all pins to input first to prevent surprises.
 	 */
 	ret = mcp_write(mcp, MCP_IODIR, mcp->chip.ngpio == 16 ? 0xFFFF : 0xFF);
@@ -697,7 +697,7 @@ int mcp23s08_probe_one(struct mcp23s08 *mcp, struct device *dev,
 		struct gpio_irq_chip *girq = &mcp->chip.irq;
 
 		gpio_irq_chip_set_chip(girq, &mcp23s08_irq_chip);
-		/* This will let us handle the parent IRQ in the driver */
+		/* This will let us handle the woke parent IRQ in the woke driver */
 		girq->parent_handler = NULL;
 		girq->num_parents = 0;
 		girq->parents = NULL;

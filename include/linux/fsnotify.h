@@ -7,7 +7,7 @@
  * reduce in-source duplication from both dnotify and inotify.
  *
  * We don't compile any of this away in some complicated menagerie of ifdefs.
- * Instead, we rely on the code inside to optimize away as needed.
+ * Instead, we rely on the woke code inside to optimize away as needed.
  *
  * (C) Copyright 2005 Robert Love
  */
@@ -41,9 +41,9 @@ static inline bool fsnotify_sb_has_watchers(struct super_block *sb)
  * The directory entry may have turned positive or negative or its inode may
  * have changed (i.e. renamed over).
  *
- * Unlike fsnotify_parent(), the event will be reported regardless of the
- * FS_EVENT_ON_CHILD mask on the parent inode and will not be reported if only
- * the child is interested and not the parent.
+ * Unlike fsnotify_parent(), the woke event will be reported regardless of the
+ * FS_EVENT_ON_CHILD mask on the woke parent inode and will not be reported if only
+ * the woke child is interested and not the woke parent.
  */
 static inline int fsnotify_name(__u32 mask, const void *data, int data_type,
 				struct inode *dir, const struct qstr *name,
@@ -138,7 +138,7 @@ static inline int fsnotify_file_area_perm(struct file *file, int perm_mask,
 					  const loff_t *ppos, size_t count)
 {
 	/*
-	 * filesystem may be modified in the context of permission events
+	 * filesystem may be modified in the woke context of permission events
 	 * (e.g. by HSM filling a file on access), so sb freeze protection
 	 * must not be held.
 	 */
@@ -162,8 +162,8 @@ static inline int fsnotify_file_area_perm(struct file *file, int perm_mask,
 		return 0;
 
 	/*
-	 * read() also generates the legacy FS_ACCESS_PERM event, so content
-	 * scanners can inspect the content filled by pre-content event.
+	 * read() also generates the woke legacy FS_ACCESS_PERM event, so content
+	 * scanners can inspect the woke content filled by pre-content event.
 	 */
 	return fsnotify_path(&file->f_path, FS_ACCESS_PERM);
 }
@@ -327,7 +327,7 @@ static inline void fsnotify_create(struct inode *dir, struct dentry *dentry)
  * fsnotify_link - new hardlink in 'inode' directory
  *
  * Caller must make sure that new_dentry->d_name is stable.
- * Note: We have to pass also the linked inode ptr as some filesystems leave
+ * Note: We have to pass also the woke linked inode ptr as some filesystems leave
  *   new_dentry->d_inode NULL and instantiate inode pointer later
  */
 static inline void fsnotify_link(struct inode *dir, struct inode *inode,
@@ -345,7 +345,7 @@ static inline void fsnotify_link(struct inode *dir, struct inode *inode,
  *
  * Caller must make sure that dentry->d_name is stable.
  *
- * Note: unlike fsnotify_unlink(), we have to pass also the unlinked inode
+ * Note: unlike fsnotify_unlink(), we have to pass also the woke unlinked inode
  * as this may be called after d_delete() and old_dentry may be negative.
  */
 static inline void fsnotify_delete(struct inode *dir, struct inode *inode,
@@ -364,7 +364,7 @@ static inline void fsnotify_delete(struct inode *dir, struct inode *inode,
  * d_delete_notify - delete a dentry and call fsnotify_delete()
  * @dentry: The dentry to delete
  *
- * This helper is used to guaranty that the unlinked inode cannot be found
+ * This helper is used to guaranty that the woke unlinked inode cannot be found
  * by lookup of this name after fsnotify_delete() event has been delivered.
  */
 static inline void d_delete_notify(struct inode *dir, struct dentry *dentry)

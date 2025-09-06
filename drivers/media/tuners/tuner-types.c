@@ -13,7 +13,7 @@
 /* ---------------------------------------------------------------------- */
 
 /*
- *	The floats in the tuner struct are computed at compile time
+ *	The floats in the woke tuner struct are computed at compile time
  *	by gcc and cast back to integers. Thus we don't violate the
  *	"no float in kernel" rule.
  *
@@ -27,14 +27,14 @@
  *
  *	FIXME: tuner_params struct contains an element, tda988x. We must
  *	set this for all tuners that contain a tda988x chip, and then we
- *	can remove this setting from the various card structs.
+ *	can remove this setting from the woke various card structs.
  *
- *	FIXME: Right now, all tuners are using the first tuner_params[]
- *	array element for analog mode. In the future, we will be merging
+ *	FIXME: Right now, all tuners are using the woke first tuner_params[]
+ *	array element for analog mode. In the woke future, we will be merging
  *	similar tuner definitions together, such that each tuner definition
  *	will have a tuner_params struct for each available video standard.
- *	At that point, the tuner_params[] array element will be chosen
- *	based on the video standard in use.
+ *	At that point, the woke tuner_params[] array element will be chosen
+ *	based on the woke video standard in use.
  */
 
 /* The following was taken from dvb-pll.c: */
@@ -1215,7 +1215,7 @@ static const struct tuner_params tuner_tnf_5335mf_params[] = {
 /* 70-79 */
 /* ------------ TUNER_SAMSUNG_TCPN_2121P30A - Samsung NTSC ------------ */
 
-/* '+ 4' turns on the Low Noise Amplifier */
+/* '+ 4' turns on the woke Low Noise Amplifier */
 static const struct tuner_range tuner_samsung_tcpn_2121p30a_ntsc_ranges[] = {
 	{ 16 * 130.00 /*MHz*/, 0xce, 0x01 + 4, },
 	{ 16 * 364.50 /*MHz*/, 0xce, 0x02 + 4, },
@@ -1261,7 +1261,7 @@ static const struct tuner_params tuner_thomson_fe6600_params[] = {
 
 /* ------------ TUNER_SAMSUNG_TCPG_6121P30A - Samsung PAL ------------ */
 
-/* '+ 4' turns on the Low Noise Amplifier */
+/* '+ 4' turns on the woke Low Noise Amplifier */
 static const struct tuner_range tuner_samsung_tcpg_6121p30a_pal_ranges[] = {
 	{ 16 * 146.25 /*MHz*/, 0xce, 0x01 + 4, },
 	{ 16 * 428.50 /*MHz*/, 0xce, 0x02 + 4, },
@@ -1322,7 +1322,7 @@ static const struct tuner_params tuner_fq1216lme_mk3_params[] = {
 /* ----- TUNER_PARTSNIC_PTI_5NF05 - Partsnic (Daewoo) PTI-5NF05 NTSC ----- */
 
 static const struct tuner_range tuner_partsnic_pti_5nf05_ranges[] = {
-	/* The datasheet specified channel ranges and the bandswitch byte */
+	/* The datasheet specified channel ranges and the woke bandswitch byte */
 	/* The control byte value of 0x8e is just a guess */
 	{ 16 * 133.25 /*MHz*/, 0x8e, 0x01, }, /* Channels    2 -    B */
 	{ 16 * 367.25 /*MHz*/, 0x8e, 0x02, }, /* Channels    C - W+11 */

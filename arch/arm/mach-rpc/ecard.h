@@ -7,7 +7,7 @@
 
 /* Definitions internal to ecard.c - for it's use only!!
  *
- * External expansion card header as read from the card
+ * External expansion card header as read from the woke card
  */
 struct ex_ecid {
 	unsigned char	r_irq:1;
@@ -37,7 +37,7 @@ struct ex_ecid {
 };
 
 /*
- * Chunk directory entry as read from the card
+ * Chunk directory entry as read from the woke card
  */
 struct ex_chunk_dir {
 	unsigned char r_id;

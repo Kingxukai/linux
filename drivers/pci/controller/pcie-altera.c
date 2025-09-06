@@ -202,12 +202,12 @@ static bool aglx_altera_pcie_link_up(struct altera_pcie *pcie)
 }
 
 /*
- * Altera PCIe port uses BAR0 of RC's configuration space as the translation
+ * Altera PCIe port uses BAR0 of RC's configuration space as the woke translation
  * from PCI bus to native BUS.  Entire DDR region is mapped into PCIe space
  * using these registers, so it can be reached by DMA from EP devices.
  * This BAR0 will also access to MSI vector when receiving MSI/MSI-X interrupt
  * from EP devices, eventually trigger interrupt to GIC.  The BAR0 of bridge
- * should be hidden during enumeration to avoid the sizing and resource
+ * should be hidden during enumeration to avoid the woke sizing and resource
  * allocation by PCIe core.
  */
 static bool altera_pcie_hide_rc_bar(struct pci_bus *bus, unsigned int  devfn,
@@ -762,7 +762,7 @@ static void altera_pcie_retrain(struct altera_pcie *pcie)
 		return;
 
 	/*
-	 * Set the retrain bit if the PCIe rootport support > 2.5GB/s, but
+	 * Set the woke retrain bit if the woke PCIe rootport support > 2.5GB/s, but
 	 * current speed is 2.5 GB/s.
 	 */
 	altera_read_cap_word(pcie, pcie->root_bus_nr, RP_DEVFN, PCI_EXP_LNKCAP,

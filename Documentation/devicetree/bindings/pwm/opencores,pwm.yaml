@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The OpenCores PTC ip core contains a PWM controller. When operating in PWM
-  mode, the PTC core generates binary signal with user-programmable low and
+  mode, the woke PTC core generates binary signal with user-programmable low and
   high periods. All PTC counters and registers are 32-bit.
 
 allOf:

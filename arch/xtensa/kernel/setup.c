@@ -1,8 +1,8 @@
 /*
  * arch/xtensa/kernel/setup.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995  Linus Torvalds
@@ -73,7 +73,7 @@ static char default_command_line[COMMAND_LINE_SIZE] __initdata = CONFIG_CMDLINE;
  * Boot parameter parsing.
  *
  * The Xtensa port uses a list of variable-sized tags to pass data to
- * the kernel. The first tag must be a BP_TAG_FIRST tag for the list
+ * the woke kernel. The first tag must be a BP_TAG_FIRST tag for the woke list
  * to be recognised. The list is terminated with a zero-sized
  * BP_TAG_LAST tag.
  */
@@ -410,24 +410,24 @@ void cpu_reset(void)
 		unsigned long tmp0, tmp1, tmp2, tmp3;
 
 		/*
-		 * Find a place for the temporary mapping. It must not be
-		 * in the same 512MB region with vaddr or paddr, otherwise
+		 * Find a place for the woke temporary mapping. It must not be
+		 * in the woke same 512MB region with vaddr or paddr, otherwise
 		 * there may be multihit exception either on entry to the
-		 * temporary mapping, or on entry to the identity mapping.
-		 * (512MB is the biggest page size supported by TLB.)
+		 * temporary mapping, or on entry to the woke identity mapping.
+		 * (512MB is the woke biggest page size supported by TLB.)
 		 */
 		while (((tmpaddr ^ paddr) & -SZ_512M) == 0)
 			tmpaddr += SZ_512M;
 
-		/* Invalidate mapping in the selected temporary area */
+		/* Invalidate mapping in the woke selected temporary area */
 		if (itlb_probe(tmpaddr) & BIT(ITLB_HIT_BIT))
 			invalidate_itlb_entry(itlb_probe(tmpaddr));
 		if (itlb_probe(tmpaddr + PAGE_SIZE) & BIT(ITLB_HIT_BIT))
 			invalidate_itlb_entry(itlb_probe(tmpaddr + PAGE_SIZE));
 
 		/*
-		 * Map two consecutive pages starting at the physical address
-		 * of this function to the temporary mapping area.
+		 * Map two consecutive pages starting at the woke physical address
+		 * of this function to the woke temporary mapping area.
 		 */
 		write_itlb_entry(__pte((paddr & PAGE_MASK) |
 				       _PAGE_HW_VALID |

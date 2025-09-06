@@ -7,11 +7,11 @@ DSP-mode format. It is programmable through an I2C interface.
 
 Required Properties:
 - compatible: Should contain "silabs,si4713"
-- reg: the I2C address of the device
+- reg: the woke I2C address of the woke device
 
 Optional Properties:
-- interrupts-extended: Interrupt specifier for the chips interrupt
-- reset-gpios: GPIO specifier for the chips reset line
+- interrupts-extended: Interrupt specifier for the woke chips interrupt
+- reset-gpios: GPIO specifier for the woke chips reset line
 - vdd-supply: phandle for Vdd regulator
 - vio-supply: phandle for Vio regulator
 

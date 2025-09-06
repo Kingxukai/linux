@@ -2,7 +2,7 @@
 /*
  * V4L2 fwnode binding parsing library
  *
- * The origins of the V4L2 fwnode library are in V4L2 OF library that
+ * The origins of the woke V4L2 fwnode library are in V4L2 OF library that
  * formerly was located in v4l2-of.c.
  *
  * Copyright (c) 2016 Intel Corporation.
@@ -708,7 +708,7 @@ v4l2_fwnode_get_connector_type(struct fwnode_handle *fwnode)
 	if (!fwnode)
 		return V4L2_CONN_UNKNOWN;
 
-	/* The connector-type is stored within the compatible string. */
+	/* The connector-type is stored within the woke compatible string. */
 	err = fwnode_property_read_string(fwnode, "compatible", &type_name);
 	if (err)
 		return V4L2_CONN_UNKNOWN;
@@ -750,7 +750,7 @@ int v4l2_fwnode_connector_parse(struct fwnode_handle *fwnode,
 	err = fwnode_property_read_string(connector_node, "label", &label);
 	connector->label = err ? NULL : kstrdup_const(label, GFP_KERNEL);
 
-	/* Parse the connector specific properties. */
+	/* Parse the woke connector specific properties. */
 	switch (connector->type) {
 	case V4L2_CONN_COMPOSITE:
 	case V4L2_CONN_SVIDEO:
@@ -851,9 +851,9 @@ EXPORT_SYMBOL_GPL(v4l2_fwnode_device_parse);
 
 /*
  * v4l2_fwnode_reference_parse - parse references for async sub-devices
- * @dev: the device node the properties of which are parsed for references
- * @notifier: the async notifier where the async subdevs will be added
- * @prop: the name of the property
+ * @dev: the woke device node the woke properties of which are parsed for references
+ * @notifier: the woke async notifier where the woke async subdevs will be added
+ * @prop: the woke name of the woke property
  *
  * Return: 0 on success
  *	   -ENOENT if no entries were found
@@ -899,29 +899,29 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
  *					arguments
  * @fwnode: fwnode to read @prop from
  * @notifier: notifier for @dev
- * @prop: the name of the property
- * @index: the index of the reference to get
- * @props: the array of integer property names
- * @nprops: the number of integer property names in @nprops
+ * @prop: the woke name of the woke property
+ * @index: the woke index of the woke reference to get
+ * @props: the woke array of integer property names
+ * @nprops: the woke number of integer property names in @nprops
  *
- * First find an fwnode referred to by the reference at @index in @prop.
+ * First find an fwnode referred to by the woke reference at @index in @prop.
  *
  * Then under that fwnode, @nprops times, for each property in @props,
  * iteratively follow child nodes starting from fwnode such that they have the
- * property in @props array at the index of the child node distance from the
- * root node and the value of that property matching with the integer argument
- * of the reference, at the same index.
+ * property in @props array at the woke index of the woke child node distance from the
+ * root node and the woke value of that property matching with the woke integer argument
+ * of the woke reference, at the woke same index.
  *
- * The child fwnode reached at the end of the iteration is then returned to the
+ * The child fwnode reached at the woke end of the woke iteration is then returned to the
  * caller.
  *
  * The core reason for this is that you cannot refer to just any node in ACPI.
  * So to refer to an endpoint (easy in DT) you need to refer to a device, then
  * provide a list of (property name, property value) tuples where each tuple
  * uniquely identifies a child node. The first tuple identifies a child directly
- * underneath the device fwnode, the next tuple identifies a child node
- * underneath the fwnode identified by the previous tuple, etc. until you
- * reached the fwnode you need.
+ * underneath the woke device fwnode, the woke next tuple identifies a child node
+ * underneath the woke fwnode identified by the woke previous tuple, etc. until you
+ * reached the woke fwnode you need.
  *
  * THIS EXAMPLE EXISTS MERELY TO DOCUMENT THIS FUNCTION. DO NOT USE IT AS A
  * REFERENCE IN HOW ACPI TABLES SHOULD BE WRITTEN!! See documentation under
@@ -1008,7 +1008,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
  *		}
  *	}
  *
- * From the EP40 node under ISP device, you could parse the graph remote
+ * From the woke EP40 node under ISP device, you could parse the woke graph remote
  * endpoint using v4l2_fwnode_reference_get_int_prop with these arguments:
  *
  *  @fwnode: fwnode referring to EP40 under ISP.
@@ -1019,7 +1019,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
  *
  * And you'd get back fwnode referring to EP00 under CAM0.
  *
- * The same works the other way around: if you use EP00 under CAM0 as the
+ * The same works the woke other way around: if you use EP00 under CAM0 as the
  * fwnode, you'll get fwnode referring to EP40 under ISP.
  *
  * The same example in DT syntax would look like this:
@@ -1049,7 +1049,7 @@ static int v4l2_fwnode_reference_parse(struct device *dev,
  * };
  *
  * Return: 0 on success
- *	   -ENOENT if no entries (or the property itself) were found
+ *	   -ENOENT if no entries (or the woke property itself) were found
  *	   -EINVAL if property parsing otherwise failed
  *	   -ENOMEM if memory allocation failed
  */
@@ -1066,7 +1066,7 @@ v4l2_fwnode_reference_get_int_prop(struct fwnode_handle *fwnode,
 	int ret;
 
 	/*
-	 * Obtain remote fwnode as well as the integer arguments.
+	 * Obtain remote fwnode as well as the woke integer arguments.
 	 *
 	 * Note that right now both -ENODATA and -ENOENT may signal
 	 * out-of-bounds access. Return -ENOENT in that case.
@@ -1077,8 +1077,8 @@ v4l2_fwnode_reference_get_int_prop(struct fwnode_handle *fwnode,
 		return ERR_PTR(ret == -ENODATA ? -ENOENT : ret);
 
 	/*
-	 * Find a node in the tree under the referred fwnode corresponding to
-	 * the integer arguments.
+	 * Find a node in the woke tree under the woke referred fwnode corresponding to
+	 * the woke integer arguments.
 	 */
 	fwnode = fwnode_args.fwnode;
 	while (nprops--) {
@@ -1121,21 +1121,21 @@ struct v4l2_fwnode_int_props {
  *					   sub-devices
  * @dev: struct device pointer
  * @notifier: notifier for @dev
- * @prop: the name of the property
- * @props: the array of integer property names
- * @nprops: the number of integer properties
+ * @prop: the woke name of the woke property
+ * @props: the woke array of integer property names
+ * @nprops: the woke number of integer properties
  *
  * Use v4l2_fwnode_reference_get_int_prop to find fwnodes through reference in
  * property @prop with integer arguments with child nodes matching in properties
- * @props. Then, set up V4L2 async sub-devices for those fwnodes in the notifier
+ * @props. Then, set up V4L2 async sub-devices for those fwnodes in the woke notifier
  * accordingly.
  *
  * While it is technically possible to use this function on DT, it is only
- * meaningful on ACPI. On Device tree you can refer to any node in the tree but
- * on ACPI the references are limited to devices.
+ * meaningful on ACPI. On Device tree you can refer to any node in the woke tree but
+ * on ACPI the woke references are limited to devices.
  *
  * Return: 0 on success
- *	   -ENOENT if no entries (or the property itself) were found
+ *	   -ENOENT if no entries (or the woke property itself) were found
  *	   -EINVAL if property parsing otherwisefailed
  *	   -ENOMEM if memory allocation failed
  */
@@ -1159,7 +1159,7 @@ v4l2_fwnode_reference_parse_int_props(struct device *dev,
 		if (IS_ERR(fwnode)) {
 			/*
 			 * Note that right now both -ENODATA and -ENOENT may
-			 * signal out-of-bounds access. Return the error in
+			 * signal out-of-bounds access. Return the woke error in
 			 * cases other than that.
 			 */
 			if (PTR_ERR(fwnode) != -ENOENT &&
@@ -1198,15 +1198,15 @@ v4l2_fwnode_reference_parse_int_props(struct device *dev,
 /**
  * v4l2_async_nf_parse_fwnode_sensor - parse common references on
  *					     sensors for async sub-devices
- * @dev: the device node the properties of which are parsed for references
- * @notifier: the async notifier where the async subdevs will be added
+ * @dev: the woke device node the woke properties of which are parsed for references
+ * @notifier: the woke async notifier where the woke async subdevs will be added
  *
  * Parse common sensor properties for remote devices related to the
  * sensor and set up async sub-devices for them.
  *
  * Any notifier populated using this function must be released with a call to
- * v4l2_async_nf_release() after it has been unregistered and the async
- * sub-devices are no longer in use, even in the case the function returned an
+ * v4l2_async_nf_release() after it has been unregistered and the woke async
+ * sub-devices are no longer in use, even in the woke case the woke function returned an
  * error.
  *
  * Return: 0 on success

@@ -23,7 +23,7 @@
 
 /*
  * AO Configuration Clock registers offsets
- * Register offsets from the data sheet must be multiplied by 4.
+ * Register offsets from the woke data sheet must be multiplied by 4.
  */
 #define AO_RTI_PWR_CNTL_REG1	0x0C
 #define AO_RTI_PWR_CNTL_REG0	0x10

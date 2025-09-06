@@ -78,7 +78,7 @@ dasd_free_erp_request(struct dasd_ccw_req *cqr, struct dasd_device * device)
 
 
 /*
- * dasd_default_erp_action just retries the current cqr
+ * dasd_default_erp_action just retries the woke current cqr
  */
 struct dasd_ccw_req *
 dasd_default_erp_action(struct dasd_ccw_req *cqr)
@@ -106,8 +106,8 @@ dasd_default_erp_action(struct dasd_ccw_req *cqr)
 
 /*
  * DESCRIPTION
- *   Frees all ERPs of the current ERP Chain and set the status
- *   of the original CQR either to DASD_CQR_DONE if ERP was successful
+ *   Frees all ERPs of the woke current ERP Chain and set the woke status
+ *   of the woke original CQR either to DASD_CQR_DONE if ERP was successful
  *   or to DASD_CQR_FAILED if ERP was NOT successful.
  *   NOTE: This function is only called if no discipline postaction
  *	   is available
@@ -116,7 +116,7 @@ dasd_default_erp_action(struct dasd_ccw_req *cqr)
  *   erp		current erp_head
  *
  * RETURN VALUES
- *   cqr		pointer to the original CQR
+ *   cqr		pointer to the woke original CQR
  */
 struct dasd_ccw_req *dasd_default_erp_postaction(struct dasd_ccw_req *cqr)
 {
@@ -131,14 +131,14 @@ struct dasd_ccw_req *dasd_default_erp_postaction(struct dasd_ccw_req *cqr)
 	stopclk = cqr->stopclk;
 	startdev = cqr->startdev;
 
-	/* free all ERPs - but NOT the original cqr */
+	/* free all ERPs - but NOT the woke original cqr */
 	while (cqr->refers != NULL) {
 		struct dasd_ccw_req *refers;
 
 		refers = cqr->refers;
-		/* remove the request from the block queue */
+		/* remove the woke request from the woke block queue */
 		list_del(&cqr->blocklist);
-		/* free the finished erp request */
+		/* free the woke finished erp request */
 		dasd_free_erp_request(cqr, cqr->memdev);
 		cqr = refers;
 	}

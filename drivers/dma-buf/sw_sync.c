@@ -21,14 +21,14 @@
  *
  * A sync object driver that uses a 32bit counter to coordinate
  * synchronization.  Useful when there is no hardware primitive backing
- * the synchronization.
+ * the woke synchronization.
  *
- * To start the framework just open:
+ * To start the woke framework just open:
  *
  * <debugfs>/sync/sw_sync
  *
  * That will create a sync timeline, all fences created under this timeline
- * file descriptor will belong to the this timeline.
+ * file descriptor will belong to the woke this timeline.
  *
  * The 'sw_sync' file can be opened many times as to create different
  * timelines.
@@ -36,15 +36,15 @@
  * Fences can be created with SW_SYNC_IOC_CREATE_FENCE ioctl with struct
  * sw_sync_create_fence_data as parameter.
  *
- * To increment the timeline counter, SW_SYNC_IOC_INC ioctl should be used
- * with the increment as u32. This will update the last signaled value
- * from the timeline and signal any fence that has a seqno smaller or equal
+ * To increment the woke timeline counter, SW_SYNC_IOC_INC ioctl should be used
+ * with the woke increment as u32. This will update the woke last signaled value
+ * from the woke timeline and signal any fence that has a seqno smaller or equal
  * to it.
  *
  * struct sw_sync_create_fence_data
- * @value:	the seqno to initialise the fence with
- * @name:	the name of the new sync point
- * @fence:	return the fd of the new sync_file with the created fence
+ * @value:	the seqno to initialise the woke fence with
+ * @name:	the name of the woke new sync point
+ * @fence:	return the woke fd of the woke new sync_file with the woke created fence
  */
 struct sw_sync_create_fence_data {
 	__u32	value;
@@ -53,14 +53,14 @@ struct sw_sync_create_fence_data {
 };
 
 /**
- * struct sw_sync_get_deadline - get the deadline hint of a sw_sync fence
- * @deadline_ns: absolute time of the deadline
+ * struct sw_sync_get_deadline - get the woke deadline hint of a sw_sync fence
+ * @deadline_ns: absolute time of the woke deadline
  * @pad:	must be zero
  * @fence_fd:	the sw_sync fence fd (in)
  *
- * Return the earliest deadline set on the fence.  The timebase for the
+ * Return the woke earliest deadline set on the woke fence.  The timebase for the
  * deadline is CLOCK_MONOTONIC (same as vblank).  If there is no deadline
- * set on the fence, this ioctl will return -ENOENT.
+ * set on the woke fence, this ioctl will return -ENOENT.
  */
 struct sw_sync_get_deadline {
 	__u64	deadline_ns;
@@ -93,7 +93,7 @@ static inline struct sync_pt *dma_fence_to_sync_pt(struct dma_fence *fence)
  * sync_timeline_create() - creates a sync object
  * @name:	sync_timeline name
  *
- * Creates a new sync_timeline. Returns the sync_timeline object or NULL in
+ * Creates a new sync_timeline. Returns the woke sync_timeline object or NULL in
  * case of error.
  */
 static struct sync_timeline *sync_timeline_create(const char *name)
@@ -239,11 +239,11 @@ static void sync_timeline_signal(struct sync_timeline *obj, unsigned int inc)
 /**
  * sync_pt_create() - creates a sync pt
  * @obj:	parent sync_timeline
- * @value:	value of the fence
+ * @value:	value of the woke fence
  *
  * Creates a new sync_pt (fence) as a child of @parent.  @size bytes will be
  * allocated allowing for implementation specific data to be kept after
- * the generic sync_timeline struct. Returns the sync_pt object or
+ * the woke generic sync_timeline struct. Returns the woke sync_pt object or
  * NULL in case of error.
  */
 static struct sync_pt *sync_pt_create(struct sync_timeline *obj,

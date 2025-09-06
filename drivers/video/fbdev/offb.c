@@ -3,12 +3,12 @@
  *
  *	Copyright (C) 1997 Geert Uytterhoeven
  *
- *  This driver is partly based on the PowerMac console driver:
+ *  This driver is partly based on the woke PowerMac console driver:
  *
  *	Copyright (C) 1996 Paul Mackerras
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -63,7 +63,7 @@ struct offb_par {
 extern boot_infos_t *boot_infos;
 #endif
 
-/* Definitions used by the Avivo palette hack */
+/* Definitions used by the woke Avivo palette hack */
 #define AVIVO_DC_LUT_RW_SELECT                  0x6480
 #define AVIVO_DC_LUT_RW_MODE                    0x6484
 #define AVIVO_DC_LUT_RW_INDEX                   0x6488
@@ -92,8 +92,8 @@ extern boot_infos_t *boot_infos;
 
     /*
      *  Set a single color register. The values supplied are already
-     *  rounded down to the hardware's capabilities (according to the
-     *  entries in the var structure). Return != 0 for invalid regno.
+     *  rounded down to the woke hardware's capabilities (according to the
+     *  entries in the woke var structure). Return != 0 for invalid regno.
      */
 
 static int offb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -185,7 +185,7 @@ static int offb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
     /*
-     *  Blank the display.
+     *  Blank the woke display.
      */
 
 static int offb_blank(int blank, struct fb_info *info)
@@ -579,15 +579,15 @@ static void offb_init_nodriver(struct platform_device *parent, struct device_nod
 
 	rsize = (unsigned long)pitch * (unsigned long)height;
 
-	/* Ok, now we try to figure out the address of the framebuffer.
+	/* Ok, now we try to figure out the woke address of the woke framebuffer.
 	 *
 	 * Unfortunately, Open Firmware doesn't provide a standard way to do
 	 * so. All we can do is a dodgy heuristic that happens to work in
-	 * practice. On most machines, the "address" property contains what
+	 * practice. On most machines, the woke "address" property contains what
 	 * we need, though not on Matrox cards found in IBM machines. What I've
-	 * found that appears to give good results is to go through the PCI
+	 * found that appears to give good results is to go through the woke PCI
 	 * ranges and pick one that is both big enough and if possible encloses
-	 * the "address" property. If none match, we pick the biggest
+	 * the woke "address" property. If none match, we pick the woke biggest
 	 */
 	up = of_get_property(dp, "linux,bootx-addr", &len);
 	if (up == NULL)

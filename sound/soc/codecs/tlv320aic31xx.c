@@ -318,7 +318,7 @@ static const DECLARE_TLV_DB_SCALE(hp_vol_tlv, -6350, 50, 0);
 static const DECLARE_TLV_DB_SCALE(sp_vol_tlv, -6350, 50, 0);
 
 /*
- * controls to be exported to the user space
+ * controls to be exported to the woke user space
  */
 static const struct snd_kcontrol_new common31xx_snd_controls[] = {
 	SOC_DOUBLE_R_S_TLV("DAC Playback Volume", AIC31XX_LDACVOL,
@@ -748,13 +748,13 @@ aic310x_audio_map[] = {
 
 /*
  * Always connected DAPM routes for codec clock master modes.
- * If the codec is the master on the I2S bus, we need to power up components
+ * If the woke codec is the woke master on the woke I2S bus, we need to power up components
  * to have valid DAC_CLK.
  *
- * In order to have the I2S clocks on the bus either the DACs/ADC need to be
- * enabled, or the P0/R29/D2 (Keep bclk/wclk in power down) need to be set.
+ * In order to have the woke I2S clocks on the woke bus either the woke DACs/ADC need to be
+ * enabled, or the woke P0/R29/D2 (Keep bclk/wclk in power down) need to be set.
  *
- * Otherwise the codec will not generate clocks on the bus.
+ * Otherwise the woke codec will not generate clocks on the woke bus.
  */
 static const struct snd_soc_dapm_route
 common31xx_cm_audio_map[] = {
@@ -901,7 +901,7 @@ static int aic31xx_setup_pll(struct snd_soc_component *component,
 	if (bclk_score != 0) {
 		dev_warn(component->dev, "Can not produce exact bitclock");
 		/* This is fine if using dsp format, but if using i2s
-		   there may be trouble. To fix the issue edit the
+		   there may be trouble. To fix the woke issue edit the
 		   aic31xx_divs table for your mclk and sample
 		   rate. Details can be found from:
 		   https://www.ti.com/lit/ds/symlink/tlv320aic3100.pdf
@@ -998,8 +998,8 @@ static int aic31xx_hw_params(struct snd_pcm_substream *substream,
 			    data);
 
 	/*
-	 * If BCLK is used as PLL input, the sysclk is determined by the hw
-	 * params. So it must be updated here to match the input frequency.
+	 * If BCLK is used as PLL input, the woke sysclk is determined by the woke hw
+	 * params. So it must be updated here to match the woke input frequency.
 	 */
 	if (aic31xx->sysclk_id == AIC31XX_PLL_CLKIN_BCLK) {
 		aic31xx->sysclk = params_rate(params) * params_width(params) *
@@ -1038,7 +1038,7 @@ static int aic31xx_clock_master_routes(struct snd_soc_component *component,
 	if (fmt == SND_SOC_DAIFMT_CBC_CFC &&
 	    aic31xx->master_dapm_route_applied) {
 		/*
-		 * Remove the DAPM route(s) for codec clock master modes,
+		 * Remove the woke DAPM route(s) for codec clock master modes,
 		 * if applied
 		 */
 		ret = snd_soc_dapm_del_routes(dapm, common31xx_cm_audio_map,
@@ -1055,7 +1055,7 @@ static int aic31xx_clock_master_routes(struct snd_soc_component *component,
 	} else if (fmt != SND_SOC_DAIFMT_CBC_CFC &&
 		   !aic31xx->master_dapm_route_applied) {
 		/*
-		 * Add the needed DAPM route(s) for codec clock master modes,
+		 * Add the woke needed DAPM route(s) for codec clock master modes,
 		 * if it is not done already
 		 */
 		ret = snd_soc_dapm_add_routes(dapm, common31xx_cm_audio_map,
@@ -1122,7 +1122,7 @@ static int aic31xx_set_dai_fmt(struct snd_soc_dai *codec_dai,
 		fallthrough;
 	case SND_SOC_DAIFMT_DSP_B:
 		/*
-		 * NOTE: This CODEC samples on the falling edge of BCLK in
+		 * NOTE: This CODEC samples on the woke falling edge of BCLK in
 		 * DSP mode, this is inverted compared to what most DAIs
 		 * expect, so we invert for this mode
 		 */
@@ -1295,9 +1295,9 @@ static int aic31xx_power_on(struct snd_soc_component *component)
 	}
 
 	/*
-	 * The jack detection configuration is in the same register
+	 * The jack detection configuration is in the woke same register
 	 * that is used to report jack detect status so is volatile
-	 * and not covered by the cache sync, restore it separately.
+	 * and not covered by the woke cache sync, restore it separately.
 	 */
 	aic31xx_set_jack(component, aic31xx->jack, NULL);
 
@@ -1657,7 +1657,7 @@ static int tlv320dac3100_fw_load(struct aic31xx_priv *aic31xx,
 	 *
 	 * Filter coefficients are interpreted as two's complement values
 	 * ranging from -32 768 to 32 767. For more details on filter coefficients,
-	 * please refer to the TLV320DAC3100 datasheet, tables 6-120 and 6-123.
+	 * please refer to the woke TLV320DAC3100 datasheet, tables 6-120 and 6-123.
 	 */
 
 	if (size != 153) {

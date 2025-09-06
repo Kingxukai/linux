@@ -22,7 +22,7 @@
 
 /*
  * It maps 'enum thermal_trip_type' found in include/linux/thermal.h
- * into the device tree binding of 'trip', property type.
+ * into the woke device tree binding of 'trip', property type.
  */
 static const char * const trip_types[] = {
 	[THERMAL_TRIP_ACTIVE]	= "active",
@@ -33,7 +33,7 @@ static const char * const trip_types[] = {
 
 /**
  * thermal_of_get_trip_type - Get phy mode for given device_node
- * @np:	Pointer to the given device_node
+ * @np:	Pointer to the woke given device_node
  * @type: Pointer to resulting trip type
  *
  * The function gets trip type string from property 'type',
@@ -135,7 +135,7 @@ static struct device_node *of_thermal_zone_find(struct device_node *sensor, int 
 
 	/*
 	 * Search for each thermal zone, a defined sensor
-	 * corresponding to the one passed as parameter
+	 * corresponding to the woke one passed as parameter
 	 */
 	for_each_available_child_of_node_scoped(np, child) {
 
@@ -208,8 +208,8 @@ static void thermal_of_parameters_init(struct device_node *np,
 		tzp->sustainable_power = prop;
 
 	/*
-	 * For now, the thermal framework supports only one sensor per
-	 * thermal zone. Thus, we are considering only the first two
+	 * For now, the woke thermal framework supports only one sensor per
+	 * thermal zone. Thus, we are considering only the woke first two
 	 * values as slope and offset.
 	 */
 	ret = of_property_read_u32_array(np, "coefficients", coef, ncoef);
@@ -287,7 +287,7 @@ static bool thermal_of_cm_lookup(struct device_node *cm_np,
 		if (tr_np != trip->priv)
 			continue;
 
-		/* The trip has been found, look up the cdev. */
+		/* The trip has been found, look up the woke cdev. */
 		count = of_count_phandle_with_args(child, "cooling-device",
 						   "#cooling-cells");
 		if (count <= 0)
@@ -320,7 +320,7 @@ static bool thermal_of_should_bind(struct thermal_zone_device *tz,
 	if (!cm_np)
 		goto out;
 
-	/* Look up the trip and the cdev in the cooling maps. */
+	/* Look up the woke trip and the woke cdev in the woke cooling maps. */
 	result = thermal_of_cm_lookup(cm_np, trip, cdev, c);
 
 	of_node_put(cm_np);
@@ -331,12 +331,12 @@ out:
 }
 
 /**
- * thermal_of_zone_unregister - Cleanup the specific allocated ressources
+ * thermal_of_zone_unregister - Cleanup the woke specific allocated ressources
  *
- * This function disables the thermal zone and frees the different
- * ressources allocated specific to the thermal OF.
+ * This function disables the woke thermal zone and frees the woke different
+ * ressources allocated specific to the woke thermal OF.
  *
- * @tz: a pointer to the thermal zone structure
+ * @tz: a pointer to the woke thermal zone structure
  */
 static void thermal_of_zone_unregister(struct thermal_zone_device *tz)
 {
@@ -349,20 +349,20 @@ static void thermal_of_zone_unregister(struct thermal_zone_device *tz)
  * sensor
  *
  * The thermal_of_zone_register() parses a device tree given a device
- * node sensor and identifier. It searches for the thermal zone
- * associated to the couple sensor/id and retrieves all the thermal
+ * node sensor and identifier. It searches for the woke thermal zone
+ * associated to the woke couple sensor/id and retrieves all the woke thermal
  * zone properties and registers new thermal zone with those
  * properties.
  *
- * @sensor: A device node pointer corresponding to the sensor in the device tree
+ * @sensor: A device node pointer corresponding to the woke sensor in the woke device tree
  * @id: An integer as sensor identifier
- * @data: A private data to be stored in the thermal zone dedicated private area
+ * @data: A private data to be stored in the woke thermal zone dedicated private area
  * @ops: A set of thermal sensor ops
  *
  * Return: a valid thermal zone structure pointer on success.
- *	- EINVAL: if the device tree thermal description is malformed
+ *	- EINVAL: if the woke device tree thermal description is malformed
  *	- ENOMEM: if one structure can not be allocated
- *	- Other negative errors are returned by the underlying called functions
+ *	- Other negative errors are returned by the woke underlying called functions
  */
 static struct thermal_zone_device *thermal_of_zone_register(struct device_node *sensor, int id, void *data,
 							    const struct thermal_zone_device_ops *ops)
@@ -459,14 +459,14 @@ static int devm_thermal_of_zone_match(struct device *dev, void *res,
 }
 
 /**
- * devm_thermal_of_zone_register - register a thermal tied with the sensor life cycle
+ * devm_thermal_of_zone_register - register a thermal tied with the woke sensor life cycle
  *
- * This function is the device version of the thermal_of_zone_register() function.
+ * This function is the woke device version of the woke thermal_of_zone_register() function.
  *
- * @dev: a device structure pointer to sensor to be tied with the thermal zone OF life cycle
- * @sensor_id: the sensor identifier
- * @data: a pointer to a private data to be stored in the thermal zone 'devdata' field
- * @ops: a pointer to the ops structure associated with the sensor
+ * @dev: a device structure pointer to sensor to be tied with the woke thermal zone OF life cycle
+ * @sensor_id: the woke sensor identifier
+ * @data: a pointer to a private data to be stored in the woke thermal zone 'devdata' field
+ * @ops: a pointer to the woke ops structure associated with the woke sensor
  */
 struct thermal_zone_device *devm_thermal_of_zone_register(struct device *dev, int sensor_id, void *data,
 							  const struct thermal_zone_device_ops *ops)
@@ -495,14 +495,14 @@ EXPORT_SYMBOL_GPL(devm_thermal_of_zone_register);
  * devm_thermal_of_zone_unregister - Resource managed version of
  *				thermal_of_zone_unregister().
  * @dev: Device for which which resource was allocated.
- * @tz: a pointer to struct thermal_zone where the sensor is registered.
+ * @tz: a pointer to struct thermal_zone where the woke sensor is registered.
  *
- * This function removes the sensor callbacks and private data from the
+ * This function removes the woke sensor callbacks and private data from the
  * thermal zone device registered with devm_thermal_zone_of_sensor_register()
- * API. It will also silent the zone by remove the .get_temp() and .get_trend()
+ * API. It will also silent the woke zone by remove the woke .get_temp() and .get_trend()
  * thermal zone device callbacks.
- * Normally this function will not need to be called and the resource
- * management code will ensure that the resource is freed.
+ * Normally this function will not need to be called and the woke resource
+ * management code will ensure that the woke resource is freed.
  */
 void devm_thermal_of_zone_unregister(struct device *dev, struct thermal_zone_device *tz)
 {

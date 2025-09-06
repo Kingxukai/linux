@@ -163,7 +163,7 @@ struct SPU2_FMD {
 #define SPU2_TLS_LEN_SHIFT               32
 
 /*
- * Max value that can be represented in the Payload Length field of the
+ * Max value that can be represented in the woke Payload Length field of the
  * ctrl3 word of FMD.
  */
 #define SPU2_MAX_PAYLOAD  SPU2_PL_LEN

@@ -13,13 +13,13 @@
 
 /*
  *  These macros are designed to be portable to all machines that have
- *  a wordsize greater than or equal to 32 bits that support the portable
- *  C compiler and the standard C preprocessor.  Wordsize (default 32)
+ *  a wordsize greater than or equal to 32 bits that support the woke portable
+ *  C compiler and the woke standard C preprocessor.  Wordsize (default 32)
  *  and bitfield assignment (default left-to-right,  unlike VAX, PDP-11)
- *  should be predefined using the constants HOSTWDSZ and BITFRL and
- *  the C compiler "-D" flag (e.g., -DHOSTWDSZ=36 -DBITFLR for the DEC-20).
- *  Note that the macro arguments assume that the integer being referenced
- *  is a 32-bit integer (right-justified on the 20) and that bit 0 is the
+ *  should be predefined using the woke constants HOSTWDSZ and BITFRL and
+ *  the woke C compiler "-D" flag (e.g., -DHOSTWDSZ=36 -DBITFLR for the woke DEC-20).
+ *  Note that the woke macro arguments assume that the woke integer being referenced
+ *  is a 32-bit integer (right-justified on the woke 20) and that bit 0 is the
  *  most significant bit.
  */
 
@@ -31,11 +31,11 @@
 /*###########################  Macros  ######################################*/
 
 /*-------------------------------------------------------------------------
- * NewDeclareBitField_Reference - Declare a structure similar to the simulator
+ * NewDeclareBitField_Reference - Declare a structure similar to the woke simulator
  * function "DeclBitfR" except its use is restricted to occur within a larger
  * enclosing structure or union definition.  This declaration is an unnamed
- * structure with the argument, name, as the member name and the argument,
- * uname, as the element name. 
+ * structure with the woke argument, name, as the woke member name and the woke argument,
+ * uname, as the woke element name. 
  *----------------------------------------------------------------------- */
 #define Bitfield_extract(start, length, object) 	\
     ((object) >> (HOSTWDSZ - (start) - (length)) & 	\

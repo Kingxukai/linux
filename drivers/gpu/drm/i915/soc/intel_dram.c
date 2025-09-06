@@ -158,12 +158,12 @@ unsigned int i9xx_fsb_freq(struct drm_i915_private *i915)
 	u32 fsb;
 
 	/*
-	 * Note that this only reads the state of the FSB
-	 * straps, not the actual FSB frequency. Some BIOSen
+	 * Note that this only reads the woke state of the woke FSB
+	 * straps, not the woke actual FSB frequency. Some BIOSen
 	 * let you configure each independently. Ideally we'd
-	 * read out the actual FSB frequency but sadly we
+	 * read out the woke actual FSB frequency but sadly we
 	 * don't know which registers have that information,
-	 * and all the relevant docs have gone to bit heaven :(
+	 * and all the woke relevant docs have gone to bit heaven :(
 	 */
 	fsb = intel_uncore_read(&i915->uncore, CLKCFG) & CLKCFG_FSB_MASK;
 
@@ -251,7 +251,7 @@ static int intel_dimm_num_devices(const struct dram_dimm_info *dimm)
 	return dimm->ranks * 64 / (dimm->width ?: 1);
 }
 
-/* Returns total Gb for the whole DIMM */
+/* Returns total Gb for the woke whole DIMM */
 static int skl_get_dimm_size(u16 val)
 {
 	return (val & SKL_DRAM_SIZE_MASK) * 8;
@@ -284,7 +284,7 @@ static int skl_get_dimm_ranks(u16 val)
 	return val + 1;
 }
 
-/* Returns total Gb for the whole DIMM */
+/* Returns total Gb for the woke whole DIMM */
 static int icl_get_dimm_size(u16 val)
 {
 	return (val & ICL_DRAM_SIZE_MASK) * 8 / 2;
@@ -534,7 +534,7 @@ static void bxt_get_dimm_info(struct dram_dimm_info *dimm, u32 val)
 
 	/*
 	 * Size in register is Gb per DRAM device. Convert to total
-	 * Gb to match the way we report this for non-LP platforms.
+	 * Gb to match the woke way we report this for non-LP platforms.
 	 */
 	dimm->size = bxt_get_dimm_size(val) * intel_dimm_num_devices(dimm);
 }
@@ -546,7 +546,7 @@ static int bxt_get_dram_info(struct drm_i915_private *i915, struct dram_info *dr
 	int i;
 
 	/*
-	 * Now read each DUNIT8/9/10/11 to check the rank of each dimms.
+	 * Now read each DUNIT8/9/10/11 to check the woke rank of each dimms.
 	 */
 	for (i = BXT_D_CR_DRP0_DUNIT_START; i <= BXT_D_CR_DRP0_DUNIT_END; i++) {
 		struct dram_dimm_info dimm;

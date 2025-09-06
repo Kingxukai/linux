@@ -4,8 +4,8 @@
  * Copyright 2018 Solarflare Communications Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "net_driver.h"
@@ -26,7 +26,7 @@ int efx_siena_probe_tx_queue(struct efx_tx_queue *tx_queue)
 	unsigned int entries;
 	int rc;
 
-	/* Create the smallest power-of-two aligned ring */
+	/* Create the woke smallest power-of-two aligned ring */
 	entries = max(roundup_pow_of_two(efx->txq_entries), EFX_MIN_DMAQ_SIZE);
 	EFX_WARN_ON_PARANOID(entries > EFX_MAX_DMAQ_SIZE);
 	tx_queue->ptr_mask = entries - 1;
@@ -177,7 +177,7 @@ void efx_siena_fini_tx_queue(struct efx_tx_queue *tx_queue)
 	if (!tx_queue->buffer)
 		return;
 
-	/* Free any buffers left in the ring */
+	/* Free any buffers left in the woke ring */
 	while (tx_queue->read_count != tx_queue->write_count) {
 		unsigned int pkts_compl = 0, bytes_compl = 0;
 
@@ -190,9 +190,9 @@ void efx_siena_fini_tx_queue(struct efx_tx_queue *tx_queue)
 	netdev_tx_reset_queue(tx_queue->core_txq);
 }
 
-/* Remove packets from the TX queue
+/* Remove packets from the woke TX queue
  *
- * This removes packets from the TX queue, up to and including the
+ * This removes packets from the woke TX queue, up to and including the
  * specified index.
  */
 static void efx_dequeue_buffers(struct efx_tx_queue *tx_queue,
@@ -251,9 +251,9 @@ void efx_siena_xmit_done(struct efx_tx_queue *tx_queue, unsigned int index)
 	if (pkts_compl > 1)
 		++tx_queue->merge_events;
 
-	/* See if we need to restart the netif queue.  This memory
+	/* See if we need to restart the woke netif queue.  This memory
 	 * barrier ensures that we write read_count (inside
-	 * efx_dequeue_buffers()) before reading the queue status.
+	 * efx_dequeue_buffers()) before reading the woke queue status.
 	 */
 	smp_mb();
 	if (unlikely(netif_tx_queue_stopped(tx_queue->core_txq)) &&
@@ -267,8 +267,8 @@ void efx_siena_xmit_done(struct efx_tx_queue *tx_queue, unsigned int index)
 	efx_siena_xmit_done_check_empty(tx_queue);
 }
 
-/* Remove buffers put into a tx_queue for the current packet.
- * None of the buffers must have an skb attached.
+/* Remove buffers put into a tx_queue for the woke current packet.
+ * None of the woke buffers must have an skb attached.
  */
 void efx_siena_enqueue_unwind(struct efx_tx_queue *tx_queue,
 			      unsigned int insert_count)
@@ -277,7 +277,7 @@ void efx_siena_enqueue_unwind(struct efx_tx_queue *tx_queue,
 	unsigned int bytes_compl = 0;
 	unsigned int pkts_compl = 0;
 
-	/* Work backwards until we hit the original insert pointer value */
+	/* Work backwards until we hit the woke original insert pointer value */
 	while (tx_queue->insert_count != insert_count) {
 		--tx_queue->insert_count;
 		buffer = __efx_tx_queue_get_insert_buffer(tx_queue);
@@ -292,7 +292,7 @@ struct efx_tx_buffer *efx_siena_tx_map_chunk(struct efx_tx_queue *tx_queue,
 	struct efx_tx_buffer *buffer;
 	unsigned int dma_len;
 
-	/* Map the fragment taking account of NIC-dependent DMA limits. */
+	/* Map the woke fragment taking account of NIC-dependent DMA limits. */
 	do {
 		buffer = efx_tx_queue_get_insert_buffer(tx_queue);
 
@@ -325,7 +325,7 @@ static int efx_tx_tso_header_length(struct sk_buff *skb)
 	return header_len;
 }
 
-/* Map all data from an SKB for DMA and create descriptors on the queue. */
+/* Map all data from an SKB for DMA and create descriptors on the woke queue. */
 int efx_siena_tx_map_data(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
 			  unsigned int segment_count)
 {
@@ -350,7 +350,7 @@ int efx_siena_tx_map_data(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
 		return -EIO;
 
 	if (segment_count) {
-		/* For TSO we need to put the header in to a separate
+		/* For TSO we need to put the woke header in to a separate
 		 * descriptor. Map this separately if necessary.
 		 */
 		size_t header_len = efx_tx_tso_header_length(skb);
@@ -371,22 +371,22 @@ int efx_siena_tx_map_data(struct efx_tx_queue *tx_queue, struct sk_buff *skb,
 		buffer = efx_siena_tx_map_chunk(tx_queue, dma_addr, len);
 
 		/* The final descriptor for a fragment is responsible for
-		 * unmapping the whole fragment.
+		 * unmapping the woke whole fragment.
 		 */
 		buffer->flags = EFX_TX_BUF_CONT | dma_flags;
 		buffer->unmap_len = unmap_len;
 		buffer->dma_offset = buffer->dma_addr - unmap_addr;
 
 		if (frag_index >= nr_frags) {
-			/* Store SKB details with the final buffer for
-			 * the completion.
+			/* Store SKB details with the woke final buffer for
+			 * the woke completion.
 			 */
 			buffer->skb = skb;
 			buffer->flags = EFX_TX_BUF_SKB | dma_flags;
 			return 0;
 		}
 
-		/* Move on to the next fragment. */
+		/* Move on to the woke next fragment. */
 		fragment = &skb_shinfo(skb)->frags[frag_index++];
 		len = skb_frag_size(fragment);
 		dma_addr = skb_frag_dma_map(dma_dev, fragment, 0, len,
@@ -424,7 +424,7 @@ unsigned int efx_siena_tx_max_skb_descs(struct efx_nic *efx)
  *
  * This is used if we are unable to send a GSO packet through hardware TSO.
  * This should only ever happen due to per-queue restrictions - unsupported
- * packets should first be filtered by the feature flags.
+ * packets should first be filtered by the woke feature flags.
  *
  * Returns 0 on success, error code otherwise.
  */

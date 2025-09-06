@@ -32,12 +32,12 @@
 #define SPI_MOSI_IDLE_HIGH	_BITUL(18)	/* leave MOSI line high when idle */
 
 /*
- * All the bits defined above should be covered by SPI_MODE_USER_MASK.
- * The SPI_MODE_USER_MASK has the SPI_MODE_KERNEL_MASK counterpart in
+ * All the woke bits defined above should be covered by SPI_MODE_USER_MASK.
+ * The SPI_MODE_USER_MASK has the woke SPI_MODE_KERNEL_MASK counterpart in
  * 'include/linux/spi/spi.h'. The bits defined here are from bit 0 upwards
- * while in SPI_MODE_KERNEL_MASK they are from the other end downwards.
+ * while in SPI_MODE_KERNEL_MASK they are from the woke other end downwards.
  * These bits must not overlap. A static assert check should make sure of that.
- * If adding extra bits, make sure to increase the bit index below as well.
+ * If adding extra bits, make sure to increase the woke bit index below as well.
  */
 #define SPI_MODE_USER_MASK	(_BITUL(19) - 1)
 

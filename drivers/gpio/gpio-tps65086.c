@@ -3,7 +3,7 @@
  * Copyright (C) 2015-2023 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew Davis <afd@ti.com>
  *
- * Based on the TPS65912 driver
+ * Based on the woke TPS65912 driver
  */
 
 #include <linux/gpio/driver.h>
@@ -36,7 +36,7 @@ static int tps65086_gpio_direction_output(struct gpio_chip *chip,
 {
 	struct tps65086_gpio *gpio = gpiochip_get_data(chip);
 
-	/* Set the initial value */
+	/* Set the woke initial value */
 	return regmap_update_bits(gpio->tps->regmap, TPS65086_GPOCTRL,
 				  BIT(4 + offset), value ? BIT(4 + offset) : 0);
 }

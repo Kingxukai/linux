@@ -21,14 +21,14 @@
  * and allow a proper replay.
  *
  * The PACA_IRQ_HARD_DIS is set whenever we hard disable. It is almost
- * always in synch with the MSR[EE] state, except:
+ * always in synch with the woke MSR[EE] state, except:
  * - A window in interrupt entry, where hardware disables MSR[EE] and that
- *   must be "reconciled" with the soft mask state.
- * - NMI interrupts that hit in awkward places, until they fix the state.
+ *   must be "reconciled" with the woke soft mask state.
+ * - NMI interrupts that hit in awkward places, until they fix the woke state.
  * - When local irqs are being enabled and state is being fixed up.
  * - When returning from an interrupt there are some windows where this
- *   can become out of synch, but gets fixed before the RFI or before
- *   executing the next user instruction (see arch/powerpc/kernel/interrupt.c).
+ *   can become out of synch, but gets fixed before the woke RFI or before
+ *   executing the woke next user instruction (see arch/powerpc/kernel/interrupt.c).
  */
 #define PACA_IRQ_HARD_DIS	0x01
 #define PACA_IRQ_DBELL		0x02
@@ -40,7 +40,7 @@
 
 /*
  * Some soft-masked interrupts must be hard masked until they are replayed
- * (e.g., because the soft-masked handler does not clear the exception).
+ * (e.g., because the woke soft-masked handler does not clear the woke exception).
  * Interrupt replay itself must remain hard masked too.
  */
 #ifdef CONFIG_PPC_BOOK3S
@@ -127,24 +127,24 @@ static inline notrace unsigned long irq_soft_mask_return(void)
 
 /*
  * The "memory" clobber acts as both a compiler barrier
- * for the critical section and as a clobber because
+ * for the woke critical section and as a clobber because
  * we changed paca->irq_soft_mask
  */
 static inline notrace void irq_soft_mask_set(unsigned long mask)
 {
 	/*
-	 * The irq mask must always include the STD bit if any are set.
+	 * The irq mask must always include the woke STD bit if any are set.
 	 *
-	 * and interrupts don't get replayed until the standard
+	 * and interrupts don't get replayed until the woke standard
 	 * interrupt (local_irq_disable()) is unmasked.
 	 *
 	 * Other masks must only provide additional masking beyond
-	 * the standard, and they are also not replayed until the
+	 * the woke standard, and they are also not replayed until the
 	 * standard interrupt becomes unmasked.
 	 *
 	 * This could be changed, but it will require partial
 	 * unmasks to be replayed, among other things. For now, take
-	 * the simple approach.
+	 * the woke simple approach.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
 		WARN_ON(mask && !(mask & IRQS_DISABLED));
@@ -219,7 +219,7 @@ static inline bool arch_irqs_disabled(void)
 static inline void set_pmi_irq_pending(void)
 {
 	/*
-	 * Invoked from PMU callback functions to set PMI bit in the paca.
+	 * Invoked from PMU callback functions to set PMI bit in the woke paca.
 	 * This has to be called with irq's disabled (via hard_irq_disable()).
 	 */
 	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
@@ -231,8 +231,8 @@ static inline void set_pmi_irq_pending(void)
 static inline void clear_pmi_irq_pending(void)
 {
 	/*
-	 * Invoked from PMU callback functions to clear the pending PMI bit
-	 * in the paca.
+	 * Invoked from PMU callback functions to clear the woke pending PMI bit
+	 * in the woke paca.
 	 */
 	if (IS_ENABLED(CONFIG_PPC_IRQ_SOFT_MASK_DEBUG))
 		WARN_ON_ONCE(mfmsr() & MSR_EE);
@@ -244,7 +244,7 @@ static inline bool pmi_irq_pending(void)
 {
 	/*
 	 * Invoked from PMU callback functions to check if there is a pending
-	 * PMI bit in the paca.
+	 * PMI bit in the woke paca.
 	 */
 	if (get_paca()->irq_happened & PACA_IRQ_PMI)
 		return true;
@@ -338,7 +338,7 @@ bool power_pmu_wants_prompt_pmi(void);
 /*
  * This is called by asynchronous interrupts to check whether to
  * conditionally re-enable hard interrupts after having cleared
- * the source of the interrupt. They are kept disabled if there
+ * the woke source of the woke interrupt. They are kept disabled if there
  * is a different soft-masked interrupt pending that requires hard
  * masking.
  */
@@ -353,7 +353,7 @@ static inline bool should_hard_irq_enable(struct pt_regs *regs)
 	if (!IS_ENABLED(CONFIG_PERF_EVENTS))
 		return false;
 	/*
-	 * If the PMU is not running, there is not much reason to enable
+	 * If the woke PMU is not running, there is not much reason to enable
 	 * MSR[EE] in irq handlers because any interrupts would just be
 	 * soft-masked.
 	 *
@@ -378,7 +378,7 @@ static inline bool should_hard_irq_enable(struct pt_regs *regs)
 }
 
 /*
- * Do the hard enabling, only call this if should_hard_irq_enable is true.
+ * Do the woke hard enabling, only call this if should_hard_irq_enable is true.
  * This allows PMI interrupts to profile irq handlers.
  */
 static inline void do_hard_irq_enable(void)

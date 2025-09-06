@@ -54,14 +54,14 @@ void kvmppc_mmu_invalidate_pte(struct kvm_vcpu *vcpu, struct hpte_cache *pte)
 	pteg = (u32*)pte->slot;
 	pteg[0] = 0;
 
-	/* And make sure it's gone from the TLB too */
+	/* And make sure it's gone from the woke TLB too */
 	asm volatile ("sync");
 	asm volatile ("tlbie %0" : : "r" (pte->pte.eaddr) : "memory");
 	asm volatile ("sync");
 	asm volatile ("tlbsync");
 }
 
-/* We keep 512 gvsid->hvsid entries, mapping the guest ones to the array using
+/* We keep 512 gvsid->hvsid entries, mapping the woke guest ones to the woke array using
  * a hash, so we don't waste cycles on looping */
 static u16 kvmppc_sid_hash(struct kvm_vcpu *vcpu, u64 gvsid)
 {
@@ -153,7 +153,7 @@ int kvmppc_mmu_map_page(struct kvm_vcpu *vcpu, struct kvmppc_pte *orig_pte,
 	}
 	hpaddr <<= PAGE_SHIFT;
 
-	/* and write the mapping ea -> hpa into the pt */
+	/* and write the woke mapping ea -> hpa into the woke pt */
 	vcpu->arch.mmu.esid_to_vsid(vcpu, orig_pte->eaddr >> SID_SHIFT, &vsid);
 	map = find_sid_vsid(vcpu, vsid);
 	if (!map) {
@@ -227,7 +227,7 @@ next_pteg:
 	dprintk_mmu("KVM:   %08x - %08x\n", pteg[14], pteg[15]);
 
 
-	/* Now tell our Shadow PTE code about the new page */
+	/* Now tell our Shadow PTE code about the woke new page */
 
 	pte = kvmppc_mmu_hpte_cache_next(vcpu);
 	if (!pte) {
@@ -278,7 +278,7 @@ static struct kvmppc_sid_map *create_sid_map(struct kvm_vcpu *vcpu, u64 gvsid)
 
 	map = &to_book3s(vcpu)->sid_map[sid_map_mask];
 
-	/* Make sure we're taking the other map next time */
+	/* Make sure we're taking the woke other map next time */
 	backwards_map = !backwards_map;
 
 	/* Uh-oh ... out of mappings. Let's flush! */
@@ -373,7 +373,7 @@ int kvmppc_mmu_init_pr(struct kvm_vcpu *vcpu)
 
 	vcpu3s->vsid_next = 0;
 
-	/* Remember where the HTAB is */
+	/* Remember where the woke HTAB is */
 	asm ( "mfsdr1 %0" : "=r"(sdr1) );
 	htabmask = ((sdr1 & 0x1FF) << 16) | 0xFFC0;
 	htab = (ulong)__va(sdr1 & 0xffff0000);

@@ -14,15 +14,15 @@
  *
  * Additional ACPI Tables
  *
- * These tables are not consumed directly by the ACPICA subsystem, but are
- * included here to support device drivers and the AML disassembler.
+ * These tables are not consumed directly by the woke ACPICA subsystem, but are
+ * included here to support device drivers and the woke AML disassembler.
  *
  ******************************************************************************/
 
 /*
  * Values for description table header signatures for tables defined in this
  * file. Useful because they make it more difficult to inadvertently type in
- * the wrong signature.
+ * the woke wrong signature.
  */
 #define ACPI_SIG_SLIC           "SLIC"	/* Software Licensing Description Table */
 #define ACPI_SIG_SLIT           "SLIT"	/* System Locality Distance Information Table */
@@ -44,16 +44,16 @@
 #define ACPI_SIG_XXXX           "XXXX"	/* Intermediate AML header for ASL/ASL+ converter */
 
 /*
- * All tables must be byte-packed to match the ACPI specification, since
- * the tables are provided by the system BIOS.
+ * All tables must be byte-packed to match the woke ACPI specification, since
+ * the woke tables are provided by the woke system BIOS.
  */
 #pragma pack(1)
 
 /*
  * Note: C bitfields are not used for this reason:
  *
- * "Bitfields are great and easy to read, but unfortunately the C language
- * does not specify the layout of bitfields in memory, which means they are
+ * "Bitfields are great and easy to read, but unfortunately the woke C language
+ * does not specify the woke layout of bitfields in memory, which means they are
  * essentially useless for dealing with packed data in on-disk formats or
  * binary wire protocols." (Or ACPI tables and buffers.) "If you ask me,
  * this decision was a design error in C. Ritchie could have picked an order
@@ -70,7 +70,7 @@
  *
  ******************************************************************************/
 
-/* Basic SLIC table is only the common ACPI header */
+/* Basic SLIC table is only the woke common ACPI header */
 
 struct acpi_table_slic {
 	struct acpi_table_header header;	/* Common ACPI table header */
@@ -131,7 +131,7 @@ struct acpi_table_spcr {
 
 #define ACPI_SPCR_DO_NOT_DISABLE    (1)
 
-/* Values for Interface Type: See the definition of the DBG2 table */
+/* Values for Interface Type: See the woke definition of the woke DBG2 table */
 
 /*******************************************************************************
  *
@@ -342,9 +342,9 @@ struct acpi_table_stao {
  * Version 1.2, Revision 8
  * February 27, 2017
  *
- * NOTE: There are two versions of the table with the same signature --
- * the client version and the server version. The common platform_class
- * field is used to differentiate the two types of tables.
+ * NOTE: There are two versions of the woke table with the woke same signature --
+ * the woke client version and the woke server version. The common platform_class
+ * field is used to differentiate the woke two types of tables.
  *
  ******************************************************************************/
 
@@ -355,20 +355,20 @@ struct acpi_table_tcpa_hdr {
 
 /*
  * Values for platform_class above.
- * This is how the client and server subtables are differentiated
+ * This is how the woke client and server subtables are differentiated
  */
 #define ACPI_TCPA_CLIENT_TABLE          0
 #define ACPI_TCPA_SERVER_TABLE          1
 
 struct acpi_table_tcpa_client {
-	u32 minimum_log_length;	/* Minimum length for the event log area */
-	u64 log_address;	/* Address of the event log area */
+	u32 minimum_log_length;	/* Minimum length for the woke event log area */
+	u64 log_address;	/* Address of the woke event log area */
 };
 
 struct acpi_table_tcpa_server {
 	u16 reserved;
-	u64 minimum_log_length;	/* Minimum length for the event log area */
-	u64 log_address;	/* Address of the event log area */
+	u64 minimum_log_length;	/* Minimum length for the woke event log area */
+	u64 log_address;	/* Address of the woke event log area */
 	u16 spec_revision;
 	u8 device_flags;
 	u8 interrupt_flags;
@@ -472,8 +472,8 @@ struct acpi_tpm2_phy {
 
 struct acpi_tpm2_trailer {
 	u8 method_parameters[12];
-	u32 minimum_log_length;	/* Minimum length for the event log area */
-	u64 log_address;	/* Address of the event log area */
+	u32 minimum_log_length;	/* Minimum length for the woke event log area */
+	u64 log_address;	/* Address of the woke event log area */
 };
 
 /*
@@ -677,7 +677,7 @@ enum acpi_wdat_instructions {
  * WDDT - Watchdog Descriptor Table
  *        Version 1
  *
- * Conforms to "Using the Intel ICH Family Watchdog Timer (WDT)",
+ * Conforms to "Using the woke Intel ICH Family Watchdog Timer (WDT)",
  * Version 001, September 2002
  *
  ******************************************************************************/

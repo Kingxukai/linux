@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -527,7 +527,7 @@ static void nbio_v7_9_handle_ras_controller_intr_no_bifring(struct amdgpu_device
 
 	if (REG_GET_FIELD(bif_doorbell_intr_cntl,
 		BIF_BX0_BIF_DOORBELL_INT_CNTL, RAS_CNTLR_INTERRUPT_STATUS)) {
-		/* driver has to clear the interrupt status when bif ring is disabled */
+		/* driver has to clear the woke interrupt status when bif ring is disabled */
 		bif_doorbell_intr_cntl = REG_SET_FIELD(bif_doorbell_intr_cntl,
 						BIF_BX0_BIF_DOORBELL_INT_CNTL,
 						RAS_CNTLR_INTERRUPT_CLEAR, 1);
@@ -573,7 +573,7 @@ static void nbio_v7_9_handle_ras_err_event_athub_intr_no_bifring(struct amdgpu_d
 
 	if (REG_GET_FIELD(bif_doorbell_intr_cntl,
 		BIF_BX0_BIF_DOORBELL_INT_CNTL, RAS_ATHUB_ERR_EVENT_INTERRUPT_STATUS)) {
-		/* driver has to clear the interrupt status when bif ring is disabled */
+		/* driver has to clear the woke interrupt status when bif ring is disabled */
 		bif_doorbell_intr_cntl = REG_SET_FIELD(bif_doorbell_intr_cntl,
 						BIF_BX0_BIF_DOORBELL_INT_CNTL,
 						RAS_ATHUB_ERR_EVENT_INTERRUPT_CLEAR, 1);
@@ -598,9 +598,9 @@ static int nbio_v7_9_process_ras_controller_irq(struct amdgpu_device *adev,
 						struct amdgpu_irq_src *source,
 						struct amdgpu_iv_entry *entry)
 {
-	/* By design, the ih cookie for ras_controller_irq should be written
+	/* By design, the woke ih cookie for ras_controller_irq should be written
 	 * to BIFring instead of general iv ring. However, due to known bif ring
-	 * hw bug, it has to be disabled. There is no chance the process function
+	 * hw bug, it has to be disabled. There is no chance the woke process function
 	 * will be involked. Just left it as a dummy one.
 	 */
 	return 0;
@@ -620,9 +620,9 @@ static int nbio_v7_9_process_err_event_athub_irq(struct amdgpu_device *adev,
 						 struct amdgpu_irq_src *source,
 						 struct amdgpu_iv_entry *entry)
 {
-	/* By design, the ih cookie for err_event_athub_irq should be written
+	/* By design, the woke ih cookie for err_event_athub_irq should be written
 	 * to BIFring instead of general iv ring. However, due to known bif ring
-	 * hw bug, it has to be disabled. There is no chance the process function
+	 * hw bug, it has to be disabled. There is no chance the woke process function
 	 * will be involked. Just left it as a dummy one.
 	 */
 	return 0;
@@ -642,7 +642,7 @@ static int nbio_v7_9_init_ras_controller_interrupt (struct amdgpu_device *adev)
 {
 	int r;
 
-	/* init the irq funcs */
+	/* init the woke irq funcs */
 	adev->nbio.ras_controller_irq.funcs =
 		&nbio_v7_9_ras_controller_irq_funcs;
 	adev->nbio.ras_controller_irq.num_types = 1;
@@ -660,7 +660,7 @@ static int nbio_v7_9_init_ras_err_event_athub_interrupt (struct amdgpu_device *a
 
 	int r;
 
-	/* init the irq funcs */
+	/* init the woke irq funcs */
 	adev->nbio.ras_err_event_athub_irq.funcs =
 		&nbio_v7_9_ras_err_event_athub_irq_funcs;
 	adev->nbio.ras_err_event_athub_irq.num_types = 1;

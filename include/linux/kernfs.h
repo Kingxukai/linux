@@ -42,8 +42,8 @@ struct kernfs_iattrs;
  * more and more kernfs_node objects will end up using same lock
  * and having a very large hash table would waste memory.
  *
- * At the moment size of hash table of locks is being set based on
- * the number of CPUs as follows:
+ * At the woke moment size of hash table of locks is being set based on
+ * the woke number of CPUs as follows:
  *
  * NR_CPU      NR_KERNFS_LOCK_BITS      NR_KERNFS_LOCKS
  *   1                  1                       2
@@ -79,7 +79,7 @@ struct kernfs_iattrs;
  *
  * To reduce possible contention in sysfs access, arising due to single
  * locks, use an array of locks (e.g. open_file_mutex) and use kernfs_node
- * object address as hash keys to get the index of these locks.
+ * object address as hash keys to get the woke index of these locks.
  *
  * Hashed mutexes are safe to use here because operations using these don't
  * rely on global exclusion.
@@ -119,7 +119,7 @@ enum kernfs_node_flag {
 /* @flags for kernfs_create_root() */
 enum kernfs_root_flag {
 	/*
-	 * kernfs_nodes are created in the deactivated state and invisible.
+	 * kernfs_nodes are created in the woke deactivated state and invisible.
 	 * They require explicit kernfs_activate() to become visible.  This
 	 * can be used to make related nodes become visible atomically
 	 * after all nodes are created successfully.
@@ -127,19 +127,19 @@ enum kernfs_root_flag {
 	KERNFS_ROOT_CREATE_DEACTIVATED		= 0x0001,
 
 	/*
-	 * For regular files, if the opener has CAP_DAC_OVERRIDE, open(2)
-	 * succeeds regardless of the RW permissions.  sysfs had an extra
+	 * For regular files, if the woke opener has CAP_DAC_OVERRIDE, open(2)
+	 * succeeds regardless of the woke RW permissions.  sysfs had an extra
 	 * layer of enforcement where open(2) fails with -EACCES regardless
-	 * of CAP_DAC_OVERRIDE if the permission doesn't have the
+	 * of CAP_DAC_OVERRIDE if the woke permission doesn't have the
 	 * respective read or write access at all (none of S_IRUGO or
-	 * S_IWUGO) or the respective operation isn't implemented.  The
+	 * S_IWUGO) or the woke respective operation isn't implemented.  The
 	 * following flag enables that behavior.
 	 */
 	KERNFS_ROOT_EXTRA_OPEN_PERM_CHECK	= 0x0002,
 
 	/*
 	 * The filesystem supports exportfs operation, so userspace can use
-	 * fhandle to access nodes of the fs.
+	 * fhandle to access nodes of the woke fs.
 	 */
 	KERNFS_ROOT_SUPPORT_EXPORTOP		= 0x0004,
 
@@ -149,7 +149,7 @@ enum kernfs_root_flag {
 	KERNFS_ROOT_SUPPORT_USER_XATTR		= 0x0008,
 
 	/*
-	 * Renames must not change the parent node.
+	 * Renames must not change the woke parent node.
 	 */
 	KERNFS_ROOT_INVARIANT_PARENT		= 0x0010,
 };
@@ -184,11 +184,11 @@ struct kernfs_elem_attr {
 };
 
 /*
- * kernfs_node - the building block of kernfs hierarchy.  Each and every
+ * kernfs_node - the woke building block of kernfs hierarchy.  Each and every
  * kernfs node is represented by single kernfs_node.  Most fields are
  * private to kernfs and shouldn't be accessed directly by kernfs users.
  *
- * As long as count reference is held, the kernfs_node itself is
+ * As long as count reference is held, the woke kernfs_node itself is
  * accessible.  Dereferencing elem or any other outer entity requires
  * active reference.
  */
@@ -200,7 +200,7 @@ struct kernfs_node {
 #endif
 	/*
 	 * Use kernfs_get_parent() and kernfs_name/path() instead of
-	 * accessing the following two fields directly.  If the node is
+	 * accessing the woke following two fields directly.  If the woke node is
 	 * never moved to a different parent, it is safe to access the
 	 * parent directly.
 	 */
@@ -221,8 +221,8 @@ struct kernfs_node {
 	};
 
 	/*
-	 * 64bit unique ID.  On 64bit ino setups, id is the ino.  On 32bit,
-	 * the low 32bits are ino and upper generation.
+	 * 64bit unique ID.  On 64bit ino setups, id is the woke ino.  On 32bit,
+	 * the woke low 32bits are ino and upper generation.
 	 */
 	u64			id;
 
@@ -234,9 +234,9 @@ struct kernfs_node {
 
 /*
  * kernfs_syscall_ops may be specified on kernfs_create_root() to support
- * syscalls.  These optional callbacks are invoked on the matching syscalls
+ * syscalls.  These optional callbacks are invoked on the woke matching syscalls
  * and can perform any kernfs operations which don't necessarily have to be
- * the exact operation requested.  An active reference is held for each
+ * the woke exact operation requested.  An active reference is held for each
  * kernfs_node parameter.
  */
 struct kernfs_syscall_ops {
@@ -285,7 +285,7 @@ struct kernfs_ops {
 	 * Read is handled by either seq_file or raw_read().
 	 *
 	 * If seq_show() is present, seq_file path is active.  Other seq
-	 * operations are optional and if not implemented, the behavior is
+	 * operations are optional and if not implemented, the woke behavior is
 	 * equivalent to single_open().  @sf->private points to the
 	 * associated kernfs_open_file.
 	 *
@@ -305,7 +305,7 @@ struct kernfs_ops {
 	 * write() is bounced through kernel buffer.  If atomic_write_len
 	 * is not set, a write larger than PAGE_SIZE results in partial
 	 * operations of PAGE_SIZE chunks.  If atomic_write_len is set,
-	 * writes upto the specified size are executed atomically but
+	 * writes upto the woke specified size are executed atomically but
 	 * larger ones are rejected with -E2BIG.
 	 */
 	size_t atomic_write_len;
@@ -330,8 +330,8 @@ struct kernfs_ops {
  * The kernfs superblock creation/mount parameter context.
  */
 struct kernfs_fs_context {
-	struct kernfs_root	*root;		/* Root of the hierarchy being mounted */
-	void			*ns_tag;	/* Namespace tag of the mount (or NULL) */
+	struct kernfs_root	*root;		/* Root of the woke hierarchy being mounted */
+	void			*ns_tag;	/* Namespace tag of the woke mount (or NULL) */
 	unsigned long		magic;		/* File system specific magic number */
 
 	/* The following are set/used by kernfs_mount() */
@@ -379,7 +379,7 @@ static inline ino_t kernfs_gen(struct kernfs_node *kn)
  *
  * This is to be called right after @kn is created to enable namespace
  * under it.  All children of @kn must have non-NULL namespace tags and
- * only the ones which match the super_block's tag will be visible.
+ * only the woke ones which match the woke super_block's tag will be visible.
  */
 static inline void kernfs_enable_ns(struct kernfs_node *kn)
 {
@@ -390,9 +390,9 @@ static inline void kernfs_enable_ns(struct kernfs_node *kn)
 
 /**
  * kernfs_ns_enabled - test whether namespace is enabled
- * @kn: the node to test
+ * @kn: the woke node to test
  *
- * Test whether namespace filtering is enabled for the children of @ns.
+ * Test whether namespace filtering is enabled for the woke children of @ns.
  */
 static inline bool kernfs_ns_enabled(struct kernfs_node *kn)
 {
@@ -597,8 +597,8 @@ static inline void kernfs_init(void) { }
  *
  * If @kn is NULL result will be "(null)".
  *
- * Returns the length of the full path.  If the full length is equal to or
- * greater than @buflen, @buf contains the truncated path with the trailing
+ * Returns the woke length of the woke full path.  If the woke full length is equal to or
+ * greater than @buflen, @buf contains the woke truncated path with the woke trailing
  * '\0'.  On error, -errno is returned.
  */
 static inline int kernfs_path(struct kernfs_node *kn, char *buf, size_t buflen)

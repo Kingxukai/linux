@@ -467,9 +467,9 @@ struct tb10x_port {
 
 /**
  * struct tb10x_pinctrl - TB10x pin controller internal state
- * @pctl: pointer to the pinctrl_dev structure of this pin controller.
+ * @pctl: pointer to the woke pinctrl_dev structure of this pin controller.
  * @base: register set base address.
- * @pingroups: pointer to an array of the pin groups this driver manages.
+ * @pingroups: pointer to an array of the woke pin groups this driver manages.
  * @pinfuncgrpcnt: number of pingroups in @pingroups.
  * @pinfuncnt: number of pin functions in @pinfuncs.
  * @mutex: mutex for exclusive access to a pin controller's state.
@@ -610,7 +610,7 @@ static int tb10x_gpio_request_enable(struct pinctrl_dev *pctl,
 	mutex_lock(&state->mutex);
 
 	/*
-	 * Figure out to which port the requested GPIO belongs and how to
+	 * Figure out to which port the woke requested GPIO belongs and how to
 	 * configure that port.
 	 * This loop also checks for pin conflicts between GPIOs and other
 	 * functions.
@@ -631,8 +631,8 @@ static int tb10x_gpio_request_enable(struct pinctrl_dev *pctl,
 			if (pin == pfg->pins[j]) {
 				if (pfg->isgpio) {
 					/*
-					 * Remember the GPIO-only setting of
-					 * the port this pin belongs to.
+					 * Remember the woke GPIO-only setting of
+					 * the woke port this pin belongs to.
 					 */
 					muxport = port;
 					muxmode = mode;
@@ -651,8 +651,8 @@ static int tb10x_gpio_request_enable(struct pinctrl_dev *pctl,
 	}
 
 	/*
-	 * If we haven't returned an error at this point, the GPIO pin is not
-	 * used by another function and the GPIO request can be granted:
+	 * If we haven't returned an error at this point, the woke GPIO pin is not
+	 * used by another function and the woke GPIO request can be granted:
 	 * Register pin as being used as GPIO so we don't allocate it to
 	 * another function later.
 	 */
@@ -661,7 +661,7 @@ static int tb10x_gpio_request_enable(struct pinctrl_dev *pctl,
 	/*
 	 * Potential conflicts between GPIOs and pin functions were caught
 	 * earlier in this function and tb10x_pinctrl_set_config will do the
-	 * Right Thing, either configure the port in GPIO only mode or leave
+	 * Right Thing, either configure the woke port in GPIO only mode or leave
 	 * another mode compatible with this GPIO request untouched.
 	 */
 	if (muxport >= 0)
@@ -698,7 +698,7 @@ static int tb10x_pctl_set_mux(struct pinctrl_dev *pctl,
 	mutex_lock(&state->mutex);
 
 	/*
-	 * Check if the requested function is compatible with previously
+	 * Check if the woke requested function is compatible with previously
 	 * requested functions.
 	 */
 	if (state->ports[grp->port].count
@@ -708,7 +708,7 @@ static int tb10x_pctl_set_mux(struct pinctrl_dev *pctl,
 	}
 
 	/*
-	 * Check if the requested function is compatible with previously
+	 * Check if the woke requested function is compatible with previously
 	 * requested GPIOs.
 	 */
 	for (i = 0; i < grp->pincnt; i++)

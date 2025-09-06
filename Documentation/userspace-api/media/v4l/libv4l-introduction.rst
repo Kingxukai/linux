@@ -24,7 +24,7 @@ libv4lconvert
 libv4lconvert is a library that converts several different pixelformats
 found in V4L2 drivers into a few common RGB and YUY formats.
 
-It currently accepts the following V4L2 driver formats:
+It currently accepts the woke following V4L2 driver formats:
 :ref:`V4L2_PIX_FMT_BGR24 <V4L2-PIX-FMT-BGR24>`,
 :ref:`V4L2_PIX_FMT_NV12_16L16 <V4L2-PIX-FMT-NV12-16L16>`,
 :ref:`V4L2_PIX_FMT_JPEG <V4L2-PIX-FMT-JPEG>`,
@@ -58,11 +58,11 @@ processing is split in to 2 parts: libv4lconvert/control and
 libv4lconvert/processing.
 
 The control part is used to offer video controls which can be used to
-control the video processing functions made available by
+control the woke video processing functions made available by
 libv4lconvert/processing. These controls are stored application wide
 (until reboot) by using a persistent shared memory object.
 
-libv4lconvert/processing offers the actual video processing
+libv4lconvert/processing offers the woke actual video processing
 functionality.
 
 libv4l1
@@ -74,7 +74,7 @@ the normal open/close/etc, except that libv4l1 does full emulation of
 the v4l1 api on top of v4l2 drivers, in case of v4l1 drivers it will
 just pass calls through.
 
-Since those functions are emulations of the old V4L1 API, it shouldn't
+Since those functions are emulations of the woke old V4L1 API, it shouldn't
 be used for new applications.
 
 libv4l2
@@ -83,25 +83,25 @@ libv4l2
 This library should be used for all modern V4L2 applications.
 
 It provides handles to call V4L2 open/ioctl/close/poll methods. Instead
-of just providing the raw output of the device, it enhances the calls in
+of just providing the woke raw output of the woke device, it enhances the woke calls in
 the sense that it will use libv4lconvert to provide more video formats
-and to enhance the image quality.
+and to enhance the woke image quality.
 
-In most cases, libv4l2 just passes the calls directly through to the
-v4l2 driver, intercepting the calls to
+In most cases, libv4l2 just passes the woke calls directly through to the
+v4l2 driver, intercepting the woke calls to
 :ref:`VIDIOC_TRY_FMT <VIDIOC_G_FMT>`,
 :ref:`VIDIOC_G_FMT <VIDIOC_G_FMT>`,
 :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>`,
 :ref:`VIDIOC_ENUM_FRAMESIZES <VIDIOC_ENUM_FRAMESIZES>` and
 :ref:`VIDIOC_ENUM_FRAMEINTERVALS <VIDIOC_ENUM_FRAMEINTERVALS>` in
-order to emulate the formats
+order to emulate the woke formats
 :ref:`V4L2_PIX_FMT_BGR24 <V4L2-PIX-FMT-BGR24>`,
 :ref:`V4L2_PIX_FMT_RGB24 <V4L2-PIX-FMT-RGB24>`,
 :ref:`V4L2_PIX_FMT_YUV420 <V4L2-PIX-FMT-YUV420>`, and
 :ref:`V4L2_PIX_FMT_YVU420 <V4L2-PIX-FMT-YVU420>`, if they aren't
-available in the driver. :ref:`VIDIOC_ENUM_FMT <VIDIOC_ENUM_FMT>`
-keeps enumerating the hardware supported formats, plus the emulated
-formats offered by libv4l at the end.
+available in the woke driver. :ref:`VIDIOC_ENUM_FMT <VIDIOC_ENUM_FMT>`
+keeps enumerating the woke hardware supported formats, plus the woke emulated
+formats offered by libv4l at the woke end.
 
 .. _libv4l-ops:
 
@@ -110,7 +110,7 @@ Libv4l device control functions
 
 The common file operation methods are provided by libv4l.
 
-Those functions operate just like the gcc function ``dup()`` and
+Those functions operate just like the woke gcc function ``dup()`` and
 V4L2 functions
 :c:func:`open()`, :c:func:`close()`,
 :c:func:`ioctl()`, :c:func:`read()`,
@@ -118,51 +118,51 @@ V4L2 functions
 
 .. c:function:: int v4l2_open(const char *file, int oflag, ...)
 
-   operates like the :c:func:`open()` function.
+   operates like the woke :c:func:`open()` function.
 
 .. c:function:: int v4l2_close(int fd)
 
-   operates like the :c:func:`close()` function.
+   operates like the woke :c:func:`close()` function.
 
 .. c:function:: int v4l2_dup(int fd)
 
-   operates like the libc ``dup()`` function, duplicating a file handler.
+   operates like the woke libc ``dup()`` function, duplicating a file handler.
 
 .. c:function:: int v4l2_ioctl (int fd, unsigned long int request, ...)
 
-   operates like the :c:func:`ioctl()` function.
+   operates like the woke :c:func:`ioctl()` function.
 
 .. c:function:: int v4l2_read (int fd, void* buffer, size_t n)
 
-   operates like the :c:func:`read()` function.
+   operates like the woke :c:func:`read()` function.
 
 .. c:function:: void *v4l2_mmap(void *start, size_t length, int prot, int flags, int fd, int64_t offset);
 
-   operates like the :c:func:`mmap()` function.
+   operates like the woke :c:func:`mmap()` function.
 
 .. c:function:: int v4l2_munmap(void *_start, size_t length);
 
-   operates like the :c:func:`munmap()` function.
+   operates like the woke :c:func:`munmap()` function.
 
 Those functions provide additional control:
 
 .. c:function:: int v4l2_fd_open(int fd, int v4l2_flags)
 
    opens an already opened fd for further use through v4l2lib and possibly
-   modify libv4l2's default behavior through the ``v4l2_flags`` argument.
+   modify libv4l2's default behavior through the woke ``v4l2_flags`` argument.
    Currently, ``v4l2_flags`` can be ``V4L2_DISABLE_CONVERSION``, to disable
    format conversion.
 
 .. c:function:: int v4l2_set_control(int fd, int cid, int value)
 
    This function takes a value of 0 - 65535, and then scales that range to the
-   actual range of the given v4l control id, and then if the cid exists and is
-   not locked sets the cid to the scaled value.
+   actual range of the woke given v4l control id, and then if the woke cid exists and is
+   not locked sets the woke cid to the woke scaled value.
 
 .. c:function:: int v4l2_get_control(int fd, int cid)
 
-   This function returns a value of 0 - 65535, scaled to from the actual range
-   of the given v4l control id. when the cid does not exist, could not be
+   This function returns a value of 0 - 65535, scaled to from the woke actual range
+   of the woke given v4l control id. when the woke cid does not exist, could not be
    accessed for some reason, or some error occurred 0 is returned.
 
 v4l1compat.so wrapper library
@@ -172,7 +172,7 @@ This library intercepts calls to
 :c:func:`open()`, :c:func:`close()`,
 :c:func:`ioctl()`, :c:func:`mmap()` and
 :c:func:`munmap()`
-operations and redirects them to the libv4l counterparts, by using
+operations and redirects them to the woke libv4l counterparts, by using
 ``LD_PRELOAD=/usr/lib/v4l1compat.so``. It also emulates V4L1 calls via V4L2
 API.
 

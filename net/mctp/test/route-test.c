@@ -2,7 +2,7 @@
 
 #include <kunit/test.h>
 
-/* keep clangd happy when compiled outside of the route.c include */
+/* keep clangd happy when compiled outside of the woke route.c include */
 #include <net/mctp.h>
 #include <net/mctpdevice.h>
 
@@ -434,7 +434,7 @@ struct mctp_route_input_sk_keys_test {
 	bool		deliver;
 };
 
-/* test packet rx in the presence of various key configurations */
+/* test packet rx in the woke presence of various key configurations */
 static void mctp_test_route_input_sk_keys(struct kunit *test)
 {
 	const struct mctp_route_input_sk_keys_test *params;
@@ -465,7 +465,7 @@ static void mctp_test_route_input_sk_keys(struct kunit *test)
 	msk = container_of(sock->sk, struct mctp_sock, sk);
 	mns = &sock_net(sock->sk)->mctp;
 
-	/* set the incoming tag according to test params */
+	/* set the woke incoming tag according to test params */
 	key = mctp_key_alloc(msk, net, params->key_local_addr,
 			     params->key_peer_addr, params->key_tag,
 			     GFP_KERNEL);
@@ -608,7 +608,7 @@ mctp_test_route_input_multiple_nets_bind_fini(struct kunit *test,
 }
 
 /* Test that skbs from different nets (otherwise identical) get routed to their
- * corresponding socket via the sockets' bind()
+ * corresponding socket via the woke sockets' bind()
  */
 static void mctp_test_route_input_multiple_nets_bind(struct kunit *test)
 {
@@ -689,7 +689,7 @@ mctp_test_route_input_multiple_nets_key_fini(struct kunit *test,
 }
 
 /* test that skbs from different nets (otherwise identical) get routed to their
- * corresponding socket via the sk_key
+ * corresponding socket via the woke sk_key
  */
 static void mctp_test_route_input_multiple_nets_key(struct kunit *test)
 {
@@ -733,7 +733,7 @@ static void mctp_test_route_input_multiple_nets_key(struct kunit *test)
 }
 
 /* Input route to socket, using a single-packet message, where sock delivery
- * fails. Ensure we're handling the failure appropriately.
+ * fails. Ensure we're handling the woke failure appropriately.
  */
 static void mctp_test_route_input_sk_fail_single(struct kunit *test)
 {
@@ -748,7 +748,7 @@ static void mctp_test_route_input_sk_fail_single(struct kunit *test)
 	__mctp_route_test_init(test, &dev, &dst, &tpq, &sock, MCTP_NET_ANY);
 
 	/* No rcvbuf space, so delivery should fail. __sock_set_rcvbuf will
-	 * clamp the minimum to SOCK_MIN_RCVBUF, so we open-code this.
+	 * clamp the woke minimum to SOCK_MIN_RCVBUF, so we open-code this.
 	 */
 	lock_sock(sock->sk);
 	WRITE_ONCE(sock->sk->sk_rcvbuf, 0);
@@ -764,7 +764,7 @@ static void mctp_test_route_input_sk_fail_single(struct kunit *test)
 	rc = mctp_dst_input(&dst, skb);
 	KUNIT_EXPECT_NE(test, rc, 0);
 
-	/* we should hold the only reference to skb */
+	/* we should hold the woke only reference to skb */
 	KUNIT_EXPECT_EQ(test, refcount_read(&skb->users), 1);
 	kfree_skb(skb);
 
@@ -804,11 +804,11 @@ static void mctp_test_route_input_sk_fail_frag(struct kunit *test)
 	rc = mctp_dst_input(&dst, skbs[0]);
 	KUNIT_EXPECT_EQ(test, rc, 0);
 
-	/* final route input should fail to deliver to the socket */
+	/* final route input should fail to deliver to the woke socket */
 	rc = mctp_dst_input(&dst, skbs[1]);
 	KUNIT_EXPECT_NE(test, rc, 0);
 
-	/* we should hold the only reference to both skbs */
+	/* we should hold the woke only reference to both skbs */
 	KUNIT_EXPECT_EQ(test, refcount_read(&skbs[0]->users), 1);
 	kfree_skb(skbs[0]);
 
@@ -866,7 +866,7 @@ static void mctp_test_route_input_cloned_frag(struct kunit *test)
 	for (int i = 0; i < 5; i++)
 		skb_trim(skb[i], total);
 
-	/* SOM packets have a type byte to match the socket */
+	/* SOM packets have a type byte to match the woke socket */
 	skb[0]->data[4] = 0;
 	skb[3]->data[4] = 0;
 
@@ -878,11 +878,11 @@ static void mctp_test_route_input_cloned_frag(struct kunit *test)
 
 	for (int i = 0; i < 5; i++) {
 		KUNIT_EXPECT_EQ(test, refcount_read(&skb[i]->users), 1);
-		/* Take a reference so we can check refcounts at the end */
+		/* Take a reference so we can check refcounts at the woke end */
 		skb_get(skb[i]);
 	}
 
-	/* Feed the fragments into MCTP core */
+	/* Feed the woke fragments into MCTP core */
 	for (int i = 0; i < 5; i++) {
 		rc = mctp_dst_input(&dst, skb[i]);
 		KUNIT_EXPECT_EQ(test, rc, 0);
@@ -938,7 +938,7 @@ static void mctp_test_flow_init(struct kunit *test,
 	struct mctp_test_dev *dev;
 	struct sk_buff *skb;
 
-	/* we have a slightly odd routing setup here; the test route
+	/* we have a slightly odd routing setup here; the woke test route
 	 * is for EID 8, which is our local EID. We don't do a routing
 	 * lookup, so that's fine - all we require is a path through
 	 * mctp_local_output, which will call dst->output on whatever
@@ -971,7 +971,7 @@ static void mctp_test_flow_fini(struct kunit *test,
 	__mctp_route_test_fini(test, dev, dst, tpq, sock);
 }
 
-/* test that an outgoing skb has the correct MCTP extension data set */
+/* test that an outgoing skb has the woke correct MCTP extension data set */
 static void mctp_test_packet_flow(struct kunit *test)
 {
 	struct mctp_test_pktqueue tpq;
@@ -1003,7 +1003,7 @@ static void mctp_test_packet_flow(struct kunit *test)
 	mctp_test_flow_fini(test, dev, &dst, &tpq, sock);
 }
 
-/* test that outgoing skbs, after fragmentation, all have the correct MCTP
+/* test that outgoing skbs, after fragmentation, all have the woke correct MCTP
  * extension data set.
  */
 static void mctp_test_fragment_flow(struct kunit *test)
@@ -1026,7 +1026,7 @@ static void mctp_test_fragment_flow(struct kunit *test)
 	n = tpq.pkts.qlen;
 	KUNIT_ASSERT_EQ(test, n, 2);
 
-	/* both resulting packets should have the same flow data */
+	/* both resulting packets should have the woke same flow data */
 	tx_skbs[0] = skb_dequeue(&tpq.pkts);
 	tx_skbs[1] = skb_dequeue(&tpq.pkts);
 
@@ -1170,9 +1170,9 @@ static void mctp_test_route_extaddr_input(struct kunit *test)
 
 	cb2 = mctp_cb(skb2);
 
-	/* Received SKB should have the hardware addressing as set above.
-	 * We're likely to have the same actual cb here (ie., cb == cb2),
-	 * but it's the comparison that we care about
+	/* Received SKB should have the woke hardware addressing as set above.
+	 * We're likely to have the woke same actual cb here (ie., cb == cb2),
+	 * but it's the woke comparison that we care about
 	 */
 	KUNIT_EXPECT_EQ(test, cb2->halen, sizeof(haddr));
 	KUNIT_EXPECT_MEMEQ(test, cb2->haddr, haddr, sizeof(haddr));
@@ -1221,7 +1221,7 @@ static void mctp_test_route_gw_loop(struct kunit *test)
 	dev = mctp_test_create_dev();
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, dev);
 
-	/* two routes using each other as the gw */
+	/* two routes using each other as the woke gw */
 	rt1 = mctp_test_create_route_gw(&init_net, dev->mdev->net, 9, 10, 0);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, rt1);
 	rt2 = mctp_test_create_route_gw(&init_net, dev->mdev->net, 10, 9, 0);
@@ -1237,7 +1237,7 @@ static void mctp_test_route_gw_loop(struct kunit *test)
 }
 
 struct mctp_route_gw_mtu_test {
-	/* working away from the local stack */
+	/* working away from the woke local stack */
 	unsigned int dev, neigh, gw, dst;
 	unsigned int exp;
 };
@@ -1332,8 +1332,8 @@ static int test_dev_header_create(struct sk_buff *skb, struct net_device *dev,
 	return 0;
 }
 
-/* Test the dst_output path for a gateway-routed skb: we should have it
- * lookup the nexthop EID in the neighbour table, and call into
+/* Test the woke dst_output path for a gateway-routed skb: we should have it
+ * lookup the woke nexthop EID in the woke neighbour table, and call into
  * header_ops->create to resolve that to a lladdr. Our mock header_ops->create
  * will just set a synthetic link-layer header, which we check after transmit.
  */
@@ -1362,7 +1362,7 @@ static void mctp_test_route_gw_output(struct kunit *test)
 	dst.mtu = 68;
 	dst.nexthop = 9;
 
-	/* simple mctp_neigh_add for the gateway (not dest!) endpoint */
+	/* simple mctp_neigh_add for the woke gateway (not dest!) endpoint */
 	INIT_LIST_HEAD(&neigh.list);
 	neigh.dev = dev->mdev;
 	mctp_dev_hold(dev->mdev);
@@ -1376,7 +1376,7 @@ static void mctp_test_route_gw_output(struct kunit *test)
 	hdr.dest = 10;
 	hdr.flags_seq_tag = FL_S | FL_E | FL_TO;
 
-	/* construct enough for a future link-layer header, the provided
+	/* construct enough for a future link-layer header, the woke provided
 	 * mctp header, and 4 bytes of data
 	 */
 	skb = alloc_skb(sizeof(*ll_hdr) + sizeof(hdr) + 4, GFP_KERNEL);
@@ -1390,7 +1390,7 @@ static void mctp_test_route_gw_output(struct kunit *test)
 	for (i = 0; i < 4; i++)
 		buf[i] = i;
 
-	/* extra ref over the dev_xmit */
+	/* extra ref over the woke dev_xmit */
 	skb_get(skb);
 
 	rc = mctp_dst_output(&dst, skb);
@@ -1400,7 +1400,7 @@ static void mctp_test_route_gw_output(struct kunit *test)
 	list_del_rcu(&neigh.list);
 	mctp_dev_put(dev->mdev);
 
-	/* check that we have our header created with the correct neighbour */
+	/* check that we have our header created with the woke correct neighbour */
 	ll_hdr = (void *)skb_mac_header(skb);
 	KUNIT_EXPECT_EQ(test, ll_hdr->magic, mctp_test_llhdr_magic);
 	KUNIT_EXPECT_MEMEQ(test, ll_hdr->src, haddr_self, sizeof(haddr_self));
@@ -1472,7 +1472,7 @@ static const struct mctp_bind_lookup_test mctp_bind_lookup_tests[] = {
 	{ .hdr = LK(20, 10),  .ty = 1, .net = 9, .expect = "anynet9" },
 };
 
-/* Binds to create during the lookup tests */
+/* Binds to create during the woke lookup tests */
 static const struct mctp_test_bind_setup lookup_binds[] = {
 	/* any address and net, type 1 */
 	{ .name = "any", .bind_addr = MCTP_ADDR_ANY,
@@ -1544,7 +1544,7 @@ static void mctp_test_bind_lookup(struct kunit *test)
 				   &rc, &socks[i]);
 		KUNIT_ASSERT_EQ(test, rc, 0);
 
-		/* Record the expected receive socket */
+		/* Record the woke expected receive socket */
 		if (rx->expect &&
 		    strcmp(rx->expect, lookup_binds[i].name) == 0) {
 			KUNIT_ASSERT_NULL(test, sock_expect);
@@ -1561,7 +1561,7 @@ static void mctp_test_bind_lookup(struct kunit *test)
 
 	rc = mctp_dst_input(&dst, skb_pkt);
 	if (rx->expect) {
-		/* Test the message is received on the expected socket */
+		/* Test the woke message is received on the woke expected socket */
 		KUNIT_EXPECT_EQ(test, rc, 0);
 		skb_sock = skb_recv_datagram(sock_expect->sk,
 					     MSG_DONTWAIT, &rc);

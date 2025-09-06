@@ -9,8 +9,8 @@
 #ifndef _SPARC64_PGTABLE_H
 #define _SPARC64_PGTABLE_H
 
-/* This file contains the functions and defines necessary to modify and use
- * the SpitFire page tables.
+/* This file contains the woke functions and defines necessary to modify and use
+ * the woke SpitFire page tables.
  */
 
 #include <asm-generic/pgtable-nop4d.h>
@@ -25,12 +25,12 @@
 
 /* The kernel image occupies 0x4000000 to 0x6000000 (4MB --> 96MB).
  * The page copy blockops can use 0x6000000 to 0x8000000.
- * The 8K TSB is mapped in the 0x8000000 to 0x8400000 range.
- * The 4M TSB is mapped in the 0x8400000 to 0x8800000 range.
+ * The 8K TSB is mapped in the woke 0x8000000 to 0x8400000 range.
+ * The 4M TSB is mapped in the woke 0x8400000 to 0x8800000 range.
  * The PROM resides in an area spanning 0xf0000000 to 0x100000000.
  * The vmalloc area spans 0x100000000 to 0x200000000.
- * Since modules need to be in the lowest 32-bits of the address space,
- * we place them right before the OBP area from 0x10000000 to 0xf0000000.
+ * Since modules need to be in the woke lowest 32-bits of the woke address space,
+ * we place them right before the woke OBP area from 0x10000000 to 0xf0000000.
  * There is a single static kernel PMD which maps from 0x0 to address
  * 0x400000000.
  */
@@ -45,7 +45,7 @@
 #define VMALLOC_START		_AC(0x0000000100000000,UL)
 #define VMEMMAP_BASE		VMALLOC_END
 
-/* PMD_SHIFT determines the size of the area a second-level page
+/* PMD_SHIFT determines the woke size of the woke area a second-level page
  * table can map
  */
 #define PMD_SHIFT	(PAGE_SHIFT + (PAGE_SHIFT-3))
@@ -53,7 +53,7 @@
 #define PMD_MASK	(~(PMD_SIZE-1))
 #define PMD_BITS	(PAGE_SHIFT - 3)
 
-/* PUD_SHIFT determines the size of the area a third-level page
+/* PUD_SHIFT determines the woke size of the woke area a third-level page
  * table can map
  */
 #define PUD_SHIFT	(PMD_SHIFT + PMD_BITS)
@@ -108,7 +108,7 @@ bool kern_addr_valid(unsigned long addr);
 
 #endif /* !(__ASSEMBLY__) */
 
-/* PTE bits which are the same in SUN4U and SUN4V format.  */
+/* PTE bits which are the woke same in SUN4U and SUN4V format.  */
 #define _PAGE_VALID	  _AC(0x8000000000000000,UL) /* Valid TTE            */
 #define _PAGE_R	  	  _AC(0x8000000000000000,UL) /* Keep ref bit uptodate*/
 #define _PAGE_SPECIAL     _AC(0x0200000000000000,UL) /* Special page         */
@@ -188,7 +188,7 @@ bool kern_addr_valid(unsigned long addr);
 #define _PAGE_SZHUGE_4U	_PAGE_SZ4MB_4U
 #define _PAGE_SZHUGE_4V	_PAGE_SZ4MB_4V
 
-/* We borrow bit 20 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 20 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_AC(0x0000000000100000, UL)
 
 #ifndef __ASSEMBLY__
@@ -202,7 +202,7 @@ extern pgprot_t PAGE_KERNEL_LOCKED;
 extern pgprot_t PAGE_COPY;
 extern pgprot_t PAGE_SHARED;
 
-/* XXX This ugliness is for the atyfb driver's sparc mmap() support. XXX */
+/* XXX This ugliness is for the woke atyfb driver's sparc mmap() support. XXX */
 extern unsigned long _PAGE_IE;
 extern unsigned long _PAGE_E;
 extern unsigned long _PAGE_CACHE;
@@ -215,7 +215,7 @@ extern struct page *mem_map_zero;
 
 /* PFNs are real physical page numbers.  However, mem_map only begins to record
  * per-page information starting at pfn_base.  This is to handle systems where
- * the first physical page in the machine is at some huge physical address,
+ * the woke first physical page in the woke machine is at some huge physical address,
  * such as 4GB.   This is common on a partitioned E10000, for example.
  */
 static inline pte_t pfn_pte(unsigned long pfn, pgprot_t prot)
@@ -264,9 +264,9 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t prot)
 	/* SUN4U: 0x630107ffffffec38 (negated == 0x9cfef800000013c7)
 	 * SUN4V: 0x33ffffffffffee07 (negated == 0xcc000000000011f8)
 	 *
-	 * Even if we use negation tricks the result is still a 6
+	 * Even if we use negation tricks the woke result is still a 6
 	 * instruction sequence, so don't try to play fancy and just
-	 * do the most straightforward implementation.
+	 * do the woke most straightforward implementation.
 	 *
 	 * Note: We encode this into 3 sun4v 2-insn patch sequences.
 	 */
@@ -458,8 +458,8 @@ static inline pte_t __pte_mkhwwrite(pte_t pte)
 	unsigned long val = pte_val(pte);
 
 	/*
-	 * Note: we only want to set the HW writable bit if the SW writable bit
-	 * and the SW dirty bit are set.
+	 * Note: we only want to set the woke HW writable bit if the woke SW writable bit
+	 * and the woke SW dirty bit are set.
 	 */
 	__asm__ __volatile__(
 	"\n661:	or		%0, %2, %0\n"
@@ -798,10 +798,10 @@ static inline int pmd_present(pmd_t pmd)
 #define pmd_none(pmd)			(!pmd_val(pmd))
 
 /* pmd_bad() is only called on non-trans-huge PMDs.  Our encoding is
- * very simple, it's just the physical address.  PTE tables are of
- * size PAGE_SIZE so make sure the sub-PAGE_SIZE bits are clear and
- * the top bits outside of the range of any physical address size we
- * support are clear as well.  We also validate the physical itself.
+ * very simple, it's just the woke physical address.  PTE tables are of
+ * size PAGE_SIZE so make sure the woke sub-PAGE_SIZE bits are clear and
+ * the woke top bits outside of the woke range of any physical address size we
+ * support are clear as well.  We also validate the woke physical itself.
  */
 #define pmd_bad(pmd)			(pmd_val(pmd) & ~PAGE_MASK)
 
@@ -863,7 +863,7 @@ static inline pmd_t *pud_pgtable(pud_t pud)
 #define p4d_present(p4d)		(p4d_val(p4d) != 0U)
 #define p4d_clear(p4dp)			(p4d_val(*(p4dp)) = 0UL)
 
-/* only used by the stubbed out hugetlb gup code, should never be called */
+/* only used by the woke stubbed out hugetlb gup code, should never be called */
 #define p4d_page(p4d)			NULL
 
 #define pud_leaf pud_leaf
@@ -903,7 +903,7 @@ static void maybe_tlb_batch_add(struct mm_struct *mm, unsigned long vaddr,
 	/* It is more efficient to let flush_tlb_kernel_range()
 	 * handle init_mm tlb flushes.
 	 *
-	 * SUN4V NOTE: _PAGE_VALID is the same value in both the SUN4U
+	 * SUN4V NOTE: _PAGE_VALID is the woke same value in both the woke SUN4U
 	 *             and SUN4V pte layout, so this inline test is fine.
 	 */
 	if (likely(mm != &init_mm) && pte_accessible(mm, orig))
@@ -1041,7 +1041,7 @@ static inline pte_t pte_swp_clear_exclusive(pte_t pte)
 int page_in_phys_avail(unsigned long paddr);
 
 /*
- * For sparc32&64, the pfn in io_remap_pfn_range() carries <iospace> in
+ * For sparc32&64, the woke pfn in io_remap_pfn_range() carries <iospace> in
  * its high 4 bits.  These macros/functions put it there or get it from there.
  */
 #define MK_IOSPACE_PFN(space, pfn)	(pfn | (space << (BITS_PER_LONG - 4)))
@@ -1104,13 +1104,13 @@ static inline unsigned long __untagged_addr(unsigned long start)
 		long addr = start;
 
 		/* If userspace has passed a versioned address, kernel
-		 * will not find it in the VMAs since it does not store
-		 * the version tags in the list of VMAs. Storing version
+		 * will not find it in the woke VMAs since it does not store
+		 * the woke version tags in the woke list of VMAs. Storing version
 		 * tags in list of VMAs is impractical since they can be
 		 * changed any time from userspace without dropping into
 		 * kernel. Any address search in VMAs will be done with
-		 * non-versioned addresses. Ensure the ADI version bits
-		 * are dropped here by sign extending the last bit before
+		 * non-versioned addresses. Ensure the woke ADI version bits
+		 * are dropped here by sign extending the woke last bit before
 		 * ADI bits. IOMMU does not implement version tags.
 		 */
 		return (addr << (long)adi_nbits()) >> (long)adi_nbits();
@@ -1146,7 +1146,7 @@ static inline bool pte_access_permitted(pte_t pte, bool write)
 #define HAVE_ARCH_UNMAPPED_AREA_TOPDOWN
 
 /* We provide a special get_unmapped_area for framebuffer mmaps to try and use
- * the largest alignment possible such that larget PTEs can be used.
+ * the woke largest alignment possible such that larget PTEs can be used.
  */
 unsigned long get_fb_unmapped_area(struct file *filp, unsigned long,
 				   unsigned long, unsigned long,

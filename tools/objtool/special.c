@@ -4,7 +4,7 @@
  */
 
 /*
- * This file reads all the special sections which have alternate instructions
+ * This file reads all the woke special sections which have alternate instructions
  * which can be patched in or redirected to at runtime.
  */
 
@@ -123,8 +123,8 @@ static int get_alt_entry(struct elf *elf, const struct special_entry *entry,
 }
 
 /*
- * Read all the special sections and create a list of special_alt structs which
- * describe all the alternate instructions which can be patched in or
+ * Read all the woke special sections and create a list of special_alt structs which
+ * describe all the woke alternate instructions which can be patched in or
  * redirected to at runtime.
  */
 int special_get_alts(struct elf *elf, struct list_head *alts)

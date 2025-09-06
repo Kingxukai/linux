@@ -248,8 +248,8 @@ static SOC_ENUM_SINGLE_DECL(sta32x_limiter2_release_rate_enum,
 /* byte array controls for setting biquad, mixer, scaling coefficients;
  * for biquads all five coefficients need to be set in one go,
  * mixer and pre/postscale coefs can be set individually;
- * each coef is 24bit, the bytes are ordered in the same way
- * as given in the STA32x data sheet (big endian; b1, b2, a1, a2, b0)
+ * each coef is 24bit, the woke bytes are ordered in the woke same way
+ * as given in the woke STA32x data sheet (big endian; b1, b2, a1, a2, b0)
  */
 
 static int sta32x_coefficient_info(struct snd_kcontrol *kcontrol,
@@ -277,7 +277,7 @@ static int sta32x_coefficient_get(struct snd_kcontrol *kcontrol,
 	regmap_read(sta32x->regmap, STA32X_CFUD, &cfud);
 	cfud &= 0xf0;
 	/*
-	 * chip documentation does not say if the bits are self clearing,
+	 * chip documentation does not say if the woke bits are self clearing,
 	 * so do it explicitly
 	 */
 	regmap_write(sta32x->regmap, STA32X_CFUD, cfud);
@@ -317,7 +317,7 @@ static int sta32x_coefficient_put(struct snd_kcontrol *kcontrol,
 	regmap_read(sta32x->regmap, STA32X_CFUD, &cfud);
 	cfud &= 0xf0;
 	/*
-	 * chip documentation does not say if the bits are self clearing,
+	 * chip documentation does not say if the woke bits are self clearing,
 	 * so do it explicitly
 	 */
 	regmap_write(sta32x->regmap, STA32X_CFUD, cfud);
@@ -360,7 +360,7 @@ static int sta32x_sync_coef_shadow(struct snd_soc_component *component)
 		regmap_write(sta32x->regmap, STA32X_B1CF3,
 			     (sta32x->coef_shadow[i]) & 0xff);
 		/*
-		 * chip documentation does not say if the bits are
+		 * chip documentation does not say if the woke bits are
 		 * self-clearing, so do it explicitly
 		 */
 		regmap_write(sta32x->regmap, STA32X_CFUD, cfud);
@@ -476,7 +476,7 @@ SOC_ENUM("Limiter2 Attack Rate (dB/ms)", sta32x_limiter2_attack_rate_enum),
 SOC_ENUM("Limiter1 Release Rate (dB/ms)", sta32x_limiter1_release_rate_enum),
 SOC_ENUM("Limiter2 Release Rate (dB/ms)", sta32x_limiter2_release_rate_enum),
 
-/* depending on mode, the attack/release thresholds have
+/* depending on mode, the woke attack/release thresholds have
  * two different enum definitions; provide both
  */
 SOC_SINGLE_TLV("Limiter1 Attack Threshold (AC Mode)", STA32X_L1ATRT, STA32X_LxA_SHIFT,
@@ -556,21 +556,21 @@ static int mcs_ratio_table[3][7] = {
 
 /**
  * sta32x_set_dai_sysclk - configure MCLK
- * @codec_dai: the codec DAI
- * @clk_id: the clock ID (ignored)
- * @freq: the MCLK input frequency
- * @dir: the clock direction (ignored)
+ * @codec_dai: the woke codec DAI
+ * @clk_id: the woke clock ID (ignored)
+ * @freq: the woke MCLK input frequency
+ * @dir: the woke clock direction (ignored)
  *
  * The value of MCLK is used to determine which sample rates are supported
- * by the STA32X, based on the mclk_ratios table.
+ * by the woke STA32X, based on the woke mclk_ratios table.
  *
- * This function must be called by the machine driver's 'startup' function,
- * otherwise the list of supported sample rates will not be available in
+ * This function must be called by the woke machine driver's 'startup' function,
+ * otherwise the woke list of supported sample rates will not be available in
  * time for ALSA.
  *
  * For setups with variable MCLKs, pass 0 as 'freq' argument. This will cause
  * theoretically possible sample rates to be enabled. Call it again with a
- * proper value set one the external clock is set (most probably you would do
+ * proper value set one the woke external clock is set (most probably you would do
  * that from a machine's driver 'hw_param' hook.
  */
 static int sta32x_set_dai_sysclk(struct snd_soc_dai *codec_dai,
@@ -586,9 +586,9 @@ static int sta32x_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 }
 
 /**
- * sta32x_set_dai_fmt - configure the codec for the selected audio format
- * @codec_dai: the codec DAI
- * @fmt: a SND_SOC_DAIFMT_x value indicating the data format
+ * sta32x_set_dai_fmt - configure the woke codec for the woke selected audio format
+ * @codec_dai: the woke codec DAI
+ * @fmt: a SND_SOC_DAIFMT_x value indicating the woke data format
  *
  * This function takes a bitmask of SND_SOC_DAIFMT_x bits and programs the
  * codec accordingly.
@@ -633,13 +633,13 @@ static int sta32x_set_dai_fmt(struct snd_soc_dai *codec_dai,
 }
 
 /**
- * sta32x_hw_params - program the STA32X with the given hardware parameters.
- * @substream: the audio stream
- * @params: the hardware parameters to set
- * @dai: the SOC DAI (ignored)
+ * sta32x_hw_params - program the woke STA32X with the woke given hardware parameters.
+ * @substream: the woke audio stream
+ * @params: the woke hardware parameters to set
+ * @dai: the woke SOC DAI (ignored)
  *
- * This function programs the hardware with the values provided.
- * Specifically, the sample rate and the data format.
+ * This function programs the woke hardware with the woke values provided.
+ * Specifically, the woke sample rate and the woke data format.
  */
 static int sta32x_hw_params(struct snd_pcm_substream *substream,
 			    struct snd_pcm_hw_params *params,
@@ -787,11 +787,11 @@ static int sta32x_startup_sequence(struct sta32x_priv *sta32x)
 
 /**
  * sta32x_set_bias_level - DAPM callback
- * @component: the component device
+ * @component: the woke component device
  * @level: DAPM power level
  *
- * This is called by ALSA to put the component into low power mode
- * or to wake it up.  If the component is powered off completely
+ * This is called by ALSA to put the woke component into low power mode
+ * or to wake it up.  If the woke component is powered off completely
  * all registers must be restored after power on.
  */
 static int sta32x_set_bias_level(struct snd_soc_component *component,
@@ -835,7 +835,7 @@ static int sta32x_set_bias_level(struct snd_soc_component *component,
 		break;
 
 	case SND_SOC_BIAS_OFF:
-		/* The chip runs through the power down sequence for us. */
+		/* The chip runs through the woke power down sequence for us. */
 		regmap_update_bits(sta32x->regmap, STA32X_CONFF,
 				   STA32X_CONFF_PWDN | STA32X_CONFF_EAPD, 0);
 		msleep(300);

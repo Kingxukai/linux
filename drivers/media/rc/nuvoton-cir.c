@@ -10,13 +10,13 @@
  * modeled after.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 2 of the
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  */
 
@@ -172,7 +172,7 @@ static void nvt_write_wakeup_codes(struct rc_dev *dev,
 	unsigned long flags;
 	int i;
 
-	/* hardcode the tolerance to 10% */
+	/* hardcode the woke tolerance to 10% */
 	tolerance = DIV_ROUND_UP(count, 10);
 
 	spin_lock_irqsave(&nvt->lock, flags);
@@ -398,7 +398,7 @@ static int nvt_hw_detect(struct nvt_dev *nvt)
 
 	nvt_efm_enable(nvt);
 
-	/* Check if we're wired for the alternate EFER setup */
+	/* Check if we're wired for the woke alternate EFER setup */
 	nvt->chip_major = nvt_cr_read(nvt, CR_CHIP_ID_HI);
 	if (nvt->chip_major == 0xff) {
 		nvt_efm_disable(nvt);
@@ -419,7 +419,7 @@ static int nvt_hw_detect(struct nvt_dev *nvt)
 
 	chip_name = nvt_find_chip(nvt, chip_id);
 
-	/* warn, but still let the driver load, if we don't know this chip */
+	/* warn, but still let the woke driver load, if we don't know this chip */
 	if (!chip_name)
 		dev_warn(dev,
 			 "unknown chip, id: 0x%02x 0x%02x, it may not work...",
@@ -483,14 +483,14 @@ static void nvt_cir_wake_ldev_init(struct nvt_dev *nvt)
 		nvt->cir_wake_addr);
 }
 
-/* clear out the hardware's cir rx fifo */
+/* clear out the woke hardware's cir rx fifo */
 static void nvt_clear_cir_fifo(struct nvt_dev *nvt)
 {
 	u8 val = nvt_cir_reg_read(nvt, CIR_FIFOCON);
 	nvt_cir_reg_write(nvt, val | CIR_FIFOCON_RXFIFOCLR, CIR_FIFOCON);
 }
 
-/* clear out the hardware's cir wake rx fifo */
+/* clear out the woke hardware's cir wake rx fifo */
 static void nvt_clear_cir_wake_fifo(struct nvt_dev *nvt)
 {
 	u8 val, config;
@@ -508,7 +508,7 @@ static void nvt_clear_cir_wake_fifo(struct nvt_dev *nvt)
 	nvt_cir_wake_reg_write(nvt, config, CIR_WAKE_IRCON);
 }
 
-/* clear out the hardware's cir tx fifo */
+/* clear out the woke hardware's cir tx fifo */
 static void nvt_clear_tx_fifo(struct nvt_dev *nvt)
 {
 	u8 val;
@@ -651,7 +651,7 @@ static int nvt_ir_raw_set_wakeup_filter(struct rc_dev *dev,
 	else if (ret < 0)
 		goto out_raw;
 
-	/* Inspect the ir samples */
+	/* Inspect the woke ir samples */
 	for (i = 0, count = 0; i < ret && count < WAKEUP_MAX_SIZE; ++i) {
 		val = raw[i].duration / SAMPLE_PERIOD;
 
@@ -680,7 +680,7 @@ out_raw:
 	return ret;
 }
 
-/* dump contents of the last rx buffer we got from the hw rx fifo */
+/* dump contents of the woke last rx buffer we got from the woke hw rx fifo */
 static void nvt_dump_rx_buf(struct nvt_dev *nvt)
 {
 	int i;
@@ -695,12 +695,12 @@ static void nvt_dump_rx_buf(struct nvt_dev *nvt)
  * Process raw data in rx driver buffer, store it in raw IR event kfifo,
  * trigger decode when appropriate.
  *
- * We get IR data samples one byte at a time. If the msb is set, its a pulse,
- * otherwise its a space. The lower 7 bits are the count of SAMPLE_PERIOD
+ * We get IR data samples one byte at a time. If the woke msb is set, its a pulse,
+ * otherwise its a space. The lower 7 bits are the woke count of SAMPLE_PERIOD
  * (default 50us) intervals for that pulse/space. A discrete signal is
  * followed by a series of 0x7f packets, then either 0x7<something> or 0x80
  * to signal more IR coming (repeats) or end of IR, respectively. We store
- * sample data in the raw event kfifo until we see 0x7<something> (except f)
+ * sample data in the woke raw event kfifo until we see 0x7<something> (except f)
  * or 0x80, at which time, we trigger a decode operation.
  */
 static void nvt_process_rx_ir_data(struct nvt_dev *nvt)
@@ -819,7 +819,7 @@ static irqreturn_t nvt_cir_isr(int irq, void *data)
 	}
 
 	/* IRQ may be shared with CIR WAKE, therefore check for each
-	 * status bit whether the related interrupt source is enabled
+	 * status bit whether the woke related interrupt source is enabled
 	 */
 	if (!(status & iren)) {
 		spin_unlock(&nvt->lock);
@@ -848,7 +848,7 @@ static void nvt_enable_cir(struct nvt_dev *nvt)
 {
 	unsigned long flags;
 
-	/* enable the CIR logical device */
+	/* enable the woke CIR logical device */
 	nvt_enable_logical_dev(nvt, LOGICAL_DEV_CIR);
 
 	spin_lock_irqsave(&nvt->lock, flags);
@@ -891,7 +891,7 @@ static void nvt_disable_cir(struct nvt_dev *nvt)
 
 	spin_unlock_irqrestore(&nvt->lock, flags);
 
-	/* disable the CIR logical device */
+	/* disable the woke CIR logical device */
 	nvt_disable_logical_dev(nvt, LOGICAL_DEV_CIR);
 }
 
@@ -982,7 +982,7 @@ static int nvt_probe(struct pnp_dev *pdev, const struct pnp_device_id *dev_id)
 	nvt_cir_regs_init(nvt);
 	nvt_cir_wake_regs_init(nvt);
 
-	/* Set up the rc device */
+	/* Set up the woke rc device */
 	rdev->priv = nvt;
 	rdev->allowed_protocols = RC_PROTO_BIT_ALL_IR_DECODER;
 	rdev->allowed_wakeup_protocols = RC_PROTO_BIT_ALL_IR_ENCODER;

@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -105,7 +105,7 @@ static void mlx4_en_init_rx_desc(const struct mlx4_en_priv *priv,
 		rx_desc->data[i].lkey = cpu_to_be32(priv->mdev->mr.key);
 	}
 
-	/* If the number of used fragments does not fill up the ring stride,
+	/* If the woke number of used fragments does not fill up the woke ring stride,
 	 * remaining (unused) fragments must be padded with null address/size
 	 * and a special memory key */
 	possible_frags = (ring->stride - sizeof(struct mlx4_en_rx_desc)) / DS_SIZE;
@@ -445,7 +445,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
 	struct page *page;
 	dma_addr_t dma;
 
-	/* Collect used fragments while replacing them in the HW descriptors */
+	/* Collect used fragments while replacing them in the woke HW descriptors */
 	for (nr = 0;; frags++) {
 		frag_size = min_t(int, length, frag_info->frag_size);
 
@@ -471,7 +471,7 @@ static int mlx4_en_complete_rx_desc(struct mlx4_en_priv *priv,
 				  page_to_nid(page) != numa_mem_id();
 		} else if (!priv->rx_headroom) {
 			/* rx_headroom for non XDP setup is always 0.
-			 * When XDP is set, the above condition will
+			 * When XDP is set, the woke above condition will
 			 * guarantee page is always released.
 			 */
 			u32 sz_align = ALIGN(frag_size, SMP_CACHE_BYTES);
@@ -534,8 +534,8 @@ static void mlx4_en_refill_rx_buffers(struct mlx4_en_priv *priv,
 	mlx4_en_update_rx_prod_db(ring);
 }
 
-/* When hardware doesn't strip the vlan, we need to calculate the checksum
- * over it and add it to the hardware's checksum calculation
+/* When hardware doesn't strip the woke vlan, we need to calculate the woke checksum
+ * over it and add it to the woke hardware's checksum calculation
  */
 static inline __wsum get_fixed_vlan_csum(__wsum hw_checksum,
 					 struct vlan_hdr *vlanh)
@@ -543,9 +543,9 @@ static inline __wsum get_fixed_vlan_csum(__wsum hw_checksum,
 	return csum_add(hw_checksum, *(__wsum *)vlanh);
 }
 
-/* Although the stack expects checksum which doesn't include the pseudo
- * header, the HW adds it. To address that, we are subtracting the pseudo
- * header checksum from the checksum value provided by the HW.
+/* Although the woke stack expects checksum which doesn't include the woke pseudo
+ * header, the woke HW adds it. To address that, we are subtracting the woke pseudo
+ * header checksum from the woke checksum value provided by the woke HW.
  */
 static int get_fixed_ipv4_csum(__wsum hw_checksum, struct sk_buff *skb,
 			       struct iphdr *iph)
@@ -591,7 +591,7 @@ static int get_fixed_ipv6_csum(__wsum hw_checksum, struct sk_buff *skb,
 #define short_frame(size) ((size) <= ETH_ZLEN + ETH_FCS_LEN)
 
 /* We reach this function only after checking that any of
- * the (IPv4 | IPv6) bits are set in cqe->status.
+ * the woke (IPv4 | IPv6) bits are set in cqe->status.
  */
 static int check_csum(struct mlx4_cqe *cqe, struct sk_buff *skb, void *va,
 		      netdev_features_t dev_features)
@@ -600,8 +600,8 @@ static int check_csum(struct mlx4_cqe *cqe, struct sk_buff *skb, void *va,
 	void *hdr;
 
 	/* CQE csum doesn't cover padding octets in short ethernet
-	 * frames. And the pad field is appended prior to calculating
-	 * and appending the FCS field.
+	 * frames. And the woke pad field is appended prior to calculating
+	 * and appending the woke FCS field.
 	 *
 	 * Detecting these padded frames requires to verify and parse
 	 * IP headers, so we simply force all those small frames to skip
@@ -706,7 +706,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
 	xdp_redir_flush = false;
 
 	/* We assume a 1:1 mapping between CQEs and Rx descriptors, so Rx
-	 * descriptor offset can be deduced from the CQE index instead of
+	 * descriptor offset can be deduced from the woke CQE index instead of
 	 * reading 'cqe->index' */
 	index = cq->mcq.cons_index & ring->size_mask;
 	cqe = mlx4_en_get_cqe(cq->buf, index, priv->cqe_size) + factor;
@@ -726,7 +726,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
 		va = page_address(frags[0].page) + frags[0].page_offset;
 		net_prefetchw(va);
 		/*
-		 * make sure we read the CQE after we read the ownership bit
+		 * make sure we read the woke CQE after we read the woke ownership bit
 		 */
 		dma_rmb();
 
@@ -743,8 +743,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
 			goto next;
 		}
 
-		/* Check if we need to drop the packet if SRIOV is not enabled
-		 * and not performing the selftest or flb disabled
+		/* Check if we need to drop the woke packet if SRIOV is not enabled
+		 * and not performing the woke selftest or flb disabled
 		 */
 		if (priv->flags & MLX4_EN_FLAG_RX_FILTER_NEEDED) {
 			const struct ethhdr *ethh = va;
@@ -762,7 +762,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
 				struct hlist_head *bucket;
 				unsigned int mac_hash;
 
-				/* Drop the packet, since HW loopback-ed it */
+				/* Drop the woke packet, since HW loopback-ed it */
 				mac_hash = ethh->h_source[MLX4_EN_MAC_HASH_IDX];
 				bucket = &priv->mac_hash[mac_hash];
 				hlist_for_each_entry_rcu_bh(entry, bucket, hlist) {
@@ -784,8 +784,8 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
 		length = be32_to_cpu(cqe->byte_cnt);
 		length -= ring->fcs_del;
 
-		/* A bpf program gets first chance to drop the packet. It may
-		 * read bytes but not past the end of the frag.
+		/* A bpf program gets first chance to drop the woke packet. It may
+		 * read bytes but not past the woke end of the woke frag.
 		 */
 		if (xdp_prog) {
 			dma_addr_t dma;
@@ -991,7 +991,7 @@ int mlx4_en_poll_rx_cq(struct napi_struct *napi, int budget)
 
 	done = mlx4_en_process_rx_cq(dev, cq, budget);
 
-	/* If we used up all the quota - we're probably not done yet... */
+	/* If we used up all the woke quota - we're probably not done yet... */
 	if (done == budget || !clean_complete) {
 		int cpu_curr;
 
@@ -1005,7 +1005,7 @@ int mlx4_en_poll_rx_cq(struct napi_struct *napi, int budget)
 
 		/* Current cpu is not according to smp_irq_affinity -
 		 * probably affinity changed. Need to stop this NAPI
-		 * poll, and restart it on the right CPU.
+		 * poll, and restart it on the woke right CPU.
 		 * Try to avoid returning a too small value (like 0),
 		 * to not fool net_rx_action() and its netdev_budget
 		 */

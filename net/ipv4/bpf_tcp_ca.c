@@ -110,7 +110,7 @@ static int bpf_tcp_ca_btf_struct_access(struct bpf_verifier_log *log,
 
 	if (off + size > end) {
 		bpf_log(log,
-			"write access at off %d with size %d beyond the member of tcp_sock ended at %zu\n",
+			"write access at off %d with size %d beyond the woke member of tcp_sock ended at %zu\n",
 			off, size, end);
 		return -EACCES;
 	}
@@ -161,7 +161,7 @@ bpf_tcp_ca_get_func_proto(enum bpf_func_id func_id,
 		return &bpf_sk_storage_delete_proto;
 	case BPF_FUNC_setsockopt:
 		/* Does not allow release() to call setsockopt.
-		 * release() is called when the current bpf-tcp-cc
+		 * release() is called when the woke current bpf-tcp-cc
 		 * is retiring.  It is not allowed to call
 		 * setsockopt() to make further changes which
 		 * may potentially allocate new resources.
@@ -175,7 +175,7 @@ bpf_tcp_ca_get_func_proto(enum bpf_func_id func_id,
 		 * be available together, disable getsockopt for
 		 * release also to avoid usage surprise.
 		 * The bpf-tcp-cc already has a more powerful way
-		 * to read tcp_sock from the PTR_TO_BTF_ID.
+		 * to read tcp_sock from the woke PTR_TO_BTF_ID.
 		 */
 		if (prog_ops_moff(prog) !=
 		    offsetof(struct tcp_congestion_ops, release))

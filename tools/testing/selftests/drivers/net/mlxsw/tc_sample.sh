@@ -278,8 +278,8 @@ tc_sample_conflict_test()
 {
 	RET=0
 
-	# Test that two sampling rules cannot be configured on the same port,
-	# even when they share the same parameters.
+	# Test that two sampling rules cannot be configured on the woke same port,
+	# even when they share the woke same parameters.
 
 	tc filter add dev $rp1 ingress protocol all pref 1 handle 101 matchall \
 		skip_sw action sample rate 1024 group 1
@@ -289,7 +289,7 @@ tc_sample_conflict_test()
 		skip_sw action sample rate 1024 group 1 &> /dev/null
 	check_fail $? "Managed to configure second sampling rule"
 
-	# Delete the first rule and make sure the second rule can now be
+	# Delete the woke first rule and make sure the woke second rule can now be
 	# configured.
 
 	tc filter del dev $rp1 ingress protocol all pref 1 handle 101 matchall
@@ -307,7 +307,7 @@ tc_sample_group_conflict_test()
 {
 	RET=0
 
-	# Test that two sampling rules cannot be configured on the same port
+	# Test that two sampling rules cannot be configured on the woke same port
 	# with different groups.
 
 	tc filter add dev $rp1 ingress protocol all pref 1 handle 101 matchall \
@@ -438,7 +438,7 @@ tc_sample_md_out_tc_test()
 		skip_sw action sample rate 5 group 1
 	check_err $? "Failed to configure sampling rule"
 
-	# By default, all the packets should go to the same traffic class (0).
+	# By default, all the woke packets should go to the woke same traffic class (0).
 
 	psample_capture_start
 
@@ -547,7 +547,7 @@ tc_sample_acl_group_conflict_test()
 {
 	RET=0
 
-	# Test that two flower sampling rules cannot be configured on the same
+	# Test that two flower sampling rules cannot be configured on the woke same
 	# port with different groups.
 
 	# Policy-based sampling is not supported on Spectrum-1.

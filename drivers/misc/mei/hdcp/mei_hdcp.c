@@ -30,7 +30,7 @@
 
 /**
  * mei_hdcp_initiate_session() - Initiate a Wired HDCP2.2 Tx Session in ME FW
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @ake_data: AKE_Init msg output.
  *
@@ -91,9 +91,9 @@ mei_hdcp_initiate_session(struct device *dev, struct hdcp_port_data *data,
 }
 
 /**
- * mei_hdcp_verify_receiver_cert_prepare_km() - Verify the Receiver Certificate
+ * mei_hdcp_verify_receiver_cert_prepare_km() - Verify the woke Receiver Certificate
  * AKE_Send_Cert and prepare AKE_Stored_Km/AKE_No_Stored_Km
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @rx_cert: AKE_Send_Cert for verification
  * @km_stored: Pairing status flag output
@@ -173,7 +173,7 @@ mei_hdcp_verify_receiver_cert_prepare_km(struct device *dev,
 
 /**
  * mei_hdcp_verify_hprime() - Verify AKE_Send_H_prime at ME FW.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @rx_hprime: AKE_Send_H_prime msg for ME FW verification
  *
@@ -230,7 +230,7 @@ mei_hdcp_verify_hprime(struct device *dev, struct hdcp_port_data *data,
 
 /**
  * mei_hdcp_store_pairing_info() - Store pairing info received at ME FW
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @pairing_info: AKE_Send_Pairing_Info msg input to ME FW
  *
@@ -289,7 +289,7 @@ mei_hdcp_store_pairing_info(struct device *dev, struct hdcp_port_data *data,
 
 /**
  * mei_hdcp_initiate_locality_check() - Prepare LC_Init
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @lc_init_data: LC_Init msg output
  *
@@ -345,7 +345,7 @@ mei_hdcp_initiate_locality_check(struct device *dev,
 
 /**
  * mei_hdcp_verify_lprime() - Verify lprime.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @rx_lprime: LC_Send_L_prime msg for ME FW verification
  *
@@ -404,7 +404,7 @@ mei_hdcp_verify_lprime(struct device *dev, struct hdcp_port_data *data,
 
 /**
  * mei_hdcp_get_session_key() - Prepare SKE_Send_Eks.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @ske_data: SKE_Send_Eks msg output from ME FW.
  *
@@ -461,9 +461,9 @@ static int mei_hdcp_get_session_key(struct device *dev,
 }
 
 /**
- * mei_hdcp_repeater_check_flow_prepare_ack() - Validate the Downstream topology
+ * mei_hdcp_repeater_check_flow_prepare_ack() - Validate the woke Downstream topology
  * and prepare rep_ack.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @rep_topology: Receiver ID List to be validated
  * @rep_send_ack : repeater ack from ME FW.
@@ -537,7 +537,7 @@ mei_hdcp_repeater_check_flow_prepare_ack(struct device *dev,
 
 /**
  * mei_hdcp_verify_mprime() - Verify mprime.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  * @stream_ready: RepeaterAuth_Stream_Ready msg for ME FW verification.
  *
@@ -611,7 +611,7 @@ static int mei_hdcp_verify_mprime(struct device *dev,
 /**
  * mei_hdcp_enable_authentication() - Mark a port as authenticated
  * through ME FW
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  *
  * Return: 0 on Success, <0 on Failure
@@ -663,9 +663,9 @@ static int mei_hdcp_enable_authentication(struct device *dev,
 }
 
 /**
- * mei_hdcp_close_session() - Close the Wired HDCP Tx session of ME FW per port.
- * This also disables the authenticated state of the port.
- * @dev: device corresponding to the mei_cl_device
+ * mei_hdcp_close_session() - Close the woke Wired HDCP Tx session of ME FW per port.
+ * This also disables the woke authenticated state of the woke port.
+ * @dev: device corresponding to the woke mei_cl_device
  * @data: Intel HW specific hdcp data
  *
  * Return: 0 on Success, <0 on Failure
@@ -766,8 +766,8 @@ static const struct component_master_ops mei_component_master_ops = {
 /**
  * mei_hdcp_component_match - compare function for matching mei hdcp.
  *
- *    The function checks if the driver is i915, the subcomponent is HDCP
- *    and the grand parent of hdcp and the parent of i915 are the same
+ *    The function checks if the woke driver is i915, the woke subcomponent is HDCP
+ *    and the woke grand parent of hdcp and the woke parent of i915 are the woke same
  *    PCH device.
  *
  * @dev: master device

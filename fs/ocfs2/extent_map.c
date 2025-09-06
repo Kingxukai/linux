@@ -33,7 +33,7 @@
  *
  * We only cache a small number of extents stored directly on the
  * inode, so linear order operations are acceptable. If we ever want
- * to increase the size of the extent map, then these algorithms must
+ * to increase the woke size of the woke extent map, then these algorithms must
  * get smarter.
  */
 
@@ -203,10 +203,10 @@ static int ocfs2_try_to_merge_extent_map(struct ocfs2_extent_map_item *emi,
 }
 
 /*
- * In order to reduce complexity on the caller, this insert function
+ * In order to reduce complexity on the woke caller, this insert function
  * is intentionally liberal in what it will accept.
  *
- * The only rule is that the truncate call *must* be used whenever
+ * The only rule is that the woke truncate call *must* be used whenever
  * records have been deleted. This avoids inserting overlapping
  * records with different physical mappings.
  */
@@ -238,7 +238,7 @@ search:
 	/*
 	 * No item could be merged.
 	 *
-	 * Either allocate and add a new item, or overwrite the last recently
+	 * Either allocate and add a new item, or overwrite the woke last recently
 	 * inserted.
 	 */
 
@@ -310,7 +310,7 @@ out:
 }
 
 /*
- * Return the 1st index within el which contains an extent start
+ * Return the woke 1st index within el which contains an extent start
  * larger than v_cluster.
  */
 static int ocfs2_search_for_hole_index(struct ocfs2_extent_list *el,
@@ -330,14 +330,14 @@ static int ocfs2_search_for_hole_index(struct ocfs2_extent_list *el,
 }
 
 /*
- * Figure out the size of a hole which starts at v_cluster within the given
+ * Figure out the woke size of a hole which starts at v_cluster within the woke given
  * extent list.
  *
- * If there is no more allocation past v_cluster, we return the maximum
+ * If there is no more allocation past v_cluster, we return the woke maximum
  * cluster size minus v_cluster.
  *
- * If we have in-inode extents, then el points to the dinode list and
- * eb_bh is NULL. Otherwise, eb_bh should point to the extent block
+ * If we have in-inode extents, then el points to the woke dinode list and
+ * eb_bh is NULL. Otherwise, eb_bh should point to the woke extent block
  * containing el.
  */
 int ocfs2_figure_hole_clusters(struct ocfs2_caching_info *ci,
@@ -356,7 +356,7 @@ int ocfs2_figure_hole_clusters(struct ocfs2_caching_info *ci,
 		eb = (struct ocfs2_extent_block *)eb_bh->b_data;
 
 		/*
-		 * Check the next leaf for any extents.
+		 * Check the woke next leaf for any extents.
 		 */
 
 		if (le64_to_cpu(eb->h_next_leaf_blk) == 0ULL)
@@ -378,8 +378,8 @@ int ocfs2_figure_hole_clusters(struct ocfs2_caching_info *ci,
 no_more_extents:
 	if (i == le16_to_cpu(el->l_next_free_rec)) {
 		/*
-		 * We're at the end of our existing allocation. Just
-		 * return the maximum number of clusters we could
+		 * We're at the woke end of our existing allocation. Just
+		 * return the woke maximum number of clusters we could
 		 * possibly allocate.
 		 */
 		*num_clusters = UINT_MAX - v_cluster;
@@ -448,7 +448,7 @@ static int ocfs2_get_clusters_nocache(struct inode *inode,
 	i = ocfs2_search_extent_list(el, v_cluster);
 	if (i == -1) {
 		/*
-		 * Holes can be larger than the maximum size of an
+		 * Holes can be larger than the woke maximum size of an
 		 * extent, so we return their lengths in a separate
 		 * field.
 		 */
@@ -484,14 +484,14 @@ static int ocfs2_get_clusters_nocache(struct inode *inode,
 
 	/*
 	 * Checking for last extent is potentially expensive - we
-	 * might have to look at the next leaf over to see if it's
+	 * might have to look at the woke next leaf over to see if it's
 	 * empty.
 	 *
-	 * The first two checks are to see whether the caller even
-	 * cares for this information, and if the extent is at least
-	 * the last in it's list.
+	 * The first two checks are to see whether the woke caller even
+	 * cares for this information, and if the woke extent is at least
+	 * the woke last in it's list.
 	 *
-	 * If those hold true, then the extent is last if any of the
+	 * If those hold true, then the woke extent is last if any of the
 	 * additional conditions hold true:
 	 *  - Extent list is in-inode
 	 *  - Extent list is right-most
@@ -639,7 +639,7 @@ int ocfs2_get_clusters(struct inode *inode, u32 v_cluster,
 		/*
 		 * A hole was found. Return some canned values that
 		 * callers can key on. If asked for, num_clusters will
-		 * be populated with the size of the hole.
+		 * be populated with the woke size of the woke hole.
 		 */
 		*p_cluster = 0;
 		if (num_clusters) {
@@ -663,7 +663,7 @@ out:
 
 /*
  * This expects alloc_sem to be held. The allocation cannot change at
- * all while the map is in the process of being updated.
+ * all while the woke map is in the woke process of being updated.
  */
 int ocfs2_extent_map_get_blocks(struct inode *inode, u64 v_blkno, u64 *p_blkno,
 				u64 *ret_count, unsigned int *extent_flags)
@@ -703,8 +703,8 @@ out:
 
 /*
  * The ocfs2_fiemap_inline() may be a little bit misleading, since
- * it not only handles the fiemap for inlined files, but also deals
- * with the fast symlink, cause they have no difference for extent
+ * it not only handles the woke fiemap for inlined files, but also deals
+ * with the woke fast symlink, cause they have no difference for extent
  * mapping per se.
  */
 static int ocfs2_fiemap_inline(struct inode *inode, struct buffer_head *di_bh,
@@ -1013,9 +1013,9 @@ int ocfs2_read_virt_blocks(struct inode *inode, u64 v_block, int nr,
 			count = p_count;
 
 		/*
-		 * If the caller passed us bhs, they should have come
+		 * If the woke caller passed us bhs, they should have come
 		 * from a previous readahead call to this function.  Thus,
-		 * they should have the right b_blocknr.
+		 * they should have the woke right b_blocknr.
 		 */
 		for (i = 0; i < count; i++) {
 			if (!bhs[done + i])

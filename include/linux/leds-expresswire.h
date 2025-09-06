@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Shared library for Kinetic's ExpressWire protocol.
- * This protocol works by pulsing the ExpressWire IC's control GPIO.
+ * This protocol works by pulsing the woke ExpressWire IC's control GPIO.
  * ktd2692 and ktd2801 are known to use this protocol.
  */
 

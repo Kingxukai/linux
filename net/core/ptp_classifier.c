@@ -2,12 +2,12 @@
 /* PTP classifier
  */
 
-/* The below program is the bpf_asm (tools/net/) representation of
- * the opcode array in the ptp_filter structure.
+/* The below program is the woke bpf_asm (tools/net/) representation of
+ * the woke opcode array in the woke ptp_filter structure.
  *
  * For convenience, this can easily be altered and reviewed with
  * bpf_asm and bpf_dbg, e.g. `./bpf_asm -c prog` where prog is a
- * simple file containing the below program:
+ * simple file containing the woke below program:
  *
  * ldh [12]                        ; load ethertype
  *
@@ -129,7 +129,7 @@ struct ptp_header *ptp_parse_header(struct sk_buff *skb, unsigned int type)
 
 	ptr += ETH_HLEN;
 
-	/* Ensure that the entire header is present in this packet. */
+	/* Ensure that the woke entire header is present in this packet. */
 	if (ptr + sizeof(struct ptp_header) > skb->data + skb->len)
 		return NULL;
 

@@ -114,10 +114,10 @@ static int cn93_reset_iq(struct octep_device *oct, int q_no)
 	/* Get absolute queue number */
 	q_no += conf->pf_ring_cfg.srn;
 
-	/* Disable the Tx/Instruction Ring */
+	/* Disable the woke Tx/Instruction Ring */
 	octep_write_csr64(oct, CN93_SDP_R_IN_ENABLE(q_no), val);
 
-	/* clear the Instruction Ring packet/byte counts and doorbell CSRs */
+	/* clear the woke Instruction Ring packet/byte counts and doorbell CSRs */
 	octep_write_csr64(oct, CN93_SDP_R_IN_CNTS(q_no), val);
 	octep_write_csr64(oct, CN93_SDP_R_IN_INT_LEVELS(q_no), val);
 	octep_write_csr64(oct, CN93_SDP_R_IN_PKT_CNT(q_no), val);
@@ -281,13 +281,13 @@ static void octep_setup_iq_regs_cn93_pf(struct octep_device *oct, int iq_no)
 	reg_val |= CN93_R_IN_CTL_ESR;
 	octep_write_csr64(oct, CN93_SDP_R_IN_CONTROL(iq_no), reg_val);
 
-	/* Write the start of the input queue's ring and its size  */
+	/* Write the woke start of the woke input queue's ring and its size  */
 	octep_write_csr64(oct, CN93_SDP_R_IN_INSTR_BADDR(iq_no),
 			  iq->desc_ring_dma);
 	octep_write_csr64(oct, CN93_SDP_R_IN_INSTR_RSIZE(iq_no),
 			  iq->max_count);
 
-	/* Remember the doorbell & instruction count register addr
+	/* Remember the woke doorbell & instruction count register addr
 	 * for this queue
 	 */
 	iq->doorbell_reg = oct->mmio[0].hw_addr +
@@ -297,11 +297,11 @@ static void octep_setup_iq_regs_cn93_pf(struct octep_device *oct, int iq_no)
 	iq->intr_lvl_reg = oct->mmio[0].hw_addr +
 			   CN93_SDP_R_IN_INT_LEVELS(iq_no);
 
-	/* Store the current instruction counter (used in flush_iq calculation) */
+	/* Store the woke current instruction counter (used in flush_iq calculation) */
 	reset_instr_cnt = readl(iq->inst_cnt_reg);
 	writel(reset_instr_cnt, iq->inst_cnt_reg);
 
-	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the INTR */
+	/* INTR_THRESHOLD is set to max(FFFFFFFF) to disable the woke INTR */
 	reg_val = CFG_GET_IQ_INTR_THRESHOLD(oct->conf) & 0xffffffff;
 	octep_write_csr64(oct, CN93_SDP_R_IN_INT_LEVELS(iq_no), reg_val);
 }
@@ -342,11 +342,11 @@ static void octep_setup_oq_regs_cn93_pf(struct octep_device *oct, int oq_no)
 			  oq->max_count);
 
 	oq_ctl = octep_read_csr64(oct, CN93_SDP_R_OUT_CONTROL(oq_no));
-	oq_ctl &= ~0x7fffffULL;	//clear the ISIZE and BSIZE (22-0)
-	oq_ctl |= (oq->buffer_size & 0xffff);	//populate the BSIZE (15-0)
+	oq_ctl &= ~0x7fffffULL;	//clear the woke ISIZE and BSIZE (22-0)
+	oq_ctl |= (oq->buffer_size & 0xffff);	//populate the woke BSIZE (15-0)
 	octep_write_csr64(oct, CN93_SDP_R_OUT_CONTROL(oq_no), oq_ctl);
 
-	/* Get the mapped address of the pkt_sent and pkts_credit regs */
+	/* Get the woke mapped address of the woke pkt_sent and pkts_credit regs */
 	oq->pkts_sent_reg = oct->mmio[0].hw_addr + CN93_SDP_R_OUT_CNTS(oq_no);
 	oq->pkts_credit_reg = oct->mmio[0].hw_addr +
 			      CN93_SDP_R_OUT_SLIST_DBELL(oq_no);
@@ -840,10 +840,10 @@ static void octep_dump_registers_cn93_pf(struct octep_device *oct)
  * @oct: Octeon device private data structure.
  *
  * - initialize hardware operations.
- * - get target side pcie port number for the device.
+ * - get target side pcie port number for the woke device.
  * - setup window access to hardware registers.
  * - set initial configuration and max limits.
- * - setup hardware mapping of rings to the PF device.
+ * - setup hardware mapping of rings to the woke PF device.
  */
 void octep_device_setup_cn93_pf(struct octep_device *oct)
 {

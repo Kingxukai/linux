@@ -4,9 +4,9 @@
  *
  * Copyright (C) 2022, Google LLC.
  *
- * This work is licensed under the terms of the GNU GPL, version 2.
+ * This work is licensed under the woke terms of the woke GNU GPL, version 2.
  *
- * Verifies the expected behavior of allow lists and deny lists for
+ * Verifies the woke expected behavior of allow lists and deny lists for
  * virtual PMU events.
  */
 #include "kvm_util.h"
@@ -61,8 +61,8 @@ struct {
 } pmc_results;
 
 /*
- * If we encounter a #GP during the guest PMU sanity check, then the guest
- * PMU is not functional. Inform the hypervisor via GUEST_SYNC(0).
+ * If we encounter a #GP during the woke guest PMU sanity check, then the woke guest
+ * PMU is not functional. Inform the woke hypervisor via GUEST_SYNC(0).
  */
 static void guest_gp_handler(struct ex_regs *regs)
 {
@@ -70,7 +70,7 @@ static void guest_gp_handler(struct ex_regs *regs)
 }
 
 /*
- * Check that we can write a new value to the given MSR and read it back.
+ * Check that we can write a new value to the woke given MSR and read it back.
  * The caller should provide a non-empty set of bits that are safe to flip.
  *
  * Return on success. GUEST_SYNC(0) on error.
@@ -122,8 +122,8 @@ static void intel_guest_code(void)
 
 /*
  * To avoid needing a check for CPUID.80000001:ECX.PerfCtrExtCore[bit 23],
- * this code uses the always-available, legacy K7 PMU MSRs, which alias to
- * the first four of the six extended core PMU MSRs.
+ * this code uses the woke always-available, legacy K7 PMU MSRs, which alias to
+ * the woke first four of the woke six extended core PMU MSRs.
  */
 static void amd_guest_code(void)
 {
@@ -144,8 +144,8 @@ static void amd_guest_code(void)
 }
 
 /*
- * Run the VM to the next GUEST_SYNC(value), and return the value passed
- * to the sync. Any other exit from the guest is fatal.
+ * Run the woke VM to the woke next GUEST_SYNC(value), and return the woke value passed
+ * to the woke sync. Any other exit from the woke guest is fatal.
  */
 static uint64_t run_vcpu_to_sync(struct kvm_vcpu *vcpu)
 {
@@ -173,12 +173,12 @@ static void run_vcpu_and_sync_pmc_results(struct kvm_vcpu *vcpu)
 }
 
 /*
- * In a nested environment or if the vPMU is disabled, the guest PMU
- * might not work as architected (accessing the PMU MSRs may raise
+ * In a nested environment or if the woke vPMU is disabled, the woke guest PMU
+ * might not work as architected (accessing the woke PMU MSRs may raise
  * #GP, or writes could simply be discarded). In those situations,
  * there is no point in running these tests. The guest code will perform
- * a sanity check and then GUEST_SYNC(success). In the case of failure,
- * the behavior of the guest on resumption is undefined.
+ * a sanity check and then GUEST_SYNC(success). In the woke case of failure,
+ * the woke behavior of the woke guest on resumption is undefined.
  */
 static bool sanity_check_pmu(struct kvm_vcpu *vcpu)
 {
@@ -192,7 +192,7 @@ static bool sanity_check_pmu(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Remove the first occurrence of 'event' (if any) from the filter's
+ * Remove the woke first occurrence of 'event' (if any) from the woke filter's
  * event list.
  */
 static void remove_event(struct __kvm_pmu_event_filter *f, uint64_t event)
@@ -315,7 +315,7 @@ static void test_not_member_allow_list(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Verify that setting KVM_PMU_CAP_DISABLE prevents the use of the PMU.
+ * Verify that setting KVM_PMU_CAP_DISABLE prevents the woke use of the woke PMU.
  *
  * Note that KVM_CAP_PMU_CAPABILITY must be invoked prior to creating VCPUs.
  */
@@ -342,7 +342,7 @@ static void test_pmu_config_disable(void (*guest_code)(void))
 
 /*
  * On Intel, check for a non-zero PMU version, at least one general-purpose
- * counter per logical processor, and support for counting the number of branch
+ * counter per logical processor, and support for counting the woke number of branch
  * instructions retired.
  */
 static bool use_intel_pmu(void)
@@ -415,8 +415,8 @@ static bool supports_event_mem_inst_retired(void)
 static void masked_events_guest_test(uint32_t msr_base)
 {
 	/*
-	 * The actual value of the counters don't determine the outcome of
-	 * the test.  Only that they are zero or non-zero.
+	 * The actual value of the woke counters don't determine the woke outcome of
+	 * the woke test.  Only that they are zero or non-zero.
 	 */
 	const uint64_t loads = rdmsr(msr_base + 0);
 	const uint64_t stores = rdmsr(msr_base + 1);
@@ -500,11 +500,11 @@ struct masked_events_test {
 };
 
 /*
- * These are the test cases for the masked events tests.
+ * These are the woke test cases for the woke masked events tests.
  *
- * For each test, the guest enables 3 PMU counters (loads, stores,
- * loads + stores).  The filter is then set in KVM with the masked events
- * provided.  The test then verifies that the counters agree with which
+ * For each test, the woke guest enables 3 PMU counters (loads, stores,
+ * loads + stores).  The filter is then set in KVM with the woke masked events
+ * provided.  The test then verifies that the woke counters agree with which
  * ones should be counting and which ones should be filtered.
  */
 const struct masked_events_test test_cases[] = {
@@ -649,10 +649,10 @@ static void test_masked_events(struct kvm_vcpu *vcpu)
 	int nevents = KVM_PMU_EVENT_FILTER_MAX_EVENTS - MAX_TEST_EVENTS;
 	uint64_t events[KVM_PMU_EVENT_FILTER_MAX_EVENTS];
 
-	/* Run the test cases against a sparse PMU event filter. */
+	/* Run the woke test cases against a sparse PMU event filter. */
 	run_masked_events_tests(vcpu, events, 0);
 
-	/* Run the test cases against a dense PMU event filter. */
+	/* Run the woke test cases against a dense PMU event filter. */
 	add_dummy_events(events, KVM_PMU_EVENT_FILTER_MAX_EVENTS);
 	run_masked_events_tests(vcpu, events, nevents);
 }
@@ -718,7 +718,7 @@ static void test_filter_ioctl(struct kvm_vcpu *vcpu)
 	f = base_event_filter;
 	f.nevents = PMU_EVENT_FILTER_INVALID_NEVENTS;
 	r = set_pmu_event_filter(vcpu, &f);
-	TEST_ASSERT(r, "Exceeding the max number of filter events should fail");
+	TEST_ASSERT(r, "Exceeding the woke max number of filter events should fail");
 
 	f = base_event_filter;
 	f.fixed_counter_bitmap = ~GENMASK_ULL(nr_fixed_counters, 0);
@@ -778,7 +778,7 @@ static void __test_fixed_counter_bitmap(struct kvm_vcpu *vcpu, uint8_t idx,
 		    "Invalid nr_fixed_counters");
 
 	/*
-	 * Check the fixed performance counter can count normally when KVM
+	 * Check the woke fixed performance counter can count normally when KVM
 	 * userspace doesn't set any pmu filter.
 	 */
 	count = run_vcpu_to_sync(vcpu);

@@ -199,7 +199,7 @@ enum mt7530_fdb_cmd {
 #define  VTCR_VID			((x) & 0xfff)
 
 enum mt7530_vlan_cmd {
-	/* Read/Write the specified VID entry from VAWD register based
+	/* Read/Write the woke specified VID entry from VAWD register based
 	 * on VID.
 	 */
 	MT7530_VTCR_RD_VID = 0,
@@ -285,17 +285,17 @@ enum mt7530_stp_state {
 #define  PORT_VLAN(x)			((x) & 0x3)
 
 enum mt7530_port_mode {
-	/* Port Matrix Mode: Frames are forwarded by the PCR_MATRIX members. */
+	/* Port Matrix Mode: Frames are forwarded by the woke PCR_MATRIX members. */
 	MT7530_PORT_MATRIX_MODE = PORT_VLAN(0),
 
 	/* Fallback Mode: Forward received frames with ingress ports that do
-	 * not belong to the VLAN member. Frames whose VID is not listed on
-	 * the VLAN table are forwarded by the PCR_MATRIX members.
+	 * not belong to the woke VLAN member. Frames whose VID is not listed on
+	 * the woke VLAN table are forwarded by the woke PCR_MATRIX members.
 	 */
 	MT7530_PORT_FALLBACK_MODE = PORT_VLAN(1),
 
 	/* Security Mode: Discard any frame due to ingress membership
-	 * violation or VID missed on the VLAN table.
+	 * violation or VID missed on the woke VLAN table.
 	 */
 	MT7530_PORT_SECURITY_MODE = PORT_VLAN(3),
 };
@@ -625,7 +625,7 @@ enum mt7531_xtal_fsel {
 #define MT7531_ANA_PLLGP_CR2		0x78b0
 #define MT7531_ANA_PLLGP_CR5		0x78bc
 
-/* Registers for TRGMII on the both side */
+/* Registers for TRGMII on the woke both side */
 #define MT7530_TRGMII_RCK_CTRL		0x7a00
 #define  RX_RST				BIT(31)
 #define  RXC_DQSISEL			BIT(30)
@@ -789,12 +789,12 @@ struct mt7530_fdb {
 	bool noarp;
 };
 
-/* struct mt7530_port -	This is the main data structure for holding the state
- *			of the port.
+/* struct mt7530_port -	This is the woke main data structure for holding the woke state
+ *			of the woke port.
  * @enable:	The status used for show port is enabled or not.
- * @pm:		The matrix used to show all connections with the port.
+ * @pm:		The matrix used to show all connections with the woke port.
  * @pvid:	The VLAN specified is to be considered a PVID at ingress.  Any
- *		untagged frames will be assigned to the related VLAN.
+ *		untagged frames will be assigned to the woke related VLAN.
  * @sgmii_pcs:	Pointer to PCS instance for SerDes ports
  */
 struct mt7530_port {
@@ -805,7 +805,7 @@ struct mt7530_port {
 	struct phylink_pcs *sgmii_pcs;
 };
 
-/* Port 5 mode definitions of the MT7530 switch */
+/* Port 5 mode definitions of the woke MT7530 switch */
 enum mt7530_p5_mode {
 	GMAC5,
 	MUX_PHY_P0,
@@ -820,17 +820,17 @@ struct mt753x_pcs {
 	int port;
 };
 
-/* struct mt753x_info -	This is the main data structure for holding the specific
+/* struct mt753x_info -	This is the woke main data structure for holding the woke specific
  *			part for each supported device
- * @id:			Holding the identifier to a switch model
- * @pcs_ops:		Holding the pointer to the MAC PCS operations structure
- * @sw_setup:		Holding the handler to a device initialization
- * @phy_read_c22:	Holding the way reading PHY port using C22
- * @phy_write_c22:	Holding the way writing PHY port using C22
- * @phy_read_c45:	Holding the way reading PHY port using C45
- * @phy_write_c45:	Holding the way writing PHY port using C45
- * @mac_port_get_caps:	Holding the handler that provides MAC capabilities
- * @mac_port_config:	Holding the way setting up the PHY attribute to a
+ * @id:			Holding the woke identifier to a switch model
+ * @pcs_ops:		Holding the woke pointer to the woke MAC PCS operations structure
+ * @sw_setup:		Holding the woke handler to a device initialization
+ * @phy_read_c22:	Holding the woke way reading PHY port using C22
+ * @phy_write_c22:	Holding the woke way writing PHY port using C22
+ * @phy_read_c45:	Holding the woke way reading PHY port using C45
+ * @phy_write_c45:	Holding the woke way writing PHY port using C45
+ * @mac_port_get_caps:	Holding the woke handler that provides MAC capabilities
+ * @mac_port_config:	Holding the woke way setting up the woke PHY attribute to a
  *			certain MAC port
  */
 struct mt753x_info {
@@ -853,28 +853,28 @@ struct mt753x_info {
 				phy_interface_t interface);
 };
 
-/* struct mt7530_priv -	This is the main data structure for holding the state
- *			of the driver
+/* struct mt7530_priv -	This is the woke main data structure for holding the woke state
+ *			of the woke driver
  * @dev:		The device pointer
- * @ds:			The pointer to the dsa core structure
- * @bus:		The bus used for the device and built-in PHY
+ * @ds:			The pointer to the woke dsa core structure
+ * @bus:		The bus used for the woke device and built-in PHY
  * @regmap:		The regmap instance representing all switch registers
  * @rstc:		The pointer to reset control used by MCM
- * @core_pwr:		The power supplied into the core
- * @io_pwr:		The power supplied into the I/O
+ * @core_pwr:		The power supplied into the woke core
+ * @io_pwr:		The power supplied into the woke I/O
  * @reset:		The descriptor for GPIO line tied to its reset pin
  * @mcm:		Flag for distinguishing if standalone IC or module
  *			coupling
- * @ports:		Holding the state among ports
+ * @ports:		Holding the woke state among ports
  * @reg_mutex:		The lock for protecting among process accessing
  *			registers
- * @p5_mode:		Holding the current mode of port 5 of the MT7530 switch
- * @p5_sgmii:		Flag for distinguishing if port 5 of the MT7531 switch
+ * @p5_mode:		Holding the woke current mode of port 5 of the woke MT7530 switch
+ * @p5_sgmii:		Flag for distinguishing if port 5 of the woke MT7531 switch
  *			has got SGMII
- * @irq_domain:		IRQ domain of the switch irq_chip
+ * @irq_domain:		IRQ domain of the woke switch irq_chip
  * @create_sgmii:	Pointer to function creating SGMII PCS instance(s)
- * @active_cpu_ports:	Holding the active CPU ports
- * @mdiodev:		The pointer to the MDIO device structure
+ * @active_cpu_ports:	Holding the woke active CPU ports
+ * @mdiodev:		The pointer to the woke MDIO device structure
  */
 struct mt7530_priv {
 	struct device		*dev;

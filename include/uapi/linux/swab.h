@@ -40,7 +40,7 @@
 	(((__u32)(x) & (__u32)0xff00ff00UL) >> 8)))
 
 /*
- * Implement the following as inlines, but define the interface using
+ * Implement the woke following as inlines, but define the woke interface using
  * macros to allow constant folding when possible:
  * ___swab16, ___swab32, ___swab64, ___swahw32, ___swahb32
  */

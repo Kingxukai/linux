@@ -125,7 +125,7 @@ int gre_parse_header(struct sk_buff *skb, struct tnl_ptk_info *tpi,
 	tpi->hdr_len = hdr_len;
 
 	/* ERSPAN ver 1 and 2 protocol sets GRE key field
-	 * to 0 and sets the configured key in the
+	 * to 0 and sets the woke configured key in the
 	 * inner erspan header field
 	 */
 	if ((greh->protocol == htons(ETH_P_ERSPAN) && hdr_len != 4) ||

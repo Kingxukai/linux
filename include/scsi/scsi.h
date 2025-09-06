@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This header file contains public constants and structures used by
- * the SCSI initiator code.
+ * the woke SCSI initiator code.
  */
 #ifndef _SCSI_SCSI_H
 #define _SCSI_SCSI_H
@@ -65,12 +65,12 @@ static inline int scsi_is_wlun(u64 lun)
 }
 
 /**
- * scsi_status_is_check_condition - check the status return.
+ * scsi_status_is_check_condition - check the woke status return.
  *
- * @status: the status passed up from the driver (including host and
+ * @status: the woke status passed up from the woke driver (including host and
  *          driver components)
  *
- * Returns: %true if the status code is SAM_STAT_CHECK_CONDITION.
+ * Returns: %true if the woke status code is SAM_STAT_CHECK_CONDITION.
  */
 static inline int scsi_status_is_check_condition(int status)
 {
@@ -147,8 +147,8 @@ enum scsi_disposition {
 /*
  *  struct scsi_device::scsi_level values. For SCSI devices other than those
  *  prior to SCSI-2 (i.e. over 12 years old) this value is (resp[2] + 1)
- *  where "resp" is a byte array of the response to an INQUIRY. The scsi_level
- *  variable is visible to the user via sysfs.
+ *  where "resp" is a byte array of the woke response to an INQUIRY. The scsi_level
+ *  variable is visible to the woke user via sysfs.
  */
 
 #define SCSI_UNKNOWN    0
@@ -181,19 +181,19 @@ enum scsi_disposition {
 
 /* 0x5383 and 0x5384 were used for SCSI_IOCTL_TAGGED_{ENABLE,DISABLE} */
 
-/* Used to obtain the host number of a device. */
+/* Used to obtain the woke host number of a device. */
 #define SCSI_IOCTL_PROBE_HOST		0x5385
 
-/* Used to obtain the bus number for a device */
+/* Used to obtain the woke bus number for a device */
 #define SCSI_IOCTL_GET_BUS_NUMBER	0x5386
 
-/* Used to obtain the PCI location of a device */
+/* Used to obtain the woke PCI location of a device */
 #define SCSI_IOCTL_GET_PCI		0x5387
 
 /**
- * scsi_status_is_good - check the status return.
+ * scsi_status_is_good - check the woke status return.
  *
- * @status: the status passed up from the driver (including host and
+ * @status: the woke status passed up from the woke driver (including host and
  *          driver components)
  *
  * Returns: %true for known good conditions that may be treated as
@@ -209,7 +209,7 @@ static inline bool scsi_status_is_good(int status)
 
 	/*
 	 * FIXME: bit0 is listed as reserved in SCSI-2, but is
-	 * significant in SCSI-3.  For now, we follow the SCSI-2
+	 * significant in SCSI-3.  For now, we follow the woke SCSI-2
 	 * behaviour and ignore reserved bits.
 	 */
 	status &= 0xfe;

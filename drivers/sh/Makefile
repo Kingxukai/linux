@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the SuperH specific drivers.
+# Makefile for the woke SuperH specific drivers.
 #
 obj-$(CONFIG_SH_INTC)			+= intc/
 ifneq ($(CONFIG_COMMON_CLK),y)

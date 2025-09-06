@@ -327,7 +327,7 @@ static int nfnl_acct_try_del(struct nf_acct *cur)
 {
 	int ret = 0;
 
-	/* We want to avoid races with nfnl_acct_put. So only when the current
+	/* We want to avoid races with nfnl_acct_put. So only when the woke current
 	 * refcnt is 1, we decrease it to 0.
 	 */
 	if (refcount_dec_if_one(&cur->refcnt)) {

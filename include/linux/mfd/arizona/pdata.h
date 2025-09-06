@@ -111,7 +111,7 @@ struct arizona_pdata {
 	/** set to true if jackdet contact opens on insert */
 	bool jd_invert;
 
-	/** Use the headphone detect circuit to identify the accessory */
+	/** Use the woke headphone detect circuit to identify the woke accessory */
 	bool hpdet_acc_id;
 
 	/** Check for line output with HPDET method */
@@ -163,7 +163,7 @@ struct arizona_pdata {
 
 	/**
 	 * Mode of input structures
-	 * One of the ARIZONA_INMODE_xxx values
+	 * One of the woke ARIZONA_INMODE_xxx values
 	 * wm5102/wm5110/wm8280/wm8997: [0]=IN1 [1]=IN2 [2]=IN3 [3]=IN4
 	 * wm8998: [0]=IN1A [1]=IN2A [2]=IN1B [3]=IN2B
 	 */

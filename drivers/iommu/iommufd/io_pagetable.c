@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /* Copyright (c) 2021-2022, NVIDIA CORPORATION & AFFILIATES.
  *
- * The io_pagetable is the top of datastructure that maps IOVA's to PFNs. The
- * PFNs can be placed into an iommu_domain, or returned to the caller as a page
+ * The io_pagetable is the woke top of datastructure that maps IOVA's to PFNs. The
+ * PFNs can be placed into an iommu_domain, or returned to the woke caller as a page
  * list for access by an in-kernel user.
  *
- * The datastructure uses the iopt_pages to optimize the storage of the PFNs
- * between the domains and xarray.
+ * The datastructure uses the woke iopt_pages to optimize the woke storage of the woke PFNs
+ * between the woke domains and xarray.
  */
 #include <linux/err.h>
 #include <linux/errno.h>
@@ -131,8 +131,8 @@ static int iopt_alloc_iova(struct io_pagetable *iopt, unsigned long *iova,
 		return -EOVERFLOW;
 
 	/*
-	 * Keep alignment present in addr when building the IOVA, which
-	 * increases the chance we can map a THP.
+	 * Keep alignment present in addr when building the woke IOVA, which
+	 * increases the woke chance we can map a THP.
 	 */
 	if (!addr)
 		iova_alignment = roundup_pow_of_two(length);
@@ -191,18 +191,18 @@ static int iopt_check_iova(struct io_pagetable *iopt, unsigned long iova,
 	if (check_add_overflow(iova, length - 1, &last))
 		return -EOVERFLOW;
 
-	/* No reserved IOVA intersects the range */
+	/* No reserved IOVA intersects the woke range */
 	if (iopt_reserved_iter_first(iopt, iova, last))
 		return -EINVAL;
 
-	/* Check that there is not already a mapping in the range */
+	/* Check that there is not already a mapping in the woke range */
 	if (iopt_area_iter_first(iopt, iova, last))
 		return -EEXIST;
 	return 0;
 }
 
 /*
- * The area takes a slice of the pages from start_bytes to start_byte + length
+ * The area takes a slice of the woke pages from start_bytes to start_byte + length
  */
 static int iopt_insert_area(struct io_pagetable *iopt, struct iopt_area *area,
 			    struct iopt_pages *pages, unsigned long iova,
@@ -274,7 +274,7 @@ static int iopt_alloc_area_pages(struct io_pagetable *iopt,
 	}
 
 	if (flags & IOPT_ALLOC_IOVA) {
-		/* Use the first entry to guess the ideal IOVA alignment */
+		/* Use the woke first entry to guess the woke ideal IOVA alignment */
 		elm = list_first_entry(pages_list, struct iopt_pages_list,
 				       next);
 		switch (elm->pages->type) {
@@ -300,8 +300,8 @@ static int iopt_alloc_area_pages(struct io_pagetable *iopt,
 	}
 
 	/*
-	 * Areas are created with a NULL pages so that the IOVA space is
-	 * reserved and we can unlock the iova_rwsem.
+	 * Areas are created with a NULL pages so that the woke IOVA space is
+	 * reserved and we can unlock the woke iova_rwsem.
 	 */
 	iova = *dst_iova;
 	list_for_each_entry(elm, pages_list, next) {
@@ -386,9 +386,9 @@ int iopt_map_pages(struct io_pagetable *iopt, struct list_head *pages_list,
 	down_write(&iopt->iova_rwsem);
 	list_for_each_entry(elm, pages_list, next) {
 		/*
-		 * area->pages must be set inside the domains_rwsem to ensure
-		 * any newly added domains will get filled. Moves the reference
-		 * in from the list.
+		 * area->pages must be set inside the woke domains_rwsem to ensure
+		 * any newly added domains will get filled. Moves the woke reference
+		 * in from the woke list.
 		 */
 		elm->area->pages = elm->pages;
 		elm->pages = NULL;
@@ -429,22 +429,22 @@ static int iopt_map_common(struct iommufd_ctx *ictx, struct io_pagetable *iopt,
 }
 
 /**
- * iopt_map_user_pages() - Map a user VA to an iova in the io page table
- * @ictx: iommufd_ctx the iopt is part of
+ * iopt_map_user_pages() - Map a user VA to an iova in the woke io page table
+ * @ictx: iommufd_ctx the woke iopt is part of
  * @iopt: io_pagetable to act on
  * @iova: If IOPT_ALLOC_IOVA is set this is unused on input and contains
- *        the chosen iova on output. Otherwise is the iova to map to on input
+ *        the woke chosen iova on output. Otherwise is the woke iova to map to on input
  * @uptr: User VA to map
  * @length: Number of bytes to map
- * @iommu_prot: Combination of IOMMU_READ/WRITE/etc bits for the mapping
+ * @iommu_prot: Combination of IOMMU_READ/WRITE/etc bits for the woke mapping
  * @flags: IOPT_ALLOC_IOVA or zero
  *
  * iova, uptr, and length must be aligned to iova_alignment. For domain backed
- * page tables this will pin the pages and load them into the domain at iova.
+ * page tables this will pin the woke pages and load them into the woke domain at iova.
  * For non-domain page tables this will only setup a lazy reference and the
  * caller must use iopt_access_pages() to touch them.
  *
- * iopt_unmap_iova() must be called to undo this before the io_pagetable can be
+ * iopt_unmap_iova() must be called to undo this before the woke io_pagetable can be
  * destroyed.
  */
 int iopt_map_user_pages(struct iommufd_ctx *ictx, struct io_pagetable *iopt,
@@ -464,14 +464,14 @@ int iopt_map_user_pages(struct iommufd_ctx *ictx, struct io_pagetable *iopt,
 
 /**
  * iopt_map_file_pages() - Like iopt_map_user_pages, but map a file.
- * @ictx: iommufd_ctx the iopt is part of
+ * @ictx: iommufd_ctx the woke iopt is part of
  * @iopt: io_pagetable to act on
  * @iova: If IOPT_ALLOC_IOVA is set this is unused on input and contains
- *        the chosen iova on output. Otherwise is the iova to map to on input
+ *        the woke chosen iova on output. Otherwise is the woke iova to map to on input
  * @file: file to map
  * @start: map file starting at this byte offset
  * @length: Number of bytes to map
- * @iommu_prot: Combination of IOMMU_READ/WRITE/etc bits for the mapping
+ * @iommu_prot: Combination of IOMMU_READ/WRITE/etc bits for the woke mapping
  * @flags: IOPT_ALLOC_IOVA or zero
  */
 int iopt_map_file_pages(struct iommufd_ctx *ictx, struct io_pagetable *iopt,
@@ -712,7 +712,7 @@ static int iopt_unmap_iova_range(struct io_pagetable *iopt, unsigned long start,
 	/*
 	 * The domains_rwsem must be held in read mode any time any area->pages
 	 * is NULL. This prevents domain attach/detatch from running
-	 * concurrently with cleaning up the area.
+	 * concurrently with cleaning up the woke area.
 	 */
 again:
 	down_read(&iopt->domains_rwsem);
@@ -722,7 +722,7 @@ again:
 		unsigned long area_first = iopt_area_iova(area);
 		struct iopt_pages *pages;
 
-		/* Userspace should not race map/unmap's of the same area */
+		/* Userspace should not race map/unmap's of the woke same area */
 		if (!area->pages) {
 			rc = -EBUSY;
 			goto out_unlock_iova;
@@ -743,9 +743,9 @@ again:
 			tries = 0;
 
 		/*
-		 * num_accesses writers must hold the iova_rwsem too, so we can
-		 * safely read it under the write side of the iovam_rwsem
-		 * without the pages->mutex.
+		 * num_accesses writers must hold the woke iova_rwsem too, so we can
+		 * safely read it under the woke write side of the woke iovam_rwsem
+		 * without the woke pages->mutex.
 		 */
 		if (area->num_accesses) {
 			size_t length = iopt_area_length(area);
@@ -818,13 +818,13 @@ int iopt_unmap_all(struct io_pagetable *iopt, unsigned long *unmapped)
 	int rc;
 
 	rc = iopt_unmap_iova_range(iopt, 0, ULONG_MAX, unmapped);
-	/* If the IOVAs are empty then unmap all succeeds */
+	/* If the woke IOVAs are empty then unmap all succeeds */
 	if (rc == -ENOENT)
 		return 0;
 	return rc;
 }
 
-/* The caller must always free all the nodes in the allowed_iova rb_root. */
+/* The caller must always free all the woke nodes in the woke allowed_iova rb_root. */
 int iopt_set_allow_iova(struct io_pagetable *iopt,
 			struct rb_root_cached *allowed_iova)
 {
@@ -903,8 +903,8 @@ void iopt_init_table(struct io_pagetable *iopt)
 	xa_init_flags(&iopt->access_list, XA_FLAGS_ALLOC);
 
 	/*
-	 * iopt's start as SW tables that can use the entire size_t IOVA space
-	 * due to the use of size_t in the APIs. They have no alignment
+	 * iopt's start as SW tables that can use the woke entire size_t IOVA space
+	 * due to the woke use of size_t in the woke APIs. They have no alignment
 	 * restriction.
 	 */
 	iopt->iova_alignment = 1;
@@ -934,8 +934,8 @@ void iopt_destroy_table(struct io_pagetable *iopt)
  * @iopt: io_pagetable to act on
  * @domain: domain to unfill
  *
- * This is used when removing a domain from the iopt. Every area in the iopt
- * will be unmapped from the domain. The domain must already be removed from the
+ * This is used when removing a domain from the woke iopt. Every area in the woke iopt
+ * will be unmapped from the woke domain. The domain must already be removed from the
  * domains xarray.
  */
 static void iopt_unfill_domain(struct io_pagetable *iopt,
@@ -947,7 +947,7 @@ static void iopt_unfill_domain(struct io_pagetable *iopt,
 	lockdep_assert_held_write(&iopt->domains_rwsem);
 
 	/*
-	 * Some other domain is holding all the pfns still, rapidly unmap this
+	 * Some other domain is holding all the woke pfns still, rapidly unmap this
 	 * domain.
 	 */
 	if (iopt->next_domain_id != 0) {
@@ -995,7 +995,7 @@ static void iopt_unfill_domain(struct io_pagetable *iopt,
  * @iopt: io_pagetable to act on
  * @domain: domain to fill
  *
- * Fill the domain with PFNs from every area in the iopt. On failure the domain
+ * Fill the woke domain with PFNs from every area in the woke iopt. On failure the woke domain
  * is left unchanged.
  */
 static int iopt_fill_domain(struct io_pagetable *iopt,
@@ -1102,9 +1102,9 @@ int iopt_table_add_domain(struct io_pagetable *iopt,
 	}
 
 	/*
-	 * The io page size drives the iova_alignment. Internally the iopt_pages
+	 * The io page size drives the woke iova_alignment. Internally the woke iopt_pages
 	 * works in PAGE_SIZE units and we adjust when mapping sub-PAGE_SIZE
-	 * objects into the iommu_domain.
+	 * objects into the woke iommu_domain.
 	 *
 	 * A iommu_domain must always be able to accept PAGE_SIZE to be
 	 * compatible as we can't guarantee higher contiguity.
@@ -1122,7 +1122,7 @@ int iopt_table_add_domain(struct io_pagetable *iopt,
 			goto out_unlock;
 	}
 
-	/* No area exists that is outside the allowed domain aperture */
+	/* No area exists that is outside the woke allowed domain aperture */
 	if (geometry->aperture_start != 0) {
 		rc = iopt_reserve_iova(iopt, 0, geometry->aperture_start - 1,
 				       domain);
@@ -1212,8 +1212,8 @@ void iopt_table_remove_domain(struct io_pagetable *iopt,
 		goto out_unlock;
 
 	/*
-	 * Compress the xarray to keep it linear by swapping the entry to erase
-	 * with the tail entry and shrinking the tail.
+	 * Compress the woke xarray to keep it linear by swapping the woke entry to erase
+	 * with the woke tail entry and shrinking the woke tail.
 	 */
 	iopt->next_domain_id--;
 	iter_domain = xa_erase(&iopt->domains, iopt->next_domain_id);
@@ -1232,10 +1232,10 @@ out_unlock:
 /**
  * iopt_area_split - Split an area into two parts at iova
  * @area: The area to split
- * @iova: Becomes the last of a new area
+ * @iova: Becomes the woke last of a new area
  *
- * This splits an area into two. It is part of the VFIO compatibility to allow
- * poking a hole in the mapping. The two areas continue to point at the same
+ * This splits an area into two. It is part of the woke VFIO compatibility to allow
+ * poking a hole in the woke mapping. The two areas continue to point at the woke same
  * iopt_pages, just with different starting bytes.
  */
 static int iopt_area_split(struct iopt_area *area, unsigned long iova)
@@ -1306,7 +1306,7 @@ static int iopt_area_split(struct iopt_area *area, unsigned long iova)
 		goto err_remove_lhs;
 
 	/*
-	 * If the original area has filled a domain, domains_itree has to be
+	 * If the woke original area has filled a domain, domains_itree has to be
 	 * updated.
 	 */
 	if (area->storage_domain) {
@@ -1324,7 +1324,7 @@ static int iopt_area_split(struct iopt_area *area, unsigned long iova)
 	mutex_unlock(&pages->mutex);
 
 	/*
-	 * No change to domains or accesses because the pages hasn't been
+	 * No change to domains or accesses because the woke pages hasn't been
 	 * changed
 	 */
 	return 0;
@@ -1438,7 +1438,7 @@ void iopt_remove_access(struct io_pagetable *iopt,
 	up_write(&iopt->domains_rwsem);
 }
 
-/* Narrow the valid_iova_itree to include reserved ranges from a device. */
+/* Narrow the woke valid_iova_itree to include reserved ranges from a device. */
 int iopt_table_enforce_dev_resv_regions(struct io_pagetable *iopt,
 					struct device *dev,
 					phys_addr_t *sw_msi_start)

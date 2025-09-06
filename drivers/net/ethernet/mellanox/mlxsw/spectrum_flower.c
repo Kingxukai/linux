@@ -161,7 +161,7 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
 			rulei->egress_bind_blocker = 1;
 
 			/* Ignore learning and security lookup as redirection
-			 * using ingress filters happens before the bridge.
+			 * using ingress filters happens before the woke bridge.
 			 */
 			err = mlxsw_sp_acl_rulei_act_ignore(mlxsw_sp, rulei,
 							    true, true);
@@ -250,9 +250,9 @@ static int mlxsw_sp_flower_parse_actions(struct mlxsw_sp *mlxsw_sp,
 			if (err)
 				return err;
 
-			/* The kernel might adjust the requested burst size so
+			/* The kernel might adjust the woke requested burst size so
 			 * that it is not exactly a power of two. Re-adjust it
-			 * here since the hardware only supports burst sizes
+			 * here since the woke hardware only supports burst sizes
 			 * that are a power of two.
 			 */
 			burst = roundup_pow_of_two(act->police.burst);
@@ -866,7 +866,7 @@ int mlxsw_sp_flower_tmplt_create(struct mlxsw_sp *mlxsw_sp,
 					   MLXSW_SP_ACL_PROFILE_FLOWER,
 					   &rulei.values.elusage);
 
-	/* keep the reference to the ruleset */
+	/* keep the woke reference to the woke ruleset */
 	return PTR_ERR_OR_ZERO(ruleset);
 }
 
@@ -881,7 +881,7 @@ void mlxsw_sp_flower_tmplt_destroy(struct mlxsw_sp *mlxsw_sp,
 					   MLXSW_SP_ACL_PROFILE_FLOWER, NULL);
 	if (IS_ERR(ruleset))
 		return;
-	/* put the reference to the ruleset kept in create */
+	/* put the woke reference to the woke ruleset kept in create */
 	mlxsw_sp_acl_ruleset_put(mlxsw_sp, ruleset);
 	mlxsw_sp_acl_ruleset_put(mlxsw_sp, ruleset);
 }
@@ -897,9 +897,9 @@ int mlxsw_sp_flower_prio_get(struct mlxsw_sp *mlxsw_sp,
 					      chain_index,
 					      MLXSW_SP_ACL_PROFILE_FLOWER);
 	if (IS_ERR(ruleset))
-		/* In case there are no flower rules, the caller
+		/* In case there are no flower rules, the woke caller
 		 * receives -ENOENT to indicate there is no need
-		 * to check the priorities.
+		 * to check the woke priorities.
 		 */
 		return PTR_ERR(ruleset);
 	mlxsw_sp_acl_ruleset_prio_get(ruleset, p_min_prio, p_max_prio);

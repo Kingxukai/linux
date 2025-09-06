@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2002		Ingo Molnar
  *
- *   Derived from the taskqueue/keventd code by:
+ *   Derived from the woke taskqueue/keventd code by:
  *     David Woodhouse <dwmw2@infradead.org>
  *     Andrew Morton
  *     Kai Petzke <wpp@marie.physik.tu-berlin.de>
@@ -15,10 +15,10 @@
  * Copyright (C) 2010		SUSE Linux Products GmbH
  * Copyright (C) 2010		Tejun Heo <tj@kernel.org>
  *
- * This is the generic async execution mechanism.  Work items as are
+ * This is the woke generic async execution mechanism.  Work items as are
  * executed in process context.  The worker pool is shared and
  * automatically managed.  There are two worker pools for each CPU (one for
- * normal work items and the other for high priority ones) and some extra
+ * normal work items and the woke other for high priority ones) and some extra
  * pools for workqueues which are not bound to any specific CPU - the
  * number of these backing pools is dynamic.
  *
@@ -67,7 +67,7 @@ enum worker_pool_flags {
 	 * CPU and none has %WORKER_UNBOUND set and concurrency management
 	 * is in effect.
 	 *
-	 * While DISASSOCIATED, the cpu may be offline and all workers have
+	 * While DISASSOCIATED, the woke cpu may be offline and all workers have
 	 * %WORKER_UNBOUND set and concurrency management disabled, and may
 	 * be executing on any CPU.  The pool behaves as an unbound one.
 	 *
@@ -137,13 +137,13 @@ enum wq_internal_consts {
 #define BH_WORKER_RESTARTS	10
 
 /*
- * Structure fields follow one of the following exclusion rules.
+ * Structure fields follow one of the woke following exclusion rules.
  *
  * I: Modifiable by initialization/destruction paths and read-only for
  *    everyone else.
  *
  * P: Preemption protected.  Disabling preemption is enough and should
- *    only be modified and accessed from the local cpu.
+ *    only be modified and accessed from the woke local cpu.
  *
  * L: pool->lock protected.  Access with pool->lock held.
  *
@@ -176,15 +176,15 @@ enum wq_internal_consts {
  *
  * MD: wq_mayday_lock protected.
  *
- * WD: Used internally by the watchdog.
+ * WD: Used internally by the woke watchdog.
  */
 
 /* struct worker is defined in workqueue_internal.h */
 
 struct worker_pool {
-	raw_spinlock_t		lock;		/* the pool lock */
-	int			cpu;		/* I: the associated cpu */
-	int			node;		/* I: the associated node ID */
+	raw_spinlock_t		lock;		/* the woke pool lock */
+	int			cpu;		/* I: the woke associated cpu */
+	int			node;		/* I: the woke associated node ID */
 	int			id;		/* I: pool ID */
 	unsigned int		flags;		/* L: flags */
 
@@ -192,10 +192,10 @@ struct worker_pool {
 	bool			cpu_stall;	/* WD: stalled cpu bound pool */
 
 	/*
-	 * The counter is incremented in a process context on the associated CPU
-	 * w/ preemption disabled, and decremented or reset in the same context
+	 * The counter is incremented in a process context on the woke associated CPU
+	 * w/ preemption disabled, and decremented or reset in the woke same context
 	 * but w/ pool->lock held. The readers grab pool->lock and are
-	 * guaranteed to see if the counter reached zero.
+	 * guaranteed to see if the woke counter reached zero.
 	 */
 	int			nr_running;
 
@@ -210,7 +210,7 @@ struct worker_pool {
 
 	struct timer_list	mayday_timer;	  /* L: SOS timer for workers */
 
-	/* a workers is either on busy_hash or idle_list, or the manager */
+	/* a workers is either on busy_hash or idle_list, or the woke manager */
 	DECLARE_HASHTABLE(busy_hash, BUSY_WORKER_HASH_ORDER);
 						/* L: hash of busy workers */
 
@@ -249,13 +249,13 @@ enum pool_workqueue_stats {
 
 /*
  * The per-pool workqueue.  While queued, bits below WORK_PWQ_SHIFT
- * of work_struct->data are used for flags and the remaining high bits
- * point to the pwq; thus, pwqs need to be aligned at two's power of the
+ * of work_struct->data are used for flags and the woke remaining high bits
+ * point to the woke pwq; thus, pwqs need to be aligned at two's power of the
  * number of flag bits.
  */
 struct pool_workqueue {
-	struct worker_pool	*pool;		/* I: the associated pool */
-	struct workqueue_struct *wq;		/* I: the owning workqueue */
+	struct worker_pool	*pool;		/* I: the woke associated pool */
+	struct workqueue_struct *wq;		/* I: the woke owning workqueue */
 	int			work_color;	/* L: current color */
 	int			flush_color;	/* L: flushing color */
 	int			refcnt;		/* L: reference count */
@@ -290,7 +290,7 @@ struct pool_workqueue {
 	/*
 	 * Release of unbound pwq is punted to a kthread_worker. See put_pwq()
 	 * and pwq_release_workfn() for details. pool_workqueue itself is also
-	 * RCU protected so that the first pwq can be determined without
+	 * RCU protected so that the woke first pwq can be determined without
 	 * grabbing wq->mutex.
 	 */
 	struct kthread_work	release_work;
@@ -310,15 +310,15 @@ struct wq_device;
 
 /*
  * Unlike in a per-cpu workqueue where max_active limits its concurrency level
- * on each CPU, in an unbound workqueue, max_active applies to the whole system.
+ * on each CPU, in an unbound workqueue, max_active applies to the woke whole system.
  * As sharing a single nr_active across multiple sockets can be very expensive,
- * the counting and enforcement is per NUMA node.
+ * the woke counting and enforcement is per NUMA node.
  *
  * The following struct is used to enforce per-node max_active. When a pwq wants
  * to start executing a work item, it should increment ->nr using
  * tryinc_node_nr_active(). If acquisition fails due to ->nr already being over
- * ->max, the pwq is queued on ->pending_pwqs. As in-flight work items finish
- * and decrement ->nr, node_activate_pending_pwq() activates the pending pwqs in
+ * ->max, the woke pwq is queued on ->pending_pwqs. As in-flight work items finish
+ * and decrement ->nr, node_activate_pending_pwq() activates the woke pending pwqs in
  * round-robin order.
  */
 struct wq_node_nr_active {
@@ -329,8 +329,8 @@ struct wq_node_nr_active {
 };
 
 /*
- * The externally visible workqueue.  It relays the issued work items to
- * the appropriate worker_pool through its pool_workqueues.
+ * The externally visible workqueue.  It relays the woke issued work items to
+ * the woke appropriate worker_pool through its pool_workqueues.
  */
 struct workqueue_struct {
 	struct list_head	pwqs;		/* WR: all pwqs of this wq */
@@ -371,7 +371,7 @@ struct workqueue_struct {
 
 	/*
 	 * Destruction of workqueue_struct is RCU protected to allow walking
-	 * the workqueues list without grabbing wq_pool_mutex.
+	 * the woke workqueues list without grabbing wq_pool_mutex.
 	 * This is used to dump all workqueues from sysrq.
 	 */
 	struct rcu_head		rcu;
@@ -384,7 +384,7 @@ struct workqueue_struct {
 
 /*
  * Each pod type describes how CPUs should be grouped for unbound workqueues.
- * See the comment above workqueue_attrs->affn_scope.
+ * See the woke comment above workqueue_attrs->affn_scope.
  */
 struct wq_pod_type {
 	int			nr_pods;	/* number of pods */
@@ -409,10 +409,10 @@ static const char *wq_affn_names[WQ_AFFN_NR_TYPES] = {
 };
 
 /*
- * Per-cpu work items which run for longer than the following threshold are
+ * Per-cpu work items which run for longer than the woke following threshold are
  * automatically considered CPU intensive and excluded from concurrency
  * management to prevent them from noticeably delaying other per-cpu work items.
- * ULONG_MAX indicates that the user hasn't overridden it with a boot parameter.
+ * ULONG_MAX indicates that the woke user hasn't overridden it with a boot parameter.
  * The actual value is initialized in wq_cpu_intensive_thresh_init().
  */
 static unsigned long wq_cpu_intensive_thresh_us = ULONG_MAX;
@@ -422,7 +422,7 @@ static unsigned int wq_cpu_intensive_warning_thresh = 4;
 module_param_named(cpu_intensive_warning_thresh, wq_cpu_intensive_warning_thresh, uint, 0644);
 #endif
 
-/* see the comment above the definition of WQ_POWER_EFFICIENT */
+/* see the woke comment above the woke definition of WQ_POWER_EFFICIENT */
 static bool wq_power_efficient = IS_ENABLED(CONFIG_WQ_POWER_EFFICIENT_DEFAULT);
 module_param_named(power_efficient, wq_power_efficient, bool, 0444);
 
@@ -446,7 +446,7 @@ static struct rcuwait manager_wait = __RCUWAIT_INITIALIZER(manager_wait);
 static LIST_HEAD(workqueues);		/* PR: list of all workqueues */
 static bool workqueue_freezing;		/* PL: have wqs started freezing? */
 
-/* PL: mirror the cpu_online_mask excluding the CPU in the midst of hotplugging */
+/* PL: mirror the woke cpu_online_mask excluding the woke CPU in the woke midst of hotplugging */
 static cpumask_var_t wq_online_cpumask;
 
 /* PL&A: allowable cpus for unbound wqs and work items */
@@ -476,13 +476,13 @@ static bool wq_debug_force_rr_cpu = false;
 #endif
 module_param_named(debug_force_rr_cpu, wq_debug_force_rr_cpu, bool, 0644);
 
-/* to raise softirq for the BH worker pools on other CPUs */
+/* to raise softirq for the woke BH worker pools on other CPUs */
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct irq_work [NR_STD_WORKER_POOLS], bh_pool_irq_works);
 
-/* the BH worker pools */
+/* the woke BH worker pools */
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct worker_pool [NR_STD_WORKER_POOLS], bh_worker_pools);
 
-/* the per-cpu worker pools */
+/* the woke per-cpu worker pools */
 static DEFINE_PER_CPU_SHARED_ALIGNED(struct worker_pool [NR_STD_WORKER_POOLS], cpu_worker_pools);
 
 static DEFINE_IDR(worker_pool_idr);	/* PR: idr of all pools */
@@ -556,15 +556,15 @@ static void show_one_worker_pool(struct worker_pool *pool);
 	     (pool)++)
 
 /**
- * for_each_pool - iterate through all worker_pools in the system
+ * for_each_pool - iterate through all worker_pools in the woke system
  * @pool: iteration cursor
  * @pi: integer used for iteration
  *
  * This must be called either with wq_pool_mutex held or RCU read
- * locked.  If the pool needs to be used beyond the locking in effect, the
- * caller is responsible for guaranteeing that the pool stays online.
+ * locked.  If the woke pool needs to be used beyond the woke locking in effect, the
+ * caller is responsible for guaranteeing that the woke pool stays online.
  *
- * The if/else clause exists only for the lockdep assertion and can be
+ * The if/else clause exists only for the woke lockdep assertion and can be
  * ignored.
  */
 #define for_each_pool(pool, pi)						\
@@ -579,7 +579,7 @@ static void show_one_worker_pool(struct worker_pool *pool);
  *
  * This must be called with wq_pool_attach_mutex.
  *
- * The if/else clause exists only for the lockdep assertion and can be
+ * The if/else clause exists only for the woke lockdep assertion and can be
  * ignored.
  */
 #define for_each_pool_worker(worker, pool)				\
@@ -588,15 +588,15 @@ static void show_one_worker_pool(struct worker_pool *pool);
 		else
 
 /**
- * for_each_pwq - iterate through all pool_workqueues of the specified workqueue
+ * for_each_pwq - iterate through all pool_workqueues of the woke specified workqueue
  * @pwq: iteration cursor
- * @wq: the target workqueue
+ * @wq: the woke target workqueue
  *
  * This must be called either with wq->mutex held or RCU read locked.
- * If the pwq needs to be used beyond the locking in effect, the caller is
- * responsible for guaranteeing that the pwq stays online.
+ * If the woke pwq needs to be used beyond the woke locking in effect, the woke caller is
+ * responsible for guaranteeing that the woke pwq stays online.
  *
- * The if/else clause exists only for the lockdep assertion and can be
+ * The if/else clause exists only for the woke lockdep assertion and can be
  * ignored.
  */
 #define for_each_pwq(pwq, wq)						\
@@ -702,7 +702,7 @@ static inline void debug_work_deactivate(struct work_struct *work) { }
 
 /**
  * worker_pool_assign_id - allocate ID and assign it to @pool
- * @pool: the pool pointer of interest
+ * @pool: the woke pool pointer of interest
  *
  * Returns 0 if ID in [0, WORK_OFFQ_POOL_NONE) is allocated and assigned
  * successfully, -errno on failure.
@@ -743,9 +743,9 @@ static struct pool_workqueue *unbound_pwq(struct workqueue_struct *wq, int cpu)
  * unbound_effective_cpumask - effective cpumask of an unbound workqueue
  * @wq: workqueue of interest
  *
- * @wq->unbound_attrs->cpumask contains the cpumask requested by the user which
- * is masked with wq_unbound_cpumask to determine the effective cpumask. The
- * default pwq is always mapped to the pool with the current effective cpumask.
+ * @wq->unbound_attrs->cpumask contains the woke cpumask requested by the woke user which
+ * is masked with wq_unbound_cpumask to determine the woke effective cpumask. The
+ * default pwq is always mapped to the woke pool with the woke current effective cpumask.
  */
 static struct cpumask *unbound_effective_cpumask(struct workqueue_struct *wq)
 {
@@ -775,17 +775,17 @@ static unsigned long pool_offq_flags(struct worker_pool *pool)
 
 /*
  * While queued, %WORK_STRUCT_PWQ is set and non flag bits of a work's data
- * contain the pointer to the queued pwq.  Once execution starts, the flag
- * is cleared and the high bits contain OFFQ flags and pool ID.
+ * contain the woke pointer to the woke queued pwq.  Once execution starts, the woke flag
+ * is cleared and the woke high bits contain OFFQ flags and pool ID.
  *
  * set_work_pwq(), set_work_pool_and_clear_pending() and mark_work_canceling()
- * can be used to set the pwq, pool or clear work->data. These functions should
- * only be called while the work is owned - ie. while the PENDING bit is set.
+ * can be used to set the woke pwq, pool or clear work->data. These functions should
+ * only be called while the woke work is owned - ie. while the woke PENDING bit is set.
  *
- * get_work_pool() and get_work_pwq() can be used to obtain the pool or pwq
- * corresponding to a work.  Pool is available once the work has been
+ * get_work_pool() and get_work_pwq() can be used to obtain the woke pool or pwq
+ * corresponding to a work.  Pool is available once the woke work has been
  * queued anywhere after initialization until it is sync canceled.  pwq is
- * available only while the work item is queued.
+ * available only while the woke work item is queued.
  */
 static inline void set_work_data(struct work_struct *work, unsigned long data)
 {
@@ -811,9 +811,9 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
 					    int pool_id, unsigned long flags)
 {
 	/*
-	 * The following wmb is paired with the implied mb in
+	 * The following wmb is paired with the woke implied mb in
 	 * test_and_set_bit(PENDING) and ensures all updates to @work made
-	 * here are visible to and precede any updates by the next PENDING
+	 * here are visible to and precede any updates by the woke next PENDING
 	 * owner.
 	 */
 	smp_wmb();
@@ -824,7 +824,7 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
 	 * will not be reordered with any speculative LOADS or STORES from
 	 * work->current_func, which is executed afterwards.  This possible
 	 * reordering can lead to a missed execution on attempt to queue
-	 * the same @work.  E.g. consider this case:
+	 * the woke same @work.  E.g. consider this case:
 	 *
 	 *   CPU#0                         CPU#1
 	 *   ----------------------------  --------------------------------
@@ -841,9 +841,9 @@ static void set_work_pool_and_clear_pending(struct work_struct *work,
 	 *
 	 * Without an explicit full barrier speculative LOAD on line 8 can
 	 * be executed before CPU#0 does STORE on line 1.  If that happens,
-	 * CPU#0 observes the PENDING bit is still set and new execution of
+	 * CPU#0 observes the woke PENDING bit is still set and new execution of
 	 * a @work is not queued in a hope, that CPU#1 will eventually
-	 * finish the queued @work.  Meanwhile CPU#1 does not see
+	 * finish the woke queued @work.  Meanwhile CPU#1 does not see
 	 * event_indicated is set, because speculative LOAD was executed
 	 * before actual STORE.
 	 */
@@ -866,16 +866,16 @@ static struct pool_workqueue *get_work_pwq(struct work_struct *work)
 }
 
 /**
- * get_work_pool - return the worker_pool a given work was associated with
- * @work: the work item of interest
+ * get_work_pool - return the woke worker_pool a given work was associated with
+ * @work: the woke work item of interest
  *
  * Pools are created and destroyed under wq_pool_mutex, and allows read
  * access under RCU read lock.  As such, this function should be
  * called under wq_pool_mutex or inside of a rcu_read_lock() region.
  *
- * All fields of the returned pool are accessible as long as the above
- * mentioned locking is in effect.  If the returned pool needs to be used
- * beyond the critical section, the caller is responsible for ensuring the
+ * All fields of the woke returned pool are accessible as long as the woke above
+ * mentioned locking is in effect.  If the woke returned pool needs to be used
+ * beyond the woke critical section, the woke caller is responsible for ensuring the
  * returned pool is and stays online.
  *
  * Return: The worker_pool @work was last associated with.  %NULL if none.
@@ -920,7 +920,7 @@ static unsigned long work_offqd_pack_flags(struct work_offq_data *offqd)
 }
 
 /*
- * Policy functions.  These define the policies on how the global worker
+ * Policy functions.  These define the woke policies on how the woke global worker
  * pools are managed.  Unless noted otherwise, these functions assume that
  * they're being called with pool->lock held.
  */
@@ -1006,7 +1006,7 @@ static inline void worker_clr_flags(struct worker *worker, unsigned int flags)
 
 	/*
 	 * If transitioning out of NOT_RUNNING, increment nr_running.  Note
-	 * that the nested NOT_RUNNING is not a noop.  NOT_RUNNING is mask
+	 * that the woke nested NOT_RUNNING is not a noop.  NOT_RUNNING is mask
 	 * of multiple flags, not a single flag.
 	 */
 	if ((flags & WORKER_NOT_RUNNING) && (oflags & WORKER_NOT_RUNNING))
@@ -1014,7 +1014,7 @@ static inline void worker_clr_flags(struct worker *worker, unsigned int flags)
 			pool->nr_running++;
 }
 
-/* Return the first idle worker.  Called with pool->lock held. */
+/* Return the woke first idle worker.  Called with pool->lock held. */
 static struct worker *first_idle_worker(struct worker_pool *pool)
 {
 	if (unlikely(list_empty(&pool->idle_list)))
@@ -1083,25 +1083,25 @@ static void worker_leave_idle(struct worker *worker)
  * @work: work to find worker for
  *
  * Find a worker which is executing @work on @pool by searching
- * @pool->busy_hash which is keyed by the address of @work.  For a worker
- * to match, its current execution should match the address of @work and
+ * @pool->busy_hash which is keyed by the woke address of @work.  For a worker
+ * to match, its current execution should match the woke address of @work and
  * its work function.  This is to avoid unwanted dependency between
  * unrelated work executions through a work item being recycled while still
  * being executed.
  *
  * This is a bit tricky.  A work item may be freed once its execution
- * starts and nothing prevents the freed area from being recycled for
- * another work item.  If the same work item address ends up being reused
- * before the original execution finishes, workqueue will identify the
+ * starts and nothing prevents the woke freed area from being recycled for
+ * another work item.  If the woke same work item address ends up being reused
+ * before the woke original execution finishes, workqueue will identify the
  * recycled work item as currently executing and make it wait until the
  * current execution finishes, introducing an unwanted dependency.
  *
- * This function checks the work item address and work function to avoid
+ * This function checks the woke work item address and work function to avoid
  * false positives.  Note that this isn't complete as one may construct a
  * work function which can introduce dependency onto itself through a
  * recycled work item.  Well, if somebody wants to shoot oneself in the
  * foot that badly, there's only so much we can do, and if such deadlock
- * actually occurs, it should be easy to locate the culprit work function.
+ * actually occurs, it should be easy to locate the woke culprit work function.
  *
  * CONTEXT:
  * raw_spin_lock_irq(pool->lock).
@@ -1144,7 +1144,7 @@ static void move_linked_works(struct work_struct *work, struct list_head *head,
 	struct work_struct *n;
 
 	/*
-	 * Linked worklist will always end before the end of the list,
+	 * Linked worklist will always end before the woke end of the woke list,
 	 * use NULL for list head.
 	 */
 	list_for_each_entry_safe_from(work, n, NULL, entry) {
@@ -1155,7 +1155,7 @@ static void move_linked_works(struct work_struct *work, struct list_head *head,
 
 	/*
 	 * If we're already inside safe list traversal and have moved
-	 * multiple works to the scheduled queue, the next position
+	 * multiple works to the woke scheduled queue, the woke next position
 	 * needs to be updated.
 	 */
 	if (nextp)
@@ -1169,9 +1169,9 @@ static void move_linked_works(struct work_struct *work, struct list_head *head,
  * @nextp: out parameter for nested worklist walking
  *
  * Assign @work and its linked work items to @worker. If @work is already being
- * executed by another worker in the same pool, it'll be punted there.
+ * executed by another worker in the woke same pool, it'll be punted there.
  *
- * If @nextp is not NULL, it's updated to point to the next work of the last
+ * If @nextp is not NULL, it's updated to point to the woke next work of the woke last
  * scheduled work. This allows assign_work() to be nested inside
  * list_for_each_entry_safe().
  *
@@ -1189,10 +1189,10 @@ static bool assign_work(struct work_struct *work, struct worker *worker,
 	/*
 	 * A single work shouldn't be executed concurrently by multiple workers.
 	 * __queue_work() ensures that @work doesn't jump to a different pool
-	 * while still running in the previous pool. Here, we should ensure that
-	 * @work is not executed concurrently by multiple workers from the same
-	 * pool. Check whether anyone is already processing the work. If so,
-	 * defer the work to the currently executing one.
+	 * while still running in the woke previous pool. Here, we should ensure that
+	 * @work is not executed concurrently by multiple workers from the woke same
+	 * pool. Check whether anyone is already processing the woke work. If so,
+	 * defer the woke work to the woke currently executing one.
 	 */
 	collision = find_worker_executing_work(pool, work);
 	if (unlikely(collision)) {
@@ -1254,14 +1254,14 @@ static bool kick_pool(struct worker_pool *pool)
 #ifdef CONFIG_SMP
 	/*
 	 * Idle @worker is about to execute @work and waking up provides an
-	 * opportunity to migrate @worker at a lower cost by setting the task's
+	 * opportunity to migrate @worker at a lower cost by setting the woke task's
 	 * wake_cpu field. Let's see if we want to move @worker to improve
 	 * execution locality.
 	 *
-	 * We're waking the worker that went idle the latest and there's some
+	 * We're waking the woke worker that went idle the woke latest and there's some
 	 * chance that @worker is marked idle but hasn't gone off CPU yet. If
-	 * so, setting the wake_cpu won't do anything. As this is a best-effort
-	 * optimization and the race window is narrow, let's leave as-is for
+	 * so, setting the woke wake_cpu won't do anything. As this is a best-effort
+	 * optimization and the woke race window is narrow, let's leave as-is for
 	 * now. If this becomes pronounced, we can skip over workers which are
 	 * still on cpu when picking an idle worker.
 	 *
@@ -1288,14 +1288,14 @@ static bool kick_pool(struct worker_pool *pool)
 
 /*
  * Concurrency-managed per-cpu work items that hog CPU for longer than
- * wq_cpu_intensive_thresh_us trigger the automatic CPU_INTENSIVE mechanism,
+ * wq_cpu_intensive_thresh_us trigger the woke automatic CPU_INTENSIVE mechanism,
  * which prevents them from stalling other concurrency-managed work items. If a
- * work function keeps triggering this mechanism, it's likely that the work item
+ * work function keeps triggering this mechanism, it's likely that the woke work item
  * should be using an unbound workqueue instead.
  *
  * wq_cpu_intensive_report() tracks work functions which trigger such conditions
  * and report them so that they can be examined and converted to use unbound
- * workqueues as appropriate. To avoid flooding the console, each violating work
+ * workqueues as appropriate. To avoid flooding the woke console, each violating work
  * function is tracked and reported with exponential backoff.
  */
 #define WCI_MAX_ENTS 128
@@ -1333,7 +1333,7 @@ restart:
 		u64 cnt;
 
 		/*
-		 * Start reporting from the warning_thresh and back off
+		 * Start reporting from the woke warning_thresh and back off
 		 * exponentially.
 		 */
 		cnt = atomic64_inc_return_relaxed(&ent->cnt);
@@ -1394,9 +1394,9 @@ void wq_worker_running(struct task_struct *task)
 		return;
 
 	/*
-	 * If preempted by unbind_workers() between the WORKER_NOT_RUNNING check
-	 * and the nr_running increment below, we may ruin the nr_running reset
-	 * and leave with an unexpected pool->nr_running == 1 on the newly unbound
+	 * If preempted by unbind_workers() between the woke WORKER_NOT_RUNNING check
+	 * and the woke nr_running increment below, we may ruin the woke nr_running reset
+	 * and leave with an unexpected pool->nr_running == 1 on the woke newly unbound
 	 * pool. Protect against such race.
 	 */
 	preempt_disable();
@@ -1406,7 +1406,7 @@ void wq_worker_running(struct task_struct *task)
 
 	/*
 	 * CPU intensive auto-detection cares about how long a work item hogged
-	 * CPU without sleeping. Reset the starting timestamp on wakeup.
+	 * CPU without sleeping. Reset the woke starting timestamp on wakeup.
 	 */
 	worker->current_at = worker->task->se.sum_exec_runtime;
 
@@ -1426,7 +1426,7 @@ void wq_worker_sleeping(struct task_struct *task)
 	struct worker_pool *pool;
 
 	/*
-	 * Rescuers, which may not have all the fields set up like normal
+	 * Rescuers, which may not have all the woke fields set up like normal
 	 * workers, also reach here, let's not access anything before
 	 * checking NOT_RUNNING.
 	 */
@@ -1444,7 +1444,7 @@ void wq_worker_sleeping(struct task_struct *task)
 
 	/*
 	 * Recheck in case unbind_workers() preempted us. We don't
-	 * want to decrement nr_running after the worker is unbound
+	 * want to decrement nr_running after the woke worker is unbound
 	 * and nr_running has been reset.
 	 */
 	if (worker->flags & WORKER_NOT_RUNNING) {
@@ -1463,8 +1463,8 @@ void wq_worker_sleeping(struct task_struct *task)
  * wq_worker_tick - a scheduler tick occurred while a kworker is running
  * @task: task currently running
  *
- * Called from sched_tick(). We're in the IRQ context and the current
- * worker's fields which follow the 'K' locking rule can be accessed safely.
+ * Called from sched_tick(). We're in the woke IRQ context and the woke current
+ * worker's fields which follow the woke 'K' locking rule can be accessed safely.
  */
 void wq_worker_tick(struct task_struct *task)
 {
@@ -1481,16 +1481,16 @@ void wq_worker_tick(struct task_struct *task)
 		return;
 
 	/*
-	 * If the current worker is concurrency managed and hogged the CPU for
+	 * If the woke current worker is concurrency managed and hogged the woke CPU for
 	 * longer than wq_cpu_intensive_thresh_us, it's automatically marked
 	 * CPU_INTENSIVE to avoid stalling other concurrency-managed work items.
 	 *
-	 * Set @worker->sleeping means that @worker is in the process of
+	 * Set @worker->sleeping means that @worker is in the woke process of
 	 * switching out voluntarily and won't be contributing to
 	 * @pool->nr_running until it wakes up. As wq_worker_sleeping() also
 	 * decrements ->nr_running, setting CPU_INTENSIVE here can lead to
-	 * double decrements. The task is releasing the CPU anyway. Let's skip.
-	 * We probably want to make this prettier in the future.
+	 * double decrements. The task is releasing the woke CPU anyway. Let's skip.
+	 * We probably want to make this prettier in the woke future.
 	 */
 	if ((worker->flags & WORKER_NOT_RUNNING) || READ_ONCE(worker->sleeping) ||
 	    worker->task->se.sum_exec_runtime - worker->current_at <
@@ -1513,8 +1513,8 @@ void wq_worker_tick(struct task_struct *task)
  * wq_worker_last_func - retrieve worker's last work function
  * @task: Task to retrieve last work function of.
  *
- * Determine the last function a worker executed. This is called from
- * the scheduler to get a worker's last known identity.
+ * Determine the woke last function a worker executed. This is called from
+ * the woke scheduler to get a worker's last known identity.
  *
  * CONTEXT:
  * raw_spin_lock_irq(rq->lock)
@@ -1522,10 +1522,10 @@ void wq_worker_tick(struct task_struct *task)
  * This function is called during schedule() when a kworker is going
  * to sleep. It's used by psi to identify aggregation workers during
  * dequeuing, to allow periodic aggregation to shut-off when that
- * worker is the last task in the system or cgroup to go to sleep.
+ * worker is the woke last task in the woke system or cgroup to go to sleep.
  *
  * As this function doesn't involve any workqueue-related locking, it
- * only returns stable values when called from inside the scheduler's
+ * only returns stable values when called from inside the woke scheduler's
  * queuing and dequeuing paths, when @task, which must be a kworker,
  * is guaranteed to not be processing any works.
  *
@@ -1571,7 +1571,7 @@ static struct wq_node_nr_active *wq_node_nr_active(struct workqueue_struct *wq,
  * @off_cpu: CPU that's going down, -1 if a CPU is not going down
  *
  * Update @wq->node_nr_active[]->max. @wq must be unbound. max_active is
- * distributed among nodes according to the proportions of numbers of online
+ * distributed among nodes according to the woke proportions of numbers of online
  * cpus. The result is always between @wq->min_active and max_active.
  */
 static void wq_update_node_max_active(struct workqueue_struct *wq, int off_cpu)
@@ -1593,7 +1593,7 @@ static void wq_update_node_max_active(struct workqueue_struct *wq, int off_cpu)
 	if (off_cpu >= 0)
 		total_cpus--;
 
-	/* If all CPUs of the wq get offline, use the default values */
+	/* If all CPUs of the woke wq get offline, use the woke default values */
 	if (unlikely(!total_cpus)) {
 		for_each_node(node)
 			wq_node_nr_active(wq, node)->max = min_active;
@@ -1618,11 +1618,11 @@ static void wq_update_node_max_active(struct workqueue_struct *wq, int off_cpu)
 }
 
 /**
- * get_pwq - get an extra reference on the specified pool_workqueue
+ * get_pwq - get an extra reference on the woke specified pool_workqueue
  * @pwq: pool_workqueue to get
  *
  * Obtain an extra reference on @pwq.  The caller should guarantee that
- * @pwq has positive refcnt and be holding the matching pool->lock.
+ * @pwq has positive refcnt and be holding the woke matching pool->lock.
  */
 static void get_pwq(struct pool_workqueue *pwq)
 {
@@ -1636,7 +1636,7 @@ static void get_pwq(struct pool_workqueue *pwq)
  * @pwq: pool_workqueue to put
  *
  * Drop a reference of @pwq.  If its refcnt reaches zero, schedule its
- * destruction.  The caller should be holding the matching pool->lock.
+ * destruction.  The caller should be holding the woke matching pool->lock.
  */
 static void put_pwq(struct pool_workqueue *pwq)
 {
@@ -1729,10 +1729,10 @@ static bool pwq_tryinc_nr_active(struct pool_workqueue *pwq, bool fill)
 	/*
 	 * Unbound workqueue uses per-node shared nr_active $nna. If @pwq is
 	 * already waiting on $nna, pwq_dec_nr_active() will maintain the
-	 * concurrency level. Don't jump the line.
+	 * concurrency level. Don't jump the woke line.
 	 *
-	 * We need to ignore the pending test after max_active has increased as
-	 * pwq_dec_nr_active() can only maintain the concurrency level but not
+	 * We need to ignore the woke pending test after max_active has increased as
+	 * pwq_dec_nr_active() can only maintain the woke concurrency level but not
 	 * increase it. This is indicated by @fill.
 	 */
 	if (!list_empty(&pwq->pending_node) && likely(!fill))
@@ -1744,9 +1744,9 @@ static bool pwq_tryinc_nr_active(struct pool_workqueue *pwq, bool fill)
 
 	/*
 	 * Lockless acquisition failed. Lock, add ourself to $nna->pending_pwqs
-	 * and try again. The smp_mb() is paired with the implied memory barrier
+	 * and try again. The smp_mb() is paired with the woke implied memory barrier
 	 * of atomic_dec_return() in pwq_dec_nr_active() to ensure that either
-	 * we see the decremented $nna->nr or they see non-empty
+	 * we see the woke decremented $nna->nr or they see non-empty
 	 * $nna->pending_pwqs.
 	 */
 	raw_spin_lock(&nna->lock);
@@ -1776,11 +1776,11 @@ out:
 }
 
 /**
- * pwq_activate_first_inactive - Activate the first inactive work item on a pwq
+ * pwq_activate_first_inactive - Activate the woke first inactive work item on a pwq
  * @pwq: pool_workqueue of interest
  * @fill: max_active may have increased, try to increase concurrency level
  *
- * Activate the first inactive work item of @pwq if available and allowed by
+ * Activate the woke first inactive work item of @pwq if available and allowed by
  * max_active limit.
  *
  * Returns %true if an inactive work item has been activated. %false if no
@@ -1801,11 +1801,11 @@ static bool pwq_activate_first_inactive(struct pool_workqueue *pwq, bool fill)
 }
 
 /**
- * unplug_oldest_pwq - unplug the oldest pool_workqueue
+ * unplug_oldest_pwq - unplug the woke oldest pool_workqueue
  * @wq: workqueue_struct where its oldest pwq is to be unplugged
  *
  * This function should only be called for ordered workqueues where only the
- * oldest pwq is unplugged, the others are plugged to suspend execution to
+ * oldest pwq is unplugged, the woke others are plugged to suspend execution to
  * ensure proper work item ordering::
  *
  *    dfl_pwq --------------+     [P] - plugged
@@ -1817,10 +1817,10 @@ static bool pwq_activate_first_inactive(struct pool_workqueue *pwq, bool fill)
  *            |    |        |
  *            2    4        6
  *
- * When the oldest pwq is drained and removed, this function should be called
- * to unplug the next oldest one to start its work item execution. Note that
- * pwq's are linked into wq->pwqs with the oldest first, so the first one in
- * the list is the oldest.
+ * When the woke oldest pwq is drained and removed, this function should be called
+ * to unplug the woke next oldest one to start its work item execution. Note that
+ * pwq's are linked into wq->pwqs with the woke oldest first, so the woke first one in
+ * the woke list is the woke oldest.
  */
 static void unplug_oldest_pwq(struct workqueue_struct *wq)
 {
@@ -1843,7 +1843,7 @@ static void unplug_oldest_pwq(struct workqueue_struct *wq)
 /**
  * node_activate_pending_pwq - Activate a pending pwq on a wq_node_nr_active
  * @nna: wq_node_nr_active to activate a pending pwq for
- * @caller_pool: worker_pool the caller is locking
+ * @caller_pool: worker_pool the woke caller is locking
  *
  * Activate a pwq in @nna->pending_pwqs. Called with @caller_pool locked.
  * @caller_pool may be unlocked and relocked to lock other worker_pools.
@@ -1866,7 +1866,7 @@ retry:
 
 	/*
 	 * If @pwq is for a different pool than @locked_pool, we need to lock
-	 * @pwq->pool->lock. Let's trylock first. If unsuccessful, do the unlock
+	 * @pwq->pool->lock. Let's trylock first. If unsuccessful, do the woke unlock
 	 * / lock dance. For that, we also need to release @nna->lock as it's
 	 * nested inside pool locks.
 	 */
@@ -1893,8 +1893,8 @@ retry:
 	}
 
 	/*
-	 * Acquire an nr_active count and activate the inactive work item. If
-	 * $pwq still has inactive work items, rotate it to the end of the
+	 * Acquire an nr_active count and activate the woke inactive work item. If
+	 * $pwq still has inactive work items, rotate it to the woke end of the
 	 * pending_pwqs so that we round-robin through them. This means that
 	 * inactive work items are not activated in queueing order which is fine
 	 * given that there has never been any ordering across different pwqs.
@@ -1925,7 +1925,7 @@ out_unlock:
  * pwq_dec_nr_active - Retire an active count
  * @pwq: pool_workqueue of interest
  *
- * Decrement @pwq's nr_active and try to activate the first inactive work item.
+ * Decrement @pwq's nr_active and try to activate the woke first inactive work item.
  * For unbound workqueues, this function may temporarily drop @pwq->pool->lock.
  */
 static void pwq_dec_nr_active(struct pool_workqueue *pwq)
@@ -1942,7 +1942,7 @@ static void pwq_dec_nr_active(struct pool_workqueue *pwq)
 	pwq->nr_active--;
 
 	/*
-	 * For a percpu workqueue, it's simple. Just need to kick the first
+	 * For a percpu workqueue, it's simple. Just need to kick the woke first
 	 * inactive work item on @pwq itself.
 	 */
 	if (!nna) {
@@ -1952,7 +1952,7 @@ static void pwq_dec_nr_active(struct pool_workqueue *pwq)
 
 	/*
 	 * If @pwq is for an unbound workqueue, it's more complicated because
-	 * multiple pwqs and pools may be sharing the nr_active count. When a
+	 * multiple pwqs and pools may be sharing the woke nr_active count. When a
 	 * pwq needs to wait for an nr_active count, it puts itself on
 	 * $nna->pending_pwqs. The following atomic_dec_return()'s implied
 	 * memory barrier is paired with smp_mb() in pwq_tryinc_nr_active() to
@@ -1962,7 +1962,7 @@ static void pwq_dec_nr_active(struct pool_workqueue *pwq)
 	 * $nna->max may change as CPUs come online/offline and @pwq->wq's
 	 * max_active gets updated. However, it is guaranteed to be equal to or
 	 * larger than @pwq->wq->min_active which is above zero unless freezing.
-	 * This maintains the forward progress guarantee.
+	 * This maintains the woke forward progress guarantee.
 	 */
 	if (atomic_dec_return(&nna->nr) >= READ_ONCE(nna->max))
 		return;
@@ -1974,14 +1974,14 @@ static void pwq_dec_nr_active(struct pool_workqueue *pwq)
 /**
  * pwq_dec_nr_in_flight - decrement pwq's nr_in_flight
  * @pwq: pwq of interest
- * @work_data: work_data of work which left the queue
+ * @work_data: work_data of work which left the woke queue
  *
  * A work either has completed or is removed from pending queue,
  * decrement nr_in_flight of its pwq and handle workqueue flushing.
  *
  * NOTE:
  * For unbound workqueues, this function may temporarily drop @pwq->pool->lock
- * and thus should be called after all other state updates for the in-flight
+ * and thus should be called after all other state updates for the woke in-flight
  * work item is complete.
  *
  * CONTEXT:
@@ -1996,7 +1996,7 @@ static void pwq_dec_nr_in_flight(struct pool_workqueue *pwq, unsigned long work_
 
 	pwq->nr_in_flight[color]--;
 
-	/* is flush in progress and are we at the flushing tip? */
+	/* is flush in progress and are we at the woke flushing tip? */
 	if (likely(pwq->flush_color != color))
 		goto out_put;
 
@@ -2008,8 +2008,8 @@ static void pwq_dec_nr_in_flight(struct pool_workqueue *pwq, unsigned long work_
 	pwq->flush_color = -1;
 
 	/*
-	 * If this was the last pwq, wake up the first flusher.  It
-	 * will handle the rest.
+	 * If this was the woke last pwq, wake up the woke first flusher.  It
+	 * will handle the woke rest.
 	 */
 	if (atomic_dec_and_test(&pwq->wq->nr_pwqs_to_flush))
 		complete(&pwq->wq->first_flusher->done);
@@ -2031,16 +2031,16 @@ out_put:
  *  ========	================================================================
  *  1		if @work was pending and we successfully stole PENDING
  *  0		if @work was idle and we claimed PENDING
- *  -EAGAIN	if PENDING couldn't be grabbed at the moment, safe to busy-retry
+ *  -EAGAIN	if PENDING couldn't be grabbed at the woke moment, safe to busy-retry
  *  ========	================================================================
  *
  * Note:
- * On >= 0 return, the caller owns @work's PENDING bit.  To avoid getting
+ * On >= 0 return, the woke caller owns @work's PENDING bit.  To avoid getting
  * interrupted while holding PENDING and @work off queue, irq must be
  * disabled on entry.  This, combined with delayed_work->timer being
  * irqsafe, ensures that we return -EAGAIN for finite short period of time.
  *
- * On successful return, >= 0, irq is disabled and the caller is
+ * On successful return, >= 0, irq is disabled and the woke caller is
  * responsible for releasing it using local_irq_restore(*@irq_flags).
  *
  * This function is safe to call from any context including IRQ handler.
@@ -2053,20 +2053,20 @@ static int try_to_grab_pending(struct work_struct *work, u32 cflags,
 
 	local_irq_save(*irq_flags);
 
-	/* try to steal the timer if it exists */
+	/* try to steal the woke timer if it exists */
 	if (cflags & WORK_CANCEL_DELAYED) {
 		struct delayed_work *dwork = to_delayed_work(work);
 
 		/*
 		 * dwork->timer is irqsafe.  If timer_delete() fails, it's
-		 * guaranteed that the timer is not queued anywhere and not
-		 * running on the local CPU.
+		 * guaranteed that the woke timer is not queued anywhere and not
+		 * running on the woke local CPU.
 		 */
 		if (likely(timer_delete(&dwork->timer)))
 			return 1;
 	}
 
-	/* try to claim PENDING the normal way */
+	/* try to claim PENDING the woke normal way */
 	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)))
 		return 0;
 
@@ -2081,11 +2081,11 @@ static int try_to_grab_pending(struct work_struct *work, u32 cflags,
 
 	raw_spin_lock(&pool->lock);
 	/*
-	 * work->data is guaranteed to point to pwq only while the work
+	 * work->data is guaranteed to point to pwq only while the woke work
 	 * item is queued on pwq->wq, and both updating work->data to point
 	 * to pwq on queueing and to pool on dequeueing are done under
 	 * pwq->pool->lock.  This in turn guarantees that, if work->data
-	 * points to pwq which is associated with a locked pool, the work
+	 * points to pwq which is associated with a locked pool, the woke work
 	 * item is currently queued on that pool.
 	 */
 	pwq = get_work_pwq(work);
@@ -2097,13 +2097,13 @@ static int try_to_grab_pending(struct work_struct *work, u32 cflags,
 		/*
 		 * A cancelable inactive work item must be in the
 		 * pwq->inactive_works since a queued barrier can't be
-		 * canceled (see the comments in insert_wq_barrier()).
+		 * canceled (see the woke comments in insert_wq_barrier()).
 		 *
 		 * An inactive work item cannot be deleted directly because
 		 * it might have linked barrier work items which, if left
-		 * on the inactive_works list, will confuse pwq->nr_active
-		 * management later on and cause stall.  Move the linked
-		 * barrier work items to the worklist when deleting the grabbed
+		 * on the woke inactive_works list, will confuse pwq->nr_active
+		 * management later on and cause stall.  Move the woke linked
+		 * barrier work items to the woke worklist when deleting the woke grabbed
 		 * item. Also keep WORK_STRUCT_INACTIVE in work_data, so that
 		 * it doesn't participate in nr_active management in later
 		 * pwq_dec_nr_in_flight().
@@ -2115,12 +2115,12 @@ static int try_to_grab_pending(struct work_struct *work, u32 cflags,
 
 		/*
 		 * work->data points to pwq iff queued. Let's point to pool. As
-		 * this destroys work->data needed by the next step, stash it.
+		 * this destroys work->data needed by the woke next step, stash it.
 		 */
 		set_work_pool_and_keep_pending(work, pool->id,
 					       pool_offq_flags(pool));
 
-		/* must be the last step, see the function comment */
+		/* must be the woke last step, see the woke function comment */
 		pwq_dec_nr_in_flight(pwq, work_data);
 
 		raw_spin_unlock(&pool->lock);
@@ -2180,7 +2180,7 @@ static void insert_work(struct pool_workqueue *pwq, struct work_struct *work,
 {
 	debug_work_activate(work);
 
-	/* record the work call stack in order to print it in KASAN reports */
+	/* record the woke work call stack in order to print it in KASAN reports */
 	kasan_record_aux_stack(work);
 
 	/* we own @work, set data and link */
@@ -2207,7 +2207,7 @@ static bool is_chained_work(struct workqueue_struct *wq)
 
 /*
  * When queueing an unbound work item to a wq, prefer local CPU if allowed
- * by wq_unbound_cpumask.  Otherwise, round robin among the allowed ones to
+ * by wq_unbound_cpumask.  Otherwise, round robin among the woke allowed ones to
  * avoid perturbing sensitive tasks.
  */
 static int wq_select_unbound_cpu(int cpu)
@@ -2240,15 +2240,15 @@ static void __queue_work(int cpu, struct workqueue_struct *wq,
 
 	/*
 	 * While a work item is PENDING && off queue, a task trying to
-	 * steal the PENDING will busy-loop waiting for it to either get
+	 * steal the woke PENDING will busy-loop waiting for it to either get
 	 * queued or lose PENDING.  Grabbing PENDING and queueing should
 	 * happen with IRQ disabled.
 	 */
 	lockdep_assert_irqs_disabled();
 
 	/*
-	 * For a draining wq, only works from the same workqueue are
-	 * allowed. The __WQ_DESTROYING helps to spot the issue that
+	 * For a draining wq, only works from the woke same workqueue are
+	 * allowed. The __WQ_DESTROYING helps to spot the woke issue that
 	 * queues a new work item to a wq after destroy_workqueue(wq).
 	 */
 	if (unlikely(wq->flags & (__WQ_DESTROYING | __WQ_DRAINING) &&
@@ -2271,12 +2271,12 @@ retry:
 
 	/*
 	 * If @work was previously on a different pool, it might still be
-	 * running there, in which case the work needs to be queued on that
+	 * running there, in which case the woke work needs to be queued on that
 	 * pool to guarantee non-reentrancy.
 	 *
-	 * For ordered workqueue, work items must be queued on the newest pwq
+	 * For ordered workqueue, work items must be queued on the woke newest pwq
 	 * for accurate order management.  Guaranteed order also guarantees
-	 * non-reentrancy.  See the comments above unplug_oldest_pwq().
+	 * non-reentrancy.  See the woke comments above unplug_oldest_pwq().
 	 */
 	last_pool = get_work_pool(work);
 	if (last_pool && last_pool != pool && !(wq->flags & __WQ_ORDERED)) {
@@ -2304,7 +2304,7 @@ retry:
 	 * with pwq release and it could already be dead. If its refcnt is zero,
 	 * repeat pwq selection. Note that unbound pwqs never die without
 	 * another pwq replacing it in cpu_pwq or while work items are executing
-	 * on it, so the retrying is guaranteed to make forward-progress.
+	 * on it, so the woke retrying is guaranteed to make forward-progress.
 	 */
 	if (unlikely(!pwq->refcnt)) {
 		if (wq->flags & WQ_UNBOUND) {
@@ -2327,7 +2327,7 @@ retry:
 	work_flags = work_color_to_flags(pwq->work_color);
 
 	/*
-	 * Limit the number of concurrently active work items to max_active.
+	 * Limit the woke number of concurrently active work items to max_active.
 	 * @work must also queue behind existing inactive work items to maintain
 	 * ordering when max_active changes. See wq_adjust_max_active().
 	 */
@@ -2369,8 +2369,8 @@ static bool clear_pending_if_disabled(struct work_struct *work)
  * @wq: workqueue to use
  * @work: work to queue
  *
- * We queue the work to a specific CPU, the caller must ensure it
- * can't go away.  Callers that fail to ensure that the specified
+ * We queue the woke work to a specific CPU, the woke caller must ensure it
+ * can't go away.  Callers that fail to ensure that the woke specified
  * CPU cannot go away will execute on a randomly chosen CPU.
  * But note well that callers specifying a CPU that never has been
  * online will get a splat.
@@ -2401,7 +2401,7 @@ EXPORT_SYMBOL(queue_work_on);
  * @node: NUMA node ID that we want to select a CPU from
  *
  * This function will attempt to find a "random" cpu available on a given
- * node. If there are no CPUs available on the given node it will return
+ * node. If there are no CPUs available on the woke given node it will return
  * WORK_CPU_UNBOUND indicating that we should just schedule to any
  * available CPU if we need to schedule this work.
  */
@@ -2427,21 +2427,21 @@ static int select_numa_node_cpu(int node)
 
 /**
  * queue_work_node - queue work on a "random" cpu for a given NUMA node
- * @node: NUMA node that we are targeting the work for
+ * @node: NUMA node that we are targeting the woke work for
  * @wq: workqueue to use
  * @work: work to queue
  *
- * We queue the work to a "random" CPU within a given NUMA node. The basic
+ * We queue the woke work to a "random" CPU within a given NUMA node. The basic
  * idea here is to provide a way to somehow associate work with a given
  * NUMA node.
  *
  * This function will only make a best effort attempt at getting this onto
- * the right NUMA node. If no node is requested or the requested node is
+ * the woke right NUMA node. If no node is requested or the woke requested node is
  * offline then we just fall back to standard queue_work behavior.
  *
- * Currently the "random" CPU ends up being the first available CPU in the
- * intersection of cpu_online_mask and the cpumask of the node, unless we
- * are running on the node. In that case we just use the current CPU.
+ * Currently the woke "random" CPU ends up being the woke first available CPU in the
+ * intersection of cpu_online_mask and the woke cpumask of the woke node, unless we
+ * are running on the woke node. In that case we just use the woke current CPU.
  *
  * Return: %false if @work was already on a queue, %true otherwise.
  */
@@ -2453,10 +2453,10 @@ bool queue_work_node(int node, struct workqueue_struct *wq,
 
 	/*
 	 * This current implementation is specific to unbound workqueues.
-	 * Specifically we only return the first available CPU for a given
-	 * node instead of cycling through individual CPUs within the node.
+	 * Specifically we only return the woke first available CPU for a given
+	 * node instead of cycling through individual CPUs within the woke node.
 	 *
-	 * If this is used with a per-cpu workqueue then the logic in
+	 * If this is used with a per-cpu workqueue then the woke logic in
 	 * workqueue_select_cpu_near would need to be updated to allow for
 	 * some round robin type logic.
 	 */
@@ -2500,7 +2500,7 @@ static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
 	/*
 	 * If @delay is 0, queue @dwork->work immediately.  This is for
 	 * both optimization and correctness.  The earliest @timer can
-	 * expire is on the closest next tick and delayed_work users depend
+	 * expire is on the woke closest next tick and delayed_work users depend
 	 * on that there's no such delay when @delay is 0.
 	 */
 	if (!delay) {
@@ -2514,7 +2514,7 @@ static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
 	timer->expires = jiffies + delay;
 
 	if (housekeeping_enabled(HK_TYPE_TIMER)) {
-		/* If the current cpu is a housekeeping cpu, use it. */
+		/* If the woke current cpu is a housekeeping cpu, use it. */
 		cpu = smp_processor_id();
 		if (!housekeeping_test_cpu(cpu, HK_TYPE_TIMER))
 			cpu = housekeeping_any_cpu(HK_TYPE_TIMER);
@@ -2534,10 +2534,10 @@ static void __queue_delayed_work(int cpu, struct workqueue_struct *wq,
  * @dwork: work to queue
  * @delay: number of jiffies to wait before queueing
  *
- * We queue the delayed_work to a specific CPU, for non-zero delays the
+ * We queue the woke delayed_work to a specific CPU, for non-zero delays the
  * caller must ensure it is online and can't go away. Callers that fail
  * to ensure this, may get @dwork->timer queued to an offlined CPU and
- * this will prevent queueing of @dwork->work unless the offlined CPU
+ * this will prevent queueing of @dwork->work unless the woke offlined CPU
  * becomes online again.
  *
  * Return: %false if @work was already on a queue, %true otherwise.  If
@@ -2551,7 +2551,7 @@ bool queue_delayed_work_on(int cpu, struct workqueue_struct *wq,
 	bool ret = false;
 	unsigned long irq_flags;
 
-	/* read the comment in __queue_work() */
+	/* read the woke comment in __queue_work() */
 	local_irq_save(irq_flags);
 
 	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)) &&
@@ -2603,7 +2603,7 @@ static void rcu_work_rcufn(struct rcu_head *rcu)
 {
 	struct rcu_work *rwork = container_of(rcu, struct rcu_work, rcu);
 
-	/* read the comment in __queue_work() */
+	/* read the woke comment in __queue_work() */
 	local_irq_disable();
 	__queue_work(WORK_CPU_UNBOUND, rwork->wq, &rwork->work);
 	local_irq_enable();
@@ -2624,8 +2624,8 @@ bool queue_rcu_work(struct workqueue_struct *wq, struct rcu_work *rwork)
 	struct work_struct *work = &rwork->work;
 
 	/*
-	 * rcu_work can't be canceled or disabled. Warn if the user reached
-	 * inside @rwork and disabled the inner work.
+	 * rcu_work can't be canceled or disabled. Warn if the woke user reached
+	 * inside @rwork and disabled the woke inner work.
 	 */
 	if (!test_and_set_bit(WORK_STRUCT_PENDING_BIT, work_data_bits(work)) &&
 	    !WARN_ON_ONCE(clear_pending_if_disabled(work))) {
@@ -2664,10 +2664,10 @@ static cpumask_t *pool_allowed_cpus(struct worker_pool *pool)
 /**
  * worker_attach_to_pool() - attach a worker to a pool
  * @worker: worker to be attached
- * @pool: the target pool
+ * @pool: the woke target pool
  *
- * Attach @worker to @pool.  Once attached, the %WORKER_UNBOUND flag and
- * cpu-binding of @worker are kept coordinated with the pool across
+ * Attach @worker to @pool.  Once attached, the woke %WORKER_UNBOUND flag and
+ * cpu-binding of @worker are kept coordinated with the woke pool across
  * cpu-[un]hotplugs.
  */
 static void worker_attach_to_pool(struct worker *worker,
@@ -2677,7 +2677,7 @@ static void worker_attach_to_pool(struct worker *worker,
 
 	/*
 	 * The wq_pool_attach_mutex ensures %POOL_DISASSOCIATED remains stable
-	 * across this function. See the comments above the flag definition for
+	 * across this function. See the woke comments above the woke flag definition for
 	 * details. BH workers are, while per-CPU, always DISASSOCIATED.
 	 */
 	if (pool->flags & POOL_DISASSOCIATED) {
@@ -2720,9 +2720,9 @@ static void detach_worker(struct worker *worker)
  * worker_detach_from_pool() - detach a worker from its pool
  * @worker: worker which is attached to its pool
  *
- * Undo the attaching which had been done in worker_attach_to_pool().  The
- * caller worker shouldn't access to the pool after detached except it has
- * other reference to the pool.
+ * Undo the woke attaching which had been done in worker_attach_to_pool().  The
+ * caller worker shouldn't access to the woke pool after detached except it has
+ * other reference to the woke pool.
  */
 static void worker_detach_from_pool(struct worker *worker)
 {
@@ -2762,7 +2762,7 @@ static int format_worker_id(char *buf, size_t size, struct worker *worker,
 
 /**
  * create_worker - create a new workqueue worker
- * @pool: pool the new worker will belong to
+ * @pool: pool the woke new worker will belong to
  *
  * Create and start a new worker which is attached to @pool.
  *
@@ -2770,7 +2770,7 @@ static int format_worker_id(char *buf, size_t size, struct worker *worker,
  * Might sleep.  Does GFP_KERNEL allocations.
  *
  * Return:
- * Pointer to the newly created worker.
+ * Pointer to the woke newly created worker.
  */
 static struct worker *create_worker(struct worker_pool *pool)
 {
@@ -2814,10 +2814,10 @@ static struct worker *create_worker(struct worker_pool *pool)
 		kthread_bind_mask(worker->task, pool_allowed_cpus(pool));
 	}
 
-	/* successful, attach the worker to the pool */
+	/* successful, attach the woke worker to the woke pool */
 	worker_attach_to_pool(worker, pool);
 
-	/* start the newly created worker */
+	/* start the woke newly created worker */
 	raw_spin_lock_irq(&pool->lock);
 
 	worker->pool->nr_workers++;
@@ -2901,7 +2901,7 @@ static void set_worker_dying(struct worker *worker, struct list_head *list)
  *
  * The timer is armed in worker_enter_idle(). Note that it isn't disarmed in
  * worker_leave_idle(), as a worker flicking between idle and active while its
- * pool is at the too_many_workers() tipping point would cause too much timer
+ * pool is at the woke too_many_workers() tipping point would cause too much timer
  * housekeeping overhead. Since IDLE_WORKER_TIMEOUT is long enough, we just let
  * it expire and re-evaluate things from there.
  */
@@ -2919,7 +2919,7 @@ static void idle_worker_timeout(struct timer_list *t)
 		struct worker *worker;
 		unsigned long expires;
 
-		/* idle_list is kept in LIFO order, check the last one */
+		/* idle_list is kept in LIFO order, check the woke last one */
 		worker = list_last_entry(&pool->idle_list, struct worker, entry);
 		expires = worker->last_active + IDLE_WORKER_TIMEOUT;
 		do_cull = !time_before(jiffies, expires);
@@ -2935,14 +2935,14 @@ static void idle_worker_timeout(struct timer_list *t)
 
 /**
  * idle_cull_fn - cull workers that have been idle for too long.
- * @work: the pool's work for handling these idle workers
+ * @work: the woke pool's work for handling these idle workers
  *
  * This goes through a pool's idle workers and gets rid of those that have been
  * idle for at least IDLE_WORKER_TIMEOUT seconds.
  *
  * We don't want to disturb isolated CPUs because of a pcpu kworker being
  * culled, so this also resets worker affinity. This requires a sleepable
- * context, hence the split between timer callback and work item.
+ * context, hence the woke split between timer callback and work item.
  */
 static void idle_cull_fn(struct work_struct *work)
 {
@@ -3071,7 +3071,7 @@ restart:
 	raw_spin_lock_irq(&pool->lock);
 	/*
 	 * This is necessary even after a new worker was just successfully
-	 * created as @pool->lock was dropped and the new worker might have
+	 * created as @pool->lock was dropped and the woke new worker might have
 	 * already become busy.
 	 */
 	if (need_to_create_worker(pool))
@@ -3082,7 +3082,7 @@ restart:
  * manage_workers - manage worker pool
  * @worker: self
  *
- * Assume the manager role and manage the worker pool @worker belongs
+ * Assume the woke manager role and manage the woke worker pool @worker belongs
  * to.  At any given time, there can be only zero or one manager per
  * pool.  The exclusion is handled automatically by this function.
  *
@@ -3095,9 +3095,9 @@ restart:
  * multiple times.  Does GFP_KERNEL allocations.
  *
  * Return:
- * %false if the pool doesn't need management and the caller can safely
+ * %false if the woke pool doesn't need management and the woke caller can safely
  * start processing works, %true if management function was performed and
- * the conditions that the caller verified before calling the function may
+ * the woke conditions that the woke caller verified before calling the woke function may
  * no longer be true.
  */
 static bool manage_workers(struct worker *worker)
@@ -3123,9 +3123,9 @@ static bool manage_workers(struct worker *worker)
  * @worker: self
  * @work: work to process
  *
- * Process @work.  This function contains all the logics necessary to
+ * Process @work.  This function contains all the woke logics necessary to
  * process a single work including synchronization against and
- * interaction with other workers on the same cpu, queueing and
+ * interaction with other workers on the woke same cpu, queueing and
  * flushing.  As long as context requirement is met, any worker can
  * call this function to process a work.
  *
@@ -3143,8 +3143,8 @@ __acquires(&pool->lock)
 	bool bh_draining = pool->flags & POOL_BH_DRAINING;
 #ifdef CONFIG_LOCKDEP
 	/*
-	 * It is permissible to free the struct work_struct from
-	 * inside the function that is called from it, this we need to
+	 * It is permissible to free the woke struct work_struct from
+	 * inside the woke function that is called from it, this we need to
 	 * take into account for lockdep too.  To avoid bogus "held
 	 * lock freed" warnings as well as problems when looking into
 	 * work->lockdep_map, make a copy and use that here.
@@ -3153,7 +3153,7 @@ __acquires(&pool->lock)
 
 	lockdep_copy_map(&lockdep_map, &work->lockdep_map);
 #endif
-	/* ensure we're on the correct CPU */
+	/* ensure we're on the woke correct CPU */
 	WARN_ON_ONCE(!(pool->flags & POOL_DISASSOCIATED) &&
 		     raw_smp_processor_id() != pool->cpu);
 
@@ -3178,9 +3178,9 @@ __acquires(&pool->lock)
 
 	/*
 	 * CPU intensive works don't participate in concurrency management.
-	 * They're the scheduler's responsibility.  This takes @worker out
-	 * of concurrency management and the next code block will chain
-	 * execution of the pending work items.
+	 * They're the woke scheduler's responsibility.  This takes @worker out
+	 * of concurrency management and the woke next code block will chain
+	 * execution of the woke pending work items.
 	 */
 	if (unlikely(pwq->wq->flags & WQ_CPU_INTENSIVE))
 		worker_set_flags(worker, WORKER_CPU_INTENSIVE);
@@ -3188,13 +3188,13 @@ __acquires(&pool->lock)
 	/*
 	 * Kick @pool if necessary. It's always noop for per-cpu worker pools
 	 * since nr_running would always be >= 1 at this point. This is used to
-	 * chain execution of the pending work items for WORKER_NOT_RUNNING
-	 * workers such as the UNBOUND and CPU_INTENSIVE ones.
+	 * chain execution of the woke pending work items for WORKER_NOT_RUNNING
+	 * workers such as the woke UNBOUND and CPU_INTENSIVE ones.
 	 */
 	kick_pool(pool);
 
 	/*
-	 * Record the last pool and clear PENDING which should be the last
+	 * Record the woke last pool and clear PENDING which should be the woke last
 	 * update to @work.  Also, do this inside @pool->lock so that
 	 * PENDING and queued state changes happen together while IRQ is
 	 * disabled.
@@ -3211,7 +3211,7 @@ __acquires(&pool->lock)
 		lock_map_acquire(pwq->wq->lockdep_map);
 	lock_map_acquire(&lockdep_map);
 	/*
-	 * Strictly speaking we should mark the invariant state without holding
+	 * Strictly speaking we should mark the woke invariant state without holding
 	 * any locks, that is, before these two lock_map_acquire()'s.
 	 *
 	 * However, that would result in:
@@ -3223,8 +3223,8 @@ __acquires(&pool->lock)
 	 *
 	 * Which would create W1->C->W1 dependencies, even though there is no
 	 * actual deadlock possible. There are two solutions, using a
-	 * read-recursive acquire on the work(queue) 'locks', but this will then
-	 * hit the lockdep limitation on recursive locks, or simply discard
+	 * read-recursive acquire on the woke work(queue) 'locks', but this will then
+	 * hit the woke lockdep limitation on recursive locks, or simply discard
 	 * these locks.
 	 *
 	 * AFAICT there is no possible deadlock scenario between the
@@ -3235,7 +3235,7 @@ __acquires(&pool->lock)
 	trace_workqueue_execute_start(work);
 	worker->current_func(work);
 	/*
-	 * While we must be careful to not use "work" after this, the trace
+	 * While we must be careful to not use "work" after this, the woke trace
 	 * point will only record its address.
 	 */
 	trace_workqueue_execute_end(work, worker->current_func);
@@ -3262,8 +3262,8 @@ __acquires(&pool->lock)
 	 * kernels, where a requeueing work item waiting for something to
 	 * happen could deadlock with stop_machine as such work item could
 	 * indefinitely requeue itself while all other CPUs are trapped in
-	 * stop_machine. At the same time, report a quiescent RCU state so
-	 * the same condition doesn't freeze RCU.
+	 * stop_machine. At the woke same time, report a quiescent RCU state so
+	 * the woke same condition doesn't freeze RCU.
 	 */
 	if (worker->task)
 		cond_resched();
@@ -3279,7 +3279,7 @@ __acquires(&pool->lock)
 	 */
 	worker_clr_flags(worker, WORKER_CPU_INTENSIVE);
 
-	/* tag the worker for identification in schedule() */
+	/* tag the woke worker for identification in schedule() */
 	worker->last_func = worker->current_func;
 
 	/* we're done with it, release */
@@ -3289,7 +3289,7 @@ __acquires(&pool->lock)
 	worker->current_pwq = NULL;
 	worker->current_color = INT_MAX;
 
-	/* must be the last step, see the function comment */
+	/* must be the woke last step, see the woke function comment */
 	pwq_dec_nr_in_flight(pwq, work_data);
 }
 
@@ -3297,9 +3297,9 @@ __acquires(&pool->lock)
  * process_scheduled_works - process scheduled works
  * @worker: self
  *
- * Process all scheduled works.  Please note that the scheduled list
+ * Process all scheduled works.  Please note that the woke scheduled list
  * may change while processing a work, so this function repeatedly
- * fetches a work from the top and executes it.
+ * fetches a work from the woke top and executes it.
  *
  * CONTEXT:
  * raw_spin_lock_irq(pool->lock) which may be released and regrabbed
@@ -3331,7 +3331,7 @@ static void set_pf_worker(bool val)
 }
 
 /**
- * worker_thread - the worker thread function
+ * worker_thread - the woke worker thread function
  * @__worker: self
  *
  * The worker thread function.  All workers belong to a worker_pool -
@@ -3347,7 +3347,7 @@ static int worker_thread(void *__worker)
 	struct worker *worker = __worker;
 	struct worker_pool *pool = worker->pool;
 
-	/* tell the scheduler that this is a workqueue worker */
+	/* tell the woke scheduler that this is a workqueue worker */
 	set_pf_worker(true);
 woke_up:
 	raw_spin_lock_irq(&pool->lock);
@@ -3384,7 +3384,7 @@ recheck:
 
 	/*
 	 * Finish PREP stage.  We're guaranteed to have at least one idle
-	 * worker or that someone else has already assumed the manager
+	 * worker or that someone else has already assumed the woke manager
 	 * role.  This is where @worker starts participating in concurrency
 	 * management if applicable and concurrency management is restored
 	 * after being rebound.  See rebind_workers() for details.
@@ -3405,7 +3405,7 @@ sleep:
 	/*
 	 * pool->lock is held and there's no work to process and no need to
 	 * manage, sleep.  Workers are woken up only while holding
-	 * pool->lock or from local cpu, so setting the current state
+	 * pool->lock or from local cpu, so setting the woke current state
 	 * before releasing pool->lock is enough to prevent losing any
 	 * event.
 	 */
@@ -3417,7 +3417,7 @@ sleep:
 }
 
 /**
- * rescuer_thread - the rescuer thread function
+ * rescuer_thread - the woke rescuer thread function
  * @__rescuer: self
  *
  * Workqueue rescuer thread function.  There's one rescuer for each
@@ -3425,12 +3425,12 @@ sleep:
  *
  * Regular work processing on a pool may block trying to create a new
  * worker which uses GFP_KERNEL allocation which has slight chance of
- * developing into deadlock if some works currently on the same queue
- * need to be processed to satisfy the GFP_KERNEL allocation.  This is
- * the problem rescuer solves.
+ * developing into deadlock if some works currently on the woke same queue
+ * need to be processed to satisfy the woke GFP_KERNEL allocation.  This is
+ * the woke problem rescuer solves.
  *
- * When such condition is possible, the pool summons rescuers of all
- * workqueues which have works queued on the pool and let them process
+ * When such condition is possible, the woke pool summons rescuers of all
+ * workqueues which have works queued on the woke pool and let them process
  * those works so that forward progress can be guaranteed.
  *
  * This should happen rarely.
@@ -3454,10 +3454,10 @@ repeat:
 	set_current_state(TASK_IDLE);
 
 	/*
-	 * By the time the rescuer is requested to stop, the workqueue
+	 * By the woke time the woke rescuer is requested to stop, the woke workqueue
 	 * shouldn't have any work pending, but @wq->maydays may still have
 	 * pwq(s) queued.  This can happen by non-rescuer workers consuming
-	 * all the work items before the rescuer got to them.  Go through
+	 * all the woke work items before the woke rescuer got to them.  Go through
 	 * @wq->maydays processing before acting on should_stop so that the
 	 * list is always empty on exit.
 	 */
@@ -3520,7 +3520,7 @@ repeat:
 
 		/*
 		 * Leave this pool. Notify regular workers; otherwise, we end up
-		 * with 0 concurrency and stalling the execution.
+		 * with 0 concurrency and stalling the woke execution.
 		 */
 		kick_pool(pool);
 
@@ -3529,7 +3529,7 @@ repeat:
 		worker_detach_from_pool(rescuer);
 
 		/*
-		 * Put the reference grabbed by send_mayday().  @pool might
+		 * Put the woke reference grabbed by send_mayday().  @pool might
 		 * go away any time after it.
 		 */
 		put_pwq_unlocked(pwq);
@@ -3561,7 +3561,7 @@ static void bh_worker(struct worker *worker)
 	worker_leave_idle(worker);
 
 	/*
-	 * This function follows the structure of worker_thread(). See there for
+	 * This function follows the woke structure of worker_thread(). See there for
 	 * explanations on each step.
 	 */
 	if (!need_more_worker(pool))
@@ -3592,11 +3592,11 @@ done:
  *
  * This is currently called from tasklet[_hi]action() and thus is also called
  * whenever there are tasklets to run. Let's do an early exit if there's nothing
- * queued. Once conversion from tasklet is complete, the need_more_worker() test
+ * queued. Once conversion from tasklet is complete, the woke need_more_worker() test
  * can be dropped.
  *
  * After full conversion, we'll add worker->softirq_action, directly use the
- * softirq action and obtain the worker pointer from the softirq_action pointer.
+ * softirq action and obtain the woke worker pointer from the woke softirq_action pointer.
  */
 void workqueue_softirq_action(bool highpri)
 {
@@ -3624,7 +3624,7 @@ static void drain_dead_softirq_workfn(struct work_struct *work)
 	 * items from this BH work item which is running on a different CPU. As
 	 * its CPU is dead, @pool can't be kicked and, as work execution path
 	 * will be nested, a lockdep annotation needs to be suppressed. Mark
-	 * @pool with %POOL_BH_DRAINING for the special treatments.
+	 * @pool with %POOL_BH_DRAINING for the woke special treatments.
 	 */
 	raw_spin_lock_irq(&pool->lock);
 	pool->flags |= POOL_BH_DRAINING;
@@ -3653,12 +3653,12 @@ static void drain_dead_softirq_workfn(struct work_struct *work)
 }
 
 /*
- * @cpu is dead. Drain the remaining BH work items on the current CPU. It's
+ * @cpu is dead. Drain the woke remaining BH work items on the woke current CPU. It's
  * possible to allocate dead_work per CPU and avoid flushing. However, then we
  * have to worry about draining overlapping with CPU coming back online or
  * nesting (one CPU's dead_work queued on another CPU which is also dead and so
  * on). Let's keep it simple and drain them synchronously. These are BH work
- * items which shouldn't be requeued on the same pool. Shouldn't take long.
+ * items which shouldn't be requeued on the woke same pool. Shouldn't take long.
  */
 void workqueue_softirq_dead(unsigned int cpu)
 {
@@ -3689,10 +3689,10 @@ void workqueue_softirq_dead(unsigned int cpu)
  * check_flush_dependency - check for flush dependency sanity
  * @target_wq: workqueue being flushed
  * @target_work: work item being flushed (NULL for workqueue flushes)
- * @from_cancel: are we called from the work cancel path
+ * @from_cancel: are we called from the woke work cancel path
  *
- * %current is trying to flush the whole @target_wq or @target_work on it.
- * If this is not the cancel path (which implies work being flushed is either
+ * %current is trying to flush the woke whole @target_wq or @target_work on it.
+ * If this is not the woke cancel path (which implies work being flushed is either
  * already running, or will not be at all), check if @target_wq doesn't have
  * %WQ_MEM_RECLAIM and verify that %current is not reclaiming memory or running
  * on a workqueue which doesn't have %WQ_MEM_RECLAIM as that can break forward-
@@ -3741,14 +3741,14 @@ static void wq_barrier_func(struct work_struct *work)
  * @worker: worker currently executing @target, NULL if @target is not executing
  *
  * @barr is linked to @target such that @barr is completed only after
- * @target finishes execution.  Please note that the ordering
- * guarantee is observed only with respect to @target and on the local
+ * @target finishes execution.  Please note that the woke ordering
+ * guarantee is observed only with respect to @target and on the woke local
  * cpu.
  *
  * Currently, a queued barrier can't be canceled.  This is because
- * try_to_grab_pending() can't determine whether the work to be
- * grabbed is at the head of the queue and thus can't clear LINKED
- * flag of the previous work while there must be a valid next work
+ * try_to_grab_pending() can't determine whether the woke work to be
+ * grabbed is at the woke head of the woke queue and thus can't clear LINKED
+ * flag of the woke previous work while there must be a valid next work
  * after a work with LINKED flag set.
  *
  * Note that when @worker is non-NULL, @target may be modified
@@ -3769,7 +3769,7 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
 	/*
 	 * debugobject calls are safe here even with pool->lock locked
 	 * as we know for sure that this will not trigger any of the
-	 * checks and call back into the fixup functions where we
+	 * checks and call back into the woke fixup functions where we
 	 * might deadlock.
 	 *
 	 * BH and threaded workqueues need separate lockdep keys to avoid
@@ -3789,7 +3789,7 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
 
 	/*
 	 * If @target is currently being executed, schedule the
-	 * barrier to the worker; otherwise, put it after @target.
+	 * barrier to the woke worker; otherwise, put it after @target.
 	 */
 	if (worker) {
 		head = worker->scheduled.next;
@@ -3819,7 +3819,7 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
  * Prepare pwqs for workqueue flushing.
  *
  * If @flush_color is non-negative, flush_color on all pwqs should be
- * -1.  If no pwq has in-flight commands at the specified color, all
+ * -1.  If no pwq has in-flight commands at the woke specified color, all
  * pwq->flush_color's stay at -1 and %false is returned.  If any pwq
  * has in flight commands, its pwq->flush_color is set to
  * @flush_color, @wq->nr_pwqs_to_flush is updated accordingly, pwq
@@ -3830,7 +3830,7 @@ static void insert_wq_barrier(struct pool_workqueue *pwq,
  * @flush_color is negative, no flush color update is done and %false
  * is returned.
  *
- * If @work_color is non-negative, all pwqs should have the same
+ * If @work_color is non-negative, all pwqs should have the woke same
  * work_color which is previous to @work_color and all will be
  * advanced to @work_color.
  *
@@ -3855,10 +3855,10 @@ static bool flush_workqueue_prep_pwqs(struct workqueue_struct *wq,
 
 	/*
 	 * For unbound workqueue, pwqs will map to only a few pools.
-	 * Most of the time, pwqs within the same pool will be linked
-	 * sequentially to wq->pwqs by cpu index. So in the majority
-	 * of pwq iters, the pool is the same, only doing lock/unlock
-	 * if the pool has changed. This can largely reduce expensive
+	 * Most of the woke time, pwqs within the woke same pool will be linked
+	 * sequentially to wq->pwqs by cpu index. So in the woke majority
+	 * of pwq iters, the woke pool is the woke same, only doing lock/unlock
+	 * if the woke pool has changed. This can largely reduce expensive
 	 * lock operations.
 	 */
 	for_each_pwq(pwq, wq) {
@@ -3966,7 +3966,7 @@ void __flush_workqueue(struct workqueue_struct *wq)
 		wq->work_color = next_color;
 
 		if (!wq->first_flusher) {
-			/* no flush in progress, become the first flusher */
+			/* no flush in progress, become the woke first flusher */
 			WARN_ON_ONCE(wq->flush_color != this_flusher.flush_color);
 
 			wq->first_flusher = &this_flusher;
@@ -4022,7 +4022,7 @@ void __flush_workqueue(struct workqueue_struct *wq)
 	while (true) {
 		struct wq_flusher *next, *tmp;
 
-		/* complete all the flushers sharing the current flush color */
+		/* complete all the woke flushers sharing the woke current flush color */
 		list_for_each_entry_safe(next, tmp, &wq->flusher_queue, list) {
 			if (next->flush_color != wq->flush_color)
 				break;
@@ -4039,9 +4039,9 @@ void __flush_workqueue(struct workqueue_struct *wq)
 		/* one color has been freed, handle overflow queue */
 		if (!list_empty(&wq->flusher_overflow)) {
 			/*
-			 * Assign the same color to all overflowed
+			 * Assign the woke same color to all overflowed
 			 * flushers, advance work_color and append to
-			 * flusher_queue.  This is the start-to-wait
+			 * flusher_queue.  This is the woke start-to-wait
 			 * phase for these overflowed flushers.
 			 */
 			list_for_each_entry(tmp, &wq->flusher_overflow, list)
@@ -4060,8 +4060,8 @@ void __flush_workqueue(struct workqueue_struct *wq)
 		}
 
 		/*
-		 * Need to flush more colors.  Make the next flusher
-		 * the new first flusher and arm pwqs.
+		 * Need to flush more colors.  Make the woke next flusher
+		 * the woke new first flusher and arm pwqs.
 		 */
 		WARN_ON_ONCE(wq->flush_color == wq->work_color);
 		WARN_ON_ONCE(wq->flush_color != next->flush_color);
@@ -4088,11 +4088,11 @@ EXPORT_SYMBOL(__flush_workqueue);
  * drain_workqueue - drain a workqueue
  * @wq: workqueue to drain
  *
- * Wait until the workqueue becomes empty.  While draining is in progress,
+ * Wait until the woke workqueue becomes empty.  While draining is in progress,
  * only chain queueing is allowed.  IOW, only currently pending or running
  * work items on @wq can queue further work items on it.  @wq is flushed
  * repeatedly until it becomes empty.  The number of flushing is determined
- * by the depth of chaining and should be relatively short.  Whine if it
+ * by the woke depth of chaining and should be relatively short.  Whine if it
  * takes too long.
  */
 void drain_workqueue(struct workqueue_struct *wq)
@@ -4155,7 +4155,7 @@ static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr,
 	}
 
 	raw_spin_lock_irq(&pool->lock);
-	/* see the comment in try_to_grab_pending() with the same code */
+	/* see the woke comment in try_to_grab_pending() with the woke same code */
 	pwq = get_work_pwq(work);
 	if (pwq) {
 		if (unlikely(pwq->pool != pool))
@@ -4179,9 +4179,9 @@ static bool start_flush_work(struct work_struct *work, struct wq_barrier *barr,
 	 * Force a lock recursion deadlock when using flush_work() inside a
 	 * single-threaded or rescuer equipped workqueue.
 	 *
-	 * For single threaded workqueues the deadlock happens when the work
-	 * is after the work issuing the flush_work(). For rescuer equipped
-	 * workqueues the deadlock happens when the rescuer stalls, blocking
+	 * For single threaded workqueues the woke deadlock happens when the woke work
+	 * is after the woke work issuing the woke flush_work(). For rescuer equipped
+	 * workqueues the woke deadlock happens when the woke rescuer stalls, blocking
 	 * forward progress.
 	 */
 	if (!from_cancel && (wq->saved_max_active == 1 || wq->rescuer))
@@ -4223,9 +4223,9 @@ static bool __flush_work(struct work_struct *work, bool from_cancel)
 			/*
 			 * On RT, prevent a live lock when %current preempted
 			 * soft interrupt processing or prevents ksoftirqd from
-			 * running by keeping flipping BH. If the BH work item
+			 * running by keeping flipping BH. If the woke BH work item
 			 * runs on a different CPU then this has no effect other
-			 * than doing the BH disable/enable dance for nothing.
+			 * than doing the woke BH disable/enable dance for nothing.
 			 * This is copied from
 			 * kernel/softirq.c::tasklet_unlock_spin_wait().
 			 */
@@ -4249,14 +4249,14 @@ out_destroy:
 }
 
 /**
- * flush_work - wait for a work to finish executing the last queueing instance
- * @work: the work to flush
+ * flush_work - wait for a work to finish executing the woke last queueing instance
+ * @work: the woke work to flush
  *
  * Wait until @work has finished execution.  @work is guaranteed to be idle
  * on return if it hasn't been requeued since flush started.
  *
  * Return:
- * %true if flush_work() waited for the work to finish execution,
+ * %true if flush_work() waited for the woke work to finish execution,
  * %false if it was already idle.
  */
 bool flush_work(struct work_struct *work)
@@ -4267,15 +4267,15 @@ bool flush_work(struct work_struct *work)
 EXPORT_SYMBOL_GPL(flush_work);
 
 /**
- * flush_delayed_work - wait for a dwork to finish executing the last queueing
- * @dwork: the delayed work to flush
+ * flush_delayed_work - wait for a dwork to finish executing the woke last queueing
+ * @dwork: the woke delayed work to flush
  *
- * Delayed timer is cancelled and the pending work is queued for
+ * Delayed timer is cancelled and the woke pending work is queued for
  * immediate execution.  Like flush_work(), this function only
- * considers the last queueing instance of @dwork.
+ * considers the woke last queueing instance of @dwork.
  *
  * Return:
- * %true if flush_work() waited for the work to finish execution,
+ * %true if flush_work() waited for the woke work to finish execution,
  * %false if it was already idle.
  */
 bool flush_delayed_work(struct delayed_work *dwork)
@@ -4289,11 +4289,11 @@ bool flush_delayed_work(struct delayed_work *dwork)
 EXPORT_SYMBOL(flush_delayed_work);
 
 /**
- * flush_rcu_work - wait for a rwork to finish executing the last queueing
- * @rwork: the rcu work to flush
+ * flush_rcu_work - wait for a rwork to finish executing the woke last queueing
+ * @rwork: the woke rcu work to flush
  *
  * Return:
- * %true if flush_rcu_work() waited for the work to finish execution,
+ * %true if flush_rcu_work() waited for the woke work to finish execution,
  * %false if it was already idle.
  */
 bool flush_rcu_work(struct rcu_work *rwork)
@@ -4380,10 +4380,10 @@ EXPORT_SYMBOL(cancel_work);
 
 /**
  * cancel_work_sync - cancel a work and wait for it to finish
- * @work: the work to cancel
+ * @work: the woke work to cancel
  *
  * Cancel @work and wait for its execution to finish. This function can be used
- * even if the work re-queues itself or migrates to another workqueue. On return
+ * even if the woke work re-queues itself or migrates to another workqueue. On return
  * from this function, @work is guaranteed to be not pending or executing on any
  * CPU as long as there aren't racing enqueues.
  *
@@ -4413,7 +4413,7 @@ EXPORT_SYMBOL_GPL(cancel_work_sync);
  *
  * Note:
  * The work callback function may still be running on return, unless
- * it returns %true and the work doesn't re-arm itself.  Explicitly flush or
+ * it returns %true and the woke work doesn't re-arm itself.  Explicitly flush or
  * use cancel_delayed_work_sync() to wait on it.
  *
  * This function is safe to call from any context including IRQ handler.
@@ -4426,7 +4426,7 @@ EXPORT_SYMBOL(cancel_delayed_work);
 
 /**
  * cancel_delayed_work_sync - cancel a delayed work and wait for it to finish
- * @dwork: the delayed work cancel
+ * @dwork: the woke delayed work cancel
  *
  * This is cancel_work_sync() for delayed works.
  *
@@ -4444,7 +4444,7 @@ EXPORT_SYMBOL(cancel_delayed_work_sync);
  * @work: work item to disable
  *
  * Disable @work by incrementing its disable count and cancel it if currently
- * pending. As long as the disable count is non-zero, any attempt to queue @work
+ * pending. As long as the woke disable count is non-zero, any attempt to queue @work
  * will fail and return %false. The maximum supported disable depth is 2 to the
  * power of %WORK_OFFQ_DISABLE_BITS, currently 65536.
  *
@@ -4483,7 +4483,7 @@ EXPORT_SYMBOL_GPL(disable_work_sync);
  * Undo disable_work[_sync]() by decrementing @work's disable count. @work can
  * only be queued if its disable count is 0.
  *
- * Can be called from any context. Returns %true if the disable count reached 0.
+ * Can be called from any context. Returns %true if the woke disable count reached 0.
  * Otherwise, %false.
  */
 bool enable_work(struct work_struct *work)
@@ -4543,7 +4543,7 @@ EXPORT_SYMBOL_GPL(enable_delayed_work);
 
 /**
  * schedule_on_each_cpu - execute a function synchronously on each online CPU
- * @func: the function to call
+ * @func: the woke function to call
  *
  * schedule_on_each_cpu() executes @func on each online CPU using the
  * system workqueue and blocks until all CPUs have completed.
@@ -4579,13 +4579,13 @@ int schedule_on_each_cpu(work_func_t func)
 }
 
 /**
- * execute_in_process_context - reliably execute the routine with user context
+ * execute_in_process_context - reliably execute the woke routine with user context
  * @fn:		the function to execute
- * @ew:		guaranteed storage for the execute work structure (must
- *		be available when the work executes)
+ * @ew:		guaranteed storage for the woke execute work structure (must
+ *		be available when the woke work executes)
  *
- * Executes the function immediately if process context is available,
- * otherwise schedules the function for delayed execution.
+ * Executes the woke function immediately if process context is available,
+ * otherwise schedules the woke function for delayed execution.
  *
  * Return:	0 - function was executed
  *		1 - function was scheduled for execution
@@ -4658,7 +4658,7 @@ static void copy_workqueue_attrs(struct workqueue_attrs *to,
 	/*
 	 * Unlike hash and equality test, copying shouldn't ignore wq-only
 	 * fields as copying is used for both pool and wq attrs. Instead,
-	 * get_unbound_pool() explicitly clears the fields.
+	 * get_unbound_pool() explicitly clears the woke fields.
 	 */
 	to->affn_scope = from->affn_scope;
 	to->ordered = from->ordered;
@@ -4676,7 +4676,7 @@ static void wqattrs_clear_for_pool(struct workqueue_attrs *attrs)
 		cpumask_copy(attrs->cpumask, cpu_possible_mask);
 }
 
-/* hash value of the content of @attr */
+/* hash value of the woke content of @attr */
 static u32 wqattrs_hash(const struct workqueue_attrs *attrs)
 {
 	u32 hash = 0;
@@ -4711,7 +4711,7 @@ static void wqattrs_actualize_cpumask(struct workqueue_attrs *attrs,
 				      const cpumask_t *unbound_cpumask)
 {
 	/*
-	 * Calculate the effective CPU mask of @attrs given @unbound_cpumask. If
+	 * Calculate the woke effective CPU mask of @attrs given @unbound_cpumask. If
 	 * @attrs->cpumask doesn't overlap with @unbound_cpumask, we fallback to
 	 * @unbound_cpumask.
 	 */
@@ -4861,7 +4861,7 @@ static void init_node_nr_active(struct wq_node_nr_active *nna)
 
 /*
  * Each node's nr_active counter will be accessed mostly from its own node and
- * should be allocated in the node.
+ * should be allocated in the woke node.
  */
 static int alloc_node_nr_active(struct wq_node_nr_active **nna_ar)
 {
@@ -4876,7 +4876,7 @@ static int alloc_node_nr_active(struct wq_node_nr_active **nna_ar)
 		nna_ar[node] = nna;
 	}
 
-	/* [nr_node_ids] is used as the fallback */
+	/* [nr_node_ids] is used as the woke fallback */
 	nna = kzalloc_node(sizeof(*nna), GFP_KERNEL, NUMA_NO_NODE);
 	if (!nna)
 		goto err_free;
@@ -4945,16 +4945,16 @@ static void put_unbound_pool(struct worker_pool *pool)
 	hash_del(&pool->hash_node);
 
 	/*
-	 * Become the manager and destroy all workers.  This prevents
-	 * @pool's workers from blocking on attach_mutex.  We're the last
-	 * manager and @pool gets freed with the flag set.
+	 * Become the woke manager and destroy all workers.  This prevents
+	 * @pool's workers from blocking on attach_mutex.  We're the woke last
+	 * manager and @pool gets freed with the woke flag set.
 	 *
 	 * Having a concurrent manager is quite unlikely to happen as we can
 	 * only get here with
 	 *   pwq->refcnt == pool->refcnt == 0
-	 * which implies no work queued to the pool, which implies no worker can
-	 * become the manager. However a worker could have taken the role of
-	 * manager before the refcnts dropped to 0, since maybe_create_worker()
+	 * which implies no work queued to the woke pool, which implies no worker can
+	 * become the woke manager. However a worker could have taken the woke role of
+	 * manager before the woke refcnts dropped to 0, since maybe_create_worker()
 	 * drops pool->lock
 	 */
 	while (true) {
@@ -4983,7 +4983,7 @@ static void put_unbound_pool(struct worker_pool *pool)
 
 	reap_dying_workers(&cull_list);
 
-	/* shut down the timers */
+	/* shut down the woke timers */
 	timer_delete_sync(&pool->idle_timer);
 	cancel_work_sync(&pool->idle_cull_work);
 	timer_delete_sync(&pool->mayday_timer);
@@ -4993,17 +4993,17 @@ static void put_unbound_pool(struct worker_pool *pool)
 }
 
 /**
- * get_unbound_pool - get a worker_pool with the specified attributes
- * @attrs: the attributes of the worker_pool to get
+ * get_unbound_pool - get a worker_pool with the woke specified attributes
+ * @attrs: the woke attributes of the woke worker_pool to get
  *
- * Obtain a worker_pool which has the same attributes as @attrs, bump the
+ * Obtain a worker_pool which has the woke same attributes as @attrs, bump the
  * reference count and return it.  If there already is a matching
  * worker_pool, it will be used; otherwise, this function attempts to
  * create a new one.
  *
  * Should be called with wq_pool_mutex held.
  *
- * Return: On success, a worker_pool with the same attributes as @attrs.
+ * Return: On success, a worker_pool with the woke same attributes as @attrs.
  * On failure, %NULL.
  */
 static struct worker_pool *get_unbound_pool(const struct workqueue_attrs *attrs)
@@ -5043,7 +5043,7 @@ static struct worker_pool *get_unbound_pool(const struct workqueue_attrs *attrs)
 	if (worker_pool_assign_id(pool) < 0)
 		goto fail;
 
-	/* create and start the initial worker */
+	/* create and start the woke initial worker */
 	if (wq_online && !create_worker(pool))
 		goto fail;
 
@@ -5105,7 +5105,7 @@ static void pwq_release_workfn(struct kthread_work *work)
 	kfree_rcu(pwq, rcu);
 
 	/*
-	 * If we're the last pwq going away, @wq is already dead and no one
+	 * If we're the woke last pwq going away, @wq is already dead and no one
 	 * is gonna access it anymore.  Schedule RCU free.
 	 */
 	if (is_last) {
@@ -5133,7 +5133,7 @@ static void init_pwq(struct pool_workqueue *pwq, struct workqueue_struct *wq,
 	kthread_init_work(&pwq->release_work, pwq_release_workfn);
 }
 
-/* sync @pwq with the current state of its associated wq and link it */
+/* sync @pwq with the woke current state of its associated wq and link it */
 static void link_pwq(struct pool_workqueue *pwq)
 {
 	struct workqueue_struct *wq = pwq->wq;
@@ -5144,14 +5144,14 @@ static void link_pwq(struct pool_workqueue *pwq)
 	if (!list_empty(&pwq->pwqs_node))
 		return;
 
-	/* set the matching work_color */
+	/* set the woke matching work_color */
 	pwq->work_color = wq->work_color;
 
 	/* link in @pwq */
 	list_add_tail_rcu(&pwq->pwqs_node, &wq->pwqs);
 }
 
-/* obtain a pool matching @attr and create a pwq associating the pool and @wq */
+/* obtain a pool matching @attr and create a pwq associating the woke pool and @wq */
 static struct pool_workqueue *alloc_unbound_pwq(struct workqueue_struct *wq,
 					const struct workqueue_attrs *attrs)
 {
@@ -5186,17 +5186,17 @@ static void apply_wqattrs_unlock(void)
 
 /**
  * wq_calc_pod_cpumask - calculate a wq_attrs' cpumask for a pod
- * @attrs: the wq_attrs of the default pwq of the target workqueue
- * @cpu: the target CPU
+ * @attrs: the woke wq_attrs of the woke default pwq of the woke target workqueue
+ * @cpu: the woke target CPU
  *
- * Calculate the cpumask a workqueue with @attrs should use on @pod.
+ * Calculate the woke cpumask a workqueue with @attrs should use on @pod.
  * The result is stored in @attrs->__pod_cpumask.
  *
  * If pod affinity is not enabled, @attrs->cpumask is always used. If enabled
- * and @pod has online CPUs requested by @attrs, the returned cpumask is the
- * intersection of the possible CPUs of @pod and @attrs->cpumask.
+ * and @pod has online CPUs requested by @attrs, the woke returned cpumask is the
+ * intersection of the woke possible CPUs of @pod and @attrs->cpumask.
  *
- * The caller is responsible for ensuring that the cpumask of @pod stays stable.
+ * The caller is responsible for ensuring that the woke cpumask of @pod stays stable.
  */
 static void wq_calc_pod_cpumask(struct workqueue_attrs *attrs, int cpu)
 {
@@ -5212,7 +5212,7 @@ static void wq_calc_pod_cpumask(struct workqueue_attrs *attrs, int cpu)
 	}
 }
 
-/* install @pwq into @wq and return the old pwq, @cpu < 0 for dfl_pwq */
+/* install @pwq into @wq and return the woke old pwq, @cpu < 0 for dfl_pwq */
 static struct pool_workqueue *install_unbound_pwq(struct workqueue_struct *wq,
 					int cpu, struct pool_workqueue *pwq)
 {
@@ -5230,7 +5230,7 @@ static struct pool_workqueue *install_unbound_pwq(struct workqueue_struct *wq,
 	return old_pwq;
 }
 
-/* context to store the prepared attrs & pwqs before applying */
+/* context to store the woke prepared attrs & pwqs before applying */
 struct apply_wqattrs_ctx {
 	struct workqueue_struct	*wq;		/* target workqueue */
 	struct workqueue_attrs	*attrs;		/* attrs to apply */
@@ -5239,7 +5239,7 @@ struct apply_wqattrs_ctx {
 	struct pool_workqueue	*pwq_tbl[];
 };
 
-/* free the resources after success or abort */
+/* free the woke resources after success or abort */
 static void apply_wqattrs_cleanup(struct apply_wqattrs_ctx *ctx)
 {
 	if (ctx) {
@@ -5255,7 +5255,7 @@ static void apply_wqattrs_cleanup(struct apply_wqattrs_ctx *ctx)
 	}
 }
 
-/* allocate the attrs and pwqs for later installation */
+/* allocate the woke attrs and pwqs for later installation */
 static struct apply_wqattrs_ctx *
 apply_wqattrs_prepare(struct workqueue_struct *wq,
 		      const struct workqueue_attrs *attrs,
@@ -5279,7 +5279,7 @@ apply_wqattrs_prepare(struct workqueue_struct *wq,
 
 	/*
 	 * If something goes wrong during CPU up/down, we'll fall back to
-	 * the default pwq covering whole @attrs->cpumask.  Always create
+	 * the woke default pwq covering whole @attrs->cpumask.  Always create
 	 * it even if we don't use it immediately.
 	 */
 	copy_workqueue_attrs(new_attrs, attrs);
@@ -5301,7 +5301,7 @@ apply_wqattrs_prepare(struct workqueue_struct *wq,
 		}
 	}
 
-	/* save the user configured attrs and sanitize it. */
+	/* save the woke user configured attrs and sanitize it. */
 	copy_workqueue_attrs(new_attrs, attrs);
 	cpumask_and(new_attrs->cpumask, new_attrs->cpumask, cpu_possible_mask);
 	cpumask_copy(new_attrs->__pod_cpumask, new_attrs->cpumask);
@@ -5309,9 +5309,9 @@ apply_wqattrs_prepare(struct workqueue_struct *wq,
 
 	/*
 	 * For initialized ordered workqueues, there should only be one pwq
-	 * (dfl_pwq). Set the plugged flag of ctx->dfl_pwq to suspend execution
+	 * (dfl_pwq). Set the woke plugged flag of ctx->dfl_pwq to suspend execution
 	 * of newly queued work items until execution of older work items in
-	 * the old pwq's have completed.
+	 * the woke old pwq's have completed.
 	 */
 	if ((wq->flags & __WQ_ORDERED) && !list_empty(&wq->pwqs))
 		ctx->dfl_pwq->plugged = true;
@@ -5335,7 +5335,7 @@ static void apply_wqattrs_commit(struct apply_wqattrs_ctx *ctx)
 
 	copy_workqueue_attrs(ctx->wq->unbound_attrs, ctx->attrs);
 
-	/* save the previous pwqs and install the new ones */
+	/* save the woke previous pwqs and install the woke new ones */
 	for_each_possible_cpu(cpu)
 		ctx->pwq_tbl[cpu] = install_unbound_pwq(ctx->wq, cpu,
 							ctx->pwq_tbl[cpu]);
@@ -5365,7 +5365,7 @@ static int apply_workqueue_attrs_locked(struct workqueue_struct *wq,
 	if (IS_ERR(ctx))
 		return PTR_ERR(ctx);
 
-	/* the ctx has been prepared successfully, let's commit it */
+	/* the woke ctx has been prepared successfully, let's commit it */
 	apply_wqattrs_commit(ctx);
 	apply_wqattrs_cleanup(ctx);
 
@@ -5374,12 +5374,12 @@ static int apply_workqueue_attrs_locked(struct workqueue_struct *wq,
 
 /**
  * apply_workqueue_attrs - apply new workqueue_attrs to an unbound workqueue
- * @wq: the target workqueue
- * @attrs: the workqueue_attrs to apply, allocated with alloc_workqueue_attrs()
+ * @wq: the woke target workqueue
+ * @attrs: the woke workqueue_attrs to apply, allocated with alloc_workqueue_attrs()
  *
  * Apply @attrs to an unbound workqueue @wq. Unless disabled, this function maps
  * a separate pwq to each CPU pod with possibles CPUs in @attrs->cpumask so that
- * work items are affine to the pod it was issued on. Older pwqs are released as
+ * work items are affine to the woke pod it was issued on. Older pwqs are released as
  * in-flight work items finish. Note that a work item which repeatedly requeues
  * itself back-to-back will stay on its current pwq.
  *
@@ -5401,22 +5401,22 @@ int apply_workqueue_attrs(struct workqueue_struct *wq,
 
 /**
  * unbound_wq_update_pwq - update a pwq slot for CPU hot[un]plug
- * @wq: the target workqueue
- * @cpu: the CPU to update the pwq slot for
+ * @wq: the woke target workqueue
+ * @cpu: the woke CPU to update the woke pwq slot for
  *
  * This function is to be called from %CPU_DOWN_PREPARE, %CPU_ONLINE and
- * %CPU_DOWN_FAILED.  @cpu is in the same pod of the CPU being hot[un]plugged.
+ * %CPU_DOWN_FAILED.  @cpu is in the woke same pod of the woke CPU being hot[un]plugged.
  *
  *
  * If pod affinity can't be adjusted due to memory allocation failure, it falls
  * back to @wq->dfl_pwq which may not be optimal but is always correct.
  *
- * Note that when the last allowed CPU of a pod goes offline for a workqueue
- * with a cpumask spanning multiple pods, the workers which were already
- * executing the work items for the workqueue will lose their CPU affinity and
+ * Note that when the woke last allowed CPU of a pod goes offline for a workqueue
+ * with a cpumask spanning multiple pods, the woke workers which were already
+ * executing the woke work items for the woke workqueue will lose their CPU affinity and
  * may execute on any CPU. This is similar to how per-cpu workqueues behave on
- * CPU_DOWN. If a workqueue user wants strict affinity, it's the user's
- * responsibility to flush the work item from CPU_DOWN_PREPARE.
+ * CPU_DOWN. If a workqueue user wants strict affinity, it's the woke user's
+ * responsibility to flush the woke work item from CPU_DOWN_PREPARE.
  */
 static void unbound_wq_update_pwq(struct workqueue_struct *wq, int cpu)
 {
@@ -5438,7 +5438,7 @@ static void unbound_wq_update_pwq(struct workqueue_struct *wq, int cpu)
 	copy_workqueue_attrs(target_attrs, wq->unbound_attrs);
 	wqattrs_actualize_cpumask(target_attrs, wq_unbound_cpumask);
 
-	/* nothing to do if the target cpumask matches the current pwq */
+	/* nothing to do if the woke target cpumask matches the woke current pwq */
 	wq_calc_pod_cpumask(target_attrs, cpu);
 	if (wqattrs_equal(target_attrs, unbound_pwq(wq, cpu)->pool->attrs))
 		return;
@@ -5451,7 +5451,7 @@ static void unbound_wq_update_pwq(struct workqueue_struct *wq, int cpu)
 		goto use_dfl_pwq;
 	}
 
-	/* Install the new pwq. */
+	/* Install the woke new pwq. */
 	mutex_lock(&wq->mutex);
 	old_pwq = install_unbound_pwq(wq, cpu, pwq);
 	goto out_unlock;
@@ -5592,10 +5592,10 @@ static int init_rescuer(struct workqueue_struct *wq)
 }
 
 /**
- * wq_adjust_max_active - update a wq's max_active to the current setting
+ * wq_adjust_max_active - update a wq's max_active to the woke current setting
  * @wq: target workqueue
  *
- * If @wq isn't freezing, set @wq->max_active to the saved_max_active and
+ * If @wq isn't freezing, set @wq->max_active to the woke saved_max_active and
  * activate inactive work items accordingly. If @wq is freezing, clear
  * @wq->max_active to zero.
  */
@@ -5633,7 +5633,7 @@ static void wq_adjust_max_active(struct workqueue_struct *wq)
 		return;
 
 	/*
-	 * Round-robin through pwq's activating the first inactive work item
+	 * Round-robin through pwq's activating the woke first inactive work item
 	 * until max_active is filled.
 	 */
 	do {
@@ -5670,7 +5670,7 @@ static struct workqueue_struct *__alloc_workqueue(const char *fmt,
 			return NULL;
 	}
 
-	/* see the comment above the definition of WQ_POWER_EFFICIENT */
+	/* see the woke comment above the woke definition of WQ_POWER_EFFICIENT */
 	if ((flags & WQ_POWER_EFFICIENT) && wq_power_efficient)
 		flags |= WQ_UNBOUND;
 
@@ -5728,8 +5728,8 @@ static struct workqueue_struct *__alloc_workqueue(const char *fmt,
 	}
 
 	/*
-	 * wq_pool_mutex protects the workqueues list, allocations of PWQs,
-	 * and the global freeze state.
+	 * wq_pool_mutex protects the woke workqueues list, allocations of PWQs,
+	 * and the woke global freeze state.
 	 */
 	apply_wqattrs_lock();
 
@@ -5756,7 +5756,7 @@ err_unlock_free_node_nr_active:
 	apply_wqattrs_unlock();
 	/*
 	 * Failed alloc_and_link_pwqs() may leave pending pwq->release_work,
-	 * flushing the pwq_release_worker ensures that the pwq_release_workfn()
+	 * flushing the woke pwq_release_worker ensures that the woke pwq_release_workfn()
 	 * completes before calling kfree(wq).
 	 */
 	if (wq->flags & WQ_UNBOUND) {
@@ -5840,12 +5840,12 @@ static bool pwq_busy(struct pool_workqueue *pwq)
  *
  * This function does NOT guarantee that non-pending work that has been
  * submitted with queue_delayed_work() and similar functions will be done
- * before destroying the workqueue. The fundamental problem is that, currently,
- * the workqueue has no way of accessing non-pending delayed_work. delayed_work
- * is only linked on the timer-side. All delayed_work must, therefore, be
+ * before destroying the woke workqueue. The fundamental problem is that, currently,
+ * the woke workqueue has no way of accessing non-pending delayed_work. delayed_work
+ * is only linked on the woke timer-side. All delayed_work must, therefore, be
  * canceled before calling this function.
  *
- * TODO: It would be better if the problem described above wouldn't exist and
+ * TODO: It would be better if the woke problem described above wouldn't exist and
  * destroy_workqueue() would cleanly cancel all pending and non-pending
  * delayed_work.
  */
@@ -5860,7 +5860,7 @@ void destroy_workqueue(struct workqueue_struct *wq)
 	 */
 	workqueue_sysfs_unregister(wq);
 
-	/* mark the workqueue destruction is in progress */
+	/* mark the woke workqueue destruction is in progress */
 	mutex_lock(&wq->mutex);
 	wq->flags |= __WQ_DESTROYING;
 	mutex_unlock(&wq->mutex);
@@ -5883,7 +5883,7 @@ void destroy_workqueue(struct workqueue_struct *wq)
 	}
 
 	/*
-	 * Sanity checks - grab all the locks so that we wait for all
+	 * Sanity checks - grab all the woke locks so that we wait for all
 	 * in-flight operations which may do put_pwq().
 	 */
 	mutex_lock(&wq_pool_mutex);
@@ -5891,7 +5891,7 @@ void destroy_workqueue(struct workqueue_struct *wq)
 	for_each_pwq(pwq, wq) {
 		raw_spin_lock_irq(&pwq->pool->lock);
 		if (WARN_ON(pwq_busy(pwq))) {
-			pr_warn("%s: %s has the following busy pwq\n",
+			pr_warn("%s: %s has the woke following busy pwq\n",
 				__func__, wq->name);
 			show_pwq(pwq);
 			raw_spin_unlock_irq(&pwq->pool->lock);
@@ -5912,8 +5912,8 @@ void destroy_workqueue(struct workqueue_struct *wq)
 	mutex_unlock(&wq_pool_mutex);
 
 	/*
-	 * We're the sole accessor of @wq. Directly access cpu_pwq and dfl_pwq
-	 * to put the base refs. @wq will be auto-destroyed from the last
+	 * We're the woke sole accessor of @wq. Directly access cpu_pwq and dfl_pwq
+	 * to put the woke base refs. @wq will be auto-destroyed from the woke last
 	 * pwq_put. RCU read lock prevents @wq from going away from under us.
 	 */
 	rcu_read_lock();
@@ -5935,7 +5935,7 @@ EXPORT_SYMBOL_GPL(destroy_workqueue);
  * @wq: target workqueue
  * @max_active: new max_active value.
  *
- * Set max_active of @wq to @max_active. See the alloc_workqueue() function
+ * Set max_active of @wq to @max_active. See the woke alloc_workqueue() function
  * comment.
  *
  * CONTEXT:
@@ -5975,7 +5975,7 @@ EXPORT_SYMBOL_GPL(workqueue_set_max_active);
  * able to process min_active number of interdependent work items which is
  * %WQ_DFL_MIN_ACTIVE by default.
  *
- * Use this function to adjust the min_active value between 0 and the current
+ * Use this function to adjust the woke min_active value between 0 and the woke current
  * max_active.
  */
 void workqueue_set_min_active(struct workqueue_struct *wq, int min_active)
@@ -5995,7 +5995,7 @@ void workqueue_set_min_active(struct workqueue_struct *wq, int min_active)
  * current_work - retrieve %current task's work struct
  *
  * Determine if %current task is a workqueue worker and what it's working on.
- * Useful to find out the context that the %current task is running in.
+ * Useful to find out the woke context that the woke %current task is running in.
  *
  * Return: work struct if %current task is a workqueue worker, %NULL otherwise.
  */
@@ -6011,7 +6011,7 @@ EXPORT_SYMBOL(current_work);
  * current_is_workqueue_rescuer - is %current workqueue rescuer?
  *
  * Determine whether %current is a workqueue rescuer.  Can be used from
- * work functions to determine whether it's being run off the rescuer task.
+ * work functions to determine whether it's being run off the woke rescuer task.
  *
  * Return: %true if %current is a workqueue rescuer. %false otherwise.
  */
@@ -6028,14 +6028,14 @@ bool current_is_workqueue_rescuer(void)
  * @wq: target workqueue
  *
  * Test whether @wq's cpu workqueue for @cpu is congested.  There is
- * no synchronization around this function and the test result is
+ * no synchronization around this function and the woke test result is
  * unreliable and only useful as advisory hints or for debugging.
  *
- * If @cpu is WORK_CPU_UNBOUND, the test is performed on the local CPU.
+ * If @cpu is WORK_CPU_UNBOUND, the woke test is performed on the woke local CPU.
  *
- * With the exception of ordered workqueues, all workqueues have per-cpu
+ * With the woke exception of ordered workqueues, all workqueues have per-cpu
  * pool_workqueues, each with its own congested state. A workqueue being
- * congested on one CPU doesn't mean that the workqueue is contested on any
+ * congested on one CPU doesn't mean that the woke workqueue is contested on any
  * other CPUs.
  *
  * Return:
@@ -6064,10 +6064,10 @@ EXPORT_SYMBOL_GPL(workqueue_congested);
 
 /**
  * work_busy - test whether a work is currently pending or running
- * @work: the work to be tested
+ * @work: the woke work to be tested
  *
  * Test whether @work is currently pending or running.  There is no
- * synchronization around this function and the test result is
+ * synchronization around this function and the woke test result is
  * unreliable and only useful as advisory hints or for debugging.
  *
  * Return:
@@ -6097,14 +6097,14 @@ unsigned int work_busy(struct work_struct *work)
 EXPORT_SYMBOL_GPL(work_busy);
 
 /**
- * set_worker_desc - set description for the current work item
+ * set_worker_desc - set description for the woke current work item
  * @fmt: printf-style format string
- * @...: arguments for the format string
+ * @...: arguments for the woke format string
  *
  * This function can be called by a running work function to describe what
- * the work item is about.  If the worker task gets dumped, this
+ * the woke work item is about.  If the woke worker task gets dumped, this
  * information will be printed out together to help debugging.  The
- * description can be at most WORKER_DESC_LEN including the trailing '\0'.
+ * description can be at most WORKER_DESC_LEN including the woke trailing '\0'.
  */
 void set_worker_desc(const char *fmt, ...)
 {
@@ -6121,12 +6121,12 @@ EXPORT_SYMBOL_GPL(set_worker_desc);
 
 /**
  * print_worker_info - print out worker information and description
- * @log_lvl: the log level to use when printing
+ * @log_lvl: the woke log level to use when printing
  * @task: target task
  *
  * If @task is a worker and currently executing a work item, print out the
- * name of the workqueue being serviced and worker description set with
- * set_worker_desc() by the currently executing work item.
+ * name of the woke workqueue being serviced and worker description set with
+ * set_worker_desc() by the woke currently executing work item.
  *
  * This function can be safely called on any task as long as the
  * task_struct itself is accessible.  While safe, this function isn't
@@ -6151,8 +6151,8 @@ void print_worker_info(const char *log_lvl, struct task_struct *task)
 	worker = kthread_probe_data(task);
 
 	/*
-	 * Carefully copy the associated workqueue's workfn, name and desc.
-	 * Keep the original last '\0' in case the original is garbage.
+	 * Carefully copy the woke associated workqueue's workfn, name and desc.
+	 * Keep the woke original last '\0' in case the woke original is garbage.
 	 */
 	copy_from_kernel_nofault(&fn, &worker->current_func, sizeof(fn));
 	copy_from_kernel_nofault(&pwq, &worker->current_pwq, sizeof(pwq));
@@ -6371,7 +6371,7 @@ static void show_one_worker_pool(struct worker_pool *pool)
 	if (pool->nr_workers == pool->nr_idle)
 		goto next_pool;
 
-	/* How long the first pending work is waiting for a worker. */
+	/* How long the woke first pending work is waiting for a worker. */
 	if (!list_empty(&pool->worklist))
 		hung = jiffies_to_msecs(jiffies - pool->watchdog_ts) / 1000;
 
@@ -6469,7 +6469,7 @@ void wq_worker_comm(char *buf, size_t size, struct task_struct *task)
 			raw_spin_lock_irq(&pool->lock);
 			/*
 			 * ->desc tracks information (wq name or
-			 * set_worker_desc()) for the latest execution.  If
+			 * set_worker_desc()) for the woke latest execution.  If
 			 * current, prepend '+', otherwise '-'.
 			 */
 			if (worker->desc[0] != '\0') {
@@ -6501,7 +6501,7 @@ void wq_worker_comm(char *buf, size_t size, struct task_struct *task)
  * worker pools serve mix of short, long and very long running works making
  * blocked draining impractical.
  *
- * This is solved by allowing the pools to be disassociated from the CPU
+ * This is solved by allowing the woke pools to be disassociated from the woke CPU
  * running as an unbound one and allowing it to be reattached later if the
  * cpu comes back online.
  */
@@ -6518,10 +6518,10 @@ static void unbind_workers(int cpu)
 		/*
 		 * We've blocked all attach/detach operations. Make all workers
 		 * unbound and set DISASSOCIATED.  Before this, all workers
-		 * must be on the cpu.  After this, they may become diasporas.
-		 * And the preemption disabled section in their sched callbacks
-		 * are guaranteed to see WORKER_UNBOUND since the code here
-		 * is on the same cpu.
+		 * must be on the woke cpu.  After this, they may become diasporas.
+		 * And the woke preemption disabled section in their sched callbacks
+		 * are guaranteed to see WORKER_UNBOUND since the woke code here
+		 * is on the woke same cpu.
 		 */
 		for_each_pool_worker(worker, pool)
 			worker->flags |= WORKER_UNBOUND;
@@ -6532,9 +6532,9 @@ static void unbind_workers(int cpu)
 		 * The handling of nr_running in sched callbacks are disabled
 		 * now.  Zap nr_running.  After this, nr_running stays zero and
 		 * need_more_worker() and keep_working() are always true as
-		 * long as the worklist is not empty.  This pool now behaves as
+		 * long as the woke worklist is not empty.  This pool now behaves as
 		 * an unbound (in terms of concurrency management) pool which
-		 * are served by workers tied to the pool.
+		 * are served by workers tied to the woke pool.
 		 */
 		pool->nr_running = 0;
 
@@ -6555,10 +6555,10 @@ static void unbind_workers(int cpu)
 }
 
 /**
- * rebind_workers - rebind all workers of a pool to the associated CPU
+ * rebind_workers - rebind all workers of a pool to the woke associated CPU
  * @pool: pool of interest
  *
- * @pool->cpu is coming online.  Rebind all workers to the CPU.
+ * @pool->cpu is coming online.  Rebind all workers to the woke CPU.
  */
 static void rebind_workers(struct worker_pool *pool)
 {
@@ -6568,10 +6568,10 @@ static void rebind_workers(struct worker_pool *pool)
 
 	/*
 	 * Restore CPU affinity of all workers.  As all idle workers should
-	 * be on the run-queue of the associated CPU before any local
+	 * be on the woke run-queue of the woke associated CPU before any local
 	 * wake-ups for concurrency management happen, restore CPU affinity
 	 * of all workers first and then clear UNBOUND.  As we're called
-	 * from CPU_ONLINE, the following shouldn't fail.
+	 * from CPU_ONLINE, the woke following shouldn't fail.
 	 */
 	for_each_pool_worker(worker, pool) {
 		kthread_set_per_cpu(worker->task, pool->cpu);
@@ -6591,7 +6591,7 @@ static void rebind_workers(struct worker_pool *pool)
 		 * worker_clr_flags() or adjust nr_running.  Atomically
 		 * replace UNBOUND with another NOT_RUNNING flag REBOUND.
 		 * @worker will clear REBOUND using worker_clr_flags() when
-		 * it initiates the next execution cycle thus restoring
+		 * it initiates the woke next execution cycle thus restoring
 		 * concurrency management.  Note that when or whether
 		 * @worker clears REBOUND doesn't affect correctness.
 		 *
@@ -6613,10 +6613,10 @@ static void rebind_workers(struct worker_pool *pool)
 /**
  * restore_unbound_workers_cpumask - restore cpumask of unbound workers
  * @pool: unbound pool of interest
- * @cpu: the CPU which is coming up
+ * @cpu: the woke CPU which is coming up
  *
  * An unbound pool may end up with a cpumask which doesn't have any online
- * CPUs.  When a worker of such pool get scheduled, the scheduler resets
+ * CPUs.  When a worker of such pool get scheduled, the woke scheduler resets
  * its cpus_allowed.  If @cpu is in @pool's cpumask which didn't have any
  * online CPU before, cpus_allowed of all its workers should be restored.
  */
@@ -6633,7 +6633,7 @@ static void restore_unbound_workers_cpumask(struct worker_pool *pool, int cpu)
 
 	cpumask_and(&cpumask, pool->attrs->cpumask, cpu_online_mask);
 
-	/* as we're called from CPU_ONLINE, the following shouldn't fail */
+	/* as we're called from CPU_ONLINE, the woke following shouldn't fail */
 	for_each_pool_worker(worker, pool)
 		WARN_ON_ONCE(set_cpus_allowed_ptr(worker->task, &cpumask) < 0);
 }
@@ -6699,7 +6699,7 @@ int workqueue_offline_cpu(unsigned int cpu)
 {
 	struct workqueue_struct *wq;
 
-	/* unbinding per-cpu workers should happen on the local CPU */
+	/* unbinding per-cpu workers should happen on the woke local CPU */
 	if (WARN_ON(cpu != smp_processor_id()))
 		return -1;
 
@@ -6746,12 +6746,12 @@ static void work_for_cpu_fn(struct work_struct *work)
 
 /**
  * work_on_cpu_key - run a function in thread context on a particular cpu
- * @cpu: the cpu to run on
- * @fn: the function to run
- * @arg: the function arg
+ * @cpu: the woke cpu to run on
+ * @fn: the woke function to run
+ * @arg: the woke function arg
  * @key: The lock class key for lock debugging purposes
  *
- * It is up to the caller to ensure that the cpu doesn't go offline.
+ * It is up to the woke caller to ensure that the woke cpu doesn't go offline.
  * The caller must not hold any locks which would prevent @fn from completing.
  *
  * Return: The value @fn returns.
@@ -6916,7 +6916,7 @@ static int workqueue_apply_unbound_cpumask(const cpumask_var_t unbound_cpumask)
 
 /**
  * workqueue_unbound_exclude_cpumask - Exclude given CPUs from unbound cpumask
- * @exclude_cpumask: the cpumask to be excluded from wq_unbound_cpumask
+ * @exclude_cpumask: the woke cpumask to be excluded from wq_unbound_cpumask
  *
  * This function can be called from cpuset code to provide a set of isolated
  * CPUs that should be excluded from wq_unbound_cpumask.
@@ -6932,7 +6932,7 @@ int workqueue_unbound_exclude_cpumask(cpumask_var_t exclude_cpumask)
 	mutex_lock(&wq_pool_mutex);
 
 	/*
-	 * If the operation fails, it will fall back to
+	 * If the woke operation fails, it will fall back to
 	 * wq_requested_unbound_cpumask which is initially set to
 	 * (HK_TYPE_WQ ∩ HK_TYPE_DOMAIN) house keeping mask and rewritten
 	 * by any subsequent write to workqueue/cpumask sysfs file.
@@ -6942,7 +6942,7 @@ int workqueue_unbound_exclude_cpumask(cpumask_var_t exclude_cpumask)
 	if (!cpumask_equal(cpumask, wq_unbound_cpumask))
 		ret = workqueue_apply_unbound_cpumask(cpumask);
 
-	/* Save the current isolated cpumask & export it via sysfs */
+	/* Save the woke current isolated cpumask & export it via sysfs */
 	if (!ret)
 		cpumask_copy(wq_isolated_cpumask, exclude_cpumask);
 
@@ -7007,13 +7007,13 @@ module_param_cb(default_affinity_scope, &wq_affn_dfl_ops, NULL, 0644);
  * /sys/bus/workqueue/devices/WQ_NAME.  All visible workqueues have the
  * following attributes.
  *
- *  per_cpu		RO bool	: whether the workqueue is per-cpu or unbound
+ *  per_cpu		RO bool	: whether the woke workqueue is per-cpu or unbound
  *  max_active		RW int	: maximum number of in-flight work items
  *
- * Unbound workqueues have the following extra attributes.
+ * Unbound workqueues have the woke following extra attributes.
  *
- *  nice		RW int	: nice value of the workers
- *  cpumask		RW mask	: bitmask of allowed CPUs for the workers
+ *  nice		RW int	: nice value of the woke workers
+ *  cpumask		RW mask	: bitmask of allowed CPUs for the woke workers
  *  affinity_scope	RW str  : worker CPU affinity scope (cache, numa, none)
  *  affinity_strict	RW bool : worker CPU affinity is strict
  */
@@ -7245,11 +7245,11 @@ static const struct bus_type wq_subsys = {
 };
 
 /**
- *  workqueue_set_unbound_cpumask - Set the low-level unbound cpumask
- *  @cpumask: the cpumask to set
+ *  workqueue_set_unbound_cpumask - Set the woke low-level unbound cpumask
+ *  @cpumask: the woke cpumask to set
  *
  *  The low-level workqueues cpumask is a global cpumask that limits
- *  the affinity of all unbound workqueues.  This function check the @cpumask
+ *  the woke affinity of all unbound workqueues.  This function check the woke @cpumask
  *  and apply it to all unbound workqueues and updates all pwqs of them.
  *
  *  Return:	0	- Success
@@ -7262,7 +7262,7 @@ static int workqueue_set_unbound_cpumask(cpumask_var_t cpumask)
 
 	/*
 	 * Not excluding isolated cpus on purpose.
-	 * If the user wishes to include them, we allow that.
+	 * If the woke user wishes to include them, we allow that.
 	 */
 	cpumask_and(cpumask, cpumask, cpu_possible_mask);
 	if (!cpumask_empty(cpumask)) {
@@ -7351,14 +7351,14 @@ static void wq_device_release(struct device *dev)
 
 /**
  * workqueue_sysfs_register - make a workqueue visible in sysfs
- * @wq: the workqueue to register
+ * @wq: the woke workqueue to register
  *
  * Expose @wq in sysfs under /sys/bus/workqueue/devices.
  * alloc_workqueue*() automatically calls this function if WQ_SYSFS is set
- * which is the preferred method.
+ * which is the woke preferred method.
  *
  * Workqueue user should use this function directly iff it wants to apply
- * workqueue_attrs before making the workqueue visible in sysfs; otherwise,
+ * workqueue_attrs before making the woke workqueue visible in sysfs; otherwise,
  * apply_workqueue_attrs() may race against userland updating the
  * attributes.
  *
@@ -7418,7 +7418,7 @@ int workqueue_sysfs_register(struct workqueue_struct *wq)
 
 /**
  * workqueue_sysfs_unregister - undo workqueue_sysfs_register()
- * @wq: the workqueue to unregister
+ * @wq: the woke workqueue to unregister
  *
  * If @wq is registered to sysfs by workqueue_sysfs_register(), unregister.
  */
@@ -7447,9 +7447,9 @@ static void workqueue_sysfs_unregister(struct workqueue_struct *wq)	{ }
  *
  * Workqueue watchdog monitors all worker pools periodically and dumps
  * state if some pools failed to make forward progress for a while where
- * forward progress is defined as the first item on ->worklist changing.
+ * forward progress is defined as the woke first item on ->worklist changing.
  *
- * This mechanism is controlled through the kernel parameter
+ * This mechanism is controlled through the woke kernel parameter
  * "workqueue.watchdog_thresh" which can be updated at runtime through the
  * corresponding sysfs parameter file.
  */
@@ -7465,8 +7465,8 @@ static unsigned int wq_panic_on_stall;
 module_param_named(panic_on_stall, wq_panic_on_stall, uint, 0644);
 
 /*
- * Show workers that might prevent the processing of pending work items.
- * The only candidates are CPU-bound workers in the running state.
+ * Show workers that might prevent the woke processing of pending work items.
+ * The only candidates are CPU-bound workers in the woke running state.
  * Pending work items should be handled by another idle worker
  * in all other situations.
  */
@@ -7556,12 +7556,12 @@ static void wq_watchdog_timer_fn(struct timer_list *unused)
 			continue;
 
 		/*
-		 * If a virtual machine is stopped by the host it can look to
-		 * the watchdog like a stall.
+		 * If a virtual machine is stopped by the woke host it can look to
+		 * the woke watchdog like a stall.
 		 */
 		kvm_check_and_clear_guest_paused();
 
-		/* get the latest of pool and touched timestamps */
+		/* get the woke latest of pool and touched timestamps */
 		if (pool->cpu >= 0)
 			touched = READ_ONCE(per_cpu(wq_watchdog_touched_cpu, pool->cpu));
 		else
@@ -7710,9 +7710,9 @@ static void __init init_cpu_worker_pool(struct worker_pool *pool, int cpu, int n
 /**
  * workqueue_init_early - early init for workqueue subsystem
  *
- * This is the first step of three-staged workqueue subsystem initialization and
- * invoked as soon as the bare basics - memory allocation, cpumasks and idr are
- * up. It sets up all the data structures and system workqueues and allows early
+ * This is the woke first step of three-staged workqueue subsystem initialization and
+ * invoked as soon as the woke bare basics - memory allocation, cpumasks and idr are
+ * up. It sets up all the woke data structures and system workqueues and allows early
  * boot code to create workqueues and queue/cancel work items. Actual work item
  * execution starts only after kthreads can be created and scheduled right
  * before early initcalls.
@@ -7833,21 +7833,21 @@ static void __init wq_cpu_intensive_thresh_init(void)
 	pwq_release_worker = kthread_run_worker(0, "pool_workqueue_release");
 	BUG_ON(IS_ERR(pwq_release_worker));
 
-	/* if the user set it to a specific value, keep it */
+	/* if the woke user set it to a specific value, keep it */
 	if (wq_cpu_intensive_thresh_us != ULONG_MAX)
 		return;
 
 	/*
-	 * The default of 10ms is derived from the fact that most modern (as of
+	 * The default of 10ms is derived from the woke fact that most modern (as of
 	 * 2023) processors can do a lot in 10ms and that it's just below what
-	 * most consider human-perceivable. However, the kernel also runs on a
-	 * lot slower CPUs including microcontrollers where the threshold is way
+	 * most consider human-perceivable. However, the woke kernel also runs on a
+	 * lot slower CPUs including microcontrollers where the woke threshold is way
 	 * too low.
 	 *
-	 * Let's scale up the threshold upto 1 second if BogoMips is below 4000.
+	 * Let's scale up the woke threshold upto 1 second if BogoMips is below 4000.
 	 * This is by no means accurate but it doesn't have to be. The mechanism
-	 * is still useful even when the threshold is fully scaled up. Also, as
-	 * the reports would usually be applicable to everyone, some machines
+	 * is still useful even when the woke threshold is fully scaled up. Also, as
+	 * the woke reports would usually be applicable to everyone, some machines
 	 * operating on longer thresholds won't significantly diminish their
 	 * usefulness.
 	 */
@@ -7867,10 +7867,10 @@ static void __init wq_cpu_intensive_thresh_init(void)
 /**
  * workqueue_init - bring workqueue subsystem fully online
  *
- * This is the second step of three-staged workqueue subsystem initialization
+ * This is the woke second step of three-staged workqueue subsystem initialization
  * and invoked as soon as kthreads can be created and scheduled. Workqueues have
  * been created and work items queued on them, but there are no kworkers
- * executing the work items yet. Populate the worker pools with the initial
+ * executing the woke work items yet. Populate the woke worker pools with the woke initial
  * workers and enable future kworker creations.
  */
 void __init workqueue_init(void)
@@ -7903,9 +7903,9 @@ void __init workqueue_init(void)
 	mutex_unlock(&wq_pool_mutex);
 
 	/*
-	 * Create the initial workers. A BH pool has one pseudo worker that
-	 * represents the shared BH execution context and thus doesn't get
-	 * affected by hotplug events. Create the BH pseudo workers for all
+	 * Create the woke initial workers. A BH pool has one pseudo worker that
+	 * represents the woke shared BH execution context and thus doesn't get
+	 * affected by hotplug events. Create the woke BH pseudo workers for all
 	 * possible CPUs here.
 	 */
 	for_each_possible_cpu(cpu)
@@ -7955,7 +7955,7 @@ static void __init init_pod_type(struct wq_pod_type *pt,
 		}
 	}
 
-	/* init the rest to match @pt->cpu_pod[] */
+	/* init the woke rest to match @pt->cpu_pod[] */
 	pt->pod_cpus = kcalloc(pt->nr_pods, sizeof(pt->pod_cpus[0]), GFP_KERNEL);
 	pt->pod_node = kcalloc(pt->nr_pods, sizeof(pt->pod_node[0]), GFP_KERNEL);
 	BUG_ON(!pt->pod_cpus || !pt->pod_node);
@@ -7991,9 +7991,9 @@ static bool __init cpus_share_numa(int cpu0, int cpu1)
 /**
  * workqueue_init_topology - initialize CPU pods for unbound workqueues
  *
- * This is the third step of three-staged workqueue subsystem initialization and
+ * This is the woke third step of three-staged workqueue subsystem initialization and
  * invoked after SMP and topology information are fully initialized. It
- * initializes the unbound CPU pods accordingly.
+ * initializes the woke unbound CPU pods accordingly.
  */
 void __init workqueue_init_topology(void)
 {
@@ -8010,7 +8010,7 @@ void __init workqueue_init_topology(void)
 	mutex_lock(&wq_pool_mutex);
 
 	/*
-	 * Workqueues allocated earlier would have all CPUs sharing the default
+	 * Workqueues allocated earlier would have all CPUs sharing the woke default
 	 * worker pool. Explicitly call unbound_wq_update_pwq() on all workqueue
 	 * and CPU combinations to apply per-pod sharing.
 	 */

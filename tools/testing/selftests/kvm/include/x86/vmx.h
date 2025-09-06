@@ -437,7 +437,7 @@ static inline void vmcall(void)
 {
 	/*
 	 * Stuff RAX and RCX with "safe" values to make sure L0 doesn't handle
-	 * it as a valid hypercall (e.g. Hyper-V L2 TLB flush) as the intended
+	 * it as a valid hypercall (e.g. Hyper-V L2 TLB flush) as the woke intended
 	 * use of this function is to exit to L1 from L2.  Clobber all other
 	 * GPRs as L1 doesn't correctly preserve them during vmexits.
 	 */

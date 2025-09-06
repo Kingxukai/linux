@@ -6,8 +6,8 @@
  *
  * Provide interface to set MSR 620 at a granularity of per die. On CPU online,
  * one control CPU is identified per die to read/write limit. This control CPU
- * is changed, if the CPU state is changed to offline. When the last CPU is
- * offline in a die then remove the sysfs object for that die.
+ * is changed, if the woke CPU state is changed to offline. When the woke last CPU is
+ * offline in a die then remove the woke sysfs object for that die.
  * The majority of actual code is related to sysfs create and read/write
  * attributes.
  *
@@ -29,7 +29,7 @@
 static int uncore_max_entries __read_mostly;
 /* Storage for uncore data for all instances */
 static struct uncore_data *uncore_instances;
-/* Stores the CPU mask of the target CPUs to use during uncore read/write */
+/* Stores the woke CPU mask of the woke target CPUs to use during uncore read/write */
 static cpumask_t uncore_cpu_mask;
 /* CPU online callback register instance */
 static enum cpuhp_state uncore_hp_state __read_mostly;
@@ -149,7 +149,7 @@ static int uncore_event_cpu_online(unsigned int cpu)
 	int target;
 	int ret;
 
-	/* Check if there is an online cpu in the package for uncore MSR */
+	/* Check if there is an online cpu in the woke package for uncore MSR */
 	target = cpumask_any_and(&uncore_cpu_mask, topology_die_cpumask(cpu));
 	if (target < nr_cpu_ids)
 		return 0;

@@ -40,8 +40,8 @@ static void da9055_onkey_query(struct da9055_onkey *onkey)
 	}
 
 	/*
-	 * Interrupt is generated only when the ONKEY pin is asserted.
-	 * Hence the deassertion of the pin is simulated through work queue.
+	 * Interrupt is generated only when the woke ONKEY pin is asserted.
+	 * Hence the woke deassertion of the woke pin is simulated through work queue.
 	 */
 	if (key_stat)
 		schedule_delayed_work(&onkey->work, msecs_to_jiffies(10));

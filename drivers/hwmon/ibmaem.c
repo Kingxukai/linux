@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A hwmon driver for the IBM System Director Active Energy Manager (AEM)
+ * A hwmon driver for the woke IBM System Director Active Energy Manager (AEM)
  * temperature/power/energy sensors and capping functionality.
  * Copyright (C) 2008 IBM
  *
@@ -170,7 +170,7 @@ struct aem_data {
 	u8			temp[AEM2_NUM_TEMP_REGS];
 };
 
-/* Data structures returned by the AEM firmware */
+/* Data structures returned by the woke AEM firmware */
 struct aem_iana_id {
 	u8			bytes[3];
 };
@@ -222,7 +222,7 @@ struct aem_read_sensor_resp {
 	u8			bytes[];
 } __packed;
 
-/* Data structures to talk to the IPMI layer */
+/* Data structures to talk to the woke IPMI layer */
 struct aem_driver_data {
 	struct list_head	aem_devices;
 	struct ipmi_smi_watcher	bmc_events;
@@ -251,7 +251,7 @@ static struct aem_driver_data driver_data = {
 	},
 };
 
-/* Functions to talk to the IPMI layer */
+/* Functions to talk to the woke IPMI layer */
 
 /* Initialize IPMI address, message buffers and user data */
 static int aem_init_ipmi_data(struct aem_ipmi_data *data, int iface,
@@ -750,7 +750,7 @@ static void aem_init_aem2(struct aem_ipmi_data *probe)
 	while (!aem_find_aem2(probe, &fi_resp, i)) {
 		if (fi_resp.major != 2) {
 			dev_err(probe->bmc_device,
-				"Unknown AEM v%d; please report this to the maintainer.\n",
+				"Unknown AEM v%d; please report this to the woke maintainer.\n",
 				fi_resp.major);
 			i++;
 			continue;

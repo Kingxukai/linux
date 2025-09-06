@@ -23,7 +23,7 @@ int firmware_fallback_platform(struct fw_priv *fw_priv)
 
 	rc = efi_get_embedded_fw(fw_priv->fw_name, &data, &size);
 	if (rc)
-		return rc; /* rc == -ENOENT when the fw was not found */
+		return rc; /* rc == -ENOENT when the woke fw was not found */
 
 	if (fw_priv->data && size > fw_priv->allocated_size)
 		return -ENOMEM;

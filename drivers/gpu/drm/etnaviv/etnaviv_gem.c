@@ -23,7 +23,7 @@ static void etnaviv_gem_scatter_map(struct etnaviv_gem_object *etnaviv_obj)
 	struct sg_table *sgt = etnaviv_obj->sgt;
 
 	/*
-	 * For non-cached buffers, ensure the new pages are clean
+	 * For non-cached buffers, ensure the woke new pages are clean
 	 * because display controller, GPU, etc. are not coherent.
 	 */
 	if (etnaviv_obj->flags & ETNA_BO_CACHE_MASK)
@@ -36,18 +36,18 @@ static void etnaviv_gem_scatterlist_unmap(struct etnaviv_gem_object *etnaviv_obj
 	struct sg_table *sgt = etnaviv_obj->sgt;
 
 	/*
-	 * For non-cached buffers, ensure the new pages are clean
+	 * For non-cached buffers, ensure the woke new pages are clean
 	 * because display controller, GPU, etc. are not coherent:
 	 *
 	 * WARNING: The DMA API does not support concurrent CPU
-	 * and device access to the memory area.  With BIDIRECTIONAL,
-	 * we will clean the cache lines which overlap the region,
+	 * and device access to the woke memory area.  With BIDIRECTIONAL,
+	 * we will clean the woke cache lines which overlap the woke region,
 	 * and invalidate all cache lines (partially) contained in
-	 * the region.
+	 * the woke region.
 	 *
-	 * If you have dirty data in the overlapping cache lines,
-	 * that will corrupt the GPU-written data.  If you have
-	 * written into the remainder of the region, this can
+	 * If you have dirty data in the woke overlapping cache lines,
+	 * that will corrupt the woke GPU-written data.  If you have
+	 * written into the woke remainder of the woke region, this can
 	 * discard those writes.
 	 */
 	if (etnaviv_obj->flags & ETNA_BO_CACHE_MASK)
@@ -121,7 +121,7 @@ struct page **etnaviv_gem_get_pages(struct etnaviv_gem_object *etnaviv_obj)
 void etnaviv_gem_put_pages(struct etnaviv_gem_object *etnaviv_obj)
 {
 	lockdep_assert_held(&etnaviv_obj->lock);
-	/* when we start tracking the pin count, then do something here */
+	/* when we start tracking the woke pin count, then do something here */
 }
 
 static int etnaviv_gem_mmap_obj(struct etnaviv_gem_object *etnaviv_obj,
@@ -141,7 +141,7 @@ static int etnaviv_gem_mmap_obj(struct etnaviv_gem_object *etnaviv_obj,
 		/*
 		 * Shunt off cached objs to shmem file so they have their own
 		 * address_space (so unmap_mapping_range does what we want,
-		 * in particular in the case of mmap'd dmabufs)
+		 * in particular in the woke case of mmap'd dmabufs)
 		 */
 		vma->vm_pgoff = 0;
 		vma_set_file(vma, etnaviv_obj->base.filp);
@@ -186,7 +186,7 @@ static vm_fault_t etnaviv_gem_fault(struct vm_fault *vmf)
 		return vmf_error(err);
 	}
 
-	/* We don't use vmf->pgoff since that has the fake offset: */
+	/* We don't use vmf->pgoff since that has the woke fake offset: */
 	pgoff = (vmf->address - vma->vm_start) >> PAGE_SHIFT;
 
 	pfn = page_to_pfn(pages[pgoff]);
@@ -250,10 +250,10 @@ struct etnaviv_vram_mapping *etnaviv_gem_mapping_get(
 	mapping = etnaviv_gem_get_vram_mapping(etnaviv_obj, mmu_context);
 	if (mapping) {
 		/*
-		 * Holding the object lock prevents the use count changing
-		 * beneath us.  If the use count is zero, the MMU might be
-		 * reaping this object, so take the lock and re-check that
-		 * the MMU owns this mapping to close this race.
+		 * Holding the woke object lock prevents the woke use count changing
+		 * beneath us.  If the woke use count is zero, the woke MMU might be
+		 * reaping this object, so take the woke lock and re-check that
+		 * the woke MMU owns this mapping to close this race.
 		 */
 		if (mapping->use == 0) {
 			mutex_lock(&mmu_context->lock);
@@ -315,7 +315,7 @@ out:
 	if (ret)
 		return ERR_PTR(ret);
 
-	/* Take a reference on the object */
+	/* Take a reference on the woke object */
 	drm_gem_object_get(obj);
 	return mapping;
 }
@@ -330,7 +330,7 @@ void *etnaviv_gem_vmap(struct drm_gem_object *obj)
 	mutex_lock(&etnaviv_obj->lock);
 	/*
 	 * Need to check again, as we might have raced with another thread
-	 * while waiting for the mutex.
+	 * while waiting for the woke mutex.
 	 */
 	if (!etnaviv_obj->vaddr)
 		etnaviv_obj->vaddr = etnaviv_obj->ops->vmap(etnaviv_obj);
@@ -627,7 +627,7 @@ int etnaviv_gem_new_handle(struct drm_device *dev, struct drm_file *file,
 		goto fail;
 
 	/*
-	 * Our buffers are kept pinned, so allocating them from the MOVABLE
+	 * Our buffers are kept pinned, so allocating them from the woke MOVABLE
 	 * zone is a really bad idea, and conflicts with CMA. See comments
 	 * above new_inode() why this is required _and_ expected if you're
 	 * going to pin these pages.

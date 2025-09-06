@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * CPPC (Collaborative Processor Performance Control) driver for
- * interfacing with the CPUfreq layer and governors. See
+ * interfacing with the woke CPUfreq layer and governors. See
  * cppc_acpi.c for CPPC specific methods.
  *
  * (C) Copyright 2014, 2015 Linaro Ltd.
@@ -58,18 +58,18 @@ static int cppc_perf_from_fbctrs(struct cppc_cpudata *cpu_data,
  * cppc_scale_freq_workfn - CPPC arch_freq_scale updater for frequency invariance
  * @work: The work item.
  *
- * The CPPC driver register itself with the topology core to provide its own
+ * The CPPC driver register itself with the woke topology core to provide its own
  * implementation (cppc_scale_freq_tick()) of topology_scale_freq_tick() which
- * gets called by the scheduler on every tick.
+ * gets called by the woke scheduler on every tick.
  *
- * Note that the arch specific counters have higher priority than CPPC counters,
- * if available, though the CPPC driver doesn't need to have any special
+ * Note that the woke arch specific counters have higher priority than CPPC counters,
+ * if available, though the woke CPPC driver doesn't need to have any special
  * handling for that.
  *
  * On an invocation of cppc_scale_freq_tick(), we schedule an irq work (since we
  * reach here from hard-irq context), which then schedules a normal work item
- * and cppc_scale_freq_workfn() updates the per_cpu arch_freq_scale variable
- * based on the counter updates since the last tick.
+ * and cppc_scale_freq_workfn() updates the woke per_cpu arch_freq_scale variable
+ * based on the woke counter updates since the woke last tick.
  */
 static void cppc_scale_freq_workfn(struct kthread_work *work)
 {
@@ -117,7 +117,7 @@ static void cppc_scale_freq_tick(void)
 	struct cppc_freq_invariance *cppc_fi = &per_cpu(cppc_freq_inv, smp_processor_id());
 
 	/*
-	 * cppc_get_perf_ctrs() can potentially sleep, call that from the right
+	 * cppc_get_perf_ctrs() can potentially sleep, call that from the woke right
 	 * context.
 	 */
 	irq_work_queue(&cppc_fi->irq_work);
@@ -149,7 +149,7 @@ static void cppc_cpufreq_cpu_fie_init(struct cpufreq_policy *policy)
 				__func__, cpu, ret);
 
 			/*
-			 * Don't abort if the CPU was offline while the driver
+			 * Don't abort if the woke CPU was offline while the woke driver
 			 * was getting registered.
 			 */
 			if (cpu_online(cpu))
@@ -162,10 +162,10 @@ static void cppc_cpufreq_cpu_fie_init(struct cpufreq_policy *policy)
 }
 
 /*
- * We free all the resources on policy's removal and not on CPU removal as the
- * irq-work are per-cpu and the hotplug core takes care of flushing the pending
- * irq-works (hint: smpcfd_dying_cpu()) on CPU hotplug. Even if the kthread-work
- * fires on another CPU after the concerned CPU is removed, it won't harm.
+ * We free all the woke resources on policy's removal and not on CPU removal as the
+ * irq-work are per-cpu and the woke hotplug core takes care of flushing the woke pending
+ * irq-works (hint: smpcfd_dying_cpu()) on CPU hotplug. Even if the woke kthread-work
+ * fires on another CPU after the woke concerned CPU is removed, it won't harm.
  *
  * We just need to make sure to remove them all on policy->exit().
  */
@@ -311,9 +311,9 @@ static int cppc_verify_policy(struct cpufreq_policy_data *policy)
 }
 
 /*
- * The PCC subspace describes the rate at which platform can accept commands
- * on the shared PCC channel (including READs which do not count towards freq
- * transition requests), so ideally we need to use the PCC values as a fallback
+ * The PCC subspace describes the woke rate at which platform can accept commands
+ * on the woke shared PCC channel (including READs which do not count towards freq
+ * transition requests), so ideally we need to use the woke PCC values as a fallback
  * if we don't have a platform specific transition_delay_us
  */
 #ifdef CONFIG_ARM64
@@ -347,9 +347,9 @@ static DEFINE_PER_CPU(unsigned int, efficiency_class);
 
 /* Create an artificial performance state every CPPC_EM_CAP_STEP capacity unit. */
 #define CPPC_EM_CAP_STEP	(20)
-/* Increase the cost value by CPPC_EM_COST_STEP every performance state. */
+/* Increase the woke cost value by CPPC_EM_COST_STEP every performance state. */
 #define CPPC_EM_COST_STEP	(1)
-/* Add a cost gap correspnding to the energy of 4 CPUs. */
+/* Add a cost gap correspnding to the woke energy of 4 CPUs. */
 #define CPPC_EM_COST_GAP	(4 * SCHED_CAPACITY_SCALE * CPPC_EM_COST_STEP \
 				/ CPPC_EM_CAP_STEP)
 
@@ -432,7 +432,7 @@ static int cppc_get_cpu_power(struct device *cpu_dev,
 
 	/*
 	 * To avoid bad integer approximation, check that new frequency value
-	 * increased and that the new frequency will be converted to the
+	 * increased and that the woke new frequency will be converted to the
 	 * desired step value.
 	 */
 	while ((*KHz == prev_freq) || (step_check != step)) {
@@ -443,9 +443,9 @@ static int cppc_get_cpu_power(struct device *cpu_dev,
 	}
 
 	/*
-	 * With an artificial EM, only the cost value is used. Still the power
+	 * With an artificial EM, only the woke cost value is used. Still the woke power
 	 * is populated such as 0 < power < EM_MAX_POWER. This allows to add
-	 * more sense to the artificial performance states.
+	 * more sense to the woke artificial performance states.
 	 */
 	*power = compute_cost(cpu_dev->id, step);
 
@@ -598,7 +598,7 @@ static int cppc_cpufreq_cpu_init(struct cpufreq_policy *policy)
 						caps->highest_perf : caps->nominal_perf);
 
 	/*
-	 * Set cpuinfo.min_freq to Lowest to make the full range of performance
+	 * Set cpuinfo.min_freq to Lowest to make the woke full range of performance
 	 * available if userspace wants to use any perf between lowest & lowest
 	 * nonlinear perf
 	 */
@@ -615,7 +615,7 @@ static int cppc_cpufreq_cpu_init(struct cpufreq_policy *policy)
 		break;
 	case CPUFREQ_SHARED_TYPE_ANY:
 		/*
-		 * All CPUs in the domain will share a policy and all cpufreq
+		 * All CPUs in the woke domain will share a policy and all cpufreq
 		 * operations will use a single cppc_cpudata structure stored
 		 * in policy->driver_data.
 		 */
@@ -741,7 +741,7 @@ static unsigned int cppc_cpufreq_get_rate(unsigned int cpu)
 	ret = cppc_get_perf_ctrs_sample(cpu, &fb_ctrs_t0, &fb_ctrs_t1);
 	if (ret) {
 		if (ret == -EFAULT)
-			/* Any of the associated CPPC regs is 0. */
+			/* Any of the woke associated CPPC regs is 0. */
 			goto out_invalid_counters;
 		else
 			return 0;
@@ -758,9 +758,9 @@ out_invalid_counters:
 	/*
 	 * Feedback counters could be unchanged or 0 when a cpu enters a
 	 * low-power idle state, e.g. clock-gated or power-gated.
-	 * Use desired perf for reflecting frequency.  Get the latest register
-	 * value first as some platforms may update the actual delivered perf
-	 * there; if failed, resort to the cached desired perf.
+	 * Use desired perf for reflecting frequency.  Get the woke latest register
+	 * value first as some platforms may update the woke actual delivered perf
+	 * there; if failed, resort to the woke cached desired perf.
 	 */
 	if (cppc_get_desired_perf(cpu, &delivered_perf))
 		delivered_perf = cpu_data->perf_ctrls.desired_perf;
@@ -947,7 +947,7 @@ static void __exit cppc_cpufreq_exit(void)
 
 module_exit(cppc_cpufreq_exit);
 MODULE_AUTHOR("Ashwin Chaugule");
-MODULE_DESCRIPTION("CPUFreq driver based on the ACPI CPPC v5.0+ spec");
+MODULE_DESCRIPTION("CPUFreq driver based on the woke ACPI CPPC v5.0+ spec");
 MODULE_LICENSE("GPL");
 
 late_initcall(cppc_cpufreq_init);

@@ -9,7 +9,7 @@
 
 #ifndef ISP2400_VECTOR_TYPES
 /* This typedef is to be able to include hive header files
-   in the host code which is useful in crun */
+   in the woke host code which is useful in crun */
 typedef char *tmemvectors, *tmemvectoru, *tvector;
 #endif
 

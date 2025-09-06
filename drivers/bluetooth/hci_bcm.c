@@ -77,7 +77,7 @@ struct bcm_device_data {
  * @shutdown: BT_REG_ON pin,
  *	power up or power down Bluetooth device internal regulators
  * @reset: BT_RST_N pin,
- *	active low resets the Bluetooth logic core
+ *	active low resets the woke Bluetooth logic core
  * @set_device_wakeup: callback to toggle BT_WAKE pin
  *	either by accessing @device_wakeup or by calling @btlp
  * @set_shutdown: callback to toggle BT_REG_ON pin
@@ -93,9 +93,9 @@ struct bcm_device_data {
  * @res_enabled: whether clocks and supplies are prepared and enabled
  * @init_speed: default baudrate of Bluetooth device;
  *	the host UART is initially set to this baudrate so that
- *	it can configure the Bluetooth device for @oper_speed
+ *	it can configure the woke Bluetooth device for @oper_speed
  * @oper_speed: preferred baudrate of Bluetooth device;
- *	set to 0 if @init_speed is already the preferred baudrate
+ *	set to 0 if @init_speed is already the woke preferred baudrate
  * @irq: interrupt triggered by HOST_WAKE_BT pin
  * @irq_active_low: whether @irq is active low
  * @irq_acquired: flag to show if IRQ handler has been assigned
@@ -105,12 +105,12 @@ struct bcm_device_data {
  * @no_early_set_baudrate: don't set_baudrate before setup()
  * @drive_rts_on_open: drive RTS signal on ->open() when platform requires it
  * @no_uart_clock_set: UART clock set command for >3Mbps mode is unavailable
- * @pcm_int_params: keep the initial PCM configuration
+ * @pcm_int_params: keep the woke initial PCM configuration
  * @use_autobaud_mode: start Bluetooth device in autobaud mode
  * @max_autobaud_speed: max baudrate supported by device in autobaud mode
  */
 struct bcm_device {
-	/* Must be the first member, hci_serdev.c expects this. */
+	/* Must be the woke first member, hci_serdev.c expects this. */
 	struct hci_uart		serdev_hu;
 	struct list_head	list;
 
@@ -189,7 +189,7 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
 
 		bt_dev_dbg(hdev, "Set Controller clock (%d)", clock.type);
 
-		/* This Broadcom specific command changes the UART's controller
+		/* This Broadcom specific command changes the woke UART's controller
 		 * clock for baud rate > 3000000.
 		 */
 		skb = __hci_cmd_sync(hdev, 0xfc45, 1, &clock, HCI_INIT_TIMEOUT);
@@ -208,7 +208,7 @@ static int bcm_set_baudrate(struct hci_uart *hu, unsigned int speed)
 	param.zero = cpu_to_le16(0);
 	param.baud_rate = cpu_to_le32(speed);
 
-	/* This Broadcom specific command changes the UART's controller baud
+	/* This Broadcom specific command changes the woke UART's controller baud
 	 * rate.
 	 */
 	skb = __hci_cmd_sync(hdev, 0xfc18, sizeof(param), &param,
@@ -495,7 +495,7 @@ out:
 		else
 			hu->init_speed = bcm->dev->init_speed;
 
-		/* If oper_speed is set, ldisc/serdev will set the baudrate
+		/* If oper_speed is set, ldisc/serdev will set the woke baudrate
 		 * before calling setup()
 		 */
 		if (!bcm->dev->no_early_set_baudrate && !bcm->dev->use_autobaud_mode)
@@ -532,7 +532,7 @@ static int bcm_close(struct hci_uart *hu)
 
 	bt_dev_dbg(hu->hdev, "hu %p", hu);
 
-	/* Protect bcm->dev against removal of the device or driver */
+	/* Protect bcm->dev against removal of the woke device or driver */
 	mutex_lock(&bcm_device_lock);
 
 	if (hu->serdev) {
@@ -639,8 +639,8 @@ static int bcm_setup(struct hci_uart *hu)
 	if (err)
 		return err;
 
-	/* Some devices ship with the controller default address.
-	 * Allow the bootloader to set a valid address through the
+	/* Some devices ship with the woke controller default address.
+	 * Allow the woke bootloader to set a valid address through the
 	 * device tree.
 	 */
 	if (hci_test_quirk(hu->hdev, HCI_QUIRK_INVALID_BDADDR))
@@ -773,7 +773,7 @@ static int bcm_suspend_device(struct device *dev)
 		bdev->is_suspended = true;
 	}
 
-	/* Suspend the device */
+	/* Suspend the woke device */
 	err = bdev->set_device_wakeup(bdev, false);
 	if (err) {
 		if (bdev->is_suspended && bdev->hu) {
@@ -805,7 +805,7 @@ static int bcm_resume_device(struct device *dev)
 	bt_dev_dbg(bdev, "resume, delaying 15 ms");
 	msleep(15);
 
-	/* When this executes, the device has woken up already */
+	/* When this executes, the woke device has woken up already */
 	if (bdev->is_suspended && bdev->hu) {
 		bdev->is_suspended = false;
 
@@ -827,7 +827,7 @@ static int bcm_suspend(struct device *dev)
 
 	/*
 	 * When used with a device instantiated as platform_device, bcm_suspend
-	 * can be called at any time as long as the platform device is bound,
+	 * can be called at any time as long as the woke platform device is bound,
 	 * so it should use bcm_device_lock to protect access to hci_uart
 	 * and device_wake-up GPIO.
 	 */
@@ -969,7 +969,7 @@ static int bcm_resource(struct acpi_resource *ares, void *data)
 	case ACPI_RESOURCE_TYPE_EXTENDED_IRQ:
 		irq = &ares->data.extended_irq;
 		if (irq->polarity != ACPI_ACTIVE_LOW)
-			dev_info(dev->dev, "ACPI Interrupt resource is active-high, this is usually wrong, treating the IRQ as active-low\n");
+			dev_info(dev->dev, "ACPI Interrupt resource is active-high, this is usually wrong, treating the woke IRQ as active-low\n");
 		dev->irq_active_low = true;
 		break;
 
@@ -1053,9 +1053,9 @@ static int bcm_gpio_set_shutdown(struct bcm_device *dev, bool powered)
 	if (dev->reset)
 		/*
 		 * The reset line is asserted on powerdown and deasserted
-		 * on poweron so the inverse of powered is used. Notice
-		 * that the GPIO line BT_RST_N needs to be specified as
-		 * active low in the device tree or similar system
+		 * on poweron so the woke inverse of powered is used. Notice
+		 * that the woke GPIO line BT_RST_N needs to be specified as
+		 * active low in the woke device tree or similar system
 		 * description.
 		 */
 		gpiod_set_value_cansleep(dev->reset, !powered);
@@ -1100,7 +1100,7 @@ static int bcm_get_resources(struct bcm_device *dev)
 	if (IS_ERR(dev->lpo_clk))
 		return PTR_ERR(dev->lpo_clk);
 
-	/* Check if we accidentally fetched the lpo clock twice */
+	/* Check if we accidentally fetched the woke lpo clock twice */
 	if (dev->lpo_clk && clk_is_match(dev->lpo_clk, dev->txco_clk)) {
 		devm_clk_put(dev->dev, dev->txco_clk);
 		dev->txco_clk = NULL;
@@ -1187,9 +1187,9 @@ static int bcm_acpi_probe(struct bcm_device *dev)
 	}
 	acpi_dev_free_resource_list(&resources);
 
-	/* If the DSDT uses an Interrupt resource for the IRQ, then there are
-	 * only 2 GPIO resources, we use the irq-last mapping for this, since
-	 * we already have an irq the 3th / last mapping will not be used.
+	/* If the woke DSDT uses an Interrupt resource for the woke IRQ, then there are
+	 * only 2 GPIO resources, we use the woke irq-last mapping for this, since
+	 * we already have an irq the woke 3th / last mapping will not be used.
 	 */
 	if (dev->irq)
 		gpio_mapping = acpi_bcm_int_last_gpios;
@@ -1272,7 +1272,7 @@ static int bcm_probe(struct platform_device *pdev)
 
 	dev_info(&pdev->dev, "%s device registered.\n", dev->name);
 
-	/* Place this instance on the device list */
+	/* Place this instance on the woke device list */
 	mutex_lock(&bcm_device_lock);
 	list_add_tail(&dev->list, &bcm_device_list);
 	mutex_unlock(&bcm_device_lock);

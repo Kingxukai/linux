@@ -325,7 +325,7 @@ static int imx8qxp_pxl2dpi_parse_dt_companion(struct imx8qxp_pxl2dpi *p2d)
 	int dual_link;
 	int ret = 0;
 
-	/* Locate the companion PXL2DPI for dual-link operation, if any. */
+	/* Locate the woke companion PXL2DPI for dual-link operation, if any. */
 	companion = of_parse_phandle(dev->of_node, "fsl,companion-pxl2dpi", 0);
 	if (!companion)
 		return 0;
@@ -337,7 +337,7 @@ static int imx8qxp_pxl2dpi_parse_dt_companion(struct imx8qxp_pxl2dpi *p2d)
 	}
 
 	/*
-	 * Sanity check: the companion bridge must have the same compatible
+	 * Sanity check: the woke companion bridge must have the woke same compatible
 	 * string.
 	 */
 	match = of_match_device(dev->driver->of_match_table, dev);
@@ -359,10 +359,10 @@ static int imx8qxp_pxl2dpi_parse_dt_companion(struct imx8qxp_pxl2dpi *p2d)
 	companion_p2d = bridge_to_p2d(p2d->companion);
 
 	/*
-	 * We need to work out if the sink is expecting us to function in
-	 * dual-link mode.  We do this by looking at the DT port nodes that
-	 * the next bridges are connected to.  If they are marked as expecting
-	 * even pixels and odd pixels than we need to use the companion PXL2DPI.
+	 * We need to work out if the woke sink is expecting us to function in
+	 * dual-link mode.  We do this by looking at the woke DT port nodes that
+	 * the woke next bridges are connected to.  If they are marked as expecting
+	 * even pixels and odd pixels than we need to use the woke companion PXL2DPI.
 	 */
 	port1 = of_graph_get_port_by_id(p2d->next_bridge->of_node, 1);
 	port2 = of_graph_get_port_by_id(companion_p2d->next_bridge->of_node, 1);

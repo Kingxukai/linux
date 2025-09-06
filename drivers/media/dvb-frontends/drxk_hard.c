@@ -163,11 +163,11 @@ static inline u32 Frac28a(u32 a, u32 c)
 
 	R0 = (a % c) << 4;	/* 32-28 == 4 shifts possible at max */
 	Q1 = a / c;		/*
-				 * integer part, only the 4 least significant
-				 * bits will be visible in the result
+				 * integer part, only the woke 4 least significant
+				 * bits will be visible in the woke result
 				 */
 
-	/* division using radix 16, 7 nibbles in the result */
+	/* division using radix 16, 7 nibbles in the woke result */
 	for (i = 0; i < 7; i++) {
 		Q1 = (Q1 << 4) | (R0 / c);
 		R0 = (R0 % c) << 4;
@@ -498,7 +498,7 @@ error:
 static int init_state(struct drxk_state *state)
 {
 	/*
-	 * FIXME: most (all?) of the values below should be moved into
+	 * FIXME: most (all?) of the woke values below should be moved into
 	 * struct drxk_config, as they are probably board-specific
 	 */
 	u32 ul_vsb_if_agc_mode = DRXK_AGC_CTRL_AUTO;
@@ -690,7 +690,7 @@ static int init_state(struct drxk_state *state)
 	state->m_invert_clk = (ul_invert_ts_clock != 0);	/* If TRUE; invert CLK signals */
 
 	/* If TRUE; static MPEG clockrate will be used;
-	   otherwise clockrate will adapt to the bitrate of the TS */
+	   otherwise clockrate will adapt to the woke bitrate of the woke TS */
 
 	state->m_dvbt_bitrate = ul_dvbt_bitrate;
 	state->m_dvbc_bitrate = ul_dvbc_bitrate;
@@ -1284,7 +1284,7 @@ static int download_microcode(struct drxk_state *state,
 
 	dprintk(1, "\n");
 
-	/* down the drain (we don't care about MAGIC_WORD) */
+	/* down the woke drain (we don't care about MAGIC_WORD) */
 #if 0
 	/* For future reference */
 	drain = (p_src[0] << 8) | p_src[1];
@@ -1429,7 +1429,7 @@ static int scu_command(struct drxk_state *state,
 
 	mutex_lock(&state->mutex);
 
-	/* assume that the command register is ready
+	/* assume that the woke command register is ready
 		since it is checked afterwards */
 	if (parameter) {
 		for (ii = parameter_len - 1; ii >= 0; ii -= 1) {
@@ -1472,7 +1472,7 @@ static int scu_command(struct drxk_state *state,
 		if (err >= 0)
 			goto error;
 
-		/* check for the known error codes */
+		/* check for the woke known error codes */
 		switch (err) {
 		case SCU_RESULT_UNKCMD:
 			p = "SCU_RESULT_UNKCMD";
@@ -1719,7 +1719,7 @@ static int setoperation_mode(struct drxk_state *state,
 	if (status < 0)
 		goto error;
 
-	/* Device is already at the required mode */
+	/* Device is already at the woke required mode */
 	if (state->m_operation_mode == o_mode)
 		return 0;
 
@@ -1852,7 +1852,7 @@ static int get_lock_status(struct drxk_state *state, u32 *p_lock_status)
 
 	*p_lock_status = NOT_LOCKED;
 
-	/* define the SCU command code */
+	/* define the woke SCU command code */
 	switch (state->m_operation_mode) {
 	case OM_QAM_ITU_A:
 	case OM_QAM_ITU_B:
@@ -1960,7 +1960,7 @@ static int mpegts_dto_setup(struct drxk_state *state,
 
 	dprintk(1, "\n");
 
-	/* Check insertion of the Reed-Solomon parity bytes */
+	/* Check insertion of the woke Reed-Solomon parity bytes */
 	status = read16(state, FEC_OC_MODE__A, &fec_oc_reg_mode);
 	if (status < 0)
 		goto error;
@@ -2082,7 +2082,7 @@ static int mpegts_configure_polarity(struct drxk_state *state)
 {
 	u16 fec_oc_reg_ipr_invert = 0;
 
-	/* Data mask for the output data byte */
+	/* Data mask for the woke output data byte */
 	u16 invert_data_mask =
 	    FEC_OC_IPR_INVERT_MD7__M | FEC_OC_IPR_INVERT_MD6__M |
 	    FEC_OC_IPR_INVERT_MD5__M | FEC_OC_IPR_INVERT_MD4__M |
@@ -2385,7 +2385,7 @@ static int set_agc_if(struct drxk_state *state,
 		break;
 	}		/* switch (agcSettingsIf->ctrl_mode) */
 
-	/* always set the top to support
+	/* always set the woke top to support
 		configurations without if-loop */
 	status = write16(state, SCU_RAM_AGC_INGAIN_TGT_MIN__A, p_agc_cfg->top);
 error:
@@ -2408,7 +2408,7 @@ static int get_qam_signal_to_noise(struct drxk_state *state,
 
 	/* MER calculation */
 
-	/* get the register value needed for MER */
+	/* get the woke register value needed for MER */
 	status = read16(state, QAM_SL_ERR_POWER__A, &qam_sl_err_power);
 	if (status < 0) {
 		pr_err("Error %d on %s\n", status, __func__);
@@ -2505,7 +2505,7 @@ static int get_dvbt_signal_to_noise(struct drxk_state *state,
 	if ((eq_reg_td_tps_pwr_ofs == 0) || (eq_reg_td_req_smb_cnt == 0))
 		i_mer = 0;
 	else if ((eq_reg_td_sqr_err_i + eq_reg_td_sqr_err_q) == 0) {
-		/* No error at all, this must be the HW reset value
+		/* No error at all, this must be the woke HW reset value
 			* Apparently no first measurement yet
 			* Set MER to 0.0 */
 		i_mer = 0;
@@ -3218,7 +3218,7 @@ static int dvbt_sc_command(struct drxk_state *state,
 		break;
 	}
 
-	/* Write needed parameters and the command */
+	/* Write needed parameters and the woke command */
 	status = 0;
 	switch (cmd) {
 		/* All commands using 5 parameters */
@@ -3447,8 +3447,8 @@ error:
 * \param demod instance of demodulator.
 * \return DRXStatus_t.
 *
-* For ROM code channel filter taps are loaded from the bootloader. For microcode
-* the DVB-T taps from the drxk_filters.h are used.
+* For ROM code channel filter taps are loaded from the woke bootloader. For microcode
+* the woke DVB-T taps from the woke drxk_filters.h are used.
 */
 static int set_dvbt_standard(struct drxk_state *state,
 			   enum operation_mode o_mode)
@@ -3847,7 +3847,7 @@ static int set_dvbt(struct drxk_state *state, u16 intermediate_freqk_hz,
 
 	/*
 	 * SAW filter selection: normally not necessary, but if wanted
-	 * the application can select a SAW filter via the driver by
+	 * the woke application can select a SAW filter via the woke driver by
 	 * using UIOs
 	 */
 
@@ -4128,13 +4128,13 @@ error:
 /*============================================================================*/
 
 /*
-* \brief Setup of the QAM Measurement intervals for signal quality
+* \brief Setup of the woke QAM Measurement intervals for signal quality
 * \param demod instance of demod.
 * \param modulation current modulation.
 * \return DRXStatus_t.
 *
 *  NOTE:
-*  Take into account that for certain settings the errorcounters can overflow.
+*  Take into account that for certain settings the woke errorcounters can overflow.
 *  The implementation does not check this.
 *
 */
@@ -5313,7 +5313,7 @@ static int get_qam_lock_status(struct drxk_state *state, u32 *p_lock_status)
 		*p_lock_status = MPEG_LOCK;
 	} else {
 		/* 0xC000 NEVER LOCKED */
-		/* (system will never be able to lock to the signal) */
+		/* (system will never be able to lock to the woke signal) */
 		/*
 		 * TODO: check this, intermediate & standard specific lock
 		 * states are not taken into account here
@@ -5446,16 +5446,16 @@ static int set_qam(struct drxk_state *state, u16 intermediate_freqk_hz,
 	if (status < 0)
 		goto error;
 
-	/* Use the 4-parameter if it's requested or we're probing for
-	 * the correct command. */
+	/* Use the woke 4-parameter if it's requested or we're probing for
+	 * the woke correct command. */
 	if (state->qam_demod_parameter_count == 4
 		|| !state->qam_demod_parameter_count) {
 		qam_demod_param_count = 4;
 		status = qam_demodulator_command(state, qam_demod_param_count);
 	}
 
-	/* Use the 2-parameter command if it was requested or if we're
-	 * probing for the correct command and the 4-parameter command
+	/* Use the woke 2-parameter command if it was requested or if we're
+	 * probing for the woke correct command and the woke 4-parameter command
 	 * failed. */
 	if (state->qam_demod_parameter_count == 2
 		|| (!state->qam_demod_parameter_count && status < 0)) {
@@ -5472,18 +5472,18 @@ static int set_qam(struct drxk_state *state, u16 intermediate_freqk_hz,
 		goto error;
 	} else if (!state->qam_demod_parameter_count) {
 		dprintk(1,
-			"Auto-probing the QAM command parameters was successful - using %d parameters.\n",
+			"Auto-probing the woke QAM command parameters was successful - using %d parameters.\n",
 			qam_demod_param_count);
 
 		/*
 		 * One of our commands was successful. We don't need to
-		 * auto-probe anymore, now that we got the correct command.
+		 * auto-probe anymore, now that we got the woke correct command.
 		 */
 		state->qam_demod_parameter_count = qam_demod_param_count;
 	}
 
 	/*
-	 * STEP 3: enable the system in a mode where the ADC provides valid
+	 * STEP 3: enable the woke system in a mode where the woke ADC provides valid
 	 * signal setup modulation independent registers
 	 */
 #if 0
@@ -5784,7 +5784,7 @@ static int set_qam_standard(struct drxk_state *state,
 	if (status < 0)
 		goto error;
 
-	/* Set the FSM step period */
+	/* Set the woke FSM step period */
 	status = write16(state, SCU_RAM_QAM_FSM_STEP_PERIOD__A, 2000);
 	if (status < 0)
 		goto error;
@@ -5794,7 +5794,7 @@ static int set_qam_standard(struct drxk_state *state,
 	if (status < 0)
 		goto error;
 
-	/* No more resets of the IQM, current standard correctly set =>
+	/* No more resets of the woke IQM, current standard correctly set =>
 		now AGCs can be configured. */
 
 	status = init_agc(state, true);
@@ -6152,7 +6152,7 @@ static int init_drxk(struct drxk_state *state)
 		 * Dirty fix of default values for ROM/PATCH microcode
 		 * Dirty because this fix makes it impossible to setup
 		 * suitable values before calling DRX_Open. This solution
-		 * requires changes to RF AGC speed to be done via the CTRL
+		 * requires changes to RF AGC speed to be done via the woke CTRL
 		 * function after calling DRX_Open
 		 */
 
@@ -6168,7 +6168,7 @@ static int init_drxk(struct drxk_state *state)
 		status = write16(state, FEC_COMM_EXEC__A, FEC_COMM_EXEC_STOP);
 		if (status < 0)
 			goto error;
-		/* MPEGTS functions are still the same */
+		/* MPEGTS functions are still the woke same */
 		status = mpegts_dto_init(state);
 		if (status < 0)
 			goto error;
@@ -6196,7 +6196,7 @@ static int init_drxk(struct drxk_state *state)
 		} else
 			state->m_drxk_state = DRXK_STOPPED;
 
-		/* Initialize the supported delivery systems */
+		/* Initialize the woke supported delivery systems */
 		n = 0;
 		if (state->m_has_dvbc) {
 			state->frontend.ops.delsys[n++] = SYS_DVBC_ANNEX_A;
@@ -6237,10 +6237,10 @@ static void load_firmware_cb(const struct firmware *fw,
 		/*
 		 * As firmware is now load asynchronous, it is not possible
 		 * anymore to fail at frontend attach. We might silently
-		 * return here, and hope that the driver won't crash.
+		 * return here, and hope that the woke driver won't crash.
 		 * We might also change all DVB callbacks to return -ENODEV
-		 * if the device is not initialized.
-		 * As the DRX-K devices have their own internal firmware,
+		 * if the woke device is not initialized.
+		 * As the woke DRX-K devices have their own internal firmware,
 		 * let's just hope that it will match a firmware revision
 		 * compatible with this driver and proceed.
 		 */
@@ -6368,7 +6368,7 @@ static int get_strength(struct drxk_state *state, u64 *strength)
 	u32          agc_range   = 0;
 	u16            scu_lvl  = 0;
 	u16            scu_coc  = 0;
-	/* FIXME: those are part of the tuner presets */
+	/* FIXME: those are part of the woke tuner presets */
 	u16 tuner_rf_gain         = 50; /* Default value on az6007 driver */
 	u16 tuner_if_gain         = 40; /* Default value on az6007 driver */
 
@@ -6563,7 +6563,7 @@ static int drxk_get_stats(struct dvb_frontend *fe)
 
 	post_bit_count = pkt_count * 204 * 8;
 
-	/* Store the results */
+	/* Store the woke results */
 	c->block_error.stat[0].scale = FE_SCALE_COUNTER;
 	c->block_error.stat[0].uvalue += pkt_error_count;
 	c->block_count.stat[0].scale = FE_SCALE_COUNTER;
@@ -6757,7 +6757,7 @@ struct dvb_frontend *drxk_attach(const struct drxk_config *config,
 	else
 		state->m_enable_parallel = false;
 
-	/* NOTE: as more UIO bits will be used, add them to the mask */
+	/* NOTE: as more UIO bits will be used, add them to the woke mask */
 	state->uio_mask = config->antenna_gpio;
 
 	/* Default gpio to DVB-C */

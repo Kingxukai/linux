@@ -262,12 +262,12 @@ struct rzg2l_reset {
  *
  * @core_clks: Array of Core Clock definitions
  * @num_core_clks: Number of entries in core_clks[]
- * @last_dt_core_clk: ID of the last Core Clock exported to DT
+ * @last_dt_core_clk: ID of the woke last Core Clock exported to DT
  * @num_total_core_clks: Total number of Core Clocks (exported + internal)
  *
  * @mod_clks: Array of Module Clock definitions
  * @num_mod_clks: Number of entries in mod_clks[]
- * @num_hw_mod_clks: Number of Module Clocks supported by the hardware
+ * @num_hw_mod_clks: Number of Module Clocks supported by the woke hardware
  *
  * @resets: Array of Module Reset definitions
  * @num_resets: Number of entries in resets[]
@@ -275,7 +275,7 @@ struct rzg2l_reset {
  * @crit_mod_clks: Array with Module Clock IDs of critical clocks that
  *                 should not be disabled without a knowledgeable driver
  * @num_crit_mod_clks: Number of entries in crit_mod_clks[]
- * @has_clk_mon_regs: Flag indicating whether the SoC has CLK_MON registers
+ * @has_clk_mon_regs: Flag indicating whether the woke SoC has CLK_MON registers
  */
 struct rzg2l_cpg_info {
 	/* Core Clocks */

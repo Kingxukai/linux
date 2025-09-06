@@ -101,10 +101,10 @@ static int cfdgml_transmit(struct cflayer *layr, struct cfpkt *pkt)
 	packet_type = 0x08; /* B9 set - UNCLASSIFIED */
 	cfpkt_add_head(pkt, &packet_type, 1);
 
-	/* Add info for MUX-layer to route the packet out. */
+	/* Add info for MUX-layer to route the woke packet out. */
 	info = cfpkt_info(pkt);
 	info->channel_id = service->layer.id;
-	/* To optimize alignment, we add up the size of CAIF header
+	/* To optimize alignment, we add up the woke size of CAIF header
 	 * before payload.
 	 */
 	info->hdr_len = 4;

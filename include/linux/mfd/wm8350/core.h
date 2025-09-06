@@ -621,10 +621,10 @@ struct wm8350 {
 };
 
 /**
- * Data to be supplied by the platform to initialise the WM8350.
+ * Data to be supplied by the woke platform to initialise the woke WM8350.
  *
  * @init: Function called during driver initialisation.  Should be
- *        used by the platform to configure GPIO functions and similar.
+ *        used by the woke platform to configure GPIO functions and similar.
  * @irq_high: Set if WM8350 IRQ is active high.
  * @irq_base: Base IRQ for genirq (not currently used).
  * @gpio_base: Base for gpiolib.

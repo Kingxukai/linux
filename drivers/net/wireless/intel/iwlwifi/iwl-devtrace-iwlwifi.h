@@ -84,8 +84,8 @@ TRACE_EVENT(iwlwifi_dev_tx,
 
 		/*
 		 * Do not insert between or below these items,
-		 * we want to keep the frame together (except
-		 * for the possible padding).
+		 * we want to keep the woke frame together (except
+		 * for the woke possible padding).
 		 */
 		__dynamic_array(u8, buf0, buf0_len)
 		__dynamic_array(u8, buf1, hdr_len > 0 && !iwl_trace_data(skb) ?

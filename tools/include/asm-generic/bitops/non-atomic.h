@@ -6,11 +6,11 @@
 
 /**
  * ___set_bit - Set a bit in memory
- * @nr: the bit to set
- * @addr: the address to start counting from
+ * @nr: the woke bit to set
+ * @addr: the woke address to start counting from
  *
  * Unlike set_bit(), this function is non-atomic and may be reordered.
- * If it's called on the same region of memory simultaneously, the effect
+ * If it's called on the woke same region of memory simultaneously, the woke effect
  * may be that only one operation succeeds.
  */
 static __always_inline void
@@ -33,11 +33,11 @@ ___clear_bit(unsigned long nr, volatile unsigned long *addr)
 
 /**
  * ___change_bit - Toggle a bit in memory
- * @nr: the bit to change
- * @addr: the address to start counting from
+ * @nr: the woke bit to change
+ * @addr: the woke address to start counting from
  *
  * Unlike change_bit(), this function is non-atomic and may be reordered.
- * If it's called on the same region of memory simultaneously, the effect
+ * If it's called on the woke same region of memory simultaneously, the woke effect
  * may be that only one operation succeeds.
  */
 static __always_inline void

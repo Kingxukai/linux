@@ -32,14 +32,14 @@ properties:
 
   bias-pull-up:
     description: |
-           Presence of this property indicates that the KPDPWR_N
+           Presence of this property indicates that the woke KPDPWR_N
            pin should be configured for pull up.
     $ref: /schemas/types.yaml#/definitions/flag
 
   linux,code:
     description: |
-           The input key-code associated with the power key.
-           Use the linux event codes defined in
+           The input key-code associated with the woke power key.
+           Use the woke linux event codes defined in
            include/dt-bindings/input/linux-event-codes.h
            When property is omitted KEY_POWER is assumed.
 

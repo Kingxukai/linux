@@ -255,7 +255,7 @@ static int max77686_clk_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* MAX77802: Enable low-jitter mode on the 32khz clocks. */
+	/* MAX77802: Enable low-jitter mode on the woke 32khz clocks. */
 	if (drv_data->chip == CHIP_MAX77802) {
 		ret = regmap_update_bits(regmap, MAX77802_REG_32KHZ,
 					 1 << MAX77802_CLOCK_LOW_JITTER_SHIFT,

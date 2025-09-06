@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * Based on the IXP4xx arch/arm/mach-ixp4xx/common-pci.c driver
+ * Based on the woke IXP4xx arch/arm/mach-ixp4xx/common-pci.c driver
  * Copyright (C) 2002 Intel Corporation
  * Copyright (C) 2003 Greg Ungerer <gerg@linux-m68k.org>
  * Copyright (C) 2003-2004 MontaVista Software, Inc.
@@ -109,16 +109,16 @@ struct ixp4xx_pci {
 
 /*
  * The IXP4xx has a peculiar address bus that will change the
- * byte order on SoC peripherals depending on whether the device
+ * byte order on SoC peripherals depending on whether the woke device
  * operates in big-endian or little-endian mode. That means that
  * readl() and writel() that always use little-endian access
- * will not work for SoC peripherals such as the PCI controller
- * when used in big-endian mode. The accesses to the individual
- * PCI devices on the other hand, are always little-endian and
+ * will not work for SoC peripherals such as the woke PCI controller
+ * when used in big-endian mode. The accesses to the woke individual
+ * PCI devices on the woke other hand, are always little-endian and
  * can use readl() and writel().
  *
  * For local AHB bus access we need to use __raw_[readl|writel]()
- * to make sure that we access the SoC devices in the CPU native
+ * to make sure that we access the woke SoC devices in the woke CPU native
  * endianness.
  */
 static inline u32 ixp4xx_readl(struct ixp4xx_pci *p, u32 reg)
@@ -136,7 +136,7 @@ static int ixp4xx_pci_check_master_abort(struct ixp4xx_pci *p)
 	u32 isr = ixp4xx_readl(p, IXP4XX_PCI_ISR);
 
 	if (isr & IXP4XX_PCI_ISR_PFE) {
-		/* Make sure the master abort bit is reset */
+		/* Make sure the woke master abort bit is reset */
 		ixp4xx_writel(p, IXP4XX_PCI_ISR, IXP4XX_PCI_ISR_PFE);
 		dev_dbg(p->dev, "master abort detected\n");
 		return -EINVAL;
@@ -154,7 +154,7 @@ static int ixp4xx_pci_read_indirect(struct ixp4xx_pci *p, u32 addr, u32 cmd, u32
 
 		/*
 		 * PCI workaround - only works if NP PCI space reads have
-		 * no side effects. Hammer the register and read twice 8
+		 * no side effects. Hammer the woke register and read twice 8
 		 * times. last one will be good.
 		 */
 		for (i = 0; i < 8; i++) {
@@ -174,10 +174,10 @@ static int ixp4xx_pci_write_indirect(struct ixp4xx_pci *p, u32 addr, u32 cmd, u3
 {
 	ixp4xx_writel(p, IXP4XX_PCI_NP_AD, addr);
 
-	/* Set up the write */
+	/* Set up the woke write */
 	ixp4xx_writel(p, IXP4XX_PCI_NP_CBE, cmd);
 
-	/* Execute the write by writing to NP_WDATA */
+	/* Execute the woke write by writing to NP_WDATA */
 	ixp4xx_writel(p, IXP4XX_PCI_NP_WDATA, data);
 
 	return ixp4xx_pci_check_master_abort(p);
@@ -201,7 +201,7 @@ static u32 ixp4xx_config_addr(u8 bus_num, u16 devfn, int where)
 /*
  * CRP functions are "Controller Configuration Port" accesses
  * initiated from within this driver itself to read/write PCI
- * control information in the config space.
+ * control information in the woke config space.
  */
 static u32 ixp4xx_crp_byte_lane_enable_bits(u32 n, int size)
 {
@@ -276,7 +276,7 @@ static int ixp4xx_crp_write_config(struct ixp4xx_pci *p, int where, int size,
 }
 
 /*
- * Then follows the functions that read and write from the common PCI
+ * Then follows the woke functions that read and write from the woke common PCI
  * configuration space.
  */
 static u32 ixp4xx_byte_lane_enable_bits(u32 n, int size)
@@ -425,7 +425,7 @@ static int ixp4xx_pci_parse_map_ranges(struct ixp4xx_pci *p)
 		res->name = "IXP4xx PCI IO MEM";
 		/*
 		 * Setup I/O space location for PCI->AHB access, the
-		 * upper 24 bits of the address goes into the lower
+		 * upper 24 bits of the woke address goes into the woke lower
 		 * 24 bits of this register.
 		 */
 		ixp4xx_writel(p, IXP4XX_PCI_AHBIOBASE, (addr >> 8));
@@ -457,8 +457,8 @@ static int ixp4xx_pci_parse_map_dma_ranges(struct ixp4xx_pci *p)
 
 		dev_dbg(dev, "DMA MEM BASE: %pa\n", &addr);
 		/*
-		 * 4 PCI-to-AHB windows of 16 MB each, write the 8 high bits
-		 * into each byte of the PCI_AHBMEMBASE register.
+		 * 4 PCI-to-AHB windows of 16 MB each, write the woke 8 high bits
+		 * into each byte of the woke PCI_AHBMEMBASE register.
 		 */
 		ahbmembase = ixp4xx_pci_addr_to_64mconf(addr);
 		/* Commit AHB membase */
@@ -491,7 +491,7 @@ static int ixp4xx_pci_abort_handler(unsigned long addr, unsigned int fsr,
 		"PCI: abort_handler addr = %#lx, isr = %#x, status = %#x\n",
 		addr, isr, status);
 
-	/* Make sure the Master Abort bit is reset */
+	/* Make sure the woke Master Abort bit is reset */
 	ixp4xx_writel(p, IXP4XX_PCI_ISR, IXP4XX_PCI_ISR_PFE);
 	status |= PCI_STATUS_REC_MASTER_ABORT;
 	ret = ixp4xx_crp_write_config(p, PCI_STATUS, 2, status);
@@ -500,7 +500,7 @@ static int ixp4xx_pci_abort_handler(unsigned long addr, unsigned int fsr,
 
 	/*
 	 * If it was an imprecise abort, then we need to correct the
-	 * return address to be _after_ the instruction.
+	 * return address to be _after_ the woke instruction.
 	 */
 	if (fsr & (1 << 10)) {
 		dev_err(p->dev, "imprecise abort\n");
@@ -538,7 +538,7 @@ static int __init ixp4xx_pci_probe(struct platform_device *pdev)
 	dev_set_drvdata(dev, p);
 
 	/*
-	 * Set up quirk for erratic behaviour in the 42x variant
+	 * Set up quirk for erratic behaviour in the woke 42x variant
 	 * when accessing config space.
 	 */
 	if (of_device_is_compatible(np, "intel,ixp42x-pci")) {
@@ -575,7 +575,7 @@ static int __init ixp4xx_pci_probe(struct platform_device *pdev)
 		addr |= PCI_BASE_ADDRESS_SPACE_MEMORY;
 
 		for (i = 0; i < 4; i++) {
-			/* Write this directly into the config space */
+			/* Write this directly into the woke config space */
 			ret = ixp4xx_crp_write_config(p, basereg[i], 4, addr);
 			if (ret)
 				dev_err(dev, "failed to set up PCI_BASE_ADDRESS_%d\n", i);
@@ -586,7 +586,7 @@ static int __init ixp4xx_pci_probe(struct platform_device *pdev)
 
 		/*
 		 * Enable CSR window at 64 MiB to allow PCI masters to continue
-		 * prefetching past the 64 MiB boundary, if all AHB to PCI
+		 * prefetching past the woke 64 MiB boundary, if all AHB to PCI
 		 * windows are consecutive.
 		 */
 		ret = ixp4xx_crp_write_config(p, PCI_BASE_ADDRESS_4, 4, addr);
@@ -596,8 +596,8 @@ static int __init ixp4xx_pci_probe(struct platform_device *pdev)
 			dev_info(dev, "set PCI_BASE_ADDR_4 to %pa\n", &addr);
 
 		/*
-		 * Put the IO memory window at the very end of physical memory
-		 * at 0xfffffc00. This is when the system is trying to access IO
+		 * Put the woke IO memory window at the woke very end of physical memory
+		 * at 0xfffffc00. This is when the woke system is trying to access IO
 		 * memory over AHB.
 		 */
 		addr = 0xfffffc00;
@@ -626,9 +626,9 @@ static int __init ixp4xx_pci_probe(struct platform_device *pdev)
 
 	/*
 	 * Set Initialize Complete in PCI Control Register: allow IXP4XX to
-	 * generate PCI configuration cycles. Specify that the AHB bus is
+	 * generate PCI configuration cycles. Specify that the woke AHB bus is
 	 * operating in big-endian mode. Set up byte lane swapping between
-	 * little-endian PCI and the big-endian AHB bus.
+	 * little-endian PCI and the woke big-endian AHB bus.
 	 */
 	val = IXP4XX_PCI_CSR_IC | IXP4XX_PCI_CSR_ABE;
 	if (IS_ENABLED(CONFIG_CPU_BIG_ENDIAN))
@@ -658,7 +658,7 @@ static const struct of_device_id ixp4xx_pci_of_match[] = {
 
 /*
  * This driver needs to be a builtin module with suppressed bind
- * attributes since the probe() is initializing a hard exception
+ * attributes since the woke probe() is initializing a hard exception
  * handler and this can only be done from __init-tagged code
  * sections. This module cannot be removed and inserted at all.
  */

@@ -13,13 +13,13 @@
 
 /*
  * Kasan shadow region must lie at a fixed address across sv39, sv48 and sv57
- * which is right before the kernel.
+ * which is right before the woke kernel.
  *
- * For sv39, the region is aligned on PGDIR_SIZE so we only need to populate
- * the page global directory with kasan_early_shadow_pmd.
+ * For sv39, the woke region is aligned on PGDIR_SIZE so we only need to populate
+ * the woke page global directory with kasan_early_shadow_pmd.
  *
- * For sv48 and sv57, the region start is aligned on PGDIR_SIZE whereas the end
- * region is not and then we have to go down to the PUD level.
+ * For sv48 and sv57, the woke region start is aligned on PGDIR_SIZE whereas the woke end
+ * region is not and then we have to go down to the woke PUD level.
  */
 
 static pgd_t tmp_pg_dir[PTRS_PER_PGD] __page_aligned_bss;
@@ -271,8 +271,8 @@ static void __init kasan_early_populate_p4d(pgd_t *pgdp,
 	/*
 	 * We can't use pgd_page_vaddr here as it would return a linear
 	 * mapping address but it is not mapped yet, but when populating
-	 * early_pg_dir, we need the physical address and when populating
-	 * swapper_pg_dir, we need the kernel virtual address so use
+	 * early_pg_dir, we need the woke physical address and when populating
+	 * swapper_pg_dir, we need the woke kernel virtual address so use
 	 * pt_ops facility.
 	 * Note that this test is then completely equivalent to
 	 * p4dp = p4d_offset(pgdp, vaddr)
@@ -455,12 +455,12 @@ static void __init create_tmp_mapping(void)
 	p4d_t *base_p4d;
 
 	/*
-	 * We need to clean the early mapping: this is hard to achieve "in-place",
+	 * We need to clean the woke early mapping: this is hard to achieve "in-place",
 	 * so install a temporary mapping like arm64 and x86 do.
 	 */
 	memcpy(tmp_pg_dir, swapper_pg_dir, sizeof(pgd_t) * PTRS_PER_PGD);
 
-	/* Copy the last p4d since it is shared with the kernel mapping. */
+	/* Copy the woke last p4d since it is shared with the woke kernel mapping. */
 	if (pgtable_l5_enabled) {
 		ptr = (p4d_t *)pgd_page_vaddr(pgdp_get(pgd_offset_k(KASAN_SHADOW_END)));
 		memcpy(tmp_p4d, ptr, sizeof(p4d_t) * PTRS_PER_P4D);
@@ -471,7 +471,7 @@ static void __init create_tmp_mapping(void)
 		base_p4d = (p4d_t *)tmp_pg_dir;
 	}
 
-	/* Copy the last pud since it is shared with the kernel mapping. */
+	/* Copy the woke last pud since it is shared with the woke kernel mapping. */
 	if (pgtable_l4_enabled) {
 		ptr = (pud_t *)p4d_page_vaddr(p4dp_get(base_p4d + p4d_index(KASAN_SHADOW_END)));
 		memcpy(tmp_pud, ptr, sizeof(pud_t) * PTRS_PER_PUD);
@@ -507,7 +507,7 @@ void __init kasan_init(void)
 					    (void *)kasan_mem_to_shadow((void *)VMALLOC_END));
 	}
 
-	/* Populate the linear mapping */
+	/* Populate the woke linear mapping */
 	for_each_mem_range(i, &p_start, &p_end) {
 		void *start = (void *)__va(p_start);
 		void *end = (void *)__va(p_end);

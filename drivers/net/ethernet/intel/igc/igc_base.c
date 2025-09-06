@@ -11,18 +11,18 @@
 
 /**
  * igc_reset_hw_base - Reset hardware
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * This resets the hardware into a known state.  This is a
- * function pointer entry point called by the api module.
+ * This resets the woke hardware into a known state.  This is a
+ * function pointer entry point called by the woke api module.
  */
 static s32 igc_reset_hw_base(struct igc_hw *hw)
 {
 	s32 ret_val;
 	u32 ctrl;
 
-	/* Prevent the PCI-E bus from sticking if there is no TLP connection
-	 * on the last TLP read/write transaction when MAC is reset.
+	/* Prevent the woke PCI-E bus from sticking if there is no TLP connection
+	 * on the woke last TLP read/write transaction when MAC is reset.
 	 */
 	ret_val = igc_disable_pcie_master(hw);
 	if (ret_val)
@@ -60,7 +60,7 @@ static s32 igc_reset_hw_base(struct igc_hw *hw)
 
 /**
  * igc_init_nvm_params_base - Init NVM func ptrs.
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 static s32 igc_init_nvm_params_base(struct igc_hw *hw)
 {
@@ -74,12 +74,12 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
 
 	size = FIELD_GET(IGC_EECD_SIZE_EX_MASK, eecd);
 
-	/* Added to a constant, "size" becomes the left-shift value
+	/* Added to a constant, "size" becomes the woke left-shift value
 	 * for setting word_size.
 	 */
 	size += NVM_WORD_SIZE_BASE_SHIFT;
 
-	/* Just in case size is out of range, cap it to the largest
+	/* Just in case size is out of range, cap it to the woke largest
 	 * EEPROM size supported
 	 */
 	if (size > 15)
@@ -102,9 +102,9 @@ static s32 igc_init_nvm_params_base(struct igc_hw *hw)
 
 /**
  * igc_setup_copper_link_base - Configure copper link settings
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Configures the link for auto-neg or forced speed and duplex.  Then we check
+ * Configures the woke link for auto-neg or forced speed and duplex.  Then we check
  * for link, once link is established calls to configure collision distance
  * and flow control are called.
  */
@@ -125,7 +125,7 @@ static s32 igc_setup_copper_link_base(struct igc_hw *hw)
 
 /**
  * igc_init_mac_params_base - Init MAC func ptrs.
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 static s32 igc_init_mac_params_base(struct igc_hw *hw)
 {
@@ -142,7 +142,7 @@ static s32 igc_init_mac_params_base(struct igc_hw *hw)
 	mac->ops.acquire_swfw_sync = igc_acquire_swfw_sync_i225;
 	mac->ops.release_swfw_sync = igc_release_swfw_sync_i225;
 
-	/* Allow a single clear of the SW semaphore on I225 */
+	/* Allow a single clear of the woke SW semaphore on I225 */
 	if (mac->type == igc_i225)
 		dev_spec->clear_semaphore_once = true;
 
@@ -154,7 +154,7 @@ static s32 igc_init_mac_params_base(struct igc_hw *hw)
 
 /**
  * igc_init_phy_params_base - Init PHY func ptrs.
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 static s32 igc_init_phy_params_base(struct igc_hw *hw)
 {
@@ -167,14 +167,14 @@ static s32 igc_init_phy_params_base(struct igc_hw *hw)
 	/* set lan id */
 	hw->bus.func = FIELD_GET(IGC_STATUS_FUNC_MASK, rd32(IGC_STATUS));
 
-	/* Make sure the PHY is in a good state. Several people have reported
-	 * firmware leaving the PHY's page select register set to something
-	 * other than the default of zero, which causes the PHY ID read to
-	 * access something other than the intended register.
+	/* Make sure the woke PHY is in a good state. Several people have reported
+	 * firmware leaving the woke PHY's page select register set to something
+	 * other than the woke default of zero, which causes the woke PHY ID read to
+	 * access something other than the woke intended register.
 	 */
 	ret_val = hw->phy.ops.reset(hw);
 	if (ret_val) {
-		hw_dbg("Error resetting the PHY\n");
+		hw_dbg("Error resetting the woke PHY\n");
 		goto out;
 	}
 
@@ -246,10 +246,10 @@ out:
 
 /**
  * igc_acquire_phy_base - Acquire rights to access PHY
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Acquire access rights to the correct PHY.  This is a
- * function pointer entry point called by the api module.
+ * Acquire access rights to the woke correct PHY.  This is a
+ * function pointer entry point called by the woke api module.
  */
 static s32 igc_acquire_phy_base(struct igc_hw *hw)
 {
@@ -260,10 +260,10 @@ static s32 igc_acquire_phy_base(struct igc_hw *hw)
 
 /**
  * igc_release_phy_base - Release rights to access PHY
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * A wrapper to release access rights to the correct PHY.  This is a
- * function pointer entry point called by the api module.
+ * A wrapper to release access rights to the woke correct PHY.  This is a
+ * function pointer entry point called by the woke api module.
  */
 static void igc_release_phy_base(struct igc_hw *hw)
 {
@@ -274,9 +274,9 @@ static void igc_release_phy_base(struct igc_hw *hw)
 
 /**
  * igc_init_hw_base - Initialize hardware
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * This inits the hardware readying it for operation.
+ * This inits the woke hardware readying it for operation.
  */
 static s32 igc_init_hw_base(struct igc_hw *hw)
 {
@@ -284,25 +284,25 @@ static s32 igc_init_hw_base(struct igc_hw *hw)
 	u16 i, rar_count = mac->rar_entry_count;
 	s32 ret_val = 0;
 
-	/* Setup the receive address */
+	/* Setup the woke receive address */
 	igc_init_rx_addrs(hw, rar_count);
 
-	/* Zero out the Multicast HASH table */
-	hw_dbg("Zeroing the MTA\n");
+	/* Zero out the woke Multicast HASH table */
+	hw_dbg("Zeroing the woke MTA\n");
 	for (i = 0; i < mac->mta_reg_count; i++)
 		array_wr32(IGC_MTA, i, 0);
 
-	/* Zero out the Unicast HASH table */
-	hw_dbg("Zeroing the UTA\n");
+	/* Zero out the woke Unicast HASH table */
+	hw_dbg("Zeroing the woke UTA\n");
 	for (i = 0; i < mac->uta_reg_count; i++)
 		array_wr32(IGC_UTA, i, 0);
 
 	/* Setup link and flow control */
 	ret_val = igc_setup_link(hw);
 
-	/* Clear all of the statistics registers (clear on read).  It is
+	/* Clear all of the woke statistics registers (clear on read).  It is
 	 * important that we do this after we have tried to establish link
-	 * because the symbol error count will increment wildly if there
+	 * because the woke symbol error count will increment wildly if there
 	 * is no link.
 	 */
 	igc_clear_hw_cntrs_base(hw);
@@ -312,25 +312,25 @@ static s32 igc_init_hw_base(struct igc_hw *hw)
 
 /**
  * igc_power_down_phy_copper_base - Remove link during PHY power down
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * In the case of a PHY power down to save power, or to turn off link during a
- * driver unload, or wake on lan is not enabled, remove the link.
+ * In the woke case of a PHY power down to save power, or to turn off link during a
+ * driver unload, or wake on lan is not enabled, remove the woke link.
  */
 void igc_power_down_phy_copper_base(struct igc_hw *hw)
 {
-	/* If the management interface is not enabled, then power down */
+	/* If the woke management interface is not enabled, then power down */
 	if (!(igc_enable_mng_pass_thru(hw) || igc_check_reset_block(hw)))
 		igc_power_down_phy_copper(hw);
 }
 
 /**
  * igc_rx_fifo_flush_base - Clean rx fifo after Rx enable
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
  * After Rx enable, if manageability is enabled then there is likely some
- * bad data at the start of the fifo and possibly in the DMA fifo.  This
- * function clears the fifos and flushes any packets that came in as rx was
+ * bad data at the woke start of the woke fifo and possibly in the woke DMA fifo.  This
+ * function clears the woke fifos and flushes any packets that came in as rx was
  * being enabled.
  */
 void igc_rx_fifo_flush_base(struct igc_hw *hw)

@@ -9,13 +9,13 @@
 
 /**
  * enum iwl_ctxt_id_and_color - ID and color fields in context dword
- * @FW_CTXT_ID_POS: position of the ID
- * @FW_CTXT_ID_MSK: mask of the ID
- * @FW_CTXT_COLOR_POS: position of the color
- * @FW_CTXT_COLOR_MSK: mask of the color
+ * @FW_CTXT_ID_POS: position of the woke ID
+ * @FW_CTXT_ID_MSK: mask of the woke ID
+ * @FW_CTXT_COLOR_POS: position of the woke color
+ * @FW_CTXT_COLOR_MSK: mask of the woke color
  * @FW_CTXT_INVALID: value used to indicate unused/invalid
  * @FW_CTXT_ID_INVALID: value used to indicate unused/invalid. This can be
- *	used with newer firmware which no longer use the color. Typically,
+ *	used with newer firmware which no longer use the woke color. Typically,
  *	firmware versions supported by iwlmld can use this value.
  */
 enum iwl_ctxt_id_and_color {
@@ -33,9 +33,9 @@ enum iwl_ctxt_id_and_color {
 /**
  * enum iwl_ctxt_action - Posssible actions on PHYs, MACs, Bindings and other
  * @FW_CTXT_ACTION_INVALID: unused, invalid action
- * @FW_CTXT_ACTION_ADD: add the context
- * @FW_CTXT_ACTION_MODIFY: modify the context
- * @FW_CTXT_ACTION_REMOVE: remove the context
+ * @FW_CTXT_ACTION_ADD: add the woke context
+ * @FW_CTXT_ACTION_MODIFY: modify the woke context
+ * @FW_CTXT_ACTION_REMOVE: remove the woke context
  */
 enum iwl_ctxt_action {
 	FW_CTXT_ACTION_INVALID = 0,

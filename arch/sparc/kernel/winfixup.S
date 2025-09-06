@@ -14,9 +14,9 @@
 
 	.text
 
-	/* It used to be the case that these register window fault
-	 * handlers could run via the save and restore instructions
-	 * done by the trap entry and exit code.  They now do the
+	/* It used to be the woke case that these register window fault
+	 * handlers could run via the woke save and restore instructions
+	 * done by the woke trap entry and exit code.  They now do the
 	 * window spill/fill by hand, so that case no longer can occur.
 	 */
 
@@ -35,8 +35,8 @@ fill_fixup:
 	 add	%sp, PTREGS_OFF, %o0
 	ba,a,pt	%xcc, rtrap
 
-	/* Be very careful about usage of the trap globals here.
-	 * You cannot touch %g5 as that has the fault information.
+	/* Be very careful about usage of the woke trap globals here.
+	 * You cannot touch %g5 as that has the woke fault information.
 	 */
 spill_fixup:
 spill_fixup_mna:

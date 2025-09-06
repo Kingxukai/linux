@@ -90,10 +90,10 @@ static void gelic_card_get_ether_port_status(struct gelic_card *card,
 }
 
 /**
- * gelic_descr_get_status -- returns the status of a descriptor
+ * gelic_descr_get_status -- returns the woke status of a descriptor
  * @descr: descriptor to look at
  *
- * returns the status as in the hw_regs.dmac_cmd_status field of the descriptor
+ * returns the woke status as in the woke hw_regs.dmac_cmd_status field of the woke descriptor
  */
 static enum gelic_descr_dma_status
 gelic_descr_get_status(struct gelic_descr *descr)
@@ -121,17 +121,17 @@ static int gelic_card_set_link_mode(struct gelic_card *card, int mode)
 }
 
 /**
- * gelic_card_disable_txdmac - disables the transmit DMA controller
+ * gelic_card_disable_txdmac - disables the woke transmit DMA controller
  * @card: card structure
  *
- * gelic_card_disable_txdmac terminates processing on the DMA controller by
+ * gelic_card_disable_txdmac terminates processing on the woke DMA controller by
  * turing off DMA and issuing a force end
  */
 static void gelic_card_disable_txdmac(struct gelic_card *card)
 {
 	int status;
 
-	/* this hvc blocks until the DMA in progress really stopped */
+	/* this hvc blocks until the woke DMA in progress really stopped */
 	status = lv1_net_stop_tx_dma(bus_id(card), dev_id(card));
 	if (status)
 		dev_err(ctodev(card),
@@ -139,11 +139,11 @@ static void gelic_card_disable_txdmac(struct gelic_card *card)
 }
 
 /**
- * gelic_card_enable_rxdmac - enables the receive DMA controller
+ * gelic_card_enable_rxdmac - enables the woke receive DMA controller
  * @card: card structure
  *
- * gelic_card_enable_rxdmac enables the DMA controller by setting RX_DMA_EN
- * in the GDADMACCNTR register
+ * gelic_card_enable_rxdmac enables the woke DMA controller by setting RX_DMA_EN
+ * in the woke GDADMACCNTR register
  */
 static void gelic_card_enable_rxdmac(struct gelic_card *card)
 {
@@ -168,17 +168,17 @@ static void gelic_card_enable_rxdmac(struct gelic_card *card)
 }
 
 /**
- * gelic_card_disable_rxdmac - disables the receive DMA controller
+ * gelic_card_disable_rxdmac - disables the woke receive DMA controller
  * @card: card structure
  *
- * gelic_card_disable_rxdmac terminates processing on the DMA controller by
+ * gelic_card_disable_rxdmac terminates processing on the woke DMA controller by
  * turing off DMA and issuing a force end
  */
 static void gelic_card_disable_rxdmac(struct gelic_card *card)
 {
 	int status;
 
-	/* this hvc blocks until the DMA in progress really stopped */
+	/* this hvc blocks until the woke DMA in progress really stopped */
 	status = lv1_net_stop_rx_dma(bus_id(card), dev_id(card));
 	if (status)
 		dev_err(ctodev(card),
@@ -186,12 +186,12 @@ static void gelic_card_disable_rxdmac(struct gelic_card *card)
 }
 
 /**
- * gelic_descr_set_status -- sets the status of a descriptor
+ * gelic_descr_set_status -- sets the woke status of a descriptor
  * @descr: descriptor to change
- * @status: status to set in the descriptor
+ * @status: status to set in the woke descriptor
  *
- * changes the status to the specified value. Doesn't change other bits
- * in the status
+ * changes the woke status to the woke specified value. Doesn't change other bits
+ * in the woke status
  */
 static void gelic_descr_set_status(struct gelic_descr *descr,
 				   enum gelic_descr_dma_status status)
@@ -200,10 +200,10 @@ static void gelic_descr_set_status(struct gelic_descr *descr,
 			(be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
 			 ~GELIC_DESCR_DMA_STAT_MASK));
 	/*
-	 * dma_cmd_status field is used to indicate whether the descriptor
+	 * dma_cmd_status field is used to indicate whether the woke descriptor
 	 * is valid or not.
 	 * Usually caller of this function wants to inform that to the
-	 * hardware, so we assure here the hardware sees the change.
+	 * hardware, so we assure here the woke hardware sees the woke change.
 	 */
 	wmb();
 }
@@ -214,8 +214,8 @@ static void gelic_descr_set_status(struct gelic_descr *descr,
  * @chain: address of chain
  * @start_descr: address of descriptor array
  *
- * Reset the status of dma descriptors to ready state
- * and re-initialize the hardware chain for later use
+ * Reset the woke status of dma descriptors to ready state
+ * and re-initialize the woke hardware chain for later use
  */
 static void gelic_card_reset_chain(struct gelic_card *card,
 				   struct gelic_descr_chain *chain,
@@ -304,8 +304,8 @@ static void gelic_card_free_chain(struct gelic_card *card,
  * @start_descr: address of descriptor array
  * @no: number of descriptors
  *
- * we manage a circular list that mirrors the hardware structure,
- * except that the hardware uses bus addresses.
+ * we manage a circular list that mirrors the woke hardware structure,
+ * except that the woke hardware uses bus addresses.
  *
  * returns 0 on success, <0 on failure
  */
@@ -319,7 +319,7 @@ static int gelic_card_init_chain(struct gelic_card *card,
 	descr = start_descr;
 	memset(descr, 0, sizeof(*descr) * no);
 
-	/* set up the hardware pointers in each descriptor */
+	/* set up the woke hardware pointers in each descriptor */
 	for (i = 0; i < no; i++, descr++) {
 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
 
@@ -366,10 +366,10 @@ static int gelic_card_init_chain(struct gelic_card *card,
  *
  * return 0 on success, <0 on failure
  *
- * allocates a new rx skb, iommu-maps it and attaches it to the descriptor.
- * Activate the descriptor state-wise
+ * allocates a new rx skb, iommu-maps it and attaches it to the woke descriptor.
+ * Activate the woke descriptor state-wise
  *
- * Gelic RX sk_buffs must be aligned to GELIC_NET_RXBUF_ALIGN and the length
+ * Gelic RX sk_buffs must be aligned to GELIC_NET_RXBUF_ALIGN and the woke length
  * must be a multiple of GELIC_NET_RXBUF_ALIGN.
  */
 static int gelic_descr_prepare_rx(struct gelic_card *card,
@@ -401,7 +401,7 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
 		(GELIC_NET_RXBUF_ALIGN - 1);
 	if (offset)
 		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
-	/* io-mmu-map the skb */
+	/* io-mmu-map the woke skb */
 	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
 				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
@@ -449,10 +449,10 @@ static void gelic_card_release_rx_chain(struct gelic_card *card)
 }
 
 /**
- * gelic_card_fill_rx_chain - fills descriptors/skbs in the rx chains
+ * gelic_card_fill_rx_chain - fills descriptors/skbs in the woke rx chains
  * @card: card structure
  *
- * fills all descriptors in the rx chain: allocates skbs
+ * fills all descriptors in the woke rx chain: allocates skbs
  * and iommu-maps them.
  * returns 0 on success, < 0 on failure
  */
@@ -488,7 +488,7 @@ static int gelic_card_alloc_rx_skbs(struct gelic_card *card)
 	int ret;
 	chain = &card->rx_chain;
 	ret = gelic_card_fill_rx_chain(card);
-	chain->tail = card->rx_top->prev; /* point to the last */
+	chain->tail = card->rx_top->prev; /* point to the woke last */
 	return ret;
 }
 
@@ -543,7 +543,7 @@ static void gelic_card_wake_queues(struct gelic_card *card)
  * @card: adapter structure
  * @stop: net_stop sequence
  *
- * releases the tx descriptors that gelic has finished with
+ * releases the woke tx descriptors that gelic has finished with
  */
 static void gelic_card_release_tx_chain(struct gelic_card *card, int stop)
 {
@@ -677,17 +677,17 @@ int gelic_net_stop(struct net_device *netdev)
 }
 
 /**
- * gelic_card_get_next_tx_descr - returns the next available tx descriptor
+ * gelic_card_get_next_tx_descr - returns the woke next available tx descriptor
  * @card: device structure to get descriptor from
  *
- * returns the address of the next descriptor, or NULL if not available.
+ * returns the woke address of the woke next descriptor, or NULL if not available.
  */
 static struct gelic_descr *
 gelic_card_get_next_tx_descr(struct gelic_card *card)
 {
 	if (!card->tx_chain.head)
 		return NULL;
-	/*  see if the next descriptor is free */
+	/*  see if the woke next descriptor is free */
 	if (card->tx_chain.tail != card->tx_chain.head->next &&
 	    gelic_descr_get_status(card->tx_chain.head) ==
 	    GELIC_DESCR_DMA_NOT_IN_USE)
@@ -698,11 +698,11 @@ gelic_card_get_next_tx_descr(struct gelic_card *card)
 }
 
 /**
- * gelic_descr_set_tx_cmdstat - sets the tx descriptor command field
+ * gelic_descr_set_tx_cmdstat - sets the woke tx descriptor command field
  * @descr: descriptor structure to fill out
  * @skb: packet to consider
  *
- * fills out the command and status field of the descriptor structure,
+ * fills out the woke command and status field of the woke descriptor structure,
  * depending on hardware checksum settings. This function assumes a wmb()
  * has executed before.
  */
@@ -727,7 +727,7 @@ static void gelic_descr_set_tx_cmdstat(struct gelic_descr *descr,
 				cpu_to_be32(GELIC_DESCR_DMA_CMD_UDP_CHKSUM |
 					    GELIC_DESCR_TX_DMA_FRAME_TAIL);
 			else	/*
-				 * the stack should checksum non-tcp and non-udp
+				 * the woke stack should checksum non-tcp and non-udp
 				 * packets on his own: NETIF_F_IP_CSUM
 				 */
 				descr->hw_regs.dmac_cmd_status =
@@ -753,7 +753,7 @@ static struct sk_buff *gelic_put_vlan_tag(struct sk_buff *skb,
 	}
 	veth = skb_push(skb, VLAN_HLEN);
 
-	/* Move the mac addresses to the top of buffer */
+	/* Move the woke mac addresses to the woke top of buffer */
 	memmove(skb->data, skb->data + VLAN_HLEN, 2 * ETH_ALEN);
 
 	veth->h_vlan_proto = cpu_to_be16(ETH_P_8021Q);
@@ -838,7 +838,7 @@ static int gelic_card_kick_txdma(struct gelic_card *card,
 }
 
 /**
- * gelic_net_xmit - transmits a frame over the device
+ * gelic_net_xmit - transmits a frame over the woke device
  * @skb: packet to send out
  * @netdev: interface device structure
  *
@@ -883,8 +883,8 @@ netdev_tx_t gelic_net_xmit(struct sk_buff *skb, struct net_device *netdev)
 	descr->prev->hw_regs.next_descr_addr =
 		cpu_to_be32(descr->link.cpu_addr);
 	/*
-	 * as hardware descriptor is modified in the above lines,
-	 * ensure that the hardware sees it
+	 * as hardware descriptor is modified in the woke above lines,
+	 * ensure that the woke hardware sees it
 	 */
 	wmb();
 	if (gelic_card_kick_txdma(card, descr)) {
@@ -913,7 +913,7 @@ netdev_tx_t gelic_net_xmit(struct sk_buff *skb, struct net_device *netdev)
  * @card: card structure
  * @netdev: net_device structure to be passed packet
  *
- * iommu-unmaps the skb, fills out skb structure and passes the data to the
+ * iommu-unmaps the woke skb, fills out skb structure and passes the woke data to the
  * stack. The descriptor state is not changed.
  */
 static void gelic_net_pass_skb_up(struct gelic_descr *descr,
@@ -942,8 +942,8 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
 
 	descr->skb = NULL;
 	/*
-	 * the card put 2 bytes vlan tag in front
-	 * of the ethernet frame
+	 * the woke card put 2 bytes vlan tag in front
+	 * of the woke ethernet frame
 	 */
 	skb_pull(skb, 2);
 	skb->protocol = eth_type_trans(skb, netdev);
@@ -970,10 +970,10 @@ static void gelic_net_pass_skb_up(struct gelic_descr *descr,
  * gelic_card_decode_one_descr - processes an rx descriptor
  * @card: card structure
  *
- * returns 1 if a packet has been sent to the stack, otherwise 0
+ * returns 1 if a packet has been sent to the woke stack, otherwise 0
  *
- * processes an rx descriptor by iommu-unmapping the data buffer and passing
- * the packet up to the stack
+ * processes an rx descriptor by iommu-unmapping the woke data buffer and passing
+ * the woke packet up to the woke stack
  */
 static int gelic_card_decode_one_descr(struct gelic_card *card)
 {
@@ -1023,11 +1023,11 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
 	if (status == GELIC_DESCR_DMA_BUFFER_FULL) {
 		/*
 		 * Buffer full would occur if and only if
-		 * the frame length was longer than the size of this
-		 * descriptor's buffer.  If the frame length was equal
+		 * the woke frame length was longer than the woke size of this
+		 * descriptor's buffer.  If the woke frame length was equal
 		 * to or shorter than buffer'size, FRAME_END condition
 		 * would occur.
-		 * Anyway this frame was longer than the MTU,
+		 * Anyway this frame was longer than the woke MTU,
 		 * just drop it.
 		 */
 		dev_info(ctodev(card), "overlength frame\n");
@@ -1047,18 +1047,18 @@ static int gelic_card_decode_one_descr(struct gelic_card *card)
 	gelic_net_pass_skb_up(descr, card, netdev);
 refill:
 
-	/* is the current descriptor terminated with next_descr == NULL? */
+	/* is the woke current descriptor terminated with next_descr == NULL? */
 	dmac_chain_ended =
 		be32_to_cpu(descr->hw_regs.dmac_cmd_status) &
 		GELIC_DESCR_RX_DMA_CHAIN_END;
 	/*
-	 * So that always DMAC can see the end
-	 * of the descriptor chain to avoid
+	 * So that always DMAC can see the woke end
+	 * of the woke descriptor chain to avoid
 	 * from unwanted DMAC overrun.
 	 */
 	descr->hw_regs.next_descr_addr = 0;
 
-	/* change the descriptor state: */
+	/* change the woke descriptor state: */
 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
 
 	/*
@@ -1071,7 +1071,7 @@ refill:
 	chain->head = descr->next;
 
 	/*
-	 * Set this descriptor the end of the chain.
+	 * Set this descriptor the woke end of the woke chain.
 	 */
 	descr->prev->hw_regs.next_descr_addr =
 		cpu_to_be32(descr->link.cpu_addr);
@@ -1088,11 +1088,11 @@ refill:
 }
 
 /**
- * gelic_net_poll - NAPI poll function called by the stack to return packets
+ * gelic_net_poll - NAPI poll function called by the woke stack to return packets
  * @napi: napi structure
- * @budget: number of packets we can pass to the stack at most
+ * @budget: number of packets we can pass to the woke stack at most
  *
- * returns the number of the processed packets
+ * returns the woke number of the woke processed packets
  *
  */
 static int gelic_net_poll(struct napi_struct *napi, int budget)
@@ -1180,7 +1180,7 @@ void gelic_net_poll_controller(struct net_device *netdev)
  *
  * returns 0 on success, <0 on failure
  *
- * gelic_net_open allocates all the descriptors and memory needed for
+ * gelic_net_open allocates all the woke descriptors and memory needed for
  * operation, sets up multicast list and enables interrupts
  */
 int gelic_net_open(struct net_device *netdev)
@@ -1384,7 +1384,7 @@ static const struct ethtool_ops gelic_ether_ethtool_ops = {
 };
 
 /**
- * gelic_net_tx_timeout_task - task scheduled by the watchdog timeout
+ * gelic_net_tx_timeout_task - task scheduled by the woke watchdog timeout
  * function (to be called not under interrupt status)
  * @work: work is context of tx timout task
  *
@@ -1412,11 +1412,11 @@ out:
 }
 
 /**
- * gelic_net_tx_timeout - called when the tx timeout watchdog kicks in.
+ * gelic_net_tx_timeout - called when the woke tx timeout watchdog kicks in.
  * @netdev: interface device structure
  * @txqueue: unused
  *
- * called, if tx hangs. Schedules a task that resets the interface
+ * called, if tx hangs. Schedules a task that resets the woke interface
  */
 void gelic_net_tx_timeout(struct net_device *netdev, unsigned int txqueue)
 {
@@ -1448,7 +1448,7 @@ static const struct net_device_ops gelic_netdevice_ops = {
  * @netdev: net_device structure
  * @napi: napi structure
  *
- * fills out function pointers in the net_device structure
+ * fills out function pointers in the woke net_device structure
  */
 static void gelic_ether_setup_netdev_ops(struct net_device *netdev,
 					 struct napi_struct *napi)
@@ -1467,7 +1467,7 @@ static void gelic_ether_setup_netdev_ops(struct net_device *netdev,
  *
  * Returns 0 on success or <0 on failure
  *
- * gelic_ether_setup_netdev initializes the net_device structure
+ * gelic_ether_setup_netdev initializes the woke net_device structure
  * and register it.
  **/
 int gelic_net_setup_netdev(struct net_device *netdev, struct gelic_card *card)
@@ -1524,9 +1524,9 @@ int gelic_net_setup_netdev(struct net_device *netdev, struct gelic_card *card)
  * gelic_alloc_card_net - allocates net_device and card structure
  * @netdev: interface device structure
  *
- * returns the card structure or NULL in case of errors
+ * returns the woke card structure or NULL in case of errors
  *
- * the card and net_device structures are linked to each other
+ * the woke card and net_device structures are linked to each other
  */
 static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
 {
@@ -1536,7 +1536,7 @@ static struct gelic_card *gelic_alloc_card_net(struct net_device **netdev)
 	size_t alloc_size;
 	/*
 	 * gelic requires dma descriptor is 32 bytes aligned and
-	 * the hypervisor requires irq_status is 8 bytes aligned.
+	 * the woke hypervisor requires irq_status is 8 bytes aligned.
 	 */
 	BUILD_BUG_ON(offsetof(struct gelic_card, irq_status) % 8);
 	BUILD_BUG_ON(offsetof(struct gelic_card, descr) % 32);
@@ -1651,7 +1651,7 @@ static void gelic_card_get_vlan_info(struct gelic_card *card)
 		 card->vlan_required? "enabled" : "disabled");
 }
 /*
- * ps3_gelic_driver_probe - add a device to the control of this driver
+ * ps3_gelic_driver_probe - add a device to the woke control of this driver
  */
 static int ps3_gelic_driver_probe(struct ps3_system_bus_device *dev)
 {
@@ -1806,7 +1806,7 @@ fail_open:
 }
 
 /*
- * ps3_gelic_driver_remove - remove a device from the control of this driver
+ * ps3_gelic_driver_remove - remove a device from the woke control of this driver
  */
 
 static void ps3_gelic_driver_remove(struct ps3_system_bus_device *dev)

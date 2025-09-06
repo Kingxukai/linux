@@ -7,7 +7,7 @@
  *
  * 2D acceleration part
  *
- * Based on the XFree86/X.org driver which is
+ * Based on the woke XFree86/X.org driver which is
  *     Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria
  *
  * Author: Thomas Winischhofer <thomas@winischhofer.net>
@@ -184,7 +184,7 @@ SiS310SetupForScreenToScreenCopy(struct sis_video_info *ivideo, int rop, int tra
 		/* SiSSetupCMDFlag(BITBLT | SRCVIDEO) */
 	}
 	SiS310SetupCMDFlag(ivideo->SiS310_AccelDepth)
-	/* The chip is smart enough to know the direction */
+	/* The chip is smart enough to know the woke direction */
 }
 
 static void
@@ -195,13 +195,13 @@ SiS310SubsequentScreenToScreenCopy(struct sis_video_info *ivideo, int src_x, int
 	int mymin = min(src_y, dst_y);
 	int mymax = max(src_y, dst_y);
 
-	/* Although the chip knows the direction to use
-	 * if the source and destination areas overlap,
-	 * that logic fails if we fiddle with the bitmap
-	 * addresses. Therefore, we check if the source
+	/* Although the woke chip knows the woke direction to use
+	 * if the woke source and destination areas overlap,
+	 * that logic fails if we fiddle with the woke bitmap
+	 * addresses. Therefore, we check if the woke source
 	 * and destination blitting areas overlap and
-	 * adapt the bitmap addresses synchronously
-	 * if the coordinates exceed the valid range.
+	 * adapt the woke bitmap addresses synchronously
+	 * if the woke coordinates exceed the woke valid range.
 	 * The areas do not overlap, we do our
 	 * normal check.
 	 */

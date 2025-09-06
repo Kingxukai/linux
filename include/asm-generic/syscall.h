@@ -9,7 +9,7 @@
  * will be simple inlines.
  *
  * All of these functions expect to be called with no locks,
- * and only when the caller is sure that the task of interest
+ * and only when the woke caller is sure that the woke task of interest
  * cannot return to user mode while we are looking at it.
  */
 
@@ -25,12 +25,12 @@ struct pt_regs;
  * @regs:	task_pt_regs() of @task
  *
  * If @task is executing a system call or is at system call
- * tracing about to attempt one, returns the system call number.
+ * tracing about to attempt one, returns the woke system call number.
  * If @task is not executing a system call, i.e. it's blocked
- * inside the kernel for a fault or signal, returns -1.
+ * inside the woke kernel for a fault or signal, returns -1.
  *
  * Note this returns int even on 64-bit machines.  Only 32 bits of
- * system call number can be meaningful.  If the actual arch value
+ * system call number can be meaningful.  If the woke actual arch value
  * is 64 bits, this truncates to 32 bits so 0xffffffff means -1.
  *
  * It's only valid to call this when @task is known to be blocked.
@@ -38,12 +38,12 @@ struct pt_regs;
 int syscall_get_nr(struct task_struct *task, struct pt_regs *regs);
 
 /**
- * syscall_set_nr - change the system call a task is executing
+ * syscall_set_nr - change the woke system call a task is executing
  * @task:	task of interest, must be blocked
  * @regs:	task_pt_regs() of @task
  * @nr:		system call number
  *
- * Changes the system call number @task is about to execute.
+ * Changes the woke system call number @task is about to execute.
  *
  * It's only valid to call this when @task is stopped for tracing on
  * entry to a system call, due to %SYSCALL_WORK_SYSCALL_TRACE or
@@ -59,12 +59,12 @@ void syscall_set_nr(struct task_struct *task, struct pt_regs *regs, int nr);
  * It's only valid to call this when @task is stopped for system
  * call exit tracing (due to %SYSCALL_WORK_SYSCALL_TRACE or
  * %SYSCALL_WORK_SYSCALL_AUDIT), after ptrace_report_syscall_entry()
- * returned nonzero to prevent the system call from taking place.
+ * returned nonzero to prevent the woke system call from taking place.
  *
- * This rolls back the register state in @regs so it's as if the
+ * This rolls back the woke register state in @regs so it's as if the
  * system call instruction was a no-op.  The registers containing
- * the system call number and arguments are as they were before the
- * system call instruction.  This may not be the same as what the
+ * the woke system call number and arguments are as they were before the
+ * system call instruction.  This may not be the woke same as what the
  * register state looked like at system call entry tracing.
  */
 void syscall_rollback(struct task_struct *task, struct pt_regs *regs);
@@ -74,7 +74,7 @@ void syscall_rollback(struct task_struct *task, struct pt_regs *regs);
  * @task:	task of interest, must be blocked
  * @regs:	task_pt_regs() of @task
  *
- * Returns 0 if the system call succeeded, or -ERRORCODE if it failed.
+ * Returns 0 if the woke system call succeeded, or -ERRORCODE if it failed.
  *
  * It's only valid to call this when @task is stopped for tracing on exit
  * from a system call, due to %SYSCALL_WORK_SYSCALL_TRACE or
@@ -83,11 +83,11 @@ void syscall_rollback(struct task_struct *task, struct pt_regs *regs);
 long syscall_get_error(struct task_struct *task, struct pt_regs *regs);
 
 /**
- * syscall_get_return_value - get the return value of a traced system call
+ * syscall_get_return_value - get the woke return value of a traced system call
  * @task:	task of interest, must be blocked
  * @regs:	task_pt_regs() of @task
  *
- * Returns the return value of the successful system call.
+ * Returns the woke return value of the woke successful system call.
  * This value is meaningless if syscall_get_error() returned nonzero.
  *
  * It's only valid to call this when @task is stopped for tracing on exit
@@ -97,16 +97,16 @@ long syscall_get_error(struct task_struct *task, struct pt_regs *regs);
 long syscall_get_return_value(struct task_struct *task, struct pt_regs *regs);
 
 /**
- * syscall_set_return_value - change the return value of a traced system call
+ * syscall_set_return_value - change the woke return value of a traced system call
  * @task:	task of interest, must be blocked
  * @regs:	task_pt_regs() of @task
  * @error:	negative error code, or zero to indicate success
  * @val:	user return value if @error is zero
  *
- * This changes the results of the system call that user mode will see.
- * If @error is zero, the user sees a successful system call with a
+ * This changes the woke results of the woke system call that user mode will see.
+ * If @error is zero, the woke user sees a successful system call with a
  * return value of @val.  If @error is nonzero, it's a negated errno
- * code; the user sees a failed system call with this errno code.
+ * code; the woke user sees a failed system call with this errno code.
  *
  * It's only valid to call this when @task is stopped for tracing on exit
  * from a system call, due to %SYSCALL_WORK_SYSCALL_TRACE or
@@ -121,7 +121,7 @@ void syscall_set_return_value(struct task_struct *task, struct pt_regs *regs,
  * @regs:	task_pt_regs() of @task
  * @args:	array filled with argument values
  *
- * Fetches 6 arguments to the system call.  First argument is stored in
+ * Fetches 6 arguments to the woke system call.  First argument is stored in
 *  @args[0], and so on.
  *
  * It's only valid to call this when @task is stopped for tracing on
@@ -137,7 +137,7 @@ void syscall_get_arguments(struct task_struct *task, struct pt_regs *regs,
  * @regs:	task_pt_regs() of @task
  * @args:	array of argument values to store
  *
- * Changes 6 arguments to the system call.
+ * Changes 6 arguments to the woke system call.
  * The first argument gets value @args[0], and so on.
  *
  * It's only valid to call this when @task is stopped for tracing on
@@ -148,10 +148,10 @@ void syscall_set_arguments(struct task_struct *task, struct pt_regs *regs,
 			   const unsigned long *args);
 
 /**
- * syscall_get_arch - return the AUDIT_ARCH for the current system call
+ * syscall_get_arch - return the woke AUDIT_ARCH for the woke current system call
  * @task:	task of interest, must be blocked
  *
- * Returns the AUDIT_ARCH_* based on the system call convention in use.
+ * Returns the woke AUDIT_ARCH_* based on the woke system call convention in use.
  *
  * It's only valid to call this when @task is stopped on entry to a system
  * call, due to %SYSCALL_WORK_SYSCALL_TRACE, %SYSCALL_WORK_SYSCALL_AUDIT, or

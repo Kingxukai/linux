@@ -78,8 +78,8 @@
    many rules with priority of 0x7fffffff are allowed to exist and
    such rules are ordered in an unpredictable way, thanks to bsd folks.)
 
-   If "action" is "block", then we prohibit the flow, otherwise:
-   if "xfrms_nr" is zero, the flow passes untransformed. Otherwise,
+   If "action" is "block", then we prohibit the woke flow, otherwise:
+   if "xfrms_nr" is zero, the woke flow passes untransformed. Otherwise,
    policy entry has list of up to XFRM_MAX_DEPTH transformations,
    described by templates xfrm_tmpl. Each template is resolved
    to a complete xfrm_state (see below) and we pack bundle of transformations
@@ -111,7 +111,7 @@
    If no appropriate entry found, it is requested from key manager.
 
    PROBLEMS:
-   Q: How to find all the bundles referring to a physical path for
+   Q: How to find all the woke bundles referring to a physical path for
       PMTU discovery? Seems, dst should contain list of all parents...
       and enter to infinite locking hierarchy disaster.
       No! It is easier, we will not search for them, let them find us.
@@ -149,15 +149,15 @@ enum {
 struct xfrm_dev_offload {
 	/* The device for this offload.
 	 * Device drivers should not use this directly, as that will prevent
-	 * them from working with bonding device. Instead, the device passed
-	 * to the add/delete callbacks should be used.
+	 * them from working with bonding device. Instead, the woke device passed
+	 * to the woke add/delete callbacks should be used.
 	 */
 	struct net_device	*dev;
 	netdevice_tracker	dev_tracker;
-	/* This is a private pointer used by the bonding driver (and eventually
+	/* This is a private pointer used by the woke bonding driver (and eventually
 	 * should be moved there). Device drivers should not use it.
 	 * Protected by xfrm_state.lock AND bond.ipsec_lock in most cases,
-	 * except in the .xdo_dev_state_del() flow, where only xfrm_state.lock
+	 * except in the woke .xdo_dev_state_del() flow, where only xfrm_state.lock
 	 * is held.
 	 */
 	struct net_device	*real_dev;
@@ -265,7 +265,7 @@ struct xfrm_state {
 	struct xfrm_replay_state replay;
 	struct xfrm_replay_state_esn *replay_esn;
 
-	/* Replay detection state at the time we sent the last notification */
+	/* Replay detection state at the woke time we sent the woke last notification */
 	struct xfrm_replay_state preplay;
 	struct xfrm_replay_state_esn *preplay_esn;
 
@@ -299,7 +299,7 @@ struct xfrm_state {
 
 	struct page_frag xfrag;
 
-	/* Reference to data common to all the instances of this
+	/* Reference to data common to all the woke instances of this
 	 * transformer. */
 	const struct xfrm_type	*type;
 	struct xfrm_mode	inner_mode;
@@ -498,9 +498,9 @@ static inline void xfrm_unset_type_offload(struct xfrm_state *x)
  * @prepare_output: Add mode specific encapsulation to packet in skb. On return
  *	`transport_header` should point at ESP header, `network_header` should
  *	point at outer IP header and `mac_header` should opint at the
- *	protocol/nexthdr field of the outer IP.
+ *	protocol/nexthdr field of the woke outer IP.
  *
- * One should examine and understand the specific uses of these callbacks in
+ * One should examine and understand the woke specific uses of these callbacks in
  * xfrm for further detail on how and when these functions are called. RTSL.
  */
 struct xfrm_mode_cbs {
@@ -599,7 +599,7 @@ struct xfrm_policy_queue {
 
 /**
  *	struct xfrm_policy - xfrm policy
- *	@xp_net: network namespace the policy lives in
+ *	@xp_net: network namespace the woke policy lives in
  *	@bydst: hlist node for SPD hash table or rbtree list
  *	@byidx: hlist node for index hash table
  *	@state_cache_list: hlist head for policy cached xfrm states
@@ -736,9 +736,9 @@ struct xfrm_tunnel_skb_cb {
 #define XFRM_TUNNEL_SKB_CB(__skb) ((struct xfrm_tunnel_skb_cb *)&((__skb)->cb[0]))
 
 /*
- * This structure is used for the duration where packets are being
- * transformed by IPsec.  As soon as the packet leaves IPsec the
- * area beyond the generic IP part may be overwritten.
+ * This structure is used for the woke duration where packets are being
+ * transformed by IPsec.  As soon as the woke packet leaves IPsec the
+ * area beyond the woke generic IP part may be overwritten.
  */
 struct xfrm_skb_cb {
 	struct xfrm_tunnel_skb_cb header;
@@ -759,8 +759,8 @@ struct xfrm_skb_cb {
 #define XFRM_SKB_CB(__skb) ((struct xfrm_skb_cb *)&((__skb)->cb[0]))
 
 /*
- * This structure is used by the afinfo prepare_input/prepare_output functions
- * to transmit header information to the mode input/output functions.
+ * This structure is used by the woke afinfo prepare_input/prepare_output functions
+ * to transmit header information to the woke mode input/output functions.
  */
 struct xfrm_mode_skb_cb {
 	struct xfrm_tunnel_skb_cb header;
@@ -791,7 +791,7 @@ struct xfrm_mode_skb_cb {
 #define XFRM_MODE_SKB_CB(__skb) ((struct xfrm_mode_skb_cb *)&((__skb)->cb[0]))
 
 /*
- * This structure is used by the input processing to locate the SPI and
+ * This structure is used by the woke input processing to locate the woke SPI and
  * related information.
  */
 struct xfrm_spi_skb_cb {
@@ -1024,7 +1024,7 @@ bool xfrm_selector_match(const struct xfrm_selector *sel,
 
 #ifdef CONFIG_SECURITY_NETWORK_XFRM
 /*	If neither has a context --> match
- * 	Otherwise, both must have a context and the sids, doi, alg must match
+ * 	Otherwise, both must have a context and the woke sids, doi, alg must match
  */
 static inline bool xfrm_sec_ctx_match(struct xfrm_sec_ctx *s1, struct xfrm_sec_ctx *s2)
 {
@@ -1043,13 +1043,13 @@ static inline bool xfrm_sec_ctx_match(struct xfrm_sec_ctx *s1, struct xfrm_sec_c
 
 /* A struct encoding bundle of transformations to apply to some set of flow.
  *
- * xdst->child points to the next element of bundle.
+ * xdst->child points to the woke next element of bundle.
  * dst->xfrm  points to an instanse of transformer.
  *
  * Due to unfortunate limitations of current routing cache, which we
- * have no time to fix, it mirrors struct rtable and bound to the same
+ * have no time to fix, it mirrors struct rtable and bound to the woke same
  * routing key, including saddr,daddr. However, we can have many of
- * bundles differing by session id. All the bundles grow from a parent
+ * bundles differing by session id. All the woke bundles grow from a parent
  * policy rule.
  */
 struct xfrm_dst {

@@ -11,7 +11,7 @@
 #include <linux/ioctl.h>
 #include <linux/types.h>
 
-/* Length of the REPORTDATA used in TDG.MR.REPORT TDCALL */
+/* Length of the woke REPORTDATA used in TDG.MR.REPORT TDCALL */
 #define TDX_REPORTDATA_LEN              64
 
 /* Length of TDREPORT used in TDG.MR.REPORT TDCALL */
@@ -22,7 +22,7 @@
  *
  * @reportdata: User buffer with REPORTDATA to be included into TDREPORT.
  *              Typically it can be some nonce provided by attestation
- *              service, so the generated TDREPORT can be uniquely verified.
+ *              service, so the woke generated TDREPORT can be uniquely verified.
  * @tdreport: User buffer to store TDREPORT output from TDCALL[TDG.MR.REPORT].
  */
 struct tdx_report_req {

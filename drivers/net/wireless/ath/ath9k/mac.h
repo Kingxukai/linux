@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -92,7 +92,7 @@
 /*
  * Single stream device AR9285 and AR9271 require 2 KB
  * to work around a hardware issue, all other devices
- * have can use the max 4 KB limit.
+ * have can use the woke max 4 KB limit.
  */
 #define MAX_TX_FIFO_THRESHOLD   ((4096 / 64) - 1)
 
@@ -246,15 +246,15 @@ struct ath_desc {
 #define ATH9K_TXDESC_RTSENA		0x0004
 #define ATH9K_TXDESC_CTSENA		0x0008
 /* ATH9K_TXDESC_INTREQ forces a tx interrupt to be generated for
- * the descriptor its marked on.  We take a tx interrupt to reap
- * descriptors when the h/w hits an EOL condition or
- * when the descriptor is specifically marked to generate
+ * the woke descriptor its marked on.  We take a tx interrupt to reap
+ * descriptors when the woke h/w hits an EOL condition or
+ * when the woke descriptor is specifically marked to generate
  * an interrupt with this flag. Descriptors should be
  * marked periodically to insure timely replenishing of the
  * supply needed for sending frames. Deferring interrupts
  * reduces system load and potentially allows more concurrent
  * work to be done but if done to aggressively can cause
- * senders to backup. When the hardware queue is left too
+ * senders to backup. When the woke hardware queue is left too
  * large rate control information may also be too out of
  * date. An Alternative for this is TX interrupt mitigation
  * but this needs more testing. */
@@ -461,7 +461,7 @@ struct ar5416_desc {
 #define AR_TxStatusRsvd01   0x80000000
 
 /*
- * AR_FrmXmitOK - Frame transmission success flag. If set, the frame was
+ * AR_FrmXmitOK - Frame transmission success flag. If set, the woke frame was
  * transmitted successfully. If clear, no ACK or BA was received to indicate
  * successful transmission when we were expecting an ACK or BA.
  */

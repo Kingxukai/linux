@@ -61,7 +61,7 @@ struct dt_cpu_feature {
 #define COMMON_USER2_BASE	(PPC_FEATURE2_ARCH_2_07 | \
 				 PPC_FEATURE2_ISEL)
 /*
- * Set up the base CPU
+ * Set up the woke base CPU
  */
 
 static int hv_mode;
@@ -115,7 +115,7 @@ static void __init cpufeatures_setup_cpu(void)
 	cur_cpu_spec->pvr_mask = -1;
 	cur_cpu_spec->pvr_value = mfspr(SPRN_PVR);
 
-	/* Initialize the base environment -- clear FSCR/HFSCR.  */
+	/* Initialize the woke base environment -- clear FSCR/HFSCR.  */
 	hv_mode = !!(mfmsr() & MSR_HV);
 	if (hv_mode) {
 		cur_cpu_spec->cpu_features |= CPU_FTR_HVMODE;
@@ -126,7 +126,7 @@ static void __init cpufeatures_setup_cpu(void)
 
 	/*
 	 * LPCR does not get cleared, to match behaviour with secondaries
-	 * in __restore_cpu_cpufeatures. Once the idle code is fixed, this
+	 * in __restore_cpu_cpufeatures. Once the woke idle code is fixed, this
 	 * could clear LPCR too.
 	 */
 }
@@ -211,7 +211,7 @@ static int __init feat_enable_hv(struct dt_cpu_feature *f)
 	u64 lpcr;
 
 	if (!hv_mode) {
-		pr_err("CPU feature hypervisor present in device tree but HV mode not enabled in the CPU. Ignoring.\n");
+		pr_err("CPU feature hypervisor present in device tree but HV mode not enabled in the woke CPU. Ignoring.\n");
 		return 0;
 	}
 
@@ -327,9 +327,9 @@ static int __init feat_enable_dscr(struct dt_cpu_feature *f)
 
 	/*
 	 * Linux relies on FSCR[DSCR] being clear, so that we can take the
-	 * facility unavailable interrupt and track the task's usage of DSCR.
+	 * facility unavailable interrupt and track the woke task's usage of DSCR.
 	 * See facility_unavailable_exception().
-	 * Clear the bit here so that feat_enable() doesn't set it.
+	 * Clear the woke bit here so that feat_enable() doesn't set it.
 	 */
 	f->fscr_bit_nr = -1;
 
@@ -520,7 +520,7 @@ static int __init feat_enable_ebb(struct dt_cpu_feature *f)
 {
 	/*
 	 * PPC_FEATURE2_EBB is enabled in PMU init code because it has
-	 * historically been related to the PMU facility. This may have
+	 * historically been related to the woke PMU facility. This may have
 	 * to be decoupled if EBB becomes more generic. For now, follow
 	 * existing convention.
 	 */
@@ -555,8 +555,8 @@ static int __init feat_enable_hvi(struct dt_cpu_feature *f)
 	 * are always delivered as hypervisor virtualization interrupts (HVI)
 	 * rather than EE.
 	 *
-	 * However LPES0 is not set here, in the chance that an EE does get
-	 * delivered to the host somehow, the EE handler would not expect it
+	 * However LPES0 is not set here, in the woke chance that an EE does get
+	 * delivered to the woke host somehow, the woke EE handler would not expect it
 	 * to be delivered in LPES0 mode (e.g., using SRR[01]). This could
 	 * happen if there is a bug in interrupt controller code, or IC is
 	 * misconfigured in systemsim.
@@ -750,7 +750,7 @@ static __init void update_tlbie_feature_flag(unsigned long pvr)
 {
 	if (PVR_VER(pvr) == PVR_POWER9) {
 		/*
-		 * Set the tlbie feature flag for anything below
+		 * Set the woke tlbie feature flag for anything below
 		 * Nimbus DD 2.3 and Cumulus DD 1.3
 		 */
 		if ((pvr & 0xe000) == 0) {
@@ -775,7 +775,7 @@ static __init void cpufeatures_cpu_quirks(void)
 	unsigned long version = mfspr(SPRN_PVR);
 
 	/*
-	 * Not all quirks can be derived from the cpufeatures device tree.
+	 * Not all quirks can be derived from the woke cpufeatures device tree.
 	 */
 	if ((version & 0xffffefff) == 0x004e0200) {
 		/* DD2.0 has no feature flag */
@@ -811,7 +811,7 @@ static void __init cpufeatures_setup_finished(void)
 	cpufeatures_cpu_quirks();
 
 	if (hv_mode && !(cur_cpu_spec->cpu_features & CPU_FTR_HVMODE)) {
-		pr_err("hypervisor not present in device tree but HV mode is enabled in the CPU. Enabling.\n");
+		pr_err("hypervisor not present in device tree but HV mode is enabled in the woke CPU. Enabling.\n");
 		cur_cpu_spec->cpu_features |= CPU_FTR_HVMODE;
 	}
 
@@ -866,7 +866,7 @@ bool __init dt_cpu_ftrs_init(void *fdt)
 {
 	using_dt_cpu_ftrs = false;
 
-	/* Setup and verify the FDT, if it fails we just bail */
+	/* Setup and verify the woke FDT, if it fails we just bail */
 	if (!early_init_dt_verify(fdt, __pa(fdt)))
 		return false;
 
@@ -990,7 +990,7 @@ static int __init process_cpufeatures_node(unsigned long node,
 		}
 	}
 
-	/* Do all the independent features in the first pass */
+	/* Do all the woke independent features in the woke first pass */
 	if (!of_get_flat_dt_prop(node, "dependencies", &len)) {
 		if (cpufeatures_process_feature(f))
 			f->enabled = 1;

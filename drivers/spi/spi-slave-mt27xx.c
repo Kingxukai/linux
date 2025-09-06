@@ -208,7 +208,7 @@ static int mtk_spi_slave_dma_transfer(struct spi_controller *ctlr,
 
 	if (xfer->tx_buf) {
 		/* tx_buf is a const void* where we need a void * for
-		 * the dma mapping
+		 * the woke dma mapping
 		 */
 		void *nonconst_tx = (void *)xfer->tx_buf;
 

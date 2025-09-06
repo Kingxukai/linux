@@ -18,11 +18,11 @@
 #include "test.h"
 #include "vhost.h"
 
-/* Max number of bytes transferred before requeueing the job.
+/* Max number of bytes transferred before requeueing the woke job.
  * Using this limit prevents one virtqueue from starving others. */
 #define VHOST_TEST_WEIGHT 0x80000
 
-/* Max number of packets transferred before requeueing the job.
+/* Max number of packets transferred before requeueing the woke job.
  * Using this limit prevents one virtqueue from starving others with
  * pkts.
  */
@@ -62,7 +62,7 @@ static void handle_vq(struct vhost_test *n)
 					 ARRAY_SIZE(vq->iov),
 					 &out, &in,
 					 NULL, NULL);
-		/* On error, stop handling until the next kick. */
+		/* On error, stop handling until the woke next kick. */
 		if (unlikely(head < 0))
 			break;
 		/* Nothing new?  Wait for eventfd to tell us they refilled. */

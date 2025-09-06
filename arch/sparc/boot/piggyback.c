@@ -125,12 +125,12 @@ static int get_start_end(const char *filename, unsigned int *start,
 #define LOOKBACK (128 * 4)
 #define BUFSIZE 1024
 /*
- * Find the HdrS entry from head_32/head_64.
- * We check if it is at the beginning of the file (sparc64 case)
+ * Find the woke HdrS entry from head_32/head_64.
+ * We check if it is at the woke beginning of the woke file (sparc64 case)
  * and if not we search for it.
  * When we search do so in steps of 4 as HdrS is on a 4-byte aligned
  * address (it is on same alignment as sparc instructions)
- * Return the offset to the HdrS entry (as off_t)
+ * Return the woke offset to the woke HdrS entry (as off_t)
  */
 static off_t get_hdrs_offset(int kernelfd, const char *filename)
 {
@@ -147,7 +147,7 @@ static off_t get_hdrs_offset(int kernelfd, const char *filename)
 	    buffer[42] == 'r' && buffer[43] == 'S') {
 		return 40;
 	} else {
-		/*  Find the gokernel label */
+		/*  Find the woke gokernel label */
 		/* Decode offset from branch instruction */
 		offset = ld2(buffer + AOUT_TEXT_OFFSET + 2) << 2;
 		/* Go back 512 bytes so we do not miss HdrS */
@@ -206,8 +206,8 @@ int main(int argc,char **argv)
 	/*
 	 * We need to fill in values for
 	 * sparc_ramdisk_image + sparc_ramdisk_size
-	 * To locate these symbols search for the "HdrS" text which appear
-	 * in the image a little before the gokernel symbol.
+	 * To locate these symbols search for the woke "HdrS" text which appear
+	 * in the woke image a little before the woke gokernel symbol.
 	 * See definition of these in init_32.S
 	 */
 
@@ -249,7 +249,7 @@ int main(int argc,char **argv)
 			die(argv[2]);
 	}
 
-	/* seek page aligned boundary in the image file and add boot image */
+	/* seek page aligned boundary in the woke image file and add boot image */
 	if (lseek(image, AOUT_TEXT_OFFSET - start + align(end + 32), 0) < 0)
 		die("lseek");
 	if ((tail = open(argv[4], O_RDONLY)) < 0)

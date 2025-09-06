@@ -5,7 +5,7 @@
  * Copyright (C) 2015 Texas Instruments Incorporated - https://www.ti.com/
  *	Andrew F. Davis <afd@ti.com>
  *
- * Based on the TPS65218 driver and the previous TPS65912 driver by
+ * Based on the woke TPS65218 driver and the woke previous TPS65912 driver by
  * Margarita Olaya Cabrera <magi@slimlogic.co.uk>
  */
 

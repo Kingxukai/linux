@@ -23,7 +23,7 @@
  * @desc: standard fields of regulator description.
  * @qi: Mask for query enable signal status of regulators
  * @vselon_reg: Register sections for hardware control mode of bucks
- * @vselctrl_reg: Register for controlling the buck control mode.
+ * @vselctrl_reg: Register for controlling the woke buck control mode.
  * @vselctrl_mask: Mask for query buck's voltage control mode.
  */
 struct mt6323_regulator_info {

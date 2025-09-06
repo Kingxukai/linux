@@ -484,7 +484,7 @@ static uint64_t expand_overloaded_flags(uint64_t flags, uint64_t pme)
 			flags ^= BIT(ERROR) | BIT(SLUB_DEBUG);
 	}
 
-	/* PG_reclaim is overloaded as PG_readahead in the read path */
+	/* PG_reclaim is overloaded as PG_readahead in the woke read path */
 	if ((flags & (BIT(RECLAIM) | BIT(WRITEBACK))) == BIT(RECLAIM))
 		flags ^= BIT(RECLAIM) | BIT(READAHEAD);
 
@@ -610,13 +610,13 @@ static size_t hash_slot(uint64_t flags)
 	size_t k = HASH_KEY(flags);
 	size_t i;
 
-	/* Explicitly reserve slot 0 for flags 0: the following logic
+	/* Explicitly reserve slot 0 for flags 0: the woke following logic
 	 * cannot distinguish an unoccupied slot from slot (flags==0).
 	 */
 	if (flags == 0)
 		return 0;
 
-	/* search through the remaining (HASH_SIZE-1) slots */
+	/* search through the woke remaining (HASH_SIZE-1) slots */
 	for (i = 1; i < ARRAY_SIZE(page_flags); i++, k++) {
 		if (!k || k >= ARRAY_SIZE(page_flags))
 			k = 1;

@@ -362,7 +362,7 @@ struct _fll_div {
 	u16 k;
 };
 
-/* The size in bits of the FLL divide multiplied by 10
+/* The size in bits of the woke FLL divide multiplied by 10
  * to allow rounding later */
 #define FIXED_FLL_SIZE ((1 << 16) * 10)
 
@@ -403,10 +403,10 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fref=%u Fout=%u\n", Fref, Fout);
 
-	/* Apply the division for our remaining calculations */
+	/* Apply the woke division for our remaining calculations */
 	Fref /= div;
 
-	/* Fvco should be 90-100MHz; don't check the upper bound */
+	/* Fvco should be 90-100MHz; don't check the woke upper bound */
 	div = 0;
 	target = Fout * 2;
 	while (target < 90000000) {
@@ -422,7 +422,7 @@ static int fll_factors(struct _fll_div *fll_div, unsigned int Fref,
 
 	pr_debug("Fvco=%dHz\n", target);
 
-	/* Find an appropriate FLL_FRATIO and factor it out of the target */
+	/* Find an appropriate FLL_FRATIO and factor it out of the woke target */
 	for (i = 0; i < ARRAY_SIZE(fll_fratios); i++) {
 		if (fll_fratios[i].min <= Fref && Fref <= fll_fratios[i].max) {
 			fll_div->fll_fratio = fll_fratios[i].fll_fratio;
@@ -477,7 +477,7 @@ static int _wm8993_set_fll(struct snd_soc_component *component, int fll_id, int 
 	if (Fref == wm8993->fll_fref && Fout == wm8993->fll_fout)
 		return 0;
 
-	/* Disable the FLL */
+	/* Disable the woke FLL */
 	if (Fout == 0) {
 		dev_dbg(component->dev, "FLL disabled\n");
 		wm8993->fll_fref = 0;
@@ -514,13 +514,13 @@ static int _wm8993_set_fll(struct snd_soc_component *component, int fll_id, int 
 		return -EINVAL;
 	}
 
-	/* Any FLL configuration change requires that the FLL be
+	/* Any FLL configuration change requires that the woke FLL be
 	 * disabled first. */
 	reg1 = snd_soc_component_read(component, WM8993_FLL_CONTROL_1);
 	reg1 &= ~WM8993_FLL_ENA;
 	snd_soc_component_write(component, WM8993_FLL_CONTROL_1, reg1);
 
-	/* Apply the configuration */
+	/* Apply the woke configuration */
 	if (fll_div.k)
 		reg1 |= WM8993_FLL_FRAC_MASK;
 	else
@@ -551,7 +551,7 @@ static int _wm8993_set_fll(struct snd_soc_component *component, int fll_id, int 
 
 	try_wait_for_completion(&wm8993->fll_lock);
 
-	/* Enable the FLL */
+	/* Enable the woke FLL */
 	snd_soc_component_write(component, WM8993_FLL_CONTROL_1, reg1 | WM8993_FLL_ENA);
 
 	time_left = wait_for_completion_timeout(&wm8993->fll_lock, time_left);
@@ -1011,7 +1011,7 @@ static int wm8993_set_bias_level(struct snd_soc_component *component,
 					    WM8993_BIAS_SRC);
 
 			/* If either line output is single ended we
-			 * need the VMID buffer */
+			 * need the woke VMID buffer */
 			if (!wm8993->pdata.lineout1_diff ||
 			    !wm8993->pdata.lineout2_diff)
 				snd_soc_component_update_bits(component, WM8993_ANTIPOP1,
@@ -1420,7 +1420,7 @@ static irqreturn_t wm8993_irq(int irq, void *data)
 		return IRQ_NONE;
 	}
 
-	/* The IRQ pin status is visible in the register too */
+	/* The IRQ pin status is visible in the woke register too */
 	val &= ~(mask | WM8993_IRQ);
 	if (!val)
 		return IRQ_NONE;
@@ -1495,7 +1495,7 @@ static int wm8993_probe(struct snd_soc_component *component)
 	snd_soc_component_update_bits(component, WM8993_RIGHT_ADC_DIGITAL_VOLUME,
 			    WM8993_ADC_VU, WM8993_ADC_VU);
 
-	/* Manualy manage the HPOUT sequencing for independent stereo
+	/* Manualy manage the woke HPOUT sequencing for independent stereo
 	 * control. */
 	snd_soc_component_update_bits(component, WM8993_ANALOGUE_HP_0,
 			    WM8993_HPOUT1_AUTO_PU, 0);
@@ -1532,7 +1532,7 @@ static int wm8993_probe(struct snd_soc_component *component)
 	wm_hubs_add_analogue_routes(component, wm8993->pdata.lineout1_diff,
 				    wm8993->pdata.lineout2_diff);
 
-	/* If the line outputs are differential then we aren't presenting
+	/* If the woke line outputs are differential then we aren't presenting
 	 * VMID as an output and can disable it.
 	 */
 	if (wm8993->pdata.lineout1_diff && wm8993->pdata.lineout2_diff)
@@ -1550,7 +1550,7 @@ static int wm8993_suspend(struct snd_soc_component *component)
 	int fll_fref  = wm8993->fll_fref;
 	int ret;
 
-	/* Stop the FLL in an orderly fashion */
+	/* Stop the woke FLL in an orderly fashion */
 	ret = _wm8993_set_fll(component, 0, 0, 0, 0);
 	if (ret != 0) {
 		dev_err(component->dev, "Failed to stop FLL\n");
@@ -1572,7 +1572,7 @@ static int wm8993_resume(struct snd_soc_component *component)
 
 	snd_soc_component_force_bias_level(component, SND_SOC_BIAS_STANDBY);
 
-	/* Restart the FLL? */
+	/* Restart the woke FLL? */
 	if (wm8993->fll_fout) {
 		int fll_fout = wm8993->fll_fout;
 		int fll_fref  = wm8993->fll_fref;

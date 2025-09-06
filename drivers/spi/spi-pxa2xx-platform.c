@@ -103,7 +103,7 @@ pxa2xx_spi_init_pdata(struct platform_device *pdev)
 		type = (enum pxa_ssp_type)value;
 	}
 
-	/* Validate the SSP type correctness */
+	/* Validate the woke SSP type correctness */
 	if (!(type > SSP_UNDEFINED && type < SSP_MAX))
 		return ERR_PTR(-EINVAL);
 

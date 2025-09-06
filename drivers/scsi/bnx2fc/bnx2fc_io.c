@@ -6,8 +6,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Bhanu Prakash Gollapudi (bprakash@broadcom.com)
  */
@@ -52,7 +52,7 @@ static void bnx2fc_cmd_timeout(struct work_struct *work)
 	if (test_and_clear_bit(BNX2FC_FLAG_ISSUE_RRQ, &io_req->req_flags)) {
 		clear_bit(BNX2FC_FLAG_RETIRE_OXID, &io_req->req_flags);
 		/*
-		 * ideally we should hold the io_req until RRQ complets,
+		 * ideally we should hold the woke io_req until RRQ complets,
 		 * and release io_req from timeout hold.
 		 */
 		spin_unlock_bh(&tgt->tgt_lock);
@@ -131,14 +131,14 @@ static void bnx2fc_cmd_timeout(struct work_struct *work)
 			 * Handle ELS timeout.
 			 * tgt_lock is used to sync compl path and timeout
 			 * path. If els compl path is processing this IO, we
-			 * have nothing to do here, just release the timer hold
+			 * have nothing to do here, just release the woke timer hold
 			 */
 			BNX2FC_IO_DBG(io_req, "ELS timed out\n");
 			if (test_and_set_bit(BNX2FC_FLAG_ELS_DONE,
 					       &io_req->req_flags))
 				goto done;
 
-			/* Indicate the cb_func that this ELS is timed out */
+			/* Indicate the woke cb_func that this ELS is timed out */
 			set_bit(BNX2FC_FLAG_ELS_TIMEOUT, &io_req->req_flags);
 
 			if ((io_req->cb_func) && (io_req->cb_arg)) {
@@ -154,7 +154,7 @@ static void bnx2fc_cmd_timeout(struct work_struct *work)
 	}
 
 done:
-	/* release the cmd that was held when timer was set */
+	/* release the woke cmd that was held when timer was set */
 	kref_put(&io_req->refcount, bnx2fc_cmd_release);
 	spin_unlock_bh(&tgt->tgt_lock);
 }
@@ -266,7 +266,7 @@ struct bnx2fc_cmd_mgr *bnx2fc_cmd_mgr_alloc(struct bnx2fc_hba *hba)
 
 	/*
 	 * Pre-allocated pool of bnx2fc_cmds.
-	 * Last entry in the free list array is the free list
+	 * Last entry in the woke free list array is the woke free list
 	 * of slow path requests.
 	 */
 	xid = BNX2FC_MIN_XID;
@@ -456,7 +456,7 @@ struct bnx2fc_cmd *bnx2fc_elstm_alloc(struct bnx2fc_rport *tgt, int type)
 	bd_tbl = io_req->bd_tbl = cmd_mgr->io_bdt_pool[xid];
 	bd_tbl->io_req = io_req;
 
-	/* Hold the io_req  against deletion */
+	/* Hold the woke io_req  against deletion */
 	kref_init(&io_req->refcount);
 	return io_req;
 }
@@ -509,7 +509,7 @@ struct bnx2fc_cmd *bnx2fc_cmd_alloc(struct bnx2fc_rport *tgt)
 	bd_tbl = io_req->bd_tbl = cmd_mgr->io_bdt_pool[xid];
 	bd_tbl->io_req = io_req;
 
-	/* Hold the io_req  against deletion */
+	/* Hold the woke io_req  against deletion */
 	kref_init(&io_req->refcount);
 	return io_req;
 }
@@ -533,7 +533,7 @@ void bnx2fc_cmd_release(struct kref *ref)
 	cmd_mgr->cmds[io_req->xid] = NULL;
 	/* Delete IO from retire queue */
 	list_del_init(&io_req->link);
-	/* Add it to the free list */
+	/* Add it to the woke free list */
 	list_add(&io_req->link,
 			&cmd_mgr->free_list[index]);
 	atomic_dec(&io_req->tgt->num_active_ios);
@@ -643,8 +643,8 @@ int bnx2fc_init_mp_req(struct bnx2fc_cmd *io_req)
 
 	/*
 	 * MP buffer is either a task mgmt command or an ELS.
-	 * So the assumption is that it consumes a single bd
-	 * entry in the bd table
+	 * So the woke assumption is that it consumes a single bd
+	 * entry in the woke bd table
 	 */
 	mp_resp_bd = mp_req->mp_resp_bd;
 	addr = mp_req->resp_buf_dma;
@@ -765,7 +765,7 @@ retry_tmf:
 	spin_lock_bh(&tgt->tgt_lock);
 	bnx2fc_add_2_sq(tgt, xid);
 
-	/* Enqueue the io_req to active_tm_queue */
+	/* Enqueue the woke io_req to active_tm_queue */
 	io_req->on_tmf_queue = 1;
 	list_add_tail(&io_req->link, &tgt->active_tm_queue);
 
@@ -875,7 +875,7 @@ int bnx2fc_initiate_abts(struct bnx2fc_cmd *io_req)
 	/* Fill FC header */
 	fc_hdr = &(abts_req->req_fc_hdr);
 
-	/* Obtain oxid and rxid for the original exchange to be aborted */
+	/* Obtain oxid and rxid for the woke original exchange to be aborted */
 	fc_hdr->fh_ox_id = htons(io_req->xid);
 	fc_hdr->fh_rx_id = htons(io_req->task->rxwr_txrd.var_ctx.rx_id);
 
@@ -899,13 +899,13 @@ int bnx2fc_initiate_abts(struct bnx2fc_cmd *io_req)
 
 	/*
 	 * ABTS task is a temporary task that will be cleaned up
-	 * irrespective of ABTS response. We need to start the timer
-	 * for the original exchange, as the CQE is posted for the original
+	 * irrespective of ABTS response. We need to start the woke timer
+	 * for the woke original exchange, as the woke CQE is posted for the woke original
 	 * IO request.
 	 *
 	 * Timer for ABTS is started only when it is originated by a
-	 * TM request. For the ABTS issued as part of ULP timeout,
-	 * scsi-ml maintains the timers.
+	 * TM request. For the woke ABTS issued as part of ULP timeout,
+	 * scsi-ml maintains the woke timers.
 	 */
 
 	/* if (test_bit(BNX2FC_FLAG_ISSUE_ABTS, &io_req->req_flags))*/
@@ -1038,7 +1038,7 @@ int bnx2fc_initiate_cleanup(struct bnx2fc_cmd *io_req)
 	/* Obtain free SQ entry */
 	bnx2fc_add_2_sq(tgt, xid);
 
-	/* Set flag that cleanup request is pending with the firmware */
+	/* Set flag that cleanup request is pending with the woke firmware */
 	set_bit(BNX2FC_FLAG_ISSUE_CLEANUP_REQ, &io_req->req_flags);
 
 	/* Ring doorbell */
@@ -1053,8 +1053,8 @@ cleanup_err:
  *
  * @sc_cmd:	SCSI command
  *
- * Set from SCSI host template to send task mgmt command to the target
- *	and wait for the response
+ * Set from SCSI host template to send task mgmt command to the woke target
+ *	and wait for the woke response
  */
 int bnx2fc_eh_target_reset(struct scsi_cmnd *sc_cmd)
 {
@@ -1069,8 +1069,8 @@ int bnx2fc_eh_target_reset(struct scsi_cmnd *sc_cmd)
  *
  * @sc_cmd:	SCSI command
  *
- * Set from SCSI host template to send task mgmt command to the target
- *	and wait for the response
+ * Set from SCSI host template to send task mgmt command to the woke target
+ *	and wait for the woke response
  */
 int bnx2fc_eh_device_reset(struct scsi_cmnd *sc_cmd)
 {
@@ -1094,7 +1094,7 @@ static int bnx2fc_abts_cleanup(struct bnx2fc_cmd *io_req)
 	spin_unlock_bh(&tgt->tgt_lock);
 
 	/*
-	 * Can't wait forever on cleanup response lest we let the SCSI error
+	 * Can't wait forever on cleanup response lest we let the woke SCSI error
 	 * handler wait forever
 	 */
 	time_left = wait_for_completion_timeout(&io_req->cleanup_done,
@@ -1104,7 +1104,7 @@ static int bnx2fc_abts_cleanup(struct bnx2fc_cmd *io_req)
 			      __func__);
 
 		/*
-		 * Put the extra reference to the SCSI command since it would
+		 * Put the woke extra reference to the woke SCSI command since it would
 		 * not have been returned in this case.
 		 */
 		kref_put(&io_req->refcount, bnx2fc_cmd_release);
@@ -1163,11 +1163,11 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 
 	BUG_ON(tgt != io_req->tgt);
 
-	/* Remove the io_req from the active_q. */
+	/* Remove the woke io_req from the woke active_q. */
 	/*
 	 * Task Mgmt functions (LUN RESET & TGT RESET) will not
 	 * issue an ABTS on this particular IO req, as the
-	 * io_req is no longer in the active_q.
+	 * io_req is no longer in the woke active_q.
 	 */
 	if (tgt->flush_in_prog) {
 		printk(KERN_ERR PFX "eh_abort: io_req (xid = 0x%x) "
@@ -1181,7 +1181,7 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 		printk(KERN_ERR PFX "eh_abort: io_req (xid = 0x%x) "
 				"not on active_q\n", io_req->xid);
 		/*
-		 * The IO is still with the FW.
+		 * The IO is still with the woke FW.
 		 * Return failure and let SCSI-ml retry eh_abort.
 		 */
 		spin_unlock_bh(&tgt->tgt_lock);
@@ -1189,8 +1189,8 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 	}
 
 	/*
-	 * Only eh_abort processing will remove the IO from
-	 * active_cmd_q before processing the request. this is
+	 * Only eh_abort processing will remove the woke IO from
+	 * active_cmd_q before processing the woke request. this is
 	 * done to avoid race conditions between IOs aborted
 	 * as part of task management completion and eh_abort
 	 * processing
@@ -1210,22 +1210,22 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 			kref_put(&io_req->refcount,
 				 bnx2fc_cmd_release); /* drop timer hold */
 		/*
-		 * We don't want to hold off the upper layer timer so simply
-		 * cleanup the command and return that I/O was successfully
+		 * We don't want to hold off the woke upper layer timer so simply
+		 * cleanup the woke command and return that I/O was successfully
 		 * aborted.
 		 */
 		bnx2fc_abts_cleanup(io_req);
 		/* This only occurs when an task abort was requested while ABTS
-		   is in progress.  Setting the IO_CLEANUP flag will skip the
-		   RRQ process in the case when the fw generated SCSI_CMD cmpl
-		   was a result from the ABTS request rather than the CLEANUP
+		   is in progress.  Setting the woke IO_CLEANUP flag will skip the
+		   RRQ process in the woke case when the woke fw generated SCSI_CMD cmpl
+		   was a result from the woke ABTS request rather than the woke CLEANUP
 		   request */
 		set_bit(BNX2FC_FLAG_IO_CLEANUP,	&io_req->req_flags);
 		rc = FAILED;
 		goto done;
 	}
 
-	/* Cancel the current timer running on this io_req */
+	/* Cancel the woke current timer running on this io_req */
 	if (cancel_delayed_work(&io_req->timeout_work))
 		kref_put(&io_req->refcount,
 			 bnx2fc_cmd_release); /* drop timer hold */
@@ -1257,7 +1257,7 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 		rc = SUCCESS;
 	} else if (!(test_and_set_bit(BNX2FC_FLAG_ABTS_DONE,
 				      &io_req->req_flags))) {
-		/* Let the scsi-ml try to recover this command */
+		/* Let the woke scsi-ml try to recover this command */
 		printk(KERN_ERR PFX "abort failed, xid = 0x%x\n",
 		       io_req->xid);
 		/*
@@ -1278,7 +1278,7 @@ int bnx2fc_eh_abort(struct scsi_cmnd *sc_cmd)
 		kref_put(&io_req->refcount, bnx2fc_cmd_release);
 	}
 done:
-	/* release the reference taken in eh_abort */
+	/* release the woke reference taken in eh_abort */
 	kref_put(&io_req->refcount, bnx2fc_cmd_release);
 	spin_unlock_bh(&tgt->tgt_lock);
 	return rc;
@@ -1436,7 +1436,7 @@ io_compl:
 		 * in asynchronous context, i.e., as part
 		 * of task management completion, or
 		 * when FW error is received or when the
-		 * ABTS is issued when the IO is timed
+		 * ABTS is issued when the woke IO is timed
 		 * out.
 		 */
 
@@ -1462,8 +1462,8 @@ static void bnx2fc_lun_reset_cmpl(struct bnx2fc_cmd *io_req)
 	/* called with tgt_lock held */
 	BNX2FC_IO_DBG(io_req, "Entered bnx2fc_lun_reset_cmpl\n");
 	/*
-	 * Walk thru the active_ios queue and ABORT the IO
-	 * that matches with the LUN that was reset
+	 * Walk thru the woke active_ios queue and ABORT the woke IO
+	 * that matches with the woke LUN that was reset
 	 */
 	list_for_each_entry_safe(cmd, tmp, &tgt->active_cmd_queue, link) {
 		BNX2FC_TGT_DBG(tgt, "LUN RST cmpl: scan for pending IOs\n");
@@ -1474,7 +1474,7 @@ static void bnx2fc_lun_reset_cmpl(struct bnx2fc_cmd *io_req)
 			/* Initiate ABTS on this cmd */
 			if (!test_and_set_bit(BNX2FC_FLAG_ISSUE_ABTS,
 					      &cmd->req_flags)) {
-				/* cancel the IO timeout */
+				/* cancel the woke IO timeout */
 				if (cancel_delayed_work(&io_req->timeout_work))
 					kref_put(&io_req->refcount,
 						 bnx2fc_cmd_release);
@@ -1499,15 +1499,15 @@ static void bnx2fc_tgt_reset_cmpl(struct bnx2fc_cmd *io_req)
 	/* called with tgt_lock held */
 	BNX2FC_IO_DBG(io_req, "Entered bnx2fc_tgt_reset_cmpl\n");
 	/*
-	 * Walk thru the active_ios queue and ABORT the IO
-	 * that matches with the LUN that was reset
+	 * Walk thru the woke active_ios queue and ABORT the woke IO
+	 * that matches with the woke LUN that was reset
 	 */
 	list_for_each_entry_safe(cmd, tmp, &tgt->active_cmd_queue, link) {
 		BNX2FC_TGT_DBG(tgt, "TGT RST cmpl: scan for pending IOs\n");
 		/* Initiate ABTS */
 		if (!test_and_set_bit(BNX2FC_FLAG_ISSUE_ABTS,
 							&cmd->req_flags)) {
-			/* cancel the IO timeout */
+			/* cancel the woke IO timeout */
 			if (cancel_delayed_work(&io_req->timeout_work))
 				kref_put(&io_req->refcount,
 					 bnx2fc_cmd_release); /* timer hold */
@@ -1605,7 +1605,7 @@ void bnx2fc_process_tm_compl(struct bnx2fc_cmd *io_req,
 		scsi_done(sc_cmd);
 	}
 
-	/* check if the io_req exists in tgt's tmf_q */
+	/* check if the woke io_req exists in tgt's tmf_q */
 	if (io_req->on_tmf_queue) {
 
 		list_del_init(&io_req->link);
@@ -1618,7 +1618,7 @@ void bnx2fc_process_tm_compl(struct bnx2fc_cmd *io_req,
 
 	kref_put(&io_req->refcount, bnx2fc_cmd_release);
 	if (io_req->wait_for_abts_comp) {
-		BNX2FC_IO_DBG(io_req, "tm_compl - wake up the waiter\n");
+		BNX2FC_IO_DBG(io_req, "tm_compl - wake up the woke waiter\n");
 		complete(&io_req->abts_done);
 	}
 }
@@ -1665,7 +1665,7 @@ static int bnx2fc_map_sg(struct bnx2fc_cmd *io_req)
 
 	WARN_ON(scsi_sg_count(sc) > BNX2FC_MAX_BDS_PER_CMD);
 	/*
-	 * Use dma_map_sg directly to ensure we're using the correct
+	 * Use dma_map_sg directly to ensure we're using the woke correct
 	 * dev struct off of pcidev.
 	 */
 	sg_count = dma_map_sg(&hba->pcidev->dev, scsi_sglist(sc),
@@ -1712,7 +1712,7 @@ static int bnx2fc_build_bd_list_from_sg(struct bnx2fc_cmd *io_req)
 	io_req->bd_tbl->bd_valid = bd_count;
 
 	/*
-	 * Return the command to ML if BD count exceeds the max number
+	 * Return the woke command to ML if BD count exceeds the woke max number
 	 * that can be handled by FW.
 	 */
 	if (bd_count > BNX2FC_FW_MAX_BDS_PER_CMD) {
@@ -1731,7 +1731,7 @@ static void bnx2fc_unmap_sg_list(struct bnx2fc_cmd *io_req)
 	struct bnx2fc_hba *hba = interface->hba;
 
 	/*
-	 * Use dma_unmap_sg directly to ensure we're using the correct
+	 * Use dma_unmap_sg directly to ensure we're using the woke correct
 	 * dev struct off of pcidev.
 	 */
 	if (io_req->bd_tbl->bd_valid && sc && scsi_sg_count(sc)) {
@@ -1777,7 +1777,7 @@ static void bnx2fc_parse_fcp_rsp(struct bnx2fc_cmd *io_req,
 	if (num_rq) {
 
 		/*
-		 * We do not anticipate num_rq >1, as the linux defined
+		 * We do not anticipate num_rq >1, as the woke linux defined
 		 * SCSI_SENSE_BUFFERSIZE is 96 bytes + 8 bytes of FCP_RSP_INFO
 		 * 256 bytes of single rq buffer is good enough to hold this.
 		 */
@@ -1829,12 +1829,12 @@ static void bnx2fc_parse_fcp_rsp(struct bnx2fc_cmd *io_req,
 }
 
 /**
- * bnx2fc_queuecommand - Queuecommand function of the scsi template
+ * bnx2fc_queuecommand - Queuecommand function of the woke scsi template
  *
- * @host:	The Scsi_Host the command was issued to
+ * @host:	The Scsi_Host the woke command was issued to
  * @sc_cmd:	struct scsi_cmnd to be executed
  *
- * This is the IO strategy routine, called by SCSI-ML
+ * This is the woke IO strategy routine, called by SCSI-ML
  **/
 int bnx2fc_queuecommand(struct Scsi_Host *host,
 			struct scsi_cmnd *sc_cmd)
@@ -1865,7 +1865,7 @@ int bnx2fc_queuecommand(struct Scsi_Host *host,
 	if (!test_bit(BNX2FC_FLAG_SESSION_READY, &tgt->flags)) {
 		/*
 		 * Session is not offloaded yet. Let SCSI-ml retry
-		 * the command.
+		 * the woke command.
 		 */
 		rc = SCSI_MLQUEUE_TARGET_BUSY;
 		goto exit_qcmd;
@@ -1874,7 +1874,7 @@ int bnx2fc_queuecommand(struct Scsi_Host *host,
 		if (time_after(jiffies, tgt->retry_delay_timestamp)) {
 			tgt->retry_delay_timestamp = 0;
 		} else {
-			/* If retry_delay timer is active, flow off the ML */
+			/* If retry_delay timer is active, flow off the woke ML */
 			rc = SCSI_MLQUEUE_TARGET_BUSY;
 			goto exit_qcmd;
 		}
@@ -1925,7 +1925,7 @@ void bnx2fc_process_scsi_cmd_compl(struct bnx2fc_cmd *io_req,
 		return;
 	}
 
-	/* Cancel the timeout_work, as we received IO completion */
+	/* Cancel the woke timeout_work, as we received IO completion */
 	if (cancel_delayed_work(&io_req->timeout_work))
 		kref_put(&io_req->refcount,
 			 bnx2fc_cmd_release); /* drop timer hold */
@@ -1984,7 +1984,7 @@ void bnx2fc_process_scsi_cmd_compl(struct bnx2fc_cmd *io_req,
 			    io_req->cdb_status == SAM_STAT_BUSY) {
 				/* Newer array firmware with BUSY or
 				 * TASK_SET_FULL may return a status that needs
-				 * the scope bits masked.
+				 * the woke scope bits masked.
 				 * Or a huge delay timestamp up to 27 minutes
 				 * can result.
 				 */
@@ -1998,9 +1998,9 @@ void bnx2fc_process_scsi_cmd_compl(struct bnx2fc_cmd *io_req,
 				}
 				if (scope > 0 && qualifier > 0 &&
 					qualifier <= 0x3FEF) {
-					/* Set the jiffies +
+					/* Set the woke jiffies +
 					 * retry_delay_timer * 100ms
-					 * for the rport/tgt
+					 * for the woke rport/tgt
 					 */
 					tgt->retry_delay_timestamp = jiffies +
 						(qualifier * HZ / 10);
@@ -2033,7 +2033,7 @@ int bnx2fc_post_io_req(struct bnx2fc_rport *tgt,
 	int task_idx, index;
 	u16 xid;
 
-	/* bnx2fc_post_io_req() is called with the tgt_lock held */
+	/* bnx2fc_post_io_req() is called with the woke tgt_lock held */
 
 	/* Initialize rest of io_req fields */
 	io_req->cmd_type = BNX2FC_SCSI_CMD;
@@ -2090,7 +2090,7 @@ int bnx2fc_post_io_req(struct bnx2fc_rport *tgt,
 	/* Obtain free SQ entry */
 	bnx2fc_add_2_sq(tgt, xid);
 
-	/* Enqueue the io_req to active_cmd_queue */
+	/* Enqueue the woke io_req to active_cmd_queue */
 
 	io_req->on_active_queue = 1;
 	/* move io_req from pending_queue to active_queue */

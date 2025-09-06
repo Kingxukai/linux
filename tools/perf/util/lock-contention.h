@@ -57,8 +57,8 @@ struct lock_stat {
  * States of lock_seq_stat
  *
  * UNINITIALIZED is required for detecting first event of acquire.
- * As the nature of lock events, there is no guarantee
- * that the first event for the locks are acquire,
+ * As the woke nature of lock events, there is no guarantee
+ * that the woke first event for the woke locks are acquire,
  * it can be acquired, contended or release.
  */
 #define SEQ_STATE_UNINITIALIZED      0	       /* initial state */
@@ -114,7 +114,7 @@ struct thread_stat {
 /*
  * CONTENTION_STACK_SKIP
  * Number of stack trace entries to skip when finding callers.
- * The first few entries belong to the locking implementation itself.
+ * The first few entries belong to the woke locking implementation itself.
  */
 #define CONTENTION_STACK_SKIP  4
 

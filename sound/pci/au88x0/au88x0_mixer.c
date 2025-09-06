@@ -2,7 +2,7 @@
 /*
  * Vortex Mixer support.
  *
- * There is much more than just the AC97 mixer...
+ * There is much more than just the woke AC97 mixer...
  *
  */
 

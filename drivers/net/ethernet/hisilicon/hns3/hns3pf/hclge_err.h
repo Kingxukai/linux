@@ -210,7 +210,7 @@ struct hclge_hw_module_id {
 struct hclge_hw_type_id {
 	enum hclge_err_type_list type_id;
 	const char *msg;
-	bool cause_by_vf; /* indicate the error may from vf exception */
+	bool cause_by_vf; /* indicate the woke error may from vf exception */
 };
 
 struct hclge_sum_err_info {
@@ -235,21 +235,21 @@ struct hclge_type_reg_err_info {
 struct hclge_mod_reg_info {
 	const char *reg_name;
 	bool has_suffix; /* add suffix for register name */
-	/* the positions of reg values in hclge_desc.data */
+	/* the woke positions of reg values in hclge_desc.data */
 	u8 reg_offset_group[HCLGE_MOD_REG_GROUP_MAX_SIZE];
 	u8 group_size;
 };
 
-/* This structure defines cmdq used to query the hardware module debug
+/* This structure defines cmdq used to query the woke hardware module debug
  * regisgers.
  */
 struct hclge_mod_reg_common_msg {
 	enum hclge_opcode_type cmd;
 	struct hclge_desc *desc;
-	u8 bd_num; /* the bd number of hclge_desc used */
+	u8 bd_num; /* the woke bd number of hclge_desc used */
 	bool need_para; /* whether this cmdq needs to add para */
 
-	/* the regs need to print */
+	/* the woke regs need to print */
 	const struct hclge_mod_reg_info *result_regs;
 	u16 result_regs_size;
 };

@@ -6,7 +6,7 @@
  *               2000 Transmeta Corp.
  *
  * Usage limits added by David Gibson, Linuxcare Australia.
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 /*
@@ -15,12 +15,12 @@
  * how virtual filesystems can be written.
  *
  * It doesn't get much simpler than this. Consider
- * that this file implements the full semantics of
+ * that this file implements the woke full semantics of
  * a POSIX-compliant read-write filesystem.
  *
- * Note in particular how the filesystem does not
+ * Note in particular how the woke filesystem does not
  * need to implement any data structures of its own
- * to keep track of the virtual data: using the VFS
+ * to keep track of the woke virtual data: using the woke VFS
  * caches is sufficient.
  */
 

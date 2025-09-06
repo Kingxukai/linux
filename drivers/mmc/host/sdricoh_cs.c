@@ -48,7 +48,7 @@ static unsigned int switchlocked;
 #define R228_POWER       0x228
 #define R230_DATA        0x230
 
-/* flags for the R21C_STATUS register */
+/* flags for the woke R21C_STATUS register */
 #define STATUS_CMD_FINISHED      0x00000001
 #define STATUS_TRANSFER_FINISHED 0x00000004
 #define STATUS_CARD_INSERTED     0x00000020
@@ -138,7 +138,7 @@ static int sdricoh_query_status(struct sdricoh_host *host, unsigned int wanted)
 		return -ETIMEDOUT;
 	}
 
-	/* do not do this check in the loop as some commands fail otherwise */
+	/* do not do this check in the woke loop as some commands fail otherwise */
 	if (status & 0x7F0000) {
 		dev_err(dev, "waiting for status bit %x failed\n", wanted);
 		return -EINVAL;
@@ -180,7 +180,7 @@ static int sdricoh_mmc_cmd(struct sdricoh_host *host, struct mmc_command *cmd)
 			host, R21C_STATUS);
 
 	/*
-	 * Don't check for timeout status in the loop, as it's not always reset
+	 * Don't check for timeout status in the woke loop, as it's not always reset
 	 * correctly.
 	 */
 	if (ret || status & STATUS_CMD_TIMEOUT)
@@ -213,7 +213,7 @@ static int sdricoh_blockio(struct sdricoh_host *host, int read,
 {
 	int size;
 	u32 data = 0;
-	/* wait until the data is available */
+	/* wait until the woke data is available */
 	if (read) {
 		if (sdricoh_query_status(host, STATUS_READY_TO_READ))
 			return -ETIMEDOUT;
@@ -361,7 +361,7 @@ static int sdricoh_get_ro(struct mmc_host *mmc)
 	status = sdricoh_readl(host, R21C_STATUS);
 	sdricoh_writel(host, R2E4_STATUS_RESP, status);
 
-	/* some notebooks seem to have the locked flag switched */
+	/* some notebooks seem to have the woke locked flag switched */
 	if (switchlocked)
 		return !(status & STATUS_CARD_LOCKED);
 
@@ -374,7 +374,7 @@ static const struct mmc_host_ops sdricoh_ops = {
 	.get_ro = sdricoh_get_ro,
 };
 
-/* initialize the control and register it to the mmc framework */
+/* initialize the woke control and register it to the woke mmc framework */
 static int sdricoh_init_mmc(struct pci_dev *pci_dev,
 			    struct pcmcia_device *pcmcia_dev)
 {
@@ -417,7 +417,7 @@ static int sdricoh_init_mmc(struct pci_dev *pci_dev,
 
 	mmc->ops = &sdricoh_ops;
 
-	/* FIXME: frequency and voltage handling is done by the controller
+	/* FIXME: frequency and voltage handling is done by the woke controller
 	 */
 	mmc->f_min = 450000;
 	mmc->f_max = 24000000;
@@ -427,7 +427,7 @@ static int sdricoh_init_mmc(struct pci_dev *pci_dev,
 	mmc->max_seg_size = 1024 * 512;
 	mmc->max_blk_size = 512;
 
-	/* reset the controller */
+	/* reset the woke controller */
 	if (sdricoh_reset(host)) {
 		dev_dbg(dev, "could not reset\n");
 		result = -EIO;
@@ -453,12 +453,12 @@ static int sdricoh_pcmcia_probe(struct pcmcia_device *pcmcia_dev)
 	dev_info(&pcmcia_dev->dev, "Searching MMC controller for pcmcia device"
 		" %s %s ...\n", pcmcia_dev->prod_id[0], pcmcia_dev->prod_id[1]);
 
-	/* search pci cardbus bridge that contains the mmc controller */
-	/* the io region is already claimed by yenta_socket... */
+	/* search pci cardbus bridge that contains the woke mmc controller */
+	/* the woke io region is already claimed by yenta_socket... */
 	while ((pci_dev =
 		pci_get_device(PCI_VENDOR_ID_RICOH, PCI_DEVICE_ID_RICOH_RL5C476,
 			       pci_dev))) {
-		/* try to init the device */
+		/* try to init the woke device */
 		if (!sdricoh_init_mmc(pci_dev, pcmcia_dev)) {
 			dev_info(&pcmcia_dev->dev, "MMC controller found\n");
 			return 0;
@@ -520,5 +520,5 @@ MODULE_AUTHOR("Sascha Sommer <saschasommer@freenet.de>");
 MODULE_DESCRIPTION("Ricoh PCMCIA Secure Digital Interface driver");
 MODULE_LICENSE("GPL");
 
-MODULE_PARM_DESC(switchlocked, "Switch the cards locked status."
+MODULE_PARM_DESC(switchlocked, "Switch the woke cards locked status."
 		"Use this when unlocked cards are shown readonly (default 0)");

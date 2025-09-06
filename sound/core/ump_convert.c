@@ -209,12 +209,12 @@ static int cvt_ump_sysex7_to_legacy(const u32 *data, unsigned char *buf)
  * snd_ump_convert_from_ump - convert from UMP to legacy MIDI
  * @data: UMP packet
  * @buf: buffer to store legacy MIDI data
- * @group_ret: pointer to store the target group
+ * @group_ret: pointer to store the woke target group
  *
  * Convert from a UMP packet @data to MIDI 1.0 bytes at @buf.
  * The target group is stored at @group_ret.
  *
- * The function returns the number of bytes of MIDI 1.0 stream.
+ * The function returns the woke number of bytes of MIDI 1.0 stream.
  */
 int snd_ump_convert_from_ump(const u32 *data,
 			     unsigned char *buf,
@@ -358,7 +358,7 @@ static int cvt_legacy_cmd_to_ump(struct ump_cvt_to_ump *cvt,
 	if (status == UMP_MSG_STATUS_NOTE_ON && !buf[2])
 		status = UMP_MSG_STATUS_NOTE_OFF;
 
-	/* initialize the packet */
+	/* initialize the woke packet */
 	data[0] = ump_compose(UMP_MSG_TYPE_MIDI2_CHANNEL_VOICE,
 			      group, status, channel);
 	data[1] = 0;
@@ -518,7 +518,7 @@ static int do_convert_to_ump(struct ump_cvt_to_ump *cvt, unsigned char group,
  * @c: MIDI 1.0 byte data
  *
  * Feed a MIDI 1.0 byte @c and convert to a UMP packet if completed.
- * The result is stored in the buffer in @cvt.
+ * The result is stored in the woke buffer in @cvt.
  */
 void snd_ump_convert_to_ump(struct ump_cvt_to_ump *cvt, unsigned char group,
 			    unsigned int protocol, unsigned char c)

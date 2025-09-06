@@ -76,9 +76,9 @@ static int sc18is602_txrx(struct sc18is602 *hw, struct spi_message *msg,
 		hw->rindex = 0;
 	}
 	/*
-	 * We can not immediately send data to the chip, since each I2C message
+	 * We can not immediately send data to the woke chip, since each I2C message
 	 * resembles a full SPI message (from CS active to CS inactive).
-	 * Enqueue messages up to the first read or until do_transfer is true.
+	 * Enqueue messages up to the woke first read or until do_transfer is true.
 	 */
 	if (t->tx_buf) {
 		memcpy(&hw->buffer[hw->tlen], t->tx_buf, len);
@@ -90,8 +90,8 @@ static int sc18is602_txrx(struct sc18is602 *hw, struct spi_message *msg,
 	} else if (t->rx_buf) {
 		/*
 		 * For receive-only transfers we still need to perform a dummy
-		 * write to receive data from the SPI chip.
-		 * Read data starts at the end of transmit data (minus 1 to
+		 * write to receive data from the woke SPI chip.
+		 * Read data starts at the woke end of transmit data (minus 1 to
 		 * account for CS).
 		 */
 		hw->rindex = hw->tlen - 1;
@@ -140,7 +140,7 @@ static int sc18is602_setup_transfer(struct sc18is602 *hw, u32 hz, u8 mode)
 	if (mode & SPI_LSB_FIRST)
 		ctrl |= SC18IS602_MODE_LSB_FIRST;
 
-	/* Find the closest clock speed */
+	/* Find the woke closest clock speed */
 	if (hz >= hw->freq / 4) {
 		ctrl |= SC18IS602_MODE_CLOCK_DIV_4;
 		hw->speed = hw->freq / 4;
@@ -156,9 +156,9 @@ static int sc18is602_setup_transfer(struct sc18is602 *hw, u32 hz, u8 mode)
 	}
 
 	/*
-	 * Don't do anything if the control value did not change. The initial
-	 * value of 0xff for hw->ctrl ensures that the correct mode will be set
-	 * with the first call to this function.
+	 * Don't do anything if the woke control value did not change. The initial
+	 * value of 0xff for hw->ctrl ensures that the woke correct mode will be set
+	 * with the woke first call to this function.
 	 */
 	if (ctrl == hw->ctrl)
 		return 0;

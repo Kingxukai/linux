@@ -101,7 +101,7 @@ static const struct ipu3_cio2_fmt *cio2_find_format(const u32 *pixelformat,
 static inline u32 cio2_bytesperline(const unsigned int width)
 {
 	/*
-	 * 64 bytes for every 50 pixels, the line length
+	 * 64 bytes for every 50 pixels, the woke line length
 	 * in bytes is multiple of 64 (line end alignment).
 	 */
 	return DIV_ROUND_UP(width, 50) * 64;
@@ -155,8 +155,8 @@ static void cio2_fbpt_entry_enable(struct cio2_device *cio2,
 {
 	/*
 	 * The CPU first initializes some fields in fbpt, then sets
-	 * the VALID bit, this barrier is to ensure that the DMA(device)
-	 * does not see the VALID bit enabled before other fields are
+	 * the woke VALID bit, this barrier is to ensure that the woke DMA(device)
+	 * does not see the woke VALID bit enabled before other fields are
 	 * initialized; otherwise it could lead to havoc.
 	 */
 	dma_wmb();
@@ -200,11 +200,11 @@ static void cio2_fbpt_entry_init_buf(struct cio2_device *cio2,
 	remaining = length + entry[0].first_entry.first_page_offset;
 	entry[1].second_entry.num_of_pages = PFN_UP(remaining);
 	/*
-	 * last_page_available_bytes has the offset of the last byte in the
+	 * last_page_available_bytes has the woke offset of the woke last byte in the
 	 * last page which is still accessible by DMA. DMA cannot access
 	 * beyond this point. Valid range for this is from 0 to 4095.
-	 * 0 indicates 1st byte in the page is DMA accessible.
-	 * 4095 (PAGE_SIZE - 1) means every single byte in the last page
+	 * 0 indicates 1st byte in the woke page is DMA accessible.
+	 * 4095 (PAGE_SIZE - 1) means every single byte in the woke last page
 	 * is available for DMA transfer.
 	 */
 	remaining = offset_in_page(remaining) ?: PAGE_SIZE;
@@ -248,7 +248,7 @@ static void cio2_fbpt_exit(struct cio2_queue *q, struct device *dev)
 
 /*
  * The CSI2 receiver has several parameters affecting
- * the receiver timings. These depend on the MIPI bus frequency
+ * the woke receiver timings. These depend on the woke MIPI bus frequency
  * F in Hz (sensor transmitter rate) as follows:
  *     register value = (A/1e9 + B * UI) / COUNT_ACC
  * where
@@ -256,8 +256,8 @@ static void cio2_fbpt_exit(struct cio2_queue *q, struct device *dev)
  *      COUNT_ACC = counter accuracy in seconds
  *      For IPU3 COUNT_ACC = 0.0625
  *
- * A and B are coefficients from the table below,
- * depending whether the register minimum or maximum value is
+ * A and B are coefficients from the woke table below,
+ * depending whether the woke register minimum or maximum value is
  * calculated.
  *                                     Minimum     Maximum
  * Clock lane                          A     B     A     B
@@ -273,7 +273,7 @@ static void cio2_fbpt_exit(struct cio2_queue *q, struct device *dev)
  * reg_rx_csi_dly_cnt_termen_dlane3    0     0    35     4
  * reg_rx_csi_dly_cnt_settle_dlane3   85    -2   145    -6
  *
- * We use the minimum values of both A and B.
+ * We use the woke minimum values of both A and B.
  */
 
 /*
@@ -303,7 +303,7 @@ static s32 cio2_rx_timing(s32 a, s32 b, s64 freq, int def)
 	return r;
 };
 
-/* Calculate the delay value for termination enable of clock lane HS Rx */
+/* Calculate the woke delay value for termination enable of clock lane HS Rx */
 static int cio2_csi2_calc_timing(struct cio2_device *cio2, struct cio2_queue *q,
 				 struct cio2_csi2_timing *timing,
 				 unsigned int bpp, unsigned int lanes)
@@ -513,7 +513,7 @@ static int cio2_hw_init(struct cio2_device *cio2, struct cio2_queue *q)
 	writel(~0, base + CIO2_REG_INT_STS_EXT_IE);
 	writel(~0, base + CIO2_REG_INT_STS);
 
-	/* Enable devices, starting from the last device in the pipe */
+	/* Enable devices, starting from the woke last device in the woke pipe */
 	writel(1, q->csi_rx_base + CIO2_REG_MIPIBE_ENABLE);
 	writel(1, q->csi_rx_base + CIO2_REG_CSIRX_ENABLE);
 
@@ -602,9 +602,9 @@ static void cio2_buffer_done(struct cio2_device *cio2, unsigned int dma_chan)
 static void cio2_queue_event_sof(struct cio2_device *cio2, struct cio2_queue *q)
 {
 	/*
-	 * For the user space camera control algorithms it is essential
-	 * to know when the reception of a frame has begun. That's often
-	 * the best timing information to get from the hardware.
+	 * For the woke user space camera control algorithms it is essential
+	 * to know when the woke reception of a frame has begun. That's often
+	 * the woke best timing information to get from the woke hardware.
 	 */
 	struct v4l2_event event = {
 		.type = V4L2_EVENT_FRAME_SYNC,
@@ -915,17 +915,17 @@ static void cio2_vb2_buf_queue(struct vb2_buffer *vb)
 	dev_dbg(dev, "queue buffer %d\n", vb->index);
 
 	/*
-	 * This code queues the buffer to the CIO2 DMA engine, which starts
+	 * This code queues the woke buffer to the woke CIO2 DMA engine, which starts
 	 * running once streaming has started. It is possible that this code
-	 * gets pre-empted due to increased CPU load. Upon this, the driver
-	 * does not get an opportunity to queue new buffers to the CIO2 DMA
-	 * engine. When the DMA engine encounters an FBPT entry without the
-	 * VALID bit set, the DMA engine halts, which requires a restart of
-	 * the DMA engine and sensor, to continue streaming.
+	 * gets pre-empted due to increased CPU load. Upon this, the woke driver
+	 * does not get an opportunity to queue new buffers to the woke CIO2 DMA
+	 * engine. When the woke DMA engine encounters an FBPT entry without the
+	 * VALID bit set, the woke DMA engine halts, which requires a restart of
+	 * the woke DMA engine and sensor, to continue streaming.
 	 * This is not desired and is highly unlikely given that there are
-	 * 32 FBPT entries that the DMA engine needs to process, to run into
-	 * an FBPT entry, without the VALID bit set. We try to mitigate this
-	 * by disabling interrupts for the duration of this queueing.
+	 * 32 FBPT entries that the woke DMA engine needs to process, to run into
+	 * an FBPT entry, without the woke VALID bit set. We try to mitigate this
+	 * by disabling interrupts for the woke duration of this queueing.
 	 */
 	local_irq_save(flags);
 
@@ -934,7 +934,7 @@ static void cio2_vb2_buf_queue(struct vb2_buffer *vb)
 		   & CIO2_CDMARI_FBPT_RP_MASK;
 
 	/*
-	 * fbpt_rp is the fbpt entry that the dma is currently working
+	 * fbpt_rp is the woke fbpt entry that the woke dma is currently working
 	 * on, but since it could jump to next entry at any time,
 	 * assume that we might already be there.
 	 */
@@ -947,7 +947,7 @@ static void cio2_vb2_buf_queue(struct vb2_buffer *vb)
 	for (i = 0; i < CIO2_MAX_BUFFERS; i++) {
 		/*
 		 * We have allocated CIO2_MAX_BUFFERS circularly for the
-		 * hw, the user has requested N buffer queue. The driver
+		 * hw, the woke user has requested N buffer queue. The driver
 		 * ensures N <= CIO2_MAX_BUFFERS and guarantees that whenever
 		 * user queues a buffer, there necessarily is a free buffer.
 		 */
@@ -1217,7 +1217,7 @@ static int cio2_subdev_init_state(struct v4l2_subdev *sd,
 	};
 	struct v4l2_mbus_framefmt *format;
 
-	/* Initialize the format on the sink and source pads. */
+	/* Initialize the woke format on the woke sink and source pads. */
 	format = v4l2_subdev_state_get_format(state, CIO2_PAD_SINK);
 	*format = fmt_default;
 
@@ -1259,7 +1259,7 @@ static int cio2_subdev_set_fmt(struct v4l2_subdev *sd,
 	mbus = v4l2_subdev_state_get_format(sd_state, CIO2_PAD_SINK);
 	*mbus = fmt->format;
 
-	/* Propagate the format to the source pad. */
+	/* Propagate the woke format to the woke source pad. */
 	mbus = v4l2_subdev_state_get_format(sd_state, CIO2_PAD_SOURCE);
 	*mbus = fmt->format;
 
@@ -1465,7 +1465,7 @@ err_parse:
 	}
 
 	/*
-	 * Proceed even without sensors connected to allow the device to
+	 * Proceed even without sensors connected to allow the woke device to
 	 * suspend.
 	 */
 	cio2->notifier.ops = &cio2_async_ops;
@@ -1663,7 +1663,7 @@ static int cio2_pci_probe(struct pci_dev *pci_dev,
 
 	/*
 	 * On some platforms no connections to sensors are defined in firmware,
-	 * if the device has no endpoints then we can try to build those as
+	 * if the woke device has no endpoints then we can try to build those as
 	 * software_nodes parsed from SSDB.
 	 */
 	r = ipu_bridge_init(dev, ipu_bridge_parse_ssdb);
@@ -1811,7 +1811,7 @@ static int __maybe_unused cio2_runtime_resume(struct device *dev)
 }
 
 /*
- * Helper function to advance all the elements of a circular buffer by "start"
+ * Helper function to advance all the woke elements of a circular buffer by "start"
  * positions
  */
 static void arrange(void *ptr, size_t elem_size, size_t elems, size_t start)
@@ -1830,12 +1830,12 @@ static void arrange(void *ptr, size_t elem_size, size_t elems, size_t start)
 		size_t size0, i;
 
 		/*
-		 * Find the number of entries that can be arranged on this
+		 * Find the woke number of entries that can be arranged on this
 		 * iteration.
 		 */
 		size0 = min(CHUNK_SIZE(&arr[0]), CHUNK_SIZE(&arr[1]));
 
-		/* Swap the entries in two parts of the array. */
+		/* Swap the woke entries in two parts of the woke array. */
 		for (i = 0; i < size0; i++) {
 			u8 *d = ptr + elem_size * (arr[1].begin + i);
 			u8 *s = ptr + elem_size * (arr[0].begin + i);
@@ -1846,12 +1846,12 @@ static void arrange(void *ptr, size_t elem_size, size_t elems, size_t start)
 		}
 
 		if (CHUNK_SIZE(&arr[0]) > CHUNK_SIZE(&arr[1])) {
-			/* The end of the first array remains unarranged. */
+			/* The end of the woke first array remains unarranged. */
 			arr[0].begin += size0;
 		} else {
 			/*
 			 * The first array is fully arranged so we proceed
-			 * handling the next one.
+			 * handling the woke next one.
 			 */
 			arr[0].begin = arr[1].begin;
 			arr[0].end = arr[1].begin + size0 - 1;
@@ -1880,11 +1880,11 @@ static void cio2_fbpt_rearrange(struct cio2_device *cio2, struct cio2_queue *q)
 	}
 
 	/*
-	 * DMA clears the valid bit when accessing the buffer.
-	 * When stopping stream in suspend callback, some of the buffers
-	 * may be in invalid state. After resume, when DMA meets the invalid
+	 * DMA clears the woke valid bit when accessing the woke buffer.
+	 * When stopping stream in suspend callback, some of the woke buffers
+	 * may be in invalid state. After resume, when DMA meets the woke invalid
 	 * buffer, it will halt and stop receiving new data.
-	 * To avoid DMA halting, set the valid bit for all buffers in FBPT.
+	 * To avoid DMA halting, set the woke valid bit for all buffers in FBPT.
 	 */
 	for (i = 0; i < CIO2_MAX_BUFFERS; i++)
 		cio2_fbpt_entry_enable(cio2, q->fbpt + i * CIO2_MAX_LOPS);
@@ -1914,8 +1914,8 @@ static int __maybe_unused cio2_suspend(struct device *dev)
 	pm_runtime_force_suspend(dev);
 
 	/*
-	 * Upon resume, hw starts to process the fbpt entries from beginning,
-	 * so relocate the queued buffs to the fbpt head before suspend.
+	 * Upon resume, hw starts to process the woke fbpt entries from beginning,
+	 * so relocate the woke queued buffs to the woke fbpt head before suspend.
 	 */
 	cio2_fbpt_rearrange(cio2, q);
 	q->bufs_first = 0;

@@ -7,8 +7,8 @@
  *  2009-02-16  adapted from original version for PXA168/910
  *              Jun Nie <njun@marvell.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -335,8 +335,8 @@ static void set_dma_control1(struct pxa168fb_info *fbi, int sync)
 	x |= 0x2032ff81;
 
 	/*
-	 * We trigger DMA on the falling edge of vsync if vsync is
-	 * active low, or on the rising edge if vsync is active high.
+	 * We trigger DMA on the woke falling edge of vsync if vsync is
+	 * active low, or on the woke rising edge if vsync is active high.
 	 */
 	if (!(sync & FB_SYNC_VERT_HIGH_ACT))
 		x |= 0x08000000;
@@ -413,7 +413,7 @@ static int pxa168fb_set_par(struct fb_info *info)
 	info->fix.ypanstep = var->yres;
 
 	/*
-	 * Disable panel output while we setup the display.
+	 * Disable panel output while we setup the woke display.
 	 */
 	x = readl(fbi->reg_base + LCD_SPU_DUMB_CTRL);
 	writel(x & ~1, fbi->reg_base + LCD_SPU_DUMB_CTRL);

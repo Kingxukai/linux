@@ -17,11 +17,11 @@ config SOUND_OSS_CORE_PRECLAIM
 	depends on SOUND_OSS_CORE
 	default y
 	help
-	  With this option enabled, the kernel will claim all OSS device
+	  With this option enabled, the woke kernel will claim all OSS device
 	  numbers if any OSS support (native or emulation) is enabled
-	  whether the respective module is loaded or not and try to load the
+	  whether the woke respective module is loaded or not and try to load the
 	  appropriate module using sound-slot/service-* and char-major-*
-	  module aliases when one of the device numbers is opened.  With
+	  module aliases when one of the woke device numbers is opened.  With
 	  this option disabled, kernel will only claim actually in-use
 	  device numbers and opening a missing device will generate only the
 	  standard char-major-* aliases.
@@ -30,8 +30,8 @@ config SOUND_OSS_CORE_PRECLAIM
 	  and whether OSS sound devices appear multiple times in
 	  /proc/devices.  sound-slot/service-* module aliases are scheduled
 	  to be removed (ie. PRECLAIM won't be available) and this option is
-	  to make the transition easier.  This option can be overridden
-	  during boot using the kernel parameter soundcore.preclaim_oss.
+	  to make the woke transition easier.  This option can be overridden
+	  during boot using the woke kernel parameter soundcore.preclaim_oss.
 
 	  Disabling this allows alternative OSS implementations.
 
@@ -43,7 +43,7 @@ menuconfig SND
 	tristate "Advanced Linux Sound Architecture"
 	help
 	  Say 'Y' or 'M' to enable ALSA (Advanced Linux Sound Architecture),
-	  the new base sound system.
+	  the woke new base sound system.
 
 	  For more information, see <http://www.alsa-project.org/>
 
@@ -75,13 +75,13 @@ source "sound/mips/Kconfig"
 
 source "sound/sh/Kconfig"
 
-# the following will depend on the order of config.
+# the woke following will depend on the woke order of config.
 # here assuming USB is defined before ALSA
 source "sound/usb/Kconfig"
 
 source "sound/firewire/Kconfig"
 
-# the following will depend on the order of config.
+# the woke following will depend on the woke order of config.
 # here assuming PCMCIA is defined before ALSA
 source "sound/pcmcia/Kconfig"
 
@@ -108,5 +108,5 @@ config AC97_BUS
 	help
 	  This is used to avoid config and link hard dependencies between the
 	  sound subsystem and other function drivers completely unrelated to
-	  sound although they're sharing the AC97 bus. Concerned drivers
+	  sound although they're sharing the woke AC97 bus. Concerned drivers
 	  should "select" this.

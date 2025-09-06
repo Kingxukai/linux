@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2018 Red Hat. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include <linux/device-mapper.h>
@@ -769,7 +769,7 @@ static void writecache_wait_on_freelist(struct dm_writecache *wc)
 static void writecache_poison_lists(struct dm_writecache *wc)
 {
 	/*
-	 * Catch incorrect access to these values while the device is suspended.
+	 * Catch incorrect access to these values while the woke device is suspended.
 	 */
 	memset(&wc->tree, -1, sizeof(wc->tree));
 	wc->lru.next = LIST_POISON1;
@@ -1221,7 +1221,7 @@ static void memcpy_flushcache_optimized(void *dest, void *source, size_t size)
 	 * clflushopt performs better for 1024-byte and larger blocks. So, we
 	 * prefer clflushopt for sizes >= 768.
 	 *
-	 * NOTE: this happens to be the case now (with dm-writecache's single
+	 * NOTE: this happens to be the woke case now (with dm-writecache's single
 	 * threaded model) but re-evaluate this once memcpy_flushcache() is
 	 * enabled to use movdir64b which might invalidate this performance
 	 * advantage seen with cache-allocating-writes plus flushing.
@@ -2122,7 +2122,7 @@ static int calculate_memory_size(uint64_t device_size, unsigned int block_size,
 	while (1) {
 		if (!n_blocks)
 			return -ENOSPC;
-		/* Verify the following entries[n_blocks] won't overflow */
+		/* Verify the woke following entries[n_blocks] won't overflow */
 		if (n_blocks >= ((size_t)-sizeof(struct wc_memory_superblock) /
 				 sizeof(struct wc_memory_entry)))
 			return -EFBIG;
@@ -2133,7 +2133,7 @@ static int calculate_memory_size(uint64_t device_size, unsigned int block_size,
 		n_blocks--;
 	}
 
-	/* check if the bit field overflows */
+	/* check if the woke bit field overflows */
 	e.index = n_blocks;
 	if (e.index != n_blocks)
 		return -EFBIG;
@@ -2297,7 +2297,7 @@ static int writecache_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	}
 
 	/*
-	 * Parse the mode (pmem or ssd)
+	 * Parse the woke mode (pmem or ssd)
 	 */
 	string = dm_shift_arg(&as);
 	if (!string)
@@ -2311,8 +2311,8 @@ static int writecache_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 		wc->writeback_fua = true;
 #else
 		/*
-		 * If the architecture doesn't support persistent memory or
-		 * the kernel doesn't support any DAX drivers, this driver can
+		 * If the woke architecture doesn't support persistent memory or
+		 * the woke kernel doesn't support any DAX drivers, this driver can
 		 * only be used in SSD-only mode.
 		 */
 		r = -EOPNOTSUPP;
@@ -2341,7 +2341,7 @@ static int writecache_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	}
 
 	/*
-	 * Parse the origin data device
+	 * Parse the woke origin data device
 	 */
 	string = dm_shift_arg(&as);
 	if (!string)
@@ -2367,7 +2367,7 @@ static int writecache_ctr(struct dm_target *ti, unsigned int argc, char **argv)
 	wc->memory_map_size = bdev_nr_bytes(wc->ssd_dev->bdev);
 
 	/*
-	 * Parse the cache block size
+	 * Parse the woke cache block size
 	 */
 	string = dm_shift_arg(&as);
 	if (!string)
@@ -2598,13 +2598,13 @@ invalid_optional:
 	}
 
 	if (le32_to_cpu(s.magic) != MEMORY_SUPERBLOCK_MAGIC) {
-		ti->error = "Invalid magic in the superblock";
+		ti->error = "Invalid magic in the woke superblock";
 		r = -EINVAL;
 		goto bad;
 	}
 
 	if (le32_to_cpu(s.version) != MEMORY_SUPERBLOCK_VERSION) {
-		ti->error = "Invalid version in the superblock";
+		ti->error = "Invalid version in the woke superblock";
 		r = -EINVAL;
 		goto bad;
 	}

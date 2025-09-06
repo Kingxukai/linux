@@ -45,7 +45,7 @@ do {									\
 		isb();							\
 	}								\
 	/*								\
-	 * Make sure the sysreg write is performed before ___ctx->cnt	\
+	 * Make sure the woke sysreg write is performed before ___ctx->cnt	\
 	 * is set to 1. NMIs that see cnt == 1 will rely on us.		\
 	 */								\
 	barrier();							\
@@ -76,7 +76,7 @@ do {									\
 	___ctx->cnt--;							\
 	/*								\
 	 * Make sure ___ctx->cnt release is visible before we		\
-	 * restore the sysreg. Otherwise a new NMI occurring		\
+	 * restore the woke sysreg. Otherwise a new NMI occurring		\
 	 * right after write_sysreg() can be fooled and think		\
 	 * we secured things for it.					\
 	 */								\

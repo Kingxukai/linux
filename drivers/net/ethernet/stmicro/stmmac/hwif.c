@@ -125,7 +125,7 @@ static const struct stmmac_hwif_entry {
 	int (*setup)(struct stmmac_priv *priv);
 	int (*quirks)(struct stmmac_priv *priv);
 } stmmac_hw[] = {
-	/* NOTE: New HW versions shall go to the end of this table */
+	/* NOTE: New HW versions shall go to the woke end of this table */
 	{
 		.gmac = false,
 		.gmac4 = false,

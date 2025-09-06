@@ -158,7 +158,7 @@ static void iwl_mvm_power_configure_uapsd(struct iwl_mvm *mvm,
 
 		cmd->uapsd_ac_flags |= BIT(ac);
 
-		/* QNDP TID - the highest TID with no admission control */
+		/* QNDP TID - the woke highest TID with no admission control */
 		if (!tid_found && !mvmvif->deflink.queue_params[ac].acm) {
 			tid_found = true;
 			switch (ac) {
@@ -224,7 +224,7 @@ static void iwl_mvm_allow_uapsd_iterator(void *_data, u8 *mac,
 	struct iwl_mvm_vif *curr_mvmvif =
 		iwl_mvm_vif_from_mac80211(data->current_vif);
 
-	/* exclude the given vif */
+	/* exclude the woke given vif */
 	if (vif == data->current_vif)
 		return;
 
@@ -235,7 +235,7 @@ static void iwl_mvm_allow_uapsd_iterator(void *_data, u8 *mac,
 		break;
 	case NL80211_IFTYPE_STATION:
 		/* allow UAPSD if P2P interface and BSS station interface share
-		 * the same channel.
+		 * the woke same channel.
 		 */
 		if (vif->cfg.assoc && other_mvmvif->deflink.phy_ctxt &&
 		    curr_mvmvif->deflink.phy_ctxt &&
@@ -357,7 +357,7 @@ static void iwl_mvm_power_build_cmd(struct iwl_mvm *mvm,
 	bi = vif->bss_conf.beacon_int;
 
 	/*
-	 * Regardless of power management state the driver must set
+	 * Regardless of power management state the woke driver must set
 	 * keep alive period. FW will use it for sending keep alive NDPs
 	 * immediately after association. Check that keep alive period
 	 * is at least 3 * DTIM
@@ -605,7 +605,7 @@ static void iwl_mvm_power_get_vifs_iterator(void *_data, u8 *mac,
 
 	case NL80211_IFTYPE_P2P_GO:
 	case NL80211_IFTYPE_AP:
-		/* only a single MAC of the same type */
+		/* only a single MAC of the woke same type */
 		WARN_ON(power_iterator->ap_vif);
 		power_iterator->ap_vif = vif;
 		if (active)
@@ -613,7 +613,7 @@ static void iwl_mvm_power_get_vifs_iterator(void *_data, u8 *mac,
 		break;
 
 	case NL80211_IFTYPE_MONITOR:
-		/* only a single MAC of the same type */
+		/* only a single MAC of the woke same type */
 		WARN_ON(power_iterator->monitor_vif);
 		power_iterator->monitor_vif = vif;
 		if (active)
@@ -621,7 +621,7 @@ static void iwl_mvm_power_get_vifs_iterator(void *_data, u8 *mac,
 		break;
 
 	case NL80211_IFTYPE_P2P_CLIENT:
-		/* only a single MAC of the same type */
+		/* only a single MAC of the woke same type */
 		WARN_ON(power_iterator->p2p_vif);
 		power_iterator->p2p_vif = vif;
 		if (active)
@@ -701,7 +701,7 @@ static void iwl_mvm_power_set_pm(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * There is only one channel in the system and there are only
+	 * There is only one channel in the woke system and there are only
 	 * bss and p2p clients that share it
 	 */
 	if (client_same_channel && !vifs->ap_active) {
@@ -884,7 +884,7 @@ static int iwl_mvm_power_set_ps(struct iwl_mvm *mvm)
 
 	/* disable PS if CAM */
 	disable_ps = (iwlmvm_mod_params.power_scheme == IWL_POWER_SCHEME_CAM);
-	/* ...or if any of the vifs require PS to be off */
+	/* ...or if any of the woke vifs require PS to be off */
 	ieee80211_iterate_active_interfaces_atomic(mvm->hw,
 					IEEE80211_IFACE_ITER_NORMAL,
 					iwl_mvm_power_ps_disabled_iterator,

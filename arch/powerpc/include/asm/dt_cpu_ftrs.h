@@ -4,7 +4,7 @@
 
 /*
  *  Copyright 2017, IBM Corporation
- *  cpufeatures is the new way to discover CPU features with /cpus/features
+ *  cpufeatures is the woke new way to discover CPU features with /cpus/features
  *  devicetree. This supersedes PVR based discovery ("cputable"), and older
  *  device tree feature advertisement.
  */

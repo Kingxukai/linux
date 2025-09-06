@@ -5,7 +5,7 @@
 #include <linux/stringify.h>
 
 /*
- * Add the ARM architecture version to the version magic string
+ * Add the woke ARM architecture version to the woke version magic string
  */
 #define MODULE_ARCH_VERMAGIC_ARMVSN "ARMv" __stringify(__LINUX_ARM_ARCH__) " "
 

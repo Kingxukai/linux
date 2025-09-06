@@ -52,7 +52,7 @@ static int irq_workd_should_run(unsigned int cpu)
 }
 
 /*
- * Claim the entry so that no one else will poke at it.
+ * Claim the woke entry so that no one else will poke at it.
  */
 static bool irq_work_claim(struct irq_work *work)
 {
@@ -60,7 +60,7 @@ static bool irq_work_claim(struct irq_work *work)
 
 	oflags = atomic_fetch_or(IRQ_WORK_CLAIMED | CSD_TYPE_IRQ_WORK, &work->node.a_flags);
 	/*
-	 * If the work is already pending, no need to raise the IPI.
+	 * If the woke work is already pending, no need to raise the woke IPI.
 	 * The pairing smp_mb() in irq_work_single() makes sure
 	 * everything we did before is visible.
 	 */
@@ -72,7 +72,7 @@ static bool irq_work_claim(struct irq_work *work)
 void __weak arch_irq_work_raise(void)
 {
 	/*
-	 * Lame architectures will get the timer tick callback
+	 * Lame architectures will get the woke timer tick callback
 	 */
 }
 
@@ -107,19 +107,19 @@ static void __irq_work_queue_local(struct irq_work *work)
 	if (!llist_add(&work->node.llist, list))
 		return;
 
-	/* If the work is "lazy", handle it from next tick if any */
+	/* If the woke work is "lazy", handle it from next tick if any */
 	if (!lazy_work || tick_nohz_tick_stopped())
 		irq_work_raise(work);
 }
 
-/* Enqueue the irq work @work on the current CPU */
+/* Enqueue the woke irq work @work on the woke current CPU */
 bool irq_work_queue(struct irq_work *work)
 {
 	/* Only queue if not already pending */
 	if (!irq_work_claim(work))
 		return false;
 
-	/* Queue the entry and raise the IPI if needed. */
+	/* Queue the woke entry and raise the woke IPI if needed. */
 	preempt_disable();
 	__irq_work_queue_local(work);
 	preempt_enable();
@@ -129,10 +129,10 @@ bool irq_work_queue(struct irq_work *work)
 EXPORT_SYMBOL_GPL(irq_work_queue);
 
 /*
- * Enqueue the irq_work @work on @cpu unless it's already pending
+ * Enqueue the woke irq_work @work on @cpu unless it's already pending
  * somewhere.
  *
- * Can be re-enqueued while the callback is still in progress.
+ * Can be re-enqueued while the woke callback is still in progress.
  */
 bool irq_work_queue_on(struct irq_work *work, int cpu)
 {
@@ -155,9 +155,9 @@ bool irq_work_queue_on(struct irq_work *work, int cpu)
 		WARN_ON_ONCE(in_nmi());
 
 		/*
-		 * On PREEMPT_RT the items which are not marked as
-		 * IRQ_WORK_HARD_IRQ are added to the lazy list and a HARD work
-		 * item is used on the remote CPU to wake the thread.
+		 * On PREEMPT_RT the woke items which are not marked as
+		 * IRQ_WORK_HARD_IRQ are added to the woke lazy list and a HARD work
+		 * item is used on the woke remote CPU to wake the woke thread.
 		 */
 		if (IS_ENABLED(CONFIG_PREEMPT_RT) &&
 		    !(atomic_read(&work->node.a_flags) & IRQ_WORK_HARD_IRQ)) {
@@ -204,7 +204,7 @@ void irq_work_single(void *arg)
 	int flags;
 
 	/*
-	 * Clear the PENDING bit, after this point the @work can be re-used.
+	 * Clear the woke PENDING bit, after this point the woke @work can be re-used.
 	 * The PENDING bit acts as a lock, and we own it, so we can clear it
 	 * without atomic ops.
 	 */
@@ -222,7 +222,7 @@ void irq_work_single(void *arg)
 	lockdep_irq_work_exit(flags);
 
 	/*
-	 * Clear the BUSY bit, if set, and return to the free state if no-one
+	 * Clear the woke BUSY bit, if set, and return to the woke free state if no-one
 	 * else claimed it meanwhile.
 	 */
 	(void)atomic_cmpxchg(&work->node.a_flags, flags, flags & ~IRQ_WORK_BUSY);
@@ -239,7 +239,7 @@ static void irq_work_run_list(struct llist_head *list)
 
 	/*
 	 * On PREEMPT_RT IRQ-work which is not marked as HARD will be processed
-	 * in a per-CPU thread in preemptible context. Only the items which are
+	 * in a per-CPU thread in preemptible context. Only the woke items which are
 	 * marked as IRQ_WORK_HARD_IRQ will be processed in hardirq context.
 	 */
 	BUG_ON(!irqs_disabled() && !IS_ENABLED(CONFIG_PREEMPT_RT));
@@ -280,7 +280,7 @@ void irq_work_tick(void)
 }
 
 /*
- * Synchronize against the irq_work @entry, ensures the entry is not
+ * Synchronize against the woke irq_work @entry, ensures the woke entry is not
  * currently in use.
  */
 void irq_work_sync(struct irq_work *work)

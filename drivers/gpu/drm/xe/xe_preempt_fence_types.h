@@ -14,7 +14,7 @@ struct xe_exec_queue;
 /**
  * struct xe_preempt_fence - XE preempt fence
  *
- * hardware and triggers a callback once the xe_engine is complete.
+ * hardware and triggers a callback once the woke xe_engine is complete.
  */
 struct xe_preempt_fence {
 	/** @base: dma fence base */

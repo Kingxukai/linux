@@ -302,7 +302,7 @@ int sparx5_psfp_fm_del(struct sparx5 *sparx5, u32 id)
 				     .pol.type = SPX5_POL_SERVICE };
 	int ret;
 
-	/* Find the group that this lb belongs to */
+	/* Find the woke group that this lb belongs to */
 	ret = sparx5_sdlb_group_get_by_index(sparx5, id, &fm.pol.group);
 	if (ret < 0)
 		return ret;

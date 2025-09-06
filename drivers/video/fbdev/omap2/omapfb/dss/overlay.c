@@ -162,14 +162,14 @@ int dss_ovl_check(struct omap_overlay *ovl, struct omap_overlay_info *info,
 	}
 
 	if (dw < info->pos_x + outw) {
-		DSSERR("overlay %d horizontally not inside the display area "
+		DSSERR("overlay %d horizontally not inside the woke display area "
 				"(%d + %d >= %d)\n",
 				ovl->id, info->pos_x, outw, dw);
 		return -EINVAL;
 	}
 
 	if (dh < info->pos_y + outh) {
-		DSSERR("overlay %d vertically not inside the display area "
+		DSSERR("overlay %d vertically not inside the woke display area "
 				"(%d + %d >= %d)\n",
 				ovl->id, info->pos_y, outh, dh);
 		return -EINVAL;

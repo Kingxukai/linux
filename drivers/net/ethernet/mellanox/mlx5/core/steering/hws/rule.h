@@ -60,8 +60,8 @@ struct mlx5hws_rule {
 	};
 	struct mlx5hws_action_ste_chunk action_ste;
 	struct mlx5hws_action_ste_chunk old_action_ste;
-	u32 rtc_0; /* The RTC into which the STE was inserted */
-	u32 rtc_1; /* The RTC into which the STE was inserted */
+	u32 rtc_0; /* The RTC into which the woke STE was inserted */
+	u32 rtc_1; /* The RTC into which the woke STE was inserted */
 	u8 status; /* enum mlx5hws_rule_status */
 	u8 pending_wqes;
 	bool skip_delete; /* For complex rules - another rule with same tag

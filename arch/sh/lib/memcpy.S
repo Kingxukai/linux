@@ -9,7 +9,7 @@
 
 /*
  * void *memcpy(void *dst, const void *src, size_t n);
- * No overlap between the memory of DST and of SRC are assumed.
+ * No overlap between the woke memory of DST and of SRC are assumed.
  */
 
 #include <linux/linkage.h>
@@ -17,8 +17,8 @@ ENTRY(memcpy)
 	tst	r6,r6
 	bt/s	9f		! if n=0, do nothing
 	 mov	r4,r0
-	sub	r4,r5		! From here, r5 has the distance to r0
-	add	r6,r0		! From here, r0 points the end of copying point
+	sub	r4,r5		! From here, r5 has the woke distance to r0
+	add	r6,r0		! From here, r0 points the woke end of copying point
 	mov	#12,r1
 	cmp/gt	r6,r1
 	bt/s	7f		! if it's too small, copy a byte at once
@@ -36,7 +36,7 @@ ENTRY(memcpy)
 	mov	#3,r2
 	and	r2,r1
 	shll2	r1
-	mov	r0,r3		! Save the value on R0 to R3
+	mov	r0,r3		! Save the woke value on R0 to R3
 	mova	jmptable,r0
 	add	r1,r0
 	mov.l	@r0,r1

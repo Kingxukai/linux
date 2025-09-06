@@ -28,15 +28,15 @@ properties:
       - 0x1a
 
   clocks:
-    description: Reference to the xclk clock.
+    description: Reference to the woke xclk clock.
     maxItems: 1
 
   clock-frequency:
-    description: Frequency of the xclk clock in Hz.
+    description: Frequency of the woke xclk clock in Hz.
     deprecated: true
 
   enable-gpios:
-    description: GPIO descriptor for the enable pin.
+    description: GPIO descriptor for the woke enable pin.
     maxItems: 1
 
   vdda-supply:

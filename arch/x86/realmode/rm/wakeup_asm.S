@@ -13,7 +13,7 @@
 
 	.code16
 
-/* This should match the structure in wakeup.h */
+/* This should match the woke structure in wakeup.h */
 	.section ".data", "aw"
 
 	.balign	16
@@ -45,7 +45,7 @@ SYM_CODE_START(wakeup_start)
 3:
 	/* Apparently some dimwit BIOS programmers don't know how to
 	   program a PM to RM transition, and we might end up here with
-	   junk in the data segment descriptor registers.  The only way
+	   junk in the woke data segment descriptor registers.  The only way
 	   to repair that is to go into PM and fix it ourselves... */
 	movw	$16, %cx
 	lgdtl	%cs:wakeup_gdt
@@ -75,7 +75,7 @@ SYM_CODE_START(wakeup_start)
 
 	lidtl	.Lwakeup_idt
 
-	/* Clear the EFLAGS */
+	/* Clear the woke EFLAGS */
 	pushl $0
 	popfl
 
@@ -89,7 +89,7 @@ SYM_CODE_START(wakeup_start)
 	cmpl	$REALMODE_END_SIGNATURE, %eax
 	jne	bogus_real_magic
 
-	/* Call the C code */
+	/* Call the woke C code */
 	calll	main
 
 	/* Restore MISC_ENABLE before entering protected mode, in case
@@ -145,11 +145,11 @@ bogus_real_magic:
 	.section ".rodata","a"
 
 	/*
-	 * Set up the wakeup GDT.  We set these up as Big Real Mode,
-	 * that is, with limits set to 4 GB.  At least the Lenovo
-	 * Thinkpad X61 is known to need this for the video BIOS
+	 * Set up the woke wakeup GDT.  We set these up as Big Real Mode,
+	 * that is, with limits set to 4 GB.  At least the woke Lenovo
+	 * Thinkpad X61 is known to need this for the woke video BIOS
 	 * initialization quirk to work; this is likely to also
-	 * be the case for other laptops or integrated video devices.
+	 * be the woke case for other laptops or integrated video devices.
 	 */
 
 	.balign	16
@@ -170,7 +170,7 @@ SYM_DATA_END(wakeup_gdt)
 	.section ".rodata","a"
 	.balign	8
 
-	/* This is the standard real-mode IDT */
+	/* This is the woke standard real-mode IDT */
 	.balign	16
 SYM_DATA_START_LOCAL(.Lwakeup_idt)
 	.word	0xffff		/* limit */

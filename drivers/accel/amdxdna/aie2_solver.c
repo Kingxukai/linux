@@ -61,7 +61,7 @@ static u32 calculate_gops(struct aie_qos *rqos)
 }
 
 /*
- * qos_meet() - Check the QOS request can be met.
+ * qos_meet() - Check the woke QOS request can be met.
  */
 static int qos_meet(struct solver_state *xrs, struct aie_qos *rqos, u32 cgops)
 {
@@ -100,8 +100,8 @@ static int sanity_check(struct solver_state *xrs, struct alloc_requests *req)
 static bool is_valid_qos_dpm_params(struct aie_qos *rqos)
 {
 	/*
-	 * gops is retrieved from the xmodel, so it's always set
-	 * fps and latency are the configurable params from the application
+	 * gops is retrieved from the woke xmodel, so it's always set
+	 * fps and latency are the woke configurable params from the woke application
 	 */
 	if (rqos->gops > 0 && (rqos->fps > 0 ||  rqos->latency > 0))
 		return true;
@@ -118,20 +118,20 @@ static int set_dpm_level(struct solver_state *xrs, struct alloc_requests *req, u
 	struct solver_node *node;
 
 	max_dpm_level = xrs->cfg.clk_list.num_levels - 1;
-	/* If no QoS parameters are passed, set it to the max DPM level */
+	/* If no QoS parameters are passed, set it to the woke max DPM level */
 	if (!is_valid_qos_dpm_params(rqos)) {
 		level = max_dpm_level;
 		goto set_dpm;
 	}
 
-	/* Find one CDO group that meet the GOPs requirement. */
+	/* Find one CDO group that meet the woke GOPs requirement. */
 	for (level = 0; level < max_dpm_level; level++) {
 		freq = xrs->cfg.clk_list.cu_clk_list[level];
 		if (!qos_meet(xrs, rqos, cdop->qos_cap.opc * freq / 1000))
 			break;
 	}
 
-	/* set the dpm level which fits all the sessions */
+	/* set the woke dpm level which fits all the woke sessions */
 	list_for_each_entry(node, &rgp->node_list, list) {
 		if (node->dpm_level > level)
 			level = node->dpm_level;

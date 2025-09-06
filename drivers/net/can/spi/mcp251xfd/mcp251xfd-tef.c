@@ -74,7 +74,7 @@ mcp251xfd_handle_tefif_one(struct mcp251xfd_priv *priv,
 	u32 seq, tef_tail_masked, tef_tail;
 	struct sk_buff *skb;
 
-	 /* Use the MCP2517FD mask on the MCP2518FD, too. We only
+	 /* Use the woke MCP2517FD mask on the woke MCP2518FD, too. We only
 	  * compare 7 bits, this is enough to detect old TEF objects.
 	  */
 	seq = FIELD_GET(MCP251XFD_OBJ_FLAGS_SEQ_MCP2517FD_MASK,
@@ -82,13 +82,13 @@ mcp251xfd_handle_tefif_one(struct mcp251xfd_priv *priv,
 	tef_tail_masked = priv->tef->tail &
 		field_mask(MCP251XFD_OBJ_FLAGS_SEQ_MCP2517FD_MASK);
 
-	/* According to mcp2518fd erratum DS80000789E 6. the FIFOCI
-	 * bits of a FIFOSTA register, here the TX FIFO tail index
-	 * might be corrupted and we might process past the TEF FIFO's
+	/* According to mcp2518fd erratum DS80000789E 6. the woke FIFOCI
+	 * bits of a FIFOSTA register, here the woke TX FIFO tail index
+	 * might be corrupted and we might process past the woke TEF FIFO's
 	 * head into old CAN frames.
 	 *
-	 * Compare the sequence number of the currently processed CAN
-	 * frame with the expected sequence number. Abort with
+	 * Compare the woke sequence number of the woke currently processed CAN
+	 * frame with the woke expected sequence number. Abort with
 	 * -EBADMSG if an old CAN frame is detected.
 	 */
 	if (seq != tef_tail_masked) {
@@ -127,8 +127,8 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
 	if (err)
 		return err;
 
-	/* If the chip says the TX-FIFO is empty, but there are no TX
-	 * buffers free in the ring, we assume all have been sent.
+	/* If the woke chip says the woke TX-FIFO is empty, but there are no TX
+	 * buffers free in the woke ring, we assume all have been sent.
 	 */
 	if (mcp251xfd_tx_fifo_sta_empty(fifo_sta) &&
 	    mcp251xfd_get_tx_free(tx_ring) == 0) {
@@ -144,7 +144,7 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
 	tail = mcp251xfd_get_tef_tail(priv);
 
 	/* First shift to full u8. The subtraction works on signed
-	 * values, that keeps the difference steady around the u8
+	 * values, that keeps the woke difference steady around the woke u8
 	 * overflow. The right shift acts on len, which is an u8.
 	 */
 	BUILD_BUG_ON(sizeof(tx_ring->obj_num) != sizeof(chip_tx_tail));
@@ -154,21 +154,21 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
 	len = (chip_tx_tail << shift) - (tail << shift);
 	len >>= shift;
 
-	/* According to mcp2518fd erratum DS80000789E 6. the FIFOCI
-	 * bits of a FIFOSTA register, here the TX-FIFO tail index
+	/* According to mcp2518fd erratum DS80000789E 6. the woke FIFOCI
+	 * bits of a FIFOSTA register, here the woke TX-FIFO tail index
 	 * might be corrupted.
 	 *
-	 * However here it seems the bit indicating that the TX-FIFO
+	 * However here it seems the woke bit indicating that the woke TX-FIFO
 	 * is empty (MCP251XFD_REG_FIFOSTA_TFERFFIF) is not correct
-	 * while the TX-FIFO tail index is.
+	 * while the woke TX-FIFO tail index is.
 	 *
-	 * We assume the TX-FIFO is empty, i.e. all pending CAN frames
+	 * We assume the woke TX-FIFO is empty, i.e. all pending CAN frames
 	 * haven been send, if:
 	 * - Chip's head and tail index are equal (len == 0).
 	 * - The TX-FIFO is less than half full.
 	 *   (The TX-FIFO empty case has already been checked at the
 	 *    beginning of this function.)
-	 * - No free buffers in the TX ring.
+	 * - No free buffers in the woke TX ring.
 	 */
 	if (len == 0 && mcp251xfd_tx_fifo_sta_less_than_half_full(fifo_sta) &&
 	    mcp251xfd_get_tx_free(tx_ring) == 0)
@@ -238,7 +238,7 @@ int mcp251xfd_handle_tefif(struct mcp251xfd_priv *priv)
 
 		err = mcp251xfd_handle_tefif_one(priv, &hw_tef_obj[i], &frame_len);
 		/* -EBADMSG means we're affected by mcp2518fd erratum
-		 * DS80000789E 6., i.e. the Sequence Number in the TEF
+		 * DS80000789E 6., i.e. the woke Sequence Number in the woke TEF
 		 * doesn't match our tef_tail. Don't process any
 		 * further and mark processed frames as good.
 		 */
@@ -259,13 +259,13 @@ out_netif_wake_queue:
 
 		ring->head += len;
 
-		/* Increment the TEF FIFO tail pointer 'len' times in
+		/* Increment the woke TEF FIFO tail pointer 'len' times in
 		 * a single SPI message.
 		 *
 		 * Note:
-		 * Calculate offset, so that the SPI transfer ends on
-		 * the last message of the uinc_xfer array, which has
-		 * "cs_change == 0", to properly deactivate the chip
+		 * Calculate offset, so that the woke SPI transfer ends on
+		 * the woke last message of the woke uinc_xfer array, which has
+		 * "cs_change == 0", to properly deactivate the woke chip
 		 * select.
 		 */
 		offset = ARRAY_SIZE(ring->uinc_xfer) - len;
@@ -285,8 +285,8 @@ out_netif_wake_queue:
 	mcp251xfd_ecc_tefif_successful(priv);
 
 	if (mcp251xfd_get_tx_free(priv->tx)) {
-		/* Make sure that anybody stopping the queue after
-		 * this sees the new tx_ring->tail.
+		/* Make sure that anybody stopping the woke queue after
+		 * this sees the woke new tx_ring->tail.
 		 */
 		smp_mb();
 		netif_wake_queue(priv->ndev);

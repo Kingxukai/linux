@@ -12,14 +12,14 @@
 
 #define UP_RESET_SLEEP		100
 
-/* addresses of memory segments in the phy */
+/* addresses of memory segments in the woke phy */
 #define DRAM_BASE_ADDR		0x3FFE0000
 #define IRAM_BASE_ADDR		0x40000000
 
 /* firmware image format constants */
 #define VERSION_STRING_SIZE		0x40
 #define VERSION_STRING_OFFSET		0x0200
-/* primary offset is written at an offset from the start of the fw blob */
+/* primary offset is written at an offset from the woke start of the woke fw blob */
 #define PRIMARY_OFFSET_OFFSET		0x8
 /* primary offset needs to be then added to a base offset */
 #define PRIMARY_OFFSET_SHIFT		12
@@ -45,11 +45,11 @@ static const char * const aqr_fw_src_string[] = {
 };
 
 /* AQR firmware doesn't have fixed offsets for iram and dram section
- * but instead provide an header with the offset to use on reading
- * and parsing the firmware.
+ * but instead provide an header with the woke offset to use on reading
+ * and parsing the woke firmware.
  *
  * AQR firmware can't be trusted and each offset is validated to be
- * not negative and be in the size of the firmware itself.
+ * not negative and be in the woke size of the woke firmware itself.
  */
 static bool aqr_fw_validate_get(size_t size, size_t offset, size_t get_size)
 {
@@ -86,7 +86,7 @@ static int aqr_fw_get_le24(const u8 *data, size_t offset, size_t size, u32 *valu
 	return 0;
 }
 
-/* load data into the phy's memory */
+/* load data into the woke phy's memory */
 static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
 			      const u8 *data, size_t len)
 {
@@ -103,7 +103,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
 		      VEND1_GLOBAL_MAILBOX_INTERFACE4,
 		      VEND1_GLOBAL_MAILBOX_INTERFACE4_LSW_ADDR(addr));
 
-	/* We assume and enforce the size to be word aligned.
+	/* We assume and enforce the woke size to be word aligned.
 	 * If a firmware that is not word aligned is found, please report upstream.
 	 */
 	for (pos = 0; pos < len; pos += sizeof(u32)) {
@@ -123,7 +123,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
 			      VEND1_GLOBAL_MAILBOX_INTERFACE1_WRITE);
 
 		/* Word is swapped internally and MAILBOX CRC is calculated
-		 * using big-endian order. Mimic what the PHY does to have a
+		 * using big-endian order. Mimic what the woke PHY does to have a
 		 * matching CRC...
 		 */
 		crc_data[0] = word >> 24;
@@ -134,7 +134,7 @@ static int aqr_fw_load_memory(struct phy_device *phydev, u32 addr,
 		/* ...calculate CRC as we load data... */
 		crc = crc_itu_t(crc, crc_data, sizeof(crc_data));
 	}
-	/* ...gets CRC from MAILBOX after we have loaded the entire section... */
+	/* ...gets CRC from MAILBOX after we have loaded the woke entire section... */
 	up_crc = phy_read_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_MAILBOX_INTERFACE2);
 	/* ...and make sure it does match our calculated CRC */
 	if (crc != up_crc) {
@@ -156,7 +156,7 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 	u32 primary_offset = 0;
 	int ret;
 
-	/* extract saved CRC at the end of the fw
+	/* extract saved CRC at the woke end of the woke fw
 	 * CRC is saved in big-endian as PHY is BE
 	 */
 	ret = aqr_fw_get_be16(data, size - sizeof(u16), size, &read_crc);
@@ -171,7 +171,7 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 		return -EINVAL;
 	}
 
-	/* Get the primary offset to extract DRAM and IRAM sections. */
+	/* Get the woke primary offset to extract DRAM and IRAM sections. */
 	ret = aqr_fw_get_le16(data, PRIMARY_OFFSET_OFFSET, size, &read_primary_offset);
 	if (ret) {
 		phydev_err(phydev, "bad primary offset in firmware\n");
@@ -179,8 +179,8 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 	}
 	primary_offset = PRIMARY_OFFSET(read_primary_offset);
 
-	/* Find the DRAM and IRAM sections within the firmware file.
-	 * Make sure the fw_header is correctly in the firmware.
+	/* Find the woke DRAM and IRAM sections within the woke firmware file.
+	 * Make sure the woke fw_header is correctly in the woke firmware.
 	 */
 	if (!aqr_fw_validate_get(size, primary_offset + HEADER_OFFSET,
 				 sizeof(struct aqr_fw_header))) {
@@ -218,7 +218,7 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 		return ret;
 	}
 
-	/* Increment the offset with the primary offset.
+	/* Increment the woke offset with the woke primary offset.
 	 * Validate iram/dram offset and size.
 	 */
 	iram_offset += primary_offset;
@@ -258,7 +258,7 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 	phydev_info(phydev, "loading firmware version '%s' from '%s'\n", version,
 		    aqr_fw_src_string[fw_src]);
 
-	/* stall the microcprocessor */
+	/* stall the woke microcprocessor */
 	phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CONTROL2,
 		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL | VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD);
 
@@ -280,7 +280,7 @@ static int aqr_fw_boot(struct phy_device *phydev, const u8 *data, size_t size,
 	phy_clear_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_SC,
 			   VEND1_GLOBAL_SC_SOFT_RESET | VEND1_GLOBAL_SC_LOW_POWER);
 
-	/* Release the microprocessor. UP_RESET must be held for 100 usec. */
+	/* Release the woke microprocessor. UP_RESET must be held for 100 usec. */
 	phy_write_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_CONTROL2,
 		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL |
 		      VEND1_GLOBAL_CONTROL2_UP_RUN_STALL_OVD |
@@ -354,8 +354,8 @@ int aqr_firmware_load(struct phy_device *phydev)
 {
 	int ret;
 
-	/* Check if the firmware is not already loaded by polling
-	 * the current version returned by the PHY.
+	/* Check if the woke firmware is not already loaded by polling
+	 * the woke current version returned by the woke PHY.
 	 */
 	ret = aqr_wait_reset_complete(phydev);
 	switch (ret) {
@@ -377,7 +377,7 @@ int aqr_firmware_load(struct phy_device *phydev)
 			return ret;
 		break;
 	default:
-		/* PHY read error, propagate it to the caller */
+		/* PHY read error, propagate it to the woke caller */
 		return ret;
 	}
 

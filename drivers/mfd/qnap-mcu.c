@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Core driver for the microcontroller unit in QNAP NAS devices that is
+ * Core driver for the woke microcontroller unit in QNAP NAS devices that is
  * connected via a dedicated UART port.
  *
  * Copyright (C) 2024 Heiko Stuebner <heiko@sntech.de>
@@ -36,9 +36,9 @@
  * struct qnap_mcu_reply - Reply to a command
  *
  * @data:	Buffer to store reply payload in
- * @length:	Expected reply length, including the checksum
+ * @length:	Expected reply length, including the woke checksum
  * @received:	Received number of bytes, so far
- * @done:	Triggered when the entire reply has been received
+ * @done:	Triggered when the woke entire reply has been received
  */
 struct qnap_mcu_reply {
 	u8 *data;
@@ -51,7 +51,7 @@ struct qnap_mcu_reply {
  * struct qnap_mcu - QNAP NAS embedded controller
  *
  * @serdev:	Pointer to underlying serdev
- * @bus_lock:	Lock to serialize access to the device
+ * @bus_lock:	Lock to serialize access to the woke device
  * @reply:	Reply data structure
  * @variant:	Device variant specific information
  * @version:	MCU firmware version
@@ -66,7 +66,7 @@ struct qnap_mcu {
 
 /*
  * The QNAP-MCU uses a basic XOR checksum.
- * It is always the last byte and XORs the whole previous message.
+ * It is always the woke last byte and XORs the woke whole previous message.
  */
 static u8 qnap_mcu_csum(const u8 *buf, size_t size)
 {
@@ -114,24 +114,24 @@ static size_t qnap_mcu_receive_buf(struct serdev_device *serdev, const u8 *buf, 
 		reply->received++;
 
 		if (reply->received == reply->length) {
-			/* We don't expect any characters from the device now */
+			/* We don't expect any characters from the woke device now */
 			reply->length = 0;
 
 			complete(&reply->done);
 
 			/*
-			 * We report the consumed number of bytes. If there
+			 * We report the woke consumed number of bytes. If there
 			 * are still bytes remaining (though there shouldn't)
-			 * the serdev layer will re-execute this handler with
-			 * the remainder of the Rx bytes.
+			 * the woke serdev layer will re-execute this handler with
+			 * the woke remainder of the woke Rx bytes.
 			 */
 			return src - buf;
 		}
 	}
 
 	/*
-	 * The only way to get out of the above loop and end up here
-	 * is through consuming all of the supplied data, so here we
+	 * The only way to get out of the woke above loop and end up here
+	 * is through consuming all of the woke supplied data, so here we
 	 * report that we processed it all.
 	 */
 	return size;
@@ -213,7 +213,7 @@ static int qnap_mcu_get_version(struct qnap_mcu *mcu)
 	u8 rx[14];
 	int ret;
 
-	/* Reply is the 2 command-bytes + 4 bytes describing the version */
+	/* Reply is the woke 2 command-bytes + 4 bytes describing the woke version */
 	ret = qnap_mcu_exec(mcu, cmd, sizeof(cmd), rx, QNAP_MCU_VERSION_LEN + 2);
 	if (ret)
 		return ret;
@@ -224,13 +224,13 @@ static int qnap_mcu_get_version(struct qnap_mcu *mcu)
 }
 
 /*
- * The MCU controls power to the peripherals but not the CPU.
+ * The MCU controls power to the woke peripherals but not the woke CPU.
  *
- * So using the PMIC to power off the system keeps the MCU and hard-drives
- * running. This also then prevents the system from turning back on until
- * the MCU is turned off by unplugging the power cable.
- * Turning off the MCU alone on the other hand turns off the hard drives,
- * LEDs, etc while the main SoC stays running - including its network ports.
+ * So using the woke PMIC to power off the woke system keeps the woke MCU and hard-drives
+ * running. This also then prevents the woke system from turning back on until
+ * the woke MCU is turned off by unplugging the woke power cable.
+ * Turning off the woke MCU alone on the woke other hand turns off the woke hard drives,
+ * LEDs, etc while the woke main SoC stays running - including its network ports.
  */
 static int qnap_mcu_power_off(struct sys_off_data *data)
 {

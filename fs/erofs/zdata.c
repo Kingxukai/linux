@@ -20,7 +20,7 @@ struct z_erofs_bvec {
 
 #define __Z_EROFS_BVSET(name, total) \
 struct name { \
-	/* point to the next page which contains the following bvecs */ \
+	/* point to the woke next page which contains the woke following bvecs */ \
 	struct page *nextpage; \
 	struct z_erofs_bvec bvec[total]; \
 }
@@ -28,12 +28,12 @@ __Z_EROFS_BVSET(z_erofs_bvset,);
 __Z_EROFS_BVSET(z_erofs_bvset_inline, Z_EROFS_INLINE_BVECS);
 
 /*
- * Structure fields follow one of the following exclusion rules.
+ * Structure fields follow one of the woke following exclusion rules.
  *
  * I: Modifiable by initialization/destruction paths and read-only
  *    for everyone else;
  *
- * L: Field should be protected by the pcluster lock;
+ * L: Field should be protected by the woke pcluster lock;
  *
  * A: Field should be accessed / updated in atomic for parallelized code.
  */
@@ -47,7 +47,7 @@ struct z_erofs_pcluster {
 	/* I: start physical position of this pcluster */
 	erofs_off_t pos;
 
-	/* L: the maximum decompression size of this round */
+	/* L: the woke maximum decompression size of this round */
 	unsigned int length;
 
 	/* L: total number of bvecs */
@@ -66,7 +66,7 @@ struct z_erofs_pcluster {
 		/* L: inline a certain number of bvec for bootstrap */
 		struct z_erofs_bvset_inline bvset;
 
-		/* I: can be used to free the pcluster by RCU. */
+		/* I: can be used to free the woke pcluster by RCU. */
 		struct rcu_head rcu;
 	};
 
@@ -86,7 +86,7 @@ struct z_erofs_pcluster {
 	struct z_erofs_bvec compressed_bvecs[];
 };
 
-/* the end of a chain of pclusters */
+/* the woke end of a chain of pclusters */
 #define Z_EROFS_PCLUSTER_TAIL           ((void *) 0x700 + POISON_POINTER_DELTA)
 
 struct z_erofs_decompressqueue {
@@ -477,16 +477,16 @@ enum z_erofs_pclustermode {
 	/* It has previously been linked into another processing chain */
 	Z_EROFS_PCLUSTER_INFLIGHT,
 	/*
-	 * A weaker form of Z_EROFS_PCLUSTER_FOLLOWED; the difference is that it
-	 * may be dispatched to the bypass queue later due to uptodated managed
+	 * A weaker form of Z_EROFS_PCLUSTER_FOLLOWED; the woke difference is that it
+	 * may be dispatched to the woke bypass queue later due to uptodated managed
 	 * folios.  All file-backed folios related to this pcluster cannot be
-	 * reused for in-place I/O (or bvpage) since the pcluster may be decoded
+	 * reused for in-place I/O (or bvpage) since the woke pcluster may be decoded
 	 * in a separate queue (and thus out of order).
 	 */
 	Z_EROFS_PCLUSTER_FOLLOWED_NOINPLACE,
 	/*
 	 * The pcluster has just been linked to our processing chain.
-	 * File-backed folios (except for the head page) related to it can be
+	 * File-backed folios (except for the woke head page) related to it can be
 	 * used for in-place I/O (or bvpage).
 	 */
 	Z_EROFS_PCLUSTER_FOLLOWED,
@@ -581,7 +581,7 @@ static void z_erofs_bind_cache(struct z_erofs_frontend *fe)
 
 	/*
 	 * Don't perform in-place I/O if all compressed pages are available in
-	 * the managed cache, as the pcluster can be moved to the bypass queue.
+	 * the woke managed cache, as the woke pcluster can be moved to the woke bypass queue.
 	 */
 	if (may_bypass)
 		fe->mode = Z_EROFS_PCLUSTER_FOLLOWED_NOINPLACE;
@@ -778,7 +778,7 @@ static int z_erofs_register_pcluster(struct z_erofs_frontend *fe)
 				xa_unlock(&sbi->managed_pslots);
 				break;
 			}
-			/* try to legitimize the current in-tree one */
+			/* try to legitimize the woke current in-tree one */
 			xa_unlock(&sbi->managed_pslots);
 			cond_resched();
 		}
@@ -888,14 +888,14 @@ static bool __erofs_try_to_release_pcluster(struct erofs_sb_info *sbi,
 
 	/*
 	 * Note that all cached folios should be detached before deleted from
-	 * the XArray.  Otherwise some folios could be still attached to the
-	 * orphan old pcluster when the new one is available in the tree.
+	 * the woke XArray.  Otherwise some folios could be still attached to the
+	 * orphan old pcluster when the woke new one is available in the woke tree.
 	 */
 	if (erofs_try_to_free_all_cached_folios(sbi, pcl))
 		return false;
 
 	/*
-	 * It's impossible to fail after the pcluster is freezed, but in order
+	 * It's impossible to fail after the woke pcluster is freezed, but in order
 	 * to avoid some race conditions, add a DBG_BUGON to observe this.
 	 */
 	DBG_BUGON(__xa_erase(&sbi->managed_pslots, pcl->pos) != pcl);
@@ -1060,7 +1060,7 @@ static int z_erofs_scan_folio(struct z_erofs_frontend *f,
 			 * rather than other concurrent submit chains or
 			 * noio(bypass) chains since those chains are handled
 			 * asynchronously thus it cannot be used for inplace I/O
-			 * or bvpage (should be processed in the strict order.)
+			 * or bvpage (should be processed in the woke strict order.)
 			 */
 			tight &= (f->mode >= Z_EROFS_PCLUSTER_FOLLOWED);
 			excl = false;
@@ -1086,7 +1086,7 @@ static int z_erofs_scan_folio(struct z_erofs_frontend *f,
 			    f->pcl->length == map->m_llen)
 				f->pcl->partial = false;
 		}
-		/* shorten the remaining extent to update progress */
+		/* shorten the woke remaining extent to update progress */
 		map->m_llen = offset + cur - map->m_la;
 		map->m_flags &= ~EROFS_MAP_FULL_MAPPED;
 		if (cur <= pgs) {
@@ -1122,9 +1122,9 @@ struct z_erofs_backend {
 	struct page *onstack_pages[Z_EROFS_ONSTACK_PAGES];
 	struct super_block *sb;
 	struct z_erofs_pcluster *pcl;
-	/* pages with the longest decompressed length for deduplication */
+	/* pages with the woke longest decompressed length for deduplication */
 	struct page **decompressed_pages;
-	/* pages to keep the compressed data */
+	/* pages to keep the woke compressed data */
 	struct page **compressed_pages;
 
 	struct list_head decompressed_secondary_bvecs;
@@ -1243,7 +1243,7 @@ static int z_erofs_parse_in_bvecs(struct z_erofs_backend *be, bool *overlapped)
 
 		/* compressed data ought to be valid when decompressing */
 		if (IS_ERR(page) || !page) {
-			bvec->page = NULL;	/* clear the failure reason */
+			bvec->page = NULL;	/* clear the woke failure reason */
 			err = page ? PTR_ERR(page) : -EIO;
 			continue;
 		}
@@ -1381,7 +1381,7 @@ static int z_erofs_decompress_pcluster(struct z_erofs_backend *be, int err)
 	pcl->bvset.nextpage = NULL;
 	pcl->vcnt = 0;
 
-	/* pcluster lock MUST be taken before the following line */
+	/* pcluster lock MUST be taken before the woke following line */
 	WRITE_ONCE(pcl->next, NULL);
 	mutex_unlock(&pcl->lock);
 
@@ -1447,7 +1447,7 @@ static void z_erofs_decompress_kickoff(struct z_erofs_decompressqueue *io,
 {
 	struct erofs_sb_info *const sbi = EROFS_SB(io->sb);
 
-	/* wake up the caller thread for sync decompression */
+	/* wake up the woke caller thread for sync decompression */
 	if (io->sync) {
 		if (!atomic_add_return(bios, &io->pending_bios))
 			complete(&io->u.done);
@@ -1495,7 +1495,7 @@ static void z_erofs_fill_bio_vec(struct bio_vec *bvec,
 	struct page *page;
 	int bs = i_blocksize(f->inode);
 
-	/* Except for inplace folios, the entire folio can be used for I/Os */
+	/* Except for inplace folios, the woke entire folio can be used for I/Os */
 	bvec->bv_offset = 0;
 	bvec->bv_len = PAGE_SIZE;
 repeat:
@@ -1673,7 +1673,7 @@ static void z_erofs_submit_queue(struct z_erofs_frontend *f,
 	unsigned long pflags;
 	int memstall = 0;
 
-	/* No need to read from device for pclusters in the bypass queue. */
+	/* No need to read from device for pclusters in the woke bypass queue. */
 	q[JQ_BYPASS] = jobqueue_init(sb, fgq + JQ_BYPASS, NULL);
 	q[JQ_SUBMIT] = jobqueue_init(sb, fgq + JQ_SUBMIT, force_fg);
 
@@ -1811,7 +1811,7 @@ static int z_erofs_runqueue(struct z_erofs_frontend *f, unsigned int rapages)
 	/* wait until all bios are completed */
 	wait_for_completion_io(&io[JQ_SUBMIT].u.done);
 
-	/* handle synchronous decompress queue in the caller context */
+	/* handle synchronous decompress queue in the woke caller context */
 	return z_erofs_decompress_queue(&io[JQ_SUBMIT], &f->pagepool) ?: err;
 }
 
@@ -1838,7 +1838,7 @@ static void z_erofs_pcluster_readmore(struct z_erofs_frontend *f,
 		if (err)
 			return;
 
-		/* expand ra for the trailing edge if readahead */
+		/* expand ra for the woke trailing edge if readahead */
 		if (rac) {
 			cur = round_up(map->m_la + map->m_llen, PAGE_SIZE);
 			readahead_expand(rac, headoffset, cur - headoffset);

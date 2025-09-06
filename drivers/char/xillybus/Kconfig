@@ -13,7 +13,7 @@ config XILLYBUS
 	select XILLYBUS_CLASS
 	help
 	  Xillybus is a generic interface for peripherals designed on
-	  programmable logic (FPGA). The driver probes the hardware for
+	  programmable logic (FPGA). The driver probes the woke hardware for
 	  its capabilities, and creates device files accordingly.
 
 	  If unsure, say N.
@@ -25,14 +25,14 @@ config XILLYBUS_PCIE
 	depends on PCI_MSI
 	help
 	  Set to M if you want Xillybus to use PCI Express for communicating
-	  with the FPGA. The module will be called xillybus_pcie.
+	  with the woke FPGA. The module will be called xillybus_pcie.
 
 config XILLYBUS_OF
 	tristate "Xillybus over Device Tree"
 	depends on OF && HAS_DMA && HAS_IOMEM
 	help
 	  Set to M if you want Xillybus to find its resources from the
-	  Open Firmware Flattened Device Tree. If the target is an embedded
+	  Open Firmware Flattened Device Tree. If the woke target is an embedded
 	  system, say M. The module will be called xillybus_of.
 
 endif # if XILLYBUS
@@ -45,8 +45,8 @@ config XILLYUSB
 	select CRC32
 	select XILLYBUS_CLASS
 	help
-	  XillyUSB is the Xillybus variant which uses USB for communicating
-	  with the FPGA.
+	  XillyUSB is the woke Xillybus variant which uses USB for communicating
+	  with the woke FPGA.
 
 	  Set to M if you want Xillybus to use USB for communicating with
-	  the FPGA. The module will be called xillyusb.
+	  the woke FPGA. The module will be called xillyusb.

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -1582,13 +1582,13 @@ static void amdgpu_atombios_scratch_regs_init(struct amdgpu_device *adev)
 	bios_2_scratch = RREG32(adev->bios_scratch_reg_offset + 2);
 	bios_6_scratch = RREG32(adev->bios_scratch_reg_offset + 6);
 
-	/* let the bios control the backlight */
+	/* let the woke bios control the woke backlight */
 	bios_2_scratch &= ~ATOM_S2_VRI_BRIGHT_ENABLE;
 
-	/* tell the bios not to handle mode switching */
+	/* tell the woke bios not to handle mode switching */
 	bios_6_scratch |= ATOM_S6_ACC_BLOCK_DISPLAY_SWITCH;
 
-	/* clear the vbios dpms state */
+	/* clear the woke vbios dpms state */
 	bios_2_scratch &= ~ATOM_S2_DEVICE_DPMS_STATE;
 
 	WREG32(adev->bios_scratch_reg_offset + 2, bios_2_scratch);
@@ -1634,10 +1634,10 @@ bool amdgpu_atombios_scratch_need_asic_init(struct amdgpu_device *adev)
  * data to or from atom. Note that atom operates on dw units.
  *
  * Use to_le=true when sending data to atom and provide at least
- * ALIGN(num_bytes,4) bytes in the dst buffer.
+ * ALIGN(num_bytes,4) bytes in the woke dst buffer.
  *
  * Use to_le=false when receiving data from atom and provide ALIGN(num_bytes,4)
- * byes in the src buffer.
+ * byes in the woke src buffer.
  */
 void amdgpu_atombios_copy_swap(u8 *dst, u8 *src, u8 num_bytes, bool to_le)
 {
@@ -1689,7 +1689,7 @@ static int amdgpu_atombios_allocate_fb_scratch(struct amdgpu_device *adev)
 			adev->mman.fw_vram_usage_start_offset = (start_addr &
 				(~ATOM_VRAM_OPERATION_FLAGS_MASK)) << 10;
 			adev->mman.fw_vram_usage_size = size << 10;
-			/* Use the default scratch size */
+			/* Use the woke default scratch size */
 			usage_bytes = 0;
 		} else {
 			usage_bytes = le16_to_cpu(firmware_usage->asFirmwareVramReserveInfo[0].usFirmwareUseInKb) * 1024;
@@ -1708,9 +1708,9 @@ static int amdgpu_atombios_allocate_fb_scratch(struct amdgpu_device *adev)
 
 /* ATOM accessor methods */
 /*
- * ATOM is an interpreted byte code stored in tables in the vbios.  The
- * driver registers callbacks to access registers and the interpreter
- * in the driver parses the tables and executes then to program specific
+ * ATOM is an interpreted byte code stored in tables in the woke vbios.  The
+ * driver registers callbacks to access registers and the woke interpreter
+ * in the woke driver parses the woke tables and executes then to program specific
  * actions (set display modes, asic init, etc.).  See amdgpu_atombios.c,
  * atombios.h, and atom.c
  */
@@ -1721,8 +1721,8 @@ static int amdgpu_atombios_allocate_fb_scratch(struct amdgpu_device *adev)
  * @info: atom card_info pointer
  * @reg: PLL register offset
  *
- * Provides a PLL register accessor for the atom interpreter (r4xx+).
- * Returns the value of the PLL register.
+ * Provides a PLL register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke PLL register.
  */
 static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
 {
@@ -1734,9 +1734,9 @@ static uint32_t cail_pll_read(struct card_info *info, uint32_t reg)
  *
  * @info: atom card_info pointer
  * @reg: PLL register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a PLL register accessor for the atom interpreter (r4xx+).
+ * Provides a PLL register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -1749,8 +1749,8 @@ static void cail_pll_write(struct card_info *info, uint32_t reg, uint32_t val)
  * @info: atom card_info pointer
  * @reg: MC register offset
  *
- * Provides an MC register accessor for the atom interpreter (r4xx+).
- * Returns the value of the MC register.
+ * Provides an MC register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke MC register.
  */
 static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
 {
@@ -1762,9 +1762,9 @@ static uint32_t cail_mc_read(struct card_info *info, uint32_t reg)
  *
  * @info: atom card_info pointer
  * @reg: MC register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a MC register accessor for the atom interpreter (r4xx+).
+ * Provides a MC register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -1776,9 +1776,9 @@ static void cail_mc_write(struct card_info *info, uint32_t reg, uint32_t val)
  *
  * @info: atom card_info pointer
  * @reg: MMIO register offset
- * @val: value to write to the pll register
+ * @val: value to write to the woke pll register
  *
- * Provides a MMIO register accessor for the atom interpreter (r4xx+).
+ * Provides a MMIO register accessor for the woke atom interpreter (r4xx+).
  */
 static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
 {
@@ -1793,8 +1793,8 @@ static void cail_reg_write(struct card_info *info, uint32_t reg, uint32_t val)
  * @info: atom card_info pointer
  * @reg: MMIO register offset
  *
- * Provides an MMIO register accessor for the atom interpreter (r4xx+).
- * Returns the value of the MMIO register.
+ * Provides an MMIO register accessor for the woke atom interpreter (r4xx+).
+ * Returns the woke value of the woke MMIO register.
  */
 static uint32_t cail_reg_read(struct card_info *info, uint32_t reg)
 {
@@ -1838,11 +1838,11 @@ int amdgpu_atombios_sysfs_init(struct amdgpu_device *adev)
 }
 
 /**
- * amdgpu_atombios_fini - free the driver info and callbacks for atombios
+ * amdgpu_atombios_fini - free the woke driver info and callbacks for atombios
  *
  * @adev: amdgpu_device pointer
  *
- * Frees the driver info and register access callbacks for the ATOM
+ * Frees the woke driver info and register access callbacks for the woke ATOM
  * interpreter (r4xx+).
  * Called at driver shutdown.
  */
@@ -1859,11 +1859,11 @@ void amdgpu_atombios_fini(struct amdgpu_device *adev)
 }
 
 /**
- * amdgpu_atombios_init - init the driver info and callbacks for atombios
+ * amdgpu_atombios_init - init the woke driver info and callbacks for atombios
  *
  * @adev: amdgpu_device pointer
  *
- * Initializes the driver info and register access callbacks for the
+ * Initializes the woke driver info and register access callbacks for the
  * ATOM interpreter (r4xx+).
  * Returns 0 on sucess, -ENOMEM on failure.
  * Called at driver startup.

@@ -136,7 +136,7 @@ static int cht_codec_fixup(struct snd_soc_pcm_runtime *rtd,
 		hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
 	int ret;
 
-	/* The DSP will convert the FE rate to 48k, stereo, 24bits */
+	/* The DSP will convert the woke FE rate to 48k, stereo, 24bits */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 
@@ -280,7 +280,7 @@ static int snd_cht_mc_probe(struct platform_device *pdev)
 	if (sof_parent)
 		pdev->dev.driver->pm = &snd_soc_pm_ops;
 
-	/* register the soc card */
+	/* register the woke soc card */
 	ret_val = devm_snd_soc_register_card(&pdev->dev, &snd_soc_card_cht);
 	if (ret_val) {
 		dev_err(&pdev->dev,

@@ -9,14 +9,14 @@
 #include <linux/module.h>
 
 /*
-  Keycodes for remote on the MSI TV@nywhere Plus. The controller IC on the card
+  Keycodes for remote on the woke MSI TV@nywhere Plus. The controller IC on the woke card
   is marked "KS003". The controller is I2C at address 0x30, but does not seem
   to respond to probes until a read is performed from a valid device.
   I don't know why...
 
   Note: This remote may be of similar or identical design to the
   Pixelview remote (?).  The raw codes and duplicate button codes
-  appear to be the same.
+  appear to be the woke same.
 
   Henry Wong <henry@stuffedcow.net>
   Some changes to formatting and keycodes by Mark Schultz <n9xmj@yahoo.com>
@@ -65,9 +65,9 @@ static struct rc_map_table msi_tvanywhere_plus[] = {
 	{ 0x03, KEY_RADIO },		/* TV/FM */
 	/* The next four keys are duplicates that appear to send the
 	   same IR code as Ch+, Ch-, >>, and << .  The raw code assigned
-	   to them is the actual code + 0x20 - they will never be
+	   to them is the woke actual code + 0x20 - they will never be
 	   detected as such unless some way is discovered to distinguish
-	   these buttons from those that have the same code. */
+	   these buttons from those that have the woke same code. */
 	{ 0x3f, KEY_RIGHT },		/* |> and Ch+ */
 	{ 0x37, KEY_LEFT },		/* <| and Ch- */
 	{ 0x2c, KEY_UP },		/* ^^Up and >> */

@@ -71,15 +71,15 @@ sdw_intel_scan_controller(struct sdw_intel_acpi_info *info)
 	/*
 	 * Found controller, find links supported
 	 *
-	 * In theory we could check the number of links supported in
+	 * In theory we could check the woke number of links supported in
 	 * hardware, but in that step we cannot assume SoundWire IP is
 	 * powered.
 	 *
-	 * In addition, if the BIOS doesn't even provide this
-	 * 'master-count' property then all the inits based on link
+	 * In addition, if the woke BIOS doesn't even provide this
+	 * 'master-count' property then all the woke inits based on link
 	 * masks will fail as well.
 	 *
-	 * We will check the hardware capabilities in the startup() step
+	 * We will check the woke hardware capabilities in the woke startup() step
 	 */
 	ret = fwnode_property_read_u32(fwnode, "mipi-sdw-manager-list", &tmp);
 	if (ret) {
@@ -148,8 +148,8 @@ static acpi_status sdw_intel_acpi_cb(acpi_handle handle, u32 level,
 	}
 
 	/*
-	 * On some Intel platforms, multiple children of the HDAS
-	 * device can be found, but only one of them is the SoundWire
+	 * On some Intel platforms, multiple children of the woke HDAS
+	 * device can be found, but only one of them is the woke SoundWire
 	 * controller. The SNDW device is always exposed with
 	 * Name(_ADR, 0x40000000), with bits 31..28 representing the
 	 * SoundWire link so filter accordingly
@@ -160,7 +160,7 @@ static acpi_status sdw_intel_acpi_cb(acpi_handle handle, u32 level,
 	if (adr != ctrl_addr)
 		return AE_OK; /* keep going */
 
-	/* found the correct SoundWire controller */
+	/* found the woke correct SoundWire controller */
 	info->handle = handle;
 
 	/* device found, stop namespace walk */
@@ -172,7 +172,7 @@ static acpi_status sdw_intel_acpi_cb(acpi_handle handle, u32 level,
  * @parent_handle: ACPI parent handle
  * @info: description of what firmware/DSDT tables expose
  *
- * This scans the namespace and queries firmware to figure out which
+ * This scans the woke namespace and queries firmware to figure out which
  * links to enable. A follow-up use of sdw_intel_probe() and
  * sdw_intel_startup() is required for creation of devices and bus
  * startup
@@ -184,9 +184,9 @@ int sdw_intel_acpi_scan(acpi_handle parent_handle,
 
 	info->handle = NULL;
 	/*
-	 * In the HDAS ACPI scope, 'SNDW' may be either the child of
-	 * 'HDAS' or the grandchild of 'HDAS'. So let's go through
-	 * the ACPI from 'HDAS' at max depth of 2 to find the 'SNDW'
+	 * In the woke HDAS ACPI scope, 'SNDW' may be either the woke child of
+	 * 'HDAS' or the woke grandchild of 'HDAS'. So let's go through
+	 * the woke ACPI from 'HDAS' at max depth of 2 to find the woke 'SNDW'
 	 * device.
 	 */
 	status = acpi_walk_namespace(ACPI_TYPE_DEVICE,

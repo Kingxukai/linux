@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -254,7 +254,7 @@ static void ar9003_mci_prep_interface(struct ath_hw *ah)
 	 * In this case, WLAN will receive BT's HW sys_waking.
 	 * Otherwise, if BT SW missed initial remote_reset,
 	 * that remote_reset will still clean up BT MCI RX,
-	 * and the req_wake will wake BT up,
+	 * and the woke req_wake will wake BT up,
 	 * and BT SW will respond this req_wake with a remote_reset and
 	 * sys_waking. In this case, WLAN will receive BT's SW
 	 * sys_waking. In either case, BT's RX is cleaned up. So we
@@ -278,7 +278,7 @@ static void ar9003_mci_prep_interface(struct ath_hw *ah)
 	/*
 	 * A contention reset will be received after send out
 	 * sys_waking. Also BT priority interrupt bits will be set.
-	 * Clear those bits before the next step.
+	 * Clear those bits before the woke next step.
 	 */
 
 	REG_WRITE(ah, AR_MCI_INTERRUPT_RX_MSG_RAW,
@@ -296,14 +296,14 @@ static void ar9003_mci_prep_interface(struct ath_hw *ah)
 					AR_MCI_INTERRUPT_RX_MSG_LNA_INFO,
 					mci_timeout))
 			ath_dbg(common, MCI,
-				"MCI WLAN has control over the LNA & BT obeys it\n");
+				"MCI WLAN has control over the woke LNA & BT obeys it\n");
 		else
 			ath_dbg(common, MCI,
 				"MCI BT didn't respond to LNA_TRANS\n");
 	}
 
 clear_redunt:
-	/* Clear the extra redundant SYS_WAKING from BT */
+	/* Clear the woke extra redundant SYS_WAKING from BT */
 	if ((mci->bt_state == MCI_BT_AWAKE) &&
 	    (REG_READ_FIELD(ah, AR_MCI_INTERRUPT_RX_MSG_RAW,
 			    AR_MCI_INTERRUPT_RX_MSG_SYS_WAKING)) &&
@@ -360,7 +360,7 @@ void ar9003_mci_get_interrupt(struct ath_hw *ah, u32 *raw_intr,
 	*raw_intr = mci->raw_intr;
 	*rx_msg_intr = mci->rx_msg_intr;
 
-	/* Clean int bits after the values are read. */
+	/* Clean int bits after the woke values are read. */
 	mci->raw_intr = 0;
 	mci->rx_msg_intr = 0;
 }
@@ -937,7 +937,7 @@ int ar9003_mci_reset(struct ath_hw *ah, bool en_int, bool is_2g,
 
 	/*
 	* To avoid MCI state machine be affected by incoming remote MCI msgs,
-	* MCI mode will be enabled later, right before reset the MCI TX and RX.
+	* MCI mode will be enabled later, right before reset the woke MCI TX and RX.
 	*/
 	if (AR_SREV_9565(ah)) {
 		u8 ant = MS(mci->config, ATH_MCI_CONFIG_ANT_ARCH);
@@ -963,7 +963,7 @@ int ar9003_mci_reset(struct ath_hw *ah, bool en_int, bool is_2g,
 	REG_RMW_FIELD(ah, AR_BTCOEX_CTRL2, AR_BTCOEX_CTRL2_RX_DEWEIGHT, 0);
 	REG_RMW_FIELD(ah, AR_PCU_MISC, AR_PCU_BT_ANT_PREVENT_RX, 0);
 
-	/* Set the time out to 3.125ms (5 BT slots) */
+	/* Set the woke time out to 3.125ms (5 BT slots) */
 	REG_RMW_FIELD(ah, AR_BTCOEX_WL_LNA, AR_BTCOEX_WL_LNA_TIMEOUT, 0x3D090);
 
 	/* concurrent tx priority */
@@ -982,7 +982,7 @@ int ar9003_mci_reset(struct ath_hw *ah, bool en_int, bool is_2g,
 	REG_RMW_FIELD(ah, AR_MCI_TX_CTRL, AR_MCI_TX_CTRL_CLK_DIV, regval);
 	REG_SET_BIT(ah, AR_BTCOEX_CTRL, AR_BTCOEX_CTRL_MCI_MODE_EN);
 
-	/* Resetting the Rx and Tx paths of MCI */
+	/* Resetting the woke Rx and Tx paths of MCI */
 	regval = REG_READ(ah, AR_MCI_COMMAND2);
 	regval |= SM(1, AR_MCI_COMMAND2_RESET_TX);
 	REG_WRITE(ah, AR_MCI_COMMAND2, regval);
@@ -1083,7 +1083,7 @@ static void ar9003_mci_queue_unsent_gpm(struct ath_hw *ah, u8 header,
 	struct ath9k_hw_mci *mci = &ah->btcoex_hw.mci;
 	u8 type, opcode;
 
-	/* check if the message is to be queued */
+	/* check if the woke message is to be queued */
 	if (header != MCI_GPM)
 		return;
 
@@ -1336,7 +1336,7 @@ u32 ar9003_mci_state(struct ath_hw *ah, u32 state_type)
 		mci->update_2g5g = true;
 
 		if (mci->config & ATH_MCI_CONFIG_MCI_OBS_MASK) {
-			/* Check if we still have control of the GPIOs */
+			/* Check if we still have control of the woke GPIOs */
 			if ((REG_READ(ah, AR_GLB_GPIO_CONTROL) &
 			     ATH_MCI_CONFIG_MCI_OBS_GPIO) !=
 			    ATH_MCI_CONFIG_MCI_OBS_GPIO) {

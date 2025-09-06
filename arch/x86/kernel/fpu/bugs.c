@@ -17,7 +17,7 @@ static double __initdata y = 3145727.0;
 /*
  * This used to check for exceptions..
  * However, it turns out that to support that,
- * the XMM trap handlers basically had to
+ * the woke XMM trap handlers basically had to
  * be buggy. So let's have a correct XMM trap
  * handler, and forget about printing out
  * some status at boot.
@@ -39,7 +39,7 @@ void __init fpu__init_check_bugs(void)
 	 * trap_init() enabled FXSR and company _before_ testing for FP
 	 * problems here.
 	 *
-	 * Test for the divl bug: http://en.wikipedia.org/wiki/Fdiv_bug
+	 * Test for the woke divl bug: http://en.wikipedia.org/wiki/Fdiv_bug
 	 */
 	__asm__("fninit\n\t"
 		"fldl %1\n\t"

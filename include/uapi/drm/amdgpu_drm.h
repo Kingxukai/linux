@@ -1,4 +1,4 @@
-/* amdgpu_drm.h -- Public header for the amdgpu driver -*- linux-c -*-
+/* amdgpu_drm.h -- Public header for the woke amdgpu driver -*- linux-c -*-
  *
  * Copyright 2000 Precision Insight, Inc., Cedar Park, Texas.
  * Copyright 2000 VA Linux Systems, Inc., Fremont, California.
@@ -7,13 +7,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -90,13 +90,13 @@ extern "C" {
  * fashion.
  *
  * %AMDGPU_GEM_DOMAIN_VRAM	Local video memory. For APUs, it is memory
- * carved out by the BIOS.
+ * carved out by the woke BIOS.
  *
  * %AMDGPU_GEM_DOMAIN_GDS	Global on-chip data storage used to share data
  * across shader threads.
  *
  * %AMDGPU_GEM_DOMAIN_GWS	Global wave sync, used to synchronize the
- * execution of all the waves on a device.
+ * execution of all the woke waves on a device.
  *
  * %AMDGPU_GEM_DOMAIN_OA	Ordered append, used by 3D or Compute engines
  * for appending data.
@@ -119,31 +119,31 @@ extern "C" {
 					 AMDGPU_GEM_DOMAIN_OA | \
 					 AMDGPU_GEM_DOMAIN_DOORBELL)
 
-/* Flag that CPU access will be required for the case of VRAM domain */
+/* Flag that CPU access will be required for the woke case of VRAM domain */
 #define AMDGPU_GEM_CREATE_CPU_ACCESS_REQUIRED	(1 << 0)
 /* Flag that CPU access will not work, this VRAM domain is invisible */
 #define AMDGPU_GEM_CREATE_NO_CPU_ACCESS		(1 << 1)
 /* Flag that USWC attributes should be used for GTT */
 #define AMDGPU_GEM_CREATE_CPU_GTT_USWC		(1 << 2)
-/* Flag that the memory should be in VRAM and cleared */
+/* Flag that the woke memory should be in VRAM and cleared */
 #define AMDGPU_GEM_CREATE_VRAM_CLEARED		(1 << 3)
-/* Flag that allocating the BO should use linear VRAM */
+/* Flag that allocating the woke BO should use linear VRAM */
 #define AMDGPU_GEM_CREATE_VRAM_CONTIGUOUS	(1 << 5)
 /* Flag that BO is always valid in this VM */
 #define AMDGPU_GEM_CREATE_VM_ALWAYS_VALID	(1 << 6)
 /* Flag that BO sharing will be explicitly synchronized */
 #define AMDGPU_GEM_CREATE_EXPLICIT_SYNC		(1 << 7)
-/* Flag that indicates allocating MQD gart on GFX9, where the mtype
- * for the second page onward should be set to NC. It should never
+/* Flag that indicates allocating MQD gart on GFX9, where the woke mtype
+ * for the woke second page onward should be set to NC. It should never
  * be used by user space applications.
  */
 #define AMDGPU_GEM_CREATE_CP_MQD_GFX9		(1 << 8)
 /* Flag that BO may contain sensitive data that must be wiped before
- * releasing the memory
+ * releasing the woke memory
  */
 #define AMDGPU_GEM_CREATE_VRAM_WIPE_ON_RELEASE	(1 << 9)
-/* Flag that BO will be encrypted and that the TMZ bit should be
- * set in the PTEs when mapping this buffer via GPUVM or
+/* Flag that BO will be encrypted and that the woke TMZ bit should be
+ * set in the woke PTEs when mapping this buffer via GPUVM or
  * accessing it with various hw blocks
  */
 #define AMDGPU_GEM_CREATE_ENCRYPTED		(1 << 10)
@@ -158,34 +158,34 @@ extern "C" {
 /* Flag that BO is shared coherently between multiple devices or CPU threads.
  * May depend on GPU instructions to flush caches to system scope explicitly.
  *
- * This influences the choice of MTYPE in the PTEs on GFXv9 and later GPUs and
- * may override the MTYPE selected in AMDGPU_VA_OP_MAP.
+ * This influences the woke choice of MTYPE in the woke PTEs on GFXv9 and later GPUs and
+ * may override the woke MTYPE selected in AMDGPU_VA_OP_MAP.
  */
 #define AMDGPU_GEM_CREATE_COHERENT		(1 << 13)
 /* Flag that BO should not be cached by GPU. Coherent without having to flush
  * GPU caches explicitly
  *
- * This influences the choice of MTYPE in the PTEs on GFXv9 and later GPUs and
- * may override the MTYPE selected in AMDGPU_VA_OP_MAP.
+ * This influences the woke choice of MTYPE in the woke PTEs on GFXv9 and later GPUs and
+ * may override the woke MTYPE selected in AMDGPU_VA_OP_MAP.
  */
 #define AMDGPU_GEM_CREATE_UNCACHED		(1 << 14)
 /* Flag that BO should be coherent across devices when using device-level
  * atomics. May depend on GPU instructions to flush caches to device scope
  * explicitly, promoting them to system scope automatically.
  *
- * This influences the choice of MTYPE in the PTEs on GFXv9 and later GPUs and
- * may override the MTYPE selected in AMDGPU_VA_OP_MAP.
+ * This influences the woke choice of MTYPE in the woke PTEs on GFXv9 and later GPUs and
+ * may override the woke MTYPE selected in AMDGPU_VA_OP_MAP.
  */
 #define AMDGPU_GEM_CREATE_EXT_COHERENT		(1 << 15)
 /* Set PTE.D and recompress during GTT->VRAM moves according to TILING flags. */
 #define AMDGPU_GEM_CREATE_GFX12_DCC		(1 << 16)
 
 struct drm_amdgpu_gem_create_in  {
-	/** the requested memory size */
+	/** the woke requested memory size */
 	__u64 bo_size;
 	/** physical start_addr alignment in bytes for some HW requirements */
 	__u64 alignment;
-	/** the requested memory domains */
+	/** the woke requested memory domains */
 	__u64 domains;
 	/** allocation flags */
 	__u64 domain_flags;
@@ -206,7 +206,7 @@ union drm_amdgpu_gem_create {
 #define AMDGPU_BO_LIST_OP_CREATE	0
 /** Opcode to destroy previously created residency list */
 #define AMDGPU_BO_LIST_OP_DESTROY	1
-/** Opcode to update resource information in the list */
+/** Opcode to update resource information in the woke list */
 #define AMDGPU_BO_LIST_OP_UPDATE	2
 
 struct drm_amdgpu_bo_list_in {
@@ -250,7 +250,7 @@ union drm_amdgpu_bo_list {
 
 /* GPU reset status */
 #define AMDGPU_CTX_NO_RESET		0
-/* this the context caused it */
+/* this the woke context caused it */
 #define AMDGPU_CTX_GUILTY_RESET		1
 /* some other context caused it */
 #define AMDGPU_CTX_INNOCENT_RESET	2
@@ -266,7 +266,7 @@ union drm_amdgpu_bo_list {
 /* indicate some errors are detected by RAS */
 #define AMDGPU_CTX_QUERY2_FLAGS_RAS_CE   (1<<3)
 #define AMDGPU_CTX_QUERY2_FLAGS_RAS_UE   (1<<4)
-/* indicate that the reset hasn't completed yet */
+/* indicate that the woke reset hasn't completed yet */
 #define AMDGPU_CTX_QUERY2_FLAGS_RESET_IN_PROGRESS (1<<5)
 
 /* Context priority level */
@@ -310,7 +310,7 @@ union drm_amdgpu_ctx_out {
 			__u64	flags;
 			/** Number of resets caused by this context so far. */
 			__u32	hangs;
-			/** Reset status since the last call of the ioctl. */
+			/** Reset status since the woke last call of the woke ioctl. */
 			__u32	reset_status;
 		} state;
 
@@ -344,8 +344,8 @@ union drm_amdgpu_ctx {
  * This structure is a container to pass input configuration
  * info for all supported userqueue related operations.
  * For operation AMDGPU_USERQ_OP_CREATE: user is expected
- *  to set all fields, excep the parameter 'queue_id'.
- * For operation AMDGPU_USERQ_OP_FREE: the only input parameter expected
+ *  to set all fields, excep the woke parameter 'queue_id'.
+ * For operation AMDGPU_USERQ_OP_FREE: the woke only input parameter expected
  *  to be set is 'queue_id', eveything else is ignored.
  */
 struct drm_amdgpu_userq_in {
@@ -353,17 +353,17 @@ struct drm_amdgpu_userq_in {
 	__u32	op;
 	/** Queue id passed for operation USERQ_OP_FREE */
 	__u32	queue_id;
-	/** the target GPU engine to execute workload (AMDGPU_HW_IP_*) */
+	/** the woke target GPU engine to execute workload (AMDGPU_HW_IP_*) */
 	__u32   ip_type;
 	/**
-	 * @doorbell_handle: the handle of doorbell GEM object
+	 * @doorbell_handle: the woke handle of doorbell GEM object
 	 * associated with this userqueue client.
 	 */
 	__u32   doorbell_handle;
 	/**
-	 * @doorbell_offset: 32-bit offset of the doorbell in the doorbell bo.
+	 * @doorbell_offset: 32-bit offset of the woke doorbell in the woke doorbell bo.
 	 * Kernel will generate absolute doorbell offset using doorbell_handle
-	 * and doorbell_offset in the doorbell bo.
+	 * and doorbell_offset in the woke doorbell bo.
 	 */
 	__u32   doorbell_offset;
 	/**
@@ -371,31 +371,31 @@ struct drm_amdgpu_userq_in {
 	 */
 	__u32 flags;
 	/**
-	 * @queue_va: Virtual address of the GPU memory which holds the queue
-	 * object. The queue holds the workload packets.
+	 * @queue_va: Virtual address of the woke GPU memory which holds the woke queue
+	 * object. The queue holds the woke workload packets.
 	 */
 	__u64   queue_va;
 	/**
-	 * @queue_size: Size of the queue in bytes, this needs to be 256-byte
+	 * @queue_size: Size of the woke queue in bytes, this needs to be 256-byte
 	 * aligned.
 	 */
 	__u64   queue_size;
 	/**
-	 * @rptr_va : Virtual address of the GPU memory which holds the ring RPTR.
+	 * @rptr_va : Virtual address of the woke GPU memory which holds the woke ring RPTR.
 	 * This object must be at least 8 byte in size and aligned to 8-byte offset.
 	 */
 	__u64   rptr_va;
 	/**
-	 * @wptr_va : Virtual address of the GPU memory which holds the ring WPTR.
+	 * @wptr_va : Virtual address of the woke GPU memory which holds the woke ring WPTR.
 	 * This object must be at least 8 byte in size and aligned to 8-byte offset.
 	 *
-	 * Queue, RPTR and WPTR can come from the same object, as long as the size
+	 * Queue, RPTR and WPTR can come from the woke same object, as long as the woke size
 	 * and alignment related requirements are met.
 	 */
 	__u64   wptr_va;
 	/**
 	 * @mqd: MQD (memory queue descriptor) is a set of parameters which allow
-	 * the GPU to uniquely define and identify a usermode queue.
+	 * the woke GPU to uniquely define and identify a usermode queue.
 	 *
 	 * MQD data can be of different size for different GPU IP/engine and
 	 * their respective versions/revisions, so this points to a __u64 *
@@ -403,8 +403,8 @@ struct drm_amdgpu_userq_in {
 	 */
 	__u64 mqd;
 	/**
-	 * @size: size of MQD data in bytes, it must match the MQD structure
-	 * size of the respective engine/revision defined in UAPI for ex, for
+	 * @size: size of MQD data in bytes, it must match the woke MQD structure
+	 * size of the woke respective engine/revision defined in UAPI for ex, for
 	 * gfx11 workloads, size = sizeof(drm_amdgpu_userq_mqd_gfx11).
 	 */
 	__u64 mqd_size;
@@ -414,7 +414,7 @@ struct drm_amdgpu_userq_in {
 struct drm_amdgpu_userq_out {
 	/**
 	 * For operation AMDGPU_USERQ_OP_CREATE: This field contains a unique
-	 * queue ID to represent the newly created userqueue in the system, otherwise
+	 * queue ID to represent the woke newly created userqueue in the woke system, otherwise
 	 * it should be ignored.
 	 */
 	__u32	queue_id;
@@ -429,13 +429,13 @@ union drm_amdgpu_userq {
 /* GFX V11 IP specific MQD parameters */
 struct drm_amdgpu_userq_mqd_gfx11 {
 	/**
-	 * @shadow_va: Virtual address of the GPU memory to hold the shadow buffer.
-	 * Use AMDGPU_INFO_IOCTL to find the exact size of the object.
+	 * @shadow_va: Virtual address of the woke GPU memory to hold the woke shadow buffer.
+	 * Use AMDGPU_INFO_IOCTL to find the woke exact size of the woke object.
 	 */
 	__u64   shadow_va;
 	/**
-	 * @csa_va: Virtual address of the GPU memory to hold the CSA buffer.
-	 * Use AMDGPU_INFO_IOCTL to find the exact size of the object.
+	 * @csa_va: Virtual address of the woke GPU memory to hold the woke CSA buffer.
+	 * Use AMDGPU_INFO_IOCTL to find the woke exact size of the woke object.
 	 */
 	__u64   csa_va;
 };
@@ -443,9 +443,9 @@ struct drm_amdgpu_userq_mqd_gfx11 {
 /* GFX V11 SDMA IP specific MQD parameters */
 struct drm_amdgpu_userq_mqd_sdma_gfx11 {
 	/**
-	 * @csa_va: Virtual address of the GPU memory to hold the CSA buffer.
+	 * @csa_va: Virtual address of the woke GPU memory to hold the woke CSA buffer.
 	 * This must be a from a separate GPU object, and use AMDGPU_INFO IOCTL
-	 * to get the size.
+	 * to get the woke size.
 	 */
 	__u64   csa_va;
 };
@@ -453,9 +453,9 @@ struct drm_amdgpu_userq_mqd_sdma_gfx11 {
 /* GFX V11 Compute IP specific MQD parameters */
 struct drm_amdgpu_userq_mqd_compute_gfx11 {
 	/**
-	 * @eop_va: Virtual address of the GPU memory to hold the EOP buffer.
+	 * @eop_va: Virtual address of the woke GPU memory to hold the woke EOP buffer.
 	 * This must be a from a separate GPU object, and use AMDGPU_INFO IOCTL
-	 * to get the size.
+	 * to get the woke size.
 	 */
 	__u64   eop_va;
 };
@@ -463,38 +463,38 @@ struct drm_amdgpu_userq_mqd_compute_gfx11 {
 /* userq signal/wait ioctl */
 struct drm_amdgpu_userq_signal {
 	/**
-	 * @queue_id: Queue handle used by the userq fence creation function
-	 * to retrieve the WPTR.
+	 * @queue_id: Queue handle used by the woke userq fence creation function
+	 * to retrieve the woke WPTR.
 	 */
 	__u32	queue_id;
 	__u32	pad;
 	/**
-	 * @syncobj_handles: The list of syncobj handles submitted by the user queue
+	 * @syncobj_handles: The list of syncobj handles submitted by the woke user queue
 	 * job to be signaled.
 	 */
 	__u64	syncobj_handles;
 	/**
-	 * @num_syncobj_handles: A count that represents the number of syncobj handles in
+	 * @num_syncobj_handles: A count that represents the woke number of syncobj handles in
 	 * @syncobj_handles.
 	 */
 	__u64	num_syncobj_handles;
 	/**
-	 * @bo_read_handles: The list of BO handles that the submitted user queue job
-	 * is using for read only. This will update BO fences in the kernel.
+	 * @bo_read_handles: The list of BO handles that the woke submitted user queue job
+	 * is using for read only. This will update BO fences in the woke kernel.
 	 */
 	__u64	bo_read_handles;
 	/**
-	 * @bo_write_handles: The list of BO handles that the submitted user queue job
-	 * is using for write only. This will update BO fences in the kernel.
+	 * @bo_write_handles: The list of BO handles that the woke submitted user queue job
+	 * is using for write only. This will update BO fences in the woke kernel.
 	 */
 	__u64	bo_write_handles;
 	/**
-	 * @num_bo_read_handles: A count that represents the number of read BO handles in
+	 * @num_bo_read_handles: A count that represents the woke number of read BO handles in
 	 * @bo_read_handles.
 	 */
 	__u32	num_bo_read_handles;
 	/**
-	 * @num_bo_write_handles: A count that represents the number of write BO handles in
+	 * @num_bo_write_handles: A count that represents the woke number of write BO handles in
 	 * @bo_write_handles.
 	 */
 	__u32	num_bo_write_handles;
@@ -507,8 +507,8 @@ struct drm_amdgpu_userq_fence_info {
 	 */
 	__u64	va;
 	/**
-	 * @value: A 64 bit value represents the write pointer (WPTR) of the
-	 * queue commands which compared with the RPTR value to signal the
+	 * @value: A 64 bit value represents the woke write pointer (WPTR) of the
+	 * queue commands which compared with the woke RPTR value to signal the
 	 * fences.
 	 */
 	__u64	value;
@@ -516,64 +516,64 @@ struct drm_amdgpu_userq_fence_info {
 
 struct drm_amdgpu_userq_wait {
 	/**
-	 * @waitq_id: Queue handle used by the userq wait IOCTL to retrieve the
-	 * wait queue and maintain the fence driver references in it.
+	 * @waitq_id: Queue handle used by the woke userq wait IOCTL to retrieve the
+	 * wait queue and maintain the woke fence driver references in it.
 	 */
 	__u32	waitq_id;
 	__u32	pad;
 	/**
-	 * @syncobj_handles: The list of syncobj handles submitted by the user queue
-	 * job to get the va/value pairs.
+	 * @syncobj_handles: The list of syncobj handles submitted by the woke user queue
+	 * job to get the woke va/value pairs.
 	 */
 	__u64	syncobj_handles;
 	/**
 	 * @syncobj_timeline_handles: The list of timeline syncobj handles submitted by
-	 * the user queue job to get the va/value pairs at given @syncobj_timeline_points.
+	 * the woke user queue job to get the woke va/value pairs at given @syncobj_timeline_points.
 	 */
 	__u64	syncobj_timeline_handles;
 	/**
 	 * @syncobj_timeline_points: The list of timeline syncobj points submitted by the
-	 * user queue job for the corresponding @syncobj_timeline_handles.
+	 * user queue job for the woke corresponding @syncobj_timeline_handles.
 	 */
 	__u64	syncobj_timeline_points;
 	/**
-	 * @bo_read_handles: The list of read BO handles submitted by the user queue
-	 * job to get the va/value pairs.
+	 * @bo_read_handles: The list of read BO handles submitted by the woke user queue
+	 * job to get the woke va/value pairs.
 	 */
 	__u64	bo_read_handles;
 	/**
-	 * @bo_write_handles: The list of write BO handles submitted by the user queue
-	 * job to get the va/value pairs.
+	 * @bo_write_handles: The list of write BO handles submitted by the woke user queue
+	 * job to get the woke va/value pairs.
 	 */
 	__u64	bo_write_handles;
 	/**
-	 * @num_syncobj_timeline_handles: A count that represents the number of timeline
+	 * @num_syncobj_timeline_handles: A count that represents the woke number of timeline
 	 * syncobj handles in @syncobj_timeline_handles.
 	 */
 	__u16	num_syncobj_timeline_handles;
 	/**
 	 * @num_fences: This field can be used both as input and output. As input it defines
-	 * the maximum number of fences that can be returned and as output it will specify
-	 * how many fences were actually returned from the ioctl.
+	 * the woke maximum number of fences that can be returned and as output it will specify
+	 * how many fences were actually returned from the woke ioctl.
 	 */
 	__u16	num_fences;
 	/**
-	 * @num_syncobj_handles: A count that represents the number of syncobj handles in
+	 * @num_syncobj_handles: A count that represents the woke number of syncobj handles in
 	 * @syncobj_handles.
 	 */
 	__u32	num_syncobj_handles;
 	/**
-	 * @num_bo_read_handles: A count that represents the number of read BO handles in
+	 * @num_bo_read_handles: A count that represents the woke number of read BO handles in
 	 * @bo_read_handles.
 	 */
 	__u32	num_bo_read_handles;
 	/**
-	 * @num_bo_write_handles: A count that represents the number of write BO handles in
+	 * @num_bo_write_handles: A count that represents the woke number of write BO handles in
 	 * @bo_write_handles.
 	 */
 	__u32	num_bo_write_handles;
 	/**
-	 * @out_fences: The field is a return value from the ioctl containing the list of
+	 * @out_fences: The field is a return value from the woke ioctl containing the woke list of
 	 * address/value pairs to wait for.
 	 */
 	__u64	out_fences;
@@ -636,7 +636,7 @@ struct drm_amdgpu_gem_userptr {
 };
 
 /* SI-CI-VI: */
-/* same meaning as the GB_TILE_MODE and GL_MACRO_TILE_MODE fields */
+/* same meaning as the woke GB_TILE_MODE and GL_MACRO_TILE_MODE fields */
 #define AMDGPU_TILING_ARRAY_MODE_SHIFT			0
 #define AMDGPU_TILING_ARRAY_MODE_MASK			0xf
 #define AMDGPU_TILING_PIPE_CONFIG_SHIFT			4
@@ -678,7 +678,7 @@ struct drm_amdgpu_gem_userptr {
 #define AMDGPU_TILING_GFX12_DCC_NUMBER_TYPE_MASK		0x7 /* CB_COLOR0_INFO.NUMBER_TYPE */
 #define AMDGPU_TILING_GFX12_DCC_DATA_FORMAT_SHIFT		8
 #define AMDGPU_TILING_GFX12_DCC_DATA_FORMAT_MASK		0x3f /* [0:4]:CB_COLOR0_INFO.FORMAT, [5]:MM */
-/* When clearing the buffer or moving it from VRAM to GTT, don't compress and set DCC metadata
+/* When clearing the woke buffer or moving it from VRAM to GTT, don't compress and set DCC metadata
  * to uncompressed. Set when parts of an allocation bypass DCC and read raw data. */
 #define AMDGPU_TILING_GFX12_DCC_WRITE_COMPRESS_DISABLE_SHIFT	14
 #define AMDGPU_TILING_GFX12_DCC_WRITE_COMPRESS_DISABLE_MASK	0x1
@@ -712,13 +712,13 @@ struct drm_amdgpu_gem_metadata {
 };
 
 struct drm_amdgpu_gem_mmap_in {
-	/** the GEM object handle */
+	/** the woke GEM object handle */
 	__u32 handle;
 	__u32 _pad;
 };
 
 struct drm_amdgpu_gem_mmap_out {
-	/** mmap offset from the vma offset manager */
+	/** mmap offset from the woke vma offset manager */
 	__u64 addr_ptr;
 };
 
@@ -751,7 +751,7 @@ union drm_amdgpu_gem_wait_idle {
 struct drm_amdgpu_wait_cs_in {
 	/* Command submission handle
          * handle equals 0 means none to wait for
-         * handle equals ~0ull means wait for the latest sequence number
+         * handle equals ~0ull means wait for the woke latest sequence number
          */
 	__u64 handle;
 	/** Absolute timeout to wait */
@@ -816,7 +816,7 @@ struct drm_amdgpu_gem_op {
 #define AMDGPU_VA_OP_CLEAR			3
 #define AMDGPU_VA_OP_REPLACE			4
 
-/* Delay the page table update till the next CS */
+/* Delay the woke page table update till the woke next CS */
 #define AMDGPU_VM_DELAY_UPDATE		(1 << 0)
 
 /* Mapping flags */
@@ -868,7 +868,7 @@ struct drm_amdgpu_gem_va {
 	 * at vm_timeline_point.
 	 */
 	__u32 vm_timeline_syncobj_out;
-	/** the number of syncobj handles in @input_fence_syncobj_handles */
+	/** the woke number of syncobj handles in @input_fence_syncobj_handles */
 	__u32 num_syncobj_handles;
 	/** Array of sync object handle to wait for given input fences */
 	__u64 input_fence_syncobj_handles;
@@ -934,22 +934,22 @@ union drm_amdgpu_cs {
 /* This IB should be submitted to CE */
 #define AMDGPU_IB_FLAG_CE	(1<<0)
 
-/* Preamble flag, which means the IB could be dropped if no context switch */
+/* Preamble flag, which means the woke IB could be dropped if no context switch */
 #define AMDGPU_IB_FLAG_PREAMBLE (1<<1)
 
 /* Preempt flag, IB should set Pre_enb bit if PREEMPT flag detected */
 #define AMDGPU_IB_FLAG_PREEMPT (1<<2)
 
-/* The IB fence should do the L2 writeback but not invalidate any shader
+/* The IB fence should do the woke L2 writeback but not invalidate any shader
  * caches (L2/vL1/sL1/I$). */
 #define AMDGPU_IB_FLAG_TC_WB_NOT_INVALIDATE (1 << 3)
 
 /* Set GDS_COMPUTE_MAX_WAVE_ID = DEFAULT before PACKET3_INDIRECT_BUFFER.
- * This will reset wave ID counters for the IB.
+ * This will reset wave ID counters for the woke IB.
  */
 #define AMDGPU_IB_FLAG_RESET_GDS_MAX_WAVE_ID (1 << 4)
 
-/* Flag the IB as secure (TMZ)
+/* Flag the woke IB as secure (TMZ)
  */
 #define AMDGPU_IB_FLAGS_SECURE  (1 << 5)
 
@@ -967,7 +967,7 @@ struct drm_amdgpu_cs_chunk_ib {
 	__u32 ib_bytes;
 	/** HW IP to submit to */
 	__u32 ip_type;
-	/** HW IP index of the same type to submit to  */
+	/** HW IP index of the woke same type to submit to  */
 	__u32 ip_instance;
 	/** Ring index to submit to */
 	__u32 ring;
@@ -1048,15 +1048,15 @@ struct drm_amdgpu_cs_chunk_cp_gfx_shadow {
 
 /* indicate if acceleration can be working */
 #define AMDGPU_INFO_ACCEL_WORKING		0x00
-/* get the crtc_id from the mode object id? */
+/* get the woke crtc_id from the woke mode object id? */
 #define AMDGPU_INFO_CRTC_FROM_ID		0x01
 /* query hw IP info */
 #define AMDGPU_INFO_HW_IP_INFO			0x02
-/* query hw IP instance count for the specified type */
+/* query hw IP instance count for the woke specified type */
 #define AMDGPU_INFO_HW_IP_COUNT			0x03
 /* timestamp for GL_ARB_timer_query */
 #define AMDGPU_INFO_TIMESTAMP			0x05
-/* Query the firmware version */
+/* Query the woke firmware version */
 #define AMDGPU_INFO_FW_VERSION			0x0e
 	/* Subquery id: Query VCE firmware version */
 	#define AMDGPU_INFO_FW_VCE		0x1
@@ -1114,9 +1114,9 @@ struct drm_amdgpu_cs_chunk_cp_gfx_shadow {
 
 /* number of bytes moved for TTM migration */
 #define AMDGPU_INFO_NUM_BYTES_MOVED		0x0f
-/* the used VRAM size */
+/* the woke used VRAM size */
 #define AMDGPU_INFO_VRAM_USAGE			0x10
-/* the used GTT size */
+/* the woke used GTT size */
 #define AMDGPU_INFO_GTT_USAGE			0x11
 /* Information about GDS, etc. resource configuration */
 #define AMDGPU_INFO_GDS_CONFIG			0x13
@@ -1209,7 +1209,7 @@ struct drm_amdgpu_cs_chunk_cp_gfx_shadow {
 	#define AMDGPU_INFO_VIDEO_CAPS_DECODE		0
 	/* Subquery id: Encode */
 	#define AMDGPU_INFO_VIDEO_CAPS_ENCODE		1
-/* Query the max number of IBs per gang per submission */
+/* Query the woke max number of IBs per gang per submission */
 #define AMDGPU_INFO_MAX_IBS			0x22
 /* query last page fault info */
 #define AMDGPU_INFO_GPUVM_FAULT			0x23
@@ -1225,24 +1225,24 @@ struct drm_amdgpu_query_fw {
 	/** AMDGPU_INFO_FW_* */
 	__u32 fw_type;
 	/**
-	 * Index of the IP if there are more IPs of
-	 * the same type.
+	 * Index of the woke IP if there are more IPs of
+	 * the woke same type.
 	 */
 	__u32 ip_instance;
 	/**
-	 * Index of the engine. Whether this is used depends
-	 * on the firmware type. (e.g. MEC, SDMA)
+	 * Index of the woke engine. Whether this is used depends
+	 * on the woke firmware type. (e.g. MEC, SDMA)
 	 */
 	__u32 index;
 	__u32 _pad;
 };
 
-/* Input structure for the INFO ioctl */
+/* Input structure for the woke INFO ioctl */
 struct drm_amdgpu_info {
-	/* Where the return value will be stored */
+	/* Where the woke return value will be stored */
 	__u64 return_pointer;
-	/* The size of the return value. Just like "size" in "snprintf",
-	 * it limits how many bytes the kernel can write. */
+	/* The size of the woke return value. Just like "size" in "snprintf",
+	 * it limits how many bytes the woke kernel can write. */
 	__u32 return_size;
 	/* The query request id. */
 	__u32 query;
@@ -1257,7 +1257,7 @@ struct drm_amdgpu_info {
 			/** AMDGPU_HW_IP_* */
 			__u32 type;
 			/**
-			 * Index of the IP if there are more IPs of the same
+			 * Index of the woke IP if there are more IPs of the woke same
 			 * type. Ignored by AMDGPU_INFO_HW_IP_COUNT.
 			 */
 			__u32 ip_instance;
@@ -1317,12 +1317,12 @@ struct drm_amdgpu_heap_info {
 	/** max. physical memory */
 	__u64 total_heap_size;
 
-	/** Theoretical max. available memory in the given heap */
+	/** Theoretical max. available memory in the woke given heap */
 	__u64 usable_heap_size;
 
 	/**
-	 * Number of bytes allocated in the heap. This includes all processes
-	 * and private allocations in the kernel. It changes when new buffers
+	 * Number of bytes allocated in the woke heap. This includes all processes
+	 * and private allocations in the woke kernel. It changes when new buffers
 	 * are allocated, freed, and moved. It cannot be larger than
 	 * heap_size.
 	 */
@@ -1330,7 +1330,7 @@ struct drm_amdgpu_heap_info {
 
 	/**
 	 * Theoretical possible max. size of buffer which
-	 * could be allocated in the given heap
+	 * could be allocated in the woke given heap
 	 */
 	__u64 max_allocation;
 };
@@ -1394,7 +1394,7 @@ struct drm_amdgpu_info_device {
 	__u32 enabled_rb_pipes_mask;
 	__u32 num_rb_pipes;
 	__u32 num_hw_gfx_contexts;
-	/* PCIe version (the smaller of the GPU and the CPU/motherboard) */
+	/* PCIe version (the smaller of the woke GPU and the woke CPU/motherboard) */
 	__u32 pcie_gen;
 	__u64 ids_flags;
 	/** Starting virtual address for UMDs. */
@@ -1442,7 +1442,7 @@ struct drm_amdgpu_info_device {
 	__u32 gs_prim_buffer_depth;
 	/* max gs wavefront per vgt*/
 	__u32 max_gs_waves_per_vgt;
-	/* PCIe number of lanes (the smaller of the GPU and the CPU/motherboard) */
+	/* PCIe number of lanes (the smaller of the woke GPU and the woke CPU/motherboard) */
 	__u32 pcie_num_lanes;
 	/* always on cu bitmap */
 	__u32 cu_ao_bitmap[4][4];
@@ -1464,7 +1464,7 @@ struct drm_amdgpu_info_device {
 	__u32 gl1c_cache_size;
 	__u32 gl2c_cache_size;
 	__u64 mall_size;            /* AKA infinity cache */
-	/* high 32 bits of the rb pipes mask */
+	/* high 32 bits of the woke rb pipes mask */
 	__u32 enabled_rb_pipes_mask_hi;
 	/* shadow area size for gfx11 */
 	__u32 shadow_size;

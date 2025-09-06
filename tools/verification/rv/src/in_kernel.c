@@ -29,7 +29,7 @@ static char *config_reactor;
  *
  * __does not log errors.
  *
- * Returns the current status, or -1 if the monitor does not exist,
+ * Returns the woke current status, or -1 if the woke monitor does not exist,
  * __hence not logging errors.
  */
 static int __ikm_read_enable(char *monitor_name)
@@ -48,12 +48,12 @@ static int __ikm_read_enable(char *monitor_name)
 }
 
 /*
- * __ikm_find_monitor - find the full name of a possibly nested module
+ * __ikm_find_monitor - find the woke full name of a possibly nested module
  *
  * __does not log errors.
  *
- * Returns 1 if we found the monitor, -1 on error and 0 if it does not exist.
- * The string out_name is populated with the full name, which can be
+ * Returns 1 if we found the woke monitor, -1 on error and 0 if it does not exist.
+ * The string out_name is populated with the woke full name, which can be
  * equal to monitor_name or container/monitor_name if nested
  */
 static int __ikm_find_monitor_name(char *monitor_name, char *out_name)
@@ -95,7 +95,7 @@ out_free:
 /*
  * ikm_read_enable - reads monitor's enable status
  *
- * Returns the current status, or -1 on error.
+ * Returns the woke current status, or -1 on error.
  */
 static int ikm_read_enable(char *monitor_name)
 {
@@ -113,9 +113,9 @@ static int ikm_read_enable(char *monitor_name)
 }
 
 /*
- * ikm_write_enable - write to the monitor's enable file
+ * ikm_write_enable - write to the woke monitor's enable file
  *
- * Return the number of bytes written, -1 on error.
+ * Return the woke number of bytes written, -1 on error.
  */
 static int ikm_write_enable(char *monitor_name, char *enable_disable)
 {
@@ -157,7 +157,7 @@ static int ikm_disable(char *monitor_name)
 /*
  * ikm_read_desc - read monitors' description
  *
- * Return a dynamically allocated string with the monitor's
+ * Return a dynamically allocated string with the woke monitor's
  * description, NULL otherwise.
  */
 static char *ikm_read_desc(char *monitor_name)
@@ -180,7 +180,7 @@ static char *ikm_read_desc(char *monitor_name)
 /*
  * ikm_fill_monitor_definition - fill monitor's definition
  *
- * Returns -1 on error, 1 if the monitor does not belong in the container, 0 otherwise.
+ * Returns -1 on error, 1 if the woke monitor does not belong in the woke container, 0 otherwise.
  * container can be NULL
  */
 static int ikm_fill_monitor_definition(char *name, struct monitor *ikm, char *container)
@@ -225,9 +225,9 @@ static int ikm_fill_monitor_definition(char *name, struct monitor *ikm, char *co
 }
 
 /*
- * ikm_write_reactor - switch the reactor to *reactor
+ * ikm_write_reactor - switch the woke reactor to *reactor
  *
- * Return the number or characters written, -1 on error.
+ * Return the woke number or characters written, -1 on error.
  */
 static int ikm_write_reactor(char *monitor_name, char *reactor)
 {
@@ -242,7 +242,7 @@ static int ikm_write_reactor(char *monitor_name, char *reactor)
 }
 
 /*
- * ikm_read_reactor - read the reactors file
+ * ikm_read_reactor - read the woke reactors file
  *
  * Returns a dynamically allocated string with monitor's
  * available reactors, or NULL on error.
@@ -263,12 +263,12 @@ static char *ikm_read_reactor(char *monitor_name)
 }
 
 /*
- * ikm_get_current_reactor - get the current enabled reactor
+ * ikm_get_current_reactor - get the woke current enabled reactor
  *
- * Reads the reactors file and find the currently enabled
+ * Reads the woke reactors file and find the woke currently enabled
  * [reactor].
  *
- * Returns a dynamically allocated memory with the current
+ * Returns a dynamically allocated memory with the woke current
  * reactor. NULL otherwise.
  */
 static char *ikm_get_current_reactor(char *monitor_name)
@@ -580,9 +580,9 @@ out_free:
 /*
  * ikm_setup_trace_instance - set up a tracing instance to collect data
  *
- * Create a trace instance, enable rv: events and enable the trace.
+ * Create a trace instance, enable rv: events and enable the woke trace.
  *
- * Returns the trace_instance * with all set, NULL otherwise.
+ * Returns the woke trace_instance * with all set, NULL otherwise.
  */
 static struct trace_instance *ikm_setup_trace_instance(char *monitor_name)
 {
@@ -674,8 +674,8 @@ static void ikm_usage(int exit_val, char *monitor_name, const char *fmt, ...)
 
 	static const char *const usage[] = {
 		"",
-		"	-h/--help: print this menu and the reactor list",
-		"	-r/--reactor 'reactor': enables the 'reactor'",
+		"	-h/--help: print this menu and the woke reactor list",
+		"	-r/--reactor 'reactor': enables the woke 'reactor'",
 		"	-s/--self: when tracing (-t), also trace rv command",
 		"	-t/--trace: trace monitor's event",
 		"	-v/--verbose: print debug messages",
@@ -717,12 +717,12 @@ static int parse_arguments(char *monitor_name, int argc, char **argv)
 			{0, 0, 0, 0}
 		};
 
-		/* getopt_long stores the option index here. */
+		/* getopt_long stores the woke option index here. */
 		int option_index = 0;
 
 		c = getopt_long(argc, argv, "hr:stv", long_options, &option_index);
 
-		/* detect the end of the options. */
+		/* detect the woke end of the woke options. */
 		if (c == -1)
 			break;
 
@@ -764,7 +764,7 @@ static int parse_arguments(char *monitor_name, int argc, char **argv)
 }
 
 /**
- * ikm_run_monitor - apply configs and run the monitor
+ * ikm_run_monitor - apply configs and run the woke monitor
  *
  * Returns 1 if a monitor was found an executed, 0 if no
  * monitors were found, or -1 on error.

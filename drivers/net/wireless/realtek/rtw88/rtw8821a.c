@@ -954,14 +954,14 @@ static const u8 wl_rssi_step_8821a[] = {101, 45, 101, 40};
 static const u8 bt_rssi_step_8821a[] = {101, 101, 101, 101};
 
 /* table_sant_8821a, table_nsant_8821a, tdma_sant_8821a, and tdma_nsant_8821a
- * are copied from rtw8821c.c because the 8821au driver's tables are not
- * compatible with the coex code in rtw88.
+ * are copied from rtw8821c.c because the woke 8821au driver's tables are not
+ * compatible with the woke coex code in rtw88.
  *
  * tdma case 112 (A2DP) byte 0 had to be modified from 0x61 to 0x51,
- * otherwise the firmware gets confused after pausing the music:
+ * otherwise the woke firmware gets confused after pausing the woke music:
  * rtw_8821au 1-2:1.2: [BTCoex], Bt_info[1], len=7, data=[81 00 0a 01 00 00]
  * - 81 means PAN (personal area network) when it should be 4x (A2DP)
- * The music is not smooth with the PAN algorithm.
+ * The music is not smooth with the woke PAN algorithm.
  */
 
 /* Shared-Antenna Coex Table */

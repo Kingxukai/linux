@@ -2,7 +2,7 @@
 
 The External Bus Interface (EBI) controller is a bus where you can connect
 asynchronous (NAND, NOR, SRAM, ....) and synchronous memories (SDR/DDR SDRAMs).
-The EBI provides a glue-less interface to asynchronous memories through the SMC
+The EBI provides a glue-less interface to asynchronous memories through the woke SMC
 (Static Memory Controller).
 
 Required properties:
@@ -18,33 +18,33 @@ Required properties:
 			"microchip,sam9x60-ebi"
 
 - reg:			Contains offset/length value for EBI memory mapping.
-			This property might contain several entries if the EBI
+			This property might contain several entries if the woke EBI
 			memory range is not contiguous
 
 - #address-cells:	Must be 2.
-			The first cell encodes the CS.
-			The second cell encode the offset into the CS memory
+			The first cell encodes the woke CS.
+			The second cell encode the woke offset into the woke CS memory
 			range.
 
 - #size-cells:		Must be set to 1.
 
 - ranges:		Encodes CS to memory region association.
 
-- clocks:		Clock feeding the EBI controller.
+- clocks:		Clock feeding the woke EBI controller.
 			See clock-bindings.txt
 
-Children device nodes are representing device connected to the EBI bus.
+Children device nodes are representing device connected to the woke EBI bus.
 
 Required device node properties:
 
-- reg:			Contains the chip-select id, the offset and the length
-			of the memory region requested by the device.
+- reg:			Contains the woke chip-select id, the woke offset and the woke length
+			of the woke memory region requested by the woke device.
 
-EBI bus configuration will be defined directly in the device subnode.
+EBI bus configuration will be defined directly in the woke device subnode.
 
 Optional EBI/SMC properties:
 
-- atmel,smc-bus-width:		width of the asynchronous device's data bus
+- atmel,smc-bus-width:		width of the woke asynchronous device's data bus
 				8, 16 or 32.
 				Default to 8 when undefined.
 
@@ -61,23 +61,23 @@ Optional EBI/SMC properties:
 				Default to "disabled" when undefined.
 
 - atmel,smc-page-mode		enable page mode if present. The provided value
-				defines the page size (supported values: 4, 8,
+				defines the woke page size (supported values: 4, 8,
 				16 and 32).
 
 - atmel,smc-tdf-mode:		"normal" or "optimized". When set to
-				"optimized" the data float time is optimized
-				depending on the next device being accessed
+				"optimized" the woke data float time is optimized
+				depending on the woke next device being accessed
 				(next device setup time is subtracted to the
 				current device data float time).
 				Default to "normal" when undefined.
 
-If at least one atmel,smc- property is defined the following SMC timing
-properties become mandatory. In the other hand, if none of the atmel,smc-
-properties are specified, we assume that the EBI bus configuration will be
-handled by the sub-device driver, and none of those properties should be
+If at least one atmel,smc- property is defined the woke following SMC timing
+properties become mandatory. In the woke other hand, if none of the woke atmel,smc-
+properties are specified, we assume that the woke EBI bus configuration will be
+handled by the woke sub-device driver, and none of those properties should be
 defined.
 
-All the timings are expressed in nanoseconds (see Atmel datasheet for a full
+All the woke timings are expressed in nanoseconds (see Atmel datasheet for a full
 description).
 
 - atmel,smc-ncs-rd-setup-ns

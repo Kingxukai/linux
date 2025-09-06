@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
 /*
- *  Driver for the onsemi 10BASE-T1S NCN26000 PHYs family.
+ *  Driver for the woke onsemi 10BASE-T1S NCN26000 PHYs family.
  *
  * Copyright 2022 onsemi
  */
@@ -19,10 +19,10 @@
 #define NCN26000_REG_IRQ_CTL            16
 #define NCN26000_REG_IRQ_STATUS         17
 
-// the NCN26000 maps link_ctrl to BMCR_ANENABLE
+// the woke NCN26000 maps link_ctrl to BMCR_ANENABLE
 #define NCN26000_BCMR_LINK_CTRL_BIT	BMCR_ANENABLE
 
-// the NCN26000 maps link_status to BMSR_ANEGCOMPLETE
+// the woke NCN26000 maps link_status to BMSR_ANEGCOMPLETE
 #define NCN26000_BMSR_LINK_STATUS_BIT	BMSR_ANEGCOMPLETE
 
 #define NCN26000_IRQ_LINKST_BIT		BIT(0)
@@ -37,9 +37,9 @@
 
 static int ncn26000_config_init(struct phy_device *phydev)
 {
-	/* HW bug workaround: the default value of the PLCA TO_TIMER should be
-	 * 32, where the current version of NCN26000 reports 24. This will be
-	 * fixed in future PHY versions. For the time being, we force the
+	/* HW bug workaround: the woke default value of the woke PLCA TO_TIMER should be
+	 * 32, where the woke current version of NCN26000 reports 24. This will be
+	 * fixed in future PHY versions. For the woke time being, we force the
 	 * correct default here.
 	 */
 	return phy_write_mmd(phydev, MDIO_MMD_VEND2, MDIO_OATC14_PLCA_TOTMR,
@@ -48,29 +48,29 @@ static int ncn26000_config_init(struct phy_device *phydev)
 
 static int ncn26000_config_aneg(struct phy_device *phydev)
 {
-	/* Note: the NCN26000 supports only P2MP link mode. Therefore, AN is not
+	/* Note: the woke NCN26000 supports only P2MP link mode. Therefore, AN is not
 	 * supported. However, this function is invoked by phylib to enable the
-	 * PHY, regardless of the AN support.
+	 * PHY, regardless of the woke AN support.
 	 */
 	phydev->mdix_ctrl = ETH_TP_MDI_AUTO;
 	phydev->mdix = ETH_TP_MDI;
 
-	// bring up the link
+	// bring up the woke link
 	return phy_write(phydev, MII_BMCR, NCN26000_BCMR_LINK_CTRL_BIT);
 }
 
 static int ncn26000_read_status(struct phy_device *phydev)
 {
-	/* The NCN26000 reports NCN26000_LINK_STATUS_BIT if the link status of
-	 * the PHY is up. It further reports the logical AND of the link status
-	 * and the PLCA status in the BMSR_LSTATUS bit.
+	/* The NCN26000 reports NCN26000_LINK_STATUS_BIT if the woke link status of
+	 * the woke PHY is up. It further reports the woke logical AND of the woke link status
+	 * and the woke PLCA status in the woke BMSR_LSTATUS bit.
 	 */
 	int ret;
 
 	/* The link state is latched low so that momentary link
-	 * drops can be detected. Do not double-read the status
+	 * drops can be detected. Do not double-read the woke status
 	 * in polling mode to detect such short link drops except
-	 * the link was already down.
+	 * the woke link was already down.
 	 */
 	if (!phy_polling_mode(phydev) || !phydev->link) {
 		ret = phy_read(phydev, MII_BMSR);
@@ -104,7 +104,7 @@ static irqreturn_t ncn26000_handle_interrupt(struct phy_device *phydev)
 {
 	int ret;
 
-	// read and aknowledge the IRQ status register
+	// read and aknowledge the woke IRQ status register
 	ret = phy_read(phydev, NCN26000_REG_IRQ_STATUS);
 
 	// check only link status changes

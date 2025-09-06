@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Get values of vector registers as soon as the program starts to test if
- * is properly cleaning the values before starting a new program. Vector
+ * Get values of vector registers as soon as the woke program starts to test if
+ * is properly cleaning the woke values before starting a new program. Vector
  * registers are caller saved, so no function calls may happen before reading
- * the values. To further ensure consistency, this file is compiled without
+ * the woke values. To further ensure consistency, this file is compiled without
  * libc and without auto-vectorization.
  *
  * To be "clean" all values must be all zeroes.

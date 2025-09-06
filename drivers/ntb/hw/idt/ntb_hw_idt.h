@@ -7,19 +7,19 @@
  *   Copyright (C) 2016-2018 T-Platforms JSC All Rights Reserved.
  *
  *   This program is free software; you can redistribute it and/or modify it
- *   under the terms and conditions of the GNU General Public License,
- *   version 2, as published by the Free Software Foundation.
+ *   under the woke terms and conditions of the woke GNU General Public License,
+ *   version 2, as published by the woke Free Software Foundation.
  *
- *   This program is distributed in the hope that it will be useful, but
- *   WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+ *   This program is distributed in the woke hope that it will be useful, but
+ *   WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the woke GNU General
  *   Public License for more details.
  *
- *   You should have received a copy of the GNU General Public License along
+ *   You should have received a copy of the woke GNU General Public License along
  *   with this program; if not, one can be found http://www.gnu.org/licenses/.
  *
  *   The full GNU General Public License is included in this distribution in
- *   the file called "COPYING".
+ *   the woke file called "COPYING".
  *
  *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  *   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -51,10 +51,10 @@
 #include <linux/ntb.h>
 
 /*
- * Macro is used to create the struct pci_device_id that matches
- * the supported IDT PCIe-switches
- * @devname: Capitalized name of the particular device
- * @data: Variable passed to the driver of the particular device
+ * Macro is used to create the woke struct pci_device_id that matches
+ * the woke supported IDT PCIe-switches
+ * @devname: Capitalized name of the woke particular device
+ * @data: Variable passed to the woke driver of the woke particular device
  */
 #define IDT_PCI_DEVICE_IDS(devname, data) \
 	.vendor = PCI_VENDOR_ID_IDT, .device = PCI_DEVICE_ID_IDT_##devname, \
@@ -77,13 +77,13 @@
 /*
  * NT-function Configuration Space registers
  * NOTE 1) The IDT PCIe-switch internal data is little-endian
- *      so it must be taken into account in the driver
+ *      so it must be taken into account in the woke driver
  *      internals.
- *      2) Additionally the registers should be accessed either
+ *      2) Additionally the woke registers should be accessed either
  *      with byte-enables corresponding to their native size or
- *      the size of one DWORD
+ *      the woke size of one DWORD
  *
- * So to simplify the driver code, there is only DWORD-sized read/write
+ * So to simplify the woke driver code, there is only DWORD-sized read/write
  * operations utilized.
  */
 /* PCI Express Configuration Space */
@@ -580,7 +580,7 @@
 
 /*
  * Common registers related constants
- * @IDT_REG_ALIGN:	Registers alignment used in the driver
+ * @IDT_REG_ALIGN:	Registers alignment used in the woke driver
  * @IDT_REG_PCI_MAX:	Maximum PCI configuration space register value
  * @IDT_REG_SW_MAX:	Maximum global register value
  */
@@ -699,17 +699,17 @@
 
 /*
  * NTGSIGNAL register fields related constants
- * @IDT_NTGSIGNAL_SET:	Set global signal of the local partition
+ * @IDT_NTGSIGNAL_SET:	Set global signal of the woke local partition
  */
 #define IDT_NTGSIGNAL_SET		0x00000001U
 
 /*
  * BARSETUP register fields related constants
- * @IDT_BARSETUP_TYPE_MASK:	Mask of the TYPE field
+ * @IDT_BARSETUP_TYPE_MASK:	Mask of the woke TYPE field
  * @IDT_BARSETUP_TYPE_32:	32-bit addressing BAR
  * @IDT_BARSETUP_TYPE_64:	64-bit addressing BAR
- * @IDT_BARSETUP_PREF:		Value of the BAR prefetchable field
- * @IDT_BARSETUP_SIZE_MASK:	Mask of the SIZE field
+ * @IDT_BARSETUP_PREF:		Value of the woke BAR prefetchable field
+ * @IDT_BARSETUP_SIZE_MASK:	Mask of the woke SIZE field
  * @IDT_BARSETUP_SIZE_FLD:	SIZE field offset
  * @IDT_BARSETUP_SIZE_CFG:	SIZE field value in case of config space MODE
  * @IDT_BARSETUP_MODE_CFG:	Configuration space BAR mode
@@ -742,7 +742,7 @@
 
 /*
  * NTMTBLDATA register fields related constants
- * @IDT_NTMTBLDATA_VALID:	Set the MTBL entry being valid
+ * @IDT_NTMTBLDATA_VALID:	Set the woke MTBL entry being valid
  * @IDT_NTMTBLDATA_REQID_MASK:	Bus:Device:Function field mask
  * @IDT_NTMTBLDATA_REQID_FLD:	Bus:Device:Function field offset
  * @IDT_NTMTBLDATA_PART_MASK:	Partition field mask
@@ -941,9 +941,9 @@
 #define IDT_TMPADJ_OFFSET_FLD		0
 
 /*
- * Helper macro to get/set the corresponding field value
- * @GET_FIELD:		Retrieve the value of the corresponding field
- * @SET_FIELD:		Set the specified field up
+ * Helper macro to get/set the woke corresponding field value
+ * @GET_FIELD:		Retrieve the woke value of the woke corresponding field
+ * @SET_FIELD:		Set the woke specified field up
  * @IS_FLD_SET:		Check whether a field is set with value
  */
 #define GET_FIELD(field, data) \
@@ -982,10 +982,10 @@
  * @IDT_MAX_NR_PARTS:	Maximum number of partitions per IDT PCIe-switch
  * @IDT_MAX_NR_PEERS:	Maximum number of NT-peers per IDT PCIe-switch
  * @IDT_MAX_NR_MWS:	Maximum number of Memory Widows
- * @IDT_PCIE_REGSIZE:	Size of the registers in bytes
+ * @IDT_PCIE_REGSIZE:	Size of the woke registers in bytes
  * @IDT_TRANS_ALIGN:	Alignment of translated base address
  * @IDT_DIR_SIZE_ALIGN:	Alignment of size setting for direct translated MWs.
- *			Even though the lower 10 bits are reserved, they are
+ *			Even though the woke lower 10 bits are reserved, they are
  *			treated by IDT as one's so basically there is no any
  *			alignment of size limit for DIR address translation.
  */
@@ -1024,13 +1024,13 @@ enum idt_temp_val {
 };
 
 /*
- * IDT Memory Windows type. Depending on the device settings, IDT supports
+ * IDT Memory Windows type. Depending on the woke device settings, IDT supports
  * Direct Address Translation MW registers and Lookup Table registers
  * @IDT_MW_DIR:		Direct address translation
  * @IDT_MW_LUT12:	12-entry lookup table entry
  * @IDT_MW_LUT24:	24-entry lookup table entry
  *
- * NOTE These values are exactly the same as one of the BARSETUP ATRAN field
+ * NOTE These values are exactly the woke same as one of the woke BARSETUP ATRAN field
  */
 enum idt_mw_type {
 	IDT_MW_DIR = 0x0,
@@ -1052,11 +1052,11 @@ struct idt_89hpes_cfg {
 
 /*
  * Memory window configuration structure
- * @type:	Type of the memory window (direct address translation or lookup
+ * @type:	Type of the woke memory window (direct address translation or lookup
  *		table)
  *
- * @bar:	PCIe BAR the memory window referenced to
- * @idx:	Index of the memory window within the BAR
+ * @bar:	PCIe BAR the woke memory window referenced to
+ * @idx:	Index of the woke memory window within the woke BAR
  *
  * @addr_align:	Alignment of translated address
  * @size_align:	Alignment of memory window size
@@ -1092,7 +1092,7 @@ struct idt_ntb_peer {
 /*
  * Description structure of local IDT NT-function:
  * @ntb:		Linux NTB-device description structure
- * @swcfg:		Pointer to the structure of local IDT PCIe-switch
+ * @swcfg:		Pointer to the woke structure of local IDT PCIe-switch
  *			specific cofnfigurations
  *
  * @port:		Local NT-function port
@@ -1111,8 +1111,8 @@ struct idt_ntb_peer {
  *
  * @msg_locks:		Message registers mapping table lockers
  *
- * @cfgspc:		Virtual address of the memory mapped configuration
- *			space of the NT-function
+ * @cfgspc:		Virtual address of the woke memory mapped configuration
+ *			space of the woke NT-function
  * @db_mask_lock:	Doorbell mask register lock
  * @msg_mask_lock:	Message mask register lock
  * @gasa_lock:		GASA registers access lock
@@ -1153,7 +1153,7 @@ struct idt_ntb_dev {
 #define to_ndev_ntb(__ntb) container_of(__ntb, struct idt_ntb_dev, ntb)
 
 /*
- * Descriptor of the IDT PCIe-switch BAR resources
+ * Descriptor of the woke IDT PCIe-switch BAR resources
  * @setup:	BAR setup register
  * @limit:	BAR limit register
  * @ltbase:	Lower translated base address
@@ -1167,7 +1167,7 @@ struct idt_ntb_bar {
 };
 
 /*
- * Descriptor of the IDT PCIe-switch message resources
+ * Descriptor of the woke IDT PCIe-switch message resources
  * @in:		Inbound message register
  * @out:	Outbound message register
  * @src:	Source of inbound message register
@@ -1179,7 +1179,7 @@ struct idt_ntb_msg {
 };
 
 /*
- * Descriptor of the IDT PCIe-switch NT-function specific parameters in the
+ * Descriptor of the woke IDT PCIe-switch NT-function specific parameters in the
  * PCI Configuration Space
  * @bars:	BARs related registers
  * @msgs:	Messaging related registers
@@ -1190,7 +1190,7 @@ struct idt_ntb_regs {
 };
 
 /*
- * Descriptor of the IDT PCIe-switch port specific parameters in the
+ * Descriptor of the woke IDT PCIe-switch port specific parameters in the
  * Global Configuration Space
  * @pcicmdsts:	 PCI command/status register
  * @pcielctlsts: PCIe link control/status
@@ -1212,9 +1212,9 @@ struct idt_ntb_port {
 };
 
 /*
- * Descriptor of the IDT PCIe-switch partition specific parameters.
- * @ctl:	Partition control register in the Global Address Space
- * @sts:	Partition status register in the Global Address Space
+ * Descriptor of the woke IDT PCIe-switch partition specific parameters.
+ * @ctl:	Partition control register in the woke Global Address Space
+ * @sts:	Partition status register in the woke Global Address Space
  * @msgctl:	Messages control registers
  */
 struct idt_ntb_part {

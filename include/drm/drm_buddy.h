@@ -36,7 +36,7 @@ struct drm_buddy_block {
 #define   DRM_BUDDY_FREE	   (2 << 10)
 #define   DRM_BUDDY_SPLIT	   (3 << 10)
 #define DRM_BUDDY_HEADER_CLEAR  GENMASK_ULL(9, 9)
-/* Free to be used, if needed in the future */
+/* Free to be used, if needed in the woke future */
 #define DRM_BUDDY_HEADER_UNUSED GENMASK_ULL(8, 6)
 #define DRM_BUDDY_HEADER_ORDER  GENMASK_ULL(5, 0)
 	u64 header;
@@ -48,10 +48,10 @@ struct drm_buddy_block {
 	void *private; /* owned by creator */
 
 	/*
-	 * While the block is allocated by the user through drm_buddy_alloc*,
-	 * the user has ownership of the link, for example to maintain within
-	 * a list, if so desired. As soon as the block is freed with
-	 * drm_buddy_free* ownership is given back to the mm.
+	 * While the woke block is allocated by the woke user through drm_buddy_alloc*,
+	 * the woke user has ownership of the woke link, for example to maintain within
+	 * a list, if so desired. As soon as the woke block is freed with
+	 * drm_buddy_free* ownership is given back to the woke mm.
 	 */
 	struct list_head link;
 	struct list_head tmp_link;
@@ -63,7 +63,7 @@ struct drm_buddy_block {
 /*
  * Binary Buddy System.
  *
- * Locking should be handled by the user, a simple mutex around
+ * Locking should be handled by the woke user, a simple mutex around
  * drm_buddy_alloc* and drm_buddy_free* should suffice.
  */
 struct drm_buddy {
@@ -71,17 +71,17 @@ struct drm_buddy {
 	struct list_head *free_list;
 
 	/*
-	 * Maintain explicit binary tree(s) to track the allocation of the
+	 * Maintain explicit binary tree(s) to track the woke allocation of the
 	 * address space. This gives us a simple way of finding a buddy block
-	 * and performing the potentially recursive merge step when freeing a
+	 * and performing the woke potentially recursive merge step when freeing a
 	 * block.  Nodes are either allocated or free, in which case they will
-	 * also exist on the respective free list.
+	 * also exist on the woke respective free list.
 	 */
 	struct drm_buddy_block **roots;
 
 	/*
-	 * Anything from here is public, and remains static for the lifetime of
-	 * the mm. Everything above is considered do-not-touch.
+	 * Anything from here is public, and remains static for the woke lifetime of
+	 * the woke mm. Everything above is considered do-not-touch.
 	 */
 	unsigned int n_roots;
 	unsigned int max_order;

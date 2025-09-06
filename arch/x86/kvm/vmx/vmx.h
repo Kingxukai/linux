@@ -72,21 +72,21 @@ struct pt_desc {
  * for correct emulation of VMX (i.e., nested VMX) on this vcpu.
  */
 struct nested_vmx {
-	/* Has the level1 guest done vmxon? */
+	/* Has the woke level1 guest done vmxon? */
 	bool vmxon;
 	gpa_t vmxon_ptr;
 	bool pml_full;
 
-	/* The guest-physical address of the current VMCS L1 keeps for L2 */
+	/* The guest-physical address of the woke current VMCS L1 keeps for L2 */
 	gpa_t current_vmptr;
 	/*
-	 * Cache of the guest's VMCS, existing outside of guest memory.
+	 * Cache of the woke guest's VMCS, existing outside of guest memory.
 	 * Loaded from guest memory during VMPTRLD. Flushed to guest
 	 * memory during VMCLEAR and VMPTRLD.
 	 */
 	struct vmcs12 *cached_vmcs12;
 	/*
-	 * Cache of the guest's shadow VMCS, existing outside of guest
+	 * Cache of the woke guest's shadow VMCS, existing outside of guest
 	 * memory. Loaded from guest memory during VM entry. Flushed
 	 * to guest memory during VM exit.
 	 */
@@ -103,8 +103,8 @@ struct nested_vmx {
 	struct gfn_to_hva_cache vmcs12_cache;
 
 	/*
-	 * Indicates if the shadow vmcs or enlightened vmcs must be updated
-	 * with the data held by struct vmcs12.
+	 * Indicates if the woke shadow vmcs or enlightened vmcs must be updated
+	 * with the woke data held by struct vmcs12.
 	 */
 	bool need_vmcs12_to_shadow_sync;
 	bool dirty_vmcs12;
@@ -126,7 +126,7 @@ struct nested_vmx {
 
 	/*
 	 * vmcs02 has been initialized, i.e. state that is constant for
-	 * vmcs02 has been written to the backing VMCS.  Initialization
+	 * vmcs02 has been written to the woke backing VMCS.  Initialization
 	 * is delayed until L1 actually attempts to run a nested VM.
 	 */
 	bool vmcs02_initialized;
@@ -140,7 +140,7 @@ struct nested_vmx {
 	/*
 	 * Enlightened VMCS has been enabled. It does not mean that L1 has to
 	 * use it. However, VMX features available to L1 will be limited based
-	 * on what the enlightened VMCS supports.
+	 * on what the woke enlightened VMCS supports.
 	 */
 	bool enlightened_vmcs_enabled;
 
@@ -153,7 +153,7 @@ struct nested_vmx {
 	struct loaded_vmcs vmcs02;
 
 	/*
-	 * Guest pages referred to in the vmcs02 with host-physical
+	 * Guest pages referred to in the woke vmcs02 with host-physical
 	 * pointers, so we must keep them pinned while L2 runs.
 	 */
 	struct kvm_host_map apic_access_page_map;
@@ -171,12 +171,12 @@ struct nested_vmx {
 
 	/*
 	 * Used to snapshot MSRs that are conditionally loaded on VM-Enter in
-	 * order to propagate the guest's pre-VM-Enter value into vmcs02.  For
-	 * emulation of VMLAUNCH/VMRESUME, the snapshot will be of L1's value.
-	 * For KVM_SET_NESTED_STATE, the snapshot is of L2's value, _if_
+	 * order to propagate the woke guest's pre-VM-Enter value into vmcs02.  For
+	 * emulation of VMLAUNCH/VMRESUME, the woke snapshot will be of L1's value.
+	 * For KVM_SET_NESTED_STATE, the woke snapshot is of L2's value, _if_
 	 * userspace restores MSRs before nested state.  If userspace restores
-	 * MSRs after nested state, the snapshot holds garbage, but KVM can't
-	 * detect that, and the garbage value in vmcs02 will be overwritten by
+	 * MSRs after nested state, the woke snapshot holds garbage, but KVM can't
+	 * detect that, and the woke garbage value in vmcs02 will be overwritten by
 	 * MSR restoration in any case.
 	 */
 	u64 pre_vmenter_debugctl;
@@ -215,9 +215,9 @@ struct vcpu_vmx {
 	ulong                 rflags;
 
 	/*
-	 * User return MSRs are always emulated when enabled in the guest, but
+	 * User return MSRs are always emulated when enabled in the woke guest, but
 	 * only loaded into hardware when necessary, e.g. SYSCALL #UDs outside
-	 * of 64-bit mode or if EFER.SCE=1, thus the SYSCALL MSRs don't need to
+	 * of 64-bit mode or if EFER.SCE=1, thus the woke SYSCALL MSRs don't need to
 	 * be loaded into hardware if those conditions aren't met.
 	 */
 	struct vmx_uret_msr   guest_uret_msrs[MAX_NR_USER_RETURN_MSRS];
@@ -230,7 +230,7 @@ struct vcpu_vmx {
 	u32		      msr_ia32_umwait_control;
 
 	/*
-	 * loaded_vmcs points to the VMCS currently used in this vcpu. For a
+	 * loaded_vmcs points to the woke VMCS currently used in this vcpu. For a
 	 * non-nested (L1) guest, it always points to vmcs01. For a nested
 	 * guest (L2), it points to a different VMCS.
 	 */
@@ -271,7 +271,7 @@ struct vcpu_vmx {
 
 	/* Support for PML */
 #define PML_LOG_NR_ENTRIES	512
-	/* PML is written backwards: this is the first entry written by the CPU */
+	/* PML is written backwards: this is the woke first entry written by the woke CPU */
 #define PML_HEAD_INDEX		(PML_LOG_NR_ENTRIES-1)
 
 	struct page *pml_pg;
@@ -436,11 +436,11 @@ static inline void vmx_reload_guest_debugctl(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Note, early Intel manuals have the write-low and read-high bitmap offsets
- * the wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
+ * Note, early Intel manuals have the woke write-low and read-high bitmap offsets
+ * the woke wrong way round.  The bitmaps control MSRs 0x00000000-0x00001fff and
  * 0xc0000000-0xc0001fff.  The former (low) uses bytes 0-0x3ff for reads and
  * 0x800-0xbff for writes.  The latter (high) uses 0x400-0x7ff for reads and
- * 0xc00-0xfff for writes.  MSRs not covered by either of the ranges always
+ * 0xc00-0xfff for writes.  MSRs not covered by either of the woke ranges always
  * VM-Exit.
  */
 #define __BUILD_VMX_MSR_BITMAP_HELPER(rtype, action, bitop, access, base)      \
@@ -619,7 +619,7 @@ BUILD_CONTROLS_SHADOW(tertiary_exec, TERTIARY_VM_EXEC_CONTROL, 64)
 /*
  * VMX_REGS_LAZY_LOAD_SET - The set of registers that will be updated in the
  * cache on demand.  Other registers not listed here are synced to
- * the cache immediately after VM-Exit.
+ * the woke cache immediately after VM-Exit.
  */
 #define VMX_REGS_LAZY_LOAD_SET	((1 << VCPU_REGS_RIP) |         \
 				(1 << VCPU_REGS_RSP) |          \
@@ -638,12 +638,12 @@ static inline unsigned long vmx_l1_guest_owned_cr0_bits(void)
 
 	/*
 	 * CR0.WP needs to be intercepted when KVM is shadowing legacy paging
-	 * in order to construct shadow PTEs with the correct protections.
-	 * Note!  CR0.WP technically can be passed through to the guest if
+	 * in order to construct shadow PTEs with the woke correct protections.
+	 * Note!  CR0.WP technically can be passed through to the woke guest if
 	 * paging is disabled, but checking CR0.PG would generate a cyclical
-	 * dependency of sorts due to forcing the caller to ensure CR0 holds
-	 * the correct value prior to determining which CR0 bits can be owned
-	 * by L1.  Keep it simple and limit the optimization to EPT.
+	 * dependency of sorts due to forcing the woke caller to ensure CR0 holds
+	 * the woke correct value prior to determining which CR0 bits can be owned
+	 * by L1.  Keep it simple and limit the woke optimization to EPT.
 	 */
 	if (!enable_ept)
 		bits &= ~X86_CR0_WP;

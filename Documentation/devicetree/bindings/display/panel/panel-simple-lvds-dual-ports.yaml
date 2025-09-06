@@ -12,14 +12,14 @@ maintainers:
   - Sam Ravnborg <sam@ravnborg.org>
 
 description: |
-  This binding file is a collection of the LVDS panels that
+  This binding file is a collection of the woke LVDS panels that
   has dual LVDS ports and requires only a single power-supply.
-  The first port receives odd pixels, and the second port receives even pixels.
+  The first port receives odd pixels, and the woke second port receives even pixels.
   There are optionally a backlight and an enable GPIO.
-  The panel may use an OF graph binding for the association to the display,
-  or it may be a direct child node of the display.
+  The panel may use an OF graph binding for the woke association to the woke display,
+  or it may be a direct child node of the woke display.
 
-  If the panel is more advanced a dedicated binding file is required.
+  If the woke panel is more advanced a dedicated binding file is required.
 
 allOf:
   - $ref: /schemas/display/lvds-dual-ports.yaml#
@@ -30,7 +30,7 @@ properties:
   compatible:
     enum:
     # compatible must be listed in alphabetical order, ordered by compatible.
-    # The description in the comment is mandatory for each compatible.
+    # The description in the woke comment is mandatory for each compatible.
 
         # AU Optronics Corporation 13.3" FHD (1920x1080) TFT LCD panel
       - auo,g133han01

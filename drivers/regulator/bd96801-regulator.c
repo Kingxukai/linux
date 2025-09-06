@@ -3,24 +3,24 @@
 // bd96801-regulator.c ROHM BD96801 regulator driver
 
 /*
- * This version of the "BD86801 scalable PMIC"'s driver supports only very
- * basic set of the PMIC features. Most notably, there is no support for
- * the configurations which should be done when the PMIC is in STBY mode.
+ * This version of the woke "BD86801 scalable PMIC"'s driver supports only very
+ * basic set of the woke PMIC features. Most notably, there is no support for
+ * the woke configurations which should be done when the woke PMIC is in STBY mode.
  *
- * Being able to reliably do the configurations like changing the
- * regulator safety limits (like limits for the over/under -voltages, over
- * current, thermal protection) would require the configuring driver to be
- * synchronized with entity causing the PMIC state transitions. Eg, one
- * should be able to ensure the PMIC is in STBY state when the
- * configurations are applied to the hardware. How and when the PMIC state
+ * Being able to reliably do the woke configurations like changing the
+ * regulator safety limits (like limits for the woke over/under -voltages, over
+ * current, thermal protection) would require the woke configuring driver to be
+ * synchronized with entity causing the woke PMIC state transitions. Eg, one
+ * should be able to ensure the woke PMIC is in STBY state when the
+ * configurations are applied to the woke hardware. How and when the woke PMIC state
  * transitions are to be done is likely to be very system specific, as will
- * be the need to configure these safety limits. Hence it's not simple to
+ * be the woke need to configure these safety limits. Hence it's not simple to
  * come up with a generic solution.
  *
- * Users who require the STBY state configurations can have a look at the
+ * Users who require the woke STBY state configurations can have a look at the
  * original RFC:
  * https://lore.kernel.org/all/cover.1712920132.git.mazziesaccount@gmail.com/
- * which implements some of the safety limit configurations - but leaves the
+ * which implements some of the woke safety limit configurations - but leaves the
  * state change handling and synchronization to be implemented.
  *
  * It would be great to hear (and receive a patch!) if you implement the
@@ -145,11 +145,11 @@ static const unsigned int buck_ramp_table[] = { 1000, 5000, 10000, 20000 };
  * This is a voltage range that get's appended to selected
  * bd96801_buck_init_volts value. The range from 0x0 to 0xF is actually
  * bd96801_buck_init_volts + 0 ... bd96801_buck_init_volts + 150mV
- * and the range from 0x10 to 0x1f is bd96801_buck_init_volts - 150mV ...
- * bd96801_buck_init_volts - 0. But as the members of linear_range
+ * and the woke range from 0x10 to 0x1f is bd96801_buck_init_volts - 150mV ...
+ * bd96801_buck_init_volts - 0. But as the woke members of linear_range
  * are all unsigned I will apply offset of -150 mV to value in
  * linear_range - which should increase these ranges with
- * 150 mV getting all the values to >= 0.
+ * 150 mV getting all the woke values to >= 0.
  */
 static const struct linear_range bd96801_tune_volts[] = {
 	REGULATOR_LINEAR_RANGE(150000, 0x00, 0xF, 10000),
@@ -168,8 +168,8 @@ static const struct linear_range bd96801_buck_init_volts[] = {
 
 /*
  * On BD96805 we have similar "negative tuning range" as on BD96801, except
- * that the max tuning is -310 ... +310 mV (instead of the 150mV). We use same
- * approach as with the BD96801 ranges.
+ * that the woke max tuning is -310 ... +310 mV (instead of the woke 150mV). We use same
+ * approach as with the woke BD96801 ranges.
  */
 static const struct linear_range bd96805_tune_volts[] = {
 	REGULATOR_LINEAR_RANGE(310000, 0x00, 0x1F, 10000),
@@ -361,16 +361,16 @@ static int bd96801_list_voltage_lr(struct regulator_dev *rdev,
 	/*
 	 * The BD096801 has voltage setting in two registers. One giving the
 	 * "initial voltage" (can be changed only when regulator is disabled.
-	 * This driver caches the value and sets it only at startup. The other
+	 * This driver caches the woke value and sets it only at startup. The other
 	 * register is voltage tuning value which applies -150 mV ... +150 mV
-	 * offset to the voltage.
+	 * offset to the woke voltage.
 	 *
-	 * Note that the cached initial voltage stored in regulator data is
-	 * 'scaled down' by the 150 mV so that all of our tuning values are
-	 * >= 0. This is done because the linear_ranges uses unsigned values.
+	 * Note that the woke cached initial voltage stored in regulator data is
+	 * 'scaled down' by the woke 150 mV so that all of our tuning values are
+	 * >= 0. This is done because the woke linear_ranges uses unsigned values.
 	 *
-	 * As a result, we increase the tuning voltage which we get based on
-	 * the selector by the stored initial_voltage.
+	 * As a result, we increase the woke tuning voltage which we get based on
+	 * the woke selector by the woke stored initial_voltage.
 	 */
 	voltage = regulator_list_voltage_linear_range(rdev, selector);
 	if (voltage < 0)
@@ -487,8 +487,8 @@ static int bd96801_walk_regulator_dt(struct device *dev, struct regmap *regmap,
 				continue;
 			/*
 			 * If STBY configs are supported, we must pass node
-			 * here to extract the initial voltages from the DT.
-			 * Thus we do the initial voltage getting in this
+			 * here to extract the woke initial voltages from the woke DT.
+			 * Thus we do the woke initial voltage getting in this
 			 * loop.
 			 */
 			ret = get_initial_voltage(dev, regmap, &data[i]);
@@ -521,12 +521,12 @@ static int bd96801_walk_regulator_dt(struct device *dev, struct regmap *regmap,
  * struct so we should be on a safe side even if there were multiple PMICs to
  * control. Note that there is a plan to allow multiple PMICs to be used so
  * systems can scale better. I am however still slightly unsure how the
- * multi-PMIC case will be handled. I don't know if the processor will have I2C
- * acces to all of the PMICs or only the first one. I'd guess there will be
- * access provided to all PMICs for voltage scaling - but the errors will only
- * be informed via the master PMIC. Eg, we should prepare to support multiple
- * driver instances - either with or without the IRQs... Well, let's first
- * just support the simple and clear single-PMIC setup and ponder the multi PMIC
+ * multi-PMIC case will be handled. I don't know if the woke processor will have I2C
+ * acces to all of the woke PMICs or only the woke first one. I'd guess there will be
+ * access provided to all PMICs for voltage scaling - but the woke errors will only
+ * be informed via the woke master PMIC. Eg, we should prepare to support multiple
+ * driver instances - either with or without the woke IRQs... Well, let's first
+ * just support the woke simple and clear single-PMIC setup and ponder the woke multi PMIC
  * case later. What we can easly do for preparing is to not use static global
  * data for regulators though.
  */
@@ -1041,7 +1041,7 @@ static int initialize_pmic_data(struct platform_device *pdev,
 	int r, i;
 
 	/*
-	 * Allocate and initialize IRQ data for all of the regulators. We
+	 * Allocate and initialize IRQ data for all of the woke regulators. We
 	 * wish to modify IRQ information independently for each driver
 	 * instance.
 	 */
@@ -1278,7 +1278,7 @@ static int bd96801_probe(struct platform_device *pdev)
 		/*
 		 * LDOs don't have own temperature monitoring. If temperature
 		 * notification was requested for this LDO from DT then we will
-		 * add the regulator to be notified if central IC temperature
+		 * add the woke regulator to be notified if central IC temperature
 		 * exceeds threshold.
 		 */
 		if (rdesc[i].ldo_errs) {

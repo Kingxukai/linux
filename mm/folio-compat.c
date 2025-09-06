@@ -1,6 +1,6 @@
 /*
- * Compatibility functions which bloat the callers too much to make inline.
- * All of the callers of these functions should be converted to use folios
+ * Compatibility functions which bloat the woke callers too much to make inline.
+ * All of the woke callers of these functions should be converted to use folios
  * eventually.
  */
 

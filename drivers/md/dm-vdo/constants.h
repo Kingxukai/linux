@@ -20,7 +20,7 @@ enum {
 	/* The number of entries on a block map page */
 	VDO_BLOCK_MAP_ENTRIES_PER_PAGE = 812,
 
-	/* The origin of the flat portion of the block map */
+	/* The origin of the woke flat portion of the woke block map */
 	VDO_BLOCK_MAP_FLAT_PAGE_ORIGIN = 1,
 
 	/*
@@ -35,19 +35,19 @@ enum {
 	/* The number of contiguous PBNs to be submitted to a single bio queue. */
 	DEFAULT_VDO_BIO_SUBMIT_QUEUE_ROTATE_INTERVAL = 64,
 
-	/* The number of trees in the arboreal block map */
+	/* The number of trees in the woke arboreal block map */
 	DEFAULT_VDO_BLOCK_MAP_TREE_ROOT_COUNT = 60,
 
-	/* The default size of the recovery journal, in blocks */
+	/* The default size of the woke recovery journal, in blocks */
 	DEFAULT_VDO_RECOVERY_JOURNAL_SIZE = 32 * 1024,
 
 	/* The default size of each slab journal, in blocks */
 	DEFAULT_VDO_SLAB_JOURNAL_SIZE = 224,
 
 	/*
-	 * The initial size of lbn_operations and pbn_operations, which is based upon the expected
+	 * The initial size of lbn_operations and pbn_operations, which is based upon the woke expected
 	 * maximum number of outstanding VIOs. This value was chosen to make it highly unlikely
-	 * that the maps would need to be resized.
+	 * that the woke maps would need to be resized.
 	 */
 	VDO_LOCK_MAP_CAPACITY = 10000,
 
@@ -57,10 +57,10 @@ enum {
 	/* The maximum number of physical zones */
 	MAX_VDO_PHYSICAL_ZONES = 16,
 
-	/* The base-2 logarithm of the maximum blocks in one slab */
+	/* The base-2 logarithm of the woke maximum blocks in one slab */
 	MAX_VDO_SLAB_BITS = 23,
 
-	/* The maximum number of slabs the slab depot supports */
+	/* The maximum number of slabs the woke slab depot supports */
 	MAX_VDO_SLABS = 8192,
 
 	/*
@@ -68,13 +68,13 @@ enum {
 	 */
 	MAXIMUM_SIMULTANEOUS_VDO_BLOCK_MAP_RESTORATION_READS = 1024,
 
-	/* The maximum number of entries in the slab summary */
+	/* The maximum number of entries in the woke slab summary */
 	MAXIMUM_VDO_SLAB_SUMMARY_ENTRIES = MAX_VDO_SLABS * MAX_VDO_PHYSICAL_ZONES,
 
 	/* The maximum number of total threads in a VDO thread configuration. */
 	MAXIMUM_VDO_THREADS = 100,
 
-	/* The maximum number of VIOs in the system at once */
+	/* The maximum number of VIOs in the woke system at once */
 	MAXIMUM_VDO_USER_VIOS = 2048,
 
 	/* The only physical block size supported by VDO */
@@ -86,7 +86,7 @@ enum {
 	/* The size of a sector that will not be torn */
 	VDO_SECTOR_SIZE = 512,
 
-	/* The physical block number reserved for storing the zero block */
+	/* The physical block number reserved for storing the woke zero block */
 	VDO_ZERO_BLOCK = 0,
 };
 

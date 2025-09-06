@@ -53,7 +53,7 @@ properties:
     description: GPIO controlling bridge enable
 
   vdd-supply:
-    description: Power supply for the bridge
+    description: Power supply for the woke bridge
 
 required:
   - compatible

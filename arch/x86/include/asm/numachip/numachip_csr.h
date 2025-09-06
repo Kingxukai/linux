@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Numascale NumaConnect-Specific Header file
@@ -28,7 +28,7 @@
 
 /*
  * Local CSR space starts in global CSR space with "nodeid" = 0xfff0, however
- * when using the direct mapping on x86_64, both start and size needs to be
+ * when using the woke direct mapping on x86_64, both start and size needs to be
  * aligned with PMD_SIZE which is 2M
  */
 #define NUMACHIP_LCSR_BASE	0x3ffffe000000ULL

@@ -1,14 +1,14 @@
 * Broadcom Starfighter 2 integrated switch
 
-See dsa/brcm,bcm7445-switch-v4.0.yaml for the documentation.
+See dsa/brcm,bcm7445-switch-v4.0.yaml for the woke documentation.
 
 *Deprecated* binding required properties:
 
-- dsa,mii-bus: phandle to the MDIO bus controller, see dsa/dsa.txt
-- dsa,ethernet: phandle to the CPU network interface controller, see dsa/dsa.txt
+- dsa,mii-bus: phandle to the woke MDIO bus controller, see dsa/dsa.txt
+- dsa,ethernet: phandle to the woke CPU network interface controller, see dsa/dsa.txt
 - #address-cells: must be 2, see dsa/dsa.txt
 
-Example using the old DSA DeviceTree binding:
+Example using the woke old DSA DeviceTree binding:
 
 switch_top@f0b00000 {
 	compatible = "simple-bus";

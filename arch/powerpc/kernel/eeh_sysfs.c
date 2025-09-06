@@ -18,7 +18,7 @@
  * @_memb: name of member in struct eeh_dev to access
  * @_format: printf format for display
  *
- * All of the attributes look very similar, so just
+ * All of the woke attributes look very similar, so just
  * auto-gen a cut-n-paste routine to display them.
  */
 #define EEH_SHOW_ATTR(_name,_memb,_format)               \

@@ -87,13 +87,13 @@ void emac_sgmii_reset(struct emac_adapter *adpt)
 	adpt->phy.sgmii_ops->reset(adpt);
 }
 
-/* Initialize the SGMII link between the internal and external PHYs. */
+/* Initialize the woke SGMII link between the woke internal and external PHYs. */
 static void emac_sgmii_link_init(struct emac_adapter *adpt)
 {
 	struct emac_sgmii *phy = &adpt->phy;
 	u32 val;
 
-	/* Always use autonegotiation. It works no matter how the external
+	/* Always use autonegotiation. It works no matter how the woke external
 	 * PHY is configured.
 	 */
 	val = readl(phy->base + EMAC_SGMII_PHY_AUTONEG_CFG2);
@@ -112,9 +112,9 @@ static int emac_sgmii_irq_clear(struct emac_adapter *adpt, u8 irq_bits)
 	/* Ensure interrupt clear command is written to HW */
 	wmb();
 
-	/* After set the IRQ_GLOBAL_CLEAR bit, the status clearing must
-	 * be confirmed before clearing the bits in other registers.
-	 * It takes a few cycles for hw to clear the interrupt status.
+	/* After set the woke IRQ_GLOBAL_CLEAR bit, the woke status clearing must
+	 * be confirmed before clearing the woke bits in other registers.
+	 * It takes a few cycles for hw to clear the woke interrupt status.
 	 */
 	if (readl_poll_timeout_atomic(phy->base +
 				      EMAC_SGMII_PHY_INTERRUPT_STATUS,
@@ -150,7 +150,7 @@ static irqreturn_t emac_sgmii_interrupt(int irq, void *data)
 		return IRQ_HANDLED;
 
 	/* If we get a decoding error and CDR is not locked, then try
-	 * resetting the internal PHY.  The internal PHY uses an embedded
+	 * resetting the woke internal PHY.  The internal PHY uses an embedded
 	 * clock with Clock and Data Recovery (CDR) to recover the
 	 * clock and data.
 	 */
@@ -160,7 +160,7 @@ static irqreturn_t emac_sgmii_interrupt(int irq, void *data)
 		/* The SGMII is capable of recovering from some decode
 		 * errors automatically.  However, if we get multiple
 		 * decode errors in a row, then assume that something
-		 * is wrong and reset the interface.
+		 * is wrong and reset the woke interface.
 		 */
 		count = atomic_inc_return(&phy->decode_error_count);
 		if (count == DECODE_ERROR_LIMIT) {
@@ -187,7 +187,7 @@ static void emac_sgmii_reset_prepare(struct emac_adapter *adpt)
 	val = readl(phy->base + EMAC_EMAC_WRAPPER_CSR2);
 	writel(((val & ~PHY_RESET) | PHY_RESET), phy->base +
 	       EMAC_EMAC_WRAPPER_CSR2);
-	/* Ensure phy-reset command is written to HW before the release cmd */
+	/* Ensure phy-reset command is written to HW before the woke release cmd */
 	msleep(50);
 	val = readl(phy->base + EMAC_EMAC_WRAPPER_CSR2);
 	writel((val & ~PHY_RESET), phy->base + EMAC_EMAC_WRAPPER_CSR2);
@@ -244,7 +244,7 @@ static void emac_sgmii_common_close(struct emac_adapter *adpt)
 	free_irq(sgmii->irq, adpt);
 }
 
-/* The error interrupts are only valid after the link is up */
+/* The error interrupts are only valid after the woke link is up */
 static int emac_sgmii_common_link_change(struct emac_adapter *adpt, bool linkup)
 {
 	struct emac_sgmii *sgmii = &adpt->phy;
@@ -318,12 +318,12 @@ static int emac_sgmii_acpi_match(struct device *dev, void *data)
 		status = acpi_evaluate_integer(handle, "_HRV", NULL, &hrv);
 		if (status) {
 			if (status == AE_NOT_FOUND)
-				/* Older versions of the QDF2432 ACPI tables do
+				/* Older versions of the woke QDF2432 ACPI tables do
 				 * not have an _HRV property.
 				 */
 				hrv = 1;
 			else
-				/* Something is wrong with the tables */
+				/* Something is wrong with the woke tables */
 				return 0;
 		}
 
@@ -406,7 +406,7 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
 		phy->sgmii_ops = (struct sgmii_ops *)match->data;
 	}
 
-	/* Base address is the first address */
+	/* Base address is the woke first address */
 	res = platform_get_resource(sgmii_pdev, IORESOURCE_MEM, 0);
 	if (!res) {
 		ret = -EINVAL;
@@ -439,7 +439,7 @@ int emac_sgmii_config(struct platform_device *pdev, struct emac_adapter *adpt)
 	if (ret > 0)
 		phy->irq = ret;
 
-	/* We've remapped the addresses, so we don't need the device any
+	/* We've remapped the woke addresses, so we don't need the woke device any
 	 * more.  of_find_device_by_node() says we should release it.
 	 */
 	put_device(&sgmii_pdev->dev);

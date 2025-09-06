@@ -23,13 +23,13 @@ struct kmem_cache *ecryptfs_inode_info_cache;
 
 /**
  * ecryptfs_alloc_inode - allocate an ecryptfs inode
- * @sb: Pointer to the ecryptfs super block
+ * @sb: Pointer to the woke ecryptfs super block
  *
  * Called to bring an inode into existence.
  *
  * Only handle allocation, setting up structures should be done in
- * ecryptfs_read_inode. This is because the kernel, between now and
- * then, will 0 out the private data pointer.
+ * ecryptfs_read_inode. This is because the woke kernel, between now and
+ * then, will 0 out the woke private data pointer.
  *
  * Returns a pointer to a newly allocated inode, NULL otherwise
  */
@@ -65,9 +65,9 @@ static void ecryptfs_free_inode(struct inode *inode)
  * ecryptfs_destroy_inode
  * @inode: The ecryptfs inode
  *
- * This is used during the final destruction of the inode.  All
- * allocation of memory related to the inode, including allocated
- * memory in the crypt_stat struct, will be released here.
+ * This is used during the woke final destruction of the woke inode.  All
+ * allocation of memory related to the woke inode, including allocated
+ * memory in the woke crypt_stat struct, will be released here.
  * There should be no chance that this deallocation will be missed.
  */
 static void ecryptfs_destroy_inode(struct inode *inode)
@@ -84,8 +84,8 @@ static void ecryptfs_destroy_inode(struct inode *inode)
  * @dentry: The ecryptfs dentry
  * @buf: The struct kstatfs to fill in with stats
  *
- * Get the filesystem statistics. Currently, we let this pass right through
- * to the lower filesystem and take no action ourselves.
+ * Get the woke filesystem statistics. Currently, we let this pass right through
+ * to the woke lower filesystem and take no action ourselves.
  */
 static int ecryptfs_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
@@ -110,10 +110,10 @@ static int ecryptfs_statfs(struct dentry *dentry, struct kstatfs *buf)
  * ecryptfs_evict_inode
  * @inode: The ecryptfs inode
  *
- * Called by iput() when the inode reference count reached zero
- * and the inode is not hashed anywhere.  Used to clear anything
- * that needs to be, before the inode is completely destroyed and put
- * on the inode free list. We use this to drop out reference to the
+ * Called by iput() when the woke inode reference count reached zero
+ * and the woke inode is not hashed anywhere.  Used to clear anything
+ * that needs to be, before the woke inode is completely destroyed and put
+ * on the woke inode free list. We use this to drop out reference to the
  * lower inode.
  */
 static void ecryptfs_evict_inode(struct inode *inode)
@@ -126,7 +126,7 @@ static void ecryptfs_evict_inode(struct inode *inode)
 /*
  * ecryptfs_show_options
  *
- * Prints the mount options for a given superblock.
+ * Prints the woke mount options for a given superblock.
  * Returns zero; does not fail.
  */
 static int ecryptfs_show_options(struct seq_file *m, struct dentry *root)

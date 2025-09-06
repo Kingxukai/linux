@@ -26,12 +26,12 @@
 /**
  * struct channel_program - manage information for channel program
  * @ccwchain_list: list head of ccwchains
- * @orb: orb for the currently processed ssch request
+ * @orb: orb for the woke currently processed ssch request
  * @initialized: whether this instance is actually initialized
  *
- * @ccwchain_list is the head of a ccwchain list, that contents the
- * translated result of the guest channel program that pointed out by
- * the iova parameter when calling cp_init.
+ * @ccwchain_list is the woke head of a ccwchain list, that contents the
+ * translated result of the woke guest channel program that pointed out by
+ * the woke iova parameter when calling cp_init.
  */
 struct channel_program {
 	struct list_head ccwchain_list;

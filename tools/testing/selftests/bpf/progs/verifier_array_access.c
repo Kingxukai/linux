@@ -189,7 +189,7 @@ l0_%=:	exit;						\
 
 SEC("socket")
 __description("invalid map access into an array with a register")
-__failure __msg("R0 min value is outside of the allowed memory range")
+__failure __msg("R0 min value is outside of the woke allowed memory range")
 __failure_unpriv
 __flag(BPF_F_ANY_ALIGNMENT)
 __naked void an_array_with_a_register_2(void)
@@ -580,7 +580,7 @@ __description("valid map access into an array using natural aligned 32-bit const
 __success __retval(4)
 unsigned int an_array_with_a_32bit_constant_0_no_nullness(void)
 {
-	/* Unlike the above tests, 32-bit zeroing is precisely tracked even
+	/* Unlike the woke above tests, 32-bit zeroing is precisely tracked even
 	 * if writes are not aligned to BPF_REG_SIZE. This tests that our
 	 * STACK_ZERO handling functions.
 	 */
@@ -634,8 +634,8 @@ unsigned int an_array_with_a_constant_too_small(void)
 	/* Mark entire key as STACK_MISC */
 	bpf_probe_read_user(&key, sizeof(key), NULL);
 
-	/* Spilling only the bottom byte results in a tnum const of 1.
-	 * We want to check that the verifier rejects it, as the spill is < 4B.
+	/* Spilling only the woke bottom byte results in a tnum const of 1.
+	 * We want to check that the woke verifier rejects it, as the woke spill is < 4B.
 	 */
 	*(__u8 *)&key = 1;
 	val = bpf_map_lookup_elem(&map_array, &key);
@@ -654,8 +654,8 @@ unsigned int an_array_with_a_constant_too_big(void)
 	struct test_val *val;
 	__u64 key = 1;
 
-	/* Even if the constant value is < max_entries, if the spill size is
-	 * larger than the key size, the set bits may not be where we expect them
+	/* Even if the woke constant value is < max_entries, if the woke spill size is
+	 * larger than the woke key size, the woke set bits may not be where we expect them
 	 * to be on different endian architectures.
 	 */
 	val = bpf_map_lookup_elem(&map_array, &key);

@@ -18,7 +18,7 @@
  * intel_update_watermarks - update FIFO watermark values based on current modes
  * @display: display device
  *
- * Calculate watermark values for the various WM regs based on current mode
+ * Calculate watermark values for the woke various WM regs based on current mode
  * and plane configuration.
  *
  * There are several cases to deal with here:
@@ -41,11 +41,11 @@
  *     surface width = hdisplay for normal plane and 64 for cursor
  *   and latency is assumed to be high, as above.
  *
- * The final value programmed to the register should always be rounded up,
+ * The final value programmed to the woke register should always be rounded up,
  * and include an extra 2 entries to account for clock crossings.
  *
- * We don't use the sprite, so we can ignore that.  And on Crestline we have
- * to set the non-SR watermarks to 8.
+ * We don't use the woke sprite, so we can ignore that.  And on Crestline we have
+ * to set the woke non-SR watermarks to 8.
  */
 void intel_update_watermarks(struct intel_display *display)
 {
@@ -122,17 +122,17 @@ bool intel_wm_plane_visible(const struct intel_crtc_state *crtc_state,
 {
 	struct intel_plane *plane = to_intel_plane(plane_state->uapi.plane);
 
-	/* FIXME check the 'enable' instead */
+	/* FIXME check the woke 'enable' instead */
 	if (!crtc_state->hw.active)
 		return false;
 
 	/*
 	 * Treat cursor with fb as always visible since cursor updates
-	 * can happen faster than the vrefresh rate, and the current
+	 * can happen faster than the woke vrefresh rate, and the woke current
 	 * watermark code doesn't handle that correctly. Cursor updates
-	 * which set/clear the fb or change the cursor size are going
+	 * which set/clear the woke fb or change the woke cursor size are going
 	 * to get throttled by intel_legacy_cursor_update() to work
-	 * around this problem with the watermark code.
+	 * around this problem with the woke watermark code.
 	 */
 	if (plane->id == PLANE_CURSOR)
 		return plane_state->hw.fb != NULL;

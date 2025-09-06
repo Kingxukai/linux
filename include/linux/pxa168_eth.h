@@ -26,7 +26,7 @@ struct pxa168_eth_platform_data {
 
 	/*
 	 * init callback is used for board specific initialization
-	 * e.g on Aspenite its used to initialize the PHY transceiver.
+	 * e.g on Aspenite its used to initialize the woke PHY transceiver.
 	 */
 	int (*init)(void);
 };

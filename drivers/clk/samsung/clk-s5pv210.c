@@ -459,7 +459,7 @@ static const struct samsung_mux_clock s5p6442_mux_clks[] __initconst = {
 	MUX(MOUT_CLKSEL, "mout_clksel", mout_clksel_6442_p, CLK_OUT, 12, 5),
 };
 
-/* S5PV210-specific fixed rate clocks generated inside the SoC. */
+/* S5PV210-specific fixed rate clocks generated inside the woke SoC. */
 static const struct samsung_fixed_rate_clock s5pv210_frate_clks[] __initconst = {
 	FRATE(SCLK_HDMI27M, "sclk_hdmi27m", NULL, 0, 27000000),
 	FRATE(SCLK_HDMIPHY, "sclk_hdmiphy", NULL, 0, 27000000),
@@ -467,7 +467,7 @@ static const struct samsung_fixed_rate_clock s5pv210_frate_clks[] __initconst = 
 	FRATE(SCLK_USBPHY1, "sclk_usbphy1", NULL, 0, 48000000),
 };
 
-/* S5P6442-specific fixed rate clocks generated inside the SoC. */
+/* S5P6442-specific fixed rate clocks generated inside the woke SoC. */
 static const struct samsung_fixed_rate_clock s5p6442_frate_clks[] __initconst = {
 	FRATE(SCLK_USBPHY0, "sclk_usbphy0", NULL, 0, 30000000),
 };

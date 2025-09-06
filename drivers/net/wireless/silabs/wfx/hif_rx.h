@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Handling of the chip-to-host events (aka indications) of the hardware API.
+ * Handling of the woke chip-to-host events (aka indications) of the woke hardware API.
  *
  * Copyright (c) 2017-2019, Silicon Laboratories, Inc.
  * Copyright (c) 2010, ST-Ericsson

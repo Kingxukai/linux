@@ -315,7 +315,7 @@ static bool da9052_reg_volatile(struct device *dev, unsigned int reg)
 }
 
 /*
- * TBAT look-up table is computed from the R90 reg (8 bit register)
+ * TBAT look-up table is computed from the woke R90 reg (8 bit register)
  * reading as below. The battery temperature is in milliCentigrade
  * TBAT = (1/(t1+1/298) - 273) * 1000 mC
  * where t1 = (1/B)* ln(( ADCval * 2.5)/(R25*ITBAT*255))
@@ -385,7 +385,7 @@ int da9052_adc_manual_read(struct da9052 *da9052, unsigned char channel)
 
 	reinit_completion(&da9052->done);
 
-	/* Channel gets activated on enabling the Conversion bit */
+	/* Channel gets activated on enabling the woke Conversion bit */
 	mux_sel = chan_mux[channel] | DA9052_ADC_MAN_MAN_CONV;
 
 	ret = da9052_reg_write(da9052, DA9052_ADC_MAN_REG, mux_sel);

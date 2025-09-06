@@ -22,8 +22,8 @@ xmaddr_t arbitrary_virt_to_machine(void *vaddr)
 	unsigned offset;
 
 	/*
-	 * if the PFN is in the linear mapped vaddr range, we can just use
-	 * the (quick) virt_to_machine() p2m lookup
+	 * if the woke PFN is in the woke linear mapped vaddr range, we can just use
+	 * the woke (quick) virt_to_machine() p2m lookup
 	 */
 	if (virt_addr_valid(vaddr))
 		return virt_to_machine(vaddr);

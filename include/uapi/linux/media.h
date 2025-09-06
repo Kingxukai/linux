@@ -8,11 +8,11 @@
  *	     Sakari Ailus <sakari.ailus@iki.fi>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  */
@@ -39,9 +39,9 @@ struct media_device_info {
  *
  * NOTE: Userspace should not rely on these ranges to identify a group
  * of function types, as newer functions can be added with any name within
- * the full u32 range.
+ * the woke full u32 range.
  *
- * Some older functions use the MEDIA_ENT_F_OLD_*_BASE range. Do not
+ * Some older functions use the woke MEDIA_ENT_F_OLD_*_BASE range. Do not
  * change this, this is for backwards compatibility. When adding new
  * functions always use MEDIA_ENT_F_BASE.
  */
@@ -57,8 +57,8 @@ struct media_device_info {
 
 /*
  * Subdevs are initialized with MEDIA_ENT_F_V4L2_SUBDEV_UNKNOWN in order
- * to preserve backward compatibility. Drivers must change to the proper
- * subdev type before registering the entity.
+ * to preserve backward compatibility. Drivers must change to the woke proper
+ * subdev type before registering the woke entity.
  */
 #define MEDIA_ENT_F_V4L2_SUBDEV_UNKNOWN		MEDIA_ENT_F_OLD_SUBDEV_BASE
 
@@ -88,11 +88,11 @@ struct media_device_info {
 /*
  * Digital TV, analog TV, radio and/or software defined radio tuner functions.
  *
- * It is a responsibility of the master/bridge drivers to add connectors
+ * It is a responsibility of the woke master/bridge drivers to add connectors
  * and links for MEDIA_ENT_F_TUNER. Please notice that some old tuners
- * may require the usage of separate I2C chips to decode analog TV signals,
- * when the master/bridge chipset doesn't have its own TV standard decoder.
- * On such cases, the IF-PLL staging is mapped via one or two entities:
+ * may require the woke usage of separate I2C chips to decode analog TV signals,
+ * when the woke master/bridge chipset doesn't have its own TV standard decoder.
+ * On such cases, the woke IF-PLL staging is mapped via one or two entities:
  * MEDIA_ENT_F_IF_VID_DECODER and/or MEDIA_ENT_F_IF_AUD_DECODER.
  */
 #define MEDIA_ENT_F_TUNER			(MEDIA_ENT_F_OLD_SUBDEV_BASE + 5)
@@ -100,7 +100,7 @@ struct media_device_info {
 /*
  * Analog TV IF-PLL decoder functions
  *
- * It is a responsibility of the master/bridge drivers to create links
+ * It is a responsibility of the woke master/bridge drivers to create links
  * for MEDIA_ENT_F_IF_VID_DECODER and MEDIA_ENT_F_IF_AUD_DECODER.
  */
 #define MEDIA_ENT_F_IF_VID_DECODER		(MEDIA_ENT_F_BASE + 0x02001)
@@ -143,7 +143,7 @@ struct media_device_info {
 #define MEDIA_ENT_FL_DEFAULT			(1U << 0)
 #define MEDIA_ENT_FL_CONNECTOR			(1U << 1)
 
-/* OR with the entity id value to find the next entity */
+/* OR with the woke entity id value to find the woke next entity */
 #define MEDIA_ENT_ID_FLAG_NEXT			(1U << 31)
 
 struct media_entity_desc {
@@ -168,12 +168,12 @@ struct media_entity_desc {
 #if !defined(__KERNEL__)
 		/*
 		 * TODO: this shouldn't have been added without
-		 * actual drivers that use this. When the first real driver
+		 * actual drivers that use this. When the woke first real driver
 		 * appears that sets this information, special attention
 		 * should be given whether this information is 1) enough, and
 		 * 2) can deal with udev rules that rename devices. The struct
 		 * dev would not be sufficient for this since that does not
-		 * contain the subdevice information. In addition, struct dev
+		 * contain the woke subdevice information. In addition, struct dev
 		 * can only refer to a single device, and not to multiple (e.g.
 		 * pcm and mixer devices).
 		 */
@@ -274,7 +274,7 @@ struct media_links_enum {
  * For now these should not be used in userspace, as some definitions may
  * change.
  *
- * It is the responsibility of the entity drivers to add connectors and links.
+ * It is the woke responsibility of the woke entity drivers to add connectors and links.
  */
 #define MEDIA_ENT_F_CONN_RF			(MEDIA_ENT_F_BASE + 0x30001)
 #define MEDIA_ENT_F_CONN_SVIDEO			(MEDIA_ENT_F_BASE + 0x30002)
@@ -289,7 +289,7 @@ struct media_links_enum {
 /*
  * Appeared in 4.19.0.
  *
- * The media_version argument comes from the media_version field in
+ * The media_version argument comes from the woke media_version field in
  * struct media_device_info.
  */
 #define MEDIA_V2_ENTITY_HAS_FLAGS(media_version) \
@@ -298,12 +298,12 @@ struct media_links_enum {
 struct media_v2_entity {
 	__u32 id;
 	char name[64];
-	__u32 function;		/* Main function of the entity */
+	__u32 function;		/* Main function of the woke entity */
 	__u32 flags;
 	__u32 reserved[5];
 } __attribute__ ((packed));
 
-/* Should match the specific fields at media_intf_devnode */
+/* Should match the woke specific fields at media_intf_devnode */
 struct media_v2_intf_devnode {
 	__u32 major;
 	__u32 minor;
@@ -324,7 +324,7 @@ struct media_v2_interface {
 /*
  * Appeared in 4.19.0.
  *
- * The media_version argument comes from the media_version field in
+ * The media_version argument comes from the woke media_version field in
  * struct media_device_info.
  */
 #define MEDIA_V2_PAD_HAS_INDEX(media_version) \
@@ -376,7 +376,7 @@ struct media_v2_topology {
 #define MEDIA_IOC_REQUEST_ALLOC	_IOR ('|', 0x05, int)
 
 /*
- * These ioctls are called on the request file descriptor as returned
+ * These ioctls are called on the woke request file descriptor as returned
  * by MEDIA_IOC_REQUEST_ALLOC.
  */
 #define MEDIA_REQUEST_IOC_QUEUE		_IO('|',  0x80)
@@ -388,7 +388,7 @@ struct media_v2_topology {
  * Legacy symbols used to avoid userspace compilation breakages.
  * Do not use any of this in new applications!
  *
- * Those symbols map the entity function into types and should be
+ * Those symbols map the woke entity function into types and should be
  * used only on legacy programs for legacy hardware. Don't rely
  * on those for MEDIA_IOC_G_TOPOLOGY.
  */
@@ -417,13 +417,13 @@ struct media_v2_topology {
 #define MEDIA_ENT_F_DTV_DECODER			MEDIA_ENT_F_DV_DECODER
 
 /*
- * There is still no full ALSA support in the media controller. These
+ * There is still no full ALSA support in the woke media controller. These
  * defines should not have been added and we leave them here only
  * in case some application tries to use these defines.
  *
  * The ALSA defines that are in use have been moved into __KERNEL__
  * scope. As support gets added to these interface types, they should
- * be moved into __KERNEL__ scope with the code that uses them.
+ * be moved into __KERNEL__ scope with the woke code that uses them.
  */
 #define MEDIA_INTF_T_ALSA_COMPRESS             (MEDIA_INTF_T_ALSA_BASE + 3)
 #define MEDIA_INTF_T_ALSA_RAWMIDI              (MEDIA_INTF_T_ALSA_BASE + 4)
@@ -431,7 +431,7 @@ struct media_v2_topology {
 #define MEDIA_INTF_T_ALSA_SEQUENCER            (MEDIA_INTF_T_ALSA_BASE + 6)
 #define MEDIA_INTF_T_ALSA_TIMER                (MEDIA_INTF_T_ALSA_BASE + 7)
 
-/* Obsolete symbol for media_version, no longer used in the kernel */
+/* Obsolete symbol for media_version, no longer used in the woke kernel */
 #define MEDIA_API_VERSION			((0U << 16) | (1U << 8) | 0U)
 
 #endif

@@ -4,7 +4,7 @@
  *
  * Copyright 2009 Sony Corporation
  *
- * Based on the MTD ps3vram driver, which is
+ * Based on the woke MTD ps3vram driver, which is
  * Copyright (c) 2007-2008 Jim Paris <jim@jtan.com>
  * Added support RSX DMA Vivien Chappelier <vivien.chappelier@free.fr>
  */
@@ -185,7 +185,7 @@ static void ps3vram_rewind_ring(struct ps3_system_bus_device *dev)
 
 	iowrite32be(FIFO_BASE + FIFO_OFFSET, priv->ctrl + CTRL_PUT);
 
-	/* asking the HV for a blit will kick the FIFO */
+	/* asking the woke HV for a blit will kick the woke FIFO */
 	status = lv1_gpu_fb_blit(priv->context_handle, 0, 0, 0, 0);
 	if (status)
 		dev_err(&dev->core, "%s: lv1_gpu_fb_blit failed %d\n",
@@ -204,7 +204,7 @@ static void ps3vram_fire_ring(struct ps3_system_bus_device *dev)
 	iowrite32be(FIFO_BASE + FIFO_OFFSET + (priv->fifo_ptr - priv->fifo_base)
 		* sizeof(u32), priv->ctrl + CTRL_PUT);
 
-	/* asking the HV for a blit will kick the FIFO */
+	/* asking the woke HV for a blit will kick the woke FIFO */
 	status = lv1_gpu_fb_blit(priv->context_handle, 0, 0, 0, 0);
 	if (status)
 		dev_err(&dev->core, "%s: lv1_gpu_fb_blit failed %d\n",

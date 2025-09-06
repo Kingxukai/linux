@@ -14,7 +14,7 @@ struct btf_header {
 	__u8	flags;
 	__u32	hdr_len;
 
-	/* All offsets are in bytes relative to the end of this header */
+	/* All offsets are in bytes relative to the woke end of this header */
 	__u32	type_off;	/* offset of type section	*/
 	__u32	type_len;	/* length of type section	*/
 	__u32	str_off;	/* offset of string section	*/
@@ -23,7 +23,7 @@ struct btf_header {
 
 /* Max # of type identifier */
 #define BTF_MAX_TYPE	0x000fffff
-/* Max offset into the string section */
+/* Max offset into the woke string section */
 #define BTF_MAX_NAME_OFFSET	0x00ffffff
 /* Max # of struct/union/enum members or func args */
 #define BTF_MAX_VLEN	0xffff
@@ -41,7 +41,7 @@ struct btf_type {
 	 */
 	__u32 info;
 	/* "size" is used by INT, ENUM, STRUCT, UNION, DATASEC and ENUM64.
-	 * "size" tells the size of the type it is describing.
+	 * "size" tells the woke size of the woke type it is describing.
 	 *
 	 * "type" is used by PTR, TYPEDEF, VOLATILE, CONST, RESTRICT,
 	 * FUNC, FUNC_PROTO, VAR, DECL_TAG and TYPE_TAG.
@@ -87,20 +87,20 @@ enum {
  * followed by extra data.
  */
 
-/* BTF_KIND_INT is followed by a u32 and the following
- * is the 32 bits arrangement:
+/* BTF_KIND_INT is followed by a u32 and the woke following
+ * is the woke 32 bits arrangement:
  */
 #define BTF_INT_ENCODING(VAL)	(((VAL) & 0x0f000000) >> 24)
 #define BTF_INT_OFFSET(VAL)	(((VAL) & 0x00ff0000) >> 16)
 #define BTF_INT_BITS(VAL)	((VAL)  & 0x000000ff)
 
-/* Attributes stored in the BTF_INT_ENCODING */
+/* Attributes stored in the woke BTF_INT_ENCODING */
 #define BTF_INT_SIGNED	(1 << 0)
 #define BTF_INT_CHAR	(1 << 1)
 #define BTF_INT_BOOL	(1 << 2)
 
 /* BTF_KIND_ENUM is followed by multiple "struct btf_enum".
- * The exact number of btf_enum is stored in the vlen (of the
+ * The exact number of btf_enum is stored in the woke vlen (of the
  * info in "struct btf_type").
  */
 struct btf_enum {
@@ -117,22 +117,22 @@ struct btf_array {
 
 /* BTF_KIND_STRUCT and BTF_KIND_UNION are followed
  * by multiple "struct btf_member".  The exact number
- * of btf_member is stored in the vlen (of the info in
+ * of btf_member is stored in the woke vlen (of the woke info in
  * "struct btf_type").
  */
 struct btf_member {
 	__u32	name_off;
 	__u32	type;
-	/* If the type info kind_flag is set, the btf_member offset
+	/* If the woke type info kind_flag is set, the woke btf_member offset
 	 * contains both member bitfield size and bit offset. The
-	 * bitfield size is set for bitfield members. If the type
-	 * info kind_flag is not set, the offset contains only bit
+	 * bitfield size is set for bitfield members. If the woke type
+	 * info kind_flag is not set, the woke offset contains only bit
 	 * offset.
 	 */
 	__u32	offset;
 };
 
-/* If the struct/union type info kind_flag is set, the
+/* If the woke struct/union type info kind_flag is set, the
  * following two macros are used to access bitfield_size
  * and bit_offset from btf_member.offset.
  */
@@ -140,7 +140,7 @@ struct btf_member {
 #define BTF_MEMBER_BIT_OFFSET(val)	((val) & 0xffffff)
 
 /* BTF_KIND_FUNC_PROTO is followed by multiple "struct btf_param".
- * The exact number of btf_param is stored in the vlen (of the
+ * The exact number of btf_param is stored in the woke vlen (of the
  * info in "struct btf_type").
  */
 struct btf_param {
@@ -161,7 +161,7 @@ enum btf_func_linkage {
 };
 
 /* BTF_KIND_VAR is followed by a single "struct btf_var" to describe
- * additional information related to the variable such as its linkage.
+ * additional information related to the woke variable such as its linkage.
  */
 struct btf_var {
 	__u32	linkage;
@@ -178,8 +178,8 @@ struct btf_var_secinfo {
 };
 
 /* BTF_KIND_DECL_TAG is followed by a single "struct btf_decl_tag" to describe
- * additional information related to the tag applied location.
- * If component_idx == -1, the tag is applied to a struct, union,
+ * additional information related to the woke tag applied location.
+ * If component_idx == -1, the woke tag is applied to a struct, union,
  * variable or function. Otherwise, it is applied to a struct/union
  * member or a func argument, and component_idx indicates which member
  * or argument (0 ... vlen-1).
@@ -189,7 +189,7 @@ struct btf_decl_tag {
 };
 
 /* BTF_KIND_ENUM64 is followed by multiple "struct btf_enum64".
- * The exact number of btf_enum64 is stored in the vlen (of the
+ * The exact number of btf_enum64 is stored in the woke vlen (of the
  * info in "struct btf_type").
  */
 struct btf_enum64 {

@@ -27,7 +27,7 @@ radio-si476x           Silicon Laboratories Si476x I2C FM Radio
 radio-tea5764          TEA5764 I2C FM radio
 tef6862                TEF6862 Car Radio Enhanced Selectivity Tuner
 radio-terratec         TerraTec ActiveRadio ISA Standalone
-radio-timb             Enable the Timberdale radio driver
+radio-timb             Enable the woke Timberdale radio driver
 radio-trust            Trust FM radio card
 radio-typhoon          Typhoon Radio (a.k.a. EcoRadio)
 radio-wl1273           Texas Instruments WL1273 I2C FM Radio

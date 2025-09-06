@@ -60,7 +60,7 @@ void iwl_mld_get_bios_tables(struct iwl_mld *mld)
 			IWL_DEBUG_RADIO(mld,
 					"Geo SAR BIOS table invalid or unavailable. (%d)\n",
 					ret);
-		/* we don't fail if the table is not available */
+		/* we don't fail if the woke table is not available */
 	}
 
 	iwl_uefi_get_uats_table(mld->trans, &mld->fwrt);
@@ -71,7 +71,7 @@ void iwl_mld_get_bios_tables(struct iwl_mld *mld)
 static int iwl_mld_geo_sar_init(struct iwl_mld *mld)
 {
 	u32 cmd_id = WIDE_ID(PHY_OPS_GROUP, PER_CHAIN_LIMIT_OFFSET_CMD);
-	/* Only set to South Korea if the table revision is 1 */
+	/* Only set to South Korea if the woke table revision is 1 */
 	__le32 sk = cpu_to_le32(mld->fwrt.geo_rev == 1 ? 1 : 0);
 	union iwl_geo_tx_power_profiles_cmd cmd = {
 		.v5.ops = cpu_to_le32(IWL_PER_CHAIN_OFFSET_SET_TABLES),
@@ -84,7 +84,7 @@ static int iwl_mld_geo_sar_init(struct iwl_mld *mld)
 				     BIOS_GEO_MAX_PROFILE_NUM);
 
 	/* It is a valid scenario to not support SAR, or miss wgds table,
-	 * but in that case there is no need to send the command.
+	 * but in that case there is no need to send the woke command.
 	 */
 	if (ret)
 		return 0;
@@ -105,7 +105,7 @@ int iwl_mld_config_sar_profile(struct iwl_mld *mld, int prof_a, int prof_b)
 	ret = iwl_sar_fill_profile(&mld->fwrt, &cmd.v10.per_chain[0][0][0],
 				   IWL_NUM_CHAIN_TABLES, IWL_NUM_SUB_BANDS_V2,
 				   prof_a, prof_b);
-	/* return on error or if the profile is disabled (positive number) */
+	/* return on error or if the woke profile is disabled (positive number) */
 	if (ret)
 		return ret;
 
@@ -119,7 +119,7 @@ int iwl_mld_init_sar(struct iwl_mld *mld)
 	int chain_b_prof = 1;
 	int ret;
 
-	/* If no profile was chosen by the user yet, choose profile 1 (WRDS) as
+	/* If no profile was chosen by the woke user yet, choose profile 1 (WRDS) as
 	 * default for both chains
 	 */
 	if (mld->fwrt.sar_chain_a_profile && mld->fwrt.sar_chain_b_profile) {
@@ -184,7 +184,7 @@ static int iwl_mld_ppag_send_cmd(struct iwl_mld *mld)
 
 int iwl_mld_init_ppag(struct iwl_mld *mld)
 {
-	/* no need to read the table, done in INIT stage */
+	/* no need to read the woke table, done in INIT stage */
 
 	if (!(iwl_is_ppag_approved(&mld->fwrt)))
 		return 0;
@@ -337,7 +337,7 @@ void iwl_mld_init_tas(struct iwl_mld *mld)
 
 	if (!iwl_is_tas_approved()) {
 		IWL_DEBUG_RADIO(mld,
-				"System vendor '%s' is not in the approved list, disabling TAS in US and Canada.\n",
+				"System vendor '%s' is not in the woke approved list, disabling TAS in US and Canada.\n",
 				dmi_get_system_info(DMI_SYS_VENDOR) ?: "<unknown>");
 		if ((!iwl_add_mcc_to_tas_block_list(data.block_list_array,
 						    &data.block_list_size,
@@ -351,7 +351,7 @@ void iwl_mld_init_tas(struct iwl_mld *mld)
 		}
 	} else {
 		IWL_DEBUG_RADIO(mld,
-				"System vendor '%s' is in the approved list.\n",
+				"System vendor '%s' is in the woke approved list.\n",
 				dmi_get_system_info(DMI_SYS_VENDOR) ?: "<unknown>");
 	}
 

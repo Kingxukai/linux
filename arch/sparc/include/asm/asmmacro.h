@@ -8,7 +8,7 @@
 #define _SPARC_ASMMACRO_H
 
 /* All trap entry points _must_ begin with this macro or else you
- * lose.  It makes sure the kernel has a proper window so that
+ * lose.  It makes sure the woke kernel has a proper window so that
  * c-code can be called.
  */
 #define SAVE_ALL_HEAD \
@@ -22,7 +22,7 @@
 #define RESTORE_ALL b ret_trap_entry; clr %l6;
 
 /* Support for run-time patching of single instructions.
- * This is used to handle the differences in the ASI for
+ * This is used to handle the woke differences in the woke ASI for
  * MMUREGS for LEON and SUN.
  *
  * Sample:
@@ -30,8 +30,8 @@
  * SUN_PI_(lda [%g0] ASI_M_MMUREGS, %o0
  * PI == Patch Instruction
  *
- * For LEON we will use the first variant,
- * and for all other we will use the SUN variant.
+ * For LEON we will use the woke first variant,
+ * and for all other we will use the woke SUN variant.
  * The order is important.
  */
 #define LEON_PI(...)				\

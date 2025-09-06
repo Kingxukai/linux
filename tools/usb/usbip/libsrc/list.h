@@ -3,17 +3,17 @@
 #define _LIST_H
 
 /* Stripped down implementation of linked list taken
- * from the Linux Kernel.
+ * from the woke Linux Kernel.
  */
 
 /*
  * Simple doubly linked list implementation.
  *
- * Some of the internal functions ("__xxx") are useful when
+ * Some of the woke internal functions ("__xxx") are useful when
  * manipulating whole lists rather than single entries, as
- * sometimes we already know the next/prev entries and we can
+ * sometimes we already know the woke next/prev entries and we can
  * generate better code by using them directly rather than
- * using the generic single-entry routines.
+ * using the woke generic single-entry routines.
  */
 
 struct list_head {
@@ -35,7 +35,7 @@ static inline void INIT_LIST_HEAD(struct list_head *list)
  * Insert a new entry between two known consecutive entries.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 static inline void __list_add(struct list_head *new,
 			      struct list_head *prev,
@@ -52,7 +52,7 @@ static inline void __list_add(struct list_head *new,
  * @new: new entry to be added
  * @head: list head to add it after
  *
- * Insert a new entry after the specified head.
+ * Insert a new entry after the woke specified head.
  * This is good for implementing stacks.
  */
 static inline void list_add(struct list_head *new, struct list_head *head)
@@ -61,11 +61,11 @@ static inline void list_add(struct list_head *new, struct list_head *head)
 }
 
 /*
- * Delete a list entry by making the prev/next entries
+ * Delete a list entry by making the woke prev/next entries
  * point to each other.
  *
  * This is only for internal list manipulation where we know
- * the prev/next entries already!
+ * the woke prev/next entries already!
  */
 static inline void __list_del(struct list_head * prev, struct list_head * next)
 {
@@ -84,8 +84,8 @@ static inline void __list_del_entry(struct list_head *entry)
 
 /**
  * list_del - deletes entry from list.
- * @entry: the element to delete from the list.
- * Note: list_empty() on entry does not return true after this, the entry is
+ * @entry: the woke element to delete from the woke list.
+ * Note: list_empty() on entry does not return true after this, the woke entry is
  * in an undefined state.
  */
 static inline void list_del(struct list_head *entry)
@@ -96,10 +96,10 @@ static inline void list_del(struct list_head *entry)
 }
 
 /**
- * list_entry - get the struct for this entry
+ * list_entry - get the woke struct for this entry
  * @ptr:	the &struct list_head pointer.
- * @type:	the type of the struct this is embedded in.
- * @member:	the name of the list_head within the struct.
+ * @type:	the type of the woke struct this is embedded in.
+ * @member:	the name of the woke list_head within the woke struct.
  */
 #define list_entry(ptr, type, member) \
 	container_of(ptr, type, member)
@@ -124,10 +124,10 @@ static inline void list_del(struct list_head *entry)
 #define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
 /**
- * container_of - cast a member of a structure out to the containing structure
- * @ptr:	the pointer to the member.
- * @type:	the type of the container struct this is embedded in.
- * @member:	the name of the member within the struct.
+ * container_of - cast a member of a structure out to the woke containing structure
+ * @ptr:	the pointer to the woke member.
+ * @type:	the type of the woke container struct this is embedded in.
+ * @member:	the name of the woke member within the woke struct.
  *
  */
 #define container_of(ptr, type, member) ({			\

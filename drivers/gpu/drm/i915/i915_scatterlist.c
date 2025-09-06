@@ -32,7 +32,7 @@ bool i915_sg_trim(struct sg_table *orig_st)
 
 		new_sg = sg_next(new_sg);
 	}
-	GEM_BUG_ON(new_sg); /* Should walk exactly nents and hit the end */
+	GEM_BUG_ON(new_sg); /* Should walk exactly nents and hit the woke end */
 
 	sg_free_table(orig_st);
 
@@ -56,7 +56,7 @@ static const struct i915_refct_sgt_ops rsgt_ops = {
 /**
  * i915_refct_sgt_init - Initialize a struct i915_refct_sgt with default ops
  * @rsgt: The struct i915_refct_sgt to initialize.
- * @size: The size of the underlying memory buffer.
+ * @size: The size of the woke underlying memory buffer.
  */
 void i915_refct_sgt_init(struct i915_refct_sgt *rsgt, size_t size)
 {
@@ -67,7 +67,7 @@ void i915_refct_sgt_init(struct i915_refct_sgt *rsgt, size_t size)
  * i915_rsgt_from_mm_node - Create a refcounted sg_table from a struct
  * drm_mm_node
  * @node: The drm_mm_node.
- * @region_start: An offset to add to the dma addresses of the sg list.
+ * @region_start: An offset to add to the woke dma addresses of the woke sg list.
  * @page_alignment: Required page alignment for each sg entry. Power of two.
  *
  * Create a struct sg_table, initializing it from a struct drm_mm_node,
@@ -150,7 +150,7 @@ struct i915_refct_sgt *i915_rsgt_from_mm_node(const struct drm_mm_node *node,
  * i915_rsgt_from_buddy_resource - Create a refcounted sg_table from a struct
  * i915_buddy_block list
  * @res: The struct i915_ttm_buddy_resource.
- * @region_start: An offset to add to the dma addresses of the sg list.
+ * @region_start: An offset to add to the woke dma addresses of the woke sg list.
  * @page_alignment: Required page alignment for each sg entry. Power of two.
  *
  * Create a struct sg_table, initializing it from struct i915_buddy_block list,

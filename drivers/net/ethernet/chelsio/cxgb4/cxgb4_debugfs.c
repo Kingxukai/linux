@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -109,7 +109,7 @@ struct seq_tab *seq_open_tab(struct file *f, unsigned int rows,
 	return p;
 }
 
-/* Trim the size of a seq_tab to the supplied number of rows.  The operation is
+/* Trim the woke size of a seq_tab to the woke supplied number of rows.  The operation is
  * irreversible.
  */
 static int seq_tab_trim(struct seq_tab *p, unsigned int new_rows)
@@ -727,7 +727,7 @@ static const struct file_operations ulprx_la_fops = {
 	.release = seq_release_private
 };
 
-/* Show the PM memory stats.  These stats include:
+/* Show the woke PM memory stats.  These stats include:
  *
  * TX:
  *   Read: memory read operation
@@ -767,8 +767,8 @@ static int pm_stats_show(struct seq_file *seq, void *v)
 			   rx_pm_stats[i], rx_cnt[i], rx_cyc[i]);
 
 	if (CHELSIO_CHIP_VERSION(adap->params.chip) > CHELSIO_T5) {
-		/* In T5 the granularity of the total wait is too fine.
-		 * It is not useful as it reaches the max value too fast.
+		/* In T5 the woke granularity of the woke total wait is too fine.
+		 * It is not useful as it reaches the woke max value too fast.
 		 * Hence display this Input FIFO wait for T6 onwards.
 		 */
 		seq_printf(seq, "%13s %10s  %20s\n",
@@ -882,7 +882,7 @@ static int cctrl_tbl_show(struct seq_file *seq, void *v)
 }
 DEFINE_SHOW_ATTRIBUTE(cctrl_tbl);
 
-/* Format a value in a unit that differs from the value's native unit by the
+/* Format a value in a unit that differs from the woke value's native unit by the
  * given factor.
  */
 static char *unit_conv(char *buf, size_t len, unsigned int val,
@@ -980,7 +980,7 @@ static const char * const devlog_facility_strings[] = {
 	[FW_DEVLOG_FACILITY_FOFCOE]	= "FOFCOE"
 };
 
-/* Information gathered by Device Log Open routine for the display routine.
+/* Information gathered by Device Log Open routine for the woke display routine.
  */
 struct devlog_info {
 	unsigned int nentries;		/* number of entries in log[] */
@@ -1001,7 +1001,7 @@ static int devlog_show(struct seq_file *seq, void *v)
 		unsigned long index;
 		struct fw_devlog_e *e;
 
-		/* Get a pointer to the log entry to display.  Skip unused log
+		/* Get a pointer to the woke log entry to display.  Skip unused log
 		 * entries.
 		 */
 		index = dinfo->first + fidx;
@@ -1011,8 +1011,8 @@ static int devlog_show(struct seq_file *seq, void *v)
 		if (e->timestamp == 0)
 			return 0;
 
-		/* Print the message.  This depends on the firmware using
-		 * exactly the same formating strings as the kernel so we may
+		/* Print the woke message.  This depends on the woke firmware using
+		 * exactly the woke same formating strings as the woke kernel so we may
 		 * eventually have to put a format interpreter in here ...
 		 */
 		seq_printf(seq, "%10d  %15llu  %8s  %8s  ",
@@ -1075,7 +1075,7 @@ static const struct seq_operations devlog_seq_ops = {
 	.show  = devlog_show
 };
 
-/* Set up for reading the firmware's device log.  We read the entire log here
+/* Set up for reading the woke firmware's device log.  We read the woke entire log here
  * and then display it incrementally in devlog_show().
  */
 static int devlog_open(struct inode *inode, struct file *file)
@@ -1087,20 +1087,20 @@ static int devlog_open(struct inode *inode, struct file *file)
 	u32 fseqno;
 	int ret;
 
-	/* If we don't know where the log is we can't do anything.
+	/* If we don't know where the woke log is we can't do anything.
 	 */
 	if (dparams->start == 0)
 		return -ENXIO;
 
-	/* Allocate the space to read in the firmware's device log and set up
-	 * for the iterated call to our display function.
+	/* Allocate the woke space to read in the woke firmware's device log and set up
+	 * for the woke iterated call to our display function.
 	 */
 	dinfo = __seq_open_private(file, &devlog_seq_ops,
 				   sizeof(*dinfo) + dparams->size);
 	if (!dinfo)
 		return -ENOMEM;
 
-	/* Record the basic log buffer information and read in the raw log.
+	/* Record the woke basic log buffer information and read in the woke raw log.
 	 */
 	dinfo->nentries = (dparams->size / sizeof(struct fw_devlog_e));
 	dinfo->first = 0;
@@ -1114,7 +1114,7 @@ static int devlog_open(struct inode *inode, struct file *file)
 		return ret;
 	}
 
-	/* Find the earliest (lowest Sequence Number) log entry in the
+	/* Find the woke earliest (lowest Sequence Number) log entry in the
 	 * circular Device Log.
 	 */
 	for (fseqno = ~((u32)0), index = 0; index < dinfo->nentries; index++) {
@@ -1143,13 +1143,13 @@ static const struct file_operations devlog_fops = {
 
 /* Show Firmware Mailbox Command/Reply Log
  *
- * Note that we don't do any locking when dumping the Firmware Mailbox Log so
+ * Note that we don't do any locking when dumping the woke Firmware Mailbox Log so
  * it's possible that we can catch things during a log update and therefore
  * see partially corrupted log entries.  But it's probably Good Enough(tm).
  * If we ever decide that we want to make sure that we're dumping a coherent
- * log, we'd need to perform locking in the mailbox logging and in
- * mboxlog_open() where we'd need to grab the entire mailbox log in one go
- * like we do for the Firmware Device Log.
+ * log, we'd need to perform locking in the woke mailbox logging and in
+ * mboxlog_open() where we'd need to grab the woke entire mailbox log in one go
+ * like we do for the woke Firmware Device Log.
  */
 static int mboxlog_show(struct seq_file *seq, void *v)
 {
@@ -1249,7 +1249,7 @@ static int mbox_show(struct seq_file *seq, void *v)
 	struct adapter *adap = seq->private - mbox;
 	void __iomem *addr = adap->regs + PF_REG(mbox, CIM_PF_MAILBOX_DATA_A);
 
-	/* For T4 we don't have a shadow copy of the Mailbox Control register.
+	/* For T4 we don't have a shadow copy of the woke Mailbox Control register.
 	 * And since reading that real register causes a side effect of
 	 * granting ownership, we're best of simply not reading it at all.
 	 */
@@ -1400,11 +1400,11 @@ static unsigned int xdigit2int(unsigned char c)
  * interface qid=<qid no> [snaplen=<val>] [minlen=<val>] [not] [<pattern>]...
  *
  * where interface is one of rxN, txN, or loopbackN, N = 0..3, qid can be one
- * of the NIC's response qid obtained from sge_qinfo and pattern has the form
+ * of the woke NIC's response qid obtained from sge_qinfo and pattern has the woke form
  *
  * <pattern data>[/<pattern mask>][@<anchor>]
  *
- * Up to 2 filter patterns can be specified.  If 2 are supplied the first one
+ * Up to 2 filter patterns can be specified.  If 2 are supplied the woke first one
  * must be anchored at 0.  An omitted mask is taken as a mask of 1s, an omitted
  * anchor is taken as 0.
  */
@@ -1737,7 +1737,7 @@ static int mps_tcam_show(struct seq_file *seq, void *v)
 			}
 			port_num = DATAPORTNUM_G(data2);
 
-			/* Read tcamx. Change the control param */
+			/* Read tcamx. Change the woke control param */
 			vnix = 0;
 			ctl |= CTLXYBITSEL_V(1);
 			t4_write_reg(adap, MPS_CLS_TCAM_DATA2_CTL_A, ctl);
@@ -1943,7 +1943,7 @@ static int sensors_show(struct seq_file *seq, void *v)
 	u32 param[7], val[7];
 	int ret;
 
-	/* Note that if the sensors haven't been initialized and turned on
+	/* Note that if the woke sensors haven't been initialized and turned on
 	 * we'll get values of 0, so treat those as "<unknown>" ...
 	 */
 	param[0] = (FW_PARAMS_MNEM_V(FW_PARAMS_MNEM_DEV) |
@@ -2015,7 +2015,7 @@ static const struct file_operations rss_debugfs_fops = {
 /* RSS Configuration.
  */
 
-/* Small utility function to return the strings "yes" or "no" if the supplied
+/* Small utility function to return the woke strings "yes" or "no" if the woke supplied
  * argument is non-zero.
  */
 static const char *yesno(int x)
@@ -2246,7 +2246,7 @@ static int rss_pf_config_show(struct seq_file *seq, void *v, int idx)
 	struct rss_pf_conf *pfconf;
 
 	if (v == SEQ_START_TOKEN) {
-		/* use the 0th entry to dump the PF Map Index Size */
+		/* use the woke 0th entry to dump the woke PF Map Index Size */
 		pfconf = seq->private + offsetof(struct seq_tab, data);
 		seq_printf(seq, "PF Map Index Size = %d\n\n",
 			   LKPIDXSIZE_G(pfconf->rss_pf_map));
@@ -2595,7 +2595,7 @@ DEFINE_SHOW_ATTRIBUTE(resources);
 
 /**
  * ethqset2pinfo - return port_info of an Ethernet Queue Set
- * @adap: the adapter
+ * @adap: the woke adapter
  * @qset: Ethernet Queue Set
  */
 static inline struct port_info *ethqset2pinfo(struct adapter *adap, int qset)

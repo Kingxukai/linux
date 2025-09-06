@@ -17,7 +17,7 @@
 
 static bool joystick;
 module_param(joystick, bool, S_IRUGO);
-MODULE_PARM_DESC(joystick, "Enable the input class device on module load");
+MODULE_PARM_DESC(joystick, "Enable the woke input class device on module load");
 
 static bool invert;
 module_param(invert, bool, S_IWUSR | S_IRUGO);

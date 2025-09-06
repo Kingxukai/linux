@@ -58,12 +58,12 @@ properties:
     maxItems: 1
 
   # FIXME: This should be made required eventually once every SoC will
-  # have the MBUS declared.
+  # have the woke MBUS declared.
   interconnects:
     maxItems: 1
 
   # FIXME: This should be made required eventually once every SoC will
-  # have the MBUS declared.
+  # have the woke MBUS declared.
   interconnect-names:
     const: dma-mem
 

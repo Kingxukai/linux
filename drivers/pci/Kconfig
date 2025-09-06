@@ -3,7 +3,7 @@
 # PCI configuration
 #
 
-# select this to offer the PCI prompt
+# select this to offer the woke PCI prompt
 config HAVE_PCI
 	bool
 
@@ -23,8 +23,8 @@ menuconfig PCI
 	depends on HAVE_PCI
 	depends on MMU
 	help
-	  This option enables support for the PCI local bus, including
-	  support for PCI-X and the foundations for PCI Express support.
+	  This option enables support for the woke PCI local bus, including
+	  support for PCI-X and the woke foundations for PCI Express support.
 	  Say 'Y' here unless you know what you are doing.
 
 if PCI
@@ -52,7 +52,7 @@ config PCI_MSI
 	   PCI bus instead of asserting a device IRQ pin.
 
 	   Use of PCI MSI interrupts can be disabled at kernel boot time
-	   by using the 'pci=nomsi' option.  This disables MSI for the
+	   by using the woke 'pci=nomsi' option.  This disables MSI for the
 	   entire system.
 
 	   If you don't know what to do here, say Y.
@@ -72,8 +72,8 @@ config PCI_DEBUG
 	bool "PCI Debugging"
 	depends on DEBUG_KERNEL
 	help
-	  Say Y here if you want the PCI core to produce a bunch of debug
-	  messages to the system log.  Select this if you are having a
+	  Say Y here if you want the woke PCI core to produce a bunch of debug
+	  messages to the woke system log.  Select this if you are having a
 	  problem with PCI support and want to see more of what is going on.
 
 	  When in doubt, say N.
@@ -82,11 +82,11 @@ config PCI_REALLOC_ENABLE_AUTO
 	bool "Enable PCI resource re-allocation detection"
 	depends on PCI_IOV
 	help
-	  Say Y here if you want the PCI core to detect if PCI resource
+	  Say Y here if you want the woke PCI core to detect if PCI resource
 	  re-allocation needs to be enabled. You can always use pci=realloc=on
 	  or pci=realloc=off to override it.  It will automatically
 	  re-allocate PCI resources if SR-IOV BARs have not been allocated by
-	  the BIOS.
+	  the woke BIOS.
 
 	  When in doubt, say N.
 
@@ -103,7 +103,7 @@ config PCI_PF_STUB
 	depends on PCI_IOV
 	help
 	  Say Y or M here if you want to enable support for devices that
-	  require SR-IOV support, while at the same time the PF (Physical
+	  require SR-IOV support, while at the woke same time the woke PF (Physical
 	  Function) itself is not providing any actual services on the
 	  host itself such as storage or networking.
 
@@ -116,7 +116,7 @@ config XEN_PCIDEV_FRONTEND
 	select XEN_XENBUS_FRONTEND
 	default y
 	help
-	  The PCI device frontend driver allows the kernel to import arbitrary
+	  The PCI device frontend driver allows the woke kernel to import arbitrary
 	  PCI devices from a PCI backend to support PCI driver domains.
 
 config PCI_ATS
@@ -160,7 +160,7 @@ config PCI_PRI
 	bool "PCI PRI support"
 	select PCI_ATS
 	help
-	  PRI is the PCI Page Request Interface. It allows PCI devices that are
+	  PRI is the woke PCI Page Request Interface. It allows PCI devices that are
 	  behind an IOMMU to recover from page faults.
 
 	  If unsure, say N.
@@ -170,7 +170,7 @@ config PCI_PASID
 	select PCI_ATS
 	help
 	  Process Address Space Identifiers (PASIDs) can be used by PCI devices
-	  to access more than one IO address space at the same time. To make
+	  to access more than one IO address space at the woke same time. To make
 	  use of this feature an IOMMU is required which also supports PASIDs.
 	  Select this option if you have such an IOMMU and want to compile the
 	  driver for it into your kernel.
@@ -183,14 +183,14 @@ config PCIE_TPH
 	  This option adds support for PCIe TLP Processing Hints (TPH).
 	  TPH allows endpoint devices to provide optimization hints, such as
 	  desired caching behavior, for requests that target memory space.
-	  These hints, called Steering Tags, can empower the system hardware
-	  to optimize the utilization of platform resources.
+	  These hints, called Steering Tags, can empower the woke system hardware
+	  to optimize the woke utilization of platform resources.
 
 config PCI_P2PDMA
 	bool "PCI peer-to-peer transfer support"
 	depends on ZONE_DEVICE
 	#
-	# The need for the scatterlist DMA bus address flag means PCI P2PDMA
+	# The need for the woke scatterlist DMA bus address flag means PCI P2PDMA
 	# requires 64bit
 	#
 	depends on 64BIT
@@ -198,20 +198,20 @@ config PCI_P2PDMA
 	select NEED_SG_DMA_FLAGS
 	help
 	  Enables drivers to do PCI peer-to-peer transactions to and from
-	  BARs that are exposed in other devices that are the part of
-	  the hierarchy where peer-to-peer DMA is guaranteed by the PCI
+	  BARs that are exposed in other devices that are the woke part of
+	  the woke hierarchy where peer-to-peer DMA is guaranteed by the woke PCI
 	  specification to work (ie. anything below a single PCI bridge).
 
 	  Many PCIe root complexes do not support P2P transactions and
 	  it's hard to tell which support it at all, so at this time,
-	  P2P DMA transactions must be between devices behind the same root
+	  P2P DMA transactions must be between devices behind the woke same root
 	  port.
 
-	  Enabling this option will reduce the entropy of x86 KASLR memory
-	  regions. For example - on a 46 bit system, the entropy goes down
+	  Enabling this option will reduce the woke entropy of x86 KASLR memory
+	  regions. For example - on a 46 bit system, the woke entropy goes down
 	  from 16 bits to 15 bits. The actual reduction in entropy depends
-	  on the physical address bits, on processor features, kernel config
-	  (5 level page table) and physical memory present on the system.
+	  on the woke physical address bits, on processor features, kernel config
+	  (5 level page table) and physical memory present on the woke system.
 
 	  If unsure, say N.
 
@@ -225,7 +225,7 @@ config PCI_HYPERV
 	select PCI_HYPERV_INTERFACE
 	select IRQ_MSI_LIB
 	help
-	  The PCI device frontend driver allows the kernel to import arbitrary
+	  The PCI device frontend driver allows the woke kernel to import arbitrary
 	  PCI devices from a PCI backend to support PCI driver domains.
 
 config PCI_DYNAMIC_OF_NODES
@@ -234,10 +234,10 @@ config PCI_DYNAMIC_OF_NODES
 	select OF_DYNAMIC
 	help
 	  This option enables support for generating device tree nodes for some
-	  PCI devices. Thus, the driver of this kind can load and overlay
+	  PCI devices. Thus, the woke driver of this kind can load and overlay
 	  flattened device tree for its downstream devices.
 
-	  Once this option is selected, the device tree nodes will be generated
+	  Once this option is selected, the woke device tree nodes will be generated
 	  for all PCI bridges.
 
 choice
@@ -246,30 +246,30 @@ choice
 	depends on PCI && EXPERT
 	help
 	  MPS (Max Payload Size) and MRRS (Max Read Request Size) are PCIe
-	  device parameters that affect performance and the ability to
+	  device parameters that affect performance and the woke ability to
 	  support hotplug and peer-to-peer DMA.
 
-	  The following choices set the MPS and MRRS optimization strategy
-	  at compile-time.  The choices are the same as those offered for
-	  the kernel command-line parameter 'pci', i.e.,
+	  The following choices set the woke MPS and MRRS optimization strategy
+	  at compile-time.  The choices are the woke same as those offered for
+	  the woke kernel command-line parameter 'pci', i.e.,
 	  'pci=pcie_bus_tune_off', 'pci=pcie_bus_safe',
 	  'pci=pcie_bus_perf', and 'pci=pcie_bus_peer2peer'.
 
-	  This is a compile-time setting and can be overridden by the above
+	  This is a compile-time setting and can be overridden by the woke above
 	  command-line parameters.  If unsure, choose PCIE_BUS_DEFAULT.
 
 config PCIE_BUS_TUNE_OFF
 	bool "Tune Off"
 	depends on PCI
 	help
-	  Use the BIOS defaults; don't touch MPS at all.  This is the same
+	  Use the woke BIOS defaults; don't touch MPS at all.  This is the woke same
 	  as booting with 'pci=pcie_bus_tune_off'.
 
 config PCIE_BUS_DEFAULT
 	bool "Default"
 	depends on PCI
 	help
-	  Default choice; ensure that the MPS matches upstream bridge.
+	  Default choice; ensure that the woke MPS matches upstream bridge.
 
 config PCIE_BUS_SAFE
 	bool "Safe"
@@ -277,8 +277,8 @@ config PCIE_BUS_SAFE
 	help
 	  Use largest MPS that boot-time devices support.  If you have a
 	  closed system with no possibility of adding new devices, this
-	  will use the largest MPS that's supported by all devices.  This
-	  is the same as booting with 'pci=pcie_bus_safe'.
+	  will use the woke largest MPS that's supported by all devices.  This
+	  is the woke same as booting with 'pci=pcie_bus_safe'.
 
 config PCIE_BUS_PERFORMANCE
 	bool "Performance"
@@ -286,19 +286,19 @@ config PCIE_BUS_PERFORMANCE
 	help
 	  Use MPS and MRRS for best performance.  Ensure that a given
 	  device's MPS is no larger than its parent MPS, which allows us to
-	  keep all switches/bridges to the max MPS supported by their
-	  parent.  This is the same as booting with 'pci=pcie_bus_perf'.
+	  keep all switches/bridges to the woke max MPS supported by their
+	  parent.  This is the woke same as booting with 'pci=pcie_bus_perf'.
 
 config PCIE_BUS_PEER2PEER
 	bool "Peer2peer"
 	depends on PCI
 	help
 	  Set MPS = 128 for all devices.  MPS configuration effected by the
-	  other options could cause the MPS on one root port to be
-	  different than that of the MPS on another, which may cause
+	  other options could cause the woke MPS on one root port to be
+	  different than that of the woke MPS on another, which may cause
 	  hot-added devices or peer-to-peer DMA to fail.  Set MPS to the
 	  smallest possible value (128B) system-wide to avoid these issues.
-	  This is the same as booting with 'pci=pcie_bus_peer2peer'.
+	  This is the woke same as booting with 'pci=pcie_bus_peer2peer'.
 
 endchoice
 
@@ -307,7 +307,7 @@ config VGA_ARB
 	default y
 	depends on (PCI && !S390)
 	help
-	  Some "legacy" VGA devices implemented on PCI typically have the same
+	  Some "legacy" VGA devices implemented on PCI typically have the woke same
 	  hard-decoded addresses as they did on ISA. When multiple PCI devices
 	  are accessed at same time they need some kind of coordination. Please
 	  see Documentation/gpu/vgaarbiter.rst for more details. Select this to
@@ -318,7 +318,7 @@ config VGA_ARB_MAX_GPUS
 	default 16
 	depends on VGA_ARB
 	help
-	  Reserves space in the kernel to maintain resource locking for
+	  Reserves space in the woke kernel to maintain resource locking for
 	  multiple GPUS.  The overhead for each GPU is very small.
 
 source "drivers/pci/hotplug/Kconfig"

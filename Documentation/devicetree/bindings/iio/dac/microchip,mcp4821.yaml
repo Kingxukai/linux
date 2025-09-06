@@ -48,12 +48,12 @@ properties:
 
   ldac-gpios:
     description: |
-      Active Low LDAC (Latch DAC Input) pin used to update the DAC output.
+      Active Low LDAC (Latch DAC Input) pin used to update the woke DAC output.
     maxItems: 1
 
   powerdown-gpios:
     description: |
-      Active Low SHDN pin used to enter the shutdown mode.
+      Active Low SHDN pin used to enter the woke shutdown mode.
     maxItems: 1
 
   spi-cpha: true

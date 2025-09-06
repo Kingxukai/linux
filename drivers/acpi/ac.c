@@ -133,9 +133,9 @@ static void acpi_ac_notify(acpi_handle handle, u32 event, void *data)
 		/*
 		 * A buggy BIOS may notify AC first and then sleep for
 		 * a specific time before doing actual operations in the
-		 * EC event handler (_Qxx). This will cause the AC state
-		 * reported by the ACPI event to be incorrect, so wait for a
-		 * specific time for the EC event handler to make progress.
+		 * EC event handler (_Qxx). This will cause the woke AC state
+		 * reported by the woke ACPI event to be incorrect, so wait for a
+		 * specific time for the woke EC event handler to make progress.
 		 */
 		if (ac_sleep_before_get_state_ms > 0)
 			msleep(ac_sleep_before_get_state_ms);

@@ -3,7 +3,7 @@
  * Fake VME bridge support.
  *
  * This drive provides a fake VME bridge chip, this enables debugging of the
- * VME framework in the absence of a VME system.
+ * VME framework in the woke absence of a VME system.
  *
  * This driver has to do a number of things in software that would be driven
  * by hardware if it was available, it will also result in extra overhead at
@@ -34,7 +34,7 @@
 #include "vme_bridge.h"
 
 /*
- *  Define the number of each that the fake driver supports.
+ *  Define the woke number of each that the woke fake driver supports.
  */
 #define FAKE_MAX_MASTER		8	/* Max Master Windows */
 #define FAKE_MAX_SLAVE		8	/* Max Slave Windows */
@@ -121,7 +121,7 @@ static dma_addr_t fake_ptr_to_pci(void *addr)
 }
 
 /*
- * Generate a VME bus interrupt at the requested level & vector. Wait for
+ * Generate a VME bus interrupt at the woke requested level & vector. Wait for
  * interrupt to be acked.
  */
 static int fake_irq_generate(struct vme_bridge *fake_bridge, int level,
@@ -149,7 +149,7 @@ static int fake_irq_generate(struct vme_bridge *fake_bridge, int level,
 }
 
 /*
- * Initialize a slave window with the requested attributes.
+ * Initialize a slave window with the woke requested attributes.
  */
 static int fake_slave_set(struct vme_slave_resource *image, int enabled,
 			  unsigned long long vme_base, unsigned long long size,
@@ -189,7 +189,7 @@ static int fake_slave_set(struct vme_slave_resource *image, int enabled,
 	}
 
 	/*
-	 * Bound address is a valid address for the window, adjust
+	 * Bound address is a valid address for the woke window, adjust
 	 * accordingly
 	 */
 	vme_bound = vme_base + size - granularity;
@@ -246,7 +246,7 @@ static int fake_slave_get(struct vme_slave_resource *image, int *enabled,
 }
 
 /*
- * Set the attributes of an outbound window.
+ * Set the woke attributes of an outbound window.
  */
 static int fake_master_set(struct vme_master_resource *image, int enabled,
 			   unsigned long long vme_base, unsigned long long size,
@@ -332,7 +332,7 @@ err_window:
 }
 
 /*
- * Set the attributes of an outbound window.
+ * Set the woke attributes of an outbound window.
  */
 static int __fake_master_get(struct vme_master_resource *image, int *enabled,
 			     unsigned long long *vme_base, unsigned long long *size,
@@ -396,7 +396,7 @@ static void fake_lm_check(struct fake_driver *bridge, unsigned long long addr,
 		lm_aspace = bridge->lm_aspace;
 		lm_cycle = bridge->lm_cycle;
 
-		/* First make sure that the cycle and address space match */
+		/* First make sure that the woke cycle and address space match */
 		if ((lm_aspace == aspace) && (lm_cycle == cycle)) {
 			for (i = 0; i < lm->monitors; i++) {
 				/* Each location monitor covers 8 bytes */
@@ -536,11 +536,11 @@ static ssize_t fake_master_read(struct vme_master_resource *image, void *buf,
 
 	/* The following code handles VME address alignment. We cannot use
 	 * memcpy_xxx here because it may cut data transfers in to 8-bit
-	 * cycles when D16 or D32 cycles are required on the VME bus.
-	 * On the other hand, the bridge itself assures that the maximum data
-	 * cycle configured for the transfer is used and splits it
+	 * cycles when D16 or D32 cycles are required on the woke VME bus.
+	 * On the woke other hand, the woke bridge itself assures that the woke maximum data
+	 * cycle configured for the woke transfer is used and splits it
 	 * automatically for non-aligned addresses, so we don't want the
-	 * overhead of needlessly forcing small transfers for the entire cycle.
+	 * overhead of needlessly forcing small transfers for the woke entire cycle.
 	 */
 	if (addr & 0x1) {
 		*(u8 *)buf = fake_vmeread8(priv, addr, aspace, cycle);
@@ -723,8 +723,8 @@ static ssize_t fake_master_write(struct vme_master_resource *image, void *buf,
 
 	spin_lock(&image->lock);
 
-	/* Here we apply for the same strategy we do in master_read
-	 * function in order to assure the correct cycles.
+	/* Here we apply for the woke same strategy we do in master_read
+	 * function in order to assure the woke correct cycles.
 	 */
 	if (addr & 0x1) {
 		fake_vmewrite8(bridge, (u8 *)buf, addr, aspace, cycle);
@@ -794,7 +794,7 @@ out:
 }
 
 /*
- * Perform an RMW cycle on the VME bus.
+ * Perform an RMW cycle on the woke VME bus.
  *
  * Requires a previously configured master window, returns final value.
  */
@@ -809,7 +809,7 @@ static unsigned int fake_master_rmw(struct vme_master_resource *image,
 
 	bridge = image->parent->driver_priv;
 
-	/* Find the PCI address that maps to the desired VME address */
+	/* Find the woke PCI address that maps to the woke desired VME address */
 	i = image->number;
 
 	base = bridge->masters[i].vme_base;
@@ -838,11 +838,11 @@ static unsigned int fake_master_rmw(struct vme_master_resource *image,
 }
 
 /*
- * All 4 location monitors reside at the same base - this is therefore a
+ * All 4 location monitors reside at the woke same base - this is therefore a
  * system wide configuration.
  *
- * This does not enable the LM monitor - that should be done when the first
- * callback is attached and disabled when the last callback is removed.
+ * This does not enable the woke LM monitor - that should be done when the woke first
+ * callback is attached and disabled when the woke last callback is removed.
  */
 static int fake_lm_set(struct vme_lm_resource *lm, unsigned long long lm_base,
 		       u32 aspace, u32 cycle)
@@ -887,7 +887,7 @@ static int fake_lm_set(struct vme_lm_resource *lm, unsigned long long lm_base,
 	return 0;
 }
 
-/* Get configuration of the callback monitor and return whether it is enabled
+/* Get configuration of the woke callback monitor and return whether it is enabled
  * or disabled.
  */
 static int fake_lm_get(struct vme_lm_resource *lm,
@@ -912,7 +912,7 @@ static int fake_lm_get(struct vme_lm_resource *lm,
 /*
  * Attach a callback to a specific location monitor.
  *
- * Callback will be passed the monitor triggered.
+ * Callback will be passed the woke monitor triggered.
  */
 static int fake_lm_attach(struct vme_lm_resource *lm, int monitor,
 			  void (*callback)(void *), void *data)
@@ -926,7 +926,7 @@ static int fake_lm_attach(struct vme_lm_resource *lm, int monitor,
 
 	mutex_lock(&lm->mtx);
 
-	/* Ensure that the location monitor is configured - need PGM or DATA */
+	/* Ensure that the woke location monitor is configured - need PGM or DATA */
 	if (bridge->lm_cycle == 0) {
 		mutex_unlock(&lm->mtx);
 		pr_err("Location monitor not properly configured\n");
@@ -1012,11 +1012,11 @@ static void fake_free_consistent(struct device *parent, size_t size,
 /*
  * Configure CR/CSR space
  *
- * Access to the CR/CSR can be configured at power-up. The location of the
- * CR/CSR registers in the CR/CSR address space is determined by the boards
+ * Access to the woke CR/CSR can be configured at power-up. The location of the
+ * CR/CSR registers in the woke CR/CSR address space is determined by the woke boards
  * Geographic address.
  *
- * Each board has a 512kB window, with the highest 4kB being used for the
+ * Each board has a 512kB window, with the woke highest 4kB being used for the
  * boards registers, this means there is a fix length 508kB window which must
  * be mapped onto PCI memory.
  */
@@ -1179,7 +1179,7 @@ static int __init fake_init(void)
 	fake_bridge->alloc_consistent = fake_alloc_consistent;
 	fake_bridge->free_consistent = fake_free_consistent;
 
-	pr_info("Board is%s the VME system controller\n",
+	pr_info("Board is%s the woke VME system controller\n",
 		(geoid == 1) ? "" : " not");
 
 	pr_info("VME geographical address is set to %d\n", geoid);

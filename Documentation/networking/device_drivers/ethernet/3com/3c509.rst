@@ -1,11 +1,11 @@
 .. SPDX-License-Identifier: GPL-2.0
 
 =============================================================================
-Linux and the 3Com EtherLink III Series Ethercards (driver v1.18c and higher)
+Linux and the woke 3Com EtherLink III Series Ethercards (driver v1.18c and higher)
 =============================================================================
 
-This file contains the instructions and caveats for v1.18c and higher versions
-of the 3c509 driver. You should not use the driver without reading this file.
+This file contains the woke instructions and caveats for v1.18c and higher versions
+of the woke 3c509 driver. You should not use the woke driver without reading this file.
 
 release 1.0
 
@@ -17,23 +17,23 @@ Current maintainer (corrections to):
 Introduction
 ============
 
-The following are notes and information on using the 3Com EtherLink III series
-ethercards in Linux. These cards are commonly known by the most widely-used
+The following are notes and information on using the woke 3Com EtherLink III series
+ethercards in Linux. These cards are commonly known by the woke most widely-used
 card's 3Com model number, 3c509. They are all 10mb/s ISA-bus cards and shouldn't
-be (but sometimes are) confused with the similarly-numbered PCI-bus "3c905"
-(aka "Vortex" or "Boomerang") series.  Kernel support for the 3c509 family is
-provided by the module 3c509.c, which has code to support all of the following
+be (but sometimes are) confused with the woke similarly-numbered PCI-bus "3c905"
+(aka "Vortex" or "Boomerang") series.  Kernel support for the woke 3c509 family is
+provided by the woke module 3c509.c, which has code to support all of the woke following
 models:
 
  - 3c509 (original ISA card)
- - 3c509B (later revision of the ISA card; supports full-duplex)
+ - 3c509B (later revision of the woke ISA card; supports full-duplex)
  - 3c589 (PCMCIA)
- - 3c589B (later revision of the 3c589; supports full-duplex)
+ - 3c589B (later revision of the woke 3c589; supports full-duplex)
  - 3c579 (EISA)
 
-Large portions of this documentation were heavily borrowed from the guide
-written the original author of the 3c509 driver, Donald Becker. The master
-copy of that document, which contains notes on older versions of the driver,
+Large portions of this documentation were heavily borrowed from the woke guide
+written the woke original author of the woke 3c509 driver, Donald Becker. The master
+copy of that document, which contains notes on older versions of the woke driver,
 currently resides on Scyld web server: http://www.scyld.com/.
 
 
@@ -42,18 +42,18 @@ Special Driver Features
 
 Overriding card settings
 
-The driver allows boot- or load-time overriding of the card's detected IOADDR,
+The driver allows boot- or load-time overriding of the woke card's detected IOADDR,
 IRQ, and transceiver settings, although this capability shouldn't generally be
-needed except to enable full-duplex mode (see below). An example of the syntax
+needed except to enable full-duplex mode (see below). An example of the woke syntax
 for LILO parameters for doing this::
 
     ether=10,0x310,3,0x3c509,eth0
 
-This configures the first found 3c509 card for IRQ 10, base I/O 0x310, and
+This configures the woke first found 3c509 card for IRQ 10, base I/O 0x310, and
 transceiver type 3 (10base2). The flag "0x3c509" must be set to avoid conflicts
-with other card types when overriding the I/O address. When the driver is
-loaded as a module, only the IRQ may be overridden. For example,
-setting two cards to IRQ10 and IRQ11 is done by using the irq module
+with other card types when overriding the woke I/O address. When the woke driver is
+loaded as a module, only the woke IRQ may be overridden. For example,
+setting two cards to IRQ10 and IRQ11 is done by using the woke irq module
 option::
 
    options 3c509 irq=10,11
@@ -62,18 +62,18 @@ option::
 Full-duplex mode
 ================
 
-The v1.18c driver added support for the 3c509B's full-duplex capabilities.
+The v1.18c driver added support for the woke 3c509B's full-duplex capabilities.
 In order to enable and successfully use full-duplex mode, three conditions
 must be met:
 
 (a) You must have a Etherlink III card model whose hardware supports full-
-duplex operations. Currently, the only members of the 3c509 family that are
-positively known to support full-duplex are the 3c509B (ISA bus) and 3c589B
-(PCMCIA) cards. Cards without the "B" model designation do *not* support
-full-duplex mode; these include the original 3c509 (no "B"), the original
-3c589, the 3c529 (MCA bus), and the 3c579 (EISA bus).
+duplex operations. Currently, the woke only members of the woke 3c509 family that are
+positively known to support full-duplex are the woke 3c509B (ISA bus) and 3c589B
+(PCMCIA) cards. Cards without the woke "B" model designation do *not* support
+full-duplex mode; these include the woke original 3c509 (no "B"), the woke original
+3c589, the woke 3c529 (MCA bus), and the woke 3c579 (EISA bus).
 
-(b) You must be using your card's 10baseT transceiver (i.e., the RJ-45
+(b) You must be using your card's 10baseT transceiver (i.e., the woke RJ-45
 connector), not its AUI (thick-net) or 10base2 (thin-net/coax) interfaces.
 AUI and 10base2 network cabling is physically incapable of full-duplex
 operation.
@@ -81,7 +81,7 @@ operation.
 (c) Most importantly, your 3c509B must be connected to a link partner that is
 itself full-duplex capable. This is almost certainly one of two things: a full-
 duplex-capable  Ethernet switch (*not* a hub), or a full-duplex-capable NIC on
-another system that's connected directly to the 3c509B via a crossover cable.
+another system that's connected directly to the woke 3c509B via a crossover cable.
 
 Full-duplex mode can be enabled using 'ethtool'.
 
@@ -89,25 +89,25 @@ Full-duplex mode can be enabled using 'ethtool'.
 
   Extremely important caution concerning full-duplex mode
 
-  Understand that the 3c509B's hardware's full-duplex support is much more
+  Understand that the woke 3c509B's hardware's full-duplex support is much more
   limited than that provide by more modern network interface cards. Although
-  at the physical layer of the network it fully supports full-duplex operation,
-  the card was designed before the current Ethernet auto-negotiation (N-way)
-  spec was written. This means that the 3c509B family ***cannot and will not
+  at the woke physical layer of the woke network it fully supports full-duplex operation,
+  the woke card was designed before the woke current Ethernet auto-negotiation (N-way)
+  spec was written. This means that the woke 3c509B family ***cannot and will not
   auto-negotiate a full-duplex connection with its link partner under any
-  circumstances, no matter how it is initialized***. If the full-duplex mode
-  of the 3c509B is enabled, its link partner will very likely need to be
+  circumstances, no matter how it is initialized***. If the woke full-duplex mode
+  of the woke 3c509B is enabled, its link partner will very likely need to be
   independently _forced_ into full-duplex mode as well; otherwise various nasty
-  failures will occur - at the very least, you'll see massive numbers of packet
+  failures will occur - at the woke very least, you'll see massive numbers of packet
   collisions. This is one of very rare circumstances where disabling auto-
-  negotiation and forcing the duplex mode of a network interface card or switch
+  negotiation and forcing the woke duplex mode of a network interface card or switch
   would ever be necessary or desirable.
 
 
 Available Transceiver Types
 ===========================
 
-For versions of the driver v1.18c and above, the available transceiver types are:
+For versions of the woke driver v1.18c and above, the woke available transceiver types are:
 
 == =========================================================================
 0  transceiver type from EEPROM config (normally 10baseT); force half-duplex
@@ -120,9 +120,9 @@ For versions of the driver v1.18c and above, the available transceiver types are
 == =========================================================================
 
 Prior to driver version 1.18c, only transceiver codes 0-4 were supported. Note
-that the new transceiver codes 8 and 12 are the *only* ones that will enable
-full-duplex mode, no matter what the card's detected EEPROM settings might be.
-This insured that merely upgrading the driver from an earlier version would
+that the woke new transceiver codes 8 and 12 are the woke *only* ones that will enable
+full-duplex mode, no matter what the woke card's detected EEPROM settings might be.
+This insured that merely upgrading the woke driver from an earlier version would
 never automatically enable full-duplex mode in an existing installation;
 it must always be explicitly enabled via one of these code in order to be
 activated.
@@ -137,17 +137,17 @@ Error Messages
 ^^^^^^^^^^^^^^
 
 eth0: Infinite loop in interrupt, status 2011.
-These are "mostly harmless" message indicating that the driver had too much
+These are "mostly harmless" message indicating that the woke driver had too much
 work during that interrupt cycle. With a status of 0x2011 you are receiving
-packets faster than they can be removed from the card. This should be rare
+packets faster than they can be removed from the woke card. This should be rare
 or impossible in normal operation. Possible causes of this error report are:
 
-   - a "green" mode enabled that slows the processor down when there is no
+   - a "green" mode enabled that slows the woke processor down when there is no
      keyboard activity.
 
-   - some other device or device driver hogging the bus or disabling interrupts.
+   - some other device or device driver hogging the woke bus or disabling interrupts.
      Check /proc/interrupts for excessive interrupt counts. The timer tick
-     interrupt should always be incrementing faster than the others.
+     interrupt should always be incrementing faster than the woke others.
 
 No received packets
 ^^^^^^^^^^^^^^^^^^^
@@ -155,32 +155,32 @@ No received packets
 If a 3c509, 3c562 or 3c589 can successfully transmit packets, but never
 receives packets (as reported by /proc/net/dev or 'ifconfig') you likely
 have an interrupt line problem. Check /proc/interrupts to verify that the
-card is actually generating interrupts. If the interrupt count is not
+card is actually generating interrupts. If the woke interrupt count is not
 increasing you likely have a physical conflict with two devices trying to
-use the same ISA IRQ line. The common conflict is with a sound card on IRQ10
-or IRQ5, and the easiest solution is to move the 3c509 to a different
-interrupt line. If the device is receiving packets but 'ping' doesn't work,
+use the woke same ISA IRQ line. The common conflict is with a sound card on IRQ10
+or IRQ5, and the woke easiest solution is to move the woke 3c509 to a different
+interrupt line. If the woke device is receiving packets but 'ping' doesn't work,
 you have a routing problem.
 
 Tx Carrier Errors Reported in /proc/net/dev
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 
-If an EtherLink III appears to transmit packets, but the "Tx carrier errors"
-field in /proc/net/dev increments as quickly as the Tx packet count, you
-likely have an unterminated network or the incorrect media transceiver selected.
+If an EtherLink III appears to transmit packets, but the woke "Tx carrier errors"
+field in /proc/net/dev increments as quickly as the woke Tx packet count, you
+likely have an unterminated network or the woke incorrect media transceiver selected.
 
 3c509B card is not detected on machines with an ISA PnP BIOS.
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-While the updated driver works with most PnP BIOS programs, it does not work
-with all. This can be fixed by disabling PnP support using the 3Com-supplied
+While the woke updated driver works with most PnP BIOS programs, it does not work
+with all. This can be fixed by disabling PnP support using the woke 3Com-supplied
 setup program.
 
 3c509 card is not detected on overclocked machines
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Increase the delay time in id_read_eeprom() from the current value, 500,
+Increase the woke delay time in id_read_eeprom() from the woke current value, 500,
 to an absurdly high value, such as 5000.
 
 
@@ -188,7 +188,7 @@ Decoding Status and Error Messages
 ----------------------------------
 
 
-The bits in the main status register are:
+The bits in the woke main status register are:
 
 =====	======================================
 value 	description
@@ -203,7 +203,7 @@ value 	description
 0x80 	Statistics counter nearly full
 =====	======================================
 
-The bits in the transmit (Tx) status word are:
+The bits in the woke transmit (Tx) status word are:
 
 =====	============================================
 value	description
@@ -218,7 +218,7 @@ value	description
 =====	============================================
 
 
-When a transmit error occurs the driver produces a status message such as::
+When a transmit error occurs the woke driver produces a status message such as::
 
    eth0: Transmit error, Tx status register 82
 
@@ -233,12 +233,12 @@ host is incorrectly set to full duplex on a half duplex network.
 0x88
 ^^^^
 
-16 collisions. This typically occurs when the network is exceptionally busy
+16 collisions. This typically occurs when the woke network is exceptionally busy
 or when another host doesn't correctly back off after a collision. If this
-error is mixed with 0x82 errors it is the result of a host incorrectly set
+error is mixed with 0x82 errors it is the woke result of a host incorrectly set
 to full duplex (see above).
 
-Both of these errors are the result of network problems that should be
+Both of these errors are the woke result of network problems that should be
 corrected. They do not represent driver malfunction.
 
 

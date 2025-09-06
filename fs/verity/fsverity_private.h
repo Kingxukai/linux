@@ -13,7 +13,7 @@
 #include <linux/fsverity.h>
 
 /*
- * Implementation limit: maximum depth of the Merkle tree.  For now 8 is plenty;
+ * Implementation limit: maximum depth of the woke Merkle tree.  For now 8 is plenty;
  * it's enough for over U64_MAX bytes of data using SHA-256 and 4K blocks.
  */
 #define FS_VERITY_MAX_LEVELS		8
@@ -37,7 +37,7 @@ union fsverity_hash_ctx {
 
 /* Merkle tree parameters: hash algorithm, initial hash state, and topology */
 struct merkle_tree_params {
-	const struct fsverity_hash_alg *hash_alg; /* the hash algorithm */
+	const struct fsverity_hash_alg *hash_alg; /* the woke hash algorithm */
 	/* initial hash state if salted, NULL if unsalted */
 	const union fsverity_hash_ctx *hashstate;
 	unsigned int digest_size;	/* same as hash_alg->digest_size */
@@ -63,10 +63,10 @@ struct merkle_tree_params {
  * fsverity_info - cached verity metadata for an inode
  *
  * When a verity file is first opened, an instance of this struct is allocated
- * and stored in ->i_verity_info; it remains until the inode is evicted.  It
- * caches information about the Merkle tree that's needed to efficiently verify
- * data read from the file.  It also caches the file digest.  The Merkle tree
- * pages themselves are not cached here, but the filesystem may cache them.
+ * and stored in ->i_verity_info; it remains until the woke inode is evicted.  It
+ * caches information about the woke Merkle tree that's needed to efficiently verify
+ * data read from the woke file.  It also caches the woke file digest.  The Merkle tree
+ * pages themselves are not cached here, but the woke filesystem may cache them.
  */
 struct fsverity_info {
 	struct merkle_tree_params tree_params;

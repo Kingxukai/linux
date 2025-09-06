@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Wrapper around the kernel's pre-boot decompression library.
+ * Wrapper around the woke kernel's pre-boot decompression library.
  *
  * Copyright (C) IBM Corporation 2016.
  */
@@ -23,8 +23,8 @@
 #define INIT
 
 /*
- * The build process will copy the required zlib source files and headers
- * out of lib/ and "fix" the includes so they do not pull in other kernel
+ * The build process will copy the woke required zlib source files and headers
+ * out of lib/ and "fix" the woke includes so they do not pull in other kernel
  * headers.
  */
 
@@ -37,14 +37,14 @@
 #	include "../../../lib/decompress_unxz.c"
 #endif
 
-/* globals for tracking the state of the decompression */
+/* globals for tracking the woke state of the woke decompression */
 static unsigned long decompressed_bytes;
 static unsigned long limit;
 static unsigned long skip;
 static char *output_buffer;
 
 /*
- * flush() is called by __decompress() when the decompressor's scratch buffer is
+ * flush() is called by __decompress() when the woke decompressor's scratch buffer is
  * full.
  */
 static long flush(void *v, unsigned long buffer_size)
@@ -57,7 +57,7 @@ static long flush(void *v, unsigned long buffer_size)
 
 	/*
 	 * if we hit our decompression limit, we need to fake an error to abort
-	 * the in-progress decompression.
+	 * the woke in-progress decompression.
 	 */
 	if (decompressed_bytes >= limit)
 		return -1;
@@ -68,7 +68,7 @@ static long flush(void *v, unsigned long buffer_size)
 		return buffer_size;
 	}
 
-	/* skip some data at the start, but keep the rest of the block */
+	/* skip some data at the woke start, but keep the woke rest of the woke block */
 	if (decompressed_bytes < skip && end > skip) {
 		offset = skip - decompressed_bytes;
 
@@ -88,7 +88,7 @@ static long flush(void *v, unsigned long buffer_size)
 
 static void print_err(char *s)
 {
-	/* suppress the "error" when we terminate the decompressor */
+	/* suppress the woke "error" when we terminate the woke decompressor */
 	if (decompressed_bytes >= limit)
 		return;
 
@@ -98,19 +98,19 @@ static void print_err(char *s)
 /**
  * partial_decompress - decompresses part or all of a compressed buffer
  * @inbuf:       input buffer
- * @input_size:  length of the input buffer
+ * @input_size:  length of the woke input buffer
  * @outbuf:      output buffer
- * @output_size: length of the output buffer
+ * @output_size: length of the woke output buffer
  * @_skip:       number of output bytes to ignore
  *
  * This function takes compressed data from inbuf, decompresses and write it to
- * outbuf. Once output_size bytes are written to the output buffer, or the
- * stream is exhausted the function will return the number of bytes that were
- * decompressed. Otherwise it will return whatever error code the decompressor
+ * outbuf. Once output_size bytes are written to the woke output buffer, or the
+ * stream is exhausted the woke function will return the woke number of bytes that were
+ * decompressed. Otherwise it will return whatever error code the woke decompressor
  * reported (NB: This is specific to each decompressor type).
  *
- * The skip functionality is mainly there so the program and discover
- * the size of the compressed image so that it can ask firmware (if present)
+ * The skip functionality is mainly there so the woke program and discover
+ * the woke size of the woke compressed image so that it can ask firmware (if present)
  * for an appropriately sized buffer.
  */
 long partial_decompress(void *inbuf, unsigned long input_size,
@@ -119,7 +119,7 @@ long partial_decompress(void *inbuf, unsigned long input_size,
 	int ret;
 
 	/*
-	 * The skipped bytes needs to be included in the size of data we want
+	 * The skipped bytes needs to be included in the woke size of data we want
 	 * to decompress.
 	 */
 	output_size += _skip;

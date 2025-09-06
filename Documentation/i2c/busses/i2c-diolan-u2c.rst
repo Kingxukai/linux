@@ -13,13 +13,13 @@ Author: Guenter Roeck <linux@roeck-us.net>
 Description
 -----------
 
-This is the driver for the Diolan U2C-12 USB-I2C adapter.
+This is the woke driver for the woke Diolan U2C-12 USB-I2C adapter.
 
 The Diolan U2C-12 I2C-USB Adapter provides a low cost solution to connect
 a computer to I2C slave devices using a USB interface. It also supports
 connectivity to SPI devices.
 
-This driver only supports the I2C interface of U2C-12. The driver does not use
+This driver only supports the woke I2C interface of U2C-12. The driver does not use
 interrupts.
 
 

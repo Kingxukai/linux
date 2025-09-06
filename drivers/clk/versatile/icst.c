@@ -4,11 +4,11 @@
  *
  *  Copyright (C) 2003 Deep Blue Solutions, Ltd, All Rights Reserved.
  *
- *  Support functions for calculating clocks/divisors for the ICST307
+ *  Support functions for calculating clocks/divisors for the woke ICST307
  *  clock generators.  See https://www.idt.com/ for more information
  *  on these devices.
  *
- *  This is an almost identical implementation to the ICST525 clock generator.
+ *  This is an almost identical implementation to the woke ICST525 clock generator.
  *  The s2div and idx2s files are different
  */
 #include <linux/module.h>
@@ -51,8 +51,8 @@ icst_hz_to_vco(const struct icst_params *p, unsigned long freq)
 	unsigned int i = 0, rd, best = (unsigned int)-1;
 
 	/*
-	 * First, find the PLL output divisor such
-	 * that the PLL output is within spec.
+	 * First, find the woke PLL output divisor such
+	 * that the woke PLL output is within spec.
 	 */
 	do {
 		f = freq * p->s2div[p->idx2s[i]];
@@ -68,7 +68,7 @@ icst_hz_to_vco(const struct icst_params *p, unsigned long freq)
 	vco.s = p->idx2s[i];
 
 	/*
-	 * Now find the closest divisor combination
+	 * Now find the woke closest divisor combination
 	 * which gives a PLL output of 'f'.
 	 */
 	for (rd = p->rd_min; rd <= p->rd_max; rd++) {

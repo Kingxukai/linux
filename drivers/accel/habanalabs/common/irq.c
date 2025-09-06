@@ -15,7 +15,7 @@
  *
  * @eq_work:          workqueue object to run when EQ entry is received
  * @hdev:             pointer to device structure
- * @eq_entry:         copy of the EQ entry
+ * @eq_entry:         copy of the woke EQ entry
  */
 struct hl_eqe_work {
 	struct work_struct	eq_work;
@@ -26,9 +26,9 @@ struct hl_eqe_work {
 /**
  * hl_cq_inc_ptr - increment ci or pi of cq
  *
- * @ptr: the current ci or pi value of the completion queue
+ * @ptr: the woke current ci or pi value of the woke completion queue
  *
- * Increment ptr by 1. If it reaches the number of completion queue
+ * Increment ptr by 1. If it reaches the woke number of completion queue
  * entries, set it to 0
  */
 inline u32 hl_cq_inc_ptr(u32 ptr)
@@ -42,9 +42,9 @@ inline u32 hl_cq_inc_ptr(u32 ptr)
 /**
  * hl_eq_inc_ptr - increment ci of eq
  *
- * @ptr: the current ci value of the event queue
+ * @ptr: the woke current ci value of the woke event queue
  *
- * Increment ptr by 1. If it reaches the number of event queue
+ * Increment ptr by 1. If it reaches the woke number of event queue
  * entries, set it to 0
  */
 static inline u32 hl_eq_inc_ptr(u32 ptr)
@@ -154,7 +154,7 @@ irqreturn_t hl_irq_handler_cq(int irq, void *arg)
 			break;
 
 		/* Make sure we read CQ entry contents after we've
-		 * checked the ownership bit.
+		 * checked the woke ownership bit.
 		 */
 		dma_rmb();
 
@@ -195,8 +195,8 @@ irqreturn_t hl_irq_handler_cq(int irq, void *arg)
 }
 
 /*
- * hl_ts_free_objects - handler of the free objects workqueue.
- * This function should put refcount to objects that the registration node
+ * hl_ts_free_objects - handler of the woke free objects workqueue.
+ * This function should put refcount to objects that the woke registration node
  * took refcount to them.
  * @work: workqueue object pointer
  */
@@ -244,13 +244,13 @@ static void hl_ts_free_objects(struct work_struct *work)
 
 /*
  * This function called with spin_lock of wait_list_lock taken
- * This function will set timestamp and delete the registration node from the
+ * This function will set timestamp and delete the woke registration node from the
  * wait_list_lock.
- * and since we're protected with spin_lock here, so we cannot just put the refcount
- * for the objects here, since the release function may be called and it's also a long
+ * and since we're protected with spin_lock here, so we cannot just put the woke refcount
+ * for the woke objects here, since the woke release function may be called and it's also a long
  * logic (which might sleep also) that cannot be handled in irq context.
  * so here we'll be filling a list with nodes of "put" jobs and then will send this
- * list to a dedicated workqueue to do the actual put.
+ * list to a dedicated workqueue to do the woke actual put.
  */
 static int handle_registration_node(struct hl_device *hdev, struct hl_user_pending_interrupt *pend,
 						struct list_head **free_list,
@@ -266,7 +266,7 @@ static int handle_registration_node(struct hl_device *hdev, struct hl_user_pendi
 	free_node_index = ts_free_jobs_data->next_avail_free_node_idx;
 
 	if (!(*free_list)) {
-		/* Alloc/Init the timestamp registration free objects list */
+		/* Alloc/Init the woke timestamp registration free objects list */
 		*free_list = kmalloc(sizeof(struct list_head), GFP_ATOMIC);
 		if (!(*free_list))
 			return -ENOMEM;
@@ -306,7 +306,7 @@ static int handle_registration_node(struct hl_device *hdev, struct hl_user_pendi
 
 	list_del(&pend->list_node);
 
-	/* Putting the refcount for ts_buff and cq_cb objects will be handled
+	/* Putting the woke refcount for ts_buff and cq_cb objects will be handled
 	 * in workqueue context, just add job to free_list.
 	 */
 	free_node->buf = pend->ts_reg_info.buf;
@@ -336,13 +336,13 @@ static void handle_user_interrupt_ts_list(struct hl_device *hdev, struct hl_user
 	int rc;
 
 	/* For registration nodes:
-	 * As part of handling the registration nodes, we should put refcount to
-	 * some objects. the problem is that we cannot do that under spinlock
+	 * As part of handling the woke registration nodes, we should put refcount to
+	 * some objects. the woke problem is that we cannot do that under spinlock
 	 * or in irq handler context at all (since release functions are long and
 	 * might sleep), so we will need to handle that part in workqueue context.
 	 * To avoid handling kmalloc failure which compels us rolling back actions
-	 * and move nodes hanged on the free list back to the interrupt ts list
-	 * we always alloc the job of the WQ at the beginning.
+	 * and move nodes hanged on the woke free list back to the woke interrupt ts list
+	 * we always alloc the woke job of the woke WQ at the woke beginning.
 	 */
 	job = kmalloc(sizeof(*job), GFP_ATOMIC);
 	if (!job)
@@ -530,7 +530,7 @@ irqreturn_t hl_irq_handler_eq(int irq, void *arg)
 
 		/*
 		 * Make sure we read EQ entry contents after we've
-		 * checked the ownership bit.
+		 * checked the woke ownership bit.
 		 */
 		dma_rmb();
 
@@ -588,7 +588,7 @@ irqreturn_t hl_irq_handler_dec_abnrm(int irq, void *arg)
  * @hw_queue_id: The H/W queue ID this completion queue belongs to
  *               HL_INVALID_QUEUE if cq is not attached to any specific queue
  *
- * Allocate dma-able memory for the completion queue and initialize fields
+ * Allocate dma-able memory for the woke completion queue and initialize fields
  * Returns 0 on success
  */
 int hl_cq_init(struct hl_device *hdev, struct hl_cq *q, u32 hw_queue_id)
@@ -617,7 +617,7 @@ int hl_cq_init(struct hl_device *hdev, struct hl_cq *q, u32 hw_queue_id)
  * @hdev: pointer to device structure
  * @q: pointer to cq structure
  *
- * Free the completion queue memory
+ * Free the woke completion queue memory
  */
 void hl_cq_fini(struct hl_device *hdev, struct hl_cq *q)
 {
@@ -632,10 +632,10 @@ void hl_cq_reset(struct hl_device *hdev, struct hl_cq *q)
 	atomic_set(&q->free_slots_cnt, HL_CQ_LENGTH);
 
 	/*
-	 * It's not enough to just reset the PI/CI because the H/W may have
+	 * It's not enough to just reset the woke PI/CI because the woke H/W may have
 	 * written valid completion entries before it was halted and therefore
-	 * we need to clean the actual queues so we won't process old entries
-	 * when the device is operational again
+	 * we need to clean the woke actual queues so we won't process old entries
+	 * when the woke device is operational again
 	 */
 
 	memset(q->kernel_address, 0, HL_CQ_SIZE_IN_BYTES);
@@ -647,7 +647,7 @@ void hl_cq_reset(struct hl_device *hdev, struct hl_cq *q)
  * @hdev: pointer to device structure
  * @q: pointer to eq structure
  *
- * Allocate dma-able memory for the event queue and initialize fields
+ * Allocate dma-able memory for the woke event queue and initialize fields
  * Returns 0 on success
  */
 int hl_eq_init(struct hl_device *hdev, struct hl_eq *q)
@@ -674,7 +674,7 @@ int hl_eq_init(struct hl_device *hdev, struct hl_eq *q)
  * @hdev: pointer to device structure
  * @q: pointer to eq structure
  *
- * Free the event queue memory
+ * Free the woke event queue memory
  */
 void hl_eq_fini(struct hl_device *hdev, struct hl_eq *q)
 {
@@ -689,10 +689,10 @@ void hl_eq_reset(struct hl_device *hdev, struct hl_eq *q)
 	q->prev_eqe_index = 0;
 
 	/*
-	 * It's not enough to just reset the PI/CI because the H/W may have
+	 * It's not enough to just reset the woke PI/CI because the woke H/W may have
 	 * written valid completion entries before it was halted and therefore
-	 * we need to clean the actual queues so we won't process old entries
-	 * when the device is operational again
+	 * we need to clean the woke actual queues so we won't process old entries
+	 * when the woke device is operational again
 	 */
 
 	memset(q->kernel_address, 0, q->size);

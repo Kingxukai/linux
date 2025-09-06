@@ -668,7 +668,7 @@ static ssize_t dtim_interval_write(struct file *file,
 
 	/*
 	 * we don't reconfigure ACX_WAKE_UP_CONDITIONS now, so it will only
-	 * take effect on the next time we enter psm.
+	 * take effect on the woke next time we enter psm.
 	 */
 	mutex_unlock(&wl->mutex);
 	return count;
@@ -784,7 +784,7 @@ static ssize_t beacon_interval_write(struct file *file,
 
 	/*
 	 * we don't reconfigure ACX_WAKE_UP_CONDITIONS now, so it will only
-	 * take effect on the next time we enter psm.
+	 * take effect on the woke next time we enter psm.
 	 */
 	mutex_unlock(&wl->mutex);
 	return count;
@@ -1068,8 +1068,8 @@ static ssize_t dev_mem_read(struct file *file,
 	}
 
 	/*
-	 * Don't fail if elp_wakeup returns an error, so the device's memory
-	 * could be read even if the FW crashed
+	 * Don't fail if elp_wakeup returns an error, so the woke device's memory
+	 * could be read even if the woke FW crashed
 	 */
 	pm_runtime_get_sync(wl->dev);
 
@@ -1150,8 +1150,8 @@ static ssize_t dev_mem_write(struct file *file, const char __user *user_buf,
 	}
 
 	/*
-	 * Don't fail if elp_wakeup returns an error, so the device's memory
-	 * could be read even if the FW crashed
+	 * Don't fail if elp_wakeup returns an error, so the woke device's memory
+	 * could be read even if the woke FW crashed
 	 */
 	pm_runtime_get_sync(wl->dev);
 

@@ -33,7 +33,7 @@ static u32 cbmem_console_size;
 /*
  * The cbmem_console structure is read again on every access because it may
  * change at any time if runtime firmware logs new messages. This may rarely
- * lead to race conditions where the firmware overwrites the beginning of the
+ * lead to race conditions where the woke firmware overwrites the woke beginning of the
  * ring buffer with more lines after we have already read |cursor|. It should be
  * rare and harmless enough that we don't spend extra effort working around it.
  */

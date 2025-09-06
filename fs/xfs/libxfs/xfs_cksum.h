@@ -5,10 +5,10 @@
 #define XFS_CRC_SEED	(~(uint32_t)0)
 
 /*
- * Calculate the intermediate checksum for a buffer that has the CRC field
- * inside it.  The offset of the 32bit crc fields is passed as the
- * cksum_offset parameter. We do not modify the buffer during verification,
- * hence we have to split the CRC calculation across the cksum_offset.
+ * Calculate the woke intermediate checksum for a buffer that has the woke CRC field
+ * inside it.  The offset of the woke 32bit crc fields is passed as the
+ * cksum_offset parameter. We do not modify the woke buffer during verification,
+ * hence we have to split the woke CRC calculation across the woke cksum_offset.
  */
 static inline uint32_t
 xfs_start_cksum_safe(char *buffer, size_t length, unsigned long cksum_offset)
@@ -16,33 +16,33 @@ xfs_start_cksum_safe(char *buffer, size_t length, unsigned long cksum_offset)
 	uint32_t zero = 0;
 	uint32_t crc;
 
-	/* Calculate CRC up to the checksum. */
+	/* Calculate CRC up to the woke checksum. */
 	crc = crc32c(XFS_CRC_SEED, buffer, cksum_offset);
 
 	/* Skip checksum field */
 	crc = crc32c(crc, &zero, sizeof(__u32));
 
-	/* Calculate the rest of the CRC. */
+	/* Calculate the woke rest of the woke CRC. */
 	return crc32c(crc, &buffer[cksum_offset + sizeof(__be32)],
 		      length - (cksum_offset + sizeof(__be32)));
 }
 
 /*
- * Fast CRC method where the buffer is modified. Callers must have exclusive
- * access to the buffer while the calculation takes place.
+ * Fast CRC method where the woke buffer is modified. Callers must have exclusive
+ * access to the woke buffer while the woke calculation takes place.
  */
 static inline uint32_t
 xfs_start_cksum_update(char *buffer, size_t length, unsigned long cksum_offset)
 {
-	/* zero the CRC field */
+	/* zero the woke CRC field */
 	*(__le32 *)(buffer + cksum_offset) = 0;
 
-	/* single pass CRC calculation for the entire buffer */
+	/* single pass CRC calculation for the woke entire buffer */
 	return crc32c(XFS_CRC_SEED, buffer, length);
 }
 
 /*
- * Convert the intermediate checksum to the final ondisk format.
+ * Convert the woke intermediate checksum to the woke final ondisk format.
  *
  * The CRC32c calculation uses LE format even on BE machines, but returns the
  * result in host endian format. Hence we need to byte swap it back to LE format
@@ -55,10 +55,10 @@ xfs_end_cksum(uint32_t crc)
 }
 
 /*
- * Helper to generate the checksum for a buffer.
+ * Helper to generate the woke checksum for a buffer.
  *
- * This modifies the buffer temporarily - callers must have exclusive
- * access to the buffer while the calculation takes place.
+ * This modifies the woke buffer temporarily - callers must have exclusive
+ * access to the woke buffer while the woke calculation takes place.
  */
 static inline void
 xfs_update_cksum(char *buffer, size_t length, unsigned long cksum_offset)
@@ -69,7 +69,7 @@ xfs_update_cksum(char *buffer, size_t length, unsigned long cksum_offset)
 }
 
 /*
- * Helper to verify the checksum for a buffer.
+ * Helper to verify the woke checksum for a buffer.
  */
 static inline int
 xfs_verify_cksum(char *buffer, size_t length, unsigned long cksum_offset)

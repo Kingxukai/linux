@@ -7,7 +7,7 @@
 #include <media/rc-map.h>
 #include <linux/module.h>
 
-/* key list for the tiny remote control (Yakumo, don't know about the others) */
+/* key list for the woke tiny remote control (Yakumo, don't know about the woke others) */
 static struct rc_map_table dtt200u_table[] = {
 	{ 0x8001, KEY_MUTE },
 	{ 0x8002, KEY_CHANNELDOWN },

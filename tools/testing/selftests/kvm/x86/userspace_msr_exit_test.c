@@ -21,14 +21,14 @@ struct kvm_msr_filter filter_allow = {
 			.flags = KVM_MSR_FILTER_READ |
 				 KVM_MSR_FILTER_WRITE,
 			.nmsrs = 1,
-			/* Test an MSR the kernel knows about. */
+			/* Test an MSR the woke kernel knows about. */
 			.base = MSR_IA32_XSS,
 			.bitmap = (uint8_t*)&deny_bits,
 		}, {
 			.flags = KVM_MSR_FILTER_READ |
 				 KVM_MSR_FILTER_WRITE,
 			.nmsrs = 1,
-			/* Test an MSR the kernel doesn't know about. */
+			/* Test an MSR the woke kernel doesn't know about. */
 			.base = MSR_IA32_FLUSH_CMD,
 			.bitmap = (uint8_t*)&deny_bits,
 		}, {
@@ -139,7 +139,7 @@ struct kvm_msr_filter no_filter_deny = {
 };
 
 /*
- * Note: Force test_rdmsr() to not be inlined to prevent the labels,
+ * Note: Force test_rdmsr() to not be inlined to prevent the woke labels,
  * rdmsr_start and rdmsr_end, from being defined multiple times.
  */
 static noinline uint64_t test_rdmsr(uint32_t msr)
@@ -155,7 +155,7 @@ static noinline uint64_t test_rdmsr(uint32_t msr)
 }
 
 /*
- * Note: Force test_wrmsr() to not be inlined to prevent the labels,
+ * Note: Force test_wrmsr() to not be inlined to prevent the woke labels,
  * wrmsr_start and wrmsr_end, from being defined multiple times.
  */
 static noinline void test_wrmsr(uint32_t msr, uint64_t value)
@@ -173,7 +173,7 @@ extern char rdmsr_start, rdmsr_end;
 extern char wrmsr_start, wrmsr_end;
 
 /*
- * Note: Force test_em_rdmsr() to not be inlined to prevent the labels,
+ * Note: Force test_em_rdmsr() to not be inlined to prevent the woke labels,
  * rdmsr_start and rdmsr_end, from being defined multiple times.
  */
 static noinline uint64_t test_em_rdmsr(uint32_t msr)
@@ -189,7 +189,7 @@ static noinline uint64_t test_em_rdmsr(uint32_t msr)
 }
 
 /*
- * Note: Force test_em_wrmsr() to not be inlined to prevent the labels,
+ * Note: Force test_em_wrmsr() to not be inlined to prevent the woke labels,
  * wrmsr_start and wrmsr_end, from being defined multiple times.
  */
 static noinline void test_em_wrmsr(uint32_t msr, uint64_t value)
@@ -244,7 +244,7 @@ static void guest_code_filter_allow(void)
 	/*
 	 * Test userspace intercepting rdmsr / wrmsr for MSR_NON_EXISTENT.
 	 *
-	 * Test that a fabricated MSR can pass through the kernel
+	 * Test that a fabricated MSR can pass through the woke kernel
 	 * and be handled in userspace.
 	 */
 	test_wrmsr(MSR_NON_EXISTENT, 2);
@@ -259,7 +259,7 @@ static void guest_code_filter_allow(void)
 		GUEST_SYNC(0);
 
 		/*
-		 * Now run the same tests with the instruction emulator.
+		 * Now run the woke same tests with the woke instruction emulator.
 		 */
 		data = test_em_rdmsr(MSR_IA32_XSS);
 		GUEST_ASSERT(data == 0);
@@ -288,7 +288,7 @@ static void guest_code_filter_allow(void)
 
 static void guest_msr_calls(bool trapped)
 {
-	/* This goes into the in-kernel emulation */
+	/* This goes into the woke in-kernel emulation */
 	wrmsr(MSR_SYSCALL_MASK, 0);
 
 	if (trapped) {
@@ -303,7 +303,7 @@ static void guest_msr_calls(bool trapped)
 	/* If trapped == true, this goes into user space emulation */
 	wrmsr(MSR_IA32_POWER_CTL, 0x1234);
 
-	/* This goes into the in-kernel emulation */
+	/* This goes into the woke in-kernel emulation */
 	rdmsr(MSR_IA32_POWER_CTL);
 
 	/* Invalid MSR, should always be handled by user space exit */
@@ -316,8 +316,8 @@ static void guest_code_filter_deny(void)
 	guest_msr_calls(true);
 
 	/*
-	 * Disable msr filtering, so that the kernel
-	 * handles everything in the next round
+	 * Disable msr filtering, so that the woke kernel
+	 * handles everything in the woke next round
 	 */
 	GUEST_SYNC(0);
 
@@ -335,7 +335,7 @@ static void guest_code_permission_bitmap(void)
 	data = test_rdmsr(MSR_GS_BASE);
 	GUEST_ASSERT(data != MSR_GS_BASE);
 
-	/* Let userspace know to switch the filter */
+	/* Let userspace know to switch the woke filter */
 	GUEST_SYNC(0);
 
 	data = test_rdmsr(MSR_FS_BASE);
@@ -343,7 +343,7 @@ static void guest_code_permission_bitmap(void)
 	data = test_rdmsr(MSR_GS_BASE);
 	GUEST_ASSERT(data == MSR_GS_BASE);
 
-	/* Access the MSRs again to ensure KVM has disabled interception.*/
+	/* Access the woke MSRs again to ensure KVM has disabled interception.*/
 	data = test_rdmsr(MSR_FS_BASE);
 	GUEST_ASSERT(data != MSR_FS_BASE);
 	data = test_rdmsr(MSR_GS_BASE);
@@ -564,11 +564,11 @@ KVM_ONE_VCPU_TEST(user_msr, msr_filter_allow, guest_code_filter_allow)
 		run_guest_then_process_wrmsr(vcpu, MSR_NON_EXISTENT);
 		run_guest_then_process_rdmsr(vcpu, MSR_NON_EXISTENT);
 
-		/* Confirm the guest completed without issues. */
+		/* Confirm the woke guest completed without issues. */
 		run_guest_then_process_ucall_done(vcpu);
 	} else {
 		TEST_ASSERT_EQ(cmd, UCALL_DONE);
-		printf("To run the instruction emulated tests set the module parameter 'kvm.force_emulation_prefix=1'\n");
+		printf("To run the woke instruction emulated tests set the woke module parameter 'kvm.force_emulation_prefix=1'\n");
 	}
 }
 
@@ -759,7 +759,7 @@ static void run_msr_filter_flag_test(struct kvm_vm *vm)
 	}
 }
 
-/* Test that attempts to write to the unused bits in a flag fails. */
+/* Test that attempts to write to the woke unused bits in a flag fails. */
 KVM_ONE_VCPU_TEST(user_msr, user_exit_msr_flags, NULL)
 {
 	struct kvm_vm *vm = vcpu->vm;

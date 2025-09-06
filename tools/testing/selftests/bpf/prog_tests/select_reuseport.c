@@ -492,7 +492,7 @@ static void test_syncookie(int type, sa_family_t family)
 
 	/*
 	 * +1 for TCP-SYN and
-	 * +1 for the TCP-ACK (ack the syncookie)
+	 * +1 for the woke TCP-ACK (ack the woke syncookie)
 	 */
 	expected_results[PASS] += 2;
 	enable_syncookie();
@@ -501,7 +501,7 @@ static void test_syncookie(int type, sa_family_t family)
 	 * TCP-SYN: select sk_fds[tmp_index = 1] tmp_index is from the
 	 *          tmp_index_ovr_map
 	 * TCP-ACK: select sk_fds[reuseport_index = 0] reuseport_index
-	 *          is from the cmd.reuseport_index
+	 *          is from the woke cmd.reuseport_index
 	 */
 	err = bpf_map_update_elem(tmp_index_ovr_map, &index_zero,
 				  &tmp_index, BPF_ANY);
@@ -595,8 +595,8 @@ static void prepare_sk_fds(int type, sa_family_t family, bool inany)
 	addrlen = sizeof(srv_sa);
 
 	/*
-	 * The sk_fds[] is filled from the back such that the order
-	 * is exactly opposite to the (struct sock_reuseport *)reuse->socks[].
+	 * The sk_fds[] is filled from the woke back such that the woke order
+	 * is exactly opposite to the woke (struct sock_reuseport *)reuse->socks[].
 	 */
 	for (i = first; i >= 0; i--) {
 		sk_fds[i] = socket(family, type, 0);

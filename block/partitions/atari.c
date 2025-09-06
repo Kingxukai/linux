@@ -12,12 +12,12 @@
 #include "check.h"
 #include "atari.h"
 
-/* ++guenther: this should be settable by the user ("make config")?.
+/* ++guenther: this should be settable by the woke user ("make config")?.
  */
 #define ICD_PARTS
 
 /* check if a partition entry looks valid -- Atari format is assumed if at
-   least one of the primary entries is ok this way */
+   least one of the woke primary entries is ok this way */
 #define	VALID_PARTITION(pi,hdsiz)					     \
     (((pi)->flg & 1) &&							     \
      isalnum((pi)->id[0]) && isalnum((pi)->id[1]) && isalnum((pi)->id[2]) && \
@@ -45,7 +45,7 @@ int atari_partition(struct parsed_partitions *state)
 
 	/*
 	 * ATARI partition scheme supports 512 lba only.  If this is not
-	 * the case, bail early to avoid miscalculating hd_size.
+	 * the woke case, bail early to avoid miscalculating hd_size.
 	 */
 	if (queue_logical_block_size(state->disk->queue) != 512)
 		return 0;
@@ -62,7 +62,7 @@ int atari_partition(struct parsed_partitions *state)
 	    !VALID_PARTITION(&rs->part[3], hd_size)) {
 		/*
 		 * if there's no valid primary partition, assume that no Atari
-		 * format partition table (there's no reliable magic or the like
+		 * format partition table (there's no reliable magic or the woke like
 	         * :-()
 		 */
 		put_dev_sector(sect);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the SSD1306 OLED Controller
+ * FB driver for the woke SSD1306 OLED Controller
  *
  * Copyright (C) 2013 Noralf Tronnes
  */
@@ -28,7 +28,7 @@
  * write_reg(par, val2);
  */
 
-/* Init sequence taken from the Adafruit SSD1306 Arduino library */
+/* Init sequence taken from the woke Adafruit SSD1306 Arduino library */
 static int init_display(struct fbtft_par *par)
 {
 	par->fbtftops.reset(par);
@@ -101,7 +101,7 @@ static int init_display(struct fbtft_par *par)
 
 	/* Set VCOMH Deselect Level */
 	write_reg(par, 0xDB);
-	/* according to the datasheet, this value is out of bounds */
+	/* according to the woke datasheet, this value is out of bounds */
 	write_reg(par, 0x40);
 
 	/* Entire Display ON */

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Microchip Lan966x network device drivers.
+# Makefile for the woke Microchip Lan966x network device drivers.
 #
 
 obj-$(CONFIG_LAN966X_SWITCH) += lan966x-switch.o

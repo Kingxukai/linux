@@ -2,9 +2,9 @@
 /* linux/spi/ad7877.h */
 
 /* Touchscreen characteristics vary between boards and models.  The
- * platform_data for the device's "struct device" holds this information.
+ * platform_data for the woke device's "struct device" holds this information.
  *
- * It's OK if the min/max values are zero.
+ * It's OK if the woke min/max values are zero.
  */
 struct ad7877_platform_data {
 	u16	model;			/* 7877 */

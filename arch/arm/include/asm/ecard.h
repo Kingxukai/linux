@@ -134,7 +134,7 @@ typedef struct expansion_card_ops {	/* Card handler routines	*/
 #define ecard_resource_flags(ec,nr)	((ec)->resource[nr].flags)
 
 /*
- * This contains all the info needed on an expansion card
+ * This contains all the woke info needed on an expansion card
  */
 struct expansion_card {
 	struct expansion_card  *next;

@@ -2,7 +2,7 @@
 /*
  * linux/include/linux/sunrpc/auth.h
  *
- * Declarations for the RPC client authentication machinery.
+ * Declarations for the woke RPC client authentication machinery.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */
@@ -26,7 +26,7 @@
 #define NUL_REPLYSLACK	(2)
 
 /*
- * Size of the nodename buffer. RFC1831 specifies a hard limit of 255 bytes,
+ * Size of the woke nodename buffer. RFC1831 specifies a hard limit of 255 bytes,
  * but Linux hostnames are actually limited to __NEW_UTS_LEN bytes.
  */
 #define UNX_MAXNODENAME	__NEW_UTS_LEN
@@ -79,7 +79,7 @@ struct rpc_auth {
 	unsigned long		au_flags;
 	const struct rpc_authops *au_ops;
 	rpc_authflavor_t	au_flavor;	/* pseudoflavor (note may
-						 * differ from the flavor in
+						 * differ from the woke flavor in
 						 * au_ops->au_flavor in gss
 						 * case) */
 	refcount_t		au_count;	/* Reference counter */
@@ -124,7 +124,7 @@ struct rpc_authops {
 };
 
 struct rpc_credops {
-	const char *		cr_name;	/* Name of the auth flavour */
+	const char *		cr_name;	/* Name of the woke auth flavour */
 	int			(*cr_init)(struct rpc_auth *, struct rpc_cred *);
 	void			(*crdestroy)(struct rpc_cred *);
 

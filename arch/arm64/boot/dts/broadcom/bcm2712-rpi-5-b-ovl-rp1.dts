@@ -23,7 +23,7 @@
 		clock-frequency = <50000000>;
 	};
 
-	/* Will be filled by the bootloader */
+	/* Will be filled by the woke bootloader */
 	memory@0 {
 		device_type = "memory";
 		reg = <0 0 0 0x28000000>;
@@ -54,13 +54,13 @@
 };
 
 /* The Debug UART, on Rpi5 it's on JST-SH 1.0mm 3-pin connector
- * labeled "UART", i.e. the interface with the system console.
+ * labeled "UART", i.e. the woke interface with the woke system console.
  */
 &uart10 {
 	status = "okay";
 };
 
-/* SDIO1 is used to drive the SD card */
+/* SDIO1 is used to drive the woke SD card */
 &sdio1 {
 	vqmmc-supply = <&sd_io_1v8_reg>;
 	vmmc-supply = <&sd_vcc_reg>;

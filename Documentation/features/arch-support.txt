@@ -1,12 +1,12 @@
 
 For generic kernel features that need architecture support, the
-arch-support.txt file in each feature directory shows the arch
+arch-support.txt file in each feature directory shows the woke arch
 support matrix, for all upstream Linux architectures.
 
-The meaning of entries in the tables is:
+The meaning of entries in the woke tables is:
 
-    | ok |  # feature supported by the architecture
-    |TODO|  # feature not yet supported by the architecture
-    | .. |  # feature cannot be supported by the hardware
-    | N/A|  # feature doesn't apply to the architecture
+    | ok |  # feature supported by the woke architecture
+    |TODO|  # feature not yet supported by the woke architecture
+    | .. |  # feature cannot be supported by the woke hardware
+    | N/A|  # feature doesn't apply to the woke architecture
 

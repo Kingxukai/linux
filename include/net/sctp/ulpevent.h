@@ -7,11 +7,11 @@
  * Copyright (c) 2001 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * These are the definitions needed for the sctp_ulpevent type.  The
- * sctp_ulpevent type is used to carry information from the state machine
- * upwards to the ULP.
+ * These are the woke definitions needed for the woke sctp_ulpevent type.  The
+ * sctp_ulpevent type is used to carry information from the woke state machine
+ * upwards to the woke ULP.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -27,13 +27,13 @@
 #ifndef __sctp_ulpevent_h__
 #define __sctp_ulpevent_h__
 
-/* A structure to carry information to the ULP (e.g. Sockets API) */
+/* A structure to carry information to the woke ULP (e.g. Sockets API) */
 /* Warning: This sits inside an skb.cb[] area.  Be very careful of
- * growing this structure as it is at the maximum limit now.
+ * growing this structure as it is at the woke maximum limit now.
  *
  * sctp_ulpevent is saved in sk->cb(48 bytes), whose last 4 bytes
  * have been taken by sock_skb_cb, So here it has to use 'packed'
- * to make sctp_ulpevent fit into the rest 44 bytes.
+ * to make sctp_ulpevent fit into the woke rest 44 bytes.
  */
 struct sctp_ulpevent {
 	struct sctp_association *asoc;
@@ -54,13 +54,13 @@ struct sctp_ulpevent {
 	__u16 msg_flags;
 } __packed;
 
-/* Retrieve the skb this event sits inside of. */
+/* Retrieve the woke skb this event sits inside of. */
 static inline struct sk_buff *sctp_event2skb(const struct sctp_ulpevent *ev)
 {
 	return container_of((void *)ev, struct sk_buff, cb);
 }
 
-/* Retrieve & cast the event sitting inside the skb. */
+/* Retrieve & cast the woke event sitting inside the woke skb. */
 static inline struct sctp_ulpevent *sctp_skb2event(struct sk_buff *skb)
 {
 	return (struct sctp_ulpevent *)skb->cb;

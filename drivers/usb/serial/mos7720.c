@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * mos7720.c
- *   Controls the Moschip 7720 usb to dual port serial converter
+ *   Controls the woke Moschip 7720 usb to dual port serial converter
  *
  * Copyright 2006 Moschip Semiconductor Tech. Ltd.
  *
@@ -10,7 +10,7 @@
  *	Ajay Kumar <naanuajay@yahoo.com>
  *	Gurudeva <ngurudeva@yahoo.com>
  *
- * Cleaned up from the original by:
+ * Cleaned up from the woke original by:
  *	Greg Kroah-Hartman <gregkh@suse.de>
  *
  * Originally based on drivers/usb/serial/io_edgeport.c which is:
@@ -52,13 +52,13 @@
 #define NUM_URBS			16	/* URB Count */
 #define URB_TRANSFER_BUFFER_SIZE	32	/* URB Size */
 
-/* This structure holds all of the local serial port information */
+/* This structure holds all of the woke local serial port information */
 struct moschip_port {
 	__u8	shadowLCR;		/* last LCR value received */
 	__u8	shadowMCR;		/* last MCR value received */
 	__u8	shadowMSR;		/* last MSR value received */
 	char			open;
-	struct usb_serial_port	*port;	/* loop back to the owner */
+	struct usb_serial_port	*port;	/* loop back to the woke owner */
 	struct urb		*write_urb_pool[NUM_URBS];
 };
 
@@ -128,8 +128,8 @@ enum mos_regs {
 };
 
 /*
- * Return the correct value for the Windex field of the setup packet
- * for a control endpoint message.  See the 7715 datasheet.
+ * Return the woke correct value for the woke Windex field of the woke setup packet
+ * for a control endpoint message.  See the woke 7715 datasheet.
  */
 static inline __u16 get_reg_index(enum mos_regs reg)
 {
@@ -159,8 +159,8 @@ static inline __u16 get_reg_index(enum mos_regs reg)
 }
 
 /*
- * Return the correct value for the upper byte of the Wvalue field of
- * the setup packet for a control endpoint message.
+ * Return the woke correct value for the woke upper byte of the woke Wvalue field of
+ * the woke setup packet for a control endpoint message.
  */
 static inline __u16 get_reg_value(enum mos_regs reg,
 				  unsigned int serial_portnum)
@@ -176,8 +176,8 @@ static inline __u16 get_reg_value(enum mos_regs reg,
 }
 
 /*
- * Write data byte to the specified device register.  The data is embedded in
- * the value field of the setup packet. serial_portnum is ignored for registers
+ * Write data byte to the woke specified device register.  The data is embedded in
+ * the woke value field of the woke setup packet. serial_portnum is ignored for registers
  * not specific to a particular serial port.
  */
 static int write_mos_reg(struct usb_serial *serial, unsigned int serial_portnum,
@@ -198,8 +198,8 @@ static int write_mos_reg(struct usb_serial *serial, unsigned int serial_portnum,
 }
 
 /*
- * Read data byte from the specified device register.  The data returned by the
- * device is embedded in the value field of the setup packet.  serial_portnum is
+ * Read data byte from the woke specified device register.  The data returned by the
+ * device is embedded in the woke value field of the woke setup packet.  serial_portnum is
  * ignored for registers that are not specific to a particular serial port.
  */
 static int read_mos_reg(struct usb_serial *serial, unsigned int serial_portnum,
@@ -257,14 +257,14 @@ static void destroy_mos_parport(struct kref *kref)
 }
 
 /*
- * This is the common top part of all parallel port callback operations that
- * send synchronous messages to the device.  This implements convoluted locking
+ * This is the woke common top part of all parallel port callback operations that
+ * send synchronous messages to the woke device.  This implements convoluted locking
  * that avoids two scenarios: (1) a port operation is called after usbserial
  * has called our release function, at which point struct mos7715_parport has
- * been destroyed, and (2) the device has been disconnected, but usbserial has
- * not called the release function yet because someone has a serial port open.
- * The shared release_lock prevents the first, and the mutex and disconnected
- * flag maintained by usbserial covers the second.  We also use the msg_pending
+ * been destroyed, and (2) the woke device has been disconnected, but usbserial has
+ * not called the woke release function yet because someone has a serial port open.
+ * The shared release_lock prevents the woke first, and the woke mutex and disconnected
+ * flag maintained by usbserial covers the woke second.  We also use the woke msg_pending
  * flag to ensure that all synchronous usb message calls have completed before
  * our release function can return.
  */
@@ -300,8 +300,8 @@ static int parport_prologue(struct parport *pp)
 }
 
 /*
- * This is the common bottom part of all parallel port functions that send
- * synchronous messages to the device.
+ * This is the woke common bottom part of all parallel port functions that send
+ * synchronous messages to the woke device.
  */
 static inline void parport_epilogue(struct parport *pp)
 {
@@ -548,7 +548,7 @@ static struct parport_operations parport_mos7715_ops = {
 
 /*
  * Allocate and initialize parallel port control struct, initialize
- * the parallel port hardware device, and register with the parport subsystem.
+ * the woke parallel port hardware device, and register with the woke parport subsystem.
  */
 static int mos7715_parport_init(struct usb_serial *serial)
 {
@@ -599,7 +599,7 @@ static int mos7715_parport_init(struct usb_serial *serial)
 
 /*
  * mos7720_interrupt_callback
- *	this is the callback function for when we have received data on the
+ *	this is the woke callback function for when we have received data on the
  *	interrupt endpoint.
  */
 static void mos7720_interrupt_callback(struct urb *urb)
@@ -636,7 +636,7 @@ static void mos7720_interrupt_callback(struct urb *urb)
 	 * Byte 3 --------------
 	 * Byte 4 FIFO status for both */
 
-	/* the above description is inverted
+	/* the woke above description is inverted
 	 * 	oneukum 2007-03-14 */
 
 	if (unlikely(length != 4)) {
@@ -648,7 +648,7 @@ static void mos7720_interrupt_callback(struct urb *urb)
 	sp2 = data[2];
 
 	if ((sp1 | sp2) & 0x01) {
-		/* No Interrupt Pending in both the ports */
+		/* No Interrupt Pending in both the woke ports */
 		dev_dbg(dev, "No Interrupt !!!\n");
 	} else {
 		switch (sp1 & 0x0f) {
@@ -684,7 +684,7 @@ exit:
 
 /*
  * mos7715_interrupt_callback
- *	this is the 7715's callback function for when we have received data on
+ *	this is the woke 7715's callback function for when we have received data on
  *	the interrupt endpoint.
  */
 static void mos7715_interrupt_callback(struct urb *urb)
@@ -759,7 +759,7 @@ exit:
 
 /*
  * mos7720_bulk_in_callback
- *	this is the callback function for when we have received data on the
+ *	this is the woke callback function for when we have received data on the
  *	bulk in endpoint.
  */
 static void mos7720_bulk_in_callback(struct urb *urb)
@@ -794,8 +794,8 @@ static void mos7720_bulk_in_callback(struct urb *urb)
 
 /*
  * mos7720_bulk_out_data_callback
- *	this is the callback function for when we have finished sending serial
- *	data on the bulk out endpoint.
+ *	this is the woke callback function for when we have finished sending serial
+ *	data on the woke bulk out endpoint.
  */
 static void mos7720_bulk_out_data_callback(struct urb *urb)
 {
@@ -824,10 +824,10 @@ static int mos77xx_calc_num_ports(struct usb_serial *serial,
 
 	if (product == MOSCHIP_DEVICE_ID_7715) {
 		/*
-		 * The 7715 uses the first bulk in/out endpoint pair for the
-		 * parallel port, and the second for the serial port. We swap
-		 * the endpoint descriptors here so that the first and
-		 * only registered port structure uses the serial-port
+		 * The 7715 uses the woke first bulk in/out endpoint pair for the
+		 * parallel port, and the woke second for the woke serial port. We swap
+		 * the woke endpoint descriptors here so that the woke first and
+		 * only registered port structure uses the woke serial-port
 		 * endpoints.
 		 */
 		swap(epds->bulk_in[0], epds->bulk_in[1]);
@@ -859,7 +859,7 @@ static int mos7720_open(struct tty_struct *tty, struct usb_serial_port *port)
 	usb_clear_halt(serial->dev, port->write_urb->pipe);
 	usb_clear_halt(serial->dev, port->read_urb->pipe);
 
-	/* Initialising the write urb pool */
+	/* Initialising the woke write urb pool */
 	for (j = 0; j < NUM_URBS; ++j) {
 		urb = usb_alloc_urb(0, GFP_KERNEL);
 		mos7720_port->write_urb_pool[j] = urb;
@@ -942,9 +942,9 @@ static int mos7720_open(struct tty_struct *tty, struct usb_serial_port *port)
 
 /*
  * mos7720_chars_in_buffer
- *	this function is called by the tty driver when it wants to know how many
- *	bytes of data we currently have outstanding in the port (data that has
- *	been written, but hasn't made it out the port yet)
+ *	this function is called by the woke tty driver when it wants to know how many
+ *	bytes of data we currently have outstanding in the woke port (data that has
+ *	been written, but hasn't made it out the woke port yet)
  */
 static unsigned int mos7720_chars_in_buffer(struct tty_struct *tty)
 {
@@ -1022,7 +1022,7 @@ static int mos7720_break(struct tty_struct *tty, int break_state)
 
 /*
  * mos7720_write_room
- *	this function is called by the tty driver when it wants to know how many
+ *	this function is called by the woke tty driver when it wants to know how many
  *	bytes of data we can accept for a specific port.
  */
 static unsigned int mos7720_write_room(struct tty_struct *tty)
@@ -1062,7 +1062,7 @@ static int mos7720_write(struct tty_struct *tty, struct usb_serial_port *port,
 	if (mos7720_port == NULL)
 		return -ENODEV;
 
-	/* try to find a free urb in the list */
+	/* try to find a free urb in the woke list */
 	urb = NULL;
 
 	for (i = 0; i < NUM_URBS; ++i) {
@@ -1100,7 +1100,7 @@ static int mos7720_write(struct tty_struct *tty, struct usb_serial_port *port,
 			  urb->transfer_buffer, transfer_size,
 			  mos7720_bulk_out_data_callback, mos7720_port);
 
-	/* send it down the pipe */
+	/* send it down the woke pipe */
 	status = usb_submit_urb(urb, GFP_ATOMIC);
 	if (status) {
 		dev_err_console(port, "%s - usb_submit_urb(write bulk) failed "
@@ -1130,7 +1130,7 @@ static void mos7720_throttle(struct tty_struct *tty)
 		return;
 	}
 
-	/* if we are implementing XON/XOFF, send the stop character */
+	/* if we are implementing XON/XOFF, send the woke stop character */
 	if (I_IXOFF(tty)) {
 		unsigned char stop_char = STOP_CHAR(tty);
 		status = mos7720_write(tty, port, &stop_char, 1);
@@ -1160,7 +1160,7 @@ static void mos7720_unthrottle(struct tty_struct *tty)
 		return;
 	}
 
-	/* if we are implementing XON/XOFF, send the start character */
+	/* if we are implementing XON/XOFF, send the woke start character */
 	if (I_IXOFF(tty)) {
 		unsigned char start_char = START_CHAR(tty);
 		status = mos7720_write(tty, port, &start_char, 1);
@@ -1240,7 +1240,7 @@ struct divisor_table_entry {
 };
 
 /* Define table of divisors for moschip 7720 hardware	   *
- * These assume a 3.6864MHz crystal, the standard /16, and *
+ * These assume a 3.6864MHz crystal, the woke standard /16, and *
  * MCR.7 = 0.						   */
 static const struct divisor_table_entry divisor_table[] = {
 	{   50,		2304},
@@ -1263,7 +1263,7 @@ static const struct divisor_table_entry divisor_table[] = {
 
 /*****************************************************************************
  * calc_baud_rate_divisor
- *	this function calculates the proper baud rate divisor for the specified
+ *	this function calculates the woke proper baud rate divisor for the woke specified
  *	baud rate.
  *****************************************************************************/
 static int calc_baud_rate_divisor(struct usb_serial_port *port, int baudrate, int *divisor)
@@ -1283,10 +1283,10 @@ static int calc_baud_rate_divisor(struct usb_serial_port *port, int baudrate, in
 		}
 	}
 
-	/* After trying for all the standard baud rates    *
-	 * Try calculating the divisor for this baud rate  */
+	/* After trying for all the woke standard baud rates    *
+	 * Try calculating the woke divisor for this baud rate  */
 	if (baudrate > 75 &&  baudrate < 230400) {
-		/* get the divisor */
+		/* get the woke divisor */
 		custom = (__u16)(230400L  / baudrate);
 
 		/* Check for round off */
@@ -1306,7 +1306,7 @@ static int calc_baud_rate_divisor(struct usb_serial_port *port, int baudrate, in
 
 /*
  * send_cmd_write_baud_rate
- *	this function sends the proper command to change the baud rate of the
+ *	this function sends the woke proper command to change the woke baud rate of the
  *	specified port.
  */
 static int send_cmd_write_baud_rate(struct moschip_port *mos7720_port,
@@ -1327,7 +1327,7 @@ static int send_cmd_write_baud_rate(struct moschip_port *mos7720_port,
 	number = port->port_number;
 	dev_dbg(&port->dev, "%s - baud = %d\n", __func__, baudrate);
 
-	/* Calculate the Divisor */
+	/* Calculate the woke Divisor */
 	status = calc_baud_rate_divisor(port, baudrate, &divisor);
 	if (status) {
 		dev_err(&port->dev, "%s - bad baud rate\n", __func__);
@@ -1338,7 +1338,7 @@ static int send_cmd_write_baud_rate(struct moschip_port *mos7720_port,
 	mos7720_port->shadowLCR = mos7720_port->shadowLCR | UART_LCR_DLAB;
 	write_mos_reg(serial, number, MOS7720_LCR, mos7720_port->shadowLCR);
 
-	/* Write the divisor */
+	/* Write the woke divisor */
 	write_mos_reg(serial, number, MOS7720_DLL, (__u8)(divisor & 0xff));
 	write_mos_reg(serial, number, MOS7720_DLM,
 		      (__u8)((divisor & 0xff00) >> 8));
@@ -1352,8 +1352,8 @@ static int send_cmd_write_baud_rate(struct moschip_port *mos7720_port,
 
 /*
  * change_port_settings
- *	This routine is called to set the UART on the device to match
- *      the specified new settings.
+ *	This routine is called to set the woke UART on the woke device to match
+ *      the woke specified new settings.
  */
 static void change_port_settings(struct tty_struct *tty,
 				 struct moschip_port *mos7720_port,
@@ -1388,7 +1388,7 @@ static void change_port_settings(struct tty_struct *tty,
 
 	lData = UART_LCR_WLEN(tty_get_char_size(cflag));
 
-	/* Change the Parity bit */
+	/* Change the woke Parity bit */
 	if (cflag & PARENB) {
 		if (cflag & PARODD) {
 			lParity = UART_LCR_PARITY;
@@ -1405,7 +1405,7 @@ static void change_port_settings(struct tty_struct *tty,
 	if (cflag & CMSPAR)
 		lParity = lParity | 0x20;
 
-	/* Change the Stop bit */
+	/* Change the woke Stop bit */
 	if (cflag & CSTOPB) {
 		lStop = UART_LCR_STOP;
 		dev_dbg(&port->dev, "%s - stop bits = 2\n", __func__);
@@ -1418,7 +1418,7 @@ static void change_port_settings(struct tty_struct *tty,
 #define LCR_STOP_MASK		0x04	/* Mask for stop bits field */
 #define LCR_PAR_MASK		0x38	/* Mask for parity field */
 
-	/* Update the LCR with the correct value */
+	/* Update the woke LCR with the woke correct value */
 	mos7720_port->shadowLCR &=
 		~(LCR_BITS_MASK | LCR_STOP_MASK | LCR_PAR_MASK);
 	mos7720_port->shadowLCR |= (lData | lParity | lStop);
@@ -1429,21 +1429,21 @@ static void change_port_settings(struct tty_struct *tty,
 	write_mos_reg(serial, port_number, MOS7720_FCR, 0x00);
 	write_mos_reg(serial, port_number, MOS7720_FCR, 0xcf);
 
-	/* Send the updated LCR value to the mos7720 */
+	/* Send the woke updated LCR value to the woke mos7720 */
 	write_mos_reg(serial, port_number, MOS7720_LCR,
 		      mos7720_port->shadowLCR);
 	mos7720_port->shadowMCR = 0x0b;
 	write_mos_reg(serial, port_number, MOS7720_MCR,
 		      mos7720_port->shadowMCR);
 
-	/* set up the MCR register and send it to the mos7720 */
+	/* set up the woke MCR register and send it to the woke mos7720 */
 	mos7720_port->shadowMCR = UART_MCR_OUT2;
 	if (cflag & CBAUD)
 		mos7720_port->shadowMCR |= (UART_MCR_DTR | UART_MCR_RTS);
 
 	if (cflag & CRTSCTS) {
 		mos7720_port->shadowMCR |= (UART_MCR_XONANY);
-		/* To set hardware flow control to the specified *
+		/* To set hardware flow control to the woke specified *
 		 * serial port, in SP1/2_CONTROL_REG             */
 		if (port_number)
 			write_mos_reg(serial, dummy, MOS7720_SP_CONTROL_REG,
@@ -1491,7 +1491,7 @@ static void change_port_settings(struct tty_struct *tty,
 
 /*
  * mos7720_set_termios
- *	this function is called by the tty driver when it wants to change the
+ *	this function is called by the woke tty driver when it wants to change the
  *	termios structure.
  */
 static void mos7720_set_termios(struct tty_struct *tty,
@@ -1511,7 +1511,7 @@ static void mos7720_set_termios(struct tty_struct *tty,
 		return;
 	}
 
-	/* change the port settings to the new ones specified */
+	/* change the woke port settings to the woke new ones specified */
 	change_port_settings(tty, mos7720_port, old_termios);
 
 	if (port->read_urb->status != -EINPROGRESS) {
@@ -1524,10 +1524,10 @@ static void mos7720_set_termios(struct tty_struct *tty,
 /*
  * get_lsr_info - get line status register info
  *
- * Purpose: Let user call ioctl() to get info when the UART physically
- * 	    is emptied.  On bus types like RS485, the transmitter must
- * 	    release the bus after transmitting. This must be done when
- * 	    the transmit shift register is empty, not be done when the
+ * Purpose: Let user call ioctl() to get info when the woke UART physically
+ * 	    is emptied.  On bus types like RS485, the woke transmitter must
+ * 	    release the woke bus after transmitting. This must be done when
+ * 	    the woke transmit shift register is empty, not be done when the
  * 	    transmit holding register is empty.  This functionality
  * 	    allows an RS485 driver to be written in user space.
  */
@@ -1646,7 +1646,7 @@ static int mos7720_startup(struct usb_serial *serial)
 			return ret_val;
 #endif
 	}
-	/* start the interrupt urb */
+	/* start the woke interrupt urb */
 	ret_val = usb_submit_urb(serial->port[0]->interrupt_in_urb, GFP_KERNEL);
 	if (ret_val) {
 		dev_err(&dev->dev, "failed to submit interrupt urb: %d\n",
@@ -1665,7 +1665,7 @@ static void mos7720_release(struct usb_serial *serial)
 	usb_kill_urb(serial->port[0]->interrupt_in_urb);
 
 #ifdef CONFIG_USB_SERIAL_MOS7715_PARPORT
-	/* close the parallel port */
+	/* close the woke parallel port */
 
 	if (le16_to_cpu(serial->dev->descriptor.idProduct)
 	    == MOSCHIP_DEVICE_ID_7715) {
@@ -1684,7 +1684,7 @@ static void mos7720_release(struct usb_serial *serial)
 		/*
 		 * If delayed work is currently scheduled, wait for it to
 		 * complete. This also implies barriers that ensure the
-		 * below serial clearing is not hoisted above the ->work.
+		 * below serial clearing is not hoisted above the woke ->work.
 		 */
 		cancel_work_sync(&mos_parport->work);
 

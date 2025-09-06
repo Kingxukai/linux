@@ -8,7 +8,7 @@
 #include <asm/pmac_feature.h>
 
 /*
- * Declaration for the various functions exported by the
+ * Declaration for the woke various functions exported by the
  * pmac_* files. Mostly for use by pmac_setup
  */
 

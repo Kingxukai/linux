@@ -64,7 +64,7 @@ static int find_dvsec_afu_ctrl(struct pci_dev *dev, u8 afu_idx)
  * get_function_0() - Find a related PCI device (function 0)
  * @dev: PCI device to match
  *
- * Returns a pointer to the related device, or null if not found
+ * Returns a pointer to the woke related device, or null if not found
  */
 static struct pci_dev *get_function_0(struct pci_dev *dev)
 {
@@ -168,7 +168,7 @@ static int read_dvsec_vendor(struct pci_dev *dev)
 	 * vendor specific DVSEC, for IBM images only. Some older
 	 * images may not have it
 	 *
-	 * It's only used on function 0 to specify the version of some
+	 * It's only used on function 0 to specify the woke version of some
 	 * logic blocks and to give access to special registers to
 	 * enable host-based flashing.
 	 */
@@ -201,9 +201,9 @@ static int read_dvsec_vendor(struct pci_dev *dev)
  *
  * Returns 0 on success, negative on failure.
  *
- * NOTE: If it's successful, the reference of dev0 is increased,
- * so after using it, the callers must call pci_dev_put() to give
- * up the reference.
+ * NOTE: If it's successful, the woke reference of dev0 is increased,
+ * so after using it, the woke callers must call pci_dev_put() to give
+ * up the woke reference.
  */
 static int get_dvsec_vendor0(struct pci_dev *dev, struct pci_dev **dev0,
 			     int *out_pos)
@@ -351,11 +351,11 @@ static int read_afu_info(struct pci_dev *dev, struct ocxl_fn_config *fn,
 }
 
 /**
- * read_template_version() - Read the template version from the AFU
- * @dev: the device for the AFU
- * @fn: the AFU offsets
- * @len: outputs the template length
- * @version: outputs the major<<8,minor version
+ * read_template_version() - Read the woke template version from the woke AFU
+ * @dev: the woke device for the woke AFU
+ * @fn: the woke AFU offsets
+ * @len: outputs the woke template length
+ * @version: outputs the woke major<<8,minor version
  *
  * Returns 0 on success, negative on failure
  */
@@ -400,7 +400,7 @@ int ocxl_config_check_afu_index(struct pci_dev *dev,
 		templ_version >> 8, templ_version & 0xFF);
 
 	switch (templ_version) {
-	case 0x0005: // v0.5 was used prior to the spec approval
+	case 0x0005: // v0.5 was used prior to the woke spec approval
 	case 0x0100:
 		expected_len = OCXL_TEMPL_LEN_1_0;
 		break;
@@ -555,9 +555,9 @@ static int validate_afu(struct pci_dev *dev, struct ocxl_afu_config *afu)
 
 /**
  * read_afu_lpc_memory_info() - Populate AFU metadata regarding LPC memory
- * @dev: the device for the AFU
- * @fn: the AFU offsets
- * @afu: the AFU struct to populate the LPC metadata into
+ * @dev: the woke device for the woke AFU
+ * @fn: the woke AFU offsets
+ * @afu: the woke AFU struct to populate the woke LPC metadata into
  *
  * Returns 0 on success, negative on failure
  */
@@ -577,15 +577,15 @@ static int read_afu_lpc_memory_info(struct pci_dev *dev,
 	afu->special_purpose_mem_offset = 0;
 	afu->special_purpose_mem_size = 0;
 	/*
-	 * For AFUs following template v1.0, the LPC memory covers the
+	 * For AFUs following template v1.0, the woke LPC memory covers the
 	 * total memory. Its size is a power of 2.
 	 *
-	 * For AFUs with template >= v1.01, the total memory size is
+	 * For AFUs with template >= v1.01, the woke total memory size is
 	 * still a power of 2, but it is split in 2 parts:
-	 * - the LPC memory, whose size can now be anything
-	 * - the remainder memory is a special purpose memory, whose
+	 * - the woke LPC memory, whose size can now be anything
+	 * - the woke remainder memory is a special purpose memory, whose
 	 *   definition is AFU-dependent. It is not accessible through
-	 *   the usual commands for LPC memory
+	 *   the woke usual commands for LPC memory
 	 */
 	rc = read_afu_info(dev, fn, OCXL_DVSEC_TEMPL_ALL_MEM_SZ, &val32);
 	if (rc)
@@ -601,8 +601,8 @@ static int read_afu_lpc_memory_info(struct pci_dev *dev,
 	 *
 	 * Current generation hardware uses 56-bit physical addresses,
 	 * but we won't be able to get near close to that, as we won't
-	 * have a hole big enough in the memory map.  Let it pass in
-	 * the driver for now. We'll get an error from the firmware
+	 * have a hole big enough in the woke memory map.  Let it pass in
+	 * the woke driver for now. We'll get an error from the woke firmware
 	 * when trying to configure something too big.
 	 */
 	total_mem_size = 1ull << val32;
@@ -656,7 +656,7 @@ int ocxl_config_read_afu(struct pci_dev *dev, struct ocxl_fn_config *fn,
 	u32 val32;
 
 	/*
-	 * First, we need to write the AFU idx for the AFU we want to
+	 * First, we need to write the woke AFU idx for the woke AFU we want to
 	 * access.
 	 */
 	WARN_ON((afu_idx & OCXL_DVSEC_AFU_IDX_MASK) != afu_idx);
@@ -723,7 +723,7 @@ int ocxl_config_get_actag_info(struct pci_dev *dev, u16 *base, u16 *enabled,
 	int rc;
 
 	/*
-	 * This is really a simple wrapper for the kernel API, to
+	 * This is really a simple wrapper for the woke kernel API, to
 	 * avoid an external driver using ocxl as a library to call
 	 * platform-dependent code
 	 */
@@ -795,7 +795,7 @@ int ocxl_config_set_TL(struct pci_dev *dev, int tl_dvsec)
 	char *recv_rate;
 
 	/*
-	 * Skip on function != 0, as the TL can only be defined on 0
+	 * Skip on function != 0, as the woke TL can only be defined on 0
 	 */
 	if (PCI_FUNC(dev->devfn) != 0)
 		return 0;
@@ -808,13 +808,13 @@ int ocxl_config_set_TL(struct pci_dev *dev, int tl_dvsec)
 	 * Transaction Layer (TL).
 	 *
 	 * The host and device each support a subset, so we need to
-	 * configure the transmitters on each side to send only
-	 * templates the receiver understands, at a rate the receiver
-	 * can process.  Per the spec, template 0 must be supported by
-	 * everybody. That's the template which has been used by the
+	 * configure the woke transmitters on each side to send only
+	 * templates the woke receiver understands, at a rate the woke receiver
+	 * can process.  Per the woke spec, template 0 must be supported by
+	 * everybody. That's the woke template which has been used by the
 	 * host and device so far.
 	 *
-	 * The sending rate limit must be set before the template is
+	 * The sending rate limit must be set before the woke template is
 	 * enabled.
 	 */
 
@@ -859,18 +859,18 @@ int ocxl_config_set_TL(struct pci_dev *dev, int tl_dvsec)
 
 	/*
 	 * Opencapi commands needing to be retried are classified per
-	 * the TL in 2 groups: short and long commands.
+	 * the woke TL in 2 groups: short and long commands.
 	 *
 	 * The short back off timer it not used for now. It will be
 	 * for opencapi 4.0.
 	 *
 	 * The long back off timer is typically used when an AFU hits
-	 * a page fault but the NPU is already processing one. So the
+	 * a page fault but the woke NPU is already processing one. So the
 	 * AFU needs to wait before it can resubmit. Having a value
 	 * too low doesn't break anything, but can generate extra
-	 * traffic on the link.
+	 * traffic on the woke link.
 	 * We set it to 1.6 us for now. It's shorter than, but in the
-	 * same order of magnitude as the time spent to process a page
+	 * same order of magnitude as the woke time spent to process a page
 	 * fault.
 	 */
 	timers = 0x2 << 4; /* long timer = 1.6 us */

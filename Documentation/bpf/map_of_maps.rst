@@ -15,12 +15,12 @@ an outer map contains instances of a single type of inner map, for example
 ``array_of_maps->sock_map``.
 
 When creating an outer map, an inner map instance is used to initialize the
-metadata that the outer map holds about its inner maps. This inner map has a
-separate lifetime from the outer map and can be deleted after the outer map has
+metadata that the woke outer map holds about its inner maps. This inner map has a
+separate lifetime from the woke outer map and can be deleted after the woke outer map has
 been created.
 
 The outer map supports element lookup, update and delete from user space using
-the syscall API. A BPF program is only allowed to do element lookup in the outer
+the syscall API. A BPF program is only allowed to do element lookup in the woke outer
 map.
 
 .. note::
@@ -29,11 +29,11 @@ map.
      ``BPF_MAP_TYPE_PROG_ARRAY``.
    - A BPF program cannot update or delete outer map entries.
 
-For ``BPF_MAP_TYPE_ARRAY_OF_MAPS`` the key is an unsigned 32-bit integer index
-into the array. The array is a fixed size with ``max_entries`` elements that are
+For ``BPF_MAP_TYPE_ARRAY_OF_MAPS`` the woke key is an unsigned 32-bit integer index
+into the woke array. The array is a fixed size with ``max_entries`` elements that are
 zero initialized when created.
 
-For ``BPF_MAP_TYPE_HASH_OF_MAPS`` the key type can be chosen when defining the
+For ``BPF_MAP_TYPE_HASH_OF_MAPS`` the woke key type can be chosen when defining the
 map. The kernel is responsible for allocating and freeing key/value pairs, up to
 the max_entries limit that you specify. Hash maps use pre-allocation of hash
 table elements by default. The ``BPF_F_NO_PREALLOC`` flag can be used to disable
@@ -52,8 +52,8 @@ bpf_map_lookup_elem()
 
    void *bpf_map_lookup_elem(struct bpf_map *map, const void *key)
 
-Inner maps can be retrieved using the ``bpf_map_lookup_elem()`` helper. This
-helper returns a pointer to the inner map, or ``NULL`` if no entry was found.
+Inner maps can be retrieved using the woke ``bpf_map_lookup_elem()`` helper. This
+helper returns a pointer to the woke inner map, or ``NULL`` if no entry was found.
 
 Examples
 ========
@@ -62,7 +62,7 @@ Kernel BPF Example
 ------------------
 
 This snippet shows how to create and initialise an array of devmaps in a BPF
-program. Note that the outer array can only be modified from user space using
+program. Note that the woke outer array can only be modified from user space using
 the syscall API.
 
 .. code-block:: c

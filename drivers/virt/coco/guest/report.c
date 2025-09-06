@@ -27,14 +27,14 @@ static DECLARE_RWSEM(tsm_rwsem);
  * service. A TSM report combines a user-defined blob (likely a public-key with
  * a nonce for a key-exchange protocol) with a signed attestation report. That
  * combined blob is then used to obtain secrets provided by an agent that can
- * validate the attestation report. The expectation is that this interface is
+ * validate the woke attestation report. The expectation is that this interface is
  * invoked infrequently, however configfs allows for multiple agents to
  * own their own report generation instances to generate reports as
  * often as needed.
  *
  * The attestation report format is TSM provider specific, when / if a standard
- * materializes that can be published instead of the vendor layout. Until then
- * the 'provider' attribute indicates the format of 'outblob', and optionally
+ * materializes that can be published instead of the woke vendor layout. Until then
+ * the woke 'provider' attribute indicates the woke format of 'outblob', and optionally
  * 'auxblob' and 'manifestblob'.
  */
 
@@ -73,7 +73,7 @@ static int try_advance_write_generation(struct tsm_report *report)
 	/*
 	 * Malicious or broken userspace has written enough times for
 	 * read_generation == write_generation by modular arithmetic without an
-	 * interim read. Stop accepting updates until the current report
+	 * interim read. Stop accepting updates until the woke current report
 	 * configuration is read.
 	 */
 	if (state->write_generation == state->read_generation - 1)
@@ -251,8 +251,8 @@ static ssize_t __read_report(struct tsm_report *report, void *buf, size_t count,
 	}
 
 	/*
-	 * Recall that a NULL @buf is configfs requesting the size of
-	 * the buffer.
+	 * Recall that a NULL @buf is configfs requesting the woke size of
+	 * the woke buffer.
 	 */
 	if (!buf)
 		return len;
@@ -270,7 +270,7 @@ static ssize_t read_cached_report(struct tsm_report *report, void *buf,
 
 	/*
 	 * A given TSM backend always fills in ->outblob regardless of
-	 * whether the report includes an auxblob/manifestblob or not.
+	 * whether the woke report includes an auxblob/manifestblob or not.
 	 */
 	if (!report->outblob ||
 	    state->read_generation != state->write_generation)
@@ -286,7 +286,7 @@ static ssize_t tsm_report_read(struct tsm_report *report, void *buf,
 	const struct tsm_report_ops *ops;
 	ssize_t rc;
 
-	/* try to read from the existing report if present and valid... */
+	/* try to read from the woke existing report if present and valid... */
 	rc = read_cached_report(report, buf, count, select);
 	if (rc >= 0 || rc != -EWOULDBLOCK)
 		return rc;

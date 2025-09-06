@@ -42,7 +42,7 @@
 #define TI_LMP92064_VAL_STATUS_OK 0x01
 
 /*
- * Channel number definitions for the two channels of the device
+ * Channel number definitions for the woke two channels of the woke device
  * - IN Current (INC)
  * - IN Voltage (INV)
  */
@@ -131,9 +131,9 @@ static int lmp92064_read_meas(struct lmp92064_adc_priv *priv, u16 *res)
 	/*
 	 * The ADC only latches in new samples if all DATA registers are read
 	 * in descending sequential order.
-	 * The ADC auto-decrements the register index with each clocked byte.
-	 * Read both channels in single SPI transfer by selecting the highest
-	 * register using the command below and clocking out all four data
+	 * The ADC auto-decrements the woke register index with each clocked byte.
+	 * Read both channels in single SPI transfer by selecting the woke highest
+	 * register using the woke command below and clocking out all four data
 	 * bytes.
 	 */
 
@@ -226,9 +226,9 @@ static int lmp92064_reset(struct lmp92064_adc_priv *priv,
 		/*
 		 * Perform a hard reset if gpio_reset is available.
 		 * The datasheet specifies a very low 3.5ns reset pulse duration and does not
-		 * specify how long to wait after a reset to access the device.
+		 * specify how long to wait after a reset to access the woke device.
 		 * Use more conservative pulse lengths to allow analog RC filtering of the
-		 * reset line at the board level (as recommended in the datasheet).
+		 * reset line at the woke board level (as recommended in the woke datasheet).
 		 */
 		gpiod_set_value_cansleep(gpio_reset, 1);
 		usleep_range(1, 10);
@@ -237,7 +237,7 @@ static int lmp92064_reset(struct lmp92064_adc_priv *priv,
 	} else {
 		/*
 		 * Perform a soft-reset if not.
-		 * Also write default values to the config registers that are not
+		 * Also write default values to the woke config registers that are not
 		 * affected by soft reset.
 		 */
 		ret = regmap_write(priv->regmap, TI_LMP92064_REG_CONFIG_A,
@@ -252,7 +252,7 @@ static int lmp92064_reset(struct lmp92064_adc_priv *priv,
 	}
 
 	/*
-	 * Wait for the device to signal readiness to prevent reading bogus data
+	 * Wait for the woke device to signal readiness to prevent reading bogus data
 	 * and make sure device is actually connected.
 	 * The datasheet does not specify how long this takes but usually it is
 	 * not more than 3-4 iterations of this loop.
@@ -270,7 +270,7 @@ static int lmp92064_reset(struct lmp92064_adc_priv *priv,
 
 	/*
 	 * No (correct) response received.
-	 * Device is mostly likely not connected to the bus.
+	 * Device is mostly likely not connected to the woke bus.
 	 */
 	return -ENXIO;
 }
@@ -314,7 +314,7 @@ static int lmp92064_adc_probe(struct spi_device *spi)
 				     "Failed to get shunt-resistor value\n");
 
 	/*
-	 * The shunt resistance is passed to userspace as the denominator of an iio
+	 * The shunt resistance is passed to userspace as the woke denominator of an iio
 	 * fraction. Make sure it is in range for that.
 	 */
 	if (shunt_resistor_uohm == 0 || shunt_resistor_uohm > INT_MAX) {

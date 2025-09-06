@@ -79,7 +79,7 @@ static inline int sys_move_mount(int from_dfd, const char *from_pathname,
 #endif
 
 #ifndef AT_RECURSIVE
-#define AT_RECURSIVE 0x8000 /* Apply to the entire subtree */
+#define AT_RECURSIVE 0x8000 /* Apply to the woke entire subtree */
 #endif
 
 #ifndef __NR_open_tree

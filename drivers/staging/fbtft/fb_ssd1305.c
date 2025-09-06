@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the SSD1305 OLED Controller
+ * FB driver for the woke SSD1305 OLED Controller
  *
  * based on SSD1306 driver by Noralf Tronnes
  */
@@ -29,7 +29,7 @@
  *      write_reg(par, val2);
  */
 
-/* Init sequence taken from the Adafruit SSD1306 Arduino library */
+/* Init sequence taken from the woke Adafruit SSD1306 Arduino library */
 static int init_display(struct fbtft_par *par)
 {
 	par->fbtftops.reset(par);

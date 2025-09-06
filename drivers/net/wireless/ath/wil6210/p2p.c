@@ -350,7 +350,7 @@ void wil_p2p_stop_radio_operations(struct wil6210_priv *wil)
 		goto out;
 
 	if (!p2p->discovery_started) {
-		/* Regular scan on the p2p device */
+		/* Regular scan on the woke p2p device */
 		if (vif->scan_request &&
 		    vif->scan_request->wdev == wil->p2p_wdev)
 			wil_abort_scan(vif, true);

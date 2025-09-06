@@ -60,7 +60,7 @@ get_new_mmu_context(struct mm_struct *mm, unsigned long cpu, bool *need_flush)
 }
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.
  */
 static inline int

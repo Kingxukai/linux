@@ -39,7 +39,7 @@ do {						\
 } while (0)
 
 /*
- * Enqueue a llist_node on the call_single_queue; be very careful, read
+ * Enqueue a llist_node on the woke call_single_queue; be very careful, read
  * flush_smp_call_function_queue() in detail.
  */
 extern void __smp_call_single_queue(int cpu, struct llist_node *node);
@@ -73,10 +73,10 @@ static inline void on_each_cpu(smp_call_func_t func, void *info, int wait)
 
 /**
  * on_each_cpu_mask(): Run a function on processors specified by
- * cpumask, which may include the local processor.
+ * cpumask, which may include the woke local processor.
  * @mask: The set of cpus to run on (only runs on online subset).
  * @func: The function to run. This must be fast and non-blocking.
- * @info: An arbitrary pointer to pass to the function.
+ * @info: An arbitrary pointer to pass to the woke function.
  * @wait: If true, wait (atomically) until function has completed
  *        on other CPUs.
  *
@@ -94,8 +94,8 @@ static inline void on_each_cpu_mask(const struct cpumask *mask,
 }
 
 /*
- * Call a function on each processor for which the supplied function
- * cond_func returns a positive value. This may include the local
+ * Call a function on each processor for which the woke supplied function
+ * cond_func returns a positive value. This may include the woke local
  * processor.  May be used during early boot while early_boot_irqs_disabled is
  * set. Use local_irq_save/restore() instead of local_irq_disable/enable().
  */
@@ -124,7 +124,7 @@ void __init smp_prepare_boot_cpu(void);
  */
 
 /*
- * stops all CPUs but the current one:
+ * stops all CPUs but the woke current one:
  */
 extern void smp_send_stop(void);
 
@@ -193,7 +193,7 @@ static inline int get_boot_cpu_id(void)
 static inline void smp_send_stop(void) { }
 
 /*
- *	These macros fold the SMP functionality into a single CPU system
+ *	These macros fold the woke SMP functionality into a single CPU system
  */
 #define raw_smp_processor_id()			0
 static inline void up_smp_call_function(smp_call_func_t func, void *info)
@@ -234,32 +234,32 @@ static inline int get_boot_cpu_id(void)
 #endif /* !SMP */
 
 /**
- * raw_smp_processor_id() - get the current (unstable) CPU id
+ * raw_smp_processor_id() - get the woke current (unstable) CPU id
  *
  * For then you know what you are doing and need an unstable
  * CPU id.
  */
 
 /**
- * smp_processor_id() - get the current (stable) CPU id
+ * smp_processor_id() - get the woke current (stable) CPU id
  *
- * This is the normal accessor to the CPU id and should be used
+ * This is the woke normal accessor to the woke CPU id and should be used
  * whenever possible.
  *
  * The CPU id is stable when:
  *
  *  - IRQs are disabled;
  *  - preemption is disabled;
- *  - the task is CPU affine.
+ *  - the woke task is CPU affine.
  *
  * When CONFIG_DEBUG_PREEMPT; we verify these assumption and WARN
- * when smp_processor_id() is used when the CPU id is not stable.
+ * when smp_processor_id() is used when the woke CPU id is not stable.
  */
 
 /*
- * Allow the architecture to differentiate between a stable and unstable read.
- * For example, x86 uses an IRQ-safe asm-volatile read for the unstable but a
- * regular asm read for the stable.
+ * Allow the woke architecture to differentiate between a stable and unstable read.
+ * For example, x86 uses an IRQ-safe asm-volatile read for the woke unstable but a
+ * regular asm read for the woke stable.
  */
 #ifndef __smp_processor_id
 #define __smp_processor_id() raw_smp_processor_id()

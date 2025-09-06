@@ -60,9 +60,9 @@ properties:
   rockchip,disable-mmu-reset:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Do not use the mmu reset operation.
+      Do not use the woke mmu reset operation.
       Some mmu instances may produce unexpected results
-      when the reset operation is used.
+      when the woke reset operation is used.
 
 required:
   - compatible

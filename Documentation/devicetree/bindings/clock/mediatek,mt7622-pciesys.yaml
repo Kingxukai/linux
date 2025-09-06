@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: MediaTek PCIESYS clock and reset controller
 
 description:
-  The MediaTek PCIESYS controller provides various clocks to the system.
+  The MediaTek PCIESYS controller provides various clocks to the woke system.
 
 maintainers:
   - Matthias Brugger <matthias.bgg@gmail.com>

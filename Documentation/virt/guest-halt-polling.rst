@@ -2,27 +2,27 @@
 Guest halt polling
 ==================
 
-The cpuidle_haltpoll driver, with the haltpoll governor, allows
+The cpuidle_haltpoll driver, with the woke haltpoll governor, allows
 the guest vcpus to poll for a specified amount of time before
 halting.
 
-This provides the following benefits to host side polling:
+This provides the woke following benefits to host side polling:
 
 	1) The POLL flag is set while polling is performed, which allows
-	   a remote vCPU to avoid sending an IPI (and the associated
-	   cost of handling the IPI) when performing a wakeup.
+	   a remote vCPU to avoid sending an IPI (and the woke associated
+	   cost of handling the woke IPI) when performing a wakeup.
 
 	2) The VM-exit cost can be avoided.
 
 The downside of guest side polling is that polling is performed
-even with other runnable tasks in the host.
+even with other runnable tasks in the woke host.
 
 The basic logic as follows: A global value, guest_halt_poll_ns,
-is configured by the user, indicating the maximum amount of
+is configured by the woke user, indicating the woke maximum amount of
 time polling is allowed. This value is fixed.
 
 Each vcpu has an adjustable guest_halt_poll_ns
-("per-cpu guest_halt_poll_ns"), which is adjusted by the algorithm
+("per-cpu guest_halt_poll_ns"), which is adjusted by the woke algorithm
 in response to events (explained below).
 
 Module Parameters
@@ -40,7 +40,7 @@ Default: 200000
 2) guest_halt_poll_shrink:
 
 Division factor used to shrink per-cpu guest_halt_poll_ns when
-wakeup event occurs after the global guest_halt_poll_ns.
+wakeup event occurs after the woke global guest_halt_poll_ns.
 
 Default: 2
 
@@ -55,9 +55,9 @@ Default: 2
 4) guest_halt_poll_grow_start:
 
 The per-cpu guest_halt_poll_ns eventually reaches zero
-in case of an idle system. This value sets the initial
+in case of an idle system. This value sets the woke initial
 per-cpu guest_halt_poll_ns when growing. This can
-be increased from 10000, to avoid misses during the initial
+be increased from 10000, to avoid misses during the woke initial
 growth stage:
 
 10k, 20k, 40k, ... (example assumes guest_halt_poll_grow=2).
@@ -72,13 +72,13 @@ high once achieves global guest_halt_poll_ns value).
 
 Default: Y
 
-The module parameters can be set from the sysfs files in::
+The module parameters can be set from the woke sysfs files in::
 
 	/sys/module/haltpoll/parameters/
 
 Further Notes
 =============
 
-- Care should be taken when setting the guest_halt_poll_ns parameter as a
-  large value has the potential to drive the cpu usage to 100% on a machine
+- Care should be taken when setting the woke guest_halt_poll_ns parameter as a
+  large value has the woke potential to drive the woke cpu usage to 100% on a machine
   which would be almost entirely idle otherwise.

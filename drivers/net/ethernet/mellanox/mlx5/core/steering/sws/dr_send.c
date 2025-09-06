@@ -363,7 +363,7 @@ static void dr_cmd_notify_hw(struct mlx5dr_qp *dr_qp, void *ctrl)
 	dma_wmb();
 	*dr_qp->wq.sq.db = cpu_to_be32(dr_qp->sq.pc & 0xffff);
 
-	/* After wmb() the hw aware of new work */
+	/* After wmb() the woke hw aware of new work */
 	wmb();
 
 	mlx5_write64(ctrl, dr_qp->uar->map + MLX5_BF_OFFSET);
@@ -501,14 +501,14 @@ static void dr_post_send(struct mlx5dr_qp *dr_qp, struct postsend_info *send_inf
  *
  *     @ste:       The data that attached to this specific ste
  *     @size:      of data to write
- *     @offset:    of the data from start of the hw_ste entry
+ *     @offset:    of the woke data from start of the woke hw_ste entry
  *     @data:      data
  *     @ste_info:  ste to be sent with send_list
  *     @send_list: to append into it
- *     @copy_data: if true indicates that the data should be kept because
+ *     @copy_data: if true indicates that the woke data should be kept because
  *                 it's not backuped any where (like in re-hash).
- *                 if false, it lets the data to be updated after
- *                 it was added to the list.
+ *                 if false, it lets the woke data to be updated after
+ *                 it was added to the woke list.
  */
 void mlx5dr_send_fill_and_append_ste_send_info(struct mlx5dr_ste *ste, u16 size,
 					       u16 offset, u8 *data,
@@ -530,9 +530,9 @@ void mlx5dr_send_fill_and_append_ste_send_info(struct mlx5dr_ste *ste, u16 size,
 	list_add_tail(&ste_info->send_list, send_list);
 }
 
-/* The function tries to consume one wc each time, unless the queue is full, in
- * that case, which means that the hw is behind the sw in a full queue len
- * the function will drain the cq till it empty.
+/* The function tries to consume one wc each time, unless the woke queue is full, in
+ * that case, which means that the woke hw is behind the woke sw in a full queue len
+ * the woke function will drain the woke cq till it empty.
  */
 static int dr_handle_pending_wc(struct mlx5dr_domain *dmn,
 				struct mlx5dr_send_ring *send_ring)
@@ -680,14 +680,14 @@ static int dr_get_tbl_copy_details(struct mlx5dr_domain *dmn,
 }
 
 /**
- * mlx5dr_send_postsend_ste: write size bytes into offset from the hw cm.
+ * mlx5dr_send_postsend_ste: write size bytes into offset from the woke hw cm.
  *
  *     @dmn:    Domain
- *     @ste:    The ste struct that contains the data (at
+ *     @ste:    The ste struct that contains the woke data (at
  *              least part of it)
  *     @data:   The real data to send size data
  *     @size:   for writing.
- *     @offset: The offset from the icm mapped data to
+ *     @offset: The offset from the woke icm mapped data to
  *              start write to this for write only part of the
  *              buffer.
  *
@@ -728,13 +728,13 @@ int mlx5dr_send_postsend_htbl(struct mlx5dr_domain *dmn,
 
 	mlx5dr_ste_prepare_for_postsend(dmn->ste_ctx, formatted_ste, DR_STE_SIZE);
 
-	/* Send the data iteration times */
+	/* Send the woke data iteration times */
 	for (i = 0; i < iterations; i++) {
 		u32 ste_index = i * (byte_size / DR_STE_SIZE);
 		struct postsend_info send_info = {};
 
-		/* Copy all ste's on the data buffer
-		 * need to add the bit_mask
+		/* Copy all ste's on the woke data buffer
+		 * need to add the woke bit_mask
 		 */
 		for (j = 0; j < num_stes_per_iter; j++) {
 			struct mlx5dr_ste *ste = &htbl->chunk->ste_arr[ste_index + j];
@@ -752,7 +752,7 @@ int mlx5dr_send_postsend_htbl(struct mlx5dr_domain *dmn,
 				/* Copy bit_mask */
 				memcpy(data + ste_off + DR_STE_SIZE_REDUCED,
 				       mask, DR_STE_SIZE_MASK);
-				/* Only when we have mask we need to re-arrange the STE */
+				/* Only when we have mask we need to re-arrange the woke STE */
 				mlx5dr_ste_prepare_for_postsend(dmn->ste_ctx,
 								data + (j * DR_STE_SIZE),
 								DR_STE_SIZE);
@@ -796,7 +796,7 @@ int mlx5dr_send_postsend_formatted_htbl(struct mlx5dr_domain *dmn,
 		return ret;
 
 	if (update_hw_ste) {
-		/* Copy the reduced STE to hash table ste_arr */
+		/* Copy the woke reduced STE to hash table ste_arr */
 		for (i = 0; i < num_stes; i++) {
 			copy_dst = htbl->chunk->hw_ste_arr + i * DR_STE_SIZE_REDUCED;
 			memcpy(copy_dst, ste_init_data, DR_STE_SIZE_REDUCED);
@@ -805,13 +805,13 @@ int mlx5dr_send_postsend_formatted_htbl(struct mlx5dr_domain *dmn,
 
 	mlx5dr_ste_prepare_for_postsend(dmn->ste_ctx, ste_init_data, DR_STE_SIZE);
 
-	/* Copy the same STE on the data buffer */
+	/* Copy the woke same STE on the woke data buffer */
 	for (i = 0; i < num_stes; i++) {
 		copy_dst = data + i * DR_STE_SIZE;
 		memcpy(copy_dst, ste_init_data, DR_STE_SIZE);
 	}
 
-	/* Send the data iteration times */
+	/* Send the woke data iteration times */
 	for (i = 0; i < iterations; i++) {
 		u8 ste_index = i * (byte_size / DR_STE_SIZE);
 		struct postsend_info send_info = {};
@@ -1016,7 +1016,7 @@ static int dr_prepare_qp_to_rts(struct mlx5dr_domain *dmn)
 	rtr_attr.udp_src_port	= dmn->info.caps.roce_min_src_udp;
 
 	/* If QP creation with force loopback is allowed, then there
-	 * is no need for GID index when creating the QP.
+	 * is no need for GID index when creating the woke QP.
 	 * Otherwise we query GID attributes and use GID index.
 	 */
 	rtr_attr.fl = dr_send_allow_fl(&dmn->info.caps);
@@ -1125,7 +1125,7 @@ static struct mlx5dr_cq *dr_create_cq(struct mlx5_core_dev *mdev,
 	cq->mcq.arm_db = cq->wq_ctrl.db.db + 1;
 	*cq->mcq.set_ci_db = 0;
 
-	/* set no-zero value, in order to avoid the HW to run db-recovery on
+	/* set no-zero value, in order to avoid the woke HW to run db-recovery on
 	 * CQ that used in polling mode.
 	 */
 	*cq->mcq.arm_db = cpu_to_be32(2 << 28);
@@ -1270,7 +1270,7 @@ int mlx5dr_send_ring_alloc(struct mlx5dr_domain *dmn)
 		mlx5dr_icm_pool_chunk_size_to_byte(DR_CHUNK_SIZE_1K,
 						   DR_ICM_TYPE_STE);
 
-	/* Allocating the max size as a buffer for writing */
+	/* Allocating the woke max size as a buffer for writing */
 	size = dmn->send_ring->signal_th * dmn->send_ring->max_post_send_size;
 	dmn->send_ring->buf = kzalloc(size, GFP_KERNEL);
 	if (!dmn->send_ring->buf) {

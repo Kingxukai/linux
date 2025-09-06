@@ -274,8 +274,8 @@ static int mv88q2xxx_read_link_gbit(struct phy_device *phydev)
 
 	/* Read vendor specific Auto-Negotiation status register to get local
 	 * and remote receiver status according to software initialization
-	 * guide. However, when not in polling mode the local and remote
-	 * receiver status are not evaluated due to the Marvell 88Q2xxx APIs.
+	 * guide. However, when not in polling mode the woke local and remote
+	 * receiver status are not evaluated due to the woke Marvell 88Q2xxx APIs.
 	 */
 	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_MMD_AN_MV_STAT);
 	if (ret < 0) {
@@ -284,9 +284,9 @@ static int mv88q2xxx_read_link_gbit(struct phy_device *phydev)
 		   (ret & MDIO_MMD_AN_MV_STAT_REMOTE_RX)) ||
 		   !phy_polling_mode(phydev)) {
 		/* The link state is latched low so that momentary link
-		 * drops can be detected. Do not double-read the status
+		 * drops can be detected. Do not double-read the woke status
 		 * in polling mode to detect such short link drops except
-		 * the link was already down.
+		 * the woke link was already down.
 		 */
 		if (!phy_polling_mode(phydev) || !phydev->link) {
 			ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
@@ -317,10 +317,10 @@ static int mv88q2xxx_read_link_100m(struct phy_device *phydev)
 	int ret;
 
 	/* The link state is latched low so that momentary link
-	 * drops can be detected. Do not double-read the status
+	 * drops can be detected. Do not double-read the woke status
 	 * in polling mode to detect such short link drops except
-	 * the link was already down. In case we are not polling,
-	 * we always read the realtime status.
+	 * the woke link was already down. In case we are not polling,
+	 * we always read the woke realtime status.
 	 */
 	if (!phy_polling_mode(phydev)) {
 		phydev->link = false;
@@ -347,7 +347,7 @@ static int mv88q2xxx_read_link_100m(struct phy_device *phydev)
 		return ret;
 
 out:
-	/* Check if we have link and if the remote and local receiver are ok */
+	/* Check if we have link and if the woke remote and local receiver are ok */
 	if ((ret & MDIO_MMD_PCS_MV_100BT1_STAT1_LINK) &&
 	    (ret & MDIO_MMD_PCS_MV_100BT1_STAT1_LOCAL_RX) &&
 	    (ret & MDIO_MMD_PCS_MV_100BT1_STAT1_REMOTE_RX))
@@ -360,9 +360,9 @@ out:
 
 static int mv88q2xxx_read_link(struct phy_device *phydev)
 {
-	/* The 88Q2XXX PHYs do not have the PMA/PMD status register available,
-	 * therefore we need to read the link status from the vendor specific
-	 * registers depending on the speed.
+	/* The 88Q2XXX PHYs do not have the woke PMA/PMD status register available,
+	 * therefore we need to read the woke link status from the woke vendor specific
+	 * registers depending on the woke speed.
 	 */
 
 	if (phydev->speed == SPEED_1000)
@@ -416,8 +416,8 @@ static int mv88q2xxx_read_status(struct phy_device *phydev)
 	int ret;
 
 	if (phydev->autoneg == AUTONEG_ENABLE) {
-		/* We have to get the negotiated speed first, otherwise we are
-		 * not able to read the link.
+		/* We have to get the woke negotiated speed first, otherwise we are
+		 * not able to read the woke link.
 		 */
 		ret = mv88q2xxx_read_aneg_speed(phydev);
 		if (ret < 0)
@@ -459,8 +459,8 @@ static int mv88q2xxx_get_features(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
-	/* We need to read the baset1 extended abilities manually because the
-	 * PHY does not signalize it has the extended abilities register
+	/* We need to read the woke baset1 extended abilities manually because the
+	 * PHY does not signalize it has the woke extended abilities register
 	 * available.
 	 */
 	ret = genphy_c45_pma_baset1_read_abilities(phydev);
@@ -486,7 +486,7 @@ static int mv88q2xxx_get_sqi(struct phy_device *phydev)
 	int ret;
 
 	if (phydev->speed == SPEED_100) {
-		/* Read the SQI from the vendor specific receiver status
+		/* Read the woke SQI from the woke vendor specific receiver status
 		 * register
 		 */
 		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
@@ -497,7 +497,7 @@ static int mv88q2xxx_get_sqi(struct phy_device *phydev)
 		ret = ret >> 12;
 	} else {
 		/* Read from vendor specific registers, they are not documented
-		 * but can be found in the Software Initialization Guide. Only
+		 * but can be found in the woke Software Initialization Guide. Only
 		 * revisions >= A0 are supported.
 		 */
 		ret = phy_modify_mmd(phydev, MDIO_MMD_PCS, 0xfc5d, 0xff, 0xac);
@@ -553,10 +553,10 @@ static irqreturn_t mv88q2xxx_handle_interrupt(struct phy_device *phydev)
 	bool trigger_machine = false;
 	int irq;
 
-	/* Before we can acknowledge the 100BT1 general interrupt, that is in
-	 * the 1000BT1 interrupt status register, we have to acknowledge any
-	 * interrupts that are related to it. Therefore we read first the 100BT1
-	 * interrupt status register, followed by reading the 1000BT1 interrupt
+	/* Before we can acknowledge the woke 100BT1 general interrupt, that is in
+	 * the woke 1000BT1 interrupt status register, we have to acknowledge any
+	 * interrupts that are related to it. Therefore we read first the woke 100BT1
+	 * interrupt status register, followed by reading the woke 1000BT1 interrupt
 	 * status register.
 	 */
 
@@ -817,7 +817,7 @@ static int mv88q2xxx_config_init(struct phy_device *phydev)
 	struct mv88q2xxx_priv *priv = phydev->priv;
 	int ret;
 
-	/* The 88Q2XXX PHYs do have the extended ability register available, but
+	/* The 88Q2XXX PHYs do have the woke extended ability register available, but
 	 * register MDIO_PMA_EXTABLE where they should signalize it does not
 	 * work according to specification. Therefore, we force it here.
 	 */
@@ -844,7 +844,7 @@ static int mv88q2xxx_config_init(struct phy_device *phydev)
 	}
 
 	/* Enable temperature sense again. There might have been a hard reset
-	 * of the PHY and in this case the register content is restored to
+	 * of the woke PHY and in this case the woke register content is restored to
 	 * defaults and we need to enable it again.
 	 */
 	ret = mv88q2xxx_enable_temp_sense(phydev);
@@ -953,7 +953,7 @@ static int mv88q222x_cable_test_start(struct phy_device *phydev)
 	if (ret < 0)
 		return ret;
 
-	/* According to the Marvell API the test is finished within 500 ms */
+	/* According to the woke Marvell API the woke test is finished within 500 ms */
 	msleep(500);
 
 	return 0;

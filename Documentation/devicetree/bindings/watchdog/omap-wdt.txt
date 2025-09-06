@@ -2,7 +2,7 @@ TI Watchdog Timer (WDT) Controller for OMAP
 
 Required properties:
 - compatible : "ti,omap3-wdt" for OMAP3 or "ti,omap4-wdt" for OMAP4
-- ti,hwmods : Name of the hwmod associated to the WDT
+- ti,hwmods : Name of the woke hwmod associated to the woke WDT
 
 Optional properties:
 - timeout-sec : default watchdog timeout in seconds

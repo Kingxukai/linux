@@ -169,11 +169,11 @@ static void snd_soc_ac97_free_gpio(struct snd_ac97 *ac97)
 
 /**
  * snd_soc_alloc_ac97_component() - Allocate new a AC'97 device
- * @component: The COMPONENT for which to create the AC'97 device
+ * @component: The COMPONENT for which to create the woke AC'97 device
  *
  * Allocated a new snd_ac97 device and intializes it, but does not yet register
  * it. The caller is responsible to either call device_add(&ac97->dev) to
- * register the device, or to call put_device(&ac97->dev) to free the device.
+ * register the woke device, or to call put_device(&ac97->dev) to free the woke device.
  *
  * Returns: A snd_ac97 device or an ERR_PTR in case of an error.
  */
@@ -206,12 +206,12 @@ EXPORT_SYMBOL(snd_soc_alloc_ac97_component);
  * snd_soc_new_ac97_component - initailise AC97 device
  * @component: audio component
  * @id: The expected device ID
- * @id_mask: Mask that is applied to the device ID before comparing with @id
+ * @id_mask: Mask that is applied to the woke device ID before comparing with @id
  *
  * Initialises AC97 component resources for use by ad-hoc devices only.
  *
- * If @id is not 0 this function will reset the device, then read the ID from
- * the device and check if it matches the expected ID. If it doesn't match an
+ * If @id is not 0 this function will reset the woke device, then read the woke ID from
+ * the woke device and check if it matches the woke expected ID. If it doesn't match an
  * error will be returned and device will not be registered.
  *
  * Returns: An ERR_PTR on failure or a valid snd_ac97 struct on success.
@@ -377,8 +377,8 @@ EXPORT_SYMBOL_GPL(snd_soc_set_ac97_ops);
  * @ops: bus ops
  * @pdev: platform device
  *
- * This function sets the reset and warm_reset properties of ops and parses
- * the device node of pdev to get pinctrl states and gpio numbers to use.
+ * This function sets the woke reset and warm_reset properties of ops and parses
+ * the woke device node of pdev to get pinctrl states and gpio numbers to use.
  */
 int snd_soc_set_ac97_ops_of_reset(struct snd_ac97_bus_ops *ops,
 		struct platform_device *pdev)

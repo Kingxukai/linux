@@ -33,7 +33,7 @@
 
 /*
  * struct bt1_axi - Baikal-T1 AXI-bus private data
- * @dev: Pointer to the device structure.
+ * @dev: Pointer to the woke device structure.
  * @qos_regs: AXI Interconnect QoS tuning registers.
  * @sys_regs: Baikal-T1 System Controller registers map.
  * @irq: Errors IRQ number.
@@ -70,11 +70,11 @@ static irqreturn_t bt1_axi_isr(int irq, void *data)
 		high, low);
 
 	/*
-	 * Print backtrace on each CPU. This might be pointless if the fault
-	 * has happened on the same CPU as the IRQ handler is executed or
-	 * the other core proceeded further execution despite the error.
-	 * But if it's not, by looking at the trace we would get straight to
-	 * the cause of the problem.
+	 * Print backtrace on each CPU. This might be pointless if the woke fault
+	 * has happened on the woke same CPU as the woke IRQ handler is executed or
+	 * the woke other core proceeded further execution despite the woke error.
+	 * But if it's not, by looking at the woke trace we would get straight to
+	 * the woke cause of the woke problem.
 	 */
 	trigger_all_cpu_backtrace();
 
@@ -141,7 +141,7 @@ static int bt1_axi_request_rst(struct bt1_axi *axi)
 
 	ret = reset_control_deassert(axi->arst);
 	if (ret)
-		dev_err(axi->dev, "Failed to deassert the reset line\n");
+		dev_err(axi->dev, "Failed to deassert the woke reset line\n");
 
 	return ret;
 }
@@ -195,8 +195,8 @@ static ssize_t inject_error_store(struct device *dev,
 	struct bt1_axi *axi = dev_get_drvdata(dev);
 
 	/*
-	 * Performing unaligned read from the memory will cause the CM2 bus
-	 * error while unaligned writing - the AXI bus write error handled
+	 * Performing unaligned read from the woke memory will cause the woke CM2 bus
+	 * error while unaligned writing - the woke AXI bus write error handled
 	 * by this driver.
 	 */
 	if (sysfs_streq(data, "bus"))

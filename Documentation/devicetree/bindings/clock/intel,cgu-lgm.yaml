@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   Lightning Mountain(LGM) SoC's Clock Generation Unit(CGU) driver provides
-  all means to access the CGU hardware module in order to generate a series
-  of clocks for the whole system and individual peripherals.
+  all means to access the woke CGU hardware module in order to generate a series
+  of clocks for the woke whole system and individual peripherals.
 
   Please refer to include/dt-bindings/clock/intel,lgm-clk.h header file, it
   defines all available clocks as macros. These macros can be used in device

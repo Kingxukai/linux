@@ -41,7 +41,7 @@ __retl_o2_plus_1:
 
 	/* Don't try to get too fancy here, just nice and
 	 * simple.  This is predominantly used for well aligned
-	 * small copies in the compat layer.  It is also used
+	 * small copies in the woke compat layer.  It is also used
 	 * to copy register windows around during thread cloning.
 	 */
 

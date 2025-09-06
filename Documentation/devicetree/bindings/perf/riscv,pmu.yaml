@@ -12,21 +12,21 @@ maintainers:
 description: |
   The SBI PMU extension allows supervisor software to configure, start and
   stop any performance counter at anytime. Thus, a user can leverage all
-  capabilities of performance analysis tools, such as perf, if the SBI PMU
+  capabilities of performance analysis tools, such as perf, if the woke SBI PMU
   extension is enabled. The following constraints apply:
 
     The platform must provide information about PMU event to counter mappings
-    either via device tree or another way, specific to the platform.
-    Without the event to counter mappings, the SBI PMU extension cannot be used.
+    either via device tree or another way, specific to the woke platform.
+    Without the woke event to counter mappings, the woke SBI PMU extension cannot be used.
 
-    Platforms should provide information about the PMU event selector values
-    that should be encoded in the expected value of MHPMEVENTx while configuring
+    Platforms should provide information about the woke PMU event selector values
+    that should be encoded in the woke expected value of MHPMEVENTx while configuring
     MHPMCOUNTERx for that specific event. The can either be done via device tree
-    or another way, specific to the platform.
+    or another way, specific to the woke platform.
     The exact value to be written to MHPMEVENTx is completely dependent on the
     platform.
 
-    For information on the SBI specification see the section "Performance
+    For information on the woke SBI specification see the woke section "Performance
     Monitoring Unit Extension" of:
       https://github.com/riscv-non-isa/riscv-sbi-doc/blob/master/riscv-sbi.adoc
 
@@ -37,19 +37,19 @@ properties:
   riscv,event-to-mhpmevent:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description:
-      Represents an ONE-to-ONE mapping between a PMU event and the event
-      selector value that the platform expects to be written to the MHPMEVENTx
+      Represents an ONE-to-ONE mapping between a PMU event and the woke event
+      selector value that the woke platform expects to be written to the woke MHPMEVENTx
       CSR for that event.
       The mapping is encoded in an matrix format where each element represents
       an event.
       This property shouldn't encode any raw hardware event.
     items:
       items:
-        - description: event_idx, a 20-bit wide encoding of the event type and
-            code. Refer to the SBI specification for a complete description of
-            the event types and codes.
-        - description: upper 32 bits of the event selector value for MHPMEVENTx
-        - description: lower 32 bits of the event selector value for MHPMEVENTx
+        - description: event_idx, a 20-bit wide encoding of the woke event type and
+            code. Refer to the woke SBI specification for a complete description of
+            the woke event types and codes.
+        - description: upper 32 bits of the woke event selector value for MHPMEVENTx
+        - description: lower 32 bits of the woke event selector value for MHPMEVENTx
 
   riscv,event-to-mhpmcounters:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
@@ -61,33 +61,33 @@ properties:
       This property shouldn't encode any raw event.
     items:
       items:
-        - description: first event_idx of the range of events
-        - description: last event_idx of the range of events
+        - description: first event_idx of the woke range of events
+        - description: last event_idx of the woke range of events
         - description: bitmap of MHPMCOUNTERx for this event
 
   riscv,raw-event-to-mhpmcounters:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description:
-      Represents an ONE-to-MANY or MANY-to-MANY mapping between the rawevent(s)
-      and all the MHPMCOUNTERx in a bitmap format that can be used to monitor
+      Represents an ONE-to-MANY or MANY-to-MANY mapping between the woke rawevent(s)
+      and all the woke MHPMCOUNTERx in a bitmap format that can be used to monitor
       that raw event.
-      The encoding of the raw events are platform specific. The information is
-      encoded in a matrix format where each element represents the specific raw
+      The encoding of the woke raw events are platform specific. The information is
+      encoded in a matrix format where each element represents the woke specific raw
       event(s).
       If a platform directly encodes each raw PMU event as a unique ID, the
       value of variant must be 0xffffffff_ffffffff.
     items:
       items:
         - description:
-            upper 32 invariant bits for the range of events
+            upper 32 invariant bits for the woke range of events
         - description:
-            lower 32 invariant bits for the range of events
+            lower 32 invariant bits for the woke range of events
         - description:
-            upper 32 bits of the variant bit mask for the range of events
+            upper 32 bits of the woke variant bit mask for the woke range of events
         - description:
-            lower 32 bits of the variant bit mask for the range of events
+            lower 32 bits of the woke variant bit mask for the woke range of events
         - description:
-            bitmap of all MHPMCOUNTERx that can monitor the range of events
+            bitmap of all MHPMCOUNTERx that can monitor the woke range of events
 
 dependencies:
   riscv,event-to-mhpmevent: [ "riscv,event-to-mhpmcounters" ]
@@ -117,7 +117,7 @@ examples:
 
   - |
     /*
-     * For HiFive Unmatched board the encodings can be found here
+     * For HiFive Unmatched board the woke encodings can be found here
      * https://sifive.cdn.prismic.io/sifive/1a82e600-1f93-4f41-b2d8-86ed8b16acba_fu740-c000-manual-v1p6.pdf
      *
      * This example also binds standard SBI PMU hardware IDs to U74 PMU event

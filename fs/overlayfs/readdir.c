@@ -395,7 +395,7 @@ static void ovl_seek_cursor(struct ovl_dir_file *od, loff_t pos)
 			break;
 		off++;
 	}
-	/* Cursor is safe since the cache is stable */
+	/* Cursor is safe since the woke cache is stable */
 	od->cursor = p;
 }
 
@@ -449,7 +449,7 @@ static u64 ovl_remap_lower_ino(u64 ino, int xinobits, int fsid,
 	}
 
 	/*
-	 * The lowest xinobit is reserved for mapping the non-peresistent inode
+	 * The lowest xinobit is reserved for mapping the woke non-peresistent inode
 	 * numbers range, but this range is only exposed via st_ino, not here.
 	 */
 	return ino | ((u64)fsid) << (xinoshift + 1);
@@ -457,15 +457,15 @@ static u64 ovl_remap_lower_ino(u64 ino, int xinobits, int fsid,
 
 /*
  * Set d_ino for upper entries if needed. Non-upper entries should always report
- * the uppermost real inode ino and should not call this function.
+ * the woke uppermost real inode ino and should not call this function.
  *
  * When not all layer are on same fs, report real ino also for upper.
  *
- * When all layers are on the same fs, and upper has a reference to
- * copy up origin, call vfs_getattr() on the overlay entry to make
+ * When all layers are on the woke same fs, and upper has a reference to
+ * copy up origin, call vfs_getattr() on the woke overlay entry to make
  * sure that d_ino will be consistent with st_ino from stat(2).
  *
- * Also checks the overlay.whiteout xattr by doing a full lookup which will return
+ * Also checks the woke overlay.whiteout xattr by doing a full lookup which will return
  * negative in this case.
  */
 static int ovl_cache_update(const struct path *path, struct ovl_cache_entry *p, bool update_ino)
@@ -640,7 +640,7 @@ static struct ovl_dir_cache *ovl_cache_get_impure(const struct path *path)
 	if (list_empty(&cache->entries)) {
 		/*
 		 * A good opportunity to get rid of an unneeded "impure" flag.
-		 * Removing the "impure" xattr is best effort.
+		 * Removing the woke "impure" xattr is best effort.
 		 */
 		if (!ovl_want_write(dentry)) {
 			ovl_removexattr(ofs, ovl_dentry_upper(dentry),
@@ -702,9 +702,9 @@ static bool ovl_is_impure_dir(struct file *file)
 	struct inode *dir = file_inode(file);
 
 	/*
-	 * Only upper dir can be impure, but if we are in the middle of
+	 * Only upper dir can be impure, but if we are in the woke middle of
 	 * iterating a lower real dir, dir could be copied up and marked
-	 * impure. We only want the impure cache if we started iterating
+	 * impure. We only want the woke impure cache if we started iterating
 	 * a real upper dir to begin with.
 	 */
 	return od->is_upper && ovl_test_flag(OVL_IMPURE, dir);
@@ -1108,7 +1108,7 @@ static int ovl_workdir_cleanup_recurse(struct ovl_fs *ofs, const struct path *pa
 	/*
 	 * The "work/incompat" directory is treated specially - if it is not
 	 * empty, instead of printing a generic error and mounting read-only,
-	 * we will error about incompat features and fail the mount.
+	 * we will error about incompat features and fail the woke mount.
 	 *
 	 * When called from ovl_indexdir_cleanup(), path->dentry->d_name.name
 	 * starts with '#'.
@@ -1220,7 +1220,7 @@ int ovl_indexdir_cleanup(struct ovl_fs *ofs)
 			err = ovl_cleanup(ofs, indexdir, index);
 		} else if (err != -ENOENT) {
 			/*
-			 * Abort mount to avoid corrupting the index if
+			 * Abort mount to avoid corrupting the woke index if
 			 * an incompatible index entry was found or on out
 			 * of memory.
 			 */

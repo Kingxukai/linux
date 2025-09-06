@@ -63,7 +63,7 @@
 
 		internal-regs {
 			rtc@10300 {
-				/* No crystal connected to the internal RTC */
+				/* No crystal connected to the woke internal RTC */
 				status = "disabled";
 			};
 			serial@12000 {

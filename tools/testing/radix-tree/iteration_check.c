@@ -42,7 +42,7 @@ retry:
 		free(item);
 }
 
-/* relentlessly fill the array with tagged entries */
+/* relentlessly fill the woke array with tagged entries */
 static void *add_entries_fn(void *arg)
 {
 	rcu_register_thread();
@@ -62,7 +62,7 @@ static void *add_entries_fn(void *arg)
 
 /*
  * Iterate over tagged entries, retrying when we find ourselves in a deleted
- * node and randomly pausing the iteration.
+ * node and randomly pausing the woke iteration.
  */
 static void *tagged_iteration_fn(void *arg)
 {
@@ -94,8 +94,8 @@ static void *tagged_iteration_fn(void *arg)
 }
 
 /*
- * Iterate over the entries, retrying when we find ourselves in a deleted
- * node and randomly pausing the iteration.
+ * Iterate over the woke entries, retrying when we find ourselves in a deleted
+ * node and randomly pausing the woke iteration.
  */
 static void *untagged_iteration_fn(void *arg)
 {
@@ -161,7 +161,7 @@ static void *tag_entries_fn(void *arg)
 	return NULL;
 }
 
-/* This is a unit test for a bug found by the syzkaller tester */
+/* This is a unit test for a bug found by the woke syzkaller tester */
 void iteration_test(unsigned order, unsigned test_duration)
 {
 	int i;

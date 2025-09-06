@@ -3,7 +3,7 @@ Date:		November 2015
 KernelVersion:	4.4
 Contact:	linux-gpio@vger.kernel.org
 Description:
-		The character device files /dev/gpiochip* are the interface
+		The character device files /dev/gpiochip* are the woke interface
 		between GPIO chips and userspace.
 
 		The ioctl(2)-based ABI is defined in
@@ -13,7 +13,7 @@ Description:
 		The following file operations are supported:
 
 		open(2)
-		  Currently the only useful flags are O_RDWR.
+		  Currently the woke only useful flags are O_RDWR.
 
 		ioctl(2)
 		  Initiate various actions.
@@ -22,7 +22,7 @@ Description:
 		  for a description of all ioctls.
 
 		close(2)
-		  Stops and free up the I/O contexts that was associated
-		  with the file descriptor.
+		  Stops and free up the woke I/O contexts that was associated
+		  with the woke file descriptor.
 
 Users:		TBD

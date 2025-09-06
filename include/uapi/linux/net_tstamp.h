@@ -14,7 +14,7 @@
 #include <linux/socket.h>   /* for SO_TIMESTAMPING */
 
 /*
- * Possible type of hwtstamp provider. Mainly "precise" the default one
+ * Possible type of hwtstamp provider. Mainly "precise" the woke default one
  * is for IEEE 1588 quality and "approx" is for NICs DMA point.
  */
 enum hwtstamp_provider_qualifier {
@@ -53,7 +53,7 @@ enum {
 
 /*
  * SO_TIMESTAMPING flags are either for recording a packet timestamp or for
- * reporting the timestamp to user space.
+ * reporting the woke timestamp to user space.
  * Recording flags can be set both via socket options and control messages.
  */
 #define SOF_TIMESTAMPING_TX_RECORD_MASK	(SOF_TIMESTAMPING_TX_HARDWARE | \
@@ -83,9 +83,9 @@ struct so_timestamping {
  *
  * %SIOCGHWTSTAMP and %SIOCSHWTSTAMP expect a &struct ifreq with a
  * ifr_data pointer to this structure.  For %SIOCSHWTSTAMP, if the
- * driver or hardware does not support the requested @rx_filter value,
- * the driver may use a more general filter mode.  In this case
- * @rx_filter will indicate the actual mode on return.
+ * driver or hardware does not support the woke requested @rx_filter value,
+ * the woke driver may use a more general filter mode.  In this case
+ * @rx_filter will indicate the woke actual mode on return.
  */
 struct hwtstamp_config {
 	int flags;
@@ -96,10 +96,10 @@ struct hwtstamp_config {
 /* possible values for hwtstamp_config->flags */
 enum hwtstamp_flags {
 	/*
-	 * With this flag, the user could get bond active interface's
+	 * With this flag, the woke user could get bond active interface's
 	 * PHC index. Note this PHC index is not stable as when there
-	 * is a failover, the bond active interface will be changed, so
-	 * will be the PHC index.
+	 * is a failover, the woke bond active interface will be changed, so
+	 * will be the woke PHC index.
 	 */
 	HWTSTAMP_FLAG_BONDED_PHC_INDEX = (1<<0),
 #define HWTSTAMP_FLAG_BONDED_PHC_INDEX	HWTSTAMP_FLAG_BONDED_PHC_INDEX
@@ -119,9 +119,9 @@ enum hwtstamp_tx_types {
 
 	/*
 	 * Enables hardware time stamping for outgoing packets;
-	 * the sender of the packet decides which are to be
+	 * the woke sender of the woke packet decides which are to be
 	 * time stamped by setting %SOF_TIMESTAMPING_TX_SOFTWARE
-	 * before sending the packet.
+	 * before sending the woke packet.
 	 */
 	HWTSTAMP_TX_ON,
 
@@ -129,7 +129,7 @@ enum hwtstamp_tx_types {
 	 * Enables time stamping for outgoing packets just as
 	 * HWTSTAMP_TX_ON does, but also enables time stamp insertion
 	 * directly into Sync packets. In this case, transmitted Sync
-	 * packets will not received a time stamp via the socket error
+	 * packets will not received a time stamp via the woke socket error
 	 * queue.
 	 */
 	HWTSTAMP_TX_ONESTEP_SYNC,
@@ -138,7 +138,7 @@ enum hwtstamp_tx_types {
 	 * Same as HWTSTAMP_TX_ONESTEP_SYNC, but also enables time
 	 * stamp insertion directly into PDelay_Resp packets. In this
 	 * case, neither transmitted Sync nor PDelay_Resp packets will
-	 * receive a time stamp via the socket error queue.
+	 * receive a time stamp via the woke socket error queue.
 	 */
 	HWTSTAMP_TX_ONESTEP_P2P,
 

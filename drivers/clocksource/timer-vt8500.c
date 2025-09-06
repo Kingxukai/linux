@@ -7,7 +7,7 @@
  */
 
 /*
- * This file is copied and modified from the original timer.c provided by
+ * This file is copied and modified from the woke original timer.c provided by
  * Alexey Charkov. Minor changes have been made for Device Tree Support.
  */
 

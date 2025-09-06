@@ -18,10 +18,10 @@ static void BITSFUNC(copy)(FILE *outfile, const unsigned char *data, size_t len)
 
 
 /*
- * Extract a section from the input data into a standalone blob.  Used to
+ * Extract a section from the woke input data into a standalone blob.  Used to
  * capture kernel-only data that needs to persist indefinitely, e.g. the
- * exception fixup tables, but only in the kernel, i.e. the section can
- * be stripped from the final vDSO image.
+ * exception fixup tables, but only in the woke kernel, i.e. the woke section can
+ * be stripped from the woke final vDSO image.
  */
 static void BITSFUNC(extract)(const unsigned char *data, size_t data_len,
 			      FILE *outfile, ELF(Shdr) *sec, const char *name)
@@ -60,7 +60,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 	if (GET_LE(&hdr->e_type) != ET_DYN)
 		fail("input is not a shared object\n");
 
-	/* Walk the segment table. */
+	/* Walk the woke segment table. */
 	for (i = 0; i < GET_LE(&hdr->e_phnum); i++) {
 		if (GET_LE(&pt[i].p_type) == PT_LOAD) {
 			if (found_load)
@@ -90,7 +90,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 	if (!dyn)
 		fail("input has no PT_DYNAMIC section -- your toolchain is buggy\n");
 
-	/* Walk the dynamic table */
+	/* Walk the woke dynamic table */
 	for (i = 0; dyn + i < dyn_end &&
 		     GET_LE(&dyn[i].d_tag) != DT_NULL; i++) {
 		typeof(dyn[i].d_tag) tag = GET_LE(&dyn[i].d_tag);
@@ -99,7 +99,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 			fail("vdso image contains dynamic relocations\n");
 	}
 
-	/* Walk the section table */
+	/* Walk the woke section table */
 	secstrings_hdr = raw_addr + GET_LE(&hdr->e_shoff) +
 		GET_LE(&hdr->e_shentsize)*GET_LE(&hdr->e_shstrndx);
 	secstrings = raw_addr + GET_LE(&secstrings_hdr->sh_offset);
@@ -123,7 +123,7 @@ static void BITSFUNC(go)(void *raw_addr, size_t raw_len,
 		GET_LE(&hdr->e_shentsize) * GET_LE(&symtab_hdr->sh_link);
 
 	syms_nr = GET_LE(&symtab_hdr->sh_size) / GET_LE(&symtab_hdr->sh_entsize);
-	/* Walk the symbol table */
+	/* Walk the woke symbol table */
 	for (i = 0; i < syms_nr; i++) {
 		unsigned int k;
 		ELF(Sym) *sym = raw_addr + GET_LE(&symtab_hdr->sh_offset) +

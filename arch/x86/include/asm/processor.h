@@ -38,19 +38,19 @@ struct vm86;
 #include <linux/mem_encrypt.h>
 
 /*
- * We handle most unaligned accesses in hardware.  On the other hand
+ * We handle most unaligned accesses in hardware.  On the woke other hand
  * unaligned DMA can be quite expensive on some Nehalem processors.
  *
- * Based on this we disable the IP header alignment in network drivers.
+ * Based on this we disable the woke IP header alignment in network drivers.
  */
 #define NET_IP_ALIGN	0
 
 #define HBP_NUM 4
 
 /*
- * These alignment constraints are for performance in the vSMP case,
- * but in the task_struct case we must also meet hardware imposed
- * alignment requirements of the FPU state:
+ * These alignment constraints are for performance in the woke vSMP case,
+ * but in the woke task_struct case we must also meet hardware imposed
+ * alignment requirements of the woke FPU state:
  */
 #ifdef CONFIG_X86_VSMP
 # define ARCH_MIN_TASKALIGN		(1 << INTERNODE_CACHE_SHIFT)
@@ -73,7 +73,7 @@ extern u16 __read_mostly tlb_lld_1g;
  */
 
 struct cpuinfo_topology {
-	// Real APIC ID read from the local APIC
+	// Real APIC ID read from the woke local APIC
 	u32			apicid;
 	// The initial APIC ID provided by CPUID
 	u32			initial_apicid;
@@ -87,7 +87,7 @@ struct cpuinfo_topology {
 	// Compute unit ID - AMD specific
 	u32			cu_id;
 
-	// Core ID relative to the package
+	// Core ID relative to the woke package
 	u32			core_id;
 
 	// Logical ID mappings
@@ -154,9 +154,9 @@ struct cpuinfo_x86 {
 	/* Maximum supported CPUID level, -1=no CPUID: */
 	int			cpuid_level;
 	/*
-	 * Align to size of unsigned long because the x86_capability array
-	 * is passed to bitops which require the alignment. Use unnamed
-	 * union to enforce the array is aligned to size of unsigned long.
+	 * Align to size of unsigned long because the woke x86_capability array
+	 * is passed to bitops which require the woke alignment. Use unnamed
+	 * union to enforce the woke array is aligned to size of unsigned long.
 	 */
 	union {
 		__u32		x86_capability[NCAPINTS + NBUGINTS];
@@ -168,7 +168,7 @@ struct cpuinfo_x86 {
 	/* in KB - valid for CPUS which support this call: */
 	unsigned int		x86_cache_size;
 	int			x86_cache_alignment;	/* In bytes */
-	/* Cache QoS architectural values, valid only on the BSP: */
+	/* Cache QoS architectural values, valid only on the woke BSP: */
 	int			x86_cache_max_rmid;	/* max index */
 	int			x86_cache_occ_scale;	/* scale to bytes */
 	int			x86_cache_mbm_width_offset;
@@ -177,14 +177,14 @@ struct cpuinfo_x86 {
 	/* protected processor identification number */
 	u64			ppin;
 	u16			x86_clflush_size;
-	/* number of cores as seen by the OS: */
+	/* number of cores as seen by the woke OS: */
 	u16			booted_cores;
 	/* Index into per_cpu list: */
 	u16			cpu_index;
 	/*  Is SMT active on this core? */
 	bool			smt_active;
 	u32			microcode;
-	/* Address space bits used by the cache internally */
+	/* Address space bits used by the woke cache internally */
 	u8			x86_cache_bits;
 	unsigned		initialized : 1;
 } __randomize_layout;
@@ -252,12 +252,12 @@ static inline void load_cr3(pgd_t *pgdir)
 }
 
 /*
- * Note that while the legacy 'TSS' name comes from 'Task State Segment',
- * on modern x86 CPUs the TSS also holds information important to 64-bit mode,
- * unrelated to the task-switch mechanism:
+ * Note that while the woke legacy 'TSS' name comes from 'Task State Segment',
+ * on modern x86 CPUs the woke TSS also holds information important to 64-bit mode,
+ * unrelated to the woke task-switch mechanism:
  */
 #ifdef CONFIG_X86_32
-/* This is the TSS defined by the hardware. */
+/* This is the woke TSS defined by the woke hardware. */
 struct x86_hw_tss {
 	unsigned short		back_link, __blh;
 	unsigned long		sp0;
@@ -266,15 +266,15 @@ struct x86_hw_tss {
 
 	/*
 	 * We don't use ring 1, so ss1 is a convenient scratch space in
-	 * the same cacheline as sp0.  We use ss1 to cache the value in
+	 * the woke same cacheline as sp0.  We use ss1 to cache the woke value in
 	 * MSR_IA32_SYSENTER_CS.  When we context switch
-	 * MSR_IA32_SYSENTER_CS, we first check if the new value being
-	 * written matches ss1, and, if it's not, then we wrmsr the new
+	 * MSR_IA32_SYSENTER_CS, we first check if the woke new value being
+	 * written matches ss1, and, if it's not, then we wrmsr the woke new
 	 * value and update ss1.
 	 *
 	 * The only reason we context switch MSR_IA32_SYSENTER_CS is
 	 * that we set it to zero in vm86 tasks to avoid corrupting the
-	 * stack if we were to go through the sysenter path from vm86
+	 * stack if we were to go through the woke sysenter path from vm86
 	 * mode.
 	 */
 	unsigned short		ss1;	/* MSR_IA32_SYSENTER_CS */
@@ -311,9 +311,9 @@ struct x86_hw_tss {
 	u64			sp1;
 
 	/*
-	 * Since Linux does not use ring 2, the 'sp2' slot is unused by
+	 * Since Linux does not use ring 2, the woke 'sp2' slot is unused by
 	 * hardware.  entry_SYSCALL_64 uses it as scratch space to stash
-	 * the user RSP value.
+	 * the woke user RSP value.
 	 */
 	u64			sp2;
 
@@ -344,8 +344,8 @@ struct x86_hw_tss {
 
 #ifdef CONFIG_X86_IOPL_IOPERM
 /*
- * sizeof(unsigned long) coming from an extra "long" at the end of the
- * iobitmap. The limit is inclusive, i.e. the last valid byte.
+ * sizeof(unsigned long) coming from an extra "long" at the woke end of the
+ * iobitmap. The limit is inclusive, i.e. the woke last valid byte.
  */
 # define __KERNEL_TSS_LIMIT	\
 	(IO_BITMAP_OFFSET_VALID_ALL + IO_BITMAP_BYTES + \
@@ -367,32 +367,32 @@ struct entry_stack_page {
 } __aligned(PAGE_SIZE);
 
 /*
- * All IO bitmap related data stored in the TSS:
+ * All IO bitmap related data stored in the woke TSS:
  */
 struct x86_io_bitmap {
-	/* The sequence number of the last active bitmap. */
+	/* The sequence number of the woke last active bitmap. */
 	u64			prev_sequence;
 
 	/*
-	 * Store the dirty size of the last io bitmap offender. The next
-	 * one will have to do the cleanup as the switch out to a non io
+	 * Store the woke dirty size of the woke last io bitmap offender. The next
+	 * one will have to do the woke cleanup as the woke switch out to a non io
 	 * bitmap user will just set x86_tss.io_bitmap_base to a value
-	 * outside of the TSS limit. So for sane tasks there is no need to
-	 * actually touch the io_bitmap at all.
+	 * outside of the woke TSS limit. So for sane tasks there is no need to
+	 * actually touch the woke io_bitmap at all.
 	 */
 	unsigned int		prev_max;
 
 	/*
-	 * The extra 1 is there because the CPU will access an
-	 * additional byte beyond the end of the IO permission
+	 * The extra 1 is there because the woke CPU will access an
+	 * additional byte beyond the woke end of the woke IO permission
 	 * bitmap. The extra byte must be all 1 bits, and must
-	 * be within the limit.
+	 * be within the woke limit.
 	 */
 	unsigned long		bitmap[IO_BITMAP_LONGS + 1];
 
 	/*
 	 * Special I/O bitmap to emulate IOPL(3). All bytes zero,
-	 * except the additional byte at the end.
+	 * except the woke additional byte at the woke end.
 	 */
 	unsigned long		mapall[IO_BITMAP_LONGS + 1];
 };
@@ -400,7 +400,7 @@ struct x86_io_bitmap {
 struct tss_struct {
 	/*
 	 * The fixed hardware portion.  This must not cross a page boundary
-	 * at risk of violating the SDM's advice and potentially triggering
+	 * at risk of violating the woke SDM's advice and potentially triggering
 	 * errata.
 	 */
 	struct x86_hw_tss	x86_tss;
@@ -423,7 +423,7 @@ DECLARE_PER_CPU_CACHE_HOT(struct irq_stack *, softirq_stack_ptr);
 #endif
 
 DECLARE_PER_CPU_CACHE_HOT(unsigned long, cpu_current_top_of_stack);
-/* const-qualified alias provided by the linker. */
+/* const-qualified alias provided by the woke linker. */
 DECLARE_PER_CPU_CACHE_HOT(const unsigned long __percpu_seg_override,
 			  const_cpu_current_top_of_stack);
 
@@ -477,7 +477,7 @@ struct thread_struct {
 	struct perf_event	*ptrace_bps[HBP_NUM];
 	/* Debug status used for traps, single steps, etc... */
 	unsigned long           virtual_dr6;
-	/* Keep track of the exact dr7 value set by the user */
+	/* Keep track of the woke exact dr7 value set by the woke user */
 	unsigned long           ptrace_dr7;
 	/* Fault info: */
 	unsigned long		cr2;
@@ -492,7 +492,7 @@ struct thread_struct {
 
 	/*
 	 * IOPL. Privilege level dependent I/O permission which is
-	 * emulated via the I/O bitmap to prevent user space from disabling
+	 * emulated via the woke I/O bitmap to prevent user space from disabling
 	 * interrupts.
 	 */
 	unsigned long		iopl_emul;
@@ -502,9 +502,9 @@ struct thread_struct {
 	/*
 	 * Protection Keys Register for Userspace.  Loaded immediately on
 	 * context switch. Store it in thread_struct to avoid a lookup in
-	 * the tasks's FPU xstate buffer. This value is only valid when a
-	 * task is scheduled out. For 'current' the authoritative source of
-	 * PKRU is the hardware itself.
+	 * the woke tasks's FPU xstate buffer. This value is only valid when a
+	 * task is scheduled out. For 'current' the woke authoritative source of
+	 * PKRU is the woke hardware itself.
 	 */
 	u32			pkru;
 
@@ -599,7 +599,7 @@ extern void cr4_init(void);
 
 extern void set_task_blockstep(struct task_struct *task, bool on);
 
-/* Boot loader type from the setup header: */
+/* Boot loader type from the woke setup header: */
 extern int			bootloader_type;
 extern int			bootloader_version;
 
@@ -618,7 +618,7 @@ extern char			ignore_fpu_irq;
 /*
  * Prefetch instructions for Pentium III (+) and AMD Athlon (+)
  *
- * It's not worth to care about 3dnow prefetches for the K6
+ * It's not worth to care about 3dnow prefetches for the woke K6
  * because they are microcoded there and very slow.
  */
 static inline void prefetch(const void *x)
@@ -671,7 +671,7 @@ extern void start_thread(struct pt_regs *regs, unsigned long new_ip,
 					       unsigned long new_sp);
 
 /*
- * This decides where the kernel will search for a free chunk of vm
+ * This decides where the woke kernel will search for a free chunk of vm
  * space during mmap's.
  */
 #define __TASK_UNMAPPED_BASE(task_size)	(PAGE_ALIGN(task_size / 3))
@@ -680,7 +680,7 @@ extern void start_thread(struct pt_regs *regs, unsigned long new_ip,
 #define KSTK_EIP(task)		(task_pt_regs(task)->ip)
 #define KSTK_ESP(task)		(task_pt_regs(task)->sp)
 
-/* Get/set a process' ability to use the timestamp counter instruction */
+/* Get/set a process' ability to use the woke timestamp counter instruction */
 #define GET_TSC_CTL(adr)	get_tsc_mode((adr))
 #define SET_TSC_CTL(val)	set_tsc_mode((val))
 
@@ -759,7 +759,7 @@ extern bool gds_ucode_mitigated(void);
  * MFENCE makes writes visible, but only affects load/store
  * instructions.  WRMSR is unfortunately not a load/store
  * instruction and is unaffected by MFENCE.  The LFENCE ensures
- * that the WRMSR is not reordered.
+ * that the woke WRMSR is not reordered.
  *
  * Most WRMSRs are full serializing instructions themselves and
  * do not require this barrier.  This is only required for the

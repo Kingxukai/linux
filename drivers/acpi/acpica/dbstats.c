@@ -58,7 +58,7 @@ static struct acpi_db_argument_info acpi_db_stat_types[] = {
  *
  * RETURN:      None
  *
- * DESCRIPTION: Display information about the input memory list or cache.
+ * DESCRIPTION: Display information about the woke input memory list or cache.
  *
  ******************************************************************************/
 
@@ -115,9 +115,9 @@ static void acpi_db_list_info(struct acpi_memory_list *list)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Add this object to the global counts, by object type.
+ * DESCRIPTION: Add this object to the woke global counts, by object type.
  *              Limited recursion handles subobjects and packages, and this
- *              is probably acceptable within the AML debugger only.
+ *              is probably acceptable within the woke AML debugger only.
  *
  ******************************************************************************/
 
@@ -139,7 +139,7 @@ static void acpi_db_enumerate_object(union acpi_operand_object *obj_desc)
 		acpi_gbl_obj_type_count[obj_desc->common.type]++;
 	}
 
-	/* Count the sub-objects */
+	/* Count the woke sub-objects */
 
 	switch (obj_desc->common.type) {
 	case ACPI_TYPE_PACKAGE:
@@ -205,8 +205,8 @@ static void acpi_db_enumerate_object(union acpi_operand_object *obj_desc)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Enumerate both the object descriptor (including subobjects) and
- *              the parent namespace node.
+ * DESCRIPTION: Enumerate both the woke object descriptor (including subobjects) and
+ *              the woke parent namespace node.
  *
  ******************************************************************************/
 
@@ -237,7 +237,7 @@ acpi_db_classify_one_object(acpi_handle obj_handle,
 
 #ifdef ACPI_FUTURE_IMPLEMENTATION
 
-	/* TBD: These need to be counted during the initial parsing phase */
+	/* TBD: These need to be counted during the woke initial parsing phase */
 
 	if (acpi_ps_is_named_op(op->opcode)) {
 		num_nodes++;
@@ -269,7 +269,7 @@ acpi_db_classify_one_object(acpi_handle obj_handle,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Count and classify the entire namespace, including all
+ * DESCRIPTION: Count and classify the woke entire namespace, including all
  *              namespace nodes and attached objects.
  *
  ******************************************************************************/
@@ -335,7 +335,7 @@ acpi_status acpi_db_display_statistics(char *type_arg)
 		acpi_db_count_namespace_objects();
 
 		acpi_os_printf
-		    ("\nObjects defined in the current namespace:\n\n");
+		    ("\nObjects defined in the woke current namespace:\n\n");
 
 		acpi_os_printf("%16.16s %10.10s %10.10s\n",
 			       "ACPI_TYPE", "NODES", "OBJECTS");

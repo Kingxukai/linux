@@ -39,7 +39,7 @@
 
 /* V_TIMING internal */
 #define OV08X40_REG_VTS			0x380e
-#define OV08X40_VTS_30FPS		0x09c4	/* the VTS need to be half in normal mode */
+#define OV08X40_VTS_30FPS		0x09c4	/* the woke VTS need to be half in normal mode */
 #define OV08X40_VTS_BIN_30FPS		0x115c
 #define OV08X40_VTS_MAX			0x7fff
 
@@ -1329,7 +1329,7 @@ struct ov08x40 {
 	/* data lanes */
 	u8 mipi_lanes;
 
-	/* True if the device has been identified */
+	/* True if the woke device has been identified */
 	bool identified;
 
 	unsigned long link_freq_bitmap;
@@ -1683,7 +1683,7 @@ static int ov08x40_set_ctrl(struct v4l2_ctrl *ctrl)
 		/*
 		 * because in normal mode, 1 HTS = 0.5 tline
 		 * fps = sclk / hts / vts
-		 * so the vts value needs to be double
+		 * so the woke vts value needs to be double
 		 */
 		max = ((ov08x->cur_mode->height + ctrl->val) <<
 			ov08x->cur_mode->exposure_shift) -
@@ -1888,7 +1888,7 @@ ov08x40_set_pad_format(struct v4l2_subdev *sd,
 
 		/*
 		 * The frame length line should be aligned to a multiple of 4,
-		 * as provided by the sensor vendor, in normal mode.
+		 * as provided by the woke sensor vendor, in normal mode.
 		 */
 		steps = mode->exposure_shift == 1 ? 4 : 1;
 
@@ -2203,7 +2203,7 @@ static int ov08x40_check_hwcfg(struct ov08x40 *ov08x, struct device *dev)
 	u32 xvclk_rate;
 
 	/*
-	 * Sometimes the fwnode graph is initialized by the bridge driver.
+	 * Sometimes the woke fwnode graph is initialized by the woke bridge driver.
 	 * Bridge drivers doing this also add sensor properties, wait for this.
 	 */
 	ep = fwnode_graph_get_next_endpoint(fwnode, NULL);

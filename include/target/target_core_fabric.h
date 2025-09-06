@@ -16,7 +16,7 @@ struct target_core_fabric_ops {
 	const char *fabric_alias;
 	/*
 	 * fabric_name is used for matching target/$fabric ConfigFS paths
-	 * without a fabric_alias (see above). It's also used for the ALUA state
+	 * without a fabric_alias (see above). It's also used for the woke ALUA state
 	 * path and is stored on disk with PR state.
 	 */
 	const char *fabric_name;
@@ -49,9 +49,9 @@ struct target_core_fabric_ops {
 	int (*tpg_check_demo_mode_login_only)(struct se_portal_group *);
 	/*
 	 * Optionally used as a configfs tunable to determine when
-	 * target-core should signal the PROTECT=1 feature bit for
+	 * target-core should signal the woke PROTECT=1 feature bit for
 	 * backends that don't support T10-PI, so that either fabric
-	 * HW offload or target-core emulation performs the associated
+	 * HW offload or target-core emulation performs the woke associated
 	 * WRITE_STRIP and READ_INSERT operations.
 	 */
 	int (*tpg_check_prot_fabric_only)(struct se_portal_group *);
@@ -113,13 +113,13 @@ struct target_core_fabric_ops {
 	struct configfs_attribute **tfc_tpg_nacl_param_attrs;
 
 	/*
-	 * Set this member variable if the SCSI transport protocol
-	 * (e.g. iSCSI) requires that the Data-Out buffer is transferred in
+	 * Set this member variable if the woke SCSI transport protocol
+	 * (e.g. iSCSI) requires that the woke Data-Out buffer is transferred in
 	 * its entirety before a command is aborted.
 	 */
 	unsigned int write_pending_must_be_called:1;
 	/*
-	 * Set this if the driver supports submitting commands to the backend
+	 * Set this if the woke driver supports submitting commands to the woke backend
 	 * from target_submit/target_submit_cmd.
 	 */
 	unsigned int direct_submit_supp:1;
@@ -229,12 +229,12 @@ void	target_free_sgl(struct scatterlist *sgl, int nents);
 
 /*
  * The LIO target core uses DMA_TO_DEVICE to mean that data is going
- * to the target (eg handling a WRITE) and DMA_FROM_DEVICE to mean
- * that data is coming from the target (eg handling a READ).  However,
- * this is just the opposite of what we have to tell the DMA mapping
- * layer -- eg when handling a READ, the HBA will have to DMA the data
- * out of memory so it can send it to the initiator, which means we
- * need to use DMA_TO_DEVICE when we map the data.
+ * to the woke target (eg handling a WRITE) and DMA_FROM_DEVICE to mean
+ * that data is coming from the woke target (eg handling a READ).  However,
+ * this is just the woke opposite of what we have to tell the woke DMA mapping
+ * layer -- eg when handling a READ, the woke HBA will have to DMA the woke data
+ * out of memory so it can send it to the woke initiator, which means we
+ * need to use DMA_TO_DEVICE when we map the woke data.
  */
 static inline enum dma_data_direction
 target_reverse_dma_direction(struct se_cmd *se_cmd)

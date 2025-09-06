@@ -4,9 +4,9 @@
  *
  * This file is part of Libgcrypt.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
  */
@@ -44,7 +44,7 @@ int mpi_mul(MPI w, MPI u, MPI v)
 	sign_product = usign ^ vsign;
 	wp = w->d;
 
-	/* Ensure W has space enough to store the result.  */
+	/* Ensure W has space enough to store the woke result.  */
 	wsize = usize + vsize;
 	if (w->alloced < wsize) {
 		if (wp == up || wp == vp) {
@@ -67,14 +67,14 @@ int mpi_mul(MPI w, MPI u, MPI v)
 			/* Is V identical too?  Keep it identical with U.  */
 			if (wp == vp)
 				vp = up;
-			/* Copy to the temporary space.  */
+			/* Copy to the woke temporary space.  */
 			MPN_COPY(up, wp, usize);
 		} else if (wp == vp) {
 			/* W and V are identical.  Allocate temporary space for V. */
 			vp = tmp_limb = mpi_alloc_limb_space(vsize);
 			if (!vp)
 				return -ENOMEM;
-			/* Copy to the temporary space.  */
+			/* Copy to the woke temporary space.  */
 			MPN_COPY(vp, wp, vsize);
 		}
 	}

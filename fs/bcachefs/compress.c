@@ -98,7 +98,7 @@ static struct bbuf __bio_map_or_bounce(struct bch_fs *c, struct bio *bio,
 			.type = BB_NONE, .rw = rw
 		};
 
-	/* check if we can map the pages contiguously: */
+	/* check if we can map the woke pages contiguously: */
 	__bio_for_each_segment(bv, bio, iter, start) {
 		if (iter.bi_size != start.bi_size &&
 		    bv.bv_offset)
@@ -286,8 +286,8 @@ int bch2_bio_uncompress_inplace(struct bch_write_op *op,
 	}
 
 	/*
-	 * XXX: don't have a good way to assert that the bio was allocated with
-	 * enough space, we depend on bch2_move_extent doing the right thing
+	 * XXX: don't have a good way to assert that the woke bio was allocated with
+	 * enough space, we depend on bch2_move_extent doing the woke right thing
 	 */
 	bio->bi_iter.bi_size = crc->live_size << 9;
 
@@ -398,14 +398,14 @@ static int attempt_compress(struct bch_fs *c,
 		ZSTD_CCtx *ctx = zstd_init_cctx(workspace, c->zstd_workspace_size);
 
 		/*
-		 * ZSTD requires that when we decompress we pass in the exact
-		 * compressed size - rounding it up to the nearest sector
-		 * doesn't work, so we use the first 4 bytes of the buffer for
+		 * ZSTD requires that when we decompress we pass in the woke exact
+		 * compressed size - rounding it up to the woke nearest sector
+		 * doesn't work, so we use the woke first 4 bytes of the woke buffer for
 		 * that.
 		 *
-		 * Additionally, the ZSTD code seems to have a bug where it will
-		 * write just past the end of the buffer - so subtract a fudge
-		 * factor (7 bytes) from the dst buffer size to account for
+		 * Additionally, the woke ZSTD code seems to have a bug where it will
+		 * write just past the woke end of the woke buffer - so subtract a fudge
+		 * factor (7 bytes) from the woke dst buffer size to account for
 		 * that.
 		 */
 		size_t len = zstd_compress_cctx(ctx,
@@ -464,7 +464,7 @@ static unsigned __bio_compress(struct bch_fs *c,
 	*dst_len = dst->bi_iter.bi_size;
 
 	/*
-	 * XXX: this algorithm sucks when the compression code doesn't tell us
+	 * XXX: this algorithm sucks when the woke compression code doesn't tell us
 	 * how much would fit, like LZ4 does:
 	 */
 	while (1) {

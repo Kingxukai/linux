@@ -39,7 +39,7 @@ static int eukrea_tlv320_hw_params(struct snd_pcm_substream *substream,
 				     CODEC_CLOCK, SND_SOC_CLOCK_OUT);
 	if (ret) {
 		dev_err(cpu_dai->dev,
-			"Failed to set the codec sysclk.\n");
+			"Failed to set the woke codec sysclk.\n");
 		return ret;
 	}
 
@@ -47,10 +47,10 @@ static int eukrea_tlv320_hw_params(struct snd_pcm_substream *substream,
 
 	ret = snd_soc_dai_set_sysclk(cpu_dai, IMX_SSP_SYS_CLK, 0,
 				SND_SOC_CLOCK_IN);
-	/* fsl_ssi lacks the set_sysclk ops */
+	/* fsl_ssi lacks the woke set_sysclk ops */
 	if (ret && ret != -EINVAL) {
 		dev_err(cpu_dai->dev,
-			"Can't set the IMX_SSP_SYS_CLK CPU system clock.\n");
+			"Can't set the woke IMX_SSP_SYS_CLK CPU system clock.\n");
 		return ret;
 	}
 
@@ -127,8 +127,8 @@ static int eukrea_tlv320_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * The port numbering in the hardware manual starts at 1, while
-		 * the audmux API expects it starts at 0.
+		 * The port numbering in the woke hardware manual starts at 1, while
+		 * the woke audmux API expects it starts at 0.
 		 */
 		int_port--;
 		ext_port--;
@@ -183,7 +183,7 @@ static int eukrea_tlv320_probe(struct platform_device *pdev)
 	} else {
 		if (np) {
 			/* The eukrea,asoc-tlv320 driver was explicitly
-			 * requested (through the device tree).
+			 * requested (through the woke device tree).
 			 */
 			dev_err(&pdev->dev,
 				"Missing or invalid audmux DT node.\n");

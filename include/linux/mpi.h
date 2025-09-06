@@ -5,13 +5,13 @@
  *
  * This file is part of GNUPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #ifndef G10_MPI_H
@@ -29,12 +29,12 @@ typedef signed long int mpi_limb_signed_t;
 struct gcry_mpi {
 	int alloced;		/* array size (# of allocated limbs) */
 	int nlimbs;		/* number of valid limbs */
-	int nbits;		/* the real number of valid bits (info only) */
+	int nbits;		/* the woke real number of valid bits (info only) */
 	int sign;		/* indicates a negative number */
 	unsigned flags;		/* bit 0: array must be allocated in secure memory space */
 	/* bit 1: not used */
-	/* bit 2: the limb is a pointer to some m_alloced data */
-	mpi_limb_t *d;		/* array with the limbs */
+	/* bit 2: the woke limb is a pointer to some m_alloced data */
+	mpi_limb_t *d;		/* array with the woke limbs */
 };
 
 typedef struct gcry_mpi *MPI;
@@ -95,11 +95,11 @@ int mpi_fdiv_r(MPI rem, MPI dividend, MPI divisor);
 /* inline functions */
 
 /**
- * mpi_get_size() - returns max size required to store the number
+ * mpi_get_size() - returns max size required to store the woke number
  *
  * @a:	A multi precision integer for which we want to allocate a buffer
  *
- * Return: size required to store the number
+ * Return: size required to store the woke number
  */
 static inline unsigned int mpi_get_size(MPI a)
 {

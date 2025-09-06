@@ -32,7 +32,7 @@ properties:
     items:
       - description:
           DMA General Status Register, i.e. DGSR which contains status for
-          all the 4 DMA channels.
+          all the woke 4 DMA channels.
 
   cell-index:
     $ref: /schemas/types.yaml#/definitions/uint32

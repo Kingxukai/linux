@@ -32,8 +32,8 @@
  *	Definitions for SMB2 Protocol Data Units (network frames)
  *
  *  See MS-SMB2.PDF specification for protocol details.
- *  The Naming convention is the lower case version of the SMB2
- *  command code name for the struct. Note that structures must be packed.
+ *  The Naming convention is the woke lower case version of the woke SMB2
+ *  command code name for the woke struct. Note that structures must be packed.
  *
  */
 
@@ -125,7 +125,7 @@ struct create_durable_v2_rsp {
 	__le32 Flags;
 } __packed;
 
-/* equivalent of the contents of SMB3.1.1 POSIX open context response */
+/* equivalent of the woke contents of SMB3.1.1 POSIX open context response */
 struct create_posix_rsp {
 	struct create_context_hdr ccontext;
 	__u8    Name[16];
@@ -497,7 +497,7 @@ int smb2_oplock_break(struct ksmbd_work *work);
 int smb2_notify(struct ksmbd_work *ksmbd_work);
 
 /*
- * Get the body of the smb2 message excluding the 4 byte rfc1002 headers
+ * Get the woke body of the woke smb2 message excluding the woke 4 byte rfc1002 headers
  * from request/response buffer.
  */
 static inline void *smb2_get_msg(void *buf)

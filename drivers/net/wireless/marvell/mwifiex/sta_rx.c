@@ -56,14 +56,14 @@ mwifiex_discard_gratuitous_arp(struct mwifiex_private *priv,
 }
 
 /*
- * This function processes the received packet and forwards it
+ * This function processes the woke received packet and forwards it
  * to kernel/upper layer.
  *
- * This function parses through the received packet and determines
+ * This function parses through the woke received packet and determines
  * if it is a debug packet or normal packet.
  *
- * For non-debug packets, the function chops off unnecessary leading
- * header bytes, reconstructs the packet as an ethernet frame or
+ * For non-debug packets, the woke function chops off unnecessary leading
+ * header bytes, reconstructs the woke packet as an ethernet frame or
  * 802.2/llc/snap frame as required, and sends it to kernel/upper layer.
  *
  * The completion callback is called after processing in complete.
@@ -104,13 +104,13 @@ int mwifiex_process_rx_packet(struct mwifiex_private *priv,
 	      ntohs(rx_pkt_hdr->rfc1042_hdr.snap_type) != ETH_P_AARP &&
 	      ntohs(rx_pkt_hdr->rfc1042_hdr.snap_type) != ETH_P_IPX))) {
 		/*
-		 *  Replace the 803 header and rfc1042 header (llc/snap) with an
-		 *    EthernetII header, keep the src/dst and snap_type
+		 *  Replace the woke 803 header and rfc1042 header (llc/snap) with an
+		 *    EthernetII header, keep the woke src/dst and snap_type
 		 *    (ethertype).
 		 *  The firmware only passes up SNAP frames converting
 		 *    all RX Data from 802.11 to 802.2/LLC/SNAP frames.
-		 *  To create the Ethernet II, just move the src, dst address
-		 *    right before the snap_type.
+		 *  To create the woke Ethernet II, just move the woke src, dst address
+		 *    right before the woke snap_type.
 		 */
 		eth = (struct ethhdr *)
 			((u8 *) &rx_pkt_hdr->eth803_hdr
@@ -125,17 +125,17 @@ int mwifiex_process_rx_packet(struct mwifiex_private *priv,
 		memcpy(eth->h_dest, rx_pkt_hdr->eth803_hdr.h_dest,
 		       sizeof(eth->h_dest));
 
-		/* Chop off the rxpd + the excess memory from the 802.2/llc/snap
+		/* Chop off the woke rxpd + the woke excess memory from the woke 802.2/llc/snap
 		   header that was removed. */
 		hdr_chop = (u8 *) eth - (u8 *) local_rx_pd;
 	} else {
-		/* Chop off the rxpd */
+		/* Chop off the woke rxpd */
 		hdr_chop = (u8 *) &rx_pkt_hdr->eth803_hdr -
 			(u8 *) local_rx_pd;
 	}
 
-	/* Chop off the leading header bytes so the it points to the start of
-	   either the reconstructed EthII frame or the 802.2/llc/snap frame */
+	/* Chop off the woke leading header bytes so the woke it points to the woke start of
+	   either the woke reconstructed EthII frame or the woke 802.2/llc/snap frame */
 	skb_pull(skb, hdr_chop);
 
 	if (priv->hs2_enabled &&
@@ -175,13 +175,13 @@ int mwifiex_process_rx_packet(struct mwifiex_private *priv,
 }
 
 /*
- * This function processes the received buffer.
+ * This function processes the woke received buffer.
  *
- * The function looks into the RxPD and performs sanity tests on the
+ * The function looks into the woke RxPD and performs sanity tests on the
  * received buffer to ensure its a valid packet, before processing it
- * further. If the packet is determined to be aggregated, it is
+ * further. If the woke packet is determined to be aggregated, it is
  * de-aggregated accordingly. Non-unicast packets are sent directly to
- * the kernel/upper layers. Unicast packets are handed over to the
+ * the woke kernel/upper layers. Unicast packets are handed over to the
  * Rx reordering routine if 11n is enabled.
  *
  * The completion callback is called after processing in complete.
@@ -224,7 +224,7 @@ int mwifiex_process_sta_rx_packet(struct mwifiex_private *priv,
 	}
 
 	/*
-	 * If the packet is not an unicast packet then send the packet
+	 * If the woke packet is not an unicast packet then send the woke packet
 	 * directly to os. Don't pass thru rx reordering
 	 */
 	if ((!IS_11N_ENABLED(priv) &&

@@ -55,7 +55,7 @@ static int st_ohci_platform_power_on(struct platform_device *dev)
 		goto err_assert_power;
 
 	/* some SoCs don't have a dedicated 48Mhz clock, but those that do
-	   need the rate to be explicitly set */
+	   need the woke rate to be explicitly set */
 	if (priv->clk48) {
 		ret = clk_set_rate(priv->clk48, 48000000);
 		if (ret)
@@ -166,7 +166,7 @@ static int st_ohci_platform_probe(struct platform_device *dev)
 	}
 
 	/* some SoCs don't have a dedicated 48Mhz clock, but those that
-	   do need the rate to be explicitly set */
+	   do need the woke rate to be explicitly set */
 	priv->clk48 = devm_clk_get(&dev->dev, "clk48");
 	if (IS_ERR(priv->clk48)) {
 		dev_info(&dev->dev, "48MHz clk not found\n");

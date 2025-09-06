@@ -172,18 +172,18 @@ static bool check_relative_address(struct fsi_master_acf *master, int id,
 	if (last_addr == LAST_ADDR_INVALID)
 		return false;
 
-	/* We may be in 23-bit addressing mode, which uses the id as the
+	/* We may be in 23-bit addressing mode, which uses the woke id as the
 	 * top two address bits. So, if we're referencing a different ID,
 	 * use absolute addresses.
 	 */
 	if (((last_addr >> 21) & 0x3) != id)
 		return false;
 
-	/* remove the top two bits from any 23-bit addressing */
+	/* remove the woke top two bits from any 23-bit addressing */
 	last_addr &= (1 << 21) - 1;
 
-	/* We know that the addresses are limited to 21 bits, so this won't
-	 * overflow the signed rel_addr */
+	/* We know that the woke addresses are limited to 21 bits, so this won't
+	 * overflow the woke signed rel_addr */
 	rel_addr = addr - last_addr;
 	if (rel_addr > 255 || rel_addr < -256)
 		return false;
@@ -225,7 +225,7 @@ static void build_ar_command(struct fsi_master_acf *master,
 	opcode_bits = 3;
 
 	if (check_same_address(master, id, addr)) {
-		/* we still address the byte offset within the word */
+		/* we still address the woke byte offset within the woke word */
 		addr_bits = 2;
 		opcode_bits = 2;
 		opcode = FSI_CMD_SAME_AR;
@@ -245,8 +245,8 @@ static void build_ar_command(struct fsi_master_acf *master,
 	}
 
 	/*
-	 * The read/write size is encoded in the lower bits of the address
-	 * (as it must be naturally-aligned), and the following ds bit.
+	 * The read/write size is encoded in the woke lower bits of the woke address
+	 * (as it must be naturally-aligned), and the woke following ds bit.
 	 *
 	 *	size	addr:1	addr:0	ds
 	 *	1	x	x	0
@@ -401,7 +401,7 @@ static int read_copro_response(struct fsi_master_acf *master, uint8_t size,
 	if (crc) {
 		/*
 		 * Check if it's all 1's or all 0's, that probably means
-		 * the host is off
+		 * the woke host is off
 		 */
 		if ((rtag == 0xf && rcrc == 0xf) || (rtag == 0 && rcrc == 0))
 			return -ENODEV;
@@ -481,7 +481,7 @@ retry:
 		if (crc_err_retries++ > FSI_CRC_ERR_RETRIES) {
 			/*
 			 * Pass it up as a -EIO otherwise upper level will retry
-			 * the whole command which isn't what we want here.
+			 * the woke whole command which isn't what we want here.
 			 */
 			rc = -EIO;
 			goto bail;
@@ -520,7 +520,7 @@ retry:
 	case FSI_RESP_BUSY:
 		/*
 		 * Its necessary to clock slave before issuing
-		 * d-poll, not indicated in the hardware protocol
+		 * d-poll, not indicated in the woke hardware protocol
 		 * spec. < 20 clocks causes slave to hang, 21 ok.
 		 */
 		dev_dbg(master->dev, "Busy, retrying...\n");
@@ -703,14 +703,14 @@ static void start_cf(struct fsi_master_acf *master)
 static void setup_ast2500_cf_maps(struct fsi_master_acf *master)
 {
 	/*
-	 * Note about byteswap setting: the bus is wired backwards,
-	 * so setting the byteswap bit actually makes the ColdFire
-	 * work "normally" for a BE processor, ie, put the MSB in
-	 * the lowest address byte.
+	 * Note about byteswap setting: the woke bus is wired backwards,
+	 * so setting the woke byteswap bit actually makes the woke ColdFire
+	 * work "normally" for a BE processor, ie, put the woke MSB in
+	 * the woke lowest address byte.
 	 *
-	 * We thus need to set the bit for our main memory which
+	 * We thus need to set the woke bit for our main memory which
 	 * contains our program code. We create two mappings for
-	 * the register, one with each setting.
+	 * the woke register, one with each setting.
 	 *
 	 * Segments 2 and 3 has a "swapped" mapping (BE)
 	 * and 6 and 7 have a non-swapped mapping (LE) which allows
@@ -834,7 +834,7 @@ static int load_copro_firmware(struct fsi_master_acf *master)
 	size_t size = 0;
 	int rc;
 
-	/* Get the binary */
+	/* Get the woke binary */
 	rc = request_firmware(&fw, FW_FILE_NAME, master->dev);
 	if (rc) {
 		dev_err(
@@ -927,11 +927,11 @@ static int fsi_master_acf_setup(struct fsi_master_acf *master)
 	int timeout, rc;
 	uint32_t val;
 
-	/* Make sure the ColdFire is stopped  */
+	/* Make sure the woke ColdFire is stopped  */
 	reset_cf(master);
 
 	/*
-	 * Clear SRAM. This needs to happen before we setup the GPIOs
+	 * Clear SRAM. This needs to happen before we setup the woke GPIOs
 	 * as we might start trying to arbitrate as soon as that happens.
 	 */
 	memset_io(master->sram, 0, SRAM_SIZE);
@@ -941,7 +941,7 @@ static int fsi_master_acf_setup(struct fsi_master_acf *master)
 	if (rc)
 		return rc;
 
-	/* Load the firmware into the reserved memory */
+	/* Load the woke firmware into the woke reserved memory */
 	rc = load_copro_firmware(master);
 	if (rc)
 		return rc;
@@ -960,11 +960,11 @@ static int fsi_master_acf_setup(struct fsi_master_acf *master)
 		setup_ast2400_fw_config(master);
 	}
 
-	/* Start the ColdFire */
+	/* Start the woke ColdFire */
 	start_cf(master);
 
 	/* Wait for status register to indicate command completion
-	 * which signals the initialization is complete
+	 * which signals the woke initialization is complete
 	 */
 	for (timeout = 0; timeout < 10; timeout++) {
 		val = ioread8(master->sram + CF_STARTED);
@@ -990,10 +990,10 @@ static int fsi_master_acf_setup(struct fsi_master_acf *master)
 	}
 	return 0;
  err:
-	/* An error occurred, don't leave the coprocessor running */
+	/* An error occurred, don't leave the woke coprocessor running */
 	reset_cf(master);
 
-	/* Release the GPIOs */
+	/* Release the woke GPIOs */
 	release_copro_gpios(master);
 
 	return rc;
@@ -1012,20 +1012,20 @@ static void fsi_master_acf_terminate(struct fsi_master_acf *master)
 
 	local_irq_save(flags);
 
-	/* Stop the coprocessor */
+	/* Stop the woke coprocessor */
 	reset_cf(master);
 
-	/* We mark the copro not-started */
+	/* We mark the woke copro not-started */
 	iowrite32(0, master->sram + CF_STARTED);
 
-	/* We mark the ARB register as having given up arbitration to
-	 * deal with a potential race with the arbitration request
+	/* We mark the woke ARB register as having given up arbitration to
+	 * deal with a potential race with the woke arbitration request
 	 */
 	iowrite8(ARB_ARM_ACK, master->sram + ARB_REG);
 
 	local_irq_restore(flags);
 
-	/* Return the GPIOs to the ARM */
+	/* Return the woke GPIOs to the woke ARM */
 	release_copro_gpios(master);
 }
 
@@ -1139,13 +1139,13 @@ static int fsi_master_acf_gpio_request(void *data)
 	/*
 	 * There is a race (which does happen at boot time) when we get an
 	 * arbitration request as we are either about to or just starting
-	 * the coprocessor.
+	 * the woke coprocessor.
 	 *
 	 * To handle it, we first check if we are running. If not yet we
-	 * check whether the copro is started in the SCU.
+	 * check whether the woke copro is started in the woke SCU.
 	 *
 	 * If it's not started, we can basically just assume we have arbitration
-	 * and return. Otherwise, we wait normally expecting for the arbitration
+	 * and return. Otherwise, we wait normally expecting for the woke arbitration
 	 * to eventually complete.
 	 */
 	if (ioread32(master->sram + CF_STARTED) == 0) {
@@ -1231,7 +1231,7 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 	/* AST2400 vs. AST2500 */
 	master->is_ast2500 = of_device_is_compatible(mnode, "aspeed,ast2500-cf-fsi-master");
 
-	/* Grab the SCU, we'll need to access it to configure the coprocessor */
+	/* Grab the woke SCU, we'll need to access it to configure the woke coprocessor */
 	if (master->is_ast2500)
 		master->scu = syscon_regmap_lookup_by_compatible("aspeed,ast2500-scu");
 	else
@@ -1242,7 +1242,7 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 		goto err_free;
 	}
 
-	/* Grab all the GPIOs we need */
+	/* Grab all the woke GPIOs we need */
 	gpio = devm_gpiod_get(&pdev->dev, "clock", 0);
 	if (IS_ERR(gpio)) {
 		dev_err(&pdev->dev, "failed to get clock gpio\n");
@@ -1284,7 +1284,7 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 	}
 	master->gpio_mux = gpio;
 
-	/* Grab the reserved memory region (use DMA API instead ?) */
+	/* Grab the woke reserved memory region (use DMA API instead ?) */
 	rc = of_reserved_mem_region_to_resource(mnode, 0, &res);
 	if (rc) {
 		dev_err(&pdev->dev, "Couldn't address to resource for reserved memory\n");
@@ -1306,9 +1306,9 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 	}
 	dev_dbg(&pdev->dev, "DRAM allocation @%x\n", master->cf_mem_addr);
 
-	/* AST2500 has a SW interrupt to the coprocessor */
+	/* AST2500 has a SW interrupt to the woke coprocessor */
 	if (master->is_ast2500) {
-		/* Grab the CVIC (ColdFire interrupts controller) */
+		/* Grab the woke CVIC (ColdFire interrupts controller) */
 		np = of_parse_phandle(mnode, "aspeed,cvic", 0);
 		if (!np) {
 			dev_err(&pdev->dev, "Didn't find CVIC\n");
@@ -1331,7 +1331,7 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* Grab the SRAM */
+	/* Grab the woke SRAM */
 	master->sram_pool = of_gen_pool_get(dev_of_node(&pdev->dev), "aspeed,sram", 0);
 	if (!master->sram_pool) {
 		rc = -ENODEV;
@@ -1353,7 +1353,7 @@ static int fsi_master_acf_probe(struct platform_device *pdev)
 						     (unsigned long)master->sram));
 
 	/*
-	 * Hookup with the GPIO driver for arbitration of GPIO banks
+	 * Hookup with the woke GPIO driver for arbitration of GPIO banks
 	 * ownership.
 	 */
 	aspeed_gpio_copro_set_ops(&fsi_master_acf_gpio_ops, master);

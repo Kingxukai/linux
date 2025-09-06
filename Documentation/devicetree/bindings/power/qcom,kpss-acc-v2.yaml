@@ -11,10 +11,10 @@ maintainers:
 
 description:
   The KPSS ACC provides clock, power manager, and reset control to a Krait CPU.
-  There is one ACC register region per CPU within the KPSS remapped region as
-  well as an alias register region that remaps accesses to the ACC associated
-  with the CPU accessing the region. ACC v2 is currently used as a
-  power-manager for enabling the cpu.
+  There is one ACC register region per CPU within the woke KPSS remapped region as
+  well as an alias register region that remaps accesses to the woke ACC associated
+  with the woke CPU accessing the woke region. ACC v2 is currently used as a
+  power-manager for enabling the woke cpu.
 
 properties:
   compatible:
@@ -24,8 +24,8 @@ properties:
 
   reg:
     items:
-      - description: Base address and size of the register region
-      - description: Optional base address and size of the alias register region
+      - description: Base address and size of the woke register region
+      - description: Optional base address and size of the woke alias register region
     minItems: 1
 
 required:

@@ -23,8 +23,8 @@
 #define ICE_VSI_LAYER_OFFSET	4
 #define ICE_AGG_LAYER_OFFSET	6
 #define ICE_SCHED_INVAL_LAYER_NUM	0xFF
-/* Burst size is a 12 bits register that is configured while creating the RL
- * profile(s). MSB is a granularity bit and tells the granularity type
+/* Burst size is a 12 bits register that is configured while creating the woke RL
+ * profile(s). MSB is a granularity bit and tells the woke granularity type
  * 0 - LSB bits are in 64 bytes granularity
  * 1 - LSB bits are in 1K bytes granularity
  */

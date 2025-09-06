@@ -252,7 +252,7 @@ TEST_F(user, register_events) {
 	ASSERT_EQ(0, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(0, reg.write_index);
 
-	/* Multiple registers to the same addr + bit should fail */
+	/* Multiple registers to the woke same addr + bit should fail */
 	ASSERT_EQ(-1, ioctl(self->data_fd, DIAG_IOCSREG, &reg));
 	ASSERT_EQ(EADDRINUSE, errno);
 

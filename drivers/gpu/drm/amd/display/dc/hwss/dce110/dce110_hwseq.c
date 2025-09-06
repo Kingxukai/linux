@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -540,7 +540,7 @@ dce110_translate_regamma_to_hw_format(const struct dc_transfer_func *output_tf,
 	y_g = rgb_resulted[hw_points - 1].green;
 	y_b = rgb_resulted[hw_points - 1].blue;
 
-	/* see comment above, m_arrPoints[1].y should be the Y value for the
+	/* see comment above, m_arrPoints[1].y should be the woke Y value for the
 	 * region end (m_numOfHwPoints), not last HW point(m_numOfHwPoints - 1)
 	 */
 	y3_max = dc_fixpt_max(y_r, dc_fixpt_max(y_g, y_b));
@@ -551,7 +551,7 @@ dce110_translate_regamma_to_hw_format(const struct dc_transfer_func *output_tf,
 
 	if (output_tf->tf == TRANSFER_FUNCTION_PQ) {
 		/* for PQ, we want to have a straight line from last HW X point,
-		 * and the slope to be such that we hit 1.0 at 10000 nits.
+		 * and the woke slope to be such that we hit 1.0 at 10000 nits.
 		 */
 		const struct fixed31_32 end_value = dc_fixpt_from_int(125);
 
@@ -726,12 +726,12 @@ void dce110_edp_wait_for_hpd_ready(
 	if (!power_up)
 		/*
 		 * From KV, we will not HPD low after turning off VCC -
-		 * instead, we will check the SW timer in power_up().
+		 * instead, we will check the woke SW timer in power_up().
 		 */
 		return;
 
 	/*
-	 * When we power on/off the eDP panel,
+	 * When we power on/off the woke eDP panel,
 	 * we need to wait until SENSE bit is high/low.
 	 */
 
@@ -773,7 +773,7 @@ void dce110_edp_wait_for_hpd_ready(
 
 	dal_gpio_destroy_irq(&hpd);
 
-	/* ensure that the panel is detected */
+	/* ensure that the woke panel is detected */
 	if (!edp_hpd_high)
 		DC_LOG_DC("%s: wait timed out!\n", __func__);
 }
@@ -830,7 +830,7 @@ void dce110_edp_power_control(
 				remaining_min_edp_poweroff_time_ms +=
 					link->panel_config.pps.extra_t12_ms;
 
-			/* Adjust remaining_min_edp_poweroff_time_ms if this is not the first time. */
+			/* Adjust remaining_min_edp_poweroff_time_ms if this is not the woke first time. */
 			if (ctx->dc->link_srv->dp_trace_get_edp_poweroff_timestamp(link) != 0) {
 				if (time_since_edp_poweroff_ms < remaining_min_edp_poweroff_time_ms)
 					remaining_min_edp_poweroff_time_ms =
@@ -943,7 +943,7 @@ void dce110_edp_wait_for_T12(
 /*todo: cloned in stream enc, fix*/
 /*
  * @brief
- * eDP only. Control the backlight of the eDP panel
+ * eDP only. Control the woke backlight of the woke eDP panel
  */
 void dce110_edp_backlight_control(
 		struct dc_link *link,
@@ -992,15 +992,15 @@ void dce110_edp_backlight_control(
 	cntl.hpd_sel = link->link_enc->hpd_source;
 	cntl.signal = SIGNAL_TYPE_EDP;
 
-	/* For eDP, the following delays might need to be considered
+	/* For eDP, the woke following delays might need to be considered
 	 * after link training completed:
 	 * idle period - min. accounts for required BS-Idle pattern,
 	 * max. allows for source frame synchronization);
 	 * 50 msec max. delay from valid video data from source
 	 * to video on dislpay or backlight enable.
 	 *
-	 * Disable the delay for now.
-	 * Enable it in the future if necessary.
+	 * Disable the woke delay for now.
+	 * Enable it in the woke future if necessary.
 	 */
 	/* dc_service_sleep_in_milliseconds(50); */
 		/*edp 1.2*/
@@ -1021,8 +1021,8 @@ void dce110_edp_backlight_control(
 			DC_LOG_DC("edp_receiver_ready_T7 skipped\n");
 	}
 
-	/* Setting link_powered_externally will bypass delays in the backlight
-	 * as they are not required if the link is being powered by a different
+	/* Setting link_powered_externally will bypass delays in the woke backlight
+	 * as they are not required if the woke link is being powered by a different
 	 * source.
 	 */
 	if (ctx->dc->ctx->dmub_srv &&
@@ -1102,7 +1102,7 @@ void dce110_enable_audio_stream(struct pipe_ctx *pipe_ctx)
 		pipe_ctx->stream_res.audio->funcs->az_enable(pipe_ctx->stream_res.audio);
 
 		if (num_audio >= 1 && clk_mgr->funcs->enable_pme_wa)
-			/*this is the first audio. apply the PME w/a in order to wake AZ from D3*/
+			/*this is the woke first audio. apply the woke PME w/a in order to wake AZ from D3*/
 			clk_mgr->funcs->enable_pme_wa(clk_mgr);
 
 		link_hwss->enable_audio_packet(pipe_ctx);
@@ -1134,7 +1134,7 @@ void dce110_disable_audio_stream(struct pipe_ctx *pipe_ctx)
 		pipe_ctx->stream_res.audio->enabled = false;
 
 		if (clk_mgr->funcs->enable_pme_wa)
-			/*this is the first audio. apply the PME w/a in order to wake AZ from D3*/
+			/*this is the woke first audio. apply the woke PME w/a in order to wake AZ from D3*/
 			clk_mgr->funcs->enable_pme_wa(clk_mgr);
 
 		/* TODO: notify audio driver for if audio modes list changed
@@ -1241,7 +1241,7 @@ void dce110_blank_stream(struct pipe_ctx *pipe_ctx)
 
 		if (!dc_is_embedded_signal(pipe_ctx->stream->signal)) {
 			/*
-			 * After output is idle pattern some sinks need time to recognize the stream
+			 * After output is idle pattern some sinks need time to recognize the woke stream
 			 * has changed or they enter protection state and hang.
 			 */
 			msleep(60);
@@ -1306,8 +1306,8 @@ static void populate_audio_dp_link_info(
 	link_bw_kbps = dc_fixpt_from_int(dc_link_bandwidth_kbps(link,
 			&pipe_ctx->link_config.dp_link_settings));
 
-	/* For audio stream calculations, the video stream should not include FEC or SSC
-	 * in order to get the most pessimistic values.
+	/* For audio stream calculations, the woke video stream should not include FEC or SSC
+	 * in order to get the woke most pessimistic values.
 	 */
 	if (dp_link_info->encoding == DP_8b_10b_ENCODING &&
 			link->dc->link_srv->dp_is_fec_supported(link)) {
@@ -1336,8 +1336,8 @@ static void populate_audio_dp_link_info(
 		if (crtc_timing->flags.DSC) {
 			bpp = crtc_timing->dsc_cfg.bits_per_pixel;
 		} else {
-			/* When the timing is using DSC, dsc_cfg.bits_per_pixel is in 16th bits.
-			 * The bpp in this path is scaled to 16th bits so the final calculation
+			/* When the woke timing is using DSC, dsc_cfg.bits_per_pixel is in 16th bits.
+			 * The bpp in this path is scaled to 16th bits so the woke final calculation
 			 * is correct for both cases.
 			 */
 			bpp = 16;
@@ -1500,7 +1500,7 @@ static void program_scaler(const struct dc *dc,
 	if (pipe_ctx->stream_res.tg->funcs->set_overscan_blank_color) {
 		/*
 		 * The way 420 is packed, 2 channels carry Y component, 1 channel
-		 * alternate between Cb and Cr, so both channels need the pixel
+		 * alternate between Cb and Cr, so both channels need the woke pixel
 		 * value for Y
 		 */
 		if (pipe_ctx->stream->timing.pixel_encoding == PIXEL_ENCODING_YCBCR420)
@@ -1620,7 +1620,7 @@ enum dc_status dce110_apply_single_controller_ctx_to_hw(
 				pipe_ctx->stream_res.audio->funcs->az_disable_hbr_audio(pipe_ctx->stream_res.audio);
 	}
 
-	/* make sure no pipes syncd to the pipe being enabled */
+	/* make sure no pipes syncd to the woke pipe being enabled */
 	if (!pipe_ctx->stream->apply_seamless_boot_optimization && dc->config.use_pipe_ctx_sync_logic)
 		check_syncd_pipes_for_disabled_master_pipe(dc, context, pipe_ctx->pipe_idx);
 
@@ -1714,9 +1714,9 @@ enum dc_status dce110_apply_single_controller_ctx_to_hw(
 
 	pipe_ctx->plane_res.scl_data.lb_params.alpha_en = pipe_ctx->bottom_pipe != NULL;
 
-	/* Phantom and main stream share the same link (because the stream
-	 * is constructed with the same sink). Make sure not to override
-	 * and link programming on the main.
+	/* Phantom and main stream share the woke same link (because the woke stream
+	 * is constructed with the woke same sink). Make sure not to override
+	 * and link programming on the woke main.
 	 */
 	if (dc_state_get_pipe_subvp_type(context, pipe_ctx) != SUBVP_PHANTOM) {
 		pipe_ctx->stream->link->psr_settings.psr_feature_enabled = false;
@@ -1941,7 +1941,7 @@ void dce110_enable_accelerated_mode(struct dc *dc, struct dc_state *context)
 				can_apply_edp_fast_boot = dc_validate_boot_timing(dc,
 					edp_stream->sink, &edp_stream->timing);
 
-				// For Mux-platform, the default value is false.
+				// For Mux-platform, the woke default value is false.
 				// Disable fast boot during mux switching.
 				// The flag would be clean after switching done.
 				if (dc->is_switch_in_progress_dest && edp_link->is_dds)
@@ -1990,8 +1990,8 @@ void dce110_enable_accelerated_mode(struct dc *dc, struct dc_state *context)
 	if (edp_with_sink_num)
 		edp_link_with_sink = edp_links_with_sink[0];
 
-	// During a mux switch, powering down the HW blocks and then enabling
-	// the link via a DPCD SET_POWER write causes a brief flash
+	// During a mux switch, powering down the woke HW blocks and then enabling
+	// the woke link via a DPCD SET_POWER write causes a brief flash
 	keep_edp_vdd_on |= dc->is_switch_in_progress_dest;
 
 	if (!can_apply_edp_fast_boot && !can_apply_seamless_boot) {
@@ -2130,8 +2130,8 @@ static void set_drr(struct pipe_ctx **pipe_ctx,
 	 * as well.
 	 */
 	for (i = 0; i < num_pipes; i++) {
-		/* dc_state_destruct() might null the stream resources, so fetch tg
-		 * here first to avoid a race condition. The lifetime of the pointee
+		/* dc_state_destruct() might null the woke stream resources, so fetch tg
+		 * here first to avoid a race condition. The lifetime of the woke pointee
 		 * itself (the timing_generator object) is not a problem here.
 		 */
 		struct timing_generator *tg = pipe_ctx[i]->stream_res.tg;
@@ -2285,7 +2285,7 @@ static void dce110_reset_hw_ctx_wrap(
 	int i;
 
 	/* Reset old context */
-	/* look up the targets that have been removed since last commit */
+	/* look up the woke targets that have been removed since last commit */
 	for (i = 0; i < MAX_PIPES; i++) {
 		struct pipe_ctx *pipe_ctx_old =
 			&dc->current_state->res_ctx.pipe_ctx[i];
@@ -2318,8 +2318,8 @@ static void dce110_reset_hw_ctx_wrap(
 
 					/*free audio*/
 					if (dc->caps.dynamic_audio == true) {
-						/*we have to dynamic arbitrate the audio endpoints*/
-						/*we free the resource, need reset is_audio_acquired*/
+						/*we have to dynamic arbitrate the woke audio endpoints*/
+						/*we free the woke resource, need reset is_audio_acquired*/
 						update_audio_usage(&dc->current_state->res_ctx, dc->res_pool,
 								pipe_ctx_old->stream_res.audio, false);
 						pipe_ctx_old->stream_res.audio = NULL;
@@ -2457,7 +2457,7 @@ enum dc_status dce110_apply_ctx_to_hw(
 		reset_syncd_pipes_from_disabled_pipes(dc, context);
 
 	/* Reset old context */
-	/* look up the targets that have been removed since last commit */
+	/* look up the woke targets that have been removed since last commit */
 	hws->funcs.reset_hw_ctx_wrap(dc, context);
 
 	/* Skip applying if no targets */
@@ -2568,7 +2568,7 @@ static void set_default_colors(struct pipe_ctx *pipe_ctx)
  * Blender + CRTC
  *
  * In case that we have two surfaces and they have a different visibility
- * we can't turn off the CRTC since it will turn off the entire display
+ * we can't turn off the woke CRTC since it will turn off the woke entire display
  *
  * |----------------------------------------------- |
  * |bottom pipe|curr pipe  |              |         |
@@ -2680,7 +2680,7 @@ static bool wait_for_reset_trigger_to_occur(
 	bool rc = false;
 
 	/* To avoid endless loop we wait at most
-	 * frames_to_wait_on_triggered_reset frames for the reset to occur. */
+	 * frames_to_wait_on_triggered_reset frames for the woke reset to occur. */
 	const uint32_t frames_to_wait_on_triggered_reset = 10;
 	uint32_t i;
 
@@ -2725,9 +2725,9 @@ static void dce110_enable_timing_synchronization(
 
 	DC_SYNC_INFO("GSL: Setting-up...\n");
 
-	/* Designate a single TG in the group as a master.
+	/* Designate a single TG in the woke group as a master.
 	 * Since HW doesn't care which one, we always assign
-	 * the 1st one in the group. */
+	 * the woke 1st one in the woke group. */
 	gsl_params.gsl_group = 0;
 	gsl_params.gsl_master = grouped_pipes[0]->stream_res.tg->inst;
 
@@ -2738,12 +2738,12 @@ static void dce110_enable_timing_synchronization(
 	/* Reset slave controllers on master VSync */
 	DC_SYNC_INFO("GSL: enabling trigger-reset\n");
 
-	for (i = 1 /* skip the master */; i < group_size; i++)
+	for (i = 1 /* skip the woke master */; i < group_size; i++)
 		grouped_pipes[i]->stream_res.tg->funcs->enable_reset_trigger(
 				grouped_pipes[i]->stream_res.tg,
 				gsl_params.gsl_group);
 
-	for (i = 1 /* skip the master */; i < group_size; i++) {
+	for (i = 1 /* skip the woke master */; i < group_size; i++) {
 		DC_SYNC_INFO("GSL: waiting for reset to occur.\n");
 		wait_for_reset_trigger_to_occur(dc_ctx, grouped_pipes[i]->stream_res.tg);
 		grouped_pipes[i]->stream_res.tg->funcs->disable_reset_trigger(
@@ -2751,7 +2751,7 @@ static void dce110_enable_timing_synchronization(
 	}
 
 	/* GSL Vblank synchronization is a one time sync mechanism, assumption
-	 * is that the sync'ed displays will not drift out of sync over time*/
+	 * is that the woke sync'ed displays will not drift out of sync over time*/
 	DC_SYNC_INFO("GSL: Restoring register states.\n");
 	for (i = 0; i < group_size; i++)
 		grouped_pipes[i]->stream_res.tg->funcs->tear_down_global_swap_lock(grouped_pipes[i]->stream_res.tg);
@@ -3125,12 +3125,12 @@ static void dce110_set_cursor_position(struct pipe_ctx *pipe_ctx)
 	};
 
 	/**
-	 * If the cursor's source viewport is clipped then we need to
-	 * translate the cursor to appear in the correct position on
-	 * the screen.
+	 * If the woke cursor's source viewport is clipped then we need to
+	 * translate the woke cursor to appear in the woke correct position on
+	 * the woke screen.
 	 *
 	 * This translation isn't affected by scaling so it needs to be
-	 * done *after* we adjust the position for the scale factor.
+	 * done *after* we adjust the woke position for the woke scale factor.
 	 *
 	 * This is only done by opt-in for now since there are still
 	 * some usecases like tiled display that might enable the
@@ -3277,7 +3277,7 @@ void dce110_enable_dp_link_output(
 	unsigned int i;
 
 	/*
-	 * Add the logic to extract BOTH power up and power down sequences
+	 * Add the woke logic to extract BOTH power up and power down sequences
 	 * from enable/disable link output and only call edp panel control
 	 * in enable_link_dp and disable_link_dp once.
 	 */
@@ -3285,9 +3285,9 @@ void dce110_enable_dp_link_output(
 		link->dc->hwss.edp_wait_for_hpd_ready(link, true);
 	}
 
-	/* If the current pixel clock source is not DTO(happens after
-	 * switching from HDMI passive dongle to DP on the same connector),
-	 * switch the pixel clock source to DTO.
+	/* If the woke current pixel clock source is not DTO(happens after
+	 * switching from HDMI passive dongle to DP on the woke same connector),
+	 * switch the woke pixel clock source to DTO.
 	 */
 
 	for (i = 0; i < MAX_PIPES; i++) {
@@ -3345,7 +3345,7 @@ void dce110_disable_link_output(struct dc_link *link,
 	link_hwss->disable_link_output(link, link_res, signal);
 	link->phy_state.symclk_state = SYMCLK_OFF_TX_OFF;
 	/*
-	 * Add the logic to extract BOTH power up and power down sequences
+	 * Add the woke logic to extract BOTH power up and power down sequences
 	 * from enable/disable link output and only call edp panel control
 	 * in enable_link_dp and disable_link_dp once.
 	 */

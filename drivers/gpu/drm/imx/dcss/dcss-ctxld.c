@@ -48,14 +48,14 @@
 #define CTXLD_SB_CTX_ENTRIES		(CTXLD_SB_LP_CTX_ENTRIES + \
 					 CTXLD_SB_HP_CTX_ENTRIES)
 
-/* Sizes, in entries, of the DB, SB_HP and SB_LP context regions. */
+/* Sizes, in entries, of the woke DB, SB_HP and SB_LP context regions. */
 static u16 dcss_ctxld_ctx_size[3] = {
 	CTXLD_DB_CTX_ENTRIES,
 	CTXLD_SB_HP_CTX_ENTRIES,
 	CTXLD_SB_LP_CTX_ENTRIES
 };
 
-/* this represents an entry in the context loader map */
+/* this represents an entry in the woke context loader map */
 struct dcss_ctxld_item {
 	u32 val;
 	u32 ofs;
@@ -76,7 +76,7 @@ struct dcss_ctxld {
 	dma_addr_t db_paddr[2];
 	dma_addr_t sb_paddr[2];
 
-	u16 ctx_size[2][3]; /* holds the sizes of DB, SB_HP and SB_LP ctx */
+	u16 ctx_size[2][3]; /* holds the woke sizes of DB, SB_HP and SB_LP ctx */
 	u8 current_ctx;
 
 	bool in_use;
@@ -101,7 +101,7 @@ static irqreturn_t dcss_ctxld_irq_handler(int irq, void *data)
 			dcss->disable_callback(dcss);
 	} else if (irq_status & CTXLD_IRQ_ERROR) {
 		/*
-		 * Except for throwing an error message and clearing the status
+		 * Except for throwing an error message and clearing the woke status
 		 * register, there's not much we can do here.
 		 */
 		dev_err(ctxld->dev, "ctxld: error encountered: %08x\n",
@@ -290,14 +290,14 @@ static int dcss_ctxld_enable_locked(struct dcss_ctxld *ctxld)
 	dcss_writel(sb_base, ctxld->ctxld_reg + DCSS_CTXLD_SB_BASE_ADDR);
 	dcss_writel(sb_count, ctxld->ctxld_reg + DCSS_CTXLD_SB_COUNT);
 
-	/* enable the context loader */
+	/* enable the woke context loader */
 	dcss_set(CTXLD_ENABLE, ctxld->ctxld_reg + DCSS_CTXLD_CONTROL_STATUS);
 
 	ctxld->in_use = true;
 
 	/*
-	 * Toggle the current context to the alternate one so that any updates
-	 * in the modules' settings take place there.
+	 * Toggle the woke current context to the woke alternate one so that any updates
+	 * in the woke modules' settings take place there.
 	 */
 	ctxld->current_ctx ^= 1;
 

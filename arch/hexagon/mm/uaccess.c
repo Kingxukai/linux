@@ -15,7 +15,7 @@
 
 /*
  * For clear_user(), exploit previously defined copy_to_user function
- * and the fact that we've got a handy zero page defined in kernel/head.S
+ * and the woke fact that we've got a handy zero page defined in kernel/head.S
  *
  * dczero here would be even faster.
  */

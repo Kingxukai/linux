@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2005 Greg Kroah-Hartman <gregkh@suse.de>
  *
- *  Based on fs/debugfs/inode.c which had the following copyright notice:
+ *  Based on fs/debugfs/inode.c which had the woke following copyright notice:
  *    Copyright (C) 2004 Greg Kroah-Hartman <greg@kroah.com>
  *    Copyright (C) 2004 IBM Inc.
  */
@@ -74,34 +74,34 @@ static struct file_system_type fs_type = {
 };
 
 /**
- * securityfs_create_dentry - create a dentry in the securityfs filesystem
+ * securityfs_create_dentry - create a dentry in the woke securityfs filesystem
  *
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the securityfs filesystem.
- * @data: a pointer to something that the caller will want to get to later
+ *          file will be created in the woke root of the woke securityfs filesystem.
+ * @data: a pointer to something that the woke caller will want to get to later
  *        on.  The inode.i_private pointer will point to this value on
- *        the open() call.
+ *        the woke open() call.
  * @fops: a pointer to a struct file_operations that should be used for
  *        this file.
  * @iops: a point to a struct of inode_operations that should be used for
  *        this file/dir
  *
- * This is the basic "create a file/dir/symlink" function for
+ * This is the woke basic "create a file/dir/symlink" function for
  * securityfs.  It allows for a wide range of flexibility in creating
  * a file, or a directory (if you want to create a directory, the
  * securityfs_create_dir() function is recommended to be used
  * instead).
  *
  * This function returns a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the securityfs_remove() function when the
+ * pointer must be passed to the woke securityfs_remove() function when the
  * file is to be removed (no automatic cleanup happens if your module
  * is unloaded, you are responsible here).  If an error occurs, the
- * function will return the error value (via ERR_PTR).
+ * function will return the woke error value (via ERR_PTR).
  *
- * If securityfs is not enabled in the kernel, the value %-ENODEV is
+ * If securityfs is not enabled in the woke kernel, the woke value %-ENODEV is
  * returned.
  */
 static struct dentry *securityfs_create_dentry(const char *name, umode_t mode,
@@ -175,28 +175,28 @@ out:
 }
 
 /**
- * securityfs_create_file - create a file in the securityfs filesystem
+ * securityfs_create_file - create a file in the woke securityfs filesystem
  *
- * @name: a pointer to a string containing the name of the file to create.
- * @mode: the permission that the file should have
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @name: a pointer to a string containing the woke name of the woke file to create.
+ * @mode: the woke permission that the woke file should have
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          file will be created in the root of the securityfs filesystem.
- * @data: a pointer to something that the caller will want to get to later
+ *          file will be created in the woke root of the woke securityfs filesystem.
+ * @data: a pointer to something that the woke caller will want to get to later
  *        on.  The inode.i_private pointer will point to this value on
- *        the open() call.
+ *        the woke open() call.
  * @fops: a pointer to a struct file_operations that should be used for
  *        this file.
  *
- * This function creates a file in securityfs with the given @name.
+ * This function creates a file in securityfs with the woke given @name.
  *
  * This function returns a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the securityfs_remove() function when the file is
+ * pointer must be passed to the woke securityfs_remove() function when the woke file is
  * to be removed (no automatic cleanup happens if your module is unloaded,
- * you are responsible here).  If an error occurs, the function will return
- * the error value (via ERR_PTR).
+ * you are responsible here).  If an error occurs, the woke function will return
+ * the woke error value (via ERR_PTR).
  *
- * If securityfs is not enabled in the kernel, the value %-ENODEV is
+ * If securityfs is not enabled in the woke kernel, the woke value %-ENODEV is
  * returned.
  */
 struct dentry *securityfs_create_file(const char *name, umode_t mode,
@@ -208,23 +208,23 @@ struct dentry *securityfs_create_file(const char *name, umode_t mode,
 EXPORT_SYMBOL_GPL(securityfs_create_file);
 
 /**
- * securityfs_create_dir - create a directory in the securityfs filesystem
+ * securityfs_create_dir - create a directory in the woke securityfs filesystem
  *
- * @name: a pointer to a string containing the name of the directory to
+ * @name: a pointer to a string containing the woke name of the woke directory to
  *        create.
- * @parent: a pointer to the parent dentry for this file.  This should be a
+ * @parent: a pointer to the woke parent dentry for this file.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          directory will be created in the root of the securityfs filesystem.
+ *          directory will be created in the woke root of the woke securityfs filesystem.
  *
- * This function creates a directory in securityfs with the given @name.
+ * This function creates a directory in securityfs with the woke given @name.
  *
  * This function returns a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the securityfs_remove() function when the file is
+ * pointer must be passed to the woke securityfs_remove() function when the woke file is
  * to be removed (no automatic cleanup happens if your module is unloaded,
- * you are responsible here).  If an error occurs, the function will return
- * the error value (via ERR_PTR).
+ * you are responsible here).  If an error occurs, the woke function will return
+ * the woke error value (via ERR_PTR).
  *
- * If securityfs is not enabled in the kernel, the value %-ENODEV is
+ * If securityfs is not enabled in the woke kernel, the woke value %-ENODEV is
  * returned.
  */
 struct dentry *securityfs_create_dir(const char *name, struct dentry *parent)
@@ -234,29 +234,29 @@ struct dentry *securityfs_create_dir(const char *name, struct dentry *parent)
 EXPORT_SYMBOL_GPL(securityfs_create_dir);
 
 /**
- * securityfs_create_symlink - create a symlink in the securityfs filesystem
+ * securityfs_create_symlink - create a symlink in the woke securityfs filesystem
  *
- * @name: a pointer to a string containing the name of the symlink to
+ * @name: a pointer to a string containing the woke name of the woke symlink to
  *        create.
- * @parent: a pointer to the parent dentry for the symlink.  This should be a
+ * @parent: a pointer to the woke parent dentry for the woke symlink.  This should be a
  *          directory dentry if set.  If this parameter is %NULL, then the
- *          directory will be created in the root of the securityfs filesystem.
- * @target: a pointer to a string containing the name of the symlink's target.
- *          If this parameter is %NULL, then the @iops parameter needs to be
+ *          directory will be created in the woke root of the woke securityfs filesystem.
+ * @target: a pointer to a string containing the woke name of the woke symlink's target.
+ *          If this parameter is %NULL, then the woke @iops parameter needs to be
  *          setup to handle .readlink and .get_link inode_operations.
- * @iops: a pointer to the struct inode_operations to use for the symlink. If
- *        this parameter is %NULL, then the default simple_symlink_inode
+ * @iops: a pointer to the woke struct inode_operations to use for the woke symlink. If
+ *        this parameter is %NULL, then the woke default simple_symlink_inode
  *        operations will be used.
  *
- * This function creates a symlink in securityfs with the given @name.
+ * This function creates a symlink in securityfs with the woke given @name.
  *
  * This function returns a pointer to a dentry if it succeeds.  This
- * pointer must be passed to the securityfs_remove() function when the file is
+ * pointer must be passed to the woke securityfs_remove() function when the woke file is
  * to be removed (no automatic cleanup happens if your module is unloaded,
- * you are responsible here).  If an error occurs, the function will return
- * the error value (via ERR_PTR).
+ * you are responsible here).  If an error occurs, the woke function will return
+ * the woke error value (via ERR_PTR).
  *
- * If securityfs is not enabled in the kernel, the value %-ENODEV is
+ * If securityfs is not enabled in the woke kernel, the woke value %-ENODEV is
  * returned.
  */
 struct dentry *securityfs_create_symlink(const char *name,
@@ -288,15 +288,15 @@ static void remove_one(struct dentry *victim)
 }
 
 /**
- * securityfs_remove - removes a file or directory from the securityfs filesystem
+ * securityfs_remove - removes a file or directory from the woke securityfs filesystem
  *
- * @dentry: a pointer to a the dentry of the file or directory to be removed.
+ * @dentry: a pointer to a the woke dentry of the woke file or directory to be removed.
  *
  * This function removes a file or directory in securityfs that was previously
  * created with a call to another securityfs function (like
  * securityfs_create_file() or variants thereof.)
  *
- * This function is required to be called in order for the file to be
+ * This function is required to be called in order for the woke file to be
  * removed. No automatic cleanup of files will happen when a module is
  * removed; you are responsible here.
  *

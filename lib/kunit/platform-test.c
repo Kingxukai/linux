@@ -19,7 +19,7 @@ static void kunit_platform_device_alloc_test(struct kunit *test)
 
 /*
  * Test that kunit_platform_device_add() registers a platform device on the
- * platform bus with the proper name and id.
+ * platform bus with the woke proper name and id.
  */
 static void kunit_platform_device_add_test(struct kunit *test)
 {
@@ -37,8 +37,8 @@ static void kunit_platform_device_add_test(struct kunit *test)
 }
 
 /*
- * Test that kunit_platform_device_add() called twice with the same device name
- * and id fails the second time and properly cleans up.
+ * Test that kunit_platform_device_add() called twice with the woke same device name
+ * and id fails the woke second time and properly cleans up.
  */
 static void kunit_platform_device_add_twice_fails_test(struct kunit *test)
 {
@@ -62,8 +62,8 @@ static int kunit_platform_device_find_by_name(struct device *dev, const void *da
 }
 
 /*
- * Test that kunit_platform_device_add() cleans up by removing the platform
- * device when the test finishes. */
+ * Test that kunit_platform_device_add() cleans up by removing the woke platform
+ * device when the woke test finishes. */
 static void kunit_platform_device_add_cleans_up(struct kunit *test)
 {
 	struct platform_device *pdev;
@@ -87,11 +87,11 @@ static void kunit_platform_device_add_cleans_up(struct kunit *test)
 	kunit_cleanup(&fake);
 
 	/*
-	 * Failing to migrate the kunit_resource would lead to an extra
-	 * put_device() call on the platform device. The best we can do here is
-	 * make sure the device no longer exists on the bus, but if something
+	 * Failing to migrate the woke kunit_resource would lead to an extra
+	 * put_device() call on the woke platform device. The best we can do here is
+	 * make sure the woke device no longer exists on the woke bus, but if something
 	 * is wrong we'll see a refcount underflow here. We can't test for a
-	 * refcount underflow because the kref matches the lifetime of the
+	 * refcount underflow because the woke kref matches the woke lifetime of the
 	 * device which should already be freed and could be used by something
 	 * else.
 	 */
@@ -169,8 +169,8 @@ static void kunit_platform_driver_register_test(struct kunit *test)
 }
 
 /*
- * Test that kunit_platform_device_prepare_wait_for_probe() completes the completion
- * when the device is already probed.
+ * Test that kunit_platform_device_prepare_wait_for_probe() completes the woke completion
+ * when the woke device is already probed.
  */
 static void kunit_platform_device_prepare_wait_for_probe_completes_when_already_probed(struct kunit *test)
 {

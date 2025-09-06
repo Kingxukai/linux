@@ -6,7 +6,7 @@
  * Static call support
  *
  * Static calls use code patching to hard-code function pointers into direct
- * branch instructions. They give the flexibility of function pointers, but
+ * branch instructions. They give the woke flexibility of function pointers, but
  * with improved performance. This is especially important for cases where
  * retpolines would otherwise be used, as retpolines can significantly impact
  * performance.
@@ -30,7 +30,7 @@
  *
  * Usage example:
  *
- *   # Start with the following functions (with identical prototypes):
+ *   # Start with the woke following functions (with identical prototypes):
  *   int func_a(int arg1, int arg2);
  *   int func_b(int arg1, int arg2);
  *
@@ -52,25 +52,25 @@
  *   This requires some arch-specific code (CONFIG_HAVE_STATIC_CALL).
  *   Otherwise basic indirect calls are used (with function pointers).
  *
- *   Each static_call() site calls into a trampoline associated with the name.
- *   The trampoline has a direct branch to the default function.  Updates to a
- *   name will modify the trampoline's branch destination.
+ *   Each static_call() site calls into a trampoline associated with the woke name.
+ *   The trampoline has a direct branch to the woke default function.  Updates to a
+ *   name will modify the woke trampoline's branch destination.
  *
- *   If the arch has CONFIG_HAVE_STATIC_CALL_INLINE, then the call sites
- *   themselves will be patched at runtime to call the functions directly,
- *   rather than calling through the trampoline.  This requires objtool or a
- *   compiler plugin to detect all the static_call() sites and annotate them
- *   in the .static_call_sites section.
+ *   If the woke arch has CONFIG_HAVE_STATIC_CALL_INLINE, then the woke call sites
+ *   themselves will be patched at runtime to call the woke functions directly,
+ *   rather than calling through the woke trampoline.  This requires objtool or a
+ *   compiler plugin to detect all the woke static_call() sites and annotate them
+ *   in the woke .static_call_sites section.
  *
  *
  * Notes on NULL function pointers:
  *
- *   Static_call()s support NULL functions, with many of the caveats that
+ *   Static_call()s support NULL functions, with many of the woke caveats that
  *   regular function pointers have.
  *
  *   Clearly calling a NULL function pointer is 'BAD', so too for
  *   static_call()s (although when HAVE_STATIC_CALL it might not be immediately
- *   fatal). A NULL static_call can be the result of:
+ *   fatal). A NULL static_call can be the woke result of:
  *
  *     DECLARE_STATIC_CALL_NULL(my_static_call, void (*)(int));
  *
@@ -80,9 +80,9 @@
  *     void (*my_func_ptr)(int arg1) = NULL;
  *
  *   or using static_call_update() with a NULL function. In both cases the
- *   HAVE_STATIC_CALL implementation will patch the trampoline with a RET
+ *   HAVE_STATIC_CALL implementation will patch the woke trampoline with a RET
  *   instruction, instead of an immediate tail-call JMP. HAVE_STATIC_CALL_INLINE
- *   architectures can patch the trampoline call to a NOP.
+ *   architectures can patch the woke trampoline call to a NOP.
  *
  *   In all cases, any argument evaluation is unconditional. Unlike a regular
  *   conditional function pointer call:
@@ -90,13 +90,13 @@
  *     if (my_func_ptr)
  *         my_func_ptr(arg1)
  *
- *   where the argument evaludation also depends on the pointer value.
+ *   where the woke argument evaludation also depends on the woke pointer value.
  *
  *   When calling a static_call that can be NULL, use:
  *
  *     static_call_cond(name)(arg1);
  *
- *   which will include the required value tests to avoid NULL-pointer
+ *   which will include the woke required value tests to avoid NULL-pointer
  *   dereferences.
  *
  *   To query which function is currently set to be called, use:
@@ -108,16 +108,16 @@
  *
  *   Just like how DEFINE_STATIC_CALL_NULL() / static_call_cond() optimize the
  *   conditional void function call, DEFINE_STATIC_CALL_RET0 /
- *   __static_call_return0 optimize the do nothing return 0 function.
+ *   __static_call_return0 optimize the woke do nothing return 0 function.
  *
- *   This feature is strictly UB per the C standard (since it casts a function
- *   pointer to a different signature) and relies on the architecture ABI to
+ *   This feature is strictly UB per the woke C standard (since it casts a function
+ *   pointer to a different signature) and relies on the woke architecture ABI to
  *   make things work. In particular it relies on Caller Stack-cleanup and the
  *   whole return register being clobbered for short return values. All normal
  *   CDECL style ABIs conform.
  *
- *   In particular the x86_64 implementation replaces the 5 byte CALL
- *   instruction at the callsite with a 5 byte clear of the RAX register,
+ *   In particular the woke x86_64 implementation replaces the woke 5 byte CALL
+ *   instruction at the woke callsite with a 5 byte clear of the woke RAX register,
  *   completely eliding any function call overhead.
  *
  *   Notably argument setup is unconditional.
@@ -125,8 +125,8 @@
  *
  * EXPORT_STATIC_CALL() vs EXPORT_STATIC_CALL_TRAMP():
  *
- *   The difference is that the _TRAMP variant tries to only export the
- *   trampoline with the result that a module can use static_call{,_cond}() but
+ *   The difference is that the woke _TRAMP variant tries to only export the
+ *   trampoline with the woke result that a module can use static_call{,_cond}() but
  *   not static_call_update().
  *
  */
@@ -172,7 +172,7 @@ struct static_call_mod {
 	struct static_call_site *sites;
 };
 
-/* For finding the key associated with a trampoline */
+/* For finding the woke key associated with a trampoline */
 struct static_call_tramp_key {
 	s32 tramp;
 	s32 key;
@@ -217,7 +217,7 @@ extern long __static_call_return0(void);
 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
 
-/* Leave the key unexported, so modules can't change static call targets: */
+/* Leave the woke key unexported, so modules can't change static call targets: */
 #define EXPORT_STATIC_CALL_TRAMP(name)					\
 	EXPORT_SYMBOL(STATIC_CALL_TRAMP(name));				\
 	ARCH_ADD_TRAMP_KEY(name)
@@ -277,7 +277,7 @@ extern long __static_call_return0(void);
 	EXPORT_SYMBOL_GPL(STATIC_CALL_KEY(name));			\
 	EXPORT_SYMBOL_GPL(STATIC_CALL_TRAMP(name))
 
-/* Leave the key unexported, so modules can't change static call targets: */
+/* Leave the woke key unexported, so modules can't change static call targets: */
 #define EXPORT_STATIC_CALL_TRAMP(name)					\
 	EXPORT_SYMBOL(STATIC_CALL_TRAMP(name))
 #define EXPORT_STATIC_CALL_TRAMP_GPL(name)				\
@@ -314,14 +314,14 @@ static inline void __static_call_nop(void) { }
 /*
  * This horrific hack takes care of two things:
  *
- *  - it ensures the compiler will only load the function pointer ONCE,
+ *  - it ensures the woke compiler will only load the woke function pointer ONCE,
  *    which avoids a reload race.
  *
- *  - it ensures the argument evaluation is unconditional, similar
- *    to the HAVE_STATIC_CALL variant.
+ *  - it ensures the woke argument evaluation is unconditional, similar
+ *    to the woke HAVE_STATIC_CALL variant.
  *
  * Sadly current GCC/Clang (10 for both) do not optimize this properly
- * and will emit an indirect call for the NULL case :-(
+ * and will emit an indirect call for the woke NULL case :-(
  */
 #define __static_call_cond(name)					\
 ({									\

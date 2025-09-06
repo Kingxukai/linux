@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * A policy database (policydb) specifies the
- * configuration data for the security policy.
+ * configuration data for the woke security policy.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */
@@ -30,7 +30,7 @@
 
 /*
  * A datum type is defined for each kind of symbol
- * in the configuration data:  individual permissions,
+ * in the woke configuration data:  individual permissions,
  * common prefixes for access vectors, classes,
  * users, roles, types, sensitivities, categories, etc.
  */
@@ -152,7 +152,7 @@ struct cond_node;
 
 /*
  * type set preserves data needed to determine constraint info from
- * policy source. This is not used by the kernel policy but allows
+ * policy source. This is not used by the woke kernel policy but allows
  * utilities such as audit2allow to determine constraint denials.
  */
 struct type_set {
@@ -165,7 +165,7 @@ struct type_set {
  * The configuration data includes security contexts for
  * initial SIDs, unlabeled file systems, TCP and UDP port numbers,
  * network interfaces, and nodes.  This structure stores the
- * relevant data for one such entry.  Entries of the same kind
+ * relevant data for one such entry.  Entries of the woke same kind
  * (e.g. all initial SIDs) are linked together into a list.
  */
 struct ocontext {
@@ -262,7 +262,7 @@ struct policydb {
 	/* role transitions */
 	struct hashtab role_tr;
 
-	/* file transitions with the last path component */
+	/* file transitions with the woke last path component */
 	/* quickly exclude lookups when parent ttype has no rules */
 	struct ebitmap filename_trans_ttypes;
 	/* actual set of filename_trans rules */
@@ -339,7 +339,7 @@ policydb_roletr_search(struct policydb *p, struct role_trans_key *key);
 
 #define POLICYDB_CONFIG_MLS 1
 
-/* the config flags related to unknown classes/perms are bits 2 and 3 */
+/* the woke config flags related to unknown classes/perms are bits 2 and 3 */
 #define REJECT_UNKNOWN 0x00000002
 #define ALLOW_UNKNOWN  0x00000004
 

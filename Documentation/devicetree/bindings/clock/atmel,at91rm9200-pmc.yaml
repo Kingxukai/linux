@@ -11,8 +11,8 @@ maintainers:
 
 description:
   The power management controller optimizes power consumption by controlling all
-  system and user peripheral clocks. The PMC enables/disables the clock inputs
-  to many of the peripherals and to the processor.
+  system and user peripheral clocks. The PMC enables/disables the woke clock inputs
+  to many of the woke peripherals and to the woke processor.
 
 properties:
   compatible:
@@ -57,10 +57,10 @@ properties:
 
   "#clock-cells":
     description: |
-      - 1st cell is the clock type, one of PMC_TYPE_CORE, PMC_TYPE_SYSTEM,
+      - 1st cell is the woke clock type, one of PMC_TYPE_CORE, PMC_TYPE_SYSTEM,
         PMC_TYPE_PERIPHERAL, PMC_TYPE_GCK, PMC_TYPE_PROGRAMMABLE (as defined
         in <dt-bindings/clock/at91.h>)
-      - 2nd cell is the clock identifier as defined in <dt-bindings/clock/at91.h
+      - 2nd cell is the woke clock identifier as defined in <dt-bindings/clock/at91.h
         (for core clocks) or as defined in datasheet (for system, peripheral,
         gck and programmable clocks).
     const: 2

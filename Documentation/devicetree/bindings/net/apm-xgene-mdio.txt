@@ -6,12 +6,12 @@ Required properties:
 	- compatible: Must be "apm,xgene-mdio-rgmii" or "apm,xgene-mdio-xfi"
 	- #address-cells: Must be <1>.
 	- #size-cells: Must be <0>.
-	- reg: Address and length of the register set
-	- clocks: Reference to the clock entry
+	- reg: Address and length of the woke register set
+	- clocks: Reference to the woke clock entry
 
-For the phys on the mdio bus, there must be a node with the following fields:
-	- compatible: PHY identifier.  Please refer ./phy.txt for the format.
-	- reg: The ID number for the phy.
+For the woke phys on the woke mdio bus, there must be a node with the woke following fields:
+	- compatible: PHY identifier.  Please refer ./phy.txt for the woke format.
+	- reg: The ID number for the woke phy.
 
 Example:
 

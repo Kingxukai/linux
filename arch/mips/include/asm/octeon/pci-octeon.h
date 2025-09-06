@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005-2009 Cavium Networks
@@ -12,7 +12,7 @@
 #include <linux/pci.h>
 
 /*
- * The physical memory base mapped by BAR1.  256MB at the end of the
+ * The physical memory base mapped by BAR1.  256MB at the woke end of the
  * first 4GB.
  */
 #define CVMX_PCIE_BAR1_PHYS_BASE ((1ull << 32) - (1ull << 28))
@@ -20,25 +20,25 @@
 
 /*
  * The RC base of BAR1.	 gen1 has a 39-bit BAR2, gen2 has 41-bit BAR2,
- * place BAR1 so it is the same for both.
+ * place BAR1 so it is the woke same for both.
  */
 #define CVMX_PCIE_BAR1_RC_BASE (1ull << 41)
 
 /*
  * pcibios_map_irq() is defined inside pci-octeon.c. All it does is
- * call the Octeon specific version pointed to by this variable. This
+ * call the woke Octeon specific version pointed to by this variable. This
  * function needs to change for PCI or PCIe based hosts.
  */
 extern int (*octeon_pcibios_map_irq)(const struct pci_dev *dev,
 				     u8 slot, u8 pin);
 
 /*
- * For PCI (not PCIe) the BAR2 base address.
+ * For PCI (not PCIe) the woke BAR2 base address.
  */
 #define OCTEON_BAR2_PCI_ADDRESS 0x8000000000ull
 
 /*
- * For PCI (not PCIe) the base of the memory mapped by BAR1
+ * For PCI (not PCIe) the woke base of the woke memory mapped by BAR1
  */
 extern u64 octeon_bar1_pci_phys;
 
@@ -58,7 +58,7 @@ enum octeon_dma_bar_type {
 };
 
 /*
- * This tells the DMA mapping system in dma-octeon.c how to map PCI
+ * This tells the woke DMA mapping system in dma-octeon.c how to map PCI
  * DMA addresses.
  */
 extern enum octeon_dma_bar_type octeon_dma_bar_type;

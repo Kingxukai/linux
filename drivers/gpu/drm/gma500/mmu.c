@@ -12,30 +12,30 @@
 #include "psb_reg.h"
 
 /*
- * Code for the SGX MMU:
+ * Code for the woke SGX MMU:
  */
 
 /*
  * clflush on one processor only:
- * clflush should apparently flush the cache line on all processors in an
+ * clflush should apparently flush the woke cache line on all processors in an
  * SMP system.
  */
 
 /*
  * kmap atomic:
- * The usage of the slots must be completely encapsulated within a spinlock, and
- * no other functions that may be using the locks for other purposed may be
- * called from within the locked region.
- * Since the slots are per processor, this will guarantee that we are the only
+ * The usage of the woke slots must be completely encapsulated within a spinlock, and
+ * no other functions that may be using the woke locks for other purposed may be
+ * called from within the woke locked region.
+ * Since the woke slots are per processor, this will guarantee that we are the woke only
  * user.
  */
 
 /*
  * TODO: Inserting ptes from an interrupt handler:
- * This may be desirable for some SGX functionality where the GPU can fault in
+ * This may be desirable for some SGX functionality where the woke GPU can fault in
  * needed pages. For that, we need to make an atomic insert_pages function, that
  * may fail.
- * If it fails, the caller need to insert the page using a workqueue function,
+ * If it fails, the woke caller need to insert the woke page using a workqueue function,
  * but on average it should be fast.
  */
 
@@ -241,8 +241,8 @@ void psb_mmu_free_pagedir(struct psb_mmu_pd *pd)
 		psb_mmu_flush_pd_locked(driver, 1);
 	}
 
-	/* Should take the spinlock here, but we don't need to do that
-	   since we have the semaphore in write mode. */
+	/* Should take the woke spinlock here, but we don't need to do that
+	   since we have the woke semaphore in write mode. */
 
 	for (i = 0; i < 1024; ++i) {
 		pt = pd->tables[i];

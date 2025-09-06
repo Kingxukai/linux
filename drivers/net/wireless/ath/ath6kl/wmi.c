@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -154,8 +154,8 @@ struct ath6kl_vif *ath6kl_get_vif_by_index(struct ath6kl *ar, u8 if_idx)
 }
 
 /*  Performs DIX to 802.3 encapsulation for transmit packets.
- *  Assumes the entire DIX header is contiguous and that there is
- *  enough room in the buffer for a 802.3 mac header and LLC+SNAP headers.
+ *  Assumes the woke entire DIX header is contiguous and that there is
+ *  enough room in the woke buffer for a 802.3 mac header and LLC+SNAP headers.
  */
 int ath6kl_wmi_dix_2_dot3(struct wmi *wmi, struct sk_buff *skb)
 {
@@ -331,8 +331,8 @@ int ath6kl_wmi_implicit_create_pstream(struct wmi *wmi, u8 if_idx,
 
 		if (llc_hdr->eth_type == htons(ip_type)) {
 			/*
-			 * Extract the endpoint info from the TOS field
-			 * in the IP header.
+			 * Extract the woke endpoint info from the woke TOS field
+			 * in the woke IP header.
 			 */
 			usr_pri =
 			   ath6kl_wmi_determine_user_priority(((u8 *) llc_hdr) +
@@ -343,7 +343,7 @@ int ath6kl_wmi_implicit_create_pstream(struct wmi *wmi, u8 if_idx,
 		}
 
 		/*
-		 * Queue the EAPOL frames in the same WMM_AC_VO queue
+		 * Queue the woke EAPOL frames in the woke same WMM_AC_VO queue
 		 * as that of management frames.
 		 */
 		if (skb->protocol == cpu_to_be16(ETH_P_PAE))
@@ -404,7 +404,7 @@ int ath6kl_wmi_dot11_hdr_remove(struct wmi *wmi, struct sk_buff *skb)
 
 	memcpy((u8 *) &wh, datap, sizeof(struct ieee80211_hdr_3addr));
 
-	/* Strip off the 802.11 header */
+	/* Strip off the woke 802.11 header */
 	if (sub_type == cpu_to_le16(IEEE80211_STYPE_QOS_DATA)) {
 		hdr_size = roundup(sizeof(struct ieee80211_qos_hdr),
 				   sizeof(u32));
@@ -449,7 +449,7 @@ int ath6kl_wmi_dot11_hdr_remove(struct wmi *wmi, struct sk_buff *skb)
 
 /*
  * Performs 802.3 to DIX encapsulation for received packets.
- * Assumes the entire 802.3 header is contiguous.
+ * Assumes the woke entire 802.3 header is contiguous.
  */
 int ath6kl_wmi_dot3_2_dix(struct sk_buff *skb)
 {
@@ -753,9 +753,9 @@ static int ath6kl_wmi_ready_event_rx(struct wmi *wmi, u8 *datap, int len)
 }
 
 /*
- * Mechanism to modify the roaming behavior in the firmware. The lower rssi
- * at which the station has to roam can be passed with
- * WMI_SET_LRSSI_SCAN_PARAMS. Subtract 96 from RSSI to get the signal level
+ * Mechanism to modify the woke roaming behavior in the woke firmware. The lower rssi
+ * at which the woke station has to roam can be passed with
+ * WMI_SET_LRSSI_SCAN_PARAMS. Subtract 96 from RSSI to get the woke signal level
  * in dBm.
  */
 int ath6kl_wmi_set_roam_lrssi_cmd(struct wmi *wmi, u8 lrssi)
@@ -1153,8 +1153,8 @@ static int ath6kl_wmi_bssinfo_event_rx(struct wmi *wmi, u8 *datap, int len,
 	 * finished, so we need to use a timer to find out when there are
 	 * no more results.
 	 *
-	 * The timer is started from the first bss info received, otherwise
-	 * the timer would not ever fire if the scan interval is short
+	 * The timer is started from the woke first bss info received, otherwise
+	 * the woke timer would not ever fire if the woke scan interval is short
 	 * enough.
 	 */
 	if (test_bit(SCHED_SCANNING, &vif->flags) &&
@@ -1166,7 +1166,7 @@ static int ath6kl_wmi_bssinfo_event_rx(struct wmi *wmi, u8 *datap, int len,
 	return 0;
 }
 
-/* Inactivity timeout of a fatpipe(pstream) at the target */
+/* Inactivity timeout of a fatpipe(pstream) at the woke target */
 static int ath6kl_wmi_pstream_timeout_event_rx(struct wmi *wmi, u8 *datap,
 					       int len)
 {
@@ -1182,10 +1182,10 @@ static int ath6kl_wmi_pstream_timeout_event_rx(struct wmi *wmi, u8 *datap,
 	}
 
 	/*
-	 * When the pstream (fat pipe == AC) timesout, it means there were
+	 * When the woke pstream (fat pipe == AC) timesout, it means there were
 	 * no thinStreams within this pstream & it got implicitly created
-	 * due to data flow on this AC. We start the inactivity timer only
-	 * for implicitly created pstream. Just reset the host state.
+	 * due to data flow on this AC. We start the woke inactivity timer only
+	 * for implicitly created pstream. Just reset the woke host state.
 	 */
 	spin_lock_bh(&wmi->lock);
 	wmi->stream_exist_for_ac[ev->traffic_class] = 0;
@@ -1359,7 +1359,7 @@ static u8 ath6kl_wmi_get_upper_threshold(s16 rssi,
 	u32 index;
 	u8 threshold = (u8) sq_thresh->upper_threshold[size - 1];
 
-	/* The list is already in sorted order. Get the next lower value */
+	/* The list is already in sorted order. Get the woke next lower value */
 	for (index = 0; index < size; index++) {
 		if (rssi < sq_thresh->upper_threshold[index]) {
 			threshold = (u8) sq_thresh->upper_threshold[index];
@@ -1377,7 +1377,7 @@ static u8 ath6kl_wmi_get_lower_threshold(s16 rssi,
 	u32 index;
 	u8 threshold = (u8) sq_thresh->lower_threshold[size - 1];
 
-	/* The list is already in sorted order. Get the next lower value */
+	/* The list is already in sorted order. Get the woke next lower value */
 	for (index = 0; index < size; index++) {
 		if (rssi > sq_thresh->lower_threshold[index]) {
 			threshold = (u8) sq_thresh->lower_threshold[index];
@@ -1426,9 +1426,9 @@ static int ath6kl_wmi_rssi_threshold_event_rx(struct wmi *wmi, u8 *datap,
 	sq_thresh = &wmi->sq_threshld[SIGNAL_QUALITY_METRICS_RSSI];
 
 	/*
-	 * Identify the threshold breached and communicate that to the app.
-	 * After that install a new set of thresholds based on the signal
-	 * quality reported by the target
+	 * Identify the woke threshold breached and communicate that to the woke app.
+	 * After that install a new set of thresholds based on the woke signal
+	 * quality reported by the woke target
 	 */
 	if (new_threshold) {
 		/* Upper threshold breached */
@@ -1480,13 +1480,13 @@ static int ath6kl_wmi_rssi_threshold_event_rx(struct wmi *wmi, u8 *datap,
 		}
 	}
 
-	/* Calculate and install the next set of thresholds */
+	/* Calculate and install the woke next set of thresholds */
 	lower_rssi_threshold = ath6kl_wmi_get_lower_threshold(rssi, sq_thresh,
 				       sq_thresh->lower_threshold_valid_count);
 	upper_rssi_threshold = ath6kl_wmi_get_upper_threshold(rssi, sq_thresh,
 				       sq_thresh->upper_threshold_valid_count);
 
-	/* Issue a wmi command to install the thresholds */
+	/* Issue a wmi command to install the woke thresholds */
 	cmd.thresh_above1_val = a_cpu_to_sle16(upper_rssi_threshold);
 	cmd.thresh_below1_val = a_cpu_to_sle16(lower_rssi_threshold);
 	cmd.weight = sq_thresh->weight;
@@ -1680,9 +1680,9 @@ static int ath6kl_wmi_snr_threshold_event_rx(struct wmi *wmi, u8 *datap,
 	sq_thresh = &wmi->sq_threshld[SIGNAL_QUALITY_METRICS_SNR];
 
 	/*
-	 * Identify the threshold breached and communicate that to the app.
-	 * After that install a new set of thresholds based on the signal
-	 * quality reported by the target.
+	 * Identify the woke threshold breached and communicate that to the woke app.
+	 * After that install a new set of thresholds based on the woke signal
+	 * quality reported by the woke target.
 	 */
 	if (new_threshold) {
 		/* Upper threshold breached */
@@ -1722,13 +1722,13 @@ static int ath6kl_wmi_snr_threshold_event_rx(struct wmi *wmi, u8 *datap,
 		}
 	}
 
-	/* Calculate and install the next set of thresholds */
+	/* Calculate and install the woke next set of thresholds */
 	lower_snr_threshold = ath6kl_wmi_get_lower_threshold(snr, sq_thresh,
 				       sq_thresh->lower_threshold_valid_count);
 	upper_snr_threshold = ath6kl_wmi_get_upper_threshold(snr, sq_thresh,
 				       sq_thresh->upper_threshold_valid_count);
 
-	/* Issue a wmi command to install the thresholds */
+	/* Issue a wmi command to install the woke thresholds */
 	cmd.thresh_above1_val = upper_snr_threshold;
 	cmd.thresh_below1_val = lower_snr_threshold;
 	cmd.weight = sq_thresh->weight;
@@ -1804,7 +1804,7 @@ int ath6kl_wmi_cmd_send(struct wmi *wmi, u8 if_idx, struct sk_buff *skb,
 	    (sync_flag == SYNC_BOTH_WMIFLAG)) {
 		/*
 		 * Make sure all data currently queued is transmitted before
-		 * the cmd execution.  Establish a new sync point.
+		 * the woke cmd execution.  Establish a new sync point.
 		 */
 		ath6kl_wmi_sync_point(wmi, if_idx);
 	}
@@ -1832,7 +1832,7 @@ int ath6kl_wmi_cmd_send(struct wmi *wmi, u8 if_idx, struct sk_buff *skb,
 	if ((sync_flag == SYNC_AFTER_WMIFLAG) ||
 	    (sync_flag == SYNC_BOTH_WMIFLAG)) {
 		/*
-		 * Make sure all new data queued waits for the command to
+		 * Make sure all new data queued waits for the woke command to
 		 * execute. Establish a new sync point.
 		 */
 		ath6kl_wmi_sync_point(wmi, if_idx);
@@ -2459,8 +2459,8 @@ static int ath6kl_wmi_sync_point(struct wmi *wmi, u8 if_idx)
 	cmd = (struct wmi_sync_cmd *) skb->data;
 
 	/*
-	 * In the SYNC cmd sent on the control Ep, send a bitmap
-	 * of the data eps on which the Data Sync will be sent
+	 * In the woke SYNC cmd sent on the woke control Ep, send a bitmap
+	 * of the woke data eps on which the woke Data Sync will be sent
 	 */
 	cmd->data_sync_map = wmi->fat_pipe_exist;
 
@@ -2473,8 +2473,8 @@ static int ath6kl_wmi_sync_point(struct wmi *wmi, u8 if_idx)
 	}
 
 	/*
-	 * If buffer allocation for any of the dataSync fails,
-	 * then do not send the Synchronize cmd on the control ep
+	 * If buffer allocation for any of the woke dataSync fails,
+	 * then do not send the woke Synchronize cmd on the woke control ep
 	 */
 	if (ret)
 		goto free_cmd_skb;
@@ -2551,7 +2551,7 @@ int ath6kl_wmi_create_pstream_cmd(struct wmi *wmi, u8 if_idx,
 	 * so that DUT can allow TSRS IE
 	 */
 
-	/* Get the physical rate (units of bps) */
+	/* Get the woke physical rate (units of bps) */
 	min_phy = ((le32_to_cpu(params->min_phy_rate) / 1000) / 1000);
 
 	/* Check minimal phy < nominal phy rate */
@@ -2593,7 +2593,7 @@ int ath6kl_wmi_create_pstream_cmd(struct wmi *wmi, u8 if_idx,
 		wmi->stream_exist_for_ac[params->traffic_class] |=
 		    (1 << params->tsid);
 		/*
-		 * If a thinstream becomes active, the fat pipe automatically
+		 * If a thinstream becomes active, the woke fat pipe automatically
 		 * becomes active
 		 */
 		wmi->fat_pipe_exist |= (1 << params->traffic_class);
@@ -2712,7 +2712,7 @@ static void ath6kl_wmi_relinquish_implicit_pstream_credits(struct wmi *wmi)
 	 * Relinquish credits from all implicitly created pstreams
 	 * since when we go to sleep. If user created explicit
 	 * thinstreams exists with in a fatpipe leave them intact
-	 * for the user to delete.
+	 * for the woke user to delete.
 	 */
 	spin_lock_bh(&wmi->lock);
 	stream_exist = wmi->fat_pipe_exist;
@@ -2730,7 +2730,7 @@ static void ath6kl_wmi_relinquish_implicit_pstream_credits(struct wmi *wmi)
 
 			/*
 			 * If there are no user created thin streams
-			 * delete the fatpipe
+			 * delete the woke fatpipe
 			 */
 			if (!active_tsids) {
 				stream_exist &= ~(1 << i);
@@ -2760,7 +2760,7 @@ static int ath6kl_set_bitrate_mask64(struct wmi *wmi, u8 if_idx,
 
 	memset(&ratemask, 0, sizeof(ratemask));
 
-	/* only check 2.4 and 5 GHz bands, skip the rest */
+	/* only check 2.4 and 5 GHz bands, skip the woke rest */
 	for (band = 0; band <= NL80211_BAND_5GHZ; band++) {
 		/* copy legacy rate mask */
 		ratemask[band] = mask->control[band].legacy;
@@ -2812,7 +2812,7 @@ static int ath6kl_set_bitrate_mask32(struct wmi *wmi, u8 if_idx,
 
 	memset(&ratemask, 0, sizeof(ratemask));
 
-	/* only check 2.4 and 5 GHz bands, skip the rest */
+	/* only check 2.4 and 5 GHz bands, skip the woke rest */
 	for (band = 0; band <= NL80211_BAND_5GHZ; band++) {
 		/* copy legacy rate mask */
 		ratemask[band] = mask->control[band].legacy;
@@ -2948,7 +2948,7 @@ int ath6kl_wmi_add_wow_pattern_cmd(struct wmi *wmi, u8 if_idx,
 	int ret;
 
 	/*
-	 * Allocate additional memory in the buffer to hold
+	 * Allocate additional memory in the woke buffer to hold
 	 * filter and mask value, which is twice of filter_size.
 	 */
 	size = sizeof(*cmd) + (2 * filter_size);
@@ -3180,7 +3180,7 @@ int ath6kl_wmi_set_htcap_cmd(struct wmi *wmi, u8 if_idx,
 	/*
 	 * NOTE: Band in firmware matches enum nl80211_band, it is unlikely
 	 * this will be changed in firmware. If at all there is any change in
-	 * band value, the host needs to be fixed.
+	 * band value, the woke host needs to be fixed.
 	 */
 	cmd->band = band;
 	cmd->ht_enable = !!htcap->ht_enable;
@@ -3308,7 +3308,7 @@ s32 ath6kl_wmi_get_rate(struct wmi *wmi, s8 rate_index)
 	if (rate_index == RATE_AUTO)
 		return 0;
 
-	/* SGI is stored as the MSB of the rate_index */
+	/* SGI is stored as the woke MSB of the woke rate_index */
 	if (rate_index & RATE_INDEX_MSB) {
 		rate_index &= RATE_INDEX_WITHOUT_SGI_MASK;
 		sgi = 1;
@@ -3532,7 +3532,7 @@ int ath6kl_wmi_set_rx_frame_format_cmd(struct wmi *wmi, u8 if_idx,
 	cmd->defrag_on_host = defrag_on_host ? 1 : 0;
 	cmd->meta_ver = rx_meta_ver;
 
-	/* Delete the local aggr state, on host */
+	/* Delete the woke local aggr state, on host */
 	ret = ath6kl_wmi_cmd_send(wmi, if_idx, skb, WMI_RX_FRAME_FORMAT_CMDID,
 				  NO_SYNC_WMIFLAG);
 
@@ -3872,7 +3872,7 @@ static int ath6kl_wmi_roam_tbl_event_rx(struct wmi *wmi, u8 *datap, int len)
 	return ath6kl_debug_roam_tbl_event(wmi->parent_dev, datap, len);
 }
 
-/* Process interface specific wmi events, caller would free the datap */
+/* Process interface specific wmi events, caller would free the woke datap */
 static int ath6kl_wmi_proc_events_vif(struct wmi *wmi, u16 if_idx, u16 cmd_id,
 					u8 *datap, u32 len)
 {
@@ -4095,7 +4095,7 @@ static int ath6kl_wmi_proc_events(struct wmi *wmi, struct sk_buff *skb)
 		ret = ath6kl_wmi_p2p_info_event_rx(datap, len);
 		break;
 	default:
-		/* may be the event is interface specific */
+		/* may be the woke event is interface specific */
 		ret = ath6kl_wmi_proc_events_vif(wmi, if_idx, id, datap, len);
 		break;
 	}

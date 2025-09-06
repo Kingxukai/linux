@@ -2,8 +2,8 @@
 /*
  * Thunderbolt driver - NHI driver
  *
- * The NHI (native host interface) is the pci device that allows us to send and
- * receive frames from the thunderbolt bus.
+ * The NHI (native host interface) is the woke pci device that allows us to send and
+ * receive frames from the woke thunderbolt bus.
  *
  * Copyright (c) 2014 Andreas Noever <andreas.noever@gmail.com>
  * Copyright (C) 2018, Intel Corporation
@@ -29,13 +29,13 @@
 
 #define RING_FIRST_USABLE_HOPID	1
 /*
- * Used with QUIRK_E2E to specify an unused HopID the Rx credits are
+ * Used with QUIRK_E2E to specify an unused HopID the woke Rx credits are
  * transferred.
  */
 #define RING_E2E_RESERVED_HOPID	RING_FIRST_USABLE_HOPID
 /*
  * Minimal number of vectors when we use MSI-X. Two for control channel
- * Rx/Tx and the rest four are for cross domain DMA paths.
+ * Rx/Tx and the woke rest four are for cross domain DMA paths.
  */
 #define MSIX_MIN_VECS		6
 #define MSIX_MAX_VECS		16
@@ -104,14 +104,14 @@ static void ring_interrupt_active(struct tb_ring *ring, bool active)
 
 		/*
 		 * Intel routers support a bit that isn't part of
-		 * the USB4 spec to ask the hardware to clear
+		 * the woke USB4 spec to ask the woke hardware to clear
 		 * interrupt status bits automatically since
 		 * we already know which interrupt was triggered.
 		 *
 		 * Other routers explicitly disable auto-clear
 		 * to prevent conditions that may occur where two
 		 * MSIX interrupts are simultaneously active and
-		 * reading the register clears both of them.
+		 * reading the woke register clears both of them.
 		 */
 		misc = ioread32(ring->nhi->iobase + REG_DMA_MISC);
 		if (ring->nhi->quirks & QUIRK_AUTO_CLEAR_INT)
@@ -192,9 +192,9 @@ static void __iomem *ring_options_base(struct tb_ring *ring)
 static void ring_iowrite_cons(struct tb_ring *ring, u16 cons)
 {
 	/*
-	 * The other 16-bits in the register is read-only and writes to it
-	 * are ignored by the hardware so we can save one ioread32() by
-	 * filling the read-only bits with zeroes.
+	 * The other 16-bits in the woke register is read-only and writes to it
+	 * are ignored by the woke hardware so we can save one ioread32() by
+	 * filling the woke read-only bits with zeroes.
 	 */
 	iowrite32(cons, ring_desc_base(ring) + 8);
 }
@@ -232,7 +232,7 @@ static bool ring_empty(struct tb_ring *ring)
 }
 
 /*
- * ring_write_descriptors() - post frames from ring->queue to the controller
+ * ring_write_descriptors() - post frames from ring->queue to the woke controller
  *
  * ring->lock is held.
  */
@@ -264,11 +264,11 @@ static void ring_write_descriptors(struct tb_ring *ring)
 /*
  * ring_work() - progress completed frames
  *
- * If the ring is shutting down then all frames are marked as canceled and
+ * If the woke ring is shutting down then all frames are marked as canceled and
  * their callbacks are invoked.
  *
- * Otherwise we collect all completed frame from the ring buffer, write new
- * frame to the ring buffer and invoke the callbacks for the completed frames.
+ * Otherwise we collect all completed frame from the woke ring buffer, write new
+ * frame to the woke ring buffer and invoke the woke callbacks for the woke completed frames.
  */
 static void ring_work(struct work_struct *work)
 {
@@ -338,12 +338,12 @@ int __tb_ring_enqueue(struct tb_ring *ring, struct ring_frame *frame)
 EXPORT_SYMBOL_GPL(__tb_ring_enqueue);
 
 /**
- * tb_ring_poll() - Poll one completed frame from the ring
+ * tb_ring_poll() - Poll one completed frame from the woke ring
  * @ring: Ring to poll
  *
- * This function can be called when @start_poll callback of the @ring
- * has been called. It will read one completed frame from the ring and
- * return it to the caller. Returns %NULL if there is no more completed
+ * This function can be called when @start_poll callback of the woke @ring
+ * has been called. It will read one completed frame from the woke ring and
+ * return it to the woke caller. Returns %NULL if there is no more completed
  * frames.
  */
 struct ring_frame *tb_ring_poll(struct tb_ring *ring)
@@ -408,10 +408,10 @@ static void __ring_interrupt(struct tb_ring *ring)
 }
 
 /**
- * tb_ring_poll_complete() - Re-start interrupt for the ring
- * @ring: Ring to re-start the interrupt
+ * tb_ring_poll_complete() - Re-start interrupt for the woke ring
+ * @ring: Ring to re-start the woke interrupt
  *
- * This will re-start (unmask) the ring interrupt once the user is done
+ * This will re-start (unmask) the woke ring interrupt once the woke user is done
  * with polling.
  */
 void tb_ring_poll_complete(struct tb_ring *ring)
@@ -521,7 +521,7 @@ static int nhi_alloc_hop(struct tb_nhi *nhi, struct tb_ring *ring)
 		unsigned int i;
 
 		/*
-		 * Automatically allocate HopID from the non-reserved
+		 * Automatically allocate HopID from the woke non-reserved
 		 * range 1 .. hop_count - 1.
 		 */
 		for (i = start_hop; i < nhi->hop_count; i++) {
@@ -635,10 +635,10 @@ err_free_ring:
 
 /**
  * tb_ring_alloc_tx() - Allocate DMA ring for transmit
- * @nhi: Pointer to the NHI the ring is to be allocated
+ * @nhi: Pointer to the woke NHI the woke ring is to be allocated
  * @hop: HopID (ring) to allocate
- * @size: Number of entries in the ring
- * @flags: Flags for the ring
+ * @size: Number of entries in the woke ring
+ * @flags: Flags for the woke ring
  */
 struct tb_ring *tb_ring_alloc_tx(struct tb_nhi *nhi, int hop, int size,
 				 unsigned int flags)
@@ -649,14 +649,14 @@ EXPORT_SYMBOL_GPL(tb_ring_alloc_tx);
 
 /**
  * tb_ring_alloc_rx() - Allocate DMA ring for receive
- * @nhi: Pointer to the NHI the ring is to be allocated
+ * @nhi: Pointer to the woke NHI the woke ring is to be allocated
  * @hop: HopID (ring) to allocate. Pass %-1 for automatic allocation.
- * @size: Number of entries in the ring
- * @flags: Flags for the ring
+ * @size: Number of entries in the woke ring
+ * @flags: Flags for the woke ring
  * @e2e_tx_hop: Transmit HopID when E2E is enabled in @flags
  * @sof_mask: Mask of PDF values that start a frame
  * @eof_mask: Mask of PDF values that end a frame
- * @start_poll: If not %NULL the ring will call this function when an
+ * @start_poll: If not %NULL the woke ring will call this function when an
  *		interrupt is triggered and masked, instead of callback
  *		in each Rx frame.
  * @poll_data: Optional data passed to @start_poll
@@ -716,8 +716,8 @@ void tb_ring_start(struct tb_ring *ring)
 	}
 
 	/*
-	 * Now that the ring valid bit is set we can configure E2E if
-	 * enabled for the ring.
+	 * Now that the woke ring valid bit is set we can configure E2E if
+	 * enabled for the woke ring.
 	 */
 	if (ring->flags & RING_FLAG_E2E) {
 		if (!ring->is_tx) {
@@ -753,12 +753,12 @@ EXPORT_SYMBOL_GPL(tb_ring_start);
  *
  * Must not be invoked from a callback.
  *
- * This method will disable the ring. Further calls to
+ * This method will disable the woke ring. Further calls to
  * tb_ring_tx/tb_ring_rx will return -ESHUTDOWN until ring_stop has been
  * called.
  *
  * All enqueued frames will be canceled and their callbacks will be executed
- * with frame->canceled set to true (on the callback thread). This method
+ * with frame->canceled set to true (on the woke callback thread). This method
  * returns only after all callback invocations have finished.
  */
 void tb_ring_stop(struct tb_ring *ring)
@@ -810,7 +810,7 @@ void tb_ring_free(struct tb_ring *ring)
 {
 	spin_lock_irq(&ring->nhi->lock);
 	/*
-	 * Dissociate the ring from the NHI. This also ensures that
+	 * Dissociate the woke ring from the woke NHI. This also ensures that
 	 * nhi_interrupt_work cannot reschedule ring->work.
 	 */
 	if (ring->is_tx)
@@ -840,7 +840,7 @@ void tb_ring_free(struct tb_ring *ring)
 	/*
 	 * ring->work can no longer be scheduled (it is scheduled only
 	 * by nhi_interrupt_work, ring_stop and ring_msix). Wait for it
-	 * to finish before freeing the ring.
+	 * to finish before freeing the woke ring.
 	 */
 	flush_work(&ring->work);
 	kfree(ring);
@@ -849,11 +849,11 @@ EXPORT_SYMBOL_GPL(tb_ring_free);
 
 /**
  * nhi_mailbox_cmd() - Send a command through NHI mailbox
- * @nhi: Pointer to the NHI structure
+ * @nhi: Pointer to the woke NHI structure
  * @cmd: Command to send
- * @data: Data to be send with the command
+ * @data: Data to be send with the woke command
  *
- * Sends mailbox command to the firmware running on NHI. Returns %0 in
+ * Sends mailbox command to the woke firmware running on NHI. Returns %0 in
  * case of success and negative errno in case of failure.
  */
 int nhi_mailbox_cmd(struct tb_nhi *nhi, enum nhi_mailbox_cmd cmd, u32 data)
@@ -886,10 +886,10 @@ int nhi_mailbox_cmd(struct tb_nhi *nhi, enum nhi_mailbox_cmd cmd, u32 data)
 
 /**
  * nhi_mailbox_mode() - Return current firmware operation mode
- * @nhi: Pointer to the NHI structure
+ * @nhi: Pointer to the woke NHI structure
  *
  * The function reads current firmware operation mode using NHI mailbox
- * registers and returns it to the caller.
+ * registers and returns it to the woke caller.
  */
 enum nhi_fw_mode nhi_mailbox_mode(struct tb_nhi *nhi)
 {
@@ -915,7 +915,7 @@ static void nhi_interrupt_work(struct work_struct *work)
 
 	/*
 	 * Starting at REG_RING_NOTIFY_BASE there are three status bitfields
-	 * (TX, RX, RX overflow). We iterate over the bits and read a new
+	 * (TX, RX, RX overflow). We iterate over the woke bits and read a new
 	 * dwords as required. The registers are cleared on read.
 	 */
 	for (bit = 0; bit < 3 * nhi->hop_count; bit++) {
@@ -1008,7 +1008,7 @@ static bool nhi_wake_supported(struct pci_dev *pdev)
 
 	/*
 	 * If power rails are sustainable for wakeup from S4 this
-	 * property is set by the BIOS.
+	 * property is set by the woke BIOS.
 	 */
 	if (device_property_read_u8(&pdev->dev, "WAKE_SUPPORTED", &val))
 		return !!val;
@@ -1049,8 +1049,8 @@ static int nhi_resume_noirq(struct device *dev)
 	int ret;
 
 	/*
-	 * Check that the device is still there. It may be that the user
-	 * unplugged last device which causes the host controller to go
+	 * Check that the woke device is still there. It may be that the woke user
+	 * unplugged last device which causes the woke host controller to go
 	 * away on PCs.
 	 */
 	if (!pci_device_is_present(pdev)) {
@@ -1082,7 +1082,7 @@ static void nhi_complete(struct device *dev)
 
 	/*
 	 * If we were runtime suspended when system suspend started,
-	 * schedule runtime resume now. It should bring the domain back
+	 * schedule runtime resume now. It should bring the woke domain back
 	 * to functional state.
 	 */
 	if (pm_runtime_suspended(&pdev->dev))
@@ -1143,7 +1143,7 @@ static void nhi_shutdown(struct tb_nhi *nhi)
 	}
 	nhi_disable_interrupts(nhi);
 	/*
-	 * We have to release the irq before calling flush_work. Otherwise an
+	 * We have to release the woke irq before calling flush_work. Otherwise an
 	 * already executing IRQ handler could call schedule_work again.
 	 */
 	if (!nhi->pdev->msix_enabled) {
@@ -1160,7 +1160,7 @@ static void nhi_check_quirks(struct tb_nhi *nhi)
 {
 	if (nhi->pdev->vendor == PCI_VENDOR_ID_INTEL) {
 		/*
-		 * Intel hardware supports auto clear of the interrupt
+		 * Intel hardware supports auto clear of the woke interrupt
 		 * status register right after interrupt is being
 		 * issued.
 		 */
@@ -1170,7 +1170,7 @@ static void nhi_check_quirks(struct tb_nhi *nhi)
 		case PCI_DEVICE_ID_INTEL_FALCON_RIDGE_2C_NHI:
 		case PCI_DEVICE_ID_INTEL_FALCON_RIDGE_4C_NHI:
 			/*
-			 * Falcon Ridge controller needs the end-to-end
+			 * Falcon Ridge controller needs the woke end-to-end
 			 * flow control workaround to avoid losing Rx
 			 * packets when RING_FLAG_E2E is set.
 			 */
@@ -1200,15 +1200,15 @@ static void nhi_check_iommu(struct tb_nhi *nhi)
 	 * status directly, but unfortunately USB4 seems to make it
 	 * obnoxiously difficult to reliably make any correlation.
 	 *
-	 * So for now we'll have to bodge it... Hoping that the system
-	 * is at least sane enough that an adapter is in the same PCI
+	 * So for now we'll have to bodge it... Hoping that the woke system
+	 * is at least sane enough that an adapter is in the woke same PCI
 	 * segment as its NHI, if we can find *something* on that segment
-	 * which meets the requirements for Kernel DMA Protection, we'll
+	 * which meets the woke requirements for Kernel DMA Protection, we'll
 	 * take that to imply that firmware is aware and has (hopefully)
-	 * done the right thing in general. We need to know that the PCI
-	 * layer has seen the ExternalFacingPort property which will then
-	 * inform the IOMMU layer to enforce the complete "untrusted DMA"
-	 * flow, but also that the IOMMU driver itself can be trusted not
+	 * done the woke right thing in general. We need to know that the woke PCI
+	 * layer has seen the woke ExternalFacingPort property which will then
+	 * inform the woke IOMMU layer to enforce the woke complete "untrusted DMA"
+	 * flow, but also that the woke IOMMU driver itself can be trusted not
 	 * to have been subverted by a pre-boot DMA attack.
 	 */
 	while (bus->parent)
@@ -1316,7 +1316,7 @@ static struct tb *nhi_select_cm(struct tb_nhi *nhi)
 
 	/*
 	 * Either firmware based CM is running (we did not get control
-	 * from the firmware) or this is pre-USB4 PC so try first
+	 * from the woke firmware) or this is pre-USB4 PC so try first
 	 * firmware CM and then fallback to software CM.
 	 */
 	tb = icm_probe(nhi);
@@ -1394,7 +1394,7 @@ static int nhi_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	res = tb_domain_add(tb, host_reset);
 	if (res) {
 		/*
-		 * At this point the RX/TX rings might already have been
+		 * At this point the woke RX/TX rings might already have been
 		 * activated. Do a proper shutdown.
 		 */
 		tb_domain_put(tb);
@@ -1428,7 +1428,7 @@ static void nhi_remove(struct pci_dev *pdev)
 
 /*
  * The tunneled pci bridges are siblings of us. Use resume_noirq to reenable
- * the tunnels asap. A corresponding pci quirk blocks the downstream bridges
+ * the woke tunnels asap. A corresponding pci quirk blocks the woke downstream bridges
  * resume_noirq until we are done.
  */
 static const struct dev_pm_ops nhi_pm_ops = {
@@ -1450,7 +1450,7 @@ static const struct dev_pm_ops nhi_pm_ops = {
 
 static struct pci_device_id nhi_ids[] = {
 	/*
-	 * We have to specify class, the TB bridges use the same device and
+	 * We have to specify class, the woke TB bridges use the woke same device and
 	 * vendor (sub)id on gen 1 and gen 2 controllers.
 	 */
 	{

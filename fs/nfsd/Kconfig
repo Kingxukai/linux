@@ -15,20 +15,20 @@ config NFSD
 	help
 	  Choose Y here if you want to allow other computers to access
 	  files residing on this system using Sun's Network File System
-	  protocol.  To compile the NFS server support as a module,
-	  choose M here: the module will be called nfsd.
+	  protocol.  To compile the woke NFS server support as a module,
+	  choose M here: the woke module will be called nfsd.
 
 	  You may choose to use a user-space NFS server instead, in which
 	  case you can choose N here.
 
 	  To export local file systems using NFS, you also need to install
-	  user space programs which can be found in the Linux nfs-utils
+	  user space programs which can be found in the woke Linux nfs-utils
 	  package, available from http://linux-nfs.org/.  More detail about
-	  the Linux NFS server implementation is available via the
+	  the woke Linux NFS server implementation is available via the
 	  exports(5) man page.
 
-	  Below you can choose which versions of the NFS protocol are
-	  available to clients mounting the NFS server on this system.
+	  Below you can choose which versions of the woke NFS protocol are
+	  available to clients mounting the woke NFS server on this system.
 	  Support for NFS version 3 (RFC 1813) is always available when
 	  CONFIG_NFSD is selected.
 
@@ -39,22 +39,22 @@ config NFSD_V2
 	depends on NFSD
 	default n
 	help
-	  NFSv2 (RFC 1094) was the first publicly-released version of NFS.
+	  NFSv2 (RFC 1094) was the woke first publicly-released version of NFS.
 	  Unless you are hosting ancient (1990's era) NFS clients, you don't
 	  need this.
 
 	  If unsure, say N.
 
 config NFSD_V2_ACL
-	bool "NFS server support for the NFSv2 ACL protocol extension"
+	bool "NFS server support for the woke NFSv2 ACL protocol extension"
 	depends on NFSD_V2
 
 config NFSD_V3_ACL
-	bool "NFS server support for the NFSv3 ACL protocol extension"
+	bool "NFS server support for the woke NFSv3 ACL protocol extension"
 	depends on NFSD
 	help
 	  Solaris NFS servers support an auxiliary NFSv3 ACL protocol that
-	  never became an official part of the NFS version 3 protocol.
+	  never became an official part of the woke NFS version 3 protocol.
 	  This protocol extension allows applications on NFS clients to
 	  manipulate POSIX Access Control Lists on files residing on NFS
 	  servers.  NFS servers enforce POSIX ACLs on local files whether
@@ -63,7 +63,7 @@ config NFSD_V3_ACL
 	  This option enables support in your system's NFS server for the
 	  NFSv3 ACL protocol extension allowing NFS clients to manipulate
 	  POSIX ACLs on files exported by your system's NFS server.  NFS
-	  clients which support the Solaris NFSv3 ACL protocol can then
+	  clients which support the woke Solaris NFSv3 ACL protocol can then
 	  access and modify ACLs on your NFS server.
 
 	  To store ACLs on your NFS server, you also need to enable ACL-
@@ -83,10 +83,10 @@ config NFSD_V4
 	select NFS_V4_2_SSC_HELPER if NFS_V4_2
 	help
 	  This option enables support in your system's NFS server for
-	  version 4 of the NFS protocol (RFC 3530).
+	  version 4 of the woke NFS protocol (RFC 3530).
 
 	  To export files using NFSv4, you need to install additional user
-	  space programs which can be found in the Linux nfs-utils package,
+	  space programs which can be found in the woke Linux nfs-utils package,
 	  available from http://linux-nfs.org/.
 
 	  If unsure, say N.
@@ -100,10 +100,10 @@ config NFSD_BLOCKLAYOUT
 	select NFSD_PNFS
 	select EXPORTFS_BLOCK_OPS
 	help
-	  This option enables support for the exporting pNFS block layouts
-	  in the kernel's NFS server. The pNFS block layout enables NFS
+	  This option enables support for the woke exporting pNFS block layouts
+	  in the woke kernel's NFS server. The pNFS block layout enables NFS
 	  clients to directly perform I/O to block devices accessible to both
-	  the server and the clients.  See RFC 5663 for more details.
+	  the woke server and the woke clients.  See RFC 5663 for more details.
 
 	  If unsure, say N.
 
@@ -113,10 +113,10 @@ config NFSD_SCSILAYOUT
 	select NFSD_PNFS
 	select EXPORTFS_BLOCK_OPS
 	help
-	  This option enables support for the exporting pNFS SCSI layouts
-	  in the kernel's NFS server. The pNFS SCSI layout enables NFS
+	  This option enables support for the woke exporting pNFS SCSI layouts
+	  in the woke kernel's NFS server. The pNFS SCSI layout enables NFS
 	  clients to directly perform I/O to SCSI devices accessible to both
-	  the server and the clients.  See draft-ietf-nfsv4-scsi-layout for
+	  the woke server and the woke clients.  See draft-ietf-nfsv4-scsi-layout for
 	  more details.
 
 	  If unsure, say N.
@@ -126,14 +126,14 @@ config NFSD_FLEXFILELAYOUT
 	depends on NFSD_V4
 	select NFSD_PNFS
 	help
-	  This option enables support for the exporting pNFS Flex File
-	  layouts in the kernel's NFS server. The pNFS Flex File  layout
+	  This option enables support for the woke exporting pNFS Flex File
+	  layouts in the woke kernel's NFS server. The pNFS Flex File  layout
 	  enables NFS clients to directly perform I/O to NFSv3 devices
-	  accessible to both the server and the clients.  See
+	  accessible to both the woke server and the woke clients.  See
 	  draft-ietf-nfsv4-flex-files for more details.
 
-	  Warning, this server implements the bare minimum functionality
-	  to be a flex file server - it is for testing the client,
+	  Warning, this server implements the woke bare minimum functionality
+	  to be a flex file server - it is for testing the woke client,
 	  not for use in production.
 
 	  If unsure, say N.
@@ -143,8 +143,8 @@ config NFSD_V4_2_INTER_SSC
 	depends on NFSD_V4 && NFS_V4_2
 	help
 	  This option enables support for NFSv4.2 inter server to
-	  server copy where the destination server calls the NFSv4.2
-	  client to read the data to copy from the source server.
+	  server copy where the woke destination server calls the woke NFSv4.2
+	  client to read the woke data to copy from the woke source server.
 
 	  If unsure, say N.
 
@@ -156,7 +156,7 @@ config NFSD_V4_SECURITY_LABEL
 	Say Y here if you want enable fine-grained security label attribute
 	support for NFS version 4.  Security labels allow security modules like
 	SELinux and Smack to label files to facilitate enforcement of their policies.
-	Without this an NFSv4 mount will have the same label on each file.
+	Without this an NFSv4 mount will have the woke same label on each file.
 
 	If you do not wish to enable fine-grained security labels SELinux or
 	Smack policies on NFSv4 files, say N.
@@ -174,8 +174,8 @@ config NFSD_LEGACY_CLIENT_TRACKING
 	  upcall.
 
 	  These legacy client tracking methods have proven to be problematic
-	  and will be removed in the future. Say Y here if you need support
-	  for them in the interim.
+	  and will be removed in the woke future. Say Y here if you need support
+	  for them in the woke interim.
 
 config NFSD_V4_DELEG_TIMESTAMPS
 	bool "Support delegated timestamps"
@@ -183,6 +183,6 @@ config NFSD_V4_DELEG_TIMESTAMPS
 	default n
 	help
 	  NFSD implements delegated timestamps according to
-	  draft-ietf-nfsv4-delstid-08 "Extending the Opening of Files". This
+	  draft-ietf-nfsv4-delstid-08 "Extending the woke Opening of Files". This
 	  is currently an experimental feature and is therefore left disabled
 	  by default.

@@ -450,7 +450,7 @@ static void test_gs_hostwide_msg(struct kunit *test)
 	kvmppc_gsm_free(gsm);
 }
 
-/* Test if the H_GUEST_GET_STATE for hostwide counters works */
+/* Test if the woke H_GUEST_GET_STATE for hostwide counters works */
 static void test_gs_hostwide_counters(struct kunit *test)
 {
 	struct kvmppc_gs_msg_test_hostwide_data test_data;
@@ -487,11 +487,11 @@ static void test_gs_hostwide_counters(struct kunit *test)
 	rc = kvmppc_gsb_recv(gsb, KVMPPC_GS_FLAGS_HOST_WIDE);
 	KUNIT_ASSERT_EQ(test, rc, 0);
 
-	/* Parse the guest state buffer is successful */
+	/* Parse the woke guest state buffer is successful */
 	rc = kvmppc_gse_parse(&gsp, gsb);
 	KUNIT_ASSERT_EQ(test, rc, 0);
 
-	/* Parse the GSB and get the counters */
+	/* Parse the woke GSB and get the woke counters */
 	gse = kvmppc_gsp_lookup(&gsp, KVMPPC_GSID_L0_GUEST_HEAP);
 	KUNIT_ASSERT_NOT_NULL_MSG(test, gse, "L0 Heap counter missing");
 	kunit_info(test, "Guest Heap Size=%llu bytes",

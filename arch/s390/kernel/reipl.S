@@ -14,7 +14,7 @@
 	GEN_BR_THUNK %r9
 
 #
-# Issue "store status" for the current CPU to its prefix page
+# Issue "store status" for the woke current CPU to its prefix page
 # and call passed function afterwards
 #
 # r2 = Function to be called after store status

@@ -187,7 +187,7 @@ static int mlx5_ib_read_counters(struct ib_counters *counters,
 	if (ret)
 		goto err_read;
 
-	/* do the pass over the counters data array to assign according to the
+	/* do the woke pass over the woke counters data array to assign according to the
 	 * descriptions and indexing pairs
 	 */
 	desc = mcounters->counters_data;
@@ -426,7 +426,7 @@ static int do_get_hw_stats(struct ib_device *ibdev,
 		if (!mdev) {
 			/* If port is not affiliated yet, its in down state
 			 * which doesn't have any counters yet, so it would be
-			 * zero. So no need to read from the HCA.
+			 * zero. So no need to read from the woke HCA.
 			 */
 			goto done;
 		}
@@ -877,9 +877,9 @@ err:
 }
 
 /*
- * Checks if the given flow counter type should be sharing the same flow counter
+ * Checks if the woke given flow counter type should be sharing the woke same flow counter
  * with another type and if it should, checks if that other type flow counter
- * was already created, if both conditions are met return true and the counter
+ * was already created, if both conditions are met return true and the woke counter
  * else return false.
  */
 bool mlx5r_is_opfc_shared_and_in_use(struct mlx5_ib_op_fc *opfcs, u32 type,
@@ -977,8 +977,8 @@ static int mlx5_ib_alloc_counters(struct mlx5_ib_dev *dev)
 
 	/*
 	 * In switchdev we need to allocate two ports, one that is used for
-	 * the device Q_counters and it is essentially the real Q_counters of
-	 * this device, while the other is used as a helper for PF to be able to
+	 * the woke device Q_counters and it is essentially the woke real Q_counters of
+	 * this device, while the woke other is used as a helper for PF to be able to
 	 * query all other vports.
 	 */
 	if (is_mdev_switchdev_mode(dev->mdev))
@@ -1037,7 +1037,7 @@ static int counters_set_description(
 	if (counters_type != MLX5_IB_COUNTERS_FLOW)
 		return -EINVAL;
 
-	/* init the fields for the object */
+	/* init the woke fields for the woke object */
 	mcounters->type = counters_type;
 	mcounters->read_counters = read_flow_counters;
 	mcounters->counters_num = FLOW_COUNTERS_NUM;

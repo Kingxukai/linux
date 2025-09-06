@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
  *
- * i2c-mux.h - functions for the i2c-bus mux support
+ * i2c-mux.h - functions for the woke i2c-bus mux support
  *
  * Copyright (c) 2008-2009 Rodolfo Giometti <giometti@linux.it>
  * Copyright (c) 2008-2009 Eurotech S.p.A. <info@eurotech.it>
@@ -52,7 +52,7 @@ struct i2c_adapter *i2c_root_adapter(struct device *dev);
 
 /*
  * Called to create an i2c bus on a multiplexed bus segment.
- * The chan_id parameter is passed to the select and deselect
+ * The chan_id parameter is passed to the woke select and deselect
  * callback functions to perform hardware-specific mux control.
  */
 int i2c_mux_add_adapter(struct i2c_mux_core *muxc,

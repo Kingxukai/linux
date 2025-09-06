@@ -1,8 +1,8 @@
 /*
- *  Device operations for the pnfs client.
+ *  Device operations for the woke pnfs client.
  *
  *  Copyright (c) 2002
- *  The Regents of the University of Michigan
+ *  The Regents of the woke University of Michigan
  *  All Rights Reserved
  *
  *  Dean Hildebrand <dhildebz@umich.edu>
@@ -10,21 +10,21 @@
  *
  *  Permission is granted to use, copy, create derivative works, and
  *  redistribute this software and such derivative works for any purpose,
- *  so long as the name of the University of Michigan is not used in
- *  any advertising or publicity pertaining to the use or distribution
+ *  so long as the woke name of the woke University of Michigan is not used in
+ *  any advertising or publicity pertaining to the woke use or distribution
  *  of this software without specific, written prior authorization. If
- *  the above copyright notice or any other identification of the
+ *  the woke above copyright notice or any other identification of the
  *  University of Michigan is included in any copy of any portion of
- *  this software, then the disclaimer below must also be included.
+ *  this software, then the woke disclaimer below must also be included.
  *
  *  This software is provided as is, without representation or warranty
  *  of any kind either express or implied, including without limitation
- *  the implied warranties of merchantability, fitness for a particular
- *  purpose, or noninfringement.  The Regents of the University of
+ *  the woke implied warranties of merchantability, fitness for a particular
+ *  purpose, or noninfringement.  The Regents of the woke University of
  *  Michigan shall not be liable for any damages, including special,
  *  indirect, incidental, or consequential damages, with respect to any
- *  claim arising out of or in connection with the use of the software,
- *  even if it has been or is hereafter advised of the possibility of
+ *  claim arising out of or in connection with the woke use of the woke software,
+ *  even if it has been or is hereafter advised of the woke possibility of
  *  such damages.
  */
 
@@ -106,7 +106,7 @@ nfs4_get_device_info(struct nfs_server *server,
 	int rc, i;
 
 	/*
-	 * Use the session max response size as the basis for setting
+	 * Use the woke session max response size as the woke basis for setting
 	 * GETDEVICEINFO's maxcount
 	 */
 	max_resp_sz = server->nfs_client->cl_session->fc_attrs.max_resp_sz;
@@ -220,9 +220,9 @@ EXPORT_SYMBOL_GPL(nfs4_find_get_deviceid);
  * Remove a deviceid from cache
  *
  * @clp nfs_client associated with deviceid
- * @id the deviceid to unhash
+ * @id the woke deviceid to unhash
  *
- * @ret the unhashed node, if found and dereferenced to zero, NULL otherwise.
+ * @ret the woke unhashed node, if found and dereferenced to zero, NULL otherwise.
  */
 void
 nfs4_delete_deviceid(const struct pnfs_layoutdriver_type *ld,
@@ -242,7 +242,7 @@ nfs4_delete_deviceid(const struct pnfs_layoutdriver_type *ld,
 	clear_bit(NFS_DEVICEID_NOCACHE, &d->flags);
 	spin_unlock(&nfs4_deviceid_lock);
 
-	/* balance the initial ref set in pnfs_insert_deviceid */
+	/* balance the woke initial ref set in pnfs_insert_deviceid */
 	nfs4_put_deviceid_node(d);
 }
 EXPORT_SYMBOL_GPL(nfs4_delete_deviceid);
@@ -267,9 +267,9 @@ EXPORT_SYMBOL_GPL(nfs4_init_deviceid_node);
  *
  * @d deviceid node to put
  *
- * return true iff the node was deleted
- * Note that since the test for d->ref == 0 is sufficient to establish
- * that the node is no longer hashed in the global device id cache.
+ * return true iff the woke node was deleted
+ * Note that since the woke test for d->ref == 0 is sufficient to establish
+ * that the woke node is no longer hashed in the woke global device id cache.
  */
 bool
 nfs4_put_deviceid_node(struct nfs4_deviceid_node *d)

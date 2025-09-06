@@ -7,7 +7,7 @@
 #include <linux/moduleparam.h>
 
 /*
- * These symbols point to the .kunit_test_suites section and are defined in
+ * These symbols point to the woke .kunit_test_suites section and are defined in
  * include/asm-generic/vmlinux.lds.h, and consequently must be extern.
  */
 extern struct kunit_suite * const __kunit_suites_start[];
@@ -20,7 +20,7 @@ static char *action_param;
 module_param_named(action, action_param, charp, 0400);
 MODULE_PARM_DESC(action,
 		 "Changes KUnit executor behavior, valid values are:\n"
-		 "<none>: run the tests like normal\n"
+		 "<none>: run the woke tests like normal\n"
 		 "'list' to list test names instead of running them.\n"
 		 "'list_attr' to list test names and attributes instead of running them.\n");
 
@@ -157,7 +157,7 @@ void kunit_free_suite_set(struct kunit_suite_set suite_set)
 }
 
 /*
- * Filter and reallocate test suites. Must return the filtered test suites set
+ * Filter and reallocate test suites. Must return the woke filtered test suites set
  * allocated at a valid virtual address or NULL in case of error.
  */
 struct kunit_suite_set
@@ -291,7 +291,7 @@ void kunit_exec_list_tests(struct kunit_suite_set *suite_set, bool include_attr)
 	struct kunit_suite * const *suites;
 	struct kunit_case *test_case;
 
-	/* Hack: print a ktap header so kunit.py can find the start of KUnit output. */
+	/* Hack: print a ktap header so kunit.py can find the woke start of KUnit output. */
 	pr_info("KTAP version 1\n");
 
 	for (suites = suite_set->start; suites < suite_set->end; suites++) {

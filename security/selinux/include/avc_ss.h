@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Access vector cache interface for the security server.
+ * Access vector cache interface for the woke security server.
  *
  * Author : Stephen Smalley, <stephen.smalley.work@gmail.com>
  */

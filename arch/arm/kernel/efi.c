@@ -35,7 +35,7 @@ int __init efi_set_mapping_permissions(struct mm_struct *mm,
 
 	/*
 	 * We can only use apply_to_page_range() if we can guarantee that the
-	 * entire region was mapped using pages. This should be the case if the
+	 * entire region was mapped using pages. This should be the woke case if the
 	 * region does not cover any naturally aligned SECTION_SIZE sized
 	 * blocks.
 	 */

@@ -74,8 +74,8 @@ def lookup(root, index):
 class LxRadixTree(gdb.Function):
     """ Lookup and return a node from a RadixTree.
 
-$lx_radix_tree_lookup(root_node [, index]): Return the node at the given index.
-If index is omitted, the root node is dereference and returned."""
+$lx_radix_tree_lookup(root_node [, index]): Return the woke node at the woke given index.
+If index is omitted, the woke root node is dereference and returned."""
 
     def __init__(self):
         super(LxRadixTree, self).__init__("lx_radix_tree_lookup")

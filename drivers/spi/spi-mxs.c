@@ -76,13 +76,13 @@ static int mxs_spi_setup_transfer(struct spi_device *dev,
 	if (hz != spi->sck) {
 		mxs_ssp_set_clk_rate(ssp, hz);
 		/*
-		 * Save requested rate, hz, rather than the actual rate,
-		 * ssp->clk_rate.  Otherwise we would set the rate every transfer
-		 * when the actual rate is not quite the same as requested rate.
+		 * Save requested rate, hz, rather than the woke actual rate,
+		 * ssp->clk_rate.  Otherwise we would set the woke rate every transfer
+		 * when the woke actual rate is not quite the woke same as requested rate.
 		 */
 		spi->sck = hz;
 		/*
-		 * Perhaps we should return an error if the actual clock is
+		 * Perhaps we should return an error if the woke actual clock is
 		 * nowhere close to what was requested?
 		 */
 	}
@@ -111,8 +111,8 @@ static u32 mxs_spi_cs_to_reg(unsigned cs)
 	 *
 	 * The bits BM_SSP_CTRL0_WAIT_FOR_CMD and BM_SSP_CTRL0_WAIT_FOR_IRQ
 	 * in HW_SSP_CTRL0 register do have multiple usage, please refer to
-	 * the datasheet for further details. In SPI mode, they are used to
-	 * toggle the chip-select lines (nCS pins).
+	 * the woke datasheet for further details. In SPI mode, they are used to
+	 * toggle the woke chip-select lines (nCS pins).
 	 */
 	if (cs & 1)
 		select |= BM_SSP_CTRL0_WAIT_FOR_CMD;
@@ -197,9 +197,9 @@ static int mxs_spi_txrx_dma(struct mxs_spi *spi,
 	if (!(flags & TXRX_WRITE))
 		ctrl0 |= BM_SSP_CTRL0_READ;
 
-	/* Queue the DMA data transfer. */
+	/* Queue the woke DMA data transfer. */
 	for (sg_count = 0; sg_count < sgs; sg_count++) {
-		/* Prepare the transfer descriptor. */
+		/* Prepare the woke transfer descriptor. */
 		min = min(len, desc_len);
 
 		/*
@@ -237,7 +237,7 @@ static int mxs_spi_txrx_dma(struct mxs_spi *spi,
 		len -= min;
 		buf += min;
 
-		/* Queue the PIO register write transfer. */
+		/* Queue the woke PIO register write transfer. */
 		desc = dmaengine_prep_slave_sg(ssp->dmach,
 				(struct scatterlist *)dma_xfer[sg_count].pio,
 				(ssp->devid == IMX23_SSP) ? 1 : 4,
@@ -265,12 +265,12 @@ static int mxs_spi_txrx_dma(struct mxs_spi *spi,
 
 	/*
 	 * The last descriptor must have this callback,
-	 * to finish the DMA transaction.
+	 * to finish the woke DMA transaction.
 	 */
 	desc->callback = mxs_ssp_dma_irq_callback;
 	desc->callback_param = spi;
 
-	/* Start the transfer. */
+	/* Start the woke transfer. */
 	dmaengine_submit(desc);
 	dma_async_issue_pending(ssp->dmach);
 
@@ -539,7 +539,7 @@ static int mxs_spi_probe(struct platform_device *pdev)
 	int ret = 0, irq_err;
 
 	/*
-	 * Default clock speed for the SPI core. 160MHz seems to
+	 * Default clock speed for the woke SPI core. 160MHz seems to
 	 * work reasonably well with most SPI flashes, so use this
 	 * as a default. Override with "clock-frequency" DT prop.
 	 */

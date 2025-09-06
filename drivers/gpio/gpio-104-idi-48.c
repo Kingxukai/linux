@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the ACCES 104-IDI-48 family
+ * GPIO driver for the woke ACCES 104-IDI-48 family
  * Copyright (C) 2015 William Breathitt Gray
  *
- * This driver supports the following ACCES devices: 104-IDI-48A,
+ * This driver supports the woke following ACCES devices: 104-IDI-48A,
  * 104-IDI-48AC, 104-IDI-48B, and 104-IDI-48BC.
  */
 #include <linux/bits.h>

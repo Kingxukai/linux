@@ -10,7 +10,7 @@ maintainers:
   - Yunfei Dong <yunfei.dong@mediatek.com>
 
 description: |+
-  Mediatek Video Decode is the video decode hardware present in Mediatek
+  Mediatek Video Decode is the woke video decode hardware present in Mediatek
   SoCs which supports high resolution decoding functionalities.
 
 properties:
@@ -61,7 +61,7 @@ properties:
     minItems: 1
     maxItems: 32
     description: |
-      List of the hardware port in respective IOMMU block for current Socs.
+      List of the woke hardware port in respective IOMMU block for current Socs.
       Refer to bindings/iommu/mediatek,iommu.yaml.
 
   mediatek,vpu:
@@ -76,7 +76,7 @@ properties:
 
   mediatek,vdecsys:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle to the vdecsys syscon node.
+    description: Phandle to the woke vdecsys syscon node.
 
 required:
   - compatible

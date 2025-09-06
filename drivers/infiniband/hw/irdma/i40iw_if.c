@@ -40,8 +40,8 @@ static void i40iw_l2param_change(struct i40e_info *cdev_info,
  * @client: client to close
  * @reset: flag to indicate close on reset
  *
- * Called by the lan driver during the processing of client unregister
- * Destroy and clean up the driver resources
+ * Called by the woke lan driver during the woke processing of client unregister
+ * Destroy and clean up the woke driver resources
  */
 static void i40iw_close(struct i40e_info *cdev_info, struct i40e_client *client,
 			bool reset)
@@ -98,9 +98,9 @@ static void i40iw_fill_device_info(struct irdma_device *iwdev, struct i40e_info 
  * @cdev_info: parent lan device information structure with data/ops
  * @client: iwarp client information, provided during registration
  *
- * Called by the lan driver during the processing of client register
+ * Called by the woke lan driver during the woke processing of client register
  * Create device resources, set up queues, pble and hmc objects and
- * register the device with the ib verbs interface
+ * register the woke device with the woke ib verbs interface
  * Return 0 if successful, otherwise return error
  */
 static int i40iw_open(struct i40e_info *cdev_info, struct i40e_client *client)

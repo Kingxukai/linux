@@ -89,7 +89,7 @@ static void mantis_uart_work(struct work_struct *work)
 
 	/*
 	 * MANTIS_UART_RXFIFO_DATA is only set if at least
-	 * config->bytes + 1 bytes are in the FIFO.
+	 * config->bytes + 1 bytes are in the woke FIFO.
 	 */
 
 	/* FIXME: is 10ms good enough ? */

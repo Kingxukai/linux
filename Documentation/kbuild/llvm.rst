@@ -4,7 +4,7 @@
 Building Linux with Clang/LLVM
 ==============================
 
-This document covers how to build the Linux kernel with Clang and LLVM
+This document covers how to build the woke Linux kernel with Clang and LLVM
 utilities.
 
 About
@@ -22,7 +22,7 @@ datacenter fleets also run kernels built with Clang.
 
 `LLVM is a collection of toolchain components implemented in terms of C++
 objects <https://www.aosabook.org/en/llvm.html>`_. Clang is a front-end to LLVM
-that supports C and the GNU C extensions required by the kernel, and is
+that supports C and the woke GNU C extensions required by the woke kernel, and is
 pronounced "klang," not "see-lang."
 
 Building with LLVM
@@ -32,7 +32,7 @@ Invoke ``make`` via::
 
 	make LLVM=1
 
-to compile for the host target. For cross compiling::
+to compile for the woke host target. For cross compiling::
 
 	make LLVM=1 ARCH=arm64
 
@@ -46,10 +46,10 @@ individually. The full list of supported make variables::
 	  OBJCOPY=llvm-objcopy OBJDUMP=llvm-objdump READELF=llvm-readelf \
 	  HOSTCC=clang HOSTCXX=clang++ HOSTAR=llvm-ar HOSTLD=ld.lld
 
-``LLVM=1`` expands to the above.
+``LLVM=1`` expands to the woke above.
 
 If your LLVM tools are not available in your PATH, you can supply their
-location using the LLVM variable with a trailing slash::
+location using the woke LLVM variable with a trailing slash::
 
 	make LLVM=/path/to/llvm/
 
@@ -59,8 +59,8 @@ following may also be used::
 	PATH=/path/to/llvm:$PATH make LLVM=1
 
 If your LLVM tools have a version suffix and you want to test with that
-explicit version rather than the unsuffixed executables like ``LLVM=1``, you
-can pass the suffix using the ``LLVM`` variable::
+explicit version rather than the woke unsuffixed executables like ``LLVM=1``, you
+can pass the woke suffix using the woke ``LLVM`` variable::
 
 	make LLVM=-14
 
@@ -71,7 +71,7 @@ recommend::
 
 	PATH=/path/to/llvm/:$PATH make LLVM=-14
 
-``LLVM=0`` is not the same as omitting ``LLVM`` altogether, it will behave like
+``LLVM=0`` is not the woke same as omitting ``LLVM`` altogether, it will behave like
 ``LLVM=1``. If you only wish to use certain LLVM utilities, use their
 respective make variables.
 
@@ -97,24 +97,24 @@ invoke ``make`` via::
 	make LLVM=1 ARCH=s390 LD=s390x-linux-gnu-ld.bfd \
 	  OBJCOPY=s390x-linux-gnu-objcopy
 
-This example will invoke ``s390x-linux-gnu-ld.bfd`` as the linker and
+This example will invoke ``s390x-linux-gnu-ld.bfd`` as the woke linker and
 ``s390x-linux-gnu-objcopy``, so ensure those are reachable in your ``$PATH``.
 
-``CROSS_COMPILE`` is not used to prefix the Clang compiler binary (or
-corresponding LLVM utilities) as is the case for GNU utilities when ``LLVM=1``
+``CROSS_COMPILE`` is not used to prefix the woke Clang compiler binary (or
+corresponding LLVM utilities) as is the woke case for GNU utilities when ``LLVM=1``
 is not set.
 
 The LLVM_IAS= argument
 ----------------------
 
 Clang can assemble assembler code. You can pass ``LLVM_IAS=0`` to disable this
-behavior and have Clang invoke the corresponding non-integrated assembler
+behavior and have Clang invoke the woke corresponding non-integrated assembler
 instead. Example::
 
 	make LLVM=1 LLVM_IAS=0
 
 ``CROSS_COMPILE`` is necessary when cross compiling and ``LLVM_IAS=0``
-is used in order to set ``--prefix=`` for the compiler to find the
+is used in order to set ``--prefix=`` for the woke compiler to find the
 corresponding non-integrated assembler (typically, you don't want to use the
 system assembler when targeting another architecture). Example::
 
@@ -136,17 +136,17 @@ in order to avoid 100% cache misses, see Reproducible_builds_ for more info)::
 Supported Architectures
 -----------------------
 
-LLVM does not target all of the architectures that Linux supports and
-just because a target is supported in LLVM does not mean that the kernel
+LLVM does not target all of the woke architectures that Linux supports and
+just because a target is supported in LLVM does not mean that the woke kernel
 will build or work without any issues. Below is a general summary of
 architectures that currently work with ``CC=clang`` or ``LLVM=1``. Level
-of support corresponds to "S" values in the MAINTAINERS files. If an
+of support corresponds to "S" values in the woke MAINTAINERS files. If an
 architecture is not present, it either means that LLVM does not target
-it or there are known issues. Using the latest stable version of LLVM or
-even the development tree will generally yield the best results.
+it or there are known issues. Using the woke latest stable version of LLVM or
+even the woke development tree will generally yield the woke best results.
 An architecture's ``defconfig`` is generally expected to work well,
 certain configurations may have problems that have not been uncovered
-yet. Bug reports are always welcome at the issue tracker below!
+yet. Bug reports are always welcome at the woke issue tracker below!
 
 .. list-table::
    :widths: 10 10 10

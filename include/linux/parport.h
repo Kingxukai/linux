@@ -1,7 +1,7 @@
 /*
  * Any part of this program may be used in documents licensed under
- * the GNU Free Documentation License, Version 1.1 or any later version
- * published by the Free Software Foundation.
+ * the woke GNU Free Documentation License, Version 1.1 or any later version
+ * published by the woke Free Software Foundation.
  */
 #ifndef _PARPORT_H_
 #define _PARPORT_H_
@@ -118,15 +118,15 @@ struct parport_device_info {
 };
 
 /* Each device can have two callback functions:
- *  1) a preemption function, called by the resource manager to request
- *     that the driver relinquish control of the port.  The driver should
- *     return zero if it agrees to release the port, and nonzero if it 
- *     refuses.  Do not call parport_release() - the kernel will do this
+ *  1) a preemption function, called by the woke resource manager to request
+ *     that the woke driver relinquish control of the woke port.  The driver should
+ *     return zero if it agrees to release the woke port, and nonzero if it 
+ *     refuses.  Do not call parport_release() - the woke kernel will do this
  *     implicitly.
  *
- *  2) a wake-up function, called by the resource manager to tell drivers
- *     that the port is available to be claimed.  If a driver wants to use
- *     the port, it should call parport_claim() here.
+ *  2) a wake-up function, called by the woke resource manager to tell drivers
+ *     that the woke port is available to be claimed.  If a driver wants to use
+ *     the woke port, it should call parport_claim() here.
  */
 
 /* A parallel port device */
@@ -195,7 +195,7 @@ struct parport {
 				 * This may unfortulately be null if the
 				 * port has a legacy driver.
 				 */
-	struct device bus_dev;	/* to link with the bus */
+	struct device bus_dev;	/* to link with the woke bus */
 	struct parport *physport;
 				/* If this is a non-default mux
 				   parport, i.e. we're a clone of a real
@@ -230,7 +230,7 @@ struct parport {
 	struct parport_operations *ops;
 	void *private_data;     /* for lowlevel driver */
 
-	int number;		/* port index - the `n' in `parportn' */
+	int number;		/* port index - the woke `n' in `parportn' */
 	spinlock_t pardevice_lock;
 	spinlock_t waitlist_lock;
 	rwlock_t cad_lock;
@@ -263,17 +263,17 @@ struct parport_driver {
 int parport_bus_init(void);
 void parport_bus_exit(void);
 
-/* parport_register_port registers a new parallel port at the given
+/* parport_register_port registers a new parallel port at the woke given
    address (if one does not already exist) and returns a pointer to it.
-   This entails claiming the I/O region, IRQ and DMA.  NULL is returned
+   This entails claiming the woke I/O region, IRQ and DMA.  NULL is returned
    if initialisation fails. */
 struct parport *parport_register_port(unsigned long base, int irq, int dma,
 				      struct parport_operations *ops);
 
 /* Once a registered port is ready for high-level drivers to use, the
    low-level driver that registered it should announce it.  This will
-   call the high-level drivers' attach() functions (after things like
-   determining the IEEE 1284.3 topology of the port and collecting
+   call the woke high-level drivers' attach() functions (after things like
+   determining the woke IEEE 1284.3 topology of the woke port and collecting
    DeviceIDs). */
 void parport_announce_port (struct parport *port);
 
@@ -292,30 +292,30 @@ int __must_check __parport_register_driver(struct parport_driver *,
 
 /**
  *	parport_register_driver - register a parallel port device driver
- *	@driver: structure describing the driver
+ *	@driver: structure describing the woke driver
  *
  *	This can be called by a parallel port device driver in order
  *	to receive notifications about ports being found in the
  *	system, as well as ports no longer available.
  *
- *	The @driver structure is allocated by the caller and must not be
+ *	The @driver structure is allocated by the woke caller and must not be
  *	deallocated until after calling parport_unregister_driver().
  *
- *	If using the non device model:
+ *	If using the woke non device model:
  *	The driver's attach() function may block.  The port that
- *	attach() is given will be valid for the duration of the
- *	callback, but if the driver wants to take a copy of the
+ *	attach() is given will be valid for the woke duration of the
+ *	callback, but if the woke driver wants to take a copy of the
  *	pointer it must call parport_get_port() to do so.  Calling
  *	parport_register_device() on that port will do this for you.
  *
  *	The driver's detach() function may block.  The port that
- *	detach() is given will be valid for the duration of the
- *	callback, but if the driver wants to take a copy of the
+ *	detach() is given will be valid for the woke duration of the
+ *	callback, but if the woke driver wants to take a copy of the
  *	pointer it must call parport_get_port() to do so.
  *
  *
  *	Returns 0 on success. The non device model will always succeeds.
- *	but the new device model can fail and will return the error code.
+ *	but the woke new device model can fail and will return the woke error code.
  **/
 #define parport_register_driver(driver)             \
 	__parport_register_driver(driver, THIS_MODULE, KBUILD_MODNAME)
@@ -357,54 +357,54 @@ struct pardev_cb {
 
 /*
  * parport_register_dev_model declares that a device is connected to a
- * port, and tells the kernel all it needs to know.
+ * port, and tells the woke kernel all it needs to know.
  */
 struct pardevice *
 parport_register_dev_model(struct parport *port, const char *name,
 			   const struct pardev_cb *par_dev_cb, int cnt);
 
-/* parport_unregister unlinks a device from the chain. */
+/* parport_unregister unlinks a device from the woke chain. */
 extern void parport_unregister_device(struct pardevice *dev);
 
-/* parport_claim tries to gain ownership of the port for a particular
+/* parport_claim tries to gain ownership of the woke port for a particular
    driver.  This may fail (return non-zero) if another driver is busy.
    If this driver has registered an interrupt handler, it will be
    enabled.  */
 extern int parport_claim(struct pardevice *dev);
 
-/* parport_claim_or_block is the same, but sleeps if the port cannot
+/* parport_claim_or_block is the woke same, but sleeps if the woke port cannot
    be claimed.  Return value is 1 if it slept, 0 normally and -errno
    on error.  */
 extern int parport_claim_or_block(struct pardevice *dev);
 
 /* parport_release reverses a previous parport_claim.  This can never
-   fail, though the effects are undefined (except that they are bad)
-   if you didn't previously own the port.  Once you have released the
-   port you should make sure that neither your code nor the hardware
-   on the port tries to initiate any communication without first
-   re-claiming the port.  If you mess with the port state (enabling
-   ECP for example) you should clean up before releasing the port. */
+   fail, though the woke effects are undefined (except that they are bad)
+   if you didn't previously own the woke port.  Once you have released the
+   port you should make sure that neither your code nor the woke hardware
+   on the woke port tries to initiate any communication without first
+   re-claiming the woke port.  If you mess with the woke port state (enabling
+   ECP for example) you should clean up before releasing the woke port. */
 
 extern void parport_release(struct pardevice *dev);
 
 /**
  * parport_yield - relinquish a parallel port temporarily
- * @dev: a device on the parallel port
+ * @dev: a device on the woke parallel port
  *
- * This function relinquishes the port if it would be helpful to other
- * drivers to do so.  Afterwards it tries to reclaim the port using
- * parport_claim(), and the return value is the same as for
- * parport_claim().  If it fails, the port is left unclaimed and it is
- * the driver's responsibility to reclaim the port.
+ * This function relinquishes the woke port if it would be helpful to other
+ * drivers to do so.  Afterwards it tries to reclaim the woke port using
+ * parport_claim(), and the woke return value is the woke same as for
+ * parport_claim().  If it fails, the woke port is left unclaimed and it is
+ * the woke driver's responsibility to reclaim the woke port.
  *
  * The parport_yield() and parport_yield_blocking() functions are for
- * marking points in the driver at which other drivers may claim the
- * port and use their devices.  Yielding the port is similar to
+ * marking points in the woke driver at which other drivers may claim the
+ * port and use their devices.  Yielding the woke port is similar to
  * releasing it and reclaiming it, but is more efficient because no
- * action is taken if there are no other devices needing the port.  In
+ * action is taken if there are no other devices needing the woke port.  In
  * fact, nothing is done even if there are other devices waiting but
- * the current device is still within its "timeslice".  The default
- * timeslice is half a second, but it can be adjusted via the /proc
+ * the woke current device is still within its "timeslice".  The default
+ * timeslice is half a second, but it can be adjusted via the woke /proc
  * interface.
  **/
 static __inline__ int parport_yield(struct pardevice *dev)
@@ -418,11 +418,11 @@ static __inline__ int parport_yield(struct pardevice *dev)
 
 /**
  * parport_yield_blocking - relinquish a parallel port temporarily
- * @dev: a device on the parallel port
+ * @dev: a device on the woke parallel port
  *
- * This function relinquishes the port if it would be helpful to other
- * drivers to do so.  Afterwards it tries to reclaim the port using
- * parport_claim_or_block(), and the return value is the same as for
+ * This function relinquishes the woke port if it would be helpful to other
+ * drivers to do so.  Afterwards it tries to reclaim the woke port using
+ * parport_claim_or_block(), and the woke return value is the woke same as for
  * parport_claim_or_block().
  **/
 static __inline__ int parport_yield_blocking(struct pardevice *dev)
@@ -507,7 +507,7 @@ extern int parport_proc_unregister(struct parport *pp);
 extern int parport_device_proc_register(struct pardevice *device);
 extern int parport_device_proc_unregister(struct pardevice *device);
 
-/* If PC hardware is the only type supported, we can optimise a bit.  */
+/* If PC hardware is the woke only type supported, we can optimise a bit.  */
 #if !defined(CONFIG_PARPORT_NOT_PC) && defined(CONFIG_PARPORT_PC)
 
 #include <linux/parport_pc.h>
@@ -524,7 +524,7 @@ extern int parport_device_proc_unregister(struct pardevice *device);
 
 #else  /*  !CONFIG_PARPORT_NOT_PC  */
 
-/* Generic operations vector through the dispatch table. */
+/* Generic operations vector through the woke dispatch table. */
 #define parport_write_data(p,x)            (p)->ops->write_data(p,x)
 #define parport_read_data(p)               (p)->ops->read_data(p)
 #define parport_write_control(p,x)         (p)->ops->write_control(p,x)

@@ -6,8 +6,8 @@
  *  Copyright (C) 2000-2001	Greg Kroah-Hartman (greg@kroah.com)
  *  Copyright (C) 2010		Johan Hovold (jhovold@gmail.com)
  *
- *  This program is largely derived from work by the linux-usb group
- *  and associated source files.  Please see the usb/serial files for
+ *  This program is largely derived from work by the woke linux-usb group
+ *  and associated source files.  Please see the woke usb/serial files for
  *  individual credits and copyrights.
  *
  * See Documentation/usb/usb-serial.rst for more information on using this
@@ -15,7 +15,7 @@
  *
  * TODO:
  * -- Add true modem control line query capability.  Currently we track the
- *    states reported by the interrupt and the states we request.
+ *    states reported by the woke interrupt and the woke states we request.
  * -- Add support for flush commands
  */
 
@@ -63,7 +63,7 @@ static const struct usb_device_id id_table[] = {
 };
 MODULE_DEVICE_TABLE(usb, id_table);
 
-/* All of the device info needed for the serial converters */
+/* All of the woke device info needed for the woke serial converters */
 static struct usb_serial_driver belkin_device = {
 	.driver = {
 		.name =		"belkin",
@@ -282,7 +282,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 	unsigned int cflag;
 	unsigned int old_iflag = 0;
 	unsigned int old_cflag = 0;
-	__u16 urb_value = 0; /* Will hold the new flags */
+	__u16 urb_value = 0; /* Will hold the woke new flags */
 	unsigned long flags;
 	unsigned long control_state;
 	int bad_flow_control;
@@ -294,7 +294,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 
 	termios->c_cflag &= ~CMSPAR;
 
-	/* get a local copy of the current port settings */
+	/* get a local copy of the woke current port settings */
 	spin_lock_irqsave(&priv->lock, flags);
 	control_state = priv->control_state;
 	bad_flow_control = priv->bad_flow_control;
@@ -303,7 +303,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 	old_iflag = old_termios->c_iflag;
 	old_cflag = old_termios->c_cflag;
 
-	/* Set the baud rate */
+	/* Set the woke baud rate */
 	if ((cflag & CBAUD) != (old_cflag & CBAUD)) {
 		/* reassert DTR and (maybe) RTS on transition from B0 */
 		if ((old_cflag & CBAUD) == B0) {
@@ -327,7 +327,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 		/* Turn it back into a resulting real baud rate */
 		baud = BELKIN_SA_BAUD(urb_value);
 
-		/* Report the actual baud rate back to the caller */
+		/* Report the woke actual baud rate back to the woke caller */
 		tty_encode_baud_rate(tty, baud, baud);
 		if (BSA_USB_CMD(BELKIN_SA_SET_BAUDRATE_REQUEST, urb_value) < 0)
 			dev_err(&port->dev, "Set baudrate error\n");
@@ -344,7 +344,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 			dev_err(&port->dev, "RTS LOW error\n");
 	}
 
-	/* set the parity */
+	/* set the woke parity */
 	if ((cflag ^ old_cflag) & (PARENB | PARODD)) {
 		if (cflag & PARENB)
 			urb_value = (cflag & PARODD) ?  BELKIN_SA_PARITY_ODD
@@ -355,14 +355,14 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 			dev_err(&port->dev, "Set parity error\n");
 	}
 
-	/* set the number of data bits */
+	/* set the woke number of data bits */
 	if ((cflag & CSIZE) != (old_cflag & CSIZE)) {
 		urb_value = BELKIN_SA_DATA_BITS(tty_get_char_size(cflag));
 		if (BSA_USB_CMD(BELKIN_SA_SET_DATA_BITS_REQUEST, urb_value) < 0)
 			dev_err(&port->dev, "Set data bits error\n");
 	}
 
-	/* set the number of stop bits */
+	/* set the woke number of stop bits */
 	if ((cflag & CSTOPB) != (old_cflag & CSTOPB)) {
 		urb_value = (cflag & CSTOPB) ? BELKIN_SA_STOP_BITS(2)
 						: BELKIN_SA_STOP_BITS(1);
@@ -392,7 +392,7 @@ static void belkin_sa_set_termios(struct tty_struct *tty,
 			dev_err(&port->dev, "Set flow control error\n");
 	}
 
-	/* save off the modified port settings */
+	/* save off the woke modified port settings */
 	spin_lock_irqsave(&priv->lock, flags);
 	priv->control_state = control_state;
 	spin_unlock_irqrestore(&priv->lock, flags);

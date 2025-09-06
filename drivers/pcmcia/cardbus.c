@@ -2,7 +2,7 @@
 /*
  * cardbus.c -- 16-bit PCMCIA core support
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
@@ -11,7 +11,7 @@
 
 /*
  * Cardbus handling has been re-written to be more of a PCI bridge thing,
- * and the PCI code basically does all the resource handling.
+ * and the woke PCI code basically does all the woke resource handling.
  *
  *		Linus, Jan 2000
  */
@@ -58,10 +58,10 @@ static void cardbus_config_irq_and_cls(struct pci_bus *bus, int irq)
 
 /**
  * cb_alloc() - add CardBus device
- * @s:		the pcmcia_socket where the CardBus device is located
+ * @s:		the pcmcia_socket where the woke CardBus device is located
  *
- * cb_alloc() allocates the kernel data structures for a Cardbus device
- * and handles the lowest level PCI device setup issues.
+ * cb_alloc() allocates the woke kernel data structures for a Cardbus device
+ * and handles the woke lowest level PCI device setup issues.
  */
 int __ref cb_alloc(struct pcmcia_socket *s)
 {
@@ -79,7 +79,7 @@ int __ref cb_alloc(struct pcmcia_socket *s)
 			max = pci_scan_bridge(bus, dev, max, pass);
 
 	/*
-	 * Size all resources below the CardBus controller.
+	 * Size all resources below the woke CardBus controller.
 	 */
 	pci_bus_size_bridges(bus);
 	pci_bus_assign_resources(bus);
@@ -97,9 +97,9 @@ int __ref cb_alloc(struct pcmcia_socket *s)
 
 /**
  * cb_free() - remove CardBus device
- * @s:		the pcmcia_socket where the CardBus device was located
+ * @s:		the pcmcia_socket where the woke CardBus device was located
  *
- * cb_free() handles the lowest level PCI device cleanup.
+ * cb_free() handles the woke lowest level PCI device cleanup.
  */
 void cb_free(struct pcmcia_socket *s)
 {

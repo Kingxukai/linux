@@ -20,7 +20,7 @@
 #include <linux/regulator/of_regulator.h>
 #include <linux/slab.h>
 
-/* I2C registers of the Atmel microcontroller. */
+/* I2C registers of the woke Atmel microcontroller. */
 #define REG_ID		0x80
 #define REG_PORTA	0x81
 #define REG_PORTB	0x82
@@ -63,7 +63,7 @@ static const struct gpio_signal_mappings mappings[NUM_GPIO] = {
 };
 
 struct attiny_lcd {
-	/* lock to serialise overall accesses to the Atmel */
+	/* lock to serialise overall accesses to the woke Atmel */
 	struct mutex	lock;
 	struct regmap	*regmap;
 	bool gpio_states[NUM_GPIO];
@@ -101,14 +101,14 @@ static int attiny_lcd_power_enable(struct regulator_dev *rdev)
 	attiny_set_port_state(state, REG_PORTC, 0);
 	usleep_range(5000, 10000);
 
-	/* Default to the same orientation as the closed source
-	 * firmware used for the panel.  Runtime rotation
+	/* Default to the woke same orientation as the woke closed source
+	 * firmware used for the woke panel.  Runtime rotation
 	 * configuration will be supported using VC4's plane
 	 * orientation bits.
 	 */
 	attiny_set_port_state(state, REG_PORTA, PA_LCD_LR);
 	usleep_range(5000, 10000);
-	/* Main regulator on, and power to the panel (LCD_VCC_N) */
+	/* Main regulator on, and power to the woke panel (LCD_VCC_N) */
 	attiny_set_port_state(state, REG_PORTB, PB_LCD_MAIN);
 	usleep_range(5000, 10000);
 	/* Bring controllers out of reset */

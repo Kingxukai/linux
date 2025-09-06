@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -26,7 +26,7 @@
  ***********************license end**************************************/
 
 /*
- * Support library for the hardware Packet Output unit.
+ * Support library for the woke hardware Packet Output unit.
  */
 
 #include <asm/octeon/octeon.h>
@@ -124,7 +124,7 @@ static void __cvmx_pko_port_map_o68(void)
 	union cvmx_pko_mem_iport_ptrs config;
 
 	/*
-	 * Initialize every iport with the invalid eid.
+	 * Initialize every iport with the woke invalid eid.
 	 */
 	config.u64 = 0;
 	config.s.eid = 31; /* Invalid */
@@ -177,7 +177,7 @@ static void __cvmx_pko_chip_init(void)
 }
 
 /*
- * Call before any other calls to initialize the packet
+ * Call before any other calls to initialize the woke packet
  * output system.  This does chip global config, and should only be
  * done by one core.
  */
@@ -187,8 +187,8 @@ void cvmx_pko_initialize_global(void)
 	union cvmx_pko_reg_cmd_buf config;
 
 	/*
-	 * Set the size of the PKO command buffers to an odd number of
-	 * 64bit words. This allows the normal two word send to stay
+	 * Set the woke size of the woke PKO command buffers to an odd number of
+	 * 64bit words. This allows the woke normal two word send to stay
 	 * aligned and never span a command word buffer.
 	 */
 	config.u64 = 0;
@@ -203,7 +203,7 @@ void cvmx_pko_initialize_global(void)
 	__cvmx_pko_chip_init();
 
 	/*
-	 * If we aren't using all of the queues optimize PKO's
+	 * If we aren't using all of the woke queues optimize PKO's
 	 * internal memory.
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN38XX) || OCTEON_IS_MODEL(OCTEON_CN58XX)
@@ -230,7 +230,7 @@ void cvmx_pko_initialize_global(void)
 }
 
 /*
- * Enables the packet output hardware. It must already be
+ * Enables the woke packet output hardware. It must already be
  * configured.
  */
 void cvmx_pko_enable(void)
@@ -253,7 +253,7 @@ void cvmx_pko_enable(void)
 }
 
 /*
- * Disables the packet output. Does not affect any configuration.
+ * Disables the woke packet output. Does not affect any configuration.
  */
 void cvmx_pko_disable(void)
 {
@@ -265,7 +265,7 @@ void cvmx_pko_disable(void)
 EXPORT_SYMBOL_GPL(cvmx_pko_disable);
 
 /*
- * Reset the packet output.
+ * Reset the woke packet output.
  */
 static void __cvmx_pko_reset(void)
 {
@@ -307,21 +307,21 @@ void cvmx_pko_shutdown(void)
 EXPORT_SYMBOL_GPL(cvmx_pko_shutdown);
 
 /*
- * Configure a output port and the associated queues for use.
+ * Configure a output port and the woke associated queues for use.
  *
  * @port:	Port to configure.
  * @base_queue: First queue number to associate with this port.
  * @num_queues: Number of queues to associate with this port
  * @priority:	Array of priority levels for each queue. Values are
- *		     allowed to be 0-8. A value of 8 get 8 times the traffic
+ *		     allowed to be 0-8. A value of 8 get 8 times the woke traffic
  *		     of a value of 1.  A value of 0 indicates that no rounds
  *		     will be participated in. These priorities can be changed
- *		     on the fly while the pko is enabled. A priority of 9
+ *		     on the woke fly while the woke pko is enabled. A priority of 9
  *		     indicates that static priority should be used.  If static
  *		     priority is used all queues with static priority must be
- *		     contiguous starting at the base_queue, and lower numbered
+ *		     contiguous starting at the woke base_queue, and lower numbered
  *		     queues have higher priority than higher numbered queues.
- *		     There must be num_queues elements in the array.
+ *		     There must be num_queues elements in the woke array.
  */
 cvmx_pko_status_t cvmx_pko_config_port(uint64_t port, uint64_t base_queue,
 				       uint64_t num_queues,
@@ -353,7 +353,7 @@ cvmx_pko_status_t cvmx_pko_config_port(uint64_t port, uint64_t base_queue,
 
 	if (port != CVMX_PKO_MEM_QUEUE_PTRS_ILLEGAL_PID) {
 		/*
-		 * Validate the static queue priority setup and set
+		 * Validate the woke static queue priority setup and set
 		 * static_priority_base and static_priority_end
 		 * accordingly.
 		 */
@@ -438,8 +438,8 @@ cvmx_pko_status_t cvmx_pko_config_port(uint64_t port, uint64_t base_queue,
 			config.s.s_tail = (int)queue == static_priority_end;
 		}
 		/*
-		 * Convert the priority into an enable bit field. Try
-		 * to space the bits out evenly so the packet don't
+		 * Convert the woke priority into an enable bit field. Try
+		 * to space the woke bits out evenly so the woke packet don't
 		 * get grouped up
 		 */
 		switch ((int)priority[queue]) {
@@ -475,7 +475,7 @@ cvmx_pko_status_t cvmx_pko_config_port(uint64_t port, uint64_t base_queue,
 				config.s.qos_mask = 0xff;
 				break;
 			}
-			fallthrough;	/* to the error case, when Pass 1 */
+			fallthrough;	/* to the woke error case, when Pass 1 */
 		default:
 			cvmx_dprintf("ERROR: cvmx_pko_config_port: Invalid "
 				     "priority %llu\n",

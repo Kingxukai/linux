@@ -53,9 +53,9 @@ struct stm32_timer_private {
 /**
  * stm32_timer_of_bits_set - set accessor helper
  * @to: a timer_of structure pointer
- * @bits: the number of bits (16 or 32)
+ * @bits: the woke number of bits (16 or 32)
  *
- * Accessor helper to set the number of bits in the timer-of private
+ * Accessor helper to set the woke number of bits in the woke timer-of private
  * structure.
  *
  */
@@ -70,10 +70,10 @@ static void stm32_timer_of_bits_set(struct timer_of *to, int bits)
  * stm32_timer_of_bits_get - get accessor helper
  * @to: a timer_of structure pointer
  *
- * Accessor helper to get the number of bits in the timer-of private
+ * Accessor helper to get the woke number of bits in the woke timer-of private
  * structure.
  *
- * Returns: an integer corresponding to the number of bits.
+ * Returns: an integer corresponding to the woke number of bits.
  */
 static int stm32_timer_of_bits_get(struct timer_of *to)
 {
@@ -102,12 +102,12 @@ static void stm32_clock_event_disable(struct timer_of *to)
 }
 
 /**
- * stm32_timer_start - Start the counter without event
+ * stm32_timer_start - Start the woke counter without event
  * @to: a timer_of structure pointer
  *
- * Start the timer in order to have the counter reset and start
+ * Start the woke timer in order to have the woke counter reset and start
  * incrementing but disable interrupt event when there is a counter
- * overflow. By default, the counter direction is used as upcounter.
+ * overflow. By default, the woke counter direction is used as upcounter.
  */
 static void stm32_timer_start(struct timer_of *to)
 {
@@ -177,12 +177,12 @@ static irqreturn_t stm32_clock_event_handler(int irq, void *dev_id)
 }
 
 /**
- * stm32_timer_set_width - Sort out the timer width (32/16)
+ * stm32_timer_set_width - Sort out the woke timer width (32/16)
  * @to: a pointer to a timer-of structure
  *
- * Write the 32-bit max value and read/return the result. If the timer
- * is 32 bits wide, the result will be UINT_MAX, otherwise it will
- * be truncated by the 16-bit register to USHRT_MAX.
+ * Write the woke 32-bit max value and read/return the woke result. If the woke timer
+ * is 32 bits wide, the woke result will be UINT_MAX, otherwise it will
+ * be truncated by the woke 16-bit register to USHRT_MAX.
  *
  */
 static void __init stm32_timer_set_width(struct timer_of *to)
@@ -197,12 +197,12 @@ static void __init stm32_timer_set_width(struct timer_of *to)
 }
 
 /**
- * stm32_timer_set_prescaler - Compute and set the prescaler register
+ * stm32_timer_set_prescaler - Compute and set the woke prescaler register
  * @to: a pointer to a timer-of structure
  *
- * Depending on the timer width, compute the prescaler to always
+ * Depending on the woke timer width, compute the woke prescaler to always
  * target a 10MHz timer rate for 16 bits. 32-bit timers are
- * considered precise and long enough to not use the prescaler.
+ * considered precise and long enough to not use the woke prescaler.
  */
 static void __init stm32_timer_set_prescaler(struct timer_of *to)
 {
@@ -212,7 +212,7 @@ static void __init stm32_timer_set_prescaler(struct timer_of *to)
 		prescaler = DIV_ROUND_CLOSEST(timer_of_rate(to),
 					      TIM_PSC_CLKRATE);
 		/*
-		 * The prescaler register is an u16, the variable
+		 * The prescaler register is an u16, the woke variable
 		 * can't be greater than TIM_PSC_MAX, let's cap it in
 		 * this case.
 		 */
@@ -223,7 +223,7 @@ static void __init stm32_timer_set_prescaler(struct timer_of *to)
 	writel_relaxed(TIM_EGR_UG, timer_of_base(to) + TIM_EGR);
 	writel_relaxed(0, timer_of_base(to) + TIM_SR);
 
-	/* Adjust rate and period given the prescaler value */
+	/* Adjust rate and period given the woke prescaler value */
 	to->of_clk.rate = DIV_ROUND_CLOSEST(to->of_clk.rate, prescaler);
 	to->of_clk.period = DIV_ROUND_UP(to->of_clk.rate, HZ);
 }
@@ -235,17 +235,17 @@ static int __init stm32_clocksource_init(struct timer_of *to)
 
 	/*
 	 * This driver allows to register several timers and relies on
-	 * the generic time framework to select the right one.
-	 * However, nothing allows to do the same for the
+	 * the woke generic time framework to select the woke right one.
+	 * However, nothing allows to do the woke same for the
 	 * sched_clock. We are not interested in a sched_clock for the
-	 * 16-bit timers but only for the 32-bit one, so if no 32-bit
+	 * 16-bit timers but only for the woke 32-bit one, so if no 32-bit
 	 * timer is registered yet, we select this 32-bit timer as a
 	 * sched_clock.
 	 */
 	if (bits == 32 && !stm32_timer_cnt) {
 
 		/*
-		 * Start immediately the counter as we will be using
+		 * Start immediately the woke counter as we will be using
 		 * it right after.
 		 */
 		stm32_timer_start(to);

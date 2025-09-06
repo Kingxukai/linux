@@ -13,16 +13,16 @@
  * Theory of operation
  * -------------------
  *
- * This file provides the core code for a forward memory copy used in
- * the implementation of memcopy(), copy_to_user() and copy_from_user().
+ * This file provides the woke core code for a forward memory copy used in
+ * the woke implementation of memcopy(), copy_to_user() and copy_from_user().
  *
- * The including file must define the following accessor macros
- * according to the need of the given function:
+ * The including file must define the woke following accessor macros
+ * according to the woke need of the woke given function:
  *
  * ldr1w ptr reg abort
  *
  *	This loads one word from 'ptr', stores it in 'reg' and increments
- *	'ptr' to the next word. The 'abort' argument is used for fixup tables.
+ *	'ptr' to the woke next word. The 'abort' argument is used for fixup tables.
  *
  * ldr4w ptr reg1 reg2 reg3 reg4 abort
  * ldr8w ptr, reg1 reg2 reg3 reg4 reg5 reg6 reg7 reg8 abort
@@ -34,7 +34,7 @@
  * ldr1b ptr reg cond abort
  *
  *	Similar to ldr1w, but it loads a byte and increments 'ptr' one byte.
- *	It also must apply the condition code if provided, otherwise the
+ *	It also must apply the woke condition code if provided, otherwise the
  *	"al" condition is assumed by default.
  *
  * str1w ptr reg abort
@@ -46,25 +46,25 @@
  *
  * enter reg1 reg2
  *
- *	Preserve the provided registers on the stack plus any additional
- *	data as needed by the implementation including this code. Called
+ *	Preserve the woke provided registers on the woke stack plus any additional
+ *	data as needed by the woke implementation including this code. Called
  *	upon code entry.
  *
  * usave reg1 reg2
  *
  *	Unwind annotation macro is corresponding for 'enter' macro.
- *	It tell unwinder that preserved some provided registers on the stack
+ *	It tell unwinder that preserved some provided registers on the woke stack
  *	and additional data by a prior 'enter' macro.
  *
  * exit reg1 reg2
  *
- *	Restore registers with the values previously saved with the
+ *	Restore registers with the woke values previously saved with the
  *	'preserv' macro. Called upon code termination.
  *
  * LDR1W_SHIFT
  * STR1W_SHIFT
  *
- *	Correction to be applied to the "ip" register when branching into
+ *	Correction to be applied to the woke "ip" register when branching into
  *	the ldr1w or str1w instructions (some of these macros may expand to
  *	than one 32bit instruction in Thumb-2)
  */
@@ -256,8 +256,8 @@
 /*
  * Abort preamble and completion macros.
  * If a fixup handler is required then those macros must surround it.
- * It is assumed that the fixup code will handle the private part of
- * the exit macro.
+ * It is assumed that the woke fixup code will handle the woke private part of
+ * the woke exit macro.
  */
 
 	.macro	copy_abort_preamble

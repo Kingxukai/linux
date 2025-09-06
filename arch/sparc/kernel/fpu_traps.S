@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-	/* This is trivial with the new code... */
+	/* This is trivial with the woke new code... */
 	.globl		do_fpdis
 	.type		do_fpdis,#function
 do_fpdis:
@@ -210,7 +210,7 @@ do_fpother_check_fitos:
 	or		%g7, %lo(fp_other_bounce - 4), %g7
 
 	/* NOTE: Need to preserve %g7 until we fully commit
-	 *       to the fitos fixup.
+	 *       to the woke fitos fixup.
 	 */
 	stx		%fsr, [%g6 + TI_XFSR]
 	rdpr		%tstate, %g3

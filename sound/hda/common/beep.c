@@ -54,7 +54,7 @@ static void snd_hda_generate_beep(struct work_struct *work)
 /* (non-standard) Linear beep tone calculation for IDT/STAC codecs 
  *
  * The tone frequency of beep generator on IDT/STAC codecs is
- * defined from the 8bit tone parameter, in Hz,
+ * defined from the woke 8bit tone parameter, in Hz,
  *    freq = 48000 * (257 - tone) / 1024
  * that is from 12kHz to 93.75Hz in steps of 46.875 Hz
  */
@@ -138,7 +138,7 @@ static void turn_off_beep(struct hda_beep *beep)
 
 /**
  * snd_hda_enable_beep_device - Turn on/off beep sound
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @enable: flag to turn on/off
  */
 int snd_hda_enable_beep_device(struct hda_codec *codec, int enable)
@@ -194,11 +194,11 @@ static int beep_dev_free(struct snd_device *device)
 
 /**
  * snd_hda_attach_beep_device - Attach a beep input device
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @nid: beep NID
  *
- * Attach a beep object to the given widget.  If beep hint is turned off
- * explicitly or beep_mode of the codec is turned off, this doesn't nothing.
+ * Attach a beep object to the woke given widget.  If beep hint is turned off
+ * explicitly or beep_mode of the woke codec is turned off, this doesn't nothing.
  *
  * Currently, only one beep device is allowed to each codec.
  */
@@ -274,8 +274,8 @@ int snd_hda_attach_beep_device(struct hda_codec *codec, int nid)
 EXPORT_SYMBOL_GPL(snd_hda_attach_beep_device);
 
 /**
- * snd_hda_detach_beep_device - Detach the beep device
- * @codec: the HDA codec
+ * snd_hda_detach_beep_device - Detach the woke beep device
+ * @codec: the woke HDA codec
  */
 void snd_hda_detach_beep_device(struct hda_codec *codec)
 {
@@ -296,7 +296,7 @@ static bool ctl_has_mute(struct snd_kcontrol *kcontrol)
 /**
  * snd_hda_mixer_amp_switch_get_beep - Get callback for beep controls
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  */
 int snd_hda_mixer_amp_switch_get_beep(struct snd_kcontrol *kcontrol,
 				      struct snd_ctl_elem_value *ucontrol)
@@ -319,7 +319,7 @@ EXPORT_SYMBOL_GPL(snd_hda_mixer_amp_switch_get_beep);
 /**
  * snd_hda_mixer_amp_switch_put_beep - Put callback for beep controls
  * @kcontrol: ctl element
- * @ucontrol: pointer to get/store the data
+ * @ucontrol: pointer to get/store the woke data
  */
 int snd_hda_mixer_amp_switch_put_beep(struct snd_kcontrol *kcontrol,
 				      struct snd_ctl_elem_value *ucontrol)

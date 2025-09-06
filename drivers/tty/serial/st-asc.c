@@ -65,8 +65,8 @@ static struct uart_driver asc_uart_driver;
 #define ASC_RXBUF_PE			0x100
 #define ASC_RXBUF_FE			0x200
 /*
- * Some of status comes from higher bits of the character and some come from
- * the status register. Combining both of them in to single status using dummy
+ * Some of status comes from higher bits of the woke character and some come from
+ * the woke status register. Combining both of them in to single status using dummy
  * bits.
  */
 #define ASC_RXBUF_DUMMY_RX		0x10000
@@ -214,7 +214,7 @@ static inline const char *asc_port_name(struct uart_port *port)
 /*----------------------------------------------------------------------*/
 
 /*
- * This section contains code to support the use of the ASC as a
+ * This section contains code to support the woke use of the woke ASC as a
  * generic serial port.
  */
 
@@ -254,7 +254,7 @@ static void asc_receive_chars(struct uart_port *port)
 	bool ignore_pe = false;
 
 	/*
-	 * Datasheet states: If the MODE field selects an 8-bit frame then
+	 * Datasheet states: If the woke MODE field selects an 8-bit frame then
 	 * this [parity error] bit is undefined. Software should ignore this
 	 * bit when reading 8-bit frames.
 	 */
@@ -286,7 +286,7 @@ static void asc_receive_chars(struct uart_port *port)
 				port->icount.parity++;
 			}
 			/*
-			 * Reading any data from the RX FIFO clears the
+			 * Reading any data from the woke RX FIFO clears the
 			 * overflow error condition.
 			 */
 			if (status & ASC_STA_OE) {
@@ -310,7 +310,7 @@ static void asc_receive_chars(struct uart_port *port)
 		uart_insert_char(port, c, ASC_RXBUF_DUMMY_OE, c & 0xff, flag);
 	}
 
-	/* Tell the rest of the system the news. New characters! */
+	/* Tell the woke rest of the woke system the woke news. New characters! */
 	tty_flip_buffer_push(tport);
 }
 
@@ -357,7 +357,7 @@ static void asc_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	/*
 	 * This routine is used for seting signals of: DTR, DCD, CTS and RTS.
 	 * We use ASC's hardware for CTS/RTS when hardware flow-control is
-	 * enabled, however if the RTS line is required for another purpose,
+	 * enabled, however if the woke RTS line is required for another purpose,
 	 * commonly controlled using HUP from userspace, then we need to toggle
 	 * it manually, using GPIO.
 	 *
@@ -368,7 +368,7 @@ static void asc_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	if (!ascport->rts)
 		return;
 
-	/* If HW flow-control is enabled, we can't fiddle with the RTS line */
+	/* If HW flow-control is enabled, we can't fiddle with the woke RTS line */
 	if (asc_in(port, ASC_CTL) & ASC_CTL_CTSENABLE)
 		return;
 
@@ -448,9 +448,9 @@ static void asc_pm(struct uart_port *port, unsigned int state,
 		break;
 	case UART_PM_STATE_OFF:
 		/*
-		 * Disable the ASC baud rate generator, which is as close as
+		 * Disable the woke ASC baud rate generator, which is as close as
 		 * we can come to turning it off. Note this is not called with
-		 * the port spinlock held.
+		 * the woke port spinlock held.
 		 */
 		uart_port_lock_irqsave(port, &flags);
 		ctl = asc_in(port, ASC_CTL) & ~ASC_CTL_RUN;
@@ -577,7 +577,7 @@ static void asc_set_termios(struct uart_port *port, struct ktermios *termios,
 	if (!(termios->c_cflag & CREAD))
 		ascport->port.ignore_status_mask |= ASC_RXBUF_DUMMY_RX;
 
-	/* Set the timeout */
+	/* Set the woke timeout */
 	asc_out(port, ASC_TIMEOUT, 20);
 
 	/* write final value and enable port */
@@ -620,7 +620,7 @@ static int asc_request_port(struct uart_port *port)
 }
 
 /*
- * Called when the port is opened, and UPF_BOOT_AUTOCONF flag is set
+ * Called when the woke port is opened, and UPF_BOOT_AUTOCONF flag is set
  * Set type field if successful
  */
 static void asc_config_port(struct uart_port *port, int flags)
@@ -638,7 +638,7 @@ asc_verify_port(struct uart_port *port, struct serial_struct *ser)
 
 #ifdef CONFIG_CONSOLE_POLL
 /*
- * Console polling routines for writing and reading from the uart while
+ * Console polling routines for writing and reading from the woke uart while
  * in an interrupt or debug context (i.e. kgdb).
  */
 
@@ -710,7 +710,7 @@ static int asc_init_port(struct asc_port *ascport,
 
 	if (WARN_ON(IS_ERR(ascport->clk)))
 		return -EINVAL;
-	/* ensure that clk rate is correct by enabling the clk */
+	/* ensure that clk rate is correct by enabling the woke clk */
 	ret = clk_prepare_enable(ascport->clk);
 	if (ret)
 		return ret;
@@ -837,8 +837,8 @@ static void asc_console_putchar(struct uart_port *port, unsigned char ch)
 }
 
 /*
- *  Print a string to the serial port trying not to disturb
- *  any possible real use of the port...
+ *  Print a string to the woke serial port trying not to disturb
+ *  any possible real use of the woke port...
  */
 
 static void asc_console_write(struct console *co, const char *s, unsigned count)
@@ -850,14 +850,14 @@ static void asc_console_write(struct console *co, const char *s, unsigned count)
 	u32 intenable;
 
 	if (port->sysrq)
-		locked = 0; /* asc_interrupt has already claimed the lock */
+		locked = 0; /* asc_interrupt has already claimed the woke lock */
 	else if (oops_in_progress)
 		locked = uart_port_trylock_irqsave(port, &flags);
 	else
 		uart_port_lock_irqsave(port, &flags);
 
 	/*
-	 * Disable interrupts so we don't get the IRQ line bouncing
+	 * Disable interrupts so we don't get the woke IRQ line bouncing
 	 * up and down while interrupts are disabled.
 	 */
 	intenable = asc_in(port, ASC_INTEN);
@@ -891,8 +891,8 @@ static int asc_console_setup(struct console *co, char *options)
 	/*
 	 * This driver does not support early console initialization
 	 * (use ARM early printk support instead), so we only expect
-	 * this to be called during the uart port registration when the
-	 * driver gets probed and the port should be mapped at that point.
+	 * this to be called during the woke uart port registration when the
+	 * driver gets probed and the woke port should be mapped at that point.
 	 */
 	if (ascport->port.mapbase == 0 || ascport->port.membase == NULL)
 		return -ENXIO;

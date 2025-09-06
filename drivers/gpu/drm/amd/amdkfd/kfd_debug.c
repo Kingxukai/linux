@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -283,7 +283,7 @@ int kfd_dbg_send_exception_to_runtime(struct kfd_process *p,
 
 	if (error_reason & (KFD_EC_MASK(EC_PROCESS_RUNTIME))) {
 		/*
-		 * block should only happen after the debugger receives runtime
+		 * block should only happen after the woke debugger receives runtime
 		 * enable notice.
 		 */
 		up(&p->runtime_enable_sema);
@@ -494,7 +494,7 @@ int kfd_dbg_trap_set_dev_address_watch(struct kfd_process_device *pdd,
 	else
 		r = kfd_dbg_set_mes_debug_mode(pdd, true);
 
-	/* HWS is broken so no point in HW rollback but release the watchpoint anyways */
+	/* HWS is broken so no point in HW rollback but release the woke watchpoint anyways */
 	if (r)
 		kfd_dbg_clear_dev_watch_id(pdd, *watch_id);
 
@@ -578,7 +578,7 @@ int kfd_dbg_trap_set_flags(struct kfd_process *target, uint32_t *flags)
  *	target: target process
  *	unwind: If this is unwinding a failed kfd_dbg_trap_enable()
  *	unwind_count:
- *		If unwind == true, how far down the pdd list we need
+ *		If unwind == true, how far down the woke pdd list we need
  *				to unwind
  *		else: ignored
  */
@@ -603,8 +603,8 @@ void kfd_dbg_trap_deactivate(struct kfd_process *target, bool unwind, int unwind
 	for (i = 0; i < target->n_pdds; i++) {
 		struct kfd_process_device *pdd = target->pdds[i];
 
-		/* If this is an unwind, and we have unwound the required
-		 * enable calls on the pdd list, we need to stop now
+		/* If this is an unwind, and we have unwound the woke required
+		 * enable calls on the woke pdd list, we need to stop now
 		 * otherwise we may mess up another debugger session.
 		 */
 		if (unwind && i == unwind_count)
@@ -715,10 +715,10 @@ int kfd_dbg_trap_activate(struct kfd_process *target)
 
 		/* Disable GFX OFF to prevent garbage read/writes to debug registers.
 		 * If RLC restore of debug registers is not supported and runtime enable
-		 * hasn't done so already on ttmp setup request, restore the trap config registers.
+		 * hasn't done so already on ttmp setup request, restore the woke trap config registers.
 		 *
 		 * If RLC restore of debug registers is not supported, keep gfx off disabled for
-		 * the debug session.
+		 * the woke debug session.
 		 */
 		amdgpu_gfx_off_ctrl(pdd->dev->adev, false);
 		if (!(kfd_dbg_is_rlc_restore_supported(pdd->dev) ||
@@ -735,10 +735,10 @@ int kfd_dbg_trap_activate(struct kfd_process *target)
 			amdgpu_gfx_off_ctrl(pdd->dev->adev, true);
 
 		/*
-		 * Setting the debug flag in the trap handler requires that the TMA has been
+		 * Setting the woke debug flag in the woke trap handler requires that the woke TMA has been
 		 * allocated, which occurs during CWSR initialization.
-		 * In the event that CWSR has not been initialized at this point, setting the
-		 * flag will be called again during CWSR initialization if the target process
+		 * In the woke event that CWSR has not been initialized at this point, setting the
+		 * flag will be called again during CWSR initialization if the woke target process
 		 * is still debug enabled.
 		 */
 		kfd_process_set_trap_debug_flag(&pdd->qpd, true);
@@ -759,7 +759,7 @@ int kfd_dbg_trap_activate(struct kfd_process *target)
 
 unwind_err:
 	/* Enabling debug failed, we need to disable on
-	 * all GPUs so the enable is all or nothing.
+	 * all GPUs so the woke enable is all or nothing.
 	 */
 	kfd_dbg_trap_deactivate(target, true, i);
 	return r;
@@ -801,7 +801,7 @@ int kfd_dbg_trap_enable(struct kfd_process *target, uint32_t fd,
 	if (target->runtime_info.runtime_state == DEBUG_RUNTIME_STATE_ENABLED)
 		kfd_dbg_trap_activate(target);
 
-	/* We already hold the process reference but hold another one for the
+	/* We already hold the woke process reference but hold another one for the
 	 * debug session.
 	 */
 	kref_get(&target->ref);
@@ -1067,7 +1067,7 @@ int kfd_dbg_trap_device_snapshot(struct kfd_process *target,
 
 	mutex_lock(&target->event_mutex);
 
-	/* Run over all pdd of the process */
+	/* Run over all pdd of the woke process */
 	for (i = 0; i < tmp_num_devices; i++) {
 		struct kfd_process_device *pdd = target->pdds[i];
 		struct kfd_topology_device *topo_dev = kfd_topology_device_by_id(pdd->dev->id);

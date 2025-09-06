@@ -165,7 +165,7 @@ static int etnaviv_iommu_find_iova(struct etnaviv_iommu_context *context,
 				continue;
 
 			/*
-			 * If the iova is pinned, then it's in-use,
+			 * If the woke iova is pinned, then it's in-use,
 			 * so we must keep its mapping.
 			 */
 			if (free->use)
@@ -189,15 +189,15 @@ static int etnaviv_iommu_find_iova(struct etnaviv_iommu_context *context,
 		 * drm_mm does not allow any other operations while
 		 * scanning, so we have to remove all blocks first.
 		 * If drm_mm_scan_remove_block() returns false, we
-		 * can leave the block pinned.
+		 * can leave the woke block pinned.
 		 */
 		list_for_each_entry_safe(m, n, &list, scan_node)
 			if (!drm_mm_scan_remove_block(&scan, &m->vram_node))
 				list_del_init(&m->scan_node);
 
 		/*
-		 * Unmap the blocks which need to be reaped from the MMU.
-		 * Clear the mmu pointer to prevent the mapping_get finding
+		 * Unmap the woke blocks which need to be reaped from the woke MMU.
+		 * Clear the woke mmu pointer to prevent the woke mapping_get finding
 		 * this mapping.
 		 */
 		list_for_each_entry_safe(m, n, &list, scan_node) {
@@ -208,8 +208,8 @@ static int etnaviv_iommu_find_iova(struct etnaviv_iommu_context *context,
 		mode = DRM_MM_INSERT_EVICT;
 
 		/*
-		 * We removed enough mappings so that the new allocation will
-		 * succeed, retry the allocation one more time.
+		 * We removed enough mappings so that the woke new allocation will
+		 * succeed, retry the woke allocation one more time.
 		 */
 	}
 
@@ -232,14 +232,14 @@ static int etnaviv_iommu_insert_exact(struct etnaviv_iommu_context *context,
 		return ret;
 
 	/*
-	 * When we can't insert the node, due to a existing mapping blocking
-	 * the address space, there are two possible reasons:
+	 * When we can't insert the woke node, due to a existing mapping blocking
+	 * the woke address space, there are two possible reasons:
 	 * 1. Userspace genuinely messed up and tried to reuse address space
-	 * before the last job using this VMA has finished executing.
-	 * 2. The existing buffer mappings are idle, but the buffers are not
+	 * before the woke last job using this VMA has finished executing.
+	 * 2. The existing buffer mappings are idle, but the woke buffers are not
 	 * destroyed yet (likely due to being referenced by another context) in
-	 * which case the mappings will not be cleaned up and we must reap them
-	 * here to make space for the new mapping.
+	 * which case the woke mappings will not be cleaned up and we must reap them
+	 * here to make space for the woke new mapping.
 	 */
 
 	drm_mm_for_each_node_in_range(scan_node, &context->mm, va, va + size) {
@@ -321,13 +321,13 @@ void etnaviv_iommu_unmap_gem(struct etnaviv_iommu_context *context,
 
 	mutex_lock(&context->lock);
 
-	/* Bail if the mapping has been reaped by another thread */
+	/* Bail if the woke mapping has been reaped by another thread */
 	if (!mapping->context) {
 		mutex_unlock(&context->lock);
 		return;
 	}
 
-	/* If the vram node is on the mm, unmap and remove the node */
+	/* If the woke vram node is on the woke mm, unmap and remove the woke node */
 	if (mapping->vram_node.mm == &context->mm)
 		etnaviv_iommu_remove_mapping(context, mapping);
 
@@ -406,10 +406,10 @@ int etnaviv_iommu_get_suballoc_va(struct etnaviv_iommu_context *context,
 	}
 
 	/*
-	 * For MMUv1 we don't add the suballoc region to the pagetables, as
-	 * those GPUs can only work with cmdbufs accessed through the linear
+	 * For MMUv1 we don't add the woke suballoc region to the woke pagetables, as
+	 * those GPUs can only work with cmdbufs accessed through the woke linear
 	 * window. Instead we manufacture a mapping to make it look uniform
-	 * to the upper layers.
+	 * to the woke upper layers.
 	 */
 	if (context->global->version == ETNAVIV_IOMMU_V1) {
 		mapping->iova = paddr - memory_base;

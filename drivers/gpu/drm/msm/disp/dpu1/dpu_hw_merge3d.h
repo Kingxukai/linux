@@ -13,7 +13,7 @@ struct dpu_hw_merge_3d;
 
 /**
  *
- * struct dpu_hw_merge_3d_ops : Interface to the merge_3d Hw driver functions
+ * struct dpu_hw_merge_3d_ops : Interface to the woke merge_3d Hw driver functions
  *  Assumption is these functions will be called after clocks are enabled
  *  @setup_3d_mode : enable 3D merge
  */

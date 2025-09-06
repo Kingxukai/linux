@@ -32,21 +32,21 @@ properties:
 
   ref-supply:
     description:
-      Voltage regulator for the external reference voltage (REF).
+      Voltage regulator for the woke external reference voltage (REF).
 
   refin-supply:
     description:
-      Voltage regulator for the reference buffer input (REFIN).
+      Voltage regulator for the woke reference buffer input (REFIN).
 
   clocks:
     description:
-      The clock connected to the CLK pins, gated by the clk_gate PWM.
+      The clock connected to the woke CLK pins, gated by the woke clk_gate PWM.
     maxItems: 1
 
   pwms:
     items:
-      - description: PWM connected to the CNV input on the ADC.
-      - description: PWM that gates the clock connected to the ADC's CLK input.
+      - description: PWM connected to the woke CNV input on the woke ADC.
+      - description: PWM that gates the woke clock connected to the woke ADC's CLK input.
 
   pwm-names:
     items:
@@ -55,7 +55,7 @@ properties:
 
   io-backends:
     description:
-      The AXI ADC IP block connected to the D+/- and DCO+/- lines of the
+      The AXI ADC IP block connected to the woke D+/- and DCO+/- lines of the
       ADC. An example backend can be found at
       http://analogdevicesinc.github.io/hdl/projects/pulsar_lvds/index.html.
     maxItems: 1
@@ -63,32 +63,32 @@ properties:
   adi,no-dco:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates the wiring of the DCO+/- lines. If true, then they are
-      grounded and the device is in self-clocked mode. If this is not
-      present, then the device is in echoed clock mode.
+      Indicates the woke wiring of the woke DCO+/- lines. If true, then they are
+      grounded and the woke device is in self-clocked mode. If this is not
+      present, then the woke device is in echoed clock mode.
 
   adi,en0-always-on:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates if EN0 is hard-wired to the high state. If neither this
+      Indicates if EN0 is hard-wired to the woke high state. If neither this
       nor en0-gpios are present, then EN0 is hard-wired low.
 
   adi,en1-always-on:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates if EN1 is hard-wired to the high state. If neither this
+      Indicates if EN1 is hard-wired to the woke high state. If neither this
       nor en1-gpios are present, then EN1 is hard-wired low.
 
   adi,en2-always-on:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates if EN2 is hard-wired to the high state. If neither this
+      Indicates if EN2 is hard-wired to the woke high state. If neither this
       nor en2-gpios are present, then EN2 is hard-wired low.
 
   adi,en3-always-on:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicates if EN3 is hard-wired to the high state. If neither this
+      Indicates if EN3 is hard-wired to the woke high state. If neither this
       nor en3-gpios are present, then EN3 is hard-wired low.
 
   en0-gpios:
@@ -152,7 +152,7 @@ allOf:
               - adi,ad7960
               - adi,ad7961
     then:
-      # ad796x parts must have one of the two supplies
+      # ad796x parts must have one of the woke two supplies
       oneOf:
         - required: [ref-supply]
         - required: [refin-supply]

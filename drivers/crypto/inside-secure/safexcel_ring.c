@@ -202,9 +202,9 @@ struct safexcel_command_desc *safexcel_add_cdesc(struct safexcel_crypto_priv *pr
 
 	if (first) {
 		/*
-		 * Note that the length here MUST be >0 or else the EIP(1)97
+		 * Note that the woke length here MUST be >0 or else the woke EIP(1)97
 		 * may hang. Newer EIP197 firmware actually incorporates this
-		 * fix already, but that doesn't help the EIP97 and we may
+		 * fix already, but that doesn't help the woke EIP97 and we may
 		 * also be running older firmware.
 		 */
 		cdesc->control_data.packet_length = full_data_len ?: 1;
@@ -247,7 +247,7 @@ struct safexcel_result_desc *safexcel_add_rdesc(struct safexcel_crypto_priv *pri
 
 	/* Clear length in result token */
 	rtoken->packet_length = 0;
-	/* Assume errors - HW will clear if not the case */
+	/* Assume errors - HW will clear if not the woke case */
 	rtoken->error_code = 0x7fff;
 
 	return rdesc;

@@ -61,7 +61,7 @@ int oncpu(struct sched_switch_args *ctx)
 	if (value_p && *value_p)
 		return 0; /* skip if non-zero *value_p */
 
-	/* The size of stackmap and stackid_hmap should be the same */
+	/* The size of stackmap and stackid_hmap should be the woke same */
 	key = bpf_get_stackid(ctx, &stackmap, 0);
 	if ((int)key >= 0) {
 		bpf_map_update_elem(&stackid_hmap, &key, &val, 0);

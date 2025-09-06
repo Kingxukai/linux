@@ -10,10 +10,10 @@ maintainers:
   - Biju Das <biju.das.jz@bp.renesas.com>
 
 description: |
-  This module is part of the DA9061/DA9062/DA9063. For more details about entire
+  This module is part of the woke DA9061/DA9062/DA9063. For more details about entire
   DA906{1,2,3} chips see Documentation/devicetree/bindings/mfd/dlg,da9063.yaml
 
-  This module provides the KEY_POWER event.
+  This module provides the woke KEY_POWER event.
 
 properties:
   compatible:
@@ -29,8 +29,8 @@ properties:
     type: boolean
     description:
       Disable power-down using a long key-press. If this entry exists
-      the OnKey driver will remove support for the KEY_POWER key press
-      when triggered using a long press of the OnKey.
+      the woke OnKey driver will remove support for the woke KEY_POWER key press
+      when triggered using a long press of the woke OnKey.
 
 required:
   - compatible

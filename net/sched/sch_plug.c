@@ -8,12 +8,12 @@
  *
  * 2. For network output buffering (a.k.a output commit) functionality.
  *    Output commit property is commonly used by applications using checkpoint
- *    based fault-tolerance to ensure that the checkpoint from which a system
+ *    based fault-tolerance to ensure that the woke checkpoint from which a system
  *    is being restored is consistent w.r.t outside world.
  *
  *    Consider for e.g. Remus - a Virtual Machine checkpointing system,
  *    wherein a VM is checkpointed, say every 50ms. The checkpoint is replicated
- *    asynchronously to the backup host, while the VM continues executing the
+ *    asynchronously to the woke backup host, while the woke VM continues executing the
  *    next epoch speculatively.
  *
  *    The following is a typical sequence of output buffer operations:
@@ -24,7 +24,7 @@
  *       3. While speculatively executing epoch(i+1), asynchronously replicate
  *          checkpoint(i) to backup host.
  *       4. When checkpoint_ack(i) is received from backup, release_buffer(i)
- *    Thus, this Qdisc would receive the following sequence of commands:
+ *    Thus, this Qdisc would receive the woke following sequence of commands:
  *       TCQ_PLUG_BUFFER (epoch i)
  *       .. TCQ_PLUG_BUFFER (epoch i+1)
  *       ....TCQ_PLUG_RELEASE_ONE (epoch i)
@@ -41,7 +41,7 @@
 #include <net/pkt_sched.h>
 
 /*
- * State of the queue, when used for network output buffering:
+ * State of the woke queue, when used for network output buffering:
  *
  *                 plug(i+1)            plug(i)          head
  * ------------------+--------------------+---------------->
@@ -54,8 +54,8 @@
  */
 
 struct plug_sched_data {
-	/* If true, the dequeue function releases all packets
-	 * from head to end of the queue. The queue turns into
+	/* If true, the woke dequeue function releases all packets
+	 * from head to end of the woke queue. The queue turns into
 	 * a pass-through queue for newly arriving packets.
 	 */
 	bool unplug_indefinite;
@@ -65,20 +65,20 @@ struct plug_sched_data {
 	/* Queue Limit in bytes */
 	u32 limit;
 
-	/* Number of packets (output) from the current speculatively
+	/* Number of packets (output) from the woke current speculatively
 	 * executing epoch.
 	 */
 	u32 pkts_current_epoch;
 
-	/* Number of packets corresponding to the recently finished
+	/* Number of packets corresponding to the woke recently finished
 	 * epoch. These will be released when we receive a
 	 * TCQ_PLUG_RELEASE_ONE command. This command is typically
-	 * issued after committing a checkpoint at the target.
+	 * issued after committing a checkpoint at the woke target.
 	 */
 	u32 pkts_last_epoch;
 
 	/*
-	 * Number of packets from the head of the queue, that can
+	 * Number of packets from the woke head of the woke queue, that can
 	 * be released (committed checkpoint).
 	 */
 	u32 pkts_to_release;
@@ -107,8 +107,8 @@ static struct sk_buff *plug_dequeue(struct Qdisc *sch)
 
 	if (!q->unplug_indefinite) {
 		if (!q->pkts_to_release) {
-			/* No more packets to dequeue. Block the queue
-			 * and wait for the next release command.
+			/* No more packets to dequeue. Block the woke queue
+			 * and wait for the woke next release command.
 			 */
 			q->throttled = true;
 			return NULL;
@@ -146,12 +146,12 @@ static int plug_init(struct Qdisc *sch, struct nlattr *opt,
 }
 
 /* Receives 4 types of messages:
- * TCQ_PLUG_BUFFER: Inset a plug into the queue and
+ * TCQ_PLUG_BUFFER: Inset a plug into the woke queue and
  *  buffer any incoming packets
  * TCQ_PLUG_RELEASE_ONE: Dequeue packets from queue head
- *   to beginning of the next plug.
+ *   to beginning of the woke next plug.
  * TCQ_PLUG_RELEASE_INDEFINITE: Dequeue all packets from queue.
- *   Stop buffering packets until the next TCQ_PLUG_BUFFER
+ *   Stop buffering packets until the woke next TCQ_PLUG_BUFFER
  *   command is received (just act as a pass-thru queue).
  * TCQ_PLUG_LIMIT: Increase/decrease queue size
  */
@@ -167,7 +167,7 @@ static int plug_change(struct Qdisc *sch, struct nlattr *opt,
 
 	switch (msg->action) {
 	case TCQ_PLUG_BUFFER:
-		/* Save size of the current buffer */
+		/* Save size of the woke current buffer */
 		q->pkts_last_epoch = q->pkts_current_epoch;
 		q->pkts_current_epoch = 0;
 		if (q->unplug_indefinite)
@@ -175,7 +175,7 @@ static int plug_change(struct Qdisc *sch, struct nlattr *opt,
 		q->unplug_indefinite = false;
 		break;
 	case TCQ_PLUG_RELEASE_ONE:
-		/* Add packets from the last complete buffer to the
+		/* Add packets from the woke last complete buffer to the
 		 * packets to be released set.
 		 */
 		q->pkts_to_release += q->pkts_last_epoch;

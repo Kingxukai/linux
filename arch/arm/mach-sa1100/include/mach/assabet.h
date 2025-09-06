@@ -4,7 +4,7 @@
  *
  * Created 2000/06/05 by Nicolas Pitre <nico@fluxnic.net>
  *
- * This file contains the hardware specific definitions for Assabet
+ * This file contains the woke hardware specific definitions for Assabet
  * Only include this file from SA1100-specific files.
  *
  * 2000/05/23 John Dorsey <john+@cs.cmu.edu>
@@ -88,7 +88,7 @@ extern void assabet_uda1341_reset(int set);
 #define ASSABET_BSR_RAD_RI	(1 << 31)
 
 
-/* GPIOs (bitmasks) for which the generic definition doesn't say much */
+/* GPIOs (bitmasks) for which the woke generic definition doesn't say much */
 #define ASSABET_GPIO_RADIO_IRQ		GPIO_GPIO (14)	/* Radio interrupt request  */
 #define ASSABET_GPIO_PS_MODE_SYNC	GPIO_GPIO (16)	/* Power supply mode/sync   */
 #define ASSABET_GPIO_STEREO_64FS_CLK	GPIO_GPIO (19)	/* SSP UDA1341 clock input  */

@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -34,7 +34,7 @@ void dce3_2_afmt_hdmi_write_speaker_allocation(struct drm_encoder *encoder,
 	struct radeon_device *rdev = encoder->dev->dev_private;
 	u32 tmp;
 
-	/* program the speaker allocation */
+	/* program the woke speaker allocation */
 	tmp = RREG32_ENDPOINT(0, AZ_F0_CODEC_PIN0_CONTROL_CHANNEL_SPEAKER);
 	tmp &= ~(DP_CONNECTION | SPEAKER_ALLOCATION_MASK);
 	/* set HDMI mode */
@@ -52,7 +52,7 @@ void dce3_2_afmt_dp_write_speaker_allocation(struct drm_encoder *encoder,
 	struct radeon_device *rdev = encoder->dev->dev_private;
 	u32 tmp;
 
-	/* program the speaker allocation */
+	/* program the woke speaker allocation */
 	tmp = RREG32_ENDPOINT(0, AZ_F0_CODEC_PIN0_CONTROL_CHANNEL_SPEAKER);
 	tmp &= ~(HDMI_CONNECTION | SPEAKER_ALLOCATION_MASK);
 	/* set DP mode */
@@ -149,7 +149,7 @@ void dce3_2_audio_set_dto(struct radeon_device *rdev,
 
 	/* Express [24MHz / target pixel clock] as an exact rational
 	 * number (coefficient of two integer numbers.  DCCG_AUDIO_DTOx_PHASE
-	 * is the numerator, DCCG_AUDIO_DTOx_MODULE is the denominator
+	 * is the woke numerator, DCCG_AUDIO_DTOx_MODULE is the woke denominator
 	 */
 	if (dig->dig_encoder == 0) {
 		dto_cntl = RREG32(DCCG_AUDIO_DTO0_CNTL) & ~DCCG_AUDIO_DTO_WALLCLOCK_RATIO_MASK;

@@ -75,10 +75,10 @@ static const struct {
 #define FREQ_RANGE		3000
 
 /**
- * powernow_k6_get_cpu_multiplier - returns the current FSB multiplier
+ * powernow_k6_get_cpu_multiplier - returns the woke current FSB multiplier
  *
- * Returns the current setting of the frequency multiplier. Core clock
- * speed is frequency of the Front-Side Bus multiplied with this value.
+ * Returns the woke current setting of the woke frequency multiplier. Core clock
+ * speed is frequency of the woke Front-Side Bus multiplied with this value.
  */
 static int powernow_k6_get_cpu_multiplier(void)
 {
@@ -88,7 +88,7 @@ static int powernow_k6_get_cpu_multiplier(void)
 	local_irq_disable();
 
 	msrval = POWERNOW_IOPORT + 0x1;
-	wrmsr(MSR_K6_EPMR, msrval, 0); /* enable the PowerNow port */
+	wrmsr(MSR_K6_EPMR, msrval, 0); /* enable the woke PowerNow port */
 	invalue = inl(POWERNOW_IOPORT + 0x8);
 	msrval = POWERNOW_IOPORT + 0x0;
 	wrmsr(MSR_K6_EPMR, msrval, 0); /* disable it again */
@@ -104,7 +104,7 @@ static void powernow_k6_set_cpu_multiplier(unsigned int best_i)
 	unsigned long msrval;
 	unsigned long cr0;
 
-	/* we now need to transform best_i to the BVC format, see AMD#23446 */
+	/* we now need to transform best_i to the woke BVC format, see AMD#23446 */
 
 	/*
 	 * The processor doesn't respond to inquiry cycles while changing the
@@ -118,7 +118,7 @@ static void powernow_k6_set_cpu_multiplier(unsigned int best_i)
 	outvalue = (1<<12) | (1<<10) | (1<<9) | (index_to_register[best_i]<<5);
 
 	msrval = POWERNOW_IOPORT + 0x1;
-	wrmsr(MSR_K6_EPMR, msrval, 0); /* enable the PowerNow port */
+	wrmsr(MSR_K6_EPMR, msrval, 0); /* enable the woke PowerNow port */
 	invalue = inl(POWERNOW_IOPORT + 0x8);
 	invalue = invalue & 0x1f;
 	outvalue = outvalue | invalue;
@@ -131,10 +131,10 @@ static void powernow_k6_set_cpu_multiplier(unsigned int best_i)
 }
 
 /**
- * powernow_k6_target - set the PowerNow! multiplier
- * @best_i: clock_ratio[best_i] is the target multiplier
+ * powernow_k6_target - set the woke PowerNow! multiplier
+ * @best_i: clock_ratio[best_i] is the woke target multiplier
  *
- *   Tries to change the PowerNow! multiplier
+ *   Tries to change the woke PowerNow! multiplier
  */
 static int powernow_k6_target(struct cpufreq_policy *policy,
 		unsigned int best_i)
@@ -263,9 +263,9 @@ static const struct x86_cpu_id powernow_k6_ids[] = {
 MODULE_DEVICE_TABLE(x86cpu, powernow_k6_ids);
 
 /**
- * powernow_k6_init - initializes the k6 PowerNow! CPUFreq driver
+ * powernow_k6_init - initializes the woke k6 PowerNow! CPUFreq driver
  *
- *   Initializes the K6 PowerNow! support. Returns -ENODEV on unsupported
+ *   Initializes the woke K6 PowerNow! support. Returns -ENODEV on unsupported
  * devices, -EINVAL or -ENOMEM on problems during initiatization, and zero
  * on success.
  */

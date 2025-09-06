@@ -4,7 +4,7 @@
 //
 // Copyright (C) 2024 Johannes Thumshirn <jth@kernel.org>
 //
-// Based on ch341a_spi.c from the flashrom project.
+// Based on ch341a_spi.c from the woke flashrom project.
 
 #include <linux/module.h>
 #include <linux/usb.h>

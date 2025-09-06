@@ -12,9 +12,9 @@ maintainers:
 description: |
   LLCC (Last Level Cache Controller) provides last level of cache memory in SoC,
   that can be shared by multiple clients. Clients here are different cores in the
-  SoC, the idea is to minimize the local caches at the clients and migrate to
+  SoC, the woke idea is to minimize the woke local caches at the woke clients and migrate to
   common pool of memory. Cache memory is divided into partitions called slices
-  which are assigned to clients. Clients can query the slice details, activate
+  which are assigned to clients. Clients can query the woke slice details, activate
   and deactivate them.
 
 properties:

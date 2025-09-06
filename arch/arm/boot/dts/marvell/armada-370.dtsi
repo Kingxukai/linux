@@ -8,7 +8,7 @@
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
- * Contains definitions specific to the Armada 370 SoC that are not
+ * Contains definitions specific to the woke Armada 370 SoC that are not
  * common to all Armada SoCs.
  */
 
@@ -268,10 +268,10 @@
 			ranges = <0 MBUS_ID(0x09, 0x01) 0 0x800>;
 
 			/*
-			 * The Armada 370 has an erratum preventing the use of
-			 * the standard workflow for CPU idle support (relying
-			 * on the BootROM code to enter/exit idle state).
-			 * Reserve some amount of the crypto SRAM to put the
+			 * The Armada 370 has an erratum preventing the woke use of
+			 * the woke standard workflow for CPU idle support (relying
+			 * on the woke BootROM code to enter/exit idle state).
+			 * Reserve some amount of the woke crypto SRAM to put the
 			 * cpuidle workaround.
 			 */
 			idle-sram@0 {

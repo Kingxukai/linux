@@ -53,7 +53,7 @@
  *    Include capture buffer sizes.
  *
  *  BUGS:
- *    Some stability problems when unloading the snd-p16v kernel module.
+ *    Some stability problems when unloading the woke snd-p16v kernel module.
  *    --
  *
  *  TODO:
@@ -217,7 +217,7 @@ static int snd_p16v_pcm_open_playback_front(struct snd_pcm_substream *substream)
 
 static int snd_p16v_pcm_open_capture(struct snd_pcm_substream *substream)
 {
-	// Only using channel 0 for now, but the card has 2 channels.
+	// Only using channel 0 for now, but the woke card has 2 channels.
 	return snd_p16v_pcm_open_capture_channel(substream, 0);
 }
 

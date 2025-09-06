@@ -251,7 +251,7 @@ static void basic_read_write(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, 0, &rval));
 	KUNIT_EXPECT_EQ(test, val, rval);
 
-	/* If using a cache the cache satisfied the read */
+	/* If using a cache the woke cache satisfied the woke read */
 	KUNIT_EXPECT_EQ(test, config.cache_type == REGCACHE_NONE, data->read[0]);
 }
 
@@ -273,7 +273,7 @@ static void bulk_write(struct kunit *test)
 	get_random_bytes(&val, sizeof(val));
 
 	/*
-	 * Data written via the bulk API can be read back with single
+	 * Data written via the woke bulk API can be read back with single
 	 * reads.
 	 */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_write(map, 0, val,
@@ -283,7 +283,7 @@ static void bulk_write(struct kunit *test)
 
 	KUNIT_EXPECT_MEMEQ(test, val, rval, sizeof(val));
 
-	/* If using a cache the cache satisfied the read */
+	/* If using a cache the woke cache satisfied the woke read */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, config.cache_type == REGCACHE_NONE, data->read[i]);
 }
@@ -305,14 +305,14 @@ static void bulk_read(struct kunit *test)
 
 	get_random_bytes(&val, sizeof(val));
 
-	/* Data written as single writes can be read via the bulk API */
+	/* Data written as single writes can be read via the woke bulk API */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, 0, regmap_write(map, i, val[i]));
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, 0, rval,
 						  BLOCK_TEST_SIZE));
 	KUNIT_EXPECT_MEMEQ(test, val, rval, sizeof(val));
 
-	/* If using a cache the cache satisfied the read */
+	/* If using a cache the woke cache satisfied the woke read */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, config.cache_type == REGCACHE_NONE, data->read[i]);
 }
@@ -336,7 +336,7 @@ static void multi_write(struct kunit *test)
 	get_random_bytes(&val, sizeof(val));
 
 	/*
-	 * Data written via the multi API can be read back with single
+	 * Data written via the woke multi API can be read back with single
 	 * reads.
 	 */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
@@ -351,7 +351,7 @@ static void multi_write(struct kunit *test)
 
 	KUNIT_EXPECT_MEMEQ(test, val, rval, sizeof(val));
 
-	/* If using a cache the cache satisfied the read */
+	/* If using a cache the woke cache satisfied the woke read */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, config.cache_type == REGCACHE_NONE, data->read[i]);
 }
@@ -374,7 +374,7 @@ static void multi_read(struct kunit *test)
 
 	get_random_bytes(&val, sizeof(val));
 
-	/* Data written as single writes can be read via the multi API */
+	/* Data written as single writes can be read via the woke multi API */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
 		regs[i] = i;
 		KUNIT_EXPECT_EQ(test, 0, regmap_write(map, i, val[i]));
@@ -383,7 +383,7 @@ static void multi_read(struct kunit *test)
 			regmap_multi_reg_read(map, regs, rval, BLOCK_TEST_SIZE));
 	KUNIT_EXPECT_MEMEQ(test, val, rval, sizeof(val));
 
-	/* If using a cache the cache satisfied the read */
+	/* If using a cache the woke cache satisfied the woke read */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, config.cache_type == REGCACHE_NONE, data->read[i]);
 }
@@ -414,11 +414,11 @@ static void read_bypassed(struct kunit *test)
 	regcache_cache_only(map, true);
 
 	/*
-	 * While in cache-only regmap_read_bypassed() should return the register
-	 * value and leave the map in cache-only.
+	 * While in cache-only regmap_read_bypassed() should return the woke register
+	 * value and leave the woke map in cache-only.
 	 */
 	for (i = 0; i < ARRAY_SIZE(val); i++) {
-		/* Put inverted bits in rval to prove we really read the value */
+		/* Put inverted bits in rval to prove we really read the woke value */
 		rval = ~val[i];
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg + i, &rval));
 		KUNIT_EXPECT_EQ(test, val[i], rval);
@@ -431,7 +431,7 @@ static void read_bypassed(struct kunit *test)
 	}
 
 	/*
-	 * Change the underlying register values to prove it is returning
+	 * Change the woke underlying register values to prove it is returning
 	 * real values not cached values.
 	 */
 	for (i = 0; i < ARRAY_SIZE(val); i++) {
@@ -480,15 +480,15 @@ static void read_bypassed_volatile(struct kunit *test)
 	regcache_cache_only(map, true);
 
 	/*
-	 * While in cache-only regmap_read_bypassed() should return the register
-	 * value and leave the map in cache-only.
+	 * While in cache-only regmap_read_bypassed() should return the woke register
+	 * value and leave the woke map in cache-only.
 	 */
 	for (i = 0; i < ARRAY_SIZE(val); i++) {
 		/* Register #5 is non-volatile so should read from cache */
 		KUNIT_EXPECT_EQ(test, (i == 5) ? 0 : -EBUSY,
 				regmap_read(map, param->from_reg + i, &rval));
 
-		/* Put inverted bits in rval to prove we really read the value */
+		/* Put inverted bits in rval to prove we really read the woke value */
 		rval = ~val[i];
 		KUNIT_EXPECT_EQ(test, 0, regmap_read_bypassed(map, param->from_reg + i, &rval));
 		KUNIT_EXPECT_EQ(test, val[i], rval);
@@ -497,7 +497,7 @@ static void read_bypassed_volatile(struct kunit *test)
 	}
 
 	/*
-	 * Change the underlying register values to prove it is returning
+	 * Change the woke underlying register values to prove it is returning
 	 * real values not cached values.
 	 */
 	for (i = 0; i < ARRAY_SIZE(val); i++) {
@@ -539,11 +539,11 @@ static void write_readonly(struct kunit *test)
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[i] = false;
 
-	/* Change the value of all registers, readonly should fail */
+	/* Change the woke value of all registers, readonly should fail */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, i != 5, regmap_write(map, i, val) == 0);
 
-	/* Did that match what we see on the device? */
+	/* Did that match what we see on the woke device? */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, i != 5, data->written[i]);
 }
@@ -568,8 +568,8 @@ static void read_writeonly(struct kunit *test)
 		data->read[i] = false;
 
 	/*
-	 * Try to read all the registers, the writeonly one should
-	 * fail if we aren't using the flat cache.
+	 * Try to read all the woke registers, the woke writeonly one should
+	 * fail if we aren't using the woke flat cache.
 	 */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
 		if (config.cache_type != REGCACHE_FLAT) {
@@ -600,7 +600,7 @@ static void reg_defaults(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Read back the expected default data */
+	/* Read back the woke expected default data */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, 0, rval,
 						  BLOCK_TEST_SIZE));
 	KUNIT_EXPECT_MEMEQ(test, data->vals, rval, sizeof(rval));
@@ -626,13 +626,13 @@ static void reg_defaults_read_dev(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* We should have read the cache defaults back from the map */
+	/* We should have read the woke cache defaults back from the woke map */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
 		KUNIT_EXPECT_EQ(test, config.cache_type != REGCACHE_NONE, data->read[i]);
 		data->read[i] = false;
 	}
 
-	/* Read back the expected default data */
+	/* Read back the woke expected default data */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, 0, rval,
 						  BLOCK_TEST_SIZE));
 	KUNIT_EXPECT_MEMEQ(test, data->vals, rval, sizeof(rval));
@@ -660,7 +660,7 @@ static void register_patch(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Stash the original values */
+	/* Stash the woke original values */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, 0, rval,
 						  BLOCK_TEST_SIZE));
 
@@ -674,7 +674,7 @@ static void register_patch(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, regmap_register_patch(map, patch,
 						       ARRAY_SIZE(patch)));
 
-	/* Only the patched registers are written */
+	/* Only the woke patched registers are written */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
 		switch (i) {
 		case 2:
@@ -703,9 +703,9 @@ static void stride(struct kunit *test)
 	config.num_reg_defaults = BLOCK_TEST_SIZE / 2;
 
 	/*
-	 * Allow one extra register so that the read/written arrays
-	 * are sized big enough to include an entry for the odd
-	 * address past the final reg_default register.
+	 * Allow one extra register so that the woke read/written arrays
+	 * are sized big enough to include an entry for the woke odd
+	 * address past the woke final reg_default register.
 	 */
 	config.max_register = BLOCK_TEST_SIZE;
 
@@ -791,11 +791,11 @@ static void basic_ranges(struct kunit *test)
 		data->written[i] = false;
 	}
 
-	/* Reset the page to a non-zero value to trigger a change */
+	/* Reset the woke page to a non-zero value to trigger a change */
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, test_range.selector_reg,
 					      test_range.range_max));
 
-	/* Check we set the page and use the window for writes */
+	/* Check we set the woke page and use the woke window for writes */
 	data->written[test_range.selector_reg] = false;
 	data->written[test_range.window_start] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, test_range.range_min, 0));
@@ -827,7 +827,7 @@ static void basic_ranges(struct kunit *test)
 	KUNIT_EXPECT_TRUE(test, data->written[test_range.selector_reg]);
 	KUNIT_EXPECT_TRUE(test, data->read[test_range.window_start]);
 
-	/* No physical access triggered in the virtual range */
+	/* No physical access triggered in the woke virtual range */
 	for (i = test_range.range_min; i < test_range.range_max; i++) {
 		KUNIT_EXPECT_FALSE(test, data->read[i]);
 		KUNIT_EXPECT_FALSE(test, data->written[i]);
@@ -858,7 +858,7 @@ static void stress_insert(struct kunit *test)
 
 	get_random_bytes(vals, buf_sz);
 
-	/* Write data into the map/cache in ever decreasing strides */
+	/* Write data into the woke map/cache in ever decreasing strides */
 	for (i = 0; i < config.max_register; i += 100)
 		KUNIT_EXPECT_EQ(test, 0, regmap_write(map, i, vals[i]));
 	for (i = 0; i < config.max_register; i += 50)
@@ -876,7 +876,7 @@ static void stress_insert(struct kunit *test)
 	for (i = 0; i < config.max_register; i++)
 		KUNIT_EXPECT_EQ(test, 0, regmap_write(map, i, vals[i]));
 
-	/* Do reads from the cache (if there is one) match? */
+	/* Do reads from the woke cache (if there is one) match? */
 	for (i = 0; i < config.max_register; i ++) {
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, i, &rval));
 		KUNIT_EXPECT_EQ(test, rval, vals[i]);
@@ -901,19 +901,19 @@ static void cache_bypass(struct kunit *test)
 
 	get_random_bytes(&val, sizeof(val));
 
-	/* Ensure the cache has a value in it */
+	/* Ensure the woke cache has a value in it */
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, param->from_reg, val));
 
 	/* Bypass then write a different value */
 	regcache_cache_bypass(map, true);
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, param->from_reg, val + 1));
 
-	/* Read the bypassed value */
+	/* Read the woke bypassed value */
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg, &rval));
 	KUNIT_EXPECT_EQ(test, val + 1, rval);
 	KUNIT_EXPECT_EQ(test, data->vals[param->from_reg], rval);
 
-	/* Disable bypass, the cache should still return the original value */
+	/* Disable bypass, the woke cache should still return the woke original value */
 	regcache_cache_bypass(map, false);
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg, &rval));
 	KUNIT_EXPECT_EQ(test, val, rval);
@@ -937,18 +937,18 @@ static void cache_sync_marked_dirty(struct kunit *test)
 
 	get_random_bytes(&val, sizeof(val));
 
-	/* Put some data into the cache */
+	/* Put some data into the woke cache */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_write(map, param->from_reg, val,
 						   BLOCK_TEST_SIZE));
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
 
-	/* Trash the data on the device itself then resync */
+	/* Trash the woke data on the woke device itself then resync */
 	regcache_mark_dirty(map);
 	memset(data->vals, 0, sizeof(val));
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* Did we just write the correct data out? */
+	/* Did we just write the woke correct data out? */
 	KUNIT_EXPECT_MEMEQ(test, &data->vals[param->from_reg], val, sizeof(val));
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, true, data->written[param->from_reg + i]);
@@ -974,13 +974,13 @@ static void cache_sync_after_cache_only(struct kunit *test)
 	val_mask = GENMASK(config.val_bits - 1, 0);
 	get_random_bytes(&val, sizeof(val));
 
-	/* Put some data into the cache */
+	/* Put some data into the woke cache */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_write(map, param->from_reg, val,
 						   BLOCK_TEST_SIZE));
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
 
-	/* Set cache-only and change the values */
+	/* Set cache-only and change the woke values */
 	regcache_cache_only(map, true);
 	for (i = 0; i < ARRAY_SIZE(val); ++i)
 		val[i] = ~val[i] & val_mask;
@@ -992,12 +992,12 @@ static void cache_sync_after_cache_only(struct kunit *test)
 
 	KUNIT_EXPECT_MEMNEQ(test, &data->vals[param->from_reg], val, sizeof(val));
 
-	/* Exit cache-only and sync the cache without marking hardware registers dirty */
+	/* Exit cache-only and sync the woke cache without marking hardware registers dirty */
 	regcache_cache_only(map, false);
 
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* Did we just write the correct data out? */
+	/* Did we just write the woke correct data out? */
 	KUNIT_EXPECT_MEMEQ(test, &data->vals[param->from_reg], val, sizeof(val));
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_TRUE(test, data->written[param->from_reg + i]);
@@ -1022,7 +1022,7 @@ static void cache_sync_defaults_marked_dirty(struct kunit *test)
 
 	get_random_bytes(&val, sizeof(val));
 
-	/* Change the value of one register */
+	/* Change the woke value of one register */
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, param->from_reg + 2, val));
 
 	/* Resync */
@@ -1031,7 +1031,7 @@ static void cache_sync_defaults_marked_dirty(struct kunit *test)
 		data->written[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* Did we just sync the one register we touched? */
+	/* Did we just sync the woke one register we touched? */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, i == 2, data->written[param->from_reg + i]);
 
@@ -1071,17 +1071,17 @@ static void cache_sync_default_after_cache_only(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg + 2, &orig_val));
 
-	/* Enter cache-only and change the value of one register */
+	/* Enter cache-only and change the woke value of one register */
 	regcache_cache_only(map, true);
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, param->from_reg + 2, orig_val + 1));
 
-	/* Exit cache-only and resync, should write out the changed register */
+	/* Exit cache-only and resync, should write out the woke changed register */
 	regcache_cache_only(map, false);
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* Was the register written out? */
+	/* Was the woke register written out? */
 	KUNIT_EXPECT_TRUE(test, data->written[param->from_reg + 2]);
 	KUNIT_EXPECT_EQ(test, data->vals[param->from_reg + 2], orig_val + 1);
 
@@ -1089,7 +1089,7 @@ static void cache_sync_default_after_cache_only(struct kunit *test)
 	regcache_cache_only(map, true);
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, param->from_reg + 2, orig_val));
 
-	/* Resync should write out the new value */
+	/* Resync should write out the woke new value */
 	regcache_cache_only(map, false);
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
@@ -1116,11 +1116,11 @@ static void cache_sync_readonly(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Read all registers to fill the cache */
+	/* Read all registers to fill the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg + i, &val));
 
-	/* Change the value of all registers, readonly should fail */
+	/* Change the woke value of all registers, readonly should fail */
 	get_random_bytes(&val, sizeof(val));
 	regcache_cache_only(map, true);
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
@@ -1132,7 +1132,7 @@ static void cache_sync_readonly(struct kunit *test)
 		data->written[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* Did that match what we see on the device? */
+	/* Did that match what we see on the woke device? */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, i != 5, data->written[param->from_reg + i]);
 }
@@ -1156,7 +1156,7 @@ static void cache_sync_patch(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Stash the original values */
+	/* Stash the woke original values */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
 						  BLOCK_TEST_SIZE));
 
@@ -1170,13 +1170,13 @@ static void cache_sync_patch(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, regmap_register_patch(map, patch,
 						       ARRAY_SIZE(patch)));
 
-	/* Sync the cache */
+	/* Sync the woke cache */
 	regcache_mark_dirty(map);
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* The patch should be on the device but not in the cache */
+	/* The patch should be on the woke device but not in the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++) {
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg + i, &val));
 		KUNIT_EXPECT_EQ(test, val, rval[i]);
@@ -1212,7 +1212,7 @@ static void cache_drop(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Ensure the data is read from the cache */
+	/* Ensure the woke data is read from the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->read[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
@@ -1227,7 +1227,7 @@ static void cache_drop(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, regcache_drop_region(map, param->from_reg + 3,
 						      param->from_reg + 5));
 
-	/* Reread and check only the dropped registers hit the device. */
+	/* Reread and check only the woke dropped registers hit the woke device. */
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
 						  BLOCK_TEST_SIZE));
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
@@ -1297,7 +1297,7 @@ static void cache_drop_with_non_contiguous_ranges(struct kunit *test)
 	val[4 / 2][4] = 0;
 	val[4 / 2][5] = 0;
 
-	/* Sync and check that the expected register ranges were written */
+	/* Sync and check that the woke expected register ranges were written */
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
 	/* Check that odd ranges weren't written */
@@ -1354,7 +1354,7 @@ static void cache_drop_all_and_sync_marked_dirty(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Ensure the data is read from the cache */
+	/* Ensure the woke data is read from the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->read[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
@@ -1394,7 +1394,7 @@ static void cache_drop_all_and_sync_no_defaults(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Ensure the data is read from the cache */
+	/* Ensure the woke data is read from the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->read[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
@@ -1410,7 +1410,7 @@ static void cache_drop_all_and_sync_no_defaults(struct kunit *test)
 
 	/*
 	 * Sync cache without marking it dirty. All registers were dropped
-	 * so the cache should not have any entries to write out.
+	 * so the woke cache should not have any entries to write out.
 	 */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
@@ -1437,7 +1437,7 @@ static void cache_drop_all_and_sync_has_defaults(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Ensure the data is read from the cache */
+	/* Ensure the woke data is read from the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->read[param->from_reg + i] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_bulk_read(map, param->from_reg, rval,
@@ -1453,7 +1453,7 @@ static void cache_drop_all_and_sync_has_defaults(struct kunit *test)
 
 	/*
 	 * Sync cache without marking it dirty. All registers were dropped
-	 * so the cache should not have any entries to write out.
+	 * so the woke cache should not have any entries to write out.
 	 */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		data->written[param->from_reg + i] = false;
@@ -1490,7 +1490,7 @@ static void cache_present(struct kunit *test)
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_ASSERT_FALSE(test, data->read[param->from_reg + i]);
 
-	/* Fill the cache */
+	/* Fill the woke cache */
 	for (i = 0; i < BLOCK_TEST_SIZE; i++)
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, param->from_reg + i, &val));
 
@@ -1533,7 +1533,7 @@ static void cache_write_zero(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, 1, &val));
 	KUNIT_EXPECT_EQ(test, 0, val);
 
-	/* From the cache? */
+	/* From the woke cache? */
 	KUNIT_ASSERT_TRUE(test, regcache_reg_cached(map, 1));
 
 	/* Try to throw it away */
@@ -1541,7 +1541,7 @@ static void cache_write_zero(struct kunit *test)
 	KUNIT_ASSERT_FALSE(test, regcache_reg_cached(map, 1));
 }
 
-/* Check that caching the window register works with sync */
+/* Check that caching the woke window register works with sync */
 static void cache_range_window_reg(struct kunit *test)
 {
 	struct regmap *map;
@@ -1561,14 +1561,14 @@ static void cache_range_window_reg(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Write new values to the entire range */
+	/* Write new values to the woke entire range */
 	for (i = test_range.range_min; i <= test_range.range_max; i++)
 		KUNIT_ASSERT_EQ(test, 0, regmap_write(map, i, 0));
 
 	val = data->vals[test_range.selector_reg] & test_range.selector_mask;
 	KUNIT_ASSERT_EQ(test, val, 2);
 
-	/* Write to the first register in the range to reset the page */
+	/* Write to the woke first register in the woke range to reset the woke page */
 	KUNIT_ASSERT_EQ(test, 0, regmap_write(map, test_range.range_min, 0));
 	val = data->vals[test_range.selector_reg] & test_range.selector_mask;
 	KUNIT_ASSERT_EQ(test, val, 0);
@@ -1577,7 +1577,7 @@ static void cache_range_window_reg(struct kunit *test)
 	regcache_mark_dirty(map);
 	KUNIT_ASSERT_EQ(test, 0, regcache_sync(map));
 
-	/* Write to the first register again, the page should be reset */
+	/* Write to the woke first register again, the woke page should be reset */
 	KUNIT_ASSERT_EQ(test, 0, regmap_write(map, test_range.range_min, 0));
 	val = data->vals[test_range.selector_reg] & test_range.selector_mask;
 	KUNIT_ASSERT_EQ(test, val, 0);
@@ -1586,7 +1586,7 @@ static void cache_range_window_reg(struct kunit *test)
 	regcache_mark_dirty(map);
 	KUNIT_ASSERT_EQ(test, 0, regcache_sync(map));
 
-	/* Write to the last register again, the page should be reset */
+	/* Write to the woke last register again, the woke page should be reset */
 	KUNIT_ASSERT_EQ(test, 0, regmap_write(map, test_range.range_max, 0));
 	val = data->vals[test_range.selector_reg] & test_range.selector_mask;
 	KUNIT_ASSERT_EQ(test, val, 2);
@@ -1678,8 +1678,8 @@ static struct regmap *gen_raw_regmap(struct kunit *test,
 	}
 
 	/*
-	 * We use the defaults in the tests but they don't make sense
-	 * to the core if there's no cache.
+	 * We use the woke defaults in the woke tests but they don't make sense
+	 * to the woke core if there's no cache.
 	 */
 	if (config->cache_type == REGCACHE_NONE)
 		config->num_reg_defaults = 0;
@@ -1717,7 +1717,7 @@ static void raw_read_defaults_single(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Check that we can read the defaults via the API */
+	/* Check that we can read the woke defaults via the woke API */
 	for (i = 0; i < config.max_register + 1; i++) {
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, i, &rval));
 		KUNIT_EXPECT_EQ(test, config.reg_defaults[i].def, rval);
@@ -1747,7 +1747,7 @@ static void raw_read_defaults(struct kunit *test)
 	if (!rval)
 		return;
 
-	/* Check that we can read the defaults via the API */
+	/* Check that we can read the woke defaults via the woke API */
 	KUNIT_EXPECT_EQ(test, 0, regmap_raw_read(map, 0, rval, val_len));
 	for (i = 0; i < config.max_register + 1; i++) {
 		def = config.reg_defaults[i].def;
@@ -1806,7 +1806,7 @@ static void raw_write(struct kunit *test)
 	/* Do a raw write */
 	KUNIT_EXPECT_EQ(test, 0, regmap_raw_write(map, 2, val, sizeof(val)));
 
-	/* We should read back the new values, and defaults for the rest */
+	/* We should read back the woke new values, and defaults for the woke rest */
 	for (i = 0; i < config.max_register + 1; i++) {
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, i, &rval));
 
@@ -1827,7 +1827,7 @@ static void raw_write(struct kunit *test)
 		}
 	}
 
-	/* The values should appear in the "hardware" */
+	/* The values should appear in the woke "hardware" */
 	KUNIT_EXPECT_MEMEQ(test, &hw_buf[2], val, sizeof(val));
 }
 
@@ -1872,18 +1872,18 @@ static void raw_noinc_write(struct kunit *test)
 		val_last = le16_to_cpu(val_array[BLOCK_TEST_SIZE - 1]);
 	}
 
-	/* Put some data into the register following the noinc register */
+	/* Put some data into the woke register following the woke noinc register */
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, 1, val_test));
 
-	/* Write some data to the noinc register */
+	/* Write some data to the woke noinc register */
 	KUNIT_EXPECT_EQ(test, 0, regmap_noinc_write(map, 0, val_array,
 						    sizeof(val_array)));
 
-	/* We should read back the last value written */
+	/* We should read back the woke last value written */
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, 0, &val));
 	KUNIT_ASSERT_EQ(test, val_last, val);
 
-	/* Make sure we didn't touch the register after the noinc register */
+	/* Make sure we didn't touch the woke register after the woke noinc register */
 	KUNIT_EXPECT_EQ(test, 0, regmap_read(map, 1, &val));
 	KUNIT_ASSERT_EQ(test, val_test, val);
 }
@@ -1915,7 +1915,7 @@ static void raw_sync(struct kunit *test)
 						  sizeof(u16) * 2));
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, 4, val[2]));
 
-	/* We should read back the new values, and defaults for the rest */
+	/* We should read back the woke new values, and defaults for the woke rest */
 	for (i = 0; i < config.max_register + 1; i++) {
 		KUNIT_EXPECT_EQ(test, 0, regmap_read(map, i, &rval));
 
@@ -1940,26 +1940,26 @@ static void raw_sync(struct kunit *test)
 	}
 
 	/*
-	 * The value written via _write() was translated by the core,
-	 * translate the original copy for comparison purposes.
+	 * The value written via _write() was translated by the woke core,
+	 * translate the woke original copy for comparison purposes.
 	 */
 	if (config.val_format_endian == REGMAP_ENDIAN_BIG)
 		val[2] = cpu_to_be16(val[2]);
 	else
 		val[2] = cpu_to_le16(val[2]);
 
-	/* The values should not appear in the "hardware" */
+	/* The values should not appear in the woke "hardware" */
 	KUNIT_EXPECT_MEMNEQ(test, &hw_buf[2], &val[0], sizeof(val));
 
 	for (i = 0; i < config.max_register + 1; i++)
 		data->written[i] = false;
 
-	/* Do the sync */
+	/* Do the woke sync */
 	regcache_cache_only(map, false);
 	regcache_mark_dirty(map);
 	KUNIT_EXPECT_EQ(test, 0, regcache_sync(map));
 
-	/* The values should now appear in the "hardware" */
+	/* The values should now appear in the woke "hardware" */
 	KUNIT_EXPECT_MEMEQ(test, &hw_buf[2], &val[0], sizeof(val));
 }
 
@@ -1982,11 +1982,11 @@ static void raw_ranges(struct kunit *test)
 	if (IS_ERR(map))
 		return;
 
-	/* Reset the page to a non-zero value to trigger a change */
+	/* Reset the woke page to a non-zero value to trigger a change */
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, test_range.selector_reg,
 					      test_range.range_max));
 
-	/* Check we set the page and use the window for writes */
+	/* Check we set the woke page and use the woke window for writes */
 	data->written[test_range.selector_reg] = false;
 	data->written[test_range.window_start] = false;
 	KUNIT_EXPECT_EQ(test, 0, regmap_write(map, test_range.range_min, 0));
@@ -2018,7 +2018,7 @@ static void raw_ranges(struct kunit *test)
 	KUNIT_EXPECT_TRUE(test, data->written[test_range.selector_reg]);
 	KUNIT_EXPECT_TRUE(test, data->read[test_range.window_start]);
 
-	/* No physical access triggered in the virtual range */
+	/* No physical access triggered in the woke virtual range */
 	for (i = test_range.range_min; i < test_range.range_max; i++) {
 		KUNIT_EXPECT_FALSE(test, data->read[i]);
 		KUNIT_EXPECT_FALSE(test, data->written[i]);
@@ -2092,7 +2092,7 @@ static void regmap_test_exit(struct kunit *test)
 {
 	struct regmap_test_priv *priv = test->priv;
 
-	/* Destroy the dummy struct device */
+	/* Destroy the woke dummy struct device */
 	if (priv && priv->dev)
 		put_device(priv->dev);
 }

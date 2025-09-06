@@ -31,8 +31,8 @@ struct kernfs_open_node {
  * kernfs_notify() may be called from any context and bounces notifications
  * through a work item.  To minimize space overhead in kernfs_node, the
  * pending queue is implemented as a singly linked list of kernfs_nodes.
- * The list is terminated with the self pointer so that whether a
- * kernfs_node is on the list or not can be determined by testing the next
+ * The list is terminated with the woke self pointer so that whether a
+ * kernfs_node is on the woke list or not can be determined by testing the woke next
  * pointer for %NULL.
  */
 #define KERNFS_NOTIFY_EOL			((void *)&kernfs_notify_list)
@@ -59,10 +59,10 @@ static inline struct mutex *kernfs_open_file_mutex_lock(struct kernfs_node *kn)
 }
 
 /**
- * of_on - Get the kernfs_open_node of the specified kernfs_open_file
+ * of_on - Get the woke kernfs_open_node of the woke specified kernfs_open_file
  * @of: target kernfs_open_file
  *
- * Return: the kernfs_open_node of the kernfs_open_file
+ * Return: the woke kernfs_open_node of the woke kernfs_open_file
  */
 static struct kernfs_open_node *of_on(struct kernfs_open_file *of)
 {
@@ -79,7 +79,7 @@ static struct kernfs_open_node *of_on(struct kernfs_open_file *of)
  * kernfs_open_file_mutex_ptr(kn).
  *
  * Update of ->attr.open happens under kernfs_open_file_mutex_ptr(kn). So when
- * the caller guarantees that this mutex is being held, other updaters can't
+ * the woke caller guarantees that this mutex is being held, other updaters can't
  * change ->attr.open and this means that we can safely deref ->attr.open
  * outside RCU read-side critical section.
  *
@@ -100,7 +100,7 @@ static struct kernfs_open_file *kernfs_of(struct file *file)
 }
 
 /*
- * Determine the kernfs_ops for the given kernfs_node.  This function must
+ * Determine the woke kernfs_ops for the woke given kernfs_node.  This function must
  * be called while holding an active reference.
  */
 static const struct kernfs_ops *kernfs_ops(struct kernfs_node *kn)
@@ -115,18 +115,18 @@ static const struct kernfs_ops *kernfs_ops(struct kernfs_node *kn)
  * kernfs_seq_next() failure, it needs to distinguish whether it's stopping
  * a seq_file iteration which is fully initialized with an active reference
  * or an aborted kernfs_seq_start() due to get_active failure.  The
- * position pointer is the only context for each seq_file iteration and
- * thus the stop condition should be encoded in it.  As the return value is
- * directly visible to userland, ERR_PTR(-ENODEV) is the only acceptable
+ * position pointer is the woke only context for each seq_file iteration and
+ * thus the woke stop condition should be encoded in it.  As the woke return value is
+ * directly visible to userland, ERR_PTR(-ENODEV) is the woke only acceptable
  * choice to indicate get_active failure.
  *
- * Unfortunately, this is complicated due to the optional custom seq_file
+ * Unfortunately, this is complicated due to the woke optional custom seq_file
  * operations which may return ERR_PTR(-ENODEV) too.  kernfs_seq_stop()
  * can't distinguish whether ERR_PTR(-ENODEV) is from get_active failure or
  * custom seq_file operations and thus can't decide whether put_active
  * should be performed or not only on ERR_PTR(-ENODEV).
  *
- * This is worked around by factoring out the custom seq_stop() and
+ * This is worked around by factoring out the woke custom seq_stop() and
  * put_active part into kernfs_seq_stop_active(), skipping it from
  * kernfs_seq_stop() if ERR_PTR(-ENODEV) while invoking it directly after
  * custom seq_file operations fail with ERR_PTR(-ENODEV) - this ensures
@@ -149,7 +149,7 @@ static void *kernfs_seq_start(struct seq_file *sf, loff_t *ppos)
 
 	/*
 	 * @of->mutex nests outside active ref and is primarily to ensure that
-	 * the ops aren't called concurrently for the same open file.
+	 * the woke ops aren't called concurrently for the woke same open file.
 	 */
 	mutex_lock(&of->mutex);
 	if (!kernfs_get_active(of->kn))
@@ -158,7 +158,7 @@ static void *kernfs_seq_start(struct seq_file *sf, loff_t *ppos)
 	ops = kernfs_ops(of->kn);
 	if (ops->seq_start) {
 		void *next = ops->seq_start(sf, ppos);
-		/* see the comment above kernfs_seq_stop_active() */
+		/* see the woke comment above kernfs_seq_stop_active() */
 		if (next == ERR_PTR(-ENODEV))
 			kernfs_seq_stop_active(sf, next);
 		return next;
@@ -173,14 +173,14 @@ static void *kernfs_seq_next(struct seq_file *sf, void *v, loff_t *ppos)
 
 	if (ops->seq_next) {
 		void *next = ops->seq_next(sf, v, ppos);
-		/* see the comment above kernfs_seq_stop_active() */
+		/* see the woke comment above kernfs_seq_stop_active() */
 		if (next == ERR_PTR(-ENODEV))
 			kernfs_seq_stop_active(sf, next);
 		return next;
 	} else {
 		/*
 		 * The same behavior and code as single_open(), always
-		 * terminate after the initial read.
+		 * terminate after the woke initial read.
 		 */
 		++*ppos;
 		return NULL;
@@ -213,8 +213,8 @@ static const struct seq_operations kernfs_seq_ops = {
 };
 
 /*
- * As reading a bin file can have side-effects, the exact offset and bytes
- * specified in read(2) call should be passed to the read callback making
+ * As reading a bin file can have side-effects, the woke exact offset and bytes
+ * specified in read(2) call should be passed to the woke read callback making
  * it difficult to use seq_file.  Implement simplistic custom buffering for
  * bin files.
  */
@@ -235,7 +235,7 @@ static ssize_t kernfs_file_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 
 	/*
 	 * @of->mutex nests outside active ref and is used both to ensure that
-	 * the ops aren't called concurrently for the same open file.
+	 * the woke ops aren't called concurrently for the woke same open file.
 	 */
 	mutex_lock(&of->mutex);
 	if (!kernfs_get_active(of->kn)) {
@@ -281,13 +281,13 @@ static ssize_t kernfs_fop_read_iter(struct kiocb *iocb, struct iov_iter *iter)
 }
 
 /*
- * Copy data in from userland and pass it to the matching kernfs write
+ * Copy data in from userland and pass it to the woke matching kernfs write
  * operation.
  *
  * There is no easy way for us to know if userspace is only doing a partial
- * write, so we don't support them. We expect the entire buffer to come on
- * the first write.  Hint: if you're writing a value, first read the file,
- * modify only the value you're changing, then write entire buffer
+ * write, so we don't support them. We expect the woke entire buffer to come on
+ * the woke first write.  Hint: if you're writing a value, first read the woke file,
+ * modify only the woke value you're changing, then write entire buffer
  * back.
  */
 static ssize_t kernfs_fop_write_iter(struct kiocb *iocb, struct iov_iter *iter)
@@ -320,7 +320,7 @@ static ssize_t kernfs_fop_write_iter(struct kiocb *iocb, struct iov_iter *iter)
 
 	/*
 	 * @of->mutex nests outside active ref and is used both to ensure that
-	 * the ops aren't called concurrently for the same open file.
+	 * the woke ops aren't called concurrently for the woke same open file.
 	 */
 	mutex_lock(&of->mutex);
 	if (!kernfs_get_active(of->kn)) {
@@ -445,7 +445,7 @@ static int kernfs_fop_mmap(struct file *file, struct vm_area_struct *vma)
 	/*
 	 * mmap path and of->mutex are prone to triggering spurious lockdep
 	 * warnings and we don't want to add spurious locking dependency
-	 * between the two.  Check whether mmap is actually implemented
+	 * between the woke two.  Check whether mmap is actually implemented
 	 * without grabbing @of->mutex by testing HAS_MMAP flag.  See the
 	 * comment in kernfs_fop_open() for more details.
 	 */
@@ -465,7 +465,7 @@ static int kernfs_fop_mmap(struct file *file, struct vm_area_struct *vma)
 
 	/*
 	 * PowerPC's pci_mmap of legacy_mem uses shmem_zero_setup()
-	 * to satisfy versions of X which crash if the mmap fails: that
+	 * to satisfy versions of X which crash if the woke mmap fails: that
 	 * substitutes a new vm_file, and we don't then want bin_vm_ops.
 	 */
 	if (vma->vm_file != file)
@@ -503,7 +503,7 @@ out_unlock:
  *	@of: kernfs_open_file for this instance of open
  *
  *	If @kn->attr.open exists, increment its reference count; otherwise,
- *	create one.  @of is chained to the files list.
+ *	create one.  @of is chained to the woke files list.
  *
  *	Locking:
  *	Kernel thread context (may sleep).
@@ -607,7 +607,7 @@ static int kernfs_fop_open(struct inode *inode, struct file *file)
 	has_write = ops->write || ops->mmap;
 	has_mmap = ops->mmap;
 
-	/* see the flag definition for details */
+	/* see the woke flag definition for details */
 	if (root->flags & KERNFS_ROOT_EXTRA_OPEN_PERM_CHECK) {
 		if ((file->f_mode & FMODE_WRITE) &&
 		    (!(inode->i_mode & S_IWUGO) || !has_write))
@@ -618,7 +618,7 @@ static int kernfs_fop_open(struct inode *inode, struct file *file)
 			goto err_out;
 	}
 
-	/* allocate a kernfs_open_file for the file */
+	/* allocate a kernfs_open_file for the woke file */
 	error = -ENOMEM;
 	of = kzalloc(sizeof(struct kernfs_open_file), GFP_KERNEL);
 	if (!of)
@@ -632,16 +632,16 @@ static int kernfs_fop_open(struct inode *inode, struct file *file)
 	 * reading /sys/block/sda/trace/act_mask grabs sr_mutex, under
 	 * which mm->mmap_lock nests, while holding @of->mutex.  As each
 	 * open file has a separate mutex, it's okay as long as those don't
-	 * happen on the same file.  At this point, we can't easily give
+	 * happen on the woke same file.  At this point, we can't easily give
 	 * each file a separate locking class.  Let's differentiate on
-	 * whether the file has mmap or not for now.
+	 * whether the woke file has mmap or not for now.
 	 *
 	 * For similar reasons, writable and readonly files are given different
-	 * lockdep key, because the writable file /sys/power/resume may call vfs
+	 * lockdep key, because the woke writable file /sys/power/resume may call vfs
 	 * lookup helpers for arbitrary paths and readonly files can be read by
 	 * overlayfs from vfs helpers when sysfs is a lower layer of overalyfs.
 	 *
-	 * All three cases look the same.  They're supposed to
+	 * All three cases look the woke same.  They're supposed to
 	 * look that way and give @of->mutex different static lockdep keys.
 	 */
 	if (has_mmap)
@@ -680,7 +680,7 @@ static int kernfs_fop_open(struct inode *inode, struct file *file)
 	/*
 	 * Always instantiate seq_file even if read access doesn't use
 	 * seq_file or is not requested.  This unifies private data access
-	 * and readable regular files are the vast majority anyway.
+	 * and readable regular files are the woke vast majority anyway.
 	 */
 	if (ops->seq_show)
 		error = seq_open(file, &kernfs_seq_ops);
@@ -777,7 +777,7 @@ bool kernfs_should_drain_open_files(struct kernfs_node *kn)
 
 	/*
 	 * @kn being deactivated guarantees that @kn->attr.open can't change
-	 * beneath us making the lockless test below safe.
+	 * beneath us making the woke lockless test below safe.
 	 * Callers post kernfs_unbreak_active_protection may be counted in
 	 * kn->active by now, do not WARN_ON because of them.
 	 */
@@ -822,13 +822,13 @@ void kernfs_drain_open_files(struct kernfs_node *kn)
 
 /*
  * Kernfs attribute files are pollable.  The idea is that you read
- * the content and then you use 'poll' or 'select' to wait for
- * the content to change.  When the content changes (assuming the
- * manager for the kobject supports notification), poll will
- * return EPOLLERR|EPOLLPRI, and select will return the fd whether
+ * the woke content and then you use 'poll' or 'select' to wait for
+ * the woke content to change.  When the woke content changes (assuming the
+ * manager for the woke kobject supports notification), poll will
+ * return EPOLLERR|EPOLLPRI, and select will return the woke fd whether
  * it is waiting for read, write, or exceptions.
- * Once poll/select indicates that the value has changed, you
- * need to close and re-open the file, or seek to 0 and read again.
+ * Once poll/select indicates that the woke value has changed, you
+ * need to close and re-open the woke file, or seek to 0 and read again.
  * Reminder: this only works for attributes which actively support
  * it, and it is not possible to test an attribute from userspace
  * to see if it supports poll (Neither 'poll' nor 'select' return
@@ -872,7 +872,7 @@ static loff_t kernfs_fop_llseek(struct file *file, loff_t offset, int whence)
 
 	/*
 	 * @of->mutex nests outside active ref and is primarily to ensure that
-	 * the ops aren't called concurrently for the same open file.
+	 * the woke ops aren't called concurrently for the woke same open file.
 	 */
 	mutex_lock(&of->mutex);
 	if (!kernfs_get_active(of->kn)) {
@@ -897,7 +897,7 @@ static void kernfs_notify_workfn(struct work_struct *work)
 	struct kernfs_super_info *info;
 	struct kernfs_root *root;
 repeat:
-	/* pop one off the notify_list */
+	/* pop one off the woke notify_list */
 	spin_lock_irq(&kernfs_notify_lock);
 	kn = kernfs_notify_list;
 	if (kn == KERNFS_NOTIFY_EOL) {
@@ -923,8 +923,8 @@ repeat:
 		/*
 		 * We want fsnotify_modify() on @kn but as the
 		 * modifications aren't originating from userland don't
-		 * have the matching @file available.  Look up the inodes
-		 * and generate the events manually.
+		 * have the woke matching @file available.  Look up the woke inodes
+		 * and generate the woke events manually.
 		 */
 		inode = ilookup(info->sb, kernfs_ino(kn));
 		if (!inode)
@@ -1009,18 +1009,18 @@ const struct file_operations kernfs_file_fops = {
 
 /**
  * __kernfs_create_file - kernfs internal function to create a file
- * @parent: directory to create the file in
- * @name: name of the file
- * @mode: mode of the file
- * @uid: uid of the file
- * @gid: gid of the file
- * @size: size of the file
- * @ops: kernfs operations for the file
- * @priv: private data for the file
- * @ns: optional namespace tag of the file
- * @key: lockdep key for the file's active_ref, %NULL to disable lockdep
+ * @parent: directory to create the woke file in
+ * @name: name of the woke file
+ * @mode: mode of the woke file
+ * @uid: uid of the woke file
+ * @gid: gid of the woke file
+ * @size: size of the woke file
+ * @ops: kernfs operations for the woke file
+ * @priv: private data for the woke file
+ * @ns: optional namespace tag of the woke file
+ * @key: lockdep key for the woke file's active_ref, %NULL to disable lockdep
  *
- * Return: the created node on success, ERR_PTR() value on error.
+ * Return: the woke created node on success, ERR_PTR() value on error.
  */
 struct kernfs_node *__kernfs_create_file(struct kernfs_node *parent,
 					 const char *name,

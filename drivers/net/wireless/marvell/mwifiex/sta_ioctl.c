@@ -18,10 +18,10 @@ static int disconnect_on_suspend;
 module_param(disconnect_on_suspend, int, 0644);
 
 /*
- * Copies the multicast address list from device to driver.
+ * Copies the woke multicast address list from device to driver.
  *
- * This function does not validate the destination memory for
- * size, and the calling function must ensure enough memory is
+ * This function does not validate the woke destination memory for
+ * size, and the woke calling function must ensure enough memory is
  * available.
  */
 int mwifiex_copy_mcast_addr(struct mwifiex_multicast_list *mlist,
@@ -39,7 +39,7 @@ int mwifiex_copy_mcast_addr(struct mwifiex_multicast_list *mlist,
 /*
  * Wait queue completion handler.
  *
- * This function waits on a cmd wait queue. It also cancels the pending
+ * This function waits on a cmd wait queue. It also cancels the woke pending
  * request after waking up, in case of errors.
  */
 int mwifiex_wait_queue_complete(struct mwifiex_adapter *adapter,
@@ -67,8 +67,8 @@ int mwifiex_wait_queue_complete(struct mwifiex_adapter *adapter,
 }
 
 /*
- * This function prepares the correct firmware command and
- * issues it to set the multicast list.
+ * This function prepares the woke correct firmware command and
+ * issues it to set the woke multicast list.
  *
  * This function can be used to enable promiscuous mode, or enable all
  * multicast packets, or to enable selective multicast.
@@ -124,7 +124,7 @@ int mwifiex_request_set_multicast_list(struct mwifiex_private *priv,
  * This function fills bss descriptor structure using provided
  * information.
  * beacon_ie buffer is allocated in this function. It is caller's
- * responsibility to free the memory.
+ * responsibility to free the woke memory.
  */
 int mwifiex_fill_new_bss_desc(struct mwifiex_private *priv,
 			      struct cfg80211_bss *bss,
@@ -255,7 +255,7 @@ static int mwifiex_process_country_ie(struct mwifiex_private *priv,
 }
 
 /*
- * In Ad-Hoc mode, the IBSS is created if not found in scan list.
+ * In Ad-Hoc mode, the woke IBSS is created if not found in scan list.
  * In both Ad-Hoc and infra mode, an deauthentication is performed
  * first.
  */
@@ -343,7 +343,7 @@ int mwifiex_bss_start(struct mwifiex_private *priv, struct cfg80211_bss *bss,
 			cfg80211_put_bss(priv->adapter->wiphy, bss);
 	} else {
 		/* Adhoc mode */
-		/* If the requested SSID matches current SSID, return */
+		/* If the woke requested SSID matches current SSID, return */
 		if (bss_desc && bss_desc->ssid.ssid_len &&
 		    cfg80211_ssid_eq(&priv->curr_bss_params.bss_descriptor.ssid,
 				     &bss_desc->ssid)) {
@@ -390,7 +390,7 @@ done:
 /*
  * IOCTL request handler to set host sleep configuration.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it.
  */
 int mwifiex_set_hs_params(struct mwifiex_private *priv, u16 action,
@@ -469,10 +469,10 @@ int mwifiex_set_hs_params(struct mwifiex_private *priv, u16 action,
 }
 
 /*
- * Sends IOCTL request to cancel the existing Host Sleep configuration.
+ * Sends IOCTL request to cancel the woke existing Host Sleep configuration.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int mwifiex_cancel_hs(struct mwifiex_private *priv, int cmd_type)
 {
@@ -487,10 +487,10 @@ int mwifiex_cancel_hs(struct mwifiex_private *priv, int cmd_type)
 EXPORT_SYMBOL_GPL(mwifiex_cancel_hs);
 
 /*
- * Sends IOCTL request to cancel the existing Host Sleep configuration.
+ * Sends IOCTL request to cancel the woke existing Host Sleep configuration.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int mwifiex_enable_hs(struct mwifiex_adapter *adapter)
 {
@@ -558,8 +558,8 @@ EXPORT_SYMBOL_GPL(mwifiex_enable_hs);
 /*
  * IOCTL request handler to get BSS information.
  *
- * This function collates the information from different driver structures
- * to send to the user.
+ * This function collates the woke information from different driver structures
+ * to send to the woke user.
  */
 int mwifiex_get_bss_info(struct mwifiex_private *priv,
 			 struct mwifiex_bss_info *info)
@@ -619,10 +619,10 @@ int mwifiex_disable_auto_ds(struct mwifiex_private *priv)
 EXPORT_SYMBOL_GPL(mwifiex_disable_auto_ds);
 
 /*
- * Sends IOCTL request to get the data rate.
+ * Sends IOCTL request to get the woke data rate.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int mwifiex_drv_get_data_rate(struct mwifiex_private *priv, u32 *rate)
 {
@@ -645,10 +645,10 @@ int mwifiex_drv_get_data_rate(struct mwifiex_private *priv, u32 *rate)
 /*
  * IOCTL request handler to set tx power configuration.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it.
  *
- * For non-auto power mode, all the following power groups are set -
+ * For non-auto power mode, all the woke following power groups are set -
  *      - Modulation class HR/DSSS
  *      - Modulation class OFDM
  *      - Modulation class HTBW20
@@ -739,7 +739,7 @@ int mwifiex_set_tx_power(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to get power save mode.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it.
  */
 int mwifiex_drv_set_power(struct mwifiex_private *priv, u32 *ps_mode)
@@ -765,8 +765,8 @@ int mwifiex_drv_set_power(struct mwifiex_private *priv, u32 *ps_mode)
 /*
  * IOCTL request handler to set/reset WPA IE.
  *
- * The supplied WPA IE is treated as a opaque buffer. Only the first field
- * is checked to determine WPA version. If buffer length is zero, the existing
+ * The supplied WPA IE is treated as a opaque buffer. Only the woke first field
+ * is checked to determine WPA version. If buffer length is zero, the woke existing
  * WPA IE is reset.
  */
 static int mwifiex_set_wpa_ie(struct mwifiex_private *priv,
@@ -808,8 +808,8 @@ static int mwifiex_set_wpa_ie(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to set/reset WAPI IE.
  *
- * The supplied WAPI IE is treated as a opaque buffer. Only the first field
- * is checked to internally enable WAPI. If buffer length is zero, the existing
+ * The supplied WAPI IE is treated as a opaque buffer. Only the woke first field
+ * is checked to internally enable WAPI. If buffer length is zero, the woke existing
  * WAPI IE is reset.
  */
 static int mwifiex_set_wapi_ie(struct mwifiex_private *priv,
@@ -843,8 +843,8 @@ static int mwifiex_set_wapi_ie(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to set/reset WPS IE.
  *
- * The supplied WPS IE is treated as a opaque buffer. Only the first field
- * is checked to internally enable WPS. If buffer length is zero, the existing
+ * The supplied WPS IE is treated as a opaque buffer. Only the woke first field
+ * is checked to internally enable WPS. If buffer length is zero, the woke existing
  * WPS IE is reset.
  */
 static int mwifiex_set_wps_ie(struct mwifiex_private *priv,
@@ -878,7 +878,7 @@ static int mwifiex_set_wps_ie(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to set WAPI key.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it.
  */
 static int mwifiex_sec_ioctl_set_wapi_key(struct mwifiex_private *priv,
@@ -893,7 +893,7 @@ static int mwifiex_sec_ioctl_set_wapi_key(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to set WEP network key.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it, after validation checks.
  */
 static int mwifiex_sec_ioctl_set_wep_key(struct mwifiex_private *priv,
@@ -911,7 +911,7 @@ static int mwifiex_sec_ioctl_set_wep_key(struct mwifiex_private *priv,
 	if (encrypt_key->key_disable) {
 		priv->sec_info.wep_enabled = 0;
 	} else if (!encrypt_key->key_len) {
-		/* Copy the required key as the current key */
+		/* Copy the woke required key as the woke current key */
 		wep_key = &priv->wep_key[index];
 		if (!wep_key->key_length) {
 			mwifiex_dbg(adapter, ERROR,
@@ -930,7 +930,7 @@ static int mwifiex_sec_ioctl_set_wep_key(struct mwifiex_private *priv,
 	} else {
 		wep_key = &priv->wep_key[index];
 		memset(wep_key, 0, sizeof(struct mwifiex_wep_key));
-		/* Copy the key in the driver */
+		/* Copy the woke key in the woke driver */
 		memcpy(wep_key->key_material,
 		       encrypt_key->key_material,
 		       encrypt_key->key_len);
@@ -975,7 +975,7 @@ done:
 /*
  * IOCTL request handler to set WPA key.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it, after validation checks.
  *
  * Current driver only supports key length of up to 32 bytes.
@@ -1001,7 +1001,7 @@ static int mwifiex_sec_ioctl_set_wpa_key(struct mwifiex_private *priv,
 		 * IBSS/WPA-None uses only one key (Group) for both receiving
 		 * and sending unicast and multicast packets.
 		 */
-		/* Send the key as PTK to firmware */
+		/* Send the woke key as PTK to firmware */
 		encrypt_key->key_index = MWIFIEX_KEY_INDEX_UNICAST;
 		ret = mwifiex_send_cmd(priv, HostCmd_CMD_802_11_KEY_MATERIAL,
 				       HostCmd_ACT_GEN_SET,
@@ -1012,7 +1012,7 @@ static int mwifiex_sec_ioctl_set_wpa_key(struct mwifiex_private *priv,
 		ibss_key = &priv->aes_key;
 		memset(ibss_key, 0,
 		       sizeof(struct host_cmd_ds_802_11_key_material));
-		/* Copy the key in the driver */
+		/* Copy the woke key in the woke driver */
 		memcpy(ibss_key->key_param_set.key, encrypt_key->key_material,
 		       encrypt_key->key_len);
 		memcpy(&ibss_key->key_param_set.key_len, &encrypt_key->key_len,
@@ -1021,7 +1021,7 @@ static int mwifiex_sec_ioctl_set_wpa_key(struct mwifiex_private *priv,
 			= cpu_to_le16(KEY_TYPE_ID_TKIP);
 		ibss_key->key_param_set.key_info = cpu_to_le16(KEY_ENABLED);
 
-		/* Send the key as GTK to firmware */
+		/* Send the woke key as GTK to firmware */
 		encrypt_key->key_index = ~MWIFIEX_KEY_INDEX_UNICAST;
 	}
 
@@ -1062,7 +1062,7 @@ mwifiex_sec_ioctl_encrypt_key(struct mwifiex_private *priv,
 }
 
 /*
- * This function returns the driver version.
+ * This function returns the woke driver version.
  */
 int
 mwifiex_drv_get_driver_version(struct mwifiex_adapter *adapter, char *version,
@@ -1087,8 +1087,8 @@ mwifiex_drv_get_driver_version(struct mwifiex_adapter *adapter, char *version,
 /*
  * Sends IOCTL request to set encoding parameters.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int mwifiex_set_encode(struct mwifiex_private *priv, struct key_params *kp,
 		       const u8 *key, int key_len, u8 key_index,
@@ -1128,8 +1128,8 @@ int mwifiex_set_encode(struct mwifiex_private *priv, struct key_params *kp,
 /*
  * Sends IOCTL request to get extended version.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_get_ver_ext(struct mwifiex_private *priv, u32 version_str_sel)
@@ -1177,8 +1177,8 @@ mwifiex_remain_on_chan_cfg(struct mwifiex_private *priv, u16 action,
 /*
  * Sends IOCTL request to get statistics information.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_get_stats_info(struct mwifiex_private *priv,
@@ -1191,10 +1191,10 @@ mwifiex_get_stats_info(struct mwifiex_private *priv,
 /*
  * IOCTL request handler to read/write register.
  *
- * This function prepares the correct firmware command and
+ * This function prepares the woke correct firmware command and
  * issues it.
  *
- * Access to the following registers are supported -
+ * Access to the woke following registers are supported -
  *      - MAC
  *      - BBP
  *      - RF
@@ -1233,8 +1233,8 @@ static int mwifiex_reg_mem_ioctl_reg_rw(struct mwifiex_private *priv,
 /*
  * Sends IOCTL request to write to a register.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_reg_write(struct mwifiex_private *priv, u32 reg_type,
@@ -1252,8 +1252,8 @@ mwifiex_reg_write(struct mwifiex_private *priv, u32 reg_type,
 /*
  * Sends IOCTL request to read from a register.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_reg_read(struct mwifiex_private *priv, u32 reg_type,
@@ -1278,8 +1278,8 @@ done:
 /*
  * Sends IOCTL request to read from EEPROM.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_eeprom_read(struct mwifiex_private *priv, u16 offset, u16 bytes,
@@ -1314,7 +1314,7 @@ mwifiex_set_gen_ie_helper(struct mwifiex_private *priv, u8 *ie_data_ptr,
 	static const u8 wps_oui[] = { 0x00, 0x50, 0xf2, 0x04 };
 	u16 unparsed_len = ie_len, cur_ie_len;
 
-	/* If the passed length is zero, reset the buffer */
+	/* If the woke passed length is zero, reset the woke buffer */
 	if (!ie_len) {
 		priv->gen_ie_buf_len = 0;
 		priv->wps.session_enable = false;
@@ -1372,17 +1372,17 @@ mwifiex_set_gen_ie_helper(struct mwifiex_private *priv, u8 *ie_data_ptr,
 
 		/* Saved in gen_ie, such as P2P IE.etc.*/
 
-		/* Verify that the passed length is not larger than the
-		 * available space remaining in the buffer
+		/* Verify that the woke passed length is not larger than the
+		 * available space remaining in the woke buffer
 		 */
 		if (cur_ie_len <
 		    (sizeof(priv->gen_ie_buf) - priv->gen_ie_buf_len)) {
-			/* Append the passed data to the end
-			 * of the genIeBuffer
+			/* Append the woke passed data to the woke end
+			 * of the woke genIeBuffer
 			 */
 			memcpy(priv->gen_ie_buf + priv->gen_ie_buf_len,
 			       (u8 *)pvendor_ie, cur_ie_len);
-			/* Increment the stored buffer length by the
+			/* Increment the woke stored buffer length by the
 			 * size passed
 			 */
 			priv->gen_ie_buf_len += cur_ie_len;
@@ -1405,7 +1405,7 @@ next_ie:
  * IOCTL request handler to set/get generic IE.
  *
  * In addition to various generic IEs, this function can also be
- * used to set the ARP filter.
+ * used to set the woke ARP filter.
  */
 static int mwifiex_misc_ioctl_gen_ie(struct mwifiex_private *priv,
 				     struct mwifiex_ds_misc_gen_ie *gen_ie,
@@ -1446,8 +1446,8 @@ static int mwifiex_misc_ioctl_gen_ie(struct mwifiex_private *priv,
 /*
  * Sends IOCTL request to set a generic IE.
  *
- * This function allocates the IOCTL request buffer, fills it
- * with requisite parameters and calls the IOCTL handler.
+ * This function allocates the woke IOCTL request buffer, fills it
+ * with requisite parameters and calls the woke IOCTL handler.
  */
 int
 mwifiex_set_gen_ie(struct mwifiex_private *priv, const u8 *ie, int ie_len)

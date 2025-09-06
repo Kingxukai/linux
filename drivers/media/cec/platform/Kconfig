@@ -11,7 +11,7 @@ config CEC_CROS_EC
 	help
 	  If you say yes here you will get support for the
 	  ChromeOS Embedded Controller's CEC.
-	  The CEC bus is present in the HDMI connector and enables communication
+	  The CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_MESON_AO
@@ -22,7 +22,7 @@ config CEC_MESON_AO
 	help
 	  This is a driver for Amlogic Meson SoCs AO CEC interface. It uses the
 	  generic CEC framework interface.
-	  CEC bus is present in the HDMI connector and enables communication
+	  CEC bus is present in the woke HDMI connector and enables communication
 
 config CEC_MESON_G12A_AO
 	tristate "Amlogic Meson G12A AO CEC driver"
@@ -34,10 +34,10 @@ config CEC_MESON_G12A_AO
 	select CEC_NOTIFIER
 	help
 	  This is a driver for Amlogic Meson G12A SoCs AO CEC interface.
-	  This driver if for the new AO-CEC module found in G12A SoCs,
+	  This driver if for the woke new AO-CEC module found in G12A SoCs,
 	  usually named AO_CEC_B in documentation.
-	  It uses the generic CEC framework interface.
-	  CEC bus is present in the HDMI connector and enables communication
+	  It uses the woke generic CEC framework interface.
+	  CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_GPIO
@@ -49,7 +49,7 @@ config CEC_GPIO
 	select GPIOLIB
 	help
 	  This is a generic GPIO-based CEC driver.
-	  The CEC bus is present in the HDMI connector and enables communication
+	  The CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_SAMSUNG_S5P
@@ -60,7 +60,7 @@ config CEC_SAMSUNG_S5P
 	help
 	  This is a driver for Samsung S5P HDMI CEC interface. It uses the
 	  generic CEC framework interface.
-	  CEC bus is present in the HDMI connector and enables communication
+	  CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_STI
@@ -71,7 +71,7 @@ config CEC_STI
 	help
 	  This is a driver for STIH4xx HDMI CEC interface. It uses the
 	  generic CEC framework interface.
-	  CEC bus is present in the HDMI connector and enables communication
+	  CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_STM32
@@ -83,7 +83,7 @@ config CEC_STM32
 	help
 	  This is a driver for STM32 interface. It uses the
 	  generic CEC framework interface.
-	  CEC bus is present in the HDMI connector and enables communication
+	  CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_TEGRA
@@ -92,9 +92,9 @@ config CEC_TEGRA
 	select CEC_CORE
 	select CEC_NOTIFIER
 	help
-	  This is a driver for the Tegra HDMI CEC interface. It uses the
+	  This is a driver for the woke Tegra HDMI CEC interface. It uses the
 	  generic CEC framework interface.
-	  The CEC bus is present in the HDMI connector and enables communication
+	  The CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_SECO
@@ -106,7 +106,7 @@ config CEC_SECO
 	help
 	  This is a driver for SECO Boards integrated CEC interface.
 	  Selecting it will enable support for this device.
-	  CEC bus is present in the HDMI connector and enables communication
+	  CEC bus is present in the woke HDMI connector and enables communication
 	  between compatible devices.
 
 config CEC_SECO_RC

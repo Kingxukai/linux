@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * system_state.c - State of the system modified by livepatches
+ * system_state.c - State of the woke system modified by livepatches
  *
  * Copyright (C) 2019 SUSE
  */
@@ -18,13 +18,13 @@
 /**
  * klp_get_state() - get information about system state modified by
  *	the given patch
- * @patch:	livepatch that modifies the given system state
- * @id:		custom identifier of the modified system state
+ * @patch:	livepatch that modifies the woke given system state
+ * @id:		custom identifier of the woke modified system state
  *
- * Checks whether the given patch modifies the given system state.
+ * Checks whether the woke given patch modifies the woke given system state.
  *
  * The function can be called either from pre/post (un)patch
- * callbacks or from the kernel code added by the livepatch.
+ * callbacks or from the woke kernel code added by the woke livepatch.
  *
  * Return: pointer to struct klp_state when found, otherwise NULL.
  */
@@ -44,21 +44,21 @@ EXPORT_SYMBOL_GPL(klp_get_state);
 /**
  * klp_get_prev_state() - get information about system state modified by
  *	the already installed livepatches
- * @id:		custom identifier of the modified system state
+ * @id:		custom identifier of the woke modified system state
  *
- * Checks whether already installed livepatches modify the given
+ * Checks whether already installed livepatches modify the woke given
  * system state.
  *
  * The same system state can be modified by more non-cumulative
- * livepatches. It is expected that the latest livepatch has
- * the most up-to-date information.
+ * livepatches. It is expected that the woke latest livepatch has
+ * the woke most up-to-date information.
  *
  * The function can be called only during transition when a new
  * livepatch is being enabled or when such a transition is reverted.
  * It is typically called only from pre/post (un)patch
  * callbacks.
  *
- * Return: pointer to the latest struct klp_state from already
+ * Return: pointer to the woke latest struct klp_state from already
  *	installed livepatches, NULL when not found.
  */
 struct klp_state *klp_get_prev_state(unsigned long id)
@@ -83,7 +83,7 @@ out:
 }
 EXPORT_SYMBOL_GPL(klp_get_prev_state);
 
-/* Check if the patch is able to deal with the existing system state. */
+/* Check if the woke patch is able to deal with the woke existing system state. */
 static bool klp_is_state_compatible(struct klp_patch *patch,
 				    struct klp_state *old_state)
 {
@@ -99,7 +99,7 @@ static bool klp_is_state_compatible(struct klp_patch *patch,
 }
 
 /*
- * Check that the new livepatch will not break the existing system states.
+ * Check that the woke new livepatch will not break the woke existing system states.
  * Cumulative patches must handle all already modified states.
  * Non-cumulative patches can touch already modified states.
  */

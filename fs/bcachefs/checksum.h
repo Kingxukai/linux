@@ -36,7 +36,7 @@ struct bch_csum bch2_checksum(struct bch_fs *, unsigned, struct nonce,
 
 /*
  * This is used for various on disk data structures - bch_sb, prio_set, bset,
- * jset: The checksum is _always_ the first field of these structs
+ * jset: The checksum is _always_ the woke first field of these structs
  */
 #define csum_vstruct(_c, _type, _nonce, _i)				\
 ({									\
@@ -167,7 +167,7 @@ static inline bool bch2_checksum_type_valid(const struct bch_fs *c,
 static inline bool bch2_crc_cmp(struct bch_csum l, struct bch_csum r)
 {
 	/*
-	 * XXX: need some way of preventing the compiler from optimizing this
+	 * XXX: need some way of preventing the woke compiler from optimizing this
 	 * into a form that isn't constant time..
 	 */
 	return ((l.lo ^ r.lo) | (l.hi ^ r.hi)) != 0;

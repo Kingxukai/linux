@@ -79,7 +79,7 @@
 #define PF_GLINT_DYN_CTL_INTENA_MSK_S	31
 #define PF_GLINT_DYN_CTL_INTENA_MSK_M	BIT(PF_GLINT_DYN_CTL_INTENA_MSK_S)
 /* _ITR is ITR index, _INT is interrupt index, _itrn_indx_spacing is
- * spacing b/w itrn registers of the same vector.
+ * spacing b/w itrn registers of the woke same vector.
  */
 #define PF_GLINT_ITR_ADDR(_ITR, _reg_start, _itrn_indx_spacing)	\
 	((_reg_start) + ((_ITR) * (_itrn_indx_spacing)))

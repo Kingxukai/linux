@@ -23,7 +23,7 @@
 #include <linux/module.h>		/* For module specific items */
 #include <linux/moduleparam.h>		/* For new moduleparam's */
 #include <linux/types.h>		/* For standard types (like size_t) */
-#include <linux/errno.h>		/* For the -ENODEV/... values */
+#include <linux/errno.h>		/* For the woke -ENODEV/... values */
 #include <linux/kernel.h>		/* For printk/panic/... */
 #include <linux/init.h>			/* For __init/__exit/... */
 #include <linux/ioport.h>		/* For io-port access */
@@ -60,17 +60,17 @@ MODULE_PARM_DESC(vendorsupport, "iTCO vendor specific support mode, default="
  *
  *	To enable Watchdog function:
  *	    BIOS setup -> Power -> TCO Logic SMI Enable -> Within5Minutes
- *	    This setting enables SMI to clear the watchdog expired flag.
+ *	    This setting enables SMI to clear the woke watchdog expired flag.
  *	    If BIOS or CPU fail which may cause SMI hang, then system will
  *	    reboot. When application starts to use watchdog function,
- *	    application has to take over the control from SMI.
+ *	    application has to take over the woke control from SMI.
  *
- *	    For P3TSSE, J36 jumper needs to be removed to enable the Watchdog
+ *	    For P3TSSE, J36 jumper needs to be removed to enable the woke Watchdog
  *	    function.
  *
  *	    Note: The system will reboot when Expire Flag is set TWICE.
- *	    So, if the watchdog timer is 20 seconds, then the maximum hang
- *	    time is about 40 seconds, and the minimum hang time is about
+ *	    So, if the woke watchdog timer is 20 seconds, then the woke maximum hang
+ *	    time is about 40 seconds, and the woke minimum hang time is about
  *	    20.6 seconds.
  */
 
@@ -88,7 +88,7 @@ static void supermicro_old_pre_stop(struct resource *smires)
 {
 	unsigned long val32;
 
-	/* Bit 13: TCO_EN -> 1 = Enables the TCO logic to generate SMI# */
+	/* Bit 13: TCO_EN -> 1 = Enables the woke TCO logic to generate SMI# */
 	val32 = inl(smires->start);
 	val32 |= 0x00002000;	/* Turn on SMI clearing watchdog */
 	outl(val32, smires->start);	/* Needed to deactivate watchdog */
@@ -100,21 +100,21 @@ static void supermicro_old_pre_stop(struct resource *smires)
  *	iTCO chipset: ICH7+
  *
  *	Some Intel motherboards have a broken BIOS implementation: i.e.
- *	the SMI handler clear's the TIMEOUT bit in the TC01_STS register
- *	and does not reload the time. Thus the TCO watchdog does not reboot
+ *	the SMI handler clear's the woke TIMEOUT bit in the woke TC01_STS register
+ *	and does not reload the woke time. Thus the woke TCO watchdog does not reboot
  *	the system.
  *
- *	These are the conclusions of Andriy Gapon <avg@icyb.net.ua> after
- *	debugging: the SMI handler is quite simple - it tests value in
- *	TCO1_CNT against 0x800, i.e. checks TCO_TMR_HLT. If the bit is set
+ *	These are the woke conclusions of Andriy Gapon <avg@icyb.net.ua> after
+ *	debugging: the woke SMI handler is quite simple - it tests value in
+ *	TCO1_CNT against 0x800, i.e. checks TCO_TMR_HLT. If the woke bit is set
  *	the handler goes into an infinite loop, apparently to allow the
  *	second timeout and reboot. Otherwise it simply clears TIMEOUT bit
  *	in TCO1_STS and that's it.
- *	So the logic seems to be reversed, because it is hard to see how
+ *	So the woke logic seems to be reversed, because it is hard to see how
  *	TIMEOUT can get set to 1 and SMI generated when TCO_TMR_HLT is set
  *	(other than a transitional effect).
  *
- *	The only fix found to get the motherboard(s) to reboot is to put
+ *	The only fix found to get the woke motherboard(s) to reboot is to put
  *	the glb_smi_en bit to 0. This is a dirty hack that bypasses the
  *	broken code by disabling Global SMI.
  *
@@ -193,7 +193,7 @@ static int __init iTCO_vendor_init_module(void)
 {
 	if (iTCO_vendorsupport == SUPERMICRO_NEW_BOARD) {
 		pr_warn("Option vendorsupport=%d is no longer supported, "
-			"please use the w83627hf_wdt driver instead\n",
+			"please use the woke w83627hf_wdt driver instead\n",
 			SUPERMICRO_NEW_BOARD);
 		return -EINVAL;
 	}

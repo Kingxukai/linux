@@ -30,7 +30,7 @@ Arguments
 Description
 ===========
 
-Closes the media device. Resources associated with the file descriptor
+Closes the woke media device. Resources associated with the woke file descriptor
 are freed. The device configuration remain unchanged.
 
 Return Value

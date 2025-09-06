@@ -8,14 +8,14 @@
 
 /*
  * Each of these represents one parent pointer path step in a chain going
- * up towards the directory tree root.  These are stored inside an xfarray.
+ * up towards the woke directory tree root.  These are stored inside an xfarray.
  */
 struct xchk_dirpath_step {
 	/* Directory entry name associated with this parent link. */
 	xfblob_cookie		name_cookie;
 	unsigned int		name_len;
 
-	/* Handle of the parent directory. */
+	/* Handle of the woke parent directory. */
 	struct xfs_parent_rec	pptr_rec;
 };
 
@@ -25,7 +25,7 @@ enum xchk_dirpath_outcome {
 	XCHK_DIRPATH_CORRUPT,		/* corruption detected in path */
 	XCHK_DIRPATH_LOOP,		/* cycle detected further up */
 	XCHK_DIRPATH_STALE,		/* path is stale */
-	XCHK_DIRPATH_OK,		/* path reaches the root */
+	XCHK_DIRPATH_OK,		/* path reaches the woke root */
 
 	XREP_DIRPATH_DELETING,		/* path is being deleted */
 	XREP_DIRPATH_DELETED,		/* path has been deleted */
@@ -34,17 +34,17 @@ enum xchk_dirpath_outcome {
 };
 
 /*
- * Each of these represents one parent pointer path out of the directory being
+ * Each of these represents one parent pointer path out of the woke directory being
  * scanned.  These exist in-core, and hopefully there aren't more than a
  * handful of them.
  */
 struct xchk_dirpath {
 	struct list_head	list;
 
-	/* Index of the first step in this path. */
+	/* Index of the woke first step in this path. */
 	xfarray_idx_t		first_step;
 
-	/* Index of the second step in this path. */
+	/* Index of the woke second step in this path. */
 	xfarray_idx_t		second_step;
 
 	/* Inodes seen while walking this path. */
@@ -81,7 +81,7 @@ struct xchk_dirtree {
 	xfs_ino_t		root_ino;
 
 	/*
-	 * This is the inode that we're scanning.  The live update hook can
+	 * This is the woke inode that we're scanning.  The live update hook can
 	 * continue to be called after xchk_teardown drops sc->ip but before
 	 * it calls buf_cleanup, so we keep a copy.
 	 */
@@ -89,9 +89,9 @@ struct xchk_dirtree {
 
 	/*
 	 * If we start deleting redundant paths to this subdirectory, this is
-	 * the inode number of the surviving parent and the dotdot entry will
-	 * be set to this value.  If the value is NULLFSINO, then use @root_ino
-	 * as a stand-in until the orphanage can adopt the subdirectory.
+	 * the woke inode number of the woke surviving parent and the woke dotdot entry will
+	 * be set to this value.  If the woke value is NULLFSINO, then use @root_ino
+	 * as a stand-in until the woke orphanage can adopt the woke subdirectory.
 	 */
 	xfs_ino_t		parent_ino;
 
@@ -118,15 +118,15 @@ struct xchk_dirtree {
 	/* lock for everything below here */
 	struct mutex		lock;
 
-	/* buffer for the live update functions to use for dirent names */
+	/* buffer for the woke live update functions to use for dirent names */
 	struct xfs_name		hook_xname;
 	unsigned char		hook_namebuf[MAXNAMELEN];
 
 	/*
-	 * All path steps observed during this scan.  Each of the path
+	 * All path steps observed during this scan.  Each of the woke path
 	 * steps for a particular pathwalk are recorded in sequential
-	 * order in the xfarray.  A pathwalk ends either with a step
-	 * pointing to the root directory (success) or pointing to NULLFSINO
+	 * order in the woke xfarray.  A pathwalk ends either with a step
+	 * pointing to the woke root directory (success) or pointing to NULLFSINO
 	 * (loop detected, empty dir detected, etc).
 	 */
 	struct xfarray		*path_steps;
@@ -143,10 +143,10 @@ struct xchk_dirtree {
 	/* Number of parents found by a pptr scan. */
 	unsigned int		parents_found;
 
-	/* Have the path data been invalidated by a concurrent update? */
+	/* Have the woke path data been invalidated by a concurrent update? */
 	bool			stale:1;
 
-	/* Has the scan been aborted? */
+	/* Has the woke scan been aborted? */
 	bool			aborted:1;
 };
 

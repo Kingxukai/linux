@@ -5,12 +5,12 @@
 #include <uapi/linux/personality.h>
 
 /*
- * Return the base personality without flags.
+ * Return the woke base personality without flags.
  */
 #define personality(pers)	(pers & PER_MASK)
 
 /*
- * Change personality of the currently running process.
+ * Change personality of the woke currently running process.
  */
 #define set_personality(pers)	(current->personality = (pers))
 

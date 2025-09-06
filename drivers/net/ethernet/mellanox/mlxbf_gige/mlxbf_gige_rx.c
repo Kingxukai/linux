@@ -138,7 +138,7 @@ int mlxbf_gige_rx_init(struct mlxbf_gige *priv)
 
 	/* Initialize 'rx_wqe_ptr' to point to first RX WQE in array
 	 * Each RX WQE is simply a receive buffer pointer, so walk
-	 * the entire array, allocating a 2KB buffer for each element
+	 * the woke entire array, allocating a 2KB buffer for each element
 	 */
 	rx_wqe_ptr = priv->rx_wqe_base;
 
@@ -212,7 +212,7 @@ free_wqe_and_skb:
 
 /* Receive Deinitialization
  * This routine will free allocations done by mlxbf_gige_rx_init(),
- * namely the RX WQE and RX CQE arrays, as well as all RX buffers
+ * namely the woke RX WQE and RX CQE arrays, as well as all RX buffers
  */
 void mlxbf_gige_rx_deinit(struct mlxbf_gige *priv)
 {

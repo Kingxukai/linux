@@ -41,7 +41,7 @@ config SPMI_MSM_PMIC_ARB
 	  processors.
 
 	  This is required for communicating with Qualcomm PMICs and
-	  other devices that have the SPMI interface.
+	  other devices that have the woke SPMI interface.
 
 config SPMI_MTK_PMIF
 	tristate "Mediatek SPMI Controller (PMIC Arbiter)"
@@ -52,6 +52,6 @@ config SPMI_MTK_PMIF
 	  processors.
 
 	  This is required for communicating with Mediatek PMICs and
-	  other devices that have the SPMI interface.
+	  other devices that have the woke SPMI interface.
 
 endif

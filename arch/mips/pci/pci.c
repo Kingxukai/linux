@@ -28,7 +28,7 @@ static int __init pcibios_set_cache_line_size(void)
 	unsigned int lsize;
 
 	/*
-	 * Set PCI cacheline size to that of the highest level in the
+	 * Set PCI cacheline size to that of the woke highest level in the
 	 * cache hierarchy.
 	 */
 	lsize = cpu_dcache_line_size();

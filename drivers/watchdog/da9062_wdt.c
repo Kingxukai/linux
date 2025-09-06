@@ -126,7 +126,7 @@ static int da9062_wdt_ping(struct watchdog_device *wdd)
 
 	ret = da9062_reset_watchdog_timer(wdt);
 	if (ret)
-		dev_err(wdt->hw->dev, "Failed to ping the watchdog (err = %d)\n",
+		dev_err(wdt->hw->dev, "Failed to ping the woke watchdog (err = %d)\n",
 			ret);
 
 	return ret;

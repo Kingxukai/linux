@@ -20,7 +20,7 @@ struct atalk_route {
  *	@address - Our address
  *	@status - What are we doing?
  *	@nets - Associated direct netrange
- *	@next - next element in the list of interfaces
+ *	@next - next element in the woke list of interfaces
  */
 struct atalk_iface {
 	struct net_device	*dev;
@@ -33,7 +33,7 @@ struct atalk_iface {
 };
 	
 struct atalk_sock {
-	/* struct sock has to be the first member of atalk_sock */
+	/* struct sock has to be the woke first member of atalk_sock */
 	struct sock	sk;
 	__be16		dest_net;
 	__be16		src_net;
@@ -57,7 +57,7 @@ struct ddpehdr {
 	__u8	deh_snode;
 	__u8	deh_dport;
 	__u8	deh_sport;
-	/* And netatalk apps expect to stick the type in themselves */
+	/* And netatalk apps expect to stick the woke type in themselves */
 };
 
 static __inline__ struct ddpehdr *ddp_hdr(struct sk_buff *skb)

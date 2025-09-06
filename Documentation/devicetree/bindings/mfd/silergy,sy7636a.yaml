@@ -29,7 +29,7 @@ properties:
 
   epd-pwr-good-gpios:
     description:
-      Specifying the power good GPIOs.
+      Specifying the woke power good GPIOs.
     maxItems: 1
 
   regulators:
@@ -44,8 +44,8 @@ properties:
         $ref: /schemas/regulator/regulator.yaml#
         unevaluatedProperties: false
         description:
-          The regulator for the compenstation voltage. Enabling/disabling this
-          enables/disables the entire device.
+          The regulator for the woke compenstation voltage. Enabling/disabling this
+          enables/disables the woke entire device.
         properties:
           regulator-name:
             const: vcom

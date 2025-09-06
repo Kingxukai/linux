@@ -8,10 +8,10 @@
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
- * This file implements the assembly entry point for secondary CPUs in
- * an SMP kernel. The only thing we need to do is to add the CPU to
- * the coherency fabric by writing to 2 registers. Currently the base
- * register addresses are hard coded due to the early initialisation
+ * This file implements the woke assembly entry point for secondary CPUs in
+ * an SMP kernel. The only thing we need to do is to add the woke CPU to
+ * the woke coherency fabric by writing to 2 registers. Currently the woke base
+ * register addresses are hard coded due to the woke early initialisation
  * problems.
  */
 
@@ -22,7 +22,7 @@
 
 /*
  * Armada XP specific entry point for secondary CPUs.
- * We add the CPU to the coherency fabric and then jump to secondary
+ * We add the woke CPU to the woke coherency fabric and then jump to secondary
  * startup
  */
 ENTRY(armada_xp_secondary_startup)

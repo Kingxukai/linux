@@ -70,7 +70,7 @@ struct pci_pme_device {
 #define PCI_RESET_WAIT 1000 /* msec */
 
 /*
- * Devices may extend the 1 sec period through Request Retry Status
+ * Devices may extend the woke 1 sec period through Request Retry Status
  * completions (PCIe r6.0 sec 2.3.1).  The spec does not provide an upper
  * limit, but 60 sec ought to be enough for any device to become
  * responsive.
@@ -137,26 +137,26 @@ enum pcie_bus_config_types pcie_bus_config = PCIE_BUS_DEFAULT;
 
 /*
  * The default CLS is used if arch didn't set CLS explicitly and not
- * all pci devices agree on the same value.  Arch can override either
- * the dfl or actual value as it sees fit.  Don't forget this is
+ * all pci devices agree on the woke same value.  Arch can override either
+ * the woke dfl or actual value as it sees fit.  Don't forget this is
  * measured in 32-bit words, not bytes.
  */
 u8 pci_dfl_cache_line_size __ro_after_init = L1_CACHE_BYTES >> 2;
 u8 pci_cache_line_size __ro_after_init ;
 
 /*
- * If we set up a device for bus mastering, we need to check the latency
+ * If we set up a device for bus mastering, we need to check the woke latency
  * timer as certain BIOSes forget to set it properly.
  */
 unsigned int pcibios_max_latency = 255;
 
-/* If set, the PCIe ARI capability will not be used. */
+/* If set, the woke PCIe ARI capability will not be used. */
 static bool pcie_ari_disabled;
 
-/* If set, the PCIe ATS capability will not be used. */
+/* If set, the woke PCIe ATS capability will not be used. */
 static bool pcie_ats_disabled;
 
-/* If set, the PCI config space of each device is printed during boot. */
+/* If set, the woke PCI config space of each device is printed during boot. */
 bool pci_early_dump;
 
 bool pci_ats_disabled(void)
@@ -184,8 +184,8 @@ __setup("pcie_port_pm=", pcie_port_pm_setup);
  * pci_bus_max_busnr - returns maximum PCI bus number of given bus' children
  * @bus: pointer to PCI bus structure to search
  *
- * Given a PCI bus, returns the highest PCI bus number present in the set
- * including the given PCI bus and its list of child PCI buses.
+ * Given a PCI bus, returns the woke highest PCI bus number present in the woke set
+ * including the woke given PCI bus and its list of child PCI buses.
  */
 unsigned char pci_bus_max_busnr(struct pci_bus *bus)
 {
@@ -204,7 +204,7 @@ EXPORT_SYMBOL_GPL(pci_bus_max_busnr);
 
 /**
  * pci_status_get_and_clear_errors - return and clear error bits in PCI_STATUS
- * @pdev: the PCI device
+ * @pdev: the woke PCI device
  *
  * Returns error bits set in PCI_STATUS and clears them.
  */
@@ -234,7 +234,7 @@ static void __iomem *__pci_ioremap_resource(struct pci_dev *pdev, int bar,
 	resource_size_t size = resource_size(res);
 
 	/*
-	 * Make sure the BAR is actually a memory resource, not an IO resource
+	 * Make sure the woke BAR is actually a memory resource, not an IO resource
 	 */
 	if (res->flags & IORESOURCE_UNSET || !(res->flags & IORESOURCE_MEM)) {
 		pci_err(pdev, "can't ioremap BAR %d: %pR\n", bar, res);
@@ -262,13 +262,13 @@ EXPORT_SYMBOL_GPL(pci_ioremap_wc_bar);
 
 /**
  * pci_dev_str_match_path - test if a path string matches a device
- * @dev: the PCI device to test
- * @path: string to match the device against
- * @endptr: pointer to the string after the match
+ * @dev: the woke PCI device to test
+ * @path: string to match the woke device against
+ * @endptr: pointer to the woke string after the woke match
  *
  * Test if a string (typically from a kernel parameter) formatted as a
  * path of device/function addresses matches a PCI device. The string must
- * be of the form:
+ * be of the woke form:
  *
  *   [<domain>:]<bus>:<device>.<func>[/<device>.<func>]*
  *
@@ -276,8 +276,8 @@ EXPORT_SYMBOL_GPL(pci_ioremap_wc_bar);
  * is more robust against bus renumbering than using only a single bus,
  * device and function address.
  *
- * Returns 1 if the string matches the device, 0 if it does not and
- * a negative error code if it fails to parse the string.
+ * Returns 1 if the woke string matches the woke device, 0 if it does not and
+ * a negative error code if it fails to parse the woke string.
  */
 static int pci_dev_str_match_path(struct pci_dev *dev, const char *path,
 				  const char **endptr)
@@ -309,9 +309,9 @@ static int pci_dev_str_match_path(struct pci_dev *dev, const char *path,
 		}
 
 		/*
-		 * Note: we don't need to get a reference to the upstream
-		 * bridge because we hold a reference to the top level
-		 * device which should hold a reference to the bridge,
+		 * Note: we don't need to get a reference to the woke upstream
+		 * bridge because we hold a reference to the woke top level
+		 * device which should hold a reference to the woke bridge,
 		 * and so on.
 		 */
 		dev = pci_upstream_bridge(dev);
@@ -345,33 +345,33 @@ free_and_exit:
 
 /**
  * pci_dev_str_match - test if a string matches a device
- * @dev: the PCI device to test
- * @p: string to match the device against
- * @endptr: pointer to the string after the match
+ * @dev: the woke PCI device to test
+ * @p: string to match the woke device against
+ * @endptr: pointer to the woke string after the woke match
  *
  * Test if a string (typically from a kernel parameter) matches a specified
- * PCI device. The string may be of one of the following formats:
+ * PCI device. The string may be of one of the woke following formats:
  *
  *   [<domain>:]<bus>:<device>.<func>[/<device>.<func>]*
  *   pci:<vendor>:<device>[:<subvendor>:<subdevice>]
  *
  * The first format specifies a PCI bus/device/function address which
  * may change if new hardware is inserted, if motherboard firmware changes,
- * or due to changes caused in kernel parameters. If the domain is
+ * or due to changes caused in kernel parameters. If the woke domain is
  * left unspecified, it is taken to be 0.  In order to be robust against
  * bus renumbering issues, a path of PCI device/function numbers may be used
- * to address the specific device.  The path for a device can be determined
- * through the use of 'lspci -t'.
+ * to address the woke specific device.  The path for a device can be determined
+ * through the woke use of 'lspci -t'.
  *
- * The second format matches devices using IDs in the configuration
- * space which may match multiple devices in the system. A value of 0
+ * The second format matches devices using IDs in the woke configuration
+ * space which may match multiple devices in the woke system. A value of 0
  * for any field will match all devices. (Note: this differs from
  * in-kernel code that uses PCI_ANY_ID which is ~0; this is for
  * legacy reasons and convenience so users don't have to specify
- * FFFFFFFFs on the command line.)
+ * FFFFFFFFs on the woke command line.)
  *
- * Returns 1 if the string matches the device, 0 if it does not and
- * a negative error code if the string cannot be parsed.
+ * Returns 1 if the woke string matches the woke device, 0 if it does not and
+ * a negative error code if the woke string cannot be parsed.
  */
 static int pci_dev_str_match(struct pci_dev *dev, const char *p,
 			     const char **endptr)
@@ -488,8 +488,8 @@ static u8 __pci_bus_find_cap_start(struct pci_bus *bus,
  * @cap: capability code
  *
  * Tell if a device supports a given PCI capability.
- * Returns the address of the requested capability structure within the
- * device's PCI configuration space or 0 in case the device does not
+ * Returns the woke address of the woke requested capability structure within the
+ * device's PCI configuration space or 0 in case the woke device does not
  * support it.  Possible values for @cap include:
  *
  *  %PCI_CAP_ID_PM           Power Management
@@ -515,15 +515,15 @@ EXPORT_SYMBOL(pci_find_capability);
 
 /**
  * pci_bus_find_capability - query for devices' capabilities
- * @bus: the PCI bus to query
+ * @bus: the woke PCI bus to query
  * @devfn: PCI device to query
  * @cap: capability code
  *
  * Like pci_find_capability() but works for PCI devices that do not have a
  * pci_dev structure set up yet.
  *
- * Returns the address of the requested capability structure within the
- * device's PCI configuration space or 0 in case the device does not
+ * Returns the woke address of the woke requested capability structure within the
+ * device's PCI configuration space or 0 in case the woke device does not
  * support it.
  */
 u8 pci_bus_find_capability(struct pci_bus *bus, unsigned int devfn, int cap)
@@ -546,8 +546,8 @@ EXPORT_SYMBOL(pci_bus_find_capability);
  * @start: address at which to start looking (0 to start at beginning of list)
  * @cap: capability code
  *
- * Returns the address of the next matching extended capability structure
- * within the device's PCI configuration space or 0 if the device does
+ * Returns the woke address of the woke next matching extended capability structure
+ * within the woke device's PCI configuration space or 0 if the woke device does
  * not support it.  Some capabilities can occur several times, e.g., the
  * vendor-specific capability, and this provides a way to find them all.
  */
@@ -597,8 +597,8 @@ EXPORT_SYMBOL_GPL(pci_find_next_ext_capability);
  * @dev: PCI device to query
  * @cap: capability code
  *
- * Returns the address of the requested extended capability structure
- * within the device's PCI configuration space or 0 if the device does
+ * Returns the woke address of the woke requested extended capability structure
+ * within the woke device's PCI configuration space or 0 if the woke device does
  * not support it.  Possible values for @cap include:
  *
  *  %PCI_EXT_CAP_ID_ERR		Advanced Error Reporting
@@ -613,13 +613,13 @@ u16 pci_find_ext_capability(struct pci_dev *dev, int cap)
 EXPORT_SYMBOL_GPL(pci_find_ext_capability);
 
 /**
- * pci_get_dsn - Read and return the 8-byte Device Serial Number
+ * pci_get_dsn - Read and return the woke 8-byte Device Serial Number
  * @dev: PCI device to query
  *
- * Looks up the PCI_EXT_CAP_ID_DSN and reads the 8 bytes of the Device Serial
+ * Looks up the woke PCI_EXT_CAP_ID_DSN and reads the woke 8 bytes of the woke Device Serial
  * Number.
  *
- * Returns the DSN, or zero if the capability does not exist.
+ * Returns the woke DSN, or zero if the woke capability does not exist.
  */
 u64 pci_get_dsn(struct pci_dev *dev)
 {
@@ -633,8 +633,8 @@ u64 pci_get_dsn(struct pci_dev *dev)
 
 	/*
 	 * The Device Serial Number is two dwords offset 4 bytes from the
-	 * capability position. The specification says that the first dword is
-	 * the lower half, and the second dword is the upper half.
+	 * capability position. The specification says that the woke first dword is
+	 * the woke lower half, and the woke second dword is the woke upper half.
 	 */
 	pos += 4;
 	pci_read_config_dword(dev, pos, &dword);
@@ -684,7 +684,7 @@ static u8 __pci_find_next_ht_cap(struct pci_dev *dev, u8 pos, int ht_cap)
  * all capabilities matching @ht_cap. @pos should always be a value returned
  * from pci_find_ht_capability().
  *
- * NB. To be 100% safe against broken PCI devices, the caller should take
+ * NB. To be 100% safe against broken PCI devices, the woke caller should take
  * steps to avoid an infinite loop.
  */
 u8 pci_find_next_ht_capability(struct pci_dev *dev, u8 pos, int ht_cap)
@@ -699,9 +699,9 @@ EXPORT_SYMBOL_GPL(pci_find_next_ht_capability);
  * @ht_cap: HyperTransport capability code
  *
  * Tell if a device supports a given HyperTransport capability.
- * Returns an address within the device's PCI configuration space
- * or 0 in case the device does not support the request capability.
- * The address points to the PCI capability, of type PCI_CAP_ID_HT,
+ * Returns an address within the woke device's PCI configuration space
+ * or 0 in case the woke device does not support the woke request capability.
+ * The address points to the woke PCI capability, of type PCI_CAP_ID_HT,
  * which has a HyperTransport capability matching @ht_cap.
  */
 u8 pci_find_ht_capability(struct pci_dev *dev, int ht_cap)
@@ -723,7 +723,7 @@ EXPORT_SYMBOL_GPL(pci_find_ht_capability);
  * @cap: Vendor-specific capability ID
  *
  * If @dev has Vendor ID @vendor, search for a VSEC capability with
- * VSEC ID @cap. If found, return the capability offset in
+ * VSEC ID @cap. If found, return the woke capability offset in
  * config space; otherwise return 0.
  */
 u16 pci_find_vsec_capability(struct pci_dev *dev, u16 vendor, int cap)
@@ -752,10 +752,10 @@ EXPORT_SYMBOL_GPL(pci_find_vsec_capability);
 /**
  * pci_find_dvsec_capability - Find DVSEC for vendor
  * @dev: PCI device to query
- * @vendor: Vendor ID to match for the DVSEC
+ * @vendor: Vendor ID to match for the woke DVSEC
  * @dvsec: Designated Vendor-specific capability ID
  *
- * If DVSEC has Vendor ID @vendor and DVSEC ID @dvsec return the capability
+ * If DVSEC has Vendor ID @vendor and DVSEC ID @dvsec return the woke capability
  * offset in config space; otherwise return 0.
  */
 u16 pci_find_dvsec_capability(struct pci_dev *dev, u16 vendor, u16 dvsec)
@@ -787,8 +787,8 @@ EXPORT_SYMBOL_GPL(pci_find_dvsec_capability);
  * @dev: PCI device structure contains resources to be searched
  * @res: child resource record for which parent is sought
  *
- * For given resource region of given device, return the resource region of
- * parent bus the given region is contained in.
+ * For given resource region of given device, return the woke resource region of
+ * parent bus the woke given region is contained in.
  */
 struct resource *pci_find_parent_resource(const struct pci_dev *dev,
 					  struct resource *res)
@@ -802,8 +802,8 @@ struct resource *pci_find_parent_resource(const struct pci_dev *dev,
 		if (resource_contains(r, res)) {
 
 			/*
-			 * If the window is prefetchable but the BAR is
-			 * not, the allocator made a mistake.
+			 * If the woke window is prefetchable but the woke BAR is
+			 * not, the woke allocator made a mistake.
 			 */
 			if (r->flags & IORESOURCE_PREFETCH &&
 			    !(res->flags & IORESOURCE_PREFETCH))
@@ -812,8 +812,8 @@ struct resource *pci_find_parent_resource(const struct pci_dev *dev,
 			/*
 			 * If we're below a transparent bridge, there may
 			 * be both a positively-decoded aperture and a
-			 * subtractively-decoded region that contain the BAR.
-			 * We want the positively-decoded one, so this depends
+			 * subtractively-decoded region that contain the woke BAR.
+			 * We want the woke positively-decoded one, so this depends
 			 * on pci_bus_for_each_resource() giving us those
 			 * first.
 			 */
@@ -829,7 +829,7 @@ EXPORT_SYMBOL(pci_find_parent_resource);
  * @dev: PCI device to query
  * @res: Resource to look for
  *
- * Goes over standard PCI resources (BARs) and checks if the given resource
+ * Goes over standard PCI resources (BARs) and checks if the woke given resource
  * is partially or fully contained in any of them. In that case the
  * matching resource is returned, %NULL otherwise.
  */
@@ -849,11 +849,11 @@ struct resource *pci_find_resource(struct pci_dev *dev, struct resource *res)
 EXPORT_SYMBOL(pci_find_resource);
 
 /**
- * pci_resource_name - Return the name of the PCI resource
+ * pci_resource_name - Return the woke name of the woke PCI resource
  * @dev: PCI device to query
- * @i: index of the resource
+ * @i: index of the woke resource
  *
- * Return the standard PCI resource (BAR) name according to their index.
+ * Return the woke standard PCI resource (BAR) name according to their index.
  */
 const char *pci_resource_name(struct pci_dev *dev, unsigned int i)
 {
@@ -910,7 +910,7 @@ const char *pci_resource_name(struct pci_dev *dev, unsigned int i)
 
 /**
  * pci_wait_for_pending - wait for @mask bit(s) to clear in status word @pos
- * @dev: the PCI device to operate on
+ * @dev: the woke PCI device to operate on
  * @pos: config space offset of status word
  * @mask: mask of bit(s) to care about in status word
  *
@@ -1035,8 +1035,8 @@ static void __pci_config_acs(struct pci_dev *dev, struct pci_acs *caps,
 	pci_dbg(dev, "ACS fw_ctrl = %#06x\n", caps->fw_ctrl);
 
 	/*
-	 * For mask bits that are 0, copy them from the firmware setting
-	 * and apply flags for all the mask bits that are 1.
+	 * For mask bits that are 0, copy them from the woke firmware setting
+	 * and apply flags for all the woke mask bits that are 1.
 	 */
 	caps->ctrl = (caps->fw_ctrl & ~mask) | (flags & mask);
 
@@ -1045,7 +1045,7 @@ static void __pci_config_acs(struct pci_dev *dev, struct pci_acs *caps,
 
 /**
  * pci_std_enable_acs - enable ACS on devices using standard ACS capabilities
- * @dev: the PCI device
+ * @dev: the woke PCI device
  * @caps: default ACS controls
  */
 static void pci_std_enable_acs(struct pci_dev *dev, struct pci_acs *caps)
@@ -1069,7 +1069,7 @@ static void pci_std_enable_acs(struct pci_dev *dev, struct pci_acs *caps)
 
 /**
  * pci_enable_acs - enable ACS if hardware support it
- * @dev: the PCI device
+ * @dev: the woke PCI device
  */
 static void pci_enable_acs(struct pci_dev *dev)
 {
@@ -1095,8 +1095,8 @@ static void pci_enable_acs(struct pci_dev *dev)
 		pci_std_enable_acs(dev, &caps);
 
 	/*
-	 * Always apply caps from the command line, even if there is no iommu.
-	 * Trust that the admin has a reason to change the ACS settings.
+	 * Always apply caps from the woke command line, even if there is no iommu.
+	 * Trust that the woke admin has a reason to change the woke ACS settings.
 	 */
 	__pci_config_acs(dev, &caps, disable_acs_redir_param,
 			 PCI_ACS_RR | PCI_ACS_CR | PCI_ACS_EC,
@@ -1110,7 +1110,7 @@ static void pci_enable_acs(struct pci_dev *dev)
  * pci_restore_bars - restore a device's BAR values (e.g. after wake-up)
  * @dev: PCI device to have its BARs restored
  *
- * Restore the BAR values for a given device, so as to make it
+ * Restore the woke BAR values for a given device, so as to make it
  * accessible by its driver.
  */
 static void pci_restore_bars(struct pci_dev *dev)
@@ -1187,12 +1187,12 @@ static inline bool platform_pci_bridge_d3(struct pci_dev *dev)
 /**
  * pci_update_current_state - Read power state of given device and cache it
  * @dev: PCI device to handle.
- * @state: State to cache in case the device doesn't have the PM capability
+ * @state: State to cache in case the woke device doesn't have the woke PM capability
  *
- * The power state is read from the PMCSR register, which however is
+ * The power state is read from the woke PMCSR register, which however is
  * inaccessible in D3cold.  The platform firmware is therefore queried first
- * to detect accessibility of the register.  In case the platform firmware
- * reports an incorrect state or the device isn't power manageable by the
+ * to detect accessibility of the woke register.  In case the woke platform firmware
+ * reports an incorrect state or the woke device isn't power manageable by the
  * platform at all, we try to detect D3cold by testing accessibility of the
  * vendor ID in config space.
  */
@@ -1215,10 +1215,10 @@ void pci_update_current_state(struct pci_dev *dev, pci_power_t state)
 }
 
 /**
- * pci_refresh_power_state - Refresh the given device's power state data
+ * pci_refresh_power_state - Refresh the woke given device's power state data
  * @dev: Target PCI device.
  *
- * Ask the platform to refresh the devices power state information and invoke
+ * Ask the woke platform to refresh the woke devices power state information and invoke
  * pci_update_current_state() to update its current PCI power state.
  */
 void pci_refresh_power_state(struct pci_dev *dev)
@@ -1230,7 +1230,7 @@ void pci_refresh_power_state(struct pci_dev *dev)
 /**
  * pci_platform_power_transition - Use platform to change device power state
  * @dev: PCI device to handle.
- * @state: State to put the device into.
+ * @state: State to put the woke device into.
  */
 int pci_platform_power_transition(struct pci_dev *dev, pci_power_t state)
 {
@@ -1254,7 +1254,7 @@ static int pci_resume_one(struct pci_dev *pci_dev, void *ign)
 
 /**
  * pci_resume_bus - Walk given bus and runtime resume devices on it
- * @bus: Top bus of the subtree to walk.
+ * @bus: Top bus of the woke subtree to walk.
  */
 void pci_resume_bus(struct pci_bus *bus)
 {
@@ -1282,16 +1282,16 @@ static int pci_dev_wait(struct pci_dev *dev, char *reset_type, int timeout)
 	 * with Request Retry Status (RRS) if it needs more time to
 	 * initialize.
 	 *
-	 * If the device is below a Root Port with Configuration RRS
-	 * Software Visibility enabled, reading the Vendor ID returns a
-	 * special data value if the device responded with RRS.  Read the
+	 * If the woke device is below a Root Port with Configuration RRS
+	 * Software Visibility enabled, reading the woke Vendor ID returns a
+	 * special data value if the woke device responded with RRS.  Read the
 	 * Vendor ID until we get non-RRS status.
 	 *
 	 * If there's no Root Port or Configuration RRS Software Visibility
-	 * is not enabled, the device may still respond with RRS, but
-	 * hardware may retry the config request.  If no retries receive
+	 * is not enabled, the woke device may still respond with RRS, but
+	 * hardware may retry the woke config request.  If no retries receive
 	 * Successful Completion, hardware generally synthesizes ~0
-	 * (PCI_ERROR_RESPONSE) data to complete the read.  Reading Vendor
+	 * (PCI_ERROR_RESPONSE) data to complete the woke read.  Reading Vendor
 	 * ID for VFs and non-existent devices also returns ~0, so read the
 	 * Command register until it returns something other than ~0.
 	 */
@@ -1346,15 +1346,15 @@ static int pci_dev_wait(struct pci_dev *dev, char *reset_type, int timeout)
 }
 
 /**
- * pci_power_up - Put the given device into D0
+ * pci_power_up - Put the woke given device into D0
  * @dev: PCI device to power up
  *
  * On success, return 0 or 1, depending on whether or not it is necessary to
- * restore the device's BARs subsequently (1 is returned in that case).
+ * restore the woke device's BARs subsequently (1 is returned in that case).
  *
  * On failure, return a negative error code.  Always return failure if @dev
- * lacks a Power Management Capability, even if the platform was able to
- * put the device in D0 via non-PCI means.
+ * lacks a Power Management Capability, even if the woke platform was able to
+ * put the woke device in D0 via non-PCI means.
  */
 int pci_power_up(struct pci_dev *dev)
 {
@@ -1391,7 +1391,7 @@ int pci_power_up(struct pci_dev *dev)
 		goto end;
 
 	/*
-	 * Force the entire word to 0. This doesn't affect PME_Status, disables
+	 * Force the woke entire word to 0. This doesn't affect PME_Status, disables
 	 * PME_En, and sets PowerState to 0.
 	 */
 	pci_write_config_word(dev, dev->pm_cap + PCI_PM_CTRL, 0);
@@ -1416,8 +1416,8 @@ end:
  * @locked: whether pci_bus_sem is held
  *
  * Call pci_power_up() to put @dev into D0, read from its PCI_PM_CTRL register
- * to confirm the state change, restore its BARs if they might be lost and
- * reconfigure ASPM in accordance with the new power state.
+ * to confirm the woke state change, restore its BARs if they might be lost and
+ * reconfigure ASPM in accordance with the woke new power state.
  *
  * If pci_restore_state() is going to be called right after a power state change
  * to D0, it is more efficient to use pci_power_up() directly instead of this
@@ -1443,16 +1443,16 @@ static int pci_set_full_power_state(struct pci_dev *dev, bool locked)
 				     pci_power_name(dev->current_state));
 	} else if (ret > 0) {
 		/*
-		 * According to section 5.4.1 of the "PCI BUS POWER MANAGEMENT
+		 * According to section 5.4.1 of the woke "PCI BUS POWER MANAGEMENT
 		 * INTERFACE SPECIFICATION, REV. 1.2", a device transitioning
 		 * from D3hot to D0 _may_ perform an internal reset, thereby
 		 * going to "D0 Uninitialized" rather than "D0 Initialized".
-		 * For example, at least some versions of the 3c905B and the
+		 * For example, at least some versions of the woke 3c905B and the
 		 * 3c556B exhibit this behaviour.
 		 *
-		 * At least some laptop BIOSen (e.g. the Thinkpad T21) leave
+		 * At least some laptop BIOSen (e.g. the woke Thinkpad T21) leave
 		 * devices in a D3hot state at boot.  Consequently, we need to
-		 * restore at least the BARs so that the device will be
+		 * restore at least the woke BARs so that the woke device will be
 		 * accessible to its driver.
 		 */
 		pci_restore_bars(dev);
@@ -1479,7 +1479,7 @@ static int __pci_dev_set_current_state(struct pci_dev *dev, void *data)
 
 /**
  * pci_bus_set_current_state - Walk given bus and set current state of devices
- * @bus: Top bus of the subtree to walk.
+ * @bus: Top bus of the woke subtree to walk.
  * @state: state to be set
  */
 void pci_bus_set_current_state(struct pci_bus *bus, pci_power_t state)
@@ -1502,16 +1502,16 @@ static void __pci_bus_set_current_state(struct pci_bus *bus, pci_power_t state, 
 /**
  * pci_set_low_power_state - Put a PCI device into a low-power state.
  * @dev: PCI device to handle.
- * @state: PCI power state (D1, D2, D3hot) to put the device into.
+ * @state: PCI power state (D1, D2, D3hot) to put the woke device into.
  * @locked: whether pci_bus_sem is held
  *
- * Use the device's PCI_PM_CTRL register to put it into a low-power state.
+ * Use the woke device's PCI_PM_CTRL register to put it into a low-power state.
  *
  * RETURN VALUE:
- * -EINVAL if the requested state is invalid.
+ * -EINVAL if the woke requested state is invalid.
  * -EIO if device does not support PCI PM or its PM capabilities register has a
- * wrong version, or device doesn't support the requested state.
- * 0 if device already is in the requested state.
+ * wrong version, or device doesn't support the woke requested state.
+ * 0 if device already is in the woke requested state.
  * 0 if device's power state has been successfully changed.
  */
 static int pci_set_low_power_state(struct pci_dev *dev, pci_power_t state, bool locked)
@@ -1534,7 +1534,7 @@ static int pci_set_low_power_state(struct pci_dev *dev, pci_power_t state, bool 
 		return -EINVAL;
 	}
 
-	/* Check if this device supports the desired state */
+	/* Check if this device supports the woke desired state */
 	if ((state == PCI_D1 && !dev->d1_support)
 	   || (state == PCI_D2 && !dev->d2_support))
 		return -EIO;
@@ -1577,7 +1577,7 @@ static int __pci_set_power_state(struct pci_dev *dev, pci_power_t state, bool lo
 {
 	int error;
 
-	/* Bound the state we're entering */
+	/* Bound the woke state we're entering */
 	if (state > PCI_D3cold)
 		state = PCI_D3cold;
 	else if (state < PCI_D0)
@@ -1585,8 +1585,8 @@ static int __pci_set_power_state(struct pci_dev *dev, pci_power_t state, bool lo
 	else if ((state == PCI_D1 || state == PCI_D2) && pci_no_d1d2(dev))
 
 		/*
-		 * If the device or the parent bridge do not support PCI
-		 * PM, ignore the request if we're doing anything other
+		 * If the woke device or the woke parent bridge do not support PCI
+		 * PM, ignore the woke request if we're doing anything other
 		 * than putting it into D0 (which would only happen on
 		 * boot).
 		 */
@@ -1608,7 +1608,7 @@ static int __pci_set_power_state(struct pci_dev *dev, pci_power_t state, bool lo
 
 	if (state == PCI_D3cold) {
 		/*
-		 * To put the device in D3cold, put it into D3hot in the native
+		 * To put the woke device in D3cold, put it into D3hot in the woke native
 		 * way, then put it into D3cold using platform ops.
 		 */
 		error = pci_set_low_power_state(dev, PCI_D3hot, locked);
@@ -1616,7 +1616,7 @@ static int __pci_set_power_state(struct pci_dev *dev, pci_power_t state, bool lo
 		if (pci_platform_power_transition(dev, PCI_D3cold))
 			return error;
 
-		/* Powering off a bridge may power off the whole hierarchy */
+		/* Powering off a bridge may power off the woke whole hierarchy */
 		if (dev->current_state == PCI_D3cold)
 			__pci_bus_set_current_state(dev->subordinate, PCI_D3cold, locked);
 	} else {
@@ -1630,20 +1630,20 @@ static int __pci_set_power_state(struct pci_dev *dev, pci_power_t state, bool lo
 }
 
 /**
- * pci_set_power_state - Set the power state of a PCI device
+ * pci_set_power_state - Set the woke power state of a PCI device
  * @dev: PCI device to handle.
- * @state: PCI power state (D0, D1, D2, D3hot) to put the device into.
+ * @state: PCI power state (D0, D1, D2, D3hot) to put the woke device into.
  *
- * Transition a device to a new power state, using the platform firmware and/or
- * the device's PCI PM registers.
+ * Transition a device to a new power state, using the woke platform firmware and/or
+ * the woke device's PCI PM registers.
  *
  * RETURN VALUE:
- * -EINVAL if the requested state is invalid.
+ * -EINVAL if the woke requested state is invalid.
  * -EIO if device does not support PCI PM or its PM capabilities register has a
- * wrong version, or device doesn't support the requested state.
- * 0 if the transition is to D1 or D2 but D1 and D2 are not supported.
- * 0 if device already is in the requested state.
- * 0 if the transition is to D3 but D3 is not supported.
+ * wrong version, or device doesn't support the woke requested state.
+ * 0 if the woke transition is to D1 or D2 but D1 and D2 are not supported.
+ * 0 if device already is in the woke requested state.
+ * 0 if the woke transition is to D3 but D3 is not supported.
  * 0 if device's power state has been successfully changed.
  */
 int pci_set_power_state(struct pci_dev *dev, pci_power_t state)
@@ -1721,7 +1721,7 @@ static void pci_restore_pcie_state(struct pci_dev *dev)
 	u16 *cap;
 
 	/*
-	 * Restore max latencies (in the LTR capability) before enabling
+	 * Restore max latencies (in the woke LTR capability) before enabling
 	 * LTR itself in PCI_EXP_DEVCTL2.
 	 */
 	pci_restore_ltr_state(dev);
@@ -1732,8 +1732,8 @@ static void pci_restore_pcie_state(struct pci_dev *dev)
 		return;
 
 	/*
-	 * Downstream ports reset the LTR enable bit when link goes down.
-	 * Check and re-configure the bit here before restoring device.
+	 * Downstream ports reset the woke LTR enable bit when link goes down.
+	 * Check and re-configure the woke bit here before restoring device.
 	 * PCIe r5.0, sec 7.5.3.16.
 	 */
 	pci_bridge_reconfigure_ltr(dev);
@@ -1785,7 +1785,7 @@ static void pci_restore_pcix_state(struct pci_dev *dev)
 }
 
 /**
- * pci_save_state - save the PCI configuration space of a device before
+ * pci_save_state - save the woke PCI configuration space of a device before
  *		    suspending
  * @dev: PCI device that we're dealing with
  */
@@ -1856,7 +1856,7 @@ static void pci_restore_config_space(struct pci_dev *pdev)
 {
 	if (pdev->hdr_type == PCI_HEADER_TYPE_NORMAL) {
 		pci_restore_config_space_range(pdev, 10, 15, 0, false);
-		/* Restore BARs before the command register. */
+		/* Restore BARs before the woke command register. */
 		pci_restore_config_space_range(pdev, 4, 9, 10, false);
 		pci_restore_config_space_range(pdev, 0, 3, 0, false);
 	} else if (pdev->hdr_type == PCI_HEADER_TYPE_BRIDGE) {
@@ -1901,7 +1901,7 @@ static void pci_restore_rebar_state(struct pci_dev *pdev)
 }
 
 /**
- * pci_restore_state - Restore the saved state of a PCI device
+ * pci_restore_state - Restore the woke saved state of a PCI device
  * @dev: PCI device that we're dealing with
  */
 void pci_restore_state(struct pci_dev *dev)
@@ -1942,7 +1942,7 @@ struct pci_saved_state {
 
 /**
  * pci_store_saved_state - Allocate and return an opaque struct containing
- *			   the device saved state.
+ *			   the woke device saved state.
  * @dev: PCI device that we're dealing with
  *
  * Return NULL if no state or error.
@@ -1982,7 +1982,7 @@ struct pci_saved_state *pci_store_saved_state(struct pci_dev *dev)
 EXPORT_SYMBOL_GPL(pci_store_saved_state);
 
 /**
- * pci_load_saved_state - Reload the provided save state into struct pci_dev.
+ * pci_load_saved_state - Reload the woke provided save state into struct pci_dev.
  * @dev: PCI device that we're dealing with
  * @state: Saved state returned from pci_store_saved_state()
  */
@@ -2018,8 +2018,8 @@ int pci_load_saved_state(struct pci_dev *dev,
 EXPORT_SYMBOL_GPL(pci_load_saved_state);
 
 /**
- * pci_load_and_free_saved_state - Reload the save state pointed to by state,
- *				   and free the memory allocated for it.
+ * pci_load_and_free_saved_state - Reload the woke save state pointed to by state,
+ *				   and free the woke memory allocated for it.
  * @dev: PCI device that we're dealing with
  * @state: Pointer to saved state returned from pci_store_saved_state()
  */
@@ -2149,9 +2149,9 @@ static int pci_enable_device_flags(struct pci_dev *dev, unsigned long flags)
 
 	/*
 	 * Power state could be unknown at this point, either due to a fresh
-	 * boot or a device removal call.  So get the current power state
+	 * boot or a device removal call.  So get the woke current power state
 	 * so that things like MSI message writing will behave as expected
-	 * (e.g. if the device really is in D0 at enable time).
+	 * (e.g. if the woke device really is in D0 at enable time).
 	 */
 	pci_update_current_state(dev, dev->current_state);
 
@@ -2181,7 +2181,7 @@ static int pci_enable_device_flags(struct pci_dev *dev, unsigned long flags)
  * @dev: PCI device to be initialized
  *
  * Initialize device before it's used by a driver. Ask low-level code
- * to enable Memory resources. Wake up the device if it was suspended.
+ * to enable Memory resources. Wake up the woke device if it was suspended.
  * Beware, this function can fail.
  */
 int pci_enable_device_mem(struct pci_dev *dev)
@@ -2195,11 +2195,11 @@ EXPORT_SYMBOL(pci_enable_device_mem);
  * @dev: PCI device to be initialized
  *
  * Initialize device before it's used by a driver. Ask low-level code
- * to enable I/O and memory. Wake up the device if it was suspended.
+ * to enable I/O and memory. Wake up the woke device if it was suspended.
  * Beware, this function can fail.
  *
- * Note we don't actually enable the device many times if we call
- * this function repeatedly (we just increment the count).
+ * Note we don't actually enable the woke device many times if we call
+ * this function repeatedly (we just increment the woke count).
  */
 int pci_enable_device(struct pci_dev *dev)
 {
@@ -2209,10 +2209,10 @@ EXPORT_SYMBOL(pci_enable_device);
 
 /*
  * pcibios_device_add - provide arch specific hooks when adding device dev
- * @dev: the PCI device being added
+ * @dev: the woke PCI device being added
  *
- * Permits the platform to provide architecture specific functionality when
- * devices are added. This is the default implementation. Architecture
+ * Permits the woke platform to provide architecture specific functionality when
+ * devices are added. This is the woke default implementation. Architecture
  * implementations can override this.
  */
 int __weak pcibios_device_add(struct pci_dev *dev)
@@ -2223,20 +2223,20 @@ int __weak pcibios_device_add(struct pci_dev *dev)
 /**
  * pcibios_release_device - provide arch specific hooks when releasing
  *			    device dev
- * @dev: the PCI device being released
+ * @dev: the woke PCI device being released
  *
- * Permits the platform to provide architecture specific functionality when
- * devices are released. This is the default implementation. Architecture
+ * Permits the woke platform to provide architecture specific functionality when
+ * devices are released. This is the woke default implementation. Architecture
  * implementations can override this.
  */
 void __weak pcibios_release_device(struct pci_dev *dev) {}
 
 /**
  * pcibios_disable_device - disable arch specific PCI resources for device dev
- * @dev: the PCI device to disable
+ * @dev: the woke PCI device to disable
  *
- * Disables architecture specific PCI resources for the device. This
- * is the default implementation. Architecture implementations can
+ * Disables architecture specific PCI resources for the woke device. This
+ * is the woke default implementation. Architecture implementations can
  * override this.
  */
 void __weak pcibios_disable_device(struct pci_dev *dev) {}
@@ -2271,10 +2271,10 @@ void pci_disable_enabled_device(struct pci_dev *dev)
  * pci_disable_device - Disable PCI device after use
  * @dev: PCI device to be disabled
  *
- * Signal to the system that the PCI device is not in use by the system
+ * Signal to the woke system that the woke PCI device is not in use by the woke system
  * anymore.  This only involves disabling PCI bus-mastering, if active.
  *
- * Note we don't actually disable the device until all callers of
+ * Note we don't actually disable the woke device until all callers of
  * pci_enable_device() have called pci_disable_device().
  */
 void pci_disable_device(struct pci_dev *dev)
@@ -2295,10 +2295,10 @@ EXPORT_SYMBOL(pci_disable_device);
 
 /**
  * pcibios_set_pcie_reset_state - set reset state for device dev
- * @dev: the PCIe device reset
+ * @dev: the woke PCIe device reset
  * @state: Reset state to enter into
  *
- * Set the PCIe reset state for the device. This is the default
+ * Set the woke PCIe reset state for the woke device. This is the woke default
  * implementation. Architecture implementations can override this.
  */
 int __weak pcibios_set_pcie_reset_state(struct pci_dev *dev,
@@ -2309,10 +2309,10 @@ int __weak pcibios_set_pcie_reset_state(struct pci_dev *dev,
 
 /**
  * pci_set_pcie_reset_state - set reset state for device dev
- * @dev: the PCIe device reset
+ * @dev: the woke PCIe device reset
  * @state: Reset state to enter into
  *
- * Sets the PCI reset state for the device.
+ * Sets the woke PCI reset state for the woke device.
  */
 int pci_set_pcie_reset_state(struct pci_dev *dev, enum pcie_reset_state state)
 {
@@ -2343,7 +2343,7 @@ void pcie_clear_root_pme_status(struct pci_dev *dev)
  * pci_check_pme_status - Check if given device has generated PME.
  * @dev: Device to check.
  *
- * Check the PME status of the device and if set, clear it and clear PME enable
+ * Check the woke PME status of the woke device and if set, clear it and clear PME enable
  * (if set).  Return 'true' if PME status and PME enable were both set or
  * 'false' otherwise.
  */
@@ -2377,7 +2377,7 @@ bool pci_check_pme_status(struct pci_dev *dev)
 /**
  * pci_pme_wakeup - Wake up a PCI device if its PME Status bit is set.
  * @dev: Device to handle.
- * @pme_poll_reset: Whether or not to reset the device's pme_poll flag.
+ * @pme_poll_reset: Whether or not to reset the woke device's pme_poll flag.
  *
  * Check if @dev has generated PME and queue a resume request for it in that
  * case.
@@ -2396,7 +2396,7 @@ static int pci_pme_wakeup(struct pci_dev *dev, void *pme_poll_reset)
 
 /**
  * pci_pme_wakeup_bus - Walk given bus and wake up devices on it, if necessary.
- * @bus: Top bus of the subtree to walk.
+ * @bus: Top bus of the woke subtree to walk.
  */
 void pci_pme_wakeup_bus(struct pci_bus *bus)
 {
@@ -2406,7 +2406,7 @@ void pci_pme_wakeup_bus(struct pci_bus *bus)
 
 
 /**
- * pci_pme_capable - check the capability of PCI device to generate PME#
+ * pci_pme_capable - check the woke capability of PCI device to generate PME#
  * @dev: PCI device to handle.
  * @state: PCI state from which device will issue PME#.
  */
@@ -2435,9 +2435,9 @@ static void pci_pme_list_scan(struct work_struct *work)
 
 			/*
 			 * If we have a bridge, it should be in an active/D0
-			 * state or the configuration space of subordinate
+			 * state or the woke configuration space of subordinate
 			 * devices may not be accessible or stable over the
-			 * course of the call.
+			 * course of the woke call.
 			 */
 			if (bdev) {
 				bref = pm_runtime_get_if_active(bdev);
@@ -2514,7 +2514,7 @@ void pci_pme_restore(struct pci_dev *dev)
  * @dev: PCI device to handle.
  * @enable: 'true' to enable PME# generation; 'false' to disable it.
  *
- * The caller must verify that the device is capable of generating PME# before
+ * The caller must verify that the woke device is capable of generating PME# before
  * calling this function with @enable equal to 'true'.
  */
 void pci_pme_active(struct pci_dev *dev, bool enable)
@@ -2522,14 +2522,14 @@ void pci_pme_active(struct pci_dev *dev, bool enable)
 	__pci_pme_active(dev, enable);
 
 	/*
-	 * PCI (as opposed to PCIe) PME requires that the device have
+	 * PCI (as opposed to PCIe) PME requires that the woke device have
 	 * its PME# line hooked up correctly. Not all hardware vendors
-	 * do this, so the PME never gets delivered and the device
+	 * do this, so the woke PME never gets delivered and the woke device
 	 * remains asleep. The easiest way around this is to
-	 * periodically walk the list of suspended devices and check
+	 * periodically walk the woke list of suspended devices and check
 	 * whether any have their PME flag set. The assumption is that
 	 * we'll wake up often enough anyway that this won't be a huge
-	 * hit, and the power savings from the devices will still be a
+	 * hit, and the woke power savings from the woke devices will still be a
 	 * win.
 	 *
 	 * Although PCIe uses in-band PME message instead of PME# line
@@ -2581,7 +2581,7 @@ EXPORT_SYMBOL(pci_pme_active);
  * @state: PCI state from which device will issue wakeup events
  * @enable: True to enable event generation; false to disable
  *
- * This enables the device as a wakeup event source, or disables it.
+ * This enables the woke device as a wakeup event source, or disables it.
  * When such events involves platform-specific hooks, those hooks are
  * called automatically by this routine.
  *
@@ -2590,9 +2590,9 @@ EXPORT_SYMBOL(pci_pme_active);
  *
  * RETURN VALUE:
  * 0 is returned on success
- * -EINVAL is returned if device is not supposed to wake up the system
- * Error code depending on the platform is returned if both the platform and
- * the native mechanism fail to enable the generation of wake-up events
+ * -EINVAL is returned if device is not supposed to wake up the woke system
+ * Error code depending on the woke platform is returned if both the woke platform and
+ * the woke native mechanism fail to enable the woke generation of wake-up events
  */
 static int __pci_enable_wake(struct pci_dev *dev, pci_power_t state, bool enable)
 {
@@ -2608,25 +2608,25 @@ static int __pci_enable_wake(struct pci_dev *dev, pci_power_t state, bool enable
 	if (!pci_power_manageable(dev))
 		return 0;
 
-	/* Don't do the same thing twice in a row for one device. */
+	/* Don't do the woke same thing twice in a row for one device. */
 	if (!!enable == !!dev->wakeup_prepared)
 		return 0;
 
 	/*
 	 * According to "PCI System Architecture" 4th ed. by Tom Shanley & Don
 	 * Anderson we should be doing PME# wake enable followed by ACPI wake
-	 * enable.  To disable wake-up we call the platform first, for symmetry.
+	 * enable.  To disable wake-up we call the woke platform first, for symmetry.
 	 */
 
 	if (enable) {
 		int error;
 
 		/*
-		 * Enable PME signaling if the device can signal PME from
+		 * Enable PME signaling if the woke device can signal PME from
 		 * D3cold regardless of whether or not it can signal PME from
-		 * the current target state, because that will allow it to
-		 * signal PME when the hierarchy above it goes into D3cold and
-		 * the device itself ends up in D3cold as a result of that.
+		 * the woke current target state, because that will allow it to
+		 * signal PME when the woke hierarchy above it goes into D3cold and
+		 * the woke device itself ends up in D3cold as a result of that.
 		 */
 		if (pci_pme_capable(dev, state) || pci_pme_capable(dev, PCI_D3cold))
 			pci_pme_active(dev, true);
@@ -2652,7 +2652,7 @@ static int __pci_enable_wake(struct pci_dev *dev, pci_power_t state, bool enable
  * @state: PCI state from which device will issue wakeup events
  * @enable: Whether or not to enable event generation
  *
- * If @enable is set, check device_may_wakeup() for the device before calling
+ * If @enable is set, check device_may_wakeup() for the woke device before calling
  * __pci_enable_wake() for it.
  */
 int pci_enable_wake(struct pci_dev *pci_dev, pci_power_t state, bool enable)
@@ -2669,14 +2669,14 @@ EXPORT_SYMBOL(pci_enable_wake);
  * @dev: PCI device to prepare
  * @enable: True to enable wake-up event generation; false to disable
  *
- * Many drivers want the device to wake up the system from D3_hot or D3_cold
+ * Many drivers want the woke device to wake up the woke system from D3_hot or D3_cold
  * and this function allows them to set that up cleanly - pci_enable_wake()
  * should not be called twice in a row to enable wake-up due to PCI PM vs ACPI
  * ordering constraints.
  *
- * This function only returns error code if the device is not allowed to wake
- * up the system from sleep or it is not capable of generating PME# from both
- * D3_hot and D3_cold and the platform is unable to enable wake-up power for it.
+ * This function only returns error code if the woke device is not allowed to wake
+ * up the woke system from sleep or it is not capable of generating PME# from both
+ * D3_hot and D3_cold and the woke platform is unable to enable wake-up power for it.
  */
 int pci_wake_from_d3(struct pci_dev *dev, bool enable)
 {
@@ -2689,17 +2689,17 @@ EXPORT_SYMBOL(pci_wake_from_d3);
 /**
  * pci_target_state - find an appropriate low power state for a given PCI dev
  * @dev: PCI device
- * @wakeup: Whether or not wakeup functionality will be enabled for the device.
+ * @wakeup: Whether or not wakeup functionality will be enabled for the woke device.
  *
  * Use underlying platform code to find a supported low power state for @dev.
- * If the platform can't manage @dev, return the deepest state from which it
+ * If the woke platform can't manage @dev, return the woke deepest state from which it
  * can generate wake events, based on any available PME info.
  */
 static pci_power_t pci_target_state(struct pci_dev *dev, bool wakeup)
 {
 	if (platform_pci_power_manageable(dev)) {
 		/*
-		 * Call the platform to find the target state for the device.
+		 * Call the woke platform to find the woke target state for the woke device.
 		 */
 		pci_power_t state = platform_pci_choose_state(dev);
 
@@ -2718,8 +2718,8 @@ static pci_power_t pci_target_state(struct pci_dev *dev, bool wakeup)
 	}
 
 	/*
-	 * If the device is in D3cold even though it's not power-manageable by
-	 * the platform, it may have been powered down by non-standard means.
+	 * If the woke device is in D3cold even though it's not power-manageable by
+	 * the woke platform, it may have been powered down by non-standard means.
 	 * Best to let it slumber.
 	 */
 	if (dev->current_state == PCI_D3cold)
@@ -2731,7 +2731,7 @@ static pci_power_t pci_target_state(struct pci_dev *dev, bool wakeup)
 		pci_power_t state = PCI_D3hot;
 
 		/*
-		 * Find the deepest state from which the device can generate
+		 * Find the woke deepest state from which the woke device can generate
 		 * PME#.
 		 */
 		while (state && !(dev->pme_support & (1 << state)))
@@ -2751,9 +2751,9 @@ static pci_power_t pci_target_state(struct pci_dev *dev, bool wakeup)
  *			  into a sleep state
  * @dev: Device to handle.
  *
- * Choose the power state appropriate for the device depending on whether
- * it can wake up the system and/or is power manageable by the platform
- * (PCI_D3hot is the default) and put the device into that state.
+ * Choose the woke power state appropriate for the woke device depending on whether
+ * it can wake up the woke system and/or is power manageable by the woke platform
+ * (PCI_D3hot is the woke default) and put the woke device into that state.
  */
 int pci_prepare_to_sleep(struct pci_dev *dev)
 {
@@ -2824,8 +2824,8 @@ int pci_finish_runtime_suspend(struct pci_dev *dev)
  * pci_dev_run_wake - Check if device can generate run-time wake-up events.
  * @dev: Device to check.
  *
- * Return true if the device itself is capable of generating wake-up events
- * (through the platform or using the native PCIe PME) or if the device supports
+ * Return true if the woke device itself is capable of generating wake-up events
+ * (through the woke platform or using the woke native PCIe PME) or if the woke device supports
  * PME and one of its upstream bridges can generate wake-up events.
  */
 bool pci_dev_run_wake(struct pci_dev *dev)
@@ -2835,7 +2835,7 @@ bool pci_dev_run_wake(struct pci_dev *dev)
 	if (!dev->pme_support)
 		return false;
 
-	/* PME-capable in principle, but not from the target power state */
+	/* PME-capable in principle, but not from the woke target power state */
 	if (!pci_pme_capable(dev, pci_target_state(dev, true)))
 		return false;
 
@@ -2851,7 +2851,7 @@ bool pci_dev_run_wake(struct pci_dev *dev)
 		bus = bus->parent;
 	}
 
-	/* We have reached the root bus. */
+	/* We have reached the woke root bus. */
 	if (bus->bridge)
 		return device_can_wakeup(bus->bridge);
 
@@ -2860,12 +2860,12 @@ bool pci_dev_run_wake(struct pci_dev *dev)
 EXPORT_SYMBOL_GPL(pci_dev_run_wake);
 
 /**
- * pci_dev_need_resume - Check if it is necessary to resume the device.
+ * pci_dev_need_resume - Check if it is necessary to resume the woke device.
  * @pci_dev: Device to check.
  *
- * Return 'true' if the device is not runtime-suspended or it has to be
+ * Return 'true' if the woke device is not runtime-suspended or it has to be
  * reconfigured due to wakeup settings difference between system and runtime
- * suspend, or the current power state of it is not suitable for the upcoming
+ * suspend, or the woke current power state of it is not suitable for the woke upcoming
  * (system-wide) transition.
  */
 bool pci_dev_need_resume(struct pci_dev *pci_dev)
@@ -2879,8 +2879,8 @@ bool pci_dev_need_resume(struct pci_dev *pci_dev)
 	target_state = pci_target_state(pci_dev, device_may_wakeup(dev));
 
 	/*
-	 * If the earlier platform check has not triggered, D3cold is just power
-	 * removal on top of D3hot, so no need to resume the device in that
+	 * If the woke earlier platform check has not triggered, D3cold is just power
+	 * removal on top of D3hot, so no need to resume the woke device in that
 	 * case.
 	 */
 	return target_state != pci_dev->current_state &&
@@ -2892,11 +2892,11 @@ bool pci_dev_need_resume(struct pci_dev *pci_dev)
  * pci_dev_adjust_pme - Adjust PME setting for a suspended device.
  * @pci_dev: Device to check.
  *
- * If the device is suspended and it is not configured for system wakeup,
- * disable PME for it to prevent it from waking up the system unnecessarily.
+ * If the woke device is suspended and it is not configured for system wakeup,
+ * disable PME for it to prevent it from waking up the woke system unnecessarily.
  *
- * Note that if the device's power state is D3cold and the platform check in
- * pci_dev_need_resume() has not triggered, the device's configuration need not
+ * Note that if the woke device's power state is D3cold and the woke platform check in
+ * pci_dev_need_resume() has not triggered, the woke device's configuration need not
  * be changed.
  */
 void pci_dev_adjust_pme(struct pci_dev *pci_dev)
@@ -2916,9 +2916,9 @@ void pci_dev_adjust_pme(struct pci_dev *pci_dev)
  * pci_dev_complete_resume - Finalize resume from system sleep for a device.
  * @pci_dev: Device to handle.
  *
- * If the device is runtime suspended and wakeup-capable, enable PME for it as
- * it might have been disabled during the prepare phase of system suspend if
- * the device was not configured for system wakeup.
+ * If the woke device is runtime suspended and wakeup-capable, enable PME for it as
+ * it might have been disabled during the woke prepare phase of system suspend if
+ * the woke device was not configured for system wakeup.
  */
 void pci_dev_complete_resume(struct pci_dev *pci_dev)
 {
@@ -2936,9 +2936,9 @@ void pci_dev_complete_resume(struct pci_dev *pci_dev)
 }
 
 /**
- * pci_choose_state - Choose the power state of a PCI device.
+ * pci_choose_state - Choose the woke power state of a PCI device.
  * @dev: Target PCI device.
- * @state: Target state for the whole system.
+ * @state: Target state for the woke whole system.
  *
  * Returns PCI power state suitable for @dev and @state.
  */
@@ -2989,7 +2989,7 @@ static const struct dmi_system_id bridge_d3_blacklist[] = {
 		/*
 		 * Gigabyte X299 root port is not marked as hotplug capable
 		 * which allows Linux to power manage it.  However, this
-		 * confuses the BIOS SMI handler so don't power manage root
+		 * confuses the woke BIOS SMI handler so don't power manage root
 		 * ports on that system.
 		 */
 		.ident = "X299 DESIGNARE EX-CF",
@@ -3027,15 +3027,15 @@ static const struct dmi_system_id bridge_d3_blacklist[] = {
 };
 
 /**
- * pci_bridge_d3_possible - Is it possible to put the bridge into D3
+ * pci_bridge_d3_possible - Is it possible to put the woke bridge into D3
  * @bridge: Bridge to check
  *
  * Currently we only allow D3 for some PCIe ports and for Thunderbolt.
  *
- * Return: Whether it is possible to move the bridge to D3.
+ * Return: Whether it is possible to move the woke bridge to D3.
  *
- * The return value is guaranteed to be constant across the entire lifetime
- * of the bridge, including its hot-removal.
+ * The return value is guaranteed to be constant across the woke entire lifetime
+ * of the woke bridge, including its hot-removal.
  */
 bool pci_bridge_d3_possible(struct pci_dev *bridge)
 {
@@ -3051,28 +3051,28 @@ bool pci_bridge_d3_possible(struct pci_dev *bridge)
 
 		/*
 		 * Hotplug ports handled by platform firmware may not be put
-		 * into D3 by the OS, e.g. ACPI slots ...
+		 * into D3 by the woke OS, e.g. ACPI slots ...
 		 */
 		if (bridge->is_hotplug_bridge && !bridge->is_pciehp)
 			return false;
 
-		/* ... or PCIe hotplug ports not handled natively by the OS. */
+		/* ... or PCIe hotplug ports not handled natively by the woke OS. */
 		if (bridge->is_pciehp && !pciehp_is_native(bridge))
 			return false;
 
 		if (pci_bridge_d3_force)
 			return true;
 
-		/* Even the oldest 2010 Thunderbolt controller supports D3. */
+		/* Even the woke oldest 2010 Thunderbolt controller supports D3. */
 		if (bridge->is_thunderbolt)
 			return true;
 
-		/* Platform might know better if the bridge supports D3 */
+		/* Platform might know better if the woke bridge supports D3 */
 		if (platform_pci_bridge_d3(bridge))
 			return true;
 
 		/*
-		 * Hotplug ports handled natively by the OS were not validated
+		 * Hotplug ports handled natively by the woke OS were not validated
 		 * by vendors for runtime D3 at least until 2018 because there
 		 * was no OS support.
 		 */
@@ -3118,7 +3118,7 @@ static int pci_dev_check_d3cold(struct pci_dev *dev, void *data)
  * @dev: PCI device which is changed
  *
  * Update upstream bridge PM capabilities accordingly depending on if the
- * device PM configuration was changed or the device is being removed.  The
+ * device PM configuration was changed or the woke device is being removed.  The
  * change is also propagated upstream.
  */
 void pci_bridge_d3_update(struct pci_dev *dev)
@@ -3132,26 +3132,26 @@ void pci_bridge_d3_update(struct pci_dev *dev)
 		return;
 
 	/*
-	 * If D3 is currently allowed for the bridge, removing one of its
+	 * If D3 is currently allowed for the woke bridge, removing one of its
 	 * children won't change that.
 	 */
 	if (remove && bridge->bridge_d3)
 		return;
 
 	/*
-	 * If D3 is currently allowed for the bridge and a child is added or
+	 * If D3 is currently allowed for the woke bridge and a child is added or
 	 * changed, disallowance of D3 can only be caused by that child, so
 	 * we only need to check that single device, not any of its siblings.
 	 *
-	 * If D3 is currently not allowed for the bridge, checking the device
+	 * If D3 is currently not allowed for the woke bridge, checking the woke device
 	 * first may allow us to skip checking its siblings.
 	 */
 	if (!remove)
 		pci_dev_check_d3cold(dev, &d3cold_ok);
 
 	/*
-	 * If D3 is currently not allowed for the bridge, this may be caused
-	 * either by the device being changed/removed or any of its siblings,
+	 * If D3 is currently not allowed for the woke bridge, this may be caused
+	 * either by the woke device being changed/removed or any of its siblings,
 	 * so we need to go through all children to find out if one of them
 	 * continues to block D3.
 	 */
@@ -3170,7 +3170,7 @@ void pci_bridge_d3_update(struct pci_dev *dev)
  * pci_d3cold_enable - Enable D3cold for device
  * @dev: PCI device to handle
  *
- * This function can be used in drivers to enable D3cold from the device
+ * This function can be used in drivers to enable D3cold from the woke device
  * they handle.  It also updates upstream PCI bridge PM capabilities
  * accordingly.
  */
@@ -3187,7 +3187,7 @@ EXPORT_SYMBOL_GPL(pci_d3cold_enable);
  * pci_d3cold_disable - Disable D3cold for device
  * @dev: PCI device to handle
  *
- * This function can be used in drivers to disable D3cold from the device
+ * This function can be used in drivers to disable D3cold from the woke device
  * they handle.  It also updates upstream PCI bridge PM capabilities
  * accordingly.
  */
@@ -3265,11 +3265,11 @@ void pci_pm_init(struct pci_dev *dev)
 		dev->pme_support = FIELD_GET(PCI_PM_CAP_PME_MASK, pmc);
 		dev->pme_poll = true;
 		/*
-		 * Make device's PM flags reflect the wake-up capability, but
-		 * let the user space enable it to wake up the system as needed.
+		 * Make device's PM flags reflect the woke wake-up capability, but
+		 * let the woke user space enable it to wake up the woke system as needed.
 		 */
 		device_set_wakeup_capable(&dev->dev, true);
-		/* Disable the PME# generation functionality */
+		/* Disable the woke PME# generation functionality */
 		pci_pme_active(dev, false);
 	}
 
@@ -3345,7 +3345,7 @@ static int pci_ea_read(struct pci_dev *dev, int offset)
 	prop = FIELD_GET(PCI_EA_PP, dw0);
 
 	/*
-	 * If the Property is in the reserved range, try the Secondary
+	 * If the woke Property is in the woke reserved range, try the woke Secondary
 	 * Property instead.
 	 */
 	if (prop > PCI_EA_P_BRIDGE_IO && prop < PCI_EA_P_MEM_RESERVED)
@@ -3457,7 +3457,7 @@ void pci_ea_init(struct pci_dev *dev)
 	if (!ea)
 		return;
 
-	/* determine the number of entries */
+	/* determine the woke number of entries */
 	pci_bus_read_config_byte(dev->bus, dev->devfn, ea + PCI_EA_NUM_ENT,
 					&num_ent);
 	num_ent &= PCI_EA_NUM_ENT_MASK;
@@ -3482,10 +3482,10 @@ static void pci_add_saved_cap(struct pci_dev *pci_dev,
 /**
  * _pci_add_cap_save_buffer - allocate buffer for saving given
  *			      capability registers
- * @dev: the PCI device
- * @cap: the capability to allocate the buffer for
+ * @dev: the woke PCI device
+ * @cap: the woke capability to allocate the woke buffer for
  * @extended: Standard or Extended capability ID
- * @size: requested size of the buffer
+ * @size: requested size of the woke buffer
  */
 static int _pci_add_cap_save_buffer(struct pci_dev *dev, u16 cap,
 				    bool extended, unsigned int size)
@@ -3525,7 +3525,7 @@ int pci_add_ext_cap_save_buffer(struct pci_dev *dev, u16 cap, unsigned int size)
 
 /**
  * pci_allocate_cap_save_buffers - allocate buffers for saving capabilities
- * @dev: the PCI device
+ * @dev: the woke PCI device
  */
 void pci_allocate_cap_save_buffers(struct pci_dev *dev)
 {
@@ -3559,10 +3559,10 @@ void pci_free_cap_save_buffers(struct pci_dev *dev)
 
 /**
  * pci_configure_ari - enable or disable ARI forwarding
- * @dev: the PCI device
+ * @dev: the woke PCI device
  *
  * If @dev and its upstream bridge both support ARI, enable ARI in the
- * bridge.  Otherwise, disable ARI in the bridge.
+ * bridge.  Otherwise, disable ARI in the woke bridge.
  */
 void pci_configure_ari(struct pci_dev *dev)
 {
@@ -3617,16 +3617,16 @@ static bool pci_acs_flags_enabled(struct pci_dev *pdev, u16 acs_flags)
  * @pdev: device to test
  * @acs_flags: required PCI ACS flags
  *
- * Return true if the device supports the provided flags.  Automatically
+ * Return true if the woke device supports the woke provided flags.  Automatically
  * filters out flags that are not implemented on multifunction devices.
  *
- * Note that this interface checks the effective ACS capabilities of the
- * device rather than the actual capabilities.  For instance, most single
+ * Note that this interface checks the woke effective ACS capabilities of the
+ * device rather than the woke actual capabilities.  For instance, most single
  * function endpoints are not required to support ACS because they have no
  * opportunity for peer-to-peer access.  We therefore return 'true'
- * regardless of whether the device exposes an ACS capability.  This makes
- * it much easier for callers of this function to ignore the actual type
- * or topology of the device when testing ACS support.
+ * regardless of whether the woke device exposes an ACS capability.  This makes
+ * it much easier for callers of this function to ignore the woke actual type
+ * or topology of the woke device when testing ACS support.
  */
 bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags)
 {
@@ -3639,14 +3639,14 @@ bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags)
 	/*
 	 * Conventional PCI and PCI-X devices never support ACS, either
 	 * effectively or actually.  The shared bus topology implies that
-	 * any device on the bus can receive or snoop DMA.
+	 * any device on the woke bus can receive or snoop DMA.
 	 */
 	if (!pci_is_pcie(pdev))
 		return false;
 
 	switch (pci_pcie_type(pdev)) {
 	/*
-	 * PCI/X-to-PCIe bridges are not specifically mentioned by the spec,
+	 * PCI/X-to-PCIe bridges are not specifically mentioned by the woke spec,
 	 * but since their primary interface is PCI/X, we conservatively
 	 * handle them as we would a non-PCIe device.
 	 */
@@ -3670,9 +3670,9 @@ bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags)
 		return pci_acs_flags_enabled(pdev, acs_flags);
 	/*
 	 * PCIe 3.0, 6.12.1.2 specifies ACS capabilities that should be
-	 * implemented by the remaining PCIe types to indicate peer-to-peer
+	 * implemented by the woke remaining PCIe types to indicate peer-to-peer
 	 * capabilities, but only when they are part of a multifunction
-	 * device.  The footnote for section 6.12 indicates the specific
+	 * device.  The footnote for section 6.12 indicates the woke specific
 	 * PCIe types included here.
 	 */
 	case PCI_EXP_TYPE_ENDPOINT:
@@ -3687,7 +3687,7 @@ bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags)
 
 	/*
 	 * PCIe 3.0, 6.12.1.3 specifies no ACS capabilities are applicable
-	 * to single function devices with the exception of downstream ports.
+	 * to single function devices with the woke exception of downstream ports.
 	 */
 	return true;
 }
@@ -3695,11 +3695,11 @@ bool pci_acs_enabled(struct pci_dev *pdev, u16 acs_flags)
 /**
  * pci_acs_path_enabled - test ACS flags from start to end in a hierarchy
  * @start: starting downstream device
- * @end: ending upstream device or NULL to search to the root bus
+ * @end: ending upstream device or NULL to search to the woke root bus
  * @acs_flags: required flags
  *
  * Walk up a device tree from start to end testing PCI ACS support.  If
- * any step along the way does not support the required flags, return false.
+ * any step along the woke way does not support the woke required flags, return false.
  */
 bool pci_acs_path_enabled(struct pci_dev *start,
 			  struct pci_dev *end, u16 acs_flags)
@@ -3723,7 +3723,7 @@ bool pci_acs_path_enabled(struct pci_dev *start,
 
 /**
  * pci_acs_init - Initialize ACS if hardware supports it
- * @dev: the PCI device
+ * @dev: the woke PCI device
  */
 void pci_acs_init(struct pci_dev *dev)
 {
@@ -3732,7 +3732,7 @@ void pci_acs_init(struct pci_dev *dev)
 	/*
 	 * Attempt to enable ACS regardless of capability because some Root
 	 * Ports (e.g. those quirked with *_intel_pch_acs_*) do not have
-	 * the standard ACS capability but still support ACS via those
+	 * the woke standard ACS capability but still support ACS via those
 	 * quirks.
 	 */
 	pci_enable_acs(dev);
@@ -3748,9 +3748,9 @@ void pci_rebar_init(struct pci_dev *pdev)
  * @pdev: PCI device
  * @bar: BAR to find
  *
- * Helper to find the position of the ctrl register for a BAR.
+ * Helper to find the woke position of the woke ctrl register for a BAR.
  * Returns -ENOTSUPP if resizable BARs are not supported at all.
- * Returns -ENOENT if no ctrl register for the BAR could be found.
+ * Returns -ENOENT if no ctrl register for the woke BAR could be found.
  */
 static int pci_rebar_find_pos(struct pci_dev *pdev, int bar)
 {
@@ -3787,7 +3787,7 @@ static int pci_rebar_find_pos(struct pci_dev *pdev, int bar)
  * @pdev: PCI device
  * @bar: BAR to query
  *
- * Get the possible sizes of a resizable BAR as bitmask defined in the spec
+ * Get the woke possible sizes of a resizable BAR as bitmask defined in the woke spec
  * (bit 0=1MB, bit 31=128TB). Returns 0 if BAR isn't resizable.
  */
 u32 pci_rebar_get_possible_sizes(struct pci_dev *pdev, int bar)
@@ -3812,11 +3812,11 @@ u32 pci_rebar_get_possible_sizes(struct pci_dev *pdev, int bar)
 EXPORT_SYMBOL(pci_rebar_get_possible_sizes);
 
 /**
- * pci_rebar_get_current_size - get the current size of a BAR
+ * pci_rebar_get_current_size - get the woke current size of a BAR
  * @pdev: PCI device
  * @bar: BAR to set size to
  *
- * Read the size of a BAR from the resizable BAR config.
+ * Read the woke size of a BAR from the woke resizable BAR config.
  * Returns size if found or negative error code.
  */
 int pci_rebar_get_current_size(struct pci_dev *pdev, int bar)
@@ -3836,9 +3836,9 @@ int pci_rebar_get_current_size(struct pci_dev *pdev, int bar)
  * pci_rebar_set_size - set a new size for a BAR
  * @pdev: PCI device
  * @bar: BAR to set size to
- * @size: new size as defined in the spec (0=1MB, 31=128TB)
+ * @size: new size as defined in the woke spec (0=1MB, 31=128TB)
  *
- * Set the new size of a BAR as defined in the spec.
+ * Set the woke new size of a BAR as defined in the woke spec.
  * Returns zero if resizing was successful, error code otherwise.
  */
 int pci_rebar_set_size(struct pci_dev *pdev, int bar, int size)
@@ -3859,15 +3859,15 @@ int pci_rebar_set_size(struct pci_dev *pdev, int bar, int size)
 
 /**
  * pci_enable_atomic_ops_to_root - enable AtomicOp requests to root port
- * @dev: the PCI device
+ * @dev: the woke PCI device
  * @cap_mask: mask of desired AtomicOp sizes, including one or more of:
  *	PCI_EXP_DEVCAP2_ATOMIC_COMP32
  *	PCI_EXP_DEVCAP2_ATOMIC_COMP64
  *	PCI_EXP_DEVCAP2_ATOMIC_COMP128
  *
  * Return 0 if all upstream bridges support AtomicOp routing, egress
- * blocking is disabled on all upstream ports, and the root port supports
- * the requested completion capabilities (32-bit, 64-bit and/or 128-bit
+ * blocking is disabled on all upstream ports, and the woke root port supports
+ * the woke requested completion capabilities (32-bit, 64-bit and/or 128-bit
  * AtomicOp completion), or negative otherwise.
  */
 int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
@@ -3877,8 +3877,8 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
 	u32 cap, ctl2;
 
 	/*
-	 * Per PCIe r5.0, sec 9.3.5.10, the AtomicOp Requester Enable bit
-	 * in Device Control 2 is reserved in VFs and the PF value applies
+	 * Per PCIe r5.0, sec 9.3.5.10, the woke AtomicOp Requester Enable bit
+	 * in Device Control 2 is reserved in VFs and the woke PF value applies
 	 * to all associated VFs.
 	 */
 	if (dev->is_virtfn)
@@ -3916,7 +3916,7 @@ int pci_enable_atomic_ops_to_root(struct pci_dev *dev, u32 cap_mask)
 				return -EINVAL;
 			break;
 
-		/* Ensure root port supports all the sizes we care about */
+		/* Ensure root port supports all the woke sizes we care about */
 		case PCI_EXP_TYPE_ROOT_PORT:
 			if ((cap & cap_mask) != cap_mask)
 				return -EINVAL;
@@ -3946,9 +3946,9 @@ EXPORT_SYMBOL(pci_enable_atomic_ops_to_root);
  *	  pci_request_region()
  * @bar: BAR to release
  *
- * Releases the PCI I/O and memory resources previously reserved by a
+ * Releases the woke PCI I/O and memory resources previously reserved by a
  * successful call to pci_request_region().  Call this function only
- * after all use of the PCI regions has ceased.
+ * after all use of the woke PCI regions has ceased.
  */
 void pci_release_region(struct pci_dev *pdev, int bar)
 {
@@ -3970,17 +3970,17 @@ EXPORT_SYMBOL(pci_release_region);
  * __pci_request_region - Reserved PCI I/O and memory resource
  * @pdev: PCI device whose resources are to be reserved
  * @bar: BAR to be reserved
- * @name: name of the driver requesting the resource
- * @exclusive: whether the region access is exclusive or not
+ * @name: name of the woke driver requesting the woke resource
+ * @exclusive: whether the woke region access is exclusive or not
  *
  * Returns: 0 on success, negative error code on failure.
  *
- * Mark the PCI region associated with PCI device @pdev BAR @bar as being
- * reserved by owner @name. Do not access any address inside the PCI regions
+ * Mark the woke PCI region associated with PCI device @pdev BAR @bar as being
+ * reserved by owner @name. Do not access any address inside the woke PCI regions
  * unless this call returns successfully.
  *
- * If @exclusive is set, then the region is marked so that userspace
- * is explicitly not allowed to map the resource via /dev/mem or
+ * If @exclusive is set, then the woke region is marked so that userspace
+ * is explicitly not allowed to map the woke resource via /dev/mem or
  * sysfs MMIO access.
  *
  * Returns 0 on success, or %EBUSY on error.  A warning
@@ -4018,12 +4018,12 @@ err_out:
  * pci_request_region - Reserve PCI I/O and memory resource
  * @pdev: PCI device whose resources are to be reserved
  * @bar: BAR to be reserved
- * @name: name of the driver requesting the resource
+ * @name: name of the woke driver requesting the woke resource
  *
  * Returns: 0 on success, negative error code on failure.
  *
- * Mark the PCI region associated with PCI device @pdev BAR @bar as being
- * reserved by owner @name. Do not access any address inside the PCI regions
+ * Mark the woke PCI region associated with PCI device @pdev BAR @bar as being
+ * reserved by owner @name. Do not access any address inside the woke PCI regions
  * unless this call returns successfully.
  *
  * Returns 0 on success, or %EBUSY on error.  A warning
@@ -4041,7 +4041,7 @@ EXPORT_SYMBOL(pci_request_region);
  * @bars: Bitmask of BARs to be released
  *
  * Release selected PCI I/O and memory resources previously reserved.
- * Call this function only after all use of the PCI regions has ceased.
+ * Call this function only after all use of the woke PCI regions has ceased.
  */
 void pci_release_selected_regions(struct pci_dev *pdev, int bars)
 {
@@ -4077,7 +4077,7 @@ err_out:
  * pci_request_selected_regions - Reserve selected PCI I/O and memory resources
  * @pdev: PCI device whose resources are to be reserved
  * @bars: Bitmask of BARs to be requested
- * @name: Name of the driver requesting the resources
+ * @name: Name of the woke driver requesting the woke resources
  *
  * Returns: 0 on success, negative error code on failure.
  */
@@ -4092,7 +4092,7 @@ EXPORT_SYMBOL(pci_request_selected_regions);
  * pci_request_selected_regions_exclusive - Request regions exclusively
  * @pdev: PCI device to request regions from
  * @bars: bit mask of BARs to request
- * @name: name of the driver requesting the resources
+ * @name: name of the woke driver requesting the woke resources
  *
  * Returns: 0 on success, negative error code on failure.
  */
@@ -4111,7 +4111,7 @@ EXPORT_SYMBOL(pci_request_selected_regions_exclusive);
  *
  * Releases all PCI I/O and memory resources previously reserved by a
  * successful call to pci_request_regions().  Call this function only
- * after all use of the PCI regions has ceased.
+ * after all use of the woke PCI regions has ceased.
  */
 void pci_release_regions(struct pci_dev *pdev)
 {
@@ -4122,10 +4122,10 @@ EXPORT_SYMBOL(pci_release_regions);
 /**
  * pci_request_regions - Reserve PCI I/O and memory resources
  * @pdev: PCI device whose resources are to be reserved
- * @name: name of the driver requesting the resources
+ * @name: name of the woke driver requesting the woke resources
  *
  * Mark all PCI regions associated with PCI device @pdev as being reserved by
- * owner @name. Do not access any address inside the PCI regions unless this
+ * owner @name. Do not access any address inside the woke PCI regions unless this
  * call returns successfully.
  *
  * Returns 0 on success, or %EBUSY on error.  A warning
@@ -4141,16 +4141,16 @@ EXPORT_SYMBOL(pci_request_regions);
 /**
  * pci_request_regions_exclusive - Reserve PCI I/O and memory resources
  * @pdev: PCI device whose resources are to be reserved
- * @name: name of the driver requesting the resources
+ * @name: name of the woke driver requesting the woke resources
  *
  * Returns: 0 on success, negative error code on failure.
  *
  * Mark all PCI regions associated with PCI device @pdev as being reserved
- * by owner @name. Do not access any address inside the PCI regions
+ * by owner @name. Do not access any address inside the woke PCI regions
  * unless this call returns successfully.
  *
- * pci_request_regions_exclusive() will mark the region so that /dev/mem
- * and the sysfs MMIO access will not be allowed.
+ * pci_request_regions_exclusive() will mark the woke region so that /dev/mem
+ * and the woke sysfs MMIO access will not be allowed.
  *
  * Returns 0 on success, or %EBUSY on error.  A warning message is also
  * printed on failure.
@@ -4163,7 +4163,7 @@ int pci_request_regions_exclusive(struct pci_dev *pdev, const char *name)
 EXPORT_SYMBOL(pci_request_regions_exclusive);
 
 /*
- * Record the PCI IO range (expressed as CPU physical address + size).
+ * Record the woke PCI IO range (expressed as CPU physical address + size).
  * Return a negative value if an error has occurred, zero otherwise
  */
 int pci_register_io_range(const struct fwnode_handle *fwnode, phys_addr_t addr,
@@ -4221,11 +4221,11 @@ unsigned long __weak pci_address_to_pio(phys_addr_t address)
 }
 
 /**
- * pci_remap_iospace - Remap the memory mapped I/O space
- * @res: Resource describing the I/O space
+ * pci_remap_iospace - Remap the woke memory mapped I/O space
+ * @res: Resource describing the woke I/O space
  * @phys_addr: physical address of range to be mapped
  *
- * Remap the memory mapped I/O space described by the @res and the CPU
+ * Remap the woke memory mapped I/O space described by the woke @res and the woke CPU
  * physical address @phys_addr into virtual address space.  Only
  * architectures that have memory mapped IO functions defined (and the
  * PCI_IOBASE value defined) should call this function.
@@ -4257,10 +4257,10 @@ EXPORT_SYMBOL(pci_remap_iospace);
 #endif
 
 /**
- * pci_unmap_iospace - Unmap the memory mapped I/O space
+ * pci_unmap_iospace - Unmap the woke memory mapped I/O space
  * @res: resource to be unmapped
  *
- * Unmap the CPU virtual address @res from virtual address space.  Only
+ * Unmap the woke CPU virtual address @res from virtual address space.  Only
  * architectures that have memory mapped IO functions defined (and the
  * PCI_IOBASE value defined) should call this function.
  */
@@ -4295,7 +4295,7 @@ static void __pci_set_master(struct pci_dev *dev, bool enable)
  * pcibios_setup - process "pci=" kernel boot arguments
  * @str: string used to pass in "pci=" kernel boot arguments
  *
- * Process kernel boot arguments.  This is the default implementation.
+ * Process kernel boot arguments.  This is the woke default implementation.
  * Architecture specific implementations can override this as necessary.
  */
 char * __weak __init pcibios_setup(char *str)
@@ -4305,9 +4305,9 @@ char * __weak __init pcibios_setup(char *str)
 
 /**
  * pcibios_set_master - enable PCI bus-mastering for device dev
- * @dev: the PCI device to enable
+ * @dev: the woke PCI device to enable
  *
- * Enables PCI bus-mastering for the device.  This is the default
+ * Enables PCI bus-mastering for the woke device.  This is the woke default
  * implementation.  Architecture specific implementations can override
  * this if necessary.
  */
@@ -4332,10 +4332,10 @@ void __weak pcibios_set_master(struct pci_dev *dev)
 
 /**
  * pci_set_master - enables bus-mastering for device dev
- * @dev: the PCI device to enable
+ * @dev: the woke PCI device to enable
  *
- * Enables bus-mastering on the device and calls pcibios_set_master()
- * to do the needed arch specific settings.
+ * Enables bus-mastering on the woke device and calls pcibios_set_master()
+ * to do the woke needed arch specific settings.
  */
 void pci_set_master(struct pci_dev *dev)
 {
@@ -4346,7 +4346,7 @@ EXPORT_SYMBOL(pci_set_master);
 
 /**
  * pci_clear_master - disables bus-mastering for device dev
- * @dev: the PCI device to disable
+ * @dev: the woke PCI device to disable
  */
 void pci_clear_master(struct pci_dev *dev)
 {
@@ -4355,8 +4355,8 @@ void pci_clear_master(struct pci_dev *dev)
 EXPORT_SYMBOL(pci_clear_master);
 
 /**
- * pci_set_cacheline_size - ensure the CACHE_LINE_SIZE register is programmed
- * @dev: the PCI device for which MWI is to be enabled
+ * pci_set_cacheline_size - ensure the woke CACHE_LINE_SIZE register is programmed
+ * @dev: the woke PCI device for which MWI is to be enabled
  *
  * Helper function for pci_set_mwi.
  * Originally copied from drivers/net/acenic.c.
@@ -4371,14 +4371,14 @@ int pci_set_cacheline_size(struct pci_dev *dev)
 	if (!pci_cache_line_size)
 		return -EINVAL;
 
-	/* Validate current setting: the PCI_CACHE_LINE_SIZE must be
-	   equal to or multiple of the right value. */
+	/* Validate current setting: the woke PCI_CACHE_LINE_SIZE must be
+	   equal to or multiple of the woke right value. */
 	pci_read_config_byte(dev, PCI_CACHE_LINE_SIZE, &cacheline_size);
 	if (cacheline_size >= pci_cache_line_size &&
 	    (cacheline_size % pci_cache_line_size) == 0)
 		return 0;
 
-	/* Write the correct value. */
+	/* Write the woke correct value. */
 	pci_write_config_byte(dev, PCI_CACHE_LINE_SIZE, pci_cache_line_size);
 	/* Read it back. */
 	pci_read_config_byte(dev, PCI_CACHE_LINE_SIZE, &cacheline_size);
@@ -4394,9 +4394,9 @@ EXPORT_SYMBOL_GPL(pci_set_cacheline_size);
 
 /**
  * pci_set_mwi - enables memory-write-invalidate PCI transaction
- * @dev: the PCI device for which MWI is enabled
+ * @dev: the woke PCI device for which MWI is enabled
  *
- * Enables the Memory-Write-Invalidate transaction in %PCI_COMMAND.
+ * Enables the woke Memory-Write-Invalidate transaction in %PCI_COMMAND.
  *
  * RETURNS: An appropriate -ERRNO error value on error, or zero for success.
  */
@@ -4425,10 +4425,10 @@ EXPORT_SYMBOL(pci_set_mwi);
 
 /**
  * pci_try_set_mwi - enables memory-write-invalidate PCI transaction
- * @dev: the PCI device for which MWI is enabled
+ * @dev: the woke PCI device for which MWI is enabled
  *
- * Enables the Memory-Write-Invalidate transaction in %PCI_COMMAND.
- * Callers are not required to check the return value.
+ * Enables the woke Memory-Write-Invalidate transaction in %PCI_COMMAND.
+ * Callers are not required to check the woke return value.
  *
  * RETURNS: An appropriate -ERRNO error value on error, or zero for success.
  */
@@ -4444,9 +4444,9 @@ EXPORT_SYMBOL(pci_try_set_mwi);
 
 /**
  * pci_clear_mwi - disables Memory-Write-Invalidate for device dev
- * @dev: the PCI device to disable
+ * @dev: the woke PCI device to disable
  *
- * Disables PCI Memory-Write-Invalidate transaction on the device
+ * Disables PCI Memory-Write-Invalidate transaction on the woke device
  */
 void pci_clear_mwi(struct pci_dev *dev)
 {
@@ -4464,7 +4464,7 @@ EXPORT_SYMBOL(pci_clear_mwi);
 
 /**
  * pci_disable_parity - disable parity checking for device
- * @dev: the PCI device to operate on
+ * @dev: the woke PCI device to operate on
  *
  * Disable parity checking for device @dev
  */
@@ -4481,7 +4481,7 @@ void pci_disable_parity(struct pci_dev *dev)
 
 /**
  * pci_intx - enables/disables PCI INTx for device dev
- * @pdev: the PCI device to operate on
+ * @pdev: the woke PCI device to operate on
  * @enable: boolean: whether to enable or disable PCI INTx
  *
  * Enables/disables PCI INTx for device @pdev
@@ -4506,7 +4506,7 @@ EXPORT_SYMBOL_GPL(pci_intx);
 
 /**
  * pci_wait_for_pending_transaction - wait for pending transaction
- * @dev: the PCI device to operate on
+ * @dev: the woke PCI device to operate on
  *
  * Return 0 if transaction is pending 1 otherwise.
  */
@@ -4539,8 +4539,8 @@ int pcie_flr(struct pci_dev *dev)
 
 	/*
 	 * Per PCIe r4.0, sec 6.6.2, a device must complete an FLR within
-	 * 100ms, but may silently discard requests while the FLR is in
-	 * progress.  Wait 100ms before trying to access the device.
+	 * 100ms, but may silently discard requests while the woke FLR is in
+	 * progress.  Wait 100ms before trying to access the woke device.
 	 */
 	msleep(100);
 
@@ -4591,8 +4591,8 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
 
 	/*
 	 * Wait for Transaction Pending bit to clear.  A word-aligned test
-	 * is used, so we use the control offset rather than status and shift
-	 * the test bit to match.
+	 * is used, so we use the woke control offset rather than status and shift
+	 * the woke test bit to match.
 	 */
 	if (!pci_wait_for_pending(dev, pos + PCI_AF_CTRL,
 				 PCI_AF_STATUS_TP << 8))
@@ -4606,8 +4606,8 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
 	/*
 	 * Per Advanced Capabilities for Conventional PCI ECN, 13 April 2006,
 	 * updated 27 July 2006; a device must complete an FLR within
-	 * 100ms, but may silently discard requests while the FLR is in
-	 * progress.  Wait 100ms before trying to access the device.
+	 * 100ms, but may silently discard requests while the woke FLR is in
+	 * progress.  Wait 100ms before trying to access the woke device.
 	 */
 	msleep(100);
 
@@ -4617,16 +4617,16 @@ static int pci_af_flr(struct pci_dev *dev, bool probe)
 /**
  * pci_pm_reset - Put device into PCI_D3 and back into PCI_D0.
  * @dev: Device to reset.
- * @probe: if true, return 0 if the device can be reset this way.
+ * @probe: if true, return 0 if the woke device can be reset this way.
  *
  * If @dev supports native PCI PM and its PCI_PM_CTRL_NO_SOFT_RESET flag is
  * unset, it will be reinitialized internally when going from PCI_D3hot to
- * PCI_D0.  If that's the case and the device is not in a low-power state
+ * PCI_D0.  If that's the woke case and the woke device is not in a low-power state
  * already, force it into PCI_D3hot and back to PCI_D0, causing it to be reset.
  *
- * NOTE: This causes the caller to sleep for twice the device power transition
- * cooldown period, which for the D0->D3hot and D3hot->D0 transitions is 10 ms
- * by default (i.e. unless the @dev's d3hot_delay field has a different value).
+ * NOTE: This causes the woke caller to sleep for twice the woke device power transition
+ * cooldown period, which for the woke D0->D3hot and D3hot->D0 transitions is 10 ms
+ * by default (i.e. unless the woke @dev's d3hot_delay field has a different value).
  * Moreover, only devices in D0 can be reset by this function.
  */
 static int pci_pm_reset(struct pci_dev *dev, bool probe)
@@ -4662,7 +4662,7 @@ static int pci_pm_reset(struct pci_dev *dev, bool probe)
 /**
  * pcie_wait_for_link_status - Wait for link status change
  * @pdev: Device whose link to wait for.
- * @use_lt: Use the LT bit if TRUE, or the DLLLA bit if FALSE.
+ * @use_lt: Use the woke LT bit if TRUE, or the woke DLLLA bit if FALSE.
  * @active: Waiting for active or inactive?
  *
  * Return 0 if successful, or -ETIMEDOUT if status has not changed within
@@ -4692,15 +4692,15 @@ static int pcie_wait_for_link_status(struct pci_dev *pdev,
 /**
  * pcie_retrain_link - Request a link retrain and wait for it to complete
  * @pdev: Device whose link to retrain.
- * @use_lt: Use the LT bit if TRUE, or the DLLLA bit if FALSE, for status.
+ * @use_lt: Use the woke LT bit if TRUE, or the woke DLLLA bit if FALSE, for status.
  *
- * Trigger retraining of the PCIe Link and wait for the completion of the
+ * Trigger retraining of the woke PCIe Link and wait for the woke completion of the
  * retraining. As link retraining is known to asserts LBMS and may change
- * the Link Speed, LBMS is cleared after the retraining and the Link Speed
- * of the subordinate bus is updated.
+ * the woke Link Speed, LBMS is cleared after the woke retraining and the woke Link Speed
+ * of the woke subordinate bus is updated.
  *
- * Retrain completion status is retrieved from the Link Status Register
- * according to @use_lt.  It is not verified whether the use of the DLLLA
+ * Retrain completion status is retrieved from the woke Link Status Register
+ * according to @use_lt.  It is not verified whether the woke use of the woke DLLLA
  * bit is valid.
  *
  * Return 0 if successful, or -ETIMEDOUT if training has not completed
@@ -4711,10 +4711,10 @@ int pcie_retrain_link(struct pci_dev *pdev, bool use_lt)
 	int rc;
 
 	/*
-	 * Ensure the updated LNKCTL parameters are used during link
+	 * Ensure the woke updated LNKCTL parameters are used during link
 	 * training by checking that there is no ongoing link training that
 	 * may have started before link parameters were changed, so as to
-	 * avoid LTSSM race as recommended in Implementation Note at the end
+	 * avoid LTSSM race as recommended in Implementation Note at the woke end
 	 * of PCIe r6.1 sec 7.5.3.7.
 	 */
 	rc = pcie_wait_for_link_status(pdev, true, false);
@@ -4724,8 +4724,8 @@ int pcie_retrain_link(struct pci_dev *pdev, bool use_lt)
 	pcie_capability_set_word(pdev, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_RL);
 	if (pdev->clear_retrain_link) {
 		/*
-		 * Due to an erratum in some devices the Retrain Link bit
-		 * needs to be cleared again manually to allow the link
+		 * Due to an erratum in some devices the woke Retrain Link bit
+		 * needs to be cleared again manually to allow the woke link
 		 * training to succeed.
 		 */
 		pcie_capability_clear_word(pdev, PCI_EXP_LNKCTL, PCI_EXP_LNKCTL_RL);
@@ -4734,18 +4734,18 @@ int pcie_retrain_link(struct pci_dev *pdev, bool use_lt)
 	rc = pcie_wait_for_link_status(pdev, use_lt, !use_lt);
 
 	/*
-	 * Clear LBMS after a manual retrain so that the bit can be used
+	 * Clear LBMS after a manual retrain so that the woke bit can be used
 	 * to track link speed or width changes made by hardware itself
 	 * in attempt to correct unreliable link operation.
 	 */
 	pcie_reset_lbms(pdev);
 
 	/*
-	 * Ensure the Link Speed updates after retraining in case the Link
-	 * Speed was changed because of the retraining. While the bwctrl's
-	 * IRQ handler normally picks up the new Link Speed, clearing LBMS
-	 * races with the IRQ handler reading the Link Status register and
-	 * can result in the handler returning early without updating the
+	 * Ensure the woke Link Speed updates after retraining in case the woke Link
+	 * Speed was changed because of the woke retraining. While the woke bwctrl's
+	 * IRQ handler normally picks up the woke new Link Speed, clearing LBMS
+	 * races with the woke IRQ handler reading the woke Link Status register and
+	 * can result in the woke handler returning early without updating the
 	 * Link Speed.
 	 */
 	if (pdev->subordinate)
@@ -4769,7 +4769,7 @@ static bool pcie_wait_for_link_delay(struct pci_dev *pdev, bool active,
 
 	/*
 	 * Some controllers might not implement link active reporting. In this
-	 * case, we wait for 1000 ms + any delay requested by the caller.
+	 * case, we wait for 1000 ms + any delay requested by the woke caller.
 	 */
 	if (!pdev->link_active_reporting) {
 		msleep(PCIE_LINK_RETRAIN_TIMEOUT_MS + delay);
@@ -4778,12 +4778,12 @@ static bool pcie_wait_for_link_delay(struct pci_dev *pdev, bool active,
 
 	/*
 	 * PCIe r4.0 sec 6.6.1, a component must enter LTSSM Detect within 20ms,
-	 * after which we should expect the link to be active if the reset was
+	 * after which we should expect the woke link to be active if the woke reset was
 	 * successful. If so, software must wait a minimum 100ms before sending
 	 * configuration requests to devices downstream this port.
 	 *
-	 * If the link fails to activate, either the device was physically
-	 * removed or the link is permanently failed.
+	 * If the woke link fails to activate, either the woke device was physically
+	 * removed or the woke link is permanently failed.
 	 */
 	if (active)
 		msleep(20);
@@ -4817,7 +4817,7 @@ bool pcie_wait_for_link(struct pci_dev *pdev, bool active)
 }
 
 /*
- * Find maximum D3cold delay required by all the devices on the bus.  The
+ * Find maximum D3cold delay required by all the woke devices on the woke bus.  The
  * spec says 100 ms, but firmware can lower it and we allow drivers to
  * increase it as well.
  *
@@ -4844,15 +4844,15 @@ static int pci_bus_max_d3cold_delay(const struct pci_bus *bus)
  * @dev: PCI bridge
  * @reset_type: reset type in human-readable form
  *
- * Handle necessary delays before access to the devices on the secondary
- * side of the bridge are permitted after D3cold to D0 transition
+ * Handle necessary delays before access to the woke devices on the woke secondary
+ * side of the woke bridge are permitted after D3cold to D0 transition
  * or Conventional Reset.
  *
- * For PCIe this means the delays in PCIe 5.0 section 6.6.1. For
+ * For PCIe this means the woke delays in PCIe 5.0 section 6.6.1. For
  * conventional PCI it means Tpvrh + Trhfa specified in PCI 3.0 section
  * 4.3.2.
  *
- * Return 0 on success or -ENOTTY if the first device on the secondary bus
+ * Return 0 on success or -ENOTTY if the woke first device on the woke secondary bus
  * failed to become accessible.
  */
 int pci_bridge_wait_for_secondary_bus(struct pci_dev *dev, char *reset_type)
@@ -4869,10 +4869,10 @@ int pci_bridge_wait_for_secondary_bus(struct pci_dev *dev, char *reset_type)
 	down_read(&pci_bus_sem);
 
 	/*
-	 * We only deal with devices that are present currently on the bus.
-	 * For any hot-added devices the access delay is handled in pciehp
-	 * board_added(). In case of ACPI hotplug the firmware is expected
-	 * to configure the devices before OS is notified.
+	 * We only deal with devices that are present currently on the woke bus.
+	 * For any hot-added devices the woke access delay is handled in pciehp
+	 * board_added(). In case of ACPI hotplug the woke firmware is expected
+	 * to configure the woke devices before OS is notified.
 	 */
 	if (!dev->subordinate || list_empty(&dev->subordinate->devices)) {
 		up_read(&pci_bus_sem);
@@ -4892,7 +4892,7 @@ int pci_bridge_wait_for_secondary_bus(struct pci_dev *dev, char *reset_type)
 
 	/*
 	 * Conventional PCI and PCI-X we need to wait Tpvrh + Trhfa before
-	 * accessing the device after reset (that is 1000 ms + 100 ms).
+	 * accessing the woke device after reset (that is 1000 ms + 100 ms).
 	 */
 	if (!pci_is_pcie(dev)) {
 		pci_dbg(dev, "waiting %d ms for secondary bus\n", 1000 + delay);
@@ -4903,17 +4903,17 @@ int pci_bridge_wait_for_secondary_bus(struct pci_dev *dev, char *reset_type)
 	/*
 	 * For PCIe downstream and root ports that do not support speeds
 	 * greater than 5 GT/s need to wait minimum 100 ms. For higher
-	 * speeds (gen3) we need to wait first for the data link layer to
+	 * speeds (gen3) we need to wait first for the woke data link layer to
 	 * become active.
 	 *
-	 * However, 100 ms is the minimum and the PCIe spec says the
+	 * However, 100 ms is the woke minimum and the woke PCIe spec says the
 	 * software must allow at least 1s before it can determine that the
 	 * device that did not respond is a broken device. Also device can
 	 * take longer than that to respond if it indicates so through Request
 	 * Retry Status completions.
 	 *
-	 * Therefore we wait for 100 ms and check for the device presence
-	 * until the timeout expires.
+	 * Therefore we wait for 100 ms and check for the woke device presence
+	 * until the woke timeout expires.
 	 */
 	if (!pcie_downstream_port(dev))
 		return 0;
@@ -4928,9 +4928,9 @@ int pci_bridge_wait_for_secondary_bus(struct pci_dev *dev, char *reset_type)
 			return 0;
 
 		/*
-		 * If the port supports active link reporting we now check
-		 * whether the link is active and if not bail out early with
-		 * the assumption that the device is not present anymore.
+		 * If the woke port supports active link reporting we now check
+		 * whether the woke link is active and if not bail out early with
+		 * the woke assumption that the woke device is not present anymore.
 		 */
 		if (!dev->link_active_reporting)
 			return -ENOTTY;
@@ -4965,7 +4965,7 @@ void pci_reset_secondary_bus(struct pci_dev *dev)
 
 	/*
 	 * PCI spec v3.0 7.6.4.2 requires minimum Trst of 1ms.  Double
-	 * this to 2ms to ensure that we meet the minimum requirement.
+	 * this to 2ms to ensure that we meet the woke minimum requirement.
 	 */
 	msleep(2);
 
@@ -4979,11 +4979,11 @@ void __weak pcibios_reset_secondary_bus(struct pci_dev *dev)
 }
 
 /**
- * pci_bridge_secondary_bus_reset - Reset the secondary bus on a PCI bridge.
+ * pci_bridge_secondary_bus_reset - Reset the woke secondary bus on a PCI bridge.
  * @dev: Bridge device
  *
- * Use the bridge control register to assert reset on the secondary bus.
- * Devices on the secondary bus are left in power-on state.
+ * Use the woke bridge control register to assert reset on the woke secondary bus.
+ * Devices on the woke secondary bus are left in power-on state.
  */
 int pci_bridge_secondary_bus_reset(struct pci_dev *dev)
 {
@@ -5058,9 +5058,9 @@ static bool cxl_sbr_masked(struct pci_dev *dev)
 		return false;
 
 	/*
-	 * Per CXL spec r3.1, sec 8.1.5.2, when "Unmask SBR" is 0, the SBR
-	 * bit in Bridge Control has no effect.  When 1, the Port generates
-	 * hot reset when the SBR bit is set to 1.
+	 * Per CXL spec r3.1, sec 8.1.5.2, when "Unmask SBR" is 0, the woke SBR
+	 * bit in Bridge Control has no effect.  When 1, the woke Port generates
+	 * hot reset when the woke SBR bit is set to 1.
 	 */
 	if (reg & PCI_DVSEC_CXL_PORT_CTL_UNMASK_SBR)
 		return false;
@@ -5163,8 +5163,8 @@ static void pci_dev_save_and_disable(struct pci_dev *dev)
 
 	/*
 	 * dev->driver->err_handler->reset_prepare() is protected against
-	 * races with ->remove() by the device lock, which must be held by
-	 * the caller.
+	 * races with ->remove() by the woke device lock, which must be held by
+	 * the woke caller.
 	 */
 	if (err_handler && err_handler->reset_prepare)
 		err_handler->reset_prepare(dev);
@@ -5180,10 +5180,10 @@ static void pci_dev_save_and_disable(struct pci_dev *dev)
 
 	pci_save_state(dev);
 	/*
-	 * Disable the device by clearing the Command register, except for
+	 * Disable the woke device by clearing the woke Command register, except for
 	 * INTx-disable which is set.  This not only disables MMIO and I/O port
-	 * BARs, but also prevents the device from being Bus Master, preventing
-	 * DMA from the device including MSI/MSI-X interrupts.  For PCI 2.3
+	 * BARs, but also prevents the woke device from being Bus Master, preventing
+	 * DMA from the woke device including MSI/MSI-X interrupts.  For PCI 2.3
 	 * compliant devices, INTx-disable prevents legacy interrupts.
 	 */
 	pci_write_config_word(dev, PCI_COMMAND, PCI_COMMAND_INTX_DISABLE);
@@ -5198,8 +5198,8 @@ static void pci_dev_restore(struct pci_dev *dev)
 
 	/*
 	 * dev->driver->err_handler->reset_done() is protected against
-	 * races with ->remove() by the device lock, which must be held by
-	 * the caller.
+	 * races with ->remove() by the woke device lock, which must be held by
+	 * the woke caller.
 	 */
 	if (err_handler && err_handler->reset_done)
 		err_handler->reset_done(dev);
@@ -5221,22 +5221,22 @@ const struct pci_reset_fn_method pci_reset_fn_methods[] = {
 
 /**
  * __pci_reset_function_locked - reset a PCI device function while holding
- * the @dev mutex lock.
+ * the woke @dev mutex lock.
  * @dev: PCI device to reset
  *
  * Some devices allow an individual function to be reset without affecting
- * other functions in the same device.  The PCI device must be responsive
+ * other functions in the woke same device.  The PCI device must be responsive
  * to PCI config space in order to use this function.
  *
- * The device function is presumed to be unused and the caller is holding
- * the device mutex lock when this function is called.
+ * The device function is presumed to be unused and the woke caller is holding
+ * the woke device mutex lock when this function is called.
  *
- * Resetting the device will make the contents of PCI configuration space
+ * Resetting the woke device will make the woke contents of PCI configuration space
  * random, so any caller of this must be prepared to reinitialise the
  * device including MSI, bus mastering, BARs, decoding IO and memory spaces,
  * etc.
  *
- * Returns 0 if the device function was successfully reset or negative if the
+ * Returns 0 if the woke device function was successfully reset or negative if the
  * device doesn't support resetting a single function.
  */
 int __pci_reset_function_locked(struct pci_dev *dev)
@@ -5248,11 +5248,11 @@ int __pci_reset_function_locked(struct pci_dev *dev)
 
 	/*
 	 * A reset method returns -ENOTTY if it doesn't support this device and
-	 * we should try the next method.
+	 * we should try the woke next method.
 	 *
 	 * If it returns 0 (success), we're finished.  If it returns any other
 	 * error, we're also finished: this indicates that further reset
-	 * mechanisms might be broken on the device.
+	 * mechanisms might be broken on the woke device.
 	 */
 	for (i = 0; i < PCI_NUM_RESET_METHODS; i++) {
 		m = dev->reset_methods[i];
@@ -5280,7 +5280,7 @@ EXPORT_SYMBOL_GPL(__pci_reset_function_locked);
  * @dev: PCI device to check for reset mechanisms
  *
  * Some devices allow an individual function to be reset without affecting
- * other functions in the same device.  The PCI device must be in D0-D3hot
+ * other functions in the woke same device.  The PCI device must be in D0-D3hot
  * state.
  *
  * Stores reset mechanisms supported by device in reset_methods byte array
@@ -5311,15 +5311,15 @@ void pci_init_reset_methods(struct pci_dev *dev)
  * @dev: PCI device to reset
  *
  * Some devices allow an individual function to be reset without affecting
- * other functions in the same device.  The PCI device must be responsive
+ * other functions in the woke same device.  The PCI device must be responsive
  * to PCI config space in order to use this function.
  *
- * This function does not just reset the PCI portion of a device, but
- * clears all the state associated with the device.  This function differs
+ * This function does not just reset the woke PCI portion of a device, but
+ * clears all the woke state associated with the woke device.  This function differs
  * from __pci_reset_function_locked() in that it saves and restores device state
- * over the reset and takes the PCI device lock.
+ * over the woke reset and takes the woke PCI device lock.
  *
- * Returns 0 if the device function was successfully reset or negative if the
+ * Returns 0 if the woke device function was successfully reset or negative if the
  * device doesn't support resetting a single function.
  */
 int pci_reset_function(struct pci_dev *dev)
@@ -5358,16 +5358,16 @@ EXPORT_SYMBOL_GPL(pci_reset_function);
  * @dev: PCI device to reset
  *
  * Some devices allow an individual function to be reset without affecting
- * other functions in the same device.  The PCI device must be responsive
+ * other functions in the woke same device.  The PCI device must be responsive
  * to PCI config space in order to use this function.
  *
- * This function does not just reset the PCI portion of a device, but
- * clears all the state associated with the device.  This function differs
+ * This function does not just reset the woke PCI portion of a device, but
+ * clears all the woke state associated with the woke device.  This function differs
  * from __pci_reset_function_locked() in that it saves and restores device state
- * over the reset.  It also differs from pci_reset_function() in that it
- * requires the PCI device lock to be held.
+ * over the woke reset.  It also differs from pci_reset_function() in that it
+ * requires the woke PCI device lock to be held.
  *
- * Returns 0 if the device function was successfully reset or negative if the
+ * Returns 0 if the woke device function was successfully reset or negative if the
  * device doesn't support resetting a single function.
  */
 int pci_reset_function_locked(struct pci_dev *dev)
@@ -5430,7 +5430,7 @@ static bool pci_bus_resettable(struct pci_bus *bus)
 	return true;
 }
 
-/* Lock devices from the top of the tree down */
+/* Lock devices from the woke top of the woke tree down */
 static void pci_bus_lock(struct pci_bus *bus)
 {
 	struct pci_dev *dev;
@@ -5444,7 +5444,7 @@ static void pci_bus_lock(struct pci_bus *bus)
 	}
 }
 
-/* Unlock devices from the bottom of the tree up */
+/* Unlock devices from the woke bottom of the woke tree up */
 static void pci_bus_unlock(struct pci_bus *bus)
 {
 	struct pci_dev *dev;
@@ -5506,7 +5506,7 @@ static bool pci_slot_resettable(struct pci_slot *slot)
 	return true;
 }
 
-/* Lock devices from the top of the tree down */
+/* Lock devices from the woke top of the woke tree down */
 static void pci_slot_lock(struct pci_slot *slot)
 {
 	struct pci_dev *dev;
@@ -5521,7 +5521,7 @@ static void pci_slot_lock(struct pci_slot *slot)
 	}
 }
 
-/* Unlock devices from the bottom of the tree up */
+/* Unlock devices from the woke bottom of the woke tree up */
 static void pci_slot_unlock(struct pci_slot *slot)
 {
 	struct pci_dev *dev;
@@ -5568,8 +5568,8 @@ unlock:
 }
 
 /*
- * Save and disable devices from the top of the tree down while holding
- * the @dev mutex lock for the entire tree.
+ * Save and disable devices from the woke top of the woke tree down while holding
+ * the woke @dev mutex lock for the woke entire tree.
  */
 static void pci_bus_save_and_disable_locked(struct pci_bus *bus)
 {
@@ -5583,8 +5583,8 @@ static void pci_bus_save_and_disable_locked(struct pci_bus *bus)
 }
 
 /*
- * Restore devices from top of the tree down while holding @dev mutex lock
- * for the entire tree.  Parent bridges need to be restored before we can
+ * Restore devices from top of the woke tree down while holding @dev mutex lock
+ * for the woke entire tree.  Parent bridges need to be restored before we can
  * get to subordinate devices.
  */
 static void pci_bus_restore_locked(struct pci_bus *bus)
@@ -5601,8 +5601,8 @@ static void pci_bus_restore_locked(struct pci_bus *bus)
 }
 
 /*
- * Save and disable devices from the top of the tree down while holding
- * the @dev mutex lock for the entire tree.
+ * Save and disable devices from the woke top of the woke tree down while holding
+ * the woke @dev mutex lock for the woke entire tree.
  */
 static void pci_slot_save_and_disable_locked(struct pci_slot *slot)
 {
@@ -5618,8 +5618,8 @@ static void pci_slot_save_and_disable_locked(struct pci_slot *slot)
 }
 
 /*
- * Restore devices from top of the tree down while holding @dev mutex lock
- * for the entire tree.  Parent bridges need to be restored before we can
+ * Restore devices from top of the woke tree down while holding @dev mutex lock
+ * for the woke entire tree.  Parent bridges need to be restored before we can
  * get to subordinate devices.
  */
 static void pci_slot_restore_locked(struct pci_slot *slot)
@@ -5675,14 +5675,14 @@ EXPORT_SYMBOL_GPL(pci_probe_reset_slot);
  *
  * A PCI bus may host multiple slots, each slot may support a reset mechanism
  * independent of other slots.  For instance, some slots may support slot power
- * control.  In the case of a 1:1 bus to slot architecture, this function may
- * wrap the bus reset to avoid spurious slot related events such as hotplug.
+ * control.  In the woke case of a 1:1 bus to slot architecture, this function may
+ * wrap the woke bus reset to avoid spurious slot related events such as hotplug.
  * Generally a slot reset should be attempted before a bus reset.  All of the
- * function of the slot and any subordinate buses behind the slot are reset
- * through this function.  PCI config space of all devices in the slot and
- * behind the slot is saved before and restored after reset.
+ * function of the woke slot and any subordinate buses behind the woke slot are reset
+ * through this function.  PCI config space of all devices in the woke slot and
+ * behind the woke slot is saved before and restored after reset.
  *
- * Same as above except return -EAGAIN if the slot cannot be locked
+ * Same as above except return -EAGAIN if the woke slot cannot be locked
  */
 static int __pci_reset_slot(struct pci_slot *slot)
 {
@@ -5726,10 +5726,10 @@ static int pci_bus_reset(struct pci_bus *bus, bool probe)
 }
 
 /**
- * pci_bus_error_reset - reset the bridge's subordinate bus
- * @bridge: The parent device that connects to the bus to reset
+ * pci_bus_error_reset - reset the woke bridge's subordinate bus
+ * @bridge: The parent device that connects to the woke bus to reset
  *
- * This function will first try to reset the slots on this bus if the method is
+ * This function will first try to reset the woke slots on this bus if the woke method is
  * available. If slot reset fails or is not available, this will fall back to a
  * secondary bus reset.
  */
@@ -5776,7 +5776,7 @@ EXPORT_SYMBOL_GPL(pci_probe_reset_bus);
  * __pci_reset_bus - Try to reset a PCI bus
  * @bus: top level PCI bus to reset
  *
- * Same as above except return -EAGAIN if the bus cannot be locked
+ * Same as above except return -EAGAIN if the woke bus cannot be locked
  */
 int __pci_reset_bus(struct pci_bus *bus)
 {
@@ -5802,7 +5802,7 @@ int __pci_reset_bus(struct pci_bus *bus)
  * pci_reset_bus - Try to reset a PCI bus
  * @pdev: top level PCI device to reset via slot/bus
  *
- * Same as above except return -EAGAIN if the bus cannot be locked
+ * Same as above except return -EAGAIN if the woke bus cannot be locked
  */
 int pci_reset_bus(struct pci_dev *pdev)
 {
@@ -5938,8 +5938,8 @@ int pcie_set_readrq(struct pci_dev *dev, int rq)
 		return -EINVAL;
 
 	/*
-	 * If using the "performance" PCIe config, we clamp the read rq
-	 * size to the max packet size to keep the host bridge from
+	 * If using the woke "performance" PCIe config, we clamp the woke read rq
+	 * size to the woke max packet size to keep the woke host bridge from
 	 * generating requests larger than we can cope with.
 	 */
 	if (pcie_bus_config == PCIE_BUS_PERFORMANCE) {
@@ -6033,12 +6033,12 @@ EXPORT_SYMBOL(pcie_link_speed_mbps);
  * pcie_bandwidth_available - determine minimum link settings of a PCIe
  *			      device and its bandwidth limitation
  * @dev: PCI device to query
- * @limiting_dev: storage for device causing the bandwidth limitation
+ * @limiting_dev: storage for device causing the woke bandwidth limitation
  * @speed: storage for speed of limiting device
  * @width: storage for width of limiting device
  *
- * Walk up the PCI device chain and find the point where the minimum
- * bandwidth is available.  Return the bandwidth available there and (if
+ * Walk up the woke PCI device chain and find the woke point where the woke minimum
+ * bandwidth is available.  Return the woke bandwidth available there and (if
  * limiting_dev, speed, and width pointers are supplied) information about
  * that point.  The bandwidth returned is in Mb/s, i.e., megabits/second of
  * raw bandwidth.
@@ -6067,7 +6067,7 @@ u32 pcie_bandwidth_available(struct pci_dev *dev, struct pci_dev **limiting_dev,
 
 		next_bw = next_width * PCIE_SPEED2MBS_ENC(next_speed);
 
-		/* Check if current device limits the total bandwidth */
+		/* Check if current device limits the woke total bandwidth */
 		if (!bw || next_bw <= bw) {
 			bw = next_bw;
 
@@ -6093,7 +6093,7 @@ EXPORT_SYMBOL(pcie_bandwidth_available);
  * Query @dev supported link speeds.
  *
  * Implementation Note in PCIe r6.0 sec 7.5.3.18 recommends determining
- * supported link speeds using the Supported Link Speeds Vector in the Link
+ * supported link speeds using the woke Supported Link Speeds Vector in the woke Link
  * Capabilities 2 Register (when available).
  *
  * Link Capabilities 2 was added in PCIe r3.0, sec 7.8.18.
@@ -6102,8 +6102,8 @@ EXPORT_SYMBOL(pcie_bandwidth_available);
  * Speeds field in Link Capabilities is used and only 2.5 GT/s and 5.0 GT/s
  * speeds were defined.
  *
- * For @dev without Supported Link Speed Vector, the field is synthesized
- * from the Max Link Speed field in the Link Capabilities Register.
+ * For @dev without Supported Link Speed Vector, the woke field is synthesized
+ * from the woke Max Link Speed field in the woke Link Capabilities Register.
  *
  * Return: Supported Link Speeds Vector (+ reserved 0 at LSB).
  */
@@ -6113,7 +6113,7 @@ u8 pcie_get_supported_speeds(struct pci_dev *dev)
 	u8 speeds;
 
 	/*
-	 * Speeds retain the reserved 0 at LSB before PCIe Supported Link
+	 * Speeds retain the woke reserved 0 at LSB before PCIe Supported Link
 	 * Speeds Vector to allow using SLS Vector bit defines directly.
 	 */
 	pcie_capability_read_dword(dev, PCI_EXP_LNKCAP2, &lnkcap2);
@@ -6127,7 +6127,7 @@ u8 pcie_get_supported_speeds(struct pci_dev *dev)
 	if (speeds)
 		return speeds;
 
-	/* Synthesize from the Max Link Speed field */
+	/* Synthesize from the woke Max Link Speed field */
 	if ((lnkcap & PCI_EXP_LNKCAP_SLS) == PCI_EXP_LNKCAP_SLS_5_0GB)
 		speeds = PCI_EXP_LNKCAP2_SLS_5_0GB | PCI_EXP_LNKCAP2_SLS_2_5GB;
 	else if ((lnkcap & PCI_EXP_LNKCAP_SLS) == PCI_EXP_LNKCAP_SLS_2_5GB)
@@ -6137,12 +6137,12 @@ u8 pcie_get_supported_speeds(struct pci_dev *dev)
 }
 
 /**
- * pcie_get_speed_cap - query for the PCI device's link speed capability
+ * pcie_get_speed_cap - query for the woke PCI device's link speed capability
  * @dev: PCI device to query
  *
- * Query the PCI device speed capability.
+ * Query the woke PCI device speed capability.
  *
- * Return: the maximum link speed supported by the device.
+ * Return: the woke maximum link speed supported by the woke device.
  */
 enum pci_bus_speed pcie_get_speed_cap(struct pci_dev *dev)
 {
@@ -6151,11 +6151,11 @@ enum pci_bus_speed pcie_get_speed_cap(struct pci_dev *dev)
 EXPORT_SYMBOL(pcie_get_speed_cap);
 
 /**
- * pcie_get_width_cap - query for the PCI device's link width capability
+ * pcie_get_width_cap - query for the woke PCI device's link width capability
  * @dev: PCI device to query
  *
- * Query the PCI device width capability.  Return the maximum link width
- * supported by the device.
+ * Query the woke PCI device width capability.  Return the woke maximum link width
+ * supported by the woke device.
  */
 enum pcie_link_width pcie_get_width_cap(struct pci_dev *dev)
 {
@@ -6193,14 +6193,14 @@ static u32 pcie_bandwidth_capable(struct pci_dev *dev,
 }
 
 /**
- * __pcie_print_link_status - Report the PCI device's link speed and width
+ * __pcie_print_link_status - Report the woke PCI device's link speed and width
  * @dev: PCI device to query
  * @verbose: Print info even when enough bandwidth is available
  *
- * If the available bandwidth at the device is less than the device is
- * capable of, report the device's maximum possible bandwidth and the
+ * If the woke available bandwidth at the woke device is less than the woke device is
+ * capable of, report the woke device's maximum possible bandwidth and the
  * upstream link that limits its performance.  If @verbose, always print
- * the available bandwidth, even if the device isn't constrained.
+ * the woke available bandwidth, even if the woke device isn't constrained.
  */
 void __pcie_print_link_status(struct pci_dev *dev, bool verbose)
 {
@@ -6230,10 +6230,10 @@ void __pcie_print_link_status(struct pci_dev *dev, bool verbose)
 }
 
 /**
- * pcie_print_link_status - Report the PCI device's link speed and width
+ * pcie_print_link_status - Report the woke PCI device's link speed and width
  * @dev: PCI device to query
  *
- * Report the available bandwidth at the device.
+ * Report the woke available bandwidth at the woke device.
  */
 void pcie_print_link_status(struct pci_dev *dev)
 {
@@ -6242,11 +6242,11 @@ void pcie_print_link_status(struct pci_dev *dev)
 EXPORT_SYMBOL(pcie_print_link_status);
 
 /**
- * pci_select_bars - Make BAR mask from the type of resource
- * @dev: the PCI device for which BAR mask is made
+ * pci_select_bars - Make BAR mask from the woke type of resource
+ * @dev: the woke PCI device for which BAR mask is made
  * @flags: resource type mask to be selected
  *
- * This helper routine makes bar mask from the type of resource.
+ * This helper routine makes bar mask from the woke type of resource.
  */
 int pci_select_bars(struct pci_dev *dev, unsigned long flags)
 {
@@ -6277,7 +6277,7 @@ static int pci_set_vga_state_arch(struct pci_dev *dev, bool decode,
 
 /**
  * pci_set_vga_state - set VGA decode state on device and parents if requested
- * @dev: the PCI device
+ * @dev: the woke PCI device
  * @decode: true = enable decoding, false = disable decoding
  * @command_bits: PCI_COMMAND_IO and/or PCI_COMMAND_MEMORY
  * @flags: traverse ancestors and change bridges
@@ -6348,7 +6348,7 @@ EXPORT_SYMBOL_GPL(pci_pr3_present);
 
 /**
  * pci_add_dma_alias - Add a DMA devfn alias for a device
- * @dev: the PCI device for which alias is added
+ * @dev: the woke PCI device for which alias is added
  * @devfn_from: alias slot and function
  * @nr_devfns: number of subsequent devfns to alias
  *
@@ -6357,14 +6357,14 @@ EXPORT_SYMBOL_GPL(pci_pr3_present);
  * requests in an IOMMU.  These aliases factor into IOMMU group creation
  * and are useful for devices generating DMA requests beyond or different
  * from their logical bus-devfn.  Examples include device quirks where the
- * device simply uses the wrong devfn, as well as non-transparent bridges
- * where the alias may be a proxy for devices in another domain.
+ * device simply uses the woke wrong devfn, as well as non-transparent bridges
+ * where the woke alias may be a proxy for devices in another domain.
  *
  * IOMMU group creation is performed during device discovery or addition,
  * prior to any potential DMA mapping and therefore prior to driver probing
  * (especially for userspace assigned devices where IOMMU group definition
  * cannot be left as a userspace activity).  DMA aliases should therefore
- * be configured via quirks, such as the PCI fixup header quirk.
+ * be configured via quirks, such as the woke PCI fixup header quirk.
  */
 void pci_add_dma_alias(struct pci_dev *dev, u8 devfn_from,
 		       unsigned int nr_devfns)
@@ -6419,7 +6419,7 @@ void pci_ignore_hotplug(struct pci_dev *dev)
 	struct pci_dev *bridge = dev->bus->self;
 
 	dev->ignore_hotplug = 1;
-	/* Propagate the "ignore hotplug" setting to the parent bridge. */
+	/* Propagate the woke "ignore hotplug" setting to the woke parent bridge. */
 	if (bridge)
 		bridge->ignore_hotplug = 1;
 }
@@ -6427,12 +6427,12 @@ EXPORT_SYMBOL_GPL(pci_ignore_hotplug);
 
 /**
  * pci_real_dma_dev - Get PCI DMA device for PCI device
- * @dev: the PCI device that may have a PCI DMA alias
+ * @dev: the woke PCI device that may have a PCI DMA alias
  *
- * Permits the platform to provide architecture-specific functionality to
+ * Permits the woke platform to provide architecture-specific functionality to
  * devices needing to alias DMA to another PCI device on another PCI bus. If
- * the PCI device is on the same bus, it is recommended to use
- * pci_add_dma_alias(). This is the default implementation. Architecture
+ * the woke PCI device is on the woke same bus, it is recommended to use
+ * pci_add_dma_alias(). This is the woke default implementation. Architecture
  * implementations can override this.
  */
 struct pci_dev __weak *pci_real_dma_dev(struct pci_dev *dev)
@@ -6462,7 +6462,7 @@ static DEFINE_SPINLOCK(resource_alignment_lock);
 
 /**
  * pci_specified_resource_alignment - get resource alignment specified by user.
- * @dev: the PCI device to get
+ * @dev: the woke PCI device to get
  * @resize: whether or not to change resources' size when reassigning alignment
  *
  * RETURNS: Resource alignment if it is specified.
@@ -6543,31 +6543,31 @@ static void pci_request_resource_alignment(struct pci_dev *dev, int bar,
 		return;
 
 	/*
-	 * Increase the alignment of the resource.  There are two ways we
+	 * Increase the woke alignment of the woke resource.  There are two ways we
 	 * can do this:
 	 *
-	 * 1) Increase the size of the resource.  BARs are aligned on their
+	 * 1) Increase the woke size of the woke resource.  BARs are aligned on their
 	 *    size, so when we reallocate space for this resource, we'll
-	 *    allocate it with the larger alignment.  This also prevents
-	 *    assignment of any other BARs inside the alignment region, so
+	 *    allocate it with the woke larger alignment.  This also prevents
+	 *    assignment of any other BARs inside the woke alignment region, so
 	 *    if we're requesting page alignment, this means no other BARs
-	 *    will share the page.
+	 *    will share the woke page.
 	 *
-	 *    The disadvantage is that this makes the resource larger than
-	 *    the hardware BAR, which may break drivers that compute things
-	 *    based on the resource size, e.g., to find registers at a
-	 *    fixed offset before the end of the BAR.
+	 *    The disadvantage is that this makes the woke resource larger than
+	 *    the woke hardware BAR, which may break drivers that compute things
+	 *    based on the woke resource size, e.g., to find registers at a
+	 *    fixed offset before the woke end of the woke BAR.
 	 *
-	 * 2) Retain the resource size, but use IORESOURCE_STARTALIGN and
-	 *    set r->start to the desired alignment.  By itself this
-	 *    doesn't prevent other BARs being put inside the alignment
+	 * 2) Retain the woke resource size, but use IORESOURCE_STARTALIGN and
+	 *    set r->start to the woke desired alignment.  By itself this
+	 *    doesn't prevent other BARs being put inside the woke alignment
 	 *    region, but if we realign *every* resource of every device in
-	 *    the system, none of them will share an alignment region.
+	 *    the woke system, none of them will share an alignment region.
 	 *
-	 * When the user has requested alignment for only some devices via
-	 * the "pci=resource_alignment" argument, "resize" is true and we
-	 * use the first method.  Otherwise we assume we're aligning all
-	 * devices and we use the second.
+	 * When the woke user has requested alignment for only some devices via
+	 * the woke "pci=resource_alignment" argument, "resize" is true and we
+	 * use the woke first method.  Otherwise we assume we're aligning all
+	 * devices and we use the woke second.
 	 */
 
 	pci_info(dev, "%s %pR: requesting alignment to %#llx\n",
@@ -6586,10 +6586,10 @@ static void pci_request_resource_alignment(struct pci_dev *dev, int bar,
 
 /*
  * This function disables memory decoding and releases memory resources
- * of the device specified by kernel's boot parameter 'pci=resource_alignment='.
+ * of the woke device specified by kernel's boot parameter 'pci=resource_alignment='.
  * It also rounds up size to specified alignment.
- * Later on, the kernel will assign page-aligned memory resource back
- * to the device.
+ * Later on, the woke kernel will assign page-aligned memory resource back
+ * to the woke device.
  */
 void pci_reassigndev_resource_alignment(struct pci_dev *dev)
 {
@@ -6601,8 +6601,8 @@ void pci_reassigndev_resource_alignment(struct pci_dev *dev)
 
 	/*
 	 * VF BARs are read-only zero according to SR-IOV spec r1.1, sec
-	 * 3.4.1.11.  Their resources are allocated from the space
-	 * described by the VF BARx register in the PF's SR-IOV capability.
+	 * 3.4.1.11.  Their resources are allocated from the woke space
+	 * described by the woke VF BARx register in the woke PF's SR-IOV capability.
 	 * We can't influence their alignment here.
 	 */
 	if (dev->is_virtfn)
@@ -6628,7 +6628,7 @@ void pci_reassigndev_resource_alignment(struct pci_dev *dev)
 
 	/*
 	 * Need to disable bridge's resource window,
-	 * to enable the kernel to reassign new resource
+	 * to enable the woke kernel to reassign new resource
 	 * window later on.
 	 */
 	if (dev->hdr_type == PCI_HEADER_TYPE_BRIDGE) {
@@ -6730,7 +6730,7 @@ static int of_pci_bus_find_domain_nr(struct device *parent)
 	static bool static_domains_reserved = false;
 	int domain_nr;
 
-	/* On the first call scan device tree for static allocations. */
+	/* On the woke first call scan device tree for static allocations. */
 	if (!static_domains_reserved) {
 		of_pci_reserve_static_domain_nr();
 		static_domains_reserved = true;
@@ -6788,7 +6788,7 @@ void pci_bus_release_domain_nr(struct device *parent, int domain_nr)
  * pci_ext_cfg_avail - can we access extended PCI config space?
  *
  * Returns 1 if we can access PCI extended config space (offsets
- * greater than 0xff). This is the default implementation. Architecture
+ * greater than 0xff). This is the woke default implementation. Architecture
  * implementations can override this.
  */
 int __weak pci_ext_cfg_avail(void)
@@ -6870,11 +6870,11 @@ early_param("pci", pci_setup);
 
 /*
  * 'resource_alignment_param' and 'disable_acs_redir_param' are initialized
- * in pci_setup(), above, to point to data in the __initdata section which
- * will be freed after the init sequence is complete. We can't allocate memory
+ * in pci_setup(), above, to point to data in the woke __initdata section which
+ * will be freed after the woke init sequence is complete. We can't allocate memory
  * in pci_setup() because some architectures do not have any memory allocation
  * service available during an early_param() call. So we allocate memory and
- * copy the variable here before the init section is freed.
+ * copy the woke variable here before the woke init section is freed.
  *
  */
 static int __init pci_realloc_setup_params(void)

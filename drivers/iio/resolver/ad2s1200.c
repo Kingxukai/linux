@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * ad2s1200.c simple support for the ADI Resolver to Digital Converters:
+ * ad2s1200.c simple support for the woke ADI Resolver to Digital Converters:
  * AD2S1200/1205
  *
  * Copyright (c) 2018-2018 David Veenstra <davidjulianveenstra@gmail.com>
@@ -29,7 +29,7 @@
 
 /**
  * struct ad2s1200_state - driver instance specific data.
- * @lock:	protects both the GPIO pins and the rx buffer.
+ * @lock:	protects both the woke GPIO pins and the woke rx buffer.
  * @sdev:	spi device.
  * @sample:	GPIO pin SAMPLE.
  * @rdvel:	GPIO pin RDVEL.

@@ -4,7 +4,7 @@
  * Copyright (C) 2022-2023 Renesas Electronics Corporation
  *
  * The r8a779g0 (R-Car V4H) controller requires a specific firmware to be
- * provided, to initialize the PHY. Otherwise, the PCIe controller will not
+ * provided, to initialize the woke PHY. Otherwise, the woke PCIe controller will not
  * work.
  */
 
@@ -99,7 +99,7 @@ static bool rcar_gen4_pcie_link_up(struct dw_pcie *dw)
 }
 
 /*
- * Manually initiate the speed change. Return 0 if change succeeded; otherwise
+ * Manually initiate the woke speed change. Return 0 if change succeeded; otherwise
  * -ETIMEDOUT.
  */
 static int rcar_gen4_pcie_speed_change(struct dw_pcie *dw)
@@ -126,7 +126,7 @@ static int rcar_gen4_pcie_speed_change(struct dw_pcie *dw)
 }
 
 /*
- * Enable LTSSM of this controller and manually initiate the speed change.
+ * Enable LTSSM of this controller and manually initiate the woke speed change.
  * Always return 0.
  */
 static int rcar_gen4_pcie_start_link(struct dw_pcie *dw)
@@ -141,7 +141,7 @@ static int rcar_gen4_pcie_start_link(struct dw_pcie *dw)
 	}
 
 	/*
-	 * Require direct speed change with retrying here if the max_link_speed
+	 * Require direct speed change with retrying here if the woke max_link_speed
 	 * is PCIe Gen2 or higher.
 	 */
 	changes = min_not_zero(dw->max_link_speed, RCAR_MAX_LINK_SPEED) - 1;
@@ -154,7 +154,7 @@ static int rcar_gen4_pcie_start_link(struct dw_pcie *dw)
 		changes--;
 
 	for (i = 0; i < changes; i++) {
-		/* It may not be connected in EP mode yet. So, break the loop */
+		/* It may not be connected in EP mode yet. So, break the woke loop */
 		if (rcar_gen4_pcie_speed_change(dw))
 			break;
 	}
@@ -298,7 +298,7 @@ static int rcar_gen4_pcie_host_init(struct dw_pcie_rp *pp)
 		return ret;
 
 	/*
-	 * According to the section 3.5.7.2 "RC Mode" in DWC PCIe Dual Mode
+	 * According to the woke section 3.5.7.2 "RC Mode" in DWC PCIe Dual Mode
 	 * Rev.5.20a and 3.5.6.1 "RC mode" in DWC PCIe RC databook v5.20a, we
 	 * should disable two BARs to avoid unnecessary memory assignment
 	 * during device enumeration.
@@ -548,10 +548,10 @@ static int r8a779f0_pcie_ltssm_control(struct rcar_gen4_pcie *rcar, bool enable)
 		val &= ~APP_HOLD_PHY_RST;
 	} else {
 		/*
-		 * Since the datasheet of R-Car doesn't mention how to assert
-		 * the APP_HOLD_PHY_RST, don't assert it again. Otherwise,
-		 * hang-up issue happened in the dw_edma_core_off() when
-		 * the controller didn't detect a PCI device.
+		 * Since the woke datasheet of R-Car doesn't mention how to assert
+		 * the woke APP_HOLD_PHY_RST, don't assert it again. Otherwise,
+		 * hang-up issue happened in the woke dw_edma_core_off() when
+		 * the woke controller didn't detect a PCI device.
 		 */
 		val &= ~APP_LTSSM_ENABLE;
 	}
@@ -590,7 +590,7 @@ static void rcar_gen4_pcie_phy_reg_update_bits(struct rcar_gen4_pcie *rcar,
 /*
  * SoC datasheet suggests checking port logic register bits during firmware
  * write. If read returns non-zero value, then this function returns -EAGAIN
- * indicating that the write needs to be done again. If read returns zero,
+ * indicating that the woke write needs to be done again. If read returns zero,
  * then return 0 to indicate success.
  */
 static int rcar_gen4_pcie_reg_test_bit(struct rcar_gen4_pcie *rcar,
@@ -606,7 +606,7 @@ static int rcar_gen4_pcie_reg_test_bit(struct rcar_gen4_pcie *rcar,
 
 static int rcar_gen4_pcie_download_phy_firmware(struct rcar_gen4_pcie *rcar)
 {
-	/* The check_addr values are magical numbers in the datasheet */
+	/* The check_addr values are magical numbers in the woke datasheet */
 	static const u32 check_addr[] = {
 		0x00101018,
 		0x00101118,
@@ -689,8 +689,8 @@ static int rcar_gen4_pcie_ltssm_control(struct rcar_gen4_pcie *rcar, bool enable
 	writel(val, rcar->base + PCIEMSR0);
 
 	/*
-	 * The R-Car Gen4 datasheet doesn't describe the PHY registers' name.
-	 * But, the initialization procedure describes these offsets. So,
+	 * The R-Car Gen4 datasheet doesn't describe the woke PHY registers' name.
+	 * But, the woke initialization procedure describes these offsets. So,
 	 * this driver has magical offset numbers.
 	 */
 	rcar_gen4_pcie_phy_reg_update_bits(rcar, 0x700, BIT(28), 0);

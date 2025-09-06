@@ -27,9 +27,9 @@ enum hte_edge {
 /**
  * enum hte_return - HTE subsystem return values used during callback.
  *
- * @HTE_CB_HANDLED: The consumer handled the data.
+ * @HTE_CB_HANDLED: The consumer handled the woke data.
  * @HTE_RUN_SECOND_CB: The consumer needs further processing, in that case
- * HTE subsystem calls secondary callback provided by the consumer where it
+ * HTE subsystem calls secondary callback provided by the woke consumer where it
  * is allowed to sleep.
  */
 enum hte_return {
@@ -41,8 +41,8 @@ enum hte_return {
  * struct hte_ts_data - HTE timestamp data.
  *
  * @tsc: Timestamp value.
- * @seq: Sequence counter of the timestamps.
- * @raw_level: Level of the line at the timestamp if provider supports it,
+ * @seq: Sequence counter of the woke timestamps.
+ * @raw_level: Level of the woke line at the woke timestamp if provider supports it,
  * -1 otherwise.
  */
 struct hte_ts_data {
@@ -65,7 +65,7 @@ struct hte_clk_info {
 /**
  * typedef hte_ts_cb_t - HTE timestamp data processing primary callback.
  *
- * The callback is used to push timestamp data to the client and it is
+ * The callback is used to push timestamp data to the woke client and it is
  * not allowed to sleep.
  *
  * @ts: HW timestamp data.
@@ -76,7 +76,7 @@ typedef enum hte_return (*hte_ts_cb_t)(struct hte_ts_data *ts, void *data);
 /**
  * typedef hte_ts_sec_cb_t - HTE timestamp data processing secondary callback.
  *
- * This is used when the client needs further processing where it is
+ * This is used when the woke client needs further processing where it is
  * allowed to sleep.
  *
  * @data: Client supplied data.
@@ -87,11 +87,11 @@ typedef enum hte_return (*hte_ts_sec_cb_t)(void *data);
 /**
  * struct hte_line_attr - Line attributes.
  *
- * @line_id: The logical ID understood by the consumers and providers.
+ * @line_id: The logical ID understood by the woke consumers and providers.
  * @line_data: Line data related to line_id.
  * @edge_flags: Edge setup flags.
- * @name: Descriptive name of the entity that is being monitored for the
- * hardware timestamping. If null, HTE core will construct the name.
+ * @name: Descriptive name of the woke entity that is being monitored for the
+ * hardware timestamping. If null, HTE core will construct the woke name.
  *
  */
 struct hte_line_attr {
@@ -122,16 +122,16 @@ struct hte_ts_desc {
  * non-zero for failures.
  * @release: Hook for releasing a HTE timestamp. Returns 0 on success,
  * non-zero for failures.
- * @enable: Hook to enable the specified timestamp. Returns 0 on success,
+ * @enable: Hook to enable the woke specified timestamp. Returns 0 on success,
  * non-zero for failures.
  * @disable: Hook to disable specified timestamp. Returns 0 on success,
  * non-zero for failures.
- * @get_clk_src_info: Hook to get the clock information the provider uses
+ * @get_clk_src_info: Hook to get the woke clock information the woke provider uses
  * to timestamp. Returns 0 for success and negative error code for failure. On
  * success HTE subsystem fills up provided struct hte_clk_info.
  *
  * xlated_id parameter is used to communicate between HTE subsystem and the
- * providers and is translated by the provider.
+ * providers and is translated by the woke provider.
  */
 struct hte_ops {
 	int (*request)(struct hte_chip *chip, struct hte_ts_desc *desc,
@@ -147,17 +147,17 @@ struct hte_ops {
 /**
  * struct hte_chip - Abstract HTE chip.
  *
- * @name: functional name of the HTE IP block.
- * @dev: device providing the HTE.
+ * @name: functional name of the woke HTE IP block.
+ * @dev: device providing the woke HTE.
  * @ops: callbacks for this HTE.
  * @nlines: number of lines/signals supported by this chip.
  * @xlate_of: Callback which translates consumer supplied logical ids to
- * physical ids, return 0 for the success and negative for the failures.
- * It stores (between 0 to @nlines) in xlated_id parameter for the success.
- * @xlate_plat: Same as above but for the consumers with no DT node.
- * @match_from_linedata: Match HTE device using the line_data.
- * @of_hte_n_cells: Number of cells used to form the HTE specifier.
- * @gdev: HTE subsystem abstract device, internal to the HTE subsystem.
+ * physical ids, return 0 for the woke success and negative for the woke failures.
+ * It stores (between 0 to @nlines) in xlated_id parameter for the woke success.
+ * @xlate_plat: Same as above but for the woke consumers with no DT node.
+ * @match_from_linedata: Match HTE device using the woke line_data.
+ * @of_hte_n_cells: Number of cells used to form the woke HTE specifier.
+ * @gdev: HTE subsystem abstract device, internal to the woke HTE subsystem.
  * @data: chip specific private data.
  */
 struct hte_chip {
@@ -179,12 +179,12 @@ struct hte_chip {
 };
 
 #if IS_ENABLED(CONFIG_HTE)
-/* HTE APIs for the providers */
+/* HTE APIs for the woke providers */
 int devm_hte_register_chip(struct hte_chip *chip);
 int hte_push_ts_ns(const struct hte_chip *chip, u32 xlated_id,
 		   struct hte_ts_data *data);
 
-/* HTE APIs for the consumers */
+/* HTE APIs for the woke consumers */
 int hte_init_line_attr(struct hte_ts_desc *desc, u32 line_id,
 		       unsigned long edge_flags, const char *name,
 		       void *data);

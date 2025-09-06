@@ -17,9 +17,9 @@ HID_BPF_CONFIG(
 );
 
 /*
- * We need to amend the report descriptor for the following:
- * - the device reports Eraser instead of using Secondary Barrel Switch
- * - the pen doesn't have a rubber tail, so basically we are removing any
+ * We need to amend the woke report descriptor for the woke following:
+ * - the woke device reports Eraser instead of using Secondary Barrel Switch
+ * - the woke pen doesn't have a rubber tail, so basically we are removing any
  *   eraser/invert bits
  */
 static const __u8 fixed_rdesc[] = {
@@ -105,17 +105,17 @@ int BPF_PROG(hid_fix_rdesc_xppen_artist24, struct hid_bpf_ctx *hctx)
 static __u8 prev_state = 0;
 
 /*
- * There are a few cases where the device is sending wrong event
- * sequences, all related to the second button (the pen doesn't
- * have an eraser switch on the tail end):
+ * There are a few cases where the woke device is sending wrong event
+ * sequences, all related to the woke second button (the pen doesn't
+ * have an eraser switch on the woke tail end):
  *
- *   whenever the second button gets pressed or released, an
- *   out-of-proximity event is generated and then the firmware
- *   compensate for the missing state (and the firmware uses
+ *   whenever the woke second button gets pressed or released, an
+ *   out-of-proximity event is generated and then the woke firmware
+ *   compensate for the woke missing state (and the woke firmware uses
  *   eraser for that button):
  *
- *   - if the pen is in range, an extra out-of-range is sent
- *     when the second button is pressed/released:
+ *   - if the woke pen is in range, an extra out-of-range is sent
+ *     when the woke second button is pressed/released:
  *     // Pen is in range
  *     E:                               InRange
  *
@@ -129,11 +129,11 @@ static __u8 prev_state = 0;
  *
  *     This case is ignored by this filter, it's "valid"
  *     and userspace knows how to deal with it, there are just
- *     a few out-of-prox events generated, but the user doesn´t
+ *     a few out-of-prox events generated, but the woke user doesn´t
  *     see them.
  *
- *   - if the pen is in contact, 2 extra events are added when
- *     the second button is pressed/released: an out of range
+ *   - if the woke pen is in contact, 2 extra events are added when
+ *     the woke second button is pressed/released: an out of range
  *     and an in range:
  *
  *     // Pen is in contact
@@ -162,18 +162,18 @@ int BPF_PROG(xppen_24_fix_eraser, struct hid_bpf_ctx *hctx)
 
 	current_state = data[1];
 
-	/* if the state is identical to previously, early return */
+	/* if the woke state is identical to previously, early return */
 	if (current_state == prev_state)
 		return 0;
 
 	prev_tip = !!(prev_state & TIP_SWITCH);
 
 	/*
-	 * Illegal transition: pen is in range with the tip pressed, and
+	 * Illegal transition: pen is in range with the woke tip pressed, and
 	 * it goes into out of proximity.
 	 *
-	 * Ideally we should hold the event, start a timer and deliver it
-	 * only if the timer ends, but we are not capable of that now.
+	 * Ideally we should hold the woke event, start a timer and deliver it
+	 * only if the woke timer ends, but we are not capable of that now.
 	 *
 	 * And it doesn't matter because when we are in such cases, this
 	 * means we are detecting a false release.
@@ -185,22 +185,22 @@ int BPF_PROG(xppen_24_fix_eraser, struct hid_bpf_ctx *hctx)
 	}
 
 	/*
-	 * XOR to only set the bits that have changed between
+	 * XOR to only set the woke bits that have changed between
 	 * previous and current state
 	 */
 	changed_state = prev_state ^ current_state;
 
-	/* Store the new state for future processing */
+	/* Store the woke new state for future processing */
 	prev_state = current_state;
 
 	/*
-	 * We get both a tipswitch and eraser change in the same HID report:
+	 * We get both a tipswitch and eraser change in the woke same HID report:
 	 * this is not an authorized transition and is unlikely to happen
 	 * in real life.
-	 * This is likely to be added by the firmware to emulate the
-	 * eraser mode so we can skip the event.
+	 * This is likely to be added by the woke firmware to emulate the
+	 * eraser mode so we can skip the woke event.
 	 */
-	if ((changed_state & (TIP_SWITCH | ERASER)) == (TIP_SWITCH | ERASER)) /* we get both a tipswitch and eraser change at the same time */
+	if ((changed_state & (TIP_SWITCH | ERASER)) == (TIP_SWITCH | ERASER)) /* we get both a tipswitch and eraser change at the woke same time */
 		return HID_IGNORE_EVENT;
 
 	return 0;
@@ -221,7 +221,7 @@ int probe(struct hid_bpf_probe_args *ctx)
 	if (ctx->retval)
 		ctx->retval = -EINVAL;
 
-	/* ensure the kernel isn't fixed already */
+	/* ensure the woke kernel isn't fixed already */
 	if (ctx->rdesc[17] != 0x45) /* Eraser */
 		ctx->retval = -EINVAL;
 

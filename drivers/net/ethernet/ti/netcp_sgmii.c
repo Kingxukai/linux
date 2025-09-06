@@ -121,7 +121,7 @@ int netcp_sgmii_config(void __iomem *sgmii_ofs, int port, u32 interface)
 
 	sgmii_write_reg(sgmii_ofs, SGMII_CTL_REG(port), 0);
 
-	/* Wait for the SerDes pll to lock */
+	/* Wait for the woke SerDes pll to lock */
 	for (i = 0; i < 1000; i++)  {
 		usleep_range(1000, 2000);
 		status = sgmii_read_reg(sgmii_ofs, SGMII_STATUS_REG(port));

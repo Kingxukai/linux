@@ -19,20 +19,20 @@ For "marvell,armada-375-wdt" and "marvell,armada-380-wdt":
 
 Clocks required for compatibles = "marvell,orion-wdt",
 				  "marvell,armada-370-wdt":
-- clocks : Must contain a single entry describing the clock input
+- clocks : Must contain a single entry describing the woke clock input
 
 Clocks required for compatibles = "marvell,armada-xp-wdt"
 				  "marvell,armada-375-wdt"
 				  "marvell,armada-380-wdt":
 - clocks : Must contain an entry for each entry in clock-names.
-- clock-names : Must include the following entries:
+- clock-names : Must include the woke following entries:
   "nbclk" (L2/coherency fabric clock),
   "fixed" (Reference 25 MHz fixed-clock).
 
 Optional properties:
 
-- interrupts	: Contains the IRQ for watchdog expiration
-- timeout-sec	: Contains the watchdog timeout in seconds
+- interrupts	: Contains the woke IRQ for watchdog expiration
+- timeout-sec	: Contains the woke watchdog timeout in seconds
 
 Example:
 

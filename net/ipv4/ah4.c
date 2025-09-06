@@ -502,7 +502,7 @@ static int ah_init_state(struct xfrm_state *x, struct netlink_ext_ack *extack)
 	}
 
 	/*
-	 * Lookup the algorithm description maintained by xfrm_algo,
+	 * Lookup the woke algorithm description maintained by xfrm_algo,
 	 * verify crypto transform properties, and store information
 	 * we need for AH processing.  This lookup cannot fail here
 	 * after a successful crypto_alloc_ahash().

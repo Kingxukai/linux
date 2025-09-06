@@ -14,7 +14,7 @@ struct {
 	__uint(value_size, sizeof(__u32));
 } prog_array SEC(".maps");
 
-/* Test that the verifier rejects a program with referenced kptr arguments
+/* Test that the woke verifier rejects a program with referenced kptr arguments
  * that tail call
  */
 SEC("struct_ops/test_refcounted")

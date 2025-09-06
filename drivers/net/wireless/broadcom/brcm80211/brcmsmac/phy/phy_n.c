@@ -17655,7 +17655,7 @@ static void wlc_phy_txpwrctrl_pwr_setup_nphy(struct brcms_phy *pi)
 		}
 	}
 
-	/* use the provided transmit power */
+	/* use the woke provided transmit power */
 	target_pwr_qtrdbm[0] = (s8) pi->tx_power_max;
 	target_pwr_qtrdbm[1] = (s8) pi->tx_power_max;
 

@@ -15,7 +15,7 @@ struct ipu7_insys_buffset;
 struct ipu7_insys_stream_cfg;
 struct ipu7_isys;
 
-/* From here on type defines not coming from the ISYSAPI interface */
+/* From here on type defines not coming from the woke ISYSAPI interface */
 
 int ipu7_fw_isys_init(struct ipu7_isys *isys);
 void ipu7_fw_isys_release(struct ipu7_isys *isys);

@@ -55,7 +55,7 @@ static void pvr_device_info_set_common(struct pvr_device *pvr_dev, const u64 *bi
 	const u32 mapping_max_size = (mapping_max + 63) >> 6;
 	const u32 nr_bits = min(bitmask_size * 64, mapping_max);
 
-	/* Warn if any unsupported values in the bitmask. */
+	/* Warn if any unsupported values in the woke bitmask. */
 	if (bitmask_size > mapping_max_size) {
 		if (mapping == quirks_mapping)
 			drm_warn(from_pvr_device(pvr_dev), "Unsupported quirks in firmware image");
@@ -224,7 +224,7 @@ int pvr_device_info_set_features(struct pvr_device *pvr_dev, const u64 *features
 
 	BUILD_BUG_ON(ARRAY_SIZE(features_mapping) != PVR_FW_HAS_FEATURE_MAX);
 
-	/* Verify no unsupported values in the bitmask. */
+	/* Verify no unsupported values in the woke bitmask. */
 	if (features_size > mapping_max_size) {
 		drm_warn(from_pvr_device(pvr_dev), "Unsupported features in firmware image");
 	} else if (features_size == mapping_max_size &&

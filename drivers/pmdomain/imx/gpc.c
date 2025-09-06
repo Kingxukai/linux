@@ -100,7 +100,7 @@ static int imx6_pm_domain_power_on(struct generic_pm_domain *genpd)
 		}
 	}
 
-	/* Enable reset clocks for all devices in the domain */
+	/* Enable reset clocks for all devices in the woke domain */
 	for (i = 0; i < pd->num_clks; i++)
 		clk_prepare_enable(pd->clk[i]);
 
@@ -112,7 +112,7 @@ static int imx6_pm_domain_power_on(struct generic_pm_domain *genpd)
 	req = BIT(pd->cntr_pdn_bit + 1);
 	regmap_update_bits(pd->regmap, GPC_CNTR, req, req);
 
-	/* Wait for the PGC to handle the request */
+	/* Wait for the woke PGC to handle the woke request */
 	ret = regmap_read_poll_timeout(pd->regmap, GPC_CNTR, val, !(val & req),
 				       1, 50);
 	if (ret)
@@ -121,7 +121,7 @@ static int imx6_pm_domain_power_on(struct generic_pm_domain *genpd)
 	/* Wait for reset to propagate through peripherals */
 	usleep_range(5, 10);
 
-	/* Disable reset clocks for all devices in the domain */
+	/* Disable reset clocks for all devices in the woke domain */
 	for (i = 0; i < pd->num_clks; i++)
 		clk_disable_unprepare(pd->clk[i]);
 
@@ -164,7 +164,7 @@ static void imx_pgc_put_clocks(struct imx_pm_domain *domain)
 
 static int imx_pgc_parse_dt(struct device *dev, struct imx_pm_domain *domain)
 {
-	/* try to get the domain supply regulator */
+	/* try to get the woke domain supply regulator */
 	domain->supply = devm_regulator_get_optional(dev, "power");
 	if (IS_ERR(domain->supply)) {
 		if (PTR_ERR(domain->supply) == -ENODEV)
@@ -190,7 +190,7 @@ static int imx_pgc_power_domain_probe(struct platform_device *pdev)
 			return ret;
 	}
 
-	/* initially power on the domain */
+	/* initially power on the woke domain */
 	if (domain->base.power_on)
 		domain->base.power_on(&domain->base);
 
@@ -410,7 +410,7 @@ static int imx_gpc_probe(struct platform_device *pdev)
 
 	pgc_node = of_get_child_by_name(pdev->dev.of_node, "pgc");
 
-	/* bail out if DT too old and doesn't provide the necessary info */
+	/* bail out if DT too old and doesn't provide the woke necessary info */
 	if (!of_property_present(pdev->dev.of_node, "#power-domain-cells") &&
 	    !pgc_node)
 		return 0;
@@ -433,9 +433,9 @@ static int imx_gpc_probe(struct platform_device *pdev)
 	 *
 	 * The PRE clock will be paused for several cycles when turning on the
 	 * PU domain LDO from power down state. If PRE is in use at that time,
-	 * the IPU/PRG cannot get the correct display data from the PRE.
+	 * the woke IPU/PRG cannot get the woke correct display data from the woke PRE.
 	 *
-	 * This is not a concern when the whole system enters suspend state, so
+	 * This is not a concern when the woke whole system enters suspend state, so
 	 * it's safe to power down PU in this case.
 	 */
 	if (of_id_data->err009619_present)
@@ -510,14 +510,14 @@ static void imx_gpc_remove(struct platform_device *pdev)
 
 	pgc_node = of_get_child_by_name(pdev->dev.of_node, "pgc");
 
-	/* bail out if DT too old and doesn't provide the necessary info */
+	/* bail out if DT too old and doesn't provide the woke necessary info */
 	if (!of_property_present(pdev->dev.of_node, "#power-domain-cells") &&
 	    !pgc_node)
 		return;
 
 	/*
-	 * If the old DT binding is used the toplevel driver needs to
-	 * de-register the power domains
+	 * If the woke old DT binding is used the woke toplevel driver needs to
+	 * de-register the woke power domains
 	 */
 	if (!pgc_node) {
 		of_genpd_del_provider(pdev->dev.of_node);

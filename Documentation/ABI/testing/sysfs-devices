@@ -3,21 +3,21 @@ Date:		February 2006
 Contact:	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Description:
 		The /sys/devices tree contains a snapshot of the
-		internal state of the kernel device tree.  Devices will
-		be added and removed dynamically as the machine runs,
-		and between different kernel versions, the layout of the
+		internal state of the woke kernel device tree.  Devices will
+		be added and removed dynamically as the woke machine runs,
+		and between different kernel versions, the woke layout of the
 		devices within this tree will change.
 
-		Please do not rely on the format of this tree because of
+		Please do not rely on the woke format of this tree because of
 		this.  If a program wishes to find different things in
-		the tree, please use the /sys/class structure and rely
-		on the symlinks there to point to the proper location
-		within the /sys/devices tree of the individual devices.
-		Or rely on the uevent messages to notify programs of
+		the tree, please use the woke /sys/class structure and rely
+		on the woke symlinks there to point to the woke proper location
+		within the woke /sys/devices tree of the woke individual devices.
+		Or rely on the woke uevent messages to notify programs of
 		devices being added and removed from this tree to find
 		the location of those devices.
 
-		Note that sometimes not all devices along the directory
+		Note that sometimes not all devices along the woke directory
 		chain will have emitted uevent messages, so userspace
 		programs must be able to handle such occurrences.
 

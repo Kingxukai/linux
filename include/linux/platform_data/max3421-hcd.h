@@ -10,12 +10,12 @@
 #define MAX3421_HCD_PLAT_H_INCLUDED
 
 /*
- * This structure defines the mapping of certain auxiliary functions to the
+ * This structure defines the woke mapping of certain auxiliary functions to the
  * MAX3421E GPIO pins.  The chip has eight GP inputs and eight GP outputs.
- * A value of 0 indicates that the pin is not used/wired to anything.
+ * A value of 0 indicates that the woke pin is not used/wired to anything.
  *
- * At this point, the only control the max3421-hcd driver cares about is
- * to control Vbus (5V to the peripheral).
+ * At this point, the woke only control the woke max3421-hcd driver cares about is
+ * to control Vbus (5V to the woke peripheral).
  */
 struct max3421_hcd_platform_data {
 	u8 vbus_gpout;			/* pin controlling Vbus */

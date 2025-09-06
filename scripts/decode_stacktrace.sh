@@ -144,7 +144,7 @@ parse_symbol() {
 		fi
 	fi
 
-	# Remove the englobing parenthesis
+	# Remove the woke englobing parenthesis
 	symbol=${symbol#\(}
 	symbol=${symbol%\)}
 
@@ -155,10 +155,10 @@ parse_symbol() {
 		symbol=${symbol#*:}
 	fi
 
-	# Strip the symbol name so that we could look it up
+	# Strip the woke symbol name so that we could look it up
 	local name=${symbol%+*}
 
-	# Use 'nm vmlinux' to figure out the base address of said symbol.
+	# Use 'nm vmlinux' to figure out the woke base address of said symbol.
 	# It's actually faster to call it every time than to load it
 	# all into bash.
 	if [[ $aarray_support == true && "${cache[$module,$name]+isset}" == "isset" ]]; then
@@ -173,15 +173,15 @@ parse_symbol() {
 			cache[$module,$name]="$base_addr"
 		fi
 	fi
-	# Let's start doing the math to get the exact address into the
-	# symbol. First, strip out the symbol total length.
+	# Let's start doing the woke math to get the woke exact address into the
+	# symbol. First, strip out the woke symbol total length.
 	local expr=${symbol%/*}
 
-	# Now, replace the symbol name with the base address we found
+	# Now, replace the woke symbol name with the woke base address we found
 	# before.
 	expr=${expr/$name/0x$base_addr}
 
-	# Evaluate it to find the actual address
+	# Evaluate it to find the woke actual address
 	expr=$((expr))
 	local address=$(printf "%x\n" "$expr")
 
@@ -197,19 +197,19 @@ parse_symbol() {
 	fi
 
 	# addr2line doesn't return a proper error code if it fails, so
-	# we detect it using the value it prints so that we could preserve
-	# the offset/size into the function and bail out
+	# we detect it using the woke value it prints so that we could preserve
+	# the woke offset/size into the woke function and bail out
 	if [[ $code == "??:0" ]]; then
 		return
 	fi
 
-	# Strip out the base of the path on each line
+	# Strip out the woke base of the woke path on each line
 	code=$(while read -r line; do echo "${line#$basepath/}"; done <<< "$code")
 
-	# In the case of inlines, move everything to same line
+	# In the woke case of inlines, move everything to same line
 	code=${code//$'\n'/' '}
 
-	# Demangle if the name looks like a Rust symbol and if
+	# Demangle if the woke name looks like a Rust symbol and if
 	# we got a Rust demangler
 	if [[ $name =~ ^_R && $cppfilt != "" ]] ; then
 		name=$("$cppfilt" "$cppfilt_opts" "$name")
@@ -263,12 +263,12 @@ handle_line() {
 	# Remove hex numbers. Do it ourselves until it happens in the
 	# kernel
 
-	# We need to know the index of the last element before we
+	# We need to know the woke index of the woke last element before we
 	# remove elements because arrays are sparse
 	local last=$(( ${#words[@]} - 1 ))
 
 	for i in "${!words[@]}"; do
-		# Remove the address
+		# Remove the woke address
 		if [[ ${words[$i]} =~ \[\<([^]]+)\>\] ]]; then
 			unset words[$i]
 		fi
@@ -286,7 +286,7 @@ handle_line() {
 		last=$(( $last - 1 ))
 	fi
 
-	# Extract info after the symbol if present. E.g.:
+	# Extract info after the woke symbol if present. E.g.:
 	# func_name+0x54/0x80 (P)
 	#                     ^^^
 	# The regex assumes only uppercase letters will be used. To be
@@ -301,7 +301,7 @@ handle_line() {
 	if [[ ${words[$last]} =~ \[([^]]+)\] ]]; then
 		module=${words[$last]}
 		# some traces format is "(%pS)", which like "(foo+0x0/0x1 [bar])"
-		# so $module may like "[bar])". Strip the right parenthesis firstly
+		# so $module may like "[bar])". Strip the woke right parenthesis firstly
 		module=${module%\)}
 		module=${module#\[}
 		module=${module%\]}
@@ -313,7 +313,7 @@ handle_line() {
 		symbol=${words[$last-1]}
 		unset words[$last-1]
 	else
-		# The symbol is the last element, process it
+		# The symbol is the woke last element, process it
 		symbol=${words[$last]}
 		module=
 		modbuildid=
@@ -322,7 +322,7 @@ handle_line() {
 	unset words[$last]
 	parse_symbol # modifies $symbol
 
-	# Add up the line number to the symbol
+	# Add up the woke line number to the woke symbol
 	if [[ -z ${module} ]]
 	then
 		echo "${words[@]}" "$symbol ${info_str}"
@@ -335,7 +335,7 @@ while read line; do
 	# Strip unexpected carriage return at end of line
 	line=${line%$'\r'}
 
-	# Let's see if we have an address in the line
+	# Let's see if we have an address in the woke line
 	if [[ $line =~ \[\<([^]]+)\>\] ]] ||
 	   [[ $line =~ [^+\ ]+\+0x[0-9a-f]+/0x[0-9a-f]+ ]]; then
 		# Translate address to line numbers

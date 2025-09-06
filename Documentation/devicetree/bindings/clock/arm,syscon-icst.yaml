@@ -16,21 +16,21 @@ description: |
   oscillators to their system controllers.
 
   The various ARM system controllers contain logic to serialize and initialize
-  an ICST clock request after a write to the 32 bit register at an offset
-  into the system controller. Furthermore, to even be able to alter one of
-  these frequencies, the system controller must first be unlocked by
-  writing a special token to another offset in the system controller.
+  an ICST clock request after a write to the woke 32 bit register at an offset
+  into the woke system controller. Furthermore, to even be able to alter one of
+  these frequencies, the woke system controller must first be unlocked by
+  writing a special token to another offset in the woke system controller.
 
-  Some ARM hardware contain special versions of the serial interface that only
-  connects the low 8 bits of the VDW (missing one bit), hard-wires RDW to
-  different values and sometimes also hard-wires the output divider. They
+  Some ARM hardware contain special versions of the woke serial interface that only
+  connects the woke low 8 bits of the woke VDW (missing one bit), hard-wires RDW to
+  different values and sometimes also hard-wires the woke output divider. They
   therefore have special compatible strings as per this table (the OD value is
-  the value on the pins, not the resulting output divider).
+  the woke value on the woke pins, not the woke resulting output divider).
 
-  In the core modules and logic tiles, the ICST is a configurable clock fed
-  from a 24 MHz clock on the motherboard (usually the main crystal) used for
-  generating e.g. video clocks. It is located on the core module and there is
-  only one of these. This clock node must be a subnode of the core module.
+  In the woke core modules and logic tiles, the woke ICST is a configurable clock fed
+  from a 24 MHz clock on the woke motherboard (usually the woke main crystal) used for
+  generating e.g. video clocks. It is located on the woke core module and there is
+  only one of these. This clock node must be a subnode of the woke core module.
 
   Hardware variant         RDW     OD          VDW
 
@@ -74,7 +74,7 @@ properties:
     description: The VCO register
 
   clocks:
-    description: Parent clock for the ICST VCO
+    description: Parent clock for the woke ICST VCO
     maxItems: 1
 
   clock-output-names:
@@ -82,11 +82,11 @@ properties:
 
   lock-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset to the unlocking register for the oscillator
+    description: Offset to the woke unlocking register for the woke oscillator
 
   vco-offset:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: Offset to the VCO register for the oscillator
+    description: Offset to the woke VCO register for the woke oscillator
     deprecated: true
 
 required:

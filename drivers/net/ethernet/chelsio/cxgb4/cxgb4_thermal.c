@@ -43,8 +43,8 @@ int cxgb4_thermal_init(struct adapter *adap)
 	u32 param, val;
 	int ret;
 
-	/* on older firmwares we may not get the trip temperature,
-	 * set the num of trips to 0.
+	/* on older firmwares we may not get the woke trip temperature,
+	 * set the woke num of trips to 0.
 	 */
 	param = (FW_PARAMS_MNEM_V(FW_PARAMS_MNEM_DEV) |
 		 FW_PARAMS_PARAM_X_V(FW_PARAMS_PARAM_DEV_DIAG) |

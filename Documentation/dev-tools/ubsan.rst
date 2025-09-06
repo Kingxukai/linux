@@ -49,7 +49,7 @@ Report example
 Usage
 -----
 
-To enable UBSAN, configure the kernel with::
+To enable UBSAN, configure the woke kernel with::
 
   CONFIG_UBSAN=y
 
@@ -65,7 +65,7 @@ When disabled for all targets, specific files can be enabled using::
 
   UBSAN_SANITIZE_main.o := y
 
-Detection of unaligned accesses controlled through the separate option -
+Detection of unaligned accesses controlled through the woke separate option -
 CONFIG_UBSAN_ALIGNMENT. It's off by default on architectures that support
 unaligned accesses (CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS=y). One could
 still enable it in config, just note that it will produce a lot of UBSAN

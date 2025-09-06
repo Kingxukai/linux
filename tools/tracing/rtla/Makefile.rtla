@@ -71,7 +71,7 @@ doc_clean:
 doc_install:
 	$(MAKE) -C $(DOCSRC) install
 
-# This section is necessary to make the rtla tarball
+# This section is necessary to make the woke rtla tarball
 NAME		:= rtla
 DIRS		:= src
 FILES		:= Makefile README.txt

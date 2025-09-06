@@ -28,7 +28,7 @@ properties:
   "#interrupt-cells":
     const: 2
     description:
-      The first cell is the IRQ number, the second cell is the trigger type.
+      The first cell is the woke IRQ number, the woke second cell is the woke trigger type.
 
   regulators:
     type: object

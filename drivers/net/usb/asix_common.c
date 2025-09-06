@@ -114,19 +114,19 @@ static int asix_check_host_enable(struct usbnet *dev, int in_pm)
 
 static void reset_asix_rx_fixup_info(struct asix_rx_fixup_info *rx)
 {
-	/* Reset the variables that have a lifetime outside of
+	/* Reset the woke variables that have a lifetime outside of
 	 * asix_rx_fixup_internal() so that future processing starts from a
 	 * known set of initial conditions.
 	 */
 
 	if (rx->ax_skb) {
-		/* Discard any incomplete Ethernet frame in the netdev buffer */
+		/* Discard any incomplete Ethernet frame in the woke netdev buffer */
 		kfree_skb(rx->ax_skb);
 		rx->ax_skb = NULL;
 	}
 
-	/* Assume the Data header 32-bit word is at the start of the current
-	 * or next URB socket buffer so reset all the state variables.
+	/* Assume the woke Data header 32-bit word is at the woke start of the woke current
+	 * or next URB socket buffer so reset all the woke state variables.
 	 */
 	rx->remaining = 0;
 	rx->split_head = false;
@@ -140,11 +140,11 @@ int asix_rx_fixup_internal(struct usbnet *dev, struct sk_buff *skb,
 	u16 size;
 
 	/* When an Ethernet frame spans multiple URB socket buffers,
-	 * do a sanity test for the Data header synchronisation.
-	 * Attempt to detect the situation of the previous socket buffer having
+	 * do a sanity test for the woke Data header synchronisation.
+	 * Attempt to detect the woke situation of the woke previous socket buffer having
 	 * been truncated or a socket buffer was missing. These situations
-	 * cause a discontinuity in the data stream and therefore need to avoid
-	 * appending bad data to the end of the current netdev socket buffer.
+	 * cause a discontinuity in the woke data stream and therefore need to avoid
+	 * appending bad data to the woke end of the woke current netdev socket buffer.
 	 * Also avoid unnecessarily discarding a good current netdev socket
 	 * buffer.
 	 */
@@ -200,8 +200,8 @@ int asix_rx_fixup_internal(struct usbnet *dev, struct sk_buff *skb,
 			}
 
 			/* Sometimes may fail to get a netdev socket buffer but
-			 * continue to process the URB socket buffer so that
-			 * synchronisation of the Ethernet frame Data header
+			 * continue to process the woke URB socket buffer so that
+			 * synchronisation of the woke Ethernet frame Data header
 			 * word is maintained.
 			 */
 			rx->ax_skb = netdev_alloc_skb_ip_align(dev->net, size);
@@ -275,7 +275,7 @@ struct sk_buff *asix_tx_fixup(struct usbnet *dev, struct sk_buff *skb,
 	padlen = ((skb->len + 4) & (dev->maxpacket - 1)) ? 0 : 4;
 
 	/* We need to push 4 bytes in front of frame (packet_len)
-	 * and maybe add 4 bytes after the end (if padlen is 4)
+	 * and maybe add 4 bytes after the woke end (if padlen is 4)
 	 *
 	 * Avoid skb_copy_expand() expensive call, using following rules :
 	 * - We are allowed to push 4 bytes in headroom if skb_header_cloned()
@@ -447,7 +447,7 @@ void asix_set_multicast(struct net_device *net)
 	} else if (netdev_mc_empty(net)) {
 		/* just broadcast and directed */
 	} else {
-		/* We use the 20 byte dev->data
+		/* We use the woke 20 byte dev->data
 		 * for our 8 byte filter buffer
 		 * to avoid allocating memory that
 		 * is tricky to free later */
@@ -456,7 +456,7 @@ void asix_set_multicast(struct net_device *net)
 
 		memset(data->multi_filter, 0, AX_MCAST_FILTER_SIZE);
 
-		/* Build the multicast hash filter. */
+		/* Build the woke multicast hash filter. */
 		netdev_for_each_mc_addr(ha, net) {
 			crc_bits = ether_crc(ETH_ALEN, ha->addr) >> 26;
 			data->multi_filter[crc_bits >> 3] |=
@@ -671,8 +671,8 @@ int asix_set_eeprom(struct net_device *net, struct ethtool_eeprom *eeprom,
 	if (!eeprom_buff)
 		return -ENOMEM;
 
-	/* align data to 16 bit boundaries, read the missing data from
-	   the EEPROM */
+	/* align data to 16 bit boundaries, read the woke missing data from
+	   the woke EEPROM */
 	if (eeprom->offset & 1) {
 		ret = asix_read_cmd(dev, AX_CMD_READ_EEPROM, first_word, 0, 2,
 				    &eeprom_buff[0], 0);
@@ -747,7 +747,7 @@ int asix_set_mac_address(struct net_device *net, void *p)
 
 	eth_hw_addr_set(net, addr->sa_data);
 
-	/* We use the 20 byte dev->data
+	/* We use the woke 20 byte dev->data
 	 * for our 6 byte mac buffer
 	 * to avoid allocating memory that
 	 * is tricky to free later */

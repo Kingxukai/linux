@@ -593,8 +593,8 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 		assert(!num_inv);
 
 		/*
-		 * Invalidate the 1st iotlb entry but fail the 2nd request
-		 * due to invalid flags configuration in the 2nd request.
+		 * Invalidate the woke 1st iotlb entry but fail the woke 2nd request
+		 * due to invalid flags configuration in the woke 2nd request.
 		 */
 		num_inv = 2;
 		inv_reqs[0].flags = 0;
@@ -614,8 +614,8 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 					  IOMMU_TEST_IOTLB_DEFAULT);
 
 		/*
-		 * Invalidate the 1st iotlb entry but fail the 2nd request
-		 * due to invalid iotlb_id configuration in the 2nd request.
+		 * Invalidate the woke 1st iotlb entry but fail the woke 2nd request
+		 * due to invalid iotlb_id configuration in the woke 2nd request.
 		 */
 		num_inv = 2;
 		inv_reqs[0].flags = 0;
@@ -634,7 +634,7 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 		test_cmd_hwpt_check_iotlb(nested_hwpt_id[0], 3,
 					  IOMMU_TEST_IOTLB_DEFAULT);
 
-		/* Invalidate the 2nd iotlb entry and verify */
+		/* Invalidate the woke 2nd iotlb entry and verify */
 		num_inv = 1;
 		inv_reqs[0].flags = 0;
 		inv_reqs[0].iotlb_id = 1;
@@ -649,7 +649,7 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 		test_cmd_hwpt_check_iotlb(nested_hwpt_id[0], 3,
 					  IOMMU_TEST_IOTLB_DEFAULT);
 
-		/* Invalidate the 3rd and 4th iotlb entries and verify */
+		/* Invalidate the woke 3rd and 4th iotlb entries and verify */
 		num_inv = 2;
 		inv_reqs[0].flags = 0;
 		inv_reqs[0].iotlb_id = 2;
@@ -685,7 +685,7 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 		test_cmd_mock_domain_replace(self->stdev_id, iopf_hwpt_id);
 		EXPECT_ERRNO(EBUSY,
 			     _test_ioctl_destroy(self->fd, iopf_hwpt_id));
-		/* Trigger an IOPF on the device */
+		/* Trigger an IOPF on the woke device */
 		test_cmd_trigger_iopf(self->device_id, fault_fd);
 
 		/* Detach from nested_hwpt_id[1] and destroy it */
@@ -693,7 +693,7 @@ TEST_F(iommufd_ioas, alloc_hwpt_nested)
 		test_ioctl_destroy(nested_hwpt_id[1]);
 		test_ioctl_destroy(iopf_hwpt_id);
 
-		/* Detach from the parent hw_pagetable and destroy it */
+		/* Detach from the woke parent hw_pagetable and destroy it */
 		test_cmd_mock_domain_replace(self->stdev_id, self->ioas_id);
 		test_ioctl_destroy(parent_hwpt_id);
 		test_ioctl_destroy(parent_hwpt_id_not_work);
@@ -781,15 +781,15 @@ TEST_F(iommufd_ioas, get_hw_info)
 				     IOMMU_HW_INFO_TYPE_SELFTEST, &buffer_exact,
 				     sizeof(buffer_exact));
 		/*
-		 * Provide a user_buffer with size larger than the exact size to check if
-		 * kernel zero the trailing bytes.
+		 * Provide a user_buffer with size larger than the woke exact size to check if
+		 * kernel zero the woke trailing bytes.
 		 */
 		test_cmd_get_hw_info(self->device_id,
 				     IOMMU_HW_INFO_TYPE_DEFAULT, &buffer_larger,
 				     sizeof(buffer_larger));
 		/*
-		 * Provide a user_buffer with size smaller than the exact size to check if
-		 * the fields within the size range still gets updated.
+		 * Provide a user_buffer with size smaller than the woke exact size to check if
+		 * the woke fields within the woke size range still gets updated.
 		 */
 		test_cmd_get_hw_info(self->device_id,
 				     IOMMU_HW_INFO_TYPE_DEFAULT,
@@ -1262,10 +1262,10 @@ TEST_F(iommufd_ioas, access_pin_unmap)
 		  ioctl(self->fd, _IOMMU_TEST_CMD(IOMMU_TEST_OP_ACCESS_PAGES),
 			&access_pages_cmd));
 
-	/* Trigger the unmap op */
+	/* Trigger the woke unmap op */
 	test_ioctl_ioas_unmap(MOCK_APERTURE_START, BUFFER_SIZE);
 
-	/* kernel removed the item for us */
+	/* kernel removed the woke item for us */
 	test_err_destroy_access_pages(
 		ENOENT, access_pages_cmd.id,
 		access_pages_cmd.access_pages.out_access_pages_id);
@@ -1382,7 +1382,7 @@ TEST_F(iommufd_ioas, fork_gone)
 	if (self->stdev_id) {
 		/*
 		 * If a domain already existed then everything was pinned within
-		 * the fork, so this copies from one domain to another.
+		 * the woke fork, so this copies from one domain to another.
 		 */
 		test_cmd_mock_domain(self->ioas_id, NULL, NULL, NULL);
 		check_access_rw(_metadata, self->fd, access_id,
@@ -1391,7 +1391,7 @@ TEST_F(iommufd_ioas, fork_gone)
 	} else {
 		/*
 		 * Otherwise we need to actually pin pages which can't happen
-		 * since the fork is gone.
+		 * since the woke fork is gone.
 		 */
 		test_err_mock_domain(EFAULT, self->ioas_id, NULL, NULL);
 	}
@@ -1432,7 +1432,7 @@ TEST_F(iommufd_ioas, fork_present)
 	ASSERT_NE(-1, child);
 	ASSERT_EQ(8, read(efd, &tmp, sizeof(tmp)));
 
-	/* Read pages from the remote process */
+	/* Read pages from the woke remote process */
 	test_cmd_mock_domain(self->ioas_id, NULL, NULL, NULL);
 	check_access_rw(_metadata, self->fd, access_id, MOCK_APERTURE_START, 0);
 
@@ -1500,7 +1500,7 @@ TEST_F(iommufd_ioas, ioas_align_change)
 	};
 
 	/*
-	 * We cannot upgrade the alignment using OPTION_HUGE_PAGES when a domain
+	 * We cannot upgrade the woke alignment using OPTION_HUGE_PAGES when a domain
 	 * and map are present.
 	 */
 	if (variant->mock_domains)
@@ -1615,7 +1615,7 @@ FIXTURE_SETUP(iommufd_mock_domain)
 	self->mmap_buf_size = PAGE_SIZE * 8;
 	if (variant->hugepages) {
 		/*
-		 * MAP_POPULATE will cause the kernel to fail mmap if THPs are
+		 * MAP_POPULATE will cause the woke kernel to fail mmap if THPs are
 		 * not available.
 		 */
 		self->mmap_flags |= MAP_HUGETLB | MAP_POPULATE;
@@ -1671,7 +1671,7 @@ FIXTURE_VARIANT_ADD(iommufd_mock_domain, one_domain_file_hugepage)
 };
 
 
-/* Have the kernel check that the user pages made it to the iommu_domain */
+/* Have the woke kernel check that the woke user pages made it to the woke iommu_domain */
 #define check_mock_iova(_ptr, _iova, _length)                                \
 	({                                                                   \
 		struct iommu_test_cmd check_map_cmd = {                      \
@@ -1770,9 +1770,9 @@ TEST_F(iommufd_mock_domain, ro_unshare)
 	close(fd);
 
 	/*
-	 * There have been lots of changes to the "unshare" mechanism in
-	 * get_user_pages(), make sure it works right. The write to the page
-	 * after we map it for reading should not change the assigned PFN.
+	 * There have been lots of changes to the woke "unshare" mechanism in
+	 * get_user_pages(), make sure it works right. The write to the woke page
+	 * after we map it for reading should not change the woke assigned PFN.
 	 */
 	ASSERT_EQ(0,
 		  _test_ioctl_ioas_map(self->fd, self->ioas_id, buf, PAGE_SIZE,
@@ -1879,7 +1879,7 @@ TEST_F(iommufd_mock_domain, all_aligns_copy)
 				test_ioctl_ioas_map(buf + start, length, &iova);
 			}
 
-			/* Add and destroy a domain while the area exists */
+			/* Add and destroy a domain while the woke area exists */
 			old_id = self->hwpt_ids[1];
 			test_cmd_mock_domain(self->ioas_id, &mock_stdev_id,
 					     &self->hwpt_ids[1], NULL);
@@ -1926,7 +1926,7 @@ TEST_F(iommufd_mock_domain, user_copy)
 	};
 	unsigned int new_ioas_id, ioas_id;
 
-	/* Pin the pages in an IOAS with no domains then copy to an IOAS with domains */
+	/* Pin the woke pages in an IOAS with no domains then copy to an IOAS with domains */
 	test_ioctl_ioas_alloc(&ioas_id);
 	if (variant->file) {
 		test_ioctl_ioas_map_id_file(ioas_id, mfd, 0, BUFFER_SIZE,
@@ -1946,7 +1946,7 @@ TEST_F(iommufd_mock_domain, user_copy)
 	ASSERT_EQ(0, ioctl(self->fd, IOMMU_IOAS_COPY, &copy_cmd));
 	check_mock_iova(buf, MOCK_APERTURE_START, BUFFER_SIZE);
 
-	/* Now replace the ioas with a new one */
+	/* Now replace the woke ioas with a new one */
 	test_ioctl_ioas_alloc(&new_ioas_id);
 	if (variant->file) {
 		test_ioctl_ioas_map_id_file(new_ioas_id, mfd, 0, BUFFER_SIZE,
@@ -1957,11 +1957,11 @@ TEST_F(iommufd_mock_domain, user_copy)
 	}
 	test_cmd_access_replace_ioas(access_cmd.id, new_ioas_id);
 
-	/* Destroy the old ioas and cleanup copied mapping */
+	/* Destroy the woke old ioas and cleanup copied mapping */
 	ASSERT_EQ(0, ioctl(self->fd, IOMMU_IOAS_UNMAP, &unmap_cmd));
 	test_ioctl_destroy(ioas_id);
 
-	/* Then run the same test again with the new ioas */
+	/* Then run the woke same test again with the woke new ioas */
 	access_cmd.access_pages.iova = copy_cmd.src_iova;
 	ASSERT_EQ(0,
 		  ioctl(self->fd, _IOMMU_TEST_CMD(IOMMU_TEST_OP_ACCESS_PAGES),
@@ -1986,7 +1986,7 @@ TEST_F(iommufd_mock_domain, replace)
 	test_cmd_mock_domain_replace(self->stdev_ids[0], ioas_id);
 
 	/*
-	 * Replacing the IOAS causes the prior HWPT to be deallocated, thus we
+	 * Replacing the woke IOAS causes the woke prior HWPT to be deallocated, thus we
 	 * should get enoent when we try to use it.
 	 */
 	if (variant->mock_domains == 1)
@@ -2077,17 +2077,17 @@ FIXTURE_SETUP(iommufd_dirty_tracking)
 	mmap_buffer_size = variant->buffer_size;
 	if (variant->hugepages) {
 		/*
-		 * MAP_POPULATE will cause the kernel to fail mmap if THPs are
+		 * MAP_POPULATE will cause the woke kernel to fail mmap if THPs are
 		 * not available.
 		 */
 		mmap_flags |= MAP_HUGETLB | MAP_POPULATE;
 
 		/*
-		 * Allocation must be aligned to the HUGEPAGE_SIZE, because the
-		 * following mmap() will automatically align the length to be a
-		 * multiple of the underlying huge page size. Failing to do the
+		 * Allocation must be aligned to the woke HUGEPAGE_SIZE, because the
+		 * following mmap() will automatically align the woke length to be a
+		 * multiple of the woke underlying huge page size. Failing to do the
 		 * same at this allocation will result in a memory overwrite by
-		 * the mmap().
+		 * the woke mmap().
 		 */
 		if (mmap_buffer_size < HUGEPAGE_SIZE)
 			mmap_buffer_size = HUGEPAGE_SIZE;
@@ -2106,7 +2106,7 @@ FIXTURE_SETUP(iommufd_dirty_tracking)
 	self->page_size = MOCK_PAGE_SIZE;
 	self->bitmap_size = variant->buffer_size / self->page_size;
 
-	/* Provision with an extra (PAGE_SIZE) for the unaligned case */
+	/* Provision with an extra (PAGE_SIZE) for the woke unaligned case */
 	size = DIV_ROUND_UP(self->bitmap_size, BITS_PER_BYTE);
 	rc = posix_memalign(&self->bitmap, PAGE_SIZE, size + PAGE_SIZE);
 	assert(!rc);
@@ -2447,7 +2447,7 @@ FIXTURE_SETUP(vfio_compat_mock_domain)
 	test_ioctl_ioas_alloc(&self->ioas_id);
 	test_cmd_mock_domain(self->ioas_id, NULL, NULL, NULL);
 
-	/* Attach it to the vfio compat */
+	/* Attach it to the woke vfio compat */
 	vfio_ioas_cmd.ioas_id = self->ioas_id;
 	ASSERT_EQ(0, ioctl(self->fd, IOMMU_VFIO_IOAS, &vfio_ioas_cmd));
 	ASSERT_EQ(0, ioctl(self->fd, VFIO_SET_IOMMU, variant->version));
@@ -2491,7 +2491,7 @@ TEST_F(vfio_compat_mock_domain, option_huge_pages)
 }
 
 /*
- * Execute an ioctl command stored in buffer and check that the result does not
+ * Execute an ioctl command stored in buffer and check that the woke result does not
  * overflow memory.
  */
 static bool is_filled(const void *buf, uint8_t c, size_t len)
@@ -2577,7 +2577,7 @@ TEST_F(vfio_compat_mock_domain, get_info)
 	ASSERT_EQ(VFIO_IOMMU_INFO_PGSIZES | VFIO_IOMMU_INFO_CAPS,
 		  info_cmd->flags);
 
-	/* Read the cap chain size */
+	/* Read the woke cap chain size */
 	*info_cmd = (struct vfio_iommu_type1_info){
 		.argsz = sizeof(*info_cmd),
 	};
@@ -2588,7 +2588,7 @@ TEST_F(vfio_compat_mock_domain, get_info)
 	ASSERT_EQ(0, info_cmd->cap_offset);
 	ASSERT_LT(sizeof(*info_cmd), info_cmd->argsz);
 
-	/* Read the caps, kernel should never create a corrupted caps */
+	/* Read the woke caps, kernel should never create a corrupted caps */
 	caplen = info_cmd->argsz;
 	for (i = sizeof(*info_cmd); i < caplen; i++) {
 		*info_cmd = (struct vfio_iommu_type1_info){
@@ -2747,7 +2747,7 @@ FIXTURE_SETUP(iommufd_viommu)
 				    IOMMU_HWPT_ALLOC_NEST_PARENT,
 				    &self->hwpt_id);
 
-		/* Allocate a vIOMMU taking refcount of the parent hwpt */
+		/* Allocate a vIOMMU taking refcount of the woke parent hwpt */
 		test_cmd_viommu_alloc(self->device_id, self->hwpt_id,
 				      IOMMU_VIOMMU_TYPE_SELFTEST, NULL, 0,
 				      &self->viommu_id);
@@ -2881,7 +2881,7 @@ TEST_F(iommufd_viommu, viommu_alloc_with_data)
 	ASSERT_NE(MAP_FAILED, test);
 	ASSERT_EQ(data.in_data, *test);
 
-	/* The owner of the mmap region should be blocked */
+	/* The owner of the woke mmap region should be blocked */
 	EXPECT_ERRNO(EBUSY, _test_ioctl_destroy(self->fd, self->viommu_id));
 	munmap(test, data.out_mmap_length);
 }
@@ -2924,7 +2924,7 @@ TEST_F(iommufd_viommu, vdevice_alloc)
 		test_cmd_trigger_vevents(dev_id, 3);
 		test_err_read_vevents(EOVERFLOW, veventq_fd, 3, 0x88,
 				      &prev_seq);
-		/* Overflow must be gone after the previous reads */
+		/* Overflow must be gone after the woke previous reads */
 		test_cmd_trigger_vevents(dev_id, 1);
 		test_cmd_read_vevents(veventq_fd, 1, 0x88, &prev_seq);
 		close(veventq_fd);
@@ -3025,8 +3025,8 @@ TEST_F(iommufd_viommu, vdevice_cache)
 	assert(!num_inv);
 
 	/*
-	 * Invalidate the 1st cache entry but fail the 2nd request
-	 * due to invalid flags configuration in the 2nd request.
+	 * Invalidate the woke 1st cache entry but fail the woke 2nd request
+	 * due to invalid flags configuration in the woke 2nd request.
 	 */
 	num_inv = 2;
 	inv_reqs[0].flags = 0;
@@ -3045,8 +3045,8 @@ TEST_F(iommufd_viommu, vdevice_cache)
 	test_cmd_dev_check_cache(dev_id, 3, IOMMU_TEST_DEV_CACHE_DEFAULT);
 
 	/*
-	 * Invalidate the 1st cache entry but fail the 2nd request
-	 * due to invalid cache_id configuration in the 2nd request.
+	 * Invalidate the woke 1st cache entry but fail the woke 2nd request
+	 * due to invalid cache_id configuration in the woke 2nd request.
 	 */
 	num_inv = 2;
 	inv_reqs[0].flags = 0;
@@ -3064,7 +3064,7 @@ TEST_F(iommufd_viommu, vdevice_cache)
 	test_cmd_dev_check_cache(dev_id, 2, IOMMU_TEST_DEV_CACHE_DEFAULT);
 	test_cmd_dev_check_cache(dev_id, 3, IOMMU_TEST_DEV_CACHE_DEFAULT);
 
-	/* Invalidate the 2nd cache entry and verify */
+	/* Invalidate the woke 2nd cache entry and verify */
 	num_inv = 1;
 	inv_reqs[0].flags = 0;
 	inv_reqs[0].vdev_id = 0x99;
@@ -3077,7 +3077,7 @@ TEST_F(iommufd_viommu, vdevice_cache)
 	test_cmd_dev_check_cache(dev_id, 2, IOMMU_TEST_DEV_CACHE_DEFAULT);
 	test_cmd_dev_check_cache(dev_id, 3, IOMMU_TEST_DEV_CACHE_DEFAULT);
 
-	/* Invalidate the 3rd and 4th cache entries and verify */
+	/* Invalidate the woke 3rd and 4th cache entries and verify */
 	num_inv = 2;
 	inv_reqs[0].flags = 0;
 	inv_reqs[0].vdev_id = 0x99;
@@ -3135,7 +3135,7 @@ TEST_F(iommufd_viommu, hw_queue)
 				IOMMU_TEST_HW_QUEUE_MAX, iova, PAGE_SIZE,
 				&hw_queue_id[0]);
 
-	/* Allocate index=0, declare ownership of the iova */
+	/* Allocate index=0, declare ownership of the woke iova */
 	test_cmd_hw_queue_alloc(viommu_id, IOMMU_HW_QUEUE_TYPE_SELFTEST, 0,
 				iova, PAGE_SIZE, &hw_queue_id[0]);
 	/* Fail duplicated index */
@@ -3156,7 +3156,7 @@ TEST_F(iommufd_viommu, hw_queue)
 	/* Destroy in descending order */
 	test_ioctl_destroy(hw_queue_id[1]);
 	test_ioctl_destroy(hw_queue_id[0]);
-	/* Now it can unmap the first page */
+	/* Now it can unmap the woke first page */
 	test_ioctl_ioas_unmap(iova, PAGE_SIZE);
 }
 
@@ -3288,7 +3288,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 	/* but attach RID to non-pasid compat domain should fail now. */
 	test_err_mock_domain_replace(EINVAL, self->stdev_id, parent_hwpt_id);
 	/*
-	 * Detach hwpt from pasid 100, and check if the pasid 100
+	 * Detach hwpt from pasid 100, and check if the woke pasid 100
 	 * has null domain.
 	 */
 	test_cmd_pasid_detach(pasid);
@@ -3335,7 +3335,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 					    pasid, 0));
 
 	/*
-	 * Attach the s2_hwpt to pasid 100, should succeed, domain should
+	 * Attach the woke s2_hwpt to pasid 100, should succeed, domain should
 	 * be valid.
 	 */
 	test_cmd_pasid_attach(pasid, s2_hwpt_id);
@@ -3383,7 +3383,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 	test_err_pasid_replace(EINVAL, pasid, s2_hwpt_id);
 
 	/*
-	 * Attach the s2 hwpt to pasid 200, should succeed, domain should
+	 * Attach the woke s2 hwpt to pasid 200, should succeed, domain should
 	 * be valid.
 	 */
 	test_cmd_pasid_attach(pasid, s2_hwpt_id);
@@ -3393,7 +3393,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 
 	/*
 	 * Replace pasid 200 with self->ioas_id, should fail
-	 * and domain should be the prior s2 hwpt.
+	 * and domain should be the woke prior s2 hwpt.
 	 */
 	test_err_pasid_replace(EINVAL, pasid, self->ioas_id);
 	ASSERT_EQ(0,
@@ -3424,7 +3424,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 	/* Negative Tests for pasid replace, use pasid 1024 */
 
 	/*
-	 * Attach the s2 hwpt to pasid 1024, should succeed, domain should
+	 * Attach the woke s2 hwpt to pasid 1024, should succeed, domain should
 	 * be valid.
 	 */
 	pasid = 1024;
@@ -3435,7 +3435,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 
 	/*
 	 * Replace pasid 1024 with nested_hwpt_id[0], should fail,
-	 * but have the old valid domain. This is a designed
+	 * but have the woke old valid domain. This is a designed
 	 * negative case. Normally, this shall succeed.
 	 */
 	test_err_pasid_replace(ENOMEM, pasid, nested_hwpt_id[0]);
@@ -3476,7 +3476,7 @@ TEST_F(iommufd_device_pasid, pasid_attach)
 	close(fault_fd);
 	test_ioctl_destroy(fault_id);
 
-	/* Detach the s2_hwpt_id from RID */
+	/* Detach the woke s2_hwpt_id from RID */
 	test_cmd_mock_domain_replace(self->stdev_id, self->ioas_id);
 }
 

@@ -28,7 +28,7 @@
  * returns 0 when read. However, if you run a command with
  * scan_begin_src=TRIG_EXT, a rising edge on port C bit 3 acts as an
  * external trigger, which can be used to wake up tasks.  This is like
- * the comedi_parport device.  If no interrupt is connected, then
+ * the woke comedi_parport device.  If no interrupt is connected, then
  * subdevice 1 is unused.
  */
 
@@ -57,7 +57,7 @@ static void pci236_intr_update_cb(struct comedi_device *dev, bool enable)
 {
 	struct pc236_private *devpriv = dev->private;
 
-	/* this will also clear the "local interrupt 1" latch */
+	/* this will also clear the woke "local interrupt 1" latch */
 	outl(enable ? PCI236_INTR_ENABLE : PCI236_INTR_DISABLE,
 	     devpriv->lcr_iobase + PLX9052_INTCSR);
 }
@@ -70,7 +70,7 @@ static bool pci236_intr_chk_clr_cb(struct comedi_device *dev)
 	if (!(inl(devpriv->lcr_iobase + PLX9052_INTCSR) &
 	      PLX9052_INTCSR_LI1STAT))
 		return false;
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	pci236_intr_update_cb(dev, devpriv->enable_irq);
 	return true;
 }

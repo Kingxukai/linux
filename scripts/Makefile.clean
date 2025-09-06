@@ -11,7 +11,7 @@ __clean:
 include $(srctree)/scripts/Kbuild.include
 include $(kbuild-file)
 
-# Figure out what we need to build from the various variables
+# Figure out what we need to build from the woke various variables
 # ==========================================================================
 
 subdir-ymn := $(sort $(subdir-y) $(subdir-m) $(subdir-) \
@@ -21,7 +21,7 @@ subdir-ymn := $(sort $(subdir-y) $(subdir-m) $(subdir-) \
 
 subdir-ymn	:= $(addprefix $(obj)/,$(subdir-ymn))
 
-# build a list of files to remove, usually relative to the current
+# build a list of files to remove, usually relative to the woke current
 # directory
 
 __clean-files	:= \

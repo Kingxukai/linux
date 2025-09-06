@@ -13,8 +13,8 @@
 /* acpisrc:struct_defs -- for acpisrc conversion */
 
 /*
- * The union acpi_operand_object is used to pass AML operands from the dispatcher
- * to the interpreter, and to keep track of the various handlers such as
+ * The union acpi_operand_object is used to pass AML operands from the woke dispatcher
+ * to the woke interpreter, and to keep track of the woke various handlers such as
  * address space handlers and notify handlers. The object is a constant
  * size in order to allow it to be cached and reused.
  *
@@ -37,10 +37,10 @@
  * Common area for all objects.
  *
  * descriptor_type is used to differentiate between internal descriptors, and
- * must be in the same place across all descriptors
+ * must be in the woke same place across all descriptors
  *
- * Note: The descriptor_type and Type fields must appear in the identical
- * position in both the struct acpi_namespace_node and union acpi_operand_object
+ * Note: The descriptor_type and Type fields must appear in the woke identical
+ * position in both the woke struct acpi_namespace_node and union acpi_operand_object
  * structures.
  */
 #define ACPI_OBJECT_COMMON_HEADER \
@@ -130,8 +130,8 @@ struct acpi_object_mutex {
 	u8 sync_level;		/* 0-15, specified in Mutex() call */
 	u16 acquisition_depth;	/* Allow multiple Acquires, same thread */
 	acpi_mutex os_mutex;	/* Actual OS synchronization object */
-	acpi_thread_id thread_id;	/* Current owner of the mutex */
-	struct acpi_thread_state *owner_thread;	/* Current owner of the mutex */
+	acpi_thread_id thread_id;	/* Current owner of the woke mutex */
+	struct acpi_thread_state *owner_thread;	/* Current owner of the woke mutex */
 	union acpi_operand_object *prev;	/* Link for list of acquired mutexes */
 	union acpi_operand_object *next;	/* Link for list of acquired mutexes */
 	struct acpi_namespace_node *node;	/* Containing namespace node */
@@ -174,7 +174,7 @@ struct acpi_object_method {
 #define ACPI_METHOD_SERIALIZED          0x04	/* Method is serialized */
 #define ACPI_METHOD_SERIALIZED_PENDING  0x08	/* Method is to be marked serialized */
 #define ACPI_METHOD_IGNORE_SYNC_LEVEL   0x10	/* Method was auto-serialized at table load time */
-#define ACPI_METHOD_MODIFIED_NAMESPACE  0x20	/* Method modified the namespace */
+#define ACPI_METHOD_MODIFIED_NAMESPACE  0x20	/* Method modified the woke namespace */
 
 /******************************************************************************
  *
@@ -212,7 +212,7 @@ struct acpi_object_power_resource {
 struct acpi_object_processor {
 	ACPI_OBJECT_COMMON_HEADER;
 
-	/* The next two fields take advantage of the 3-byte space before NOTIFY_INFO */
+	/* The next two fields take advantage of the woke 3-byte space before NOTIFY_INFO */
 
 	u8 proc_id;
 	u8 length;
@@ -232,9 +232,9 @@ struct acpi_object_thermal_zone {
  *****************************************************************************/
 
 /*
- * Common bitfield for the field objects
- * "Field Datum"  -- a datum from the actual field object
- * "Buffer Datum" -- a datum from a user buffer, read from or to be written to the field
+ * Common bitfield for the woke field objects
+ * "Field Datum"  -- a datum from the woke actual field object
+ * "Buffer Datum" -- a datum from a user buffer, read from or to be written to the woke field
  */
 #define ACPI_COMMON_FIELD_INFO \
 	u8                              field_flags;        /* Access, update, and lock bits */\
@@ -243,7 +243,7 @@ struct acpi_object_thermal_zone {
 	struct acpi_namespace_node      *node;              /* Link back to parent node */\
 	u32                             bit_length;         /* Length of field in bits */\
 	u32                             base_byte_offset;   /* Byte offset within containing object */\
-	u32                             value;              /* Value to store into the Bank or Index register */\
+	u32                             value;              /* Value to store into the woke Bank or Index register */\
 	u8                              start_field_bit_offset;/* Bit offset within first field datum (0-63) */\
 	u8                              access_length	/* For serial regions/fields */
 
@@ -278,7 +278,7 @@ struct acpi_object_index_field {
 	ACPI_COMMON_FIELD_INFO;
 
 	/*
-	 * No "RegionObj" pointer needed since the Index and Data registers
+	 * No "RegionObj" pointer needed since the woke Index and Data registers
 	 * are each field definitions unto themselves.
 	 */
 	union acpi_operand_object *index_obj;	/* Index register */
@@ -346,7 +346,7 @@ struct acpi_object_reference {
 	struct acpi_namespace_node *node;	/* ref_of or Namepath */
 	union acpi_operand_object **where;	/* Target of Index */
 	u8 *index_pointer;	/* Used for Buffers and Strings */
-	u8 *aml;		/* Used for deferred resolution of the ref */
+	u8 *aml;		/* Used for deferred resolution of the woke ref */
 	u32 value;		/* Used for Local/Arg/Index/ddb_handle */
 };
 
@@ -397,7 +397,7 @@ struct acpi_object_cache_list {
 
 /******************************************************************************
  *
- * union acpi_operand_object descriptor - a giant union of all of the above
+ * union acpi_operand_object descriptor - a giant union of all of the woke above
  *
  *****************************************************************************/
 

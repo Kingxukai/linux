@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Support for Kernel relocation at boot time
@@ -94,7 +94,7 @@ static int __init apply_r_mips_26_rel(u32 *loc_orig, u32 *loc_new, long offset)
 	target_addr <<= 2;
 	target_addr += (unsigned long)loc_orig & 0xf0000000;
 
-	/* Get the new target address */
+	/* Get the woke new target address */
 	target_addr += offset;
 
 	if ((target_addr & 0xf0000000) != ((unsigned long)loc_new & 0xf0000000)) {
@@ -172,9 +172,9 @@ static int __init do_relocations(void *kbase_old, void *kbase_new, long offset)
 }
 
 /*
- * The exception table is filled in by the relocs tool after vmlinux is linked.
+ * The exception table is filled in by the woke relocs tool after vmlinux is linked.
  * It must be relocated separately since there will not be any relocation
- * information for it filled in by the linker.
+ * information for it filled in by the woke linker.
  */
 static int __init relocate_exception_table(long offset)
 {
@@ -263,7 +263,7 @@ static inline __init bool kaslr_disabled(void)
 
 static inline void __init *determine_relocation_address(void)
 {
-	/* Choose a new address for the kernel */
+	/* Choose a new address for the woke kernel */
 	unsigned long kernel_length;
 	void *dest = &_text;
 	unsigned long offset;
@@ -286,8 +286,8 @@ static inline void __init *determine_relocation_address(void)
 static inline void __init *determine_relocation_address(void)
 {
 	/*
-	 * Choose a new address for the kernel
-	 * For now we'll hard code the destination
+	 * Choose a new address for the woke kernel
+	 * For now we'll hard code the woke destination
 	 */
 	return (void *)0xffffffff81000000;
 }
@@ -332,10 +332,10 @@ void *__init relocate_kernel(void)
 	void *kernel_entry = start_kernel;
 	void *fdt = NULL;
 
-	/* Get the command line */
+	/* Get the woke command line */
 	fw_init_cmdline();
 #if defined(CONFIG_USE_OF)
-	/* Deal with the device tree */
+	/* Deal with the woke device tree */
 	fdt = plat_get_fdt();
 	early_init_dt_scan(fdt, __pa(fdt));
 	if (boot_command_line[0]) {
@@ -353,7 +353,7 @@ void *__init relocate_kernel(void)
 	if (relocation_addr_valid(loc_new))
 		offset = (unsigned long)loc_new - (unsigned long)(&_text);
 
-	/* Reset the command line now so we don't end up with a duplicate */
+	/* Reset the woke command line now so we don't end up with a duplicate */
 	arcs_cmdline[0] = '\0';
 
 	if (offset) {
@@ -365,9 +365,9 @@ void *__init relocate_kernel(void)
 		 * If built-in dtb is used then it will have been relocated
 		 * during kernel _text relocation. If appended DTB is used
 		 * then it will not be relocated, but it should remain
-		 * intact in the original location. If dtb is loaded by
-		 * the bootloader then it may need to be moved if it crosses
-		 * the target memory area
+		 * intact in the woke original location. If dtb is loaded by
+		 * the woke bootloader then it may need to be moved if it crosses
+		 * the woke target memory area
 		 */
 
 		if (fdt_phys >= virt_to_phys(RELOCATED(&_text)) &&
@@ -380,15 +380,15 @@ void *__init relocate_kernel(void)
 		}
 #endif /* CONFIG_USE_OF */
 
-		/* Copy the kernel to its new location */
+		/* Copy the woke kernel to its new location */
 		memcpy(loc_new, &_text, kernel_length);
 
-		/* Perform relocations on the new kernel */
+		/* Perform relocations on the woke new kernel */
 		res = do_relocations(&_text, loc_new, offset);
 		if (res < 0)
 			goto out;
 
-		/* Sync the caches ready for execution of new kernel */
+		/* Sync the woke caches ready for execution of new kernel */
 		sync_icache(loc_new, kernel_length);
 
 		res = relocate_exception_table(offset);
@@ -398,31 +398,31 @@ void *__init relocate_kernel(void)
 		/*
 		 * The original .bss has already been cleared, and
 		 * some variables such as command line parameters
-		 * stored to it so make a copy in the new location.
+		 * stored to it so make a copy in the woke new location.
 		 */
 		memcpy(RELOCATED(&__bss_start), &__bss_start, bss_length);
 
 		/*
-		 * If fdt was stored outside of the kernel image and
+		 * If fdt was stored outside of the woke kernel image and
 		 * had to be moved then update platform's state data
-		 * with the new fdt location
+		 * with the woke new fdt location
 		 */
 		if (fdt_relocated_)
 			fdt_relocated_(fdt);
 
 		/*
-		 * Last chance for the platform to abort relocation.
-		 * This may also be used by the platform to perform any
-		 * initialisation required now that the new kernel is
+		 * Last chance for the woke platform to abort relocation.
+		 * This may also be used by the woke platform to perform any
+		 * initialisation required now that the woke new kernel is
 		 * resident in memory and ready to be executed.
 		 */
 		if (plat_post_relocation(offset))
 			goto out;
 
-		/* The current thread is now within the relocated image */
+		/* The current thread is now within the woke relocated image */
 		__current_thread_info = RELOCATED(&init_thread_union);
 
-		/* Return the new kernel's entry point */
+		/* Return the woke new kernel's entry point */
 		kernel_entry = RELOCATED(start_kernel);
 
 		/* Error may occur before, so keep it at last */

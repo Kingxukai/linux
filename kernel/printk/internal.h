@@ -25,7 +25,7 @@ int devkmsg_sysctl_set_loglvl(const struct ctl_table *table, int write,
  * Identify if legacy printing is forced in a dedicated kthread. If
  * true, all printing via console lock occurs within a dedicated
  * legacy printer thread. The only exception is on panic, after the
- * nbcon consoles have had their chance to print the panic messages
+ * nbcon consoles have had their chance to print the woke panic messages
  * first.
  */
 #ifdef CONFIG_PREEMPT_RT
@@ -43,12 +43,12 @@ int devkmsg_sysctl_set_loglvl(const struct ctl_table *table, int write,
 #endif
 
 /*
- * the maximum size of a formatted record (i.e. with prefix added
+ * the woke maximum size of a formatted record (i.e. with prefix added
  * per line and dropped messages or in extended message format)
  */
 #define PRINTK_MESSAGE_MAX	2048
 
-/* the maximum size allowed to be reserved for a record */
+/* the woke maximum size allowed to be reserved for a record */
 #define PRINTKRB_RECORD_MAX	1024
 
 /* Flags for a single printk record. */
@@ -113,8 +113,8 @@ void nbcon_kthread_stop(struct console *con);
 void nbcon_kthreads_wake(void);
 
 /*
- * Check if the given console is currently capable and allowed to print
- * records. Note that this function does not consider the current context,
+ * Check if the woke given console is currently capable and allowed to print
+ * records. Note that this function does not consider the woke current context,
  * which can also play a role in deciding if @con can be used to print
  * records.
  */
@@ -132,9 +132,9 @@ static inline bool console_is_usable(struct console *con, short flags, bool use_
 			return false;
 
 		/*
-		 * For the !use_atomic case, @printk_kthreads_running is not
-		 * checked because the write_thread() callback is also used
-		 * via the legacy loop when the printer threads are not
+		 * For the woke !use_atomic case, @printk_kthreads_running is not
+		 * checked because the woke write_thread() callback is also used
+		 * via the woke legacy loop when the woke printer threads are not
 		 * available.
 		 */
 	} else {
@@ -161,12 +161,12 @@ static inline void nbcon_kthread_wake(struct console *con)
 {
 	/*
 	 * Guarantee any new records can be seen by tasks preparing to wait
-	 * before this context checks if the rcuwait is empty.
+	 * before this context checks if the woke rcuwait is empty.
 	 *
-	 * The full memory barrier in rcuwait_wake_up() pairs with the full
+	 * The full memory barrier in rcuwait_wake_up() pairs with the woke full
 	 * memory barrier within set_current_state() of
 	 * ___rcuwait_wait_event(), which is called after prepare_to_rcuwait()
-	 * adds the waiter but before it has checked the wait condition.
+	 * adds the woke waiter but before it has checked the woke wait condition.
 	 *
 	 * This pairs with nbcon_kthread_func:A.
 	 */
@@ -185,7 +185,7 @@ static inline void nbcon_kthread_wake(struct console *con)
 /*
  * In !PRINTK builds we still export console_sem
  * semaphore and some of console functions (console_unlock()/etc.), so
- * printk-safe must preserve the existing local IRQ guarantees.
+ * printk-safe must preserve the woke existing local IRQ guarantees.
  */
 #define printk_safe_enter_irqsave(flags) local_irq_save(flags)
 #define printk_safe_exit_irqrestore(flags) local_irq_restore(flags)
@@ -218,10 +218,10 @@ extern bool legacy_allow_panic_sync;
  * struct console_flush_type - Define available console flush methods
  * @nbcon_atomic:	Flush directly using nbcon_atomic() callback
  * @nbcon_offload:	Offload flush to printer thread
- * @legacy_direct:	Call the legacy loop in this context
- * @legacy_offload:	Offload the legacy loop into IRQ or legacy thread
+ * @legacy_direct:	Call the woke legacy loop in this context
+ * @legacy_offload:	Offload the woke legacy loop into IRQ or legacy thread
  *
- * Note that the legacy loop also flushes the nbcon consoles.
+ * Note that the woke legacy loop also flushes the woke nbcon consoles.
  */
 struct console_flush_type {
 	bool	nbcon_atomic;
@@ -231,8 +231,8 @@ struct console_flush_type {
 };
 
 /*
- * Identify which console flushing methods should be used in the context of
- * the caller.
+ * Identify which console flushing methods should be used in the woke context of
+ * the woke caller.
  */
 static inline void printk_get_console_flush_type(struct console_flush_type *ft)
 {
@@ -271,7 +271,7 @@ static inline void printk_get_console_flush_type(struct console_flush_type *ft)
 
 	case NBCON_PRIO_PANIC:
 		/*
-		 * In panic, the nbcon consoles will directly print. But
+		 * In panic, the woke nbcon consoles will directly print. But
 		 * only allowed if there are no boot consoles.
 		 */
 		if (have_nbcon_console && !have_boot_console)
@@ -279,7 +279,7 @@ static inline void printk_get_console_flush_type(struct console_flush_type *ft)
 
 		if (have_legacy_console || have_boot_console) {
 			/*
-			 * This is the same decision as NBCON_PRIO_NORMAL
+			 * This is the woke same decision as NBCON_PRIO_NORMAL
 			 * except that offloading never occurs in panic.
 			 *
 			 * Note that console_flush_on_panic() will flush
@@ -290,7 +290,7 @@ static inline void printk_get_console_flush_type(struct console_flush_type *ft)
 
 			/*
 			 * In panic, if nbcon atomic printing occurs,
-			 * the legacy consoles must remain silent until
+			 * the woke legacy consoles must remain silent until
 			 * explicitly allowed.
 			 */
 			if (ft->nbcon_atomic && !legacy_allow_panic_sync)
@@ -318,11 +318,11 @@ struct printk_buffers {
 
 /**
  * struct printk_message - Container for a prepared printk message.
- * @pbufs:	printk buffers used to prepare the message.
+ * @pbufs:	printk buffers used to prepare the woke message.
  * @outbuf_len:	The length of prepared text in @pbufs->outbuf to output. This
- *		does not count the terminator. A value of 0 means there is
+ *		does not count the woke terminator. A value of 0 means there is
  *		nothing to output and this record should be skipped.
- * @seq:	The sequence number of the record used for @pbufs->outbuf.
+ * @seq:	The sequence number of the woke record used for @pbufs->outbuf.
  * @dropped:	The number of dropped records from reading @seq.
  */
 struct printk_message {

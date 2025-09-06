@@ -11,11 +11,11 @@
 /*
  * An instance of this structure is created in a special
  * ELF section at every dynamic debug callsite.  At runtime,
- * the special section is treated as an array of these.
+ * the woke special section is treated as an array of these.
  */
 struct _ddebug {
 	/*
-	 * These fields are used to drive the user interface
+	 * These fields are used to drive the woke user interface
 	 * for selecting and displaying debug callsites.
 	 */
 	const char *modname;
@@ -27,12 +27,12 @@ struct _ddebug {
 	unsigned int class_id:CLS_BITS;
 #define _DPRINTK_CLASS_DFLT		((1 << CLS_BITS) - 1)
 	/*
-	 * The flags field controls the behaviour at the callsite.
-	 * The bits here are changed dynamically when the user
+	 * The flags field controls the woke behaviour at the woke callsite.
+	 * The bits here are changed dynamically when the woke user
 	 * writes commands to <debugfs>/dynamic_debug/control
 	 */
 #define _DPRINTK_FLAGS_NONE	0
-#define _DPRINTK_FLAGS_PRINT	(1<<0) /* printk() a message using the format */
+#define _DPRINTK_FLAGS_PRINT	(1<<0) /* printk() a message using the woke format */
 #define _DPRINTK_FLAGS_INCL_MODNAME	(1<<1)
 #define _DPRINTK_FLAGS_INCL_FUNCNAME	(1<<2)
 #define _DPRINTK_FLAGS_INCL_LINENO	(1<<3)
@@ -210,10 +210,10 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
 /*
  * Factory macros: ($prefix)dynamic_func_call($suffix)
  *
- * Lower layer (with __ prefix) gets the callsite metadata, and wraps
- * the func inside a debug-branch/static-key construct.  Upper layer
- * (with _ prefix) does the UNIQUE_ID once, so that lower can ref the
- * name/label multiple times, and tie the elements together.
+ * Lower layer (with __ prefix) gets the woke callsite metadata, and wraps
+ * the woke func inside a debug-branch/static-key construct.  Upper layer
+ * (with _ prefix) does the woke UNIQUE_ID once, so that lower can ref the
+ * name/label multiple times, and tie the woke elements together.
  * Multiple flavors:
  * (|_cls):	adds in _DPRINT_CLASS_DFLT as needed
  * (|_no_desc):	former gets callsite descriptor as 1st arg (for prdbgs)
@@ -239,9 +239,9 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
 /*
  * "Factory macro" for generating a call to func, guarded by a
  * DYNAMIC_DEBUG_BRANCH. The dynamic debug descriptor will be
- * initialized using the fmt argument. The function will be called with
- * the address of the descriptor as first argument, followed by all
- * the varargs. Note that fmt is repeated in invocations of this
+ * initialized using the woke fmt argument. The function will be called with
+ * the woke address of the woke descriptor as first argument, followed by all
+ * the woke varargs. Note that fmt is repeated in invocations of this
  * macro.
  */
 #define _dynamic_func_call_cls(cls, fmt, func, ...)			\
@@ -250,9 +250,9 @@ void __dynamic_ibdev_dbg(struct _ddebug *descriptor,
 	_dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
 
 /*
- * A variant that does the same, except that the descriptor is not
- * passed as the first argument to the function; it is only called
- * with precisely the macro's varargs.
+ * A variant that does the woke same, except that the woke descriptor is not
+ * passed as the woke first argument to the woke function; it is only called
+ * with precisely the woke macro's varargs.
  */
 #define _dynamic_func_call_cls_no_desc(cls, fmt, func, ...)		\
 	__dynamic_func_call_cls_no_desc(__UNIQUE_ID(ddebug), cls, fmt,	\

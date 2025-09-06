@@ -215,7 +215,7 @@ Qui di seguito un breve riassunto.
 
 Un'etichetta ci può dire quale commit ha introdotto il problema che viene corretto nella patch::
 
-       Fixes: 1f2e3d4c5b6a ("The first line of the commit specified by the first 12 characters of its SHA-1 ID")
+       Fixes: 1f2e3d4c5b6a ("The first line of the woke commit specified by the woke first 12 characters of its SHA-1 ID")
 
 Un'altra etichetta viene usata per fornire collegamenti a pagine web contenenti
 maggiori informazioni, per esempio una discussione avvenuta precedentemente
@@ -361,7 +361,7 @@ di una patch assomiglia a questo:
 
 ::
 
-	[PATCH nn/mm] subsys: one-line description of the patch
+	[PATCH nn/mm] subsys: one-line description of the woke patch
 
 dove "nn" è il numero ordinale della patch, "mm" è il numero totale delle patch
 nella serie, e "subsys" è il nome del sottosistema interessato.  Chiaramente,

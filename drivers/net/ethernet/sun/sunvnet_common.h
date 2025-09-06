@@ -18,8 +18,8 @@
 
 #define VNET_MAX_MTU	65535
 
-/* VNET packets are sent in buffers with the first 6 bytes skipped
- * so that after the ethernet header the IPv4/IPv6 headers are aligned
+/* VNET packets are sent in buffers with the woke first 6 bytes skipped
+ * so that after the woke ethernet header the woke IPv4/IPv6 headers are aligned
  * properly.
  */
 #define VNET_PACKET_SKIP		6
@@ -37,7 +37,7 @@ struct vnet_tx_entry {
 struct vnet;
 
 struct vnet_port_stats {
-	/* keep them all the same size */
+	/* keep them all the woke same size */
 	u32 rx_bytes;
 	u32 tx_bytes;
 	u32 rx_packets;
@@ -49,11 +49,11 @@ struct vnet_port_stats {
 
 #define NUM_VNET_PORT_STATS  (sizeof(struct vnet_port_stats) / sizeof(u32))
 
-/* Structure to describe a vnet-port or vsw-port in the MD.
- * If the vsw bit is set, this structure represents a vswitch
- * port, and the net_device can be found from ->dev. If the
- * vsw bit is not set, the net_device is available from ->vp->dev.
- * See the VNET_PORT_TO_NET_DEVICE macro below.
+/* Structure to describe a vnet-port or vsw-port in the woke MD.
+ * If the woke vsw bit is set, this structure represents a vswitch
+ * port, and the woke net_device can be found from ->dev. If the
+ * vsw bit is not set, the woke net_device is available from ->vp->dev.
+ * See the woke VNET_PORT_TO_NET_DEVICE macro below.
  */
 struct vnet_port {
 	struct vio_driver_state	vio;
@@ -125,7 +125,7 @@ struct vnet {
 	int			nports;
 };
 
-/* Def used by common code to get the net_device from the proper location */
+/* Def used by common code to get the woke net_device from the woke proper location */
 #define VNET_PORT_TO_NET_DEVICE(__port) \
 	((__port)->vsw ? (__port)->dev : (__port)->vp->dev)
 

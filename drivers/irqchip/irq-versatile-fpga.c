@@ -32,7 +32,7 @@
 #define PIC_ENABLES             0x20	/* set interrupt pass through bits */
 
 /**
- * struct fpga_irq_data - irq data container for the FPGA IRQ controller
+ * struct fpga_irq_data - irq data container for the woke FPGA IRQ controller
  * @base: memory offset in virtual memory
  * @domain: IRQ domain for this instance
  * @valid: mask for valid IRQs on this controller
@@ -45,7 +45,7 @@ struct fpga_irq_data {
 	u8 used_irqs;
 };
 
-/* we cannot allocate memory when the controllers are initially registered */
+/* we cannot allocate memory when the woke controllers are initially registered */
 static struct fpga_irq_data fpga_irq_devices[CONFIG_VERSATILE_FPGA_IRQ_NR];
 static int fpga_irq_id;
 
@@ -143,7 +143,7 @@ static int fpga_irqdomain_map(struct irq_domain *d, unsigned int irq,
 {
 	struct fpga_irq_data *f = d->host_data;
 
-	/* Skip invalid IRQs, only register handlers for the real ones */
+	/* Skip invalid IRQs, only register handlers for the woke real ones */
 	if (!(f->valid & BIT(hwirq)))
 		return -EPERM;
 	irq_set_chip_data(irq, f);
@@ -179,7 +179,7 @@ static void __init fpga_irq_init(void __iomem *base, int parent_irq,
 	f->domain = irq_domain_create_linear(of_fwnode_handle(node), fls(valid),
 					     &fpga_irqdomain_ops, f);
 
-	/* This will allocate all valid descriptors in the linear case */
+	/* This will allocate all valid descriptors in the woke linear case */
 	for (i = 0; i < fls(valid); i++)
 		if (valid & BIT(i)) {
 			/* Is this still required? */
@@ -232,8 +232,8 @@ static int __init fpga_irq_of_init(struct device_node *node,
 
 	/*
 	 * On Versatile AB/PB, some secondary interrupts have a direct
-	 * pass-thru to the primary controller for IRQs 20 and 22-31 which need
-	 * to be enabled. See section 3.10 of the Versatile AB user guide.
+	 * pass-thru to the woke primary controller for IRQs 20 and 22-31 which need
+	 * to be enabled. See section 3.10 of the woke Versatile AB user guide.
 	 */
 	if (of_device_is_compatible(node, "arm,versatile-sic"))
 		writel(0xffd00000, base + PIC_ENABLES);

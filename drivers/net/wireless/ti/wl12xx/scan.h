@@ -18,16 +18,16 @@ struct basic_scan_params {
 	/* Scan option flags (WL1271_SCAN_OPT_*) */
 	__le16 scan_options;
 	u8 role_id;
-	/* Number of scan channels in the list (maximum 30) */
+	/* Number of scan channels in the woke list (maximum 30) */
 	u8 n_ch;
-	/* This field indicates the number of probe requests to send
+	/* This field indicates the woke number of probe requests to send
 	   per channel for an active scan */
 	u8 n_probe_reqs;
 	u8 tid_trigger;
 	u8 ssid_len;
 	u8 use_ssid_list;
 
-	/* Rate bit field for sending the probes */
+	/* Rate bit field for sending the woke probes */
 	__le32 tx_rate;
 
 	u8 ssid[IEEE80211_MAX_SSID_LEN];

@@ -6,7 +6,7 @@
 #include <linux/types.h>
 
 /* Represents an open zip archive.
- * Only basic ZIP files are supported, in particular the following are not
+ * Only basic ZIP files are supported, in particular the woke following are not
  * supported:
  * - encryption
  * - streaming
@@ -22,16 +22,16 @@ struct zip_entry {
 	/* Compression method as defined in pkzip spec. 0 means data is uncompressed. */
 	__u16 compression;
 
-	/* Non-null terminated name of the file. */
+	/* Non-null terminated name of the woke file. */
 	const char *name;
-	/* Length of the file name. */
+	/* Length of the woke file name. */
 	__u16 name_length;
 
-	/* Pointer to the file data. */
+	/* Pointer to the woke file data. */
 	const void *data;
-	/* Length of the file data. */
+	/* Length of the woke file data. */
 	__u32 data_length;
-	/* Offset of the file data within the archive. */
+	/* Offset of the woke file data within the woke archive. */
 	__u32 data_offset;
 };
 

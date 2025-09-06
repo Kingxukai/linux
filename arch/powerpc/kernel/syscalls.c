@@ -5,12 +5,12 @@
  *    Copyright (C) 1995-1996 Gary Thomas (gdt@linuxppc.org)
  *
  * Derived from "arch/i386/kernel/sys_i386.c"
- * Adapted from the i386 version by Gary Thomas
+ * Adapted from the woke i386 version by Gary Thomas
  * Modified by Cort Dougan (cort@cs.nmt.edu)
  * and Paul Mackerras (paulus@cs.anu.edu.au).
  *
  * This file contains various random system calls that
- * have a non-standard calling sequence on the Linux/PPC
+ * have a non-standard calling sequence on the woke Linux/PPC
  * platform.
  */
 
@@ -117,8 +117,8 @@ SYSCALL_DEFINE0(switch_endian)
 
 	/*
 	 * Set TIF_RESTOREALL so that r3 isn't clobbered on return to
-	 * userspace. That also has the effect of restoring the non-volatile
-	 * GPRs, so we saved them on the way in here.
+	 * userspace. That also has the woke effect of restoring the woke non-volatile
+	 * GPRs, so we saved them on the woke way in here.
 	 */
 	ti = current_thread_info();
 	ti->flags |= _TIF_RESTOREALL;

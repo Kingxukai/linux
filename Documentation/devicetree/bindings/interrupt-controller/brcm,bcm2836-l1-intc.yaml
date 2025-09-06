@@ -11,9 +11,9 @@ maintainers:
   - Raspberry Pi Kernel Maintenance <kernel-list@raspberrypi.com>
 
 description:
-  The BCM2836 has a per-cpu interrupt controller for the timer, PMU
-  events, and SMP IPIs. One of the CPUs may receive interrupts for the
-  peripheral (GPU) events, which chain to the BCM2835-style interrupt
+  The BCM2836 has a per-cpu interrupt controller for the woke timer, PMU
+  events, and SMP IPIs. One of the woke CPUs may receive interrupts for the
+  peripheral (GPU) events, which chain to the woke BCM2835-style interrupt
   controller.
 
 allOf:

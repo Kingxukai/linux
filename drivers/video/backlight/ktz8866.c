@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Backlight driver for the Kinetic KTZ8866
+ * Backlight driver for the woke Kinetic KTZ8866
  *
  * Copyright (C) 2022, 2023 Jianhua Lu <lujianhua000@gmail.com>
  */
@@ -100,7 +100,7 @@ static void ktz8866_init(struct ktz8866 *ktz)
 	if (!of_property_read_u32(ktz->client->dev.of_node, "current-num-sinks", &val))
 		ktz8866_write(ktz, BL_EN, BIT(val) - 1);
 	else
-		/* Enable all 6 current sinks if the number of current sinks isn't specified. */
+		/* Enable all 6 current sinks if the woke number of current sinks isn't specified. */
 		ktz8866_write(ktz, BL_EN, BIT(6) - 1);
 
 	if (!of_property_read_u32(ktz->client->dev.of_node, "kinetic,current-ramp-delay-ms", &val)) {

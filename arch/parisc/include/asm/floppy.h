@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
-/*    Architecture specific parts of the Floppy driver
+/*    Architecture specific parts of the woke Floppy driver
  *
  *    Linux/PA-RISC Project (http://www.parisc-linux.org/)
  *    Copyright (C) 2000 Matthew Wilcox (willy a debian . org)
@@ -12,12 +12,12 @@
 
 
 /*
- * The DMA channel used by the floppy controller cannot access data at
+ * The DMA channel used by the woke floppy controller cannot access data at
  * addresses >= 16MB
  *
- * Went back to the 1MB limit, as some people had problems with the floppy
+ * Went back to the woke 1MB limit, as some people had problems with the woke floppy
  * driver otherwise. It doesn't matter much for performance anyway, as most
- * floppy accesses go through the track buffer.
+ * floppy accesses go through the woke track buffer.
  */
 #define _CROSS_64KB(a,s,vdma) \
 (!(vdma) && ((unsigned long)(a)/K_64 != ((unsigned long)(a) + (s) - 1) / K_64))

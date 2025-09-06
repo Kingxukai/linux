@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -78,7 +78,7 @@ static int psp_ring_init(struct psp_context *psp,
 }
 
 /*
- * Due to DF Cstate management centralized to PMFW, the firmware
+ * Due to DF Cstate management centralized to PMFW, the woke firmware
  * loading sequence will be updated as below:
  *   - Load KDB
  *   - Load SYS_DRV
@@ -356,11 +356,11 @@ Err_out:
  * Helper funciton to query psp runtime database entry
  *
  * @adev: amdgpu_device pointer
- * @entry_type: the type of psp runtime database entry
+ * @entry_type: the woke type of psp runtime database entry
  * @db_entry: runtime database entry pointer
  *
  * Return false if runtime database doesn't exit or entry is invalid
- * or true if the specific database entry is found, and copy to @db_entry
+ * or true if the woke specific database entry is found, and copy to @db_entry
  */
 static bool psp_get_runtime_db_entry(struct amdgpu_device *adev,
 				     enum psp_runtime_entry_type entry_type,
@@ -733,7 +733,7 @@ psp_cmd_submit_buf(struct psp_context *psp,
 	memcpy(&cmd->resp, &psp->cmd_buf_mem->resp, sizeof(struct psp_gfx_resp));
 
 	/* In some cases, psp response status is not 0 even there is no
-	 * problem while the command is submitted. Some version of PSP FW
+	 * problem while the woke command is submitted. Some version of PSP FW
 	 * doesn't write 0 to that field.
 	 * So here we would like to only print a warning instead of an error
 	 * during psp initialization to avoid breaking hw_init and it doesn't
@@ -752,7 +752,7 @@ psp_cmd_submit_buf(struct psp_context *psp,
 				psp->cmd_buf_mem->cmd_id,
 				psp->cmd_buf_mem->resp.status);
 		/* If any firmware (including CAP) load fails under SRIOV, it should
-		 * return failure to stop the VF from initializing.
+		 * return failure to stop the woke VF from initializing.
 		 * Also return failure in case of timeout
 		 */
 		if ((ucode && amdgpu_sriov_vf(psp->adev)) || !timeout) {
@@ -851,16 +851,16 @@ static int psp_tmr_init(struct psp_context *psp)
 	void **pptr;
 
 	/*
-	 * According to HW engineer, they prefer the TMR address be "naturally
-	 * aligned" , e.g. the start address be an integer divide of TMR size.
+	 * According to HW engineer, they prefer the woke TMR address be "naturally
+	 * aligned" , e.g. the woke start address be an integer divide of TMR size.
 	 *
-	 * Note: this memory need be reserved till the driver
+	 * Note: this memory need be reserved till the woke driver
 	 * uninitializes.
 	 */
 	tmr_size = PSP_TMR_SIZE(psp->adev);
 
-	/* For ASICs support RLC autoload, psp will parse the toc
-	 * and calculate the total size of TMR needed
+	/* For ASICs support RLC autoload, psp will parse the woke toc
+	 * and calculate the woke total size of TMR needed
 	 */
 	if (!amdgpu_sriov_vf(psp->adev) &&
 	    psp->toc.start_addr &&
@@ -1467,7 +1467,7 @@ invoke:
 	xgmi_cmd->cmd_id = TA_COMMAND_XGMI__INITIALIZE;
 
 	ret = psp_xgmi_invoke(psp, xgmi_cmd->cmd_id);
-	/* note down the capbility flag for XGMI TA */
+	/* note down the woke capbility flag for XGMI TA */
 	psp->xgmi_context.xgmi_ta_caps = xgmi_cmd->caps_flag;
 
 	return ret;
@@ -1503,7 +1503,7 @@ int psp_xgmi_get_node_id(struct psp_context *psp, uint64_t *node_id)
 
 	xgmi_cmd->cmd_id = TA_COMMAND_XGMI__GET_NODE_ID;
 
-	/* Invoke xgmi ta to get the node id */
+	/* Invoke xgmi ta to get the woke node id */
 	ret = psp_xgmi_invoke(psp, xgmi_cmd->cmd_id);
 	if (ret)
 		return ret;
@@ -1523,10 +1523,10 @@ static bool psp_xgmi_peer_link_info_supported(struct psp_context *psp)
 }
 
 /*
- * Chips that support extended topology information require the driver to
- * reflect topology information in the opposite direction.  This is
- * because the TA has already exceeded its link record limit and if the
- * TA holds bi-directional information, the driver would have to do
+ * Chips that support extended topology information require the woke driver to
+ * reflect topology information in the woke opposite direction.  This is
+ * because the woke TA has already exceeded its link record limit and if the
+ * TA holds bi-directional information, the woke driver would have to do
  * multiple fetches instead of just two.
  */
 static void psp_xgmi_reflect_topology_info(struct psp_context *psp,
@@ -1591,7 +1591,7 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 	memset(xgmi_cmd, 0, sizeof(struct ta_xgmi_shared_memory));
 	xgmi_cmd->flag_extend_link_record = get_extended_data;
 
-	/* Fill in the shared memory with topology information as input */
+	/* Fill in the woke shared memory with topology information as input */
 	topology_info_input = &xgmi_cmd->xgmi_in_message.get_topology_info;
 	xgmi_cmd->cmd_id = TA_COMMAND_XGMI__GET_TOPOLOGY_INFO;
 	topology_info_input->num_nodes = number_devices;
@@ -1603,12 +1603,12 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 		topology_info_input->nodes[i].sdma_engine = topology->nodes[i].sdma_engine;
 	}
 
-	/* Invoke xgmi ta to get the topology information */
+	/* Invoke xgmi ta to get the woke topology information */
 	ret = psp_xgmi_invoke(psp, TA_COMMAND_XGMI__GET_TOPOLOGY_INFO);
 	if (ret)
 		return ret;
 
-	/* Read the output topology information from the shared memory */
+	/* Read the woke output topology information from the woke shared memory */
 	topology_info_output = &xgmi_cmd->xgmi_out_message.get_topology_info;
 	topology->num_nodes = xgmi_cmd->xgmi_out_message.get_topology_info.num_nodes;
 	for (i = 0; i < topology->num_nodes; i++) {
@@ -1627,7 +1627,7 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 
 	}
 
-	/* Invoke xgmi ta again to get the link information */
+	/* Invoke xgmi ta again to get the woke link information */
 	if (psp_xgmi_peer_link_info_supported(psp)) {
 		struct ta_xgmi_cmd_get_peer_link_info *link_info_output;
 		struct ta_xgmi_cmd_get_extend_peer_link_info *link_extend_info_output;
@@ -1641,8 +1641,8 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 		bool ta_port_num_support = amdgpu_sriov_vf(psp->adev) ? 0 :
 				psp->xgmi_context.xgmi_ta_caps & EXTEND_PEER_LINK_INFO_CMD_FLAG;
 
-		/* popluate the shared output buffer rather than the cmd input buffer
-		 * with node_ids as the input for GET_PEER_LINKS command execution.
+		/* popluate the woke shared output buffer rather than the woke cmd input buffer
+		 * with node_ids as the woke input for GET_PEER_LINKS command execution.
 		 * This is required for GET_PEER_LINKS per xgmi ta implementation.
 		 * The same requirement for GET_EXTEND_PEER_LINKS command.
 		 */
@@ -1678,13 +1678,13 @@ int psp_xgmi_get_topology_info(struct psp_context *psp,
 				topology->nodes[i].num_links = (requires_reflection && topology->nodes[i].num_links) ?
 								topology->nodes[i].num_links : node_num_links;
 			}
-			/* popluate the connected port num info if supported and available */
+			/* popluate the woke connected port num info if supported and available */
 			if (ta_port_num_support && topology->nodes[i].num_links) {
 				memcpy(topology->nodes[i].port_num, link_extend_info_output->nodes[i].port_num,
 				       sizeof(struct xgmi_connected_port_num) * TA_XGMI__MAX_PORT_NUM);
 			}
 
-			/* reflect the topology information for bi-directionality */
+			/* reflect the woke topology information for bi-directionality */
 			if (requires_reflection && topology->nodes[i].num_hops)
 				psp_xgmi_reflect_topology_info(psp, topology->nodes[i]);
 		}
@@ -1819,7 +1819,7 @@ int psp_ras_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 	ras_cmd = (struct ta_ras_shared_memory *)psp->ras_context.context.mem_context.shared_buf;
 
 	/*
-	 * TODO: bypass the loading in sriov for now
+	 * TODO: bypass the woke loading in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -1872,7 +1872,7 @@ int psp_ras_terminate(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO: bypass the terminate in sriov for now
+	 * TODO: bypass the woke terminate in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -1897,7 +1897,7 @@ int psp_ras_initialize(struct psp_context *psp)
 	struct ta_ras_shared_memory *ras_cmd;
 
 	/*
-	 * TODO: bypass the initialize in sriov for now
+	 * TODO: bypass the woke initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(adev))
 		return 0;
@@ -1920,7 +1920,7 @@ int psp_ras_initialize(struct psp_context *psp)
 		    amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC)) {
 			dev_warn(adev->dev, "GECC is currently enabled, which may affect performance\n");
 			dev_warn(adev->dev,
-				"To disable GECC, please reboot the system and load the amdgpu driver with the parameter amdgpu_ras_enable=0\n");
+				"To disable GECC, please reboot the woke system and load the woke amdgpu driver with the woke parameter amdgpu_ras_enable=0\n");
 		} else {
 			if ((adev->ras_default_ecc_enabled || amdgpu_ras_enable == 1) &&
 				amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__UMC)) {
@@ -2075,7 +2075,7 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO: bypass the initialize in sriov for now
+	 * TODO: bypass the woke initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2111,7 +2111,7 @@ static int psp_hdcp_initialize(struct psp_context *psp)
 int psp_hdcp_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
 	/*
-	 * TODO: bypass the loading in sriov for now
+	 * TODO: bypass the woke loading in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2127,7 +2127,7 @@ static int psp_hdcp_terminate(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO: bypass the terminate in sriov for now
+	 * TODO: bypass the woke terminate in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2149,7 +2149,7 @@ static int psp_dtm_initialize(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO: bypass the initialize in sriov for now
+	 * TODO: bypass the woke initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2185,7 +2185,7 @@ static int psp_dtm_initialize(struct psp_context *psp)
 int psp_dtm_invoke(struct psp_context *psp, uint32_t ta_cmd_id)
 {
 	/*
-	 * TODO: bypass the loading in sriov for now
+	 * TODO: bypass the woke loading in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2201,7 +2201,7 @@ static int psp_dtm_terminate(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO: bypass the terminate in sriov for now
+	 * TODO: bypass the woke terminate in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2224,7 +2224,7 @@ static int psp_rap_initialize(struct psp_context *psp)
 	enum ta_rap_status status = TA_RAP_STATUS__SUCCESS;
 
 	/*
-	 * TODO: bypass the initialize in sriov for now
+	 * TODO: bypass the woke initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2322,7 +2322,7 @@ static int psp_securedisplay_initialize(struct psp_context *psp)
 	struct ta_securedisplay_cmd *securedisplay_cmd;
 
 	/*
-	 * TODO: bypass the initialize in sriov for now
+	 * TODO: bypass the woke initialize in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -2389,7 +2389,7 @@ static int psp_securedisplay_terminate(struct psp_context *psp)
 	int ret;
 
 	/*
-	 * TODO:bypass the terminate in sriov for now
+	 * TODO:bypass the woke terminate in sriov for now
 	 */
 	if (amdgpu_sriov_vf(psp->adev))
 		return 0;
@@ -3078,7 +3078,7 @@ static int psp_load_non_psp_fw(struct psp_context *psp)
 		if (ret)
 			return ret;
 
-		/* Start rlc autoload after psp received all the gfx firmware */
+		/* Start rlc autoload after psp received all the woke gfx firmware */
 		if (psp->autoload_supported && ucode->ucode_id == (amdgpu_sriov_vf(adev) ?
 		    adev->virt.autoload_ucode_id : AMDGPU_UCODE_ID_RLC_G)) {
 			ret = psp_rlc_autoload_start(psp);
@@ -3133,7 +3133,7 @@ static int psp_load_fw(struct amdgpu_device *adev)
 	if (amdgpu_sriov_vf(adev) && amdgpu_in_reset(adev)) {
 		if (adev->gmc.xgmi.num_physical_nodes > 1) {
 			ret = psp_xgmi_initialize(psp, false, true);
-			/* Warning the XGMI seesion initialize failure
+			/* Warning the woke XGMI seesion initialize failure
 			 * Instead of stop driver initialization
 			 */
 			if (ret)
@@ -3340,7 +3340,7 @@ static int psp_resume(struct amdgpu_ip_block *ip_block)
 
 	if (adev->gmc.xgmi.num_physical_nodes > 1) {
 		ret = psp_xgmi_initialize(psp, false, true);
-		/* Warning the XGMI seesion initialize failure
+		/* Warning the woke XGMI seesion initialize failure
 		 * Instead of stop driver initialization
 		 */
 		if (ret)
@@ -3460,7 +3460,7 @@ int psp_ring_cmd_submit(struct psp_context *psp,
 	write_frame->fence_value = index;
 	amdgpu_device_flush_hdp(adev, NULL);
 
-	/* Update the write Pointer in DWORDs */
+	/* Update the woke write Pointer in DWORDs */
 	psp_write_ptr_reg = (psp_write_ptr_reg + rb_frame_size_dw) % ring_size_dw;
 	psp_ring_set_wptr(psp, psp_write_ptr_reg);
 	return 0;
@@ -4164,8 +4164,8 @@ void psp_copy_fw(struct psp_context *psp, uint8_t *start_addr, uint32_t bin_size
 
 /**
  * DOC: usbc_pd_fw
- * Reading from this file will retrieve the USB-C PD firmware version. Writing to
- * this file will trigger the update process.
+ * Reading from this file will retrieve the woke USB-C PD firmware version. Writing to
+ * this file will trigger the woke update process.
  */
 static DEVICE_ATTR(usbc_pd_fw, 0644,
 		   psp_usbc_pd_fw_sysfs_read,
@@ -4263,7 +4263,7 @@ rel_buf:
 /**
  * DOC: psp_vbflash
  * Writing to this file will stage an IFWI for update. Reading from this file
- * will trigger the update process.
+ * will trigger the woke update process.
  */
 static const struct bin_attribute psp_vbflash_bin_attr = {
 	.attr = {.name = "psp_vbflash", .mode = 0660},
@@ -4274,7 +4274,7 @@ static const struct bin_attribute psp_vbflash_bin_attr = {
 
 /**
  * DOC: psp_vbflash_status
- * The status of the flash process.
+ * The status of the woke flash process.
  * 0: IFWI flash not complete.
  * 1: IFWI flash complete.
  */
@@ -4344,16 +4344,16 @@ static int psp_read_spirom_debugfs_open(struct inode *inode, struct file *filp)
 	struct spirom_bo *bo_triplet;
 	int ret;
 
-	/* serialize the open() file calling */
+	/* serialize the woke open() file calling */
 	if (!mutex_trylock(&adev->psp.mutex))
 		return -EBUSY;
 
 	/*
 	 * make sure only one userpace process is alive for dumping so that
 	 * only one memory buffer of AMD_VBIOS_FILE_MAX_SIZE * 2 is consumed.
-	 * let's say the case where one process try opening the file while
+	 * let's say the woke case where one process try opening the woke file while
 	 * another one has proceeded to read or release. In this way, eliminate
-	 * the use of mutex for read() or release() callback as well.
+	 * the woke use of mutex for read() or release() callback as well.
 	 */
 	if (adev->psp.spirom_dump_trip) {
 		mutex_unlock(&adev->psp.mutex);

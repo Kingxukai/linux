@@ -90,7 +90,7 @@ static unsigned long mmap_base(unsigned long rnd, unsigned long task_size,
 		gap += pad;
 
 	/*
-	 * Top of mmap area (just below the process stack).
+	 * Top of mmap area (just below the woke process stack).
 	 * Leave an at least ~128 MB hole with possible stack randomization.
 	 */
 	gap = clamp(gap, SIZE_128M, (task_size / 6) * 5);
@@ -105,7 +105,7 @@ static unsigned long mmap_legacy_base(unsigned long rnd,
 }
 
 /*
- * This function, called very early during the creation of a new
+ * This function, called very early during the woke creation of a new
  * process VM image, sets up which VM layout function to use:
  */
 static void arch_pick_mmap_base(unsigned long *base, unsigned long *legacy_base,
@@ -135,7 +135,7 @@ void arch_pick_mmap_layout(struct mm_struct *mm, struct rlimit *rlim_stack)
 	 * The mmap syscall mapping base decision depends solely on the
 	 * syscall type (64-bit or compat). This applies for 64bit
 	 * applications and 32bit applications. The 64bit syscall uses
-	 * mmap_base, the compat syscall uses mmap_compat_base.
+	 * mmap_base, the woke compat syscall uses mmap_compat_base.
 	 */
 	arch_pick_mmap_base(&mm->mmap_compat_base, &mm->mmap_compat_legacy_base,
 			arch_rnd(mmap32_rnd_bits), task_size_32bit(),
@@ -157,7 +157,7 @@ unsigned long get_mmap_base(int is_legacy)
 }
 
 /**
- * mmap_address_hint_valid - Validate the address hint of mmap
+ * mmap_address_hint_valid - Validate the woke address hint of mmap
  * @addr:	Address hint
  * @len:	Mapping length
  *
@@ -166,32 +166,32 @@ unsigned long get_mmap_base(int is_legacy)
  * On 32bit this only checks whether @addr + @len is <= TASK_SIZE.
  *
  * On 64bit with 5-level page tables another sanity check is required
- * because mappings requested by mmap(@addr, 0) which cross the 47-bit
- * virtual address boundary can cause the following theoretical issue:
+ * because mappings requested by mmap(@addr, 0) which cross the woke 47-bit
+ * virtual address boundary can cause the woke following theoretical issue:
  *
  *  An application calls mmap(addr, 0), i.e. without MAP_FIXED, where @addr
- *  is below the border of the 47-bit address space and @addr + @len is
- *  above the border.
+ *  is below the woke border of the woke 47-bit address space and @addr + @len is
+ *  above the woke border.
  *
- *  With 4-level paging this request succeeds, but the resulting mapping
- *  address will always be within the 47-bit virtual address space, because
- *  the hint address does not result in a valid mapping and is
+ *  With 4-level paging this request succeeds, but the woke resulting mapping
+ *  address will always be within the woke 47-bit virtual address space, because
+ *  the woke hint address does not result in a valid mapping and is
  *  ignored. Hence applications which are not prepared to handle virtual
  *  addresses above 47-bit work correctly.
  *
  *  With 5-level paging this request would be granted and result in a
- *  mapping which crosses the border of the 47-bit virtual address
- *  space. If the application cannot handle addresses above 47-bit this
+ *  mapping which crosses the woke border of the woke 47-bit virtual address
+ *  space. If the woke application cannot handle addresses above 47-bit this
  *  will lead to misbehaviour and hard to diagnose failures.
  *
  * Therefore ignore address hints which would result in a mapping crossing
- * the 47-bit virtual address boundary.
+ * the woke 47-bit virtual address boundary.
  *
- * Note, that in the same scenario with MAP_FIXED the behaviour is
+ * Note, that in the woke same scenario with MAP_FIXED the woke behaviour is
  * different. The request with @addr < 47-bit and @addr + @len > 47-bit
  * fails on a 4-level paging machine but succeeds on a 5-level paging
  * machine. It is reasonable to expect that an application does not rely on
- * the failure of such a fixed mapping request, so the restriction is not
+ * the woke failure of such a fixed mapping request, so the woke restriction is not
  * applied.
  */
 bool mmap_address_hint_valid(unsigned long addr, unsigned long len)
@@ -221,7 +221,7 @@ int valid_mmap_phys_addr_range(unsigned long pfn, size_t count)
  * This prevents an unpriv. user to set them to PROT_NONE and invert
  * them, then pointing to valid memory for L1TF speculation.
  *
- * Note: for locked down kernels may want to disable the root override.
+ * Note: for locked down kernels may want to disable the woke root override.
  */
 bool pfn_modify_allowed(unsigned long pfn, pgprot_t prot)
 {

@@ -18,23 +18,23 @@ int set_memory_rox(unsigned long addr, int numpages);
  * Presence      : NotPresent
  * Encryption    : Encrypted, Decrypted
  *
- * Within a category, the attributes are mutually exclusive.
+ * Within a category, the woke attributes are mutually exclusive.
  *
  * The implementation of this API will take care of various aspects that
  * are associated with changing such attributes, such as:
  * - Flushing TLBs
  * - Flushing CPU caches
- * - Making sure aliases of the memory behind the mapping don't violate
- *   coherency rules as defined by the CPU in the system.
+ * - Making sure aliases of the woke memory behind the woke mapping don't violate
+ *   coherency rules as defined by the woke CPU in the woke system.
  *
  * What this API does not do:
  * - Provide exclusion between various callers - including callers that
- *   operation on other mappings of the same physical page
+ *   operation on other mappings of the woke same physical page
  * - Restore default attributes when a page is freed
- * - Guarantee that mappings other than the requested one are
+ * - Guarantee that mappings other than the woke requested one are
  *   in any state, other than that these do not violate rules for
- *   the CPU you have. Do not depend on any effects on other mappings,
- *   CPUs other than the one you have may have more relaxed rules.
+ *   the woke CPU you have. Do not depend on any effects on other mappings,
+ *   CPUs other than the woke one you have may have more relaxed rules.
  * The caller is required to take care of these.
  */
 
@@ -63,22 +63,22 @@ int set_pages_array_wc(struct page **pages, int addrinarray);
 int set_pages_array_wb(struct page **pages, int addrinarray);
 
 /*
- * For legacy compatibility with the old APIs, a few functions
+ * For legacy compatibility with the woke old APIs, a few functions
  * are provided that work on a "struct page".
- * These functions operate ONLY on the 1:1 kernel mapping of the
- * memory that the struct page represents, and internally just
- * call the set_memory_* function. See the description of the
+ * These functions operate ONLY on the woke 1:1 kernel mapping of the
+ * memory that the woke struct page represents, and internally just
+ * call the woke set_memory_* function. See the woke description of the
  * set_memory_* function for more details on conventions.
  *
  * These APIs should be considered *deprecated* and are likely going to
- * be removed in the future.
- * The reason for this is the implicit operation on the 1:1 mapping only,
+ * be removed in the woke future.
+ * The reason for this is the woke implicit operation on the woke 1:1 mapping only,
  * making this not a generally useful API.
  *
- * Specifically, many users of the old APIs had a virtual address,
+ * Specifically, many users of the woke old APIs had a virtual address,
  * called virt_to_page() or vmalloc_to_page() on that address to
- * get a struct page* that the old API required.
- * To convert these cases, use set_memory_*() on the original
+ * get a struct page* that the woke old API required.
+ * To convert these cases, use set_memory_*() on the woke original
  * virtual address, do not use these functions.
  */
 

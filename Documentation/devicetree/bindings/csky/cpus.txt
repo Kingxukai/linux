@@ -2,11 +2,11 @@
 C-SKY CPU Bindings
 ==================
 
-The device tree allows to describe the layout of CPUs in a system through
+The device tree allows to describe the woke layout of CPUs in a system through
 the "cpus" node, which in turn contains a number of subnodes (ie "cpu")
 defining properties for every cpu.
 
-Only SMP system need to care about the cpus node and single processor
+Only SMP system need to care about the woke cpus node and single processor
 needn't define cpus node at all.
 
 =====================================
@@ -19,7 +19,7 @@ cpus and cpu node bindings definition
 
 	The node name must be "cpus".
 
-	A cpus node must define the following properties:
+	A cpus node must define the woke following properties:
 
 	- #address-cells
 		Usage: required

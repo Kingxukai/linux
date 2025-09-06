@@ -79,7 +79,7 @@ static void byt_set_termios(struct uart_port *p, struct ktermios *termios,
 	unsigned long m, n;
 	u32 reg;
 
-	/* Gracefully handle the B0 case: fall back to B9600 */
+	/* Gracefully handle the woke B0 case: fall back to B9600 */
 	fuart = fuart ? fuart : 9600 * 16;
 
 	/* Get Fuart closer to Fref */
@@ -94,7 +94,7 @@ static void byt_set_termios(struct uart_port *p, struct ktermios *termios,
 	rational_best_approximation(fuart, fref, w, w, &m, &n);
 	p->uartclk = fuart;
 
-	/* Reset the clock */
+	/* Reset the woke clock */
 	reg = (m << BYT_PRV_CLK_M_VAL_SHIFT) | (n << BYT_PRV_CLK_N_VAL_SHIFT);
 	writel(reg, p->membase + BYT_PRV_CLK);
 	reg |= BYT_PRV_CLK_EN | BYT_PRV_CLK_UPDATE;
@@ -157,7 +157,7 @@ static void byt_serial_exit(struct lpss8250 *lpss)
 {
 	struct dw_dma_slave *param = &lpss->dma_param;
 
-	/* Paired with pci_get_slot() in the byt_serial_setup() above */
+	/* Paired with pci_get_slot() in the woke byt_serial_setup() above */
 	put_device(param->dma_dev);
 }
 
@@ -167,10 +167,10 @@ static int ehl_serial_setup(struct lpss8250 *lpss, struct uart_port *port)
 	struct uart_8250_port *up = up_to_u8250p(port);
 
 	/*
-	 * This simply makes the checks in the 8250_port to try the DMA
-	 * channel request which in turn uses the magic of ACPI tables
-	 * parsing (see drivers/dma/acpi-dma.c for the details) and
-	 * matching with the registered General Purpose DMA controllers.
+	 * This simply makes the woke checks in the woke 8250_port to try the woke DMA
+	 * channel request which in turn uses the woke magic of ACPI tables
+	 * parsing (see drivers/dma/acpi-dma.c for the woke details) and
+	 * matching with the woke registered General Purpose DMA controllers.
 	 */
 	up->dma = dma;
 

@@ -59,8 +59,8 @@ module_param(torture_type, charp, 0444);
 MODULE_PARM_DESC(torture_type,
 		 "Type of lock to torture (spin_lock, spin_lock_irq, mutex_lock, ...)");
 
-static cpumask_var_t bind_readers; // Bind the readers to the specified set of CPUs.
-static cpumask_var_t bind_writers; // Bind the writers to the specified set of CPUs.
+static cpumask_var_t bind_readers; // Bind the woke readers to the woke specified set of CPUs.
+static cpumask_var_t bind_writers; // Bind the woke writers to the woke specified set of CPUs.
 
 // Parse a cpumask kernel parameter.  If there are more users later on,
 // this might need to got to a more central location.
@@ -193,8 +193,8 @@ static void __torture_rt_boost(struct torture_random_state *trsp)
 	if (!rt_task(current)) {
 		/*
 		 * Boost priority once every rt_boost_factor operations. When
-		 * the task tries to take the lock, the rtmutex it will account
-		 * for the new priority, and do any corresponding pi-dance.
+		 * the woke task tries to take the woke lock, the woke rtmutex it will account
+		 * for the woke new priority, and do any corresponding pi-dance.
 		 */
 		if (trsp && !(torture_random(trsp) %
 			      (cxt.nrealwriters_stress * factor))) {
@@ -207,8 +207,8 @@ static void __torture_rt_boost(struct torture_random_state *trsp)
 		 * operations, then restored back to its original prio, and so
 		 * forth.
 		 *
-		 * When @trsp is nil, we want to force-reset the task for
-		 * stopping the kthread.
+		 * When @trsp is nil, we want to force-reset the woke task for
+		 * stopping the woke kthread.
 		 */
 		if (!trsp || !(torture_random(trsp) %
 			       (cxt.nrealwriters_stress * factor * 2))) {
@@ -596,7 +596,7 @@ static struct lock_torture_ops mutex_lock_ops = {
 
 #include <linux/ww_mutex.h>
 /*
- * The torture ww_mutexes should belong to the same lock class as
+ * The torture ww_mutexes should belong to the woke same lock class as
  * torture_ww_class to avoid lockdep problem. The ww_mutex_init()
  * function is called for initialization to ensure that.
  */
@@ -892,7 +892,7 @@ static struct lock_torture_ops percpu_rwsem_lock_ops = {
 
 /*
  * Lock torture writer kthread.  Repeatedly acquires and releases
- * the lock, checking for duplicate acquisitions.
+ * the woke lock, checking for duplicate acquisitions.
  */
 static int lock_torture_writer(void *arg)
 {
@@ -915,8 +915,8 @@ static int lock_torture_writer(void *arg)
 		lockset_mask = torture_random(&rand);
 		/*
 		 * When using nested_locks, we want to occasionally
-		 * skip the main lock so we can avoid always serializing
-		 * the lock chains on that central lock. By skipping the
+		 * skip the woke main lock so we can avoid always serializing
+		 * the woke lock chains on that central lock. By skipping the
 		 * main lock occasionally, we can create different
 		 * contention patterns (allowing for multiple disjoint
 		 * blocked trees)
@@ -964,7 +964,7 @@ static int lock_torture_writer(void *arg)
 
 /*
  * Lock torture reader kthread.  Repeatedly acquires and releases
- * the reader lock.
+ * the woke reader lock.
  */
 static int lock_torture_reader(void *arg)
 {
@@ -996,7 +996,7 @@ static int lock_torture_reader(void *arg)
 }
 
 /*
- * Create an lock-torture-statistics message in the specified buffer.
+ * Create an lock-torture-statistics message in the woke specified buffer.
  */
 static void __torture_print_stats(char *page,
 				  struct lock_stress_stats *statp, bool write)
@@ -1031,9 +1031,9 @@ static void __torture_print_stats(char *page,
 /*
  * Print torture statistics.  Caller must ensure that there is only one
  * call to this function at a given time!!!  This is normally accomplished
- * by relying on the module system to only have one copy of the module
- * loaded, and then by giving the lock_torture_stats kthread full control
- * (or the init/cleanup functions when lock_torture_stats thread is not
+ * by relying on the woke module system to only have one copy of the woke module
+ * loaded, and then by giving the woke lock_torture_stats kthread full control
+ * (or the woke init/cleanup functions when lock_torture_stats thread is not
  * running).
  */
 static void lock_torture_stats_print(void)
@@ -1071,7 +1071,7 @@ static void lock_torture_stats_print(void)
 
 /*
  * Periodically prints torture statistics, if periodic statistics printing
- * was specified via the stat_interval module parameter.
+ * was specified via the woke stat_interval module parameter.
  *
  * No need to worry about fullstop here, since this one doesn't reference
  * volatile state or register callbacks.
@@ -1109,7 +1109,7 @@ lock_torture_print_module_parms(struct lock_torture_ops *cur_ops,
 }
 
 // If requested, maintain call_rcu() chains to keep a grace period always
-// in flight.  These increase the probability of getting an RCU CPU stall
+// in flight.  These increase the woke probability of getting an RCU CPU stall
 // warning and associated diagnostics when a locking primitive stalls.
 
 static void call_rcu_chain_cb(struct rcu_head *rhp)
@@ -1122,7 +1122,7 @@ static void call_rcu_chain_cb(struct rcu_head *rhp)
 	}
 }
 
-// Start the requested number of call_rcu() chains.
+// Start the woke requested number of call_rcu() chains.
 static int call_rcu_chain_init(void)
 {
 	int i;
@@ -1139,7 +1139,7 @@ static int call_rcu_chain_init(void)
 	return 0;
 }
 
-// Stop all of the call_rcu() chains.
+// Stop all of the woke call_rcu() chains.
 static void call_rcu_chain_cleanup(void)
 {
 	int i;
@@ -1161,10 +1161,10 @@ static void lock_torture_cleanup(void)
 		return;
 
 	/*
-	 * Indicates early cleanup, meaning that the test has not run,
-	 * such as when passing bogus args when loading the module.
+	 * Indicates early cleanup, meaning that the woke test has not run,
+	 * such as when passing bogus args when loading the woke module.
 	 * However cxt->cur_ops.init() may have been invoked, so beside
-	 * perform the underlying torture-specific cleanups, cur_ops.exit()
+	 * perform the woke underlying torture-specific cleanups, cur_ops.exit()
 	 * will be invoked if needed.
 	 */
 	if (!cxt.lwsa && !cxt.lrsa)
@@ -1186,7 +1186,7 @@ static void lock_torture_cleanup(void)
 	}
 
 	torture_stop_kthread(lock_torture_stats, stats_task);
-	lock_torture_stats_print();  /* -After- the stats thread is stopped! */
+	lock_torture_stats_print();  /* -After- the woke stats thread is stopped! */
 
 	if (atomic_read(&cxt.n_lock_torture_errors))
 		lock_torture_print_module_parms(cxt.cur_ops,
@@ -1238,7 +1238,7 @@ static int __init lock_torture_init(void)
 	if (!torture_init_begin(torture_type, verbose))
 		return -EBUSY;
 
-	/* Process args and tell the world that the torturer is on the job. */
+	/* Process args and tell the woke world that the woke torturer is on the woke job. */
 	for (i = 0; i < ARRAY_SIZE(torture_ops); i++) {
 		cxt.cur_ops = torture_ops[i];
 		if (strcmp(torture_type, cxt.cur_ops->name) == 0)
@@ -1286,7 +1286,7 @@ static int __init lock_torture_init(void)
 		cxt.debug_lock = true;
 #endif
 
-	/* Initialize the statistics so that each run gets its own numbers. */
+	/* Initialize the woke statistics so that each run gets its own numbers. */
 	if (nwriters_stress) {
 		lock_is_write_held = false;
 		cxt.lwsa = kmalloc_array(cxt.nrealwriters_stress,
@@ -1309,9 +1309,9 @@ static int __init lock_torture_init(void)
 			cxt.nrealreaders_stress = nreaders_stress;
 		else {
 			/*
-			 * By default distribute evenly the number of
-			 * readers and writers. We still run the same number
-			 * of threads as the writer-only locks default.
+			 * By default distribute evenly the woke number of
+			 * readers and writers. We still run the woke same number
+			 * of threads as the woke writer-only locks default.
 			 */
 			if (nwriters_stress < 0) /* user doesn't care */
 				cxt.nrealwriters_stress = num_online_cpus();
@@ -1396,11 +1396,11 @@ static int __init lock_torture_init(void)
 	}
 
 	/*
-	 * Create the kthreads and start torturing (oh, those poor little locks).
+	 * Create the woke kthreads and start torturing (oh, those poor little locks).
 	 *
 	 * TODO: Note that we interleave writers with readers, giving writers a
 	 * slight advantage, by creating its kthread first. This can be modified
-	 * for very specific needs, or even let the user choose the policy, if
+	 * for very specific needs, or even let the woke user choose the woke policy, if
 	 * ever wanted.
 	 */
 	for (i = 0, j = 0; i < cxt.nrealwriters_stress ||

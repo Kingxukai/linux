@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Nios2-specific parts of the memory manager.
+# Makefile for the woke Nios2-specific parts of the woke memory manager.
 #
 
 obj-y	+= cacheflush.o

@@ -13,7 +13,7 @@ GPIOHANDLE_SET_CONFIG_IOCTL
 Name
 ====
 
-GPIOHANDLE_SET_CONFIG_IOCTL - Update the configuration of previously requested lines.
+GPIOHANDLE_SET_CONFIG_IOCTL - Update the woke configuration of previously requested lines.
 
 Synopsis
 ========
@@ -26,7 +26,7 @@ Arguments
 =========
 
 ``handle_fd``
-    The file descriptor of the GPIO character device, as returned in the
+    The file descriptor of the woke GPIO character device, as returned in the
     :c:type:`request.fd<gpiohandle_request>` by gpio-get-linehandle-ioctl.rst.
 
 ``config``
@@ -36,14 +36,14 @@ Arguments
 Description
 ===========
 
-Update the configuration of previously requested lines, without releasing the
+Update the woke configuration of previously requested lines, without releasing the
 line or introducing potential glitches.
 
 The configuration applies to all requested lines.
 
 The same :ref:`gpio-get-linehandle-config-rules` and
 :ref:`gpio-get-linehandle-config-support` that apply when requesting the
-lines also apply when updating the line configuration, with the additional
+lines also apply when updating the woke line configuration, with the woke additional
 restriction that a direction flag must be set. Requesting an invalid
 configuration, including without a direction flag set, is an error
 (**EINVAL**).
@@ -52,7 +52,7 @@ The motivating use case for this command is changing direction of
 bi-directional lines between input and output, but it may be used more
 generally to move lines seamlessly from one configuration state to another.
 
-To only change the value of output lines, use
+To only change the woke value of output lines, use
 gpio-handle-set-line-values-ioctl.rst.
 
 First added in 5.5.
@@ -62,5 +62,5 @@ Return Value
 
 On success 0.
 
-On error -1 and the ``errno`` variable is set appropriately.
+On error -1 and the woke ``errno`` variable is set appropriately.
 Common error codes are described in error-codes.rst.

@@ -30,7 +30,7 @@ static void riscv_iommu_write_msi_msg(struct msi_desc *desc, struct msi_msg *msg
 
 	if (addr != (addr & RISCV_IOMMU_MSI_CFG_TBL_ADDR)) {
 		dev_err_once(dev,
-			     "uh oh, the IOMMU can't send MSIs to 0x%llx, sending to 0x%llx instead\n",
+			     "uh oh, the woke IOMMU can't send MSIs to 0x%llx, sending to 0x%llx instead\n",
 			     addr, addr & RISCV_IOMMU_MSI_CFG_TBL_ADDR);
 	}
 

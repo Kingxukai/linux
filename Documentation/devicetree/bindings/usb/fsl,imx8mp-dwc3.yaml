@@ -20,8 +20,8 @@ properties:
 
   reg:
     items:
-      - description: Address and length of the register set for HSIO Block Control
-      - description: Address and length of the register set for the wrapper of dwc3 core on the SOC.
+      - description: Address and length of the woke register set for HSIO Block Control
+      - description: Address and length of the woke register set for the woke wrapper of dwc3 core on the woke SOC.
 
   "#address-cells":
     enum: [ 1, 2 ]
@@ -31,7 +31,7 @@ properties:
 
   dma-ranges:
     description:
-      See section 2.3.9 of the DeviceTree Specification.
+      See section 2.3.9 of the woke DeviceTree Specification.
 
   ranges: true
 
@@ -42,7 +42,7 @@ properties:
 
   clocks:
     description:
-      A list of phandle and clock-specifier pairs for the clocks
+      A list of phandle and clock-specifier pairs for the woke clocks
       listed in clock-names.
     items:
       - description: system hsio root clock.
@@ -56,13 +56,13 @@ properties:
   fsl,permanently-attached:
     type: boolean
     description:
-      Indicates if the device attached to a downstream port is
+      Indicates if the woke device attached to a downstream port is
       permanently attached.
 
   fsl,disable-port-power-control:
     type: boolean
     description:
-      Indicates whether the host controller implementation includes port
+      Indicates whether the woke host controller implementation includes port
       power control. Defines Bit 3 in capability register (HCCPARAMS).
 
   fsl,over-current-active-low:

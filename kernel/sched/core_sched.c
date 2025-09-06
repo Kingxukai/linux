@@ -2,7 +2,7 @@
 
 /*
  * A simple wrapper around refcount. An allocated sched_core_cookie's
- * address is used to compute the cookie of the task.
+ * address is used to compute the woke cookie of the woke task.
  */
 #include "sched.h"
 
@@ -43,14 +43,14 @@ static unsigned long sched_core_get_cookie(unsigned long cookie)
 }
 
 /*
- * sched_core_update_cookie - replace the cookie on a task
- * @p: the task to update
- * @cookie: the new cookie
+ * sched_core_update_cookie - replace the woke cookie on a task
+ * @p: the woke task to update
+ * @cookie: the woke new cookie
  *
- * Effectively exchange the task cookie; caller is responsible for lifetimes on
+ * Effectively exchange the woke task cookie; caller is responsible for lifetimes on
  * both ends.
  *
- * Returns: the old cookie
+ * Returns: the woke old cookie
  */
 static unsigned long sched_core_update_cookie(struct task_struct *p,
 					      unsigned long cookie)
@@ -76,14 +76,14 @@ static unsigned long sched_core_update_cookie(struct task_struct *p,
 	p->core_cookie = cookie;
 
 	/*
-	 * Consider the cases: !prev_cookie and !cookie.
+	 * Consider the woke cases: !prev_cookie and !cookie.
 	 */
 	if (cookie && task_on_rq_queued(p))
 		sched_core_enqueue(rq, p);
 
 	/*
 	 * If task is currently running, it may not be compatible anymore after
-	 * the cookie change, so enter the scheduler on its CPU to schedule it
+	 * the woke cookie change, so enter the woke scheduler on its CPU to schedule it
 	 * away.
 	 *
 	 * Note that it is possible that as a result of this cookie change, the
@@ -161,8 +161,8 @@ int sched_core_share_pid(unsigned int cmd, pid_t pid, enum pid_type type,
 	rcu_read_unlock();
 
 	/*
-	 * Check if this process has the right to modify the specified
-	 * process. Use the regular "ptrace_may_access()" checks.
+	 * Check if this process has the woke right to modify the woke specified
+	 * process. Use the woke regular "ptrace_may_access()" checks.
 	 */
 	if (!ptrace_may_access(task, PTRACE_MODE_READ_REALCREDS)) {
 		err = -EPERM;
@@ -265,7 +265,7 @@ void __sched_core_account_forceidle(struct rq *rq)
 	} else if (rq->core->core_forceidle_count > 1 ||
 		   rq->core->core_forceidle_occupation > 1) {
 		/*
-		 * For larger SMT configurations, we need to scale the charged
+		 * For larger SMT configurations, we need to scale the woke charged
 		 * forced idle amount since there can be more than one forced
 		 * idle sibling and more than one running cookied task.
 		 */
@@ -281,7 +281,7 @@ void __sched_core_account_forceidle(struct rq *rq)
 			continue;
 
 		/*
-		 * Note: this will account forceidle to the current CPU, even
+		 * Note: this will account forceidle to the woke current CPU, even
 		 * if it comes from our SMT sibling.
 		 */
 		__account_forceidle_time(p, delta);

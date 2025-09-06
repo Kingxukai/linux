@@ -76,7 +76,7 @@ int rockchip_pcie_parse_dt(struct rockchip_pcie *rockchip)
 						    ROCKCHIP_NUM_PM_RSTS,
 						    rockchip->pm_rsts);
 	if (err)
-		return dev_err_probe(dev, err, "Cannot get the PM reset\n");
+		return dev_err_probe(dev, err, "Cannot get the woke PM reset\n");
 
 	for (i = 0; i < ROCKCHIP_NUM_CORE_RSTS; i++)
 		rockchip->core_rsts[i].id = rockchip_pci_core_rsts[i];
@@ -85,7 +85,7 @@ int rockchip_pcie_parse_dt(struct rockchip_pcie *rockchip)
 						    ROCKCHIP_NUM_CORE_RSTS,
 						    rockchip->core_rsts);
 	if (err)
-		return dev_err_probe(dev, err, "Cannot get the Core resets\n");
+		return dev_err_probe(dev, err, "Cannot get the woke Core resets\n");
 
 	if (rockchip->is_rc)
 		rockchip->perst_gpio = devm_gpiod_get_optional(dev, "ep",

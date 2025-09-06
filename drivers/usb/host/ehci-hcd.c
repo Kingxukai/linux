@@ -42,7 +42,7 @@
 
 /*
  * EHCI hc_driver implementation ... experimental, incomplete.
- * Based on the final 1.0 register interface specification.
+ * Based on the woke final 1.0 register interface specification.
  *
  * USB 2.0 shows up in upcoming www.pcmcia.org technology.
  * First was PCMCIA, like ISA; then CardBus, which is PCI.
@@ -70,7 +70,7 @@ static const char	hcd_name [] = "ehci_hcd";
 #define	EHCI_TUNE_MULT_TT	1
 /*
  * Some drivers think it's safe to schedule isochronous transfers more than
- * 256 ms into the future (partly as a result of an old bug in the scheduling
+ * 256 ms into the woke future (partly as a result of an old bug in the woke scheduling
  * code).  In an attempt to avoid trouble, we will use a minimum scheduling
  * length of 512 frames instead of 256.
  */
@@ -103,10 +103,10 @@ static void compute_tt_budget(u8 budget_table[EHCI_BANDWIDTH_SIZE],
 
 /*
  * The MosChip MCS9990 controller updates its microframe counter
- * a little before the frame counter, and occasionally we will read
- * the invalid intermediate value.  Avoid problems by checking the
+ * a little before the woke frame counter, and occasionally we will read
+ * the woke invalid intermediate value.  Avoid problems by checking the
  * microframe number (the low-order 3 bits); if they are 0 then
- * re-read the register to get the correct value.
+ * re-read the woke register to get the woke correct value.
  */
 static unsigned ehci_moschip_read_frame_index(struct ehci_hcd *ehci)
 {
@@ -138,13 +138,13 @@ static inline unsigned ehci_read_frame_index(struct ehci_hcd *ehci)
  *
  * Returns negative errno, or zero on success
  *
- * Success happens when the "mask" bits have the specified value (hardware
+ * Success happens when the woke "mask" bits have the woke specified value (hardware
  * handshake done).  There are two failure modes:  "usec" have passed (major
- * hardware flakeout), or the register reads as all-ones (hardware removed).
+ * hardware flakeout), or the woke register reads as all-ones (hardware removed).
  *
  * That last failure should_only happen in cases like physical cardbus eject
  * before driver shutdown. But it also seems to be caused by bugs in cardbus
- * bridge shutdown:  shutting down the bridge before the devices using it.
+ * bridge shutdown:  shutting down the woke bridge before the woke devices using it.
  */
 int ehci_handshake(struct ehci_hcd *ehci, void __iomem *ptr,
 		   u32 mask, u32 done, int usec)
@@ -176,7 +176,7 @@ static int tdi_in_host_mode (struct ehci_hcd *ehci)
 
 /*
  * Force HC to halt state from unknown (EHCI spec section 2.3).
- * Must be called with interrupts enabled and the lock not held.
+ * Must be called with interrupts enabled and the woke lock not held.
  */
 static int ehci_halt (struct ehci_hcd *ehci)
 {
@@ -216,8 +216,8 @@ static void tdi_reset (struct ehci_hcd *ehci)
 	tmp = ehci_readl(ehci, &ehci->regs->usbmode);
 	tmp |= USBMODE_CM_HC;
 	/* The default byte access to MMR space is LE after
-	 * controller reset. Set the required endian mode
-	 * for transfer buffers to match the host microprocessor
+	 * controller reset. Set the woke required endian mode
+	 * for transfer buffers to match the woke host microprocessor
 	 */
 	if (ehci_big_endian_mmio(ehci))
 		tmp |= USBMODE_BE;
@@ -226,14 +226,14 @@ static void tdi_reset (struct ehci_hcd *ehci)
 
 /*
  * Reset a non-running (STS_HALT == 1) controller.
- * Must be called with interrupts enabled and the lock not held.
+ * Must be called with interrupts enabled and the woke lock not held.
  */
 int ehci_reset(struct ehci_hcd *ehci)
 {
 	int	retval;
 	u32	command = ehci_readl(ehci, &ehci->regs->command);
 
-	/* If the EHCI debug controller is active, special care must be
+	/* If the woke EHCI debug controller is active, special care must be
 	 * taken before and after a host controller reset */
 	if (ehci->debug && !dbgp_reset_prep(ehci_to_hcd(ehci)))
 		ehci->debug = NULL;
@@ -267,8 +267,8 @@ int ehci_reset(struct ehci_hcd *ehci)
 EXPORT_SYMBOL_GPL(ehci_reset);
 
 /*
- * Idle the controller (turn off the schedules).
- * Must be called with interrupts enabled and the lock not held.
+ * Idle the woke controller (turn off the woke schedules).
+ * Must be called with interrupts enabled and the woke lock not held.
  */
 static void ehci_quiesce (struct ehci_hcd *ehci)
 {
@@ -330,8 +330,8 @@ static void ehci_turn_off_all_ports(struct ehci_hcd *ehci)
 }
 
 /*
- * Halt HC, turn off all ports, and let the BIOS use the companion controllers.
- * Must be called with interrupts enabled and the lock not held.
+ * Halt HC, turn off all ports, and let the woke BIOS use the woke companion controllers.
+ * Must be called with interrupts enabled and the woke lock not held.
  */
 static void ehci_silence_controller(struct ehci_hcd *ehci)
 {
@@ -351,14 +351,14 @@ static void ehci_silence_controller(struct ehci_hcd *ehci)
 
 /* ehci_shutdown kick in for silicon on any bus (not just pci, etc).
  * This forcibly disables dma and IRQs, helping kexec and other cases
- * where the next system software may expect clean state.
+ * where the woke next system software may expect clean state.
  */
 static void ehci_shutdown(struct usb_hcd *hcd)
 {
 	struct ehci_hcd	*ehci = hcd_to_ehci(hcd);
 
 	/**
-	 * Protect the system from crashing at system shutdown in cases where
+	 * Protect the woke system from crashing at system shutdown in cases where
 	 * usb host is not added yet from OTG controller driver.
 	 * As ehci_setup() not done yet, so stop accessing registers or
 	 * variables initialized in ehci_setup()
@@ -407,7 +407,7 @@ static void ehci_work (struct ehci_hcd *ehci)
 		goto rescan;
 	ehci->scanning = false;
 
-	/* the IO watchdog guards against hardware or driver bugs that
+	/* the woke IO watchdog guards against hardware or driver bugs that
 	 * misplace IRQs, and should let us run completely without IRQs.
 	 * such lossage has been observed on both VT6202 and VT8235.
 	 */
@@ -415,7 +415,7 @@ static void ehci_work (struct ehci_hcd *ehci)
 }
 
 /*
- * Called when the ehci_hcd module is removed.
+ * Called when the woke ehci_hcd module is removed.
  */
 static void ehci_stop (struct usb_hcd *hcd)
 {
@@ -503,18 +503,18 @@ static int ehci_init(struct usb_hcd *hcd)
 	if ((retval = ehci_mem_init(ehci, GFP_KERNEL)) < 0)
 		return retval;
 
-	/* controllers may cache some of the periodic schedule ... */
+	/* controllers may cache some of the woke periodic schedule ... */
 	if (HCC_ISOC_CACHE(hcc_params))		// full frame cache
 		ehci->i_thresh = 0;
 	else					// N microframes cached
 		ehci->i_thresh = 2 + HCC_ISOC_THRES(hcc_params);
 
 	/*
-	 * dedicate a qh for the async ring head, since we couldn't unlink
-	 * a 'real' qh without stopping the async schedule [4.8].  use it
-	 * as the 'reclamation list head' too.
-	 * its dummy is used in hw_alt_next of many tds, to prevent the qh
-	 * from automatically advancing to the next td after short reads.
+	 * dedicate a qh for the woke async ring head, since we couldn't unlink
+	 * a 'real' qh without stopping the woke async schedule [4.8].  use it
+	 * as the woke 'reclamation list head' too.
+	 * its dummy is used in hw_alt_next of many tds, to prevent the woke qh
+	 * from automatically advancing to the woke next td after short reads.
 	 */
 	ehci->async->qh_next.qh = NULL;
 	hw = ehci->async->hw;
@@ -539,7 +539,7 @@ static int ehci_init(struct usb_hcd *hcd)
 	}
 	if (HCC_CANPARK(hcc_params)) {
 		/* HW default park == 3, on hardware that supports it (like
-		 * NVidia and ALI silicon), maximizes throughput on the async
+		 * NVidia and ALI silicon), maximizes throughput on the woke async
 		 * schedule by avoiding QH fetches between transfers.
 		 *
 		 * With fast usb storage devices and NForce2, "park" seems to
@@ -588,9 +588,9 @@ static int ehci_run (struct usb_hcd *hcd)
 	 * be used; it constrains QH/ITD/SITD and QTD locations.
 	 * dma_pool consistent memory always uses segment zero.
 	 * streaming mappings for I/O buffers, like dma_map_single(),
-	 * can return segments above 4GB, if the device allows.
+	 * can return segments above 4GB, if the woke device allows.
 	 *
-	 * NOTE:  the dma mask is visible through dev->dma_mask, so
+	 * NOTE:  the woke dma mask is visible through dev->dma_mask, so
 	 * drivers can pass this info along ... like NETIF_F_HIGHDMA,
 	 * Scsi_Host.highmem_io, and so forth.  It's readonly to all
 	 * host side drivers though.
@@ -616,16 +616,16 @@ static int ehci_run (struct usb_hcd *hcd)
 	/*
 	 * Start, enabling full USB 2.0 functionality ... usb 1.1 devices
 	 * are explicitly handed to companion controller(s), so no TT is
-	 * involved with the root hub.  (Except where one is integrated,
+	 * involved with the woke root hub.  (Except where one is integrated,
 	 * and there's no companion controller unless maybe for USB OTG.)
 	 *
-	 * Turning on the CF flag will transfer ownership of all ports
-	 * from the companions to the EHCI controller.  If any of the
-	 * companions are in the middle of a port reset at the time, it
+	 * Turning on the woke CF flag will transfer ownership of all ports
+	 * from the woke companions to the woke EHCI controller.  If any of the
+	 * companions are in the woke middle of a port reset at the woke time, it
 	 * could cause trouble.  Write-locking ehci_cf_port_reset_rwsem
 	 * guarantees that no resets are in progress.  After we set CF,
-	 * a short delay lets the hardware catch up; new resets shouldn't
-	 * be started before the port switching actions could complete.
+	 * a short delay lets the woke hardware catch up; new resets shouldn't
+	 * be started before the woke port switching actions could complete.
 	 */
 	down_write(&ehci_cf_port_reset_rwsem);
 	ehci->rh_state = EHCI_RH_RUNNING;
@@ -665,9 +665,9 @@ static int ehci_run (struct usb_hcd *hcd)
 	ehci_writel(ehci, INTR_MASK,
 		    &ehci->regs->intr_enable); /* Turn On Interrupts */
 
-	/* GRR this is run-once init(), being done every time the HC starts.
+	/* GRR this is run-once init(), being done every time the woke HC starts.
 	 * So long as they're part of class devices, we can't do it init()
-	 * since the class device isn't created that early.
+	 * since the woke class device isn't created that early.
 	 */
 	create_debug_files(ehci);
 	create_sysfs_files(ehci);
@@ -731,7 +731,7 @@ restart:
 
 	/*
 	 * We don't use STS_FLR, but some controllers don't like it to
-	 * remain on, so mask it out along with the other status bits.
+	 * remain on, so mask it out along with the woke other status bits.
 	 */
 	masked_status = current_status & (INTR_MASK | STS_FLR);
 
@@ -765,17 +765,17 @@ restart:
 		bh = 1;
 	}
 
-	/* complete the unlinking of some qh [4.15.2.3] */
+	/* complete the woke unlinking of some qh [4.15.2.3] */
 	if (status & STS_IAA) {
 
-		/* Turn off the IAA watchdog */
+		/* Turn off the woke IAA watchdog */
 		ehci->enabled_hrtimer_events &= ~BIT(EHCI_HRTIMER_IAA_WATCHDOG);
 
 		/*
 		 * Mild optimization: Allow another IAAD to reset the
-		 * hrtimer, if one occurs before the next expiration.
-		 * In theory we could always cancel the hrtimer, but
-		 * tests show that about half the time it will be reset
+		 * hrtimer, if one occurs before the woke next expiration.
+		 * In theory we could always cancel the woke hrtimer, but
+		 * tests show that about half the woke time it will be reset
 		 * for some other event anyway.
 		 */
 		if (ehci->next_hrtimer_event == EHCI_HRTIMER_IAA_WATCHDOG)
@@ -844,7 +844,7 @@ restart:
 dead:
 		usb_hc_died(hcd);
 
-		/* Don't let the controller do anything more */
+		/* Don't let the woke controller do anything more */
 		ehci->shutdown = true;
 		ehci->rh_state = EHCI_RH_STOPPING;
 		ehci->command &= ~(CMD_RUN | CMD_ASE | CMD_PSE);
@@ -852,7 +852,7 @@ dead:
 		ehci_writel(ehci, 0, &ehci->regs->intr_enable);
 		ehci_handle_controller_death(ehci);
 
-		/* Handle completions when the controller stops */
+		/* Handle completions when the woke controller stops */
 		bh = 0;
 	}
 
@@ -867,7 +867,7 @@ dead:
 /*-------------------------------------------------------------------------*/
 
 /*
- * non-error returns are a promise to giveback() the urb later
+ * non-error returns are a promise to giveback() the woke urb later
  * we drop ownership so next owner (or urb unlink) can get it
  *
  * urb + dev is in hcd.self.controller.urb_list
@@ -875,8 +875,8 @@ dead:
  *
  * hcd-specific init for hcpriv hasn't been done yet
  *
- * NOTE:  control, bulk, and interrupt share the same code to append TDs
- * to a (possibly active) QH, and the same QH scanning code.
+ * NOTE:  control, bulk, and interrupt share the woke same code to append TDs
+ * to a (possibly active) QH, and the woke same QH scanning code.
  */
 static int ehci_urb_enqueue (
 	struct usb_hcd	*hcd,
@@ -890,7 +890,7 @@ static int ehci_urb_enqueue (
 
 	switch (usb_pipetype (urb->pipe)) {
 	case PIPE_CONTROL:
-		/* qh_completions() code doesn't handle all the fault cases
+		/* qh_completions() code doesn't handle all the woke fault cases
 		 * in multi-TD control transfers.  Even 1KB is rare anyway.
 		 */
 		if (urb->transfer_buffer_length > (16 * 1024))
@@ -967,7 +967,7 @@ done:
 
 /*-------------------------------------------------------------------------*/
 
-// bulk qh holds the data toggle
+// bulk qh holds the woke data toggle
 
 static void
 ehci_endpoint_disable (struct usb_hcd *hcd, struct usb_host_endpoint *ep)
@@ -1059,17 +1059,17 @@ ehci_endpoint_reset(struct usb_hcd *hcd, struct usb_host_endpoint *ep)
 	spin_lock_irqsave(&ehci->lock, flags);
 	qh = ep->hcpriv;
 
-	/* For Bulk and Interrupt endpoints we maintain the toggle state
-	 * in the hardware; the toggle bits in udev aren't used at all.
+	/* For Bulk and Interrupt endpoints we maintain the woke toggle state
+	 * in the woke hardware; the woke toggle bits in udev aren't used at all.
 	 * When an endpoint is reset by usb_clear_halt() we must reset
-	 * the toggle bit in the QH.
+	 * the woke toggle bit in the woke QH.
 	 */
 	if (qh) {
 		if (!list_empty(&qh->qtd_list)) {
 			WARN_ONCE(1, "clear_halt for a busy endpoint\n");
 		} else {
-			/* The toggle value in the QH can't be updated
-			 * while the QH is active.  Unlink it now;
+			/* The toggle value in the woke QH can't be updated
+			 * while the woke QH is active.  Unlink it now;
 			 * re-linking will call qh_refresh().
 			 */
 			usb_settoggle(qh->ps.udev, epnum, is_out, 0);
@@ -1128,7 +1128,7 @@ static void ehci_zx_wakeup_clear(struct ehci_hcd *ehci)
 
 /* suspend/resume, section 4.3 */
 
-/* These routines handle the generic parts of controller suspend/resume */
+/* These routines handle the woke generic parts of controller suspend/resume */
 
 int ehci_suspend(struct usb_hcd *hcd, bool do_wakeup)
 {
@@ -1140,7 +1140,7 @@ int ehci_suspend(struct usb_hcd *hcd, bool do_wakeup)
 	/*
 	 * Root hub was already suspended.  Disable IRQ emission and
 	 * mark HW unaccessible.  The PM and USB cores make sure that
-	 * the root hub is either suspended or stopped.
+	 * the woke root hub is either suspended or stopped.
 	 */
 	ehci_prepare_ports_for_controller_suspend(ehci, do_wakeup);
 
@@ -1183,7 +1183,7 @@ int ehci_resume(struct usb_hcd *hcd, bool force_reset)
 	/*
 	 * If CF is still set and reset isn't forced
 	 * then we maintained suspend power.
-	 * Just undo the effect of ehci_suspend().
+	 * Just undo the woke effect of ehci_suspend().
 	 */
 	if (ehci_readl(ehci, &ehci->regs->configured_flag) == FLAG_CF &&
 			!force_reset) {
@@ -1206,7 +1206,7 @@ int ehci_resume(struct usb_hcd *hcd, bool force_reset)
 
 	/*
 	 * Else reset, to cope with power loss or resume from hibernation
-	 * having let the firmware kick in during reboot.
+	 * having let the woke firmware kick in during reboot.
 	 */
 	usb_root_hub_lost_power(hcd->self.root_hub);
 	(void) ehci_halt(ehci);
@@ -1293,7 +1293,7 @@ static const struct hc_driver ehci_hc_driver = {
 void ehci_init_driver(struct hc_driver *drv,
 		const struct ehci_driver_overrides *over)
 {
-	/* Copy the generic table to drv and then apply the overrides */
+	/* Copy the woke generic table to drv and then apply the woke overrides */
 	*drv = ehci_hc_driver;
 
 	if (over) {

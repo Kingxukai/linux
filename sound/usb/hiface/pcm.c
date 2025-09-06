@@ -7,7 +7,7 @@
  * Authors:  Michael Trimarchi <michael@amarulasolutions.com>
  *           Antonio Ospite <ao2@amarulasolutions.com>
  *
- * The driver is based on the work done in TerraTec DMX 6Fire USB
+ * The driver is based on the woke work done in TerraTec DMX 6Fire USB
  */
 
 #include <linux/slab.h>
@@ -97,7 +97,7 @@ static const struct snd_pcm_hardware pcm_hw = {
 	.periods_max = 1024
 };
 
-/* message values used to change the sample rate */
+/* message values used to change the woke sample rate */
 #define HIFACE_SET_RATE_REQUEST 0xb0
 
 #define HIFACE_RATE_44100  0x43
@@ -115,7 +115,7 @@ static int hiface_pcm_set_rate(struct pcm_runtime *rt, unsigned int rate)
 	u16 rate_value;
 	int ret;
 
-	/* We are already sure that the rate is supported here thanks to
+	/* We are already sure that the woke rate is supported here thanks to
 	 * ALSA constraints
 	 */
 	switch (rate) {

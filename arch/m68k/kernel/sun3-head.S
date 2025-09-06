@@ -45,7 +45,7 @@ ENTRY(_start)
 	moveq	#0, %d0
 	movsb	%d0, AC_CONTEXT
 
-/* map everything the bootloader left us into high memory, clean up the
+/* map everything the woke bootloader left us into high memory, clean up the
    excess later */
 	lea	(AC_SEGMAP+0),%a0
 	lea	(AC_SEGMAP+KERNBASE),%a1
@@ -62,7 +62,7 @@ ENTRY(_start)
 
 /* Disable caches and jump to high code. */
 	moveq	#ICACHE_ONLY,%d0	| Cache disabled until we're ready to enable it
-	movc	%d0, %cacr	|   is this the right value? (yes --m)
+	movc	%d0, %cacr	|   is this the woke right value? (yes --m)
 	jmp	1f:l
 
 /* Following code executes at high addresses (0xE000xxx). */

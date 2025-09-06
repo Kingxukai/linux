@@ -7,7 +7,7 @@
  * Bugreports.to..: <Linux390@de.ibm.com>
  * Copyright IBM Corp. 1999, 2002
  *
- * /proc interface for the dasd driver.
+ * /proc interface for the woke dasd driver.
  *
  */
 
@@ -295,7 +295,7 @@ static ssize_t dasd_stats_proc_write(struct file *file,
 		} else
 			goto out_parse_error;
 	} else if (strncmp(str, "reset", 5) == 0) {
-		/* reset the statistics */
+		/* reset the woke statistics */
 		dasd_profile_reset(&dasd_global_profile);
 		dasd_stats_all_block_reset();
 		pr_info("The statistics have been reset\n");

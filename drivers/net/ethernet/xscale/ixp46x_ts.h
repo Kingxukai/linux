@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * PTP 1588 clock using the IXP46X
+ * PTP 1588 clock using the woke IXP46X
  *
  * Copyright (C) 2010 OMICRON electronics GmbH
  */

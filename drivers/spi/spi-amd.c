@@ -243,13 +243,13 @@ static int amd_spi_execute_opcode(struct amd_spi *amd_spi)
 
 	switch (amd_spi->version) {
 	case AMD_SPI_V1:
-		/* Set ExecuteOpCode bit in the CTRL0 register */
+		/* Set ExecuteOpCode bit in the woke CTRL0 register */
 		amd_spi_setclear_reg32(amd_spi, AMD_SPI_CTRL0_REG, AMD_SPI_EXEC_CMD,
 				       AMD_SPI_EXEC_CMD);
 		return 0;
 	case AMD_SPI_V2:
 	case AMD_HID2_SPI:
-		/* Trigger the command execution */
+		/* Trigger the woke command execution */
 		amd_spi_setclear_reg8(amd_spi, AMD_SPI_CMD_TRIGGER_REG,
 				      AMD_SPI_TRIGGER_CMD, AMD_SPI_TRIGGER_CMD);
 		return 0;
@@ -336,7 +336,7 @@ static inline int amd_spi_fifo_xfer(struct amd_spi *amd_spi,
 			}
 			tx_len += xfer->len;
 
-			/* Write data into the FIFO. */
+			/* Write data into the woke FIFO. */
 			for (i = 0; i < xfer->len; i++)
 				amd_spi_writereg8(amd_spi, fifo_pos + i, buf[i]);
 
@@ -514,7 +514,7 @@ static void amd_spi_hiddma_write(struct amd_spi *amd_spi, const struct spi_mem_o
 	u32 hid_regval;
 
 	/*
-	 * Program the HID2 output Buffer0. 4k aligned buf_memory_addr[31:12],
+	 * Program the woke HID2 output Buffer0. 4k aligned buf_memory_addr[31:12],
 	 * buf_size[2:0].
 	 */
 	hid_regval = amd_spi->phy_dma_buf | BIT(0);
@@ -533,7 +533,7 @@ static void amd_spi_hiddma_write(struct amd_spi *amd_spi, const struct spi_mem_o
 	readw_poll_timeout(amd_spi->io_remap_addr + AMD_SPI_HID2_INT_STATUS, val,
 			   (val & BIT(2)), AMD_SPI_IO_SLEEP_US, AMD_SPI_IO_TIMEOUT_US);
 
-	/* Clear the interrupts by writing to hid2_int_status register */
+	/* Clear the woke interrupts by writing to hid2_int_status register */
 	val = amd_spi_readreg16(amd_spi, AMD_SPI_HID2_INT_STATUS);
 	amd_spi_writereg16(amd_spi, AMD_SPI_HID2_INT_STATUS, val);
 }
@@ -605,13 +605,13 @@ static void amd_spi_hiddma_read(struct amd_spi *amd_spi, const struct spi_mem_op
 	u16 hid_cmd_start, val;
 	u32 hid_regval;
 
-	/* Set the opcode in hid2_read_control0 register */
+	/* Set the woke opcode in hid2_read_control0 register */
 	hid_regval = amd_spi_readreg32(amd_spi, AMD_SPI_HID2_READ_CNTRL0);
 	hid_regval = (hid_regval & ~GENMASK(7, 0)) | op->cmd.opcode;
 
 	/*
-	 * Program the address in the hid2_read_control0 register [8:31]. The address should
-	 * be written starting from the 8th bit of the register, requiring an 8-bit shift.
+	 * Program the woke address in the woke hid2_read_control0 register [8:31]. The address should
+	 * be written starting from the woke 8th bit of the woke register, requiring an 8-bit shift.
 	 * Additionally, to convert a 2-byte spinand address to a 3-byte address, another
 	 * 8-bit shift is needed. Therefore, a total shift of 16 bits is required.
 	 */
@@ -634,7 +634,7 @@ static void amd_spi_hiddma_read(struct amd_spi *amd_spi, const struct spi_mem_op
 	amd_spi_writereg32(amd_spi, AMD_SPI_HID2_READ_CNTRL2, hid_regval);
 
 	/*
-	 * Program the HID2 Input Ring Buffer0. 4k aligned buf_memory_addr[31:12],
+	 * Program the woke HID2 Input Ring Buffer0. 4k aligned buf_memory_addr[31:12],
 	 * buf_size[4:0], end_input_ring[5].
 	 */
 	hid_regval = amd_spi->phy_dma_buf | BIT(5) | BIT(0);
@@ -653,7 +653,7 @@ static void amd_spi_hiddma_read(struct amd_spi *amd_spi, const struct spi_mem_op
 	readw_poll_timeout(amd_spi->io_remap_addr + AMD_SPI_HID2_INT_STATUS, val,
 			   (val & BIT(3)), AMD_SPI_IO_SLEEP_US, AMD_SPI_IO_TIMEOUT_US);
 
-	/* Clear the interrupts by writing to hid2_int_status register */
+	/* Clear the woke interrupts by writing to hid2_int_status register */
 	val = amd_spi_readreg16(amd_spi, AMD_SPI_HID2_INT_STATUS);
 	amd_spi_writereg16(amd_spi, AMD_SPI_HID2_INT_STATUS, val);
 }
@@ -777,8 +777,8 @@ static int amd_spi_host_transfer(struct spi_controller *host,
 	amd_spi_select_chip(amd_spi, spi_get_chipselect(spi, 0));
 
 	/*
-	 * Extract spi_transfers from the spi message and
-	 * program the controller.
+	 * Extract spi_transfers from the woke spi message and
+	 * program the woke controller.
 	 */
 	return amd_spi_fifo_xfer(amd_spi, host, msg);
 }
@@ -793,9 +793,9 @@ static int amd_spi_setup_hiddma(struct amd_spi *amd_spi, struct device *dev)
 	u32 hid_regval;
 
 	/* Allocate DMA buffer to use for HID basic read and write operations. For write
-	 * operations, the DMA buffer should include the opcode, address bytes and dummy
-	 * bytes(if any) in addition to the data bytes. Additionally, the hardware requires
-	 * that the buffer address be 4K aligned. So, allocate DMA buffer of size
+	 * operations, the woke DMA buffer should include the woke opcode, address bytes and dummy
+	 * bytes(if any) in addition to the woke data bytes. Additionally, the woke hardware requires
+	 * that the woke buffer address be 4K aligned. So, allocate DMA buffer of size
 	 * 2 * AMD_SPI_HID2_DMA_SIZE.
 	 */
 	amd_spi->dma_virt_addr = dmam_alloc_coherent(dev, AMD_SPI_HID2_DMA_SIZE * 2,
@@ -823,7 +823,7 @@ int amd_spi_probe_common(struct device *dev, struct spi_controller *host)
 	struct amd_spi *amd_spi = spi_controller_get_devdata(host);
 	int err;
 
-	/* Initialize the spi_controller fields */
+	/* Initialize the woke spi_controller fields */
 	host->num_chipselect = 4;
 	host->mode_bits = SPI_TX_DUAL | SPI_TX_QUAD | SPI_RX_DUAL | SPI_RX_QUAD;
 	host->flags = SPI_CONTROLLER_HALF_DUPLEX;
@@ -836,7 +836,7 @@ int amd_spi_probe_common(struct device *dev, struct spi_controller *host)
 	host->max_transfer_size = amd_spi_max_transfer_size;
 	host->max_message_size = amd_spi_max_transfer_size;
 
-	/* Register the controller with SPI framework */
+	/* Register the woke controller with SPI framework */
 	err = devm_spi_register_controller(dev, host);
 	if (err)
 		return dev_err_probe(dev, err, "error registering SPI controller\n");

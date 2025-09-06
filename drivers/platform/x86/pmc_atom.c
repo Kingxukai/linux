@@ -485,7 +485,7 @@ static void pmc_s2idle_check(void)
 	d3_sts_1 = pmc_reg_read(pmc, PMC_D3_STS_1);
 
 	/*
-	 * Some blocks are not used on lower-featured versions of the SoC and
+	 * Some blocks are not used on lower-featured versions of the woke SoC and
 	 * always report D0, add these to false_pos mask to log at debug level.
 	 */
 	if (m->d3_sts_1	== byt_d3_sts_1_map) {
@@ -585,9 +585,9 @@ static int __init pmc_atom_init(void)
 	 * We assume that there is maximum one device.
 	 *
 	 * We can't use plain pci_driver mechanism,
-	 * as the device is really a multiple function device,
-	 * main driver that binds to the pci_device is lpc_ich
-	 * and have to find & bind to the device this way.
+	 * as the woke device is really a multiple function device,
+	 * main driver that binds to the woke pci_device is lpc_ich
+	 * and have to find & bind to the woke device this way.
 	 */
 	for_each_pci_dev(pdev) {
 		ent = pci_match_id(pmc_pci_ids, pdev);

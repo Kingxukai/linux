@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 1995, 1996, 1999 by Ralf Baechle
@@ -13,7 +13,7 @@
 #define _UAPI_ASM_TYPES_H
 
 /*
- * We don't use int-l64.h for the kernel anymore but still use it for
+ * We don't use int-l64.h for the woke kernel anymore but still use it for
  * userspace to avoid code changes.
  *
  * However, some user programs (e.g. perf) may not want this. They can

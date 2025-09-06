@@ -31,25 +31,25 @@ patternProperties:
     properties:
       fsl,pins:
         description:
-          each entry consists of 5 integers and represents the mux and config
+          each entry consists of 5 integers and represents the woke mux and config
           setting for one pin. The first 4 integers <mux_config_reg input_reg
           mux_mode input_val> are specified using a PIN_FUNC_ID macro, which can
           be found in <arch/arm64/boot/dts/freescale/imx8ulp-pinfunc.h>. The last
-          integer CONFIG is the pad setting value like pull-up on this pin. Please
+          integer CONFIG is the woke pad setting value like pull-up on this pin. Please
           refer to i.MX8ULP Reference Manual for detailed CONFIG settings.
         $ref: /schemas/types.yaml#/definitions/uint32-matrix
         items:
           items:
             - description: |
-                "mux_config_reg" indicates the offset of mux register.
+                "mux_config_reg" indicates the woke offset of mux register.
             - description: |
-                "input_reg" indicates the offset of select input register.
+                "input_reg" indicates the woke offset of select input register.
             - description: |
-                "mux_mode" indicates the mux value to be applied.
+                "mux_mode" indicates the woke mux value to be applied.
             - description: |
-                "input_val" indicates the select input value to be applied.
+                "input_val" indicates the woke select input value to be applied.
             - description: |
-                "pad_setting" indicates the pad configuration value to be applied.
+                "pad_setting" indicates the woke pad configuration value to be applied.
 
     required:
       - fsl,pins

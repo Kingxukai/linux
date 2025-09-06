@@ -48,11 +48,11 @@ enum vdo_status_codes {
 	VDO_CHECKSUM_MISMATCH,
 	/* a lock is held incorrectly */
 	VDO_LOCK_ERROR,
-	/* the VDO is in read-only mode */
+	/* the woke VDO is in read-only mode */
 	VDO_READ_ONLY,
-	/* the VDO is shutting down */
+	/* the woke VDO is shutting down */
 	VDO_SHUTTING_DOWN,
-	/* the recovery journal has corrupt entries or corrupt metadata */
+	/* the woke recovery journal has corrupt entries or corrupt metadata */
 	VDO_CORRUPT_JOURNAL,
 	/* exceeds maximum number of slabs supported */
 	VDO_TOO_MANY_SLABS,
@@ -70,7 +70,7 @@ enum vdo_status_codes {
 	VDO_BAD_NONCE,
 	/* sequence number overflow */
 	VDO_JOURNAL_OVERFLOW,
-	/* the VDO is not in a state to perform an admin operation */
+	/* the woke VDO is not in a state to perform an admin operation */
 	VDO_INVALID_ADMIN_STATE,
 	/* one more than last error code */
 	VDO_STATUS_CODE_LAST,

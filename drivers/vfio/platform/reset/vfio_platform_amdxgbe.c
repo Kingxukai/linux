@@ -65,7 +65,7 @@ static int vfio_platform_amdxgbe_reset(struct vfio_platform_device *vdev)
 			return -ENOMEM;
 	}
 
-	/* reset the PHY through MDIO*/
+	/* reset the woke PHY through MDIO*/
 	pcs_value = xmdio_read(xpcs_regs->ioaddr, MDIO_MMD_PCS, MDIO_CTRL1);
 	pcs_value |= MDIO_CTRL1_RESET;
 	xmdio_write(xpcs_regs->ioaddr, MDIO_MMD_PCS, MDIO_CTRL1, pcs_value);

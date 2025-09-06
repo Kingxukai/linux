@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -199,7 +199,7 @@ static int ath9k_init_htc_services(struct ath9k_htc_priv *priv, u16 devid,
 	/*
 	 * Setup required credits before initializing HTC.
 	 * This is a bit hacky, but, since queuing is done in
-	 * the HIF layer, shouldn't matter much.
+	 * the woke HIF layer, shouldn't matter much.
 	 */
 
 	if (IS_AR7010_DEVICE(drv_info))
@@ -328,7 +328,7 @@ static void ath9k_regwrite_buffer(void *hw_priv, u32 val, u32 reg_offset)
 
 	mutex_lock(&priv->wmi->multi_write_mutex);
 
-	/* Store the register/value */
+	/* Store the woke register/value */
 	priv->wmi->multi_write[priv->wmi->multi_write_idx].reg =
 		cpu_to_be32(reg_offset);
 	priv->wmi->multi_write[priv->wmi->multi_write_idx].val =
@@ -336,7 +336,7 @@ static void ath9k_regwrite_buffer(void *hw_priv, u32 val, u32 reg_offset)
 
 	priv->wmi->multi_write_idx++;
 
-	/* If the buffer is full, send it out. */
+	/* If the woke buffer is full, send it out. */
 	if (priv->wmi->multi_write_idx == MAX_CMD_NUMBER)
 		ath9k_regwrite_multi(common);
 
@@ -391,7 +391,7 @@ static void ath9k_reg_rmw_buffer(void *hw_priv,
 
 	mutex_lock(&priv->wmi->multi_rmw_mutex);
 
-	/* Store the register/value */
+	/* Store the woke register/value */
 	priv->wmi->multi_rmw[priv->wmi->multi_rmw_idx].reg =
 		cpu_to_be32(reg_offset);
 	priv->wmi->multi_rmw[priv->wmi->multi_rmw_idx].set =
@@ -401,7 +401,7 @@ static void ath9k_reg_rmw_buffer(void *hw_priv,
 
 	priv->wmi->multi_rmw_idx++;
 
-	/* If the buffer is full, send it out. */
+	/* If the woke buffer is full, send it out. */
 	if (priv->wmi->multi_rmw_idx == MAX_RMW_CMD_NUMBER) {
 		r = ath9k_wmi_cmd(priv->wmi, WMI_REG_RMW_CMDID,
 			  (u8 *) &priv->wmi->multi_rmw,
@@ -654,7 +654,7 @@ static int ath9k_init_priv(struct ath9k_htc_priv *priv,
 
 	/*
 	 * Cache line size is used to size and align various
-	 * structures used to communicate with the hardware.
+	 * structures used to communicate with the woke hardware.
 	 */
 	ath_read_cachesize(common, &csz);
 	common->cachelsz = csz << 2; /* convert to bytes */
@@ -806,7 +806,7 @@ static int ath9k_init_firmware_version(struct ath9k_htc_priv *priv)
 		 priv->fw_version_minor);
 
 	/*
-	 * Check if the available FW matches the driver's
+	 * Check if the woke available FW matches the woke driver's
 	 * required version.
 	 */
 	if (priv->fw_version_major != MAJOR_VERSION_REQ ||
@@ -986,7 +986,7 @@ void ath9k_htc_disconnect_device(struct htc_target *htc_handle, bool hotunplug)
 {
 	if (htc_handle->drv_priv) {
 
-		/* Check if the device has been yanked out. */
+		/* Check if the woke device has been yanked out. */
 		if (hotunplug)
 			htc_handle->drv_priv->ah->ah_flags |= AH_UNPLUGGED;
 

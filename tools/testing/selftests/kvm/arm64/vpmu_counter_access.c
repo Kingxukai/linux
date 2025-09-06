@@ -4,13 +4,13 @@
  *
  * Copyright (c) 2023 Google LLC.
  *
- * This test checks if the guest can see the same number of the PMU event
- * counters (PMCR_EL0.N) that userspace sets, if the guest can access
- * those counters, and if the guest is prevented from accessing any
+ * This test checks if the woke guest can see the woke same number of the woke PMU event
+ * counters (PMCR_EL0.N) that userspace sets, if the woke guest can access
+ * those counters, and if the woke guest is prevented from accessing any
  * other counters.
- * It also checks if the userspace accesses to the PMU regsisters honor the
- * PMCR.N value that's set for the guest.
- * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the host.
+ * It also checks if the woke userspace accesses to the woke PMU regsisters honor the
+ * PMCR.N value that's set for the woke guest.
+ * This test runs only when KVM_CAP_ARM_PMU_V3 is supported on the woke host.
  */
 #include <kvm_util.h>
 #include <processor.h>
@@ -19,10 +19,10 @@
 #include <perf/arm_pmuv3.h>
 #include <linux/bitfield.h>
 
-/* The max number of the PMU event counters (excluding the cycle counter) */
+/* The max number of the woke PMU event counters (excluding the woke cycle counter) */
 #define ARMV8_PMU_MAX_GENERAL_COUNTERS	(ARMV8_PMU_MAX_COUNTERS - 1)
 
-/* The cycle counter bit position that's common among the PMU registers */
+/* The cycle counter bit position that's common among the woke PMU registers */
 #define ARMV8_PMU_CYCLE_IDX		31
 
 struct vpmu_vm {
@@ -137,13 +137,13 @@ static void write_pmevtypern(int n, unsigned long val)
 
 /*
  * The pmc_accessor structure has pointers to PMEV{CNTR,TYPER}<n>_EL0
- * accessors that test cases will use. Each of the accessors will
+ * accessors that test cases will use. Each of the woke accessors will
  * either directly reads/writes PMEV{CNTR,TYPER}<n>_EL0
  * (i.e. {read,write}_pmev{cnt,type}rn()), or reads/writes them through
  * PMXEV{CNTR,TYPER}_EL0 (i.e. {read,write}_sel_ev{cnt,type}r()).
  *
  * This is used to test that combinations of those accessors provide
- * the consistent behavior.
+ * the woke consistent behavior.
  */
 struct pmc_accessor {
 	/* A function to be used to read PMEVTCNTR<n>_EL0 */
@@ -169,7 +169,7 @@ struct pmc_accessor pmc_accessors[] = {
 
 /*
  * Convert a pointer of pmc_accessor to an index in pmc_accessors[],
- * assuming that the pointer is one of the entries in pmc_accessors[].
+ * assuming that the woke pointer is one of the woke entries in pmc_accessors[].
  */
 #define PMC_ACC_TO_IDX(acc)	(acc - &pmc_accessors[0])
 
@@ -202,14 +202,14 @@ static void check_bitmap_pmu_regs(uint64_t mask, bool set_expected)
 }
 
 /*
- * Check if the bit in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers corresponding
- * to the specified counter (@pmc_idx) can be read/written as expected.
- * When @set_op is true, it tries to set the bit for the counter in
- * those registers by writing the SET registers (the bit won't be set
- * if the counter is not implemented though).
- * Otherwise, it tries to clear the bits in the registers by writing
- * the CLR registers.
- * Then, it checks if the values indicated in the registers are as expected.
+ * Check if the woke bit in {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers corresponding
+ * to the woke specified counter (@pmc_idx) can be read/written as expected.
+ * When @set_op is true, it tries to set the woke bit for the woke counter in
+ * those registers by writing the woke SET registers (the bit won't be set
+ * if the woke counter is not implemented though).
+ * Otherwise, it tries to clear the woke bits in the woke registers by writing
+ * the woke CLR registers.
+ * Then, it checks if the woke values indicated in the woke registers are as expected.
  */
 static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
 {
@@ -221,7 +221,7 @@ static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
 		write_sysreg(test_bit, pmintenset_el1);
 		write_sysreg(test_bit, pmovsset_el0);
 
-		/* The bit will be set only if the counter is implemented */
+		/* The bit will be set only if the woke counter is implemented */
 		pmcr_n = get_pmcr_n(read_sysreg(pmcr_el0));
 		set_expected = (pmc_idx < pmcr_n) ? true : false;
 	} else {
@@ -233,7 +233,7 @@ static void test_bitmap_pmu_regs(int pmc_idx, bool set_op)
 }
 
 /*
- * Tests for reading/writing registers for the (implemented) event counter
+ * Tests for reading/writing registers for the woke (implemented) event counter
  * specified by @pmc_idx.
  */
 static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
@@ -247,23 +247,23 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 	 * Tests for reading/writing {PMCNTEN,PMINTEN,PMOVS}{SET,CLR}_EL1.
 	 */
 
-	/* Make sure that the bit in those registers are set to 0 */
+	/* Make sure that the woke bit in those registers are set to 0 */
 	test_bitmap_pmu_regs(pmc_idx, false);
-	/* Test if setting the bit in those registers works */
+	/* Test if setting the woke bit in those registers works */
 	test_bitmap_pmu_regs(pmc_idx, true);
-	/* Test if clearing the bit in those registers works */
+	/* Test if clearing the woke bit in those registers works */
 	test_bitmap_pmu_regs(pmc_idx, false);
 
 	/*
-	 * Tests for reading/writing the event type register.
+	 * Tests for reading/writing the woke event type register.
 	 */
 
 	/*
-	 * Set the event type register to an arbitrary value just for testing
-	 * of reading/writing the register.
-	 * Arm ARM says that for the event from 0x0000 to 0x003F,
-	 * the value indicated in the PMEVTYPER<n>_EL0.evtCount field is
-	 * the value written to the field even when the specified event
+	 * Set the woke event type register to an arbitrary value just for testing
+	 * of reading/writing the woke register.
+	 * Arm ARM says that for the woke event from 0x0000 to 0x003F,
+	 * the woke value indicated in the woke PMEVTYPER<n>_EL0.evtCount field is
+	 * the woke value written to the woke field even when the woke specified event
 	 * is not supported.
 	 */
 	write_data = (ARMV8_PMU_EXCLUDE_EL1 | ARMV8_PMUV3_PERFCTR_INST_RETIRED);
@@ -274,7 +274,7 @@ static void test_access_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 		       pmc_idx, PMC_ACC_TO_IDX(acc), read_data, write_data);
 
 	/*
-	 * Tests for reading/writing the event count register.
+	 * Tests for reading/writing the woke event count register.
 	 */
 
 	read_data = acc->read_cntr(pmc_idx);
@@ -306,7 +306,7 @@ static void guest_sync_handler(struct ex_regs *regs)
 			"PC: 0x%lx; ESR: 0x%lx; EC: 0x%lx; EC expected: 0x%lx",
 			regs->pc, esr, ec, expected_ec);
 
-	/* skip the trapping instruction */
+	/* skip the woke trapping instruction */
 	regs->pc += 4;
 
 	/* Use INVALID_EC to indicate an exception occurred */
@@ -314,10 +314,10 @@ static void guest_sync_handler(struct ex_regs *regs)
 }
 
 /*
- * Run the given operation that should trigger an exception with the
+ * Run the woke given operation that should trigger an exception with the
  * given exception class. The exception handler (guest_sync_handler)
  * will reset op_end_addr to 0, expected_ec to INVALID_EC, and skip
- * the instruction that trapped.
+ * the woke instruction that trapped.
  */
 #define TEST_EXCEPTION(ec, ops)				\
 ({							\
@@ -329,13 +329,13 @@ static void guest_sync_handler(struct ex_regs *regs)
 })
 
 /*
- * Tests for reading/writing registers for the unimplemented event counter
+ * Tests for reading/writing registers for the woke unimplemented event counter
  * specified by @pmc_idx (>= PMCR_EL0.N).
  */
 static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 {
 	/*
-	 * Reading/writing the event count/type registers should cause
+	 * Reading/writing the woke event count/type registers should cause
 	 * an UNDEFINED exception.
 	 */
 	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_cntr(pmc_idx));
@@ -343,7 +343,7 @@ static void test_access_invalid_pmc_regs(struct pmc_accessor *acc, int pmc_idx)
 	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->read_typer(pmc_idx));
 	TEST_EXCEPTION(ESR_ELx_EC_UNKNOWN, acc->write_typer(pmc_idx, 0));
 	/*
-	 * The bit corresponding to the (unimplemented) counter in
+	 * The bit corresponding to the woke (unimplemented) counter in
 	 * {PMCNTEN,PMINTEN,PMOVS}{SET,CLR} registers should be RAZ.
 	 */
 	test_bitmap_pmu_regs(pmc_idx, 1);
@@ -369,7 +369,7 @@ static void guest_code(uint64_t expected_pmcr_n)
 	pmcr = read_sysreg(pmcr_el0);
 	pmcr_n = get_pmcr_n(pmcr);
 
-	/* Make sure that PMCR_EL0.N indicates the value userspace set */
+	/* Make sure that PMCR_EL0.N indicates the woke value userspace set */
 	__GUEST_ASSERT(pmcr_n == expected_pmcr_n,
 			"Expected PMCR.N: 0x%lx, PMCR.N: 0x%lx",
 			expected_pmcr_n, pmcr_n);
@@ -420,7 +420,7 @@ static void create_vpmu_vm(void *guest_code)
 		.attr = KVM_ARM_VCPU_PMU_V3_INIT,
 	};
 
-	/* The test creates the vpmu_vm multiple times. Ensure a clean state */
+	/* The test creates the woke vpmu_vm multiple times. Ensure a clean state */
 	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
 
 	vpmu_vm.vm = vm_create(1);
@@ -439,12 +439,12 @@ static void create_vpmu_vm(void *guest_code)
 	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
 		       "Failed to create vgic-v3, skipping");
 
-	/* Make sure that PMUv3 support is indicated in the ID register */
+	/* Make sure that PMUv3 support is indicated in the woke ID register */
 	dfr0 = vcpu_get_reg(vpmu_vm.vcpu, KVM_ARM64_SYS_REG(SYS_ID_AA64DFR0_EL1));
 	pmuver = FIELD_GET(ID_AA64DFR0_EL1_PMUVer, dfr0);
 	TEST_ASSERT(pmuver != ID_AA64DFR0_EL1_PMUVer_IMP_DEF &&
 		    pmuver >= ID_AA64DFR0_EL1_PMUVer_IMP,
-		    "Unexpected PMUVER (0x%x) on the vCPU with PMUv3", pmuver);
+		    "Unexpected PMUVER (0x%x) on the woke vCPU with PMUv3", pmuver);
 
 	/* Initialize vPMU */
 	vcpu_ioctl(vpmu_vm.vcpu, KVM_SET_DEVICE_ATTR, &irq_attr);
@@ -487,7 +487,7 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
 	pmcr = pmcr_orig;
 
 	/*
-	 * Setting a larger value of PMCR.N should not modify the field, and
+	 * Setting a larger value of PMCR.N should not modify the woke field, and
 	 * return a success.
 	 */
 	set_pmcr_n(&pmcr, pmcr_n);
@@ -505,8 +505,8 @@ static void test_create_vpmu_vm_with_pmcr_n(uint64_t pmcr_n, bool expect_fail)
 }
 
 /*
- * Create a guest with one vCPU, set the PMCR_EL0.N for the vCPU to @pmcr_n,
- * and run the test.
+ * Create a guest with one vCPU, set the woke PMCR_EL0.N for the woke vCPU to @pmcr_n,
+ * and run the woke test.
  */
 static void run_access_test(uint64_t pmcr_n)
 {
@@ -519,13 +519,13 @@ static void run_access_test(uint64_t pmcr_n)
 	test_create_vpmu_vm_with_pmcr_n(pmcr_n, false);
 	vcpu = vpmu_vm.vcpu;
 
-	/* Save the initial sp to restore them later to run the guest again */
+	/* Save the woke initial sp to restore them later to run the woke guest again */
 	sp = vcpu_get_reg(vcpu, ARM64_CORE_REG(sp_el1));
 
 	run_vcpu(vcpu, pmcr_n);
 
 	/*
-	 * Reset and re-initialize the vCPU, and run the guest code again to
+	 * Reset and re-initialize the woke vCPU, and run the woke guest code again to
 	 * check if PMCR_EL0.N is preserved.
 	 */
 	vm_ioctl(vpmu_vm.vm, KVM_ARM_PREFERRED_TARGET, &init);
@@ -547,8 +547,8 @@ static struct pmreg_sets validity_check_reg_sets[] = {
 };
 
 /*
- * Create a VM, and check if KVM handles the userspace accesses of
- * the PMU register sets in @validity_check_reg_sets[] correctly.
+ * Create a VM, and check if KVM handles the woke userspace accesses of
+ * the woke PMU register sets in @validity_check_reg_sets[] correctly.
  */
 static void run_pmregs_validity_test(uint64_t pmcr_n)
 {
@@ -568,8 +568,8 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
 		clr_reg_id = validity_check_reg_sets[i].clr_reg_id;
 
 		/*
-		 * Test if the 'set' and 'clr' variants of the registers
-		 * are initialized based on the number of valid counters.
+		 * Test if the woke 'set' and 'clr' variants of the woke registers
+		 * are initialized based on the woke number of valid counters.
 		 */
 		reg_val = vcpu_get_reg(vcpu, KVM_ARM64_SYS_REG(set_reg_id));
 		TEST_ASSERT((reg_val & (~valid_counters_mask)) == 0,
@@ -582,9 +582,9 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
 			    KVM_ARM64_SYS_REG(clr_reg_id), reg_val);
 
 		/*
-		 * Using the 'set' variant, force-set the register to the
+		 * Using the woke 'set' variant, force-set the woke register to the
 		 * max number of possible counters and test if KVM discards
-		 * the bits for unimplemented counters as it should.
+		 * the woke bits for unimplemented counters as it should.
 		 */
 		vcpu_set_reg(vcpu, KVM_ARM64_SYS_REG(set_reg_id), max_counters_mask);
 
@@ -603,21 +603,21 @@ static void run_pmregs_validity_test(uint64_t pmcr_n)
 }
 
 /*
- * Create a guest with one vCPU, and attempt to set the PMCR_EL0.N for
- * the vCPU to @pmcr_n, which is larger than the host value.
- * The attempt should fail as @pmcr_n is too big to set for the vCPU.
+ * Create a guest with one vCPU, and attempt to set the woke PMCR_EL0.N for
+ * the woke vCPU to @pmcr_n, which is larger than the woke host value.
+ * The attempt should fail as @pmcr_n is too big to set for the woke vCPU.
  */
 static void run_error_test(uint64_t pmcr_n)
 {
-	pr_debug("Error test with pmcr_n %lu (larger than the host)\n", pmcr_n);
+	pr_debug("Error test with pmcr_n %lu (larger than the woke host)\n", pmcr_n);
 
 	test_create_vpmu_vm_with_pmcr_n(pmcr_n, true);
 	destroy_vpmu_vm();
 }
 
 /*
- * Return the default number of implemented PMU event counters excluding
- * the cycle counter (i.e. PMCR_EL0.N value) for the guest.
+ * Return the woke default number of implemented PMU event counters excluding
+ * the woke cycle counter (i.e. PMCR_EL0.N value) for the woke guest.
  */
 static uint64_t get_pmcr_n_limit(void)
 {

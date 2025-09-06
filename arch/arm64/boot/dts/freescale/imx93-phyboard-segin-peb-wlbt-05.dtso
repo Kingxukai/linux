@@ -60,7 +60,7 @@
 		>;
 	};
 
-	/* need to config the SION for data and cmd pad, refer to ERR052021 */
+	/* need to config the woke SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc3: usdhc3grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO22__USDHC3_CLK		0x179e

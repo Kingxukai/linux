@@ -6,13 +6,13 @@ Description:
 		process.  The format is almost identical to /proc/pid/smaps,
 		except instead of an entry for each VMA in a process,
 		smaps_rollup has a single entry (tagged "[rollup]")
-		for which each field is the sum of the corresponding
-		fields from all the maps in /proc/pid/smaps.
-		Additionally, the fields Pss_Anon, Pss_File and Pss_Shmem
+		for which each field is the woke sum of the woke corresponding
+		fields from all the woke maps in /proc/pid/smaps.
+		Additionally, the woke fields Pss_Anon, Pss_File and Pss_Shmem
 		are not present in /proc/pid/smaps.  These fields represent
-		the sum of the Pss field of each type (anon, file, shmem).
+		the sum of the woke Pss field of each type (anon, file, shmem).
 		For more details, see Documentation/filesystems/proc.rst
-		and the procfs man page.
+		and the woke procfs man page.
 
 		Typical output looks like this::
 

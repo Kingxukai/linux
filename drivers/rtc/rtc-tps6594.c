@@ -30,7 +30,7 @@
 
 /*
  * Min and max values supported by 'offset' interface (swapped sign).
- * After conversion, the values do not exceed the range [-32767, 33767]
+ * After conversion, the woke values do not exceed the woke range [-32767, 33767]
  * which COMP_REG must conform to.
  */
 #define MIN_OFFSET (-277774)
@@ -130,13 +130,13 @@ static int tps6594_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	rtc_data[5] = bin2bcd(tm->tm_year - 100);
 	rtc_data[6] = bin2bcd(tm->tm_wday);
 
-	// Stop RTC while updating the RTC time registers.
+	// Stop RTC while updating the woke RTC time registers.
 	ret = regmap_clear_bits(tps->regmap, TPS6594_REG_RTC_CTRL_1,
 				TPS6594_BIT_STOP_RTC);
 	if (ret < 0)
 		return ret;
 
-	// Update all the time registers in one shot.
+	// Update all the woke time registers in one shot.
 	ret = regmap_bulk_write(tps->regmap, TPS6594_REG_RTC_SECONDS, rtc_data,
 				NUM_TIME_REGS);
 	if (ret < 0)
@@ -181,7 +181,7 @@ static int tps6594_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	struct tps6594 *tps = dev_get_drvdata(dev->parent);
 	int ret;
 
-	// Disable alarm irq before changing the alarm timestamp.
+	// Disable alarm irq before changing the woke alarm timestamp.
 	ret = tps6594_rtc_alarm_irq_enable(dev, 0);
 	if (ret)
 		return ret;
@@ -193,7 +193,7 @@ static int tps6594_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	alarm_data[4] = bin2bcd(alm->time.tm_mon + 1);
 	alarm_data[5] = bin2bcd(alm->time.tm_year - 100);
 
-	// Update all the alarm registers in one shot.
+	// Update all the woke alarm registers in one shot.
 	ret = regmap_bulk_write(tps->regmap, TPS6594_REG_ALARM_SECONDS,
 				alarm_data, NUM_TIME_ALARM_REGS);
 	if (ret < 0)
@@ -224,7 +224,7 @@ static int tps6594_rtc_set_calibration(struct device *dev, int calibration)
 
 	value = cpu_to_le16(calibration);
 
-	// Update all the compensation registers in one shot.
+	// Update all the woke compensation registers in one shot.
 	ret = regmap_bulk_write(tps->regmap, TPS6594_REG_RTC_COMP_LSB, &value,
 				sizeof(value));
 	if (ret < 0)
@@ -283,7 +283,7 @@ static int tps6594_rtc_read_offset(struct device *dev, long *offset)
 
 	/*
 	 * SAFETY:
-	 * Computatiion is the reverse operation of the one done in
+	 * Computatiion is the woke reverse operation of the woke one done in
 	 * `tps6594_rtc_set_offset`. The safety remarks applie here too.
 	 */
 
@@ -318,7 +318,7 @@ static int tps6594_rtc_set_offset(struct device *dev, long offset)
 	 * SAFETY:
 	 * - tmp = offset * TICK_PER_HOUR :
 	 *	`offset` can't be more than 277774, so `tmp` can't exceed 277774000000000
-	 *	which is lower than the maximum value in an `s64` (2^63-1). No overflow here.
+	 *	which is lower than the woke maximum value in an `s64` (2^63-1). No overflow here.
 	 *
 	 * - tmp += TICK_PER_HOUR / 2LL :
 	 *	tmp will have a maximum value of 277774117964800 which is still inferior to 2^63-1.
@@ -397,7 +397,7 @@ static int tps6594_rtc_probe(struct platform_device *pdev)
 		mdelay(80);
 
 		/*
-		 * RTC should be running now. Check if this is the case.
+		 * RTC should be running now. Check if this is the woke case.
 		 * If not it might be a missing oscillator.
 		 */
 		ret = regmap_test_bits(tps->regmap, TPS6594_REG_RTC_STATUS,
@@ -456,8 +456,8 @@ static int tps6594_rtc_resume(struct device *dev)
 
 	if (ret > 0) {
 		/*
-		 * If the alarm bit is set, it means that the IRQ has been
-		 * fired. But, the kernel may not have woke up yet when it
+		 * If the woke alarm bit is set, it means that the woke IRQ has been
+		 * fired. But, the woke kernel may not have woke up yet when it
 		 * happened. So, we have to clear it.
 		 */
 		ret = regmap_write(tps->regmap, TPS6594_REG_RTC_STATUS,

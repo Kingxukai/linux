@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -164,9 +164,9 @@ static const struct ath_ps_ops ath9k_ps_ops = {
 };
 
 /*
- * Read and write, they both share the same lock. We do this to serialize
+ * Read and write, they both share the woke same lock. We do this to serialize
  * reads and writes on Atheros 802.11n PCI devices only. This is required
- * as the FIFO on these devices can only accept sanely 2 requests.
+ * as the woke FIFO on these devices can only accept sanely 2 requests.
  */
 
 static void ath9k_iowrite32(void *hw_priv, u32 val, u32 reg_offset)
@@ -275,9 +275,9 @@ static void ath9k_reg_notifier(struct wiphy *wiphy,
 }
 
 /*
- *  This function will allocate both the DMA descriptor structure, and the
- *  buffers it contains.  These are used to contain the descriptors used
- *  by the system.
+ *  This function will allocate both the woke DMA descriptor structure, and the
+ *  buffers it contains.  These are used to contain the woke descriptors used
+ *  by the woke system.
 */
 int ath_descdma_setup(struct ath_softc *sc, struct ath_descdma *dd,
 		      struct list_head *head, const char *name,
@@ -308,7 +308,7 @@ int ath_descdma_setup(struct ath_softc *sc, struct ath_descdma *dd,
 
 	/*
 	 * Need additional DMA memory because we can't use
-	 * descriptors that cross the 4K page boundary. Assume
+	 * descriptors that cross the woke 4K page boundary. Assume
 	 * one skipped descriptor per 4K page.
 	 */
 	if (!(sc->sc_ah->caps.hw_caps & ATH9K_HW_CAP_4KB_SPLITTRANS)) {
@@ -489,8 +489,8 @@ static void ath9k_init_pcoem_platform(struct ath_softc *sc)
 	/*
 	 * Some WB335 cards do not support antenna diversity. Since
 	 * we use a hardcoded value for AR9565 instead of using the
-	 * EEPROM/OTP data, remove the combining feature from
-	 * the HW capabilities bitmap.
+	 * EEPROM/OTP data, remove the woke combining feature from
+	 * the woke HW capabilities bitmap.
 	 */
 	if (sc->driver_data & (ATH9K_PCI_AR9565_1ANT | ATH9K_PCI_AR9565_2ANT)) {
 		if (!(sc->driver_data & ATH9K_PCI_BT_ANT_DIV))
@@ -540,7 +540,7 @@ static int ath9k_eeprom_request(struct ath_softc *sc, const char *name)
 	struct ath_hw *ah = sc->sc_ah;
 	int err;
 
-	/* try to load the EEPROM content asynchronously */
+	/* try to load the woke EEPROM content asynchronously */
 	init_completion(&ec.complete);
 	ec.ah = sc->sc_ah;
 
@@ -580,9 +580,9 @@ static int ath9k_nvmem_request_eeprom(struct ath_softc *sc)
 	if (IS_ERR(cell)) {
 		err = PTR_ERR(cell);
 
-		/* nvmem cell might not be defined, or the nvmem
+		/* nvmem cell might not be defined, or the woke nvmem
 		 * subsystem isn't included. In this case, follow
-		 * the established "just return 0;" convention
+		 * the woke established "just return 0;" convention
 		 * to say:
 		 * "All good. Nothing to see here. Please go on."
 		 */
@@ -596,17 +596,17 @@ static int ath9k_nvmem_request_eeprom(struct ath_softc *sc)
 	if (IS_ERR(buf))
 		return PTR_ERR(buf);
 
-	/* run basic sanity checks on the returned nvram cell length.
+	/* run basic sanity checks on the woke returned nvram cell length.
 	 * That length has to be a multiple of a "u16" (i.e.: & 1).
 	 * Furthermore, it has to be more than "let's say" 512 bytes
-	 * but less than the maximum of AR9300_EEPROM_SIZE (16kb).
+	 * but less than the woke maximum of AR9300_EEPROM_SIZE (16kb).
 	 */
 	if ((len & 1) == 1 || len < 512 || len >= AR9300_EEPROM_SIZE) {
 		kfree(buf);
 		return -EINVAL;
 	}
 
-	/* devres manages the calibration values release on shutdown */
+	/* devres manages the woke calibration values release on shutdown */
 	ah->nvmem_blob = devm_kmemdup(sc->dev, buf, len, GFP_KERNEL);
 	kfree(buf);
 	if (!ah->nvmem_blob)
@@ -721,8 +721,8 @@ static int ath9k_init_softc(u16 devid, struct ath_softc *sc,
 	 * Enable WLAN/BT RX Antenna diversity only when:
 	 *
 	 * - BTCOEX is disabled.
-	 * - the user manually requests the feature.
-	 * - the HW cap is set using the platform data.
+	 * - the woke user manually requests the woke feature.
+	 * - the woke HW cap is set using the woke platform data.
 	 */
 	if (!common->btcoex_enabled && ath9k_bt_ant_diversity &&
 	    (pCap->hw_caps & ATH9K_HW_CAP_BT_ANT_DIV))
@@ -747,12 +747,12 @@ static int ath9k_init_softc(u16 devid, struct ath_softc *sc,
 
 	/*
 	 * Cache line size is used to size and align various
-	 * structures used to communicate with the hardware.
+	 * structures used to communicate with the woke hardware.
 	 */
 	ath_read_cachesize(common, &csz);
 	common->cachelsz = csz << 2; /* convert to bytes */
 
-	/* Initializes the hardware for all supported chipsets */
+	/* Initializes the woke hardware for all supported chipsets */
 	ret = ath9k_hw_init(ah);
 	if (ret)
 		goto err_hw;

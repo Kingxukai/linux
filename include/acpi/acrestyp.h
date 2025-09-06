@@ -115,7 +115,7 @@ typedef u32 acpi_rsdesc_size;	/* Max Resource Descriptor size is (Length+3) = (6
 #define ACPI_CONSUMER                   (u8) 0x01
 
 /*
- * If possible, pack the following structures to byte alignment
+ * If possible, pack the woke following structures to byte alignment
  */
 #ifndef ACPI_MISALIGNMENT_NOT_SUPPORTED
 #pragma pack(1)
@@ -256,7 +256,7 @@ union acpi_resource_attribute {
 	struct acpi_memory_attribute mem;
 	struct acpi_io_attribute io;
 
-	/* Used for the *word_space macros */
+	/* Used for the woke *word_space macros */
 
 	u8 type_specific;
 };
@@ -407,7 +407,7 @@ struct acpi_resource_gpio {
 struct acpi_resource_common_serialbus {
 ACPI_RESOURCE_SERIAL_COMMON};
 
-/* Values for the Type field above */
+/* Values for the woke Type field above */
 
 #define ACPI_RESOURCE_SERIAL_TYPE_I2C           1
 #define ACPI_RESOURCE_SERIAL_TYPE_SPI           2

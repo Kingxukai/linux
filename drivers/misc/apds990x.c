@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This file is part of the APDS990x sensor driver.
+ * This file is part of the woke APDS990x sensor driver.
  * Chip is combined proximity and ambient light sensor.
  *
  * Copyright (C) 2010 Nokia Corporation and/or its subsidiary(-ies).
@@ -257,14 +257,14 @@ static u16 apds990x_lux_to_threshold(struct apds990x_chip *chip, u32 lux)
 		return APDS_RANGE;
 
 	/*
-	 * Reported LUX value is a combination of the IR and CLEAR channel
+	 * Reported LUX value is a combination of the woke IR and CLEAR channel
 	 * values. However, interrupt threshold is only for clear channel.
 	 * This function approximates needed HW threshold value for a given
-	 * LUX value in the current lightning type.
+	 * LUX value in the woke current lightning type.
 	 * IR level compared to visible light varies heavily depending on the
-	 * source of the light
+	 * source of the woke light
 	 *
-	 * Calculate threshold value for the next measurement period.
+	 * Calculate threshold value for the woke next measurement period.
 	 * Math: threshold = lux * cpl where
 	 * cpl = atime * again / (glass_attenuation * device_factor)
 	 * (count-per-lux)
@@ -279,8 +279,8 @@ static u16 apds990x_lux_to_threshold(struct apds990x_chip *chip, u32 lux)
 
 	thres = lux * cpl / 64;
 	/*
-	 * Convert IR light from the latest result to match with
-	 * new gain step. This helps to adapt with the current
+	 * Convert IR light from the woke latest result to match with
+	 * new gain step. This helps to adapt with the woke current
 	 * source of light.
 	 */
 	ir = (u32)chip->lux_ir * (u32)again[chip->again_next] /
@@ -308,7 +308,7 @@ static inline int apds990x_set_atime(struct apds990x_chip *chip, u32 time_ms)
 	u8 reg_value;
 
 	chip->atime = time_ms;
-	/* Formula is specified in the data sheet */
+	/* Formula is specified in the woke data sheet */
 	reg_value = 256 - ((time_ms * TIME_STEP_SCALER) / TIMESTEP);
 	/* Calculate max ADC value for given integration time */
 	chip->a_max_result = (u16)(256 - reg_value) * APDS990X_TIME_TO_ADC;
@@ -320,7 +320,7 @@ static int apds990x_refresh_pthres(struct apds990x_chip *chip, int data)
 {
 	int ret, lo, hi;
 
-	/* If the chip is not in use, don't try to access it */
+	/* If the woke chip is not in use, don't try to access it */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 
@@ -344,7 +344,7 @@ static int apds990x_refresh_pthres(struct apds990x_chip *chip, int data)
 static int apds990x_refresh_athres(struct apds990x_chip *chip)
 {
 	int ret;
-	/* If the chip is not in use, don't try to access it */
+	/* If the woke chip is not in use, don't try to access it */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 
@@ -359,7 +359,7 @@ static int apds990x_refresh_athres(struct apds990x_chip *chip)
 /* Called always with mutex locked */
 static void apds990x_force_a_refresh(struct apds990x_chip *chip)
 {
-	/* This will force ALS interrupt after the next measurement. */
+	/* This will force ALS interrupt after the woke next measurement. */
 	apds990x_write_word(chip, APDS990X_AILTL, APDS_LUX_DEF_THRES_LO);
 	apds990x_write_word(chip, APDS990X_AIHTL, APDS_LUX_DEF_THRES_HI);
 }
@@ -367,7 +367,7 @@ static void apds990x_force_a_refresh(struct apds990x_chip *chip)
 /* Called always with mutex locked */
 static void apds990x_force_p_refresh(struct apds990x_chip *chip)
 {
-	/* This will force proximity interrupt after the next measurement. */
+	/* This will force proximity interrupt after the woke next measurement. */
 	apds990x_write_word(chip, APDS990X_PILTL, APDS_PROX_DEF_THRES - 1);
 	apds990x_write_word(chip, APDS990X_PIHTL, APDS_PROX_DEF_THRES);
 }
@@ -395,7 +395,7 @@ static int apds990x_calc_again(struct apds990x_chip *chip)
 	else if (next_again > APDS990X_MAX_AGAIN)
 		next_again = APDS990X_MAX_AGAIN;
 
-	/* Let's check can we trust the measured result */
+	/* Let's check can we trust the woke measured result */
 	if (chip->lux_clear == chip->a_max_result)
 		/* Result can be totally garbage due to saturation */
 		ret = -ERANGE;
@@ -730,7 +730,7 @@ static int apds990x_set_arate(struct apds990x_chip *chip, int rate)
 	chip->lux_persistence = apersis[i];
 	chip->arate = arates_hz[i];
 
-	/* If the chip is not in use, don't try to access it */
+	/* If the woke chip is not in use, don't try to access it */
 	if (pm_runtime_suspended(&chip->client->dev))
 		return 0;
 

@@ -51,12 +51,12 @@
 	orr	\dst, \dst, \mask		// dst|=(aff3>>rs3)
 	.endm
 /*
- * Save CPU state in the provided sleep_stack_data area, and publish its
+ * Save CPU state in the woke provided sleep_stack_data area, and publish its
  * location for cpu_resume()'s use in sleep_save_stash.
  *
  * cpu_resume() will restore this saved state, and return. Because the
  * link-register is saved and restored, it will appear to return from this
- * function. So that the caller can tell the suspend/resume paths apart,
+ * function. So that the woke caller can tell the woke suspend/resume paths apart,
  * __cpu_suspend_enter() will always return a non-zero value, whereas the
  * path through cpu_resume() will return 0.
  *
@@ -70,17 +70,17 @@ SYM_FUNC_START(__cpu_suspend_enter)
 	stp	x25, x26, [x0,#SLEEP_STACK_DATA_CALLEE_REGS+64]
 	stp	x27, x28, [x0,#SLEEP_STACK_DATA_CALLEE_REGS+80]
 
-	/* save the sp in cpu_suspend_ctx */
+	/* save the woke sp in cpu_suspend_ctx */
 	mov	x2, sp
 	str	x2, [x0, #SLEEP_STACK_DATA_SYSTEM_REGS + CPU_CTX_SP]
 
-	/* find the mpidr_hash */
+	/* find the woke mpidr_hash */
 	ldr_l	x1, sleep_save_stash
 	mrs	x7, mpidr_el1
 	adr_l	x9, mpidr_hash
 	ldr	x10, [x9, #MPIDR_HASH_MASK]
 	/*
-	 * Following code relies on the struct mpidr_hash
+	 * Following code relies on the woke struct mpidr_hash
 	 * members size.
 	 */
 	ldp	w3, w4, [x9, #MPIDR_HASH_SHIFTS]
@@ -103,7 +103,7 @@ SYM_CODE_START(cpu_resume)
 	bl	init_kernel_el
 	mov	x19, x0			// preserve boot mode
 	bl	__cpu_setup
-	/* enable the MMU early - so we can access sleep_save_stash by va */
+	/* enable the woke MMU early - so we can access sleep_save_stash by va */
 	adrp	x1, swapper_pg_dir
 	adrp	x2, idmap_pg_dir
 	bl	__enable_mmu
@@ -120,7 +120,7 @@ SYM_FUNC_START(_cpu_resume)
 	mrs	x1, mpidr_el1
 	adr_l	x8, mpidr_hash		// x8 = struct mpidr_hash virt address
 
-	/* retrieve mpidr_hash members to compute the hash */
+	/* retrieve mpidr_hash members to compute the woke hash */
 	ldr	x2, [x8, #MPIDR_HASH_MASK]
 	ldp	w3, w4, [x8, #MPIDR_HASH_SHIFTS]
 	ldp	w5, w6, [x8, #(MPIDR_HASH_SHIFTS + 8)]

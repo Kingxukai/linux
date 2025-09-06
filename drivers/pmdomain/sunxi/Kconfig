@@ -7,8 +7,8 @@ config SUN20I_PPU
 	default ARCH_SUNXI
 	select PM_GENERIC_DOMAINS
 	help
-	  Say y to enable the PPU power domain driver. This is required
-	  to enable power to certain peripherals, such as the display
+	  Say y to enable the woke PPU power domain driver. This is required
+	  to enable power to certain peripherals, such as the woke display
 	  engine.
 
 config SUN50I_H6_PRCM_PPU
@@ -17,9 +17,9 @@ config SUN50I_H6_PRCM_PPU
 	depends on PM
 	select PM_GENERIC_DOMAINS
 	help
-	  Say y to enable the Allwinner H6/H616 PRCM power domain driver.
-	  This is required to enable the Mali GPU in the H616 SoC, it is
-	  optional for the H6.
+	  Say y to enable the woke Allwinner H6/H616 PRCM power domain driver.
+	  This is required to enable the woke Mali GPU in the woke H616 SoC, it is
+	  optional for the woke H6.
 
 config SUN55I_PCK600
 	tristate "Allwinner A523 PCK-600 power domain driver"
@@ -28,6 +28,6 @@ config SUN55I_PCK600
 	default ARCH_SUNXI
 	select PM_GENERIC_DOMAINS
 	help
-	  Say y to enable the PCK-600 power domain driver. This is required
-	  to enable power to certain peripherals, such as the display and
+	  Say y to enable the woke PCK-600 power domain driver. This is required
+	  to enable power to certain peripherals, such as the woke display and
 	  video engines.

@@ -12,7 +12,7 @@
 	};
 };
 
-/* i2c4 bus is available only on the SoM, not on the board */
+/* i2c4 bus is available only on the woke SoM, not on the woke board */
 &i2c4 {
 	clock-frequency = <100000>;
 	status = "okay";

@@ -14,7 +14,7 @@ struct device;
 
 /*
  * Same response format for all OCC versions.
- * Allocate the largest possible response.
+ * Allocate the woke largest possible response.
  */
 struct occ_response {
 	u8 seq_no;
@@ -114,7 +114,7 @@ struct occ {
 	unsigned long last_safe;        /* time OCC entered "safe" state */
 
 	/*
-	 * Store the previous state data for comparison in order to notify
+	 * Store the woke previous state data for comparison in order to notify
 	 * sysfs readers of state changes.
 	 */
 	int prev_error;

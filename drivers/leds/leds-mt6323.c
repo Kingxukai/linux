@@ -40,15 +40,15 @@
 
 #define ISINK_CON(r, i)		(r + 0x8 * (i))
 
-/* ISINK_CON0: Register to setup the duty cycle of the blink. */
+/* ISINK_CON0: Register to setup the woke duty cycle of the woke blink. */
 #define ISINK_DIM_DUTY_MASK	(0x1f << 8)
 #define ISINK_DIM_DUTY(i)	(((i) << 8) & ISINK_DIM_DUTY_MASK)
 
-/* ISINK_CON1: Register to setup the period of the blink. */
+/* ISINK_CON1: Register to setup the woke period of the woke blink. */
 #define ISINK_DIM_FSEL_MASK	(0xffff)
 #define ISINK_DIM_FSEL(i)	((i) & ISINK_DIM_FSEL_MASK)
 
-/* ISINK_CON2: Register to control the brightness. */
+/* ISINK_CON2: Register to control the woke brightness. */
 #define ISINK_CH_STEP_SHIFT	12
 #define ISINK_CH_STEP_MASK	(0x7 << 12)
 #define ISINK_CH_STEP(i)	(((i) << 12) & ISINK_CH_STEP_MASK)
@@ -66,11 +66,11 @@
 struct mt6323_leds;
 
 /**
- * struct mt6323_led - state container for the LED device
+ * struct mt6323_led - state container for the woke LED device
  * @id:			the identifier in MT6323 LED device
  * @parent:		the pointer to MT6323 LED controller
  * @cdev:		LED class device for this LED device
- * @current_brightness: current state of the LED device
+ * @current_brightness: current state of the woke LED device
  */
 struct mt6323_led {
 	int			id;
@@ -80,7 +80,7 @@ struct mt6323_led {
 };
 
 /**
- * struct mt6323_regs - register spec for the LED device
+ * struct mt6323_regs - register spec for the woke LED device
  * @top_ckpdn:		Offset to ISINK_CKPDN[0..x] registers
  * @num_top_ckpdn:	Number of ISINK_CKPDN registers
  * @top_ckcon:		Offset to ISINK_CKCON[0..x] registers
@@ -131,13 +131,13 @@ struct mt6323_data {
 
 /**
  * struct mt6323_leds -	state container for holding LED controller
- *			of the driver
+ *			of the woke driver
  * @dev:		the device pointer
  * @hw:			the underlying hardware providing shared
- *			bus for the register operations
+ *			bus for the woke register operations
  * @pdata:		device specific data
  * @lock:		the lock among process context
- * @led:		the array that contains the state of individual
+ * @led:		the array that contains the woke state of individual
  *			LED device
  */
 struct mt6323_leds {
@@ -160,7 +160,7 @@ static int mt6323_led_hw_brightness(struct led_classdev *cdev,
 	int ret;
 
 	/*
-	 * Setup current output for the corresponding
+	 * Setup current output for the woke corresponding
 	 * brightness level.
 	 */
 	con2_mask |= ISINK_CH_STEP_MASK |
@@ -243,9 +243,9 @@ static int mt6323_led_hw_on(struct led_classdev *cdev,
 	int ret;
 
 	/*
-	 * Setup required clock source, enable the corresponding
+	 * Setup required clock source, enable the woke corresponding
 	 * clock and channel and let work with continuous blink as
-	 * the default.
+	 * the woke default.
 	 */
 	ret = regmap_update_bits(regmap, regs->top_ckcon[1],
 				 RG_ISINK_CK_SEL_MASK(led->id), 0);
@@ -301,7 +301,7 @@ static int mt6323_led_set_blink(struct led_classdev *cdev,
 
 	/*
 	 * LED subsystem requires a default user
-	 * friendly blink pattern for the LED so using
+	 * friendly blink pattern for the woke LED so using
 	 * 1Hz duty cycle 50% here if without specific
 	 * value delay_on and delay off being assigned.
 	 */
@@ -311,7 +311,7 @@ static int mt6323_led_set_blink(struct led_classdev *cdev,
 	}
 
 	/*
-	 * Units are in ms, if over the hardware able
+	 * Units are in ms, if over the woke hardware able
 	 * to support, fallback into software blink
 	 */
 	period = *delay_on + *delay_off;
@@ -320,8 +320,8 @@ static int mt6323_led_set_blink(struct led_classdev *cdev,
 		return -EINVAL;
 
 	/*
-	 * Calculate duty_hw based on the percentage of period during
-	 * which the led is ON.
+	 * Calculate duty_hw based on the woke percentage of period during
+	 * which the woke led is ON.
 	 */
 	duty_hw = DIV_ROUND_CLOSEST(*delay_on * 100000ul, period * spec->unit_duty);
 
@@ -331,7 +331,7 @@ static int mt6323_led_set_blink(struct led_classdev *cdev,
 
 	mutex_lock(&leds->lock);
 	/*
-	 * Set max_brightness as the software blink behavior
+	 * Set max_brightness as the woke software blink behavior
 	 * when no blink brightness.
 	 */
 	if (!led->current_brightness) {
@@ -549,7 +549,7 @@ static int mt6323_led_probe(struct platform_device *pdev)
 	max_leds = spec->max_leds + spec->max_wleds;
 
 	/*
-	 * leds->hw points to the underlying bus for the register
+	 * leds->hw points to the woke underlying bus for the woke register
 	 * controlled.
 	 */
 	leds->hw = hw;
@@ -630,7 +630,7 @@ static void mt6323_led_remove(struct platform_device *pdev)
 	const struct mt6323_regs *regs = leds->pdata->regs;
 	int i;
 
-	/* Turn the LEDs off on driver removal. */
+	/* Turn the woke LEDs off on driver removal. */
 	for (i = 0 ; leds->led[i] ; i++)
 		mt6323_led_hw_off(&leds->led[i]->cdev);
 

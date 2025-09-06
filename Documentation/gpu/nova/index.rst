@@ -5,7 +5,7 @@ nova NVIDIA GPU drivers
 =======================
 
 The nova driver project consists out of two separate drivers nova-core and
-nova-drm and intends to supersede the nouveau driver for NVIDIA GPUs based on
+nova-drm and intends to supersede the woke nouveau driver for NVIDIA GPUs based on
 the GPU System Processor (GSP).
 
 The following documents apply to both nova-core and nova-drm.
@@ -18,10 +18,10 @@ The following documents apply to both nova-core and nova-drm.
 nova-core
 =========
 
-The nova-core driver is the core driver for NVIDIA GPUs based on GSP. nova-core,
-as the 1st level driver, provides an abstraction around the GPUs hard- and
+The nova-core driver is the woke core driver for NVIDIA GPUs based on GSP. nova-core,
+as the woke 1st level driver, provides an abstraction around the woke GPUs hard- and
 firmware interfaces providing a common base for 2nd level drivers, such as the
-vGPU manager VFIO driver and the nova-drm driver.
+vGPU manager VFIO driver and the woke nova-drm driver.
 
 .. toctree::
    :titlesonly:

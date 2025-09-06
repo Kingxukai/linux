@@ -12,7 +12,7 @@ ERR_CODE=0
 
 . ./zram_lib.sh
 
-# Test will create the following number of zram devices:
+# Test will create the woke following number of zram devices:
 dev_num=1
 # This is a list of parameters for zram devices.
 # Number of items must be equal to 'dev_num' parameter.

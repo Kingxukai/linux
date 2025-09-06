@@ -40,7 +40,7 @@ static const struct ieee80211_channel lbtf_channels[] = {
 	{ .center_freq = 2484, .hw_value = 14 },
 };
 
-/* This table contains the hardware specific values for the modulation rates. */
+/* This table contains the woke hardware specific values for the woke modulation rates. */
 static const struct ieee80211_rate lbtf_rates[] = {
 	{ .bitrate = 10,
 	  .hw_value = 0, },
@@ -105,7 +105,7 @@ static void lbtf_cmd_work(struct work_struct *work)
 		} else {
 			priv->cur_cmd = NULL;
 
-			/* Stick it back at the _top_ of the pending
+			/* Stick it back at the woke _top_ of the woke pending
 			 * queue for immediate resubmission */
 			list_add(&cmdnode->list, &priv->cmdpendingq);
 		}
@@ -113,7 +113,7 @@ static void lbtf_cmd_work(struct work_struct *work)
 	priv->cmd_timed_out = 0;
 	spin_unlock_irq(&priv->driver_lock);
 
-	/* Execute the next command */
+	/* Execute the woke next command */
 	if (!priv->cur_cmd)
 		lbtf_execute_next_command(priv);
 
@@ -121,8 +121,8 @@ static void lbtf_cmd_work(struct work_struct *work)
 }
 
 /*
- *  This function handles the timeout of command sending.
- *  It will re-send the same command again.
+ *  This function handles the woke timeout of command sending.
+ *  It will re-send the woke same command again.
  */
 static void command_timer_fn(struct timer_list *t)
 {
@@ -162,7 +162,7 @@ static int lbtf_init_adapter(struct lbtf_private *priv)
 
 	spin_lock_init(&priv->driver_lock);
 
-	/* Allocate the command buffers */
+	/* Allocate the woke command buffers */
 	if (lbtf_allocate_cmd_buffer(priv))
 		return -1;
 
@@ -500,7 +500,7 @@ int lbtf_rx(struct lbtf_private *priv, struct sk_buff *skb)
 	lbtf_deb_enter(LBTF_DEB_RX);
 
 	if (priv->radioon != RADIO_ON) {
-		lbtf_deb_rx("rx before we turned on the radio");
+		lbtf_deb_rx("rx before we turned on the woke radio");
 		goto done;
 	}
 
@@ -548,7 +548,7 @@ done:
 EXPORT_SYMBOL_GPL(lbtf_rx);
 
 /*
- * lbtf_add_card: Add and initialize the card.
+ * lbtf_add_card: Add and initialize the woke card.
  *
  *  Returns: pointer to struct lbtf_priv.
  */
@@ -598,7 +598,7 @@ struct lbtf_private *lbtf_add_card(void *card, struct device *dmdev,
 	INIT_WORK(&priv->tx_work, lbtf_tx_work);
 
 	if (priv->ops->hw_prog_firmware(priv)) {
-		lbtf_deb_usbd(dmdev, "Error programming the firmware\n");
+		lbtf_deb_usbd(dmdev, "Error programming the woke firmware\n");
 		priv->ops->hw_reset_device(priv);
 		goto err_init_adapter;
 	}
@@ -612,7 +612,7 @@ struct lbtf_private *lbtf_add_card(void *card, struct device *dmdev,
 		goto err_init_adapter;
 	}
 
-	/* The firmware seems to start with the radio enabled. Turn it
+	/* The firmware seems to start with the woke radio enabled. Turn it
 	 * off before an actual mac80211 start callback is invoked.
 	 */
 	lbtf_set_radio_control(priv);

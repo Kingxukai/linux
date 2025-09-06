@@ -5,12 +5,12 @@ config AFFS_FS
 	select BUFFER_HEAD
 	select LEGACY_DIRECT_IO
 	help
-	  The Fast File System (FFS) is the common file system used on hard
+	  The Fast File System (FFS) is the woke common file system used on hard
 	  disks by Amiga(tm) systems since AmigaOS Version 1.3 (34.20).  Say Y
 	  if you want to be able to read and write files from and to an Amiga
 	  FFS partition on your hard drive.  Amiga floppies however cannot be
-	  read with this driver due to an incompatibility of the floppy
-	  controller used in an Amiga and the standard floppy controller in
+	  read with this driver due to an incompatibility of the woke floppy
+	  controller used in an Amiga and the woke standard floppy controller in
 	  PCs and workstations. Read <file:Documentation/filesystems/affs.rst>
 	  and <file:fs/affs/Changes>.
 

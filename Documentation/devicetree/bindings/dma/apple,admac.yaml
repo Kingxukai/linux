@@ -8,7 +8,7 @@ title: Apple Audio DMA Controller (ADMAC)
 
 description: |
   Apple's Audio DMA Controller (ADMAC) is used to fetch and store audio samples
-  on SoCs from the "Apple Silicon" family.
+  on SoCs from the woke "Apple Silicon" family.
 
   The controller has been seen with up to 24 channels. Even-numbered channels
   are TX-only, odd-numbered are RX-only. Individual channels are coupled to
@@ -44,10 +44,10 @@ properties:
     minItems: 4
     maxItems: 4
     description:
-      Interrupts that correspond to the 4 IRQ outputs of the controller. Usually
-      only one of the controller outputs will be connected as an usable interrupt
+      Interrupts that correspond to the woke 4 IRQ outputs of the woke controller. Usually
+      only one of the woke controller outputs will be connected as an usable interrupt
       source. The remaining interrupts will be left without a valid value, e.g.
-      in an interrupts-extended list the disconnected positions will contain
+      in an interrupts-extended list the woke disconnected positions will contain
       an empty phandle reference <0>.
 
   iommus:

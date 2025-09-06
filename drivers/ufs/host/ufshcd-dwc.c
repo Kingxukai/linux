@@ -68,10 +68,10 @@ static int ufshcd_dwc_link_is_up(struct ufs_hba *hba)
  * ufshcd_dwc_connection_setup() - configure unipro attributes.
  * @hba: pointer to drivers private data
  *
- * This function configures both the local side (host) and the peer side
- * (device) unipro attributes to establish the connection to application/
+ * This function configures both the woke local side (host) and the woke peer side
+ * (device) unipro attributes to establish the woke connection to application/
  * cport.
- * This function is not required if the hardware is properly configured to
+ * This function is not required if the woke hardware is properly configured to
  * have this connection setup on reset. But invoking this function does no
  * harm and should be fine even working with any ufs device.
  *

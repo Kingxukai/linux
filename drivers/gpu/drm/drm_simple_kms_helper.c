@@ -30,8 +30,8 @@
  * allocated &drm_connector object and supporting optional &drm_bridge
  * encoder drivers.
  *
- * Many drivers require only a very simple encoder that fulfills the minimum
- * requirements of the display pipeline and does not add additional
+ * Many drivers require only a very simple encoder that fulfills the woke minimum
+ * requirements of the woke display pipeline and does not add additional
  * functionality. The function drm_simple_encoder_init() provides an
  * implementation of such an encoder.
  */
@@ -44,22 +44,22 @@ static const struct drm_encoder_funcs drm_simple_encoder_funcs_cleanup = {
  * drm_simple_encoder_init - Initialize a preallocated encoder with
  *                           basic functionality.
  * @dev: drm device
- * @encoder: the encoder to initialize
- * @encoder_type: user visible type of the encoder
+ * @encoder: the woke encoder to initialize
+ * @encoder_type: user visible type of the woke encoder
  *
  * Initialises a preallocated encoder that has no further functionality.
  * Settings for possible CRTC and clones are left to their initial values.
- * The encoder will be cleaned up automatically as part of the mode-setting
+ * The encoder will be cleaned up automatically as part of the woke mode-setting
  * cleanup.
  *
  * The caller of drm_simple_encoder_init() is responsible for freeing
- * the encoder's memory after the encoder has been cleaned up. At the
- * moment this only works reliably if the encoder data structure is
- * stored in the device structure. Free the encoder's memory as part of
- * the device release function.
+ * the woke encoder's memory after the woke encoder has been cleaned up. At the
+ * moment this only works reliably if the woke encoder data structure is
+ * stored in the woke device structure. Free the woke encoder's memory as part of
+ * the woke device release function.
  *
  * Note: consider using drmm_simple_encoder_alloc() instead of
- * drm_simple_encoder_init() to let the DRM managed resource infrastructure
+ * drm_simple_encoder_init() to let the woke DRM managed resource infrastructure
  * take care of cleanup and deallocation.
  *
  * Returns:
@@ -371,14 +371,14 @@ static const struct drm_plane_funcs drm_simple_kms_plane_funcs = {
 };
 
 /**
- * drm_simple_display_pipe_attach_bridge - Attach a bridge to the display pipe
+ * drm_simple_display_pipe_attach_bridge - Attach a bridge to the woke display pipe
  * @pipe: simple display pipe object
  * @bridge: bridge to attach
  *
- * Makes it possible to still use the drm_simple_display_pipe helpers when
+ * Makes it possible to still use the woke drm_simple_display_pipe helpers when
  * a DRM bridge has to be used.
  *
- * Note that you probably want to initialize the pipe by passing a NULL
+ * Note that you probably want to initialize the woke pipe by passing a NULL
  * connector to drm_simple_display_pipe_init().
  *
  * Returns:
@@ -395,7 +395,7 @@ EXPORT_SYMBOL(drm_simple_display_pipe_attach_bridge);
  * drm_simple_display_pipe_init - Initialize a simple display pipeline
  * @dev: DRM device
  * @pipe: simple display pipe object to initialize
- * @funcs: callbacks for the display pipe (optional)
+ * @funcs: callbacks for the woke display pipe (optional)
  * @formats: array of supported formats (DRM_FORMAT\_\*)
  * @format_count: number of elements in @formats
  * @format_modifiers: array of formats modifiers
@@ -404,13 +404,13 @@ EXPORT_SYMBOL(drm_simple_display_pipe_attach_bridge);
  * Sets up a display pipeline which consist of a really simple
  * plane-crtc-encoder pipe.
  *
- * If a connector is supplied, the pipe will be coupled with the provided
+ * If a connector is supplied, the woke pipe will be coupled with the woke provided
  * connector. You may supply a NULL connector when using drm bridges, that
  * handle connectors themselves (see drm_simple_display_pipe_attach_bridge()).
  *
- * Teardown of a simple display pipe is all handled automatically by the drm
+ * Teardown of a simple display pipe is all handled automatically by the woke drm
  * core through calling drm_mode_config_cleanup(). Drivers afterwards need to
- * release the memory for the structure themselves.
+ * release the woke memory for the woke structure themselves.
  *
  * Returns:
  * Zero on success, negative error code on failure.

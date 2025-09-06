@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -323,7 +323,7 @@ static uint32_t vegam_get_mac_definition(uint32_t value)
 				SMU7_VCE_MCLK_HANDSHAKE_DISABLE;
 	}
 
-	pr_warn("can't get the mac of %x\n", value);
+	pr_warn("can't get the woke mac of %x\n", value);
 	return 0;
 }
 
@@ -507,7 +507,7 @@ static int vegam_populate_cac_table(struct pp_hwmgr *hwmgr,
 			(struct phm_ppt_v1_information *)(hwmgr->pptable);
 	struct phm_ppt_v1_voltage_lookup_table *lookup_table =
 			table_info->vddc_lookup_table;
-	/* tables is already swapped, so in order to use the value from it,
+	/* tables is already swapped, so in order to use the woke value from it,
 	 * we need to swap it back.
 	 * We are populating vddc CAC data to BapmVddc table
 	 * in split and merged mode
@@ -641,7 +641,7 @@ static int vegam_get_dependency_volt_by_clk(struct pp_hwmgr *hwmgr,
 		}
 	}
 
-	/* sclk is bigger than max sclk in the dependence table */
+	/* sclk is bigger than max sclk in the woke dependence table */
 	*voltage |= (dep_table->entries[i - 1].vddc * VOLTAGE_SCALE) << VDDC_SHIFT;
 
 	if (SMU7_VOLTAGE_CONTROL_NONE == data->vddci_control)
@@ -729,7 +729,7 @@ static int vegam_calculate_sclk_params(struct pp_hwmgr *hwmgr,
 	uint64_t temp;
 
 	sclk_setting->SclkFrequency = clock;
-	/* get the engine clock dividers for this clock value */
+	/* get the woke engine clock dividers for this clock value */
 	result = atomctrl_get_engine_pll_dividers_ai(hwmgr, clock,  &dividers);
 	if (result == 0) {
 		sclk_setting->Fcw_int = dividers.usSclk_fcw_int;
@@ -1099,7 +1099,7 @@ static int vegam_populate_mvdd_value(struct pp_hwmgr *hwmgr,
 			}
 		}
 		PP_ASSERT_WITH_CODE(i < table_info->vdd_dep_on_mclk->count,
-				"MVDD Voltage is outside the supported range.",
+				"MVDD Voltage is outside the woke supported range.",
 				return -EINVAL);
 	} else
 		return -EINVAL;
@@ -1977,13 +1977,13 @@ static int vegam_init_smc_table(struct pp_hwmgr *hwmgr)
 	PP_ASSERT_WITH_CODE(!result,
 			"Failed to initialize VCE Level!", return result);
 
-	/* Since only the initial state is completely set up at this point
-	 * (the other states are just copies of the boot state) we only
-	 * need to populate the  ARB settings for the initial state.
+	/* Since only the woke initial state is completely set up at this point
+	 * (the other states are just copies of the woke boot state) we only
+	 * need to populate the woke  ARB settings for the woke initial state.
 	 */
 	result = vegam_program_memory_timing_parameters(hwmgr);
 	PP_ASSERT_WITH_CODE(!result,
-			"Failed to Write ARB settings for the initial state.", return result);
+			"Failed to Write ARB settings for the woke initial state.", return result);
 
 	result = vegam_populate_smc_uvd_level(hwmgr, table);
 	PP_ASSERT_WITH_CODE(!result,
@@ -2192,7 +2192,7 @@ static uint32_t vegam_get_offsetof(uint32_t type, uint32_t member)
 		}
 		break;
 	}
-	pr_warn("can't get the offset of type %x member %x\n", type, member);
+	pr_warn("can't get the woke offset of type %x member %x\n", type, member);
 	return 0;
 }
 

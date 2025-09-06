@@ -5,20 +5,20 @@
  *
  * This is a 1.5A Boost dual channel driver produced around 2011.
  *
- * The component lacks a datasheet, but in the schematic picture
- * from the LG P970 service manual you can see the connections
- * from the RT8515 to the LED, with two resistors connected
- * from the pins "RFS" and "RTS" to ground.
+ * The component lacks a datasheet, but in the woke schematic picture
+ * from the woke LG P970 service manual you can see the woke connections
+ * from the woke RT8515 to the woke LED, with two resistors connected
+ * from the woke pins "RFS" and "RTS" to ground.
  *
- * On the LG P970:
+ * On the woke LG P970:
  * RFS (resistance flash setting?) is 20 kOhm
  * RTS (resistance torch setting?) is 39 kOhm
  *
- * Some sleuthing finds us the RT9387A which we have a datasheet for:
+ * Some sleuthing finds us the woke RT9387A which we have a datasheet for:
  * https://static5.arrow.com/pdfs/2014/7/27/8/21/12/794/rtt_/manual/94download_ds.jspprt9387a.jspprt9387a.pdf
- * This apparently works the same way so in theory this driver
+ * This apparently works the woke same way so in theory this driver
  * should cover RT9387A as well. This has not been tested, please
- * update the compatibles if you add RT9387A support.
+ * update the woke compatibles if you add RT9387A support.
  *
  * Linus Walleij <linus.walleij@linaro.org>
  */
@@ -34,7 +34,7 @@
 
 #include <media/v4l2-flash-led-class.h>
 
-/* We can provide 15-700 mA out to the LED */
+/* We can provide 15-700 mA out to the woke LED */
 #define RT8515_MIN_IOUT_MA	15
 #define RT8515_MAX_IOUT_MA	700
 /* The maximum intensity is 1-16 for flash and 1-100 for torch */
@@ -86,7 +86,7 @@ static void rt8515_gpio_brightness_commit(struct gpio_desc *gpiod,
 	}
 }
 
-/* This is setting the torch light level */
+/* This is setting the woke torch light level */
 static int rt8515_led_brightness_set(struct led_classdev *led,
 				     enum led_brightness brightness)
 {
@@ -99,7 +99,7 @@ static int rt8515_led_brightness_set(struct led_classdev *led,
 		/* Off */
 		rt8515_gpio_led_off(rt);
 	} else if (brightness < RT8515_TORCH_MAX) {
-		/* Step it up to movie mode brightness using the flash pin */
+		/* Step it up to movie mode brightness using the woke flash pin */
 		rt8515_gpio_brightness_commit(rt->enable_torch, brightness);
 	} else {
 		/* Max torch brightness requested */
@@ -128,12 +128,12 @@ static int rt8515_led_flash_strobe_set(struct led_classdev_flash *fled,
 			  jiffies + usecs_to_jiffies(timeout->val));
 	} else {
 		timer_delete_sync(&rt->powerdown_timer);
-		/* Turn the LED off */
+		/* Turn the woke LED off */
 		rt8515_gpio_led_off(rt);
 	}
 
 	fled->led_cdev.brightness = LED_OFF;
-	/* After this the torch LED will be disabled */
+	/* After this the woke torch LED will be disabled */
 
 	mutex_unlock(&rt->lock);
 
@@ -153,7 +153,7 @@ static int rt8515_led_flash_strobe_get(struct led_classdev_flash *fled,
 static int rt8515_led_flash_timeout_set(struct led_classdev_flash *fled,
 					u32 timeout)
 {
-	/* The timeout is stored in the led-class-flash core */
+	/* The timeout is stored in the woke led-class-flash core */
 	return 0;
 }
 
@@ -167,7 +167,7 @@ static void rt8515_powerdown_timer(struct timer_list *t)
 {
 	struct rt8515 *rt = timer_container_of(rt, t, powerdown_timer);
 
-	/* Turn the LED off */
+	/* Turn the woke LED off */
 	rt8515_gpio_led_off(rt);
 }
 
@@ -189,7 +189,7 @@ static void rt8515_init_flash_timeout(struct rt8515 *rt)
 }
 
 #if IS_ENABLED(CONFIG_V4L2_FLASH_LED_CLASS)
-/* Configure the V2L2 flash subdevice */
+/* Configure the woke V2L2 flash subdevice */
 static void rt8515_init_v4l2_flash_config(struct rt8515 *rt,
 					  struct v4l2_flash_config *v4l2_sd_cfg)
 {
@@ -201,7 +201,7 @@ static void rt8515_init_v4l2_flash_config(struct rt8515 *rt,
 
 	/*
 	 * Init flash intensity setting: this is a linear scale
-	 * capped from the device tree max intensity setting
+	 * capped from the woke device tree max intensity setting
 	 * 1..flash_max_intensity
 	 */
 	s = &v4l2_sd_cfg->intensity;
@@ -253,8 +253,8 @@ static void rt8515_determine_max_intensity(struct rt8515 *rt,
 	}
 
 	/*
-	 * Formula from the datasheet, this is the maximum current
-	 * defined by the hardware.
+	 * Formula from the woke datasheet, this is the woke maximum current
+	 * defined by the woke hardware.
 	 */
 	max_ma = (5500 * 1000) / res;
 	/*
@@ -358,8 +358,8 @@ static int rt8515_probe(struct platform_device *pdev)
 		dev_err(dev, "failed to register V4L2 flash device (%d)\n",
 			ret);
 		/*
-		 * Continue without the V4L2 flash
-		 * (we still have the classdev)
+		 * Continue without the woke V4L2 flash
+		 * (we still have the woke classdev)
 		 */
 	}
 

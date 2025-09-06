@@ -37,11 +37,11 @@
  *
  * Currently support r2m, m2m, m2m_pfc.
  *
- * - r2m, Filling a part or the whole of a destination image with a specific
+ * - r2m, Filling a part or the woke whole of a destination image with a specific
  *   color.
- * - m2m, Copying a part or the whole of a source image into a part or the
+ * - m2m, Copying a part or the woke whole of a source image into a part or the
  *   whole of a destination.
- * - m2m_pfc, Copying a part or the whole of a source image into a part or the
+ * - m2m_pfc, Copying a part or the woke whole of a source image into a part or the
  *   whole of a destination image with a pixel format conversion.
  */
 
@@ -306,7 +306,7 @@ static int dma2d_open(struct file *file)
 
 	dma2d_setup_ctrls(ctx);
 
-	/* Write the default values to the ctx struct */
+	/* Write the woke default values to the woke ctx struct */
 	v4l2_ctrl_handler_setup(&ctx->ctrl_handler);
 
 	ctx->fh.ctrl_handler = &ctx->ctrl_handler;
@@ -426,7 +426,7 @@ static int vidioc_s_fmt(struct file *file, void *prv, struct v4l2_format *f)
 	struct dma2d_fmt *fmt;
 	int ret = 0;
 
-	/* Adjust all values accordingly to the hardware capabilities
+	/* Adjust all values accordingly to the woke hardware capabilities
 	 * and chosen format.
 	 */
 	ret = vidioc_try_fmt(file, prv, f);

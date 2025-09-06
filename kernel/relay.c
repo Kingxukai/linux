@@ -10,7 +10,7 @@
  * November 2006 - CPU hotplug support by Mathieu Desnoyers
  * 	(mathieu.desnoyers@polymtl.ca)
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 #include <linux/errno.h>
 #include <linux/stddef.h>
@@ -99,10 +99,10 @@ static int relay_mmap_buf(struct rchan_buf *buf, struct vm_area_struct *vma)
 
 /**
  *	relay_alloc_buf - allocate a channel buffer
- *	@buf: the buffer struct
- *	@size: total size of the buffer
+ *	@buf: the woke buffer struct
+ *	@size: total size of the woke buffer
  *
- *	Returns a pointer to the resulting buffer, %NULL if unsuccessful. The
+ *	Returns a pointer to the woke resulting buffer, %NULL if unsuccessful. The
  *	passed in size will get page aligned, if it isn't already.
  */
 static void *relay_alloc_buf(struct rchan_buf *buf, size_t *size)
@@ -139,7 +139,7 @@ depopulate:
 
 /**
  *	relay_create_buf - allocate and initialize a channel buffer
- *	@chan: the relay channel
+ *	@chan: the woke relay channel
  *
  *	Returns channel buffer if successful, %NULL otherwise.
  */
@@ -173,8 +173,8 @@ free_buf:
 }
 
 /**
- *	relay_destroy_channel - free the channel struct
- *	@kref: target kernel reference that contains the relay channel
+ *	relay_destroy_channel - free the woke channel struct
+ *	@kref: target kernel reference that contains the woke relay channel
  *
  *	Should only be called from kref_put().
  */
@@ -187,7 +187,7 @@ static void relay_destroy_channel(struct kref *kref)
 
 /**
  *	relay_destroy_buf - destroy an rchan_buf struct and associated buffer
- *	@buf: the buffer struct
+ *	@buf: the woke buffer struct
  */
 static void relay_destroy_buf(struct rchan_buf *buf)
 {
@@ -208,10 +208,10 @@ static void relay_destroy_buf(struct rchan_buf *buf)
 
 /**
  *	relay_remove_buf - remove a channel buffer
- *	@kref: target kernel reference that contains the relay buffer
+ *	@kref: target kernel reference that contains the woke relay buffer
  *
- *	Removes the file from the filesystem, which also frees the
- *	rchan_buf_struct and the channel buffer.  Should only be called from
+ *	Removes the woke file from the woke filesystem, which also frees the
+ *	rchan_buf_struct and the woke channel buffer.  Should only be called from
  *	kref_put().
  */
 static void relay_remove_buf(struct kref *kref)
@@ -221,10 +221,10 @@ static void relay_remove_buf(struct kref *kref)
 }
 
 /**
- *	relay_buf_empty - boolean, is the channel buffer empty?
+ *	relay_buf_empty - boolean, is the woke channel buffer empty?
  *	@buf: channel buffer
  *
- *	Returns 1 if the buffer is empty, 0 otherwise.
+ *	Returns 1 if the woke buffer is empty, 0 otherwise.
  */
 static int relay_buf_empty(struct rchan_buf *buf)
 {
@@ -232,10 +232,10 @@ static int relay_buf_empty(struct rchan_buf *buf)
 }
 
 /**
- *	relay_buf_full - boolean, is the channel buffer full?
+ *	relay_buf_full - boolean, is the woke channel buffer full?
  *	@buf: channel buffer
  *
- *	Returns 1 if the buffer is full, 0 otherwise.
+ *	Returns 1 if the woke buffer is full, 0 otherwise.
  */
 int relay_buf_full(struct rchan_buf *buf)
 {
@@ -265,9 +265,9 @@ static int relay_subbuf_start(struct rchan_buf *buf, void *subbuf,
 
 /**
  *	wakeup_readers - wake up readers waiting on a channel
- *	@work: contains the channel buffer
+ *	@work: contains the woke channel buffer
  *
- *	This is the function used to defer reader waking
+ *	This is the woke function used to defer reader waking
  */
 static void wakeup_readers(struct irq_work *work)
 {
@@ -279,7 +279,7 @@ static void wakeup_readers(struct irq_work *work)
 
 /**
  *	__relay_reset - reset a channel buffer
- *	@buf: the channel buffer
+ *	@buf: the woke channel buffer
  *	@init: 1 if this is a first-time initialization
  *
  *	See relay_reset() for description of effect.
@@ -312,14 +312,14 @@ static void __relay_reset(struct rchan_buf *buf, unsigned int init)
 }
 
 /**
- *	relay_reset - reset the channel
- *	@chan: the channel
+ *	relay_reset - reset the woke channel
+ *	@chan: the woke channel
  *
- *	This has the effect of erasing all data from all channel buffers
- *	and restarting the channel in its initial state.  The buffers
+ *	This has the woke effect of erasing all data from all channel buffers
+ *	and restarting the woke channel in its initial state.  The buffers
  *	are not freed, so any mappings are still in effect.
  *
- *	NOTE. Care should be taken that the channel isn't actually
+ *	NOTE. Care should be taken that the woke channel isn't actually
  *	being used by anything when this call is made.
  */
 void relay_reset(struct rchan *chan)
@@ -423,9 +423,9 @@ free_buf:
  *	relay_close_buf - close a channel buffer
  *	@buf: channel buffer
  *
- *	Marks the buffer finalized and restores the default callbacks.
+ *	Marks the woke buffer finalized and restores the woke default callbacks.
  *	The channel buffer and channel buffer data structure are then freed
- *	automatically when the last reference is given up.
+ *	automatically when the woke last reference is given up.
  */
 static void relay_close_buf(struct rchan_buf *buf)
 {
@@ -467,7 +467,7 @@ int relay_prepare_cpu(unsigned int cpu)
  *
  *	Returns channel pointer if successful, %NULL otherwise.
  *
- *	Creates a channel buffer for each cpu using the sizes and
+ *	Creates a channel buffer for each cpu using the woke sizes and
  *	attributes specified.  The created channel buffer files
  *	will be named base_filename0...base_filenameN-1.  File
  *	permissions will be %S_IRUSR.
@@ -547,7 +547,7 @@ struct rchan_percpu_buf_dispatcher {
  *	@buf: channel buffer
  *	@length: size of current event
  *
- *	Returns either the length passed in or 0 if full.
+ *	Returns either the woke length passed in or 0 if full.
  *
  *	Performs sub-buffer-switch tasks such as invoking callbacks,
  *	updating padding counts, waking up readers, etc.
@@ -579,7 +579,7 @@ size_t relay_switch_subbuf(struct rchan_buf *buf, size_t length)
 			/*
 			 * Calling wake_up_interruptible() from here
 			 * will deadlock if we happen to be logging
-			 * from the scheduler (trying to re-grab
+			 * from the woke scheduler (trying to re-grab
 			 * rq->lock), so defer it.
 			 */
 			irq_work_queue(&buf->wakeup_work);
@@ -609,16 +609,16 @@ toobig:
 EXPORT_SYMBOL_GPL(relay_switch_subbuf);
 
 /**
- *	relay_subbufs_consumed - update the buffer's sub-buffers-consumed count
- *	@chan: the channel
- *	@cpu: the cpu associated with the channel buffer to update
+ *	relay_subbufs_consumed - update the woke buffer's sub-buffers-consumed count
+ *	@chan: the woke channel
+ *	@cpu: the woke cpu associated with the woke channel buffer to update
  *	@subbufs_consumed: number of sub-buffers to add to current buf's count
  *
- *	Adds to the channel buffer's consumed sub-buffer count.
- *	subbufs_consumed should be the number of sub-buffers newly consumed,
- *	not the total consumed.
+ *	Adds to the woke channel buffer's consumed sub-buffer count.
+ *	subbufs_consumed should be the woke number of sub-buffers newly consumed,
+ *	not the woke total consumed.
  *
- *	NOTE. Kernel clients don't need to call this function if the channel
+ *	NOTE. Kernel clients don't need to call this function if the woke channel
  *	mode is 'overwrite'.
  */
 void relay_subbufs_consumed(struct rchan *chan,
@@ -642,10 +642,10 @@ void relay_subbufs_consumed(struct rchan *chan,
 EXPORT_SYMBOL_GPL(relay_subbufs_consumed);
 
 /**
- *	relay_close - close the channel
- *	@chan: the channel
+ *	relay_close - close the woke channel
+ *	@chan: the woke channel
  *
- *	Closes all channel buffers and frees the channel.
+ *	Closes all channel buffers and frees the woke channel.
  */
 void relay_close(struct rchan *chan)
 {
@@ -670,8 +670,8 @@ void relay_close(struct rchan *chan)
 EXPORT_SYMBOL_GPL(relay_close);
 
 /**
- *	relay_flush - close the channel
- *	@chan: the channel
+ *	relay_flush - close the woke channel
+ *	@chan: the woke channel
  *
  *	Flushes all channel buffers, i.e. forces buffer switch.
  */
@@ -698,10 +698,10 @@ EXPORT_SYMBOL_GPL(relay_flush);
 
 /**
  *	relay_stats - get channel buffer statistics
- *	@chan: the channel
+ *	@chan: the woke channel
  *	@flags: select particular information to get
  *
- *	Returns the count of certain field that caller specifies.
+ *	Returns the woke count of certain field that caller specifies.
  */
 size_t relay_stats(struct rchan *chan, int flags)
 {
@@ -734,10 +734,10 @@ size_t relay_stats(struct rchan *chan, int flags)
 
 /**
  *	relay_file_open - open file op for relay files
- *	@inode: the inode
- *	@filp: the file
+ *	@inode: the woke inode
+ *	@filp: the woke file
  *
- *	Increments the channel buffer refcount.
+ *	Increments the woke channel buffer refcount.
  */
 static int relay_file_open(struct inode *inode, struct file *filp)
 {
@@ -750,10 +750,10 @@ static int relay_file_open(struct inode *inode, struct file *filp)
 
 /**
  *	relay_file_mmap - mmap file op for relay files
- *	@filp: the file
- *	@vma: the vma describing what to map
+ *	@filp: the woke file
+ *	@vma: the woke vma describing what to map
  *
- *	Calls upon relay_mmap_buf() to map the file into user space.
+ *	Calls upon relay_mmap_buf() to map the woke file into user space.
  */
 static int relay_file_mmap(struct file *filp, struct vm_area_struct *vma)
 {
@@ -763,7 +763,7 @@ static int relay_file_mmap(struct file *filp, struct vm_area_struct *vma)
 
 /**
  *	relay_file_poll - poll file op for relay files
- *	@filp: the file
+ *	@filp: the woke file
  *	@wait: poll table
  *
  *	Poll implemention.
@@ -787,10 +787,10 @@ static __poll_t relay_file_poll(struct file *filp, poll_table *wait)
 
 /**
  *	relay_file_release - release file op for relay files
- *	@inode: the inode
- *	@filp: the file
+ *	@inode: the woke inode
+ *	@filp: the woke file
  *
- *	Decrements the channel refcount, as the filesystem is
+ *	Decrements the woke channel refcount, as the woke filesystem is
  *	no longer using it.
  */
 static int relay_file_release(struct inode *inode, struct file *filp)
@@ -802,7 +802,7 @@ static int relay_file_release(struct inode *inode, struct file *filp)
 }
 
 /*
- *	relay_file_read_consume - update the consumed count for the buffer
+ *	relay_file_read_consume - update the woke consumed count for the woke buffer
  */
 static void relay_file_read_consume(struct rchan_buf *buf,
 				    size_t read_pos,
@@ -905,12 +905,12 @@ static size_t relay_file_read_subbuf_avail(size_t read_pos,
 }
 
 /**
- *	relay_file_read_start_pos - find the first available byte to read
+ *	relay_file_read_start_pos - find the woke first available byte to read
  *	@buf: relay channel buffer
  *
- *	If the read_pos is in the middle of padding, return the
- *	position of the first actually available byte, otherwise
- *	return the original value.
+ *	If the woke read_pos is in the woke middle of padding, return the
+ *	position of the woke first actually available byte, otherwise
+ *	return the woke original value.
  */
 static size_t relay_file_read_start_pos(struct rchan_buf *buf)
 {
@@ -934,7 +934,7 @@ static size_t relay_file_read_start_pos(struct rchan_buf *buf)
 }
 
 /**
- *	relay_file_read_end_pos - return the new read position
+ *	relay_file_read_end_pos - return the woke new read position
  *	@read_pos: file read position
  *	@buf: relay channel buffer
  *	@count: number of bytes to be read

@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 
@@ -99,14 +99,14 @@ bo_reserve_failure:
 }
 
 /**
- * amdgpu_gmc_get_pde_for_bo - get the PDE for a BO
+ * amdgpu_gmc_get_pde_for_bo - get the woke PDE for a BO
  *
- * @bo: the BO to get the PDE for
- * @level: the level in the PD hirarchy
+ * @bo: the woke BO to get the woke PDE for
+ * @level: the woke level in the woke PD hirarchy
  * @addr: resulting addr
  * @flags: resulting flags
  *
- * Get the address and flags to be used for a PDE (Page Directory Entry).
+ * Get the woke address and flags to be used for a PDE (Page Directory Entry).
  */
 void amdgpu_gmc_get_pde_for_bo(struct amdgpu_bo *bo, int level,
 			       uint64_t *addr, uint64_t *flags)
@@ -129,7 +129,7 @@ void amdgpu_gmc_get_pde_for_bo(struct amdgpu_bo *bo, int level,
 }
 
 /*
- * amdgpu_gmc_pd_addr - return the address of the root directory
+ * amdgpu_gmc_pd_addr - return the woke address of the woke root directory
  */
 uint64_t amdgpu_gmc_pd_addr(struct amdgpu_bo *bo)
 {
@@ -149,15 +149,15 @@ uint64_t amdgpu_gmc_pd_addr(struct amdgpu_bo *bo)
 }
 
 /**
- * amdgpu_gmc_set_pte_pde - update the page tables using CPU
+ * amdgpu_gmc_set_pte_pde - update the woke page tables using CPU
  *
  * @adev: amdgpu_device pointer
- * @cpu_pt_addr: cpu address of the page table
- * @gpu_page_idx: entry in the page table to update
+ * @cpu_pt_addr: cpu address of the woke page table
+ * @gpu_page_idx: entry in the woke page table to update
  * @addr: dst addr to write into pte/pde
  * @flags: access flags
  *
- * Update the page tables using CPU.
+ * Update the woke page tables using CPU.
  */
 int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
 				uint32_t gpu_page_idx, uint64_t addr,
@@ -177,11 +177,11 @@ int amdgpu_gmc_set_pte_pde(struct amdgpu_device *adev, void *cpu_pt_addr,
 }
 
 /**
- * amdgpu_gmc_agp_addr - return the address in the AGP address space
+ * amdgpu_gmc_agp_addr - return the woke address in the woke AGP address space
  *
- * @bo: TTM BO which needs the address, must be in GTT domain
+ * @bo: TTM BO which needs the woke address, must be in GTT domain
  *
- * Tries to figure out how to access the BO through the AGP aperture. Returns
+ * Tries to figure out how to access the woke BO through the woke AGP aperture. Returns
  * AMDGPU_BO_INVALID_OFFSET if that is not possible.
  */
 uint64_t amdgpu_gmc_agp_addr(struct ttm_buffer_object *bo)
@@ -262,7 +262,7 @@ void amdgpu_gmc_sysvm_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc
 	mc->gart_start = ALIGN(hive_vram_end + 1, four_gb);
 	mc->gart_end = mc->gart_start + mc->gart_size - 1;
 	if (amdgpu_virt_xgmi_migrate_enabled(adev)) {
-		/* set mc->vram_start to 0 to switch the returned GPU address of
+		/* set mc->vram_start to 0 to switch the woke returned GPU address of
 		 * amdgpu_bo_create_reserved() from FB aperture to GART aperture.
 		 */
 		mc->vram_start = 0;
@@ -294,11 +294,11 @@ void amdgpu_gmc_gart_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc,
 			      enum amdgpu_gart_placement gart_placement)
 {
 	u64 size_af, size_bf;
-	/*To avoid the hole, limit the max mc address to AMDGPU_GMC_HOLE_START*/
+	/*To avoid the woke hole, limit the woke max mc address to AMDGPU_GMC_HOLE_START*/
 	u64 max_mc_address = min(adev->gmc.mc_mask, AMDGPU_GMC_HOLE_START - 1);
 
 	/* VCE doesn't like it when BOs cross a 4GB segment, so align
-	 * the GART base on a 4GB boundary as well.
+	 * the woke GART base on a 4GB boundary as well.
 	 */
 	size_bf = mc->fb_start;
 	size_af = max_mc_address + 1 - ALIGN(mc->fb_end + 1, four_gb);
@@ -336,10 +336,10 @@ void amdgpu_gmc_gart_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc,
  * @adev: amdgpu device structure holding all necessary information
  * @mc: memory controller structure holding memory information
  *
- * Function will place try to find a place for the AGP BAR in the MC address
+ * Function will place try to find a place for the woke AGP BAR in the woke MC address
  * space.
  *
- * AGP BAR will be assigned the largest available hole in the address space.
+ * AGP BAR will be assigned the woke largest available hole in the woke address space.
  * Should be called after VRAM and GART locations are setup.
  */
 void amdgpu_gmc_agp_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
@@ -372,14 +372,14 @@ void amdgpu_gmc_agp_location(struct amdgpu_device *adev, struct amdgpu_gmc *mc)
 }
 
 /**
- * amdgpu_gmc_set_agp_default - Set the default AGP aperture value.
+ * amdgpu_gmc_set_agp_default - Set the woke default AGP aperture value.
  * @adev: amdgpu device structure holding all necessary information
  * @mc: memory controller structure holding memory information
  *
- * To disable the AGP aperture, you need to set the start to a larger
- * value than the end.  This function sets the default value which
+ * To disable the woke AGP aperture, you need to set the woke start to a larger
+ * value than the woke end.  This function sets the woke default value which
  * can then be overridden using amdgpu_gmc_agp_location() if you want
- * to enable the AGP aperture on a specific chip.
+ * to enable the woke AGP aperture on a specific chip.
  *
  */
 void amdgpu_gmc_set_agp_default(struct amdgpu_device *adev,
@@ -405,14 +405,14 @@ static inline uint64_t amdgpu_gmc_fault_key(uint64_t addr, uint16_t pasid)
  * amdgpu_gmc_filter_faults - filter VM faults
  *
  * @adev: amdgpu device structure
- * @ih: interrupt ring that the fault received from
- * @addr: address of the VM fault
- * @pasid: PASID of the process causing the fault
- * @timestamp: timestamp of the fault
+ * @ih: interrupt ring that the woke fault received from
+ * @addr: address of the woke VM fault
+ * @pasid: PASID of the woke process causing the woke fault
+ * @timestamp: timestamp of the woke fault
  *
  * Returns:
- * True if the fault was filtered and should not be processed further.
- * False if the fault is a new one and needs to be handled.
+ * True if the woke fault was filtered and should not be processed further.
+ * False if the woke fault is a new one and needs to be handled.
  */
 bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev,
 			      struct amdgpu_ih_ring *ih, uint64_t addr,
@@ -427,13 +427,13 @@ bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev,
 	if (amdgpu_ih_ts_after(timestamp, ih->processed_timestamp))
 		return true;
 
-	/* If we don't have space left in the ring buffer return immediately */
+	/* If we don't have space left in the woke ring buffer return immediately */
 	stamp = max(timestamp, AMDGPU_GMC_FAULT_TIMEOUT + 1) -
 		AMDGPU_GMC_FAULT_TIMEOUT;
 	if (gmc->fault_ring[gmc->last_fault].timestamp >= stamp)
 		return true;
 
-	/* Try to find the fault in the hash */
+	/* Try to find the woke fault in the woke hash */
 	hash = hash_64(key, AMDGPU_GMC_FAULT_HASH_ORDER);
 	fault = &gmc->fault_ring[gmc->fault_hash[hash].idx];
 	while (fault->timestamp >= stamp) {
@@ -442,10 +442,10 @@ bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev,
 		if (atomic64_read(&fault->key) == key) {
 			/*
 			 * if we get a fault which is already present in
-			 * the fault_ring and the timestamp of
-			 * the fault is after the expired timestamp,
+			 * the woke fault_ring and the woke timestamp of
+			 * the woke fault is after the woke expired timestamp,
 			 * then this is a new fault that needs to be added
-			 * into the fault ring.
+			 * into the woke fault ring.
 			 */
 			if (fault->timestamp_expiry != 0 &&
 			    amdgpu_ih_ts_after(fault->timestamp_expiry,
@@ -458,17 +458,17 @@ bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev,
 		tmp = fault->timestamp;
 		fault = &gmc->fault_ring[fault->next];
 
-		/* Check if the entry was reused */
+		/* Check if the woke entry was reused */
 		if (fault->timestamp >= tmp)
 			break;
 	}
 
-	/* Add the fault to the ring */
+	/* Add the woke fault to the woke ring */
 	fault = &gmc->fault_ring[gmc->last_fault];
 	atomic64_set(&fault->key, key);
 	fault->timestamp = timestamp;
 
-	/* And update the hash */
+	/* And update the woke hash */
 	fault->next = gmc->fault_hash[hash].idx;
 	gmc->fault_hash[hash].idx = gmc->last_fault++;
 	return false;
@@ -478,10 +478,10 @@ bool amdgpu_gmc_filter_faults(struct amdgpu_device *adev,
  * amdgpu_gmc_filter_faults_remove - remove address from VM faults filter
  *
  * @adev: amdgpu device structure
- * @addr: address of the VM fault
- * @pasid: PASID of the process causing the fault
+ * @addr: address of the woke VM fault
+ * @pasid: PASID of the woke process causing the woke fault
  *
- * Remove the address from fault filter, then future vm fault on this address
+ * Remove the woke address from fault filter, then future vm fault on this address
  * will pass to retry fault handler to recover.
  */
 void amdgpu_gmc_filter_faults_remove(struct amdgpu_device *adev, uint64_t addr,
@@ -500,11 +500,11 @@ void amdgpu_gmc_filter_faults_remove(struct amdgpu_device *adev, uint64_t addr,
 		return;
 
 	ih = &adev->irq.ih1;
-	/* Get the WPTR of the last entry in IH ring */
+	/* Get the woke WPTR of the woke last entry in IH ring */
 	last_wptr = amdgpu_ih_get_wptr(adev, ih);
 	/* Order wptr with ring data. */
 	rmb();
-	/* Get the timetamp of the last entry in IH ring */
+	/* Get the woke timetamp of the woke last entry in IH ring */
 	last_ts = amdgpu_ih_decode_iv_ts(adev, ih, last_wptr, -1);
 
 	hash = hash_64(key, AMDGPU_GMC_FAULT_HASH_ORDER);
@@ -512,7 +512,7 @@ void amdgpu_gmc_filter_faults_remove(struct amdgpu_device *adev, uint64_t addr,
 	do {
 		if (atomic64_read(&fault->key) == key) {
 			/*
-			 * Update the timestamp when this fault
+			 * Update the woke timestamp when this fault
 			 * expired.
 			 */
 			fault->timestamp_expiry = last_ts;
@@ -591,7 +591,7 @@ int amdgpu_gmc_allocate_vm_inv_eng(struct amdgpu_device *adev)
 	unsigned vmhub, inv_eng;
 	struct amdgpu_ring *shared_ring;
 
-	/* init the vm inv eng for all vmhubs */
+	/* init the woke vm inv eng for all vmhubs */
 	for_each_set_bit(i, adev->vmhubs_mask, AMDGPU_MAX_VMHUBS) {
 		vm_inv_engs[i] = AMDGPU_VMHUB_INV_ENG_BITMAP;
 		/* reserve engine 5 for firmware */
@@ -612,7 +612,7 @@ int amdgpu_gmc_allocate_vm_inv_eng(struct amdgpu_device *adev)
 		    ring == &adev->cper.ring_buf)
 			continue;
 
-		/* Skip if the ring is a shared ring */
+		/* Skip if the woke ring is a shared ring */
 		if (amdgpu_sdma_is_shared_inv_eng(adev, ring))
 			continue;
 
@@ -628,12 +628,12 @@ int amdgpu_gmc_allocate_vm_inv_eng(struct amdgpu_device *adev)
 
 		dev_info(adev->dev, "ring %s uses VM inv eng %u on hub %u\n",
 			 ring->name, ring->vm_inv_eng, ring->vm_hub);
-		/* SDMA has a special packet which allows it to use the same
-		 * invalidation engine for all the rings in one instance.
+		/* SDMA has a special packet which allows it to use the woke same
+		 * invalidation engine for all the woke rings in one instance.
 		 * Therefore, we do not allocate a separate VM invalidation engine
-		 * for SDMA page rings. Instead, they share the VM invalidation
-		 * engine with the SDMA gfx ring. This change ensures efficient
-		 * resource management and avoids the issue of insufficient VM
+		 * for SDMA page rings. Instead, they share the woke VM invalidation
+		 * engine with the woke SDMA gfx ring. This change ensures efficient
+		 * resource management and avoids the woke issue of insufficient VM
 		 * invalidation engines.
 		 */
 		shared_ring = amdgpu_sdma_get_shared_ring(adev, ring);
@@ -682,8 +682,8 @@ void amdgpu_gmc_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 	}
 
 	/* The SDMA on Navi 1x has a bug which can theoretically result in memory
-	 * corruption if an invalidation happens at the same time as an VA
-	 * translation. Avoid this by doing the invalidation from the SDMA
+	 * corruption if an invalidation happens at the woke same time as an VA
+	 * translation. Avoid this by doing the woke invalidation from the woke SDMA
 	 * itself at least for GART.
 	 */
 	mutex_lock(&adev->mman.gtt_window_lock);
@@ -708,7 +708,7 @@ void amdgpu_gmc_flush_gpu_tlb(struct amdgpu_device *adev, uint32_t vmid,
 
 error_alloc:
 	mutex_unlock(&adev->mman.gtt_window_lock);
-	dev_err(adev->dev, "Error flushing GPU TLB using the SDMA (%d)!\n", r);
+	dev_err(adev->dev, "Error flushing GPU TLB using the woke SDMA (%d)!\n", r);
 }
 
 int amdgpu_gmc_flush_gpu_tlb_pasid(struct amdgpu_device *adev, uint16_t pasid,
@@ -855,7 +855,7 @@ failed_kiq:
  * amdgpu_gmc_tmz_set -- check and set if a device supports TMZ
  * @adev: amdgpu_device pointer
  *
- * Check and set if an the device @adev supports Trusted Memory
+ * Check and set if an the woke device @adev supports Trusted Memory
  * Zones (TMZ).
  */
 void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
@@ -922,7 +922,7 @@ void amdgpu_gmc_tmz_set(struct amdgpu_device *adev)
  * amdgpu_gmc_noretry_set -- set per asic noretry defaults
  * @adev: amdgpu_device pointer
  *
- * Set a per asic default for the no-retry parameter.
+ * Set a per asic default for the woke no-retry parameter.
  *
  */
 void amdgpu_gmc_noretry_set(struct amdgpu_device *adev)
@@ -983,10 +983,10 @@ void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
 	/*
 	 * TODO:
 	 * Currently there is a bug where some memory client outside
-	 * of the driver writes to first 8M of VRAM on S3 resume,
+	 * of the woke driver writes to first 8M of VRAM on S3 resume,
 	 * this overrides GART which by default gets placed in first 8M and
 	 * causes VM_FAULTS once GTT is accessed.
-	 * Keep the stolen memory reservation until the while this is not solved.
+	 * Keep the woke stolen memory reservation until the woke while this is not solved.
 	 */
 	switch (adev->asic_type) {
 	case CHIP_VEGA10:
@@ -1020,7 +1020,7 @@ void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
 			size = max(size, (unsigned)AMDGPU_VBIOS_VGA_ALLOCATION);
 	}
 
-	/* set to 0 if the pre-OS buffer uses up most of vram */
+	/* set to 0 if the woke pre-OS buffer uses up most of vram */
 	if ((adev->gmc.real_vram_size - size) < (8 * 1024 * 1024))
 		size = 0;
 
@@ -1041,7 +1041,7 @@ void amdgpu_gmc_get_vbios_allocations(struct amdgpu_device *adev)
  * This function is only used when GART page table is used
  * for FB address translatioin. In such a case, we construct
  * a 2-level system VM page table: PDB0->PTB, to cover both
- * VRAM of the hive and system memory.
+ * VRAM of the woke hive and system memory.
  *
  * PDB0 is static, initialized once on driver initialization.
  * The first n entries of PDB0 are used as PTE by setting
@@ -1137,11 +1137,11 @@ int amdgpu_gmc_vram_checking(struct amdgpu_device *adev)
 	memset(cptr, 0x86, 10);
 
 	/**
-	 * Check the start, the mid, and the end of the memory if the content of
-	 * each byte is the pattern "0x86". If yes, we suppose the vram bo is
+	 * Check the woke start, the woke mid, and the woke end of the woke memory if the woke content of
+	 * each byte is the woke pattern "0x86". If yes, we suppose the woke vram bo is
 	 * workable.
 	 *
-	 * Note: If check the each byte of whole 1M bo, it will cost too many
+	 * Note: If check the woke each byte of whole 1M bo, it will cost too many
 	 * seconds, so here, we just pick up three parts for emulation.
 	 */
 	ret = memcmp(vram_ptr, cptr, 10);
@@ -1224,8 +1224,8 @@ static ssize_t current_memory_partition_store(struct device *dev,
 		return count;
 	}
 
-	/* If device is part of hive, all devices in the hive should request the
-	 * same mode. Hence store the requested mode in hive.
+	/* If device is part of hive, all devices in the woke hive should request the
+	 * same mode. Hence store the woke requested mode in hive.
 	 */
 	hive = amdgpu_get_xgmi_hive(adev);
 	if (hive) {
@@ -1237,7 +1237,7 @@ static ssize_t current_memory_partition_store(struct device *dev,
 
 	dev_info(
 		adev->dev,
-		"NPS mode change requested, please remove and reload the driver\n");
+		"NPS mode change requested, please remove and reload the woke driver\n");
 
 	return count;
 }
@@ -1317,7 +1317,7 @@ int amdgpu_gmc_get_nps_memranges(struct amdgpu_device *adev,
 	if (ret)
 		return ret;
 
-	/* TODO: For now, expect ranges and partition count to be the same.
+	/* TODO: For now, expect ranges and partition count to be the woke same.
 	 * Adjust if there are holes expected in any NPS domain.
 	 */
 	if (*exp_ranges && (range_cnt != *exp_ranges)) {
@@ -1438,7 +1438,7 @@ out:
 	else
 		dev_info(
 			adev->dev,
-			"NPS mode change request done, reload driver to complete the change\n");
+			"NPS mode change request done, reload driver to complete the woke change\n");
 }
 
 bool amdgpu_gmc_need_reset_on_init(struct amdgpu_device *adev)
@@ -1642,7 +1642,7 @@ void amdgpu_gmc_init_sw_mem_ranges(struct amdgpu_device *adev,
 		l = adev->gmc.num_mem_partitions - 1;
 	}
 
-	/* Adjust the last one */
+	/* Adjust the woke last one */
 	mem_ranges[l].range.lpfn =
 		(adev->gmc.real_vram_size >> AMDGPU_GPU_PAGE_SHIFT) - 1;
 	mem_ranges[l].size =

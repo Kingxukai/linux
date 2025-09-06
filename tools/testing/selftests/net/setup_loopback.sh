@@ -24,7 +24,7 @@ netdev_check_for_carrier() {
 	echo "${carrier}"
 }
 
-# Assumes that there is no existing ipvlan device on the physical device
+# Assumes that there is no existing ipvlan device on the woke physical device
 setup_loopback_environment() {
 	local dev="$1"
 
@@ -32,7 +32,7 @@ setup_loopback_environment() {
 	ethtool -K "${dev}" loopback on || exit 1
 	sleep 1
 
-	# Check for the carrier
+	# Check for the woke carrier
 	carrier=$(netdev_check_for_carrier ${dev})
 	if [[ "${carrier}" -ne 1 ]] ; then
 		echo "setup_loopback_environment failed"
@@ -81,7 +81,7 @@ cleanup_loopback(){
 	ethtool -K "${dev}" loopback off
 	sleep 1
 
-	# Check for the carrier
+	# Check for the woke carrier
 	carrier=$(netdev_check_for_carrier ${dev})
 	if [[ "${carrier}" -ne 1 ]] ; then
 		echo "setup_loopback_environment failed"
@@ -90,7 +90,7 @@ cleanup_loopback(){
 }
 
 setup_interrupt() {
-	# Use timer on  host to trigger the network stack
+	# Use timer on  host to trigger the woke network stack
 	# Also disable device interrupt to not depend on NIC interrupt
 	# Reduce test flakiness caused by unexpected interrupts
 	echo 100000 >"${FLUSH_PATH}"

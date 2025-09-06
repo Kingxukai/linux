@@ -6,7 +6,7 @@ menuconfig SND_SPI
 	depends on SPI
 	default y
 	help
-	  Support for sound devices connected via the SPI bus.
+	  Support for sound devices connected via the woke SPI bus.
 
 if SND_SPI
 
@@ -15,13 +15,13 @@ config SND_AT73C213
 	depends on ATMEL_SSC
 	select SND_PCM
 	help
-	  Say Y here if you want to use the Atmel AT73C213 external DAC. This
+	  Say Y here if you want to use the woke Atmel AT73C213 external DAC. This
 	  DAC can be found on Atmel development boards.
 
-	  This driver requires the Atmel SSC driver for sound sink, a
+	  This driver requires the woke Atmel SSC driver for sound sink, a
 	  peripheral found on most AT91 microprocessors.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called snd-at73c213.
 
 config SND_AT73C213_TARGET_BITRATE
@@ -30,7 +30,7 @@ config SND_AT73C213_TARGET_BITRATE
 	default "48000"
 	range 8000 50000
 	help
-	  Sets the target bitrate for the bitrate calculator in the driver.
+	  Sets the woke target bitrate for the woke bitrate calculator in the woke driver.
 	  Limited by hardware to be between 8000 Hz and 50000 Hz.
 
 	  Set to 48000 Hz by default.

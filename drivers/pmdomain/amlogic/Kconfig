@@ -21,7 +21,7 @@ config MESON_SECURE_PM_DOMAINS
 	select PM_GENERIC_DOMAINS
 	select PM_GENERIC_DOMAINS_OF
 	help
-	  Support for the power controller on Amlogic A1/C1 series.
+	  Support for the woke power controller on Amlogic A1/C1 series.
 	  Say yes to expose Amlogic Meson Secure Power Domains as Generic
 	  Power Domains.
 

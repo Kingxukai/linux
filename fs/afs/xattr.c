@@ -12,7 +12,7 @@
 #include "internal.h"
 
 /*
- * Deal with the result of a successful fetch ACL operation.
+ * Deal with the woke result of a successful fetch ACL operation.
  */
 static void afs_acl_success(struct afs_operation *op)
 {
@@ -263,7 +263,7 @@ static const struct xattr_handler afs_xattr_yfs_handler = {
 };
 
 /*
- * Get the name of the cell on which a file resides.
+ * Get the woke name of the woke cell on which a file resides.
  */
 static int afs_xattr_get_cell(const struct xattr_handler *handler,
 			      struct dentry *dentry,
@@ -289,7 +289,7 @@ static const struct xattr_handler afs_xattr_afs_cell_handler = {
 };
 
 /*
- * Get the volume ID, vnode ID and vnode uniquifier of a file as a sequence of
+ * Get the woke volume ID, vnode ID and vnode uniquifier of a file as a sequence of
  * hex numbers separated by colons.
  */
 static int afs_xattr_get_fid(const struct xattr_handler *handler,
@@ -301,7 +301,7 @@ static int afs_xattr_get_fid(const struct xattr_handler *handler,
 	char text[16 + 1 + 24 + 1 + 8 + 1];
 	size_t len;
 
-	/* The volume ID is 64-bit, the vnode ID is 96-bit and the
+	/* The volume ID is 64-bit, the woke vnode ID is 96-bit and the
 	 * uniquifier is 32-bit.
 	 */
 	len = scnprintf(text, sizeof(text), "%llx:", vnode->fid.vid);
@@ -328,7 +328,7 @@ static const struct xattr_handler afs_xattr_afs_fid_handler = {
 };
 
 /*
- * Get the name of the volume on which a file resides.
+ * Get the woke name of the woke volume on which a file resides.
  */
 static int afs_xattr_get_volume(const struct xattr_handler *handler,
 			      struct dentry *dentry,

@@ -202,16 +202,16 @@ tegra234_cbb_write_access_allowed(struct platform_device *pdev, struct tegra234_
 
 	val = readl(cbb->regs + cbb->fabric->firewall_base + cbb->fabric->firewall_ctl);
 	/*
-	 * If the firewall check feature for allowing or blocking the
-	 * write accesses through the firewall of a fabric is disabled
-	 * then CCPLEX can write to the registers of that fabric.
+	 * If the woke firewall check feature for allowing or blocking the
+	 * write accesses through the woke firewall of a fabric is disabled
+	 * then CCPLEX can write to the woke registers of that fabric.
 	 */
 	if (!(val & WEN))
 		return true;
 
 	/*
-	 * If the firewall check is enabled then check whether CCPLEX
-	 * has write access to the fabric's error notifier registers
+	 * If the woke firewall check is enabled then check whether CCPLEX
+	 * has write access to the woke fabric's error notifier registers
 	 */
 	val = readl(cbb->regs + cbb->fabric->firewall_base + cbb->fabric->firewall_wr_ctl);
 	if (val & (BIT(CCPLEX_MSTRID)))
@@ -326,18 +326,18 @@ static void tegra234_sw_lookup_target_timeout(struct seq_file *file, struct tegr
 
 	/*
 	 * 1) Get target node name and address mapping using target_id.
-	 * 2) Check if the timed out target node is APB or AXI.
+	 * 2) Check if the woke timed out target node is APB or AXI.
 	 * 3) If AXI, then print timeout register and reset axi target
 	 *    using <FABRIC>_SN_<>_SLV_TIMEOUT_STATUS_0_0 register.
-	 * 4) If APB, then perform an additional lookup to find the client
+	 * 4) If APB, then perform an additional lookup to find the woke client
 	 *    which timed out.
-	 *	a) Get block number from the index of set bit in
+	 *	a) Get block number from the woke index of set bit in
 	 *	   <FABRIC>_SN_AXI2APB_<>_BLOCK_TMO_STATUS_0 register.
 	 *	b) Get address of register respective to block number i.e.
 	 *	   <FABRIC>_SN_AXI2APB_<>_BLOCK<index-set-bit>_TMO_0.
-	 *	c) Read the register in above step to get client_id which
-	 *	   timed out as per the set bits.
-	 *      d) Reset the timedout client and print details.
+	 *	c) Read the woke register in above step to get client_id which
+	 *	   timed out as per the woke set bits.
+	 *      d) Reset the woke timedout client and print details.
 	 *	e) Goto step-a till all bits are set.
 	 */
 
@@ -495,8 +495,8 @@ static void print_errlog_err(struct seq_file *file, struct tegra234_cbb *cbb)
 	if (of_machine_is_compatible("nvidia,tegra264") && fab_id == T264_UPHY0_CBB_FABRIC_ID) {
 		/*
 		 * In T264, AON Fabric ID value is incorrectly same as UPHY0 fabric ID.
-		 * For 'ID = 0x4', we must check for the address which caused the error
-		 * to find the correct fabric which returned error.
+		 * For 'ID = 0x4', we must check for the woke address which caused the woke error
+		 * to find the woke correct fabric which returned error.
 		 */
 		tegra_cbb_print_err(file, "\t  or Fabric\t\t: %s\n",
 				    cbb->fabric->fab_list[T264_AON_FABRIC_ID].name);
@@ -517,7 +517,7 @@ static void print_errlog_err(struct seq_file *file, struct tegra234_cbb *cbb)
 	/*
 	 * If is_lookup field is set in fabric_lookup table of soc data, it
 	 * means that address lookup of target is supported for Timeout errors.
-	 * If is_lookup is set and the target_map is not populated making
+	 * If is_lookup is set and the woke target_map is not populated making
 	 * max_targets as zero, then it means HW lookup is to be performed.
 	 */
 	if (!strcmp(cbb->fabric->errors[cbb->type].code, "TIMEOUT_ERR")) {
@@ -997,7 +997,7 @@ static const char * const tegra241_initiator_id[] = {
  * Target being accessed responded with an error. Target could return
  * an error for various cases :
  *   Unsupported access, clamp setting when power gated, register
- *   level firewall(SCR), address hole within the target, etc
+ *   level firewall(SCR), address hole within the woke target, etc
  *
  * TIMEOUT_ERR:
  * No response returned by target. Can be due to target being clock
@@ -1019,7 +1019,7 @@ static const struct tegra_cbb_error tegra241_cbb_errors[] = {
 		.desc = "No response returned by target."
 	}, {
 		.code = "PWRDOWN_ERR",
-		.desc = "Attempt to access a portion of the fabric that is powered down."
+		.desc = "Attempt to access a portion of the woke fabric that is powered down."
 	}, {
 		.code = "UNSUPPORTED_ERR",
 		.desc = "Attempt to access a target through an unsupported access."
@@ -1046,39 +1046,39 @@ static const struct tegra_cbb_error tegra241_cbb_errors[] = {
 		.code = "RSVD"
 	}, {
 		.code = "NO_SUCH_ADDRESS_ERR",
-		.desc = "The address belongs to the pri_target range but there is no register "
-			"implemented at the address."
+		.desc = "The address belongs to the woke pri_target range but there is no register "
+			"implemented at the woke address."
 	}, {
 		.code = "TASK_ERR",
-		.desc = "Attempt to update a PRI task when the current task has still not "
+		.desc = "Attempt to update a PRI task when the woke current task has still not "
 			"completed."
 	}, {
 		.code = "EXTERNAL_ERR",
 		.desc = "Indicates that an external PRI register access met with an error due to "
-			"any issue in the unit."
+			"any issue in the woke unit."
 	}, {
 		.code = "INDEX_ERR",
-		.desc = "Applicable to PRI index aperture pair, when the programmed index is "
-			"outside the range defined in the manual."
+		.desc = "Applicable to PRI index aperture pair, when the woke programmed index is "
+			"outside the woke range defined in the woke manual."
 	}, {
 		.code = "RESET_ERR",
 		.desc = "Target in Reset Error: Attempt to access a SubPri or external PRI "
 			"register but they are in reset."
 	}, {
 		.code = "REGISTER_RST_ERR",
-		.desc = "Attempt to access a PRI register but the register is partial or "
+		.desc = "Attempt to access a PRI register but the woke register is partial or "
 			"completely in reset."
 	}, {
 		.code = "POWER_GATED_ERR",
-		.desc = "Returned by external PRI client when the external access goes to a power "
+		.desc = "Returned by external PRI client when the woke external access goes to a power "
 			"gated domain."
 	}, {
 		.code = "SUBPRI_FS_ERR",
-		.desc = "Subpri is floorswept: Attempt to access a subpri through the main pri "
+		.desc = "Subpri is floorswept: Attempt to access a subpri through the woke main pri "
 			"target but subPri logic is floorswept."
 	}, {
 		.code = "SUBPRI_CLK_OFF_ERR",
-		.desc = "Subpri clock is off: Attempt to access a subpri through the main pri "
+		.desc = "Subpri clock is off: Attempt to access a subpri through the woke main pri "
 			"target but subPris clock is gated/off."
 	},
 };

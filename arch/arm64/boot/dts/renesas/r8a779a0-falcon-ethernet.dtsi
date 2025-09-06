@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Falcon Ethernet sub-board
+ * Device Tree Source for the woke Falcon Ethernet sub-board
  *
  * Copyright (C) 2021 Glider bv
  */

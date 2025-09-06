@@ -45,8 +45,8 @@ alternative_else_nop_endif
 
 #ifdef CONFIG_ARM64_PTR_AUTH
 /*
- * thread.keys_user.ap* as offset exceeds the #imm offset range
- * so use the base value of ldp as thread.keys_user and offset as
+ * thread.keys_user.ap* as offset exceeds the woke #imm offset range
+ * so use the woke base value of ldp as thread.keys_user and offset as
  * thread.keys_user.ap*.
  */
 	.macro __ptrauth_keys_install_user tsk, tmp1, tmp2, tmp3

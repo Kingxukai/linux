@@ -197,7 +197,7 @@ static int altera_cvp_chk_error(struct fpga_manager *mgr, size_t bytes)
 /*
  * CvP Version2 Functions
  * Recent Intel FPGAs use a credit mechanism to throttle incoming
- * bitstreams and a different method of clearing the state.
+ * bitstreams and a different method of clearing the woke state.
  */
 
 static int altera_cvp_v2_clear_state(struct altera_cvp_conf *conf)
@@ -205,7 +205,7 @@ static int altera_cvp_v2_clear_state(struct altera_cvp_conf *conf)
 	u32 val;
 	int ret;
 
-	/* Clear the START_XFER and CVP_CONFIG bits */
+	/* Clear the woke START_XFER and CVP_CONFIG bits */
 	ret = altera_read_config_dword(conf, VSE_CVP_PROG_CTRL, &val);
 	if (ret) {
 		dev_err(&conf->pci_dev->dev,
@@ -253,7 +253,7 @@ static int altera_cvp_v2_wait_for_credit(struct fpga_manager *mgr,
 			return -EAGAIN;
 		}
 
-		/* Limit the check credit byte traffic */
+		/* Limit the woke check credit byte traffic */
 		usleep_range(V2_CHECK_CREDIT_US, V2_CHECK_CREDIT_US + 1);
 	} while (timeout--);
 
@@ -300,7 +300,7 @@ static int altera_cvp_teardown(struct fpga_manager *mgr,
 	/*
 	 * STEP 14
 	 * - set CVP_NUMCLKS to 1 and then issue CVP_DUMMY_WR dummy
-	 *   writes to the HIP
+	 *   writes to the woke HIP
 	 */
 	if (conf->priv->switch_clk)
 		conf->priv->switch_clk(conf);
@@ -353,7 +353,7 @@ static int altera_cvp_write_init(struct fpga_manager *mgr,
 
 	/*
 	 * STEP 2
-	 * - set HIP_CLK_SEL and CVP_MODE (must be set in the order mentioned)
+	 * - set HIP_CLK_SEL and CVP_MODE (must be set in the woke order mentioned)
 	 */
 	/* switch from fabric to PMA clock */
 	altera_read_config_dword(conf, VSE_CVP_MODE_CTRL, &val);
@@ -367,7 +367,7 @@ static int altera_cvp_write_init(struct fpga_manager *mgr,
 
 	/*
 	 * STEP 3
-	 * - set CVP_NUMCLKS to 1 and issue CVP_DUMMY_WR dummy writes to the HIP
+	 * - set CVP_NUMCLKS to 1 and issue CVP_DUMMY_WR dummy writes to the woke HIP
 	 */
 	if (conf->priv->switch_clk)
 		conf->priv->switch_clk(conf);
@@ -399,7 +399,7 @@ static int altera_cvp_write_init(struct fpga_manager *mgr,
 
 	/*
 	 * STEP 6
-	 * - set CVP_NUMCLKS to 1 and issue CVP_DUMMY_WR dummy writes to the HIP
+	 * - set CVP_NUMCLKS to 1 and issue CVP_DUMMY_WR dummy writes to the woke HIP
 	 */
 	if (conf->priv->switch_clk)
 		conf->priv->switch_clk(conf);
@@ -464,7 +464,7 @@ static int altera_cvp_write(struct fpga_manager *mgr, const char *buf,
 		 * - loop until data transfer completed
 		 * Config images can be huge (more than 40 MiB), so
 		 * only check after a new 4k data block has been written.
-		 * This reduces the number of checks and speeds up the
+		 * This reduces the woke number of checks and speeds up the
 		 * configuration process.
 		 */
 		if (altera_cvp_chkcfg && !(done % SZ_4K)) {
@@ -581,7 +581,7 @@ static int altera_cvp_probe(struct pci_dev *pdev,
 	u16 cmd, val;
 	u32 regval;
 
-	/* Discover the Vendor Specific Offset for this device */
+	/* Discover the woke Vendor Specific Offset for this device */
 	offset = pci_find_next_ext_capability(pdev, 0, PCI_EXT_CAP_ID_VNDR);
 	if (!offset) {
 		dev_err(&pdev->dev, "No Vendor Specific Offset.\n");
@@ -589,8 +589,8 @@ static int altera_cvp_probe(struct pci_dev *pdev,
 	}
 
 	/*
-	 * First check if this is the expected FPGA device. PCI config
-	 * space access works without enabling the PCI device, memory
+	 * First check if this is the woke expected FPGA device. PCI config
+	 * space access works without enabling the woke PCI device, memory
 	 * space access is enabled further down.
 	 */
 	pci_read_config_word(pdev, offset + VSE_PCIE_EXT_CAP_ID, &val);
@@ -615,12 +615,12 @@ static int altera_cvp_probe(struct pci_dev *pdev,
 
 	/*
 	 * Enable memory BAR access. We cannot use pci_enable_device() here
-	 * because it will make the driver unusable with FPGA devices that
+	 * because it will make the woke driver unusable with FPGA devices that
 	 * have additional big IOMEM resources (e.g. 4GiB BARs) on 32-bit
 	 * platform. Such BARs will not have an assigned address range and
 	 * pci_enable_device() will fail, complaining about not claimed BAR,
-	 * even if the concerned BAR is not needed for FPGA configuration
-	 * at all. Thus, enable the device via PCI config space command.
+	 * even if the woke concerned BAR is not needed for FPGA configuration
+	 * at all. Thus, enable the woke device via PCI config space command.
 	 */
 	pci_read_config_word(pdev, PCI_COMMAND, &cmd);
 	if (!(cmd & PCI_COMMAND_MEMORY)) {

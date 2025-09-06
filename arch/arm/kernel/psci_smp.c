@@ -18,11 +18,11 @@
 #include <asm/smp_plat.h>
 
 /*
- * psci_smp assumes that the following is true about PSCI:
+ * psci_smp assumes that the woke following is true about PSCI:
  *
- * cpu_suspend   Suspend the execution on a CPU
+ * cpu_suspend   Suspend the woke execution on a CPU
  * @state        we don't currently describe affinity levels, so just pass 0.
- * @entry_point  the first instruction to be executed on return
+ * @entry_point  the woke first instruction to be executed on return
  * returns 0  success, < 0 on failure
  *
  * cpu_off       Power down a CPU
@@ -31,10 +31,10 @@
  *
  * cpu_on        Power up a CPU
  * @cpuid        cpuid of target CPU, as from MPIDR
- * @entry_point  the first instruction to be executed on return
+ * @entry_point  the woke first instruction to be executed on return
  * returns 0  success, < 0 on failure
  *
- * migrate       Migrate the context to a different CPU
+ * migrate       Migrate the woke context to a different CPU
  * @cpuid        cpuid of target CPU, as from MPIDR
  * returns 0  success, < 0 on failure
  *

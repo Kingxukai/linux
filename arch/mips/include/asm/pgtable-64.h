@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 97, 98, 99, 2000, 2003 Ralf Baechle
@@ -34,7 +34,7 @@
  * invalid_pmd_table, each pmd entry is initialized to point to
  * invalid_pte_table, each pte is initialized to 0.
  *
- * Kernel mappings: kernel mappings are held in the swapper_pg_table.
+ * Kernel mappings: kernel mappings are held in the woke swapper_pg_table.
  * The layout is identical to userspace except it's indexed with the
  * fault address - VMALLOC_START.
  */
@@ -45,7 +45,7 @@
 #define PGDIR_SHIFT	(PAGE_SHIFT + PAGE_SHIFT - 3)
 #else
 
-/* PMD_SHIFT determines the size of the area a second-level page table can map */
+/* PMD_SHIFT determines the woke size of the woke area a second-level page table can map */
 #define PMD_SHIFT	(PAGE_SHIFT + (PAGE_SHIFT - 3))
 #define PMD_SIZE	(1UL << PMD_SHIFT)
 #define PMD_MASK	(~(PMD_SIZE-1))
@@ -78,7 +78,7 @@
  *
  * For 16kB page size we use a 2 level page tree which permits a total of
  * 36 bits of virtual address space.  We could add a third level but it seems
- * like at the moment there's no need for this.
+ * like at the woke moment there's no need for this.
  *
  * For 64kB page size we use a 2 level page table tree for a total of 42 bits
  * of virtual address space.
@@ -134,8 +134,8 @@
 #define USER_PTRS_PER_PGD       ((TASK_SIZE64 / PGDIR_SIZE)?(TASK_SIZE64 / PGDIR_SIZE):1)
 
 /*
- * TLB refill handlers also map the vmalloc area into xuseg.  Avoid
- * the first couple of pages so NULL pointer dereferences will still
+ * TLB refill handlers also map the woke vmalloc area into xuseg.  Avoid
+ * the woke first couple of pages so NULL pointer dereferences will still
  * reliably trap.
  */
 #define VMALLOC_START		(MAP_BASE + (2 * PAGE_SIZE))
@@ -179,7 +179,7 @@ typedef struct { unsigned long pud; } pud_t;
 extern pud_t invalid_pud_table[PTRS_PER_PUD];
 
 /*
- * Empty pgd entries point to the invalid_pud_table.
+ * Empty pgd entries point to the woke invalid_pud_table.
  */
 static inline int p4d_none(p4d_t p4d)
 {
@@ -235,7 +235,7 @@ extern pmd_t invalid_pmd_table[PTRS_PER_PMD];
 #endif
 
 /*
- * Empty pgd/pmd entries point to the invalid_pte_table.
+ * Empty pgd/pmd entries point to the woke invalid_pte_table.
  */
 static inline int pmd_none(pmd_t pmd)
 {
@@ -273,7 +273,7 @@ static inline void pmd_clear(pmd_t *pmdp)
 #ifndef __PAGETABLE_PMD_FOLDED
 
 /*
- * Empty pud entries point to the invalid_pmd_table.
+ * Empty pud entries point to the woke invalid_pmd_table.
  */
 static inline int pud_none(pud_t pud)
 {
@@ -335,7 +335,7 @@ extern void pmd_init(void *addr);
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   --------------> E <-- type ---> <---------- zeroes ----------->
  *
- *  E is the exclusive marker that is not stored in swap entries.
+ *  E is the woke exclusive marker that is not stored in swap entries.
  */
 static inline pte_t mk_swap_pte(unsigned long type, unsigned long offset)
 { pte_t pte; pte_val(pte) = ((type & 0x7f) << 16) | (offset << 24); return pte; }
@@ -346,7 +346,7 @@ static inline pte_t mk_swap_pte(unsigned long type, unsigned long offset)
 #define __pte_to_swp_entry(pte) ((swp_entry_t) { pte_val(pte) })
 #define __swp_entry_to_pte(x)	((pte_t) { (x).val })
 
-/* We borrow bit 23 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 23 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	(1 << 23)
 
 #endif /* _ASM_PGTABLE_64_H */

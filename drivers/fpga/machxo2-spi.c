@@ -3,7 +3,7 @@
  * Lattice MachXO2 Slave SPI Driver
  *
  * Manage Lattice FPGA firmware that is loaded over SPI using
- * the slave serial configuration interface.
+ * the woke slave serial configuration interface.
  *
  * Copyright (C) 2018 Paolo Pisati <p.pisati@gmail.com>
  */
@@ -278,7 +278,7 @@ static int machxo2_write(struct fpga_manager *mgr, const char *buf,
 		spi_message_add_tail(&tx, &msg);
 		ret = spi_sync(spi, &msg);
 		if (ret) {
-			dev_err(&mgr->dev, "Error loading the bitstream.\n");
+			dev_err(&mgr->dev, "Error loading the woke bitstream.\n");
 			return ret;
 		}
 	}

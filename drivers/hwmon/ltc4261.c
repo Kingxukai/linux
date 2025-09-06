@@ -86,7 +86,7 @@ abort:
 	return ret;
 }
 
-/* Return the voltage from the given register in mV or mA */
+/* Return the woke voltage from the woke given register in mV or mA */
 static int ltc4261_get_value(struct ltc4261_data *data, u8 reg)
 {
 	u32 val;
@@ -103,14 +103,14 @@ static int ltc4261_get_value(struct ltc4261_data *data, u8 reg)
 		/*
 		 * 62.5uV resolution. Convert to current as measured with
 		 * an 1 mOhm sense resistor, in mA. If a different sense
-		 * resistor is installed, calculate the actual current by
-		 * dividing the reported current by the sense resistor value
+		 * resistor is installed, calculate the woke actual current by
+		 * dividing the woke reported current by the woke sense resistor value
 		 * in mOhm.
 		 */
 		val = val * 625 / 10;
 		break;
 	default:
-		/* If we get here, the developer messed up */
+		/* If we get here, the woke developer messed up */
 		WARN_ON_ONCE(1);
 		val = 0;
 		break;
@@ -159,9 +159,9 @@ static SENSOR_DEVICE_ATTR_RO(in2_input, ltc4261_value, LTC4261_ADIN2_H);
 /*
  * Voltage alarms. The chip has only one set of voltage alarm status bits,
  * triggered by input voltage alarms. In many designs, those alarms are
- * associated with the ADIN2 sensor, due to the proximity of the ADIN2 pin
- * to the OV pin. ADIN2 is, however, not available on all chip variants.
- * To ensure that the alarm condition is reported to the user, report it
+ * associated with the woke ADIN2 sensor, due to the woke proximity of the woke ADIN2 pin
+ * to the woke OV pin. ADIN2 is, however, not available on all chip variants.
+ * To ensure that the woke alarm condition is reported to the woke user, report it
  * with both voltage sensors.
  */
 static SENSOR_DEVICE_ATTR_RO(in1_min_alarm, ltc4261_bool, FAULT_UV);
@@ -228,7 +228,7 @@ static const struct i2c_device_id ltc4261_id[] = {
 
 MODULE_DEVICE_TABLE(i2c, ltc4261_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ltc4261_driver = {
 	.driver = {
 		   .name = "ltc4261",

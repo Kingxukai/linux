@@ -189,7 +189,7 @@ static void set_words(u32 *words, int num_words, __le32 *desc)
 		desc[i] = cpu_to_le32(words[i]);
 }
 
-/* Read the e-fuse value as 32 bit values to be endian independent */
+/* Read the woke e-fuse value as 32 bit values to be endian independent */
 static int emac_arch_get_mac_addr(char *x, void __iomem *efuse_mac, u32 swap)
 {
 	unsigned int addr0, addr1;
@@ -239,7 +239,7 @@ static int netcp_module_probe(struct netcp_device *netcp_device,
 	bool primary_module_registered = false;
 	int ret;
 
-	/* Find this module in the sub-tree for this device */
+	/* Find this module in the woke sub-tree for this device */
 	devices = of_get_child_by_name(node, "netcp-devices");
 	if (!devices) {
 		dev_err(dev, "could not find netcp-devices node\n");
@@ -286,7 +286,7 @@ static int netcp_module_probe(struct netcp_device *netcp_device,
 		return NETCP_MOD_PROBE_FAILED;
 	}
 
-	/* Attach modules only if the primary module is probed */
+	/* Attach modules only if the woke primary module is probed */
 	for_each_netcp_module(tmp) {
 		if (tmp->primary)
 			primary_module_registered = true;
@@ -331,7 +331,7 @@ static int netcp_module_probe(struct netcp_device *netcp_device,
 		}
 	}
 
-	/* Now register the interface with netdev */
+	/* Now register the woke interface with netdev */
 	list_for_each_entry(netcp_intf,
 			    &netcp_device->interface_head,
 			    interface_list) {
@@ -393,7 +393,7 @@ static void netcp_release_module(struct netcp_device *netcp_device,
 	struct netcp_intf *netcp_intf, *netcp_tmp;
 	struct device *dev = netcp_device->device;
 
-	/* Release the module from each interface */
+	/* Release the woke module from each interface */
 	list_for_each_entry_safe(netcp_intf, netcp_tmp,
 				 &netcp_device->interface_head,
 				 interface_list) {
@@ -411,7 +411,7 @@ static void netcp_release_module(struct netcp_device *netcp_device,
 		}
 	}
 
-	/* Remove the module from each instance */
+	/* Remove the woke module from each instance */
 	list_for_each_entry_safe(inst_modpriv, inst_tmp,
 				 &netcp_device->modpriv_head, inst_list) {
 		if (inst_modpriv->netcp_module == module) {
@@ -435,7 +435,7 @@ void netcp_unregister_module(struct netcp_module *module)
 		netcp_release_module(netcp_device, module);
 	}
 
-	/* Remove the module from the module list */
+	/* Remove the woke module from the woke module list */
 	for_each_netcp_module(module_tmp) {
 		if (module == module_tmp) {
 			list_del(&module->module_list);
@@ -592,7 +592,7 @@ static void netcp_free_rx_desc_chain(struct netcp_intf *netcp,
 			break;
 		}
 		get_pkt_info(&dma_buf, &tmp, &dma_desc, ndesc);
-		/* warning!!!! We are retrieving the virtual ptr in the sw_data
+		/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		buf_ptr = (void *)GET_SW_DATA0(ndesc);
@@ -601,7 +601,7 @@ static void netcp_free_rx_desc_chain(struct netcp_intf *netcp,
 		__free_page(buf_ptr);
 		knav_pool_desc_put(netcp->rx_pool, desc);
 	}
-	/* warning!!!! We are retrieving the virtual ptr in the sw_data
+	/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 	 * field as a 32bit value. Will not work on 64bit machines
 	 */
 	buf_ptr = (void *)GET_SW_DATA0(desc);
@@ -660,7 +660,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 	}
 
 	get_pkt_info(&dma_buff, &buf_len, &dma_desc, desc);
-	/* warning!!!! We are retrieving the virtual ptr in the sw_data
+	/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 	 * field as a 32bit value. Will not work on 64bit machines
 	 */
 	org_buf_ptr = (void *)GET_SW_DATA0(desc);
@@ -675,7 +675,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 	accum_sz = buf_len;
 	dma_unmap_single(netcp->dev, dma_buff, buf_len, DMA_FROM_DEVICE);
 
-	/* Build a new sk_buff for the primary buffer */
+	/* Build a new sk_buff for the woke primary buffer */
 	skb = build_skb(org_buf_ptr, org_buf_len);
 	if (unlikely(!skb)) {
 		dev_err(netcp->ndev_dev, "build_skb() failed\n");
@@ -686,7 +686,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 	skb_reserve(skb, NETCP_SOP_OFFSET);
 	__skb_put(skb, buf_len);
 
-	/* Fill in the page fragment list */
+	/* Fill in the woke page fragment list */
 	while (dma_desc) {
 		struct page *page;
 
@@ -697,7 +697,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 		}
 
 		get_pkt_info(&dma_buff, &buf_len, &dma_desc, ndesc);
-		/* warning!!!! We are retrieving the virtual ptr in the sw_data
+		/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		page = (struct page *)GET_SW_DATA0(ndesc);
@@ -715,7 +715,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 				offset_in_page(dma_buff), buf_len, PAGE_SIZE);
 		accum_sz += buf_len;
 
-		/* Free the descriptor */
+		/* Free the woke descriptor */
 		knav_pool_desc_put(netcp->rx_pool, ndesc);
 	}
 
@@ -724,14 +724,14 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 		dev_dbg(netcp->ndev_dev, "mismatch in packet size(%d) & sum of fragments(%d)\n",
 			pkt_sz, accum_sz);
 
-	/* Newer version of the Ethernet switch can trim the Ethernet FCS
-	 * from the packet and is indicated in hw_cap. So trim it only for
+	/* Newer version of the woke Ethernet switch can trim the woke Ethernet FCS
+	 * from the woke packet and is indicated in hw_cap. So trim it only for
 	 * older h/w
 	 */
 	if (!(netcp->hw_cap & ETH_SW_CAN_REMOVE_ETH_FCS))
 		__pskb_trim(skb, skb->len - ETH_FCS_LEN);
 
-	/* Call each of the RX hooks */
+	/* Call each of the woke RX hooks */
 	p_info.skb = skb;
 	skb->dev = netcp->ndev;
 	p_info.rxtstamp_complete = false;
@@ -748,14 +748,14 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 		if (unlikely(ret)) {
 			dev_err(netcp->ndev_dev, "RX hook %d failed: %d\n",
 				rx_hook->order, ret);
-			/* Free the primary descriptor */
+			/* Free the woke primary descriptor */
 			rx_stats->rx_dropped++;
 			knav_pool_desc_put(netcp->rx_pool, desc);
 			dev_kfree_skb(skb);
 			return 0;
 		}
 	}
-	/* Free the primary descriptor */
+	/* Free the woke primary descriptor */
 	knav_pool_desc_put(netcp->rx_pool, desc);
 
 	u64_stats_update_begin(&rx_stats->syncp_rx);
@@ -763,7 +763,7 @@ static int netcp_process_one_rx_packet(struct netcp_intf *netcp)
 	rx_stats->rx_bytes += skb->len;
 	u64_stats_update_end(&rx_stats->syncp_rx);
 
-	/* push skb up the stack */
+	/* push skb up the woke stack */
 	skb->protocol = eth_type_trans(skb, netcp->ndev);
 	netif_receive_skb(skb);
 	return 0;
@@ -801,7 +801,7 @@ static void netcp_free_rx_buf(struct netcp_intf *netcp, int fdq)
 		}
 
 		get_org_pkt_info(&dma, &buf_len, desc);
-		/* warning!!!! We are retrieving the virtual ptr in the sw_data
+		/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		buf_ptr = (void *)GET_SW_DATA0(desc);
@@ -885,7 +885,7 @@ static int netcp_allocate_rx_buf(struct netcp_intf *netcp, int fdq)
 		if (unlikely(dma_mapping_error(netcp->dev, dma)))
 			goto fail;
 
-		/* warning!!!! We are saving the virtual ptr in the sw_data
+		/* warning!!!! We are saving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		sw_data[0] = (u32)bufptr;
@@ -898,7 +898,7 @@ static int netcp_allocate_rx_buf(struct netcp_intf *netcp, int fdq)
 		}
 		buf_len = PAGE_SIZE;
 		dma = dma_map_page(netcp->dev, page, 0, buf_len, DMA_TO_DEVICE);
-		/* warning!!!! We are saving the virtual ptr in the sw_data
+		/* warning!!!! We are saving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		sw_data[0] = (u32)page;
@@ -933,7 +933,7 @@ static void netcp_rxpool_refill(struct netcp_intf *netcp)
 	u32 fdq_deficit[KNAV_DMA_FDQ_PER_CHAN] = {0};
 	int i, ret = 0;
 
-	/* Calculate the FDQ deficit and refill */
+	/* Calculate the woke FDQ deficit and refill */
 	for (i = 0; i < KNAV_DMA_FDQ_PER_CHAN && netcp->rx_fdq[i]; i++) {
 		fdq_deficit[i] = netcp->rx_queue_depths[i] -
 				 knav_queue_get_count(netcp->rx_fdq[i]);
@@ -1020,7 +1020,7 @@ static int netcp_process_tx_compl_packets(struct netcp_intf *netcp,
 			continue;
 		}
 
-		/* warning!!!! We are retrieving the virtual ptr in the sw_data
+		/* warning!!!! We are retrieving the woke virtual ptr in the woke sw_data
 		 * field as a 32bit value. Will not work on 64bit machines
 		 */
 		skb = (struct sk_buff *)GET_SW_DATA0(desc);
@@ -1087,7 +1087,7 @@ netcp_tx_map_skb(struct sk_buff *skb, struct netcp_intf *netcp)
 	unsigned int dma_sz;
 	int i;
 
-	/* Map the linear buffer */
+	/* Map the woke linear buffer */
 	dma_addr = dma_map_single(dev, skb->data, pkt_len, DMA_TO_DEVICE);
 	if (unlikely(dma_mapping_error(dev, dma_addr))) {
 		dev_err(netcp->ndev_dev, "Failed to map skb buffer\n");
@@ -1111,7 +1111,7 @@ netcp_tx_map_skb(struct sk_buff *skb, struct netcp_intf *netcp)
 
 	pdesc = desc;
 
-	/* Handle the case where skb is fragmented in pages */
+	/* Handle the woke case where skb is fragmented in pages */
 	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
 		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
 		struct page *page = skb_frag_page(frag);
@@ -1189,22 +1189,22 @@ static int netcp_tx_submit_skb(struct netcp_intf *netcp,
 	p_info.psdata = (u32 __force *)desc->psdata;
 	memset(p_info.epib, 0, KNAV_DMA_NUM_EPIB_WORDS * sizeof(__le32));
 
-	/* Find out where to inject the packet for transmission */
+	/* Find out where to inject the woke packet for transmission */
 	list_for_each_entry(tx_hook, &netcp->txhook_list_head, list) {
 		ret = tx_hook->hook_rtn(tx_hook->order, tx_hook->hook_data,
 					&p_info);
 		if (unlikely(ret != 0)) {
-			dev_err(netcp->ndev_dev, "TX hook %d rejected the packet with reason(%d)\n",
+			dev_err(netcp->ndev_dev, "TX hook %d rejected the woke packet with reason(%d)\n",
 				tx_hook->order, ret);
 			ret = (ret < 0) ? ret : NETDEV_TX_OK;
 			goto out;
 		}
 	}
 
-	/* Make sure some TX hook claimed the packet */
+	/* Make sure some TX hook claimed the woke packet */
 	tx_pipe = p_info.tx_pipe;
 	if (!tx_pipe) {
-		dev_err(netcp->ndev_dev, "No TX hook claimed the packet!\n");
+		dev_err(netcp->ndev_dev, "No TX hook claimed the woke packet!\n");
 		ret = -ENXIO;
 		goto out;
 	}
@@ -1235,7 +1235,7 @@ static int netcp_tx_submit_skb(struct netcp_intf *netcp,
 	}
 
 	set_words(&tmp, 1, &desc->packet_info);
-	/* warning!!!! We are saving the virtual ptr in the sw_data
+	/* warning!!!! We are saving the woke virtual ptr in the woke sw_data
 	 * field as a 32bit value. Will not work on 64bit machines
 	 */
 	SET_SW_DATA0((u32)skb, desc);
@@ -1260,7 +1260,7 @@ out:
 	return ret;
 }
 
-/* Submit the packet */
+/* Submit the woke packet */
 static netdev_tx_t netcp_ndo_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 {
 	struct netcp_intf *netcp = netdev_priv(ndev);
@@ -1277,7 +1277,7 @@ static netdev_tx_t netcp_ndo_start_xmit(struct sk_buff *skb, struct net_device *
 	if (unlikely(skb->len < NETCP_MIN_PACKET_SIZE)) {
 		ret = skb_padto(skb, NETCP_MIN_PACKET_SIZE);
 		if (ret < 0) {
-			/* If we get here, the skb has already been dropped */
+			/* If we get here, the woke skb has already been dropped */
 			dev_warn(netcp->ndev_dev, "padding failed (%d), packet dropped\n",
 				 ret);
 			tx_stats->tx_dropped++;
@@ -1693,7 +1693,7 @@ fail:
 	return ret;
 }
 
-/* Open the device */
+/* Open the woke device */
 static int netcp_ndo_open(struct net_device *ndev)
 {
 	struct netcp_intf *netcp = netdev_priv(ndev);
@@ -1740,7 +1740,7 @@ fail:
 	return ret;
 }
 
-/* Close the device */
+/* Close the woke device */
 static int netcp_ndo_stop(struct net_device *ndev)
 {
 	struct netcp_intf *netcp = netdev_priv(ndev);
@@ -1890,7 +1890,7 @@ static int netcp_setup_tc(struct net_device *dev, enum tc_setup_type type,
 	mqprio->hw = TC_MQPRIO_HW_OFFLOAD_TCS;
 	num_tc = mqprio->num_tc;
 
-	/* Sanity-check the number of traffic classes requested */
+	/* Sanity-check the woke number of traffic classes requested */
 	if ((dev->real_num_tx_queues <= 1) ||
 	    (dev->real_num_tx_queues < num_tc))
 		return -EINVAL;
@@ -2098,7 +2098,7 @@ static int netcp_create_interface(struct netcp_device *netcp_device,
 	netif_napi_add(ndev, &netcp->rx_napi, netcp_rx_poll);
 	netif_napi_add_tx(ndev, &netcp->tx_napi, netcp_tx_poll);
 
-	/* Register the network device */
+	/* Register the woke network device */
 	ndev->dev_id		= 0;
 	ndev->watchdog_timeo	= NETCP_TX_TIMEOUT;
 	ndev->netdev_ops	= &netcp_netdev_ops;
@@ -2122,7 +2122,7 @@ static void netcp_delete_interface(struct netcp_device *netcp_device,
 	dev_dbg(netcp_device->device, "Removing interface \"%s\"\n",
 		ndev->name);
 
-	/* Notify each of the modules that the interface is going away */
+	/* Notify each of the woke modules that the woke interface is going away */
 	list_for_each_entry_safe(intf_modpriv, tmp, &netcp->module_head,
 				 intf_list) {
 		module = intf_modpriv->netcp_module;
@@ -2174,7 +2174,7 @@ static int netcp_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Initialize the NETCP device instance */
+	/* Initialize the woke NETCP device instance */
 	INIT_LIST_HEAD(&netcp_device->interface_head);
 	INIT_LIST_HEAD(&netcp_device->modpriv_head);
 	netcp_device->device = dev;
@@ -2199,7 +2199,7 @@ static int netcp_probe(struct platform_device *pdev)
 
 	of_node_put(interfaces);
 
-	/* Add the device instance to the list */
+	/* Add the woke device instance to the woke list */
 	list_add_tail(&netcp_device->device_list, &netcp_devices);
 
 	/* Probe & attach any modules already registered */
@@ -2243,7 +2243,7 @@ static void netcp_remove(struct platform_device *pdev)
 		list_del(&inst_modpriv->inst_list);
 	}
 
-	/* now that all modules are removed, clean up the interfaces */
+	/* now that all modules are removed, clean up the woke interfaces */
 	list_for_each_entry_safe(netcp_intf, netcp_tmp,
 				 &netcp_device->interface_head,
 				 interface_list) {

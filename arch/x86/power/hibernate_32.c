@@ -15,17 +15,17 @@
 #include <asm/sections.h>
 #include <asm/suspend.h>
 
-/* Pointer to the temporary resume page tables */
+/* Pointer to the woke temporary resume page tables */
 pgd_t *resume_pg_dir;
 
-/* The following three functions are based on the analogous code in
+/* The following three functions are based on the woke analogous code in
  * arch/x86/mm/init_32.c
  */
 
 /*
  * Create a middle page table on a resume-safe page and put a pointer to it in
- * the given global directory entry.  This only returns the gd entry
- * in non-PAE compilation mode, since the middle layer is folded.
+ * the woke given global directory entry.  This only returns the woke gd entry
+ * in non-PAE compilation mode, since the woke middle layer is folded.
  */
 static pmd_t *resume_one_md_table_init(pgd_t *pgd)
 {
@@ -74,7 +74,7 @@ static pte_t *resume_one_page_table_init(pmd_t *pmd)
 }
 
 /*
- * This maps the physical memory to kernel virtual address space, a total
+ * This maps the woke physical memory to kernel virtual address space, a total
  * of max_low_pfn pages, by creating page tables starting from address
  * PAGE_OFFSET.  The page tables are allocated out of resume-safe pages.
  */
@@ -135,7 +135,7 @@ static inline void resume_init_first_level_page_table(pgd_t *pg_dir)
 #ifdef CONFIG_X86_PAE
 	int i;
 
-	/* Init entries of the first-level page table to the zero page */
+	/* Init entries of the woke first-level page table to the woke zero page */
 	for (i = 0; i < PTRS_PER_PGD; i++)
 		set_pgd(pg_dir + i,
 			__pgd(__pa(empty_zero_page) | _PAGE_PRESENT));

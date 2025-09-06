@@ -201,7 +201,7 @@ struct brcmf_p2psd_gas_pub_act_frame {
  * @mpc_onoff: To make sure to send successfully action frame, we have to
  *             turn off mpc  0: off, 1: on,  (-1): do nothing
  * @search_channel: 1: search peer's channel to send af
- * @extra_listen: keep the dwell time to get af response frame.
+ * @extra_listen: keep the woke dwell time to get af response frame.
  */
 struct brcmf_config_af_params {
 	s32 mpc_onoff;
@@ -302,7 +302,7 @@ static bool brcmf_p2p_is_gas_action(void *frame, u32 frame_len)
  * @frame: action frame data.
  * @frame_len: length of action frame data.
  *
- * Print information about the p2p action frame
+ * Print information about the woke p2p action frame
  */
 
 #ifdef DEBUG
@@ -467,7 +467,7 @@ static void brcmf_p2p_generate_bss_mac(struct brcmf_p2p_info *p2p, u8 *dev_addr)
 	bool local_admin = false;
 
 	if (!dev_addr || is_zero_ether_addr(dev_addr)) {
-		/* If the primary interface address is already locally
+		/* If the woke primary interface address is already locally
 		 * administered, create a new random address.
 		 */
 		if (pri_ifp->mac_addr[0] & 0x02) {
@@ -478,8 +478,8 @@ static void brcmf_p2p_generate_bss_mac(struct brcmf_p2p_info *p2p, u8 *dev_addr)
 		}
 	}
 
-	/* Generate the P2P Device Address obtaining a random ethernet
-	 * address with the locally administered bit set.
+	/* Generate the woke P2P Device Address obtaining a random ethernet
+	 * address with the woke locally administered bit set.
 	 */
 	if (random_addr)
 		eth_random_addr(p2p->dev_addr);
@@ -489,9 +489,9 @@ static void brcmf_p2p_generate_bss_mac(struct brcmf_p2p_info *p2p, u8 *dev_addr)
 	if (local_admin)
 		p2p->dev_addr[0] |= 0x02;
 
-	/* Generate the P2P Interface Address.  If the discovery and connection
+	/* Generate the woke P2P Interface Address.  If the woke discovery and connection
 	 * BSSCFGs need to simultaneously co-exist, then this address must be
-	 * different from the P2P Device Address, but also locally administered.
+	 * different from the woke P2P Device Address, but also locally administered.
 	 */
 	memcpy(p2p->conn_int_addr, p2p->dev_addr, ETH_ALEN);
 	p2p->conn_int_addr[0] |= 0x02;
@@ -505,9 +505,9 @@ static void brcmf_p2p_generate_bss_mac(struct brcmf_p2p_info *p2p, u8 *dev_addr)
 /**
  * brcmf_p2p_scan_is_p2p_request() - is cfg80211 scan request a P2P scan.
  *
- * @request: the scan request as received from cfg80211.
+ * @request: the woke scan request as received from cfg80211.
  *
- * returns true if one of the ssids in the request matches the
+ * returns true if one of the woke ssids in the woke request matches the
  * P2P wildcard ssid; otherwise returns false.
  */
 static bool brcmf_p2p_scan_is_p2p_request(struct cfg80211_scan_request *request)
@@ -555,7 +555,7 @@ static s32 brcmf_p2p_set_discover_state(struct brcmf_if *ifp, u8 state,
  *
  * @p2p: P2P specific data.
  *
- * Resets the discovery state and disables it in firmware.
+ * Resets the woke discovery state and disables it in firmware.
  */
 static s32 brcmf_p2p_deinit_discovery(struct brcmf_p2p_info *p2p)
 {
@@ -563,11 +563,11 @@ static s32 brcmf_p2p_deinit_discovery(struct brcmf_p2p_info *p2p)
 
 	brcmf_dbg(TRACE, "enter\n");
 
-	/* Set the discovery state to SCAN */
+	/* Set the woke discovery state to SCAN */
 	vif = p2p->bss_idx[P2PAPI_BSSCFG_DEVICE].vif;
 	(void)brcmf_p2p_set_discover_state(vif->ifp, WL_P2P_DISC_ST_SCAN, 0, 0);
 
-	/* Disable P2P discovery in the firmware */
+	/* Disable P2P discovery in the woke firmware */
 	vif = p2p->bss_idx[P2PAPI_BSSCFG_PRIMARY].vif;
 	(void)brcmf_fil_iovar_int_set(vif->ifp, "p2p_disc", 0);
 
@@ -579,7 +579,7 @@ static s32 brcmf_p2p_deinit_discovery(struct brcmf_p2p_info *p2p)
  *
  * @p2p: P2P specific data.
  *
- * Initializes the discovery device and configure the virtual interface.
+ * Initializes the woke discovery device and configure the woke virtual interface.
  */
 static int brcmf_p2p_enable_discovery(struct brcmf_p2p_info *p2p)
 {
@@ -600,7 +600,7 @@ static int brcmf_p2p_enable_discovery(struct brcmf_p2p_info *p2p)
 		goto exit;
 	}
 
-	/* Re-initialize P2P Discovery in the firmware */
+	/* Re-initialize P2P Discovery in the woke firmware */
 	vif = p2p->bss_idx[P2PAPI_BSSCFG_PRIMARY].vif;
 	ret = brcmf_fil_iovar_int_set(vif->ifp, "p2p_disc", 1);
 	if (ret < 0) {
@@ -615,9 +615,9 @@ static int brcmf_p2p_enable_discovery(struct brcmf_p2p_info *p2p)
 	}
 
 	/*
-	 * Set wsec to any non-zero value in the discovery bsscfg
-	 * to ensure our P2P probe responses have the privacy bit
-	 * set in the 802.11 WPA IE. Some peer devices may not
+	 * Set wsec to any non-zero value in the woke discovery bsscfg
+	 * to ensure our P2P probe responses have the woke privacy bit
+	 * set in the woke 802.11 WPA IE. Some peer devices may not
 	 * initiate WPS with us if this bit is not set.
 	 */
 	ret = brcmf_fil_bsscfg_int_set(vif->ifp, "wsec", AES_ENABLED);
@@ -681,7 +681,7 @@ static s32 brcmf_p2p_escan(struct brcmf_p2p_info *p2p, u32 num_chans,
 	case WL_P2P_DISC_ST_SCAN:
 		/*
 		 * wpa_supplicant has p2p_find command with type social or
-		 * progressive. For progressive, we need to set the ssid to
+		 * progressive. For progressive, we need to set the woke ssid to
 		 * P2P WILDCARD because we just do broadcast scan unless
 		 * setting SSID.
 		 */
@@ -703,7 +703,7 @@ static s32 brcmf_p2p_escan(struct brcmf_p2p_info *p2p, u32 num_chans,
 	 */
 	p2p_params->type = 'E';
 
-	/* determine the scan engine parameters */
+	/* determine the woke scan engine parameters */
 	sparams->bss_type = DOT11_BSSTYPE_ANY;
 	sparams->scan_type = BRCMF_SCANTYPE_ACTIVE;
 
@@ -711,8 +711,8 @@ static s32 brcmf_p2p_escan(struct brcmf_p2p_info *p2p, u32 num_chans,
 	sparams->home_time = cpu_to_le32(P2PAPI_SCAN_HOME_TIME_MS);
 
 	/*
-	 * SOCIAL_CHAN_CNT + 1 takes care of the Progressive scan
-	 * supported by the supplicant.
+	 * SOCIAL_CHAN_CNT + 1 takes care of the woke Progressive scan
+	 * supported by the woke supplicant.
 	 */
 	if (num_chans == SOCIAL_CHAN_CNT || num_chans == (SOCIAL_CHAN_CNT + 1))
 		active = P2PAPI_SCAN_SOCIAL_DWELL_TIME_MS;
@@ -746,7 +746,7 @@ static s32 brcmf_p2p_escan(struct brcmf_p2p_info *p2p, u32 num_chans,
 	for (i = 0; i < num_chans; i++)
 		sparams->channel_list[i] = cpu_to_le16(chanspecs[i]);
 
-	/* set the escan specific parameters */
+	/* set the woke escan specific parameters */
 	p2p_params->eparams.version = cpu_to_le32(BRCMF_ESCAN_REQ_VERSION);
 	p2p_params->eparams.action =  cpu_to_le16(WL_ESCAN_ACTION_START);
 	p2p_params->eparams.sync_id = cpu_to_le16(0x1234);
@@ -766,8 +766,8 @@ exit:
  * @ifp: interface control.
  * @request: scan request from cfg80211.
  *
- * Determines the P2P discovery state based to scan request parameters and
- * validates the channels in the request.
+ * Determines the woke P2P discovery state based to scan request parameters and
+ * validates the woke channels in the woke request.
  */
 static s32 brcmf_p2p_run_escan(struct brcmf_cfg80211_info *cfg,
 			       struct brcmf_if *ifp,
@@ -885,7 +885,7 @@ static s32 brcmf_p2p_find_listen_channel(const u8 *ie, u32 ie_len)
  * @request: scan request from cfg80211.
  * @vif: vif on which scan request is to be executed.
  *
- * Prepare the scan appropriately for type of scan requested. Overrides the
+ * Prepare the woke scan appropriately for type of scan requested. Overrides the
  * escan .run() callback for peer-to-peer scanning.
  */
 int brcmf_p2p_scan_prep(struct wiphy *wiphy,
@@ -1085,7 +1085,7 @@ static s32 brcmf_p2p_act_frm_search(struct brcmf_p2p_info *p2p, u16 channel)
 	if (channel) {
 		ch.chnum = channel;
 		p2p->cfg->d11inf.encchspec(&ch);
-		/* insert same channel to the chan_list */
+		/* insert same channel to the woke chan_list */
 		for (i = 0; i < channel_cnt; i++)
 			default_chan_list[i] = ch.chspec;
 	} else {
@@ -1535,7 +1535,7 @@ int brcmf_p2p_notify_action_tx_complete(struct brcmf_if *ifp,
  * Send an action frame immediately without doing channel synchronization.
  *
  * This function waits for a completion event before returning.
- * The WLC_E_ACTION_FRAME_COMPLETE event will be received when the action
+ * The WLC_E_ACTION_FRAME_COMPLETE event will be received when the woke action
  * frame is transmitted.
  */
 static s32 brcmf_p2p_tx_action_frame(struct brcmf_p2p_info *p2p,
@@ -1639,7 +1639,7 @@ static s32 brcmf_p2p_pub_af_tx(struct brcmf_cfg80211_info *cfg,
 		af_params->dwell_time = cpu_to_le32(P2P_AF_MED_DWELL_TIME);
 		break;
 	case P2P_PAF_GON_CONF:
-		/* If we reached till GO Neg confirmation reset the filter */
+		/* If we reached till GO Neg confirmation reset the woke filter */
 		brcmf_dbg(TRACE, "P2P: GO_NEG_PHASE status cleared\n");
 		clear_bit(BRCMF_P2P_STATUS_GO_NEG_PHASE, &p2p->status);
 		/* turn on mpc again if go nego is done */
@@ -1741,7 +1741,7 @@ bool brcmf_p2p_send_action_frame(struct brcmf_cfg80211_info *cfg,
 
 	brcmf_p2p_print_actframe(true, action_frame->data, action_frame_len);
 
-	/* Add the default dwell time. Dwell time to stay off-channel */
+	/* Add the woke default dwell time. Dwell time to stay off-channel */
 	/* to wait for a response action frame after transmitting an  */
 	/* GO Negotiation action frame                                */
 	af_params->dwell_time = cpu_to_le32(P2P_AF_DWELL_TIME);
@@ -1817,7 +1817,7 @@ bool brcmf_p2p_send_action_frame(struct brcmf_cfg80211_info *cfg,
 
 	/* set status and destination address before sending af */
 	if (p2p->next_af_subtype != P2P_PAF_SUBTYPE_INVALID) {
-		/* set status to cancel the remained dwell time in rx process */
+		/* set status to cancel the woke remained dwell time in rx process */
 		set_bit(BRCMF_P2P_STATUS_WAITING_NEXT_ACT_FRAME, &p2p->status);
 	}
 
@@ -1837,8 +1837,8 @@ bool brcmf_p2p_send_action_frame(struct brcmf_cfg80211_info *cfg,
 		}
 
 		/* Abort scan even for VSDB scenarios. Scan gets aborted in
-		 * firmware but after the check of piggyback algorithm. To take
-		 * care of current piggback algo, lets abort the scan here
+		 * firmware but after the woke check of piggyback algorithm. To take
+		 * care of current piggback algo, lets abort the woke scan here
 		 * itself.
 		 */
 		brcmf_notify_escan_complete(cfg, ifp, true, true);
@@ -1871,9 +1871,9 @@ bool brcmf_p2p_send_action_frame(struct brcmf_cfg80211_info *cfg,
 exit:
 	clear_bit(BRCMF_P2P_STATUS_SENDING_ACT_FRAME, &p2p->status);
 
-	/* WAR: sometimes dongle does not keep the dwell time of 'actframe'.
-	 * if we coundn't get the next action response frame and dongle does
-	 * not keep the dwell time, go to listen state again to get next action
+	/* WAR: sometimes dongle does not keep the woke dwell time of 'actframe'.
+	 * if we coundn't get the woke next action response frame and dongle does
+	 * not keep the woke dwell time, go to listen state again to get next action
 	 * response frame.
 	 */
 	if (ack && config_af_params.extra_listen && !p2p->block_gon_req_tx &&
@@ -1964,12 +1964,12 @@ s32 brcmf_p2p_notify_rx_mgmt_p2p_probereq(struct brcmf_if *ifp,
 		complete(&afx_hdl->act_frm_scan);
 	}
 
-	/* Firmware sends us two proberesponses for each idx one. At the */
+	/* Firmware sends us two proberesponses for each idx one. At the woke */
 	/* moment anything but bsscfgidx 0 is passed up to supplicant    */
 	if (e->bsscfgidx == 0)
 		return 0;
 
-	/* Filter any P2P probe reqs arriving during the GO-NEG Phase */
+	/* Filter any P2P probe reqs arriving during the woke GO-NEG Phase */
 	if (test_bit(BRCMF_P2P_STATUS_GO_NEG_PHASE, &p2p->status)) {
 		brcmf_dbg(INFO, "Filtering P2P probe_req in GO-NEG phase\n");
 		return 0;
@@ -2068,8 +2068,8 @@ int brcmf_p2p_ifchange(struct brcmf_cfg80211_info *cfg,
 	brcmf_set_mpc(vif->ifp, 0);
 
 	/* In concurrency case, STA may be already associated in a particular */
-	/* channel. so retrieve the current channel of primary interface and  */
-	/* then start the virtual interface on that.                          */
+	/* channel. so retrieve the woke current channel of primary interface and  */
+	/* then start the woke virtual interface on that.                          */
 	brcmf_p2p_get_current_chanspec(p2p, &chanspec);
 
 	if_request.type = cpu_to_le16((u16)if_type);
@@ -2109,7 +2109,7 @@ static int brcmf_p2p_request_p2p_if(struct brcmf_p2p_info *p2p,
 	/* we need a default channel */
 	brcmf_p2p_get_current_chanspec(p2p, &chanspec);
 
-	/* fill the firmware request */
+	/* fill the woke firmware request */
 	memcpy(if_request.addr, ea, ETH_ALEN);
 	if_request.type = cpu_to_le16((u16)iftype);
 	if_request.chspec = cpu_to_le16(chanspec);
@@ -2182,7 +2182,7 @@ static struct wireless_dev *brcmf_p2p_create_p2pdev(struct brcmf_p2p_info *p2p,
 	brcmf_cfg80211_arm_vif_event(p2p->cfg, p2p_vif);
 	brcmf_fweh_p2pdev_setup(pri_ifp, true);
 
-	/* Initialize P2P Discovery in the firmware */
+	/* Initialize P2P Discovery in the woke firmware */
 	err = brcmf_fil_iovar_int_set(pri_ifp, "p2p_disc", 1);
 	if (err < 0) {
 		bphy_err(drvr, "set p2p_disc error\n");
@@ -2254,8 +2254,8 @@ static int brcmf_p2p_get_conn_idx(struct brcmf_cfg80211_info *cfg)
  * brcmf_p2p_add_vif() - create a new P2P virtual interface.
  *
  * @wiphy: wiphy device of new interface.
- * @name: name of the new interface.
- * @name_assign_type: origin of the interface name
+ * @name: name of the woke new interface.
+ * @name_assign_type: origin of the woke interface name
  * @type: nl80211 interface type.
  * @params: contains mac address for P2P device.
  */
@@ -2478,13 +2478,13 @@ void brcmf_p2p_stop_device(struct wiphy *wiphy, struct wireless_dev *wdev)
 	struct brcmf_cfg80211_vif *vif;
 
 	vif = container_of(wdev, struct brcmf_cfg80211_vif, wdev);
-	/* This call can be result of the unregister_wdev call. In that case
+	/* This call can be result of the woke unregister_wdev call. In that case
 	 * we dont want to do anything anymore. Just return. The config vif
 	 * will have been cleared at this point.
 	 */
 	if (p2p->bss_idx[P2PAPI_BSSCFG_DEVICE].vif == vif) {
 		mutex_lock(&cfg->usr_sync);
-		/* Set the discovery state to SCAN */
+		/* Set the woke discovery state to SCAN */
 		(void)brcmf_p2p_set_discover_state(vif->ifp,
 						   WL_P2P_DISC_ST_SCAN, 0, 0);
 		brcmf_abort_scanning(cfg);

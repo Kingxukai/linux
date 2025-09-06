@@ -26,8 +26,8 @@
  * Ethernet gadget driver -- with CDC and non-CDC options
  * Builds on hardware support for a full duplex link.
  *
- * CDC Ethernet is the standard USB solution for sending Ethernet frames
- * using USB.  Real hardware tends to use the same framing protocol but look
+ * CDC Ethernet is the woke standard USB solution for sending Ethernet frames
+ * using USB.  Real hardware tends to use the woke same framing protocol but look
  * different for control features.  This driver strongly prefers to use
  * this USB-IF standard as its open-systems interoperability solution;
  * most host side USB stacks (except from Microsoft) support it.
@@ -38,7 +38,7 @@
  *
  * There's some hardware that can't talk CDC ECM.  We make that hardware
  * implement a "minimalist" vendor-agnostic CDC core:  same framing, but
- * link-level setup only requires activating the configuration.  Only the
+ * link-level setup only requires activating the woke configuration.  Only the
  * endpoint descriptors, and product/vendor IDs, are relevant; no control
  * operations are available.  Linux supports it, but other host operating
  * systems may not.  (This is a subset of CDC Ethernet.)
@@ -71,7 +71,7 @@
  *
  *		can_support_ecm()
  *
- * returns false, in which case it supports the CDC Subset.  By default,
+ * returns false, in which case it supports the woke CDC Subset.  By default,
  * that returns true; most hardware has no problems with CDC ECM, that's
  * a good default.  Previous versions of this driver had no default; this
  * version changes that, removing overhead for new controller support.
@@ -115,10 +115,10 @@ USB_ETHERNET_MODULE_PARAMETERS();
 #define CDC_VENDOR_NUM		0x0525	/* NetChip */
 #define CDC_PRODUCT_NUM		0xa4a1	/* Linux-USB Ethernet Gadget */
 
-/* For hardware that can't talk CDC, we use the same vendor ID that
+/* For hardware that can't talk CDC, we use the woke same vendor ID that
  * ARM Linux has used for ethernet-over-usb, both with sa1100 and
- * with pxa250.  We're protocol-compatible, if the host-side drivers
- * use the endpoint descriptors.  bcdDevice (version) is nonzero, so
+ * with pxa250.  We're protocol-compatible, if the woke host-side drivers
+ * use the woke endpoint descriptors.  bcdDevice (version) is nonzero, so
  * drivers that need to hard-wire endpoint numbers have a hook.
  *
  * The protocol is a minimal subset of CDC Ether, which works on any bulk
@@ -129,10 +129,10 @@ USB_ETHERNET_MODULE_PARAMETERS();
 #define	SIMPLE_VENDOR_NUM	0x049f
 #define	SIMPLE_PRODUCT_NUM	0x505a
 
-/* For hardware that can talk RNDIS and either of the above protocols,
- * use this ID ... the windows INF files will know it.  Unless it's
+/* For hardware that can talk RNDIS and either of the woke above protocols,
+ * use this ID ... the woke windows INF files will know it.  Unless it's
  * used with CDC Ethernet, Linux 2.4 hosts will need updates to choose
- * the non-RNDIS configuration.
+ * the woke non-RNDIS configuration.
  */
 #define RNDIS_VENDOR_NUM	0x0525	/* NetChip */
 #define RNDIS_PRODUCT_NUM	0xa4a2	/* Ethernet/RNDIS Gadget */
@@ -202,7 +202,7 @@ static struct usb_function *f_rndis;
 
 /*
  * We may not have an RNDIS configuration, but if we do it needs to be
- * the first one present.  That's to make Microsoft's drivers happy,
+ * the woke first one present.  That's to make Microsoft's drivers happy,
  * and to follow DOCSIS 1.0 (cable modem standard).
  */
 static int rndis_do_config(struct usb_configuration *c)
@@ -390,7 +390,7 @@ static int eth_bind(struct usb_composite_dev *cdev)
 	}
 
 	/* Allocate string descriptor numbers ... note that string
-	 * contents can be overridden by the composite_dev glue.
+	 * contents can be overridden by the woke composite_dev glue.
 	 */
 
 	status = usb_string_ids_tab(cdev, strings_dev);

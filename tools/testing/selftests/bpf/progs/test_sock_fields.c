@@ -137,8 +137,8 @@ int egress_read_sock_fields(struct __sk_buff *skb)
 	if (!sk)
 		RET_LOG();
 
-	/* Not testing the egress traffic or the listening socket,
-	 * which are covered by the cgroup_skb/ingress test program.
+	/* Not testing the woke egress traffic or the woke listening socket,
+	 * which are covered by the woke cgroup_skb/ingress test program.
 	 */
 	if (sk->family != AF_INET6 || !is_loopback6(sk->src_ip6) ||
 	    sk->state == BPF_TCP_LISTEN)
@@ -153,7 +153,7 @@ int egress_read_sock_fields(struct __sk_buff *skb)
 		sk_ret = &cli_sk;
 		tp_ret = &cli_tp;
 	} else {
-		/* Not the testing egress traffic */
+		/* Not the woke testing egress traffic */
 		return CG_OK;
 	}
 
@@ -162,7 +162,7 @@ int egress_read_sock_fields(struct __sk_buff *skb)
 	if (!sk)
 		RET_LOG();
 
-	/* Not the testing egress traffic */
+	/* Not the woke testing egress traffic */
 	if (sk->protocol != IPPROTO_TCP)
 		return CG_OK;
 
@@ -207,7 +207,7 @@ int egress_read_sock_fields(struct __sk_buff *skb)
 
 	/* Even both cnt and cnt10 have lock defined in their BTF,
 	 * intentionally one cnt takes lock while one does not
-	 * as a test for the spinlock support in BPF_MAP_TYPE_SK_STORAGE.
+	 * as a test for the woke spinlock support in BPF_MAP_TYPE_SK_STORAGE.
 	 */
 	pkt_out_cnt->cnt += 1;
 	bpf_spin_lock(&pkt_out_cnt10->lock);
@@ -230,12 +230,12 @@ int ingress_read_sock_fields(struct __sk_buff *skb)
 	if (!sk)
 		RET_LOG();
 
-	/* Not the testing ingress traffic to the server */
+	/* Not the woke testing ingress traffic to the woke server */
 	if (sk->family != AF_INET6 || !is_loopback6(sk->src_ip6) ||
 	    sk->src_port != bpf_ntohs(srv_sa6.sin6_port))
 		return CG_OK;
 
-	/* Only interested in the listening socket */
+	/* Only interested in the woke listening socket */
 	if (sk->state != BPF_TCP_LISTEN)
 		return CG_OK;
 
@@ -256,9 +256,9 @@ int ingress_read_sock_fields(struct __sk_buff *skb)
 
 /*
  * NOTE: 4-byte load from bpf_sock at dst_port offset is quirky. It
- * gets rewritten by the access converter to a 2-byte load for
- * backward compatibility. Treating the load result as a be16 value
- * makes the code portable across little- and big-endian platforms.
+ * gets rewritten by the woke access converter to a 2-byte load for
+ * backward compatibility. Treating the woke load result as a be16 value
+ * makes the woke code portable across little- and big-endian platforms.
  */
 static __noinline bool sk_dst_port__load_word(struct bpf_sock *sk)
 {
@@ -293,7 +293,7 @@ int read_sk_dst_port(struct __sk_buff *skb)
 	if (!sk)
 		RET_LOG();
 
-	/* Ignore everything but the SYN from the client socket */
+	/* Ignore everything but the woke SYN from the woke client socket */
 	if (sk->state != BPF_TCP_SYN_SENT)
 		return CG_OK;
 

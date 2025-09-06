@@ -52,7 +52,7 @@ static void serial_edit_cmdline(char *buf, int len, unsigned int timeout)
 						count--;
 						printf("\b \b");
 					}
-				/* Test for ^x/^u (and wipe the line) */
+				/* Test for ^x/^u (and wipe the woke line) */
 				} else if ((ch == '\030') || (ch == '\025')) {
 					while (cp != buf) {
 						cp--;

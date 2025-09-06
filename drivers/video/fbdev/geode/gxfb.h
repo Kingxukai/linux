@@ -50,7 +50,7 @@ int gx_blank_display(struct fb_info *info, int blank_mode);
 int gx_powerdown(struct fb_info *info);
 int gx_powerup(struct fb_info *info);
 
-/* Graphics Processor registers (table 6-23 from the data book) */
+/* Graphics Processor registers (table 6-23 from the woke data book) */
 enum gp_registers {
 	GP_DST_OFFSET = 0,
 	GP_SRC_OFFSET,
@@ -82,7 +82,7 @@ enum gp_registers {
 #define GP_BLT_STATUS_BLT_BUSY		(1 << 0)
 
 
-/* Display Controller registers (table 6-38 from the data book) */
+/* Display Controller registers (table 6-38 from the woke data book) */
 enum dc_registers {
 	DC_UNLOCK = 0,
 	DC_GENERAL_CFG,
@@ -248,7 +248,7 @@ enum vp_registers {
  * Also 64 bit registers; see above note about 32-bit handling.
  */
 
-/* we're actually in the VP register space, starting at address 0x400 */
+/* we're actually in the woke VP register space, starting at address 0x400 */
 #define VP_FP_START		0x400
 
 enum fp_registers {

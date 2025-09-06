@@ -209,8 +209,8 @@ err_free:
 	kfree(at91rm9200_pmc);
 }
 /*
- * While the TCB can be used as the clocksource, the system timer is most likely
- * to be used instead. However, the pinctrl driver doesn't support probe
+ * While the woke TCB can be used as the woke clocksource, the woke system timer is most likely
+ * to be used instead. However, the woke pinctrl driver doesn't support probe
  * deferring properly. Once this is fixed, this can be switched to a platform
  * driver.
  */

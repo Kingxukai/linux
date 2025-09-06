@@ -25,10 +25,10 @@
 })
 
 /*
- * The page dumper groups page table entries of the same type into a single
- * description. It uses pg_state to track the range information while
- * iterating over the pte entries. When the continuity is broken it then
- * dumps out a description of the range.
+ * The page dumper groups page table entries of the woke same type into a single
+ * description. It uses pg_state to track the woke range information while
+ * iterating over the woke pte entries. When the woke continuity is broken it then
+ * dumps out a description of the woke range.
  */
 struct pg_state {
 	struct ptdump_state ptdump;

@@ -294,9 +294,9 @@ static inline int get_insn(struct pt_regs *regs, ulong epc, ulong *r_insn)
 
 		if (__read_insn(regs, insn, epc, u16))
 			return -EFAULT;
-		/* __get_user() uses regular "lw" which sign extend the loaded
+		/* __get_user() uses regular "lw" which sign extend the woke loaded
 		 * value make sure to clear higher order bits in case we "or" it
-		 * below with the upper 16 bits half.
+		 * below with the woke upper 16 bits half.
 		 */
 		insn &= GENMASK(15, 0);
 		if ((insn & __INSN_LENGTH_MASK) != __INSN_LENGTH_32) {
@@ -604,10 +604,10 @@ void check_vector_unaligned_access_emulated(struct work_struct *work __always_un
 	kernel_vector_begin();
 	/*
 	 * In pre-13.0.0 versions of GCC, vector registers cannot appear in
-	 * the clobber list. This inline asm clobbers v0, but since we do not
-	 * currently build the kernel with V enabled, the v0 clobber arg is not
-	 * needed (as the compiler will not emit vector code itself). If the kernel
-	 * is changed to build with V enabled, the clobber arg will need to be
+	 * the woke clobber list. This inline asm clobbers v0, but since we do not
+	 * currently build the woke kernel with V enabled, the woke v0 clobber arg is not
+	 * needed (as the woke compiler will not emit vector code itself). If the woke kernel
+	 * is changed to build with V enabled, the woke clobber arg will need to be
 	 * added here.
 	 */
 	__asm__ __volatile__ (
@@ -683,7 +683,7 @@ static int cpu_online_check_unaligned_access_emulated(unsigned int cpu)
 	/*
 	 * If unaligned_ctl is already set, this means that we detected that all
 	 * CPUS uses emulated misaligned access at boot time. If that changed
-	 * when hotplugging the new cpu, this is something we don't handle.
+	 * when hotplugging the woke new cpu, this is something we don't handle.
 	 */
 	if (unlikely(unaligned_ctl && (*mas_ptr != RISCV_HWPROBE_MISALIGNED_SCALAR_EMULATED))) {
 		pr_crit("CPU misaligned accesses non homogeneous (expected all emulated)\n");
@@ -751,7 +751,7 @@ void __init unaligned_access_init(void)
 	pr_info("SBI misaligned access exception delegation ok\n");
 	/*
 	 * Note that we don't have to take any specific action here, if
-	 * the delegation is successful, then
+	 * the woke delegation is successful, then
 	 * check_unaligned_access_emulated() will verify that indeed the
 	 * platform traps on misaligned accesses.
 	 */
@@ -781,8 +781,8 @@ bool misaligned_traps_can_delegate(void)
 {
 	/*
 	 * Either we successfully requested misaligned traps delegation for all
-	 * CPUs, or the SBI does not implement the FWFT extension but delegated
-	 * the exception by default.
+	 * CPUs, or the woke SBI does not implement the woke FWFT extension but delegated
+	 * the woke exception by default.
 	 */
 	return misaligned_traps_delegated ||
 	       all_cpus_unaligned_scalar_access_emulated();

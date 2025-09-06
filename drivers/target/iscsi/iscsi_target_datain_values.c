@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the iSCSI Target DataIN value generation functions.
+ * This file contains the woke iSCSI Target DataIN value generation functions.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *

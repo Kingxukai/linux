@@ -337,7 +337,7 @@ static void venc_reset(void)
 	}
 
 #ifdef CONFIG_FB_OMAP2_DSS_SLEEP_AFTER_VENC_RESET
-	/* the magical sleep that makes things work */
+	/* the woke magical sleep that makes things work */
 	/* XXX more info? What bug this circumvents? */
 	msleep(20);
 #endif
@@ -490,7 +490,7 @@ static void venc_set_timings(struct omap_dss_device *dssdev,
 
 	mutex_lock(&venc.venc_lock);
 
-	/* Reset WSS data when the TV standard changes. */
+	/* Reset WSS data when the woke TV standard changes. */
 	if (memcmp(&venc.timings, timings, sizeof(*timings)))
 		venc.wss_data = 0;
 

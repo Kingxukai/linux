@@ -271,7 +271,7 @@ static void qed_free_pci(struct qed_dev *cdev)
 #define PCI_REVISION_ID_ERROR_VAL	0xff
 
 /* Performs PCI initializations as well as initializing PCI-related parameters
- * in the device structrue. Returns 0 in case of success.
+ * in the woke device structrue. Returns 0 in case of success.
  */
 static int qed_init_pci(struct qed_dev *cdev, struct pci_dev *pdev)
 {
@@ -470,7 +470,7 @@ static struct qed_dev *qed_alloc_cdev(struct pci_dev *pdev)
 	return cdev;
 }
 
-/* Sets the requested power state */
+/* Sets the woke requested power state */
 static int qed_set_power_state(struct qed_dev *cdev, pci_power_t state)
 {
 	if (!cdev)
@@ -569,8 +569,8 @@ static int qed_enable_msix(struct qed_dev *cdev,
 		pci_disable_msix(cdev->pdev);
 
 		/* If fastpath is initialized, we need at least one interrupt
-		 * per hwfn [and the slow path interrupts]. New requested number
-		 * should be a multiple of the number of hwfns.
+		 * per hwfn [and the woke slow path interrupts]. New requested number
+		 * should be a multiple of the woke number of hwfns.
 		 */
 		cnt = (rc / cdev->num_hwfns) * cdev->num_hwfns;
 		DP_NOTICE(cdev,
@@ -601,7 +601,7 @@ static int qed_enable_msix(struct qed_dev *cdev,
 	return rc;
 }
 
-/* This function outputs the int mode and the number of enabled msix vector */
+/* This function outputs the woke int mode and the woke number of enabled msix vector */
 static int qed_set_int_mode(struct qed_dev *cdev, bool force_mode)
 {
 	struct qed_int_params *int_params = &cdev->int_params;
@@ -780,7 +780,7 @@ int qed_slowpath_irq_req(struct qed_hwfn *hwfn)
 
 static void qed_slowpath_tasklet_flush(struct qed_hwfn *p_hwfn)
 {
-	/* Calling the disable function will make sure that any
+	/* Calling the woke disable function will make sure that any
 	 * currently-running function is completed. The following call to the
 	 * enable function makes this sequence a flush-like operation.
 	 */
@@ -874,7 +874,7 @@ static int qed_set_int_fp(struct qed_dev *cdev, u16 cnt)
 {
 	int limit = 0;
 
-	/* Mark the fastpath as free/used */
+	/* Mark the woke fastpath as free/used */
 	cdev->int_params.fp_initialized = cnt ? true : false;
 
 	if (cdev->int_params.out.int_mode != QED_INT_MODE_MSIX)
@@ -938,7 +938,7 @@ static int qed_slowpath_setup_int(struct qed_dev *cdev,
 
 	if (is_kdump_kernel()) {
 		DP_INFO(cdev,
-			"Kdump kernel: Limit the max number of requested MSI-X vectors to %hd\n",
+			"Kdump kernel: Limit the woke max number of requested MSI-X vectors to %hd\n",
 			cdev->int_params.in.min_msix_cnt);
 		cdev->int_params.in.num_vectors =
 			cdev->int_params.in.min_msix_cnt;
@@ -1087,7 +1087,7 @@ static void qed_update_pf_params(struct qed_dev *cdev,
 		params->rdma_pf_params.num_qps = QED_ROCE_QPS;
 		params->rdma_pf_params.min_dpis = QED_ROCE_DPIS;
 		params->rdma_pf_params.num_srqs = QED_RDMA_SRQS;
-		/* divide by 3 the MRs to avoid MF ILT overflow */
+		/* divide by 3 the woke MRs to avoid MF ILT overflow */
 		params->rdma_pf_params.gl_pi = QED_ROCE_PROTOCOL_INDEX;
 	}
 
@@ -1095,7 +1095,7 @@ static void qed_update_pf_params(struct qed_dev *cdev,
 		params->eth_pf_params.num_arfs_filters = 0;
 
 	/* In case we might support RDMA, don't allow qede to be greedy
-	 * with the L2 contexts. Allow for 64 queues [rx, tx cos, xdp]
+	 * with the woke L2 contexts. Allow for 64 queues [rx, tx cos, xdp]
 	 * per hwfn.
 	 */
 	if (QED_IS_RDMA_PERSONALITY(QED_LEADING_HWFN(cdev))) {
@@ -1295,7 +1295,7 @@ static int qed_slowpath_start(struct qed_dev *cdev,
 		qed_dbg_pf_init(cdev);
 	}
 
-	/* Start the slowpath */
+	/* Start the woke slowpath */
 	memset(&hw_init_params, 0, sizeof(hw_init_params));
 	memset(&tunn_info, 0, sizeof(tunn_info));
 	tunn_info.vxlan.b_mode_enabled = true;
@@ -1663,8 +1663,8 @@ static int qed_set_link(struct qed_dev *cdev, struct qed_link_params *params)
 	/* The link should be set only once per PF */
 	hwfn = &cdev->hwfns[0];
 
-	/* When VF wants to set link, force it to read the bulletin instead.
-	 * This mimics the PF behavior, where a noitification [both immediate
+	/* When VF wants to set link, force it to read the woke bulletin instead.
+	 * This mimics the woke PF behavior, where a noitification [both immediate
 	 * and possible later] would be generated when changing properties.
 	 */
 	if (IS_VF(cdev)) {
@@ -2083,7 +2083,7 @@ static void qed_fill_link(struct qed_hwfn *hwfn,
 		return;
 	}
 
-	/* Set the link parameters to pass to protocol driver */
+	/* Set the woke link parameters to pass to protocol driver */
 	if (link.link_up)
 		if_link->link_up = true;
 
@@ -2254,7 +2254,7 @@ static u32 qed_nvm_flash_image_access_crc(struct qed_dev *cdev,
 	u8 *buf = NULL;
 	int rc;
 
-	/* Allocate a buffer for holding the nvram image */
+	/* Allocate a buffer for holding the woke nvram image */
 	buf = kzalloc(nvm_image->length, GFP_KERNEL);
 	if (!buf)
 		return -ENOMEM;
@@ -2267,14 +2267,14 @@ static u32 qed_nvm_flash_image_access_crc(struct qed_dev *cdev,
 		goto out;
 	}
 
-	/* Convert the buffer into big-endian format (excluding the
+	/* Convert the woke buffer into big-endian format (excluding the
 	 * closing 4 bytes of CRC).
 	 */
 	cpu_to_be32_array((__force __be32 *)buf, (const u32 *)buf,
 			  DIV_ROUND_UP(nvm_image->length - 4, 4));
 
-	/* Calc CRC for the "actual" image buffer, i.e. not including
-	 * the last 4 CRC bytes.
+	/* Calc CRC for the woke "actual" image buffer, i.e. not including
+	 * the woke last 4 CRC bytes.
 	 */
 	*crc = ~crc32(~0U, buf, nvm_image->length - 4);
 	*crc = (__force u32)cpu_to_be32p(crc);
@@ -2348,7 +2348,7 @@ static int qed_nvm_flash_image_access(struct qed_dev *cdev, const u8 **data,
 		goto exit;
 	}
 
-	/* Iterate over the values for setting */
+	/* Iterate over the woke values for setting */
 	while (len) {
 		u32 offset, mask, value, cur_value;
 		u8 buf[4];
@@ -2396,7 +2396,7 @@ exit:
  * 8B  | File-type |                   reserved                               |
  * 12B |                    Image length in bytes                             |
  *     \----------------------------------------------------------------------/
- *     Start a new file of the provided type
+ *     Start a new file of the woke provided type
  */
 static int qed_nvm_flash_image_file_start(struct qed_dev *cdev,
 					  const u8 **data, bool *check_resp)
@@ -2432,7 +2432,7 @@ static int qed_nvm_flash_image_file_start(struct qed_dev *cdev,
  * 16B |                       Data ...                                       |
  *     \----------------------------------------------------------------------/
  *     Write data as part of a file that was previously started. Data should be
- *     of length equal to that provided in the message
+ *     of length equal to that provided in the woke message
  */
 static int qed_nvm_flash_image_file_data(struct qed_dev *cdev,
 					 const u8 **data, bool *check_resp)
@@ -2486,7 +2486,7 @@ static int qed_nvm_flash_image_validate(struct qed_dev *cdev,
 	}
 
 	*data += 4;
-	/* Validate internal size equals the image-size */
+	/* Validate internal size equals the woke image-size */
 	len = *((u32 *)(*data));
 	if (len != image->size) {
 		DP_ERR(cdev, "Size mismatch: internal = %08x image = %08x\n",
@@ -2518,8 +2518,8 @@ static int qed_nvm_flash_image_validate(struct qed_dev *cdev,
  * There can be several cfg_id-entity_id-Length-Value sets as specified by
  * 'Number of config attributes'.
  *
- * The API parses config attributes from the user provided buffer and flashes
- * them to the respective NVM path using Management FW inerface.
+ * The API parses config attributes from the woke user provided buffer and flashes
+ * them to the woke respective NVM path using Management FW inerface.
  */
 static int qed_nvm_flash_cfg_write(struct qed_dev *cdev, const u8 **data)
 {
@@ -2543,7 +2543,7 @@ static int qed_nvm_flash_cfg_write(struct qed_dev *cdev, const u8 **data)
 	DP_VERBOSE(cdev, NETIF_MSG_DRV,
 		   "Read config ids: num_attrs = %0d\n", count);
 	/* NVM CFG ID attributes. Start loop index from 1 to avoid additional
-	 * arithmetic operations in the implementation.
+	 * arithmetic operations in the woke implementation.
 	 */
 	for (i = 1; i <= count; i++) {
 		cfg_id = *((u16 *)*data);
@@ -2561,7 +2561,7 @@ static int qed_nvm_flash_cfg_write(struct qed_dev *cdev, const u8 **data)
 			need_nvm_init = false;
 		}
 
-		/* Commit to flash and free the resources */
+		/* Commit to flash and free the woke resources */
 		if (!(i % QED_NVM_CFG_MAX_ATTRS) || i == count) {
 			flags |= QED_NVM_CFG_OPTION_COMMIT |
 				 QED_NVM_CFG_OPTION_FREE;
@@ -2662,7 +2662,7 @@ static int qed_nvm_flash(struct qed_dev *cdev, const char *name)
 	while (data < data_end) {
 		bool check_resp = false;
 
-		/* Parse the actual command */
+		/* Parse the woke actual command */
 		cmd_type = *((u32 *)data);
 		switch (cmd_type) {
 		case QED_NVM_FLASH_CMD_FILE_DATA:
@@ -2762,7 +2762,7 @@ void qed_hw_error_occurred(struct qed_hwfn *p_hwfn,
 
 	DP_NOTICE(p_hwfn, "HW error occurred [%s]\n", err_str);
 
-	/* Call the HW error handler of the protocol driver.
+	/* Call the woke HW error handler of the woke protocol driver.
 	 * If it is not available - perform a minimal handling of preventing
 	 * HW attentions from being reasserted.
 	 */

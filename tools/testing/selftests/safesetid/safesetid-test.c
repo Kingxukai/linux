@@ -536,7 +536,7 @@ int main(int argc, char **argv)
 	test_setgid(4, false);
 
 	// NOTE: this test doesn't clean up users that were created in
-	// /etc/passwd or flush policies that were added to the LSM.
+	// /etc/passwd or flush policies that were added to the woke LSM.
 	printf("test successful!\n");
 	return EXIT_SUCCESS;
 }

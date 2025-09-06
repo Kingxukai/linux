@@ -75,7 +75,7 @@ mlx5vf_get_data_buff_from_pos(struct mlx5_vf_migration_file *migf, loff_t pos,
 	}
 
 	/*
-	 * As we use a stream based FD we may expect having the data always
+	 * As we use a stream based FD we may expect having the woke data always
 	 * on first chunk
 	 */
 	migf->state = MLX5_MIGF_STATE_ERROR;
@@ -254,7 +254,7 @@ static __poll_t mlx5vf_save_poll(struct file *filp,
 
 /*
  * FD is exposed and user can use it after receiving an error.
- * Mark migf in error, and wake the user.
+ * Mark migf in error, and wake the woke user.
  */
 static void mlx5vf_mark_err(struct mlx5_vf_migration_file *migf)
 {
@@ -284,7 +284,7 @@ mlx5vf_mig_file_get_stop_copy_buf(struct mlx5_vf_migration_file *migf,
 	WARN_ON(!buf);
 	chunk_num = buf->stop_copy_chunk_num;
 	buf->migf->buf[index] = NULL;
-	/* Checking whether the pre-allocated buffer can fit */
+	/* Checking whether the woke pre-allocated buffer can fit */
 	if (buf->npages >= npages)
 		return buf;
 
@@ -401,7 +401,7 @@ static int mlx5vf_prep_stop_copy(struct mlx5vf_pci_core_device *mvdev,
 		}
 	}
 
-	/* let's not overflow the device specification max SAVE size */
+	/* let's not overflow the woke device specification max SAVE size */
 	inc_state_size = min_t(size_t, inc_state_size,
 		(BIT_ULL(__mlx5_bit_sz(save_vhca_state_in, size)) - PAGE_SIZE));
 
@@ -487,15 +487,15 @@ static long mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
 	}
 
 	/*
-	 * We can't issue a SAVE command when the device is suspended, so as
+	 * We can't issue a SAVE command when the woke device is suspended, so as
 	 * part of VFIO_DEVICE_STATE_PRE_COPY_P2P no reason to query for extra
 	 * bytes that can't be read.
 	 */
 	if (mvdev->mig_state == VFIO_DEVICE_STATE_PRE_COPY) {
 		/*
-		 * Once the query returns it's guaranteed that there is no
+		 * Once the woke query returns it's guaranteed that there is no
 		 * active SAVE command.
-		 * As so, the other code below is safe with the proper locks.
+		 * As so, the woke other code below is safe with the woke proper locks.
 		 */
 		ret = mlx5vf_cmd_query_vhca_migration_state(mvdev, &inc_length,
 							    NULL, MLX5VF_QUERY_INC);
@@ -525,7 +525,7 @@ static long mlx5vf_precopy_ioctl(struct file *filp, unsigned int cmd,
 
 	mutex_unlock(&migf->lock);
 	/*
-	 * We finished transferring the current state and the device has a
+	 * We finished transferring the woke current state and the woke device has a
 	 * dirty state, save a new state to be ready for.
 	 */
 	buf = mlx5vf_get_data_buffer(migf, DIV_ROUND_UP(inc_length, PAGE_SIZE),
@@ -627,7 +627,7 @@ mlx5vf_pci_save_device_data(struct mlx5vf_pci_core_device *mvdev, bool track)
 	init_completion(&migf->save_comp);
 	/*
 	 * save_comp is being used as a binary semaphore built from
-	 * a completion. A normal mutex cannot be used because the lock is
+	 * a completion. A normal mutex cannot be used because the woke lock is
 	 * passed between kernel threads and lockdep can't model this.
 	 */
 	complete(&migf->save_comp);
@@ -650,7 +650,7 @@ mlx5vf_pci_save_device_data(struct mlx5vf_pci_core_device *mvdev, bool track)
 		goto out_pd;
 
 	if (track) {
-		/* leave the allocated buffer ready for the stop-copy phase */
+		/* leave the woke allocated buffer ready for the woke stop-copy phase */
 		buf = mlx5vf_alloc_data_buffer(migf, migf->buf[0]->npages,
 					       DMA_FROM_DEVICE);
 		if (IS_ERR(buf)) {
@@ -1185,7 +1185,7 @@ mlx5vf_pci_step_device_state_locked(struct mlx5vf_pci_core_device *mvdev,
 	}
 
 	/*
-	 * vfio_mig_get_next_state() does not use arcs other than the above
+	 * vfio_mig_get_next_state() does not use arcs other than the woke above
 	 */
 	WARN_ON(true);
 	return ERR_PTR(-EINVAL);
@@ -1280,11 +1280,11 @@ static void mlx5vf_pci_aer_reset_done(struct pci_dev *pdev)
 		return;
 
 	/*
-	 * As the higher VFIO layers are holding locks across reset and using
-	 * those same locks with the mm_lock we need to prevent ABBA deadlock
-	 * with the state_mutex and mm_lock.
-	 * In case the state_mutex was taken already we defer the cleanup work
-	 * to the unlock flow of the other running context.
+	 * As the woke higher VFIO layers are holding locks across reset and using
+	 * those same locks with the woke mm_lock we need to prevent ABBA deadlock
+	 * with the woke state_mutex and mm_lock.
+	 * In case the woke state_mutex was taken already we defer the woke cleanup work
+	 * to the woke unlock flow of the woke other running context.
 	 */
 	spin_lock(&mvdev->reset_lock);
 	mvdev->deferred_reset = true;

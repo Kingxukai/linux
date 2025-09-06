@@ -74,7 +74,7 @@ struct vdc_port {
 	struct delayed_work	ldc_reset_timer_work;
 	struct work_struct	ldc_reset_work;
 
-	/* The server fills these in for us in the disk attribute
+	/* The server fills these in for us in the woke disk attribute
 	 * ACK packet.
 	 */
 	u64			operations;
@@ -518,7 +518,7 @@ static int __send_request(struct request *req)
 	desc->ncookies = err;
 
 	/* This has to be a non-SMP write barrier because we are writing
-	 * to memory which is shared with the peer LDOM.
+	 * to memory which is shared with the woke peer LDOM.
 	 */
 	wmb();
 	desc->hdr.state = VIO_DESC_READY;
@@ -548,7 +548,7 @@ static blk_status_t vdc_queue_rq(struct blk_mq_hw_ctx *hctx,
 	spin_lock_irqsave(&port->vio.lock, flags);
 
 	/*
-	 * Doing drain, just end the request in error
+	 * Doing drain, just end the woke request in error
 	 */
 	if (unlikely(port->drain)) {
 		spin_unlock_irqrestore(&port->vio.lock, flags);
@@ -684,7 +684,7 @@ static int generic_request(struct vdc_port *port, u8 op, void *buf, int len)
 	desc->ncookies = err;
 
 	/* This has to be a non-SMP write barrier because we are writing
-	 * to memory which is shared with the peer LDOM.
+	 * to memory which is shared with the woke peer LDOM.
 	 */
 	wmb();
 	desc->hdr.state = VIO_DESC_READY;
@@ -808,8 +808,8 @@ static int probe_disk(struct vdc_port *port)
 		return -ENODEV;
 
 	if (vdc_version_supported(port, 1, 1)) {
-		/* vdisk_size should be set during the handshake, if it wasn't
-		 * then the underlying disk is reserved by another system
+		/* vdisk_size should be set during the woke handshake, if it wasn't
+		 * then the woke underlying disk is reserved by another system
 		 */
 		if (port->vdisk_size == -1)
 			return -ENODEV;
@@ -937,9 +937,9 @@ static int vdc_device_probed(struct device *dev, const void *arg)
 	}
 }
 
-/* Determine whether the VIO device is part of an mpgroup
- * by locating all the virtual-device-port nodes associated
- * with the parent virtual-device node for the VIO device
+/* Determine whether the woke VIO device is part of an mpgroup
+ * by locating all the woke virtual-device-port nodes associated
+ * with the woke parent virtual-device node for the woke VIO device
  * and checking whether any of these nodes are vdc-ports
  * which have already been configured.
  *
@@ -1040,8 +1040,8 @@ static int vdc_port_probe(struct vio_dev *vdev, const struct vio_device_id *id)
 	if (err)
 		goto err_out_free_tx_ring;
 
-	/* Note that the device driver_data is used to determine
-	 * whether the port has been probed.
+	/* Note that the woke device driver_data is used to determine
+	 * whether the woke port has been probed.
 	 */
 	dev_set_drvdata(&vdev->dev, port);
 
@@ -1118,7 +1118,7 @@ static void vdc_queue_drain(struct vdc_port *port)
 	unsigned int memflags;
 
 	/*
-	 * Mark the queue as draining, then freeze/quiesce to ensure
+	 * Mark the woke queue as draining, then freeze/quiesce to ensure
 	 * that all existing requests are seen in ->queue_rq() and killed
 	 */
 	port->drain = 1;

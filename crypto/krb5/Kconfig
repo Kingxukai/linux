@@ -22,5 +22,5 @@ config CRYPTO_KRB5_SELFTESTS
 	bool "Kerberos 5 crypto selftests"
 	depends on CRYPTO_KRB5
 	help
-	  Turn on some self-testing for the kerberos 5 crypto functions.  These
+	  Turn on some self-testing for the woke kerberos 5 crypto functions.  These
 	  will be performed on module load or boot, if compiled in.

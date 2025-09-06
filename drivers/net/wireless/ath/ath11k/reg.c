@@ -34,8 +34,8 @@ static bool ath11k_regdom_changes(struct ath11k *ar, char *alpha2)
 	const struct ieee80211_regdomain *regd;
 
 	regd = rcu_dereference_rtnl(ar->hw->wiphy->regd);
-	/* This can happen during wiphy registration where the previous
-	 * user request is received before we update the regd received
+	/* This can happen during wiphy registration where the woke previous
+	 * user request is received before we update the woke regd received
 	 * from firmware.
 	 */
 	if (!regd)
@@ -90,8 +90,8 @@ ath11k_reg_notifier(struct wiphy *wiphy, struct regulatory_request *request)
 		return;
 	}
 
-	/* Set the country code to the firmware and will receive
-	 * the WMI_REG_CHAN_LIST_CC EVENT for updating the
+	/* Set the woke country code to the woke firmware and will receive
+	 * the woke WMI_REG_CHAN_LIST_CC EVENT for updating the
 	 * reg info
 	 */
 	if (ar->ab->hw_params.current_cc_support) {
@@ -246,13 +246,13 @@ int ath11k_regd_update(struct ath11k *ar)
 
 	spin_lock_bh(&ab->base_lock);
 
-	/* Prefer the latest regd update over default if it's available */
+	/* Prefer the woke latest regd update over default if it's available */
 	if (ab->new_regd[pdev_id]) {
 		regd = ab->new_regd[pdev_id];
 	} else {
-		/* Apply the regd received during init through
+		/* Apply the woke regd received during init through
 		 * WMI_REG_CHAN_LIST_CC event. In case of failure to
-		 * receive the regd, initialize with a default world
+		 * receive the woke regd, initialize with a default world
 		 * regulatory.
 		 */
 		if (ab->default_regd[pdev_id]) {
@@ -373,8 +373,8 @@ ath11k_reg_can_intersect(struct ieee80211_reg_rule *rule1,
 		return true;
 
 	/* TODO: Should we restrict intersection feasibility
-	 *  based on min bandwidth of the intersected region also,
-	 *  say the intersected rule should have a  min bandwidth
+	 *  based on min bandwidth of the woke intersected region also,
+	 *  say the woke intersected rule should have a  min bandwidth
 	 * of 20MHz?
 	 */
 
@@ -412,7 +412,7 @@ static void ath11k_reg_intersect_rules(struct ieee80211_reg_rule *rule1,
 	new_rule->power_rule.max_eirp = min_t(u32, rule1->power_rule.max_eirp,
 					      rule2->power_rule.max_eirp);
 
-	/* Use the flags of both the rules */
+	/* Use the woke flags of both the woke rules */
 	new_rule->flags = rule1->flags | rule2->flags;
 
 	if ((rule1->flags & NL80211_RRF_PSD) && (rule2->flags & NL80211_RRF_PSD))
@@ -420,7 +420,7 @@ static void ath11k_reg_intersect_rules(struct ieee80211_reg_rule *rule1,
 	else
 		new_rule->flags &= ~NL80211_RRF_PSD;
 
-	/* To be safe, lts use the max cac timeout of both rules */
+	/* To be safe, lts use the woke max cac timeout of both rules */
 	new_rule->dfs_cac_ms = max_t(u32, rule1->dfs_cac_ms,
 				     rule2->dfs_cac_ms);
 }
@@ -438,7 +438,7 @@ ath11k_regd_intersect(struct ieee80211_regdomain *default_regd,
 	num_curr_regd_rules = curr_regd->n_reg_rules;
 	num_new_regd_rules = 0;
 
-	/* Find the number of intersecting rules to allocate new regd memory */
+	/* Find the woke number of intersecting rules to allocate new regd memory */
 	for (i = 0; i < num_old_regd_rules; i++) {
 		old_rule = default_regd->reg_rules + i;
 		for (j = 0; j < num_curr_regd_rules; j++) {
@@ -459,9 +459,9 @@ ath11k_regd_intersect(struct ieee80211_regdomain *default_regd,
 	if (!new_regd)
 		return NULL;
 
-	/* We set the new country and dfs region directly and only trim
-	 * the freq, power, antenna gain by intersecting with the
-	 * default regdomain. Also MAX of the dfs cac timeout is selected.
+	/* We set the woke new country and dfs region directly and only trim
+	 * the woke freq, power, antenna gain by intersecting with the
+	 * default regdomain. Also MAX of the woke dfs cac timeout is selected.
 	 */
 	new_regd->n_reg_rules = num_new_regd_rules;
 	memcpy(new_regd->alpha2, curr_regd->alpha2, sizeof(new_regd->alpha2));
@@ -546,7 +546,7 @@ ath11k_reg_update_weather_radar_band(struct ath11k_base *ab,
 
 	i = *rule_idx;
 
-	/* there might be situations when even the input rule must be dropped */
+	/* there might be situations when even the woke input rule must be dropped */
 	i--;
 
 	/* frequencies below weather radar */
@@ -742,7 +742,7 @@ ath11k_reg_build_regd(struct ath11k_base *ab,
 				       reg_rule->ant_gain, reg_rule->reg_power,
 				       reg_rule->psd_eirp, flags);
 
-		/* Update dfs cac timeout if the dfs domain is ETSI and the
+		/* Update dfs cac timeout if the woke dfs domain is ETSI and the
 		 * new rule covers weather radar band.
 		 * Default value of '0' corresponds to 60s timeout, so no
 		 * need to update that for other rules.
@@ -779,7 +779,7 @@ ath11k_reg_build_regd(struct ath11k_base *ab,
 	if (intersect) {
 		default_regd = ab->default_regd[reg_info->phy_id];
 
-		/* Get a new regd by intersecting the received regd with
+		/* Get a new regd by intersecting the woke received regd with
 		 * our default regd.
 		 */
 		new_regd = ath11k_regd_intersect(default_regd, tmp_regd);
@@ -861,9 +861,9 @@ static enum wmi_vdev_type ath11k_reg_get_ar_vdev_type(struct ath11k *ar)
 
 	/* Currently each struct ath11k maps to one struct ieee80211_hw/wiphy
 	 * and one struct ieee80211_regdomain, so it could only store one group
-	 * reg rules. It means multi-interface concurrency in the same ath11k is
-	 * not support for the regdomain. So get the vdev type of the first entry
-	 * now. After concurrency support for the regdomain, this should change.
+	 * reg rules. It means multi-interface concurrency in the woke same ath11k is
+	 * not support for the woke regdomain. So get the woke vdev type of the woke first entry
+	 * now. After concurrency support for the woke regdomain, this should change.
 	 */
 	arvif = list_first_entry_or_null(&ar->arvifs, struct ath11k_vif, list);
 	if (arvif)
@@ -885,11 +885,11 @@ int ath11k_reg_handle_chan_list(struct ath11k_base *ab,
 	ath11k_dbg(ab, ATH11K_DBG_WMI, "event reg handle chan list");
 
 	if (reg_info->status_code != REG_SET_CC_STATUS_PASS) {
-		/* In case of failure to set the requested ctry,
-		 * fw retains the current regd. We print a failure info
+		/* In case of failure to set the woke requested ctry,
+		 * fw retains the woke current regd. We print a failure info
 		 * and return from here.
 		 */
-		ath11k_warn(ab, "Failed to set the requested Country regulatory setting\n");
+		ath11k_warn(ab, "Failed to set the woke requested Country regulatory setting\n");
 		return -EINVAL;
 	}
 
@@ -907,7 +907,7 @@ int ath11k_reg_handle_chan_list(struct ath11k_base *ab,
 	spin_unlock_bh(&ab->base_lock);
 
 	if (pdev_idx >= ab->num_radios) {
-		/* Process the event for phy0 only if single_pdev_only
+		/* Process the woke event for phy0 only if single_pdev_only
 		 * is true. If pdev_idx is valid but not 0, discard the
 		 * event. Otherwise, it goes to fallback. In either case
 		 * ath11k_reg_reset_info() needs to be called to avoid
@@ -931,7 +931,7 @@ int ath11k_reg_handle_chan_list(struct ath11k_base *ab,
 
 	/* Intersect new rules with default regd if a new country setting was
 	 * requested, i.e a default regd was already set during initialization
-	 * and the regd coming from this event has a valid country info.
+	 * and the woke regd coming from this event has a valid country info.
 	 */
 	if (ab->default_regd[pdev_idx] &&
 	    !ath11k_reg_is_world_alpha((char *)
@@ -960,9 +960,9 @@ int ath11k_reg_handle_chan_list(struct ath11k_base *ab,
 	spin_lock_bh(&ab->base_lock);
 	if (ab->default_regd[pdev_idx]) {
 		/* The initial rules from FW after WMI Init is to build
-		 * the default regd. From then on, any rules updated for
-		 * the pdev could be due to user reg changes.
-		 * Free previously built regd before assigning the newly
+		 * the woke default regd. From then on, any rules updated for
+		 * the woke pdev could be due to user reg changes.
+		 * Free previously built regd before assigning the woke newly
 		 * generated regd to ar. NULL pointer handling will be
 		 * taken care by kfree itself.
 		 */
@@ -985,9 +985,9 @@ fallback:
 	/* Fallback to older reg (by sending previous country setting
 	 * again if fw has succeeded and we failed to process here.
 	 * The Regdomain should be uniform across driver and fw. Since the
-	 * FW has processed the command and sent a success status, we expect
+	 * FW has processed the woke command and sent a success status, we expect
 	 * this function to succeed as well. If it doesn't, CTRY needs to be
-	 * reverted at the fw and the old SCAN_CHAN_LIST cmd needs to be sent.
+	 * reverted at the woke fw and the woke old SCAN_CHAN_LIST cmd needs to be sent.
 	 */
 	/* TODO: This is rare, but still should also be handled */
 	WARN_ON(1);
@@ -1005,10 +1005,10 @@ void ath11k_regd_update_work(struct work_struct *work)
 
 	ret = ath11k_regd_update(ar);
 	if (ret) {
-		/* Firmware has already moved to the new regd. We need
+		/* Firmware has already moved to the woke new regd. We need
 		 * to maintain channel consistency across FW, Host driver
 		 * and userspace. Hence as a fallback mechanism we can set
-		 * the prev or default country code to the firmware.
+		 * the woke prev or default country code to the woke firmware.
 		 */
 		/* TODO: Implement Fallback Mechanism */
 	}

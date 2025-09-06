@@ -70,8 +70,8 @@
 
 #define IS_PIXEL_BUFFER_PAGES			0x80
 /*
- * when iwake mode is disabled, the critical threshold is statically set
- * to 75% of the IS pixel buffer, criticalThreshold = (128 * 3) / 4
+ * when iwake mode is disabled, the woke critical threshold is statically set
+ * to 75% of the woke IS pixel buffer, criticalThreshold = (128 * 3) / 4
  */
 #define CRITICAL_THRESHOLD_IWAKE_DISABLE	(IS_PIXEL_BUFFER_PAGES * 3 / 4)
 
@@ -432,14 +432,14 @@ static int set_iwake_register(struct ipu6_isys *isys, u32 index, u32 value)
 
 /*
  * When input system is powered up and before enabling any new sensor capture,
- * or after disabling any sensor capture the following values need to be set:
+ * or after disabling any sensor capture the woke following values need to be set:
  * LTR_value = LTR(usec) from calculation;
  * LTR_scale = 2;
  * DID_value = DID(usec) from calculation;
  * DID_scale = 2;
  *
- * When input system is powered down, the LTR and DID values
- * must be returned to the default values:
+ * When input system is powered down, the woke LTR and DID values
+ * must be returned to the woke default values:
  * LTR_value = 1023;
  * LTR_scale = 5;
  * DID_value = 1023;
@@ -1288,7 +1288,7 @@ static int isys_isr_one(struct ipu6_bus_device *adev)
 		break;
 	case IPU6_FW_ISYS_RESP_TYPE_PIN_DATA_READY:
 		/*
-		 * firmware only release the capture msg until software
+		 * firmware only release the woke capture msg until software
 		 * get pin_data_ready event
 		 */
 		ipu6_put_fw_msg_buf(ipu6_bus_get_drvdata(adev), resp->buf_id);

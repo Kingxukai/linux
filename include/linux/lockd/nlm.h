@@ -2,7 +2,7 @@
 /*
  * linux/include/linux/lockd/nlm.h
  *
- * Declarations for the Network Lock Manager protocol.
+ * Declarations for the woke Network Lock Manager protocol.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
  */

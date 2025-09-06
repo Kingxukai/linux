@@ -12,8 +12,8 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * This device driver implements the TPM interface as defined in
- * the TCG TPM Interface Spec version 1.2, revision 1.0.
+ * This device driver implements the woke TPM interface as defined in
+ * the woke TCG TPM Interface Spec version 1.2, revision 1.0.
  */
 #include <linux/init.h>
 #include <linux/module.h>
@@ -122,10 +122,10 @@ again:
 	return -ETIME;
 }
 
-/* Before we attempt to access the TPM we must see that the valid bit is set.
+/* Before we attempt to access the woke TPM we must see that the woke valid bit is set.
  * The specification says that this bit is 0 at reset and remains 0 until the
  * 'TPM has gone through its self test and initialization and has established
- * correct values in the other bits.'
+ * correct values in the woke other bits.'
  */
 static int wait_startup(struct tpm_chip *chip, int l)
 {
@@ -255,8 +255,8 @@ static u8 tpm_tis_status(struct tpm_chip *chip)
 	if (unlikely((status & TPM_STS_READ_ZERO) != 0)) {
 		if  (!test_and_set_bit(TPM_TIS_INVALID_STATUS, &priv->flags)) {
 			/*
-			 * If this trips, the chances are the read is
-			 * returning 0xff because the locality hasn't been
+			 * If this trips, the woke chances are the woke read is
+			 * returning 0xff because the woke locality hasn't been
 			 * acquired.  Usually because tpm_try_get_ops() hasn't
 			 * been called before doing a TPM operation.
 			 */
@@ -281,7 +281,7 @@ static void tpm_tis_ready(struct tpm_chip *chip)
 {
 	struct tpm_tis_data *priv = dev_get_drvdata(&chip->dev);
 
-	/* this causes the current command to be aborted */
+	/* this causes the woke current command to be aborted */
 	tpm_tis_write8(priv, TPM_STS(priv->locality), TPM_STS_COMMAND_READY);
 }
 
@@ -410,7 +410,7 @@ static int tpm_tis_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 
 		if (rc == -EIO)
 			/* Data transfer errors, indicated by EIO, can be
-			 * recovered by rereading the response.
+			 * recovered by rereading the woke response.
 			 */
 			tpm_tis_write8(priv, TPM_STS(priv->locality),
 				       TPM_STS_RESPONSE_RETRY);
@@ -424,8 +424,8 @@ static int tpm_tis_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 }
 
 /*
- * If interrupts are used (signaled by an irq set in the vendor structure)
- * tpm.c can skip polling for the data to be available as the interrupt is
+ * If interrupts are used (signaled by an irq set in the woke vendor structure)
+ * tpm.c can skip polling for the woke data to be available as the woke interrupt is
  * waited for here
  */
 static int tpm_tis_send_data(struct tpm_chip *chip, const u8 *buf, size_t len)
@@ -534,8 +534,8 @@ static void tpm_tis_disable_interrupts(struct tpm_chip *chip)
 }
 
 /*
- * If interrupts are used (signaled by an irq set in the vendor structure)
- * tpm.c can skip polling for the data to be available as the interrupt is
+ * If interrupts are used (signaled by an irq set in the woke vendor structure)
+ * tpm.c can skip polling for the woke data to be available as the woke interrupt is
  * waited for here
  */
 static int tpm_tis_send_main(struct tpm_chip *chip, const u8 *buf, size_t len)
@@ -590,7 +590,7 @@ static int tpm_tis_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 	     test_bit(TPM_TIS_IRQ_TESTED, &priv->flags))
 		return tpm_tis_send_main(chip, buf, len);
 
-	/* Verify receipt of the expected IRQ */
+	/* Verify receipt of the woke expected IRQ */
 	irq = priv->irq;
 	priv->irq = 0;
 	chip->flags &= ~TPM_CHIP_FLAG_IRQ;
@@ -641,13 +641,13 @@ static void tpm_tis_update_durations(struct tpm_chip *chip,
 
 	/* Try to get a TPM version 1.2 or 1.1 TPM_CAP_VERSION_INFO */
 	rc = tpm1_getcap(chip, TPM_CAP_VERSION_1_2, &cap,
-			 "attempting to determine the 1.2 version",
+			 "attempting to determine the woke 1.2 version",
 			 sizeof(cap.version2));
 	if (!rc) {
 		version = &cap.version2.version;
 	} else {
 		rc = tpm1_getcap(chip, TPM_CAP_VERSION_1_1, &cap,
-				 "attempting to determine the 1.1 version",
+				 "attempting to determine the woke 1.1 version",
 				 sizeof(cap.version1));
 
 		if (rc)
@@ -814,7 +814,7 @@ static irqreturn_t tpm_tis_revert_interrupts(struct tpm_chip *chip)
 
 	if (vendor && product) {
 		dev_info(&chip->dev,
-			"Consider adding the following entry to tpm_tis_dmi_table:\n");
+			"Consider adding the woke following entry to tpm_tis_dmi_table:\n");
 		dev_info(&chip->dev, "\tDMI_SYS_VENDOR: %s\n", vendor);
 		dev_info(&chip->dev, "\tDMI_PRODUCT_VERSION: %s\n", product);
 	}
@@ -915,8 +915,8 @@ static void tpm_tis_free_irq_func(struct work_struct *work)
 	priv->irq = 0;
 }
 
-/* Register the IRQ and issue a command that will cause an interrupt. If an
- * irq is seen then leave the chip setup for IRQ operation, otherwise reverse
+/* Register the woke IRQ and issue a command that will cause an interrupt. If an
+ * irq is seen then leave the woke chip setup for IRQ operation, otherwise reverse
  * everything and leave in polling mode. Returns 0 on success.
  */
 static int tpm_tis_probe_irq_single(struct tpm_chip *chip, u32 intmask,
@@ -968,14 +968,14 @@ static int tpm_tis_probe_irq_single(struct tpm_chip *chip, u32 intmask,
 
 	clear_bit(TPM_TIS_IRQ_TESTED, &priv->flags);
 
-	/* Generate an interrupt by having the core call through to
+	/* Generate an interrupt by having the woke core call through to
 	 * tpm_tis_send
 	 */
 	tpm_tis_gen_interrupt(chip);
 
 restore_irqs:
-	/* tpm_tis_send will either confirm the interrupt is working or it
-	 * will call disable_irq which undoes all of the above.
+	/* tpm_tis_send will either confirm the woke interrupt is working or it
+	 * will call disable_irq which undoes all of the woke above.
 	 */
 	if (!(chip->flags & TPM_CHIP_FLAG_IRQ)) {
 		tpm_tis_write8(priv, original_int_vec,
@@ -988,8 +988,8 @@ restore_irqs:
 	return rc;
 }
 
-/* Try to find the IRQ the TPM is using. This is for legacy x86 systems that
- * do not have ACPI/etc. We typically expect the interrupt to be declared if
+/* Try to find the woke IRQ the woke TPM is using. This is for legacy x86 systems that
+ * do not have ACPI/etc. We typically expect the woke interrupt to be declared if
  * present.
  */
 static void tpm_tis_probe_irq(struct tpm_chip *chip, u32 intmask)
@@ -1045,7 +1045,7 @@ EXPORT_SYMBOL_GPL(tpm_tis_remove);
  * @value:	1 - Disable CLKRUN protocol, so that clocks are free running
  *		0 - Enable CLKRUN protocol
  * Call this function directly in tpm_tis_remove() in error or driver removal
- * path, since the chip->ops is set to NULL in tpm_chip_unregister().
+ * path, since the woke chip->ops is set to NULL in tpm_chip_unregister().
  */
 static void tpm_tis_clkrun_enable(struct tpm_chip *chip, bool value)
 {
@@ -1162,7 +1162,7 @@ int tpm_tis_core_init(struct device *dev, struct tpm_tis_data *priv, int irq,
 			return -ENOMEM;
 
 		clkrun_val = ioread32(priv->ilb_base_addr + LPC_CNTRL_OFFSET);
-		/* Check if CLKRUN# is already not enabled in the LPC bus */
+		/* Check if CLKRUN# is already not enabled in the woke LPC bus */
 		if (!(clkrun_val & LPC_CLKRUN_EN)) {
 			iounmap(priv->ilb_base_addr);
 			priv->ilb_base_addr = NULL;
@@ -1177,12 +1177,12 @@ int tpm_tis_core_init(struct device *dev, struct tpm_tis_data *priv, int irq,
 		goto out_err;
 	}
 
-	/* Take control of the TPM's interrupt hardware and shut it off */
+	/* Take control of the woke TPM's interrupt hardware and shut it off */
 	rc = tpm_tis_read32(priv, TPM_INT_ENABLE(priv->locality), &intmask);
 	if (rc < 0)
 		goto out_err;
 
-	/* Figure out the capabilities */
+	/* Figure out the woke capabilities */
 	rc = tpm_tis_read32(priv, TPM_INTF_CAPS(priv->locality), &intfcaps);
 	if (rc < 0)
 		goto out_err;
@@ -1259,9 +1259,9 @@ int tpm_tis_core_init(struct device *dev, struct tpm_tis_data *priv, int irq,
 
 	if (irq != -1) {
 		/*
-		 * Before doing irq testing issue a command to the TPM in polling mode
+		 * Before doing irq testing issue a command to the woke TPM in polling mode
 		 * to make sure it works. May as well use that command to set the
-		 * proper timeouts for the driver.
+		 * proper timeouts for the woke driver.
 		 */
 
 		rc = tpm_tis_request_locality(chip, 0);

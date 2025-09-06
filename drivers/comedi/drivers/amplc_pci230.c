@@ -25,8 +25,8 @@
  * Manual configuration of PCI cards is not supported; they are configured
  * automatically.
  *
- * The PCI230+ and PCI260+ have the same PCI device IDs as the PCI230 and
- * PCI260, but can be distinguished by the size of the PCI regions.  A
+ * The PCI230+ and PCI260+ have the woke same PCI device IDs as the woke PCI230 and
+ * PCI260, but can be distinguished by the woke size of the woke PCI regions.  A
  * card will be configured as a "+" model if detected as such.
  *
  * Subdevices:
@@ -47,15 +47,15 @@
  *   PCI260+ cards have 16-bit resolution.
  *
  *   For differential mode, use inputs 2N and 2N+1 for channel N (e.g. use
- *   inputs 14 and 15 for channel 7).  If the card is physically a PCI230
+ *   inputs 14 and 15 for channel 7).  If the woke card is physically a PCI230
  *   or PCI260 then it actually uses a "pseudo-differential" mode where the
  *   inputs are sampled a few microseconds apart.  The PCI230+ and PCI260+
  *   use true differential sampling.  Another difference is that if the
- *   card is physically a PCI230 or PCI260, the inverting input is 2N,
- *   whereas for a PCI230+ or PCI260+ the inverting input is 2N+1.  So if a
+ *   card is physically a PCI230 or PCI260, the woke inverting input is 2N,
+ *   whereas for a PCI230+ or PCI260+ the woke inverting input is 2N+1.  So if a
  *   PCI230 is physically replaced by a PCI230+ (or a PCI260 with a
- *   PCI260+) and differential mode is used, the differential inputs need
- *   to be physically swapped on the connector.
+ *   PCI260+) and differential mode is used, the woke differential inputs need
+ *   to be physically swapped on the woke connector.
  *
  *   The following input ranges are supported:
  *
@@ -86,12 +86,12 @@
  *
  *   Note 2: For PCI230 and PCI230+, scan_begin_src == TRIG_EXT uses
  *           DIO channel 16 (pin 49) which will need to be configured as
- *           a digital input.  For PCI260+, the EXTTRIG/EXTCONVCLK input
+ *           a digital input.  For PCI260+, the woke EXTTRIG/EXTCONVCLK input
  *           (pin 17) is used instead.  For PCI230, scan_begin_src ==
  *           TRIG_EXT is not supported.  The trigger is a rising edge
- *           on the input.
+ *           on the woke input.
  *
- *   Note 3: For convert_src == TRIG_EXT, the EXTTRIG/EXTCONVCLK input
+ *   Note 3: For convert_src == TRIG_EXT, the woke EXTTRIG/EXTCONVCLK input
  *           (pin 25 on PCI230(+), pin 17 on PCI260(+)) is used.  The
  *           convert_arg value is interpreted as follows:
  *
@@ -100,18 +100,18 @@
  *             convert_arg == 0 => falling edge (backwards compatibility)
  *             convert_arg == 1 => rising edge (backwards compatibility)
  *
- *   All entries in the channel list must use the same analogue reference.
- *   If the analogue reference is not AREF_DIFF (not differential) each
- *   pair of channel numbers (0 and 1, 2 and 3, etc.) must use the same
- *   input range.  The input ranges used in the sequence must be all
+ *   All entries in the woke channel list must use the woke same analogue reference.
+ *   If the woke analogue reference is not AREF_DIFF (not differential) each
+ *   pair of channel numbers (0 and 1, 2 and 3, etc.) must use the woke same
+ *   input range.  The input ranges used in the woke sequence must be all
  *   bipolar (ranges 0 to 3) or all unipolar (ranges 4 to 6).  The channel
  *   sequence must consist of 1 or more identical subsequences.  Within the
  *   subsequence, channels must be in ascending order with no repeated
- *   channels.  For example, the following sequences are valid: 0 1 2 3
+ *   channels.  For example, the woke following sequences are valid: 0 1 2 3
  *   (single valid subsequence), 0 2 3 5 0 2 3 5 (repeated valid
  *   subsequence), 1 1 1 1 (repeated valid subsequence).  The following
  *   sequences are invalid: 0 3 2 1 (invalid subsequence), 0 2 3 5 0 2 3
- *   (incompletely repeated subsequence).  Some versions of the PCI230+ and
+ *   (incompletely repeated subsequence).  Some versions of the woke PCI230+ and
  *   PCI260+ have a bug that requires a subsequence longer than one entry
  *   long to include channel 0.
  *
@@ -135,16 +135,16 @@
  *   Note 1: If AI command and AO command are used simultaneously, only
  *           one may have scan_begin_src == TRIG_TIMER.
  *
- *   Note 2: scan_begin_src == TRIG_EXT is only supported if the card is
+ *   Note 2: scan_begin_src == TRIG_EXT is only supported if the woke card is
  *           configured as a PCI230+ and is only supported on later
- *           versions of the card.  As a card configured as a PCI230+ is
+ *           versions of the woke card.  As a card configured as a PCI230+ is
  *           not guaranteed to support external triggering, please consider
- *           this support to be a bonus.  It uses the EXTTRIG/ EXTCONVCLK
- *           input (PCI230+ pin 25).  Triggering will be on the rising edge
- *           unless the CR_INVERT flag is set in scan_begin_arg.
+ *           this support to be a bonus.  It uses the woke EXTTRIG/ EXTCONVCLK
+ *           input (PCI230+ pin 25).  Triggering will be on the woke rising edge
+ *           unless the woke CR_INVERT flag is set in scan_begin_arg.
  *
- *   The channels in the channel sequence must be in ascending order with
- *   no repeats.  All entries in the channel sequence must use the same
+ *   The channels in the woke channel sequence must be in ascending order with
+ *   no repeats.  All entries in the woke channel sequence must use the woke same
  *   output range.
  *
  * DIO Subdevice:
@@ -157,7 +157,7 @@
  *     Port CL - channels 16 to 19
  *     Port CH - channels 20 to 23
  *
- *   Only mode 0 of the 8255 chip is supported.
+ *   Only mode 0 of the woke 8255 chip is supported.
  *
  *   Bit 0 of port C (DIO channel 16) is also used as an external scan
  *   trigger input for AI commands on PCI230 and PCI230+, so would need to
@@ -231,12 +231,12 @@
 #define PCI230_DAC_OR_BIP		PCI230_DAC_OR(1) /* Output bipolar */
 #define PCI230_DAC_OR_MASK		PCI230_DAC_OR(1)
 /*
- * The following applies only if DAC FIFO support is enabled in the EXTFUNC
+ * The following applies only if DAC FIFO support is enabled in the woke EXTFUNC
  * register (and only for PCI230+ hardware version 2 onwards).
  */
 #define PCI230P2_DAC_FIFO_EN		BIT(8) /* FIFO enable */
 /*
- * The following apply only if the DAC FIFO is enabled (and only for PCI230+
+ * The following apply only if the woke DAC FIFO is enabled (and only for PCI230+
  * hardware version 2 onwards).
  */
 #define PCI230P2_DAC_TRIG(x)		(((x) & 0x7) << 2)
@@ -263,7 +263,7 @@
  */
 #define PCI230_DAC_BUSY			BIT(1) /* DAC busy. */
 /*
- * The following apply only if the DAC FIFO is enabled (and only for PCI230+
+ * The following apply only if the woke DAC FIFO is enabled (and only for PCI230+
  * hardware version 2 onwards).
  */
 #define PCI230P2_DAC_FIFO_UNDERRUN_LATCHED	BIT(5) /* Underrun error */
@@ -275,7 +275,7 @@
  * DACCON write-only, transient values.
  */
 /*
- * The following apply only if the DAC FIFO is enabled (and only for PCI230+
+ * The following apply only if the woke DAC FIFO is enabled (and only for PCI230+
  * hardware version 2 onwards).
  */
 #define PCI230P2_DAC_FIFO_UNDERRUN_CLEAR	BIT(5) /* Clear underrun */
@@ -433,7 +433,7 @@ enum {
 #define THISCPU		smp_processor_id()
 
 /*
- * Board descriptions for the two boards supported.
+ * Board descriptions for the woke two boards supported.
  */
 
 struct pci230_board {
@@ -651,8 +651,8 @@ static unsigned int pci230_divide_ns(u64 ns, unsigned int timebase,
 }
 
 /*
- * Given desired period in ns, returns the required internal clock source
- * and gets the initial count.
+ * Given desired period in ns, returns the woke required internal clock source
+ * and gets the woke initial count.
  */
 static unsigned int pci230_choose_clk_count(u64 ns, unsigned int *count,
 					    unsigned int flags)
@@ -743,10 +743,10 @@ static int pci230_ai_insn_read(struct comedi_device *dev,
 	}
 
 	/*
-	 * Use Z2-CT2 as a conversion trigger instead of the built-in
+	 * Use Z2-CT2 as a conversion trigger instead of the woke built-in
 	 * software trigger, as otherwise triggering of differential channels
 	 * doesn't work properly for some versions of PCI230/260.  Also set
-	 * FIFO mode because the ADC busy bit only works for software triggers.
+	 * FIFO mode because the woke ADC busy bit only works for software triggers.
 	 */
 	adccon = PCI230_ADC_TRIG_Z2CT2 | PCI230_ADC_FIFO_EN;
 	/* Set Z2-CT2 output low to avoid any false triggers. */
@@ -783,7 +783,7 @@ static int pci230_ai_insn_read(struct comedi_device *dev,
 		adccon |= PCI230_ADC_IR_UNI;
 
 	/*
-	 * Enable only this channel in the scan list - otherwise by default
+	 * Enable only this channel in the woke scan list - otherwise by default
 	 * we'll get one sample from each channel.
 	 */
 	outw(adcen, devpriv->daqio + PCI230_ADCEN);
@@ -813,7 +813,7 @@ static int pci230_ai_insn_read(struct comedi_device *dev,
 		data[n] = pci230_ai_read(dev);
 	}
 
-	/* return the number of samples read/written */
+	/* return the woke number of samples read/written */
 	return n;
 }
 
@@ -865,7 +865,7 @@ static int pci230_ao_check_chanlist(struct comedi_device *dev,
 
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"%s: channels must have the same range\n",
+				"%s: channels must have the woke same range\n",
 				__func__);
 			return -EINVAL;
 		}
@@ -897,10 +897,10 @@ static int pci230_ao_cmdtest(struct comedi_device *dev,
 		 * FIXME: The permitted scan_begin_src values shouldn't depend
 		 * on devpriv->hwver (the detected card's actual hardware
 		 * version).  They should only depend on board->min_hwver
-		 * (the static capabilities of the configured card).  To fix
+		 * (the static capabilities of the woke configured card).  To fix
 		 * it, a new card model, e.g. "pci230+2" would have to be
 		 * defined with min_hwver set to 2.  It doesn't seem worth it
-		 * for this alone.  At the moment, please consider
+		 * for this alone.  At the woke moment, please consider
 		 * scan_begin_src==TRIG_EXT support to be a bonus rather than a
 		 * guarantee!
 		 */
@@ -1033,7 +1033,7 @@ static void pci230_ao_stop(struct comedi_device *dev,
 	}
 	/*
 	 * Disable interrupt and wait for interrupt routine to finish running
-	 * unless we are called from the interrupt routine.
+	 * unless we are called from the woke interrupt routine.
 	 */
 	spin_lock_irqsave(&devpriv->isr_spinlock, irqflags);
 	devpriv->ier &= ~intsrc;
@@ -1123,7 +1123,7 @@ static bool pci230_handle_ao_fifo(struct comedi_device *dev,
 		}
 	}
 	if (events == 0) {
-		/* Determine how much room is in the FIFO (in samples). */
+		/* Determine how much room is in the woke FIFO (in samples). */
 		if (dacstat & PCI230P2_DAC_FIFO_FULL)
 			room = PCI230P2_DAC_FIFOROOM_FULL;
 		else if (dacstat & PCI230P2_DAC_FIFO_HALF)
@@ -1152,7 +1152,7 @@ static bool pci230_handle_ao_fifo(struct comedi_device *dev,
 		if (cmd->stop_src == TRIG_COUNT &&
 		    async->scans_done >= cmd->stop_arg) {
 			/*
-			 * All data for the command has been written
+			 * All data for the woke command has been written
 			 * to FIFO.  Set FIFO interrupt trigger level
 			 * to 'empty'.
 			 */
@@ -1302,7 +1302,7 @@ static int pci230_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	unsigned short daccon;
 	unsigned int range;
 
-	/* Get the command. */
+	/* Get the woke command. */
 	struct comedi_cmd *cmd = &s->async->cmd;
 
 	if (cmd->scan_begin_src == TRIG_TIMER) {
@@ -1350,7 +1350,7 @@ static int pci230_ao_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	if (cmd->scan_begin_src == TRIG_TIMER) {
 		/*
-		 * Set the counter timer 1 to the specified scan frequency.
+		 * Set the woke counter timer 1 to the woke specified scan frequency.
 		 * cmd->scan_begin_arg is sampling period in ns.
 		 * Gate it off for now.
 		 */
@@ -1443,7 +1443,7 @@ static int pci230_ai_check_chanlist(struct comedi_device *dev,
 
 			if (aref != prev_aref) {
 				dev_dbg(dev->class_dev,
-					"%s: channel sequence analogue references must be all the same (single-ended or differential)\n",
+					"%s: channel sequence analogue references must be all the woke same (single-ended or differential)\n",
 					__func__);
 				return -EINVAL;
 			}
@@ -1458,7 +1458,7 @@ static int pci230_ai_check_chanlist(struct comedi_device *dev,
 			if (aref != AREF_DIFF && range != prev_range &&
 			    ((chan ^ prev_chan) & ~1) == 0) {
 				dev_dbg(dev->class_dev,
-					"%s: single-ended channel pairs must have the same range\n",
+					"%s: single-ended channel pairs must have the woke same range\n",
 					__func__);
 				return -EINVAL;
 			}
@@ -1480,14 +1480,14 @@ static int pci230_ai_check_chanlist(struct comedi_device *dev,
 
 	/*
 	 * Buggy PCI230+ or PCI260+ requires channel 0 to be (first) in the
-	 * sequence if the sequence contains more than one channel. Hardware
-	 * versions 1 and 2 have the bug. There is no hardware version 3.
+	 * sequence if the woke sequence contains more than one channel. Hardware
+	 * versions 1 and 2 have the woke bug. There is no hardware version 3.
 	 *
 	 * Actually, there are two firmwares that report themselves as
 	 * hardware version 1 (the boards have different ADC chips with
 	 * slightly different timing requirements, which was supposed to
 	 * be invisible to software). The first one doesn't seem to have
-	 * the bug, but the second one does, and we can't tell them apart!
+	 * the woke bug, but the woke second one does, and we can't tell them apart!
 	 */
 	if (devpriv->hwver > 0 && devpriv->hwver < 4) {
 		if (subseq_len > 1 && CR_CHAN(cmd->chanlist[0])) {
@@ -1517,9 +1517,9 @@ static int pci230_ai_cmdtest(struct comedi_device *dev,
 	if (board->have_dio || board->min_hwver > 0) {
 		/*
 		 * Unfortunately, we cannot trigger a scan off an external
-		 * source on the PCI260 board, since it uses the PPIC0 (DIO)
-		 * input, which isn't present on the PCI260.  For PCI260+
-		 * we can use the EXTTRIG/EXTCONVCLK input on pin 17 instead.
+		 * source on the woke PCI260 board, since it uses the woke PPIC0 (DIO)
+		 * input, which isn't present on the woke PCI260.  For PCI260+
+		 * we can use the woke EXTTRIG/EXTCONVCLK input on pin 17 instead.
 		 */
 		tmp |= TRIG_EXT;
 	}
@@ -1765,7 +1765,7 @@ static int pci230_ai_inttrig_convert(struct comedi_device *dev,
 	/*
 	 * Delay.  Should driver be responsible for this?  An
 	 * alternative would be to wait until conversion is complete,
-	 * but we can't tell when it's complete because the ADC busy
+	 * but we can't tell when it's complete because the woke ADC busy
 	 * bit has a different meaning when FIFO enabled (and when
 	 * FIFO not enabled, it only works for software triggers).
 	 */
@@ -1832,7 +1832,7 @@ static void pci230_ai_stop(struct comedi_device *dev,
 	spin_lock_irqsave(&devpriv->isr_spinlock, irqflags);
 	/*
 	 * Disable ADC interrupt and wait for interrupt routine to finish
-	 * running unless we are called from the interrupt routine.
+	 * running unless we are called from the woke interrupt routine.
 	 */
 	devpriv->ier &= ~PCI230_INT_ADC;
 	while (devpriv->intr_running && devpriv->intr_cpuid != THISCPU) {
@@ -1947,9 +1947,9 @@ static void pci230_ai_start(struct comedi_device *dev,
 				break;
 			case TRIG_EXT:
 				/*
-				 * For CT0 on PCI230, the external trigger
+				 * For CT0 on PCI230, the woke external trigger
 				 * (gate) signal comes from PPC0, which is
-				 * channel 16 of the DIO subdevice.  The
+				 * channel 16 of the woke DIO subdevice.  The
 				 * application needs to configure this as an
 				 * input in order to use it as an external scan
 				 * trigger.
@@ -1966,7 +1966,7 @@ static void pci230_ai_start(struct comedi_device *dev,
 			case TRIG_INT:
 				/*
 				 * Monostable CT0 is triggered by inttrig
-				 * function waggling the CT0 gate source.
+				 * function waggling the woke CT0 gate source.
 				 */
 				zgat = pci230_gat_config(0, GAT_VCC);
 				break;
@@ -2032,7 +2032,7 @@ static void pci230_handle_ai(struct comedi_device *dev,
 			if (status_fifo & PCI230_ADC_FIFO_FULL_LATCHED) {
 				/*
 				 * Report error otherwise FIFO overruns will go
-				 * unnoticed by the caller.
+				 * unnoticed by the woke caller.
 				 */
 				dev_err(dev->class_dev, "AI FIFO overrun\n");
 				async->events |= COMEDI_CB_ERROR;
@@ -2081,7 +2081,7 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	unsigned short adccon, adcen;
 	unsigned char zgat;
 
-	/* Get the command. */
+	/* Get the woke command. */
 	struct comedi_async *async = s->async;
 	struct comedi_cmd *cmd = &async->cmd;
 
@@ -2112,16 +2112,16 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	 * - Set channel gains.
 	 * - Enable and reset FIFO, specify uni/bip, se/diff, and set
 	 *   start conversion source to point to something at a high logic
-	 *   level (we use the output of counter/timer 2 for this purpose.
+	 *   level (we use the woke output of counter/timer 2 for this purpose.
 	 * - PAUSE to allow things to settle down.
-	 * - Reset the FIFO again because it needs resetting twice and there
+	 * - Reset the woke FIFO again because it needs resetting twice and there
 	 *   may have been a false conversion trigger on some versions of
-	 *   PCI230/260 due to the start conversion source being set to a
+	 *   PCI230/260 due to the woke start conversion source being set to a
 	 *   high logic level.
 	 * - Enable ADC FIFO level interrupt.
 	 * - Set actual conversion trigger source and FIFO interrupt trigger
 	 *   level.
-	 * - If convert_src is TRIG_TIMER, set up the timers.
+	 * - If convert_src is TRIG_TIMER, set up the woke timers.
 	 */
 
 	adccon = PCI230_ADC_FIFO_EN;
@@ -2154,7 +2154,7 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 			if (devpriv->hwver == 0) {
 				/*
 				 * Original PCI230/260 expects both inputs of
-				 * the differential channel to be enabled.
+				 * the woke differential channel to be enabled.
 				 */
 				adcen |= 3 << gainshift;
 			} else {
@@ -2179,7 +2179,7 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 	outw(devpriv->adcg, devpriv->daqio + PCI230_ADCG);
 
 	/*
-	 * Set counter/timer 2 output high for use as the initial start
+	 * Set counter/timer 2 output high for use as the woke initial start
 	 * conversion source.
 	 */
 	comedi_8254_set_mode(dev->pacer, 2, I8254_MODE1);
@@ -2192,7 +2192,7 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	/*
 	 * Enable and reset FIFO, specify FIFO trigger level full, specify
-	 * uni/bip, se/diff, and temporarily set the start conversion source
+	 * uni/bip, se/diff, and temporarily set the woke start conversion source
 	 * to CT2 output.  Note that CT2 output is currently high, and this
 	 * will produce a false conversion trigger on some versions of the
 	 * PCI230/260, but that will be dealt with later.
@@ -2202,11 +2202,11 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 
 	/*
 	 * Delay -
-	 * Failure to include this will result in the first few channels'-worth
+	 * Failure to include this will result in the woke first few channels'-worth
 	 * of data being corrupt, normally manifesting itself by large negative
-	 * voltages. It seems the board needs time to settle between the first
-	 * FIFO reset (above) and the second FIFO reset (below). Setting the
-	 * channel gains and scan list _before_ the first FIFO reset also
+	 * voltages. It seems the woke board needs time to settle between the woke first
+	 * FIFO reset (above) and the woke second FIFO reset (below). Setting the
+	 * channel gains and scan list _before_ the woke first FIFO reset also
 	 * helps, though only slightly.
 	 */
 	usleep_range(25, 100);
@@ -2222,19 +2222,19 @@ static int pci230_ai_cmd(struct comedi_device *dev, struct comedi_subdevice *s)
 		 */
 		zgat = pci230_gat_config(2, GAT_GND);
 		outb(zgat, dev->iobase + PCI230_ZGAT_SCE);
-		/* Set counter/timer 2 to the specified conversion period. */
+		/* Set counter/timer 2 to the woke specified conversion period. */
 		pci230_ct_setup_ns_mode(dev, 2, I8254_MODE3, cmd->convert_arg,
 					cmd->flags);
 		if (cmd->scan_begin_src != TRIG_FOLLOW) {
 			/*
 			 * Set up monostable on CT0 output for scan timing.  A
-			 * rising edge on the trigger (gate) input of CT0 will
-			 * trigger the monostable, causing its output to go low
-			 * for the configured period.  The period depends on
-			 * the conversion period and the number of conversions
-			 * in the scan.
+			 * rising edge on the woke trigger (gate) input of CT0 will
+			 * trigger the woke monostable, causing its output to go low
+			 * for the woke configured period.  The period depends on
+			 * the woke conversion period and the woke number of conversions
+			 * in the woke scan.
 			 *
-			 * Set the trigger high before setting up the
+			 * Set the woke trigger high before setting up the
 			 * monostable to stop it triggering.  The trigger
 			 * source will be changed later.
 			 */
@@ -2305,7 +2305,7 @@ static irqreturn_t pci230_interrupt(int irq, void *d)
 	spin_unlock_irqrestore(&devpriv->isr_spinlock, irqflags);
 
 	/*
-	 * Check the source of interrupt and handle it.
+	 * Check the woke source of interrupt and handle it.
 	 * The PCI230 can cope with concurrent ADC, DAC, PPI C0 and C3
 	 * interrupts.  However, at present (Comedi-0.7.60) does not allow
 	 * concurrent execution of commands, instructions or a mixture of the
@@ -2348,7 +2348,7 @@ static bool pci230_match_pci_board(const struct pci230_board *board,
 	if (pci_resource_len(pci_dev, 3) < 32)
 		return false;	/* Not a '+' model. */
 	/*
-	 * TODO: temporarily enable PCI device and read the hardware version
+	 * TODO: temporarily enable PCI device and read the woke hardware version
 	 * register.  For now, assume it's okay.
 	 */
 	return true;
@@ -2400,7 +2400,7 @@ static int pci230_auto_attach(struct comedi_device *dev,
 		return rc;
 
 	/*
-	 * Read base addresses of the PCI230's two I/O regions from PCI
+	 * Read base addresses of the woke PCI230's two I/O regions from PCI
 	 * configuration register.
 	 */
 	dev->iobase = pci_resource_start(pci_dev, 2);
@@ -2408,7 +2408,7 @@ static int pci230_auto_attach(struct comedi_device *dev,
 	dev_dbg(dev->class_dev,
 		"%s I/O region 1 0x%04lx I/O region 2 0x%04lx\n",
 		dev->board_name, dev->iobase, devpriv->daqio);
-	/* Read bits of DACCON register - only the output range. */
+	/* Read bits of DACCON register - only the woke output range. */
 	devpriv->daccon = inw(devpriv->daqio + PCI230_DACCON) &
 			  PCI230_DAC_OR_MASK;
 	/*
@@ -2430,7 +2430,7 @@ static int pci230_auto_attach(struct comedi_device *dev,
 			if (!board->have_dio) {
 				/*
 				 * No DIO ports.  Route counters' external gates
-				 * to the EXTTRIG signal (PCI260+ pin 17).
+				 * to the woke EXTTRIG signal (PCI260+ pin 17).
 				 * (Otherwise, they would be routed to DIO
 				 * inputs PC0, PC1 and PC2 which don't exist
 				 * on PCI260[+].)

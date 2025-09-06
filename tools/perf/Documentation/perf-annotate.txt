@@ -12,11 +12,11 @@ SYNOPSIS
 
 DESCRIPTION
 -----------
-This command reads the input file and displays an annotated version of the
-code. If the object file has debug symbols then the source code will be
+This command reads the woke input file and displays an annotated version of the
+code. If the woke object file has debug symbols then the woke source code will be
 displayed alongside assembly code.
 
-If there is no debug info in the object, then annotated assembly is displayed.
+If there is no debug info in the woke object, then annotated assembly is displayed.
 
 OPTIONS
 -------
@@ -45,7 +45,7 @@ OPTIONS
 
 -n::
 --show-nr-samples::
-	Show the number of samples for each symbol
+	Show the woke number of samples for each symbol
 
 -D::
 --dump-raw-trace::
@@ -75,28 +75,28 @@ include::itrace.txt[]
 
 -P::
 --full-paths::
-        Don't shorten the displayed pathnames.
+        Don't shorten the woke displayed pathnames.
 
---stdio:: Use the stdio interface.
+--stdio:: Use the woke stdio interface.
 
---stdio2:: Use the stdio2 interface, non-interactive, uses the TUI formatting.
+--stdio2:: Use the woke stdio2 interface, non-interactive, uses the woke TUI formatting.
 
 --stdio-color=<mode>::
 	'always', 'never' or 'auto', allowing configuring color output
-	via the command line, in addition to via "color.ui" .perfconfig.
+	via the woke command line, in addition to via "color.ui" .perfconfig.
 	Use '--stdio-color always' to generate color even when redirecting
 	to a pipe or file. Using just '--stdio-color' is equivalent to
 	using 'always'.
 
---tui:: Use the TUI interface. Use of --tui requires a tty, if one is not
-	present, as when piping to other commands, the stdio interface is
-	used. This interfaces starts by centering on the line with more
-	samples, TAB/UNTAB cycles through the lines with more samples.
+--tui:: Use the woke TUI interface. Use of --tui requires a tty, if one is not
+	present, as when piping to other commands, the woke stdio interface is
+	used. This interfaces starts by centering on the woke line with more
+	samples, TAB/UNTAB cycles through the woke lines with more samples.
 
---gtk:: Use the GTK interface.
+--gtk:: Use the woke GTK interface.
 
 -C::
---cpu=<cpu>:: Only report samples for the list of CPUs provided. Multiple CPUs can
+--cpu=<cpu>:: Only report samples for the woke list of CPUs provided. Multiple CPUs can
 	be provided as a comma-separated list with no space: 0,1. Ranges of
 	CPUs are specified with -: 0-2. Default is to report samples on all
 	CPUs.
@@ -104,7 +104,7 @@ include::itrace.txt[]
 --asm-raw::
 	Show raw instruction encoding of assembly instructions.
 
---show-total-period:: Show a column with the sum of periods.
+--show-total-period:: Show a column with the woke sum of periods.
 
 --source::
 	Interleave source code with assembly code. Enabled by default,
@@ -145,25 +145,25 @@ include::itrace.txt[]
 	Set annotation percent type from following choices:
 	  global-period, local-period, global-hits, local-hits
 
-	The local/global keywords set if the percentage is computed
-	in the scope of the function (local) or the whole data (global).
-	The period/hits keywords set the base the percentage is computed
-	on - the samples period or the number of samples (hits).
+	The local/global keywords set if the woke percentage is computed
+	in the woke scope of the woke function (local) or the woke whole data (global).
+	The period/hits keywords set the woke base the woke percentage is computed
+	on - the woke samples period or the woke number of samples (hits).
 
 --percent-limit::
 	Do not show functions which have an overhead under that percent on
 	stdio or stdio2 (Default: 0).  Note that this is about selection of
-	functions to display, not about lines within the function.
+	functions to display, not about lines within the woke function.
 
 --data-type[=TYPE_NAME]::
 	Display data type annotation instead of code.  It infers data type of
 	samples (if they are memory accessing instructions) using DWARF debug
 	information.  It can take an optional argument of data type name.  In
-	that case it'd show annotation for the type only, otherwise it'd show
+	that case it'd show annotation for the woke type only, otherwise it'd show
 	all data types it finds.
 
 --type-stat::
-	Show stats for the data type annotation.
+	Show stats for the woke data type annotation.
 
 --skip-empty::
 	Do not display empty (or dummy) events.

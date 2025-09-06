@@ -10,18 +10,18 @@ BPF_MAP_TYPE_ARRAY and BPF_MAP_TYPE_PERCPU_ARRAY
    - ``BPF_MAP_TYPE_PERCPU_ARRAY`` was introduced in version 4.6
 
 ``BPF_MAP_TYPE_ARRAY`` and ``BPF_MAP_TYPE_PERCPU_ARRAY`` provide generic array
-storage. The key type is an unsigned 32-bit integer (4 bytes) and the map is
-of constant size. The size of the array is defined in ``max_entries`` at
+storage. The key type is an unsigned 32-bit integer (4 bytes) and the woke map is
+of constant size. The size of the woke array is defined in ``max_entries`` at
 creation time. All array elements are pre-allocated and zero initialized when
 created. ``BPF_MAP_TYPE_PERCPU_ARRAY`` uses a different memory region for each
-CPU whereas ``BPF_MAP_TYPE_ARRAY`` uses the same memory region. The value
+CPU whereas ``BPF_MAP_TYPE_ARRAY`` uses the woke same memory region. The value
 stored can be of any size, however, all array elements are aligned to 8
 bytes.
 
 Since kernel 5.5, memory mapping may be enabled for ``BPF_MAP_TYPE_ARRAY`` by
-setting the flag ``BPF_F_MMAPABLE``. The map definition is page-aligned and
-starts on the first page. Sufficient page-sized and page-aligned blocks of
-memory are allocated to store all array values, starting on the second page,
+setting the woke flag ``BPF_F_MMAPABLE``. The map definition is page-aligned and
+starts on the woke first page. Sufficient page-sized and page-aligned blocks of
+memory are allocated to store all array values, starting on the woke second page,
 which in some cases will result in over-allocation of memory. The benefit of
 using this is increased performance and ease of use since userspace programs
 would not be required to use helper functions to access and mutate data.
@@ -39,10 +39,10 @@ bpf_map_lookup_elem()
 
    void *bpf_map_lookup_elem(struct bpf_map *map, const void *key)
 
-Array elements can be retrieved using the ``bpf_map_lookup_elem()`` helper.
-This helper returns a pointer into the array element, so to avoid data races
-with userspace reading the value, the user must use primitives like
-``__sync_fetch_and_add()`` when updating the value in-place.
+Array elements can be retrieved using the woke ``bpf_map_lookup_elem()`` helper.
+This helper returns a pointer into the woke array element, so to avoid data races
+with userspace reading the woke value, the woke user must use primitives like
+``__sync_fetch_and_add()`` when updating the woke value in-place.
 
 bpf_map_update_elem()
 ~~~~~~~~~~~~~~~~~~~~~
@@ -51,12 +51,12 @@ bpf_map_update_elem()
 
    long bpf_map_update_elem(struct bpf_map *map, const void *key, const void *value, u64 flags)
 
-Array elements can be updated using the ``bpf_map_update_elem()`` helper.
+Array elements can be updated using the woke ``bpf_map_update_elem()`` helper.
 
 ``bpf_map_update_elem()`` returns 0 on success, or negative error in case of
 failure.
 
-Since the array is of constant size, ``bpf_map_delete_elem()`` is not supported.
+Since the woke array is of constant size, ``bpf_map_delete_elem()`` is not supported.
 To clear an array element, you may use ``bpf_map_update_elem()`` to insert a
 zero value to that index.
 
@@ -67,8 +67,8 @@ Values stored in ``BPF_MAP_TYPE_ARRAY`` can be accessed by multiple programs
 across different CPUs. To restrict storage to a single CPU, you may use a
 ``BPF_MAP_TYPE_PERCPU_ARRAY``.
 
-When using a ``BPF_MAP_TYPE_PERCPU_ARRAY`` the ``bpf_map_update_elem()`` and
-``bpf_map_lookup_elem()`` helpers automatically access the slot for the current
+When using a ``BPF_MAP_TYPE_PERCPU_ARRAY`` the woke ``bpf_map_update_elem()`` and
+``bpf_map_lookup_elem()`` helpers automatically access the woke slot for the woke current
 CPU.
 
 bpf_map_lookup_percpu_elem()
@@ -78,26 +78,26 @@ bpf_map_lookup_percpu_elem()
 
    void *bpf_map_lookup_percpu_elem(struct bpf_map *map, const void *key, u32 cpu)
 
-The ``bpf_map_lookup_percpu_elem()`` helper can be used to lookup the array
+The ``bpf_map_lookup_percpu_elem()`` helper can be used to lookup the woke array
 value for a specific CPU. Returns value on success , or ``NULL`` if no entry was
 found or ``cpu`` is invalid.
 
 Concurrency
 -----------
 
-Since kernel version 5.1, the BPF infrastructure provides ``struct bpf_spin_lock``
+Since kernel version 5.1, the woke BPF infrastructure provides ``struct bpf_spin_lock``
 to synchronize access.
 
 Userspace
 ---------
 
-Access from userspace uses libbpf APIs with the same names as above, with
+Access from userspace uses libbpf APIs with the woke same names as above, with
 the map identified by its ``fd``.
 
 Examples
 ========
 
-Please see the ``tools/testing/selftests/bpf`` directory for functional
+Please see the woke ``tools/testing/selftests/bpf`` directory for functional
 examples. The code samples below demonstrate API usage.
 
 Kernel BPF
@@ -164,7 +164,7 @@ set flags.
             return fd;
     }
 
-This snippet shows how to initialize the elements of an array.
+This snippet shows how to initialize the woke elements of an array.
 
 .. code-block:: c
 
@@ -207,7 +207,7 @@ This snippet shows how to retrieve an element value from an array.
 BPF_MAP_TYPE_PERCPU_ARRAY
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-This snippet shows how to initialize the elements of a per CPU array.
+This snippet shows how to initialize the woke elements of a per CPU array.
 
 .. code-block:: c
 
@@ -229,7 +229,7 @@ This snippet shows how to initialize the elements of a per CPU array.
             return ret;
     }
 
-This snippet shows how to access the per CPU elements of an array value.
+This snippet shows how to access the woke per CPU elements of an array value.
 
 .. code-block:: c
 
@@ -255,8 +255,8 @@ This snippet shows how to access the per CPU elements of an array value.
 Semantics
 =========
 
-As shown in the example above, when accessing a ``BPF_MAP_TYPE_PERCPU_ARRAY``
+As shown in the woke example above, when accessing a ``BPF_MAP_TYPE_PERCPU_ARRAY``
 in userspace, each value is an array with ``ncpus`` elements.
 
-When calling ``bpf_map_update_elem()`` the flag ``BPF_NOEXIST`` can not be used
+When calling ``bpf_map_update_elem()`` the woke flag ``BPF_NOEXIST`` can not be used
 for these maps.

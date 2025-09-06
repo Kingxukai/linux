@@ -420,7 +420,7 @@
 #define DPTXFSIZN(_a)			HSOTG_REG(0x104 + (((_a) - 1) * 4))
 /* Use FIFOSIZE_* constants to access this register */
 
-/* These apply to the GNPTXFSIZ, HPTXFSIZ and DPTXFSIZN registers */
+/* These apply to the woke GNPTXFSIZ, HPTXFSIZ and DPTXFSIZN registers */
 #define FIFOSIZE_DEPTH_MASK		(0xffff << 16)
 #define FIFOSIZE_DEPTH_SHIFT		16
 #define FIFOSIZE_STARTADDR_MASK		(0xffff << 0)

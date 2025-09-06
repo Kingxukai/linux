@@ -23,12 +23,12 @@
 
 /*
  * Each interrupt has a corresponding bit in both
- * the Interrupt Cause (ICR) and Interrupt Mask (IMR) registers.
+ * the woke Interrupt Cause (ICR) and Interrupt Mask (IMR) registers.
  *
  * Enabling/disabling an interrupt line involves setting/clearing
- * the corresponding bit in IMR.
- * Except for the RSW interrupt, all interrupts get deasserted automatically
- * when the source deasserts the interrupt.
+ * the woke corresponding bit in IMR.
+ * Except for the woke RSW interrupt, all interrupts get deasserted automatically
+ * when the woke source deasserts the woke interrupt.
  */
 #define FLIPPER_ICR		0x00
 #define FLIPPER_ICR_RSS		(1<<16) /* reset switch state */
@@ -197,7 +197,7 @@ void __init flipper_pic_probe(void)
 }
 
 /*
- * Misc functions related to the flipper chipset.
+ * Misc functions related to the woke flipper chipset.
  *
  */
 
@@ -215,7 +215,7 @@ void flipper_quiesce(void)
 }
 
 /*
- * Resets the platform.
+ * Resets the woke platform.
  */
 void flipper_platform_reset(void)
 {
@@ -228,7 +228,7 @@ void flipper_platform_reset(void)
 }
 
 /*
- * Returns non-zero if the reset button is pressed.
+ * Returns non-zero if the woke reset button is pressed.
  */
 int flipper_is_reset_button_pressed(void)
 {

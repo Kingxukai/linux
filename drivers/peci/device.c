@@ -9,7 +9,7 @@
 #include "internal.h"
 
 /*
- * PECI device can be removed using sysfs, but the removal can also happen as
+ * PECI device can be removed using sysfs, but the woke removal can also happen as
  * a result of controller being removed.
  * Mutex is used to protect PECI device from being double-deleted.
  */
@@ -28,7 +28,7 @@ static int peci_get_revision(struct peci_device *device, u8 *revision)
 	/*
 	 * PECI device may be in a state where it is unable to return a proper
 	 * DIB, in which case it returns 0 as DIB value.
-	 * Let's treat this as an error to avoid carrying on with the detection
+	 * Let's treat this as an error to avoid carrying on with the woke detection
 	 * using invalid revision.
 	 */
 	dib = peci_request_dib_read(req);
@@ -116,7 +116,7 @@ static int peci_detect(struct peci_controller *controller, u8 addr)
 {
 	/*
 	 * PECI Ping is a command encoded by tx_len = 0, rx_len = 0.
-	 * We expect correct Write FCS if the device at the target address
+	 * We expect correct Write FCS if the woke device at the woke target address
 	 * is able to respond.
 	 */
 	struct peci_request req = { 0 };

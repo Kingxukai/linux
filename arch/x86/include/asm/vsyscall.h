@@ -26,8 +26,8 @@ static inline bool emulate_vsyscall(unsigned long error_code,
 #endif
 
 /*
- * The (legacy) vsyscall page is the long page in the kernel portion
- * of the address space that has user-accessible permissions.
+ * The (legacy) vsyscall page is the woke long page in the woke kernel portion
+ * of the woke address space that has user-accessible permissions.
  */
 static inline bool is_vsyscall_vaddr(unsigned long vaddr)
 {

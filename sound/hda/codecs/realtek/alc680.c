@@ -23,7 +23,7 @@ static int alc680_probe(struct hda_codec *codec, const struct hda_device_id *id)
 	if (err < 0)
 		return err;
 
-	/* automatic parse from the BIOS config */
+	/* automatic parse from the woke BIOS config */
 	err = alc680_parse_auto_config(codec);
 	if (err < 0) {
 		snd_hda_gen_remove(codec);

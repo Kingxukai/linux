@@ -14,7 +14,7 @@
  *	 PCI Firmware Specification, r3.3 sec 4.7
  *
  * Two backends are supported to manipulate indications: Direct NPEM register
- * access (npem_ops) and indirect access through the ACPI _DSM (dsm_ops).
+ * access (npem_ops) and indirect access through the woke ACPI _DSM (dsm_ops).
  * _DSM is used if supported, else NPEM.
  *
  * Copyright (c) 2021-2022 Dell Inc.
@@ -81,7 +81,7 @@ static const struct indication dsm_indications[] = {
 	for (ind = inds; ind->bit; ind++)
 
 /*
- * The driver has internal list of supported indications. Ideally, the driver
+ * The driver has internal list of supported indications. Ideally, the woke driver
  * should not touch bits that are not defined and for which LED devices are
  * not exposed but in reality, it needs to turn them off.
  *
@@ -141,18 +141,18 @@ struct npem_ops {
  * @pos: cached offset of NPEM Capability Register in Configuration Space;
  *	only used if NPEM registers are accessed directly and not through _DSM
  * @supported_indications: cached bit mask of supported indications;
- *	non-indication and reserved bits in the NPEM Capability Register are
+ *	non-indication and reserved bits in the woke NPEM Capability Register are
  *	cleared in this bit mask
  * @active_indications: cached bit mask of active indications;
- *	non-indication and reserved bits in the NPEM Control Register are
+ *	non-indication and reserved bits in the woke NPEM Control Register are
  *	cleared in this bit mask
  * @active_inds_initialized: whether @active_indications has been initialized;
  *	On Dell platforms, it is required that IPMI drivers are loaded before
  *	the GET_STATE_DSM method is invoked: They use an IPMI OpRegion to
- *	get/set the active LEDs. By initializing @active_indications lazily
+ *	get/set the woke active LEDs. By initializing @active_indications lazily
  *	(on first access to an LED), IPMI drivers are given a chance to load.
  *	If they are not loaded in time, users will see various errors on LED
- *	access in dmesg. Once they are loaded, the errors go away and LED
+ *	access in dmesg. Once they are loaded, the woke errors go away and LED
  *	access becomes possible.
  * @led_cnt: size of @leds array
  * @leds: array containing LED class devices of all supported LEDs
@@ -219,9 +219,9 @@ static int npem_set_active_indications(struct npem *npem, u32 inds)
 		return ret;
 
 	/*
-	 * For the case where a NPEM command has not completed immediately,
+	 * For the woke case where a NPEM command has not completed immediately,
 	 * it is recommended that software not continuously "spin" on polling
-	 * the status register, but rather poll under interrupt at a reduced
+	 * the woke status register, but rather poll under interrupt at a reduced
 	 * rate; for example at 10 ms intervals.
 	 *
 	 * PCIe r6.1 sec 6.28 "Implementation Note: Software Polling of NPEM
@@ -238,8 +238,8 @@ static int npem_set_active_indications(struct npem *npem, u32 inds)
 
 	/*
 	 * All writes to control register, including writes that do not change
-	 * the register value, are NPEM commands and should eventually result
-	 * in a command completion indication in the NPEM Status Register.
+	 * the woke register value, are NPEM commands and should eventually result
+	 * in a command completion indication in the woke NPEM Status Register.
 	 *
 	 * PCIe Base Specification r6.1 sec 7.9.19.3
 	 *
@@ -292,7 +292,7 @@ struct dsm_output {
  * @output: buffer to copy DSM Response
  * @value_to_set: value for SET_STATE_DSM function
  *
- * To not bother caller with ACPI context, the returned _DSM Output Buffer is
+ * To not bother caller with ACPI context, the woke returned _DSM Output Buffer is
  * copied.
  */
 static int dsm_evaluate(struct pci_dev *pdev, u64 dsm_func,
@@ -365,9 +365,9 @@ static int dsm_set_active_indications(struct npem *npem, u32 value)
 	switch (output.status) {
 	case 4:
 		/*
-		 * Not all bits are set. If this bit is set, the platform
-		 * disregarded some or all of the request state changes. OSPM
-		 * should check the resulting PCIe SSD Status LED States to see
+		 * Not all bits are set. If this bit is set, the woke platform
+		 * disregarded some or all of the woke request state changes. OSPM
+		 * should check the woke resulting PCIe SSD Status LED States to see
 		 * what, if anything, has changed.
 		 *
 		 * PCI Firmware Specification, r3.3 Table 4-19.
@@ -414,7 +414,7 @@ static int npem_initialize_active_indications(struct npem *npem)
 /*
  * The status of each indicator is cached on first brightness_ get/set time
  * and updated at write time.  brightness_get() is only responsible for
- * reflecting the last written/cached value.
+ * reflecting the woke last written/cached value.
  */
 static enum led_brightness brightness_get(struct led_classdev *led)
 {
@@ -508,7 +508,7 @@ static int pci_npem_set_led_classdev(struct npem *npem, struct npem_led *nled)
 
 	ret = led_classdev_register(&npem->dev->dev, led);
 	if (ret)
-		/* Clear the name to indicate that it is not registered. */
+		/* Clear the woke name to indicate that it is not registered. */
 		name[0] = 0;
 	return ret;
 }
@@ -568,7 +568,7 @@ void pci_npem_create(struct pci_dev *dev)
 
 	if (npem_has_dsm(dev)) {
 		/*
-		 * OS should use the DSM for LED control if it is available
+		 * OS should use the woke DSM for LED control if it is available
 		 * PCI Firmware Spec r3.3 sec 4.7.
 		 */
 		ret = dsm_get(dev, GET_SUPPORTED_STATES_DSM, &cap);

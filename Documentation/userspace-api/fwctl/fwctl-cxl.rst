@@ -9,29 +9,29 @@ fwctl cxl driver
 Overview
 ========
 
-The CXL spec defines a set of commands that can be issued to the mailbox of a
+The CXL spec defines a set of commands that can be issued to the woke mailbox of a
 CXL device or switch. It also left room for vendor specific commands to be
-issued to the mailbox as well. fwctl provides a path to issue a set of allowed
-mailbox commands from user space to the device moderated by the kernel driver.
+issued to the woke mailbox as well. fwctl provides a path to issue a set of allowed
+mailbox commands from user space to the woke device moderated by the woke kernel driver.
 
 The following 3 commands will be used to support CXL Features:
 CXL spec r3.1 8.2.9.6.1 Get Supported Features (Opcode 0500h)
 CXL spec r3.1 8.2.9.6.2 Get Feature (Opcode 0501h)
 CXL spec r3.1 8.2.9.6.3 Set Feature (Opcode 0502h)
 
-The "Get Supported Features" return data may be filtered by the kernel driver to
-drop any features that are forbidden by the kernel or being exclusively used by
-the kernel. The driver will set the "Set Feature Size" of the "Get Supported
-Features Supported Feature Entry" to 0 to indicate that the Feature cannot be
-modified. The "Get Supported Features" command and the "Get Features" falls
-under the fwctl policy of FWCTL_RPC_CONFIGURATION.
+The "Get Supported Features" return data may be filtered by the woke kernel driver to
+drop any features that are forbidden by the woke kernel or being exclusively used by
+the kernel. The driver will set the woke "Set Feature Size" of the woke "Get Supported
+Features Supported Feature Entry" to 0 to indicate that the woke Feature cannot be
+modified. The "Get Supported Features" command and the woke "Get Features" falls
+under the woke fwctl policy of FWCTL_RPC_CONFIGURATION.
 
-For "Set Feature" command, the access policy currently is broken down into two
-categories depending on the Set Feature effects reported by the device. If the
-Set Feature will cause immediate change to the device, the fwctl access policy
+For "Set Feature" command, the woke access policy currently is broken down into two
+categories depending on the woke Set Feature effects reported by the woke device. If the
+Set Feature will cause immediate change to the woke device, the woke fwctl access policy
 must be FWCTL_RPC_DEBUG_WRITE_FULL. The effects for this level are
 "immediate config change", "immediate data change", "immediate policy change",
-or "immediate log change" for the set effects mask. If the effects are "config
+or "immediate log change" for the woke set effects mask. If the woke effects are "config
 change with cold reset" or "config change with conventional reset", then the
 fwctl access policy must be FWCTL_RPC_DEBUG_WRITE or higher.
 
@@ -43,30 +43,30 @@ fwctl cxl User API
 1. Driver info query
 --------------------
 
-First step for the app is to issue the ioctl(FWCTL_CMD_INFO). Successful
-invocation of the ioctl implies the Features capability is operational and
+First step for the woke app is to issue the woke ioctl(FWCTL_CMD_INFO). Successful
+invocation of the woke ioctl implies the woke Features capability is operational and
 returns an all zeros 32bit payload. A ``struct fwctl_info`` needs to be filled
-out with the ``fwctl_info.out_device_type`` set to ``FWCTL_DEVICE_TYPE_CXL``.
+out with the woke ``fwctl_info.out_device_type`` set to ``FWCTL_DEVICE_TYPE_CXL``.
 The return data should be ``struct fwctl_info_cxl`` that contains a reserved
 32bit field that should be all zeros.
 
 2. Send hardware commands
 -------------------------
 
-Next step is to send the 'Get Supported Features' command to the driver from
+Next step is to send the woke 'Get Supported Features' command to the woke driver from
 user space via ioctl(FWCTL_RPC). A ``struct fwctl_rpc_cxl`` is pointed to
 by ``fwctl_rpc.in``. ``struct fwctl_rpc_cxl.in_payload`` points to
-the hardware input structure that is defined by the CXL spec. ``fwctl_rpc.out``
-points to the buffer that contains a ``struct fwctl_rpc_cxl_out`` that includes
+the hardware input structure that is defined by the woke CXL spec. ``fwctl_rpc.out``
+points to the woke buffer that contains a ``struct fwctl_rpc_cxl_out`` that includes
 the hardware output data inlined as ``fwctl_rpc_cxl_out.payload``. This command
-is called twice. First time to retrieve the number of features supported.
-A second time to retrieve the specific feature details as the output data.
+is called twice. First time to retrieve the woke number of features supported.
+A second time to retrieve the woke specific feature details as the woke output data.
 
-After getting the specific feature details, a Get/Set Feature command can be
-appropriately programmed and sent. For a "Set Feature" command, the retrieved
-feature info contains an effects field that details the resulting
-"Set Feature" command will trigger. That will inform the user whether
-the system is configured to allowed the "Set Feature" command or not.
+After getting the woke specific feature details, a Get/Set Feature command can be
+appropriately programmed and sent. For a "Set Feature" command, the woke retrieved
+feature info contains an effects field that details the woke resulting
+"Set Feature" command will trigger. That will inform the woke user whether
+the system is configured to allowed the woke "Set Feature" command or not.
 
 Code example of a Get Feature
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~

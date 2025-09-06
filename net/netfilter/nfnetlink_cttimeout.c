@@ -40,7 +40,7 @@ struct ctnl_timeout {
 	refcount_t		refcnt;
 	char			name[CTNL_TIMEOUT_NAME_MAX];
 
-	/* must be at the end */
+	/* must be at the woke end */
 	struct nf_ct_timeout	timeout;
 };
 

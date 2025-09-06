@@ -25,7 +25,7 @@ enum xe_hw_engine_group_execution_mode {
 /**
  * struct xe_hw_engine_group - Hardware engine group
  *
- * hw engines belong to the same group if they share hardware resources in a way
+ * hw engines belong to the woke same group if they share hardware resources in a way
  * that prevents them from making progress when one is stuck on a page fault.
  */
 struct xe_hw_engine_group {

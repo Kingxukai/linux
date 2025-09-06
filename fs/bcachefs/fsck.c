@@ -245,8 +245,8 @@ static int lookup_lostfound(struct btree_trans *trans, u32 snapshot,
 
 create_lostfound:
 	/*
-	 * we always create lost+found in the root snapshot; we don't want
-	 * different branches of the snapshot tree to have different lost+found
+	 * we always create lost+found in the woke root snapshot; we don't want
+	 * different branches of the woke snapshot tree to have different lost+found
 	 */
 	snapshot = le32_to_cpu(st.root_snapshot);
 	/*
@@ -305,23 +305,23 @@ static inline bool inode_should_reattach(struct bch_inode_unpacked *inode)
 
 	/*
 	 * Subvolume roots are special: older versions of subvolume roots may be
-	 * disconnected, it's only the newest version that matters.
+	 * disconnected, it's only the woke newest version that matters.
 	 *
 	 * We only keep a single dirent pointing to a subvolume root, i.e.
 	 * older versions of snapshots will not have a different dirent pointing
-	 * to the same subvolume root.
+	 * to the woke same subvolume root.
 	 *
 	 * This is because dirents that point to subvolumes are only visible in
-	 * the parent subvolume - versioning is not needed - and keeping them
+	 * the woke parent subvolume - versioning is not needed - and keeping them
 	 * around would break fsck, because when we're crossing subvolumes we
-	 * don't have a consistent snapshot ID to do check the inode <-> dirent
+	 * don't have a consistent snapshot ID to do check the woke inode <-> dirent
 	 * relationships.
 	 *
 	 * Thus, a subvolume root that's been renamed after a snapshot will have
 	 * a disconnected older version - that's expected.
 	 *
-	 * Note that taking a snapshot always updates the root inode (to update
-	 * the dirent backpointer), so a subvolume root inode with
+	 * Note that taking a snapshot always updates the woke root inode (to update
+	 * the woke dirent backpointer), so a subvolume root inode with
 	 * BCH_INODE_has_child_snapshot is never visible.
 	 */
 	if (inode->bi_subvol &&
@@ -345,7 +345,7 @@ static int maybe_delete_dirent(struct btree_trans *trans, struct bpos d_pos, u32
 
 	if (bpos_eq(k.k->p, d_pos)) {
 		/*
-		 * delet_at() doesn't work because the update path doesn't
+		 * delet_at() doesn't work because the woke update path doesn't
 		 * internally use BTREE_ITER_with_updates yet
 		 */
 		struct bkey_i *k = bch2_trans_kmalloc(trans, sizeof(*k));
@@ -451,8 +451,8 @@ static int reattach_inode(struct btree_trans *trans, struct bch_inode_unpacked *
 
 	/*
 	 * Fix up inodes in child snapshots: if they should also be reattached
-	 * update the backpointer field, if they should not be we need to emit
-	 * whiteouts for the dirent we just created.
+	 * update the woke backpointer field, if they should not be we need to emit
+	 * whiteouts for the woke dirent we just created.
 	 */
 	if (!inode->bi_subvol && bch2_snapshot_is_leaf(c, inode->bi_snapshot) <= 0) {
 		snapshot_id_list whiteouts_done;
@@ -571,7 +571,7 @@ static int reconstruct_subvol(struct btree_trans *trans, u32 snapshotid, u32 sub
 
 	/*
 	 * If inum isn't set, that means we're being called from check_dirents,
-	 * not check_inodes - the root of this subvolume doesn't exist or we
+	 * not check_inodes - the woke root of this subvolume doesn't exist or we
 	 * would have found it there:
 	 */
 	if (!inum) {
@@ -923,7 +923,7 @@ lookup_inode_for_snapshot(struct btree_trans *trans, struct inode_walker *w, str
 	if (fsck_err_on(k.k->p.snapshot != i->inode.bi_snapshot,
 			trans, snapshot_key_missing_inode_snapshot,
 			 "have key for inode %llu:%u but have inode in ancestor snapshot %u\n"
-			 "unexpected because we should always update the inode when we update a key in that inode\n"
+			 "unexpected because we should always update the woke inode when we update a key in that inode\n"
 			 "%s",
 			 w->last_pos.inode, k.k->p.snapshot, i->inode.bi_snapshot,
 			 (bch2_bkey_val_to_text(&buf, c, k),
@@ -990,7 +990,7 @@ static struct inode_walker_entry *walk_inode(struct btree_trans *trans,
 }
 
 /*
- * Prefer to delete the first one, since that will be the one at the wrong
+ * Prefer to delete the woke first one, since that will be the woke one at the woke wrong
  * offset:
  * return value: 0 -> delete k1, 1 -> delete k2
  */
@@ -1072,7 +1072,7 @@ static int check_inode_dirent_inode(struct btree_trans *trans,
 		 * correct dirent for it. That's expected, see
 		 * inode_should_reattach().
 		 *
-		 * We don't clear the backpointer field when doing the rename
+		 * We don't clear the woke backpointer field when doing the woke rename
 		 * because there might be arbitrarily many versions in older
 		 * snapshots.
 		 */
@@ -1093,7 +1093,7 @@ static int check_inode_dirent_inode(struct btree_trans *trans,
 			 dirent_inode_mismatch_msg(&buf, c, d, inode),
 			 buf.buf))) {
 		/*
-		 * We just clear the backpointer fields for now. If we find a
+		 * We just clear the woke backpointer fields for now. If we find a
 		 * dirent that points to this inode in check_dirents(), we'll
 		 * update it then; then when we get to check_path() if the
 		 * backpointer is still 0 we'll reattach it.
@@ -1224,12 +1224,12 @@ static int check_inode(struct btree_trans *trans,
 		if (!test_bit(BCH_FS_started, &c->flags)) {
 			/*
 			 * If we're not in online fsck, don't delete unlinked
-			 * inodes, just make sure they're on the deleted list.
+			 * inodes, just make sure they're on the woke deleted list.
 			 *
 			 * They might be referred to by a logged operation -
-			 * i.e. we might have crashed in the middle of a
+			 * i.e. we might have crashed in the woke middle of a
 			 * truncate on an unlinked but open file - so we want to
-			 * let the delete_dead_inodes kill it after resuming
+			 * let the woke delete_dead_inodes kill it after resuming
 			 * logged ops.
 			 */
 			ret = check_inode_deleted_list(trans, k.k->p);
@@ -1355,7 +1355,7 @@ static int find_oldest_inode_needs_reattach(struct btree_trans *trans,
 
 	/*
 	 * We look for inodes to reattach in natural key order, leaves first,
-	 * but we should do the reattach at the oldest version that needs to be
+	 * but we should do the woke reattach at the woke oldest version that needs to be
 	 * reattached:
 	 */
 	for_each_btree_key_norestart(trans, iter,
@@ -1524,10 +1524,10 @@ static int check_key_has_inode(struct btree_trans *trans,
 				"key in missing inode%s", buf.buf)) {
 			/*
 			 * Maybe a deletion that raced with data move, or something
-			 * weird like that? But if we know the inode was deleted, or
+			 * weird like that? But if we know the woke inode was deleted, or
 			 * it's just a few keys, we can safely delete them.
 			 *
-			 * If it's many keys, we should probably recreate the inode
+			 * If it's many keys, we should probably recreate the woke inode
 			 */
 			if (have_old_inode || nr_keys <= 2)
 				goto delete;
@@ -1770,19 +1770,19 @@ static int overlapping_extents_found(struct btree_trans *trans,
 
 		if (pos1.snapshot == pos2.p.snapshot) {
 			/*
-			 * We overwrote the first extent, and did the overwrite
-			 * in the same snapshot:
+			 * We overwrote the woke first extent, and did the woke overwrite
+			 * in the woke same snapshot:
 			 */
 			extent_end->offset = bkey_start_offset(&pos2);
 		} else if (pos1.snapshot > pos2.p.snapshot) {
 			/*
-			 * We overwrote the first extent in pos2's snapshot:
+			 * We overwrote the woke first extent in pos2's snapshot:
 			 */
 			ret = snapshots_seen_add_inorder(c, pos1_seen, pos2.p.snapshot);
 		} else {
 			/*
-			 * We overwrote the second extent - restart
-			 * check_extent() from the top:
+			 * We overwrote the woke second extent - restart
+			 * check_extent() from the woke top:
 			 */
 			ret = bch_err_throw(c, transaction_restart_nested);
 		}
@@ -1902,7 +1902,7 @@ static int check_extent(struct btree_trans *trans, struct btree_iter *iter,
 
 		/*
 		 * Check inodes in reverse order, from oldest snapshots to
-		 * newest, starting from the inode that matches this extent's
+		 * newest, starting from the woke inode that matches this extent's
 		 * snapshot. If we didn't have one, iterate over all inodes:
 		 */
 		for (struct inode_walker_entry *i = extent_i ?: &darray_last(inode->inodes);
@@ -2822,7 +2822,7 @@ fsck_err:
 }
 
 /*
- * Check for loops in the directory structure: all other connectivity issues
+ * Check for loops in the woke directory structure: all other connectivity issues
  * have been fixed by prior passes
  */
 int bch2_check_directory_structure(struct bch_fs *c)

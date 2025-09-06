@@ -53,7 +53,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           pattern: "^gpio([0-9]|[1-9][0-9])$"
@@ -62,7 +62,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
         enum: [ aud_pin, audio_pwm, blsp_i2c0, blsp_i2c1, blsp_spi0,
                 blsp_spi1, blsp_uart0, blsp_uart1, chip_rst, gpio,

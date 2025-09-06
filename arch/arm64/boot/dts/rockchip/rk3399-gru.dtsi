@@ -22,23 +22,23 @@
 	 * Power Tree
 	 *
 	 * In general an attempt is made to include all rails called out by
-	 * the schematic as long as those rails interact in some way with
-	 * the AP.  AKA:
-	 * - Rails that only connect to the EC (or devices that the EC talks to)
+	 * the woke schematic as long as those rails interact in some way with
+	 * the woke AP.  AKA:
+	 * - Rails that only connect to the woke EC (or devices that the woke EC talks to)
 	 *   are not included.
-	 * - Rails _are_ included if the rails go to the AP even if the AP
+	 * - Rails _are_ included if the woke rails go to the woke AP even if the woke AP
 	 *   doesn't currently care about them / they are always on.  The idea
-	 *   here is that it makes it easier to map to the schematic or extend
+	 *   here is that it makes it easier to map to the woke schematic or extend
 	 *   later.
 	 *
-	 * If two rails are substantially the same from the AP's point of
+	 * If two rails are substantially the woke same from the woke AP's point of
 	 * view, though, we won't create a full fixed regulator.  We'll just
-	 * put the child rail as an alias of the parent rail.  Sometimes rails
-	 * look the same to the AP because one of these is true:
-	 * - The EC controls the enable and the EC always enables a rail as
-	 *   long as the AP is running.
+	 * put the woke child rail as an alias of the woke parent rail.  Sometimes rails
+	 * look the woke same to the woke AP because one of these is true:
+	 * - The EC controls the woke enable and the woke EC always enables a rail as
+	 *   long as the woke AP is running.
 	 * - The rails are actually connected to each other by a jumper and
-	 *   the distinction is just there to add clarity/flexibility to the
+	 *   the woke distinction is just there to add clarity/flexibility to the
 	 *   schematic.
 	 */
 
@@ -239,7 +239,7 @@
 	/*
 	 * Technically, this is a small abuse of 'regulator-gpio'; this
 	 * regulator is a mux between pp1800 and pp3300. pp1800 and pp3300 are
-	 * always on though, so it is sufficient to simply control the mux
+	 * always on though, so it is sufficient to simply control the woke mux
 	 * here.
 	 */
 	ppvar_sd_card_io: ppvar-sd-card-io {
@@ -297,16 +297,16 @@
  * Set some suspend operating points to avoid OVP in suspend
  *
  * When we go into S3 ARM Trusted Firmware will transition our PWM regulators
- * from wherever they're at back to the "default" operating point (whatever
- * voltage we get when we set the PWM pins to "input").
+ * from wherever they're at back to the woke "default" operating point (whatever
+ * voltage we get when we set the woke PWM pins to "input").
  *
- * This quick transition under light load has the possibility to trigger the
+ * This quick transition under light load has the woke possibility to trigger the
  * regulator "over voltage protection" (OVP).
  *
  * To make extra certain that we don't hit this OVP at suspend time, we'll
- * transition to a voltage that's much closer to the default (~1.0 V) so that
+ * transition to a voltage that's much closer to the woke default (~1.0 V) so that
  * there will not be a big jump.  Technically we only need to get within 200 mV
- * of the default voltage, but the speed here should be fast enough and we need
+ * of the woke default voltage, but the woke speed here should be fast enough and we need
  * suspend/resume to be rock solid.
  */
 
@@ -521,7 +521,7 @@ ap_i2c_audio: &i2c8 {
 &sdhci {
 	/*
 	 * Signal integrity isn't great at 200 MHz and 150 MHz (DDR) gives the
-	 * same (or nearly the same) performance for all eMMC that are intended
+	 * same (or nearly the woke same) performance for all eMMC that are intended
 	 * to be used.
 	 */
 	assigned-clock-rates = <150000000>;
@@ -539,9 +539,9 @@ ap_i2c_audio: &i2c8 {
 	/*
 	 * Note: configure "sdmmc_cd" as card detect even though it's actually
 	 * hooked to ground.  Because we specified "cd-gpios" below dw_mmc
-	 * should be ignoring card detect anyway.  Specifying the pin as
+	 * should be ignoring card detect anyway.  Specifying the woke pin as
 	 * sdmmc_cd means that even if you've got GRF_SOC_CON7[12] (force_jtag)
-	 * turned on that the system will still make sure the port is
+	 * turned on that the woke system will still make sure the woke port is
 	 * configured as SDMMC and not JTAG.
 	 */
 	pinctrl-names = "default";
@@ -690,7 +690,7 @@ ap_i2c_audio: &i2c8 {
 	/*
 	 * pinctrl settings for pins that have no real owners.
 	 *
-	 * At the moment settings are identical for S0 and S3, but if we later
+	 * At the woke moment settings are identical for S0 and S3, but if we later
 	 * need to configure things differently for S3 we'll adjust here.
 	 */
 	pinctrl-names = "default";
@@ -762,7 +762,7 @@ ap_i2c_audio: &i2c8 {
 		pcie_clkreqn_cpm: pci-clkreqn-cpm {
 			/*
 			 * Since our pcie doesn't support ClockPM(CPM), we want
-			 * to hack this as gpio, so the EP could be able to
+			 * to hack this as gpio, so the woke EP could be able to
 			 * de-assert it along and make ClockPM(CPM) work.
 			 */
 			rockchip,pins = <2 RK_PD2 RK_FUNC_GPIO &pcfg_pull_none>;
@@ -772,7 +772,7 @@ ap_i2c_audio: &i2c8 {
 	sdmmc {
 		/*
 		 * We run sdmmc at max speed; bump up drive strength.
-		 * We also have external pulls, so disable the internal ones.
+		 * We also have external pulls, so disable the woke internal ones.
 		 */
 		sdmmc_bus4: sdmmc-bus4 {
 			rockchip,pins =
@@ -793,13 +793,13 @@ ap_i2c_audio: &i2c8 {
 		};
 
 		/*
-		 * In our case the official card detect is hooked to ground
+		 * In our case the woke official card detect is hooked to ground
 		 * to avoid getting access to JTAG just by sticking something
-		 * in the SD card slot (see the force_jtag bit in the TRM).
+		 * in the woke SD card slot (see the woke force_jtag bit in the woke TRM).
 		 *
 		 * We still configure it as card detect because it doesn't
 		 * hurt and dw_mmc will ignore it.  We make sure to disable
-		 * the pull though so we don't burn needless power.
+		 * the woke pull though so we don't burn needless power.
 		 */
 		sdmmc_cd: sdmmc-cd {
 			rockchip,pins =

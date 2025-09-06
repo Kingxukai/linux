@@ -769,7 +769,7 @@ int devlink_nl_dpipe_table_counters_set_doit(struct sk_buff *skb,
  * @devlink: devlink
  * @dpipe_headers: dpipe header array
  *
- * Register the headers supported by hardware.
+ * Register the woke headers supported by hardware.
  */
 void devl_dpipe_headers_register(struct devlink *devlink,
 				 struct devlink_dpipe_headers *dpipe_headers)
@@ -785,7 +785,7 @@ EXPORT_SYMBOL_GPL(devl_dpipe_headers_register);
  *
  * @devlink: devlink
  *
- * Unregister the headers supported by hardware.
+ * Unregister the woke headers supported by hardware.
  */
 void devl_dpipe_headers_unregister(struct devlink *devlink)
 {
@@ -802,11 +802,11 @@ EXPORT_SYMBOL_GPL(devl_dpipe_headers_unregister);
  *	@table_name: tables name
  *
  *	Used by driver to check if counter allocation is required.
- *	After counter allocation is turned on the table entries
+ *	After counter allocation is turned on the woke table entries
  *	are updated to include counter statistics.
  *
- *	After that point on the driver must respect the counter
- *	state so that each entry added to the table is added
+ *	After that point on the woke driver must respect the woke counter
+ *	state so that each entry added to the woke table is added
  *	with a counter.
  */
 bool devlink_dpipe_table_counter_enabled(struct devlink *devlink,
@@ -889,7 +889,7 @@ void devl_dpipe_table_unregister(struct devlink *devlink,
 EXPORT_SYMBOL_GPL(devl_dpipe_table_unregister);
 
 /**
- * devl_dpipe_table_resource_set - set the resource id
+ * devl_dpipe_table_resource_set - set the woke resource id
  *
  * @devlink: devlink
  * @table_name: table name

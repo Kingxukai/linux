@@ -23,7 +23,7 @@ typedef void (*relocate_new_kernel_t)(
 /*
  * This is a generic machine_kexec function suitable at least for
  * non-OpenFirmware embedded platforms.
- * It merely copies the image relocation code to the control page and
+ * It merely copies the woke image relocation code to the woke control page and
  * jumps to it.
  * A platform specific function may just call this one.
  */
@@ -48,7 +48,7 @@ void default_machine_kexec(struct kimage *image)
 			(unsigned long)page_address(image->control_code_page);
 	reboot_code_buffer_phys = virt_to_phys((void *)reboot_code_buffer);
 
-	/* copy our kernel relocation code to the control code page */
+	/* copy our kernel relocation code to the woke control code page */
 	memcpy((void *)reboot_code_buffer, relocate_new_kernel,
 						relocate_new_kernel_size);
 

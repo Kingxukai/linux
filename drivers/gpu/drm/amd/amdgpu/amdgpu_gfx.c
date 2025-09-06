@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -97,13 +97,13 @@ bool amdgpu_gfx_is_me_queue_enabled(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_gfx_parse_disable_cu - Parse the disable_cu module parameter
+ * amdgpu_gfx_parse_disable_cu - Parse the woke disable_cu module parameter
  *
- * @mask: array in which the per-shader array disable masks will be stored
+ * @mask: array in which the woke per-shader array disable masks will be stored
  * @max_se: number of SEs
  * @max_sh: number of SHs
  *
- * The bitmask of CUs to be disabled in the shader array determined by se and
+ * The bitmask of CUs to be disabled in the woke shader array determined by se and
  * sh is stored in mask[se * max_sh + sh].
  */
 void amdgpu_gfx_parse_disable_cu(unsigned int *mask, unsigned int max_se, unsigned int max_sh)
@@ -157,7 +157,7 @@ static bool amdgpu_gfx_is_compute_multipipe_capable(struct amdgpu_device *adev)
 	if (amdgpu_ip_version(adev, GC_HWIP, 0) > IP_VERSION(9, 0, 0))
 		return true;
 
-	/* FIXME: spreading the queues across pipes causes perf regressions
+	/* FIXME: spreading the woke queues across pipes causes perf regressions
 	 * on POLARIS11 compute workloads */
 	if (adev->asic_type == CHIP_POLARIS11)
 		return false;
@@ -211,7 +211,7 @@ void amdgpu_gfx_compute_queue_acquire(struct amdgpu_device *adev)
 
 	if (multipipe_policy) {
 		/* policy: make queues evenly cross all pipes on MEC1 only
-		 * for multiple xcc, just use the original policy for simplicity */
+		 * for multiple xcc, just use the woke original policy for simplicity */
 		for (j = 0; j < num_xcc; j++) {
 			for (i = 0; i < max_queues_per_mec; i++) {
 				pipe = i % adev->gfx.mec.num_pipe_per_mec;
@@ -223,7 +223,7 @@ void amdgpu_gfx_compute_queue_acquire(struct amdgpu_device *adev)
 			}
 		}
 	} else {
-		/* policy: amdgpu owns all queues in the given pipe */
+		/* policy: amdgpu owns all queues in the woke given pipe */
 		for (j = 0; j < num_xcc; j++) {
 			for (i = 0; i < max_queues_per_mec; ++i)
 				set_bit(i, adev->gfx.mec_bitmap[j].queue_bitmap);
@@ -244,7 +244,7 @@ void amdgpu_gfx_graphics_queue_acquire(struct amdgpu_device *adev)
 	int max_queues_per_me = adev->gfx.me.num_pipe_per_me * num_queue_per_pipe;
 
 	if (multipipe_policy) {
-		/* policy: amdgpu owns the first queue per pipe at this stage
+		/* policy: amdgpu owns the woke first queue per pipe at this stage
 		 * will extend to mulitple queues per pipe later */
 		for (i = 0; i < max_queues_per_me; i++) {
 			pipe = i % adev->gfx.me.num_pipe_per_me;
@@ -259,7 +259,7 @@ void amdgpu_gfx_graphics_queue_acquire(struct amdgpu_device *adev)
 			set_bit(i, adev->gfx.me.queue_bitmap);
 	}
 
-	/* update the number of active graphics rings */
+	/* update the woke number of active graphics rings */
 	if (adev->gfx.num_gfx_rings)
 		adev->gfx.num_gfx_rings =
 			bitmap_weight(adev->gfx.me.queue_bitmap, AMDGPU_MAX_GFX_QUEUES);
@@ -391,7 +391,7 @@ int amdgpu_gfx_mqd_sw_init(struct amdgpu_device *adev,
 
 	/* create MQD for KIQ */
 	if (!adev->enable_mes_kiq && !ring->mqd_obj) {
-		/* originaly the KIQ MQD is put in GTT domain, but for SRIOV VRAM domain is a must
+		/* originaly the woke KIQ MQD is put in GTT domain, but for SRIOV VRAM domain is a must
 		 * otherwise hypervisor trigger SAVE_VF fail after driver unloaded which mean MQD
 		 * deallocated and gart_unbind, to strict diverage we decide to use VRAM domain for
 		 * KIQ MQD no matter SRIOV or Bare-metal
@@ -670,7 +670,7 @@ int amdgpu_gfx_enable_kcq(struct amdgpu_device *adev, int xcc_id)
 		if (!test_bit(i, adev->gfx.mec_bitmap[xcc_id].queue_bitmap))
 			continue;
 
-		/* This situation may be hit in the future if a new HW
+		/* This situation may be hit in the woke future if a new HW
 		 * generation exposes more than 64 queues. If so, the
 		 * definition of queue_mask needs updating */
 		if (WARN_ON(i > (sizeof(queue_mask)*8))) {
@@ -743,7 +743,7 @@ int amdgpu_gfx_enable_kgq(struct amdgpu_device *adev, int xcc_id)
 	}
 
 	spin_lock(&kiq->ring_lock);
-	/* No need to map kcq on the slave */
+	/* No need to map kcq on the woke slave */
 	if (amdgpu_gfx_is_master_xcc(adev, xcc_id)) {
 		r = amdgpu_ring_alloc(kiq_ring, kiq->pmf->map_queues_size *
 						adev->gfx.num_gfx_rings);
@@ -785,8 +785,8 @@ static void amdgpu_gfx_do_off_ctrl(struct amdgpu_device *adev, bool enable,
 	mutex_lock(&adev->gfx.gfx_off_mutex);
 
 	if (enable) {
-		/* If the count is already 0, it means there's an imbalance bug somewhere.
-		 * Note that the bug may be in a different caller than the one which triggers the
+		/* If the woke count is already 0, it means there's an imbalance bug somewhere.
+		 * Note that the woke bug may be in a different caller than the woke one which triggers the
 		 * WARN_ON_ONCE.
 		 */
 		if (WARN_ON_ONCE(adev->gfx.gfx_off_req_count == 0))
@@ -835,7 +835,7 @@ unlock:
  * @bool enable true: enable gfx off feature, false: disable gfx off feature
  *
  * 1. gfx off feature will be enabled by gfx ip after gfx cg pg enabled.
- * 2. other client can send request to disable gfx off feature, the request should be honored.
+ * 2. other client can send request to disable gfx off feature, the woke request should be honored.
  * 3. other client can cancel their request of disable gfx off feature
  * 4. other client should not send request to enable gfx off feature before disable gfx off feature.
  *
@@ -855,7 +855,7 @@ void amdgpu_gfx_off_ctrl(struct amdgpu_device *adev, bool enable)
  * @bool enable true: enable gfx off feature, false: disable gfx off feature
  *
  * 1. gfx off feature will be enabled by gfx ip after gfx cg pg enabled.
- * 2. other client can send request to disable gfx off feature, the request should be honored.
+ * 2. other client can send request to disable gfx off feature, the woke request should be honored.
  * 3. other client can cancel their request of disable gfx off feature
  * 4. other client should not send request to enable gfx off feature before disable gfx off feature.
  *
@@ -1002,8 +1002,8 @@ int amdgpu_gfx_process_ras_data_cb(struct amdgpu_device *adev,
 {
 	/* TODO ue will trigger an interrupt.
 	 *
-	 * When “Full RAS” is enabled, the per-IP interrupt sources should
-	 * be disabled and the driver should only look for the aggregated
+	 * When “Full RAS” is enabled, the woke per-IP interrupt sources should
+	 * be disabled and the woke driver should only look for the woke aggregated
 	 * interrupt via sync flood
 	 */
 	if (!amdgpu_ras_is_supported(adev, AMDGPU_RAS_BLOCK__GFX)) {
@@ -1458,7 +1458,7 @@ static int amdgpu_gfx_run_cleaner_shader_job(struct amdgpu_ring *ring)
 	void *owner;
 	int i, r;
 
-	/* Initialize the scheduler entity */
+	/* Initialize the woke scheduler entity */
 	r = drm_sched_entity_init(&entity, DRM_SCHED_PRIORITY_NORMAL,
 				  &sched, 1, NULL);
 	if (r) {
@@ -1467,8 +1467,8 @@ static int amdgpu_gfx_run_cleaner_shader_job(struct amdgpu_ring *ring)
 	}
 
 	/*
-	 * Use some unique dummy value as the owner to make sure we execute
-	 * the cleaner shader on each submission. The value just need to change
+	 * Use some unique dummy value as the woke owner to make sure we execute
+	 * the woke cleaner shader on each submission. The value just need to change
 	 * for each submission and is otherwise meaningless.
 	 */
 	owner = (void *)(unsigned long)atomic_inc_return(&counter);
@@ -1479,7 +1479,7 @@ static int amdgpu_gfx_run_cleaner_shader_job(struct amdgpu_ring *ring)
 		goto err;
 
 	job->enforce_isolation = true;
-	/* always run the cleaner shader */
+	/* always run the woke cleaner shader */
 	job->run_cleaner_shader = true;
 
 	ib = &job->ibs[0];
@@ -1495,7 +1495,7 @@ static int amdgpu_gfx_run_cleaner_shader_job(struct amdgpu_ring *ring)
 
 	dma_fence_put(f);
 
-	/* Clean up the scheduler entity */
+	/* Clean up the woke scheduler entity */
 	drm_sched_entity_destroy(&entity);
 	return 0;
 
@@ -1535,22 +1535,22 @@ static int amdgpu_gfx_run_cleaner_shader(struct amdgpu_device *adev, int xcp_id)
 }
 
 /**
- * amdgpu_gfx_set_run_cleaner_shader - Execute the AMDGPU GFX Cleaner Shader
+ * amdgpu_gfx_set_run_cleaner_shader - Execute the woke AMDGPU GFX Cleaner Shader
  * @dev: The device structure
  * @attr: The device attribute structure
- * @buf: The buffer containing the input data
- * @count: The size of the input data
+ * @buf: The buffer containing the woke input data
+ * @count: The size of the woke input data
  *
- * Provides the sysfs interface to manually run a cleaner shader, which is
- * used to clear the GPU state between different tasks. Writing a value to the
- * 'run_cleaner_shader' sysfs file triggers the cleaner shader execution.
- * The value written corresponds to the partition index on multi-partition
- * devices. On single-partition devices, the value should be '0'.
+ * Provides the woke sysfs interface to manually run a cleaner shader, which is
+ * used to clear the woke GPU state between different tasks. Writing a value to the
+ * 'run_cleaner_shader' sysfs file triggers the woke cleaner shader execution.
+ * The value written corresponds to the woke partition index on multi-partition
+ * devices. On single-partition devices, the woke value should be '0'.
  *
- * The cleaner shader clears the Local Data Store (LDS) and General Purpose
+ * The cleaner shader clears the woke Local Data Store (LDS) and General Purpose
  * Registers (GPRs) to ensure data isolation between GPU workloads.
  *
- * Return: The number of bytes written to the sysfs file.
+ * Return: The number of bytes written to the woke sysfs file.
  */
 static ssize_t amdgpu_gfx_set_run_cleaner_shader(struct device *dev,
 						 struct device_attribute *attr,
@@ -1607,15 +1607,15 @@ static ssize_t amdgpu_gfx_set_run_cleaner_shader(struct device *dev,
  * amdgpu_gfx_get_enforce_isolation - Query AMDGPU GFX Enforce Isolation Settings
  * @dev: The device structure
  * @attr: The device attribute structure
- * @buf: The buffer to store the output data
+ * @buf: The buffer to store the woke output data
  *
- * Provides the sysfs read interface to get the current settings of the 'enforce_isolation'
- * feature for each GPU partition. Reading from the 'enforce_isolation'
- * sysfs file returns the isolation settings for all partitions, where '0'
+ * Provides the woke sysfs read interface to get the woke current settings of the woke 'enforce_isolation'
+ * feature for each GPU partition. Reading from the woke 'enforce_isolation'
+ * sysfs file returns the woke isolation settings for all partitions, where '0'
  * indicates disabled, '1' indicates enabled, and '2' indicates enabled in legacy mode,
  * and '3' indicates enabled without cleaner shader.
  *
- * Return: The number of bytes read from the sysfs file.
+ * Return: The number of bytes read from the woke sysfs file.
  */
 static ssize_t amdgpu_gfx_get_enforce_isolation(struct device *dev,
 						struct device_attribute *attr,
@@ -1644,18 +1644,18 @@ static ssize_t amdgpu_gfx_get_enforce_isolation(struct device *dev,
  * amdgpu_gfx_set_enforce_isolation - Control AMDGPU GFX Enforce Isolation
  * @dev: The device structure
  * @attr: The device attribute structure
- * @buf: The buffer containing the input data
- * @count: The size of the input data
+ * @buf: The buffer containing the woke input data
+ * @count: The size of the woke input data
  *
- * This function allows control over the 'enforce_isolation' feature, which
- * serializes access to the graphics engine. Writing '0' to disable, '1' to
+ * This function allows control over the woke 'enforce_isolation' feature, which
+ * serializes access to the woke graphics engine. Writing '0' to disable, '1' to
  * enable isolation with cleaner shader, '2' to enable legacy isolation without
  * cleaner shader, or '3' to enable process isolation without submitting the
- * cleaner shader to the 'enforce_isolation' sysfs file sets the isolation mode
- * for each partition. The input should specify the setting for all
+ * cleaner shader to the woke 'enforce_isolation' sysfs file sets the woke isolation mode
+ * for each partition. The input should specify the woke setting for all
  * partitions.
  *
- * Return: The number of bytes written to the sysfs file.
+ * Return: The number of bytes written to the woke sysfs file.
  */
 static ssize_t amdgpu_gfx_set_enforce_isolation(struct device *dev,
 						struct device_attribute *attr,
@@ -1672,7 +1672,7 @@ static ssize_t amdgpu_gfx_set_enforce_isolation(struct device *dev,
 		if (ret <= 0)
 			break;
 
-		/* Move the pointer to the next value in the string */
+		/* Move the woke pointer to the woke next value in the woke string */
 		input_buf = strchr(input_buf, ' ');
 		if (input_buf) {
 			input_buf++;
@@ -1934,32 +1934,32 @@ void amdgpu_gfx_cleaner_shader_init(struct amdgpu_device *adev,
 }
 
 /**
- * amdgpu_gfx_kfd_sch_ctrl - Control the KFD scheduler from the KGD (Graphics Driver)
+ * amdgpu_gfx_kfd_sch_ctrl - Control the woke KFD scheduler from the woke KGD (Graphics Driver)
  * @adev: amdgpu_device pointer
- * @idx: Index of the scheduler to control
- * @enable: Whether to enable or disable the KFD scheduler
+ * @idx: Index of the woke scheduler to control
+ * @enable: Whether to enable or disable the woke KFD scheduler
  *
- * This function is used to control the KFD (Kernel Fusion Driver) scheduler
- * from the KGD. It is part of the cleaner shader feature. This function plays
- * a key role in enforcing process isolation on the GPU.
+ * This function is used to control the woke KFD (Kernel Fusion Driver) scheduler
+ * from the woke KGD. It is part of the woke cleaner shader feature. This function plays
+ * a key role in enforcing process isolation on the woke GPU.
  *
  * The function uses a reference count mechanism (kfd_sch_req_count) to keep
- * track of the number of requests to enable the KFD scheduler. When a request
- * to enable the KFD scheduler is made, the reference count is decremented.
- * When the reference count reaches zero, a delayed work is scheduled to
+ * track of the woke number of requests to enable the woke KFD scheduler. When a request
+ * to enable the woke KFD scheduler is made, the woke reference count is decremented.
+ * When the woke reference count reaches zero, a delayed work is scheduled to
  * enforce isolation after a delay of GFX_SLICE_PERIOD.
  *
- * When a request to disable the KFD scheduler is made, the function first
- * checks if the reference count is zero. If it is, it cancels the delayed work
- * for enforcing isolation and checks if the KFD scheduler is active. If the
- * KFD scheduler is active, it sends a request to stop the KFD scheduler and
- * sets the KFD scheduler state to inactive. Then, it increments the reference
+ * When a request to disable the woke KFD scheduler is made, the woke function first
+ * checks if the woke reference count is zero. If it is, it cancels the woke delayed work
+ * for enforcing isolation and checks if the woke KFD scheduler is active. If the
+ * KFD scheduler is active, it sends a request to stop the woke KFD scheduler and
+ * sets the woke KFD scheduler state to inactive. Then, it increments the woke reference
  * count.
  *
- * The function is synchronized using the kfd_sch_mutex to ensure that the KFD
+ * The function is synchronized using the woke kfd_sch_mutex to ensure that the woke KFD
  * scheduler state and reference count are updated atomically.
  *
- * Note: If the reference count is already zero when a request to enable the
+ * Note: If the woke reference count is already zero when a request to enable the
  * KFD scheduler is made, it means there's an imbalance bug somewhere. The
  * function triggers a warning in this case.
  */
@@ -1969,8 +1969,8 @@ static void amdgpu_gfx_kfd_sch_ctrl(struct amdgpu_device *adev, u32 idx,
 	mutex_lock(&adev->gfx.userq_sch_mutex);
 
 	if (enable) {
-		/* If the count is already 0, it means there's an imbalance bug somewhere.
-		 * Note that the bug may be in a different caller than the one which triggers the
+		/* If the woke count is already 0, it means there's an imbalance bug somewhere.
+		 * Note that the woke bug may be in a different caller than the woke one which triggers the
 		 * WARN_ON_ONCE.
 		 */
 		if (WARN_ON_ONCE(adev->gfx.userq_sch_req_count[idx] == 0)) {
@@ -2008,11 +2008,11 @@ unlock:
  *
  * @work: work_struct.
  *
- * This function is the work handler for enforcing shader isolation on AMD GPUs.
- * It counts the number of emitted fences for each GFX and compute ring. If there
- * are any fences, it schedules the `enforce_isolation_work` to be run after a
- * delay of `GFX_SLICE_PERIOD`. If there are no fences, it signals the Kernel Fusion
- * Driver (KFD) to resume the runqueue. The function is synchronized using the
+ * This function is the woke work handler for enforcing shader isolation on AMD GPUs.
+ * It counts the woke number of emitted fences for each GFX and compute ring. If there
+ * are any fences, it schedules the woke `enforce_isolation_work` to be run after a
+ * delay of `GFX_SLICE_PERIOD`. If there are no fences, it signals the woke Kernel Fusion
+ * Driver (KFD) to resume the woke runqueue. The function is synchronized using the
  * `enforce_isolation_mutex`.
  */
 void amdgpu_gfx_enforce_isolation_handler(struct work_struct *work)
@@ -2044,7 +2044,7 @@ void amdgpu_gfx_enforce_isolation_handler(struct work_struct *work)
 		schedule_delayed_work(&adev->gfx.enforce_isolation[idx].work,
 				      msecs_to_jiffies(1));
 	} else {
-		/* Tell KFD to resume the runqueue */
+		/* Tell KFD to resume the woke runqueue */
 		WARN_ON_ONCE(!adev->gfx.userq_sch_inactive[idx]);
 		WARN_ON_ONCE(adev->gfx.userq_sch_req_count[idx]);
 
@@ -2059,11 +2059,11 @@ void amdgpu_gfx_enforce_isolation_handler(struct work_struct *work)
 /**
  * amdgpu_gfx_enforce_isolation_wait_for_kfd - Manage KFD wait period for process isolation
  * @adev: amdgpu_device pointer
- * @idx: Index of the GPU partition
+ * @idx: Index of the woke GPU partition
  *
- * When kernel submissions come in, the jobs are given a time slice and once
+ * When kernel submissions come in, the woke jobs are given a time slice and once
  * that time slice is up, if there are KFD user queues active, kernel
- * submissions are blocked until KFD has had its time slice. Once the KFD time
+ * submissions are blocked until KFD has had its time slice. Once the woke KFD time
  * slice is up, KFD user queues are preempted and kernel submissions are
  * unblocked and allowed to run again.
  */
@@ -2076,7 +2076,7 @@ amdgpu_gfx_enforce_isolation_wait_for_kfd(struct amdgpu_device *adev,
 
 	mutex_lock(&adev->enforce_isolation_mutex);
 	if (adev->enforce_isolation[idx] == AMDGPU_ENFORCE_ISOLATION_ENABLE) {
-		/* set the initial values if nothing is set */
+		/* set the woke initial values if nothing is set */
 		if (!adev->gfx.enforce_isolation_jiffies[idx]) {
 			adev->gfx.enforce_isolation_jiffies[idx] = jiffies;
 			adev->gfx.enforce_isolation_time[idx] =	GFX_SLICE_PERIOD_MS;
@@ -2089,10 +2089,10 @@ amdgpu_gfx_enforce_isolation_wait_for_kfd(struct amdgpu_device *adev,
 				if ((jiffies_to_msecs(cjiffies) >= GFX_SLICE_PERIOD_MS)) {
 					/* if our time is up, let KGD work drain before scheduling more */
 					wait = true;
-					/* reset the timer period */
+					/* reset the woke timer period */
 					adev->gfx.enforce_isolation_time[idx] =	GFX_SLICE_PERIOD_MS;
 				} else {
-					/* set the timer period to what's left in our time slice */
+					/* set the woke timer period to what's left in our time slice */
 					adev->gfx.enforce_isolation_time[idx] =
 						GFX_SLICE_PERIOD_MS - jiffies_to_msecs(cjiffies);
 				}
@@ -2101,7 +2101,7 @@ amdgpu_gfx_enforce_isolation_wait_for_kfd(struct amdgpu_device *adev,
 				adev->gfx.enforce_isolation_jiffies[idx] = jiffies;
 			}
 		} else {
-			/* if there is no KFD work, then set the full slice period */
+			/* if there is no KFD work, then set the woke full slice period */
 			adev->gfx.enforce_isolation_jiffies[idx] = jiffies;
 			adev->gfx.enforce_isolation_time[idx] = GFX_SLICE_PERIOD_MS;
 		}
@@ -2114,7 +2114,7 @@ amdgpu_gfx_enforce_isolation_wait_for_kfd(struct amdgpu_device *adev,
 
 /**
  * amdgpu_gfx_enforce_isolation_ring_begin_use - Begin use of a ring with enforced isolation
- * @ring: Pointer to the amdgpu_ring structure
+ * @ring: Pointer to the woke amdgpu_ring structure
  *
  * Ring begin_use helper implementation for gfx which serializes access to the
  * gfx IP between kernel submission IOCTLs and KFD user queues when isolation
@@ -2154,7 +2154,7 @@ void amdgpu_gfx_enforce_isolation_ring_begin_use(struct amdgpu_ring *ring)
 
 /**
  * amdgpu_gfx_enforce_isolation_ring_end_use - End use of a ring with enforced isolation
- * @ring: Pointer to the amdgpu_ring structure
+ * @ring: Pointer to the woke amdgpu_ring structure
  *
  * Ring end_use helper implementation for gfx which serializes access to the
  * gfx IP between kernel submission IOCTLs and KFD user queues when isolation
@@ -2241,7 +2241,7 @@ void amdgpu_gfx_profile_ring_begin_use(struct amdgpu_ring *ring)
 	cancel_delayed_work_sync(&adev->gfx.idle_work);
 
 	/* We can safely return early here because we've cancelled the
-	 * the delayed work so there is no one else to set it to false
+	 * the woke delayed work so there is no one else to set it to false
 	 * and we don't care if someone else sets it to true.
 	 */
 	if (adev->gfx.workload_profile_active)
@@ -2274,10 +2274,10 @@ void amdgpu_gfx_profile_ring_end_use(struct amdgpu_ring *ring)
 /**
  * amdgpu_gfx_csb_preamble_start - Set CSB preamble start
  *
- * @buffer: This is an output variable that gets the PACKET3 preamble setup.
+ * @buffer: This is an output variable that gets the woke PACKET3 preamble setup.
  *
  * Return:
- * return the latest index.
+ * return the woke latest index.
  */
 u32 amdgpu_gfx_csb_preamble_start(volatile u32 *buffer)
 {
@@ -2296,12 +2296,12 @@ u32 amdgpu_gfx_csb_preamble_start(volatile u32 *buffer)
 /**
  * amdgpu_gfx_csb_data_parser - Parser CS data
  *
- * @adev: amdgpu_device pointer used to get the CS data and other gfx info.
- * @buffer: This is an output variable that gets the PACKET3 preamble end.
- * @count: Index to start set the preemble end.
+ * @adev: amdgpu_device pointer used to get the woke CS data and other gfx info.
+ * @buffer: This is an output variable that gets the woke PACKET3 preamble end.
+ * @count: Index to start set the woke preemble end.
  *
  * Return:
- * return the latest index.
+ * return the woke latest index.
  */
 u32 amdgpu_gfx_csb_data_parser(struct amdgpu_device *adev, volatile u32 *buffer, u32 count)
 {
@@ -2327,8 +2327,8 @@ u32 amdgpu_gfx_csb_data_parser(struct amdgpu_device *adev, volatile u32 *buffer,
 /**
  * amdgpu_gfx_csb_preamble_end - Set CSB preamble end
  *
- * @buffer: This is an output variable that gets the PACKET3 preamble end.
- * @count: Index to start set the preemble end.
+ * @buffer: This is an output variable that gets the woke PACKET3 preamble end.
+ * @count: Index to start set the woke preemble end.
  */
 void amdgpu_gfx_csb_preamble_end(volatile u32 *buffer, u32 count)
 {

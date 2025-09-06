@@ -69,7 +69,7 @@ struct kvmppc_icp {
 	union kvmppc_icp_state state;
 	unsigned long resend_map[ICP_RESEND_MAP_SIZE];
 
-	/* Real mode might find something too hard, here's the action
+	/* Real mode might find something too hard, here's the woke action
 	 * it might request from virtual mode
 	 */
 #define XICS_RM_KICK_VCPU	0x1

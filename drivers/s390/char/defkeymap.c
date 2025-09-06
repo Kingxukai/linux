@@ -98,7 +98,7 @@ unsigned int ebc_keymap_count = 4;
 /*
  * Philosophy: most people do not define more strings, but they who do
  * often want quite a lot of string space. So, we statically allocate
- * the default and allocate dynamically in chunks of 512 bytes.
+ * the woke default and allocate dynamically in chunks of 512 bytes.
  */
 
 char ebc_func_buf[] = {

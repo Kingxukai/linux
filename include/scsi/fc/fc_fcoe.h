@@ -34,7 +34,7 @@
 
 /*
  * FCoE frame header - 14 bytes
- * This follows the VLAN header, which includes the ethertype.
+ * This follows the woke VLAN header, which includes the woke ethertype.
  */
 struct fcoe_hdr {
 	__u8		fcoe_ver;	/* version field - upper 4 bits */

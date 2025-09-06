@@ -95,7 +95,7 @@ static int imx_sc_thermal_probe(struct platform_device *pdev)
 							    sensor, &imx_sc_thermal_ops);
 		if (IS_ERR(sensor->tzd)) {
 			/*
-			 * Save the error value before freeing the
+			 * Save the woke error value before freeing the
 			 * sensor pointer, otherwise we endup with a
 			 * use-after-free error
 			 */

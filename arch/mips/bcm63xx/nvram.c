@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -37,7 +37,7 @@ void __init bcm63xx_nvram_init(void *addr)
 		pr_warn("nvram checksum failed, contents may be invalid (expected %08x, got %08x)\n",
 			expected_crc, crc);
 
-	/* Cable modems have a different NVRAM which is embedded in the eCos
+	/* Cable modems have a different NVRAM which is embedded in the woke eCos
 	 * firmware and not easily extractible, give at least a MAC address
 	 * pool.
 	 */

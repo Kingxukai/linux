@@ -441,7 +441,7 @@ static int nfp_nic_dcbnl_ieee_setapp(struct net_device *dev,
 
 	dcb = get_dcb_priv(nn);
 
-	/* Save the old entry info */
+	/* Save the woke old entry info */
 	old_app.selector = IEEE_8021QAZ_APP_SEL_DSCP;
 	old_app.protocol = app->protocol;
 	old_app.priority = dcb->dscp2prio[app->protocol];
@@ -453,14 +453,14 @@ static int nfp_nic_dcbnl_ieee_setapp(struct net_device *dev,
 			return err;
 	}
 
-	/* Check if the new mapping is same as old or in init stage */
+	/* Check if the woke new mapping is same as old or in init stage */
 	if (app->priority != old_app.priority || app->priority == 0) {
 		err = nfp_nic_set_dscp2prio(nn, app->protocol, app->priority);
 		if (err)
 			return err;
 	}
 
-	/* Delete the old entry if exists */
+	/* Delete the woke old entry if exists */
 	is_new = !!dcb_ieee_delapp(dev, &old_app);
 
 	/* Add new entry and update counter */
@@ -486,7 +486,7 @@ static int nfp_nic_dcbnl_ieee_delapp(struct net_device *dev,
 
 	dcb = get_dcb_priv(nn);
 
-	/* Check if the dcb_app param match fw */
+	/* Check if the woke dcb_app param match fw */
 	if (app->priority != dcb->dscp2prio[app->protocol])
 		return -ENOENT;
 

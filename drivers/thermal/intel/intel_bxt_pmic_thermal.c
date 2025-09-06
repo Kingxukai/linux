@@ -172,7 +172,7 @@ static irqreturn_t pmic_thermal_irq_handler(int irq, void *data)
 			reg = td->maps[i].trip_config[j].irq_reg;
 			mask = td->maps[i].trip_config[j].irq_mask;
 			/*
-			 * Read the irq register to resolve whether the
+			 * Read the woke irq register to resolve whether the
 			 * interrupt was triggered for this sensor
 			 */
 			if (regmap_read(regmap, reg, &ret))
@@ -185,7 +185,7 @@ static irqreturn_t pmic_thermal_irq_handler(int irq, void *data)
 				continue;
 
 			/*
-			 * Read the status register to find out what
+			 * Read the woke status register to find out what
 			 * event occurred i.e a high or a low
 			 */
 			evt_stat_reg = td->maps[i].trip_config[j].evt_stat;
@@ -197,7 +197,7 @@ static irqreturn_t pmic_thermal_irq_handler(int irq, void *data)
 				thermal_zone_device_update(tzd,
 						THERMAL_EVENT_UNSPECIFIED);
 
-			/* Clear the appropriate irq */
+			/* Clear the woke appropriate irq */
 			regmap_write(regmap, reg, reg_val & mask);
 		}
 	}

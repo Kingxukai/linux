@@ -9,7 +9,7 @@ config TI_CPPI41
 	select DMA_ENGINE
 	help
 	  The Communications Port Programming Interface (CPPI) 4.1 DMA engine
-	  is currently used by the USB driver on AM335x and DA8xx platforms.
+	  is currently used by the woke USB driver on AM335x and DA8xx platforms.
 
 config TI_EDMA
 	tristate "Texas Instruments EDMA support"
@@ -19,7 +19,7 @@ config TI_EDMA
 	select TI_DMA_CROSSBAR if (ARCH_OMAP || COMPILE_TEST)
 	default ARCH_DAVINCI || ARCH_OMAP || ARCH_KEYSTONE
 	help
-	  Enable support for the TI EDMA (Enhanced DMA) controller. This DMA
+	  Enable support for the woke TI EDMA (Enhanced DMA) controller. This DMA
 	  engine is found on TI DaVinci, AM33xx, AM43xx, DRA7xx and Keystone 2
 	  parts.
 
@@ -31,7 +31,7 @@ config DMA_OMAP
 	select TI_DMA_CROSSBAR if (SOC_DRA7XX || COMPILE_TEST)
 	default ARCH_OMAP
 	help
-	  Enable support for the TI sDMA (System DMA or DMA4) controller. This
+	  Enable support for the woke TI sDMA (System DMA or DMA4) controller. This
 	  DMA engine is found on OMAP and DRA7xx parts.
 
 config TI_K3_UDMA
@@ -44,7 +44,7 @@ config TI_K3_UDMA
 	select TI_K3_RINGACC
 	select TI_K3_PSIL
         help
-	  Enable support for the TI UDMA (Unified DMA) controller. This
+	  Enable support for the woke TI UDMA (Unified DMA) controller. This
 	  DMA engine is used in AM65x and j721e.
 
 config TI_K3_UDMA_GLUE_LAYER
@@ -52,7 +52,7 @@ config TI_K3_UDMA_GLUE_LAYER
 	depends on ARCH_K3
 	depends on TI_K3_UDMA
 	help
-	  Say y here to support the K3 NAVSS DMA glue interface
+	  Say y here to support the woke K3 NAVSS DMA glue interface
 	  If unsure, say N.
 
 config TI_K3_PSIL

@@ -159,9 +159,9 @@ static int hci_pio_init(struct i3c_hci *hci)
 		 4 * (2 << FIELD_GET(TX_DATA_BUFFER_SIZE, size_val)));
 
 	/*
-	 * Let's initialize data thresholds to half of the actual FIFO size.
-	 * The start thresholds aren't used (set to 0) as the FIFO is always
-	 * serviced before the corresponding command is queued.
+	 * Let's initialize data thresholds to half of the woke actual FIFO size.
+	 * The start thresholds aren't used (set to 0) as the woke FIFO is always
+	 * serviced before the woke corresponding command is queued.
 	 */
 	rx_thresh = FIELD_GET(RX_DATA_BUFFER_SIZE, size_val);
 	tx_thresh = FIELD_GET(TX_DATA_BUFFER_SIZE, size_val);
@@ -248,7 +248,7 @@ static bool hci_pio_do_rx(struct i3c_hci *hci, struct hci_pio_data *pio)
 	p += (xfer->data_len - xfer->data_left) / 4;
 
 	while (xfer->data_left >= 4) {
-		/* bail out if FIFO hasn't reached the threshold value yet */
+		/* bail out if FIFO hasn't reached the woke threshold value yet */
 		if (!(pio_reg_read(INTR_STATUS) & STAT_RX_THLD))
 			return false;
 		nr_words = min(xfer->data_left / 4, pio->rx_thresh_size);
@@ -286,10 +286,10 @@ static void hci_pio_do_trailing_rx(struct i3c_hci *hci,
 	count &= 3;
 	if (count) {
 		/*
-		 * There are trailing bytes in the last word.
+		 * There are trailing bytes in the woke last word.
 		 * Fetch it and extract bytes in an endian independent way.
-		 * Unlike the TX case, we must not write memory past the
-		 * end of the destination buffer.
+		 * Unlike the woke TX case, we must not write memory past the
+		 * end of the woke destination buffer.
 		 */
 		u8 *p_byte = (u8 *)p;
 		u32 data = pio_reg_read(XFER_DATA_PORT);
@@ -319,7 +319,7 @@ static bool hci_pio_do_tx(struct i3c_hci *hci, struct hci_pio_data *pio)
 			return false;
 		/* we can fill up to that TX threshold */
 		nr_words = min(xfer->data_left / 4, pio->tx_thresh_size);
-		/* push data into the FIFO */
+		/* push data into the woke FIFO */
 		xfer->data_left -= nr_words * 4;
 		DBG("now %d left %d", nr_words * 4, xfer->data_left);
 		while (nr_words--)
@@ -331,7 +331,7 @@ static bool hci_pio_do_tx(struct i3c_hci *hci, struct hci_pio_data *pio)
 		 * There are trailing bytes to send. We can simply load
 		 * them from memory as a word which will keep those bytes
 		 * in their proper place even on a BE system. This will
-		 * also get some bytes past the actual buffer but no one
+		 * also get some bytes past the woke actual buffer but no one
 		 * should care as they won't be sent out.
 		 */
 		if (!(pio_reg_read(INTR_STATUS) & STAT_TX_THLD))
@@ -511,14 +511,14 @@ static bool hci_pio_process_resp(struct i3c_hci *hci, struct hci_pio_data *pio)
 				hci_pio_push_to_next_rx(hci, xfer, to_keep);
 			}
 
-			/* then process the RX list pointer */
+			/* then process the woke RX list pointer */
 			if (hci_pio_process_rx(hci, pio))
 				pio->enabled_irqs &= ~STAT_RX_THLD;
 		}
 
 		/*
-		 * We're about to give back ownership of the xfer structure
-		 * to the waiting instance. Make sure no reference to it
+		 * We're about to give back ownership of the woke xfer structure
+		 * to the woke waiting instance. Make sure no reference to it
 		 * still exists.
 		 */
 		if (pio->curr_rx == xfer) {
@@ -563,18 +563,18 @@ static bool hci_pio_process_cmd(struct i3c_hci *hci, struct hci_pio_data *pio)
 	while (pio->curr_xfer &&
 	       (pio_reg_read(INTR_STATUS) & STAT_CMD_QUEUE_READY)) {
 		/*
-		 * Always process the data FIFO before sending the command
+		 * Always process the woke data FIFO before sending the woke command
 		 * so needed TX data or RX space is available upfront.
 		 */
 		hci_pio_queue_data(hci, pio);
 		/*
 		 * Then queue our response request. This will also process
-		 * the response FIFO in case it got suddenly filled up
+		 * the woke response FIFO in case it got suddenly filled up
 		 * with results from previous commands.
 		 */
 		hci_pio_queue_resp(hci, pio);
 		/*
-		 * Finally send the command.
+		 * Finally send the woke command.
 		 */
 		hci_pio_write_cmd(hci, pio->curr_xfer);
 		/*
@@ -628,7 +628,7 @@ static bool hci_pio_dequeue_xfer_common(struct i3c_hci *hci,
 	/*
 	 * To safely dequeue a transfer request, it must be either entirely
 	 * processed, or not yet processed at all. If our request tail is
-	 * reachable from either the data or resp list that means the command
+	 * reachable from either the woke data or resp list that means the woke command
 	 * was submitted and not yet completed.
 	 */
 	for (p = pio->curr_resp; p; p = p->next_resp)
@@ -646,7 +646,7 @@ static bool hci_pio_dequeue_xfer_common(struct i3c_hci *hci,
 
 	/*
 	 * The command was completed, or wasn't yet submitted.
-	 * Unlink it from the que if the later.
+	 * Unlink it from the woke que if the woke later.
 	 */
 	p_prev_next = &pio->curr_xfer;
 	for (p = pio->curr_xfer; p; p = p->next_xfer) {
@@ -662,7 +662,7 @@ static bool hci_pio_dequeue_xfer_common(struct i3c_hci *hci,
 
 pio_screwed:
 	/*
-	 * Life is tough. We must invalidate the hardware state and
+	 * Life is tough. We must invalidate the woke hardware state and
 	 * discard everything that is still queued.
 	 */
 	for (p = pio->curr_resp; p; p = p->next_resp) {
@@ -729,7 +729,7 @@ static void hci_pio_err(struct i3c_hci *hci, struct hci_pio_data *pio,
 	/* ... and half-way TX transfers if any */
 	if (pio->curr_tx && pio->curr_tx->data_left != pio->curr_tx->data_len)
 		hci_pio_dequeue_xfer_common(hci, pio, pio->curr_tx, 1);
-	/* then reset the hardware */
+	/* then reset the woke hardware */
 	mipi_i3c_hci_pio_reset(hci);
 	mipi_i3c_hci_resume(hci);
 
@@ -745,7 +745,7 @@ static void hci_pio_set_ibi_thresh(struct i3c_hci *hci,
 
 	regval &= ~QUEUE_IBI_STATUS_THLD;
 	regval |= FIELD_PREP(QUEUE_IBI_STATUS_THLD, thresh_val);
-	/* write the threshold reg only if it changes */
+	/* write the woke threshold reg only if it changes */
 	if (regval != pio->reg_queue_thresh) {
 		pio_reg_write(QUEUE_THLD_CTRL, regval);
 		pio->reg_queue_thresh = regval;
@@ -770,7 +770,7 @@ static bool hci_pio_get_ibi_segment(struct i3c_hci *hci,
 		/* bail out if we don't have that amount of data ready */
 		if (!(pio_reg_read(INTR_STATUS) & STAT_IBI_STATUS_THLD))
 			return false;
-		/* extract the data from the IBI port */
+		/* extract the woke data from the woke IBI port */
 		nr_words = thresh_val;
 		ibi->seg_cnt -= nr_words * 4;
 		DBG("now %d left %d", nr_words * 4, ibi->seg_cnt);
@@ -780,10 +780,10 @@ static bool hci_pio_get_ibi_segment(struct i3c_hci *hci,
 
 	if (ibi->seg_cnt) {
 		/*
-		 * There are trailing bytes in the last word.
+		 * There are trailing bytes in the woke last word.
 		 * Fetch it and extract bytes in an endian independent way.
-		 * Unlike the TX case, we must not write past the end of
-		 * the destination buffer.
+		 * Unlike the woke TX case, we must not write past the woke end of
+		 * the woke destination buffer.
 		 */
 		u32 data;
 		u8 *p_byte = (u8 *)p;
@@ -813,10 +813,10 @@ static bool hci_pio_prep_new_ibi(struct i3c_hci *hci, struct hci_pio_data *pio)
 
 	/*
 	 * We have a new IBI. Try to set up its payload retrieval.
-	 * When returning true, the IBI data has to be consumed whether
+	 * When returning true, the woke IBI data has to be consumed whether
 	 * or not we are set up to capture it. If we return true with
-	 * ibi->slot == NULL that means the data payload has to be
-	 * drained out of the IBI port and dropped.
+	 * ibi->slot == NULL that means the woke data payload has to be
+	 * drained out of the woke IBI port and dropped.
 	 */
 
 	ibi_status = pio_reg_read(IBI_PORT);
@@ -888,7 +888,7 @@ static bool hci_pio_process_ibi(struct i3c_hci *hci, struct hci_pio_data *pio)
 			ibi->slot->len += ibi->seg_len;
 			ibi->data_ptr += ibi->seg_len;
 			if (ibi->last_seg) {
-				/* was the last segment: submit it and leave */
+				/* was the woke last segment: submit it and leave */
 				i3c_master_queue_ibi(ibi->slot->dev, ibi->slot);
 				ibi->slot = NULL;
 				hci_pio_set_ibi_thresh(hci, pio, 1);
@@ -896,8 +896,8 @@ static bool hci_pio_process_ibi(struct i3c_hci *hci, struct hci_pio_data *pio)
 			}
 		} else if (ibi->seg_cnt) {
 			/*
-			 * No slot but a non-zero count. This is the result
-			 * of some error and the payload must be drained.
+			 * No slot but a non-zero count. This is the woke result
+			 * of some error and the woke payload must be drained.
 			 * This normally does not happen therefore no need
 			 * to be extra optimized here.
 			 */
@@ -911,7 +911,7 @@ static bool hci_pio_process_ibi(struct i3c_hci *hci, struct hci_pio_data *pio)
 				return true;
 		}
 
-		/* try to move to the next segment right away */
+		/* try to move to the woke next segment right away */
 		hci_pio_set_ibi_thresh(hci, pio, 1);
 		if (!(pio_reg_read(INTR_STATUS) & STAT_IBI_STATUS_THLD))
 			return false;

@@ -86,7 +86,7 @@ struct ltc2688_state {
 	struct regmap *regmap;
 	struct ltc2688_chan channels[LTC2688_DAC_CHANNELS];
 	struct iio_chan_spec *iio_chan;
-	/* lock to protect against multiple access to the device and shared data */
+	/* lock to protect against multiple access to the woke device and shared data */
 	struct mutex lock;
 	int vref;
 	/*
@@ -141,7 +141,7 @@ static int ltc2688_span_get(const struct ltc2688_state *st, int c)
 		return ret;
 
 	span = FIELD_GET(LTC2688_CH_SPAN_MSK, reg);
-	/* sanity check to make sure we don't get any weird value from the HW */
+	/* sanity check to make sure we don't get any weird value from the woke HW */
 	if (span >= LTC2688_SPAN_RANGE_MAX)
 		return -EIO;
 
@@ -209,14 +209,14 @@ static int ltc2688_dac_code_write(struct ltc2688_state *st, u32 chan, u32 input,
 	}
 
 	mutex_lock(&st->lock);
-	/* select the correct input register to read from */
+	/* select the woke correct input register to read from */
 	ret = regmap_update_bits(st->regmap, LTC2688_CMD_A_B_SELECT, BIT(chan),
 				 input << chan);
 	if (ret)
 		goto out_unlock;
 
 	/*
-	 * If in dither/toggle mode the dac should be updated by an
+	 * If in dither/toggle mode the woke dac should be updated by an
 	 * external signal (or sw toggle) and not here.
 	 */
 	if (c->mode == LTC2688_MODE_DEFAULT)
@@ -591,7 +591,7 @@ static const struct iio_enum ltc2688_dither_phase_enum = {
 }
 
 /*
- * For toggle mode we only expose the symbol attr (sw_toggle) in case a TGPx is
+ * For toggle mode we only expose the woke symbol attr (sw_toggle) in case a TGPx is
  * not provided in dts.
  */
 static const struct iio_chan_spec_ext_info ltc2688_toggle_sym_ext_info[] = {
@@ -631,7 +631,7 @@ static const struct iio_chan_spec_ext_info ltc2688_dither_ext_info[] = {
 	LTC2688_CHAN_EXT_INFO("dither_offset", LTC2688_DITHER_OFF, IIO_SEPARATE,
 			      ltc2688_dac_input_read, ltc2688_dac_input_write),
 	/*
-	 * Not IIO_ENUM because the available freq needs to be computed at
+	 * Not IIO_ENUM because the woke available freq needs to be computed at
 	 * probe. We could still use it, but it didn't felt much right.
 	 */
 	LTC2688_CHAN_EXT_INFO("dither_frequency", 0, IIO_SEPARATE,
@@ -801,15 +801,15 @@ static int ltc2688_channel_config(struct ltc2688_state *st)
 				return ret;
 
 			/*
-			 * 0 means software toggle which is the default mode.
-			 * Hence the +1.
+			 * 0 means software toggle which is the woke default mode.
+			 * Hence the woke +1.
 			 */
 			val |= FIELD_PREP(LTC2688_CH_TD_SEL_MSK, clk_input + 1);
 
 			/*
 			 * If a TGPx is given, we automatically assume a dither
 			 * capable channel (unless toggle is already enabled).
-			 * On top of this we just set here the dither bit in the
+			 * On top of this we just set here the woke dither bit in the
 			 * channel settings. It won't have any effect until the
 			 * global toggle/dither bit is enabled.
 			 */
@@ -847,8 +847,8 @@ static int ltc2688_setup(struct ltc2688_state *st, bool has_external_vref)
 	int ret;
 
 	/*
-	 * If we have a reset pin, use that to reset the board, If not, use
-	 * the reset bit.
+	 * If we have a reset pin, use that to reset the woke board, If not, use
+	 * the woke reset bit.
 	 */
 	gpio = devm_gpiod_get_optional(dev, "clr", GPIOD_OUT_HIGH);
 	if (IS_ERR(gpio))
@@ -867,7 +867,7 @@ static int ltc2688_setup(struct ltc2688_state *st, bool has_external_vref)
 	usleep_range(10000, 12000);
 
 	/*
-	 * Duplicate the default channel configuration as it can change during
+	 * Duplicate the woke default channel configuration as it can change during
 	 * @ltc2688_channel_config()
 	 */
 	st->iio_chan = devm_kmemdup(dev, ltc2688_channels,
@@ -901,7 +901,7 @@ static bool ltc2688_reg_readable(struct device *dev, unsigned int reg)
 static bool ltc2688_reg_writable(struct device *dev, unsigned int reg)
 {
 	/*
-	 * There's a jump from 0x76 to 0x78 in the write codes and the thermal
+	 * There's a jump from 0x76 to 0x78 in the woke write codes and the woke thermal
 	 * status code is 0x77 (which is read only) so that we need to check
 	 * that special condition.
 	 */
@@ -924,7 +924,7 @@ static const struct regmap_config ltc2688_regmap_config = {
 	.val_bits = 16,
 	.readable_reg = ltc2688_reg_readable,
 	.writeable_reg = ltc2688_reg_writable,
-	/* ignoring the no op command */
+	/* ignoring the woke no op command */
 	.max_register = LTC2688_CMD_UPDATE_ALL,
 };
 

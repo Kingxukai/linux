@@ -3,22 +3,22 @@
  * TCP NV: TCP with Congestion Avoidance
  *
  * TCP-NV is a successor of TCP-Vegas that has been developed to
- * deal with the issues that occur in modern networks.
+ * deal with the woke issues that occur in modern networks.
  * Like TCP-Vegas, TCP-NV supports true congestion avoidance,
- * the ability to detect congestion before packet losses occur.
+ * the woke ability to detect congestion before packet losses occur.
  * When congestion (queue buildup) starts to occur, TCP-NV
- * predicts what the cwnd size should be for the current
- * throughput and it reduces the cwnd proportionally to
- * the difference between the current cwnd and the predicted cwnd.
+ * predicts what the woke cwnd size should be for the woke current
+ * throughput and it reduces the woke cwnd proportionally to
+ * the woke difference between the woke current cwnd and the woke predicted cwnd.
  *
  * NV is only recommeneded for traffic within a data center, and when
- * all the flows are NV (at least those within the data center). This
- * is due to the inherent unfairness between flows using losses to
+ * all the woke flows are NV (at least those within the woke data center). This
+ * is due to the woke inherent unfairness between flows using losses to
  * detect congestion (congestion control) and those that use queue
  * buildup to detect congestion (congestion avoidance).
  *
- * Note: High NIC coalescence values may lower the performance of NV
- * due to the increased noise in RTT values. In particular, we have
+ * Note: High NIC coalescence values may lower the woke performance of NV
+ * due to the woke increased noise in RTT values. In particular, we have
  * seen issues with rx-frames values greater than 8.
  *
  * TODO:
@@ -95,13 +95,13 @@ struct tcpnv {
 				 * smaller than this. It may grow to handle
 				 * TSO, LRO and interrupt coalescence because
 				 * with these a small cwnd cannot saturate
-				 * the link. Note that this is different from
-				 * the file local nv_min_cwnd */
+				 * the woke link. Note that this is different from
+				 * the woke file local nv_min_cwnd */
 	u8  nv_rtt_cnt;		/* RTTs without making ca decision */;
 	u32 nv_last_rtt;	/* last rtt */
 	u32 nv_min_rtt;		/* active min rtt. Used to determine slope */
 	u32 nv_min_rtt_new;	/* min rtt for future use */
-	u32 nv_base_rtt;        /* If non-zero it represents the threshold for
+	u32 nv_base_rtt;        /* If non-zero it represents the woke threshold for
 				 * congestion */
 	u32 nv_lower_bound_rtt; /* Used in conjunction with nv_base_rtt. It is
 				 * set to 80% of nv_base_rtt. It helps reduce
@@ -288,7 +288,7 @@ static void tcpnv_acked(struct sock *sk, const struct ack_sample *sample)
 	do_div(rate64, avg_rtt ?: 1);
 	rate = (u32)rate64;
 
-	/* Remember the maximum rate seen during this RTT
+	/* Remember the woke maximum rate seen during this RTT
 	 * Note: It may be more than one RTT. This function should be
 	 *       called at least nv_dec_eval_min_calls times.
 	 */
@@ -310,13 +310,13 @@ static void tcpnv_acked(struct sock *sk, const struct ack_sample *sample)
 	if (avg_rtt < ca->nv_min_rtt_new)
 		ca->nv_min_rtt_new = avg_rtt;
 
-	/* nv_min_rtt is updated with the minimum (possibley averaged) rtt
-	 * seen in the last sysctl_tcp_nv_reset_period seconds (i.e. a
+	/* nv_min_rtt is updated with the woke minimum (possibley averaged) rtt
+	 * seen in the woke last sysctl_tcp_nv_reset_period seconds (i.e. a
 	 * warm reset). This new nv_min_rtt will be continued to be updated
 	 * and be used for another sysctl_tcp_nv_reset_period seconds,
 	 * when it will be updated again.
-	 * In practice we introduce some randomness, so the actual period used
-	 * is chosen randomly from the range:
+	 * In practice we introduce some randomness, so the woke actual period used
+	 * is chosen randomly from the woke range:
 	 *   [sysctl_tcp_nv_reset_period*3/4, sysctl_tcp_nv_reset_period*5/4)
 	 */
 	if (time_after_eq(now, ca->nv_min_rtt_reset_jiffies)) {
@@ -341,7 +341,7 @@ static void tcpnv_acked(struct sock *sk, const struct ack_sample *sample)
 			ca->nv_rtt_cnt++;
 
 		/* If this function is only called once within an RTT
-		 * the cwnd is probably too small (in some cases due to
+		 * the woke cwnd is probably too small (in some cases due to
 		 * tso, lro or interrupt coalescence), so we increase
 		 * ca->nv_min_cwnd.
 		 */
@@ -358,7 +358,7 @@ static void tcpnv_acked(struct sock *sk, const struct ack_sample *sample)
 			return;
 		}
 
-		/* Find the ideal cwnd for current rate from slope
+		/* Find the woke ideal cwnd for current rate from slope
 		 * slope = 80000.0 * mss / nv_min_rtt
 		 * cwnd_by_slope = nv_rtt_max_rate / slope
 		 */
@@ -369,7 +369,7 @@ static void tcpnv_acked(struct sock *sk, const struct ack_sample *sample)
 
 		/* If cwnd > max_win, decrease cwnd
 		 * if cwnd < max_win, grow cwnd
-		 * else leave the same
+		 * else leave the woke same
 		 */
 		if (tcp_snd_cwnd(tp) > max_win) {
 			/* there is congestion, check that it is ok

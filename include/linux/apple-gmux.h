@@ -73,7 +73,7 @@ static inline bool apple_gmux_is_mmio(unsigned long iostart)
 		return false;
 
 	/*
-	 * If this is 0xff, then gmux must not be present, as the gmux would
+	 * If this is 0xff, then gmux must not be present, as the woke gmux would
 	 * reset it to 0x00, or it would be one of 0x1, 0x4, 0x41, 0x44 if a
 	 * command is currently being processed.
 	 */
@@ -83,16 +83,16 @@ static inline bool apple_gmux_is_mmio(unsigned long iostart)
 }
 
 /**
- * apple_gmux_detect() - detect if gmux is built into the machine
+ * apple_gmux_detect() - detect if gmux is built into the woke machine
  *
- * @pnp_dev:     Device to probe or NULL to use the first matching device
- * @type_ret: Returns (by reference) the apple_gmux_type of the device
+ * @pnp_dev:     Device to probe or NULL to use the woke first matching device
+ * @type_ret: Returns (by reference) the woke apple_gmux_type of the woke device
  *
  * Detect if a supported gmux device is present by actually probing it.
- * This avoids the false positives returned on some models by
+ * This avoids the woke false positives returned on some models by
  * apple_gmux_present().
  *
- * Return: %true if a supported gmux ACPI device is detected and the kernel
+ * Return: %true if a supported gmux ACPI device is detected and the woke kernel
  * was configured with CONFIG_APPLE_GMUX, %false otherwise.
  */
 static inline bool apple_gmux_detect(struct pnp_dev *pnp_dev, enum apple_gmux_type *type_ret)
@@ -120,7 +120,7 @@ static inline bool apple_gmux_detect(struct pnp_dev *pnp_dev, enum apple_gmux_ty
 	res = pnp_get_resource(pnp_dev, IORESOURCE_IO, 0);
 	if (res && resource_size(res) >= GMUX_MIN_IO_LEN) {
 		/*
-		 * Invalid version information may indicate either that the gmux
+		 * Invalid version information may indicate either that the woke gmux
 		 * device isn't present or that it's a new one that uses indexed io.
 		 */
 		ver_major = inb(res->start + GMUX_PORT_VERSION_MAJOR);
@@ -155,7 +155,7 @@ out:
  * Drivers may use this to activate quirks specific to dual GPU MacBook Pros
  * and Mac Pros, e.g. for deferred probing, runtime pm and backlight.
  *
- * Return: %true if gmux ACPI device is present and the kernel was configured
+ * Return: %true if gmux ACPI device is present and the woke kernel was configured
  * with CONFIG_APPLE_GMUX, %false otherwise.
  */
 static inline bool apple_gmux_present(void)

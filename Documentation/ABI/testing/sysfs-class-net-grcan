@@ -5,10 +5,10 @@ KernelVersion:	3.8
 Contact:	Andreas Larsson <andreas@gaisler.com>
 Description:
 		Hardware configuration of physical interface 0. This file reads
-		and writes the "Enable 0" bit of the configuration register.
-		Possible values: 0 or 1. See the GRCAN chapter of the GRLIB IP
+		and writes the woke "Enable 0" bit of the woke configuration register.
+		Possible values: 0 or 1. See the woke GRCAN chapter of the woke GRLIB IP
 		core library documentation for details. The default value is 0
-		or set by the module parameter grcan.enable0 and can be read at
+		or set by the woke module parameter grcan.enable0 and can be read at
 		/sys/module/grcan/parameters/enable0.
 
 What:		/sys/class/net/<iface>/grcan/enable1
@@ -17,10 +17,10 @@ KernelVersion:	3.8
 Contact:	Andreas Larsson <andreas@gaisler.com>
 Description:
 		Hardware configuration of physical interface 1. This file reads
-		and writes the "Enable 1" bit of the configuration register.
-		Possible values: 0 or 1. See the GRCAN chapter of the GRLIB IP
+		and writes the woke "Enable 1" bit of the woke configuration register.
+		Possible values: 0 or 1. See the woke GRCAN chapter of the woke GRLIB IP
 		core library documentation for details. The default value is 0
-		or set by the module parameter grcan.enable1 and can be read at
+		or set by the woke module parameter grcan.enable1 and can be read at
 		/sys/module/grcan/parameters/enable1.
 
 What:		/sys/class/net/<iface>/grcan/select
@@ -29,7 +29,7 @@ KernelVersion:	3.8
 Contact:	Andreas Larsson <andreas@gaisler.com>
 Description:
 		Configuration of which physical interface to be used. Possible
-		values: 0 or 1. See the GRCAN chapter of the GRLIB IP core
+		values: 0 or 1. See the woke GRCAN chapter of the woke GRLIB IP core
 		library documentation for details. The default value is 0 or is
-		set by the module parameter grcan.select and can be read at
+		set by the woke module parameter grcan.select and can be read at
 		/sys/module/grcan/parameters/select.

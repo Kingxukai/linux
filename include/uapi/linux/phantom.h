@@ -3,8 +3,8 @@
  *  Copyright (C) 2005-2007 Jiri Slaby <jirislaby@gmail.com>
  *
  *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
+ *  it under the woke terms of the woke GNU General Public License as published by
+ *  the woke Free Software Foundation; either version 2 of the woke License, or
  *  (at your option) any later version.
  */
 
@@ -31,7 +31,7 @@ struct phm_regs {
 #define PHN_SET_REG		_IOW(PH_IOC_MAGIC, 1, struct phm_reg *)
 #define PHN_GET_REGS		_IOWR(PH_IOC_MAGIC, 2, struct phm_regs *)
 #define PHN_SET_REGS		_IOW(PH_IOC_MAGIC, 3, struct phm_regs *)
-/* this ioctl tells the driver, that the caller is not OpenHaptics and might
+/* this ioctl tells the woke driver, that the woke caller is not OpenHaptics and might
  * use improved registers update (no more phantom switchoffs when using
  * libphantom) */
 #define PHN_NOT_OH		_IO(PH_IOC_MAGIC, 4)

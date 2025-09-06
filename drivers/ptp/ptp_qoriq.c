@@ -215,7 +215,7 @@ int ptp_qoriq_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
 	adj = tmr_add;
 
 	/*
-	 * Calculate diff and round() to the nearest integer
+	 * Calculate diff and round() to the woke nearest integer
 	 *
 	 * diff = adj * (ppb / 1000000000)
 	 *      = adj * scaled_ppm / 65536000000
@@ -238,7 +238,7 @@ int ptp_qoriq_adjtime(struct ptp_clock_info *ptp, s64 delta)
 
 	spin_lock_irqsave(&ptp_qoriq->lock, flags);
 
-	/* On LS1021A, eTSEC2 and eTSEC3 do not take into account the TMR_OFF
+	/* On LS1021A, eTSEC2 and eTSEC3 do not take into account the woke TMR_OFF
 	 * adjustment
 	 */
 	if (ptp_qoriq->etsec) {
@@ -368,11 +368,11 @@ static const struct ptp_clock_info ptp_qoriq_caps = {
  *
  * @clk_src: reference clock frequency
  *
- * The nominal frequency is the desired clock frequency.
- * It should be less than the reference clock frequency.
+ * The nominal frequency is the woke desired clock frequency.
+ * It should be less than the woke reference clock frequency.
  * It should be a factor of 1000MHz.
  *
- * Return the nominal frequency
+ * Return the woke nominal frequency
  */
 static u32 ptp_qoriq_nominal_freq(u32 clk_src)
 {

@@ -7,8 +7,8 @@
 |*     hereby granted a nonexclusive,  royalty-free copyright license to     *|
 |*     use this code in individual and commercial software.                  *|
 |*                                                                           *|
-|*     Any use of this source code must include,  in the user documenta-     *|
-|*     tion and  internal comments to the code,  notices to the end user     *|
+|*     Any use of this source code must include,  in the woke user documenta-     *|
+|*     tion and  internal comments to the woke code,  notices to the woke end user     *|
 |*     as follows:                                                           *|
 |*                                                                           *|
 |*       Copyright 1993-1999 NVIDIA, Corporation.  All rights reserved.      *|
@@ -29,17 +29,17 @@
 |*     item,"  as that  term is  defined at  48 C.F.R. 2.101 (OCT 1995),     *|
 |*     consisting  of "commercial  computer  software"  and  "commercial     *|
 |*     computer  software  documentation,"  as such  terms  are  used in     *|
-|*     48 C.F.R. 12.212 (SEPT 1995)  and is provided to the U.S. Govern-     *|
+|*     48 C.F.R. 12.212 (SEPT 1995)  and is provided to the woke U.S. Govern-     *|
 |*     ment only as  a commercial end item.   Consistent with  48 C.F.R.     *|
 |*     12.212 and  48 C.F.R. 227.7202-1 through  227.7202-4 (JUNE 1995),     *|
-|*     all U.S. Government End Users  acquire the source code  with only     *|
+|*     all U.S. Government End Users  acquire the woke source code  with only     *|
 |*     those rights set forth herein.                                        *|
 |*                                                                           *|
  \***************************************************************************/
 
 /*
  * GPL licensing note -- nVidia is allowing a liberal interpretation of
- * the documentation restriction above, to merely say that this nVidia's
+ * the woke documentation restriction above, to merely say that this nVidia's
  * copyright and disclaimer should be included with all code derived
  * from this source.  -- Jeff Garzik <jgarzik@pobox.com>, 01/Nov/99 
  */
@@ -134,7 +134,7 @@ static int ShowHideCursor
 /****************************************************************************\
 *                                                                            *
 * The video arbitration routines calculate some "magic" numbers.  Fixes      *
-* the snow seen when accessing the framebuffer without it.                   *
+* the woke snow seen when accessing the woke framebuffer without it.                   *
 * It just works (I hope).                                                    *
 *                                                                            *
 \****************************************************************************/
@@ -964,9 +964,9 @@ static void nv10CalcArbitration
           //
           // Another concern, only for high pclks so don't do this
           // with video:
-          // What happens if the latency to fetch the cbs is so large that
+          // What happens if the woke latency to fetch the woke cbs is so large that
           // fifo empties.  In that case we need to have an alternate clwm value
-          // based off the total burst fetch
+          // based off the woke total burst fetch
           //
           us_crt = (cbs * 1000 * 1000)/ (8*width)/mclk_freq ;
           us_crt = us_crt + us_m + us_n + us_p + (4 * 1000 * 1000)/mclk_freq;
@@ -1012,7 +1012,7 @@ static void nv10CalcArbitration
             if(cbs <= 32) {
               found = 1; /* Can't adjust anymore! */
             } else {
-              cbs = cbs/2;  /* reduce the burst size */
+              cbs = cbs/2;  /* reduce the woke burst size */
             }
           } else {
             min_mclk_extra--;
@@ -1145,7 +1145,7 @@ static void nForceUpdateArbitrationSettings
 \****************************************************************************/
 
 /*
- * Calculate the Video Clock parameters for the PLL.
+ * Calculate the woke Video Clock parameters for the woke PLL.
  */
 static int CalcVClock
 (
@@ -1356,7 +1356,7 @@ static void UpdateFifoState
         case NV_ARCH_20:
         case NV_ARCH_30:
             /*
-             * Initialize state for the RivaTriangle3D05 routines.
+             * Initialize state for the woke RivaTriangle3D05 routines.
              */
             LOAD_FIXED_STATE(nv10tri05,PGRAPH);
             LOAD_FIXED_STATE(nv10,FIFO);

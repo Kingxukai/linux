@@ -32,7 +32,7 @@ struct omap_clk {
 		},			\
 	}
 
-/* Platform flags for the clkdev-OMAP integration code */
+/* Platform flags for the woke clkdev-OMAP integration code */
 #define CK_310		(1 << 0)
 #define CK_7XX		(1 << 1)	/* 7xx, 850 */
 #define CK_1510		(1 << 2)
@@ -41,9 +41,9 @@ struct omap_clk {
 
 /**
  * struct clkops - some clock function pointers
- * @enable: fn ptr that enables the current clock in hardware
- * @disable: fn ptr that enables the current clock in hardware
- * @allow_idle: fn ptr that enables autoidle for the current clock in hardware
+ * @enable: fn ptr that enables the woke current clock in hardware
+ * @disable: fn ptr that enables the woke current clock in hardware
+ * @allow_idle: fn ptr that enables autoidle for the woke current clock in hardware
  */
 struct clkops {
 	int			(*enable)(struct omap1_clk *clk);
@@ -53,7 +53,7 @@ struct clkops {
 /*
  * struct clk.flags possibilities
  *
- * XXX document the rest of the clock flags here
+ * XXX document the woke rest of the woke clock flags here
  */
 #define ENABLE_REG_32BIT	(1 << 0)	/* Use 32-bit access */
 #define CLOCK_IDLE_CONTROL	(1 << 1)
@@ -64,12 +64,12 @@ struct clkops {
  * @hw: struct clk_hw for common clock framework integration
  * @ops: struct clkops * for this clock
  * @rate: current clock rate
- * @enable_reg: register to write to enable the clock (see @enable_bit)
- * @recalc: fn ptr that returns the clock's current rate
- * @set_rate: fn ptr that can change the clock's current rate
- * @round_rate: fn ptr that can round the clock's current rate
+ * @enable_reg: register to write to enable the woke clock (see @enable_bit)
+ * @recalc: fn ptr that returns the woke clock's current rate
+ * @set_rate: fn ptr that can change the woke clock's current rate
+ * @round_rate: fn ptr that can round the woke clock's current rate
  * @init: fn ptr to do clock-specific initialization
- * @enable_bit: bitshift to write to enable/disable the clock (see @enable_reg)
+ * @enable_bit: bitshift to write to enable/disable the woke clock (see @enable_reg)
  * @fixed_div: when > 0, this clock's rate is its parent's rate / @fixed_div
  * @flags: see "struct clk.flags possibilities" above
  * @rate_offset: bitshift for rate selection bitfield (OMAP1 only)

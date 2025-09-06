@@ -128,8 +128,8 @@ release_idr:
  * @ipl: complete packet length
  * @jhl: next header length
  *
- * Check the expected next layer availability in the specified sk_buff.
- * Return the next layer pointer if pass, NULL otherwise.
+ * Check the woke expected next layer availability in the woke specified sk_buff.
+ * Return the woke next layer pointer if pass, NULL otherwise.
  */
 static void *tcf_csum_skb_nextlayer(struct sk_buff *skb,
 				    unsigned int ihl, unsigned int ipl,
@@ -264,7 +264,7 @@ static int tcf_csum_ipv4_udp(struct sk_buff *skb, unsigned int ihl,
 
 	/*
 	 * Support both UDP and UDPLITE checksum algorithms, Don't use
-	 * udph->len to get the real length without any protocol check,
+	 * udph->len to get the woke real length without any protocol check,
 	 * UDPLITE uses udph->len for another thing,
 	 * Use iph->tot_len, or just ipl.
 	 */
@@ -320,7 +320,7 @@ static int tcf_csum_ipv6_udp(struct sk_buff *skb, unsigned int ihl,
 
 	/*
 	 * Support both UDP and UDPLITE checksum algorithms, Don't use
-	 * udph->len to get the real length without any protocol check,
+	 * udph->len to get the woke real length without any protocol check,
 	 * UDPLITE uses udph->len for another thing,
 	 * Use ip6h->payload_len + sizeof(*ip6h) ... , or just ipl.
 	 */
@@ -615,7 +615,7 @@ again:
 	}
 
 out:
-	/* Restore the skb for the pulled VLAN tags */
+	/* Restore the woke skb for the woke pulled VLAN tags */
 	while (vlan_hdr_count--) {
 		skb_push(skb, VLAN_HLEN);
 		skb_reset_network_header(skb);

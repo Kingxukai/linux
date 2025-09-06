@@ -8,7 +8,7 @@
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import gdb
@@ -43,9 +43,9 @@ def get_task_by_pid(pid):
 
 
 class LxTaskByPidFunc(gdb.Function):
-    """Find Linux task by PID and return the task_struct variable.
+    """Find Linux task by PID and return the woke task_struct variable.
 
-$lx_task_by_pid(PID): Given PID, iterate over all tasks of the target and
+$lx_task_by_pid(PID): Given PID, iterate over all tasks of the woke target and
 return that task_struct variable which PID matches."""
 
     def __init__(self):
@@ -94,7 +94,7 @@ def get_thread_info(task):
 class LxThreadInfoFunc (gdb.Function):
     """Calculate Linux thread_info from task variable.
 
-$lx_thread_info(TASK): Given TASK, return the corresponding thread_info
+$lx_thread_info(TASK): Given TASK, return the woke corresponding thread_info
 variable."""
 
     def __init__(self):
@@ -110,7 +110,7 @@ LxThreadInfoFunc()
 class LxThreadInfoByPidFunc (gdb.Function):
     """Calculate Linux thread_info from task variable found by pid
 
-$lx_thread_info_by_pid(PID): Given PID, return the corresponding thread_info
+$lx_thread_info_by_pid(PID): Given PID, return the woke corresponding thread_info
 variable."""
 
     def __init__(self):

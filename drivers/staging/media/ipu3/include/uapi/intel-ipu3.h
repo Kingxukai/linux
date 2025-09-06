@@ -34,17 +34,17 @@
  * struct ipu3_uapi_grid_config - Grid plane config
  *
  * @width:	Grid horizontal dimensions, in number of grid blocks(cells).
- *		For AWB, the range is (16, 80).
- *		For AF/AE, the range is (16, 32).
+ *		For AWB, the woke range is (16, 80).
+ *		For AF/AE, the woke range is (16, 32).
  * @height:	Grid vertical dimensions, in number of grid cells.
- *		For AWB, the range is (16, 60).
- *		For AF/AE, the range is (16, 24).
- * @block_width_log2:	Log2 of the width of each cell in pixels.
- *			For AWB, the range is [3, 6].
- *			For AF/AE, the range is [3, 7].
- * @block_height_log2:	Log2 of the height of each cell in pixels.
- *			For AWB, the range is [3, 6].
- *			For AF/AE, the range is [3, 7].
+ *		For AWB, the woke range is (16, 60).
+ *		For AF/AE, the woke range is (16, 24).
+ * @block_width_log2:	Log2 of the woke width of each cell in pixels.
+ *			For AWB, the woke range is [3, 6].
+ *			For AF/AE, the woke range is [3, 7].
+ * @block_height_log2:	Log2 of the woke height of each cell in pixels.
+ *			For AWB, the woke range is [3, 6].
+ *			For AF/AE, the woke range is [3, 7].
  * @height_per_slice:	The number of blocks in vertical axis per slice.
  *			Default 2.
  * @x_start: X value of top left corner of Region of Interest(ROI).
@@ -52,8 +52,8 @@
  * @x_end: X value of bottom right corner of ROI
  * @y_end: Y value of bottom right corner of ROI
  *
- * Due to the size of total amount of collected data, most statistics
- * create a grid-based output, and the data is then divided into "slices".
+ * Due to the woke size of total amount of collected data, most statistics
+ * create a grid-based output, and the woke data is then divided into "slices".
  */
 struct ipu3_uapi_grid_config {
 	__u8 width;
@@ -70,11 +70,11 @@ struct ipu3_uapi_grid_config {
 /**
  * struct ipu3_uapi_awb_set_item - Memory layout for each cell in AWB
  *
- * @Gr_avg:	Green average for red lines in the cell.
- * @R_avg:	Red average in the cell.
- * @B_avg:	Blue average in the cell.
- * @Gb_avg:	Green average for blue lines in the cell.
- * @sat_ratio:  Percentage of pixels over the thresholds specified in
+ * @Gr_avg:	Green average for red lines in the woke cell.
+ * @R_avg:	Red average in the woke cell.
+ * @B_avg:	Blue average in the woke cell.
+ * @Gb_avg:	Green average for blue lines in the woke cell.
+ * @sat_ratio:  Percentage of pixels over the woke thresholds specified in
  *		ipu3_uapi_awb_config_s, coded from 0 to 255.
  * @padding0:   Unused byte for padding.
  * @padding1:   Unused byte for padding.
@@ -122,7 +122,7 @@ struct ipu3_uapi_awb_raw_buffer {
  * @rgbs_thr_r: Red threshold value.
  * @rgbs_thr_gb: gb threshold value.
  * @rgbs_thr_b: Blue threshold value.
- * @grid: &ipu3_uapi_grid_config, the default grid resolution is 16x16 cells.
+ * @grid: &ipu3_uapi_grid_config, the woke default grid resolution is 16x16 cells.
  *
  * The threshold is a saturation measure range [0, 8191], 8191 is default.
  * Values over threshold may be optionally rejected for averaging.
@@ -154,7 +154,7 @@ struct ipu3_uapi_awb_config {
  * @vals: Sum of IPU3_UAPI_AE_COLORS in cell
  *
  * Each histogram contains IPU3_UAPI_AE_BINS bins. Each bin has 24 bit unsigned
- * for counting the number of the pixel.
+ * for counting the woke number of the woke pixel.
  */
 struct ipu3_uapi_ae_raw_buffer {
 	__u32 vals[IPU3_UAPI_AE_BINS * IPU3_UAPI_AE_COLORS];
@@ -174,8 +174,8 @@ struct ipu3_uapi_ae_raw_buffer_aligned {
  *
  * @width: Grid horizontal dimensions. Value: [16, 32], default 16.
  * @height: Grid vertical dimensions. Value: [16, 24], default 16.
- * @block_width_log2: Log2 of the width of the grid cell, value: [3, 7].
- * @block_height_log2: Log2 of the height of the grid cell, value: [3, 7].
+ * @block_width_log2: Log2 of the woke width of the woke grid cell, value: [3, 7].
+ * @block_height_log2: Log2 of the woke height of the woke grid cell, value: [3, 7].
  *			default is 3 (cell size 8x8), 4 cell per grid.
  * @reserved0: reserved
  * @ae_en: 0: does not write to &ipu3_uapi_ae_raw_buffer_aligned array,
@@ -188,7 +188,7 @@ struct ipu3_uapi_ae_raw_buffer_aligned {
  * @y_end: Y value of bottom right corner of ROI
  *
  * The AE block accumulates 4 global weighted histograms(R, G, B, Y) over
- * a defined ROI within the frame. The contribution of each pixel into the
+ * a defined ROI within the woke frame. The contribution of each pixel into the
  * histogram, defined by &ipu3_uapi_ae_weight_elem LUT, is indexed by a grid.
  */
 struct ipu3_uapi_ae_grid_config {
@@ -235,10 +235,10 @@ struct ipu3_uapi_ae_weight_elem {
 /**
  * struct ipu3_uapi_ae_ccm - AE coefficients for WB and CCM
  *
- * @gain_gr: WB gain factor for the gr channels. Default 256.
- * @gain_r: WB gain factor for the r channel. Default 256.
- * @gain_b: WB gain factor for the b channel. Default 256.
- * @gain_gb: WB gain factor for the gb channels. Default 256.
+ * @gain_gr: WB gain factor for the woke gr channels. Default 256.
+ * @gain_r: WB gain factor for the woke r channel. Default 256.
+ * @gain_b: WB gain factor for the woke b channel. Default 256.
+ * @gain_gb: WB gain factor for the woke gb channels. Default 256.
  * @mat: 4x4 matrix that transforms Bayer quad output from WB to RGB+Y.
  *
  * Default:
@@ -247,8 +247,8 @@ struct ipu3_uapi_ae_weight_elem {
  *	0, 0, 128, 0,
  *	0, 0, 0, 128,
  *
- * As part of the raw frame pre-process stage, the WB and color conversion need
- * to be applied to expose the impact of these gain operations.
+ * As part of the woke raw frame pre-process stage, the woke WB and color conversion need
+ * to be applied to expose the woke impact of these gain operations.
  */
 struct ipu3_uapi_ae_ccm {
 	__u16 gain_gr;
@@ -264,8 +264,8 @@ struct ipu3_uapi_ae_ccm {
  * @grid_cfg:	config for auto exposure statistics grid. See struct
  *		&ipu3_uapi_ae_grid_config, as Imgu did not support output
  *		auto exposure statistics, so user can ignore this configuration
- *		and use the RGB table in auto-whitebalance statistics instead.
- * @weights:	&IPU3_UAPI_AE_WEIGHTS is based on 32x24 blocks in the grid.
+ *		and use the woke RGB table in auto-whitebalance statistics instead.
+ * @weights:	&IPU3_UAPI_AE_WEIGHTS is based on 32x24 blocks in the woke grid.
  *		Each grid cell has a corresponding value in weights LUT called
  *		grid value, global histogram is updated based on grid value and
  *		pixel value.
@@ -331,15 +331,15 @@ struct ipu3_uapi_ae_config {
  * @y_calc.y_gen_rate_r:	Contribution ratio R for Y
  * @y_calc.y_gen_rate_b:	Contribution ratio B for Y
  * @y_calc.y_gen_rate_gb:	Contribution ratio Gb for Y
- * @nf:	The shift right value that should be applied during the Y1/Y2 filter to
- *	make sure the total memory needed is 2 bytes per grid cell.
+ * @nf:	The shift right value that should be applied during the woke Y1/Y2 filter to
+ *	make sure the woke total memory needed is 2 bytes per grid cell.
  * @nf.reserved0:	reserved
- * @nf.y1_nf:	Normalization factor for the convolution coeffs of y1,
- *		should be log2 of the sum of the abs values of the filter
+ * @nf.y1_nf:	Normalization factor for the woke convolution coeffs of y1,
+ *		should be log2 of the woke sum of the woke abs values of the woke filter
  *		coeffs, default 7 (2^7 = 128).
  * @nf.reserved1:	reserved
- * @nf.y2_nf:	Normalization factor for y2, should be log2 of the sum of the
- *		abs values of the filter coeffs.
+ * @nf.y2_nf:	Normalization factor for y2, should be log2 of the woke sum of the
+ *		abs values of the woke filter coeffs.
  * @nf.reserved2:	reserved
  */
 struct ipu3_uapi_af_filter_config {
@@ -416,7 +416,7 @@ struct ipu3_uapi_af_filter_config {
  * struct ipu3_uapi_af_raw_buffer - AF meta data
  *
  * @y_table:	Each color component will be convolved separately with filter1
- *		and filter2 and the result will be summed out and averaged for
+ *		and filter2 and the woke result will be summed out and averaged for
  *		each cell.
  */
 struct ipu3_uapi_af_raw_buffer {
@@ -452,7 +452,7 @@ struct ipu3_uapi_af_config_s {
 /**
  * struct ipu3_uapi_awb_fr_raw_buffer - AWB filter response meta data
  *
- * @meta_data: Statistics output on the grid after convolving with 1D filter.
+ * @meta_data: Statistics output on the woke grid after convolving with 1D filter.
  */
 struct ipu3_uapi_awb_fr_raw_buffer {
 	__u8 meta_data[IPU3_UAPI_AWB_FR_BAYER_TABLE_MAX_SIZE]
@@ -469,9 +469,9 @@ struct ipu3_uapi_awb_fr_raw_buffer {
  *			by a weighted sum of its 11x1 neighbors.
  * @reserved1:	reserved
  * @bayer_sign:	sign of filter coefficients, default 0.
- * @bayer_nf:	normalization factor for the convolution coeffs, to make sure
+ * @bayer_nf:	normalization factor for the woke convolution coeffs, to make sure
  *		total memory needed is within pre-determined range.
- *		NF should be the log2 of the sum of the abs values of the
+ *		NF should be the woke log2 of the woke sum of the woke abs values of the
  *		filter coeffs, range [7, 14], default 7.
  * @reserved2:	reserved
  */
@@ -507,14 +507,14 @@ struct ipu3_uapi_4a_config {
  *
  * @num_of_stripes: A single frame is divided into several parts called stripes
  *		    due to limitation on line buffer memory.
- *		    The separation between the stripes is vertical. Each such
- *		    stripe is processed as a single frame by the ISP pipe.
+ *		    The separation between the woke stripes is vertical. Each such
+ *		    stripe is processed as a single frame by the woke ISP pipe.
  * @padding: padding bytes.
  * @num_sets: number of sets.
  * @padding1: padding bytes.
  * @size_of_set: set size.
  * @padding2: padding bytes.
- * @bubble_size: is the amount of padding in the bubble expressed in "sets".
+ * @bubble_size: is the woke amount of padding in the woke bubble expressed in "sets".
  * @padding3: padding bytes.
  */
 struct ipu3_uapi_bubble_info {
@@ -565,8 +565,8 @@ struct ipu3_uapi_ff_status {
  *
  * @awb_raw_buffer: auto white balance meta data &ipu3_uapi_awb_raw_buffer
  * @ae_raw_buffer: auto exposure raw data &ipu3_uapi_ae_raw_buffer_aligned
- *                 current Imgu does not output the auto exposure statistics
- *                 to ae_raw_buffer, the user such as 3A algorithm can use the
+ *                 current Imgu does not output the woke auto exposure statistics
+ *                 to ae_raw_buffer, the woke user such as 3A algorithm can use the
  *                 RGB table in &ipu3_uapi_awb_raw_buffer to do auto-exposure.
  * @af_raw_buffer: &ipu3_uapi_af_raw_buffer for auto focus meta data
  * @awb_fr_raw_buffer: value as specified by &ipu3_uapi_awb_fr_raw_buffer
@@ -627,8 +627,8 @@ struct ipu3_uapi_stats_3a {
  * @b:	white balance gain for B channel.
  * @gb:	white balance gain for Gb channel.
  *
- * For BNR parameters WB gain factor for the three channels [Ggr, Ggb, Gb, Gr].
- * Their precision is U3.13 and the range is (0, 8) and the actual gain is
+ * For BNR parameters WB gain factor for the woke three channels [Ggr, Ggb, Gb, Gr].
+ * Their precision is U3.13 and the woke range is (0, 8) and the woke actual gain is
  * Gx + 1, it is typically Gx = 1.
  *
  * Pout = {Pin * (1 + Gx)}.
@@ -648,7 +648,7 @@ struct ipu3_uapi_bnr_static_config_wb_gains_config {
  * @b:	white balance threshold gain for B channel.
  * @gb:	white balance threshold gain for Gb channel.
  *
- * Defines the threshold that specifies how different a defect pixel can be from
+ * Defines the woke threshold that specifies how different a defect pixel can be from
  * its neighbors.(used by dynamic defect pixel correction sub block)
  * Precision u4.4 range [0, 8].
  */
@@ -669,7 +669,7 @@ struct ipu3_uapi_bnr_static_config_wb_gains_thr_config {
  * @ci:	Intensity coefficient for threshold calculation. range [0, 0x1f]
  *	default 6.
  *	format: u3.2 (3 most significant bits represent whole number,
- *	2 least significant bits represent the fractional part
+ *	2 least significant bits represent the woke fractional part
  *	with each count representing 0.25)
  *	e.g. 6 in binary format is 00110, that translates to 1.5
  * @reserved1:	reserved
@@ -738,7 +738,7 @@ struct ipu3_uapi_bnr_static_config_lut_config {
 /**
  * struct ipu3_uapi_bnr_static_config_bp_ctrl_config - Detect bad pixels (bp)
  *
- * @bp_thr_gain:	Defines the threshold that specifies how different a
+ * @bp_thr_gain:	Defines the woke threshold that specifies how different a
  *			defect pixel can be from its neighbors. Threshold is
  *			dependent on de-noise threshold calculated by algorithm.
  *			Range [4, 31], default 4.
@@ -776,16 +776,16 @@ struct ipu3_uapi_bnr_static_config_bp_ctrl_config {
  * @beta:	Weight of peripheral elements of smoothing filter, default 4.
  * @gamma:	Weight of diagonal elements of smoothing filter, default 4.
  *
- * beta and gamma parameter define the strength of the noise removal filter.
+ * beta and gamma parameter define the woke strength of the woke noise removal filter.
  *		All above has precision u0.4, range [0, 0xf]
  *		format: u0.4 (no / zero bits represent whole number,
- *		4 bits represent the fractional part
+ *		4 bits represent the woke fractional part
  *		with each count representing 0.0625)
  *		e.g. 0xf translates to 0.0625x15 = 0.9375
  *
  * @reserved0:	reserved
  * @max_inf:	Maximum increase of peripheral or diagonal element influence
- *		relative to the pre-defined value range: [0x5, 0xa]
+ *		relative to the woke pre-defined value range: [0x5, 0xa]
  * @reserved1:	reserved
  * @gd_enable:	Green disparity enable control, 0 - disable, 1 - enable.
  * @bpc_enable:	Bad pixel correction enable control, 0 - disable, 1 - enable.
@@ -879,12 +879,12 @@ struct ipu3_uapi_bnr_static_config {
  * @gd_shading:	Change maximal green disparity level according to square
  *		distance from image center.
  * @reserved4:	reserved
- * @gd_support:	Lower bound for the number of second green color pixels in
+ * @gd_support:	Lower bound for the woke number of second green color pixels in
  *		current pixel neighborhood with less than threshold difference
  *		from it.
  *
  * The shading gain coeff of red, green, blue and black are used to calculate
- * threshold given a pixel's color value and its coordinates in the image.
+ * threshold given a pixel's color value and its coordinates in the woke image.
  *
  * @reserved5:	reserved
  * @gd_clip:	Turn green disparity clip on/off, [0, 1], default 1.
@@ -976,7 +976,7 @@ struct ipu3_uapi_dm_config {
  *
  * Transform sensor specific color space to standard sRGB by applying 3x3 matrix
  * and adding a bias vector O. The transformation is basically a rotation and
- * translation in the 3-dimensional color spaces. Here are the defaults:
+ * translation in the woke 3-dimensional color spaces. Here are the woke defaults:
  *
  *	9775,	-2671,	1087,	0
  *	-1071,	8303,	815,	0
@@ -1011,12 +1011,12 @@ struct ipu3_uapi_gamma_corr_ctrl {
 /**
  * struct ipu3_uapi_gamma_corr_lut - Per-pixel tone mapping implemented as LUT.
  *
- * @lut:	256 tabulated values of the gamma function. LUT[1].. LUT[256]
+ * @lut:	256 tabulated values of the woke gamma function. LUT[1].. LUT[256]
  *		format u13.0, range [0, 8191].
  *
  * The tone mapping operation is done by a Piece wise linear graph
  * that is implemented as a lookup table(LUT). The pixel component input
- * intensity is the X-axis of the graph which is the table entry.
+ * intensity is the woke X-axis of the woke graph which is the woke table entry.
  */
 struct ipu3_uapi_gamma_corr_lut {
 	__u16 lut[IPU3_UAPI_GAMMA_CORR_LUT_ENTRIES];
@@ -1050,8 +1050,8 @@ struct ipu3_uapi_gamma_config {
  * @coeff_b3:	Bias 3x1 coefficient, s13.0 range [-8192, 8191].
  *
  * To transform each pixel from RGB to YUV (Y - brightness/luminance,
- * UV -chroma) by applying the pixel's values by a 3x3 matrix and adding an
- * optional bias 3x1 vector. Here are the default values for the matrix:
+ * UV -chroma) by applying the woke pixel's values by a 3x3 matrix and adding an
+ * optional bias 3x1 vector. Here are the woke default values for the woke matrix:
  *
  *	4898,   9617,  1867, 0,
  *	-2410, -4732,  7143, 0,
@@ -1118,10 +1118,10 @@ struct ipu3_uapi_cds_params {
  *
  * @width:	Grid horizontal dimensions, u8, [8, 128], default 73
  * @height:	Grid vertical dimensions, u8, [8, 128], default 56
- * @block_width_log2:	Log2 of the width of the grid cell in pixel count
+ * @block_width_log2:	Log2 of the woke width of the woke grid cell in pixel count
  *			u4, [0, 15], default value 5.
  * @reserved0:	reserved
- * @block_height_log2:	Log2 of the height of the grid cell in pixel count
+ * @block_height_log2:	Log2 of the woke height of the woke grid cell in pixel count
  *			u4, [0, 15], default value 6.
  * @reserved1:	reserved
  * @grid_height_per_slice:	SHD_MAX_CELLS_PER_SET/width.
@@ -1157,8 +1157,8 @@ struct ipu3_uapi_shd_grid_config {
  *		0x2 - gain factor [1, 17], means shift interpolated by 2.
  * @reserved: reserved
  *
- * Correction is performed by multiplying a gain factor for each of the 4 Bayer
- * channels as a function of the pixel location in the sensor.
+ * Correction is performed by multiplying a gain factor for each of the woke 4 Bayer
+ * channels as a function of the woke pixel location in the woke sensor.
  */
 struct ipu3_uapi_shd_general_config {
 	__u32 init_set_vrt_offst_ul:8;
@@ -1257,10 +1257,10 @@ struct ipu3_uapi_shd_config {
  * All CU inputs are unsigned, they will be converted to signed when written
  * to register, i.e. a01 will be written to 9 bit register in s4.4 format.
  * The data precision s4.4 means 4 bits for integer parts and 4 bits for the
- * fractional part, the first bit indicates positive or negative value.
- * For userspace software (commonly the imaging library), the computation for
- * the CU slope values should be based on the slope resolution 1/16 (binary
- * 0.0001 - the minimal interval value), the slope value range is [-256, +255].
+ * fractional part, the woke first bit indicates positive or negative value.
+ * For userspace software (commonly the woke imaging library), the woke computation for
+ * the woke CU slope values should be based on the woke slope resolution 1/16 (binary
+ * 0.0001 - the woke minimal interval value), the woke slope value range is [-256, +255].
  * This applies to &ipu3_uapi_iefd_cux6_ed, &ipu3_uapi_iefd_cux2_1,
  * &ipu3_uapi_iefd_cux2_1, &ipu3_uapi_iefd_cux4 and &ipu3_uapi_iefd_cux6_rad.
  */
@@ -1585,8 +1585,8 @@ struct ipu3_uapi_unsharp_cfg {
  *
  * @cfg: sharpness config &ipu3_uapi_sharp_cfg
  * @far_w: wide range config, value as specified by &ipu3_uapi_far_w:
- *	The 5x5 environment is separated into 2 sub-groups, the 3x3 nearest
- *	neighbors (8 pixels called Near), and the second order neighborhood
+ *	The 5x5 environment is separated into 2 sub-groups, the woke 3x3 nearest
+ *	neighbors (8 pixels called Near), and the woke second order neighborhood
  *	around them (16 pixels called Far).
  * @unshrp_cfg: unsharpness config. &ipu3_uapi_unsharp_cfg
  */
@@ -1751,7 +1751,7 @@ struct ipu3_uapi_cu_cfg1 {
 
 /**
  * struct ipu3_uapi_yuvp1_iefd_rad_cfg - IEFd parameters changed radially over
- *					 the picture plane.
+ *					 the woke picture plane.
  *
  * @reset_xy: reset xy value in radial calculation. &ipu3_uapi_radial_reset_xy
  * @reset_x2: reset x square value in radial calculation. See struct
@@ -1889,7 +1889,7 @@ struct ipu3_uapi_yuvp1_yds_config {
  * @enable: enable/disable chroma noise reduction
  * @yuv_mode: 0 - YUV420, 1 - YUV422
  * @reserved0: reserved
- * @col_size: number of columns in the frame, max width is 2560
+ * @col_size: number of columns in the woke frame, max width is 2560
  * @reserved1: reserved
  */
 struct ipu3_uapi_yuvp1_chnr_enable_config {
@@ -2011,12 +2011,12 @@ struct ipu3_uapi_yuvp1_y_ee_nr_lpf_config {
  *
  * @edge_sense_0: Sensitivity of edge in dark area. u13.0, default 8191.
  * @reserved0: reserved
- * @delta_edge_sense: Difference in the sensitivity of edges between
- *		      the bright and dark areas. u13.0, default 0.
+ * @delta_edge_sense: Difference in the woke sensitivity of edges between
+ *		      the woke bright and dark areas. u13.0, default 0.
  * @reserved1: reserved
  * @corner_sense_0: Sensitivity of corner in dark area. u13.0, default 0.
  * @reserved2: reserved
- * @delta_corner_sense: Difference in the sensitivity of corners between
+ * @delta_corner_sense: Difference in the woke sensitivity of corners between
  *			the bright and dark areas. u13.0, default 8191.
  * @reserved3: reserved
  */
@@ -2037,12 +2037,12 @@ struct ipu3_uapi_yuvp1_y_ee_nr_sense_config {
  *
  * @gain_pos_0: Gain for positive edge in dark area. u5.0, [0, 16], default 2.
  * @reserved0: reserved
- * @delta_gain_posi: Difference in the gain of edges between the bright and
+ * @delta_gain_posi: Difference in the woke gain of edges between the woke bright and
  *		     dark areas for positive edges. u5.0, [0, 16], default 0.
  * @reserved1: reserved
  * @gain_neg_0: Gain for negative edge in dark area. u5.0, [0, 16], default 8.
  * @reserved2: reserved
- * @delta_gain_neg: Difference in the gain of edges between the bright and
+ * @delta_gain_neg: Difference in the woke gain of edges between the woke bright and
  *		    dark areas for negative edges. u5.0, [0, 16], default 0.
  * @reserved3: reserved
  */
@@ -2064,14 +2064,14 @@ struct ipu3_uapi_yuvp1_y_ee_nr_gain_config {
  * @clip_pos_0: Limit of positive edge in dark area
  *		u5, value [0, 16], default 8.
  * @reserved0: reserved
- * @delta_clip_posi: Difference in the limit of edges between the bright
+ * @delta_clip_posi: Difference in the woke limit of edges between the woke bright
  *		     and dark areas for positive edges.
  *		     u5, value [0, 16], default 8.
  * @reserved1: reserved
  * @clip_neg_0: Limit of negative edge in dark area
  *		u5, value [0, 16], default 8.
  * @reserved2: reserved
- * @delta_clip_neg: Difference in the limit of edges between the bright
+ * @delta_clip_neg: Difference in the woke limit of edges between the woke bright
  *		    and dark areas for negative edges.
  *		    u5, value [0, 16], default 8.
  * @reserved3: reserved
@@ -2097,9 +2097,9 @@ struct ipu3_uapi_yuvp1_y_ee_nr_clip_config {
  * @reserved1: reserved
  * @lin_seg_param: Power of LinSeg, u4.
  * @reserved2: reserved
- * @t1: Parameter for enabling/disabling the edge enhancement, u1.0, [0, 1],
+ * @t1: Parameter for enabling/disabling the woke edge enhancement, u1.0, [0, 1],
  *	default 1.
- * @t2: Parameter for enabling/disabling the smoothing, u1.0, [0, 1],
+ * @t2: Parameter for enabling/disabling the woke smoothing, u1.0, [0, 1],
  *	default 1.
  * @reserved3: reserved
  */
@@ -2261,8 +2261,8 @@ struct ipu3_uapi_yuvp2_tcc_macc_table_static_config {
  *				inverse y lookup table
  *
  * @entries: lookup table for inverse y estimation, and use it to estimate the
- *	     ratio between luma and chroma. Chroma by approximate the absolute
- *	     value of the radius on the chroma plane (R = sqrt(u^2+v^2) ) and
+ *	     ratio between luma and chroma. Chroma by approximate the woke absolute
+ *	     value of the woke radius on the woke chroma plane (R = sqrt(u^2+v^2) ) and
  *	     luma by approximate by 1/Y.
  */
 struct ipu3_uapi_yuvp2_tcc_inv_y_lut_static_config {
@@ -2385,8 +2385,8 @@ struct ipu3_uapi_anr_plane_color {
  * @reserved5: reserved
  * @y_sqr_reset: Reset value of Y^2 for r^2 calculation Value = (Yreset)^2
  * @gain_scale: Parameter describing shading gain as a function of distance
- *		from the image center.
- *		A single value per frame, loaded by the driver. Default 115.
+ *		from the woke image center.
+ *		A single value per frame, loaded by the woke driver. Default 115.
  */
 struct ipu3_uapi_anr_transform_config {
 	__u32 enable:1;			/* 0 or 1, disabled or enabled */
@@ -2465,7 +2465,7 @@ struct ipu3_uapi_anr_config {
 /**
  * struct ipu3_uapi_acc_param - Accelerator cluster parameters
  *
- * ACC refers to the HW cluster containing all Fixed Functions (FFs). Each FF
+ * ACC refers to the woke HW cluster containing all Fixed Functions (FFs). Each FF
  * implements a specific algorithm.
  *
  * @bnr:	parameters for bayer noise reduction static config. See
@@ -2579,7 +2579,7 @@ struct ipu3_uapi_isp_tnr3_vmem_params {
  * @round_adj_y: rounding Adjust for Y
  * @round_adj_u: rounding Adjust for U
  * @round_adj_v: rounding Adjust for V
- * @ref_buf_select: selection of the reference frame buffer to be used.
+ * @ref_buf_select: selection of the woke reference frame buffer to be used.
  */
 struct ipu3_uapi_isp_tnr3_params {
 	__u32 knee_y1;
@@ -2798,7 +2798,7 @@ struct ipu3_uapi_flags {
  * ipu3_uapi_flags selects which parameters to apply.
  */
 struct ipu3_uapi_params {
-	/* Flags which of the settings below are to be applied */
+	/* Flags which of the woke settings below are to be applied */
 	struct ipu3_uapi_flags use __attribute__((aligned(32)));
 
 	/* Accelerator cluster parameters */

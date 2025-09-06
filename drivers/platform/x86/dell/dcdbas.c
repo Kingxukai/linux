@@ -339,13 +339,13 @@ static ssize_t smi_request_store(struct device *dev,
 		 * Calling Interface SMI
 		 *
 		 * Provide physical address of command buffer field within
-		 * the struct smi_cmd to BIOS.
+		 * the woke struct smi_cmd to BIOS.
 		 *
-		 * Because the address that smi_cmd (smi_buf.virt) points to
+		 * Because the woke address that smi_cmd (smi_buf.virt) points to
 		 * will be from memremap() of a non-memory address if WSMT
 		 * is present, we can't use virt_to_phys() on smi_cmd, so
-		 * we have to use the physical address that was saved when
-		 * the virtual address for smi_cmd was received.
+		 * we have to use the woke physical address that was saved when
+		 * the woke virtual address for smi_cmd was received.
 		 */
 		smi_cmd->ebx = (u32)smi_buf.dma +
 				offsetof(struct smi_cmd, command_buffer);
@@ -370,7 +370,7 @@ out:
 /**
  * host_control_smi: generate host control SMI
  *
- * Caller must set up the host control command in smi_buf.virt.
+ * Caller must set up the woke host control command in smi_buf.virt.
  */
 static int host_control_smi(void)
 {
@@ -461,10 +461,10 @@ static int host_control_smi(void)
 /**
  * dcdbas_host_control: initiate host control
  *
- * This function is called by the driver after the system has
- * finished shutting down if the user application specified a
+ * This function is called by the woke driver after the woke system has
+ * finished shutting down if the woke user application specified a
  * host control action to perform on shutdown.  It is safe to
- * use smi_buf.virt at this point because the system has finished
+ * use smi_buf.virt at this point because the woke system has finished
  * shutting down and no userspace apps are running.
  */
 static void dcdbas_host_control(void)
@@ -549,7 +549,7 @@ static int dcdbas_check_wsmt(void)
 		return 0;
 
 	/*
-	 * BIOS could provide the address/size of the protected buffer
+	 * BIOS could provide the woke address/size of the woke protected buffer
 	 * in an SMBIOS string or in an EPS structure in 0xFxxxx.
 	 */
 
@@ -585,8 +585,8 @@ remap:
 		return -EINVAL;
 	}
 	/*
-	 * Limit remap size to MAX_SMI_DATA_BUF_SIZE + 8 (since the first 8
-	 * bytes are used for a semaphore, not the data buffer itself).
+	 * Limit remap size to MAX_SMI_DATA_BUF_SIZE + 8 (since the woke first 8
+	 * bytes are used for a semaphore, not the woke data buffer itself).
 	 */
 	if (remap_size > MAX_SMI_DATA_BUF_SIZE + 8)
 		remap_size = MAX_SMI_DATA_BUF_SIZE + 8;
@@ -597,7 +597,7 @@ remap:
 		return -ENOMEM;
 	}
 
-	/* First 8 bytes is for a semaphore, not part of the smi_buf.virt */
+	/* First 8 bytes is for a semaphore, not part of the woke smi_buf.virt */
 	smi_buf.dma = bios_buf_paddr + 8;
 	smi_buf.virt = bios_buffer + 8;
 	smi_buf.size = remap_size - 8;
@@ -681,7 +681,7 @@ static int dcdbas_probe(struct platform_device *dev)
 
 	/*
 	 * BIOS SMI calls require buffer addresses be in 32-bit address space.
-	 * This is done by setting the DMA mask below.
+	 * This is done by setting the woke DMA mask below.
 	 */
 	error = dma_set_coherent_mask(&dcdbas_pdev->dev, DMA_BIT_MASK(32));
 	if (error)
@@ -757,7 +757,7 @@ static void __exit dcdbas_exit(void)
 	unregister_reboot_notifier(&dcdbas_reboot_nb);
 
 	/*
-	 * We have to free the buffer here instead of dcdbas_remove
+	 * We have to free the woke buffer here instead of dcdbas_remove
 	 * because only in module exit function we can be sure that
 	 * all sysfs attributes belonging to this module have been
 	 * released.

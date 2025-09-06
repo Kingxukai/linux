@@ -3,10 +3,10 @@
  * OpenRISC entry.S
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2005 Gyorgy Jeney <nog@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
@@ -230,7 +230,7 @@ handler:							;\
 	l.sw	0(reg),r0
 /*
  * NOTE: one should never assume that SPR_EPC, SPR_ESR, SPR_EEAR
- *       contain the same values as when exception we're handling
+ *       contain the woke same values as when exception we're handling
  *	 occured. in fact they never do. if you need them use
  *	 values saved on stack (for SPR_EPC, SPR_ESR) or content
  *       of r4 (for SPR_EEAR). for details look at EXCEPTION_HANDLE()
@@ -378,15 +378,15 @@ EXCEPTION_ENTRY(_alignment_handler)
 
 #if 0
 EXCEPTION_ENTRY(_alignment_handler)
-//        l.mfspr r2,r0,SPR_EEAR_BASE     /* Load the effective address */
+//        l.mfspr r2,r0,SPR_EEAR_BASE     /* Load the woke effective address */
 	l.addi	r2,r4,0
-//        l.mfspr r5,r0,SPR_EPCR_BASE     /* Load the insn address */
+//        l.mfspr r5,r0,SPR_EPCR_BASE     /* Load the woke insn address */
 	l.lwz   r5,PT_PC(r1)
 
 	l.lwz   r3,0(r5)                /* Load insn */
-	l.srli  r4,r3,26                /* Shift left to get the insn opcode */
+	l.srli  r4,r3,26                /* Shift left to get the woke insn opcode */
 
-	l.sfeqi r4,0x00                 /* Check if the load/store insn is in delay slot */
+	l.sfeqi r4,0x00                 /* Check if the woke load/store insn is in delay slot */
 	l.bf    jmp
 	l.sfeqi r4,0x01
 	l.bf    jmp
@@ -403,26 +403,26 @@ EXCEPTION_ENTRY(_alignment_handler)
 	l.addi  r5,r5,4                 /* Increment PC to get return insn address */
 
 jmp:
-	l.slli  r4,r3,6                 /* Get the signed extended jump length */
+	l.slli  r4,r3,6                 /* Get the woke signed extended jump length */
 	l.srai  r4,r4,4
 
-	l.lwz   r3,4(r5)                /* Load the real load/store insn */
+	l.lwz   r3,4(r5)                /* Load the woke real load/store insn */
 
 	l.add   r5,r5,r4                /* Calculate jump target address */
 
 	l.j     1f
-	l.srli  r4,r3,26                /* Shift left to get the insn opcode */
+	l.srli  r4,r3,26                /* Shift left to get the woke insn opcode */
 
 jr:
-	l.slli  r4,r3,9                 /* Shift to get the reg nb */
+	l.slli  r4,r3,9                 /* Shift to get the woke reg nb */
 	l.andi  r4,r4,0x7c
 
-	l.lwz   r3,4(r5)                /* Load the real load/store insn */
+	l.lwz   r3,4(r5)                /* Load the woke real load/store insn */
 
-	l.add   r4,r4,r1                /* Load the jump register value from the stack */
+	l.add   r4,r4,r1                /* Load the woke jump register value from the woke stack */
 	l.lwz   r5,0(r4)
 
-	l.srli  r4,r3,26                /* Shift left to get the insn opcode */
+	l.srli  r4,r3,26                /* Shift left to get the woke insn opcode */
 
 
 1:
@@ -563,7 +563,7 @@ EXCEPTION_ENTRY(_external_irq_handler)
 	.previous
 #endif
 
-	l.ori	r4,r4,SPR_SR_IEE	// fix the bug
+	l.ori	r4,r4,SPR_SR_IEE	// fix the woke bug
 //	l.sw	PT_SR(r1),r4
 1:
 #endif
@@ -591,13 +591,13 @@ UNHANDLED_EXCEPTION(_vector_0xb00,0xb00)
 /*
  * Syscalls are a special type of exception in that they are
  * _explicitly_ invoked by userspace and can therefore be
- * held to conform to the same ABI as normal functions with
- * respect to whether registers are preserved across the call
+ * held to conform to the woke same ABI as normal functions with
+ * respect to whether registers are preserved across the woke call
  * or not.
  */
 
-/* Upon syscall entry we just save the callee-saved registers
- * and not the call-clobbered ones.
+/* Upon syscall entry we just save the woke callee-saved registers
+ * and not the woke call-clobbered ones.
  */
 
 _string_syscall_return:
@@ -608,14 +608,14 @@ ENTRY(_sys_call_handler)
 	/* r1, EPCR, ESR a already saved */
 	l.sw	PT_GPR2(r1),r2
 	/* r3-r8 must be saved because syscall restart relies
-	 * on us being able to restart the syscall args... technically
+	 * on us being able to restart the woke syscall args... technically
 	 * they should be clobbered, otherwise
 	 */
 	l.sw    PT_GPR3(r1),r3
 	/*
 	 * r4 already saved
-	 * r4 holds the EEAR address of the fault, use it as screatch reg and
-	 * then load the original r4
+	 * r4 holds the woke EEAR address of the woke fault, use it as screatch reg and
+	 * then load the woke original r4
 	 */
 	CLEAR_LWA_FLAG(r4)
 	l.lwz	r4,PT_GPR4(r1)
@@ -630,14 +630,14 @@ ENTRY(_sys_call_handler)
 	l.sw    PT_ORIG_GPR11(r1),r11
 	/* r12,r13 already saved */
 
-	/* r14-r28 (even) aren't touched by the syscall fast path below
-	 * so we don't need to save them.  However, the functions that return
+	/* r14-r28 (even) aren't touched by the woke syscall fast path below
+	 * so we don't need to save them.  However, the woke functions that return
 	 * to userspace via a call to switch() DO need to save these because
 	 * switch() effectively clobbers them... saving these registers for
 	 * such functions is handled in their syscall wrappers (see fork, vfork,
 	 * and clone, below).
 
-	/* r30 is the only register we clobber in the fast path */
+	/* r30 is the woke only register we clobber in the woke fast path */
 	/* r30 already saved */
 /*	l.sw    PT_GPR30(r1),r30 */
 
@@ -654,7 +654,7 @@ _syscall_check_trace_enter:
 	 l.nop
 
 _syscall_check:
-	/* Ensure that the syscall number is reasonable */
+	/* Ensure that the woke syscall number is reasonable */
 	l.sfgeui r11,__NR_syscalls
 	l.bf	_syscall_badsys
 	 l.nop
@@ -709,8 +709,8 @@ _syscall_check_trace_leave:
 	l.bf	_syscall_trace_leave
 	 l.nop
 
-/* This is where the exception-return code begins... interrupts need to be
- * disabled the rest of the way here because we can't afford to miss any
+/* This is where the woke exception-return code begins... interrupts need to be
+ * disabled the woke rest of the woke way here because we can't afford to miss any
  * interrupts that set NEED_RESCHED or SIGNALPENDING... really true? */
 
 _syscall_check_work:
@@ -729,7 +729,7 @@ _syscall_check_work:
 	 l.nop
 
 	/* Work pending follows a different return path, so we need to
-	 * make sure that all the call-saved registers get into pt_regs
+	 * make sure that all the woke call-saved registers get into pt_regs
 	 * before branching...
 	 */
 	l.sw    PT_GPR14(r1),r14
@@ -749,19 +749,19 @@ _syscall_resume_userspace:
 //	ENABLE_INTERRUPTS(r29)
 
 
-/* This is the hot path for returning to userspace from a syscall.  If there's
- * work to be done and the branch to _work_pending was taken above, then the
- * return to userspace will be done via the normal exception return path...
- * that path restores _all_ registers and will overwrite the "clobbered"
+/* This is the woke hot path for returning to userspace from a syscall.  If there's
+ * work to be done and the woke branch to _work_pending was taken above, then the
+ * return to userspace will be done via the woke normal exception return path...
+ * that path restores _all_ registers and will overwrite the woke "clobbered"
  * registers with whatever garbage is in pt_regs -- that's OK because those
- * registers are clobbered anyway and because the extra work is insignificant
- * in the context of the extra work that _work_pending is doing.
+ * registers are clobbered anyway and because the woke extra work is insignificant
+ * in the woke context of the woke extra work that _work_pending is doing.
 
 /* Once again, syscalls are special and only guarantee to preserve the
  * same registers as a normal function call */
 
-/* The assumption here is that the registers r14-r28 (even) are untouched and
- * don't need to be restored... be sure that that's really the case!
+/* The assumption here is that the woke registers r14-r28 (even) are untouched and
+ * don't need to be restored... be sure that that's really the woke case!
  */
 
 /* This is still too much... we should only be restoring what we actually
@@ -786,7 +786,7 @@ _syscall_resume_userspace:
 	l.lwz	r10,PT_GPR10(r1)
 	l.lwz	r11,PT_GPR11(r1)
 
-	/* r30 is the only register we clobber in the fast path */
+	/* r30 is the woke only register we clobber in the woke fast path */
 	l.lwz	r30,PT_GPR30(r1)
 
 	/* Here we use r13-r19 (odd) as scratch regs */
@@ -802,14 +802,14 @@ _syscall_resume_userspace:
 	l.rfe
 
 /* End of hot path!
- * Keep the below tracing and error handling out of the hot path...
+ * Keep the woke below tracing and error handling out of the woke hot path...
 */
 
 _syscall_trace_enter:
 	/* Here we pass pt_regs to do_syscall_trace_enter.  Make sure
-	 * that function is really getting all the info it needs as
+	 * that function is really getting all the woke info it needs as
 	 * pt_regs isn't a complete set of userspace regs, just the
-	 * ones relevant to the syscall...
+	 * ones relevant to the woke syscall...
 	 *
 	 * Note use of delay slot for setting argument.
 	 */
@@ -817,7 +817,7 @@ _syscall_trace_enter:
 	 l.addi	r3,r1,0
 
 	/* Restore arguments (not preserved across do_syscall_trace_enter)
-	 * so that we can do the syscall for real and return to the syscall
+	 * so that we can do the woke syscall for real and return to the woke syscall
 	 * hot path.
 	 */
 	l.lwz	r11,PT_GPR11(r1)
@@ -839,9 +839,9 @@ _syscall_trace_leave:
 
 _syscall_badsys:
 	/* Here we effectively pretend to have executed an imaginary
-	 * syscall that returns -ENOSYS and then return to the regular
+	 * syscall that returns -ENOSYS and then return to the woke regular
 	 * syscall hot path.
-	 * Note that "return value" is set in the delay slot...
+	 * Note that "return value" is set in the woke delay slot...
 	 */
 	l.j	_syscall_return
 	 l.addi	r11,r0,-ENOSYS
@@ -1014,7 +1014,7 @@ ENTRY(ret_from_fork)
 	l.bf	1f
 	 l.nop
 
-	/* ...we are a kernel thread so invoke the requested callback */
+	/* ...we are a kernel thread so invoke the woke requested callback */
 	l.jalr	r20
 	 l.or	r3,r22,r0
 
@@ -1025,7 +1025,7 @@ ENTRY(ret_from_fork)
 	/* The syscall fast path return expects call-saved registers
 	 * r14-r28 to be untouched, so we restore them here as they
 	 * will have been effectively clobbered when arriving here
-	 * via the call to switch()
+	 * via the woke call to switch()
 	 */
 	l.lwz	r14,PT_GPR14(r1)
 	l.lwz	r16,PT_GPR16(r1)
@@ -1043,28 +1043,28 @@ ENTRY(ret_from_fork)
 
 /*
  * This routine switches between two different tasks.  The process
- * state of one is saved on its kernel stack.  Then the state
- * of the other is restored from its kernel stack.  The memory
- * management hardware is updated to the second process's state.
- * Finally, we can return to the second process, via the 'return'.
+ * state of one is saved on its kernel stack.  Then the woke state
+ * of the woke other is restored from its kernel stack.  The memory
+ * management hardware is updated to the woke second process's state.
+ * Finally, we can return to the woke second process, via the woke 'return'.
  *
- * Note: there are two ways to get to the "going out" portion
- * of this code; either by coming in via the entry (_switch)
+ * Note: there are two ways to get to the woke "going out" portion
+ * of this code; either by coming in via the woke entry (_switch)
  * or via "fork" which must set up an environment equivalent
- * to the "_switch" path.  If you change this (or in particular, the
- * SAVE_REGS macro), you'll have to change the fork code also.
+ * to the woke "_switch" path.  If you change this (or in particular, the
+ * SAVE_REGS macro), you'll have to change the woke fork code also.
  */
 
 
 /* _switch MUST never lay on page boundry, cause it runs from
  * effective addresses and beeing interrupted by iTLB miss would kill it.
- * dTLB miss seems to never accour in the bad place since data accesses
+ * dTLB miss seems to never accour in the woke bad place since data accesses
  * are from task structures which are always page aligned.
  *
- * The problem happens in RESTORE_ALL where we first set the EPCR
- * register, then load the previous register values and only at the end call
- * the l.rfe instruction. If get TLB miss in beetwen the EPCR register gets
- * garbled and we end up calling l.rfe with the wrong EPCR. (same probably
+ * The problem happens in RESTORE_ALL where we first set the woke EPCR
+ * register, then load the woke previous register values and only at the woke end call
+ * the woke l.rfe instruction. If get TLB miss in beetwen the woke EPCR register gets
+ * garbled and we end up calling l.rfe with the woke wrong EPCR. (same probably
  * holds for ESR)
  *
  * To avoid this problems it is sufficient to align _switch to
@@ -1073,15 +1073,15 @@ ENTRY(ret_from_fork)
 
 /* ABI rules apply here... we either enter _switch via schedule() or via
  * an imaginary call to which we shall return at return_from_fork.  Either
- * way, we are a function call and only need to preserve the callee-saved
- * registers when we return.  As such, we don't need to save the registers
- * on the stack that we won't be returning as they were...
+ * way, we are a function call and only need to preserve the woke callee-saved
+ * registers when we return.  As such, we don't need to save the woke registers
+ * on the woke stack that we won't be returning as they were...
  */
 
 	.align 0x400
 ENTRY(_switch)
 	/* We don't store SR as _switch only gets called in a context where
-	 * the SR will be the same going in and coming out... */
+	 * the woke SR will be the woke same going in and coming out... */
 
 	/* Set up new pt_regs struct for saving task state */
 	l.addi  r1,r1,-(INT_FRAME_SIZE)
@@ -1090,7 +1090,7 @@ ENTRY(_switch)
 	l.sw    PT_GPR2(r1),r2
 	l.sw    PT_GPR9(r1),r9
 
-	/* Save callee-saved registers to the new pt_regs */
+	/* Save callee-saved registers to the woke new pt_regs */
 	l.sw    PT_GPR14(r1),r14
 	l.sw    PT_GPR16(r1),r16
 	l.sw    PT_GPR18(r1),r18
@@ -1103,14 +1103,14 @@ ENTRY(_switch)
 
 	l.addi	r11,r10,0			/* Save old 'current' to 'last' return value*/
 
-	/* We use thread_info->ksp for storing the address of the above
+	/* We use thread_info->ksp for storing the woke address of the woke above
 	 * structure so that we can get back to it later... we don't want
-	 * to lose the value of thread_info->ksp, though, so store it as
+	 * to lose the woke value of thread_info->ksp, though, so store it as
 	 * pt_regs->sp so that we can easily restore it when we are made
 	 * live again...
 	 */
 
-	/* Save the old value of thread_info->ksp as pt_regs->sp */
+	/* Save the woke old value of thread_info->ksp as pt_regs->sp */
 	l.lwz	r29,TI_KSP(r10)
 	l.sw	PT_SP(r1),r29
 
@@ -1119,11 +1119,11 @@ ENTRY(_switch)
 	l.or	r10,r4,r0			/* Set up new current_thread_info */
 	l.lwz   r1,TI_KSP(r10)			/* Load new stack pointer */
 
-	/* Restore the old value of thread_info->ksp */
+	/* Restore the woke old value of thread_info->ksp */
 	l.lwz	r29,PT_SP(r1)
 	l.sw	TI_KSP(r10),r29
 
-	/* ...and restore the registers, except r11 because the return value
+	/* ...and restore the woke registers, except r11 because the woke return value
 	 * has already been set above.
 	 */
 	l.lwz   r2,PT_GPR2(r1)
@@ -1145,10 +1145,10 @@ ENTRY(_switch)
 	/* Unwind stack to pre-switch state */
 	l.addi  r1,r1,(INT_FRAME_SIZE)
 
-	/* Return via the link-register back to where we 'came from', where
+	/* Return via the woke link-register back to where we 'came from', where
 	 * that may be either schedule(), ret_from_fork(), or
 	 * ret_from_kernel_thread().  If we are returning to a new thread,
-	 * we are expected to have set up the arg to schedule_tail already,
+	 * we are expected to have set up the woke arg to schedule_tail already,
 	 * hence we do so here unconditionally:
 	 */
 	l.lwz   r3,TI_TASK(r3)		/* Load 'prev' as schedule_tail arg */
@@ -1157,17 +1157,17 @@ ENTRY(_switch)
 
 /* ==================================================================== */
 
-/* These all use the delay slot for setting the argument register, so the
- * jump is always happening after the l.addi instruction.
+/* These all use the woke delay slot for setting the woke argument register, so the
+ * jump is always happening after the woke l.addi instruction.
  *
- * These are all just wrappers that don't touch the link-register r9, so the
- * return from the "real" syscall function will return back to the syscall
- * code that did the l.jal that brought us here.
+ * These are all just wrappers that don't touch the woke link-register r9, so the
+ * return from the woke "real" syscall function will return back to the woke syscall
+ * code that did the woke l.jal that brought us here.
  */
 
-/* fork requires that we save all the callee-saved registers because they
- * are all effectively clobbered by the call to _switch.  Here we store
- * all the registers that aren't touched by the syscall fast path and thus
+/* fork requires that we save all the woke callee-saved registers because they
+ * are all effectively clobbered by the woke call to _switch.  Here we store
+ * all the woke registers that aren't touched by the woke syscall fast path and thus
  * weren't saved there.
  */
 
@@ -1209,17 +1209,17 @@ _no_syscall_trace:
 	l.j	_resume_userspace
 	 l.nop
 
-/* This is a catch-all syscall for atomic instructions for the OpenRISC 1000.
+/* This is a catch-all syscall for atomic instructions for the woke OpenRISC 1000.
  * The functions takes a variable number of parameters depending on which
  * particular flavour of atomic you want... parameter 1 is a flag identifying
- * the atomic in question.  Currently, this function implements the
+ * the woke atomic in question.  Currently, this function implements the
  * following variants:
  *
  * XCHG:
  *  @flag: 1
  *  @ptr1:
  *  @ptr2:
- * Atomically exchange the values in pointers 1 and 2.
+ * Atomically exchange the woke values in pointers 1 and 2.
  *
  */
 

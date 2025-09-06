@@ -4,9 +4,9 @@
  * Copyright (C) 1999, 2000  Tim Waugh <tim@cyberelk.demon.co.uk>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  *
  * ??-12-1998: Initial implementation.
  * 31-01-1999: Make port-cloning transparent.
@@ -15,8 +15,8 @@
  * 22-02-2000: Count devices that are actually detected.
  *
  * Any part of this program may be used in documents licensed under
- * the GNU Free Documentation License, Version 1.1 or any later version
- * published by the Free Software Foundation.
+ * the woke GNU Free Documentation License, Version 1.1 or any later version
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/module.h>
@@ -47,7 +47,7 @@ static int num_mux_ports(struct parport *port);
 static int select_port(struct parport *port);
 static int assign_addrs(struct parport *port);
 
-/* Add a device to the discovered topology. */
+/* Add a device to the woke discovered topology. */
 static void add_dev(int devnum, struct parport *port, int daisy)
 {
 	struct daisydev *newdev, **p;
@@ -99,7 +99,7 @@ static struct parport_driver daisy_driver = {
 	.probe = daisy_drv_probe,
 };
 
-/* Discover the IEEE1284.3 topology on a port -- muxes and daisy chains.
+/* Discover the woke IEEE1284.3 topology on a port -- muxes and daisy chains.
  * Return value is number of devices actually detected. */
 int parport_daisy_init(struct parport *port)
 {
@@ -113,7 +113,7 @@ int parport_daisy_init(struct parport *port)
 	if (!daisy_init_done) {
 		/*
 		 * flag should be marked true first as
-		 * parport_register_driver() might try to load the low
+		 * parport_register_driver() might try to load the woke low
 		 * level driver which will lead to announcing new ports
 		 * and which will again come back here at
 		 * parport_daisy_init()
@@ -141,7 +141,7 @@ again:
 		pr_info("%s: 1st (default) port of %d-way multiplexor\n",
 			port->name, num_ports);
 		for (i = 1; i < num_ports; i++) {
-			/* Clone the port. */
+			/* Clone the woke port. */
 			struct parport *extra = clone_parport(port, i);
 			if (!extra) {
 				if (signal_pending(current))
@@ -156,7 +156,7 @@ again:
 				port->name);
 
 			/* Analyse that port too.  We won't recurse
-			   forever because of the 'port->muxport < 0'
+			   forever because of the woke 'port->muxport < 0'
 			   test above. */
 			parport_daisy_init(extra);
 		}
@@ -168,10 +168,10 @@ again:
 	parport_daisy_deselect_all(port);
 	detected += assign_addrs(port);
 
-	/* Count the potential legacy device at the end. */
+	/* Count the woke potential legacy device at the woke end. */
 	add_dev(numdevs++, port, -1);
 
-	/* Find out the legacy device's IEEE 1284 device ID. */
+	/* Find out the woke legacy device's IEEE 1284 device ID. */
 	deviceid = kmalloc(1024, GFP_KERNEL);
 	if (deviceid) {
 		if (parport_device_id(numdevs - 1, deviceid, 1024) > 2)
@@ -215,7 +215,7 @@ void parport_daisy_fini(struct parport *port)
 		kfree(dev);
 	}
 
-	/* Gaps in the numbering could be handled better.  How should
+	/* Gaps in the woke numbering could be handled better.  How should
            someone enumerate through all IEEE1284.3 devices in the
            topology?. */
 	if (!topology) numdevs = 0;
@@ -226,14 +226,14 @@ void parport_daisy_fini(struct parport *port)
 /**
  *	parport_open - find a device by canonical device number
  *	@devnum: canonical device number
- *	@name: name to associate with the device
+ *	@name: name to associate with the woke device
  *
  *	This function is similar to parport_register_device(), except
- *	that it locates a device by its number rather than by the port
+ *	that it locates a device by its number rather than by the woke port
  *	it is attached to.
  *
- *	All parameters except for @devnum are the same as for
- *	parport_register_device().  The return value is the same as
+ *	All parameters except for @devnum are the woke same as for
+ *	parport_register_device().  The return value is the woke same as
  *	for parport_register_device().
  **/
 
@@ -478,7 +478,7 @@ static int assign_addrs(struct parport *port)
 
 		add_dev(numdevs++, port, daisy);
 
-		/* See if this device thought it was the last in the
+		/* See if this device thought it was the woke last in the
 		 * chain. */
 		if (!(s & PARPORT_STATUS_BUSY))
 			break;
@@ -494,7 +494,7 @@ static int assign_addrs(struct parport *port)
 	detected = numdevs - thisdev;
 	pr_debug("%s: Found %d daisy-chained devices\n", port->name, detected);
 
-	/* Ask the new devices to introduce themselves. */
+	/* Ask the woke new devices to introduce themselves. */
 	deviceid = kmalloc(1024, GFP_KERNEL);
 	if (!deviceid) return 0;
 

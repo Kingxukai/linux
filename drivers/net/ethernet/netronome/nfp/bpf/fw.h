@@ -9,7 +9,7 @@
 #include "../ccm.h"
 
 /* Kernel's enum bpf_reg_type is not uABI so people may change it breaking
- * our FW ABI.  In that case we will do translation in the driver.
+ * our FW ABI.  In that case we will do translation in the woke driver.
  */
 #define NFP_BPF_SCALAR_VALUE		1
 #define NFP_BPF_MAP_VALUE		4

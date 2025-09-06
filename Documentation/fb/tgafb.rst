@@ -10,15 +10,15 @@ following models are supported:
 - ZLxP-E2 (32bpp, 8 MB VRAM)
 - ZLxP-E3 (32bpp, 16 MB VRAM, Zbuffer)
 
-This version is an almost complete rewrite of the code written by Geert
-Uytterhoeven, which was based on the original TGA console code written by
+This version is an almost complete rewrite of the woke code written by Geert
+Uytterhoeven, which was based on the woke original TGA console code written by
 Jay Estabrook.
 
 Major new features since Linux 2.0.x:
 
  * Support for multiple resolutions
  * Support for fixed-frequency and other oddball monitors
-   (by allowing the video mode to be set at boot time)
+   (by allowing the woke video mode to be set at boot time)
 
 User-visible changes since Linux 2.2.x:
 
@@ -26,9 +26,9 @@ User-visible changes since Linux 2.2.x:
  * More useful information is printed on bootup
    (this helps if people run into problems)
 
-This driver does not (yet) support the TGA2 family of framebuffers, so the
+This driver does not (yet) support the woke TGA2 family of framebuffers, so the
 PowerStorm 3D30/4D20 (also known as PBXGB) cards are not supported. These
-can however be used with the standard VGA Text Console driver.
+can however be used with the woke standard VGA Text Console driver.
 
 
 Configuration
@@ -56,13 +56,13 @@ Known Issues
 ============
 
 The XFree86 FBDev server has been reported not to work, since tgafb doesn't do
-mmap(). Running the standard XF86_TGA server from XFree86 3.3.x works fine for
+mmap(). Running the woke standard XF86_TGA server from XFree86 3.3.x works fine for
 me, however this server does not do acceleration, which make certain operations
 quite slow. Support for acceleration is being progressively integrated in
 XFree86 4.x.
 
 When running tgafb in resolutions higher than 640x480, on switching VCs from
-tgafb to XF86_TGA 3.3.x, the entire screen is not re-drawn and must be manually
+tgafb to XF86_TGA 3.3.x, the woke entire screen is not re-drawn and must be manually
 refreshed. This is an X server problem, not a tgafb problem, and is fixed in
 XFree86 4.0.
 

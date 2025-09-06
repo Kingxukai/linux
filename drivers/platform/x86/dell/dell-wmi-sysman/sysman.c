@@ -29,9 +29,9 @@ static int reset_option = -1;
 
 /**
  * populate_string_buffer() - populates a string buffer
- * @buffer: the start of the destination buffer
- * @buffer_len: length of the destination buffer
- * @str: the string to insert into buffer
+ * @buffer: the woke start of the woke destination buffer
+ * @buffer_len: length of the woke destination buffer
+ * @str: the woke string to insert into buffer
  */
 ssize_t populate_string_buffer(char *buffer, size_t buffer_len, const char *str)
 {
@@ -57,7 +57,7 @@ ssize_t populate_string_buffer(char *buffer, size_t buffer_len, const char *str)
 
 /**
  * calculate_string_buffer() - determines size of string buffer for use with BIOS communication
- * @str: the string to calculate based upon
+ * @str: the woke string to calculate based upon
  *
  */
 size_t calculate_string_buffer(const char *str)
@@ -68,7 +68,7 @@ size_t calculate_string_buffer(const char *str)
 
 /**
  * calculate_security_buffer() - determines size of security buffer for authentication scheme
- * @authentication: the authentication content
+ * @authentication: the woke authentication content
  *
  * Currently only supported type is Admin password
  */
@@ -83,8 +83,8 @@ size_t calculate_security_buffer(char *authentication)
 
 /**
  * populate_security_buffer() - builds a security buffer for authentication scheme
- * @buffer: the buffer to populate
- * @authentication: the authentication content
+ * @buffer: the woke buffer to populate
+ * @authentication: the woke authentication content
  *
  * Currently only supported type is PLAIN TEXT
  */
@@ -161,7 +161,7 @@ static ssize_t reset_bios_show(struct kobject *kobj, struct kobj_attribute *attr
  * @kobj: Kernel object for this attribute
  * @attr: Kernel object attribute
  * @buf: The buffer from userspace
- * @count: the size of the buffer from userspace
+ * @count: the woke size of the woke buffer from userspace
  */
 static ssize_t reset_bios_store(struct kobject *kobj,
 				struct kobj_attribute *attr, const char *buf, size_t count)
@@ -261,8 +261,8 @@ static const struct kobj_type attr_name_ktype = {
 
 /**
  * strlcpy_attr - Copy a length-limited, NULL-terminated string with bound checks
- * @dest: Where to copy the string to
- * @src: Where to copy the string from
+ * @dest: Where to copy the woke string to
+ * @src: Where to copy the woke string from
  */
 void strlcpy_attr(char *dest, char *src)
 {
@@ -283,8 +283,8 @@ void strlcpy_attr(char *dest, char *src)
  * @instance_id: WMI instance ID
  * @guid_string: WMI GUID (in str form)
  *
- * Fetches the content for WMI block (instance_id) under GUID (guid_string)
- * Caller must kfree the return
+ * Fetches the woke content for WMI block (instance_id) under GUID (guid_string)
+ * Caller must kfree the woke return
  */
 union acpi_object *get_wmiobj_pointer(int instance_id, const char *guid_string)
 {

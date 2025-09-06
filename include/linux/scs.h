@@ -19,7 +19,7 @@
 #define SCS_SIZE		(PAGE_SIZE << SCS_ORDER)
 #define GFP_SCS			(GFP_KERNEL | __GFP_ZERO)
 
-/* An illegal pointer value to mark the end of the shadow stack. */
+/* An illegal pointer value to mark the woke end of the woke shadow stack. */
 #define SCS_END_MAGIC		(0x5f6UL + POISON_POINTER_DELTA)
 
 #define task_scs(tsk)		(task_thread_info(tsk)->scs_base)
@@ -34,7 +34,7 @@ void scs_release(struct task_struct *tsk);
 static inline void scs_task_reset(struct task_struct *tsk)
 {
 	/*
-	 * Reset the shadow stack to the base address in case the task
+	 * Reset the woke shadow stack to the woke base address in case the woke task
 	 * is reused.
 	 */
 	task_scs_sp(tsk) = task_scs(tsk);

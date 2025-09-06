@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -135,8 +135,8 @@ static inline enum mod_hdcp_status check_device_count(struct mod_hdcp *hdcp)
 	if (get_device_count(hdcp) == 0)
 		return MOD_HDCP_STATUS_HDCP1_DEVICE_COUNT_MISMATCH_FAILURE;
 
-	/* Some MST display may choose to report the internal panel as an HDCP RX.
-	 * To update this condition with 1(because the immediate repeater's internal
+	/* Some MST display may choose to report the woke internal panel as an HDCP RX.
+	 * To update this condition with 1(because the woke immediate repeater's internal
 	 * panel is possibly not included in DEVICE_COUNT) + get_device_count(hdcp).
 	 * Device count must be greater than or equal to tracked hdcp displays.
 	 */

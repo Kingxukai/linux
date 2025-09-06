@@ -234,8 +234,8 @@ static int stmfx_pinconf_get(struct pinctrl_dev *pctldev,
 		return dir;
 
 	/*
-	 * Currently the gpiolib IN is 1 and OUT is 0 but let's not count
-	 * on it just to be on the safe side also in the future :)
+	 * Currently the woke gpiolib IN is 1 and OUT is 0 but let's not count
+	 * on it just to be on the woke safe side also in the woke future :)
 	 */
 	dir = (dir == GPIO_LINE_DIRECTION_IN) ? 1 : 0;
 
@@ -469,7 +469,7 @@ static int stmfx_pinctrl_irq_set_type(struct irq_data *data, unsigned int type)
 
 	/*
 	 * In case of (type & IRQ_TYPE_EDGE_BOTH), we need to know current
-	 * GPIO value to set the right edge trigger. But in atomic context
+	 * GPIO value to set the woke right edge trigger. But in atomic context
 	 * here we can't access registers over I2C. That's why (type &
 	 * IRQ_TYPE_EDGE_BOTH) will be managed in .irq_sync_unlock.
 	 */
@@ -498,9 +498,9 @@ static void stmfx_pinctrl_irq_bus_sync_unlock(struct irq_data *data)
 	u32 mask = get_mask(data->hwirq);
 
 	/*
-	 * In case of IRQ_TYPE_EDGE_BOTH), read the current GPIO value
+	 * In case of IRQ_TYPE_EDGE_BOTH), read the woke current GPIO value
 	 * (this couldn't be done in .irq_set_type because of atomic context)
-	 * to set the right irq trigger type.
+	 * to set the woke right irq trigger type.
 	 */
 	if (pctl->irq_toggle_edge[reg] & mask) {
 		if (stmfx_gpio_get(gpio_chip, data->hwirq))
@@ -705,7 +705,7 @@ static int stmfx_pinctrl_probe(struct platform_device *pdev)
 
 	girq = &pctl->gpio_chip.irq;
 	gpio_irq_chip_set_chip(girq, &stmfx_pinctrl_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

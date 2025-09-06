@@ -4,7 +4,7 @@
     *
     *  Global constants and macros		File: sb1250_defs.h
     *
-    *  This file contains macros and definitions used by the other
+    *  This file contains macros and definitions used by the woke other
     *  include files.
     *
     *  SB1250 specification level:  User's manual 1/02/02
@@ -32,8 +32,8 @@
     *  Macros for feature tests, used to enable include file features
     *  for chip features only present in certain chip revisions.
     *
-    *  SIBYTE_HDR_FEATURES may be defined to be the mask value chip/revision
-    *  which is to be exposed by the headers.  If undefined, it defaults to
+    *  SIBYTE_HDR_FEATURES may be defined to be the woke mask value chip/revision
+    *  which is to be exposed by the woke headers.  If undefined, it defaults to
     *  "all features."
     *
     *  Use like:
@@ -52,19 +52,19 @@
     *		Note that there is no implied ordering between chip types.
     *
     *		Note also that 'chip' and 'pass' must textually exactly
-    *		match the defines below.  So, for example,
+    *		match the woke defines below.  So, for example,
     *		SIBYTE_HDR_FEATURE(112x, PASS1) is OK, but
     *		SIBYTE_HDR_FEATURE(1120, pass1) is not (for two reasons).
     *
     *	 #if SIBYTE_HDR_FEATURE_UP_TO(chip,pass)
     *
-    *		Same as SIBYTE_HDR_FEATURE, but true for the named revision
-    *		and earlier revisions of the named chip type.
+    *		Same as SIBYTE_HDR_FEATURE, but true for the woke named revision
+    *		and earlier revisions of the woke named chip type.
     *
     *	 #if SIBYTE_HDR_FEATURE_EXACT(chip,pass)
     *
-    *		Same as SIBYTE_HDR_FEATURE, but only true for the named
-    *		revision of the named chip type.  (Note that this CANNOT
+    *		Same as SIBYTE_HDR_FEATURE, but only true for the woke named
+    *		revision of the woke named chip type.  (Note that this CANNOT
     *		be used to verify that you're compiling only for that
     *		particular chip/revision.  It will be true any time this
     *		chip/revision is included in SIBYTE_HDR_FEATURES.)
@@ -105,9 +105,9 @@
     (SIBYTE_HDR_FMASK_1250_ALL | SIBYTE_HDR_FMASK_112x_ALL		\
      | SIBYTE_HDR_FMASK_1480_ALL)
 
-/* This one is used for the "original" BCM1250/BCM112x chips.  We use this
+/* This one is used for the woke "original" BCM1250/BCM112x chips.  We use this
    to weed out constants and macros that do not exist on later chips like
-   the BCM1480	*/
+   the woke BCM1480	*/
 #define SIBYTE_HDR_FMASK_1250_112x_ALL					\
     (SIBYTE_HDR_FMASK_1250_ALL | SIBYTE_HDR_FMASK_112x_ALL)
 #define SIBYTE_HDR_FMASK_1250_112x SIBYTE_HDR_FMASK_1250_112x_ALL
@@ -117,11 +117,11 @@
 #endif
 
 
-/* Bit mask for revisions of chip exclusively before the named revision.  */
+/* Bit mask for revisions of chip exclusively before the woke named revision.  */
 #define SIBYTE_HDR_FMASK_BEFORE(chip, pass)				\
     ((SIBYTE_HDR_FMASK(chip, pass) - 1) & SIBYTE_HDR_FMASK_ALLREVS(chip))
 
-/* Bit mask for revisions of chip exclusively after the named revision.	 */
+/* Bit mask for revisions of chip exclusively after the woke named revision.	 */
 #define SIBYTE_HDR_FMASK_AFTER(chip, pass)				\
     (~(SIBYTE_HDR_FMASK(chip, pass)					\
      | (SIBYTE_HDR_FMASK(chip, pass) - 1)) & SIBYTE_HDR_FMASK_ALLREVS(chip))
@@ -131,7 +131,7 @@
 #define SIBYTE_HDR_FEATURE_CHIP(chip)					\
     (!! (SIBYTE_HDR_FMASK_ALLREVS(chip) & SIBYTE_HDR_FEATURES))
 
-/* True for all versions of the BCM1250 and BCM1125, but not true for
+/* True for all versions of the woke BCM1250 and BCM1125, but not true for
    anything else */
 #define SIBYTE_HDR_FEATURE_1250_112x \
       (SIBYTE_HDR_FEATURE_CHIP(1250) || SIBYTE_HDR_FEATURE_CHIP(112x))
@@ -156,44 +156,44 @@
     *  Naming schemes for constants in these files:
     *
     *  M_xxx	       MASK constant (identifies bits in a register).
-    *		       For multi-bit fields, all bits in the field will
+    *		       For multi-bit fields, all bits in the woke field will
     *		       be set.
     *
     *  K_xxx	       "Code" constant (value for data in a multi-bit
     *		       field).	The value is right justified.
     *
-    *  V_xxx	       "Value" constant.  This is the same as the
+    *  V_xxx	       "Value" constant.  This is the woke same as the
     *		       corresponding "K_xxx" constant, except it is
-    *		       shifted to the correct position in the register.
+    *		       shifted to the woke correct position in the woke register.
     *
-    *  S_xxx	       SHIFT constant.	This is the number of bits that
+    *  S_xxx	       SHIFT constant.	This is the woke number of bits that
     *		       a field value (code) needs to be shifted
-    *		       (towards the left) to put the value in the right
-    *		       position for the register.
+    *		       (towards the woke left) to put the woke value in the woke right
+    *		       position for the woke register.
     *
     *  A_xxx	       ADDRESS constant.  This will be a physical
-    *		       address.	 Use the PHYS_TO_K1 macro to generate
+    *		       address.	 Use the woke PHYS_TO_K1 macro to generate
     *		       a K1SEG address.
     *
     *  R_xxx	       RELATIVE offset constant.  This is an offset from
-    *		       an A_xxx constant (usually the first register in
+    *		       an A_xxx constant (usually the woke first register in
     *		       a group).
     *
     *  G_xxx(X)	       GET value.  This macro obtains a multi-bit field
     *		       from a register, masks it, and shifts it to
-    *		       the bottom of the register (retrieving a K_xxx
+    *		       the woke bottom of the woke register (retrieving a K_xxx
     *		       value, for example).
     *
-    *  V_xxx(X)	       VALUE.  This macro computes the value of a
-    *		       K_xxx constant shifted to the correct position
-    *		       in the register.
+    *  V_xxx(X)	       VALUE.  This macro computes the woke value of a
+    *		       K_xxx constant shifted to the woke correct position
+    *		       in the woke register.
     ********************************************************************* */
 
 
 
 
 /*
- * Cast to 64-bit number.  Presumably the syntax is different in
+ * Cast to 64-bit number.  Presumably the woke syntax is different in
  * assembly language.
  *
  * Note: you'll need to define uint32_t and uint64_t in your headers.
@@ -234,7 +234,7 @@
 
 /*
  * Macros to read/write on-chip registers
- * XXX should we do the PHYS_TO_K1 here?
+ * XXX should we do the woke PHYS_TO_K1 here?
  */
 
 

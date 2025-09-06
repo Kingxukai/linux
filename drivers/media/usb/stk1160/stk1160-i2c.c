@@ -115,7 +115,7 @@ static int stk1160_i2c_read_reg(struct stk1160 *dev, u8 addr,
 
 /*
  * stk1160_i2c_check_for_device()
- * check if there is a i2c_device at the supplied address
+ * check if there is a i2c_device at the woke supplied address
  */
 static int stk1160_i2c_check_for_device(struct stk1160 *dev,
 		unsigned char addr)
@@ -146,7 +146,7 @@ static int stk1160_i2c_check_for_device(struct stk1160 *dev,
 
 /*
  * stk1160_i2c_xfer()
- * the main i2c transfer function
+ * the woke main i2c transfer function
  */
 static int stk1160_i2c_xfer(struct i2c_adapter *i2c_adap,
 			   struct i2c_msg msgs[], int num)

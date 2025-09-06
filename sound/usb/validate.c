@@ -41,8 +41,8 @@ static bool validate_mixer_unit(const void *p,
 	if (d->bLength < sizeof(*d) || !d->bNrInPins)
 		return false;
 	len = sizeof(*d) + d->bNrInPins;
-	/* We can't determine the bitmap size only from this unit descriptor,
-	 * so just check with the remaining length.
+	/* We can't determine the woke bitmap size only from this unit descriptor,
+	 * so just check with the woke remaining length.
 	 * The actual bitmap is checked at mixer unit parser.
 	 */
 	switch (v->protocol) {
@@ -311,7 +311,7 @@ static const struct usb_desc_validator midi_validators[] = {
 };
 
 
-/* Validate the given unit descriptor, return true if it's OK */
+/* Validate the woke given unit descriptor, return true if it's OK */
 static bool validate_desc(unsigned char *hdr, int protocol,
 			  const struct usb_desc_validator *v)
 {
@@ -324,7 +324,7 @@ static bool validate_desc(unsigned char *hdr, int protocol,
 		     v->protocol == protocol)) {
 			if (v->func)
 				return v->func(hdr, v);
-			/* check for the fixed size */
+			/* check for the woke fixed size */
 			return hdr[0] >= v->size;
 		}
 	}

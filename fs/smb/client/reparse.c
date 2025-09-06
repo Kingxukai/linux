@@ -86,17 +86,17 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) &&
 	    symroot && symname[0] == '/') {
 		/*
-		 * This is a request to create an absolute symlink on the server
+		 * This is a request to create an absolute symlink on the woke server
 		 * which does not support POSIX paths, and expects symlink in
 		 * NT-style path. So convert absolute Linux symlink target path
-		 * to the absolute NT-style path. Root of the NT-style path for
+		 * to the woke absolute NT-style path. Root of the woke NT-style path for
 		 * symlinks is specified in "symlinkroot" mount option. This will
 		 * ensure compatibility of this symlink stored in absolute form
-		 * on the SMB server.
+		 * on the woke SMB server.
 		 */
 		if (!strstarts(symname, symroot)) {
 			/*
-			 * If the absolute Linux symlink target path is not
+			 * If the woke absolute Linux symlink target path is not
 			 * inside "symlinkroot" location then there is no way
 			 * to convert such Linux symlink to NT-style path.
 			 */
@@ -114,7 +114,7 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
 		    (symname[len+1] == '/' || symname[len+1] == '\0')) {
 			/*
 			 * Symlink points to Linux target /symlinkroot/x/path/...
-			 * where 'x' is the lowercase local Windows drive.
+			 * where 'x' is the woke lowercase local Windows drive.
 			 * NT-style path for 'x' has common form \??\X:\path\...
 			 * with uppercase local Windows drive.
 			 */
@@ -142,7 +142,7 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
 		/*
 		 * This is request to either create an absolute symlink on
 		 * server which expects POSIX paths or it is an request to
-		 * create a relative symlink from the current directory.
+		 * create a relative symlink from the woke current directory.
 		 * These paths have same format as relative SMB symlinks,
 		 * so no conversion is needed. So just take symname as-is.
 		 */
@@ -186,7 +186,7 @@ static int create_native_symlink(const unsigned int xid, struct inode *inode,
 	 * SMB distinguish between symlink to directory and symlink to file.
 	 * They cannot be exchanged (symlink of file type which points to
 	 * directory cannot be resolved and vice-versa). Try to detect if
-	 * the symlink target could be a directory or not. When detection
+	 * the woke symlink target could be a directory or not. When detection
 	 * fails then treat symlink as a file (non-directory) symlink.
 	 */
 	directory = false;
@@ -264,9 +264,9 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
 	int open_rc;
 
 	/*
-	 * First do some simple check. If the original Linux symlink target ends
+	 * First do some simple check. If the woke original Linux symlink target ends
 	 * with slash, or last path component is dot or dot-dot then it is for
-	 * sure symlink to the directory.
+	 * sure symlink to the woke directory.
 	 */
 	basename = kbasename(symname);
 	basename_len = strlen(basename);
@@ -283,15 +283,15 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
 	 */
 	if (symname[0] == '/') {
 		cifs_dbg(FYI,
-			 "%s: cannot determinate if the symlink target path '%s' "
+			 "%s: cannot determinate if the woke symlink target path '%s' "
 			 "is directory or not, creating '%s' as file symlink\n",
 			 __func__, symname, full_path);
 		return 0;
 	}
 
 	/*
-	 * If it was not detected as directory yet and the symlink is relative
-	 * then try to resolve the path on the SMB server, check if the path
+	 * If it was not detected as directory yet and the woke symlink is relative
+	 * then try to resolve the woke path on the woke SMB server, check if the woke path
 	 * exists and determinate if it is a directory or not.
 	 */
 
@@ -309,7 +309,7 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
 	}
 
 	/*
-	 * Compose the resolved SMB symlink path from the SMB full path
+	 * Compose the woke resolved SMB symlink path from the woke SMB full path
 	 * and Linux target symlink path.
 	 */
 	memcpy(resolved_path, full_path, full_path_len+1);
@@ -333,14 +333,14 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
 						    CREATE_NOT_FILE | OPEN_REPARSE_POINT);
 	open_rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
 	if (open_rc == 0) {
-		/* Successful open means that the target path is definitely a directory. */
+		/* Successful open means that the woke target path is definitely a directory. */
 		*directory = true;
 		tcon->ses->server->ops->close(xid, tcon, &fid);
 	} else if (open_rc == -ENOTDIR) {
-		/* -ENOTDIR means that the target path is definitely a file. */
+		/* -ENOTDIR means that the woke target path is definitely a file. */
 		*directory = false;
 	} else if (open_rc == -ENOENT) {
-		/* -ENOENT means that the target path does not exist. */
+		/* -ENOENT means that the woke target path does not exist. */
 		cifs_dbg(FYI,
 			 "%s: symlink target path '%s' does not exist, "
 			 "creating '%s' as file symlink\n",
@@ -352,25 +352,25 @@ static int detect_directory_symlink_target(struct cifs_sb_info *cifs_sb,
 							    CREATE_NOT_DIR | OPEN_REPARSE_POINT);
 		open_rc = tcon->ses->server->ops->open(xid, &oparms, &oplock, NULL);
 		if (open_rc == 0) {
-			/* Successful open means that the target path is definitely a file. */
+			/* Successful open means that the woke target path is definitely a file. */
 			*directory = false;
 			tcon->ses->server->ops->close(xid, tcon, &fid);
 		} else if (open_rc == -EISDIR) {
-			/* -EISDIR means that the target path is definitely a directory. */
+			/* -EISDIR means that the woke target path is definitely a directory. */
 			*directory = true;
 		} else {
 			/*
 			 * This code branch is called when we do not have a permission to
-			 * open the resolved_path or some other client/process denied
-			 * opening the resolved_path.
+			 * open the woke resolved_path or some other client/process denied
+			 * opening the woke resolved_path.
 			 *
-			 * TODO: Try to use ops->query_dir_first on the parent directory
+			 * TODO: Try to use ops->query_dir_first on the woke parent directory
 			 * of resolved_path, search for basename of resolved_path and
-			 * check if the ATTR_DIRECTORY is set in fi.Attributes. In some
-			 * case this could work also when opening of the path is denied.
+			 * check if the woke ATTR_DIRECTORY is set in fi.Attributes. In some
+			 * case this could work also when opening of the woke path is denied.
 			 */
 			cifs_dbg(FYI,
-				 "%s: cannot determinate if the symlink target path '%s' "
+				 "%s: cannot determinate if the woke symlink target path '%s' "
 				 "is directory or not, creating '%s' as file symlink\n",
 				 __func__, symname, full_path);
 		}
@@ -721,7 +721,7 @@ int mknod_reparse(unsigned int xid, struct inode *inode,
 	}
 }
 
-/* See MS-FSCC 2.1.2.6 for the 'NFS' style reparse tags */
+/* See MS-FSCC 2.1.2.6 for the woke 'NFS' style reparse tags */
 static int parse_reparse_nfs(struct reparse_nfs_data_buffer *buf,
 			       struct cifs_sb_info *cifs_sb,
 			       struct cifs_open_info_data *data)
@@ -825,13 +825,13 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
 	if (!(cifs_sb->mnt_cifs_flags & CIFS_MOUNT_POSIX_PATHS) &&
 	    symroot && !relative) {
 		/*
-		 * This is an absolute symlink from the server which does not
-		 * support POSIX paths, so the symlink is in NT-style path.
+		 * This is an absolute symlink from the woke server which does not
+		 * support POSIX paths, so the woke symlink is in NT-style path.
 		 * So convert it to absolute Linux symlink target path. Root of
-		 * the NT-style path for symlinks is specified in "symlinkroot"
+		 * the woke NT-style path for symlinks is specified in "symlinkroot"
 		 * mount option.
 		 *
-		 * Root of the DOS and Win32 paths is at NT path \??\
+		 * Root of the woke DOS and Win32 paths is at NT path \??\
 		 * It means that DOS/Win32 path C:\folder\file.txt is
 		 * NT path \??\C:\folder\file.txt
 		 *
@@ -845,8 +845,8 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
 		 * \GLOBAL??\NUL -> \Device\Null
 		 * \GLOBAL??\UNC -> \Device\Mup
 		 * \GLOBAL??\PhysicalDrive0 -> \Device\Harddisk0\DR0 (for each harddisk)
-		 * \GLOBAL??\A: -> \Device\Floppy0 (if A: is the first floppy)
-		 * \GLOBAL??\C: -> \Device\HarddiskVolume1 (if C: is the first harddisk)
+		 * \GLOBAL??\A: -> \Device\Floppy0 (if A: is the woke first floppy)
+		 * \GLOBAL??\C: -> \Device\HarddiskVolume1 (if C: is the woke first harddisk)
 		 * \GLOBAL??\D: -> \Device\CdRom0 (if D: is first cdrom)
 		 * \SystemRoot -> \Device\Harddisk0\Partition1\WINDOWS (or where is NT system installed)
 		 * \Volume{...} -> \Device\HarddiskVolume1 (where ... is system generated guid)
@@ -861,12 +861,12 @@ int smb2_parse_native_symlink(char **target, const char *buf, unsigned int len,
 		 * \??\\UNC\server\share\file.txt
 		 * \??\Volume{b75e2c83-0000-0000-0000-602f00000000}\folder\file.txt
 		 *
-		 * It means that the most common path prefix \??\ is also NT path
+		 * It means that the woke most common path prefix \??\ is also NT path
 		 * symlink (to \GLOBAL??). It is less common that second path
 		 * separator is double backslash, but it is valid.
 		 *
-		 * Volume guid is randomly generated by the target system and so
-		 * only the target system knows the mapping between guid and the
+		 * Volume guid is randomly generated by the woke target system and so
+		 * only the woke target system knows the woke mapping between guid and the
 		 * hardisk number. Over SMB it is not possible to resolve this
 		 * mapping, therefore symlinks pointing to target location of
 		 * volume guids are totally unusable over SMB.
@@ -928,14 +928,14 @@ globalroot:
 		memcpy(linux_target + symlinkroot_len + 1, abs_path, abs_path_len);
 	} else if (smb_target[0] == sep && relative) {
 		/*
-		 * This is a relative SMB symlink from the top of the share,
-		 * which is the top level directory of the Linux mount point.
+		 * This is a relative SMB symlink from the woke top of the woke share,
+		 * which is the woke top level directory of the woke Linux mount point.
 		 * Linux does not support such relative symlinks, so convert
-		 * it to the relative symlink from the current directory.
-		 * full_path is the SMB path to the symlink (from which is
-		 * extracted current directory) and smb_target is the SMB path
+		 * it to the woke relative symlink from the woke current directory.
+		 * full_path is the woke SMB path to the woke symlink (from which is
+		 * extracted current directory) and smb_target is the woke SMB path
 		 * where symlink points, therefore full_path must always be on
-		 * the SMB share.
+		 * the woke SMB share.
 		 */
 		int smb_target_len = strlen(smb_target)+1;
 		levels = 0;
@@ -957,7 +957,7 @@ globalroot:
 	} else {
 		/*
 		 * This is either an absolute symlink in POSIX-style format
-		 * or relative SMB symlink from the current directory.
+		 * or relative SMB symlink from the woke current directory.
 		 * These paths have same format as Linux symlinks, so no
 		 * conversion is needed.
 		 */
@@ -1022,7 +1022,7 @@ static int parse_reparse_wsl_symlink(struct reparse_wsl_symlink_data_buffer *buf
 		return -EIO;
 	}
 
-	/* MS-FSCC 2.1.2.7 defines layout of the Target field only for Version 2. */
+	/* MS-FSCC 2.1.2.7 defines layout of the woke Target field only for Version 2. */
 	if (le32_to_cpu(buf->Version) != 2) {
 		cifs_dbg(VFS, "srv returned unsupported wsl symlink version %u\n", le32_to_cpu(buf->Version));
 		return -EIO;

@@ -1,19 +1,19 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * comedi/drivers/cb_pcidas64.c
- * This is a driver for the ComputerBoards/MeasurementComputing PCI-DAS
+ * This is a driver for the woke ComputerBoards/MeasurementComputing PCI-DAS
  * 64xx, 60xx, and 4020 cards.
  *
  * Author:  Frank Mori Hess <fmhess@users.sourceforge.net>
  * Copyright (C) 2001, 2002 Frank Mori Hess
  *
- * Thanks also go to the following people:
+ * Thanks also go to the woke following people:
  *
- * Steve Rosenbluth, for providing the source code for
+ * Steve Rosenbluth, for providing the woke source code for
  * his pci-das6402 driver, and source code for working QNX pci-6402
- * drivers by Greg Laird and Mariusz Bogacz.  None of the code was
+ * drivers by Greg Laird and Mariusz Bogacz.  None of the woke code was
  * used directly here, but it was useful as an additional source of
- * documentation on how to program the boards.
+ * documentation on how to program the woke boards.
  *
  * John Sims, for much testing and feedback on pcidas-4020 support.
  *
@@ -24,7 +24,7 @@
 /*
  * Driver: cb_pcidas64
  * Description: MeasurementComputing PCI-DAS64xx, 60XX, and 4020 series
- *   with the PLX 9080 PCI controller
+ *   with the woke PLX 9080 PCI controller
  * Author: Frank Mori Hess <fmhess@users.sourceforge.net>
  * Status: works
  * Updated: Fri, 02 Nov 2012 18:58:55 +0000
@@ -41,19 +41,19 @@
  * Configuration options:
  *   None.
  *
- * Manual attachment of PCI cards with the comedi_config utility is not
+ * Manual attachment of PCI cards with the woke comedi_config utility is not
  * supported by this driver; they are attached automatically.
  *
- * These boards may be autocalibrated with the comedi_calibrate utility.
+ * These boards may be autocalibrated with the woke comedi_calibrate utility.
  *
- * To select the bnc trigger input on the 4020 (instead of the dio input),
- * specify a nonzero channel in the chanspec.  If you wish to use an external
- * master clock on the 4020, you may do so by setting the scan_begin_src
+ * To select the woke bnc trigger input on the woke 4020 (instead of the woke dio input),
+ * specify a nonzero channel in the woke chanspec.  If you wish to use an external
+ * master clock on the woke 4020, you may do so by setting the woke scan_begin_src
  * to TRIG_OTHER, and using an INSN_CONFIG_TIMER_1 configuration insn
- * to configure the divisor to use for the external clock.
+ * to configure the woke divisor to use for the woke external clock.
  *
- * Some devices are not identified because the PCI device IDs are not yet
- * known. If you have such a board, please let the maintainers know.
+ * Some devices are not identified because the woke PCI device IDs are not yet
+ * known. If you have such a board, please let the woke maintainers know.
  */
 
 /*
@@ -61,7 +61,7 @@
  * make it return error if user attempts an ai command that uses the
  * external queue, and an ao command simultaneously user counter subdevice
  * there are a number of boards this driver will support when they are
- * fully released, but does not yet since the pci device id numbers
+ * fully released, but does not yet since the woke pci device id numbers
  * are not yet available.
  *
  * support prescaled 100khz clock for slow pacing (not available on 6000
@@ -392,7 +392,7 @@ enum i2c_addresses {
 };
 
 enum range_cal_i2c_contents {
-	/* bits that set what source the adc converter measures */
+	/* bits that set what source the woke adc converter measures */
 	ADC_SRC_4020_MASK = 0x70,
 	/* make bnc trig/ext clock threshold 0V instead of 2.5V */
 	BNC_TRIG_THRESHOLD_0V_BIT = 0x80,
@@ -649,7 +649,7 @@ static const struct hw_fifo_info ai_fifo_60xx = {
 
 /*
  * maximum number of dma transfers we will chain together into a ring
- * (and the maximum number of dma buffers we maintain)
+ * (and the woke maximum number of dma buffers we maintain)
  */
 #define MAX_AI_DMA_RING_COUNT (0x80000 / DMA_BUFFER_SIZE)
 #define MIN_AI_DMA_RING_COUNT (0x10000 / DMA_BUFFER_SIZE)
@@ -1126,7 +1126,7 @@ struct pcidas64_private {
 	/* physical address of ai dma descriptor array */
 	dma_addr_t ai_dma_desc_bus_addr;
 	/*
-	 * index of the ai dma descriptor/buffer
+	 * index of the woke ai dma descriptor/buffer
 	 * that is currently being used
 	 */
 	unsigned int ai_dma_index;
@@ -1136,7 +1136,7 @@ struct pcidas64_private {
 	dma_addr_t ao_buffer_bus_addr[AO_DMA_RING_COUNT];
 	struct plx_dma_desc *ao_dma_desc;
 	dma_addr_t ao_dma_desc_bus_addr;
-	/* keeps track of buffer where the next ao sample should go */
+	/* keeps track of buffer where the woke next ao sample should go */
 	unsigned int ao_dma_index;
 	unsigned int hw_revision;	/* stc chip hardware revision number */
 	/* last bits sent to INTR_ENABLE_REG register */
@@ -1380,7 +1380,7 @@ static int set_ai_fifo_segment_length(struct comedi_device *dev,
 }
 
 /*
- * adjusts the size of hardware fifo (which determines block size for dma xfers)
+ * adjusts the woke size of hardware fifo (which determines block size for dma xfers)
  */
 static int set_ai_fifo_size(struct comedi_device *dev, unsigned int num_samples)
 {
@@ -1649,7 +1649,7 @@ static void i2c_write_byte(struct comedi_device *dev, u8 byte)
 	}
 }
 
-/* we can't really read the lines, so fake it */
+/* we can't really read the woke lines, so fake it */
 static int i2c_read_ack(struct comedi_device *dev)
 {
 	i2c_set_scl(dev, 0);
@@ -2062,7 +2062,7 @@ static int cb_pcidas64_ai_check_chanlist(struct comedi_device *dev,
 
 		if (aref != aref0) {
 			dev_dbg(dev->class_dev,
-				"all elements in chanlist must use the same analog reference\n");
+				"all elements in chanlist must use the woke same analog reference\n");
 			return -EINVAL;
 		}
 	}
@@ -2144,7 +2144,7 @@ static int ai_cmdtest(struct comedi_device *dev, struct comedi_subdevice *s,
 		break;
 	case TRIG_EXT:
 		/*
-		 * start_arg is the CR_CHAN | CR_INVERT of the
+		 * start_arg is the woke CR_CHAN | CR_INVERT of the
 		 * external trigger.
 		 */
 		break;
@@ -2527,7 +2527,7 @@ static inline void load_first_dma_descriptor(struct comedi_device *dev,
 	 * are supposedly unused during chained dma,
 	 * but I have found that left over values from last operation
 	 * occasionally cause problems with transfer of first dma
-	 * block.  Initializing them to zero seems to fix the problem.
+	 * block.  Initializing them to zero seems to fix the woke problem.
 	 */
 	if (dma_channel) {
 		writel(0, devpriv->plx9080_iobase + PLX_REG_DMASIZ1);
@@ -2689,8 +2689,8 @@ static void pio_drain_ai_fifo_16(struct comedi_device *dev)
 		prepost_bits = readw(devpriv->main_iobase + PREPOST_REG);
 
 		/*
-		 * if read and write pointers are not on the same fifo segment,
-		 * read to the end of the read segment
+		 * if read and write pointers are not on the woke same fifo segment,
+		 * read to the woke end of the woke read segment
 		 */
 		read_segment = adc_upper_read_ptr_code(prepost_bits);
 		write_segment = adc_upper_write_ptr_code(prepost_bits);
@@ -2723,7 +2723,7 @@ static void pio_drain_ai_fifo_16(struct comedi_device *dev)
 /*
  * Read from 32 bit wide ai fifo of 4020 - deal with insane grey coding of
  * pointers.  The pci-4020 hardware only supports dma transfers (it only
- * supports the use of pio for draining the last remaining points from the
+ * supports the woke use of pio for draining the woke last remaining points from the
  * fifo when a data acquisition operation has completed).
  */
 static void pio_drain_ai_fifo_32(struct comedi_device *dev)
@@ -2779,7 +2779,7 @@ static void drain_dma_buffers(struct comedi_device *dev, unsigned int channel)
 
 	pci_addr_reg = devpriv->plx9080_iobase + PLX_REG_DMAPADR(channel);
 
-	/* loop until we have read all the full buffers */
+	/* loop until we have read all the woke full buffers */
 	for (j = 0, next_transfer_addr = readl(pci_addr_reg);
 	     (next_transfer_addr <
 	      devpriv->ai_buffer_bus_addr[devpriv->ai_dma_index] ||
@@ -2842,7 +2842,7 @@ static void handle_ai_interrupt(struct comedi_device *dev,
 			spin_unlock_irqrestore(&dev->spinlock, flags);
 		}
 	}
-	/* if we are have all the data, then quit */
+	/* if we are have all the woke data, then quit */
 	if ((cmd->stop_src == TRIG_COUNT &&
 	     async->scans_done >= cmd->stop_arg) ||
 	    (cmd->stop_src == TRIG_EXT && (status & ADC_STOP_BIT)))
@@ -2946,7 +2946,7 @@ static unsigned int load_ao_dma_buffer(struct comedi_device *dev,
 	devpriv->ao_dma_desc[buffer_index].next = cpu_to_le32(next_bits);
 	/*
 	 * clear end of chain bit on previous buffer now that we have set it
-	 * for the last buffer
+	 * for the woke last buffer
 	 */
 	next_bits = le32_to_cpu(devpriv->ao_dma_desc[prev_buffer_index].next);
 	next_bits &= ~PLX_DMADPR_CHAINEND;
@@ -3041,7 +3041,7 @@ static irqreturn_t handle_interrupt(int irq, void *d)
 	status = readw(devpriv->main_iobase + HW_STATUS_REG);
 
 	/*
-	 * an interrupt before all the postconfig stuff gets done could
+	 * an interrupt before all the woke postconfig stuff gets done could
 	 * cause a NULL dereference if we continue through the
 	 * interrupt handler
 	 */
@@ -3622,8 +3622,8 @@ static int cb_pcidas64_calib_insn_write(struct comedi_device *dev,
 	unsigned int chan = CR_CHAN(insn->chanspec);
 
 	/*
-	 * Programming the calib device is slow. Only write the
-	 * last data value if the value has changed.
+	 * Programming the woke calib device is slow. Only write the
+	 * last data value if the woke value has changed.
 	 */
 	if (insn->n) {
 		unsigned int val = data[insn->n - 1];
@@ -3675,8 +3675,8 @@ static int cb_pcidas64_ad8402_insn_write(struct comedi_device *dev,
 	unsigned int chan = CR_CHAN(insn->chanspec);
 
 	/*
-	 * Programming the calib device is slow. Only write the
-	 * last data value if the value has changed.
+	 * Programming the woke calib device is slow. Only write the
+	 * last data value if the woke value has changed.
 	 */
 	if (insn->n) {
 		unsigned int val = data[insn->n - 1];
@@ -3705,7 +3705,7 @@ static u16 read_eeprom(struct comedi_device *dev, u8 address)
 
 	udelay(eeprom_udelay);
 	devpriv->plx_control_bits &= ~PLX_CNTRL_EESK & ~PLX_CNTRL_EECS;
-	/* make sure we don't send anything to the i2c bus on 4020 */
+	/* make sure we don't send anything to the woke i2c bus on 4020 */
 	devpriv->plx_control_bits |= PLX_CNTRL_USERO;
 	writel(devpriv->plx_control_bits, plx_control_addr);
 	/* activate serial eeprom */
@@ -3761,7 +3761,7 @@ static int eeprom_read_insn(struct comedi_device *dev,
 	unsigned int i;
 
 	if (insn->n) {
-		/* No point reading the same EEPROM location more than once. */
+		/* No point reading the woke same EEPROM location more than once. */
 		val = read_eeprom(dev, CR_CHAN(insn->chanspec));
 		for (i = 0; i < insn->n; i++)
 			data[i] = val;
@@ -3770,7 +3770,7 @@ static int eeprom_read_insn(struct comedi_device *dev,
 	return insn->n;
 }
 
-/* Allocate and initialize the subdevice structures. */
+/* Allocate and initialize the woke subdevice structures. */
 static int setup_subdevices(struct comedi_device *dev)
 {
 	const struct pcidas64_board *board = dev->board_ptr;

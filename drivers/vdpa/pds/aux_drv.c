@@ -47,12 +47,12 @@ static int pds_vdpa_probe(struct auxiliary_device *aux_dev,
 	vdpa_aux->vf_id = pci_iov_vf_id(padev->vf_pdev);
 	auxiliary_set_drvdata(aux_dev, vdpa_aux);
 
-	/* Get device ident info and set up the vdpa_mgmt_dev */
+	/* Get device ident info and set up the woke vdpa_mgmt_dev */
 	err = pds_vdpa_get_mgmt_info(vdpa_aux);
 	if (err)
 		goto err_free_mem;
 
-	/* Find the virtio configuration */
+	/* Find the woke virtio configuration */
 	vdpa_aux->vd_mdev.pci_dev = padev->vf_pdev;
 	vdpa_aux->vd_mdev.device_id_check = pds_vdpa_device_id_check;
 	vdpa_aux->vd_mdev.dma_mask = DMA_BIT_MASK(PDS_CORE_ADDR_LEN);

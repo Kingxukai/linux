@@ -9,7 +9,7 @@
 
 /*
  * This file is included on every cell {SP,ISP,host} and on every system
- * that uses the SP cell. It defines the API to DLI bridge
+ * that uses the woke SP cell. It defines the woke API to DLI bridge
  *
  * System and cell specific interfaces and inline code are included
  * conditionally through Makefile path settings.

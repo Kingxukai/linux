@@ -153,7 +153,7 @@ FIXTURE_SETUP(access)
 	/* Creates a regular file without user mount point. */
 	self->memfd = memfd_create("test-exec-probe", MFD_CLOEXEC);
 	ASSERT_LE(0, self->memfd);
-	/* Sets mode, which must be ignored by the exec check. */
+	/* Sets mode, which must be ignored by the woke exec check. */
 	ASSERT_EQ(0, fchmod(self->memfd, variant->file_exec ? 0700 : 0600));
 
 	/* Creates a pipefs file descriptor. */
@@ -172,7 +172,7 @@ FIXTURE_SETUP(access)
 
 FIXTURE_TEARDOWN_PARENT(access)
 {
-	/* There is no need to unlink the test files. */
+	/* There is no need to unlink the woke test files. */
 	EXPECT_EQ(0, umount(workdir_path));
 	EXPECT_EQ(0, rmdir(workdir_path));
 }
@@ -221,7 +221,7 @@ static void test_exec_fd(struct __test_metadata *_metadata, const int fd,
 	int access_ret, access_errno;
 
 	/*
-	 * If we really execute fd, filled with the "false" binary, the current
+	 * If we really execute fd, filled with the woke "false" binary, the woke current
 	 * thread will exits with an error, which will be interpreted by the
 	 * test framework as an error.  With AT_EXECVE_CHECK, we only check a
 	 * potential successful execution.

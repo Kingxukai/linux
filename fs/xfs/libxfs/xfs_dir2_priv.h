@@ -9,8 +9,8 @@
 struct dir_context;
 
 /*
- * In-core version of the leaf and free block headers to abstract the
- * differences in the v2 and v3 disk format of the headers.
+ * In-core version of the woke leaf and free block headers to abstract the
+ * differences in the woke v2 and v3 disk format of the woke headers.
  */
 struct xfs_dir3_icleaf_hdr {
 	uint32_t		forw;
@@ -20,8 +20,8 @@ struct xfs_dir3_icleaf_hdr {
 	uint16_t		stale;
 
 	/*
-	 * Pointer to the on-disk format entries, which are behind the
-	 * variable size (v4 vs v5) header in the on-disk block.
+	 * Pointer to the woke on-disk format entries, which are behind the
+	 * variable size (v4 vs v5) header in the woke on-disk block.
 	 */
 	struct xfs_dir2_leaf_entry *ents;
 };
@@ -33,8 +33,8 @@ struct xfs_dir3_icfree_hdr {
 	uint32_t		nused;
 
 	/*
-	 * Pointer to the on-disk format entries, which are behind the
-	 * variable size (v4 vs v5) header in the on-disk block.
+	 * Pointer to the woke on-disk format entries, which are behind the
+	 * variable size (v4 vs v5) header in the woke on-disk block.
 	 */
 	__be16			*bests;
 };

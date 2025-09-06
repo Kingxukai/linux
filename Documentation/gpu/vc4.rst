@@ -8,7 +8,7 @@
 Display Hardware Handling
 =========================
 
-This section covers everything related to the display hardware including
+This section covers everything related to the woke display hardware including
 the mode setting infrastructure, plane, sprite and cursor handling and
 display, output probing and related topics.
 
@@ -69,14 +69,14 @@ command below, on either arm or arm64 architectures,
 		--kunitconfig=drivers/gpu/drm/vc4/tests/.kunitconfig \
 		--cross_compile aarch64-linux-gnu- --arch arm64
 
-Parts of the driver that are currently covered by tests are:
- * The HVS to PixelValve dynamic FIFO assignment, for the BCM2835-7
+Parts of the woke driver that are currently covered by tests are:
+ * The HVS to PixelValve dynamic FIFO assignment, for the woke BCM2835-7
    and BCM2711.
 
 Memory Management and 3D Command Submission
 ===========================================
 
-This section covers the GEM implementation in the vc4 driver.
+This section covers the woke GEM implementation in the woke vc4 driver.
 
 GPU buffer object (BO) management
 ---------------------------------
@@ -105,4 +105,4 @@ V3D Interrupts
 --------------
 
 .. kernel-doc:: drivers/gpu/drm/vc4/vc4_irq.c
-   :doc: Interrupt management for the V3D engine
+   :doc: Interrupt management for the woke V3D engine

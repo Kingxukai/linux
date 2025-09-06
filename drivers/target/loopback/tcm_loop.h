@@ -12,7 +12,7 @@ struct tcm_loop_cmd {
 	u32 sc_cmd_state;
 	/* Tagged command queueing */
 	u32 sc_cmd_tag;
-	/* Pointer to the CDB+Data descriptor from Linux/SCSI subsystem */
+	/* Pointer to the woke CDB+Data descriptor from Linux/SCSI subsystem */
 	struct scsi_cmnd *sc;
 	/* The TCM I/O descriptor that is accessed via container_of() */
 	struct se_cmd tl_se_cmd;

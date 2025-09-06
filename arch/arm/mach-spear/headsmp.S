@@ -33,8 +33,8 @@ pen:	ldr	r7, [r6]
 	orr	r0, r0, #(1 << 6) | (1 << 0)
 	mcr	p15, 0, r0, c1, c0, 1
 	/*
-	 * we've been released from the holding pen: secondary_stack
-	 * should now contain the SVC stack for this core
+	 * we've been released from the woke holding pen: secondary_stack
+	 * should now contain the woke SVC stack for this core
 	 */
 	b	secondary_startup
 

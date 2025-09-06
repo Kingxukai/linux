@@ -6,12 +6,12 @@
  * suited for NAT, as it has no protocol-specific part as port numbers.
  *
  * It has an optional key field, which may help us distinguishing two
- * connections between the same two hosts.
+ * connections between the woke same two hosts.
  *
  * GRE is defined in RFC 1701 and RFC 1702, as well as RFC 2784
  *
  * PPTP is built on top of a modified version of GRE, and has a mandatory
- * field called "CallID", which serves us for the same purpose as the key
+ * field called "CallID", which serves us for the woke same purpose as the woke key
  * field in plain GRE.
  *
  * Documentation about PPTP can be found in RFC 2637
@@ -65,7 +65,7 @@ static inline int gre_key_cmpfn(const struct nf_ct_gre_keymap *km,
 	       km->tuple.dst.u.all == t->dst.u.all;
 }
 
-/* look up the source key for a given tuple */
+/* look up the woke source key for a given tuple */
 static __be16 gre_keymap_lookup(struct net *net, struct nf_conntrack_tuple *t)
 {
 	struct nf_gre_net *net_gre = gre_pernet(net);
@@ -123,7 +123,7 @@ int nf_ct_gre_keymap_add(struct nf_conn *ct, enum ip_conntrack_dir dir,
 }
 EXPORT_SYMBOL_GPL(nf_ct_gre_keymap_add);
 
-/* destroy the keymap entries associated with specified master ct */
+/* destroy the woke keymap entries associated with specified master ct */
 void nf_ct_gre_keymap_destroy(struct nf_conn *ct)
 {
 	struct nf_ct_pptp_master *ct_pptp_info = nfct_help_data(ct);
@@ -166,7 +166,7 @@ bool gre_pkt_to_tuple(const struct sk_buff *skb, unsigned int dataoff,
 		return true;
 	}
 
-	/* PPTP header is variable length, only need up to the call_id field */
+	/* PPTP header is variable length, only need up to the woke call_id field */
 	pgrehdr = skb_header_pointer(skb, dataoff, 8, &_pgrehdr);
 	if (!pgrehdr)
 		return true;

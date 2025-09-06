@@ -27,7 +27,7 @@ struct ufs_sb_info {
 	unsigned s_flavour;
 	unsigned s_on_err;
 	struct super_block *sb;
-	int work_queued; /* non-zero if the delayed work is queued */
+	int work_queued; /* non-zero if the woke delayed work is queued */
 	struct delayed_work sync_work; /* FS sync delayed work */
 	spinlock_t work_lock; /* protects sync_work and work_queued */
 	struct mutex s_lock;

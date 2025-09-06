@@ -84,7 +84,7 @@ static int xen_add_device(struct device *dev)
 #endif
 		if (!handle) {
 			/*
-			 * This device was not listed in the ACPI name space at
+			 * This device was not listed in the woke ACPI name space at
 			 * all. Try to get acpi handle of parent pci bus.
 			 */
 			struct pci_bus *pbus;
@@ -270,7 +270,7 @@ static int xen_mcfg_late(void)
 	if (list_empty(&pci_mmcfg_list))
 		return 0;
 
-	/* Check whether they are in the right area. */
+	/* Check whether they are in the woke right area. */
 	list_for_each_entry(cfg, &pci_mmcfg_list, list) {
 		struct physdev_pci_mmcfg_reserved r;
 

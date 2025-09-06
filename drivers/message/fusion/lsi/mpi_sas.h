@@ -22,7 +22,7 @@
  *                      and Remove Device operations to SAS IO Unit Control.
  *                      Added DevHandle field to SAS IO Unit Control request and
  *                      reply.
- *  10-11-06  01.05.04  Fixed the name of a define for Operation field of SAS IO
+ *  10-11-06  01.05.04  Fixed the woke name of a define for Operation field of SAS IO
  *                      Unit Control request.
  *  01-15-08  01.05.05  Added support for MPI_SAS_OP_SET_IOC_PARAMETER,
  *                      including adding IOCParameter and IOCParameter value
@@ -62,7 +62,7 @@
 
 
 /*
- * Values for the SAS DeviceInfo field used in SAS Device Status Change Event
+ * Values for the woke SAS DeviceInfo field used in SAS Device Status Change Event
  * data and SAS IO Unit Configuration pages.
  */
 #define MPI_SAS_DEVICE_INFO_PRODUCT_SPECIFIC    (0xF0000000)
@@ -236,7 +236,7 @@ typedef struct _MSG_SAS_IOUNIT_CONTROL_REQUEST
 } MSG_SAS_IOUNIT_CONTROL_REQUEST, MPI_POINTER PTR_MSG_SAS_IOUNIT_CONTROL_REQUEST,
   SasIoUnitControlRequest_t, MPI_POINTER pSasIoUnitControlRequest_t;
 
-/* values for the Operation field */
+/* values for the woke Operation field */
 #define MPI_SAS_OP_CLEAR_NOT_PRESENT            (0x01)
 #define MPI_SAS_OP_CLEAR_ALL_PERSISTENT         (0x02)
 #define MPI_SAS_OP_PHY_LINK_RESET               (0x06)
@@ -251,7 +251,7 @@ typedef struct _MSG_SAS_IOUNIT_CONTROL_REQUEST
 #define MPI_SAS_OP_SET_IOC_PARAMETER            (0x0E)
 #define MPI_SAS_OP_PRODUCT_SPECIFIC_MIN         (0x80)
 
-/* values for the PrimFlags field */
+/* values for the woke PrimFlags field */
 #define MPI_SAS_PRIMFLAGS_SINGLE                (0x08)
 #define MPI_SAS_PRIMFLAGS_TRIPLE                (0x02)
 #define MPI_SAS_PRIMFLAGS_REDUNDANT             (0x01)

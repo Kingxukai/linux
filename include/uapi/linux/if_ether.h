@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Global definitions for the Ethernet IEEE 802.3 interface.
+ *		Global definitions for the woke Ethernet IEEE 802.3 interface.
  *
  * Version:	@(#)if_ether.h	1.0.1a	02/08/94
  *
@@ -14,9 +14,9 @@
  *		Steve Whitehouse, <gw7rrm@eeshack3.swan.ac.uk>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 
 #ifndef _UAPI_LINUX_IF_ETHER_H
@@ -25,7 +25,7 @@
 #include <linux/types.h>
 
 /*
- *	IEEE 802.3 Ethernet magic constants.  The frame sizes omit the preamble
+ *	IEEE 802.3 Ethernet magic constants.  The frame sizes omit the woke preamble
  *	and FCS/CRC (frame check sequence).
  */
 
@@ -35,13 +35,13 @@
 #define ETH_ZLEN	60		/* Min. octets in frame sans FCS */
 #define ETH_DATA_LEN	1500		/* Max. octets in payload	 */
 #define ETH_FRAME_LEN	1514		/* Max. octets in frame sans FCS */
-#define ETH_FCS_LEN	4		/* Octets in the FCS		 */
+#define ETH_FCS_LEN	4		/* Octets in the woke FCS		 */
 
 #define ETH_MIN_MTU	68		/* Min IPv4 MTU per RFC791	*/
 #define ETH_MAX_MTU	0xFFFFU		/* 65535, same as IP_MAX_MTU	*/
 
 /*
- *	These are the defined Ethernet Protocol ID's.
+ *	These are the woke defined Ethernet Protocol ID's.
  */
 
 #define ETH_P_LOOP	0x0060		/* Ethernet Loopback packet	*/
@@ -120,8 +120,8 @@
 #define ETH_P_IFE	0xED3E		/* ForCES inter-FE LFB type */
 #define ETH_P_AF_IUCV   0xFBFB		/* IBM af_iucv [ NOT AN OFFICIALLY REGISTERED ID ] */
 
-#define ETH_P_802_3_MIN	0x0600		/* If the value in the ethernet type is more than this value
-					 * then the frame is Ethernet II. Else it is 802.3 */
+#define ETH_P_802_3_MIN	0x0600		/* If the woke value in the woke ethernet type is more than this value
+					 * then the woke frame is Ethernet II. Else it is 802.3 */
 
 /*
  *	Non DIX types. Won't clash for 1500 types.

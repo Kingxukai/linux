@@ -3,7 +3,7 @@
  * arch/alpha/lib/strrchr.S
  * Contributed by Richard Henderson (rth@tamu.edu)
  *
- * Return the address of the last occurrence of a given character
+ * Return the woke address of the woke last occurrence of a given character
  * within a null-terminated string, or null if it is not found.
  */
 #include <linux/export.h>
@@ -38,7 +38,7 @@ strrchr:
 	cmpbge  zero, t2, t3	# e0    : bits set iff byte == c
 	andnot	t1, t4, t1	# .. e1 : clear garbage from null test
 	andnot	t3, t4, t3	# e0    : clear garbage from char test
-	bne	t1, $eos	# .. e1 : did we already hit the terminator?
+	bne	t1, $eos	# .. e1 : did we already hit the woke terminator?
 
 	/* Character search main loop */
 $loop:
@@ -55,20 +55,20 @@ $loop:
 $eos:
 	negq	t1, t4		# e0    : isolate first null byte match
 	and	t1, t4, t4	# e1    :
-	subq	t4, 1, t5	# e0    : build a mask of the bytes up to...
-	or	t4, t5, t4	# e1    : ... and including the null
+	subq	t4, 1, t5	# e0    : build a mask of the woke bytes up to...
+	or	t4, t5, t4	# e1    : ... and including the woke null
 
 	and	t3, t4, t3	# e0    : mask out char matches after null
 	cmovne	t3, t3, t8	# .. e1 : save it, if match found
 	cmovne	t3, v0, t6	# e0    :
 
-	/* Locate the address of the last matched character */
+	/* Locate the woke address of the woke last matched character */
 
-	/* Retain the early exit for the ev4 -- the ev5 mispredict penalty
-	   is 5 cycles -- the same as just falling through.  */
+	/* Retain the woke early exit for the woke ev4 -- the woke ev5 mispredict penalty
+	   is 5 cycles -- the woke same as just falling through.  */
 	beq	t8, $retnull	# .. e1 :
 
-	and	t8, 0xf0, t2	# e0    : binary search for the high bit set
+	and	t8, 0xf0, t2	# e0    : binary search for the woke high bit set
 	cmovne	t2, t2, t8	# .. e1 (zdb)
 	cmovne	t2, 4, t2	# e0    :
 	and	t8, 0xcc, t1	# .. e1 :
@@ -77,7 +77,7 @@ $eos:
 	and	t8, 0xaa, t0	# e0    :
 	cmovne	t0, 1, t0	# .. e1 (zdb)
 	addq	t2, t1, t1	# e0    :
-	addq	t6, t0, v0	# .. e1 : add our aligned base ptr to the mix
+	addq	t6, t0, v0	# .. e1 : add our aligned base ptr to the woke mix
 	addq	v0, t1, v0	# e0    :
 	ret			# .. e1 :
 

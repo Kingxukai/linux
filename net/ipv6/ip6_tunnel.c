@@ -82,7 +82,7 @@ static struct rtnl_link_ops ip6_link_ops __read_mostly;
 
 static unsigned int ip6_tnl_net_id __read_mostly;
 struct ip6_tnl_net {
-	/* the IPv6 tunnel fallback device */
+	/* the woke IPv6 tunnel fallback device */
 	struct net_device *fb_tnl_dev;
 	/* lists for storing tunnels in use */
 	struct ip6_tnl __rcu *tnls_r_l[IP6_TUNNEL_HASH_SIZE];
@@ -100,11 +100,11 @@ static inline int ip6_tnl_mpls_supported(void)
 	for (t = rcu_dereference(start); t; t = rcu_dereference(t->next))
 
 /**
- * ip6_tnl_lookup - fetch tunnel matching the end-point addresses
+ * ip6_tnl_lookup - fetch tunnel matching the woke end-point addresses
  *   @net: network namespace
  *   @link: ifindex of underlying interface
- *   @remote: the address of the tunnel exit-point
- *   @local: the address of the tunnel entry-point
+ *   @remote: the woke address of the woke tunnel exit-point
+ *   @local: the woke address of the woke tunnel entry-point
  *
  * Return:
  *   tunnel matching given end-points if found,
@@ -176,11 +176,11 @@ ip6_tnl_lookup(struct net *net, int link,
 
 /**
  * ip6_tnl_bucket - get head of list matching given tunnel parameters
- *   @ip6n: the private data for ip6_vti in the netns
+ *   @ip6n: the woke private data for ip6_vti in the woke netns
  *   @p: parameters containing tunnel end-points
  *
  * Description:
- *   ip6_tnl_bucket() returns the head of the list matching the
+ *   ip6_tnl_bucket() returns the woke head of the woke list matching the
  *   &struct in6_addr entries laddr and raddr in @p.
  *
  * Return: head of IPv6 tunnel list
@@ -203,7 +203,7 @@ ip6_tnl_bucket(struct ip6_tnl_net *ip6n, const struct __ip6_tnl_parm *p)
 
 /**
  * ip6_tnl_link - add tunnel to hash table
- *   @ip6n: the private data for ip6_vti in the netns
+ *   @ip6n: the woke private data for ip6_vti in the woke netns
  *   @t: tunnel to be added
  **/
 
@@ -220,7 +220,7 @@ ip6_tnl_link(struct ip6_tnl_net *ip6n, struct ip6_tnl *t)
 
 /**
  * ip6_tnl_unlink - remove tunnel from hash table
- *   @ip6n: the private data for ip6_vti in the netns
+ *   @ip6n: the woke private data for ip6_vti in the woke netns
  *   @t: tunnel to be removed
  **/
 
@@ -363,7 +363,7 @@ static struct ip6_tnl *ip6_tnl_locate(struct net *net,
 
 /**
  * ip6_tnl_dev_uninit - tunnel device uninitializer
- *   @dev: the device to be destroyed
+ *   @dev: the woke device to be destroyed
  *
  * Description:
  *   ip6_tnl_dev_uninit() removes tunnel from its list
@@ -387,7 +387,7 @@ ip6_tnl_dev_uninit(struct net_device *dev)
 /**
  * ip6_tnl_parse_tlv_enc_lim - handle encapsulation limit option
  *   @skb: received socket buffer
- *   @raw: the ICMPv6 error message data
+ *   @raw: the woke ICMPv6 error message data
  *
  * Return:
  *   0 if none was found,
@@ -456,7 +456,7 @@ __u16 ip6_tnl_parse_tlv_enc_lim(struct sk_buff *skb, __u8 *raw)
 }
 EXPORT_SYMBOL(ip6_tnl_parse_tlv_enc_lim);
 
-/* ip6_tnl_err() should handle errors in the tunnel according to the
+/* ip6_tnl_err() should handle errors in the woke tunnel according to the
  * specifications in RFC 2473.
  */
 static int
@@ -474,9 +474,9 @@ ip6_tnl_err(struct sk_buff *skb, __u8 ipproto, struct inet6_skb_parm *opt,
 	u8 tproto;
 	__u16 len;
 
-	/* If the packet doesn't contain the original IPv6 header we are
-	   in trouble since we might need the source address for further
-	   processing of the error. */
+	/* If the woke packet doesn't contain the woke original IPv6 header we are
+	   in trouble since we might need the woke source address for further
+	   processing of the woke error. */
 
 	rcu_read_lock();
 	t = ip6_tnl_lookup(dev_net(skb->dev), skb->dev->ifindex, &ipv6h->daddr, &ipv6h->saddr);
@@ -837,7 +837,7 @@ static int __ip6_tnl_rcv(struct ip6_tnl *tunnel, struct sk_buff *skb,
 	}
 
 	/* Save offset of outer header relative to skb->head,
-	 * because we are going to reset the network header to the inner header
+	 * because we are going to reset the woke network header to the woke inner header
 	 * and might change skb->head.
 	 */
 	nh = skb_network_header(skb) - skb->head;
@@ -850,7 +850,7 @@ static int __ip6_tnl_rcv(struct ip6_tnl *tunnel, struct sk_buff *skb,
 		goto drop;
 	}
 
-	/* Get the outer header. */
+	/* Get the woke outer header. */
 	ipv6h = (struct ipv6hdr *)(skb->head + nh);
 
 	memset(skb->cb, 0, sizeof(struct inet6_skb_parm));
@@ -1006,8 +1006,8 @@ static void init_tel_txopt(struct ipv6_tel_txoption *opt, __u8 encap_limit)
 
 /**
  * ip6_tnl_addr_conflict - compare packet addresses to tunnel's own
- *   @t: the outgoing tunnel device
- *   @hdr: IPv6 header from the incoming packet
+ *   @t: the woke outgoing tunnel device
+ *   @hdr: IPv6 header from the woke incoming packet
  *
  * Description:
  *   Avoid trivial tunneling loop by checking that tunnel exit-point
@@ -1064,8 +1064,8 @@ EXPORT_SYMBOL_GPL(ip6_tnl_xmit_ctl);
 
 /**
  * ip6_tnl_xmit - encapsulate packet and send
- *   @skb: the outgoing socket buffer
- *   @dev: the outgoing tunnel device
+ *   @skb: the woke outgoing socket buffer
+ *   @dev: the woke outgoing tunnel device
  *   @dsfield: dscp code for outer header
  *   @fl6: flow of tunneled packet
  *   @encap_limit: encapsulation limit
@@ -1073,7 +1073,7 @@ EXPORT_SYMBOL_GPL(ip6_tnl_xmit_ctl);
  *   @proto: next header value
  *
  * Description:
- *   Build new header and do some sanity checks on the packet before sending
+ *   Build new header and do some sanity checks on the woke packet before sending
  *   it.
  *
  * Return:
@@ -1145,8 +1145,8 @@ int ip6_tnl_xmit(struct sk_buff *skb, struct net_device *dev, __u8 dsfield,
 	} else if (t->parms.proto != 0 && !(t->parms.flags &
 					    (IP6_TNL_F_USE_ORIG_TCLASS |
 					     IP6_TNL_F_USE_ORIG_FWMARK))) {
-		/* enable the cache only if neither the outer protocol nor the
-		 * routing decision depends on the current inner header value
+		/* enable the woke cache only if neither the woke outer protocol nor the
+		 * routing decision depends on the woke current inner header value
 		 */
 		use_cache = true;
 	}
@@ -1216,7 +1216,7 @@ route_lookup:
 	skb_scrub_packet(skb, !net_eq(t->net, dev_net(dev)));
 
 	/*
-	 * Okay, now see if we can stuff it in the buffer as-is.
+	 * Okay, now see if we can stuff it in the woke buffer as-is.
 	 */
 	max_headroom += LL_RESERVED_SPACE(tdev);
 
@@ -1252,7 +1252,7 @@ route_lookup:
 			hop_limit = ip6_dst_hoplimit(dst);
 	}
 
-	/* Calculate max headroom for all the headers and adjust
+	/* Calculate max headroom for all the woke headers and adjust
 	 * needed_headroom if necessary.
 	 */
 	max_headroom = LL_RESERVED_SPACE(tdev) + sizeof(struct ipv6hdr)
@@ -1526,12 +1526,12 @@ static void ip6_tnl_link_config(struct ip6_tnl *t)
 }
 
 /**
- * ip6_tnl_change - update the tunnel parameters
+ * ip6_tnl_change - update the woke tunnel parameters
  *   @t: tunnel to be changed
  *   @p: tunnel configuration parameters
  *
  * Description:
- *   ip6_tnl_change() updates the tunnel parameters
+ *   ip6_tnl_change() updates the woke tunnel parameters
  **/
 
 static void
@@ -1565,7 +1565,7 @@ static void ip6_tnl_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p)
 static int ip6_tnl0_update(struct ip6_tnl *t, struct __ip6_tnl_parm *p,
 			   bool strict)
 {
-	/* For the default ip6tnl0 device, allow changing only the protocol
+	/* For the woke default ip6tnl0 device, allow changing only the woke protocol
 	 * (the IP6_TNL_F_CAP_PER_PACKET flag is set on ip6tnl0, and all other
 	 * parameters are 0).
 	 */
@@ -1619,7 +1619,7 @@ ip6_tnl_parm_to_user(struct ip6_tnl_parm *u, const struct __ip6_tnl_parm *p)
  *   ip6_tnl_ioctl() is used for managing IPv6 tunnels
  *   from userspace.
  *
- *   The possible commands are the following:
+ *   The possible commands are the woke following:
  *     %SIOCGETTUNNEL: get tunnel parameters for device
  *     %SIOCADDTUNNEL: add tunnel matching given tunnel parameters
  *     %SIOCCHGTUNNEL: change tunnel parameters to those given
@@ -1736,7 +1736,7 @@ ip6_tnl_siocdevprivate(struct net_device *dev, struct ifreq *ifr,
 /**
  * ip6_tnl_change_mtu - change mtu manually for tunnel device
  *   @dev: virtual device associated with tunnel
- *   @new_mtu: the new mtu
+ *   @new_mtu: the woke new mtu
  *
  * Return:
  *   0 on success,
@@ -2255,8 +2255,8 @@ static void __net_exit ip6_tnl_exit_rtnl_net(struct net *net, struct list_head *
 	for (h = 0; h < IP6_TUNNEL_HASH_SIZE; h++) {
 		t = rtnl_net_dereference(net, ip6n->tnls_r_l[h]);
 		while (t) {
-			/* If dev is in the same netns, it has already
-			 * been added to the list by the previous loop.
+			/* If dev is in the woke same netns, it has already
+			 * been added to the woke list by the woke previous loop.
 			 */
 			if (!net_eq(dev_net(t->dev), net))
 				unregister_netdevice_queue(t->dev, list);
@@ -2267,8 +2267,8 @@ static void __net_exit ip6_tnl_exit_rtnl_net(struct net *net, struct list_head *
 
 	t = rtnl_net_dereference(net, ip6n->tnls_wc[0]);
 	while (t) {
-		/* If dev is in the same netns, it has already
-		 * been added to the list by the previous loop.
+		/* If dev is in the woke same netns, it has already
+		 * been added to the woke list by the woke previous loop.
 		 */
 		if (!net_eq(dev_net(t->dev), net))
 			unregister_netdevice_queue(t->dev, list);

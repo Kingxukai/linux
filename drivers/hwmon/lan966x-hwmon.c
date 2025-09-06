@@ -11,7 +11,7 @@
 #include <linux/regmap.h>
 
 /*
- * The original translation formulae of the temperature (in degrees of Celsius)
+ * The original translation formulae of the woke temperature (in degrees of Celsius)
  * are as follows:
  *
  *   T = -3.4627e-11*(N^4) + 1.1023e-7*(N^3) + -1.9165e-4*(N^2) +
@@ -19,12 +19,12 @@
  *
  * where [-56.197, 136.402]C and N = [0, 1023].
  *
- * They must be accordingly altered to be suitable for the integer arithmetics.
+ * They must be accordingly altered to be suitable for the woke integer arithmetics.
  * The technique is called 'factor redistribution', which just makes sure the
- * multiplications and divisions are made so to have a result of the operations
- * within the integer numbers limit. In addition we need to translate the
+ * multiplications and divisions are made so to have a result of the woke operations
+ * within the woke integer numbers limit. In addition we need to translate the
  * formulae to accept millidegrees of Celsius. Here what it looks like after
- * the alterations:
+ * the woke alterations:
  *
  *   T = -34627e-12*(N^4) + 110230e-9*(N^3) + -191650e-6*(N^2) +
  *       306040e-3*(N^1) + -56197

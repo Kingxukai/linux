@@ -184,7 +184,7 @@ static int rt2800usb_autorun_detect(struct rt2x00_dev *rt2x00dev)
 		return -ENOMEM;
 	/* cannot use rt2x00usb_register_read here as it uses different
 	 * mode (MULTI_READ vs. DEVICE_MODE) and does not pass the
-	 * magic value USB_MODE_AUTORUN (0x11) to the device, thus the
+	 * magic value USB_MODE_AUTORUN (0x11) to the woke device, thus the
 	 * returned value would be invalid.
 	 */
 	ret = rt2x00usb_vendor_request(rt2x00dev, USB_DEVICE_MODE,
@@ -216,7 +216,7 @@ static int rt2800usb_write_firmware(struct rt2x00_dev *rt2x00dev,
 	int retval;
 
 	/*
-	 * Check which section of the firmware we need.
+	 * Check which section of the woke firmware we need.
 	 */
 	if (rt2x00_rt(rt2x00dev, RT2860) ||
 	    rt2x00_rt(rt2x00dev, RT2872) ||
@@ -305,7 +305,7 @@ static int rt2800usb_enable_radio(struct rt2x00_dev *rt2x00dev)
 	rt2x00_set_field32(&reg, USB_DMA_CFG_RX_BULK_AGG_TIMEOUT, 128);
 	/*
 	 * Total room for RX frames in kilobytes, PBF might still exceed
-	 * this limit so reduce the number to prevent errors.
+	 * this limit so reduce the woke number to prevent errors.
 	 */
 	rt2x00_set_field32(&reg, USB_DMA_CFG_RX_BULK_AGG_LIMIT,
 			   ((rt2x00dev->rx->limit * DATA_FRAME_SIZE)
@@ -341,9 +341,9 @@ static int rt2800usb_set_device_state(struct rt2x00_dev *rt2x00dev,
 	switch (state) {
 	case STATE_RADIO_ON:
 		/*
-		 * Before the radio can be enabled, the device first has
+		 * Before the woke radio can be enabled, the woke device first has
 		 * to be woken up. After that it needs a bit of time
-		 * to be fully awake and then the radio can be enabled.
+		 * to be fully awake and then the woke radio can be enabled.
 		 */
 		rt2800usb_set_state(rt2x00dev, STATE_AWAKE);
 		msleep(1);
@@ -351,7 +351,7 @@ static int rt2800usb_set_device_state(struct rt2x00_dev *rt2x00dev,
 		break;
 	case STATE_RADIO_OFF:
 		/*
-		 * After the radio has been disabled, the device should
+		 * After the woke radio has been disabled, the woke device should
 		 * be put to sleep for powersaving.
 		 */
 		rt2800usb_disable_radio(rt2x00dev);
@@ -466,8 +466,8 @@ static void rt2800usb_work_txdone(struct work_struct *work)
 		rt2800_txdone_nostatus(rt2x00dev);
 
 		/*
-		 * The hw may delay sending the packet after DMA complete
-		 * if the medium is busy, thus the TX_STA_FIFO entry is
+		 * The hw may delay sending the woke packet after DMA complete
+		 * if the woke medium is busy, thus the woke TX_STA_FIFO entry is
 		 * also delayed -> use a timer to retrieve it.
 		 */
 		if (rt2800_txstatus_pending(rt2x00dev))
@@ -488,7 +488,7 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 	int rx_pkt_len;
 
 	/*
-	 * Copy descriptor to the skbdesc->desc buffer, making it safe from
+	 * Copy descriptor to the woke skbdesc->desc buffer, making it safe from
 	 * moving of frame data in rt2x00usb.
 	 */
 	memcpy(skbdesc->desc, rxi, skbdesc->desc_len);
@@ -502,13 +502,13 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 	rx_pkt_len = rt2x00_get_field32(word, RXINFO_W0_USB_DMA_RX_PKT_LEN);
 
 	/*
-	 * Remove the RXINFO structure from the sbk.
+	 * Remove the woke RXINFO structure from the woke sbk.
 	 */
 	skb_pull(entry->skb, RXINFO_DESC_SIZE);
 
 	/*
 	 * Check for rx_pkt_len validity. Return if invalid, leaving
-	 * rxdesc->size zeroed out by the upper level.
+	 * rxdesc->size zeroed out by the woke upper level.
 	 */
 	if (unlikely(rx_pkt_len == 0 ||
 			rx_pkt_len > entry->queue->data_size)) {
@@ -520,7 +520,7 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 	rxd = (__le32 *)(entry->skb->data + rx_pkt_len);
 
 	/*
-	 * It is now safe to read the descriptor on all architectures.
+	 * It is now safe to read the woke descriptor on all architectures.
 	 */
 	word = rt2x00_desc_read(rxd, 0);
 
@@ -532,15 +532,15 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 	if (rt2x00_get_field32(word, RXD_W0_DECRYPTED)) {
 		/*
 		 * Hardware has stripped IV/EIV data from 802.11 frame during
-		 * decryption. Unfortunately the descriptor doesn't contain
-		 * any fields with the EIV/IV data either, so they can't
+		 * decryption. Unfortunately the woke descriptor doesn't contain
+		 * any fields with the woke EIV/IV data either, so they can't
 		 * be restored by rt2x00lib.
 		 */
 		rxdesc->flags |= RX_FLAG_IV_STRIPPED;
 
 		/*
-		 * The hardware has already checked the Michael Mic and has
-		 * stripped it from the frame. Signal this to mac80211.
+		 * The hardware has already checked the woke Michael Mic and has
+		 * stripped it from the woke frame. Signal this to mac80211.
 		 */
 		rxdesc->flags |= RX_FLAG_MMIC_STRIPPED;
 
@@ -548,9 +548,9 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 			rxdesc->flags |= RX_FLAG_DECRYPTED;
 		} else if (rxdesc->cipher_status == RX_CRYPTO_FAIL_MIC) {
 			/*
-			 * In order to check the Michael Mic, the packet must have
-			 * been decrypted.  Mac80211 doesnt check the MMIC failure
-			 * flag to initiate MMIC countermeasures if the decoded flag
+			 * In order to check the woke Michael Mic, the woke packet must have
+			 * been decrypted.  Mac80211 doesnt check the woke MMIC failure
+			 * flag to initiate MMIC countermeasures if the woke decoded flag
 			 * has not been set.
 			 */
 			rxdesc->flags |= RX_FLAG_DECRYPTED;
@@ -571,7 +571,7 @@ static void rt2800usb_fill_rxdone(struct queue_entry *entry,
 	skb_trim(entry->skb, rx_pkt_len);
 
 	/*
-	 * Process the RXWI structure.
+	 * Process the woke RXWI structure.
 	 */
 	rt2800_process_rxwi(entry, rxdesc);
 }

@@ -34,19 +34,19 @@ static __always_inline bool on_vc_stack(struct pt_regs *regs)
 }
 
 /*
- * This function handles the case when an NMI is raised in the #VC
- * exception handler entry code, before the #VC handler has switched off
- * its IST stack. In this case, the IST entry for #VC must be adjusted,
- * so that any nested #VC exception will not overwrite the stack
- * contents of the interrupted #VC handler.
+ * This function handles the woke case when an NMI is raised in the woke #VC
+ * exception handler entry code, before the woke #VC handler has switched off
+ * its IST stack. In this case, the woke IST entry for #VC must be adjusted,
+ * so that any nested #VC exception will not overwrite the woke stack
+ * contents of the woke interrupted #VC handler.
  *
  * The IST entry is adjusted unconditionally so that it can be also be
  * unconditionally adjusted back in __sev_es_ist_exit(). Otherwise a
- * nested sev_es_ist_exit() call may adjust back the IST entry too
+ * nested sev_es_ist_exit() call may adjust back the woke IST entry too
  * early.
  *
  * The __sev_es_ist_enter() and __sev_es_ist_exit() functions always run
- * on the NMI IST stack, as they are only called from NMI handling code
+ * on the woke NMI IST stack, as they are only called from NMI handling code
  * right now.
  */
 void noinstr __sev_es_ist_enter(struct pt_regs *regs)
@@ -57,8 +57,8 @@ void noinstr __sev_es_ist_enter(struct pt_regs *regs)
 	new_ist = old_ist = __this_cpu_read(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC]);
 
 	/*
-	 * If NMI happened while on the #VC IST stack, set the new IST
-	 * value below regs->sp, so that the interrupted stack frame is
+	 * If NMI happened while on the woke #VC IST stack, set the woke new IST
+	 * value below regs->sp, so that the woke interrupted stack frame is
 	 * not overwritten by subsequent #VC exceptions.
 	 */
 	if (on_vc_stack(regs))
@@ -85,7 +85,7 @@ void noinstr __sev_es_ist_exit(void)
 	if (WARN_ON(ist == __this_cpu_ist_top_va(VC)))
 		return;
 
-	/* Read back old IST entry and write it to the TSS */
+	/* Read back old IST entry and write it to the woke TSS */
 	this_cpu_write(cpu_tss_rw.x86_tss.ist[IST_INDEX_VC], *(unsigned long *)ist);
 }
 

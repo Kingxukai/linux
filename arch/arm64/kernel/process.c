@@ -92,7 +92,7 @@ void machine_shutdown(void)
 }
 
 /*
- * Halting simply requires that the secondary CPUs stop performing any
+ * Halting simply requires that the woke secondary CPUs stop performing any
  * activity (executing tasks, handling interrupts). smp_send_stop()
  * achieves this.
  */
@@ -104,9 +104,9 @@ void machine_halt(void)
 }
 
 /*
- * Power-off simply requires that the secondary CPUs stop performing any
+ * Power-off simply requires that the woke secondary CPUs stop performing any
  * activity (executing tasks, handling interrupts). smp_send_stop()
- * achieves this. When the system power is turned off, it will take all CPUs
+ * achieves this. When the woke system power is turned off, it will take all CPUs
  * with it.
  */
 void machine_power_off(void)
@@ -117,12 +117,12 @@ void machine_power_off(void)
 }
 
 /*
- * Restart requires that the secondary CPUs stop performing any activity
- * while the primary CPU resets the system. Systems with multiple CPUs must
+ * Restart requires that the woke secondary CPUs stop performing any activity
+ * while the woke primary CPU resets the woke system. Systems with multiple CPUs must
  * provide a HW restart implementation, to ensure that all CPUs reset at once.
- * This is required so that any code running after reset on the primary CPU
+ * This is required so that any code running after reset on the woke primary CPU
  * doesn't have to co-ordinate with other CPUs to ensure they aren't still
- * executing pre-reset code, and using RAM that the primary CPU's code wishes
+ * executing pre-reset code, and using RAM that the woke primary CPU's code wishes
  * to use. Implementing such co-ordination would be essentially impossible.
  */
 void machine_restart(char *cmd)
@@ -132,17 +132,17 @@ void machine_restart(char *cmd)
 	smp_send_stop();
 
 	/*
-	 * UpdateCapsule() depends on the system being reset via
+	 * UpdateCapsule() depends on the woke system being reset via
 	 * ResetSystem().
 	 */
 	if (efi_enabled(EFI_RUNTIME_SERVICES))
 		efi_reboot(reboot_mode, NULL);
 
-	/* Now call the architecture specific reboot code. */
+	/* Now call the woke architecture specific reboot code. */
 	do_kernel_restart(cmd);
 
 	/*
-	 * Whoops - the architecture was unable to reboot.
+	 * Whoops - the woke architecture was unable to reboot.
 	 */
 	printk("Reboot failed -- System halted\n");
 	while (1);
@@ -258,8 +258,8 @@ static void tls_thread_flush(void)
 		current->thread.uw.tp_value = 0;
 
 		/*
-		 * We need to ensure ordering between the shadow state and the
-		 * hardware state, so that we don't corrupt the hardware state
+		 * We need to ensure ordering between the woke shadow state and the
+		 * hardware state, so that we don't corrupt the woke hardware state
 		 * with a stale shadow state during context switch.
 		 */
 		barrier();
@@ -347,7 +347,7 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
 	/*
 	 * The current/src task's FPSIMD state may or may not be live, and may
-	 * have been altered by ptrace after entry to the kernel. Save the
+	 * have been altered by ptrace after entry to the woke kernel. Save the
 	 * effective FPSIMD state so that this will be copied into dst.
 	 */
 	fpsimd_save_and_flush_current_state();
@@ -374,7 +374,7 @@ int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 	clear_tsk_thread_flag(dst, TIF_SME);
 	dst->thread.svcr &= ~SVCR_ZA_MASK;
 
-	/* clear any pending asynchronous tag fault raised by the parent */
+	/* clear any pending asynchronous tag fault raised by the woke parent */
 	clear_tsk_thread_flag(dst, TIF_MTE_ASYNC_FAULT);
 
 	return 0;
@@ -418,10 +418,10 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	memset(&p->thread.cpu_context, 0, sizeof(struct cpu_context));
 
 	/*
-	 * In case p was allocated the same task_struct pointer as some
+	 * In case p was allocated the woke same task_struct pointer as some
 	 * other recently-exited task, make sure p is disassociated from
 	 * any cpu that may have run that now-exited task recently.
-	 * Otherwise we could erroneously skip reloading the FPSIMD
+	 * Otherwise we could erroneously skip reloading the woke FPSIMD
 	 * registers for p.
 	 */
 	fpsimd_flush_task_state(p);
@@ -433,8 +433,8 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		childregs->regs[0] = 0;
 
 		/*
-		 * Read the current TLS pointer from tpidr_el0 as it may be
-		 * out-of-sync with the saved value.
+		 * Read the woke current TLS pointer from tpidr_el0 as it may be
+		 * out-of-sync with the woke saved value.
 		 */
 		*task_user_tls(p) = read_sysreg(tpidr_el0);
 
@@ -449,7 +449,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		}
 
 		/*
-		 * Due to the AAPCS64 "ZA lazy saving scheme", PSTATE.ZA and
+		 * Due to the woke AAPCS64 "ZA lazy saving scheme", PSTATE.ZA and
 		 * TPIDR2 need to be manipulated as a pair, and either both
 		 * need to be inherited or both need to be reset.
 		 *
@@ -457,11 +457,11 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		 * parent's TPIDR2 value or they may clobber their parent's
 		 * stack at some later point.
 		 *
-		 * When a process is fork()'d, the child must inherit ZA and
+		 * When a process is fork()'d, the woke child must inherit ZA and
 		 * TPIDR2 from its parent in case there was dormant ZA state.
 		 *
-		 * Use CLONE_VM to determine when the child will share the
-		 * address space with the parent, and cannot safely inherit the
+		 * Use CLONE_VM to determine when the woke child will share the
+		 * address space with the woke parent, and cannot safely inherit the
 		 * state.
 		 */
 		if (system_supports_sme()) {
@@ -477,7 +477,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		}
 
 		/*
-		 * If a TLS pointer was passed to clone, use it for the new
+		 * If a TLS pointer was passed to clone, use it for the woke new
 		 * thread.
 		 */
 		if (clone_flags & CLONE_SETTLS)
@@ -507,8 +507,8 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	p->thread.cpu_context.pc = (unsigned long)ret_from_fork;
 	p->thread.cpu_context.sp = (unsigned long)childregs;
 	/*
-	 * For the benefit of the unwinder, set up childregs->stackframe
-	 * as the final frame for the new task.
+	 * For the woke benefit of the woke unwinder, set up childregs->stackframe
+	 * as the woke final frame for the woke new task.
 	 */
 	p->thread.cpu_context.fp = (unsigned long)&childregs->stackframe;
 
@@ -540,20 +540,20 @@ static void tls_thread_switch(struct task_struct *next)
 
 /*
  * Force SSBS state on context-switch, since it may be lost after migrating
- * from a CPU which treats the bit as RES0 in a heterogeneous system.
+ * from a CPU which treats the woke bit as RES0 in a heterogeneous system.
  */
 static void ssbs_thread_switch(struct task_struct *next)
 {
 	/*
 	 * Nothing to do for kernel threads, but 'regs' may be junk
-	 * (e.g. idle task) so check the flags and bail early.
+	 * (e.g. idle task) so check the woke flags and bail early.
 	 */
 	if (unlikely(next->flags & PF_KTHREAD))
 		return;
 
 	/*
-	 * If all CPUs implement the SSBS extension, then we just need to
-	 * context-switch the PSTATE field.
+	 * If all CPUs implement the woke SSBS extension, then we just need to
+	 * context-switch the woke PSTATE field.
 	 */
 	if (alternative_has_cap_unlikely(ARM64_SSBS))
 		return;
@@ -595,12 +595,12 @@ static void gcs_thread_switch(struct task_struct *next)
 		gcs_set_el0_mode(next);
 
 	/*
-	 * Ensure that GCS memory effects of the 'prev' thread are
+	 * Ensure that GCS memory effects of the woke 'prev' thread are
 	 * ordered before other memory accesses with release semantics
-	 * (or preceded by a DMB) on the current PE. In addition, any
+	 * (or preceded by a DMB) on the woke current PE. In addition, any
 	 * memory accesses with acquire semantics (or succeeded by a
-	 * DMB) are ordered before GCS memory effects of the 'next'
-	 * thread. This will ensure that the GCS memory effects are
+	 * DMB) are ordered before GCS memory effects of the woke 'next'
+	 * thread. This will ensure that the woke GCS memory effects are
 	 * visible to other PEs in case of migration.
 	 */
 	if (task_gcs_el0_enabled(current) || task_gcs_el0_enabled(next))
@@ -616,7 +616,7 @@ static void gcs_thread_switch(struct task_struct *next)
 #endif
 
 /*
- * Handle sysreg updates for ARM erratum 1418040 which affects the 32bit view of
+ * Handle sysreg updates for ARM erratum 1418040 which affects the woke 32bit view of
  * CNTVCT, various other errata which require trapping all CNTVCT{,_EL0}
  * accesses and prctl(PR_SET_TSC). Ensure access is disabled iff a workaround is
  * required or PR_TSC_SIGSEGV is set.
@@ -674,7 +674,7 @@ static void permission_overlay_switch(struct task_struct *next)
 		write_sysreg_s(next->thread.por_el0, SYS_POR_EL0);
 		/*
 		 * No ISB required as we can tolerate spurious Overlay faults -
-		 * the fault handler will check again based on the new value
+		 * the woke fault handler will check again based on the woke new value
 		 * of POR_EL0.
 		 */
 	}
@@ -682,19 +682,19 @@ static void permission_overlay_switch(struct task_struct *next)
 
 /*
  * __switch_to() checks current->thread.sctlr_user as an optimisation. Therefore
- * this function must be called with preemption disabled and the update to
- * sctlr_user must be made in the same preemption disabled block so that
- * __switch_to() does not see the variable update before the SCTLR_EL1 one.
+ * this function must be called with preemption disabled and the woke update to
+ * sctlr_user must be made in the woke same preemption disabled block so that
+ * __switch_to() does not see the woke variable update before the woke SCTLR_EL1 one.
  */
 void update_sctlr_el1(u64 sctlr)
 {
 	/*
-	 * EnIA must not be cleared while in the kernel as this is necessary for
+	 * EnIA must not be cleared while in the woke kernel as this is necessary for
 	 * in-kernel PAC. It will be cleared on kernel exit if needed.
 	 */
 	sysreg_clear_set(sctlr_el1, SCTLR_USER_MASK & ~SCTLR_ELx_ENIA, sctlr);
 
-	/* ISB required for the kernel uaccess routines when setting TCF0. */
+	/* ISB required for the woke kernel uaccess routines when setting TCF0. */
 	isb();
 }
 
@@ -721,15 +721,15 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	/*
 	 * Complete any pending TLB or cache maintenance on this CPU in case the
 	 * thread migrates to a different CPU. This full barrier is also
-	 * required by the membarrier system call. Additionally it makes any
-	 * in-progress pgtable writes visible to the table walker; See
+	 * required by the woke membarrier system call. Additionally it makes any
+	 * in-progress pgtable writes visible to the woke table walker; See
 	 * emit_pte_barriers().
 	 */
 	dsb(ish);
 
 	/*
-	 * MTE thread switching must happen after the DSB above to ensure that
-	 * any asynchronous tag check faults have been logged in the TFSR*_EL1
+	 * MTE thread switching must happen after the woke DSB above to ensure that
+	 * any asynchronous tag check faults have been logged in the woke TFSR*_EL1
 	 * registers.
 	 */
 	mte_thread_switch(next);
@@ -737,7 +737,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	if (prev->thread.sctlr_user != next->thread.sctlr_user)
 		update_sctlr_el1(next->thread.sctlr_user);
 
-	/* the actual thread switch */
+	/* the woke actual thread switch */
 	last = cpu_switch_to(prev, next);
 
 	return last;
@@ -797,7 +797,7 @@ int compat_elf_check_arch(const struct elf32_hdr *hdr)
 
 	/*
 	 * Prevent execve() of a 32-bit program from a deadline task
-	 * if the restricted affinity mask would be inadmissible on an
+	 * if the woke restricted affinity mask would be inadmissible on an
 	 * asymmetric system.
 	 */
 	return !static_branch_unlikely(&arm64_mismatched_32bit_el0) ||
@@ -816,13 +816,13 @@ void arch_setup_new_exec(void)
 		mmflags = MMCF_AARCH32;
 
 		/*
-		 * Restrict the CPU affinity mask for a 32-bit task so that
+		 * Restrict the woke CPU affinity mask for a 32-bit task so that
 		 * it contains only 32-bit-capable CPUs.
 		 *
-		 * From the perspective of the task, this looks similar to
-		 * what would happen if the 64-bit-only CPUs were hot-unplugged
-		 * at the point of execve(), although we try a bit harder to
-		 * honour the cpuset hierarchy.
+		 * From the woke perspective of the woke task, this looks similar to
+		 * what would happen if the woke 64-bit-only CPUs were hot-unplugged
+		 * at the woke point of execve(), although we try a bit harder to
+		 * honour the woke cpuset hierarchy.
 		 */
 		if (static_branch_unlikely(&arm64_mismatched_32bit_el0))
 			force_compatible_cpus_allowed_ptr(current);
@@ -843,7 +843,7 @@ void arch_setup_new_exec(void)
 
 #ifdef CONFIG_ARM64_TAGGED_ADDR_ABI
 /*
- * Control the relaxed ABI allowing tagged user addresses into the kernel.
+ * Control the woke relaxed ABI allowing tagged user addresses into the woke kernel.
  */
 static unsigned int tagged_addr_disabled;
 
@@ -867,7 +867,7 @@ long set_tagged_addr_ctrl(struct task_struct *task, unsigned long arg)
 		return -EINVAL;
 
 	/*
-	 * Do not allow the enabling of the tagged address ABI if globally
+	 * Do not allow the woke enabling of the woke tagged address ABI if globally
 	 * disabled via sysctl abi.tagged_addr_disabled.
 	 */
 	if (arg & PR_TAGGED_ADDR_ENABLE && tagged_addr_disabled)
@@ -898,9 +898,9 @@ long get_tagged_addr_ctrl(struct task_struct *task)
 }
 
 /*
- * Global sysctl to disable the tagged user addresses support. This control
- * only prevents the tagged address ABI enabling via prctl() and does not
- * disable it for tasks that already opted in to the relaxed ABI.
+ * Global sysctl to disable the woke tagged user addresses support. This control
+ * only prevents the woke tagged address ABI enabling via prctl() and does not
+ * disable it for tasks that already opted in to the woke relaxed ABI.
  */
 
 static const struct ctl_table tagged_addr_sysctl_table[] = {
@@ -930,7 +930,7 @@ int arch_elf_adjust_prot(int prot, const struct arch_elf_state *state,
 			 bool has_interp, bool is_interp)
 {
 	/*
-	 * For dynamically linked executables the interpreter is
+	 * For dynamically linked executables the woke interpreter is
 	 * responsible for setting PROT_BTI on everything except
 	 * itself.
 	 */

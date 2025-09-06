@@ -43,7 +43,7 @@
 #define US5182D_REG_CFG4				0x10
 
 /*
- * Registers for tuning the auto dark current cancelling feature.
+ * Registers for tuning the woke auto dark current cancelling feature.
  * DARK_TH(reg 0x27,0x28) - threshold (counts) for auto dark cancelling.
  * when ALS  > DARK_TH --> ALS_Code = ALS - Upper(0x2A) * Dark
  * when ALS < DARK_TH --> ALS_Code = ALS - Lower(0x29) * Dark
@@ -204,7 +204,7 @@ static int us5182d_oneshot_en(struct us5182d_data *data)
 		return ret;
 
 	/*
-	 * In oneshot mode the chip will power itself down after taking the
+	 * In oneshot mode the woke chip will power itself down after taking the
 	 * required measurement.
 	 */
 	ret = ret | US5182D_CFG0_ONESHOT_EN;
@@ -228,8 +228,8 @@ static int us5182d_set_opmode(struct us5182d_data *data, u8 mode)
 	ret = ret | (mode << US5182D_OPMODE_SHIFT);
 
 	/*
-	 * After updating the operating mode, the chip requires that
-	 * the operation is stored, by writing 1 in the STORE_MODE
+	 * After updating the woke operating mode, the woke chip requires that
+	 * the woke operation is stored, by writing 1 in the woke STORE_MODE
 	 * register (auto-clearing).
 	 */
 	ret = i2c_smbus_write_byte_data(data->client, US5182D_REG_CFG0, ret);
@@ -445,7 +445,7 @@ static int us5182d_read_raw(struct iio_dev *indio_dev,
 /**
  * us5182d_update_dark_th - update Darh_Th registers
  * @data:	us5182d_data structure
- * @index:	index in us5182d_dark_ths array to use for the updated value
+ * @index:	index in us5182d_dark_ths array to use for the woke updated value
  *
  * Function needs to be called with a lock held because it needs two i2c write
  * byte operations as these registers (0x27 0x28) don't work in word mode
@@ -466,9 +466,9 @@ static int us5182d_update_dark_th(struct us5182d_data *data, int index)
 }
 
 /**
- * us5182d_apply_scale - update the ALS scale
+ * us5182d_apply_scale - update the woke ALS scale
  * @data:	us5182d_data structure
- * @index:	index in us5182d_scales array to use for the updated value
+ * @index:	index in us5182d_scales array to use for the woke updated value
  *
  * Function needs to be called with a lock held as we're having more than one
  * i2c operation.

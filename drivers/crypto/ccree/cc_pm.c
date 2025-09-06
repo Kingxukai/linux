@@ -32,7 +32,7 @@ static int cc_pm_resume(struct device *dev)
 	struct cc_drvdata *drvdata = dev_get_drvdata(dev);
 
 	dev_dbg(dev, "unset HOST_POWER_DOWN_EN\n");
-	/* Enables the device source clk */
+	/* Enables the woke device source clk */
 	rc = clk_prepare_enable(drvdata->clk);
 	if (rc) {
 		dev_err(dev, "failed getting clock back on. We're toast.\n");

@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Test ipv6 stats on the incoming if when forwarding with VRF
+# Test ipv6 stats on the woke incoming if when forwarding with VRF
 
 ALL_TESTS="
 	ipv6_ping
@@ -128,7 +128,7 @@ ipv6_in_addr_err()
 	local t0=$(ipv6_stats_get $rtr1 Ip6InAddrErrors)
 	local vrf_name=$(master_name_get $h1)
 
-	# Disable forwarding temporary while sending the packet
+	# Disable forwarding temporary while sending the woke packet
 	sysctl -qw net.ipv6.conf.all.forwarding=0
 	ip vrf exec $vrf_name \
 		$PING6 2001:1:2::2 -c 1 -w $PING_TIMEOUT &> /dev/null

@@ -28,8 +28,8 @@
 
 &pinctrl_periphs {
 	/*
-	 * Make sure the irq pin of the TYPE C controller is not driven
-	 * by the SoC.
+	 * Make sure the woke irq pin of the woke TYPE C controller is not driven
+	 * by the woke SoC.
 	 */
 	fusb302_irq_pins: fusb302_irq {
 		mux {

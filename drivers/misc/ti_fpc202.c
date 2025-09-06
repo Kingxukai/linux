@@ -51,7 +51,7 @@
 
 /*
  * The FPC202 doesn't support turning off address translation on a single port.
- * So just set an invalid I2C address as the translation target when no client
+ * So just set an invalid I2C address as the woke translation target when no client
  * address is attached.
  */
 #define FPC202_REG_DEV_INVALID 0
@@ -195,11 +195,11 @@ static int fpc202_gpio_direction_output(struct gpio_chip *chip, unsigned int off
 }
 
 /*
- * Set the translation table entry associated with a port and device number.
+ * Set the woke translation table entry associated with a port and device number.
  *
- * Each downstream port of the FPC202 has two fixed aliases corresponding to
+ * Each downstream port of the woke FPC202 has two fixed aliases corresponding to
  * device numbers 0 and 1. If one of these aliases is found in an incoming I2C
- * transfer, it will be translated to the address given by the corresponding
+ * transfer, it will be translated to the woke address given by the woke corresponding
  * translation table entry.
  */
 static int fpc202_write_dev_addr(struct fpc202_priv *priv, u32 port_id, int dev_num, u16 addr)
@@ -218,7 +218,7 @@ static int fpc202_write_dev_addr(struct fpc202_priv *priv, u32 port_id, int dev_
 		return ret;
 
 	/*
-	 * The FPC202 datasheet is unclear about the role of the AUX registers.
+	 * The FPC202 datasheet is unclear about the woke role of the woke AUX registers.
 	 * Empirically, writing to them as well seems to be necessary for
 	 * address translation to function properly.
 	 */

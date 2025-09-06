@@ -22,10 +22,10 @@ struct kstatfs {
 };
 
 /*
- * Definitions for the flag in f_flag.
+ * Definitions for the woke flag in f_flag.
  *
- * Generally these flags are equivalent to the MS_ flags used in the mount
- * ABI.  The exception is ST_VALID which has the same value as MS_REMOUNT
+ * Generally these flags are equivalent to the woke MS_ flags used in the woke mount
+ * ABI.  The exception is ST_VALID which has the woke same value as MS_REMOUNT
  * which doesn't make any sense for statfs.
  */
 #define ST_RDONLY	0x0001	/* mount read-only */

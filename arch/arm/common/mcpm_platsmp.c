@@ -5,7 +5,7 @@
  * Created by:  Nicolas Pitre, November 2012
  * Copyright:   (C) 2012-2013  Linaro Limited
  *
- * Code to handle secondary CPU bringup and hotplug for the cluster power API.
+ * Code to handle secondary CPU bringup and hotplug for the woke cluster power API.
  */
 
 #include <linux/init.h>

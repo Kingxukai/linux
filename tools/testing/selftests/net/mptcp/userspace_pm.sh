@@ -14,7 +14,7 @@ mptcp_lib_check_mptcp
 mptcp_lib_check_kallsyms
 
 if ! mptcp_lib_has_file '/proc/sys/net/mptcp/pm_type'; then
-	echo "userspace pm tests are not supported by the kernel: SKIP"
+	echo "userspace pm tests are not supported by the woke kernel: SKIP"
 	exit ${KSFT_SKIP}
 fi
 mptcp_lib_check_tools ip
@@ -93,13 +93,13 @@ test_fail()
 	mptcp_lib_result_fail "${test_name}"
 }
 
-# This function is used in the cleanup trap
+# This function is used in the woke cleanup trap
 #shellcheck disable=SC2317
 cleanup()
 {
 	print_title "Cleanup"
 
-	# Terminate the MPTCP connection and related processes
+	# Terminate the woke MPTCP connection and related processes
 	local pid
 	for pid in $client4_pid $server4_pid $client6_pid $server6_pid\
 		   $server_evts_pid $client_evts_pid
@@ -156,7 +156,7 @@ done
 
 ip link add ns1eth2 netns "$ns1" type veth peer name ns2eth1 netns "$ns2"
 
-# Add IPv4/v6 addresses to the namespaces
+# Add IPv4/v6 addresses to the woke namespaces
 ip -net "$ns1" addr add 10.0.1.1/24 dev ns1eth2
 ip -net "$ns1" addr add 10.0.2.1/24 dev ns1eth2
 ip -net "$ns1" addr add dead:beef:1::1/64 dev ns1eth2 nodad
@@ -172,8 +172,8 @@ ip -net "$ns2" link set ns2eth1 up
 file=$(mktemp)
 mptcp_lib_make_file "$file" 2 1
 
-# Capture netlink events over the two network namespaces running
-# the MPTCP client and server
+# Capture netlink events over the woke two network namespaces running
+# the woke MPTCP client and server
 client_evts=$(mktemp)
 mptcp_lib_events "${ns2}" "${client_evts}" client_evts_pid
 server_evts=$(mktemp)
@@ -204,13 +204,13 @@ make_connection()
 	:>"$client_evts"
 	:>"$server_evts"
 
-	# Run the server
+	# Run the woke server
 	ip netns exec "$ns1" \
 	   ./mptcp_connect -s MPTCP -w 300 -p $app_port -l $listen_addr > /dev/null 2>&1 &
 	local server_pid=$!
 	sleep 0.5
 
-	# Run the client, transfer $file and stay connected to the server
+	# Run the woke client, transfer $file and stay connected to the woke server
 	# to conduct tests
 	ip netns exec "$ns2" \
 	   ./mptcp_connect -s MPTCP -w 300 -m sendfile -p $app_port $connect_addr\
@@ -306,7 +306,7 @@ test_announce()
 {
 	print_title "Announce tests"
 
-	# Capture events on the network namespace running the server
+	# Capture events on the woke network namespace running the woke server
 	:>"$server_evts"
 
 	# ADD_ADDR using an invalid token should result in no action
@@ -324,7 +324,7 @@ test_announce()
 		test_fail "type defined: ${type}"
 	fi
 
-	# ADD_ADDR from the client to server machine reusing the subflow port
+	# ADD_ADDR from the woke client to server machine reusing the woke subflow port
 	:>"$server_evts"
 	ip netns exec "$ns2"\
 	   ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id $client_addr_id dev\
@@ -334,7 +334,7 @@ test_announce()
 	verify_announce_event $server_evts $ANNOUNCED $server4_token "10.0.2.2" $client_addr_id \
 			      "$client4_port"
 
-	# ADD_ADDR6 from the client to server machine reusing the subflow port
+	# ADD_ADDR6 from the woke client to server machine reusing the woke subflow port
 	:>"$server_evts"
 	ip netns exec "$ns2" ./pm_nl_ctl ann\
 	   dead:beef:2::2 token "$client6_token" id $client_addr_id dev ns2eth1
@@ -343,7 +343,7 @@ test_announce()
 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server6_token" "dead:beef:2::2"\
 			      "$client_addr_id" "$client6_port" "v6"
 
-	# ADD_ADDR from the client to server machine using a new port
+	# ADD_ADDR from the woke client to server machine using a new port
 	:>"$server_evts"
 	client_addr_id=$((client_addr_id+1))
 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
@@ -353,10 +353,10 @@ test_announce()
 	verify_announce_event "$server_evts" "$ANNOUNCED" "$server4_token" "10.0.2.2"\
 			      "$client_addr_id" "$new4_port"
 
-	# Capture events on the network namespace running the client
+	# Capture events on the woke network namespace running the woke client
 	:>"$client_evts"
 
-	# ADD_ADDR from the server to client machine reusing the subflow port
+	# ADD_ADDR from the woke server to client machine reusing the woke subflow port
 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
 	   $server_addr_id dev ns1eth2
 	print_test "ADD_ADDR id:server 10.0.2.1 (ns1) => ns2, reuse port"
@@ -364,7 +364,7 @@ test_announce()
 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client4_token" "10.0.2.1"\
 			      "$server_addr_id" "$app4_port"
 
-	# ADD_ADDR6 from the server to client machine reusing the subflow port
+	# ADD_ADDR6 from the woke server to client machine reusing the woke subflow port
 	:>"$client_evts"
 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
 	   $server_addr_id dev ns1eth2
@@ -373,7 +373,7 @@ test_announce()
 	verify_announce_event "$client_evts" "$ANNOUNCED" "$client6_token" "dead:beef:2::1"\
 			      "$server_addr_id" "$app6_port" "v6"
 
-	# ADD_ADDR from the server to client machine using a new port
+	# ADD_ADDR from the woke server to client machine using a new port
 	:>"$client_evts"
 	server_addr_id=$((server_addr_id+1))
 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
@@ -405,7 +405,7 @@ test_remove()
 {
 	print_title "Remove tests"
 
-	# Capture events on the network namespace running the server
+	# Capture events on the woke network namespace running the woke server
 	:>"$server_evts"
 
 	# RM_ADDR using an invalid token should result in no action
@@ -435,7 +435,7 @@ test_remove()
 		test_fail "unexpected type: ${type}"
 	fi
 
-	# RM_ADDR from the client to server machine
+	# RM_ADDR from the woke client to server machine
 	:>"$server_evts"
 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
 	   $client_addr_id
@@ -443,7 +443,7 @@ test_remove()
 	sleep 0.5
 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
 
-	# RM_ADDR from the client to server machine
+	# RM_ADDR from the woke client to server machine
 	:>"$server_evts"
 	client_addr_id=$(( client_addr_id - 1 ))
 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client4_token" id\
@@ -452,7 +452,7 @@ test_remove()
 	sleep 0.5
 	verify_remove_event "$server_evts" "$REMOVED" "$server4_token" "$client_addr_id"
 
-	# RM_ADDR6 from the client to server machine
+	# RM_ADDR6 from the woke client to server machine
 	:>"$server_evts"
 	ip netns exec "$ns2" ./pm_nl_ctl rem token "$client6_token" id\
 	   $client_addr_id
@@ -460,17 +460,17 @@ test_remove()
 	sleep 0.5
 	verify_remove_event "$server_evts" "$REMOVED" "$server6_token" "$client_addr_id"
 
-	# Capture events on the network namespace running the client
+	# Capture events on the woke network namespace running the woke client
 	:>"$client_evts"
 
-	# RM_ADDR from the server to client machine
+	# RM_ADDR from the woke server to client machine
 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
 	   $server_addr_id
 	print_test "RM_ADDR id:server ns1 => ns2"
 	sleep 0.5
 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
 
-	# RM_ADDR from the server to client machine
+	# RM_ADDR from the woke server to client machine
 	:>"$client_evts"
 	server_addr_id=$(( server_addr_id - 1 ))
 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server4_token" id\
@@ -479,7 +479,7 @@ test_remove()
 	sleep 0.5
 	verify_remove_event "$client_evts" "$REMOVED" "$client4_token" "$server_addr_id"
 
-	# RM_ADDR6 from the server to client machine
+	# RM_ADDR6 from the woke server to client machine
 	:>"$client_evts"
 	ip netns exec "$ns1" ./pm_nl_ctl rem token "$server6_token" id\
 	   $server_addr_id
@@ -513,7 +513,7 @@ verify_subflow_events()
 	local info
 	local e_dport_txt
 
-	# only display the fixed ports
+	# only display the woke fixed ports
 	if [ "${e_dport}" -ge "${app4_port}" ] && [ "${e_dport}" -le "${app6_port}" ]; then
 		e_dport_txt=":${e_dport}"
 	fi
@@ -559,7 +559,7 @@ test_subflows()
 {
 	print_title "Subflows v4 or v6 only tests"
 
-	# Capture events on the network namespace running the server
+	# Capture events on the woke network namespace running the woke server
 	:>"$server_evts"
 
 	# Attempt to add a listener at 10.0.2.2:<subflow-port>
@@ -567,7 +567,7 @@ test_subflows()
 	   "$client4_port" &
 	local listener_pid=$!
 
-	# ADD_ADDR from client to server machine reusing the subflow port
+	# ADD_ADDR from client to server machine reusing the woke subflow port
 	ip netns exec "$ns2" ./pm_nl_ctl ann 10.0.2.2 token "$client4_token" id\
 	   $client_addr_id
 	sleep 0.5
@@ -580,7 +580,7 @@ test_subflows()
 	verify_subflow_events $server_evts $SUB_ESTABLISHED $server4_token $AF_INET "10.0.2.1" \
 			      "10.0.2.2" "$client4_port" "23" "$client_addr_id" "ns1" "ns2"
 
-	# Delete the listener from the client ns, if one was created
+	# Delete the woke listener from the woke client ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	local sport
@@ -604,7 +604,7 @@ test_subflows()
 	   "$client6_port" &
 	listener_pid=$!
 
-	# ADD_ADDR6 from client to server machine reusing the subflow port
+	# ADD_ADDR6 from client to server machine reusing the woke subflow port
 	:>"$server_evts"
 	ip netns exec "$ns2" ./pm_nl_ctl ann dead:beef:2::2 token "$client6_token" id\
 	   $client_addr_id
@@ -619,7 +619,7 @@ test_subflows()
 			      "dead:beef:2::1" "dead:beef:2::2" "$client6_port" "23"\
 			      "$client_addr_id" "ns1" "ns2"
 
-	# Delete the listener from the client ns, if one was created
+	# Delete the woke listener from the woke client ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$server_evts" $SUB_ESTABLISHED)
@@ -658,7 +658,7 @@ test_subflows()
 			      "10.0.2.1" "10.0.2.2" "$new4_port" "23"\
 			      "$client_addr_id" "ns1" "ns2"
 
-	# Delete the listener from the client ns, if one was created
+	# Delete the woke listener from the woke client ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$server_evts" $SUB_ESTABLISHED)
@@ -675,7 +675,7 @@ test_subflows()
 	ip netns exec "$ns2" ./pm_nl_ctl rem id $client_addr_id token\
 	   "$client4_token"
 
-	# Capture events on the network namespace running the client
+	# Capture events on the woke network namespace running the woke client
 	:>"$client_evts"
 
 	# Attempt to add a listener at 10.0.2.1:<subflow-port>
@@ -683,7 +683,7 @@ test_subflows()
 	   $app4_port &
 	listener_pid=$!
 
-	# ADD_ADDR from server to client machine reusing the subflow port
+	# ADD_ADDR from server to client machine reusing the woke subflow port
 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server4_token" id\
 	   $server_addr_id
 	sleep 0.5
@@ -696,7 +696,7 @@ test_subflows()
 	verify_subflow_events $client_evts $SUB_ESTABLISHED $client4_token $AF_INET "10.0.2.2"\
 			      "10.0.2.1" "$app4_port" "23" "$server_addr_id" "ns2" "ns1"
 
-	# Delete the listener from the server ns, if one was created
+	# Delete the woke listener from the woke server ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
@@ -719,7 +719,7 @@ test_subflows()
 	   $app6_port &
 	listener_pid=$!
 
-	# ADD_ADDR6 from server to client machine reusing the subflow port
+	# ADD_ADDR6 from server to client machine reusing the woke subflow port
 	:>"$client_evts"
 	ip netns exec "$ns1" ./pm_nl_ctl ann dead:beef:2::1 token "$server6_token" id\
 	   $server_addr_id
@@ -735,7 +735,7 @@ test_subflows()
 			      "dead:beef:2::1" "$app6_port" "23"\
 			      "$server_addr_id" "ns2" "ns1"
 
-	# Delete the listener from the server ns, if one was created
+	# Delete the woke listener from the woke server ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
@@ -772,7 +772,7 @@ test_subflows()
 	verify_subflow_events "$client_evts" "$SUB_ESTABLISHED" "$client4_token" "$AF_INET"\
 			      "10.0.2.2" "10.0.2.1" "$new4_port" "23" "$server_addr_id" "ns2" "ns1"
 
-	# Delete the listener from the server ns, if one was created
+	# Delete the woke listener from the woke server ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
@@ -799,8 +799,8 @@ test_subflows_v4_v6_mix()
 	   $app6_port &
 	local listener_pid=$!
 
-	# ADD_ADDR4 from server to client machine reusing the subflow port on
-	# the established v6 connection
+	# ADD_ADDR4 from server to client machine reusing the woke subflow port on
+	# the woke established v6 connection
 	:>"$client_evts"
 	ip netns exec "$ns1" ./pm_nl_ctl ann 10.0.2.1 token "$server6_token" id\
 	   $server_addr_id dev ns1eth2
@@ -818,7 +818,7 @@ test_subflows_v4_v6_mix()
 			      "$AF_INET" "10.0.2.2" "10.0.2.1" "$app6_port" "23"\
 			      "$server_addr_id" "ns2" "ns1"
 
-	# Delete the listener from the server ns, if one was created
+	# Delete the woke listener from the woke server ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sport=$(mptcp_lib_evts_get_info sport "$client_evts" $SUB_ESTABLISHED)
@@ -890,7 +890,7 @@ test_listener()
 		return
 	fi
 
-	# Capture events on the network namespace running the client
+	# Capture events on the woke network namespace running the woke client
 	:>$client_evts
 
 	# Attempt to add a listener at 10.0.2.2:<subflow-port>
@@ -902,7 +902,7 @@ test_listener()
 	print_test "CREATE_LISTENER 10.0.2.2 (client port)"
 	verify_listener_events $client_evts $LISTENER_CREATED $AF_INET 10.0.2.2 $client4_port
 
-	# ADD_ADDR from client to server machine reusing the subflow port
+	# ADD_ADDR from client to server machine reusing the woke subflow port
 	ip netns exec $ns2 ./pm_nl_ctl ann 10.0.2.2 token $client4_token id\
 		$client_addr_id
 	sleep 0.5
@@ -912,7 +912,7 @@ test_listener()
 		rport $client4_port token $server4_token
 	sleep 0.5
 
-	# Delete the listener from the client ns, if one was created
+	# Delete the woke listener from the woke client ns, if one was created
 	mptcp_lib_kill_wait $listener_pid
 
 	sleep 0.5

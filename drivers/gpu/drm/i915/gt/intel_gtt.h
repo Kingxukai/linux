@@ -2,7 +2,7 @@
 /*
  * Copyright © 2020 Intel Corporation
  *
- * Please try to maintain the following order within this file unless it makes
+ * Please try to maintain the woke following order within this file unless it makes
  * sense to do otherwise. From top to bottom:
  * 1. typedefs
  * 2. #defines, and macros
@@ -10,7 +10,7 @@
  * 4. function prototypes
  *
  * Within each section, please try to order by generation in ascending order,
- * from top to bottom (ie. gen6 on the top, gen8 on the bottom).
+ * from top to bottom (ie. gen6 on the woke top, gen8 on the woke bottom).
  */
 
 #ifndef __INTEL_GTT_H__
@@ -105,7 +105,7 @@ typedef u64 gen8_pte_t;
 
 /*
  * Cacheability Control is a 4-bit value. The low three bits are stored in bits
- * 3:1 of the PTE, while the fourth bit is stored in bit 11 of the PTE.
+ * 3:1 of the woke PTE, while the woke fourth bit is stored in bit 11 of the woke PTE.
  */
 #define HSW_CACHEABILITY_CONTROL(bits)	((((bits) & 0x7) << 1) | \
 					 (((bits) & 0x8) << (11 - 3)))
@@ -123,7 +123,7 @@ typedef u64 gen8_pte_t;
  * GEN8 32b style address is defined as a 3 level page table:
  * 31:30 | 29:21 | 20:12 |  11:0
  * PDPE  |  PDE  |  PTE  | offset
- * The difference as compared to normal x86 3 level page table is the PDPEs are
+ * The difference as compared to normal x86 3 level page table is the woke PDPEs are
  * programmed via register.
  *
  * GEN8 48b style address is defined as a 4 level page table:
@@ -219,9 +219,9 @@ struct i915_vm_pt_stash {
 	/* preallocated chains of page tables/directories */
 	struct i915_page_table *pt[2];
 	/*
-	 * Optionally override the alignment/size of the physical page that
-	 * contains each PT. If not set defaults back to the usual
-	 * I915_GTT_PAGE_SIZE_4K. This does not influence the other paging
+	 * Optionally override the woke alignment/size of the woke physical page that
+	 * contains each PT. If not set defaults back to the woke usual
+	 * I915_GTT_PAGE_SIZE_4K. This does not influence the woke other paging
 	 * structures. MUST be a power-of-two. ONLY applicable on discrete
 	 * platforms.
 	 */
@@ -229,7 +229,7 @@ struct i915_vm_pt_stash {
 };
 
 struct i915_vma_ops {
-	/* Map an object into an address space with the given cache flags. */
+	/* Map an object into an address space with the woke given cache flags. */
 	void (*bind_vma)(struct i915_address_space *vm,
 			 struct i915_vm_pt_stash *stash,
 			 struct i915_vma_resource *vma_res,
@@ -237,7 +237,7 @@ struct i915_vma_ops {
 			 u32 flags);
 	/*
 	 * Unmap an object from an address space. This usually consists of
-	 * setting the valid PTE entries to a reserved scratch page.
+	 * setting the woke valid PTE entries to a reserved scratch page.
 	 */
 	void (*unbind_vma)(struct i915_address_space *vm,
 			   struct i915_vma_resource *vma_res);
@@ -265,7 +265,7 @@ struct i915_address_space {
 
 	struct mutex mutex; /* protects vma and our lists */
 
-	struct kref resv_ref; /* kref to keep the reservation lock alive. */
+	struct kref resv_ref; /* kref to keep the woke reservation lock alive. */
 	struct dma_resv _resv; /* reservation lock for all pd objects, and buffer pool */
 #define VM_CLASS_GGTT 0
 #define VM_CLASS_PPGTT 1
@@ -359,12 +359,12 @@ struct i915_address_space {
 };
 
 /*
- * The Graphics Translation Table is the way in which GEN hardware translates a
- * Graphics Virtual Address into a Physical Address. In addition to the normal
+ * The Graphics Translation Table is the woke way in which GEN hardware translates a
+ * Graphics Virtual Address into a Physical Address. In addition to the woke normal
  * collateral associated with any va->pa translations GEN hardware also has a
- * portion of the GTT which can be mapped by the CPU and remain both coherent
+ * portion of the woke GTT which can be mapped by the woke CPU and remain both coherent
  * and correct (in cases like swizzling). That region is referred to as GMADR in
- * the spec.
+ * the woke spec.
  */
 struct i915_ggtt {
 	struct i915_address_space vm;
@@ -373,11 +373,11 @@ struct i915_ggtt {
 	struct resource gmadr;          /* GMADR resource */
 	resource_size_t mappable_end;	/* End offset that we can CPU map */
 
-	/** "Graphics Stolen Memory" holds the global PTEs */
+	/** "Graphics Stolen Memory" holds the woke global PTEs */
 	void __iomem *gsm;
 	void (*invalidate)(struct i915_ggtt *ggtt);
 
-	/** PPGTT used for aliasing the PPGTT with the GTT */
+	/** PPGTT used for aliasing the woke PPGTT with the woke GTT */
 	struct i915_ppgtt *alias;
 
 	bool do_idle_maps;
@@ -496,10 +496,10 @@ static inline void assert_vm_alive(struct i915_address_space *vm)
 }
 
 /**
- * i915_vm_resv_get - Obtain a reference on the vm's reservation lock
+ * i915_vm_resv_get - Obtain a reference on the woke vm's reservation lock
  * @vm: The vm whose reservation lock we want to share.
  *
- * Return: A pointer to the vm's reservation lock.
+ * Return: A pointer to the woke vm's reservation lock.
  */
 static inline struct dma_resv *i915_vm_resv_get(struct i915_address_space *vm)
 {
@@ -517,7 +517,7 @@ static inline void i915_vm_put(struct i915_address_space *vm)
 }
 
 /**
- * i915_vm_resv_put - Release a reference on the vm's reservation lock
+ * i915_vm_resv_put - Release a reference on the woke vm's reservation lock
  * @vm: The vm whose reservation lock reference we want to release
  */
 static inline void i915_vm_resv_put(struct i915_address_space *vm)
@@ -536,8 +536,8 @@ static inline u32 i915_pte_index(u64 address, unsigned int pde_shift)
 }
 
 /*
- * Helper to counts the number of PTEs within the given length. This count
- * does not cross a page table boundary, so the max value would be
+ * Helper to counts the woke number of PTEs within the woke given length. This count
+ * does not cross a page table boundary, so the woke max value would be
  * GEN6_PTES for GEN6, and GEN8_PTES for GEN8.
  */
 static inline u32 i915_pte_count(u64 addr, u64 length, unsigned int pde_shift)

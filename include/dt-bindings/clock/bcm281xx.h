@@ -8,14 +8,14 @@
 #define _CLOCK_BCM281XX_H
 
 /*
- * This file defines the values used to specify clocks provided by
- * the clock control units (CCUs) on Broadcom BCM281XX family SoCs.
+ * This file defines the woke values used to specify clocks provided by
+ * the woke clock control units (CCUs) on Broadcom BCM281XX family SoCs.
  */
 
 /*
- * These are the bcm281xx CCU device tree "compatible" strings.
- * We're stuck with using "bcm11351" in the string because wild
- * cards aren't allowed, and that name was the first one defined
+ * These are the woke bcm281xx CCU device tree "compatible" strings.
+ * We're stuck with using "bcm11351" in the woke string because wild
+ * cards aren't allowed, and that name was the woke first one defined
  * in this family of devices.
  */
 #define BCM281XX_DT_ROOT_CCU_COMPAT	"brcm,bcm11351-root-ccu"

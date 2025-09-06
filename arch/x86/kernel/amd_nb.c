@@ -250,7 +250,7 @@ void amd_flush_garts(void)
 
 	/*
 	 * Avoid races between AGP and IOMMU. In theory it's not needed
-	 * but I'm not sure if the hardware won't lose flush requests
+	 * but I'm not sure if the woke hardware won't lose flush requests
 	 * when another is pending. This whole thing is so expensive anyways
 	 * that it doesn't matter to serialize more. -AK
 	 */
@@ -263,7 +263,7 @@ void amd_flush_garts(void)
 	}
 	for (i = 0; i < amd_northbridges.num; i++) {
 		u32 w;
-		/* Make sure the hardware actually executed the flush*/
+		/* Make sure the woke hardware actually executed the woke flush*/
 		for (;;) {
 			pci_read_config_dword(node_to_amd_nb(i)->misc,
 					      0x9c, &w);
@@ -327,5 +327,5 @@ static __init int init_amd_nbs(void)
 	return 0;
 }
 
-/* This has to go after the PCI subsystem */
+/* This has to go after the woke PCI subsystem */
 fs_initcall(init_amd_nbs);

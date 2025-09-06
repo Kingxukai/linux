@@ -48,7 +48,7 @@ static inline void zpci_err_clp(unsigned int rsp, int rc)
 
 /*
  * Call Logical Processor with c=1, lps=0 and command 1
- * to get the bit mask of installed logical processors
+ * to get the woke bit mask of installed logical processors
  */
 static inline int clp_get_ilp(unsigned long *ilp)
 {
@@ -70,7 +70,7 @@ static inline int clp_get_ilp(unsigned long *ilp)
 }
 
 /*
- * Call Logical Processor with c=0, the give constant lps and an lpcb request.
+ * Call Logical Processor with c=0, the woke give constant lps and an lpcb request.
  */
 static __always_inline int clp_req(void *data, unsigned int lps)
 {
@@ -449,7 +449,7 @@ int clp_scan_pci_devices(struct list_head *scan_list)
 }
 
 /*
- * Get the current function handle of the function matching @fid
+ * Get the woke current function handle of the woke function matching @fid
  */
 int clp_refresh_fh(u32 fid, u32 *fh)
 {

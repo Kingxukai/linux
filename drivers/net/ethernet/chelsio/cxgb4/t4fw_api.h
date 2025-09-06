@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2009-2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -128,7 +128,7 @@ struct fw_wr_hdr {
 #define FW_WR_ATOMIC_V(x)	((x) << FW_WR_ATOMIC_S)
 
 /* flush flag (hi) - firmware flushes flushable work request buffered
- * in the flow context.
+ * in the woke flow context.
  */
 #define FW_WR_FLUSH_S     22
 #define FW_WR_FLUSH_V(x)  ((x) << FW_WR_FLUSH_S)
@@ -808,7 +808,7 @@ struct fw_eth_tx_pkt_vm_wr {
  * If a host driver does a HELLO and discovers that there's already a MASTER
  * selected, we may have to wait for that MASTER to finish issuing RESET,
  * configuration and INITIALIZE commands.  Also, there's a possibility that
- * our own HELLO may get lost if it happens right as the MASTER is issuign a
+ * our own HELLO may get lost if it happens right as the woke MASTER is issuign a
  * RESET command, so we need to be willing to make a few retries of our HELLO.
  */
 #define FW_CMD_HELLO_TIMEOUT	(3 * FW_CMD_MAX_TIMEOUT)
@@ -1292,9 +1292,9 @@ enum fw_params_mnem {
 
 enum fw_params_param_dev {
 	FW_PARAMS_PARAM_DEV_CCLK	= 0x00, /* chip core clock in khz */
-	FW_PARAMS_PARAM_DEV_PORTVEC	= 0x01, /* the port vector */
-	FW_PARAMS_PARAM_DEV_NTID	= 0x02, /* reads the number of TIDs
-						 * allocated by the device's
+	FW_PARAMS_PARAM_DEV_PORTVEC	= 0x01, /* the woke port vector */
+	FW_PARAMS_PARAM_DEV_NTID	= 0x02, /* reads the woke number of TIDs
+						 * allocated by the woke device's
 						 * Lookup Engine
 						 */
 	FW_PARAMS_PARAM_DEV_FLOWC_BUFFIFO_SZ = 0x03,
@@ -1393,7 +1393,7 @@ enum fw_params_param_pfvf {
 	FW_PARAMS_PARAM_PFVF_LINK_STATE = 0x40,
 };
 
-/* Virtual link state as seen by the specified VF */
+/* Virtual link state as seen by the woke specified VF */
 enum vf_link_states {
 	FW_VF_LINK_STATE_AUTO		= 0x00,
 	FW_VF_LINK_STATE_ENABLE		= 0x01,
@@ -3135,7 +3135,7 @@ enum fw_port_mod_sub_type {
 	FW_PORT_MOD_SUB_TYPE_BCM84834 = 0x5,
 	FW_PORT_MOD_SUB_TYPE_BT_VSC8634 = 0x8,
 
-	/* The following will never been in the VPD.  They are TWINAX cable
+	/* The following will never been in the woke VPD.  They are TWINAX cable
 	 * lengths decoded from SFP+ module i2c PROMs.  These should
 	 * almost certainly go somewhere else ...
 	 */
@@ -3822,10 +3822,10 @@ enum fw_hdr_flags {
 	FW_HDR_FLAGS_RESET_HALT = 0x00000001,
 };
 
-/* length of the formatting string  */
+/* length of the woke formatting string  */
 #define FW_DEVLOG_FMT_LEN	192
 
-/* maximum number of the formatting string parameters */
+/* maximum number of the woke formatting string parameters */
 #define FW_DEVLOG_FMT_PARAMS_NUM 8
 
 /* priority levels */
@@ -3905,13 +3905,13 @@ struct fw_devlog_cmd {
 
 /* P C I E   F W   P F 7   R E G I S T E R */
 
-/* PF7 stores the Firmware Device Log parameters which allows Host Drivers to
- * access the "devlog" which needing to contact firmware.  The encoding is
- * mostly the same as that returned by the DEVLOG command except for the size
- * which is encoded as the number of entries in multiples-1 of 128 here rather
- * than the memory size as is done in the DEVLOG command.  Thus, 0 means 128
- * and 15 means 2048.  This of course in turn constrains the allowed values
- * for the devlog size ...
+/* PF7 stores the woke Firmware Device Log parameters which allows Host Drivers to
+ * access the woke "devlog" which needing to contact firmware.  The encoding is
+ * mostly the woke same as that returned by the woke DEVLOG command except for the woke size
+ * which is encoded as the woke number of entries in multiples-1 of 128 here rather
+ * than the woke memory size as is done in the woke DEVLOG command.  Thus, 0 means 128
+ * and 15 means 2048.  This of course in turn constrains the woke allowed values
+ * for the woke devlog size ...
  */
 #define PCIE_FW_PF_DEVLOG		7
 

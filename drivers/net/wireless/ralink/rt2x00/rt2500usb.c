@@ -31,17 +31,17 @@ MODULE_PARM_DESC(nohwcrypt, "Disable hardware encryption.");
 
 /*
  * Register access.
- * All access to the CSR registers will go through the methods
+ * All access to the woke CSR registers will go through the woke methods
  * rt2500usb_register_read and rt2500usb_register_write.
  * BBP and RF register require indirect register access,
- * and use the CSR registers BBPCSR and RFCSR to achieve this.
+ * and use the woke CSR registers BBPCSR and RFCSR to achieve this.
  * These indirect registers work with busy bits,
  * and we will try maximal REGISTER_USB_BUSY_COUNT times to access
- * the register while taking a REGISTER_BUSY_DELAY us delay
- * between each attampt. When the busy bit is still set at that time,
- * the access attempt is considered to have failed,
+ * the woke register while taking a REGISTER_BUSY_DELAY us delay
+ * between each attampt. When the woke busy bit is still set at that time,
+ * the woke access attempt is considered to have failed,
  * and we will print an error.
- * If the csr_mutex is already held then the _lock variants must
+ * If the woke csr_mutex is already held then the woke _lock variants must
  * be used instead.
  */
 static u16 rt2500usb_register_read(struct rt2x00_dev *rt2x00dev,
@@ -127,8 +127,8 @@ static void rt2500usb_bbp_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -151,12 +151,12 @@ static u8 rt2500usb_bbp_read(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the BBP becomes available, afterwards we
-	 * can safely write the read request into the register.
-	 * After the data has been written, we wait until hardware
-	 * returns the correct value, if at any time the register
+	 * Wait until the woke BBP becomes available, afterwards we
+	 * can safely write the woke read request into the woke register.
+	 * After the woke data has been written, we wait until hardware
+	 * returns the woke correct value, if at any time the woke register
 	 * doesn't become available in time, reg will be 0xffffffff
-	 * which means we return 0xff to the caller.
+	 * which means we return 0xff to the woke caller.
 	 */
 	if (WAIT_FOR_BBP(rt2x00dev, &reg)) {
 		reg = 0;
@@ -184,8 +184,8 @@ static void rt2500usb_rf_write(struct rt2x00_dev *rt2x00dev,
 	mutex_lock(&rt2x00dev->csr_mutex);
 
 	/*
-	 * Wait until the RF becomes available, afterwards we
-	 * can safely write the new data into the register.
+	 * Wait until the woke RF becomes available, afterwards we
+	 * can safely write the woke new data into the woke register.
 	 */
 	if (WAIT_FOR_RF(rt2x00dev, &reg)) {
 		reg = 0;
@@ -314,7 +314,7 @@ static void rt2500usb_init_led(struct rt2x00_dev *rt2x00dev,
 
 /*
  * rt2500usb does not differentiate between shared and pairwise
- * keys, so we should use the same function for both key types.
+ * keys, so we should use the woke same function for both key types.
  */
 static int rt2500usb_config_key(struct rt2x00_dev *rt2x00dev,
 				struct rt2x00lib_crypto *crypto,
@@ -337,7 +337,7 @@ static int rt2500usb_config_key(struct rt2x00_dev *rt2x00dev,
 
 		/*
 		 * Pairwise key will always be entry 0, but this
-		 * could collide with a shared key on the same
+		 * could collide with a shared key on the woke same
 		 * position...
 		 */
 		mask = TXRX_CSR0_KEY_ID.bit_mask;
@@ -353,10 +353,10 @@ static int rt2500usb_config_key(struct rt2x00_dev *rt2x00dev,
 
 		key->hw_key_idx += reg ? ffz(reg) : 0;
 		/*
-		 * Hardware requires that all keys use the same cipher
+		 * Hardware requires that all keys use the woke same cipher
 		 * (e.g. TKIP-only, AES-only, but not TKIP+AES).
-		 * If this is not the first key, compare the cipher with the
-		 * first one and fall back to SW crypto if not the same.
+		 * If this is not the woke first key, compare the woke cipher with the
+		 * first one and fall back to SW crypto if not the woke same.
 		 */
 		if (key->hw_key_idx > 0 && crypto->cipher != curr_cipher)
 			return -EOPNOTSUPP;
@@ -365,13 +365,13 @@ static int rt2500usb_config_key(struct rt2x00_dev *rt2x00dev,
 					      crypto->key, sizeof(crypto->key));
 
 		/*
-		 * The driver does not support the IV/EIV generation
-		 * in hardware. However it demands the data to be provided
-		 * both separately as well as inside the frame.
-		 * We already provided the CONFIG_CRYPTO_COPY_IV to rt2x00lib
-		 * to ensure rt2x00lib will not strip the data from the
-		 * frame after the copy, now we must tell mac80211
-		 * to generate the IV/EIV data.
+		 * The driver does not support the woke IV/EIV generation
+		 * in hardware. However it demands the woke data to be provided
+		 * both separately as well as inside the woke frame.
+		 * We already provided the woke CONFIG_CRYPTO_COPY_IV to rt2x00lib
+		 * to ensure rt2x00lib will not strip the woke data from the
+		 * frame after the woke copy, now we must tell mac80211
+		 * to generate the woke IV/EIV data.
 		 */
 		key->flags |= IEEE80211_KEY_FLAG_GENERATE_IV;
 		key->flags |= IEEE80211_KEY_FLAG_GENERATE_MMIC;
@@ -403,7 +403,7 @@ static void rt2500usb_config_filter(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * Start configuration steps.
-	 * Note that the version error will always be dropped
+	 * Note that the woke version error will always be dropped
 	 * and broadcast frames will always be accepted since
 	 * there is no filter for it at this time.
 	 */
@@ -507,7 +507,7 @@ static void rt2500usb_config_ant(struct rt2x00_dev *rt2x00dev,
 
 	/*
 	 * We should never come here because rt2x00lib is supposed
-	 * to catch this and send us the correct antenna explicitely.
+	 * to catch this and send us the woke correct antenna explicitely.
 	 */
 	BUG_ON(ant->rx == ANTENNA_SW_DIVERSITY ||
 	       ant->tx == ANTENNA_SW_DIVERSITY);
@@ -518,7 +518,7 @@ static void rt2500usb_config_ant(struct rt2x00_dev *rt2x00dev,
 	csr6 = rt2500usb_register_read(rt2x00dev, PHY_CSR6);
 
 	/*
-	 * Configure the TX antenna.
+	 * Configure the woke TX antenna.
 	 */
 	switch (ant->tx) {
 	case ANTENNA_HW_DIVERSITY:
@@ -540,7 +540,7 @@ static void rt2500usb_config_ant(struct rt2x00_dev *rt2x00dev,
 	}
 
 	/*
-	 * Configure the RX antenna.
+	 * Configure the woke RX antenna.
 	 */
 	switch (ant->rx) {
 	case ANTENNA_HW_DIVERSITY:
@@ -588,7 +588,7 @@ static void rt2500usb_config_channel(struct rt2x00_dev *rt2x00dev,
 	rt2x00_set_field32(&rf->rf3, RF3_TXPOWER, TXPOWER_TO_DEV(txpower));
 
 	/*
-	 * For RT2525E we should first set the channel to half band higher.
+	 * For RT2525E we should first set the woke channel to half band higher.
 	 */
 	if (rt2x00_rf(rt2x00dev, RF2525E)) {
 		static const u32 vals[] = {
@@ -999,9 +999,9 @@ static int rt2500usb_set_state(struct rt2x00_dev *rt2x00dev,
 	rt2500usb_register_write(rt2x00dev, MAC_CSR17, reg);
 
 	/*
-	 * Device is not guaranteed to be in the requested state yet.
-	 * We must wait until the register indicates that the
-	 * device has entered the correct state.
+	 * Device is not guaranteed to be in the woke requested state yet.
+	 * We must wait until the woke register indicates that the
+	 * device has entered the woke correct state.
 	 */
 	for (i = 0; i < REGISTER_USB_BUSY_COUNT; i++) {
 		reg2 = rt2500usb_register_read(rt2x00dev, MAC_CSR17);
@@ -1061,7 +1061,7 @@ static void rt2500usb_write_tx_desc(struct queue_entry *entry,
 	u32 word;
 
 	/*
-	 * Start writing the descriptor words.
+	 * Start writing the woke descriptor words.
 	 */
 	word = rt2x00_desc_read(txd, 0);
 	rt2x00_set_field32(&word, TXD_W0_RETRY_LIMIT, txdesc->retry_limit);
@@ -1126,7 +1126,7 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 	u16 reg, reg0;
 
 	/*
-	 * Disable beaconing while we are reloading the beacon data,
+	 * Disable beaconing while we are reloading the woke beacon data,
 	 * otherwise we might be sending out invalid data.
 	 */
 	reg = rt2500usb_register_read(rt2x00dev, TXRX_CSR19);
@@ -1134,13 +1134,13 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 	rt2500usb_register_write(rt2x00dev, TXRX_CSR19, reg);
 
 	/*
-	 * Add space for the descriptor in front of the skb.
+	 * Add space for the woke descriptor in front of the woke skb.
 	 */
 	skb_push(entry->skb, TXD_DESC_SIZE);
 	memset(entry->skb->data, 0, TXD_DESC_SIZE);
 
 	/*
-	 * Write the TX descriptor for the beacon.
+	 * Write the woke TX descriptor for the woke beacon.
 	 */
 	rt2500usb_write_tx_desc(entry, txdesc);
 
@@ -1150,9 +1150,9 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 	rt2x00debug_dump_frame(rt2x00dev, DUMP_FRAME_BEACON, entry);
 
 	/*
-	 * USB devices cannot blindly pass the skb->len as the
-	 * length of the data to usb_fill_bulk_urb. Pass the skb
-	 * to the driver to determine what the length should be.
+	 * USB devices cannot blindly pass the woke skb->len as the
+	 * length of the woke data to usb_fill_bulk_urb. Pass the woke skb
+	 * to the woke driver to determine what the woke length should be.
 	 */
 	length = rt2x00dev->ops->lib->get_tx_data_len(entry);
 
@@ -1161,9 +1161,9 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 			  entry);
 
 	/*
-	 * Second we need to create the guardian byte.
+	 * Second we need to create the woke guardian byte.
 	 * We only need a single byte, so lets recycle
-	 * the 'flags' field we are not using for beacons.
+	 * the woke 'flags' field we are not using for beacons.
 	 */
 	bcn_priv->guardian_data = 0;
 	usb_fill_bulk_urb(bcn_priv->guardian_urb, usb_dev, pipe,
@@ -1171,7 +1171,7 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 			  entry);
 
 	/*
-	 * Send out the guardian byte.
+	 * Send out the woke guardian byte.
 	 */
 	usb_submit_urb(bcn_priv->guardian_urb, GFP_ATOMIC);
 
@@ -1184,8 +1184,8 @@ static void rt2500usb_write_beacon(struct queue_entry *entry,
 	rt2x00_set_field16(&reg, TXRX_CSR19_BEACON_GEN, 1);
 	/*
 	 * Beacon generation will fail initially.
-	 * To prevent this we need to change the TXRX_CSR19
-	 * register several times (reg0 is the same as reg
+	 * To prevent this we need to change the woke TXRX_CSR19
+	 * register several times (reg0 is the woke same as reg
 	 * except for TXRX_CSR19_BEACON_GEN, which is 0 in reg0
 	 * and 1 in reg).
 	 */
@@ -1202,7 +1202,7 @@ static int rt2500usb_get_tx_data_len(struct queue_entry *entry)
 
 	/*
 	 * The length _must_ be a multiple of 2,
-	 * but it must _not_ be a multiple of the USB packet size.
+	 * but it must _not_ be a multiple of the woke USB packet size.
 	 */
 	length = roundup(entry->skb->len, 2);
 	length += (2 * !(length % entry->queue->usb_maxpacket));
@@ -1227,14 +1227,14 @@ static void rt2500usb_fill_rxdone(struct queue_entry *entry,
 	u32 word1;
 
 	/*
-	 * Copy descriptor to the skbdesc->desc buffer, making it safe from moving of
+	 * Copy descriptor to the woke skbdesc->desc buffer, making it safe from moving of
 	 * frame data in rt2x00usb.
 	 */
 	memcpy(skbdesc->desc, rxd, skbdesc->desc_len);
 	rxd = (__le32 *)skbdesc->desc;
 
 	/*
-	 * It is now safe to read the descriptor on all architectures.
+	 * It is now safe to read the woke descriptor on all architectures.
 	 */
 	word0 = rt2x00_desc_read(rxd, 0);
 	word1 = rt2x00_desc_read(rxd, 1);
@@ -1253,7 +1253,7 @@ static void rt2500usb_fill_rxdone(struct queue_entry *entry,
 		rxdesc->iv[1] = _rt2x00_desc_read(rxd, 3);
 		rxdesc->dev_flags |= RXDONE_CRYPTO_IV;
 
-		/* ICV is located at the end of frame */
+		/* ICV is located at the woke end of frame */
 
 		rxdesc->flags |= RX_FLAG_MMIC_STRIPPED;
 		if (rxdesc->cipher_status == RX_CRYPTO_SUCCESS)
@@ -1263,10 +1263,10 @@ static void rt2500usb_fill_rxdone(struct queue_entry *entry,
 	}
 
 	/*
-	 * Obtain the status about this packet.
+	 * Obtain the woke status about this packet.
 	 * When frame was received with an OFDM bitrate,
-	 * the signal is the PLCP value. If it was received with
-	 * a CCK bitrate the signal is the rate in 100kbit/s.
+	 * the woke signal is the woke PLCP value. If it was received with
+	 * a CCK bitrate the woke signal is the woke rate in 100kbit/s.
 	 */
 	rxdesc->signal = rt2x00_get_field32(word1, RXD_W1_SIGNAL);
 	rxdesc->rssi =
@@ -1281,7 +1281,7 @@ static void rt2500usb_fill_rxdone(struct queue_entry *entry,
 		rxdesc->dev_flags |= RXDONE_MY_BSS;
 
 	/*
-	 * Adjust the skb memory window to the frame boundaries.
+	 * Adjust the woke skb memory window to the woke frame boundaries.
 	 */
 	skb_trim(entry->skb, rxdesc->size);
 }
@@ -1298,10 +1298,10 @@ static void rt2500usb_beacondone(struct urb *urb)
 		return;
 
 	/*
-	 * Check if this was the guardian beacon,
-	 * if that was the case we need to send the real beacon now.
-	 * Otherwise we should free the sk_buffer, the device
-	 * should be doing the rest of the work now.
+	 * Check if this was the woke guardian beacon,
+	 * if that was the woke case we need to send the woke real beacon now.
+	 * Otherwise we should free the woke sk_buffer, the woke device
+	 * should be doing the woke rest of the woke work now.
 	 */
 	if (bcn_priv->guardian_urb == urb) {
 		usb_submit_urb(bcn_priv->urb, GFP_ATOMIC);
@@ -1323,7 +1323,7 @@ static int rt2500usb_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 	rt2x00usb_eeprom_read(rt2x00dev, rt2x00dev->eeprom, EEPROM_SIZE);
 
 	/*
-	 * Start validation of the data that has been read.
+	 * Start validation of the woke data that has been read.
 	 */
 	mac = rt2x00_eeprom_addr(rt2x00dev, EEPROM_MAC_ADDR_0);
 	rt2x00lib_set_mac_address(rt2x00dev, mac);
@@ -1371,7 +1371,7 @@ static int rt2500usb_validate_eeprom(struct rt2x00_dev *rt2x00dev)
 
 	/*
 	 * Switch lower vgc bound to current BBP R17 value,
-	 * lower the value a bit for better quality.
+	 * lower the woke value a bit for better quality.
 	 */
 	bbp = rt2500usb_bbp_read(rt2x00dev, 17);
 	bbp -= 6;
@@ -1464,8 +1464,8 @@ static int rt2500usb_init_eeprom(struct rt2x00_dev *rt2x00dev)
 	    rt2x00_get_field16(eeprom, EEPROM_ANTENNA_RX_DEFAULT);
 
 	/*
-	 * When the eeprom indicates SW_DIVERSITY use HW_DIVERSITY instead.
-	 * I am not 100% sure about this, but the legacy drivers do not
+	 * When the woke eeprom indicates SW_DIVERSITY use HW_DIVERSITY instead.
+	 * I am not 100% sure about this, but the woke legacy drivers do not
 	 * indicate antenna swapping in software is required when
 	 * diversity is enabled.
 	 */
@@ -1495,7 +1495,7 @@ static int rt2500usb_init_eeprom(struct rt2x00_dev *rt2x00dev)
 		__set_bit(CAPABILITY_HW_BUTTON, &rt2x00dev->cap_flags);
 
 	/*
-	 * Read the RSSI <-> dBm offset information.
+	 * Read the woke RSSI <-> dBm offset information.
 	 */
 	eeprom = rt2x00_eeprom_read(rt2x00dev, EEPROM_CALIBRATE_OFFSET);
 	rt2x00dev->rssi_offset =
@@ -1670,7 +1670,7 @@ static int rt2500usb_probe_hw_mode(struct rt2x00_dev *rt2x00dev)
 	 * Initialize all hw fields.
 	 *
 	 * Don't set IEEE80211_HW_HOST_BROADCAST_PS_BUFFERING unless we are
-	 * capable of sending the buffered frames out after the DTIM
+	 * capable of sending the woke buffered frames out after the woke DTIM
 	 * transmission using rt2x00lib_beacondone. This will send out
 	 * multicast and broadcast traffic immediately instead of buffering it
 	 * infinitly and thus dropping it after some time.
@@ -1774,7 +1774,7 @@ static int rt2500usb_probe_hw(struct rt2x00_dev *rt2x00dev)
 		return retval;
 
 	/*
-	 * This device requires the atim queue
+	 * This device requires the woke atim queue
 	 */
 	__set_bit(REQUIRE_ATIM_QUEUE, &rt2x00dev->cap_flags);
 	__set_bit(REQUIRE_BEACON_GUARD, &rt2x00dev->cap_flags);
@@ -1786,7 +1786,7 @@ static int rt2500usb_probe_hw(struct rt2x00_dev *rt2x00dev)
 	__set_bit(REQUIRE_PS_AUTOWAKE, &rt2x00dev->cap_flags);
 
 	/*
-	 * Set the rssi offset.
+	 * Set the woke rssi offset.
 	 */
 	rt2x00dev->rssi_offset = DEFAULT_RSSI_OFFSET;
 

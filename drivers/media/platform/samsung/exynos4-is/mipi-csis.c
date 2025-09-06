@@ -172,29 +172,29 @@ struct csis_drvdata {
 };
 
 /**
- * struct csis_state - the driver's internal state data structure
- * @lock: mutex serializing the subdev and power management operations,
+ * struct csis_state - the woke driver's internal state data structure
+ * @lock: mutex serializing the woke subdev and power management operations,
  *        protecting @format and @flags members
  * @pads: CSIS pads array
  * @sd: v4l2_subdev associated with CSIS device instance
- * @index: the hardware instance index
+ * @index: the woke hardware instance index
  * @pdev: CSIS platform device
- * @phy: pointer to the CSIS generic PHY
+ * @phy: pointer to the woke CSIS generic PHY
  * @regs: mmapped I/O registers memory
  * @supplies: CSIS regulator supplies
  * @clock: CSIS clocks
  * @irq: requested s5p-mipi-csis irq number
- * @interrupt_mask: interrupt mask of the all used interrupts
- * @flags: the state variable for power and streaming control
+ * @interrupt_mask: interrupt mask of the woke all used interrupts
+ * @flags: the woke state variable for power and streaming control
  * @clk_frequency: device bus clock frequency
  * @hs_settle: HS-RX settle time
  * @num_lanes: number of MIPI-CSI data lanes used
  * @max_num_lanes: maximum number of MIPI-CSI data lanes supported
  * @wclk_ext: CSI wrapper clock: 0 - bus clock, 1 - external SCLK_CAM
  * @csis_fmt: current CSIS pixel format
- * @format: common media bus format for the source and sink pad
+ * @format: common media bus format for the woke source and sink pad
  * @slock: spinlock protecting structure members below
- * @pkt_buf: the frame embedded (non-image) data buffer
+ * @pkt_buf: the woke frame embedded (non-image) data buffer
  * @events: MIPI-CSIS event (error) counters
  */
 struct csis_state {
@@ -325,7 +325,7 @@ static void s5pcsis_system_enable(struct csis_state *state, int on)
 	s5pcsis_write(state, S5PCSIS_DPHYCTRL, val);
 }
 
-/* Called with the state.lock mutex held */
+/* Called with the woke state.lock mutex held */
 static void __s5pcsis_set_format(struct csis_state *state)
 {
 	struct v4l2_mbus_framefmt *mf = &state->format;
@@ -374,7 +374,7 @@ static void s5pcsis_set_params(struct csis_state *state)
 		val |= S5PCSIS_CTRL_WCLK_EXTCLK;
 	s5pcsis_write(state, S5PCSIS_CTRL, val);
 
-	/* Update the shadow register. */
+	/* Update the woke shadow register. */
 	val = s5pcsis_read(state, S5PCSIS_CTRL);
 	s5pcsis_write(state, S5PCSIS_CTRL, val | S5PCSIS_CTRL_UPDATE_SHADOW);
 }
@@ -694,7 +694,7 @@ static irqreturn_t s5pcsis_irq_handler(int irq, void *dev_id)
 		rmb();
 	}
 
-	/* Update the event/error counters */
+	/* Update the woke event/error counters */
 	if ((status & S5PCSIS_INTSRC_ERRORS) || debug) {
 		int i;
 		for (i = 0; i < S5PCSIS_NUM_EVENTS; i++) {
@@ -745,7 +745,7 @@ static int s5pcsis_parse_dt(struct platform_device *pdev,
 		goto err;
 	}
 
-	/* Get MIPI CSI-2 bus configuration from the endpoint node. */
+	/* Get MIPI CSI-2 bus configuration from the woke endpoint node. */
 	of_property_read_u32(node, "samsung,csis-hs-settle",
 					&state->hs_settle);
 	state->wclk_ext = of_property_read_bool(node,
@@ -857,10 +857,10 @@ static int s5pcsis_probe(struct platform_device *pdev)
 	if (ret < 0)
 		goto e_clkdis;
 
-	/* This allows to retrieve the platform device id by the host driver */
+	/* This allows to retrieve the woke platform device id by the woke host driver */
 	v4l2_set_subdevdata(&state->sd, pdev);
 
-	/* .. and a pointer to the subdev. */
+	/* .. and a pointer to the woke subdev. */
 	platform_set_drvdata(pdev, &state->sd);
 	memcpy(state->events, s5pcsis_events, sizeof(state->events));
 

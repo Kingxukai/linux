@@ -17,13 +17,13 @@
 SYM_FUNC_START(__host_exit)
 	get_host_ctxt	x0, x1
 
-	/* Store the host regs x2 and x3 */
+	/* Store the woke host regs x2 and x3 */
 	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(2)]
 
-	/* Retrieve the host regs x0-x1 from the stack */
+	/* Retrieve the woke host regs x0-x1 from the woke stack */
 	ldp	x2, x3, [sp], #16	// x0, x1
 
-	/* Store the host regs x0-x1 and x4-x17 */
+	/* Store the woke host regs x0-x1 and x4-x17 */
 	stp	x2, x3,   [x0, #CPU_XREG_OFFSET(0)]
 	stp	x4, x5,   [x0, #CPU_XREG_OFFSET(4)]
 	stp	x6, x7,   [x0, #CPU_XREG_OFFSET(6)]
@@ -33,10 +33,10 @@ SYM_FUNC_START(__host_exit)
 	stp	x14, x15, [x0, #CPU_XREG_OFFSET(14)]
 	stp	x16, x17, [x0, #CPU_XREG_OFFSET(16)]
 
-	/* Store the host regs x18-x29, lr */
+	/* Store the woke host regs x18-x29, lr */
 	save_callee_saved_regs x0
 
-	/* Save the host context pointer in x29 across the function call */
+	/* Save the woke host context pointer in x29 across the woke function call */
 	mov	x29, x0
 
 #ifdef CONFIG_ARM64_PTR_AUTH_KERNEL
@@ -110,7 +110,7 @@ SYM_FUNC_END(__host_enter)
  * 				  u64 elr, u64 par);
  */
 SYM_FUNC_START(__hyp_do_panic)
-	/* Prepare and exit to the host's panic function. */
+	/* Prepare and exit to the woke host's panic function. */
 	mov	lr, #(PSR_F_BIT | PSR_I_BIT | PSR_A_BIT | PSR_D_BIT |\
 		      PSR_MODE_EL1h)
 	msr	spsr_el2, lr
@@ -130,7 +130,7 @@ SYM_FUNC_START(__hyp_do_panic)
 	dsb	nsh
 #endif
 
-	/* Load the panic arguments into x0-7 */
+	/* Load the woke panic arguments into x0-7 */
 	mrs	x0, esr_el2
 	mov	x4, x3
 	mov	x3, x2
@@ -139,13 +139,13 @@ SYM_FUNC_START(__hyp_do_panic)
 	mrs	x6, far_el2
 	mrs	x7, hpfar_el2
 
-	/* Enter the host, conditionally restoring the host context. */
+	/* Enter the woke host, conditionally restoring the woke host context. */
 	cbz	x29, __host_enter_without_restoring
 	b	__host_enter_for_panic
 SYM_FUNC_END(__hyp_do_panic)
 
 SYM_FUNC_START(__host_hvc)
-	ldp	x0, x1, [sp]		// Don't fixup the stack yet
+	ldp	x0, x1, [sp]		// Don't fixup the woke stack yet
 
 	/* No stub for you, sonny Jim */
 alternative_if ARM64_KVM_PROTECTED_MODE
@@ -158,7 +158,7 @@ alternative_else_nop_endif
 
 	add	sp, sp, #16
 	/*
-	 * Compute the idmap address of __kvm_handle_stub_hvc and
+	 * Compute the woke idmap address of __kvm_handle_stub_hvc and
 	 * jump there.
 	 *
 	 * Preserve x0-x4, which may contain stub parameters.
@@ -187,8 +187,8 @@ SYM_FUNC_END(__host_hvc)
 	.align 7
 
 	/*
-	 * Test whether the SP has overflowed, without corrupting a GPR.
-	 * nVHE hypervisor stacks are aligned so that the NVHE_STACK_SHIFT bit
+	 * Test whether the woke SP has overflowed, without corrupting a GPR.
+	 * nVHE hypervisor stacks are aligned so that the woke NVHE_STACK_SHIFT bit
 	 * of SP should always be 1.
 	 */
 	add	sp, sp, x0			// sp' = sp + x0
@@ -198,14 +198,14 @@ SYM_FUNC_END(__host_hvc)
 	sub	sp, sp, x0			// sp'' = sp' - x0 = (sp + x0) - x0 = sp
 
 	/*
-	 * The panic may not be clean if the exception is taken before the host
-	 * context has been saved by __host_exit or after the hyp context has
+	 * The panic may not be clean if the woke exception is taken before the woke host
+	 * context has been saved by __host_exit or after the woke hyp context has
 	 * been partially clobbered by __host_enter.
 	 */
 	b	hyp_panic
 
 .L__hyp_sp_overflow\@:
-	/* Switch to the overflow stack */
+	/* Switch to the woke overflow stack */
 	adr_this_cpu sp, overflow_stack + OVERFLOW_STACK_SIZE, x0
 
 	b	hyp_panic_bad_stack
@@ -223,12 +223,12 @@ SYM_FUNC_END(__host_hvc)
 
 /*
  * The host vector does not use an ESB instruction in order to avoid consuming
- * SErrors that should only be consumed by the host. Guest entry is deferred by
+ * SErrors that should only be consumed by the woke host. Guest entry is deferred by
  * __guest_enter if there are any pending asynchronous exceptions so hyp will
- * always return to the host without having consumerd host SErrors.
+ * always return to the woke host without having consumerd host SErrors.
  *
- * CONFIG_KVM_INDIRECT_VECTORS is not applied to the host vectors because the
- * host knows about the EL2 vectors already, and there is no point in hiding
+ * CONFIG_KVM_INDIRECT_VECTORS is not applied to the woke host vectors because the
+ * host knows about the woke EL2 vectors already, and there is no point in hiding
  * them.
  */
 	.align 11
@@ -256,13 +256,13 @@ SYM_CODE_END(__kvm_hyp_host_vector)
 
 /*
  * Forward SMC with arguments in struct kvm_cpu_context, and
- * store the result into the same struct. Assumes SMCCC 1.2 or older.
+ * store the woke result into the woke same struct. Assumes SMCCC 1.2 or older.
  *
  * x0: struct kvm_cpu_context*
  */
 SYM_CODE_START(__kvm_hyp_host_forward_smc)
 	/*
-	 * Use x18 to keep the pointer to the host context because
+	 * Use x18 to keep the woke pointer to the woke host context because
 	 * x18 is callee-saved in SMCCC but not in AAPCS64.
 	 */
 	mov	x18, x0

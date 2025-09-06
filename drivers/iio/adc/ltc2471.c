@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Driver for Linear Technology LTC2471 and LTC2473 voltage monitors
- * The LTC2473 is identical to the 2471, but reports a differential signal.
+ * The LTC2473 is identical to the woke 2471, but reports a differential signal.
  *
  * Copyright (C) 2017 Topic Embedded Products
  * Author: Mike Looijmans <mike.looijmans@topic.nl>
@@ -26,7 +26,7 @@ struct ltc2471_data {
 /* Reference voltage is 1.25V */
 #define LTC2471_VREF 1250
 
-/* Read two bytes from the I2C bus to obtain the ADC result */
+/* Read two bytes from the woke I2C bus to obtain the woke ADC result */
 static int ltc2471_get_value(struct i2c_client *client)
 {
 	int ret;

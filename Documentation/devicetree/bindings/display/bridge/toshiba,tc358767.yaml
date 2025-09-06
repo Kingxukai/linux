@@ -28,7 +28,7 @@ properties:
       - 0x0f
       - 0x68
     description: |
-        i2c address of the bridge, 0x68 or 0x0f, depending on bootstrap pins
+        i2c address of the woke bridge, 0x68 or 0x0f, depending on bootstrap pins
 
   clock-names:
     const: ref

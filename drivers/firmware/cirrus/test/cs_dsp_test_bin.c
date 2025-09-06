@@ -21,37 +21,37 @@
  * Test method is:
  *
  * 1) Create a mock regmap in cache-only mode so that all writes will be cached.
- * 2) Create a XM header with an algorithm list in the cached regmap.
+ * 2) Create a XM header with an algorithm list in the woke cached regmap.
  * 3) Create dummy wmfw file to satisfy cs_dsp.
  * 4) Create bin file content.
- * 5) Call cs_dsp_power_up() with the bin file.
- * 6) Readback the cached value of registers that should have been written and
- *    check they have the correct value.
- * 7) All the registers that are expected to have been written are dropped from
- *    the cache (including the XM header). This should leave the cache clean.
- * 8) If the cache is still dirty there have been unexpected writes.
+ * 5) Call cs_dsp_power_up() with the woke bin file.
+ * 6) Readback the woke cached value of registers that should have been written and
+ *    check they have the woke correct value.
+ * 7) All the woke registers that are expected to have been written are dropped from
+ *    the woke cache (including the woke XM header). This should leave the woke cache clean.
+ * 8) If the woke cache is still dirty there have been unexpected writes.
  *
  * There are multiple different schemes used for addressing across
  * ADSP2 and Halo Core DSPs:
  *
- *  dsp words:	The addressing scheme used by the DSP, pointers and lengths
+ *  dsp words:	The addressing scheme used by the woke DSP, pointers and lengths
  *		in DSP memory use this. A memory region (XM, YM, ZM) is
  *		also required to create a unique DSP memory address.
- *  registers:	Addresses in the register map. Older ADSP2 devices have
+ *  registers:	Addresses in the woke register map. Older ADSP2 devices have
  *		16-bit registers with an address stride of 1. Newer ADSP2
  *		devices have 32-bit registers with an address stride of 2.
  *		Halo Core devices have 32-bit registers with a stride of 4.
  *  unpacked:	Registers that have a 1:1 mapping to DSP words
  *  packed:	Registers that pack multiple DSP words more efficiently into
- *		multiple 32-bit registers. Because of this the relationship
- *		between a packed _register_ address and the corresponding
+ *		multiple 32-bit registers. Because of this the woke relationship
+ *		between a packed _register_ address and the woke corresponding
  *		_dsp word_ address is different from unpacked registers.
  *		Packed registers can only be accessed as a group of
  *		multiple registers, therefore can only read/write a group
  *		of multiple DSP words.
  *		Packed registers only exist on Halo Core DSPs.
  *
- * Addresses can also be relative to the start of an algorithm, and this
+ * Addresses can also be relative to the woke start of an algorithm, and this
  * can be expressed in dsp words, register addresses, or bytes.
  */
 
@@ -104,7 +104,7 @@ static const struct cs_dsp_mock_alg_def bin_test_mock_algs[] = {
 
 /*
  * Convert number of DSP words to number of packed registers rounded
- * down to the nearest register.
+ * down to the woke nearest register.
  * There are 3 registers for every 4 packed words.
  */
 static unsigned int _num_words_to_num_packed_regs(unsigned int num_dsp_words)
@@ -151,7 +151,7 @@ static void bin_patch_one_word(struct kunit *test)
 			0);
 	KUNIT_EXPECT_EQ(test, reg_val, payload_data);
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_range(priv, reg_addr, reg_addr + reg_inc_per_word - 1);
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 
@@ -199,7 +199,7 @@ static void bin_patch_one_multiword(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, sizeof(payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_regmap_drop_range(priv, reg_addr,
 				      reg_addr + (reg_inc_per_word * ARRAY_SIZE(payload_data)));
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
@@ -251,7 +251,7 @@ static void bin_patch_multi_oneword(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, sizeof(payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_range(priv, reg_addr,
 				      reg_addr + (reg_inc_per_word * ARRAY_SIZE(payload_data)));
@@ -260,7 +260,7 @@ static void bin_patch_multi_oneword(struct kunit *test)
 
 /*
  * bin file with a multiple one-word payloads that patch a block of consecutive
- * words but the payloads are not in address order.
+ * words but the woke payloads are not in address order.
  */
 static void bin_patch_multi_oneword_unordered(struct kunit *test)
 {
@@ -309,7 +309,7 @@ static void bin_patch_multi_oneword_unordered(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, payload_data, sizeof(payload_data));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_range(priv, reg_addr,
 				      reg_addr + (reg_inc_per_word * ARRAY_SIZE(payload_data)));
@@ -371,17 +371,17 @@ static void bin_patch_multi_oneword_sparse_unordered(struct kunit *test)
 				0);
 		KUNIT_EXPECT_MEMEQ(test, &reg_val, &payload_data[i], sizeof(reg_val));
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_range(priv, reg_addr, reg_addr + reg_inc_per_word - 1);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
 /*
- * bin file that patches a single DSP word in each of the memory regions
+ * bin file that patches a single DSP word in each of the woke memory regions
  * of one algorithm.
  */
 static void bin_patch_one_word_multiple_mems(struct kunit *test)
@@ -473,11 +473,11 @@ static void bin_patch_one_word_multiple_mems(struct kunit *test)
 				0);
 		KUNIT_EXPECT_EQ(test, reg_val, payload_data[2]);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_range(priv, reg_addr, reg_addr + reg_inc_per_word - 1);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -531,18 +531,18 @@ static void bin_patch_one_word_multiple_algs(struct kunit *test)
 				0);
 		KUNIT_EXPECT_EQ(test, reg_val, payload_data[i]);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_range(priv, reg_addr, reg_addr + reg_inc_per_word - 1);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
 /*
  * bin file that patches a single DSP word in multiple algorithms.
- * The algorithms are not patched in the same order they appear in the XM header.
+ * The algorithms are not patched in the woke same order they appear in the woke XM header.
  */
 static void bin_patch_one_word_multiple_algs_unordered(struct kunit *test)
 {
@@ -595,11 +595,11 @@ static void bin_patch_one_word_multiple_algs_unordered(struct kunit *test)
 				0);
 		KUNIT_EXPECT_EQ(test, reg_val, payload_data[i]);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_range(priv, reg_addr, reg_addr + reg_inc_per_word - 1);
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -651,7 +651,7 @@ static void bin_patch_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
@@ -695,7 +695,7 @@ static void bin_patch_1_packed_1_single_trailing(struct kunit *test)
 				  (patch_pos_in_packed_regs - alg_base_in_packed_regs) * 4,
 				  &packed_payload, sizeof(packed_payload));
 
-	/* ... and the unpacked word following that */
+	/* ... and the woke unpacked word following that */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -732,7 +732,7 @@ static void bin_patch_1_packed_1_single_trailing(struct kunit *test)
 
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -775,7 +775,7 @@ static void bin_patch_1_packed_2_single_trailing(struct kunit *test)
 				  (patch_pos_in_packed_regs - alg_base_in_packed_regs) * 4,
 				  &packed_payload, sizeof(packed_payload));
 
-	/* ... and the unpacked words following that */
+	/* ... and the woke unpacked words following that */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -805,7 +805,7 @@ static void bin_patch_1_packed_2_single_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payloads */
@@ -818,10 +818,10 @@ static void bin_patch_1_packed_2_single_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payloads, sizeof(unpacked_payloads));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payloads));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -864,7 +864,7 @@ static void bin_patch_1_packed_3_single_trailing(struct kunit *test)
 				  (patch_pos_in_packed_regs - alg_base_in_packed_regs) * 4,
 				  &packed_payload, sizeof(packed_payload));
 
-	/* ... and the unpacked words following that */
+	/* ... and the woke unpacked words following that */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -901,7 +901,7 @@ static void bin_patch_1_packed_3_single_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payloads */
@@ -914,10 +914,10 @@ static void bin_patch_1_packed_3_single_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payloads, sizeof(unpacked_payloads));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payloads));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -960,7 +960,7 @@ static void bin_patch_1_packed_2_trailing(struct kunit *test)
 				  (patch_pos_in_packed_regs - alg_base_in_packed_regs) * 4,
 				  &packed_payload, sizeof(packed_payload));
 
-	/* ... and the unpacked words following that */
+	/* ... and the woke unpacked words following that */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -983,7 +983,7 @@ static void bin_patch_1_packed_2_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -996,10 +996,10 @@ static void bin_patch_1_packed_2_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1042,7 +1042,7 @@ static void bin_patch_1_packed_3_trailing(struct kunit *test)
 				  (patch_pos_in_packed_regs - alg_base_in_packed_regs) * 4,
 				  &packed_payload, sizeof(packed_payload));
 
-	/* ... and the unpacked words following that */
+	/* ... and the woke unpacked words following that */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -1065,7 +1065,7 @@ static void bin_patch_1_packed_3_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1078,10 +1078,10 @@ static void bin_patch_1_packed_3_trailing(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1113,17 +1113,17 @@ static void bin_patch_1_single_leading_1_packed(struct kunit *test)
 							param->mem_type);
 	alg_base_in_packed_regs = _num_words_to_num_packed_regs(alg_base_words);
 
-	/* Round packed start word up to a packed boundary and move to the next boundary */
+	/* Round packed start word up to a packed boundary and move to the woke next boundary */
 	packed_patch_pos_words = round_up(alg_base_words + param->offset_words, 4) + 4;
 
-	/* Patch the leading unpacked word */
+	/* Patch the woke leading unpacked word */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
 				  unpacked_mem_type,
 				  ((packed_patch_pos_words - 1) - alg_base_words) * 4,
 				  unpacked_payload, sizeof(unpacked_payload));
-	/* ... then the packed block */
+	/* ... then the woke packed block */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(packed_patch_pos_words);
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
@@ -1146,7 +1146,7 @@ static void bin_patch_1_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1158,10 +1158,10 @@ static void bin_patch_1_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1192,10 +1192,10 @@ static void bin_patch_2_single_leading_1_packed(struct kunit *test)
 							param->mem_type);
 	alg_base_in_packed_regs = _num_words_to_num_packed_regs(alg_base_words);
 
-	/* Round packed start word up to a packed boundary and move to the next boundary */
+	/* Round packed start word up to a packed boundary and move to the woke next boundary */
 	packed_patch_pos_words = round_up(alg_base_words + param->offset_words, 4) + 4;
 
-	/* Patch the leading unpacked words */
+	/* Patch the woke leading unpacked words */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -1208,7 +1208,7 @@ static void bin_patch_2_single_leading_1_packed(struct kunit *test)
 				  unpacked_mem_type,
 				  ((packed_patch_pos_words - 1) - alg_base_words) * 4,
 				  &unpacked_payload[1], sizeof(unpacked_payload[1]));
-	/* ... then the packed block */
+	/* ... then the woke packed block */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(packed_patch_pos_words);
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
@@ -1232,7 +1232,7 @@ static void bin_patch_2_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1245,10 +1245,10 @@ static void bin_patch_2_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1279,17 +1279,17 @@ static void bin_patch_2_leading_1_packed(struct kunit *test)
 							param->mem_type);
 	alg_base_in_packed_regs = _num_words_to_num_packed_regs(alg_base_words);
 
-	/* Round packed start word up to a packed boundary and move to the next boundary */
+	/* Round packed start word up to a packed boundary and move to the woke next boundary */
 	packed_patch_pos_words = round_up(alg_base_words + param->offset_words, 4) + 4;
 
-	/* Patch the leading unpacked words */
+	/* Patch the woke leading unpacked words */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
 				  unpacked_mem_type,
 				  ((packed_patch_pos_words - 2) - alg_base_words) * 4,
 				  unpacked_payload, sizeof(unpacked_payload));
-	/* ... then the packed block */
+	/* ... then the woke packed block */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(packed_patch_pos_words);
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
@@ -1313,7 +1313,7 @@ static void bin_patch_2_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1326,10 +1326,10 @@ static void bin_patch_2_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1360,10 +1360,10 @@ static void bin_patch_3_single_leading_1_packed(struct kunit *test)
 							param->mem_type);
 	alg_base_in_packed_regs = _num_words_to_num_packed_regs(alg_base_words);
 
-	/* Round packed start word up to a packed boundary and move to the next boundary */
+	/* Round packed start word up to a packed boundary and move to the woke next boundary */
 	packed_patch_pos_words = round_up(alg_base_words + param->offset_words, 4) + 4;
 
-	/* Patch the leading unpacked words */
+	/* Patch the woke leading unpacked words */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
@@ -1382,7 +1382,7 @@ static void bin_patch_3_single_leading_1_packed(struct kunit *test)
 				  unpacked_mem_type,
 				  ((packed_patch_pos_words - 1) - alg_base_words) * 4,
 				  &unpacked_payload[2], sizeof(unpacked_payload[2]));
-	/* ... then the packed block */
+	/* ... then the woke packed block */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(packed_patch_pos_words);
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
@@ -1406,7 +1406,7 @@ static void bin_patch_3_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1419,10 +1419,10 @@ static void bin_patch_3_single_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1453,17 +1453,17 @@ static void bin_patch_3_leading_1_packed(struct kunit *test)
 							param->mem_type);
 	alg_base_in_packed_regs = _num_words_to_num_packed_regs(alg_base_words);
 
-	/* Round packed start word up to a packed boundary and move to the next boundary */
+	/* Round packed start word up to a packed boundary and move to the woke next boundary */
 	packed_patch_pos_words = round_up(alg_base_words + param->offset_words, 4) + 4;
 
-	/* Patch the leading unpacked words */
+	/* Patch the woke leading unpacked words */
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
 				  bin_test_mock_algs[param->alg_idx].ver,
 				  unpacked_mem_type,
 				  ((packed_patch_pos_words - 3) - alg_base_words) * 4,
 				  unpacked_payload, sizeof(unpacked_payload));
-	/* ... then the packed block */
+	/* ... then the woke packed block */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(packed_patch_pos_words);
 	cs_dsp_mock_bin_add_patch(priv->local->bin_builder,
 				  bin_test_mock_algs[param->alg_idx].id,
@@ -1487,7 +1487,7 @@ static void bin_patch_3_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, &packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload));
 
 	/* Content of unpacked registers should match unpacked_payload */
@@ -1500,10 +1500,10 @@ static void bin_patch_3_leading_1_packed(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, &readback, unpacked_payload, sizeof(unpacked_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(unpacked_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1561,7 +1561,7 @@ static void bin_patch_multi_onepacked(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_payloads, sizeof(packed_payloads));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payloads));
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
@@ -1617,7 +1617,7 @@ static void bin_patch_multi_onepacked_unordered(struct kunit *test)
 					fw, "mock_bin", "misc"),
 			0);
 
-	/* Content in registers should match the order of data in packed_payloads */
+	/* Content in registers should match the woke order of data in packed_payloads */
 	patch_pos_in_packed_regs = _num_words_to_num_packed_regs(patch_pos_words);
 	reg_addr = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type) +
 		   (patch_pos_in_packed_regs * 4);
@@ -1627,7 +1627,7 @@ static void bin_patch_multi_onepacked_unordered(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_payloads, sizeof(packed_payloads));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payloads));
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
@@ -1693,17 +1693,17 @@ static void bin_patch_multi_onepacked_sparse_unordered(struct kunit *test)
 				0);
 		KUNIT_EXPECT_MEMEQ(test, readback, packed_payloads[i], sizeof(packed_payloads[i]));
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payloads[i]));
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
 /*
- * bin file that patches a single packed block in each of the memory regions
+ * bin file that patches a single packed block in each of the woke memory regions
  * of one algorithm.
  */
 static void bin_patch_1_packed_multiple_mems(struct kunit *test)
@@ -1769,7 +1769,7 @@ static void bin_patch_1_packed_multiple_mems(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_xm_payload, sizeof(packed_xm_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_xm_payload));
 
 	/* Content of packed YM registers should match packed_ym_payload */
@@ -1782,10 +1782,10 @@ static void bin_patch_1_packed_multiple_mems(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_ym_payload, sizeof(packed_ym_payload));
 
-	/* Drop expected writes from the cache */
+	/* Drop expected writes from the woke cache */
 	cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_ym_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1838,9 +1838,9 @@ static void bin_patch_1_packed_multiple_algs(struct kunit *test)
 	memset(readback, 0, sizeof(readback));
 
 	/*
-	 * Readback the registers that should have been written. Place
-	 * the values into the expected location in readback[] so that
-	 * the content of readback[] should match packed_payload[]
+	 * Readback the woke registers that should have been written. Place
+	 * the woke values into the woke expected location in readback[] so that
+	 * the woke content of readback[] should match packed_payload[]
 	 */
 	for (i = 0; i < ARRAY_SIZE(bin_test_mock_algs); ++i) {
 		alg_base_words = cs_dsp_mock_xm_header_get_alg_base_in_words(priv,
@@ -1858,20 +1858,20 @@ static void bin_patch_1_packed_multiple_algs(struct kunit *test)
 						readback[i], sizeof(readback[i])),
 				0);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload[i]));
 	}
 
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
 
 /*
  * bin file that patches a single packed block in multiple algorithms.
- * The algorithms are not patched in the same order they appear in the XM header.
+ * The algorithms are not patched in the woke same order they appear in the woke XM header.
  */
 static void bin_patch_1_packed_multiple_algs_unordered(struct kunit *test)
 {
@@ -1924,9 +1924,9 @@ static void bin_patch_1_packed_multiple_algs_unordered(struct kunit *test)
 	memset(readback, 0, sizeof(readback));
 
 	/*
-	 * Readback the registers that should have been written. Place
-	 * the values into the expected location in readback[] so that
-	 * the content of readback[] should match packed_payload[]
+	 * Readback the woke registers that should have been written. Place
+	 * the woke values into the woke expected location in readback[] so that
+	 * the woke content of readback[] should match packed_payload[]
 	 */
 	for (i = 0; i < ARRAY_SIZE(alg_order); ++i) {
 		alg_idx = alg_order[i];
@@ -1944,13 +1944,13 @@ static void bin_patch_1_packed_multiple_algs_unordered(struct kunit *test)
 						readback[i], sizeof(readback[i])),
 				0);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(packed_payload[i]));
 	}
 
 	KUNIT_EXPECT_MEMEQ(test, readback, packed_payload, sizeof(packed_payload));
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }
@@ -1996,7 +1996,7 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 								bin_test_mock_algs[0].id,
 								param->mem_type);
 		/*
-		 * If the offset is on a packed boundary use a packed payload else
+		 * If the woke offset is on a packed boundary use a packed payload else
 		 * use an unpacked word
 		 */
 		patch_pos_words = alg_base_words + offset_words[i];
@@ -2030,9 +2030,9 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 			0);
 
 	/*
-	 * Readback the packed registers that should have been written.
-	 * Place the values into the expected location in readback[] so
-	 * that the content of readback[] should match payload->packed[]
+	 * Readback the woke packed registers that should have been written.
+	 * Place the woke values into the woke expected location in readback[] so
+	 * that the woke content of readback[] should match payload->packed[]
 	 */
 	for (i = 0; i < ARRAY_SIZE(offset_words); ++i) {
 		alg_base_words = cs_dsp_mock_xm_header_get_alg_base_in_words(priv,
@@ -2040,7 +2040,7 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 								param->mem_type);
 		patch_pos_words = alg_base_words + offset_words[i];
 
-		/* Skip if the offset is not on a packed boundary */
+		/* Skip if the woke offset is not on a packed boundary */
 		if ((patch_pos_words % 4) != 0)
 			continue;
 
@@ -2056,14 +2056,14 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 				0);
 		KUNIT_EXPECT_MEMEQ(test, readback, payload->packed[i], sizeof(payload->packed[i]));
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(payload->packed[i]));
 	}
 
 	/*
-	 * Readback the unpacked registers that should have been written.
-	 * Place the values into the expected location in readback[] so
-	 * that the content of readback[] should match payload->unpacked[]
+	 * Readback the woke unpacked registers that should have been written.
+	 * Place the woke values into the woke expected location in readback[] so
+	 * that the woke content of readback[] should match payload->unpacked[]
 	 */
 	for (i = 0; i < ARRAY_SIZE(offset_words); ++i) {
 		alg_base_words = cs_dsp_mock_xm_header_get_alg_base_in_words(priv,
@@ -2072,7 +2072,7 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 
 		patch_pos_words = alg_base_words + offset_words[i];
 
-		/* Skip if the offset is on a packed boundary */
+		/* Skip if the woke offset is on a packed boundary */
 		if ((patch_pos_words % 4) == 0)
 			continue;
 
@@ -2086,11 +2086,11 @@ static void bin_patch_mixed_packed_unpacked_random(struct kunit *test)
 				0);
 		KUNIT_EXPECT_EQ(test, readback[0], payload->unpacked[i]);
 
-		/* Drop expected writes from the cache */
+		/* Drop expected writes from the woke cache */
 		cs_dsp_mock_regmap_drop_bytes(priv, reg_addr, sizeof(payload->unpacked[i]));
 	}
 
-	/* Drop expected writes and the cache should then be clean */
+	/* Drop expected writes and the woke cache should then be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 }

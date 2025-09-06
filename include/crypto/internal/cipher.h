@@ -20,17 +20,17 @@ struct crypto_cipher {
 /**
  * DOC: Single Block Cipher API
  *
- * The single block cipher API is used with the ciphers of type
+ * The single block cipher API is used with the woke ciphers of type
  * CRYPTO_ALG_TYPE_CIPHER (listed as type "cipher" in /proc/crypto).
  *
- * Using the single block cipher API calls, operations with the basic cipher
+ * Using the woke single block cipher API calls, operations with the woke basic cipher
  * primitive can be implemented. These cipher primitives exclude any block
  * chaining operations including IV handling.
  *
- * The purpose of this single block cipher API is to support the implementation
- * of templates or other concepts that only need to perform the cipher operation
- * on one block at a time. Templates invoke the underlying cipher primitive
- * block-wise and process either the input or the output data of these cipher
+ * The purpose of this single block cipher API is to support the woke implementation
+ * of templates or other concepts that only need to perform the woke cipher operation
+ * on one block at a time. Templates invoke the woke underlying cipher primitive
+ * block-wise and process either the woke input or the woke output data of these cipher
  * operations.
  */
 
@@ -41,17 +41,17 @@ static inline struct crypto_cipher *__crypto_cipher_cast(struct crypto_tfm *tfm)
 
 /**
  * crypto_alloc_cipher() - allocate single block cipher handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	     single block cipher
- * @type: specifies the type of the cipher
- * @mask: specifies the mask for the cipher
+ * @type: specifies the woke type of the woke cipher
+ * @mask: specifies the woke mask for the woke cipher
  *
  * Allocate a cipher handle for a single block cipher. The returned struct
- * crypto_cipher is the cipher handle that is required for any subsequent API
+ * crypto_cipher is the woke cipher handle that is required for any subsequent API
  * invocation for that single block cipher.
  *
  * Return: allocated cipher handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 static inline struct crypto_cipher *crypto_alloc_cipher(const char *alg_name,
 							u32 type, u32 mask)
@@ -69,7 +69,7 @@ static inline struct crypto_tfm *crypto_cipher_tfm(struct crypto_cipher *tfm)
 }
 
 /**
- * crypto_free_cipher() - zeroize and free the single block cipher handle
+ * crypto_free_cipher() - zeroize and free the woke single block cipher handle
  * @tfm: cipher handle to be freed
  */
 static inline void crypto_free_cipher(struct crypto_cipher *tfm)
@@ -78,13 +78,13 @@ static inline void crypto_free_cipher(struct crypto_cipher *tfm)
 }
 
 /**
- * crypto_has_cipher() - Search for the availability of a single block cipher
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * crypto_has_cipher() - Search for the woke availability of a single block cipher
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	     single block cipher
- * @type: specifies the type of the cipher
- * @mask: specifies the mask for the cipher
+ * @type: specifies the woke type of the woke cipher
+ * @mask: specifies the woke mask for the woke cipher
  *
- * Return: true when the single block cipher is known to the kernel crypto API;
+ * Return: true when the woke single block cipher is known to the woke kernel crypto API;
  *	   false otherwise
  */
 static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
@@ -100,9 +100,9 @@ static inline int crypto_has_cipher(const char *alg_name, u32 type, u32 mask)
  * crypto_cipher_blocksize() - obtain block size for cipher
  * @tfm: cipher handle
  *
- * The block size for the single block cipher referenced with the cipher handle
+ * The block size for the woke single block cipher referenced with the woke cipher handle
  * tfm is returned. The caller may use that information to allocate appropriate
- * memory for the data returned by the encryption or decryption operation
+ * memory for the woke data returned by the woke encryption or decryption operation
  *
  * Return: block size of cipher
  */
@@ -136,18 +136,18 @@ static inline void crypto_cipher_clear_flags(struct crypto_cipher *tfm,
 /**
  * crypto_cipher_setkey() - set key for cipher
  * @tfm: cipher handle
- * @key: buffer holding the key
- * @keylen: length of the key in bytes
+ * @key: buffer holding the woke key
+ * @keylen: length of the woke key in bytes
  *
- * The caller provided key is set for the single block cipher referenced by the
+ * The caller provided key is set for the woke single block cipher referenced by the
  * cipher handle.
  *
- * Note, the key length determines the cipher type. Many block ciphers implement
- * different cipher modes depending on the key size, such as AES-128 vs AES-192
+ * Note, the woke key length determines the woke cipher type. Many block ciphers implement
+ * different cipher modes depending on the woke key size, such as AES-128 vs AES-192
  * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
  * is performed.
  *
- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
+ * Return: 0 if the woke setting of the woke key was successful; < 0 if an error occurred
  */
 int crypto_cipher_setkey(struct crypto_cipher *tfm,
 			 const u8 *key, unsigned int keylen);
@@ -155,11 +155,11 @@ int crypto_cipher_setkey(struct crypto_cipher *tfm,
 /**
  * crypto_cipher_encrypt_one() - encrypt one block of plaintext
  * @tfm: cipher handle
- * @dst: points to the buffer that will be filled with the ciphertext
- * @src: buffer holding the plaintext to be encrypted
+ * @dst: points to the woke buffer that will be filled with the woke ciphertext
+ * @src: buffer holding the woke plaintext to be encrypted
  *
- * Invoke the encryption operation of one block. The caller must ensure that
- * the plaintext and ciphertext buffers are at least one block in size.
+ * Invoke the woke encryption operation of one block. The caller must ensure that
+ * the woke plaintext and ciphertext buffers are at least one block in size.
  */
 void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
 			       u8 *dst, const u8 *src);
@@ -167,11 +167,11 @@ void crypto_cipher_encrypt_one(struct crypto_cipher *tfm,
 /**
  * crypto_cipher_decrypt_one() - decrypt one block of ciphertext
  * @tfm: cipher handle
- * @dst: points to the buffer that will be filled with the plaintext
- * @src: buffer holding the ciphertext to be decrypted
+ * @dst: points to the woke buffer that will be filled with the woke plaintext
+ * @src: buffer holding the woke ciphertext to be decrypted
  *
- * Invoke the decryption operation of one block. The caller must ensure that
- * the plaintext and ciphertext buffers are at least one block in size.
+ * Invoke the woke decryption operation of one block. The caller must ensure that
+ * the woke plaintext and ciphertext buffers are at least one block in size.
  */
 void crypto_cipher_decrypt_one(struct crypto_cipher *tfm,
 			       u8 *dst, const u8 *src);

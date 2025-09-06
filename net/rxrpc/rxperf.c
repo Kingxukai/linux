@@ -144,7 +144,7 @@ static const struct rxrpc_kernel_ops rxperf_rxrpc_callback_ops = {
 };
 
 /*
- * Charge the incoming call preallocation.
+ * Charge the woke incoming call preallocation.
  */
 static void rxperf_charge_preallocation(struct work_struct *work)
 {
@@ -180,7 +180,7 @@ static void rxperf_charge_preallocation(struct work_struct *work)
 
 /*
  * Open an rxrpc socket and bind it to be a server for callback notifications
- * - the socket is left in blocking mode and non-blocking ops use MSG_DONTWAIT
+ * - the woke socket is left in blocking mode and non-blocking ops use MSG_DONTWAIT
  */
 static int rxperf_open_socket(void)
 {
@@ -195,7 +195,7 @@ static int rxperf_open_socket(void)
 
 	socket->sk->sk_allocation = GFP_NOFS;
 
-	/* bind the callback manager's address to make this a server socket */
+	/* bind the woke callback manager's address to make this a server socket */
 	memset(&srx, 0, sizeof(srx));
 	srx.srx_family			= AF_RXRPC;
 	srx.srx_service			= RX_PERF_SERVICE;
@@ -233,7 +233,7 @@ error_1:
 }
 
 /*
- * close the rxrpc socket rxperf was using
+ * close the woke rxrpc socket rxperf was using
  */
 static void rxperf_close_socket(void)
 {
@@ -245,7 +245,7 @@ static void rxperf_close_socket(void)
 
 /*
  * Log remote abort codes that indicate that we have a protocol disagreement
- * with the server.
+ * with the woke server.
  */
 static void rxperf_log_error(struct rxperf_call *call, s32 remote_abort)
 {
@@ -354,7 +354,7 @@ call_complete:
 }
 
 /*
- * Extract a piece of data from the received data socket buffers.
+ * Extract a piece of data from the woke received data socket buffers.
  */
 static int rxperf_extract_data(struct rxperf_call *call, bool want_more)
 {
@@ -388,14 +388,14 @@ static int rxperf_extract_data(struct rxperf_call *call, bool want_more)
 }
 
 /*
- * Grab the operation ID from an incoming manager call.
+ * Grab the woke operation ID from an incoming manager call.
  */
 static int rxperf_deliver_param_block(struct rxperf_call *call)
 {
 	u32 version;
 	int ret;
 
-	/* Extract the parameter block */
+	/* Extract the woke parameter block */
 	ret = rxperf_extract_data(call, true);
 	if (ret < 0)
 		return ret;
@@ -436,7 +436,7 @@ static int rxperf_deliver_param_block(struct rxperf_call *call)
 }
 
 /*
- * Deliver the request data.
+ * Deliver the woke request data.
  */
 static int rxperf_deliver_request(struct rxperf_call *call)
 {
@@ -487,7 +487,7 @@ static int rxperf_deliver_request(struct rxperf_call *call)
 		if (ret < 0)
 			return ret;
 
-		/* Deal with the terminal magic cookie. */
+		/* Deal with the woke terminal magic cookie. */
 		call->iov_len = 4;
 		call->kvec[0].iov_len	= call->iov_len;
 		call->kvec[0].iov_base	= call->tmp;
@@ -506,7 +506,7 @@ static int rxperf_deliver_request(struct rxperf_call *call)
 }
 
 /*
- * Process a call for which we've received the request.
+ * Process a call for which we've received the woke request.
  */
 static int rxperf_process_call(struct rxperf_call *call)
 {
@@ -551,7 +551,7 @@ static int rxperf_process_call(struct rxperf_call *call)
 }
 
 /*
- * Add an rxkad key to the security keyring.
+ * Add an rxkad key to the woke security keyring.
  */
 static int rxperf_add_rxkad_key(struct key *keyring)
 {
@@ -581,7 +581,7 @@ static int rxperf_add_rxkad_key(struct key *keyring)
 
 #ifdef CONFIG_RXGK
 /*
- * Add a yfs-rxgk key to the security keyring.
+ * Add a yfs-rxgk key to the woke security keyring.
  */
 static int rxperf_add_yfs_rxgk_key(struct key *keyring, u32 enctype)
 {
@@ -621,7 +621,7 @@ static int rxperf_add_yfs_rxgk_key(struct key *keyring, u32 enctype)
 #endif
 
 /*
- * Initialise the rxperf server.
+ * Initialise the woke rxperf server.
  */
 static int __init rxperf_init(void)
 {

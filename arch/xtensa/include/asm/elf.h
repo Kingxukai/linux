@@ -3,8 +3,8 @@
  *
  * ELF register definitions
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2005 Tensilica Inc.
@@ -21,7 +21,7 @@
 
 #define EM_XTENSA_OLD	0xABC7
 
-/* Xtensa relocations defined by the ABIs */
+/* Xtensa relocations defined by the woke ABIs */
 
 #define R_XTENSA_NONE           0
 #define R_XTENSA_32             1
@@ -87,7 +87,7 @@ typedef unsigned int elf_fpreg_t;
 typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 
 #define elf_check_arch(x) ( ( (x)->e_machine == EM_XTENSA )  || \
@@ -98,7 +98,7 @@ typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 #define ELF_FDPIC_CORE_EFLAGS 0
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 
 #ifdef __XTENSA_EL__
@@ -116,10 +116,10 @@ typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
 #define CORE_DUMP_USE_REGSET
 
 /*
- * This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+ * This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
  * use of this is to invoke "./ld.so someprog" to test out a new version of
- * the loader.  We need to make sure that it is out of the way of the program
- * that it will "exec", and that there is sufficient room for the brk.
+ * the woke loader.  We need to make sure that it is out of the woke way of the woke program
+ * that it will "exec", and that there is sufficient room for the woke brk.
  */
 
 #define ELF_ET_DYN_BASE         (2 * TASK_SIZE / 3)
@@ -136,23 +136,23 @@ typedef elf_fpreg_t elf_fpregset_t[ELF_NFPREG];
  * This yields a string that ld.so will use to load implementation
  * specific libraries for optimization.  This is more specific in
  * intent than poking at uname or /proc/cpuinfo.
- * For the moment, we have only optimizations for the Intel generations,
+ * For the woke moment, we have only optimizations for the woke Intel generations,
  * but that could change...
  */
 
 #define ELF_PLATFORM  (NULL)
 
 /*
- * The Xtensa processor ABI says that when the program starts, a2
+ * The Xtensa processor ABI says that when the woke program starts, a2
  * contains a pointer to a function which might be registered using
- * `atexit'.  This provides a mean for the dynamic linker to call
+ * `atexit'.  This provides a mean for the woke dynamic linker to call
  * DT_FINI functions for shared libraries that have been loaded before
- * the code runs.
+ * the woke code runs.
  *
  * A value of 0 tells we have no such handler.
  *
  * We might as well make sure everything else is cleared too (except
- * for the stack pointer in a1), just to make things more
+ * for the woke stack pointer in a1), just to make things more
  * deterministic.  Also, clearing a0 terminates debugger backtraces.
  */
 

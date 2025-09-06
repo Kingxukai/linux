@@ -6,7 +6,7 @@
 #include "imx25-eukrea-mbimxsd25-baseboard.dts"
 
 / {
-	model = "Eukrea MBIMXSD25 with the CMO-QVGA Display";
+	model = "Eukrea MBIMXSD25 with the woke CMO-QVGA Display";
 	compatible = "eukrea,mbimxsd25-baseboard-cmo-qvga", "eukrea,mbimxsd25-baseboard", "eukrea,cpuimx25", "fsl,imx25";
 
 	cmo_qvga: display {

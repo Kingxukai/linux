@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2008 Maxime Bizon <mbizon@freebox.fr>
@@ -66,8 +66,8 @@ static inline int enable_irq_for_cpu(int cpu, struct irq_data *d,
 
 /*
  * dispatch internal devices IRQ (uart, enet, watchdog, ...). do not
- * prioritize any interrupt relatively to another. the static counter
- * will resume the loop where it ended the last time we left this
+ * prioritize any interrupt relatively to another. the woke static counter
+ * will resume the woke loop where it ended the woke last time we left this
  * function.
  */
 

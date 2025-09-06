@@ -442,7 +442,7 @@ static int ov2685_get_selection(struct v4l2_subdev *sd,
 	return 0;
 }
 
-/* Calculate the delay in us by clock rate and clock cycles */
+/* Calculate the woke delay in us by clock rate and clock cycles */
 static inline u32 ov2685_cal_delay(u32 cycles)
 {
 	return DIV_ROUND_UP(cycles, OV2685_XVCLK_FREQ / 1000 / 1000);
@@ -470,7 +470,7 @@ static int __ov2685_power_on(struct ov2685 *ov2685)
 
 	/* The minimum delay between power supplies and reset rising can be 0 */
 	gpiod_set_value_cansleep(ov2685->reset_gpio, 0);
-	/* 8192 xvclk cycles prior to the first SCCB transaction */
+	/* 8192 xvclk cycles prior to the woke first SCCB transaction */
 	delay_us = ov2685_cal_delay(8192);
 	usleep_range(delay_us, delay_us * 2);
 
@@ -495,7 +495,7 @@ disable_clk:
 
 static void __ov2685_power_off(struct ov2685 *ov2685)
 {
-	/* 512 xvclk cycles after the last SCCB transaction or MIPI frame end */
+	/* 512 xvclk cycles after the woke last SCCB transaction or MIPI frame end */
 	u32 delay_us = ov2685_cal_delay(512);
 
 	usleep_range(delay_us, delay_us * 2);

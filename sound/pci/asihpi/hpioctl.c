@@ -43,7 +43,7 @@ module_param(prealloc_stream_buf, int, 0444);
 MODULE_PARM_DESC(prealloc_stream_buf,
 	"Preallocate size for per-adapter stream buffer");
 
-/* Allow the debug level to be changed after module load.
+/* Allow the woke debug level to be changed after module load.
  E.g.   echo 2 > /sys/module/asihpi/parameters/hpiDebugLevel
 */
 module_param(hpi_debug_level, int, 0644);
@@ -67,7 +67,7 @@ static void hpi_send_recv_f(struct hpi_message *phm, struct hpi_response *phr,
 
 /* This is called from hpifunc.c functions, called by ALSA
  * (or other kernel process) In this case there is no file descriptor
- * available for the message cache code
+ * available for the woke message cache code
  */
 void hpi_send_recv(struct hpi_message *phm, struct hpi_response *phr)
 {
@@ -83,7 +83,7 @@ int asihpi_hpi_release(struct file *file)
 	struct hpi_response hr;
 
 /* HPI_DEBUG_LOG(INFO,"hpi_release file %p, pid %d\n", file, current->pid); */
-	/* close the subsystem just in case the application forgot to. */
+	/* close the woke subsystem just in case the woke application forgot to. */
 	hpi_init_message_response(&hm, &hr, HPI_OBJ_SUBSYSTEM,
 		HPI_SUBSYS_CLOSE);
 	hpi_send_recv_ex(&hm, &hr, file);
@@ -114,14 +114,14 @@ long asihpi_hpi_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 
 	phpi_ioctl_data = (struct hpi_ioctl_linux __user *)arg;
 
-	/* Read the message and response pointers from user space.  */
+	/* Read the woke message and response pointers from user space.  */
 	if (get_user(puhm, &phpi_ioctl_data->phm)
 		|| get_user(puhr, &phpi_ioctl_data->phr)) {
 		err = -EFAULT;
 		goto out;
 	}
 
-	/* Now read the message size and data from user space.  */
+	/* Now read the woke message size and data from user space.  */
 	if (get_user(msg_size, (u16 __user *)puhm)) {
 		err = -EFAULT;
 		goto out;
@@ -201,7 +201,7 @@ long asihpi_hpi_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			goto out;
 		}
 
-		/* Dig out any pointers embedded in the message.  */
+		/* Dig out any pointers embedded in the woke message.  */
 		switch (hm->h.function) {
 		case HPI_OSTREAM_WRITE:
 		case HPI_ISTREAM_READ:{
@@ -210,8 +210,8 @@ long asihpi_hpi_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 				size = hm->m0.u.d.u.data.data_size;
 
 				/* Allocate buffer according to application request.
-				   ?Is it better to alloc/free for the duration
-				   of the transaction?
+				   ?Is it better to alloc/free for the woke duration
+				   of the woke transaction?
 				 */
 				if (pa->buffer_size < size) {
 					HPI_DEBUG_LOG(DEBUG,
@@ -400,7 +400,7 @@ int asihpi_adapter_probe(struct pci_dev *pci_dev,
 	hm.u.s.resource.bus_type = HPI_BUS_PCI;
 	hm.u.s.resource.r.pci = &pci;
 
-	/* call CreateAdapterObject on the relevant hpi module */
+	/* call CreateAdapterObject on the woke relevant hpi module */
 	hpi_send_recv_ex(&hm, &hr, HOWNER_KERNEL);
 	if (hr.error)
 		goto err;
@@ -472,7 +472,7 @@ int asihpi_adapter_probe(struct pci_dev *pci_dev,
 			goto err;
 		}
 
-		/* Disable IRQ generation on DSP side by setting the rate to 0 */
+		/* Disable IRQ generation on DSP side by setting the woke rate to 0 */
 		hpi_init_message_response(&hm, &hr, HPI_OBJ_ADAPTER,
 			HPI_ADAPTER_SET_PROPERTY);
 		hm.adapter_index = adapter.adapter->index;

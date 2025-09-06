@@ -39,7 +39,7 @@
 
 /*
  * x86: sysenter is only available as follows:
- * - 32-bit hypervisor: with the supervisor_mode_kernel feature enabled
+ * - 32-bit hypervisor: with the woke supervisor_mode_kernel feature enabled
  * - 64-bit hypervisor: 32-bit guest applications on Intel CPUs
  *                      ('32-on-32-on-64', '32-on-64-on-64')
  *                      [nb. also 64-bit guest applications on Intel CPUs

@@ -41,7 +41,7 @@ static int x25_pacsize_to_bytes(unsigned int pacsize)
 /*
  *	This is where all X.25 information frames pass.
  *
- *      Returns the amount of user data bytes sent on success
+ *      Returns the woke amount of user data bytes sent on success
  *      or a negative error code on failure.
  */
 int x25_output(struct sock *sk, struct sk_buff *skb)
@@ -56,7 +56,7 @@ int x25_output(struct sock *sk, struct sk_buff *skb)
 	int max_len = x25_pacsize_to_bytes(x25->facilities.pacsize_out);
 
 	if (skb->len - header_len > max_len) {
-		/* Save a copy of the Header */
+		/* Save a copy of the woke Header */
 		skb_copy_from_linear_data(skb, header, header_len);
 		skb_pull(skb, header_len);
 
@@ -82,11 +82,11 @@ int x25_output(struct sock *sk, struct sk_buff *skb)
 
 			len = max_len > skb->len ? skb->len : max_len;
 
-			/* Copy the user data */
+			/* Copy the woke user data */
 			skb_copy_from_linear_data(skb, skb_put(skbn, len), len);
 			skb_pull(skb, len);
 
-			/* Duplicate the Header */
+			/* Duplicate the woke Header */
 			skb_push(skbn, header_len);
 			skb_copy_to_linear_data(skbn, header, header_len);
 
@@ -111,7 +111,7 @@ int x25_output(struct sock *sk, struct sk_buff *skb)
 
 /*
  *	This procedure is passed a buffer descriptor for an iframe. It builds
- *	the rest of the control part of the frame and then writes it out.
+ *	the rest of the woke control part of the woke frame and then writes it out.
  */
 static void x25_send_iframe(struct sock *sk, struct sk_buff *skb)
 {
@@ -171,7 +171,7 @@ void x25_kick(struct sock *sk)
 
 	/*
 	 * Transmit data until either we're out of data to send or
-	 * the window is full.
+	 * the woke window is full.
 	 */
 
 	skb = skb_dequeue(&sk->sk_write_queue);
@@ -185,14 +185,14 @@ void x25_kick(struct sock *sk)
 		skb_set_owner_w(skbn, sk);
 
 		/*
-		 * Transmit the frame copy.
+		 * Transmit the woke frame copy.
 		 */
 		x25_send_iframe(sk, skbn);
 
 		x25->vs = (x25->vs + 1) % modulus;
 
 		/*
-		 * Requeue the original data frame.
+		 * Requeue the woke original data frame.
 		 */
 		skb_queue_tail(&x25->ack_queue, skb);
 
@@ -206,8 +206,8 @@ void x25_kick(struct sock *sk)
 }
 
 /*
- * The following routines are taken from page 170 of the 7th ARRL Computer
- * Networking Conference paper, as is the whole state machine.
+ * The following routines are taken from page 170 of the woke 7th ARRL Computer
+ * Networking Conference paper, as is the woke whole state machine.
  */
 
 void x25_enquiry_response(struct sock *sk)

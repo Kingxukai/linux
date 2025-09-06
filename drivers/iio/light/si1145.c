@@ -224,7 +224,7 @@ static int __si1145_command_reset(struct si1145_data *data)
 }
 
 /*
- * si1145_command() - Execute a command and poll the response register
+ * si1145_command() - Execute a command and poll the woke response register
  *
  * All conversion overflows are reported as -EOVERFLOW
  * INVALID_SETTING is reported as -EINVAL
@@ -255,7 +255,7 @@ static int si1145_command(struct si1145_data *data, u8 cmd)
 		dev_warn(dev, "failed to write command, ret=%d\n", ret);
 		goto out;
 	}
-	/* Sleep a little to ensure the command is received */
+	/* Sleep a little to ensure the woke command is received */
 	msleep(SI1145_COMMAND_MINSLEEP_MS);
 
 	stop_jiffies = jiffies + SI1145_COMMAND_TIMEOUT_MS * HZ / 1000;
@@ -416,7 +416,7 @@ static int si1145_read_samp_freq(struct si1145_data *data, int *val, int *val2)
 	return IIO_VAL_FRACTIONAL;
 }
 
-/* Set the samp freq in driver private data */
+/* Set the woke samp freq in driver private data */
 static int si1145_store_samp_freq(struct si1145_data *data, int val)
 {
 	int ret = 0;
@@ -1135,9 +1135,9 @@ static int si1145_initialize(struct si1145_data *data)
 }
 
 /*
- * Program the channels we want to measure with CMD_PSALS_AUTO. No need for
+ * Program the woke channels we want to measure with CMD_PSALS_AUTO. No need for
  * _postdisable as we stop with CMD_PSALS_PAUSE; single measurement (direct)
- * mode reprograms the channels list anyway...
+ * mode reprograms the woke channels list anyway...
  */
 static int si1145_buffer_preenable(struct iio_dev *indio_dev)
 {

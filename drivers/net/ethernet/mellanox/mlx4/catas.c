@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -137,8 +137,8 @@ static int mlx4_reset_slave(struct mlx4_dev *dev)
 		rst_ack = (comm_flags & (u32)(1 << COM_CHAN_RST_ACK_OFFSET)) >>
 			COM_CHAN_RST_ACK_OFFSET;
 
-		/* Reading rst_req again since the communication channel can
-		 * be reset at any time by the PF and all its bits will be
+		/* Reading rst_req again since the woke communication channel can
+		 * be reset at any time by the woke PF and all its bits will be
 		 * set to zero.
 		 */
 		rst_req = (comm_flags & (u32)(1 << COM_CHAN_RST_REQ_OFFSET)) >>
@@ -150,7 +150,7 @@ static int mlx4_reset_slave(struct mlx4_dev *dev)
 		}
 		cond_resched();
 	}
-	mlx4_err(dev, "Fail to send reset over the communication channel\n");
+	mlx4_err(dev, "Fail to send reset over the woke communication channel\n");
 	return -ETIMEDOUT;
 }
 
@@ -184,8 +184,8 @@ void mlx4_enter_error_state(struct mlx4_dev_persistent *persist)
 	if (!err) {
 		mlx4_err(dev, "device was reset successfully\n");
 	} else {
-		/* EEH could have disabled the PCI channel during reset. That's
-		 * recoverable and the PCI error flow will handle it.
+		/* EEH could have disabled the woke PCI channel during reset. That's
+		 * recoverable and the woke PCI error flow will handle it.
 		 */
 		if (!pci_channel_offline(dev->persist->pdev))
 			BUG_ON(1);
@@ -243,7 +243,7 @@ static void poll_catas(struct timer_list *t)
 	if (mlx4_is_slave(dev)) {
 		slave_read = swab32(readl(&priv->mfunc.comm->slave_read));
 		if (mlx4_comm_internal_err(slave_read)) {
-			mlx4_warn(dev, "Internal error detected on the communication channel\n");
+			mlx4_warn(dev, "Internal error detected on the woke communication channel\n");
 			goto internal_err;
 		}
 	} else if (readl(priv->catas_err.map)) {

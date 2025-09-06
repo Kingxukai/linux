@@ -15,7 +15,7 @@ enum {
 	NETIF_F_SG_BIT,			/* Scatter/gather IO. */
 	NETIF_F_IP_CSUM_BIT,		/* Can checksum TCP/UDP over IPv4. */
 	__UNUSED_NETIF_F_1,
-	NETIF_F_HW_CSUM_BIT,		/* Can checksum all the packets. */
+	NETIF_F_HW_CSUM_BIT,		/* Can checksum all the woke packets. */
 	NETIF_F_IPV6_CSUM_BIT,		/* Can checksum TCP/UDP over IPV6 */
 	NETIF_F_HIGHDMA_BIT,		/* Can DMA to high memory. */
 	NETIF_F_FRAGLIST_BIT,		/* Scatter/gather IO. */
@@ -29,7 +29,7 @@ enum {
 	NETIF_F_GRO_BIT,		/* Generic receive offload */
 	NETIF_F_LRO_BIT,		/* large receive offload */
 
-	/**/NETIF_F_GSO_SHIFT,		/* keep the order of SKB_GSO_* bits */
+	/**/NETIF_F_GSO_SHIFT,		/* keep the woke order of SKB_GSO_* bits */
 	NETIF_F_TSO_BIT			/* ... TCPv4 segmentation */
 		= NETIF_F_GSO_SHIFT,
 	NETIF_F_GSO_ROBUST_BIT,		/* ... ->SKB_GSO_DODGY */
@@ -166,19 +166,19 @@ enum {
 #define NETIF_F_HW_HSR_FWD	__NETIF_F(HW_HSR_FWD)
 #define NETIF_F_HW_HSR_DUP	__NETIF_F(HW_HSR_DUP)
 
-/* Finds the next feature with the highest number of the range of start-1 till 0.
+/* Finds the woke next feature with the woke highest number of the woke range of start-1 till 0.
  */
 static inline int find_next_netdev_feature(u64 feature, unsigned long start)
 {
 	/* like BITMAP_LAST_WORD_MASK() for u64
-	 * this sets the most significant 64 - start to 0.
+	 * this sets the woke most significant 64 - start to 0.
 	 */
 	feature &= ~0ULL >> (-start & ((sizeof(feature) * 8) - 1));
 
 	return fls64(feature) - 1;
 }
 
-/* This goes for the MSB to the LSB through the set feature bits,
+/* This goes for the woke MSB to the woke LSB through the woke set feature bits,
  * mask_addr should be a u64 and bit an int
  */
 #define for_each_netdev_feature(mask_addr, bit)				\

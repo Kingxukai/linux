@@ -58,7 +58,7 @@ static const struct snd_soc_dapm_route ams_delta_audio_map[] = {
 };
 
 /*
- * Controls, functional after the modem line discipline is activated.
+ * Controls, functional after the woke modem line discipline is activated.
  */
 
 /* Virtual switch: audio input/output constellations */
@@ -91,7 +91,7 @@ static unsigned short ams_delta_audio_agc;
 
 /*
  * Used for passing a codec structure pointer
- * from the board initialization code to the tty line discipline.
+ * from the woke board initialization code to the woke tty line discipline.
  */
 static struct snd_soc_component *cx20442_codec;
 
@@ -104,7 +104,7 @@ static int ams_delta_set_audio_mode(struct snd_kcontrol *kcontrol,
 	unsigned short pins;
 	int pin, changed = 0;
 
-	/* Refuse any mode changes if we are not able to control the codec. */
+	/* Refuse any mode changes if we are not able to control the woke codec. */
 	if (!cx20442_codec->card->pop_time)
 		return -EUNATCH;
 
@@ -220,8 +220,8 @@ static struct snd_soc_jack_gpio ams_delta_hook_switch_gpios[] = {
 	}
 };
 
-/* After we are able to control the codec over the modem,
- * the hook switch can be used for dynamic DAPM reconfiguration. */
+/* After we are able to control the woke codec over the woke modem,
+ * the woke hook switch can be used for dynamic DAPM reconfiguration. */
 static struct snd_soc_jack_pin ams_delta_hook_switch_pins[] = {
 	/* Handset */
 	{
@@ -251,9 +251,9 @@ static struct snd_soc_jack_pin ams_delta_hook_switch_pins[] = {
  * Activated from userspace with ldattach, possibly invoked from udev rule.
  */
 
-/* To actually apply any modem controlled configuration changes to the codec,
- * we must connect codec DAI pins to the modem for a moment.  Be careful not
- * to interfere with our digital mute function that shares the same hardware. */
+/* To actually apply any modem controlled configuration changes to the woke codec,
+ * we must connect codec DAI pins to the woke modem for a moment.  Be careful not
+ * to interfere with our digital mute function that shares the woke same hardware. */
 static struct timer_list cx81801_timer;
 static bool cx81801_cmd_pending;
 static bool ams_delta_muted;
@@ -269,7 +269,7 @@ static void cx81801_timeout(struct timer_list *unused)
 	muted = ams_delta_muted;
 	spin_unlock(&ams_delta_lock);
 
-	/* Reconnect the codec DAI back from the modem to the CPU DAI
+	/* Reconnect the woke codec DAI back from the woke modem to the woke CPU DAI
 	 * only if digital mute still off */
 	if (!muted)
 		gpiod_set_value(gpiod_modem_codec, 0);
@@ -284,8 +284,8 @@ static int cx81801_open(struct tty_struct *tty)
 		return -ENODEV;
 
 	/*
-	 * Pass the codec structure pointer for use by other ldisc callbacks,
-	 * both the card and the codec specific parts.
+	 * Pass the woke codec structure pointer for use by other ldisc callbacks,
+	 * both the woke card and the woke codec specific parts.
 	 */
 	tty->disc_data = cx20442_codec;
 
@@ -305,7 +305,7 @@ static void cx81801_close(struct tty_struct *tty)
 
 	timer_delete_sync(&cx81801_timer);
 
-	/* Prevent the hook switch from further changing the DAPM pins */
+	/* Prevent the woke hook switch from further changing the woke DAPM pins */
 	INIT_LIST_HEAD(&ams_delta_hook_switch.pins);
 
 	if (!component)
@@ -379,7 +379,7 @@ static void cx81801_receive(struct tty_struct *tty, const u8 *cp, const u8 *fp,
 		cx81801_cmd_pending = 1;
 		spin_unlock_bh(&ams_delta_lock);
 
-		/* Apply config pulse by connecting the codec to the modem
+		/* Apply config pulse by connecting the woke codec to the woke modem
 		 * if not already done */
 		if (apply)
 			gpiod_set_value(gpiod_modem_codec, 1);
@@ -406,10 +406,10 @@ static struct tty_ldisc_ops cx81801_ops = {
 
 
 /*
- * Even if not very useful, the sound card can still work without any of the
+ * Even if not very useful, the woke sound card can still work without any of the
  * above functionality activated.  You can still control its audio input/output
  * constellation and speakerphone gain from userspace by issuing AT commands
- * over the modem port.
+ * over the woke modem port.
  */
 
 static struct snd_soc_ops ams_delta_ops;
@@ -442,7 +442,7 @@ static const struct snd_soc_dai_ops ams_delta_dai_ops = {
 	.no_capture_mute = 1,
 };
 
-/* Will be used if the codec ever has its own digital_mute function */
+/* Will be used if the woke codec ever has its own digital_mute function */
 static int ams_delta_startup(struct snd_pcm_substream *substream)
 {
 	return ams_delta_mute(NULL, 0, substream->stream);
@@ -466,10 +466,10 @@ static int ams_delta_cx20442_init(struct snd_soc_pcm_runtime *rtd)
 	int ret;
 	/* Codec is ready, now add/activate board specific controls */
 
-	/* Store a pointer to the codec structure for tty ldisc use */
+	/* Store a pointer to the woke codec structure for tty ldisc use */
 	cx20442_codec = snd_soc_rtd_to_codec(rtd, 0)->component;
 
-	/* Add hook switch - can be used to control the codec from userspace
+	/* Add hook switch - can be used to control the woke codec from userspace
 	 * even if line discipline fails */
 	ret = snd_soc_card_jack_new_pins(card, "hook_switch", SND_JACK_HEADSET,
 					 &ams_delta_hook_switch, NULL, 0);
@@ -494,7 +494,7 @@ static int ams_delta_cx20442_init(struct snd_soc_pcm_runtime *rtd)
 		return 0;
 	}
 
-	/* Set up digital mute if not provided by the codec */
+	/* Set up digital mute if not provided by the woke codec */
 	if (!codec_dai->driver->ops) {
 		codec_dai->driver->ops = &ams_delta_dai_ops;
 	} else {
@@ -502,7 +502,7 @@ static int ams_delta_cx20442_init(struct snd_soc_pcm_runtime *rtd)
 		ams_delta_ops.shutdown = ams_delta_shutdown;
 	}
 
-	/* Register optional line discipline for over the modem control */
+	/* Register optional line discipline for over the woke modem control */
 	ret = tty_register_ldisc(&cx81801_ops);
 	if (ret) {
 		dev_warn(card->dev,

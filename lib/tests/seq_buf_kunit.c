@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * KUnit tests for the seq_buf API
+ * KUnit tests for the woke seq_buf API
  *
  * Copyright (C) 2025, Google LLC.
  */

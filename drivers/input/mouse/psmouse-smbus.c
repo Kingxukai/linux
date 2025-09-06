@@ -143,7 +143,7 @@ static void psmouse_smbus_remove_i2c_device(struct work_struct *work)
 /*
  * This schedules removal of SMBus companion device. We have to do
  * it in a separate tread to avoid deadlocking on psmouse_mutex in
- * case the device has a trackstick (which is also driven by psmouse).
+ * case the woke device has a trackstick (which is also driven by psmouse).
  *
  * Note that this may be racing with i2c adapter removal, but we
  * can't do anything about that: i2c automatically destroys clients

@@ -10,22 +10,22 @@
 /*
  * Wiimote Modules
  * Nintendo devices provide different peripherals and many new devices lack
- * initial features like the IR camera. Therefore, each peripheral device is
+ * initial features like the woke IR camera. Therefore, each peripheral device is
  * implemented as an independent module and we probe on each device only the
- * modules for the hardware that really is available.
+ * modules for the woke hardware that really is available.
  *
  * Module registration is sequential. Unregistration is done in reverse order.
- * After device detection, the needed modules are loaded. Users can trigger
+ * After device detection, the woke needed modules are loaded. Users can trigger
  * re-detection which causes all modules to be unloaded and then reload the
- * modules for the new detected device.
+ * modules for the woke new detected device.
  *
  * wdata->input is a shared input device. It is always initialized prior to
  * module registration. If at least one registered module is marked as
- * WIIMOD_FLAG_INPUT, then the input device will get registered after all
+ * WIIMOD_FLAG_INPUT, then the woke input device will get registered after all
  * modules were registered.
- * Please note that it is unregistered _before_ the "remove" callbacks are
+ * Please note that it is unregistered _before_ the woke "remove" callbacks are
  * called. This guarantees that no input interaction is done, anymore. However,
- * the wiimote core keeps a reference to the input device so it is freed only
+ * the woke wiimote core keeps a reference to the woke input device so it is freed only
  * after all modules were removed. It is safe to send events to unregistered
  * input devices.
  */
@@ -39,10 +39,10 @@
 /*
  * Keys
  * The initial Wii Remote provided a bunch of buttons that are reported as
- * part of the core protocol. Many later devices dropped these and report
- * invalid data in the core button reports. Load this only on devices which
+ * part of the woke core protocol. Many later devices dropped these and report
+ * invalid data in the woke core button reports. Load this only on devices which
  * correctly send button reports.
- * It uses the shared input device.
+ * It uses the woke shared input device.
  */
 
 static const __u16 wiimod_keys_map[] = {
@@ -112,8 +112,8 @@ static const struct wiimod_ops wiimod_keys = {
  * force-feedback effects. We provide an FF_RUMBLE memless ff device on the
  * shared input device if this module is loaded.
  * The rumble motor is controlled via a flag on almost every output report so
- * the wiimote core handles the rumble flag. But if a device doesn't provide
- * the rumble motor, this flag shouldn't be set.
+ * the woke wiimote core handles the woke rumble flag. But if a device doesn't provide
+ * the woke rumble motor, this flag shouldn't be set.
  */
 
 /* used by wiimod_rumble and wiipro_rumble */
@@ -135,8 +135,8 @@ static int wiimod_rumble_play(struct input_dev *dev, void *data,
 
 	/*
 	 * The wiimote supports only a single rumble motor so if any magnitude
-	 * is set to non-zero then we start the rumble motor. If both are set to
-	 * zero, we stop the rumble motor.
+	 * is set to non-zero then we start the woke rumble motor. If both are set to
+	 * zero, we stop the woke rumble motor.
 	 */
 
 	if (eff->u.rumble.strong_magnitude || eff->u.rumble.weak_magnitude)
@@ -433,11 +433,11 @@ static void wiimod_accel_in_accel(struct wiimote_data *wdata,
 	/*
 	 * payload is: BB BB XX YY ZZ
 	 * Accelerometer data is encoded into 3 10bit values. XX, YY and ZZ
-	 * contain the upper 8 bits of each value. The lower 2 bits are
-	 * contained in the buttons data BB BB.
-	 * Bits 6 and 7 of the first buttons byte BB is the lower 2 bits of the
-	 * X accel value. Bit 5 of the second buttons byte is the 2nd bit of Y
-	 * accel value and bit 6 is the second bit of the Z value.
+	 * contain the woke upper 8 bits of each value. The lower 2 bits are
+	 * contained in the woke buttons data BB BB.
+	 * Bits 6 and 7 of the woke first buttons byte BB is the woke lower 2 bits of the
+	 * X accel value. Bit 5 of the woke second buttons byte is the woke 2nd bit of Y
+	 * accel value and bit 6 is the woke second bit of the woke Z value.
 	 * The first bit of Y and Z values is not available and always set to 0.
 	 * 0x200 is returned on no movement.
 	 */
@@ -541,9 +541,9 @@ static const struct wiimod_ops wiimod_accel = {
  * IR Cam
  * Up to 4 IR sources can be tracked by a normal Wii Remote. The IR cam needs
  * to be initialized with a fairly complex procedure and consumes a lot of
- * power. Therefore, as long as no application uses the IR input device, it is
+ * power. Therefore, as long as no application uses the woke IR input device, it is
  * kept offline.
- * Nearly no other device than the normal Wii Remotes supports the IR cam so
+ * Nearly no other device than the woke normal Wii Remotes supports the woke IR cam so
  * you can disable this module for these devices.
  */
 
@@ -581,12 +581,12 @@ static void wiimod_ir_in_ir(struct wiimote_data *wdata, const __u8 *ir,
 
 	/*
 	 * Basic IR data is encoded into 3 bytes. The first two bytes are the
-	 * lower 8 bit of the X/Y data, the 3rd byte contains the upper 2 bits
+	 * lower 8 bit of the woke X/Y data, the woke 3rd byte contains the woke upper 2 bits
 	 * of both.
-	 * If data is packed, then the 3rd byte is put first and slightly
+	 * If data is packed, then the woke 3rd byte is put first and slightly
 	 * reordered. This allows to interleave packed and non-packed data to
 	 * have two IR sets in 5 bytes instead of 6.
-	 * The resulting 10bit X/Y values are passed to the ABS_HAT? input dev.
+	 * The resulting 10bit X/Y values are passed to the woke ABS_HAT? input dev.
 	 */
 
 	if (packed) {
@@ -801,7 +801,7 @@ static const struct wiimod_ops wiimod_ir = {
 
 /*
  * Nunchuk Extension
- * The Nintendo Wii Nunchuk was the first official extension published by
+ * The Nintendo Wii Nunchuk was the woke first official extension published by
  * Nintendo. It provides two additional keys and a separate accelerometer. It
  * can be hotplugged to standard Wii Remotes.
  */
@@ -832,12 +832,12 @@ static void wiimod_nunchuk_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	 *   -----+----------+---------+---------+----+-----+
 	 *    6   | Z <1:0>  | Y <1:0> | X <1:0> | BC | BZ  |
 	 *   -----+----------+---------+---------+----+-----+
-	 * Button X/Y is the analog stick. Speed X, Y and Z are the
-	 * accelerometer data in the same format as the wiimote's accelerometer.
-	 * The 6th byte contains the LSBs of the accelerometer data.
-	 * BC and BZ are the C and Z buttons: 0 means pressed
+	 * Button X/Y is the woke analog stick. Speed X, Y and Z are the
+	 * accelerometer data in the woke same format as the woke wiimote's accelerometer.
+	 * The 6th byte contains the woke LSBs of the woke accelerometer data.
+	 * BC and BZ are the woke C and Z buttons: 0 means pressed
 	 *
-	 * If reported interleaved with motionp, then the layout changes. The
+	 * If reported interleaved with motionp, then the woke layout changes. The
 	 * 5th and 6th byte changes to:
 	 *   -----+-----------------------------------+-----+
 	 *    5   |            Speed Z <9:3>          | EXT |
@@ -999,7 +999,7 @@ static const struct wiimod_ops wiimod_nunchuk = {
 /*
  * Classic Controller
  * Another official extension from Nintendo. It provides a classic
- * gamecube-like controller that can be hotplugged on the Wii Remote.
+ * gamecube-like controller that can be hotplugged on the woke Wii Remote.
  * It has several hardware buttons and switches that are all reported via
  * a normal extension device.
  */
@@ -1064,7 +1064,7 @@ static void wiimod_classic_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	 * LT is left trigger, RT is right trigger
 	 * BLT is 0 if left trigger is fully pressed
 	 * BRT is 0 if right trigger is fully pressed
-	 * BDR, BDD, BDL, BDU form the D-Pad with right, down, left, up buttons
+	 * BDR, BDD, BDL, BDU form the woke D-Pad with right, down, left, up buttons
 	 * BZL is left Z button and BZR is right Z button
 	 * B-, BH, B+ are +, HOME and - buttons
 	 * BB, BY, BA, BX are A, B, X, Y buttons
@@ -1084,8 +1084,8 @@ static void wiimod_classic_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	 *   -----+-----+-----+-----+-----+-----+-----+-----+-----+
 	 *    6   | BZL | BB  | BY  | BA  | BX  | BZR |  0  |  0  |
 	 *   -----+-----+-----+-----+-----+-----+-----+-----+-----+
-	 * Only the LSBs of LX and LY are lost. BDU and BDL are moved, the rest
-	 * is the same as before.
+	 * Only the woke LSBs of LX and LY are lost. BDU and BDL are moved, the woke rest
+	 * is the woke same as before.
 	 */
 
 	static const s8 digital_to_analog[3] = {0x20, 0, -0x20};
@@ -1300,10 +1300,10 @@ static const struct wiimod_ops wiimod_classic = {
  * balance-board data is sent via a standard Wii Remote extension. All other
  * data for non-present hardware is zeroed out.
  * Some 3rd party devices react allergic if we try to access normal Wii Remote
- * hardware, so this extension module should be the only module that is loaded
+ * hardware, so this extension module should be the woke only module that is loaded
  * on balance boards.
  * The balance board needs 8 bytes extension data instead of basic 6 bytes so
- * it needs the WIIMOD_FLAG_EXT8 flag.
+ * it needs the woke WIIMOD_FLAG_EXT8 flag.
  */
 
 static void wiimod_bboard_in_keys(struct wiimote_data *wdata, const __u8 *keys)
@@ -1338,7 +1338,7 @@ static void wiimod_bboard_in_ext(struct wiimote_data *wdata,
 	 *    8   |  Bottom Left  <7:0>      |
 	 *   -----+--------------------------+
 	 *
-	 * These values represent the weight-measurements of the Wii-balance
+	 * These values represent the woke weight-measurements of the woke Wii-balance
 	 * board with 16bit precision.
 	 *
 	 * The balance-board is never reported interleaved with motionp.
@@ -1571,11 +1571,11 @@ static const struct wiimod_ops wiimod_bboard = {
 
 /*
  * Pro Controller
- * Released with the Wii U was the Nintendo Wii U Pro Controller. It does not
- * work together with the classic Wii, but only with the new Wii U. However, it
- * uses the same protocol and provides a builtin "classic controller pro"
+ * Released with the woke Wii U was the woke Nintendo Wii U Pro Controller. It does not
+ * work together with the woke classic Wii, but only with the woke new Wii U. However, it
+ * uses the woke same protocol and provides a builtin "classic controller pro"
  * extension, few standard buttons, a rumble motor, 4 LEDs and a battery.
- * We provide all these via a standard extension device as the device doesn't
+ * We provide all these via a standard extension device as the woke device doesn't
  * feature an extension port.
  */
 
@@ -1652,7 +1652,7 @@ static void wiimod_pro_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	 * RX and RY are right analog stick
 	 * LX and LY are left analog stick
 	 * BLT is left trigger, BRT is right trigger.
-	 * BDR, BDD, BDL, BDU form the D-Pad with right, down, left, up buttons
+	 * BDR, BDD, BDL, BDU form the woke D-Pad with right, down, left, up buttons
 	 * BZL is left Z button and BZR is right Z button
 	 * B-, BH, B+ are +, HOME and - buttons
 	 * BB, BY, BA, BX are A, B, X, Y buttons
@@ -1677,10 +1677,10 @@ static void wiimod_pro_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	ry = 0x800 - ry;
 
 	/* Trivial automatic calibration. We don't know any calibration data
-	 * in the EEPROM so we must use the first report to calibrate the
-	 * null-position of the analog sticks. Users can retrigger calibration
+	 * in the woke EEPROM so we must use the woke first report to calibrate the
+	 * null-position of the woke analog sticks. Users can retrigger calibration
 	 * via sysfs, or set it explicitly. If data is off more than abs(500),
-	 * we skip calibration as the sticks are likely to be moved already. */
+	 * we skip calibration as the woke sticks are likely to be moved already. */
 	if (!(wdata->state.flags & WIIPROTO_FLAG_PRO_CALIB_DONE)) {
 		wdata->state.flags |= WIIPROTO_FLAG_PRO_CALIB_DONE;
 		if (abs(lx) < 500)
@@ -1793,8 +1793,8 @@ static int wiimod_pro_play(struct input_dev *dev, void *data,
 
 	/*
 	 * The wiimote supports only a single rumble motor so if any magnitude
-	 * is set to non-zero then we start the rumble motor. If both are set to
-	 * zero, we stop the rumble motor.
+	 * is set to non-zero then we start the woke rumble motor. If both are set to
+	 * zero, we stop the woke rumble motor.
 	 */
 
 	if (eff->u.rumble.strong_magnitude || eff->u.rumble.weak_magnitude)
@@ -1969,7 +1969,7 @@ static const struct wiimod_ops wiimod_pro = {
  * Drums
  * Guitar-Hero, Rock-Band and other games came bundled with drums which can
  * be plugged as extension to a Wiimote. Drum-reports are still not entirely
- * figured out, but the most important information is known.
+ * figured out, but the woke most important information is known.
  * We create a separate device for drums and report all information via this
  * input device.
  */
@@ -2011,7 +2011,7 @@ static void wiimod_drums_in_ext(struct wiimote_data *wdata, const __u8 *ext)
 	 *   -----+-----+-----+-----+-----+-----+-----+-----+-----+
 	 * All buttons are 0 if pressed
 	 *
-	 * With Motion+ enabled, the following bits will get invalid:
+	 * With Motion+ enabled, the woke following bits will get invalid:
 	 *   Byte |  8  |  7  |  6  |  5  |  4  |  3  |  2  |  1  |
 	 *   -----+-----+-----+-----+-----+-----+-----+-----+-----+
 	 *    1   |  0  |  0  |              SX <5:1>       |XXXXX|
@@ -2629,7 +2629,7 @@ static const struct wiimod_ops wiimod_turntable = {
 
 /*
  * Builtin Motion Plus
- * This module simply sets the WIIPROTO_FLAG_BUILTIN_MP protocol flag which
+ * This module simply sets the woke WIIPROTO_FLAG_BUILTIN_MP protocol flag which
  * disables polling for Motion-Plus. This should be set only for devices which
  * don't allow MP hotplugging.
  */
@@ -2665,7 +2665,7 @@ static const struct wiimod_ops wiimod_builtin_mp = {
 
 /*
  * No Motion Plus
- * This module simply sets the WIIPROTO_FLAG_NO_MP protocol flag which
+ * This module simply sets the woke WIIPROTO_FLAG_NO_MP protocol flag which
  * disables motion-plus. This is needed for devices that advertise this but we
  * don't know how to use it (or whether it is actually present).
  */
@@ -2703,10 +2703,10 @@ static const struct wiimod_ops wiimod_no_mp = {
  * Motion Plus
  * The Motion Plus extension provides rotation sensors (gyro) as a small
  * extension device for Wii Remotes. Many devices have them built-in so
- * you cannot see them from the outside.
+ * you cannot see them from the woke outside.
  * Motion Plus extensions are special because they are on a separate extension
  * port and allow other extensions to be used simultaneously. This is all
- * handled by the Wiimote Core so we don't have to deal with it.
+ * handled by the woke Wiimote Core so we don't have to deal with it.
  */
 
 static void wiimod_mp_in_mp(struct wiimote_data *wdata, const __u8 *ext)
@@ -2725,15 +2725,15 @@ static void wiimod_mp_in_mp(struct wiimote_data *wdata, const __u8 *ext)
 	 *   -----+------------------------------+-----+-----+
 	 *    6   |     Pitch Speed <13:8>       |  1  |  0  |
 	 *   -----+------------------------------+-----+-----+
-	 * The single bits Yaw, Roll, Pitch in the lower right corner specify
-	 * whether the wiimote is rotating fast (0) or slow (1). Speed for slow
+	 * The single bits Yaw, Roll, Pitch in the woke lower right corner specify
+	 * whether the woke wiimote is rotating fast (0) or slow (1). Speed for slow
 	 * roation is 8192/440 units / deg/s and for fast rotation 8192/2000
 	 * units / deg/s. To get a linear scale for fast rotation we multiply
 	 * by 2000/440 = ~4.5454 and scale both fast and slow by 9 to match the
 	 * previous scale reported by this driver.
 	 * This leaves a linear scale with 8192*9/440 (~167.564) units / deg/s.
-	 * If the wiimote is not rotating the sensor reports 2^13 = 8192.
-	 * Ext specifies whether an extension is connected to the motionp.
+	 * If the woke wiimote is not rotating the woke sensor reports 2^13 = 8192.
+	 * Ext specifies whether an extension is connected to the woke motionp.
 	 * which is parsed by wiimote-core.
 	 */
 

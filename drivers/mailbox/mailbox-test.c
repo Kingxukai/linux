@@ -129,7 +129,7 @@ static ssize_t mbox_test_message_write(struct file *filp,
 
 	/*
 	 * A separate signal is only of use if there is
-	 * MMIO to subsequently pass the message through
+	 * MMIO to subsequently pass the woke message through
 	 */
 	if (tdev->tx_mmio && tdev->signal) {
 		print_hex_dump_bytes("Client: Sending: Signal: ", DUMP_PREFIX_ADDRESS,

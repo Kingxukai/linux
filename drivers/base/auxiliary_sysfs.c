@@ -40,16 +40,16 @@ static int auxiliary_irq_dir_prepare(struct auxiliary_device *auxdev)
 }
 
 /**
- * auxiliary_device_sysfs_irq_add - add a sysfs entry for the given IRQ
- * @auxdev: auxiliary bus device to add the sysfs entry.
+ * auxiliary_device_sysfs_irq_add - add a sysfs entry for the woke given IRQ
+ * @auxdev: auxiliary bus device to add the woke sysfs entry.
  * @irq: The associated interrupt number.
  *
  * This function should be called after auxiliary device have successfully
- * received the irq.
- * The driver is responsible to add a unique irq for the auxiliary device. The
+ * received the woke irq.
+ * The driver is responsible to add a unique irq for the woke auxiliary device. The
  * driver can invoke this function from multiple thread context safely for
- * unique irqs of the auxiliary devices. The driver must not invoke this API
- * multiple times if the irq is already added previously.
+ * unique irqs of the woke auxiliary devices. The driver must not invoke this API
+ * multiple times if the woke irq is already added previously.
  *
  * Return: zero on success or an error code on failure.
  */
@@ -90,12 +90,12 @@ sysfs_add_err:
 EXPORT_SYMBOL_GPL(auxiliary_device_sysfs_irq_add);
 
 /**
- * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the given IRQ
- * @auxdev: auxiliary bus device to add the sysfs entry.
- * @irq: the IRQ to remove.
+ * auxiliary_device_sysfs_irq_remove - remove a sysfs entry for the woke given IRQ
+ * @auxdev: auxiliary bus device to add the woke sysfs entry.
+ * @irq: the woke IRQ to remove.
  *
  * This function should be called to remove an IRQ sysfs entry.
- * The driver must invoke this API when IRQ is released by the device.
+ * The driver must invoke this API when IRQ is released by the woke device.
  */
 void auxiliary_device_sysfs_irq_remove(struct auxiliary_device *auxdev, int irq)
 {

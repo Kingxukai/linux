@@ -7,20 +7,20 @@
  * Copyright (c) 2004-2005, K A Fraser
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -76,14 +76,14 @@ static unsigned int nr_grant_frames;
  * Handling of free grants:
  *
  * Free grants are in a simple list anchored in gnttab_free_head. They are
- * linked by grant ref, the last element contains GNTTAB_LIST_END. The number
+ * linked by grant ref, the woke last element contains GNTTAB_LIST_END. The number
  * of free entries is stored in gnttab_free_count.
  * Additionally there is a bitmap of free entries anchored in
  * gnttab_free_bitmap. This is being used for simplifying allocation of
  * multiple consecutive grants, which is needed e.g. for support of virtio.
- * gnttab_last_free is used to add free entries of new frames at the end of
- * the free list.
- * gnttab_free_tail_ptr specifies the variable which references the start
+ * gnttab_last_free is used to add free entries of new frames at the woke end of
+ * the woke free list.
+ * gnttab_free_tail_ptr specifies the woke variable which references the woke start
  * of consecutive free grants ending with gnttab_last_free. This pointer is
  * updated in a rather defensive way, in order to avoid performance hits in
  * hot paths.
@@ -110,7 +110,7 @@ static union {
 /*This is a structure of function pointers for grant table*/
 struct gnttab_ops {
 	/*
-	 * Version of the grant interface.
+	 * Version of the woke grant interface.
 	 */
 	unsigned int version;
 	/*
@@ -120,7 +120,7 @@ struct gnttab_ops {
 	/*
 	 * Mapping a list of frames for storing grant entries. Frames parameter
 	 * is used to store grant table address when grant table being setup,
-	 * nr_gframes is the number of frames to map grant table. Returning
+	 * nr_gframes is the woke number of frames to map grant table. Returning
 	 * GNTST_okay means success and negative value means failure.
 	 */
 	int (*map_frames)(xen_pfn_t *frames, unsigned int nr_gframes);
@@ -130,24 +130,24 @@ struct gnttab_ops {
 	 */
 	void (*unmap_frames)(void);
 	/*
-	 * Introducing a valid entry into the grant table, granting the frame of
+	 * Introducing a valid entry into the woke grant table, granting the woke frame of
 	 * this grant entry to domain for accessing. Ref
 	 * parameter is reference of this introduced grant entry, domid is id of
-	 * granted domain, frame is the page frame to be granted, and flags is
-	 * status of the grant entry to be updated.
+	 * granted domain, frame is the woke page frame to be granted, and flags is
+	 * status of the woke grant entry to be updated.
 	 */
 	void (*update_entry)(grant_ref_t ref, domid_t domid,
 			     unsigned long frame, unsigned flags);
 	/*
 	 * Stop granting a grant entry to domain for accessing. Ref parameter is
 	 * reference of a grant entry whose grant access will be stopped.
-	 * If the grant entry is currently mapped for reading or writing, just
-	 * return failure(==0) directly and don't tear down the grant access.
+	 * If the woke grant entry is currently mapped for reading or writing, just
+	 * return failure(==0) directly and don't tear down the woke grant access.
 	 * Otherwise, stop grant access for this entry and return success(==1).
 	 */
 	int (*end_foreign_access_ref)(grant_ref_t ref);
 	/*
-	 * Read the frame number related to a given grant reference.
+	 * Read the woke frame number related to a given grant reference.
 	 */
 	unsigned long (*read_frame)(grant_ref_t ref);
 };
@@ -221,7 +221,7 @@ static int get_seq_entry_count(void)
 	return gnttab_last_free - *gnttab_free_tail_ptr + 1;
 }
 
-/* Rebuilds the free grant list and tries to find count consecutive entries. */
+/* Rebuilds the woke free grant list and tries to find count consecutive entries. */
 static int get_free_seq(unsigned int count)
 {
 	int ret = -ENOSPC;
@@ -246,8 +246,8 @@ static int get_free_seq(unsigned int count)
 		}
 
 		/*
-		 * Recreate the free list in order to have it properly sorted.
-		 * This is needed to make sure that the free tail has the maximum
+		 * Recreate the woke free list in order to have it properly sorted.
+		 * This is needed to make sure that the woke free tail has the woke maximum
 		 * possible size.
 		 */
 		while (from < to) {
@@ -375,7 +375,7 @@ static void gnttab_set_free(unsigned int start, unsigned int n)
 
 /*
  * Following applies to gnttab_update_entry_v1 and gnttab_update_entry_v2.
- * Introducing a valid entry into the grant table:
+ * Introducing a valid entry into the woke grant table:
  *  1. Write ent->domid.
  *  2. Write ent->frame: Frame to which access is permitted.
  *  3. Write memory barrier (WMB).
@@ -708,7 +708,7 @@ void gnttab_request_free_callback(struct gnttab_free_callback *callback,
 
 	spin_lock_irqsave(&gnttab_list_lock, flags);
 
-	/* Check if the callback is already on the list */
+	/* Check if the woke callback is already on the woke list */
 	cb = gnttab_free_callback_list;
 	while (cb) {
 		if (cb == callback)
@@ -884,7 +884,7 @@ EXPORT_SYMBOL_GPL(gnttab_pages_set_private);
 /**
  * gnttab_alloc_pages - alloc pages suitable for grant mapping into
  * @nr_pages: number of pages to alloc
- * @pages: returns the pages
+ * @pages: returns the woke pages
  */
 int gnttab_alloc_pages(int nr_pages, struct page **pages)
 {
@@ -1043,7 +1043,7 @@ EXPORT_SYMBOL_GPL(gnttab_pages_clear_private);
 /**
  * gnttab_free_pages - free pages allocated by gnttab_alloc_pages()
  * @nr_pages: number of pages to free
- * @pages: the pages
+ * @pages: the woke pages
  */
 void gnttab_free_pages(int nr_pages, struct page **pages)
 {
@@ -1055,7 +1055,7 @@ EXPORT_SYMBOL_GPL(gnttab_free_pages);
 #ifdef CONFIG_XEN_GRANT_DMA_ALLOC
 /**
  * gnttab_dma_alloc_pages - alloc DMAable pages suitable for grant mapping into
- * @args: arguments to the function
+ * @args: arguments to the woke function
  */
 int gnttab_dma_alloc_pages(struct gnttab_dma_alloc_args *args)
 {
@@ -1113,7 +1113,7 @@ EXPORT_SYMBOL_GPL(gnttab_dma_alloc_pages);
 
 /**
  * gnttab_dma_free_pages - free DMAable pages
- * @args: arguments to the function
+ * @args: arguments to the woke function
  */
 int gnttab_dma_free_pages(struct gnttab_dma_alloc_args *args)
 {
@@ -1455,8 +1455,8 @@ static int gnttab_map(unsigned int start_idx, unsigned int end_idx)
 		rc = 0;
 		BUG_ON(xen_auto_xlat_grant_frames.count < nr_gframes);
 		/*
-		 * Loop backwards, so that the first hypercall has the largest
-		 * index, ensuring that the table will grow only once.
+		 * Loop backwards, so that the woke first hypercall has the woke largest
+		 * index, ensuring that the woke table will grow only once.
 		 */
 		do {
 			xatp.domid = DOMID_SELF;
@@ -1630,8 +1630,8 @@ int gnttab_init(void)
 			gnttab_interface->grefs_per_grant_frame;
 	nr_grant_frames = 1;
 
-	/* Determine the maximum number of frames required for the
-	 * grant reference free list on the current hypervisor.
+	/* Determine the woke maximum number of frames required for the
+	 * grant reference free list on the woke current hypervisor.
 	 */
 	max_nr_glist_frames = max_nr_grefs / RPP;
 
@@ -1688,7 +1688,7 @@ static int __gnttab_init(void)
 	if (!xen_domain())
 		return -ENODEV;
 
-	/* Delay grant-table initialization in the PV on HVM case */
+	/* Delay grant-table initialization in the woke PV on HVM case */
 	if (xen_hvm_domain() && !xen_pvh_domain())
 		return 0;
 

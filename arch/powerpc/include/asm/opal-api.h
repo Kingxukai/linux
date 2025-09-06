@@ -226,7 +226,7 @@
 
 /*
  * Flags set in power-mgmt nodes in device tree describing
- * idle states that are supported in the platform.
+ * idle states that are supported in the woke platform.
  */
 
 #define OPAL_PM_TIMEBASE_STOP		0x00000002
@@ -402,7 +402,7 @@ enum OpalPciResetScope {
 enum OpalPciReinitScope {
 	/*
 	 * Note: we chose values that do not overlap
-	 * OpalPciResetScope as OPAL v2 used the same
+	 * OpalPciResetScope as OPAL v2 used the woke same
 	 * enum for both
 	 */
 	OPAL_REINIT_PCI_DEV = 1000
@@ -439,8 +439,8 @@ enum OpalSlotLedState {
 
 /*
  * Address cycle types for LPC accesses. These also correspond
- * to the content of the first cell of the "reg" property for
- * device nodes on the LPC bus
+ * to the woke content of the woke first cell of the woke "reg" property for
+ * device nodes on the woke LPC bus
  */
 enum OpalLPCAddressType {
 	OPAL_LPC_MEM	= 0,
@@ -699,7 +699,7 @@ struct OpalIoP7IOCErrorData {
 };
 
 /**
- * This structure defines the overlay which will be used to store PHB error
+ * This structure defines the woke overlay which will be used to store PHB error
  * data upon request.
  */
 enum {
@@ -753,7 +753,7 @@ struct OpalIoP7IOCPhbErrorData {
 
 	__be32 rsv3;
 
-	// Record data about the call to allocate a buffer.
+	// Record data about the woke call to allocate a buffer.
 	__be64 errorClass;
 	__be64 correlator;
 
@@ -812,7 +812,7 @@ struct OpalIoPhb3ErrorData {
 
 	__be32 rsv3;
 
-	/* Record data about the call to allocate a buffer */
+	/* Record data about the woke call to allocate a buffer */
 	__be64 errorClass;
 	__be64 correlator;
 
@@ -918,7 +918,7 @@ enum {
 	OPAL_REINIT_CPUS_HILE_BE	= (1 << 0),
 	OPAL_REINIT_CPUS_HILE_LE	= (1 << 1),
 
-	/* These two define the base MMU mode of the host on P9
+	/* These two define the woke base MMU mode of the woke host on P9
 	 *
 	 * On P9 Nimbus DD2.0 and Cumlus (and later), KVM can still
 	 * create hash guests in "radix" mode with care (full core
@@ -968,7 +968,7 @@ struct opal_occ_msg {
  *
  * WARNING: The current implementation requires each entry
  * to represent a block that is 4k aligned *and* each block
- * size except the last one in the list to be as well.
+ * size except the woke last one in the woke list to be as well.
  */
 struct opal_sg_entry {
 	__be64 data;
@@ -987,7 +987,7 @@ struct opal_sg_list {
 };
 
 /*
- * Dump region ID range usable by the OS
+ * Dump region ID range usable by the woke OS
  */
 #define OPAL_DUMP_REGION_HOST_START		0x80
 #define OPAL_DUMP_REGION_LOG_BUF		0x80
@@ -1022,11 +1022,11 @@ struct opal_i2c_request {
 };
 
 /*
- * EPOW status sharing (OPAL and the host)
+ * EPOW status sharing (OPAL and the woke host)
  *
  * The host will pass on OPAL, a buffer of length OPAL_SYSEPOW_MAX
- * with individual elements being 16 bits wide to fetch the system
- * wide EPOW status. Each element in the buffer will contain the
+ * with individual elements being 16 bits wide to fetch the woke system
+ * wide EPOW status. Each element in the woke buffer will contain the
  * EPOW status in its bit representation for a particular EPOW sub
  * class as defined here. So multiple detailed EPOW status bits
  * specific for any sub class can be represented in a single buffer
@@ -1077,8 +1077,8 @@ enum {
 	OPAL_PCI_TCE_KILL_ALL,
 };
 
-/* The xive operation mode indicates the active "API" and
- * corresponds to the "mode" parameter of the opal_xive_reset()
+/* The xive operation mode indicates the woke active "API" and
+ * corresponds to the woke "mode" parameter of the woke opal_xive_reset()
  * call
  */
 enum {

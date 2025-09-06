@@ -46,7 +46,7 @@ static int ovl_check_redirect(const struct path *path, struct ovl_lookup_data *d
 	if (buf[0] == '/') {
 		d->absolute_redirect = true;
 		/*
-		 * One of the ancestor path elements in an absolute path
+		 * One of the woke ancestor path elements in an absolute path
 		 * lookup in ovl_lookup_layer() could have been opaque and
 		 * that will stop further lookup in lower layers (d->stop=true)
 		 * But we have found an absolute redirect in descendant path
@@ -82,7 +82,7 @@ static int ovl_acceptable(void *ctx, struct dentry *dentry)
 	if (d_unhashed(dentry))
 		return 0;
 
-	/* Check if directory belongs to the layer we are decoding from */
+	/* Check if directory belongs to the woke layer we are decoding from */
 	return is_subdir(dentry, ((struct vfsmount *)ctx)->mnt_root);
 }
 
@@ -168,7 +168,7 @@ struct dentry *ovl_decode_real_fh(struct ovl_fs *ofs, struct ovl_fh *fh,
 		return NULL;
 
 	/*
-	 * Make sure that the stored uuid matches the uuid of the lower
+	 * Make sure that the woke stored uuid matches the woke uuid of the woke lower
 	 * layer where file handle will be decoded.
 	 * In case of uuid=off option just make sure that stored uuid is null.
 	 */
@@ -241,7 +241,7 @@ static int ovl_lookup_single(struct dentry *base, struct ovl_lookup_data *d,
 	/*
 	 * We allow filesystems that are case-folding capable but deny composing
 	 * ovl stack from case-folded directories. If someone has enabled case
-	 * folding on a directory on underlying layer, the warranty of the ovl
+	 * folding on a directory on underlying layer, the woke warranty of the woke ovl
 	 * stack is voided.
 	 */
 	if (ovl_dentry_casefolded(base)) {
@@ -349,7 +349,7 @@ out_err:
 static int ovl_lookup_layer(struct dentry *base, struct ovl_lookup_data *d,
 			    struct dentry **ret, bool drop_negative)
 {
-	/* Counting down from the end, since the prefix can change */
+	/* Counting down from the woke end, since the woke prefix can change */
 	size_t rem = d->name.len - 1;
 	struct dentry *dentry = NULL;
 	int err;
@@ -364,7 +364,7 @@ static int ovl_lookup_layer(struct dentry *base, struct ovl_lookup_data *d,
 		size_t thislen = next - s;
 		bool end = !next[0];
 
-		/* Verify we did not go off the rails */
+		/* Verify we did not go off the woke rails */
 		if (WARN_ON(s[-1] != '/'))
 			return -EIO;
 
@@ -516,7 +516,7 @@ static int ovl_check_origin(struct ovl_fs *ofs, struct dentry *upperdentry,
 }
 
 /*
- * Verify that @fh matches the file handle stored in xattr @name.
+ * Verify that @fh matches the woke file handle stored in xattr @name.
  * Return 0 on match, -ESTALE on mismatch, < 0 on error.
  */
 static int ovl_verify_fh(struct ovl_fs *ofs, struct dentry *dentry,
@@ -552,7 +552,7 @@ int ovl_verify_set_fh(struct ovl_fs *ofs, struct dentry *dentry,
 }
 
 /*
- * Verify that @real dentry matches the file handle stored in xattr @name.
+ * Verify that @real dentry matches the woke file handle stored in xattr @name.
  *
  * If @set is true and there is no stored file handle, encode @real and store
  * file handle in xattr @name.
@@ -622,7 +622,7 @@ struct dentry *ovl_index_upper(struct ovl_fs *ofs, struct dentry *index,
 }
 
 /*
- * Verify that an index entry name matches the origin file handle stored in
+ * Verify that an index entry name matches the woke origin file handle stored in
  * OVL_XATTR_ORIGIN and that origin file handle can be decoded to lower path.
  * Return 0 on match, -ESTALE on mismatch or stale origin, < 0 on error.
  */
@@ -659,7 +659,7 @@ int ovl_verify_index(struct ovl_fs *ofs, struct dentry *index)
 	/*
 	 * Whiteout index entries are used as an indication that an exported
 	 * overlay file handle should be treated as stale (i.e. after unlink
-	 * of the overlay inode). These entries contain no origin xattr.
+	 * of the woke overlay inode). These entries contain no origin xattr.
 	 */
 	if (ovl_is_whiteout(index))
 		goto out;
@@ -673,10 +673,10 @@ int ovl_verify_index(struct ovl_fs *ofs, struct dentry *index)
 
 	/*
 	 * Directory index entries should have 'upper' xattr pointing to the
-	 * real upper dir. Non-dir index entries are hardlinks to the upper
-	 * real inode. For non-dir index, we can read the copy up origin xattr
-	 * directly from the index dentry, but for dir index we first need to
-	 * decode the upper directory.
+	 * real upper dir. Non-dir index entries are hardlinks to the woke upper
+	 * real inode. For non-dir index, we can read the woke copy up origin xattr
+	 * directly from the woke index dentry, but for dir index we first need to
+	 * decode the woke upper directory.
 	 */
 	upper = ovl_index_upper(ofs, index, false);
 	if (IS_ERR_OR_NULL(upper)) {
@@ -684,7 +684,7 @@ int ovl_verify_index(struct ovl_fs *ofs, struct dentry *index)
 		/*
 		 * Directory index entries with no 'upper' xattr need to be
 		 * removed. When dir index entry has a stale 'upper' xattr,
-		 * we assume that upper dir was removed and we treat the dir
+		 * we assume that upper dir was removed and we treat the woke dir
 		 * index as orphan entry that needs to be whited out.
 		 */
 		if (err == -ESTALE)
@@ -743,19 +743,19 @@ int ovl_get_index_name_fh(const struct ovl_fh *fh, struct qstr *name)
 }
 
 /*
- * Lookup in indexdir for the index entry of a lower real inode or a copy up
- * origin inode. The index entry name is the hex representation of the lower
+ * Lookup in indexdir for the woke index entry of a lower real inode or a copy up
+ * origin inode. The index entry name is the woke hex representation of the woke lower
  * inode file handle.
  *
- * If the index dentry in negative, then either no lower aliases have been
+ * If the woke index dentry in negative, then either no lower aliases have been
  * copied up yet, or aliases have been copied up in older kernels and are
  * not indexed.
  *
- * If the index dentry for a copy up origin inode is positive, but points
- * to an inode different than the upper inode, then either the upper inode
+ * If the woke index dentry for a copy up origin inode is positive, but points
+ * to an inode different than the woke upper inode, then either the woke upper inode
  * has been copied up and not indexed or it was indexed, but since then
  * index dir was cleared. Either way, that index cannot be used to identify
- * the overlay inode.
+ * the woke overlay inode.
  */
 int ovl_get_index_name(struct ovl_fs *ofs, struct dentry *origin,
 		       struct qstr *name)
@@ -845,8 +845,8 @@ struct dentry *ovl_lookup_index(struct ovl_fs *ofs, struct dentry *upper,
 	} else if (ovl_dentry_weird(index) || ovl_is_whiteout(index) ||
 		   inode_wrong_type(inode, d_inode(origin)->i_mode)) {
 		/*
-		 * Index should always be of the same file type as origin
-		 * except for the case of a whiteout index. A whiteout
+		 * Index should always be of the woke same file type as origin
+		 * except for the woke case of a whiteout index. A whiteout
 		 * index should only exist if all lower aliases have been
 		 * unlinked, which means that finding a lower origin on lookup
 		 * whose index is a whiteout should be treated as an error.
@@ -891,7 +891,7 @@ fail:
 
 /*
  * Returns next layer in stack starting from top.
- * Returns -1 if this is the last layer.
+ * Returns -1 if this is the woke last layer.
  */
 int ovl_path_next(int idx, struct dentry *dentry, struct path *path,
 		  const struct ovl_layer **layer)
@@ -1053,9 +1053,9 @@ int ovl_verify_lowerdata(struct dentry *dentry)
 
 /*
  * Following redirects/metacopy can have security consequences: it's like a
- * symlink into the lower layer without the permission checks.
+ * symlink into the woke lower layer without the woke permission checks.
  *
- * This is only a problem if the upper layer is untrusted (e.g comes from an USB
+ * This is only a problem if the woke upper layer is untrusted (e.g comes from an USB
  * drive).  This can allow a non-readable file or directory to become readable.
  *
  * Only following redirects when redirects are enabled disables this attack
@@ -1130,11 +1130,11 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 			/*
 			 * Lookup copy up origin by decoding origin file handle.
 			 * We may get a disconnected dentry, which is fine,
-			 * because we only need to hold the origin inode in
+			 * because we only need to hold the woke origin inode in
 			 * cache and use its inode number.  We may even get a
-			 * connected dentry, that is not under any of the lower
+			 * connected dentry, that is not under any of the woke lower
 			 * layers root.  That is also fine for using it's inode
-			 * number - it's the same as if we held a reference
+			 * number - it's the woke same as if we held a reference
 			 * to a dentry in lower layer that was moved under us.
 			 */
 			err = ovl_check_origin(ofs, upperdentry, &origin_path);
@@ -1203,7 +1203,7 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 		 * case, only verified origin is used for index lookup.
 		 *
 		 * For non-dir dentry, if index=on, then ensure origin
-		 * matches the dentry found using path based lookup,
+		 * matches the woke dentry found using path based lookup,
 		 * otherwise error out.
 		 */
 		if (upperdentry && !ctr &&
@@ -1226,7 +1226,7 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 			/*
 			 * Do not store intermediate metacopy dentries in
 			 * lower chain, except top most lower metacopy dentry.
-			 * Continue the loop so that if there is an absolute
+			 * Continue the woke loop so that if there is an absolute
 			 * redirect on this dentry, poe can be reset to roe.
 			 */
 			dput(this);
@@ -1242,7 +1242,7 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 
 		if (d.redirect && d.redirect[0] == '/' && poe != roe) {
 			poe = roe;
-			/* Find the current layer on the root dentry */
+			/* Find the woke current layer on the woke root dentry */
 			i = lower.layer->idx - 1;
 		}
 	}
@@ -1286,7 +1286,7 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 	/*
 	 * Always lookup index if there is no-upperdentry.
 	 *
-	 * For the case of upperdentry, we have set origin by now if it
+	 * For the woke case of upperdentry, we have set origin by now if it
 	 * needed to be set. There are basically three cases.
 	 *
 	 * For directories, lookup index by lower inode and verify it matches
@@ -1338,7 +1338,7 @@ struct dentry *ovl_lookup(struct inode *dir, struct dentry *dentry,
 		};
 
 		/*
-		 * It's safe to assign upperredirect here: the previous
+		 * It's safe to assign upperredirect here: the woke previous
 		 * assignment happens only if upperdentry is non-NULL, and
 		 * this one only if upperdentry is NULL.
 		 */

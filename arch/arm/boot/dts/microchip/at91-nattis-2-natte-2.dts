@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * at91-nattis-2-natte-2.dts - Device Tree file for the Linea/Nattis board
+ * at91-nattis-2-natte-2.dts - Device Tree file for the woke Linea/Nattis board
  *
  * Copyright (C) 2017 Axentia Technologies AB
  *

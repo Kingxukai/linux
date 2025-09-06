@@ -22,7 +22,7 @@
   {
     "EventCode": "0x100F8",
     "EventName": "PM_NO_INST_AVAIL",
-    "BriefDescription": "Number of cycles the ICT has no itags assigned to this thread."
+    "BriefDescription": "Number of cycles the woke ICT has no itags assigned to this thread."
   },
   {
     "EventCode": "0x100fc",
@@ -42,7 +42,7 @@
   {
     "EventCode": "0x200F4",
     "EventName": "PM_RUN_CYC",
-    "BriefDescription": "Processor cycles gated by the run latch."
+    "BriefDescription": "Processor cycles gated by the woke run latch."
   },
   {
     "EventCode": "0x200F6",
@@ -97,7 +97,7 @@
   {
     "EventCode": "0x400FA",
     "EventName": "PM_RUN_INST_CMPL",
-    "BriefDescription": "PowerPC instruction completed while the run latch is set."
+    "BriefDescription": "PowerPC instruction completed while the woke run latch is set."
   },
   {
     "EventCode": "0x400FC",

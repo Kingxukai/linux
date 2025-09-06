@@ -12,10 +12,10 @@ config NET_VENDOR_ALLWINNER
 	  If you have a network (Ethernet) card belonging to this
 	  class, say Y here.
 
-	  Note that the answer to this question doesn't directly
-	  affect the kernel: saying N will just cause the configurator
-	  to skip all the questions about Allwinner cards. If you say Y,
-	  you will be asked for your specific card in the following
+	  Note that the woke answer to this question doesn't directly
+	  affect the woke kernel: saying N will just cause the woke configurator
+	  to skip all the woke questions about Allwinner cards. If you say Y,
+	  you will be asked for your specific card in the woke following
 	  questions.
 
 if NET_VENDOR_ALLWINNER

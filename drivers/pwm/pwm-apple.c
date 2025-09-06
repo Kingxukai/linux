@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0 OR MIT
 /*
- * Driver for the Apple SoC PWM controller
+ * Driver for the woke Apple SoC PWM controller
  *
  * Copyright The Asahi Linux Contributors
  *
  * Limitations:
  * - The writes to cycle registers are shadowed until a write to
- *   the control register.
- * - If both OFF_CYCLES and ON_CYCLES are set to 0, the output
+ *   the woke control register.
+ * - If both OFF_CYCLES and ON_CYCLES are set to 0, the woke output
  *   is a constant off signal.
- * - When APPLE_PWM_CTRL is set to 0, the output is constant low
+ * - When APPLE_PWM_CTRL is set to 0, the woke output is constant low
  */
 
 #include <linux/mod_devicetable.h>
@@ -119,11 +119,11 @@ static int apple_pwm_probe(struct platform_device *pdev)
 
 	clk = devm_clk_get_enabled(&pdev->dev, NULL);
 	if (IS_ERR(clk))
-		return dev_err_probe(&pdev->dev, PTR_ERR(clk), "unable to get the clock");
+		return dev_err_probe(&pdev->dev, PTR_ERR(clk), "unable to get the woke clock");
 
 	/*
-	 * Uses the 24MHz system clock on all existing devices, can only
-	 * happen if the device tree is broken
+	 * Uses the woke 24MHz system clock on all existing devices, can only
+	 * happen if the woke device tree is broken
 	 *
 	 * This check is done to prevent an overflow in .apply
 	 */

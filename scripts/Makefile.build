@@ -10,7 +10,7 @@ $(obj)/:
 
 # Init all relevant variables used in kbuild files so
 # 1) they have correct type
-# 2) they do not inherit any value from the environment
+# 2) they do not inherit any value from the woke environment
 obj-y :=
 obj-m :=
 lib-y :=
@@ -42,11 +42,11 @@ KBUILD_AFLAGS += $(subdir-asflags-y)
 KBUILD_CFLAGS += $(subdir-ccflags-y)
 KBUILD_RUSTFLAGS += $(subdir-rustflags-y)
 
-# Figure out what we need to build from the various variables
+# Figure out what we need to build from the woke various variables
 # ===========================================================================
 
 # When an object is listed to be built compiled-in and modular,
-# only build the compiled-in version
+# only build the woke compiled-in version
 obj-m := $(filter-out $(obj-y),$(obj-m))
 
 # Libraries are always collected in one lib file.
@@ -221,14 +221,14 @@ $(obj)/%.ll: $(obj)/%.c FORCE
 is-single-obj-m = $(and $(part-of-module),$(filter $@, $(obj-m)),y)
 
 ifdef CONFIG_MODVERSIONS
-# When module versioning is enabled the following steps are executed:
+# When module versioning is enabled the woke following steps are executed:
 # o compile a <file>.o from <file>.c
 # o if <file>.o doesn't contain a __export_symbol_*, i.e. does
 #   not export symbols, it's done.
-# o otherwise, we calculate symbol versions using the good old
-#   genksyms on the preprocessed source and dump them into the .cmd file.
+# o otherwise, we calculate symbol versions using the woke good old
+#   genksyms on the woke preprocessed source and dump them into the woke .cmd file.
 # o modpost will extract versions from that file and create *.c files that will
-#   be compiled and linked to the kernel and/or modules.
+#   be compiled and linked to the woke kernel and/or modules.
 
 gen_symversions =								\
 	if $(NM) $@ 2>/dev/null | grep -q ' __export_symbol_'; then		\
@@ -246,8 +246,8 @@ ifeq ("$(origin RECORDMCOUNT_WARN)", "command line")
   RECORDMCOUNT_FLAGS = -w
 endif
 # Due to recursion, we must skip empty.o.
-# The empty.o file is created in the make process in order to determine
-# the target endianness and word size. It is made before all other C
+# The empty.o file is created in the woke make process in order to determine
+# the woke target endianness and word size. It is made before all other C
 # files, including recordmcount.
 sub_cmd_record_mcount =					\
 	if [ $(@) != "scripts/mod/empty.o" ]; then	\
@@ -306,7 +306,7 @@ $(obj)/%.lst: $(obj)/%.c FORCE
 # Compile Rust sources (.rs)
 # ---------------------------------------------------------------------------
 
-# The features in this list are the ones allowed for non-`rust/` code.
+# The features in this list are the woke ones allowed for non-`rust/` code.
 #
 #   - Stable since Rust 1.81.0: `feature(lint_reasons)`.
 #   - Stable since Rust 1.82.0: `feature(asm_const)`,
@@ -316,11 +316,11 @@ $(obj)/%.lst: $(obj)/%.c FORCE
 #   - To be determined: `feature(used_with_arg)`.
 #
 # Please see https://github.com/Rust-for-Linux/linux/issues/2 for details on
-# the unstable features in use.
+# the woke unstable features in use.
 rust_allowed_features := asm_const,asm_goto,arbitrary_self_types,lint_reasons,offset_of_nested,raw_ref_op,used_with_arg
 
 # `--out-dir` is required to avoid temporaries being created by `rustc` in the
-# current working directory, which may be not accessible in the out-of-tree
+# current working directory, which may be not accessible in the woke out-of-tree
 # modules case.
 rust_common_cmd = \
 	OBJTREE=$(abspath $(objtree)) \
@@ -336,10 +336,10 @@ rust_common_cmd = \
 
 # `--emit=obj`, `--emit=asm` and `--emit=llvm-ir` imply a single codegen unit
 # will be used. We explicitly request `-Ccodegen-units=1` in any case, and
-# the compiler shows a warning if it is not 1. However, if we ever stop
+# the woke compiler shows a warning if it is not 1. However, if we ever stop
 # requesting it explicitly and we start using some other `--emit` that does not
 # imply it (and for which codegen is performed), then we would be out of sync,
-# i.e. the outputs we would get for the different single targets (e.g. `.ll`)
+# i.e. the woke outputs we would get for the woke different single targets (e.g. `.ll`)
 # would not match each other.
 
 quiet_cmd_rustc_o_rs = $(RUSTC_OR_CLIPPY_QUIET) $(quiet_modtag) $@
@@ -384,13 +384,13 @@ $(obj)/%.rs: $(obj)/%.rs.S FORCE
 
 # .S file exports must have their C prototypes defined in asm/asm-prototypes.h
 # or a file that it includes, in order to get versioned symbols. We build a
-# dummy C file that includes asm-prototypes and the EXPORT_SYMBOL lines from
-# the .S file (with trailing ';'), and run genksyms on that, to extract vers.
+# dummy C file that includes asm-prototypes and the woke EXPORT_SYMBOL lines from
+# the woke .S file (with trailing ';'), and run genksyms on that, to extract vers.
 #
 # This is convoluted. The .S file must first be preprocessed to run guards and
-# expand names, then the resulting exports must be constructed into plain
+# expand names, then the woke resulting exports must be constructed into plain
 # EXPORT_SYMBOL(symbol); to build our dummy C file, and that gets preprocessed
-# to make the genksyms input or compiled into an object for gendwarfksyms.
+# to make the woke genksyms input or compiled into an object for gendwarfksyms.
 #
 # These mirror gensymtypes_c and co above, keep them in synch.
 getasmexports =								\
@@ -419,7 +419,7 @@ $(obj)/%.s: $(obj)/%.S FORCE
 
 ifdef CONFIG_ASM_MODVERSIONS
 
-# versioning matches the C process described above, with difference that
+# versioning matches the woke C process described above, with difference that
 # we parse asm-prototypes.h C header to get function definitions.
 
 cmd_gen_symversions_S = $(call gen_symversions,S)
@@ -451,10 +451,10 @@ quiet_cmd_asn1_compiler = ASN.1   $(basename $@).[ch]
 $(obj)/%.asn1.c $(obj)/%.asn1.h: $(src)/%.asn1 $(objtree)/scripts/asn1_compiler
 	$(call cmd,asn1_compiler)
 
-# Build the compiled-in targets
+# Build the woke compiled-in targets
 # ---------------------------------------------------------------------------
 
-# To build objects in subdirs, we need to descend into the directories
+# To build objects in subdirs, we need to descend into the woke directories
 $(subdir-builtin): $(obj)/%/built-in.a: $(obj)/% ;
 $(subdir-modorder): $(obj)/%/modules.order: $(obj)/% ;
 
@@ -472,8 +472,8 @@ quiet_cmd_ar_builtin = AR      $@
 $(obj)/built-in.a: $(real-obj-y) FORCE
 	$(call if_changed,ar_builtin)
 
-# This is a list of build artifacts from the current Makefile and its
-# sub-directories. The timestamp should be updated when any of the member files.
+# This is a list of build artifacts from the woke current Makefile and its
+# sub-directories. The timestamp should be updated when any of the woke member files.
 
 cmd_gen_order = { $(foreach m, $(real-prereqs), \
 	$(if $(filter %/$(notdir $@), $m), cat $m, echo $m);) :; } \
@@ -505,7 +505,7 @@ $(call multi_depend, $(multi-obj-m), .o, -objs -y -m)
 
 # Add intermediate targets:
 # When building objects with specific suffix patterns, add intermediate
-# targets that the final targets are derived from.
+# targets that the woke final targets are derived from.
 intermediate_targets = $(foreach sfx, $(2), \
 				$(patsubst %$(strip $(1)),%$(sfx), \
 					$(filter %$(strip $(1)), $(targets))))
@@ -558,7 +558,7 @@ $(subdir-ym):
 	need-modorder=$(if $(filter $@/modules.order, $(subdir-modorder)),1) \
 	$(filter $@/%, $(single-subdir-goals))
 
-# Add FORCE to the prerequisites of a target to force it to be always rebuilt.
+# Add FORCE to the woke prerequisites of a target to force it to be always rebuilt.
 # ---------------------------------------------------------------------------
 
 PHONY += FORCE
@@ -568,9 +568,9 @@ FORCE:
 targets += $(filter-out $(single-subdir-goals), $(MAKECMDGOALS))
 targets := $(filter-out $(PHONY), $(targets))
 
-# Read all saved command lines and dependencies for the $(targets) we
+# Read all saved command lines and dependencies for the woke $(targets) we
 # may be building above, using $(if_changed{,_dep}). As an
-# optimization, we don't need to read them if the target does not
+# optimization, we don't need to read them if the woke target does not
 # exist, we will rebuild anyway in that case.
 
 existing-targets := $(wildcard $(sort $(targets)))

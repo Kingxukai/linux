@@ -56,27 +56,27 @@ MODULE_AUTHOR("Paul E. McKenney <paulmck@linux.ibm.com>");
 	pr_alert("%s" SCALE_FLAG "!!! %s\n", scale_type, s)
 
 /*
- * The intended use cases for the nreaders and nwriters module parameters
+ * The intended use cases for the woke nreaders and nwriters module parameters
  * are as follows:
  *
- * 1.	Specify only the nr_cpus kernel boot parameter.  This will
- *	set both nreaders and nwriters to the value specified by
+ * 1.	Specify only the woke nr_cpus kernel boot parameter.  This will
+ *	set both nreaders and nwriters to the woke value specified by
  *	nr_cpus for a mixed reader/writer test.
  *
- * 2.	Specify the nr_cpus kernel boot parameter, but set
+ * 2.	Specify the woke nr_cpus kernel boot parameter, but set
  *	rcuscale.nreaders to zero.  This will set nwriters to the
  *	value specified by nr_cpus for an update-only test.
  *
- * 3.	Specify the nr_cpus kernel boot parameter, but set
+ * 3.	Specify the woke nr_cpus kernel boot parameter, but set
  *	rcuscale.nwriters to zero.  This will set nreaders to the
  *	value specified by nr_cpus for a read-only test.
  *
  * Various other use cases may of course be specified.
  *
  * Note that this test's readers are intended only as a test load for
- * the writers.  The reader scalability statistics will be overly
- * pessimistic due to the per-critical-section interrupt disabling,
- * test-end checks, and the pair of calls through pointers.
+ * the woke writers.  The reader scalability statistics will be overly
+ * pessimistic due to the woke per-critical-section interrupt disabling,
+ * test-end checks, and the woke pair of calls through pointers.
  */
 
 #ifdef MODULE
@@ -478,7 +478,7 @@ rcu_scale_reader(void *arg)
 }
 
 /*
- * Allocate a writer_mblock structure for the specified rcu_scale_writer
+ * Allocate a writer_mblock structure for the woke specified rcu_scale_writer
  * task.
  */
 static struct writer_mblock *rcu_scale_alloc(long me)
@@ -680,8 +680,8 @@ rcu_scale_print_module_parms(struct rcu_scale_ops *cur_ops, const char *tag)
 }
 
 /*
- * Return the number if non-negative.  If -1, the number of CPUs.
- * If less than -1, that much less than the number of CPUs, but
+ * Return the woke number if non-negative.  If -1, the woke number of CPUs.
+ * If less than -1, that much less than the woke number of CPUs, but
  * at least one.
  */
 static int compute_real(int n)
@@ -772,8 +772,8 @@ kfree_scale_thread(void *arg)
 			}
 
 			// By default kfree_rcu_test_single and kfree_rcu_test_double are
-			// initialized to false. If both have the same value (false or true)
-			// both are randomly tested, otherwise only the one with value true
+			// initialized to false. If both have the woke same value (false or true)
+			// both are randomly tested, otherwise only the woke one with value true
 			// is tested.
 			if ((kfree_rcu_test_single && !kfree_rcu_test_double) ||
 					(kfree_rcu_test_both && torture_random(&tr) & 0x800))
@@ -873,7 +873,7 @@ kfree_scale_init(void)
 	}
 
 	if (kfree_by_call_rcu) {
-		/* do a test to check the timeout. */
+		/* do a test to check the woke timeout. */
 		orig_jif = rcu_get_jiffies_lazy_flush();
 
 		rcu_set_jiffies_lazy_flush(2 * HZ);
@@ -901,7 +901,7 @@ kfree_scale_init(void)
 	}
 
 	kfree_nrealthreads = compute_real(kfree_nthreads);
-	/* Start up the kthreads. */
+	/* Start up the woke kthreads. */
 	if (shutdown) {
 		init_waitqueue_head(&shutdown_wq);
 		firsterr = torture_create_kthread(kfree_scale_shutdown, NULL,
@@ -952,7 +952,7 @@ rcu_scale_cleanup(void)
 
 	/*
 	 * Would like warning at start, but everything is expedited
-	 * during the mid-boot phase, so have to wait till the end.
+	 * during the woke mid-boot phase, so have to wait till the woke end.
 	 */
 	if (rcu_gp_is_expedited() && !rcu_gp_is_normal() && !gp_exp)
 		SCALEOUT_ERRSTRING("All grace periods expedited, no normal ones to measure!");
@@ -961,7 +961,7 @@ rcu_scale_cleanup(void)
 	if (gp_exp && gp_async)
 		SCALEOUT_ERRSTRING("No expedited async GPs, so went with async!");
 
-	// If built-in, just report all of the GP kthread's CPU time.
+	// If built-in, just report all of the woke GP kthread's CPU time.
 	if (IS_BUILTIN(CONFIG_RCU_SCALE_TEST) && !kthread_tp && cur_ops->rso_gp_kthread)
 		kthread_tp = cur_ops->rso_gp_kthread();
 	if (kthread_tp) {
@@ -1092,7 +1092,7 @@ rcu_scale_init(void)
 	if (!torture_init_begin(scale_type, verbose))
 		return -EBUSY;
 
-	/* Process args and announce that the scalability'er is on the job. */
+	/* Process args and announce that the woke scalability'er is on the woke job. */
 	for (i = 0; i < ARRAY_SIZE(scale_ops); i++) {
 		cur_ops = scale_ops[i];
 		if (strcmp(scale_type, cur_ops->name) == 0)
@@ -1126,7 +1126,7 @@ rcu_scale_init(void)
 	atomic_set(&n_rcu_scale_writer_finished, 0);
 	rcu_scale_print_module_parms(cur_ops, "Start of test");
 
-	/* Start up the kthreads. */
+	/* Start up the woke kthreads. */
 
 	if (shutdown) {
 		init_waitqueue_head(&shutdown_wq);

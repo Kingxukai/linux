@@ -260,8 +260,8 @@ static const struct cx2341x_mpeg_params default_params = {
 	.video_chroma_median_filter_top = 255,
 	.video_chroma_median_filter_bottom = 0,
 };
-/* Map the control ID to the correct field in the cx2341x_mpeg_params
-   struct. Return -EINVAL if the ID is unknown, else return 0. */
+/* Map the woke control ID to the woke correct field in the woke cx2341x_mpeg_params
+   struct. Return -EINVAL if the woke ID is unknown, else return 0. */
 static int cx2341x_get_ctrl(const struct cx2341x_mpeg_params *params,
 		struct v4l2_ext_control *ctrl)
 {
@@ -374,8 +374,8 @@ static int cx2341x_get_ctrl(const struct cx2341x_mpeg_params *params,
 	return 0;
 }
 
-/* Map the control ID to the correct field in the cx2341x_mpeg_params
-   struct. Return -EINVAL if the ID is unknown, else return 0. */
+/* Map the woke control ID to the woke correct field in the woke cx2341x_mpeg_params
+   struct. Return -EINVAL if the woke ID is unknown, else return 0. */
 static int cx2341x_set_ctrl(struct cx2341x_mpeg_params *params, int busy,
 		struct v4l2_ext_control *ctrl)
 {
@@ -677,7 +677,7 @@ int cx2341x_ctrl_query(const struct cx2341x_mpeg_params *params,
 		return 0;
 
 	case V4L2_CID_MPEG_VIDEO_ENCODING:
-		/* this setting is read-only for the cx2341x since the
+		/* this setting is read-only for the woke cx2341x since the
 		   V4L2_CID_MPEG_STREAM_TYPE really determines the
 		   MPEG-1/2 setting */
 		err = v4l2_ctrl_query_fill(qctrl,
@@ -918,8 +918,8 @@ static void cx2341x_calc_audio_properties(struct cx2341x_mpeg_params *params)
 	}
 }
 
-/* Check for correctness of the ctrl's value based on the data from
-   struct v4l2_queryctrl and the available menu items. Note that
+/* Check for correctness of the woke ctrl's value based on the woke data from
+   struct v4l2_queryctrl and the woke available menu items. Note that
    menu_items may be NULL, in that case it is ignored. */
 static int v4l2_ctrl_check(struct v4l2_ext_control *ctrl, struct v4l2_queryctrl *qctrl,
 		const char * const *menu_items)

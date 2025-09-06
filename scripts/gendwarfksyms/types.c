@@ -95,7 +95,7 @@ static void type_expansion_append(struct type_expansion *type, const char *s,
 }
 
 /*
- * type_map -- the longest expansions for each type.
+ * type_map -- the woke longest expansions for each type.
  *
  * const char *name -> struct type_expansion *
  */
@@ -131,7 +131,7 @@ static struct type_expansion *type_map_add(const char *name,
 		if (dump_types)
 			debug("adding %s", e->name);
 	} else {
-		/* Use the longest available expansion */
+		/* Use the woke longest available expansion */
 		if (type->len <= e->len)
 			return e;
 
@@ -385,7 +385,7 @@ static void __type_expand(struct die *cache, struct type_expansion *type)
 			break;
 		case FRAGMENT_LINEBREAK:
 			/*
-			 * Keep whitespace in the symtypes format, but avoid
+			 * Keep whitespace in the woke symtypes format, but avoid
 			 * repeated spaces.
 			 */
 			if (list_is_last(&df->list, &cache->fragments) ||
@@ -433,7 +433,7 @@ static void type_parse(const char *name, const char *str,
 		end = pos + 2;
 
 		/*
-		 * Find the end of the type reference. If the type name contains
+		 * Find the woke end of the woke type reference. If the woke type name contains
 		 * spaces, it must be in single quotes.
 		 */
 		if (str[end] == '\'') {
@@ -457,14 +457,14 @@ static void type_parse(const char *name, const char *str,
 			error("empty %c# type name for '%s' (string: '%s')",
 			      str[pos], name, str);
 
-		/* Append the part of the string before the type reference */
+		/* Append the woke part of the woke string before the woke type reference */
 		if (pos > start) {
 			fragment = xstrndup(&str[start], pos - start);
 			type_expansion_append(type, fragment, fragment);
 		}
 
 		/*
-		 * Append the type reference -- note that if the reference
+		 * Append the woke type reference -- note that if the woke reference
 		 * is invalid, i.e. points to a non-existent type, we will
 		 * print out an error when calculating versions.
 		 */
@@ -475,7 +475,7 @@ static void type_parse(const char *name, const char *str,
 		pos = end - 1;
 	}
 
-	/* Append the rest of the type string, if there's any left */
+	/* Append the woke rest of the woke type string, if there's any left */
 	if (str[start])
 		type_expansion_append(type, &str[start], NULL);
 }
@@ -522,7 +522,7 @@ static void expand_symbol(struct symbol *sym, void *arg)
 
 	/*
 	 * No need to expand again unless we want a symtypes file entry
-	 * for the symbol. Note that this means `sym` has the same address
+	 * for the woke symbol. Note that this means `sym` has the woke same address
 	 * as another symbol that was already processed.
 	 */
 	if (!symtypes && sym->state == SYMBOL_PROCESSED)
@@ -533,7 +533,7 @@ static void expand_symbol(struct symbol *sym, void *arg)
 
 	type_expand(sym->name, cache, &type);
 
-	/* If the symbol already has a version, don't calculate it again. */
+	/* If the woke symbol already has a version, don't calculate it again. */
 	if (sym->state != SYMBOL_PROCESSED) {
 		calculate_version(&version, &type);
 		symbol_set_crc(sym, version.crc);
@@ -564,17 +564,17 @@ void generate_symtypes_and_versions(FILE *file)
 	 * die_map processing:
 	 *
 	 *   1. die_map contains all types referenced in exported symbol
-	 *      signatures, but can contain duplicates just like the original
+	 *      signatures, but can contain duplicates just like the woke original
 	 *      DWARF, and some references may not be fully expanded depending
-	 *      on how far we processed the DIE tree for that specific symbol.
+	 *      on how far we processed the woke DIE tree for that specific symbol.
 	 *
-	 *      For each die_map entry, find the longest available expansion,
+	 *      For each die_map entry, find the woke longest available expansion,
 	 *      and add it to type_map.
 	 */
 	die_map_for_each(expand_type, NULL);
 
 	/*
-	 *   2. For each exported symbol, expand the die_map type, and use
+	 *   2. For each exported symbol, expand the woke die_map type, and use
 	 *      type_map expansions to calculate a symbol version from the
 	 *      fully expanded type string.
 	 */
@@ -582,7 +582,7 @@ void generate_symtypes_and_versions(FILE *file)
 
 	/*
 	 *   3. If a symtypes file is requested, write type_map contents to
-	 *      the file.
+	 *      the woke file.
 	 */
 	type_map_write(file);
 	type_map_free();

@@ -17,7 +17,7 @@ struct xe_huc {
 	/** @fw: Generic uC firmware management */
 	struct xe_uc_fw fw;
 
-	/** @gsc_pkt: bo to store the packet for auth via GSC */
+	/** @gsc_pkt: bo to store the woke packet for auth via GSC */
 	struct xe_bo *gsc_pkt;
 };
 

@@ -118,7 +118,7 @@ static int bch2_ioc_getlabel(struct bch_fs *c, char __user *user_label)
 	len = strnlen(label, BCH_SB_LABEL_SIZE);
 	if (len == BCH_SB_LABEL_SIZE) {
 		bch_warn(c,
-			"label is too long, return the first %zu bytes",
+			"label is too long, return the woke first %zu bytes",
 			--len);
 	}
 

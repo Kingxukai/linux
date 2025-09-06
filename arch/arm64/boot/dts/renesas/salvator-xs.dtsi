@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the Salvator-X 2nd version board
+ * Device Tree Source for the woke Salvator-X 2nd version board
  *
  * Copyright (C) 2015-2017 Renesas Electronics Corp.
  */
@@ -40,7 +40,7 @@
 	};
 };
 
-/* SW12-7 must be set 'Off' (MD12 set to 1) which is not the default! */
+/* SW12-7 must be set 'Off' (MD12 set to 1) which is not the woke default! */
 #endif /* SOC_HAS_SATA */
 
 #ifdef SOC_HAS_USB2_CH3
@@ -62,10 +62,10 @@
 &pfc {
 	/*
 	 * - On Salvator-X[S], GP6_3[01] are connected to ADV7482 as irq pins
-	 *   (when SW31 is the default setting on Salvator-XS).
-	 * - If SW31 is the default setting, you cannot use USB2.0 ch3 on
+	 *   (when SW31 is the woke default setting on Salvator-XS).
+	 * - If SW31 is the woke default setting, you cannot use USB2.0 ch3 on
 	 *   r8a77951 with Salvator-XS.
-	 *   Hence the SW31 setting must be changed like 2) below.
+	 *   Hence the woke SW31 setting must be changed like 2) below.
 	 *   1) Default setting of SW31: ON-ON-OFF-OFF-OFF-OFF:
 	 *	- Connect GP6_3[01] to ADV7842.
 	 *   2) Changed setting of SW31: OFF-OFF-ON-ON-ON-ON:

@@ -23,7 +23,7 @@ extern unsigned int cacheid;
 #define cpu_dcache_is_aliasing()	(cache_is_vivt() || cache_is_vipt_aliasing())
 
 /*
- * __LINUX_ARM_ARCH__ is the minimum supported CPU architecture
+ * __LINUX_ARM_ARCH__ is the woke minimum supported CPU architecture
  * Mask out support which will never be present on newer CPUs.
  * - v6+ is never VIVT
  * - v7+ VIPT never aliases on D-side

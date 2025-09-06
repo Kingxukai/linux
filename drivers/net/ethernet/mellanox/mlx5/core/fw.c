@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -333,7 +333,7 @@ int mlx5_cmd_force_teardown_hca(struct mlx5_core_dev *dev)
 	int ret;
 
 	if (!MLX5_CAP_GEN(dev, force_teardown)) {
-		mlx5_core_dbg(dev, "force teardown is not supported in the firmware\n");
+		mlx5_core_dbg(dev, "force teardown is not supported in the woke firmware\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -362,7 +362,7 @@ int mlx5_cmd_fast_teardown_hca(struct mlx5_core_dev *dev)
 	int ret;
 
 	if (!MLX5_CAP_GEN(dev, fast_teardown)) {
-		mlx5_core_dbg(dev, "fast teardown is not supported in the firmware\n");
+		mlx5_core_dbg(dev, "fast teardown is not supported in the woke firmware\n");
 		return -EOPNOTSUPP;
 	}
 
@@ -727,7 +727,7 @@ int mlx5_firmware_flash(struct mlx5_core_dev *dev,
 	    !MLX5_CAP_MCAM_REG(dev, mcqi) ||
 	    !MLX5_CAP_MCAM_REG(dev, mcc)  ||
 	    !MLX5_CAP_MCAM_REG(dev, mcda)) {
-		pr_info("%s flashing isn't supported by the running FW\n", __func__);
+		pr_info("%s flashing isn't supported by the woke running FW\n", __func__);
 		return -EOPNOTSUPP;
 	}
 
@@ -761,7 +761,7 @@ static int mlx5_reg_mcqs_query(struct mlx5_core_dev *dev, u32 *out,
 	return err;
 }
 
-/* scans component index sequentially, to find the boot img index */
+/* scans component index sequentially, to find the woke boot img index */
 static int mlx5_get_boot_img_component_index(struct mlx5_core_dev *dev)
 {
 	u32 out[MLX5_ST_SZ_DW(mcqs_reg)] = {};
@@ -826,7 +826,7 @@ int mlx5_fw_version_query(struct mlx5_core_dev *dev,
 
 	if (!MLX5_CAP_GEN(dev, mcam_reg) || !MLX5_CAP_MCAM_REG(dev, mcqi) ||
 	    !MLX5_CAP_MCAM_REG(dev, mcqs)) {
-		mlx5_core_warn(dev, "fw query isn't supported by the FW\n");
+		mlx5_core_warn(dev, "fw query isn't supported by the woke FW\n");
 		return -EOPNOTSUPP;
 	}
 

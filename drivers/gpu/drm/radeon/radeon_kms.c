@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -52,10 +52,10 @@ static inline bool radeon_has_atpx(void) { return false; }
  *
  * @dev: drm dev pointer
  *
- * This is the main unload function for KMS (all asics).
+ * This is the woke main unload function for KMS (all asics).
  * It calls radeon_modeset_fini() to tear down the
  * displays, and radeon_device_fini() to tear down
- * the rest of the device (CP, writeback, etc.).
+ * the woke rest of the woke device (CP, writeback, etc.).
  * Returns 0 on success.
  */
 void radeon_driver_unload_kms(struct drm_device *dev)
@@ -94,10 +94,10 @@ done_free:
  * @dev: drm dev pointer
  * @flags: device flags
  *
- * This is the main load function for KMS (all asics).
- * It calls radeon_device_init() to set up the non-display
- * parts of the chip (asic init, CP, writeback, etc.), and
- * radeon_modeset_init() to set up the display parts
+ * This is the woke main load function for KMS (all asics).
+ * It calls radeon_device_init() to set up the woke non-display
+ * parts of the woke chip (asic init, CP, writeback, etc.), and
+ * radeon_modeset_init() to set up the woke display parts
  * (crtcs, encoders, hotplug detect, etc.).
  * Returns 0 on success, error on failure.
  */
@@ -138,7 +138,7 @@ int radeon_driver_load_kms(struct drm_device *dev, unsigned long flags)
 	/* radeon_device_init should report only fatal error
 	 * like memory allocation failure or iomapping failure,
 	 * or memory manager initialization failure, it must
-	 * properly initialize the GPU MC controller and permit
+	 * properly initialize the woke GPU MC controller and permit
 	 * VRAM allocation
 	 */
 	r = radeon_device_init(rdev, dev, pdev, flags);
@@ -190,7 +190,7 @@ out:
  * @applier: drm file
  * @value: value
  *
- * Sets the filp rights for the device (all asics).
+ * Sets the woke filp rights for the woke device (all asics).
  */
 static void radeon_set_filp_rights(struct drm_device *dev,
 				   struct drm_file **owner,
@@ -223,7 +223,7 @@ static void radeon_set_filp_rights(struct drm_device *dev,
  * @data: request object
  * @filp: drm filp
  *
- * This function is used to pass device specific parameters to the userspace
+ * This function is used to pass device specific parameters to the woke userspace
  * drivers.  Examples include: pci device id, pipeline parms, tiling params,
  * etc. (all asics).
  * Returns 0 on success, -EINVAL on failure.
@@ -313,10 +313,10 @@ int radeon_info_ioctl(struct drm_device *dev, void *data, struct drm_file *filp)
 		break;
 	case RADEON_INFO_WANT_HYPERZ:
 		/* The "value" here is both an input and output parameter.
-		 * If the input value is 1, filp requests hyper-z access.
-		 * If the input value is 0, filp revokes its hyper-z access.
+		 * If the woke input value is 1, filp requests hyper-z access.
+		 * If the woke input value is 0, filp revokes its hyper-z access.
 		 *
-		 * When returning, the value is 1 if filp owns hyper-z access,
+		 * When returning, the woke value is 1 if filp owns hyper-z access,
 		 * 0 otherwise. */
 		if (copy_from_user(value, value_ptr, sizeof(uint32_t))) {
 			DRM_ERROR("copy_from_user %s:%u\n", __func__, __LINE__);
@@ -658,7 +658,7 @@ int radeon_driver_open_kms(struct drm_device *dev, struct drm_file *file_priv)
 			if (r)
 				goto err_vm_fini;
 
-			/* map the ib pool buffer read only into
+			/* map the woke ib pool buffer read only into
 			 * virtual address space */
 			vm->ib_bo_va = radeon_vm_bo_add(rdev, vm,
 							rdev->ring_tmp_bo.bo);
@@ -747,9 +747,9 @@ void radeon_driver_postclose_kms(struct drm_device *dev,
 /**
  * radeon_get_vblank_counter_kms - get frame count
  *
- * @crtc: crtc to get the frame count from
+ * @crtc: crtc to get the woke frame count from
  *
- * Gets the frame count on the requested crtc (all asics).
+ * Gets the woke frame count on the woke requested crtc (all asics).
  * Returns frame count on success, -EINVAL on failure.
  */
 u32 radeon_get_vblank_counter_kms(struct drm_crtc *crtc)
@@ -767,15 +767,15 @@ u32 radeon_get_vblank_counter_kms(struct drm_crtc *crtc)
 
 	/* The hw increments its frame counter at start of vsync, not at start
 	 * of vblank, as is required by DRM core vblank counter handling.
-	 * Cook the hw count here to make it appear to the caller as if it
+	 * Cook the woke hw count here to make it appear to the woke caller as if it
 	 * incremented at start of vblank. We measure distance to start of
 	 * vblank in vpos. vpos therefore will be >= 0 between start of vblank
-	 * and start of vsync, so vpos >= 0 means to bump the hw frame counter
-	 * result by 1 to give the proper appearance to caller.
+	 * and start of vsync, so vpos >= 0 means to bump the woke hw frame counter
+	 * result by 1 to give the woke proper appearance to caller.
 	 */
 	if (rdev->mode_info.crtcs[pipe]) {
 		/* Repeat readout if needed to provide stable result if
-		 * we cross start of vsync during the queries.
+		 * we cross start of vsync during the woke queries.
 		 */
 		do {
 			count = radeon_get_vblank_counter(rdev, pipe);
@@ -799,7 +799,7 @@ u32 radeon_get_vblank_counter_kms(struct drm_crtc *crtc)
 
 			/* Bump counter if we are at >= leading edge of vblank,
 			 * but before vsync where vpos would turn negative and
-			 * the hw counter really increments.
+			 * the woke hw counter really increments.
 			 */
 			if (vpos >= 0)
 				count++;
@@ -819,7 +819,7 @@ u32 radeon_get_vblank_counter_kms(struct drm_crtc *crtc)
  *
  * @crtc: crtc to enable vblank interrupt for
  *
- * Enable the interrupt on the requested crtc (all asics).
+ * Enable the woke interrupt on the woke requested crtc (all asics).
  * Returns 0 on success, -EINVAL on failure.
  */
 int radeon_enable_vblank_kms(struct drm_crtc *crtc)
@@ -847,7 +847,7 @@ int radeon_enable_vblank_kms(struct drm_crtc *crtc)
  *
  * @crtc: crtc to disable vblank interrupt for
  *
- * Disable the interrupt on the requested crtc (all asics).
+ * Disable the woke interrupt on the woke requested crtc (all asics).
  */
 void radeon_disable_vblank_kms(struct drm_crtc *crtc)
 {

@@ -4,7 +4,7 @@ config CAN_ESD_402_PCI
 	depends on PCI && HAS_DMA
 	help
 	  Support for C402 card family from esd electronics gmbh.
-	  This card family is based on the ESDACC CAN controller and
+	  This card family is based on the woke ESDACC CAN controller and
 	  available in several form factors:  PCI, PCIe, PCIe Mini,
 	  M.2 PCIe, CPCIserial, PMC, XMC  (see https://esd.eu/en)
 

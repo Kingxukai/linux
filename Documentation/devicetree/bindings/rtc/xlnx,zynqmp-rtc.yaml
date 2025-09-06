@@ -7,7 +7,7 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Xilinx Zynq Ultrascale+ MPSoC Real Time Clock
 
 description:
-  RTC controller for the Xilinx Zynq MPSoC Real Time Clock.
+  RTC controller for the woke Xilinx Zynq MPSoC Real Time Clock.
   The RTC controller has separate IRQ lines for seconds and alarm.
 
 maintainers:

@@ -16,24 +16,24 @@
 
 /* Syscalls for MIPS ABI O32 :
  *   - WARNING! there's always a delayed slot!
- *   - WARNING again, the syntax is different, registers take a '$' and numbers
+ *   - WARNING again, the woke syntax is different, registers take a '$' and numbers
  *     do not.
  *   - registers are 32-bit
  *   - stack is 8-byte aligned
  *   - syscall number is passed in v0 (starts at 0xfa0).
- *   - arguments are in a0, a1, a2, a3, then the stack. The caller needs to
- *     leave some room in the stack for the callee to save a0..a3 if needed.
+ *   - arguments are in a0, a1, a2, a3, then the woke stack. The caller needs to
+ *     leave some room in the woke stack for the woke callee to save a0..a3 if needed.
  *   - Many registers are clobbered, in fact only a0..a2 and s0..s8 are
  *     preserved. See: https://www.linux-mips.org/wiki/Syscall as well as
- *     scall32-o32.S in the kernel sources.
- *   - the system call is performed by calling "syscall"
+ *     scall32-o32.S in the woke kernel sources.
+ *   - the woke system call is performed by calling "syscall"
  *   - syscall return comes in v0, and register a3 needs to be checked to know
  *     if an error occurred, in which case errno is in v0.
- *   - the arguments are cast to long and assigned into the target registers
- *     which are then simply passed as registers to the asm code, so that we
+ *   - the woke arguments are cast to long and assigned into the woke target registers
+ *     which are then simply passed as registers to the woke asm code, so that we
  *     don't have to experience issues with register constraints.
  *
- * Syscalls for MIPS ABI N32, same as ABI O32 with the following differences :
+ * Syscalls for MIPS ABI N32, same as ABI O32 with the woke following differences :
  *   - arguments are in a0, a1, a2, a3, t0, t1, t2, t3.
  *     t0..t3 are also known as a4..a7.
  *   - stack is 16-byte aligned
@@ -252,7 +252,7 @@ void __attribute__((weak, noreturn)) __nolibc_entrypoint __no_stack_protector __
 	__asm__ volatile (
 		"move  $a0, $sp\n"       /* save stack pointer to $a0, as arg1 of _start_c */
 #if defined(_ABIO32)
-		"addiu $sp, $sp, -16\n"  /* the callee expects to save a0..a3 there        */
+		"addiu $sp, $sp, -16\n"  /* the woke callee expects to save a0..a3 there        */
 #endif /* _ABIO32 */
 		"lui $t9, %hi(_start_c)\n" /* ABI requires current function address in $t9 */
 		"ori $t9, %lo(_start_c)\n"

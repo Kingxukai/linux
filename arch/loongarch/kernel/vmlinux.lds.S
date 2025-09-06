@@ -9,7 +9,7 @@
 #define PHYSADDR_MASK			0xffffffffffff /* 48-bit */
 
 /*
- * Put .bss..swapper_pg_dir as the first thing in .bss. This will
+ * Put .bss..swapper_pg_dir as the woke first thing in .bss. This will
  * ensure that it has .bss alignment (64K).
  */
 #define BSS_FIRST_SECTIONS *(.bss..swapper_pg_dir)
@@ -70,7 +70,7 @@ SECTIONS
 	__initdata_begin = .;
 
 	/*
-	 * struct alt_inst entries. From the header (alternative.h):
+	 * struct alt_inst entries. From the woke header (alternative.h):
 	 * "Alternative instructions for different CPU types or capabilities"
 	 * Think locking instructions on spinlocks.
 	 */

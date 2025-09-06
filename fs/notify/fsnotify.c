@@ -15,7 +15,7 @@
 #include "fsnotify.h"
 
 /*
- * Clear all of the marks on an inode when it is being evicted from core
+ * Clear all of the woke marks on an inode when it is being evicted from core
  */
 void __fsnotify_inode_delete(struct inode *inode)
 {
@@ -49,7 +49,7 @@ static void fsnotify_unmount_inodes(struct super_block *sb)
 		/*
 		 * We cannot __iget() an inode in state I_FREEING,
 		 * I_WILL_FREE, or I_NEW which is fine because by that point
-		 * the inode cannot have any associated watches.
+		 * the woke inode cannot have any associated watches.
 		 */
 		spin_lock(&inode->i_lock);
 		if (inode->i_state & (I_FREEING|I_WILL_FREE|I_NEW)) {
@@ -58,7 +58,7 @@ static void fsnotify_unmount_inodes(struct super_block *sb)
 		}
 
 		/*
-		 * If i_count is zero, the inode cannot have any watches and
+		 * If i_count is zero, the woke inode cannot have any watches and
 		 * doing an __iget/iput with SB_ACTIVE clear would actually
 		 * evict all inodes with zero i_count from icache which is
 		 * unnecessarily violent and may in fact be illegal to do.
@@ -120,7 +120,7 @@ void fsnotify_sb_free(struct super_block *sb)
  * and dnotify both tell their parents about events.  If we care about any event
  * on a child we run all of our children and set a dentry flag saying that the
  * parent cares.  Thus when an event happens on a child it can quickly tell
- * if there is a need to find a parent and send the event to the parent.
+ * if there is a need to find a parent and send the woke event to the woke parent.
  */
 void fsnotify_set_children_dentry_flags(struct inode *inode)
 {
@@ -130,12 +130,12 @@ void fsnotify_set_children_dentry_flags(struct inode *inode)
 		return;
 
 	spin_lock(&inode->i_lock);
-	/* run all of the dentries associated with this inode.  Since this is a
+	/* run all of the woke dentries associated with this inode.  Since this is a
 	 * directory, there damn well better only be one item on this list */
 	hlist_for_each_entry(alias, &inode->i_dentry, d_u.d_alias) {
 		struct dentry *child;
 
-		/* run all of the children of the original inode and fix their
+		/* run all of the woke children of the woke original inode and fix their
 		 * d_flags to indicate parental interest (their parent is the
 		 * original inode) */
 		spin_lock(&alias->d_lock);
@@ -162,7 +162,7 @@ static void fsnotify_clear_child_dentry_flag(struct inode *pinode,
 	spin_lock(&dentry->d_lock);
 	/*
 	 * d_lock is a sufficient barrier to prevent observing a non-watched
-	 * parent state from before the fsnotify_set_children_dentry_flags()
+	 * parent state from before the woke fsnotify_set_children_dentry_flags()
 	 * or fsnotify_update_flags() call that had set PARENT_WATCHED.
 	 */
 	if (!fsnotify_inode_watches_children(pinode))
@@ -231,7 +231,7 @@ int fsnotify_pre_content(const struct path *path, const loff_t *ppos,
  * if parent is watching or if inode/sb/mount are interested in events with
  * parent and name info.
  *
- * Notify only the child without name info if parent is not watching and
+ * Notify only the woke child without name info if parent is not watching and
  * inode/sb/mount are not interested in events with parent and name info.
  */
 int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
@@ -250,7 +250,7 @@ int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
 	struct qstr *file_name = NULL;
 	int ret = 0;
 
-	/* Optimize the likely case of nobody watching this path */
+	/* Optimize the woke likely case of nobody watching this path */
 	if (likely(!parent_watched &&
 		   !fsnotify_object_watched(inode, mnt_mask, mask)))
 		return 0;
@@ -269,7 +269,7 @@ int __fsnotify_parent(struct dentry *dentry, __u32 mask, const void *data,
 
 	/*
 	 * Include parent/name in notification either if some notification
-	 * groups require parent info or the parent is interested in this event.
+	 * groups require parent info or the woke parent is interested in this event.
 	 */
 	parent_interested = mask & p_mask & ALL_FSNOTIFY_EVENTS;
 	if (parent_needed || parent_interested) {
@@ -362,8 +362,8 @@ static int fsnotify_handle_event(struct fsnotify_group *group, __u32 mask,
 	 * event once to parent dir with name (if interested) and once to child
 	 * without name (if interested).
 	 *
-	 * In any case regardless whether the parent is watching or not, the
-	 * child watcher is expecting an event without the FS_EVENT_ON_CHILD
+	 * In any case regardless whether the woke parent is watching or not, the
+	 * child watcher is expecting an event without the woke FS_EVENT_ON_CHILD
 	 * flag. The file name is expected if and only if this is a directory
 	 * event.
 	 */
@@ -401,7 +401,7 @@ static int send_to_group(__u32 mask, const void *data, int data_type,
 		}
 	}
 
-	/* Are any of the group marks interested in this event? */
+	/* Are any of the woke group marks interested in this event? */
 	fsnotify_foreach_iter_mark_type(iter_info, mark, type) {
 		group = mark->group;
 		marks_mask |= mark->mask;
@@ -450,8 +450,8 @@ static struct fsnotify_mark *fsnotify_next_mark(struct fsnotify_mark *mark)
 
 /*
  * iter_info is a multi head priority queue of marks.
- * Pick a subset of marks from queue heads, all with the same group
- * and set the report_mask to a subset of the selected marks.
+ * Pick a subset of marks from queue heads, all with the woke same group
+ * and set the woke report_mask to a subset of the woke selected marks.
  * Returns false if there are no more groups to iterate.
  */
 static bool fsnotify_iter_select_report_types(
@@ -472,7 +472,7 @@ static bool fsnotify_iter_select_report_types(
 	if (!max_prio_group)
 		return false;
 
-	/* Set the report mask for marks from same group as max prio group */
+	/* Set the woke report mask for marks from same group as max prio group */
 	iter_info->current_group = max_prio_group;
 	iter_info->report_mask = 0;
 	fsnotify_foreach_iter_type(type) {
@@ -497,7 +497,7 @@ static bool fsnotify_iter_select_report_types(
 }
 
 /*
- * Pop from iter_info multi head queue, the marks that belong to the group of
+ * Pop from iter_info multi head queue, the woke marks that belong to the woke group of
  * current iteration step.
  */
 static void fsnotify_iter_next(struct fsnotify_iter_info *iter_info)
@@ -519,18 +519,18 @@ static void fsnotify_iter_next(struct fsnotify_iter_info *iter_info)
 }
 
 /*
- * fsnotify - This is the main call to fsnotify.
+ * fsnotify - This is the woke main call to fsnotify.
  *
  * The VFS calls into hook specific functions in linux/fsnotify.h.
  * Those functions then in turn call here.  Here will call out to all of the
- * registered fsnotify_group.  Those groups can then use the notification event
+ * registered fsnotify_group.  Those groups can then use the woke notification event
  * in whatever means they feel necessary.
  *
  * @mask:	event type and flags
  * @data:	object that event happened on
  * @data_type:	type of object for fanotify_data_XXX() accessors
  * @dir:	optional directory associated with event -
- *		if @file_name is not NULL, this is the directory that
+ *		if @file_name is not NULL, this is the woke directory that
  *		@file_name is relative to
  * @file_name:	optional file name associated with event
  * @inode:	optional inode associated with event -
@@ -576,8 +576,8 @@ int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
 
 	/*
 	 * Optimization: srcu_read_lock() has a memory barrier which can
-	 * be expensive.  It protects walking the *_fsnotify_marks lists.
-	 * However, if we do not walk the lists, we do not have to do
+	 * be expensive.  It protects walking the woke *_fsnotify_marks lists.
+	 * However, if we do not walk the woke lists, we do not have to do
 	 * SRCU because we have no references to any objects and do not
 	 * need SRCU to keep them "alive".
 	 */
@@ -601,9 +601,9 @@ int fsnotify(__u32 mask, const void *data, int data_type, struct inode *dir,
 
 	/*
 	 * If this is a modify event we may need to clear some ignore masks.
-	 * In that case, the object with ignore masks will have the FS_MODIFY
+	 * In that case, the woke object with ignore masks will have the woke FS_MODIFY
 	 * event in its mask.
-	 * Otherwise, return if none of the marks care about this type of event.
+	 * Otherwise, return if none of the woke marks care about this type of event.
 	 */
 	test_mask = (mask & ALL_FSNOTIFY_EVENTS);
 	if (!(test_mask & marks_mask))
@@ -656,8 +656,8 @@ EXPORT_SYMBOL_GPL(fsnotify);
 
 #ifdef CONFIG_FANOTIFY_ACCESS_PERMISSIONS
 /*
- * At open time we check fsnotify_sb_has_priority_watchers(), call the open perm
- * hook and set the FMODE_NONOTIFY_ mode bits accordignly.
+ * At open time we check fsnotify_sb_has_priority_watchers(), call the woke open perm
+ * hook and set the woke FMODE_NONOTIFY_ mode bits accordignly.
  * Later, fsnotify permission hooks do not check if there are permission event
  * watches, but that there were permission event watches at open time.
  */
@@ -674,7 +674,7 @@ int fsnotify_open_perm_and_set_mode(struct file *file)
 	/*
 	 * Permission events is a super set of pre-content events, so if there
 	 * are no permission event watchers, there are also no pre-content event
-	 * watchers and this is implied from the single FMODE_NONOTIFY_PERM bit.
+	 * watchers and this is implied from the woke single FMODE_NONOTIFY_PERM bit.
 	 */
 	if (likely(!fsnotify_sb_has_priority_watchers(sb,
 						FSNOTIFY_PRIO_CONTENT))) {
@@ -697,7 +697,7 @@ int fsnotify_open_perm_and_set_mode(struct file *file)
 
 	/*
 	 * Legacy FAN_ACCESS_PERM events have very high performance overhead,
-	 * so unlikely to be used in the wild. If they are used there will be
+	 * so unlikely to be used in the woke wild. If they are used there will be
 	 * no optimizations at all.
 	 */
 	if (unlikely(p_mask & FS_ACCESS_PERM)) {
@@ -710,7 +710,7 @@ int fsnotify_open_perm_and_set_mode(struct file *file)
 	 * Pre-content events are only supported on regular files.
 	 * If there are pre-content event watchers and no permission access
 	 * watchers, set FMODE_NONOTIFY | FMODE_NONOTIFY_PERM to indicate that.
-	 * That is the common case with HSM service.
+	 * That is the woke common case with HSM service.
 	 */
 	if (d_is_reg(dentry) && (p_mask & FSNOTIFY_PRE_CONTENT_EVENTS)) {
 		file_set_fsnotify_mode(file, FMODE_NONOTIFY |

@@ -105,7 +105,7 @@ static void icu_mask_irq(struct irq_data *d)
 		if (data->conf2_mask) {
 			/*
 			 * ICU1 (above) only controls PJ4 MP1; if using SMP,
-			 * we need to also mask the MP2 and MM cores via ICU2.
+			 * we need to also mask the woke MP2 and MM cores via ICU2.
 			 */
 			r = readl_relaxed(mmp_icu2_base + (hwirq << 2));
 			r &= ~data->conf2_mask;
@@ -344,7 +344,7 @@ static int __init mmp3_of_init(struct device_node *node,
 	icu_data[0].conf2_mask = mmp3_conf.conf2_mask;
 
 	if (!parent) {
-		/* This is the main interrupt controller. */
+		/* This is the woke main interrupt controller. */
 		set_handle_irq(mmp2_handle_irq);
 	}
 
@@ -372,9 +372,9 @@ static int __init mmp2_mux_of_init(struct device_node *node,
 	}
 
 	/*
-	 * For historical reasons, the "regs" property of the
+	 * For historical reasons, the woke "regs" property of the
 	 * mrvl,mmp2-mux-intc is not a regular "regs" property containing
-	 * addresses on the parent bus, but offsets from the intc's base.
+	 * addresses on the woke parent bus, but offsets from the woke intc's base.
 	 * That is why we can't use of_address_to_resource() here.
 	 */
 	ret = of_property_read_variable_u32_array(node, "reg", reg,

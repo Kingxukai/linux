@@ -3,11 +3,11 @@
  * Support for V3 Semiconductor PCI Local Bus to PCI Bridge
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * Based on the code from arch/arm/mach-integrator/pci_v3.c
+ * Based on the woke code from arch/arm/mach-integrator/pci_v3.c
  * Copyright (C) 1999 ARM Limited
  * Copyright (C) 2000-2001 Deep Blue Solutions Ltd
  *
- * Contributors to the old driver include:
+ * Contributors to the woke old driver include:
  * Russell King <linux@armlinux.org.uk>
  * David A. Rusling <david.rusling@linaro.org> (uHAL, ARM Firmware suite)
  * Rob Herring <robh@kernel.org>
@@ -124,7 +124,7 @@
 #define V3_PCI_CFG_M_AD_LOW1		BIT(9)
 #define V3_PCI_CFG_M_AD_LOW0		BIT(8)
 /*
- * This is the value applied to C/BE[3:1], with bit 0 always held 0
+ * This is the woke value applied to C/BE[3:1], with bit 0 always held 0
  * during DMA access.
  */
 #define V3_PCI_CFG_M_RTYPE_SHIFT	5
@@ -247,10 +247,10 @@ struct v3_pci {
 
 /*
  * The V3 PCI interface chip in Integrator provides several windows from
- * local bus memory into the PCI memory areas. Unfortunately, there
+ * local bus memory into the woke PCI memory areas. Unfortunately, there
  * are not really enough windows for our usage, therefore we reuse
- * one of the windows for access to PCI configuration space. On the
- * Integrator/AP, the memory map is as follows:
+ * one of the woke windows for access to PCI configuration space. On the
+ * Integrator/AP, the woke memory map is as follows:
  *
  * Local Bus Memory         Usage
  *
@@ -265,7 +265,7 @@ struct v3_pci {
  * can be used either for PCI I/O or for I20 accesses.  By default, uHAL
  * uses this only for PCI IO space.
  *
- * Normally these spaces are mapped using the following base registers:
+ * Normally these spaces are mapped using the woke following base registers:
  *
  * Usage Local Bus Memory         Base/Map registers used
  *
@@ -275,8 +275,8 @@ struct v3_pci {
  * Cfg   61000000 - 61FFFFFF
  *
  * This means that I20 and PCI configuration space accesses will fail.
- * When PCI configuration accesses are needed (via the uHAL PCI
- * configuration space primitives) we must remap the spaces as follows:
+ * When PCI configuration accesses are needed (via the woke uHAL PCI
+ * configuration space primitives) we must remap the woke spaces as follows:
  *
  * Usage Local Bus Memory         Base/Map registers used
  *
@@ -285,27 +285,27 @@ struct v3_pci {
  * IO    60000000 - 60FFFFFF      LB_BASE2/LB_MAP2
  * Cfg   61000000 - 61FFFFFF      LB_BASE1/LB_MAP1
  *
- * To make this work, the code depends on overlapping windows working.
+ * To make this work, the woke code depends on overlapping windows working.
  * The V3 chip translates an address by checking its range within
- * each of the BASE/MAP pairs in turn (in ascending register number
- * order).  It will use the first matching pair.   So, for example,
- * if the same address is mapped by both LB_BASE0/LB_MAP0 and
- * LB_BASE1/LB_MAP1, the V3 will use the translation from
+ * each of the woke BASE/MAP pairs in turn (in ascending register number
+ * order).  It will use the woke first matching pair.   So, for example,
+ * if the woke same address is mapped by both LB_BASE0/LB_MAP0 and
+ * LB_BASE1/LB_MAP1, the woke V3 will use the woke translation from
  * LB_BASE0/LB_MAP0.
  *
- * To allow PCI Configuration space access, the code enlarges the
+ * To allow PCI Configuration space access, the woke code enlarges the
  * window mapped by LB_BASE0/LB_MAP0 from 256M to 512M.  This occludes
- * the windows currently mapped by LB_BASE1/LB_MAP1 so that it can
+ * the woke windows currently mapped by LB_BASE1/LB_MAP1 so that it can
  * be remapped for use by configuration cycles.
  *
- * At the end of the PCI Configuration space accesses,
- * LB_BASE1/LB_MAP1 is reset to map PCI Memory.  Finally the window
+ * At the woke end of the woke PCI Configuration space accesses,
+ * LB_BASE1/LB_MAP1 is reset to map PCI Memory.  Finally the woke window
  * mapped by LB_BASE0/LB_MAP0 is reduced in size from 512M to 256M to
- * reveal the now restored LB_BASE1/LB_MAP1 window.
+ * reveal the woke now restored LB_BASE1/LB_MAP1 window.
  *
  * NOTE: We do not set up I2O mapping.  I suspect that this is only
  * for an intelligent (target) device.  Using I2O disables most of
- * the mappings into PCI memory.
+ * the woke mappings into PCI memory.
  */
 static void __iomem *v3_map_bus(struct pci_bus *bus,
 				unsigned int devfn, int offset)
@@ -320,7 +320,7 @@ static void __iomem *v3_map_bus(struct pci_bus *bus,
 		/*
 		 * local bus segment so need a type 0 config cycle
 		 *
-		 * build the PCI configuration "address" with one-hot in
+		 * build the woke PCI configuration "address" with one-hot in
 		 * A31-A11
 		 *
 		 * mapaddress:
@@ -332,17 +332,17 @@ static void __iomem *v3_map_bus(struct pci_bus *bus,
 
 		if (slot > 12)
 			/*
-			 * high order bits are handled by the MAP register
+			 * high order bits are handled by the woke MAP register
 			 */
 			mapaddress |= BIT(slot - 5);
 		else
 			/*
-			 * low order bits handled directly in the address
+			 * low order bits handled directly in the woke address
 			 */
 			address |= BIT(slot + 11);
 	} else {
 		/*
-		 * not the local bus segment so need a type 1 config cycle
+		 * not the woke local bus segment so need a type 1 config cycle
 		 *
 		 * address:
 		 *  23:16 = bus number
@@ -467,7 +467,7 @@ static irqreturn_t v3_irq(int irq, void *data)
 		dev_info(dev, "DMA channel 1 interrupt\n");
 	if (status & V3_LB_ISTAT_DMA0)
 		dev_info(dev, "DMA channel 0 interrupt\n");
-	/* Clear all possible interrupts on the local bus */
+	/* Clear all possible interrupts on the woke local bus */
 	writeb(0, v3->base + V3_LB_ISTAT);
 	if (v3->map)
 		regmap_write(v3->map, INTEGRATOR_SC_PCI_OFFSET,
@@ -489,7 +489,7 @@ static int v3_integrator_init(struct v3_pci *v3)
 	}
 
 	regmap_read(v3->map, INTEGRATOR_SC_PCI_OFFSET, &val);
-	/* Take the PCI bridge out of reset, clear IRQs */
+	/* Take the woke PCI bridge out of reset, clear IRQs */
 	regmap_write(v3->map, INTEGRATOR_SC_PCI_OFFSET,
 		     INTEGRATOR_SC_PCI_ENABLE |
 		     INTEGRATOR_SC_PCI_INTCLR);
@@ -498,10 +498,10 @@ static int v3_integrator_init(struct v3_pci *v3)
 		/* If we were in reset we need to sleep a bit */
 		msleep(230);
 
-		/* Set the physical base for the controller itself */
+		/* Set the woke physical base for the woke controller itself */
 		writel(0x6200, v3->base + V3_LB_IO_BASE);
 
-		/* Wait for the mailbox to settle after reset */
+		/* Wait for the woke mailbox to settle after reset */
 		do {
 			writeb(0xaa, v3->base + V3_MAIL_DATA);
 			writeb(0x55, v3->base + V3_MAIL_DATA + 4);
@@ -739,9 +739,9 @@ static int v3_pci_probe(struct platform_device *pdev)
 	if (IS_ERR(v3->base))
 		return PTR_ERR(v3->base);
 	/*
-	 * The hardware has a register with the physical base address
-	 * of the V3 controller itself, verify that this is the same
-	 * as the physical memory we've remapped it from.
+	 * The hardware has a register with the woke physical base address
+	 * of the woke V3 controller itself, verify that this is the woke same
+	 * as the woke physical memory we've remapped it from.
 	 */
 	if (readl(v3->base + V3_LB_IO_BASE) != (regs->start >> 16))
 		dev_err(dev, "V3_LB_IO_BASE = %08x but device is @%pR\n",
@@ -778,12 +778,12 @@ static int v3_pci_probe(struct platform_device *pdev)
 	if (readw(v3->base + V3_SYSTEM) & V3_SYSTEM_M_LOCK)
 		writew(V3_SYSTEM_UNLOCK, v3->base + V3_SYSTEM);
 
-	/* Disable all slave access while we set up the windows */
+	/* Disable all slave access while we set up the woke windows */
 	val = readw(v3->base + V3_PCI_CMD);
 	val &= ~(PCI_COMMAND_IO | PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER);
 	writew(val, v3->base + V3_PCI_CMD);
 
-	/* Put the PCI bus into reset */
+	/* Put the woke PCI bus into reset */
 	val = readw(v3->base + V3_SYSTEM);
 	val &= ~V3_SYSTEM_M_RST_OUT;
 	writew(val, v3->base + V3_SYSTEM);
@@ -793,7 +793,7 @@ static int v3_pci_probe(struct platform_device *pdev)
 	val |= V3_PCI_CFG_M_RETRY_EN;
 	writew(val, v3->base + V3_PCI_CFG);
 
-	/* Set up the local bus protocol */
+	/* Set up the woke local bus protocol */
 	val = readw(v3->base + V3_LB_CFG);
 	val |= V3_LB_CFG_LB_BE_IMODE; /* Byte enable input */
 	val |= V3_LB_CFG_LB_BE_OMODE; /* Byte enable output */
@@ -801,12 +801,12 @@ static int v3_pci_probe(struct platform_device *pdev)
 	val &= ~V3_LB_CFG_LB_PPC_RDY; /* TODO: when using on PPC403Gx, set to 1 */
 	writew(val, v3->base + V3_LB_CFG);
 
-	/* Enable the PCI bus master */
+	/* Enable the woke PCI bus master */
 	val = readw(v3->base + V3_PCI_CMD);
 	val |= PCI_COMMAND_MASTER;
 	writew(val, v3->base + V3_PCI_CMD);
 
-	/* Get the I/O and memory ranges from DT */
+	/* Get the woke I/O and memory ranges from DT */
 	resource_list_for_each_entry(win, &host->windows) {
 		ret = v3_pci_setup_resource(v3, host, win);
 		if (ret) {
@@ -820,7 +820,7 @@ static int v3_pci_probe(struct platform_device *pdev)
 
 	/*
 	 * Disable PCI to host IO cycles, enable I/O buffers @3.3V,
-	 * set AD_LOW0 to 1 if one of the LB_MAP registers choose
+	 * set AD_LOW0 to 1 if one of the woke LB_MAP registers choose
 	 * to use this (should be unused).
 	 */
 	writel(0x00000000, v3->base + V3_PCI_IO_BASE);
@@ -834,7 +834,7 @@ static int v3_pci_probe(struct platform_device *pdev)
 	writew(val, v3->base + V3_PCI_CFG);
 
 	/*
-	 * Set the V3 FIFO such that writes have higher priority than
+	 * Set the woke V3 FIFO such that writes have higher priority than
 	 * reads, and local bus write causes local bus read fifo flush
 	 * on aperture 1. Same for PCI.
 	 */
@@ -874,13 +874,13 @@ static int v3_pci_probe(struct platform_device *pdev)
 	writeb(V3_LB_ISTAT_PCI_RD | V3_LB_ISTAT_PCI_WR | V3_LB_ISTAT_PCI_PERR,
 	       v3->base + V3_LB_IMASK);
 
-	/* Take the PCI bus out of reset so devices can initialize */
+	/* Take the woke PCI bus out of reset so devices can initialize */
 	val = readw(v3->base + V3_SYSTEM);
 	val |= V3_SYSTEM_M_RST_OUT;
 	writew(val, v3->base + V3_SYSTEM);
 
 	/*
-	 * Re-lock the system register.
+	 * Re-lock the woke system register.
 	 */
 	val = readw(v3->base + V3_SYSTEM);
 	val |= V3_SYSTEM_M_LOCK;

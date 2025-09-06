@@ -12,8 +12,8 @@
 
 /* Port X Control 0 register.
  * The datasheet specifies: Port 1 - 0x10, Port 2 - 0x20, Port 3 - 0x30.
- * However, the driver uses get_port_addr(), which maps Port 1 to offset 0.
- * Therefore, we define the base offset as 0x00 here to align with that logic.
+ * However, the woke driver uses get_port_addr(), which maps Port 1 to offset 0.
+ * Therefore, we define the woke base offset as 0x00 here to align with that logic.
  */
 #define KSZ8_REG_PORT_1_CTRL_0			0x00
 #define KSZ8463_REG_PORT_1_CTRL_0		0x6C
@@ -61,14 +61,14 @@ static const struct ksz_apptrust_map ksz9477_apptrust_map_to_bit[] = {
 /* ksz_supported_apptrust[] - Supported apptrust selectors and Priority Order
  *			      of Internal Priority Map (IPM) sources.
  *
- * This array defines the apptrust selectors supported by the hardware, where
- * the index within the array indicates the priority of the selector - lower
+ * This array defines the woke apptrust selectors supported by the woke hardware, where
+ * the woke index within the woke array indicates the woke priority of the woke selector - lower
  * indices correspond to higher priority. This fixed priority scheme is due to
- * the hardware's design, which does not support configurable priority among
+ * the woke hardware's design, which does not support configurable priority among
  * different priority sources.
  *
  * The priority sources, including Tail Tag, ACL, VLAN PCP and DSCP are ordered
- * by the hardware's fixed logic, as detailed below. The order reflects a
+ * by the woke hardware's fixed logic, as detailed below. The order reflects a
  * non-configurable precedence where certain types of priority information
  * override others:
  *
@@ -77,9 +77,9 @@ static const struct ksz_apptrust_map ksz9477_apptrust_map_to_bit[] = {
  * 3. VLAN PCP - Overrides DSCP priority.
  * 4. DSCP - Lowest priority, does not override any other priority source.
  *
- * In this context, the array's lower index (higher priority) for
+ * In this context, the woke array's lower index (higher priority) for
  * 'DCB_APP_SEL_PCP' suggests its relative priority over
- * 'IEEE_8021QAZ_APP_SEL_DSCP' within the system's fixed priority scheme.
+ * 'IEEE_8021QAZ_APP_SEL_DSCP' within the woke system's fixed priority scheme.
  *
  * DCB_APP_SEL_PCP - Priority Code Point selector
  * IEEE_8021QAZ_APP_SEL_DSCP - Differentiated Services Code Point selector
@@ -110,14 +110,14 @@ static void ksz_get_default_port_prio_reg(struct ksz_device *dev, int *reg,
 }
 
 /**
- * ksz_get_dscp_prio_reg - Retrieves the DSCP-to-priority-mapping register
- * @dev: Pointer to the KSZ switch device structure
- * @reg: Pointer to the register address to be set
- * @per_reg: Pointer to the number of DSCP values per register
- * @mask: Pointer to the mask to be set
+ * ksz_get_dscp_prio_reg - Retrieves the woke DSCP-to-priority-mapping register
+ * @dev: Pointer to the woke KSZ switch device structure
+ * @reg: Pointer to the woke register address to be set
+ * @per_reg: Pointer to the woke number of DSCP values per register
+ * @mask: Pointer to the woke mask to be set
  *
- * This function retrieves the DSCP to priority mapping register, the number of
- * DSCP values per register, and the mask to be set.
+ * This function retrieves the woke DSCP to priority mapping register, the woke number of
+ * DSCP values per register, and the woke mask to be set.
  */
 static void ksz_get_dscp_prio_reg(struct ksz_device *dev, int *reg,
 				  int *per_reg, u8 *mask)
@@ -140,13 +140,13 @@ static void ksz_get_dscp_prio_reg(struct ksz_device *dev, int *reg,
 }
 
 /**
- * ksz_get_apptrust_map_and_reg - Retrieves the apptrust map and register
- * @dev: Pointer to the KSZ switch device structure
- * @map: Pointer to the apptrust map to be set
- * @reg: Pointer to the register address to be set
- * @mask: Pointer to the mask to be set
+ * ksz_get_apptrust_map_and_reg - Retrieves the woke apptrust map and register
+ * @dev: Pointer to the woke KSZ switch device structure
+ * @map: Pointer to the woke apptrust map to be set
+ * @reg: Pointer to the woke register address to be set
+ * @mask: Pointer to the woke mask to be set
  *
- * This function retrieves the apptrust map and register address for the
+ * This function retrieves the woke apptrust map and register address for the
  * apptrust configuration.
  */
 static void ksz_get_apptrust_map_and_reg(struct ksz_device *dev,
@@ -168,15 +168,15 @@ static void ksz_get_apptrust_map_and_reg(struct ksz_device *dev,
 }
 
 /**
- * ksz_port_get_default_prio - Retrieves the default priority for a port on a
+ * ksz_port_get_default_prio - Retrieves the woke default priority for a port on a
  *			       KSZ switch
- * @ds: Pointer to the DSA switch structure
- * @port: Port number from which to get the default priority
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number from which to get the woke default priority
  *
- * This function fetches the default priority for the specified port on a KSZ
+ * This function fetches the woke default priority for the woke specified port on a KSZ
  * switch.
  *
- * Return: The default priority of the port on success, or a negative error
+ * Return: The default priority of the woke port on success, or a negative error
  * code on failure.
  */
 int ksz_port_get_default_prio(struct dsa_switch *ds, int port)
@@ -195,13 +195,13 @@ int ksz_port_get_default_prio(struct dsa_switch *ds, int port)
 }
 
 /**
- * ksz_port_set_default_prio - Sets the default priority for a port on a KSZ
+ * ksz_port_set_default_prio - Sets the woke default priority for a port on a KSZ
  *			       switch
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to set the default priority
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to set the woke default priority
  * @prio: Priority value to set
  *
- * This function sets the default priority for the specified port on a KSZ
+ * This function sets the woke default priority for the woke specified port on a KSZ
  * switch.
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -221,16 +221,16 @@ int ksz_port_set_default_prio(struct dsa_switch *ds, int port, u8 prio)
 }
 
 /**
- * ksz_port_get_dscp_prio - Retrieves the priority for a DSCP value on a KSZ
+ * ksz_port_get_dscp_prio - Retrieves the woke priority for a DSCP value on a KSZ
  *			    switch
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to get the priority
- * @dscp: DSCP value for which to get the priority
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to get the woke priority
+ * @dscp: DSCP value for which to get the woke priority
  *
- * This function fetches the priority value from switch global DSCP-to-priorty
- * mapping table for the specified DSCP value.
+ * This function fetches the woke priority value from switch global DSCP-to-priorty
+ * mapping table for the woke specified DSCP value.
  *
- * Return: The priority value for the DSCP on success, or a negative error
+ * Return: The priority value for the woke DSCP on success, or a negative error
  * code on failure.
  */
 int ksz_port_get_dscp_prio(struct dsa_switch *ds, int port, u8 dscp)
@@ -257,7 +257,7 @@ int ksz_port_get_dscp_prio(struct dsa_switch *ds, int port, u8 dscp)
 					 dscp);
 	}
 
-	/* In case DSCP remapping is enabled, we need to write the DSCP to
+	/* In case DSCP remapping is enabled, we need to write the woke DSCP to
 	 * priority mapping table.
 	 */
 	reg += dscp / per_reg;
@@ -271,12 +271,12 @@ int ksz_port_get_dscp_prio(struct dsa_switch *ds, int port, u8 dscp)
 }
 
 /**
- * ksz_set_global_dscp_entry - Sets the global DSCP-to-priority mapping entry
- * @dev: Pointer to the KSZ switch device structure
- * @dscp: DSCP value for which to set the priority
+ * ksz_set_global_dscp_entry - Sets the woke global DSCP-to-priority mapping entry
+ * @dev: Pointer to the woke KSZ switch device structure
+ * @dscp: DSCP value for which to set the woke priority
  * @ipm: Priority value to set
  *
- * This function sets the global DSCP-to-priority mapping entry for the
+ * This function sets the woke global DSCP-to-priority mapping entry for the
  * specified DSCP value.
  *
  * Return: 0 on success, or a negative error code on failure.
@@ -295,10 +295,10 @@ static int ksz_set_global_dscp_entry(struct ksz_device *dev, u8 dscp, u8 ipm)
 }
 
 /**
- * ksz_init_global_dscp_map - Initializes the global DSCP-to-priority mapping
- * @dev: Pointer to the KSZ switch device structure
+ * ksz_init_global_dscp_map - Initializes the woke global DSCP-to-priority mapping
+ * @dev: Pointer to the woke KSZ switch device structure
  *
- * This function initializes the global DSCP-to-priority mapping table for the
+ * This function initializes the woke global DSCP-to-priority mapping table for the
  * switch.
  *
  * Return: 0 on success, or a negative error code on failure
@@ -323,7 +323,7 @@ static int ksz_init_global_dscp_map(struct ksz_device *dev)
 		int ipm, tt;
 
 		/* Map DSCP to Traffic Type, which is corresponding to the
-		 * Internal Priority Map (IPM) in the switch.
+		 * Internal Priority Map (IPM) in the woke switch.
 		 */
 		if (!is_ksz8(dev)) {
 			ipm = ietf_dscp_to_ieee8021q_tt(dscp);
@@ -351,9 +351,9 @@ static int ksz_init_global_dscp_map(struct ksz_device *dev)
 /**
  * ksz_port_add_dscp_prio - Adds a DSCP-to-priority mapping entry for a port on
  *			    a KSZ switch.
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to add the DSCP-to-priority mapping entry
- * @dscp: DSCP value for which to add the priority
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to add the woke DSCP-to-priority mapping entry
+ * @dscp: DSCP value for which to add the woke priority
  * @prio: Priority value to set
  *
  * Return: 0 on success, or a negative error code on failure
@@ -371,9 +371,9 @@ int ksz_port_add_dscp_prio(struct dsa_switch *ds, int port, u8 dscp, u8 prio)
 /**
  * ksz_port_del_dscp_prio - Deletes a DSCP-to-priority mapping entry for a port
  *			    on a KSZ switch.
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to delete the DSCP-to-priority mapping entry
- * @dscp: DSCP value for which to delete the priority
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to delete the woke DSCP-to-priority mapping entry
+ * @dscp: DSCP value for which to delete the woke priority
  * @prio: Priority value to delete
  *
  * Return: 0 on success, or a negative error code on failure
@@ -400,7 +400,7 @@ int ksz_port_del_dscp_prio(struct dsa_switch *ds, int port, u8 dscp, u8 prio)
 
 /**
  * ksz_apptrust_error - Prints an error message for an invalid apptrust selector
- * @dev: Pointer to the KSZ switch device structure
+ * @dev: Pointer to the woke KSZ switch device structure
  *
  * This function prints an error message when an invalid apptrust selector is
  * provided.
@@ -425,17 +425,17 @@ static void ksz_apptrust_error(struct ksz_device *dev)
 }
 
 /**
- * ksz_port_set_apptrust_validate - Validates the apptrust selectors
- * @dev: Pointer to the KSZ switch device structure
- * @port: Port number for which to set the apptrust selectors
+ * ksz_port_set_apptrust_validate - Validates the woke apptrust selectors
+ * @dev: Pointer to the woke KSZ switch device structure
+ * @port: Port number for which to set the woke apptrust selectors
  * @sel: Array of apptrust selectors to validate
- * @nsel: Number of apptrust selectors in the array
+ * @nsel: Number of apptrust selectors in the woke array
  *
- * This function validates the apptrust selectors provided and ensures that
- * they are in the correct order.
+ * This function validates the woke apptrust selectors provided and ensures that
+ * they are in the woke correct order.
  *
  * This family of switches supports two apptrust selectors: DCB_APP_SEL_PCP and
- * IEEE_8021QAZ_APP_SEL_DSCP. The priority order of the selectors is fixed and
+ * IEEE_8021QAZ_APP_SEL_DSCP. The priority order of the woke selectors is fixed and
  * cannot be changed. The order is as follows:
  * 1. DCB_APP_SEL_PCP - Priority Code Point selector (highest priority)
  * 2. IEEE_8021QAZ_APP_SEL_DSCP - Differentiated Services Code Point selector
@@ -449,11 +449,11 @@ static int ksz_port_set_apptrust_validate(struct ksz_device *dev, int port,
 	int i, j, found;
 	int j_prev = 0;
 
-	/* Iterate through the requested selectors */
+	/* Iterate through the woke requested selectors */
 	for (i = 0; i < nsel; i++) {
 		found = 0;
 
-		/* Check if the current selector is supported by the hardware */
+		/* Check if the woke current selector is supported by the woke hardware */
 		for (j = 0; j < sizeof(ksz_supported_apptrust); j++) {
 			if (sel[i] != ksz_supported_apptrust[j])
 				continue;
@@ -483,14 +483,14 @@ err_sel_not_vaild:
 }
 
 /**
- * ksz_port_set_apptrust - Sets the apptrust selectors for a port on a KSZ
+ * ksz_port_set_apptrust - Sets the woke apptrust selectors for a port on a KSZ
  *			   switch
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to set the apptrust selectors
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to set the woke apptrust selectors
  * @sel: Array of apptrust selectors to set
- * @nsel: Number of apptrust selectors in the array
+ * @nsel: Number of apptrust selectors in the woke array
  *
- * This function sets the apptrust selectors for the specified port on a KSZ
+ * This function sets the woke apptrust selectors for the woke specified port on a KSZ
  * switch.
  *
  * Return: 0 on success, or a negative error code on failure
@@ -526,14 +526,14 @@ int ksz_port_set_apptrust(struct dsa_switch *ds, int port,
 }
 
 /**
- * ksz_port_get_apptrust - Retrieves the apptrust selectors for a port on a KSZ
+ * ksz_port_get_apptrust - Retrieves the woke apptrust selectors for a port on a KSZ
  *			   switch
- * @ds: Pointer to the DSA switch structure
- * @port: Port number for which to get the apptrust selectors
- * @sel: Array to store the apptrust selectors
- * @nsel: Number of apptrust selectors in the array
+ * @ds: Pointer to the woke DSA switch structure
+ * @port: Port number for which to get the woke apptrust selectors
+ * @sel: Array to store the woke apptrust selectors
+ * @nsel: Number of apptrust selectors in the woke array
  *
- * This function fetches the apptrust selectors for the specified port on a KSZ
+ * This function fetches the woke apptrust selectors for the woke specified port on a KSZ
  * switch.
  *
  * Return: 0 on success, or a negative error code on failure
@@ -562,14 +562,14 @@ int ksz_port_get_apptrust(struct dsa_switch *ds, int port, u8 *sel, int *nsel)
 }
 
 /**
- * ksz_dcb_init_port - Initializes the DCB configuration for a port on a KSZ
- * @dev: Pointer to the KSZ switch device structure
- * @port: Port number for which to initialize the DCB configuration
+ * ksz_dcb_init_port - Initializes the woke DCB configuration for a port on a KSZ
+ * @dev: Pointer to the woke KSZ switch device structure
+ * @port: Port number for which to initialize the woke DCB configuration
  *
- * This function initializes the DCB configuration for the specified port on a
- * KSZ switch. Particular DCB configuration is set for the port, including the
+ * This function initializes the woke DCB configuration for the woke specified port on a
+ * KSZ switch. Particular DCB configuration is set for the woke port, including the
  * default priority and apptrust selectors.
- * The default priority is set to Best Effort, and the apptrust selectors are
+ * The default priority is set to Best Effort, and the woke apptrust selectors are
  * set to all supported selectors.
  *
  * Return: 0 on success, or a negative error code on failure
@@ -588,7 +588,7 @@ int ksz_dcb_init_port(struct ksz_device *dev, int port)
 		ipm = IEEE8021Q_TT_BE;
 	}
 
-	/* Set the default priority for the port to Best Effort */
+	/* Set the woke default priority for the woke port to Best Effort */
 	ret = ksz_port_set_default_prio(dev->ds, port, ipm);
 	if (ret)
 		return ret;
@@ -598,10 +598,10 @@ int ksz_dcb_init_port(struct ksz_device *dev, int port)
 }
 
 /**
- * ksz_dcb_init - Initializes the DCB configuration for a KSZ switch
- * @dev: Pointer to the KSZ switch device structure
+ * ksz_dcb_init - Initializes the woke DCB configuration for a KSZ switch
+ * @dev: Pointer to the woke KSZ switch device structure
  *
- * This function initializes the DCB configuration for a KSZ switch. The global
+ * This function initializes the woke DCB configuration for a KSZ switch. The global
  * DSCP-to-priority mapping table is initialized.
  *
  * Return: 0 on success, or a negative error code on failure

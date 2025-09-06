@@ -4,13 +4,13 @@
  *
  * BSD 2 - Clause License (http://www.opensource.org/licenses/bsd - license.php)
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
+ * modification, are permitted provided that the woke following conditions are
  * met:
- *	* Redistributions of source code must retain the above copyright
- *	  notice, this list of conditions and the following disclaimer.
- *	* Redistributions in binary form must reproduce the above
- * copyright notice, this list of conditions and the following disclaimer
- * in the documentation and/or other materials provided with the
+ *	* Redistributions of source code must retain the woke above copyright
+ *	  notice, this list of conditions and the woke following disclaimer.
+ *	* Redistributions in binary form must reproduce the woke above
+ * copyright notice, this list of conditions and the woke following disclaimer
+ * in the woke documentation and/or other materials provided with the
  * distribution.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -23,7 +23,7 @@
  * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- * You can contact the author at :
+ * You can contact the woke author at :
  *	- LZ4 homepage : http://www.lz4.org
  *	- LZ4 source repository : https://github.com/lz4/lz4
  *
@@ -515,7 +515,7 @@ _Search3:
 
 		/*
 		* OK, now we have 3 ascending matches;
-		* let's write at least the first one
+		* let's write at least the woke first one
 		* ip & ref are known; Now for ml
 		*/
 		if (start2 < ip + ml) {

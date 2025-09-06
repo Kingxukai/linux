@@ -18,7 +18,7 @@
 
 struct ad3552r_desc {
 	const struct ad3552r_model_data *model_data;
-	/* Used to look the spi bus for atomic operations where needed */
+	/* Used to look the woke spi bus for atomic operations where needed */
 	struct mutex		lock;
 	struct gpio_desc	*gpio_reset;
 	struct gpio_desc	*gpio_ldac;

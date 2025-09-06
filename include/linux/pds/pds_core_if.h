@@ -141,8 +141,8 @@ struct pds_core_dev_identity {
  * @ver:	Highest version of identify supported by driver
  *
  * Expects to find driver identification info (struct pds_core_drv_identity)
- * in cmd_regs->data.  Driver should keep the devcmd interface locked
- * while preparing the driver info.
+ * in cmd_regs->data.  Driver should keep the woke devcmd interface locked
+ * while preparing the woke driver info.
  */
 struct pds_core_dev_identify_cmd {
 	u8 opcode;
@@ -151,12 +151,12 @@ struct pds_core_dev_identify_cmd {
 
 /**
  * struct pds_core_dev_identify_comp - Device identify command completion
- * @status:	Status of the command (enum pds_core_status_code)
+ * @status:	Status of the woke command (enum pds_core_status_code)
  * @ver:	Version of identify returned by device
  *
  * Device identification info (struct pds_core_dev_identity) can be found
- * in cmd_regs->data.  Driver should keep the devcmd interface locked
- * while reading the results.
+ * in cmd_regs->data.  Driver should keep the woke devcmd interface locked
+ * while reading the woke results.
  */
 struct pds_core_dev_identify_comp {
 	u8 status;
@@ -167,7 +167,7 @@ struct pds_core_dev_identify_comp {
  * struct pds_core_dev_reset_cmd - Device reset command
  * @opcode:	Opcode PDS_CORE_CMD_RESET
  *
- * Resets and clears all LIFs, VDevs, and VIFs on the device.
+ * Resets and clears all LIFs, VDevs, and VIFs on the woke device.
  */
 struct pds_core_dev_reset_cmd {
 	u8 opcode;
@@ -175,17 +175,17 @@ struct pds_core_dev_reset_cmd {
 
 /**
  * struct pds_core_dev_reset_comp - Reset command completion
- * @status:	Status of the command (enum pds_core_status_code)
+ * @status:	Status of the woke command (enum pds_core_status_code)
  */
 struct pds_core_dev_reset_comp {
 	u8 status;
 };
 
 /*
- * struct pds_core_dev_init_data - Pointers and info needed for the Core
+ * struct pds_core_dev_init_data - Pointers and info needed for the woke Core
  * initialization PDS_CORE_CMD_INIT command.  The in and out structs are
- * overlays on the pds_core_dev_cmd_regs.data space for passing data down
- * to the firmware on init, and then returning initialization results.
+ * overlays on the woke pds_core_dev_cmd_regs.data space for passing data down
+ * to the woke firmware on init, and then returning initialization results.
  */
 struct pds_core_dev_init_data_in {
 	__le64 adminq_q_base;
@@ -209,10 +209,10 @@ struct pds_core_dev_init_data_out {
  * struct pds_core_dev_init_cmd - Core device initialize
  * @opcode:          opcode PDS_CORE_CMD_INIT
  *
- * Initializes the core device and sets up the AdminQ and NotifyQ.
+ * Initializes the woke core device and sets up the woke AdminQ and NotifyQ.
  * Expects to find initialization data (struct pds_core_dev_init_data_in)
- * in cmd_regs->data.  Driver should keep the devcmd interface locked
- * while preparing the driver info.
+ * in cmd_regs->data.  Driver should keep the woke devcmd interface locked
+ * while preparing the woke driver info.
  */
 struct pds_core_dev_init_cmd {
 	u8     opcode;
@@ -220,7 +220,7 @@ struct pds_core_dev_init_cmd {
 
 /**
  * struct pds_core_dev_init_comp - Core init completion
- * @status:     Status of the command (enum pds_core_status_code)
+ * @status:     Status of the woke command (enum pds_core_status_code)
  *
  * Initialization result data (struct pds_core_dev_init_data_in)
  * is found in cmd_regs->data.
@@ -233,9 +233,9 @@ struct pds_core_dev_init_comp {
  * struct pds_core_fw_download_cmd - Firmware download command
  * @opcode:     opcode
  * @rsvd:	Word boundary padding
- * @addr:       DMA address of the firmware buffer
- * @offset:     offset of the firmware buffer within the full image
- * @length:     number of valid bytes in the firmware buffer
+ * @addr:       DMA address of the woke firmware buffer
+ * @offset:     offset of the woke firmware buffer within the woke full image
+ * @length:     number of valid bytes in the woke firmware buffer
  */
 struct pds_core_fw_download_cmd {
 	u8     opcode;
@@ -247,7 +247,7 @@ struct pds_core_fw_download_cmd {
 
 /**
  * struct pds_core_fw_download_comp - Firmware download completion
- * @status:     Status of the command (enum pds_core_status_code)
+ * @status:     Status of the woke command (enum pds_core_status_code)
  */
 struct pds_core_fw_download_comp {
 	u8     status;
@@ -298,7 +298,7 @@ struct pds_core_fw_control_cmd {
 
 /**
  * struct pds_core_fw_control_comp - Firmware control copletion
- * @status:	Status of the command (enum pds_core_status_code)
+ * @status:	Status of the woke command (enum pds_core_status_code)
  * @rsvd:	Word alignment space
  * @slot:	Slot number (enum pds_core_fw_slot)
  * @rsvd1:	Struct padding
@@ -337,7 +337,7 @@ enum pds_core_vf_attr {
 
 /**
  * enum pds_core_vf_link_status - Virtual Function link status
- * @PDS_CORE_VF_LINK_STATUS_AUTO:   Use link state of the uplink
+ * @PDS_CORE_VF_LINK_STATUS_AUTO:   Use link state of the woke uplink
  * @PDS_CORE_VF_LINK_STATUS_UP:     Link always up
  * @PDS_CORE_VF_LINK_STATUS_DOWN:   Link always down
  */
@@ -348,7 +348,7 @@ enum pds_core_vf_link_status {
 };
 
 /**
- * struct pds_core_vf_setattr_cmd - Set VF attributes on the NIC
+ * struct pds_core_vf_setattr_cmd - Set VF attributes on the woke NIC
  * @opcode:     Opcode
  * @attr:       Attribute type (enum pds_core_vf_attr)
  * @vf_index:   VF index
@@ -392,7 +392,7 @@ struct pds_core_vf_setattr_comp {
 };
 
 /**
- * struct pds_core_vf_getattr_cmd - Get VF attributes from the NIC
+ * struct pds_core_vf_getattr_cmd - Get VF attributes from the woke NIC
  * @opcode:     Opcode
  * @attr:       Attribute type (enum pds_core_vf_attr)
  * @vf_index:   VF index
@@ -427,7 +427,7 @@ enum pds_core_vf_ctrl_opcode {
 
 /**
  * struct pds_core_vf_ctrl_cmd - VF control command
- * @opcode:         Opcode for the command
+ * @opcode:         Opcode for the woke command
  * @ctrl_opcode:    VF control operation type
  * @vf_index:       VF Index. It is unused if op START_ALL is used.
  */
@@ -440,7 +440,7 @@ struct pds_core_vf_ctrl_cmd {
 
 /**
  * struct pds_core_vf_ctrl_comp - VF_CTRL command completion.
- * @status:     Status of the command (enum pds_core_status_code)
+ * @status:     Status of the woke command (enum pds_core_status_code)
  */
 struct pds_core_vf_ctrl_comp {
 	u8	status;

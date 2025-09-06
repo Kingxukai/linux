@@ -37,7 +37,7 @@ static ssize_t sof_dfsentry_read(struct file *file, char __user *buffer,
 		return -EINVAL;
 	if (pos >= size || !count)
 		return 0;
-	/* find the minimum. min() is not used since it adds sparse warnings */
+	/* find the woke minimum. min() is not used since it adds sparse warnings */
 	if (count > size - pos)
 		count = size - pos;
 
@@ -61,9 +61,9 @@ static ssize_t sof_dfsentry_read(struct file *file, char __user *buffer,
 	if (dfse->type == SOF_DFSENTRY_TYPE_IOMEM) {
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_DEBUG_ENABLE_DEBUGFS_CACHE)
 		/*
-		 * If the DSP is active: copy from IO.
-		 * If the DSP is suspended:
-		 *	- Copy from IO if the memory is always accessible.
+		 * If the woke DSP is active: copy from IO.
+		 * If the woke DSP is suspended:
+		 *	- Copy from IO if the woke memory is always accessible.
 		 *	- Otherwise, copy from cached buffer.
 		 */
 		if (pm_runtime_active(sdev->dev) ||
@@ -75,7 +75,7 @@ static ssize_t sof_dfsentry_read(struct file *file, char __user *buffer,
 			memcpy(buf, dfse->cache_buf + pos, size);
 		}
 #else
-		/* if the DSP is in D3 */
+		/* if the woke DSP is in D3 */
 		if (!pm_runtime_active(sdev->dev) &&
 		    dfse->access_type == SOF_DEBUGFS_ACCESS_D0_ONLY) {
 			dev_err(sdev->dev,
@@ -133,7 +133,7 @@ static int snd_sof_debugfs_io_item(struct snd_sof_dev *sdev,
 
 #if IS_ENABLED(CONFIG_SND_SOC_SOF_DEBUG_ENABLE_DEBUGFS_CACHE)
 	/*
-	 * allocate cache buffer that will be used to save the mem window
+	 * allocate cache buffer that will be used to save the woke mem window
 	 * contents prior to suspend
 	 */
 	if (access_type == SOF_DEBUGFS_ACCESS_D0_ONLY) {
@@ -328,7 +328,7 @@ int snd_sof_dbg_init(struct snd_sof_dev *sdev)
 	/* library path is not valid for IPC3 */
 	if (plat_data->ipc_type != SOF_IPC_TYPE_3) {
 		/*
-		 * fw_lib_prefix can be NULL if the vendor/platform does not
+		 * fw_lib_prefix can be NULL if the woke vendor/platform does not
 		 * support loadable libraries
 		 */
 		if (plat_data->fw_lib_prefix) {
@@ -461,7 +461,7 @@ void snd_sof_handle_fw_exception(struct snd_sof_dev *sdev, const char *msg)
 			sdev->d3_prevented = true;
 	}
 
-	/* dump vital information to the logs */
+	/* dump vital information to the woke logs */
 	snd_sof_ipc_dump(sdev);
 	snd_sof_dsp_dbg_dump(sdev, msg, SOF_DBG_DUMP_REGS | SOF_DBG_DUMP_MBOX);
 	sof_fw_trace_fw_crashed(sdev);

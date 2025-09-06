@@ -2,12 +2,12 @@
 BPF Documentation
 =================
 
-This directory contains documentation for the BPF (Berkeley Packet
-Filter) facility, with a focus on the extended BPF version (eBPF).
+This directory contains documentation for the woke BPF (Berkeley Packet
+Filter) facility, with a focus on the woke extended BPF version (eBPF).
 
 This kernel side documentation is still work in progress.
 The Cilium project also maintains a `BPF and XDP Reference Guide`_
-that goes into great technical depth about the BPF Architecture.
+that goes into great technical depth about the woke BPF Architecture.
 
 .. toctree::
    :maxdepth: 1

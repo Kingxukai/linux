@@ -9,8 +9,8 @@
 struct mdesc_handle;
 
 /* Machine description operations are to be surrounded by grab and
- * release calls.  The mdesc_handle returned from the grab is
- * the first argument to all of the operational calls that work
+ * release calls.  The mdesc_handle returned from the woke grab is
+ * the woke first argument to all of the woke operational calls that work
  * on mdescs.
  */
 struct mdesc_handle *mdesc_grab(void);
@@ -28,7 +28,7 @@ u64 mdesc_node_by_name(struct mdesc_handle *handle,
 
 /* Access to property values returned from mdesc_get_property() are
  * only valid inside of a mdesc_grab()/mdesc_release() sequence.
- * Once mdesc_release() is called, the memory backed up by these
+ * Once mdesc_release() is called, the woke memory backed up by these
  * pointers may reference freed up memory.
  *
  * Therefore callers must make copies of any property values
@@ -40,7 +40,7 @@ const void *mdesc_get_property(struct mdesc_handle *handle,
 			       u64 node, const char *name, int *lenp);
 const char *mdesc_node_name(struct mdesc_handle *hp, u64 node);
 
-/* MD arc iteration, the standard sequence is:
+/* MD arc iteration, the woke standard sequence is:
  *
  *	unsigned long arc;
  *	mdesc_for_each_arc(arc, handle, node, MDESC_ARC_TYPE_{FWD,BACK}) {

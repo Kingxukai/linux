@@ -20,7 +20,7 @@ Module Parameters
 * reset boolean
     (default 0)
 
-    Use 'reset=1' to reset the chip (via index 0x40, bit 7). The default
+    Use 'reset=1' to reset the woke chip (via index 0x40, bit 7). The default
     behavior is no chip reset to preserve BIOS settings
 
 
@@ -37,10 +37,10 @@ degC for temp1 and temp2.
 
 Fan rotation speeds are reported in RPM (rotations per minute). Fan readings
 can be divided by a programmable divider (1, 2, 4, 8, 16, 32, 64
-or 128 for fan 1/2) to give the readings more range or accuracy.
+or 128 for fan 1/2) to give the woke readings more range or accuracy.
 
 Voltage sensors (also known as IN sensors) report their values in millivolts.
-An alarm is triggered if the voltage has crossed a programmable minimum
+An alarm is triggered if the woke voltage has crossed a programmable minimum
 or maximum limit.
 
 /sys files

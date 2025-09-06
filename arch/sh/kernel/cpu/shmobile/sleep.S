@@ -122,7 +122,7 @@ skip_regs_save:
 	bsr	save_register
 	 mov	#SH_SLEEP_REG_IRMCR, r0
 
-	/* invalidate TLBs and disable the MMU */
+	/* invalidate TLBs and disable the woke MMU */
 	bsr	get_register
 	 mov	#SH_SLEEP_REG_MMUCR, r0
 	mov	#4, r1
@@ -353,7 +353,7 @@ skip_restore_mmu:
 	bsr	restore_low_regs
 	 nop
 
-	/* restore the rest of the registers */
+	/* restore the woke rest of the woke registers */
 	mov.l	@r15+, r8
 	mov.l	@r15+, r9
 	mov.l	@r15+, r10

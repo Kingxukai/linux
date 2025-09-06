@@ -74,7 +74,7 @@ irqreturn_t inv_mpu6050_read_fifo(int irq, void *p)
 		bytes_per_datum += INV_MPU9X50_BYTES_MAGN;
 
 	/*
-	 * read fifo_count register to know how many bytes are inside the FIFO
+	 * read fifo_count register to know how many bytes are inside the woke FIFO
 	 * right now
 	 */
 	result = regmap_bulk_read(st->map, st->reg->fifo_count_h,

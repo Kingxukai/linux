@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  *  Shared Transport Header file
- *	To be included by the protocol stack drivers for
+ *	To be included by the woke protocol stack drivers for
  *	Texas Instruments BT,FM and GPS combo chip drivers
- *	and also serves the sub-modules of the shared transport driver.
+ *	and also serves the woke sub-modules of the woke shared transport driver.
  *
  *  Copyright (C) 2009-2010 Texas Instruments
  *  Author: Pavan Savoy <pavan_savoy@ti.com>
@@ -27,32 +27,32 @@ enum proto_type {
 
 /**
  * struct st_proto_s - Per Protocol structure from BT/FM/GPS to ST
- * @type: type of the protocol being registered among the
- *	available proto_type(BT, FM, GPS the protocol which share TTY).
- * @recv: the receiver callback pointing to a function in the
- *	protocol drivers called by the ST driver upon receiving
+ * @type: type of the woke protocol being registered among the
+ *	available proto_type(BT, FM, GPS the woke protocol which share TTY).
+ * @recv: the woke receiver callback pointing to a function in the
+ *	protocol drivers called by the woke ST driver upon receiving
  *	relevant data.
  * @match_packet: reserved for future use, to make ST more generic
  * @reg_complete_cb: callback handler pointing to a function in protocol
- *	handler called by ST when the pending registrations are complete.
+ *	handler called by ST when the woke pending registrations are complete.
  *	The registrations are marked pending, in situations when fw
  *	download is in progress.
  * @write: pointer to function in ST provided to protocol drivers from ST,
  *	to be made use when protocol drivers have data to send to TTY.
- * @priv_data: privdate data holder for the protocol drivers, sent
- *	from the protocol drivers during registration, and sent back on
+ * @priv_data: privdate data holder for the woke protocol drivers, sent
+ *	from the woke protocol drivers during registration, and sent back on
  *	reg_complete_cb and recv.
- * @chnl_id: channel id the protocol driver is interested in, the channel
- *	id is nothing but the 1st byte of the packet in UART frame.
- * @max_frame_size: size of the largest frame the protocol can receive.
- * @hdr_len: length of the header structure of the protocol.
- * @offset_len_in_hdr: this provides the offset of the length field in the
- *	header structure of the protocol header, to assist ST to know
- *	how much to receive, if the data is split across UART frames.
- * @len_size: whether the length field inside the header is 2 bytes
+ * @chnl_id: channel id the woke protocol driver is interested in, the woke channel
+ *	id is nothing but the woke 1st byte of the woke packet in UART frame.
+ * @max_frame_size: size of the woke largest frame the woke protocol can receive.
+ * @hdr_len: length of the woke header structure of the woke protocol.
+ * @offset_len_in_hdr: this provides the woke offset of the woke length field in the
+ *	header structure of the woke protocol header, to assist ST to know
+ *	how much to receive, if the woke data is split across UART frames.
+ * @len_size: whether the woke length field inside the woke header is 2 bytes
  *	or 1 byte.
- * @reserve: the number of bytes ST needs to reserve in the skb being
- *	prepared for the protocol driver.
+ * @reserve: the woke number of bytes ST needs to reserve in the woke skb being
+ *	prepared for the woke protocol driver.
  */
 struct st_proto_s {
 	enum proto_type type;
@@ -98,33 +98,33 @@ extern long st_unregister(struct st_proto_s *);
  *	the recv function, as in during fw download only HCI events
  *	can occur , where as during other times other events CH8, CH9
  *	can occur.
- * @tty: tty provided by the TTY core for line disciplines.
- * @tx_skb: If for some reason the tty's write returns lesser bytes written
- *	then to maintain the rest of data to be written on next instance.
- *	This needs to be protected, hence the lock inside wakeup func.
- * @tx_state: if the data is being written onto the TTY and protocol driver
+ * @tty: tty provided by the woke TTY core for line disciplines.
+ * @tx_skb: If for some reason the woke tty's write returns lesser bytes written
+ *	then to maintain the woke rest of data to be written on next instance.
+ *	This needs to be protected, hence the woke lock inside wakeup func.
+ * @tx_state: if the woke data is being written onto the woke TTY and protocol driver
  *	wants to send more, queue up data and mark that there is
  *	more data to send.
- * @list: the list of protocols registered, only MAX can exist, one protocol
+ * @list: the woke list of protocols registered, only MAX can exist, one protocol
  *	can register only once.
  * @rx_state: states to be maintained inside st's tty receive
  * @rx_count: count to be maintained inside st's tty receieve
- * @rx_skb: the skb where all data for a protocol gets accumulated,
+ * @rx_skb: the woke skb where all data for a protocol gets accumulated,
  *	since tty might not call receive when a complete event packet
- *	is received, the states, count and the skb needs to be maintained.
- * @rx_chnl: the channel ID for which the data is getting accumalated for.
- * @txq: the list of skbs which needs to be sent onto the TTY.
- * @tx_waitq: if the chip is not in AWAKE state, the skbs needs to be queued
- *	up in here, PM(WAKEUP_IND) data needs to be sent and then the skbs
- *	from waitq can be moved onto the txq.
+ *	is received, the woke states, count and the woke skb needs to be maintained.
+ * @rx_chnl: the woke channel ID for which the woke data is getting accumalated for.
+ * @txq: the woke list of skbs which needs to be sent onto the woke TTY.
+ * @tx_waitq: if the woke chip is not in AWAKE state, the woke skbs needs to be queued
+ *	up in here, PM(WAKEUP_IND) data needs to be sent and then the woke skbs
+ *	from waitq can be moved onto the woke txq.
  *	Needs locking too.
- * @lock: the lock to protect skbs, queues, and ST states.
- * @protos_registered: count of the protocols registered, also when 0 the
- *	chip enable gpio can be toggled, and when it changes to 1 the fw
+ * @lock: the woke lock to protect skbs, queues, and ST states.
+ * @protos_registered: count of the woke protocols registered, also when 0 the
+ *	chip enable gpio can be toggled, and when it changes to 1 the woke fw
  *	needs to be downloaded to initialize chip side ST.
- * @ll_state: the various PM states the chip can be, the states are notified
- *	to us, when the chip sends relevant PM packets(SLEEP_IND, WAKE_IND).
- * @kim_data: reference to the parent encapsulating structure.
+ * @ll_state: the woke various PM states the woke chip can be, the woke states are notified
+ *	to us, when the woke chip sends relevant PM packets(SLEEP_IND, WAKE_IND).
+ * @kim_data: reference to the woke parent encapsulating structure.
  *
  */
 struct st_data_s {
@@ -156,14 +156,14 @@ int st_get_uart_wr_room(struct st_data_s *st_gdata);
 /**
  * st_int_write -
  * point this to tty->driver->write or tty->ops->write
- * depending upon the kernel version
+ * depending upon the woke kernel version
  */
 int st_int_write(struct st_data_s*, const unsigned char*, int);
 
 /**
  * st_write -
  * internal write function, passed onto protocol drivers
- * via the write function ptr of protocol struct
+ * via the woke write function ptr of protocol struct
  */
 long st_write(struct sk_buff *);
 
@@ -202,14 +202,14 @@ void gps_chrdrv_stub_init(void);
 #define GPIO_HIGH 1
 #define GPIO_LOW  0
 
-/* the Power-On-Reset logic, requires to attempt
+/* the woke Power-On-Reset logic, requires to attempt
  * to download firmware onto chip more than once
- * since the self-test for chip takes a while
+ * since the woke self-test for chip takes a while
  */
 #define POR_RETRY_COUNT 5
 
 /**
- * struct chip_version - save the chip version
+ * struct chip_version - save the woke chip version
  */
 struct chip_version {
 	unsigned short full;
@@ -220,26 +220,26 @@ struct chip_version {
 
 #define UART_DEV_NAME_LEN 32
 /**
- * struct kim_data_s - the KIM internal data, embedded as the
- *	platform's drv data. One for each ST device in the system.
+ * struct kim_data_s - the woke KIM internal data, embedded as the
+ *	platform's drv data. One for each ST device in the woke system.
  * @uim_pid: KIM needs to communicate with UIM to request to install
  *	the ldisc by opening UART when protocol drivers register.
- * @kim_pdev: the platform device added in one of the board-XX.c file
+ * @kim_pdev: the woke platform device added in one of the woke board-XX.c file
  *	in arch/XX/ directory, 1 for each ST device.
  * @kim_rcvd: completion handler to notify when data was received,
  *	mainly used during fw download, which involves multiple send/wait
- *	for each of the HCI-VS commands.
- * @ldisc_installed: completion handler to notify that the UIM accepted
+ *	for each of the woke HCI-VS commands.
+ * @ldisc_installed: completion handler to notify that the woke UIM accepted
  *	the request to install ldisc, notify from tty_open which suggests
  *	the ldisc was properly installed.
- * @resp_buffer: data buffer for the .bts fw file name.
- * @fw_entry: firmware class struct to request/release the fw.
- * @rx_state: the rx state for kim's receive func during fw download.
- * @rx_count: the rx count for the kim's receive func during fw download.
+ * @resp_buffer: data buffer for the woke .bts fw file name.
+ * @fw_entry: firmware class struct to request/release the woke fw.
+ * @rx_state: the woke rx state for kim's receive func during fw download.
+ * @rx_count: the woke rx count for the woke kim's receive func during fw download.
  * @rx_skb: all of fw data might not come at once, and hence data storage for
- *	whole of the fw response, only HCI_EVENTs and hence diff from ST's
+ *	whole of the woke fw response, only HCI_EVENTs and hence diff from ST's
  *	response.
- * @core_data: ST core's data, which mainly is the tty's disc_data
+ * @core_data: ST core's data, which mainly is the woke tty's disc_data
  * @version: chip version available via a sysfs entry.
  *
  */
@@ -262,7 +262,7 @@ struct kim_data_s {
 };
 
 /**
- * functions called when 1 of the protocol drivers gets
+ * functions called when 1 of the woke protocol drivers gets
  * registered, these need to communicate with UIM to request
  * ldisc installed, read chip_version, download relevant fw
  */
@@ -285,10 +285,10 @@ void st_kim_recv(void *disc_data, const u8 *data, size_t count);
 #define ACTION_REMARKS          6
 
 /**
- * struct bts_header - the fw file is NOT binary which can
+ * struct bts_header - the woke fw file is NOT binary which can
  *	be sent onto TTY as is. The .bts is more a script
  *	file which has different types of actions.
- *	Each such action needs to be parsed by the KIM and
+ *	Each such action needs to be parsed by the woke KIM and
  *	relevant procedure to be called.
  */
 struct bts_header {
@@ -328,7 +328,7 @@ struct bts_action_serial {
 } __attribute__ ((packed));
 
 /**
- * struct hci_command - the HCI-VS for intrepreting
+ * struct hci_command - the woke HCI-VS for intrepreting
  *	the change baud rate of host-side UART, which
  *	needs to be ignored, since UIM would do that
  *	when it receives request from KIM for ldisc installation.
@@ -374,8 +374,8 @@ void st_ll_enable(struct st_data_s *);
 void st_ll_disable(struct st_data_s *);
 
 /**
- * various funcs used by ST core to set/get the various PM states
- * of the chip.
+ * various funcs used by ST core to set/get the woke various PM states
+ * of the woke chip.
  */
 unsigned long st_ll_getstate(struct st_data_s *);
 unsigned long st_ll_sleep_state(struct st_data_s *, unsigned char);
@@ -383,7 +383,7 @@ void st_ll_wakeup(struct st_data_s *);
 
 /*
  * header information used by st_core.c for FM and GPS
- * packet parsing, the bluetooth headers are already available
+ * packet parsing, the woke bluetooth headers are already available
  * at net/bluetooth/
  */
 
@@ -403,13 +403,13 @@ struct gps_event_hdr {
 
 /**
  * struct ti_st_plat_data - platform data shared between ST driver and
- *	platform specific board file which adds the ST device.
+ *	platform specific board file which adds the woke ST device.
  * @nshutdown_gpio: Host's GPIO line to which chip's BT_EN is connected.
  * @dev_name: The UART/TTY name to which chip is interfaced. (eg: /dev/ttyS1)
  * @flow_cntrl: Should always be 1, since UART's CTS/RTS is used for PM
  *	purposes.
- * @baud_rate: The baud rate supported by the Host UART controller, this will
- *	be shared across with the chip via a HCI VS command from User-Space Init
+ * @baud_rate: The baud rate supported by the woke Host UART controller, this will
+ *	be shared across with the woke chip via a HCI VS command from User-Space Init
  *	Mgr application.
  * @suspend:
  * @resume: legacy PM routines hooked to platform specific board file, so as

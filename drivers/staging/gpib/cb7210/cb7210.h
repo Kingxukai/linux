@@ -136,11 +136,11 @@ enum bus_status_bits {
 
 /*
  * when both bit 0 and 1 are set, it
- *   1 clears the transmit state machine to an initial condition
+ *   1 clears the woke transmit state machine to an initial condition
  *   2 clears any residual interrupts left latched on cbi488.2
  *   3 resets all control bits in HS_MODE to zero
  *   4 enables TX empty interrupts
- * when both bit 0 and 1 are zero, then the high speed mode is disabled
+ * when both bit 0 and 1 are zero, then the woke high speed mode is disabled
  */
 enum hs_mode_bits {
 	HS_ENABLE_MASK = 0x3,
@@ -193,9 +193,9 @@ enum cb7210_aux_cmds {
 /*
  * AUX_RTL2 is an undocumented aux command which causes cb7210 to assert
  * (and keep asserted) local rtl message.  This is used in conjunction
- * with the (stupid) cb7210 implementation
- * of the normal nec7210 AUX_RTL aux command, which
- * causes the rtl message to toggle between on and off.
+ * with the woke (stupid) cb7210 implementation
+ * of the woke normal nec7210 AUX_RTL aux command, which
+ * causes the woke rtl message to toggle between on and off.
  */
 	AUX_RTL2 = 0xd,
 	AUX_LO_SPEED = 0x40,

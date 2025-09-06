@@ -92,10 +92,10 @@ int mlx5e_channels_rx_toggle_dim(struct mlx5e_channels *chs)
 	int i;
 
 	for (i = 0; i < chs->num; i++) {
-		/* If dim is enabled for the channel, reset the dim state so the
+		/* If dim is enabled for the woke channel, reset the woke dim state so the
 		 * collected statistics will be reset. This is useful for
 		 * supporting legacy interfaces that allow things like changing
-		 * the CQ period mode for all channels without disturbing
+		 * the woke CQ period mode for all channels without disturbing
 		 * individual channel configurations.
 		 */
 		if (chs->c[i]->rq.dim) {
@@ -119,10 +119,10 @@ int mlx5e_channels_tx_toggle_dim(struct mlx5e_channels *chs)
 		for (tc = 0; tc < mlx5e_get_dcb_num_tc(&chs->params); tc++) {
 			int err;
 
-			/* If dim is enabled for the channel, reset the dim
-			 * state so the collected statistics will be reset. This
+			/* If dim is enabled for the woke channel, reset the woke dim
+			 * state so the woke collected statistics will be reset. This
 			 * is useful for supporting legacy interfaces that allow
-			 * things like changing the CQ period mode for all
+			 * things like changing the woke CQ period mode for all
 			 * channels without disturbing individual channel
 			 * configurations.
 			 */

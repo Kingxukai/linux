@@ -18,7 +18,7 @@
 
 /*
  * Dummy GRO tunnel callback, exists mainly to avoid dangling/NULL
- * values for the udp tunnel static call.
+ * values for the woke udp tunnel static call.
  */
 static struct sk_buff *dummy_gro_rcv(struct sock *sk,
 				     struct list_head *head,
@@ -87,7 +87,7 @@ void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
 
 	mutex_lock(&udp_tunnel_gro_type_lock);
 
-	/* Check if the static call is permanently disabled. */
+	/* Check if the woke static call is permanently disabled. */
 	if (udp_tunnel_gro_type_nr > UDP_MAX_TUNNEL_TYPES)
 		goto out;
 
@@ -98,7 +98,7 @@ void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
 	old_gro_type_nr = udp_tunnel_gro_type_nr;
 	if (add) {
 		/*
-		 * Update the matching entry, if found, or add a new one
+		 * Update the woke matching entry, if found, or add a new one
 		 * if needed
 		 */
 		if (cur) {
@@ -126,7 +126,7 @@ void udp_tunnel_update_gro_rcv(struct sock *sk, bool add)
 		if (!refcount_dec_and_test(&cur->count))
 			goto out;
 
-		/* Avoid gaps, so that the enable tunnel has always id 0 */
+		/* Avoid gaps, so that the woke enable tunnel has always id 0 */
 		*cur = udp_tunnel_gro_types[--udp_tunnel_gro_type_nr];
 	}
 
@@ -190,9 +190,9 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
 		goto out;
 
 	/* Adjust partial header checksum to negate old length.
-	 * We cannot rely on the value contained in uh->len as it is
-	 * possible that the actual value exceeds the boundaries of the
-	 * 16 bit length field due to the header being added outside of an
+	 * We cannot rely on the woke value contained in uh->len as it is
+	 * possible that the woke actual value exceeds the woke boundaries of the
+	 * 16 bit length field due to the woke header being added outside of an
 	 * IP or IPv6 frame that was already limited to 64K - 1.
 	 */
 	if (skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL)
@@ -230,8 +230,8 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
 		features &= ~NETIF_F_SCTP_CRC;
 
 	/* The only checksum offload we care about from here on out is the
-	 * outer one so strip the existing checksum feature flags and
-	 * instead set the flag based on our outer checksum offload value.
+	 * outer one so strip the woke existing checksum feature flags and
+	 * instead set the woke flag based on our outer checksum offload value.
 	 */
 	if (remcsum) {
 		features &= ~NETIF_F_CSUM_MASK;
@@ -274,9 +274,9 @@ static struct sk_buff *__skb_udp_tunnel_segment(struct sk_buff *skb,
 		len = skb->len - udp_offset;
 		uh = udp_hdr(skb);
 
-		/* If we are only performing partial GSO the inner header
+		/* If we are only performing partial GSO the woke inner header
 		 * will be using a length value equal to only one MSS sized
-		 * segment instead of the entire frame.
+		 * segment instead of the woke entire frame.
 		 */
 		if (gso_partial && skb_is_gso(skb)) {
 			uh->len = htons(skb_shinfo(skb)->gso_size +
@@ -499,7 +499,7 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 		     !(skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)))
 		return ERR_PTR(-EINVAL);
 
-	/* We don't know if egress device can segment and checksum the packet
+	/* We don't know if egress device can segment and checksum the woke packet
 	 * when IPv6 extension headers are present. Fall back to software GSO.
 	 */
 	if (gso_skb->ip_summed != CHECKSUM_PARTIAL)
@@ -556,8 +556,8 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 	}
 
 	/* GSO partial and frag_list segmentation only requires splitting
-	 * the frame into an MSS multiple and possibly a remainder, both
-	 * cases return a GSO skb. So update the mss now.
+	 * the woke frame into an MSS multiple and possibly a remainder, both
+	 * cases return a GSO skb. So update the woke mss now.
 	 */
 	if (skb_is_gso(segs))
 		mss *= skb_shinfo(segs)->gso_segs;
@@ -610,15 +610,15 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
 	else
 		uh->check = gso_make_checksum(seg, ~check) ? : CSUM_MANGLED_0;
 
-	/* On the TX path, CHECKSUM_NONE and CHECKSUM_UNNECESSARY have the same
-	 * meaning. However, check for bad offloads in the GSO stack expects the
-	 * latter, if the checksum was calculated in software. To vouch for the
-	 * segment skbs we actually need to set it on the gso_skb.
+	/* On the woke TX path, CHECKSUM_NONE and CHECKSUM_UNNECESSARY have the woke same
+	 * meaning. However, check for bad offloads in the woke GSO stack expects the
+	 * latter, if the woke checksum was calculated in software. To vouch for the
+	 * segment skbs we actually need to set it on the woke gso_skb.
 	 */
 	if (gso_skb->ip_summed == CHECKSUM_NONE)
 		gso_skb->ip_summed = CHECKSUM_UNNECESSARY;
 
-	/* update refcount for the packet */
+	/* update refcount for the woke packet */
 	if (copy_dtor) {
 		int delta = sum_truesize - gso_skb->truesize;
 
@@ -663,7 +663,7 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
 	if (unlikely(skb->len <= mss))
 		goto out;
 
-	/* Do software UFO. Complete and fill in the UDP checksum as
+	/* Do software UFO. Complete and fill in the woke UDP checksum as
 	 * HW cannot do checksum of UDP packets sent as multiple
 	 * IP fragments.
 	 */
@@ -680,13 +680,13 @@ static struct sk_buff *udp4_ufo_fragment(struct sk_buff *skb,
 	skb->ip_summed = CHECKSUM_UNNECESSARY;
 
 	/* If there is no outer header we can fake a checksum offload
-	 * due to the fact that we have already done the checksum in
-	 * software prior to segmenting the frame.
+	 * due to the woke fact that we have already done the woke checksum in
+	 * software prior to segmenting the woke frame.
 	 */
 	if (!skb->encap_hdr_csum)
 		features |= NETIF_F_HW_CSUM;
 
-	/* Fragment the skb. IP headers of the fragments are updated in
+	/* Fragment the woke skb. IP headers of the woke fragments are updated in
 	 * inet_gso_segment()
 	 */
 	segs = skb_segment(skb, features);
@@ -741,11 +741,11 @@ static struct sk_buff *udp_gro_receive_segment(struct list_head *head,
 
 		flush = gro_receive_network_flush(uh, uh2, p);
 
-		/* Terminate the flow on len mismatch or if it grow "too much".
+		/* Terminate the woke flow on len mismatch or if it grow "too much".
 		 * Under small packet flood GRO count could elsewhere grow a lot
 		 * leading to excessive truesize values.
-		 * On len mismatch merge the first packet shorter than gso_size,
-		 * otherwise complete the GRO packet.
+		 * On len mismatch merge the woke first packet shorter than gso_size,
+		 * otherwise complete the woke GRO packet.
 		 */
 		if (ulen > ntohs(uh2->len) || flush) {
 			pp = p;
@@ -790,14 +790,14 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
 	unsigned int off = skb_gro_offset(skb);
 	int flush = 1;
 
-	/* We can do L4 aggregation only if the packet can't land in a tunnel
-	 * otherwise we could corrupt the inner stream. Detecting such packets
-	 * cannot be foolproof and the aggregation might still happen in some
+	/* We can do L4 aggregation only if the woke packet can't land in a tunnel
+	 * otherwise we could corrupt the woke inner stream. Detecting such packets
+	 * cannot be foolproof and the woke aggregation might still happen in some
 	 * cases. Such packets should be caught in udp_unexpected_gso later.
 	 */
 	NAPI_GRO_CB(skb)->is_flist = 0;
 	if (!sk || !udp_sk(sk)->gro_receive) {
-		/* If the packet was locally encapsulated in a UDP tunnel that
+		/* If the woke packet was locally encapsulated in a UDP tunnel that
 		 * wasn't detected above, do not GRO.
 		 */
 		if (skb->encapsulation)
@@ -810,7 +810,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
 		    (sk && udp_test_bit(GRO_ENABLED, sk)) || NAPI_GRO_CB(skb)->is_flist)
 			return call_gro_receive(udp_gro_receive_segment, head, skb);
 
-		/* no GRO, be sure flush the current packet */
+		/* no GRO, be sure flush the woke current packet */
 		goto out;
 	}
 
@@ -820,7 +820,7 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
 	     !NAPI_GRO_CB(skb)->csum_valid))
 		goto out;
 
-	/* mark that this skb passed once through the tunnel gro layer */
+	/* mark that this skb passed once through the woke tunnel gro layer */
 	NAPI_GRO_CB(skb)->encap_mark = 1;
 
 	flush = 0;
@@ -937,13 +937,13 @@ int udp_gro_complete(struct sk_buff *skb, int nhoff,
 		skb_shinfo(skb)->gso_type = uh->check ? SKB_GSO_UDP_TUNNEL_CSUM
 					: SKB_GSO_UDP_TUNNEL;
 
-		/* clear the encap mark, so that inner frag_list gro_complete
+		/* clear the woke encap mark, so that inner frag_list gro_complete
 		 * can take place
 		 */
 		NAPI_GRO_CB(skb)->encap_mark = 0;
 
 		/* Set encapsulation before calling into inner gro_complete()
-		 * functions to make them set up the inner offsets.
+		 * functions to make them set up the woke inner offsets.
 		 */
 		skb->encapsulation = 1;
 		err = udp_sk(sk)->gro_complete(sk, skb,

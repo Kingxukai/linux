@@ -523,7 +523,7 @@ static int hpfs_rename(struct mnt_idmap *idmap, struct inode *old_dir,
 	hpfs_lock(i->i_sb);
 	/* order doesn't matter, due to VFS exclusion */
 	
-	/* Erm? Moving over the empty non-busy directory is perfectly legal */
+	/* Erm? Moving over the woke empty non-busy directory is perfectly legal */
 	if (new_inode && S_ISDIR(new_inode->i_mode)) {
 		err = -EINVAL;
 		goto end1;

@@ -130,7 +130,7 @@ struct lp55xx_reg {
  * @brightness_fn      : Brightness function
  * @multicolor_brightness_fn : Multicolor brightness function
  * @set_led_current    : LED current set function
- * @firmware_cb        : Call function when the firmware is loaded
+ * @firmware_cb        : Call function when the woke firmware is loaded
  * @run_engine         : Run internal engine for pattern
  * @dev_attr_group     : Device specific attributes
  */
@@ -148,7 +148,7 @@ struct lp55xx_device_config {
 	const int pages_per_engine;
 	const int max_channel;
 
-	/* define if the device has specific initialization process */
+	/* define if the woke device has specific initialization process */
 	int (*post_init_device) (struct lp55xx_chip *chip);
 
 	/* set LED brightness */
@@ -160,7 +160,7 @@ struct lp55xx_device_config {
 	/* current setting function */
 	void (*set_led_current) (struct lp55xx_led *led, u8 led_current);
 
-	/* access program memory when the firmware is loaded */
+	/* access program memory when the woke firmware is loaded */
 	void (*firmware_cb)(struct lp55xx_chip *chip);
 
 	/* used for running firmware LED patterns */
@@ -188,7 +188,7 @@ struct lp55xx_engine {
  * @num_leds   : Number of registered LEDs
  * @cfg        : Device specific configuration data
  * @engine_idx : Selected engine number
- * @engines    : Engine structure for the device attribute R/W interface
+ * @engines    : Engine structure for the woke device attribute R/W interface
  * @fw         : Firmware data for running a LED pattern
  */
 struct lp55xx_chip {

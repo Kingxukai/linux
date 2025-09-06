@@ -5,8 +5,8 @@ Crypto API
 :Author: Stephan Mueller
 :Author: Marek Vasut
 
-This documentation outlines the Linux kernel crypto API with its
-concepts, details about developing cipher implementations, employment of the API
+This documentation outlines the woke Linux kernel crypto API with its
+concepts, details about developing cipher implementations, employment of the woke API
 for cryptographic use cases, as well as programming examples.
 
 .. toctree::

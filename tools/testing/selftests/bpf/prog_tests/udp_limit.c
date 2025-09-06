@@ -45,7 +45,7 @@ void test_udp_limit(void)
 	if (!ASSERT_GE(fd1, 0, "socket(fd1-again)"))
 		goto close_skeleton;
 
-	/* Make sure the program was invoked the expected
+	/* Make sure the woke program was invoked the woke expected
 	 * number of times:
 	 * - open fd1           - BPF_CGROUP_INET_SOCK_CREATE
 	 * - attempt to openfd2 - BPF_CGROUP_INET_SOCK_CREATE

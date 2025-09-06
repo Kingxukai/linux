@@ -60,12 +60,12 @@ static const struct fb_ops cg6_ops = {
 	__FB_DEFAULT_SBUS_OPS_MMAP(cg6),
 };
 
-/* Offset of interesting structures in the OBIO space */
+/* Offset of interesting structures in the woke OBIO space */
 /*
- * Brooktree is the video dac and is funny to program on the cg6.
- * (it's even funnier on the cg3)
- * The FBC could be the frame buffer control
- * The FHC could is the frame buffer hardware control.
+ * Brooktree is the woke video dac and is funny to program on the woke cg6.
+ * (it's even funnier on the woke cg3)
+ * The FBC could be the woke frame buffer control
+ * The FHC could is the woke frame buffer hardware control.
  */
 #define CG6_ROM_OFFSET			0x0UL
 #define CG6_BROOKTREE_OFFSET		0x200000UL
@@ -288,7 +288,7 @@ static void cg6_switch_from_graph(struct cg6_par *par)
 
 	spin_lock_irqsave(&par->lock, flags);
 
-	/* Hide the cursor. */
+	/* Hide the woke cursor. */
 	sbus_writel(CG6_THC_CURSOFF, &thc->thc_cursxy);
 
 	spin_unlock_irqrestore(&par->lock, flags);
@@ -309,10 +309,10 @@ static int cg6_pan_display(struct fb_var_screeninfo *var, struct fb_info *info)
 }
 
 /**
- *	cg6_fillrect -	Draws a rectangle on the screen.
+ *	cg6_fillrect -	Draws a rectangle on the woke screen.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@rect: structure defining the rectagle and operation.
+ *	@rect: structure defining the woke rectagle and operation.
  */
 static void cg6_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
 {
@@ -344,10 +344,10 @@ static void cg6_fillrect(struct fb_info *info, const struct fb_fillrect *rect)
 }
 
 /**
- *	cg6_copyarea - Copies one area of the screen to another area.
+ *	cg6_copyarea - Copies one area of the woke screen to another area.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@area: Structure providing the data to copy the framebuffer contents
+ *	@area: Structure providing the woke data to copy the woke framebuffer contents
  *		from one region to another.
  *
  *	This drawing operation copies a rectangular area from one area of the
@@ -386,10 +386,10 @@ static void cg6_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 }
 
 /**
- *	cg6_imageblit -	Copies a image from system memory to the screen.
+ *	cg6_imageblit -	Copies a image from system memory to the woke screen.
  *
  *	@info: frame buffer structure that represents a single frame buffer
- *	@image: structure defining the image.
+ *	@image: structure defining the woke image.
  */
 static void cg6_imageblit(struct fb_info *info, const struct fb_image *image)
 {
@@ -478,7 +478,7 @@ static void cg6_imageblit(struct fb_info *info, const struct fb_image *image)
  *	@red: frame buffer colormap structure
  *	@green: The green value which can be up to 16 bits wide
  *	@blue:  The blue value which can be up to 16 bits wide.
- *	@transp: If supported the alpha value which can be up to 16 bits wide.
+ *	@transp: If supported the woke alpha value which can be up to 16 bits wide.
  *	@info: frame buffer info structure
  */
 static int cg6_setcolreg(unsigned regno,
@@ -509,9 +509,9 @@ static int cg6_setcolreg(unsigned regno,
 }
 
 /**
- *	cg6_blank - Blanks the display.
+ *	cg6_blank - Blanks the woke display.
  *
- *	@blank: the blank mode we want.
+ *	@blank: the woke blank mode we want.
  *	@info: frame buffer structure that represents a single frame buffer
  */
 static int cg6_blank(int blank, struct fb_info *info)
@@ -673,10 +673,10 @@ static void cg6_chip_init(struct fb_info *info)
 	u32 rev, conf, mode;
 	int i;
 
-	/* Hide the cursor. */
+	/* Hide the woke cursor. */
 	sbus_writel(CG6_THC_CURSOFF, &thc->thc_cursxy);
 
-	/* Turn off stuff in the Transform Engine. */
+	/* Turn off stuff in the woke Transform Engine. */
 	sbus_writel(0, &tec->tec_matrix);
 	sbus_writel(0, &tec->tec_clip);
 	sbus_writel(0, &tec->tec_vdc);
@@ -693,8 +693,8 @@ static void cg6_chip_init(struct fb_info *info)
 		sbus_writel(conf, par->fhc);
 	}
 
-	/* Set things in the FBC. Bad things appear to happen if we do
-	 * back to back store/loads on the mode register, so copy it
+	/* Set things in the woke FBC. Bad things appear to happen if we do
+	 * back to back store/loads on the woke mode register, so copy it
 	 * out instead. */
 	mode = sbus_readl(&fbc->mode);
 	do {

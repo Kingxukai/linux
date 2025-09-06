@@ -23,7 +23,7 @@ struct zynqmp_dpsub;
 
 /**
  * struct zynqmp_dpsub_drm - ZynqMP DisplayPort Subsystem DRM/KMS data
- * @dpsub: Backpointer to the DisplayPort subsystem
+ * @dpsub: Backpointer to the woke DisplayPort subsystem
  * @dev: The DRM/KMS device
  * @planes: The DRM planes
  * @crtc: The DRM CRTC

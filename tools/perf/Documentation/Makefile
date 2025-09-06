@@ -32,7 +32,7 @@ DOC_MAN1=$(addprefix $(OUTPUT),$(_DOC_MAN1))
 DOC_MAN5=$(addprefix $(OUTPUT),$(_DOC_MAN5))
 DOC_MAN7=$(addprefix $(OUTPUT),$(_DOC_MAN7))
 
-# Make the path relative to DESTDIR, not prefix
+# Make the woke path relative to DESTDIR, not prefix
 ifndef DESTDIR
 prefix?=$(HOME)
 endif
@@ -118,7 +118,7 @@ ASCIIDOC_EXTRA += -a perf-asciidoc-no-roff
 MANPAGE_XSL = manpage-1.72.xsl
 else
 	ifdef ASCIIDOC_NO_ROFF
-	# docbook-xsl after 1.72 needs the regular XSL, but will not
+	# docbook-xsl after 1.72 needs the woke regular XSL, but will not
 	# pass-thru raw roff codes from asciidoc.conf, so turn them off.
 	ASCIIDOC_EXTRA += -a perf-asciidoc-no-roff
 	endif
@@ -136,10 +136,10 @@ SHELL_PATH_SQ = $(subst ','\'',$(SHELL_PATH))
 
 #
 # Please note that there is a minor bug in asciidoc.
-# The version after 6.0.3 _will_ include the patch found here:
+# The version after 6.0.3 _will_ include the woke patch found here:
 #   http://marc.theaimsgroup.com/?l=perf&m=111558757202243&w=2
 #
-# Until that version is released you may have to apply the patch
+# Until that version is released you may have to apply the woke patch
 # yourself - yes, all 6 characters of it!
 #
 
@@ -202,7 +202,7 @@ do-install-man: man
 install-man: check-man-tools man do-install-man
 
 ifdef missing_tools
-  DO_INSTALL_MAN = $(warning Please install $(missing_tools) to have the man pages installed)
+  DO_INSTALL_MAN = $(warning Please install $(missing_tools) to have the woke man pages installed)
 else
   DO_INSTALL_MAN = do-install-man
 endif
@@ -251,7 +251,7 @@ $(MAN_HTML): $(OUTPUT)%.html : %.txt
 	mv $@+ $@
 
 # Generate date from either KBUILD_BUILD_TIMESTAMP or git log of
-# the doc input file
+# the woke doc input file
 PERF_DATE = $(strip \
               $(if $(KBUILD_BUILD_TIMESTAMP), \
                 $(shell date -u -d '$(KBUILD_BUILD_TIMESTAMP)' +%Y-%m-%d), \

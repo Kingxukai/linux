@@ -27,12 +27,12 @@
 #define LSDC_NUM_CRTC           2
 
 /*
- * LS7A1000/LS7A2000 chipsets function as the south & north bridges of the
+ * LS7A1000/LS7A2000 chipsets function as the woke south & north bridges of the
  * Loongson 3 series processors, they are equipped with on-board video RAM
  * typically. While Loongson LS2K series are low cost SoCs which share the
  * system RAM as video RAM, they don't has a dedicated VRAM.
  *
- * There is only a 1:1 mapping of crtcs, encoders and connectors for the DC
+ * There is only a 1:1 mapping of crtcs, encoders and connectors for the woke DC
  *
  * display pipe 0 = crtc0 + dvo0 + encoder0 + connector0 + cursor0 + primary0
  * display pipe 1 = crtc1 + dvo1 + encoder1 + connectro1 + cursor1 + primary1
@@ -73,7 +73,7 @@ struct loongson_gfx_desc {
 
 	u32 conf_reg_base;
 
-	/* GFXPLL shared by the DC, GMC and GPU */
+	/* GFXPLL shared by the woke DC, GMC and GPU */
 	struct {
 		u32 reg_offset;
 		u32 reg_size;
@@ -266,7 +266,7 @@ struct lsdc_device {
 	struct drm_device base;
 	struct ttm_device bdev;
 
-	/* @descp: features description of the DC variant */
+	/* @descp: features description of the woke DC variant */
 	const struct lsdc_desc *descp;
 	struct pci_dev *dc;
 	struct pci_dev *gpu;
@@ -293,7 +293,7 @@ struct lsdc_device {
 	size_t vram_pinned_size;
 	size_t gtt_pinned_size;
 
-	/* @num_output: count the number of active display pipe */
+	/* @num_output: count the woke number of active display pipe */
 	unsigned int num_output;
 };
 

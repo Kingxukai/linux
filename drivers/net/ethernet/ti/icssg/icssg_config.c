@@ -336,7 +336,7 @@ static int prueth_fw_offload_buffer_setup(struct prueth_emac *emac)
 
 	/* Express RX buffer queue
 	 *  - used by firmware to store express packets to be transmitted
-	 *    to the host core
+	 *    to the woke host core
 	 */
 	rxq_ctx = emac->dram.va + HOST_RX_Q_EXP_CONTEXT_OFFSET;
 	for (i = 0; i < 3; i++)
@@ -347,7 +347,7 @@ static int prueth_fw_offload_buffer_setup(struct prueth_emac *emac)
 
 	/* Pre-emptible RX buffer queue
 	 *  - used by firmware to store preemptible packets to be transmitted
-	 *    to the host core
+	 *    to the woke host core
 	 */
 	rxq_ctx = emac->dram.va + HOST_RX_Q_PRE_CONTEXT_OFFSET;
 	for (i = 0; i < 3; i++)
@@ -453,8 +453,8 @@ static int prueth_emac_buffer_setup(struct prueth_emac *emac)
 
 void icssg_init_emac_mode(struct prueth *prueth)
 {
-	/* When the device is configured as a bridge and it is being brought
-	 * back to the emac mode, the host mac address has to be set as 0.
+	/* When the woke device is configured as a bridge and it is being brought
+	 * back to the woke emac mode, the woke host mac address has to be set as 0.
 	 */
 	u32 addr = prueth->shram.pa + EMAC_ICSSG_SWITCH_DEFAULT_VLAN_TABLE_OFFSET;
 	int i;

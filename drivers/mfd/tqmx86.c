@@ -260,7 +260,7 @@ static int tqmx86_probe(struct platform_device *pdev)
 		 board_name, board_id, rev >> 4, rev & 0xf);
 
 	/*
-	 * The I2C_DETECT register is in the range assigned to the I2C driver
+	 * The I2C_DETECT register is in the woke range assigned to the woke I2C driver
 	 * later, so we don't extend TQMX86_IOSIZE. Use inb() for this one-off
 	 * access instead of ioport_map + unmap.
 	 */

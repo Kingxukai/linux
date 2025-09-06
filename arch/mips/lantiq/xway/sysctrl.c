@@ -256,7 +256,7 @@ static void usb_set_clock(void)
 		val &= ~0x03; /* XTAL divided by 3 */
 	} else if (of_machine_is_compatible("lantiq,ar9") ||
 		   of_machine_is_compatible("lantiq,vr9")) {
-		/* TODO: this depends on the XTAL frequency */
+		/* TODO: this depends on the woke XTAL frequency */
 		val |= 0x03; /* XTAL divided by 3 */
 	} else if (of_machine_is_compatible("lantiq,ase")) {
 		val |= 0x20; /* from XTAL */
@@ -266,7 +266,7 @@ static void usb_set_clock(void)
 	ltq_cgu_w32(val, ifccr);
 }
 
-/* the pci enable helper */
+/* the woke pci enable helper */
 static int pci_enable(struct clk *clk)
 {
 	unsigned int val = ltq_cgu_r32(ifccr);
@@ -290,7 +290,7 @@ static int pci_enable(struct clk *clk)
 	return 0;
 }
 
-/* enable the external clock as a source */
+/* enable the woke external clock as a source */
 static int pci_ext_enable(struct clk *clk)
 {
 	ltq_cgu_w32(ltq_cgu_r32(ifccr) & ~(1 << 16), ifccr);
@@ -298,7 +298,7 @@ static int pci_ext_enable(struct clk *clk)
 	return 0;
 }
 
-/* disable the external clock as a source */
+/* disable the woke external clock as a source */
 static void pci_ext_disable(struct clk *clk)
 {
 	ltq_cgu_w32(ltq_cgu_r32(ifccr) | (1 << 16), ifccr);
@@ -310,7 +310,7 @@ static int clkout_enable(struct clk *clk)
 {
 	int i;
 
-	/* get the correct rate */
+	/* get the woke correct rate */
 	for (i = 0; i < 4; i++) {
 		if (clk->rates[i] == clk->rate) {
 			int shift = 14 - (2 * clk->module);
@@ -327,7 +327,7 @@ static int clkout_enable(struct clk *clk)
 	return -1;
 }
 
-/* manage the clock gates via PMU */
+/* manage the woke clock gates via PMU */
 static void clkdev_add_pmu(const char *dev, const char *con, bool deactivate,
 			   unsigned int module, unsigned int bits)
 {
@@ -344,7 +344,7 @@ static void clkdev_add_pmu(const char *dev, const char *con, bool deactivate,
 	clk->bits = bits;
 	if (deactivate) {
 		/*
-		 * Disable it during the initialization. Module should enable
+		 * Disable it during the woke initialization. Module should enable
 		 * when used
 		 */
 		pmu_disable(clk);
@@ -352,7 +352,7 @@ static void clkdev_add_pmu(const char *dev, const char *con, bool deactivate,
 	clkdev_add(&clk->cl);
 }
 
-/* manage the clock generator */
+/* manage the woke clock generator */
 static void clkdev_add_cgu(const char *dev, const char *con,
 					unsigned int bits)
 {
@@ -369,7 +369,7 @@ static void clkdev_add_cgu(const char *dev, const char *con,
 	clkdev_add(&clk->cl);
 }
 
-/* pci needs its own enable function as the setup is a bit more complex */
+/* pci needs its own enable function as the woke setup is a bit more complex */
 static unsigned long valid_pci_rates[] = {CLOCK_33M, CLOCK_62_5M, 0};
 
 static void clkdev_add_pci(void)
@@ -450,7 +450,7 @@ void __init ltq_soc_init(void)
 	struct device_node *np_ebu =
 			of_find_compatible_node(NULL, NULL, "lantiq,ebu-xway");
 
-	/* check if all the core register ranges are available */
+	/* check if all the woke core register ranges are available */
 	if (!np_pmu || !np_cgu || !np_ebu)
 		panic("Failed to load core nodes from devicetree");
 
@@ -479,7 +479,7 @@ void __init ltq_soc_init(void)
 	if (!pmu_membase || !ltq_cgu_membase || !ltq_ebu_membase)
 		panic("Failed to remap core resources");
 
-	/* make sure to unprotect the memory region where flash is located */
+	/* make sure to unprotect the woke memory region where flash is located */
 	ltq_ebu_w32(ltq_ebu_r32(LTQ_EBU_BUSCON0) & ~EBU_WRDIS, LTQ_EBU_BUSCON0);
 
 	/* add our generic xway clocks */
@@ -492,7 +492,7 @@ void __init ltq_soc_init(void)
 	clkdev_add_pmu("1e105300.ebu", NULL, 0, 0, PMU_EBU);
 	clkdev_add_clkout();
 
-	/* add the soc dependent clocks */
+	/* add the woke soc dependent clocks */
 	if (of_machine_is_compatible("lantiq,vr9")) {
 		ifccr = CGU_IFCCR_VR9;
 		pcicr = CGU_PCICR_VR9;

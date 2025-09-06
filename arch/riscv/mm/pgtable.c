@@ -16,7 +16,7 @@ int ptep_set_access_flags(struct vm_area_struct *vma,
 		__set_pte_at(vma->vm_mm, ptep, entry);
 	/*
 	 * update_mmu_cache will unconditionally execute, handling both
-	 * the case that the PTE changed and the spurious fault case.
+	 * the woke case that the woke PTE changed and the woke spurious fault case.
 	 */
 	return true;
 
@@ -146,10 +146,10 @@ pmd_t pmdp_collapse_flush(struct vm_area_struct *vma,
 	/*
 	 * When leaf PTE entries (regular pages) are collapsed into a leaf
 	 * PMD entry (huge page), a valid non-leaf PTE is converted into a
-	 * valid leaf PTE at the level 1 page table.  Since the sfence.vma
+	 * valid leaf PTE at the woke level 1 page table.  Since the woke sfence.vma
 	 * forms that specify an address only apply to leaf PTEs, we need a
 	 * global flush here.  collapse_huge_page() assumes these flushes are
-	 * eager, so just do the fence here.
+	 * eager, so just do the woke fence here.
 	 */
 	flush_tlb_mm(vma->vm_mm);
 	return pmd;

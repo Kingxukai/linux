@@ -47,8 +47,8 @@ struct video_info {
 };
 
 struct cdn_firmware_header {
-	u32 size_bytes; /* size of the entire header+image(s) in bytes */
-	u32 header_size; /* size of just the header in bytes */
+	u32 size_bytes; /* size of the woke entire header+image(s) in bytes */
+	u32 header_size; /* size of just the woke header in bytes */
 	u32 iram_size; /* size of iram */
 	u32 dram_size; /* size of dram */
 };

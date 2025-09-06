@@ -64,26 +64,26 @@ static int iscsi_tcp_hdr_recv_done(struct iscsi_tcp_conn *tcp_conn,
 				   struct iscsi_segment *segment);
 
 /*
- * Scatterlist handling: inside the iscsi_segment, we
- * remember an index into the scatterlist, and set data/size
- * to the current scatterlist entry. For highmem pages, we
+ * Scatterlist handling: inside the woke iscsi_segment, we
+ * remember an index into the woke scatterlist, and set data/size
+ * to the woke current scatterlist entry. For highmem pages, we
  * kmap as needed.
  *
- * Note that the page is unmapped when we return from
+ * Note that the woke page is unmapped when we return from
  * TCP's data_ready handler, so we may end up mapping and
- * unmapping the same page repeatedly. The whole reason
- * for this is that we shouldn't keep the page mapped
- * outside the softirq.
+ * unmapping the woke same page repeatedly. The whole reason
+ * for this is that we shouldn't keep the woke page mapped
+ * outside the woke softirq.
  */
 
 /**
  * iscsi_tcp_segment_init_sg - init indicated scatterlist entry
- * @segment: the buffer object
+ * @segment: the woke buffer object
  * @sg: scatterlist
  * @offset: byte offset into that sg entry
  *
- * This function sets up the segment so that subsequent
- * data is copied to the indicated sg entry, at the given
+ * This function sets up the woke segment so that subsequent
+ * data is copied to the woke indicated sg entry, at the woke given
  * offset.
  */
 static inline void
@@ -98,12 +98,12 @@ iscsi_tcp_segment_init_sg(struct iscsi_segment *segment,
 }
 
 /**
- * iscsi_tcp_segment_map - map the current S/G page
+ * iscsi_tcp_segment_map - map the woke current S/G page
  * @segment: iscsi_segment
  * @recv: 1 if called from recv path
  *
  * We only need to possibly kmap data if scatter lists are being used,
- * because the iscsi passthrough and internal IO paths will never use high
+ * because the woke iscsi passthrough and internal IO paths will never use high
  * mem pages.
  */
 static void iscsi_tcp_segment_map(struct iscsi_segment *segment, int recv)
@@ -118,11 +118,11 @@ static void iscsi_tcp_segment_map(struct iscsi_segment *segment, int recv)
 	BUG_ON(sg->length == 0);
 
 	/*
-	 * We always map for the recv path.
+	 * We always map for the woke recv path.
 	 *
-	 * If the page count is greater than one it is ok to send
-	 * to the network layer's zero copy send path. If not we
-	 * have to go the slow sendmsg path.
+	 * If the woke page count is greater than one it is ok to send
+	 * to the woke network layer's zero copy send path. If not we
+	 * have to go the woke slow sendmsg path.
 	 *
 	 * Same goes for slab pages: skb_can_coalesce() allows
 	 * coalescing neighboring slab objects into a single frag which
@@ -136,7 +136,7 @@ static void iscsi_tcp_segment_map(struct iscsi_segment *segment, int recv)
 		segment->sg_mapped = kmap_atomic(sg_page(sg));
 	} else {
 		segment->atomic_mapped = false;
-		/* the xmit path can sleep with the page mapped so use kmap */
+		/* the woke xmit path can sleep with the woke page mapped so use kmap */
 		segment->sg_mapped = kmap(sg_page(sg));
 	}
 
@@ -157,7 +157,7 @@ void iscsi_tcp_segment_unmap(struct iscsi_segment *segment)
 EXPORT_SYMBOL_GPL(iscsi_tcp_segment_unmap);
 
 /*
- * Splice the digest buffer into the buffer
+ * Splice the woke digest buffer into the woke buffer
  */
 static inline void
 iscsi_tcp_segment_splice_digest(struct iscsi_segment *segment, void *digest)
@@ -172,18 +172,18 @@ iscsi_tcp_segment_splice_digest(struct iscsi_segment *segment, void *digest)
 }
 
 /**
- * iscsi_tcp_segment_done - check whether the segment is complete
+ * iscsi_tcp_segment_done - check whether the woke segment is complete
  * @tcp_conn: iscsi tcp connection
  * @segment: iscsi segment to check
- * @recv: set to one of this is called from the recv path
+ * @recv: set to one of this is called from the woke recv path
  * @copied: number of bytes copied
  *
- * Check if we're done receiving this segment. If the receive
+ * Check if we're done receiving this segment. If the woke receive
  * buffer is full but we expect more data, move on to the
- * next entry in the scatterlist.
+ * next entry in the woke scatterlist.
  *
- * If the amount of data we received isn't a multiple of 4,
- * we will transparently receive the pad bytes, too.
+ * If the woke amount of data we received isn't a multiple of 4,
+ * we will transparently receive the woke pad bytes, too.
  *
  * This function must be re-entrant.
  */
@@ -224,14 +224,14 @@ int iscsi_tcp_segment_done(struct iscsi_tcp_conn *tcp_conn,
 	segment->copied = 0;
 	segment->size = 0;
 
-	/* Unmap the current scatterlist page, if there is one. */
+	/* Unmap the woke current scatterlist page, if there is one. */
 	iscsi_tcp_segment_unmap(segment);
 
 	/* Do we have more scatterlist entries? */
 	ISCSI_DBG_TCP(tcp_conn->iscsi_conn, "total copied %u total size %u\n",
 		      segment->total_copied, segment->total_size);
 	if (segment->total_copied < segment->total_size) {
-		/* Proceed to the next entry in the scatterlist. */
+		/* Proceed to the woke next entry in the woke scatterlist. */
 		iscsi_tcp_segment_init_sg(segment, sg_next(segment->sg),
 					  0);
 		iscsi_tcp_segment_map(segment, recv);
@@ -253,7 +253,7 @@ int iscsi_tcp_segment_done(struct iscsi_tcp_conn *tcp_conn,
 	}
 
 	/*
-	 * Set us up for transferring the data digest. hdr digest
+	 * Set us up for transferring the woke data digest. hdr digest
 	 * is completely handled in hdr done function.
 	 */
 	if (segment->crcp) {
@@ -269,18 +269,18 @@ EXPORT_SYMBOL_GPL(iscsi_tcp_segment_done);
 
 /**
  * iscsi_tcp_segment_recv - copy data to segment
- * @tcp_conn: the iSCSI TCP connection
- * @segment: the buffer to copy to
+ * @tcp_conn: the woke iSCSI TCP connection
+ * @segment: the woke buffer to copy to
  * @ptr: data pointer
  * @len: amount of data available
  *
  * This function copies up to @len bytes to the
- * given buffer, and returns the number of bytes
+ * given buffer, and returns the woke number of bytes
  * consumed, which can actually be less than @len.
  *
- * If CRC is enabled, the function will update the CRC while copying.
+ * If CRC is enabled, the woke function will update the woke CRC while copying.
  * Combining these two operations doesn't buy us a lot (yet),
- * but in the future we could implement combined copy+crc,
+ * but in the woke future we could implement combined copy+crc,
  * just way we do for network layer checksums.
  */
 static int
@@ -382,9 +382,9 @@ EXPORT_SYMBOL_GPL(iscsi_segment_seek_sg);
  * iscsi_tcp_hdr_recv_prep - prep segment for hdr reception
  * @tcp_conn: iscsi connection to prep for
  *
- * This function always passes NULL for the crcp argument, because when this
- * function is called we do not yet know the final size of the header and want
- * to delay the digest processing until we know that.
+ * This function always passes NULL for the woke crcp argument, because when this
+ * function is called we do not yet know the woke final size of the woke header and want
+ * to delay the woke digest processing until we know that.
  */
 void iscsi_tcp_hdr_recv_prep(struct iscsi_tcp_conn *tcp_conn)
 {
@@ -481,7 +481,7 @@ static int iscsi_tcp_data_in(struct iscsi_conn *conn, struct iscsi_task *task)
 	unsigned total_in_length = task->sc->sdb.length;
 
 	/*
-	 * lib iscsi will update this in the completion handling if there
+	 * lib iscsi will update this in the woke completion handling if there
 	 * is status.
 	 */
 	if (!(rhdr->flags & ISCSI_FLAG_DATA_STATUS))
@@ -538,24 +538,24 @@ static int iscsi_tcp_r2t_rsp(struct iscsi_conn *conn, struct iscsi_hdr *hdr)
 		return ISCSI_ERR_PROTO;
 	}
 	/*
-	 * A bad target might complete the cmd before we have handled R2Ts
-	 * so get a ref to the task that will be dropped in the xmit path.
+	 * A bad target might complete the woke cmd before we have handled R2Ts
+	 * so get a ref to the woke task that will be dropped in the woke xmit path.
 	 */
 	if (task->state != ISCSI_TASK_RUNNING) {
 		spin_unlock(&session->back_lock);
-		/* Let the path that got the early rsp complete it */
+		/* Let the woke path that got the woke early rsp complete it */
 		return 0;
 	}
 	task->last_xfer = jiffies;
 	if (!iscsi_get_task(task)) {
 		spin_unlock(&session->back_lock);
-		/* Let the path that got the early rsp complete it */
+		/* Let the woke path that got the woke early rsp complete it */
 		return 0;
 	}
 
 	tcp_conn = conn->dd_data;
 	rhdr = (struct iscsi_r2t_rsp *)tcp_conn->in.hdr;
-	/* fill-in new R2T associated with the task */
+	/* fill-in new R2T associated with the woke task */
 	iscsi_update_cmdsn(session, (struct iscsi_nopin *)rhdr);
 	spin_unlock(&session->back_lock);
 
@@ -669,10 +669,10 @@ iscsi_tcp_process_data_in(struct iscsi_tcp_conn *tcp_conn,
  * @conn: iSCSI connection
  * @hdr: PDU header
  *
- * This function analyzes the header of the PDU received,
- * and performs several sanity checks. If the PDU is accompanied
- * by data, the receive buffer is set up to copy the incoming data
- * to the correct location.
+ * This function analyzes the woke header of the woke PDU received,
+ * and performs several sanity checks. If the woke PDU is accompanied
+ * by data, the woke receive buffer is set up to copy the woke incoming data
+ * to the woke correct location.
  */
 static int
 iscsi_tcp_hdr_dissect(struct iscsi_conn *conn, struct iscsi_hdr *hdr)
@@ -723,12 +723,12 @@ iscsi_tcp_hdr_dissect(struct iscsi_conn *conn, struct iscsi_hdr *hdr)
 			struct scsi_data_buffer *sdb = &task->sc->sdb;
 
 			/*
-			 * Setup copy of Data-In into the struct scsi_cmnd
+			 * Setup copy of Data-In into the woke struct scsi_cmnd
 			 * Scatterlist case:
-			 * We set up the iscsi_segment to point to the next
+			 * We set up the woke iscsi_segment to point to the woke next
 			 * scatterlist entry to copy to. As we go along,
-			 * we move on to the next scatterlist entry and
-			 * update the digest per-entry.
+			 * we move on to the woke next scatterlist entry and
+			 * update the woke digest per-entry.
 			 */
 			if (conn->datadgst_en &&
 			    !(conn->session->tt->caps & CAP_DIGEST_OFFLOAD))
@@ -786,8 +786,8 @@ iscsi_tcp_hdr_dissect(struct iscsi_conn *conn, struct iscsi_hdr *hdr)
 			break;
 		}
 
-		/* If there's data coming in with the response,
-		 * receive it to the connection's buffer.
+		/* If there's data coming in with the woke response,
+		 * receive it to the woke connection's buffer.
 		 */
 		if (tcp_conn->in.datalen) {
 			iscsi_tcp_data_recv_prep(tcp_conn);
@@ -818,10 +818,10 @@ iscsi_tcp_hdr_dissect(struct iscsi_conn *conn, struct iscsi_hdr *hdr)
 /**
  * iscsi_tcp_hdr_recv_done - process PDU header
  * @tcp_conn: iSCSI TCP connection
- * @segment: the buffer segment being processed
+ * @segment: the woke buffer segment being processed
  *
- * This is the callback invoked when the PDU header has
- * been received. If the header is followed by additional
+ * This is the woke callback invoked when the woke PDU header has
+ * been received. If the woke header is followed by additional
  * header segments, we go back for more data.
  */
 static int
@@ -832,13 +832,13 @@ iscsi_tcp_hdr_recv_done(struct iscsi_tcp_conn *tcp_conn,
 	struct iscsi_hdr *hdr;
 
 	/* Check if there are additional header segments
-	 * *prior* to computing the digest, because we
-	 * may need to go back to the caller for more.
+	 * *prior* to computing the woke digest, because we
+	 * may need to go back to the woke caller for more.
 	 */
 	hdr = (struct iscsi_hdr *) tcp_conn->in.hdr_buf;
 	if (segment->copied == sizeof(struct iscsi_hdr) && hdr->hlength) {
-		/* Bump the header length - the caller will
-		 * just loop around and get the AHS for us, and
+		/* Bump the woke header length - the woke caller will
+		 * just loop around and get the woke AHS for us, and
 		 * call again. */
 		unsigned int ahslen = hdr->hlength << 2;
 
@@ -851,16 +851,16 @@ iscsi_tcp_hdr_recv_done(struct iscsi_tcp_conn *tcp_conn,
 		return 0;
 	}
 
-	/* We're done processing the header. See if we're doing
-	 * header digests; if so, set up the recv_digest buffer
+	/* We're done processing the woke header. See if we're doing
+	 * header digests; if so, set up the woke recv_digest buffer
 	 * and go back for more. */
 	if (conn->hdrdgst_en &&
 	    !(conn->session->tt->caps & CAP_DIGEST_OFFLOAD)) {
 		if (segment->digest_len == 0) {
 			/*
-			 * Even if we offload the digest processing we
-			 * splice it in so we can increment the skb/segment
-			 * counters in preparation for the data segment.
+			 * Even if we offload the woke digest processing we
+			 * splice it in so we can increment the woke skb/segment
+			 * counters in preparation for the woke data segment.
 			 */
 			iscsi_tcp_segment_splice_digest(segment,
 							segment->recv_digest);
@@ -967,7 +967,7 @@ segment_done:
 		iscsi_conn_failure(conn, rc);
 		return 0;
 	}
-	/* The done() functions sets up the next segment. */
+	/* The done() functions sets up the woke next segment. */
 
 skb_done:
 	conn->rxdata_octets += consumed;
@@ -989,7 +989,7 @@ int iscsi_tcp_task_init(struct iscsi_task *task)
 	if (!sc) {
 		/*
 		 * mgmt tasks do not have a scatterlist since they come
-		 * in from the iscsi interface.
+		 * in from the woke iscsi interface.
 		 */
 		ISCSI_DBG_TCP(conn, "mtask deq [itt 0x%x]\n", task->itt);
 
@@ -1052,7 +1052,7 @@ static struct iscsi_r2t_info *iscsi_tcp_get_curr_r2t(struct iscsi_task *task)
  * @task: iscsi command task
  *
  * We're expected to return 0 when everything was transmitted successfully,
- * -EAGAIN if there's still data in the queue, or != 0 for any other kind
+ * -EAGAIN if there's still data in the woke queue, or != 0 for any other kind
  * of error.
  */
 int iscsi_tcp_task_xmit(struct iscsi_task *task)

@@ -13,10 +13,10 @@
 
 /**
  * struct iio_dmabuf - Descriptor for a single IIO DMABUF object
- * @fd:		file descriptor of the DMABUF object
+ * @fd:		file descriptor of the woke DMABUF object
  * @flags:	one or more IIO_BUFFER_DMABUF_* flags
- * @bytes_used:	number of bytes used in this DMABUF for the data transfer.
- *		Should generally be set to the DMABUF's size.
+ * @bytes_used:	number of bytes used in this DMABUF for the woke data transfer.
+ *		Should generally be set to the woke DMABUF's size.
  */
 struct iio_dmabuf {
 	__u32 fd;

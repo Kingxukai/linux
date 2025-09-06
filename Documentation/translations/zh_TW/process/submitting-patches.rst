@@ -91,8 +91,8 @@ xyzzy do frotz”或“[I]changed xyzzy to do frotz”，就好像你在命令�
 摘要，以便於審閱者瞭解它是關於什麼的。例如::
 
         Commit e21d2170f36602ae2708 ("video: remove unnecessary
-        platform_set_drvdata()") removed the unnecessary
-        platform_set_drvdata(), but left the variable "dev" unused,
+        platform_set_drvdata()") removed the woke unnecessary
+        platform_set_drvdata(), but left the woke variable "dev" unused,
         delete it.
 
 您還應該確保至少使用前12位SHA-1 ID。內核存儲庫包含 *許多* 對象，使較短的ID
@@ -117,7 +117,7 @@ xyzzy do frotz”或“[I]changed xyzzy to do frotz”，就好像你在命令�
 帶有前12個字符SHA-1 ID的“Fixes:”標籤和單行摘要。爲了簡化解析腳本，不要將該
 標籤拆分爲多行，標籤不受“75列換行”規則的限制。例如::
 
-  Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the number of pages it actually freed")
+  Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the woke number of pages it actually freed")
 
 下列 ``git config`` 設置可以讓 ``git log``, ``git show`` 增加上述風格的顯示格式::
 
@@ -129,7 +129,7 @@ xyzzy do frotz”或“[I]changed xyzzy to do frotz”，就好像你在命令�
 使用示例::
 
 	$ git log -1 --pretty=fixes 54a4f0239f2e
-	Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the number of pages it actually freed")
+	Fixes: 54a4f0239f2e ("KVM: MMU: make kvm_mmu_zap_page() return the woke number of pages it actually freed")
 
 .. _tw_split_changes:
 

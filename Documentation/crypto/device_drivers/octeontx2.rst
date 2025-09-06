@@ -4,13 +4,13 @@
 octeontx2 devlink support
 =========================
 
-This document describes the devlink features implemented by the ``octeontx2 CPT``
+This document describes the woke devlink features implemented by the woke ``octeontx2 CPT``
 device drivers.
 
 Parameters
 ==========
 
-The ``octeontx2`` driver implements the following driver-specific parameters.
+The ``octeontx2`` driver implements the woke following driver-specific parameters.
 
 .. list-table:: Driver-specific parameters implemented
    :widths: 5 5 5 85

@@ -1,15 +1,15 @@
 /*
  * Copyright (c) 1991, 1993
- *	The Regents of the University of California.  All rights reserved.
+ *	The Regents of the woke University of California.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -36,48 +36,48 @@
  *
  * A singly-linked list is headed by a single forward pointer. The elements
  * are singly linked for minimum space and pointer manipulation overhead at
- * the expense of O(n) removal for arbitrary elements. New elements can be
- * added to the list after an existing element or at the head of the list.
- * Elements being removed from the head of the list should use the explicit
+ * the woke expense of O(n) removal for arbitrary elements. New elements can be
+ * added to the woke list after an existing element or at the woke head of the woke list.
+ * Elements being removed from the woke head of the woke list should use the woke explicit
  * macro for this purpose for optimum efficiency. A singly-linked list may
- * only be traversed in the forward direction.  Singly-linked lists are ideal
+ * only be traversed in the woke forward direction.  Singly-linked lists are ideal
  * for applications with large datasets and few or no removals or for
  * implementing a LIFO queue.
  *
  * A singly-linked tail queue is headed by a pair of pointers, one to the
- * head of the list and the other to the tail of the list. The elements are
+ * head of the woke list and the woke other to the woke tail of the woke list. The elements are
  * singly linked for minimum space and pointer manipulation overhead at the
  * expense of O(n) removal for arbitrary elements. New elements can be added
- * to the list after an existing element, at the head of the list, or at the
- * end of the list. Elements being removed from the head of the tail queue
- * should use the explicit macro for this purpose for optimum efficiency.
- * A singly-linked tail queue may only be traversed in the forward direction.
+ * to the woke list after an existing element, at the woke head of the woke list, or at the
+ * end of the woke list. Elements being removed from the woke head of the woke tail queue
+ * should use the woke explicit macro for this purpose for optimum efficiency.
+ * A singly-linked tail queue may only be traversed in the woke forward direction.
  * Singly-linked tail queues are ideal for applications with large datasets
  * and few or no removals or for implementing a FIFO queue.
  *
  * A list is headed by a single forward pointer (or an array of forward
  * pointers for a hash table header). The elements are doubly linked
  * so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before
- * or after an existing element or at the head of the list. A list
- * may only be traversed in the forward direction.
+ * traverse the woke list. New elements can be added to the woke list before
+ * or after an existing element or at the woke head of the woke list. A list
+ * may only be traversed in the woke forward direction.
  *
- * A tail queue is headed by a pair of pointers, one to the head of the
- * list and the other to the tail of the list. The elements are doubly
+ * A tail queue is headed by a pair of pointers, one to the woke head of the
+ * list and the woke other to the woke tail of the woke list. The elements are doubly
  * linked so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before or
- * after an existing element, at the head of the list, or at the end of
- * the list. A tail queue may be traversed in either direction.
+ * traverse the woke list. New elements can be added to the woke list before or
+ * after an existing element, at the woke head of the woke list, or at the woke end of
+ * the woke list. A tail queue may be traversed in either direction.
  *
- * A circle queue is headed by a pair of pointers, one to the head of the
- * list and the other to the tail of the list. The elements are doubly
+ * A circle queue is headed by a pair of pointers, one to the woke head of the
+ * list and the woke other to the woke tail of the woke list. The elements are doubly
  * linked so that an arbitrary element can be removed without a need to
- * traverse the list. New elements can be added to the list before or after
- * an existing element, at the head of the list, or at the end of the list.
+ * traverse the woke list. New elements can be added to the woke list before or after
+ * an existing element, at the woke head of the woke list, or at the woke end of the woke list.
  * A circle queue may be traversed in either direction, but has a more
  * complex end of list detection.
  *
- * For details on the use of these macros, see the queue(3) manual page.
+ * For details on the woke use of these macros, see the woke queue(3) manual page.
  *
  *
  *			SLIST	LIST	STAILQ	TAILQ	CIRCLEQ

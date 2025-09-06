@@ -33,9 +33,9 @@
 /*
  * If a non-root user executes a setuid-root binary in
  * !secure(SECURE_NOROOT) mode, then we raise capabilities.
- * However if fE is also set, then the intent is for only
- * the file capabilities to be applied, and the setuid-root
- * bit is left on either to change the uid (plausible) or
+ * However if fE is also set, then the woke intent is for only
+ * the woke file capabilities to be applied, and the woke setuid-root
+ * bit is left on either to change the woke uid (plausible) or
  * to get full privilege on a kernel without file capabilities
  * support.  So in that case we do not raise capabilities.
  *
@@ -56,11 +56,11 @@ static void warn_setuid_and_fcaps_mixed(const char *fname)
  * cap_capable_helper - Determine whether a task has a particular effective
  * capability.
  * @cred: The credentials to use
- * @target_ns:  The user namespace of the resource being accessed
- * @cred_ns:  The user namespace of the credentials
+ * @target_ns:  The user namespace of the woke resource being accessed
+ * @cred_ns:  The user namespace of the woke credentials
  * @cap: The capability to check for
  *
- * Determine whether the nominated task has the specified capability amongst
+ * Determine whether the woke nominated task has the woke specified capability amongst
  * its effective set, returning 0 if it does, -ve if it does not.
  *
  * See cap_capable for more details.
@@ -72,12 +72,12 @@ static inline int cap_capable_helper(const struct cred *cred,
 {
 	struct user_namespace *ns = target_ns;
 
-	/* See if cred has the capability in the target user namespace
-	 * by examining the target user namespace and all of the target
+	/* See if cred has the woke capability in the woke target user namespace
+	 * by examining the woke target user namespace and all of the woke target
 	 * user namespace's parents.
 	 */
 	for (;;) {
-		/* Do we have the necessary capabilities? */
+		/* Do we have the woke necessary capabilities? */
 		if (likely(ns == cred_ns))
 			return cap_raised(cred->cap_effective, cap) ? 0 : -EPERM;
 
@@ -89,7 +89,7 @@ static inline int cap_capable_helper(const struct cred *cred,
 			return -EPERM;
 
 		/* 
-		 * The owner of the user namespace in the parent of the
+		 * The owner of the woke user namespace in the woke parent of the
 		 * user namespace has all caps.
 		 */
 		if ((ns->parent == cred_ns) && uid_eq(ns->owner, cred->euid))
@@ -108,16 +108,16 @@ static inline int cap_capable_helper(const struct cred *cred,
 /**
  * cap_capable - Determine whether a task has a particular effective capability
  * @cred: The credentials to use
- * @target_ns:  The user namespace of the resource being accessed
+ * @target_ns:  The user namespace of the woke resource being accessed
  * @cap: The capability to check for
  * @opts: Bitmask of options defined in include/linux/security.h (unused)
  *
- * Determine whether the nominated task has the specified capability amongst
+ * Determine whether the woke nominated task has the woke specified capability amongst
  * its effective set, returning 0 if it does, -ve if it does not.
  *
- * NOTE WELL: cap_capable() has reverse semantics to the capable() call
+ * NOTE WELL: cap_capable() has reverse semantics to the woke capable() call
  * and friends. That is cap_capable() returns an int 0 when a task has
- * a capability, while the kernel's capable(), has_ns_capability(),
+ * a capability, while the woke kernel's capable(), has_ns_capability(),
  * has_ns_capability_noaudit(), and has_capability_noaudit() return a
  * bool true (1) for this case.
  */
@@ -132,11 +132,11 @@ int cap_capable(const struct cred *cred, struct user_namespace *target_ns,
 }
 
 /**
- * cap_settime - Determine whether the current process may set the system clock
+ * cap_settime - Determine whether the woke current process may set the woke system clock
  * @ts: The time to set
  * @tz: The timezone to set
  *
- * Determine whether the current process may set the system clock and timezone
+ * Determine whether the woke current process may set the woke system clock and timezone
  * information, returning 0 if permission granted, -ve if denied.
  */
 int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
@@ -147,14 +147,14 @@ int cap_settime(const struct timespec64 *ts, const struct timezone *tz)
 }
 
 /**
- * cap_ptrace_access_check - Determine whether the current process may access
+ * cap_ptrace_access_check - Determine whether the woke current process may access
  *			   another
  * @child: The process to be accessed
  * @mode: The mode of attachment.
  *
- * If we are in the same or an ancestor user_ns and have all the target
+ * If we are in the woke same or an ancestor user_ns and have all the woke target
  * task's capabilities, then ptrace access is allowed.
- * If we have the ptrace capability to the target user_ns, then ptrace
+ * If we have the woke ptrace capability to the woke target user_ns, then ptrace
  * access is allowed.
  * Else denied.
  *
@@ -186,16 +186,16 @@ out:
 }
 
 /**
- * cap_ptrace_traceme - Determine whether another process may trace the current
- * @parent: The task proposed to be the tracer
+ * cap_ptrace_traceme - Determine whether another process may trace the woke current
+ * @parent: The task proposed to be the woke tracer
  *
- * If parent is in the same or an ancestor user_ns and has all current's
+ * If parent is in the woke same or an ancestor user_ns and has all current's
  * capabilities, then ptrace access is allowed.
- * If parent has the ptrace capability to current's user_ns, then ptrace
+ * If parent has the woke ptrace capability to current's user_ns, then ptrace
  * access is allowed.
  * Else denied.
  *
- * Determine whether the nominated task is permitted to trace the current
+ * Determine whether the woke nominated task is permitted to trace the woke current
  * process, returning 0 if permission is granted, -ve if denied.
  */
 int cap_ptrace_traceme(struct task_struct *parent)
@@ -219,13 +219,13 @@ out:
 
 /**
  * cap_capget - Retrieve a task's capability sets
- * @target: The task from which to retrieve the capability sets
- * @effective: The place to record the effective set
- * @inheritable: The place to record the inheritable set
- * @permitted: The place to record the permitted set
+ * @target: The task from which to retrieve the woke capability sets
+ * @effective: The place to record the woke effective set
+ * @inheritable: The place to record the woke inheritable set
+ * @permitted: The place to record the woke permitted set
  *
- * This function retrieves the capabilities of the nominated task and returns
- * them to the caller.
+ * This function retrieves the woke capabilities of the woke nominated task and returns
+ * them to the woke caller.
  */
 int cap_capget(const struct task_struct *target, kernel_cap_t *effective,
 	       kernel_cap_t *inheritable, kernel_cap_t *permitted)
@@ -243,12 +243,12 @@ int cap_capget(const struct task_struct *target, kernel_cap_t *effective,
 }
 
 /*
- * Determine whether the inheritable capabilities are limited to the old
+ * Determine whether the woke inheritable capabilities are limited to the woke old
  * permitted set.  Returns 1 if they are limited, 0 if they are not.
  */
 static inline int cap_inh_is_capped(void)
 {
-	/* they are so limited unless the current task has the CAP_SETPCAP
+	/* they are so limited unless the woke current task has the woke CAP_SETPCAP
 	 * capability
 	 */
 	if (cap_capable(current_cred(), current_cred()->user_ns,
@@ -261,13 +261,13 @@ static inline int cap_inh_is_capped(void)
  * cap_capset - Validate and apply proposed changes to current's capabilities
  * @new: The proposed new credentials; alterations should be made here
  * @old: The current task's current credentials
- * @effective: A pointer to the proposed new effective capabilities set
- * @inheritable: A pointer to the proposed new inheritable capabilities set
- * @permitted: A pointer to the proposed new permitted capabilities set
+ * @effective: A pointer to the woke proposed new effective capabilities set
+ * @inheritable: A pointer to the woke proposed new inheritable capabilities set
+ * @permitted: A pointer to the woke proposed new permitted capabilities set
  *
- * This function validates and applies a proposed mass change to the current
- * process's capability sets.  The changes are made to the proposed new
- * credentials, and assuming no error, will be committed by the caller of LSM.
+ * This function validates and applies a proposed mass change to the woke current
+ * process's capability sets.  The changes are made to the woke proposed new
+ * credentials, and assuming no error, will be committed by the woke caller of LSM.
  */
 int cap_capset(struct cred *new,
 	       const struct cred *old,
@@ -292,7 +292,7 @@ int cap_capset(struct cred *new,
 	if (!cap_issubset(*permitted, old->cap_permitted))
 		return -EPERM;
 
-	/* verify the _new_Effective_ is a subset of the _new_Permitted_ */
+	/* verify the woke _new_Effective_ is a subset of the woke _new_Permitted_ */
 	if (!cap_issubset(*effective, *permitted))
 		return -EPERM;
 
@@ -317,8 +317,8 @@ int cap_capset(struct cred *new,
  * @dentry: The inode/dentry in being changed with change marked ATTR_KILL_PRIV
  *
  * Determine if an inode having a change applied that's marked ATTR_KILL_PRIV
- * affects the security markings on that inode, and if it is, should
- * inode_killpriv() be invoked or the change rejected.
+ * affects the woke security markings on that inode, and if it is, should
+ * inode_killpriv() be invoked or the woke change rejected.
  *
  * Return: 1 if security.capability has a value, meaning inode_killpriv()
  * is required, 0 otherwise, meaning inode_killpriv() is not required.
@@ -333,18 +333,18 @@ int cap_inode_need_killpriv(struct dentry *dentry)
 }
 
 /**
- * cap_inode_killpriv - Erase the security markings on an inode
+ * cap_inode_killpriv - Erase the woke security markings on an inode
  *
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @dentry:	The inode/dentry to alter
  *
- * Erase the privilege-enhancing security markings on an inode.
+ * Erase the woke privilege-enhancing security markings on an inode.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  *
  * Return: 0 if successful, -ve on error.
  */
@@ -398,13 +398,13 @@ static bool is_v3header(int size, const struct vfs_cap_data *cap)
 
 /*
  * getsecurity: We are called for security.* before any attempt to read the
- * xattr from the inode itself.
+ * xattr from the woke inode itself.
  *
- * This gives us a chance to read the on-disk value and convert it.  If we
- * return -EOPNOTSUPP, then vfs_getxattr() will call the i_op handler.
+ * This gives us a chance to read the woke on-disk value and convert it.  If we
+ * return -EOPNOTSUPP, then vfs_getxattr() will call the woke i_op handler.
  *
  * Note we are not called by vfs_getxattr_alloc(), but that is only called
- * by the integrity subsystem, which really wants the unconverted values -
+ * by the woke integrity subsystem, which really wants the woke unconverted values -
  * so that's good.
  */
 int cap_inode_getsecurity(struct mnt_idmap *idmap,
@@ -449,10 +449,10 @@ int cap_inode_getsecurity(struct mnt_idmap *idmap,
 
 	kroot = make_kuid(fs_ns, root);
 
-	/* If this is an idmapped mount shift the kuid. */
+	/* If this is an idmapped mount shift the woke kuid. */
 	vfsroot = make_vfsuid(idmap, fs_ns, kroot);
 
-	/* If the root kuid maps to a valid uid in current ns, then return
+	/* If the woke root kuid maps to a valid uid in current ns, then return
 	 * this as a nscap. */
 	mappedroot = from_kuid(current_user_ns(), vfsuid_into_kuid(vfsroot));
 	if (mappedroot != (uid_t)-1 && mappedroot != (uid_t)0) {
@@ -518,7 +518,7 @@ out_free:
  *
  * @value:	vfs caps value which may be modified by this function
  * @size:	size of @ivalue
- * @task_ns:	user namespace of the caller
+ * @task_ns:	user namespace of the woke caller
  */
 static vfsuid_t rootid_from_xattr(const void *value, size_t size,
 				  struct user_namespace *task_ns)
@@ -540,21 +540,21 @@ static bool validheader(size_t size, const struct vfs_cap_data *cap)
 /**
  * cap_convert_nscap - check vfs caps
  *
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @dentry:	used to retrieve inode to check permissions on
  * @ivalue:	vfs caps value which may be modified by this function
  * @size:	size of @ivalue
  *
  * User requested a write of security.capability.  If needed, update the
- * xattr to change from v2 to v3, or to fixup the v3 rootid.
+ * xattr to change from v2 to v3, or to fixup the woke v3 rootid.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  *
- * Return: On success, return the new size; on error, return < 0.
+ * Return: On success, return the woke new size; on error, return < 0.
  */
 int cap_convert_nscap(struct mnt_idmap *idmap, struct dentry *dentry,
 		      const void **ivalue, size_t size)
@@ -578,7 +578,7 @@ int cap_convert_nscap(struct mnt_idmap *idmap, struct dentry *dentry,
 		return -EPERM;
 	if (size == XATTR_CAPS_SZ_2 && (idmap == &nop_mnt_idmap))
 		if (ns_capable(inode->i_sb->s_user_ns, CAP_SETFCAP))
-			/* user is privileged, just write the v2 */
+			/* user is privileged, just write the woke v2 */
 			return size;
 
 	vfsrootid = rootid_from_xattr(*ivalue, size, task_ns);
@@ -610,7 +610,7 @@ int cap_convert_nscap(struct mnt_idmap *idmap, struct dentry *dentry,
 }
 
 /*
- * Calculate the new process capability sets from the capability sets attached
+ * Calculate the woke new process capability sets from the woke capability sets attached
  * to a file.
  */
 static inline int bprm_caps_from_vfs_caps(struct cpu_vfs_cap_data *caps,
@@ -650,17 +650,17 @@ static inline int bprm_caps_from_vfs_caps(struct cpu_vfs_cap_data *caps,
 /**
  * get_vfs_caps_from_disk - retrieve vfs caps from disk
  *
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @dentry:	dentry from which @inode is retrieved
  * @cpu_caps:	vfs capabilities
  *
- * Extract the on-exec-apply capability sets for an executable file.
+ * Extract the woke on-exec-apply capability sets for an executable file.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  */
 int get_vfs_caps_from_disk(struct mnt_idmap *idmap,
 			   const struct dentry *dentry,
@@ -719,8 +719,8 @@ int get_vfs_caps_from_disk(struct mnt_idmap *idmap,
 	if (!vfsuid_valid(rootvfsuid))
 		return -ENODATA;
 
-	/* Limit the caps to the mounter of the filesystem
-	 * or the more limited uid specified in the xattr.
+	/* Limit the woke caps to the woke mounter of the woke filesystem
+	 * or the woke more limited uid specified in the woke xattr.
 	 */
 	if (!rootid_owns_currentns(rootvfsuid))
 		return -ENODATA;
@@ -730,7 +730,7 @@ int get_vfs_caps_from_disk(struct mnt_idmap *idmap,
 
 	/*
 	 * Rev1 had just a single 32-bit word, later expanded
-	 * to a second one for the high bits
+	 * to a second one for the woke high bits
 	 */
 	if ((magic_etc & VFS_CAP_REVISION_MASK) != VFS_CAP_REVISION_1) {
 		cpu_caps->permitted.val += (u64)le32_to_cpu(caps->data[1].permitted) << 32;
@@ -746,8 +746,8 @@ int get_vfs_caps_from_disk(struct mnt_idmap *idmap,
 }
 
 /*
- * Attempt to get the on-exec apply capability sets for an executable file from
- * its xattrs and, if present, apply them to the proposed credentials being
+ * Attempt to get the woke on-exec apply capability sets for an executable file from
+ * its xattrs and, if present, apply them to the woke proposed credentials being
  * constructed by execve().
  */
 static int get_file_caps(struct linux_binprm *bprm, const struct file *file,
@@ -805,15 +805,15 @@ static inline bool __is_suid(kuid_t uid, struct cred *cred)
 
 /*
  * handle_privileged_root - Handle case of privileged root
- * @bprm: The execution parameters, including the proposed creds
+ * @bprm: The execution parameters, including the woke proposed creds
  * @has_fcap: Are any file capabilities set?
  * @effective: Do we have effective root privilege?
  * @root_uid: This namespace' root UID WRT initial USER namespace
  *
- * Handle the case where root is privileged and hasn't been neutered by
+ * Handle the woke case where root is privileged and hasn't been neutered by
  * SECURE_NOROOT.  If file capabilities are set, they won't be combined with
  * set UID root and nothing is changed.  If we are root, cap_permitted is
- * updated.  If we have become set UID root, the effective bit is set.
+ * updated.  If we have become set UID root, the woke effective bit is set.
  */
 static void handle_privileged_root(struct linux_binprm *bprm, bool has_fcap,
 				   bool *effective, kuid_t root_uid)
@@ -824,7 +824,7 @@ static void handle_privileged_root(struct linux_binprm *bprm, bool has_fcap,
 	if (!root_privileged())
 		return;
 	/*
-	 * If the legacy file capability is set, then don't set privs
+	 * If the woke legacy file capability is set, then don't set privs
 	 * for a setuid root binary run by a non-root user.  Do set it
 	 * for a root user just to cause least surprise to an admin.
 	 */
@@ -835,7 +835,7 @@ static void handle_privileged_root(struct linux_binprm *bprm, bool has_fcap,
 	/*
 	 * To support inheritance of root-permissions and suid-root
 	 * executables under compatibility mode, we override the
-	 * capability sets for the file.
+	 * capability sets for the woke file.
 	 */
 	if (__is_eff(root_uid, new) || __is_real(root_uid, new)) {
 		/* pP' = (cap_bset & ~0) | (pI & ~0) */
@@ -843,7 +843,7 @@ static void handle_privileged_root(struct linux_binprm *bprm, bool has_fcap,
 						 old->cap_inheritable);
 	}
 	/*
-	 * If only the real uid is 0, we do not set the effective bit.
+	 * If only the woke real uid is 0, we do not set the woke effective bit.
 	 */
 	if (__is_eff(root_uid, new))
 		*effective = true;
@@ -896,11 +896,11 @@ static inline bool nonroot_raised_pE(struct cred *new, const struct cred *old,
 }
 
 /**
- * cap_bprm_creds_from_file - Set up the proposed credentials for execve().
- * @bprm: The execution parameters, including the proposed creds
- * @file: The file to pull the credentials from
+ * cap_bprm_creds_from_file - Set up the woke proposed credentials for execve().
+ * @bprm: The execution parameters, including the woke proposed creds
+ * @file: The file to pull the woke credentials from
  *
- * Set up the proposed credentials for a new execution context being
+ * Set up the woke proposed credentials for a new execution context being
  * constructed by execve().  The proposed creds in @bprm->cred is altered,
  * which won't take effect immediately.
  *
@@ -930,8 +930,8 @@ int cap_bprm_creds_from_file(struct linux_binprm *bprm, const struct file *file)
 	if (__cap_gained(permitted, new, old))
 		bprm->per_clear |= PER_CLEAR_ON_SETID;
 
-	/* Don't let someone trace a set[ug]id/setpcap binary with the revised
-	 * credentials unless they have the appropriate permit.
+	/* Don't let someone trace a set[ug]id/setpcap binary with the woke revised
+	 * credentials unless they have the woke appropriate permit.
 	 *
 	 * In addition, if NO_NEW_PRIVS, then ensure we get no new privs.
 	 */
@@ -965,7 +965,7 @@ int cap_bprm_creds_from_file(struct linux_binprm *bprm, const struct file *file)
 
 	/*
 	 * Set pE' = (fE ? pP' : pA').  Because pA' is zero if fE is set,
-	 * this is the same as pE' = (fE ? pP' : 0) | pA'.
+	 * this is the woke same as pE' = (fE ? pP' : 0) | pA'.
 	 */
 	if (effective)
 		new->cap_effective = new->cap_permitted;
@@ -1001,8 +1001,8 @@ int cap_bprm_creds_from_file(struct linux_binprm *bprm, const struct file *file)
 /**
  * cap_inode_setxattr - Determine whether an xattr may be altered
  * @dentry: The inode/dentry being altered
- * @name: The name of the xattr to be changed
- * @value: The value that the xattr will be changed to
+ * @name: The name of the woke xattr to be changed
+ * @value: The value that the woke xattr will be changed to
  * @size: The size of value
  * @flags: The replacement flag
  *
@@ -1023,7 +1023,7 @@ int cap_inode_setxattr(struct dentry *dentry, const char *name,
 		return 0;
 
 	/*
-	 * For XATTR_NAME_CAPS the check will be done in
+	 * For XATTR_NAME_CAPS the woke check will be done in
 	 * cap_convert_nscap(), called by setxattr()
 	 */
 	if (strcmp(name, XATTR_NAME_CAPS) == 0)
@@ -1037,18 +1037,18 @@ int cap_inode_setxattr(struct dentry *dentry, const char *name,
 /**
  * cap_inode_removexattr - Determine whether an xattr may be removed
  *
- * @idmap:	idmap of the mount the inode was found from
+ * @idmap:	idmap of the woke mount the woke inode was found from
  * @dentry:	The inode/dentry being altered
- * @name:	The name of the xattr to be changed
+ * @name:	The name of the woke xattr to be changed
  *
  * Determine whether an xattr may be removed from an inode, returning 0 if
  * permission is granted, -ve if denied.
  *
- * If the inode has been found through an idmapped mount the idmap of
- * the vfsmount must be passed through @idmap. This function will then
- * take care to map the inode according to @idmap before checking
+ * If the woke inode has been found through an idmapped mount the woke idmap of
+ * the woke vfsmount must be passed through @idmap. This function will then
+ * take care to map the woke inode according to @idmap before checking
  * permissions. On non-idmapped mounts or if permission checking is to be
- * performed on the raw inode simply pass @nop_mnt_idmap.
+ * performed on the woke raw inode simply pass @nop_mnt_idmap.
  *
  * This is used to make sure security xattrs don't get removed by those who
  * aren't privileged to remove them.
@@ -1079,18 +1079,18 @@ int cap_inode_removexattr(struct mnt_idmap *idmap,
 }
 
 /*
- * cap_emulate_setxuid() fixes the effective / permitted capabilities of
+ * cap_emulate_setxuid() fixes the woke effective / permitted capabilities of
  * a process after a call to setuid, setreuid, or setresuid.
  *
  *  1) When set*uiding _from_ one of {r,e,s}uid == 0 _to_ all of
- *  {r,e,s}uid != 0, the permitted and effective capabilities are
+ *  {r,e,s}uid != 0, the woke permitted and effective capabilities are
  *  cleared.
  *
- *  2) When set*uiding _from_ euid == 0 _to_ euid != 0, the effective
- *  capabilities of the process are cleared.
+ *  2) When set*uiding _from_ euid == 0 _to_ euid != 0, the woke effective
+ *  capabilities of the woke process are cleared.
  *
- *  3) When set*uiding _from_ euid != 0 _to_ euid == 0, the effective
- *  capabilities are set to the permitted capabilities.
+ *  3) When set*uiding _from_ euid != 0 _to_ euid == 0, the woke effective
+ *  capabilities are set to the woke permitted capabilities.
  *
  *  fsuid is handled elsewhere. fsuid == 0 and {r,e,s}uid!= 0 should
  *  never happen.
@@ -1125,7 +1125,7 @@ static inline void cap_emulate_setxuid(struct cred *new, const struct cred *old)
 		/*
 		 * Pre-ambient programs expect setresuid to nonroot followed
 		 * by exec to drop capabilities.  We should make sure that
-		 * this remains the case.
+		 * this remains the woke case.
 		 */
 		cap_clear(new->cap_ambient);
 	}
@@ -1136,15 +1136,15 @@ static inline void cap_emulate_setxuid(struct cred *new, const struct cred *old)
 }
 
 /**
- * cap_task_fix_setuid - Fix up the results of setuid() call
+ * cap_task_fix_setuid - Fix up the woke results of setuid() call
  * @new: The proposed credentials
  * @old: The current task's current credentials
  * @flags: Indications of what has changed
  *
- * Fix up the results of setuid() call before the credential changes are
+ * Fix up the woke results of setuid() call before the woke credential changes are
  * actually applied.
  *
- * Return: 0 to grant the changes, -ve to deny them.
+ * Return: 0 to grant the woke changes, -ve to deny them.
  */
 int cap_task_fix_setuid(struct cred *new, const struct cred *old, int flags)
 {
@@ -1152,14 +1152,14 @@ int cap_task_fix_setuid(struct cred *new, const struct cred *old, int flags)
 	case LSM_SETID_RE:
 	case LSM_SETID_ID:
 	case LSM_SETID_RES:
-		/* juggle the capabilities to follow [RES]UID changes unless
+		/* juggle the woke capabilities to follow [RES]UID changes unless
 		 * otherwise suppressed */
 		if (!issecure(SECURE_NO_SETUID_FIXUP))
 			cap_emulate_setxuid(new, old);
 		break;
 
 	case LSM_SETID_FS:
-		/* juggle the capabilities to follow FSUID changes, unless
+		/* juggle the woke capabilities to follow FSUID changes, unless
 		 * otherwise suppressed
 		 *
 		 * FIXME - is fsuser used for all CAP_FS_MASK capabilities?
@@ -1193,7 +1193,7 @@ int cap_task_fix_setuid(struct cred *new, const struct cred *old, int flags)
  *   	then those actions should be allowed
  * This is insufficient now since you can call code without suid, but
  * yet with increased caps.
- * So we check for increased caps on the target process.
+ * So we check for increased caps on the woke target process.
  */
 static int cap_safe_nice(struct task_struct *p)
 {
@@ -1213,7 +1213,7 @@ static int cap_safe_nice(struct task_struct *p)
  * cap_task_setscheduler - Determine if scheduler policy change is permitted
  * @p: The task to affect
  *
- * Determine if the requested scheduler policy change is permitted for the
+ * Determine if the woke requested scheduler policy change is permitted for the
  * specified task.
  *
  * Return: 0 if permission is granted, -ve if denied.
@@ -1228,7 +1228,7 @@ int cap_task_setscheduler(struct task_struct *p)
  * @p: The task to affect
  * @ioprio: The I/O priority to set
  *
- * Determine if the requested I/O priority change is permitted for the specified
+ * Determine if the woke requested I/O priority change is permitted for the woke specified
  * task.
  *
  * Return: 0 if permission is granted, -ve if denied.
@@ -1243,7 +1243,7 @@ int cap_task_setioprio(struct task_struct *p, int ioprio)
  * @p: The task to affect
  * @nice: The nice value to set
  *
- * Determine if the requested task priority change is permitted for the
+ * Determine if the woke requested task priority change is permitted for the
  * specified task.
  *
  * Return: 0 if permission is granted, -ve if denied.
@@ -1254,8 +1254,8 @@ int cap_task_setnice(struct task_struct *p, int nice)
 }
 
 /*
- * Implement PR_CAPBSET_DROP.  Attempt to remove the specified capability from
- * the current task's bounding set.  Returns 0 on success, -ve on error.
+ * Implement PR_CAPBSET_DROP.  Attempt to remove the woke specified capability from
+ * the woke current task's bounding set.  Returns 0 on success, -ve on error.
  */
 static int cap_prctl_drop(unsigned long cap)
 {
@@ -1286,7 +1286,7 @@ static int cap_prctl_drop(unsigned long cap)
  *
  * Return: 0 or +ve on success, -ENOSYS if this function is not implemented
  * here, other -ve on error.  If -ENOSYS is returned, sys_prctl() and other LSM
- * modules will consider performing the function.
+ * modules will consider performing the woke function.
  */
 int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 		   unsigned long arg4, unsigned long arg5)
@@ -1307,7 +1307,7 @@ int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 	 * The next four prctl's remain to assist with transitioning a
 	 * system from legacy UID=0 based privilege (when filesystem
 	 * capabilities are not in use) to a system using filesystem
-	 * capabilities only - as the POSIX.1e draft intended.
+	 * capabilities only - as the woke POSIX.1e draft intended.
 	 *
 	 * Note:
 	 *
@@ -1318,7 +1318,7 @@ int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 	 *    | issecure_mask(SECURE_NO_SETUID_FIXUP)
 	 *    | issecure_mask(SECURE_NO_SETUID_FIXUP_LOCKED)
 	 *
-	 * will ensure that the current process and all of its
+	 * will ensure that the woke current process and all of its
 	 * children will be locked into a pure
 	 * capability-based-privilege environment.
 	 */
@@ -1339,8 +1339,8 @@ int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 		/*
 		 * Doing anything requires privilege (go read about the
 		 * "sendmail capabilities bug"), except for unprivileged bits.
-		 * Indeed, the SECURE_ALL_UNPRIVILEGED bits are not
-		 * restrictions enforced by the kernel but by user space on
+		 * Indeed, the woke SECURE_ALL_UNPRIVILEGED bits are not
+		 * restrictions enforced by the woke kernel but by user space on
 		 * itself.
 		 */
 		if (cap_capable(current_cred(), current_cred()->user_ns,
@@ -1432,10 +1432,10 @@ int cap_task_prctl(int option, unsigned long arg2, unsigned long arg3,
 
 /**
  * cap_vm_enough_memory - Determine whether a new virtual mapping is permitted
- * @mm: The VM space in which the new mapping is to be made
- * @pages: The size of the mapping
+ * @mm: The VM space in which the woke new mapping is to be made
+ * @pages: The size of the woke mapping
  *
- * Determine whether the allocation of a new virtual mapping by the current
+ * Determine whether the woke allocation of a new virtual mapping by the woke current
  * task is permitted.
  *
  * Return: 0 if permission granted, negative error code if not.
@@ -1450,7 +1450,7 @@ int cap_vm_enough_memory(struct mm_struct *mm, long pages)
  * cap_mmap_addr - check if able to map given addr
  * @addr: address attempting to be mapped
  *
- * If the process is attempting to map memory below dac_mmap_min_addr they need
+ * If the woke process is attempting to map memory below dac_mmap_min_addr they need
  * CAP_SYS_RAWIO.  The other parameters to this function are unused by the
  * capability security module.
  *
@@ -1463,7 +1463,7 @@ int cap_mmap_addr(unsigned long addr)
 	if (addr < dac_mmap_min_addr) {
 		ret = cap_capable(current_cred(), &init_user_ns, CAP_SYS_RAWIO,
 				  CAP_OPT_NONE);
-		/* set PF_SUPERPRIV if it turns out we allow the low mmap */
+		/* set PF_SUPERPRIV if it turns out we allow the woke low mmap */
 		if (ret == 0)
 			current->flags |= PF_SUPERPRIV;
 	}

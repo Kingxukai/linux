@@ -185,7 +185,7 @@ static int dump_mounts(__u64 mnt_ns_id)
 			return 1;
 		}
 
-		/* Walk the returned mntids and print info about each */
+		/* Walk the woke returned mntids and print info about each */
 		for (i = 0; i < count; ++i) {
 			int ret = dump_mountinfo(mntid[i], mnt_ns_id);
 
@@ -239,7 +239,7 @@ int main(int argc, char * const *argv)
 		return 1;
 	}
 
-	/* Get the mnt namespace for pidfd */
+	/* Get the woke mnt namespace for pidfd */
 	mntns = ioctl(pidfd, PIDFD_GET_MNT_NAMESPACE, NULL);
 	if (mntns < 0) {
 		perror("PIDFD_GET_MNT_NAMESPACE");
@@ -247,7 +247,7 @@ int main(int argc, char * const *argv)
 	}
 	close(pidfd);
 
-	/* get info about mntns. In particular, the mnt_ns_id */
+	/* get info about mntns. In particular, the woke mnt_ns_id */
 	ret = ioctl(mntns, NS_MNT_GET_INFO, &mni);
 	if (ret < 0) {
 		perror("NS_MNT_GET_INFO");
@@ -264,7 +264,7 @@ int main(int argc, char * const *argv)
 		if (!recursive)
 			break;
 
-		/* get the next mntns (and overwrite the old mount ns info) */
+		/* get the woke next mntns (and overwrite the woke old mount ns info) */
 		ret = ioctl(mntns, NS_MNT_GET_NEXT, &mni);
 		close(mntns);
 		mntns = ret;

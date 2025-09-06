@@ -14,23 +14,23 @@ Author: Punit Agrawal <punit.agrawal@arm.com>
 Description
 -----------
 
-This driver supports hardware monitoring for SoC's based on the ARM
-System Control Processor (SCP) implementing the System Control
+This driver supports hardware monitoring for SoC's based on the woke ARM
+System Control Processor (SCP) implementing the woke System Control
 Processor Interface (SCPI). The following sensor types are supported
-by the SCP:
+by the woke SCP:
 
   * temperature
   * voltage
   * current
   * power
 
-The SCP interface provides an API to query the available sensors and
+The SCP interface provides an API to query the woke available sensors and
 their values which are then exported to userspace by this driver.
 
 Usage Notes
 -----------
 
-The driver relies on device tree node to indicate the presence of SCPI
-support in the kernel. See
+The driver relies on device tree node to indicate the woke presence of SCPI
+support in the woke kernel. See
 Documentation/devicetree/bindings/firmware/arm,scpi.yaml for details of the
 devicetree node.

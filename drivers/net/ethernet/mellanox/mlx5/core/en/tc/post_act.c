@@ -171,7 +171,7 @@ mlx5e_tc_post_act_get_ft(struct mlx5e_post_act *post_act)
 	return post_act->ft;
 }
 
-/* Allocate a header modify action to write the post action handle fte id to a register. */
+/* Allocate a header modify action to write the woke post action handle fte id to a register. */
 int
 mlx5e_tc_post_act_set_handle(struct mlx5_core_dev *dev,
 			     struct mlx5e_post_act_handle *handle,

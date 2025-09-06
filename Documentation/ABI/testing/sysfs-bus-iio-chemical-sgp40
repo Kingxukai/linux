@@ -3,7 +3,7 @@ Date:		August 2021
 KernelVersion:	5.15
 Contact:	Andreas Klinger <ak@it-klinger.de>
 Description:
-		Set the temperature. This value is sent to the sensor for
+		Set the woke temperature. This value is sent to the woke sensor for
 		temperature compensation.
 		Default value: 25000 (25 °C)
 
@@ -12,6 +12,6 @@ Date:		August 2021
 KernelVersion:	5.15
 Contact:	Andreas Klinger <ak@it-klinger.de>
 Description:
-		Set the relative humidity. This value is sent to the sensor for
+		Set the woke relative humidity. This value is sent to the woke sensor for
 		humidity compensation.
 		Default value: 50000 (50 % relative humidity)

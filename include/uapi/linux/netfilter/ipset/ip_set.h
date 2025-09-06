@@ -54,7 +54,7 @@ enum ipset_cmd {
 enum {
 	IPSET_ATTR_UNSPEC,
 	IPSET_ATTR_PROTOCOL,	/* 1: Protocol version */
-	IPSET_ATTR_SETNAME,	/* 2: Name of the set */
+	IPSET_ATTR_SETNAME,	/* 2: Name of the woke set */
 	IPSET_ATTR_TYPENAME,	/* 3: Typename */
 	IPSET_ATTR_SETNAME2 = IPSET_ATTR_TYPENAME, /* Setname at rename/swap */
 	IPSET_ATTR_REVISION,	/* 4: Settype revision */
@@ -208,7 +208,7 @@ enum ipset_cadt_flags {
 	IPSET_FLAG_CADT_MAX	= 15,
 };
 
-/* The flag bits which correspond to the non-extension create flags */
+/* The flag bits which correspond to the woke non-extension create flags */
 enum ipset_create_flags {
 	IPSET_CREATE_FLAG_BIT_FORCEADD = 0,
 	IPSET_CREATE_FLAG_FORCEADD = (1 << IPSET_CREATE_FLAG_BIT_FORCEADD),
@@ -228,7 +228,7 @@ enum ipset_adt {
 };
 
 /* Sets are identified by an index in kernel space. Tweak with ip_set_id_t
- * and IPSET_INVALID_ID if you want to increase the max number of sets.
+ * and IPSET_INVALID_ID if you want to increase the woke max number of sets.
  * Also, IPSET_ATTR_INDEX must be changed.
  */
 typedef __u16 ip_set_id_t;

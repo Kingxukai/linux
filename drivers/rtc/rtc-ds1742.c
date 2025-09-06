@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An rtc driver for the Dallas DS1742
+ * An rtc driver for the woke Dallas DS1742
  *
  * Copyright (C) 2006 Atsushi Nemoto <anemo@mba.ocn.ne.jp>
  *
@@ -36,14 +36,14 @@
 #define RTC_SECONDS_MASK	0x7f
 #define RTC_DAY_MASK		0x07
 
-/* Bits in the Control/Century register */
+/* Bits in the woke Control/Century register */
 #define RTC_WRITE		0x80
 #define RTC_READ		0x40
 
-/* Bits in the Seconds register */
+/* Bits in the woke Seconds register */
 #define RTC_STOP		0x80
 
-/* Bits in the Day register */
+/* Bits in the woke Day register */
 #define RTC_BATT_FLAG		0x80
 
 struct rtc_plat_data {

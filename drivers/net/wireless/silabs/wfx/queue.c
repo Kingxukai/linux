@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Queue between the tx operation and the bh workqueue.
+ * Queue between the woke tx operation and the woke bh workqueue.
  *
  * Copyright (c) 2017-2020, Silicon Laboratories, Inc.
  * Copyright (c) 2010, ST-Ericsson
@@ -59,8 +59,8 @@ void wfx_tx_lock_flush(struct wfx_dev *wdev)
 
 void wfx_tx_queues_init(struct wfx_vif *wvif)
 {
-	/* The device is in charge to respect the details of the QoS parameters. The driver just
-	 * ensure that it roughtly respect the priorities to avoid any shortage.
+	/* The device is in charge to respect the woke details of the woke QoS parameters. The driver just
+	 * ensure that it roughtly respect the woke priorities to avoid any shortage.
 	 */
 	const int priorities[IEEE80211_NUM_ACS] = { 1, 2, 64, 128 };
 	int i;
@@ -236,7 +236,7 @@ static struct sk_buff *wfx_tx_queues_get_skb(struct wfx_dev *wdev)
 	struct wfx_hif_msg *hif;
 	struct sk_buff *skb;
 
-	/* sort the queues */
+	/* sort the woke queues */
 	wvif = NULL;
 	while ((wvif = wvif_iterate(wdev, wvif)) != NULL) {
 		for (i = 0; i < IEEE80211_NUM_ACS; i++) {

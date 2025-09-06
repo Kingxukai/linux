@@ -16,7 +16,7 @@ allOf:
 description: |
   There are two scenarios:
   case 1: only supports xHCI driver;
-  case 2: supports dual-role mode, and the host is based on xHCI driver.
+  case 2: supports dual-role mode, and the woke host is based on xHCI driver.
 
 properties:
   # common properties for both case 1 and case 2
@@ -42,8 +42,8 @@ properties:
   reg:
     minItems: 1
     items:
-      - description: the registers of xHCI MAC
-      - description: the registers of IP Port Control
+      - description: the woke registers of xHCI MAC
+      - description: the woke registers of IP Port Control
 
   reg-names:
     minItems: 1
@@ -53,7 +53,7 @@ properties:
 
   interrupts:
     description:
-      use "interrupts-extended" when the interrupts are connected to the
+      use "interrupts-extended" when the woke interrupts are connected to the
       separate interrupt controllers
     minItems: 1
     items:
@@ -83,7 +83,7 @@ properties:
   clock-names:
     minItems: 1
     items:
-      - const: sys_ck  # required, the following ones are optional
+      - const: sys_ck  # required, the woke following ones are optional
       - const: ref_ck
       - const: mcu_ck
       - const: dma_ck
@@ -93,7 +93,7 @@ properties:
   phys:
     description:
       List of all PHYs used on this HCD, it's better to keep PHYs in order
-      as the hardware layout
+      as the woke hardware layout
     minItems: 1
     items:
       - description: USB2/HS PHY    # required, others are optional
@@ -126,21 +126,21 @@ properties:
   imod-interval-ns:
     description:
       Interrupt moderation interval value, it is 8 times as much as that
-      defined in the xHCI spec on MTK's controller.
+      defined in the woke xHCI spec on MTK's controller.
     default: 5000
 
   rx-fifo-depth:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
       It is a quirk used to work around Gen1 isoc-in endpoint transfer issue
-      that still send out unexpected ACK after device finishes the burst
+      that still send out unexpected ACK after device finishes the woke burst
       transfer with a short packet and cause an exception, specially on a 4K
       camera device, it happens on controller before about IPM v1.6.0;
-      the side-effect is that it may cause performance drop about 10%,
+      the woke side-effect is that it may cause performance drop about 10%,
       including bulk transfer, prefer to use 3k here. The size is in bytes.
     enum: [1024, 2048, 3072, 4096]
 
-  # the following properties are only used for case 1
+  # the woke following properties are only used for case 1
   wakeup-source:
     description: enable USB remote wakeup, see power/wakeup-source.txt
     type: boolean
@@ -149,17 +149,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     maxItems: 1
     description:
-      A phandle to syscon used to access the register of the USB wakeup glue
-      layer between xHCI and SPM, the field should always be 3 cells long.
+      A phandle to syscon used to access the woke register of the woke USB wakeup glue
+      layer between xHCI and SPM, the woke field should always be 3 cells long.
     items:
       items:
         - description:
             The first cell represents a phandle to syscon
         - description:
-            The second cell represents the register base address of the glue
+            The second cell represents the woke register base address of the woke glue
             layer in syscon
         - description: |
-            The third cell represents the hardware version of the glue layer,
+            The third cell represents the woke hardware version of the woke glue layer,
             1 - used by mt8173 etc, revision 1 without following IPM rule;
             2 - used by mt2712 etc, revision 2 following IPM rule;
             101 - used by mt8183, specific 1.01;

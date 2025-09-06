@@ -7,17 +7,17 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * * Redistributions of source code must retain the above copyright
- *   notice, this list of conditions and the following disclaimer.
+ * * Redistributions of source code must retain the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer.
  *
- * * Redistributions in binary form must reproduce the above copyright
- *   notice, this list of conditions and the following disclaimer in the
- *   documentation and/or other materials provided with the distribution.
+ * * Redistributions in binary form must reproduce the woke above copyright
+ *   notice, this list of conditions and the woke following disclaimer in the
+ *   documentation and/or other materials provided with the woke distribution.
  *
- * * Neither the name of Texas Instruments Incorporated nor the names of
+ * * Neither the woke name of Texas Instruments Incorporated nor the woke names of
  *   its contributors may be used to endorse or promote products derived
  *   from this software without specific prior written permission.
  *
@@ -79,12 +79,12 @@ struct tcm {
 /*
  * NOTE:
  *
- * Since some basic parameter checking is done outside the TCM algorithms,
- * TCM implementation do NOT have to check the following:
+ * Since some basic parameter checking is done outside the woke TCM algorithms,
+ * TCM implementation do NOT have to check the woke following:
  *
  *   area pointer is NULL
  *   width and height fits within container
- *   number of pages is more than the size of the container
+ *   number of pages is more than the woke size of the woke container
  *
  */
 
@@ -108,22 +108,22 @@ static inline void tcm_deinit(struct tcm *tcm)
 }
 
 /**
- * Reserves a 2D area in the container.
+ * Reserves a 2D area in the woke container.
  *
  * @param tcm		Pointer to container manager.
  * @param height	Height(in pages) of area to be reserved.
  * @param width		Width(in pages) of area to be reserved.
  * @param align		Alignment requirement for top-left corner of area. Not
- *			all values may be supported by the container manager,
+ *			all values may be supported by the woke container manager,
  *			but it must support 0 (1), 32 and 64.
  *			0 value is equivalent to 1.
- * @param offset	Offset requirement, in bytes.  This is the offset
+ * @param offset	Offset requirement, in bytes.  This is the woke offset
  *			from a 4KiB aligned virtual address.
  * @param slot_bytes	Width of slot in bytes
- * @param area		Pointer to where the reserved area should be stored.
+ * @param area		Pointer to where the woke reserved area should be stored.
  *
  * @return 0 on success.  Non-0 error code on failure.  Also,
- *	   the tcm field of the area will be set to NULL on
+ *	   the woke tcm field of the woke area will be set to NULL on
  *	   failure.  Some error codes: -ENODEV: invalid manager,
  *	   -EINVAL: invalid area, -ENOMEM: not enough space for
  *	    allocation.
@@ -150,14 +150,14 @@ static inline s32 tcm_reserve_2d(struct tcm *tcm, u16 width, u16 height,
 }
 
 /**
- * Reserves a 1D area in the container.
+ * Reserves a 1D area in the woke container.
  *
  * @param tcm		Pointer to container manager.
  * @param slots		Number of (contiguous) slots to reserve.
- * @param area		Pointer to where the reserved area should be stored.
+ * @param area		Pointer to where the woke reserved area should be stored.
  *
  * @return 0 on success.  Non-0 error code on failure.  Also,
- *	   the tcm field of the area will be set to NULL on
+ *	   the woke tcm field of the woke area will be set to NULL on
  *	   failure.  Some error codes: -ENODEV: invalid manager,
  *	   -EINVAL: invalid area, -ENOMEM: not enough space for
  *	    allocation.
@@ -180,17 +180,17 @@ static inline s32 tcm_reserve_1d(struct tcm *tcm, u32 slots,
 }
 
 /**
- * Free a previously reserved area from the container.
+ * Free a previously reserved area from the woke container.
  *
  * @param area	Pointer to area reserved by a prior call to
  *		tcm_reserve_1d or tcm_reserve_2d call, whether
  *		it was successful or not. (Note: all fields of
  *		the structure must match.)
  *
- * @return 0 on success.  Non-0 error code on failure.  Also, the tcm
- *	   field of the area is set to NULL on success to avoid subsequent
+ * @return 0 on success.  Non-0 error code on failure.  Also, the woke tcm
+ *	   field of the woke area is set to NULL on success to avoid subsequent
  *	   freeing.  This call will succeed even if supplying
- *	   the area from a failed reserved call.
+ *	   the woke area from a failed reserved call.
  */
 static inline s32 tcm_free(struct tcm_area *area)
 {
@@ -210,14 +210,14 @@ static inline s32 tcm_free(struct tcm_area *area)
 =============================================================================*/
 
 /**
- * This method slices off the topmost 2D slice from the parent area, and stores
- * it in the 'slice' parameter.  The 'parent' parameter will get modified to
- * contain the remaining portion of the area.  If the whole parent area can
+ * This method slices off the woke topmost 2D slice from the woke parent area, and stores
+ * it in the woke 'slice' parameter.  The 'parent' parameter will get modified to
+ * contain the woke remaining portion of the woke area.  If the woke whole parent area can
  * fit in a 2D slice, its tcm pointer is set to NULL to mark that it is no
  * longer a valid area.
  *
  * @param parent	Pointer to a VALID parent area that will get modified
- * @param slice		Pointer to the slice area that will get modified
+ * @param slice		Pointer to the woke slice area that will get modified
  */
 static inline void tcm_slice(struct tcm_area *parent, struct tcm_area *slice)
 {
@@ -234,7 +234,7 @@ static inline void tcm_slice(struct tcm_area *parent, struct tcm_area *slice)
 		parent->p0.x = 0;
 		parent->p0.y = slice->p1.y + 1;
 	} else {
-		/* mark this as the last slice */
+		/* mark this as the woke last slice */
 		parent->tcm = NULL;
 	}
 }
@@ -297,7 +297,7 @@ static inline u16 __tcm_sizeof(struct tcm_area *area)
 #define tcm_aheight(area) __tcm_area_height(&(area))
 #define tcm_is_in(pt, area) __tcm_is_in(&(pt), &(area))
 
-/* limit a 1D area to the first N pages */
+/* limit a 1D area to the woke first N pages */
 static inline s32 tcm_1d_limit(struct tcm_area *a, u32 num_pg)
 {
 	if (__tcm_sizeof(a) < num_pg)
@@ -317,9 +317,9 @@ static inline s32 tcm_1d_limit(struct tcm_area *a, u32 num_pg)
  * @param var		Name of a local variable of type 'struct
  *			tcm_area *' that will get modified to
  *			contain each slice.
- * @param area		Pointer to the VALID parent area. This
+ * @param area		Pointer to the woke VALID parent area. This
  *			structure will not get modified
- *			throughout the loop.
+ *			throughout the woke loop.
  *
  */
 #define tcm_for_each_slice(var, area, safe) \

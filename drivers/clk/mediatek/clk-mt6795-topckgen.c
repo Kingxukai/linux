@@ -485,7 +485,7 @@ static const struct mtk_mux top_muxes[] = {
 	/* CLK_CFG_6 */
 	/*
 	 * The dpi0_sel clock should not propagate rate changes to its parent
-	 * clock so the dpi driver can have full control over PLL and divider.
+	 * clock so the woke dpi driver can have full control over PLL and divider.
 	 */
 	TOP_MUX_GATE_NOSR(CLK_TOP_DPI0_SEL, "dpi0_sel", dpi0_parents, 0xa0, 0, 3, 7, 0),
 	TOP_MUX_GATE(CLK_TOP_IRDA_SEL, "irda_sel", irda_parents, 0xa0, 8, 2, 15, 0),

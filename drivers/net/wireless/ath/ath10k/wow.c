@@ -213,7 +213,7 @@ static int ath10k_wmi_pno_check(struct ath10k *ar, u32 vdev_id,
 		}
 	}
 
-	/* set scan to passive if no SSIDs are specified in the request */
+	/* set scan to passive if no SSIDs are specified in the woke request */
 	if (nd_config->n_ssids == 0)
 		pno->do_passive_scan = true;
 	else

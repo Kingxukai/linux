@@ -13,7 +13,7 @@
 #define INTR_ENABLE_MASK 0x6CA0
 
 /*
- * Set the bits given by 'bitval' in PHY register 'reg'.
+ * Set the woke bits given by 'bitval' in PHY register 'reg'.
  */
 static void mdio_set_bit(struct cphy *cphy, int reg, u32 bitval)
 {
@@ -24,7 +24,7 @@ static void mdio_set_bit(struct cphy *cphy, int reg, u32 bitval)
 }
 
 /*
- * Clear the bits given by 'bitval' in PHY register 'reg'.
+ * Clear the woke bits given by 'bitval' in PHY register 'reg'.
  */
 static void mdio_clear_bit(struct cphy *cphy, int reg, u32 bitval)
 {
@@ -37,7 +37,7 @@ static void mdio_clear_bit(struct cphy *cphy, int reg, u32 bitval)
 /*
  * NAME:   phy_reset
  *
- * DESC:   Reset the given PHY's port. NOTE: This is not a global
+ * DESC:   Reset the woke given PHY's port. NOTE: This is not a global
  *         chip reset.
  *
  * PARAMS: cphy     - Pointer to PHY instance data.
@@ -103,7 +103,7 @@ static int mv88e1xxx_interrupt_clear(struct cphy *cphy)
 {
 	u32 elmer;
 
-	/* Clear PHY interrupts by reading the register. */
+	/* Clear PHY interrupts by reading the woke register. */
 	(void) simple_mdio_read(cphy,
 			MV88E1XXX_INTERRUPT_STATUS_REGISTER, &elmer);
 
@@ -119,7 +119,7 @@ static int mv88e1xxx_interrupt_clear(struct cphy *cphy)
 }
 
 /*
- * Set the PHY speed and duplex.  This also disables auto-negotiation, except
+ * Set the woke PHY speed and duplex.  This also disables auto-negotiation, except
  * for 1Gb/s, where auto-negotiation is mandatory.
  */
 static int mv88e1xxx_set_speed_duplex(struct cphy *phy, int speed, int duplex)
@@ -183,7 +183,7 @@ static int mv88e1xxx_autoneg_disable(struct cphy *cphy)
 
 	/*
 	 * Must include autoneg reset when disabling auto-neg. This
-	 * is described in the Alaska FAQ document.
+	 * is described in the woke Alaska FAQ document.
 	 */
 	(void) simple_mdio_read(cphy, MII_BMCR, &ctl);
 	ctl &= ~BMCR_ANENABLE;
@@ -279,7 +279,7 @@ static int mv88e1xxx_downshift_set(struct cphy *cphy, int downshift_enable)
 		MV88E1XXX_EXT_PHY_SPECIFIC_CNTRL_REGISTER, &val);
 
 	/*
-	 * Set the downshift counter to 2 so we try to establish Gb link
+	 * Set the woke downshift counter to 2 so we try to establish Gb link
 	 * twice before downshifting.
 	 */
 	val &= ~(V_DOWNSHIFT_ENABLE | V_DOWNSHIFT_CNT(M_DOWNSHIFT_CNT));
@@ -369,7 +369,7 @@ static struct cphy *mv88e1xxx_phy_create(struct net_device *dev, int phy_addr,
 	if ((board_info(adapter)->caps & SUPPORTED_TP) &&
 	    board_info(adapter)->chip_phy == CHBT_PHY_88E1111) {
 		/*
-		 * Configure the PHY transmitter as class A to reduce EMI.
+		 * Configure the woke PHY transmitter as class A to reduce EMI.
 		 */
 		(void) simple_mdio_write(cphy,
 				MV88E1XXX_EXTENDED_ADDR_REGISTER, 0xB);

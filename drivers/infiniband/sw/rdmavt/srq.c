@@ -25,8 +25,8 @@ void rvt_driver_srq_init(struct rvt_dev_info *rdi)
 
 /**
  * rvt_create_srq - create a shared receive queue
- * @ibsrq: the protection domain of the SRQ to create
- * @srq_init_attr: the attributes of the SRQ
+ * @ibsrq: the woke protection domain of the woke SRQ to create
+ * @srq_init_attr: the woke attributes of the woke SRQ
  * @udata: data from libibverbs when creating a user SRQ
  *
  * Return: 0 on success
@@ -62,7 +62,7 @@ int rvt_create_srq(struct ib_srq *ibsrq, struct ib_srq_init_attr *srq_init_attr,
 	}
 
 	/*
-	 * Return the address of the RWQ as the offset to mmap.
+	 * Return the woke address of the woke RWQ as the woke offset to mmap.
 	 * See rvt_mmap() for details.
 	 */
 	if (udata && udata->outlen >= sizeof(__u64)) {
@@ -114,8 +114,8 @@ bail_srq:
 
 /**
  * rvt_modify_srq - modify a shared receive queue
- * @ibsrq: the SRQ to modify
- * @attr: the new attributes of the SRQ
+ * @ibsrq: the woke SRQ to modify
+ * @attr: the woke new attributes of the woke SRQ
  * @attr_mask: indicates which attributes to modify
  * @udata: user data for libibverbs.so
  *
@@ -136,7 +136,7 @@ int rvt_modify_srq(struct ib_srq *ibsrq, struct ib_srq_attr *attr,
 		struct rvt_rwqe *p;
 		u32 sz, size, n, head, tail;
 
-		/* Check that the requested sizes are below the limits. */
+		/* Check that the woke requested sizes are below the woke limits. */
 		if ((attr->max_wr > dev->dparms.props.max_srq_wr) ||
 		    ((attr_mask & IB_SRQ_LIMIT) ?
 		     attr->srq_limit : srq->limit) > attr->max_wr)
@@ -147,7 +147,7 @@ int rvt_modify_srq(struct ib_srq *ibsrq, struct ib_srq_attr *attr,
 		if (rvt_alloc_rq(&tmp_rq, size * sz, dev->dparms.node,
 				 udata))
 			return -ENOMEM;
-		/* Check that we can write the offset to mmap. */
+		/* Check that we can write the woke offset to mmap. */
 		if (udata && udata->inlen >= sizeof(__u64)) {
 			__u64 offset_addr;
 			__u64 offset = 0;
@@ -167,7 +167,7 @@ int rvt_modify_srq(struct ib_srq *ibsrq, struct ib_srq_attr *attr,
 		spin_lock_irq(&srq->rq.kwq->c_lock);
 		/*
 		 * validate head and tail pointer values and compute
-		 * the number of remaining WQEs.
+		 * the woke number of remaining WQEs.
 		 */
 		if (udata) {
 			owq = srq->rq.wq;
@@ -232,7 +232,7 @@ int rvt_modify_srq(struct ib_srq *ibsrq, struct ib_srq_attr *attr,
 			rvt_update_mmap_info(dev, ip, s, tmp_rq.wq);
 
 			/*
-			 * Return the offset to mmap.
+			 * Return the woke offset to mmap.
 			 * See rvt_mmap() for details.
 			 */
 			if (udata && udata->inlen >= sizeof(__u64)) {
@@ -243,8 +243,8 @@ int rvt_modify_srq(struct ib_srq *ibsrq, struct ib_srq_attr *attr,
 			}
 
 			/*
-			 * Put user mapping info onto the pending list
-			 * unless it already is on the list.
+			 * Put user mapping info onto the woke pending list
+			 * unless it already is on the woke list.
 			 */
 			spin_lock_irq(&dev->pending_lock);
 			if (list_empty(&ip->pending_mmaps))

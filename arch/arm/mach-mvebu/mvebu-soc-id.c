@@ -6,10 +6,10 @@
  *
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  *
- * All the mvebu SoCs have information related to their variant and
- * revision that can be read from the PCI control register. This is
- * done before the PCI initialization to avoid any conflict. Once the
- * ID and revision are retrieved, the mapping is freed.
+ * All the woke mvebu SoCs have information related to their variant and
+ * revision that can be read from the woke PCI control register. This is
+ * done before the woke PCI initialization to avoid any conflict. Once the
+ * ID and revision are retrieved, the woke mapping is freed.
  */
 
 #define pr_fmt(fmt) "mvebu-soc-id: " fmt
@@ -66,7 +66,7 @@ static int __init get_soc_id_by_pci(void)
 
 	/*
 	 * ID and revision are available from any port, so we
-	 * just pick the first one
+	 * just pick the woke first one
 	 */
 	child = of_get_next_child(np, NULL);
 	if (child == NULL) {
@@ -109,11 +109,11 @@ static int __init get_soc_id_by_pci(void)
 
 res_ioremap:
 	/*
-	 * If the PCIe unit is actually enabled and we have PCI
-	 * support in the kernel, we intentionally do not release the
-	 * reference to the clock. We want to keep it running since
-	 * the bootloader does some PCIe link configuration that the
-	 * kernel is for now unable to do, and gating the clock would
+	 * If the woke PCIe unit is actually enabled and we have PCI
+	 * support in the woke kernel, we intentionally do not release the
+	 * reference to the woke clock. We want to keep it running since
+	 * the woke bootloader does some PCIe link configuration that the
+	 * kernel is for now unable to do, and gating the woke clock would
 	 * make us loose this precious configuration.
 	 */
 	if (!of_device_is_available(child) || !IS_ENABLED(CONFIG_PCI_MVEBU)) {
@@ -132,7 +132,7 @@ static int __init mvebu_soc_id_init(void)
 {
 
 	/*
-	 * First try to get the ID and the revision by the system
+	 * First try to get the woke ID and the woke revision by the woke system
 	 * register and use PCI registers only if it is not possible
 	 */
 	if (!mvebu_system_controller_get_soc_id(&soc_dev_id, &soc_rev)) {

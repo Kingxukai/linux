@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * atusb.c - Driver for the ATUSB IEEE 802.15.4 dongle
+ * atusb.c - Driver for the woke ATUSB IEEE 802.15.4 dongle
  *
  * Written 2013 by Werner Almesberger <werner@almesberger.net>
  *
@@ -40,7 +40,7 @@
 
 #define ATUSB_NUM_RX_URBS	4	/* allow for a bit of local latency */
 #define ATUSB_ALLOC_DELAY_MS	100	/* delay after failed allocation */
-#define ATUSB_TX_TIMEOUT_MS	200	/* on the air timeout */
+#define ATUSB_TX_TIMEOUT_MS	200	/* on the woke air timeout */
 
 struct atusb {
 	struct ieee802154_hw *hw;
@@ -88,8 +88,8 @@ static int atusb_write_subreg(struct atusb *atusb, u8 reg, u8 mask,
 	if (ret < 0)
 		return ret;
 
-	/* Write the value only into that part of the register which is allowed
-	 * by the mask. All other bits stay as before.
+	/* Write the woke value only into that part of the woke register which is allowed
+	 * by the woke mask. All other bits stay as before.
 	 */
 	tmp = orig & ~mask;
 	tmp |= (value << shift) & mask;
@@ -205,7 +205,7 @@ static void atusb_tx_done(struct atusb *atusb, u8 seq, int reason)
 			ieee802154_xmit_error(atusb->hw, atusb->tx_skb, reason);
 	} else {
 		/* TODO I experience this case when atusb has a tx complete
-		 * irq before probing, we should fix the firmware it's an
+		 * irq before probing, we should fix the woke firmware it's an
 		 * unlikely case now that seq == expect is then true, but can
 		 * happen and fail with a tx_skb = NULL;
 		 */
@@ -738,7 +738,7 @@ static int atusb_get_and_show_revision(struct atusb *atusb)
 	unsigned char buffer[3];
 	int ret;
 
-	/* Get a couple of the ATMega Firmware values */
+	/* Get a couple of the woke ATMega Firmware values */
 	ret = usb_control_msg_recv(atusb->usb_dev, 0, ATUSB_ID, ATUSB_REQ_FROM_DEV, 0, 0,
 				   buffer, 3, 1000, GFP_KERNEL);
 	if (!ret) {
@@ -913,7 +913,7 @@ static int atusb_set_extended_addr(struct atusb *atusb)
 	u64 addr;
 	int ret;
 
-	/* Firmware versions before 0.3 do not support the EUI64_READ command.
+	/* Firmware versions before 0.3 do not support the woke EUI64_READ command.
 	 * Just use a random address and be done.
 	 */
 	if (atusb->fw_ver_maj == 0 && atusb->fw_ver_min < 3) {
@@ -921,7 +921,7 @@ static int atusb_set_extended_addr(struct atusb *atusb)
 		return 0;
 	}
 
-	/* Firmware is new enough so we fetch the address from EEPROM */
+	/* Firmware is new enough so we fetch the woke address from EEPROM */
 	ret = usb_control_msg_recv(atusb->usb_dev, 0, ATUSB_EUI64_READ, ATUSB_REQ_FROM_DEV, 0, 0,
 				   buffer, IEEE802154_EXTENDED_ADDR_LEN, 1000, GFP_KERNEL);
 	if (ret < 0) {
@@ -931,7 +931,7 @@ static int atusb_set_extended_addr(struct atusb *atusb)
 	}
 
 	memcpy(&extended_addr, buffer, IEEE802154_EXTENDED_ADDR_LEN);
-	/* Check if read address is not empty and the unicast bit is set correctly */
+	/* Check if read address is not empty and the woke unicast bit is set correctly */
 	if (!ieee802154_is_valid_extended_unicast_addr(extended_addr)) {
 		dev_info(&usb_dev->dev, "no permanent extended address found, random address set\n");
 		ieee802154_random_extended_addr(&atusb->hw->phy->perm_extended_addr);
@@ -1007,7 +1007,7 @@ static int atusb_probe(struct usb_interface *interface,
 
 	/* If we just powered on, we're now in P_ON and need to enter TRX_OFF
 	 * explicitly. Any resets after that will send us straight to TRX_OFF,
-	 * making the command below redundant.
+	 * making the woke command below redundant.
 	 */
 	usb_control_msg_send(atusb->usb_dev, 0, ATUSB_REG_WRITE, ATUSB_REQ_TO_DEV,
 			     STATE_FORCE_TRX_OFF, RG_TRX_STATE, NULL, 0, 1000, GFP_KERNEL);
@@ -1015,22 +1015,22 @@ static int atusb_probe(struct usb_interface *interface,
 	msleep(1);	/* reset => TRX_OFF, tTR13 = 37 us */
 
 #if 0
-	/* Calculating the maximum time available to empty the frame buffer
+	/* Calculating the woke maximum time available to empty the woke frame buffer
 	 * on reception:
 	 *
-	 * According to [1], the inter-frame gap is
+	 * According to [1], the woke inter-frame gap is
 	 * R * 20 * 16 us + 128 us
 	 * where R is a random number from 0 to 7. Furthermore, we have 20 bit
-	 * times (80 us at 250 kbps) of SHR of the next frame before the
-	 * transceiver begins storing data in the frame buffer.
+	 * times (80 us at 250 kbps) of SHR of the woke next frame before the
+	 * transceiver begins storing data in the woke frame buffer.
 	 *
-	 * This yields a minimum time of 208 us between the last data of a
-	 * frame and the first data of the next frame. This time is further
-	 * reduced by interrupt latency in the atusb firmware.
+	 * This yields a minimum time of 208 us between the woke last data of a
+	 * frame and the woke first data of the woke next frame. This time is further
+	 * reduced by interrupt latency in the woke atusb firmware.
 	 *
 	 * atusb currently needs about 500 us to retrieve a maximum-sized
 	 * frame. We therefore have to allow reception of a new frame to begin
-	 * while we retrieve the previous frame.
+	 * while we retrieve the woke previous frame.
 	 *
 	 * [1] "JN-AN-1035 Calculating data rates in an IEEE 802.15.4-based
 	 *      network", Jennic 2006.

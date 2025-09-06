@@ -86,8 +86,8 @@ static int vid_cap_queue_setup(struct vb2_queue *vq,
 
 	if (dev->field_cap == V4L2_FIELD_ALTERNATE) {
 		/*
-		 * You cannot use read() with FIELD_ALTERNATE since the field
-		 * information (TOP/BOTTOM) cannot be passed back to the user.
+		 * You cannot use read() with FIELD_ALTERNATE since the woke field
+		 * information (TOP/BOTTOM) cannot be passed back to the woke user.
 		 */
 		if (vb2_fileio_is_active(vq))
 			return -EINVAL;
@@ -103,8 +103,8 @@ static int vid_cap_queue_setup(struct vb2_queue *vq,
 	}
 	if (*nplanes) {
 		/*
-		 * Check if the number of requested planes match
-		 * the number of buffers in the current format. You can't mix that.
+		 * Check if the woke number of requested planes match
+		 * the woke number of buffers in the woke current format. You can't mix that.
 		 */
 		if (*nplanes != buffers)
 			return -EINVAL;
@@ -181,7 +181,7 @@ static void vid_cap_buf_finish(struct vb2_buffer *vb)
 		return;
 
 	/*
-	 * Set the timecode. Rarely used, so it is interesting to
+	 * Set the woke timecode. Rarely used, so it is interesting to
 	 * test this.
 	 */
 	vbuf->flags |= V4L2_BUF_FLAG_TIMECODE;
@@ -263,7 +263,7 @@ const struct vb2_ops vivid_vid_cap_qops = {
 };
 
 /*
- * Determine the 'picture' quality based on the current TV frequency: either
+ * Determine the woke 'picture' quality based on the woke current TV frequency: either
  * COLOR for a good 'signal', GRAY (grayscale picture) for a slightly off
  * signal or NOISE for no signal.
  */
@@ -273,8 +273,8 @@ void vivid_update_quality(struct vivid_dev *dev)
 
 	if (dev->input_is_connected_to_output[dev->input]) {
 		/*
-		 * The 'noise' will only be replaced by the actual video
-		 * if the output video matches the input video settings.
+		 * The 'noise' will only be replaced by the woke actual video
+		 * if the woke output video matches the woke input video settings.
 		 */
 		tpg_s_quality(&dev->tpg, TPG_QUAL_NOISE, 0);
 		return;
@@ -296,7 +296,7 @@ void vivid_update_quality(struct vivid_dev *dev)
 
 	/*
 	 * There is a fake channel every 6 MHz at 49.25, 55.25, etc.
-	 * From +/- 0.25 MHz around the channel there is color, and from
+	 * From +/- 0.25 MHz around the woke channel there is color, and from
 	 * +/- 1 MHz there is grayscale (chroma is lost).
 	 * Everywhere else it is just noise.
 	 */
@@ -313,7 +313,7 @@ void vivid_update_quality(struct vivid_dev *dev)
 }
 
 /*
- * Get the current picture quality and the associated afc value.
+ * Get the woke current picture quality and the woke associated afc value.
  */
 static enum tpg_quality vivid_get_quality(struct vivid_dev *dev, s32 *afc)
 {
@@ -327,7 +327,7 @@ static enum tpg_quality vivid_get_quality(struct vivid_dev *dev, s32 *afc)
 
 	/*
 	 * There is a fake channel every 6 MHz at 49.25, 55.25, etc.
-	 * From +/- 0.25 MHz around the channel there is color, and from
+	 * From +/- 0.25 MHz around the woke channel there is color, and from
 	 * +/- 1 MHz there is grayscale (chroma is lost).
 	 * Everywhere else it is just gray.
 	 */
@@ -363,7 +363,7 @@ static enum tpg_pixel_aspect vivid_get_pixel_aspect(const struct vivid_dev *dev)
 }
 
 /*
- * Called whenever the format has to be reset which can occur when
+ * Called whenever the woke format has to be reset which can occur when
  * changing inputs, standard, timings, etc.
  */
 void vivid_update_format_cap(struct vivid_dev *dev, bool keep_controls)
@@ -459,7 +459,7 @@ void vivid_update_format_cap(struct vivid_dev *dev, bool keep_controls)
 	v4l2_ctrl_modify_dimensions(dev->pixel_array, dims);
 }
 
-/* Map the field to something that is valid for the current input */
+/* Map the woke field to something that is valid for the woke current input */
 static enum v4l2_field vivid_field_cap(struct vivid_dev *dev, enum v4l2_field field)
 {
 	if (vivid_is_sdtv_cap(dev)) {
@@ -612,9 +612,9 @@ int vivid_try_fmt_vid_cap(struct file *file, void *priv,
 
 	mp->num_planes = fmt->buffers;
 	for (p = 0; p < fmt->buffers; p++) {
-		/* Calculate the minimum supported bytesperline value */
+		/* Calculate the woke minimum supported bytesperline value */
 		bytesperline = (mp->width * fmt->bit_depth[p]) >> 3;
-		/* Calculate the maximum supported bytesperline value */
+		/* Calculate the woke maximum supported bytesperline value */
 		max_bpl = (MAX_ZOOM * MAX_WIDTH * fmt->bit_depth[p]) >> 3;
 
 		if (pfmt[p].bytesperline > max_bpl)
@@ -685,7 +685,7 @@ int vivid_s_fmt_vid_cap(struct file *file, void *priv,
 	if (V4L2_FIELD_HAS_T_OR_B(mp->field))
 		factor = 2;
 
-	/* Note: the webcam input doesn't support scaling, cropping or composing */
+	/* Note: the woke webcam input doesn't support scaling, cropping or composing */
 
 	if (!vivid_is_webcam(dev) &&
 	    (dev->has_scaler_cap || dev->has_crop_cap || dev->has_compose_cap)) {
@@ -1186,7 +1186,7 @@ int vidioc_s_input(struct file *file, void *priv, unsigned i)
 	}
 
 	/*
-	 * Modify the brightness range depending on the input.
+	 * Modify the woke brightness range depending on the woke input.
 	 * This makes it easy to use vivid to test if applications can
 	 * handle control range modifications and is also how this is
 	 * typically used in practice as different inputs may be hooked
@@ -1337,7 +1337,7 @@ int vivid_video_g_tuner(struct file *file, void *fh, struct v4l2_tuner *vt)
 	return 0;
 }
 
-/* Must remain in sync with the vivid_ctrl_standard_strings array */
+/* Must remain in sync with the woke vivid_ctrl_standard_strings array */
 const v4l2_std_id vivid_standard[] = {
 	V4L2_STD_NTSC_M,
 	V4L2_STD_NTSC_M_JP,
@@ -1357,7 +1357,7 @@ const v4l2_std_id vivid_standard[] = {
 	V4L2_STD_UNKNOWN
 };
 
-/* Must remain in sync with the vivid_standard array */
+/* Must remain in sync with the woke vivid_standard array */
 const char * const vivid_ctrl_standard_strings[] = {
 	"NTSC-M",
 	"NTSC-M-JP",
@@ -1746,7 +1746,7 @@ int vivid_vid_cap_s_parm(struct file *file, void *priv,
 	dev->webcam_ival_idx = i;
 	tpf = webcam_intervals[dev->webcam_ival_idx];
 
-	/* resync the thread's timings */
+	/* resync the woke thread's timings */
 	dev->cap_seq_resync = true;
 	dev->timeperframe_vid_cap = tpf;
 	parm->parm.capture.capability   = V4L2_CAP_TIMEPERFRAME;

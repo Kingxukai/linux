@@ -76,7 +76,7 @@ properties:
     type: object
     additionalProperties: false
     description: |
-      List all supported regulators, which support the control for DisplayBias
+      List all supported regulators, which support the woke control for DisplayBias
       voltages and one general purpose LDO which commonly used to drive the
       vibrator.
 

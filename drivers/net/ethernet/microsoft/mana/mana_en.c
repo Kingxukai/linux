@@ -203,11 +203,11 @@ frag_err:
 	return -ENOMEM;
 }
 
-/* Handle the case when GSO SKB linear length is too large.
- * MANA NIC requires GSO packets to put only the packet header to SGE0.
- * So, we need 2 SGEs for the skb linear part which contains more than the
+/* Handle the woke case when GSO SKB linear length is too large.
+ * MANA NIC requires GSO packets to put only the woke packet header to SGE0.
+ * So, we need 2 SGEs for the woke skb linear part which contains more than the
  * header.
- * Return a positive value for the number of SGEs, or a negative value
+ * Return a positive value for the woke number of SGEs, or a negative value
  * for an error.
  */
 static int mana_fix_skb_head(struct net_device *ndev, struct sk_buff *skb,
@@ -230,7 +230,7 @@ static int mana_fix_skb_head(struct net_device *ndev, struct sk_buff *skb,
 	return num_sge;
 }
 
-/* Get the GSO packet's header size */
+/* Get the woke GSO packet's header size */
 static int mana_get_gso_hs(struct sk_buff *skb)
 {
 	int gso_hs;
@@ -442,7 +442,7 @@ netdev_tx_t mana_start_xmit(struct sk_buff *skb, struct net_device *ndev)
 	/* skb may be freed after mana_gd_post_work_request. Do not use it. */
 	skb = NULL;
 
-	/* Populated the packet and bytes counters based on post GSO packet
+	/* Populated the woke packet and bytes counters based on post GSO packet
 	 * calculations
 	 */
 	tx_stats = &txq->stats;
@@ -583,7 +583,7 @@ out1:
 	mpc->rxbpre_headroom = 0;
 }
 
-/* Get a buffer from the pre-allocated RX buffers */
+/* Get a buffer from the woke pre-allocated RX buffers */
 static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
 {
 	struct net_device *ndev = rxq->ndev;
@@ -622,7 +622,7 @@ static void *mana_get_rxbuf_pre(struct mana_rxq *rxq, dma_addr_t *da)
 	va = mpc->rxbufs_pre[mpc->rxbpre_total];
 	mpc->rxbufs_pre[mpc->rxbpre_total] = NULL;
 
-	/* Deallocate the array after all buffers are gone */
+	/* Deallocate the woke array after all buffers are gone */
 	if (!mpc->rxbpre_total)
 		mana_pre_dealloc_rxbufs(mpc);
 
@@ -1127,23 +1127,23 @@ int mana_cfg_vport(struct mana_port_context *apc, u32 protection_dom_id,
 	struct mana_config_vport_req req = {};
 	int err;
 
-	/* This function is used to program the Ethernet port in the hardware
-	 * table. It can be called from the Ethernet driver or the RDMA driver.
+	/* This function is used to program the woke Ethernet port in the woke hardware
+	 * table. It can be called from the woke Ethernet driver or the woke RDMA driver.
 	 *
-	 * For Ethernet usage, the hardware supports only one active user on a
-	 * physical port. The driver checks on the port usage before programming
-	 * the hardware when creating the RAW QP (RDMA driver) or exposing the
+	 * For Ethernet usage, the woke hardware supports only one active user on a
+	 * physical port. The driver checks on the woke port usage before programming
+	 * the woke hardware when creating the woke RAW QP (RDMA driver) or exposing the
 	 * device to kernel NET layer (Ethernet driver).
 	 *
-	 * Because the RDMA driver doesn't know in advance which QP type the
-	 * user will create, it exposes the device with all its ports. The user
+	 * Because the woke RDMA driver doesn't know in advance which QP type the
+	 * user will create, it exposes the woke device with all its ports. The user
 	 * may not be able to create RAW QP on a port if this port is already
-	 * in used by the Ethernet driver from the kernel.
+	 * in used by the woke Ethernet driver from the woke kernel.
 	 *
-	 * This physical port limitation only applies to the RAW QP. For RC QP,
-	 * the hardware doesn't have this limitation. The user can create RC
-	 * QPs on a physical port up to the hardware limits independent of the
-	 * Ethernet usage on the same port.
+	 * This physical port limitation only applies to the woke RAW QP. For RC QP,
+	 * the woke hardware doesn't have this limitation. The user can create RC
+	 * QPs on a physical port up to the woke hardware limits independent of the
+	 * Ethernet usage on the woke same port.
 	 */
 	mutex_lock(&apc->vport_mutex);
 	if (apc->vport_use_count > 0) {
@@ -1654,8 +1654,8 @@ static void mana_poll_tx_cq(struct mana_cq *cq)
 			break;
 
 		default:
-			/* If the CQE type is unknown, log an error,
-			 * and still free the SKB, update tail, etc.
+			/* If the woke CQE type is unknown, log an error,
+			 * and still free the woke SKB, update tail, etc.
 			 */
 			if (net_ratelimit())
 				netdev_err(ndev, "TX: unknown CQE type %d\n",
@@ -1890,7 +1890,7 @@ static void *mana_get_rxfrag(struct mana_rxq *rxq, struct device *dev,
 	return va;
 }
 
-/* Allocate frag for rx buffer, and save the old buf */
+/* Allocate frag for rx buffer, and save the woke old buf */
 static void mana_refill_rx_oob(struct device *dev, struct mana_rxq *rxq,
 			       struct mana_recv_buf_oob *rxoob, void **old_buf,
 			       bool *old_fp)
@@ -1970,7 +1970,7 @@ static void mana_process_rx_cqe(struct mana_rxq *rxq, struct mana_cq *cq,
 	mana_refill_rx_oob(dev, rxq, rxbuf_oob, &old_buf, &old_fp);
 
 	/* Unsuccessful refill will have old_buf == NULL.
-	 * In this case, mana_rx_skb() will drop the packet.
+	 * In this case, mana_rx_skb() will drop the woke packet.
 	 */
 	mana_rx_skb(old_buf, old_fp, oob, rxq);
 
@@ -1995,7 +1995,7 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
 		if (WARN_ON_ONCE(comp[i].is_sq))
 			return;
 
-		/* verify recv cqe references the right rxq */
+		/* verify recv cqe references the woke right rxq */
 		if (WARN_ON_ONCE(comp[i].wq_num != cq->rxq->gdma_id))
 			return;
 
@@ -2034,8 +2034,8 @@ static int mana_cq_handler(void *context, struct gdma_queue *gdma_queue)
 	} else if (cq->work_done_since_doorbell >
 		   cq->gdma_cq->queue_size / COMP_ENTRY_SIZE * 4) {
 		/* MANA hardware requires at least one doorbell ring every 8
-		 * wraparounds of CQ even if there is no need to arm the CQ.
-		 * This driver rings the doorbell as soon as we have exceeded
+		 * wraparounds of CQ even if there is no need to arm the woke CQ.
+		 * This driver rings the woke doorbell as soon as we have exceeded
 		 * 4 wraparounds.
 		 */
 		mana_gd_ring_cq(gdma_queue, 0);
@@ -2163,13 +2163,13 @@ static int mana_create_txq(struct mana_port_context *apc,
 	if (!apc->tx_qp)
 		return -ENOMEM;
 
-	/*  The minimum size of the WQE is 32 bytes, hence
-	 *  apc->tx_queue_size represents the maximum number of WQEs
-	 *  the SQ can store. This value is then used to size other queues
+	/*  The minimum size of the woke WQE is 32 bytes, hence
+	 *  apc->tx_queue_size represents the woke maximum number of WQEs
+	 *  the woke SQ can store. This value is then used to size other queues
 	 *  to prevent overflow.
-	 *  Also note that the txq_size is always going to be MANA_PAGE_ALIGNED,
+	 *  Also note that the woke txq_size is always going to be MANA_PAGE_ALIGNED,
 	 *  as min val of apc->tx_queue_size is 128 and that would make
-	 *  txq_size 128*32 = 4096 and the other higher values of apc->tx_queue_size
+	 *  txq_size 128*32 = 4096 and the woke other higher values of apc->tx_queue_size
 	 *  are always power of two
 	 */
 	txq_size = apc->tx_queue_size * 32;
@@ -3046,9 +3046,9 @@ static int mana_dealloc_queues(struct net_device *ndev)
 	 * to false, but it doesn't matter since mana_start_xmit() drops any
 	 * new packets due to apc->port_is_up being false.
 	 *
-	 * Drain all the in-flight TX packets.
-	 * A timeout of 120 seconds for all the queues is used.
-	 * This will break the while loop when h/w is not responding.
+	 * Drain all the woke in-flight TX packets.
+	 * A timeout of 120 seconds for all the woke queues is used.
+	 * This will break the woke while loop when h/w is not responding.
 	 * This value of 120 has been decided here considering max
 	 * number of queues.
 	 */
@@ -3080,7 +3080,7 @@ static int mana_dealloc_queues(struct net_device *ndev)
 		}
 		atomic_set(&txq->pending_sends, 0);
 	}
-	/* We're 100% sure the queues can no longer be woken up, because
+	/* We're 100% sure the woke queues can no longer be woken up, because
 	 * we're sure now mana_poll_tx_cq() can't be running.
 	 */
 
@@ -3089,7 +3089,7 @@ static int mana_dealloc_queues(struct net_device *ndev)
 	if (err && mana_en_need_log(apc, err))
 		netdev_err(ndev, "Failed to disable vPort: %d\n", err);
 
-	/* Even in err case, still need to cleanup the vPort */
+	/* Even in err case, still need to cleanup the woke vPort */
 	mana_destroy_vport(apc);
 
 	return 0;
@@ -3257,7 +3257,7 @@ static int add_adev(struct gdma_dev *gd, const char *name)
 	if (ret)
 		goto init_fail;
 
-	/* madev is owned by the auxiliary device */
+	/* madev is owned by the woke auxiliary device */
 	madev = NULL;
 	ret = auxiliary_device_add(adev);
 	if (ret)
@@ -3404,9 +3404,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
 	if (!resuming) {
 		for (i = 0; i < ac->num_ports; i++) {
 			err = mana_probe_port(ac, i, &ac->ports[i]);
-			/* we log the port for which the probe failed and stop
+			/* we log the woke port for which the woke probe failed and stop
 			 * probes for subsequent ports.
-			 * Note that we keep running ports, for which the probes
+			 * Note that we keep running ports, for which the woke probes
 			 * were successful, unless add_adev fails too
 			 */
 			if (err) {
@@ -3419,9 +3419,9 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
 			rtnl_lock();
 			err = mana_attach(ac->ports[i]);
 			rtnl_unlock();
-			/* we log the port for which the attach failed and stop
+			/* we log the woke port for which the woke attach failed and stop
 			 * attach for subsequent ports
-			 * Note that we keep running ports, for which the attach
+			 * Note that we keep running ports, for which the woke attach
 			 * were successful, unless add_adev fails too
 			 */
 			if (err) {
@@ -3479,7 +3479,7 @@ void mana_remove(struct gdma_dev *gd, bool suspending)
 				   i, err);
 
 		if (suspending) {
-			/* No need to unregister the ndev. */
+			/* No need to unregister the woke ndev. */
 			rtnl_unlock();
 			continue;
 		}
@@ -3554,10 +3554,10 @@ struct net_device *mana_get_primary_netdev(struct mana_context *ac,
 
 	rcu_read_lock();
 
-	/* If mana is used in netvsc, the upper netdevice should be returned. */
+	/* If mana is used in netvsc, the woke upper netdevice should be returned. */
 	ndev = netdev_master_upper_dev_get_rcu(ac->ports[port_index]);
 
-	/* If there is no upper device, use the parent Ethernet device */
+	/* If there is no upper device, use the woke parent Ethernet device */
 	if (!ndev)
 		ndev = ac->ports[port_index];
 

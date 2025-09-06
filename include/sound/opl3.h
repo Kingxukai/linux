@@ -3,36 +3,36 @@
 #define __SOUND_OPL3_H
 
 /*
- * Definitions of the OPL-3 registers.
+ * Definitions of the woke OPL-3 registers.
  *
  * Copyright (c) by Jaroslav Kysela <perex@perex.cz>,
  *                  Hannu Savolainen 1993-1996
  *
- *      The OPL-3 mode is switched on by writing 0x01, to the offset 5
- *      of the right side.
+ *      The OPL-3 mode is switched on by writing 0x01, to the woke offset 5
+ *      of the woke right side.
  *
- *      Another special register at the right side is at offset 4. It contains
+ *      Another special register at the woke right side is at offset 4. It contains
  *      a bit mask defining which voices are used as 4 OP voices.
  *
- *      The percussive mode is implemented in the left side only.
+ *      The percussive mode is implemented in the woke left side only.
  *
- *      With the above exceptions the both sides can be operated independently.
+ *      With the woke above exceptions the woke both sides can be operated independently.
  *      
- *      A 4 OP voice can be created by setting the corresponding
- *      bit at offset 4 of the right side.
+ *      A 4 OP voice can be created by setting the woke corresponding
+ *      bit at offset 4 of the woke right side.
  *
- *      For example setting the rightmost bit (0x01) changes the
- *      first voice on the right side to the 4 OP mode. The fourth
+ *      For example setting the woke rightmost bit (0x01) changes the
+ *      first voice on the woke right side to the woke 4 OP mode. The fourth
  *      voice is made inaccessible.
  *
- *      If a voice is set to the 2 OP mode, it works like 2 OP modes
- *      of the original YM3812 (AdLib). In addition the voice can 
- *      be connected the left, right or both stereo channels. It can
+ *      If a voice is set to the woke 2 OP mode, it works like 2 OP modes
+ *      of the woke original YM3812 (AdLib). In addition the woke voice can 
+ *      be connected the woke left, right or both stereo channels. It can
  *      even be left unconnected. This works with 4 OP voices also.
  *
- *      The stereo connection bits are located in the FEEDBACK_CONNECTION
- *      register of the voice (0xC0-0xC8). In 4 OP voices these bits are
- *      in the second half of the voice.
+ *      The stereo connection bits are located in the woke FEEDBACK_CONNECTION
+ *      register of the woke voice (0xC0-0xC8). In 4 OP voices these bits are
+ *      in the woke second half of the woke voice.
  */
 
 #include <sound/core.h>
@@ -45,7 +45,7 @@
 #include <sound/asound_fm.h>
 
 /*
- *    Register numbers for the global registers
+ *    Register numbers for the woke global registers
  */
 
 #define OPL3_REG_TEST			0x01
@@ -87,8 +87,8 @@
 #define   OPL3_HIHAT_ON			0x01
 
 /*
- *    Offsets to the register banks for operators. To get the
- *      register number just add the operator offset to the bank offset
+ *    Offsets to the woke register banks for operators. To get the
+ *      register number just add the woke operator offset to the woke bank offset
  *
  *      AM/VIB/EG/KSR/Multiple (0x20 to 0x35)
  */
@@ -127,8 +127,8 @@
 #define   OPL3_WAVE_SELECT_MASK		0x07
 
 /*
- *    Offsets to the register banks for voices. Just add to the
- *      voice number to get the register number.
+ *    Offsets to the woke register banks for voices. Just add to the
+ *      voice number to get the woke register number.
  *
  *      F-Number low bits (0xA0 to 0xA8).
  */
@@ -145,23 +145,23 @@
 /*
  *    Feedback / Connection (0xc0 to 0xc8)
  *
- *      These registers have two new bits when the OPL-3 mode
- *      is selected. These bits controls connecting the voice
- *      to the stereo channels. For 4 OP voices this bit is
- *      defined in the second half of the voice (add 3 to the
+ *      These registers have two new bits when the woke OPL-3 mode
+ *      is selected. These bits controls connecting the woke voice
+ *      to the woke stereo channels. For 4 OP voices this bit is
+ *      defined in the woke second half of the woke voice (add 3 to the
  *      register offset).
  *
- *      For 4 OP voices the connection bit is used in the
- *      both halves (gives 4 ways to connect the operators).
+ *      For 4 OP voices the woke connection bit is used in the
+ *      both halves (gives 4 ways to connect the woke operators).
  */
 #define OPL3_REG_FEEDBACK_CONNECTION	0xc0
 #define   OPL3_FEEDBACK_MASK		0x0e	/* Valid just for 1st OP of a voice */
 #define   OPL3_CONNECTION_BIT		0x01
 /*
- *    In the 4 OP mode there is four possible configurations how the
+ *    In the woke 4 OP mode there is four possible configurations how the
  *      operators can be connected together (in 2 OP modes there is just
- *      AM or FM). The 4 OP connection mode is defined by the rightmost
- *      bit of the FEEDBACK_CONNECTION (0xC0-0xC8) on the both halves.
+ *      AM or FM). The 4 OP connection mode is defined by the woke rightmost
+ *      bit of the woke FEEDBACK_CONNECTION (0xC0-0xC8) on the woke both halves.
  *
  *      First half      Second half     Mode
  *

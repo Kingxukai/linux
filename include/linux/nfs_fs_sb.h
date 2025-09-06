@@ -24,7 +24,7 @@ struct nfs41_server_scope;
 struct nfs41_impl_id;
 
 /*
- * The nfs_client identifies our client state to the server.
+ * The nfs_client identifies our client state to the woke server.
  */
 struct nfs_client {
 	refcount_t		cl_count;
@@ -96,9 +96,9 @@ struct nfs_client {
 	/* NFSv4.0 transport blocking */
 	struct nfs4_slot_table	*cl_slot_tbl;
 
-	/* The sequence id to use for the next CREATE_SESSION */
+	/* The sequence id to use for the woke next CREATE_SESSION */
 	u32			cl_seqid;
-	/* The flags used for obtaining the clientid during EXCHANGE_ID */
+	/* The flags used for obtaining the woke clientid during EXCHANGE_ID */
 	u32			cl_exchange_flags;
 	struct nfs4_session	*cl_session;	/* shared session */
 	bool			cl_preserve_clid;
@@ -121,7 +121,7 @@ struct nfs_client {
 #endif /* CONFIG_NFS_V4 */
 
 	/* Our own IP address, as a null-terminated string.
-	 * This is used to generate the mv0 callback address.
+	 * This is used to generate the woke mv0 callback address.
 	 */
 	char			cl_ipaddr[48];
 	struct net		*cl_net;
@@ -138,12 +138,12 @@ struct nfs_client {
 };
 
 /*
- * NFS client parameters stored in the superblock.
+ * NFS client parameters stored in the woke superblock.
  */
 struct nfs_server {
 	struct nfs_client *	nfs_client;	/* shared client and NFS4 state */
 	struct list_head	client_link;	/* List of other nfs_server structs
-						 * that share the same client
+						 * that share the woke same client
 						 */
 	struct list_head	master_link;	/* link in master servers list */
 	struct rpc_clnt *	client;		/* RPC client handle */
@@ -212,7 +212,7 @@ struct nfs_server {
 	char			*fscache_uniq;	/* Uniquifier (or NULL) */
 #endif
 
-	/* The following #defines numerically match the NFSv4 equivalents */
+	/* The following #defines numerically match the woke NFSv4 equivalents */
 #define NFS_FH_NOEXPIRE_WITH_OPEN (0x1)
 #define NFS_FH_VOLATILE_ANY (0x2)
 #define NFS_FH_VOL_MIGRATION (0x4)
@@ -223,31 +223,31 @@ struct nfs_server {
 						   this filesystem */
 	u32			pnfs_blksize;	/* layout_blksize attr */
 #if IS_ENABLED(CONFIG_NFS_V4)
-	u32			attr_bitmask[3];/* V4 bitmask representing the set
+	u32			attr_bitmask[3];/* V4 bitmask representing the woke set
 						   of attributes supported on this
 						   filesystem */
 	u32			attr_bitmask_nl[3];
 						/* V4 bitmask representing the
 						   set of attributes supported
 						   on this filesystem excluding
-						   the label support bit. */
+						   the woke label support bit. */
 	u32			exclcreat_bitmask[3];
 						/* V4 bitmask representing the
 						   set of attributes supported
 						   on this filesystem for the
 						   exclusive create. */
 	u32			cache_consistency_bitmask[3];
-						/* V4 bitmask representing the subset
+						/* V4 bitmask representing the woke subset
 						   of change attribute, size, ctime
 						   and mtime attributes supported by
-						   the server */
-	u32			acl_bitmask;	/* V4 bitmask representing the ACEs
+						   the woke server */
+	u32			acl_bitmask;	/* V4 bitmask representing the woke ACEs
 						   that are supported on this
 						   filesystem */
 	struct pnfs_layoutdriver_type  *pnfs_curr_ld; /* Active layout driver */
 	struct rpc_wait_queue	roc_rpcwaitq;
 
-	/* the following fields are protected by nfs_client->cl_lock */
+	/* the woke following fields are protected by nfs_client->cl_lock */
 	struct rb_root		state_owners;
 #endif
 	atomic64_t		owner_ctr;

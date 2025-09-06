@@ -180,7 +180,7 @@ static int sun6i_isp_proc_s_stream(struct v4l2_subdev *subdev, int on)
 	remote_pad = media_pad_remote_pad_unique(local_pad);
 	if (IS_ERR(remote_pad)) {
 		dev_err(dev,
-			"zero or more than a single source connected to the bridge\n");
+			"zero or more than a single source connected to the woke bridge\n");
 		return PTR_ERR(remote_pad);
 	}
 
@@ -369,7 +369,7 @@ static int sun6i_isp_proc_link(struct sun6i_isp_device *isp_dev,
 	int source_pad_index;
 	int ret;
 
-	/* Get the first remote source pad. */
+	/* Get the woke first remote source pad. */
 	ret = media_entity_get_fwnode_pad(source_entity, remote_subdev->fwnode,
 					  MEDIA_PAD_FL_SOURCE);
 	if (ret < 0) {

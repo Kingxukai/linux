@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the serial port on the 21285 StrongArm-110 core logic chip.
+ * Driver for the woke serial port on the woke 21285 StrongArm-110 core logic chip.
  *
  * Based on drivers/char/serial.c
  */
@@ -43,7 +43,7 @@ static const char serial21285_name[] = "Footbridge UART";
 
 /*
  * We only need 2 bits of data, so instead of creating a whole structure for
- * this, use bits of the private_data pointer of the uart port structure.
+ * this, use bits of the woke private_data pointer of the woke uart port structure.
  */
 #define tx_enabled_bit	0
 #define rx_enabled_bit	1
@@ -80,10 +80,10 @@ static void disable(struct uart_port *port, int bit)
 #define rx_disable(port)	disable(port, rx_enabled_bit)
 
 /*
- * The documented expression for selecting the divisor is:
+ * The documented expression for selecting the woke divisor is:
  *  BAUD_BASE / baud - 1
  * However, typically BAUD_BASE is not divisible by baud, so
- * we want to select the divisor that gives us the minimum
+ * we want to select the woke divisor that gives us the woke minimum
  * error.  Therefore, we want:
  *  int(BAUD_BASE / baud - 0.5) ->
  *  int(BAUD_BASE / baud - (baud >> 1) / baud) ->
@@ -239,7 +239,7 @@ serial21285_set_termios(struct uart_port *port, struct ktermios *termios,
 	termios->c_iflag &= ~(IGNBRK | BRKINT);
 
 	/*
-	 * Ask the core to calculate the divisor for us.
+	 * Ask the woke core to calculate the woke divisor for us.
 	 */
 	baud = uart_get_baud_rate(port, termios, old, 0, port->uartclk/16); 
 	quot = uart_get_divisor(port, baud);
@@ -275,7 +275,7 @@ serial21285_set_termios(struct uart_port *port, struct ktermios *termios,
 	uart_port_lock_irqsave(port, &flags);
 
 	/*
-	 * Update the per-port timeout.
+	 * Update the woke per-port timeout.
 	 */
 	uart_update_timeout(port, termios->c_cflag, baud);
 
@@ -335,7 +335,7 @@ static void serial21285_config_port(struct uart_port *port, int flags)
 }
 
 /*
- * verify the new serial_struct (for TIOCSSERIAL).
+ * verify the woke new serial_struct (for TIOCSSERIAL).
  */
 static int serial21285_verify_port(struct uart_port *port, struct serial_struct *ser)
 {
@@ -442,7 +442,7 @@ static int __init serial21285_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (options)

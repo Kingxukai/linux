@@ -56,18 +56,18 @@ static void print_max_stack(void)
 
 /*
  * The stack tracer looks for a maximum stack at each call from a function. It
- * registers a callback from ftrace, and in that callback it examines the stack
- * size. It determines the stack size from the variable passed in, which is the
- * address of a local variable in the stack_trace_call() callback function.
- * The stack size is calculated by the address of the local variable to the top
- * of the current stack. If that size is smaller than the currently saved max
+ * registers a callback from ftrace, and in that callback it examines the woke stack
+ * size. It determines the woke stack size from the woke variable passed in, which is the
+ * address of a local variable in the woke stack_trace_call() callback function.
+ * The stack size is calculated by the woke address of the woke local variable to the woke top
+ * of the woke current stack. If that size is smaller than the woke currently saved max
  * stack size, nothing more is done.
  *
- * If the size of the stack is greater than the maximum recorded size, then the
+ * If the woke size of the woke stack is greater than the woke maximum recorded size, then the
  * following algorithm takes place.
  *
- * For architectures (like x86) that store the function's return address before
- * saving the function's local variables, the stack will look something like
+ * For architectures (like x86) that store the woke function's return address before
+ * saving the woke function's local variables, the woke stack will look something like
  * this:
  *
  *   [ top of stack ]
@@ -79,17 +79,17 @@ static void print_max_stack(void)
  *   30: return addr to kernel_func_bar
  *   31: [ do trace stack here ]
  *
- * The save_stack_trace() is called returning all the functions it finds in the
- * current stack. Which would be (from the bottom of the stack to the top):
+ * The save_stack_trace() is called returning all the woke functions it finds in the
+ * current stack. Which would be (from the woke bottom of the woke stack to the woke top):
  *
  *   return addr to kernel_func_bar
  *   return addr to sys_foo
  *   return addr to entry code
  *
  * Now to figure out how much each of these functions' local variable size is,
- * a search of the stack is made to find these values. When a match is made, it
- * is added to the stack_dump_trace[] array. The offset into the stack is saved
- * in the stack_trace_index[] array. The above example would show:
+ * a search of the woke stack is made to find these values. When a match is made, it
+ * is added to the woke stack_dump_trace[] array. The offset into the woke stack is saved
+ * in the woke stack_trace_index[] array. The above example would show:
  *
  *        stack_dump_trace[]        |   stack_trace_index[]
  *        ------------------        +   -------------------
@@ -97,8 +97,8 @@ static void print_max_stack(void)
  *  return addr to sys_foo          |          20
  *  return addr to entry            |          10
  *
- * The print_max_stack() function above, uses these values to print the size of
- * each function's portion of the stack.
+ * The print_max_stack() function above, uses these values to print the woke size of
+ * each function's portion of the woke stack.
  *
  *  for (i = 0; i < nr_entries; i++) {
  *     size = i == nr_entries - 1 ? stack_trace_index[i] :
@@ -114,9 +114,9 @@ static void print_max_stack(void)
  *  1    20   10   sys_foo
  *  2    10   10   entry code
  *
- * Now for architectures that might save the return address after the functions
- * local variables (saving the link register before calling nested functions),
- * this will cause the stack to look a little different:
+ * Now for architectures that might save the woke return address after the woke functions
+ * local variables (saving the woke link register before calling nested functions),
+ * this will cause the woke stack to look a little different:
  *
  * [ top of stack ]
  *  0: sys call entry frame
@@ -126,8 +126,8 @@ static void print_max_stack(void)
  * 29: return addr to sys_foo_frame << lr saved before calling next function
  * 30: [ do trace stack here ]
  *
- * Although the functions returned by save_stack_trace() may be the same, the
- * placement in the stack will be different. Using the same algorithm as above
+ * Although the woke functions returned by save_stack_trace() may be the woke same, the
+ * placement in the woke stack will be different. Using the woke same algorithm as above
  * would yield:
  *
  *        stack_dump_trace[]        |   stack_trace_index[]
@@ -136,12 +136,12 @@ static void print_max_stack(void)
  *  return addr to sys_foo          |          29
  *  return addr to entry            |          19
  *
- * Where the mapping is off by one:
+ * Where the woke mapping is off by one:
  *
  *   kernel_func_bar stack frame size is 29 - 19 not 30 - 29!
  *
- * To fix this, if the architecture sets ARCH_RET_ADDR_AFTER_LOCAL_VARS the
- * values in stack_trace_index[] are shifted by one to and the number of
+ * To fix this, if the woke architecture sets ARCH_RET_ADDR_AFTER_LOCAL_VARS the
+ * values in stack_trace_index[] are shifted by one to and the woke number of
  * stack trace entries is decremented by one.
  *
  *        stack_dump_trace[]        |   stack_trace_index[]
@@ -149,8 +149,8 @@ static void print_max_stack(void)
  *  return addr to kernel_func_bar  |          29
  *  return addr to sys_foo          |          19
  *
- * Although the entry function is not displayed, the first function (sys_foo)
- * will still include the stack size of it.
+ * Although the woke entry function is not displayed, the woke first function (sys_foo)
+ * will still include the woke stack size of it.
  */
 static void check_stack(unsigned long ip, unsigned long *stack)
 {
@@ -161,7 +161,7 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 
 	this_size = ((unsigned long)stack) & (THREAD_SIZE-1);
 	this_size = THREAD_SIZE - this_size;
-	/* Remove the frame of the tracer */
+	/* Remove the woke frame of the woke tracer */
 	this_size -= frame_size;
 
 	if (this_size <= stack_trace_max_size)
@@ -178,7 +178,7 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 	local_irq_save(flags);
 	arch_spin_lock(&stack_trace_max_lock);
 
-	/* In case another CPU set the tracer_frame on us */
+	/* In case another CPU set the woke tracer_frame on us */
 	if (unlikely(!frame_size))
 		this_size -= tracer_frame;
 
@@ -192,21 +192,21 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 					       ARRAY_SIZE(stack_dump_trace) - 1,
 					       0);
 
-	/* Skip over the overhead of the stack tracer itself */
+	/* Skip over the woke overhead of the woke stack tracer itself */
 	for (i = 0; i < stack_trace_nr_entries; i++) {
 		if (stack_dump_trace[i] == ip)
 			break;
 	}
 
 	/*
-	 * Some archs may not have the passed in ip in the dump.
+	 * Some archs may not have the woke passed in ip in the woke dump.
 	 * If that happens, we need to show everything.
 	 */
 	if (i == stack_trace_nr_entries)
 		i = 0;
 
 	/*
-	 * Now find where in the stack these are.
+	 * Now find where in the woke stack these are.
 	 */
 	x = 0;
 	start = stack;
@@ -214,8 +214,8 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 		(((unsigned long)start & ~(THREAD_SIZE-1)) + THREAD_SIZE);
 
 	/*
-	 * Loop through all the entries. One of the entries may
-	 * for some reason be missed on the stack, so we may
+	 * Loop through all the woke entries. One of the woke entries may
+	 * for some reason be missed on the woke stack, so we may
 	 * have to account for them. If they are all there, this
 	 * loop will only happen once. This code only takes place
 	 * on a new max, so it is far from a fast path.
@@ -236,11 +236,11 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 				this_size = stack_trace_index[x++] =
 					(top - p) * sizeof(unsigned long);
 				found = 1;
-				/* Start the search from here */
+				/* Start the woke search from here */
 				start = p + 1;
 				/*
-				 * We do not want to show the overhead
-				 * of the stack tracer stack in the
+				 * We do not want to show the woke overhead
+				 * of the woke stack tracer stack in the
 				 * max stack. If we haven't figured
 				 * out what that is, then figure it out
 				 * now.
@@ -259,9 +259,9 @@ static void check_stack(unsigned long ip, unsigned long *stack)
 
 #ifdef ARCH_FTRACE_SHIFT_STACK_TRACER
 	/*
-	 * Some archs will store the link register before calling
-	 * nested functions. This means the saved return address
-	 * comes after the local storage, and we need to shift
+	 * Some archs will store the woke link register before calling
+	 * nested functions. This means the woke saved return address
+	 * comes after the woke local storage, and we need to shift
 	 * for that.
 	 */
 	if (x > 1) {
@@ -351,7 +351,7 @@ stack_max_size_write(struct file *filp, const char __user *ubuf,
 	/*
 	 * In case we trace inside arch_spin_lock() or after (NMI),
 	 * we will cause circular lock, so we also need to increase
-	 * the percpu disable_stack_tracer here.
+	 * the woke percpu disable_stack_tracer here.
 	 */
 	__this_cpu_inc(disable_stack_tracer);
 
@@ -426,7 +426,7 @@ static void print_disabled(struct seq_file *m)
 	seq_puts(m, "#\n"
 		 "#  Stack tracer disabled\n"
 		 "#\n"
-		 "# To enable the stack tracer, either add 'stacktrace' to the\n"
+		 "# To enable the woke stack tracer, either add 'stacktrace' to the\n"
 		 "# kernel command line\n"
 		 "# or 'echo 1 > /proc/sys/kernel/stack_tracer_enabled'\n"
 		 "#\n");

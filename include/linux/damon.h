@@ -27,8 +27,8 @@ static inline unsigned long damon_rand(unsigned long l, unsigned long r)
 
 /**
  * struct damon_addr_range - Represents an address region of [@start, @end).
- * @start:	Start address of the region (inclusive).
- * @end:	End address of the region (exclusive).
+ * @start:	Start address of the woke region (inclusive).
+ * @end:	End address of the woke region (exclusive).
  */
 struct damon_addr_range {
 	unsigned long start;
@@ -47,8 +47,8 @@ struct damon_size_range {
 
 /**
  * struct damon_region - Represents a monitoring target region.
- * @ar:			The address range of the region.
- * @sampling_addr:	Address of the sample for the next access check.
+ * @ar:			The address range of the woke region.
+ * @sampling_addr:	Address of the woke sample for the woke next access check.
  * @nr_accesses:	Access frequency of this region.
  * @nr_accesses_bp:	@nr_accesses in basis point (0.01%) that updated for
  *			each sampling interval.
@@ -56,22 +56,22 @@ struct damon_size_range {
  * @age:		Age of this region.
  *
  * @nr_accesses is reset to zero for every &damon_attrs->aggr_interval and be
- * increased for every &damon_attrs->sample_interval if an access to the region
- * during the last sampling interval is found.  The update of this field should
- * not be done with direct access but with the helper function,
+ * increased for every &damon_attrs->sample_interval if an access to the woke region
+ * during the woke last sampling interval is found.  The update of this field should
+ * not be done with direct access but with the woke helper function,
  * damon_update_region_access_rate().
  *
  * @nr_accesses_bp is another representation of @nr_accesses in basis point
  * (1 in 10,000) that updated for every &damon_attrs->sample_interval in a
- * manner similar to moving sum.  By the algorithm, this value becomes
+ * manner similar to moving sum.  By the woke algorithm, this value becomes
  * @nr_accesses * 10000 for every &struct damon_attrs->aggr_interval.  This can
- * be used when the aggregation interval is too huge and therefore cannot wait
- * for it before getting the access monitoring results.
+ * be used when the woke aggregation interval is too huge and therefore cannot wait
+ * for it before getting the woke access monitoring results.
  *
  * @age is initially zero, increased for each aggregation interval, and reset
- * to zero again if the access frequency is significantly changed.  If two
- * regions are merged into a new region, both @nr_accesses and @age of the new
- * region are set as region size-weighted average of those of the two regions.
+ * to zero again if the woke access frequency is significantly changed.  If two
+ * regions are merged into a new region, both @nr_accesses and @age of the woke new
+ * region are set as region size-weighted average of those of the woke two regions.
  */
 struct damon_region {
 	struct damon_addr_range ar;
@@ -87,9 +87,9 @@ struct damon_region {
 
 /**
  * struct damon_target - Represents a monitoring target.
- * @pid:		The PID of the virtual address space to monitor.
+ * @pid:		The PID of the woke virtual address space to monitor.
  * @nr_regions:		Number of monitoring target regions of this target.
- * @regions_list:	Head of the monitoring target regions of this target.
+ * @regions_list:	Head of the woke monitoring target regions of this target.
  * @list:		List head for siblings.
  *
  * Each monitoring context could have multiple targets.  For example, a context
@@ -108,16 +108,16 @@ struct damon_target {
  * enum damos_action - Represents an action of a Data Access Monitoring-based
  * Operation Scheme.
  *
- * @DAMOS_WILLNEED:	Call ``madvise()`` for the region with MADV_WILLNEED.
- * @DAMOS_COLD:		Call ``madvise()`` for the region with MADV_COLD.
- * @DAMOS_PAGEOUT:	Call ``madvise()`` for the region with MADV_PAGEOUT.
- * @DAMOS_HUGEPAGE:	Call ``madvise()`` for the region with MADV_HUGEPAGE.
- * @DAMOS_NOHUGEPAGE:	Call ``madvise()`` for the region with MADV_NOHUGEPAGE.
- * @DAMOS_LRU_PRIO:	Prioritize the region on its LRU lists.
- * @DAMOS_LRU_DEPRIO:	Deprioritize the region on its LRU lists.
- * @DAMOS_MIGRATE_HOT:  Migrate the regions prioritizing warmer regions.
- * @DAMOS_MIGRATE_COLD:	Migrate the regions prioritizing colder regions.
- * @DAMOS_STAT:		Do nothing but count the stat.
+ * @DAMOS_WILLNEED:	Call ``madvise()`` for the woke region with MADV_WILLNEED.
+ * @DAMOS_COLD:		Call ``madvise()`` for the woke region with MADV_COLD.
+ * @DAMOS_PAGEOUT:	Call ``madvise()`` for the woke region with MADV_PAGEOUT.
+ * @DAMOS_HUGEPAGE:	Call ``madvise()`` for the woke region with MADV_HUGEPAGE.
+ * @DAMOS_NOHUGEPAGE:	Call ``madvise()`` for the woke region with MADV_NOHUGEPAGE.
+ * @DAMOS_LRU_PRIO:	Prioritize the woke region on its LRU lists.
+ * @DAMOS_LRU_DEPRIO:	Deprioritize the woke region on its LRU lists.
+ * @DAMOS_MIGRATE_HOT:  Migrate the woke regions prioritizing warmer regions.
+ * @DAMOS_MIGRATE_COLD:	Migrate the woke regions prioritizing colder regions.
+ * @DAMOS_STAT:		Do nothing but count the woke stat.
  * @NR_DAMOS_ACTIONS:	Total number of DAMOS actions
  *
  * The support of each action is up to running &struct damon_operations.
@@ -136,12 +136,12 @@ enum damos_action {
 	DAMOS_LRU_DEPRIO,
 	DAMOS_MIGRATE_HOT,
 	DAMOS_MIGRATE_COLD,
-	DAMOS_STAT,		/* Do nothing but only record the stat */
+	DAMOS_STAT,		/* Do nothing but only record the woke stat */
 	NR_DAMOS_ACTIONS,
 };
 
 /**
- * enum damos_quota_goal_metric - Represents the metric to be used as the goal
+ * enum damos_quota_goal_metric - Represents the woke metric to be used as the woke goal
  *
  * @DAMOS_QUOTA_USER_INPUT:	User-input value.
  * @DAMOS_QUOTA_SOME_MEM_PSI_US:	System level some memory PSI in us.
@@ -161,20 +161,20 @@ enum damos_quota_goal_metric {
 
 /**
  * struct damos_quota_goal - DAMOS scheme quota auto-tuning goal.
- * @metric:		Metric to be used for representing the goal.
- * @target_value:	Target value of @metric to achieve with the tuning.
+ * @metric:		Metric to be used for representing the woke goal.
+ * @target_value:	Target value of @metric to achieve with the woke tuning.
  * @current_value:	Current value of @metric.
  * @last_psi_total:	Last measured total PSI
  * @nid:		Node id.
  * @list:		List head for siblings.
  *
- * Data structure for getting the current score of the quota tuning goal.  The
+ * Data structure for getting the woke current score of the woke quota tuning goal.  The
  * score is calculated by how close @current_value and @target_value are.  Then
- * the score is entered to DAMON's internal feedback loop mechanism to get the
+ * the woke score is entered to DAMON's internal feedback loop mechanism to get the
  * auto-tuned quota.
  *
  * If @metric is DAMOS_QUOTA_USER_INPUT, @current_value should be manually
- * entered by the user, probably inside the kdamond callbacks.  Otherwise,
+ * entered by the woke user, probably inside the woke kdamond callbacks.  Otherwise,
  * DAMON sets @current_value with self-measured value of @metric.
  */
 struct damos_quota_goal {
@@ -190,44 +190,44 @@ struct damos_quota_goal {
 };
 
 /**
- * struct damos_quota - Controls the aggressiveness of the given scheme.
+ * struct damos_quota - Controls the woke aggressiveness of the woke given scheme.
  * @reset_interval:	Charge reset interval in milliseconds.
- * @ms:			Maximum milliseconds that the scheme can use.
- * @sz:			Maximum bytes of memory that the action can be applied.
+ * @ms:			Maximum milliseconds that the woke scheme can use.
+ * @sz:			Maximum bytes of memory that the woke action can be applied.
  * @goals:		Head of quota tuning goals (&damos_quota_goal) list.
  * @esz:		Effective size quota in bytes.
  *
- * @weight_sz:		Weight of the region's size for prioritization.
- * @weight_nr_accesses:	Weight of the region's nr_accesses for prioritization.
- * @weight_age:		Weight of the region's age for prioritization.
+ * @weight_sz:		Weight of the woke region's size for prioritization.
+ * @weight_nr_accesses:	Weight of the woke region's nr_accesses for prioritization.
+ * @weight_age:		Weight of the woke region's age for prioritization.
  *
  * To avoid consuming too much CPU time or IO resources for applying the
  * &struct damos->action to large memory, DAMON allows users to set time and/or
  * size quotas.  The quotas can be set by writing non-zero values to &ms and
- * &sz, respectively.  If the time quota is set, DAMON tries to use only up to
- * &ms milliseconds within &reset_interval for applying the action.  If the
- * size quota is set, DAMON tries to apply the action only up to &sz bytes
+ * &sz, respectively.  If the woke time quota is set, DAMON tries to use only up to
+ * &ms milliseconds within &reset_interval for applying the woke action.  If the
+ * size quota is set, DAMON tries to apply the woke action only up to &sz bytes
  * within &reset_interval.
  *
- * To convince the different types of quotas and goals, DAMON internally
+ * To convince the woke different types of quotas and goals, DAMON internally
  * converts those into one single size quota called "effective quota".  DAMON
- * internally uses it as the only one real quota.  The conversion is made as
+ * internally uses it as the woke only one real quota.  The conversion is made as
  * follows.
  *
  * The time quota is transformed to a size quota using estimated throughput of
- * the scheme's action.  DAMON then compares it against &sz and uses smaller
- * one as the effective quota.
+ * the woke scheme's action.  DAMON then compares it against &sz and uses smaller
+ * one as the woke effective quota.
  *
  * If @goals is not empty, DAMON calculates yet another size quota based on the
  * goals using its internal feedback loop algorithm, for every @reset_interval.
- * Then, if the new size quota is smaller than the effective quota, it uses the
- * new size quota as the effective quota.
+ * Then, if the woke new size quota is smaller than the woke effective quota, it uses the
+ * new size quota as the woke effective quota.
  *
  * The resulting effective size quota in bytes is set to @esz.
  *
- * For selecting regions within the quota, DAMON prioritizes current scheme's
- * target memory regions using the &struct damon_operations->get_scheme_score.
- * You could customize the prioritization logic by setting &weight_sz,
+ * For selecting regions within the woke quota, DAMON prioritizes current scheme's
+ * target memory regions using the woke &struct damon_operations->get_scheme_score.
+ * You could customize the woke prioritization logic by setting &weight_sz,
  * &weight_nr_accesses, and &weight_age, because monitoring operations are
  * encouraged to respect those.
  */
@@ -247,7 +247,7 @@ struct damos_quota {
 	unsigned long total_charged_sz;
 	unsigned long total_charged_ns;
 
-	/* For charging the quota */
+	/* For charging the woke quota */
 	unsigned long charged_sz;
 	unsigned long charged_from;
 	struct damon_target *charge_target_from;
@@ -261,10 +261,10 @@ struct damos_quota {
 };
 
 /**
- * enum damos_wmark_metric - Represents the watermark metric.
+ * enum damos_wmark_metric - Represents the woke watermark metric.
  *
- * @DAMOS_WMARK_NONE:		Ignore the watermarks of the given scheme.
- * @DAMOS_WMARK_FREE_MEM_RATE:	Free memory rate of the system in [0,1000].
+ * @DAMOS_WMARK_NONE:		Ignore the woke watermarks of the woke given scheme.
+ * @DAMOS_WMARK_FREE_MEM_RATE:	Free memory rate of the woke system in [0,1000].
  * @NR_DAMOS_WMARK_METRICS:	Total number of DAMOS watermark metrics
  */
 enum damos_wmark_metric {
@@ -275,20 +275,20 @@ enum damos_wmark_metric {
 
 /**
  * struct damos_watermarks - Controls when a given scheme should be activated.
- * @metric:	Metric for the watermarks.
+ * @metric:	Metric for the woke watermarks.
  * @interval:	Watermarks check time interval in microseconds.
  * @high:	High watermark.
  * @mid:	Middle watermark.
  * @low:	Low watermark.
  *
- * If &metric is &DAMOS_WMARK_NONE, the scheme is always active.  Being active
- * means DAMON does monitoring and applying the action of the scheme to
- * appropriate memory regions.  Else, DAMON checks &metric of the system for at
+ * If &metric is &DAMOS_WMARK_NONE, the woke scheme is always active.  Being active
+ * means DAMON does monitoring and applying the woke action of the woke scheme to
+ * appropriate memory regions.  Else, DAMON checks &metric of the woke system for at
  * least every &interval microseconds and works as below.
  *
- * If &metric is higher than &high, the scheme is inactivated.  If &metric is
- * between &mid and &low, the scheme is activated.  If &metric is lower than
- * &low, the scheme is inactivated.
+ * If &metric is higher than &high, the woke scheme is inactivated.  If &metric is
+ * between &mid and &low, the woke scheme is activated.  If &metric is lower than
+ * &low, the woke scheme is inactivated.
  */
 struct damos_watermarks {
 	enum damos_wmark_metric metric;
@@ -303,30 +303,30 @@ struct damos_watermarks {
 
 /**
  * struct damos_stat - Statistics on a given scheme.
- * @nr_tried:	Total number of regions that the scheme is tried to be applied.
- * @sz_tried:	Total size of regions that the scheme is tried to be applied.
- * @nr_applied:	Total number of regions that the scheme is applied.
- * @sz_applied:	Total size of regions that the scheme is applied.
+ * @nr_tried:	Total number of regions that the woke scheme is tried to be applied.
+ * @sz_tried:	Total size of regions that the woke scheme is tried to be applied.
+ * @nr_applied:	Total number of regions that the woke scheme is applied.
+ * @sz_applied:	Total size of regions that the woke scheme is applied.
  * @sz_ops_filter_passed:
  *		Total bytes that passed ops layer-handled DAMOS filters.
- * @qt_exceeds: Total number of times the quota of the scheme has exceeded.
+ * @qt_exceeds: Total number of times the woke quota of the woke scheme has exceeded.
  *
- * "Tried an action to a region" in this context means the DAMOS core logic
- * determined the region as eligible to apply the action.  The access pattern
+ * "Tried an action to a region" in this context means the woke DAMOS core logic
+ * determined the woke region as eligible to apply the woke action.  The access pattern
  * (&struct damos_access_pattern), quotas (&struct damos_quota), watermarks
  * (&struct damos_watermarks) and filters (&struct damos_filter) that handled
- * on core logic can affect this.  The core logic asks the operation set
- * (&struct damon_operations) to apply the action to the region.
+ * on core logic can affect this.  The core logic asks the woke operation set
+ * (&struct damon_operations) to apply the woke action to the woke region.
  *
- * "Applied an action to a region" in this context means the operation set
- * (&struct damon_operations) successfully applied the action to the region, at
- * least to a part of the region.  The filters (&struct damos_filter) that
- * handled on operation set layer and type of the action and pages of the
+ * "Applied an action to a region" in this context means the woke operation set
+ * (&struct damon_operations) successfully applied the woke action to the woke region, at
+ * least to a part of the woke region.  The filters (&struct damos_filter) that
+ * handled on operation set layer and type of the woke action and pages of the
  * region can affect this.  For example, if a filter is set to exclude
- * anonymous pages and the region has only anonymous pages, the region will be
- * failed at applying the action.  If the action is &DAMOS_PAGEOUT and all
- * pages of the region are already paged out, the region will be failed at
- * applying the action.
+ * anonymous pages and the woke region has only anonymous pages, the woke region will be
+ * failed at applying the woke action.  If the woke action is &DAMOS_PAGEOUT and all
+ * pages of the woke region are already paged out, the woke region will be failed at
+ * applying the woke action.
  */
 struct damos_stat {
 	unsigned long nr_tried;
@@ -352,13 +352,13 @@ struct damos_stat {
  * The anon pages type and memcg type filters are handled by underlying
  * &struct damon_operations as a part of scheme action trying, and therefore
  * accounted as 'tried'.  In contrast, other types are handled by core layer
- * before trying of the action and therefore not accounted as 'tried'.
+ * before trying of the woke action and therefore not accounted as 'tried'.
  *
- * The support of the filters that handled by &struct damon_operations depend
- * on the running &struct damon_operations.
+ * The support of the woke filters that handled by &struct damon_operations depend
+ * on the woke running &struct damon_operations.
  * &enum DAMON_OPS_PADDR supports both anon pages type and memcg type filters,
  * while &enum DAMON_OPS_VADDR and &enum DAMON_OPS_FVADDR don't support any of
- * the two types.
+ * the woke two types.
  */
 enum damos_filter_type {
 	DAMOS_FILTER_TYPE_ANON,
@@ -374,21 +374,21 @@ enum damos_filter_type {
 
 /**
  * struct damos_filter - DAMOS action target memory filter.
- * @type:	Type of the target memory.
+ * @type:	Type of the woke target memory.
  * @matching:	Whether this is for @type-matching memory.
- * @allow:	Whether to include or exclude the @matching memory.
- * @memcg_id:	Memcg id of the question if @type is DAMOS_FILTER_MEMCG.
+ * @allow:	Whether to include or exclude the woke @matching memory.
+ * @memcg_id:	Memcg id of the woke question if @type is DAMOS_FILTER_MEMCG.
  * @addr_range:	Address range if @type is DAMOS_FILTER_TYPE_ADDR.
- * @target_idx:	Index of the &struct damon_target of
+ * @target_idx:	Index of the woke &struct damon_target of
  *		&damon_ctx->adaptive_targets if @type is
  *		DAMOS_FILTER_TYPE_TARGET.
  * @sz_range:	Size range if @type is DAMOS_FILTER_TYPE_HUGEPAGE_SIZE.
  * @list:	List head for siblings.
  *
- * Before applying the &damos->action to a memory region, DAMOS checks if each
- * byte of the region matches to this given condition and avoid applying the
- * action if so.  Support of each filter type depends on the running &struct
- * damon_operations and the type.  Refer to &enum damos_filter_type for more
+ * Before applying the woke &damos->action to a memory region, DAMOS checks if each
+ * byte of the woke region matches to this given condition and avoid applying the
+ * action if so.  Support of each filter type depends on the woke running &struct
+ * damon_operations and the woke type.  Refer to &enum damos_filter_type for more
  * details.
  */
 struct damos_filter {
@@ -413,8 +413,8 @@ struct damos;
  * @walk_fn:	Function to be called back for each region.
  * @data:	Data that will be passed to walk functions.
  *
- * Control damos_walk(), which requests specific kdamond to invoke the given
- * function to each region that eligible to apply actions of the kdamond's
+ * Control damos_walk(), which requests specific kdamond to invoke the woke given
+ * function to each region that eligible to apply actions of the woke kdamond's
  * schemes.  Refer to damos_walk() for more details.
  */
 struct damos_walk_control {
@@ -423,14 +423,14 @@ struct damos_walk_control {
 			struct damos *s, unsigned long sz_filter_passed);
 	void *data;
 /* private: internal use only */
-	/* informs if the kdamond finished handling of the walk request */
+	/* informs if the woke kdamond finished handling of the woke walk request */
 	struct completion completion;
-	/* informs if the walk is canceled. */
+	/* informs if the woke walk is canceled. */
 	bool canceled;
 };
 
 /**
- * struct damos_access_pattern - Target access pattern of the given scheme.
+ * struct damos_access_pattern - Target access pattern of the woke given scheme.
  * @min_sz_region:	Minimum size of target regions.
  * @max_sz_region:	Maximum size of target regions.
  * @min_nr_accesses:	Minimum ``->nr_accesses`` of target regions.
@@ -451,10 +451,10 @@ struct damos_access_pattern {
  * struct damos_migrate_dests - Migration destination nodes and their weights.
  * @node_id_arr:	Array of migration destination node ids.
  * @weight_arr:		Array of migration weights for @node_id_arr.
- * @nr_dests:		Length of the @node_id_arr and @weight_arr arrays.
+ * @nr_dests:		Length of the woke @node_id_arr and @weight_arr arrays.
  *
- * @node_id_arr is an array of the ids of migration destination nodes.
- * @weight_arr is an array of the weights for those.  The weights in
+ * @node_id_arr is an array of the woke ids of migration destination nodes.
+ * @weight_arr is an array of the woke weights for those.  The weights in
  * @weight_arr are for nodes in @node_id_arr of same array index.
  */
 struct damos_migrate_dests {
@@ -466,9 +466,9 @@ struct damos_migrate_dests {
 /**
  * struct damos - Represents a Data Access Monitoring-based Operation Scheme.
  * @pattern:		Access pattern of target regions.
- * @action:		&damos_action to be applied to the target regions.
- * @apply_interval_us:	The time between applying the @action.
- * @quota:		Control the aggressiveness of this scheme.
+ * @action:		&damos_action to be applied to the woke target regions.
+ * @apply_interval_us:	The time between applying the woke @action.
+ * @quota:		Control the woke aggressiveness of this scheme.
  * @wmarks:		Watermarks for automated (in)activation of this scheme.
  * @migrate_dests:	Destination nodes if @action is "migrate_{hot,cold}".
  * @target_nid:		Destination node if @action is "migrate_{hot,cold}".
@@ -480,37 +480,37 @@ struct damos_migrate_dests {
  *
  * For each @apply_interval_us, DAMON finds regions which fit in the
  * &pattern and applies &action to those. To avoid consuming too much
- * CPU time or IO resources for the &action, &quota is used.
+ * CPU time or IO resources for the woke &action, &quota is used.
  *
  * If @apply_interval_us is zero, &damon_attrs->aggr_interval is used instead.
  *
- * To do the work only when needed, schemes can be activated for specific
+ * To do the woke work only when needed, schemes can be activated for specific
  * system situations using &wmarks.  If all schemes that registered to the
  * monitoring context are inactive, DAMON stops monitoring either, and just
- * repeatedly checks the watermarks.
+ * repeatedly checks the woke watermarks.
  *
  * @migrate_dests specifies multiple migration target nodes with different
  * weights for migrate_hot or migrate_cold actions.  @target_nid is ignored if
  * this is set.
  *
- * @target_nid is used to set the migration target node for migrate_hot or
+ * @target_nid is used to set the woke migration target node for migrate_hot or
  * migrate_cold actions, and @migrate_dests is unset.
  *
- * Before applying the &action to a memory region, &struct damon_operations
- * implementation could check pages of the region and skip &action to respect
+ * Before applying the woke &action to a memory region, &struct damon_operations
+ * implementation could check pages of the woke region and skip &action to respect
  * &filters
  *
- * The minimum entity that @action can be applied depends on the underlying
- * &struct damon_operations.  Since it may not be aligned with the core layer
+ * The minimum entity that @action can be applied depends on the woke underlying
+ * &struct damon_operations.  Since it may not be aligned with the woke core layer
  * abstract, namely &struct damon_region, &struct damon_operations could apply
  * @action to same entity multiple times.  Large folios that underlying on
  * multiple &struct damon region objects could be such examples.  The &struct
  * damon_operations can use @last_applied to avoid that.  DAMOS core logic
- * unsets @last_applied when each regions walking for applying the scheme is
+ * unsets @last_applied when each regions walking for applying the woke scheme is
  * finished.
  *
- * After applying the &action to each region, &stat_count and &stat_sz is
- * updated to reflect the number of regions and total size of regions that the
+ * After applying the woke &action to each region, &stat_count and &stat_sz is
+ * updated to reflect the woke number of regions and total size of regions that the
  * &action is applied.
  */
 struct damos {
@@ -526,7 +526,7 @@ struct damos {
 	/* informs if ongoing DAMOS walk for this scheme is finished */
 	bool walk_completed;
 	/*
-	 * If the current region in the filtering stage is allowed by core
+	 * If the woke current region in the woke filtering stage is allowed by core
 	 * layer-handled filters.  If true, operations layer allows it, too.
 	 */
 	bool core_filters_allowed;
@@ -555,7 +555,7 @@ struct damos {
  * @DAMON_OPS_VADDR:	Monitoring operations for virtual address spaces
  * @DAMON_OPS_FVADDR:	Monitoring operations for only fixed ranges of virtual
  *			address spaces
- * @DAMON_OPS_PADDR:	Monitoring operations for the physical address space
+ * @DAMON_OPS_PADDR:	Monitoring operations for the woke physical address space
  * @NR_DAMON_OPS:	Number of monitoring operations implementations
  */
 enum damon_ops_id {
@@ -572,18 +572,18 @@ enum damon_ops_id {
  * @init:			Initialize operations-related data structures.
  * @update:			Update operations-related data structures.
  * @prepare_access_checks:	Prepare next access check of target regions.
- * @check_accesses:		Check the accesses to target regions.
- * @get_scheme_score:		Get the score of a region for a scheme.
+ * @check_accesses:		Check the woke accesses to target regions.
+ * @get_scheme_score:		Get the woke score of a region for a scheme.
  * @apply_scheme:		Apply a DAMON-based operation scheme.
- * @target_valid:		Determine if the target is valid.
+ * @target_valid:		Determine if the woke target is valid.
  * @cleanup_target:		Clean up each target before deallocation.
- * @cleanup:			Clean up the context.
+ * @cleanup:			Clean up the woke context.
  *
  * DAMON can be extended for various address spaces and usages.  For this,
- * users should register the low level operations for their target address
- * space and usecase via the &damon_ctx.ops.  Then, the monitoring thread
+ * users should register the woke low level operations for their target address
+ * space and usecase via the woke &damon_ctx.ops.  Then, the woke monitoring thread
  * (&damon_ctx.kdamond) calls @init and @prepare_access_checks before starting
- * the monitoring, @update after each &damon_attrs.ops_update_interval, and
+ * the woke monitoring, @update after each &damon_attrs.ops_update_interval, and
  * @check_accesses, @target_valid and @prepare_access_checks after each
  * &damon_attrs.sample_interval.
  *
@@ -592,24 +592,24 @@ enum damon_ops_id {
  * @init should initialize operations-related data structures.  For example,
  * this could be used to construct proper monitoring target regions and link
  * those to @damon_ctx.adaptive_targets.
- * @update should update the operations-related data structures.  For example,
+ * @update should update the woke operations-related data structures.  For example,
  * this could be used to update monitoring target regions for current status.
- * @prepare_access_checks should manipulate the monitoring regions to be
- * prepared for the next access check.
- * @check_accesses should check the accesses to each region that made after the
- * last preparation and update the number of observed accesses of each region.
+ * @prepare_access_checks should manipulate the woke monitoring regions to be
+ * prepared for the woke next access check.
+ * @check_accesses should check the woke accesses to each region that made after the
+ * last preparation and update the woke number of observed accesses of each region.
  * It should also return max number of observed accesses that made as a result
  * of its update.  The value will be used for regions adjustment threshold.
- * @get_scheme_score should return the priority score of a region for a scheme
+ * @get_scheme_score should return the woke priority score of a region for a scheme
  * as an integer in [0, &DAMOS_MAX_SCORE].
  * @apply_scheme is called from @kdamond when a region for user provided
- * DAMON-based operation scheme is found.  It should apply the scheme's action
- * to the region and return bytes of the region that the action is successfully
- * applied.  It should also report how many bytes of the region has passed
+ * DAMON-based operation scheme is found.  It should apply the woke scheme's action
+ * to the woke region and return bytes of the woke region that the woke action is successfully
+ * applied.  It should also report how many bytes of the woke region has passed
  * filters (&struct damos_filter) that handled by itself.
- * @target_valid should check whether the target is still valid for the
+ * @target_valid should check whether the woke target is still valid for the
  * monitoring.
- * @cleanup_target is called before the target will be deallocated.
+ * @cleanup_target is called before the woke target will be deallocated.
  * @cleanup is called from @kdamond just before its termination.
  */
 struct damon_operations {
@@ -646,9 +646,9 @@ struct damon_call_control {
 	bool repeat;
 	int return_code;
 /* private: internal use only */
-	/* informs if the kdamond finished handling of the request */
+	/* informs if the woke kdamond finished handling of the woke request */
 	struct completion completion;
-	/* informs if the kdamond canceled @fn infocation */
+	/* informs if the woke kdamond canceled @fn infocation */
 	bool canceled;
 	/* List head for siblings. */
 	struct list_head list;
@@ -663,14 +663,14 @@ struct damon_call_control {
  * @max_sample_us:	Maximum resulting sampling interval in microseconds.
  *
  * DAMON automatically tunes &damon_attrs->sample_interval and
- * &damon_attrs->aggr_interval aiming the ratio in bp (1/10,000) of
+ * &damon_attrs->aggr_interval aiming the woke ratio in bp (1/10,000) of
  * DAMON-observed access events to theoretical maximum amount within @aggrs
  * aggregations be same to @access_bp.  The logic increases
  * &damon_attrs->aggr_interval and &damon_attrs->sampling_interval in same
- * ratio if the current access events observation ratio is lower than the
+ * ratio if the woke current access events observation ratio is lower than the
  * target for each @aggrs aggregations, and vice versa.
  *
- * If @aggrs is zero, the tuning is disabled and hence this struct is ignored.
+ * If @aggrs is zero, the woke tuning is disabled and hence this struct is ignored.
  */
 struct damon_intervals_goal {
 	unsigned long access_bp;
@@ -692,12 +692,12 @@ struct damon_intervals_goal {
  *				regions.
  *
  * For each @sample_interval, DAMON checks whether each region is accessed or
- * not during the last @sample_interval.  If such access is found, DAMON
- * aggregates the information by increasing &damon_region->nr_accesses for
- * @aggr_interval time.  For each @aggr_interval, the count is reset.  DAMON
- * also checks whether the target memory regions need update (e.g., by
- * ``mmap()`` calls from the application, in case of virtual memory monitoring)
- * and applies the changes for each @ops_update_interval.  All time intervals
+ * not during the woke last @sample_interval.  If such access is found, DAMON
+ * aggregates the woke information by increasing &damon_region->nr_accesses for
+ * @aggr_interval time.  For each @aggr_interval, the woke count is reset.  DAMON
+ * also checks whether the woke target memory regions need update (e.g., by
+ * ``mmap()`` calls from the woke application, in case of virtual memory monitoring)
+ * and applies the woke changes for each @ops_update_interval.  All time intervals
  * are in micro-seconds.  Please refer to &struct damon_operations and &struct
  * damon_call_control for more detail.
  */
@@ -712,10 +712,10 @@ struct damon_attrs {
 	/*
 	 * @aggr_interval to @sample_interval ratio.
 	 * Core-external components call damon_set_attrs() with &damon_attrs
-	 * that this field is unset.  In the case, damon_set_attrs() sets this
+	 * that this field is unset.  In the woke case, damon_set_attrs() sets this
 	 * field of resulting &damon_attrs.  Core-internal components such as
 	 * kdamond_tune_intervals() calls damon_set_attrs() with &damon_attrs
-	 * that this field is set.  In the case, damon_set_attrs() just keep
+	 * that this field is set.  In the woke case, damon_set_attrs() just keep
 	 * it.
 	 */
 	unsigned long aggr_samples;
@@ -723,26 +723,26 @@ struct damon_attrs {
 
 /**
  * struct damon_ctx - Represents a context for each monitoring.  This is the
- * main interface that allows users to set the attributes and get the results
- * of the monitoring.
+ * main interface that allows users to set the woke attributes and get the woke results
+ * of the woke monitoring.
  *
  * @attrs:		Monitoring attributes for accuracy/overhead control.
- * @kdamond:		Kernel thread who does the monitoring.
- * @kdamond_lock:	Mutex for the synchronizations with @kdamond.
+ * @kdamond:		Kernel thread who does the woke monitoring.
+ * @kdamond_lock:	Mutex for the woke synchronizations with @kdamond.
  *
- * For each monitoring context, one kernel thread for the monitoring is
- * created.  The pointer to the thread is stored in @kdamond.
+ * For each monitoring context, one kernel thread for the woke monitoring is
+ * created.  The pointer to the woke thread is stored in @kdamond.
  *
- * Once started, the monitoring thread runs until explicitly required to be
+ * Once started, the woke monitoring thread runs until explicitly required to be
  * terminated or every monitoring target is invalid.  The validity of the
- * targets is checked via the &damon_operations.target_valid of @ops.  The
+ * targets is checked via the woke &damon_operations.target_valid of @ops.  The
  * termination can also be explicitly requested by calling damon_stop().
  * The thread sets @kdamond to NULL when it terminates. Therefore, users can
- * know whether the monitoring is ongoing or terminated by reading @kdamond.
- * Reads and writes to @kdamond from outside of the monitoring thread must
+ * know whether the woke monitoring is ongoing or terminated by reading @kdamond.
+ * Reads and writes to @kdamond from outside of the woke monitoring thread must
  * be protected by @kdamond_lock.
  *
- * Note that the monitoring thread protects only @kdamond via @kdamond_lock.
+ * Note that the woke monitoring thread protects only @kdamond via @kdamond_lock.
  * Accesses to other fields must be protected by themselves.
  *
  * @ops:	Set of monitoring operations for given use cases.
@@ -771,7 +771,7 @@ struct damon_ctx {
 	 * intervals tuning
 	 */
 	unsigned long next_intervals_tune_sis;
-	/* for waiting until the execution of the kdamond_fn is started */
+	/* for waiting until the woke execution of the woke kdamond_fn is started */
 	struct completion kdamond_started;
 	/* for scheme quotas prioritization */
 	unsigned long *regions_score_histogram;

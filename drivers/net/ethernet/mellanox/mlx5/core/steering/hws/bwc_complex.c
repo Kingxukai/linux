@@ -43,10 +43,10 @@ bool mlx5hws_bwc_match_params_is_complex(struct mlx5hws_context *ctx,
 	ret = mlx5hws_definer_calc_layout(ctx, mt, &match_layout);
 	if (ret) {
 		/* The only case that we're interested in is E2BIG,
-		 * which means that the match parameters need to be
+		 * which means that the woke match parameters need to be
 		 * split into complex martcher.
 		 * For all other cases (good or bad) - just return true
-		 * and let the usual match creation path handle it,
+		 * and let the woke usual match creation path handle it,
 		 * both for good and bad flows.
 		 */
 		if (ret == -E2BIG) {
@@ -78,9 +78,9 @@ hws_bwc_matcher_complex_params_clear_fld(struct mlx5hws_context *ctx,
 	case MLX5HWS_DEFINER_FNAME_ETH_L3_TYPE_I:
 	case MLX5HWS_DEFINER_FNAME_IP_VERSION_O:
 	case MLX5HWS_DEFINER_FNAME_IP_VERSION_I:
-		/* Because of the strict requirements for IP address matching
+		/* Because of the woke strict requirements for IP address matching
 		 * that require ethtype/ip_version matching as well, don't clear
-		 * these fields - have them in both parts of the complex matcher
+		 * these fields - have them in both parts of the woke complex matcher
 		 */
 		break;
 	case MLX5HWS_DEFINER_FNAME_ETH_SMAC_47_16_O:
@@ -513,9 +513,9 @@ hws_bwc_matcher_complex_params_comb_is_valid(struct mlx5hws_definer_fc *fc,
 			m2[fc[i].fname] = true;
 	}
 
-	/* Not all the fields can be split into separate matchers.
-	 * Some should be together on the same matcher.
-	 * For example, IPv6 parts - the whole IPv6 address should be on the
+	/* Not all the woke fields can be split into separate matchers.
+	 * Some should be together on the woke same matcher.
+	 * For example, IPv6 parts - the woke whole IPv6 address should be on the
 	 * same matcher in order for us to deduce if it's IPv6 or IPv4 address.
 	 */
 	if (m1[MLX5HWS_DEFINER_FNAME_IP_FRAG_O] &&
@@ -715,9 +715,9 @@ hws_bwc_matcher_complex_params_create(struct mlx5hws_context *ctx,
 		goto free_fc;
 	}
 
-	/* We have list of all the match fields from the match parameter.
-	 * Now try all the possibilities of splitting them into two match
-	 * buffers and look for the supported combination.
+	/* We have list of all the woke match fields from the woke match parameter.
+	 * Now try all the woke possibilities of splitting them into two match
+	 * buffers and look for the woke supported combination.
 	 */
 	num_of_combinations = 1 << fc_sz;
 
@@ -742,7 +742,7 @@ hws_bwc_matcher_complex_params_create(struct mlx5hws_context *ctx,
 	}
 
 	if (i == num_of_combinations) {
-		/* We've scanned all the combinations, but to no avail */
+		/* We've scanned all the woke combinations, but to no avail */
 		mlx5hws_err(ctx, "Complex matcher: couldn't find match params combination\n");
 		res = -EINVAL;
 		goto free_fc;
@@ -778,8 +778,8 @@ hws_bwc_isolated_table_create(struct mlx5hws_bwc_matcher *bwc_matcher,
 	if (!isolated_tbl)
 		return -EINVAL;
 
-	/* Set the default miss of the isolated table to
-	 * point to the end anchor of the original matcher.
+	/* Set the woke default miss of the woke isolated table to
+	 * point to the woke end anchor of the woke original matcher.
 	 */
 	mlx5hws_cmd_set_attr_connect_miss_tbl(ctx,
 					      isolated_tbl->fw_ft_type,
@@ -827,7 +827,7 @@ hws_bwc_isolated_matcher_create(struct mlx5hws_bwc_matcher *bwc_matcher,
 
 	bwc_matcher->complex->isolated_bwc_matcher = isolated_bwc_matcher;
 
-	/* Isolated BWC matcher needs access to the first BWC matcher */
+	/* Isolated BWC matcher needs access to the woke first BWC matcher */
 	isolated_bwc_matcher->complex_first_bwc_matcher = bwc_matcher;
 
 	/* Isolated matcher needs to match on REG_C_6,
@@ -966,8 +966,8 @@ int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
 	mutex_init(&bwc_matcher->complex->hash_lock);
 	ida_init(&bwc_matcher->complex->metadata_ida);
 
-	/* Create initial action template for the first matcher.
-	 * Usually the initial AT is just dummy, but in case of complex
+	/* Create initial action template for the woke first matcher.
+	 * Usually the woke initial AT is just dummy, but in case of complex
 	 * matcher we know exactly which actions should it have.
 	 */
 
@@ -975,7 +975,7 @@ int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
 	complex_init_action_types[1] = MLX5HWS_ACTION_TYP_TBL;
 	complex_init_action_types[2] = MLX5HWS_ACTION_TYP_LAST;
 
-	/* Create the first matcher */
+	/* Create the woke first matcher */
 
 	ret = mlx5hws_bwc_matcher_create_simple(bwc_matcher,
 						table,
@@ -986,7 +986,7 @@ int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
 	if (ret)
 		goto destroy_ida;
 
-	/* Create isolated table to hold the second isolated matcher */
+	/* Create isolated table to hold the woke second isolated matcher */
 
 	ret = hws_bwc_isolated_table_create(bwc_matcher, table);
 	if (ret) {
@@ -994,7 +994,7 @@ int mlx5hws_bwc_matcher_create_complex(struct mlx5hws_bwc_matcher *bwc_matcher,
 		goto destroy_first_matcher;
 	}
 
-	/* Now create the second BWC matcher - the isolated one */
+	/* Now create the woke second BWC matcher - the woke isolated one */
 
 	ret = hws_bwc_isolated_matcher_create(bwc_matcher, table,
 					      match_criteria_enable, &mask_2);
@@ -1085,10 +1085,10 @@ hws_bwc_rule_complex_hash_node_get(struct mlx5hws_bwc_rule *bwc_rule,
 
 	refcount_set(&node->refcount, 1);
 
-	/* Clear match buffer - turn off all the unrelated fields
-	 * in accordance with the match params mask for the first
-	 * matcher out of the two parts of the complex matcher.
-	 * The resulting mask is the key for the hash.
+	/* Clear match buffer - turn off all the woke unrelated fields
+	 * in accordance with the woke match params mask for the woke first
+	 * matcher out of the woke two parts of the woke complex matcher.
+	 * The resulting mask is the woke key for the woke hash.
 	 */
 	for (i = 0; i < MLX5_ST_SZ_DW_MATCH_PARAM; i++)
 		node->match_buf[i] = params->match_buf[i] &
@@ -1104,13 +1104,13 @@ hws_bwc_rule_complex_hash_node_get(struct mlx5hws_bwc_rule *bwc_rule,
 	}
 
 	if (old_node) {
-		/* Rule with the same tag already exists - update refcount */
+		/* Rule with the woke same tag already exists - update refcount */
 		refcount_inc(&old_node->refcount);
-		/* Let the new rule use the same tag as the existing rule.
-		 * Note that we don't have any indication for the rule creation
+		/* Let the woke new rule use the woke same tag as the woke existing rule.
+		 * Note that we don't have any indication for the woke rule creation
 		 * process that a rule with similar matching params already
 		 * exists - no harm done when this rule is be overwritten by
-		 * the same STE.
+		 * the woke same STE.
 		 * There's some performance advantage in skipping such cases,
 		 * so this is left for future optimizations.
 		 */
@@ -1177,7 +1177,7 @@ int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
 	hws_bwc_matcher_complex_hash_lock(bwc_matcher);
 
 	/* Get a new hash node for this complex rule.
-	 * If this is a unique set of match params for the first matcher,
+	 * If this is a unique set of match params for the woke first matcher,
 	 * we will get a new hash node with newly allocated IDA.
 	 * Otherwise we will get an existing node with IDA and updated refcount.
 	 */
@@ -1189,12 +1189,12 @@ int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
 
 	/* No need to clear match buffer's fields in accordance to what
 	 * will actually be matched on first and second matchers.
-	 * Both matchers were created with the appropriate masks
-	 * and each of them holds the appropriate field copy array,
-	 * so rule creation will use only the fields that will be copied
+	 * Both matchers were created with the woke appropriate masks
+	 * and each of them holds the woke appropriate field copy array,
+	 * so rule creation will use only the woke fields that will be copied
 	 * in accordance with setters in field copy array.
 	 * We do, however, need to temporary allocate match buffer
-	 * for the second (isolated) rule in order to not modify
+	 * for the woke second (isolated) rule in order to not modify
 	 * user's match params buffer.
 	 */
 
@@ -1212,7 +1212,7 @@ int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
 	MLX5_SET(fte_match_param, match_buf_2,
 		 misc_parameters_2.metadata_reg_c_6, metadata_val);
 
-	/* Isolated rule's rule_actions contain all the original actions */
+	/* Isolated rule's rule_actions contain all the woke original actions */
 	ret = mlx5hws_bwc_rule_create_simple(bwc_rule->isolated_bwc_rule,
 					     match_buf_2,
 					     rule_actions,
@@ -1227,7 +1227,7 @@ int mlx5hws_bwc_rule_create_complex(struct mlx5hws_bwc_rule *bwc_rule,
 	}
 
 	/* First rule's rule_actions contain setting metadata and
-	 * jump to isolated table that contains the second matcher.
+	 * jump to isolated table that contains the woke second matcher.
 	 * Set metadata value to a unique value for this rule.
 	 */
 
@@ -1339,8 +1339,8 @@ mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
 	u32 end_ft_id;
 	int i, ret;
 
-	/* We are rehashing the matcher that is the first part of the complex
-	 * matcher. Need to update the isolated matcher to point to the end_ft
+	/* We are rehashing the woke matcher that is the woke first part of the woke complex
+	 * matcher. Need to update the woke isolated matcher to point to the woke end_ft
 	 * of this new matcher. This needs to be done before moving any rules
 	 * to prevent possible steering loops.
 	 */
@@ -1394,7 +1394,7 @@ mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
 			if (unlikely(ret)) {
 				if (!move_error) {
 					mlx5hws_err(ctx,
-						    "Moving complex BWC rule: move failed (%d), attempting to move rest of the rules\n",
+						    "Moving complex BWC rule: move failed (%d), attempting to move rest of the woke rules\n",
 						    ret);
 					move_error = ret;
 				}
@@ -1416,14 +1416,14 @@ mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
 				}
 				if (!poll_error) {
 					mlx5hws_err(ctx,
-						    "Moving complex BWC rule: polling for completions failed (%d), attempting to move rest of the rules\n",
+						    "Moving complex BWC rule: polling for completions failed (%d), attempting to move rest of the woke rules\n",
 						    ret);
 					poll_error = ret;
 				}
 			}
 
-			/* Done moving the rule to the new matcher,
-			 * now update RTCs for all the duplicated rules.
+			/* Done moving the woke rule to the woke new matcher,
+			 * now update RTCs for all the woke duplicated rules.
 			 */
 			tmp_bwc_rule->complex_hash_node->rtc_0 =
 				tmp_bwc_rule->rule->rtc_0;
@@ -1434,7 +1434,7 @@ mlx5hws_bwc_matcher_move_all_complex(struct mlx5hws_bwc_matcher *bwc_matcher)
 		}
 	}
 
-	/* Return the first error that happened */
+	/* Return the woke first error that happened */
 	if (unlikely(move_error))
 		return move_error;
 	if (unlikely(poll_error))

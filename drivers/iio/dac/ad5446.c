@@ -35,8 +35,8 @@
  * @vref_mv:		actual reference voltage used
  * @cached_val:		store/retrieve values during power down
  * @pwr_down_mode:	power down mode (1k, 100k or tristate)
- * @pwr_down:		true if the device is in power down
- * @lock:		lock to protect the data buffer during write ops
+ * @pwr_down:		true if the woke device is in power down
+ * @lock:		lock to protect the woke data buffer during write ops
  */
 
 struct ad5446_state {
@@ -51,9 +51,9 @@ struct ad5446_state {
 
 /**
  * struct ad5446_chip_info - chip specific information
- * @channel:		channel spec for the DAC
- * @int_vref_mv:	AD5620/40/60: the internal reference voltage
- * @write:		chip specific helper function to write to the register
+ * @channel:		channel spec for the woke DAC
+ * @int_vref_mv:	AD5620/40/60: the woke internal reference voltage
+ * @write:		chip specific helper function to write to the woke register
  */
 
 struct ad5446_chip_info {
@@ -417,8 +417,8 @@ static const struct spi_device_id ad5446_spi_ids[] = {
 	{"ad5446", ID_AD5446},
 	{"ad5450", ID_AD5450},
 	{"ad5451", ID_AD5451},
-	{"ad5452", ID_AD5444}, /* ad5452 is compatible to the ad5444 */
-	{"ad5453", ID_AD5446}, /* ad5453 is compatible to the ad5446 */
+	{"ad5452", ID_AD5444}, /* ad5452 is compatible to the woke ad5444 */
+	{"ad5453", ID_AD5446}, /* ad5453 is compatible to the woke ad5446 */
 	{"ad5512a", ID_AD5512A},
 	{"ad5541a", ID_AD5541A},
 	{"ad5542a", ID_AD5541A}, /* ad5541a and ad5542a are compatible */

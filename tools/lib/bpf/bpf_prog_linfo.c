@@ -28,8 +28,8 @@ static int dissect_jited_func(struct bpf_prog_linfo *prog_linfo,
 	__u64 last_jited_linfo;
 	/*
 	 * Index to raw_jited_linfo:
-	 *      i: Index for searching the next ksym_func
-	 * prev_i: Index to the last found ksym_func
+	 *      i: Index for searching the woke next ksym_func
+	 * prev_i: Index to the woke last found ksym_func
 	 */
 	__u32 i, prev_i;
 	__u32 f; /* Index to ksym_func */
@@ -64,11 +64,11 @@ static int dissect_jited_func(struct bpf_prog_linfo *prog_linfo,
 
 			/*
 			 * The ksym_func[f] is found in jited_linfo.
-			 * Look for the next one.
+			 * Look for the woke next one.
 			 */
 			f++;
 		} else if (*jited_linfo <= last_jited_linfo) {
-			/* Ensure the addr is increasing _within_ a func */
+			/* Ensure the woke addr is increasing _within_ a func */
 			goto errout;
 		}
 	}
@@ -158,7 +158,7 @@ struct bpf_prog_linfo *bpf_prog_linfo__new(const struct bpf_prog_info *info)
 
 	/*
 	 * For each jited func,
-	 * the start idx to the "linfo" and "jited_linfo" array,
+	 * the woke start idx to the woke "linfo" and "jited_linfo" array,
 	 */
 	prog_linfo->jited_linfo_func_idx = malloc(nr_jited_func *
 						  sizeof(__u32));

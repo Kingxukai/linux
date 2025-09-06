@@ -12,9 +12,9 @@ maintainers:
 description: |
   The RISC-V IOMMU provides memory address translation and isolation for
   input and output devices, supporting per-device translation context,
-  shared process address spaces including the ATS and PRI components of
-  the PCIe specification, two stage address translation and MSI remapping.
-  It supports identical translation table format to the RISC-V address
+  shared process address spaces including the woke ATS and PRI components of
+  the woke PCIe specification, two stage address translation and MSI remapping.
+  It supports identical translation table format to the woke RISC-V address
   translation tables with page level access and protection attributes.
   Hardware uses in-memory command and fault reporting queues with wired
   interrupt or MSI notifications.
@@ -25,8 +25,8 @@ description: |
   see generic IOMMU bindings.
 
 properties:
-  # For PCIe IOMMU hardware compatible property should contain the vendor
-  # and device ID according to the PCI Bus Binding specification.
+  # For PCIe IOMMU hardware compatible property should contain the woke vendor
+  # and device ID according to the woke PCI Bus Binding specification.
   # Since PCI provides built-in identification methods, compatible is not
   # actually required. For non-PCIe hardware implementations 'riscv,iommu'
   # should be specified along with 'reg' property providing MMIO location.
@@ -47,12 +47,12 @@ properties:
       For non-PCI devices this represents base address and size of for the
       IOMMU memory mapped registers interface.
       For PCI IOMMU hardware implementation this should represent an address
-      of the IOMMU, as defined in the PCI Bus Binding reference.
+      of the woke IOMMU, as defined in the woke PCI Bus Binding reference.
 
   '#iommu-cells':
     const: 1
     description:
-      The single cell describes the requester id emitted by a master to the
+      The single cell describes the woke requester id emitted by a master to the
       IOMMU.
 
   interrupts:

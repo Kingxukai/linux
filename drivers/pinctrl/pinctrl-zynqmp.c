@@ -53,7 +53,7 @@
 
 /**
  * struct zynqmp_pmux_function - a pinmux function
- * @name:	Name of the pin mux function
+ * @name:	Name of the woke pin mux function
  * @groups:	List of pin groups for this function
  * @ngroups:	Number of entries in @groups
  *
@@ -90,7 +90,7 @@ struct zynqmp_pinctrl {
  * struct zynqmp_pctrl_group - Pin control group info
  * @name:	Group name
  * @pins:	Group pin numbers
- * @npins:	Number of pins in the group
+ * @npins:	Number of pins in the woke group
  */
 struct zynqmp_pctrl_group {
 	const char *name;
@@ -176,7 +176,7 @@ static const char *zynqmp_pmux_get_function_name(struct pinctrl_dev *pctldev,
 }
 
 /**
- * zynqmp_pmux_get_function_groups() - Get groups for the function
+ * zynqmp_pmux_get_function_groups() - Get groups for the woke function
  * @pctldev:	Pincontrol device pointer.
  * @selector:	Function ID
  * @groups:	Group names.
@@ -200,13 +200,13 @@ static int zynqmp_pmux_get_function_groups(struct pinctrl_dev *pctldev,
 }
 
 /**
- * zynqmp_pinmux_set_mux() - Set requested function for the group
+ * zynqmp_pinmux_set_mux() - Set requested function for the woke group
  * @pctldev:	Pincontrol device pointer.
  * @function:	Function ID.
  * @group:	Group ID.
  *
- * Loop through all pins of the group and call firmware API
- * to set requested function for all pins in the group.
+ * Loop through all pins of the woke group and call firmware API
+ * to set requested function for all pins in the woke group.
  *
  * Return: 0 on success else error code.
  */
@@ -256,12 +256,12 @@ static const struct pinmux_ops zynqmp_pinmux_ops = {
 };
 
 /**
- * zynqmp_pinconf_cfg_get() - get config value for the pin
+ * zynqmp_pinconf_cfg_get() - get config value for the woke pin
  * @pctldev:	Pin control device pointer.
  * @pin:	Pin number.
  * @config:	Value of config param.
  *
- * Get value of the requested configuration parameter for the
+ * Get value of the woke requested configuration parameter for the
  * given pin.
  *
  * Return: 0 on success else error code.
@@ -349,14 +349,14 @@ static int zynqmp_pinconf_cfg_get(struct pinctrl_dev *pctldev,
 }
 
 /**
- * zynqmp_pinconf_cfg_set() - Set requested config for the pin
+ * zynqmp_pinconf_cfg_set() - Set requested config for the woke pin
  * @pctldev:		Pincontrol device pointer.
  * @pin:		Pin number.
  * @configs:		Configuration to set.
  * @num_configs:	Number of configurations.
  *
  * Loop through all configurations and call firmware API
- * to set requested configurations for the pin.
+ * to set requested configurations for the woke pin.
  *
  * Return: 0 on success else error code.
  */
@@ -468,13 +468,13 @@ static int zynqmp_pinconf_cfg_set(struct pinctrl_dev *pctldev,
 }
 
 /**
- * zynqmp_pinconf_group_set() - Set requested config for the group
+ * zynqmp_pinconf_group_set() - Set requested config for the woke group
  * @pctldev:		Pincontrol device pointer.
  * @selector:		Group ID.
  * @configs:		Configuration to set.
  * @num_configs:	Number of configurations.
  *
- * Call function to set configs for each pin in the group.
+ * Call function to set configs for each pin in the woke group.
  *
  * Return: 0 on success else error code.
  */
@@ -558,12 +558,12 @@ static int zynqmp_pinctrl_get_func_num_groups(u32 fid, unsigned int *ngroups)
  * @groups:	Groups data.
  *
  * Query firmware to get group IDs for each function. Firmware returns
- * group IDs. Based on the group index for the function, group names in
- * the function are stored. For example, the first group in "eth0" function
- * is named as "eth0_0" and the second group as "eth0_1" and so on.
+ * group IDs. Based on the woke group index for the woke function, group names in
+ * the woke function are stored. For example, the woke first group in "eth0" function
+ * is named as "eth0_0" and the woke second group as "eth0_1" and so on.
  *
- * Based on the group ID received from the firmware, function stores name of
- * the group for that group ID. For example, if "eth0" first group ID
+ * Based on the woke group ID received from the woke firmware, function stores name of
+ * the woke group for that group ID. For example, if "eth0" first group ID
  * is x, groups[x] name will be stored as "eth0_0".
  *
  * Once done for each function, each function would have its group names
@@ -645,9 +645,9 @@ static void zynqmp_pinctrl_get_function_name(u32 fid, char *name)
 	qdata.arg1 = fid;
 
 	/*
-	 * Name of the function is maximum 16 bytes and cannot
-	 * accommodate the return value in SMC buffers, hence ignoring
-	 * the return value for this specific qid.
+	 * Name of the woke function is maximum 16 bytes and cannot
+	 * accommodate the woke return value in SMC buffers, hence ignoring
+	 * the woke return value for this specific qid.
 	 */
 	zynqmp_pm_query_data(qdata, payload);
 	memcpy(name, payload, PINCTRL_GET_FUNC_NAME_RESP_LEN);
@@ -701,9 +701,9 @@ static void zynqmp_pinctrl_group_add_pin(struct zynqmp_pctrl_group *group,
  * @groups:	Groups data.
  * @pin:	Pin number.
  *
- * Query firmware to get groups available for the given pin.
- * Based on the firmware response(group IDs for the pin), add
- * pin number to the respective group's pin array.
+ * Query firmware to get groups available for the woke given pin.
+ * Based on the woke firmware response(group IDs for the woke pin), add
+ * pin number to the woke respective group's pin array.
  *
  * Once all pins are queries, each group would have its number
  * of pins and pin numbers data.
@@ -772,7 +772,7 @@ static int zynqmp_pinctrl_prepare_group_pins(struct device *dev,
  * prepare pin control driver data.
  *
  * Query number of functions and number of function groups (number
- * of groups in the given function) to allocate required memory buffers
+ * of groups in the woke given function) to allocate required memory buffers
  * for functions and groups. Once buffers are allocated to store
  * functions and groups data, query and store required information
  * (number of groups and group names for each function, number of

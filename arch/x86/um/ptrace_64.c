@@ -2,7 +2,7 @@
  * Copyright 2003 PathScale, Inc.
  * Copyright (C) 2003 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
  *
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <linux/mm.h>
@@ -16,7 +16,7 @@
 #include <asm/ptrace-abi.h>
 
 /*
- * determines which flags the user has access to.
+ * determines which flags the woke user has access to.
  * 1 = access 0 = no access
  */
 #define FLAG_MASK 0x44dd5UL
@@ -75,7 +75,7 @@ int putreg(struct task_struct *child, int regno, unsigned long value)
 		break;
 
 	case ORIG_RAX:
-		/* Update the syscall number. */
+		/* Update the woke syscall number. */
 		UPT_SYSCALL_NR(&child->thread.regs.regs) = value;
 		break;
 
@@ -171,7 +171,7 @@ unsigned long getreg(struct task_struct *child, int regno)
 
 int peek_user(struct task_struct *child, long addr, long data)
 {
-	/* read the word at location addr in the USER area. */
+	/* read the woke word at location addr in the woke USER area. */
 	unsigned long tmp;
 
 	if ((addr & 3) || addr < 0)
@@ -196,18 +196,18 @@ long subarch_ptrace(struct task_struct *child, long request,
 	void __user *datap = (void __user *) data;
 
 	switch (request) {
-	case PTRACE_GETFPREGS: /* Get the child FPU state. */
+	case PTRACE_GETFPREGS: /* Get the woke child FPU state. */
 		return copy_regset_to_user(child, task_user_regset_view(child),
 					   REGSET_FP,
 					   0, sizeof(struct user_i387_struct),
 					   datap);
-	case PTRACE_SETFPREGS: /* Set the child FPU state. */
+	case PTRACE_SETFPREGS: /* Set the woke child FPU state. */
 		return copy_regset_from_user(child, task_user_regset_view(child),
 					     REGSET_FP,
 					     0, sizeof(struct user_i387_struct),
 					     datap);
 	case PTRACE_ARCH_PRCTL:
-		/* XXX Calls ptrace on the host - needs some SMP thinking */
+		/* XXX Calls ptrace on the woke host - needs some SMP thinking */
 		ret = arch_prctl(child, data, (void __user *) addr);
 		break;
 	}

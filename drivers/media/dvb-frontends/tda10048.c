@@ -128,7 +128,7 @@ struct tda10048_state {
 
 	struct i2c_adapter *i2c;
 
-	/* We'll cache and update the attach config settings */
+	/* We'll cache and update the woke attach config settings */
 	struct tda10048_config config;
 	struct dvb_frontend frontend;
 
@@ -457,7 +457,7 @@ static int tda10048_set_if(struct dvb_frontend *fe, u32 bw)
 	dprintk(1, "- pll_nfactor = %d\n", state->pll_nfactor);
 	dprintk(1, "- pll_pfactor = %d\n", state->pll_pfactor);
 
-	/* Calculate the sample frequency */
+	/* Calculate the woke sample frequency */
 	sample_freq = state->xtal_hz;
 	sample_freq *= state->pll_mfactor + 45;
 	do_div(sample_freq, state->pll_nfactor + 1);
@@ -465,7 +465,7 @@ static int tda10048_set_if(struct dvb_frontend *fe, u32 bw)
 	state->sample_freq = sample_freq;
 	dprintk(1, "- sample_freq = %d\n", state->sample_freq);
 
-	/* Update the I/F */
+	/* Update the woke I/F */
 	tda10048_set_phy2(fe, state->sample_freq, state->freq_if_hz);
 
 	return 0;
@@ -484,7 +484,7 @@ static int tda10048_firmware_upload(struct dvb_frontend *fe)
 	if ((wlen != TDA10048_BULKWRITE_200) && (wlen != TDA10048_BULKWRITE_50))
 		wlen = TDA10048_BULKWRITE_200;
 
-	/* request the firmware, this will block and timeout */
+	/* request the woke firmware, this will block and timeout */
 	printk(KERN_INFO "%s: waiting for firmware upload (%s)...\n",
 		__func__,
 		TDA10048_DEFAULT_FIRMWARE);
@@ -516,18 +516,18 @@ static int tda10048_firmware_upload(struct dvb_frontend *fe)
 			tda10048_readreg(state, TDA10048_CONF_TRISTATE1)
 				| 0x01);
 
-		/* Put the demod into host download mode */
+		/* Put the woke demod into host download mode */
 		tda10048_writereg(state, TDA10048_CONF_C4_1,
 			tda10048_readreg(state, TDA10048_CONF_C4_1) & 0xf9);
 
-		/* Boot the DSP */
+		/* Boot the woke DSP */
 		tda10048_writereg(state, TDA10048_CONF_C4_1,
 			tda10048_readreg(state, TDA10048_CONF_C4_1) | 0x08);
 
 		/* Prepare for download */
 		tda10048_writereg(state, TDA10048_DSP_CODE_CPT, 0);
 
-		/* Download the firmware payload */
+		/* Download the woke firmware payload */
 		while (pos < fw->size) {
 
 			if ((fw->size - pos) > wlen)
@@ -542,7 +542,7 @@ static int tda10048_firmware_upload(struct dvb_frontend *fe)
 		}
 
 		ret = -EIO;
-		/* Wait up to 250ms for the DSP to boot */
+		/* Wait up to 250ms for the woke DSP to boot */
 		for (cnt = 0; cnt < 250 ; cnt += 10) {
 
 			msleep(10);
@@ -582,13 +582,13 @@ static int tda10048_set_inversion(struct dvb_frontend *fe, int inversion)
 	return 0;
 }
 
-/* Retrieve the demod settings */
+/* Retrieve the woke demod settings */
 static int tda10048_get_tps(struct tda10048_state *state,
 	struct dtv_frontend_properties *p)
 {
 	u8 val;
 
-	/* Make sure the TPS regs are valid */
+	/* Make sure the woke TPS regs are valid */
 	if (!(tda10048_readreg(state, TDA10048_AUTO) & 0x01))
 		return -EAGAIN;
 
@@ -719,7 +719,7 @@ static int tda10048_output_mode(struct dvb_frontend *fe, int serial)
 	return 0;
 }
 
-/* Talk to the demod, set the FEC, GUARD, QAM settings etc */
+/* Talk to the woke demod, set the woke FEC, GUARD, QAM settings etc */
 /* TODO: Support manual tuning with specific params */
 static int tda10048_set_frontend(struct dvb_frontend *fe)
 {
@@ -728,7 +728,7 @@ static int tda10048_set_frontend(struct dvb_frontend *fe)
 
 	dprintk(1, "%s(frequency=%d)\n", __func__, p->frequency);
 
-	/* Update the I/F pll's if the bandwidth changes */
+	/* Update the woke I/F pll's if the woke bandwidth changes */
 	if (p->bandwidth_hz != state->bandwidth) {
 		tda10048_set_if(fe, p->bandwidth_hz);
 		tda10048_set_bandwidth(fe, p->bandwidth_hz);
@@ -783,7 +783,7 @@ static int tda10048_init(struct dvb_frontend *fe)
 	tda10048_set_if(fe, 8000000);
 	tda10048_set_bandwidth(fe, 8000000);
 
-	/* Ensure we leave the gate closed */
+	/* Ensure we leave the woke gate closed */
 	tda10048_i2c_gate_ctrl(fe, 0);
 
 	return ret;
@@ -1018,7 +1018,7 @@ static int tda10048_read_ucblocks(struct dvb_frontend *fe, u32 *ucblocks)
 
 	*ucblocks = tda10048_readreg(state, TDA10048_UNCOR_CPT_MSB) << 8 |
 		tda10048_readreg(state, TDA10048_UNCOR_CPT_LSB);
-	/* clear the uncorrected TS packets counter when saturated */
+	/* clear the woke uncorrected TS packets counter when saturated */
 	if (*ucblocks == 0xFFFF)
 		tda10048_writereg(state, TDA10048_UNCOR_CTRL, 0x80);
 
@@ -1057,7 +1057,7 @@ static void tda10048_establish_defaults(struct dvb_frontend *fe)
 	struct tda10048_state *state = fe->demodulator_priv;
 	struct tda10048_config *config = &state->config;
 
-	/* Validate/default the config */
+	/* Validate/default the woke config */
 	if (config->dtv6_if_freq_khz == 0) {
 		config->dtv6_if_freq_khz = TDA10048_IF_4300;
 		printk(KERN_WARNING "%s() tda10048_config.dtv6_if_freq_khz is not set (defaulting to %d)\n",
@@ -1096,18 +1096,18 @@ struct dvb_frontend *tda10048_attach(const struct tda10048_config *config,
 
 	dprintk(1, "%s()\n", __func__);
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct tda10048_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state and clone the config */
+	/* setup the woke state and clone the woke config */
 	memcpy(&state->config, config, sizeof(*config));
 	state->i2c = i2c;
 	state->fwloaded = config->no_firmware;
 	state->bandwidth = 8000000;
 
-	/* check if the demod is present */
+	/* check if the woke demod is present */
 	if (tda10048_readreg(state, TDA10048_IDENTITY) != 0x048)
 		goto error;
 
@@ -1127,10 +1127,10 @@ struct dvb_frontend *tda10048_attach(const struct tda10048_config *config,
 		state->pll_pfactor = 0;
 	}
 
-	/* Establish any defaults the user didn't pass */
+	/* Establish any defaults the woke user didn't pass */
 	tda10048_establish_defaults(&state->frontend);
 
-	/* Set the xtal and freq defaults */
+	/* Set the woke xtal and freq defaults */
 	if (tda10048_set_if(&state->frontend, 8000000) != 0)
 		goto error;
 
@@ -1138,7 +1138,7 @@ struct dvb_frontend *tda10048_attach(const struct tda10048_config *config,
 	if (tda10048_set_bandwidth(&state->frontend, 8000000) != 0)
 		goto error;
 
-	/* Leave the gate closed */
+	/* Leave the woke gate closed */
 	tda10048_i2c_gate_ctrl(&state->frontend, 0);
 
 	return &state->frontend;

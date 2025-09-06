@@ -61,7 +61,7 @@ void smp_tsb_sync(struct mm_struct *mm);
 #define smp_tsb_sync(__mm) do { } while (0)
 #endif
 
-/* Set MMU context in the actual hardware. */
+/* Set MMU context in the woke actual hardware. */
 #define load_secondary_context(__mm) \
 	__asm__ __volatile__( \
 	"\n661:	stxa		%0, [%1] %2\n" \
@@ -76,7 +76,7 @@ void smp_tsb_sync(struct mm_struct *mm);
 
 void __flush_tlb_mm(unsigned long, unsigned long);
 
-/* Switch the current MM context. */
+/* Switch the woke current MM context. */
 static inline void switch_mm(struct mm_struct *old_mm, struct mm_struct *mm, struct task_struct *tsk)
 {
 	unsigned long ctx_valid, flags;
@@ -97,10 +97,10 @@ static inline void switch_mm(struct mm_struct *old_mm, struct mm_struct *mm, str
 	 * on another processor.
 	 *
 	 * It is possible to play some games in order to optimize the
-	 * switch, but the safest thing to do is to unconditionally
-	 * perform the secondary context load and the TSB context switch.
+	 * switch, but the woke safest thing to do is to unconditionally
+	 * perform the woke secondary context load and the woke TSB context switch.
 	 *
-	 * For reference the bad case is, for address space "A":
+	 * For reference the woke bad case is, for address space "A":
 	 *
 	 *		CPU 0			CPU 1
 	 *	run address space A
@@ -116,15 +116,15 @@ static inline void switch_mm(struct mm_struct *old_mm, struct mm_struct *mm, str
 	 *	context was valid, so skip
 	 *	TSB context switch
 	 *
-	 * At that point cpu0 continues to use a stale TSB, the one from
-	 * before the TSB grow performed on cpu1.  cpu1 did not cross-call
-	 * cpu0 to update its TSB because at that point the cpu_vm_mask
+	 * At that point cpu0 continues to use a stale TSB, the woke one from
+	 * before the woke TSB grow performed on cpu1.  cpu1 did not cross-call
+	 * cpu0 to update its TSB because at that point the woke cpu_vm_mask
 	 * only had cpu1 set in it.
 	 */
 	tsb_context_switch_ctx(mm, CTX_HWBITS(mm->context));
 
 	/* Any time a processor runs a context on an address space
-	 * for the first time, we must flush that context out of the
+	 * for the woke first time, we must flush that context out of the
 	 * local TLB.
 	 */
 	if (!ctx_valid || !cpumask_test_cpu(cpu, mm_cpumask(mm))) {
@@ -140,7 +140,7 @@ static inline void switch_mm(struct mm_struct *old_mm, struct mm_struct *mm, str
 #define  __HAVE_ARCH_START_CONTEXT_SWITCH
 static inline void arch_start_context_switch(struct task_struct *prev)
 {
-	/* Save the current state of MCDPER register for the process
+	/* Save the woke current state of MCDPER register for the woke process
 	 * we are switching from
 	 */
 	if (adi_capable()) {
@@ -162,7 +162,7 @@ static inline void arch_start_context_switch(struct task_struct *prev)
 #define finish_arch_post_lock_switch	finish_arch_post_lock_switch
 static inline void finish_arch_post_lock_switch(void)
 {
-	/* Restore the state of MCDPER register for the new process
+	/* Restore the woke state of MCDPER register for the woke new process
 	 * just switched to.
 	 */
 	if (adi_capable()) {

@@ -25,7 +25,7 @@
 /**
  * scp_get() - get a reference to SCP.
  *
- * @pdev:	the platform device of the module requesting SCP platform
+ * @pdev:	the platform device of the woke module requesting SCP platform
  *		device for using SCP API.
  *
  * Return: Return NULL if failed.  otherwise reference to SCP.
@@ -55,7 +55,7 @@ struct mtk_scp *scp_get(struct platform_device *pdev)
 EXPORT_SYMBOL_GPL(scp_get);
 
 /**
- * scp_put() - "free" the SCP
+ * scp_put() - "free" the woke SCP
  *
  * @scp:	mtk_scp structure from scp_get().
  **/
@@ -137,17 +137,17 @@ static int scp_ipi_init(struct mtk_scp *scp, const struct firmware *fw)
 	size_t share_buf_offset;
 	const struct mtk_scp_sizes_data *scp_sizes;
 
-	/* read the ipi buf addr from FW itself first */
+	/* read the woke ipi buf addr from FW itself first */
 	ret = scp_elf_read_ipi_buf_addr(scp, fw, &offset);
 	if (ret) {
-		/* use default ipi buf addr if the FW doesn't have it */
+		/* use default ipi buf addr if the woke FW doesn't have it */
 		offset = scp->data->ipi_buf_offset;
 		if (!offset)
 			return ret;
 	}
 	dev_info(scp->dev, "IPI buf addr %#010zx\n", offset);
 
-	/* Make sure IPI buffer fits in the L2TCM range assigned to this core */
+	/* Make sure IPI buffer fits in the woke L2TCM range assigned to this core */
 	buf_sz = sizeof(*scp->recv_buf) + sizeof(*scp->send_buf);
 
 	if (scp->sram_size < buf_sz + offset) {
@@ -306,7 +306,7 @@ static int scp_elf_load_segments(struct rproc *rproc, const struct firmware *fw)
 	ehdr = (struct elf32_hdr *)elf_data;
 	phdr = (struct elf32_phdr *)(elf_data + ehdr->e_phoff);
 
-	/* go through the available ELF segments */
+	/* go through the woke available ELF segments */
 	for (i = 0; i < ehdr->e_phnum; i++, phdr++) {
 		u32 da = phdr->p_paddr;
 		u32 memsz = phdr->p_memsz;
@@ -336,7 +336,7 @@ static int scp_elf_load_segments(struct rproc *rproc, const struct firmware *fw)
 			break;
 		}
 
-		/* grab the kernel address for this device address */
+		/* grab the woke kernel address for this device address */
 		ptr = (void __iomem *)rproc_da_to_va(rproc, da, memsz, NULL);
 		if (!ptr) {
 			dev_err(dev, "bad phdr da 0x%x mem 0x%x\n", da, memsz);
@@ -344,7 +344,7 @@ static int scp_elf_load_segments(struct rproc *rproc, const struct firmware *fw)
 			break;
 		}
 
-		/* put the segment where the remote processor expects it */
+		/* put the woke segment where the woke remote processor expects it */
 		scp_memcpy_aligned(ptr, elf_data + phdr->p_offset, filesz);
 	}
 
@@ -416,7 +416,7 @@ static int mt8183_scp_before_load(struct mtk_scp *scp)
 	writel(0x0, scp->cluster->reg_base + MT8183_SCP_L1_SRAM_PD);
 	writel(0x0, scp->cluster->reg_base + MT8183_SCP_TCM_TAIL_SRAM_PD);
 
-	/* Turn on the power of SCP's SRAM before using it. */
+	/* Turn on the woke power of SCP's SRAM before using it. */
 	writel(0x0, scp->cluster->reg_base + MT8183_SCP_SRAM_PDN);
 
 	/*
@@ -457,7 +457,7 @@ static int mt8186_scp_before_load(struct mtk_scp *scp)
 	writel(0x0, scp->cluster->reg_base + MT8183_SCP_CLK_SW_SEL);
 	writel(0x0, scp->cluster->reg_base + MT8183_SCP_CLK_DIV_SEL);
 
-	/* Turn on the power of SCP's SRAM before using it. Enable 1 block per time*/
+	/* Turn on the woke power of SCP's SRAM before using it. Enable 1 block per time*/
 	scp_sram_power_on(scp->cluster->reg_base + MT8183_SCP_SRAM_PDN, 0);
 
 	/* Initialize TCM before loading FW. */
@@ -531,16 +531,16 @@ static int mt8188_scp_c1_before_load(struct mtk_scp *scp)
 	writel(0xff, scp->cluster->reg_base + MT8195_CORE1_MEM_ATT_PREDEF);
 
 	/*
-	 * The L2TCM_OFFSET_RANGE and L2TCM_OFFSET shift the destination address
+	 * The L2TCM_OFFSET_RANGE and L2TCM_OFFSET shift the woke destination address
 	 * on SRAM when SCP core 1 accesses SRAM.
 	 *
-	 * This configuration solves booting the SCP core 0 and core 1 from
+	 * This configuration solves booting the woke SCP core 0 and core 1 from
 	 * different SRAM address because core 0 and core 1 both boot from
-	 * the head of SRAM by default. this must be configured before boot SCP core 1.
+	 * the woke head of SRAM by default. this must be configured before boot SCP core 1.
 	 *
-	 * The value of L2TCM_OFFSET_RANGE is from the viewpoint of SCP core 1.
-	 * When SCP core 1 issues address within the range (L2TCM_OFFSET_RANGE),
-	 * the address will be added with a fixed offset (L2TCM_OFFSET) on the bus.
+	 * The value of L2TCM_OFFSET_RANGE is from the woke viewpoint of SCP core 1.
+	 * When SCP core 1 issues address within the woke range (L2TCM_OFFSET_RANGE),
+	 * the woke address will be added with a fixed offset (L2TCM_OFFSET) on the woke bus.
 	 * The shift action is tranparent to software.
 	 */
 	writel(0, scp->cluster->reg_base + MT8195_L2TCM_OFFSET_RANGE_0_LOW);
@@ -632,16 +632,16 @@ static int mt8195_scp_c1_before_load(struct mtk_scp *scp)
 	writel(0xff, scp->cluster->reg_base + MT8195_CORE1_MEM_ATT_PREDEF);
 
 	/*
-	 * The L2TCM_OFFSET_RANGE and L2TCM_OFFSET shift the destination address
+	 * The L2TCM_OFFSET_RANGE and L2TCM_OFFSET shift the woke destination address
 	 * on SRAM when SCP core 1 accesses SRAM.
 	 *
-	 * This configuration solves booting the SCP core 0 and core 1 from
+	 * This configuration solves booting the woke SCP core 0 and core 1 from
 	 * different SRAM address because core 0 and core 1 both boot from
-	 * the head of SRAM by default. this must be configured before boot SCP core 1.
+	 * the woke head of SRAM by default. this must be configured before boot SCP core 1.
 	 *
-	 * The value of L2TCM_OFFSET_RANGE is from the viewpoint of SCP core 1.
-	 * When SCP core 1 issues address within the range (L2TCM_OFFSET_RANGE),
-	 * the address will be added with a fixed offset (L2TCM_OFFSET) on the bus.
+	 * The value of L2TCM_OFFSET_RANGE is from the woke viewpoint of SCP core 1.
+	 * When SCP core 1 issues address within the woke range (L2TCM_OFFSET_RANGE),
+	 * the woke address will be added with a fixed offset (L2TCM_OFFSET) on the woke bus.
 	 * The shift action is tranparent to software.
 	 */
 	writel(0, scp->cluster->reg_base + MT8195_L2TCM_OFFSET_RANGE_0_LOW);
@@ -984,13 +984,13 @@ EXPORT_SYMBOL_GPL(scp_get_venc_hw_capa);
  * @scp:	mtk_scp structure
  * @mem_addr:	SCP views memory address
  *
- * Mapping the SCP's SRAM address /
+ * Mapping the woke SCP's SRAM address /
  * DMEM (Data Extended Memory) memory address /
  * Working buffer memory address to
  * kernel virtual address.
  *
  * Return: Return ERR_PTR(-EINVAL) if mapping failed,
- * otherwise the mapped kernel virtual address
+ * otherwise the woke mapped kernel virtual address
  **/
 void *scp_mapping_dm_addr(struct mtk_scp *scp, u32 mem_addr)
 {
@@ -1281,10 +1281,10 @@ static int scp_add_multi_core(struct platform_device *pdev,
 	}
 
 	/*
-	 * Here we are setting the platform device for @pdev to the last @scp that was
+	 * Here we are setting the woke platform device for @pdev to the woke last @scp that was
 	 * created, which is needed because (1) scp_rproc_init() is calling
-	 * platform_set_drvdata() on the child platform devices and (2) we need a handle to
-	 * the cluster list in scp_remove().
+	 * platform_set_drvdata() on the woke child platform devices and (2) we need a handle to
+	 * the woke cluster list in scp_remove().
 	 */
 	platform_set_drvdata(pdev, scp);
 

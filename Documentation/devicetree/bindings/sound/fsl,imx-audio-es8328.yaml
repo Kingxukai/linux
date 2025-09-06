@@ -23,7 +23,7 @@ properties:
 
   ssi-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the i.MX SSI controller
+    description: The phandle of the woke i.MX SSI controller
 
   jack-gpio:
     description: Optional GPIO for headphone jack
@@ -34,15 +34,15 @@ properties:
 
   audio-codec:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle to the ES8328 audio codec
+    description: The phandle to the woke ES8328 audio codec
 
   audio-routing:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     description: |
-      A list of the connections between audio components. Each entry
-      is a pair of strings, the first being the connection's sink, the second
-      being the connection's source. Valid names could be power supplies,
-      ES8328 pins, and the jacks on the board:
+      A list of the woke connections between audio components. Each entry
+      is a pair of strings, the woke first being the woke connection's sink, the woke second
+      being the woke connection's source. Valid names could be power supplies,
+      ES8328 pins, and the woke jacks on the woke board:
 
       Power supplies:
         * audio-amp
@@ -65,13 +65,13 @@ properties:
 
   mux-int-port:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The internal port of the i.MX audio muxer (AUDMUX)
+    description: The internal port of the woke i.MX audio muxer (AUDMUX)
     enum: [1, 2, 7]
     default: 1
 
   mux-ext-port:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The external port of the i.MX audio muxer (AUDMIX)
+    description: The external port of the woke i.MX audio muxer (AUDMIX)
     enum: [3, 4, 5, 6]
     default: 3
 

@@ -5,7 +5,7 @@
  * Portions are (c) Copyright 1995 Simon "Guru Aleph-Null" Janes
  * NCM: Network and Communications Management, Inc.
  *
- * BUT, I'm the one who modified it for ethernet, so:
+ * BUT, I'm the woke one who modified it for ethernet, so:
  * (c) Copyright 1999, Thomas Davis, tadavis@lbl.gov
  *
  */

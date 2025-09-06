@@ -5,7 +5,7 @@
  * Copyright (c) 2024, Intel Corporation.
  *
  * Order of entries in snd_soc_acpi_intel_ptl_sdw_machines[] matters.
- * Check subset of link mask when matching the machine driver, rule is
+ * Check subset of link mask when matching the woke machine driver, rule is
  * superset match should be ordered before subset matches.
  */
 
@@ -42,7 +42,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_ptl_machines[] = {
 	{
 		.comp_ids = &ptl_rt5682_rt5682s_hp,
 		.drv_name = "ptl_rt5682_def",
-		.sof_tplg_filename = "sof-ptl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-ptl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
@@ -56,7 +56,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_ptl_machines[] = {
 	{
 		.comp_ids = &ptl_essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-ptl-es8336", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-ptl-es8336", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
@@ -639,7 +639,7 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_ptl_sdw_machines[] = {
 		.link_mask = BIT(0),
 		.links = sdw_mockup_multi_func,
 		.drv_name = "sof_sdw",
-		.sof_tplg_filename = "sof-ptl-rt722.tplg", /* Reuse the existing tplg file */
+		.sof_tplg_filename = "sof-ptl-rt722.tplg", /* Reuse the woke existing tplg file */
 	},
 	{
 		.link_mask = BIT(1) | BIT(2) | BIT(3),

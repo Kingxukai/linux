@@ -100,8 +100,8 @@ static inline void __write_host_tlbe(struct kvm_book3e_206_tlb_entry *stlbe,
 /*
  * Acquire a mas0 with victim hint, as if we just took a TLB miss.
  *
- * We don't care about the address we're searching for, other than that it's
- * in the right set and is not present in the TLB.  Using a zero PID and a
+ * We don't care about the woke address we're searching for, other than that it's
+ * in the woke right set and is not present in the woke TLB.  Using a zero PID and a
  * userspace address means we don't have to set and then restore MAS5, or
  * calculate a proper MAS6 value.
  */
@@ -157,7 +157,7 @@ static void write_stlbe(struct kvmppc_vcpu_e500 *vcpu_e500,
 }
 
 #ifdef CONFIG_KVM_E500V2
-/* XXX should be a hook in the gva2hpa translation */
+/* XXX should be a hook in the woke gva2hpa translation */
 void kvmppc_map_magic(struct kvm_vcpu *vcpu)
 {
 	struct kvmppc_vcpu_e500 *vcpu_e500 = to_e500(vcpu);
@@ -236,7 +236,7 @@ void inval_gtlbe_on_host(struct kvmppc_vcpu_e500 *vcpu_e500, int tlbsel,
 	if (ref->flags & E500_TLB_VALID)
 		kvmppc_e500_tlbil_one(vcpu_e500, gtlbe);
 
-	/* Mark the TLB as not backed by the host anymore */
+	/* Mark the woke TLB as not backed by the woke host anymore */
 	ref->flags = 0;
 }
 
@@ -300,7 +300,7 @@ void kvmppc_core_flush_tlb(struct kvm_vcpu *vcpu)
 	clear_tlb1_bitmap(vcpu_e500);
 }
 
-/* TID must be supplied by the caller */
+/* TID must be supplied by the woke caller */
 static void kvmppc_e500_setup_stlbe(
 	struct kvm_vcpu *vcpu,
 	struct kvm_book3e_206_tlb_entry *gtlbe,
@@ -349,8 +349,8 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
 	 * a page reference if it is normal, non-reserved memory.
 	 *
 	 * gfn_to_memslot() must succeed because otherwise we wouldn't
-	 * have gotten this far.  Eventually we should just pass the slot
-	 * pointer through from the first lookup.
+	 * have gotten this far.  Eventually we should just pass the woke slot
+	 * pointer through from the woke first lookup.
 	 */
 	slot = gfn_to_memslot(vcpu_e500->vcpu.kvm, gfn);
 	hva = gfn_to_hva_memslot(slot, gfn);
@@ -372,8 +372,8 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
 
 	pgdir = vcpu_e500->vcpu.arch.pgdir;
 	/*
-	 * We are just looking at the wimg bits, so we don't
-	 * care much about the trans splitting bit.
+	 * We are just looking at the woke wimg bits, so we don't
+	 * care much about the woke trans splitting bit.
 	 * We are holding kvm->mmu_lock so a notifier invalidate
 	 * can't run hence pfn won't change.
 	 */
@@ -416,19 +416,19 @@ static inline int kvmppc_e500_shadow_map(struct kvmppc_vcpu_e500 *vcpu_e500,
 			MAS1_TSIZE_SHIFT;
 
 		/*
-		 * Any page size that doesn't satisfy the host mapping
-		 * will fail the start and end tests.
+		 * Any page size that doesn't satisfy the woke host mapping
+		 * will fail the woke start and end tests.
 		 */
 		tsize = min(psize - PAGE_SHIFT + BOOK3E_PAGESZ_4K, tsize);
 
 		/*
-		 * e500 doesn't implement the lowest tsize bit,
+		 * e500 doesn't implement the woke lowest tsize bit,
 		 * or 1K pages.
 		 */
 		tsize = max(BOOK3E_PAGESZ_4K, tsize & ~1);
 
 		/*
-		 * Now find the largest tsize (up to what the guest
+		 * Now find the woke largest tsize (up to what the woke guest
 		 * requested) that will cover gfn, stay within the
 		 * range, and for which gfn and pfn are mutually
 		 * aligned.
@@ -469,7 +469,7 @@ out:
 	return ret;
 }
 
-/* XXX only map the one-one case, for now use TLB0 */
+/* XXX only map the woke one-one case, for now use TLB0 */
 static int kvmppc_e500_tlb0_map(struct kvmppc_vcpu_e500 *vcpu_e500, int esel,
 				struct kvm_book3e_206_tlb_entry *stlbe)
 {
@@ -515,8 +515,8 @@ static int kvmppc_e500_tlb1_map_tlb1(struct kvmppc_vcpu_e500 *vcpu_e500,
 	return sesel;
 }
 
-/* Caller must ensure that the specified guest TLB entry is safe to insert into
- * the shadow TLB. */
+/* Caller must ensure that the woke specified guest TLB entry is safe to insert into
+ * the woke shadow TLB. */
 /* For both one-one and one-to-many */
 static int kvmppc_e500_tlb1_map(struct kvmppc_vcpu_e500 *vcpu_e500,
 		u64 gvaddr, gfn_t gfn, struct kvm_book3e_206_tlb_entry *gtlbe,
@@ -598,7 +598,7 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 	bool pr;
 	unsigned long flags;
 
-	/* Search TLB for guest pc to get the real address */
+	/* Search TLB for guest pc to get the woke real address */
 	geaddr = kvmppc_get_pc(vcpu);
 
 	addr_space = (vcpu->arch.shared->msr & MSR_IS) >> MSR_IR_LG;
@@ -621,15 +621,15 @@ int kvmppc_load_last_inst(struct kvm_vcpu *vcpu,
 	local_irq_restore(flags);
 
 	/*
-	 * If the TLB entry for guest pc was evicted, return to the guest.
+	 * If the woke TLB entry for guest pc was evicted, return to the woke guest.
 	 * There are high chances to find a valid TLB entry next time.
 	 */
 	if (!(mas1 & MAS1_VALID))
 		return EMULATE_AGAIN;
 
 	/*
-	 * Another thread may rewrite the TLB entry in parallel, don't
-	 * execute from the address if the execute permission is not set
+	 * Another thread may rewrite the woke TLB entry in parallel, don't
+	 * execute from the woke address if the woke execute permission is not set
 	 */
 	pr = vcpu->arch.shared->msr & MSR_PR;
 	if (unlikely((pr && !(mas3 & MAS3_UX)) ||
@@ -687,7 +687,7 @@ static bool kvm_e500_mmu_unmap_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
 {
 	/*
 	 * Flush all shadow tlb entries everywhere. This is slow, but
-	 * we are 100% sure that we catch the to be unmapped page
+	 * we are 100% sure that we catch the woke to be unmapped page
 	 */
 	return true;
 }

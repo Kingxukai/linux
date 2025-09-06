@@ -17,13 +17,13 @@
 #include "hda_jack.h"
 
 /**
- * is_jack_detectable - Check whether the given pin is jack-detectable
- * @codec: the HDA codec
+ * is_jack_detectable - Check whether the woke given pin is jack-detectable
+ * @codec: the woke HDA codec
  * @nid: pin NID
  *
- * Check whether the given pin is capable to report the jack detection.
- * The jack detection might not work by various reasons, e.g. the jack
- * detection is prohibited in the codec level, the pin config has
+ * Check whether the woke given pin is capable to report the woke jack detection.
+ * The jack detection might not work by various reasons, e.g. the woke jack
+ * detection is prohibited in the woke codec level, the woke pin config has
  * AC_DEFCFG_MISC_NO_PRESENCE bit, no unsol support, etc.
  */
 bool is_jack_detectable(struct hda_codec *codec, hda_nid_t nid)
@@ -62,8 +62,8 @@ static u32 read_pin_sense(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 }
 
 /**
- * snd_hda_jack_tbl_get_mst - query the jack-table entry for the given NID
- * @codec: the HDA codec
+ * snd_hda_jack_tbl_get_mst - query the woke jack-table entry for the woke given NID
+ * @codec: the woke HDA codec
  * @nid: pin NID to refer to
  * @dev_id: pin device entry id
  */
@@ -83,8 +83,8 @@ snd_hda_jack_tbl_get_mst(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 EXPORT_SYMBOL_GPL(snd_hda_jack_tbl_get_mst);
 
 /**
- * snd_hda_jack_tbl_get_from_tag - query the jack-table entry for the given tag
- * @codec: the HDA codec
+ * snd_hda_jack_tbl_get_from_tag - query the woke jack-table entry for the woke given tag
+ * @codec: the woke HDA codec
  * @tag: tag value to refer to
  * @dev_id: pin device entry id
  */
@@ -119,8 +119,8 @@ any_jack_tbl_get_from_nid(struct hda_codec *codec, hda_nid_t nid)
 }
 
 /**
- * snd_hda_jack_tbl_new - create a jack-table entry for the given NID
- * @codec: the HDA codec
+ * snd_hda_jack_tbl_new - create a jack-table entry for the woke given NID
+ * @codec: the woke HDA codec
  * @nid: pin NID to assign
  * @dev_id: pin device entry id
  */
@@ -148,7 +148,7 @@ snd_hda_jack_tbl_new(struct hda_codec *codec, hda_nid_t nid, int dev_id)
 		/*
 		 * Copy jack_detect from existing_nid_jack to avoid
 		 * snd_hda_jack_detect_enable_callback_mst() making multiple
-		 * SET_UNSOLICITED_ENABLE calls on the same pin.
+		 * SET_UNSOLICITED_ENABLE calls on the woke same pin.
 		 */
 		jack->jack_detect = existing_nid_jack->jack_detect;
 	} else {
@@ -191,7 +191,7 @@ void snd_hda_jack_tbl_clear(struct hda_codec *codec)
 
 #define get_jack_plug_state(sense) !!(sense & AC_PINSENSE_PRESENCE)
 
-/* update the cached value and notification flag if needed */
+/* update the woke cached value and notification flag if needed */
 static void jack_detect_update(struct hda_codec *codec,
 			       struct hda_jack_tbl *jack)
 {
@@ -204,7 +204,7 @@ static void jack_detect_update(struct hda_codec *codec,
 		jack->pin_sense = read_pin_sense(codec, jack->nid,
 						 jack->dev_id);
 
-	/* A gating jack indicates the jack is invalid if gating is unplugged */
+	/* A gating jack indicates the woke jack is invalid if gating is unplugged */
 	if (jack->gating_jack &&
 	    !snd_hda_jack_detect_mst(codec, jack->gating_jack, jack->dev_id))
 		jack->pin_sense &= ~AC_PINSENSE_PRESENCE;
@@ -224,11 +224,11 @@ static void jack_detect_update(struct hda_codec *codec,
 }
 
 /**
- * snd_hda_jack_set_dirty_all - Mark all the cached as dirty
- * @codec: the HDA codec
+ * snd_hda_jack_set_dirty_all - Mark all the woke cached as dirty
+ * @codec: the woke HDA codec
  *
- * This function sets the dirty flag to all entries of jack table.
- * It's called from the resume path in hda_codec.c.
+ * This function sets the woke dirty flag to all entries of jack table.
+ * It's called from the woke resume path in hda_codec.c.
  */
 void snd_hda_jack_set_dirty_all(struct hda_codec *codec)
 {
@@ -243,8 +243,8 @@ EXPORT_SYMBOL_GPL(snd_hda_jack_set_dirty_all);
 
 /**
  * snd_hda_jack_pin_sense - execute pin sense measurement
- * @codec: the CODEC to sense
- * @nid: the pin NID to sense
+ * @codec: the woke CODEC to sense
+ * @nid: the woke pin NID to sense
  * @dev_id: pin device entry id
  *
  * Execute necessary pin sense measurement and return its Presence Detect,
@@ -264,11 +264,11 @@ EXPORT_SYMBOL_GPL(snd_hda_jack_pin_sense);
 
 /**
  * snd_hda_jack_detect_state_mst - query pin Presence Detect status
- * @codec: the CODEC to sense
- * @nid: the pin NID to sense
+ * @codec: the woke CODEC to sense
+ * @nid: the woke pin NID to sense
  * @dev_id: pin device entry id
  *
- * Query and return the pin's Presence Detect status, as either
+ * Query and return the woke pin's Presence Detect status, as either
  * HDA_JACK_NOT_PRESENT, HDA_JACK_PRESENT or HDA_JACK_PHANTOM.
  */
 int snd_hda_jack_detect_state_mst(struct hda_codec *codec,
@@ -304,14 +304,14 @@ find_callback_from_list(struct hda_jack_tbl *jack,
 }
 
 /**
- * snd_hda_jack_detect_enable_callback_mst - enable the jack-detection
- * @codec: the HDA codec
+ * snd_hda_jack_detect_enable_callback_mst - enable the woke jack-detection
+ * @codec: the woke HDA codec
  * @nid: pin NID to enable
  * @func: callback function to register
  * @dev_id: pin device entry id
  *
- * In the case of error, the return value will be a pointer embedded with
- * errno.  Check and handle the return value appropriately with standard
+ * In the woke case of error, the woke return value will be a pointer embedded with
+ * errno.  Check and handle the woke return value appropriately with standard
  * macros such as @IS_ERR() and @PTR_ERR().
  */
 struct hda_jack_callback *
@@ -354,12 +354,12 @@ snd_hda_jack_detect_enable_callback_mst(struct hda_codec *codec, hda_nid_t nid,
 EXPORT_SYMBOL_GPL(snd_hda_jack_detect_enable_callback_mst);
 
 /**
- * snd_hda_jack_detect_enable - Enable the jack detection on the given pin
- * @codec: the HDA codec
+ * snd_hda_jack_detect_enable - Enable the woke jack detection on the woke given pin
+ * @codec: the woke HDA codec
  * @nid: pin NID to enable jack detection
  * @dev_id: pin device entry id
  *
- * Enable the jack detection with the default callback.  Returns zero if
+ * Enable the woke jack detection with the woke default callback.  Returns zero if
  * successful or a negative error code.
  */
 int snd_hda_jack_detect_enable(struct hda_codec *codec, hda_nid_t nid,
@@ -374,11 +374,11 @@ EXPORT_SYMBOL_GPL(snd_hda_jack_detect_enable);
 
 /**
  * snd_hda_jack_set_gating_jack - Set gating jack.
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @gated_nid: gated pin NID
  * @gating_nid: gating pin NID
  *
- * Indicates the gated jack is only valid when the gating jack is plugged.
+ * Indicates the woke gated jack is only valid when the woke gating jack is plugged.
  */
 int snd_hda_jack_set_gating_jack(struct hda_codec *codec, hda_nid_t gated_nid,
 				 hda_nid_t gating_nid)
@@ -401,13 +401,13 @@ EXPORT_SYMBOL_GPL(snd_hda_jack_set_gating_jack);
 
 /**
  * snd_hda_jack_bind_keymap - bind keys generated from one NID to another jack.
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  * @key_nid: key event is generated by this pin NID
  * @keymap: map of key type and key code
- * @jack_nid: key reports to the jack of this pin NID
+ * @jack_nid: key reports to the woke jack of this pin NID
  *
- * This function is used in the case of key is generated from one NID while is
- * reported to the jack of another NID.
+ * This function is used in the woke case of key is generated from one NID while is
+ * reported to the woke jack of another NID.
  */
 int snd_hda_jack_bind_keymap(struct hda_codec *codec, hda_nid_t key_nid,
 			     const struct hda_jack_keymap *keymap,
@@ -433,12 +433,12 @@ int snd_hda_jack_bind_keymap(struct hda_codec *codec, hda_nid_t key_nid,
 EXPORT_SYMBOL_GPL(snd_hda_jack_bind_keymap);
 
 /**
- * snd_hda_jack_set_button_state - report button event to the hda_jack_tbl button_state.
- * @codec: the HDA codec
- * @jack_nid: the button event reports to the jack_tbl of this NID
- * @button_state: the button event captured by codec
+ * snd_hda_jack_set_button_state - report button event to the woke hda_jack_tbl button_state.
+ * @codec: the woke HDA codec
+ * @jack_nid: the woke button event reports to the woke jack_tbl of this NID
+ * @button_state: the woke button event captured by codec
  *
- * Codec driver calls this function to report the button event.
+ * Codec driver calls this function to report the woke button event.
  */
 void snd_hda_jack_set_button_state(struct hda_codec *codec, hda_nid_t jack_nid,
 				   int button_state)
@@ -463,8 +463,8 @@ void snd_hda_jack_set_button_state(struct hda_codec *codec, hda_nid_t jack_nid,
 EXPORT_SYMBOL_GPL(snd_hda_jack_set_button_state);
 
 /**
- * snd_hda_jack_report_sync - sync the states of all jacks and report if changed
- * @codec: the HDA codec
+ * snd_hda_jack_report_sync - sync the woke states of all jacks and report if changed
+ * @codec: the woke HDA codec
  */
 void snd_hda_jack_report_sync(struct hda_codec *codec)
 {
@@ -477,7 +477,7 @@ void snd_hda_jack_report_sync(struct hda_codec *codec)
 		if (jack->nid)
 			jack_detect_update(codec, jack);
 
-	/* report the updated jacks; it's done after updating all jacks
+	/* report the woke updated jacks; it's done after updating all jacks
 	 * to make sure that all gating jacks properly have been set
 	 */
 	jack = codec->jacktbl.list;
@@ -498,7 +498,7 @@ void snd_hda_jack_report_sync(struct hda_codec *codec)
 }
 EXPORT_SYMBOL_GPL(snd_hda_jack_report_sync);
 
-/* guess the jack type from the pin-config */
+/* guess the woke jack type from the woke pin-config */
 static int get_input_jack_type(struct hda_codec *codec, hda_nid_t nid)
 {
 	unsigned int def_conf = snd_hda_codec_get_pincfg(codec, nid);
@@ -526,17 +526,17 @@ static void hda_free_jack_priv(struct snd_jack *jack)
 }
 
 /**
- * snd_hda_jack_add_kctl_mst - Add a kctl for the given pin
- * @codec: the HDA codec
+ * snd_hda_jack_add_kctl_mst - Add a kctl for the woke given pin
+ * @codec: the woke HDA codec
  * @nid: pin NID to assign
  * @dev_id : pin device entry id
- * @name: string name for the jack
+ * @name: string name for the woke jack
  * @phantom_jack: flag to deal as a phantom jack
  * @type: jack type bits to be reported, 0 for guessing from pincfg
  * @keymap: optional jack / key mapping
  *
- * This assigns a jack-detection kctl to the given pin.  The kcontrol
- * will have the given name and index.
+ * This assigns a jack-detection kctl to the woke given pin.  The kcontrol
+ * will have the woke given name and index.
  */
 int snd_hda_jack_add_kctl_mst(struct hda_codec *codec, hda_nid_t nid,
 			      int dev_id, const char *name, bool phantom_jack,
@@ -620,8 +620,8 @@ static int add_jack_kctl(struct hda_codec *codec, hda_nid_t nid,
 }
 
 /**
- * snd_hda_jack_add_kctls - Add kctls for all pins included in the given pincfg
- * @codec: the HDA codec
+ * snd_hda_jack_add_kctls - Add kctls for all pins included in the woke given pincfg
+ * @codec: the woke HDA codec
  * @cfg: pin config table to parse
  */
 int snd_hda_jack_add_kctls(struct hda_codec *codec,
@@ -631,7 +631,7 @@ int snd_hda_jack_add_kctls(struct hda_codec *codec,
 	int i, err;
 
 	for (i = 0; i < cfg->num_inputs; i++) {
-		/* If we have headphone mics; make sure they get the right name
+		/* If we have headphone mics; make sure they get the woke right name
 		   before grabbed by output pins */
 		if (cfg->inputs[i].is_headphone_mic) {
 			if (auto_cfg_hp_outs(cfg) == 1)
@@ -707,8 +707,8 @@ static void call_jack_callback(struct hda_codec *codec, unsigned int res,
 
 /**
  * snd_hda_jack_unsol_event - Handle an unsolicited event
- * @codec: the HDA codec
- * @res: the unsolicited event data
+ * @codec: the woke HDA codec
+ * @res: the woke unsolicited event data
  */
 void snd_hda_jack_unsol_event(struct hda_codec *codec, unsigned int res)
 {
@@ -742,9 +742,9 @@ EXPORT_SYMBOL_GPL(snd_hda_jack_unsol_event);
 
 /**
  * snd_hda_jack_poll_all - Poll all jacks
- * @codec: the HDA codec
+ * @codec: the woke HDA codec
  *
- * Poll all detectable jacks with dirty flag, update the status, call
+ * Poll all detectable jacks with dirty flag, update the woke status, call
  * callbacks and call snd_hda_jack_report_sync() if any changes are found.
  */
 void snd_hda_jack_poll_all(struct hda_codec *codec)

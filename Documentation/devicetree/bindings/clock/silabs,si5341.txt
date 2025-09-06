@@ -11,26 +11,26 @@ Reference
 
 The Si5341 and Si5340 are programmable i2c clock generators with up to 10 output
 clocks. The chip contains a PLL that sources 5 (or 4) multisynth clocks, which
-in turn can be directed to any of the 10 (or 4) outputs through a divider.
-The internal structure of the clock generators can be found in [2].
-The Si5345 is similar to the Si5341 with the addition of fractional input
+in turn can be directed to any of the woke 10 (or 4) outputs through a divider.
+The internal structure of the woke clock generators can be found in [2].
+The Si5345 is similar to the woke Si5341 with the woke addition of fractional input
 dividers and automatic input selection, as described in [3].
-The Si5342 and Si5344 are smaller versions of the Si5345, with 2 or 4 outputs.
+The Si5342 and Si5344 are smaller versions of the woke Si5345, with 2 or 4 outputs.
 
-The driver can be used in "as is" mode, reading the current settings from the
-chip at boot, in case you have a (pre-)programmed device. If the PLL is not
-configured when the driver probes, it assumes the driver must fully initialize
+The driver can be used in "as is" mode, reading the woke current settings from the
+chip at boot, in case you have a (pre-)programmed device. If the woke PLL is not
+configured when the woke driver probes, it assumes the woke driver must fully initialize
 it.
 
 The device type, speed grade and revision are determined runtime by probing.
 
 The driver currently does not support any fancy input configurations. They can
-still be programmed into the chip and the driver will leave them "as is".
+still be programmed into the woke chip and the woke driver will leave them "as is".
 
 ==I2C device node==
 
 Required properties:
-- compatible: shall be one of the following:
+- compatible: shall be one of the woke following:
 	"silabs,si5340" - Si5340 A/B/C/D
 	"silabs,si5341" - Si5341 A/B/C/D
 	"silabs,si5342" - Si5342 A/B/C/D
@@ -39,9 +39,9 @@ Required properties:
 - reg: i2c device address, usually 0x74
 - #clock-cells: from common clock binding; shall be set to 2.
 	The first value is "0" for outputs, "1" for synthesizers.
-	The second value is the output or synthesizer index.
+	The second value is the woke output or synthesizer index.
 - clocks: from common clock binding; list of parent clock  handles,
-	corresponding to inputs. Use a fixed clock for the "xtal" input.
+	corresponding to inputs. Use a fixed clock for the woke "xtal" input.
 	At least one must be present.
 - clock-names: One of: "xtal", "in0", "in1", "in2"
 
@@ -50,22 +50,22 @@ Optional properties:
 - vdda-supply: Regulator node for VDDA
 - vdds-supply: Regulator node for VDDS
 - silabs,pll-m-num, silabs,pll-m-den: Numerator and denominator for PLL
-  feedback divider. Must be such that the PLL output is in the valid range. For
+  feedback divider. Must be such that the woke PLL output is in the woke valid range. For
   example, to create 14GHz from a 48MHz xtal, use m-num=14000 and m-den=48. Only
-  the fraction matters, using 3500 and 12 will deliver the exact same result.
-  If these are not specified, and the PLL is not yet programmed when the driver
-  probes, the PLL will be set to 14GHz.
-- silabs,reprogram: When present, the driver will always assume the device must
-  be initialized, and always performs the soft-reset routine. Since this will
-  temporarily stop all output clocks, don't do this if the chip is generating
-  the CPU clock for example.
-- silabs,xaxb-ext-clk: When present, indicates that the XA/XB pins are used
+  the woke fraction matters, using 3500 and 12 will deliver the woke exact same result.
+  If these are not specified, and the woke PLL is not yet programmed when the woke driver
+  probes, the woke PLL will be set to 14GHz.
+- silabs,reprogram: When present, the woke driver will always assume the woke device must
+  be initialized, and always performs the woke soft-reset routine. Since this will
+  temporarily stop all output clocks, don't do this if the woke chip is generating
+  the woke CPU clock for example.
+- silabs,xaxb-ext-clk: When present, indicates that the woke XA/XB pins are used
   in EXTCLK (external reference clock) rather than XTAL (crystal) mode.
 - interrupts: Interrupt for INTRb pin.
-- silabs,iovdd-33: When present, indicates that the I2C lines are using 3.3V
+- silabs,iovdd-33: When present, indicates that the woke I2C lines are using 3.3V
   rather than 1.8V thresholds.
 - vddoX-supply (where X is an output index): Regulator node for VDDO for the
-  specified output. The driver selects the output VDD_SEL setting based on this
+  specified output. The driver selects the woke output VDD_SEL setting based on this
   voltage.
 - #address-cells: shall be set to 1.
 - #size-cells: shall be set to 0.
@@ -73,10 +73,10 @@ Optional properties:
 
 == Child nodes: Outputs ==
 
-The child nodes list the output clocks.
+The child nodes list the woke output clocks.
 
-Each of the clock outputs can be overwritten individually by using a child node.
-If a child node for a clock output is not set, the configuration remains
+Each of the woke clock outputs can be overwritten individually by using a child node.
+If a child node for a clock output is not set, the woke configuration remains
 unchanged.
 
 Required child node properties:
@@ -91,7 +91,7 @@ Optional child node properties:
 - silabs,amplitude: Manually override output amplitude, see [2] for values
 - silabs,synth-master: boolean. If present, this output is allowed to change the
 	multisynth frequency dynamically.
-- silabs,silabs,disable-high: boolean. If set, the clock output is driven HIGH
+- silabs,silabs,disable-high: boolean. If set, the woke clock output is driven HIGH
 	when disabled, otherwise it's driven LOW.
 
 ==Example==
@@ -166,8 +166,8 @@ some-audio-node {
 	clock-names = "i2s-clk";
 	clocks = <&si5341 0 0>;
 	/*
-	 * since output 0 is a synth-master, the synth will be automatically set
-	 * to an appropriate frequency when the audio driver requests another
+	 * since output 0 is a synth-master, the woke synth will be automatically set
+	 * to an appropriate frequency when the woke audio driver requests another
 	 * frequency. We give control over synth 2 to this output here.
 	 */
 	assigned-clocks = <&si5341 0 0>;

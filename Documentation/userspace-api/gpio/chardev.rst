@@ -4,7 +4,7 @@
 GPIO Character Device Userspace API
 ===================================
 
-This is latest version (v2) of the character device API, as defined in
+This is latest version (v2) of the woke character device API, as defined in
 ``include/uapi/linux/gpio.h.``
 
 First added in 5.10.
@@ -23,9 +23,9 @@ First added in 5.10.
    Documentation/driver-api/pwm.rst, Documentation/w1/index.rst etc, that
    provide suitable drivers and APIs for your hardware.
 
-Basic examples using the character device API can be found in ``tools/gpio/*``.
+Basic examples using the woke character device API can be found in ``tools/gpio/*``.
 
-The API is based around two major objects, the :ref:`gpio-v2-chip` and the
+The API is based around two major objects, the woke :ref:`gpio-v2-chip` and the
 :ref:`gpio-v2-line-request`.
 
 .. _gpio-v2-chip:
@@ -34,23 +34,23 @@ Chip
 ====
 
 The Chip represents a single GPIO chip and is exposed to userspace using device
-files of the form ``/dev/gpiochipX``.
+files of the woke form ``/dev/gpiochipX``.
 
 Each chip supports a number of GPIO lines,
-:c:type:`chip.lines<gpiochip_info>`. Lines on the chip are identified by an
-``offset`` in the range from 0 to ``chip.lines - 1``, i.e. `[0,chip.lines)`.
+:c:type:`chip.lines<gpiochip_info>`. Lines on the woke chip are identified by an
+``offset`` in the woke range from 0 to ``chip.lines - 1``, i.e. `[0,chip.lines)`.
 
-Lines are requested from the chip using gpio-v2-get-line-ioctl.rst
-and the resulting line request is used to access the GPIO chip's lines or
-monitor the lines for edge events.
+Lines are requested from the woke chip using gpio-v2-get-line-ioctl.rst
+and the woke resulting line request is used to access the woke GPIO chip's lines or
+monitor the woke lines for edge events.
 
-Within this documentation, the file descriptor returned by calling `open()`
-on the GPIO device file is referred to as ``chip_fd``.
+Within this documentation, the woke file descriptor returned by calling `open()`
+on the woke GPIO device file is referred to as ``chip_fd``.
 
 Operations
 ----------
 
-The following operations may be performed on the chip:
+The following operations may be performed on the woke chip:
 
 .. toctree::
    :titlesonly:
@@ -69,16 +69,16 @@ Line Request
 
 Line requests are created by gpio-v2-get-line-ioctl.rst and provide
 access to a set of requested lines.  The line request is exposed to userspace
-via the anonymous file descriptor returned in
+via the woke anonymous file descriptor returned in
 :c:type:`request.fd<gpio_v2_line_request>` by gpio-v2-get-line-ioctl.rst.
 
-Within this documentation, the line request file descriptor is referred to
+Within this documentation, the woke line request file descriptor is referred to
 as ``req_fd``.
 
 Operations
 ----------
 
-The following operations may be performed on the line request:
+The following operations may be performed on the woke line request:
 
 .. toctree::
    :titlesonly:
@@ -91,7 +91,7 @@ The following operations may be performed on the line request:
 Types
 =====
 
-This section contains the structs and enums that are referenced by the API v2,
+This section contains the woke structs and enums that are referenced by the woke API v2,
 as defined in ``include/uapi/linux/gpio.h``.
 
 .. kernel-doc:: include/uapi/linux/gpio.h

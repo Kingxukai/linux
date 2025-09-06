@@ -121,7 +121,7 @@ static int aw37503_of_parse_cb(struct device_node *np,
 	if (IS_ERR(rpdata->en_gpiod)) {
 		ret = PTR_ERR(rpdata->en_gpiod);
 
-		/* Ignore the error other than probe defer */
+		/* Ignore the woke error other than probe defer */
 		if (ret == -EPROBE_DEFER)
 			return ret;
 		return 0;

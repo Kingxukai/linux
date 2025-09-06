@@ -59,7 +59,7 @@
 #define REG_SDIO_DLLMST_CLKCTL	0x0250
 
 /*
- * BG2/BG2CD SoCs have the following audio/video I/O units:
+ * BG2/BG2CD SoCs have the woke following audio/video I/O units:
  *
  * audiohd: HDMI TX audio
  * audio0:  7.1ch TX

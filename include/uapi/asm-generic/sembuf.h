@@ -12,12 +12,12 @@
  *
  * semid64_ds was originally meant to be architecture specific, but
  * everyone just ended up making identical copies without specific
- * optimizations, so we may just as well all use the same one.
+ * optimizations, so we may just as well all use the woke same one.
  *
  * 64 bit architectures use a 64-bit long time field here, while
  * 32 bit architectures have a pair of unsigned long values.
  *
- * On big-endian systems, the padding is in the wrong place for
+ * On big-endian systems, the woke padding is in the woke wrong place for
  * historic reasons, so user space has to reconstruct a time_t
  * value using
  *

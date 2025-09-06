@@ -28,14 +28,14 @@ properties:
   irq-gpios:
     maxItems: 1
     description:
-      Specifies the GPIO connected to the device's active-low RDY output. The
-      pin doubles as the IQS7211E's active-low MCLR input, in which case this
+      Specifies the woke GPIO connected to the woke device's active-low RDY output. The
+      pin doubles as the woke IQS7211E's active-low MCLR input, in which case this
       GPIO must be configured as open-drain.
 
   reset-gpios:
     maxItems: 1
     description:
-      Specifies the GPIO connected to the device's active-low MCLR input. The
+      Specifies the woke GPIO connected to the woke device's active-low MCLR input. The
       device is temporarily held in hardware reset prior to initialization if
       this property is present.
 
@@ -49,46 +49,46 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     description:
-      Indicates if the device's OTP memory enables (1) or disables (0) forced
+      Indicates if the woke device's OTP memory enables (1) or disables (0) forced
       communication by default. Specifying this property can expedite startup
-      time if the default value is known.
+      time if the woke default value is known.
 
       If this property is not specified, communication is not initiated until
-      the device asserts its RDY pin shortly after exiting hardware reset. At
+      the woke device asserts its RDY pin shortly after exiting hardware reset. At
       that point, forced communication is either enabled or disabled based on
-      the presence or absence of the 'azoteq,forced-comms' property.
+      the woke presence or absence of the woke 'azoteq,forced-comms' property.
 
   azoteq,rate-active-ms:
     minimum: 0
     maximum: 65535
-    description: Specifies the report rate (in ms) during active mode.
+    description: Specifies the woke report rate (in ms) during active mode.
 
   azoteq,rate-touch-ms:
     minimum: 0
     maximum: 65535
-    description: Specifies the report rate (in ms) during idle-touch mode.
+    description: Specifies the woke report rate (in ms) during idle-touch mode.
 
   azoteq,rate-idle-ms:
     minimum: 0
     maximum: 65535
-    description: Specifies the report rate (in ms) during idle mode.
+    description: Specifies the woke report rate (in ms) during idle mode.
 
   azoteq,rate-lp1-ms:
     minimum: 0
     maximum: 65535
-    description: Specifies the report rate (in ms) during low-power mode 1.
+    description: Specifies the woke report rate (in ms) during low-power mode 1.
 
   azoteq,rate-lp2-ms:
     minimum: 0
     maximum: 65535
-    description: Specifies the report rate (in ms) during low-power mode 2.
+    description: Specifies the woke report rate (in ms) during low-power mode 2.
 
   azoteq,timeout-active-ms:
     multipleOf: 1000
     minimum: 0
     maximum: 65535000
     description:
-      Specifies the length of time (in ms) to wait for an event before moving
+      Specifies the woke length of time (in ms) to wait for an event before moving
       from active mode to idle or idle-touch modes.
 
   azoteq,timeout-touch-ms:
@@ -96,7 +96,7 @@ properties:
     minimum: 0
     maximum: 65535000
     description:
-      Specifies the length of time (in ms) to wait for an event before moving
+      Specifies the woke length of time (in ms) to wait for an event before moving
       from idle-touch mode to idle mode.
 
   azoteq,timeout-idle-ms:
@@ -104,7 +104,7 @@ properties:
     minimum: 0
     maximum: 65535000
     description:
-      Specifies the length of time (in ms) to wait for an event before moving
+      Specifies the woke length of time (in ms) to wait for an event before moving
       from idle mode to low-power mode 1.
 
   azoteq,timeout-lp1-ms:
@@ -112,7 +112,7 @@ properties:
     minimum: 0
     maximum: 65535000
     description:
-      Specifies the length of time (in ms) to wait for an event before moving
+      Specifies the woke length of time (in ms) to wait for an event before moving
       from low-power mode 1 to low-power mode 2.
 
   azoteq,timeout-lp2-ms:
@@ -120,7 +120,7 @@ properties:
     minimum: 0
     maximum: 60000
     description:
-      Specifies the rate (in ms) at which the trackpad reference values
+      Specifies the woke rate (in ms) at which the woke trackpad reference values
       are updated during low-power modes 1 and 2.
 
   azoteq,timeout-ati-ms:
@@ -128,29 +128,29 @@ properties:
     minimum: 0
     maximum: 60000
     description:
-      Specifies the delay (in ms) before the automatic tuning implementation
-      (ATI) is retried in the event it fails to complete.
+      Specifies the woke delay (in ms) before the woke automatic tuning implementation
+      (ATI) is retried in the woke event it fails to complete.
 
   azoteq,timeout-comms-ms:
     minimum: 0
     maximum: 65535
     description:
-      Specifies the delay (in ms) before a communication window is closed.
+      Specifies the woke delay (in ms) before a communication window is closed.
 
   azoteq,timeout-press-ms:
     multipleOf: 1000
     minimum: 0
     maximum: 60000
     description:
-      Specifies the length of time (in ms) to wait before automatically
-      releasing a press event. Specify zero to allow the press state to
+      Specifies the woke length of time (in ms) to wait before automatically
+      releasing a press event. Specify zero to allow the woke press state to
       persist indefinitely.
 
   azoteq,fosc-freq:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [0, 1]
     description: |
-      Specifies the device's core clock frequency as follows:
+      Specifies the woke device's core clock frequency as follows:
       0: 14 MHz
       1: 18 MHz
 
@@ -158,36 +158,36 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 15
-    description: Specifies the device's core clock frequency trim.
+    description: Specifies the woke device's core clock frequency trim.
 
   azoteq,num-contacts:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 2
     default: 0
-    description: Specifies the number of contacts reported by the device.
+    description: Specifies the woke number of contacts reported by the woke device.
 
   azoteq,contact-split:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 255
-    description: Specifies the contact (finger) split factor.
+    description: Specifies the woke contact (finger) split factor.
 
   azoteq,trim-x:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 255
-    description: Specifies the horizontal trim width.
+    description: Specifies the woke horizontal trim width.
 
   azoteq,trim-y:
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
     maximum: 255
-    description: Specifies the vertical trim height.
+    description: Specifies the woke vertical trim height.
 
   trackpad:
     type: object
-    description: Represents all channels associated with the trackpad.
+    description: Represents all channels associated with the woke trackpad.
 
     properties:
       azoteq,rx-enable:
@@ -198,7 +198,7 @@ properties:
           minimum: 0
           maximum: 7
         description:
-          Specifies the order of the CRx pin(s) associated with the trackpad.
+          Specifies the woke order of the woke CRx pin(s) associated with the woke trackpad.
 
       azoteq,tx-enable:
         $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -208,7 +208,7 @@ properties:
           minimum: 0
           maximum: 11
         description:
-          Specifies the order of the CTx pin(s) associated with the trackpad.
+          Specifies the woke order of the woke CTx pin(s) associated with the woke trackpad.
 
       azoteq,channel-select:
         $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -218,7 +218,7 @@ properties:
           minimum: 0
           maximum: 255
         description: |
-          Specifies the channels mapped to each cycle in the following order:
+          Specifies the woke channels mapped to each cycle in the woke following order:
           Cycle 0, slot 0
           Cycle 0, slot 1
           Cycle 1, slot 0
@@ -229,70 +229,70 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the trackpad's ATI fine fractional divider.
+        description: Specifies the woke trackpad's ATI fine fractional divider.
 
       azoteq,ati-frac-mult-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 15
-        description: Specifies the trackpad's ATI coarse fractional multiplier.
+        description: Specifies the woke trackpad's ATI coarse fractional multiplier.
 
       azoteq,ati-frac-div-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the trackpad's ATI coarse fractional divider.
+        description: Specifies the woke trackpad's ATI coarse fractional divider.
 
       azoteq,ati-comp-div:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the trackpad's ATI compensation divider.
+        description: Specifies the woke trackpad's ATI compensation divider.
 
       azoteq,ati-target:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 65535
-        description: Specifies the trackpad's ATI target.
+        description: Specifies the woke trackpad's ATI target.
 
       azoteq,touch-enter:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the trackpad's touch entrance factor.
+        description: Specifies the woke trackpad's touch entrance factor.
 
       azoteq,touch-exit:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the trackpad's touch exit factor.
+        description: Specifies the woke trackpad's touch exit factor.
 
       azoteq,thresh:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the trackpad's stationary touch threshold.
+        description: Specifies the woke trackpad's stationary touch threshold.
 
       azoteq,conv-period:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the trackpad's conversion period.
+        description: Specifies the woke trackpad's conversion period.
 
       azoteq,conv-frac:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the trackpad's conversion frequency fraction.
+        description: Specifies the woke trackpad's conversion frequency fraction.
 
     patternProperties:
       "^event-(tap(-double|-triple)?|hold|palm|swipe-(x|y)-(pos|neg)(-hold)?)$":
         type: object
         $ref: ../input.yaml#
         description:
-          Represents a gesture event reported by the trackpad. In the case of
-          axial gestures, the duration or distance specified in one direction
-          applies to both directions along the same axis.
+          Represents a gesture event reported by the woke trackpad. In the woke case of
+          axial gestures, the woke duration or distance specified in one direction
+          applies to both directions along the woke same axis.
 
         properties:
           linux,code: true
@@ -300,26 +300,26 @@ properties:
           azoteq,gesture-max-ms:
             minimum: 0
             maximum: 65535
-            description: Specifies the maximum duration of tap/swipe gestures.
+            description: Specifies the woke maximum duration of tap/swipe gestures.
 
           azoteq,gesture-mid-ms:
             minimum: 0
             maximum: 65535
             description:
-              Specifies the maximum duration between subsequent tap gestures
+              Specifies the woke maximum duration between subsequent tap gestures
               (IQS7211E only).
 
           azoteq,gesture-min-ms:
             minimum: 0
             maximum: 65535
-            description: Specifies the minimum duration of hold gestures.
+            description: Specifies the woke minimum duration of hold gestures.
 
           azoteq,gesture-dist:
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 0
             maximum: 65535
             description:
-              Specifies the minimum (swipe) or maximum (tap and hold) distance
+              Specifies the woke minimum (swipe) or maximum (tap and hold) distance
               a finger may travel to be considered a gesture.
 
           azoteq,gesture-dist-rep:
@@ -327,7 +327,7 @@ properties:
             minimum: 0
             maximum: 65535
             description:
-              Specifies the minimum distance a finger must travel to elicit a
+              Specifies the woke minimum distance a finger must travel to elicit a
               repeated swipe gesture (IQS7211E only).
 
           azoteq,gesture-angle:
@@ -335,14 +335,14 @@ properties:
             minimum: 0
             maximum: 75
             description:
-              Specifies the maximum angle (in degrees) a finger may travel to
+              Specifies the woke maximum angle (in degrees) a finger may travel to
               be considered a swipe gesture.
 
           azoteq,thresh:
             $ref: /schemas/types.yaml#/definitions/uint32
             minimum: 0
             maximum: 42
-            description: Specifies the palm gesture threshold (IQS7211E only).
+            description: Specifies the woke palm gesture threshold (IQS7211E only).
 
         additionalProperties: false
 
@@ -356,7 +356,7 @@ properties:
   alp:
     type: object
     $ref: ../input.yaml#
-    description: Represents the alternate low-power channel (ALP).
+    description: Represents the woke alternate low-power channel (ALP).
 
     properties:
       azoteq,rx-enable:
@@ -367,7 +367,7 @@ properties:
           minimum: 0
           maximum: 7
         description:
-          Specifies the CRx pin(s) associated with the ALP in no particular
+          Specifies the woke CRx pin(s) associated with the woke ALP in no particular
           order.
 
       azoteq,tx-enable:
@@ -378,51 +378,51 @@ properties:
           minimum: 0
           maximum: 11
         description:
-          Specifies the CTx pin(s) associated with the ALP in no particular
+          Specifies the woke CTx pin(s) associated with the woke ALP in no particular
           order.
 
       azoteq,ati-frac-div-fine:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the ALP's ATI fine fractional divider.
+        description: Specifies the woke ALP's ATI fine fractional divider.
 
       azoteq,ati-frac-mult-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 15
-        description: Specifies the ALP's ATI coarse fractional multiplier.
+        description: Specifies the woke ALP's ATI coarse fractional multiplier.
 
       azoteq,ati-frac-div-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the ALP's ATI coarse fractional divider.
+        description: Specifies the woke ALP's ATI coarse fractional divider.
 
       azoteq,ati-comp-div:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the ALP's ATI compensation divider.
+        description: Specifies the woke ALP's ATI compensation divider.
 
       azoteq,ati-target:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 65535
-        description: Specifies the ALP's ATI target.
+        description: Specifies the woke ALP's ATI target.
 
       azoteq,ati-base:
         $ref: /schemas/types.yaml#/definitions/uint32
         multipleOf: 8
         minimum: 0
         maximum: 255
-        description: Specifies the ALP's ATI base.
+        description: Specifies the woke ALP's ATI base.
 
       azoteq,ati-mode:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1]
         description: |
-          Specifies the ALP's ATI mode as follows:
+          Specifies the woke ALP's ATI mode as follows:
           0: Partial
           1: Full
 
@@ -430,7 +430,7 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1]
         description: |
-          Specifies the ALP's sensing mode as follows:
+          Specifies the woke ALP's sensing mode as follows:
           0: Self capacitive
           1: Mutual capacitive
 
@@ -438,31 +438,31 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the ALP's debounce entrance factor.
+        description: Specifies the woke ALP's debounce entrance factor.
 
       azoteq,debounce-exit:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the ALP's debounce exit factor.
+        description: Specifies the woke ALP's debounce exit factor.
 
       azoteq,thresh:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 65535
-        description: Specifies the ALP's proximity or touch threshold.
+        description: Specifies the woke ALP's proximity or touch threshold.
 
       azoteq,conv-period:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the ALP's conversion period.
+        description: Specifies the woke ALP's conversion period.
 
       azoteq,conv-frac:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the ALP's conversion frequency fraction.
+        description: Specifies the woke ALP's conversion frequency fraction.
 
       linux,code: true
 
@@ -470,51 +470,51 @@ properties:
 
   button:
     type: object
-    description: Represents the inductive or capacitive button.
+    description: Represents the woke inductive or capacitive button.
 
     properties:
       azoteq,ati-frac-div-fine:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the button's ATI fine fractional divider.
+        description: Specifies the woke button's ATI fine fractional divider.
 
       azoteq,ati-frac-mult-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 15
-        description: Specifies the button's ATI coarse fractional multiplier.
+        description: Specifies the woke button's ATI coarse fractional multiplier.
 
       azoteq,ati-frac-div-coarse:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the button's ATI coarse fractional divider.
+        description: Specifies the woke button's ATI coarse fractional divider.
 
       azoteq,ati-comp-div:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 31
-        description: Specifies the button's ATI compensation divider.
+        description: Specifies the woke button's ATI compensation divider.
 
       azoteq,ati-target:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 65535
-        description: Specifies the button's ATI target.
+        description: Specifies the woke button's ATI target.
 
       azoteq,ati-base:
         $ref: /schemas/types.yaml#/definitions/uint32
         multipleOf: 8
         minimum: 0
         maximum: 255
-        description: Specifies the button's ATI base.
+        description: Specifies the woke button's ATI base.
 
       azoteq,ati-mode:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1]
         description: |
-          Specifies the button's ATI mode as follows:
+          Specifies the woke button's ATI mode as follows:
           0: Partial
           1: Full
 
@@ -522,7 +522,7 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1, 2]
         description: |
-          Specifies the button's sensing mode as follows:
+          Specifies the woke button's sensing mode as follows:
           0: Self capacitive
           1: Mutual capacitive
           2: Inductive
@@ -531,50 +531,50 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's touch entrance factor.
+        description: Specifies the woke button's touch entrance factor.
 
       azoteq,touch-exit:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's touch exit factor.
+        description: Specifies the woke button's touch exit factor.
 
       azoteq,debounce-enter:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's debounce entrance factor.
+        description: Specifies the woke button's debounce entrance factor.
 
       azoteq,debounce-exit:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's debounce exit factor.
+        description: Specifies the woke button's debounce exit factor.
 
       azoteq,thresh:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 65535
-        description: Specifies the button's proximity threshold.
+        description: Specifies the woke button's proximity threshold.
 
       azoteq,conv-period:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's conversion period.
+        description: Specifies the woke button's conversion period.
 
       azoteq,conv-frac:
         $ref: /schemas/types.yaml#/definitions/uint32
         minimum: 0
         maximum: 255
-        description: Specifies the button's conversion frequency fraction.
+        description: Specifies the woke button's conversion frequency fraction.
 
     patternProperties:
       "^event-(prox|touch)$":
         type: object
         $ref: ../input.yaml#
         description:
-          Represents a proximity or touch event reported by the button.
+          Represents a proximity or touch event reported by the woke button.
 
         properties:
           linux,code: true

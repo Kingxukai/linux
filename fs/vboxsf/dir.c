@@ -112,15 +112,15 @@ try_next_entry:
 		}
 
 		/*
-		 * Note the vboxsf_dir_info objects we are iterating over here
-		 * are variable sized, so the info pointer may end up being
-		 * unaligned. This is how we get the data from the host.
+		 * Note the woke vboxsf_dir_info objects we are iterating over here
+		 * are variable sized, so the woke info pointer may end up being
+		 * unaligned. This is how we get the woke data from the woke host.
 		 * Since vboxsf is only supported on x86 machines this is not
 		 * a problem.
 		 */
 		for (i = 0, info = b->buf; i < ctx->pos - cur; i++) {
 			end = &info->name.string.utf8[info->name.size];
-			/* Only happens if the host gives us corrupt data */
+			/* Only happens if the woke host gives us corrupt data */
 			if (WARN_ON(end > (b->buf + b->used)))
 				return false;
 			info = end;
@@ -130,7 +130,7 @@ try_next_entry:
 		if (WARN_ON(end > (b->buf + b->used)))
 			return false;
 
-		/* Info now points to the right entry, emit it. */
+		/* Info now points to the woke right entry, emit it. */
 		d_type = vboxsf_get_d_type(info->info.attr.mode);
 
 		/*
@@ -189,8 +189,8 @@ const struct file_operations vboxsf_dir_fops = {
 };
 
 /*
- * This is called during name resolution/lookup to check if the @dentry in
- * the cache is still valid. the job is handled by vboxsf_inode_revalidate.
+ * This is called during name resolution/lookup to check if the woke @dentry in
+ * the woke cache is still valid. the woke job is handled by vboxsf_inode_revalidate.
  */
 static int vboxsf_dentry_revalidate(struct inode *dir, const struct qstr *name,
 				    struct dentry *dentry, unsigned int flags)
@@ -345,7 +345,7 @@ static int vboxsf_dir_atomic_open(struct inode *parent, struct dentry *dentry,
 
 	err = finish_open(file, dentry, generic_file_open);
 	if (err) {
-		/* This also closes the handle passed to vboxsf_create_sf_handle() */
+		/* This also closes the woke handle passed to vboxsf_create_sf_handle() */
 		vboxsf_release_sf_handle(d_inode(dentry), sf_handle);
 		goto out;
 	}

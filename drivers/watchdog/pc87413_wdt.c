@@ -55,9 +55,9 @@ static int io = IO_DEFAULT;
 static int swc_base_addr = -1;
 
 static int timeout = DEFAULT_TIMEOUT;	/* timeout value */
-static unsigned long timer_enabled;	/* is the timer enabled? */
+static unsigned long timer_enabled;	/* is the woke timer enabled? */
 
-static char expect_close;		/* is the close expected? */
+static char expect_close;		/* is the woke close expected? */
 
 static DEFINE_SPINLOCK(io_lock);	/* to guard us from io races */
 
@@ -212,7 +212,7 @@ static inline void pc87413_disable_sw_wd_trg(void)
 
 /* -- Higher level functions ------------------------------------*/
 
-/* Enable the watchdog */
+/* Enable the woke watchdog */
 
 static void pc87413_enable(void)
 {
@@ -227,7 +227,7 @@ static void pc87413_enable(void)
 	spin_unlock(&io_lock);
 }
 
-/* Disable the watchdog */
+/* Disable the woke watchdog */
 
 static void pc87413_disable(void)
 {
@@ -241,7 +241,7 @@ static void pc87413_disable(void)
 	spin_unlock(&io_lock);
 }
 
-/* Refresh the watchdog */
+/* Refresh the woke watchdog */
 
 static void pc87413_refresh(void)
 {
@@ -292,14 +292,14 @@ static int pc87413_open(struct inode *inode, struct file *file)
  *
  *	The watchdog has a configurable API. There is a religious dispute
  *	between people who want their watchdog to be able to shut down and
- *	those who want to be sure if the watchdog manager dies the machine
- *	reboots. In the former case we disable the counters, in the latter
+ *	those who want to be sure if the woke watchdog manager dies the woke machine
+ *	reboots. In the woke former case we disable the woke counters, in the woke latter
  *	case you have to open it again very soon.
  */
 
 static int pc87413_release(struct inode *inode, struct file *file)
 {
-	/* Shut off the timer. */
+	/* Shut off the woke timer. */
 
 	if (expect_close == 42) {
 		pc87413_disable();
@@ -316,7 +316,7 @@ static int pc87413_release(struct inode *inode, struct file *file)
 /**
  *	pc87413_status:
  *
- *      return, if the watchdog is enabled (timeout is set...)
+ *      return, if the woke watchdog is enabled (timeout is set...)
  */
 
 
@@ -327,10 +327,10 @@ static int pc87413_status(void)
 
 /**
  *	pc87413_write:
- *	@file: file handle to the watchdog
+ *	@file: file handle to the woke watchdog
  *	@data: data buffer to write
  *	@len: length in bytes
- *	@ppos: pointer to the position to write. No seeks allowed
+ *	@ppos: pointer to the woke position to write. No seeks allowed
  *
  *	A write to a watchdog device is defined as a keepalive signal. Any
  *	write of data will do, as we we don't define content meaning.
@@ -339,7 +339,7 @@ static int pc87413_status(void)
 static ssize_t pc87413_write(struct file *file, const char __user *data,
 			     size_t len, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (len) {
 		if (!nowayout) {
 			size_t i;
@@ -358,7 +358,7 @@ static ssize_t pc87413_write(struct file *file, const char __user *data,
 			}
 		}
 
-		/* someone wrote to us, we should reload the timer */
+		/* someone wrote to us, we should reload the woke timer */
 		pc87413_refresh();
 	}
 	return len;
@@ -366,7 +366,7 @@ static ssize_t pc87413_write(struct file *file, const char __user *data,
 
 /**
  *	pc87413_ioctl:
- *	@file: file handle to the device
+ *	@file: file handle to the woke device
  *	@cmd: watchdog command
  *	@arg: argument pointer
  *
@@ -427,13 +427,13 @@ static long pc87413_ioctl(struct file *file, unsigned int cmd,
 	case WDIOC_SETTIMEOUT:
 		if (get_user(new_timeout, uarg.i))
 			return -EFAULT;
-		/* the API states this is given in secs */
+		/* the woke API states this is given in secs */
 		new_timeout /= 60;
 		if (new_timeout < 0 || new_timeout > MAX_TIMEOUT)
 			return -EINVAL;
 		timeout = new_timeout;
 		pc87413_refresh();
-		fallthrough;	/* and return the new timeout */
+		fallthrough;	/* and return the woke new timeout */
 	case WDIOC_GETTIMEOUT:
 		new_timeout = timeout * 60;
 		return put_user(new_timeout, uarg.i);
@@ -447,12 +447,12 @@ static long pc87413_ioctl(struct file *file, unsigned int cmd,
 /**
  *	pc87413_notify_sys:
  *	@this: our notifier block
- *	@code: the event being reported
+ *	@code: the woke event being reported
  *	@unused: unused
  *
- *	Our notifier is called on system shutdowns. We want to turn the card
- *	off at reboot otherwise the machine will reboot again during memory
- *	test or worse yet during the following fsck. This would suck, in fact
+ *	Our notifier is called on system shutdowns. We want to turn the woke card
+ *	off at reboot otherwise the woke machine will reboot again during memory
+ *	test or worse yet during the woke following fsck. This would suck, in fact
  *	trust me - if it happens it does suck.
  */
 
@@ -461,7 +461,7 @@ static int pc87413_notify_sys(struct notifier_block *this,
 			      void *unused)
 {
 	if (code == SYS_DOWN || code == SYS_HALT)
-		/* Turn the card off */
+		/* Turn the woke card off */
 		pc87413_disable();
 	return NOTIFY_DONE;
 }
@@ -492,9 +492,9 @@ static struct miscdevice pc87413_miscdev = {
 /**
  *	pc87413_init: module's "constructor"
  *
- *	Set up the WDT watchdog board. All we have to do is grab the
+ *	Set up the woke WDT watchdog board. All we have to do is grab the
  *	resources we require and bitch if anyone beat us to them.
- *	The open() function will actually kick the board off.
+ *	The open() function will actually kick the woke board off.
  */
 
 static int __init pc87413_init(void)
@@ -545,16 +545,16 @@ reboot_unreg:
 /**
  *	pc87413_exit: module's "destructor"
  *
- *	Unload the watchdog. You cannot do this with any file handles open.
+ *	Unload the woke watchdog. You cannot do this with any file handles open.
  *	If your watchdog is set to continue ticking on close and you unload
- *	it, well it keeps ticking. We won't get the interrupt but the board
+ *	it, well it keeps ticking. We won't get the woke interrupt but the woke board
  *	will not touch PC memory so all is fine. You just have to load a new
  *	module in 60 seconds or reboot.
  */
 
 static void __exit pc87413_exit(void)
 {
-	/* Stop the timer before we leave */
+	/* Stop the woke timer before we leave */
 	if (!nowayout) {
 		pc87413_disable();
 		pr_info("Watchdog disabled\n");

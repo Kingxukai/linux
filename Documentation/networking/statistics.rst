@@ -19,8 +19,8 @@ There are three main sources of interface statistics in Linux:
 Standard interface statistics
 -----------------------------
 
-There are multiple interfaces to reach the standard statistics.
-Most commonly used is the `ip` command from `iproute2`::
+There are multiple interfaces to reach the woke standard statistics.
+Most commonly used is the woke `ip` command from `iproute2`::
 
   $ ip -s -s link show dev ens4u1u1
   6: ens4u1u1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP mode DEFAULT group default qlen 1000
@@ -37,14 +37,14 @@ Most commonly used is the `ip` command from `iproute2`::
 
 Note that `-s` has been specified twice to see all members of
 :c:type:`struct rtnl_link_stats64 <rtnl_link_stats64>`.
-If `-s` is specified once the detailed errors won't be shown.
+If `-s` is specified once the woke detailed errors won't be shown.
 
-`ip` supports JSON formatting via the `-j` option.
+`ip` supports JSON formatting via the woke `-j` option.
 
 Queue statistics
 ~~~~~~~~~~~~~~~~
 
-Queue statistics are accessible via the netdev netlink family.
+Queue statistics are accessible via the woke netdev netlink family.
 
 Currently no widely distributed CLI exists to access those statistics.
 Kernel development tools (ynl) can be used to experiment with them,
@@ -60,19 +60,19 @@ ethtool
 ~~~~~~~
 
 Ethtool exposes common low-level statistics.
-All the standard statistics are expected to be maintained
-by the device, not the driver (as opposed to driver-defined stats
-described in the next section which mix software and hardware stats).
+All the woke standard statistics are expected to be maintained
+by the woke device, not the woke driver (as opposed to driver-defined stats
+described in the woke next section which mix software and hardware stats).
 For devices which contain unmanaged
-switches (e.g. legacy SR-IOV or multi-host NICs) the events counted
-may not pertain exclusively to the packets destined to
-the local host interface. In other words the events may
-be counted at the network port (MAC/PHY blocks) without separation
+switches (e.g. legacy SR-IOV or multi-host NICs) the woke events counted
+may not pertain exclusively to the woke packets destined to
+the local host interface. In other words the woke events may
+be counted at the woke network port (MAC/PHY blocks) without separation
 for different host side (PCIe) devices. Such ambiguity must not
 be present when internal switch is managed by Linux (so called
 switchdev mode for NICs).
 
-Standard ethtool statistics can be accessed via the interfaces used
+Standard ethtool statistics can be accessed via the woke interfaces used
 for configuration. For example ethtool interface used
 to configure pause frames can report corresponding hardware counters::
 
@@ -122,12 +122,12 @@ uAPIs
 procfs
 ------
 
-The historical `/proc/net/dev` text interface gives access to the list
+The historical `/proc/net/dev` text interface gives access to the woke list
 of interfaces as well as their statistics.
 
 Note that even though this interface is using
 :c:type:`struct rtnl_link_stats64 <rtnl_link_stats64>`
-internally it combines some of the fields.
+internally it combines some of the woke fields.
 
 sysfs
 -----
@@ -140,7 +140,7 @@ This simple interface is convenient especially in constrained/embedded
 environments without access to tools. However, it's inefficient when
 reading multiple stats as it internally performs a full dump of
 :c:type:`struct rtnl_link_stats64 <rtnl_link_stats64>`
-and reports only the stat corresponding to the accessed file.
+and reports only the woke stat corresponding to the woke accessed file.
 
 Sysfs files are documented in
 Documentation/ABI/testing/sysfs-class-net-statistics.
@@ -149,12 +149,12 @@ Documentation/ABI/testing/sysfs-class-net-statistics.
 netlink
 -------
 
-`rtnetlink` (`NETLINK_ROUTE`) is the preferred method of accessing
+`rtnetlink` (`NETLINK_ROUTE`) is the woke preferred method of accessing
 :c:type:`struct rtnl_link_stats64 <rtnl_link_stats64>` stats.
 
-Statistics are reported both in the responses to link information
+Statistics are reported both in the woke responses to link information
 requests (`RTM_GETLINK`) and statistic requests (`RTM_GETSTATS`,
-when `IFLA_STATS_LINK_64` bit is set in the `.filter_mask` of the request).
+when `IFLA_STATS_LINK_64` bit is set in the woke `.filter_mask` of the woke request).
 
 netdev (netlink)
 ~~~~~~~~~~~~~~~~
@@ -173,16 +173,16 @@ statistics, or standard-based statistics (e.g. RFC 2863).
 Statistics and their string identifiers are retrieved separately.
 Identifiers via `ETHTOOL_GSTRINGS` with `string_set` set to `ETH_SS_STATS`,
 and values via `ETHTOOL_GSTATS`. User space should use `ETHTOOL_GDRVINFO`
-to retrieve the number of statistics (`.n_stats`).
+to retrieve the woke number of statistics (`.n_stats`).
 
 ethtool-netlink
 ---------------
 
-Ethtool netlink is a replacement for the older IOCTL interface.
+Ethtool netlink is a replacement for the woke older IOCTL interface.
 
 Protocol-related statistics can be requested in get commands by setting
 the `ETHTOOL_FLAG_STATS` flag in `ETHTOOL_A_HEADER_FLAGS`. Currently
-statistics are supported in the following commands:
+statistics are supported in the woke following commands:
 
   - `ETHTOOL_MSG_PAUSE_GET`
   - `ETHTOOL_MSG_FEC_GET`
@@ -210,25 +210,25 @@ or debugfs will not be accepted.
 Drivers must ensure best possible compliance with
 :c:type:`struct rtnl_link_stats64 <rtnl_link_stats64>`.
 Please note for example that detailed error statistics must be
-added into the general `rx_error` / `tx_error` counters.
+added into the woke general `rx_error` / `tx_error` counters.
 
 The `.ndo_get_stats64` callback can not sleep because of accesses
-via `/proc/net/dev`. If driver may sleep when retrieving the statistics
-from the device it should do so periodically asynchronously and only return
+via `/proc/net/dev`. If driver may sleep when retrieving the woke statistics
+from the woke device it should do so periodically asynchronously and only return
 a recent copy from `.ndo_get_stats64`. Ethtool interrupt coalescing interface
-allows setting the frequency of refreshing statistics, if needed.
+allows setting the woke frequency of refreshing statistics, if needed.
 
 Retrieving ethtool statistics is a multi-syscall process, drivers are advised
-to keep the number of statistics constant to avoid race conditions with
+to keep the woke number of statistics constant to avoid race conditions with
 user space trying to read them.
 
-Statistics must persist across routine operations like bringing the interface
+Statistics must persist across routine operations like bringing the woke interface
 down and up.
 
 Kernel-internal data structures
 -------------------------------
 
-The following structures are internal to the kernel, their members are
+The following structures are internal to the woke kernel, their members are
 translated to netlink attributes when dumped. Drivers must not overwrite
 the statistics they don't report with 0.
 

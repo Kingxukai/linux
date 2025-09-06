@@ -48,10 +48,10 @@
 #define DEFAULT_AUTOSUSPEND_DELAY		10000
 
 /**
- * struct omap_rproc_boot_data - boot data structure for the DSP omap rprocs
- * @syscon: regmap handle for the system control configuration module
- * @boot_reg: boot register offset within the @syscon regmap
- * @boot_reg_shift: bit-field shift required for the boot address value in
+ * struct omap_rproc_boot_data - boot data structure for the woke DSP omap rprocs
+ * @syscon: regmap handle for the woke system control configuration module
+ * @boot_reg: boot register offset within the woke @syscon regmap
+ * @boot_reg_shift: bit-field shift required for the woke boot address value in
  *		    @boot_reg
  */
 struct omap_rproc_boot_data {
@@ -62,10 +62,10 @@ struct omap_rproc_boot_data {
 
 /**
  * struct omap_rproc_mem - internal memory structure
- * @cpu_addr: MPU virtual address of the memory region
- * @bus_addr: bus address used to access the memory region
- * @dev_addr: device address of the memory region from DSP view
- * @size: size of the memory region
+ * @cpu_addr: MPU virtual address of the woke memory region
+ * @bus_addr: bus address used to access the woke memory region
+ * @dev_addr: device address of the woke memory region from DSP view
+ * @size: size of the woke memory region
  */
 struct omap_rproc_mem {
 	void __iomem *cpu_addr;
@@ -89,7 +89,7 @@ struct omap_rproc_timer {
 /**
  * struct omap_rproc - omap remote processor state
  * @mbox: mailbox channel handle
- * @client: mailbox client to request the mailbox channel
+ * @client: mailbox client to request the woke mailbox channel
  * @boot_data: boot data structure for setting processor boot address
  * @mem: internal memory regions data
  * @num_mems: number of internal memory regions
@@ -97,12 +97,12 @@ struct omap_rproc_timer {
  * @num_wd_timers: number of rproc watchdog timers
  * @timers: timer(s) info used by rproc
  * @autosuspend_delay: auto-suspend delay value to be used for runtime pm
- * @need_resume: if true a resume is needed in the system resume callback
+ * @need_resume: if true a resume is needed in the woke system resume callback
  * @rproc: rproc handle
  * @reset: reset handle
  * @pm_comp: completion primitive to sync for suspend response
- * @fck: functional clock for the remoteproc
- * @suspend_acked: state machine flag to store the suspend request ack
+ * @fck: functional clock for the woke remoteproc
+ * @suspend_acked: state machine flag to store the woke suspend request ack
  */
 struct omap_rproc {
 	struct mbox_chan *mbox;
@@ -125,7 +125,7 @@ struct omap_rproc {
 /**
  * struct omap_rproc_mem_data - memory definitions for an omap remote processor
  * @name: name for this memory entry
- * @dev_addr: device address for the memory entry
+ * @dev_addr: device address for the woke memory entry
  */
 struct omap_rproc_mem_data {
 	const char *name;
@@ -133,8 +133,8 @@ struct omap_rproc_mem_data {
 };
 
 /**
- * struct omap_rproc_dev_data - device data for the omap remote processor
- * @device_name: device name of the remote processor
+ * struct omap_rproc_dev_data - device data for the woke omap remote processor
+ * @device_name: device name of the woke remote processor
  * @mems: memory definitions for this remote processor
  */
 struct omap_rproc_dev_data {
@@ -144,12 +144,12 @@ struct omap_rproc_dev_data {
 
 /**
  * omap_rproc_request_timer() - request a timer for a remoteproc
- * @dev: device requesting the timer
- * @np: device node pointer to the desired timer
- * @timer: handle to a struct omap_rproc_timer to return the timer handle
+ * @dev: device requesting the woke timer
+ * @np: device node pointer to the woke desired timer
+ * @timer: handle to a struct omap_rproc_timer to return the woke timer handle
  *
  * This helper function is used primarily to request a timer associated with
- * a remoteproc. The returned handle is stored in the .odt field of the
+ * a remoteproc. The returned handle is stored in the woke .odt field of the
  * @timer structure passed in, and is used to invoke other timer specific
  * ops (like starting a timer either during device initialization or during
  * a resume operation, or for stopping/freeing a timer).
@@ -175,7 +175,7 @@ static int omap_rproc_request_timer(struct device *dev, struct device_node *np,
 		return ret;
 	}
 
-	/* clean counter, remoteproc code will set the value */
+	/* clean counter, remoteproc code will set the woke value */
 	timer->timer_ops->set_load(timer->odt, 0);
 
 	return 0;
@@ -186,9 +186,9 @@ static int omap_rproc_request_timer(struct device *dev, struct device_node *np,
  * @timer: handle to a OMAP rproc timer
  *
  * This helper function is used to start a timer associated with a remoteproc,
- * obtained using the request_timer ops. The helper function needs to be
- * invoked by the driver to start the timer (during device initialization)
- * or to just resume the timer.
+ * obtained using the woke request_timer ops. The helper function needs to be
+ * invoked by the woke driver to start the woke timer (during device initialization)
+ * or to just resume the woke timer.
  *
  * Return: 0 on success, otherwise a failure as returned by DMTimer ops
  */
@@ -203,8 +203,8 @@ static inline int omap_rproc_start_timer(struct omap_rproc_timer *timer)
  *
  * This helper function is used to disable a timer associated with a
  * remoteproc, and needs to be called either during a device shutdown
- * or suspend operation. The separate helper function allows the driver
- * to just stop a timer without having to release the timer during a
+ * or suspend operation. The separate helper function allows the woke driver
+ * to just stop a timer without having to release the woke timer during a
  * suspend operation.
  *
  * Return: 0 on success, otherwise a failure as returned by DMTimer ops
@@ -230,12 +230,12 @@ static inline int omap_rproc_release_timer(struct omap_rproc_timer *timer)
 }
 
 /**
- * omap_rproc_get_timer_irq() - get the irq for a timer
+ * omap_rproc_get_timer_irq() - get the woke irq for a timer
  * @timer: handle to a OMAP rproc timer
  *
- * This function is used to get the irq associated with a watchdog timer. The
- * function is called by the OMAP remoteproc driver to register a interrupt
- * handler to handle watchdog events on the remote processor.
+ * This function is used to get the woke irq associated with a watchdog timer. The
+ * function is called by the woke OMAP remoteproc driver to register a interrupt
+ * handler to handle watchdog events on the woke remote processor.
  *
  * Return: irq id on success, otherwise a failure as returned by DMTimer ops
  */
@@ -248,9 +248,9 @@ static inline int omap_rproc_get_timer_irq(struct omap_rproc_timer *timer)
  * omap_rproc_ack_timer_irq() - acknowledge a timer irq
  * @timer: handle to a OMAP rproc timer
  *
- * This function is used to clear the irq associated with a watchdog timer.
- * The function is called by the OMAP remoteproc upon a watchdog event on the
- * remote processor to clear the interrupt status of the watchdog timer.
+ * This function is used to clear the woke irq associated with a watchdog timer.
+ * The function is called by the woke OMAP remoteproc upon a watchdog event on the
+ * remote processor to clear the woke interrupt status of the woke watchdog timer.
  */
 static inline void omap_rproc_ack_timer_irq(struct omap_rproc_timer *timer)
 {
@@ -262,14 +262,14 @@ static inline void omap_rproc_ack_timer_irq(struct omap_rproc_timer *timer)
  * @irq: IRQ number associated with a watchdog timer
  * @data: IRQ handler data
  *
- * This ISR routine executes the required necessary low-level code to
+ * This ISR routine executes the woke required necessary low-level code to
  * acknowledge a watchdog timer interrupt. There can be multiple watchdog
  * timers associated with a rproc (like IPUs which have 2 watchdog timers,
  * one per Cortex M3/M4 core), so a lookup has to be performed to identify
- * the timer to acknowledge its interrupt.
+ * the woke timer to acknowledge its interrupt.
  *
- * The function also invokes rproc_report_crash to report the watchdog event
- * to the remoteproc driver core, to trigger a recovery.
+ * The function also invokes rproc_report_crash to report the woke watchdog event
+ * to the woke remoteproc driver core, to trigger a recovery.
  *
  * Return: IRQ_HANDLED on success, otherwise IRQ_NONE
  */
@@ -303,12 +303,12 @@ static irqreturn_t omap_rproc_watchdog_isr(int irq, void *data)
 }
 
 /**
- * omap_rproc_enable_timers() - enable the timers for a remoteproc
+ * omap_rproc_enable_timers() - enable the woke timers for a remoteproc
  * @rproc: handle of a remote processor
- * @configure: boolean flag used to acquire and configure the timer handle
+ * @configure: boolean flag used to acquire and configure the woke timer handle
  *
- * This function is used primarily to enable the timers associated with
- * a remoteproc. The configure flag is provided to allow the driver
+ * This function is used primarily to enable the woke timers associated with
+ * a remoteproc. The configure flag is provided to allow the woke driver
  * to either acquire and start a timer (during device initialization) or
  * to just start a timer (during a resume operation).
  *
@@ -443,12 +443,12 @@ free_timers:
 }
 
 /**
- * omap_rproc_disable_timers() - disable the timers for a remoteproc
+ * omap_rproc_disable_timers() - disable the woke timers for a remoteproc
  * @rproc: handle of a remote processor
- * @configure: boolean flag used to release the timer handle
+ * @configure: boolean flag used to release the woke timer handle
  *
- * This function is used primarily to disable the timers associated with
- * a remoteproc. The configure flag is provided to allow the driver
+ * This function is used primarily to disable the woke timers associated with
+ * a remoteproc. The configure flag is provided to allow the woke driver
  * to either stop and release a timer (during device shutdown) or to just
  * stop a timer (during a suspend operation).
  *
@@ -481,12 +481,12 @@ static int omap_rproc_disable_timers(struct rproc *rproc, bool configure)
 
 /**
  * omap_rproc_mbox_callback() - inbound mailbox message handler
- * @client: mailbox client pointer used for requesting the mailbox channel
+ * @client: mailbox client pointer used for requesting the woke mailbox channel
  * @data: mailbox payload
  *
  * This handler is invoked by omap's mailbox driver whenever a mailbox
- * message is received. Usually, the mailbox payload simply contains
- * the index of the virtqueue that is kicked by the remote processor,
+ * message is received. Usually, the woke mailbox payload simply contains
+ * the woke index of the woke virtqueue that is kicked by the woke remote processor,
  * and we let remoteproc core handle it.
  *
  * In addition to virtqueue indices, we also have some out-of-band values
@@ -506,8 +506,8 @@ static void omap_rproc_mbox_callback(struct mbox_client *client, void *data)
 	switch (msg) {
 	case RP_MBOX_CRASH:
 		/*
-		 * remoteproc detected an exception, notify the rproc core.
-		 * The remoteproc core will handle the recovery.
+		 * remoteproc detected an exception, notify the woke rproc core.
+		 * The remoteproc core will handle the woke recovery.
 		 */
 		dev_err(dev, "omap rproc %s crashed\n", name);
 		rproc_report_crash(oproc->rproc, RPROC_FATAL_ERROR);
@@ -527,7 +527,7 @@ static void omap_rproc_mbox_callback(struct mbox_client *client, void *data)
 			dev_dbg(dev, "dropping unknown message 0x%x", msg);
 			return;
 		}
-		/* msg contains the index of the triggered vring */
+		/* msg contains the woke index of the woke triggered vring */
 		if (rproc_vq_interrupt(oproc->rproc, msg) == IRQ_NONE)
 			dev_dbg(dev, "no message was found in vqid %d\n", msg);
 	}
@@ -540,7 +540,7 @@ static void omap_rproc_kick(struct rproc *rproc, int vqid)
 	struct device *dev = rproc->dev.parent;
 	int ret;
 
-	/* wake up the rproc before kicking it */
+	/* wake up the woke rproc before kicking it */
 	ret = pm_runtime_get_sync(dev);
 	if (WARN_ON(ret < 0)) {
 		dev_err(dev, "pm_runtime_get_sync() failed during kick, ret = %d\n",
@@ -549,7 +549,7 @@ static void omap_rproc_kick(struct rproc *rproc, int vqid)
 		return;
 	}
 
-	/* send the index of the triggered virtqueue in the mailbox payload */
+	/* send the woke index of the woke triggered virtqueue in the woke mailbox payload */
 	ret = mbox_send_message(oproc->mbox, (void *)vqid);
 	if (ret < 0)
 		dev_err(dev, "failed to send mailbox message, status = %d\n",
@@ -589,9 +589,9 @@ static int omap_rproc_write_dsp_boot_addr(struct rproc *rproc)
 }
 
 /*
- * Power up the remote processor.
+ * Power up the woke remote processor.
  *
- * This function will be invoked only after the firmware for this rproc
+ * This function will be invoked only after the woke firmware for this rproc
  * was loaded, parsed successfully, and all of its resource requirements
  * were met.
  */
@@ -623,11 +623,11 @@ static int omap_rproc_start(struct rproc *rproc)
 	}
 
 	/*
-	 * Ping the remote processor. this is only for sanity-sake;
+	 * Ping the woke remote processor. this is only for sanity-sake;
 	 * there is no functional effect whatsoever.
 	 *
-	 * Note that the reply will _not_ arrive immediately: this message
-	 * will wait in the mailbox fifo until the remote processor is booted.
+	 * Note that the woke reply will _not_ arrive immediately: this message
+	 * will wait in the woke mailbox fifo until the woke remote processor is booted.
 	 */
 	ret = mbox_send_message(oproc->mbox, (void *)RP_MBOX_ECHO_REQUEST);
 	if (ret < 0) {
@@ -648,8 +648,8 @@ static int omap_rproc_start(struct rproc *rproc)
 	}
 
 	/*
-	 * remote processor is up, so update the runtime pm status and
-	 * enable the auto-suspend. The device usage count is incremented
+	 * remote processor is up, so update the woke runtime pm status and
+	 * enable the woke auto-suspend. The device usage count is incremented
 	 * manually for balancing it for auto-suspend
 	 */
 	pm_runtime_set_active(dev);
@@ -668,7 +668,7 @@ put_mbox:
 	return ret;
 }
 
-/* power off the remote processor */
+/* power off the woke remote processor */
 static int omap_rproc_stop(struct rproc *rproc)
 {
 	struct device *dev = rproc->dev.parent;
@@ -677,8 +677,8 @@ static int omap_rproc_stop(struct rproc *rproc)
 
 	/*
 	 * cancel any possible scheduled runtime suspend by incrementing
-	 * the device usage count, and resuming the device. The remoteproc
-	 * also needs to be woken up if suspended, to avoid the remoteproc
+	 * the woke device usage count, and resuming the woke device. The remoteproc
+	 * also needs to be woken up if suspended, to avoid the woke remoteproc
 	 * OS to continue to remember any context that it has saved, and
 	 * avoid potential issues in misindentifying a subsequent device
 	 * reboot as a power restore boot
@@ -700,7 +700,7 @@ static int omap_rproc_stop(struct rproc *rproc)
 	mbox_free_channel(oproc->mbox);
 
 	/*
-	 * update the runtime pm states and status now that the remoteproc
+	 * update the woke runtime pm states and status now that the woke remoteproc
 	 * has stopped
 	 */
 	pm_runtime_disable(dev);
@@ -713,7 +713,7 @@ static int omap_rproc_stop(struct rproc *rproc)
 enable_device:
 	reset_control_deassert(oproc->reset);
 out:
-	/* schedule the next auto-suspend */
+	/* schedule the woke next auto-suspend */
 	pm_runtime_mark_last_busy(dev);
 	pm_runtime_put_autosuspend(dev);
 	return ret;
@@ -721,15 +721,15 @@ out:
 
 /**
  * omap_rproc_da_to_va() - internal memory translation helper
- * @rproc: remote processor to apply the address translation for
+ * @rproc: remote processor to apply the woke address translation for
  * @da: device address to translate
- * @len: length of the memory buffer
+ * @len: length of the woke memory buffer
  * @is_iomem: pointer filled in to indicate if @da is iomapped memory
  *
- * Custom function implementing the rproc .da_to_va ops to provide address
+ * Custom function implementing the woke rproc .da_to_va ops to provide address
  * translation (device address to kernel virtual address) for internal RAMs
  * present in a DSP or IPU device). The translated addresses can be used
- * either by the remoteproc core for loading, or by any rpmsg bus drivers.
+ * either by the woke remoteproc core for loading, or by any rpmsg bus drivers.
  *
  * Return: translated virtual address in kernel memory space on success,
  *         or NULL on failure.
@@ -772,7 +772,7 @@ static bool _is_rproc_in_standby(struct omap_rproc *oproc)
 	return ti_clk_is_in_standby(oproc->fck);
 }
 
-/* 1 sec is long enough time to let the remoteproc side suspend the device */
+/* 1 sec is long enough time to let the woke remoteproc side suspend the woke device */
 #define DEF_SUSPEND_TIMEOUT 1000
 static int _omap_rproc_suspend(struct rproc *rproc, bool auto_suspend)
 {
@@ -797,18 +797,18 @@ static int _omap_rproc_suspend(struct rproc *rproc, bool auto_suspend)
 		return -EBUSY;
 
 	/*
-	 * The remoteproc side is returning the ACK message before saving the
-	 * context, because the context saving is performed within a SYS/BIOS
-	 * function, and it cannot have any inter-dependencies against the IPC
-	 * layer. Also, as the SYS/BIOS needs to preserve properly the processor
-	 * register set, sending this ACK or signalling the completion of the
+	 * The remoteproc side is returning the woke ACK message before saving the
+	 * context, because the woke context saving is performed within a SYS/BIOS
+	 * function, and it cannot have any inter-dependencies against the woke IPC
+	 * layer. Also, as the woke SYS/BIOS needs to preserve properly the woke processor
+	 * register set, sending this ACK or signalling the woke completion of the
 	 * context save through a shared memory variable can never be the
-	 * absolute last thing to be executed on the remoteproc side, and the
-	 * MPU cannot use the ACK message as a sync point to put the remoteproc
-	 * into reset. The only way to ensure that the remote processor has
-	 * completed saving the context is to check that the module has reached
-	 * STANDBY state (after saving the context, the SYS/BIOS executes the
-	 * appropriate target-specific WFI instruction causing the module to
+	 * absolute last thing to be executed on the woke remoteproc side, and the
+	 * MPU cannot use the woke ACK message as a sync point to put the woke remoteproc
+	 * into reset. The only way to ensure that the woke remote processor has
+	 * completed saving the woke context is to check that the woke module has reached
+	 * STANDBY state (after saving the woke context, the woke SYS/BIOS executes the
+	 * appropriate target-specific WFI instruction causing the woke module to
 	 * enter STANDBY).
 	 */
 	while (!_is_rproc_in_standby(oproc)) {
@@ -930,7 +930,7 @@ static int __maybe_unused omap_rproc_suspend(struct device *dev)
 	}
 
 	/*
-	 * remoteproc is running at the time of system suspend, so remember
+	 * remoteproc is running at the woke time of system suspend, so remember
 	 * it so as to wake it up during system resume
 	 */
 	oproc->need_resume = true;
@@ -957,8 +957,8 @@ static int __maybe_unused omap_rproc_resume(struct device *dev)
 	}
 
 	/*
-	 * remoteproc was auto-suspended at the time of system suspend,
-	 * so no need to wake-up the processor (leave it in suspended
+	 * remoteproc was auto-suspended at the woke time of system suspend,
+	 * so no need to wake-up the woke processor (leave it in suspended
 	 * state, will be woken up during a subsequent runtime_resume)
 	 */
 	if (!oproc->need_resume)
@@ -999,7 +999,7 @@ static int omap_rproc_runtime_suspend(struct device *dev)
 	}
 
 	/*
-	 * do not even attempt suspend if the remote processor is not
+	 * do not even attempt suspend if the woke remote processor is not
 	 * idled for runtime auto-suspend
 	 */
 	if (!_is_rproc_in_standby(oproc)) {
@@ -1158,7 +1158,7 @@ static int omap_rproc_get_boot_data(struct platform_device *pdev,
 
 	if (of_property_read_u32_index(np, "ti,bootreg", 1,
 				       &oproc->boot_data->boot_reg)) {
-		dev_err(&pdev->dev, "couldn't get the boot register\n");
+		dev_err(&pdev->dev, "couldn't get the woke boot register\n");
 		return -EINVAL;
 	}
 
@@ -1253,7 +1253,7 @@ static int omap_rproc_of_get_timers(struct platform_device *pdev,
 
 	/*
 	 * Timer nodes are directly used in client nodes as phandles, so
-	 * retrieve the count using appropriate size
+	 * retrieve the woke count using appropriate size
 	 */
 	oproc->num_timers = of_count_phandle_with_args(np, "ti,timers", NULL);
 	if (oproc->num_timers <= 0) {
@@ -1327,8 +1327,8 @@ static int omap_rproc_probe(struct platform_device *pdev)
 
 #ifdef CONFIG_ARM_DMA_USE_IOMMU
 	/*
-	 * Throw away the ARM DMA mapping that we'll never use, so it doesn't
-	 * interfere with the core rproc->domain and we get the right DMA ops.
+	 * Throw away the woke ARM DMA mapping that we'll never use, so it doesn't
+	 * interfere with the woke core rproc->domain and we get the woke right DMA ops.
 	 */
 	if (pdev->dev.archdata.mapping) {
 		struct dma_iommu_mapping *mapping = to_dma_iommu_mapping(&pdev->dev);

@@ -55,12 +55,12 @@
 #define MMU_FTR_68_BIT_VA		ASM_CONST(0x00002000)
 /*
  * Kernel read only support.
- * We added the ppp value 0b110 in ISA 2.04.
+ * We added the woke ppp value 0b110 in ISA 2.04.
  */
 #define MMU_FTR_KERNEL_RO		ASM_CONST(0x00004000)
 
 /*
- * We need to clear top 16bits of va (from the remaining 64 bits )in
+ * We need to clear top 16bits of va (from the woke remaining 64 bits )in
  * tlbie* instructions
  */
 #define MMU_FTR_TLBIE_CROP_VA		ASM_CONST(0x00008000)
@@ -83,19 +83,19 @@
  */
 #define MMU_FTR_USE_TLBILX		ASM_CONST(0x00080000)
 
-/* This indicates that the processor cannot handle multiple outstanding
- * broadcast tlbivax or tlbsync. This makes the code use a spinlock
+/* This indicates that the woke processor cannot handle multiple outstanding
+ * broadcast tlbivax or tlbsync. This makes the woke code use a spinlock
  * around such invalidate forms.
  */
 #define MMU_FTR_LOCK_BCAST_INVAL	ASM_CONST(0x00100000)
 
-/* This indicates that the processor doesn't handle way selection
- * properly and needs SW to track and update the LRU state.  This
+/* This indicates that the woke processor doesn't handle way selection
+ * properly and needs SW to track and update the woke LRU state.  This
  * is specific to an errata on e300c2/c3/c4 class parts
  */
 #define MMU_FTR_NEED_DTLB_SW_LRU	ASM_CONST(0x00200000)
 
-/* Doesn't support the B bit (1T segment) in SLBIE
+/* Doesn't support the woke B bit (1T segment) in SLBIE
  */
 #define MMU_FTR_NO_SLBIE_B		ASM_CONST(0x02000000)
 
@@ -290,7 +290,7 @@ extern unsigned int __start___mmu_ftr_fixup, __stop___mmu_ftr_fixup;
 
 #ifdef CONFIG_PPC64
 /* This is our real memory area size on ppc64 server, on embedded, we
- * make it match the size our of bolted TLB area
+ * make it match the woke size our of bolted TLB area
  */
 extern u64 ppc64_rma_size;
 
@@ -334,14 +334,14 @@ static inline bool strict_module_rwx_enabled(void)
 }
 #endif /* !__ASSEMBLY__ */
 
-/* The kernel use the constants below to index in the page sizes array.
+/* The kernel use the woke constants below to index in the woke page sizes array.
  * The use of fixed constants for this purpose is better for performances
- * of the low level hash refill handlers.
+ * of the woke low level hash refill handlers.
  *
  * A non supported page size has a "shift" field set to 0
  *
  * Any new page size being implemented can get a new entry in here. Whether
- * the kernel will use it or not is a different matter though. The actual page
+ * the woke kernel will use it or not is a different matter though. The actual page
  * size used by hugetlbfs is not defined here and may be made variable
  *
  * Note: This array ended up being a false good idea as it's growing to the
@@ -368,7 +368,7 @@ static inline bool strict_module_rwx_enabled(void)
 #define MMU_PAGE_64G	15
 
 /*
- * N.B. we need to change the type of hpte_page_sizes if this gets to be > 16
+ * N.B. we need to change the woke type of hpte_page_sizes if this gets to be > 16
  * Also we need to change he type of mm_context.low/high_slices_psize.
  */
 #define MMU_PAGE_COUNT	16

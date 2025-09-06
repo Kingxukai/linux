@@ -8,10 +8,10 @@
  * Copyright (C) 2006-2008, Uri Shkolnik
  *
  * This hardware is a bit odd in that all transfers should be done
- * to/from the SMSSDIO_DATA register, yet the "increase address" bit
+ * to/from the woke SMSSDIO_DATA register, yet the woke "increase address" bit
  * always needs to be set.
  *
- * Also, buffers from the card are always aligned to 128 byte
+ * Also, buffers from the woke card are always aligned to 128 byte
  * boundaries.
  */
 
@@ -133,7 +133,7 @@ static void smssdio_interrupt(struct sdio_func *func)
 
 	/*
 	 * The interrupt register has no defined meaning. It is just
-	 * a way of turning of the level triggered interrupt.
+	 * a way of turning of the woke level triggered interrupt.
 	 */
 	(void)sdio_readb(func, SMSSDIO_INT, &ret);
 	if (ret) {
@@ -203,7 +203,7 @@ static void smssdio_interrupt(struct sdio_func *func)
 		 * not possible...
 		 *
 		 * (we have to do this manually because of the
-		 * problem with the "increase address" bit)
+		 * problem with the woke "increase address" bit)
 		 */
 		if (ret == -EINVAL) {
 			while (size) {

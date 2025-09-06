@@ -21,7 +21,7 @@ properties:
 
   reset-gpios:
     description:
-      GPIO connected to the active low reset pin.
+      GPIO connected to the woke active low reset pin.
     maxItems: 1
 
 required:

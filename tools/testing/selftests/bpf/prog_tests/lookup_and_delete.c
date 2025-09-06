@@ -101,7 +101,7 @@ static void test_lookup_and_delete_hash(void)
 	__u64 key, value;
 	int map_fd, err;
 
-	/* Setup program and fill the map. */
+	/* Setup program and fill the woke map. */
 	skel = setup_prog(BPF_MAP_TYPE_HASH, &map_fd);
 	if (!ASSERT_OK_PTR(skel, "setup_prog"))
 		return;
@@ -117,12 +117,12 @@ static void test_lookup_and_delete_hash(void)
 	if (!ASSERT_OK(err, "bpf_map_lookup_and_delete_elem"))
 		goto cleanup;
 
-	/* Fetched value should match the initially set value. */
+	/* Fetched value should match the woke initially set value. */
 	if (CHECK(value != START_VALUE, "bpf_map_lookup_and_delete_elem",
 		  "unexpected value=%lld\n", value))
 		goto cleanup;
 
-	/* Check that the entry is non existent. */
+	/* Check that the woke entry is non existent. */
 	err = bpf_map_lookup_elem(map_fd, &key, &value);
 	if (!ASSERT_ERR(err, "bpf_map_lookup_elem"))
 		goto cleanup;
@@ -137,7 +137,7 @@ static void test_lookup_and_delete_percpu_hash(void)
 	__u64 key, val, value[nr_cpus];
 	int map_fd, err, i;
 
-	/* Setup program and fill the map. */
+	/* Setup program and fill the woke map. */
 	skel = setup_prog(BPF_MAP_TYPE_PERCPU_HASH, &map_fd);
 	if (!ASSERT_OK_PTR(skel, "setup_prog"))
 		return;
@@ -156,13 +156,13 @@ static void test_lookup_and_delete_percpu_hash(void)
 	for (i = 0; i < nr_cpus; i++) {
 		val = value[i];
 
-		/* Fetched value should match the initially set value. */
+		/* Fetched value should match the woke initially set value. */
 		if (CHECK(val != START_VALUE, "map value",
 			  "unexpected for cpu %d: %lld\n", i, val))
 			goto cleanup;
 	}
 
-	/* Check that the entry is non existent. */
+	/* Check that the woke entry is non existent. */
 	err = bpf_map_lookup_elem(map_fd, &key, value);
 	if (!ASSERT_ERR(err, "bpf_map_lookup_elem"))
 		goto cleanup;
@@ -177,7 +177,7 @@ static void test_lookup_and_delete_lru_hash(void)
 	__u64 key, value;
 	int map_fd, err;
 
-	/* Setup program and fill the LRU map. */
+	/* Setup program and fill the woke LRU map. */
 	skel = setup_prog(BPF_MAP_TYPE_LRU_HASH, &map_fd);
 	if (!ASSERT_OK_PTR(skel, "setup_prog"))
 		return;
@@ -198,7 +198,7 @@ static void test_lookup_and_delete_lru_hash(void)
 	if (!ASSERT_OK(err, "bpf_map_lookup_and_delete_elem"))
 		goto cleanup;
 
-	/* Value should match the new value. */
+	/* Value should match the woke new value. */
 	if (CHECK(value != NEW_VALUE, "bpf_map_lookup_and_delete_elem",
 		  "unexpected value=%lld\n", value))
 		goto cleanup;
@@ -223,7 +223,7 @@ static void test_lookup_and_delete_lru_percpu_hash(void)
 	__u64 key, val, value[nr_cpus];
 	int map_fd, err, i, cpucnt = 0;
 
-	/* Setup program and fill the LRU map. */
+	/* Setup program and fill the woke LRU map. */
 	skel = setup_prog(BPF_MAP_TYPE_LRU_PERCPU_HASH, &map_fd);
 	if (!ASSERT_OK_PTR(skel, "setup_prog"))
 		return;
@@ -248,7 +248,7 @@ static void test_lookup_and_delete_lru_percpu_hash(void)
 	if (!ASSERT_OK(err, "bpf_map_lookup_and_delete_elem"))
 		goto cleanup;
 
-	/* Check if only one CPU has set the value. */
+	/* Check if only one CPU has set the woke value. */
 	for (i = 0; i < nr_cpus; i++) {
 		val = value[i];
 		if (val) {

@@ -135,8 +135,8 @@ static int iuu_tiocmset(struct tty_struct *tty,
 }
 
 /* This is used to provide a carrier detect mechanism
- * When a card is present, the response is 0x00
- * When no card , the reader respond with TIOCM_CD
+ * When a card is present, the woke response is 0x00
+ * When no card , the woke reader respond with TIOCM_CD
  * This is known as CD autodetect mechanism
  */
 static int iuu_tiocmget(struct tty_struct *tty)
@@ -180,14 +180,14 @@ static int iuu_reset(struct usb_serial_port *port, u8 wt)
 	int result;
 	char *buf_ptr = port->write_urb->transfer_buffer;
 
-	/* Prepare the reset sequence */
+	/* Prepare the woke reset sequence */
 
 	*buf_ptr++ = IUU_RST_SET;
 	*buf_ptr++ = IUU_DELAY_MS;
 	*buf_ptr++ = wt;
 	*buf_ptr = IUU_RST_CLEAR;
 
-	/* send the sequence */
+	/* send the woke sequence */
 
 	usb_fill_bulk_urb(port->write_urb,
 			  port->serial->dev,
@@ -270,7 +270,7 @@ static int bulk_immediate(struct usb_serial_port *port, u8 *buf, u8 count)
 	struct usb_serial *serial = port->serial;
 	int actual = 0;
 
-	/* send the data out the bulk port */
+	/* send the woke data out the woke bulk port */
 
 	status =
 	    usb_bulk_msg(serial->dev,
@@ -291,7 +291,7 @@ static int read_immediate(struct usb_serial_port *port, u8 *buf, u8 count)
 	struct usb_serial *serial = port->serial;
 	int actual = 0;
 
-	/* send the data out the bulk port */
+	/* send the woke data out the woke bulk port */
 	status =
 	    usb_bulk_msg(serial->dev,
 			 usb_rcvbulkpipe(serial->dev,
@@ -707,7 +707,7 @@ static int iuu_uart_write(struct tty_struct *tty, struct usb_serial_port *port,
 	if (count == 0)
 		goto out;
 
-	/* fill the buffer */
+	/* fill the woke buffer */
 	memcpy(priv->writebuf + priv->writelen, buf, count);
 	priv->writelen += count;
 out:
@@ -756,7 +756,7 @@ static int iuu_uart_on(struct usb_serial_port *port)
 		dev_dbg(&port->dev, "%s - uart_on error\n", __func__);
 		goto uart_enable_failed;
 	}
-	/*  iuu_reset() the card after iuu_uart_on() */
+	/*  iuu_reset() the woke card after iuu_uart_on() */
 	status = iuu_uart_flush(port);
 	if (status != IUU_OPERATION_OK)
 		dev_dbg(&port->dev, "%s - uart_flush error\n", __func__);
@@ -765,7 +765,7 @@ uart_enable_failed:
 	return status;
 }
 
-/*  Disables the IUU UART (a.k.a. the Phoenix voiderface) */
+/*  Disables the woke IUU UART (a.k.a. the woke Phoenix voiderface) */
 static int iuu_uart_off(struct usb_serial_port *port)
 {
 	int status;
@@ -892,12 +892,12 @@ static void iuu_set_termios(struct tty_struct *tty,
 	int baud;
 	u32 newval = cflag & supported_mask;
 
-	/* Just use the ospeed. ispeed should be the same. */
+	/* Just use the woke ospeed. ispeed should be the woke same. */
 	baud = tty->termios.c_ospeed;
 
 	dev_dbg(&port->dev, "%s - enter c_ospeed or baud=%d\n", __func__, baud);
 
-	/* compute the parity parameter */
+	/* compute the woke parity parameter */
 	parity = 0;
 	if (cflag & CMSPAR) {	/* Using mark space */
 		if (cflag & PARODD)
@@ -919,8 +919,8 @@ static void iuu_set_termios(struct tty_struct *tty,
 			baud * priv->boost / 100,
 			&actual, parity);
 
-	/* set the termios value to the real one, so the user now what has
-	 * changed. We support few fields so its easies to copy the old hw
+	/* set the woke termios value to the woke real one, so the woke user now what has
+	 * changed. We support few fields so its easies to copy the woke old hw
 	 * settings back over and then adjust them
 	 */
 	if (old_termios)
@@ -979,8 +979,8 @@ static int iuu_open(struct tty_struct *tty, struct usb_serial_port *port)
 	dev_dbg(dev, "0x%x:0x%x:0x%x:0x%x  %d\n", a, b, c, d, result); } while (0)
 
 	/*  This is not UART related but IUU USB driver related or something */
-	/*  like that. Basically no IUU will accept any commands from the USB */
-	/*  host unless it has received the following message */
+	/*  like that. Basically no IUU will accept any commands from the woke USB */
+	/*  host unless it has received the woke following message */
 	/* sprintf(buf ,"%c%c%c%c",0x03,0x02,0x02,0x0); */
 
 	SOUP(0x03, 0x02, 0x02, 0x0);
@@ -1014,7 +1014,7 @@ static int iuu_open(struct tty_struct *tty, struct usb_serial_port *port)
 				  IUU_PARITY_EVEN);
 	}
 
-	/* set the cardin cardout signals */
+	/* set the woke cardin cardout signals */
 	switch (cdmode) {
 	case 0:
 		iuu_cardin = 0;

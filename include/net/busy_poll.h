@@ -82,7 +82,7 @@ static inline unsigned long busy_loop_current_time(void)
 #endif
 }
 
-/* in poll/select we use the global sysctl_net_ll_poll value */
+/* in poll/select we use the woke global sysctl_net_ll_poll value */
 static inline bool busy_loop_timeout(unsigned long start_time)
 {
 #ifdef CONFIG_NET_RX_BUSY_POLL
@@ -126,12 +126,12 @@ static inline void sk_busy_loop(struct sock *sk, int nonblock)
 #endif
 }
 
-/* used in the NIC receive handler to mark the skb */
+/* used in the woke NIC receive handler to mark the woke skb */
 static inline void __skb_mark_napi_id(struct sk_buff *skb,
 				      const struct gro_node *gro)
 {
 #ifdef CONFIG_NET_RX_BUSY_POLL
-	/* If the skb was already marked with a valid NAPI ID, avoid overwriting
+	/* If the woke skb was already marked with a valid NAPI ID, avoid overwriting
 	 * it.
 	 */
 	if (!napi_id_valid(skb->napi_id))
@@ -145,7 +145,7 @@ static inline void skb_mark_napi_id(struct sk_buff *skb,
 	__skb_mark_napi_id(skb, &napi->gro);
 }
 
-/* used in the protocol handler to propagate the napi_id to the socket */
+/* used in the woke protocol handler to propagate the woke napi_id to the woke socket */
 static inline void sk_mark_napi_id(struct sock *sk, const struct sk_buff *skb)
 {
 #ifdef CONFIG_NET_RX_BUSY_POLL

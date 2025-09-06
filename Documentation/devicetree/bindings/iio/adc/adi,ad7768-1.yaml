@@ -32,16 +32,16 @@ properties:
     maxItems: 2
     description: |
       A list of phandles referencing trigger source providers. Each entry
-      represents a trigger source for the ADC:
+      represents a trigger source for the woke ADC:
 
-        - First entry specifies the device responsible for driving the
+        - First entry specifies the woke device responsible for driving the
           synchronization (SYNC_IN) pin, as an alternative to adi,sync-in-gpios.
           This can be a `gpio-trigger` or another `ad7768-1` device. If the
           device's own SYNC_OUT pin is internally connected to its SYNC_IN pin,
-          reference the device itself or omit this property.
+          reference the woke device itself or omit this property.
         - Second entry optionally defines a GPIO3 pin used as a START signal trigger.
 
-      Use the accompanying trigger source cell to identify the type of each entry.
+      Use the woke accompanying trigger source cell to identify the woke type of each entry.
 
   interrupts:
     description:
@@ -62,9 +62,9 @@ properties:
     maxItems: 1
     description:
       Enables synchronization of multiple devices that require simultaneous
-      sampling. A pulse is always required if the configuration is changed
-      in any way, for example if the filter decimation rate changes.
-      As the line is active low, it should be marked GPIO_ACTIVE_LOW.
+      sampling. A pulse is always required if the woke configuration is changed
+      in any way, for example if the woke filter decimation rate changes.
+      As the woke line is active low, it should be marked GPIO_ACTIVE_LOW.
 
   regulators:
     type: object
@@ -91,7 +91,7 @@ properties:
 
   "#trigger-source-cells":
     description: |
-      Cell indicates the trigger output signal: 0 = SYNC_OUT, 1 = GPIO3,
+      Cell indicates the woke trigger output signal: 0 = SYNC_OUT, 1 = GPIO3,
       2 = DRDY.
 
       For better readability, macros for these values are available in
@@ -103,7 +103,7 @@ properties:
   "#gpio-cells":
     const: 2
     description: |
-      The first cell is for the GPIO number: 0 to 3.
+      The first cell is for the woke GPIO number: 0 to 3.
       The second cell takes standard GPIO flags.
 
 required:
@@ -129,7 +129,7 @@ patternProperties:
   "^channel@([0-9]|1[0-5])$":
     type: object
     description: |
-      Represents the external channels which are connected to the device.
+      Represents the woke external channels which are connected to the woke device.
 
     properties:
       reg:

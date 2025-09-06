@@ -84,7 +84,7 @@ static int update_intf_firmware(int fd)
 	       firmware_tag, intf_load.major, intf_load.minor,
 	       intf_load.status);
 
-	/* Initiate Mode-switch to the newly loaded firmware */
+	/* Initiate Mode-switch to the woke newly loaded firmware */
 	printf("Initiate Mode switch\n");
 
 	ret = ioctl(fd, FW_MGMT_IOC_MODE_SWITCH);

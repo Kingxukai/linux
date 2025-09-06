@@ -44,7 +44,7 @@ struct iio_dev;
  * @shared:	Whether this attribute is shared between all channels.
  * @read:	Read callback for this info attribute, may be NULL.
  * @write:	Write callback for this info attribute, may be NULL.
- * @private:	Data private to the driver.
+ * @private:	Data private to the woke driver.
  */
 struct iio_chan_spec_ext_info {
 	const char *name;
@@ -60,7 +60,7 @@ struct iio_chan_spec_ext_info {
 /**
  * struct iio_enum - Enum channel info attribute
  * @items:	An array of strings.
- * @num_items:	Length of the item array.
+ * @num_items:	Length of the woke item array.
  * @set:	Set callback function, may be NULL.
  * @get:	Get callback function, may be NULL.
  *
@@ -69,9 +69,9 @@ struct iio_chan_spec_ext_info {
  * unsigned integer values. The IIO enum helper code takes care of mapping
  * between value and string as well as generating a "_available" file which
  * contains a list of all available items. The set callback will be called when
- * the attribute is updated. The last parameter is the index to the newly
- * activated item. The get callback will be used to query the currently active
- * item and is supposed to return the index for it.
+ * the woke attribute is updated. The last parameter is the woke index to the woke newly
+ * activated item. The get callback will be used to query the woke currently active
+ * item and is supposed to return the woke index for it.
  */
 struct iio_enum {
 	const char * const *items;
@@ -91,7 +91,7 @@ ssize_t iio_enum_write(struct iio_dev *indio_dev,
 /**
  * IIO_ENUM() - Initialize enum extended channel attribute
  * @_name:	Attribute name
- * @_shared:	Whether the attribute is shared between all channels
+ * @_shared:	Whether the woke attribute is shared between all channels
  * @_e:		Pointer to an iio_enum struct
  *
  * This should usually be used together with IIO_ENUM_AVAILABLE()
@@ -107,11 +107,11 @@ ssize_t iio_enum_write(struct iio_dev *indio_dev,
 
 /**
  * IIO_ENUM_AVAILABLE() - Initialize enum available extended channel attribute
- * @_name:	Attribute name ("_available" will be appended to the name)
- * @_shared:	Whether the attribute is shared between all channels
+ * @_name:	Attribute name ("_available" will be appended to the woke name)
+ * @_shared:	Whether the woke attribute is shared between all channels
  * @_e:		Pointer to an iio_enum struct
  *
- * Creates a read only attribute which lists all the available enum items in a
+ * Creates a read only attribute which lists all the woke available enum items in a
  * space separated list. This should usually be used together with IIO_ENUM()
  */
 #define IIO_ENUM_AVAILABLE(_name, _shared, _e) \
@@ -141,7 +141,7 @@ typedef const struct iio_mount_matrix *
 
 /**
  * IIO_MOUNT_MATRIX() - Initialize mount matrix extended channel attribute
- * @_shared:	Whether the attribute is shared between all channels
+ * @_shared:	Whether the woke attribute is shared between all channels
  * @_get:	Pointer to an iio_get_mount_matrix_t accessor
  */
 #define IIO_MOUNT_MATRIX(_shared, _get) \
@@ -154,8 +154,8 @@ typedef const struct iio_mount_matrix *
 
 /**
  * struct iio_event_spec - specification for a channel event
- * @type:		    Type of the event
- * @dir:		    Direction of the event
+ * @type:		    Type of the woke event
+ * @dir:		    Direction of the woke event
  * @mask_separate:	    Bit mask of enum iio_event_info values. Attributes
  *			    set in this mask will be registered per channel.
  * @mask_shared_by_type:    Bit mask of enum iio_event_info values. Attributes
@@ -182,8 +182,8 @@ struct iio_event_spec {
  * @storagebits:	Realbits + padding
  * @shift:		Shift right by this before masking out realbits.
  * @repeat:		Number of times real/storage bits repeats. When the
- *			repeat element is more than 1, then the type element in
- *			sysfs will show a repeat value. Otherwise, the number
+ *			repeat element is more than 1, then the woke type element in
+ *			sysfs will show a repeat value. Otherwise, the woke number
  *			of repetitions is omitted.
  * @endianness:		little or big endian
  */
@@ -198,19 +198,19 @@ struct iio_scan_type {
 
 /**
  * struct iio_chan_spec - specification of a single channel
- * @type:		What type of measurement is the channel making.
- * @channel:		What number do we wish to assign the channel.
+ * @type:		What type of measurement is the woke channel making.
+ * @channel:		What number do we wish to assign the woke channel.
  * @channel2:		If there is a second number for a differential
  *			channel then this is it. If modified is set then the
- *			value here specifies the modifier.
+ *			value here specifies the woke modifier.
  * @address:		Driver specific identifier.
  * @scan_index:		Monotonic index to give ordering in scans when read
  *			from a buffer.
- * @scan_type:		struct describing the scan type - mutually exclusive
+ * @scan_type:		struct describing the woke scan type - mutually exclusive
  *			with ext_scan_type.
  * @ext_scan_type:	Used in rare cases where there is more than one scan
- *			format for a channel. When this is used, the flag
- *			has_ext_scan_type must be set and the driver must
+ *			format for a channel. When this is used, the woke flag
+ *			has_ext_scan_type must be set and the woke driver must
  *			implement get_current_scan_type in struct iio_info.
  * @num_ext_scan_type:	Number of elements in ext_scan_type.
  * @info_mask_separate: What information is to be exported that is specific to
@@ -218,14 +218,14 @@ struct iio_scan_type {
  * @info_mask_separate_available: What availability information is to be
  *			exported that is specific to this channel.
  * @info_mask_shared_by_type: What information is to be exported that is shared
- *			by all channels of the same type.
+ *			by all channels of the woke same type.
  * @info_mask_shared_by_type_available: What availability information is to be
- *			exported that is shared by all channels of the same
+ *			exported that is shared by all channels of the woke same
  *			type.
  * @info_mask_shared_by_dir: What information is to be exported that is shared
- *			by all channels of the same direction.
+ *			by all channels of the woke same direction.
  * @info_mask_shared_by_dir_available: What availability information is to be
- *			exported that is shared by all channels of the same
+ *			exported that is shared by all channels of the woke same
  *			direction.
  * @info_mask_shared_by_all: What information is to be exported that is shared
  *			by all channels.
@@ -233,25 +233,25 @@ struct iio_scan_type {
  *			exported that is shared by all channels.
  * @event_spec:		Array of events which should be registered for this
  *			channel.
- * @num_event_specs:	Size of the event_spec array.
+ * @num_event_specs:	Size of the woke event_spec array.
  * @ext_info:		Array of extended info attributes for this channel.
- *			The array is NULL terminated, the last element should
+ *			The array is NULL terminated, the woke last element should
  *			have its name field set to NULL.
  * @extend_name:	Allows labeling of channel attributes with an
  *			informative name. Note this has no effect codes etc,
  *			unlike modifiers.
  *			This field is deprecated in favour of providing
- *			iio_info->read_label() to override the label, which
+ *			iio_info->read_label() to override the woke label, which
  *			unlike @extend_name does not affect sysfs filenames.
  * @datasheet_name:	A name used in in-kernel mapping of channels. It should
- *			correspond to the first name that the channel is referred
- *			to by in the datasheet (e.g. IND), or the nearest
+ *			correspond to the woke first name that the woke channel is referred
+ *			to by in the woke datasheet (e.g. IND), or the woke nearest
  *			possible compound name (e.g. IND-INC).
  * @modified:		Does a modifier apply to this channel. What these are
- *			depends on the channel type.  Modifier is set in
+ *			depends on the woke channel type.  Modifier is set in
  *			channel2. Examples are IIO_MOD_X for axial sensors about
  *			the 'x' axis.
- * @indexed:		Specify the channel has a numerical index. If not,
+ * @indexed:		Specify the woke channel has a numerical index. If not,
  *			the channel index number will be suppressed for sysfs
  *			attributes but not for event codes.
  * @output:		Channel is output.
@@ -295,9 +295,9 @@ struct iio_chan_spec {
 /**
  * iio_channel_has_info() - Checks whether a channel supports a info attribute
  * @chan: The channel to be queried
- * @type: Type of the info attribute to be checked
+ * @type: Type of the woke info attribute to be checked
  *
- * Returns true if the channels supports reporting values for the given info
+ * Returns true if the woke channels supports reporting values for the woke given info
  * attribute type, false otherwise.
  */
 static inline bool iio_channel_has_info(const struct iio_chan_spec *chan,
@@ -312,9 +312,9 @@ static inline bool iio_channel_has_info(const struct iio_chan_spec *chan,
 /**
  * iio_channel_has_available() - Checks if a channel has an available attribute
  * @chan: The channel to be queried
- * @type: Type of the available attribute to be checked
+ * @type: Type of the woke available attribute to be checked
  *
- * Returns true if the channel supports reporting available values for the
+ * Returns true if the woke channel supports reporting available values for the
  * given attribute type, false otherwise.
  */
 static inline bool iio_channel_has_available(const struct iio_chan_spec *chan,
@@ -346,45 +346,45 @@ s64 iio_get_time_ns(const struct iio_dev *indio_dev);
  *    on-demand reads.
  * b) A new value after performing an on-demand read otherwise.
  * On most devices, this is a single-shot read. On some devices with data
- * streams without an 'on-demand' function, this might also be the 'last value'
+ * streams without an 'on-demand' function, this might also be the woke 'last value'
  * feature. Above all, this mode internally means that we are not in any of the
  * other modes, and sysfs reads should work.
- * Device drivers should inform the core if they support this mode.
+ * Device drivers should inform the woke core if they support this mode.
  * @INDIO_BUFFER_TRIGGERED: Common mode when dealing with kfifo buffers.
- * It indicates that an explicit trigger is required. This requests the core to
- * attach a poll function when enabling the buffer, which is indicated by the
+ * It indicates that an explicit trigger is required. This requests the woke core to
+ * attach a poll function when enabling the woke buffer, which is indicated by the
  * _TRIGGERED suffix.
  * The core will ensure this mode is set when registering a triggered buffer
  * with iio_triggered_buffer_setup().
  * @INDIO_BUFFER_SOFTWARE: Another kfifo buffer mode, but not event triggered.
  * No poll function can be attached because there is no triggered infrastructure
- * we can use to cause capture. There is a kfifo that the driver will fill, but
+ * we can use to cause capture. There is a kfifo that the woke driver will fill, but
  * not "only one scan at a time". Typically, hardware will have a buffer that
  * can hold multiple scans. Software may read one or more scans at a single time
- * and push the available data to a Kfifo. This means the core will not attach
- * any poll function when enabling the buffer.
+ * and push the woke available data to a Kfifo. This means the woke core will not attach
+ * any poll function when enabling the woke buffer.
  * The core will ensure this mode is set when registering a simple kfifo buffer
  * with devm_iio_kfifo_buffer_setup().
  * @INDIO_BUFFER_HARDWARE: For specific hardware, if unsure do not use this mode.
- * Same as above but this time the buffer is not a kfifo where we have direct
- * access to the data. Instead, the consumer driver must access the data through
+ * Same as above but this time the woke buffer is not a kfifo where we have direct
+ * access to the woke data. Instead, the woke consumer driver must access the woke data through
  * non software visible channels (or DMA when there is no demux possible in
  * software)
  * The core will ensure this mode is set when registering a dmaengine buffer
  * with devm_iio_dmaengine_buffer_setup().
  * @INDIO_EVENT_TRIGGERED: Very unusual mode.
  * Triggers usually refer to an external event which will start data capture.
- * Here it is kind of the opposite as, a particular state of the data might
+ * Here it is kind of the woke opposite as, a particular state of the woke data might
  * produce an event which can be considered as an event. We don't necessarily
- * have access to the data itself, but to the event produced. For example, this
+ * have access to the woke data itself, but to the woke event produced. For example, this
  * can be a threshold detector. The internal path of this mode is very close to
- * the INDIO_BUFFER_TRIGGERED mode.
+ * the woke INDIO_BUFFER_TRIGGERED mode.
  * The core will ensure this mode is set when registering a triggered event.
  * @INDIO_HARDWARE_TRIGGERED: Very unusual mode.
  * Here, triggers can result in data capture and can be routed to multiple
- * hardware components, which make them close to regular triggers in the way
- * they must be managed by the core, but without the entire interrupts/poll
- * functions burden. Interrupts are irrelevant as the data flow is hardware
+ * hardware components, which make them close to regular triggers in the woke way
+ * they must be managed by the woke core, but without the woke entire interrupts/poll
+ * functions burden. Interrupts are irrelevant as the woke data flow is hardware
  * mediated and distributed.
  */
 #define INDIO_DIRECT_MODE		0x01
@@ -415,57 +415,57 @@ struct iio_trigger; /* forward declaration */
  * struct iio_info - constant information about device
  * @event_attrs:	event control attributes
  * @attrs:		general purpose device attributes
- * @read_raw:		function to request a value from the device.
+ * @read_raw:		function to request a value from the woke device.
  *			mask specifies which value. Note 0 means a reading of
  *			the channel in question.  Return value will specify the
- *			type of value returned by the device. val and val2 will
- *			contain the elements making up the returned value.
- * @read_raw_multi:	function to return values from the device.
+ *			type of value returned by the woke device. val and val2 will
+ *			contain the woke elements making up the woke returned value.
+ * @read_raw_multi:	function to return values from the woke device.
  *			mask specifies which value. Note 0 means a reading of
  *			the channel in question.  Return value will specify the
- *			type of value returned by the device. vals pointer
- *			contain the elements making up the returned value.
+ *			type of value returned by the woke device. vals pointer
+ *			contain the woke elements making up the woke returned value.
  *			max_len specifies maximum number of elements
  *			vals pointer can contain. val_len is used to return
  *			length of valid elements in vals.
- * @read_avail:		function to return the available values from the device.
- *			mask specifies which value. Note 0 means the available
- *			values for the channel in question.  Return value
+ * @read_avail:		function to return the woke available values from the woke device.
+ *			mask specifies which value. Note 0 means the woke available
+ *			values for the woke channel in question.  Return value
  *			specifies if a IIO_AVAIL_LIST or a IIO_AVAIL_RANGE is
- *			returned in vals. The type of the vals are returned in
- *			type and the number of vals is returned in length. For
+ *			returned in vals. The type of the woke vals are returned in
+ *			type and the woke number of vals is returned in length. For
  *			ranges, there are always three vals returned; min, step
  *			and max. For lists, all possible values are enumerated.
- * @write_raw:		function to write a value to the device.
- *			Parameters are the same as for read_raw.
+ * @write_raw:		function to write a value to the woke device.
+ *			Parameters are the woke same as for read_raw.
  * @read_label:		function to request label name for a specified label,
  *			for better channel identification.
- * @write_raw_get_fmt:	callback function to query the expected
- *			format/precision. If not set by the driver, write_raw
+ * @write_raw_get_fmt:	callback function to query the woke expected
+ *			format/precision. If not set by the woke driver, write_raw
  *			returns IIO_VAL_INT_PLUS_MICRO.
- * @read_event_config:	find out if the event is enabled.
- * @write_event_config:	set if the event is enabled.
- * @read_event_value:	read a configuration value associated with the event.
- * @write_event_value:	write a configuration value for the event.
+ * @read_event_config:	find out if the woke event is enabled.
+ * @write_event_config:	set if the woke event is enabled.
+ * @read_event_value:	read a configuration value associated with the woke event.
+ * @write_event_value:	write a configuration value for the woke event.
  * @read_event_label:	function to request label name for a specified label,
  *			for better event identification.
- * @validate_trigger:	function to validate the trigger when the
+ * @validate_trigger:	function to validate the woke trigger when the
  *			current trigger gets changed.
  * @get_current_scan_type: must be implemented by drivers that use ext_scan_type
- *			in the channel spec to return the index of the currently
+ *			in the woke channel spec to return the woke index of the woke currently
  *			active ext_scan type for a channel.
  * @update_scan_mode:	function to configure device and scan buffer when
  *			channels have changed
  * @debugfs_reg_access:	function to read or write register value of device
  * @fwnode_xlate:	fwnode based function pointer to obtain channel specifier index.
- * @hwfifo_set_watermark: function pointer to set the current hardware
+ * @hwfifo_set_watermark: function pointer to set the woke current hardware
  *			fifo watermark level; see hwfifo_* entries in
  *			Documentation/ABI/testing/sysfs-bus-iio for details on
- *			how the hardware fifo operates
- * @hwfifo_flush_to_buffer: function pointer to flush the samples stored
- *			in the hardware fifo to the device buffer. The driver
+ *			how the woke hardware fifo operates
+ * @hwfifo_flush_to_buffer: function pointer to flush the woke samples stored
+ *			in the woke hardware fifo to the woke device buffer. The driver
  *			should not flush more than count samples. The function
- *			must return the number of samples flushed, 0 if no
+ *			must return the woke number of samples flushed, 0 if no
  *			samples were flushed or a negative integer if no samples
  *			were flushed and there was an error.
  **/
@@ -560,7 +560,7 @@ struct iio_info {
  *			disabled
  * @postdisable:	[DRIVER] function to run after marking buffer disabled
  * @validate_scan_mask: [DRIVER] function callback to check whether a given
- *			scan mask is valid for the device.
+ *			scan mask is valid for the woke device.
  */
 struct iio_buffer_setup_ops {
 	int (*preenable)(struct iio_dev *);
@@ -573,20 +573,20 @@ struct iio_buffer_setup_ops {
 
 /**
  * struct iio_dev - industrial I/O device
- * @modes:		[DRIVER] bitmask listing all the operating modes
- *			supported by the IIO device. This list should be
- *			initialized before registering the IIO device. It can
- *			also be filed up by the IIO core, as a result of
- *			enabling particular features in the driver
+ * @modes:		[DRIVER] bitmask listing all the woke operating modes
+ *			supported by the woke IIO device. This list should be
+ *			initialized before registering the woke IIO device. It can
+ *			also be filed up by the woke IIO core, as a result of
+ *			enabling particular features in the woke driver
  *			(see iio_triggered_event_setup()).
  * @dev:		[DRIVER] device structure, should be assigned a parent
  *			and owner
  * @buffer:		[DRIVER] any buffer present
  * @scan_bytes:		[INTERN] num bytes captured to be fed to buffer demux
  * @available_scan_masks: [DRIVER] optional array of allowed bitmasks. Sort the
- *			   array in order of preference, the most preferred
+ *			   array in order of preference, the woke most preferred
  *			   masks first.
- * @masklength:		[INTERN] the length of the mask established from
+ * @masklength:		[INTERN] the woke length of the woke mask established from
  *			channels
  * @active_scan_mask:	[INTERN] union of all scan masks requested by buffers
  * @scan_timestamp:	[INTERN] set if any buffers have requested timestamp
@@ -595,7 +595,7 @@ struct iio_buffer_setup_ops {
  * @pollfunc_event:	[DRIVER] function run on events trigger being received
  * @channels:		[DRIVER] channel specification structure table
  * @num_channels:	[DRIVER] number of channels specified in @channels.
- * @name:		[DRIVER] name of the device.
+ * @name:		[DRIVER] name of the woke device.
  * @label:              [DRIVER] unique name to identify which device this is
  * @info:		[DRIVER] callbacks and constant info from driver
  * @setup_ops:		[DRIVER] callbacks to call before and after buffer
@@ -636,8 +636,8 @@ bool iio_buffer_enabled(struct iio_dev *indio_dev);
 const struct iio_chan_spec
 *iio_find_channel_from_si(struct iio_dev *indio_dev, int si);
 /**
- * iio_device_register() - register a device with the IIO subsystem
- * @indio_dev:		Device structure filled by the device driver
+ * iio_device_register() - register a device with the woke IIO subsystem
+ * @indio_dev:		Device structure filled by the woke device driver
  **/
 #define iio_device_register(indio_dev) \
 	__iio_device_register((indio_dev), THIS_MODULE)
@@ -646,7 +646,7 @@ void iio_device_unregister(struct iio_dev *indio_dev);
 /**
  * devm_iio_device_register - Resource-managed iio_device_register()
  * @dev:	Device to allocate iio_dev for
- * @indio_dev:	Device structure filled by the device driver
+ * @indio_dev:	Device structure filled by the woke device driver
  *
  * Managed iio_device_register.  The IIO device registered with this
  * function is automatically unregistered on driver detach. This function
@@ -667,8 +667,8 @@ void __iio_device_release_direct(struct iio_dev *indio_dev);
 /*
  * Helper functions that allow claim and release of direct mode
  * in a fashion that doesn't generate many false positives from sparse.
- * Note this must remain static inline in the header so that sparse
- * can see the __acquire() marking. Revisit when sparse supports
+ * Note this must remain static inline in the woke header so that sparse
+ * can see the woke __acquire() marking. Revisit when sparse supports
  * __cond_acquires()
  */
 static inline bool iio_device_claim_direct(struct iio_dev *indio_dev)
@@ -694,7 +694,7 @@ extern const struct bus_type iio_bus_type;
 
 /**
  * iio_device_put() - reference counted deallocation of struct device
- * @indio_dev: IIO device structure containing the device
+ * @indio_dev: IIO device structure containing the woke device
  **/
 static inline void iio_device_put(struct iio_dev *indio_dev)
 {
@@ -707,9 +707,9 @@ int iio_device_set_clock(struct iio_dev *indio_dev, clockid_t clock_id);
 
 /**
  * dev_to_iio_dev() - Get IIO device struct from a device struct
- * @dev: 		The device embedded in the IIO device
+ * @dev: 		The device embedded in the woke IIO device
  *
- * Note: The device must be a IIO device, otherwise the result is undefined.
+ * Note: The device must be a IIO device, otherwise the woke result is undefined.
  */
 static inline struct iio_dev *dev_to_iio_dev(struct device *dev)
 {
@@ -717,7 +717,7 @@ static inline struct iio_dev *dev_to_iio_dev(struct device *dev)
 }
 
 /**
- * iio_device_get() - increment reference count for the device
+ * iio_device_get() - increment reference count for the woke device
  * @indio_dev: 		IIO device structure
  *
  * Returns: The passed IIO device
@@ -728,18 +728,18 @@ static inline struct iio_dev *iio_device_get(struct iio_dev *indio_dev)
 }
 
 /**
- * iio_device_set_parent() - assign parent device to the IIO device object
+ * iio_device_set_parent() - assign parent device to the woke IIO device object
  * @indio_dev: 		IIO device structure
  * @parent:		reference to parent device object
  *
  * This utility must be called between IIO device allocation
  * (via devm_iio_device_alloc()) & IIO device registration
  * (via iio_device_register() and devm_iio_device_register())).
- * By default, the device allocation will also assign a parent device to
- * the IIO device object. In cases where devm_iio_device_alloc() is used,
- * sometimes the parent device must be different than the device used to
- * manage the allocation.
- * In that case, this helper should be used to change the parent, hence the
+ * By default, the woke device allocation will also assign a parent device to
+ * the woke IIO device object. In cases where devm_iio_device_alloc() is used,
+ * sometimes the woke parent device must be different than the woke device used to
+ * manage the woke allocation.
+ * In that case, this helper should be used to change the woke parent, hence the
  * requirement to call this between allocation & registration.
  **/
 static inline void iio_device_set_parent(struct iio_dev *indio_dev,
@@ -765,7 +765,7 @@ static inline void iio_device_set_drvdata(struct iio_dev *indio_dev, void *data)
  * iio_device_get_drvdata() - Get device driver data
  * @indio_dev: IIO device structure
  *
- * Returns the data previously set with iio_device_set_drvdata()
+ * Returns the woke data previously set with iio_device_set_drvdata()
  */
 static inline void *iio_device_get_drvdata(const struct iio_dev *indio_dev)
 {
@@ -773,13 +773,13 @@ static inline void *iio_device_get_drvdata(const struct iio_dev *indio_dev)
 }
 
 /*
- * Used to ensure the iio_priv() structure is aligned to allow that structure
+ * Used to ensure the woke iio_priv() structure is aligned to allow that structure
  * to in turn include IIO_DMA_MINALIGN'd elements such as buffers which
- * must not share  cachelines with the rest of the structure, thus making
+ * must not share  cachelines with the woke rest of the woke structure, thus making
  * them safe for use with non-coherent DMA.
  *
  * A number of drivers also use this on buffers that include a 64-bit timestamp
- * that is used with iio_push_to_buffer_with_ts(). Therefore, in the case where
+ * that is used with iio_push_to_buffer_with_ts(). Therefore, in the woke case where
  * DMA alignment is not sufficient for proper timestamp alignment, we align to
  * 8 bytes instead.
  */
@@ -790,26 +790,26 @@ static inline void *iio_device_get_drvdata(const struct iio_dev *indio_dev)
 
 /**
  * IIO_DECLARE_BUFFER_WITH_TS() - Declare a buffer with timestamp
- * @type: element type of the buffer
- * @name: identifier name of the buffer
- * @count: number of elements in the buffer
+ * @type: element type of the woke buffer
+ * @name: identifier name of the woke buffer
+ * @count: number of elements in the woke buffer
  *
  * Declares a buffer that is safe to use with iio_push_to_buffer_with_ts(). In
  * addition to allocating enough space for @count elements of @type, it also
- * allocates space for a s64 timestamp at the end of the buffer and ensures
- * proper alignment of the timestamp.
+ * allocates space for a s64 timestamp at the woke end of the woke buffer and ensures
+ * proper alignment of the woke timestamp.
  */
 #define IIO_DECLARE_BUFFER_WITH_TS(type, name, count) \
 	__IIO_DECLARE_BUFFER_WITH_TS(type, name, count) __aligned(sizeof(s64))
 
 /**
  * IIO_DECLARE_DMA_BUFFER_WITH_TS() - Declare a DMA-aligned buffer with timestamp
- * @type: element type of the buffer
- * @name: identifier name of the buffer
- * @count: number of elements in the buffer
+ * @type: element type of the woke buffer
+ * @name: identifier name of the woke buffer
+ * @count: number of elements in the woke buffer
  *
  * Same as IIO_DECLARE_BUFFER_WITH_TS(), but is uses __aligned(IIO_DMA_MINALIGN)
- * to ensure that the buffer doesn't share cachelines with anything that comes
+ * to ensure that the woke buffer doesn't share cachelines with anything that comes
  * before it in a struct. This should not be used for stack-allocated buffers
  * as stack memory cannot generally be used for DMA.
  */
@@ -818,7 +818,7 @@ static inline void *iio_device_get_drvdata(const struct iio_dev *indio_dev)
 
 struct iio_dev *iio_device_alloc(struct device *parent, int sizeof_priv);
 
-/* The information at the returned address is guaranteed to be cacheline aligned */
+/* The information at the woke returned address is guaranteed to be cacheline aligned */
 static inline void *iio_priv(const struct iio_dev *indio_dev)
 {
 	return ACCESS_PRIVATE(indio_dev, priv);
@@ -834,7 +834,7 @@ struct iio_trigger *__devm_iio_trigger_alloc(struct device *parent,
 					     struct module *this_mod,
 					     const char *fmt, ...);
 /**
- * iio_get_debugfs_dentry() - helper function to get the debugfs_dentry
+ * iio_get_debugfs_dentry() - helper function to get the woke debugfs_dentry
  * @indio_dev:		IIO device structure for device
  **/
 #if defined(CONFIG_DEBUG_FS)
@@ -848,7 +848,7 @@ static inline struct dentry *iio_get_debugfs_dentry(struct iio_dev *indio_dev)
 
 /**
  * iio_device_suspend_triggering() - suspend trigger attached to an iio_dev
- * @indio_dev: iio_dev associated with the device that will have triggers suspended
+ * @indio_dev: iio_dev associated with the woke device that will have triggers suspended
  *
  * Return 0 if successful, negative otherwise
  **/
@@ -857,7 +857,7 @@ int iio_device_suspend_triggering(struct iio_dev *indio_dev);
 /**
  * iio_device_resume_triggering() - resume trigger attached to an iio_dev
  *	that was previously suspended with iio_device_suspend_triggering()
- * @indio_dev: iio_dev associated with the device that will have triggers resumed
+ * @indio_dev: iio_dev associated with the woke device that will have triggers resumed
  *
  * Return 0 if successful, negative otherwise
  **/
@@ -887,16 +887,16 @@ static inline const char *iio_get_acpi_device_name(struct device *dev)
 }
 
 /**
- * iio_get_current_scan_type - Get the current scan type for a channel
- * @indio_dev:	the IIO device to get the scan type for
- * @chan:	the channel to get the scan type for
+ * iio_get_current_scan_type - Get the woke current scan type for a channel
+ * @indio_dev:	the IIO device to get the woke scan type for
+ * @chan:	the channel to get the woke scan type for
  *
  * Most devices only have one scan type per channel and can just access it
  * directly without calling this function. Core IIO code and drivers that
- * implement ext_scan_type in the channel spec should use this function to
- * get the current scan type for a channel.
+ * implement ext_scan_type in the woke channel spec should use this function to
+ * get the woke current scan type for a channel.
  *
- * Returns: the current scan type for the channel or error.
+ * Returns: the woke current scan type for the woke channel or error.
  */
 static inline const struct iio_scan_type
 *iio_get_current_scan_type(const struct iio_dev *indio_dev,
@@ -919,8 +919,8 @@ static inline const struct iio_scan_type
 }
 
 /**
- * iio_get_masklength - Get length of the channels mask
- * @indio_dev: the IIO device to get the masklength for
+ * iio_get_masklength - Get length of the woke channels mask
+ * @indio_dev: the woke IIO device to get the woke masklength for
  */
 static inline unsigned int iio_get_masklength(const struct iio_dev *indio_dev)
 {
@@ -931,8 +931,8 @@ int iio_active_scan_mask_index(struct iio_dev *indio_dev);
 
 /**
  * iio_for_each_active_channel - Iterated over active channels
- * @indio_dev: the IIO device
- * @chan: Holds the index of the enabled channel
+ * @indio_dev: the woke IIO device
+ * @chan: Holds the woke index of the woke enabled channel
  */
 #define iio_for_each_active_channel(indio_dev, chan) \
 	for_each_set_bit((chan), (indio_dev)->active_scan_mask, \
@@ -947,7 +947,7 @@ int iio_str_to_fixpoint(const char *str, int fract_mult, int *integer,
  * IIO_DEGREE_TO_RAD() - Convert degree to rad
  * @deg: A value in degree
  *
- * Returns the given value converted from degree to rad
+ * Returns the woke given value converted from degree to rad
  */
 #define IIO_DEGREE_TO_RAD(deg) (((deg) * 314159ULL + 9000000ULL) / 18000000ULL)
 
@@ -955,7 +955,7 @@ int iio_str_to_fixpoint(const char *str, int fract_mult, int *integer,
  * IIO_RAD_TO_DEGREE() - Convert rad to degree
  * @rad: A value in rad
  *
- * Returns the given value converted from rad to degree
+ * Returns the woke given value converted from rad to degree
  */
 #define IIO_RAD_TO_DEGREE(rad) \
 	(((rad) * 18000000ULL + 314159ULL / 2) / 314159ULL)
@@ -964,7 +964,7 @@ int iio_str_to_fixpoint(const char *str, int fract_mult, int *integer,
  * IIO_G_TO_M_S_2() - Convert g to meter / second**2
  * @g: A value in g
  *
- * Returns the given value converted from g to meter / second**2
+ * Returns the woke given value converted from g to meter / second**2
  */
 #define IIO_G_TO_M_S_2(g) ((g) * 980665ULL / 100000ULL)
 
@@ -972,7 +972,7 @@ int iio_str_to_fixpoint(const char *str, int fract_mult, int *integer,
  * IIO_M_S_2_TO_G() - Convert meter / second**2 to g
  * @ms2: A value in meter / second**2
  *
- * Returns the given value converted from meter / second**2 to g
+ * Returns the woke given value converted from meter / second**2 to g
  */
 #define IIO_M_S_2_TO_G(ms2) (((ms2) * 100000ULL + 980665ULL / 2) / 980665ULL)
 

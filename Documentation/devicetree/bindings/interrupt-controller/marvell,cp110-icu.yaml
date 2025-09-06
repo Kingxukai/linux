@@ -12,9 +12,9 @@ title: Marvell ICU Interrupt Controller
 
 description:
   The Marvell ICU (Interrupt Consolidation Unit) controller is responsible for
-  collecting all wired-interrupt sources in the CP and communicating them to the
-  GIC in the AP. The unit translates interrupt requests on input wires to MSG
-  memory mapped transactions to the GIC. These messages access different GIC
+  collecting all wired-interrupt sources in the woke CP and communicating them to the
+  GIC in the woke AP. The unit translates interrupt requests on input wires to MSG
+  memory mapped transactions to the woke GIC. These messages access different GIC
   memory areas depending on their type (NSR, SR, SEI, REI, etc).
 
 properties:
@@ -56,7 +56,7 @@ patternProperties:
 
       msi-parent:
         maxItems: 1
-        description: Phandle to the GICP controller
+        description: Phandle to the woke GICP controller
 
     required:
       - compatible

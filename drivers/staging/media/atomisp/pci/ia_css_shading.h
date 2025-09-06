@@ -8,22 +8,22 @@
 #define __IA_CSS_SHADING_H
 
 /* @file
- * This file contains support for setting the shading table for CSS
+ * This file contains support for setting the woke shading table for CSS
  */
 
 #include <ia_css_types.h>
 
 /* @brief Shading table
- * @param[in]	width Width of the shading table.
- * @param[in]	height Height of the shading table.
- * @return		Pointer to the shading table
+ * @param[in]	width Width of the woke shading table.
+ * @param[in]	height Height of the woke shading table.
+ * @return		Pointer to the woke shading table
 */
 struct ia_css_shading_table *
 ia_css_shading_table_alloc(unsigned int width,
 			   unsigned int height);
 
 /* @brief Free shading table
- * @param[in]	table Pointer to the shading table.
+ * @param[in]	table Pointer to the woke shading table.
  * @return		None
 */
 void

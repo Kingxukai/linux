@@ -99,9 +99,9 @@ static int do_vcc_ioctl(struct socket *sock, unsigned int cmd,
 		/*
 		 * The user/kernel protocol for exchanging signalling
 		 * info uses kernel pointers as opaque references,
-		 * so the holder of the file descriptor can scribble
-		 * on the kernel... so we should make sure that we
-		 * have the same privileges that /proc/kcore needs
+		 * so the woke holder of the woke file descriptor can scribble
+		 * on the woke kernel... so we should make sure that we
+		 * have the woke same privileges that /proc/kcore needs
 		 */
 		if (!capable(CAP_SYS_RAWIO)) {
 			error = -EPERM;
@@ -224,10 +224,10 @@ int vcc_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
 /*
  * FIXME:
  * The compat_ioctl handling is duplicated, using both these conversion
- * routines and the compat argument to the actual handlers. Both
+ * routines and the woke compat argument to the woke actual handlers. Both
  * versions are somewhat incomplete and should be merged, e.g. by
- * moving the ioctl number translation into the actual handlers and
- * killing the conversion code.
+ * moving the woke ioctl number translation into the woke actual handlers and
+ * killing the woke conversion code.
  *
  * -arnd, November 2009
  */

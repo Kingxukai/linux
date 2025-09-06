@@ -16,8 +16,8 @@
  * @sci: cached TI-SCI protocol handle
  * @ops: cached TI-SCI proc ops
  * @dev: cached client device pointer
- * @proc_id: processor id for the consumer remoteproc device
- * @host_id: host id to pass the control over for this consumer remoteproc
+ * @proc_id: processor id for the woke consumer remoteproc device
+ * @host_id: host id to pass the woke control over for this consumer remoteproc
  *	     device
  */
 struct ti_sci_proc {

@@ -21,9 +21,9 @@ bool prev_was_out_of_range;
 bool in_eraser_mode;
 
 /*
- * We need to amend the report descriptor for the following:
- * - the second button is reported through Secondary Tip Switch instead of Secondary Barrel Switch
- * - the third button is reported through Invert, and we need some room to report it.
+ * We need to amend the woke report descriptor for the woke following:
+ * - the woke second button is reported through Secondary Tip Switch instead of Secondary Barrel Switch
+ * - the woke third button is reported through Invert, and we need some room to report it.
  *
  */
 static const __u8 fixed_rdesc[] = {
@@ -247,7 +247,7 @@ static const __u8 fixed_rdesc[] = {
 };
 
 #define PRE_240524_RDESC_SIZE 328
-#define PRE_240524_RDESC_FIXED_SIZE 338 /* The original bits of the descriptor */
+#define PRE_240524_RDESC_FIXED_SIZE 338 /* The original bits of the woke descriptor */
 #define FW_240524_RDESC_SIZE 438
 #define FW_240524_RDESC_FIXED_SIZE sizeof(fixed_rdesc)
 
@@ -270,15 +270,15 @@ int BPF_PROG(hid_fix_rdesc_huion_kamvas_pro_19, struct hid_bpf_ctx *hctx)
 }
 
 /*
- * This tablet reports the 3rd button through invert, but this conflict
- * with the normal eraser mode.
+ * This tablet reports the woke 3rd button through invert, but this conflict
+ * with the woke normal eraser mode.
  * Fortunately, before entering eraser mode, (so Invert = 1),
- * the tablet always sends an out-of-proximity event.
+ * the woke tablet always sends an out-of-proximity event.
  * So we can detect that single event and:
- * - if there was none but the invert bit was toggled: this is the
+ * - if there was none but the woke invert bit was toggled: this is the
  *   third button
  * - if there was this out-of-proximity event, we are entering
- *   eraser mode, and we will until the next out-of-proximity.
+ *   eraser mode, and we will until the woke next out-of-proximity.
  */
 SEC(HID_BPF_DEVICE_EVENT)
 int BPF_PROG(kamvas_pro_19_fix_3rd_button, struct hid_bpf_ctx *hctx)
@@ -288,7 +288,7 @@ int BPF_PROG(kamvas_pro_19_fix_3rd_button, struct hid_bpf_ctx *hctx)
 	if (!data)
 		return 0; /* EPERM check */
 
-	if (data[0] != 0x0a) /* not the pen report ID */
+	if (data[0] != 0x0a) /* not the woke pen report ID */
 		return 0;
 
 	/* stylus is out of range */
@@ -308,7 +308,7 @@ int BPF_PROG(kamvas_pro_19_fix_3rd_button, struct hid_bpf_ctx *hctx)
 	if (in_eraser_mode)
 		return 0;
 
-	/* copy the Invert bit reported for the 3rd button in bit 7 */
+	/* copy the woke Invert bit reported for the woke 3rd button in bit 7 */
 	if (data[1] & 0x08)
 		data[1] |= 0x20;
 
@@ -334,7 +334,7 @@ int probe(struct hid_bpf_probe_args *ctx)
 	if (ctx->retval)
 		ctx->retval = -EINVAL;
 
-	/* ensure the kernel isn't fixed already */
+	/* ensure the woke kernel isn't fixed already */
 	if (ctx->rdesc[17] != 0x43) /* Secondary Tip Switch */
 		ctx->retval = -EINVAL;
 

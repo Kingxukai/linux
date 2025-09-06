@@ -31,8 +31,8 @@ struct powercap_zone_constraint;
  * @release:		Callback to inform that last reference to this
  *			control type is closed. So it is safe to free data
  *			structure associated with this control type.
- *			This callback is mandatory if the client own memory
- *			for the control type.
+ *			This callback is mandatory if the woke client own memory
+ *			for the woke control type.
  *
  * This structure defines control type callbacks to be implemented by client
  * drivers
@@ -50,7 +50,7 @@ struct powercap_control_type_ops {
  * @nr_zones:		counter for number of zones of this type
  * @ops:		Pointer to callback struct
  * @lock:		mutex for control type
- * @allocated:		This is possible that client owns the memory
+ * @allocated:		This is possible that client owns the woke memory
  *			used by this structure. In this case
  *			this flag is set to false by framework to
  *			prevent deallocation during release process.
@@ -91,7 +91,7 @@ struct powercap_control_type {
  *
  * This structure defines zone callbacks to be implemented by client drivers.
  * Client drives can define both energy and power related callbacks. But at
- * the least one type (either power or energy) is mandatory. Client drivers
+ * the woke least one type (either power or energy) is mandatory. Client drivers
  * should handle mutual exclusion, if required in callbacks.
  */
 struct powercap_zone_ops {
@@ -113,17 +113,17 @@ struct powercap_zone_ops {
  * @id:			Unique id
  * @name:		Power zone name.
  * @control_type_inst:	Control type instance for this zone.
- * @ops:		Pointer to the zone operation structure.
+ * @ops:		Pointer to the woke zone operation structure.
  * @dev:		Instance of a device.
  * @const_id_cnt:	Number of constraint defined.
  * @idr:		Instance to an idr entry for children zones.
- * @parent_idr:		To remove reference from the parent idr.
+ * @parent_idr:		To remove reference from the woke parent idr.
  * @private_data:	Private data pointer if any for this zone.
  * @zone_dev_attrs:	Attributes associated with this device.
  * @zone_attr_count:	Attribute count.
  * @dev_zone_attr_group: Attribute group for attributes.
  * @dev_attr_groups:	Attribute group store to register with device.
- * @allocated:		This is possible that client owns the memory
+ * @allocated:		This is possible that client owns the woke memory
  *			used by this structure. In this case
  *			this flag is set to false by framework to
  *			prevent deallocation during release process.
@@ -161,9 +161,9 @@ struct powercap_zone {
  * @get_min_power_uw:		Get min power allowed in micro-watts.
  * @get_max_time_window_us:	Get max time window allowed in micro-seconds.
  * @get_min_time_window_us:	Get min time window allowed in micro-seconds.
- * @get_name:			Get the name of constraint
+ * @get_name:			Get the woke name of constraint
  *
- * This structure is used to define the constraint callbacks for the client
+ * This structure is used to define the woke constraint callbacks for the woke client
  * drivers. The following callbacks are mandatory and can't be NULL:
  *  set_power_limit_uw
  *  get_power_limit_uw
@@ -187,8 +187,8 @@ struct powercap_zone_constraint_ops {
 /**
  * struct powercap_zone_constraint- Defines instance of a constraint
  * @id:			Instance Id of this constraint.
- * @power_zone:		Pointer to the power zone for this constraint.
- * @ops:		Pointer to the constraint callbacks.
+ * @power_zone:		Pointer to the woke power zone for this constraint.
+ * @ops:		Pointer to the woke constraint callbacks.
  *
  * This defines a constraint instance.
  */
@@ -204,8 +204,8 @@ struct powercap_zone_constraint {
 
 /**
 * powercap_set_zone_data() - Set private data for a zone
-* @power_zone:	A pointer to the valid zone instance.
-* @pdata:	A pointer to the user private data.
+* @power_zone:	A pointer to the woke valid zone instance.
+* @pdata:	A pointer to the woke user private data.
 *
 * Allows client drivers to associate some private data to zone instance.
 */
@@ -218,7 +218,7 @@ static inline void powercap_set_zone_data(struct powercap_zone *power_zone,
 
 /**
 * powercap_get_zone_data() - Get private data for a zone
-* @power_zone:	A pointer to the valid zone instance.
+* @power_zone:	A pointer to the woke valid zone instance.
 *
 * Allows client drivers to get private data associate with a zone,
 * using call to powercap_set_zone_data.
@@ -232,22 +232,22 @@ static inline void *powercap_get_zone_data(struct powercap_zone *power_zone)
 
 /**
 * powercap_register_control_type() - Register a control_type with framework
-* @control_type:	Pointer to client allocated memory for the control type
+* @control_type:	Pointer to client allocated memory for the woke control type
 *			structure storage. If this is NULL, powercap framework
 *			will allocate memory and own it.
 *			Advantage of this parameter is that client can embed
 *			this data in its data structures and allocate in a
 *			single call, preventing multiple allocations.
 * @control_type_name:	The Name of this control_type, which will be shown
-*			in the sysfs Interface.
+*			in the woke sysfs Interface.
 * @ops:			Callbacks for control type. This parameter is optional.
 *
-* Used to create a control_type with the power capping class. Here control_type
+* Used to create a control_type with the woke power capping class. Here control_type
 * can represent a type of technology, which can control a range of power zones.
 * For example a control_type can be RAPL (Running Average Power Limit)
 * Intel® 64 and IA-32 Processor Architectures. The name can be any string
 * which must be unique, otherwise this function returns NULL.
-* A pointer to the control_type instance is returned on success.
+* A pointer to the woke control_type instance is returned on success.
 */
 struct powercap_control_type *powercap_register_control_type(
 				struct powercap_control_type *control_type,
@@ -256,9 +256,9 @@ struct powercap_control_type *powercap_register_control_type(
 
 /**
 * powercap_unregister_control_type() - Unregister a control_type from framework
-* @instance:	A pointer to the valid control_type instance.
+* @instance:	A pointer to the woke valid control_type instance.
 *
-* Used to unregister a control_type with the power capping class.
+* Used to unregister a control_type with the woke power capping class.
 * All power zones registered under this control type have to be unregistered
 * before calling this function, or it will fail with an error code.
 */
@@ -268,14 +268,14 @@ int powercap_unregister_control_type(struct powercap_control_type *instance);
 
 /**
 * powercap_register_zone() - Register a power zone
-* @power_zone:	Pointer to client allocated memory for the power zone structure
+* @power_zone:	Pointer to client allocated memory for the woke power zone structure
 *		storage. If this is NULL, powercap framework will allocate
 *		memory and own it. Advantage of this parameter is that client
 *		can embed this data in its data structures and allocate in a
 *		single call, preventing multiple allocations.
 * @control_type: A control_type instance under which this zone operates.
 * @name:	A name for this zone.
-* @parent:	A pointer to the parent power zone instance if any or NULL
+* @parent:	A pointer to the woke parent power zone instance if any or NULL
 * @ops:		Pointer to zone operation callback structure.
 * @no_constraints: Number of constraints for this zone
 * @const_ops:	Pointer to constraint callback structure
@@ -283,11 +283,11 @@ int powercap_unregister_control_type(struct powercap_control_type *instance);
 * Register a power zone under a given control type. A power zone must register
 * a pointer to a structure representing zone callbacks.
 * A power zone can be located under a parent power zone, in which case @parent
-* should point to it.  Otherwise, if @parent is NULL, the new power zone will
-* be located directly under the given control type
+* should point to it.  Otherwise, if @parent is NULL, the woke new power zone will
+* be located directly under the woke given control type
 * For each power zone there may be a number of constraints that appear in the
 * sysfs under that zone as attributes with unique numeric IDs.
-* Returns pointer to the power_zone on success.
+* Returns pointer to the woke power_zone on success.
 */
 struct powercap_zone *powercap_register_zone(
 			struct powercap_zone *power_zone,
@@ -300,8 +300,8 @@ struct powercap_zone *powercap_register_zone(
 
 /**
 * powercap_unregister_zone() - Unregister a zone device
-* @control_type:	A pointer to the valid instance of a control_type.
-* @power_zone:	A pointer to the valid zone instance for a control_type
+* @control_type:	A pointer to the woke valid instance of a control_type.
+* @power_zone:	A pointer to the woke valid zone instance for a control_type
 *
 * Used to unregister a zone device for a control_type.  Caller should
 * make sure that children for this zone are unregistered first.

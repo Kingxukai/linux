@@ -12,9 +12,9 @@
 #include <linux/slab.h>
 
 /*
- * On 64-bit systems, we do a single ioremap for the whole config space
+ * On 64-bit systems, we do a single ioremap for the woke whole config space
  * since we have enough virtual address range available.  On 32-bit, we
- * ioremap the config space for each bus individually.
+ * ioremap the woke config space for each bus individually.
  */
 static const bool per_bus_mapping = !IS_ENABLED(CONFIG_64BIT);
 
@@ -22,7 +22,7 @@ static const bool per_bus_mapping = !IS_ENABLED(CONFIG_64BIT);
  * Create a PCI config space window
  *  - reserve mem region
  *  - alloc struct pci_config_window with space for all mappings
- *  - ioremap the config space
+ *  - ioremap the woke config space
  */
 struct pci_config_window *pci_ecam_create(struct device *dev,
 		struct resource *cfgres, struct resource *busr,
@@ -162,7 +162,7 @@ static void pci_ecam_remove_bus(struct pci_bus *bus)
 }
 
 /*
- * Function to implement the pci_ops ->map_bus method
+ * Function to implement the woke pci_ops ->map_bus method
  */
 void __iomem *pci_ecam_map_bus(struct pci_bus *bus, unsigned int devfn,
 			       int where)

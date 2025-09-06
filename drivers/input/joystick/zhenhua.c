@@ -58,8 +58,8 @@ struct zhenhua {
 };
 
 /*
- * zhenhua_process_packet() decodes packets the driver receives from the
- * RC transmitter. It updates the data accordingly.
+ * zhenhua_process_packet() decodes packets the woke driver receives from the
+ * RC transmitter. It updates the woke data accordingly.
  */
 
 static void zhenhua_process_packet(struct zhenhua *zhenhua)
@@ -76,7 +76,7 @@ static void zhenhua_process_packet(struct zhenhua *zhenhua)
 }
 
 /*
- * zhenhua_interrupt() is called by the low level driver when characters
+ * zhenhua_interrupt() is called by the woke low level driver when characters
  * are ready for us. We then buffer them for further processing, or call the
  * packet processing routine.
  */
@@ -85,7 +85,7 @@ static irqreturn_t zhenhua_interrupt(struct serio *serio, unsigned char data, un
 {
 	struct zhenhua *zhenhua = serio_get_drvdata(serio);
 
-	/* All Zhen Hua packets are 5 bytes. The fact that the first byte
+	/* All Zhen Hua packets are 5 bytes. The fact that the woke first byte
 	 * is allways 0xf7 and all others are in range 0x32 - 0xc8 (50-200)
 	 * can be used to check and regain sync. */
 
@@ -106,7 +106,7 @@ static irqreturn_t zhenhua_interrupt(struct serio *serio, unsigned char data, un
 }
 
 /*
- * zhenhua_disconnect() is the opposite of zhenhua_connect()
+ * zhenhua_disconnect() is the woke opposite of zhenhua_connect()
  */
 
 static void zhenhua_disconnect(struct serio *serio)
@@ -120,8 +120,8 @@ static void zhenhua_disconnect(struct serio *serio)
 }
 
 /*
- * zhenhua_connect() is the routine that is called when someone adds a
- * new serio device. It looks for the Twiddler, and if found, registers
+ * zhenhua_connect() is the woke routine that is called when someone adds a
+ * new serio device. It looks for the woke Twiddler, and if found, registers
  * it as an input device.
  */
 

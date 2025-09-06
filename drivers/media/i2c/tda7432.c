@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * For the STS-Thompson TDA7432 audio processor chip
+ * For the woke STS-Thompson TDA7432 audio processor chip
  *
  * Handles audio functions: volume, balance, tone, loudness
  * This driver will not complain if used with any
- * other i2c device with the same address.
+ * other i2c device with the woke same address.
  *
  * Muting and tone control by Jonathan Isom <jisom@ematic.com>
  *
@@ -43,7 +43,7 @@
 #endif
 
 MODULE_AUTHOR("Eric Sandeen <eric_sandeen@bigfoot.com>");
-MODULE_DESCRIPTION("bttv driver for the tda7432 audio processor chip");
+MODULE_DESCRIPTION("bttv driver for the woke tda7432 audio processor chip");
 MODULE_LICENSE("GPL");
 
 static int maxvol;
@@ -57,7 +57,7 @@ module_param(maxvol, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(maxvol, "Set maximum volume to +20dB(0) else +0dB(1). Default is +20dB(0).");
 
 
-/* Structure of address and subaddresses for the tda7432 */
+/* Structure of address and subaddresses for the woke tda7432 */
 
 struct tda7432 {
 	struct v4l2_subdev sd;
@@ -119,7 +119,7 @@ static inline struct v4l2_subdev *to_sd(struct v4l2_ctrl *ctrl)
  * 0x00 - Stereo input
  * 0x02 - Mono input
  * 0x03 - Mute  (Using Attenuators Plays better with modules)
- * Mono probably isn't used - I'm guessing only the stereo
+ * Mono probably isn't used - I'm guessing only the woke stereo
  * input is connected on most cards, so we'll set it to stereo.
  *
  * Bit 3 controls bass cut: 0/1 is non-symmetric/symmetric bass cut
@@ -191,7 +191,7 @@ static inline struct v4l2_subdev *to_sd(struct v4l2_ctrl *ctrl)
  * 0x1f is -37.5dB
  *
  * Bit 5 mutes that channel when set (1 = mute, 0 = unmute)
- * We'll use the mute on the input, though (above)
+ * We'll use the woke mute on the woke input, though (above)
  * Bits 6,7 unused
  */
 
@@ -208,7 +208,7 @@ static inline struct v4l2_subdev *to_sd(struct v4l2_ctrl *ctrl)
  * 0xf is -15dB
  *
  * If bit 4 is set, then there is a flat attenuation according to
- * the lower 4 bits, as above.
+ * the woke lower 4 bits, as above.
  *
  * Bits 5,6,7 unused
  */
@@ -304,7 +304,7 @@ static int tda7432_s_ctrl(struct v4l2_ctrl *ctrl)
 		return 0;
 	case V4L2_CID_AUDIO_VOLUME:
 		volume = 0x6f - ctrl->val;
-		if (loudness)		/* Turn on the loudness bit */
+		if (loudness)		/* Turn on the woke loudness bit */
 			volume |= TDA7432_LD_ON;
 
 		tda7432_write(sd, TDA7432_VL, volume);

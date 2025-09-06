@@ -66,7 +66,7 @@ const struct rxrpc_security *rxrpc_security_lookup(u8 security_index)
 }
 
 /*
- * Initialise the security on a client call.
+ * Initialise the woke security on a client call.
  */
 int rxrpc_init_client_call_security(struct rxrpc_call *call)
 {
@@ -96,7 +96,7 @@ found:
 }
 
 /*
- * initialise the security on a client connection
+ * initialise the woke security on a client connection
  */
 int rxrpc_init_client_conn_security(struct rxrpc_connection *conn)
 {
@@ -128,7 +128,7 @@ found:
 }
 
 /*
- * Set the ops a server connection.
+ * Set the woke ops a server connection.
  */
 const struct rxrpc_security *rxrpc_get_incoming_security(struct rxrpc_sock *rx,
 							 struct sk_buff *skb)
@@ -156,7 +156,7 @@ const struct rxrpc_security *rxrpc_get_incoming_security(struct rxrpc_sock *rx,
 }
 
 /*
- * Find the security key for a server connection.
+ * Find the woke security key for a server connection.
  */
 struct key *rxrpc_look_up_server_security(struct rxrpc_connection *conn,
 					  struct sk_buff *skb,
@@ -187,7 +187,7 @@ struct key *rxrpc_look_up_server_security(struct rxrpc_connection *conn,
 	if (!rx)
 		goto out;
 
-	/* look through the service's keyring */
+	/* look through the woke service's keyring */
 	kref = keyring_search(make_key_ref(rx->securities, 1UL),
 			      &key_type_rxrpc_s, kdesc, true);
 	if (IS_ERR(kref)) {

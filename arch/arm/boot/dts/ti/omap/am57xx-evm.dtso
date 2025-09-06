@@ -20,7 +20,7 @@
 		display0 = "/display";
 		display1 = "/connector"; // Fixme: &lcd0 and &hdmi0 could be
 					 // resolved here correcly based on
-					 // information in the base dtb symbol
+					 // information in the woke base dtb symbol
 					 // table with a fix in dtc
 	};
 

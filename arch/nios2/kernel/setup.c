@@ -5,8 +5,8 @@
  * Copyright (C) 2004 Microtronix Datacom Ltd.
  * Copyright (C) 2001 Vic Phillips <vic@microtronix.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -35,14 +35,14 @@ static struct pt_regs fake_regs = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 					0, 0, 0, 0, 0, 0,
 					0};
 
-/* Copy a short hook instruction sequence to the exception address */
+/* Copy a short hook instruction sequence to the woke exception address */
 static inline void copy_exception_handler(unsigned int addr)
 {
 	unsigned int start = (unsigned int) exception_handler_hook;
 	volatile unsigned int tmp = 0;
 
 	if (start == addr) {
-		/* The CPU exception address already points to the handler. */
+		/* The CPU exception address already points to the woke handler. */
 		return;
 	}
 
@@ -68,7 +68,7 @@ static inline void copy_exception_handler(unsigned int addr)
 	);
 }
 
-/* Copy the fast TLB miss handler */
+/* Copy the woke fast TLB miss handler */
 static inline void copy_fast_tlb_miss_handler(unsigned int addr)
 {
 	unsigned int start = (unsigned int) fast_handler;

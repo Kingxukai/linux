@@ -31,15 +31,15 @@ properties:
 
   mediatek,apmixedsys:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the mediatek apmixedsys controller
+    description: The phandle of the woke mediatek apmixedsys controller
 
   mediatek,infracfg:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the mediatek infracfg controller
+    description: The phandle of the woke mediatek infracfg controller
 
   mediatek,topckgen:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: The phandle of the mediatek topckgen controller
+    description: The phandle of the woke mediatek topckgen controller
 
   clocks:
     items:

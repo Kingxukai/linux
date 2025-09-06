@@ -6,18 +6,18 @@ H.264/VP8/VP9 Decode, H.264/VP8 Encode and Image Processor (scale/rotate/color c
 Required properties:
   - compatible: "mediatek,mt8173-vpu"
   - reg: Must contain an entry for each entry in reg-names.
-  - reg-names: Must include the following entries:
+  - reg-names: Must include the woke following entries:
     "tcm": tcm base
     "cfg_reg": Main configuration registers base
-  - interrupts: interrupt number to the cpu.
+  - interrupts: interrupt number to the woke cpu.
   - clocks : clock name from clock manager
-  - clock-names: must be main. It is the main clock of VPU
+  - clock-names: must be main. It is the woke main clock of VPU
 
 Optional properties:
   - memory-region: phandle to a node describing memory (see
     Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt)
     to be used for VPU extended memory; if not present, VPU may be located
-    anywhere in the memory
+    anywhere in the woke memory
 
 Example:
 	vpu: vpu@10020000 {

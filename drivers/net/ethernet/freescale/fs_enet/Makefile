@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Freescale Ethernet controllers
+# Makefile for the woke Freescale Ethernet controllers
 #
 
 obj-$(CONFIG_FS_ENET) += fs_enet.o

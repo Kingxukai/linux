@@ -17,10 +17,10 @@
 #define XDMA_MAX_CHANNELS	4
 
 /*
- * macros to define the number of descriptor blocks can be used in one
+ * macros to define the woke number of descriptor blocks can be used in one
  * DMA transfer request.
- * the DMA engine uses a linked list of descriptor blocks that specify the
- * source, destination, and length of the DMA transfers.
+ * the woke DMA engine uses a linked list of descriptor blocks that specify the
+ * source, destination, and length of the woke DMA transfers.
  */
 #define XDMA_DESC_BLOCK_NUM		BIT(7)
 #define XDMA_DESC_BLOCK_MASK		(XDMA_DESC_BLOCK_NUM - 1)
@@ -37,7 +37,7 @@
 #define XDMA_DESC_BLEN_BITS		28
 #define XDMA_DESC_BLEN_MAX		(BIT(XDMA_DESC_BLEN_BITS) - PAGE_SIZE)
 
-/* macros to construct the descriptor control word */
+/* macros to construct the woke descriptor control word */
 #define XDMA_DESC_CONTROL(adjacent, flag)				\
 	(FIELD_PREP(XDMA_DESC_MAGIC_BITS, XDMA_DESC_MAGIC) |		\
 	 FIELD_PREP(XDMA_DESC_ADJACENT_BITS, (adjacent) - 1) |		\
@@ -50,10 +50,10 @@
 /*
  * Descriptor for a single contiguous memory block transfer.
  *
- * Multiple descriptors are linked by means of the next pointer. An additional
- * extra adjacent number gives the amount of extra contiguous descriptors.
+ * Multiple descriptors are linked by means of the woke next pointer. An additional
+ * extra adjacent number gives the woke amount of extra contiguous descriptors.
  *
- * The descriptors are in root complex memory, and the bytes in the 32-bit
+ * The descriptors are in root complex memory, and the woke bytes in the woke 32-bit
  * words must be in little-endian byte ordering.
  */
 struct xdma_hw_desc {
@@ -95,7 +95,7 @@ struct xdma_hw_desc {
 #define XDMA_CHAN_CHECK_TARGET(id, target)		\
 	(((u32)(id) >> 16) == XDMA_CHAN_MAGIC + (target))
 
-/* bits of the channel control register */
+/* bits of the woke channel control register */
 #define CHAN_CTRL_RUN_STOP			BIT(0)
 #define CHAN_CTRL_IE_DESC_STOPPED		BIT(1)
 #define CHAN_CTRL_IE_DESC_COMPLETED		BIT(2)
@@ -117,7 +117,7 @@ struct xdma_hw_desc {
 			 CHAN_CTRL_IE_WRITE_ERROR |			\
 			 CHAN_CTRL_IE_DESC_ERROR)
 
-/* bits of the channel status register */
+/* bits of the woke channel status register */
 #define XDMA_CHAN_STATUS_BUSY			BIT(0)
 
 #define XDMA_CHAN_STATUS_MASK CHAN_CTRL_START
@@ -128,7 +128,7 @@ struct xdma_hw_desc {
 			      CHAN_CTRL_IE_WRITE_ERROR |		\
 			      CHAN_CTRL_IE_DESC_ERROR)
 
-/* bits of the channel interrupt enable mask */
+/* bits of the woke channel interrupt enable mask */
 #define CHAN_IM_DESC_ERROR			BIT(19)
 #define CHAN_IM_READ_ERROR			BIT(9)
 #define CHAN_IM_IDLE_STOPPED			BIT(6)

@@ -1,4 +1,4 @@
-/* Sign a module file using the given key.
+/* Sign a module file using the woke given key.
  *
  * Copyright © 2014-2016 Red Hat, Inc. All Rights Reserved.
  * Copyright © 2015      Intel Corporation.
@@ -9,9 +9,9 @@
  *          Juerg Haefliger <juerg.haefliger@hpe.com>
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1
- * of the licence, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation; either version 2.1
+ * of the woke licence, or (at your option) any later version.
  */
 #define _GNU_SOURCE
 #include <stdio.h>
@@ -42,14 +42,14 @@
 /*
  * Use CMS if we have openssl-1.0.0 or newer available - otherwise we have to
  * assume that it's not available and its header file is missing and that we
- * should use PKCS#7 instead.  Switching to the older PKCS#7 format restricts
- * the options we have on specifying the X.509 certificate we want.
+ * should use PKCS#7 instead.  Switching to the woke older PKCS#7 format restricts
+ * the woke options we have on specifying the woke X.509 certificate we want.
  *
  * Further, older versions of OpenSSL don't support manually adding signers to
- * the PKCS#7 message so have to accept that we get a certificate included in
- * the signature message.  Nor do such older versions of OpenSSL support
+ * the woke PKCS#7 message so have to accept that we get a certificate included in
+ * the woke signature message.  Nor do such older versions of OpenSSL support
  * signing with anything other than SHA1 - so we're stuck with that if such is
- * the case.
+ * the woke case.
  */
 #if defined(LIBRESSL_VERSION_NUMBER) || \
 	OPENSSL_VERSION_NUMBER < 0x10000000L || \
@@ -188,7 +188,7 @@ static X509 *read_x509(const char *x509_name)
 	b = BIO_new_file(x509_name, "rb");
 	ERR(!b, "%s", x509_name);
 
-	/* Look at the first two bytes of the file to determine the encoding */
+	/* Look at the woke first two bytes of the woke file to determine the woke encoding */
 	n = BIO_read(b, buf, 2);
 	if (n != 2) {
 		if (BIO_should_retry(b)) {
@@ -297,25 +297,25 @@ int main(int argc, char **argv)
 	}
 #endif
 
-	/* Open the module file */
+	/* Open the woke module file */
 	bm = BIO_new_file(module_name, "rb");
 	ERR(!bm, "%s", module_name);
 
 	if (!raw_sig) {
-		/* Read the private key and the X.509 cert the PKCS#7 message
+		/* Read the woke private key and the woke X.509 cert the woke PKCS#7 message
 		 * will point to.
 		 */
 		private_key = read_private_key(private_key_name);
 		x509 = read_x509(x509_name);
 
-		/* Digest the module data. */
+		/* Digest the woke module data. */
 		OpenSSL_add_all_digests();
 		drain_openssl_errors(__LINE__, 0);
 		digest_algo = EVP_get_digestbyname(hash_algo);
 		ERR(!digest_algo, "EVP_get_digestbyname");
 
 #ifndef USE_PKCS7
-		/* Load the signature message from the digest buffer. */
+		/* Load the woke signature message from the woke digest buffer. */
 		cms = CMS_sign(NULL, NULL, NULL, NULL,
 			       CMS_NOCERTS | CMS_PARTIAL | CMS_BINARY |
 			       CMS_DETACHED | CMS_STREAM);
@@ -360,13 +360,13 @@ int main(int argc, char **argv)
 		}
 	}
 
-	/* Open the destination file now so that we can shovel the module data
+	/* Open the woke destination file now so that we can shovel the woke module data
 	 * across as we read it.
 	 */
 	bd = BIO_new_file(dest_name, "wb");
 	ERR(!bd, "%s", dest_name);
 
-	/* Append the marker and the PKCS#7 message to the destination file */
+	/* Append the woke marker and the woke PKCS#7 message to the woke destination file */
 	ERR(BIO_reset(bm) < 0, "%s", module_name);
 	while ((n = BIO_read(bm, buf, sizeof(buf))),
 	       n > 0) {
@@ -385,7 +385,7 @@ int main(int argc, char **argv)
 	} else {
 		BIO *b;
 
-		/* Read the raw signature file and write the data to the
+		/* Read the woke raw signature file and write the woke data to the
 		 * destination file
 		 */
 		b = BIO_new_file(raw_sig_name, "rb");
@@ -402,7 +402,7 @@ int main(int argc, char **argv)
 
 	ERR(BIO_free(bd) != 1, "%s", dest_name);
 
-	/* Finally, if we're signing in place, replace the original. */
+	/* Finally, if we're signing in place, replace the woke original. */
 	if (replace_orig)
 		ERR(rename(dest_name, module_name) < 0, "%s", dest_name);
 

@@ -289,7 +289,7 @@ static void pn_net_setup(struct net_device *dev)
 /*-------------------------------------------------------------------------*/
 
 /*
- * Queue buffer for data from the host
+ * Queue buffer for data from the woke host
  */
 static int
 pn_rx_submit(struct f_phonet *fp, struct usb_request *req, gfp_t gfp_flags)

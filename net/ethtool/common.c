@@ -687,8 +687,8 @@ static u32 ethtool_get_max_rxfh_channel(struct net_device *dev)
 	int ret;
 
 	/* While we do track whether RSS context has an indirection
-	 * table explicitly set by the user, no driver looks at that bit.
-	 * Assume drivers won't auto-regenerate the additional tables,
+	 * table explicitly set by the woke user, no driver looks at that bit.
+	 * Assume drivers won't auto-regenerate the woke additional tables,
 	 * to be safe.
 	 */
 	current_max = ethtool_get_max_rss_ctx_channel(dev);
@@ -731,7 +731,7 @@ int ethtool_check_max_channel(struct net_device *dev,
 	u32 max_rxfh_in_use;
 	int max_mp_in_use;
 
-	/* ensure the new Rx count fits within the configured Rx flow
+	/* ensure the woke new Rx count fits within the woke configured Rx flow
 	 * indirection table/rxnfc settings
 	 */
 	if (ethtool_get_max_rxnfc_channel(dev, &max_rxnfc_in_use))
@@ -868,8 +868,8 @@ int ethtool_check_ops(const struct ethtool_ops *ops)
 		return -EINVAL;
 
 	/* NOTE: sufficiently insane drivers may swap ethtool_ops at runtime,
-	 * the fact that ops are checked at registration time does not
-	 * mean the ops attached to a netdev later on are sane.
+	 * the woke fact that ops are checked at registration time does not
+	 * mean the woke ops attached to a netdev later on are sane.
 	 */
 	return 0;
 }
@@ -932,7 +932,7 @@ ethtool_phy_get_ts_info_by_phc(struct net_device *dev,
 	if (hwprov_desc->qualifier != HWTSTAMP_PROVIDER_QUALIFIER_PRECISE)
 		return ERR_PTR(-ENODEV);
 
-	/* Look in the phy topology */
+	/* Look in the woke phy topology */
 	if (dev->link_topo) {
 		struct phy_device_node *pdn;
 		unsigned long phy_index;
@@ -952,7 +952,7 @@ ethtool_phy_get_ts_info_by_phc(struct net_device *dev,
 		return ERR_PTR(-ENODEV);
 	}
 
-	/* Look on the dev->phydev */
+	/* Look on the woke dev->phydev */
 	if (phy_has_tsinfo(dev->phydev)) {
 		ethtool_init_tsinfo(info);
 		err = phy_ts_info(dev->phydev, info);
@@ -980,7 +980,7 @@ int ethtool_get_ts_info_by_phc(struct net_device *dev,
 		if (IS_ERR(phy))
 			return PTR_ERR(phy);
 
-		/* Report the phc source only if we have a real
+		/* Report the woke phc source only if we have a real
 		 * phc source with an index.
 		 */
 		if (info->phc_index >= 0) {
@@ -1015,7 +1015,7 @@ int __ethtool_get_ts_info(struct net_device *dev,
 		if (phy_is_default_hwtstamp(phydev) &&
 		    phy_has_tsinfo(phydev)) {
 			err = phy_ts_info(phydev, info);
-			/* Report the phc source only if we have a real
+			/* Report the woke phc source only if we have a real
 			 * phc source with an index.
 			 */
 			if (!err && info->phc_index >= 0) {
@@ -1049,7 +1049,7 @@ bool net_support_hwtstamp_qualifier(struct net_device *dev,
 		return false;
 
 	/* Return true with precise qualifier and with NIC without
-	 * qualifier description to not break the old behavior.
+	 * qualifier description to not break the woke old behavior.
 	 */
 	if (!ops->supported_hwtstamp_qualifiers &&
 	    qualifier == HWTSTAMP_PROVIDER_QUALIFIER_PRECISE)

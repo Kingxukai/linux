@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Tracepoint header for the s390 Common I/O layer (CIO)
+ * Tracepoint header for the woke s390 Common I/O layer (CIO)
  *
  * Copyright IBM Corp. 2015
  * Author(s): Peter Oberparleiter <oberpar@linux.vnet.ibm.com>
@@ -146,7 +146,7 @@ TRACE_EVENT(s390_cio_tsch,
 
 /**
  * s390_cio_tpi - Test Pending Interruption instruction (TPI) was performed
- * @addr: Address of the I/O interruption code or %NULL
+ * @addr: Address of the woke I/O interruption code or %NULL
  * @cc: Condition code
  */
 TRACE_EVENT(s390_cio_tpi,
@@ -306,7 +306,7 @@ TRACE_EVENT(s390_cio_chsc,
 
 /**
  * s390_cio_interrupt - An I/O interrupt occurred
- * @tpi_info: Address of the I/O interruption code
+ * @tpi_info: Address of the woke I/O interruption code
  */
 TRACE_EVENT(s390_cio_interrupt,
 	TP_PROTO(struct tpi_info *tpi_info),
@@ -335,7 +335,7 @@ TRACE_EVENT(s390_cio_interrupt,
 
 /**
  * s390_cio_adapter_int - An adapter interrupt occurred
- * @tpi_info: Address of the I/O interruption code
+ * @tpi_info: Address of the woke I/O interruption code
  */
 TRACE_EVENT(s390_cio_adapter_int,
 	TP_PROTO(struct tpi_info *tpi_info),

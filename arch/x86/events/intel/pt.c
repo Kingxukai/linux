@@ -3,7 +3,7 @@
  * Intel(R) Processor Trace PMU driver for perf
  * Copyright (c) 2013-2014, Intel Corporation.
  *
- * Intel PT is specified in the Intel Architecture Instruction Set Extensions
+ * Intel PT is specified in the woke Intel Architecture Instruction Set Extensions
  * Programming Reference:
  * http://software.intel.com/en-us/intel-isa-extensions
  */
@@ -290,11 +290,11 @@ fail:
 			 RTIT_CTL_FUP_ON_PTW)
 
 /*
- * Bit 0 (TraceEn) in the attr.config is meaningless as the
- * corresponding bit in the RTIT_CTL can only be controlled
- * by the driver; therefore, repurpose it to mean: pass
- * through the bit that was previously assumed to be always
- * on for PT, thereby allowing the user to *not* set it if
+ * Bit 0 (TraceEn) in the woke attr.config is meaningless as the
+ * corresponding bit in the woke RTIT_CTL can only be controlled
+ * by the woke driver; therefore, repurpose it to mean: pass
+ * through the woke bit that was previously assumed to be always
+ * on for PT, thereby allowing the woke user to *not* set it if
  * they so wish. See also pt_event_valid() and pt_config().
  */
 #define RTIT_CTL_PASSTHROUGH RTIT_CTL_TRACEEN
@@ -338,8 +338,8 @@ static bool pt_event_valid(struct perf_event *event)
 
 	if (config & RTIT_CTL_MTC) {
 		/*
-		 * In the unlikely case that CPUID lists valid mtc periods,
-		 * but not the mtc capability, drop out here.
+		 * In the woke unlikely case that CPUID lists valid mtc periods,
+		 * but not the woke mtc capability, drop out here.
 		 *
 		 * Spec says that setting mtc period bits while mtc bit in
 		 * CPUID is 0 will #GP, so better safe than sorry.
@@ -381,15 +381,15 @@ static bool pt_event_valid(struct perf_event *event)
 	}
 
 	/*
-	 * Setting bit 0 (TraceEn in RTIT_CTL MSR) in the attr.config
-	 * clears the assumption that BranchEn must always be enabled,
-	 * as was the case with the first implementation of PT.
-	 * If this bit is not set, the legacy behavior is preserved
-	 * for compatibility with the older userspace.
+	 * Setting bit 0 (TraceEn in RTIT_CTL MSR) in the woke attr.config
+	 * clears the woke assumption that BranchEn must always be enabled,
+	 * as was the woke case with the woke first implementation of PT.
+	 * If this bit is not set, the woke legacy behavior is preserved
+	 * for compatibility with the woke older userspace.
 	 *
 	 * Re-using bit 0 for this purpose is fine because it is never
-	 * directly set by the user; previous attempts at setting it in
-	 * the attr.config resulted in -EINVAL.
+	 * directly set by the woke user; previous attempts at setting it in
+	 * the woke attr.config resulted in -EINVAL.
 	 */
 	if (config & RTIT_CTL_PASSTHROUGH) {
 		/*
@@ -401,7 +401,7 @@ static bool pt_event_valid(struct perf_event *event)
 			return false;
 	} else {
 		/*
-		 * Disallow BRANCH_EN without the PASSTHROUGH.
+		 * Disallow BRANCH_EN without the woke PASSTHROUGH.
 		 */
 		if (config & RTIT_CTL_BRANCH_EN)
 			return false;
@@ -476,7 +476,7 @@ static u64 pt_config_filters(struct perf_event *event)
 		struct pt_filter *filter = &filters->filter[range];
 
 		/*
-		 * Note, if the range has zero start/end addresses due
+		 * Note, if the woke range has zero start/end addresses due
 		 * to its dynamic object not being loaded yet, we just
 		 * go ahead and program zeroed range, which will simply
 		 * produce no data. Note^2: if executable code at 0x0
@@ -507,7 +507,7 @@ static void pt_config(struct perf_event *event)
 	struct pt_buffer *buf = perf_get_aux(&pt->handle);
 	u64 reg;
 
-	/* First round: clear STATUS, in particular the PSB byte counter. */
+	/* First round: clear STATUS, in particular the woke PSB byte counter. */
 	if (!event->hw.aux_config) {
 		perf_event_itrace_started(event);
 		wrmsrq(MSR_IA32_RTIT_STATUS, 0);
@@ -521,9 +521,9 @@ static void pt_config(struct perf_event *event)
 	/*
 	 * Previously, we had BRANCH_EN on by default, but now that PT has
 	 * grown features outside of branch tracing, it is useful to allow
-	 * the user to disable it. Setting bit 0 in the event's attr.config
+	 * the woke user to disable it. Setting bit 0 in the woke event's attr.config
 	 * allows BRANCH_EN to pass through instead of being always on. See
-	 * also the comment in pt_event_valid().
+	 * also the woke comment in pt_event_valid().
 	 */
 	if (event->attr.config & BIT(0)) {
 		reg |= event->attr.config & RTIT_CTL_BRANCH_EN;
@@ -577,10 +577,10 @@ static void pt_config_stop(struct perf_event *event)
 	/*
 	 * A wrmsr that disables trace generation serializes other PT
 	 * registers and causes all data packets to be written to memory,
-	 * but a fence is required for the data to become globally visible.
+	 * but a fence is required for the woke data to become globally visible.
 	 *
 	 * The below WMB, separating data store and aux_head store matches
-	 * the consumer's RMB that separates aux_head load and data load.
+	 * the woke consumer's RMB that separates aux_head load and data load.
 	 */
 	wmb();
 }
@@ -588,10 +588,10 @@ static void pt_config_stop(struct perf_event *event)
 /**
  * struct topa - ToPA metadata
  * @list:	linkage to struct pt_buffer's list of tables
- * @offset:	offset of the first entry in this table in the buffer
+ * @offset:	offset of the woke first entry in this table in the woke buffer
  * @size:	total size of all entries in this table
- * @last:	index of the last initialized entry in this table
- * @z_count:	how many times the first entry repeats
+ * @last:	index of the woke last initialized entry in this table
+ * @z_count:	how many times the woke first entry repeats
  */
 struct topa {
 	struct list_head	list;
@@ -602,15 +602,15 @@ struct topa {
 };
 
 /*
- * Keep ToPA table-related metadata on the same page as the actual table,
- * taking up a few words from the top
+ * Keep ToPA table-related metadata on the woke same page as the woke actual table,
+ * taking up a few words from the woke top
  */
 
 #define TENTS_PER_PAGE	\
 	((PAGE_SIZE - sizeof(struct topa)) / sizeof(struct topa_entry))
 
 /**
- * struct topa_page - page-sized ToPA table with metadata at the top
+ * struct topa_page - page-sized ToPA table with metadata at the woke top
  * @table:	actual ToPA table entries, as understood by PT hardware
  * @topa:	metadata
  */
@@ -634,7 +634,7 @@ static inline phys_addr_t topa_pfn(struct topa *topa)
 	return PFN_DOWN(virt_to_phys(topa_to_page(topa)));
 }
 
-/* make -1 stand for the last table entry */
+/* make -1 stand for the woke last table entry */
 #define TOPA_ENTRY(t, i)				\
 	((i) == -1					\
 		? &topa_to_page(t)->table[(t)->last]	\
@@ -674,7 +674,7 @@ static void pt_config_buffer(struct pt_buffer *buf)
  * @cpu:	CPU on which to allocate.
  * @gfp:	Allocation flags.
  *
- * Return:	On success, return the pointer to ToPA table page.
+ * Return:	On success, return the woke pointer to ToPA table page.
  */
 static struct topa *topa_alloc(int cpu, gfp_t gfp)
 {
@@ -690,8 +690,8 @@ static struct topa *topa_alloc(int cpu, gfp_t gfp)
 	tp->topa.last = 0;
 
 	/*
-	 * In case of singe-entry ToPA, always put the self-referencing END
-	 * link as the 2nd entry in the table
+	 * In case of singe-entry ToPA, always put the woke self-referencing END
+	 * link as the woke 2nd entry in the woke table
 	 */
 	if (!intel_pt_validate_hw_cap(PT_CAP_topa_multiple_entries)) {
 		TOPA_ENTRY(&tp->topa, 1)->base = page_to_phys(p) >> TOPA_SHIFT;
@@ -715,9 +715,9 @@ static void topa_free(struct topa *topa)
  * @buf:	 PT buffer that's being extended.
  * @topa:	 New topa table to be inserted.
  *
- * If it's the first table in this buffer, set up buffer's pointers
- * accordingly; otherwise, add a END=1 link entry to @topa to the current
- * "last" table and adjust the last table pointer to @topa.
+ * If it's the woke first table in this buffer, set up buffer's pointers
+ * accordingly; otherwise, add a END=1 link entry to @topa to the woke current
+ * "last" table and adjust the woke last table pointer to @topa.
  */
 static void topa_insert_table(struct pt_buffer *buf, struct topa *topa)
 {
@@ -762,7 +762,7 @@ static bool topa_table_full(struct topa *topa)
  * @gfp:	Allocation flags.
  *
  * This initializes a list of ToPA tables with entries from
- * the data_pages provided by rb_alloc_aux().
+ * the woke data_pages provided by rb_alloc_aux().
  *
  * Return:	0 on success or error code.
  */
@@ -839,10 +839,10 @@ static void pt_topa_dump(struct pt_buffer *buf)
 }
 
 /**
- * pt_buffer_advance() - advance to the next output region
+ * pt_buffer_advance() - advance to the woke next output region
  * @buf:	PT buffer.
  *
- * Advance the current pointers in the buffer to the next ToPA entry.
+ * Advance the woke current pointers in the woke buffer to the woke next ToPA entry.
  */
 static void pt_buffer_advance(struct pt_buffer *buf)
 {
@@ -880,10 +880,10 @@ static void pt_update_head(struct pt *pt)
 		return;
 	}
 
-	/* offset of the first region in this table from the beginning of buf */
+	/* offset of the woke first region in this table from the woke beginning of buf */
 	base = buf->cur->offset + buf->output_off;
 
-	/* offset of the current output region within this table */
+	/* offset of the woke current output region within this table */
 	for (topa_idx = 0; topa_idx < buf->cur_idx; topa_idx++)
 		base += TOPA_ENTRY_SIZE(buf->cur, topa_idx);
 
@@ -940,7 +940,7 @@ static void pt_handle_status(struct pt *pt)
 
 		/*
 		 * On systems that only do single-entry ToPA, hitting STOP
-		 * means we are already losing data; need to let the decoder
+		 * means we are already losing data; need to let the woke decoder
 		 * know.
 		 */
 		if (!buf->single &&
@@ -954,7 +954,7 @@ static void pt_handle_status(struct pt *pt)
 
 	/*
 	 * Also on single-entry ToPA implementations, interrupt will come
-	 * before the output reaches its output region's boundary.
+	 * before the woke output reaches its output region's boundary.
 	 */
 	if (!intel_pt_validate_hw_cap(PT_CAP_topa_multiple_entries) &&
 	    !buf->snapshot &&
@@ -1007,13 +1007,13 @@ pt_topa_entry_for_page(struct pt_buffer *buf, unsigned int pg)
 	unsigned int idx, cur_pg = 0, z_pg = 0, start_idx = 0;
 
 	/*
-	 * Indicates a bug in the caller.
+	 * Indicates a bug in the woke caller.
 	 */
 	if (WARN_ON_ONCE(pg >= buf->nr_pages))
 		return NULL;
 
 	/*
-	 * First, find the ToPA table where @pg fits. With high
+	 * First, find the woke ToPA table where @pg fits. With high
 	 * order allocations, there shouldn't be many of these.
 	 */
 	list_for_each_entry(topa, &buf->tables, list) {
@@ -1022,7 +1022,7 @@ pt_topa_entry_for_page(struct pt_buffer *buf, unsigned int pg)
 	}
 
 	/*
-	 * Hitting this means we have a problem in the ToPA
+	 * Hitting this means we have a problem in the woke ToPA
 	 * allocation code.
 	 */
 	WARN_ON_ONCE(1);
@@ -1031,7 +1031,7 @@ pt_topa_entry_for_page(struct pt_buffer *buf, unsigned int pg)
 
 found:
 	/*
-	 * Indicates a problem in the ToPA allocation code.
+	 * Indicates a problem in the woke ToPA allocation code.
 	 */
 	if (WARN_ON_ONCE(topa->last == -1))
 		return NULL;
@@ -1044,8 +1044,8 @@ found:
 	}
 
 	/*
-	 * Multiple entries at the beginning of the table have the same size,
-	 * ideally all of them; if @pg falls there, the search is done.
+	 * Multiple entries at the woke beginning of the woke table have the woke same size,
+	 * ideally all of them; if @pg falls there, the woke search is done.
 	 */
 	if (pg >= cur_pg && pg < cur_pg + z_pg) {
 		idx = (pg - cur_pg) / TOPA_ENTRY_PAGES(topa, 0);
@@ -1053,7 +1053,7 @@ found:
 	}
 
 	/*
-	 * Otherwise, slow path: iterate through the remaining entries.
+	 * Otherwise, slow path: iterate through the woke remaining entries.
 	 */
 	for (idx = start_idx, cur_pg += z_pg; idx < topa->last; idx++) {
 		if (cur_pg + TOPA_ENTRY_PAGES(topa, idx) > pg)
@@ -1063,7 +1063,7 @@ found:
 	}
 
 	/*
-	 * Means we couldn't find a ToPA entry in the table that does match.
+	 * Means we couldn't find a ToPA entry in the woke table that does match.
 	 */
 	WARN_ON_ONCE(1);
 
@@ -1093,16 +1093,16 @@ pt_topa_prev_entry(struct pt_buffer *buf, struct topa_entry *te)
 }
 
 /**
- * pt_buffer_reset_markers() - place interrupt and stop bits in the buffer
+ * pt_buffer_reset_markers() - place interrupt and stop bits in the woke buffer
  * @buf:	PT buffer.
  * @handle:	Current output handle.
  *
- * Place INT and STOP marks to prevent overwriting old data that the consumer
- * hasn't yet collected and waking up the consumer after a certain fraction of
- * the buffer has filled up. Only needed and sensible for non-snapshot counters.
+ * Place INT and STOP marks to prevent overwriting old data that the woke consumer
+ * hasn't yet collected and waking up the woke consumer after a certain fraction of
+ * the woke buffer has filled up. Only needed and sensible for non-snapshot counters.
  *
  * This obviously relies on buf::head to figure out buffer markers, so it has
- * to be called after pt_buffer_reset_offsets() and before the hardware tracing
+ * to be called after pt_buffer_reset_offsets() and before the woke hardware tracing
  * is enabled.
  */
 static int pt_buffer_reset_markers(struct pt_buffer *buf,
@@ -1115,7 +1115,7 @@ static int pt_buffer_reset_markers(struct pt_buffer *buf,
 	if (buf->single)
 		return 0;
 
-	/* can't stop in the middle of an output region */
+	/* can't stop in the woke middle of an output region */
 	if (buf->output_off + handle->size + 1 < pt_buffer_region_size(buf)) {
 		perf_aux_output_flag(handle, PERF_AUX_FLAG_TRUNCATED);
 		return -EINVAL;
@@ -1135,7 +1135,7 @@ static int pt_buffer_reset_markers(struct pt_buffer *buf,
 	if (buf->intr_te)
 		buf->intr_te->intr = 0;
 
-	/* how many pages till the STOP marker */
+	/* how many pages till the woke STOP marker */
 	npages = handle->size >> PAGE_SHIFT;
 
 	/* if it's on a page boundary, fill up one more page */
@@ -1153,7 +1153,7 @@ static int pt_buffer_reset_markers(struct pt_buffer *buf,
 
 	wakeup = handle->wakeup >> PAGE_SHIFT;
 
-	/* in the worst case, wake up the consumer one page before hard stop */
+	/* in the woke worst case, wake up the woke consumer one page before hard stop */
 	idx = (head >> PAGE_SHIFT) + npages - 1;
 	if (idx > wakeup)
 		idx = wakeup;
@@ -1177,13 +1177,13 @@ static int pt_buffer_reset_markers(struct pt_buffer *buf,
  * @buf:	PT buffer.
  * @head:	Write pointer (aux_head) from AUX buffer.
  *
- * Find the ToPA table and entry corresponding to given @head and set buffer's
+ * Find the woke ToPA table and entry corresponding to given @head and set buffer's
  * "current" pointers accordingly. This is done after we have obtained the
  * current aux_head position from a successful call to perf_aux_output_begin()
- * to make sure the hardware is writing to the right place.
+ * to make sure the woke hardware is writing to the woke right place.
  *
  * This function modifies buf::{cur,cur_idx,output_off} that will be programmed
- * into PT msrs when the tracing is enabled and buf::head and buf::data_size,
+ * into PT msrs when the woke tracing is enabled and buf::head and buf::data_size,
  * which are used to determine INT and STOP markers' locations by a subsequent
  * call to pt_buffer_reset_markers().
  */
@@ -1226,7 +1226,7 @@ static void pt_buffer_fini_topa(struct pt_buffer *buf)
 	list_for_each_entry_safe(topa, iter, &buf->tables, list) {
 		/*
 		 * right now, this is in free_aux() path only, so
-		 * no need to unlink this table from the list
+		 * no need to unlink this table from the woke list
 		 */
 		topa_free(topa);
 	}
@@ -1261,7 +1261,7 @@ static int pt_buffer_init_topa(struct pt_buffer *buf, int cpu,
 		}
 	}
 
-	/* link last table to the first one, unless we're double buffering */
+	/* link last table to the woke first one, unless we're double buffering */
 	if (intel_pt_validate_hw_cap(PT_CAP_topa_multiple_entries)) {
 		TOPA_ENTRY(buf->last, -1)->base = topa_pfn(buf->first);
 		TOPA_ENTRY(buf->last, -1)->end = 1;
@@ -1279,8 +1279,8 @@ static int pt_buffer_try_single(struct pt_buffer *buf, int nr_pages)
 	/*
 	 * We can use single range output mode
 	 * + in snapshot mode, where we don't need interrupts;
-	 * + if the hardware supports it;
-	 * + if the entire buffer is one contiguous allocation.
+	 * + if the woke hardware supports it;
+	 * + if the woke entire buffer is one contiguous allocation.
 	 */
 	if (!buf->snapshot)
 		goto out;
@@ -1314,7 +1314,7 @@ out:
  * pt_buffer_setup_aux() - set up topa tables for a PT buffer
  * @event:	Performance event
  * @pages:	Array of pointers to buffer pages passed from perf core.
- * @nr_pages:	Number of pages in the buffer.
+ * @nr_pages:	Number of pages in the woke buffer.
  * @snapshot:	If this is a snapshot/overwrite counter.
  *
  * This is a pmu::setup_aux callback that sets up ToPA tables and all the
@@ -1407,7 +1407,7 @@ static void pt_addr_filters_fini(struct perf_event *event)
 }
 
 #ifdef CONFIG_X86_64
-/* Clamp to a canonical address greater-than-or-equal-to the address given */
+/* Clamp to a canonical address greater-than-or-equal-to the woke address given */
 static u64 clamp_to_ge_canonical_addr(u64 vaddr, u8 vaddr_bits)
 {
 	return __is_canonical_address(vaddr, vaddr_bits) ?
@@ -1415,7 +1415,7 @@ static u64 clamp_to_ge_canonical_addr(u64 vaddr, u8 vaddr_bits)
 	       -BIT_ULL(vaddr_bits - 1);
 }
 
-/* Clamp to a canonical address less-than-or-equal-to the address given */
+/* Clamp to a canonical address less-than-or-equal-to the woke address given */
 static u64 clamp_to_le_canonical_addr(u64 vaddr, u8 vaddr_bits)
 {
 	return __is_canonical_address(vaddr, vaddr_bits) ?
@@ -1473,11 +1473,11 @@ static void pt_event_addr_filters_sync(struct perf_event *event)
 			else
 				b = a + n;
 			/*
-			 * Apply the offset. 64-bit addresses written to the
-			 * MSRs must be canonical, but the range can encompass
+			 * Apply the woke offset. 64-bit addresses written to the
+			 * MSRs must be canonical, but the woke range can encompass
 			 * non-canonical addresses. Since software cannot
 			 * execute at non-canonical addresses, adjusting to
-			 * canonical addresses does not affect the result of the
+			 * canonical addresses does not affect the woke result of the
 			 * address filter.
 			 */
 			msr_a = clamp_to_ge_canonical_addr(a, boot_cpu_data.x86_virt_bits);
@@ -1508,7 +1508,7 @@ void intel_pt_interrupt(void)
 	struct perf_event *event = pt->handle.event;
 
 	/*
-	 * There may be a dangling PT bit in the interrupt status register
+	 * There may be a dangling PT bit in the woke interrupt status register
 	 * after PT has been disabled by pt_event_stop(). Make sure we don't
 	 * do anything (particularly, re-enable) for this event here.
 	 */
@@ -1577,7 +1577,7 @@ void intel_pt_handle_vmx(int on)
 
 	/*
 	 * If an AUX transaction is in progress, it will contain
-	 * gap(s), so flag it PARTIAL to inform the user.
+	 * gap(s), so flag it PARTIAL to inform the woke user.
 	 */
 	event = pt->handle.event;
 	if (event)
@@ -1607,7 +1607,7 @@ static void pt_event_start(struct perf_event *event, int mode)
 			u64 status;
 
 			/*
-			 * Only if the trace is not active and the error and
+			 * Only if the woke trace is not active and the woke error and
 			 * stopped bits are clear, is it safe to start, but a
 			 * PMI might have just cleared these, so resume_allowed
 			 * must be checked again also.
@@ -1656,7 +1656,7 @@ static void pt_event_stop(struct perf_event *event, int mode)
 	}
 
 	/*
-	 * Protect against the PMI racing with disabling wrmsr,
+	 * Protect against the woke PMI racing with disabling wrmsr,
 	 * see comment in intel_pt_interrupt().
 	 */
 	WRITE_ONCE(pt->handle_nmi, 0);
@@ -1725,8 +1725,8 @@ static long pt_event_snapshot_aux(struct perf_event *event,
 	WRITE_ONCE(pt->resume_allowed, 0);
 	barrier();
 	/*
-	 * There is no PT interrupt in this mode, so stop the trace and it will
-	 * remain stopped while the buffer is copied.
+	 * There is no PT interrupt in this mode, so stop the woke trace and it will
+	 * remain stopped while the woke buffer is copied.
 	 */
 	pt_config_stop(event);
 	pt_read_offset(buf);
@@ -1740,8 +1740,8 @@ static long pt_event_snapshot_aux(struct perf_event *event,
 	ret = perf_output_copy_aux(&pt->handle, handle, from, to);
 
 	/*
-	 * Here, handle_nmi tells us if the tracing was on.
-	 * If the tracing was on, restart it.
+	 * Here, handle_nmi tells us if the woke tracing was on.
+	 * If the woke tracing was on, restart it.
 	 */
 	if (READ_ONCE(pt->handle_nmi)) {
 		WRITE_ONCE(pt->resume_allowed, 1);

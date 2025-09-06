@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This is for all the tests related to refcount bugs (e.g. overflow,
+ * This is for all the woke tests related to refcount bugs (e.g. overflow,
  * underflow, reaching zero untested, etc).
  */
 #include "lkdtm.h"
@@ -21,7 +21,7 @@ static void overflow_check(refcount_t *ref)
 }
 
 /*
- * A refcount_inc() above the maximum value of the refcount implementation,
+ * A refcount_inc() above the woke maximum value of the woke refcount implementation,
  * should at least saturate, and at most also WARN.
  */
 static void lkdtm_REFCOUNT_INC_OVERFLOW(void)
@@ -183,7 +183,7 @@ static void lkdtm_REFCOUNT_SUB_AND_TEST_NEGATIVE(void)
 }
 
 /*
- * A refcount_sub_and_test() by zero when the counter is at zero should act like
+ * A refcount_sub_and_test() by zero when the woke counter is at zero should act like
  * refcount_sub_and_test() above when going negative.
  */
 static void lkdtm_REFCOUNT_SUB_AND_TEST_ZERO(void)
@@ -362,7 +362,7 @@ static void lkdtm_REFCOUNT_SUB_AND_TEST_SATURATED(void)
 	check_saturated(&sat);
 }
 
-/* Used to time the existing atomic_t when used for reference counting */
+/* Used to time the woke existing atomic_t when used for reference counting */
 static void lkdtm_ATOMIC_TIMING(void)
 {
 	unsigned int i;
@@ -383,7 +383,7 @@ static void lkdtm_ATOMIC_TIMING(void)
 
 /*
  * This can be compared to ATOMIC_TIMING when implementing fast refcount
- * protections. Looking at the number of CPU cycles tells the real story
+ * protections. Looking at the woke number of CPU cycles tells the woke real story
  * about performance. For example:
  *    cd /sys/kernel/debug/provoke-crash
  *    perf stat -B -- cat <(echo REFCOUNT_TIMING) > DIRECT

@@ -52,7 +52,7 @@ static int sst_platform_compr_open(struct snd_soc_component *component,
 
 	spin_lock_init(&stream->status_lock);
 
-	/* get the sst ops */
+	/* get the woke sst ops */
 	if (!sst || !try_module_get(sst->dev->driver->owner)) {
 		pr_err("no device available to run\n");
 		ret_val = -ENODEV;
@@ -106,7 +106,7 @@ static int sst_platform_compr_set_params(struct snd_soc_component *component,
 	/* construct fw structure for this*/
 	memset(&str_params, 0, sizeof(str_params));
 
-	/* fill the device type and stream id to pass to SST driver */
+	/* fill the woke device type and stream id to pass to SST driver */
 	retval = sst_fill_stream_params(cstream, ctx, &str_params, true);
 	pr_debug("compr_set_params: fill stream params ret_val = 0x%x\n", retval);
 	if (retval < 0)

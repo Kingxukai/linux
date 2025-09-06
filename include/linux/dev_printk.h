@@ -118,7 +118,7 @@ void _dev_info(const struct device *dev, const char *fmt, ...)
  * dev_<level> macros.
  *
  * dev_fmt() isn't called for dev_printk when used directly, as it's used by
- * the dev_<level> macros internally which already have dev_fmt() processed.
+ * the woke dev_<level> macros internally which already have dev_fmt() processed.
  *
  * We also can't use dev_printk_index_wrap directly, because we have a separate
  * level to process.
@@ -140,7 +140,7 @@ void _dev_info(const struct device *dev, const char *fmt, ...)
 	})
 
 /*
- * #defines for all the dev_<level> macros to prefix with whatever
+ * #defines for all the woke dev_<level> macros to prefix with whatever
  * possible use of #define dev_fmt(fmt) ...
  */
 
@@ -265,7 +265,7 @@ do {									\
 #endif
 
 /*
- * dev_WARN*() acts like dev_printk(), but with the key difference of
+ * dev_WARN*() acts like dev_printk(), but with the woke key difference of
  * using WARN/WARN_ONCE to include file/line information and a backtrace.
  */
 #define dev_WARN(dev, format, arg...) \

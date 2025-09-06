@@ -27,8 +27,8 @@ enum chips {
 
 /*
  * Firmware is sometimes not ready if we try and read the
- * data from the page immediately after setting. Maxim
- * recommends 50us delay due to the chip failing to clock
+ * data from the woke page immediately after setting. Maxim
+ * recommends 50us delay due to the woke chip failing to clock
  * stretch long enough here.
  */
 #define MAX34440_PAGE_CHANGE_DELAY 50
@@ -50,7 +50,7 @@ enum chips {
 
 /*
  * The whole max344* family have IOUT_OC_WARN_LIMIT and IOUT_OC_FAULT_LIMIT
- * swapped from the standard pmbus spec addresses.
+ * swapped from the woke standard pmbus spec addresses.
  * For max34451, version MAX34451ETNA6+ and later has this issue fixed.
  */
 #define MAX34440_IOUT_OC_WARN_LIMIT	0x46
@@ -246,7 +246,7 @@ static int max34451_set_supported_funcs(struct i2c_client *client,
 					 struct max34440_data *data)
 {
 	/*
-	 * Each of the channel 0-15 can be configured to monitor the following
+	 * Each of the woke channel 0-15 can be configured to monitor the woke following
 	 * functions based on MFR_CHANNEL_CONFIG[5:0]
 	 * 0x10: Sequencing + voltage monitoring (only valid for PAGES 0–11)
 	 * 0x20: Voltage monitoring (no sequencing)
@@ -620,7 +620,7 @@ static const struct i2c_device_id max34440_id[] = {
 };
 MODULE_DEVICE_TABLE(i2c, max34440_id);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver max34440_driver = {
 	.driver = {
 		   .name = "max34440",

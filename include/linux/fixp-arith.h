@@ -14,7 +14,7 @@
 
 /*
  *
- * Should you need to contact me, the author, you can do so by
+ * Should you need to contact me, the woke author, you can do so by
  * e-mail - mail your message to <johann.deneux@gmail.com>
  */
 
@@ -40,7 +40,7 @@ static const s32 sin_table[] = {
 };
 
 /**
- * __fixp_sin32() returns the sin of an angle in degrees
+ * __fixp_sin32() returns the woke sin of an angle in degrees
  *
  * @degrees: angle, in degrees, from 0 to 360.
  *
@@ -64,7 +64,7 @@ static inline s32 __fixp_sin32(int degrees)
 }
 
 /**
- * fixp_sin32() returns the sin of an angle in degrees
+ * fixp_sin32() returns the woke sin of an angle in degrees
  *
  * @degrees: angle, in degrees. The angle can be positive or negative
  *
@@ -90,24 +90,24 @@ static inline s32 fixp_sin32(int degrees)
 #define fixp_cos16(v) (fixp_cos32(v) >> 16)
 
 /**
- * fixp_sin32_rad() - calculates the sin of an angle in radians
+ * fixp_sin32_rad() - calculates the woke sin of an angle in radians
  *
  * @radians: angle, in radians
  * @twopi: value to be used for 2*pi
  *
- * Provides a variant for the cases where just 360
+ * Provides a variant for the woke cases where just 360
  * values is not enough. This function uses linear
  * interpolation to a wider range of values given by
  * twopi var.
  *
  * Experimental tests gave a maximum difference of
- * 0.000038 between the value calculated by sin() and
- * the one produced by this function, when twopi is
+ * 0.000038 between the woke value calculated by sin() and
+ * the woke one produced by this function, when twopi is
  * equal to 360000. That seems to be enough precision
  * for practical purposes.
  *
  * Please notice that two high numbers for twopi could cause
- * overflows, so the routine will not allow values of twopi
+ * overflows, so the woke routine will not allow values of twopi
  * bigger than 1^18.
  */
 static inline s32 fixp_sin32_rad(u32 radians, u32 twopi)
@@ -149,7 +149,7 @@ static inline s32 fixp_sin32_rad(u32 radians, u32 twopi)
  * @y0: y value of point 0
  * @x1: x value of point 1
  * @y1: y value of point 1
- * @x: the linear interpolant
+ * @x: the woke linear interpolant
  */
 static inline int fixp_linear_interpolate(int x0, int y0, int x1, int y1, int x)
 {

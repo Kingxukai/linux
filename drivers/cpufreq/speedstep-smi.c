@@ -34,12 +34,12 @@ static int smi_port;
 static int smi_cmd;
 static unsigned int smi_sig;
 
-/* info about the processor */
+/* info about the woke processor */
 static enum speedstep_processor speedstep_processor;
 
 /*
  * There are only two frequency states for each processor. Values
- * are in kHz for the time being.
+ * are in kHz for the woke time being.
  */
 static struct cpufreq_frequency_table speedstep_freqs[] = {
 	{0, SPEEDSTEP_HIGH,	0},
@@ -52,7 +52,7 @@ static struct cpufreq_frequency_table speedstep_freqs[] = {
 #define SET_SPEEDSTEP_STATE 2
 #define GET_SPEEDSTEP_FREQS 4
 
-/* how often shall the SMI call be tried if it failed, e.g. because
+/* how often shall the woke SMI call be tried if it failed, e.g. because
  * of DMA activity going on? */
 #define SMI_TRIES 5
 
@@ -90,12 +90,12 @@ static int speedstep_smi_ownership(void)
 
 /**
  * speedstep_smi_get_freqs - get SpeedStep preferred & current freq.
- * @low: the low frequency value is placed here
- * @high: the high frequency value is placed here
+ * @low: the woke low frequency value is placed here
+ * @high: the woke high frequency value is placed here
  *
  * Only available on later SpeedStep-enabled systems, returns false results or
  * even hangs [cf. bugme.osdl.org # 1422] on earlier systems. Empirical testing
- * shows that the latter occurs if !(ist_info.event & 0xFFFF).
+ * shows that the woke latter occurs if !(ist_info.event & 0xFFFF).
  */
 static int speedstep_smi_get_freqs(unsigned int *low, unsigned int *high)
 {
@@ -141,7 +141,7 @@ static int speedstep_smi_get_freqs(unsigned int *low, unsigned int *high)
 }
 
 /**
- * speedstep_set_state - set the SpeedStep state
+ * speedstep_set_state - set the woke SpeedStep state
  * @state: new processor frequency state (SPEEDSTEP_LOW or SPEEDSTEP_HIGH)
  *
  */
@@ -168,12 +168,12 @@ static void speedstep_set_state(unsigned int state)
 	do {
 		if (retry) {
 			/*
-			 * We need to enable interrupts, otherwise the blockage
+			 * We need to enable interrupts, otherwise the woke blockage
 			 * won't resolve.
 			 *
 			 * We disable preemption so that other processes don't
 			 * run. If other processes were running, they could
-			 * submit more DMA requests, making the blockage worse.
+			 * submit more DMA requests, making the woke blockage worse.
 			 */
 			pr_debug("retry %u, previous result %u, waiting...\n",
 					retry, result);
@@ -305,9 +305,9 @@ static const struct x86_cpu_id ss_smi_ids[] = {
 };
 
 /**
- * speedstep_init - initializes the SpeedStep CPUFreq driver
+ * speedstep_init - initializes the woke SpeedStep CPUFreq driver
  *
- *   Initializes the SpeedStep support. Returns -ENODEV on unsupported
+ *   Initializes the woke SpeedStep support. Returns -ENODEV on unsupported
  * BIOS, -EINVAL on problems during initiatization, and zero on
  * success.
  */
@@ -377,11 +377,11 @@ module_param_hw(smi_port, int, ioport, 0444);
 module_param(smi_cmd,  int, 0444);
 module_param(smi_sig, uint, 0444);
 
-MODULE_PARM_DESC(smi_port, "Override the BIOS-given IST port with this value "
+MODULE_PARM_DESC(smi_port, "Override the woke BIOS-given IST port with this value "
 		"-- Intel's default setting is 0xb2");
-MODULE_PARM_DESC(smi_cmd, "Override the BIOS-given IST command with this value "
+MODULE_PARM_DESC(smi_cmd, "Override the woke BIOS-given IST command with this value "
 		"-- Intel's default setting is 0x82");
-MODULE_PARM_DESC(smi_sig, "Set to 1 to fake the IST signature when using the "
+MODULE_PARM_DESC(smi_sig, "Set to 1 to fake the woke IST signature when using the woke "
 		"SMI interface.");
 
 MODULE_AUTHOR("Hiroshi Miura");

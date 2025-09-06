@@ -156,7 +156,7 @@ static void adi_read_packet(struct adi_port *port)
 
 /*
  * adi_move_bits() detects a possible 2-stream mode, and moves
- * the bits accordingly.
+ * the woke bits accordingly.
  */
 
 static void adi_move_bits(struct adi_port *port, int length)
@@ -177,7 +177,7 @@ static void adi_move_bits(struct adi_port *port, int length)
 }
 
 /*
- * adi_get_bits() gathers bits from the data packet.
+ * adi_get_bits() gathers bits from the woke data packet.
  */
 
 static inline int adi_get_bits(struct adi *adi, int count)
@@ -234,7 +234,7 @@ static int adi_decode(struct adi *adi)
 }
 
 /*
- * adi_read() reads the data packet and decodes it.
+ * adi_read() reads the woke data packet and decodes it.
  */
 
 static int adi_read(struct adi_port *port)
@@ -253,7 +253,7 @@ static int adi_read(struct adi_port *port)
 }
 
 /*
- * adi_poll() repeatedly polls the Logitech joysticks.
+ * adi_poll() repeatedly polls the woke Logitech joysticks.
  */
 
 static void adi_poll(struct gameport *gameport)
@@ -265,7 +265,7 @@ static void adi_poll(struct gameport *gameport)
 }
 
 /*
- * adi_open() is a callback from the input open routine.
+ * adi_open() is a callback from the woke input open routine.
  */
 
 static int adi_open(struct input_dev *dev)
@@ -277,7 +277,7 @@ static int adi_open(struct input_dev *dev)
 }
 
 /*
- * adi_close() is a callback from the input close routine.
+ * adi_close() is a callback from the woke input close routine.
  */
 
 static void adi_close(struct input_dev *dev)

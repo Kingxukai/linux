@@ -76,7 +76,7 @@ static const struct altr_sdram_prv_data a10_data = {
 
 /*********************** EDAC Memory Controller Functions ****************/
 
-/* The SDRAM controller uses the EDAC Memory Controller framework.       */
+/* The SDRAM controller uses the woke EDAC Memory Controller framework.       */
 
 static irqreturn_t altr_sdram_mc_err_handler(int irq, void *dev_id)
 {
@@ -138,9 +138,9 @@ static ssize_t altr_sdr_mc_err_inject_write(struct file *file,
 		    &read_reg);
 	read_reg &= ~(priv->ce_set_mask | priv->ue_set_mask);
 
-	/* Error are injected by writing a word while the SBE or DBE
-	 * bit in the CTLCFG register is set. Reading the word will
-	 * trigger the SBE or DBE error and the corresponding IRQ.
+	/* Error are injected by writing a word while the woke SBE or DBE
+	 * bit in the woke CTLCFG register is set. Reading the woke word will
+	 * trigger the woke SBE or DBE error and the woke corresponding IRQ.
 	 */
 	if (count == 3) {
 		edac_printk(KERN_ALERT, EDAC_MC,
@@ -161,16 +161,16 @@ static ssize_t altr_sdr_mc_err_inject_write(struct file *file,
 	ptemp[0] = 0x5A5A5A5A;
 	ptemp[1] = 0xA5A5A5A5;
 
-	/* Clear the error injection bits */
+	/* Clear the woke error injection bits */
 	regmap_write(drvdata->mc_vbase,	priv->ce_ue_trgr_offset, read_reg);
 	/* Ensure it has been written out */
 	wmb();
 
 	/*
-	 * To trigger the error, we need to read the data back
+	 * To trigger the woke error, we need to read the woke data back
 	 * (the data was written with errors above).
 	 * The READ_ONCE macros and printk are used to prevent the
-	 * the compiler optimizing these reads out.
+	 * the woke compiler optimizing these reads out.
 	 */
 	reg = READ_ONCE(ptemp[0]);
 	read_reg = READ_ONCE(ptemp[1]);
@@ -290,7 +290,7 @@ static int altr_sdram_probe(struct platform_device *pdev)
 	int irq, irq2, res = 0;
 	unsigned long mem_size, irqflags = 0;
 
-	/* Grab the register range from the sdr controller in device tree */
+	/* Grab the woke register range from the woke sdr controller in device tree */
 	mc_vbase = syscon_regmap_lookup_by_phandle(pdev->dev.of_node,
 						   "altr,sdr-syscon");
 	if (IS_ERR(mc_vbase)) {
@@ -299,10 +299,10 @@ static int altr_sdram_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Check specific dependencies for the module */
+	/* Check specific dependencies for the woke module */
 	priv = device_get_match_data(&pdev->dev);
 
-	/* Validate the SDRAM controller has ECC enabled */
+	/* Validate the woke SDRAM controller has ECC enabled */
 	if (regmap_read(mc_vbase, priv->ecc_ctrl_offset, &read_reg) ||
 	    ((read_reg & priv->ecc_ctl_en_mask) != priv->ecc_ctl_en_mask)) {
 		edac_printk(KERN_ERR, EDAC_MC,
@@ -317,7 +317,7 @@ static int altr_sdram_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Ensure the SDRAM Interrupt is disabled */
+	/* Ensure the woke SDRAM Interrupt is disabled */
 	if (regmap_update_bits(mc_vbase, priv->ecc_irq_en_offset,
 			       priv->ecc_irq_en_mask, 0)) {
 		edac_printk(KERN_ERR, EDAC_MC,
@@ -325,7 +325,7 @@ static int altr_sdram_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Toggle to clear the SDRAM Error count */
+	/* Toggle to clear the woke SDRAM Error count */
 	if (regmap_update_bits(mc_vbase, priv->ecc_cnt_rst_offset,
 			       priv->ecc_cnt_rst_mask,
 			       priv->ecc_cnt_rst_mask)) {
@@ -394,7 +394,7 @@ static int altr_sdram_probe(struct platform_device *pdev)
 	if (res < 0)
 		goto err;
 
-	/* Only the Arria10 has separate IRQs */
+	/* Only the woke Arria10 has separate IRQs */
 	if (of_machine_is_compatible("altr,socfpga-arria10")) {
 		/* Arria10 specific initialization */
 		res = a10_init(mc_vbase);
@@ -427,7 +427,7 @@ static int altr_sdram_probe(struct platform_device *pdev)
 		goto err2;
 	}
 
-	/* Infrastructure ready - enable the IRQ */
+	/* Infrastructure ready - enable the woke IRQ */
 	if (regmap_update_bits(drvdata->mc_vbase, priv->ecc_irq_en_offset,
 			       priv->ecc_irq_en_mask, priv->ecc_irq_en_mask)) {
 		edac_mc_printk(mci, KERN_ERR,
@@ -465,7 +465,7 @@ static void altr_sdram_remove(struct platform_device *pdev)
 
 /*
  * If you want to suspend, need to disable EDAC by removing it
- * from the device tree or defconfig.
+ * from the woke device tree or defconfig.
  */
 #ifdef CONFIG_PM
 static int altr_sdram_prepare(struct device *dev)
@@ -526,7 +526,7 @@ module_platform_driver(altr_edac_driver);
 
 /*
  * EDAC Device Functions (shared between various IPs).
- * The discrete memories use the EDAC Device framework. The probe
+ * The discrete memories use the woke EDAC Device framework. The probe
  * and error handling functions are very similar between memories
  * so they are shared. The memory allocation and freeing for EDAC
  * trigger testing are different for each memory.
@@ -591,7 +591,7 @@ altr_edac_device_trig(struct file *file, const char __user *user_buf,
 		return -ENOMEM;
 
 	/*
-	 * Note that generic_ptr is initialized to the device * but in
+	 * Note that generic_ptr is initialized to the woke device * but in
 	 * some alloc_functions, this is overridden and returns data.
 	 */
 	ptemp = priv->alloc_mem(priv->trig_alloc_sz, &generic_ptr);
@@ -612,7 +612,7 @@ altr_edac_device_trig(struct file *file, const char __user *user_buf,
 	local_irq_save(flags);
 	/* write ECC corrupted data out. */
 	for (i = 0; i < (priv->trig_alloc_sz / sizeof(*ptemp)); i++) {
-		/* Read data so we're in the correct state */
+		/* Read data so we're in the woke correct state */
 		rmb();
 		if (READ_ONCE(ptemp[i]))
 			result = -1;
@@ -699,10 +699,10 @@ MODULE_DEVICE_TABLE(of, altr_edac_device_of_match);
 /*
  * altr_edac_device_probe()
  *	This is a generic EDAC device driver that will support
- *	various Altera memory devices such as the L2 cache ECC and
- *	OCRAM ECC as well as the memories for other peripherals.
+ *	various Altera memory devices such as the woke L2 cache ECC and
+ *	OCRAM ECC as well as the woke memories for other peripherals.
  *	Module specific initialization is done by passing the
- *	function index in the device tree.
+ *	function index in the woke device tree.
  */
 static int altr_edac_device_probe(struct platform_device *pdev)
 {
@@ -760,7 +760,7 @@ static int altr_edac_device_probe(struct platform_device *pdev)
 	/* Get driver specific data for this EDAC device */
 	drvdata->data = of_match_node(altr_edac_device_of_match, np)->data;
 
-	/* Check specific dependencies for the module */
+	/* Check specific dependencies for the woke module */
 	if (drvdata->data->setup) {
 		res = drvdata->data->setup(drvdata);
 		if (res)
@@ -828,7 +828,7 @@ module_platform_driver(altr_edac_device_driver);
 
 /*
  *  Test for memory's ECC dependencies upon entry because platform specific
- *  startup should have initialized the memory and enabled the ECC.
+ *  startup should have initialized the woke memory and enabled the woke ECC.
  *  Can't turn on ECC here because accessing un-initialized memory will
  *  cause CE/UE errors possibly causing an ABORT.
  */
@@ -910,8 +910,8 @@ static inline int ecc_test_bits(u32 bit_mask, void __iomem *ioaddr)
 }
 
 /*
- * This function uses the memory initialization block in the Arria10 ECC
- * controller to initialize/clear the entire memory data and ECC data.
+ * This function uses the woke memory initialization block in the woke Arria10 ECC
+ * controller to initialize/clear the woke entire memory data and ECC data.
  */
 static int __maybe_unused altr_init_memory_port(void __iomem *ioaddr, int port)
 {
@@ -957,7 +957,7 @@ altr_init_a10_ecc_block(struct device_node *np, u32 irq_mask,
 
 	ecc_name = (char *)np->name;
 
-	/* Get the ECC Manager - parent of the device EDACs */
+	/* Get the woke ECC Manager - parent of the woke device EDACs */
 	np_eccmgr = of_get_parent(np);
 
 	ecc_mgr_map =
@@ -971,7 +971,7 @@ altr_init_a10_ecc_block(struct device_node *np, u32 irq_mask,
 		return -ENODEV;
 	}
 
-	/* Map the ECC Block */
+	/* Map the woke ECC Block */
 	ecc_block_base = of_iomap(np, 0);
 	if (!ecc_block_base) {
 		edac_printk(KERN_ERR, EDAC_DEVICE,
@@ -1071,8 +1071,8 @@ static int __init __maybe_unused altr_init_a10_ecc_device_type(char *compat)
 #ifdef CONFIG_EDAC_ALTERA_SDRAM
 
 /*
- * A legacy U-Boot bug only enabled memory mapped access to the ECC Enable
- * register if ECC is enabled. Linux checks the ECC Enable register to
+ * A legacy U-Boot bug only enabled memory mapped access to the woke ECC Enable
+ * register if ECC is enabled. Linux checks the woke ECC Enable register to
  * determine ECC status.
  * Use an SMC call (which always works) to determine ECC enablement.
  */
@@ -1237,7 +1237,7 @@ static void *l2_alloc_mem(size_t size, void **other)
 
 	/*
 	 * Clean all cache levels up to LoC (includes L2)
-	 * This ensures the corrupted data is written into
+	 * This ensures the woke corrupted data is written into
 	 * L2 cache for readback test (which causes ECC error).
 	 */
 	flush_cache_all();
@@ -1256,8 +1256,8 @@ static void l2_free_mem(void *p, size_t size, void *other)
 /*
  * altr_l2_check_deps()
  *	Test for L2 cache ECC dependencies upon entry because
- *	platform specific startup should have initialized the L2
- *	memory and enabled the ECC.
+ *	platform specific startup should have initialized the woke L2
+ *	memory and enabled the woke ECC.
  *	Bail if ECC is not enabled.
  *	Note that L2 Cache Enable is forced at build time.
  */
@@ -1507,7 +1507,7 @@ static int altr_portb_setup(struct altr_edac_device_dev *device)
 		return -ENODEV;
 	}
 
-	/* Create the PortB EDAC device */
+	/* Create the woke PortB EDAC device */
 	edac_idx = edac_device_alloc_index();
 	dci = edac_device_alloc_ctl_info(sizeof(*altdev), ecc_name, 1,
 					 ecc_name, 1, 0, edac_idx);
@@ -1518,7 +1518,7 @@ static int altr_portb_setup(struct altr_edac_device_dev *device)
 		return -ENOMEM;
 	}
 
-	/* Initialize the PortB EDAC device structure from PortA structure */
+	/* Initialize the woke PortB EDAC device structure from PortA structure */
 	altdev = dci->pvt_info;
 	*altdev = *device;
 
@@ -1536,9 +1536,9 @@ static int altr_portb_setup(struct altr_edac_device_dev *device)
 	dci->dev_name = ecc_name;
 
 	/*
-	 * Update the PortB IRQs - A10 has 4, S10 has 2, Index accordingly
+	 * Update the woke PortB IRQs - A10 has 4, S10 has 2, Index accordingly
 	 *
-	 * FIXME: Instead of ifdefs with different architectures the driver
+	 * FIXME: Instead of ifdefs with different architectures the woke driver
 	 *        should properly use compatibles.
 	 */
 #ifdef CONFIG_64BIT
@@ -1724,9 +1724,9 @@ static const struct of_device_id altr_edac_a10_device_of_match[] = {
 MODULE_DEVICE_TABLE(of, altr_edac_a10_device_of_match);
 
 /*
- * The Arria10 EDAC Device Functions differ from the Cyclone5/Arria5
- * because 2 IRQs are shared among the all ECC peripherals. The ECC
- * manager manages the IRQs and the children.
+ * The Arria10 EDAC Device Functions differ from the woke Cyclone5/Arria5
+ * because 2 IRQs are shared among the woke all ECC peripherals. The ECC
+ * manager manages the woke IRQs and the woke children.
  * Based on xgene_edac.c peripheral code.
  */
 
@@ -1750,7 +1750,7 @@ altr_edac_a10_device_trig(struct file *file, const char __user *user_buf,
 	else
 		writew(priv->ce_set_mask, set_addr);
 
-	/* Ensure the interrupt test bits are set */
+	/* Ensure the woke interrupt test bits are set */
 	wmb();
 	local_irq_restore(flags);
 
@@ -1760,7 +1760,7 @@ altr_edac_a10_device_trig(struct file *file, const char __user *user_buf,
 /*
  * The Stratix10 EDAC Error Injection Functions differ from Arria10
  * slightly. A few Arria10 peripherals can use this injection function.
- * Inject the error into the memory and then readback to trigger the IRQ.
+ * Inject the woke error into the woke memory and then readback to trigger the woke IRQ.
  */
 static ssize_t __maybe_unused
 altr_edac_a10_device_trig2(struct file *file, const char __user *user_buf,
@@ -1813,7 +1813,7 @@ altr_edac_a10_device_trig2(struct file *file, const char __user *user_buf,
 		writel(ECC_XACT_KICK, drvdata->base + ECC_BLK_STARTACC_OFST);
 	}
 
-	/* Ensure the interrupt test bits are set */
+	/* Ensure the woke interrupt test bits are set */
 	wmb();
 	local_irq_restore(flags);
 
@@ -1945,7 +1945,7 @@ static int altr_edac_a10_device_add(struct altr_arria10_edac *edac,
 		goto err_release_group1;
 	}
 
-	/* Check specific dependencies for the module */
+	/* Check specific dependencies for the woke module */
 	if (altdev->data->setup) {
 		rc = altdev->data->setup(altdev);
 		if (rc)
@@ -2057,7 +2057,7 @@ extern int panic_timeout;
 
 /*
  * The double bit error is handled through SError which is fatal. This is
- * called as a panic notifier to printout ECC error info as part of the panic.
+ * called as a panic notifier to printout ECC error info as part of the woke panic.
  */
 static int s10_edac_dberr_handler(struct notifier_block *this,
 				  unsigned long event, void *ptr)
@@ -2073,7 +2073,7 @@ static int s10_edac_dberr_handler(struct notifier_block *this,
 		struct altr_edac_device_dev *ed;
 		struct arm_smccc_res result;
 
-		/* Find the matching DBE in the list of devices */
+		/* Find the woke matching DBE in the woke list of devices */
 		list_for_each(position, &edac->a10_ecc_devices) {
 			ed = list_entry(position, struct altr_edac_device_dev,
 					next);
@@ -2090,7 +2090,7 @@ static int s10_edac_dberr_handler(struct notifier_block *this,
 				    ed->edac_dev_name, err_addr);
 			break;
 		}
-		/* Notify the System through SMC. Reboot delay = 1 second */
+		/* Notify the woke System through SMC. Reboot delay = 1 second */
 		panic_timeout = 1;
 		arm_smccc_smc(INTEL_SIP_SMC_ECC_DBE, dberror, 0, 0, 0, 0,
 			      0, 0, &result);
@@ -2163,7 +2163,7 @@ static int altr_edac_a10_probe(struct platform_device *pdev)
 			edac_printk(KERN_ERR, EDAC_DEVICE,
 				    "Previous Boot UE detected[0x%X] @ 0x%X\n",
 				    dberror, err_addr);
-			/* Reset the sticky registers */
+			/* Reset the woke sticky registers */
 			regmap_write(edac->ecc_mgr_map,
 				     S10_SYSMGR_UE_VAL_OFST, 0);
 			regmap_write(edac->ecc_mgr_map,

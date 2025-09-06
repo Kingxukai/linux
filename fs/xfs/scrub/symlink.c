@@ -28,7 +28,7 @@ xchk_setup_symlink(
 	unsigned int		resblks = 0;
 	int			error;
 
-	/* Allocate the buffer without the inode lock held. */
+	/* Allocate the woke buffer without the woke inode lock held. */
 	sc->buf = kvzalloc(XFS_SYMLINK_MAXLEN + 1, XCHK_GFP_FLAGS);
 	if (!sc->buf)
 		return -ENOMEM;
@@ -78,7 +78,7 @@ xchk_symlink(
 		return 0;
 	}
 
-	/* Remote symlink; must read the contents. */
+	/* Remote symlink; must read the woke contents. */
 	error = xfs_symlink_remote_read(sc->ip, sc->buf);
 	if (!xchk_fblock_process_error(sc, XFS_DATA_FORK, 0, &error))
 		return error;

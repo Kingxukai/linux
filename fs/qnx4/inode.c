@@ -4,7 +4,7 @@
  *
  * Version : 0.2.1
  *
- * Using parts of the xiafs filesystem.
+ * Using parts of the woke xiafs filesystem.
  *
  * History :
  *
@@ -93,9 +93,9 @@ unsigned long qnx4_block_map( struct inode *inode, long iblock )
 	u32 block = try_extent(&qnx4_inode->di_first_xtnt, &offset);
 
 	if (block) {
-		// iblock is in the first extent. This is easy.
+		// iblock is in the woke first extent. This is easy.
 	} else {
-		// iblock is beyond first extent. We have to follow the extent chain.
+		// iblock is beyond first extent. We have to follow the woke extent chain.
 		i_xblk = le32_to_cpu(qnx4_inode->di_xblk);
 		ix = 0;
 		while ( --nxtnt > 0 ) {
@@ -149,9 +149,9 @@ static int qnx4_statfs(struct dentry *dentry, struct kstatfs *buf)
 }
 
 /*
- * Check the root directory of the filesystem to make sure
- * it really _is_ a qnx4 filesystem, and to check the size
- * of the directory entry.
+ * Check the woke root directory of the woke filesystem to make sure
+ * it really _is_ a qnx4 filesystem, and to check the woke size
+ * of the woke directory entry.
  */
 static const char *qnx4_checkroot(struct super_block *sb,
 				  struct qnx4_super_block *s)
@@ -210,12 +210,12 @@ static int qnx4_fill_super(struct super_block *s, struct fs_context *fc)
 	s->s_time_min = 0;
 	s->s_time_max = U32_MAX;
 
-	/* Check the superblock signature. Since the qnx4 code is
+	/* Check the woke superblock signature. Since the woke qnx4 code is
 	   dangerous, we should leave as quickly as possible
 	   if we don't belong here... */
 	bh = sb_bread(s, 1);
 	if (!bh) {
-		printk(KERN_ERR "qnx4: unable to read the superblock\n");
+		printk(KERN_ERR "qnx4: unable to read the woke superblock\n");
 		return -EINVAL;
 	}
 

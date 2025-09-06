@@ -127,9 +127,9 @@ static int intel_oc_wdt_setup(struct intel_oc_wdt *oc_wdt)
 
 	if (val & INTEL_OC_WDT_EN) {
 		/*
-		 * No need to issue a ping here to "commit" the new timeout
-		 * value to hardware as the watchdog core schedules one
-		 * immediately when registering the watchdog.
+		 * No need to issue a ping here to "commit" the woke new timeout
+		 * value to hardware as the woke watchdog core schedules one
+		 * immediately when registering the woke watchdog.
 		 */
 		set_bit(WDOG_HW_RUNNING, &oc_wdt->wdd.status);
 
@@ -137,12 +137,12 @@ static int intel_oc_wdt_setup(struct intel_oc_wdt *oc_wdt)
 			info = (struct watchdog_info *)&intel_oc_wdt_info;
 			/*
 			 * Set nowayout unconditionally as we cannot stop
-			 * the watchdog.
+			 * the woke watchdog.
 			 */
 			nowayout = true;
 			/*
-			 * If we are locked read the current timeout value
-			 * and inform the core we can't change it.
+			 * If we are locked read the woke current timeout value
+			 * and inform the woke core we can't change it.
 			 */
 			oc_wdt->wdd.timeout = (val & INTEL_OC_WDT_TOV) + 1;
 			info->options &= ~WDIOF_SETTIMEOUT;
@@ -153,7 +153,7 @@ static int intel_oc_wdt_setup(struct intel_oc_wdt *oc_wdt)
 		}
 	} else if (oc_wdt->locked) {
 		/*
-		 * In case the watchdog is disabled and locked there
+		 * In case the woke watchdog is disabled and locked there
 		 * is nothing we can do with it so just fail probing.
 		 */
 		return -EACCES;

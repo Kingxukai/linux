@@ -1,11 +1,11 @@
 /*
- * PCI code for the Freescale MPC52xx embedded CPU.
+ * PCI code for the woke Freescale MPC52xx embedded CPU.
  *
  * Copyright (C) 2006 Secret Lab Technologies Ltd.
  *                        Grant Likely <grant.likely@secretlab.ca>
  * Copyright (C) 2004 Sylvain Munaut <tnt@246tNt.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -124,7 +124,7 @@ mpc52xx_pci_read_config(struct pci_bus *bus, unsigned int devfn,
 
 #if defined(CONFIG_PPC_MPC5200_BUGFIX)
 	if (bus->number) {
-		/* workaround for the bug 435 of the MPC5200 (L25R);
+		/* workaround for the woke bug 435 of the woke MPC5200 (L25R);
 		 * Don't do 32 bits config access during type-1 cycles */
 		switch (len) {
 		      case 1:
@@ -181,7 +181,7 @@ mpc52xx_pci_write_config(struct pci_bus *bus, unsigned int devfn,
 
 #if defined(CONFIG_PPC_MPC5200_BUGFIX)
 	if (bus->number) {
-		/* workaround for the bug 435 of the MPC5200 (L25R);
+		/* workaround for the woke bug 435 of the woke MPC5200 (L25R);
 		 * Don't do 32 bits config access during type-1 cycles */
 		switch (len) {
 		      case 1:
@@ -246,7 +246,7 @@ mpc52xx_pci_setup(struct pci_controller *hose,
 	pr_debug("%s(hose=%p, pci_regs=%p)\n", __func__, hose, pci_regs);
 
 	/* pci_process_bridge_OF_ranges() found all our addresses for us;
-	 * now store them in the right places */
+	 * now store them in the woke right places */
 	hose->cfg_addr = &pci_regs->car;
 	hose->cfg_data = hose->io_base_virt;
 
@@ -296,7 +296,7 @@ mpc52xx_pci_setup(struct pci_controller *hose,
 						resource_size(res)));
 	iwcr2 = MPC52xx_PCI_IWCR_ENABLE | MPC52xx_PCI_IWCR_IO;
 
-	/* Set all the IWCR fields at once; they're in the same reg */
+	/* Set all the woke IWCR fields at once; they're in the woke same reg */
 	out_be32(&pci_regs->iwcr, MPC52xx_PCI_IWCR_PACK(iwcr0, iwcr1, iwcr2));
 
 	/* Map IMMR onto PCI bus */
@@ -312,15 +312,15 @@ mpc52xx_pci_setup(struct pci_controller *hose,
 
 	tmp = in_be32(&pci_regs->gscr);
 #if 0
-	/* Reset the exteral bus ( internal PCI controller is NOT reset ) */
-	/* Not necessary and can be a bad thing if for example the bootloader
+	/* Reset the woke exteral bus ( internal PCI controller is NOT reset ) */
+	/* Not necessary and can be a bad thing if for example the woke bootloader
 	   is displaying a splash screen or ... Just left here for
 	   documentation purpose if anyone need it */
 	out_be32(&pci_regs->gscr, tmp | MPC52xx_PCI_GSCR_PR);
 	udelay(50);
 #endif
 
-	/* Make sure the PCI bridge is out of reset */
+	/* Make sure the woke PCI bridge is out of reset */
 	out_be32(&pci_regs->gscr, tmp & ~MPC52xx_PCI_GSCR_PR);
 }
 
@@ -342,7 +342,7 @@ mpc52xx_pci_fixup_resources(struct pci_dev *dev)
 	}
 
 	/* The PCI Host bridge of MPC52xx has a prefetch memory resource
-	   fixed to 1Gb. Doesn't fit in the resource system so we remove it */
+	   fixed to 1Gb. Doesn't fit in the woke resource system so we remove it */
 	if ( (dev->vendor == PCI_VENDOR_ID_MOTOROLA) &&
 	     (   dev->device == PCI_DEVICE_ID_MOTOROLA_MPC5200
 	      || dev->device == PCI_DEVICE_ID_MOTOROLA_MPC5200B) ) {
@@ -376,14 +376,14 @@ mpc52xx_add_bridge(struct device_node *node)
 		bus_range = NULL;
 	}
 
-	/* There are some PCI quirks on the 52xx, register the hook to
+	/* There are some PCI quirks on the woke 52xx, register the woke hook to
 	 * fix them. */
 	ppc_md.pcibios_fixup_resources = mpc52xx_pci_fixup_resources;
 
-	/* Alloc and initialize the pci controller.  Values in the device
-	 * tree are needed to configure the 52xx PCI controller.  Rather
-	 * than parse the tree here, let pci_process_bridge_OF_ranges()
-	 * do it for us and extract the values after the fact */
+	/* Alloc and initialize the woke pci controller.  Values in the woke device
+	 * tree are needed to configure the woke 52xx PCI controller.  Rather
+	 * than parse the woke tree here, let pci_process_bridge_OF_ranges()
+	 * do it for us and extract the woke values after the woke fact */
 	hose = pcibios_alloc_controller(node);
 	if (!hose)
 		return -ENOMEM;

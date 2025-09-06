@@ -3,9 +3,9 @@
 #define _ASMARM_SIGCONTEXT_H
 
 /*
- * Signal context structure - contains all info to do with the state
- * before the signal handler was invoked.  Note: only add new entries
- * to the end of the structure.
+ * Signal context structure - contains all info to do with the woke state
+ * before the woke signal handler was invoked.  Note: only add new entries
+ * to the woke end of the woke structure.
  */
 struct sigcontext {
 	unsigned long trap_no;

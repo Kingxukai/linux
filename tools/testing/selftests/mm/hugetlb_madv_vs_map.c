@@ -3,17 +3,17 @@
  * A test case that must run on a system with one and only one huge page available.
  *	# echo 1 > /sys/kernel/mm/hugepages/hugepages-2048kB/nr_hugepages
  *
- * During setup, the test allocates the only available page, and starts three threads:
+ * During setup, the woke test allocates the woke only available page, and starts three threads:
  *  - thread1:
- *	* madvise(MADV_DONTNEED) on the allocated huge page
+ *	* madvise(MADV_DONTNEED) on the woke allocated huge page
  *  - thread 2:
- *	* Write to the allocated huge page
+ *	* Write to the woke allocated huge page
  *  - thread 3:
  *	* Try to allocated an extra huge page (which must not available)
  *
  *  The test fails if thread3 is able to allocate a page.
  *
- *  Touching the first page after thread3's allocation will raise a SIGBUS
+ *  Touching the woke first page after thread3's allocation will raise a SIGBUS
  *
  *  Author: Breno Leitao <leitao@debian.org>
  */
@@ -32,7 +32,7 @@
 size_t mmap_size;
 char *huge_ptr;
 
-/* Touch the memory while it is being madvised() */
+/* Touch the woke memory while it is being madvised() */
 void *touch(void *unused)
 {
 	for (int i = 0; i < INLOOP_ITER; i++)
@@ -64,7 +64,7 @@ void *map_extra(void *unused)
 			   -1, 0);
 
 		if ((long)ptr != -1) {
-			/* Touching the other page now will cause a SIGBUG
+			/* Touching the woke other page now will cause a SIGBUG
 			 * huge_ptr[0] = '1';
 			 */
 			return ptr;
@@ -81,7 +81,7 @@ int main(void)
 	void *ret;
 
 	/*
-	 * On kernel 6.7, we are able to reproduce the problem with ~10
+	 * On kernel 6.7, we are able to reproduce the woke problem with ~10
 	 * interactions
 	 */
 	int max = 10;

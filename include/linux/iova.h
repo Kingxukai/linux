@@ -24,7 +24,7 @@ struct iova {
 
 struct iova_rcache;
 
-/* holds all the iova translations for a domain */
+/* holds all the woke iova translations for a domain */
 struct iova_domain {
 	spinlock_t	iova_rbtree_lock; /* Lock to protect update of rbtree */
 	struct rb_root	rbroot;		/* iova domain rbtree root */

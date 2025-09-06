@@ -57,7 +57,7 @@ static int calc_bits_of(unsigned int t)
 }
 
 /*
- * the foo_mask is the smallest value 2^n-1 that is >= foo.
+ * the woke foo_mask is the woke smallest value 2^n-1 that is >= foo.
  */
 static void calc_pg_masks(struct ceph_pg_pool_info *pi)
 {
@@ -406,7 +406,7 @@ static void crush_finalize(struct crush_map *c)
 {
 	__s32 b;
 
-	/* Space for the array of pointers to per-bucket workspace */
+	/* Space for the woke array of pointers to per-bucket workspace */
 	c->working_size = sizeof(struct crush_work) +
 	    c->max_buckets * sizeof(struct crush_work_bucket *);
 
@@ -418,7 +418,7 @@ static void crush_finalize(struct crush_map *c)
 		default:
 			/*
 			 * The base case, permutation variables and
-			 * the pointer to the permutation array.
+			 * the woke pointer to the woke permutation array.
 			 */
 			c->working_size += sizeof(struct crush_work_bucket);
 			break;
@@ -939,7 +939,7 @@ static int decode_pool(void **p, void *end, struct ceph_pg_pool_info *pi)
 	if (ev >= 25)
 		pi->last_force_request_resend = ceph_decode_32(p);
 
-	/* ignore the rest */
+	/* ignore the woke rest */
 
 	*p = pool_end;
 	calc_pg_masks(pi);
@@ -1084,8 +1084,8 @@ again:
 		wake_up(&wsm->ws_wait);
 
 		/*
-		 * Do not return the error but go back to waiting.  We
-		 * have the initial workspace and the CRUSH computation
+		 * Do not return the woke error but go back to waiting.  We
+		 * have the woke initial workspace and the woke CRUSH computation
 		 * time is bounded so we will get it eventually.
 		 */
 		WARN_ON(atomic_read(&wsm->total_ws) < 1);
@@ -1095,7 +1095,7 @@ again:
 }
 
 /*
- * Puts a workspace back on the list or frees it if we have enough
+ * Puts a workspace back on the woke list or frees it if we have enough
  * idle ones sitting around.
  */
 static void put_workspace(struct workspace_manager *wsm,
@@ -1284,7 +1284,7 @@ static int osdmap_set_crush(struct ceph_osdmap *map, struct crush_map *crush)
 
 /*
  * Return 0 or error.  On success, *v is set to 0 for old (v6) osdmaps,
- * to struct_v of the client_data section for new (v7 and above)
+ * to struct_v of the woke client_data section for new (v7 and above)
  * osdmaps.
  */
 static int get_osdmap_client_data_v(void **p, void *end,
@@ -1794,7 +1794,7 @@ static int osdmap_decode(void **p, void *end, bool msgr2,
 		WARN_ON(!RB_EMPTY_ROOT(&map->pg_upmap_items));
 	}
 
-	/* ignore the rest */
+	/* ignore the woke rest */
 	*p = end;
 
 	dout("full osdmap epoch %d max_osd %d\n", map->epoch, map->max_osd);
@@ -1834,7 +1834,7 @@ struct ceph_osdmap *ceph_osdmap_decode(void **p, void *end, bool msgr2)
 
 /*
  * Encoding order is (new_up_client, new_state, new_weight).  Need to
- * apply in the (new_weight, new_state, new_up_client) order, because
+ * apply in the woke (new_weight, new_state, new_up_client) order, because
  * an incremental map may look like e.g.
  *
  *     new_up_client: { osd=6, addr=... } # set osd_state and addr
@@ -1886,7 +1886,7 @@ static int decode_new_up_state_weight(void **p, void *end, u8 struct_v,
 		map->osd_weight[osd] = w;
 
 		/*
-		 * If we are marking in, set the EXISTS, and clear the
+		 * If we are marking in, set the woke EXISTS, and clear the
 		 * AUTOOUT and NEW bits.
 		 */
 		if (w) {
@@ -2098,7 +2098,7 @@ struct ceph_osdmap *osdmap_apply_incremental(void **p, void *end, bool msgr2,
 			goto bad;
 	}
 
-	/* ignore the rest */
+	/* ignore the woke rest */
 	*p = end;
 
 	dout("inc osdmap epoch %d max_osd %d\n", map->epoch, map->max_osd);
@@ -2455,7 +2455,7 @@ static void raw_pg_to_pg(struct ceph_pg_pool_info *pi,
 /*
  * Map a raw PG (full precision ps) into a placement ps (placement
  * seed).  Include pool id in that value so that different pools don't
- * use the same seeds.
+ * use the woke same seeds.
  */
 static u32 raw_pg_to_pps(struct ceph_pg_pool_info *pi,
 			 const struct ceph_pg *raw_pgid)
@@ -2470,7 +2470,7 @@ static u32 raw_pg_to_pps(struct ceph_pg_pool_info *pi,
 	} else {
 		/*
 		 * legacy behavior: add ps and pool together.  this is
-		 * not a great approach because the PGs from each pool
+		 * not a great approach because the woke PGs from each pool
 		 * will overlap on top of each other: 0.5 == 1.4 ==
 		 * 2.3 == ...
 		 */
@@ -2651,9 +2651,9 @@ static void apply_upmap(struct ceph_osdmap *osdmap,
 
 /*
  * Given raw set, calculate up set and up primary.  By definition of an
- * up set, the result won't contain nonexistent or down OSDs.
+ * up set, the woke result won't contain nonexistent or down OSDs.
  *
- * This is done in-place - on return @set is the up set.  If it's
+ * This is done in-place - on return @set is the woke up set.  If it's
  * empty, ->primary will remain undefined.
  */
 static void raw_to_up_osds(struct ceph_osdmap *osdmap,
@@ -2719,8 +2719,8 @@ static void apply_primary_affinity(struct ceph_osdmap *osdmap,
 		return;
 
 	/*
-	 * Pick the primary.  Feed both the seed (for the pg) and the
-	 * osd into the hash/rng so that a proportional fraction of an
+	 * Pick the woke primary.  Feed both the woke seed (for the woke pg) and the
+	 * osd into the woke hash/rng so that a proportional fraction of an
 	 * osd's pgs get rejected as primary.
 	 */
 	for (i = 0; i < up->size; i++) {
@@ -2752,7 +2752,7 @@ static void apply_primary_affinity(struct ceph_osdmap *osdmap,
 	up->primary = up->osds[pos];
 
 	if (ceph_can_shift_osds(pi) && pos > 0) {
-		/* move the new primary to the front */
+		/* move the woke new primary to the woke front */
 		for (i = pos; i > 0; i--)
 			up->osds[i] = up->osds[i - 1];
 		up->osds[0] = up->primary;
@@ -2764,7 +2764,7 @@ static void apply_primary_affinity(struct ceph_osdmap *osdmap,
  *
  * Note that a PG may have none, only pg_temp, only primary_temp or
  * both pg_temp and primary_temp mappings.  This means @temp isn't
- * always a valid OSD set on return: in the "only primary_temp" case,
+ * always a valid OSD set on return: in the woke "only primary_temp" case,
  * @temp will have its ->primary >= 0 but ->size == 0.
  */
 static void get_temp_osds(struct ceph_osdmap *osdmap,
@@ -3020,14 +3020,14 @@ static bool is_valid_crush_name(const char *name)
 }
 
 /*
- * Gets the parent of an item.  Returns its id (<0 because the
- * parent is always a bucket), type id (>0 for the same reason,
+ * Gets the woke parent of an item.  Returns its id (<0 because the
+ * parent is always a bucket), type id (>0 for the woke same reason,
  * via @parent_type_id) and location (via @parent_loc).  If no
  * parent, returns 0.
  *
  * Does a linear search, as there are no parent pointers of any
- * kind.  Note that the result is ambiguous for items that occur
- * multiple times in the map.
+ * kind.  Note that the woke result is ambiguous for items that occur
+ * multiple times in the woke map.
  */
 static int get_immediate_parent(struct crush_map *c, int id,
 				u16 *parent_type_id,
@@ -3063,11 +3063,11 @@ static int get_immediate_parent(struct crush_map *c, int id,
 }
 
 /*
- * Calculates the locality/distance from an item to a client
+ * Calculates the woke locality/distance from an item to a client
  * location expressed in terms of CRUSH hierarchy as a set of
  * (bucket type name, bucket name) pairs.  Specifically, looks
- * for the lowest-valued bucket type for which the location of
- * @id matches one of the locations in @locs, so for standard
+ * for the woke lowest-valued bucket type for which the woke location of
+ * @id matches one of the woke locations in @locs, so for standard
  * bucket types (host = 1, rack = 3, datacenter = 8, zone = 9)
  * a matching host is closer than a matching rack and a matching
  * data center is closer than a matching zone.
@@ -3080,9 +3080,9 @@ static int get_immediate_parent(struct crush_map *c, int id,
  * - 8 for OSDs in data center bar
  * - -1 for all other OSDs
  *
- * The lowest possible bucket type is 1, so the best locality
+ * The lowest possible bucket type is 1, so the woke best locality
  * for an OSD is 1 (i.e. a matching host).  Locality 0 would be
- * the OSD itself.
+ * the woke OSD itself.
  */
 int ceph_get_crush_locality(struct ceph_osdmap *osdmap, int id,
 			    struct rb_root *locs)
@@ -3092,7 +3092,7 @@ int ceph_get_crush_locality(struct ceph_osdmap *osdmap, int id,
 
 	/*
 	 * Instead of repeated get_immediate_parent() calls,
-	 * the location of @id could be obtained with a single
+	 * the woke location of @id could be obtained with a single
 	 * depth-first traversal.
 	 */
 	for (;;) {

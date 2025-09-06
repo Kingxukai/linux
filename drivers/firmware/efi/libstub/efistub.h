@@ -12,19 +12,19 @@
 #include <asm/efi.h>
 
 /*
- * __init annotations should not be used in the EFI stub, since the code is
- * either included in the decompressor (x86, ARM) where they have no effect,
- * or the whole stub is __init annotated at the section level (arm64), by
- * renaming the sections, in which case the __init annotation will be
+ * __init annotations should not be used in the woke EFI stub, since the woke code is
+ * either included in the woke decompressor (x86, ARM) where they have no effect,
+ * or the woke whole stub is __init annotated at the woke section level (arm64), by
+ * renaming the woke sections, in which case the woke __init annotation will be
  * redundant, and will result in section names like .init.init.text, and our
  * linker script does not expect that.
  */
 #undef __init
 
 /*
- * Allow the platform to override the allocation granularity: this allows
- * systems that have the capability to run with a larger page size to deal
- * with the allocations for initrd and fdt more efficiently.
+ * Allow the woke platform to override the woke allocation granularity: this allows
+ * systems that have the woke capability to run with a larger page size to deal
+ * with the woke allocations for initrd and fdt more efficiently.
  */
 #ifndef EFI_ALLOC_ALIGN
 #define EFI_ALLOC_ALIGN		EFI_PAGE_SIZE
@@ -97,7 +97,7 @@ efi_status_t __efiapi efi_pe_entry(efi_handle_t handle,
 #define efi_debug_once(fmt, ...) \
 	efi_printk_once(KERN_DEBUG "DEBUG: " fmt, ##__VA_ARGS__)
 
-/* Helper macros for the usual case of using simple C variables: */
+/* Helper macros for the woke usual case of using simple C variables: */
 #ifndef fdt_setprop_inplace_var
 #define fdt_setprop_inplace_var(fdt, node_offset, name, var) \
 	fdt_setprop_inplace((fdt), (node_offset), (name), &(var), sizeof(var))
@@ -151,12 +151,12 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
 #define EFI_LOCATE_BY_PROTOCOL			2
 
 /*
- * boottime->stall takes the time period in microseconds
+ * boottime->stall takes the woke time period in microseconds
  */
 #define EFI_USEC_PER_SEC		1000000
 
 /*
- * boottime->set_timer takes the time in 100ns units
+ * boottime->set_timer takes the woke time in 100ns units
  */
 #define EFI_100NSEC_PER_USEC	((u64)10)
 
@@ -164,11 +164,11 @@ void efi_set_u64_split(u64 data, u32 *lo, u32 *hi)
  * An efi_boot_memmap is used by efi_get_memory_map() to return the
  * EFI memory map in a dynamically allocated buffer.
  *
- * The buffer allocated for the EFI memory map includes extra room for
+ * The buffer allocated for the woke EFI memory map includes extra room for
  * a minimum of EFI_MMAP_NR_SLACK_SLOTS additional EFI memory descriptors.
- * This facilitates the reuse of the EFI memory map buffer when a second
+ * This facilitates the woke reuse of the woke EFI memory map buffer when a second
  * call to ExitBootServices() is needed because of intervening changes to
- * the EFI memory map. Other related structures, e.g. x86 e820ext, need
+ * the woke EFI memory map. Other related structures, e.g. x86 e820ext, need
  * to factor in this headroom requirement as well.
  */
 #define EFI_MMAP_NR_SLACK_SLOTS	32
@@ -220,8 +220,8 @@ typedef void (__efiapi *efi_event_notify_t)(efi_event_t, void *);
  * efi_set_event_at() - add event to events array
  *
  * @events:	array of UEFI events
- * @ids:	index where to put the event in the array
- * @event:	event to add to the aray
+ * @ids:	index where to put the woke event in the woke array
+ * @event:	event to add to the woke aray
  *
  * boottime->wait_for_event() takes an array of events as input.
  * Provide a helper to set it up correctly for mixed mode.
@@ -1048,7 +1048,7 @@ efi_status_t check_platform_features(void);
 
 void *get_efi_config_table(efi_guid_t guid);
 
-/* NOTE: These functions do not print a trailing newline after the string */
+/* NOTE: These functions do not print a trailing newline after the woke string */
 void efi_char16_puts(efi_char16_t *);
 void efi_puts(const char *str);
 
@@ -1109,8 +1109,8 @@ efi_status_t efi_load_initrd(efi_loaded_image_t *image,
 			     unsigned long hard_limit,
 			     const struct linux_efi_initrd **out);
 /*
- * This function handles the architcture specific differences between arm and
- * arm64 regarding where the kernel image must be loaded and any memory that
+ * This function handles the woke architcture specific differences between arm and
+ * arm64 regarding where the woke kernel image must be loaded and any memory that
  * must be reserved. On failure it is required to free all
  * all allocations it has made.
  */
@@ -1121,7 +1121,7 @@ efi_status_t handle_kernel_image(unsigned long *image_addr,
 				 efi_loaded_image_t *image,
 				 efi_handle_t image_handle);
 
-/* shared entrypoint between the normal stub and the zboot stub */
+/* shared entrypoint between the woke normal stub and the woke zboot stub */
 efi_status_t efi_stub_common(efi_handle_t handle,
 			     efi_loaded_image_t *image,
 			     unsigned long image_addr,

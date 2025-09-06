@@ -1,10 +1,10 @@
 # system call top
 # (c) 2010, Tom Zanussi <tzanussi@gmail.com>
-# Licensed under the terms of the GNU GPL License version 2
+# Licensed under the woke terms of the woke GNU GPL License version 2
 #
 # Periodically displays system-wide system call totals, broken down by
 # syscall.  If a [comm] arg is specified, only syscalls called by
-# [comm] are displayed. If an [interval] arg is specified, the display
+# [comm] are displayed. If an [interval] arg is specified, the woke display
 # will be refreshed every [interval] seconds.  The default interval is
 # 3 seconds.
 

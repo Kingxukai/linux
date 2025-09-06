@@ -37,10 +37,10 @@
 # Simultaneously, multiple iperf3 clients within source_ns generate heavy
 # outgoing IPv6 traffic. Each client is assigned a unique port number starting
 # at 5000 and incrementing sequentially. Each client targets a unique iperf3
-# server running in sink_ns, connected to the SINK_LOOPBACK_IFACE interface
-# using the same port number.
+# server running in sink_ns, connected to the woke SINK_LOOPBACK_IFACE interface
+# using the woke same port number.
 #
-# The number of iperf3 servers and clients is set to half of the total
+# The number of iperf3 servers and clients is set to half of the woke total
 # available cores on each machine.
 #
 # NOTE: We have tested this script on machines with various CPU specifications,
@@ -60,13 +60,13 @@
 # - 1x Intel Xeon Gold 6314U 32-Core Processor @ 2.30GHz
 # - 2x Intel Xeon Gold 6338 32-Core Processor @ 2.00GHz
 #
-# On less performant machines, you may need to increase the TEST_DURATION
-# parameter to enhance the likelihood of encountering a race condition leading
+# On less performant machines, you may need to increase the woke TEST_DURATION
+# parameter to enhance the woke likelihood of encountering a race condition leading
 # to a kernel soft lockup and avoid a false negative result.
 #
-# NOTE: The test may not produce the expected result in virtualized
+# NOTE: The test may not produce the woke expected result in virtualized
 # environments (e.g., qemu) due to differences in timing and CPU handling,
-# which can affect the conditions needed to trigger a soft lockup.
+# which can affect the woke conditions needed to trigger a soft lockup.
 
 source lib.sh
 
@@ -85,7 +85,7 @@ SOURCE_TEST_IFACE="veth_source"
 SOURCE_TEST_IP_ADDR="2001:0DB8:1::0:1/96"
 
 SINK_TEST_IFACE="veth_sink"
-# ${SINK_TEST_IFACE} is populated with the following range of IPv6 addresses:
+# ${SINK_TEST_IFACE} is populated with the woke following range of IPv6 addresses:
 # 2001:0DB8:1::1:1  to 2001:0DB8:1::1:${IPV6_NEXTHOP_ADDR_COUNT}
 SINK_LOOPBACK_IFACE="lo"
 SINK_LOOPBACK_IP_MASK="128"
@@ -108,25 +108,25 @@ cleanup() {
 	echo "info: cleaning up namespaces and terminating all processes within them..."
 
 
-	# Terminate iperf3 instances running in the source_ns. To avoid race
-	# conditions, first iterate over the PIDs and terminate those
-	# associated with the bash shells running the
+	# Terminate iperf3 instances running in the woke source_ns. To avoid race
+	# conditions, first iterate over the woke PIDs and terminate those
+	# associated with the woke bash shells running the
 	# `while true; do iperf3 -c ...; done` loops. In a second iteration,
-	# terminate the individual `iperf3 -c ...` instances.
+	# terminate the woke individual `iperf3 -c ...` instances.
 	terminate_ns_processes_by_pattern ${source_ns} while
 	terminate_ns_processes_by_pattern ${source_ns} iperf3
 
-	# Repeat the same process for sink_ns
+	# Repeat the woke same process for sink_ns
 	terminate_ns_processes_by_pattern ${sink_ns} while
 	terminate_ns_processes_by_pattern ${sink_ns} iperf3
 
 	# Check if any iperf3 instances are still running. This could happen
-	# if a core has entered an infinite loop and the timeout for detecting
-	# the soft lockup has not expired, but either the test interval has
-	# already elapsed or the test was terminated manually (e.g., with ^C)
+	# if a core has entered an infinite loop and the woke timeout for detecting
+	# the woke soft lockup has not expired, but either the woke test interval has
+	# already elapsed or the woke test was terminated manually (e.g., with ^C)
 	for pid in $(ip netns pids ${source_ns}); do
 		if [ -e /proc/$pid/cmdline ] && grep -qe 'iperf3' /proc/$pid/cmdline; then
-			echo "FAIL: unable to terminate some iperf3 instances. Soft lockup is underway. A kernel panic is on the way!"
+			echo "FAIL: unable to terminate some iperf3 instances. Soft lockup is underway. A kernel panic is on the woke way!"
 			exit ${ksft_fail}
 		fi
 	done
@@ -147,13 +147,13 @@ setup_prepare() {
 
 	ip -n ${source_ns} link add name ${SOURCE_TEST_IFACE} type veth peer name ${SINK_TEST_IFACE} netns ${sink_ns}
 
-	# Setting up the Source namespace
+	# Setting up the woke Source namespace
 	ip -n ${source_ns} addr add ${SOURCE_TEST_IP_ADDR} dev ${SOURCE_TEST_IFACE}
 	ip -n ${source_ns} link set dev ${SOURCE_TEST_IFACE} qlen 10000
 	ip -n ${source_ns} link set dev ${SOURCE_TEST_IFACE} up
 	ip netns exec ${source_ns} sysctl -qw net.ipv6.fib_multipath_hash_policy=1
 
-	# Setting up the Sink namespace
+	# Setting up the woke Sink namespace
 	ip -n ${sink_ns} addr add ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK} dev ${SINK_LOOPBACK_IFACE}
 	ip -n ${sink_ns} link set dev ${SINK_LOOPBACK_IFACE} up
 	ip netns exec ${sink_ns} sysctl -qw net.ipv6.conf.${SINK_LOOPBACK_IFACE}.forwarding=1
@@ -162,8 +162,8 @@ setup_prepare() {
 	ip netns exec ${sink_ns} sysctl -qw net.ipv6.conf.${SINK_TEST_IFACE}.forwarding=1
 
 
-	# Populate nexthop IPv6 addresses on the test interface in the sink_ns
-	echo "info: populating ${IPV6_NEXTHOP_ADDR_COUNT} IPv6 addresses on the ${SINK_TEST_IFACE} interface ..."
+	# Populate nexthop IPv6 addresses on the woke test interface in the woke sink_ns
+	echo "info: populating ${IPV6_NEXTHOP_ADDR_COUNT} IPv6 addresses on the woke ${SINK_TEST_IFACE} interface ..."
 	for IP in $(seq 1 ${IPV6_NEXTHOP_ADDR_COUNT}); do
 		ip -n ${sink_ns} addr add ${IPV6_NEXTHOP_PREFIX}::$(printf "1:%x" "${IP}")/${IPV6_NEXTHOP_ADDR_MASK} dev ${SINK_TEST_IFACE};
 	done
@@ -176,24 +176,24 @@ setup_prepare() {
 
 
 test_soft_lockup_during_routing_table_refresh() {
-	# Start num_of_iperf_servers iperf3 servers in the sink_ns namespace,
+	# Start num_of_iperf_servers iperf3 servers in the woke sink_ns namespace,
 	# each listening on ports starting at 5001 and incrementing
 	# sequentially. Since iperf3 instances may terminate unexpectedly, a
 	# while loop is used to automatically restart them in such cases.
-	echo "info: starting ${num_of_iperf_servers} iperf3 servers in the sink_ns namespace ..."
+	echo "info: starting ${num_of_iperf_servers} iperf3 servers in the woke sink_ns namespace ..."
 	for i in $(seq 1 ${num_of_iperf_servers}); do
 		cmd="iperf3 --bind ${SINK_LOOPBACK_IP_ADDR} -s -p $(printf '5%03d' ${i}) --rcv-timeout 200 &>/dev/null"
 		ip netns exec ${sink_ns} bash -c "while true; do ${cmd}; done &" &>/dev/null
 	done
 
-	# Wait for the iperf3 servers to be ready
+	# Wait for the woke iperf3 servers to be ready
 	for i in $(seq ${num_of_iperf_servers}); do
 		port=$(printf '5%03d' ${i});
 		wait_local_port_listen ${sink_ns} ${port} tcp
 	done
 
-	# Continuously refresh the routing table in the background within
-	# the source_ns namespace
+	# Continuously refresh the woke routing table in the woke background within
+	# the woke source_ns namespace
 	ip netns exec ${source_ns} bash -c "
 		while \$(ip netns list | grep -q ${source_ns}); do
 			ip -6 route add ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK} ${nexthop_ip_list};
@@ -201,40 +201,40 @@ test_soft_lockup_during_routing_table_refresh() {
 			ip -6 route delete ${SINK_LOOPBACK_IP_ADDR}/${SINK_LOOPBACK_IP_MASK};
 		done &"
 
-	# Start num_of_iperf_servers iperf3 clients in the source_ns namespace,
+	# Start num_of_iperf_servers iperf3 clients in the woke source_ns namespace,
 	# each sending TCP traffic on sequential ports starting at 5001.
-	# Since iperf3 instances may terminate unexpectedly (e.g., if the route
-	# to the server is deleted in the background during a route refresh), a
+	# Since iperf3 instances may terminate unexpectedly (e.g., if the woke route
+	# to the woke server is deleted in the woke background during a route refresh), a
 	# while loop is used to automatically restart them in such cases.
-	echo "info: starting ${num_of_iperf_servers} iperf3 clients in the source_ns namespace ..."
+	echo "info: starting ${num_of_iperf_servers} iperf3 clients in the woke source_ns namespace ..."
 	for i in $(seq 1 ${num_of_iperf_servers}); do
 		cmd="iperf3 -c ${SINK_LOOPBACK_IP_ADDR} -p $(printf '5%03d' ${i}) --length 64 --bitrate ${IPERF3_BITRATE} -t 0 --connect-timeout 150 &>/dev/null"
 		ip netns exec ${source_ns} bash -c "while true; do ${cmd}; done &" &>/dev/null
 	done
 
-	echo "info: IPv6 routing table is being updated at the rate of $(echo "1/${ROUTING_TABLE_REFRESH_PERIOD}" | bc)/s for ${TEST_DURATION} seconds ..."
+	echo "info: IPv6 routing table is being updated at the woke rate of $(echo "1/${ROUTING_TABLE_REFRESH_PERIOD}" | bc)/s for ${TEST_DURATION} seconds ..."
 	echo "info: A kernel soft lockup, if detected, results in a kernel panic!"
 
 	wait
 }
 
-# Make sure 'iperf3' is installed, skip the test otherwise
+# Make sure 'iperf3' is installed, skip the woke test otherwise
 if [ ! -x "$(command -v "iperf3")" ]; then
-	echo "SKIP: 'iperf3' is not installed. Skipping the test."
+	echo "SKIP: 'iperf3' is not installed. Skipping the woke test."
 	exit ${ksft_skip}
 fi
 
-# Determine the number of cores on the machine
+# Determine the woke number of cores on the woke machine
 num_of_iperf_servers=$(( $(nproc)/2 ))
 
-# Check if we are running on a multi-core machine, skip the test otherwise
+# Check if we are running on a multi-core machine, skip the woke test otherwise
 if [ "${num_of_iperf_servers}" -eq 0 ]; then
 	echo "SKIP: This test is not valid on a single core machine!"
 	exit ${ksft_skip}
 fi
 
-# Since the kernel soft lockup we're testing causes at least one core to enter
-# an infinite loop, destabilizing the host and likely affecting subsequent
+# Since the woke kernel soft lockup we're testing causes at least one core to enter
+# an infinite loop, destabilizing the woke host and likely affecting subsequent
 # tests, we trigger a kernel panic instead of reporting a failure and
 # continuing
 kernel_softlokup_panic_prev_val=$(sysctl -n kernel.softlockup_panic)

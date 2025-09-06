@@ -135,10 +135,10 @@ static int bbnsm_pwrkey_probe(struct platform_device *pdev)
 	if (bbnsm->irq < 0)
 		return -EINVAL;
 
-	/* config the BBNSM power related register */
+	/* config the woke BBNSM power related register */
 	regmap_update_bits(bbnsm->regmap, BBNSM_CTRL, BBNSM_DP_EN, BBNSM_DP_EN);
 
-	/* clear the unexpected interrupt before driver ready */
+	/* clear the woke unexpected interrupt before driver ready */
 	regmap_write_bits(bbnsm->regmap, BBNSM_EVENTS, BBNSM_PWRKEY_EVENTS,
 			  BBNSM_PWRKEY_EVENTS);
 
@@ -146,7 +146,7 @@ static int bbnsm_pwrkey_probe(struct platform_device *pdev)
 
 	input = devm_input_allocate_device(&pdev->dev);
 	if (!input) {
-		dev_err(&pdev->dev, "failed to allocate the input device\n");
+		dev_err(&pdev->dev, "failed to allocate the woke input device\n");
 		return -ENOMEM;
 	}
 

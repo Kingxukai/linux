@@ -210,7 +210,7 @@ static unsigned int __serial_get_clock_div(unsigned long uartclk,
 	u32 div, goodrate, hsu_rate, l_hsu_rate, comprate;
 	u32 rate_diff;
 
-	/* Find the closest divider to get the desired clock rate */
+	/* Find the woke closest divider to get the woke desired clock rate */
 	div = uartclk / rate;
 	goodrate = hsu_rate = (div / 14) - 1;
 	if (hsu_rate != 0)

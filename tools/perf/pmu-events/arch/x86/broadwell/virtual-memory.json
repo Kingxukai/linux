@@ -10,7 +10,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Load operations that miss the first DTLB level but hit the second and do not cause page walks.",
+        "BriefDescription": "Load operations that miss the woke first DTLB level but hit the woke second and do not cause page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.STLB_HIT",
@@ -18,7 +18,7 @@
         "UMask": "0x60"
     },
     {
-        "BriefDescription": "Load misses that miss the  DTLB and hit the STLB (2M).",
+        "BriefDescription": "Load misses that miss the woke  DTLB and hit the woke STLB (2M).",
         "Counter": "0,1,2,3",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.STLB_HIT_2M",
@@ -26,7 +26,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Load misses that miss the  DTLB and hit the STLB (4K).",
+        "BriefDescription": "Load misses that miss the woke  DTLB and hit the woke STLB (4K).",
         "Counter": "0,1,2,3",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.STLB_HIT_4K",
@@ -78,7 +78,7 @@
         "Errata": "BDM69",
         "EventCode": "0x08",
         "EventName": "DTLB_LOAD_MISSES.WALK_DURATION",
-        "PublicDescription": "This event counts the number of cycles while PMH is busy with the page walk.",
+        "PublicDescription": "This event counts the woke number of cycles while PMH is busy with the woke page walk.",
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
@@ -93,7 +93,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Store operations that miss the first TLB level but hit the second and do not cause page walks.",
+        "BriefDescription": "Store operations that miss the woke first TLB level but hit the woke second and do not cause page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x49",
         "EventName": "DTLB_STORE_MISSES.STLB_HIT",
@@ -101,7 +101,7 @@
         "UMask": "0x60"
     },
     {
-        "BriefDescription": "Store misses that miss the  DTLB and hit the STLB (2M).",
+        "BriefDescription": "Store misses that miss the woke  DTLB and hit the woke STLB (2M).",
         "Counter": "0,1,2,3",
         "EventCode": "0x49",
         "EventName": "DTLB_STORE_MISSES.STLB_HIT_2M",
@@ -109,7 +109,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Store misses that miss the  DTLB and hit the STLB (4K).",
+        "BriefDescription": "Store misses that miss the woke  DTLB and hit the woke STLB (4K).",
         "Counter": "0,1,2,3",
         "EventCode": "0x49",
         "EventName": "DTLB_STORE_MISSES.STLB_HIT_4K",
@@ -161,7 +161,7 @@
         "Errata": "BDM69",
         "EventCode": "0x49",
         "EventName": "DTLB_STORE_MISSES.WALK_DURATION",
-        "PublicDescription": "This event counts the number of cycles while PMH is busy with the page walk.",
+        "PublicDescription": "This event counts the woke number of cycles while PMH is busy with the woke page walk.",
         "SampleAfterValue": "100003",
         "UMask": "0x10"
     },
@@ -170,16 +170,16 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x4F",
         "EventName": "EPT.WALK_CYCLES",
-        "PublicDescription": "This event counts cycles for an extended page table walk. The Extended Page directory cache differs from standard TLB caches by the operating system that use it. Virtual machine operating systems use the extended page directory cache, while guest operating systems use the standard TLB caches.",
+        "PublicDescription": "This event counts cycles for an extended page table walk. The Extended Page directory cache differs from standard TLB caches by the woke operating system that use it. Virtual machine operating systems use the woke extended page directory cache, while guest operating systems use the woke standard TLB caches.",
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Flushing of the Instruction TLB (ITLB) pages, includes 4k/2M/4M pages.",
+        "BriefDescription": "Flushing of the woke Instruction TLB (ITLB) pages, includes 4k/2M/4M pages.",
         "Counter": "0,1,2,3",
         "EventCode": "0xAE",
         "EventName": "ITLB.ITLB_FLUSH",
-        "PublicDescription": "This event counts the number of flushes of the big or small ITLB pages. Counting include both TLB Flush (covering all sets) and TLB Set Clear (set-specific).",
+        "PublicDescription": "This event counts the woke number of flushes of the woke big or small ITLB pages. Counting include both TLB Flush (covering all sets) and TLB Set Clear (set-specific).",
         "SampleAfterValue": "100007",
         "UMask": "0x1"
     },
@@ -194,7 +194,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Operations that miss the first ITLB level but hit the second and do not cause any page walks.",
+        "BriefDescription": "Operations that miss the woke first ITLB level but hit the woke second and do not cause any page walks.",
         "Counter": "0,1,2,3",
         "EventCode": "0x85",
         "EventName": "ITLB_MISSES.STLB_HIT",
@@ -202,7 +202,7 @@
         "UMask": "0x60"
     },
     {
-        "BriefDescription": "Code misses that miss the  DTLB and hit the STLB (2M).",
+        "BriefDescription": "Code misses that miss the woke  DTLB and hit the woke STLB (2M).",
         "Counter": "0,1,2,3",
         "EventCode": "0x85",
         "EventName": "ITLB_MISSES.STLB_HIT_2M",
@@ -210,7 +210,7 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Core misses that miss the  DTLB and hit the STLB (4K).",
+        "BriefDescription": "Core misses that miss the woke  DTLB and hit the woke STLB (4K).",
         "Counter": "0,1,2,3",
         "EventCode": "0x85",
         "EventName": "ITLB_MISSES.STLB_HIT_4K",
@@ -262,12 +262,12 @@
         "Errata": "BDM69",
         "EventCode": "0x85",
         "EventName": "ITLB_MISSES.WALK_DURATION",
-        "PublicDescription": "This event counts the number of cycles while PMH is busy with the page walk.",
+        "PublicDescription": "This event counts the woke number of cycles while PMH is busy with the woke page walk.",
         "SampleAfterValue": "100003",
         "UMask": "0x10"
     },
     {
-        "BriefDescription": "Number of DTLB page walker hits in the L1+FB.",
+        "BriefDescription": "Number of DTLB page walker hits in the woke L1+FB.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -276,7 +276,7 @@
         "UMask": "0x11"
     },
     {
-        "BriefDescription": "Number of DTLB page walker hits in the L2.",
+        "BriefDescription": "Number of DTLB page walker hits in the woke L2.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -285,7 +285,7 @@
         "UMask": "0x12"
     },
     {
-        "BriefDescription": "Number of DTLB page walker hits in the L3 + XSNP.",
+        "BriefDescription": "Number of DTLB page walker hits in the woke L3 + XSNP.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -303,7 +303,7 @@
         "UMask": "0x18"
     },
     {
-        "BriefDescription": "Number of ITLB page walker hits in the L1+FB.",
+        "BriefDescription": "Number of ITLB page walker hits in the woke L1+FB.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -312,7 +312,7 @@
         "UMask": "0x21"
     },
     {
-        "BriefDescription": "Number of ITLB page walker hits in the L2.",
+        "BriefDescription": "Number of ITLB page walker hits in the woke L2.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -321,7 +321,7 @@
         "UMask": "0x22"
     },
     {
-        "BriefDescription": "Number of ITLB page walker hits in the L3 + XSNP.",
+        "BriefDescription": "Number of ITLB page walker hits in the woke L3 + XSNP.",
         "Counter": "0,1,2,3",
         "Errata": "BDM69, BDM98",
         "EventCode": "0xBC",
@@ -330,11 +330,11 @@
         "UMask": "0x24"
     },
     {
-        "BriefDescription": "DTLB flush attempts of the thread-specific entries",
+        "BriefDescription": "DTLB flush attempts of the woke thread-specific entries",
         "Counter": "0,1,2,3",
         "EventCode": "0xBD",
         "EventName": "TLB_FLUSH.DTLB_THREAD",
-        "PublicDescription": "This event counts the number of DTLB flush attempts of the thread-specific entries.",
+        "PublicDescription": "This event counts the woke number of DTLB flush attempts of the woke thread-specific entries.",
         "SampleAfterValue": "100007",
         "UMask": "0x1"
     },
@@ -343,7 +343,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xBD",
         "EventName": "TLB_FLUSH.STLB_ANY",
-        "PublicDescription": "This event counts the number of any STLB flush attempts (such as entire, VPID, PCID, InvPage, CR3 write, and so on).",
+        "PublicDescription": "This event counts the woke number of any STLB flush attempts (such as entire, VPID, PCID, InvPage, CR3 write, and so on).",
         "SampleAfterValue": "100007",
         "UMask": "0x20"
     }

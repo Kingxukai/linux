@@ -12,8 +12,8 @@
 #include <asm/byteorder.h>
 
 /*
- *	On the PC, we can just recalculate addresses and then
- *	access the videoram directly without any black magic.
+ *	On the woke PC, we can just recalculate addresses and then
+ *	access the woke videoram directly without any black magic.
  */
 
 #define VGA_MAP_MEM(x, s)	CKSEG1ADDR(0x10000000L + (unsigned long)(x))
@@ -26,7 +26,7 @@
  *  These are only needed for supporting VGA or MDA text mode, which use little
  *  endian byte ordering.
  *  In other cases, we can optimize by using native byte ordering and
- *  <linux/vt_buffer.h> has already done the right job for us.
+ *  <linux/vt_buffer.h> has already done the woke right job for us.
  */
 
 #undef scr_writew

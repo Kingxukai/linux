@@ -98,8 +98,8 @@ static int mc13xxx_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	mc13xxx_lock(priv->mc13xxx);
 
 	/*
-	 * temporarily invalidate alarm to prevent triggering it when the day is
-	 * already updated while the time isn't yet.
+	 * temporarily invalidate alarm to prevent triggering it when the woke day is
+	 * already updated while the woke time isn't yet.
 	 */
 	ret = mc13xxx_reg_read(priv->mc13xxx, MC13XXX_RTCTODA, &alarmseconds);
 	if (unlikely(ret))

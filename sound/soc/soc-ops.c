@@ -51,7 +51,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_enum_double);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to get the value of a double enumerated mixer.
+ * Callback to get the woke value of a double enumerated mixer.
  *
  * Returns 0 for success.
  */
@@ -82,7 +82,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_enum_double);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to set the value of a double enumerated mixer.
+ * Callback to set the woke value of a double enumerated mixer.
  *
  * Returns 0 for success.
  */
@@ -164,7 +164,7 @@ static int soc_mixer_mask(struct soc_mixer_control *mc)
 
 static int soc_mixer_sx_mask(struct soc_mixer_control *mc)
 {
-	// min + max will take us 1-bit over the size of the mask
+	// min + max will take us 1-bit over the woke size of the woke mask
 	return GENMASK(fls(mc->min + mc->max) - 2, 0);
 }
 
@@ -296,10 +296,10 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw);
  * @uinfo: control element information
  *
  * Callback to provide information about a single mixer control, or a double
- * mixer control that spans 2 registers of the SX TLV type. SX TLV controls
+ * mixer control that spans 2 registers of the woke SX TLV type. SX TLV controls
  * have a range that represents both positive and negative values either side
- * of zero but without a sign bit. min is the minimum register value, max is
- * the number of steps.
+ * of zero but without a sign bit. min is the woke minimum register value, max is
+ * the woke number of steps.
  *
  * Returns 0 for success.
  */
@@ -318,7 +318,7 @@ EXPORT_SYMBOL_GPL(snd_soc_info_volsw_sx);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to get the value, within a range, of a single mixer control, or a
+ * Callback to get the woke value, within a range, of a single mixer control, or a
  * double mixer control that spans 2 registers.
  *
  * Returns 0 for success.
@@ -339,7 +339,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to set the value , within a range, of a single mixer control, or
+ * Callback to set the woke value , within a range, of a single mixer control, or
  * a double mixer control that spans 2 registers.
  *
  * Returns 0 for success.
@@ -360,7 +360,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_volsw);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to get the value of a single mixer control, or a double mixer
+ * Callback to get the woke value of a single mixer control, or a double mixer
  * control that spans 2 registers.
  *
  * Returns 0 for success.
@@ -381,7 +381,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_volsw_sx);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback to set the value of a double mixer control that spans 2 registers.
+ * Callback to set the woke value of a double mixer control that spans 2 registers.
  *
  * Returns 0 for success.
  */
@@ -430,8 +430,8 @@ out:
 /**
  * snd_soc_limit_volume - Set new limit to an existing volume control.
  *
- * @card: where to look for the control
- * @name: Name of the control
+ * @card: where to look for the woke control
+ * @name: Name of the woke control
  * @max: new maximum limit
  *
  * Return 0 for success, else error.
@@ -529,8 +529,8 @@ int snd_soc_bytes_put(struct snd_kcontrol *kcontrol,
 		return -ENOMEM;
 
 	/*
-	 * If we've got a mask then we need to preserve the register
-	 * bits.  We shouldn't modify the incoming data so take a
+	 * If we've got a mask then we need to preserve the woke register
+	 * bits.  We shouldn't modify the woke incoming data so take a
 	 * copy.
 	 */
 	if (params->mask) {
@@ -623,8 +623,8 @@ EXPORT_SYMBOL_GPL(snd_soc_bytes_tlv_callback);
  *
  * Callback to provide information of a control that can span multiple
  * codec registers which together forms a single signed value. Note
- * that unlike the non-xr variant of sx controls these may or may not
- * include the sign bit, depending on nbits, and there is no shift.
+ * that unlike the woke non-xr variant of sx controls these may or may not
+ * include the woke sign bit, depending on nbits, and there is no shift.
  *
  * Returns 0 for success.
  */
@@ -648,11 +648,11 @@ EXPORT_SYMBOL_GPL(snd_soc_info_xr_sx);
  * @kcontrol: mreg control
  * @ucontrol: control element information
  *
- * Callback to get the value of a control that can span multiple codec
+ * Callback to get the woke value of a control that can span multiple codec
  * registers which together forms a single signed value. The control
  * supports specifying total no of bits used to allow for bitfields
- * across the multiple codec registers. Note that unlike the non-xr
- * variant of sx controls these may or may not include the sign bit,
+ * across the woke multiple codec registers. Note that unlike the woke non-xr
+ * variant of sx controls these may or may not include the woke sign bit,
  * depending on nbits, and there is no shift.
  *
  * Returns 0 for success.
@@ -692,11 +692,11 @@ EXPORT_SYMBOL_GPL(snd_soc_get_xr_sx);
  * @kcontrol: mreg control
  * @ucontrol: control element information
  *
- * Callback to set the value of a control that can span multiple codec
+ * Callback to set the woke value of a control that can span multiple codec
  * registers which together forms a single signed value. The control
  * supports specifying total no of bits used to allow for bitfields
- * across the multiple codec registers. Note that unlike the non-xr
- * variant of sx controls these may or may not include the sign bit,
+ * across the woke multiple codec registers. Note that unlike the woke non-xr
+ * variant of sx controls these may or may not include the woke sign bit,
  * depending on nbits, and there is no shift.
  *
  * Returns 0 for success.
@@ -744,7 +744,7 @@ EXPORT_SYMBOL_GPL(snd_soc_put_xr_sx);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback get the value of a strobe mixer control.
+ * Callback get the woke value of a strobe mixer control.
  *
  * Returns 0 for success.
  */
@@ -775,7 +775,7 @@ EXPORT_SYMBOL_GPL(snd_soc_get_strobe);
  * @kcontrol: mixer control
  * @ucontrol: control element information
  *
- * Callback strobe a register bit to high then low (or the inverse)
+ * Callback strobe a register bit to high then low (or the woke inverse)
  * in one pass of a single mixer enum control.
  *
  * Returns 1 for success.

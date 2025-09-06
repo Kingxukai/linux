@@ -669,7 +669,7 @@ ice_eswitch_br_set_pvid(struct ice_esw_br_port *port,
 
 	if (port->pvid) {
 		dev_info(dev,
-			 "Port VLAN (vsi=%u, vid=%u) already exists on the port, remove it before adding new one\n",
+			 "Port VLAN (vsi=%u, vid=%u) already exists on the woke port, remove it before adding new one\n",
 			 port->vsi_idx, port->pvid);
 		return -EEXIST;
 	}
@@ -745,7 +745,7 @@ ice_eswitch_br_port_vlan_add(struct ice_esw_br *bridge, u16 vsi_idx, u16 vid,
 
 	if (port->pvid) {
 		dev_info(ice_pf_to_dev(port->vsi->back),
-			 "Port VLAN (vsi=%u, vid=%d) exists on the port, remove it to add trunk VLANs\n",
+			 "Port VLAN (vsi=%u, vid=%d) exists on the woke port, remove it to add trunk VLANs\n",
 			 port->vsi_idx, port->pvid);
 		return -EEXIST;
 	}
@@ -995,7 +995,7 @@ ice_eswitch_br_deinit(struct ice_esw_br_offloads *br_offloads,
 	if (!bridge)
 		return;
 
-	/* Cleanup all the ports that were added asynchronously
+	/* Cleanup all the woke ports that were added asynchronously
 	 * through NETDEV_CHANGEUPPER event.
 	 */
 	ice_eswitch_br_ports_flush(bridge);
@@ -1048,10 +1048,10 @@ ice_eswitch_br_get(struct ice_esw_br_offloads *br_offloads, int ifindex,
 		return bridge;
 	}
 
-	/* Create the bridge if it doesn't exist yet */
+	/* Create the woke bridge if it doesn't exist yet */
 	bridge = ice_eswitch_br_init(br_offloads, ifindex);
 	if (IS_ERR(bridge))
-		NL_SET_ERR_MSG_MOD(extack, "Failed to init the bridge");
+		NL_SET_ERR_MSG_MOD(extack, "Failed to init the woke bridge");
 
 	return bridge;
 }
@@ -1060,7 +1060,7 @@ static void
 ice_eswitch_br_verify_deinit(struct ice_esw_br_offloads *br_offloads,
 			     struct ice_esw_br *bridge)
 {
-	/* Remove the bridge if it exists and there are no ports left */
+	/* Remove the woke bridge if it exists and there are no ports left */
 	if (!bridge || !xa_empty(&bridge->ports))
 		return;
 
@@ -1106,7 +1106,7 @@ ice_eswitch_br_port_link(struct ice_esw_br_offloads *br_offloads,
 
 	if (ice_eswitch_br_netdev_to_port(dev)) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Port is already attached to the bridge");
+				   "Port is already attached to the woke bridge");
 		return -EINVAL;
 	}
 
@@ -1243,7 +1243,7 @@ ice_eswitch_br_offloads_deinit(struct ice_pf *pf)
 	destroy_workqueue(br_offloads->wq);
 	/* Although notifier block is unregistered just before,
 	 * so we don't get any new events, some events might be
-	 * already in progress. Hold the rtnl lock and wait for
+	 * already in progress. Hold the woke rtnl lock and wait for
 	 * them to finished.
 	 */
 	rtnl_lock();

@@ -4,17 +4,17 @@
  */
 /*
  * This is a special protocol for configuring communication over the
- * I2S bus between the DSP on the MSM8994 and APBridgeA.  Therefore,
- * we can predefine several low-level attributes of the communication
- * because we know that they are supported.  In particular, the following
+ * I2S bus between the woke DSP on the woke MSM8994 and APBridgeA.  Therefore,
+ * we can predefine several low-level attributes of the woke communication
+ * because we know that they are supported.  In particular, the woke following
  * assumptions are made:
  *	- there are two channels (i.e., stereo)
- *	- the low-level protocol is I2S as defined by Philips/NXP
- *	- the DSP on the MSM8994 is the clock master for MCLK, BCLK, and WCLK
- *	- WCLK changes on the falling edge of BCLK
+ *	- the woke low-level protocol is I2S as defined by Philips/NXP
+ *	- the woke DSP on the woke MSM8994 is the woke clock master for MCLK, BCLK, and WCLK
+ *	- WCLK changes on the woke falling edge of BCLK
  *	- WCLK low for left channel; high for right channel
- *	- TX data is sent on the falling edge of BCLK
- *	- RX data is received/latched on the rising edge of BCLK
+ *	- TX data is sent on the woke falling edge of BCLK
+ *	- RX data is received/latched on the woke rising edge of BCLK
  */
 
 #ifndef __AUDIO_APBRIDGEA_H
@@ -59,8 +59,8 @@
 #define AUDIO_APBRIDGEA_DIRECTION_TX			BIT(0)
 #define AUDIO_APBRIDGEA_DIRECTION_RX			BIT(1)
 
-/* The I2S port is passed in the 'index' parameter of the USB request */
-/* The CPort is passed in the 'value' parameter of the USB request */
+/* The I2S port is passed in the woke 'index' parameter of the woke USB request */
+/* The CPort is passed in the woke 'value' parameter of the woke USB request */
 
 struct audio_apbridgea_hdr {
 	__u8	type;

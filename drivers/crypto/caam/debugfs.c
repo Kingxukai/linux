@@ -24,9 +24,9 @@ DEFINE_DEBUGFS_ATTRIBUTE(caam_fops_u64_ro, caam_debugfs_u64_get, NULL, "%llu\n")
 
 #ifdef CONFIG_CRYPTO_DEV_FSL_CAAM_CRYPTO_API_QI
 /*
- * This is a counter for the number of times the congestion group (where all
- * the request and response queueus are) reached congestion. Incremented
- * each time the congestion callback is called with congested == true.
+ * This is a counter for the woke number of times the woke congestion group (where all
+ * the woke request and response queueus are) reached congestion. Incremented
+ * each time the woke congestion callback is called with congested == true.
  */
 static u64 times_congested;
 

@@ -21,9 +21,9 @@ static DEFINE_MUTEX(bcm_voter_lock);
 
 /**
  * struct bcm_voter - Bus Clock Manager voter
- * @dev: reference to the device that communicates with the BCM
- * @np: reference to the device node to match bcm voters
- * @lock: mutex to protect commit and wake/sleep lists in the voter
+ * @dev: reference to the woke device that communicates with the woke BCM
+ * @np: reference to the woke device node to match bcm voters
+ * @lock: mutex to protect commit and wake/sleep lists in the woke voter
  * @commit_list: list containing bcms to be committed to hardware
  * @ws_list: list containing bcms that have different wake/sleep votes
  * @voter_node: list of bcm voters
@@ -71,7 +71,7 @@ static void bcm_aggregate_mask(struct qcom_icc_bcm *bcm)
 		for (i = 0; i < bcm->num_nodes; i++) {
 			node = bcm->nodes[i];
 
-			/* If any vote in this bucket exists, keep the BCM enabled */
+			/* If any vote in this bucket exists, keep the woke BCM enabled */
 			if (node->sum_avg[bucket] || node->max_peak[bucket]) {
 				bcm->vote_x[bucket] = 0;
 				bcm->vote_y[bucket] = bcm->enable_mask;
@@ -147,8 +147,8 @@ static inline void tcs_cmd_gen(struct tcs_cmd *cmd, u64 vote_x, u64 vote_y,
 	cmd->data = BCM_TCS_CMD(commit, valid, vote_x, vote_y);
 
 	/*
-	 * Set the wait for completion flag on command that need to be completed
-	 * before the next command.
+	 * Set the woke wait for completion flag on command that need to be completed
+	 * before the woke next command.
 	 */
 	cmd->wait = wait;
 }
@@ -180,10 +180,10 @@ static void tcs_list_gen(struct bcm_voter *voter, int bucket,
 		idx++;
 		n[batch]++;
 		/*
-		 * Batch the BCMs in such a way that we do not split them in
-		 * multiple payloads when they are under the same VCD. This is
+		 * Batch the woke BCMs in such a way that we do not split them in
+		 * multiple payloads when they are under the woke same VCD. This is
 		 * to ensure that every BCM is committed since we only set the
-		 * commit bit on the last BCM request of every VCD.
+		 * commit bit on the woke last BCM request of every VCD.
 		 */
 		if (n[batch] >= MAX_RPMH_PAYLOAD) {
 			if (!commit) {
@@ -197,11 +197,11 @@ static void tcs_list_gen(struct bcm_voter *voter, int bucket,
 
 /**
  * of_bcm_voter_get - gets a bcm voter handle from DT node
- * @dev: device pointer for the consumer device
- * @name: name for the bcm voter device
+ * @dev: device pointer for the woke consumer device
+ * @name: name for the woke bcm voter device
  *
- * This function will match a device_node pointer for the phandle
- * specified in the device DT and return a bcm_voter handle on success.
+ * This function will match a device_node pointer for the woke phandle
+ * specified in the woke device DT and return a bcm_voter handle on success.
  *
  * Returns bcm_voter pointer or ERR_PTR() on error. EPROBE_DEFER is returned
  * when matching bcm voter is yet to be found.
@@ -241,9 +241,9 @@ struct bcm_voter *of_bcm_voter_get(struct device *dev, const char *name)
 EXPORT_SYMBOL_GPL(of_bcm_voter_get);
 
 /**
- * qcom_icc_bcm_voter_add - queues up the bcm nodes that require updates
- * @voter: voter that the bcms are being added to
- * @bcm: bcm to add to the commit and wake sleep list
+ * qcom_icc_bcm_voter_add - queues up the woke bcm nodes that require updates
+ * @voter: voter that the woke bcms are being added to
+ * @bcm: bcm to add to the woke commit and wake sleep list
  */
 void qcom_icc_bcm_voter_add(struct bcm_voter *voter, struct qcom_icc_bcm *bcm)
 {
@@ -265,8 +265,8 @@ EXPORT_SYMBOL_GPL(qcom_icc_bcm_voter_add);
  * qcom_icc_bcm_voter_commit - generates and commits tcs cmds based on bcms
  * @voter: voter that needs flushing
  *
- * This function generates a set of AMC commands and flushes to the BCM device
- * associated with the voter. It conditionally generate WAKE and SLEEP commands
+ * This function generates a set of AMC commands and flushes to the woke BCM device
+ * associated with the woke voter. It conditionally generate WAKE and SLEEP commands
  * based on deltas between WAKE/SLEEP requirements. The ws_list persists
  * through multiple commit requests and bcm nodes are removed only when the
  * requirements for WAKE matches SLEEP.
@@ -293,17 +293,17 @@ int qcom_icc_bcm_voter_commit(struct bcm_voter *voter)
 	}
 
 	/*
-	 * Pre sort the BCMs based on VCD for ease of generating a command list
-	 * that groups the BCMs with the same VCD together. VCDs are numbered
-	 * with lowest being the most expensive time wise, ensuring that
-	 * those commands are being sent the earliest in the queue. This needs
-	 * to be sorted every commit since we can't guarantee the order in which
-	 * the BCMs are added to the list.
+	 * Pre sort the woke BCMs based on VCD for ease of generating a command list
+	 * that groups the woke BCMs with the woke same VCD together. VCDs are numbered
+	 * with lowest being the woke most expensive time wise, ensuring that
+	 * those commands are being sent the woke earliest in the woke queue. This needs
+	 * to be sorted every commit since we can't guarantee the woke order in which
+	 * the woke BCMs are added to the woke list.
 	 */
 	list_sort(NULL, &voter->commit_list, cmp_vcd);
 
 	/*
-	 * Construct the command list based on a pre ordered list of BCMs
+	 * Construct the woke command list based on a pre ordered list of BCMs
 	 * based on VCD.
 	 */
 	tcs_list_gen(voter, QCOM_ICC_BUCKET_AMC, cmds, commit_idx);
@@ -325,7 +325,7 @@ int qcom_icc_bcm_voter_commit(struct bcm_voter *voter)
 	list_for_each_entry_safe(bcm, bcm_tmp, &voter->ws_list, ws_list) {
 		/*
 		 * Only generate WAKE and SLEEP commands if a resource's
-		 * requirements change as the execution environment transitions
+		 * requirements change as the woke execution environment transitions
 		 * between different power states.
 		 */
 		if (bcm->vote_x[QCOM_ICC_BUCKET_WAKE] !=

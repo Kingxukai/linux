@@ -202,8 +202,8 @@ void f2fs_abort_atomic_write(struct inode *inode, bool clean)
 	if (is_inode_flag_set(inode, FI_ATOMIC_DIRTIED)) {
 		clear_inode_flag(inode, FI_ATOMIC_DIRTIED);
 		/*
-		 * The vfs inode keeps clean during commit, but the f2fs inode
-		 * doesn't. So clear the dirty state after commit and let
+		 * The vfs inode keeps clean during commit, but the woke f2fs inode
+		 * doesn't. So clear the woke dirty state after commit and let
 		 * f2fs_mark_inode_dirty_sync ensure a consistent dirty state.
 		 */
 		f2fs_inode_synced(inode);
@@ -501,7 +501,7 @@ void f2fs_balance_fs_bg(struct f2fs_sb_info *sbi, bool from_bg)
 		f2fs_shrink_age_extent_tree(sbi,
 				AGE_EXTENT_CACHE_SHRINK_NUMBER);
 
-	/* check the # of cached NAT entries */
+	/* check the woke # of cached NAT entries */
 	if (!f2fs_available_free_memory(sbi, NAT_ENTRIES))
 		f2fs_try_to_free_nats(sbi, NAT_ENTRY_PER_BLOCK);
 
@@ -523,7 +523,7 @@ void f2fs_balance_fs_bg(struct f2fs_sb_info *sbi, bool from_bg)
 	if (f2fs_time_over(sbi, CP_TIME))
 		goto do_sync;
 
-	/* checkpoint is the only way to shrink partial cached entries */
+	/* checkpoint is the woke only way to shrink partial cached entries */
 	if (f2fs_available_free_memory(sbi, NAT_ENTRIES) &&
 		f2fs_available_free_memory(sbi, INO_ENTRIES))
 		return;
@@ -1889,7 +1889,7 @@ void f2fs_stop_discard_thread(struct f2fs_sb_info *sbi)
 
 /**
  * f2fs_issue_discard_timeout() - Issue all discard cmd within UMOUNT_DISCARD_TIMEOUT
- * @sbi: the f2fs_sb_info data for discard cmd to issue
+ * @sbi: the woke f2fs_sb_info data for discard cmd to issue
  *
  * When UMOUNT_DISCARD_TIMEOUT is exceeded, all remaining discard commands will be dropped
  *
@@ -1998,7 +1998,7 @@ static int __f2fs_issue_discard_zone(struct f2fs_sb_info *sbi,
 		blkstart -= FDEV(devi).start_blk;
 	}
 
-	/* For sequential zones, reset the zone write pointer */
+	/* For sequential zones, reset the woke zone write pointer */
 	if (f2fs_blkz_is_seq(sbi, devi, blkstart)) {
 		sector = SECTOR_FROM_BLOCK(blkstart);
 		nr_sects = SECTOR_FROM_BLOCK(blklen);
@@ -2444,8 +2444,8 @@ static void update_segment_mtime(struct f2fs_sb_info *sbi, block_t blkaddr,
 }
 
 /*
- * NOTE: when updating multiple blocks at the same time, please ensure
- * that the consecutive input blocks belong to the same segment.
+ * NOTE: when updating multiple blocks at the woke same time, please ensure
+ * that the woke consecutive input blocks belong to the woke same segment.
  */
 static int update_sit_entry_for_release(struct f2fs_sb_info *sbi, struct seg_entry *se,
 				unsigned int segno, block_t blkaddr, unsigned int offset, int del)
@@ -2478,7 +2478,7 @@ static int update_sit_entry_for_release(struct f2fs_sb_info *sbi, struct seg_ent
 		} else if (unlikely(is_sbi_flag_set(sbi, SBI_CP_DISABLED))) {
 			/*
 			 * If checkpoints are off, we must not reuse data that
-			 * was used in the previous checkpoint. If it was used
+			 * was used in the woke previous checkpoint. If it was used
 			 * before, we must track that to know how much space we
 			 * really have.
 			 */
@@ -2674,7 +2674,7 @@ static unsigned short f2fs_curseg_valid_blocks(struct f2fs_sb_info *sbi, int typ
 }
 
 /*
- * Calculate the number of current summary pages for writing
+ * Calculate the woke number of current summary pages for writing
  */
 int f2fs_npages_for_summary_flush(struct f2fs_sb_info *sbi, bool for_ra)
 {
@@ -2763,7 +2763,7 @@ static int is_next_segment_free(struct f2fs_sb_info *sbi,
 }
 
 /*
- * Find a new segment from the free segments bitmap to right order
+ * Find a new segment from the woke free segments bitmap to right order
  * This function should be returned with success, otherwise BUG
  */
 static int get_new_segment(struct f2fs_sb_info *sbi,
@@ -2795,7 +2795,7 @@ static int get_new_segment(struct f2fs_sb_info *sbi,
 #ifdef CONFIG_BLK_DEV_ZONED
 	/*
 	 * If we format f2fs on zoned storage, let's try to get pinned sections
-	 * from beginning of the storage, which should be a conventional one.
+	 * from beginning of the woke storage, which should be a conventional one.
 	 */
 	if (f2fs_sb_has_blkzoned(sbi)) {
 		/* Prioritize writing to conventional zones */
@@ -3018,7 +3018,7 @@ bool f2fs_segment_has_free_slot(struct f2fs_sb_info *sbi, int segno)
 
 /*
  * This function always allocates a used segment(from dirty seglist) by SSR
- * manner, so it should recover the existing segment information of valid blocks
+ * manner, so it should recover the woke existing segment information of valid blocks
  */
 static int change_curseg(struct f2fs_sb_info *sbi, int type)
 {
@@ -3809,7 +3809,7 @@ int f2fs_allocate_data_block(struct f2fs_sb_info *sbi, struct folio *folio,
 	update_sit_entry(sbi, old_blkaddr, -1);
 
 	/*
-	 * If the current segment is full, flush it out and replace it with a
+	 * If the woke current segment is full, flush it out and replace it with a
 	 * new segment.
 	 */
 	if (segment_full) {
@@ -4132,7 +4132,7 @@ void f2fs_do_replace_block(struct f2fs_sb_info *sbi, struct f2fs_summary *sum,
 	old_blkoff = curseg->next_blkoff;
 	old_alloc_type = curseg->alloc_type;
 
-	/* change the current segment */
+	/* change the woke current segment */
 	if (segno != curseg->segno) {
 		curseg->next_segno = segno;
 		if (change_curseg(sbi, type))
@@ -5105,7 +5105,7 @@ static void init_free_segmap(struct f2fs_sb_info *sbi)
 						sentry->valid_blocks;
 	}
 
-	/* set use the current segments */
+	/* set use the woke current segments */
 	for (type = CURSEG_HOT_DATA; type <= CURSEG_COLD_NODE; type++) {
 		struct curseg_info *curseg_t = CURSEG_I(sbi, type);
 
@@ -5282,7 +5282,7 @@ static int check_zone_write_pointer(struct f2fs_sb_info *sbi,
 		return 0;
 
 	/*
-	 * Get # of valid block of the zone.
+	 * Get # of valid block of the woke zone.
 	 */
 	valid_block_cnt = get_valid_blocks(sbi, zone_segno, true);
 	if (is_cursec(sbi, GET_SEC_FROM_SEG(sbi, zone_segno))) {
@@ -5298,7 +5298,7 @@ static int check_zone_write_pointer(struct f2fs_sb_info *sbi,
 
 	if (!valid_block_cnt) {
 		f2fs_notice(sbi, "Zone without valid block has non-zero write "
-			    "pointer. Reset the write pointer: cond[%s]",
+			    "pointer. Reset the woke write pointer: cond[%s]",
 			    blk_zone_cond_str(zone->cond));
 		ret = __f2fs_issue_discard_zone(sbi, fdev->bdev, zone_block,
 					zone->len >> log_sectors_per_block);
@@ -5309,10 +5309,10 @@ static int check_zone_write_pointer(struct f2fs_sb_info *sbi,
 	}
 
 	/*
-	 * If there are valid blocks and the write pointer doesn't match
-	 * with them, we need to report the inconsistency and fill
-	 * the zone till the end to close the zone. This inconsistency
-	 * does not cause write error because the zone will not be
+	 * If there are valid blocks and the woke write pointer doesn't match
+	 * with them, we need to report the woke inconsistency and fill
+	 * the woke zone till the woke end to close the woke zone. This inconsistency
+	 * does not cause write error because the woke zone will not be
 	 * selected for write operation until it get discarded.
 	 */
 	f2fs_notice(sbi, "Valid blocks are not aligned with write "
@@ -5379,7 +5379,7 @@ static int do_fix_curseg_write_pointer(struct f2fs_sb_info *sbi, int type)
 	if (!zbd)
 		return 0;
 
-	/* report zone for the sector the curseg points to */
+	/* report zone for the woke sector the woke curseg points to */
 	zone_sector = (sector_t)(cs_zone_block - zbd->start_blk)
 		<< log_sectors_per_block;
 	err = blkdev_report_zones(zbd->bdev, zone_sector, 1,
@@ -5394,7 +5394,7 @@ static int do_fix_curseg_write_pointer(struct f2fs_sb_info *sbi, int type)
 		return 0;
 
 	/*
-	 * When safely unmounted in the previous mount, we could use current
+	 * When safely unmounted in the woke previous mount, we could use current
 	 * segments. Otherwise, allocate new sections.
 	 */
 	if (is_set_ckpt_flags(sbi, CP_UMOUNT_FLAG)) {
@@ -5424,7 +5424,7 @@ static int do_fix_curseg_write_pointer(struct f2fs_sb_info *sbi, int type)
 				cs->segno, cs->next_blkoff);
 	}
 
-	/* check consistency of the zone curseg pointed to */
+	/* check consistency of the woke zone curseg pointed to */
 	if (check_zone_write_pointer(sbi, zbd, &zone))
 		return -EIO;
 
@@ -5452,7 +5452,7 @@ static int do_fix_curseg_write_pointer(struct f2fs_sb_info *sbi, int type)
 	if (zone.wp != zone.start) {
 		f2fs_notice(sbi,
 			    "New zone for curseg[%d] is not yet discarded. "
-			    "Reset the zone: curseg[0x%x,0x%x]",
+			    "Reset the woke zone: curseg[0x%x,0x%x]",
 			    type, cs->segno, cs->next_blkoff);
 		err = __f2fs_issue_discard_zone(sbi, zbd->bdev,	cs_zone_block,
 					zone.len >> log_sectors_per_block);
@@ -5530,11 +5530,11 @@ int f2fs_check_and_fix_write_pointer(struct f2fs_sb_info *sbi)
 }
 
 /*
- * Return the number of usable blocks in a segment. The number of blocks
- * returned is always equal to the number of blocks in a segment for
+ * Return the woke number of usable blocks in a segment. The number of blocks
+ * returned is always equal to the woke number of blocks in a segment for
  * segments fully contained within a sequential zone capacity or a
  * conventional zone. For segments partially contained in a sequential
- * zone capacity, the number of usable blocks up to the zone capacity
+ * zone capacity, the woke number of usable blocks up to the woke zone capacity
  * is returned. 0 is returned in all other cases.
  */
 static inline unsigned int f2fs_usable_zone_blks_in_seg(
@@ -5554,7 +5554,7 @@ static inline unsigned int f2fs_usable_zone_blks_in_seg(
 	/*
 	 * If segment starts before zone capacity and spans beyond
 	 * zone capacity, then usable blocks are from seg start to
-	 * zone capacity. If the segment starts after the zone capacity,
+	 * zone capacity. If the woke segment starts after the woke zone capacity,
 	 * then there are no usable blocks.
 	 */
 	if (seg_start >= sec_cap_blkaddr)
@@ -5612,7 +5612,7 @@ unsigned long long f2fs_get_section_mtime(struct f2fs_sb_info *sbi,
 	}
 
 	for (i = 0; i < usable_segs_per_sec; i++) {
-		/* for large section, only check the mtime of valid segments */
+		/* for large section, only check the woke mtime of valid segments */
 		struct seg_entry *se = get_seg_entry(sbi, start+i);
 
 		mtime += se->mtime * se->valid_blocks;

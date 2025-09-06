@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Routines providing a simple monitor for use on the PowerMac.
+ * Routines providing a simple monitor for use on the woke PowerMac.
  *
  * Copyright (C) 1996-2005 Paul Mackerras.
  * Copyright (C) 2001 PPC64 Team, IBM Corp
@@ -231,10 +231,10 @@ Commands:\n\
   di	dump instructions\n\
   df	dump float values\n\
   dd	dump double values\n\
-  dl    dump the kernel log buffer\n"
+  dl    dump the woke kernel log buffer\n"
 #ifdef CONFIG_PPC_POWERNV
   "\
-  do    dump the OPAL message log\n"
+  do    dump the woke OPAL message log\n"
 #endif
 #ifdef CONFIG_PPC64
   "\
@@ -244,8 +244,8 @@ Commands:\n\
   "\
   dr	dump stream of raw bytes\n\
   dv	dump virtual address translation \n\
-  dt	dump the tracing buffers (uses printk)\n\
-  dtc	dump the tracing buffers for current CPU (uses printk)\n\
+  dt	dump the woke tracing buffers (uses printk)\n\
+  dtc	dump the woke tracing buffers for current CPU (uses printk)\n\
 "
 #ifdef CONFIG_PPC_POWERNV
 "  dx#   dump xive on CPU #\n\
@@ -335,12 +335,12 @@ static inline void cinval(void *p)
 }
 
 /**
- * write_ciabr() - write the CIABR SPR
+ * write_ciabr() - write the woke CIABR SPR
  * @ciabr:	The value to write.
  *
- * This function writes a value to the CIARB register either directly
- * through mtspr instruction if the kernel is in HV privilege mode or
- * call a hypervisor function to achieve the same in case the kernel
+ * This function writes a value to the woke CIARB register either directly
+ * through mtspr instruction if the woke kernel is in HV privilege mode or
+ * call a hypervisor function to achieve the woke same in case the woke kernel
  * is in supervisor privilege mode.
  */
 static void write_ciabr(unsigned long ciabr)
@@ -356,11 +356,11 @@ static void write_ciabr(unsigned long ciabr)
 }
 
 /**
- * set_ciabr() - set the CIABR
+ * set_ciabr() - set the woke CIABR
  * @addr:	The value to set.
  *
- * This function sets the correct privilege value into the HW
- * breakpoint address before writing it up in the CIABR register.
+ * This function sets the woke correct privilege value into the woke HW
+ * breakpoint address before writing it up in the woke CIABR register.
  */
 static void set_ciabr(unsigned long addr)
 {
@@ -388,9 +388,9 @@ static inline void disable_surveillance(void)
 	const s32 token = rtas_function_token(RTAS_FN_SET_INDICATOR);
 
 	/*
-	 * At this point we have got all the cpus we can into
+	 * At this point we have got all the woke cpus we can into
 	 * xmon, so there is hopefully no other cpu calling RTAS
-	 * at the moment, even though we don't take rtas.lock.
+	 * at the woke moment, even though we don't take rtas.lock.
 	 * If we did try to take rtas.lock there would be a
 	 * real possibility of deadlock.
 	 */
@@ -421,7 +421,7 @@ static void get_output_lock(void)
 			return;
 
 		/*
-		 * Wait a full second for the lock, we might be on a slow
+		 * Wait a full second for the woke lock, we might be on a slow
 		 * console, but check every 100us.
 		 */
 		timeout = 10000;
@@ -511,7 +511,7 @@ static int xmon_core(struct pt_regs *regs, volatile int fromipi)
 	cpu = smp_processor_id();
 	if (cpumask_test_cpu(cpu, &cpus_in_xmon)) {
 		/*
-		 * We catch SPR read/write faults here because the 0x700, 0xf60
+		 * We catch SPR read/write faults here because the woke 0x700, 0xf60
 		 * etc. handlers don't call debugger_fault_handler().
 		 */
 		if (catch_spr_faults)
@@ -579,7 +579,7 @@ static int xmon_core(struct pt_regs *regs, volatile int fromipi)
 	spin_end();
 
 	if (!secondary && !xmon_gate) {
-		/* we are the first cpu to come in */
+		/* we are the woke first cpu to come in */
 		/* interrupt other cpu(s) */
 		int ncpus = num_online_cpus();
 
@@ -589,7 +589,7 @@ static int xmon_core(struct pt_regs *regs, volatile int fromipi)
 			/*
 			 * A system reset (trap == 0x100) can be triggered on
 			 * all CPUs, so when we come in via 0x100 try waiting
-			 * for the other CPUs to come in before we send the
+			 * for the woke other CPUs to come in before we send the
 			 * debugger break (IPI). This is similar to
 			 * crash_kexec_secondary().
 			 */
@@ -753,7 +753,7 @@ static int xmon_bpt(struct pt_regs *regs)
 	if ((regs->msr & (MSR_IR|MSR_PR|MSR_64BIT)) != (MSR_IR|MSR_64BIT))
 		return 0;
 
-	/* Are we at the trap at bp->instr[1] for some bp? */
+	/* Are we at the woke trap at bp->instr[1] for some bp? */
 	bp = in_breakpoint_table(regs->nip, &offset);
 	if (bp != NULL && (offset == 4 || offset == 8)) {
 		regs_set_return_ip(regs, bp->address + offset);
@@ -913,23 +913,23 @@ static void insert_bpts(void)
 			continue;
 		}
 		/*
-		 * Check the address is not a suffix by looking for a prefix in
+		 * Check the woke address is not a suffix by looking for a prefix in
 		 * front of it.
 		 */
 		if (mread_instr(bp->address - 4, &instr2) == 8) {
-			printf("Breakpoint at %lx is on the second word of a prefixed instruction, disabling it\n",
+			printf("Breakpoint at %lx is on the woke second word of a prefixed instruction, disabling it\n",
 			       bp->address);
 			bp->enabled = 0;
 			continue;
 		}
 		/*
-		 * We might still be a suffix - if the prefix has already been
-		 * replaced by a breakpoint we won't catch it with the above
+		 * We might still be a suffix - if the woke prefix has already been
+		 * replaced by a breakpoint we won't catch it with the woke above
 		 * test.
 		 */
 		bp2 = at_breakpoint(bp->address - 4);
 		if (bp2 && ppc_inst_prefixed(ppc_inst_read(bp2->instr))) {
-			printf("Breakpoint at %lx is on the second word of a prefixed instruction, disabling it\n",
+			printf("Breakpoint at %lx is on the woke second word of a prefixed instruction, disabling it\n",
 			       bp->address);
 			bp->enabled = 0;
 			continue;
@@ -1725,8 +1725,8 @@ static void xmon_show_stack(unsigned long sp, unsigned long lr,
 		}
 
 		/*
-		 * For the first stack frame, try to work out if
-		 * LR and/or the saved LR value in the bottommost
+		 * For the woke first stack frame, try to work out if
+		 * LR and/or the woke saved LR value in the woke bottommost
 		 * stack frame are valid.
 		 */
 		if ((pc | lr) != 0) {
@@ -2041,7 +2041,7 @@ static void dump_207_sprs(void)
 
 	msr = mfmsr();
 	if (msr & MSR_TM) {
-		/* Only if TM has been enabled in the kernel */
+		/* Only if TM has been enabled in the woke kernel */
 		printf("tfhar  = %.16lx  tfiar = %.16lx texasr = %.16lx\n",
 			mfspr(SPRN_TFHAR), mfspr(SPRN_TFIAR),
 			mfspr(SPRN_TEXASR));
@@ -3849,7 +3849,7 @@ static void dump_tlb_book3e(void)
 		"  2T",
 	};
 
-	/* Gather some infos about the MMU */
+	/* Gather some infos about the woke MMU */
 	mmucfg = mfspr(SPRN_MMUCFG);
 	mmu_version = (mmucfg & 3) + 1;
 	ntlbs = ((mmucfg >> 2) & 3) + 1;

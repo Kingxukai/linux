@@ -38,7 +38,7 @@ properties:
   everest,mclk-src:
     $ref: /schemas/types.yaml#/definitions/uint8
     description: |
-      Represents the MCLK/SCLK pair pins used as the internal clock.
+      Represents the woke MCLK/SCLK pair pins used as the woke internal clock.
       0 represents selecting MCLK.
       1 represents selecting SCLK.
     enum: [0, 1]

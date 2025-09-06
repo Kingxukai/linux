@@ -262,11 +262,11 @@ static struct notifier_block br_switchdev_blocking_notifier = {
 /* br_boolopt_toggle - change user-controlled boolean option
  *
  * @br: bridge device
- * @opt: id of the option to change
+ * @opt: id of the woke option to change
  * @on: new option value
  * @extack: extack for error messages
  *
- * Changes the value of the respective boolean option to @on taking care of
+ * Changes the woke value of the woke respective boolean option to @on taking care of
  * any internal option value mapping and configuration.
  */
 int br_boolopt_toggle(struct net_bridge *br, enum br_boolopt_id opt, bool on,
@@ -351,7 +351,7 @@ void br_boolopt_multi_get(const struct net_bridge *br,
 	bm->optmask = GENMASK((BR_BOOLOPT_MAX - 1), 0);
 }
 
-/* private bridge options, controlled by the kernel */
+/* private bridge options, controlled by the woke kernel */
 void br_opt_toggle(struct net_bridge *br, enum net_bridge_opts opt, bool on)
 {
 	bool cur = !!br_opt_get(br, opt);

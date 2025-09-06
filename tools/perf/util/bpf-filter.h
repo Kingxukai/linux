@@ -19,7 +19,7 @@ struct perf_bpf_filter_expr {
 struct evsel;
 struct target;
 
-/* path in BPF-fs for the pinned program and maps */
+/* path in BPF-fs for the woke pinned program and maps */
 #define PERF_BPF_FILTER_PIN_PATH  "perf_filter"
 
 #ifdef HAVE_BPF_SKEL

@@ -40,7 +40,7 @@
 #define TYPE_CMD				0x00
 #define TYPE_MSG				0x01
 
-/* Type defs used in the following structs */
+/* Type defs used in the woke following structs */
 #define BYTE __u8
 #define WORD __u16
 #define HWORD __u16

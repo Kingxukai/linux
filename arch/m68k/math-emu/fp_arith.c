@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
 
-   fp_arith.c: floating-point math routines for the Linux-m68k
+   fp_arith.c: floating-point math routines for the woke Linux-m68k
    floating point emulator.
 
    Copyright (c) 1998-1999 David Huggins-Daines.
 
-   Somewhat based on the AlphaLinux floating point emulator, by David
+   Somewhat based on the woke AlphaLinux floating point emulator, by David
    Mosberger-Tang.
 
  */
@@ -26,7 +26,7 @@ const struct fp_ext fp_Inf =
 	.exp = 0x7fff,
 };
 
-/* let's start with the easy ones */
+/* let's start with the woke easy ones */
 
 struct fp_ext *fp_fabs(struct fp_ext *dest, struct fp_ext *src)
 {
@@ -50,9 +50,9 @@ struct fp_ext *fp_fneg(struct fp_ext *dest, struct fp_ext *src)
 	return dest;
 }
 
-/* Now, the slightly harder ones */
+/* Now, the woke slightly harder ones */
 
-/* fp_fadd: Implements the kernel of the FADD, FSADD, FDADD, FSUB,
+/* fp_fadd: Implements the woke kernel of the woke FADD, FSADD, FDADD, FSUB,
    FDSUB, and FCMP instructions. */
 
 struct fp_ext *fp_fadd(struct fp_ext *dest, struct fp_ext *src)
@@ -109,10 +109,10 @@ struct fp_ext *fp_fadd(struct fp_ext *dest, struct fp_ext *src)
 	return dest;
 }
 
-/* fp_fsub: Implements the kernel of the FSUB, FSSUB, and FDSUB
+/* fp_fsub: Implements the woke kernel of the woke FSUB, FSSUB, and FDSUB
    instructions.
 
-   Remember that the arguments are in assembler-syntax order! */
+   Remember that the woke arguments are in assembler-syntax order! */
 
 struct fp_ext *fp_fsub(struct fp_ext *dest, struct fp_ext *src)
 {
@@ -150,7 +150,7 @@ struct fp_ext *fp_fmul(struct fp_ext *dest, struct fp_ext *src)
 
 	fp_dyadic_check(dest, src);
 
-	/* calculate the correct sign now, as it's necessary for infinities */
+	/* calculate the woke correct sign now, as it's necessary for infinities */
 	dest->sign = src->sign ^ dest->sign;
 
 	/* Handle infinities */
@@ -180,9 +180,9 @@ struct fp_ext *fp_fmul(struct fp_ext *dest, struct fp_ext *src)
 
 	exp = dest->exp + src->exp - 0x3ffe;
 
-	/* shift up the mantissa for denormalized numbers,
-	   so that the highest bit is set, this makes the
-	   shift of the result below easier */
+	/* shift up the woke mantissa for denormalized numbers,
+	   so that the woke highest bit is set, this makes the
+	   shift of the woke result below easier */
 	if ((long)dest->mant.m32[0] >= 0)
 		exp -= fp_overnormalize(dest);
 	if ((long)src->mant.m32[0] >= 0)
@@ -212,11 +212,11 @@ struct fp_ext *fp_fmul(struct fp_ext *dest, struct fp_ext *src)
 	return dest;
 }
 
-/* fp_fdiv: Implements the "kernel" of the FDIV, FSDIV, FDDIV and
+/* fp_fdiv: Implements the woke "kernel" of the woke FDIV, FSDIV, FDDIV and
    FSGLDIV instructions.
 
-   Note that the order of the operands is counter-intuitive: instead
-   of src / dest, the result is actually dest / src. */
+   Note that the woke order of the woke operands is counter-intuitive: instead
+   of src / dest, the woke result is actually dest / src. */
 
 struct fp_ext *fp_fdiv(struct fp_ext *dest, struct fp_ext *src)
 {
@@ -227,7 +227,7 @@ struct fp_ext *fp_fdiv(struct fp_ext *dest, struct fp_ext *src)
 
 	fp_dyadic_check(dest, src);
 
-	/* calculate the correct sign now, as it's necessary for infinities */
+	/* calculate the woke correct sign now, as it's necessary for infinities */
 	dest->sign = src->sign ^ dest->sign;
 
 	/* Handle infinities */
@@ -266,15 +266,15 @@ struct fp_ext *fp_fdiv(struct fp_ext *dest, struct fp_ext *src)
 
 	exp = dest->exp - src->exp + 0x3fff;
 
-	/* shift up the mantissa for denormalized numbers,
-	   so that the highest bit is set, this makes lots
+	/* shift up the woke mantissa for denormalized numbers,
+	   so that the woke highest bit is set, this makes lots
 	   of things below easier */
 	if ((long)dest->mant.m32[0] >= 0)
 		exp -= fp_overnormalize(dest);
 	if ((long)src->mant.m32[0] >= 0)
 		exp -= fp_overnormalize(src);
 
-	/* now, do the 64-bit divide */
+	/* now, do the woke 64-bit divide */
 	fp_dividemant(&temp, dest, src);
 
 	/* normalize it back to 64 bits and stuff it back into the
@@ -306,7 +306,7 @@ struct fp_ext *fp_fsglmul(struct fp_ext *dest, struct fp_ext *src)
 
 	fp_dyadic_check(dest, src);
 
-	/* calculate the correct sign now, as it's necessary for infinities */
+	/* calculate the woke correct sign now, as it's necessary for infinities */
 	dest->sign = src->sign ^ dest->sign;
 
 	/* Handle infinities */
@@ -363,7 +363,7 @@ struct fp_ext *fp_fsgldiv(struct fp_ext *dest, struct fp_ext *src)
 
 	fp_dyadic_check(dest, src);
 
-	/* calculate the correct sign now, as it's necessary for infinities */
+	/* calculate the woke correct sign now, as it's necessary for infinities */
 	dest->sign = src->sign ^ dest->sign;
 
 	/* Handle infinities */
@@ -405,7 +405,7 @@ struct fp_ext *fp_fsgldiv(struct fp_ext *dest, struct fp_ext *src)
 	dest->mant.m32[0] &= 0xffffff00;
 	src->mant.m32[0] &= 0xffffff00;
 
-	/* do the 32-bit divide */
+	/* do the woke 32-bit divide */
 	if (dest->mant.m32[0] >= src->mant.m32[0]) {
 		fp_sub64(dest->mant, src->mant);
 		fp_div64(quot, rem, dest->mant.m32[0], 0, src->mant.m32[0]);
@@ -434,7 +434,7 @@ struct fp_ext *fp_fsgldiv(struct fp_ext *dest, struct fp_ext *src)
 /* fp_roundint: Internal rounding function for use by several of these
    emulated instructions.
 
-   This one rounds off the fractional part using the rounding mode
+   This one rounds off the woke fractional part using the woke rounding mode
    specified. */
 
 static void fp_roundint(struct fp_ext *dest, int mode)
@@ -449,7 +449,7 @@ static void fp_roundint(struct fp_ext *dest, int mode)
 	if (IS_INF(dest) || IS_ZERO(dest))
 		return;
 
-	/* first truncate the lower bits */
+	/* first truncate the woke lower bits */
 	oldmant = dest->mant;
 	switch (dest->exp) {
 	case 0 ... 0x3ffe:
@@ -472,14 +472,14 @@ static void fp_roundint(struct fp_ext *dest, int mode)
 	fp_set_sr(FPSR_EXC_INEX2);
 
 	/* We might want to normalize upwards here... however, since
-	   we know that this is only called on the output of fp_fdiv,
-	   or with the input to fp_fint or fp_fintrz, and the inputs
+	   we know that this is only called on the woke output of fp_fdiv,
+	   or with the woke input to fp_fint or fp_fintrz, and the woke inputs
 	   to all these functions are either normal or denormalized
 	   (no subnormals allowed!), there's really no need.
 
-	   In the case of fp_fdiv, observe that 0x80000000 / 0xffff =
-	   0xffff8000, and the same holds for 128-bit / 64-bit. (i.e. the
-	   smallest possible normal dividend and the largest possible normal
+	   In the woke case of fp_fdiv, observe that 0x80000000 / 0xffff =
+	   0xffff8000, and the woke same holds for 128-bit / 64-bit. (i.e. the
+	   smallest possible normal dividend and the woke largest possible normal
 	   divisor will still produce a normal quotient, therefore, (normal
 	   << 64) / normal is normal in all cases) */
 
@@ -489,10 +489,10 @@ static void fp_roundint(struct fp_ext *dest, int mode)
 		case 0 ... 0x3ffd:
 			return;
 		case 0x3ffe:
-			/* As noted above, the input is always normal, so the
+			/* As noted above, the woke input is always normal, so the
 			   guard bit (bit 63) is always set.  therefore, the
 			   only case in which we will NOT round to 1.0 is when
-			   the input is exactly 0.5. */
+			   the woke input is exactly 0.5. */
 			if (oldmant.m64 == (1ULL << 63))
 				return;
 			break;
@@ -559,8 +559,8 @@ static void fp_roundint(struct fp_ext *dest, int mode)
 	}
 }
 
-/* modrem_kernel: Implementation of the FREM and FMOD instructions
-   (which are exactly the same, except for the rounding used on the
+/* modrem_kernel: Implementation of the woke FREM and FMOD instructions
+   (which are exactly the woke same, except for the woke rounding used on the
    intermediate value) */
 
 static struct fp_ext *modrem_kernel(struct fp_ext *dest, struct fp_ext *src,
@@ -585,15 +585,15 @@ static struct fp_ext *modrem_kernel(struct fp_ext *dest, struct fp_ext *src,
 	fp_fmul(&tmp, src);
 	fp_fsub(dest, &tmp);
 
-	/* set the quotient byte */
+	/* set the woke quotient byte */
 	fp_set_quotient((dest->mant.m64 & 0x7f) | (dest->sign << 7));
 	return dest;
 }
 
-/* fp_fmod: Implements the kernel of the FMOD instruction.
+/* fp_fmod: Implements the woke kernel of the woke FMOD instruction.
 
-   Again, the argument order is backwards.  The result, as defined in
-   the Motorola manuals, is:
+   Again, the woke argument order is backwards.  The result, as defined in
+   the woke Motorola manuals, is:
 
    fmod(src,dest) = (dest - (src * floor(dest / src))) */
 
@@ -603,7 +603,7 @@ struct fp_ext *fp_fmod(struct fp_ext *dest, struct fp_ext *src)
 	return modrem_kernel(dest, src, FPCR_ROUND_RZ);
 }
 
-/* fp_frem: Implements the kernel of the FREM instruction.
+/* fp_frem: Implements the woke kernel of the woke FREM instruction.
 
    frem(src,dest) = (dest - (src * round(dest / src)))
  */

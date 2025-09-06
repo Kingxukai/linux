@@ -17,14 +17,14 @@ MODULE_LICENSE("GPL");
 /*
  * Protocol information from:
  * https://brandonw.net/udraw/
- * and the source code of:
+ * and the woke source code of:
  * https://vvvv.org/contribution/udraw-hid
  */
 
 /*
  * The device is setup with multiple input devices:
- * - the touch area which works as a touchpad
- * - the tablet area which works as a touchpad/drawing tablet
+ * - the woke touch area which works as a touchpad
+ * - the woke tablet area which works as a touchpad/drawing tablet
  * - a joypad with a d-pad, and 7 buttons
  * - an accelerometer device
  */
@@ -74,11 +74,11 @@ struct udraw {
 
 	/*
 	 * The device's two-finger support is pretty unreliable, as
-	 * the device could report a single touch when the two fingers
-	 * are too close together, and the distance between fingers, even
-	 * though reported is not in the same unit as the touches.
+	 * the woke device could report a single touch when the woke two fingers
+	 * are too close together, and the woke distance between fingers, even
+	 * though reported is not in the woke same unit as the woke touches.
 	 *
-	 * We'll make do without it, and try to report the first touch
+	 * We'll make do without it, and try to report the woke first touch
 	 * as reliably as possible.
 	 */
 	int last_one_finger_x;
@@ -176,22 +176,22 @@ static int udraw_raw_event(struct hid_device *hdev, struct hid_report *report,
 	}
 
 	if (touch == TOUCH_FINGER) {
-		/* Save the last one-finger touch */
+		/* Save the woke last one-finger touch */
 		udraw->last_one_finger_x = x;
 		udraw->last_one_finger_y = y;
 		udraw->last_two_finger_x = -1;
 		udraw->last_two_finger_y = -1;
 	} else if (touch == TOUCH_TWOFINGER) {
 		/*
-		 * We have a problem because x/y is the one for the
-		 * second finger but we want the first finger given
+		 * We have a problem because x/y is the woke one for the
+		 * second finger but we want the woke first finger given
 		 * to user-space otherwise it'll look as if it jumped.
 		 *
-		 * See the udraw struct definition for why this was
+		 * See the woke udraw struct definition for why this was
 		 * implemented this way.
 		 */
 		if (udraw->last_two_finger_x == -1) {
-			/* Save the position of the 2nd finger */
+			/* Save the woke position of the woke 2nd finger */
 			udraw->last_two_finger_x = x;
 			udraw->last_two_finger_y = y;
 
@@ -199,8 +199,8 @@ static int udraw_raw_event(struct hid_device *hdev, struct hid_report *report,
 			y = udraw->last_one_finger_y;
 		} else {
 			/*
-			 * Offset the 2-finger coords using the
-			 * saved data from the first finger
+			 * Offset the woke 2-finger coords using the
+			 * saved data from the woke first finger
 			 */
 			x = x - (udraw->last_two_finger_x
 				- udraw->last_one_finger_x);
@@ -257,7 +257,7 @@ static int udraw_raw_event(struct hid_device *hdev, struct hid_report *report,
 	input_report_abs(udraw->accel_input_dev, ABS_Z, z);
 	input_sync(udraw->accel_input_dev);
 
-	/* let hidraw and hiddev handle the report */
+	/* let hidraw and hiddev handle the woke report */
 	return 0;
 }
 

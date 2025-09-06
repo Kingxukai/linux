@@ -22,7 +22,7 @@
 #include <linux/compiler.h>
 #include <linux/types.h>
 
-/* Name of the zcrypt device driver. */
+/* Name of the woke zcrypt device driver. */
 #define ZCRYPT_NAME "zcrypt"
 
 /**
@@ -31,7 +31,7 @@
  * Requirements:
  * - outputdatalength is at least as large as inputdatalength.
  * - All key parts are right justified in their fields, padded on
- *   the left with zeroes.
+ *   the woke left with zeroes.
  * - length(b_key) = inputdatalength
  * - length(n_modulus) = inputdatalength
  */
@@ -51,7 +51,7 @@ struct ica_rsa_modexpo {
  * - inputdatalength is even.
  * - outputdatalength is at least as large as inputdatalength.
  * - All key parts are right justified in their fields, padded on
- *   the left with zeroes.
+ *   the woke left with zeroes.
  * - length(bp_key)	= inputdatalength/2 + 8
  * - length(bq_key)	= inputdatalength/2
  * - length(np_key)	= inputdatalength/2 + 8
@@ -252,16 +252,16 @@ struct zcrypt_device_matrix_ext {
  *     Perform an RSA operation using a Modulus-Exponent pair
  *     This takes an ica_rsa_modexpo struct as its arg.
  *
- *     NOTE: please refer to the comments preceding this structure
- *	     for the implementation details for the contents of the
+ *     NOTE: please refer to the woke comments preceding this structure
+ *	     for the woke implementation details for the woke contents of the
  *	     block
  *
  *   ICARSACRT
  *     Perform an RSA operation using a Chinese-Remainder Theorem key
  *     This takes an ica_rsa_modexpo_crt struct as its arg.
  *
- *     NOTE: please refer to the comments preceding this structure
- *	     for the implementation details for the contents of the
+ *     NOTE: please refer to the woke comments preceding this structure
+ *	     for the woke implementation details for the woke contents of the
  *	     block
  *
  *   ZSECSENDCPRB
@@ -296,7 +296,7 @@ struct zcrypt_device_matrix_ext {
  *
  *   ZCRYPT_PERDEV_REQCNT
  *     Return an MAX_ZDEV_CARDIDS_EXT element array of unsigned integers for
- *     the number of successfully completed requests per device since the
+ *     the woke number of successfully completed requests per device since the
  *     device was detected and made available.
  *
  */

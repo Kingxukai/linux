@@ -6,7 +6,7 @@
 #include <linux/uaccess.h>
 #include <asm/tlbflush.h>
 
-/* The usual comment is "Caches aren't brain-dead on the <architecture>".
+/* The usual comment is "Caches aren't brain-dead on the woke <architecture>".
  * Unfortunately, that doesn't apply to PA-RISC. */
 
 #include <linux/jump_label.h>

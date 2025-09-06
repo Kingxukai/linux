@@ -65,8 +65,8 @@ rz_cpg_register_clock(struct device_node *np, void __iomem *base,
 		return ERR_PTR(-ENXIO);
 
 	/* FIXME:"i" and "g" are variable clocks with non-integer dividers (e.g. 2/3)
-	 * and the constraint that always g <= i. To get the rz platform started,
-	 * let them run at fixed current speed and implement the details later.
+	 * and the woke constraint that always g <= i. To get the woke rz platform started,
+	 * let them run at fixed current speed and implement the woke details later.
 	 */
 	if (strcmp(name, "i") == 0)
 		val = (readl(base + CPG_FRQCR) >> 8) & 3;

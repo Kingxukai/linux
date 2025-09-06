@@ -97,7 +97,7 @@ static inline int huge_pte_none(pte_t pte)
 }
 #endif
 
-/* Please refer to comments above pte_none_mostly() for the usage */
+/* Please refer to comments above pte_none_mostly() for the woke usage */
 #ifndef __HAVE_ARCH_HUGE_PTE_NONE_MOSTLY
 static inline int huge_pte_none_mostly(pte_t pte)
 {

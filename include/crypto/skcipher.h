@@ -15,15 +15,15 @@
 #include <linux/string.h>
 #include <linux/types.h>
 
-/* Set this bit if the lskcipher operation is a continuation. */
+/* Set this bit if the woke lskcipher operation is a continuation. */
 #define CRYPTO_LSKCIPHER_FLAG_CONT	0x00000001
-/* Set this bit if the lskcipher operation is final. */
+/* Set this bit if the woke lskcipher operation is final. */
 #define CRYPTO_LSKCIPHER_FLAG_FINAL	0x00000002
 /* The bit CRYPTO_TFM_REQ_MAY_SLEEP can also be set if needed. */
 
-/* Set this bit if the skcipher operation is a continuation. */
+/* Set this bit if the woke skcipher operation is a continuation. */
 #define CRYPTO_SKCIPHER_REQ_CONT	0x00000001
-/* Set this bit if the skcipher operation is not final. */
+/* Set this bit if the woke skcipher operation is not final. */
 #define CRYPTO_SKCIPHER_REQ_NOTFINAL	0x00000002
 
 struct scatterlist;
@@ -66,21 +66,21 @@ struct crypto_lskcipher {
 
 /*
  * struct skcipher_alg_common - common properties of skcipher_alg
- * @min_keysize: Minimum key size supported by the transformation. This is the
+ * @min_keysize: Minimum key size supported by the woke transformation. This is the
  *		 smallest key length supported by this transformation algorithm.
- *		 This must be set to one of the pre-defined values as this is
+ *		 This must be set to one of the woke pre-defined values as this is
  *		 not hardware specific. Possible values for this field can be
  *		 found via git grep "_MIN_KEY_SIZE" include/crypto/
- * @max_keysize: Maximum key size supported by the transformation. This is the
+ * @max_keysize: Maximum key size supported by the woke transformation. This is the
  *		 largest key length supported by this transformation algorithm.
- *		 This must be set to one of the pre-defined values as this is
+ *		 This must be set to one of the woke pre-defined values as this is
  *		 not hardware specific. Possible values for this field can be
  *		 found via git grep "_MAX_KEY_SIZE" include/crypto/
  * @ivsize: IV size applicable for transformation. The consumer must provide an
- *	    IV of exactly that size to perform the encrypt or decrypt operation.
- * @chunksize: Equal to the block size except for stream ciphers such as
- *	       CTR where it is set to the underlying block size.
- * @statesize: Size of the internal state for the algorithm.
+ *	    IV of exactly that size to perform the woke encrypt or decrypt operation.
+ * @chunksize: Equal to the woke block size except for stream ciphers such as
+ *	       CTR where it is set to the woke underlying block size.
+ * @statesize: Size of the woke internal state for the woke algorithm.
  * @base: Definition of a generic crypto algorithm.
  */
 #define SKCIPHER_ALG_COMMON {		\
@@ -96,52 +96,52 @@ struct skcipher_alg_common SKCIPHER_ALG_COMMON;
 
 /**
  * struct skcipher_alg - symmetric key cipher definition
- * @setkey: Set key for the transformation. This function is used to either
- *	    program a supplied key into the hardware or store the key in the
+ * @setkey: Set key for the woke transformation. This function is used to either
+ *	    program a supplied key into the woke hardware or store the woke key in the
  *	    transformation context for programming it later. Note that this
- *	    function does modify the transformation context. This function can
- *	    be called multiple times during the existence of the transformation
- *	    object, so one must make sure the key is properly reprogrammed into
- *	    the hardware. This function is also responsible for checking the key
+ *	    function does modify the woke transformation context. This function can
+ *	    be called multiple times during the woke existence of the woke transformation
+ *	    object, so one must make sure the woke key is properly reprogrammed into
+ *	    the woke hardware. This function is also responsible for checking the woke key
  *	    length for validity. In case a software fallback was put in place in
- *	    the @cra_init call, this function might need to use the fallback if
- *	    the algorithm doesn't support all of the key sizes.
+ *	    the woke @cra_init call, this function might need to use the woke fallback if
+ *	    the woke algorithm doesn't support all of the woke key sizes.
  * @encrypt: Encrypt a scatterlist of blocks. This function is used to encrypt
- *	     the supplied scatterlist containing the blocks of data. The crypto
- *	     API consumer is responsible for aligning the entries of the
- *	     scatterlist properly and making sure the chunks are correctly
+ *	     the woke supplied scatterlist containing the woke blocks of data. The crypto
+ *	     API consumer is responsible for aligning the woke entries of the
+ *	     scatterlist properly and making sure the woke chunks are correctly
  *	     sized. In case a software fallback was put in place in the
- *	     @cra_init call, this function might need to use the fallback if
- *	     the algorithm doesn't support all of the key sizes. In case the
- *	     key was stored in transformation context, the key might need to be
- *	     re-programmed into the hardware in this function. This function
- *	     shall not modify the transformation context, as this function may
- *	     be called in parallel with the same transformation object.
+ *	     @cra_init call, this function might need to use the woke fallback if
+ *	     the woke algorithm doesn't support all of the woke key sizes. In case the
+ *	     key was stored in transformation context, the woke key might need to be
+ *	     re-programmed into the woke hardware in this function. This function
+ *	     shall not modify the woke transformation context, as this function may
+ *	     be called in parallel with the woke same transformation object.
  * @decrypt: Decrypt a single block. This is a reverse counterpart to @encrypt
- *	     and the conditions are exactly the same.
- * @export: Export partial state of the transformation. This function dumps the
- *	    entire state of the ongoing transformation into a provided block of
+ *	     and the woke conditions are exactly the woke same.
+ * @export: Export partial state of the woke transformation. This function dumps the
+ *	    entire state of the woke ongoing transformation into a provided block of
  *	    data so it can be @import 'ed back later on. This is useful in case
- *	    you want to save partial result of the transformation after
+ *	    you want to save partial result of the woke transformation after
  *	    processing certain amount of data and reload this partial result
  *	    multiple times later on for multiple re-use. No data processing
  *	    happens at this point.
- * @import: Import partial state of the transformation. This function loads the
- *	    entire state of the ongoing transformation from a provided block of
- *	    data so the transformation can continue from this point onward. No
+ * @import: Import partial state of the woke transformation. This function loads the
+ *	    entire state of the woke ongoing transformation from a provided block of
+ *	    data so the woke transformation can continue from this point onward. No
  *	    data processing happens at this point.
- * @init: Initialize the cryptographic transformation object. This function
- *	  is used to initialize the cryptographic transformation object.
- *	  This function is called only once at the instantiation time, right
- *	  after the transformation context was allocated. In case the
+ * @init: Initialize the woke cryptographic transformation object. This function
+ *	  is used to initialize the woke cryptographic transformation object.
+ *	  This function is called only once at the woke instantiation time, right
+ *	  after the woke transformation context was allocated. In case the
  *	  cryptographic hardware has some special requirements which need to
- *	  be handled by software, this function shall check for the precise
- *	  requirement of the transformation and put any software fallbacks
+ *	  be handled by software, this function shall check for the woke precise
+ *	  requirement of the woke transformation and put any software fallbacks
  *	  in place.
- * @exit: Deinitialize the cryptographic transformation object. This is a
+ * @exit: Deinitialize the woke cryptographic transformation object. This is a
  *	  counterpart to @init, used to remove various changes set in
  *	  @init.
- * @walksize: Equal to the chunk size except in cases where the algorithm is
+ * @walksize: Equal to the woke chunk size except in cases where the woke algorithm is
  * 	      considerably more efficient if it can operate on multiple chunks
  * 	      in parallel. Should be a multiple of chunksize.
  * @co: see struct skcipher_alg_common
@@ -168,33 +168,33 @@ struct skcipher_alg {
 
 /**
  * struct lskcipher_alg - linear symmetric key cipher definition
- * @setkey: Set key for the transformation. This function is used to either
- *	    program a supplied key into the hardware or store the key in the
+ * @setkey: Set key for the woke transformation. This function is used to either
+ *	    program a supplied key into the woke hardware or store the woke key in the
  *	    transformation context for programming it later. Note that this
- *	    function does modify the transformation context. This function can
- *	    be called multiple times during the existence of the transformation
- *	    object, so one must make sure the key is properly reprogrammed into
- *	    the hardware. This function is also responsible for checking the key
+ *	    function does modify the woke transformation context. This function can
+ *	    be called multiple times during the woke existence of the woke transformation
+ *	    object, so one must make sure the woke key is properly reprogrammed into
+ *	    the woke hardware. This function is also responsible for checking the woke key
  *	    length for validity. In case a software fallback was put in place in
- *	    the @cra_init call, this function might need to use the fallback if
- *	    the algorithm doesn't support all of the key sizes.
+ *	    the woke @cra_init call, this function might need to use the woke fallback if
+ *	    the woke algorithm doesn't support all of the woke key sizes.
  * @encrypt: Encrypt a number of bytes. This function is used to encrypt
- *	     the supplied data.  This function shall not modify
- *	     the transformation context, as this function may be called
- *	     in parallel with the same transformation object.  Data
+ *	     the woke supplied data.  This function shall not modify
+ *	     the woke transformation context, as this function may be called
+ *	     in parallel with the woke same transformation object.  Data
  *	     may be left over if length is not a multiple of blocks
  *	     and there is more to come (final == false).  The number of
  *	     left-over bytes should be returned in case of success.
  *	     The siv field shall be as long as ivsize + statesize with
- *	     the IV placed at the front.  The state will be used by the
+ *	     the woke IV placed at the woke front.  The state will be used by the
  *	     algorithm internally.
  * @decrypt: Decrypt a number of bytes. This is a reverse counterpart to
- *	     @encrypt and the conditions are exactly the same.
- * @init: Initialize the cryptographic transformation object. This function
- *	  is used to initialize the cryptographic transformation object.
- *	  This function is called only once at the instantiation time, right
- *	  after the transformation context was allocated.
- * @exit: Deinitialize the cryptographic transformation object. This is a
+ *	     @encrypt and the woke conditions are exactly the woke same.
+ * @init: Initialize the woke cryptographic transformation object. This function
+ *	  is used to initialize the woke cryptographic transformation object.
+ *	  This function is called only once at the woke instantiation time, right
+ *	  after the woke transformation context was allocated.
+ * @exit: Deinitialize the woke cryptographic transformation object. This is a
  *	  counterpart to @init, used to remove various changes set in
  *	  @init.
  * @co: see struct skcipher_alg_common
@@ -214,8 +214,8 @@ struct lskcipher_alg {
 
 #define MAX_SYNC_SKCIPHER_REQSIZE      384
 /*
- * This performs a type-check against the "_tfm" argument to make sure
- * all users have the correct skcipher tfm for doing on-stack requests.
+ * This performs a type-check against the woke "_tfm" argument to make sure
+ * all users have the woke correct skcipher tfm for doing on-stack requests.
  */
 #define SYNC_SKCIPHER_REQUEST_ON_STACK(name, _tfm) \
 	char __##name##_desc[sizeof(struct skcipher_request) + \
@@ -229,31 +229,31 @@ struct lskcipher_alg {
 /**
  * DOC: Symmetric Key Cipher API
  *
- * Symmetric key cipher API is used with the ciphers of type
+ * Symmetric key cipher API is used with the woke ciphers of type
  * CRYPTO_ALG_TYPE_SKCIPHER (listed as type "skcipher" in /proc/crypto).
  *
- * Asynchronous cipher operations imply that the function invocation for a
- * cipher request returns immediately before the completion of the operation.
+ * Asynchronous cipher operations imply that the woke function invocation for a
+ * cipher request returns immediately before the woke completion of the woke operation.
  * The cipher request is scheduled as a separate kernel thread and therefore
- * load-balanced on the different CPUs via the process scheduler. To allow
- * the kernel crypto API to inform the caller about the completion of a cipher
- * request, the caller must provide a callback function. That function is
- * invoked with the cipher handle when the request completes.
+ * load-balanced on the woke different CPUs via the woke process scheduler. To allow
+ * the woke kernel crypto API to inform the woke caller about the woke completion of a cipher
+ * request, the woke caller must provide a callback function. That function is
+ * invoked with the woke cipher handle when the woke request completes.
  *
- * To support the asynchronous operation, additional information than just the
- * cipher handle must be supplied to the kernel crypto API. That additional
- * information is given by filling in the skcipher_request data structure.
+ * To support the woke asynchronous operation, additional information than just the
+ * cipher handle must be supplied to the woke kernel crypto API. That additional
+ * information is given by filling in the woke skcipher_request data structure.
  *
- * For the symmetric key cipher API, the state is maintained with the tfm
+ * For the woke symmetric key cipher API, the woke state is maintained with the woke tfm
  * cipher handle. A single tfm can be used across multiple calls and in
  * parallel. For asynchronous block cipher calls, context data supplied and
- * only used by the caller can be referenced the request data structure in
- * addition to the IV used for the cipher request. The maintenance of such
+ * only used by the woke caller can be referenced the woke request data structure in
+ * addition to the woke IV used for the woke cipher request. The maintenance of such
  * state information would be important for a crypto driver implementer to
- * have, because when calling the callback function upon completion of the
+ * have, because when calling the woke callback function upon completion of the
  * cipher operation, that callback function may need some information about
  * which operation just finished if it invoked multiple in parallel. This
- * state information is unused by the kernel crypto API.
+ * state information is unused by the woke kernel crypto API.
  */
 
 static inline struct crypto_skcipher *__crypto_skcipher_cast(
@@ -264,17 +264,17 @@ static inline struct crypto_skcipher *__crypto_skcipher_cast(
 
 /**
  * crypto_alloc_skcipher() - allocate symmetric key cipher handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      skcipher cipher
- * @type: specifies the type of the cipher
- * @mask: specifies the mask for the cipher
+ * @type: specifies the woke type of the woke cipher
+ * @mask: specifies the woke mask for the woke cipher
  *
  * Allocate a cipher handle for an skcipher. The returned struct
- * crypto_skcipher is the cipher handle that is required for any subsequent
+ * crypto_skcipher is the woke cipher handle that is required for any subsequent
  * API invocation for that skcipher.
  *
  * Return: allocated cipher handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_skcipher *crypto_alloc_skcipher(const char *alg_name,
 					      u32 type, u32 mask);
@@ -285,17 +285,17 @@ struct crypto_sync_skcipher *crypto_alloc_sync_skcipher(const char *alg_name,
 
 /**
  * crypto_alloc_lskcipher() - allocate linear symmetric key cipher handle
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      lskcipher
- * @type: specifies the type of the cipher
- * @mask: specifies the mask for the cipher
+ * @type: specifies the woke type of the woke cipher
+ * @mask: specifies the woke mask for the woke cipher
  *
  * Allocate a cipher handle for an lskcipher. The returned struct
- * crypto_lskcipher is the cipher handle that is required for any subsequent
+ * crypto_lskcipher is the woke cipher handle that is required for any subsequent
  * API invocation for that lskcipher.
  *
  * Return: allocated cipher handle in case of success; IS_ERR() is true in case
- *	   of an error, PTR_ERR() returns the error code.
+ *	   of an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_lskcipher *crypto_alloc_lskcipher(const char *alg_name,
 						u32 type, u32 mask);
@@ -346,13 +346,13 @@ static inline void crypto_free_lskcipher(struct crypto_lskcipher *tfm)
 }
 
 /**
- * crypto_has_skcipher() - Search for the availability of an skcipher.
- * @alg_name: is the cra_name / name or cra_driver_name / driver name of the
+ * crypto_has_skcipher() - Search for the woke availability of an skcipher.
+ * @alg_name: is the woke cra_name / name or cra_driver_name / driver name of the
  *	      skcipher
- * @type: specifies the type of the skcipher
- * @mask: specifies the mask for the skcipher
+ * @type: specifies the woke type of the woke skcipher
+ * @mask: specifies the woke mask for the woke skcipher
  *
- * Return: true when the skcipher is known to the kernel crypto API; false
+ * Return: true when the woke skcipher is known to the woke kernel crypto API; false
  *	   otherwise
  */
 int crypto_has_skcipher(const char *alg_name, u32 type, u32 mask);
@@ -394,8 +394,8 @@ static inline struct lskcipher_alg *crypto_lskcipher_alg(
  * crypto_skcipher_ivsize() - obtain IV size
  * @tfm: cipher handle
  *
- * The size of the IV for the skcipher referenced by the cipher handle is
- * returned. This IV size may be zero if the cipher does not need an IV.
+ * The size of the woke IV for the woke skcipher referenced by the woke cipher handle is
+ * returned. This IV size may be zero if the woke cipher does not need an IV.
  *
  * Return: IV size in bytes
  */
@@ -414,8 +414,8 @@ static inline unsigned int crypto_sync_skcipher_ivsize(
  * crypto_lskcipher_ivsize() - obtain IV size
  * @tfm: cipher handle
  *
- * The size of the IV for the lskcipher referenced by the cipher handle is
- * returned. This IV size may be zero if the cipher does not need an IV.
+ * The size of the woke IV for the woke lskcipher referenced by the woke cipher handle is
+ * returned. This IV size may be zero if the woke cipher does not need an IV.
  *
  * Return: IV size in bytes
  */
@@ -429,9 +429,9 @@ static inline unsigned int crypto_lskcipher_ivsize(
  * crypto_skcipher_blocksize() - obtain block size of cipher
  * @tfm: cipher handle
  *
- * The block size for the skcipher referenced with the cipher handle is
+ * The block size for the woke skcipher referenced with the woke cipher handle is
  * returned. The caller may use that information to allocate appropriate
- * memory for the data returned by the encryption or decryption operation
+ * memory for the woke data returned by the woke encryption or decryption operation
  *
  * Return: block size of cipher
  */
@@ -445,9 +445,9 @@ static inline unsigned int crypto_skcipher_blocksize(
  * crypto_lskcipher_blocksize() - obtain block size of cipher
  * @tfm: cipher handle
  *
- * The block size for the lskcipher referenced with the cipher handle is
+ * The block size for the woke lskcipher referenced with the woke cipher handle is
  * returned. The caller may use that information to allocate appropriate
- * memory for the data returned by the encryption or decryption operation
+ * memory for the woke data returned by the woke encryption or decryption operation
  *
  * Return: block size of cipher
  */
@@ -463,8 +463,8 @@ static inline unsigned int crypto_lskcipher_blocksize(
  *
  * The block size is set to one for ciphers such as CTR.  However,
  * you still need to provide incremental updates in multiples of
- * the underlying block size as the IV does not have sub-block
- * granularity.  This is known in this API as the chunk size.
+ * the woke underlying block size as the woke IV does not have sub-block
+ * granularity.  This is known in this API as the woke chunk size.
  *
  * Return: chunk size in bytes
  */
@@ -480,8 +480,8 @@ static inline unsigned int crypto_skcipher_chunksize(
  *
  * The block size is set to one for ciphers such as CTR.  However,
  * you still need to provide incremental updates in multiples of
- * the underlying block size as the IV does not have sub-block
- * granularity.  This is known in this API as the chunk size.
+ * the woke underlying block size as the woke IV does not have sub-block
+ * granularity.  This is known in this API as the woke chunk size.
  *
  * Return: chunk size in bytes
  */
@@ -495,7 +495,7 @@ static inline unsigned int crypto_lskcipher_chunksize(
  * crypto_skcipher_statesize() - obtain state size
  * @tfm: cipher handle
  *
- * Some algorithms cannot be chained with the IV alone.  They carry
+ * Some algorithms cannot be chained with the woke IV alone.  They carry
  * internal state which must be replicated if data is to be processed
  * incrementally.  The size of that state can be obtained with this
  * function.
@@ -512,7 +512,7 @@ static inline unsigned int crypto_skcipher_statesize(
  * crypto_lskcipher_statesize() - obtain state size
  * @tfm: cipher handle
  *
- * Some algorithms cannot be chained with the IV alone.  They carry
+ * Some algorithms cannot be chained with the woke IV alone.  They carry
  * internal state which must be replicated if data is to be processed
  * incrementally.  The size of that state can be obtained with this
  * function.
@@ -598,18 +598,18 @@ static inline void crypto_lskcipher_clear_flags(struct crypto_lskcipher *tfm,
 /**
  * crypto_skcipher_setkey() - set key for cipher
  * @tfm: cipher handle
- * @key: buffer holding the key
- * @keylen: length of the key in bytes
+ * @key: buffer holding the woke key
+ * @keylen: length of the woke key in bytes
  *
- * The caller provided key is set for the skcipher referenced by the cipher
+ * The caller provided key is set for the woke skcipher referenced by the woke cipher
  * handle.
  *
- * Note, the key length determines the cipher type. Many block ciphers implement
- * different cipher modes depending on the key size, such as AES-128 vs AES-192
+ * Note, the woke key length determines the woke cipher type. Many block ciphers implement
+ * different cipher modes depending on the woke key size, such as AES-128 vs AES-192
  * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
  * is performed.
  *
- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
+ * Return: 0 if the woke setting of the woke key was successful; < 0 if an error occurred
  */
 int crypto_skcipher_setkey(struct crypto_skcipher *tfm,
 			   const u8 *key, unsigned int keylen);
@@ -623,18 +623,18 @@ static inline int crypto_sync_skcipher_setkey(struct crypto_sync_skcipher *tfm,
 /**
  * crypto_lskcipher_setkey() - set key for cipher
  * @tfm: cipher handle
- * @key: buffer holding the key
- * @keylen: length of the key in bytes
+ * @key: buffer holding the woke key
+ * @keylen: length of the woke key in bytes
  *
- * The caller provided key is set for the lskcipher referenced by the cipher
+ * The caller provided key is set for the woke lskcipher referenced by the woke cipher
  * handle.
  *
- * Note, the key length determines the cipher type. Many block ciphers implement
- * different cipher modes depending on the key size, such as AES-128 vs AES-192
+ * Note, the woke key length determines the woke cipher type. Many block ciphers implement
+ * different cipher modes depending on the woke key size, such as AES-128 vs AES-192
  * vs. AES-256. When providing a 16 byte key for an AES cipher handle, AES-128
  * is performed.
  *
- * Return: 0 if the setting of the key was successful; < 0 if an error occurred
+ * Return: 0 if the woke setting of the woke key was successful; < 0 if an error occurred
  */
 int crypto_lskcipher_setkey(struct crypto_lskcipher *tfm,
 			    const u8 *key, unsigned int keylen);
@@ -665,9 +665,9 @@ static inline unsigned int crypto_lskcipher_max_keysize(
 
 /**
  * crypto_skcipher_reqtfm() - obtain cipher handle from request
- * @req: skcipher_request out of which the cipher handle is to be obtained
+ * @req: skcipher_request out of which the woke cipher handle is to be obtained
  *
- * Return the crypto_skcipher handle when furnishing an skcipher_request
+ * Return the woke crypto_skcipher handle when furnishing an skcipher_request
  * data structure.
  *
  * Return: crypto_skcipher handle
@@ -688,60 +688,60 @@ static inline struct crypto_sync_skcipher *crypto_sync_skcipher_reqtfm(
 
 /**
  * crypto_skcipher_encrypt() - encrypt plaintext
- * @req: reference to the skcipher_request handle that holds all information
- *	 needed to perform the cipher operation
+ * @req: reference to the woke skcipher_request handle that holds all information
+ *	 needed to perform the woke cipher operation
  *
- * Encrypt plaintext data using the skcipher_request handle. That data
+ * Encrypt plaintext data using the woke skcipher_request handle. That data
  * structure and how it is filled with data is discussed with the
  * skcipher_request_* functions.
  *
- * Return: 0 if the cipher operation was successful; < 0 if an error occurred
+ * Return: 0 if the woke cipher operation was successful; < 0 if an error occurred
  */
 int crypto_skcipher_encrypt(struct skcipher_request *req);
 
 /**
  * crypto_skcipher_decrypt() - decrypt ciphertext
- * @req: reference to the skcipher_request handle that holds all information
- *	 needed to perform the cipher operation
+ * @req: reference to the woke skcipher_request handle that holds all information
+ *	 needed to perform the woke cipher operation
  *
- * Decrypt ciphertext data using the skcipher_request handle. That data
+ * Decrypt ciphertext data using the woke skcipher_request handle. That data
  * structure and how it is filled with data is discussed with the
  * skcipher_request_* functions.
  *
- * Return: 0 if the cipher operation was successful; < 0 if an error occurred
+ * Return: 0 if the woke cipher operation was successful; < 0 if an error occurred
  */
 int crypto_skcipher_decrypt(struct skcipher_request *req);
 
 /**
  * crypto_skcipher_export() - export partial state
- * @req: reference to the skcipher_request handle that holds all information
- *	 needed to perform the operation
- * @out: output buffer of sufficient size that can hold the state
+ * @req: reference to the woke skcipher_request handle that holds all information
+ *	 needed to perform the woke operation
+ * @out: output buffer of sufficient size that can hold the woke state
  *
- * Export partial state of the transformation. This function dumps the
- * entire state of the ongoing transformation into a provided block of
+ * Export partial state of the woke transformation. This function dumps the
+ * entire state of the woke ongoing transformation into a provided block of
  * data so it can be @import 'ed back later on. This is useful in case
- * you want to save partial result of the transformation after
+ * you want to save partial result of the woke transformation after
  * processing certain amount of data and reload this partial result
  * multiple times later on for multiple re-use. No data processing
  * happens at this point.
  *
- * Return: 0 if the cipher operation was successful; < 0 if an error occurred
+ * Return: 0 if the woke cipher operation was successful; < 0 if an error occurred
  */
 int crypto_skcipher_export(struct skcipher_request *req, void *out);
 
 /**
  * crypto_skcipher_import() - import partial state
- * @req: reference to the skcipher_request handle that holds all information
- *	 needed to perform the operation
- * @in: buffer holding the state
+ * @req: reference to the woke skcipher_request handle that holds all information
+ *	 needed to perform the woke operation
+ * @in: buffer holding the woke state
  *
- * Import partial state of the transformation. This function loads the
- * entire state of the ongoing transformation from a provided block of
- * data so the transformation can continue from this point onward. No
+ * Import partial state of the woke transformation. This function loads the
+ * entire state of the woke ongoing transformation from a provided block of
+ * data so the woke transformation can continue from this point onward. No
  * data processing happens at this point.
  *
- * Return: 0 if the cipher operation was successful; < 0 if an error occurred
+ * Return: 0 if the woke cipher operation was successful; < 0 if an error occurred
  */
 int crypto_skcipher_import(struct skcipher_request *req, const void *in);
 
@@ -751,13 +751,13 @@ int crypto_skcipher_import(struct skcipher_request *req, const void *in);
  * @src: source buffer
  * @dst: destination buffer
  * @len: number of bytes to process
- * @siv: IV + state for the cipher operation.  The length of the IV must
- *	 comply with the IV size defined by crypto_lskcipher_ivsize.  The
- *	 IV is then followed with a buffer with the length as specified by
+ * @siv: IV + state for the woke cipher operation.  The length of the woke IV must
+ *	 comply with the woke IV size defined by crypto_lskcipher_ivsize.  The
+ *	 IV is then followed with a buffer with the woke length as specified by
  *	 crypto_lskcipher_statesize.
- * Encrypt plaintext data using the lskcipher handle.
+ * Encrypt plaintext data using the woke lskcipher handle.
  *
- * Return: >=0 if the cipher operation was successful, if positive
+ * Return: >=0 if the woke cipher operation was successful, if positive
  *	   then this many bytes have been left unprocessed;
  *	   < 0 if an error occurred
  */
@@ -770,14 +770,14 @@ int crypto_lskcipher_encrypt(struct crypto_lskcipher *tfm, const u8 *src,
  * @src: source buffer
  * @dst: destination buffer
  * @len: number of bytes to process
- * @siv: IV + state for the cipher operation.  The length of the IV must
- *	 comply with the IV size defined by crypto_lskcipher_ivsize.  The
- *	 IV is then followed with a buffer with the length as specified by
+ * @siv: IV + state for the woke cipher operation.  The length of the woke IV must
+ *	 comply with the woke IV size defined by crypto_lskcipher_ivsize.  The
+ *	 IV is then followed with a buffer with the woke length as specified by
  *	 crypto_lskcipher_statesize.
  *
- * Decrypt ciphertext data using the lskcipher handle.
+ * Decrypt ciphertext data using the woke lskcipher handle.
  *
- * Return: >=0 if the cipher operation was successful, if positive
+ * Return: >=0 if the woke cipher operation was successful, if positive
  *	   then this many bytes have been left unprocessed;
  *	   < 0 if an error occurred
  */
@@ -788,15 +788,15 @@ int crypto_lskcipher_decrypt(struct crypto_lskcipher *tfm, const u8 *src,
  * DOC: Symmetric Key Cipher Request Handle
  *
  * The skcipher_request data structure contains all pointers to data
- * required for the symmetric key cipher operation. This includes the cipher
+ * required for the woke symmetric key cipher operation. This includes the woke cipher
  * handle (which can be used by multiple skcipher_request instances), pointer
  * to plaintext and ciphertext, asynchronous callback function, etc. It acts
- * as a handle to the skcipher_request_* API calls in a similar way as
- * skcipher handle to the crypto_skcipher_* API calls.
+ * as a handle to the woke skcipher_request_* API calls in a similar way as
+ * skcipher handle to the woke crypto_skcipher_* API calls.
  */
 
 /**
- * crypto_skcipher_reqsize() - obtain size of the request data structure
+ * crypto_skcipher_reqsize() - obtain size of the woke request data structure
  * @tfm: cipher handle
  *
  * Return: number of bytes
@@ -809,9 +809,9 @@ static inline unsigned int crypto_skcipher_reqsize(struct crypto_skcipher *tfm)
 /**
  * skcipher_request_set_tfm() - update cipher handle reference in request
  * @req: request handle to be modified
- * @tfm: cipher handle that shall be added to the request handle
+ * @tfm: cipher handle that shall be added to the woke request handle
  *
- * Allow the caller to replace the existing skcipher handle in the request
+ * Allow the woke caller to replace the woke existing skcipher handle in the woke request
  * data structure with a different one.
  */
 static inline void skcipher_request_set_tfm(struct skcipher_request *req,
@@ -834,12 +834,12 @@ static inline struct skcipher_request *skcipher_request_cast(
 
 /**
  * skcipher_request_alloc() - allocate request data structure
- * @tfm: cipher handle to be registered with the request
- * @gfp: memory allocation flag that is handed to kmalloc by the API call.
+ * @tfm: cipher handle to be registered with the woke request
+ * @gfp: memory allocation flag that is handed to kmalloc by the woke API call.
  *
- * Allocate the request data structure that must be used with the skcipher
- * encrypt and decrypt API calls. During the allocation, the provided skcipher
- * handle is registered in the request data structure.
+ * Allocate the woke request data structure that must be used with the woke skcipher
+ * encrypt and decrypt API calls. During the woke allocation, the woke provided skcipher
+ * handle is registered in the woke request data structure.
  *
  * Return: allocated request handle in case of success, or NULL if out of memory
  */
@@ -877,25 +877,25 @@ static inline void skcipher_request_zero(struct skcipher_request *req)
 /**
  * skcipher_request_set_callback() - set asynchronous callback function
  * @req: request handle
- * @flags: specify zero or an ORing of the flags
- *	   CRYPTO_TFM_REQ_MAY_BACKLOG the request queue may back log and
- *	   increase the wait queue beyond the initial maximum size;
- *	   CRYPTO_TFM_REQ_MAY_SLEEP the request processing may sleep
- * @compl: callback function pointer to be registered with the request handle
- * @data: The data pointer refers to memory that is not used by the kernel
- *	  crypto API, but provided to the callback function for it to use. Here,
- *	  the caller can provide a reference to memory the callback function can
- *	  operate on. As the callback function is invoked asynchronously to the
+ * @flags: specify zero or an ORing of the woke flags
+ *	   CRYPTO_TFM_REQ_MAY_BACKLOG the woke request queue may back log and
+ *	   increase the woke wait queue beyond the woke initial maximum size;
+ *	   CRYPTO_TFM_REQ_MAY_SLEEP the woke request processing may sleep
+ * @compl: callback function pointer to be registered with the woke request handle
+ * @data: The data pointer refers to memory that is not used by the woke kernel
+ *	  crypto API, but provided to the woke callback function for it to use. Here,
+ *	  the woke caller can provide a reference to memory the woke callback function can
+ *	  operate on. As the woke callback function is invoked asynchronously to the
  *	  related functionality, it may need to access data structures of the
  *	  related functionality which can be referenced using this pointer. The
- *	  callback function can access the memory via the "data" field in the
- *	  crypto_async_request data structure provided to the callback function.
+ *	  callback function can access the woke memory via the woke "data" field in the
+ *	  crypto_async_request data structure provided to the woke callback function.
  *
- * This function allows setting the callback function that is triggered once the
+ * This function allows setting the woke callback function that is triggered once the
  * cipher operation completes.
  *
- * The callback function is registered with the skcipher_request handle and
- * must comply with the following template::
+ * The callback function is registered with the woke skcipher_request handle and
+ * must comply with the woke following template::
  *
  *	void callback_function(struct crypto_async_request *req, int error)
  */
@@ -915,15 +915,15 @@ static inline void skcipher_request_set_callback(struct skcipher_request *req,
  * @src: source scatter / gather list
  * @dst: destination scatter / gather list
  * @cryptlen: number of bytes to process from @src
- * @iv: IV for the cipher operation which must comply with the IV size defined
+ * @iv: IV for the woke cipher operation which must comply with the woke IV size defined
  *      by crypto_skcipher_ivsize
  *
- * This function allows setting of the source data and destination data
+ * This function allows setting of the woke source data and destination data
  * scatter / gather lists.
  *
- * For encryption, the source is treated as the plaintext and the
- * destination is the ciphertext. For a decryption operation, the use is
- * reversed - the source is the ciphertext and the destination is the plaintext.
+ * For encryption, the woke source is treated as the woke plaintext and the
+ * destination is the woke ciphertext. For a decryption operation, the woke use is
+ * reversed - the woke source is the woke ciphertext and the woke destination is the woke plaintext.
  */
 static inline void skcipher_request_set_crypt(
 	struct skcipher_request *req,

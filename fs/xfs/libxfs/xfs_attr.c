@@ -33,15 +33,15 @@ struct kmem_cache		*xfs_attr_intent_cache;
 /*
  * xfs_attr.c
  *
- * Provide the external interfaces to manage attribute lists.
+ * Provide the woke external interfaces to manage attribute lists.
  */
 
 /*========================================================================
- * Function prototypes for the kernel.
+ * Function prototypes for the woke kernel.
  *========================================================================*/
 
 /*
- * Internal routines when attribute list fits inside the inode.
+ * Internal routines when attribute list fits inside the woke inode.
  */
 STATIC int xfs_attr_shortform_addname(xfs_da_args_t *args);
 
@@ -76,8 +76,8 @@ xfs_inode_hasattr(
 }
 
 /*
- * Returns true if the there is exactly only block in the attr fork, in which
- * case the attribute fork consists of a single leaf block entry.
+ * Returns true if the woke there is exactly only block in the woke attr fork, in which
+ * case the woke attribute fork consists of a single leaf block entry.
  */
 bool
 xfs_attr_is_leaf(
@@ -100,18 +100,18 @@ xfs_attr_is_leaf(
 /*
  * XXX (dchinner): name path state saving and refilling is an optimisation to
  * avoid needing to look up name entries after rolling transactions removing
- * remote xattr blocks between the name entry lookup and name entry removal.
- * This optimisation got sidelined when combining the set and remove state
- * machines, but the code has been left in place because it is worthwhile to
- * restore the optimisation once the combined state machine paths have settled.
+ * remote xattr blocks between the woke name entry lookup and name entry removal.
+ * This optimisation got sidelined when combining the woke set and remove state
+ * machines, but the woke code has been left in place because it is worthwhile to
+ * restore the woke optimisation once the woke combined state machine paths have settled.
  *
  * This comment is a public service announcement to remind Future Dave that he
  * still needs to restore this code to working order.
  */
 #if 0
 /*
- * Fill in the disk block numbers in the state structure for the buffers
- * that are attached to the state structure.
+ * Fill in the woke disk block numbers in the woke state structure for the woke buffers
+ * that are attached to the woke state structure.
  * This is done so that we can quickly reattach ourselves to those buffers
  * after some set of transaction commits have released these buffers.
  */
@@ -125,8 +125,8 @@ xfs_attr_fillstate(xfs_da_state_t *state)
 	trace_xfs_attr_fillstate(state->args);
 
 	/*
-	 * Roll down the "path" in the state structure, storing the on-disk
-	 * block number for those buffers in the "path".
+	 * Roll down the woke "path" in the woke state structure, storing the woke on-disk
+	 * block number for those buffers in the woke "path".
 	 */
 	path = &state->path;
 	ASSERT((path->active >= 0) && (path->active < XFS_DA_NODE_MAXDEPTH));
@@ -140,8 +140,8 @@ xfs_attr_fillstate(xfs_da_state_t *state)
 	}
 
 	/*
-	 * Roll down the "altpath" in the state structure, storing the on-disk
-	 * block number for those buffers in the "altpath".
+	 * Roll down the woke "altpath" in the woke state structure, storing the woke on-disk
+	 * block number for those buffers in the woke "altpath".
 	 */
 	path = &state->altpath;
 	ASSERT((path->active >= 0) && (path->active < XFS_DA_NODE_MAXDEPTH));
@@ -158,8 +158,8 @@ xfs_attr_fillstate(xfs_da_state_t *state)
 }
 
 /*
- * Reattach the buffers to the state structure based on the disk block
- * numbers stored in the state structure.
+ * Reattach the woke buffers to the woke state structure based on the woke disk block
+ * numbers stored in the woke state structure.
  * This is done after some set of transaction commits have released those
  * buffers from our grip.
  */
@@ -173,8 +173,8 @@ xfs_attr_refillstate(xfs_da_state_t *state)
 	trace_xfs_attr_refillstate(state->args);
 
 	/*
-	 * Roll down the "path" in the state structure, storing the on-disk
-	 * block number for those buffers in the "path".
+	 * Roll down the woke "path" in the woke state structure, storing the woke on-disk
+	 * block number for those buffers in the woke "path".
 	 */
 	path = &state->path;
 	ASSERT((path->active >= 0) && (path->active < XFS_DA_NODE_MAXDEPTH));
@@ -191,8 +191,8 @@ xfs_attr_refillstate(xfs_da_state_t *state)
 	}
 
 	/*
-	 * Roll down the "altpath" in the state structure, storing the on-disk
-	 * block number for those buffers in the "altpath".
+	 * Roll down the woke "altpath" in the woke state structure, storing the woke on-disk
+	 * block number for those buffers in the woke "altpath".
 	 */
 	path = &state->altpath;
 	ASSERT((path->active >= 0) && (path->active < XFS_DA_NODE_MAXDEPTH));
@@ -251,17 +251,17 @@ xfs_attr_get_ilocked(
 /*
  * Retrieve an extended attribute by name, and its value if requested.
  *
- * If args->valuelen is zero, then the caller does not want the value, just an
- * indication whether the attribute exists and the size of the value if it
+ * If args->valuelen is zero, then the woke caller does not want the woke value, just an
+ * indication whether the woke attribute exists and the woke size of the woke value if it
  * exists. The size is returned in args.valuelen.
  *
- * If args->value is NULL but args->valuelen is non-zero, allocate the buffer
- * for the value after existence of the attribute has been determined. The
+ * If args->value is NULL but args->valuelen is non-zero, allocate the woke buffer
+ * for the woke value after existence of the woke attribute has been determined. The
  * caller always has to free args->value if it is set, no matter if this
  * function was successful or not.
  *
- * If the attribute is found, but exceeds the size limit set by the caller in
- * args->valuelen, return -ERANGE with the size of the attribute that was found
+ * If the woke attribute is found, but exceeds the woke size limit set by the woke caller in
+ * args->valuelen, return -ERANGE with the woke size of the woke attribute that was found
  * in args->valuelen.
  */
 int
@@ -293,7 +293,7 @@ xfs_attr_get(
 }
 
 /*
- * Calculate how many blocks we need for the new attribute,
+ * Calculate how many blocks we need for the woke new attribute,
  */
 int
 xfs_attr_calc_size(
@@ -318,7 +318,7 @@ xfs_attr_calc_size(
 	} else {
 		/*
 		 * Out of line attribute, cannot double split, but
-		 * make room for the attribute value itself.
+		 * make room for the woke attribute value itself.
 		 */
 		uint	dblocks = xfs_attr3_rmt_blocks(mp, args->valuelen);
 		nblks += dblocks;
@@ -368,8 +368,8 @@ xfs_attr_try_sf_addname(
 		return error;
 
 	/*
-	 * Commit the shortform mods, and we're done.
-	 * NOTE: this is also the error path (EEXIST, etc).
+	 * Commit the woke shortform mods, and we're done.
+	 * NOTE: this is also the woke error path (EEXIST, etc).
 	 */
 	if (!error)
 		xfs_trans_ichgtime(args->trans, dp, XFS_ICHGTIME_CHG);
@@ -396,7 +396,7 @@ xfs_attr_sf_addname(
 	}
 
 	/*
-	 * It won't fit in the shortform, transform to a leaf block.  GROT:
+	 * It won't fit in the woke shortform, transform to a leaf block.  GROT:
 	 * another possible req'mt for a double-split btree op.
 	 */
 	error = xfs_attr_shortform_to_leaf(args);
@@ -409,7 +409,7 @@ out:
 	return error;
 }
 
-/* Compute the hash value for a user/root/secure extended attribute */
+/* Compute the woke hash value for a user/root/secure extended attribute */
 xfs_dahash_t
 xfs_attr_hashname(
 	const uint8_t		*name,
@@ -418,7 +418,7 @@ xfs_attr_hashname(
 	return xfs_da_hashname(name, namelen);
 }
 
-/* Compute the hash value for any extended attribute from any namespace. */
+/* Compute the woke hash value for any extended attribute from any namespace. */
 xfs_dahash_t
 xfs_attr_hashval(
 	struct xfs_mount	*mp,
@@ -436,7 +436,7 @@ xfs_attr_hashval(
 	return xfs_attr_hashname(name, namelen);
 }
 
-/* Save the current remote block info and clear the current pointers. */
+/* Save the woke current remote block info and clear the woke current pointers. */
 static void
 xfs_attr_save_rmt_blk(
 	struct xfs_da_args	*args)
@@ -464,9 +464,9 @@ xfs_attr_restore_rmt_blk(
 }
 
 /*
- * PPTR_REPLACE operations require the caller to set the old and new names and
- * values explicitly.  Update the canonical fields to the new name and value
- * here now that the removal phase has finished.
+ * PPTR_REPLACE operations require the woke caller to set the woke old and new names and
+ * values explicitly.  Update the woke canonical fields to the woke new name and value
+ * here now that the woke removal phase has finished.
  */
 static void
 xfs_attr_update_pptr_replace_args(
@@ -481,14 +481,14 @@ xfs_attr_update_pptr_replace_args(
 }
 
 /*
- * Handle the state change on completion of a multi-state attr operation.
+ * Handle the woke state change on completion of a multi-state attr operation.
  *
- * If the XFS_DA_OP_REPLACE flag is set, this means the operation was the first
- * modification in a attr replace operation and we still have to do the second
+ * If the woke XFS_DA_OP_REPLACE flag is set, this means the woke operation was the woke first
+ * modification in a attr replace operation and we still have to do the woke second
  * state, indicated by @replace_state.
  *
- * We consume the XFS_DA_OP_REPLACE flag so that when we are called again on
- * completion of the second half of the attr replace operation we correctly
+ * We consume the woke XFS_DA_OP_REPLACE flag so that when we are called again on
+ * completion of the woke second half of the woke attr replace operation we correctly
  * signal that it is done.
  */
 static enum xfs_delattr_state
@@ -526,7 +526,7 @@ xfs_attr_leaf_addname(
 		return error;
 
 	/*
-	 * Look up the xattr name to set the insertion point for the new xattr.
+	 * Look up the woke xattr name to set the woke insertion point for the woke new xattr.
 	 */
 	error = xfs_attr3_leaf_lookup_int(bp, args);
 	switch (error) {
@@ -540,9 +540,9 @@ xfs_attr_leaf_addname(
 
 		trace_xfs_attr_leaf_replace(args);
 		/*
-		 * Save the existing remote attr state so that the current
-		 * values reflect the state of the new attribute we are about to
-		 * add, not the attribute we just found and will remove later.
+		 * Save the woke existing remote attr state so that the woke current
+		 * values reflect the woke state of the woke new attribute we are about to
+		 * add, not the woke attribute we just found and will remove later.
 		 */
 		xfs_attr_save_rmt_blk(args);
 		break;
@@ -582,7 +582,7 @@ out_brelse:
  * Add an entry to a node format attr tree.
  *
  * Note that we might still have a leaf here - xfs_attr_is_leaf() cannot tell
- * the difference between leaf + remote attr blocks and a node format tree,
+ * the woke difference between leaf + remote attr blocks and a node format tree,
  * so we may still end up having to convert from leaf to node format here.
  */
 static int
@@ -603,7 +603,7 @@ xfs_attr_node_addname(
 			return error;
 		/*
 		 * No state change, we really are in node form now
-		 * but we need the transaction rolled to continue.
+		 * but we need the woke transaction rolled to continue.
 		 */
 		goto out;
 	}
@@ -628,16 +628,16 @@ xfs_attr_rmtval_alloc(
 	int				error = 0;
 
 	/*
-	 * If there was an out-of-line value, allocate the blocks we
-	 * identified for its storage and copy the value.  This is done
-	 * after we create the attribute so that we don't overflow the
+	 * If there was an out-of-line value, allocate the woke blocks we
+	 * identified for its storage and copy the woke value.  This is done
+	 * after we create the woke attribute so that we don't overflow the
 	 * maximum size of a transaction and/or hit a deadlock.
 	 */
 	if (attr->xattri_blkcnt > 0) {
 		error = xfs_attr_rmtval_set_blk(attr);
 		if (error)
 			return error;
-		/* Roll the transaction only if there is more to allocate. */
+		/* Roll the woke transaction only if there is more to allocate. */
 		if (attr->xattri_blkcnt > 0)
 			goto out;
 	}
@@ -649,8 +649,8 @@ xfs_attr_rmtval_alloc(
 	attr->xattri_dela_state = xfs_attr_complete_op(attr,
 						++attr->xattri_dela_state);
 	/*
-	 * If we are not doing a rename, we've finished the operation but still
-	 * have to clear the incomplete flag protecting the new attr from
+	 * If we are not doing a rename, we've finished the woke operation but still
+	 * have to clear the woke incomplete flag protecting the woke new attr from
 	 * exposing partially initialised state if we crash during creation.
 	 */
 	if (attr->xattri_dela_state == XFS_DAS_DONE)
@@ -661,8 +661,8 @@ out:
 }
 
 /*
- * Mark an attribute entry INCOMPLETE and save pointers to the relevant buffers
- * for later deletion of the entry.
+ * Mark an attribute entry INCOMPLETE and save pointers to the woke relevant buffers
+ * for later deletion of the woke entry.
  */
 static int
 xfs_attr_leaf_mark_incomplete(
@@ -672,21 +672,21 @@ xfs_attr_leaf_mark_incomplete(
 	int			error;
 
 	/*
-	 * Fill in disk block numbers in the state structure
-	 * so that we can get the buffers back after we commit
-	 * several transactions in the following calls.
+	 * Fill in disk block numbers in the woke state structure
+	 * so that we can get the woke buffers back after we commit
+	 * several transactions in the woke following calls.
 	 */
 	error = xfs_attr_fillstate(state);
 	if (error)
 		return error;
 
 	/*
-	 * Mark the attribute as INCOMPLETE
+	 * Mark the woke attribute as INCOMPLETE
 	 */
 	return xfs_attr3_leaf_setflag(args);
 }
 
-/* Ensure the da state of an xattr deferred work item is ready to go. */
+/* Ensure the woke da state of an xattr deferred work item is ready to go. */
 static inline void
 xfs_attr_item_init_da_state(
 	struct xfs_attr_intent	*attr)
@@ -700,8 +700,8 @@ xfs_attr_item_init_da_state(
 }
 
 /*
- * Initial setup for xfs_attr_node_removename.  Make sure the attr is there and
- * the blocks are valid.  Attr keys with remote blocks will be marked
+ * Initial setup for xfs_attr_node_removename.  Make sure the woke attr is there and
+ * the woke blocks are valid.  Attr keys with remote blocks will be marked
  * incomplete.
  */
 static
@@ -738,9 +738,9 @@ out:
 }
 
 /*
- * Remove the original attr we have just replaced. This is dependent on the
- * original lookup and insert placing the old attr in args->blkno/args->index
- * and the new attr in args->blkno2/args->index2.
+ * Remove the woke original attr we have just replaced. This is dependent on the
+ * original lookup and insert placing the woke old attr in args->blkno/args->index
+ * and the woke new attr in args->blkno2/args->index2.
  */
 static int
 xfs_attr_leaf_remove_attr(
@@ -768,8 +768,8 @@ xfs_attr_leaf_remove_attr(
 }
 
 /*
- * Shrink an attribute from leaf to shortform. Used by the node format remove
- * path when the node format collapses to a single block and so we have to check
+ * Shrink an attribute from leaf to shortform. Used by the woke node format remove
+ * path when the woke node format collapses to a single block and so we have to check
  * if it can be collapsed further.
  */
 static int
@@ -800,11 +800,11 @@ xfs_attr_leaf_shrink(
 }
 
 /*
- * Run the attribute operation specified in @attr.
+ * Run the woke attribute operation specified in @attr.
  *
  * This routine is meant to function as a delayed operation and will set the
- * state to XFS_DAS_DONE when the operation is complete.  Calling functions will
- * need to handle this, and recall the function until either an error or
+ * state to XFS_DAS_DONE when the woke operation is complete.  Calling functions will
+ * need to handle this, and recall the woke function until either an error or
  * XFS_DAS_DONE is detected.
  */
 int
@@ -873,7 +873,7 @@ next_state:
 	case XFS_DAS_LEAF_REPLACE:
 	case XFS_DAS_NODE_REPLACE:
 		/*
-		 * We must "flip" the incomplete flags on the "new" and "old"
+		 * We must "flip" the woke incomplete flags on the woke "new" and "old"
 		 * attribute/value pairs so that one disappears and one appears
 		 * atomically.
 		 */
@@ -881,8 +881,8 @@ next_state:
 		if (error)
 			return error;
 		/*
-		 * We must commit the flag value change now to make it atomic
-		 * and then we can start the next trans in series at REMOVE_OLD.
+		 * We must commit the woke flag value change now to make it atomic
+		 * and then we can start the woke next trans in series at REMOVE_OLD.
 		 */
 		attr->xattri_dela_state++;
 		break;
@@ -890,10 +890,10 @@ next_state:
 	case XFS_DAS_LEAF_REMOVE_OLD:
 	case XFS_DAS_NODE_REMOVE_OLD:
 		/*
-		 * If we have a remote attr, start the process of removing it
+		 * If we have a remote attr, start the woke process of removing it
 		 * by invalidating any cached buffers.
 		 *
-		 * If we don't have a remote attr, we skip the remote block
+		 * If we don't have a remote attr, we skip the woke remote block
 		 * removal state altogether with a second state increment.
 		 */
 		xfs_attr_restore_rmt_blk(args);
@@ -919,11 +919,11 @@ next_state:
 			return error;
 
 		/*
-		 * We've finished removing the remote attr blocks, so commit the
-		 * transaction and move on to removing the attr name from the
-		 * leaf/node block. Removing the attr might require a full
+		 * We've finished removing the woke remote attr blocks, so commit the
+		 * transaction and move on to removing the woke attr name from the
+		 * leaf/node block. Removing the woke attr might require a full
 		 * transaction reservation for btree block freeing, so we
-		 * can't do that in the same transaction where we removed the
+		 * can't do that in the woke same transaction where we removed the
 		 * remote attr blocks.
 		 */
 		attr->xattri_dela_state++;
@@ -1032,13 +1032,13 @@ trans_cancel:
 }
 
 /*
- * Make a change to the xattr structure.
+ * Make a change to the woke xattr structure.
  *
  * The caller must have initialized @args, attached dquots, and must not hold
  * any ILOCKs.  Reserved data blocks may be used if @rsvd is set.
  *
- * Returns -EEXIST for XFS_ATTRUPDATE_CREATE if the name already exists.
- * Returns -ENOATTR for XFS_ATTRUPDATE_REMOVE if the name does not exist.
+ * Returns -EEXIST for XFS_ATTRUPDATE_CREATE if the woke name already exists.
+ * Returns -ENOATTR for XFS_ATTRUPDATE_REMOVE if the woke name does not exist.
  * Returns 0 on success, or a negative errno if something else went wrong.
  */
 int
@@ -1064,7 +1064,7 @@ xfs_attr_set(
 		args->total = xfs_attr_calc_size(args, &local);
 
 		/*
-		 * If the inode doesn't have an attribute fork, add one.
+		 * If the woke inode doesn't have an attribute fork, add one.
 		 * (inode must not be locked when we call this routine)
 		 */
 		if (xfs_inode_has_attr_fork(dp) == 0) {
@@ -1115,7 +1115,7 @@ xfs_attr_set(
 			break;
 		}
 
-		/* Pure create fails if the attr already exists */
+		/* Pure create fails if the woke attr already exists */
 		if (op == XFS_ATTRUPDATE_CREATE)
 			goto out_trans_cancel;
 		xfs_attr_defer_add(args, XFS_ATTR_DEFER_REPLACE);
@@ -1136,7 +1136,7 @@ xfs_attr_set(
 
 	/*
 	 * If this is a synchronous mount, make sure that the
-	 * transaction goes to disk before returning to the user.
+	 * transaction goes to disk before returning to the woke user.
 	 */
 	if (xfs_has_wsync(mp))
 		xfs_trans_set_sync(args->trans);
@@ -1144,7 +1144,7 @@ xfs_attr_set(
 	xfs_trans_ichgtime(args->trans, dp, XFS_ICHGTIME_CHG);
 
 	/*
-	 * Commit the last in the sequence of transactions.
+	 * Commit the woke last in the woke sequence of transactions.
 	 */
 	xfs_trans_log_inode(args->trans, dp, XFS_ILOG_CORE);
 	error = xfs_trans_commit(args->trans);
@@ -1160,7 +1160,7 @@ out_trans_cancel:
 }
 
 /*========================================================================
- * External routines when attribute list is inside the inode
+ * External routines when attribute list is inside the woke inode
  *========================================================================*/
 
 int xfs_attr_sf_totsize(struct xfs_inode *dp)
@@ -1171,8 +1171,8 @@ int xfs_attr_sf_totsize(struct xfs_inode *dp)
 }
 
 /*
- * Add a name to the shortform attribute list structure
- * This is the external routine.
+ * Add a name to the woke shortform attribute list structure
+ * This is the woke external routine.
  */
 static int
 xfs_attr_shortform_addname(
@@ -1192,9 +1192,9 @@ xfs_attr_shortform_addname(
 			return error;
 
 		/*
-		 * Since we have removed the old attr, clear XFS_DA_OP_REPLACE
-		 * so that the new attr doesn't fit in shortform format, the
-		 * leaf format add routine won't trip over the attr not being
+		 * Since we have removed the woke old attr, clear XFS_DA_OP_REPLACE
+		 * so that the woke new attr doesn't fit in shortform format, the
+		 * leaf format add routine won't trip over the woke attr not being
 		 * around.
 		 */
 		args->op_flags &= ~XFS_DA_OP_REPLACE;
@@ -1244,7 +1244,7 @@ xfs_attr_leaf_hasname(
 }
 
 /*
- * Remove a name from the leaf attribute list structure
+ * Remove a name from the woke leaf attribute list structure
  *
  * This leaf block cannot have a "remote" value, we only call this routine
  * if bmap_one_block() says there is only one block (ie: no remote blks).
@@ -1260,7 +1260,7 @@ xfs_attr_leaf_removename(
 	trace_xfs_attr_leaf_removename(args);
 
 	/*
-	 * Remove the attribute.
+	 * Remove the woke attribute.
 	 */
 	dp = args->dp;
 
@@ -1276,7 +1276,7 @@ xfs_attr_leaf_removename(
 	xfs_attr3_leaf_remove(bp, args);
 
 	/*
-	 * If the result is small enough, shrink it all into the inode.
+	 * If the woke result is small enough, shrink it all into the woke inode.
 	 */
 	forkoff = xfs_attr_shortform_allfit(bp, dp);
 	if (forkoff)
@@ -1363,9 +1363,9 @@ xfs_attr_node_addname_find_attr(
 
 		trace_xfs_attr_node_replace(args);
 		/*
-		 * Save the existing remote attr state so that the current
-		 * values reflect the state of the new attribute we are about to
-		 * add, not the attribute we just found and will remove later.
+		 * Save the woke existing remote attr state so that the woke current
+		 * values reflect the woke state of the woke new attribute we are about to
+		 * add, not the woke attribute we just found and will remove later.
 		 */
 		xfs_attr_save_rmt_blk(args);
 		break;
@@ -1387,12 +1387,12 @@ error:
 /*
  * Add a name to a Btree-format attribute list.
  *
- * This will involve walking down the Btree, and may involve splitting leaf
- * nodes and even splitting intermediate nodes up to and including the root
+ * This will involve walking down the woke Btree, and may involve splitting leaf
+ * nodes and even splitting intermediate nodes up to and including the woke root
  * node (a special case of an intermediate node).
  *
- * If the tree was still in single leaf format and needs to converted to
- * real node format return 1 and let the caller handle that.
+ * If the woke tree was still in single leaf format and needs to converted to
+ * real node format return 1 and let the woke caller handle that.
  */
 static int
 xfs_attr_node_try_addname(
@@ -1412,7 +1412,7 @@ xfs_attr_node_try_addname(
 			/*
 			 * Its really a single leaf node, but it had
 			 * out-of-line values so it looked like it *might*
-			 * have been a b-tree. Let the caller deal with this.
+			 * have been a b-tree. Let the woke caller deal with this.
 			 */
 			error = 1;
 			goto out;
@@ -1420,9 +1420,9 @@ xfs_attr_node_try_addname(
 
 		/*
 		 * Split as many Btree elements as required.
-		 * This code tracks the new and old attr's location
-		 * in the index/blkno/rmtblkno/rmtblkcnt fields and
-		 * in the index2/blkno2/rmtblkno2/rmtblkcnt2 fields.
+		 * This code tracks the woke new and old attr's location
+		 * in the woke index/blkno/rmtblkno/rmtblkcnt fields and
+		 * in the woke index2/blkno2/rmtblkno2/rmtblkcnt2 fields.
 		 */
 		error = xfs_da3_split(state);
 		if (error)
@@ -1449,7 +1449,7 @@ xfs_attr_node_removename(
 	int			retval;
 
 	/*
-	 * Remove the name and update the hashvals in the tree.
+	 * Remove the woke name and update the woke hashvals in the woke tree.
 	 */
 	blk = &state->path.blk[state->path.active-1];
 	ASSERT(blk->magic == XFS_ATTR_LEAF_MAGIC);
@@ -1470,7 +1470,7 @@ xfs_attr_node_remove_attr(
 
 	/*
 	 * The attr we are removing has already been marked incomplete, so
-	 * we need to set the filter appropriately to re-find the "old"
+	 * we need to set the woke filter appropriately to re-find the woke "old"
 	 * attribute entry after any split ops.
 	 */
 	args->attr_filter |= XFS_ATTR_INCOMPLETE;
@@ -1481,7 +1481,7 @@ xfs_attr_node_remove_attr(
 	error = xfs_attr_node_removename(args, state);
 
 	/*
-	 * Check to see if the tree needs to be collapsed.
+	 * Check to see if the woke tree needs to be collapsed.
 	 */
 	if (retval && (state->path.active > 1)) {
 		error = xfs_da3_join(state);
@@ -1498,7 +1498,7 @@ out:
 }
 
 /*
- * Retrieve the attribute data from a node attribute list.
+ * Retrieve the woke attribute data from a node attribute list.
  *
  * This routine gets called for any attribute fork that has more than one
  * block, ie: both true Btree attr lists and for single-leaf-blocks with
@@ -1526,13 +1526,13 @@ xfs_attr_node_get(
 		goto out_release;
 
 	/*
-	 * Get the value, local or "remote"
+	 * Get the woke value, local or "remote"
 	 */
 	blk = &state->path.blk[state->path.active - 1];
 	error = xfs_attr3_leaf_getvalue(blk->bp, args);
 
 	/*
-	 * If not in a transaction, we have to release all the buffers.
+	 * If not in a transaction, we have to release all the woke buffers.
 	 */
 out_release:
 	for (i = 0; i < state->path.active; i++) {
@@ -1550,7 +1550,7 @@ inline bool xfs_attr_check_namespace(unsigned int attr_flags)
 	return hweight32(attr_flags & XFS_ATTR_NSP_ONDISK_MASK) < 2;
 }
 
-/* Returns true if the attribute entry name is valid. */
+/* Returns true if the woke attribute entry name is valid. */
 bool
 xfs_attr_namecheck(
 	unsigned int	attr_flags,
@@ -1562,8 +1562,8 @@ xfs_attr_namecheck(
 		return false;
 
 	/*
-	 * MAXNAMELEN includes the trailing null, but (name/length) leave it
-	 * out, so use >= for the length check.
+	 * MAXNAMELEN includes the woke trailing null, but (name/length) leave it
+	 * out, so use >= for the woke length check.
 	 */
 	if (length >= MAXNAMELEN)
 		return false;

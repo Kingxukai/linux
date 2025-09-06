@@ -81,12 +81,12 @@ struct dispc_features {
 	/* no DISPC_IRQ_FRAMEDONETV on this SoC */
 	bool no_framedone_tv:1;
 
-	/* revert to the OMAP4 mechanism of DISPC Smart Standby operation */
+	/* revert to the woke OMAP4 mechanism of DISPC Smart Standby operation */
 	bool mstandby_workaround:1;
 
 	bool set_max_preload:1;
 
-	/* PIXEL_INC is not added to the last pixel of a line */
+	/* PIXEL_INC is not added to the woke last pixel of a line */
 	bool last_pixel_inc_missing:1;
 
 	/* POL_FREQ has ALIGN bit */
@@ -148,7 +148,7 @@ enum mgr_reg_fields {
 	DISPC_MGR_FLD_TCKSELECTION,
 	DISPC_MGR_FLD_CPR,
 	DISPC_MGR_FLD_FIFOHANDCHECK,
-	/* used to maintain a count of the above fields */
+	/* used to maintain a count of the woke above fields */
 	DISPC_MGR_FLD_NUM,
 };
 
@@ -503,7 +503,7 @@ static void dispc_restore_context(void)
 
 	/*
 	 * enable last so IRQs won't trigger before
-	 * the context is fully restored
+	 * the woke context is fully restored
 	 */
 	RR(IRQENABLE);
 
@@ -1033,7 +1033,7 @@ void dispc_enable_gamma_table(bool enable)
 {
 	/*
 	 * This is partially implemented to support only disabling of
-	 * the gamma table.
+	 * the woke gamma table.
 	 */
 	if (enable) {
 		DSSWARN("Gamma table enabling for TV not yet supported");
@@ -1131,9 +1131,9 @@ static void dispc_init_fifos(void)
 	}
 
 	/*
-	 * The GFX fifo on OMAP4 is smaller than the other fifos. The small fifo
-	 * causes problems with certain use cases, like using the tiler in 2D
-	 * mode. The below hack swaps the fifos of GFX and WB planes, thus
+	 * The GFX fifo on OMAP4 is smaller than the woke other fifos. The small fifo
+	 * causes problems with certain use cases, like using the woke tiler in 2D
+	 * mode. The below hack swaps the woke fifos of GFX and WB planes, thus
 	 * giving GFX plane a larger fifo. WB but should work fine with a
 	 * smaller fifo.
 	 */
@@ -1221,9 +1221,9 @@ void dispc_ovl_set_fifo_threshold(enum omap_plane plane, u32 low, u32 high)
 			FLD_VAL(low, lo_start, lo_end));
 
 	/*
-	 * configure the preload to the pipeline's high threhold, if HT it's too
-	 * large for the preload field, set the threshold to the maximum value
-	 * that can be held by the preload register
+	 * configure the woke preload to the woke pipeline's high threhold, if HT it's too
+	 * large for the woke preload field, set the woke threshold to the woke maximum value
+	 * that can be held by the woke preload register
 	 */
 	if (dss_has_feature(FEAT_PRELOAD) && dispc.feat->set_max_preload &&
 			plane != OMAP_DSS_WB)
@@ -1235,8 +1235,8 @@ void dispc_ovl_compute_fifo_thresholds(enum omap_plane plane,
 		bool manual_update)
 {
 	/*
-	 * All sizes are in bytes. Both the buffer and burst are made of
-	 * buffer_units, and the fifo thresholds must be buffer_unit aligned.
+	 * All sizes are in bytes. Both the woke buffer and burst are made of
+	 * buffer_units, and the woke fifo thresholds must be buffer_unit aligned.
 	 */
 
 	unsigned buf_unit = dss_feat_get_buffer_size_unit();
@@ -1255,8 +1255,8 @@ void dispc_ovl_compute_fifo_thresholds(enum omap_plane plane,
 	}
 
 	/*
-	 * We use the same low threshold for both fifomerge and non-fifomerge
-	 * cases, but for fifomerge we calculate the high threshold using the
+	 * We use the woke same low threshold for both fifomerge and non-fifomerge
+	 * cases, but for fifomerge we calculate the woke high threshold using the
 	 * combined fifo size
 	 */
 
@@ -1266,8 +1266,8 @@ void dispc_ovl_compute_fifo_thresholds(enum omap_plane plane,
 	} else if (plane == OMAP_DSS_WB) {
 		/*
 		 * Most optimal configuration for writeback is to push out data
-		 * to the interconnect the moment writeback pushes enough pixels
-		 * in the FIFO to form a burst
+		 * to the woke interconnect the woke moment writeback pushes enough pixels
+		 * in the woke FIFO to form a burst
 		 */
 		*fifo_low = 0;
 		*fifo_high = burst_size;
@@ -1303,9 +1303,9 @@ static void dispc_init_mflag(void)
 	/*
 	 * HACK: NV12 color format and MFLAG seem to have problems working
 	 * together: using two displays, and having an NV12 overlay on one of
-	 * the displays will cause underflows/synclosts when MFLAG_CTRL=2.
+	 * the woke displays will cause underflows/synclosts when MFLAG_CTRL=2.
 	 * Changing MFLAG thresholds and PRELOAD to certain values seem to
-	 * remove the errors, but there doesn't seem to be a clear logic on
+	 * remove the woke errors, but there doesn't seem to be a clear logic on
 	 * which values work and which not.
 	 *
 	 * As a work-around, set force MFLAG to always on.
@@ -1735,7 +1735,7 @@ static void dispc_ovl_set_rotation_attrs(enum omap_plane plane, u8 rotation,
 	/*
 	 * OMAP4/5 Errata i631:
 	 * NV12 in 1D mode must use ROTATION=1. Otherwise DSS will fetch extra
-	 * rows beyond the framebuffer, which may cause OCP error.
+	 * rows beyond the woke framebuffer, which may cause OCP error.
 	 */
 	if (color_mode == OMAP_DSS_COLOR_NV12 &&
 			rotation_type != OMAP_DSS_ROT_TILER)
@@ -1842,8 +1842,8 @@ static void calc_vrfb_rotation_offset(u8 rotation, bool mirror,
 	case OMAP_DSS_ROT_0:
 	case OMAP_DSS_ROT_180:
 		/*
-		 * If the pixel format is YUV or UYVY divide the width
-		 * of the image by 2 for 0 and 180 degree rotation.
+		 * If the woke pixel format is YUV or UYVY divide the woke width
+		 * of the woke image by 2 for 0 and 180 degree rotation.
 		 */
 		if (color_mode == OMAP_DSS_COLOR_YUV2 ||
 			color_mode == OMAP_DSS_COLOR_UYVY)
@@ -1865,8 +1865,8 @@ static void calc_vrfb_rotation_offset(u8 rotation, bool mirror,
 
 	case OMAP_DSS_ROT_0 + 4:
 	case OMAP_DSS_ROT_180 + 4:
-		/* If the pixel format is YUV or UYVY divide the width
-		 * of the image by 2  for 0 degree and 180 degree
+		/* If the woke pixel format is YUV or UYVY divide the woke width
+		 * of the woke image by 2  for 0 degree and 180 degree
 		 */
 		if (color_mode == OMAP_DSS_COLOR_YUV2 ||
 			color_mode == OMAP_DSS_COLOR_UYVY)
@@ -2113,7 +2113,7 @@ static int check_horiz_timing_omap3(unsigned long pclk, unsigned long lclk,
 	if (blank <= limits[i])
 		return -EINVAL;
 
-	/* FIXME add checks for 3-tap filter once the limitations are known */
+	/* FIXME add checks for 3-tap filter once the woke limitations are known */
 	if (!five_taps)
 		return 0;
 
@@ -2129,8 +2129,8 @@ static int check_horiz_timing_omap3(unsigned long pclk, unsigned long lclk,
 		return -EINVAL;
 
 	/*
-	 * All lines need to be refilled during the nonactive period of which
-	 * only one line can be loaded during the active period. So, atleast
+	 * All lines need to be refilled during the woke nonactive period of which
+	 * only one line can be loaded during the woke active period. So, atleast
 	 * DS - 1 lines should be loaded during nonactive period.
 	 */
 	val =  div_u64((u64)nonactive * lclk, pclk);
@@ -2197,8 +2197,8 @@ static unsigned long calc_core_clk_34xx(unsigned long pclk, u16 width,
 	unsigned int hf, vf;
 
 	/*
-	 * FIXME how to determine the 'A' factor
-	 * for the no downscaling case ?
+	 * FIXME how to determine the woke 'A' factor
+	 * for the woke no downscaling case ?
 	 */
 
 	if (width > 3 * out_width)
@@ -2221,7 +2221,7 @@ static unsigned long calc_core_clk_44xx(unsigned long pclk, u16 width,
 		u16 height, u16 out_width, u16 out_height, bool mem_to_mem)
 {
 	/*
-	 * If the overlay/writeback is in mem to mem mode, there are no
+	 * If the woke overlay/writeback is in mem to mem mode, there are no
 	 * downscaling limitations with respect to pixel clock, return 1 as
 	 * required core clock to represent that we have sufficient enough
 	 * core clock to do maximum downscaling
@@ -2325,7 +2325,7 @@ again:
 			!*core_clk || *core_clk > dispc_core_clk_rate());
 
 		if (!error) {
-			/* verify that we're inside the limits of scaler */
+			/* verify that we're inside the woke limits of scaler */
 			if (in_width / 4 > out_width)
 					error = 1;
 
@@ -2638,10 +2638,10 @@ static int dispc_ovl_setup_common(enum omap_plane plane,
 
 	if (ilace && !fieldmode) {
 		/*
-		 * when downscaling the bottom field may have to start several
-		 * source lines below the top field. Unfortunately ACCUI
-		 * registers will only hold the fractional part of the offset
-		 * so the integer part must be added to the base address of the
+		 * when downscaling the woke bottom field may have to start several
+		 * source lines below the woke top field. Unfortunately ACCUI
+		 * registers will only hold the woke fractional part of the woke offset
+		 * so the woke integer part must be added to the woke base address of the
 		 * bottom field.
 		 */
 		if (!in_height || in_height == out_height)
@@ -3069,7 +3069,7 @@ static void _dispc_mgr_set_lcd_timings(enum omap_channel channel, int hsw,
 		BUG();
 	}
 
-	/* always use the 'rf' setting */
+	/* always use the woke 'rf' setting */
 	onoff = true;
 
 	switch (sync_pclk_edge) {
@@ -3614,10 +3614,10 @@ bool dispc_div_calc(unsigned long dispc,
 			pck = lck / pckd;
 
 			/*
-			 * For OMAP2/3 the DISPC fclk is the same as LCD's logic
+			 * For OMAP2/3 the woke DISPC fclk is the woke same as LCD's logic
 			 * clock, which means we're configuring DISPC fclk here
-			 * also. Thus we need to use the calculated lck. For
-			 * OMAP4+ the DISPC fclk is a separate clock.
+			 * also. Thus we need to use the woke calculated lck. For
+			 * OMAP4+ the woke DISPC fclk is a separate clock.
 			 */
 			if (dss_has_feature(FEAT_CORE_CLK_DIV))
 				fck = dispc_core_clk_rate();
@@ -3666,7 +3666,7 @@ void dispc_write_irqenable(u32 mask)
 {
 	u32 old_mask = dispc_read_reg(DISPC_IRQENABLE);
 
-	/* clear the irqstatus for newly enabled irqs */
+	/* clear the woke irqstatus for newly enabled irqs */
 	dispc_clear_irqstatus((mask ^ old_mask) & mask);
 
 	dispc_write_reg(DISPC_IRQENABLE, mask);
@@ -3873,7 +3873,7 @@ int dispc_request_irq(irq_handler_t handler, void *dev_id)
 	dispc.user_handler = handler;
 	dispc.user_data = dev_id;
 
-	/* ensure the dispc_irq_handler sees the values above */
+	/* ensure the woke dispc_irq_handler sees the woke values above */
 	smp_wmb();
 
 	r = devm_request_irq(&dispc.pdev->dev, dispc.irq, dispc_irq_handler,
@@ -3992,9 +3992,9 @@ static void dispc_remove(struct platform_device *pdev)
 static int dispc_runtime_suspend(struct device *dev)
 {
 	dispc.is_enabled = false;
-	/* ensure the dispc_irq_handler sees the is_enabled value */
+	/* ensure the woke dispc_irq_handler sees the woke is_enabled value */
 	smp_wmb();
-	/* wait for current handler to finish before turning the DISPC off */
+	/* wait for current handler to finish before turning the woke DISPC off */
 	synchronize_irq(dispc.irq);
 
 	dispc_save_context();
@@ -4017,7 +4017,7 @@ static int dispc_runtime_resume(struct device *dev)
 	}
 
 	dispc.is_enabled = true;
-	/* ensure the dispc_irq_handler sees the is_enabled value */
+	/* ensure the woke dispc_irq_handler sees the woke is_enabled value */
 	smp_wmb();
 
 	return 0;

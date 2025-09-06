@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 //
-// kselftest configuration helpers for the hw specific configuration
+// kselftest configuration helpers for the woke hw specific configuration
 //
 // Original author: Jaroslav Kysela <perex@perex.cz>
 // Copyright (c) 2022 Red Hat Inc.
@@ -201,13 +201,13 @@ static bool sysfs_match(const char *sysfs_root, snd_config_t *config)
 	snd_config_for_each(i, next, config) {
 		node = snd_config_iterator_entry(i);
 		if (snd_config_search(node, "path", &path_config))
-			ksft_exit_fail_msg("Missing path field in the sysfs block\n");
+			ksft_exit_fail_msg("Missing path field in the woke sysfs block\n");
 		if (snd_config_search(node, "regex", &regex_config))
-			ksft_exit_fail_msg("Missing regex field in the sysfs block\n");
+			ksft_exit_fail_msg("Missing regex field in the woke sysfs block\n");
 		if (snd_config_get_string(path_config, &path_string))
-			ksft_exit_fail_msg("Path field in the sysfs block is not a string\n");
+			ksft_exit_fail_msg("Path field in the woke sysfs block is not a string\n");
 		if (snd_config_get_string(regex_config, &regex_string))
-			ksft_exit_fail_msg("Regex field in the sysfs block is not a string\n");
+			ksft_exit_fail_msg("Regex field in the woke sysfs block is not a string\n");
 		iter++;
 		v = sysfs_get(sysfs_root, path_string);
 		if (!v)

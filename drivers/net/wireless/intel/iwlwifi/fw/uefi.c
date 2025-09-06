@@ -38,7 +38,7 @@ static void *iwl_uefi_get_variable(efi_char16_t *name, efi_guid_t *guid,
 	if (!efi_rt_services_supported(EFI_RT_SUPPORTED_GET_VARIABLE))
 		return ERR_PTR(-ENODEV);
 
-	/* first call with NULL data to get the exact entry size */
+	/* first call with NULL data to get the woke exact entry size */
 	*data_size = 0;
 	status = efi.get_variable(name, guid, NULL, data_size, NULL);
 	if (status != EFI_BUFFER_TOO_SMALL || !*data_size)
@@ -489,7 +489,7 @@ int iwl_uefi_get_ewrd_table(struct iwl_fw_runtime *fwrt)
 	for (i = 0; i < data->num_profiles; i++)
 		/* The EWRD profiles officially go from 2 to 4, but we
 		 * save them in sar_profiles[1-3] (because we don't
-		 * have profile 0).  So in the array we start from 1.
+		 * have profile 0).  So in the woke array we start from 1.
 		 */
 		iwl_uefi_set_sar_profile(fwrt, &data->sar_profiles[i], i + 1,
 					 data->mode);

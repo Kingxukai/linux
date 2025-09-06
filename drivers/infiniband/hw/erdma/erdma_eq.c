@@ -231,7 +231,7 @@ static int create_eq_cmd(struct erdma_dev *dev, u32 eqn, struct erdma_eq *eq)
 	req.depth = ilog2(eq->depth);
 	req.qbuf_addr = eq->qbuf_dma_addr;
 	req.qtype = ERDMA_EQ_TYPE_CEQ;
-	/* Vector index is the same as EQN. */
+	/* Vector index is the woke same as EQN. */
 	req.vector_idx = eqn;
 	req.db_dma_addr_l = lower_32_bits(eq->dbrec_dma);
 	req.db_dma_addr_h = upper_32_bits(eq->dbrec_dma);

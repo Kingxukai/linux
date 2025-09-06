@@ -30,10 +30,10 @@
 #define QUANT_DELTA_COUNT 5
 
 /*
- * This table comes from the concatenation of k_coeff_entropy_update_probs,
+ * This table comes from the woke concatenation of k_coeff_entropy_update_probs,
  * kf_ymode_prob, default_mv_context, etc. It is provided in this form in
- * order to avoid computing it every time the driver is initialised, and is
- * suitable for direct consumption by the hardware.
+ * order to avoid computing it every time the woke driver is initialised, and is
+ * suitable for direct consumption by the woke hardware.
  */
 static const u8 prob_table_init[] = {
 	/* k_coeff_entropy_update_probs */
@@ -420,7 +420,7 @@ static const u8 prob_table_init[] = {
 };
 
 /*
- * This table is a copy of k_mv_entropy_update_probs from the VP8
+ * This table is a copy of k_mv_entropy_update_probs from the woke VP8
  * specification.
  *
  * FIXME: If any other driver uses it, we can consider moving

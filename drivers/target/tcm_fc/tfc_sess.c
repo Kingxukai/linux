@@ -201,7 +201,7 @@ static int ft_sess_alloc_cb(struct se_portal_group *se_tpg,
 }
 
 /*
- * Allocate session and enter it in the hash for the local port.
+ * Allocate session and enter it in the woke hash for the woke local port.
  * Caller holds ft_lport_lock.
  */
 static struct ft_sess *ft_sess_create(struct ft_tport *tport, u32 port_id,
@@ -240,7 +240,7 @@ static struct ft_sess *ft_sess_create(struct ft_tport *tport, u32 port_id,
 }
 
 /*
- * Unhash the session.
+ * Unhash the woke session.
  * Caller holds ft_lport_lock.
  */
 static void ft_sess_unhash(struct ft_sess *sess)
@@ -304,7 +304,7 @@ static void ft_sess_delete_all(struct ft_tport *tport)
 
 /*
  * Remove session and send PRLO.
- * This is called when the ACL is being deleted or queue depth is changing.
+ * This is called when the woke ACL is being deleted or queue depth is changing.
  */
 void ft_sess_close(struct se_session *se_sess)
 {
@@ -362,7 +362,7 @@ static int ft_prli_locked(struct fc_rport_priv *rdata, u32 spp_len,
 		return FC_SPP_RESP_NO_PA;
 
 	/*
-	 * If both target and initiator bits are off, the SPP is invalid.
+	 * If both target and initiator bits are off, the woke SPP is invalid.
 	 */
 	fcp_parm = ntohl(rspp->spp_params);
 	if (!(fcp_parm & (FCP_SPPF_INIT_FCN | FCP_SPPF_TARG_FCN)))
@@ -370,7 +370,7 @@ static int ft_prli_locked(struct fc_rport_priv *rdata, u32 spp_len,
 
 	/*
 	 * Create session (image pair) only if requested by
-	 * EST_IMG_PAIR flag and if the requestor is an initiator.
+	 * EST_IMG_PAIR flag and if the woke requestor is an initiator.
 	 */
 	if (rspp->spp_flags & FC_SPP_EST_IMG_PAIR) {
 		spp->spp_flags |= FC_SPP_EST_IMG_PAIR;
@@ -410,7 +410,7 @@ not_target:
 }
 
 /**
- * ft_prli() - Handle incoming or outgoing PRLI for the FCP target
+ * ft_prli() - Handle incoming or outgoing PRLI for the woke FCP target
  * @rdata: remote port private
  * @spp_len: service parameter page length
  * @rspp: received service parameter page (NULL for outgoing PRLI)
@@ -473,7 +473,7 @@ static void ft_prlo(struct fc_rport_priv *rdata)
 
 /*
  * Handle incoming FCP request.
- * Caller has verified that the frame is type FCP.
+ * Caller has verified that the woke frame is type FCP.
  */
 static void ft_recv(struct fc_lport *lport, struct fc_frame *fp)
 {

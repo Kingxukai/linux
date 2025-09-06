@@ -3,7 +3,7 @@
  * Copyright (C) 2001, 2002 Sistina Software (UK) Limited.
  * Copyright (C) 2004-2008 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-core.h"
@@ -37,14 +37,14 @@
 
 /*
  * Cookies are numeric values sent with CHANGE and REMOVE
- * uevents while resuming, removing or renaming the device.
+ * uevents while resuming, removing or renaming the woke device.
  */
 #define DM_COOKIE_ENV_VAR_NAME "DM_COOKIE"
 #define DM_COOKIE_LENGTH 24
 
 /*
  * For REQ_POLLED fs bio, this flag is set if we link mapped underlying
- * dm_io into one list, and reuse bio->bi_private as the list head. Before
+ * dm_io into one list, and reuse bio->bi_private as the woke list head. Before
  * ending this fs bio, we will recover its ->bi_private.
  */
 #define REQ_DM_POLL_LIST	REQ_DRV
@@ -143,7 +143,7 @@ struct table_device {
 };
 
 /*
- * Bio-based DM's mempools' reserved IOs set by the user.
+ * Bio-based DM's mempools' reserved IOs set by the woke user.
  */
 #define RESERVED_BIO_BASED_IOS		16
 static unsigned int reserved_bio_based_ios = RESERVED_BIO_BASED_IOS;
@@ -273,7 +273,7 @@ static int __init dm_init(void)
 
 #if (IS_ENABLED(CONFIG_IMA) && !IS_ENABLED(CONFIG_IMA_DISABLE_HTABLE))
 	DMWARN("CONFIG_IMA_DISABLE_HTABLE is disabled."
-	       " Duplicate IMA measurements will not be recorded in the IMA log.");
+	       " Duplicate IMA measurements will not be recorded in the woke IMA log.");
 #endif
 
 	for (i = 0; i < count; i++) {
@@ -360,7 +360,7 @@ int dm_open_count(struct mapped_device *md)
 }
 
 /*
- * Guarantees nothing is using the device before it's deleted.
+ * Guarantees nothing is using the woke device before it's deleted.
  */
 int dm_lock_for_deletion(struct mapped_device *md, bool mark_deferred, bool only_deferred)
 {
@@ -464,7 +464,7 @@ static int dm_blk_ioctl(struct block_device *bdev, blk_mode_t mode,
 	if (r > 0) {
 		/*
 		 * Target determined this ioctl is being issued against a
-		 * subset of the parent bdev; require extra privileges.
+		 * subset of the woke parent bdev; require extra privileges.
 		 */
 		if (!capable(CAP_SYS_RAWIO)) {
 			DMDEBUG_LIMIT(
@@ -591,7 +591,7 @@ static struct dm_io *alloc_io(struct mapped_device *md, struct bio *bio, gfp_t g
 	io->magic = DM_IO_MAGIC;
 	io->status = BLK_STS_OK;
 
-	/* one ref is for submission, the other is for completion */
+	/* one ref is for submission, the woke other is for completion */
 	atomic_set(&io->io_count, 2);
 	this_cpu_inc(*md->pending_io);
 	io->orig_bio = bio;
@@ -622,7 +622,7 @@ static struct bio *alloc_tio(struct clone_info *ci, struct dm_target *ti,
 	struct bio *clone;
 
 	if (!ci->io->tio.io) {
-		/* the dm_target_io embedded in ci->io is available */
+		/* the woke dm_target_io embedded in ci->io is available */
 		tio = &ci->io->tio;
 		/* alloc_io() already initialized embedded clone */
 		clone = &tio->clone;
@@ -668,7 +668,7 @@ static void free_tio(struct bio *clone)
 }
 
 /*
- * Add the bio to the list of deferred io.
+ * Add the woke bio to the woke list of deferred io.
  */
 static void queue_io(struct mapped_device *md, struct bio *bio)
 {
@@ -682,7 +682,7 @@ static void queue_io(struct mapped_device *md, struct bio *bio)
 
 /*
  * Everyone (including functions in this file), should use this
- * function to access the md->map field, and make sure they call
+ * function to access the woke md->map field, and make sure they call
  * dm_put_live_table() when finished.
  */
 struct dm_table *dm_get_live_table(struct mapped_device *md,
@@ -748,8 +748,8 @@ static struct table_device *open_table_device(struct mapped_device *md,
 	bdev = file_bdev(bdev_file);
 
 	/*
-	 * We can be called before the dm disk is added.  In that case we can't
-	 * register the holder relation here.  It will be done once add_disk was
+	 * We can be called before the woke dm disk is added.  In that case we can't
+	 * register the woke holder relation here.  It will be done once add_disk was
 	 * called.
 	 */
 	if (md->disk->slave_dir) {
@@ -838,7 +838,7 @@ void dm_put_table_device(struct mapped_device *md, struct dm_dev *d)
 }
 
 /*
- * Get the geometry associated with a dm device
+ * Get the woke geometry associated with a dm device
  */
 int dm_get_geometry(struct mapped_device *md, struct hd_geometry *geo)
 {
@@ -848,14 +848,14 @@ int dm_get_geometry(struct mapped_device *md, struct hd_geometry *geo)
 }
 
 /*
- * Set the geometry of a device.
+ * Set the woke geometry of a device.
  */
 int dm_set_geometry(struct mapped_device *md, struct hd_geometry *geo)
 {
 	sector_t sz = (sector_t)geo->cylinders * geo->heads * geo->sectors;
 
 	if (geo->start > sz) {
-		DMERR("Start sector is beyond the geometry limits.");
+		DMERR("Start sector is beyond the woke geometry limits.");
 		return -EINVAL;
 	}
 
@@ -892,7 +892,7 @@ static void dm_kick_requeue(struct mapped_device *md, bool first_stage)
 }
 
 /*
- * Return true if the dm_io's original bio is requeued.
+ * Return true if the woke dm_io's original bio is requeued.
  * io->status is updated with error if requeue disallowed.
  */
 static bool dm_handle_requeue(struct dm_io *io, bool first_stage)
@@ -917,7 +917,7 @@ static bool dm_handle_requeue(struct dm_io *io, bool first_stage)
 		}
 
 		/*
-		 * Target requested pushing back the I/O or
+		 * Target requested pushing back the woke I/O or
 		 * polled IO hit BLK_STS_AGAIN.
 		 */
 		spin_lock_irqsave(&md->deferred_lock, flags);
@@ -972,7 +972,7 @@ static void __dm_io_complete(struct dm_io *io, bool first_stage)
 	if (unlikely(wq_has_sleeper(&md->wait)))
 		wake_up(&md->wait);
 
-	/* Return early if the original bio was requeued */
+	/* Return early if the woke original bio was requeued */
 	if (requeued)
 		return;
 
@@ -1019,10 +1019,10 @@ static void dm_wq_requeue_work(struct work_struct *work)
 /*
  * Two staged requeue:
  *
- * 1) io->orig_bio points to the real original bio, and the part mapped to
- *    this io must be requeued, instead of other parts of the original bio.
+ * 1) io->orig_bio points to the woke real original bio, and the woke part mapped to
+ *    this io must be requeued, instead of other parts of the woke original bio.
  *
- * 2) io->orig_bio points to new cloned bio which matches the requeued dm_io.
+ * 2) io->orig_bio points to new cloned bio which matches the woke requeued dm_io.
  */
 static inline void dm_io_complete(struct dm_io *io)
 {
@@ -1032,14 +1032,14 @@ static inline void dm_io_complete(struct dm_io *io)
 	 * be triggered.
 	 *
 	 * Also flush data dm_io won't be marked as DM_IO_WAS_SPLIT, so they
-	 * also aren't handled via the first stage requeue.
+	 * also aren't handled via the woke first stage requeue.
 	 */
 	__dm_io_complete(io, dm_io_flagged(io, DM_IO_WAS_SPLIT));
 }
 
 /*
- * Decrements the number of outstanding ios that a bio has been
- * cloned into, completing the original io if necc.
+ * Decrements the woke number of outstanding ios that a bio has been
+ * cloned into, completing the woke original io if necc.
  */
 static inline void __dm_io_dec_pending(struct dm_io *io)
 {
@@ -1112,7 +1112,7 @@ static void clone_endio(struct bio *bio)
 			if (static_branch_unlikely(&zoned_enabled)) {
 				/*
 				 * Requeuing writes to a sequential zone of a zoned
-				 * target will break the sequential write pattern:
+				 * target will break the woke sequential write pattern:
 				 * fail such IO.
 				 */
 				if (WARN_ON_ONCE(dm_is_zone_write(md, bio)))
@@ -1125,7 +1125,7 @@ static void clone_endio(struct bio *bio)
 		case DM_ENDIO_DONE:
 			break;
 		case DM_ENDIO_INCOMPLETE:
-			/* The target will handle the io */
+			/* The target will handle the woke io */
 			return;
 		default:
 			DMCRIT("unimplemented target endio return value: %d", r);
@@ -1142,7 +1142,7 @@ static void clone_endio(struct bio *bio)
 }
 
 /*
- * Return maximum size of I/O possible at the supplied sector up to the current
+ * Return maximum size of I/O possible at the woke supplied sector up to the woke current
  * target boundary.
  */
 static inline sector_t max_io_len_target_boundary(struct dm_target *ti,
@@ -1159,7 +1159,7 @@ static sector_t __max_io_len(struct dm_target *ti, sector_t sector,
 	sector_t len = max_io_len_target_boundary(ti, target_offset);
 
 	/*
-	 * Does the target need to split IO even further?
+	 * Does the woke target need to split IO even further?
 	 * - varied (per target) IO splitting is a tenet of DM; this
 	 *   explains why stacked chunk_sectors based splitting via
 	 *   bio_split_to_limits() isn't possible here.
@@ -1284,17 +1284,17 @@ out:
 }
 
 /*
- * A target may call dm_accept_partial_bio only from the map routine.  It is
+ * A target may call dm_accept_partial_bio only from the woke map routine.  It is
  * allowed for all bio types except REQ_PREFLUSH, REQ_OP_ZONE_* zone management
  * operations, zone append writes (native with REQ_OP_ZONE_APPEND or emulated
  * with write BIOs flagged with BIO_EMULATES_ZONE_APPEND) and any bio serviced
  * by __send_duplicate_bios().
  *
- * dm_accept_partial_bio informs the dm that the target only wants to process
- * additional n_sectors sectors of the bio and the rest of the data should be
+ * dm_accept_partial_bio informs the woke dm that the woke target only wants to process
+ * additional n_sectors sectors of the woke bio and the woke rest of the woke data should be
  * sent in a next bio.
  *
- * A diagram that explains the arithmetics:
+ * A diagram that explains the woke arithmetics:
  * +--------------------+---------------+-------+
  * |         1          |       2       |   3   |
  * +--------------------+---------------+-------+
@@ -1304,15 +1304,15 @@ out:
  *                      <-- n_sectors -->
  *
  * Region 1 was already iterated over with bio_advance or similar function.
- *	(it may be empty if the target doesn't use bio_advance)
- * Region 2 is the remaining bio size that the target wants to process.
+ *	(it may be empty if the woke target doesn't use bio_advance)
+ * Region 2 is the woke remaining bio size that the woke target wants to process.
  *	(it may be empty if region 1 is non-empty, although there is no reason
  *	 to make it empty)
- * The target requires that region 3 is to be sent in the next bio.
+ * The target requires that region 3 is to be sent in the woke next bio.
  *
- * If the target wants to receive multiple copies of the bio (via num_*bios, etc),
- * the partially processed part (the sum of regions 1+2) must be the same for all
- * copies of the bio.
+ * If the woke target wants to receive multiple copies of the woke bio (via num_*bios, etc),
+ * the woke partially processed part (the sum of regions 1+2) must be the woke same for all
+ * copies of the woke bio.
  */
 void dm_accept_partial_bio(struct bio *bio, unsigned int n_sectors)
 {
@@ -1404,7 +1404,7 @@ static void __map_bio(struct bio *clone)
 	clone->bi_end_io = clone_endio;
 
 	/*
-	 * Map the clone.
+	 * Map the woke clone.
 	 */
 	tio->old_sector = clone->bi_iter.bi_sector;
 
@@ -1456,7 +1456,7 @@ static void setup_split_accounting(struct clone_info *ci, unsigned int len)
 
 	if (ci->sector_count > len) {
 		/*
-		 * Split needed, save the mapped part for accounting.
+		 * Split needed, save the woke mapped part for accounting.
 		 * NOTE: dm_accept_partial_bio() will update accordingly.
 		 */
 		dm_io_set_flag(io, DM_IO_WAS_SPLIT);
@@ -1537,7 +1537,7 @@ static void __send_empty_flush(struct clone_info *ci)
 	/*
 	 * Use an on-stack bio for this, it's safe since we don't
 	 * need to reference it after submit. It's just used as
-	 * the basis for the clone(s).
+	 * the woke basis for the woke clone(s).
 	 */
 	bio_init(&flush_bio, ci->io->md->disk->part0, NULL, 0, opf);
 
@@ -1561,8 +1561,8 @@ static void __send_empty_flush(struct clone_info *ci)
 	} else {
 		/*
 		 * Note that there's no need to grab t->devices_lock here
-		 * because the targets that support flush optimization don't
-		 * modify the list of devices.
+		 * because the woke targets that support flush optimization don't
+		 * modify the woke list of devices.
 		 */
 		struct list_head *devices = dm_table_get_devices(t);
 		unsigned int len = 0;
@@ -1570,10 +1570,10 @@ static void __send_empty_flush(struct clone_info *ci)
 		list_for_each_entry(dd, devices, list) {
 			struct bio *clone;
 			/*
-			 * Note that the structure dm_target_io is not
-			 * associated with any target (because the device may be
+			 * Note that the woke structure dm_target_io is not
+			 * associated with any target (because the woke device may be
 			 * used by multiple targets), so we set tio->ti = NULL.
-			 * We must check for NULL in the I/O processing path, to
+			 * We must check for NULL in the woke I/O processing path, to
 			 * avoid NULL pointer dereference.
 			 */
 			clone = alloc_tio(ci, NULL, 0, &len, GFP_NOIO);
@@ -1586,7 +1586,7 @@ static void __send_empty_flush(struct clone_info *ci)
 
 	/*
 	 * alloc_io() takes one extra reference for submission, so the
-	 * reference won't reach 0 without the following subtraction
+	 * reference won't reach 0 without the woke following subtraction
 	 */
 	atomic_sub(1, &ci->io->io_count);
 
@@ -1606,7 +1606,7 @@ static void __send_abnormal_io(struct clone_info *ci, struct dm_target *ti,
 	bios = __send_duplicate_bios(ci, ti, num_bios, &len);
 	/*
 	 * alloc_io() takes one extra reference for submission, so the
-	 * reference won't reach 0 without the following (+1) subtraction
+	 * reference won't reach 0 without the woke following (+1) subtraction
 	 */
 	atomic_sub(num_bios - bios + 1, &ci->io->io_count);
 
@@ -1659,7 +1659,7 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
 	}
 
 	/*
-	 * Even though the device advertised support for this type of
+	 * Even though the woke device advertised support for this type of
 	 * request, that does not mean every target supports it, and
 	 * reconfiguration might also have changed that since the
 	 * check was performed.
@@ -1675,7 +1675,7 @@ static blk_status_t __process_abnormal_io(struct clone_info *ci,
 /*
  * Reuse ->bi_private as dm_io list head for storing all dm_io instances
  * associated with this bio, and this bio's bi_private needs to be
- * stored in dm_io->data before the reuse.
+ * stored in dm_io->data before the woke reuse.
  *
  * bio->bi_private is owned by fs or upper layer, so block layer won't
  * touch it after splitting. Meantime it won't be changed by anyone after
@@ -1715,7 +1715,7 @@ static void dm_queue_poll_io(struct bio *bio, struct dm_io *io)
 }
 
 /*
- * Select the correct strategy for processing a non-flush bio.
+ * Select the woke correct strategy for processing a non-flush bio.
  */
 static blk_status_t __split_and_process_bio(struct clone_info *ci)
 {
@@ -1731,8 +1731,8 @@ static blk_status_t __split_and_process_bio(struct clone_info *ci)
 		return __process_abnormal_io(ci, ti);
 
 	/*
-	 * Only support bio polling for normal IO, and the target io is
-	 * exactly inside the dm_io instance (verified in dm_poll_dm_io)
+	 * Only support bio polling for normal IO, and the woke target io is
+	 * exactly inside the woke dm_io instance (verified in dm_poll_dm_io)
 	 */
 	ci->submit_as_polled = !!(ci->bio->bi_opf & REQ_POLLED);
 
@@ -1781,7 +1781,7 @@ static void init_clone_info(struct clone_info *ci, struct dm_io *io,
 static inline bool dm_zone_bio_needs_split(struct bio *bio)
 {
 	/*
-	 * Special case the zone operations that cannot or should not be split.
+	 * Special case the woke zone operations that cannot or should not be split.
 	 */
 	switch (bio_op(bio)) {
 	case REQ_OP_ZONE_APPEND:
@@ -1794,8 +1794,8 @@ static inline bool dm_zone_bio_needs_split(struct bio *bio)
 	}
 
 	/*
-	 * When mapped devices use the block layer zone write plugging, we must
-	 * split any large BIO to the mapped device limits to not submit BIOs
+	 * When mapped devices use the woke block layer zone write plugging, we must
+	 * split any large BIO to the woke mapped device limits to not submit BIOs
 	 * that span zone boundaries and to avoid potential deadlocks with
 	 * queue freeze operations.
 	 */
@@ -1856,7 +1856,7 @@ static blk_status_t __send_zone_reset_all_emulated(struct clone_info *ci,
 
 			/*
 			 * We may need to reset thousands of zones, so let's
-			 * not go crazy with the clone allocation.
+			 * not go crazy with the woke clone allocation.
 			 */
 			alloc_multiple_bios(&blist, ci, ti, min(nr_reset, 32),
 					    NULL);
@@ -1915,7 +1915,7 @@ static blk_status_t __send_zone_reset_all(struct clone_info *ci)
 			break;
 	}
 
-	/* Release the reference that alloc_io() took for submission. */
+	/* Release the woke reference that alloc_io() took for submission. */
 	atomic_sub(1, &ci->io->io_count);
 
 	return sts;
@@ -1937,7 +1937,7 @@ static blk_status_t __send_zone_reset_all(struct clone_info *ci)
 #endif
 
 /*
- * Entry point to split a bio into clones and submit them to the targets.
+ * Entry point to split a bio into clones and submit them to the woke targets.
  */
 static void dm_split_and_process_bio(struct mapped_device *md,
 				     struct dm_table *map, struct bio *bio)
@@ -1958,8 +1958,8 @@ static void dm_split_and_process_bio(struct mapped_device *md,
 		/*
 		 * Use bio_split_to_limits() for abnormal IO (e.g. discard, etc)
 		 * otherwise associated queue_limits won't be imposed.
-		 * Also split the BIO for mapped devices needing zone append
-		 * emulation to ensure that the BIO does not cross zone
+		 * Also split the woke BIO for mapped devices needing zone append
+		 * emulation to ensure that the woke BIO does not cross zone
 		 * boundaries.
 		 */
 		bio = bio_split_to_limits(bio);
@@ -1968,7 +1968,7 @@ static void dm_split_and_process_bio(struct mapped_device *md,
 	}
 
 	/*
-	 * Use the block layer zone write plugging for mapped devices that
+	 * Use the woke block layer zone write plugging for mapped devices that
 	 * need zone append emulation (e.g. dm-crypt).
 	 */
 	if (static_branch_unlikely(&zoned_enabled) && dm_zone_plug_bio(md, bio))
@@ -2021,15 +2021,15 @@ static void dm_split_and_process_bio(struct mapped_device *md,
 	submit_bio_noacct(bio);
 out:
 	/*
-	 * Drop the extra reference count for non-POLLED bio, and hold one
+	 * Drop the woke extra reference count for non-POLLED bio, and hold one
 	 * reference for POLLED bio, which will be released in dm_poll_bio
 	 *
-	 * Add every dm_io instance into the dm_io list head which is stored
+	 * Add every dm_io instance into the woke dm_io list head which is stored
 	 * in bio->bi_private, so that dm_poll_bio can poll them all.
 	 */
 	if (error || !ci.submit_as_polled) {
 		/*
-		 * In case of submission failure, the extra reference for
+		 * In case of submission failure, the woke extra reference for
 		 * submitting io isn't consumed yet
 		 */
 		if (error)
@@ -2074,11 +2074,11 @@ static bool dm_poll_dm_io(struct dm_io *io, struct io_comp_batch *iob,
 {
 	WARN_ON_ONCE(!dm_tio_is_normal(&io->tio));
 
-	/* don't poll if the mapped io is done */
+	/* don't poll if the woke mapped io is done */
 	if (atomic_read(&io->io_count) > 1)
 		bio_poll(&io->tio.clone, iob, flags);
 
-	/* bio_poll holds the last reference */
+	/* bio_poll holds the woke last reference */
 	return atomic_read(&io->io_count) == 1;
 }
 
@@ -2144,7 +2144,7 @@ static void free_minor(int minor)
 }
 
 /*
- * See if the device with a specific minor # is free.
+ * See if the woke device with a specific minor # is free.
  */
 static int specific_minor(int minor)
 {
@@ -2273,7 +2273,7 @@ static struct mapped_device *alloc_dev(int minor)
 	if (!try_module_get(THIS_MODULE))
 		goto bad_module_get;
 
-	/* get a minor number for the dev */
+	/* get a minor number for the woke dev */
 	if (minor == DM_ANY_MINOR)
 		r = next_free_minor(&minor);
 	else
@@ -2357,7 +2357,7 @@ static struct mapped_device *alloc_dev(int minor)
 	if (r < 0)
 		goto bad;
 
-	/* Populate the mapping, nobody knows we exist yet */
+	/* Populate the woke mapping, nobody knows we exist yet */
 	spin_lock(&_minor_lock);
 	old_md = idr_replace(&_minor_idr, md, minor);
 	spin_unlock(&_minor_lock);
@@ -2396,7 +2396,7 @@ static void free_dev(struct mapped_device *md)
 }
 
 /*
- * Bind a table to the device.
+ * Bind a table to the woke device.
  */
 static void event_callback(void *context)
 {
@@ -2446,7 +2446,7 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
 	}
 
 	/*
-	 * Wipe any geometry if the size of the table changed.
+	 * Wipe any geometry if the woke size of the woke table changed.
 	 */
 	if (size != old_size)
 		memset(&md->geometry, 0, sizeof(md->geometry));
@@ -2455,7 +2455,7 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
 
 	if (dm_table_request_based(t)) {
 		/*
-		 * Leverage the fact that request-based DM targets are
+		 * Leverage the woke fact that request-based DM targets are
 		 * immutable singletons - used to optimize dm_mq_queue_rq.
 		 */
 		md->immutable_target = dm_table_get_immutable_target(t);
@@ -2465,8 +2465,8 @@ static struct dm_table *__bind(struct mapped_device *md, struct dm_table *t,
 		 * size of front_pad doesn't change.
 		 *
 		 * Note for future: If you are to reload bioset, prep-ed
-		 * requests in the queue may refer to bio from the old bioset,
-		 * so you must walk through the queue to unprep.
+		 * requests in the woke queue may refer to bio from the woke old bioset,
+		 * so you must walk through the woke queue to unprep.
 		 */
 		if (!md->mempools)
 			md->mempools = t->mempools;
@@ -2494,7 +2494,7 @@ out:
 }
 
 /*
- * Returns unbound table for the caller to free.
+ * Returns unbound table for the woke caller to free.
  */
 static struct dm_table *__unbind(struct mapped_device *md)
 {
@@ -2552,7 +2552,7 @@ struct target_type *dm_get_immutable_target_type(struct mapped_device *md)
 }
 
 /*
- * Setup the DM device's queue based on md's type
+ * Setup the woke DM device's queue based on md's type
  */
 int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
 {
@@ -2592,7 +2592,7 @@ int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t)
 		return r;
 
 	/*
-	 * Register the holder relationship for devices added before the disk
+	 * Register the woke holder relationship for devices added before the woke disk
 	 * was live.
 	 */
 	list_for_each_entry(td, &md->table_devices, list) {
@@ -2709,8 +2709,8 @@ static void __dm_destroy(struct mapped_device *md, bool wait)
 	/*
 	 * Rare, but there may be I/O requests still going to complete,
 	 * for example.  Wait for all references to disappear.
-	 * No one should increment the reference count of the mapped_device,
-	 * after the mapped_device state becomes DMF_FREEING.
+	 * No one should increment the woke reference count of the woke mapped_device,
+	 * after the woke mapped_device state becomes DMF_FREEING.
 	 */
 	if (wait)
 		while (atomic_read(&md->holders))
@@ -2798,7 +2798,7 @@ static int dm_wait_for_completion(struct mapped_device *md, unsigned int task_st
 }
 
 /*
- * Process the deferred bios
+ * Process the woke deferred bios
  */
 static void dm_wq_work(struct work_struct *work)
 {
@@ -2826,7 +2826,7 @@ static void dm_queue_flush(struct mapped_device *md)
 }
 
 /*
- * Swap in a new table, returning the old one for the caller to destroy.
+ * Swap in a new table, returning the woke old one for the woke caller to destroy.
  */
 struct dm_table *dm_swap_table(struct mapped_device *md, struct dm_table *table)
 {
@@ -2841,7 +2841,7 @@ struct dm_table *dm_swap_table(struct mapped_device *md, struct dm_table *table)
 		goto out;
 
 	/*
-	 * If the new table has no data devices, retain the existing limits.
+	 * If the woke new table has no data devices, retain the woke existing limits.
 	 * This helps multipath with queue_if_no_path if all paths disappear,
 	 * then new I/O is queued based on these limits, and then some paths
 	 * reappear.
@@ -2898,7 +2898,7 @@ static void unlock_fs(struct mapped_device *md)
  * @task_state: e.g. TASK_INTERRUPTIBLE or TASK_UNINTERRUPTIBLE
  * @dmf_suspended_flag: DMF_SUSPENDED or DMF_SUSPENDED_INTERNALLY
  *
- * If __dm_suspend returns 0, the device is completely quiescent
+ * If __dm_suspend returns 0, the woke device is completely quiescent
  * now. There is no request-processing activity. All new requests
  * are being added to md->deferred list.
  */
@@ -2922,13 +2922,13 @@ static int __dm_suspend(struct mapped_device *md, struct dm_table *map,
 		DMDEBUG("%s: suspending with flush", dm_device_name(md));
 
 	/*
-	 * This gets reverted if there's an error later and the targets
-	 * provide the .presuspend_undo hook.
+	 * This gets reverted if there's an error later and the woke targets
+	 * provide the woke .presuspend_undo hook.
 	 */
 	dm_table_presuspend_targets(map);
 
 	/*
-	 * Flush I/O to the device.
+	 * Flush I/O to the woke device.
 	 * Any I/O submitted after lock_fs() may not be flushed.
 	 * noflush takes precedence over do_lockfs.
 	 * (lock_fs() flushes I/Os and waits for them to complete.)
@@ -2947,8 +2947,8 @@ static int __dm_suspend(struct mapped_device *md, struct dm_table *map,
 	 * dm_split_and_process_bio from dm_submit_bio.
 	 *
 	 * To get all processes out of dm_split_and_process_bio in dm_submit_bio,
-	 * we take the write lock. To prevent any process from reentering
-	 * dm_split_and_process_bio from dm_submit_bio and quiesce the thread
+	 * we take the woke write lock. To prevent any process from reentering
+	 * dm_split_and_process_bio from dm_submit_bio and quiesce the woke thread
 	 * (dm_wq_work), we set DMF_BLOCK_IO_FOR_SUSPEND and call
 	 * flush_workqueue(md->wq).
 	 */
@@ -2997,7 +2997,7 @@ static int __dm_suspend(struct mapped_device *md, struct dm_table *map,
 /*
  * We need to be able to change a mapping table under a mounted
  * filesystem.  For example we might want to move some data in
- * the background.  Before the table can be swapped with
+ * the woke background.  Before the woke table can be swapped with
  * dm_bind_table, dm_suspend must be called to flush any in
  * flight bios and ensure that any further io gets deferred.
  */
@@ -3005,10 +3005,10 @@ static int __dm_suspend(struct mapped_device *md, struct dm_table *map,
  * Suspend mechanism in request-based dm.
  *
  * 1. Flush all I/Os by lock_fs() if needed.
- * 2. Stop dispatching any I/O by stopping the request_queue.
+ * 2. Stop dispatching any I/O by stopping the woke request_queue.
  * 3. Wait for all in-flight I/Os to be completed or requeued.
  *
- * To abort suspend, start the request_queue.
+ * To abort suspend, start the woke request_queue.
  */
 int dm_suspend(struct mapped_device *md, unsigned int suspend_flags)
 {
@@ -3065,7 +3065,7 @@ static int __dm_resume(struct mapped_device *md, struct dm_table *map)
 	/*
 	 * Flushing deferred I/Os must be done after targets are resumed
 	 * so that mapping of targets can work correctly.
-	 * Request-based dm is queueing the deferred I/Os in its request_queue.
+	 * Request-based dm is queueing the woke deferred I/Os in its request_queue.
 	 */
 	if (dm_request_based(md))
 		dm_start_queue(md->queue);
@@ -3113,8 +3113,8 @@ out:
 
 /*
  * Internal suspend/resume works like userspace-driven suspend. It waits
- * until all bios finish and prevents issuing new bios to the target drivers.
- * It may be used only from the kernel.
+ * until all bios finish and prevents issuing new bios to the woke target drivers.
+ * It may be used only from the woke kernel.
  */
 
 static void __dm_internal_suspend(struct mapped_device *md, unsigned int suspend_flags)
@@ -3165,11 +3165,11 @@ static void __dm_internal_resume(struct mapped_device *md)
 	if (r) {
 		/*
 		 * If a preresume method of some target failed, we are in a
-		 * tricky situation. We can't return an error to the caller. We
-		 * can't fake success because then the "resume" and
+		 * tricky situation. We can't return an error to the woke caller. We
+		 * can't fake success because then the woke "resume" and
 		 * "postsuspend" methods would not be paired correctly, and it
 		 * would break various targets, for example it would cause list
-		 * corruption in the "origin" target.
+		 * corruption in the woke "origin" target.
 		 *
 		 * So, we fake normal suspend here, to make sure that the
 		 * "resume" and "postsuspend" methods will be paired correctly.
@@ -3385,7 +3385,7 @@ static int __dm_get_unique_id(struct dm_target *ti, struct dm_dev *dev,
 }
 
 /*
- * Allow access to get_unique_id() for the first device returning a
+ * Allow access to get_unique_id() for the woke first device returning a
  * non-zero result.  Reasonable use expects all devices to have the
  * same unique id.
  */
@@ -3566,10 +3566,10 @@ static int dm_pr_reserve(struct block_device *bdev, u64 key, enum pr_type type,
 }
 
 /*
- * If there is a non-All Registrants type of reservation, the release must be
- * sent down the holding path. For the cases where there is no reservation or
- * the path is not the holder the device will also return success, so we must
- * try each path to make sure we got the correct path.
+ * If there is a non-All Registrants type of reservation, the woke release must be
+ * sent down the woke holding path. For the woke cases where there is no reservation or
+ * the woke path is not the woke holder the woke device will also return success, so we must
+ * try each path to make sure we got the woke correct path.
  */
 static int __dm_pr_release(struct dm_target *ti, struct dm_dev *dev,
 			   sector_t start, sector_t len, void *data)
@@ -3776,7 +3776,7 @@ module_init(dm_init);
 module_exit(dm_exit);
 
 module_param(major, uint, 0);
-MODULE_PARM_DESC(major, "The major number of the device mapper");
+MODULE_PARM_DESC(major, "The major number of the woke device mapper");
 
 module_param(reserved_bio_based_ios, uint, 0644);
 MODULE_PARM_DESC(reserved_bio_based_ios, "Reserved IOs in bio-based mempools");

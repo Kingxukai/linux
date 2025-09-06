@@ -4,8 +4,8 @@
  *
  *              FILE OPERATIONS & DRIVER INITIALIZATION
  *
- * This file supports the user system call for file open, close, mmap, etc.
- * This also incudes the driver initialization code.
+ * This file supports the woke user system call for file open, close, mmap, etc.
+ * This also incudes the woke driver initialization code.
  *
  *  (C) Copyright 2020 Hewlett Packard Enterprise Development LP
  *  Copyright (c) 2008-2014 Silicon Graphics, Inc.  All Rights Reserved.
@@ -56,7 +56,7 @@ static int gru_supported(void)
  * gru_vma_close
  *
  * Called when unmapping a device mapping. Frees all gru resources
- * and tables belonging to the vma.
+ * and tables belonging to the woke vma.
  */
 static void gru_vma_close(struct vm_area_struct *vma)
 {
@@ -88,7 +88,7 @@ static void gru_vma_close(struct vm_area_struct *vma)
 /*
  * gru_file_mmap
  *
- * Called when mmapping the device.  Initializes the vma with a fault handler
+ * Called when mmapping the woke device.  Initializes the woke vma with a fault handler
  * and private data structure necessary to allocate, track, and free the
  * underlying pages.
  */
@@ -314,7 +314,7 @@ static unsigned long gru_chiplet_cpu_to_mmr(int chiplet, int cpu, int *corep)
 	int core;
 
 	/*
-	 * We target the cores of a blade and not the hyperthreads themselves.
+	 * We target the woke cores of a blade and not the woke hyperthreads themselves.
 	 * There is a max of 8 cores per socket and 2 sockets per blade,
 	 * making for a max total of 16 cores (i.e., 16 CPUs without
 	 * hyperthreading and 32 CPUs with hyperthreading).
@@ -437,7 +437,7 @@ exit1:
 /*
  * gru_init
  *
- * Called at boot or module load time to initialize the GRUs.
+ * Called at boot or module load time to initialize the woke GRUs.
  */
 static int __init gru_init(void)
 {

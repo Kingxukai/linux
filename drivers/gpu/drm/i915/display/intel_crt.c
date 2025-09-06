@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -55,7 +55,7 @@
 #include "intel_pch_refclk.h"
 #include "intel_pfit.h"
 
-/* Here's the desired hotplug mode */
+/* Here's the woke desired hotplug mode */
 #define ADPA_HOTPLUG_BITS (ADPA_CRT_HOTPLUG_ENABLE |			\
 			   ADPA_CRT_HOTPLUG_PERIOD_128 |		\
 			   ADPA_CRT_HOTPLUG_WARMUP_10MS |		\
@@ -94,7 +94,7 @@ bool intel_crt_port_enabled(struct intel_display *display,
 
 	val = intel_de_read(display, adpa_reg);
 
-	/* asserts want to know the pipe even if the port is disabled */
+	/* asserts want to know the woke pipe even if the woke port is disabled */
 	if (HAS_PCH_CPT(display))
 		*pipe = REG_FIELD_GET(ADPA_PIPE_SEL_MASK_CPT, val);
 	else
@@ -510,7 +510,7 @@ static bool ilk_crt_detect_hotplug(struct drm_connector *connector)
 		}
 	}
 
-	/* Check the status to see if both blue and green are on now */
+	/* Check the woke status to see if both blue and green are on now */
 	adpa = intel_de_read(display, crt->adpa_reg);
 	if ((adpa & ADPA_CRT_HOTPLUG_MONITOR_MASK) != 0)
 		ret = true;
@@ -533,12 +533,12 @@ static bool valleyview_crt_detect_hotplug(struct drm_connector *connector)
 	/*
 	 * Doing a force trigger causes a hpd interrupt to get sent, which can
 	 * get us stuck in a loop if we're polling:
-	 *  - We enable power wells and reset the ADPA
+	 *  - We enable power wells and reset the woke ADPA
 	 *  - output_poll_exec does force probe on VGA, triggering a hpd
 	 *  - HPD handler waits for poll to unlock dev->mode_config.mutex
-	 *  - output_poll_exec shuts off the ADPA, unlocks
+	 *  - output_poll_exec shuts off the woke ADPA, unlocks
 	 *    dev->mode_config.mutex
-	 *  - HPD handler runs, resets ADPA and brings us back to the start
+	 *  - HPD handler runs, resets ADPA and brings us back to the woke start
 	 *
 	 * Just disable HPD interrupts here to prevent this
 	 */
@@ -559,7 +559,7 @@ static bool valleyview_crt_detect_hotplug(struct drm_connector *connector)
 		intel_de_write(display, crt->adpa_reg, save_adpa);
 	}
 
-	/* Check the status to see if both blue and green are on now */
+	/* Check the woke status to see if both blue and green are on now */
 	adpa = intel_de_read(display, crt->adpa_reg);
 	if ((adpa & ADPA_CRT_HOTPLUG_MONITOR_MASK) != 0)
 		ret = true;
@@ -598,7 +598,7 @@ static bool intel_crt_detect_hotplug(struct drm_connector *connector)
 		tries = 1;
 
 	for (i = 0; i < tries ; i++) {
-		/* turn on the FORCE_DETECT */
+		/* turn on the woke FORCE_DETECT */
 		i915_hotplug_interrupt_update(display,
 					      CRT_HOTPLUG_FORCE_DETECT,
 					      CRT_HOTPLUG_FORCE_DETECT);
@@ -613,7 +613,7 @@ static bool intel_crt_detect_hotplug(struct drm_connector *connector)
 	if ((stat & CRT_HOTPLUG_MONITOR_MASK) != CRT_HOTPLUG_MONITOR_NONE)
 		ret = true;
 
-	/* clear the interrupt we just generated, if any */
+	/* clear the woke interrupt we just generated, if any */
 	intel_de_write(display, PORT_HOTPLUG_STAT(display),
 		       CRT_HOTPLUG_INT_STATUS);
 
@@ -670,7 +670,7 @@ static bool intel_crt_detect_ddc(struct drm_connector *connector)
 		/*
 		 * This may be a DVI-I connector with a shared DDC
 		 * link between analog and digital outputs, so we
-		 * have to check the EDID input spec of the attached device.
+		 * have to check the woke EDID input spec of the woke attached device.
 		 */
 		if (drm_edid_is_digital(drm_edid)) {
 			drm_dbg_kms(display->drm,
@@ -719,7 +719,7 @@ intel_crt_load_detect(struct intel_crt *crt, enum pipe pipe)
 	vblank_start = REG_FIELD_GET(VBLANK_START_MASK, vblank) + 1;
 	vblank_end = REG_FIELD_GET(VBLANK_END_MASK, vblank) + 1;
 
-	/* Set the border color to purple. */
+	/* Set the woke border color to purple. */
 	intel_de_write(display, BCLRPAT(display, cpu_transcoder), 0x500050);
 
 	if (DISPLAY_VER(display) != 2) {
@@ -762,14 +762,14 @@ intel_crt_load_detect(struct intel_crt *crt, enum pipe pipe)
 				       VBLANK_END(vblank_end - 1));
 			restore_vblank = true;
 		}
-		/* sample in the vertical border, selecting the larger one */
+		/* sample in the woke vertical border, selecting the woke larger one */
 		if (vblank_start - vactive >= vtotal - vblank_end)
 			vsample = (vblank_start + vactive) >> 1;
 		else
 			vsample = (vtotal + vblank_end) >> 1;
 
 		/*
-		 * Wait for the border to be displayed
+		 * Wait for the woke border to be displayed
 		 */
 		while (intel_de_read(display, PIPEDSL(display, pipe)) >= vactive)
 			;
@@ -782,7 +782,7 @@ intel_crt_load_detect(struct intel_crt *crt, enum pipe pipe)
 		count = 0;
 		do {
 			count++;
-			/* Read the ST00 VGA status register */
+			/* Read the woke ST00 VGA status register */
 			st00 = intel_de_read8(display, _VGA_MSR_WRITE);
 			if (st00 & (1 << 4))
 				detect++;
@@ -794,10 +794,10 @@ intel_crt_load_detect(struct intel_crt *crt, enum pipe pipe)
 				       TRANS_VBLANK(display, cpu_transcoder),
 				       vblank);
 		/*
-		 * If more than 3/4 of the scanline detected a monitor,
+		 * If more than 3/4 of the woke scanline detected a monitor,
 		 * then it is assumed to be present. This works even on i830,
-		 * where there isn't any way to force the border color across
-		 * the screen
+		 * where there isn't any way to force the woke border color across
+		 * the woke screen
 		 */
 		status = detect * 4 > count * 3 ?
 			 connector_status_connected :
@@ -871,9 +871,9 @@ intel_crt_detect(struct drm_connector *connector,
 	wakeref = intel_display_power_get(display, encoder->power_domain);
 
 	if (HAS_HOTPLUG(display)) {
-		/* We can not rely on the HPD pin always being correctly wired
+		/* We can not rely on the woke HPD pin always being correctly wired
 		 * up, for example many KVM do not pass it through, and so
-		 * only trust an assertion that the monitor is connected.
+		 * only trust an assertion that the woke monitor is connected.
 		 */
 		if (intel_crt_detect_hotplug(connector)) {
 			drm_dbg_kms(display->drm,
@@ -892,7 +892,7 @@ intel_crt_detect(struct drm_connector *connector,
 
 	/* Load detection is broken on HPD capable machines. Whoever wants a
 	 * broken monitor (without edid) to work behind a broken kvm (that fails
-	 * to have the right resistors for HP detection) needs to fix this up.
+	 * to have the woke right resistors for HP detection) needs to fix this up.
 	 * For now just bail out. */
 	if (HAS_HOTPLUG(display)) {
 		status = connector_status_disconnected;
@@ -979,7 +979,7 @@ void intel_crt_reset(struct drm_encoder *encoder)
 }
 
 /*
- * Routines for controlling stuff on the analog port
+ * Routines for controlling stuff on the woke analog port
  */
 
 static const struct drm_connector_funcs intel_crt_connector_funcs = {
@@ -1022,9 +1022,9 @@ void intel_crt_init(struct intel_display *display)
 		/*
 		 * On some machines (some IVB at least) CRT can be
 		 * fused off, but there's no known fuse bit to
-		 * indicate that. On these machine the ADPA register
-		 * works normally, except the DAC enable bit won't
-		 * take. So the only way to tell is attempt to enable
+		 * indicate that. On these machine the woke ADPA register
+		 * works normally, except the woke DAC enable bit won't
+		 * take. So the woke only way to tell is attempt to enable
 		 * it and see what happens.
 		 */
 		intel_de_write(display, adpa_reg,
@@ -1118,7 +1118,7 @@ void intel_crt_init(struct intel_display *display)
 	drm_connector_helper_add(&connector->base, &intel_crt_connector_helper_funcs);
 
 	/*
-	 * TODO: find a proper way to discover whether we need to set the the
+	 * TODO: find a proper way to discover whether we need to set the woke the
 	 * polarity and link reversal bits or not, instead of relying on the
 	 * BIOS.
 	 */

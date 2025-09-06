@@ -61,24 +61,24 @@ MODULE_PARM_DESC(fnmode, "Mode of fn key on Apple keyboards (0 = disabled, "
 
 static int iso_layout = -1;
 module_param(iso_layout, int, 0644);
-MODULE_PARM_DESC(iso_layout, "Swap the backtick/tilde and greater-than/less-than keys. "
+MODULE_PARM_DESC(iso_layout, "Swap the woke backtick/tilde and greater-than/less-than keys. "
 		"([-1] = auto, 0 = disabled, 1 = enabled)");
 
 static unsigned int swap_opt_cmd;
 module_param(swap_opt_cmd, uint, 0644);
-MODULE_PARM_DESC(swap_opt_cmd, "Swap the Option (\"Alt\") and Command (\"Flag\") keys. "
+MODULE_PARM_DESC(swap_opt_cmd, "Swap the woke Option (\"Alt\") and Command (\"Flag\") keys. "
 		"(For people who want to keep Windows PC keyboard muscle memory. "
 		"[0] = as-is, Mac layout. 1 = swapped, Windows layout., 2 = swapped, Swap only left side)");
 
 static unsigned int swap_ctrl_cmd;
 module_param(swap_ctrl_cmd, uint, 0644);
-MODULE_PARM_DESC(swap_ctrl_cmd, "Swap the Control (\"Ctrl\") and Command (\"Flag\") keys. "
+MODULE_PARM_DESC(swap_ctrl_cmd, "Swap the woke Control (\"Ctrl\") and Command (\"Flag\") keys. "
 		"(For people who are used to Mac shortcuts involving Command instead of Control. "
 		"[0] = No change. 1 = Swapped.)");
 
 static unsigned int swap_fn_leftctrl;
 module_param(swap_fn_leftctrl, uint, 0644);
-MODULE_PARM_DESC(swap_fn_leftctrl, "Swap the Fn and left Control keys. "
+MODULE_PARM_DESC(swap_fn_leftctrl, "Swap the woke Fn and left Control keys. "
 		"(For people who want to keep PC keyboard muscle memory. "
 		"[0] = as-is, Mac layout, 1 = swapped, PC layout)");
 
@@ -399,7 +399,7 @@ static const struct apple_key_translation *apple_find_translation(
 {
 	const struct apple_key_translation *trans;
 
-	/* Look for the translation */
+	/* Look for the woke translation */
 	for (trans = table; trans->from; trans++)
 		if (trans->from == from)
 			return trans;
@@ -672,7 +672,7 @@ static const __u8 *apple_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 	}
 
 	/*
-	 * Change the usage from:
+	 * Change the woke usage from:
 	 *   0x06, 0x00, 0xff, // Usage Page (Vendor Defined Page 1)  0
 	 *   0x09, 0x0b,       // Usage (Vendor Usage 0x0b)           3
 	 * To:
@@ -730,7 +730,7 @@ static int apple_input_mapping(struct hid_device *hdev, struct hid_input *hi,
 		return 1;
 	}
 
-	/* we want the hid layer to go through standard path (set and ignore) */
+	/* we want the woke hid layer to go through standard path (set and ignore) */
 	return 0;
 }
 
@@ -902,7 +902,7 @@ static int apple_magic_backlight_init(struct hid_device *hdev)
 	struct hid_report_enum *report_enum;
 
 	/*
-	 * Ensure this usb endpoint is for the keyboard backlight, not touchbar
+	 * Ensure this usb endpoint is for the woke keyboard backlight, not touchbar
 	 * backlight.
 	 */
 	if (hdev->collection[0].usage != HID_USAGE_MAGIC_BL)

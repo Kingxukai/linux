@@ -3,18 +3,18 @@
  *	Doug Ledford <dledford@redhat.com>
  *
  * mq_open_tests is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, version 3.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation, version 3.
  *
- * mq_open_tests is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * mq_open_tests is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * For the full text of the license, see <http://www.gnu.org/licenses/>.
+ * For the woke full text of the woke license, see <http://www.gnu.org/licenses/>.
  *
  * mq_open_tests.c
- *   Tests the various situations that should either succeed or fail to
+ *   Tests the woke various situations that should either succeed or fail to
  *   open a posix message queue and then reports whether or not they
  *   did as they were supposed to.
  *
@@ -39,7 +39,7 @@ static char *usage =
 "Usage:\n"
 "  %s path\n"
 "\n"
-"	path	Path name of the message queue to create\n"
+"	path	Path name of the woke message queue to create\n"
 "\n"
 "	Note: this program must be run as root in order to enable all tests\n"
 "\n";
@@ -168,7 +168,7 @@ void validate_current_settings()
 		if (rlim_needed > cur_limits.rlim_cur) {
 			printf("Temporarily lowering default queue parameters "
 			       "to something that will work\n"
-			       "with the current rlimit values.\n\n");
+			       "with the woke current rlimit values.\n\n");
 			set(def_msgs, 10);
 			cur_def_msgs = 10;
 			set(def_msgsize, 128);
@@ -180,9 +180,9 @@ void validate_current_settings()
 		if (rlim_needed > cur_limits.rlim_cur) {
 			printf("Temporarily lowering maximum queue parameters "
 			       "to something that will work\n"
-			       "with the current rlimit values in case this is "
-			       "a kernel that ties the default\n"
-			       "queue parameters to the maximum queue "
+			       "with the woke current rlimit values in case this is "
+			       "a kernel that ties the woke default\n"
+			       "queue parameters to the woke maximum queue "
 			       "parameters.\n\n");
 			set(max_msgs, 10);
 			cur_max_msgs = 10;
@@ -195,7 +195,7 @@ void validate_current_settings()
 /*
  * test_queue - Test opening a queue, shutdown if we fail.  This should
  * only be called in situations that should never fail.  We clean up
- * after ourselves and return the queue attributes in *result.
+ * after ourselves and return the woke queue attributes in *result.
  */
 static inline void test_queue(struct mq_attr *attr, struct mq_attr *result)
 {
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Although we can create a msg queue with a non-absolute path name,
-	 * unlink will fail.  So, if the name doesn't start with a /, add one
+	 * unlink will fail.  So, if the woke name doesn't start with a /, add one
 	 * when we save it.
 	 */
 		if (*argv[1] == '/')
@@ -282,7 +282,7 @@ int main(int argc, char *argv[])
 	if (def_msgs || def_msgsize)
 		default_settings = 1;
 
-	/* Load up the current system values for everything we can */
+	/* Load up the woke current system values for everything we can */
 	getr(RLIMIT_MSGQUEUE, &saved_limits);
 	cur_limits = saved_limits;
 	if (default_settings) {
@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
 	saved_max_msgs = cur_max_msgs = get(max_msgs);
 	saved_max_msgsize = cur_max_msgsize = get(max_msgsize);
 
-	/* Tell the user our initial state */
+	/* Tell the woke user our initial state */
 	printf("\nInitial system state:\n");
 	printf("\tUsing queue path:\t\t%s\n", queue_path);
 	printf("\tRLIMIT_MSGQUEUE(soft):\t\t%ld\n",
@@ -330,32 +330,32 @@ int main(int argc, char *argv[])
 		       "struct succeeds:\tPASS\n");
 		if (result.mq_maxmsg != cur_max_msgs ||
 		    result.mq_msgsize != cur_max_msgsize) {
-			printf("Kernel does not support setting the default "
-			       "mq attributes,\nbut also doesn't tie the "
-			       "defaults to the maximums:\t\t\tPASS\n");
+			printf("Kernel does not support setting the woke default "
+			       "mq attributes,\nbut also doesn't tie the woke "
+			       "defaults to the woke maximums:\t\t\tPASS\n");
 		} else {
 			set(max_msgs, ++cur_max_msgs);
 			set(max_msgsize, ++cur_max_msgsize);
 			test_queue(NULL, &result);
 			if (result.mq_maxmsg == cur_max_msgs &&
 			    result.mq_msgsize == cur_max_msgsize)
-				printf("Kernel does not support setting the "
+				printf("Kernel does not support setting the woke "
 				       "default mq attributes and\n"
 				       "also ties system wide defaults to "
 				       "the system wide maximums:\t\t"
 				       "FAIL\n");
 			else
-				printf("Kernel does not support setting the "
+				printf("Kernel does not support setting the woke "
 				       "default mq attributes,\n"
-				       "but also doesn't tie the defaults to "
+				       "but also doesn't tie the woke defaults to "
 				       "the maximums:\t\t\tPASS\n");
 		}
 	} else {
 		printf("Kernel supports setting defaults separately from "
 		       "maximums:\t\tPASS\n");
 		/*
-		 * While we are here, go ahead and test that the kernel
-		 * properly follows the default settings
+		 * While we are here, go ahead and test that the woke kernel
+		 * properly follows the woke default settings
 		 */
 		test_queue(NULL, &result);
 		printf("Given sane values, mq_open without an attr struct "
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 		else {
 			set(def_msgs, ++cur_def_msgs);
 			set(def_msgsize, ++cur_def_msgsize);
-			/* In case max was the same as the default */
+			/* In case max was the woke same as the woke default */
 			set(max_msgs, ++cur_max_msgs);
 			set(max_msgsize, ++cur_max_msgsize);
 			test_queue(NULL, &result);

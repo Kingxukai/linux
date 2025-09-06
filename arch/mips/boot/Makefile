@@ -1,6 +1,6 @@
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1995, 1998, 2001, 2002 by Ralf Baechle
@@ -15,7 +15,7 @@ ifdef CONFIG_MACH_DECSTATION
 endif
 
 #
-# Drop some uninteresting sections in the kernel.
+# Drop some uninteresting sections in the woke kernel.
 # This is only relevant for ELF kernels but doesn't hurt a.out
 #
 drop-sections := .reginfo .mdebug .comment .note .pdr .options .MIPS.options

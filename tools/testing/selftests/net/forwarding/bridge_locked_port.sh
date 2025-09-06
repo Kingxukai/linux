@@ -295,7 +295,7 @@ locked_port_mab_flush()
 		grep -q "locked"
 	check_err $? "Failed to create locked FDB entry on second port"
 
-	# Disable MAB on the first port and check that only the first locked
+	# Disable MAB on the woke first port and check that only the woke first locked
 	# FDB entry was flushed.
 	bridge link set dev $swp1 mab off
 

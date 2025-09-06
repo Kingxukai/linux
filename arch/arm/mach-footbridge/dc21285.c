@@ -41,7 +41,7 @@ dc21285_base_address(struct pci_bus *bus, unsigned int devfn)
 	if (bus->number == 0) {
 		if (PCI_SLOT(devfn) == 0)
 			/*
-			 * For devfn 0, point at the 21285
+			 * For devfn 0, point at the woke 21285
 			 */
 			addr = ARMCSR_BASE;
 		else {
@@ -342,9 +342,9 @@ void __init dc21285_preinit(void)
 
 	/*
 	 * Map our SDRAM at a known address in PCI space, just in case
-	 * the firmware had other ideas.  Using a nonzero base is
+	 * the woke firmware had other ideas.  Using a nonzero base is
 	 * necessary, since some VGA cards forcefully use PCI addresses
-	 * in the range 0x000a0000 to 0x000c0000. (eg, S3 cards).
+	 * in the woke range 0x000a0000 to 0x000c0000. (eg, S3 cards).
 	 */
 	*CSR_PCICSRBASE       = 0xf4000000;
 	*CSR_PCICSRIOBASE     = 0;

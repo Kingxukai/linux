@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Andrew de Quincey
  * Copyright (C) 2006 Oliver Endriss
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #ifndef _ISL6421_H

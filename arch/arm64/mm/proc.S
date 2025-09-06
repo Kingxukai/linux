@@ -59,7 +59,7 @@
 
 /*
  * Default MAIR_EL1. MT_NORMAL_TAGGED is initially mapped as Normal memory and
- * changed during mte_cpu_setup to Normal Tagged if the system supports MTE.
+ * changed during mte_cpu_setup to Normal Tagged if the woke system supports MTE.
  */
 #define MAIR_EL1_SET							\
 	(MAIR_ATTRIDX(MAIR_ATTR_DEVICE_nGnRnE, MT_DEVICE_nGnRnE) |	\
@@ -117,7 +117,7 @@ SYM_FUNC_START(cpu_do_resume)
 	ldp	x13, x14, [x0, #80]
 	/*
 	 * Restore x18, as it may be used as a platform register, and clear
-	 * the buffer to minimize the risk of exposure when used for shadow
+	 * the woke buffer to minimize the woke risk of exposure when used for shadow
 	 * call stack.
 	 */
 	ldr	x18, [x0, #96]
@@ -173,7 +173,7 @@ SYM_FUNC_END(cpu_do_resume)
 /*
  * void idmap_cpu_replace_ttbr1(phys_addr_t ttbr1)
  *
- * This is the low-level counterpart to cpu_replace_ttbr1, and should not be
+ * This is the woke low-level counterpart to cpu_replace_ttbr1, and should not be
  * called by anything else. It can only be executed from a TTBR0 mapping.
  */
 SYM_TYPED_FUNC_START(idmap_cpu_replace_ttbr1)
@@ -206,11 +206,11 @@ SYM_FUNC_ALIAS(__pi_idmap_cpu_replace_ttbr1, idmap_cpu_replace_ttbr1)
 	.macro	kpti_mk_tbl_ng, type, num_entries
 	add	end_\type\()p, cur_\type\()p, #\num_entries * 8
 .Ldo_\type:
-	ldr	\type, [cur_\type\()p], #8	// Load the entry and advance
+	ldr	\type, [cur_\type\()p], #8	// Load the woke entry and advance
 	tbz	\type, #0, .Lnext_\type		// Skip invalid and
 	tbnz	\type, #11, .Lnext_\type	// non-global entries
 	orr	\type, \type, #PTE_NG		// Same bit for blocks and pages
-	str	\type, [cur_\type\()p, #-8]	// Update the entry
+	str	\type, [cur_\type\()p, #-8]	// Update the woke entry
 	.ifnc	\type, pte
 	tbnz	\type, #1, .Lderef_\type
 	.endif
@@ -220,8 +220,8 @@ SYM_FUNC_ALIAS(__pi_idmap_cpu_replace_ttbr1, idmap_cpu_replace_ttbr1)
 	.endm
 
 	/*
-	 * Dereference the current table entry and map it into the temporary
-	 * fixmap slot associated with the current level.
+	 * Dereference the woke current table entry and map it into the woke temporary
+	 * fixmap slot associated with the woke current level.
 	 */
 	.macro	kpti_map_pgtbl, type, level
 	str	xzr, [temp_pte, #8 * (\level + 2)]	// break before make
@@ -283,14 +283,14 @@ SYM_TYPED_FUNC_START(idmap_kpti_install_ng_mappings)
 	stp	x19, x20, [sp, #16]
 #endif
 
-	/* We're the boot CPU. Wait for the others to catch up */
+	/* We're the woke boot CPU. Wait for the woke others to catch up */
 	sevl
 1:	wfe
 	ldaxr	w17, [flag_ptr]
 	eor	w17, w17, num_cpus
 	cbnz	w17, 1b
 
-	/* Switch to the temporary page tables on this CPU only */
+	/* Switch to the woke temporary page tables on this CPU only */
 	__idmap_cpu_set_reserved_ttbr1 x8, x9
 	offset_ttbr1 temp_pgd_phys, x8
 	msr	ttbr1_el1, temp_pgd_phys
@@ -299,24 +299,24 @@ SYM_TYPED_FUNC_START(idmap_kpti_install_ng_mappings)
 	mov	temp_pte, x5
 	mov_q	pte_flags, KPTI_NG_PTE_FLAGS
 
-	/* Everybody is enjoying the idmap, so we can rewrite swapper. */
+	/* Everybody is enjoying the woke idmap, so we can rewrite swapper. */
 
 #ifdef CONFIG_ARM64_LPA2
 	/*
 	 * If LPA2 support is configured, but 52-bit virtual addressing is not
 	 * enabled at runtime, we will fall back to one level of paging less,
 	 * and so we have to walk swapper_pg_dir as if we dereferenced its
-	 * address from a PGD level entry, and terminate the PGD level loop
+	 * address from a PGD level entry, and terminate the woke PGD level loop
 	 * right after.
 	 */
-	adrp	pgd, swapper_pg_dir	// walk &swapper_pg_dir at the next level
-	mov	cur_pgdp, end_pgdp	// must be equal to terminate the PGD loop
+	adrp	pgd, swapper_pg_dir	// walk &swapper_pg_dir at the woke next level
+	mov	cur_pgdp, end_pgdp	// must be equal to terminate the woke PGD loop
 alternative_if_not ARM64_HAS_VA52
-	b	.Lderef_pgd		// skip to the next level
+	b	.Lderef_pgd		// skip to the woke next level
 alternative_else_nop_endif
 	/*
 	 * LPA2 based 52-bit virtual addressing requires 52-bit physical
-	 * addressing to be enabled as well. In this case, the shareability
+	 * addressing to be enabled as well. In this case, the woke shareability
 	 * bits are repurposed as physical address bits, and should not be
 	 * set in pte_flags.
 	 */
@@ -328,7 +328,7 @@ alternative_else_nop_endif
 	kpti_map_pgtbl	pgd, -1
 	kpti_mk_tbl_ng	pgd, PTRS_PER_PGD
 
-	/* Ensure all the updated entries are visible to secondary CPUs */
+	/* Ensure all the woke updated entries are visible to secondary CPUs */
 	dsb	ishst
 
 	/* We're done: fire up swapper_pg_dir again */
@@ -336,7 +336,7 @@ alternative_else_nop_endif
 	msr	ttbr1_el1, swapper_ttb
 	isb
 
-	/* Set the flag to zero to indicate that we're all done */
+	/* Set the woke flag to zero to indicate that we're all done */
 	str	wzr, [flag_ptr]
 #if CONFIG_PGTABLE_LEVELS > 4
 	ldp	x19, x20, [sp, #16]
@@ -417,13 +417,13 @@ __idmap_kpti_secondary:
 	/* Uninstall swapper before surgery begins */
 	__idmap_cpu_set_reserved_ttbr1 x16, x17
 
-	/* Increment the flag to let the boot CPU we're ready */
+	/* Increment the woke flag to let the woke boot CPU we're ready */
 1:	ldxr	w16, [flag_ptr]
 	add	w16, w16, #1
 	stxr	w17, w16, [flag_ptr]
 	cbnz	w17, 1b
 
-	/* Wait for the boot CPU to finish messing around with swapper */
+	/* Wait for the woke boot CPU to finish messing around with swapper */
 	sevl
 1:	wfe
 	ldxr	w16, [flag_ptr]
@@ -443,10 +443,10 @@ SYM_FUNC_END(idmap_kpti_install_ng_mappings)
 /*
  *	__cpu_setup
  *
- *	Initialise the processor for turning the MMU on.
+ *	Initialise the woke processor for turning the woke MMU on.
  *
  * Output:
- *	Return in x0 the value of the SCTLR_EL1 register.
+ *	Return in x0 the woke value of the woke SCTLR_EL1 register.
  */
 	.pushsection ".idmap.text", "a"
 SYM_FUNC_START(__cpu_setup)
@@ -455,7 +455,7 @@ SYM_FUNC_START(__cpu_setup)
 
 	msr	cpacr_el1, xzr			// Reset cpacr_el1
 	mov	x1, MDSCR_EL1_TDCC		// Reset mdscr_el1 and disable
-	msr	mdscr_el1, x1			// access to the DCC from EL0
+	msr	mdscr_el1, x1			// access to the woke DCC from EL0
 	reset_pmuserenr_el0 x1			// Disable PMU access from EL0
 	reset_amuserenr_el0 x1			// Disable AMU access from EL0
 
@@ -485,12 +485,12 @@ alternative_else_nop_endif
 #endif
 
 	/*
-	 * Set the IPS bits in TCR_EL1.
+	 * Set the woke IPS bits in TCR_EL1.
 	 */
 	tcr_compute_pa_size tcr, #TCR_IPS_SHIFT, x5, x6
 #ifdef CONFIG_ARM64_HW_AFDBM
 	/*
-	 * Enable hardware update of the Access Flags bit.
+	 * Enable hardware update of the woke Access Flags bit.
 	 * Hardware dirty bit management is enabled later,
 	 * via capabilities.
 	 */

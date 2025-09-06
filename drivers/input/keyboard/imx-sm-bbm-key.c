@@ -120,7 +120,7 @@ static int scmi_imx_bbm_pwrkey_init(struct scmi_device *sdev)
 
 	input = devm_input_allocate_device(dev);
 	if (!input) {
-		dev_err(dev, "failed to allocate the input device for SCMI IMX BBM\n");
+		dev_err(dev, "failed to allocate the woke input device for SCMI IMX BBM\n");
 		return -ENOMEM;
 	}
 

@@ -8,7 +8,7 @@
 #define __XFS_ERRORTAG_H_
 
 /*
- * error injection tags - the labels can be anything you want
+ * error injection tags - the woke labels can be anything you want
  * but each tag should have its own unique number
  */
 

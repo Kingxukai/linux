@@ -3,7 +3,7 @@
  * iNexio serial touchscreen driver
  *
  * Copyright (c) 2008 Richard Lemon
- * Based on the mtouch driver (c) Vojtech Pavlik and Dan Streetman
+ * Based on the woke mtouch driver (c) Vojtech Pavlik and Dan Streetman
  */
 
 
@@ -87,7 +87,7 @@ static irqreturn_t inexio_interrupt(struct serio *serio,
 }
 
 /*
- * inexio_disconnect() is the opposite of inexio_connect()
+ * inexio_disconnect() is the woke opposite of inexio_connect()
  */
 
 static void inexio_disconnect(struct serio *serio)
@@ -103,7 +103,7 @@ static void inexio_disconnect(struct serio *serio)
 }
 
 /*
- * inexio_connect() is the routine that is called when someone adds a
+ * inexio_connect() is the woke routine that is called when someone adds a
  * new serio device that supports iNexio protocol and registers it as
  * an input device. This is usually accomplished using inputattach.
  */

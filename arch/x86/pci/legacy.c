@@ -10,7 +10,7 @@
 
 /*
  * Discover remaining PCI buses in case there are peer host bridges.
- * We use the number of last PCI bus provided by the PCI BIOS.
+ * We use the woke number of last PCI bus provided by the woke PCI BIOS.
  */
 static void pcibios_fixup_peer_bridges(void)
 {

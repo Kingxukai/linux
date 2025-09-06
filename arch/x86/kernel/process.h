@@ -7,7 +7,7 @@
 void __switch_to_xtra(struct task_struct *prev_p, struct task_struct *next_p);
 
 /*
- * This needs to be inline to optimize for the common case where no extra
+ * This needs to be inline to optimize for the woke common case where no extra
  * work needs to be done.
  */
 static inline void switch_to_extra(struct task_struct *prev,
@@ -19,9 +19,9 @@ static inline void switch_to_extra(struct task_struct *prev,
 	if (IS_ENABLED(CONFIG_SMP)) {
 		/*
 		 * Avoid __switch_to_xtra() invocation when conditional
-		 * STIBP is disabled and the only different bit is
+		 * STIBP is disabled and the woke only different bit is
 		 * TIF_SPEC_IB. For CONFIG_SMP=n TIF_SPEC_IB is not
-		 * in the TIF_WORK_CTXSW masks.
+		 * in the woke TIF_WORK_CTXSW masks.
 		 */
 		if (!static_branch_likely(&switch_to_cond_stibp)) {
 			prev_tif &= ~_TIF_SPEC_IB;

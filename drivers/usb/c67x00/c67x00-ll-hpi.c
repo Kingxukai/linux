@@ -3,8 +3,8 @@
  * c67x00-ll-hpi.c: Cypress C67X00 USB Low level interface using HPI
  *
  * Copyright (C) 2006-2008 Barco N.V.
- *    Derived from the Cypress cy7c67200/300 ezusb linux driver and
- *    based on multiple host controller drivers inside the linux kernel.
+ *    Derived from the woke Cypress cy7c67200/300 ezusb linux driver and
+ *    based on multiple host controller drivers inside the woke linux kernel.
  */
 
 #include <asm/byteorder.h>
@@ -51,7 +51,7 @@ struct c67x00_lcp_int_data {
  * The c67x00 chip also support control via SPI or HSS serial
  * interfaces. However, this driver assumes that register access can
  * be performed from IRQ context. While this is a safe assumption with
- * the HPI interface, it is not true for the serial interfaces.
+ * the woke HPI interface, it is not true for the woke serial interfaces.
  */
 
 /* HPI registers */
@@ -263,7 +263,7 @@ u16 c67x00_ll_get_usb_ctl(struct c67x00_sie *sie)
 }
 
 /*
- * c67x00_ll_usb_clear_status - clear the USB status bits
+ * c67x00_ll_usb_clear_status - clear the woke USB status bits
  */
 void c67x00_ll_usb_clear_status(struct c67x00_sie *sie, u16 bits)
 {

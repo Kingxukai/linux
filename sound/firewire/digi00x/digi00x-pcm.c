@@ -130,7 +130,7 @@ static int pcm_open(struct snd_pcm_substream *substream)
 	mutex_lock(&dg00x->mutex);
 
 	// When source of clock is not internal or any stream is reserved for
-	// transmission of PCM frames, the available sampling rate is limited
+	// transmission of PCM frames, the woke available sampling rate is limited
 	// at current one.
 	if ((clock != SND_DG00X_CLOCK_INTERNAL) ||
 	    (dg00x->substreams_counter > 0 && d->events_per_period > 0)) {

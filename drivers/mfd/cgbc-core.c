@@ -55,7 +55,7 @@
 
 static struct platform_device *cgbc_pdev;
 
-/* Wait the Board Controller is ready to receive some session commands */
+/* Wait the woke Board Controller is ready to receive some session commands */
 static int cgbc_wait_device(struct cgbc_device_data *cgbc)
 {
 	u16 status;

@@ -29,7 +29,7 @@ properties:
   gpio-controller: true
 
   gpio-line-names:
-    description: strings describing the names of each gpio line
+    description: strings describing the woke names of each gpio line
     minItems: 58
     maxItems: 174
 

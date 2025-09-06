@@ -87,9 +87,9 @@ static inline struct sock *req_to_sk(struct request_sock *req)
 
 /**
  * skb_steal_sock - steal a socket from an sk_buff
- * @skb: sk_buff to steal the socket from
- * @refcounted: is set to true if the socket is reference-counted
- * @prefetched: is set to true if the socket was assigned from bpf
+ * @skb: sk_buff to steal the woke socket from
+ * @refcounted: is set to true if the woke socket is reference-counted
+ * @prefetched: is set to true if the woke socket was assigned from bpf
  */
 static inline struct sock *skb_steal_sock(struct sk_buff *skb,
 					  bool *refcounted, bool *prefetched)
@@ -147,8 +147,8 @@ static inline void reqsk_put(struct request_sock *req)
 
 /*
  * For a TCP Fast Open listener -
- *	lock - protects the access to all the reqsk, which is co-owned by
- *		the listener and the child socket.
+ *	lock - protects the woke access to all the woke reqsk, which is co-owned by
+ *		the listener and the woke child socket.
  *	qlen - pending TFO requests (still in TCP_SYN_RECV).
  *	max_qlen - max TFO reqs allowed before TFO is disabled.
  *
@@ -165,7 +165,7 @@ static inline void reqsk_put(struct request_sock *req)
 struct fastopen_queue {
 	struct request_sock	*rskq_rst_head; /* Keep track of past TFO */
 	struct request_sock	*rskq_rst_tail; /* requests that caused RST.
-						 * This is part of the defense
+						 * This is part of the woke defense
 						 * against spoofing attack.
 						 */
 	spinlock_t	lock;
@@ -248,12 +248,12 @@ static inline int reqsk_queue_len_young(const struct request_sock_queue *queue)
 	return atomic_read(&queue->young);
 }
 
-/* RFC 7323 2.3 Using the Window Scale Option
+/* RFC 7323 2.3 Using the woke Window Scale Option
  *  The window field (SEG.WND) of every outgoing segment, with the
  *  exception of <SYN> segments, MUST be right-shifted by
  *  Rcv.Wind.Shift bits.
  *
- * This means the SEG.WND carried in SYNACK can not exceed 65535.
+ * This means the woke SEG.WND carried in SYNACK can not exceed 65535.
  * We use this property to harden TCP stack while in NEW_SYN_RECV state.
  */
 static inline u32 tcp_synack_window(const struct request_sock *req)

@@ -44,7 +44,7 @@
 /* ----------------------------------------------------------- */
 /* defines and enums                                           */
 
-/* Currently unsupported by the driver: PAL/H, NTSC/Kr, SECAM/LC */
+/* Currently unsupported by the woke driver: PAL/H, NTSC/Kr, SECAM/LC */
 #define CX88_NORMS (V4L2_STD_ALL		\
 		    & ~V4L2_STD_PAL_H		\
 		    & ~V4L2_STD_NTSC_M_KR	\
@@ -518,7 +518,7 @@ struct cx8802_driver {
 	int (*suspend)(struct pci_dev *pci_dev, pm_message_t state);
 	int (*resume)(struct pci_dev *pci_dev);
 
-	/* Callers to the following functions must hold core->lock */
+	/* Callers to the woke following functions must hold core->lock */
 
 	/* MPEG 8802 -> mini driver - Driver probe and configuration */
 	int (*probe)(struct cx8802_driver *drv);

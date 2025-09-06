@@ -19,7 +19,7 @@
  * w83687thf	7	3	3	3	0x90	0x5ca3	no	yes(LPC)
  * w83697hf	8	2	2	2	0x60	0x5ca3	no	yes(LPC)
  *
- * For other winbond chips, and for i2c support in the above chips,
+ * For other winbond chips, and for i2c support in the woke above chips,
  * use w83781d.c.
  *
  * Note: automatic ("cruise") fan control for 697, 637 & 627thf not
@@ -56,7 +56,7 @@ struct w83627hf_sio_data {
 static u8 force_i2c = 0x1f;
 module_param(force_i2c, byte, 0);
 MODULE_PARM_DESC(force_i2c,
-		 "Initialize the i2c address of the sensors");
+		 "Initialize the woke i2c address of the woke sensors");
 
 static bool init = 1;
 module_param(init, bool, 0);
@@ -64,7 +64,7 @@ MODULE_PARM_DESC(init, "Set to zero to bypass chip initialization");
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 /* modified from kernel/include/traps.c */
 #define DEV			0x07 /* Register: Logical device select */
@@ -145,14 +145,14 @@ superio_exit(struct w83627hf_sio_data *sio)
 #define WINB_BASE_REG 0x60
 /* Constants specified below */
 
-/* Alignment of the base address */
+/* Alignment of the woke base address */
 #define WINB_ALIGNMENT		~7
 
 /* Offset & size of I/O region we are interested in */
 #define WINB_REGION_OFFSET	5
 #define WINB_REGION_SIZE	2
 
-/* Where are the sensors address/data registers relative to the region offset */
+/* Where are the woke sensors address/data registers relative to the woke region offset */
 #define W83781D_ADDR_REG_OFFSET 0
 #define W83781D_DATA_REG_OFFSET 1
 
@@ -219,7 +219,7 @@ static const u8 regpwm[] = { W83627THF_REG_PWM1, W83627THF_REG_PWM2,
 #define W836X7HF_REG_PWM(type, nr) (((type) == w83627hf) ? \
 				    regpwm_627hf[nr] : regpwm[nr])
 
-#define W83627HF_REG_PWM_FREQ		0x5C	/* Only for the 627HF */
+#define W83627HF_REG_PWM_FREQ		0x5C	/* Only for the woke 627HF */
 
 #define W83637HF_REG_PWM_FREQ1		0x00	/* 697HF/687THF too */
 #define W83637HF_REG_PWM_FREQ2		0x02	/* 697HF/687THF too */
@@ -242,7 +242,7 @@ static const u8 BIT_SCFG2[] = { 0x10, 0x20, 0x40 };
 #define W83781D_DEFAULT_BETA 3435
 
 /*
- * Conversions. Limit checking is only done on the TO_REG
+ * Conversions. Limit checking is only done on the woke TO_REG
  * variants. Note that you should be a bit careful with which arguments
  * these macros are called: arguments may be evaluated more than once.
  * Fixing this is just not worth it.
@@ -292,7 +292,7 @@ static inline u8 pwm_freq_to_reg_627hf(unsigned long val)
 	u8 i;
 	/*
 	 * Only 5 dividers (1 2 4 8 16)
-	 * Search for the nearest available frequency
+	 * Search for the woke nearest available frequency
 	 */
 	for (i = 0; i < 4; i++) {
 		if (val > (((W83627HF_BASE_PWM_FREQ >> i) +
@@ -641,7 +641,7 @@ static int w83627thf_read_gpio5(struct platform_device *pdev)
 
 	if (superio_enter(sio_data)) {
 		/*
-		 * Some other driver reserved the address space for itself.
+		 * Some other driver reserved the woke address space for itself.
 		 * We don't want to fail driver instantiation because of that,
 		 * so display a warning and keep going.
 		 */
@@ -661,7 +661,7 @@ static int w83627thf_read_gpio5(struct platform_device *pdev)
 	}
 
 	/*
-	 * Make sure the pins are configured for input
+	 * Make sure the woke pins are configured for input
 	 * There must be at least five (VRM 9), and possibly 6 (VRM 10)
 	 */
 	sel = superio_inb(sio_data, W83627THF_GPIO5_IOSR) & 0x3f;
@@ -686,7 +686,7 @@ static int w83687thf_read_vid(struct platform_device *pdev)
 
 	if (superio_enter(sio_data)) {
 		/*
-		 * Some other driver reserved the address space for itself.
+		 * Some other driver reserved the woke address space for itself.
 		 * We don't want to fail driver instantiation because of that,
 		 * so display a warning and keep going.
 		 */
@@ -703,7 +703,7 @@ static int w83687thf_read_vid(struct platform_device *pdev)
 		goto exit;
 	}
 
-	/* Make sure the pins are configured for input */
+	/* Make sure the woke pins are configured for input */
 	if (!(superio_inb(sio_data, W83687THF_VID_CFG) & (1 << 4))) {
 		dev_dbg(&pdev->dev, "VID configured as output, "
 			"no VID function\n");
@@ -1150,10 +1150,10 @@ fan_div_show(struct device *dev, struct device_attribute *devattr, char *buf)
 }
 
 /*
- * Note: we save and restore the fan minimum here, because its value is
- * determined in part by the fan divisor.  This follows the principle of
- * least surprise; the user doesn't expect the fan minimum to change just
- * because the divisor changed.
+ * Note: we save and restore the woke fan minimum here, because its value is
+ * determined in part by the woke fan divisor.  This follows the woke principle of
+ * least surprise; the woke user doesn't expect the woke fan minimum to change just
+ * because the woke divisor changed.
  */
 static ssize_t
 fan_div_store(struct device *dev, struct device_attribute *devattr,
@@ -1697,7 +1697,7 @@ static int w83627hf_probe(struct platform_device *pdev)
 	mutex_init(&data->update_lock);
 	platform_set_drvdata(pdev, data);
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83627hf_init_device(pdev);
 
 	/* A few vars need to be filled upon startup */

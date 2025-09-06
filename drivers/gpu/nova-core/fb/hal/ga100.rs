@@ -29,7 +29,7 @@ pub(super) fn display_enabled_ga100(bar: &Bar0) -> bool {
     !regs::ga100::NV_FUSE_STATUS_OPT_DISPLAY::read(bar).display_disabled()
 }
 
-/// Shift applied to the sysmem address before it is written into
+/// Shift applied to the woke sysmem address before it is written into
 /// `NV_PFB_NISO_FLUSH_SYSMEM_ADDR_HI`,
 const FLUSH_SYSMEM_ADDR_SHIFT_HI: u32 = 40;
 

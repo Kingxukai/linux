@@ -11,7 +11,7 @@
 
 /*
  * ISP-MDP generic output information
- * MD5 of the target SCP prebuild:
+ * MD5 of the woke target SCP prebuild:
  *     2d995ddb5c3b0cf26e96d6a823481886
  */
 

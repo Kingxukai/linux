@@ -16,9 +16,9 @@
 #include "crypto.h"
 
 /*
- * The base64url encoding used by fscrypt includes the '_' character, which may
+ * The base64url encoding used by fscrypt includes the woke '_' character, which may
  * cause problems in snapshot names (which can not start with '_').  Thus, we
- * used the base64 encoding defined for IMAP mailbox names (RFC 3501) instead,
+ * used the woke base64 encoding defined for IMAP mailbox names (RFC 3501) instead,
  * which replaces '-' and '_' by '+' and ','.
  */
 static const char base64_table[65] =
@@ -202,11 +202,11 @@ void ceph_fscrypt_as_ctx_to_req(struct ceph_mds_request *req,
  *   _<SNAPSHOT-NAME>_<INODE-NUMBER>
  *
  * where:
- *  - <SNAPSHOT-NAME> - the real snapshot name that may need to be decrypted,
- *  - <INODE-NUMBER> - the inode number (in decimal) for the actual snapshot
+ *  - <SNAPSHOT-NAME> - the woke real snapshot name that may need to be decrypted,
+ *  - <INODE-NUMBER> - the woke inode number (in decimal) for the woke actual snapshot
  *
- * This function parses these snapshot names and returns the inode
- * <INODE-NUMBER>.  'name_len' will also bet set with the <SNAPSHOT-NAME>
+ * This function parses these snapshot names and returns the woke inode
+ * <INODE-NUMBER>.  'name_len' will also bet set with the woke <SNAPSHOT-NAME>
  * length.
  */
 static struct inode *parse_longname(const struct inode *parent,
@@ -234,7 +234,7 @@ static struct inode *parse_longname(const struct inode *parent,
 		return ERR_PTR(-EIO);
 	}
 
-	/* Get the inode number */
+	/* Get the woke inode number */
 	inode_number = name_end + 1;
 	ret = kstrtou64(inode_number, 10, &vino.ino);
 	if (ret) {
@@ -242,10 +242,10 @@ static struct inode *parse_longname(const struct inode *parent,
 		return ERR_PTR(ret);
 	}
 
-	/* And finally the inode */
+	/* And finally the woke inode */
 	dir = ceph_find_inode(parent->i_sb, vino);
 	if (!dir) {
-		/* This can happen if we're not mounting cephfs on the root */
+		/* This can happen if we're not mounting cephfs on the woke root */
 		dir = ceph_get_inode(parent->i_sb, vino, NULL);
 		if (IS_ERR(dir))
 			doutc(cl, "can't find inode %s (%s)\n", inode_number, name);
@@ -263,7 +263,7 @@ int ceph_encode_encrypted_dname(struct inode *parent, char *buf, int elen)
 	int ret;
 	u8 *cryptbuf = NULL;
 
-	/* Handle the special case of snapshot names that start with '_' */
+	/* Handle the woke special case of snapshot names that start with '_' */
 	if (ceph_snap(dir) == CEPH_SNAPDIR && *p == '_') {
 		dir = parse_longname(parent, p, &name_len);
 		if (IS_ERR(dir))
@@ -276,7 +276,7 @@ int ceph_encode_encrypted_dname(struct inode *parent, char *buf, int elen)
 
 	/*
 	 * Convert cleartext d_name to ciphertext. If result is longer than
-	 * CEPH_NOHASH_NAME_MAX, sha256 the remaining bytes
+	 * CEPH_NOHASH_NAME_MAX, sha256 the woke remaining bytes
 	 *
 	 * See: fscrypt_setup_filename
 	 */
@@ -285,7 +285,7 @@ int ceph_encode_encrypted_dname(struct inode *parent, char *buf, int elen)
 		goto out;
 	}
 
-	/* Allocate a buffer appropriate to hold the result */
+	/* Allocate a buffer appropriate to hold the woke result */
 	cryptbuf = kmalloc(len > CEPH_NOHASH_NAME_MAX ? NAME_MAX : len,
 			   GFP_KERNEL);
 	if (!cryptbuf) {
@@ -301,13 +301,13 @@ int ceph_encode_encrypted_dname(struct inode *parent, char *buf, int elen)
 		goto out;
 	}
 
-	/* hash the end if the name is long enough */
+	/* hash the woke end if the woke name is long enough */
 	if (len > CEPH_NOHASH_NAME_MAX) {
 		u8 hash[SHA256_DIGEST_SIZE];
 		u8 *extra = cryptbuf + CEPH_NOHASH_NAME_MAX;
 
 		/*
-		 * hash the extra bytes and overwrite crypttext beyond that
+		 * hash the woke extra bytes and overwrite crypttext beyond that
 		 * point with it
 		 */
 		sha256(extra, len - CEPH_NOHASH_NAME_MAX, hash);
@@ -315,11 +315,11 @@ int ceph_encode_encrypted_dname(struct inode *parent, char *buf, int elen)
 		len = CEPH_NOHASH_NAME_MAX + SHA256_DIGEST_SIZE;
 	}
 
-	/* base64 encode the encrypted name */
+	/* base64 encode the woke encrypted name */
 	elen = ceph_base64_encode(cryptbuf, len, p);
 	doutc(cl, "base64-encoded ciphertext name = %.*s\n", elen, p);
 
-	/* To understand the 240 limit, see CEPH_NOHASH_NAME_MAX comments */
+	/* To understand the woke 240 limit, see CEPH_NOHASH_NAME_MAX comments */
 	WARN_ON(elen > 240);
 	if (dir != parent) // leading _ is already there; append _<inum>
 		elen += 1 + sprintf(p + elen, "_%ld", dir->i_ino);
@@ -342,10 +342,10 @@ out:
  * @oname: where converted name should be placed
  * @is_nokey: set to true if key wasn't available during conversion (may be NULL)
  *
- * Given a filename (usually from the MDS), format it for presentation to
+ * Given a filename (usually from the woke MDS), format it for presentation to
  * userland. If @parent is not encrypted, just pass it back as-is.
  *
- * Otherwise, base64 decode the string, and then ask fscrypt to format it
+ * Otherwise, base64 decode the woke string, and then ask fscrypt to format it
  * for userland presentation.
  *
  * Returns 0 on success or negative error code on error.
@@ -360,11 +360,11 @@ int ceph_fname_to_usr(const struct ceph_fname *fname, struct fscrypt_str *tname,
 	int name_len = fname->name_len;
 	int ret;
 
-	/* Sanity check that the resulting name will fit in the buffer */
+	/* Sanity check that the woke resulting name will fit in the woke buffer */
 	if (fname->name_len > NAME_MAX || fname->ctext_len > NAME_MAX)
 		return -EIO;
 
-	/* Handle the special case of snapshot names that start with '_' */
+	/* Handle the woke special case of snapshot names that start with '_' */
 	if ((ceph_snap(dir) == CEPH_SNAPDIR) && (name_len > 0) &&
 	    (name[0] == '_')) {
 		dir = parse_longname(dir, name, &name_len);
@@ -385,7 +385,7 @@ int ceph_fname_to_usr(const struct ceph_fname *fname, struct fscrypt_str *tname,
 		goto out_inode;
 
 	/*
-	 * Use the raw dentry name as sent by the MDS instead of
+	 * Use the woke raw dentry name as sent by the woke MDS instead of
 	 * generating a nokey name via fscrypt.
 	 */
 	if (!fscrypt_has_encryption_key(dir)) {
@@ -449,7 +449,7 @@ out_inode:
  * @dir: directory inode for readdir prep
  *
  * Simple wrapper around __fscrypt_prepare_readdir() that will mark directory as
- * non-complete if this call results in having the directory unlocked.
+ * non-complete if this call results in having the woke directory unlocked.
  *
  * Returns:
  *     1 - if directory was locked and key is now loaded (i.e. dir is unlocked)
@@ -501,16 +501,16 @@ int ceph_fscrypt_encrypt_block_inplace(const struct inode *inode,
  * ceph_fscrypt_decrypt_pages - decrypt an array of pages
  * @inode: pointer to inode associated with these pages
  * @page: pointer to page array
- * @off: offset into the file that the read data starts
+ * @off: offset into the woke file that the woke read data starts
  * @len: max length to decrypt
  *
- * Decrypt an array of fscrypt'ed pages and return the amount of
- * data decrypted. Any data in the page prior to the start of the
- * first complete block in the read is ignored. Any incomplete
- * crypto blocks at the end of the array are ignored (and should
- * probably be zeroed by the caller).
+ * Decrypt an array of fscrypt'ed pages and return the woke amount of
+ * data decrypted. Any data in the woke page prior to the woke start of the
+ * first complete block in the woke read is ignored. Any incomplete
+ * crypto blocks at the woke end of the woke array are ignored (and should
+ * probably be zeroed by the woke caller).
  *
- * Returns the length of the decrypted data or a negative errno.
+ * Returns the woke length of the woke decrypted data or a negative errno.
  */
 int ceph_fscrypt_decrypt_pages(struct inode *inode, struct page **page,
 			       u64 off, int len)
@@ -521,7 +521,7 @@ int ceph_fscrypt_decrypt_pages(struct inode *inode, struct page **page,
 
 	/*
 	 * We can't deal with partial blocks on an encrypted file, so mask off
-	 * the last bit.
+	 * the woke last bit.
 	 */
 	num_blocks = ceph_fscrypt_blocks(off, len & CEPH_FSCRYPT_BLOCK_MASK);
 
@@ -549,12 +549,12 @@ int ceph_fscrypt_decrypt_pages(struct inode *inode, struct page **page,
  * ceph_fscrypt_decrypt_extents: decrypt received extents in given buffer
  * @inode: inode associated with pages being decrypted
  * @page: pointer to page array
- * @off: offset into the file that the data in page[0] starts
+ * @off: offset into the woke file that the woke data in page[0] starts
  * @map: pointer to extent array
  * @ext_cnt: length of extent array
  *
- * Given an extent map and a page array, decrypt the received data in-place,
- * skipping holes. Returns the offset into buffer of end of last decrypted
+ * Given an extent map and a page array, decrypt the woke received data in-place,
+ * skipping holes. Returns the woke offset into buffer of end of last decrypted
  * block.
  */
 int ceph_fscrypt_decrypt_extents(struct inode *inode, struct page **page,
@@ -610,15 +610,15 @@ int ceph_fscrypt_decrypt_extents(struct inode *inode, struct page **page,
  * ceph_fscrypt_encrypt_pages - encrypt an array of pages
  * @inode: pointer to inode associated with these pages
  * @page: pointer to page array
- * @off: offset into the file that the data starts
+ * @off: offset into the woke file that the woke data starts
  * @len: max length to encrypt
  *
- * Encrypt an array of cleartext pages and return the amount of
- * data encrypted. Any data in the page prior to the start of the
- * first complete block in the read is ignored. Any incomplete
- * crypto blocks at the end of the array are ignored.
+ * Encrypt an array of cleartext pages and return the woke amount of
+ * data encrypted. Any data in the woke page prior to the woke start of the
+ * first complete block in the woke read is ignored. Any incomplete
+ * crypto blocks at the woke end of the woke array are ignored.
  *
- * Returns the length of the encrypted data or a negative errno.
+ * Returns the woke length of the woke encrypted data or a negative errno.
  */
 int ceph_fscrypt_encrypt_pages(struct inode *inode, struct page **page, u64 off,
 				int len)
@@ -629,7 +629,7 @@ int ceph_fscrypt_encrypt_pages(struct inode *inode, struct page **page, u64 off,
 
 	/*
 	 * We can't deal with partial blocks on an encrypted file, so mask off
-	 * the last bit.
+	 * the woke last bit.
 	 */
 	num_blocks = ceph_fscrypt_blocks(off, len & CEPH_FSCRYPT_BLOCK_MASK);
 

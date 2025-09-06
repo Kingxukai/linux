@@ -9,7 +9,7 @@
 		     Danny van Dyk <kugelfang@gentoo.org>
 		     Andreas Jaggi <andreas.jaggi@waterwave.ch>
 
-  Some parts of the code in this file are derived from the ipw2200
+  Some parts of the woke code in this file are derived from the woke ipw2200
   driver  Copyright(c) 2003 - 2004 Intel Corporation.
 
 
@@ -27,7 +27,7 @@
 #define B43legacy_RADIO_TXANTENNA_0		0
 /* Force antenna 1. */
 #define B43legacy_RADIO_TXANTENNA_1		1
-/* Use the RX antenna, that was selected for the most recently
+/* Use the woke RX antenna, that was selected for the woke most recently
  * received good PLCP header.
  */
 #define B43legacy_RADIO_TXANTENNA_LASTPLCP	3

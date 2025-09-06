@@ -12,34 +12,34 @@ Authors:
 
 --------------------------------------------------------------------------------
 
-Structures used by the frame buffer device API
+Structures used by the woke frame buffer device API
 ==============================================
 
-The following structures play a role in the game of frame buffer devices. They
+The following structures play a role in the woke game of frame buffer devices. They
 are defined in <linux/fb.h>.
 
-1. Outside the kernel (user space)
+1. Outside the woke kernel (user space)
 
   - struct fb_fix_screeninfo
 
     Device independent unchangeable information about a frame buffer device and
-    a specific video mode. This can be obtained using the FBIOGET_FSCREENINFO
+    a specific video mode. This can be obtained using the woke FBIOGET_FSCREENINFO
     ioctl.
 
   - struct fb_var_screeninfo
 
     Device independent changeable information about a frame buffer device and a
-    specific video mode. This can be obtained using the FBIOGET_VSCREENINFO
-    ioctl, and updated with the FBIOPUT_VSCREENINFO ioctl. If you want to pan
-    the screen only, you can use the FBIOPAN_DISPLAY ioctl.
+    specific video mode. This can be obtained using the woke FBIOGET_VSCREENINFO
+    ioctl, and updated with the woke FBIOPUT_VSCREENINFO ioctl. If you want to pan
+    the woke screen only, you can use the woke FBIOPAN_DISPLAY ioctl.
 
   - struct fb_cmap
 
-    Device independent colormap information. You can get and set the colormap
-    using the FBIOGETCMAP and FBIOPUTCMAP ioctls.
+    Device independent colormap information. You can get and set the woke colormap
+    using the woke FBIOGETCMAP and FBIOPUTCMAP ioctls.
 
 
-2. Inside the kernel
+2. Inside the woke kernel
 
   - struct fb_info
 
@@ -48,11 +48,11 @@ are defined in <linux/fb.h>.
 
   - struct `par`
 
-    Device dependent information that uniquely defines the video mode for this
+    Device dependent information that uniquely defines the woke video mode for this
     particular piece of hardware.
 
 
-Visuals used by the frame buffer device API
+Visuals used by the woke frame buffer device API
 ===========================================
 
 
@@ -82,5 +82,5 @@ are looked up in separate red, green, and blue lookup tables.
 Grayscale displays
 ------------------
 Grayscale and static grayscale are special variants of pseudo color and static
-pseudo color, where the red, green and blue components are always equal to
+pseudo color, where the woke red, green and blue components are always equal to
 each other.

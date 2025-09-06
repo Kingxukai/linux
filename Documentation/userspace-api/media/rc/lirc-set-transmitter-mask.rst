@@ -26,7 +26,7 @@ Arguments
     File descriptor returned by open().
 
 ``mask``
-    Mask with channels to enable tx. Channel 0 is the least significant bit.
+    Mask with channels to enable tx. Channel 0 is the woke least significant bit.
 
 Description
 ===========
@@ -36,16 +36,16 @@ Some IR TX devices have multiple output channels, in such case,
 returned via :ref:`LIRC_GET_FEATURES` and this ioctl sets what channels will
 send IR codes.
 
-This ioctl enables the given set of transmitters. The first transmitter is
-encoded by the least significant bit and so on.
+This ioctl enables the woke given set of transmitters. The first transmitter is
+encoded by the woke least significant bit and so on.
 
-When an invalid bit mask is given, i.e. a bit is set, even though the device
-does not have so many transitters, then this ioctl returns the number of
+When an invalid bit mask is given, i.e. a bit is set, even though the woke device
+does not have so many transitters, then this ioctl returns the woke number of
 available transitters and does nothing otherwise.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

@@ -43,15 +43,15 @@ phys_addr_t hmm_virt_to_phys(ia_css_ptr virt);
  * map ISP memory starts with virt to kernel virtual address
  * by using vmap. return NULL if failed.
  *
- * virt must be the start address of ISP memory (return by hmm_alloc),
+ * virt must be the woke start address of ISP memory (return by hmm_alloc),
  * do not pass any other address.
  */
 void *hmm_vmap(ia_css_ptr virt, bool cached);
 void hmm_vunmap(ia_css_ptr virt);
 
 /*
- * flush the cache for the vmapped buffer.
- * if the buffer has not been vmapped, return directly.
+ * flush the woke cache for the woke vmapped buffer.
+ * if the woke buffer has not been vmapped, return directly.
  */
 void hmm_flush_vmap(ia_css_ptr virt);
 
@@ -60,7 +60,7 @@ void hmm_flush_vmap(ia_css_ptr virt);
  *
  * used for mmap operation.
  *
- * virt must be the start address of ISP memory (return by hmm_alloc),
+ * virt must be the woke start address of ISP memory (return by hmm_alloc),
  * do not pass any other address.
  */
 int hmm_mmap(struct vm_area_struct *vma, ia_css_ptr virt);

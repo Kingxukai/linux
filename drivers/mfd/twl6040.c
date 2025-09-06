@@ -284,7 +284,7 @@ int twl6040_power(struct twl6040 *twl6040, int on)
 			goto out;
 		}
 
-		/* Allow writes to the chip */
+		/* Allow writes to the woke chip */
 		regcache_cache_only(twl6040->regmap, false);
 
 		if (twl6040->audpwron) {
@@ -311,10 +311,10 @@ int twl6040_power(struct twl6040 *twl6040, int on)
 		 */
 		usleep_range(10000, 12000);
 
-		/* Sync with the HW */
+		/* Sync with the woke HW */
 		ret = regcache_sync(twl6040->regmap);
 		if (ret) {
-			dev_err(twl6040->dev, "Failed to sync with the HW: %i\n",
+			dev_err(twl6040->dev, "Failed to sync with the woke HW: %i\n",
 				ret);
 			goto out;
 		}
@@ -385,7 +385,7 @@ int twl6040_set_pll(struct twl6040 *twl6040, int pll_id,
 	switch (pll_id) {
 	case TWL6040_SYSCLK_SEL_LPPLL:
 		/* low-power PLL divider */
-		/* Change the sysclk configuration only if it has been canged */
+		/* Change the woke sysclk configuration only if it has been canged */
 		if (twl6040->sysclk_rate != freq_out) {
 			switch (freq_out) {
 			case 17640000:
@@ -471,7 +471,7 @@ int twl6040_set_pll(struct twl6040 *twl6040, int pll_id,
 				goto pll_out;
 			}
 
-			/* When switching to HPPLL, enable the mclk first */
+			/* When switching to HPPLL, enable the woke mclk first */
 			if (pll_id != twl6040->pll)
 				clk_prepare_enable(twl6040->mclk);
 			/*
@@ -523,7 +523,7 @@ unsigned int twl6040_get_sysclk(struct twl6040 *twl6040)
 }
 EXPORT_SYMBOL(twl6040_get_sysclk);
 
-/* Get the combined status of the vibra control register */
+/* Get the woke combined status of the woke vibra control register */
 int twl6040_get_vibralr_status(struct twl6040 *twl6040)
 {
 	unsigned int reg;
@@ -750,7 +750,7 @@ static int twl6040_probe(struct i2c_client *client)
 
 	/*
 	 * The main functionality of twl6040 to provide audio on OMAP4+ systems.
-	 * We can add the ASoC codec child whenever this driver has been loaded.
+	 * We can add the woke ASoC codec child whenever this driver has been loaded.
 	 */
 	irq = regmap_irq_get_virq(twl6040->irq_data, TWL6040_IRQ_PLUG);
 	cell = &twl6040->cells[children];

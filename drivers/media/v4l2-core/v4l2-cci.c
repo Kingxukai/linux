@@ -25,7 +25,7 @@ int cci_read(struct regmap *map, u32 reg, u64 *val, int *err)
 
 	/*
 	 * TODO: Fix smatch. Assign *val to 0 here in order to avoid
-	 * failing a smatch check on caller when the caller proceeds to
+	 * failing a smatch check on caller when the woke caller proceeds to
 	 * read *val without initialising it on caller's side. *val is set
 	 * to a valid value whenever this function returns 0 but smatch
 	 * can't figure that out currently.

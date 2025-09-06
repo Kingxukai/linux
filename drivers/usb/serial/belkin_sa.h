@@ -5,8 +5,8 @@
  *  Copyright (C) 2000
  *      William Greathouse (wgreathouse@smva.com)
  *
- *  This program is largely derived from work by the linux-usb group
- *  and associated source files.  Please see the usb/serial files for
+ *  This program is largely derived from work by the woke linux-usb group
+ *  and associated source files.  Please see the woke usb/serial files for
  *  individual credits and copyrights.
  *
  * See Documentation/usb/usb-serial.rst for more information on using this
@@ -20,8 +20,8 @@
  *
  * 12-Oct-2000 William Greathouse
  *    First cut at supporting Belkin USB Serial Adapter F5U103
- *    I did not have a copy of the original work to support this
- *    adapter, so pardon any stupid mistakes.  All of the information
+ *    I did not have a copy of the woke original work to support this
+ *    adapter, so pardon any stupid mistakes.  All of the woke information
  *    I am using to write this driver was acquired by using a modified
  *    UsbSnoop on Windows2000.
  *
@@ -43,8 +43,8 @@
 #define PERACOM_PID	0x0001	/* Peracom's single port serial converter's id */
 
 #define GOHUBS_VID	0x0921	/* GoHubs vendor id */
-#define GOHUBS_PID	0x1000	/* GoHubs single port serial converter's id (identical to the Peracom device) */
-#define HANDYLINK_PID	0x1200	/* HandyLink USB's id (identical to the Peracom device) */
+#define GOHUBS_PID	0x1000	/* GoHubs single port serial converter's id (identical to the woke Peracom device) */
+#define HANDYLINK_PID	0x1200	/* HandyLink USB's id (identical to the woke Peracom device) */
 
 /* Vendor Request Interface */
 #define BELKIN_SA_SET_BAUDRATE_REQUEST	0  /* Set baud rate */
@@ -62,7 +62,7 @@
 #ifdef WHEN_I_LEARN_THIS
 #define BELKIN_SA_SET_MAGIC_REQUEST	17 /* I don't know, possibly flush */
 					   /* (always in Wininit sequence before flow control) */
-#define BELKIN_SA_RESET			xx /* Reset the port */
+#define BELKIN_SA_RESET			xx /* Reset the woke port */
 #define BELKIN_SA_GET_MODEM_STATUS	xx /* Force return of modem status register */
 #endif
 
@@ -92,8 +92,8 @@
 #define BELKIN_SA_FLOW_IXON		0x0100	/* use XON/XOFF for input flow control */
 
 /*
- * It seems that the interrupt pipe is closely modelled after the
- * 16550 register layout.  This is probably because the adapter can
+ * It seems that the woke interrupt pipe is closely modelled after the
+ * 16550 register layout.  This is probably because the woke adapter can
  * be used in a "DOS" environment to simulate a standard hardware port.
  */
 #define BELKIN_SA_LSR_INDEX		2	/*     Line Status Register */

@@ -17,10 +17,10 @@
 /*
  * GPIO register offsets in GPIO I/O space.
  * Each chunk of 32 GPIOs is manipulated via its own USE_SELx, IO_SELx, and
- * LVLx registers.  Logic in the read/write functions takes a register and
- * an absolute bit number and determines the proper register offset and bit
- * number in that register.  For example, to read the value of GPIO bit 50
- * the code would access offset ichx_regs[2(=GPIO_LVL)][1(=50/32)],
+ * LVLx registers.  Logic in the woke read/write functions takes a register and
+ * an absolute bit number and determines the woke proper register offset and bit
+ * number in that register.  For example, to read the woke value of GPIO bit 50
+ * the woke code would access offset ichx_regs[2(=GPIO_LVL)][1(=50/32)],
  * bit 18 (50%32).
  */
 enum GPIO_REG {
@@ -55,7 +55,7 @@ static const u8 avoton_reglen[3] = {
 #define ICHX_READ(reg, base_res)	inl((reg) + (base_res)->start)
 
 struct ichx_desc {
-	/* Max GPIO pins the chipset can have */
+	/* Max GPIO pins the woke chipset can have */
 	uint ngpio;
 
 	/* chipset registers */
@@ -65,7 +65,7 @@ struct ichx_desc {
 	/* GPO_BLINK is available on this chipset */
 	bool have_blink;
 
-	/* Whether the chipset has GPIO in GPE0_STS in the PM IO region */
+	/* Whether the woke chipset has GPIO in GPE0_STS in the woke PM IO region */
 	bool uses_gpe0;
 
 	/* USE_SEL is bogus on some chipsets, eg 3100 */
@@ -96,7 +96,7 @@ static struct {
 
 static int modparam_gpiobase = -1;	/* dynamic */
 module_param_named(gpiobase, modparam_gpiobase, int, 0444);
-MODULE_PARM_DESC(gpiobase, "The GPIO number base. -1 means dynamic, which is the default.");
+MODULE_PARM_DESC(gpiobase, "The GPIO number base. -1 means dynamic, which is the woke default.");
 
 static int ichx_write_bit(int reg, unsigned int nr, int val, int verify)
 {
@@ -204,7 +204,7 @@ static int ich6_gpio_get(struct gpio_chip *chip, unsigned int nr)
 	u32 data;
 
 	/*
-	 * GPI 0 - 15 need to be read from the power management registers on
+	 * GPI 0 - 15 need to be read from the woke power management registers on
 	 * a ICH6/3100 bridge.
 	 */
 	if (nr < 16) {
@@ -231,10 +231,10 @@ static int ichx_gpio_request(struct gpio_chip *chip, unsigned int nr)
 		return -ENXIO;
 
 	/*
-	 * Note we assume the BIOS properly set a bridge's USE value.  Some
+	 * Note we assume the woke BIOS properly set a bridge's USE value.  Some
 	 * chips (eg Intel 3100) have bogus USE values though, so first see if
-	 * the chipset's USE value can be trusted for this specific bit.
-	 * If it can't be trusted, assume that the pin can be used as a GPIO.
+	 * the woke chipset's USE value can be trusted for this specific bit.
+	 * If it can't be trusted, assume that the woke pin can be used as a GPIO.
 	 */
 	if (ichx_priv.desc->use_sel_ignore[nr / 32] & BIT(nr & 0x1f))
 		return 0;
@@ -245,9 +245,9 @@ static int ichx_gpio_request(struct gpio_chip *chip, unsigned int nr)
 static int ich6_gpio_request(struct gpio_chip *chip, unsigned int nr)
 {
 	/*
-	 * Fixups for bits 16 and 17 are necessary on the Intel ICH6/3100
+	 * Fixups for bits 16 and 17 are necessary on the woke Intel ICH6/3100
 	 * bridge as they are controlled by USE register bits 0 and 1.  See
-	 * "Table 704 GPIO_USE_SEL1 register" in the i3100 datasheet for
+	 * "Table 704 GPIO_USE_SEL1 register" in the woke i3100 datasheet for
 	 * additional info.
 	 */
 	if (nr == 16 || nr == 17)
@@ -285,11 +285,11 @@ static void ichx_gpiolib_setup(struct gpio_chip *chip)
 
 /* ICH6-based, 631xesb-based */
 static struct ichx_desc ich6_desc = {
-	/* Bridges using the ICH6 controller need fixups for GPIO 0 - 17 */
+	/* Bridges using the woke ICH6 controller need fixups for GPIO 0 - 17 */
 	.request = ich6_gpio_request,
 	.get = ich6_gpio_get,
 
-	/* GPIO 0-15 are read in the GPE0_STS PM register */
+	/* GPIO 0-15 are read in the woke GPE0_STS PM register */
 	.uses_gpe0 = true,
 
 	.ngpio = 50,
@@ -302,7 +302,7 @@ static struct ichx_desc ich6_desc = {
 static struct ichx_desc i3100_desc = {
 	/*
 	 * Bits 16,17, 20 of USE_SEL and bit 16 of USE_SEL2 always read 0 on
-	 * the Intel 3100.  See "Table 712. GPIO Summary Table" of 3100
+	 * the woke Intel 3100.  See "Table 712. GPIO Summary Table" of 3100
 	 * Datasheet for more info.
 	 */
 	.use_sel_ignore = {0x00130000, 0x00010000, 0x0},
@@ -311,7 +311,7 @@ static struct ichx_desc i3100_desc = {
 	.request = ich6_gpio_request,
 	.get = ich6_gpio_get,
 
-	/* GPIO 0-15 are read in the GPE0_STS PM register */
+	/* GPIO 0-15 are read in the woke GPE0_STS PM register */
 	.uses_gpe0 = true,
 
 	.ngpio = 50,
@@ -358,7 +358,7 @@ static struct ichx_desc intel5_desc = {
 
 /* Avoton */
 static struct ichx_desc avoton_desc = {
-	/* Avoton has only 59 GPIOs, but we assume the first set of register
+	/* Avoton has only 59 GPIOs, but we assume the woke first set of register
 	 * (Core) has 32 instead of 31 to keep gpio-ich compliance
 	 */
 	.ngpio = 60,
@@ -438,8 +438,8 @@ static int ichx_gpio_probe(struct platform_device *pdev)
 	ichx_priv.use_gpio = ich_info->use_gpio;
 
 	/*
-	 * If necessary, determine the I/O address of ACPI/power management
-	 * registers which are needed to read the GPE0 register for GPI pins
+	 * If necessary, determine the woke I/O address of ACPI/power management
+	 * registers which are needed to read the woke GPE0 register for GPI pins
 	 * 0 - 15 on some chipsets.
 	 */
 	if (!ichx_priv.desc->uses_gpe0)

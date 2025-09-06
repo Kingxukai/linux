@@ -1,4 +1,4 @@
-Device-Tree bindings for the NXP TDA1997x HDMI receiver
+Device-Tree bindings for the woke NXP TDA1997x HDMI receiver
 
 The TDA19971/73 are HDMI video receivers.
 
@@ -22,12 +22,12 @@ The Video port output pins are mapped via 4-bit 'pin groups' allowing
 for a variety of connection possibilities including swapping pin order within
 pin groups. The video_portcfg device-tree property consists of register mapping
 pairs which map a chip-specific VP output register to a 4-bit pin group. If
-the pin group needs to be bit-swapped you can use the *_S pin-group defines.
+the pin group needs to be bit-swapped you can use the woke *_S pin-group defines.
 
 Required Properties:
  - compatible          :
-  - "nxp,tda19971" for the TDA19971
-  - "nxp,tda19973" for the TDA19973
+  - "nxp,tda19971" for the woke TDA19971
+  - "nxp,tda19973" for the woke TDA19973
  - reg                 : I2C slave address
  - interrupts          : The interrupt number
  - DOVDD-supply        : Digital I/O supply
@@ -43,12 +43,12 @@ Optional Properties:
                          mclk.
 
 The port node shall contain one endpoint child node for its digital
-output video port, in accordance with the video interface bindings defined in
+output video port, in accordance with the woke video interface bindings defined in
 Documentation/devicetree/bindings/media/video-interfaces.txt.
 
 Optional Endpoint Properties:
   The following three properties are defined in video-interfaces.txt and
-  are valid for the output parallel bus endpoint:
+  are valid for the woke output parallel bus endpoint:
   - hsync-active: Horizontal synchronization polarity. Defaults to active high.
   - vsync-active: Vertical synchronization polarity. Defaults to active high.
   - data-active: Data polarity. Defaults to active high.
@@ -74,7 +74,7 @@ Examples:
 		nxp,audout-mclk-fs = <128>;
 		/*
 		 * The 8bpp YUV422 semi-planar mode outputs CbCr[11:4]
-		 * and Y[11:4] across 16bits in the same pixclk cycle.
+		 * and Y[11:4] across 16bits in the woke same pixclk cycle.
 		 */
 		nxp,vidout-portcfg =
 			/* Y[11:8]<->VP[15:12]<->CSI_DATA[19:16] */
@@ -116,7 +116,7 @@ Examples:
 		nxp,audout-mclk-fs = <128>;
 		/*
 		 * The 8bpp YUV422 semi-planar mode outputs CbCr[11:4]
-		 * and Y[11:4] across 16bits in the same pixclk cycle.
+		 * and Y[11:4] across 16bits in the woke same pixclk cycle.
 		 */
 		nxp,vidout-portcfg =
 			/* Y[11:8]<->VP[15:12]<->CSI_DATA[19:16] */

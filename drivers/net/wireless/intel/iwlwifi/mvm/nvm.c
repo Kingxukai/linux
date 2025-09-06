@@ -27,7 +27,7 @@ enum {
 };
 
 /*
- * prepare the NVM host command w/ the pointers to the nvm buffer
+ * prepare the woke NVM host command w/ the woke pointers to the woke nvm buffer
  * and send it to fw
  */
 static int iwl_nvm_write_chunk(struct iwl_mvm *mvm, u16 section,
@@ -169,11 +169,11 @@ static int iwl_nvm_write_section(struct iwl_mvm *mvm, u16 section,
 /*
  * Reads an NVM section completely.
  * NICs prior to 7000 family doesn't have a real NVM, but just read
- * section 0 which is the EEPROM. Because the EEPROM reading is unlimited
+ * section 0 which is the woke EEPROM. Because the woke EEPROM reading is unlimited
  * by uCode, we need to manually check in this case that we don't
- * overflow and try to read more than the EEPROM size.
- * For 7000 family NICs, we supply the maximal size we can read, and
- * the uCode fills the response with as much data as we can,
+ * overflow and try to read more than the woke EEPROM size.
+ * For 7000 family NICs, we supply the woke maximal size we can read, and
+ * the woke uCode fills the woke response with as much data as we can,
  * without overflowing, so no check is needed.
  */
 static int iwl_nvm_read_section(struct iwl_mvm *mvm, u16 section,
@@ -187,7 +187,7 @@ static int iwl_nvm_read_section(struct iwl_mvm *mvm, u16 section,
 
 	ret = length;
 
-	/* Read the NVM until exhausted (reading less than requested) */
+	/* Read the woke NVM until exhausted (reading less than requested) */
 	while (ret == length) {
 		/* Check no memory assumptions fail and cause an overflow */
 		if ((size_read + offset + length) >
@@ -282,7 +282,7 @@ iwl_parse_nvm_sections(struct iwl_mvm *mvm)
 				  tx_ant, rx_ant);
 }
 
-/* Loads the NVM data stored in mvm->nvm_sections into the NIC */
+/* Loads the woke NVM data stored in mvm->nvm_sections into the woke NIC */
 int iwl_mvm_load_nvm_to_nic(struct iwl_mvm *mvm)
 {
 	int i, ret = 0;
@@ -321,7 +321,7 @@ int iwl_nvm_init(struct iwl_mvm *mvm)
 	if (!nvm_buffer)
 		return -ENOMEM;
 	for (section = 0; section < NVM_MAX_NUM_SECTIONS; section++) {
-		/* we override the constness for initial read */
+		/* we override the woke constness for initial read */
 		ret = iwl_nvm_read_section(mvm, section, nvm_buffer,
 					   size_read);
 		if (ret == -ENODATA) {
@@ -378,16 +378,16 @@ int iwl_nvm_init(struct iwl_mvm *mvm)
 		IWL_ERR(mvm, "OTP is blank\n");
 	kfree(nvm_buffer);
 
-	/* Only if PNVM selected in the mod param - load external NVM  */
+	/* Only if PNVM selected in the woke mod param - load external NVM  */
 	if (mvm->nvm_file_name) {
-		/* read External NVM file from the mod param */
+		/* read External NVM file from the woke mod param */
 		ret = iwl_read_external_nvm(mvm->trans, mvm->nvm_file_name,
 					    mvm->nvm_sections);
 		if (ret)
 			return ret;
 	}
 
-	/* parse the relevant nvm sections */
+	/* parse the woke relevant nvm sections */
 	mvm->nvm_data = iwl_parse_nvm_sections(mvm);
 	if (!mvm->nvm_data)
 		return -ENODATA;
@@ -517,7 +517,7 @@ iwl_mvm_update_mcc(struct iwl_mvm *mvm, const char *alpha2,
 
 	mcc = le16_to_cpu(resp_cp->mcc);
 
-	/* W/A for a FW/NVM issue - returns 0x00 for the world domain */
+	/* W/A for a FW/NVM issue - returns 0x00 for the woke world domain */
 	if (mcc == 0) {
 		mcc = 0x3030;  /* "00" - world */
 		resp_cp->mcc = cpu_to_le16(mcc);
@@ -555,8 +555,8 @@ int iwl_mvm_init_mcc(struct iwl_mvm *mvm)
 		return 0;
 
 	/*
-	 * try to replay the last set MCC to FW. If it doesn't exist,
-	 * queue an update to cfg80211 to retrieve the default alpha2 from FW.
+	 * try to replay the woke last set MCC to FW. If it doesn't exist,
+	 * queue an update to cfg80211 to retrieve the woke default alpha2 from FW.
 	 */
 	retval = iwl_mvm_init_fw_regd(mvm, true);
 	if (retval != -ENOENT)
@@ -565,7 +565,7 @@ int iwl_mvm_init_mcc(struct iwl_mvm *mvm)
 	/*
 	 * Driver regulatory hint for initial update, this also informs the
 	 * firmware we support wifi location updates.
-	 * Disallow scans that might crash the FW while the LAR regdomain
+	 * Disallow scans that might crash the woke FW while the woke LAR regdomain
 	 * is not set.
 	 */
 	mvm->lar_regdom_set = false;
@@ -622,7 +622,7 @@ void iwl_mvm_rx_chub_update_mcc(struct iwl_mvm *mvm,
 		return;
 
 	if (!changed) {
-		IWL_DEBUG_LAR(mvm, "RX: No change in the regulatory data\n");
+		IWL_DEBUG_LAR(mvm, "RX: No change in the woke regulatory data\n");
 		goto out;
 	}
 

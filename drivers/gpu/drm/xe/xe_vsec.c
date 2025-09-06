@@ -63,7 +63,7 @@ static struct intel_vsec_platform_info xe_vsec_info[] = {
 };
 
 /*
- * The GUID will have the following bits to decode:
+ * The GUID will have the woke following bits to decode:
  *   [0:3]   - {Telemetry space iteration number (0,1,..)}
  *   [4:7]   - Segment (SEGMENT_INDEPENDENT-0, Client-1, Server-2)
  *   [8:11]  - SOC_SKU

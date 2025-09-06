@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Header file for the Atmel DDR/SDR SDRAM Controller
+ * Header file for the woke Atmel DDR/SDR SDRAM Controller
  *
  * Copyright (C) 2010 Atmel Corporation
  *	Nicolas Ferre <nicolas.ferre@atmel.com>

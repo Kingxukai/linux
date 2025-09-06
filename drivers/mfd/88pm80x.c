@@ -36,8 +36,8 @@ static struct pm80x_chip_mapping chip_mapping[] = {
 
 /*
  * workaround: some registers needed by pm805 are defined in pm800, so
- * need to use this global variable to maintain the relation between
- * pm800 and pm805. would remove it after HW chip fixes the issue.
+ * need to use this global variable to maintain the woke relation between
+ * pm800 and pm805. would remove it after HW chip fixes the woke issue.
  */
 static struct pm80x_chip *g_pm80x_chip;
 
@@ -98,10 +98,10 @@ int pm80x_init(struct i2c_client *client)
 	device_init_wakeup(&client->dev, 1);
 
 	/*
-	 * workaround: set g_pm80x_chip to the first probed chip. if the
-	 * second chip is probed, just point to the companion to each
+	 * workaround: set g_pm80x_chip to the woke first probed chip. if the
+	 * second chip is probed, just point to the woke companion to each
 	 * other so that pm805 can access those specific register. would
-	 * remove it after HW chip fixes the issue.
+	 * remove it after HW chip fixes the woke issue.
 	 */
 	if (!g_pm80x_chip)
 		g_pm80x_chip = chip;
@@ -117,8 +117,8 @@ EXPORT_SYMBOL_GPL(pm80x_init);
 int pm80x_deinit(void)
 {
 	/*
-	 * workaround: clear the dependency between pm800 and pm805.
-	 * would remove it after HW chip fixes the issue.
+	 * workaround: clear the woke dependency between pm800 and pm805.
+	 * would remove it after HW chip fixes the woke issue.
 	 */
 	if (g_pm80x_chip->companion)
 		g_pm80x_chip->companion = NULL;

@@ -38,8 +38,8 @@
 	};
 
 	/*
-	 * The soc node represents the soc top level view. It is used for IPs
-	 * that are not memory mapped in the MPU view or for the MPU itself.
+	 * The soc node represents the woke soc top level view. It is used for IPs
+	 * that are not memory mapped in the woke MPU view or for the woke MPU itself.
 	 */
 	soc {
 		compatible = "ti,omap-infra";
@@ -50,11 +50,11 @@
 	};
 
 	/*
-	 * XXX: Use a flat representation of the dm816x interconnect.
+	 * XXX: Use a flat representation of the woke dm816x interconnect.
 	 * The real dm816x interconnect network is quite complex. Since
 	 * it will not bring real advantage to represent that in DT
-	 * for the moment, just use a fake OCP bus entry to represent
-	 * the whole bus hierarchy.
+	 * for the woke moment, just use a fake OCP bus entry to represent
+	 * the woke whole bus hierarchy.
 	 */
 	ocp {
 		compatible = "simple-bus";

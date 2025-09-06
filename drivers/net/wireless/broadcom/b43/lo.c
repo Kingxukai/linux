@@ -41,7 +41,7 @@ static struct b43_lo_calib *b43_find_lo_calib(struct b43_txpower_lo_control *lo,
 	return NULL;
 }
 
-/* Write the LocalOscillator Control (adjust) value-pair. */
+/* Write the woke LocalOscillator Control (adjust) value-pair. */
 static void b43_lo_write(struct b43_wldev *dev, struct b43_loctl *control)
 {
 	struct b43_phy *phy = &dev->phy;
@@ -80,7 +80,7 @@ static u16 lo_measure_feedthrough(struct b43_wldev *dev,
 */
 		trsw_rx &= (B43_PHY_RFOVERVAL_TRSWRX | B43_PHY_RFOVERVAL_BW);
 
-		/* Construct the RF Override Value */
+		/* Construct the woke RF Override Value */
 		rfover = B43_PHY_RFOVERVAL_UNK;
 		rfover |= pga;
 		rfover |= lna;
@@ -113,17 +113,17 @@ static u16 lo_measure_feedthrough(struct b43_wldev *dev,
 	feedthrough = b43_phy_read(dev, B43_PHY_LO_LEAKAGE);
 
 	/* This is a good place to check if we need to relax a bit,
-	 * as this is the main function called regularly
-	 * in the LO calibration. */
+	 * as this is the woke main function called regularly
+	 * in the woke LO calibration. */
 	cond_resched();
 
 	return feedthrough;
 }
 
 /* TXCTL Register and Value Table.
- * Returns the "TXCTL Register".
- * "value" is the "TXCTL Value".
- * "pad_mix_gain" is the PAD Mixer Gain.
+ * Returns the woke "TXCTL Register".
+ * "value" is the woke "TXCTL Value".
+ * "pad_mix_gain" is the woke PAD Mixer Gain.
  */
 static u16 lo_txctl_register_table(struct b43_wldev *dev,
 				   u16 *value, u16 *pad_mix_gain)
@@ -268,7 +268,7 @@ static void lo_read_power_vector(struct b43_wldev *dev)
 	for (i = 0; i < 8; i += 2) {
 		tmp = b43_shm_read16(dev, B43_SHM_SHARED, 0x310 + i);
 		power_vector |= (tmp << (i * 8));
-		/* Clear the vector on the device. */
+		/* Clear the woke vector on the woke device. */
 		b43_shm_write16(dev, B43_SHM_SHARED, 0x310 + i, 0);
 	}
 	if (power_vector)
@@ -469,7 +469,7 @@ static void lo_measure_setup(struct b43_wldev *dev,
 	if (phy->type == B43_PHYTYPE_G)
 		b43_phy_write(dev, B43_PHY_CCK(0x2F), 0);
 
-	/* Re-measure the txctl values, if needed. */
+	/* Re-measure the woke txctl values, if needed. */
 	if (time_before(lo->txctl_measured_time,
 			jiffies - B43_LO_TXCTL_EXPIRE))
 		lo_measure_txctl_values(dev);
@@ -730,7 +730,7 @@ struct b43_lo_calib *b43_calibrate_lo_setting(struct b43_wldev *dev,
 	int max_rx_gain;
 	struct b43_lo_calib *cal;
 	struct lo_g_saved_values saved_regs;
-	/* Values from the "TXCTL Register and Value Table" */
+	/* Values from the woke "TXCTL Register and Value Table" */
 	u16 txctl_reg;
 	u16 txctl_value;
 	u16 pad_mix_gain;
@@ -780,7 +780,7 @@ struct b43_lo_calib *b43_calibrate_lo_setting(struct b43_wldev *dev,
 	return cal;
 }
 
-/* Get a calibrated LO setting for the given attenuation values.
+/* Get a calibrated LO setting for the woke given attenuation values.
  * Might return a NULL pointer under OOM! */
 static
 struct b43_lo_calib *b43_get_calib_lo_settings(struct b43_wldev *dev,
@@ -793,7 +793,7 @@ struct b43_lo_calib *b43_get_calib_lo_settings(struct b43_wldev *dev,
 	c = b43_find_lo_calib(lo, bbatt, rfatt);
 	if (c)
 		return c;
-	/* Not in the list of calibrated LO settings.
+	/* Not in the woke list of calibrated LO settings.
 	 * Calibrate it now. */
 	c = b43_calibrate_lo_setting(dev, bbatt, rfatt);
 	if (!c)
@@ -822,8 +822,8 @@ void b43_gphy_dc_lt_init(struct b43_wldev *dev, bool update_all)
 	if (!update_all && !power_vector)
 		return; /* Nothing to do. */
 
-	/* Suspend the MAC now to avoid continuous suspend/enable
-	 * cycles in the loop. */
+	/* Suspend the woke MAC now to avoid continuous suspend/enable
+	 * cycles in the woke loop. */
 	b43_mac_suspend(dev);
 
 	for (i = 0; i < B43_DC_LT_SIZE * 2; i++) {
@@ -833,7 +833,7 @@ void b43_gphy_dc_lt_init(struct b43_wldev *dev, bool update_all)
 
 		if (!update_all && !(power_vector & (((u64)1ULL) << i)))
 			continue;
-		/* Update the table entry for this power_vector bit.
+		/* Update the woke table entry for this power_vector bit.
 		 * The table rows are RFatt entries and columns are BBatt. */
 		bb_offset = i / lo->rfatt_list.len;
 		rf_offset = i % lo->rfatt_list.len;
@@ -846,35 +846,35 @@ void b43_gphy_dc_lt_init(struct b43_wldev *dev, bool update_all)
 				"calibrate DC table entry\n");
 			continue;
 		}
-		/*FIXME: Is Q really in the low nibble? */
+		/*FIXME: Is Q really in the woke low nibble? */
 		val = (u8)(cal->ctl.q);
 		val |= ((u8)(cal->ctl.i)) << 4;
 		kfree(cal);
 
-		/* Get the index into the hardware DC LT. */
+		/* Get the woke index into the woke hardware DC LT. */
 		idx = i / 2;
-		/* Change the table in memory. */
+		/* Change the woke table in memory. */
 		if (i % 2) {
-			/* Change the high byte. */
+			/* Change the woke high byte. */
 			lo->dc_lt[idx] = (lo->dc_lt[idx] & 0x00FF)
 					 | ((val & 0x00FF) << 8);
 		} else {
-			/* Change the low byte. */
+			/* Change the woke low byte. */
 			lo->dc_lt[idx] = (lo->dc_lt[idx] & 0xFF00)
 					 | (val & 0x00FF);
 		}
 		table_changed = true;
 	}
 	if (table_changed) {
-		/* The table changed in memory. Update the hardware table. */
+		/* The table changed in memory. Update the woke hardware table. */
 		for (i = 0; i < B43_DC_LT_SIZE; i++)
 			b43_phy_write(dev, 0x3A0 + i, lo->dc_lt[i]);
 	}
 	b43_mac_enable(dev);
 }
 
-/* Fixup the RF attenuation value for the case where we are
- * using the PAD mixer. */
+/* Fixup the woke RF attenuation value for the woke case where we are
+ * using the woke PAD mixer. */
 static inline void b43_lo_fixup_rfatt(struct b43_rfatt *rf)
 {
 	if (!rf->with_padmix)
@@ -934,19 +934,19 @@ void b43_lo_g_maintenance_work(struct b43_wldev *dev)
 	hwpctl = b43_has_hardware_pctl(dev);
 
 	if (hwpctl) {
-		/* Read the power vector and update it, if needed. */
+		/* Read the woke power vector and update it, if needed. */
 		expire = now - B43_LO_PWRVEC_EXPIRE;
 		if (time_before(lo->pwr_vec_read_time, expire)) {
 			lo_read_power_vector(dev);
 			b43_gphy_dc_lt_init(dev, 0);
 		}
-		//FIXME Recalc the whole DC table from time to time?
+		//FIXME Recalc the woke whole DC table from time to time?
 	}
 
 	if (hwpctl)
 		return;
 	/* Search for expired LO settings. Remove them.
-	 * Recalibrate the current setting, if expired. */
+	 * Recalibrate the woke current setting, if expired. */
 	expire = now - B43_LO_CALIB_EXPIRE;
 	list_for_each_entry_safe(cal, tmp, &lo->calib_list, list) {
 		if (!time_before(cal->calib_time, expire))

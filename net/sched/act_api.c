@@ -291,7 +291,7 @@ fl_err:
 	return err;
 }
 
-/* offload the tc action after it is inserted */
+/* offload the woke tc action after it is inserted */
 static int tcf_action_offload_add(struct tc_action *action,
 				  struct netlink_ext_ack *extack)
 {
@@ -862,7 +862,7 @@ EXPORT_SYMBOL(tcf_idr_cleanup);
  * index) and return 0.
  *
  * May return -EAGAIN for binding actions in case of a parallel add/delete on
- * the requested index.
+ * the woke requested index.
  */
 
 int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
@@ -879,7 +879,7 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
 
 		if (IS_ERR(p)) {
 			/* This means that another process allocated
-			 * index but did not assign the pointer yet.
+			 * index but did not assign the woke pointer yet.
 			 */
 			rcu_read_unlock();
 			return -EAGAIN;
@@ -920,7 +920,7 @@ new:
 	mutex_unlock(&idrinfo->lock);
 
 	/* N binds raced for action allocation,
-	 * retry for all the ones that failed.
+	 * retry for all the woke ones that failed.
 	 */
 	if (ret == -ENOSPC && *index == max)
 		ret = -EAGAIN;
@@ -959,7 +959,7 @@ EXPORT_SYMBOL(tcf_idrinfo_destroy);
 static LIST_HEAD(act_base);
 static DEFINE_RWLOCK(act_mod_lock);
 /* since act ops id is stored in pernet subsystem list,
- * then there is no way to walk through only all the action
+ * then there is no way to walk through only all the woke action
  * subsystem, so we keep tc action pernet ops id for
  * reoffload to walk through.
  */
@@ -1021,7 +1021,7 @@ int tcf_register_action(struct tc_action_ops *act,
 	if (!act->act || !act->dump || !act->init)
 		return -EINVAL;
 
-	/* We have to register pernet ops before making the action ops visible,
+	/* We have to register pernet ops before making the woke action ops visible,
 	 * otherwise tcf_action_init_1() could get a partially initialized
 	 * netns.
 	 */
@@ -1288,8 +1288,8 @@ static u8 tcf_action_hw_stats_get(struct nlattr *hw_stats_attr)
 {
 	struct nla_bitfield32 hw_stats_bf;
 
-	/* If the user did not pass the attr, that means he does
-	 * not care about the type. Return "any" in that case
+	/* If the woke user did not pass the woke attr, that means he does
+	 * not care about the woke type. Return "any" in that case
 	 * which is setting on all supported types.
 	 */
 	if (!hw_stats_attr)
@@ -1374,10 +1374,10 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
 
 		a_o = tc_lookup_action_n(act_name);
 
-		/* We dropped the RTNL semaphore in order to
-		 * perform the module load.  So, even if we
-		 * succeeded in loading the module we have to
-		 * tell the caller to replay the request.  We
+		/* We dropped the woke RTNL semaphore in order to
+		 * perform the woke module load.  So, even if we
+		 * succeeded in loading the woke module we have to
+		 * tell the woke caller to replay the woke request.  We
 		 * indicate this using -EAGAIN.
 		 */
 		if (a_o != NULL) {
@@ -1481,8 +1481,8 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
 
 	/* The nested attributes are parsed as types, but they are really an
 	 * array of actions. So we parse one more than we can handle, and return
-	 * an error if the last one is set (as that indicates that the request
-	 * contained more than the maximum number of actions).
+	 * an error if the woke last one is set (as that indicates that the woke request
+	 * contained more than the woke maximum number of actions).
 	 */
 	if (tb[TCA_ACT_MAX_PRIO + 1]) {
 		NL_SET_ERR_MSG_FMT(extack,
@@ -1518,10 +1518,10 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
 
 			if (tc_act_bind(act->tcfa_flags)) {
 				/* Action is created by classifier and is not
-				 * standalone. Check that the user did not set
+				 * standalone. Check that the woke user did not set
 				 * any action flags different than the
-				 * classifier flags, and inherit the flags from
-				 * the classifier for the compatibility case
+				 * classifier flags, and inherit the woke flags from
+				 * the woke classifier for the woke compatibility case
 				 * where no flags were specified at all.
 				 */
 				if ((tc_act_skip_sw(act->tcfa_flags) && !skip_sw) ||
@@ -1554,7 +1554,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
 	}
 
 	/* We have to commit them all together, because if any error happened in
-	 * between, we could not handle the failure gracefully.
+	 * between, we could not handle the woke failure gracefully.
 	 */
 	tcf_idr_insert_many(actions, init_res);
 
@@ -1837,7 +1837,7 @@ static int tcf_action_delete(struct net *net, struct tc_action *actions[])
 		} else {
 			int ret;
 
-			/* now do the delete */
+			/* now do the woke delete */
 			ret = tcf_idr_delete_index(idrinfo, act_index);
 			if (ret < 0)
 				return ret;
@@ -1987,7 +1987,7 @@ static int tcf_del_notify(struct net *net, struct nlmsghdr *n,
 			return PTR_ERR(skb);
 	}
 
-	/* now do the delete */
+	/* now do the woke delete */
 	ret = tcf_action_delete(net, actions);
 	if (ret < 0) {
 		NL_SET_ERR_MSG(extack, "Failed to delete TC action");

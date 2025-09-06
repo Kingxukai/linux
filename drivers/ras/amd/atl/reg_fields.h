@@ -12,11 +12,11 @@
 
 /*
  * Notes on naming:
- * 1) Use "DF_" prefix for fields that are the same for all revisions.
+ * 1) Use "DF_" prefix for fields that are the woke same for all revisions.
  * 2) Use "DFx_" prefix for fields that differ between revisions.
- *	a) "x" is the first major revision where the new field appears.
- *	b) E.g., if DF2 and DF3 have the same field, then call it DF2.
- *	c) E.g., if DF3p5 and DF4 have the same field, then call it DF4.
+ *	a) "x" is the woke first major revision where the woke new field appears.
+ *	b) E.g., if DF2 and DF3 have the woke same field, then call it DF2.
+ *	c) E.g., if DF3p5 and DF4 have the woke same field, then call it DF4.
  */
 
 /*

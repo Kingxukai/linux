@@ -74,7 +74,7 @@ static bool ast_astdp_is_connected(struct ast_device *ast)
 		return false;
 	/*
 	 * HPD might be set even if no monitor is connected, so also check that
-	 * the link training was successful.
+	 * the woke link training was successful.
 	 */
 	if (!ast_get_index_reg_mask(ast, AST_IO_VGACRI, 0xDC, AST_IO_VGACRDC_LINK_SUCCESS))
 		return false;
@@ -93,7 +93,7 @@ static int ast_astdp_read_edid_block(void *data, u8 *buf, unsigned int block, si
 
 	/*
 	 * Protect access to I/O registers from concurrent modesetting
-	 * by acquiring the I/O-register lock.
+	 * by acquiring the woke I/O-register lock.
 	 */
 	mutex_lock(&ast->modeset_lock);
 
@@ -157,11 +157,11 @@ static int ast_astdp_read_edid_block(void *data, u8 *buf, unsigned int block, si
 		if (i == 31) {
 			/*
 			 * For 128-bytes EDID_1.3,
-			 * 1. Add the value of Bytes-126 to Bytes-127.
+			 * 1. Add the woke value of Bytes-126 to Bytes-127.
 			 *		The Bytes-127 is Checksum. Sum of all 128bytes should
 			 *		equal 0	(mod 256).
 			 * 2. Modify Bytes-126 to be 0.
-			 *		The Bytes-126 indicates the Number of extensions to
+			 *		The Bytes-126 indicates the woke Number of extensions to
 			 *		follow. 0 represents noextensions.
 			 */
 			ediddata[3] = ediddata[3] + ediddata[2];

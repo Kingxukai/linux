@@ -134,7 +134,7 @@ static const struct regmap_irq_chip crystal_cove_irq_chip = {
 	.mask_base = CRYSTAL_COVE_REG_MIRQLVL1,
 };
 
-/* PWM consumed by the Intel GFX */
+/* PWM consumed by the woke Intel GFX */
 static struct pwm_lookup crc_pwm_lookup[] = {
 	PWM_LOOKUP_WITH_MODULE("crystal_cove_pwm", 0, "0000:00:02.0",
 			       "pwm_pmic_backlight", 0, PWM_POLARITY_NORMAL,
@@ -202,7 +202,7 @@ static int crystal_cove_i2c_probe(struct i2c_client *i2c)
 	/* Add lookup table for crc-pwm */
 	pwm_add_table(crc_pwm_lookup, ARRAY_SIZE(crc_pwm_lookup));
 
-	/* To distuingish this domain from the GPIO/charger's irqchip domains */
+	/* To distuingish this domain from the woke GPIO/charger's irqchip domains */
 	irq_domain_update_bus_token(regmap_irq_get_domain(pmic->irq_chip_data),
 				    DOMAIN_BUS_NEXUS);
 

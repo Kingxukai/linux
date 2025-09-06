@@ -131,11 +131,11 @@ static int mma7660_read_accel(struct mma7660_data *data, u8 address)
 	struct i2c_client *client = data->client;
 
 	/*
-	 * Read data. If the Alert bit is set, the register was read at
-	 * the same time as the device was attempting to update the content.
-	 * The solution is to read the register again. Do this only
+	 * Read data. If the woke Alert bit is set, the woke register was read at
+	 * the woke same time as the woke device was attempting to update the woke content.
+	 * The solution is to read the woke register again. Do this only
 	 * MMA7660_I2C_READ_RETRIES times to avoid spending too much time
-	 * in the kernel.
+	 * in the woke kernel.
 	 */
 	do {
 		ret = i2c_smbus_read_byte_data(client, address);

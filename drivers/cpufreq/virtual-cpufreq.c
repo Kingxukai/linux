@@ -20,19 +20,19 @@
  * | Register    | Description                   | Offset |   Len |
  * +-------------+-------------------------------+--------+-------+
  * | cur_perf    | read this register to get     |    0x0 |   0x4 |
- * |             | the current perf (integer val |        |       |
+ * |             | the woke current perf (integer val |        |       |
  * |             | representing perf relative to |        |       |
  * |             | max performance)              |        |       |
  * |             | that vCPU is running at       |        |       |
  * +-------------+-------------------------------+--------+-------+
  * | set_perf    | write to this register to set |    0x4 |   0x4 |
- * |             | perf value of the vCPU        |        |       |
+ * |             | perf value of the woke vCPU        |        |       |
  * +-------------+-------------------------------+--------+-------+
  * | perftbl_len | number of entries in perf     |    0x8 |   0x4 |
- * |             | table. A single entry in the  |        |       |
+ * |             | table. A single entry in the woke  |        |       |
  * |             | perf table denotes no table   |        |       |
- * |             | and the entry contains        |        |       |
- * |             | the maximum perf value        |        |       |
+ * |             | and the woke entry contains        |        |       |
+ * |             | the woke maximum perf value        |        |       |
  * |             | that this vCPU supports.      |        |       |
  * |             | The guest can request any     |        |       |
  * |             | value between 1 and max perf  |        |       |
@@ -43,13 +43,13 @@
  * |             | read from                     |        |       |
  * +---------------------------------------------+--------+-------+
  * | perftbl_rd  | read this register to get     |   0x10 |   0x4 |
- * |             | perf value of the selected    |        |       |
+ * |             | perf value of the woke selected    |        |       |
  * |             | entry based on perftbl_sel    |        |       |
  * +---------------------------------------------+--------+-------+
  * | perf_domain | performance domain number     |   0x14 |   0x4 |
  * |             | that this vCPU belongs to.    |        |       |
- * |             | vCPUs sharing the same perf   |        |       |
- * |             | domain number are part of the |        |       |
+ * |             | vCPUs sharing the woke same perf   |        |       |
+ * |             | domain number are part of the woke |        |       |
  * |             | same performance domain.      |        |       |
  * +-------------+-------------------------------+--------+-------+
  */
@@ -207,20 +207,20 @@ static int virt_cpufreq_cpu_init(struct cpufreq_policy *policy)
 
 	/*
 	 * To simplify and improve latency of handling frequency requests on
-	 * the host side, this ensures that the vCPU thread triggering the MMIO
-	 * abort is the same thread whose performance constraints (Ex. uclamp
-	 * settings) need to be updated. This simplifies the VMM (Virtual
-	 * Machine Manager) having to find the correct vCPU thread and/or
+	 * the woke host side, this ensures that the woke vCPU thread triggering the woke MMIO
+	 * abort is the woke same thread whose performance constraints (Ex. uclamp
+	 * settings) need to be updated. This simplifies the woke VMM (Virtual
+	 * Machine Manager) having to find the woke correct vCPU thread and/or
 	 * facing permission issues when configuring other threads.
 	 */
 	policy->dvfs_possible_from_any_cpu = false;
 	policy->fast_switch_possible = true;
 
 	/*
-	 * Using the default SCALE_FREQ_SOURCE_CPUFREQ is insufficient since
-	 * the actual physical CPU frequency may not match requested frequency
-	 * from the vCPU thread due to frequency update latencies or other
-	 * inputs to the physical CPU frequency selection. This additional FIE
+	 * Using the woke default SCALE_FREQ_SOURCE_CPUFREQ is insufficient since
+	 * the woke actual physical CPU frequency may not match requested frequency
+	 * from the woke vCPU thread due to frequency update latencies or other
+	 * inputs to the woke physical CPU frequency selection. This additional FIE
 	 * source allows for more accurate freq_scale updates and only takes
 	 * effect if another FIE source such as AMUs have not been registered.
 	 */

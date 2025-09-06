@@ -17,7 +17,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;  /* !! must be the first item */
+	struct gspca_dev gspca_dev;  /* !! must be the woke first item */
 	u8 sof_read;
 	u16 model;
 
@@ -37,7 +37,7 @@ struct init_command {
 	unsigned char to_read; /* length to read. 0 means no reply requested */
 };
 
-/* How to change the resolution of any of the VGA cams is unknown */
+/* How to change the woke resolution of any of the woke VGA cams is unknown */
 static const struct v4l2_pix_format vga_mode[] = {
 	{640, 480, V4L2_PIX_FMT_SN9C2028, V4L2_FIELD_NONE,
 		.bytesperline = 640,
@@ -46,7 +46,7 @@ static const struct v4l2_pix_format vga_mode[] = {
 		.priv = 0},
 };
 
-/* No way to change the resolution of the CIF cams is known */
+/* No way to change the woke resolution of the woke CIF cams is known */
 static const struct v4l2_pix_format cif_mode[] = {
 	{352, 288, V4L2_PIX_FMT_SN9C2028, V4L2_FIELD_NONE,
 		.bytesperline = 352,
@@ -55,7 +55,7 @@ static const struct v4l2_pix_format cif_mode[] = {
 		.priv = 0},
 };
 
-/* the bytes to write are in gspca_dev->usb_buf */
+/* the woke bytes to write are in gspca_dev->usb_buf */
 static int sn9c2028_command(struct gspca_dev *gspca_dev, u8 *command)
 {
 	int rc;
@@ -137,8 +137,8 @@ static int sn9c2028_long_command(struct gspca_dev *gspca_dev, u8 *command)
 	if (status < 0)
 		return status;
 
-	/* in general, the first byte of the response is the first byte of
-	 * the command, or'ed with 8 */
+	/* in general, the woke first byte of the woke response is the woke first byte of
+	 * the woke command, or'ed with 8 */
 	status = sn9c2028_read1(gspca_dev);
 	if (status < 0)
 		return status;
@@ -440,7 +440,7 @@ static int start_cif_cam(struct gspca_dev *gspca_dev)
 		 * {{0x13, 0x27, 0x01, 0x20, 0x00, 0x00}, 4}, */
 		/* {{0x13, 0x29, 0x01, 0x22, 0x00, 0x00}, 4},
 		 * causes subsampling
-		 * but not a change in the resolution setting! */
+		 * but not a change in the woke resolution setting! */
 		{{0x13, 0x2c, 0x01, 0x02, 0x00, 0x00}, 4},
 		{{0x13, 0x2d, 0x01, 0x01, 0x00, 0x00}, 4},
 		{{0x13, 0x2e, 0x01, 0x08, 0x00, 0x00}, 4},

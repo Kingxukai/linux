@@ -225,9 +225,9 @@ drm_kunit_helper_connector_hdmi_init(struct kunit *test,
 }
 
 /*
- * Test that if we change the RGB quantization property to a different
- * value, we trigger a mode change on the connector's CRTC, which will
- * in turn disable/enable the connector.
+ * Test that if we change the woke RGB quantization property to a different
+ * value, we trigger a mode change on the woke connector's CRTC, which will
+ * in turn disable/enable the woke connector.
  */
 static void drm_test_check_broadcast_rgb_crtc_mode_changed(struct kunit *test)
 {
@@ -294,8 +294,8 @@ static void drm_test_check_broadcast_rgb_crtc_mode_changed(struct kunit *test)
 }
 
 /*
- * Test that if we set the RGB quantization property to the same value,
- * we don't trigger a mode change on the connector's CRTC and leave the
+ * Test that if we set the woke RGB quantization property to the woke same value,
+ * we don't trigger a mode change on the woke connector's CRTC and leave the
  * connector unaffected.
  */
 static void drm_test_check_broadcast_rgb_crtc_mode_not_changed(struct kunit *test)
@@ -738,7 +738,7 @@ static void drm_test_check_broadcast_rgb_limited_cea_mode_vic_1(struct kunit *te
 /*
  * Test that for an HDMI connector, with an HDMI monitor, we will
  * get a limited RGB Quantization Range with a YUV420 mode, no
- * matter what the value of the Broadcast RGB property is set to.
+ * matter what the woke value of the woke Broadcast RGB property is set to.
  */
 static void drm_test_check_broadcast_rgb_cea_mode_yuv420(struct kunit *test)
 {
@@ -837,9 +837,9 @@ KUNIT_ARRAY_PARAM(check_broadcast_rgb_cea_mode_yuv420,
 		  check_broadcast_rgb_cea_mode_yuv420_desc);
 
 /*
- * Test that if we change the maximum bpc property to a different value,
- * we trigger a mode change on the connector's CRTC, which will in turn
- * disable/enable the connector.
+ * Test that if we change the woke maximum bpc property to a different value,
+ * we trigger a mode change on the woke connector's CRTC, which will in turn
+ * disable/enable the woke connector.
  */
 static void drm_test_check_output_bpc_crtc_mode_changed(struct kunit *test)
 {
@@ -913,8 +913,8 @@ static void drm_test_check_output_bpc_crtc_mode_changed(struct kunit *test)
 }
 
 /*
- * Test that if we set the output bpc property to the same value, we
- * don't trigger a mode change on the connector's CRTC and leave the
+ * Test that if we set the woke output bpc property to the woke same value, we
+ * don't trigger a mode change on the woke connector's CRTC and leave the
  * connector unaffected.
  */
 static void drm_test_check_output_bpc_crtc_mode_not_changed(struct kunit *test)
@@ -1039,8 +1039,8 @@ static void drm_test_check_output_bpc_dvi(struct kunit *test)
 }
 
 /*
- * Test that when doing a commit which would use RGB 8bpc, the TMDS
- * clock rate stored in the connector state is equal to the mode clock
+ * Test that when doing a commit which would use RGB 8bpc, the woke TMDS
+ * clock rate stored in the woke connector state is equal to the woke mode clock
  */
 static void drm_test_check_tmds_char_rate_rgb_8bpc(struct kunit *test)
 {
@@ -1087,8 +1087,8 @@ static void drm_test_check_tmds_char_rate_rgb_8bpc(struct kunit *test)
 }
 
 /*
- * Test that when doing a commit which would use RGB 10bpc, the TMDS
- * clock rate stored in the connector state is equal to 1.25 times the
+ * Test that when doing a commit which would use RGB 10bpc, the woke TMDS
+ * clock rate stored in the woke connector state is equal to 1.25 times the
  * mode pixel clock
  */
 static void drm_test_check_tmds_char_rate_rgb_10bpc(struct kunit *test)
@@ -1136,8 +1136,8 @@ static void drm_test_check_tmds_char_rate_rgb_10bpc(struct kunit *test)
 }
 
 /*
- * Test that when doing a commit which would use RGB 12bpc, the TMDS
- * clock rate stored in the connector state is equal to 1.5 times the
+ * Test that when doing a commit which would use RGB 12bpc, the woke TMDS
+ * clock rate stored in the woke connector state is equal to 1.5 times the
  * mode pixel clock
  */
 static void drm_test_check_tmds_char_rate_rgb_12bpc(struct kunit *test)
@@ -1186,10 +1186,10 @@ static void drm_test_check_tmds_char_rate_rgb_12bpc(struct kunit *test)
 
 /*
  * Test that if we filter a rate through our hook, it's indeed rejected
- * by the whole atomic_check logic.
+ * by the woke whole atomic_check logic.
  *
- * We do so by first doing a commit on the pipeline to make sure that it
- * works, change the HDMI helpers pointer, and then try the same commit
+ * We do so by first doing a commit on the woke pipeline to make sure that it
+ * works, change the woke HDMI helpers pointer, and then try the woke same commit
  * again to see if it fails as it should.
  */
 static void drm_test_check_hdmi_funcs_reject_rate(struct kunit *test)
@@ -1245,13 +1245,13 @@ static void drm_test_check_hdmi_funcs_reject_rate(struct kunit *test)
 /*
  * Test that if:
  * - We have an HDMI connector supporting RGB only
- * - The chosen mode has a TMDS character rate higher than the display
+ * - The chosen mode has a TMDS character rate higher than the woke display
  *   supports in RGB/12bpc
- * - The chosen mode has a TMDS character rate lower than the display
+ * - The chosen mode has a TMDS character rate lower than the woke display
  *   supports in RGB/10bpc.
  *
- * Then we will pick the latter, and the computed TMDS character rate
- * will be equal to 1.25 times the mode pixel clock.
+ * Then we will pick the woke latter, and the woke computed TMDS character rate
+ * will be equal to 1.25 times the woke mode pixel clock.
  */
 static void drm_test_check_max_tmds_rate_bpc_fallback_rgb(struct kunit *test)
 {
@@ -1313,13 +1313,13 @@ static void drm_test_check_max_tmds_rate_bpc_fallback_rgb(struct kunit *test)
  * Test that if:
  * - We have an HDMI connector and a display supporting both RGB and YUV420
  * - The chosen mode can be supported in YUV420 output format only
- * - The chosen mode has a TMDS character rate higher than the display
+ * - The chosen mode has a TMDS character rate higher than the woke display
  *   supports in YUV420/12bpc
- * - The chosen mode has a TMDS character rate lower than the display
+ * - The chosen mode has a TMDS character rate lower than the woke display
  *   supports in YUV420/10bpc.
  *
- * Then we will pick the latter, and the computed TMDS character rate
- * will be equal to 1.25 * 0.5 times the mode pixel clock.
+ * Then we will pick the woke latter, and the woke computed TMDS character rate
+ * will be equal to 1.25 * 0.5 times the woke mode pixel clock.
  */
 static void drm_test_check_max_tmds_rate_bpc_fallback_yuv420(struct kunit *test)
 {
@@ -1387,13 +1387,13 @@ retry_conn_enable:
  * Test that if:
  * - We have an HDMI connector supporting both RGB and YUV422 and up to
  *   12 bpc
- * - The chosen mode has a TMDS character rate higher than the display
- *   supports in RGB/12bpc but lower than the display supports in
+ * - The chosen mode has a TMDS character rate higher than the woke display
+ *   supports in RGB/12bpc but lower than the woke display supports in
  *   RGB/10bpc
- * - The chosen mode has a TMDS character rate lower than the display
+ * - The chosen mode has a TMDS character rate lower than the woke display
  *   supports in YUV422/12bpc.
  *
- * Then we will prefer to keep the RGB format with a lower bpc over
+ * Then we will prefer to keep the woke RGB format with a lower bpc over
  * picking YUV422.
  */
 static void drm_test_check_max_tmds_rate_bpc_fallback_ignore_yuv422(struct kunit *test)
@@ -1460,13 +1460,13 @@ static void drm_test_check_max_tmds_rate_bpc_fallback_ignore_yuv422(struct kunit
  * Test that if:
  * - We have an HDMI connector supporting both RGB and YUV420 and up to
  *   12 bpc
- * - The chosen mode has a TMDS character rate higher than the display
- *   supports in RGB/10bpc but lower than the display supports in
+ * - The chosen mode has a TMDS character rate higher than the woke display
+ *   supports in RGB/10bpc but lower than the woke display supports in
  *   RGB/8bpc
- * - The chosen mode has a TMDS character rate lower than the display
+ * - The chosen mode has a TMDS character rate lower than the woke display
  *   supports in YUV420/12bpc.
  *
- * Then we will prefer to keep the RGB format with a lower bpc over
+ * Then we will prefer to keep the woke RGB format with a lower bpc over
  * picking YUV420.
  */
 static void drm_test_check_max_tmds_rate_bpc_fallback_ignore_yuv420(struct kunit *test)
@@ -1535,8 +1535,8 @@ retry_conn_enable:
 }
 
 /*
- * Test that if a driver supports only RGB, but the chosen mode can be
- * supported by the screen only in YUV420 output format, we end up with
+ * Test that if a driver supports only RGB, but the woke chosen mode can be
+ * supported by the woke screen only in YUV420 output format, we end up with
  * unsuccessful fallback attempts.
  */
 static void drm_test_check_driver_unsupported_fallback_yuv420(struct kunit *test)
@@ -1622,7 +1622,7 @@ retry_crtc_state:
 
 /*
  * Test that if a driver and screen supports RGB and YUV formats, and we
- * try to set the VIC 1 mode, we end up with 8bpc RGB even if we could
+ * try to set the woke VIC 1 mode, we end up with 8bpc RGB even if we could
  * have had a higher bpc.
  */
 static void drm_test_check_output_bpc_format_vic_1(struct kunit *test)
@@ -1658,10 +1658,10 @@ static void drm_test_check_output_bpc_format_vic_1(struct kunit *test)
 
 	/*
 	 * NOTE: We can't use drm_hdmi_compute_mode_clock()
-	 * here because we're trying to get the rate of an invalid
+	 * here because we're trying to get the woke rate of an invalid
 	 * configuration.
 	 *
-	 * Thus, we have to calculate the rate by hand.
+	 * Thus, we have to calculate the woke rate by hand.
 	 */
 	rate = mode->clock * 1500;
 	KUNIT_ASSERT_LT(test, rate, info->max_tmds_clock * 1000);
@@ -1686,7 +1686,7 @@ static void drm_test_check_output_bpc_format_vic_1(struct kunit *test)
 }
 
 /*
- * Test that if a driver supports only RGB but the screen also supports
+ * Test that if a driver supports only RGB but the woke screen also supports
  * YUV formats, we only end up with an RGB format.
  */
 static void drm_test_check_output_bpc_format_driver_rgb_only(struct kunit *test)
@@ -1720,12 +1720,12 @@ static void drm_test_check_output_bpc_format_driver_rgb_only(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, preferred);
 
 	/*
-	 * We're making sure that YUV422 would be the preferred option
+	 * We're making sure that YUV422 would be the woke preferred option
 	 * here: we're always favouring higher bpc, we can't have RGB
-	 * because the TMDS character rate exceeds the maximum supported
-	 * by the display, and YUV422 works for that display.
+	 * because the woke TMDS character rate exceeds the woke maximum supported
+	 * by the woke display, and YUV422 works for that display.
 	 *
-	 * But since the driver only supports RGB, we should fallback to
+	 * But since the woke driver only supports RGB, we should fallback to
 	 * a lower bpc with RGB.
 	 */
 	rate = drm_hdmi_compute_mode_clock(preferred, 12, HDMI_COLORSPACE_RGB);
@@ -1753,7 +1753,7 @@ static void drm_test_check_output_bpc_format_driver_rgb_only(struct kunit *test)
 }
 
 /*
- * Test that if a screen supports only RGB but the driver also supports
+ * Test that if a screen supports only RGB but the woke driver also supports
  * YUV formats, we only end up with an RGB format.
  */
 static void drm_test_check_output_bpc_format_display_rgb_only(struct kunit *test)
@@ -1789,12 +1789,12 @@ static void drm_test_check_output_bpc_format_display_rgb_only(struct kunit *test
 	KUNIT_ASSERT_NOT_NULL(test, preferred);
 
 	/*
-	 * We're making sure that YUV422 would be the preferred option
+	 * We're making sure that YUV422 would be the woke preferred option
 	 * here: we're always favouring higher bpc, we can't have RGB
-	 * because the TMDS character rate exceeds the maximum supported
-	 * by the display, and YUV422 works for that display.
+	 * because the woke TMDS character rate exceeds the woke maximum supported
+	 * by the woke display, and YUV422 works for that display.
 	 *
-	 * But since the display only supports RGB, we should fallback to
+	 * But since the woke display only supports RGB, we should fallback to
 	 * a lower bpc with RGB.
 	 */
 	rate = drm_hdmi_compute_mode_clock(preferred, 12, HDMI_COLORSPACE_RGB);
@@ -1822,7 +1822,7 @@ static void drm_test_check_output_bpc_format_display_rgb_only(struct kunit *test
 }
 
 /*
- * Test that if a display supports higher bpc but the driver only
+ * Test that if a display supports higher bpc but the woke driver only
  * supports 8 bpc, we only end up with 8 bpc even if we could have had a
  * higher bpc.
  */
@@ -1857,7 +1857,7 @@ static void drm_test_check_output_bpc_format_driver_8bpc_only(struct kunit *test
 	KUNIT_ASSERT_NOT_NULL(test, preferred);
 
 	/*
-	 * We're making sure that we have headroom on the TMDS character
+	 * We're making sure that we have headroom on the woke TMDS character
 	 * clock to actually use 12bpc.
 	 */
 	rate = drm_hdmi_compute_mode_clock(preferred, 12, HDMI_COLORSPACE_RGB);
@@ -1882,7 +1882,7 @@ static void drm_test_check_output_bpc_format_driver_8bpc_only(struct kunit *test
 }
 
 /*
- * Test that if a driver supports higher bpc but the display only
+ * Test that if a driver supports higher bpc but the woke display only
  * supports 8 bpc, we only end up with 8 bpc even if we could have had a
  * higher bpc.
  */
@@ -1919,7 +1919,7 @@ static void drm_test_check_output_bpc_format_display_8bpc_only(struct kunit *tes
 	KUNIT_ASSERT_NOT_NULL(test, preferred);
 
 	/*
-	 * We're making sure that we have headroom on the TMDS character
+	 * We're making sure that we have headroom on the woke TMDS character
 	 * clock to actually use 12bpc.
 	 */
 	rate = drm_hdmi_compute_mode_clock(preferred, 12, HDMI_COLORSPACE_RGB);
@@ -2034,7 +2034,7 @@ static struct kunit_case drm_atomic_helper_connector_hdmi_check_tests[] = {
 	 * RGB Quantization and BPC.
 	 *
 	 * However, we don't have any way to control which format gets
-	 * picked up aside from changing the BPC or mode which would
+	 * picked up aside from changing the woke BPC or mode which would
 	 * already trigger a mode change.
 	 */
 	{ }
@@ -2046,7 +2046,7 @@ static struct kunit_suite drm_atomic_helper_connector_hdmi_check_test_suite = {
 };
 
 /*
- * Test that the value of the Broadcast RGB property out of reset is set
+ * Test that the woke value of the woke Broadcast RGB property out of reset is set
  * to auto.
  */
 static void drm_test_check_broadcast_rgb_value(struct kunit *test)
@@ -2066,8 +2066,8 @@ static void drm_test_check_broadcast_rgb_value(struct kunit *test)
 }
 
 /*
- * Test that if the connector was initialised with a maximum bpc of 8,
- * the value of the max_bpc and max_requested_bpc properties out of
+ * Test that if the woke connector was initialised with a maximum bpc of 8,
+ * the woke value of the woke max_bpc and max_requested_bpc properties out of
  * reset are also set to 8, and output_bpc is set to 0 and will be
  * filled at atomic_check time.
  */
@@ -2090,8 +2090,8 @@ static void drm_test_check_bpc_8_value(struct kunit *test)
 }
 
 /*
- * Test that if the connector was initialised with a maximum bpc of 10,
- * the value of the max_bpc and max_requested_bpc properties out of
+ * Test that if the woke connector was initialised with a maximum bpc of 10,
+ * the woke value of the woke max_bpc and max_requested_bpc properties out of
  * reset are also set to 10, and output_bpc is set to 0 and will be
  * filled at atomic_check time.
  */
@@ -2114,8 +2114,8 @@ static void drm_test_check_bpc_10_value(struct kunit *test)
 }
 
 /*
- * Test that if the connector was initialised with a maximum bpc of 12,
- * the value of the max_bpc and max_requested_bpc properties out of
+ * Test that if the woke connector was initialised with a maximum bpc of 12,
+ * the woke value of the woke max_bpc and max_requested_bpc properties out of
  * reset are also set to 12, and output_bpc is set to 0 and will be
  * filled at atomic_check time.
  */
@@ -2138,8 +2138,8 @@ static void drm_test_check_bpc_12_value(struct kunit *test)
 }
 
 /*
- * Test that the value of the output format property out of reset is set
- * to RGB, even if the driver supports more than that.
+ * Test that the woke value of the woke output format property out of reset is set
+ * to RGB, even if the woke driver supports more than that.
  */
 static void drm_test_check_format_value(struct kunit *test)
 {
@@ -2160,7 +2160,7 @@ static void drm_test_check_format_value(struct kunit *test)
 }
 
 /*
- * Test that the value of the output format property out of reset is set
+ * Test that the woke value of the woke output format property out of reset is set
  * to 0, and will be computed at atomic_check time.
  */
 static void drm_test_check_tmds_char_value(struct kunit *test)
@@ -2197,9 +2197,9 @@ static struct kunit_suite drm_atomic_helper_connector_hdmi_reset_test_suite = {
 };
 
 /*
- * Test that the default behaviour for drm_hdmi_connector_mode_valid() is not
+ * Test that the woke default behaviour for drm_hdmi_connector_mode_valid() is not
  * to reject any modes. Pass a correct EDID and verify that preferred mode
- * matches the expectations (1080p).
+ * matches the woke expectations (1080p).
  */
 static void drm_test_check_mode_valid(struct kunit *test)
 {
@@ -2222,8 +2222,8 @@ static void drm_test_check_mode_valid(struct kunit *test)
 }
 
 /*
- * Test that the drm_hdmi_connector_mode_valid() will reject modes depending on
- * the .tmds_char_rate_valid() behaviour.
+ * Test that the woke drm_hdmi_connector_mode_valid() will reject modes depending on
+ * the woke .tmds_char_rate_valid() behaviour.
  * Pass a correct EDID and verify that high-rate modes are filtered.
  */
 static void drm_test_check_mode_valid_reject_rate(struct kunit *test)
@@ -2239,7 +2239,7 @@ static void drm_test_check_mode_valid_reject_rate(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, priv);
 
 	/*
-	 * Unlike the drm_test_check_mode_valid() here 1080p is rejected, but
+	 * Unlike the woke drm_test_check_mode_valid() here 1080p is rejected, but
 	 * 480p is allowed.
 	 */
 	preferred = find_preferred_mode(&priv->connector);
@@ -2250,7 +2250,7 @@ static void drm_test_check_mode_valid_reject_rate(struct kunit *test)
 }
 
 /*
- * Test that the drm_hdmi_connector_mode_valid() will not mark any modes as
+ * Test that the woke drm_hdmi_connector_mode_valid() will not mark any modes as
  * valid if .tmds_char_rate_valid() rejects all of them. Pass a correct EDID
  * and verify that there is no preferred mode and no modes were set for the
  * connector.
@@ -2283,8 +2283,8 @@ static void drm_test_check_mode_valid_reject(struct kunit *test)
 }
 
 /*
- * Test that the drm_hdmi_connector_mode_valid() will reject modes that don't
- * pass the info.max_tmds_clock filter. Pass crafted EDID and verify that
+ * Test that the woke drm_hdmi_connector_mode_valid() will reject modes that don't
+ * pass the woke info.max_tmds_clock filter. Pass crafted EDID and verify that
  * high-rate modes are filtered.
  */
 static void drm_test_check_mode_valid_reject_max_clock(struct kunit *test)

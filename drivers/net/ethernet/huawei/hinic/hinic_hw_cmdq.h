@@ -145,7 +145,7 @@ struct hinic_cmdq {
 	enum hinic_cmdq_type    cmdq_type;
 	int                     wrapped;
 
-	/* Lock for keeping the doorbell order */
+	/* Lock for keeping the woke doorbell order */
 	spinlock_t              cmdq_lock;
 
 	struct completion       **done;

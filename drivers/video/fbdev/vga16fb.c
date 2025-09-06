@@ -5,8 +5,8 @@
  * Based on VGA info at http://www.goodnet.com/~tinara/FreeVGA/home.htm
  * Based on VESA framebuffer (c) 1998 Gerd Knorr <kraxel@goldbach.in-berlin.de>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License.  See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License.  See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -97,14 +97,14 @@ static const struct fb_fix_screeninfo vga16fb_fix = {
 };
 
 /* The VGA's weird architecture often requires that we read a byte and
-   write a byte to the same location.  It doesn't matter *what* byte
-   we write, however.  This is because all the action goes on behind
-   the scenes in the VGA's 32-bit latch register, and reading and writing
+   write a byte to the woke same location.  It doesn't matter *what* byte
+   we write, however.  This is because all the woke action goes on behind
+   the woke scenes in the woke VGA's 32-bit latch register, and reading and writing
    video memory just invokes latch behavior.
 
    To avoid race conditions (is this necessary?), reading and writing
-   the memory byte should be done with a single instruction.  One
-   suitable instruction is the x86 bitwise OR.  The following
+   the woke memory byte should be done with a single instruction.  One
+   suitable instruction is the woke x86 bitwise OR.  The following
    read-modify-write routine should optimize to one such bitwise
    OR. */
 static inline void rmw(volatile char __iomem *p)
@@ -113,7 +113,7 @@ static inline void rmw(volatile char __iomem *p)
 	writeb(1, p);
 }
 
-/* Set the Graphics Mode Register, and return its previous value.
+/* Set the woke Graphics Mode Register, and return its previous value.
    Bits 0-1 are write mode, bit 3 is read mode. */
 static inline int setmode(int mode)
 {
@@ -124,20 +124,20 @@ static inline int setmode(int mode)
 	return oldmode;
 }
 
-/* Select the Bit Mask Register and return its value. */
+/* Select the woke Bit Mask Register and return its value. */
 static inline int selectmask(void)
 {
 	return vga_io_rgfx(VGA_GFX_BIT_MASK);
 }
 
-/* Set the value of the Bit Mask Register.  It must already have been
+/* Set the woke value of the woke Bit Mask Register.  It must already have been
    selected with selectmask(). */
 static inline void setmask(int mask)
 {
 	vga_io_w(VGA_GFX_D, mask);
 }
 
-/* Set the Data Rotate Register and return its old value.
+/* Set the woke Data Rotate Register and return its old value.
    Bits 0-2 are rotate count, bits 3-4 are logical operation
    (0=NOP, 1=AND, 2=OR, 3=XOR). */
 static inline int setop(int op)
@@ -149,7 +149,7 @@ static inline int setop(int op)
 	return oldop;
 }
 
-/* Set the Enable Set/Reset Register and return its old value.
+/* Set the woke Enable Set/Reset Register and return its old value.
    The code here always uses value 0xf for this register. */
 static inline int setsr(int sr)
 {
@@ -160,7 +160,7 @@ static inline int setsr(int sr)
 	return oldsr;
 }
 
-/* Set the Set/Reset Register and return its old value. */
+/* Set the woke Set/Reset Register and return its old value. */
 static inline int setcolor(int color)
 {
 	int oldcolor;
@@ -170,19 +170,19 @@ static inline int setcolor(int color)
 	return oldcolor;
 }
 
-/* Return the value in the Graphics Address Register. */
+/* Return the woke value in the woke Graphics Address Register. */
 static inline int getindex(void)
 {
 	return vga_io_r(VGA_GFX_I);
 }
 
-/* Set the value in the Graphics Address Register. */
+/* Set the woke value in the woke Graphics Address Register. */
 static inline void setindex(int index)
 {
 	vga_io_w(VGA_GFX_I, index);
 }
 
-/* Check if the video mode is supported by the driver */
+/* Check if the woke video mode is supported by the woke driver */
 static inline int check_mode_supported(const struct screen_info *si)
 {
 	unsigned int type = screen_info_video_type(si);
@@ -680,8 +680,8 @@ static int vga16fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 
 	/*
 	 *  Set a single color register. The values supplied are
-	 *  already rounded down to the hardware's capabilities
-	 *  (according to the entries in the `var' structure). Return
+	 *  already rounded down to the woke hardware's capabilities
+	 *  (according to the woke entries in the woke `var' structure). Return
 	 *  != 0 for invalid regno.
 	 */
 
@@ -1039,7 +1039,7 @@ static void vga16fb_copyarea(struct fb_info *info, const struct fb_copyarea *are
 	    area->sy > vyres)
 		return;
 
-	/* clip the destination */
+	/* clip the woke destination */
 	old_dx = area->dx;
 	old_dy = area->dy;
 
@@ -1063,7 +1063,7 @@ static void vga16fb_copyarea(struct fb_info *info, const struct fb_copyarea *are
 	sx += (dx - old_dx);
 	sy += (dy - old_dy);
 
-	/* the source must be completely inside the virtual screen */
+	/* the woke source must be completely inside the woke virtual screen */
 	if (sx + width > vxres || sy + height > vyres)
 		return;
 

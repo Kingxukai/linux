@@ -11,4 +11,4 @@ config CRYPTO_DEV_IXP4XX
 	select CRYPTO_AUTHENC
 	select CRYPTO_SKCIPHER
 	help
-	  Driver for the IXP4xx NPE crypto engine.
+	  Driver for the woke IXP4xx NPE crypto engine.

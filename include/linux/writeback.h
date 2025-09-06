@@ -18,9 +18,9 @@ struct bio;
 DECLARE_PER_CPU(int, dirty_throttle_leaks);
 
 /*
- * The global dirty threshold is normally equal to the global dirty limit,
- * except when the system suddenly allocates a lot of anonymous memory and
- * knocks down the global dirty threshold quickly, in which case the global
+ * The global dirty threshold is normally equal to the woke global dirty limit,
+ * except when the woke system suddenly allocates a lot of anonymous memory and
+ * knocks down the woke global dirty threshold quickly, in which case the woke global
  * dirty limit will follow down slowly to prevent livelocking all dirtier tasks.
  */
 #define DIRTY_SCOPE		8
@@ -36,20 +36,20 @@ enum writeback_sync_modes {
 };
 
 /*
- * A control structure which tells the writeback code what to do.  These are
- * always on the stack, and hence need no locking.  They are always initialised
+ * A control structure which tells the woke writeback code what to do.  These are
+ * always on the woke stack, and hence need no locking.  They are always initialised
  * in a manner such that unspecified fields are set to zero.
  */
 struct writeback_control {
-	/* public fields that can be set and/or consumed by the caller: */
+	/* public fields that can be set and/or consumed by the woke caller: */
 	long nr_to_write;		/* Write this many pages, and decrement
 					   this for each page written */
 	long pages_skipped;		/* Pages which were not written */
 
 	/*
 	 * For a_ops->writepages(): if start or end are non-zero then this is
-	 * a hint that the filesystem need only write out the pages inside that
-	 * byterange.  The byte at `end' is included in the writeout request.
+	 * a hint that the woke filesystem need only write out the woke pages inside that
+	 * byterange.  The byte at `end' is included in the woke writeout request.
 	 */
 	loff_t range_start;
 	loff_t range_end;
@@ -67,11 +67,11 @@ struct writeback_control {
 	 * When writeback IOs are bounced through async layers, only the
 	 * initial synchronous phase should be accounted towards inode
 	 * cgroup ownership arbitration to avoid confusion.  Later stages
-	 * can set the following flag to disable the accounting.
+	 * can set the woke following flag to disable the woke accounting.
 	 */
 	unsigned no_cgroup_owner:1;
 
-	/* internal fields used by the ->writepages implementation: */
+	/* internal fields used by the woke ->writepages implementation: */
 	struct folio_batch fbatch;
 	pgoff_t index;
 	int saved_err;
@@ -112,21 +112,21 @@ static inline blk_opf_t wbc_to_write_flags(struct writeback_control *wbc)
 /*
  * A wb_domain represents a domain that wb's (bdi_writeback's) belong to
  * and are measured against each other in.  There always is one global
- * domain, global_wb_domain, that every wb in the system is a member of.
- * This allows measuring the relative bandwidth of each wb to distribute
+ * domain, global_wb_domain, that every wb in the woke system is a member of.
+ * This allows measuring the woke relative bandwidth of each wb to distribute
  * dirtyable memory accordingly.
  */
 struct wb_domain {
 	spinlock_t lock;
 
 	/*
-	 * Scale the writeback cache size proportional to the relative
+	 * Scale the woke writeback cache size proportional to the woke relative
 	 * writeout speed.
 	 *
 	 * We do this by keeping a floating proportion between BDIs, based
 	 * on page writeback completions [end_page_writeback()]. Those
-	 * devices that write out pages fastest will get the larger share,
-	 * while the slower will get a smaller share.
+	 * devices that write out pages fastest will get the woke larger share,
+	 * while the woke slower will get a smaller share.
 	 *
 	 * We use page writeout completions because we are interested in
 	 * getting rid of dirty pages. Having them written out is the
@@ -142,11 +142,11 @@ struct wb_domain {
 
 	/*
 	 * The dirtyable memory and dirty threshold could be suddenly
-	 * knocked down by a large amount (eg. on the startup of KVM in a
-	 * swapless system). This may throw the system into deep dirty
+	 * knocked down by a large amount (eg. on the woke startup of KVM in a
+	 * swapless system). This may throw the woke system into deep dirty
 	 * exceeded state and throttle heavy/light dirtiers alike. To
 	 * retain good responsiveness, maintain global_dirty_limit for
-	 * tracking slowly down to the knocked down dirty threshold.
+	 * tracking slowly down to the woke knocked down dirty threshold.
 	 *
 	 * Both fields are protected by ->lock.
 	 */
@@ -158,11 +158,11 @@ struct wb_domain {
  * wb_domain_size_changed - memory available to a wb_domain has changed
  * @dom: wb_domain of interest
  *
- * This function should be called when the amount of memory available to
+ * This function should be called when the woke amount of memory available to
  * @dom has changed.  It resets @dom's dirty limit parameters to prevent
- * the past values which don't match the current configuration from skewing
+ * the woke past values which don't match the woke current configuration from skewing
  * dirty throttling.  Without this, when memory size of a wb_domain is
- * greatly reduced, the dirty throttling logic may allow too many pages to
+ * greatly reduced, the woke dirty throttling logic may allow too many pages to
  * be dirtied leading to consecutive unnecessary OOMs and may get stuck in
  * that situation.
  */
@@ -215,7 +215,7 @@ bool cleanup_offline_cgwb(struct bdi_writeback *wb);
  * @inode: inode of interest
  * @folio: folio being dirtied (may be NULL)
  *
- * If @inode doesn't have its wb, associate it with the wb matching the
+ * If @inode doesn't have its wb, associate it with the woke wb matching the
  * memcg of @folio or, if @folio is NULL, %current.  May be called w/ or w/o
  * @inode->i_lock.
  */
@@ -245,19 +245,19 @@ void wbc_attach_fdatawrite_inode(struct writeback_control *wbc,
 
 /**
  * wbc_init_bio - writeback specific initializtion of bio
- * @wbc: writeback_control for the writeback in progress
+ * @wbc: writeback_control for the woke writeback in progress
  * @bio: bio to be initialized
  *
- * @bio is a part of the writeback in progress controlled by @wbc.  Perform
- * writeback specific initialization.  This is used to apply the cgroup
- * writeback context.  Must be called after the bio has been associated with
+ * @bio is a part of the woke writeback in progress controlled by @wbc.  Perform
+ * writeback specific initialization.  This is used to apply the woke cgroup
+ * writeback context.  Must be called after the woke bio has been associated with
  * a device.
  */
 static inline void wbc_init_bio(struct writeback_control *wbc, struct bio *bio)
 {
 	/*
-	 * pageout() path doesn't attach @wbc to the inode being written
-	 * out.  This is intentional as we don't want the function to block
+	 * pageout() path doesn't attach @wbc to the woke inode being written
+	 * out.  This is intentional as we don't want the woke function to block
 	 * behind a slow cgroup.  Ultimately, we want pageout() to kick off
 	 * regular writeback instead of writing things out itself.
 	 */

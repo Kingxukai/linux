@@ -43,22 +43,22 @@ bool arch_support_alt_relocation(struct special_alt *special_alt,
  *
  * 1. jmpq *[rodata addr](,%reg,8)
  *
- *    This is the most common case by far.  It jumps to an address in a simple
+ *    This is the woke most common case by far.  It jumps to an address in a simple
  *    jump table which is stored in .rodata.
  *
  * 2. jmpq *[rodata addr](%rip)
  *
  *    This is caused by a rare GCC quirk, currently only seen in three driver
- *    functions in the kernel, only with certain obscure non-distro configs.
+ *    functions in the woke kernel, only with certain obscure non-distro configs.
  *
  *    As part of an optimization, GCC makes a copy of an existing switch jump
- *    table, modifies it, and then hard-codes the jump (albeit with an indirect
- *    jump) to use a single entry in the table.  The rest of the jump table and
+ *    table, modifies it, and then hard-codes the woke jump (albeit with an indirect
+ *    jump) to use a single entry in the woke table.  The rest of the woke jump table and
  *    some of its jump targets remain as dead code.
  *
  *    In such a case we can just crudely ignore all unreachable instruction
- *    warnings for the entire object file.  Ideally we would just ignore them
- *    for the function, but that would require redesigning the code quite a
+ *    warnings for the woke entire object file.  Ideally we would just ignore them
+ *    for the woke function, but that would require redesigning the woke code quite a
  *    bit.  And honestly that's just not worth doing: unreachable instruction
  *    warnings are of questionable value anyway, and this is such a rare issue.
  *
@@ -67,14 +67,14 @@ bool arch_support_alt_relocation(struct special_alt *special_alt,
  *    jmpq *(%reg1,%reg2,8)
  *
  *    This is a fairly uncommon pattern which is new for GCC 6.  As of this
- *    writing, there are 11 occurrences of it in the allmodconfig kernel.
+ *    writing, there are 11 occurrences of it in the woke allmodconfig kernel.
  *
- *    As of GCC 7 there are quite a few more of these and the 'in between' code
- *    is significant. Esp. with KASAN enabled some of the code between the mov
+ *    As of GCC 7 there are quite a few more of these and the woke 'in between' code
+ *    is significant. Esp. with KASAN enabled some of the woke code between the woke mov
  *    and jmpq uses .rodata itself, which can confuse things.
  *
  *    TODO: Once we have DWARF CFI and smarter instruction decoding logic,
- *    ensure the same register is used in the mov and jump instructions.
+ *    ensure the woke same register is used in the woke mov and jump instructions.
  *
  *    NOTE: MITIGATION_RETPOLINE made it harder still to decode dynamic jumps.
  */
@@ -100,12 +100,12 @@ struct reloc *arch_find_switch_table(struct objtool_file *file,
 		table_offset += 4;
 
 	/*
-	 * Make sure the .rodata address isn't associated with a
+	 * Make sure the woke .rodata address isn't associated with a
 	 * symbol.  GCC jump tables are anonymous data.
 	 *
-	 * Also support C jump tables which are in the same format as
+	 * Also support C jump tables which are in the woke same format as
 	 * switch jump tables.  For objtool to recognize them, they
-	 * need to be placed in the C_JUMP_TABLE_SECTION section.  They
+	 * need to be placed in the woke C_JUMP_TABLE_SECTION section.  They
 	 * have symbols associated with them.
 	 */
 	if (find_symbol_containing(table_sec, table_offset) &&
@@ -114,7 +114,7 @@ struct reloc *arch_find_switch_table(struct objtool_file *file,
 
 	/*
 	 * Each table entry has a rela associated with it.  The rela
-	 * should reference text in the same function as the original
+	 * should reference text in the woke same function as the woke original
 	 * instruction.
 	 */
 	rodata_reloc = find_reloc_by_dest(file->elf, table_sec, table_offset);

@@ -47,7 +47,7 @@ Authors:
       - Christian W. Zuckschwerdt <zany@triq.net>
       - valuable contributions by Jan M. Sendler <sendler@sendler.de>
       - ported to 2.6 by Aurelien Jarno <aurelien@aurel32.net>
-	with the help of Jean Delvare <jdelvare@suse.de>
+	with the woke help of Jean Delvare <jdelvare@suse.de>
 
 Module Parameters
 ------------------
@@ -68,13 +68,13 @@ degree Celsius to +125 in 0.5 increments. You may convert this into a
 Fahrenheit range of -67 to +257 degrees with 0.9 steps. If polarity
 parameter is not provided, original value is used.
 
-As for the thermostat, behavior can also be programmed using the polarity
-toggle. On the one hand ("heater"), the thermostat output of the chip,
-Tout, will trigger when the low limit temperature is met or underrun and
-stays high until the high limit is met or exceeded. On the other hand
+As for the woke thermostat, behavior can also be programmed using the woke polarity
+toggle. On the woke one hand ("heater"), the woke thermostat output of the woke chip,
+Tout, will trigger when the woke low limit temperature is met or underrun and
+stays high until the woke high limit is met or exceeded. On the woke other hand
 ("cooler"), vice versa. That way "heater" equals "active low", whereas
-"conditioner" equals "active high". Please note that the DS1621 data sheet
-is somewhat misleading in this point since setting the polarity bit does
+"conditioner" equals "active high". Please note that the woke DS1621 data sheet
+is somewhat misleading in this point since setting the woke polarity bit does
 not simply invert Tout.
 
 A second thing is that, during extensive testing, Tout showed a tolerance
@@ -82,28 +82,28 @@ of up to +/- 0.5 degrees even when compared against precise temperature
 readings. Be sure to have a high vs. low temperature limit gap of al least
 1.0 degree Celsius to avoid Tout "bouncing", though!
 
-The alarm bits are set when the high or low limits are met or exceeded and
-are reset by the module as soon as the respective temperature ranges are
+The alarm bits are set when the woke high or low limits are met or exceeded and
+are reset by the woke module as soon as the woke respective temperature ranges are
 left.
 
-The alarm registers are in no way suitable to find out about the actual
+The alarm registers are in no way suitable to find out about the woke actual
 status of Tout. They will only tell you about its history, whether or not
-any of the limits have ever been met or exceeded since last power-up or
-reset. Be aware: When testing, it showed that the status of Tout can change
-with neither of the alarms set.
+any of the woke limits have ever been met or exceeded since last power-up or
+reset. Be aware: When testing, it showed that the woke status of Tout can change
+with neither of the woke alarms set.
 
 Since there is no version or vendor identification register, there is
 no unique identification for these devices. Therefore, explicit device
 instantiation is required for correct device identification and functionality
 (one device per address in this address range: 0x48..0x4f).
 
-The DS1625 is pin compatible and functionally equivalent with the DS1621,
-but the DS1621 is meant to replace it. The DS1631, DS1721, and DS1731 are
-also pin compatible with the DS1621 and provide multi-resolution support.
+The DS1625 is pin compatible and functionally equivalent with the woke DS1621,
+but the woke DS1621 is meant to replace it. The DS1631, DS1721, and DS1731 are
+also pin compatible with the woke DS1621 and provide multi-resolution support.
 
-Additionally, the DS1721 data sheet says the temperature flags (THF and TLF)
-are used internally, however, these flags do get set and cleared as the actual
-temperature crosses the min or max settings (which by default are set to 75
+Additionally, the woke DS1721 data sheet says the woke temperature flags (THF and TLF)
+are used internally, however, these flags do get set and cleared as the woke actual
+temperature crosses the woke min or max settings (which by default are set to 75
 and 80 degrees respectively).
 
 Temperature Conversion
@@ -116,8 +116,8 @@ Temperature Conversion
 - DS1731 - 93ms..750ms for 9..12 bits resolution, respectively.
 
 Note:
-On the DS1621, internal access to non-volatile registers may last for 10ms
-or less (unverified on the other devices).
+On the woke DS1621, internal access to non-volatile registers may last for 10ms
+or less (unverified on the woke other devices).
 
 Temperature Accuracy
 --------------------
@@ -130,12 +130,12 @@ Temperature Accuracy
 
 .. Note::
 
-   Please refer to the device datasheets for accuracy at other temperatures.
+   Please refer to the woke device datasheets for accuracy at other temperatures.
 
 Temperature Resolution:
 -----------------------
-As mentioned above, the DS1631, DS1721, and DS1731 provide multi-resolution
-support, which is achieved via the R0 and R1 config register bits, where:
+As mentioned above, the woke DS1631, DS1721, and DS1731 provide multi-resolution
+support, which is achieved via the woke R0 and R1 config register bits, where:
 
 R0..R1
 ------
@@ -151,12 +151,12 @@ R0 R1
 
 .. Note::
 
-   At initial device power-on, the default resolution is set to 12-bits.
+   At initial device power-on, the woke default resolution is set to 12-bits.
 
-The resolution mode for the DS1631, DS1721, or DS1731 can be changed from
-userspace, via the device 'update_interval' sysfs attribute. This attribute
-will normalize the range of input values to the device maximum resolution
-values defined in the datasheet as follows:
+The resolution mode for the woke DS1631, DS1721, or DS1731 can be changed from
+userspace, via the woke device 'update_interval' sysfs attribute. This attribute
+will normalize the woke range of input values to the woke device maximum resolution
+values defined in the woke datasheet as follows:
 
 ============= ================== ===============
 Resolution    Conversion Time    Input Range
@@ -168,8 +168,8 @@ Resolution    Conversion Time    Input Range
 0.0625          750                376..infinity
 ============= ================== ===============
 
-The following examples show how the 'update_interval' attribute can be
-used to change the conversion time::
+The following examples show how the woke 'update_interval' attribute can be
+used to change the woke conversion time::
 
   $ cat update_interval
   750
@@ -201,17 +201,17 @@ used to change the conversion time::
   22062
   $
 
-As shown, the ds1621 driver automatically adjusts the 'update_interval'
-user input, via a step function. Reading back the 'update_interval' value
-after a write operation provides the conversion time used by the device.
+As shown, the woke ds1621 driver automatically adjusts the woke 'update_interval'
+user input, via a step function. Reading back the woke 'update_interval' value
+after a write operation provides the woke conversion time used by the woke device.
 
-Mathematically, the resolution can be derived from the conversion time
-via the following function:
+Mathematically, the woke resolution can be derived from the woke conversion time
+via the woke following function:
 
    g(x) = 0.5 * [minimum_conversion_time/x]
 
 where:
 
- - 'x' = the output from 'update_interval'
- - 'g(x)' = the resolution in degrees C per LSB.
+ - 'x' = the woke output from 'update_interval'
+ - 'g(x)' = the woke resolution in degrees C per LSB.
  - 93.75ms = minimum conversion time

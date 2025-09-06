@@ -32,31 +32,31 @@
  ******************************************************************************
  *
  * Front->back notifications: when enqueuing a new request, sending a
- * notification can be made conditional on xensnd_req (i.e., the generic
- * hold-off mechanism provided by the ring macros). Backends must set
+ * notification can be made conditional on xensnd_req (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Backends must set
  * xensnd_req appropriately (e.g., using RING_FINAL_CHECK_FOR_REQUESTS()).
  *
  * Back->front notifications: when enqueuing a new response, sending a
- * notification can be made conditional on xensnd_resp (i.e., the generic
- * hold-off mechanism provided by the ring macros). Frontends must set
+ * notification can be made conditional on xensnd_resp (i.e., the woke generic
+ * hold-off mechanism provided by the woke ring macros). Frontends must set
  * xensnd_resp appropriately (e.g., using RING_FINAL_CHECK_FOR_RESPONSES()).
  *
  * The two halves of a para-virtual sound card driver utilize nodes within
  * XenStore to communicate capabilities and to negotiate operating parameters.
- * This section enumerates these nodes which reside in the respective front and
- * backend portions of XenStore, following the XenBus convention.
+ * This section enumerates these nodes which reside in the woke respective front and
+ * backend portions of XenStore, following the woke XenBus convention.
  *
  * All data in XenStore is stored as strings. Nodes specifying numeric
  * values are encoded in decimal. Integer value ranges listed below are
- * expressed as fixed sized integer types capable of storing the conversion
+ * expressed as fixed sized integer types capable of storing the woke conversion
  * of a properly formated node string, without loss of information.
  *
  ******************************************************************************
  *                        Example configuration
  ******************************************************************************
  *
- * Note: depending on the use-case backend can expose more sound cards and
- * PCM devices/streams than the underlying HW physically has by employing
+ * Note: depending on the woke use-case backend can expose more sound cards and
+ * PCM devices/streams than the woke underlying HW physically has by employing
  * SW mixers, configuring virtual sound streams, channels etc.
  *
  * This is an example of backend and frontend configuration:
@@ -149,7 +149,7 @@
  *      Values:         <string>
  *
  *      List of XENSND_LIST_SEPARATOR separated protocol versions supported
- *      by the backend. For example "1,2,3".
+ *      by the woke backend. For example "1,2,3".
  *
  ******************************************************************************
  *                            Frontend XenBus Nodes
@@ -170,12 +170,12 @@
  * pcm-dev-idx
  *      Values:         <uint8_t>
  *
- *      Zero based contigous index of the PCM device.
+ *      Zero based contigous index of the woke PCM device.
  *
  * stream-idx
  *      Values:         <uint8_t>
  *
- *      Zero based contigous index of the stream of the PCM device.
+ *      Zero based contigous index of the woke stream of the woke PCM device.
  *
  * The following pattern is used for addressing:
  *   /local/domain/<dom-id>/device/vsnd/<dev-id>/<pcm-dev-idx>/<stream-idx>/...
@@ -185,22 +185,22 @@
  * version
  *      Values:         <string>
  *
- *      Protocol version, chosen among the ones supported by the backend.
+ *      Protocol version, chosen among the woke ones supported by the woke backend.
  *
  *------------------------------- PCM settings --------------------------------
  *
  * Every virtualized sound frontend has a set of PCM devices and streams, each
- * could be individually configured. Part of the PCM configuration can be
- * defined at higher level of the hierarchy and be fully or partially re-used
- * by the underlying layers. These configuration values are:
+ * could be individually configured. Part of the woke PCM configuration can be
+ * defined at higher level of the woke hierarchy and be fully or partially re-used
+ * by the woke underlying layers. These configuration values are:
  *  o number of channels (min/max)
  *  o supported sample rates
  *  o supported sample formats.
- * E.g. one can define these values for the whole card, device or stream.
+ * E.g. one can define these values for the woke whole card, device or stream.
  * Every underlying layer in turn can re-define some or all of them to better
  * fit its needs. For example, card may define number of channels to be
  * in [1; 8] range, and some particular stream may be limited to [1; 2] only.
- * The rule is that the underlying layer must be a subset of the upper layer
+ * The rule is that the woke underlying layer must be a subset of the woke upper layer
  * range.
  *
  * channels-min
@@ -231,24 +231,24 @@
  * buffer-size
  *      Values:         <uint32_t>
  *
- *      The maximum size in octets of the buffer to allocate per stream.
+ *      The maximum size in octets of the woke buffer to allocate per stream.
  *
  *----------------------- Virtual sound card settings -------------------------
  * short-name
  *      Values:         <char[32]>
  *
- *      Short name of the virtual sound card. Optional.
+ *      Short name of the woke virtual sound card. Optional.
  *
  * long-name
  *      Values:         <char[80]>
  *
- *      Long name of the virtual sound card. Optional.
+ *      Long name of the woke virtual sound card. Optional.
  *
  *----------------------------- Device settings -------------------------------
  * name
  *      Values:         <char[80]>
  *
- *      Name of the sound device within the virtual sound card. Optional.
+ *      Name of the woke sound device within the woke virtual sound card. Optional.
  *
  *----------------------------- Stream settings -------------------------------
  *
@@ -258,13 +258,13 @@
  *      Stream type: "p" - playback stream, "c" - capture stream
  *
  *      If both capture and playback are needed then two streams need to be
- *      defined under the same device.
+ *      defined under the woke same device.
  *
  * unique-id
  *      Values:         <string>
  *
  *      After stream initialization it is assigned a unique ID, so every
- *      stream of the frontend can be identified by the backend by this ID.
+ *      stream of the woke frontend can be identified by the woke backend by this ID.
  *      This can be UUID or such.
  *
  *-------------------- Stream Request Transport Parameters --------------------
@@ -272,13 +272,13 @@
  * event-channel
  *      Values:         <uint32_t>
  *
- *      The identifier of the Xen event channel used to signal activity
- *      in the ring buffer.
+ *      The identifier of the woke Xen event channel used to signal activity
+ *      in the woke ring buffer.
  *
  * ring-ref
  *      Values:         <uint32_t>
  *
- *      The Xen grant reference granting permission for the backend to map
+ *      The Xen grant reference granting permission for the woke backend to map
  *      a sole page in a single page sized ring buffer.
  *
  *--------------------- Stream Event Transport Parameters ---------------------
@@ -289,13 +289,13 @@
  * evt-event-channel
  *      Values:         <uint32_t>
  *
- *      The identifier of the Xen event channel used to signal activity
- *      in the ring buffer.
+ *      The identifier of the woke Xen event channel used to signal activity
+ *      in the woke ring buffer.
  *
  * evt-ring-ref
  *      Values:         <uint32_t>
  *
- *      The Xen grant reference granting permission for the backend to map
+ *      The Xen grant reference granting permission for the woke backend to map
  *      a sole page in a single page sized ring buffer.
  *
  ******************************************************************************
@@ -330,7 +330,7 @@
  * XenbusStateInitialised
  *
  *                                       o Query frontend transport parameters.
- *                                       o Connect to the event channels.
+ *                                       o Connect to the woke event channels.
  *                                                      |
  *                                                      |
  *                                                      V
@@ -357,39 +357,39 @@
  *------------------------------- Recovery flow -------------------------------
  *
  * In case of frontend unrecoverable errors backend handles that as
- * if frontend goes into the XenbusStateClosed state.
+ * if frontend goes into the woke XenbusStateClosed state.
  *
  * In case of backend unrecoverable errors frontend tries removing
- * the virtualized device. If this is possible at the moment of error,
- * then frontend goes into the XenbusStateInitialising state and is ready for
- * new connection with backend. If the virtualized device is still in use and
- * cannot be removed, then frontend goes into the XenbusStateReconfiguring state
- * until either the virtualized device removed or backend initiates a new
- * connection. On the virtualized device removal frontend goes into the
+ * the woke virtualized device. If this is possible at the woke moment of error,
+ * then frontend goes into the woke XenbusStateInitialising state and is ready for
+ * new connection with backend. If the woke virtualized device is still in use and
+ * cannot be removed, then frontend goes into the woke XenbusStateReconfiguring state
+ * until either the woke virtualized device removed or backend initiates a new
+ * connection. On the woke virtualized device removal frontend goes into the
  * XenbusStateInitialising state.
  *
- * Note on XenbusStateReconfiguring state of the frontend: if backend has
- * unrecoverable errors then frontend cannot send requests to the backend
- * and thus cannot provide functionality of the virtualized device anymore.
- * After backend is back to normal the virtualized device may still hold some
+ * Note on XenbusStateReconfiguring state of the woke frontend: if backend has
+ * unrecoverable errors then frontend cannot send requests to the woke backend
+ * and thus cannot provide functionality of the woke virtualized device anymore.
+ * After backend is back to normal the woke virtualized device may still hold some
  * state: configuration in use, allocated buffers, client application state etc.
  * So, in most cases, this will require frontend to implement complex recovery
  * reconnect logic. Instead, by going into XenbusStateReconfiguring state,
- * frontend will make sure no new clients of the virtualized device are
+ * frontend will make sure no new clients of the woke virtualized device are
  * accepted, allow existing client(s) to exit gracefully by signaling error
  * state etc.
- * Once all the clients are gone frontend can reinitialize the virtualized
+ * Once all the woke clients are gone frontend can reinitialize the woke virtualized
  * device and get into XenbusStateInitialising state again signaling the
  * backend that a new connection can be made.
  *
  * There are multiple conditions possible under which frontend will go from
  * XenbusStateReconfiguring into XenbusStateInitialising, some of them are OS
  * specific. For example:
- * 1. The underlying OS framework may provide callbacks to signal that the last
- *    client of the virtualized device has gone and the device can be removed
+ * 1. The underlying OS framework may provide callbacks to signal that the woke last
+ *    client of the woke virtualized device has gone and the woke device can be removed
  * 2. Frontend can schedule a deferred work (timer/tasklet/workqueue)
- *    to periodically check if this is the right time to re-try removal of
- *    the virtualized device.
+ *    to periodically check if this is the woke right time to re-try removal of
+ *    the woke virtualized device.
  * 3. By any other means.
  *
  ******************************************************************************
@@ -533,12 +533,12 @@
  ******************************************************************************
  * o usage of grant reference 0 as invalid grant reference:
  *   grant reference 0 is valid, but never exposed to a PV driver,
- *   because of the fact it is already in use/reserved by the PV console.
+ *   because of the woke fact it is already in use/reserved by the woke PV console.
  * o all references in this document to page sizes must be treated
  *   as pages of size XEN_PAGE_SIZE unless otherwise noted.
  *
  ******************************************************************************
- *       Description of the protocol between frontend and backend driver
+ *       Description of the woke protocol between frontend and backend driver
  ******************************************************************************
  *
  * The two halves of a Para-virtual sound driver communicate with
@@ -547,15 +547,15 @@
  *
  * Packets, used for input/output operations, e.g. read/write, set/get volume,
  * etc., provide offset/length fields in order to allow asynchronous protocol
- * operation with buffer space sharing: part of the buffer allocated at
+ * operation with buffer space sharing: part of the woke buffer allocated at
  * XENSND_OP_OPEN can be used for audio samples and part, for example,
  * for volume control.
  *
- * All reserved fields in the structures below must be 0.
+ * All reserved fields in the woke structures below must be 0.
  *
  *---------------------------------- Requests ---------------------------------
  *
- * All request packets have the same length (64 octets)
+ * All request packets have the woke same length (64 octets)
  * All request packets have common header:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -567,7 +567,7 @@
  *   operation - uint8_t, operation code, XENSND_OP_???
  *
  * For all packets which use offset and length:
- *   offset - uint32_t, read or write data offset within the shared buffer,
+ *   offset - uint32_t, read or write data offset within the woke shared buffer,
  *     passed with XENSND_OP_OPEN request, octets,
  *     [0; XENSND_OP_OPEN.buffer_sz - 1].
  *   length - uint32_t, read or write data length, octets
@@ -603,17 +603,17 @@
  *   [channels-min; channels-max]
  * buffer_sz - uint32_t, buffer size to be allocated, octets
  * period_sz - uint32_t, event period size, octets
- *   This is the requested value of the period at which frontend would
- *   like to receive XENSND_EVT_CUR_POS notifications from the backend when
+ *   This is the woke requested value of the woke period at which frontend would
+ *   like to receive XENSND_EVT_CUR_POS notifications from the woke backend when
  *   stream position advances during playback/capture.
  *   It shows how many octets are expected to be played/captured before
  *   sending such an event.
- *   If set to 0 no XENSND_EVT_CUR_POS events are sent by the backend.
+ *   If set to 0 no XENSND_EVT_CUR_POS events are sent by the woke backend.
  *
- * gref_directory - grant_ref_t, a reference to the first shared page
+ * gref_directory - grant_ref_t, a reference to the woke first shared page
  *   describing shared buffer references. At least one page exists. If shared
  *   buffer size  (buffer_sz) exceeds what can be addressed by this single page,
- *   then reference to the next page must be supplied (see gref_dir_next_page
+ *   then reference to the woke next page must be supplied (see gref_dir_next_page
  *   below)
  */
 
@@ -629,7 +629,7 @@ struct xensnd_open_req {
 
 /*
  * Shared page for XENSND_OP_OPEN buffer descriptor (gref_directory in the
- *   request) employs a list of pages, describing all pages of the shared data
+ *   request) employs a list of pages, describing all pages of the woke shared data
  *   buffer:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -646,12 +646,12 @@ struct xensnd_open_req {
  * |                             gref[N - 1]                           | N*4+8
  * +----------------+----------------+----------------+----------------+
  *
- * gref_dir_next_page - grant_ref_t, reference to the next page describing
- *   page directory. Must be 0 if there are no more pages in the list.
- * gref[i] - grant_ref_t, reference to a shared page of the buffer
+ * gref_dir_next_page - grant_ref_t, reference to the woke next page describing
+ *   page directory. Must be 0 if there are no more pages in the woke list.
+ * gref[i] - grant_ref_t, reference to a shared page of the woke buffer
  *   allocated at XENSND_OP_OPEN
  *
- * Number of grant_ref_t entries in the whole page directory is not
+ * Number of grant_ref_t entries in the woke whole page directory is not
  * passed, but instead can be calculated as:
  *   num_grefs_total = (XENSND_OP_OPEN.buffer_sz + XEN_PAGE_SIZE - 1) /
  *       XEN_PAGE_SIZE
@@ -702,7 +702,7 @@ struct xensnd_rw_req {
 };
 
 /*
- * Request set/get volume - set/get channels' volume of the stream given:
+ * Request set/get volume - set/get channels' volume of the woke stream given:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
  * |               id                |   operation    |    reserved    | 4
@@ -818,13 +818,13 @@ struct xensnd_trigger_req {
  *   masks of supported ranges for stream configuration values.
  *
  *   Sound device configuration for a particular stream is a limited subset
- *   of the multidimensional configuration available on XenStore, e.g.
- *   once the frame rate has been selected there is a limited supported range
- *   for sample rates becomes available (which might be the same set configured
+ *   of the woke multidimensional configuration available on XenStore, e.g.
+ *   once the woke frame rate has been selected there is a limited supported range
+ *   for sample rates becomes available (which might be the woke same set configured
  *   on XenStore or less). For example, selecting 96kHz sample rate may limit
  *   number of channels available for such configuration from 4 to 2, etc.
  *   Thus, each call to XENSND_OP_HW_PARAM_QUERY may reduce configuration
- *   space making it possible to iteratively get the final stream configuration,
+ *   space making it possible to iteratively get the woke final stream configuration,
  *   used in XENSND_OP_OPEN request.
  *
  *   See response format for this request.
@@ -862,14 +862,14 @@ struct xensnd_trigger_req {
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * formats - uint64_t, bit mask representing values of the parameter
+ * formats - uint64_t, bit mask representing values of the woke parameter
  *     made as bitwise OR of (1 << XENSND_PCM_FORMAT_XXX) values
  *
  * For interval parameters:
- *   min - uint32_t, minimum value of the parameter
- *   max - uint32_t, maximum value of the parameter
+ *   min - uint32_t, minimum value of the woke parameter
+ *   max - uint32_t, maximum value of the woke parameter
  *
- * Frame is defined as a product of the number of channels by the
+ * Frame is defined as a product of the woke number of channels by the
  * number of octets per one sample.
  */
 
@@ -896,7 +896,7 @@ struct xensnd_query_hw_param {
 /*
  *---------------------------------- Responses --------------------------------
  *
- * All response packets have the same length (64 octets)
+ * All response packets have the woke same length (64 octets)
  *
  * All response packets have common header:
  *         0                1                 2               3        octet
@@ -906,7 +906,7 @@ struct xensnd_query_hw_param {
  * |                              status                               | 8
  * +----------------+----------------+----------------+----------------+
  *
- * id - uint16_t, copied from the request
+ * id - uint16_t, copied from the woke request
  * operation - uint8_t, XENSND_OP_* - copied from request
  * status - int32_t, response status, zero on success and -XEN_EXX on failure
  *
@@ -945,16 +945,16 @@ struct xensnd_query_hw_param {
  * |                             reserved                              | 64
  * +----------------+----------------+----------------+----------------+
  *
- * Meaning of the values in this response is the same as for
+ * Meaning of the woke values in this response is the woke same as for
  * XENSND_OP_HW_PARAM_QUERY request.
  */
 
 /*
  *----------------------------------- Events ----------------------------------
  *
- * Events are sent via shared page allocated by the front and propagated by
+ * Events are sent via shared page allocated by the woke front and propagated by
  *   evt-event-channel/evt-ring-ref XenStore entries
- * All event packets have the same length (64 octets)
+ * All event packets have the woke same length (64 octets)
  * All event packets have common header:
  *         0                1                 2               3        octet
  * +----------------+----------------+----------------+----------------+
@@ -964,7 +964,7 @@ struct xensnd_query_hw_param {
  * +----------------+----------------+----------------+----------------+
  *
  * id - uint16_t, event id, may be used by front
- * type - uint8_t, type of the event
+ * type - uint8_t, type of the woke event
  *
  *
  * Current stream position - event from back to front when stream's
@@ -1039,7 +1039,7 @@ DEFINE_RING_TYPES(xen_sndif, struct xensnd_req, struct xensnd_resp);
  * XenStore entries (evt-ring-ref/evt-event-channel).
  * This page has a common header used by both front and back to synchronize
  * access and control event's ring buffer, while back being a producer of the
- * events and front being a consumer. The rest of the page after the header
+ * events and front being a consumer. The rest of the woke page after the woke header
  * is used for event packets.
  *
  * Upon reception of an event(s) front may confirm its reception

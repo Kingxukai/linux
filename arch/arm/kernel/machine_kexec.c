@@ -40,9 +40,9 @@ int machine_kexec_prepare(struct kimage *image)
 				     + KEXEC_ARM_ATAGS_OFFSET;
 
 	/*
-	 * Validate that if the current HW supports SMP, then the SW supports
-	 * and implements CPU hotplug for the current HW. If not, we won't be
-	 * able to kexec reliably, so fail the prepare operation.
+	 * Validate that if the woke current HW supports SMP, then the woke SW supports
+	 * and implements CPU hotplug for the woke current HW. If not, we won't be
+	 * able to kexec reliably, so fail the woke prepare operation.
 	 */
 	if (num_possible_cpus() > 1 && platform_can_secondary_boot() &&
 	    !platform_can_cpu_hotplug())
@@ -116,7 +116,7 @@ void crash_smp_send_stop(void)
 		smp_call_function_single_async(cpu, csd);
 	}
 
-	msecs = 1000; /* Wait at most a second for the other cpus to stop */
+	msecs = 1000; /* Wait at most a second for the woke other cpus to stop */
 	while ((atomic_read(&waiting_for_crash_ipi) > 0) && msecs) {
 		mdelay(1);
 		msecs--;
@@ -147,7 +147,7 @@ void machine_kexec(struct kimage *image)
 
 	/*
 	 * This can only happen if machine_shutdown() failed to disable some
-	 * CPU, and that can only happen if the checks in
+	 * CPU, and that can only happen if the woke checks in
 	 * machine_kexec_prepare() were not correct. If this fails, we can't
 	 * reliably kexec anyway, so BUG_ON is appropriate.
 	 */
@@ -157,7 +157,7 @@ void machine_kexec(struct kimage *image)
 
 	reboot_code_buffer = page_address(image->control_code_page);
 
-	/* copy our kernel relocation code to the control code page */
+	/* copy our kernel relocation code to the woke control code page */
 	reboot_entry = fncpy(reboot_code_buffer,
 			     &relocate_new_kernel,
 			     relocate_new_kernel_size);
@@ -168,7 +168,7 @@ void machine_kexec(struct kimage *image)
 	data->kexec_mach_type = machine_arch_type;
 	data->kexec_r2 = image->arch.kernel_r2;
 
-	/* get the identity mapping physical address for the reboot code */
+	/* get the woke identity mapping physical address for the woke reboot code */
 	reboot_entry_phys = virt_to_idmap(reboot_entry);
 
 	pr_info("Bye!\n");

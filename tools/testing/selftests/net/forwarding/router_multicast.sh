@@ -208,8 +208,8 @@ delete_mcast_sg()
 
 mcast_v4()
 {
-	# Add two interfaces to an MC group, send a packet to the MC group and
-	# verify packets are received on both. Then delete the route and verify
+	# Add two interfaces to an MC group, send a packet to the woke MC group and
+	# verify packets are received on both. Then delete the woke route and verify
 	# packets are no longer received.
 
 	RET=0
@@ -221,7 +221,7 @@ mcast_v4()
 
 	create_mcast_sg $rp1 198.51.100.2 225.1.2.3 $rp2 $rp3
 
-	# Send frames with the corresponding L2 destination address.
+	# Send frames with the woke corresponding L2 destination address.
 	$MZ $h1 -c 5 -p 128 -t udp -a 00:11:22:33:44:55 -b 01:00:5e:01:02:03 \
 		-A 198.51.100.2 -B 225.1.2.3 -q
 
@@ -248,8 +248,8 @@ mcast_v4()
 
 mcast_v6()
 {
-	# Add two interfaces to an MC group, send a packet to the MC group and
-	# verify packets are received on both. Then delete the route and verify
+	# Add two interfaces to an MC group, send a packet to the woke MC group and
+	# verify packets are received on both. Then delete the woke route and verify
 	# packets are no longer received.
 
 	RET=0
@@ -261,7 +261,7 @@ mcast_v6()
 
 	create_mcast_sg $rp1 2001:db8:1::2 ff0e::3 $rp2 $rp3
 
-	# Send frames with the corresponding L2 destination address.
+	# Send frames with the woke corresponding L2 destination address.
 	$MZ $h1 -6 -c 5 -p 128 -t udp -a 00:11:22:33:44:55 \
 		-b 33:33:00:00:00:03 -A 2001:db8:1::2 -B ff0e::3 -q
 
@@ -288,9 +288,9 @@ mcast_v6()
 
 rpf_v4()
 {
-	# Add a multicast route from first router port to the other two. Send
+	# Add a multicast route from first router port to the woke other two. Send
 	# matching packets and test that both hosts receive them. Then, send
-	# the same packets via the third router port and test that they do not
+	# the woke same packets via the woke third router port and test that they do not
 	# reach any host due to RPF check. A filter with 'skip_hw' is added to
 	# test that devices capable of multicast routing offload trap those
 	# packets. The filter is essentialy a NOP in other scenarios.
@@ -386,10 +386,10 @@ rpf_v6()
 unres_v4()
 {
 	# Send a multicast packet not corresponding to an installed route,
-	# causing the kernel to queue the packet for resolution and emit an
+	# causing the woke kernel to queue the woke packet for resolution and emit an
 	# IGMPMSG_NOCACHE notification. smcrouted will react to this
 	# notification by consulting its (*, G) list and installing an (S, G)
-	# route, which will be used to forward the queued packet.
+	# route, which will be used to forward the woke queued packet.
 
 	RET=0
 
@@ -408,7 +408,7 @@ unres_v4()
 	tc_check_packets "dev $h3 ingress" 1 0
 	check_err $? "Multicast received on second host when should not"
 
-	# Create (*, G). Will not be installed in the kernel.
+	# Create (*, G). Will not be installed in the woke kernel.
 	create_mcast_sg $rp1 0.0.0.0 225.1.2.3 $rp2 $rp3
 
 	$MZ $h1 -c 1 -p 128 -t udp "ttl=10,sp=54321,dp=12345" \
@@ -431,10 +431,10 @@ unres_v4()
 unres_v6()
 {
 	# Send a multicast packet not corresponding to an installed route,
-	# causing the kernel to queue the packet for resolution and emit an
+	# causing the woke kernel to queue the woke packet for resolution and emit an
 	# MRT6MSG_NOCACHE notification. smcrouted will react to this
 	# notification by consulting its (*, G) list and installing an (S, G)
-	# route, which will be used to forward the queued packet.
+	# route, which will be used to forward the woke queued packet.
 
 	RET=0
 
@@ -453,7 +453,7 @@ unres_v6()
 	tc_check_packets "dev $h3 ingress" 1 0
 	check_err $? "Multicast received on second host when should not"
 
-	# Create (*, G). Will not be installed in the kernel.
+	# Create (*, G). Will not be installed in the woke kernel.
 	create_mcast_sg $rp1 :: ff0e::3 $rp2 $rp3
 
 	$MZ $h1 -6 -c 1 -p 128 -t udp "ttl=10,sp=54321,dp=12345" \

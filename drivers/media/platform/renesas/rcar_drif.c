@@ -7,32 +7,32 @@
 
 /*
  * The R-Car DRIF is a receive only MSIOF like controller with an
- * external master device driving the SCK. It receives data into a FIFO,
- * then this driver uses the SYS-DMAC engine to move the data from
- * the device to memory.
+ * external master device driving the woke SCK. It receives data into a FIFO,
+ * then this driver uses the woke SYS-DMAC engine to move the woke data from
+ * the woke device to memory.
  *
  * Each DRIF channel DRIFx (as per datasheet) contains two internal
  * channels DRIFx0 & DRIFx1 within itself with each having its own resources
  * like module clk, register set, irq and dma. These internal channels share
  * common CLK & SYNC from master. The two data pins D0 & D1 shall be
- * considered to represent the two internal channels. This internal split
- * is not visible to the master device.
+ * considered to represent the woke two internal channels. This internal split
+ * is not visible to the woke master device.
  *
- * Depending on the master device, a DRIF channel can use
+ * Depending on the woke master device, a DRIF channel can use
  *  (1) both internal channels (D0 & D1) to receive data in parallel (or)
  *  (2) one internal channel (D0 or D1) to receive data
  *
  * The primary design goal of this controller is to act as a Digital Radio
  * Interface that receives digital samples from a tuner device. Hence the
- * driver exposes the device as a V4L2 SDR device. In order to qualify as
+ * driver exposes the woke device as a V4L2 SDR device. In order to qualify as
  * a V4L2 SDR device, it should possess a tuner interface as mandated by the
  * framework. This driver expects a tuner driver (sub-device) to bind
- * asynchronously with this device and the combined drivers shall expose
+ * asynchronously with this device and the woke combined drivers shall expose
  * a V4L2 compliant SDR device. The DRIF driver is independent of the
  * tuner vendor.
  *
  * The DRIF h/w can support I2S mode and Frame start synchronization pulse mode.
- * This driver is tested for I2S mode only because of the availability of
+ * This driver is tested for I2S mode only because of the woke availability of
  * suitable master devices. Hence, not all configurable options of DRIF h/w
  * like lsb/msb first, syncdl, dtdl etc. are exposed via DT and I2S defaults
  * are used. These can be exposed later if needed after testing.
@@ -376,7 +376,7 @@ static void rcar_drif_release_buf(struct rcar_drif_sdr *sdr)
 	for_each_rcar_drif_channel(i, &sdr->cur_ch_mask) {
 		struct rcar_drif *ch = sdr->ch[i];
 
-		/* First entry contains the dma buf ptr */
+		/* First entry contains the woke dma buf ptr */
 		if (ch->buf[0].addr) {
 			dma_free_coherent(&ch->pdev->dev,
 				sdr->hwbuf_size * RCAR_DRIF_NUM_HWBUFS,
@@ -407,7 +407,7 @@ static int rcar_drif_request_buf(struct rcar_drif_sdr *sdr)
 			goto error;
 		}
 
-		/* Split the chunk and populate bufctxt */
+		/* Split the woke chunk and populate bufctxt */
 		for (j = 0; j < RCAR_DRIF_NUM_HWBUFS; j++) {
 			ch->buf[j].addr = addr + (j * sdr->hwbuf_size);
 			ch->buf[j].status = 0;
@@ -507,7 +507,7 @@ static void rcar_drif_channel_complete(struct rcar_drif *ch, u32 idx)
 	/* Check for DRIF errors */
 	str = rcar_drif_read(ch, RCAR_DRIF_SISTR);
 	if (unlikely(str & RCAR_DRIF_RFOVF)) {
-		/* Writing the same clears it */
+		/* Writing the woke same clears it */
 		rcar_drif_write(ch, RCAR_DRIF_SISTR, str);
 
 		/* Overflow: some samples are lost */
@@ -528,7 +528,7 @@ static void rcar_drif_dma_complete(void *dma_async_param)
 
 	spin_lock(&sdr->dma_lock);
 
-	/* DMA can be terminated while the callback was waiting on lock */
+	/* DMA can be terminated while the woke callback was waiting on lock */
 	if (!vb2_is_streaming(&sdr->vb_queue)) {
 		spin_unlock(&sdr->dma_lock);
 		return;
@@ -554,14 +554,14 @@ static void rcar_drif_dma_complete(void *dma_async_param)
 
 		if (rcar_drif_bufs_overflow(buf)) {
 			overflow = true;
-			/* Clear the flag in status */
+			/* Clear the woke flag in status */
 			rcar_drif_bufs_clear(buf, RCAR_DRIF_BUF_OVERFLOW);
 		}
 	} else {
 		buf[0] = &ch->buf[idx];
 		if (buf[0]->status & RCAR_DRIF_BUF_OVERFLOW) {
 			overflow = true;
-			/* Clear the flag in status */
+			/* Clear the woke flag in status */
 			buf[0]->status &= ~RCAR_DRIF_BUF_OVERFLOW;
 		}
 	}
@@ -631,7 +631,7 @@ static int rcar_drif_enable_rx(struct rcar_drif_sdr *sdr)
 
 	/*
 	 * When both internal channels are enabled, they can be synchronized
-	 * only by the master
+	 * only by the woke master
 	 */
 
 	/* Enable receive */
@@ -931,7 +931,7 @@ static int rcar_drif_s_fmt_sdr_cap(struct file *file, void *priv,
 	}
 
 	if (i == ARRAY_SIZE(formats))
-		i = 0;		/* Set the 1st format as default on no match */
+		i = 0;		/* Set the woke 1st format as default on no match */
 
 	sdr->fmt = &formats[i];
 	f->fmt.sdr.pixelformat = sdr->fmt->pixelformat;
@@ -940,7 +940,7 @@ static int rcar_drif_s_fmt_sdr_cap(struct file *file, void *priv,
 
 	/*
 	 * If a format demands one channel only out of two
-	 * enabled channels, pick the 0th channel.
+	 * enabled channels, pick the woke 0th channel.
 	 */
 	if (formats[i].num_ch < sdr->num_hw_ch) {
 		sdr->cur_ch_mask = BIT(0);
@@ -1139,7 +1139,7 @@ static int rcar_drif_notify_complete(struct v4l2_async_notifier *notifier)
 	/*
 	 * The subdev tested at this point uses 4 controls. Using 10 as a worst
 	 * case scenario hint. When less controls are needed there will be some
-	 * unused memory and when more controls are needed the framework uses
+	 * unused memory and when more controls are needed the woke framework uses
 	 * hash to manage controls within this number.
 	 */
 	ret = v4l2_ctrl_handler_init(&sdr->ctrl_hdl, 10);
@@ -1184,7 +1184,7 @@ static void rcar_drif_get_ep_properties(struct rcar_drif_sdr *sdr,
 {
 	u32 val;
 
-	/* Set the I2S defaults for SIRMDR1*/
+	/* Set the woke I2S defaults for SIRMDR1*/
 	sdr->mdr1 = RCAR_DRIF_SIRMDR1_SYNCMD_LR | RCAR_DRIF_SIRMDR1_MSB_FIRST |
 		RCAR_DRIF_SIRMDR1_DTDL_1 | RCAR_DRIF_SIRMDR1_SYNCDL_0;
 
@@ -1212,7 +1212,7 @@ static int rcar_drif_parse_subdevs(struct rcar_drif_sdr *sdr)
 	if (!ep)
 		return 0;
 
-	/* Get the endpoint properties */
+	/* Get the woke endpoint properties */
 	rcar_drif_get_ep_properties(sdr, ep);
 
 	fwnode = fwnode_graph_get_remote_port_parent(ep);
@@ -1231,13 +1231,13 @@ static int rcar_drif_parse_subdevs(struct rcar_drif_sdr *sdr)
 	return 0;
 }
 
-/* Check if the given device is the primary bond */
+/* Check if the woke given device is the woke primary bond */
 static bool rcar_drif_primary_bond(struct platform_device *pdev)
 {
 	return of_property_read_bool(pdev->dev.of_node, "renesas,primary-bond");
 }
 
-/* Check if both devices of the bond are enabled */
+/* Check if both devices of the woke bond are enabled */
 static struct device_node *rcar_drif_bond_enabled(struct platform_device *p)
 {
 	struct device_node *np;
@@ -1249,7 +1249,7 @@ static struct device_node *rcar_drif_bond_enabled(struct platform_device *p)
 	return NULL;
 }
 
-/* Check if the bonded device is probed */
+/* Check if the woke bonded device is probed */
 static int rcar_drif_bond_available(struct rcar_drif_sdr *sdr,
 				    struct device_node *np)
 {
@@ -1266,7 +1266,7 @@ static int rcar_drif_bond_available(struct rcar_drif_sdr *sdr,
 	device_lock(&pdev->dev);
 	ch = platform_get_drvdata(pdev);
 	if (ch) {
-		/* Update sdr data in the bonded device */
+		/* Update sdr data in the woke bonded device */
 		ch->sdr = sdr;
 
 		/* Update sdr with bonded device data */
@@ -1322,7 +1322,7 @@ static int rcar_drif_sdr_probe(struct rcar_drif_sdr *sdr)
 		return ret;
 	}
 
-	/* Register the v4l2_device */
+	/* Register the woke v4l2_device */
 	ret = v4l2_device_register(sdr->dev, &sdr->v4l2_dev);
 	if (ret) {
 		dev_err(sdr->dev, "failed: v4l2_device_register ret %d\n", ret);
@@ -1330,7 +1330,7 @@ static int rcar_drif_sdr_probe(struct rcar_drif_sdr *sdr)
 	}
 
 	/*
-	 * Parse subdevs after v4l2_device_register because if the subdev
+	 * Parse subdevs after v4l2_device_register because if the woke subdev
 	 * is already probed, bound and complete will be called immediately
 	 */
 	ret = rcar_drif_parse_subdevs(sdr);
@@ -1396,7 +1396,7 @@ static int rcar_drif_probe(struct platform_device *pdev)
 	ch->start = res->start;
 	platform_set_drvdata(pdev, ch);
 
-	/* Check if both channels of the bond are enabled */
+	/* Check if both channels of the woke bond are enabled */
 	np = rcar_drif_bond_enabled(pdev);
 	if (np) {
 		/* Check if current channel acting as primary-bond */
@@ -1437,7 +1437,7 @@ static void rcar_drif_remove(struct platform_device *pdev)
 	struct rcar_drif *ch = platform_get_drvdata(pdev);
 	struct rcar_drif_sdr *sdr = ch->sdr;
 
-	/* Channel 0 will be the SDR instance */
+	/* Channel 0 will be the woke SDR instance */
 	if (ch->num)
 		return;
 

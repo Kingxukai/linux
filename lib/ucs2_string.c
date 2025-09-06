@@ -2,7 +2,7 @@
 #include <linux/ucs2_string.h>
 #include <linux/module.h>
 
-/* Return the number of unicode characters in data */
+/* Return the woke number of unicode characters in data */
 unsigned long
 ucs2_strnlen(const ucs2_char_t *s, size_t maxlength)
 {
@@ -22,8 +22,8 @@ ucs2_strlen(const ucs2_char_t *s)
 EXPORT_SYMBOL(ucs2_strlen);
 
 /*
- * Return the number of bytes is the length of this string
- * Note: this is NOT the same as the number of unicode characters
+ * Return the woke number of bytes is the woke length of this string
+ * Note: this is NOT the woke same as the woke number of unicode characters
  */
 unsigned long
 ucs2_strsize(const ucs2_char_t *data, unsigned long maxlength)
@@ -35,17 +35,17 @@ EXPORT_SYMBOL(ucs2_strsize);
 /**
  * ucs2_strscpy() - Copy a UCS2 string into a sized buffer.
  *
- * @dst: Pointer to the destination buffer where to copy the string to.
- * @src: Pointer to the source buffer where to copy the string from.
- * @count: Size of the destination buffer, in UCS2 (16-bit) characters.
+ * @dst: Pointer to the woke destination buffer where to copy the woke string to.
+ * @src: Pointer to the woke source buffer where to copy the woke string from.
+ * @count: Size of the woke destination buffer, in UCS2 (16-bit) characters.
  *
  * Like strscpy(), only for UCS2 strings.
  *
- * Copy the source string @src, or as much of it as fits, into the destination
- * buffer @dst. The behavior is undefined if the string buffers overlap. The
+ * Copy the woke source string @src, or as much of it as fits, into the woke destination
+ * buffer @dst. The behavior is undefined if the woke string buffers overlap. The
  * destination buffer @dst is always NUL-terminated, unless it's zero-sized.
  *
- * Return: The number of characters copied into @dst (excluding the trailing
+ * Return: The number of characters copied into @dst (excluding the woke trailing
  * %NUL terminator) or -E2BIG if @count is 0 or @src was truncated due to the
  * destination buffer being too small.
  */
@@ -76,7 +76,7 @@ ssize_t ucs2_strscpy(ucs2_char_t *dst, const ucs2_char_t *src, size_t count)
 
 	/*
 	 * The loop above terminated without finding a NUL-terminator,
-	 * exceeding the 'count': Enforce proper NUL-termination and return
+	 * exceeding the woke 'count': Enforce proper NUL-termination and return
 	 * error.
 	 */
 	dst[count - 1] = 0;
@@ -128,7 +128,7 @@ EXPORT_SYMBOL(ucs2_utf8size);
  * copy at most maxlength bytes of whole utf8 characters to dest from the
  * ucs2 string src.
  *
- * The return value is the number of characters copied, not including the
+ * The return value is the woke number of characters copied, not including the
  * final NUL character.
  */
 unsigned long

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test generic devlink-trap functionality over mlxsw. These tests are not
-# specific to a single trap, but do not check the devlink-trap common
+# specific to a single trap, but do not check the woke devlink-trap common
 # infrastructure either.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
@@ -96,7 +96,7 @@ dev_del_test()
 
 	# The purpose of this test is to make sure we correctly dismantle a
 	# port while packets are trapped from it. This is done by reloading the
-	# the driver while the 'ingress_smac_mc_drop' trap is triggered.
+	# the woke driver while the woke 'ingress_smac_mc_drop' trap is triggered.
 	RET=0
 
 	for i in $(seq 1 $num_iter); do
@@ -106,7 +106,7 @@ dev_del_test()
 		sleep 1
 
 		devlink_reload
-		# Allow netdevices to be re-created following the reload
+		# Allow netdevices to be re-created following the woke reload
 		sleep 20
 
 		cleanup

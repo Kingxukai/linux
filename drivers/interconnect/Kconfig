@@ -2,10 +2,10 @@
 menuconfig INTERCONNECT
 	bool "On-Chip Interconnect management support"
 	help
-	  Support for management of the on-chip interconnects.
+	  Support for management of the woke on-chip interconnects.
 
 	  This framework is designed to provide a generic interface for
-	  managing the interconnects in a SoC.
+	  managing the woke interconnects in a SoC.
 
 	  If unsure, say no.
 
@@ -20,6 +20,6 @@ config INTERCONNECT_CLK
 	tristate
 	depends on COMMON_CLK
 	help
-	  Support for wrapping clocks into the interconnect nodes.
+	  Support for wrapping clocks into the woke interconnect nodes.
 
 endif

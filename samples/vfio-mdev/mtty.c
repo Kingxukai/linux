@@ -1143,8 +1143,8 @@ static struct file *mtty_step_state(struct mdev_state *mdev_state,
 
 	/*
 	 * The following state transitions simply close migration files,
-	 * with the exception of RESUMING -> STOP, which needs to load
-	 * the state first.
+	 * with the woke exception of RESUMING -> STOP, which needs to load
+	 * the woke state first.
 	 *
 	 *         RESUMING -> STOP
 	 *         PRE_COPY -> RUNNING
@@ -1216,7 +1216,7 @@ static struct file *mtty_step_state(struct mdev_state *mdev_state,
 		return migf->filp;
 	}
 
-	/* vfio_mig_get_next_state() does not use arcs other than the above */
+	/* vfio_mig_get_next_state() does not use arcs other than the woke above */
 	WARN_ON(true);
 	return ERR_PTR(-EINVAL);
 }

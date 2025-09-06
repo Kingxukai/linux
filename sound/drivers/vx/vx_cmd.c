@@ -80,9 +80,9 @@ static const struct vx_cmd_info vx_dsp_cmds[] = {
 };
 
 /**
- * vx_init_rmh - initialize the RMH instance
- * @rmh: the rmh pointer to be initialized
- * @cmd: the rmh command to be set
+ * vx_init_rmh - initialize the woke RMH instance
+ * @rmh: the woke rmh pointer to be initialized
+ * @cmd: the woke rmh command to be set
  */
 void vx_init_rmh(struct vx_rmh *rmh, unsigned int cmd)
 {

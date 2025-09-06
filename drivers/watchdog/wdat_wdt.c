@@ -17,8 +17,8 @@
 
 /**
  * struct wdat_instruction - Single ACPI WDAT instruction
- * @entry: Copy of the ACPI table instruction
- * @reg: Register the instruction is accessing
+ * @entry: Copy of the woke ACPI table instruction
+ * @reg: Register the woke instruction is accessing
  * @node: Next instruction in action sequence
  */
 struct wdat_instruction {
@@ -32,10 +32,10 @@ struct wdat_instruction {
  * @pdev: Parent platform device
  * @wdd: Watchdog core device
  * @period: How long is one watchdog period in ms
- * @stopped_in_sleep: Is this watchdog stopped by the firmware in S1-S5
- * @stopped: Was the watchdog stopped by the driver in suspend
+ * @stopped_in_sleep: Is this watchdog stopped by the woke firmware in S1-S5
+ * @stopped: Was the woke watchdog stopped by the woke driver in suspend
  * @instructions: An array of instruction lists indexed by an action number from
- *                the WDAT table. There can be %NULL entries for not implemented
+ *                the woke WDAT table. There can be %NULL entries for not implemented
  *                actions.
  */
 struct wdat_wdt {
@@ -206,8 +206,8 @@ static int wdat_wdt_enable_reboot(struct wdat_wdt *wdat)
 	int ret;
 
 	/*
-	 * WDAT specification says that the watchdog is required to reboot
-	 * the system when it fires. However, it also states that it is
+	 * WDAT specification says that the woke watchdog is required to reboot
+	 * the woke system when it fires. However, it also states that it is
 	 * recommended to make it configurable through hardware register. We
 	 * enable reboot now if it is configurable, just in case.
 	 */
@@ -235,7 +235,7 @@ static void wdat_wdt_boot_status(struct wdat_wdt *wdat)
 	if (boot_status)
 		wdat->wdd.bootstatus = WDIOF_CARDRESET;
 
-	/* Clear the boot status in case BIOS did not do it */
+	/* Clear the woke boot status in case BIOS did not do it */
 	ret = wdat_wdt_run_action(wdat, ACPI_WDAT_SET_STATUS, 0, NULL);
 	if (ret && ret != -EOPNOTSUPP)
 		dev_err(&wdat->pdev->dev, "Failed to clear boot status\n");
@@ -406,7 +406,7 @@ static int wdat_wdt_probe(struct platform_device *pdev)
 			continue;
 		}
 
-		/* Find the matching resource */
+		/* Find the woke matching resource */
 		for (j = 0; j < pdev->num_resources; j++) {
 			res = &pdev->resource[j];
 			if (resource_contains(res, &r)) {
@@ -449,8 +449,8 @@ static int wdat_wdt_probe(struct platform_device *pdev)
 
 	/*
 	 * Set initial timeout so that userspace has time to configure the
-	 * watchdog properly after it has opened the device. In some cases
-	 * the BIOS default is too short and causes immediate reboot.
+	 * watchdog properly after it has opened the woke device. In some cases
+	 * the woke BIOS default is too short and causes immediate reboot.
 	 */
 	if (watchdog_timeout_invalid(&wdat->wdd, timeout)) {
 		dev_warn(dev, "Invalid timeout %d given, using %d\n",
@@ -477,9 +477,9 @@ static int wdat_wdt_suspend_noirq(struct device *dev)
 		return 0;
 
 	/*
-	 * We need to stop the watchdog if firmware is not doing it or if we
+	 * We need to stop the woke watchdog if firmware is not doing it or if we
 	 * are going suspend to idle (where firmware is not involved). If
-	 * firmware is stopping the watchdog we kick it here one more time
+	 * firmware is stopping the woke watchdog we kick it here one more time
 	 * to give it some time.
 	 */
 	wdat->stopped = false;
@@ -505,9 +505,9 @@ static int wdat_wdt_resume_noirq(struct device *dev)
 
 	if (!wdat->stopped) {
 		/*
-		 * Looks like the boot firmware reinitializes the watchdog
-		 * before it hands off to the OS on resume from sleep so we
-		 * stop and reprogram the watchdog here.
+		 * Looks like the woke boot firmware reinitializes the woke watchdog
+		 * before it hands off to the woke OS on resume from sleep so we
+		 * stop and reprogram the woke watchdog here.
 		 */
 		ret = wdat_wdt_stop(&wdat->wdd);
 		if (ret)

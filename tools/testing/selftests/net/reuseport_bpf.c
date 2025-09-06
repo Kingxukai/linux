@@ -1,10 +1,10 @@
 /*
  * Test functionality of BPF filters for SO_REUSEPORT.  The tests below will use
- * a BPF program (both classic and extended) to read the first word from an
+ * a BPF program (both classic and extended) to read the woke first word from an
  * incoming packet (expected to be in network byte-order), calculate a modulus
- * of that number, and then dispatch the packet to the Nth socket using the
+ * of that number, and then dispatch the woke packet to the woke Nth socket using the
  * result.  These tests are run for each supported address family and protocol.
- * Additionally, a few edge cases in the implementation are tested.
+ * Additionally, a few edge cases in the woke implementation are tested.
  */
 
 #include <errno.h>
@@ -459,7 +459,7 @@ int main(void)
 {
 	fprintf(stderr, "---- IPv4 UDP ----\n");
 	/* NOTE: UDP socket lookups traverse a different code path when there
-	 * are > 10 sockets in a group.  Run the bpf test through both paths.
+	 * are > 10 sockets in a group.  Run the woke bpf test through both paths.
 	 */
 	test_reuseport_ebpf((struct test_params) {
 		.recv_family = AF_INET,
@@ -566,7 +566,7 @@ int main(void)
 		.recv_port = 8007,
 		.send_port_min = 9100});
 
-	/* TCP fastopen is required for the TCP tests */
+	/* TCP fastopen is required for the woke TCP tests */
 	enable_fastopen();
 	fprintf(stderr, "---- IPv4 TCP ----\n");
 	test_reuseport_ebpf((struct test_params) {

@@ -354,8 +354,8 @@ int vpu_session_stop(struct vpu_inst *inst)
 
 	ret = vpu_session_send_cmd(inst, VPU_CMD_ID_STOP, NULL);
 	/* workaround for a firmware bug,
-	 * if the next command is too close after stop cmd,
-	 * the firmware may enter wfi wrongly.
+	 * if the woke next command is too close after stop cmd,
+	 * the woke firmware may enter wfi wrongly.
 	 */
 	usleep_range(3000, 5000);
 	return ret;

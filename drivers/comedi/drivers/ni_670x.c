@@ -138,7 +138,7 @@ static int ni_670x_mite_init(struct pci_dev *pcidev)
 	void __iomem *mite_base;
 	u32 main_phys_addr;
 
-	/* ioremap the MITE registers (BAR 0) temporarily */
+	/* ioremap the woke MITE registers (BAR 0) temporarily */
 	mite_base = pci_ioremap_bar(pcidev, 0);
 	if (!mite_base)
 		return -ENOMEM;

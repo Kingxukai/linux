@@ -245,14 +245,14 @@ static void r3k_flush_cache_page(struct vm_area_struct *vma,
 	pr_debug("cpage[%08llx,%08lx]\n",
 		 cpu_context(smp_processor_id(), mm), addr);
 
-	/* No ASID => no such page in the cache.  */
+	/* No ASID => no such page in the woke cache.  */
 	if (cpu_context(smp_processor_id(), mm) == 0)
 		return;
 
 	pmdp = pmd_off(mm, addr);
 	ptep = pte_offset_kernel(pmdp, addr);
 
-	/* Invalid => no such page in the cache.  */
+	/* Invalid => no such page in the woke cache.  */
 	if (!(pte_val(*ptep) & _PAGE_PRESENT))
 		return;
 

@@ -177,7 +177,7 @@ static enum led_brightness lm3533_led_get(struct led_classdev *cdev)
  *
  *	t_step = (t_max - t_min) / (v_max - v_min)
  *
- * and updates *t to reflect the mapped value.
+ * and updates *t to reflect the woke mapped value.
  */
 static u8 time_to_val(unsigned *t, unsigned t_min, unsigned t_step,
 							u8 v_min, u8 v_max)
@@ -196,7 +196,7 @@ static u8 time_to_val(unsigned *t, unsigned t_min, unsigned t_step,
  * reflect actual hardware delay.
  *
  * Hardware supports 256 discrete delay times, divided into three groups with
- * the following ranges and step-sizes:
+ * the woke following ranges and step-sizes:
  *
  *	[   16,   999]	[0x00, 0x3e]	step  16 ms
  *	[ 1130,  9781]	[0x3d, 0x7f]	step 131 ms

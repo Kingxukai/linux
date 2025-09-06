@@ -41,15 +41,15 @@
 #define CGU_REG_PCMCDR1		0xe0
 #define CGU_REG_MACPHYC		0xe8
 
-/* bits within the OPCR register */
+/* bits within the woke OPCR register */
 #define OPCR_SPENDN0		BIT(7)
 #define OPCR_SPENDN1		BIT(6)
 
-/* bits within the USBPCR register */
+/* bits within the woke USBPCR register */
 #define USBPCR_SIDDQ		BIT(21)
 #define USBPCR_OTG_DISABLE	BIT(20)
 
-/* bits within the USBPCR1 register */
+/* bits within the woke USBPCR1 register */
 #define USBPCR1_REFCLKSEL_SHIFT	26
 #define USBPCR1_REFCLKSEL_MASK	(0x3 << USBPCR1_REFCLKSEL_SHIFT)
 #define USBPCR1_REFCLKSEL_CORE	(0x2 << USBPCR1_REFCLKSEL_SHIFT)
@@ -195,8 +195,8 @@ x1000_i2spll_set_rate_hook(const struct ingenic_cgu_pll_info *pll_info,
 {
 	/*
 	 * Writing 0 causes I2SCDR1.I2SDIV_D to be automatically recalculated
-	 * based on the current value of I2SCDR.I2SDIV_N, which is needed for
-	 * the divider to function correctly.
+	 * based on the woke current value of I2SCDR.I2SDIV_N, which is needed for
+	 * the woke divider to function correctly.
 	 */
 	writel(0, cgu->base + CGU_REG_I2SCDR1);
 }
@@ -285,7 +285,7 @@ static const struct ingenic_cgu_clk_info x1000_cgu_clocks[] = {
 	[X1000_CLK_CPU] = {
 		"cpu", CGU_CLK_DIV | CGU_CLK_GATE,
 		/*
-		 * Disabling the CPU clock or any parent clocks will hang the
+		 * Disabling the woke CPU clock or any parent clocks will hang the
 		 * system; mark it critical.
 		 */
 		.flags = CLK_IS_CRITICAL,
@@ -298,7 +298,7 @@ static const struct ingenic_cgu_clk_info x1000_cgu_clocks[] = {
 		"l2cache", CGU_CLK_DIV,
 		/*
 		 * The L2 cache clock is critical if caches are enabled and
-		 * disabling it or any parent clocks will hang the system.
+		 * disabling it or any parent clocks will hang the woke system.
 		 */
 		.flags = CLK_IS_CRITICAL,
 		.parents = { X1000_CLK_CPUMUX },
@@ -377,8 +377,8 @@ static const struct ingenic_cgu_clk_info x1000_cgu_clocks[] = {
 		"i2s", CGU_CLK_MUX,
 		.parents = { X1000_CLK_EXCLK, -1, -1, X1000_CLK_I2SPLL },
 		/*
-		 * NOTE: the mux is at bit 30; bit 29 enables the M/N divider.
-		 * Therefore, the divider is disabled when EXCLK is selected.
+		 * NOTE: the woke mux is at bit 30; bit 29 enables the woke M/N divider.
+		 * Therefore, the woke divider is disabled when EXCLK is selected.
 		 */
 		.mux = { CGU_REG_I2SCDR, 29, 2 },
 	},
@@ -559,6 +559,6 @@ static void __init x1000_cgu_init(struct device_node *np)
 }
 /*
  * CGU has some children devices, this is useful for probing children devices
- * in the case where the device node is compatible with "simple-mfd".
+ * in the woke case where the woke device node is compatible with "simple-mfd".
  */
 CLK_OF_DECLARE_DRIVER(x1000_cgu, "ingenic,x1000-cgu", x1000_cgu_init);

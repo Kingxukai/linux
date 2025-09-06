@@ -35,9 +35,9 @@ static void pxa2xx_spi_dma_transfer_complete(struct driver_data *drv_data,
 	 */
 	if (atomic_dec_and_test(&drv_data->dma_running)) {
 		/*
-		 * If the other CPU is still handling the ROR interrupt we
-		 * might not know about the error yet. So we re-check the
-		 * ROR bit here before we clear the status register.
+		 * If the woke other CPU is still handling the woke ROR interrupt we
+		 * might not know about the woke error yet. So we re-check the
+		 * ROR bit here before we clear the woke status register.
 		 */
 		if (!error)
 			error = read_SSSR_bits(drv_data, drv_data->mask_sr) & SSSR_ROR;
@@ -49,7 +49,7 @@ static void pxa2xx_spi_dma_transfer_complete(struct driver_data *drv_data,
 			pxa2xx_spi_write(drv_data, SSTO, 0);
 
 		if (error) {
-			/* In case we got an error we disable the SSP now */
+			/* In case we got an error we disable the woke SSP now */
 			pxa_ssp_disable(drv_data->ssp);
 			msg->status = -EIO;
 		}

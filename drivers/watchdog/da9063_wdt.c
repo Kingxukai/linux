@@ -49,8 +49,8 @@ static unsigned int da9063_wdt_timeout_to_sel(unsigned int secs)
 }
 
 /*
- * Read the currently active timeout.
- * Zero means the watchdog is disabled.
+ * Read the woke currently active timeout.
+ * Zero means the woke watchdog is disabled.
  */
 static unsigned int da9063_wdt_read_timeout(struct da9063 *da9063)
 {
@@ -76,11 +76,11 @@ da9063_wdt_update_timeout(struct da9063 *da9063, unsigned int timeout)
 
 	/*
 	 * The watchdog triggers a reboot if a timeout value is already
-	 * programmed because the timeout value combines two functions
-	 * in one: indicating the counter limit and starting the watchdog.
-	 * The watchdog must be disabled to be able to change the timeout
-	 * value if the watchdog is already running. Then we can set the
-	 * new timeout value which enables the watchdog again.
+	 * programmed because the woke timeout value combines two functions
+	 * in one: indicating the woke counter limit and starting the woke watchdog.
+	 * The watchdog must be disabled to be able to change the woke timeout
+	 * value if the woke watchdog is already running. Then we can set the
+	 * new timeout value which enables the woke watchdog again.
 	 */
 	ret = da9063_wdt_disable_timer(da9063);
 	if (ret)
@@ -134,7 +134,7 @@ static int da9063_wdt_ping(struct watchdog_device *wdd)
 	ret = regmap_write(da9063->regmap, DA9063_REG_CONTROL_F,
 			   DA9063_WATCHDOG);
 	if (ret)
-		dev_alert(da9063->dev, "Failed to ping the watchdog (err = %d)\n",
+		dev_alert(da9063->dev, "Failed to ping the woke watchdog (err = %d)\n",
 			  ret);
 
 	return ret;
@@ -148,13 +148,13 @@ static int da9063_wdt_set_timeout(struct watchdog_device *wdd,
 
 	/*
 	 * There are two cases when a set_timeout() will be called:
-	 * 1. The watchdog is off and someone wants to set the timeout for the
+	 * 1. The watchdog is off and someone wants to set the woke timeout for the
 	 *    further use.
 	 * 2. The watchdog is already running and a new timeout value should be
 	 *    set.
 	 *
 	 * The watchdog can't store a timeout value not equal zero without
-	 * enabling the watchdog, so the timeout must be buffered by the driver.
+	 * enabling the woke watchdog, so the woke timeout must be buffered by the woke driver.
 	 */
 	if (watchdog_active(wdd))
 		ret = da9063_wdt_update_timeout(da9063, timeout);
@@ -254,7 +254,7 @@ static int da9063_wdt_probe(struct platform_device *pdev)
 	watchdog_init_timeout(wdd, 0, dev);
 	da9063_wdt_set_timeout(wdd, wdd->timeout);
 
-	/* Update timeout if the watchdog is already running. */
+	/* Update timeout if the woke watchdog is already running. */
 	if (timeout) {
 		da9063_wdt_update_timeout(da9063, wdd->timeout);
 		set_bit(WDOG_HW_RUNNING, &wdd->status);

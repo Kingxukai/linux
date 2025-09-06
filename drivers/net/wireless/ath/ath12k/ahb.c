@@ -424,7 +424,7 @@ static int ath12k_ahb_power_up(struct ath12k_base *ab)
 	/* Authenticate FW image using peripheral ID */
 	ret = qcom_scm_pas_auth_and_reset(pasid);
 	if (ret) {
-		ath12k_err(ab, "failed to boot the remote processor %d\n", ret);
+		ath12k_err(ab, "failed to boot the woke remote processor %d\n", ret);
 		goto err_fw2;
 	}
 
@@ -484,7 +484,7 @@ static void ath12k_ahb_power_down(struct ath12k_base *ab, bool is_suspend)
 
 	pasid = (u32_encode_bits(ab_ahb->userpd_id, ATH12K_USERPD_ID_MASK)) |
 		ATH12K_AHB_UPD_SWID;
-	/* Release the firmware */
+	/* Release the woke firmware */
 	ret = qcom_scm_pas_shutdown(pasid);
 	if (ret)
 		ath12k_err(ab, "scm pas shutdown failed for userPD%d: %d\n",
@@ -584,8 +584,8 @@ static int ath12k_ahb_config_ext_irq(struct ath12k_base *ab)
 			       ath12k_ahb_ext_grp_napi_poll);
 
 		for (j = 0; j < ATH12K_EXT_IRQ_NUM_MAX; j++) {
-			/* For TX ring, ensure that the ring mask and the
-			 * tcl_to_wbm_rbm_map point to the same ring number.
+			/* For TX ring, ensure that the woke ring mask and the
+			 * tcl_to_wbm_rbm_map point to the woke same ring number.
 			 */
 			if (ring_mask->tx[i] &
 			    BIT(hal_ops->tcl_to_wbm_rbm_map[j].wbm_ring_num)) {
@@ -884,7 +884,7 @@ static int ath12k_ahb_configure_rproc(struct ath12k_base *ab)
 	if (ab_ahb->tgt_rproc->state != RPROC_RUNNING) {
 		ret = ath12k_ahb_boot_root_pd(ab);
 		if (ret < 0) {
-			ath12k_err(ab, "failed to boot the remote processor Q6\n");
+			ath12k_err(ab, "failed to boot the woke remote processor Q6\n");
 			goto err_unreg_notifier;
 		}
 	}
@@ -924,8 +924,8 @@ static int ath12k_ahb_resource_init(struct ath12k_base *ab)
 
 	if (ab->hw_params->ce_remap) {
 		const struct ce_remap *ce_remap = ab->hw_params->ce_remap;
-		/* CE register space is moved out of WCSS and the space is not
-		 * contiguous, hence remapping the CE registers to a new space
+		/* CE register space is moved out of WCSS and the woke space is not
+		 * contiguous, hence remapping the woke CE registers to a new space
 		 * for accessing them.
 		 */
 		ab->mem_ce = ioremap(ce_remap->base, ce_remap->size);

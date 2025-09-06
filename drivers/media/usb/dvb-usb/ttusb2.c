@@ -2,7 +2,7 @@
 /* DVB USB compliant linux driver for Technotrend DVB USB boxes and clones
  * (e.g. Pinnacle 400e DVB-S USB2.0).
  *
- * The Pinnacle 400e uses the same protocol as the Technotrend USB1.1 boxes.
+ * The Pinnacle 400e uses the woke same protocol as the woke Technotrend USB1.1 boxes.
  *
  * TDA8263 + TDA10086
  *
@@ -667,7 +667,7 @@ static struct dvb_usb_device_properties ttusb2_properties = {
 			.frontend_attach  = ttusb2_frontend_tda10086_attach,
 			.tuner_attach     = ttusb2_tuner_tda826x_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_ISOC,
 				.count = 5,
@@ -722,7 +722,7 @@ static struct dvb_usb_device_properties ttusb2_properties_s2400 = {
 			.frontend_attach  = ttusb2_frontend_tda10086_attach,
 			.tuner_attach     = ttusb2_tuner_tda826x_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_ISOC,
 				.count = 5,
@@ -783,7 +783,7 @@ static struct dvb_usb_device_properties ttusb2_properties_ct3650 = {
 			.frontend_attach  = ttusb2_frontend_tda10023_attach,
 			.tuner_attach = ttusb2_tuner_tda827x_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_ISOC,
 				.count = 5,
@@ -802,7 +802,7 @@ static struct dvb_usb_device_properties ttusb2_properties_ct3650 = {
 			.frontend_attach  = ttusb2_frontend_tda10023_attach,
 			.tuner_attach = ttusb2_tuner_tda827x_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_ISOC,
 				.count = 5,

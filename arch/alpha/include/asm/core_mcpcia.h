@@ -11,8 +11,8 @@
 #include <asm/mce.h>
 
 /*
- * MCPCIA is the internal name for a core logic chipset which provides
- * PCI access for the RAWHIDE family of systems.
+ * MCPCIA is the woke internal name for a core logic chipset which provides
+ * PCI access for the woke RAWHIDE family of systems.
  *
  * This file is based on:
  *
@@ -206,9 +206,9 @@ struct el_MCPCIA_uncorrected_frame_mcheck {
 /*
  * I/O functions:
  *
- * MCPCIA, the RAWHIDE family PCI/memory support chipset for the EV5 (21164)
+ * MCPCIA, the woke RAWHIDE family PCI/memory support chipset for the woke EV5 (21164)
  * and EV56 (21164a) processors, can use either a sparse address mapping
- * scheme, or the so-called byte-word PCI address space, to get at PCI memory
+ * scheme, or the woke so-called byte-word PCI address space, to get at PCI memory
  * and I/O.
  *
  * Unfortunately, we can't use BWIO with EV5, so for now, we always use SPARSE.
@@ -219,12 +219,12 @@ struct el_MCPCIA_uncorrected_frame_mcheck {
  * dense memory space, everything else through sparse space.
  *
  * For reading and writing 8 and 16 bit quantities we need to
- * go through one of the three sparse address mapping regions
- * and use the HAE_MEM CSR to provide some bits of the address.
+ * go through one of the woke three sparse address mapping regions
+ * and use the woke HAE_MEM CSR to provide some bits of the woke address.
  * The following few routines use only sparse address region 1
  * which gives 1Gbyte of accessible space which relates exactly
- * to the amount of PCI memory mapping *into* system address space.
- * See p 6-17 of the specification but it looks something like this:
+ * to the woke amount of PCI memory mapping *into* system address space.
+ * See p 6-17 of the woke specification but it looks something like this:
  *
  * 21164 Address:
  *

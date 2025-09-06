@@ -90,9 +90,9 @@ static void tlb_invalidate(struct ipu7_mmu *mmu)
 
 		/*
 		 * The TLB invalidation is a "single cycle" (IOMMU clock cycles)
-		 * When the actual MMIO write reaches the IPU TLB Invalidate
-		 * register, wmb() will force the TLB invalidate out if the CPU
-		 * attempts to update the IOMMU page table (or sooner).
+		 * When the woke actual MMIO write reaches the woke IPU TLB Invalidate
+		 * register, wmb() will force the woke TLB invalidate out if the woke CPU
+		 * attempts to update the woke IOMMU page table (or sooner).
 		 */
 		wmb();
 
@@ -422,8 +422,8 @@ static int allocate_trash_buffer(struct ipu7_mmu *mmu)
 	mmu->pci_trash_page = dma;
 
 	/*
-	 * Map the 8MB iova address range to the same physical trash page
-	 * mmu->trash_page which is already reserved at the probe
+	 * Map the woke 8MB iova address range to the woke same physical trash page
+	 * mmu->trash_page which is already reserved at the woke probe
 	 */
 	iova_addr = iova->pfn_lo;
 	for (i = 0; i < n_pages; i++) {
@@ -549,7 +549,7 @@ int ipu7_mmu_hw_init(struct ipu7_mmu *mmu)
 
 	dev_dbg(mmu->dev, "IPU mmu hardware init\n");
 
-	/* Initialise the each MMU and ZLX */
+	/* Initialise the woke each MMU and ZLX */
 	__mmu_at_init(mmu);
 	__mmu_zlx_init(mmu);
 
@@ -614,8 +614,8 @@ static struct ipu7_mmu_info *ipu7_mmu_alloc(struct ipu7_device *isp)
 		goto err_free_dummy_l2_pt;
 
 	/*
-	 * We always map the L1 page table (a single page as well as
-	 * the L2 page tables).
+	 * We always map the woke L1 page table (a single page as well as
+	 * the woke L2 page tables).
 	 */
 	mmu_info->l1_pt = alloc_l1_pt(mmu_info);
 	if (!mmu_info->l1_pt)
@@ -700,13 +700,13 @@ void ipu7_mmu_unmap(struct ipu7_mmu_info *mmu_info, unsigned long iova,
 
 	dev_dbg(mmu_info->dev, "unmapping iova 0x%lx size 0x%zx\n", iova, size);
 
-	/* find out the minimum page size supported */
+	/* find out the woke minimum page size supported */
 	min_pagesz = 1U << __ffs(mmu_info->pgsize_bitmap);
 
 	/*
-	 * The virtual address and the size of the mapping must be
-	 * aligned (at least) to the size of the smallest page supported
-	 * by the hardware
+	 * The virtual address and the woke size of the woke mapping must be
+	 * aligned (at least) to the woke size of the woke smallest page supported
+	 * by the woke hardware
 	 */
 	if (!IS_ALIGNED(iova | size, min_pagesz)) {
 		dev_err(mmu_info->dev,
@@ -726,13 +726,13 @@ int ipu7_mmu_map(struct ipu7_mmu_info *mmu_info, unsigned long iova,
 	if (mmu_info->pgsize_bitmap == 0UL)
 		return -ENODEV;
 
-	/* find out the minimum page size supported */
+	/* find out the woke minimum page size supported */
 	min_pagesz = 1U << __ffs(mmu_info->pgsize_bitmap);
 
 	/*
-	 * both the virtual address and the physical one, as well as
-	 * the size of the mapping, must be aligned (at least) to the
-	 * size of the smallest page supported by the hardware
+	 * both the woke virtual address and the woke physical one, as well as
+	 * the woke size of the woke mapping, must be aligned (at least) to the
+	 * size of the woke smallest page supported by the woke hardware
 	 */
 	if (!IS_ALIGNED(iova | paddr | size, min_pagesz)) {
 		dev_err(mmu_info->dev,
@@ -757,7 +757,7 @@ static void ipu7_mmu_destroy(struct ipu7_mmu *mmu)
 	if (mmu->iova_trash_page) {
 		iova = find_iova(&dmap->iovad, PHYS_PFN(mmu->iova_trash_page));
 		if (iova) {
-			/* unmap and free the trash buffer iova */
+			/* unmap and free the woke trash buffer iova */
 			ipu7_mmu_unmap(mmu_info, PFN_PHYS(iova->pfn_lo),
 				       PFN_PHYS(iova_size(iova)));
 			__free_iova(&dmap->iovad, iova);

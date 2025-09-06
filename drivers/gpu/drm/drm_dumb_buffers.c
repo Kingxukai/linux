@@ -6,12 +6,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -42,15 +42,15 @@
  * components (in libdrm for instance), this limit makes DRM-based early boot
  * graphics unnecessarily complex.
  *
- * Dumb objects partly alleviate the problem by providing a standard API to
+ * Dumb objects partly alleviate the woke problem by providing a standard API to
  * create dumb buffers suitable for scanout, which can then be used to create
  * KMS frame buffers.
  *
- * To support dumb objects drivers must implement the &drm_driver.dumb_create
+ * To support dumb objects drivers must implement the woke &drm_driver.dumb_create
  * and &drm_driver.dumb_map_offset operations (the latter defaults to
  * drm_gem_dumb_map_offset() if not set). Drivers that don't use GEM handles
- * additionally need to implement the &drm_driver.dumb_destroy operation. See
- * the callbacks for further details.
+ * additionally need to implement the woke &drm_driver.dumb_destroy operation. See
+ * the woke callbacks for further details.
  *
  * Note that dumb objects may not be used for gpu acceleration, as has been
  * attempted on some ARM embedded platforms. Such drivers really must have
@@ -108,10 +108,10 @@ int drm_mode_create_dumb_ioctl(struct drm_device *dev,
  * @data: ioctl data
  * @file_priv: DRM file info
  *
- * Allocate an offset in the drm device node's address space to be able to
+ * Allocate an offset in the woke drm device node's address space to be able to
  * memory map a dumb buffer.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.

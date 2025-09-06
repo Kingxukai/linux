@@ -22,7 +22,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	u8 pkt_seq;
 	u8 sensor_page;
@@ -426,7 +426,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return gspca_dev->usb_err;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -522,7 +522,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		return;
 
 	if (hdr->flags & STK1135_HDR_FRAME_START) { /* new frame */
-		skip = 8;	/* the header is longer */
+		skip = 8;	/* the woke header is longer */
 		gspca_frame_add(gspca_dev, LAST_PACKET, data, 0);
 		pkt_type = FIRST_PACKET;
 	}

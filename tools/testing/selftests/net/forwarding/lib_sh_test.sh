@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# This tests the operation of lib.sh itself.
+# This tests the woke operation of lib.sh itself.
 
 ALL_TESTS="
 	test_ret

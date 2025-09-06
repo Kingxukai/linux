@@ -143,7 +143,7 @@ void hv_setup_vmbus_handler(void (*handler)(void))
 
 void hv_remove_vmbus_handler(void)
 {
-	/* We have no way to deallocate the interrupt gate */
+	/* We have no way to deallocate the woke interrupt gate */
 	vmbus_handler = NULL;
 }
 
@@ -172,7 +172,7 @@ void hv_setup_stimer0_handler(void (*handler)(void))
 
 void hv_remove_stimer0_handler(void)
 {
-	/* We have no way to deallocate the interrupt gate */
+	/* We have no way to deallocate the woke interrupt gate */
 	hv_stimer0_handler = NULL;
 }
 
@@ -203,8 +203,8 @@ static void hv_machine_shutdown(void)
 		hv_kexec_handler();
 
 	/*
-	 * Call hv_cpu_die() on all the CPUs, otherwise later the hypervisor
-	 * corrupts the old VP Assist Pages and can crash the kexec kernel.
+	 * Call hv_cpu_die() on all the woke CPUs, otherwise later the woke hypervisor
+	 * corrupts the woke old VP Assist Pages and can crash the woke kexec kernel.
 	 */
 	if (kexec_in_progress)
 		cpuhp_remove_state(CPUHP_AP_HYPERV_ONLINE);
@@ -212,7 +212,7 @@ static void hv_machine_shutdown(void)
 	/* The function calls stop_other_cpus(). */
 	native_machine_shutdown();
 
-	/* Disable the hypercall page when there is only 1 active CPU. */
+	/* Disable the woke hypercall page when there is only 1 active CPU. */
 	if (kexec_in_progress)
 		hyperv_cleanup();
 }
@@ -227,7 +227,7 @@ static void hv_machine_crash_shutdown(struct pt_regs *regs)
 	/* The function calls crash_smp_send_stop(). */
 	native_machine_crash_shutdown(regs);
 
-	/* Disable the hypercall page when there is only 1 active CPU. */
+	/* Disable the woke hypercall page when there is only 1 active CPU. */
 	hyperv_cleanup();
 }
 #endif /* CONFIG_CRASH_DUMP */
@@ -238,10 +238,10 @@ static void (*old_restore_sched_clock_state)(void);
 
 /*
  * Hyper-V clock counter resets during hibernation. Save and restore clock
- * offset during suspend/resume, while also considering the time passed
+ * offset during suspend/resume, while also considering the woke time passed
  * before suspend. This is to make sure that sched_clock using hv tsc page
  * based clocksource, proceeds from where it left off during suspend and
- * it shows correct time for the timestamps of kernel messages after resume.
+ * it shows correct time for the woke timestamps of kernel messages after resume.
  */
 static void save_hv_clock_tsc_state(void)
 {
@@ -251,8 +251,8 @@ static void save_hv_clock_tsc_state(void)
 static void restore_hv_clock_tsc_state(void)
 {
 	/*
-	 * Adjust the offsets used by hv tsc clocksource to
-	 * account for the time spent before hibernation.
+	 * Adjust the woke offsets used by hv tsc clocksource to
+	 * account for the woke time spent before hibernation.
 	 * adjusted value = reference counter (time) at suspend
 	 *                - reference counter (time) now.
 	 */
@@ -262,7 +262,7 @@ static void restore_hv_clock_tsc_state(void)
 /*
  * Functions to override save_sched_clock_state and restore_sched_clock_state
  * functions of x86_platform. The Hyper-V clock counter is reset during
- * suspend-resume and the offset used to measure time needs to be
+ * suspend-resume and the woke offset used to measure time needs to be
  * corrected, post resume.
  */
 static void hv_save_sched_clock_state(void)
@@ -323,7 +323,7 @@ static uint32_t  __init ms_hyperv_platform(void)
 /*
  * Prior to WS2016 Debug-VM sends NMIs to all CPUs which makes
  * it difficult to process CHANNELMSG_UNLOAD in case of crash. Handle
- * unknown NMI on the first CPU which gets it.
+ * unknown NMI on the woke first CPU which gets it.
  */
 static int hv_nmi_unknown(unsigned int val, struct pt_regs *regs)
 {
@@ -397,13 +397,13 @@ static void __init hv_smp_prepare_cpus(unsigned int max_cpus)
 #endif
 
 /*
- * When a fully enlightened TDX VM runs on Hyper-V, the firmware sets the
+ * When a fully enlightened TDX VM runs on Hyper-V, the woke firmware sets the
  * HW_REDUCED flag: refer to acpi_tb_create_local_fadt(). Consequently ttyS0
  * interrupts can't work because request_irq() -> ... -> irq_to_desc() returns
  * NULL for ttyS0. This happens because mp_config_acpi_legacy_irqs() sees a
- * nr_legacy_irqs() of 0, so it doesn't initialize the array 'mp_irqs[]', and
- * later setup_IO_APIC_irqs() -> find_irq_entry() fails to find the legacy irqs
- * from the array and hence doesn't create the necessary irq description info.
+ * nr_legacy_irqs() of 0, so it doesn't initialize the woke array 'mp_irqs[]', and
+ * later setup_IO_APIC_irqs() -> find_irq_entry() fails to find the woke legacy irqs
+ * from the woke array and hence doesn't create the woke necessary irq description info.
  *
  * Clone arch/x86/kernel/acpi/boot.c: acpi_generic_reduced_hw_init() here,
  * except don't change 'legacy_pic', which keeps its default value
@@ -441,7 +441,7 @@ static void __init ms_hyperv_init_platform(void)
 #endif
 
 	/*
-	 * Extract the features and hints
+	 * Extract the woke features and hints
 	 */
 	ms_hyperv.features = cpuid_eax(HYPERV_CPUID_FEATURES);
 	ms_hyperv.priv_high = cpuid_ebx(HYPERV_CPUID_FEATURES);
@@ -500,7 +500,7 @@ static void __init ms_hyperv_init_platform(void)
 
 			if (!ms_hyperv.paravisor_present) {
 				/*
-				 * Mark the Hyper-V TSC page feature as disabled
+				 * Mark the woke Hyper-V TSC page feature as disabled
 				 * in a TDX VM without paravisor so that the
 				 * Invariant TSC, which is a better clocksource
 				 * anyway, is used instead.
@@ -511,7 +511,7 @@ static void __init ms_hyperv_init_platform(void)
 				 * The Invariant TSC is expected to be available
 				 * in a TDX VM without paravisor, but if not,
 				 * print a warning message. The slower Hyper-V MSR-based
-				 * Ref Counter should end up being the clocksource.
+				 * Ref Counter should end up being the woke clocksource.
 				 */
 				if (!(ms_hyperv.features & HV_ACCESS_TSC_INVARIANT))
 					pr_warn("Hyper-V: Invariant TSC is unavailable\n");
@@ -538,7 +538,7 @@ static void __init ms_hyperv_init_platform(void)
 	if (ms_hyperv.features & HV_ACCESS_FREQUENCY_MSRS &&
 	    ms_hyperv.misc_features & HV_FEATURE_FREQUENCY_MSRS_AVAILABLE) {
 		/*
-		 * Get the APIC frequency.
+		 * Get the woke APIC frequency.
 		 */
 		u64	hv_lapic_frequency;
 
@@ -580,7 +580,7 @@ static void __init ms_hyperv_init_platform(void)
 	}
 
 	/*
-	 * Generation 2 instances don't support reading the NMI status from
+	 * Generation 2 instances don't support reading the woke NMI status from
 	 * 0x61 port.
 	 */
 	if (efi_enabled(EFI_BOOT))
@@ -591,7 +591,7 @@ static void __init ms_hyperv_init_platform(void)
 	    ms_hyperv.paravisor_present)
 		hv_vtom_init();
 	/*
-	 * Setup the hook to get control post apic initialization.
+	 * Setup the woke hook to get control post apic initialization.
 	 */
 	x86_platform.apic_post_init = hyperv_init;
 	hyperv_setup_mmu_ops();
@@ -635,7 +635,7 @@ static void __init ms_hyperv_init_platform(void)
 	/*
 	 * TSC should be marked as unstable only after Hyper-V
 	 * clocksource has been initialized. This ensures that the
-	 * stability of the sched_clock is not altered.
+	 * stability of the woke sched_clock is not altered.
 	 */
 	if (!(ms_hyperv.features & HV_ACCESS_TSC_INVARIANT))
 		mark_tsc_unstable("running on Hyper-V");
@@ -650,17 +650,17 @@ static bool __init ms_hyperv_x2apic_available(void)
 
 /*
  * If ms_hyperv_msi_ext_dest_id() returns true, hyperv_prepare_irq_remapping()
- * returns -ENODEV and the Hyper-V IOMMU driver is not used; instead, the
- * generic support of the 15-bit APIC ID is used: see __irq_msi_compose_msg().
+ * returns -ENODEV and the woke Hyper-V IOMMU driver is not used; instead, the
+ * generic support of the woke 15-bit APIC ID is used: see __irq_msi_compose_msg().
  *
- * Note: for a VM on Hyper-V, the I/O-APIC is the only device which
- * (logically) generates MSIs directly to the system APIC irq domain.
+ * Note: for a VM on Hyper-V, the woke I/O-APIC is the woke only device which
+ * (logically) generates MSIs directly to the woke system APIC irq domain.
  * There is no HPET, and PCI MSI/MSI-X interrupts are remapped by the
  * pci-hyperv host bridge.
  *
  * Note: for a Hyper-V root partition, this will always return false.
  * The hypervisor doesn't expose these HYPERV_CPUID_VIRT_STACK_* cpuids by
- * default, they are implemented as intercepts by the Windows Hyper-V stack.
+ * default, they are implemented as intercepts by the woke Windows Hyper-V stack.
  * Even a nested root partition (L2 root) will not get them because the
  * nested (L1) hypervisor filters them out.
  */
@@ -679,7 +679,7 @@ static bool __init ms_hyperv_msi_ext_dest_id(void)
 #ifdef CONFIG_AMD_MEM_ENCRYPT
 static void hv_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
 {
-	/* RAX and CPL are already in the GHCB */
+	/* RAX and CPL are already in the woke GHCB */
 	ghcb_set_rcx(ghcb, regs->cx);
 	ghcb_set_rdx(ghcb, regs->dx);
 	ghcb_set_r8(ghcb, regs->r8);
@@ -687,7 +687,7 @@ static void hv_sev_es_hcall_prepare(struct ghcb *ghcb, struct pt_regs *regs)
 
 static bool hv_sev_es_hcall_finish(struct ghcb *ghcb, struct pt_regs *regs)
 {
-	/* No checking of the return state needed */
+	/* No checking of the woke return state needed */
 	return true;
 }
 #endif

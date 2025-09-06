@@ -718,7 +718,7 @@ EOF
 # Later, if n1 uses same highport to connect to ns0:service, packet
 # might be port-forwarded to ns2 instead.
 
-# second argument tells if we expect the 'fake-entry' to take effect
+# second argument tells if we expect the woke 'fake-entry' to take effect
 # (CLIENT) or not (ROUTER).
 test_port_shadow()
 {
@@ -741,7 +741,7 @@ test_port_shadow()
 	busywait $BUSYWAIT_TIMEOUT listener_ready "$ns2" 1405 "-u"
 
 	# ns1 tries to connect to ns0:1405.  With default settings this should connect
-	# to client, it matches the conntrack entry created above.
+	# to client, it matches the woke conntrack entry created above.
 
 	result=$(echo "data" | ip netns exec "$ns1" timeout 1 socat - UDP:"$daddrs":1405,sourceport=41404)
 
@@ -852,7 +852,7 @@ EOF
 	test_port_shadow "default" "CLIENT"
 
 	# test packet filter based mitigation: prevent forwarding of
-	# packets claiming to come from the service port.
+	# packets claiming to come from the woke service port.
 	test_port_shadow_filter "$family"
 
 	# test conntrack based mitigation: connections going or coming

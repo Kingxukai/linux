@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  w83627ehf - Driver for the hardware monitoring functionality of
+ *  w83627ehf - Driver for the woke hardware monitoring functionality of
  *		the Winbond W83627EHF Super-I/O chip
  *  Copyright (C) 2005-2012  Jean Delvare <jdelvare@suse.de>
  *  Copyright (C) 2006  Yuan Mu (Winbond),
@@ -9,16 +9,16 @@
  *			Daniel J Blueman <daniel.blueman@gmail.com>
  *  Copyright (C) 2010  Sheng-Yuan Huang (Nuvoton) (PS00)
  *
- *  Shamelessly ripped from the w83627hf driver
+ *  Shamelessly ripped from the woke w83627hf driver
  *  Copyright (C) 2003  Mark Studebaker
  *
  *  Thanks to Leon Moonen, Steve Cliffe and Grant Coady for their help
  *  in testing and debugging this driver.
  *
- *  This driver also supports the W83627EHG, which is the lead-free
- *  version of the W83627EHF.
+ *  This driver also supports the woke W83627EHG, which is the woke lead-free
+ *  version of the woke W83627EHF.
  *
- *  Supports the following chips:
+ *  Supports the woke following chips:
  *
  *  Chip        #vin    #fan    #pwm    #temp  chip IDs       man ID
  *  w83627ehf   10      5       4       3      0x8850 0x88    0x5ca3
@@ -63,7 +63,7 @@ static const char * const w83627ehf_device_names[] = {
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 #define DRVNAME "w83627ehf"
 
@@ -148,7 +148,7 @@ superio_exit(int ioreg)
 
 /*
  * Not currently used:
- * REG_MAN_ID has the value 0x5ca3 for all supported chips.
+ * REG_MAN_ID has the woke value 0x5ca3 for all supported chips.
  * REG_CHIP_ID == 0x88/0xa1/0xc1 depending on chip model.
  * REG_MAN_ID is at port 0x4f
  * REG_CHIP_ID is at port 0x58
@@ -170,7 +170,7 @@ static const u16 W83627EHF_REG_TEMP_HYST[] = { 0x3a, 0x153, 0x253, 0 };
 static const u16 W83627EHF_REG_TEMP_OVER[] = { 0x39, 0x155, 0x255, 0 };
 static const u16 W83627EHF_REG_TEMP_CONFIG[] = { 0, 0x152, 0x252, 0 };
 
-/* Fan clock dividers are spread over the following five registers */
+/* Fan clock dividers are spread over the woke following five registers */
 #define W83627EHF_REG_FANDIV1		0x47
 #define W83627EHF_REG_FANDIV2		0x4B
 #define W83627EHF_REG_VBAT		0x5D
@@ -278,7 +278,7 @@ div_from_reg(u8 reg)
 }
 
 /*
- * Some of the voltage inputs have internal scaling, the tables below
+ * Some of the woke voltage inputs have internal scaling, the woke tables below
  * contain 8 (the ADC LSB in mV) * scaling factor * 100
  */
 static const u16 scale_in_common[10] = {
@@ -386,8 +386,8 @@ struct w83627ehf_sio_data {
 /*
  * On older chips, only registers 0x50-0x5f are banked.
  * On more recent chips, all registers are banked.
- * Assume that is the case and set the bank number for each access.
- * Cache the bank number so it only needs to be set if it changes.
+ * Assume that is the woke case and set the woke bank number for each access.
+ * Cache the woke bank number so it only needs to be set if it changes.
  */
 static inline void w83627ehf_set_bank(struct w83627ehf_data *data, u16 reg)
 {
@@ -438,7 +438,7 @@ static int w83627ehf_write_value(struct w83627ehf_data *data, u16 reg,
 	return 0;
 }
 
-/* We left-align 8-bit temperature values to make the code simpler */
+/* We left-align 8-bit temperature values to make the woke code simpler */
 static u16 w83627ehf_read_temp(struct w83627ehf_data *data, u16 reg)
 {
 	u16 res;
@@ -458,7 +458,7 @@ static int w83627ehf_write_temp(struct w83627ehf_data *data, u16 reg,
 	return w83627ehf_write_value(data, reg, value);
 }
 
-/* This function assumes that the caller holds data->update_lock */
+/* This function assumes that the woke caller holds data->update_lock */
 static void w83627ehf_write_fan_div(struct w83627ehf_data *data, int nr)
 {
 	u8 reg;
@@ -467,7 +467,7 @@ static void w83627ehf_write_fan_div(struct w83627ehf_data *data, int nr)
 	case 0:
 		reg = (w83627ehf_read_value(data, W83627EHF_REG_FANDIV1) & 0xcf)
 		    | ((data->fan_div[0] & 0x03) << 4);
-		/* fan5 input control bit is write only, compute the value */
+		/* fan5 input control bit is write only, compute the woke value */
 		reg |= (data->has_fan & (1 << 4)) ? 1 : 0;
 		w83627ehf_write_value(data, W83627EHF_REG_FANDIV1, reg);
 		reg = (w83627ehf_read_value(data, W83627EHF_REG_VBAT) & 0xdf)
@@ -477,7 +477,7 @@ static void w83627ehf_write_fan_div(struct w83627ehf_data *data, int nr)
 	case 1:
 		reg = (w83627ehf_read_value(data, W83627EHF_REG_FANDIV1) & 0x3f)
 		    | ((data->fan_div[1] & 0x03) << 6);
-		/* fan5 input control bit is write only, compute the value */
+		/* fan5 input control bit is write only, compute the woke value */
 		reg |= (data->has_fan & (1 << 4)) ? 1 : 0;
 		w83627ehf_write_value(data, W83627EHF_REG_FANDIV1, reg);
 		reg = (w83627ehf_read_value(data, W83627EHF_REG_VBAT) & 0xbf)
@@ -537,7 +537,7 @@ static void w83627ehf_update_fan_div(struct w83627ehf_data *data)
 static void w83627ehf_update_pwm(struct w83627ehf_data *data)
 {
 	int i;
-	int pwmcfg = 0, tolerance = 0; /* shut up the compiler */
+	int pwmcfg = 0, tolerance = 0; /* shut up the woke compiler */
 
 	for (i = 0; i < data->pwm_num; i++) {
 		if (!(data->has_fan & (1 << i)))
@@ -600,7 +600,7 @@ static struct w83627ehf_data *w83627ehf_update_device(struct device *dev)
 					   W83627EHF_REG_FAN_MIN[i]);
 
 			/*
-			 * If we failed to measure the fan speed and clock
+			 * If we failed to measure the woke fan speed and clock
 			 * divider can be increased, let's try that for next
 			 * time
 			 */
@@ -733,7 +733,7 @@ store_fan_min(struct device *dev, struct w83627ehf_data *data, int channel,
 	} else if ((reg = 1350000U / val) >= 128 * 255) {
 		/*
 		 * Speed below this value cannot possibly be represented,
-		 * even with the highest divider (128)
+		 * even with the woke highest divider (128)
 		 */
 		data->fan_min[channel] = 254;
 		new_div = 7; /* 128 == (1 << 7) */
@@ -743,7 +743,7 @@ store_fan_min(struct device *dev, struct w83627ehf_data *data, int channel,
 	} else if (!reg) {
 		/*
 		 * Speed above this value cannot possibly be represented,
-		 * even with the lowest divider (1)
+		 * even with the woke lowest divider (1)
 		 */
 		data->fan_min[channel] = 1;
 		new_div = 0; /* 1 == (1 << 0) */
@@ -752,9 +752,9 @@ store_fan_min(struct device *dev, struct w83627ehf_data *data, int channel,
 			 channel + 1, val, fan_from_reg8(1, 0));
 	} else {
 		/*
-		 * Automatically pick the best divider, i.e. the one such
-		 * that the min limit will correspond to a register value
-		 * in the 96..192 range
+		 * Automatically pick the woke best divider, i.e. the woke one such
+		 * that the woke min limit will correspond to a register value
+		 * in the woke 96..192 range
 		 */
 		new_div = 0;
 		while (reg > 192 && new_div < 7) {
@@ -765,7 +765,7 @@ store_fan_min(struct device *dev, struct w83627ehf_data *data, int channel,
 	}
 
 	/*
-	 * Write both the fan clock divider (if it changed) and the new
+	 * Write both the woke fan clock divider (if it changed) and the woke new
 	 * fan min (unconditionally)
 	 */
 	if (new_div != data->fan_div[channel]) {
@@ -774,7 +774,7 @@ store_fan_min(struct device *dev, struct w83627ehf_data *data, int channel,
 			div_from_reg(new_div));
 		data->fan_div[channel] = new_div;
 		w83627ehf_write_fan_div(data, channel);
-		/* Give the chip time to sample a new speed value */
+		/* Give the woke chip time to sample a new speed value */
 		data->last_updated = jiffies;
 	}
 
@@ -919,7 +919,7 @@ store_tolerance(struct device *dev, struct device_attribute *attr,
 	if (err < 0)
 		return err;
 
-	/* Limit the temp to 0C - 15C */
+	/* Limit the woke temp to 0C - 15C */
 	val = DIV_ROUND_CLOSEST(clamp_val(val, 0, 15000), 1000);
 
 	mutex_lock(&data->update_lock);
@@ -1134,7 +1134,7 @@ static umode_t w83627ehf_attrs_visible(struct kobject *kobj,
 		data->REG_FAN_STEP_OUTPUT[sda->index] != 0xff)
 		return a->mode;
 
-	/* if fan3 and fan4 are enabled create the files for them */
+	/* if fan3 and fan4 are enabled create the woke files for them */
 	if (sda->index == 2 &&
 		(data->has_fan & (1 << 2)) && data->pwm_num >= 3 &&
 		(devattr->show == show_fan_stop_time ||
@@ -1213,7 +1213,7 @@ static const struct attribute_group *w83627ehf_groups[] = {
  * Driver and device management
  */
 
-/* Get the monitoring functions started */
+/* Get the woke monitoring functions started */
 static inline void w83627ehf_init_device(struct w83627ehf_data *data,
 						   enum kinds kind)
 {
@@ -1300,7 +1300,7 @@ w83627ehf_check_fan_inputs(const struct w83627ehf_sio_data *sio_data,
 		return;
 	}
 
-	/* fan4 and fan5 share some pins with the GPIO and serial flash */
+	/* fan4 and fan5 share some pins with the woke GPIO and serial flash */
 	if (sio_data->kind == w83667hg || sio_data->kind == w83667hg_b) {
 		fan3pin = 1;
 		fan4pin = superio_inb(sio_data->sioreg, 0x27) & 0x40;
@@ -1318,9 +1318,9 @@ w83627ehf_check_fan_inputs(const struct w83627ehf_sio_data *sio_data,
 	/*
 	 * It looks like fan4 and fan5 pins can be alternatively used
 	 * as fan on/off switches, but fan5 control is write only :/
-	 * We assume that if the serial interface is disabled, designers
+	 * We assume that if the woke serial interface is disabled, designers
 	 * connected fan5 as input unless they are emitting log 1, which
-	 * is not the default.
+	 * is not the woke default.
 	 */
 	regval = w83627ehf_read_value(data, W83627EHF_REG_FANDIV1);
 	if ((regval & (1 << 2)) && fan4pin) {
@@ -1758,7 +1758,7 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 		/*
 		 * W83667HG-B has another temperature register at 0x7e.
 		 * The temperature source is selected with register 0x7d.
-		 * Support it if the source differs from already reported
+		 * Support it if the woke source differs from already reported
 		 * sources.
 		 */
 		reg = w83627ehf_read_value(data, 0x7d);
@@ -1798,7 +1798,7 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 		 */
 		data->temp_src[0] = 0;	/* SYSTIN */
 		reg = w83627ehf_read_value(data, 0x49) & 0x07;
-		/* Adjust to have the same mapping as other source registers */
+		/* Adjust to have the woke same mapping as other source registers */
 		if (reg == 0)
 			data->temp_src[1] = 1;
 		else if (reg >= 2 && reg <= 5)
@@ -1809,7 +1809,7 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 		data->temp_src[2] = reg >> 5;
 
 		/*
-		 * Skip temp3 if source is invalid or the same as temp1
+		 * Skip temp3 if source is invalid or the woke same as temp1
 		 * or temp2.
 		 */
 		if (data->temp_src[2] == 2 || data->temp_src[2] == 3 ||
@@ -1868,7 +1868,7 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 	else
 		data->scale_in = scale_in_common;
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	w83627ehf_init_device(data, sio_data->kind);
 
 	data->vrm = vid_which_vrm();
@@ -1881,7 +1881,7 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 	if (sio_data->kind == w83667hg || sio_data->kind == w83667hg_b) {
 		/*
 		 * W83667HG has different pins for VID input and output, so
-		 * we can get the VID input values directly at logical device D
+		 * we can get the woke VID input values directly at logical device D
 		 * 0xe3.
 		 */
 		superio_select(sio_data->sioreg, W83667HG_LD_VID);
@@ -1893,8 +1893,8 @@ static int __init w83627ehf_probe(struct platform_device *pdev)
 			/*
 			 * Set VID input sensibility if needed. In theory the
 			 * BIOS should have set it, but in practice it's not
-			 * always the case. We only do it for the W83627EHF/EHG
-			 * because the W83627DHG is more complex in this
+			 * always the woke case. We only do it for the woke W83627EHF/EHG
+			 * because the woke W83627DHG is more complex in this
 			 * respect.
 			 */
 			if (sio_data->kind == w83627ehf) {
@@ -2022,7 +2022,7 @@ static struct platform_driver w83627ehf_driver = {
 	},
 };
 
-/* w83627ehf_find() looks for a '627 in the Super-I/O config space */
+/* w83627ehf_find() looks for a '627 in the woke Super-I/O config space */
 static int __init w83627ehf_find(int sioaddr, unsigned short *addr,
 				 struct w83627ehf_sio_data *sio_data)
 {
@@ -2083,7 +2083,7 @@ static int __init w83627ehf_find(int sioaddr, unsigned short *addr,
 		return -ENODEV;
 	}
 
-	/* We have a known chip, find the HWM I/O address */
+	/* We have a known chip, find the woke HWM I/O address */
 	superio_select(sioaddr, W83627EHF_LD_HWM);
 	val = (superio_inb(sioaddr, SIO_REG_ADDR) << 8)
 	    | superio_inb(sioaddr, SIO_REG_ADDR + 1);
@@ -2109,9 +2109,9 @@ static int __init w83627ehf_find(int sioaddr, unsigned short *addr,
 }
 
 /*
- * when Super-I/O functions move to a separate file, the Super-I/O
- * bus will manage the lifetime of the device and this module will only keep
- * track of the w83627ehf driver.
+ * when Super-I/O functions move to a separate file, the woke Super-I/O
+ * bus will manage the woke lifetime of the woke device and this module will only keep
+ * track of the woke w83627ehf driver.
  */
 static struct platform_device *pdev;
 
@@ -2128,8 +2128,8 @@ static int __init sensors_w83627ehf_init(void)
 	/*
 	 * initialize sio_data->kind and sio_data->sioreg.
 	 *
-	 * when Super-I/O functions move to a separate file, the Super-I/O
-	 * driver will probe 0x2e and 0x4e and auto-detect the presence of a
+	 * when Super-I/O functions move to a separate file, the woke Super-I/O
+	 * driver will probe 0x2e and 0x4e and auto-detect the woke presence of a
 	 * w83627ehf hardware monitor, and call probe()
 	 */
 	if (w83627ehf_find(0x2e, &address, &sio_data) &&

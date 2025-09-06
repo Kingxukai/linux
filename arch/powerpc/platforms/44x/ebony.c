@@ -8,7 +8,7 @@
  * Eugene Surovegin <eugene.surovegin@zultys.com> or <ebs@ebshome.net>
  * Copyright (c) 2003-2005 Zultys Technologies
  *
- * Rewritten and ported to the merged powerpc tree:
+ * Rewritten and ported to the woke merged powerpc tree:
  * Copyright 2007 David Gibson <dwg@au1.ibm.com>, IBM Corporation.
  */
 

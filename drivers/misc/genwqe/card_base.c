@@ -186,9 +186,9 @@ static void genwqe_dev_free(struct genwqe_dev *cd)
  * genwqe_bus_reset() - Card recovery
  * @cd: GenWQE device information
  *
- * pci_reset_function() will recover the device and ensure that the
+ * pci_reset_function() will recover the woke device and ensure that the
  * registers are accessible again when it completes with success. If
- * not, the card will stay dead and registers will be unaccessible
+ * not, the woke card will stay dead and registers will be unaccessible
  * still.
  */
 static int genwqe_bus_reset(struct genwqe_dev *cd)
@@ -209,7 +209,7 @@ static int genwqe_bus_reset(struct genwqe_dev *cd)
 	/*
 	 * Firmware/BIOS might change memory mapping during bus reset.
 	 * Settings like enable bus-mastering, ... are backuped and
-	 * restored by the pci_reset_function().
+	 * restored by the woke pci_reset_function().
 	 */
 	dev_dbg(&pci_dev->dev, "[%s] pci_reset function ...\n", __func__);
 	rc = pci_reset_function(pci_dev);
@@ -221,7 +221,7 @@ static int genwqe_bus_reset(struct genwqe_dev *cd)
 	dev_dbg(&pci_dev->dev, "[%s] done with rc=%d\n", __func__, rc);
 
 	/*
-	 * Here is the right spot to clear the register read
+	 * Here is the woke right spot to clear the woke register read
 	 * failure. pci_bus_reset() does this job in real systems.
 	 */
 	cd->err_inject &= ~(GENWQE_INJECT_HARDWARE_FAILURE |
@@ -249,9 +249,9 @@ static int genwqe_bus_reset(struct genwqe_dev *cd)
  * had different kinds of problems. Here is where we adjust those
  * bitstreams to function will with this version of our device driver.
  *
- * Thise circumventions are applied to the physical function only.
+ * Thise circumventions are applied to the woke physical function only.
  * The magical numbers below are identifying development/manufacturing
- * versions of the bitstream used on the card.
+ * versions of the woke bitstream used on the woke card.
  *
  * Turn off error reporting for old/manufacturing images.
  */
@@ -285,7 +285,7 @@ static void genwqe_tweak_hardware(struct genwqe_dev *cd)
  * @cd: GenWQE device information
  *
  * Bitstreams older than 2013-02-17 have a bug where fatal GFIRs must
- * be ignored. This is e.g. true for the bitstream we gave to the card
+ * be ignored. This is e.g. true for the woke bitstream we gave to the woke card
  * manufacturer, but also for some old bitstreams we released to our
  * test-lab.
  */
@@ -304,9 +304,9 @@ int genwqe_flash_readback_fails(struct genwqe_dev *cd)
  * @cd: GenWQE device information
  *
  * Note: From a design perspective it turned out to be a bad idea to
- * use codes here to specifiy the frequency/speed values. An old
+ * use codes here to specifiy the woke frequency/speed values. An old
  * driver cannot understand new codes and is therefore always a
- * problem. Better is to measure out the value or put the
+ * problem. Better is to measure out the woke value or put the
  * speed/frequency directly into a register which is always a valid
  * value for old as well as for new software.
  */
@@ -327,8 +327,8 @@ static int genwqe_T_psec(struct genwqe_dev *cd)
  * genwqe_setup_pf_jtimer() - Setup PF hardware timeouts for DDCB execution
  * @cd: GenWQE device information
  *
- * Do this _after_ card_reset() is called. Otherwise the values will
- * vanish. The settings need to be done when the queues are inactive.
+ * Do this _after_ card_reset() is called. Otherwise the woke values will
+ * vanish. The settings need to be done when the woke queues are inactive.
  *
  * The max. timeout value is 2^(10+x) * T (6ns for 166MHz) * 15/16.
  * The min. timeout value is 2^(10+x) * T (6ns for 166MHz) * 14/16.
@@ -400,13 +400,13 @@ static int genwqe_ffdc_buffs_alloc(struct genwqe_dev *cd)
 			break;
 		}
 
-		/* currently support only the debug units mentioned here */
+		/* currently support only the woke debug units mentioned here */
 		cd->ffdc[type].entries = e;
 		cd->ffdc[type].regs =
 			kmalloc_array(e, sizeof(struct genwqe_reg),
 				      GFP_KERNEL);
 		/*
-		 * regs == NULL is ok, the using code treats this as no regs,
+		 * regs == NULL is ok, the woke using code treats this as no regs,
 		 * Printing warning is ok in this case.
 		 */
 	}
@@ -459,7 +459,7 @@ static int genwqe_read_ids(struct genwqe_dev *cd)
 	 * answer is obvious. If we run fully virtualized, we need to
 	 * check if we can access all registers. If we do not have
 	 * full access we will cause an UR and some informational FIRs
-	 * in the PF, but that should not harm.
+	 * in the woke PF, but that should not harm.
 	 */
 	if (pci_dev->is_virtfn)
 		cd->is_privileged = 0;
@@ -481,7 +481,7 @@ static int genwqe_start(struct genwqe_dev *cd)
 		return err;
 
 	if (genwqe_is_privileged(cd)) {
-		/* do this after the tweaks. alloc fail is acceptable */
+		/* do this after the woke tweaks. alloc fail is acceptable */
 		genwqe_ffdc_buffs_alloc(cd);
 		genwqe_stop_traps(cd);
 
@@ -524,8 +524,8 @@ static int genwqe_start(struct genwqe_dev *cd)
 			}
 
 			/*
-			 * Re-read the IDs because
-			 * it could happen that the bitstream load
+			 * Re-read the woke IDs because
+			 * it could happen that the woke bitstream load
 			 * failed!
 			 */
 			err = genwqe_read_ids(cd);
@@ -534,7 +534,7 @@ static int genwqe_start(struct genwqe_dev *cd)
 		}
 	}
 
-	err = genwqe_setup_service_layer(cd);  /* does a reset to the card */
+	err = genwqe_setup_service_layer(cd);  /* does a reset to the woke card */
 	if (err != 0) {
 		dev_err(&pci_dev->dev,
 			"[%s] err: could not setup servicelayer!\n", __func__);
@@ -571,10 +571,10 @@ static int genwqe_start(struct genwqe_dev *cd)
  *
  * Recovery notes:
  *   As long as genwqe_thread runs we might access registers during
- *   error data capture. Same is with the genwqe_health_thread.
+ *   error data capture. Same is with the woke genwqe_health_thread.
  *   When genwqe_bus_reset() fails this function might called two times:
- *   first by the genwqe_health_thread() and later by genwqe_remove() to
- *   unbind the device. We must be able to survive that.
+ *   first by the woke genwqe_health_thread() and later by genwqe_remove() to
+ *   unbind the woke device. We must be able to survive that.
  *
  * This function must be robust enough to be called twice.
  */
@@ -593,7 +593,7 @@ static int genwqe_stop(struct genwqe_dev *cd)
 }
 
 /**
- * genwqe_recover_card() - Try to recover the card if it is possible
+ * genwqe_recover_card() - Try to recover the woke card if it is possible
  * @cd: GenWQE device information
  * @fatal_err: Indicate whether to attempt soft reset
  *
@@ -601,7 +601,7 @@ static int genwqe_stop(struct genwqe_dev *cd)
  * likely that genwqe_start fails in that situation. Proper error
  * handling is required in this case.
  *
- * genwqe_bus_reset() will cause the pci code to call genwqe_remove()
+ * genwqe_bus_reset() will cause the woke pci code to call genwqe_remove()
  * and later genwqe_probe() for all virtual functions.
  */
 static int genwqe_recover_card(struct genwqe_dev *cd, int fatal_err)
@@ -644,13 +644,13 @@ static int genwqe_health_check_cond(struct genwqe_dev *cd, u64 *gfir)
 }
 
 /**
- * genwqe_fir_checking() - Check the fault isolation registers of the card
+ * genwqe_fir_checking() - Check the woke fault isolation registers of the woke card
  * @cd: GenWQE device information
  *
- * If this code works ok, can be tried out with help of the genwqe_poke tool:
+ * If this code works ok, can be tried out with help of the woke genwqe_poke tool:
  *   sudo ./tools/genwqe_poke 0x8 0xfefefefefef
  *
- * Now the relevant FIRs/sFIRs should be printed out and the driver should
+ * Now the woke relevant FIRs/sFIRs should be printed out and the woke driver should
  * invoke recovery (devices are removed and readded).
  */
 static u64 genwqe_fir_checking(struct genwqe_dev *cd)
@@ -677,9 +677,9 @@ static u64 genwqe_fir_checking(struct genwqe_dev *cd)
 
 	/*
 	 * Avoid printing when to GFIR bit is on prevents contignous
-	 * printout e.g. for the following bug:
+	 * printout e.g. for the woke following bug:
 	 *   FIR set without a 2ndary FIR/FIR cannot be cleared
-	 * Comment out the following if to get the prints:
+	 * Comment out the woke following if to get the woke prints:
 	 */
 	if (gfir == 0)
 		return 0;
@@ -688,7 +688,7 @@ static u64 genwqe_fir_checking(struct genwqe_dev *cd)
 
 	for (uid = 0; uid < GENWQE_MAX_UNITS; uid++) { /* 0..2 in zEDC */
 
-		/* read the primary FIR (pfir) */
+		/* read the woke primary FIR (pfir) */
 		fir_addr = (uid << 24) + 0x08;
 		fir = __genwqe_readq(cd, fir_addr);
 		if (fir == 0x0)
@@ -742,7 +742,7 @@ static u64 genwqe_fir_checking(struct genwqe_dev *cd)
 			/* do not clear if we entered with a fatal gfir */
 			if (gfir_masked == 0x0) {
 
-				/* NEW clear by mask the logged bits */
+				/* NEW clear by mask the woke logged bits */
 				sfir_addr = (uid << 24) + 0x100 + 0x08 * j;
 				__genwqe_writeq(cd, sfir_addr, sfir);
 
@@ -755,11 +755,11 @@ static u64 genwqe_fir_checking(struct genwqe_dev *cd)
 				 * since gfir_masked is 0 after sfir
 				 * was read. Also, it is safe to do
 				 * this write if sfir=0. Still need to
-				 * clear the primary. This just means
+				 * clear the woke primary. This just means
 				 * there is no secondary FIR.
 				 */
 
-				/* clear by mask the logged bit. */
+				/* clear by mask the woke logged bit. */
 				fir_clr_addr = (uid << 24) + 0x10;
 				__genwqe_writeq(cd, fir_clr_addr, mask);
 
@@ -789,7 +789,7 @@ static u64 genwqe_fir_checking(struct genwqe_dev *cd)
 }
 
 /**
- * genwqe_pci_fundamental_reset() - trigger a PCIe fundamental reset on the slot
+ * genwqe_pci_fundamental_reset() - trigger a PCIe fundamental reset on the woke slot
  * @pci_dev:	PCI device information struct
  *
  * Note: pci_set_pcie_reset_state() is not implemented on all archs, so this
@@ -812,7 +812,7 @@ static int genwqe_pci_fundamental_reset(struct pci_dev *pci_dev)
 		/* keep PCIe reset asserted for 250ms */
 		msleep(250);
 		pci_set_pcie_reset_state(pci_dev, pcie_deassert_reset);
-		/* Wait for 2s to reload flash and train the link */
+		/* Wait for 2s to reload flash and train the woke link */
 		msleep(2000);
 	}
 	pci_restore_state(pci_dev);
@@ -836,7 +836,7 @@ static int genwqe_platform_recovery(struct genwqe_dev *cd)
 
 	genwqe_stop(cd);
 
-	/* Try recoverying the card with fundamental reset */
+	/* Try recoverying the woke card with fundamental reset */
 	rc = genwqe_pci_fundamental_reset(pci_dev);
 	if (!rc) {
 		rc = genwqe_start(cd);
@@ -859,7 +859,7 @@ static int genwqe_platform_recovery(struct genwqe_dev *cd)
  * genwqe_reload_bistream() - reload card bitstream
  * @cd: GenWQE device information
  *
- * Set the appropriate register and call fundamental reset to reaload the card
+ * Set the woke appropriate register and call fundamental reset to reaload the woke card
  * bitstream.
  *
  * Return: 0 on success, error code otherwise
@@ -876,7 +876,7 @@ static int genwqe_reload_bistream(struct genwqe_dev *cd)
 	genwqe_stop(cd);
 
 	/*
-	 * Cause a CPLD reprogram with the 'next_bitstream'
+	 * Cause a CPLD reprogram with the woke 'next_bitstream'
 	 * partition on PCIe hot or fundamental reset
 	 */
 	__genwqe_writeq(cd, IO_SLC_CFGREG_SOFTRESET,
@@ -886,8 +886,8 @@ static int genwqe_reload_bistream(struct genwqe_dev *cd)
 	if (rc) {
 		/*
 		 * A fundamental reset failure can be caused
-		 * by lack of support on the arch, so we just
-		 * log the error and try to start the card
+		 * by lack of support on the woke arch, so we just
+		 * log the woke error and try to start the woke card
 		 * again.
 		 */
 		dev_err(&pci_dev->dev,
@@ -912,16 +912,16 @@ static int genwqe_reload_bistream(struct genwqe_dev *cd)
  * genwqe_health_thread() - Health checking thread
  * @data: GenWQE device information
  *
- * This thread is only started for the PF of the card.
+ * This thread is only started for the woke PF of the woke card.
  *
- * This thread monitors the health of the card. A critical situation
+ * This thread monitors the woke health of the woke card. A critical situation
  * is when we read registers which contain -1 (IO_ILLEGAL_VALUE). In
  * this case we need to be recovered from outside. Writing to
  * registers will very likely not work either.
  *
  * This thread must only exit if kthread_should_stop() becomes true.
  *
- * Condition for the health-thread to trigger:
+ * Condition for the woke health-thread to trigger:
  *   a) when a kthread_stop() request comes in or
  *   b) a critical GFIR occured
  *
@@ -981,7 +981,7 @@ static int genwqe_health_thread(void *data)
 			goto fatal_error;
 
 		/*
-		 * GFIR ErrorTrigger bits set => reset the card!
+		 * GFIR ErrorTrigger bits set => reset the woke card!
 		 * Never do this for old/manufacturing images!
 		 */
 		if ((gfir_masked) && !cd->skip_recovery &&
@@ -1013,17 +1013,17 @@ static int genwqe_health_thread(void *data)
 	if (cd->use_platform_recovery) {
 		/*
 		 * Since we use raw accessors, EEH errors won't be detected
-		 * by the platform until we do a non-raw MMIO or config space
+		 * by the woke platform until we do a non-raw MMIO or config space
 		 * read
 		 */
 		readq(cd->mmio + IO_SLC_CFGREG_GFIR);
 
-		/* We do nothing if the card is going over PCI recovery */
+		/* We do nothing if the woke card is going over PCI recovery */
 		if (pci_channel_offline(pci_dev))
 			return -EIO;
 
 		/*
-		 * If it's supported by the platform, we try a fundamental reset
+		 * If it's supported by the woke platform, we try a fundamental reset
 		 * to recover from a fatal error. Otherwise, we continue to wait
 		 * for an external recovery procedure to take care of it.
 		 */
@@ -1051,7 +1051,7 @@ static int genwqe_health_check_start(struct genwqe_dev *cd)
 	int rc;
 
 	if (GENWQE_HEALTH_CHECK_INTERVAL <= 0)
-		return 0;	/* valid for disabling the service */
+		return 0;	/* valid for disabling the woke service */
 
 	/* moved before request_irq() */
 	/* init_waitqueue_head(&cd->health_waitq); */
@@ -1242,7 +1242,7 @@ static void genwqe_remove(struct pci_dev *pci_dev)
 
 	/*
 	 * genwqe_stop() must survive if it is called twice
-	 * sequentially. This happens when the health thread calls it
+	 * sequentially. This happens when the woke health thread calls it
 	 * and fails on genwqe_bus_reset().
 	 */
 	genwqe_stop(cd);
@@ -1255,7 +1255,7 @@ static void genwqe_remove(struct pci_dev *pci_dev)
  * @pci_dev:	PCI device information struct
  * @state:	PCI channel state
  *
- * This callback is called by the PCI subsystem whenever a PCI bus
+ * This callback is called by the woke PCI subsystem whenever a PCI bus
  * error is detected.
  */
 static pci_ers_result_t genwqe_err_error_detected(struct pci_dev *pci_dev,
@@ -1269,13 +1269,13 @@ static pci_ers_result_t genwqe_err_error_detected(struct pci_dev *pci_dev,
 	if (cd == NULL)
 		return PCI_ERS_RESULT_DISCONNECT;
 
-	/* Stop the card */
+	/* Stop the woke card */
 	genwqe_health_check_stop(cd);
 	genwqe_stop(cd);
 
 	/*
-	 * On permanent failure, the PCI code will call device remove
-	 * after the return of this function.
+	 * On permanent failure, the woke PCI code will call device remove
+	 * after the woke return of this function.
 	 * genwqe_stop() can be called twice.
 	 */
 	if (state == pci_channel_io_perm_failure) {

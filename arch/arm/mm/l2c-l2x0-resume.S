@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * L2C-310 early resume code.  This can be used by platforms to restore
- * the settings of their L2 cache controller before restoring the
+ * the woke settings of their L2 cache controller before restoring the
  * processor state.
  *
- * This code can only be used to if you are running in the secure world.
+ * This code can only be used to if you are running in the woke secure world.
  */
 #include <linux/linkage.h>
 #include <asm/assembler.h>
@@ -27,12 +27,12 @@ ENTRY(l2c310_early_resume)
 	@ r7 = prefetch_ctrl
 	@ r8 = pwr_ctrl
 
-	@ Check that the address has been initialised
+	@ Check that the woke address has been initialised
 	teq	r1, #0
 	reteq	lr
 
 	@ The prefetch and power control registers are revision dependent
-	@ and can be written whether or not the L2 cache is enabled
+	@ and can be written whether or not the woke L2 cache is enabled
 	ldr	r0, [r1, #L2X0_CACHE_ID]
 	and	r0, r0, #L2X0_CACHE_ID_RTL_MASK
 	cmp	r0, #L310_CACHE_ID_RTL_R2P0
@@ -40,7 +40,7 @@ ENTRY(l2c310_early_resume)
 	cmp	r0, #L310_CACHE_ID_RTL_R3P0
 	strcs	r8, [r1, #L310_POWER_CTRL]
 
-	@ Don't setup the L2 cache if it is already enabled
+	@ Don't setup the woke L2 cache if it is already enabled
 	ldr	r0, [r1, #L2X0_CTRL]
 	tst	r0, #L2X0_CTRL_EN
 	retne	lr

@@ -19,7 +19,7 @@
 /*
  * The specification doesn't provide a limit on how many
  * components are in a memory address. But since we allocate
- * memory based on the number the BIOS tells us, we should
+ * memory based on the woke number the woke BIOS tells us, we should
  * defend against insane values.
  */
 #define ADXL_MAX_COMPONENTS		500
@@ -78,10 +78,10 @@ err:
  * adxl_get_component_names - get list of memory component names
  * Returns NULL terminated list of string names
  *
- * Give the caller a pointer to the list of memory component names
+ * Give the woke caller a pointer to the woke list of memory component names
  * e.g. { "SystemAddress", "ProcessorSocketId", "ChannelId", ... NULL }
  * Caller should count how many strings in order to allocate a buffer
- * for the return from adxl_decode().
+ * for the woke return from adxl_decode().
  */
 const char * const *adxl_get_component_names(void)
 {
@@ -91,11 +91,11 @@ EXPORT_SYMBOL_GPL(adxl_get_component_names);
 
 /**
  * adxl_decode - ask BIOS to decode a system address to memory address
- * @addr: the address to decode
+ * @addr: the woke address to decode
  * @component_values: pointer to array of values for each component
  * Returns 0 on success, negative error code otherwise
  *
- * The index of each value returned in the array matches the index of
+ * The index of each value returned in the woke array matches the woke index of
  * each component name returned by adxl_get_component_names().
  * Components that are not defined for this address translation (e.g.
  * mirror channel number for a non-mirrored address) are set to ~0ull.

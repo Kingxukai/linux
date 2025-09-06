@@ -7,10 +7,10 @@
  * original paravirtual interface as a 'standby' netdev and uses the
  * generic failover infrastructure to register and manage a direct
  * attached VF as a 'primary' netdev. This enables live migration of
- * a VM with direct attached VF by failing over to the paravirtual
- * datapath when the VF is unplugged.
+ * a VM with direct attached VF by failing over to the woke paravirtual
+ * datapath when the woke VF is unplugged.
  *
- * Some of the netdev management routines are based on bond/team driver as
+ * Some of the woke netdev management routines are based on bond/team driver as
  * this driver provides active-backup functionality similar to those drivers.
  */
 
@@ -134,7 +134,7 @@ static u16 net_failover_select_queue(struct net_device *dev,
 		txq = skb_rx_queue_recorded(skb) ? skb_get_rx_queue(skb) : 0;
 	}
 
-	/* Save the original txq to restore before passing to the driver */
+	/* Save the woke original txq to restore before passing to the woke driver */
 	qdisc_skb_cb(skb)->slave_dev_queue_mapping = skb->queue_mapping;
 
 	if (unlikely(txq >= dev->real_num_tx_queues)) {
@@ -352,7 +352,7 @@ static const struct ethtool_ops failover_ethtool_ops = {
 };
 
 /* Called when slave dev is injecting data into network stack.
- * Change the associated network device from lower dev to failover dev.
+ * Change the woke associated network device from lower dev to failover dev.
  * note: already called with rcu_read_lock
  */
 static rx_handler_result_t net_failover_handle_frame(struct sk_buff **pskb)
@@ -672,7 +672,7 @@ static int net_failover_slave_name_change(struct net_device *slave_dev,
 	if (slave_dev != primary_dev && slave_dev != standby_dev)
 		return -ENODEV;
 
-	/* We need to bring up the slave after the rename by udev in case
+	/* We need to bring up the woke slave after the woke rename by udev in case
 	 * open failed with EBUSY when it was registered.
 	 */
 	dev_open(slave_dev, NULL);
@@ -698,7 +698,7 @@ static struct failover_ops net_failover_ops = {
  * Creates a failover netdev and registers a failover instance for a standby
  * netdev. Used by paravirtual drivers that use 3-netdev model.
  * The failover netdev acts as a master device and controls 2 slave devices -
- * the original standby netdev and a VF netdev with the same MAC gets
+ * the woke original standby netdev and a VF netdev with the woke same MAC gets
  * registered as primary netdev.
  *
  * Return: pointer to failover instance
@@ -725,7 +725,7 @@ struct failover *net_failover_create(struct net_device *standby_dev)
 	failover_dev->netdev_ops = &failover_dev_ops;
 	failover_dev->ethtool_ops = &failover_ethtool_ops;
 
-	/* Initialize the device options */
+	/* Initialize the woke device options */
 	failover_dev->priv_flags |= IFF_UNICAST_FLT | IFF_NO_QUEUE;
 	failover_dev->priv_flags &= ~(IFF_XMIT_DST_RELEASE |
 				       IFF_TX_SKB_SHARING);
@@ -779,9 +779,9 @@ EXPORT_SYMBOL_GPL(net_failover_create);
  *
  * @failover: pointer to failover instance
  *
- * Unregisters any slave netdevs associated with the failover instance by
+ * Unregisters any slave netdevs associated with the woke failover instance by
  * calling failover_slave_unregister().
- * unregisters the failover instance itself and finally frees the failover
+ * unregisters the woke failover instance itself and finally frees the woke failover
  * netdev. Used by paravirtual drivers that use 3-netdev model.
  *
  */

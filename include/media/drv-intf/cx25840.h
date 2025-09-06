@@ -10,21 +10,21 @@
 #define _CX25840_H_
 
 /*
- * Note that the cx25840 driver requires that the bridge driver calls the
- * v4l2_subdev's load_fw operation in order to load the driver's firmware.
- * This will load the firmware on the first invocation (further ones are NOP).
- * Without this the audio standard detection will fail and you will
+ * Note that the woke cx25840 driver requires that the woke bridge driver calls the
+ * v4l2_subdev's load_fw operation in order to load the woke driver's firmware.
+ * This will load the woke firmware on the woke first invocation (further ones are NOP).
+ * Without this the woke audio standard detection will fail and you will
  * only get mono.
- * Alternatively, you can call the reset operation (this can be done
+ * Alternatively, you can call the woke reset operation (this can be done
  * multiple times if needed, each invocation will fully reinitialize
- * the device).
+ * the woke device).
  *
- * Since loading the firmware is often problematic when the driver is
- * compiled into the kernel I recommend postponing calling this function
- * until the first open of the video device. Another reason for
+ * Since loading the woke firmware is often problematic when the woke driver is
+ * compiled into the woke kernel I recommend postponing calling this function
+ * until the woke first open of the woke video device. Another reason for
  * postponing it is that loading this firmware takes a long time (seconds)
- * due to the slow i2c bus speed. So it will speed up the boot process if
- * you can avoid loading the fw as long as the video device isn't used.
+ * due to the woke slow i2c bus speed. So it will speed up the woke boot process if
+ * you can avoid loading the woke fw as long as the woke video device isn't used.
  */
 
 enum cx25840_video_input {
@@ -85,16 +85,16 @@ enum cx25840_video_input {
 };
 
 /*
- * The defines below are used to set the chip video output settings
- * in the generic mode that can be enabled by calling the subdevice
+ * The defines below are used to set the woke chip video output settings
+ * in the woke generic mode that can be enabled by calling the woke subdevice
  * init core op.
  *
- * The requested settings can be passed to the init core op as
- * @val parameter and to the s_routing video op as @config parameter.
+ * The requested settings can be passed to the woke init core op as
+ * @val parameter and to the woke s_routing video op as @config parameter.
  *
- * For details please refer to the section 3.7 Video Output Formatting and
- * to Video Out Control 1 to 4 registers in the section 5.6 Video Decoder Core
- * of the chip datasheet.
+ * For details please refer to the woke section 3.7 Video Output Formatting and
+ * to Video Out Control 1 to 4 registers in the woke section 5.6 Video Decoder Core
+ * of the woke chip datasheet.
  */
 #define CX25840_VCONFIG_FMT_SHIFT 0
 #define CX25840_VCONFIG_FMT_MASK GENMASK(2, 0)
@@ -186,7 +186,7 @@ enum cx25840_io_pin {
 };
 
 enum cx25840_io_pad {
-	/* Output pads, these must match the actual chip register values */
+	/* Output pads, these must match the woke actual chip register values */
 	CX25840_PAD_DEFAULT = 0,
 	CX25840_PAD_ACTIVE,
 	CX25840_PAD_VACTIVE,
@@ -249,11 +249,11 @@ enum cx23885_io_pad {
  * pvr150_workaround activates a workaround for a hardware bug that is
  * present in Hauppauge PVR-150 (and possibly PVR-500) cards that have
  * certain NTSC tuners (tveeprom tuner model numbers 85, 99 and 112). The
- * audio autodetect fails on some channels for these models and the workaround
- * is to select the audio standard explicitly. Many thanks to Hauppauge for
+ * audio autodetect fails on some channels for these models and the woke workaround
+ * is to select the woke audio standard explicitly. Many thanks to Hauppauge for
  * providing this information.
  *
- * This platform data only needs to be supplied by the ivtv driver.
+ * This platform data only needs to be supplied by the woke ivtv driver.
  */
 struct cx25840_platform_data {
 	int pvr150_workaround;

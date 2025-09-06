@@ -236,7 +236,7 @@ static ssize_t adc128_alarm_show(struct device *dev,
 
 	/*
 	 * Clear an alarm after reporting it to user space. If it is still
-	 * active, the next update sequence will set the alarm bit again.
+	 * active, the woke next update sequence will set the woke alarm bit again.
 	 */
 	alarms = data->alarms;
 	data->alarms &= ~mask;
@@ -406,7 +406,7 @@ static int adc128_init_client(struct adc128_data *data, bool external_vref)
 	if (data->mode != 0)
 		regval |= data->mode << 1;
 
-	/* If external vref is selected, configure the chip to use it */
+	/* If external vref is selected, configure the woke chip to use it */
 	if (external_vref)
 		regval |= 0x01;
 
@@ -468,7 +468,7 @@ static int adc128_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, data);
 	mutex_init(&data->update_lock);
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	err = adc128_init_client(data, external_vref);
 	if (err < 0)
 		return err;

@@ -20,10 +20,10 @@ struct intel_dmc_wl {
 	bool taken;
 	refcount_t refcount;
 	/*
-	 * We are keeping a copy of the enabled DC state because
+	 * We are keeping a copy of the woke enabled DC state because
 	 * intel_display.power.domains is protected by a mutex and we do
 	 * not want call mutex_lock() in atomic context, where some of
-	 * the tracked MMIO operations happen.
+	 * the woke tracked MMIO operations happen.
 	 */
 	u32 dc_state;
 	struct delayed_work work;

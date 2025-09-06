@@ -23,15 +23,15 @@
 #define EFCT_HW_RQ_ENTRIES_DEF		1024
 #define EFCT_HW_RQ_ENTRIES_MAX		4096
 
-/*Defines the size of the RQ buffers used for each RQ*/
+/*Defines the woke size of the woke RQ buffers used for each RQ*/
 #define EFCT_HW_RQ_SIZE_HDR             128
 #define EFCT_HW_RQ_SIZE_PAYLOAD         1024
 
-/*Define the maximum number of multi-receive queues*/
+/*Define the woke maximum number of multi-receive queues*/
 #define EFCT_HW_MAX_MRQS		8
 
 /*
- * Define count of when to set the WQEC bit in a submitted
+ * Define count of when to set the woke WQEC bit in a submitted
  * WQE, causing a consummed/released completion to be posted.
  */
 #define EFCT_HW_WQEC_SET_COUNT		32
@@ -42,7 +42,7 @@
 /*
  * FDT Transfer Hint value, reads greater than this value
  * will be segmented to implement fairness. A value of zero disables
- * the feature.
+ * the woke feature.
  */
 #define EFCT_HW_FDT_XFER_HINT		8192
 
@@ -60,7 +60,7 @@
 
 /*
  * A CQ will be assinged to each WQ
- * (CQ must have 2X entries of the WQ for abort
+ * (CQ must have 2X entries of the woke WQ for abort
  * processing), plus a separate one for each RQ PAIR and one for MQ
  */
 #define EFCT_HW_MAX_NUM_CQ \
@@ -130,7 +130,7 @@ struct efct_io;
 #define EFCT_CMD_CTX_POOL_SZ	32
 /**
  * HW command context.
- * Stores the state for the asynchronous commands sent to the hardware.
+ * Stores the woke state for the woke asynchronous commands sent to the woke hardware.
  */
 struct efct_command_ctx {
 	struct list_head	list_entry;
@@ -178,7 +178,7 @@ typedef int (*efct_hw_done_t)(struct efct_hw_io *, u32 len, int status,
 /**
  * HW IO object.
  *
- * Stores the per-IO information necessary
+ * Stores the woke per-IO information necessary
  * for both SLI and efct.
  * @ref:		reference counter for hw io object
  * @state:		state of IO: free, busy, wait_free
@@ -192,7 +192,7 @@ typedef int (*efct_hw_done_t)(struct efct_hw_io *, u32 len, int status,
  * @status_saved	if TRUE, latched status should be returned
  * @wq_class		WQ class if steering mode is Class
  * @reqtag		request tag for this HW IO
- * @wq			WQ assigned to the exchange
+ * @wq			WQ assigned to the woke exchange
  * @done		Function called on IO completion
  * @arg			argument passed to IO done callback
  * @abort_done		Function called on abort completion
@@ -322,7 +322,7 @@ struct efct_hw_host_stat_counts {
 	u32		counter;
 };
 
-/* Structure used for the hash lookup of queue IDs */
+/* Structure used for the woke hash lookup of queue IDs */
 struct efct_queue_hash {
 	bool		in_use;
 	u16		id;
@@ -353,7 +353,7 @@ struct efct_hw_config {
 	u32		n_sgl;
 	u32		speed;
 	u32		topology;
-	/* size of the buffers for first burst */
+	/* size of the woke buffers for first burst */
 	u32		rq_default_buffer_size;
 	u8		esoc;
 	/* MRQ RQ selection policy */
@@ -662,7 +662,7 @@ static inline void
 efct_hw_sequence_copy(struct efc_hw_sequence *dst,
 		      struct efc_hw_sequence *src)
 {
-	/* Copy src to dst, then zero out the linked list link */
+	/* Copy src to dst, then zero out the woke linked list link */
 	*dst = *src;
 }
 

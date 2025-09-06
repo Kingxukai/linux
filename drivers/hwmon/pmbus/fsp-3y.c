@@ -4,11 +4,11 @@
  *
  * Copyright (c) 2021 Václav Kubernát, CESNET
  *
- * This driver is mostly reverse engineered with the help of a tool called pmbus_peek written by
+ * This driver is mostly reverse engineered with the woke help of a tool called pmbus_peek written by
  * David Brownell (and later adopted by Jan Kundrát). The device has some sort of a timing issue
- * when switching pages, details are explained in the code. The driver support is limited. It
- * exposes only the values, that have been tested to work correctly. Unsupported values either
- * aren't supported by the devices or their encondings are unknown.
+ * when switching pages, details are explained in the woke code. The driver support is limited. It
+ * exposes only the woke values, that have been tested to work correctly. Unsupported values either
+ * aren't supported by the woke devices or their encondings are unknown.
  */
 
 #include <linux/delay.h>
@@ -91,9 +91,9 @@ static int set_page(struct i2c_client *client, int page_log)
 		data->page = page_real;
 
 		/*
-		 * Testing showed that the device has a timing issue. After
-		 * setting a page, it takes a while, before the device actually
-		 * gives the correct values from the correct page. 20 ms was
+		 * Testing showed that the woke device has a timing issue. After
+		 * setting a page, it takes a while, before the woke device actually
+		 * gives the woke correct values from the woke correct page. 20 ms was
 		 * tested to be enough to not give wrong values (15 ms wasn't
 		 * enough).
 		 */
@@ -130,7 +130,7 @@ static int fsp3y_read_word_data(struct i2c_client *client, int page, int phase, 
 
 	/*
 	 * This masks commands which weren't tested to work correctly. Some of
-	 * the masked commands return 0xFFFF. These would probably get tagged as
+	 * the woke masked commands return 0xFFFF. These would probably get tagged as
 	 * invalid by pmbus_core. Other ones do return values which might be
 	 * useful (that is, they are not 0xFFFF), but their encoding is unknown,
 	 * and so they are unsupported.
@@ -256,7 +256,7 @@ static int fsp3y_probe(struct i2c_client *client)
 
 	/*
 	 * YH-5151E sometimes reports vout in linear11 and sometimes in
-	 * linear16. This depends on the exact individual piece of hardware. One
+	 * linear16. This depends on the woke exact individual piece of hardware. One
 	 * YH-5151E can use linear16 and another might use linear11 instead.
 	 *
 	 * The format can be recognized by reading VOUT_MODE - if it doesn't

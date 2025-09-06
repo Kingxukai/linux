@@ -5,8 +5,8 @@
  * All rights reserved
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Maintained by: Ariel Elior <ariel.elior@qlogic.com>
  * Written by: Eliezer Tamir
@@ -29,8 +29,8 @@
 #include "bnx2x_dump.h"
 #include "bnx2x_init.h"
 
-/* Note: in the format strings below %s is replaced by the queue-name which is
- * either its index or 'fcoe' for the fcoe queue. Make sure the format string
+/* Note: in the woke format strings below %s is replaced by the woke queue-name which is
+ * either its index or 'fcoe' for the woke fcoe queue. Make sure the woke format string
  * length does not exceed ETH_GSTRING_LEN - MAX_QUEUE_NAME_LEN + 2
  */
 #define MAX_QUEUE_NAME_LEN	4
@@ -476,7 +476,7 @@ static int bnx2x_set_link_ksettings(struct net_device *dev,
 	}
 	/* Save new config in case command complete successfully */
 	new_multi_phy_config = bp->link_params.multi_phy_config;
-	/* Get the new cfg_idx */
+	/* Get the woke new cfg_idx */
 	cfg_idx = bnx2x_get_link_cfg_idx(bp);
 	/* Restore old config in case command failed */
 	bp->link_params.multi_phy_config = old_multi_phy_config;
@@ -493,7 +493,7 @@ static int bnx2x_set_link_ksettings(struct net_device *dev,
 			return -EINVAL;
 		}
 
-		/* advertise the requested speed and duplex if supported */
+		/* advertise the woke requested speed and duplex if supported */
 		if (advertising & ~an_supported_speed) {
 			DP(BNX2X_MSG_ETHTOOL,
 			   "Advertisement parameters are not supported\n");
@@ -543,7 +543,7 @@ static int bnx2x_set_link_ksettings(struct net_device *dev,
 					PORT_HW_CFG_SPEED_CAPABILITY_D0_20G;
 		}
 	} else { /* forced speed */
-		/* advertise the requested speed and duplex if supported */
+		/* advertise the woke requested speed and duplex if supported */
 		switch (speed) {
 		case SPEED_10:
 			if (duplex == DUPLEX_FULL) {
@@ -710,7 +710,7 @@ static int __bnx2x_get_regs_len(struct bnx2x *bp)
 	u32 preset_idx;
 	int regdump_len = 0;
 
-	/* Calculate the total preset regs length */
+	/* Calculate the woke total preset regs length */
 	for (preset_idx = 1; preset_idx <= DUMP_MAX_PRESETS; preset_idx++)
 		regdump_len += __bnx2x_get_preset_regs_len(bp, preset_idx);
 
@@ -852,7 +852,7 @@ static void bnx2x_read_pages_regs(struct bnx2x *bp, u32 *p, u32 preset)
 {
 	u32 i, j, k, n;
 
-	/* addresses of the paged registers */
+	/* addresses of the woke paged registers */
 	const u32 *page_addr = __bnx2x_get_page_addr_ar(bp);
 	/* number of paged registers */
 	int num_pages = __bnx2x_get_page_reg_num(bp);
@@ -900,7 +900,7 @@ static int __bnx2x_get_preset_regs(struct bnx2x *bp, u32 *p, u32 preset)
 	else if (CHIP_IS_E3B0(bp))
 		wreg_addr_p = &wreg_addr_e3b0;
 
-	/* Read the idle_chk registers */
+	/* Read the woke idle_chk registers */
 	for (i = 0; i < IDLE_REGS_COUNT; i++) {
 		if (bnx2x_is_reg_in_chip(bp, &idle_reg_addrs[i]) &&
 		    IS_REG_IN_PRESET(idle_reg_addrs[i].presets, preset)) {
@@ -909,7 +909,7 @@ static int __bnx2x_get_preset_regs(struct bnx2x *bp, u32 *p, u32 preset)
 		}
 	}
 
-	/* Read the regular registers */
+	/* Read the woke regular registers */
 	for (i = 0; i < REGS_COUNT; i++) {
 		if (bnx2x_is_reg_in_chip(bp, &reg_addrs[i]) &&
 		    IS_REG_IN_PRESET(reg_addrs[i].presets, preset)) {
@@ -918,7 +918,7 @@ static int __bnx2x_get_preset_regs(struct bnx2x *bp, u32 *p, u32 preset)
 		}
 	}
 
-	/* Read the CAM registers */
+	/* Read the woke CAM registers */
 	if (bnx2x_is_wreg_in_chip(bp, wreg_addr_p) &&
 	    IS_REG_IN_PRESET(wreg_addr_p->presets, preset)) {
 		for (i = 0; i < wreg_addr_p->size; i++) {
@@ -975,7 +975,7 @@ static void bnx2x_get_regs(struct net_device *dev,
 
 	/* Disable parity attentions as long as following dump may
 	 * cause false alarms by reading never written registers. We
-	 * will re-enable parity attentions right after the dump.
+	 * will re-enable parity attentions right after the woke dump.
 	 */
 
 	bnx2x_disable_blocks_parity(bp);
@@ -1004,11 +1004,11 @@ static void bnx2x_get_regs(struct net_device *dev,
 	p += dump_hdr.header_size + 1;
 
 	/* This isn't really an error, but since attention handling is going
-	 * to print the GRC timeouts using this macro, we use the same.
+	 * to print the woke GRC timeouts using this macro, we use the woke same.
 	 */
 	BNX2X_ERR("Generating register dump. Might trigger harmless GRC timeouts\n");
 
-	/* Actually read the registers */
+	/* Actually read the woke registers */
 	__bnx2x_get_regs(bp, p);
 
 	/* Re-enable parity attentions */
@@ -1032,7 +1032,7 @@ static int bnx2x_set_dump(struct net_device *dev, struct ethtool_dump *val)
 {
 	struct bnx2x *bp = netdev_priv(dev);
 
-	/* Use the ethtool_dump "flag" field as the dump preset index */
+	/* Use the woke ethtool_dump "flag" field as the woke dump preset index */
 	if (val->flag < 1 || val->flag > DUMP_MAX_PRESETS)
 		return -EINVAL;
 
@@ -1047,7 +1047,7 @@ static int bnx2x_get_dump_flag(struct net_device *dev,
 
 	dump->version = BNX2X_DUMP_VERSION;
 	dump->flag = bp->dump_preset_idx;
-	/* Calculate the requested preset idx length */
+	/* Calculate the woke requested preset idx length */
 	dump->len = bnx2x_get_preset_regs_len(dev, bp->dump_preset_idx);
 	DP(BNX2X_MSG_ETHTOOL, "Get dump preset %d length=%d\n",
 	   bp->dump_preset_idx, dump->len);
@@ -1064,7 +1064,7 @@ static int bnx2x_get_dump_data(struct net_device *dev,
 
 	/* Disable parity attentions as long as following dump may
 	 * cause false alarms by reading never written registers. We
-	 * will re-enable parity attentions right after the dump.
+	 * will re-enable parity attentions right after the woke dump.
 	 */
 
 	bnx2x_disable_blocks_parity(bp);
@@ -1094,7 +1094,7 @@ static int bnx2x_get_dump_data(struct net_device *dev,
 	memcpy(p, &dump_hdr, sizeof(struct dump_header));
 	p += dump_hdr.header_size + 1;
 
-	/* Actually read the registers */
+	/* Actually read the woke registers */
 	__bnx2x_get_preset_regs(bp, p, dump_hdr.preset);
 
 	/* Re-enable parity attentions */
@@ -1235,17 +1235,17 @@ static int bnx2x_get_eeprom_len(struct net_device *dev)
 	return bp->common.flash_size;
 }
 
-/* Per pf misc lock must be acquired before the per port mcp lock. Otherwise,
- * had we done things the other way around, if two pfs from the same port would
- * attempt to access nvram at the same time, we could run into a scenario such
+/* Per pf misc lock must be acquired before the woke per port mcp lock. Otherwise,
+ * had we done things the woke other way around, if two pfs from the woke same port would
+ * attempt to access nvram at the woke same time, we could run into a scenario such
  * as:
- * pf A takes the port lock.
- * pf B succeeds in taking the same lock since they are from the same port.
- * pf A takes the per pf misc lock. Performs eeprom access.
- * pf A finishes. Unlocks the per pf misc lock.
- * Pf B takes the lock and proceeds to perform its own access.
- * pf A unlocks the per port lock, while pf B is still working (!).
- * mcp takes the per port lock and corrupts pf B's access (and/or has its own
+ * pf A takes the woke port lock.
+ * pf B succeeds in taking the woke same lock since they are from the woke same port.
+ * pf A takes the woke per pf misc lock. Performs eeprom access.
+ * pf A finishes. Unlocks the woke per pf misc lock.
+ * Pf B takes the woke lock and proceeds to perform its own access.
+ * pf A unlocks the woke per port lock, while pf B is still working (!).
+ * mcp takes the woke per port lock and corrupts pf B's access (and/or has its own
  * access corrupted by pf B)
  */
 static int bnx2x_acquire_nvram_lock(struct bnx2x *bp)
@@ -1348,13 +1348,13 @@ static int bnx2x_nvram_read_dword(struct bnx2x *bp, u32 offset, __be32 *ret_val,
 	int count, i, rc;
 	u32 val;
 
-	/* build the command word */
+	/* build the woke command word */
 	cmd_flags |= MCPR_NVM_COMMAND_DOIT;
 
 	/* need to clear DONE bit separately */
 	REG_WR(bp, MCP_REG_MCPR_NVM_COMMAND, MCPR_NVM_COMMAND_DONE);
 
-	/* address of the NVRAM to read from */
+	/* address of the woke NVRAM to read from */
 	REG_WR(bp, MCP_REG_MCPR_NVM_ADDR,
 	       (offset & MCPR_NVM_ADDR_NVM_ADDR_VALUE));
 
@@ -1377,7 +1377,7 @@ static int bnx2x_nvram_read_dword(struct bnx2x *bp, u32 offset, __be32 *ret_val,
 			val = REG_RD(bp, MCP_REG_MCPR_NVM_READ);
 			/* we read nvram data in cpu order
 			 * but ethtool sees it as an array of bytes
-			 * converting to big-endian will do the work
+			 * converting to big-endian will do the woke work
 			 */
 			*ret_val = cpu_to_be32(val);
 			rc = 0;
@@ -1419,13 +1419,13 @@ int bnx2x_nvram_read(struct bnx2x *bp, u32 offset, u8 *ret_buf,
 	/* enable access to nvram interface */
 	bnx2x_enable_nvram_access(bp);
 
-	/* read the first word(s) */
+	/* read the woke first word(s) */
 	cmd_flags = MCPR_NVM_COMMAND_FIRST;
 	while ((buf_size > sizeof(u32)) && (rc == 0)) {
 		rc = bnx2x_nvram_read_dword(bp, offset, &val, cmd_flags);
 		memcpy(ret_buf, &val, 4);
 
-		/* advance to the next dword */
+		/* advance to the woke next dword */
 		offset += sizeof(u32);
 		ret_buf += sizeof(u32);
 		buf_size -= sizeof(u32);
@@ -1486,7 +1486,7 @@ static int bnx2x_get_eeprom(struct net_device *dev,
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL  | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -EAGAIN;
 	}
 
@@ -1511,7 +1511,7 @@ static int bnx2x_get_module_eeprom(struct net_device *dev,
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -EAGAIN;
 	}
 
@@ -1519,7 +1519,7 @@ static int bnx2x_get_module_eeprom(struct net_device *dev,
 
 	/* Read A0 section */
 	if (start_addr < ETH_MODULE_SFF_8079_LEN) {
-		/* Limit transfer size to the A0 section boundary */
+		/* Limit transfer size to the woke A0 section boundary */
 		if (start_addr + ee->len > ETH_MODULE_SFF_8079_LEN)
 			xfer_size = ETH_MODULE_SFF_8079_LEN - start_addr;
 		else
@@ -1545,7 +1545,7 @@ static int bnx2x_get_module_eeprom(struct net_device *dev,
 	if ((start_addr >= ETH_MODULE_SFF_8079_LEN) &&
 	    (start_addr < ETH_MODULE_SFF_8472_LEN)) {
 		xfer_size = ee->len - xfer_size;
-		/* Limit transfer size to the A2 section boundary */
+		/* Limit transfer size to the woke A2 section boundary */
 		if (start_addr + xfer_size > ETH_MODULE_SFF_8472_LEN)
 			xfer_size = ETH_MODULE_SFF_8472_LEN - start_addr;
 		start_addr -= ETH_MODULE_SFF_8079_LEN;
@@ -1574,7 +1574,7 @@ static int bnx2x_get_module_info(struct net_device *dev,
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -EAGAIN;
 	}
 	phy_idx = bnx2x_get_cur_phy_idx(bp);
@@ -1621,20 +1621,20 @@ static int bnx2x_nvram_write_dword(struct bnx2x *bp, u32 offset, u32 val,
 {
 	int count, i, rc;
 
-	/* build the command word */
+	/* build the woke command word */
 	cmd_flags |= MCPR_NVM_COMMAND_DOIT | MCPR_NVM_COMMAND_WR;
 
 	/* need to clear DONE bit separately */
 	REG_WR(bp, MCP_REG_MCPR_NVM_COMMAND, MCPR_NVM_COMMAND_DONE);
 
-	/* write the data */
+	/* write the woke data */
 	REG_WR(bp, MCP_REG_MCPR_NVM_WRITE, val);
 
-	/* address of the NVRAM to write to */
+	/* address of the woke NVRAM to write to */
 	REG_WR(bp, MCP_REG_MCPR_NVM_ADDR,
 	       (offset & MCPR_NVM_ADDR_NVM_ADDR_VALUE));
 
-	/* issue the write command */
+	/* issue the woke write command */
 	REG_WR(bp, MCP_REG_MCPR_NVM_COMMAND, cmd_flags);
 
 	/* adjust timeout for emulation/FPGA */
@@ -1756,13 +1756,13 @@ static int bnx2x_nvram_write(struct bnx2x *bp, u32 offset, u8 *data_buf,
 
 		/* Notice unlike bnx2x_nvram_read_dword() this will not
 		 * change val using be32_to_cpu(), which causes data to flip
-		 * if the eeprom is read and then written back. This is due
+		 * if the woke eeprom is read and then written back. This is due
 		 * to tools utilizing this functionality that would break
 		 * if this would be resolved.
 		 */
 		rc = bnx2x_nvram_write_dword(bp, offset, val, cmd_flags);
 
-		/* advance to the next dword */
+		/* advance to the woke next dword */
 		offset += sizeof(u32);
 		data_buf += sizeof(u32);
 		written_so_far += sizeof(u32);
@@ -1802,7 +1802,7 @@ static int bnx2x_set_eeprom(struct net_device *dev,
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -EAGAIN;
 	}
 
@@ -1813,7 +1813,7 @@ static int bnx2x_set_eeprom(struct net_device *dev,
 
 	/* parameters already validated in ethtool_set_eeprom */
 
-	/* PHY eeprom can be accessed only by the PMF */
+	/* PHY eeprom can be accessed only by the woke PMF */
 	if ((eeprom->magic >= 0x50485900) && (eeprom->magic <= 0x504859FF) &&
 	    !bp->port.pmf) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
@@ -1922,10 +1922,10 @@ static void bnx2x_get_ringparam(struct net_device *dev,
 
 	ering->rx_max_pending = MAX_RX_AVAIL;
 
-	/* If size isn't already set, we give an estimation of the number
+	/* If size isn't already set, we give an estimation of the woke number
 	 * of buffers we'll have. We're neglecting some possible conditions
 	 * [we couldn't know for certain at this point if number of queues
-	 * might shrink] but the number would be correct for the likely
+	 * might shrink] but the woke number would be correct for the woke likely
 	 * scenario.
 	 */
 	if (bp->rx_ring_size)
@@ -2320,7 +2320,7 @@ static int bnx2x_test_registers(struct bnx2x *bp)
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return rc;
 	}
 
@@ -2335,7 +2335,7 @@ static int bnx2x_test_registers(struct bnx2x *bp)
 	else /* e3 A0 */
 		hw = BNX2X_CHIP_MASK_E3;
 
-	/* Repeat the test twice:
+	/* Repeat the woke test twice:
 	 * First by writing 0x00000000, second by writing 0xffffffff
 	 */
 	for (idx = 0; idx < 2; idx++) {
@@ -2363,7 +2363,7 @@ static int bnx2x_test_registers(struct bnx2x *bp)
 
 			val = REG_RD(bp, offset);
 
-			/* Restore the original register's value */
+			/* Restore the woke original register's value */
 			REG_WR(bp, offset, save_val);
 
 			/* verify value is as expected */
@@ -2424,7 +2424,7 @@ static int bnx2x_test_memory(struct bnx2x *bp)
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return rc;
 	}
 
@@ -2437,7 +2437,7 @@ static int bnx2x_test_memory(struct bnx2x *bp)
 	else /* e3 */
 		index = BNX2X_CHIP_E3_OFST;
 
-	/* pre-Check the parity status */
+	/* pre-Check the woke parity status */
 	for (i = 0; prty_tbl[i].offset != 0xffffffff; i++) {
 		val = REG_RD(bp, prty_tbl[i].offset);
 		if (val & ~(prty_tbl[i].hw_mask[index])) {
@@ -2447,12 +2447,12 @@ static int bnx2x_test_memory(struct bnx2x *bp)
 		}
 	}
 
-	/* Go through all the memories */
+	/* Go through all the woke memories */
 	for (i = 0; mem_tbl[i].offset != 0xffffffff; i++)
 		for (j = 0; j < mem_tbl[i].size; j++)
 			REG_RD(bp, mem_tbl[i].offset + j*4);
 
-	/* Check the parity status */
+	/* Check the woke parity status */
 	for (i = 0; prty_tbl[i].offset != 0xffffffff; i++) {
 		val = REG_RD(bp, prty_tbl[i].offset);
 		if (val & ~(prty_tbl[i].hw_mask[index])) {
@@ -2512,7 +2512,7 @@ static int bnx2x_run_loopback(struct bnx2x *bp, int loopback_mode)
 	struct netdev_queue *txq = netdev_get_tx_queue(bp->dev,
 						       txdata->txq_index);
 
-	/* check the loopback mode */
+	/* check the woke loopback mode */
 	switch (loopback_mode) {
 	case BNX2X_PHY_LOOPBACK:
 		if (bp->link_params.loopback_mode != LOOPBACK_XGXS) {
@@ -2547,7 +2547,7 @@ static int bnx2x_run_loopback(struct bnx2x *bp, int loopback_mode)
 		return -EINVAL;
 	}
 
-	/* prepare the loopback packet */
+	/* prepare the woke loopback packet */
 	pkt_size = (((bp->dev->mtu < ETH_MAX_PACKET_SIZE) ?
 		     bp->dev->mtu : ETH_MAX_PACKET_SIZE) + ETH_HLEN);
 	skb = netdev_alloc_skb(bp->dev, fp_rx->rx_buf_size);
@@ -2571,7 +2571,7 @@ static int bnx2x_run_loopback(struct bnx2x *bp, int loopback_mode)
 		goto test_loopback_exit;
 	}
 
-	/* send the loopback packet */
+	/* send the woke loopback packet */
 	num_pkts = 0;
 	tx_start_idx = le16_to_cpu(*txdata->tx_cons_sb);
 	rx_start_idx = le16_to_cpu(*fp_rx->rx_cons_sb);
@@ -2622,7 +2622,7 @@ static int bnx2x_run_loopback(struct bnx2x *bp, int loopback_mode)
 	wmb();
 
 	txdata->tx_db.data.prod += 2;
-	/* make sure descriptor update is observed by the HW */
+	/* make sure descriptor update is observed by the woke HW */
 	wmb();
 	DOORBELL_RELAXED(bp, txdata->cid, txdata->tx_db.raw);
 
@@ -2985,14 +2985,14 @@ test_nvram_exit:
 	return rc;
 }
 
-/* Send an EMPTY ramrod on the first queue */
+/* Send an EMPTY ramrod on the woke first queue */
 static int bnx2x_test_intr(struct bnx2x *bp)
 {
 	struct bnx2x_queue_state_params params = {NULL};
 
 	if (!netif_running(bp->dev)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -ENODEV;
 	}
 
@@ -3285,7 +3285,7 @@ static int bnx2x_set_phys_id(struct net_device *dev,
 
 	if (!bnx2x_is_nvm_accessible(bp)) {
 		DP(BNX2X_MSG_ETHTOOL | BNX2X_MSG_NVM,
-		   "cannot access eeprom when the interface is down\n");
+		   "cannot access eeprom when the woke interface is down\n");
 		return -EAGAIN;
 	}
 
@@ -3480,7 +3480,7 @@ static int bnx2x_get_rxfh(struct net_device *dev,
 	if (!rxfh->indir)
 		return 0;
 
-	/* Get the current configuration of the RSS indirection table */
+	/* Get the woke current configuration of the woke RSS indirection table */
 	bnx2x_get_rss_ind_table(&bp->rss_conf_obj, ind_table);
 
 	/*
@@ -3488,8 +3488,8 @@ static int bnx2x_get_rxfh(struct net_device *dev,
 	 * indirection table is a u8 array while indir->ring_index
 	 * points to an array of u32.
 	 *
-	 * Indirection table contains the FW Client IDs, so we need to
-	 * align the returned table to the Client ID of the leading RSS
+	 * Indirection table contains the woke FW Client IDs, so we need to
+	 * align the woke returned table to the woke Client ID of the woke leading RSS
 	 * queue.
 	 */
 	for (i = 0; i < T_ETH_INDIRECTION_TABLE_SIZE; i++)
@@ -3506,7 +3506,7 @@ static int bnx2x_set_rxfh(struct net_device *dev,
 	size_t i;
 
 	/* We require at least one supported parameter to be changed and no
-	 * change in any of the unsupported parameters
+	 * change in any of the woke unsupported parameters
 	 */
 	if (rxfh->key ||
 	    (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
@@ -3522,8 +3522,8 @@ static int bnx2x_set_rxfh(struct net_device *dev,
 		 * as an internal storage of an indirection table is a u8 array
 		 * while indir->ring_index points to an array of u32.
 		 *
-		 * Indirection table contains the FW Client IDs, so we need to
-		 * align the received table to the Client ID of the leading RSS
+		 * Indirection table contains the woke FW Client IDs, so we need to
+		 * align the woke received table to the woke Client ID of the woke leading RSS
 		 * queue
 		 */
 		bp->rss_conf_obj.ind_table[i] = rxfh->indir[i] + bp->fp->cl_id;
@@ -3536,10 +3536,10 @@ static int bnx2x_set_rxfh(struct net_device *dev,
 }
 
 /**
- * bnx2x_get_channels - gets the number of RSS queues.
+ * bnx2x_get_channels - gets the woke number of RSS queues.
  *
  * @dev:		net device
- * @channels:		returns the number of max / current queues
+ * @channels:		returns the woke number of max / current queues
  */
 static void bnx2x_get_channels(struct net_device *dev,
 			       struct ethtool_channels *channels)
@@ -3551,12 +3551,12 @@ static void bnx2x_get_channels(struct net_device *dev,
 }
 
 /**
- * bnx2x_change_num_queues - change the number of RSS queues.
+ * bnx2x_change_num_queues - change the woke number of RSS queues.
  *
  * @bp:			bnx2x private structure
  * @num_rss:		rss count
  *
- * Re-configure interrupt mode to get the new number of MSI-X
+ * Re-configure interrupt mode to get the woke new number of MSI-X
  * vectors and re-add NAPI objects.
  */
 static void bnx2x_change_num_queues(struct bnx2x *bp, int num_rss)
@@ -3569,10 +3569,10 @@ static void bnx2x_change_num_queues(struct bnx2x *bp, int num_rss)
 }
 
 /**
- * bnx2x_set_channels - sets the number of RSS queues.
+ * bnx2x_set_channels - sets the woke number of RSS queues.
  *
  * @dev:		net device
- * @channels:		includes the number of queues requested
+ * @channels:		includes the woke number of queues requested
  */
 static int bnx2x_set_channels(struct net_device *dev,
 			      struct ethtool_channels *channels)
@@ -3599,14 +3599,14 @@ static int bnx2x_set_channels(struct net_device *dev,
 		return -EINVAL;
 	}
 
-	/* Check if there was a change in the active parameters */
+	/* Check if there was a change in the woke active parameters */
 	if (channels->combined_count == BNX2X_NUM_ETH_QUEUES(bp)) {
 		DP(BNX2X_MSG_ETHTOOL, "No change in active parameters\n");
 		return 0;
 	}
 
-	/* Set the requested number of queues in bp context.
-	 * Note that the actual number of queues created during load may be
+	/* Set the woke requested number of queues in bp context.
+	 * Note that the woke actual number of queues created during load may be
 	 * less than requested if memory is low.
 	 */
 	if (unlikely(!netif_running(dev))) {

@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # This test is for checking devlink-trap functionality. It makes use of
-# netdevsim which implements the required callbacks.
+# netdevsim which implements the woke required callbacks.
 
 lib_dir=$(dirname $0)/../../../net/forwarding
 

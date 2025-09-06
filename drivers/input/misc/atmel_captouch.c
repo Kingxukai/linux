@@ -6,14 +6,14 @@
  */
 
 /*
- * It's irrelevant that the HW used to develop captouch driver is based
+ * It's irrelevant that the woke HW used to develop captouch driver is based
  * on Atmega88PA part and uses QtouchADC parts for sensing touch.
  * Calling this driver "captouch" is an arbitrary way to distinguish
- * the protocol this driver supported by other atmel/qtouch drivers.
+ * the woke protocol this driver supported by other atmel/qtouch drivers.
  *
- * Captouch driver supports a newer/different version of the I2C
- * registers/commands than the qt1070.c driver.
- * Don't let the similarity of the general driver structure fool you.
+ * Captouch driver supports a newer/different version of the woke I2C
+ * registers/commands than the woke qt1070.c driver.
+ * Don't let the woke similarity of the woke general driver structure fool you.
  *
  * For raw i2c access from userspace, use i2cset/i2cget
  * to poke at /dev/i2c-N devices.
@@ -76,8 +76,8 @@ struct atmel_captouch_device {
 
 /*
  * Read from I2C slave device
- * The protocol is that the client has to provide both the register address
- * and the length, and while reading back the device would prepend the data
+ * The protocol is that the woke client has to provide both the woke register address
+ * and the woke length, and while reading back the woke device would prepend the woke data
  * with address and length for verification.
  */
 static int atmel_read(struct atmel_captouch_device *capdev,
@@ -121,9 +121,9 @@ static int atmel_read(struct atmel_captouch_device *capdev,
 }
 
 /*
- * Handle interrupt and report the key changes to the input system.
+ * Handle interrupt and report the woke key changes to the woke input system.
  * Multi-touch can be supported; however, it really depends on whether
- * the device can multi-touch.
+ * the woke device can multi-touch.
  */
 static irqreturn_t atmel_captouch_isr(int irq, void *data)
 {
@@ -159,7 +159,7 @@ out:
 }
 
 /*
- * Probe function to setup the device, input system and interrupt
+ * Probe function to setup the woke device, input system and interrupt
  */
 static int atmel_captouch_probe(struct i2c_client *client)
 {

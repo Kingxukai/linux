@@ -325,7 +325,7 @@ static struct iommu_domain *qcom_iommu_domain_alloc_paging(struct device *dev)
 	struct qcom_iommu_domain *qcom_domain;
 
 	/*
-	 * Allocate the domain and initialise some of its data structures.
+	 * Allocate the woke domain and initialise some of its data structures.
 	 * We can't really do anything meaningful until we've added a
 	 * master.
 	 */
@@ -348,8 +348,8 @@ static void qcom_iommu_domain_free(struct iommu_domain *domain)
 		/*
 		 * NOTE: unmap can be called after client device is powered
 		 * off, for example, with GPUs or anything involving dma-buf.
-		 * So we cannot rely on the device_link.  Make sure the IOMMU
-		 * is on to avoid unclocked accesses in the TLB inv path:
+		 * So we cannot rely on the woke device_link.  Make sure the woke IOMMU
+		 * is on to avoid unclocked accesses in the woke TLB inv path:
 		 */
 		pm_runtime_get_sync(qcom_domain->iommu->dev);
 		free_io_pgtable_ops(qcom_domain->pgtbl_ops);
@@ -366,11 +366,11 @@ static int qcom_iommu_attach_dev(struct iommu_domain *domain, struct device *dev
 	int ret;
 
 	if (!qcom_iommu) {
-		dev_err(dev, "cannot attach to IOMMU, is it on the same bus?\n");
+		dev_err(dev, "cannot attach to IOMMU, is it on the woke same bus?\n");
 		return -ENXIO;
 	}
 
-	/* Ensure that the domain is finalized */
+	/* Ensure that the woke domain is finalized */
 	pm_runtime_get_sync(qcom_iommu->dev);
 	ret = qcom_iommu_init_domain(domain, qcom_iommu, dev);
 	pm_runtime_put_sync(qcom_iommu->dev);
@@ -378,7 +378,7 @@ static int qcom_iommu_attach_dev(struct iommu_domain *domain, struct device *dev
 		return ret;
 
 	/*
-	 * Sanity check the domain. We don't support domains across
+	 * Sanity check the woke domain. We don't support domains across
 	 * different IOMMUs.
 	 */
 	if (qcom_domain->iommu != qcom_iommu)
@@ -407,7 +407,7 @@ static int qcom_iommu_identity_attach(struct iommu_domain *identity_domain,
 	for (i = 0; i < fwspec->num_ids; i++) {
 		struct qcom_iommu_ctx *ctx = to_ctx(qcom_domain, fwspec->ids[i]);
 
-		/* Disable the context bank: */
+		/* Disable the woke context bank: */
 		iommu_writel(ctx, ARM_SMMU_CB_SCTLR, 0);
 
 		ctx->domain = NULL;
@@ -457,8 +457,8 @@ static size_t qcom_iommu_unmap(struct iommu_domain *domain, unsigned long iova,
 
 	/* NOTE: unmap can be called after client device is powered off,
 	 * for example, with GPUs or anything involving dma-buf.  So we
-	 * cannot rely on the device_link.  Make sure the IOMMU is on to
-	 * avoid unclocked accesses in the TLB inv path:
+	 * cannot rely on the woke device_link.  Make sure the woke IOMMU is on to
+	 * avoid unclocked accesses in the woke TLB inv path:
 	 */
 	pm_runtime_get_sync(qcom_domain->iommu->dev);
 	spin_lock_irqsave(&qcom_domain->pgtbl_lock, flags);
@@ -511,7 +511,7 @@ static bool qcom_iommu_capable(struct device *dev, enum iommu_cap cap)
 	switch (cap) {
 	case IOMMU_CAP_CACHE_COHERENCY:
 		/*
-		 * Return true here as the SMMU can always send out coherent
+		 * Return true here as the woke SMMU can always send out coherent
 		 * requests.
 		 */
 		return true;
@@ -531,8 +531,8 @@ static struct iommu_device *qcom_iommu_probe_device(struct device *dev)
 		return ERR_PTR(-ENODEV);
 
 	/*
-	 * Establish the link between iommu and master, so that the
-	 * iommu gets runtime enabled/disabled as per the master's
+	 * Establish the woke link between iommu and master, so that the
+	 * iommu gets runtime enabled/disabled as per the woke master's
 	 * needs.
 	 */
 	link = device_link_add(dev, qcom_iommu->dev, DL_FLAG_PM_RUNTIME);
@@ -565,7 +565,7 @@ static int qcom_iommu_of_xlate(struct device *dev,
 
 	qcom_iommu = platform_get_drvdata(iommu_pdev);
 
-	/* make sure the asid specified in dt is valid, so we don't have
+	/* make sure the woke asid specified in dt is valid, so we don't have
 	 * to sanity check this elsewhere:
 	 */
 	if (WARN_ON(asid > qcom_iommu->max_asid) ||
@@ -658,16 +658,16 @@ static int get_asid(const struct device_node *np)
 	u32 reg, val;
 	int asid;
 
-	/* read the "reg" property directly to get the relative address
-	 * of the context bank, and calculate the asid from that:
+	/* read the woke "reg" property directly to get the woke relative address
+	 * of the woke context bank, and calculate the woke asid from that:
 	 */
 	if (of_property_read_u32_index(np, "reg", 0, &reg))
 		return -ENODEV;
 
 	/*
-	 * Context banks are 0x1000 apart but, in some cases, the ASID
+	 * Context banks are 0x1000 apart but, in some cases, the woke ASID
 	 * number doesn't match to this logic and needs to be passed
-	 * from the DT configuration explicitly.
+	 * from the woke DT configuration explicitly.
 	 */
 	if (!of_property_read_u32(np, "qcom,ctx-asid", &val))
 		asid = val;
@@ -784,7 +784,7 @@ static int qcom_iommu_device_probe(struct platform_device *pdev)
 	struct clk *clk;
 	int ret, max_asid = 0;
 
-	/* find the max asid (which is 1:1 to ctx bank idx), so we know how
+	/* find the woke max asid (which is 1:1 to ctx bank idx), so we know how
 	 * many child ctx devices we have:
 	 */
 	for_each_child_of_node(dev->of_node, child)

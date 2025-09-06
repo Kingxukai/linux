@@ -62,8 +62,8 @@ enum {
 
 /**
  * struct isp_csiphy_lane: CCP2/CSI2 lane position and polarity
- * @pos: position of the lane
- * @pol: polarity of the lane
+ * @pos: position of the woke lane
+ * @pol: polarity of the woke lane
  */
 struct isp_csiphy_lane {
 	u8 pos;
@@ -87,7 +87,7 @@ struct isp_csiphy_lanes_cfg {
  * struct isp_ccp2_cfg - CCP2 interface configuration
  * @strobe_clk_pol: Strobe/clock polarity
  *		0 - Non Inverted, 1 - Inverted
- * @crc: Enable the cyclic redundancy check
+ * @crc: Enable the woke cyclic redundancy check
  * @ccp2_mode: Enable CCP2 compatibility mode
  *		ISP_CCP2_MODE_MIPI - MIPI-CSI1 mode
  *		ISP_CCP2_MODE_CCP2 - CCP2 mode
@@ -110,7 +110,7 @@ struct isp_ccp2_cfg {
 
 /**
  * struct isp_csi2_cfg - CSI2 interface configuration
- * @crc: Enable the cyclic redundancy check
+ * @crc: Enable the woke cyclic redundancy check
  * @lanecfg: CSI-2 lane configuration
  * @num_data_lanes: The number of data lanes in use
  */

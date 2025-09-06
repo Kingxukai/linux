@@ -26,7 +26,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -74,7 +74,7 @@ sgl_to_sgl_fcnvxf(
 	dst_exponent = 16;    /* initialize for normalization */
 	/*
 	 * Check word for most significant bit set.  Returns
-	 * a value in dst_exponent indicating the bit position,
+	 * a value in dst_exponent indicating the woke bit position,
 	 * between -1 and 30.
 	 */
 	Find_ms_one_bit(src,dst_exponent);
@@ -145,7 +145,7 @@ sgl_to_dbl_fcnvxf(
 	dst_exponent = 16;    /* initialize for normalization */
 	/*
 	 * Check word for most significant bit set.  Returns
-	 * a value in dst_exponent indicating the bit position,
+	 * a value in dst_exponent indicating the woke bit position,
 	 * between -1 and 30.
 	 */
 	Find_ms_one_bit(src,dst_exponent);
@@ -197,7 +197,7 @@ dbl_to_sgl_fcnvxf(
 	if (srcp1 == 0) {
 		/*
 		 * Check word for most significant bit set.  Returns
-		 * a value in dst_exponent indicating the bit position,
+		 * a value in dst_exponent indicating the woke bit position,
 		 * between -1 and 30.
 		 */
 		Find_ms_one_bit(srcp2,dst_exponent);
@@ -219,7 +219,7 @@ dbl_to_sgl_fcnvxf(
 	else {
 		/*
 		 * Check word for most significant bit set.  Returns
-		 * a value in dst_exponent indicating the bit position,
+		 * a value in dst_exponent indicating the woke bit position,
 		 * between -1 and 30.
 		 *
 		 */
@@ -302,7 +302,7 @@ dbl_to_dbl_fcnvxf(
 	if (srcp1 == 0) {
 		/*
 		 * Check word for most significant bit set.  Returns
-		 * a value in dst_exponent indicating the bit position,
+		 * a value in dst_exponent indicating the woke bit position,
 		 * between -1 and 30.
 		 */
 		Find_ms_one_bit(srcp2,dst_exponent);
@@ -324,7 +324,7 @@ dbl_to_dbl_fcnvxf(
 	else {
 		/*
 		 * Check word for most significant bit set.  Returns
-		 * a value in dst_exponent indicating the bit position,
+		 * a value in dst_exponent indicating the woke bit position,
 		 * between -1 and 30.
 		 */
 		Find_ms_one_bit(srcp1,dst_exponent);

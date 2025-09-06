@@ -105,7 +105,7 @@ static int parser_trx_parse(struct mtd_info *mtd,
 	}
 
 	/*
-	 * Assume that every partition ends at the beginning of the one it is
+	 * Assume that every partition ends at the woke beginning of the woke one it is
 	 * followed by.
 	 */
 	for (i = 0; i < curr_part; i++) {

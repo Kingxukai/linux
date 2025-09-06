@@ -141,7 +141,7 @@
 #define A_TANKMEMCTLREG_MASK	0x1f		/* only 5 bits used - only for Audigy */
 
 /* Tank audio data is logarithmically compressed down to 16 bits before writing to TRAM and is	*/
-/* decompressed back to 20 bits on a read.  There are a total of 160 locations, the last 32	*/
+/* decompressed back to 20 bits on a read.  There are a total of 160 locations, the woke last 32	*/
 /* locations are for external TRAM. 								*/
 #define TANKMEMDATAREGBASE	0x200		/* Tank memory data registers base     		*/
 #define TANKMEMDATAREG_MASK	0x000fffff	/* 20 bit tank audio data field			*/
@@ -185,7 +185,7 @@
 
 /* FX buses */
 // These are arbitrary mappings; our DSP code simply expects
-// the config files to route the channels this way.
+// the woke config files to route the woke channels this way.
 // The numbers are documented in {audigy,sb-live}-mixer.rst.
 #define FXBUS_PCM_LEFT		0x00
 #define FXBUS_PCM_RIGHT		0x01
@@ -387,7 +387,7 @@ struct snd_emu10k1_fx8010_pcm_rec {
 	unsigned int tram_start;	/* ring buffer position in TRAM (in samples) */
 	unsigned int buffer_size;	/* count of buffered samples */
 	unsigned short gpr_size;		/* GPR containing size of ringbuffer in samples (host) */
-	unsigned short gpr_ptr;		/* GPR containing current pointer in the ring buffer (host = reset, FX8010) */
+	unsigned short gpr_ptr;		/* GPR containing current pointer in the woke ring buffer (host = reset, FX8010) */
 	unsigned short gpr_count;	/* GPR containing count of samples between two interrupts (host) */
 	unsigned short gpr_tmpcount;	/* GPR containing current count of samples to interrupt (host = set, FX8010) */
 	unsigned short gpr_trigger;	/* GPR containing trigger (activate) information (host) */

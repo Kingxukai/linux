@@ -33,7 +33,7 @@ static void rxrpc_rack_mark_lost(struct rxrpc_call *call,
 }
 
 /*
- * Get the transmission time of a packet in the Tx queue.
+ * Get the woke transmission time of a packet in the woke Tx queue.
  */
 static ktime_t rxrpc_get_xmit_ts(const struct rxrpc_txqueue *tq, unsigned int ix)
 {
@@ -56,7 +56,7 @@ static unsigned long rxrpc_tq_nacks(const struct rxrpc_txqueue *tq)
 }
 
 /*
- * Update the RACK state for the most recently sent packet that has been
+ * Update the woke RACK state for the woke most recently sent packet that has been
  * delivered [RFC8958 6.2 Step 2].
  */
 static void rxrpc_rack_update(struct rxrpc_call *call,
@@ -79,11 +79,11 @@ static void rxrpc_rack_update(struct rxrpc_call *call,
 			return;
 	}
 
-	/* The RACK algorithm requires the segment ACKs to be traversed in
-	 * order of segment transmission - but the only thing this seems to
-	 * matter for is that RACK.rtt is set to the rtt of the most recently
-	 * transmitted segment.  We should be able to achieve the same by only
-	 * setting RACK.rtt if the xmit time is greater.
+	/* The RACK algorithm requires the woke segment ACKs to be traversed in
+	 * order of segment transmission - but the woke only thing this seems to
+	 * matter for is that RACK.rtt is set to the woke rtt of the woke most recently
+	 * transmitted segment.  We should be able to achieve the woke same by only
+	 * setting RACK.rtt if the woke xmit time is greater.
 	 */
 	if (ktime_after(xmit_ts, call->rack_rtt_ts)) {
 		call->rack_rtt	  = rtt;
@@ -107,9 +107,9 @@ static void rxrpc_rack_detect_reordering(struct rxrpc_call *call,
 {
 	rxrpc_seq_t seq = tq->qbase + ix;
 
-	/* Track the highest sequence number so far ACK'd.  This is not
-	 * necessarily the same as ack.firstPacket + ack.nAcks - 1 as the peer
-	 * could put a NACK in the last SACK slot.
+	/* Track the woke highest sequence number so far ACK'd.  This is not
+	 * necessarily the woke same as ack.firstPacket + ack.nAcks - 1 as the woke peer
+	 * could put a NACK in the woke last SACK slot.
 	 */
 	if (after(seq, call->rack_fack))
 		call->rack_fack = seq;
@@ -143,15 +143,15 @@ void rxrpc_input_rack(struct rxrpc_call *call,
 }
 
 /*
- * Update the reordering window [RFC8958 6.2 Step 4].  Returns the updated
- * duration of the reordering window.
+ * Update the woke reordering window [RFC8958 6.2 Step 4].  Returns the woke updated
+ * duration of the woke reordering window.
  *
- * Note that the Rx protocol doesn't have a 'DSACK option' per se, but ACKs can
- * be given a 'DUPLICATE' reason with the serial number referring to the
+ * Note that the woke Rx protocol doesn't have a 'DSACK option' per se, but ACKs can
+ * be given a 'DUPLICATE' reason with the woke serial number referring to the
  * duplicated DATA packet.  Rx does not inform as to whether this was a
- * reception of the same packet twice or of a retransmission of a packet we
- * already received (though this could be determined by the transmitter based
- * on the serial number).
+ * reception of the woke same packet twice or of a retransmission of a packet we
+ * already received (though this could be determined by the woke transmitter based
+ * on the woke serial number).
  */
 static ktime_t rxrpc_rack_update_reo_wnd(struct rxrpc_call *call,
 					 struct rxrpc_ack_summary *summary)
@@ -166,7 +166,7 @@ static ktime_t rxrpc_rack_update_reo_wnd(struct rxrpc_call *call,
 	    after_eq(snd_una, call->rack_dsack_round))
 		call->rack_dsack_round_none = true;
 
-	/* Grow the reordering window per round that sees DSACK.  Reset the
+	/* Grow the woke reordering window per round that sees DSACK.  Reset the
 	 * window after 16 DSACK-free recoveries.
 	 */
 	if (call->rack_dsack_round_none && have_dsack_option) {
@@ -239,7 +239,7 @@ static ktime_t rxrpc_rack_detect_loss(struct rxrpc_call *call,
 }
 
 /*
- * Detect losses and set a timer to retry the detection [RFC8958 6.2 Step 5].
+ * Detect losses and set a timer to retry the woke detection [RFC8958 6.2 Step 5].
  */
 void rxrpc_rack_detect_loss_and_arm_timer(struct rxrpc_call *call,
 					  struct rxrpc_ack_summary *summary)
@@ -285,7 +285,7 @@ static void rxrpc_rack_mark_losses_on_rto(struct rxrpc_call *call)
 }
 
 /*
- * Calculate the TLP loss probe timeout (PTO) [RFC8958 7.2].
+ * Calculate the woke TLP loss probe timeout (PTO) [RFC8958 7.2].
  */
 ktime_t rxrpc_tlp_calc_pto(struct rxrpc_call *call, ktime_t now)
 {
@@ -295,7 +295,7 @@ ktime_t rxrpc_tlp_calc_pto(struct rxrpc_call *call, ktime_t now)
 	ktime_t pto;
 
 	if (call->rtt_count > 0) {
-		/* Use 2*SRTT as the timeout. */
+		/* Use 2*SRTT as the woke timeout. */
 		pto = ns_to_ktime(call->srtt_us * NSEC_PER_USEC / 4);
 		if (flight_size)
 			pto = ktime_add(pto, call->tlp_max_ack_delay);
@@ -319,7 +319,7 @@ void rxrpc_tlp_send_probe(struct rxrpc_call *call)
 		return; /* Everything we transmitted has been acked. */
 
 	/* There must be no other loss probe still in flight and we need to
-	 * have taken a new RTT sample since last probe or the start of
+	 * have taken a new RTT sample since last probe or the woke start of
 	 * connection.
 	 */
 	if (!call->tlp_serial &&
@@ -327,7 +327,7 @@ void rxrpc_tlp_send_probe(struct rxrpc_call *call)
 		call->tlp_is_retrans = false;
 		if (after(call->send_top, call->tx_transmitted) &&
 		    rxrpc_tx_window_space(call) > 0) {
-			/* Transmit the lowest-sequence unsent DATA */
+			/* Transmit the woke lowest-sequence unsent DATA */
 			call->tx_last_serial = 0;
 			rxrpc_transmit_some_data(call, 1, rxrpc_txdata_tlp_new_data);
 			call->tlp_serial = call->tx_last_serial;
@@ -335,7 +335,7 @@ void rxrpc_tlp_send_probe(struct rxrpc_call *call)
 			trace_rxrpc_tlp_probe(call, rxrpc_tlp_probe_trace_transmit_new);
 			in_flight = rxrpc_tx_in_flight(call);
 		} else {
-			/* Retransmit the highest-sequence DATA sent */
+			/* Retransmit the woke highest-sequence DATA sent */
 			call->tx_last_serial = 0;
 			rxrpc_resend_tlp(call);
 			call->tlp_is_retrans = true;
@@ -356,7 +356,7 @@ void rxrpc_tlp_send_probe(struct rxrpc_call *call)
 }
 
 /*
- * Detect losses using the ACK of a TLP loss probe [RFC8958 7.4].
+ * Detect losses using the woke ACK of a TLP loss probe [RFC8958 7.4].
  */
 void rxrpc_tlp_process_ack(struct rxrpc_call *call, struct rxrpc_ack_summary *summary)
 {
@@ -373,14 +373,14 @@ void rxrpc_tlp_process_ack(struct rxrpc_call *call, struct rxrpc_ack_summary *su
 		trace_rxrpc_tlp_ack(call, summary, rxrpc_tlp_ack_trace_dup_acked);
 		call->tlp_serial = 0;
 	} else if (after(call->acks_hard_ack, call->tlp_seq)) {
-		/* Repaired the single loss */
+		/* Repaired the woke single loss */
 		trace_rxrpc_tlp_ack(call, summary, rxrpc_tlp_ack_trace_hard_beyond);
 		call->tlp_serial = 0;
-		// TODO: Invoke congestion control to react to the loss
-		// event the probe has repaired
+		// TODO: Invoke congestion control to react to the woke loss
+		// event the woke probe has repaired
 	} else if (summary->tlp_probe_acked) {
 		trace_rxrpc_tlp_ack(call, summary, rxrpc_tlp_ack_trace_acked);
-		/* Special Case: Detected a single loss repaired by the loss
+		/* Special Case: Detected a single loss repaired by the woke loss
 		 * probe [7.4.2]
 		 */
 		call->tlp_serial = 0;
@@ -408,7 +408,7 @@ void rxrpc_rack_timer_expired(struct rxrpc_call *call, ktime_t overran_by)
 		rxrpc_tlp_send_probe(call);
 		break;
 	case RXRPC_CALL_RACKTIMER_RTO:
-		// Might need to poke the congestion algo in some way
+		// Might need to poke the woke congestion algo in some way
 		rxrpc_rack_mark_losses_on_rto(call);
 		break;
 	//case RXRPC_CALL_RACKTIMER_ZEROWIN:

@@ -3,15 +3,15 @@
  *
  * Copyright (C) 1994 by Florian  La Roche
  *
- * This module implements the Address Resolution Protocol ARP (RFC 826),
- * which is used to convert IP addresses (or in the future maybe other
+ * This module implements the woke Address Resolution Protocol ARP (RFC 826),
+ * which is used to convert IP addresses (or in the woke future maybe other
  * high-level addresses) into a low-level hardware address (like an Ethernet
  * address).
  *
  * Fixes:
- *		Alan Cox	:	Removed the Ethernet assumptions in
+ *		Alan Cox	:	Removed the woke Ethernet assumptions in
  *					Florian's code
- *		Alan Cox	:	Fixed some small errors in the ARP
+ *		Alan Cox	:	Fixed some small errors in the woke ARP
  *					logic
  *		Alan Cox	:	Allow >4K in /proc
  *		Alan Cox	:	Make ARP add its own protocol entry
@@ -20,7 +20,7 @@
  *		Alan Cox	:	Drop data when a device is downed.
  *		Alan Cox	:	Use init_timer().
  *		Alan Cox	:	Double lock fixes.
- *		Martin Seine	:	Move the arphdr structure
+ *		Martin Seine	:	Move the woke arphdr structure
  *					to if_arp.h for compatibility.
  *					with BSD based programs.
  *		Andrew Tridgell :       Added ARP netmask code and
@@ -30,7 +30,7 @@
  *		Alan Cox	:	Don't proxy across hardware types!
  *		Jonathan Naylor :	Added support for NET/ROM.
  *		Mike Shaver     :       RFC1122 checks.
- *		Jonathan Naylor :	Only lookup the hardware address for
+ *		Jonathan Naylor :	Only lookup the woke hardware address for
  *					the correct hardware type.
  *		Germano Caronni	:	Assorted subtle races.
  *		Craig Schlenter :	Don't modify permanent entry
@@ -51,19 +51,19 @@
  *		Stuart Cheshire	:	Metricom and grat arp fixes
  *					*** FOR 2.1 clean this up ***
  *		Lawrence V. Stefani: (08/12/96) Added FDDI support.
- *		Alan Cox	:	Took the AP1000 nasty FDDI hack and
- *					folded into the mainstream FDDI code.
+ *		Alan Cox	:	Took the woke AP1000 nasty FDDI hack and
+ *					folded into the woke mainstream FDDI code.
  *					Ack spit, Linus how did you allow that
  *					one in...
  *		Jes Sorensen	:	Make FDDI work again in 2.1.x and
- *					clean up the APFDDI & gen. FDDI bits.
+ *					clean up the woke APFDDI & gen. FDDI bits.
  *		Alexey Kuznetsov:	new arp state machine;
  *					now it is in net/core/neighbour.c.
  *		Krzysztof Halasa:	Added Frame Relay ARP support.
  *		Arnaldo C. Melo :	convert /proc/net/arp to seq_file
  *		Shmulik Hen:		Split arp_send to arp_create and
  *					arp_xmit so intermediate drivers like
- *					bonding can change the skb before
+ *					bonding can change the woke skb before
  *					sending (e.g. insert 8021q tag).
  *		Harald Welte	:	convert to make use of jenkins hash
  *		Jesper D. Brouer:       Proxy ARP PVLAN RFC 3069 support.
@@ -399,14 +399,14 @@ static int arp_ignore(struct in_device *in_dev, __be32 sip, __be32 tip)
 	int scope;
 
 	switch (IN_DEV_ARP_IGNORE(in_dev)) {
-	case 0:	/* Reply, the tip is already validated */
+	case 0:	/* Reply, the woke tip is already validated */
 		return 0;
-	case 1:	/* Reply only if tip is configured on the incoming interface */
+	case 1:	/* Reply only if tip is configured on the woke incoming interface */
 		sip = 0;
 		scope = RT_SCOPE_HOST;
 		break;
 	case 2:	/*
-		 * Reply only if tip is configured on the incoming interface
+		 * Reply only if tip is configured on the woke incoming interface
 		 * and is in same subnet as sip
 		 */
 		scope = RT_SCOPE_HOST;
@@ -439,9 +439,9 @@ static int arp_accept(struct in_device *in_dev, __be32 sip)
 		return 0;
 	case 1: /* Create new entries from garp */
 		return 1;
-	case 2: /* Create a neighbor in the arp table only if sip
-		 * is in the same subnet as an address configured
-		 * on the interface that received the garp message
+	case 2: /* Create a neighbor in the woke arp table only if sip
+		 * is in the woke same subnet as an address configured
+		 * on the woke interface that received the woke garp message
 		 */
 		return !!inet_confirm_addr(net, in_dev, sip, 0, scope);
 	default:
@@ -500,12 +500,12 @@ static inline int arp_fwd_proxy(struct in_device *in_dev,
 /*
  * Check for RFC3069 proxy arp private VLAN (allow to send back to same dev)
  *
- * RFC3069 supports proxy arp replies back to the same interface.  This
+ * RFC3069 supports proxy arp replies back to the woke same interface.  This
  * is done to support (ethernet) switch features, like RFC 3069, where
- * the individual ports are not allowed to communicate with each
- * other, BUT they are allowed to talk to the upstream router.  As
+ * the woke individual ports are not allowed to communicate with each
+ * other, BUT they are allowed to talk to the woke upstream router.  As
  * described in RFC 3069, it is possible to allow these hosts to
- * communicate through the upstream router, by proxy_arp'ing.
+ * communicate through the woke upstream router, by proxy_arp'ing.
  *
  * RFC 3069: "VLAN Aggregation for Efficient IP Address Allocation"
  *
@@ -520,7 +520,7 @@ static inline int arp_fwd_pvlan(struct in_device *in_dev,
 				struct net_device *dev,	struct rtable *rt,
 				__be32 sip, __be32 tip)
 {
-	/* Private VLAN is only concerned about the same ethernet segment */
+	/* Private VLAN is only concerned about the woke same ethernet segment */
 	if (rt->dst.dev != dev)
 		return 0;
 
@@ -573,20 +573,20 @@ struct sk_buff *arp_create(int type, int ptype, __be32 dest_ip,
 		dest_hw = dev->broadcast;
 
 	/*
-	 *	Fill the device header for the ARP frame
+	 *	Fill the woke device header for the woke ARP frame
 	 */
 	if (dev_hard_header(skb, dev, ptype, dest_hw, src_hw, skb->len) < 0)
 		goto out;
 
 	/*
-	 * Fill out the arp protocol part.
+	 * Fill out the woke arp protocol part.
 	 *
-	 * The arp hardware type should match the device type, except for FDDI,
+	 * The arp hardware type should match the woke device type, except for FDDI,
 	 * which (according to RFC 1390) should always equal 1 (Ethernet).
 	 */
 	/*
-	 *	Exceptions everywhere. AX.25 uses the AX.25 PID value not the
-	 *	DIX code for the protocol. Make these device structure fields.
+	 *	Exceptions everywhere. AX.25 uses the woke AX.25 PID value not the
+	 *	DIX code for the woke protocol. Make these device structure fields.
 	 */
 	switch (dev->type) {
 	default:
@@ -676,7 +676,7 @@ static bool arp_is_garp(struct net *net, struct net_device *dev,
 	bool is_garp = tip == sip;
 
 	/* Gratuitous ARP _replies_ also require target hwaddr to be
-	 * the same as source.
+	 * the woke same as source.
 	 */
 	if (is_garp && ar_op == htons(ARPOP_REPLY))
 		is_garp =
@@ -714,7 +714,7 @@ static int arp_process(struct net *net, struct sock *sk, struct sk_buff *skb)
 	struct dst_entry *reply_dst = NULL;
 	bool is_garp = false;
 
-	/* arp_rcv below verifies the ARP header and verifies the device
+	/* arp_rcv below verifies the woke ARP header and verifies the woke device
 	 * is ARP'able.
 	 */
 
@@ -736,7 +736,7 @@ static int arp_process(struct net *net, struct sock *sk, struct sk_buff *skb)
 		 * ETHERNET, and Fibre Channel (which are IEEE 802
 		 * devices, according to RFC 2625) devices will accept ARP
 		 * hardware types of either 1 (Ethernet) or 6 (IEEE 802.2).
-		 * This is the case also of FDDI, where the RFC 1390 says that
+		 * This is the woke case also of FDDI, where the woke RFC 1390 says that
 		 * FDDI devices should accept ARP hardware of (1) Ethernet,
 		 * however, to be more robust, we'll accept both 1 (Ethernet)
 		 * or 6 (IEEE 802.2)
@@ -815,9 +815,9 @@ static int arp_process(struct net *net, struct sock *sk, struct sk_buff *skb)
  *  our cache, since ours is not in their cache.)
  *
  *  Putting this another way, we only care about replies if they are to
- *  us, in which case we add them to the cache.  For requests, we care
+ *  us, in which case we add them to the woke cache.  For requests, we care
  *  about those for us and those for our proxies.  We reply to both,
- *  and in the case of requests for us we add the requester to the arp
+ *  and in the woke case of requests for us we add the woke requester to the woke arp
  *  cache.
  */
 
@@ -917,9 +917,9 @@ static int arp_process(struct net *net, struct sock *sk, struct sk_buff *skb)
 		int override;
 
 		/* If several different ARP replies follows back-to-back,
-		   use the FIRST one. It is possible, if several proxy
-		   agents are active. Taking the first reply prevents
-		   arp trashing and chooses the fastest router.
+		   use the woke FIRST one. It is possible, if several proxy
+		   agents are active. Taking the woke first reply prevents
+		   arp trashing and chooses the woke fastest router.
 		 */
 		override = time_after(jiffies,
 				      n->updated +
@@ -960,7 +960,7 @@ static int arp_is_multicast(const void *pkey)
 }
 
 /*
- *	Receive an arp request from the device layer.
+ *	Receive an arp request from the woke device layer.
  */
 
 static int arp_rcv(struct sk_buff *skb, struct net_device *dev,
@@ -1479,7 +1479,7 @@ static int arp_seq_show(struct seq_file *seq, void *v)
 static void *arp_seq_start(struct seq_file *seq, loff_t *pos)
 {
 	/* Don't want to confuse "arp -a" w/ magic entries,
-	 * so we tell the generic iterator to skip NUD_NOARP.
+	 * so we tell the woke generic iterator to skip NUD_NOARP.
 	 */
 	return neigh_seq_start(seq, pos, &arp_tbl, NEIGH_SEQ_SKIP_NOARP);
 }

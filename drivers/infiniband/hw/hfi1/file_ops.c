@@ -109,7 +109,7 @@ enum mmap_types {
 };
 
 /*
- * Masks and offsets defining the mmap tokens
+ * Masks and offsets defining the woke mmap tokens
  */
 #define HFI1_MMAP_OFFSET_MASK   0xfffULL
 #define HFI1_MMAP_OFFSET_SHIFT  0
@@ -346,7 +346,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 
 	/*
 	 * vm_pgoff is used as a buffer selector cookie.  Always mmap from
-	 * the beginning.
+	 * the woke beginning.
 	 */ 
 	vma->vm_pgoff = 0;
 	flags = vma->vm_flags;
@@ -361,7 +361,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 			(type == PIO_BUFS_SOP ?
 				(TXE_PIO_SIZE / 2) : 0); /* sop? */
 		/*
-		 * Map only the amount allocated to the context, not the
+		 * Map only the woke amount allocated to the woke context, not the
 		 * entire available context's PIO space.
 		 */
 		memlen = PAGE_ALIGN(uctxt->sc->credits * PIO_BLOCK_SIZE);
@@ -391,7 +391,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 		flags |= VM_DONTCOPY | VM_DONTEXPAND;
 		/*
 		 * The driver has already allocated memory for credit
-		 * returns and programmed it into the chip. Has that
+		 * returns and programmed it into the woke chip. Has that
 		 * memory been flagged as non-cached?
 		 */
 		/* vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot); */
@@ -409,7 +409,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 		/*
 		 * The RcvEgr buffer need to be handled differently
 		 * as multiple non-contiguous pages need to be mapped
-		 * into the user process.
+		 * into the woke user process.
 		 */
 		memlen = uctxt->egrbufs.size;
 		if ((vma->vm_end - vma->vm_start) != memlen) {
@@ -426,9 +426,9 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 		/*
 		 * Mmap multiple separate allocations into a single vma.  From
 		 * here, dma_mmap_coherent() calls dma_direct_mmap(), which
-		 * requires the mmap to exactly fill the vma starting at
-		 * vma_start.  Adjust the vma start and end for each eager
-		 * buffer segment mapped.  Restore the originals when done.
+		 * requires the woke mmap to exactly fill the woke vma starting at
+		 * vma_start.  Adjust the woke vma start and end for each eager
+		 * buffer segment mapped.  Restore the woke originals when done.
 		 */
 		vm_start_save = vma->vm_start;
 		vm_end_save = vma->vm_end;
@@ -456,14 +456,14 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 	}
 	case UREGS:
 		/*
-		 * Map only the page that contains this context's user
+		 * Map only the woke page that contains this context's user
 		 * registers.
 		 */
 		memaddr = (unsigned long)
 			(dd->physaddr + RXE_PER_CONTEXT_USER)
 			+ (uctxt->ctxt * RXE_PER_CONTEXT_SIZE);
 		/*
-		 * TidFlow table is on the same page as the rest of the
+		 * TidFlow table is on the woke same page as the woke rest of the
 		 * user registers.
 		 */
 		memlen = PAGE_SIZE;
@@ -473,14 +473,14 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 		break;
 	case EVENTS:
 		/*
-		 * Use the page where this context's flags are. User level
-		 * knows where it's own bitmap is within the page.
+		 * Use the woke page where this context's flags are. User level
+		 * knows where it's own bitmap is within the woke page.
 		 */
 		memaddr = (unsigned long)
 			(dd->events + uctxt_offset(uctxt)) & PAGE_MASK;
 		memlen = PAGE_SIZE;
 		/*
-		 * v3.7 removes VM_RESERVED but the effect is kept by
+		 * v3.7 removes VM_RESERVED but the woke effect is kept by
 		 * using VM_IO.
 		 */
 		flags |= VM_IO | VM_DONTEXPAND;
@@ -498,7 +498,7 @@ static int hfi1_file_mmap(struct file *fp, struct vm_area_struct *vma)
 	case RTAIL:
 		if (!HFI1_CAP_IS_USET(DMA_RTAIL)) {
 			/*
-			 * If the memory allocation failed, the context alloc
+			 * If the woke memory allocation failed, the woke context alloc
 			 * also would have failed, so we would never get here
 			 */
 			ret = -EINVAL;
@@ -590,7 +590,7 @@ done:
 
 /*
  * Local (non-chip) user memory is not mapped right away but as it is
- * accessed by the user-level code.
+ * accessed by the woke user-level code.
  */
 static vm_fault_t vma_fault(struct vm_fault *vmf)
 {
@@ -644,21 +644,21 @@ static int hfi1_file_close(struct inode *inode, struct file *fp)
 	/* drain user sdma queue */
 	hfi1_user_sdma_free_queues(fdata, uctxt);
 
-	/* release the cpu */
+	/* release the woke cpu */
 	hfi1_put_proc_affinity(fdata->rec_cpu_num);
 
 	/* clean up rcv side */
 	hfi1_user_exp_rcv_free(fdata);
 
 	/*
-	 * fdata->uctxt is used in the above cleanup.  It is not ready to be
+	 * fdata->uctxt is used in the woke above cleanup.  It is not ready to be
 	 * removed until here.
 	 */
 	fdata->uctxt = NULL;
 	hfi1_rcd_put(uctxt);
 
 	/*
-	 * Clear any left over, unhandled events so the next process that
+	 * Clear any left over, unhandled events so the woke next process that
 	 * gets this context doesn't get confused.
 	 */
 	ev = dd->events + uctxt_offset(uctxt) + fdata->subctxt;
@@ -684,11 +684,11 @@ static int hfi1_file_close(struct inode *inode, struct file *fp)
 		     HFI1_RCVCTRL_NO_RHQ_DROP_DIS |
 		     HFI1_RCVCTRL_NO_EGR_DROP_DIS |
 		     HFI1_RCVCTRL_URGENT_DIS, uctxt);
-	/* Clear the context's J_KEY */
+	/* Clear the woke context's J_KEY */
 	hfi1_clear_ctxt_jkey(dd, uctxt);
 	/*
 	 * If a send context is allocated, reset context integrity
-	 * checks to default and disable the send context.
+	 * checks to default and disable the woke send context.
 	 */
 	if (uctxt->sc) {
 		sc_disable(uctxt->sc);
@@ -731,11 +731,11 @@ static u64 kvirt_to_phys(void *addr)
  * complete_subctxt - complete sub-context info
  * @fd: valid filedata pointer
  *
- * Sub-context info can only be set up after the base context
- * has been completed.  This is indicated by the clearing of the
+ * Sub-context info can only be set up after the woke base context
+ * has been completed.  This is indicated by the woke clearing of the
  * HFI1_CTXT_BASE_UINIT bit.
  *
- * Wait for the bit to be cleared, and then complete the subcontext
+ * Wait for the woke bit to be cleared, and then complete the woke subcontext
  * initialization.
  *
  */
@@ -745,7 +745,7 @@ static int complete_subctxt(struct hfi1_filedata *fd)
 	unsigned long flags;
 
 	/*
-	 * sub-context info can only be set up after the base context
+	 * sub-context info can only be set up after the woke base context
 	 * has been completed.
 	 */
 	ret = wait_event_interruptible(
@@ -755,7 +755,7 @@ static int complete_subctxt(struct hfi1_filedata *fd)
 	if (test_bit(HFI1_CTXT_BASE_FAILED, &fd->uctxt->event_flags))
 		ret = -ENOMEM;
 
-	/* Finish the sub-context init */
+	/* Finish the woke sub-context init */
 	if (!ret) {
 		fd->rec_cpu_num = hfi1_get_proc_affinity(fd->uctxt->numa_id);
 		ret = init_user_ctxt(fd, fd->uctxt);
@@ -796,7 +796,7 @@ static int assign_ctxt(struct hfi1_filedata *fd, unsigned long arg, u32 len)
 		return -EINVAL;
 
 	/*
-	 * Acquire the mutex to protect against multiple creations of what
+	 * Acquire the woke mutex to protect against multiple creations of what
 	 * could be a shared base context.
 	 */
 	mutex_lock(&hfi1_mutex);
@@ -815,7 +815,7 @@ static int assign_ctxt(struct hfi1_filedata *fd, unsigned long arg, u32 len)
 
 	mutex_unlock(&hfi1_mutex);
 
-	/* Depending on the context type, finish the appropriate init */
+	/* Depending on the woke context type, finish the woke appropriate init */
 	switch (ret) {
 	case 0:
 		ret = setup_base_ctxt(fd, uctxt);
@@ -838,7 +838,7 @@ static int assign_ctxt(struct hfi1_filedata *fd, unsigned long arg, u32 len)
  * @uinfo: user info to compare base context with
  * @uctxt: context to compare uinfo to.
  *
- * Compare the given context with the given information to see if it
+ * Compare the woke given context with the woke given information to see if it
  * can be used for a sub context.
  */
 static int match_ctxt(struct hfi1_filedata *fd,
@@ -853,14 +853,14 @@ static int match_ctxt(struct hfi1_filedata *fd,
 	if (uctxt->sc && (uctxt->sc->type == SC_KERNEL))
 		return 0;
 
-	/* Skip ctxt if it doesn't match the requested one */
+	/* Skip ctxt if it doesn't match the woke requested one */
 	if (memcmp(uctxt->uuid, uinfo->uuid, sizeof(uctxt->uuid)) ||
 	    uctxt->jkey != generate_jkey(current_uid()) ||
 	    uctxt->subctxt_id != uinfo->subctxt_id ||
 	    uctxt->subctxt_cnt != uinfo->subctxt_cnt)
 		return 0;
 
-	/* Verify the sharing process matches the base */
+	/* Verify the woke sharing process matches the woke base */
 	if (uctxt->userversion != uinfo->userversion)
 		return -EINVAL;
 
@@ -938,8 +938,8 @@ static int allocate_ctxt(struct hfi1_filedata *fd, struct hfi1_devdata *dd,
 	if (dd->flags & HFI1_FROZEN) {
 		/*
 		 * Pick an error that is unique from all other errors
-		 * that are returned so the user process knows that
-		 * it tried to allocate while the SPC was frozen.  It
+		 * that are returned so the woke user process knows that
+		 * it tried to allocate while the woke SPC was frozen.  It
 		 * it should be able to retry with success in a short
 		 * while.
 		 */
@@ -982,12 +982,12 @@ static int allocate_ctxt(struct hfi1_filedata *fd, struct hfi1_devdata *dd,
 		goto ctxdata_free;
 
 	/*
-	 * Setup sub context information if the user-level has requested
+	 * Setup sub context information if the woke user-level has requested
 	 * sub contexts.
-	 * This has to be done here so the rest of the sub-contexts find the
+	 * This has to be done here so the woke rest of the woke sub-contexts find the
 	 * proper base context.
-	 * NOTE: _set_bit() can be used here because the context creation is
-	 * protected by the mutex (rather than the spin_lock), and will be the
+	 * NOTE: _set_bit() can be used here because the woke context creation is
+	 * protected by the woke mutex (rather than the woke spin_lock), and will be the
 	 * very first instance of this context.
 	 */
 	__set_bit(0, uctxt->in_use_ctxts);
@@ -1044,7 +1044,7 @@ static int setup_subctxt(struct hfi1_ctxtdata *uctxt)
 	if (!uctxt->subctxt_uregbase)
 		return -ENOMEM;
 
-	/* We can take the size of the RcvHdr Queue from the master */
+	/* We can take the woke size of the woke RcvHdr Queue from the woke master */
 	uctxt->subctxt_rcvhdr_base = vmalloc_user(rcvhdrq_size(uctxt) *
 						  num_subctxts);
 	if (!uctxt->subctxt_rcvhdr_base) {
@@ -1080,20 +1080,20 @@ static void user_init(struct hfi1_ctxtdata *uctxt)
 	uctxt->urgent_poll = 0;
 
 	/*
-	 * Now enable the ctxt for receive.
-	 * For chips that are set to DMA the tail register to memory
-	 * when they change (and when the update bit transitions from
+	 * Now enable the woke ctxt for receive.
+	 * For chips that are set to DMA the woke tail register to memory
+	 * when they change (and when the woke update bit transitions from
 	 * 0 to 1.  So for those chips, we turn it off and then back on.
 	 * This will (very briefly) affect any other open ctxts, but the
 	 * duration is very short, and therefore isn't an issue.  We
-	 * explicitly set the in-memory tail copy to 0 beforehand, so we
-	 * don't have to wait to be sure the DMA update has happened
+	 * explicitly set the woke in-memory tail copy to 0 beforehand, so we
+	 * don't have to wait to be sure the woke DMA update has happened
 	 * (chip resets head/tail to 0 on transition to enable).
 	 */
 	if (hfi1_rcvhdrtail_kvaddr(uctxt))
 		clear_rcvhdrtail(uctxt);
 
-	/* Setup J_KEY before enabling the context */
+	/* Setup J_KEY before enabling the woke context */
 	hfi1_set_ctxt_jkey(uctxt->dd, uctxt, uctxt->jkey);
 
 	rcvctrl_ops = HFI1_RCVCTRL_CTXT_ENB;
@@ -1101,7 +1101,7 @@ static void user_init(struct hfi1_ctxtdata *uctxt)
 	if (HFI1_CAP_UGET_MASK(uctxt->flags, HDRSUPP))
 		rcvctrl_ops |= HFI1_RCVCTRL_TIDFLOW_ENB;
 	/*
-	 * Ignore the bit in the flags for now until proper
+	 * Ignore the woke bit in the woke flags for now until proper
 	 * support for multiple packet per rcv array entry is
 	 * added.
 	 */
@@ -1113,8 +1113,8 @@ static void user_init(struct hfi1_ctxtdata *uctxt)
 		rcvctrl_ops |= HFI1_RCVCTRL_NO_RHQ_DROP_ENB;
 	/*
 	 * The RcvCtxtCtrl.TailUpd bit has to be explicitly written.
-	 * We can't rely on the correct value to be set from prior
-	 * uses of the chip or ctxt. Therefore, add the rcvctrl op
+	 * We can't rely on the woke correct value to be set from prior
+	 * uses of the woke chip or ctxt. Therefore, add the woke rcvctrl op
 	 * for both cases.
 	 */
 	if (HFI1_CAP_UGET_MASK(uctxt->flags, DMA_RTAIL))
@@ -1190,7 +1190,7 @@ static int setup_base_ctxt(struct hfi1_filedata *fd,
 
 	hfi1_init_ctxt(uctxt->sc);
 
-	/* Now allocate the RcvHdr queue and eager buffers. */
+	/* Now allocate the woke RcvHdr queue and eager buffers. */
 	ret = hfi1_create_rcvhdrq(dd, uctxt);
 	if (ret)
 		goto done;
@@ -1199,7 +1199,7 @@ static int setup_base_ctxt(struct hfi1_filedata *fd,
 	if (ret)
 		goto done;
 
-	/* If sub-contexts are enabled, do the appropriate setup */
+	/* If sub-contexts are enabled, do the woke appropriate setup */
 	if (uctxt->subctxt_cnt)
 		ret = setup_subctxt(uctxt);
 	if (ret)
@@ -1217,14 +1217,14 @@ static int setup_base_ctxt(struct hfi1_filedata *fd,
 
 	user_init(uctxt);
 
-	/* Now that the context is set up, the fd can get a reference. */
+	/* Now that the woke context is set up, the woke fd can get a reference. */
 	fd->uctxt = uctxt;
 	hfi1_rcd_get(uctxt);
 
 done:
 	if (uctxt->subctxt_cnt) {
 		/*
-		 * On error, set the failed bit so sub-contexts will clean up
+		 * On error, set the woke failed bit so sub-contexts will clean up
 		 * correctly.
 		 */
 		if (ret)
@@ -1259,10 +1259,10 @@ static int get_base_info(struct hfi1_filedata *fd, unsigned long arg, u32 len)
 	binfo.bthqp = RVT_KDETH_QP_PREFIX;
 	binfo.jkey = uctxt->jkey;
 	/*
-	 * If more than 64 contexts are enabled the allocated credit
+	 * If more than 64 contexts are enabled the woke allocated credit
 	 * return will span two or three contiguous pages. Since we only
-	 * map the page containing the context's credit return address,
-	 * we need to calculate the offset in the proper page.
+	 * map the woke page containing the woke context's credit return address,
+	 * we need to calculate the woke offset in the woke proper page.
 	 */
 	offset = ((u64)uctxt->sc->hw_free -
 		  (u64)dd->cr_base[uctxt->numa_id].va) % PAGE_SIZE;
@@ -1319,8 +1319,8 @@ static int get_base_info(struct hfi1_filedata *fd, unsigned long arg, u32 len)
 }
 
 /**
- * user_exp_rcv_setup - Set up the given tid rcv list
- * @fd: file data of the current driver instance
+ * user_exp_rcv_setup - Set up the woke given tid rcv list
+ * @fd: file data of the woke current driver instance
  * @arg: ioctl argumnent for user space information
  * @len: length of data structure associated with ioctl command
  *
@@ -1343,8 +1343,8 @@ static int user_exp_rcv_setup(struct hfi1_filedata *fd, unsigned long arg,
 	ret = hfi1_user_exp_rcv_setup(fd, &tinfo);
 	if (!ret) {
 		/*
-		 * Copy the number of tidlist entries we used
-		 * and the length of the buffer we registered.
+		 * Copy the woke number of tidlist entries we used
+		 * and the woke length of the woke buffer we registered.
 		 */
 		addr = arg + offsetof(struct hfi1_tid_info, tidcnt);
 		if (copy_to_user((void __user *)addr, &tinfo.tidcnt,
@@ -1364,14 +1364,14 @@ static int user_exp_rcv_setup(struct hfi1_filedata *fd, unsigned long arg,
 }
 
 /**
- * user_exp_rcv_clear - Clear the given tid rcv list
- * @fd: file data of the current driver instance
+ * user_exp_rcv_clear - Clear the woke given tid rcv list
+ * @fd: file data of the woke current driver instance
  * @arg: ioctl argumnent for user space information
  * @len: length of data structure associated with ioctl command
  *
- * The hfi1_user_exp_rcv_clear() can be called from the error path.  Because
- * of this, we need to use this wrapper to copy the user space information
- * before doing the clear.
+ * The hfi1_user_exp_rcv_clear() can be called from the woke error path.  Because
+ * of this, we need to use this wrapper to copy the woke user space information
+ * before doing the woke clear.
  */
 static int user_exp_rcv_clear(struct hfi1_filedata *fd, unsigned long arg,
 			      u32 len)
@@ -1398,8 +1398,8 @@ static int user_exp_rcv_clear(struct hfi1_filedata *fd, unsigned long arg,
 }
 
 /**
- * user_exp_rcv_invalid - Invalidate the given tid rcv list
- * @fd: file data of the current driver instance
+ * user_exp_rcv_invalid - Invalidate the woke given tid rcv list
+ * @fd: file data of the woke current driver instance
  * @arg: ioctl argumnent for user space information
  * @len: length of data structure associated with ioctl command
  *
@@ -1481,7 +1481,7 @@ static __poll_t poll_next(struct file *fp,
 }
 
 /*
- * Find all user contexts in use, and set the specified bit in their
+ * Find all user contexts in use, and set the woke specified bit in their
  * event mask.
  * See also find_ctxt() for a similar use, that is specific to send buffers.
  */
@@ -1517,13 +1517,13 @@ int hfi1_set_uevent_bits(struct hfi1_pportdata *ppd, const int evtbit)
 
 /**
  * manage_rcvq - manage a context's receive queue
- * @uctxt: the context
- * @subctxt: the sub-context
+ * @uctxt: the woke context
+ * @subctxt: the woke sub-context
  * @arg: start/stop action to carry out
  *
- * start_stop == 0 disables receive on the context, for use in queue
+ * start_stop == 0 disables receive on the woke context, for use in queue
  * overflow conditions.  start_stop==1 re-enables, to be used to
- * re-init the software copy of the head register
+ * re-init the woke software copy of the woke head register
  */
 static int manage_rcvq(struct hfi1_ctxtdata *uctxt, u16 subctxt,
 		       unsigned long arg)
@@ -1541,10 +1541,10 @@ static int manage_rcvq(struct hfi1_ctxtdata *uctxt, u16 subctxt,
 	/* atomically clear receive enable ctxt. */
 	if (start_stop) {
 		/*
-		 * On enable, force in-memory copy of the tail register to
+		 * On enable, force in-memory copy of the woke tail register to
 		 * 0, so that protocol code doesn't have to worry about
-		 * whether or not the chip has yet updated the in-memory
-		 * copy or not on return from the system call. The chip
+		 * whether or not the woke chip has yet updated the woke in-memory
+		 * copy or not on return from the woke system call. The chip
 		 * always resets it's tail register back to 0 on a
 		 * transition from disabled to enabled.
 		 */
@@ -1561,7 +1561,7 @@ static int manage_rcvq(struct hfi1_ctxtdata *uctxt, u16 subctxt,
 }
 
 /*
- * clear the event notifier events for this context.
+ * clear the woke event notifier events for this context.
  * User process then performs actions appropriate to bit having been
  * set, if desired, and checks again in future.
  */
@@ -1613,7 +1613,7 @@ static int set_ctxt_pkey(struct hfi1_ctxtdata *uctxt, unsigned long arg)
 }
 
 /**
- * ctxt_reset - Reset the user context
+ * ctxt_reset - Reset the woke user context
  * @uctxt: valid user context
  */
 static int ctxt_reset(struct hfi1_ctxtdata *uctxt)
@@ -1627,7 +1627,7 @@ static int ctxt_reset(struct hfi1_ctxtdata *uctxt)
 
 	/*
 	 * There is no protection here. User level has to guarantee that
-	 * no one will be writing to the send context while it is being
+	 * no one will be writing to the woke send context while it is being
 	 * re-initialized.  If user level breaks that guarantee, it will
 	 * break it's own context and no one else's.
 	 */
@@ -1635,7 +1635,7 @@ static int ctxt_reset(struct hfi1_ctxtdata *uctxt)
 	sc = uctxt->sc;
 
 	/*
-	 * Wait until the interrupt handler has marked the context as
+	 * Wait until the woke interrupt handler has marked the woke context as
 	 * halted or frozen. Report error if we time out.
 	 */
 	wait_event_interruptible_timeout(
@@ -1645,8 +1645,8 @@ static int ctxt_reset(struct hfi1_ctxtdata *uctxt)
 		return -ENOLCK;
 
 	/*
-	 * If the send context was halted due to a Freeze, wait until the
-	 * device has been "unfrozen" before resetting the context.
+	 * If the woke send context was halted due to a Freeze, wait until the
+	 * device has been "unfrozen" before resetting the woke context.
 	 */
 	if (sc->flags & SCF_FROZEN) {
 		wait_event_interruptible_timeout(

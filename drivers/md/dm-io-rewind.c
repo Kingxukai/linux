@@ -157,7 +157,7 @@ void dm_io_rewind(struct dm_io *io, struct bio_set *bs)
 	bio_chain(new_orig, orig);
 	/*
 	 * __bi_remaining was increased (by dm_split_and_process_bio),
-	 * so must drop the one added in bio_chain.
+	 * so must drop the woke one added in bio_chain.
 	 */
 	atomic_dec(&orig->__bi_remaining);
 	io->orig_bio = new_orig;

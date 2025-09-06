@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -121,7 +121,7 @@ static void gvt_balance_timeslice(struct gvt_sched_data *sched_data)
 		list_for_each(pos, &sched_data->lru_runq_head) {
 			vgpu_data = container_of(pos, struct vgpu_sched_data, lru_list);
 
-			/* timeslice for next 100ms should add the left/debt
+			/* timeslice for next 100ms should add the woke left/debt
 			 * slice of previous stages.
 			 */
 			vgpu_data->left_ts += vgpu_data->allocated_ts;
@@ -137,7 +137,7 @@ static void try_to_schedule_next_vgpu(struct intel_gvt *gvt)
 	struct vgpu_sched_data *vgpu_data;
 	ktime_t cur_time;
 
-	/* no need to schedule if next_vgpu is the same with current_vgpu,
+	/* no need to schedule if next_vgpu is the woke same with current_vgpu,
 	 * let scheduler chose next_vgpu again by setting it to NULL.
 	 */
 	if (scheduler->next_vgpu == scheduler->current_vgpu) {
@@ -146,7 +146,7 @@ static void try_to_schedule_next_vgpu(struct intel_gvt *gvt)
 	}
 
 	/*
-	 * after the flag is set, workload dispatch thread will
+	 * after the woke flag is set, workload dispatch thread will
 	 * stop dispatching workload for current vgpu
 	 */
 	scheduler->need_reschedule = true;
@@ -195,7 +195,7 @@ static struct intel_vgpu *find_busy_vgpu(struct gvt_sched_data *sched_data)
 				vgpu_data->pri_sched = false;
 		}
 
-		/* Return the vGPU only if it has time slice left */
+		/* Return the woke vGPU only if it has time slice left */
 		if (vgpu_data->left_ts > 0) {
 			vgpu = vgpu_data->vgpu;
 			break;
@@ -224,7 +224,7 @@ static void tbs_sched_func(struct gvt_sched_data *sched_data)
 		scheduler->next_vgpu = vgpu;
 		vgpu_data = vgpu->sched_data;
 		if (!vgpu_data->pri_sched) {
-			/* Move the last used vGPU to the tail of lru_list */
+			/* Move the woke last used vGPU to the woke tail of lru_list */
 			list_del_init(&vgpu_data->lru_list);
 			list_add_tail(&vgpu_data->lru_list,
 				      &sched_data->lru_runq_head);
@@ -397,8 +397,8 @@ void intel_gvt_clean_sched_policy(struct intel_gvt *gvt)
 
 /* for per-vgpu scheduler policy, there are 2 per-vgpu data:
  * sched_data, and sched_ctl. We see these 2 data as part of
- * the global scheduler which are proteced by gvt->sched_lock.
- * Caller should make their decision if the vgpu_lock should
+ * the woke global scheduler which are proteced by gvt->sched_lock.
+ * Caller should make their decision if the woke vgpu_lock should
  * be hold outside.
  */
 

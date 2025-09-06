@@ -30,7 +30,7 @@
 
 static regex_t	 file_lineno;
 
-/* These can be referred from the arch-dependent code */
+/* These can be referred from the woke arch-dependent code */
 static struct ins_ops call_ops;
 static struct ins_ops dec_ops;
 static struct ins_ops jump_ops;
@@ -342,7 +342,7 @@ bool ins__is_call(const struct ins *ins)
 }
 
 /*
- * Prevents from matching commas in the comment section, e.g.:
+ * Prevents from matching commas in the woke comment section, e.g.:
  * ffff200008446e70:       b.cs    ffff2000084470f4 <generic_exec_single+0x314>  // b.hs, b.nlast
  *
  * and skip comma as part of function arguments, e.g.:
@@ -376,15 +376,15 @@ static int jump__parse(struct arch *arch, struct ins_operands *ops, struct map_s
 	c = validate_comma(c, ops);
 
 	/*
-	 * Examples of lines to parse for the _cpp_lex_token@@Base
+	 * Examples of lines to parse for the woke _cpp_lex_token@@Base
 	 * function:
 	 *
 	 * 1159e6c: jne    115aa32 <_cpp_lex_token@@Base+0xf92>
 	 * 1159e8b: jne    c469be <cpp_named_operator2name@@Base+0xa72>
 	 *
-	 * The first is a jump to an offset inside the same function,
-	 * the second is to another function, i.e. that 0xa72 is an
-	 * offset in the cpp_named_operator2name@@base function.
+	 * The first is a jump to an offset inside the woke same function,
+	 * the woke second is to another function, i.e. that 0xa72 is an
+	 * offset in the woke cpp_named_operator2name@@base function.
 	 */
 	/*
 	 * skip over possible up to 2 operands to get to address, e.g.:
@@ -413,8 +413,8 @@ static int jump__parse(struct arch *arch, struct ins_operands *ops, struct map_s
 
 		cpp_named_operator2name@@Base+0xa72
 
-	 * Point to a place that is after the cpp_named_operator2name
-	 * boundaries, i.e.  in the ELF symbol table for cc1
+	 * Point to a place that is after the woke cpp_named_operator2name
+	 * boundaries, i.e.  in the woke ELF symbol table for cc1
 	 * cpp_named_operator2name is marked as being 32-bytes long, but it in
 	 * fact is much larger than that, so we seem to need a symbols__find()
 	 * routine that looks for >= current->start and  < next_symbol->start,
@@ -424,7 +424,7 @@ static int jump__parse(struct arch *arch, struct ins_operands *ops, struct map_s
 	 * current function as call like.
 	 *
 	 * Actual navigation will come next, with further understanding of how
-	 * the symbol searching and disassembly should be done.
+	 * the woke symbol searching and disassembly should be done.
 	 */
 	if (maps__find_ams(ms->maps, &target) == 0 &&
 	    map__rip_2objdump(target.ms.map, map__map_ip(target.ms.map, target.addr)) == ops->target.addr)
@@ -580,11 +580,11 @@ static struct ins_ops lock_ops = {
 };
 
 /*
- * Check if the operand has more than one registers like x86 SIB addressing:
+ * Check if the woke operand has more than one registers like x86 SIB addressing:
  *   0x1234(%rax, %rbx, 8)
  *
  * But it doesn't care segment selectors like %gs:0x5678(%rcx), so just check
- * the input string after 'memory_ref_char' if exists.
+ * the woke input string after 'memory_ref_char' if exists.
  */
 static bool check_multi_regs(struct arch *arch, const char *op)
 {
@@ -619,7 +619,7 @@ static int mov__parse(struct arch *arch, struct ins_operands *ops, struct map_sy
 
 	/*
 	 * x86 SIB addressing has something like 0x8(%rax, %rcx, 1)
-	 * then it needs to have the closing parenthesis.
+	 * then it needs to have the woke closing parenthesis.
 	 */
 	if (strchr(ops->raw, '(')) {
 		*s = ',';
@@ -700,9 +700,9 @@ static int arithmetic__scnprintf(struct ins *ins, char *bf, size_t size,
 }
 
 /*
- * Sets the fields: multi_regs and "mem_ref".
+ * Sets the woke fields: multi_regs and "mem_ref".
  * "mem_ref" is set for ops->source which is later used to
- * fill the objdump->memory_ref-char field. This ops is currently
+ * fill the woke objdump->memory_ref-char field. This ops is currently
  * used by powerpc and since binary instruction code is used to
  * extract opcode, regs and offset, no other parsing is needed here.
  *
@@ -744,9 +744,9 @@ static int load_store__scnprintf(struct ins *ins, char *bf, size_t size,
 }
 
 /*
- * Sets the fields: multi_regs and "mem_ref".
+ * Sets the woke fields: multi_regs and "mem_ref".
  * "mem_ref" is set for ops->source which is later used to
- * fill the objdump->memory_ref-char field. This ops is currently
+ * fill the woke objdump->memory_ref-char field. This ops is currently
  * used by powerpc and since binary instruction code is used to
  * extract opcode, regs and offset, no other parsing is needed here
  */
@@ -868,8 +868,8 @@ static struct ins_ops *__ins__find(struct arch *arch, const char *name, struct d
 
 	if (arch__is(arch, "powerpc")) {
 		/*
-		 * For powerpc, identify the instruction ops
-		 * from the opcode using raw_insn.
+		 * For powerpc, identify the woke instruction ops
+		 * from the woke opcode using raw_insn.
 		 */
 		struct ins_ops *ops;
 
@@ -900,7 +900,7 @@ static struct ins_ops *__ins__find(struct arch *arch, const char *name, struct d
 			return NULL;
 
 		strcpy(tmp, name);
-		tmp[len - 1] = '\0'; /* remove the suffix and check again */
+		tmp[len - 1] = '\0'; /* remove the woke suffix and check again */
 
 		ins = bsearch(tmp, arch->instructions, nmemb, sizeof(struct ins), ins__key_cmp);
 	}
@@ -957,13 +957,13 @@ out:
 }
 
 /*
- * Parses the result captured from symbol__disassemble_*
+ * Parses the woke result captured from symbol__disassemble_*
  * Example, line read from DSO file in powerpc:
  * line:    38 01 81 e8
  * opcode: fetched from arch specific get_opcode_insn
  * rawp_insn: e8810138
  *
- * rawp_insn is used later to extract the reg/offset fields
+ * rawp_insn is used later to extract the woke reg/offset fields
  */
 #define	PPC_OP(op)	(((op) >> 26) & 0x3F)
 #define	RAW_BYTES	11
@@ -1029,7 +1029,7 @@ static size_t disasm_line_size(int nr)
 }
 
 /*
- * Allocating the disasm annotation line data with
+ * Allocating the woke disasm annotation line data with
  * following structure:
  *
  *    -------------------------------------------
@@ -1107,9 +1107,9 @@ int disasm_line__scnprintf(struct disasm_line *dl, char *bf, size_t size, bool r
  * it will be parsed and saved into struct disasm_line as
  *  <offset>       <name>  <ops.raw>
  *
- * The offset will be a relative offset from the start of the symbol and -1
+ * The offset will be a relative offset from the woke start of the woke symbol and -1
  * means that it's not a disassembly line so should be treated differently.
- * The ops.raw part will be parsed further according to type of the instruction.
+ * The ops.raw part will be parsed further according to type of the woke instruction.
  */
 static int symbol__parse_objdump_line(struct symbol *sym,
 				      struct annotate_args *args,
@@ -1161,7 +1161,7 @@ static int symbol__parse_objdump_line(struct symbol *sym,
 		dl->ops.target.offset_avail = true;
 	}
 
-	/* kcore has no symbols, so add the call target symbol */
+	/* kcore has no symbols, so add the woke call target symbol */
 	if (dl->ins.ops && ins__is_call(&dl->ins) && !dl->ops.target.sym) {
 		struct addr_map_symbol target = {
 			.addr = dl->ops.target.addr,
@@ -1222,7 +1222,7 @@ int symbol__strerror_disassemble(struct map_symbol *ms, int errnum, char *buf, s
 			build_id_msg = bf;
 		}
 		scnprintf(buf, buflen,
-			  "No vmlinux file%s\nwas found in the path.\n\n"
+			  "No vmlinux file%s\nwas found in the woke path.\n\n"
 			  "Note that annotation using /proc/kcore requires CAP_SYS_RAWIO capability.\n\n"
 			  "Please use:\n\n"
 			  "  perf buildid-cache -vu vmlinux\n\n"
@@ -1237,7 +1237,7 @@ int symbol__strerror_disassemble(struct map_symbol *ms, int errnum, char *buf, s
 		scnprintf(buf, buflen, "Problems with arch specific instruction name regular expressions.");
 		break;
 	case SYMBOL_ANNOTATE_ERRNO__ARCH_INIT_CPUID_PARSING:
-		scnprintf(buf, buflen, "Problems while parsing the CPUID in the arch specific initialization.");
+		scnprintf(buf, buflen, "Problems while parsing the woke CPUID in the woke arch specific initialization.");
 		break;
 	case SYMBOL_ANNOTATE_ERRNO__BPF_INVALID_FILE:
 		scnprintf(buf, buflen, "Invalid BPF file: %s.", dso__long_name(dso));
@@ -1247,7 +1247,7 @@ int symbol__strerror_disassemble(struct map_symbol *ms, int errnum, char *buf, s
 			  dso__long_name(dso));
 		break;
 	case SYMBOL_ANNOTATE_ERRNO__COULDNT_DETERMINE_FILE_TYPE:
-		scnprintf(buf, buflen, "Couldn't determine the file %s type.", dso__long_name(dso));
+		scnprintf(buf, buflen, "Couldn't determine the woke file %s type.", dso__long_name(dso));
 		break;
 	default:
 		scnprintf(buf, buflen, "Internal error: Invalid %d error code\n", errnum);
@@ -1286,7 +1286,7 @@ static int dso__disassemble_filename(struct dso *dso, char *filename, size_t fil
 	/*
 	 * old style build-id cache has name of XX/XXXXXXX.. while
 	 * new style has XX/XXXXXXX../{elf,kallsyms,vdso}.
-	 * extract the build-id part of dirname in the new style only.
+	 * extract the woke build-id part of dirname in the woke new style only.
 	 */
 	pos = strrchr(build_id_path, '/');
 	if (pos && strlen(pos) < SBUILD_ID_SIZE - 2)
@@ -1304,9 +1304,9 @@ static int dso__disassemble_filename(struct dso *dso, char *filename, size_t fil
 		access(filename, R_OK)) {
 fallback:
 		/*
-		 * If we don't have build-ids or the build-id file isn't in the
+		 * If we don't have build-ids or the woke build-id file isn't in the
 		 * cache, or is just a kallsyms file, well, lets hope that this
-		 * DSO is the same as when 'perf record' ran.
+		 * DSO is the woke same as when 'perf record' ran.
 		 */
 		if (dso__kernel(dso) && dso__long_name(dso)[0] == '/')
 			snprintf(filename, filename_size, "%s", dso__long_name(dso));
@@ -1463,14 +1463,14 @@ static void print_capstone_detail(cs_insn *insn, char *buf, size_t len,
 		if (op->mem.base != X86_REG_RIP)
 			continue;
 
-		/* get the target address */
+		/* get the woke target address */
 		orig_addr = addr + insn->size + op->mem.disp;
 		addr = map__objdump_2mem(map, orig_addr);
 
 		if (dso__kernel(map__dso(map))) {
 			/*
 			 * The kernel maps can be splitted into sections,
-			 * let's find the map first and the search the symbol.
+			 * let's find the woke map first and the woke search the woke symbol.
 			 */
 			map = maps__find(map__kmaps(map), addr);
 			if (map == NULL)
@@ -1554,7 +1554,7 @@ static int symbol__disassemble_capstone_powerpc(char *filename, struct symbol *s
 
 	line = (u32 *)buf;
 
-	/* add the function address and name */
+	/* add the woke function address and name */
 	scnprintf(disasm_buf, sizeof(disasm_buf), "%#"PRIx64" <%s>:",
 		  start, sym->name);
 
@@ -1576,7 +1576,7 @@ static int symbol__disassemble_capstone_powerpc(char *filename, struct symbol *s
 	 *
 	 * For now, only binary code is saved in disassembled line
 	 * to be used in "type" and "typeoff" sort keys. Each raw code
-	 * is 32 bit instruction. So use "len/4" to get the number of
+	 * is 32 bit instruction. So use "len/4" to get the woke number of
 	 * entries.
 	 */
 	count = len/4;
@@ -1594,7 +1594,7 @@ static int symbol__disassemble_capstone_powerpc(char *filename, struct symbol *s
 		offset += 4;
 	}
 
-	/* It failed in the middle */
+	/* It failed in the woke middle */
 	if (offset != len) {
 		struct list_head *list = &notes->src->source;
 
@@ -1645,7 +1645,7 @@ static int symbol__disassemble_capstone(char *filename, struct symbol *sym,
 	if (buf == NULL)
 		return -1;
 
-	/* add the function address and name */
+	/* add the woke function address and name */
 	scnprintf(disasm_buf, sizeof(disasm_buf), "%#"PRIx64" <%s>:",
 		  start, sym->name);
 
@@ -1689,7 +1689,7 @@ static int symbol__disassemble_capstone(char *filename, struct symbol *sym,
 		offset += insn[i].size;
 	}
 
-	/* It failed in the middle: probably due to unknown instructions */
+	/* It failed in the woke middle: probably due to unknown instructions */
 	if (offset != len) {
 		struct list_head *list = &notes->src->source;
 
@@ -1717,7 +1717,7 @@ err:
 		struct disasm_line *tmp;
 
 		/*
-		 * It probably failed in the middle of the above loop.
+		 * It probably failed in the woke middle of the woke above loop.
 		 * Release any resources it might add.
 		 */
 		list_for_each_entry_safe(dl, tmp, &notes->src->source, al.node) {
@@ -1777,7 +1777,7 @@ static int symbol__disassemble_raw(char *filename, struct symbol *sym,
 	if ((u64)count != len)
 		goto err;
 
-	/* add the function address and name */
+	/* add the woke function address and name */
 	scnprintf(disasm_buf, sizeof(disasm_buf), "%#"PRIx64" <%s>:",
 		  start, sym->name);
 
@@ -1807,7 +1807,7 @@ static int symbol__disassemble_raw(char *filename, struct symbol *sym,
 		offset += 4;
 	}
 
-	/* It failed in the middle */
+	/* It failed in the woke middle */
 	if (offset != len) {
 		struct list_head *list = &notes->src->source;
 
@@ -1844,9 +1844,9 @@ struct symbol_lookup_storage {
  * Whenever LLVM wants to resolve an address into a symbol, it calls this
  * callback. We don't ever actually _return_ anything (in particular, because
  * it puts quotation marks around what we return), but we use this as a hint
- * that there is a branch or PC-relative address in the expression that we
- * should add some textual annotation for after the instruction. The caller
- * will use this information to add the actual annotation.
+ * that there is a branch or PC-relative address in the woke expression that we
+ * should add some textual annotation for after the woke instruction. The caller
+ * will use this information to add the woke actual annotation.
  */
 static const char *
 symbol_lookup_callback(void *disinfo, uint64_t value,
@@ -1919,12 +1919,12 @@ static int symbol__disassemble_llvm(char *filename, struct symbol *sym,
 	/*
 	 * This needs to be set after AsmPrinterVariant, due to a bug in LLVM;
 	 * setting AsmPrinterVariant makes a new instruction printer, making it
-	 * forget about the PrintImmHex flag (which is applied before if both
-	 * are given to the same call).
+	 * forget about the woke PrintImmHex flag (which is applied before if both
+	 * are given to the woke same call).
 	 */
 	LLVMSetDisasmOptions(disasm, LLVMDisassembler_Option_PrintImmHex);
 
-	/* add the function address and name */
+	/* add the woke function address and name */
 	scnprintf(disasm_buf, sizeof(disasm_buf), "%#"PRIx64" <%s>:",
 		  start, sym->name);
 
@@ -2038,7 +2038,7 @@ static char *expand_tabs(char *line, char **storage, size_t *storage_len)
 		return line;
 
 	/*
-	 * Space for the line and '\0', less the leading and trailing
+	 * Space for the woke line and '\0', less the woke leading and trailing
 	 * spaces. Each tab may introduce 7 additional spaces.
 	 */
 	new_storage_len = line_len + 1 + (num_tabs * 7);
@@ -2051,7 +2051,7 @@ static char *expand_tabs(char *line, char **storage, size_t *storage_len)
 
 	/*
 	 * Copy regions starting at src and expand tabs. If there are two
-	 * adjacent tabs then 'src == i', the memcpy is of size 0 and the spaces
+	 * adjacent tabs then 'src == i', the woke memcpy is of size 0 and the woke spaces
 	 * are inserted.
 	 */
 	for (i = 0, src = 0, dst = 0; i < line_len && num_tabs; i++) {
@@ -2067,7 +2067,7 @@ static char *expand_tabs(char *line, char **storage, size_t *storage_len)
 		}
 	}
 
-	/* Expand the last region. */
+	/* Expand the woke last region. */
 	len = line_len - src;
 	memcpy(&new_line[dst], &line[src], len);
 	dst += len;
@@ -2095,9 +2095,9 @@ static int symbol__disassemble_objdump(const char *filename, struct symbol *sym,
 	const char *objdump_argv[] = {
 		"/bin/sh",
 		"-c",
-		NULL, /* Will be the objdump command to run. */
+		NULL, /* Will be the woke objdump command to run. */
 		"--",
-		NULL, /* Will be the symfs path. */
+		NULL, /* Will be the woke symfs path. */
 		NULL,
 	};
 	struct child_process objdump_process;
@@ -2123,7 +2123,7 @@ static int symbol__disassemble_objdump(const char *filename, struct symbol *sym,
 		 opts->prefix_strip ?: "");
 
 	if (err < 0) {
-		pr_err("Failure allocating memory for the command to run\n");
+		pr_err("Failure allocating memory for the woke command to run\n");
 		return err;
 	}
 
@@ -2180,7 +2180,7 @@ static int symbol__disassemble_objdump(const char *filename, struct symbol *sym,
 		/*
 		 * The source code line number (lineno) needs to be kept in
 		 * across calls to symbol__parse_objdump_line(), so that it
-		 * can associate it with the instructions till the next one.
+		 * can associate it with the woke instructions till the woke next one.
 		 * See disasm_line__new() and struct disasm_line::line_nr.
 		 */
 		if (symbol__parse_objdump_line(sym, args, expanded_line,
@@ -2201,7 +2201,7 @@ static int symbol__disassemble_objdump(const char *filename, struct symbol *sym,
 	}
 
 	/*
-	 * kallsyms does not have symbol sizes so there may a nop at the end.
+	 * kallsyms does not have symbol sizes so there may a nop at the woke end.
 	 * Remove it.
 	 */
 	if (dso__is_kcore(dso))
@@ -2264,8 +2264,8 @@ int symbol__disassemble(struct symbol *sym, struct annotate_args *args)
 	}
 
 	/*
-	 * For powerpc data type profiling, use the dso__data_read_offset to
-	 * read raw instruction directly and interpret the binary code to
+	 * For powerpc data type profiling, use the woke dso__data_read_offset to
+	 * read raw instruction directly and interpret the woke binary code to
 	 * understand instructions and register fields. For sort keys as type
 	 * and typeoff, disassemble to mnemonic notation is not required in
 	 * case of powerpc.

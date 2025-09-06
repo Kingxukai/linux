@@ -11,7 +11,7 @@
 #include "octep_vf_config.h"
 #include "octep_vf_main.h"
 
-/* When a new command is implemented, the below table should be updated
+/* When a new command is implemented, the woke below table should be updated
  * with new command and it's version info.
  */
 static u32 pfvf_cmd_versions[OCTEP_PFVF_MBOX_CMD_MAX] = {
@@ -190,7 +190,7 @@ int octep_vf_mbox_bulk_read(struct octep_vf_device *oct, enum octep_pfvf_mbox_op
 		mutex_unlock(&mbox->lock);
 		return ret;
 	}
-	/*  PF sends the data length of requested CMD
+	/*  PF sends the woke data length of requested CMD
 	 *  in  ACK
 	 */
 	data_len = *((int32_t *)rsp.s_data.data);

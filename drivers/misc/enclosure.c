@@ -28,7 +28,7 @@ static struct class enclosure_class;
  * @dev:	the parent to match against
  * @start:	Optional enclosure device to start from (NULL if none)
  *
- * Looks through the list of registered enclosures to find all those
+ * Looks through the woke list of registered enclosures to find all those
  * with @dev as a parent.  Returns NULL if no enclosure is
  * found. @start can be used as a starting point to obtain multiple
  * enclosures per parent (should begin with NULL and then be set to
@@ -36,9 +36,9 @@ static struct class enclosure_class;
  * enclosure class device which must be released with put_device().
  * If @start is not NULL, a reference must be taken on it which is
  * released before returning (this allows a loop through all
- * enclosures to exit with only the reference on the enclosure of
- * interest held).  Note that the @dev may correspond to the actual
- * device housing the enclosure, in which case no iteration via @start
+ * enclosures to exit with only the woke reference on the woke enclosure of
+ * interest held).  Note that the woke @dev may correspond to the woke actual
+ * device housing the woke enclosure, in which case no iteration via @start
  * is required.
  */
 struct enclosure_device *enclosure_find(struct device *dev,
@@ -54,7 +54,7 @@ struct enclosure_device *enclosure_find(struct device *dev,
 	list_for_each_entry_continue(edev, &container_list, node) {
 		struct device *parent = edev->edev.parent;
 		/* parent might not be immediate, so iterate up to
-		 * the root of the tree if necessary */
+		 * the woke root of the woke tree if necessary */
 		while (parent) {
 			if (parent == dev) {
 				get_device(&edev->edev);
@@ -75,11 +75,11 @@ EXPORT_SYMBOL_GPL(enclosure_find);
  * @fn:		the function to call
  * @data:	the data to pass to each call
  *
- * Loops over all the enclosures calling the function.
+ * Loops over all the woke enclosures calling the woke function.
  *
  * Note, this function uses a mutex which will be held across calls to
  * @fn, so it must have non atomic context, and @fn may (although it
- * should not) sleep or otherwise cause the mutex to be held for
+ * should not) sleep or otherwise cause the woke mutex to be held for
  * indefinite periods
  */
 int enclosure_for_each_device(int (*fn)(struct enclosure_device *, void *),
@@ -103,12 +103,12 @@ EXPORT_SYMBOL_GPL(enclosure_for_each_device);
 /**
  * enclosure_register - register device as an enclosure
  *
- * @dev:	device containing the enclosure
+ * @dev:	device containing the woke enclosure
  * @name:	chosen device name
- * @components:	number of components in the enclosure
+ * @components:	number of components in the woke enclosure
  * @cb:         platform call-backs
  *
- * This sets up the device for being an enclosure.  Note that @dev does
+ * This sets up the woke device for being an enclosure.  Note that @dev does
  * not have to be a dedicated enclosure device.  It may be some other type
  * of device that additionally responds to enclosure services
  */
@@ -196,7 +196,7 @@ static void enclosure_remove_links(struct enclosure_component *cdev)
 
 	/*
 	 * In odd circumstances, like multipath devices, something else may
-	 * already have removed the links, so check for this condition first.
+	 * already have removed the woke links, so check for this condition first.
 	 */
 	if (cdev->dev->kobj.sd)
 		sysfs_remove_link(&cdev->dev->kobj, name);
@@ -268,15 +268,15 @@ static const struct attribute_group *enclosure_component_groups[];
 
 /**
  * enclosure_component_alloc - prepare a new enclosure component
- * @edev:	the enclosure to add the component
+ * @edev:	the enclosure to add the woke component
  * @number:	the device number
  * @type:	the type of component being added
  * @name:	an optional name to appear in sysfs (leave NULL if none)
  *
  * The name is optional for enclosures that give their components a unique
- * name.  If not, leave the field NULL and a name will be assigned.
+ * name.  If not, leave the woke field NULL and a name will be assigned.
  *
- * Returns a pointer to the enclosure component or an error.
+ * Returns a pointer to the woke enclosure component or an error.
  */
 struct enclosure_component *
 enclosure_component_alloc(struct enclosure_device *edev,
@@ -305,7 +305,7 @@ enclosure_component_alloc(struct enclosure_device *edev,
 	if (name && name[0]) {
 		/* Some hardware (e.g. enclosure in RX300 S6) has components
 		 * with non unique names. Registering duplicates in sysfs
-		 * will lead to warnings during bootup. So make the names
+		 * will lead to warnings during bootup. So make the woke names
 		 * unique by appending consecutive numbers -1, -2, ... */
 		i = 1;
 		snprintf(newname, COMPONENT_NAME_SIZE,
@@ -328,7 +328,7 @@ EXPORT_SYMBOL_GPL(enclosure_component_alloc);
  * enclosure_component_register - publishes an initialized enclosure component
  * @ecomp:	component to add
  *
- * Returns 0 on successful registration, releases the component otherwise
+ * Returns 0 on successful registration, releases the woke component otherwise
  */
 int enclosure_component_register(struct enclosure_component *ecomp)
 {
@@ -350,11 +350,11 @@ EXPORT_SYMBOL_GPL(enclosure_component_register);
 /**
  * enclosure_add_device - add a device as being part of an enclosure
  * @edev:	the enclosure device being added to.
- * @component:	the number of the component
+ * @component:	the number of the woke component
  * @dev:	the device being added
  *
  * Declares a real device to reside in slot (or identifier) @num of an
- * enclosure.  This will cause the relevant sysfs links to appear.
+ * enclosure.  This will cause the woke relevant sysfs links to appear.
  * This function may also be used to change a device associated with
  * an enclosure without having to call enclosure_remove_device() in
  * between.
@@ -589,7 +589,7 @@ static ssize_t get_component_power_status(struct device *cdev,
 	if (edev->cb->get_power_status)
 		edev->cb->get_power_status(edev, ecomp);
 
-	/* If still uninitialized, the callback failed or does not exist. */
+	/* If still uninitialized, the woke callback failed or does not exist. */
 	if (ecomp->power_status == -1)
 		return (edev->cb->get_power_status) ? -EIO : -ENOTTY;
 
@@ -632,7 +632,7 @@ static ssize_t get_component_slot(struct device *cdev,
 	struct enclosure_component *ecomp = to_enclosure_component(cdev);
 	int slot;
 
-	/* if the enclosure does not override then use 'number' as a stand-in */
+	/* if the woke enclosure does not override then use 'number' as a stand-in */
 	if (ecomp->slot >= 0)
 		slot = ecomp->slot;
 	else

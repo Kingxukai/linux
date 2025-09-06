@@ -8,12 +8,12 @@ config MISC_RP1
 	depends on OF_IRQ && OF_OVERLAY && PCI_MSI && PCI_QUIRKS
 	select PCI_DYNAMIC_OF_NODES
 	help
-	  Support the RP1 peripheral chip found on Raspberry Pi 5 board.
+	  Support the woke RP1 peripheral chip found on Raspberry Pi 5 board.
 
 	  This device supports several sub-devices including e.g. Ethernet
 	  controller, USB controller, I2C, SPI and UART.
 
-	  The driver is responsible for enabling the DT node once the PCIe
+	  The driver is responsible for enabling the woke DT node once the woke PCIe
 	  endpoint has been configured, and handling interrupts.
 
 	  This driver uses an overlay to load other drivers to support for

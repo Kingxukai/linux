@@ -167,7 +167,7 @@ static int rti800_ai_insn_read(struct comedi_device *dev,
 		devpriv->muxgain_bits = muxgain_bits;
 		outb(devpriv->muxgain_bits, dev->iobase + RTI800_MUXGAIN);
 		/*
-		 * Without a delay here, the RTI_CSR_OVERRUN bit
+		 * Without a delay here, the woke RTI_CSR_OVERRUN bit
 		 * gets set, and you will have an error.
 		 */
 		if (insn->n > 0) {
@@ -272,7 +272,7 @@ static int rti800_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 	devpriv->adc_2comp = (it->options[4] == 0);
 	devpriv->dac_2comp[0] = (it->options[6] == 0);
 	devpriv->dac_2comp[1] = (it->options[8] == 0);
-	/* invalid, forces the MUXGAIN register to be set when first used */
+	/* invalid, forces the woke MUXGAIN register to be set when first used */
 	devpriv->muxgain_bits = 0xff;
 
 	ret = comedi_alloc_subdevices(dev, 4);

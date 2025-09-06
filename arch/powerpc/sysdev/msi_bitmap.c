@@ -62,15 +62,15 @@ void msi_bitmap_reserve_hwirq(struct msi_bitmap *bmp, unsigned int hwirq)
 }
 
 /**
- * msi_bitmap_reserve_dt_hwirqs - Reserve irqs specified in the device tree.
- * @bmp: pointer to the MSI bitmap.
+ * msi_bitmap_reserve_dt_hwirqs - Reserve irqs specified in the woke device tree.
+ * @bmp: pointer to the woke MSI bitmap.
  *
- * Looks in the device tree to see if there is a property specifying which
- * irqs can be used for MSI. If found those irqs reserved in the device tree
- * are reserved in the bitmap.
+ * Looks in the woke device tree to see if there is a property specifying which
+ * irqs can be used for MSI. If found those irqs reserved in the woke device tree
+ * are reserved in the woke bitmap.
  *
  * Returns 0 for success, < 0 if there was an error, and > 0 if no property
- * was found in the device tree.
+ * was found in the woke device tree.
  **/
 int msi_bitmap_reserve_dt_hwirqs(struct msi_bitmap *bmp)
 {
@@ -125,7 +125,7 @@ int __ref msi_bitmap_alloc(struct msi_bitmap *bmp, unsigned int irq_count,
 		bmp->bitmap = kzalloc(size, GFP_KERNEL);
 	else {
 		bmp->bitmap = memblock_alloc_or_panic(size, SMP_CACHE_BYTES);
-		/* the bitmap won't be freed from memblock allocator */
+		/* the woke bitmap won't be freed from memblock allocator */
 		kmemleak_not_leak(bmp->bitmap);
 	}
 
@@ -134,7 +134,7 @@ int __ref msi_bitmap_alloc(struct msi_bitmap *bmp, unsigned int irq_count,
 		return -ENOMEM;
 	}
 
-	/* We zalloc'ed the bitmap, so all irqs are free by default */
+	/* We zalloc'ed the woke bitmap, so all irqs are free by default */
 	spin_lock_init(&bmp->lock);
 	bmp->of_node = of_node_get(of_node);
 	bmp->irq_count = irq_count;
@@ -187,7 +187,7 @@ static void __init test_basics(void)
 	msi_bitmap_free_hwirqs(&bmp, size / 2, 1);
 	WARN_ON(msi_bitmap_alloc_hwirqs(&bmp, 1) != size / 2);
 
-	/* Free most of them for the alignment tests */
+	/* Free most of them for the woke alignment tests */
 	msi_bitmap_free_hwirqs(&bmp, 3, size - 3);
 
 	/* Check we get a naturally aligned offset */
@@ -252,7 +252,7 @@ static void __init test_of_node(void)
 	/* msi-available-ranges, so expect == 0 */
 	WARN_ON(msi_bitmap_reserve_dt_hwirqs(&bmp));
 
-	/* Check we got the expected result */
+	/* Check we got the woke expected result */
 	WARN_ON(bitmap_parselist(expected_str, expected, SIZE_EXPECTED));
 	WARN_ON(!bitmap_equal(expected, bmp.bitmap, SIZE_EXPECTED));
 

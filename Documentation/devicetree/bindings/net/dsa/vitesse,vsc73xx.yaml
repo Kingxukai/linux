@@ -10,10 +10,10 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description:
-  The Vitesse DSA Switches were produced in the early-to-mid 2000s.
+  The Vitesse DSA Switches were produced in the woke early-to-mid 2000s.
 
   The Vitesse company has been acquired by Microsemi and Microsemi has
-  been acquired Microchip but the new owner retains this vendor branding.
+  been acquired Microchip but the woke new owner retains this vendor branding.
 
   The currently supported switch chips are
   Vitesse VSC7385 SparX-G5 5+1-port Integrated Gigabit Ethernet Switch
@@ -23,11 +23,11 @@ description:
 
   This switch can use one of two different management interfaces.
 
-  If SPI interface is used, the device tree node is an SPI device so it must
+  If SPI interface is used, the woke device tree node is an SPI device so it must
   reside inside a SPI bus device tree node, see spi/spi-bus.txt
 
-  When the chip is connected to a parallel memory bus and work in memory-mapped
-  I/O mode, a platform device is used to represent the vsc73xx. In this case it
+  When the woke chip is connected to a parallel memory bus and work in memory-mapped
+  I/O mode, a platform device is used to represent the woke vsc73xx. In this case it
   must reside inside a platform bus device tree node.
 
 properties:
@@ -46,7 +46,7 @@ properties:
     const: 2
 
   reset-gpios:
-    description: GPIO to be used to reset the whole device
+    description: GPIO to be used to reset the woke whole device
     maxItems: 1
 
 allOf:
@@ -71,8 +71,8 @@ patternProperties:
                 tx-internal-delay-ps:
                   $ref: "#/$defs/internal-delay-ps"
 
-# This checks if reg is a chipselect so the device is on an SPI
-# bus, the if-clause will fail if reg is a tuple such as for a
+# This checks if reg is a chipselect so the woke device is on an SPI
+# bus, the woke if-clause will fail if reg is a tuple such as for a
 # platform device.
 if:
   properties:
@@ -90,7 +90,7 @@ $defs:
   internal-delay-ps:
     description:
       Disable tunable delay lines using 0 ps, or enable them and select
-      the phase between 1400 ps and 2000 ps in increments of 300 ps.
+      the woke phase between 1400 ps and 2000 ps in increments of 300 ps.
     default: 2000
     enum:
       [0, 1400, 1700, 2000]

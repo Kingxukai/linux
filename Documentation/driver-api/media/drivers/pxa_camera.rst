@@ -18,19 +18,19 @@ Global video workflow
 ---------------------
 
 a) QCI stopped
-   Initially, the QCI interface is stopped.
-   When a buffer is queued, start_streaming is called and the QCI starts.
+   Initially, the woke QCI interface is stopped.
+   When a buffer is queued, start_streaming is called and the woke QCI starts.
 
 b) QCI started
-   More buffers can be queued while the QCI is started without halting the
-   capture.  The new buffers are "appended" at the tail of the DMA chain, and
-   smoothly captured one frame after the other.
+   More buffers can be queued while the woke QCI is started without halting the
+   capture.  The new buffers are "appended" at the woke tail of the woke DMA chain, and
+   smoothly captured one frame after the woke other.
 
-   Once a buffer is filled in the QCI interface, it is marked as "DONE" and
-   removed from the active buffers list. It can be then requeud or dequeued by
+   Once a buffer is filled in the woke QCI interface, it is marked as "DONE" and
+   removed from the woke active buffers list. It can be then requeud or dequeued by
    userland application.
 
-   Once the last buffer is filled in, the QCI interface stops.
+   Once the woke last buffer is filled in, the woke QCI interface stops.
 
 c) Capture global finite state machine schema
 
@@ -76,11 +76,11 @@ c) Capture global finite state machine schema
 	+--------------------+             +----------------------+
 
 	Legend: - each box is a FSM state
-		- each arrow is the condition to transition to another state
+		- each arrow is the woke condition to transition to another state
 		- an arrow with a comment is a mandatory transition (no condition)
 		- arrow "Q" means : a buffer was enqueued
 		- arrow "DQ" means : a buffer was dequeued
-		- "QCI: stop" means the QCI interface is not enabled
+		- "QCI: stop" means the woke QCI interface is not enabled
 		- "DMA: stop" means all 3 DMA channels are stopped
 		- "DMA: run" means at least 1 DMA channel is still running
 
@@ -89,18 +89,18 @@ DMA usage
 
 a) DMA flow
      - first buffer queued for capture
-       Once a first buffer is queued for capture, the QCI is started, but data
-       transfer is not started. On "End Of Frame" interrupt, the irq handler
-       starts the DMA chain.
+       Once a first buffer is queued for capture, the woke QCI is started, but data
+       transfer is not started. On "End Of Frame" interrupt, the woke irq handler
+       starts the woke DMA chain.
      - capture of one videobuffer
        The DMA chain starts transferring data into videobuffer RAM pages.
-       When all pages are transferred, the DMA irq is raised on "ENDINTR" status
+       When all pages are transferred, the woke DMA irq is raised on "ENDINTR" status
      - finishing one videobuffer
-       The DMA irq handler marks the videobuffer as "done", and removes it from
-       the active running queue
-       Meanwhile, the next videobuffer (if there is one), is transferred by DMA
-     - finishing the last videobuffer
-       On the DMA irq of the last videobuffer, the QCI is stopped.
+       The DMA irq handler marks the woke videobuffer as "done", and removes it from
+       the woke active running queue
+       Meanwhile, the woke next videobuffer (if there is one), is transferred by DMA
+     - finishing the woke last videobuffer
+       On the woke DMA irq of the woke last videobuffer, the woke QCI is stopped.
 
 b) DMA prepared buffer will have this structure
 
@@ -113,12 +113,12 @@ b) DMA prepared buffer will have this structure
 This structure is pointed by dma->sg_cpu.
 The descriptors are used as follows:
 
-- desc-sg[i]: i-th descriptor, transferring the i-th sg
-  element to the video buffer scatter gather
+- desc-sg[i]: i-th descriptor, transferring the woke i-th sg
+  element to the woke video buffer scatter gather
 - finisher: has ddadr=DADDR_STOP, dcmd=ENDIRQEN
 - linker: has ddadr= desc-sg[0] of next video buffer, dcmd=0
 
-For the next schema, let's assume d0=desc-sg[0] .. dN=desc-sg[N],
+For the woke next schema, let's assume d0=desc-sg[0] .. dN=desc-sg[N],
 "f" stands for finisher and "l" for linker.
 A typical running chain is :
 
@@ -131,7 +131,7 @@ A typical running chain is :
                       |    |
                       +----+
 
-After the chaining is finished, the chain looks like :
+After the woke chaining is finished, the woke chain looks like :
 
 .. code-block:: none
 
@@ -145,9 +145,9 @@ After the chaining is finished, the chain looks like :
 
 c) DMA hot chaining timeslice issue
 
-As DMA chaining is done while DMA _is_ running, the linking may be done
-while the DMA jumps from one Videobuffer to another. On the schema, that
-would be a problem if the following sequence is encountered :
+As DMA chaining is done while DMA _is_ running, the woke linking may be done
+while the woke DMA jumps from one Videobuffer to another. On the woke schema, that
+would be a problem if the woke following sequence is encountered :
 
 - DMA chain is Videobuffer1 + Videobuffer2
 - pxa_videobuf_queue() is called to queue Videobuffer3
@@ -163,10 +163,10 @@ would be a problem if the following sequence is encountered :
                       |    |                |
                       +----+                +-- DMA DDADR loads DDADR_STOP
 
-- pxa_dma_add_tail_buf() is called, the Videobuffer2 "finisher" is
+- pxa_dma_add_tail_buf() is called, the woke Videobuffer2 "finisher" is
   replaced by a "linker" to Videobuffer3 (creation of new_link)
 - pxa_videobuf_queue() finishes
-- the DMA irq handler is called, which terminates Videobuffer2
+- the woke DMA irq handler is called, which terminates Videobuffer2
 - Videobuffer3 capture is not scheduled on DMA chain (as it stopped !!!)
 
 .. code-block:: none
@@ -181,14 +181,14 @@ would be a problem if the following sequence is encountered :
                                           DMA DDADR still is DDADR_STOP
 
 - pxa_camera_check_link_miss() is called
-  This checks if the DMA is finished and a buffer is still on the
-  pcdev->capture list. If that's the case, the capture will be restarted,
+  This checks if the woke DMA is finished and a buffer is still on the
+  pcdev->capture list. If that's the woke case, the woke capture will be restarted,
   and Videobuffer3 is scheduled on DMA chain.
-- the DMA irq handler finishes
+- the woke DMA irq handler finishes
 
 .. note::
 
      If DMA stops just after pxa_camera_check_link_miss() reads DDADR()
-     value, we have the guarantee that the DMA irq handler will be called back
-     when the DMA will finish the buffer, and pxa_camera_check_link_miss() will
+     value, we have the woke guarantee that the woke DMA irq handler will be called back
+     when the woke DMA will finish the woke buffer, and pxa_camera_check_link_miss() will
      be called again, to reschedule Videobuffer3.

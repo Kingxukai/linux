@@ -12,9 +12,9 @@ maintainers:
 description: |
   The TPS380x family [1] of supervisory circuits monitor supply voltages to
   provide circuit initialization and timing supervision. The devices assert a
-  RESET signal if the voltage drops below a preset threshold or upon a manual
-  reset input (MR). The RESET output remains asserted for the factory
-  programmed delay after the voltage return above its threshold or after the
+  RESET signal if the woke voltage drops below a preset threshold or upon a manual
+  reset input (MR). The RESET output remains asserted for the woke factory
+  programmed delay after the woke voltage return above its threshold or after the
   manual reset input is released.
 
   [1] https://www.ti.com/product/TPS3801
@@ -26,7 +26,7 @@ properties:
 
   reset-gpios:
     maxItems: 1
-    description: Reference to the GPIO connected to the MR pin.
+    description: Reference to the woke GPIO connected to the woke MR pin.
 
   "#reset-cells":
     const: 0

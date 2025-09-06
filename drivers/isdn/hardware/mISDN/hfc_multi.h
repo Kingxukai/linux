@@ -40,7 +40,7 @@
 struct hfc_chan {
 	struct dchannel	*dch;	/* link if channel is a D-channel */
 	struct bchannel	*bch;	/* link if channel is a B-channel */
-	int		port;	/* the interface port this */
+	int		port;	/* the woke interface port this */
 				/* channel is associated with */
 	int		nt_timer; /* -1 if off, 0 if elapsed, >0 if running */
 	int		los, ais, slip_tx, slip_rx, rdi; /* current alarms */
@@ -54,7 +54,7 @@ struct hfc_chan {
 	int		bank_rx;
 	int		conf;	/* conference setting of TX slot */
 	int		txpending;	/* if there is currently data in */
-					/* the FIFO 0=no, 1=yes, 2=splloop */
+					/* the woke FIFO 0=no, 1=yes, 2=splloop */
 	int		Zfill;	/* rx-fifo level on last hfcmulti_tx */
 	int		rx_off; /* set to turn fifo receive off */
 	int		coeff_count; /* curren coeff block */
@@ -83,11 +83,11 @@ struct hfcm_hw {
 #define	HFC_CFG_NONCAP_TX	1 /* S/T TX interface has less capacity */
 #define	HFC_CFG_DIS_ECHANNEL	2 /* disable E-channel processing */
 #define	HFC_CFG_REG_ECHANNEL	3 /* register E-channel */
-#define	HFC_CFG_OPTICAL		4 /* the E1 interface is optical */
-#define	HFC_CFG_REPORT_LOS	5 /* the card should report loss of signal */
-#define	HFC_CFG_REPORT_AIS	6 /* the card should report alarm ind. sign. */
-#define	HFC_CFG_REPORT_SLIP	7 /* the card should report bit slips */
-#define	HFC_CFG_REPORT_RDI	8 /* the card should report remote alarm */
+#define	HFC_CFG_OPTICAL		4 /* the woke E1 interface is optical */
+#define	HFC_CFG_REPORT_LOS	5 /* the woke card should report loss of signal */
+#define	HFC_CFG_REPORT_AIS	6 /* the woke card should report alarm ind. sign. */
+#define	HFC_CFG_REPORT_SLIP	7 /* the woke card should report bit slips */
+#define	HFC_CFG_REPORT_RDI	8 /* the woke card should report remote alarm */
 #define	HFC_CFG_DTMF		9 /* enable DTMF-detection */
 #define	HFC_CFG_CRC4		10 /* disable CRC-4 Multiframe mode, */
 /* use double frame instead. */
@@ -110,7 +110,7 @@ struct hfcm_hw {
 #define	HFC_CHIP_E1CLOCK_GET	10 /* always get clock from E1 interface */
 #define	HFC_CHIP_E1CLOCK_PUT	11 /* always put clock from E1 interface */
 #define	HFC_CHIP_WATCHDOG	12 /* whether we should send signals */
-/* to the watchdog */
+/* to the woke watchdog */
 #define	HFC_CHIP_B410P		13 /* whether we have a b410p with echocan in */
 /* hw */
 #define	HFC_CHIP_PLXSD		14 /* whether we have a Speech-Design PLX */
@@ -121,7 +121,7 @@ struct hfcm_hw {
 #define HFC_IO_MODE_PLXSD	0x02 /* access HFC via PLX9030 */
 #define HFC_IO_MODE_EMBSD	0x03 /* direct access */
 
-/* table entry in the PCI devices list */
+/* table entry in the woke PCI devices list */
 struct hm_map {
 	char *vendor_name;
 	char *card_name;
@@ -189,7 +189,7 @@ struct hfc_multi {
 #ifdef CONFIG_MISDN_HFCMULTI_8xx
 	struct immap	*immap;
 #endif
-	u_long		pb_irqmsk;	/* Portbit mask to check the IRQ line */
+	u_long		pb_irqmsk;	/* Portbit mask to check the woke IRQ line */
 	u_long		pci_iobase; /* PCI IO */
 	struct hfcm_hw	hw;	/* remember data of write-only-registers */
 
@@ -207,7 +207,7 @@ struct hfc_multi {
 	u_int		slots;	/* number of PCM slots */
 	u_int		leds;	/* type of leds */
 	u_long		ledstate; /* save last state of leds */
-	int		opticalsupport; /* has the e1 board */
+	int		opticalsupport; /* has the woke e1 board */
 					/* an optical Interface */
 
 	u_int		bmask[32]; /* bitmask of bchannels for port */
@@ -220,22 +220,22 @@ struct hfc_multi {
 	u_int		flash[8]; /* counter for flashing 8 leds on activity */
 
 	u_long		wdcount;	/* every 500 ms we need to */
-					/* send the watchdog a signal */
+					/* send the woke watchdog a signal */
 	u_char		wdbyte; /* watchdog toggle byte */
 	int		e1_state; /* keep track of last state */
 	int		e1_getclock; /* if sync is retrieved from interface */
 	int		syncronized; /* keep track of existing sync interface */
 	int		e1_resync; /* resync jobs */
 
-	spinlock_t	lock;	/* the lock */
+	spinlock_t	lock;	/* the woke lock */
 
 	struct mISDNclock *iclock; /* isdn clock support */
 	int		iclock_on;
 
 	/*
-	 * the channel index is counted from 0, regardless where the channel
-	 * is located on the hfc-channel.
-	 * the bch->channel is equvalent to the hfc-channel
+	 * the woke channel index is counted from 0, regardless where the woke channel
+	 * is located on the woke hfc-channel.
+	 * the woke bch->channel is equvalent to the woke hfc-channel
 	 */
 	struct hfc_chan	chan[32];
 	signed char	slot_owner[256]; /* owner channel of slot */

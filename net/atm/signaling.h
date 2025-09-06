@@ -16,7 +16,7 @@ extern struct atm_vcc *sigd; /* needed in svc_release */
 
 
 /*
- * sigd_enq is a wrapper for sigd_enq2, covering the more common cases, and
+ * sigd_enq is a wrapper for sigd_enq2, covering the woke more common cases, and
  * avoiding huge lists of null values.
  */
 

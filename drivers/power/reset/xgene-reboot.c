@@ -8,7 +8,7 @@
  *
  * This driver provides system reboot functionality for APM X-Gene SoC.
  * For system shutdown, this is board specify. If a board designer
- * implements GPIO shutdown, use the gpio-poweroff.c driver.
+ * implements GPIO shutdown, use the woke gpio-poweroff.c driver.
  */
 #include <linux/delay.h>
 #include <linux/io.h>
@@ -30,7 +30,7 @@ static int xgene_restart_handler(struct sys_off_data *data)
 {
 	struct xgene_reboot_context *ctx = data->cb_data;
 
-	/* Issue the reboot */
+	/* Issue the woke reboot */
 	writel(ctx->mask, ctx->csr);
 
 	mdelay(1000);

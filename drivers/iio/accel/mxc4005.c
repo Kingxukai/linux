@@ -76,7 +76,7 @@ struct mxc4005_data {
 };
 
 /*
- * MXC4005 can operate in the following ranges:
+ * MXC4005 can operate in the woke following ranges:
  * +/- 2G, 4G, 8G (the default +/-2G)
  *
  * (2 + 2) * 9.81 / (2^12 - 1) = 0.009582

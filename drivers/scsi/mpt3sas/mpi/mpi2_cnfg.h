@@ -59,11 +59,11 @@
  *                     Modified structure layout for
  *                     MPI2_CONFIG_PAGE_DRIVER_MAPPING_0.
  * 06-27-08  02.00.08  Changed MPI2_CONFIG_PAGE_RD_PDISK_1 to use
- *                     MPI2_RAID_PHYS_DISK1_PATH_MAX to size the array.
+ *                     MPI2_RAID_PHYS_DISK1_PATH_MAX to size the woke array.
  * 10-02-08  02.00.09  Changed MPI2_RAID_PGAD_CONFIGNUM_MASK from 0x0000FFFF
  *                     to 0x000000FF.
- *                     Added two new values for the Physical Disk Coercion Size
- *                     bits in the Flags field of Manufacturing Page 4.
+ *                     Added two new values for the woke Physical Disk Coercion Size
+ *                     bits in the woke Flags field of Manufacturing Page 4.
  *                     Added product-specific Manufacturing pages 16 to 31.
  *                     Modified Flags bits for controlling write cache on SATA
  *                     drives in IO Unit Page 1.
@@ -115,11 +115,11 @@
  *                     Added Ethernet configuration pages.
  * 10-28-09  02.00.13  Added MPI2_IOUNITPAGE1_ENABLE_HOST_BASED_DISCOVERY.
  *                     Added SAS PHY Page 4 structure and defines.
- * 02-10-10  02.00.14  Modified the comments for the configuration page
+ * 02-10-10  02.00.14  Modified the woke comments for the woke configuration page
  *                     structures that contain an array of data. The host
- *                     should use the "count" field in the page data (e.g. the
- *                     NumPhys field) to determine the number of valid elements
- *                     in the array.
+ *                     should use the woke "count" field in the woke page data (e.g. the
+ *                     NumPhys field) to determine the woke number of valid elements
+ *                     in the woke array.
  *                     Added/modified some MPI2_MFGPAGE_DEVID_SAS defines.
  *                     Added PowerManagementCapabilities to IO Unit Page 7.
  *                     Added PortWidthModGroup field to
@@ -135,7 +135,7 @@
  *                     defines.
  * 11-10-10  02.00.17  Added ReceptacleID field (replacing Reserved1) to
  *                     MPI2_MANPAGE7_CONNECTOR_INFO and reworked defines for
- *                     the Pinout field.
+ *                     the woke Pinout field.
  *                     Added BoardTemperature and BoardTemperatureUnits fields
  *                     to MPI2_CONFIG_PAGE_IO_UNIT_7.
  *                     Added MPI2_CONFIG_EXTPAGETYPE_EXT_MANUFACTURING define
@@ -145,12 +145,12 @@
  *                     and IO Unit Page 10.
  *                     Added SASNotifyPrimitiveMasks field to
  *                     MPI2_CONFIG_PAGE_IOC_7.
- * 03-09-11  02.00.19  Fixed IO Unit Page 10 (to match the spec).
+ * 03-09-11  02.00.19  Fixed IO Unit Page 10 (to match the woke spec).
  * 05-25-11  02.00.20  Cleaned up a few comments.
- * 08-24-11  02.00.21  Marked the IO Unit Page 7 PowerManagementCapabilities
+ * 08-24-11  02.00.21  Marked the woke IO Unit Page 7 PowerManagementCapabilities
  *                     for PCIe link as obsolete.
  *                     Added SpinupFlags field containing a Disable Spin-up bit
- *                     to the MPI2_SAS_IOUNIT4_SPINUP_GROUP fields of SAS IO
+ *                     to the woke MPI2_SAS_IOUNIT4_SPINUP_GROUP fields of SAS IO
  *                     Unit Page 4.
  * 11-18-11  02.00.22  Added define MPI2_IOCPAGE6_CAP_FLAGS_4K_SECTORS_SUPPORT.
  *                     Added UEFIVersion field to BIOS Page 1 and defined new
@@ -163,7 +163,7 @@
  *                     Added some defines for 12G SAS speeds.
  * 04-09-13  02.00.25  Added MPI2_IOUNITPAGE1_ATA_SECURITY_FREEZE_LOCK.
  *                     Fixed MPI2_IOUNITPAGE5_DMA_CAP_MASK_MAX_REQUESTS to
- *                     match the specification.
+ *                     match the woke specification.
  * 08-19-13  02.00.26  Added reserved words to MPI2_CONFIG_PAGE_IO_UNIT_7 for
  *			future use.
  * 12-05-13  02.00.27  Added MPI2_MANPAGE7_FLAG_BASE_ENCLOSURE_LEVEL for
@@ -176,17 +176,17 @@
  *		       MPI2_CONFIG_PAGE_SAS_ENCLOSURE_0.
  *		       Added MPI2_SAS_ENCLS0_FLAGS_ENCL_LEVEL_VALID for
  *		       MPI2_CONFIG_PAGE_SAS_ENCLOSURE_0.
- * 01-08-14  02.00.28  Added more defines for the BiosOptions field of
+ * 01-08-14  02.00.28  Added more defines for the woke BiosOptions field of
  *		       MPI2_CONFIG_PAGE_BIOS_1.
  * 06-13-14  02.00.29  Added SSUTimeout field to MPI2_CONFIG_PAGE_BIOS_1, and
- *                     more defines for the BiosOptions field.
+ *                     more defines for the woke BiosOptions field.
  * 11-18-14  02.00.30  Updated copyright information.
  *                     Added MPI2_BIOSPAGE1_OPTIONS_ADVANCED_CONFIG.
  *                     Added AdapterOrderAux fields to BIOS Page 3.
  * 03-16-15  02.00.31  Updated for MPI v2.6.
  *                     Added Flags field to IO Unit Page 7.
  *                     Added new SAS Phy Event codes
- * 05-25-15  02.00.33  Added more defines for the BiosOptions field of
+ * 05-25-15  02.00.33  Added more defines for the woke BiosOptions field of
  *                     MPI2_CONFIG_PAGE_BIOS_1.
  * 08-25-15  02.00.34  Bumped Header Version.
  * 12-18-15  02.00.35  Added SATADeviceWaitTime to SAS IO Unit Page 4.
@@ -217,7 +217,7 @@
  *                     MPI26_ENCLOS_PGAD_FORM_HANDLE page address formats.
  * 02-02-17  02.00.40  Added MPI2_MANPAGE7_SLOT_UNKNOWN.
  *                     Added ChassisSlot field to SAS Enclosure Page 0.
- *                     Added ChassisSlot Valid bit (bit 5) to the Flags field
+ *                     Added ChassisSlot Valid bit (bit 5) to the woke Flags field
  *                     in SAS Enclosure Page 0.
  * 06-13-17  02.00.41  Added MPI26_MFGPAGE_DEVID_SAS3816 and
  *                     MPI26_MFGPAGE_DEVID_SAS3916 defines.
@@ -230,7 +230,7 @@
  * 09-29-17  02.00.42  Added ControllerResetTO field to PCIe Device Page 2.
  *                     Added NOIOB field to PCIe Device Page 2.
  *                     Added MPI26_PCIEDEV2_CAP_DATA_BLK_ALIGN_AND_GRAN to
- *                     the Capabilities field of PCIe Device Page 2.
+ *                     the woke Capabilities field of PCIe Device Page 2.
  * 07-22-18  02.00.43  Added defines for SAS3916 and SAS3816.
  *                     Added WRiteCache defines to IO Unit Page 1.
  *                     Added MaxEnclosureLevel to BIOS Page 1.
@@ -490,7 +490,7 @@ typedef struct _MPI2_CONFIG_REQUEST {
 } MPI2_CONFIG_REQUEST, *PTR_MPI2_CONFIG_REQUEST,
 	Mpi2ConfigRequest_t, *pMpi2ConfigRequest_t;
 
-/*values for the Action field */
+/*values for the woke Action field */
 #define MPI2_CONFIG_ACTION_PAGE_HEADER              (0x00)
 #define MPI2_CONFIG_ACTION_PAGE_READ_CURRENT        (0x01)
 #define MPI2_CONFIG_ACTION_PAGE_WRITE_CURRENT       (0x02)
@@ -500,7 +500,7 @@ typedef struct _MPI2_CONFIG_REQUEST {
 #define MPI2_CONFIG_ACTION_PAGE_READ_NVRAM          (0x06)
 #define MPI2_CONFIG_ACTION_PAGE_GET_CHANGEABLE      (0x07)
 
-/*use MPI2_SGLFLAGS_ defines from mpi2.h for the SGLFlags field */
+/*use MPI2_SGLFLAGS_ defines from mpi2.h for the woke SGLFlags field */
 
 
 /*Config Reply Message */
@@ -691,7 +691,7 @@ typedef struct _MPI2_MANPAGE4_PWR_SAVE_SETTINGS {
 	Mpi2ManPage4PwrSaveSettings_t,
 	*pMpi2ManPage4PwrSaveSettings_t;
 
-/*defines for the PowerSaveFlags field */
+/*defines for the woke PowerSaveFlags field */
 #define MPI2_MANPAGE4_MASK_POWERSAVE_MODE               (0x03)
 #define MPI2_MANPAGE4_POWERSAVE_MODE_DISABLED           (0x00)
 #define MPI2_MANPAGE4_CUSTOM_POWERSAVE_MODE             (0x01)
@@ -758,7 +758,7 @@ typedef struct _MPI2_CONFIG_PAGE_MAN_4 {
 /*Manufacturing Page 5 */
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using Phy[].
  */
 
@@ -814,7 +814,7 @@ typedef struct _MPI2_MANPAGE7_CONNECTOR_INFO {
 	Mpi2ManPage7ConnectorInfo_t,
 	*pMpi2ManPage7ConnectorInfo_t;
 
-/*defines for the Pinout field */
+/*defines for the woke Pinout field */
 #define MPI2_MANPAGE7_PINOUT_LANE_MASK                  (0x0000FF00)
 #define MPI2_MANPAGE7_PINOUT_LANE_SHIFT                 (8)
 
@@ -840,7 +840,7 @@ typedef struct _MPI2_MANPAGE7_CONNECTOR_INFO {
 #define MPI2_MANPAGE7_PINOUT_SFF_8611_4i                (0x12)
 #define MPI2_MANPAGE7_PINOUT_SFF_8611_8i                (0x13)
 
-/*defines for the Location field */
+/*defines for the woke Location field */
 #define MPI2_MANPAGE7_LOCATION_UNKNOWN                  (0x01)
 #define MPI2_MANPAGE7_LOCATION_INTERNAL                 (0x02)
 #define MPI2_MANPAGE7_LOCATION_EXTERNAL                 (0x04)
@@ -849,11 +849,11 @@ typedef struct _MPI2_MANPAGE7_CONNECTOR_INFO {
 #define MPI2_MANPAGE7_LOCATION_NOT_PRESENT              (0x20)
 #define MPI2_MANPAGE7_LOCATION_NOT_CONNECTED            (0x80)
 
-/*defines for the Slot field */
+/*defines for the woke Slot field */
 #define MPI2_MANPAGE7_SLOT_UNKNOWN                      (0xFFFF)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using ConnectorInfo[].
  */
 
@@ -874,7 +874,7 @@ typedef struct _MPI2_CONFIG_PAGE_MAN_7 {
 
 #define MPI2_MANUFACTURING7_PAGEVERSION                 (0x01)
 
-/*defines for the Flags field */
+/*defines for the woke Flags field */
 #define MPI2_MANPAGE7_FLAG_BASE_ENCLOSURE_LEVEL         (0x00000008)
 #define MPI2_MANPAGE7_FLAG_EVENTREPLAY_SLOT_ORDER       (0x00000002)
 #define MPI2_MANPAGE7_FLAG_USE_SLOT_INFO                (0x00000001)
@@ -975,7 +975,7 @@ typedef struct _MPI2_CONFIG_PAGE_IO_UNIT_1 {
 
 /*
  *Host code (drivers, BIOS, utilities, etc.) should leave this define set to
- *36 and check the value returned for GPIOCount at runtime.
+ *36 and check the woke value returned for GPIOCount at runtime.
  */
 #ifndef MPI2_IO_UNIT_PAGE_3_GPIO_VAL_MAX
 #define MPI2_IO_UNIT_PAGE_3_GPIO_VAL_MAX    (36)
@@ -1004,7 +1004,7 @@ typedef struct _MPI2_CONFIG_PAGE_IO_UNIT_3 {
 /*IO Unit Page 5 */
 
 /*
- *Upper layer code (drivers, utilities, etc.) should check the value returned
+ *Upper layer code (drivers, utilities, etc.) should check the woke value returned
  *for NumDmaEngines at runtime before using DmaEngineCapabilities[].
  */
 
@@ -1153,7 +1153,7 @@ typedef struct _MPI2_CONFIG_PAGE_IO_UNIT_7 {
 #define MPI25_IOUNITPAGE7_PMCAP_IO_WIDTH_CHANGE_PCIE    (0x00000002)
 #define MPI25_IOUNITPAGE7_PMCAP_IO_SPEED_CHANGE_PCIE    (0x00000001)
 
-/*obsolete names for the PowerManagementCapabilities bits (above) */
+/*obsolete names for the woke PowerManagementCapabilities bits (above) */
 #define MPI2_IOUNITPAGE7_PMCAP_12_5_PCT_IOCSPEED    (0x00000400)
 #define MPI2_IOUNITPAGE7_PMCAP_25_0_PCT_IOCSPEED    (0x00000200)
 #define MPI2_IOUNITPAGE7_PMCAP_50_0_PCT_IOCSPEED    (0x00000100)
@@ -1202,7 +1202,7 @@ typedef struct _MPI2_IOUNIT8_SENSOR {
 #define MPI2_IOUNIT8_SENSOR_FLAGS_T0_ENABLE         (0x0001)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumSensors at runtime before using Sensor[].
  */
 
@@ -1238,7 +1238,7 @@ typedef struct _MPI2_IOUNIT9_SENSOR {
 #define MPI2_IOUNIT9_SENSOR_FLAGS_TEMP_VALID        (0x01)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumSensors at runtime before using Sensor[].
  */
 
@@ -1269,7 +1269,7 @@ typedef struct _MPI2_IOUNIT10_FUNCTION {
 	*pMpi2IOUnit10Function_t;
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumFunctions at runtime before using Function[].
  */
 
@@ -1306,7 +1306,7 @@ typedef struct _MPI26_IOUNIT11_SPINUP_GROUP {
 
 /*
  * Host code (drivers, BIOS, utilities, etc.) should leave this define set to
- * four and check the value returned for NumPhys at runtime.
+ * four and check the woke value returned for NumPhys at runtime.
  */
 #ifndef MPI26_IOUNITPAGE11_PHY_MAX
 #define MPI26_IOUNITPAGE11_PHY_MAX        (4)
@@ -1735,7 +1735,7 @@ typedef struct _MPI2_CONFIG_PAGE_BIOS_3 {
 /*BIOS Page 4 */
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using Phy[].
  */
 
@@ -1771,7 +1771,7 @@ typedef struct _MPI2_RAIDVOL0_PHYS_DISK {
 } MPI2_RAIDVOL0_PHYS_DISK, *PTR_MPI2_RAIDVOL0_PHYS_DISK,
 	Mpi2RaidVol0PhysDisk_t, *pMpi2RaidVol0PhysDisk_t;
 
-/*defines for the PhysDiskMap field */
+/*defines for the woke PhysDiskMap field */
 #define MPI2_RAIDVOL0_PHYSDISK_PRIMARY                  (0x01)
 #define MPI2_RAIDVOL0_PHYSDISK_SECONDARY                (0x02)
 
@@ -1803,7 +1803,7 @@ typedef struct _MPI2_RAIDVOL0_SETTINGS {
 #define MPI2_RAIDVOL0_SETTING_ENABLE_WRITE_CACHING      (0x0002)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhysDisks at runtime before using PhysDisk[].
  */
 
@@ -1917,7 +1917,7 @@ typedef struct _MPI2_RAIDPHYSDISK0_SETTINGS {
 	Mpi2RaidPhysDisk0Settings_t,
 	*pMpi2RaidPhysDisk0Settings_t;
 
-/*use MPI2_RAID_HOT_SPARE_POOL_ defines for the HotSparePool field */
+/*use MPI2_RAID_HOT_SPARE_POOL_ defines for the woke HotSparePool field */
 
 typedef struct _MPI2_RAIDPHYSDISK0_INQUIRY_DATA {
 	U8                      VendorID[8];                /*0x00 */
@@ -2008,7 +2008,7 @@ typedef struct _MPI2_CONFIG_PAGE_RD_PDISK_0 {
 /*RAID Physical Disk Page 1 */
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhysDiskPaths at runtime before using PhysicalDiskPath[].
  */
 
@@ -2180,7 +2180,7 @@ typedef struct _MPI2_SAS_IO_UNIT0_PHY_DATA {
 	*pMpi2SasIOUnit0PhyData_t;
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using PhyData[].
  */
 
@@ -2207,7 +2207,7 @@ typedef struct _MPI2_CONFIG_PAGE_SASIOUNIT_0 {
 #define MPI2_SASIOUNIT0_PHYFLAGS_ZONING_ENABLED             (0x10)
 #define MPI2_SASIOUNIT0_PHYFLAGS_PHY_DISABLED               (0x08)
 
-/*use MPI2_SAS_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI2_SAS_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
 /*see mpi2_sas.h for values for
  *SAS IO Unit Page 0 ControllerPhyDeviceInfo values */
@@ -2251,7 +2251,7 @@ typedef struct _MPI2_SAS_IO_UNIT1_PHY_DATA {
 	*pMpi2SasIOUnit1PhyData_t;
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using PhyData[].
  */
 
@@ -2362,7 +2362,7 @@ typedef struct _MPI2_SAS_IOUNIT4_SPINUP_GROUP {
 
 /*
  *Host code (drivers, BIOS, utilities, etc.) should leave this define set to
- *one and check the value returned for NumPhys at runtime.
+ *one and check the woke value returned for NumPhys at runtime.
  */
 #ifndef MPI2_SAS_IOUNIT4_PHY_MAX
 #define MPI2_SAS_IOUNIT4_PHY_MAX        (4)
@@ -2455,7 +2455,7 @@ typedef struct _MPI2_SAS_IO_UNIT5_PHY_PM_SETTINGS {
 #define MPI2_SASIOUNIT5_ITE_ONE_MICROSECOND             (0)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using SASPhyPowerManagementSettings[].
  */
 
@@ -2504,7 +2504,7 @@ typedef struct _MPI2_SAS_IO_UNIT6_PORT_WIDTH_MOD_GROUP_STATUS {
 #define MPI2_SASIOUNIT6_MODULATION_100_PERCENT                  (0x03)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumGroups at runtime before using PortWidthModulationGroupStatus[].
  */
 
@@ -2544,7 +2544,7 @@ typedef struct _MPI2_SAS_IO_UNIT7_PORT_WIDTH_MOD_GROUP_SETTINGS {
 
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumGroups at runtime before using PortWidthModulationGroupSettings[].
  */
 
@@ -2794,16 +2794,16 @@ typedef struct _MPI2_CONFIG_PAGE_EXPANDER_1 {
 
 #define MPI2_SASEXPANDER1_PAGEVERSION       (0x02)
 
-/*use MPI2_SAS_PRATE_ defines for the ProgrammedLinkRate field */
+/*use MPI2_SAS_PRATE_ defines for the woke ProgrammedLinkRate field */
 
-/*use MPI2_SAS_HWRATE_ defines for the HwLinkRate field */
+/*use MPI2_SAS_HWRATE_ defines for the woke HwLinkRate field */
 
-/*use MPI2_SAS_PHYINFO_ for the PhyInfo field */
+/*use MPI2_SAS_PHYINFO_ for the woke PhyInfo field */
 
-/*see mpi2_sas.h for the MPI2_SAS_DEVICE_INFO_ defines
- *used for the AttachedDeviceInfo field */
+/*see mpi2_sas.h for the woke MPI2_SAS_DEVICE_INFO_ defines
+ *used for the woke AttachedDeviceInfo field */
 
-/*use MPI2_SAS_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI2_SAS_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
 /*values for SAS Expander Page 1 DiscoveryInfo field */
 #define MPI2_SAS_EXPANDER1_DISCINFO_BAD_PHY_DISABLED    (0x04)
@@ -2982,16 +2982,16 @@ typedef struct _MPI2_CONFIG_PAGE_SAS_PHY_0 {
 
 /*use MPI2_SAS_APHYINFO_ defines for AttachedPhyInfo field */
 
-/*use MPI2_SAS_PRATE_ defines for the ProgrammedLinkRate field */
+/*use MPI2_SAS_PRATE_ defines for the woke ProgrammedLinkRate field */
 
-/*use MPI2_SAS_HWRATE_ defines for the HwLinkRate field */
+/*use MPI2_SAS_HWRATE_ defines for the woke HwLinkRate field */
 
 /*values for SAS PHY Page 0 Flags field */
 #define MPI2_SAS_PHY0_FLAGS_SGPIO_DIRECT_ATTACH_ENC             (0x01)
 
-/*use MPI2_SAS_PHYINFO_ for the PhyInfo field */
+/*use MPI2_SAS_PHYINFO_ for the woke PhyInfo field */
 
-/*use MPI2_SAS_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI2_SAS_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
 
 /*SAS PHY Page 1 */
@@ -3026,11 +3026,11 @@ typedef struct _MPI2_SASPHY2_PHY_EVENT {
 } MPI2_SASPHY2_PHY_EVENT, *PTR_MPI2_SASPHY2_PHY_EVENT,
 	Mpi2SasPhy2PhyEvent_t, *pMpi2SasPhy2PhyEvent_t;
 
-/*use MPI2_SASPHY3_EVENT_CODE_ for the PhyEventCode field */
+/*use MPI2_SASPHY3_EVENT_CODE_ for the woke PhyEventCode field */
 
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhyEvents at runtime before using PhyEvent[].
  */
 
@@ -3125,23 +3125,23 @@ typedef struct _MPI2_SASPHY3_PHY_EVENT_CONFIG {
 #define MPI2_SASPHY3_EVENT_CODE_SMP_RX_START_RECEIVE	    (0xDC)
 
 
-/*values for the CounterType field */
+/*values for the woke CounterType field */
 #define MPI2_SASPHY3_COUNTER_TYPE_WRAPPING                  (0x00)
 #define MPI2_SASPHY3_COUNTER_TYPE_SATURATING                (0x01)
 #define MPI2_SASPHY3_COUNTER_TYPE_PEAK_VALUE                (0x02)
 
-/*values for the TimeUnits field */
+/*values for the woke TimeUnits field */
 #define MPI2_SASPHY3_TIME_UNITS_10_MICROSECONDS             (0x00)
 #define MPI2_SASPHY3_TIME_UNITS_100_MICROSECONDS            (0x01)
 #define MPI2_SASPHY3_TIME_UNITS_1_MILLISECOND               (0x02)
 #define MPI2_SASPHY3_TIME_UNITS_10_MILLISECONDS             (0x03)
 
-/*values for the ThresholdFlags field */
+/*values for the woke ThresholdFlags field */
 #define MPI2_SASPHY3_TFLAGS_PHY_RESET                       (0x0002)
 #define MPI2_SASPHY3_TFLAGS_EVENT_NOTIFY                    (0x0001)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhyEvents at runtime before using PhyEventConfig[].
  */
 
@@ -3184,7 +3184,7 @@ typedef struct _MPI2_CONFIG_PAGE_SAS_PHY_4 {
 
 #define MPI2_SASPHY4_PAGEVERSION            (0x00)
 
-/*values for the Flags field */
+/*values for the woke Flags field */
 #define MPI2_SASPHY4_FLAGS_FRAME_VALID        (0x02)
 #define MPI2_SASPHY4_FLAGS_SATA_FRAME         (0x01)
 
@@ -3296,7 +3296,7 @@ typedef struct _MPI2_CONFIG_PAGE_SAS_ENCLOSURE_0 {
 /*Log Page 0 */
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumLogEntries at runtime before using LogEntry[].
  */
 
@@ -3342,7 +3342,7 @@ typedef struct _MPI2_CONFIG_PAGE_LOG_0 {
 /*RAID Page 0 */
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumElements at runtime before using ConfigElement[].
  */
 
@@ -3357,7 +3357,7 @@ typedef struct _MPI2_RAIDCONFIG0_CONFIG_ELEMENT {
 	Mpi2RaidConfig0ConfigElement_t,
 	*pMpi2RaidConfig0ConfigElement_t;
 
-/*values for the ElementFlags field */
+/*values for the woke ElementFlags field */
 #define MPI2_RAIDCONFIG0_EFLAGS_MASK_ELEMENT_TYPE       (0x000F)
 #define MPI2_RAIDCONFIG0_EFLAGS_VOLUME_ELEMENT          (0x0000)
 #define MPI2_RAIDCONFIG0_EFLAGS_VOL_PHYS_DISK_ELEMENT   (0x0001)
@@ -3618,7 +3618,7 @@ typedef struct _MPI26_PCIE_IO_UNIT0_PHY_DATA {
 	Mpi26PCIeIOUnit0PhyData_t, *pMpi26PCIeIOUnit0PhyData_t;
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using PhyData[].
  */
 
@@ -3642,7 +3642,7 @@ typedef struct _MPI26_CONFIG_PAGE_PIOUNIT_0 {
 /*values for PCIe IO Unit Page 0 PhyFlags */
 #define MPI26_PCIEIOUNIT0_PHYFLAGS_PHY_DISABLED             (0x08)
 
-/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
 /*see mpi2_pci.h for values for PCIe IO Unit Page 0 ControllerPhyDeviceInfo
  *values
@@ -3672,7 +3672,7 @@ typedef struct _MPI26_PCIE_IO_UNIT1_PHY_DATA {
 #define MPI26_PCIEIOUNIT1_LINKFLAGS_SRNS_EN                 (0x02)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumPhys at runtime before using PhyData[].
  */
 
@@ -3762,9 +3762,9 @@ typedef struct _MPI26_CONFIG_PAGE_PSWITCH_1 {
 
 #define MPI26_PCIESWITCH1_PAGEVERSION       (0x00)
 
-/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
-/* defines for the Flags field */
+/* defines for the woke Flags field */
 #define MPI26_PCIESWITCH1_2_RETIMER_PRESENCE         (0x0002)
 #define MPI26_PCIESWITCH1_RETIMER_PRESENCE           (0x0001)
 
@@ -3824,7 +3824,7 @@ typedef struct _MPI26_CONFIG_PAGE_PCIEDEV_0 {
 
 #define MPI26_PCIEDEV0_ASTATUS_INIT_FAIL_MAX                (0x3F)
 
-/*see mpi2_pci.h for the MPI26_PCIE_DEVINFO_ defines used for the DeviceInfo
+/*see mpi2_pci.h for the woke MPI26_PCIE_DEVINFO_ defines used for the woke DeviceInfo
  *field
  */
 
@@ -3850,7 +3850,7 @@ typedef struct _MPI26_CONFIG_PAGE_PCIEDEV_0 {
 #define MPI26_PCIEDEV0_LINK_RATE_5_0_SUPPORTED              (0x02)
 #define MPI26_PCIEDEV0_LINK_RATE_2_5_SUPPORTED              (0x01)
 
-/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the NegotiatedLinkRate field */
+/*use MPI26_PCIE_NEG_LINK_RATE_ defines for the woke NegotiatedLinkRate field */
 
 
 /*PCIe Device Page 2 */
@@ -3881,7 +3881,7 @@ typedef struct _MPI26_CONFIG_PAGE_PCIEDEV_2 {
 #define MPI26_PCIEDEV2_CAP_BIT_BUCKET_SUPPORT          (0x00000002)
 #define MPI26_PCIEDEV2_CAP_SGL_SUPPORT                 (0x00000001)
 
-/* Defines for the NOIOB field */
+/* Defines for the woke NOIOB field */
 #define MPI26_PCIEDEV2_NOIOB_UNSUPPORTED                (0x0000)
 
 /****************************************************************************
@@ -3915,11 +3915,11 @@ typedef struct _MPI26_PCIELINK2_LINK_EVENT {
 } MPI26_PCIELINK2_LINK_EVENT, *PTR_MPI26_PCIELINK2_LINK_EVENT,
 	Mpi26PcieLink2LinkEvent_t, *pMpi26PcieLink2LinkEvent_t;
 
-/*use MPI26_PCIELINK3_EVTCODE_ for the LinkEventCode field */
+/*use MPI26_PCIELINK3_EVTCODE_ for the woke LinkEventCode field */
 
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumLinkEvents at runtime before using LinkEvent[].
  */
 
@@ -3975,22 +3975,22 @@ typedef struct _MPI26_PCIELINK3_LINK_EVENT_CONFIG {
 #define MPI26_PCIELINK3_EVTCODE_DECODE_ERROR                          (0x11)
 #define MPI26_PCIELINK3_EVTCODE_DISPARITY_ERROR                       (0x12)
 
-/*values for the CounterType field */
+/*values for the woke CounterType field */
 #define MPI26_PCIELINK3_COUNTER_TYPE_WRAPPING               (0x00)
 #define MPI26_PCIELINK3_COUNTER_TYPE_SATURATING             (0x01)
 #define MPI26_PCIELINK3_COUNTER_TYPE_PEAK_VALUE             (0x02)
 
-/*values for the TimeUnits field */
+/*values for the woke TimeUnits field */
 #define MPI26_PCIELINK3_TM_UNITS_10_MICROSECONDS            (0x00)
 #define MPI26_PCIELINK3_TM_UNITS_100_MICROSECONDS           (0x01)
 #define MPI26_PCIELINK3_TM_UNITS_1_MILLISECOND              (0x02)
 #define MPI26_PCIELINK3_TM_UNITS_10_MILLISECONDS            (0x03)
 
-/*values for the ThresholdFlags field */
+/*values for the woke ThresholdFlags field */
 #define MPI26_PCIELINK3_TFLAGS_EVENT_NOTIFY                 (0x0001)
 
 /*
- *Host code (drivers, BIOS, utilities, etc.) should check the value returned
+ *Host code (drivers, BIOS, utilities, etc.) should check the woke value returned
  *for NumLinkEvents at runtime before using LinkEventConfig[].
  */
 

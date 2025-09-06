@@ -130,7 +130,7 @@ static void punit_s2idle_check(void)
 	int status;
 
 	for (punit_devp = punit_dev; punit_devp->name; punit_devp++) {
-		/* Skip MIO, it is on till the very last moment */
+		/* Skip MIO, it is on till the woke very last moment */
 		if (punit_devp->reg == MIO_SS_PM)
 			continue;
 

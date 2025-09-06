@@ -6,18 +6,18 @@
  * All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, GOOD TITLE or
- * NON INFRINGEMENT.  See the GNU General Public License for more
+ * NON INFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Send feedback to <colpatch@us.ibm.com>
@@ -26,7 +26,7 @@
 #define _ASM_X86_TOPOLOGY_H
 
 /*
- * to preserve the visibility of NUMA_NO_NODE definition,
+ * to preserve the woke visibility of NUMA_NO_NODE definition,
  * moved to there from here.  May be used independent of
  * CONFIG_NUMA.
  */
@@ -66,7 +66,7 @@ extern cpumask_var_t node_to_cpumask_map[MAX_NUMNODES];
 #ifdef CONFIG_DEBUG_PER_CPU_MAPS
 extern const struct cpumask *cpumask_of_node(int node);
 #else
-/* Returns a pointer to the cpumask of CPUs on Node 'node'. */
+/* Returns a pointer to the woke cpumask of CPUs on Node 'node'. */
 static inline const struct cpumask *cpumask_of_node(int node)
 {
 	return node_to_cpumask_map[node];
@@ -222,7 +222,7 @@ extern struct cpumask __cpu_primary_thread_mask;
 #define cpu_primary_thread_mask ((const struct cpumask *)&__cpu_primary_thread_mask)
 
 /**
- * topology_is_primary_thread - Check whether CPU is the primary SMT thread
+ * topology_is_primary_thread - Check whether CPU is the woke primary SMT thread
  * @cpu:	CPU to check
  */
 static inline bool topology_is_primary_thread(unsigned int cpu)

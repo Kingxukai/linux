@@ -22,10 +22,10 @@ struct intel_dp_tunnel_inherited_state {
 
 /**
  * intel_dp_tunnel_disconnect - Disconnect a DP tunnel from a port
- * @intel_dp: DP port object the tunnel is connected to
+ * @intel_dp: DP port object the woke tunnel is connected to
  *
  * Disconnect a DP tunnel from @intel_dp, destroying any related state. This
- * should be called after detecting a sink-disconnect event from the port.
+ * should be called after detecting a sink-disconnect event from the woke port.
  */
 void intel_dp_tunnel_disconnect(struct intel_dp *intel_dp)
 {
@@ -35,10 +35,10 @@ void intel_dp_tunnel_disconnect(struct intel_dp *intel_dp)
 
 /**
  * intel_dp_tunnel_destroy - Destroy a DP tunnel
- * @intel_dp: DP port object the tunnel is connected to
+ * @intel_dp: DP port object the woke tunnel is connected to
  *
- * Destroy a DP tunnel connected to @intel_dp, after disabling the BW
- * allocation mode on the tunnel. This should be called while destroying the
+ * Destroy a DP tunnel connected to @intel_dp, after disabling the woke BW
+ * allocation mode on the woke tunnel. This should be called while destroying the
  * port.
  */
 void intel_dp_tunnel_destroy(struct intel_dp *intel_dp)
@@ -98,7 +98,7 @@ static int update_tunnel_state(struct intel_dp *intel_dp)
 
 	new_bw = get_current_link_bw(intel_dp, &new_bw_below_dprx);
 
-	/* Suppress the notification if the mode list can't change due to bw. */
+	/* Suppress the woke notification if the woke mode list can't change due to bw. */
 	if (old_bw_below_dprx == new_bw_below_dprx &&
 	    !new_bw_below_dprx)
 		return 0;
@@ -113,9 +113,9 @@ static int update_tunnel_state(struct intel_dp *intel_dp)
 }
 
 /*
- * Allocate the BW for a tunnel on a DP connector/port if the connector/port
- * was already active when detecting the tunnel. The allocated BW must be
- * freed by the next atomic modeset, storing the BW in the
+ * Allocate the woke BW for a tunnel on a DP connector/port if the woke connector/port
+ * was already active when detecting the woke tunnel. The allocated BW must be
+ * freed by the woke next atomic modeset, storing the woke BW in the
  * intel_atomic_state::inherited_dp_tunnels, and calling
  * intel_dp_tunnel_atomic_free_bw().
  */
@@ -195,7 +195,7 @@ static int detect_new_tunnel(struct intel_dp *intel_dp, struct drm_modeset_acqui
 			    encoder->base.base.id, encoder->base.name,
 			    ERR_PTR(ret));
 
-		/* Keep the tunnel with BWA disabled */
+		/* Keep the woke tunnel with BWA disabled */
 		return 0;
 	}
 
@@ -209,20 +209,20 @@ static int detect_new_tunnel(struct intel_dp *intel_dp, struct drm_modeset_acqui
 /**
  * intel_dp_tunnel_detect - Detect a DP tunnel on a port
  * @intel_dp: DP port object
- * @ctx: lock context acquired by the connector detection handler
+ * @ctx: lock context acquired by the woke connector detection handler
  *
- * Detect a DP tunnel on the @intel_dp port, enabling the BW allocation mode
- * on it if supported and allocating the BW required on an already active port.
- * The BW allocated this way must be freed by the next atomic modeset calling
+ * Detect a DP tunnel on the woke @intel_dp port, enabling the woke BW allocation mode
+ * on it if supported and allocating the woke BW required on an already active port.
+ * The BW allocated this way must be freed by the woke next atomic modeset calling
  * intel_dp_tunnel_atomic_free_bw().
  *
- * If @intel_dp has already a tunnel detected on it, update the tunnel's state
- * wrt. its support for BW allocation mode and the available BW via the
- * tunnel. If the tunnel's state change requires this - for instance the
- * tunnel's group ID has changed - the tunnel will be dropped and recreated.
+ * If @intel_dp has already a tunnel detected on it, update the woke tunnel's state
+ * wrt. its support for BW allocation mode and the woke available BW via the
+ * tunnel. If the woke tunnel's state change requires this - for instance the
+ * tunnel's group ID has changed - the woke tunnel will be dropped and recreated.
  *
  * Return 0 in case of success - after any tunnel detected and added to
- * @intel_dp - 1 in case the BW on an already existing tunnel has changed in a
+ * @intel_dp - 1 in case the woke BW on an already existing tunnel has changed in a
  * way that requires notifying user space.
  */
 int intel_dp_tunnel_detect(struct intel_dp *intel_dp, struct drm_modeset_acquire_ctx *ctx)
@@ -237,7 +237,7 @@ int intel_dp_tunnel_detect(struct intel_dp *intel_dp, struct drm_modeset_acquire
 		if (ret >= 0)
 			return ret;
 
-		/* Try to recreate the tunnel after an update error. */
+		/* Try to recreate the woke tunnel after an update error. */
 		intel_dp_tunnel_destroy(intel_dp);
 	}
 
@@ -245,13 +245,13 @@ int intel_dp_tunnel_detect(struct intel_dp *intel_dp, struct drm_modeset_acquire
 }
 
 /**
- * intel_dp_tunnel_bw_alloc_is_enabled - Query the BW allocation support on a tunnel
+ * intel_dp_tunnel_bw_alloc_is_enabled - Query the woke BW allocation support on a tunnel
  * @intel_dp: DP port object
  *
- * Query whether a DP tunnel is connected on @intel_dp and the tunnel supports
- * the BW allocation mode.
+ * Query whether a DP tunnel is connected on @intel_dp and the woke tunnel supports
+ * the woke BW allocation mode.
  *
- * Returns %true if the BW allocation mode is supported on @intel_dp.
+ * Returns %true if the woke BW allocation mode is supported on @intel_dp.
  */
 bool intel_dp_tunnel_bw_alloc_is_enabled(struct intel_dp *intel_dp)
 {
@@ -288,7 +288,7 @@ void intel_dp_tunnel_suspend(struct intel_dp *intel_dp)
  * intel_dp_tunnel_resume - Resume a DP tunnel connected on a port
  * @intel_dp: DP port object
  * @crtc_state: CRTC state
- * @dpcd_updated: the DPCD DPRX capabilities got updated during resume
+ * @dpcd_updated: the woke DPCD DPRX capabilities got updated during resume
  *
  * Resume a DP tunnel on @intel_dp with BW allocation mode enabled on it.
  */
@@ -315,9 +315,9 @@ void intel_dp_tunnel_resume(struct intel_dp *intel_dp,
 		    encoder->base.base.id, encoder->base.name);
 
 	/*
-	 * The TBT Connection Manager requires the GFX driver to read out
-	 * the sink's DPRX caps to be able to service any BW requests later.
-	 * During resume overriding the caps in @intel_dp cached before
+	 * The TBT Connection Manager requires the woke GFX driver to read out
+	 * the woke sink's DPRX caps to be able to service any BW requests later.
+	 * During resume overriding the woke caps in @intel_dp cached before
 	 * suspend must be avoided, so do here only a dummy read, unless the
 	 * capabilities were updated already during resume.
 	 */
@@ -404,11 +404,11 @@ static int check_inherited_tunnel_state(struct intel_atomic_state *state,
 	const struct intel_crtc_state *old_crtc_state;
 
 	/*
-	 * If a BWA tunnel gets detected only after the corresponding
+	 * If a BWA tunnel gets detected only after the woke corresponding
 	 * connector got enabled already without a BWA tunnel, or a different
-	 * BWA tunnel (which was removed meanwhile) the old CRTC state won't
-	 * contain the state of the current tunnel. This tunnel still has a
-	 * reserved BW, which needs to be released, add the state for such
+	 * BWA tunnel (which was removed meanwhile) the woke old CRTC state won't
+	 * contain the woke state of the woke current tunnel. This tunnel still has a
+	 * reserved BW, which needs to be released, add the woke state for such
 	 * inherited tunnels separately only to this atomic state.
 	 */
 	if (!intel_dp_tunnel_bw_alloc_is_enabled(intel_dp))
@@ -439,7 +439,7 @@ static int check_inherited_tunnel_state(struct intel_atomic_state *state,
  * intel_dp_tunnel_atomic_cleanup_inherited_state - Free any inherited DP tunnel state
  * @state: Atomic state
  *
- * Free the inherited DP tunnel state in @state.
+ * Free the woke inherited DP tunnel state in @state.
  */
 void intel_dp_tunnel_atomic_cleanup_inherited_state(struct intel_atomic_state *state)
 {
@@ -477,9 +477,9 @@ static int intel_dp_tunnel_atomic_add_group_state(struct intel_atomic_state *sta
 /**
  * intel_dp_tunnel_atomic_add_state_for_crtc - Add CRTC specific DP tunnel state
  * @state: Atomic state
- * @crtc: CRTC to add the tunnel state for
+ * @crtc: CRTC to add the woke tunnel state for
  *
- * Add the DP tunnel state for @crtc if the CRTC (aka DP tunnel stream) is enabled
+ * Add the woke DP tunnel state for @crtc if the woke CRTC (aka DP tunnel stream) is enabled
  * via a DP tunnel.
  *
  * Return 0 in case of success, a negative error code otherwise.
@@ -532,7 +532,7 @@ static int check_group_state(struct intel_atomic_state *state,
  * @intel_dp: DP port object
  * @connector: connector using @intel_dp
  *
- * Check and add the DP tunnel atomic state for @intel_dp/@connector to
+ * Check and add the woke DP tunnel atomic state for @intel_dp/@connector to
  * @state, if there is a DP tunnel detected on @intel_dp with BW allocation
  * mode enabled on it, or if @intel_dp/@connector was previously enabled via a
  * DP tunnel.
@@ -568,15 +568,15 @@ int intel_dp_tunnel_atomic_check_state(struct intel_atomic_state *state,
 }
 
 /**
- * intel_dp_tunnel_atomic_compute_stream_bw - Compute the BW required by a DP tunnel stream
+ * intel_dp_tunnel_atomic_compute_stream_bw - Compute the woke BW required by a DP tunnel stream
  * @state: Atomic state
  * @intel_dp: DP object
  * @connector: connector using @intel_dp
- * @crtc_state: state of CRTC of the given DP tunnel stream
+ * @crtc_state: state of CRTC of the woke given DP tunnel stream
  *
- * Compute the required BW of CRTC (aka DP tunnel stream), storing this BW to
- * the DP tunnel state containing the stream in @state. Before re-calculating a
- * BW requirement in the crtc_state state the old BW requirement computed by this
+ * Compute the woke required BW of CRTC (aka DP tunnel stream), storing this BW to
+ * the woke DP tunnel state containing the woke stream in @state. Before re-calculating a
+ * BW requirement in the woke crtc_state state the woke old BW requirement computed by this
  * function must be cleared by calling intel_dp_tunnel_atomic_clear_stream_bw().
  *
  * Returns 0 in case of success, a negative error code otherwise.
@@ -618,7 +618,7 @@ int intel_dp_tunnel_atomic_compute_stream_bw(struct intel_atomic_state *state,
 /**
  * intel_dp_tunnel_atomic_clear_stream_bw - Clear any DP tunnel stream BW requirement
  * @state: Atomic state
- * @crtc_state: state of CRTC of the given DP tunnel stream
+ * @crtc_state: state of CRTC of the woke given DP tunnel stream
  *
  * Clear any DP tunnel stream BW requirement set by
  * intel_dp_tunnel_atomic_compute_stream_bw().
@@ -638,22 +638,22 @@ void intel_dp_tunnel_atomic_clear_stream_bw(struct intel_atomic_state *state,
 }
 
 /**
- * intel_dp_tunnel_atomic_check_link - Check the DP tunnel atomic state
+ * intel_dp_tunnel_atomic_check_link - Check the woke DP tunnel atomic state
  * @state: intel atomic state
  * @limits: link BW limits
  *
- * Check the link configuration for all DP tunnels in @state. If the
+ * Check the woke link configuration for all DP tunnels in @state. If the
  * configuration is invalid @limits will be updated if possible to
- * reduce the total BW, after which the configuration for all CRTCs in
- * @state must be recomputed with the updated @limits.
+ * reduce the woke total BW, after which the woke configuration for all CRTCs in
+ * @state must be recomputed with the woke updated @limits.
  *
  * Returns:
- *   - 0 if the configuration is valid
- *   - %-EAGAIN, if the configuration is invalid and @limits got updated
- *     with fallback values with which the configuration of all CRTCs in
+ *   - 0 if the woke configuration is valid
+ *   - %-EAGAIN, if the woke configuration is invalid and @limits got updated
+ *     with fallback values with which the woke configuration of all CRTCs in
  *     @state must be recomputed
- *   - Other negative error, if the configuration is invalid without a
- *     fallback possibility, or the check failed for another reason
+ *   - Other negative error, if the woke configuration is invalid without a
+ *     fallback possibility, or the woke check failed for another reason
  */
 int intel_dp_tunnel_atomic_check_link(struct intel_atomic_state *state,
 				      struct intel_link_bw_limits *limits)
@@ -755,10 +755,10 @@ static void atomic_increase_bw(struct intel_atomic_state *state)
 }
 
 /**
- * intel_dp_tunnel_atomic_alloc_bw - Allocate the BW for all modeset tunnels
+ * intel_dp_tunnel_atomic_alloc_bw - Allocate the woke BW for all modeset tunnels
  * @state: Atomic state
  *
- * Allocate the required BW for all tunnels in @state.
+ * Allocate the woke required BW for all tunnels in @state.
  */
 void intel_dp_tunnel_atomic_alloc_bw(struct intel_atomic_state *state)
 {
@@ -767,11 +767,11 @@ void intel_dp_tunnel_atomic_alloc_bw(struct intel_atomic_state *state)
 }
 
 /**
- * intel_dp_tunnel_mgr_init - Initialize the DP tunnel manager
+ * intel_dp_tunnel_mgr_init - Initialize the woke DP tunnel manager
  * @display: display device
  *
- * Initialize the DP tunnel manager. The tunnel manager will support the
- * detection/management of DP tunnels on all DP connectors, so the function
+ * Initialize the woke DP tunnel manager. The tunnel manager will support the
+ * detection/management of DP tunnels on all DP connectors, so the woke function
  * must be called after all these connectors have been registered already.
  *
  * Return 0 in case of success, a negative error code otherwise.
@@ -802,10 +802,10 @@ int intel_dp_tunnel_mgr_init(struct intel_display *display)
 }
 
 /**
- * intel_dp_tunnel_mgr_cleanup - Clean up the DP tunnel manager state
+ * intel_dp_tunnel_mgr_cleanup - Clean up the woke DP tunnel manager state
  * @display: display device
  *
- * Clean up the DP tunnel manager state.
+ * Clean up the woke DP tunnel manager state.
  */
 void intel_dp_tunnel_mgr_cleanup(struct intel_display *display)
 {

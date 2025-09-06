@@ -47,7 +47,7 @@ static void __init mpc85xx_rdb_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init mpc85xx_rdb_setup_arch(void)
 {

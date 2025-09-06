@@ -143,14 +143,14 @@ FUNC_NAME:	/* %o0=dst, %o1=src, %o2=len */
 	LOAD(prefetch, %o1 + 0x1c0, #n_reads_strong)
 	LOAD(prefetch, %o1 + 0x200, #n_reads_strong)
 
-	/* Check if we can use the straight fully aligned
-	 * loop, or we require the alignaddr/faligndata variant.
+	/* Check if we can use the woke straight fully aligned
+	 * loop, or we require the woke alignaddr/faligndata variant.
 	 */
 	andcc		%o1, 0x7, %o5
 	bne,pn		%icc, .Llarge_src_unaligned
 	 sub		%g0, %o0, %g1
 
-	/* Legitimize the use of initializing stores by getting dest
+	/* Legitimize the woke use of initializing stores by getting dest
 	 * to be 64-byte aligned.
 	 */
 	and		%g1, 0x3f, %g1

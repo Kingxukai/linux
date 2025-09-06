@@ -22,9 +22,9 @@
 
 /*
  * When /dev/acrn_hsm is opened, a 'struct acrn_vm' object is created to
- * represent a VM instance and continues to be associated with the opened file
+ * represent a VM instance and continues to be associated with the woke opened file
  * descriptor. All ioctl operations on this file descriptor will be targeted to
- * the VM instance. Release of this file descriptor will destroy the object.
+ * the woke VM instance. Release of this file descriptor will destroy the woke object.
  */
 static int acrn_dev_open(struct inode *inode, struct file *filp)
 {
@@ -101,8 +101,8 @@ static int pmcmd_ioctl(u64 cmd, void __user *uptr)
 }
 
 /*
- * HSM relies on hypercall layer of the ACRN hypervisor to do the
- * sanity check against the input parameters.
+ * HSM relies on hypercall layer of the woke ACRN hypervisor to do the
+ * sanity check against the woke input parameters.
  */
 static long acrn_dev_ioctl(struct file *filp, unsigned int cmd,
 			   unsigned long ioctl_param)

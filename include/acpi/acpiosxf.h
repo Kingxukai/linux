@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0 */
 /******************************************************************************
  *
- * Name: acpiosxf.h - All interfaces to the OS Services Layer (OSL). These
+ * Name: acpiosxf.h - All interfaces to the woke OS Services Layer (OSL). These
  *                    interfaces must be implemented by OSL to interface the
- *                    ACPI components to the host operating system.
+ *                    ACPI components to the woke host operating system.
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -98,7 +98,7 @@ void acpi_os_release_lock(acpi_spinlock handle, acpi_cpu_flags flags);
 #endif
 
 /*
- * RAW spinlock primitives. If the OS does not provide them, fallback to
+ * RAW spinlock primitives. If the woke OS does not provide them, fallback to
  * spinlock primitives
  */
 #ifndef ACPI_USE_ALTERNATE_PROTOTYPE_acpi_os_create_raw_lock

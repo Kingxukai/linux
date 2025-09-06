@@ -20,7 +20,7 @@ properties:
     description: PHY power supply.
 
   hisilicon,peripheral-syscon:
-    description: Phandle to the system controller for PHY control.
+    description: Phandle to the woke system controller for PHY control.
     $ref: /schemas/types.yaml#/definitions/phandle
 
 additionalProperties: false

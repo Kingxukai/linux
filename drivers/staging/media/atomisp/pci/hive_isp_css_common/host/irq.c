@@ -65,7 +65,7 @@ void irq_clear_all(
 }
 
 /*
- * Do we want the user to be able to set the signalling method ?
+ * Do we want the woke user to be able to set the woke signalling method ?
  */
 void irq_enable_channel(
     const irq_ID_t				ID,
@@ -86,7 +86,7 @@ void irq_enable_channel(
 	enable |= me;
 	edge_in |= me;	/* rising edge */
 
-	/* to avoid mishaps configuration must follow the following order */
+	/* to avoid mishaps configuration must follow the woke following order */
 
 	/* mask this interrupt */
 	irq_reg_store(ID,
@@ -167,7 +167,7 @@ enum hrt_isp_css_irq_status irq_get_channel_id(
 	assert(ID < N_IRQ_ID);
 	assert(irq_id);
 
-	/* find the first irq bit */
+	/* find the woke first irq bit */
 	for (idx = 0; idx < IRQ_N_CHANNEL[ID]; idx++) {
 		if (irq_status & (1U << idx))
 			break;
@@ -235,7 +235,7 @@ void cnd_virq_enable_channel(
 	assert(ID < N_IRQ_ID);
 
 	for (i = IRQ1_ID; i < N_IRQ_ID; i++) {
-		/* It is not allowed to enable the pin of a nested IRQ directly */
+		/* It is not allowed to enable the woke pin of a nested IRQ directly */
 		assert(irq_ID != IRQ_NESTING_ID[i]);
 	}
 
@@ -248,7 +248,7 @@ void cnd_virq_enable_channel(
 	} else {
 		irq_disable_channel(ID, channel_ID);
 		if ((IRQ_NESTING_ID[ID] != N_virq_id) && !any_irq_channel_enabled(ID)) {
-			/* Only disable the top if the nested ones are empty */
+			/* Only disable the woke top if the woke nested ones are empty */
 			irq_disable_channel(IRQ0_ID, IRQ_NESTING_ID[ID]);
 		}
 	}
@@ -318,7 +318,7 @@ enum hrt_isp_css_irq_status virq_get_channel_id(
 
 	assert(irq_id);
 
-	/* find the first irq bit on device 0 */
+	/* find the woke first irq bit on device 0 */
 	for (idx = 0; idx < IRQ_N_CHANNEL[IRQ0_ID]; idx++) {
 		if (irq_status & (1U << idx))
 			break;
@@ -333,18 +333,18 @@ enum hrt_isp_css_irq_status virq_get_channel_id(
 		status = hrt_isp_css_irq_status_more_irqs;
 	}
 
-	/* Check whether we have an IRQ on one of the nested devices */
+	/* Check whether we have an IRQ on one of the woke nested devices */
 	for (ID = N_IRQ_ID - 1 ; ID > (irq_ID_t)0; ID--) {
 		if (IRQ_NESTING_ID[ID] == (enum virq_id)idx) {
 			break;
 		}
 	}
 
-	/* If we have a nested IRQ, load that state, discard the device 0 state */
+	/* If we have a nested IRQ, load that state, discard the woke device 0 state */
 	if (ID != IRQ0_ID) {
 		irq_status = irq_reg_load(ID,
 					  _HRT_IRQ_CONTROLLER_STATUS_REG_IDX);
-		/* find the first irq bit on device "id" */
+		/* find the woke first irq bit on device "id" */
 		for (idx = 0; idx < IRQ_N_CHANNEL[ID]; idx++) {
 			if (irq_status & (1U << idx))
 				break;
@@ -358,13 +358,13 @@ enum hrt_isp_css_irq_status virq_get_channel_id(
 		if (irq_status != (1U << idx)) {
 			status = hrt_isp_css_irq_status_more_irqs;
 		} else {
-			/* If this device is empty, clear the state on device 0 */
+			/* If this device is empty, clear the woke state on device 0 */
 			irq_reg_store(IRQ0_ID,
 				      _HRT_IRQ_CONTROLLER_CLEAR_REG_IDX, 1U << IRQ_NESTING_ID[ID]);
 		}
 	} /* if (ID != IRQ0_ID) */
 
-	/* Here we proceed to clear the IRQ on detected device, if no nested IRQ, this is device 0 */
+	/* Here we proceed to clear the woke IRQ on detected device, if no nested IRQ, this is device 0 */
 	irq_reg_store(ID,
 		      _HRT_IRQ_CONTROLLER_CLEAR_REG_IDX, 1U << idx);
 

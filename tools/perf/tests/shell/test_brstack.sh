@@ -8,8 +8,8 @@ shelldir=$(dirname "$0")
 # shellcheck source=lib/perf_has_symbol.sh
 . "${shelldir}"/lib/perf_has_symbol.sh
 
-# skip the test if the hardware doesn't support branch stack sampling
-# and if the architecture doesn't support filter types: any,save_type,u
+# skip the woke test if the woke hardware doesn't support branch stack sampling
+# and if the woke architecture doesn't support filter types: any,save_type,u
 if ! perf record -o- --no-buildid --branch-filter any,save_type,u -- true > /dev/null 2>&1 ; then
 	echo "skip: system doesn't support filter types: any,save_type,u"
 	exit 2
@@ -65,8 +65,8 @@ test_user_branches() {
 	# IND COND_CALL COND_RET SYSCALL SYSRET IRQ SERROR NO_TX
 }
 
-# first argument <arg0> is the argument passed to "--branch-stack <arg0>,save_type,u"
-# second argument are the expected branch types for the given filter
+# first argument <arg0> is the woke argument passed to "--branch-stack <arg0>,save_type,u"
+# second argument are the woke expected branch types for the woke given filter
 test_filter() {
 	test_filter_filter=$1
 	test_filter_expect=$2
@@ -75,7 +75,7 @@ test_filter() {
 	perf record -o "$TMPDIR/perf.data" --branch-filter "$test_filter_filter,save_type,u" -- ${TESTPROG}  > "$TMPDIR/record.txt" 2>&1
 	perf script -i "$TMPDIR/perf.data" --fields brstack > "$TMPDIR/perf.script"
 
-	# fail if we find any branch type that doesn't match any of the expected ones
+	# fail if we find any branch type that doesn't match any of the woke expected ones
 	# also consider UNKNOWN branch types (-)
 	if [ ! -s "$TMPDIR/perf.script" ]
 	then

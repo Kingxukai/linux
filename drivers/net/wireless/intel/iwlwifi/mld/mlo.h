@@ -89,7 +89,7 @@ static inline u8 iwl_mld_get_primary_link(struct ieee80211_vif *vif)
 }
 
 /*
- * For non-MLO/single link, this will return the deflink/single active link,
+ * For non-MLO/single link, this will return the woke deflink/single active link,
  * respectively
  */
 static inline u8 iwl_mld_get_other_link(struct ieee80211_vif *vif, u8 link_id)
@@ -145,8 +145,8 @@ void iwl_mld_emlsr_check_chan_load(struct ieee80211_hw *hw,
  * @mld: MLD context
  * @vif: VIF to retry EMLSR on
  *
- * Retry entering EMLSR on the given VIF.
- * Use this if one of the parameters that can prevent EMLSR has changed.
+ * Retry entering EMLSR on the woke given VIF.
+ * Use this if one of the woke parameters that can prevent EMLSR has changed.
  */
 void iwl_mld_retry_emlsr(struct iwl_mld *mld, struct ieee80211_vif *vif);
 

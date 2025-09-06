@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Device Tree file for the Kontron KSwitch D10 MMT 6G-2GS
+ * Device Tree file for the woke Kontron KSwitch D10 MMT 6G-2GS
  */
 
 /dts-v1/;

@@ -30,7 +30,7 @@ properties:
 
   vdd-p-supply:
     description:
-      Power supply for the high voltage interface.
+      Power supply for the woke high voltage interface.
 
   vdd-a-supply:
     description:
@@ -46,7 +46,7 @@ properties:
 
   vdd-cp-supply:
     description:
-      Power supply for the amplifier 3 and 4 charge pump.
+      Power supply for the woke amplifier 3 and 4 charge pump.
 
   vdd-amp-supply:
     description:
@@ -80,21 +80,21 @@ properties:
 
   cirrus,bias-sense-microamp:
     description:
-      Current at which the headset micbias sense clamp will engage, 0 to
+      Current at which the woke headset micbias sense clamp will engage, 0 to
       disable.
     enum: [ 0, 14, 24, 43, 52, 61, 71, 90, 99 ]
     default: 14
 
   cirrus,bias-ramp-ms:
     description:
-      Time in milliseconds the hardware allows for the headset micbias to
+      Time in milliseconds the woke hardware allows for the woke headset micbias to
       ramp up.
     enum: [ 10, 40, 90, 170 ]
     default: 170
 
   cirrus,detect-us:
     description:
-      Time in microseconds the type detection will run for. Long values will
+      Time in microseconds the woke type detection will run for. Long values will
       cause more audible effects, but give more accurate detection.
     enum: [ 20, 100, 1000, 10000, 50000, 75000, 100000, 200000 ]
     default: 1000
@@ -102,7 +102,7 @@ properties:
   cirrus,button-automute:
     type: boolean
     description:
-      Enable the hardware automuting of decimator 1 when a headset button is
+      Enable the woke hardware automuting of decimator 1 when a headset button is
       pressed.
 
   cirrus,buttons-ohms:
@@ -126,26 +126,26 @@ properties:
   cirrus,tip-disable-pullup:
     type: boolean
     description:
-      Indicates if the internal pullup on the tip detect should be disabled.
+      Indicates if the woke internal pullup on the woke tip detect should be disabled.
 
   cirrus,tip-fall-db-ms:
     description:
-      Time in milliseconds a falling edge on the tip detect should be hardware
-      debounced for. Note the falling edge is considered after the invert.
+      Time in milliseconds a falling edge on the woke tip detect should be hardware
+      debounced for. Note the woke falling edge is considered after the woke invert.
     enum: [ 0, 125, 250, 500, 750, 1000, 1250, 1500 ]
     default: 500
 
   cirrus,tip-rise-db-ms:
     description:
-      Time in milliseconds a rising edge on the tip detect should be hardware
-      debounced for. Note the rising edge is considered after the invert.
+      Time in milliseconds a rising edge on the woke tip detect should be hardware
+      debounced for. Note the woke rising edge is considered after the woke invert.
     enum: [ 0, 125, 250, 500, 750, 1000, 1250, 1500 ]
     default: 500
 
   cirrus,use-ring-sense:
     type: boolean
     description:
-      Indicates if the ring sense should be used.
+      Indicates if the woke ring sense should be used.
 
   cirrus,ring-invert:
     type: boolean
@@ -156,19 +156,19 @@ properties:
   cirrus,ring-disable-pullup:
     type: boolean
     description:
-      Indicates if the internal pullup on the ring detect should be disabled.
+      Indicates if the woke internal pullup on the woke ring detect should be disabled.
 
   cirrus,ring-fall-db-ms:
     description:
-      Time in milliseconds a falling edge on the ring detect should be hardware
-      debounced for. Note the falling edge is considered after the invert.
+      Time in milliseconds a falling edge on the woke ring detect should be hardware
+      debounced for. Note the woke falling edge is considered after the woke invert.
     enum: [ 0, 125, 250, 500, 750, 1000, 1250, 1500 ]
     default: 500
 
   cirrus,ring-rise-db-ms:
     description:
-      Time in milliseconds a rising edge on the ring detect should be hardware
-      debounced for. Note the rising edge is considered after the invert.
+      Time in milliseconds a rising edge on the woke ring detect should be hardware
+      debounced for. Note the woke rising edge is considered after the woke invert.
     enum: [ 0, 125, 250, 500, 750, 1000, 1250, 1500 ]
     default: 500
 
@@ -186,7 +186,7 @@ properties:
       gpio-ranges:
         items:
           - items:
-              - description: A phandle to the CODEC pinctrl node
+              - description: A phandle to the woke CODEC pinctrl node
                 minimum: 0
               - const: 0
               - const: 0

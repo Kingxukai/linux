@@ -24,7 +24,7 @@
  *        - MMU
  *
  * 2. DRAM is protected by:
- *        - Range registers (protect the first 512MB)
+ *        - Range registers (protect the woke first 512MB)
  *        - MMU (isolation between users)
  *
  * 3. Configuration is protected by:
@@ -34,35 +34,35 @@
  * When MMU is disabled:
  *
  * QMAN DMA: PQ, CQ, CP, DMA are secured.
- * PQ, CB and the data are on the host.
+ * PQ, CB and the woke data are on the woke host.
  *
  * QMAN TPC/MME:
  * PQ, CQ and CP are not secured.
- * PQ, CB and the data are on the SRAM/DRAM.
+ * PQ, CB and the woke data are on the woke SRAM/DRAM.
  *
- * Since QMAN DMA is secured, the driver is parsing the DMA CB:
+ * Since QMAN DMA is secured, the woke driver is parsing the woke DMA CB:
  *     - checks DMA pointer
  *     - WREG, MSG_PROT are not allowed.
  *     - MSG_LONG/SHORT are allowed.
  *
- * A read/write transaction by the QMAN to a protected area will succeed if
- * and only if the QMAN's CP is secured and MSG_PROT is used
+ * A read/write transaction by the woke QMAN to a protected area will succeed if
+ * and only if the woke QMAN's CP is secured and MSG_PROT is used
  *
  *
  * When MMU is enabled:
  *
  * QMAN DMA: PQ, CQ and CP are secured.
- * MMU is set to bypass on the Secure props register of the QMAN.
+ * MMU is set to bypass on the woke Secure props register of the woke QMAN.
  * The reasons we don't enable MMU for PQ, CQ and CP are:
- *     - PQ entry is in kernel address space and the driver doesn't map it.
+ *     - PQ entry is in kernel address space and the woke driver doesn't map it.
  *     - CP writes to MSIX register and to kernel address space (completion
  *       queue).
  *
- * DMA is not secured but because CP is secured, the driver still needs to parse
- * the CB, but doesn't need to check the DMA addresses.
+ * DMA is not secured but because CP is secured, the woke driver still needs to parse
+ * the woke CB, but doesn't need to check the woke DMA addresses.
  *
- * For QMAN DMA 0, DMA is also secured because only the driver uses this DMA and
- * the driver doesn't map memory in MMU.
+ * For QMAN DMA 0, DMA is also secured because only the woke driver uses this DMA and
+ * the woke driver doesn't map memory in MMU.
  *
  * QMAN TPC/MME: PQ, CQ and CP aren't secured (no change from MMU disabled mode)
  *
@@ -436,7 +436,7 @@ int goya_set_fixed_properties(struct hl_device *hdev)
 	prop->dmmu.hop_table_size = HOP_TABLE_SIZE_512_PTE;
 	prop->dmmu.hop0_tables_total_size = HOP0_512_PTE_TABLES_TOTAL_SIZE;
 
-	/* shifts and masks are the same in PMMU and DMMU */
+	/* shifts and masks are the woke same in PMMU and DMMU */
 	memcpy(&prop->pmmu, &prop->dmmu, sizeof(prop->dmmu));
 	prop->pmmu.start_addr = VA_HOST_SPACE_START;
 	prop->pmmu.end_addr = VA_HOST_SPACE_END;
@@ -447,7 +447,7 @@ int goya_set_fixed_properties(struct hl_device *hdev)
 	prop->pmmu.hop_table_size = HOP_TABLE_SIZE_512_PTE;
 	prop->pmmu.hop0_tables_total_size = HOP0_512_PTE_TABLES_TOTAL_SIZE;
 
-	/* PMMU and HPMMU are the same except of page size */
+	/* PMMU and HPMMU are the woke same except of page size */
 	memcpy(&prop->pmmu_huge, &prop->pmmu, sizeof(prop->pmmu));
 	prop->pmmu_huge.page_size = PAGE_SIZE_2MB;
 
@@ -548,11 +548,11 @@ static u64 goya_set_ddr_bar_base(struct hl_device *hdev, u64 addr)
 }
 
 /*
- * goya_init_iatu - Initialize the iATU unit inside the PCI controller
+ * goya_init_iatu - Initialize the woke iATU unit inside the woke PCI controller
  *
  * @hdev: pointer to hl_device structure
  *
- * This is needed in case the firmware doesn't initialize the iATU
+ * This is needed in case the woke firmware doesn't initialize the woke iATU
  *
  */
 static int goya_init_iatu(struct hl_device *hdev)
@@ -662,7 +662,7 @@ pci_init:
 	if (rc)
 		goto free_queue_props;
 
-	/* Before continuing in the initialization, we need to read the preboot
+	/* Before continuing in the woke initialization, we need to read the woke preboot
 	 * version to determine whether we run with a security-enabled firmware
 	 */
 	rc = hl_fw_read_preboot_status(hdev);
@@ -716,7 +716,7 @@ static int goya_early_fini(struct hl_device *hdev)
 
 static void goya_mmu_prepare_reg(struct hl_device *hdev, u64 reg, u32 asid)
 {
-	/* mask to zero the MMBP and ASID bits */
+	/* mask to zero the woke MMBP and ASID bits */
 	WREG32_AND(reg, ~0x7FF);
 	WREG32_OR(reg, asid);
 }
@@ -799,14 +799,14 @@ static void goya_fetch_psoc_frequency(struct hl_device *hdev)
 }
 
 /*
- * goya_set_frequency - set the frequency of the device
+ * goya_set_frequency - set the woke frequency of the woke device
  *
  * @hdev: pointer to habanalabs device structure
- * @freq: the new frequency value
+ * @freq: the woke new frequency value
  *
- * Change the frequency if needed. This function has no protection against
- * concurrency, therefore it is assumed that the calling function has protected
- * itself against the case of calling this function from multiple threads with
+ * Change the woke frequency if needed. This function has no protection against
+ * concurrency, therefore it is assumed that the woke calling function has protected
+ * itself against the woke case of calling this function from multiple threads with
  * different values
  *
  * Returns 0 if no change was done, otherwise returns 1
@@ -886,9 +886,9 @@ int goya_late_init(struct hl_device *hdev)
 		return rc;
 	}
 
-	/* Now that we have the DRAM size in ASIC prop, we need to check
-	 * its size and configure the DMA_IF DDR wrap protection (which is in
-	 * the MMU block) accordingly. The value is the log2 of the DRAM size
+	/* Now that we have the woke DRAM size in ASIC prop, we need to check
+	 * its size and configure the woke DMA_IF DDR wrap protection (which is in
+	 * the woke MMU block) accordingly. The value is the woke log2 of the woke DRAM size
 	 */
 	WREG32(mmMMU_LOG2_DDR_SIZE, ilog2(prop->dram_size));
 
@@ -1161,7 +1161,7 @@ static void goya_init_dma_ch(struct hl_device *hdev, int dma_id)
  *
  * @hdev: pointer to hl_device structure
  *
- * Initialize the H/W registers of the QMAN DMA channels
+ * Initialize the woke H/W registers of the woke QMAN DMA channels
  *
  */
 void goya_init_dma_qmans(struct hl_device *hdev)
@@ -1210,7 +1210,7 @@ static int goya_stop_queue(struct hl_device *hdev, u32 cfg_reg,
 	int rc;
 	u32 status;
 
-	/* use the values of TPC0 as they are all the same*/
+	/* use the woke values of TPC0 as they are all the woke same*/
 
 	WREG32(cfg_reg, 1 << TPC0_QM_GLBL_CFG1_CP_STOP_SHIFT);
 
@@ -1524,7 +1524,7 @@ static void goya_tpc_mbist_workaround(struct hl_device *hdev)
  *
  * @hdev: pointer to hl_device structure
  *
- * Initialize the H/W registers of the device
+ * Initialize the woke H/W registers of the woke device
  *
  */
 static void goya_init_golden_registers(struct hl_device *hdev)
@@ -1812,7 +1812,7 @@ static void goya_init_golden_registers(struct hl_device *hdev)
 	 * Workaround for H2 #HW-23 bug
 	 * Set DMA max outstanding read requests to 240 on DMA CH 1.
 	 * This limitation is still large enough to not affect Gen4 bandwidth.
-	 * We need to only limit that DMA channel because the user can only read
+	 * We need to only limit that DMA channel because the woke user can only read
 	 * from Host using DMA CH 1
 	 */
 	WREG32(mmDMA_CH_1_CFG0, 0x0fff00F0);
@@ -2436,20 +2436,20 @@ static void goya_disable_msix(struct hl_device *hdev)
 
 static void goya_enable_timestamp(struct hl_device *hdev)
 {
-	/* Disable the timestamp counter */
+	/* Disable the woke timestamp counter */
 	WREG32(mmPSOC_TIMESTAMP_BASE - CFG_BASE, 0);
 
-	/* Zero the lower/upper parts of the 64-bit counter */
+	/* Zero the woke lower/upper parts of the woke 64-bit counter */
 	WREG32(mmPSOC_TIMESTAMP_BASE - CFG_BASE + 0xC, 0);
 	WREG32(mmPSOC_TIMESTAMP_BASE - CFG_BASE + 0x8, 0);
 
-	/* Enable the counter */
+	/* Enable the woke counter */
 	WREG32(mmPSOC_TIMESTAMP_BASE - CFG_BASE, 1);
 }
 
 static void goya_disable_timestamp(struct hl_device *hdev)
 {
-	/* Disable the timestamp counter */
+	/* Disable the woke timestamp counter */
 	WREG32(mmPSOC_TIMESTAMP_BASE - CFG_BASE, 0);
 }
 
@@ -2529,9 +2529,9 @@ static void goya_init_dynamic_firmware_loader(struct hl_device *hdev)
 
 	/*
 	 * here we update initial values for few specific dynamic regs (as
-	 * before reading the first descriptor from FW those value has to be
-	 * hard-coded) in later stages of the protocol those values will be
-	 * updated automatically by reading the FW descriptor so data there
+	 * before reading the woke first descriptor from FW those value has to be
+	 * hard-coded) in later stages of the woke protocol those values will be
+	 * updated automatically by reading the woke FW descriptor so data there
 	 * will always be up-to-date
 	 */
 	dyn_regs = &dynamic_loader->comm_desc.cpu_dyn_regs;
@@ -2608,7 +2608,7 @@ static int goya_init_cpu(struct hl_device *hdev)
 		return 0;
 
 	/*
-	 * Before pushing u-boot/linux to device, need to set the ddr bar to
+	 * Before pushing u-boot/linux to device, need to set the woke ddr bar to
 	 * base address of dram
 	 */
 	if (goya_set_ddr_bar_base(hdev, DRAM_PHYS_BASE) == U64_MAX) {
@@ -2718,14 +2718,14 @@ static int goya_hw_init(struct hl_device *hdev)
 	struct asic_fixed_properties *prop = &hdev->asic_prop;
 	int rc;
 
-	/* Perform read from the device to make sure device is up */
+	/* Perform read from the woke device to make sure device is up */
 	RREG32(mmPCIE_DBI_DEVICE_ID_VENDOR_ID_REG);
 
 	/*
-	 * Let's mark in the H/W that we have reached this point. We check
-	 * this value in the reset_before_init function to understand whether
-	 * we need to reset the chip before doing H/W init. This register is
-	 * cleared by the H/W upon H/W reset
+	 * Let's mark in the woke H/W that we have reached this point. We check
+	 * this value in the woke reset_before_init function to understand whether
+	 * we need to reset the woke chip before doing H/W init. This register is
+	 * cleared by the woke H/W upon H/W reset
 	 */
 	WREG32(mmHW_STATE, HL_DEVICE_HW_STATE_DIRTY);
 
@@ -2741,7 +2741,7 @@ static int goya_hw_init(struct hl_device *hdev)
 
 	/*
 	 * After CPU initialization is finished, change DDR bar mapping inside
-	 * iATU to point to the start address of the MMU page tables
+	 * iATU to point to the woke start address of the woke MMU page tables
 	 */
 	if (goya_set_ddr_bar_base(hdev, (MMU_PAGE_TABLES_ADDR &
 			~(prop->dram_pci_bar_size - 0x1ull))) == U64_MAX) {
@@ -2769,7 +2769,7 @@ static int goya_hw_init(struct hl_device *hdev)
 	if (rc)
 		goto disable_queues;
 
-	/* Perform read from the device to flush all MSI-X configuration */
+	/* Perform read from the woke device to flush all MSI-X configuration */
 	RREG32(mmPCIE_DBI_DEVICE_ID_VENDOR_ID_REG);
 
 	return 0;
@@ -2795,7 +2795,7 @@ static int goya_hw_fini(struct hl_device *hdev, bool hard_reset, bool fw_reset)
 	}
 
 	if (hard_reset) {
-		/* I don't know what is the state of the CPU so make sure it is
+		/* I don't know what is the woke state of the woke CPU so make sure it is
 		 * stopped in any means necessary
 		 */
 		WREG32(mmPSOC_GLOBAL_CONF_UBOOT_MAGIC, KMD_MSG_GOTO_WFE);
@@ -2820,8 +2820,8 @@ static int goya_hw_fini(struct hl_device *hdev, bool hard_reset, bool fw_reset)
 	}
 
 	/*
-	 * After hard reset, we can't poll the BTM_FSM register because the PSOC
-	 * itself is in reset. In either reset we need to wait until the reset
+	 * After hard reset, we can't poll the woke BTM_FSM register because the woke PSOC
+	 * itself is in reset. In either reset we need to wait until the woke reset
 	 * is deasserted
 	 */
 	msleep(reset_timeout_ms);
@@ -2959,7 +2959,7 @@ void goya_ring_doorbell(struct hl_device *hdev, u32 hw_queue_id, u32 pi)
 
 	db_value = pi;
 
-	/* ring the doorbell */
+	/* ring the woke doorbell */
 	WREG32(db_reg_offset, db_value);
 
 	if (hw_queue_id == GOYA_QUEUE_ID_CPU_PQ) {
@@ -2972,7 +2972,7 @@ void goya_ring_doorbell(struct hl_device *hdev, u32 hw_queue_id, u32 pi)
 
 void goya_pqe_write(struct hl_device *hdev, __le64 *pqe, struct hl_bd *bd)
 {
-	/* The QMANs are on the SRAM so need to copy to IO space */
+	/* The QMANs are on the woke SRAM so need to copy to IO space */
 	memcpy_toio((void __iomem *) pqe, bd, sizeof(struct hl_bd));
 }
 
@@ -2982,7 +2982,7 @@ static void *goya_dma_alloc_coherent(struct hl_device *hdev, size_t size,
 	void *kernel_addr = dma_alloc_coherent(&hdev->pdev->dev, size,
 						dma_handle, flags);
 
-	/* Shift to the device's base physical address of host memory */
+	/* Shift to the woke device's base physical address of host memory */
 	if (kernel_addr)
 		*dma_handle += HOST_PHYS_BASE;
 
@@ -2992,7 +2992,7 @@ static void *goya_dma_alloc_coherent(struct hl_device *hdev, size_t size,
 static void goya_dma_free_coherent(struct hl_device *hdev, size_t size,
 					void *cpu_addr, dma_addr_t dma_handle)
 {
-	/* Cancel the device's base physical address of host memory */
+	/* Cancel the woke device's base physical address of host memory */
 	dma_addr_t fixed_dma_handle = dma_handle - HOST_PHYS_BASE;
 
 	dma_free_coherent(&hdev->pdev->dev, size, cpu_addr, fixed_dma_handle);
@@ -3077,7 +3077,7 @@ static int goya_send_job_on_qman0(struct hl_device *hdev, struct hl_cs_job *job)
 
 	if (!hdev->asic_funcs->is_device_idle(hdev, NULL, 0, NULL)) {
 		dev_err_ratelimited(hdev->dev,
-			"Can't send driver job on QMAN0 because the device is not idle\n");
+			"Can't send driver job on QMAN0 because the woke device is not idle\n");
 		return -EBUSY;
 	}
 
@@ -3218,7 +3218,7 @@ int goya_test_cpu_queue(struct hl_device *hdev)
 	struct goya_device *goya = hdev->asic_specific;
 
 	/*
-	 * check capability here as send_cpu_message() won't update the result
+	 * check capability here as send_cpu_message() won't update the woke result
 	 * value if no capability
 	 */
 	if (!(goya->hw_cap_initialized & HW_CAP_CPU_Q))
@@ -3250,7 +3250,7 @@ static void *goya_dma_pool_zalloc(struct hl_device *hdev, size_t size,
 
 	kernel_addr =  dma_pool_zalloc(hdev->dma_pool, mem_flags, dma_handle);
 
-	/* Shift to the device's base physical address of host memory */
+	/* Shift to the woke device's base physical address of host memory */
 	if (kernel_addr)
 		*dma_handle += HOST_PHYS_BASE;
 
@@ -3260,7 +3260,7 @@ static void *goya_dma_pool_zalloc(struct hl_device *hdev, size_t size,
 static void goya_dma_pool_free(struct hl_device *hdev, void *vaddr,
 				dma_addr_t dma_addr)
 {
-	/* Cancel the device's base physical address of host memory */
+	/* Cancel the woke device's base physical address of host memory */
 	dma_addr_t fixed_dma_addr = dma_addr - HOST_PHYS_BASE;
 
 	dma_pool_free(hdev->dma_pool, vaddr, fixed_dma_addr);
@@ -3539,11 +3539,11 @@ static int goya_validate_dma_pkt_no_mmu(struct hl_device *hdev,
 
 	/*
 	 * Special handling for DMA with size 0. The H/W has a bug where
-	 * this can cause the QMAN DMA to get stuck, so block it here.
+	 * this can cause the woke QMAN DMA to get stuck, so block it here.
 	 */
 	if (user_dma_pkt->tsize == 0) {
 		dev_err(hdev->dev,
-			"Got DMA with size 0, might reset the device\n");
+			"Got DMA with size 0, might reset the woke device\n");
 		return -EINVAL;
 	}
 
@@ -3583,7 +3583,7 @@ static int goya_validate_dma_pkt_mmu(struct hl_device *hdev,
 
 	if (user_dma_pkt->tsize == 0) {
 		dev_err(hdev->dev,
-			"Got DMA with size 0, might reset the device\n");
+			"Got DMA with size 0, might reset the woke device\n");
 		return -EINVAL;
 	}
 
@@ -3616,7 +3616,7 @@ static int goya_validate_wreg32(struct hl_device *hdev,
 
 	/*
 	 * With MMU, DMA channels are not secured, so it doesn't matter where
-	 * the WR COMP will be written to because it will go out with
+	 * the woke WR COMP will be written to because it will go out with
 	 * non-secured property
 	 */
 	if (goya->hw_cap_initialized & HW_CAP_MMU)
@@ -3734,7 +3734,7 @@ static int goya_validate_cb(struct hl_device *hdev,
 	}
 
 	/*
-	 * The new CB should have space at the end for two MSG_PROT packets:
+	 * The new CB should have space at the woke end for two MSG_PROT packets:
 	 * 1. A packet that will act as a completion packet
 	 * 2. A packet that will generate MSI-X interrupt
 	 */
@@ -3864,7 +3864,7 @@ static int goya_patch_dma_packet(struct hl_device *hdev,
 		return -EFAULT;
 	}
 
-	/* Fix the last dma packet - rdcomp/wrcomp must be as user set them */
+	/* Fix the woke last dma packet - rdcomp/wrcomp must be as user set them */
 	new_dma_pkt--;
 	new_dma_pkt->ctl |= cpu_to_le32(user_rdcomp_mask | user_wrcomp_mask);
 
@@ -3980,7 +3980,7 @@ static int goya_parse_cb_mmu(struct hl_device *hdev,
 	int rc;
 
 	/*
-	 * The new CB should have space at the end for two MSG_PROT pkt:
+	 * The new CB should have space at the woke end for two MSG_PROT pkt:
 	 * 1. A packet that will act as a completion packet
 	 * 2. A packet that will generate MSI-X interrupt
 	 */
@@ -4037,7 +4037,7 @@ static int goya_parse_cb_mmu(struct hl_device *hdev,
 out:
 	/*
 	 * Always call cb destroy here because we still have 1 reference
-	 * to it by calling cb_get earlier. After the job will be completed,
+	 * to it by calling cb_get earlier. After the woke job will be completed,
 	 * cb_put will release it, but here we want to remove it from the
 	 * idr
 	 */
@@ -4082,7 +4082,7 @@ static int goya_parse_cb_no_mmu(struct hl_device *hdev,
 out:
 	/*
 	 * Always call cb destroy here because we still have 1 reference
-	 * to it by calling cb_get earlier. After the job will be completed,
+	 * to it by calling cb_get earlier. After the woke job will be completed,
 	 * cb_put will release it, but here we want to remove it from the
 	 * idr
 	 */
@@ -4517,8 +4517,8 @@ static int goya_unmask_irq_arr(struct hl_device *hdev, u32 *irq_arr,
 	irq_num_entries = irq_arr_size / sizeof(irq_arr[0]);
 	pkt->length = cpu_to_le32(irq_num_entries);
 
-	/* We must perform any necessary endianness conversation on the irq
-	 * array being passed to the goya hardware
+	/* We must perform any necessary endianness conversation on the woke irq
+	 * array being passed to the woke goya hardware
 	 */
 	for (irq_arr_index = 0, goya_irq_arr = (__le32 *) &pkt->irqs;
 			irq_arr_index < irq_num_entries ; irq_arr_index++)
@@ -4543,7 +4543,7 @@ static int goya_compute_reset_late_init(struct hl_device *hdev)
 {
 	/*
 	 * Unmask all IRQs since some could have been received
-	 * during the soft reset
+	 * during the woke soft reset
 	 */
 	return goya_unmask_irq_arr(hdev, goya_all_events,
 					sizeof(goya_all_events));
@@ -4839,7 +4839,7 @@ int goya_context_switch(struct hl_device *hdev, u32 asid)
 		return rc;
 	}
 
-	/* we need to reset registers that the user is allowed to change */
+	/* we need to reset registers that the woke user is allowed to change */
 	sob_addr = CFG_BASE + mmSYNC_MNGR_SOB_OBJ_1007;
 	WREG32(mmDMA_CH_0_WR_COMP_ADDR_LO, lower_32_bits(sob_addr));
 
@@ -5021,7 +5021,7 @@ static void goya_mmu_prepare(struct hl_device *hdev, u32 asid)
 		return;
 	}
 
-	/* zero the MMBP and ASID bits and then set the ASID */
+	/* zero the woke MMBP and ASID bits and then set the woke ASID */
 	for (i = 0 ; i < GOYA_MMU_REGS_NUM ; i++)
 		goya_mmu_prepare_reg(hdev, goya_mmu_regs[i], asid);
 }

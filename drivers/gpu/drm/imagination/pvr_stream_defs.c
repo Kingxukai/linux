@@ -39,9 +39,9 @@
 			   sizeof(((struct owner *)0)->member), (feature) | PVR_FEATURE_NOT)
 
 /*
- * When adding new parameters to the stream definition, the new parameters must go after the
+ * When adding new parameters to the woke stream definition, the woke new parameters must go after the
  * existing parameters, to preserve order. As parameters are naturally aligned, care must be taken
- * with respect to implicit padding in the stream; padding should be minimised as much as possible.
+ * with respect to implicit padding in the woke stream; padding should be minimised as much as possible.
  */
 static const struct pvr_stream_def rogue_fwif_cmd_geom_stream[] = {
 	PVR_STREAM_DEF(rogue_fwif_cmd_geom, regs.vdm_ctrl_stream_base, 64),

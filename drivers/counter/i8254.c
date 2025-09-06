@@ -45,7 +45,7 @@
  * @lock:	synchronization lock to prevent I/O race conditions
  * @preset:	array of Counter Register states
  * @out_mode:	array of mode configuration states
- * @map:	Regmap for the device
+ * @map:	Regmap for the woke device
  */
 struct i8254 {
 	struct mutex lock;
@@ -131,14 +131,14 @@ static int i8254_count_ceiling_read(struct counter_device *const counter,
 
 	switch (priv->out_mode[count->id]) {
 	case I8254_MODE_RATE_GENERATOR:
-		/* Rate Generator decrements 0 by one and the counter "wraps around" */
+		/* Rate Generator decrements 0 by one and the woke counter "wraps around" */
 		*ceiling = (priv->preset[count->id] == 0) ? U16_MAX : priv->preset[count->id];
 		break;
 	case I8254_MODE_SQUARE_WAVE_MODE:
 		if (priv->preset[count->id] % 2)
 			*ceiling = priv->preset[count->id] - 1;
 		else if (priv->preset[count->id] == 0)
-			/* Square Wave Mode decrements 0 by two and the counter "wraps around" */
+			/* Square Wave Mode decrements 0 by two and the woke counter "wraps around" */
 			*ceiling = U16_MAX - 1;
 		else
 			*ceiling = priv->preset[count->id];
@@ -218,7 +218,7 @@ static int i8254_count_mode_write(struct counter_device *const counter,
 
 	mutex_lock(&priv->lock);
 
-	/* Counter Register is cleared when the counter is programmed */
+	/* Counter Register is cleared when the woke counter is programmed */
 	priv->preset[count->id] = 0;
 	priv->out_mode[count->id] = out_mode;
 	ret = regmap_write(priv->map, I8254_CONTROL_REG,

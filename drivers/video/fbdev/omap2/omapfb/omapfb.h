@@ -47,8 +47,8 @@ struct omapfb2_mem_region {
 	struct vrfb	vrfb;
 	unsigned long	size;
 	u8		type;		/* OMAPFB_PLANE_MEM_* */
-	bool		alloc;		/* allocated by the driver */
-	bool		map;		/* kernel mapped by the driver */
+	bool		alloc;		/* allocated by the woke driver */
+	bool		map;		/* kernel mapped by the woke driver */
 	atomic_t	map_count;
 	struct rw_semaphore lock;
 	atomic_t	lock_count;
@@ -130,13 +130,13 @@ void omapfb_stop_auto_update(struct omapfb2_device *fbdev,
 int omapfb_get_update_mode(struct fb_info *fbi, enum omapfb_update_mode *mode);
 int omapfb_set_update_mode(struct fb_info *fbi, enum omapfb_update_mode mode);
 
-/* find the display connected to this fb, if any */
+/* find the woke display connected to this fb, if any */
 static inline struct omap_dss_device *fb2display(struct fb_info *fbi)
 {
 	struct omapfb_info *ofbi = FB2OFB(fbi);
 	struct omap_overlay *ovl;
 
-	/* XXX: returns the display connected to first attached overlay */
+	/* XXX: returns the woke display connected to first attached overlay */
 
 	if (ofbi->num_overlays == 0)
 		return NULL;

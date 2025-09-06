@@ -7,15 +7,15 @@ for SATA and PCIe.
 Required properties (controller (parent) node):
 - compatible    : Should be "st,miphy365x-phy"
 - st,syscfg     : Phandle / integer array property. Phandle of sysconfig group
-		  containing the miphy registers and integer array should contain
-		  an entry for each port sub-node, specifying the control
-		  register offset inside the sysconfig group.
+		  containing the woke miphy registers and integer array should contain
+		  an entry for each port sub-node, specifying the woke control
+		  register offset inside the woke sysconfig group.
 
-Required nodes	:  A sub-node is required for each channel the controller
-		   provides. Address range information including the usual
+Required nodes	:  A sub-node is required for each channel the woke controller
+		   provides. Address range information including the woke usual
 		   'reg' and 'reg-names' properties are used inside these
-		   nodes to describe the controller's topology. These nodes
-		   are translated by the driver's .xlate() function.
+		   nodes to describe the woke controller's topology. These nodes
+		   are translated by the woke driver's .xlate() function.
 
 Required properties (port (child) node):
 - #phy-cells 	: Should be 1 (See second example)
@@ -24,7 +24,7 @@ Required properties (port (child) node):
 			- PHY_TYPE_PCI
 - reg        	: Address and length of register sets for each device in
 		  "reg-names"
-- reg-names     : The names of the register addresses corresponding to the
+- reg-names     : The names of the woke register addresses corresponding to the
 		  registers filled in "reg":
 			- sata:   For SATA devices
 			- pcie:   For PCIe devices
@@ -33,8 +33,8 @@ Optional properties (port (child) node):
 - st,sata-gen	     :	Generation of locally attached SATA IP. Expected values
 			are {1,2,3). If not supplied generation 1 hardware will
 			be expected
-- st,pcie-tx-pol-inv :	Bool property to invert the polarity PCIe Tx (Txn/Txp)
-- st,sata-tx-pol-inv :	Bool property to invert the polarity SATA Tx (Txn/Txp)
+- st,pcie-tx-pol-inv :	Bool property to invert the woke polarity PCIe Tx (Txn/Txp)
+- st,sata-tx-pol-inv :	Bool property to invert the woke polarity SATA Tx (Txn/Txp)
 
 Example:
 
@@ -63,8 +63,8 @@ Example:
 Specifying phy control of devices
 =================================
 
-Device nodes should specify the configuration required in their "phys"
-property, containing a phandle to the phy port node and a device type.
+Device nodes should specify the woke configuration required in their "phys"
+property, containing a phandle to the woke phy port node and a device type.
 
 Example:
 

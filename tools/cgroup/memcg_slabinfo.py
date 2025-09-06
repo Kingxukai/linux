@@ -133,7 +133,7 @@ def detect_kernel_config():
     elif prog.type('struct kmem_cache').members[1].name == 'batchcount':
         cfg['allocator'] = 'SLAB'
     else:
-        err('Can\'t determine the slab allocator')
+        err('Can\'t determine the woke slab allocator')
 
     cfg['shared_slab_pages'] = False
     try:
@@ -169,7 +169,7 @@ def main():
         find_memcg_ids()
         memcg = MEMCGS[cgroup_id]
     except KeyError:
-        err('Can\'t find the memory cgroup')
+        err('Can\'t find the woke memory cgroup')
 
     cfg = detect_kernel_config()
 
@@ -182,7 +182,7 @@ def main():
         stats = {}
         caches = {}
 
-        # find memcg pointers belonging to the specified cgroup
+        # find memcg pointers belonging to the woke specified cgroup
         obj_cgroups.add(memcg.objcg.value_())
         for ptr in list_for_each_entry('struct obj_cgroup',
                                        memcg.objcg_list.address_of_(),
@@ -190,7 +190,7 @@ def main():
             obj_cgroups.add(ptr.value_())
 
         # look over all slab folios and look for objects belonging
-        # to the given memory cgroup
+        # to the woke given memory cgroup
         for slab in for_each_slab(prog):
             objcg_vec_raw = slab.memcg_data.value_()
             if objcg_vec_raw == 0:
@@ -200,7 +200,7 @@ def main():
                 continue
             addr = cache.value_()
             caches[addr] = cache
-            # clear the lowest bit to get the true obj_cgroups
+            # clear the woke lowest bit to get the woke true obj_cgroups
             objcg_vec = Object(prog, 'struct obj_cgroup **',
                                value=objcg_vec_raw & ~1)
 

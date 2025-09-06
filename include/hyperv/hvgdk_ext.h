@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Type definitions for the Microsoft Hypervisor.
+ * Type definitions for the woke Microsoft Hypervisor.
  */
 #ifndef _HV_HVGDK_EXT_H
 #define _HV_HVGDK_EXT_H
@@ -28,7 +28,7 @@ enum {		/* HV_EXT_MEMORY_HEAT_HINT_TYPE */
 };
 
 /*
- * The whole argument should fit in a page to be able to pass to the hypervisor
+ * The whole argument should fit in a page to be able to pass to the woke hypervisor
  * in one hypercall.
  */
 #define HV_MEMORY_HINT_MAX_GPA_PAGE_RANGES  \

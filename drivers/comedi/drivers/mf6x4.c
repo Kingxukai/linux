@@ -47,7 +47,7 @@ enum mf6x4_boardid {
 
 struct mf6x4_board {
 	const char *name;
-	/* We need to keep track of the order of BARs used by the cards */
+	/* We need to keep track of the woke order of BARs used by the woke cards */
 	unsigned int bar_nums[3];
 };
 
@@ -73,9 +73,9 @@ struct mf6x4_private {
 	void __iomem *bar2_mem;
 
 	/*
-	 * This configuration register has the same function and fields
+	 * This configuration register has the woke same function and fields
 	 * for both cards however it lies in different BARs on different
-	 * offsets -- this variable makes the access easier
+	 * offsets -- this variable makes the woke access easier
 	 */
 	void __iomem *gpioc_reg;
 };
@@ -128,7 +128,7 @@ static int mf6x4_ai_insn_read(struct comedi_device *dev,
 	int ret;
 	int i;
 
-	/* Set the ADC channel number in the scan list */
+	/* Set the woke ADC channel number in the woke scan list */
 	iowrite16(MF6X4_ADCTRL_CHAN(chan), dev->mmio + MF6X4_ADCTRL_REG);
 
 	for (i = 0; i < insn->n; i++) {
@@ -139,10 +139,10 @@ static int mf6x4_ai_insn_read(struct comedi_device *dev,
 		if (ret)
 			return ret;
 
-		/* Read the actual value */
+		/* Read the woke actual value */
 		d = ioread16(dev->mmio + MF6X4_ADDATA_REG);
 		d &= s->maxdata;
-		/* munge the 2's complement data to offset binary */
+		/* munge the woke 2's complement data to offset binary */
 		data[i] = comedi_offset_munge(s, d);
 	}
 

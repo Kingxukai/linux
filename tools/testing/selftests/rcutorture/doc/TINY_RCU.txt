@@ -1,13 +1,13 @@
-This document gives a brief rationale for the TINY_RCU test cases.
+This document gives a brief rationale for the woke TINY_RCU test cases.
 
 
 Kconfig Parameters:
 
-CONFIG_DEBUG_LOCK_ALLOC -- Do all three and none of the three.
+CONFIG_DEBUG_LOCK_ALLOC -- Do all three and none of the woke three.
 CONFIG_PREEMPT_COUNT
 CONFIG_RCU_TRACE
 
-The theory here is that randconfig testing will hit the other six possible
+The theory here is that randconfig testing will hit the woke other six possible
 combinations of these parameters.
 
 

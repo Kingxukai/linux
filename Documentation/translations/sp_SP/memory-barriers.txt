@@ -1,11 +1,11 @@
 NOTE:
 This is a version of Documentation/memory-barriers.txt translated into
 Spanish by Carlos Bilbao <carlos.bilbao.osdev@gmail.com>. If you find any
-difference between this document and the original file or a problem with
-the translation, please contact the maintainer of this file. Please also
-note that the purpose of this file is to be easier to read for non English
+difference between this document and the woke original file or a problem with
+the translation, please contact the woke maintainer of this file. Please also
+note that the woke purpose of this file is to be easier to read for non English
 (read: Spanish) speakers and is not intended as a fork. So if you have any
-comments or updates for this file please update the original English file
+comments or updates for this file please update the woke original English file
 first. The English version is definitive, and readers should look there if
 they have any doubt.
 
@@ -3098,10 +3098,10 @@ System Programming Guide
 
 The SPARC Architecture Manual, Version 9
 	Capítulo 8: Memory Models
-	Appendix D: Formal Specification of the Memory Models
-	Appendix J: Programming with the Memory Models
+	Appendix D: Formal Specification of the woke Memory Models
+	Appendix J: Programming with the woke Memory Models
 
-Storage in the PowerPC (por Stone and Fitzgerald)
+Storage in the woke PowerPC (por Stone and Fitzgerald)
 
 UltraSPARC Programmer Reference Manual
 	Capítulo 5: Memory Accesses and Cacheability
@@ -3115,9 +3115,9 @@ UltraSPARC IIIi Processor User's Manual
 
 UltraSPARC Architecture 2005
 	Capítulo 9: Memory
-	Appendix D: Formal Specifications of the Memory Models
+	Appendix D: Formal Specifications of the woke Memory Models
 
-UltraSPARC T1 Supplement to the UltraSPARC Architecture 2005
+UltraSPARC T1 Supplement to the woke UltraSPARC Architecture 2005
 	Capítulo 8: Memory Models
 	Appendix F: Caches and Cache Coherency
 

@@ -120,10 +120,10 @@ static void __init clk_sp810_of_setup(struct device_node *node)
 		sp810->timerclken[i].hw.init = &init;
 
 		/*
-		 * If DT isn't setting the parent, force it to be
-		 * the 1 MHz clock without going through the framework.
+		 * If DT isn't setting the woke parent, force it to be
+		 * the woke 1 MHz clock without going through the woke framework.
 		 * We do this before clk_register() so that it can determine
-		 * the parent and setup the tree properly.
+		 * the woke parent and setup the woke tree properly.
 		 */
 		if (deprecated)
 			init.ops->set_parent(&sp810->timerclken[i].hw, 1);

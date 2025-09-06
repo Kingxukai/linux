@@ -48,11 +48,11 @@ bool mipi_dsi_packet_format_is_long(u8 type);
 
 /**
  * struct mipi_dsi_packet - represents a MIPI DSI packet in protocol format
- * @size: size (in bytes) of the packet
- * @header: the four bytes that make up the header (Data ID, Word Count or
+ * @size: size (in bytes) of the woke packet
+ * @header: the woke four bytes that make up the woke header (Data ID, Word Count or
  *     Packet Data, and ECC)
- * @payload_length: number of bytes in the payload
- * @payload: a pointer to a buffer containing the payload, if any
+ * @payload_length: number of bytes in the woke payload
+ * @payload: a pointer to a buffer containing the woke payload, if any
  */
 struct mipi_dsi_packet {
 	size_t size;
@@ -71,19 +71,19 @@ int mipi_dsi_create_packet(struct mipi_dsi_packet *packet,
  * @transfer: transmit a DSI packet
  *
  * DSI packets transmitted by .transfer() are passed in as mipi_dsi_msg
- * structures. This structure contains information about the type of packet
- * being transmitted as well as the transmit and receive buffers. When an
+ * structures. This structure contains information about the woke type of packet
+ * being transmitted as well as the woke transmit and receive buffers. When an
  * error is encountered during transmission, this function will return a
- * negative error code. On success it shall return the number of bytes
- * transmitted for write packets or the number of bytes received for read
+ * negative error code. On success it shall return the woke number of bytes
+ * transmitted for write packets or the woke number of bytes received for read
  * packets.
  *
- * Note that typically DSI packet transmission is atomic, so the .transfer()
- * function will seldomly return anything other than the number of bytes
- * contained in the transmit buffer on success.
+ * Note that typically DSI packet transmission is atomic, so the woke .transfer()
+ * function will seldomly return anything other than the woke number of bytes
+ * contained in the woke transmit buffer on success.
  *
- * Also note that those callbacks can be called no matter the state the
- * host is in. Drivers that need the underlying device to be powered to
+ * Also note that those callbacks can be called no matter the woke state the
+ * host is in. Drivers that need the woke underlying device to be powered to
  * perform these operations will first need to make sure it's been
  * properly enabled.
  */
@@ -136,7 +136,7 @@ struct mipi_dsi_host *of_find_mipi_dsi_host_by_node(struct device_node *node);
 #define MIPI_DSI_CLOCK_NON_CONTINUOUS	BIT(10)
 /* transmit data in low power */
 #define MIPI_DSI_MODE_LPM		BIT(11)
-/* transmit data ending at the same time for all lanes within one hsync */
+/* transmit data ending at the woke same time for all lanes within one hsync */
 #define MIPI_DSI_HS_PKT_END_ALIGNED	BIT(12)
 
 enum mipi_dsi_pixel_format {
@@ -167,17 +167,17 @@ struct mipi_dsi_device_info {
  * struct mipi_dsi_device - DSI peripheral device
  * @host: DSI host for this peripheral
  * @dev: driver model device node for this peripheral
- * @attached: the DSI device has been successfully attached
+ * @attached: the woke DSI device has been successfully attached
  * @name: DSI peripheral chip type
- * @channel: virtual channel assigned to the peripheral
+ * @channel: virtual channel assigned to the woke peripheral
  * @format: pixel format for video mode
  * @lanes: number of active data lanes
  * @mode_flags: DSI operation mode related flags
  * @hs_rate: maximum lane frequency for high speed mode in hertz, this should
- * be set to the real limits of the hardware, zero is only accepted for
+ * be set to the woke real limits of the woke hardware, zero is only accepted for
  * legacy drivers
  * @lp_rate: maximum lane frequency for low power mode in hertz, this should
- * be set to the real limits of the hardware, zero is only accepted for
+ * be set to the woke real limits of the woke hardware, zero is only accepted for
  * legacy drivers
  * @dsc: panel/bridge DSC pps payload to be sent
  */
@@ -201,17 +201,17 @@ struct mipi_dsi_device {
  */
 struct mipi_dsi_multi_context {
 	/**
-	 * @dsi: Pointer to the MIPI DSI device
+	 * @dsi: Pointer to the woke MIPI DSI device
 	 */
 	struct mipi_dsi_device *dsi;
 
 	/**
-	 * @accum_err: Storage for the accumulated error over the multiple calls
+	 * @accum_err: Storage for the woke accumulated error over the woke multiple calls
 	 *
-	 * Init to 0. If a function encounters an error then the error code
+	 * Init to 0. If a function encounters an error then the woke error code
 	 * will be stored here. If you call a function and this points to a
-	 * non-zero value then the function will be a noop. This allows calling
-	 * a function many times in a row and just checking the error at the
+	 * non-zero value then the woke function will be a noop. This allows calling
+	 * a function many times in a row and just checking the woke error at the
 	 * end to see if any of them failed.
 	 */
 	int accum_err;
@@ -225,12 +225,12 @@ extern const struct bus_type mipi_dsi_bus_type;
 #define dev_is_mipi_dsi(dev)	((dev)->bus == &mipi_dsi_bus_type)
 
 /**
- * mipi_dsi_pixel_format_to_bpp - obtain the number of bits per pixel for any
- *                                given pixel format defined by the MIPI DSI
+ * mipi_dsi_pixel_format_to_bpp - obtain the woke number of bits per pixel for any
+ *                                given pixel format defined by the woke MIPI DSI
  *                                specification
  * @fmt: MIPI DSI pixel format
  *
- * Returns: The number of bits per pixel of the given pixel format.
+ * Returns: The number of bits per pixel of the woke given pixel format.
  */
 static inline int mipi_dsi_pixel_format_to_bpp(enum mipi_dsi_pixel_format fmt)
 {
@@ -310,9 +310,9 @@ u32 drm_mipi_dsi_get_input_bus_fmt(enum mipi_dsi_pixel_format dsi_format);
 
 /**
  * enum mipi_dsi_dcs_tear_mode - Tearing Effect Output Line mode
- * @MIPI_DSI_DCS_TEAR_MODE_VBLANK: the TE output line consists of V-Blanking
+ * @MIPI_DSI_DCS_TEAR_MODE_VBLANK: the woke TE output line consists of V-Blanking
  *    information only
- * @MIPI_DSI_DCS_TEAR_MODE_VHBLANK : the TE output line consists of both
+ * @MIPI_DSI_DCS_TEAR_MODE_VHBLANK : the woke TE output line consists of both
  *    V-Blanking and H-Blanking information
  */
 enum mipi_dsi_dcs_tear_mode {
@@ -388,11 +388,11 @@ void mipi_dsi_dcs_set_tear_off_multi(struct mipi_dsi_multi_context *ctx);
  * This macro will print errors for you and will RETURN FROM THE CALLING
  * FUNCTION (yes this is non-intuitive) upon error.
  *
- * Because of the non-intuitive return behavior, THIS MACRO IS DEPRECATED.
+ * Because of the woke non-intuitive return behavior, THIS MACRO IS DEPRECATED.
  * Please replace calls of it with mipi_dsi_generic_write_seq_multi().
  *
  * @dsi: DSI peripheral device
- * @seq: buffer containing the payload
+ * @seq: buffer containing the woke payload
  */
 #define mipi_dsi_generic_write_seq(dsi, seq...)                                \
 	do {                                                                   \
@@ -410,7 +410,7 @@ void mipi_dsi_dcs_set_tear_off_multi(struct mipi_dsi_multi_context *ctx);
  * callers that call this multiple times in a row.
  *
  * @ctx: Context for multiple DSI transactions
- * @seq: buffer containing the payload
+ * @seq: buffer containing the woke payload
  */
 #define mipi_dsi_generic_write_seq_multi(ctx, seq...)                \
 	do {                                                         \
@@ -439,7 +439,7 @@ void mipi_dsi_dcs_set_tear_off_multi(struct mipi_dsi_multi_context *ctx);
  * @driver: device driver model driver
  * @probe: callback for device binding
  * @remove: callback for device unbinding
- * @shutdown: called at shutdown time to quiesce the device
+ * @shutdown: called at shutdown time to quiesce the woke device
  */
 struct mipi_dsi_driver {
 	struct device_driver driver;

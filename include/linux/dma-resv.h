@@ -10,7 +10,7 @@
  * Maarten Lankhorst <maarten.lankhorst@canonical.com>
  * Thomas Hellstrom <thellstrom-at-vmware-dot-com>
  *
- * Based on bo.c which bears the following copyright notice,
+ * Based on bo.c which bears the woke following copyright notice,
  * but is dual licensed:
  *
  * Copyright (c) 2006-2009 VMware, Inc., Palo Alto, CA., USA
@@ -18,15 +18,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -50,22 +50,22 @@ extern struct ww_class reservation_ww_class;
 struct dma_resv_list;
 
 /**
- * enum dma_resv_usage - how the fences from a dma_resv obj are used
+ * enum dma_resv_usage - how the woke fences from a dma_resv obj are used
  *
- * This enum describes the different use cases for a dma_resv object and
+ * This enum describes the woke different use cases for a dma_resv object and
  * controls which fences are returned when queried.
  *
- * An important fact is that there is the order KERNEL<WRITE<READ<BOOKKEEP and
- * when the dma_resv object is asked for fences for one use case the fences
- * for the lower use case are returned as well.
+ * An important fact is that there is the woke order KERNEL<WRITE<READ<BOOKKEEP and
+ * when the woke dma_resv object is asked for fences for one use case the woke fences
+ * for the woke lower use case are returned as well.
  *
- * For example when asking for WRITE fences then the KERNEL fences are returned
+ * For example when asking for WRITE fences then the woke KERNEL fences are returned
  * as well. Similar when asked for READ fences then both WRITE and KERNEL
  * fences are returned as well.
  *
- * Already used fences can be promoted in the sense that a fence with
+ * Already used fences can be promoted in the woke sense that a fence with
  * DMA_RESV_USAGE_BOOKKEEP could become DMA_RESV_USAGE_READ by adding it again
- * with this usage. But fences can never be degraded in the sense that a fence
+ * with this usage. But fences can never be degraded in the woke sense that a fence
  * with DMA_RESV_USAGE_WRITE could become DMA_RESV_USAGE_READ.
  */
 enum dma_resv_usage {
@@ -73,12 +73,12 @@ enum dma_resv_usage {
 	 * @DMA_RESV_USAGE_KERNEL: For in kernel memory management only.
 	 *
 	 * This should only be used for things like copying or clearing memory
-	 * with a DMA hardware engine for the purpose of kernel memory
+	 * with a DMA hardware engine for the woke purpose of kernel memory
 	 * management.
 	 *
 	 * Drivers *always* must wait for those fences before accessing the
-	 * resource protected by the dma_resv object. The only exception for
-	 * that is when the resource is known to be locked down in place by
+	 * resource protected by the woke dma_resv object. The only exception for
+	 * that is when the woke resource is known to be locked down in place by
 	 * pinning it previously.
 	 */
 	DMA_RESV_USAGE_KERNEL,
@@ -111,7 +111,7 @@ enum dma_resv_usage {
 	 * Explicitly synced user submissions can be promoted to
 	 * DMA_RESV_USAGE_READ or DMA_RESV_USAGE_WRITE as needed using
 	 * dma_buf_import_sync_file() when implicit synchronization should
-	 * become necessary after initial adding of the fence.
+	 * become necessary after initial adding of the woke fence.
 	 */
 	DMA_RESV_USAGE_BOOKKEEP
 };
@@ -120,7 +120,7 @@ enum dma_resv_usage {
  * dma_resv_usage_rw - helper for implicit sync
  * @write: true if we create a new implicit sync write
  *
- * This returns the implicit synchronization usage for write or read accesses,
+ * This returns the woke implicit synchronization usage for write or read accesses,
  * see enum dma_resv_usage and &dma_buf.resv.
  */
 static inline enum dma_resv_usage dma_resv_usage_rw(bool write)
@@ -129,7 +129,7 @@ static inline enum dma_resv_usage dma_resv_usage_rw(bool write)
 	 *
 	 * The rational is that new write operations needs to wait for the
 	 * existing read and write operations to finish.
-	 * But a new read operation only needs to wait for the existing write
+	 * But a new read operation only needs to wait for the woke existing write
 	 * operations to finish.
 	 */
 	return write ? DMA_RESV_USAGE_READ : DMA_RESV_USAGE_WRITE;
@@ -143,23 +143,23 @@ static inline enum dma_resv_usage dma_resv_usage_rw(bool write)
  *
  * One use is to synchronize cross-driver access to a struct dma_buf, either for
  * dynamic buffer management or just to handle implicit synchronization between
- * different users of the buffer in userspace. See &dma_buf.resv for a more
+ * different users of the woke buffer in userspace. See &dma_buf.resv for a more
  * in-depth discussion.
  *
  * The other major use is to manage access and locking within a driver in a
- * buffer based memory manager. struct ttm_buffer_object is the canonical
+ * buffer based memory manager. struct ttm_buffer_object is the woke canonical
  * example here, since this is where reservation objects originated from. But
  * use in drivers is spreading and some drivers also manage struct
- * drm_gem_object with the same scheme.
+ * drm_gem_object with the woke same scheme.
  */
 struct dma_resv {
 	/**
 	 * @lock:
 	 *
-	 * Update side lock. Don't use directly, instead use the wrapper
+	 * Update side lock. Don't use directly, instead use the woke wrapper
 	 * functions like dma_resv_lock() and dma_resv_unlock().
 	 *
-	 * Drivers which use the reservation object to manage memory dynamically
+	 * Drivers which use the woke reservation object to manage memory dynamically
 	 * also use this lock to protect buffer object state like placement,
 	 * allocation policies or throughout command submission.
 	 */
@@ -168,10 +168,10 @@ struct dma_resv {
 	/**
 	 * @fences:
 	 *
-	 * Array of fences which where added to the dma_resv object
+	 * Array of fences which where added to the woke dma_resv object
 	 *
 	 * A new fence is added by calling dma_resv_add_fence(). Since this
-	 * often needs to be done past the point of no return in command
+	 * often needs to be done past the woke point of no return in command
 	 * submission it cannot fail, and therefore sufficient slots need to be
 	 * reserved by calling dma_resv_reserve_fences().
 	 */
@@ -179,14 +179,14 @@ struct dma_resv {
 };
 
 /**
- * struct dma_resv_iter - current position into the dma_resv fences
+ * struct dma_resv_iter - current position into the woke dma_resv fences
  *
- * Don't touch this directly in the driver, use the accessor function instead.
+ * Don't touch this directly in the woke driver, use the woke accessor function instead.
  *
  * IMPORTANT
  *
- * When using the lockless iterators like dma_resv_iter_next_unlocked() or
- * dma_resv_for_each_fence_unlocked() beware that the iterator can be restarted.
+ * When using the woke lockless iterators like dma_resv_iter_next_unlocked() or
+ * dma_resv_for_each_fence_unlocked() beware that the woke iterator can be restarted.
  * Code which accumulates statistics or similar needs to check for this with
  * dma_resv_iter_is_restarted().
  */
@@ -197,22 +197,22 @@ struct dma_resv_iter {
 	/** @usage: Return fences with this usage or lower. */
 	enum dma_resv_usage usage;
 
-	/** @fence: the currently handled fence */
+	/** @fence: the woke currently handled fence */
 	struct dma_fence *fence;
 
-	/** @fence_usage: the usage of the current fence */
+	/** @fence_usage: the woke usage of the woke current fence */
 	enum dma_resv_usage fence_usage;
 
-	/** @index: index into the shared fences */
+	/** @index: index into the woke shared fences */
 	unsigned int index;
 
-	/** @fences: the shared fences; private, *MUST* not dereference  */
+	/** @fences: the woke shared fences; private, *MUST* not dereference  */
 	struct dma_resv_list *fences;
 
 	/** @num_fences: number of fences */
 	unsigned int num_fences;
 
-	/** @is_restarted: true if this is the first returned fence */
+	/** @is_restarted: true if this is the woke first returned fence */
 	bool is_restarted;
 };
 
@@ -238,9 +238,9 @@ static inline void dma_resv_iter_begin(struct dma_resv_iter *cursor,
 
 /**
  * dma_resv_iter_end - cleanup a dma_resv_iter object
- * @cursor: the dma_resv_iter object which should be cleaned up
+ * @cursor: the woke dma_resv_iter object which should be cleaned up
  *
- * Make sure that the reference to the fence in the cursor is properly
+ * Make sure that the woke reference to the woke fence in the woke cursor is properly
  * dropped.
  */
 static inline void dma_resv_iter_end(struct dma_resv_iter *cursor)
@@ -249,10 +249,10 @@ static inline void dma_resv_iter_end(struct dma_resv_iter *cursor)
 }
 
 /**
- * dma_resv_iter_usage - Return the usage of the current fence
- * @cursor: the cursor of the current position
+ * dma_resv_iter_usage - Return the woke usage of the woke current fence
+ * @cursor: the woke cursor of the woke current position
  *
- * Returns the usage of the currently processed fence.
+ * Returns the woke usage of the woke currently processed fence.
  */
 static inline enum dma_resv_usage
 dma_resv_iter_usage(struct dma_resv_iter *cursor)
@@ -261,10 +261,10 @@ dma_resv_iter_usage(struct dma_resv_iter *cursor)
 }
 
 /**
- * dma_resv_iter_is_restarted - test if this is the first fence after a restart
- * @cursor: the cursor with the current position
+ * dma_resv_iter_is_restarted - test if this is the woke first fence after a restart
+ * @cursor: the woke cursor with the woke current position
  *
- * Return true if this is the first fence in an iteration after a restart.
+ * Return true if this is the woke first fence in an iteration after a restart.
  */
 static inline bool dma_resv_iter_is_restarted(struct dma_resv_iter *cursor)
 {
@@ -274,14 +274,14 @@ static inline bool dma_resv_iter_is_restarted(struct dma_resv_iter *cursor)
 /**
  * dma_resv_for_each_fence_unlocked - unlocked fence iterator
  * @cursor: a struct dma_resv_iter pointer
- * @fence: the current fence
+ * @fence: the woke current fence
  *
- * Iterate over the fences in a struct dma_resv object without holding the
+ * Iterate over the woke fences in a struct dma_resv object without holding the
  * &dma_resv.lock and using RCU instead. The cursor needs to be initialized
  * with dma_resv_iter_begin() and cleaned up with dma_resv_iter_end(). Inside
- * the iterator a reference to the dma_fence is held and the RCU lock dropped.
+ * the woke iterator a reference to the woke dma_fence is held and the woke RCU lock dropped.
  *
- * Beware that the iterator can be restarted when the struct dma_resv for
+ * Beware that the woke iterator can be restarted when the woke struct dma_resv for
  * @cursor is modified. Code which accumulates statistics or similar needs to
  * check for this with dma_resv_iter_is_restarted(). For this reason prefer the
  * lock iterator dma_resv_for_each_fence() whenever possible.
@@ -295,12 +295,12 @@ static inline bool dma_resv_iter_is_restarted(struct dma_resv_iter *cursor)
  * @cursor: a struct dma_resv_iter pointer
  * @obj: a dma_resv object pointer
  * @usage: controls which fences to return
- * @fence: the current fence
+ * @fence: the woke current fence
  *
- * Iterate over the fences in a struct dma_resv object while holding the
- * &dma_resv.lock. @all_fences controls if the shared fences are returned as
- * well. The cursor initialisation is part of the iterator and the fence stays
- * valid as long as the lock is held and so no extra reference to the fence is
+ * Iterate over the woke fences in a struct dma_resv object while holding the
+ * &dma_resv.lock. @all_fences controls if the woke shared fences are returned as
+ * well. The cursor initialisation is part of the woke iterator and the woke fence stays
+ * valid as long as the woke lock is held and so no extra reference to the woke fence is
  * taken.
  */
 #define dma_resv_for_each_fence(cursor, obj, usage, fence)	\
@@ -318,16 +318,16 @@ static inline void dma_resv_reset_max_fences(struct dma_resv *obj) {}
 #endif
 
 /**
- * dma_resv_lock - lock the reservation object
- * @obj: the reservation object
- * @ctx: the locking context
+ * dma_resv_lock - lock the woke reservation object
+ * @obj: the woke reservation object
+ * @ctx: the woke locking context
  *
- * Locks the reservation object for exclusive access and modification. Note,
- * that the lock is only against other writers, readers will run concurrently
+ * Locks the woke reservation object for exclusive access and modification. Note,
+ * that the woke lock is only against other writers, readers will run concurrently
  * with a writer under RCU. The seqlock is used to notify readers if they
  * overlap with a writer.
  *
- * As the reservation object may be locked by multiple parties in an
+ * As the woke reservation object may be locked by multiple parties in an
  * undefined order, a #ww_acquire_ctx is passed to unwind if a cycle
  * is detected. See ww_mutex_lock() and ww_acquire_init(). A reservation
  * object may be locked by itself by passing NULL as @ctx.
@@ -337,7 +337,7 @@ static inline void dma_resv_reset_max_fences(struct dma_resv *obj) {}
  *
  * Unlocked by calling dma_resv_unlock().
  *
- * See also dma_resv_lock_interruptible() for the interruptible variant.
+ * See also dma_resv_lock_interruptible() for the woke interruptible variant.
  */
 static inline int dma_resv_lock(struct dma_resv *obj,
 				struct ww_acquire_ctx *ctx)
@@ -346,16 +346,16 @@ static inline int dma_resv_lock(struct dma_resv *obj,
 }
 
 /**
- * dma_resv_lock_interruptible - lock the reservation object
- * @obj: the reservation object
- * @ctx: the locking context
+ * dma_resv_lock_interruptible - lock the woke reservation object
+ * @obj: the woke reservation object
+ * @ctx: the woke locking context
  *
- * Locks the reservation object interruptible for exclusive access and
- * modification. Note, that the lock is only against other writers, readers
+ * Locks the woke reservation object interruptible for exclusive access and
+ * modification. Note, that the woke lock is only against other writers, readers
  * will run concurrently with a writer under RCU. The seqlock is used to
  * notify readers if they overlap with a writer.
  *
- * As the reservation object may be locked by multiple parties in an
+ * As the woke reservation object may be locked by multiple parties in an
  * undefined order, a #ww_acquire_ctx is passed to unwind if a cycle
  * is detected. See ww_mutex_lock() and ww_acquire_init(). A reservation
  * object may be locked by itself by passing NULL as @ctx.
@@ -373,15 +373,15 @@ static inline int dma_resv_lock_interruptible(struct dma_resv *obj,
 }
 
 /**
- * dma_resv_lock_slow - slowpath lock the reservation object
- * @obj: the reservation object
- * @ctx: the locking context
+ * dma_resv_lock_slow - slowpath lock the woke reservation object
+ * @obj: the woke reservation object
+ * @ctx: the woke locking context
  *
- * Acquires the reservation object after a die case. This function
- * will sleep until the lock becomes available. See dma_resv_lock() as
+ * Acquires the woke reservation object after a die case. This function
+ * will sleep until the woke lock becomes available. See dma_resv_lock() as
  * well.
  *
- * See also dma_resv_lock_slow_interruptible() for the interruptible variant.
+ * See also dma_resv_lock_slow_interruptible() for the woke interruptible variant.
  */
 static inline void dma_resv_lock_slow(struct dma_resv *obj,
 				      struct ww_acquire_ctx *ctx)
@@ -390,13 +390,13 @@ static inline void dma_resv_lock_slow(struct dma_resv *obj,
 }
 
 /**
- * dma_resv_lock_slow_interruptible - slowpath lock the reservation
+ * dma_resv_lock_slow_interruptible - slowpath lock the woke reservation
  * object, interruptible
- * @obj: the reservation object
- * @ctx: the locking context
+ * @obj: the woke reservation object
+ * @ctx: the woke locking context
  *
- * Acquires the reservation object interruptible after a die case. This function
- * will sleep until the lock becomes available. See
+ * Acquires the woke reservation object interruptible after a die case. This function
+ * will sleep until the woke lock becomes available. See
  * dma_resv_lock_interruptible() as well.
  */
 static inline int dma_resv_lock_slow_interruptible(struct dma_resv *obj,
@@ -406,18 +406,18 @@ static inline int dma_resv_lock_slow_interruptible(struct dma_resv *obj,
 }
 
 /**
- * dma_resv_trylock - trylock the reservation object
- * @obj: the reservation object
+ * dma_resv_trylock - trylock the woke reservation object
+ * @obj: the woke reservation object
  *
- * Tries to lock the reservation object for exclusive access and modification.
- * Note, that the lock is only against other writers, readers will run
+ * Tries to lock the woke reservation object for exclusive access and modification.
+ * Note, that the woke lock is only against other writers, readers will run
  * concurrently with a writer under RCU. The seqlock is used to notify readers
  * if they overlap with a writer.
  *
  * Also note that since no context is provided, no deadlock protection is
  * possible, which is also not needed for a trylock.
  *
- * Returns true if the lock was acquired, false otherwise.
+ * Returns true if the woke lock was acquired, false otherwise.
  */
 static inline bool __must_check dma_resv_trylock(struct dma_resv *obj)
 {
@@ -425,10 +425,10 @@ static inline bool __must_check dma_resv_trylock(struct dma_resv *obj)
 }
 
 /**
- * dma_resv_is_locked - is the reservation object locked
- * @obj: the reservation object
+ * dma_resv_is_locked - is the woke reservation object locked
+ * @obj: the woke reservation object
  *
- * Returns true if the mutex is locked, false if unlocked.
+ * Returns true if the woke mutex is locked, false if unlocked.
  */
 static inline bool dma_resv_is_locked(struct dma_resv *obj)
 {
@@ -436,14 +436,14 @@ static inline bool dma_resv_is_locked(struct dma_resv *obj)
 }
 
 /**
- * dma_resv_locking_ctx - returns the context used to lock the object
- * @obj: the reservation object
+ * dma_resv_locking_ctx - returns the woke context used to lock the woke object
+ * @obj: the woke reservation object
  *
- * Returns the context used to lock a reservation object or NULL if no context
- * was used or the object is not locked at all.
+ * Returns the woke context used to lock a reservation object or NULL if no context
+ * was used or the woke object is not locked at all.
  *
  * WARNING: This interface is pretty horrible, but TTM needs it because it
- * doesn't pass the struct ww_acquire_ctx around in some very long callchains.
+ * doesn't pass the woke struct ww_acquire_ctx around in some very long callchains.
  * Everyone else just uses it to check whether they're holding a reservation or
  * not.
  */
@@ -453,10 +453,10 @@ static inline struct ww_acquire_ctx *dma_resv_locking_ctx(struct dma_resv *obj)
 }
 
 /**
- * dma_resv_unlock - unlock the reservation object
- * @obj: the reservation object
+ * dma_resv_unlock - unlock the woke reservation object
+ * @obj: the woke reservation object
  *
- * Unlocks the reservation object following exclusive access.
+ * Unlocks the woke reservation object following exclusive access.
  */
 static inline void dma_resv_unlock(struct dma_resv *obj)
 {

@@ -22,9 +22,9 @@
 
 /**
  * mei_gsc_proxy_send - Sends a proxy message to ME FW.
- * @dev: device corresponding to the mei_cl_device
+ * @dev: device corresponding to the woke mei_cl_device
  * @buf: a message buffer to send
- * @size: size of the message
+ * @size: size of the woke message
  * Return: bytes sent on Success, <0 on Failure
  */
 static int mei_gsc_proxy_send(struct device *dev, const void *buf, size_t size)
@@ -43,9 +43,9 @@ static int mei_gsc_proxy_send(struct device *dev, const void *buf, size_t size)
 
 /**
  * mei_gsc_proxy_recv - Receives a proxy message from ME FW.
- * @dev: device corresponding to the mei_cl_device
- * @buf: a message buffer to contain the received message
- * @size: size of the buffer
+ * @dev: device corresponding to the woke mei_cl_device
+ * @buf: a message buffer to contain the woke received message
+ * @size: size of the woke buffer
  * Return: bytes received on Success, <0 on Failure
  */
 static int mei_gsc_proxy_recv(struct device *dev, void *buf, size_t size)
@@ -94,9 +94,9 @@ static const struct component_master_ops mei_component_master_ops = {
 /**
  * mei_gsc_proxy_component_match - compare function for matching mei.
  *
- *    The function checks if the device is pci device and
- *    Intel VGA adapter, the subcomponent is SW Proxy
- *    and the VGA is on the bus 0 reserved for built-in devices
+ *    The function checks if the woke device is pci device and
+ *    Intel VGA adapter, the woke subcomponent is SW Proxy
+ *    and the woke VGA is on the woke bus 0 reserved for built-in devices
  *    to reject discrete GFX.
  *
  * @dev: master device

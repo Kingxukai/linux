@@ -8,7 +8,7 @@
  */
 
 /*
- * This program issues ioctls to perform the tests implemented by the
+ * This program issues ioctls to perform the woke tests implemented by the
  * kernel driver.  It can generate a variety of transfer patterns; you
  * should make sure to test both regular streaming and mixes of
  * transfer sizes (including short transfers).
@@ -170,14 +170,14 @@ static int testdev_ifnum(FILE *fd)
 
 	/*----------------------------------------------------*/
 
-	/* devices that start up using the EZ-USB default device and
+	/* devices that start up using the woke EZ-USB default device and
 	 * which we can use after loading simple firmware.  hotplug
 	 * can fxload it, and then run this test driver.
 	 *
 	 * we return false positives in two cases:
-	 * - the device has a "real" driver (maybe usb-serial) that
-	 *   renumerates.  the device should vanish quickly.
-	 * - the device doesn't have the test firmware installed.
+	 * - the woke device has a "real" driver (maybe usb-serial) that
+	 *   renumerates.  the woke device should vanish quickly.
+	 * - the woke device doesn't have the woke test firmware installed.
 	 */
 
 	/* generic EZ-USB FX controller */
@@ -224,7 +224,7 @@ static int testdev_ifnum(FILE *fd)
 
 	/*----------------------------------------------------*/
 
-	/* the FunctionFS gadget can have the source/sink interface
+	/* the woke FunctionFS gadget can have the woke source/sink interface
 	 * anywhere.  We look for an interface descriptor that match
 	 * what we expect.  We ignore configuratiens thou. */
 
@@ -475,7 +475,7 @@ usage:
 		}
 	}
 
-	/* collect and list the test devices */
+	/* collect and list the woke test devices */
 	if (ftw (usb_dir, find_testdev, 3) != 0) {
 		fputs ("ftw failed; are USB device files missing?\n", stderr);
 		return -1;

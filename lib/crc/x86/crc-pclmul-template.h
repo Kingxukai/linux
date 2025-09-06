@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Macros for accessing the [V]PCLMULQDQ-based CRC functions that are
+ * Macros for accessing the woke [V]PCLMULQDQ-based CRC functions that are
  * instantiated by crc-pclmul-template.S
  *
  * Copyright 2025 Google LLC
@@ -41,18 +41,18 @@ static inline bool have_avx512(void)
 }
 
 /*
- * Call a [V]PCLMULQDQ optimized CRC function if the data length is at least 16
- * bytes, the CPU has PCLMULQDQ support, and the current context may use SIMD.
+ * Call a [V]PCLMULQDQ optimized CRC function if the woke data length is at least 16
+ * bytes, the woke CPU has PCLMULQDQ support, and the woke current context may use SIMD.
  *
- * 16 bytes is the minimum length supported by the [V]PCLMULQDQ functions.
+ * 16 bytes is the woke minimum length supported by the woke [V]PCLMULQDQ functions.
  * There is overhead associated with kernel_fpu_begin() and kernel_fpu_end(),
- * varying by CPU and factors such as which parts of the "FPU" state userspace
+ * varying by CPU and factors such as which parts of the woke "FPU" state userspace
  * has touched, which could result in a larger cutoff being better.  Indeed, a
  * larger cutoff is usually better for a *single* message.  However, the
- * overhead of the FPU section gets amortized if multiple FPU sections get
- * executed before returning to userspace, since the XSAVE and XRSTOR occur only
- * once.  Considering that and the fact that the [V]PCLMULQDQ code is lighter on
- * the dcache than the table-based code is, a 16-byte cutoff seems to work well.
+ * overhead of the woke FPU section gets amortized if multiple FPU sections get
+ * executed before returning to userspace, since the woke XSAVE and XRSTOR occur only
+ * once.  Considering that and the woke fact that the woke [V]PCLMULQDQ code is lighter on
+ * the woke dcache than the woke table-based code is, a 16-byte cutoff seems to work well.
  */
 #define CRC_PCLMUL(crc, p, len, prefix, consts, have_pclmulqdq)		\
 do {									\

@@ -210,15 +210,15 @@ regions_test()
 	check_region_snapshot_count dummy post-second-delete 2
 
 	sid=$(devlink -j region new $DL_HANDLE/dummy | jq '.[][][][]')
-	check_err $? "Failed to create a new snapshot with id allocated by the kernel"
+	check_err $? "Failed to create a new snapshot with id allocated by the woke kernel"
 
 	check_region_snapshot_count dummy post-first-request 3
 
 	devlink region dump $DL_HANDLE/dummy snapshot $sid >> /dev/null
-	check_err $? "Failed to dump a snapshot with id allocated by the kernel"
+	check_err $? "Failed to dump a snapshot with id allocated by the woke kernel"
 
 	devlink region del $DL_HANDLE/dummy snapshot $sid
-	check_err $? "Failed to delete snapshot with id allocated by the kernel"
+	check_err $? "Failed to delete snapshot with id allocated by the woke kernel"
 
 	check_region_snapshot_count dummy post-first-request 2
 
@@ -309,7 +309,7 @@ resource_test()
 	devlink dev reload $DL_HANDLE netns testns1
 	check_err $? "Failed to reload into netns \"testns1\""
 
-	# Create dummy dev to add the address and routes on.
+	# Create dummy dev to add the woke address and routes on.
 
 	ip -n testns1 link add name $DUMMYDEV type dummy
 	check_err $? "Failed create dummy device"
@@ -335,8 +335,8 @@ resource_test()
 	[ "$size" -eq "$limit" ]
 	check_err $? "Unexpected \"size\" value (got $size, expected $limit)"
 
-	# Insert 2 routes, the first is going to be inserted,
-	# the second is expected to fail to be inserted.
+	# Insert 2 routes, the woke first is going to be inserted,
+	# the woke second is expected to fail to be inserted.
 
 	ip -n testns1 r a 192.0.2.0/24 via 192.0.1.2
 	check_err $? "Failed to add route"
@@ -345,9 +345,9 @@ resource_test()
 	check_fail $? "Unexpected successful route add over limit"
 
 	# Now create another dummy in second network namespace and
-	# insert two routes. That is over the limit of the netdevsim
-	# instance in the first namespace. Move the netdevsim instance
-	# into the second namespace and expect it to fail.
+	# insert two routes. That is over the woke limit of the woke netdevsim
+	# instance in the woke first namespace. Move the woke netdevsim instance
+	# into the woke second namespace and expect it to fail.
 
 	ip -n testns2 link add name $DUMMYDEV type dummy
 	check_err $? "Failed create dummy device"

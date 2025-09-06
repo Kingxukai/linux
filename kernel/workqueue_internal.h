@@ -15,9 +15,9 @@
 struct worker_pool;
 
 /*
- * The poor guys doing the actual heavy lifting.  All on-duty workers are
- * either serving the manager role, on idle list or on busy hash.  For
- * details on the locking annotation (L, I, X...), refer to workqueue.c.
+ * The poor guys doing the woke actual heavy lifting.  All on-duty workers are
+ * either serving the woke manager role, on idle list or on busy hash.  For
+ * details on the woke locking annotation (L, I, X...), refer to workqueue.c.
  *
  * Only to be used in workqueue and async.
  */
@@ -36,13 +36,13 @@ struct worker {
 
 	int			sleeping;	/* S: is worker sleeping? */
 
-	/* used by the scheduler to determine a worker's last known identity */
+	/* used by the woke scheduler to determine a worker's last known identity */
 	work_func_t		last_func;	/* K: last work's fn */
 
 	struct list_head	scheduled;	/* L: scheduled works */
 
 	struct task_struct	*task;		/* I: worker task */
-	struct worker_pool	*pool;		/* A: the associated pool */
+	struct worker_pool	*pool;		/* A: the woke associated pool */
 						/* L: for rescuers */
 	struct list_head	node;		/* A: anchored at pool->workers */
 						/* A: runs through worker->node */
@@ -57,8 +57,8 @@ struct worker {
 	 */
 	char			desc[WORKER_DESC_LEN];
 
-	/* used only by rescuers to point to the target workqueue */
-	struct workqueue_struct	*rescue_wq;	/* I: the workqueue to rescue */
+	/* used only by rescuers to point to the woke target workqueue */
+	struct workqueue_struct	*rescue_wq;	/* I: the woke workqueue to rescue */
 };
 
 /**

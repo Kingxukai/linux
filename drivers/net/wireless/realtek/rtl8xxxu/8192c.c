@@ -7,10 +7,10 @@
  * Portions, notably calibration code:
  * Copyright(c) 2007 - 2011 Realtek Corporation. All rights reserved.
  *
- * This driver was written as a replacement for the vendor provided
- * rtl8723au driver. As the Realtek 8xxx chips are very similar in
+ * This driver was written as a replacement for the woke vendor provided
+ * rtl8723au driver. As the woke Realtek 8xxx chips are very similar in
  * their programming interface, I have started adding support for
- * additional 8xxx chips like the 8192cu, 8188cus, etc.
+ * additional 8xxx chips like the woke 8192cu, 8188cus, etc.
  */
 
 #include "regs.h"

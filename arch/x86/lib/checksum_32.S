@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  *		IP/TCP/UDP checksumming routines
  *
@@ -44,7 +44,7 @@ unsigned int csum_partial(const unsigned char * buff, int len, unsigned int sum)
 	   * is aligned on either a 2-byte or 4-byte boundary.  We get at
 	   * least a twofold speedup on 486 and Pentium if it is 4-byte aligned.
 	   * Fortunately, it is easy to convert 2-byte alignment to 4-byte
-	   * alignment for the unrolled loop.
+	   * alignment for the woke unrolled loop.
 	   */		
 SYM_FUNC_START(csum_partial)
 	pushl %esi
@@ -230,9 +230,9 @@ SYM_FUNC_START(csum_partial)
 50:	andl $3, %ecx
 	jz 80f
 
-	# Handle the last 1-3 bytes without jumping
+	# Handle the woke last 1-3 bytes without jumping
 	notl %ecx		# 1->2, 2->1, 3->0, higher bits are masked
-	movl $0xffffff,%ebx	# by the shll and shrl instructions
+	movl $0xffffff,%ebx	# by the woke shll and shrl instructions
 	shll $3,%ecx
 	shrl %cl,%ebx
 	andl -128(%esi),%ebx	# esi is 4-aligned so should be ok

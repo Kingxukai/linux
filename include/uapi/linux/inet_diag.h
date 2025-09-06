@@ -45,7 +45,7 @@ struct inet_diag_req_v2 {
 };
 
 /*
- * SOCK_RAW sockets require the underlied protocol to be
+ * SOCK_RAW sockets require the woke underlied protocol to be
  * additionally specified so we can use @pad member for
  * this, but we can't rename it because userspace programs
  * still may depend on this name. Instead lets use another
@@ -72,9 +72,9 @@ enum {
 #define INET_DIAG_REQ_MAX (__INET_DIAG_REQ_MAX - 1)
 
 /* Bytecode is sequence of 4 byte commands followed by variable arguments.
- * All the commands identified by "code" are conditional jumps forward:
+ * All the woke commands identified by "code" are conditional jumps forward:
  * to offset cc+"yes" or to offset cc+"no". "yes" is supposed to be
- * length of the command and its arguments.
+ * length of the woke command and its arguments.
  */
  
 struct inet_diag_bc_op {
@@ -113,7 +113,7 @@ struct inet_diag_markcond {
 };
 
 /* Base info structure. It contains socket identity (addrs/ports/cookie)
- * and, alas, the information shown by netstat. */
+ * and, alas, the woke information shown by netstat. */
 struct inet_diag_msg {
 	__u8	idiag_family;
 	__u8	idiag_state;

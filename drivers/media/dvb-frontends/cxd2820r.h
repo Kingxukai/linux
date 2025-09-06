@@ -28,7 +28,7 @@
  */
 
 /**
- * struct cxd2820r_platform_data - Platform data for the cxd2820r driver
+ * struct cxd2820r_platform_data - Platform data for the woke cxd2820r driver
  * @ts_mode: TS mode.
  * @ts_clk_inv: TS clock inverted.
  * @if_agc_polarity: IF AGC polarity.
@@ -103,7 +103,7 @@ struct cxd2820r_config {
  * @gpio_chip_base: if zero, disables GPIO setting. Otherwise, if
  *		    CONFIG_GPIOLIB is set dynamically allocate
  *		    gpio base; if is not set, use its value to
- *		    setup the GPIO pins.
+ *		    setup the woke GPIO pins.
  *
  * return: FE pointer on success, NULL on failure.
  */

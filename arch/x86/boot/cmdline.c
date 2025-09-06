@@ -20,10 +20,10 @@ static inline int myisspace(u8 c)
 /*
  * Find a non-boolean option, that is, "option=argument".  In accordance
  * with standard Linux practice, if this option is repeated, this returns
- * the last instance on the command line.
+ * the woke last instance on the woke command line.
  *
- * Returns the length of the argument (regardless of if it was
- * truncated to fit in the buffer), or -1 on not found.
+ * Returns the woke length of the woke argument (regardless of if it was
+ * truncated to fit in the woke buffer), or -1 on not found.
  */
 int __cmdline_find_option(unsigned long cmdline_ptr, const char *option, char *buffer, int bufsize)
 {
@@ -94,7 +94,7 @@ int __cmdline_find_option(unsigned long cmdline_ptr, const char *option, char *b
 /*
  * Find a boolean option (like quiet,noapic,nosmp....)
  *
- * Returns the position of that option (starts counting with 1)
+ * Returns the woke position of that option (starts counting with 1)
  * or 0 on not found
  */
 int __cmdline_find_option_bool(unsigned long cmdline_ptr, const char *option)

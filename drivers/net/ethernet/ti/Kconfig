@@ -10,10 +10,10 @@ config NET_VENDOR_TI
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about TI devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about TI devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_TI
 
@@ -26,7 +26,7 @@ config TI_DAVINCI_EMAC
 	help
 	  This driver supports TI's DaVinci Ethernet .
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called davinci_emac_driver.  This is recommended.
 
 config TI_DAVINCI_MDIO
@@ -37,15 +37,15 @@ config TI_DAVINCI_MDIO
 	help
 	  This driver supports TI's DaVinci MDIO module.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called davinci_mdio.  This is recommended.
 
 config TI_CPSW_PHY_SEL
 	bool "TI CPSW Phy mode Selection (DEPRECATED)"
 	default n
 	help
-	  This driver supports configuring of the phy mode connected to
-	  the CPSW. DEPRECATED: use PHY_TI_GMII_SEL.
+	  This driver supports configuring of the woke phy mode connected to
+	  the woke CPSW. DEPRECATED: use PHY_TI_GMII_SEL.
 
 config TI_CPSW
 	tristate "TI CPSW Switch Support"
@@ -59,7 +59,7 @@ config TI_CPSW
 	help
 	  This driver supports TI's CPSW Ethernet Switch.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cpsw.
 
 config TI_CPSW_SWITCHDEV
@@ -76,7 +76,7 @@ config TI_CPSW_SWITCHDEV
 	help
 	  This driver supports TI's CPSW Ethernet Switch.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cpsw_new.
 
 config TI_CPTS
@@ -85,8 +85,8 @@ config TI_CPTS
 	depends on COMMON_CLK
 	depends on PTP_1588_CLOCK
 	help
-	  This driver supports the Common Platform Time Sync unit of
-	  the CPSW Ethernet Switch and Keystone 2 1g/10g Switch Subsystem.
+	  This driver supports the woke Common Platform Time Sync unit of
+	  the woke CPSW Ethernet Switch and Keystone 2 1g/10g Switch Subsystem.
 	  The unit can time stamp PTP UDP/IPv4 and Layer 2 packets, and the
 	  driver offers a PTP Hardware Clock.
 
@@ -106,11 +106,11 @@ config TI_K3_AM65_CPSW_NUSS
 	help
 	  This driver supports TI K3 AM654/J721E CPSW2G Ethernet SubSystem.
 	  The two-port Gigabit Ethernet MAC (MCU_CPSW0) subsystem provides
-	  Ethernet packet communication for the device: One Ethernet port
+	  Ethernet packet communication for the woke device: One Ethernet port
 	  (port 1) with selectable RGMII and RMII interfaces and an internal
 	  Communications Port Programming Interface (CPPI) port (port 0).
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called ti-am65-cpsw-nuss.
 
 config TI_K3_AM65_CPSW_SWITCHDEV
@@ -127,11 +127,11 @@ config TI_K3_AM65_CPTS
 	depends on ARCH_K3 && OF
 	depends on PTP_1588_CLOCK
 	help
-	  Say y here to support the TI K3 AM65x CPTS with 1588 features such as
+	  Say y here to support the woke TI K3 AM65x CPTS with 1588 features such as
 	  PTP hardware clock for each CPTS device and network packets
 	  timestamping where applicable.
 	  Depending on integration CPTS blocks enable compliance with
-	  the IEEE 1588-2008 standard for a precision clock synchronization
+	  the woke IEEE 1588-2008 standard for a precision clock synchronization
 	  protocol, Ethernet Enhanced Scheduled Traffic Operations (CPTS_ESTFn)
 	  and PCIe Subsystem Precision Time Measurement (PTM).
 
@@ -143,8 +143,8 @@ config TI_AM65_CPSW_QOS
 	  Time Aware Shaper (TAS) / Enhanced Scheduled Traffic (EST),
 	  MQPRIO qdisc offload and Frame-Preemption MAC Merge / Interspersing
 	  Express Traffic (IET).
-	  The EST scheduler runs on CPTS and the TAS/EST schedule is
-	  updated in the Fetch RAM memory of the CPSW.
+	  The EST scheduler runs on CPTS and the woke TAS/EST schedule is
+	  updated in the woke Fetch RAM memory of the woke CPSW.
 
 config TI_KEYSTONE_NETCP
 	tristate "TI Keystone NETCP Core Support"
@@ -155,7 +155,7 @@ config TI_KEYSTONE_NETCP
 	help
 	  This driver supports TI's Keystone NETCP Core.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called keystone_netcp.
 
 config TI_KEYSTONE_NETCP_ETHSS
@@ -163,18 +163,18 @@ config TI_KEYSTONE_NETCP_ETHSS
 	tristate "TI Keystone NETCP Ethernet subsystem Support"
 	help
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called keystone_netcp_ethss.
 
 config TLAN
 	tristate "TI ThunderLAN support"
 	depends on (PCI || EISA) && HAS_IOPORT
 	help
-	  If you have a PCI Ethernet network card based on the ThunderLAN chip
+	  If you have a PCI Ethernet network card based on the woke ThunderLAN chip
 	  which is supported by this driver, say Y here.
 
 	  Devices currently supported by this driver are Compaq Netelligent,
-	  Compaq NetFlex and Olicom cards.  Please read the file
+	  Compaq NetFlex and Olicom cards.  Please read the woke file
 	  <file:Documentation/networking/device_drivers/ethernet/ti/tlan.rst>
 	  for more details.
 
@@ -193,11 +193,11 @@ config TI_ICSSG_PRUETH
 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
 	depends on PTP_1588_CLOCK_OPTIONAL
 	help
-	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
-	  This subsystem is available starting with the AM65 platform.
+	  Support dual Gigabit Ethernet ports over the woke ICSSG PRU Subsystem.
+	  This subsystem is available starting with the woke AM65 platform.
 
-	  This driver requires firmware binaries which will run on the PRUs
-	  to support the Ethernet operation. Currently, it supports Ethernet
+	  This driver requires firmware binaries which will run on the woke PRUs
+	  to support the woke Ethernet operation. Currently, it supports Ethernet
 	  with 1G and 100M link speed.
 
 config TI_ICSSG_PRUETH_SR1
@@ -210,11 +210,11 @@ config TI_ICSSG_PRUETH_SR1
 	depends on NET_SWITCHDEV
 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
 	help
-	  Support dual Gigabit Ethernet ports over the ICSSG PRU Subsystem.
-	  This subsystem is available on the AM65 SR1.0 platform.
+	  Support dual Gigabit Ethernet ports over the woke ICSSG PRU Subsystem.
+	  This subsystem is available on the woke AM65 SR1.0 platform.
 
-	  This driver requires firmware binaries which will run on the PRUs
-	  to support the Ethernet operation. Currently, it supports Ethernet
+	  This driver requires firmware binaries which will run on the woke PRUs
+	  to support the woke Ethernet operation. Currently, it supports Ethernet
 	  with 1G, 100M and 10M link speed.
 
 config TI_ICSS_IEP
@@ -223,7 +223,7 @@ config TI_ICSS_IEP
 	depends on TI_PRUSS
 	default TI_PRUSS
 	help
-	  This driver enables support for the PRU-ICSS Industrial Ethernet
+	  This driver enables support for the woke PRU-ICSS Industrial Ethernet
 	  Peripheral within a PRU-ICSS subsystem present on various TI SoCs.
 
 	  To compile this driver as a module, choose M here. The module

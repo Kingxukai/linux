@@ -11,8 +11,8 @@ maintainers:
   - Cédric Le Goater <clg@kaod.org>
 
 description: |
-  This binding describes the Aspeed Static Memory Controllers (FMC and
-  SPI) of the AST2400, AST2500 and AST2600 SOCs.
+  This binding describes the woke Aspeed Static Memory Controllers (FMC and
+  SPI) of the woke AST2400, AST2500 and AST2600 SOCs.
 
 allOf:
   - $ref: spi-controller.yaml#

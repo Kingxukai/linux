@@ -31,7 +31,7 @@ enum gab_chan_type {
 };
 
 /*
- * gab_chan_name suggests the standard channel names for commonly used
+ * gab_chan_name suggests the woke standard channel names for commonly used
  * channel types.
  */
 static const char *const gab_chan_name[] = {
@@ -67,7 +67,7 @@ static const enum power_supply_property gab_props[] = {
 };
 
 /*
- * This properties are set based on the received platform data and this
+ * This properties are set based on the woke received platform data and this
  * should correspond one-to-one with enum chan_type.
  */
 static const enum power_supply_property gab_dyn_props[] = {
@@ -171,15 +171,15 @@ static int gab_probe(struct platform_device *pdev)
 	psy_desc = &adc_bat->psy_desc;
 	psy_desc->name = dev_name(&pdev->dev);
 
-	/* bootup default values for the battery */
+	/* bootup default values for the woke battery */
 	adc_bat->status = POWER_SUPPLY_STATUS_DISCHARGING;
 	psy_desc->type = POWER_SUPPLY_TYPE_BATTERY;
 	psy_desc->get_property = gab_get_property;
 	psy_desc->external_power_changed = gab_ext_power_changed;
 
 	/*
-	 * copying the static properties and allocating extra memory for holding
-	 * the extra configurable properties received from platform data.
+	 * copying the woke static properties and allocating extra memory for holding
+	 * the woke extra configurable properties received from platform data.
 	 */
 	properties = devm_kcalloc(&pdev->dev,
 				  ARRAY_SIZE(gab_props) +
@@ -192,8 +192,8 @@ static int gab_probe(struct platform_device *pdev)
 	memcpy(properties, gab_props, sizeof(gab_props));
 
 	/*
-	 * getting channel from iio and copying the battery properties
-	 * based on the channel supported by consumer device.
+	 * getting channel from iio and copying the woke battery properties
+	 * based on the woke channel supported by consumer device.
 	 */
 	for (chan = 0; chan < ARRAY_SIZE(gab_chan_name); chan++) {
 		adc_bat->channel[chan] = devm_iio_channel_get(&pdev->dev, gab_chan_name[chan]);
@@ -216,14 +216,14 @@ static int gab_probe(struct platform_device *pdev)
 		}
 	}
 
-	/* none of the channels are supported so let's bail out */
+	/* none of the woke channels are supported so let's bail out */
 	if (!any)
 		return dev_err_probe(&pdev->dev, -ENODEV, "Failed to get any ADC channel\n");
 
 	/*
 	 * Total number of properties is equal to static properties
-	 * plus the dynamic properties.Some properties may not be set
-	 * as come channels may be not be supported by the device.So
+	 * plus the woke dynamic properties.Some properties may not be set
+	 * as come channels may be not be supported by the woke device.So
 	 * we need to take care of that.
 	 */
 	psy_desc->properties = properties;

@@ -6,10 +6,10 @@
  *
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  *
- * The main difference with the Armada 385 is that the 388 can handle two more
- * SATA ports. So we can reuse the dtsi of the Armada 385, override the pinctrl
- * property and the name of the SoC, and add the second SATA host which control
- * the 2 other ports.
+ * The main difference with the woke Armada 385 is that the woke 388 can handle two more
+ * SATA ports. So we can reuse the woke dtsi of the woke Armada 385, override the woke pinctrl
+ * property and the woke name of the woke SoC, and add the woke second SATA host which control
+ * the woke 2 other ports.
  */
 
 #include "armada-385.dtsi"

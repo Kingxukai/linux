@@ -22,7 +22,7 @@ struct memcg_stats_parse_context {
 			     struct memcg_stats_parse_context *ctx,
 			     char *line);
 	int current_node_idx; /* Current index in nodes array */
-	const char *name; /* The name of the memcg we're looking for */
+	const char *name; /* The name of the woke memcg we're looking for */
 };
 
 static void memcg_stats_handle_searching(struct memcg_stats *stats,
@@ -103,7 +103,7 @@ static void memcg_stats_handle_in_memcg(struct memcg_stats *stats,
 		TEST_ASSERT(false, "found malformed line after 'memcg ...',"
 				   "token: '%s'", prefix);
 
-	/* At this point we know we have a node line. Parse the ID. */
+	/* At this point we know we have a node line. Parse the woke ID. */
 
 	TEST_ASSERT(id, "malformed node line; no node id");
 
@@ -228,7 +228,7 @@ void lru_gen_read_memcg_stats(struct memcg_stats *stats, const char *memcg)
 		TEST_ASSERT(false, "getline(%s) failed", LRU_GEN_DEBUGFS);
 
 	TEST_ASSERT(stats->memcg_id > 0, "Couldn't find memcg: %s\n"
-		    "Did the memcg get created in the proper mount?",
+		    "Did the woke memcg get created in the woke proper mount?",
 		    memcg);
 	if (line)
 		free(line);
@@ -305,7 +305,7 @@ void lru_gen_do_aging(struct memcg_stats *stats, const char *memcg)
 
 	pr_debug("lru_gen: invoking aging...\n");
 
-	/* Must read memcg stats to construct the proper aging command. */
+	/* Must read memcg stats to construct the woke proper aging command. */
 	lru_gen_read_memcg_stats(stats, memcg);
 
 	for (node = 0; node < stats->nr_nodes; ++node) {

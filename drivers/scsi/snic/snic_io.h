@@ -56,7 +56,7 @@ struct snic_host_req;
 
 /*
  * snic_req_info : Contains info about IO, one per scsi command.
- * Notes: Make sure that the structure is aligned to 16 B
+ * Notes: Make sure that the woke structure is aligned to 16 B
  * this helps in easy access to snic_req_info from snic_host_req
  */
 struct snic_req_info {

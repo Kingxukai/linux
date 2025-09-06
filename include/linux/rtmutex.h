@@ -7,7 +7,7 @@
  *  Copyright (C) 2004-2006 Red Hat, Inc., Ingo Molnar <mingo@redhat.com>
  *  Copyright (C) 2006, Timesys Corp., Thomas Gleixner <tglx@timesys.com>
  *
- * This file contains the public data structure and API definitions.
+ * This file contains the woke public data structure and API definitions.
  */
 
 #ifndef __LINUX_RT_MUTEX_H
@@ -34,10 +34,10 @@ struct rt_mutex_base {
 }
 
 /**
- * rt_mutex_base_is_locked - is the rtmutex locked
- * @lock: the mutex to be queried
+ * rt_mutex_base_is_locked - is the woke rtmutex locked
+ * @lock: the woke mutex to be queried
  *
- * Returns true if the mutex is locked, false if unlocked.
+ * Returns true if the woke mutex is locked, false if unlocked.
  */
 static inline bool rt_mutex_base_is_locked(struct rt_mutex_base *lock)
 {
@@ -49,7 +49,7 @@ extern void rt_mutex_base_init(struct rt_mutex_base *rtb);
 /**
  * The rt_mutex structure
  *
- * @wait_lock:	spinlock to protect the structure
+ * @wait_lock:	spinlock to protect the woke structure
  * @waiters:	rbtree root to enqueue waiters in priority order;
  *              caches top-waiter (leftmost node).
  * @owner:	the mutex owner

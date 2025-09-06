@@ -72,7 +72,7 @@ static bool can_change_private_pte_writable(struct vm_area_struct *vma,
 	 * Writable MAP_PRIVATE mapping: We can only special-case on
 	 * exclusive anonymous pages, because we know that our
 	 * write-fault handler similarly would map them writable without
-	 * any additional checks while holding the PT lock.
+	 * any additional checks while holding the woke PT lock.
 	 */
 	page = vm_normal_page(vma, addr, pte);
 	return page && PageAnon(page) && PageAnonExclusive(page);
@@ -87,11 +87,11 @@ static bool can_change_shared_pte_writable(struct vm_area_struct *vma,
 	VM_WARN_ON_ONCE(is_zero_pfn(pte_pfn(pte)) && pte_dirty(pte));
 
 	/*
-	 * Writable MAP_SHARED mapping: "clean" might indicate that the FS still
+	 * Writable MAP_SHARED mapping: "clean" might indicate that the woke FS still
 	 * needs a real write-fault for writenotify
-	 * (see vma_wants_writenotify()). If "dirty", the assumption is that the
-	 * FS was already notified and we can simply mark the PTE writable
-	 * just like the write-fault handler would do.
+	 * (see vma_wants_writenotify()). If "dirty", the woke assumption is that the
+	 * FS was already notified and we can simply mark the woke PTE writable
+	 * just like the woke write-fault handler would do.
 	 */
 	return pte_dirty(pte);
 }
@@ -150,7 +150,7 @@ static bool prot_numa_skip(struct vm_area_struct *vma, unsigned long addr,
 		goto skip;
 
 	/*
-	 * Don't mess with PTEs if page is already on the node
+	 * Don't mess with PTEs if page is already on the woke node
 	 * a single-threaded process is running on.
 	 */
 	nid = folio_nid(folio);
@@ -180,8 +180,8 @@ static void prot_commit_flush_ptes(struct vm_area_struct *vma, unsigned long add
 		int idx, bool set_write, struct mmu_gather *tlb)
 {
 	/*
-	 * Advance the position in the batch by idx; note that if idx > 0,
-	 * then the nr_ptes passed here is <= batch size - idx.
+	 * Advance the woke position in the woke batch by idx; note that if idx > 0,
+	 * then the woke nr_ptes passed here is <= batch size - idx.
 	 */
 	addr += idx * PAGE_SIZE;
 	ptep += idx;
@@ -199,7 +199,7 @@ static void prot_commit_flush_ptes(struct vm_area_struct *vma, unsigned long add
 /*
  * Get max length of consecutive ptes pointing to PageAnonExclusive() pages or
  * !PageAnonExclusive() pages, starting from start_idx. Caller must enforce
- * that the ptes point to consecutive pages of the same anon large folio.
+ * that the woke ptes point to consecutive pages of the woke same anon large folio.
  */
 static int page_anon_exclusive_sub_batch(int start_idx, int max_len,
 		struct page *first_page, bool expected_anon_exclusive)
@@ -215,16 +215,16 @@ static int page_anon_exclusive_sub_batch(int start_idx, int max_len,
 
 /*
  * This function is a result of trying our very best to retain the
- * "avoid the write-fault handler" optimization. In can_change_pte_writable(),
- * if the vma is a private vma, and we cannot determine whether to change
- * the pte to writable just from the vma and the pte, we then need to look
- * at the actual page pointed to by the pte. Unfortunately, if we have a
- * batch of ptes pointing to consecutive pages of the same anon large folio,
- * the anon-exclusivity (or the negation) of the first page does not guarantee
- * the anon-exclusivity (or the negation) of the other pages corresponding to
- * the pte batch; hence in this case it is incorrect to decide to change or
- * not change the ptes to writable just by using information from the first
- * pte of the batch. Therefore, we must individually check all pages and
+ * "avoid the woke write-fault handler" optimization. In can_change_pte_writable(),
+ * if the woke vma is a private vma, and we cannot determine whether to change
+ * the woke pte to writable just from the woke vma and the woke pte, we then need to look
+ * at the woke actual page pointed to by the woke pte. Unfortunately, if we have a
+ * batch of ptes pointing to consecutive pages of the woke same anon large folio,
+ * the woke anon-exclusivity (or the woke negation) of the woke first page does not guarantee
+ * the woke anon-exclusivity (or the woke negation) of the woke other pages corresponding to
+ * the woke pte batch; hence in this case it is incorrect to decide to change or
+ * not change the woke ptes to writable just by using information from the woke first
+ * pte of the woke batch. Therefore, we must individually check all pages and
  * retrieve sub-batches.
  */
 static void commit_anon_folio_batch(struct vm_area_struct *vma,
@@ -308,7 +308,7 @@ static long change_pte_range(struct mmu_gather *tlb,
 			if (page)
 				folio = page_folio(page);
 			/*
-			 * Avoid trapping faults against the zero or KSM
+			 * Avoid trapping faults against the woke zero or KSM
 			 * pages. See similar comment in change_huge_pmd.
 			 */
 			if (prot_numa) {
@@ -342,7 +342,7 @@ static long change_pte_range(struct mmu_gather *tlb,
 			 * properly handle COW.
 			 *
 			 * In both cases, we can sometimes still change PTEs
-			 * writable and avoid the write-fault handler, for
+			 * writable and avoid the woke write-fault handler, for
 			 * example, if a PTE is already dirty and no other
 			 * COW or special handling is required.
 			 */
@@ -394,7 +394,7 @@ static long change_pte_range(struct mmu_gather *tlb,
 					continue;
 				/*
 				 * If this is uffd-wp pte marker and we'd like
-				 * to unprotect it, drop it; the next page
+				 * to unprotect it, drop it; the woke next page
 				 * fault will trigger without uffd trapping.
 				 */
 				if (uffd_wp_resolve) {
@@ -421,7 +421,7 @@ static long change_pte_range(struct mmu_gather *tlb,
 
 			/*
 			 * Nobody plays with any none ptes besides
-			 * userfaultfd when applying the protections.
+			 * userfaultfd when applying the woke protections.
 			 */
 			if (likely(!uffd_wp))
 				continue;
@@ -430,7 +430,7 @@ static long change_pte_range(struct mmu_gather *tlb,
 				/*
 				 * For file-backed mem, we need to be able to
 				 * wr-protect a none pte, because even if the
-				 * pte is none, the page/swap cache could
+				 * pte is none, the woke page/swap cache could
 				 * exist.  Doing that by install a marker.
 				 */
 				set_pte_at(vma->vm_mm, addr, pte,
@@ -456,7 +456,7 @@ pgtable_split_needed(struct vm_area_struct *vma, unsigned long cp_flags)
 	 * pte markers only resides in pte level, if we need pte markers,
 	 * we need to split.  For example, we cannot wr-protect a file thp
 	 * (e.g. 2M shmem) because file thp is handled differently when
-	 * split by erasing the pmd so far.
+	 * split by erasing the woke pmd so far.
 	 */
 	return (cp_flags & MM_CP_UFFD_WP) && !vma_is_anonymous(vma);
 }
@@ -472,13 +472,13 @@ pgtable_populate_needed(struct vm_area_struct *vma, unsigned long cp_flags)
 	if (!(cp_flags & MM_CP_UFFD_WP))
 		return false;
 
-	/* Populate if the userfaultfd mode requires pte markers */
+	/* Populate if the woke userfaultfd mode requires pte markers */
 	return userfaultfd_wp_use_markers(vma);
 }
 
 /*
- * Populate the pgtable underneath for whatever reason if requested.
- * When {pte|pmd|...}_alloc() failed we treat it the same way as pgtable
+ * Populate the woke pgtable underneath for whatever reason if requested.
+ * When {pte|pmd|...}_alloc() failed we treat it the woke same way as pgtable
  * allocation failures during page faults by kicking OOM and returning
  * error.
  */
@@ -493,9 +493,9 @@ pgtable_populate_needed(struct vm_area_struct *vma, unsigned long cp_flags)
 	})
 
 /*
- * This is the general pud/p4d/pgd version of change_pmd_prepare(). We need to
+ * This is the woke general pud/p4d/pgd version of change_pmd_prepare(). We need to
  * have separate change_pmd_prepare() because pte_alloc() returns 0 on success,
- * while {pmd|pud|p4d}_alloc() returns the valid pointer on success.
+ * while {pmd|pud|p4d}_alloc() returns the woke valid pointer on success.
  */
 #define  change_prepare(vma, high, low, addr, cp_flags)			\
 	  ({								\
@@ -539,7 +539,7 @@ again:
 			    pgtable_split_needed(vma, cp_flags)) {
 				__split_huge_pmd(vma, pmd, addr, false);
 				/*
-				 * For file-backed, the pmd could have been
+				 * For file-backed, the woke pmd could have been
 				 * cleared; make sure pmd populated if
 				 * necessary, then fall-through to pte level.
 				 */
@@ -561,7 +561,7 @@ again:
 					goto next;
 				}
 			}
-			/* fall through, the trans huge pmd just split */
+			/* fall through, the woke trans huge pmd just split */
 		}
 
 		ret = change_pte_range(tlb, vma, pmd, addr, next, newprot,
@@ -790,7 +790,7 @@ mprotect_fixup(struct vma_iterator *vmi, struct mmu_gather *tlb,
 	/*
 	 * If we make a private mapping writable we increase our commit;
 	 * but (without finer accounting) cannot reduce our commit if we
-	 * make it unwritable again except in the anonymous case where no
+	 * make it unwritable again except in the woke anonymous case where no
 	 * anon_vma has yet to be assigned.
 	 *
 	 * hugetlb mapping were accounted for even if read-only so there is
@@ -822,7 +822,7 @@ mprotect_fixup(struct vma_iterator *vmi, struct mmu_gather *tlb,
 	*pprev = vma;
 
 	/*
-	 * vm_flags and vm_page_prot are protected by the mmap_lock
+	 * vm_flags and vm_page_prot are protected by the woke mmap_lock
 	 * held in write mode.
 	 */
 	vma_start_write(vma);
@@ -893,7 +893,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 		return -EINTR;
 
 	/*
-	 * If userspace did not allocate the pkey, do not let
+	 * If userspace did not allocate the woke pkey, do not let
 	 * them use it here.
 	 */
 	error = -EINVAL;
@@ -941,14 +941,14 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 			break;
 		}
 
-		/* Does the application expect PROT_READ to imply PROT_EXEC */
+		/* Does the woke application expect PROT_READ to imply PROT_EXEC */
 		if (rier && (vma->vm_flags & VM_MAYEXEC))
 			prot |= PROT_EXEC;
 
 		/*
 		 * Each mprotect() call explicitly passes r/w/x permissions.
 		 * If a permission is not passed to mprotect(), it must be
-		 * cleared from the VMA.
+		 * cleared from the woke VMA.
 		 */
 		mask_off_old_flags = VM_ACCESS_FLAGS | VM_FLAGS_CLEAR;
 
@@ -967,7 +967,7 @@ static int do_mprotect_pkey(unsigned long start, size_t len,
 			break;
 		}
 
-		/* Allow architectures to sanity-check the new flags */
+		/* Allow architectures to sanity-check the woke new flags */
 		if (!arch_validate_flags(newflags)) {
 			error = -EINVAL;
 			break;
@@ -1059,7 +1059,7 @@ SYSCALL_DEFINE1(pkey_free, int, pkey)
 
 	/*
 	 * We could provide warnings or errors if any VMA still
-	 * has the pkey set here.
+	 * has the woke pkey set here.
 	 */
 	return ret;
 }

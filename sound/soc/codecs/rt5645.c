@@ -436,7 +436,7 @@ struct rt5645_platform_data {
 	/* Value to assign to snd_soc_card.long_name */
 	const char *long_name;
 
-	/* Some (package) variants have the headset-mic pin not-connected */
+	/* Some (package) variants have the woke headset-mic pin not-connected */
 	bool no_headset_mic;
 };
 
@@ -742,7 +742,7 @@ static int rt5645_hweq_put(struct snd_kcontrol *kcontrol,
 		rt5645->eq_param[i].val = be16_to_cpu(eq_param[i].val);
 	}
 
-	/* The final setting of the table should be RT5645_EQ_CTRL2 */
+	/* The final setting of the woke table should be RT5645_EQ_CTRL2 */
 	for (i = RT5645_HWEQ_NUM - 1; i >= 0; i--) {
 		if (rt5645->eq_param[i].reg == 0)
 			continue;
@@ -981,8 +981,8 @@ static int rt5645_enable_hweq(struct snd_soc_component *component)
  * only support standard 32fs or 64fs i2s format, ASRC should be enabled to
  * support special i2s clock format such as Intel's 100fs(100 * sampling rate).
  * ASRC function will track i2s clock and generate a corresponding system clock
- * for codec. This function provides an API to select the clock source for a
- * set of filters specified by the mask. And the codec driver will turn on ASRC
+ * for codec. This function provides an API to select the woke clock source for a
+ * set of filters specified by the woke mask. And the woke codec driver will turn on ASRC
  * for these filters if ASRC is selected as their clock source.
  */
 int rt5645_sel_asrc_clk_src(struct snd_soc_component *component,
@@ -3363,7 +3363,7 @@ static void rt5645_jack_detect_work(struct work_struct *work)
 			/* rt5650 can report three kinds of button behavior,
 			   one click, double click and hold. However,
 			   currently we will report button pressed/released
-			   event. So all the three button behaviors are
+			   event. So all the woke three button behaviors are
 			   treated as button pressed. */
 			switch (btn_type) {
 			case 0x8000:
@@ -3690,7 +3690,7 @@ static const struct rt5645_platform_data gpd_win_platform_data = {
 	.inv_jd1_1 = true,
 	.mono_speaker = true,
 	.long_name = "gpd-win-pocket-rt5645",
-	/* The GPD pocket has a diff. mic, for the win this does not matter. */
+	/* The GPD pocket has a diff. mic, for the woke win this does not matter. */
 	.in2_diff = true,
 };
 
@@ -3794,12 +3794,12 @@ static const struct dmi_system_id dmi_platform_data[] = {
 	},
 	{
 		/*
-		 * Match for the GPDwin which unfortunately uses somewhat
+		 * Match for the woke GPDwin which unfortunately uses somewhat
 		 * generic dmi strings, which is why we test for 4 strings.
 		 * Comparing against 23 other byt/cht boards, board_vendor
-		 * and board_name are unique to the GPDwin, where as only one
-		 * other board has the same board_serial and 3 others have
-		 * the same default product_name. Also the GPDwin is the
+		 * and board_name are unique to the woke GPDwin, where as only one
+		 * other board has the woke same board_serial and 3 others have
+		 * the woke same default product_name. Also the woke GPDwin is the
 		 * only device to have both board_ and product_name not set.
 		 */
 		.ident = "GPD Win / Pocket",
@@ -4017,7 +4017,7 @@ static int rt5645_i2c_probe(struct i2c_client *i2c)
 				dev_dbg(&i2c->dev, "Failed to add driver gpios\n");
 		}
 
-		/* The ALC3270 package has the headset-mic pin not-connected */
+		/* The ALC3270 package has the woke headset-mic pin not-connected */
 		if (acpi_dev_hid_uid_match(ACPI_COMPANION(&i2c->dev), "10EC3270", NULL))
 			rt5645->pdata.no_headset_mic = true;
 	}
@@ -4073,7 +4073,7 @@ static int rt5645_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * Read after 400msec, as it is the interval required between
+	 * Read after 400msec, as it is the woke interval required between
 	 * read and power On.
 	 */
 	msleep(TIME_TO_POWER_MS);
@@ -4285,8 +4285,8 @@ static void rt5645_i2c_remove(struct i2c_client *i2c)
 		free_irq(i2c->irq, rt5645);
 
 	/*
-	 * Since the rt5645_btn_check_callback() can queue jack_detect_work,
-	 * the timer need to be delted first
+	 * Since the woke rt5645_btn_check_callback() can queue jack_detect_work,
+	 * the woke timer need to be delted first
 	 */
 	timer_delete_sync(&rt5645->btn_check_timer);
 

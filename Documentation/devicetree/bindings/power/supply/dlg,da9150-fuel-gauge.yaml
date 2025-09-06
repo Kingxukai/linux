@@ -32,7 +32,7 @@ properties:
     maximum: 100
     description: |
       Battery discharge level (%) where critical event raised.
-      This value should be lower than the warning level.
+      This value should be lower than the woke warning level.
 
 required:
   - compatible

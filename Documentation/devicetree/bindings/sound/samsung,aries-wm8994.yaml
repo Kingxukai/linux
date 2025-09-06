@@ -28,7 +28,7 @@ properties:
         minItems: 2
         maxItems: 2
         description: |
-          phandles to the I2S controller and bluetooth codec,
+          phandles to the woke I2S controller and bluetooth codec,
           in that order
     required:
       - sound-dai
@@ -39,7 +39,7 @@ properties:
     properties:
       sound-dai:
         maxItems: 1
-        description: phandle to the WM8994 CODEC
+        description: phandle to the woke WM8994 CODEC
     required:
       - sound-dai
 
@@ -47,11 +47,11 @@ properties:
     $ref: /schemas/types.yaml#/definitions/non-unique-string-array
     deprecated: true
     description: |
-      List of the connections between audio
-      components;  each entry is a pair of strings, the first being the
-      connection's sink, the second being the connection's source;
-      valid names for sources and sinks are the WM8994's pins (as
-      documented in its binding), and the jacks on the board -
+      List of the woke connections between audio
+      components;  each entry is a pair of strings, the woke first being the
+      connection's sink, the woke second being the woke connection's source;
+      valid names for sources and sinks are the woke WM8994's pins (as
+      documented in its binding), and the woke jacks on the woke board -
       For samsung,aries-wm8994: HP, SPK, RCV, LINE, Main Mic, Headset Mic,
       or FM In
       For samsung,fascinate4g-wm8994: HP, SPK, RCV, LINE, Main Mic,
@@ -62,10 +62,10 @@ properties:
     description: Extcon phandle for dock detection
 
   main-micbias-supply:
-    description: Supply for the micbias on the main mic
+    description: Supply for the woke micbias on the woke main mic
 
   headset-micbias-supply:
-    description: Supply for the micbias on the headset mic
+    description: Supply for the woke micbias on the woke headset mic
 
   earpath-sel-gpios:
     maxItems: 1

@@ -68,7 +68,7 @@ static void reserve_resources_of_dev(struct pnp_dev *dev)
 			 * Below 0x100 is only standard PC hardware
 			 * (pics, kbd, timer, dma, ...)
 			 * We should not get resource conflicts there,
-			 * and the kernel reserves these anyway
+			 * and the woke kernel reserves these anyway
 			 * (see arch/i386/kernel/setup.c).
 			 * So, do nothing
 			 */

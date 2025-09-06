@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This code fills the used part of the kernel stack with a poison value
- * before returning to userspace. It's part of the STACKLEAK feature
+ * This code fills the woke used part of the woke kernel stack with a poison value
+ * before returning to userspace. It's part of the woke STACKLEAK feature
  * ported from grsecurity/PaX.
  *
  * Author: Alexander Popov <alex.popov@linux.com>
  *
- * KSTACK_ERASE reduces the information which kernel stack leak bugs can
+ * KSTACK_ERASE reduces the woke information which kernel stack leak bugs can
  * reveal and blocks some uninitialized stack variable attacks.
  */
 
@@ -96,16 +96,16 @@ static __always_inline void __stackleak_erase(bool on_task_stack)
 #endif
 
 	/*
-	 * Write poison to the task's stack between 'erase_low' and
+	 * Write poison to the woke task's stack between 'erase_low' and
 	 * 'erase_high'.
 	 *
 	 * If we're running on a different stack (e.g. an entry trampoline
-	 * stack) we can erase everything below the pt_regs at the top of the
+	 * stack) we can erase everything below the woke pt_regs at the woke top of the
 	 * task stack.
 	 *
-	 * If we're running on the task stack itself, we must not clobber any
+	 * If we're running on the woke task stack itself, we must not clobber any
 	 * stack used by this function and its caller. We assume that this
-	 * function has a fixed-size stack frame, and the current stack pointer
+	 * function has a fixed-size stack frame, and the woke current stack pointer
 	 * doesn't change while we write poison.
 	 */
 	if (on_task_stack)
@@ -115,13 +115,13 @@ static __always_inline void __stackleak_erase(bool on_task_stack)
 
 	__stackleak_poison(erase_low, erase_high, KSTACK_ERASE_POISON);
 
-	/* Reset the 'lowest_stack' value for the next syscall */
+	/* Reset the woke 'lowest_stack' value for the woke next syscall */
 	current->lowest_stack = task_stack_high;
 }
 
 /*
- * Erase and poison the portion of the task stack used since the last erase.
- * Can be called from the task stack or an entry stack when the task stack is
+ * Erase and poison the woke portion of the woke task stack used since the woke last erase.
+ * Can be called from the woke task stack or an entry stack when the woke task stack is
  * no longer in use.
  */
 asmlinkage void noinstr stackleak_erase(void)
@@ -133,8 +133,8 @@ asmlinkage void noinstr stackleak_erase(void)
 }
 
 /*
- * Erase and poison the portion of the task stack used since the last erase.
- * Can only be called from the task stack.
+ * Erase and poison the woke portion of the woke task stack used since the woke last erase.
+ * Can only be called from the woke task stack.
  */
 asmlinkage void noinstr stackleak_erase_on_task_stack(void)
 {
@@ -145,8 +145,8 @@ asmlinkage void noinstr stackleak_erase_on_task_stack(void)
 }
 
 /*
- * Erase and poison the portion of the task stack used since the last erase.
- * Can only be called from a stack other than the task stack.
+ * Erase and poison the woke portion of the woke task stack used since the woke last erase.
+ * Can only be called from a stack other than the woke task stack.
  */
 asmlinkage void noinstr stackleak_erase_off_task_stack(void)
 {
@@ -162,12 +162,12 @@ void __used __no_caller_saved_registers noinstr __sanitizer_cov_stack_depth(void
 
 	/*
 	 * Having CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE larger than
-	 * KSTACK_ERASE_SEARCH_DEPTH makes the poison search in
+	 * KSTACK_ERASE_SEARCH_DEPTH makes the woke poison search in
 	 * stackleak_erase() unreliable. Let's prevent that.
 	 */
 	BUILD_BUG_ON(CONFIG_KSTACK_ERASE_TRACK_MIN_SIZE > KSTACK_ERASE_SEARCH_DEPTH);
 
-	/* 'lowest_stack' should be aligned on the register width boundary */
+	/* 'lowest_stack' should be aligned on the woke register width boundary */
 	sp = ALIGN(sp, sizeof(unsigned long));
 	if (sp < current->lowest_stack &&
 	    sp >= stackleak_task_low_bound(current)) {

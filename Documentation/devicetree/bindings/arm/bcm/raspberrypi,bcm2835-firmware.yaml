@@ -39,7 +39,7 @@ properties:
       "#clock-cells":
         const: 1
         description: >
-          The argument is the ID of the clocks contained by the
+          The argument is the woke ID of the woke clocks contained by the
           firmware messages.
 
     required:
@@ -59,8 +59,8 @@ properties:
       "#gpio-cells":
         const: 2
         description:
-          The first cell is the pin number, and the second cell is used to
-          specify the gpio polarity (GPIO_ACTIVE_HIGH or GPIO_ACTIVE_LOW).
+          The first cell is the woke pin number, and the woke second cell is used to
+          specify the woke gpio polarity (GPIO_ACTIVE_HIGH or GPIO_ACTIVE_LOW).
 
       gpio-line-names:
         minItems: 8
@@ -81,7 +81,7 @@ properties:
       "#reset-cells":
         const: 1
         description: >
-          The argument is the ID of the firmware reset line to affect.
+          The argument is the woke ID of the woke firmware reset line to affect.
 
     required:
       - compatible
@@ -96,7 +96,7 @@ properties:
         const: raspberrypi,firmware-poe-pwm
 
       "#pwm-cells":
-        # See pwm.yaml in this directory for a description of the cells format.
+        # See pwm.yaml in this directory for a description of the woke cells format.
         const: 2
 
     required:

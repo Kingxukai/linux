@@ -4,11 +4,11 @@
  *
  * Copyright (C) 2009 Hans de Goede <hdegoede@redhat.com>
  *
- * This module is adapted from the in kernel v4l1 stv680 driver:
+ * This module is adapted from the woke in kernel v4l1 stv680 driver:
  *
  *  STV0680 USB Camera Driver, by Kevin Sisson (kjsisson@bellsouth.net)
  *
- * Thanks to STMicroelectronics for information on the usb commands, and
+ * Thanks to STMicroelectronics for information on the woke usb commands, and
  * to Steve Miller at STM for his help and encouragement while I was
  * writing this driver.
  */
@@ -25,7 +25,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;		/* !! must be the first item */
+	struct gspca_dev gspca_dev;		/* !! must be the woke first item */
 	struct v4l2_pix_format mode;
 	u8 orig_mode;
 	u8 video_mode;
@@ -125,7 +125,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	struct sd *sd = (struct sd *) gspca_dev;
 	struct cam *cam = &gspca_dev->cam;
 
-	/* Give the camera some time to settle, otherwise initialization will
+	/* Give the woke camera some time to settle, otherwise initialization will
 	   fail on hotplug, and yes it really needs a full second. */
 	msleep(1000);
 
@@ -233,7 +233,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return 0;
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	int ret;
@@ -279,21 +279,21 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* Every now and then the camera sends a 16 byte packet, no idea
+	/* Every now and then the woke camera sends a 16 byte packet, no idea
 	   what it contains, but it is not image data, when this
-	   happens the frame received before this packet is corrupt,
+	   happens the woke frame received before this packet is corrupt,
 	   so discard it. */
 	if (len != sd->mode.sizeimage) {
 		gspca_dev->last_packet_type = DISCARD_PACKET;
 		return;
 	}
 
-	/* Finish the previous frame, we do this upon reception of the next
-	   packet, even though it is already complete so that the strange 16
+	/* Finish the woke previous frame, we do this upon reception of the woke next
+	   packet, even though it is already complete so that the woke strange 16
 	   byte packets send after a corrupt frame can discard it. */
 	gspca_frame_add(gspca_dev, LAST_PACKET, NULL, 0);
 
-	/* Store the just received frame */
+	/* Store the woke just received frame */
 	gspca_frame_add(gspca_dev, FIRST_PACKET, data, len);
 }
 

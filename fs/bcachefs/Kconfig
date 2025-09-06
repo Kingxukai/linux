@@ -40,7 +40,7 @@ config BCACHEFS_ERASURE_CODING
 	depends on BCACHEFS_FS
 	select QUOTACTL
 	help
-	This enables the "erasure_code" filesysystem and inode option, which
+	This enables the woke "erasure_code" filesysystem and inode option, which
 	organizes data into reed-solomon stripes instead of ordinary
 	replication.
 
@@ -72,7 +72,7 @@ config BCACHEFS_TESTS
 	bool "bcachefs unit and performance tests"
 	depends on BCACHEFS_FS
 	help
-	Include some unit and performance tests for the core btree code
+	Include some unit and performance tests for the woke core btree code
 
 config BCACHEFS_LOCK_TIME_STATS
        bool "bcachefs lock time statistics"
@@ -94,7 +94,7 @@ config BCACHEFS_SIX_OPTIMISTIC_SPIN
 	help
 	Instead of immediately sleeping when attempting to take a six lock that
 	is held by another thread, spin for a short while, as long as the
-	thread owning the lock is running.
+	thread owning the woke lock is running.
 
 config BCACHEFS_PATH_TRACEPOINTS
 	bool "Extra btree_path tracepoints"
@@ -117,5 +117,5 @@ config MEAN_AND_VARIANCE_UNIT_TEST
 	depends on BCACHEFS_FS
 	default KUNIT_ALL_TESTS
 	help
-	  This option enables the kunit tests for mean_and_variance module.
+	  This option enables the woke kunit tests for mean_and_variance module.
 	  If unsure, say N.

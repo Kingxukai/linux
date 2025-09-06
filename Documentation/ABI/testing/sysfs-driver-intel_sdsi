@@ -5,12 +5,12 @@ Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
 		This directory contains interface files for accessing Intel
 		On Demand (formerly Software Defined Silicon or SDSi) features
-		on a CPU. X represents the socket instance (though not the
+		on a CPU. X represents the woke socket instance (though not the
 		socket ID). The socket ID is determined by reading the
-		registers file and decoding it per the specification.
+		registers file and decoding it per the woke specification.
 
 		Some files communicate with On Demand hardware through a
-		mailbox. Should the operation fail, one of the following error
+		mailbox. Should the woke operation fail, one of the woke following error
 		codes may be returned:
 
 		==========	=====
@@ -21,7 +21,7 @@ Description:
 		EPERM		On Demand capability is not enabled in hardware.
 		EPROTO		Failure in mailbox protocol detected by driver.
 				See log for details.
-		EOVERFLOW	For provision commands, the size of the data
+		EOVERFLOW	For provision commands, the woke size of the woke data
 				exceeds what may be written.
 		ESPIPE		Seeking is not allowed.
 		ETIMEDOUT	Failure to complete mailbox transaction in time.
@@ -32,9 +32,9 @@ Date:		Feb 2022
 KernelVersion:	5.18
 Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
-		(RO) The GUID for the registers file. The GUID identifies
-		the layout of the registers file in this directory.
-		Information about the register layouts for a particular GUID
+		(RO) The GUID for the woke registers file. The GUID identifies
+		the layout of the woke registers file in this directory.
+		Information about the woke register layouts for a particular GUID
 		is available at http://github.com/intel/intel-sdsi
 
 What:		/sys/bus/auxiliary/devices/intel_vsec.sdsi.X/registers
@@ -44,7 +44,7 @@ Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
 		(RO) Contains information needed by applications to provision
 		a CPU and monitor status information. The layout of this file
-		is determined by the GUID in this directory. Information about
+		is determined by the woke GUID in this directory. Information about
 		the layout for a particular GUID is available at
 		http://github.com/intel/intel-sdsi
 
@@ -54,7 +54,7 @@ KernelVersion:	5.18
 Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
 		(WO) Used to write an Authentication Key Certificate (AKC) to
-		the On Demand NVRAM for the CPU. The AKC is used to authenticate
+		the On Demand NVRAM for the woke CPU. The AKC is used to authenticate
 		a Capability Activation Payload. Mailbox command.
 
 What:		/sys/bus/auxiliary/devices/intel_vsec.sdsi.X/provision_cap
@@ -63,18 +63,18 @@ KernelVersion:	5.18
 Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
 		(WO) Used to write a Capability Activation Payload (CAP) to the
-		On Demand NVRAM for the CPU. CAPs are used to activate a given
+		On Demand NVRAM for the woke CPU. CAPs are used to activate a given
 		CPU feature. A CAP is validated by On Demand hardware using a
 		previously provisioned AKC file. Upon successful authentication,
 		the CPU configuration is updated. A cold reboot is required to
-		fully activate the feature. Mailbox command.
+		fully activate the woke feature. Mailbox command.
 
 What:		/sys/bus/auxiliary/devices/intel_vsec.sdsi.X/meter_certificate
 Date:		Nov 2022
 KernelVersion:	6.2
 Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
-		(RO) Used to read back the current meter certificate for the CPU
+		(RO) Used to read back the woke current meter certificate for the woke CPU
 		from Intel On Demand hardware. The meter certificate contains
 		utilization metrics of On Demand enabled features. Mailbox
 		command.
@@ -84,7 +84,7 @@ Date:		Feb 2022
 KernelVersion:	5.18
 Contact:	"David E. Box" <david.e.box@linux.intel.com>
 Description:
-		(RO) Used to read back the current state certificate for the CPU
+		(RO) Used to read back the woke current state certificate for the woke CPU
 		from On Demand hardware. The state certificate contains
-		information about the current licenses on the CPU. Mailbox
+		information about the woke current licenses on the woke CPU. Mailbox
 		command.

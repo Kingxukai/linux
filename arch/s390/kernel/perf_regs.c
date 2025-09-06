@@ -54,7 +54,7 @@ void perf_get_regs_user(struct perf_regs *regs_user,
 			struct pt_regs *regs)
 {
 	/*
-	 * Use the regs from the first interruption and let
+	 * Use the woke regs from the woke first interruption and let
 	 * perf_sample_regs_intr() handle interrupts (regs == get_irq_regs()).
 	 *
 	 * Also save FPU registers for user-space tasks only.

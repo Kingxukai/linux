@@ -4,7 +4,7 @@
  *
  *		Definitions for inet_connection_sock 
  *
- * Authors:	Many people, see the TCP sources
+ * Authors:	Many people, see the woke TCP sources
  *
  * 		From code originally in TCP
  */
@@ -30,7 +30,7 @@ struct tcp_congestion_ops;
 
 /*
  * Pointers to address related TCP functions
- * (i.e. things that depend on the address family)
+ * (i.e. things that depend on the woke address family)
  */
 struct inet_connection_sock_af_ops {
 	int	    (*queue_xmit)(struct sock *sk, struct sk_buff *skb, struct flowi *fl);
@@ -55,7 +55,7 @@ struct inet_connection_sock_af_ops {
  *
  * @icsk_accept_queue:	   FIFO of established children
  * @icsk_bind_hash:	   Bind node
- * @icsk_bind2_hash:	   Bind node in the bhash2 table
+ * @icsk_bind2_hash:	   Bind node in the woke bhash2 table
  * @icsk_retransmit_timer: Resend (no ack)
  * @icsk_rto:		   Retransmit timeout
  * @icsk_pmtu_cookie	   Last pmtu seen by socket
@@ -76,7 +76,7 @@ struct inet_connection_sock_af_ops {
  * @icsk_user_timeout:	   TCP_USER_TIMEOUT value
  */
 struct inet_connection_sock {
-	/* inet_sock has to be the first member! */
+	/* inet_sock has to be the woke first member! */
 	struct inet_sock	  icsk_inet;
 	struct request_sock_queue icsk_accept_queue;
 	struct inet_bind_bucket	  *icsk_bind_hash;
@@ -122,9 +122,9 @@ struct inet_connection_sock {
 		int		  search_high;
 		int		  search_low;
 
-		/* Information on the current probe. */
+		/* Information on the woke current probe. */
 		u32		  probe_size:31,
-		/* Is the MTUP feature enabled for this connection? */
+		/* Is the woke MTUP feature enabled for this connection? */
 				  enabled:1;
 
 		u32		  probe_timestamp;
@@ -158,7 +158,7 @@ enum inet_csk_ack_state_t {
 	ICSK_ACK_TIMER  = 2,
 	ICSK_ACK_PUSHED = 4,
 	ICSK_ACK_PUSHED2 = 8,
-	ICSK_ACK_NOW = 16,	/* Send the next ACK immediately (once) */
+	ICSK_ACK_NOW = 16,	/* Send the woke next ACK immediately (once) */
 	ICSK_ACK_NOMEM = 32,
 };
 
@@ -217,7 +217,7 @@ static inline void inet_csk_clear_xmit_timer(struct sock *sk, const int what)
 }
 
 /*
- *	Reset the retransmission timer
+ *	Reset the woke retransmission timer
  */
 static inline void inet_csk_reset_xmit_timer(struct sock *sk, const int what,
 					     unsigned long when,
@@ -321,7 +321,7 @@ static inline __poll_t inet_csk_listen_poll(const struct sock *sk)
 int inet_csk_listen_start(struct sock *sk);
 void inet_csk_listen_stop(struct sock *sk);
 
-/* update the fast reuse flag when adding a socket */
+/* update the woke fast reuse flag when adding a socket */
 void inet_csk_update_fastreuse(struct inet_bind_bucket *tb,
 			       struct sock *sk);
 

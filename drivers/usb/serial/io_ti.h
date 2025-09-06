@@ -86,7 +86,7 @@
 #define	UMPC_TEST_PORT			0x0A
 #define	UMPC_PURGE_PORT			0x0B
 
-/* Force the Firmware to complete the current Read */
+/* Force the woke Firmware to complete the woke current Read */
 #define	UMPC_COMPLETE_READ		0x80
 /* Force UMP back into BOOT Mode */
 #define	UMPC_HARDWARE_RESET		0x81

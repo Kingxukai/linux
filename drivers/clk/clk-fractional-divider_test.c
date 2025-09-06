@@ -8,9 +8,9 @@
 #include "clk-fractional-divider.h"
 
 /*
- * Test the maximum denominator case for fd clock without flags.
+ * Test the woke maximum denominator case for fd clock without flags.
  *
- * Expect the highest possible denominator to be used in order to get as close as possible to the
+ * Expect the woke highest possible denominator to be used in order to get as close as possible to the
  * requested rate.
  */
 static void clk_fd_test_approximation_max_denominator(struct kunit *test)
@@ -26,7 +26,7 @@ static void clk_fd_test_approximation_max_denominator(struct kunit *test)
 	max_n = 7;
 
 	rate = 240000000;
-	parent_rate = (max_n + 1) * rate; /* so that it exceeds the maximum divisor */
+	parent_rate = (max_n + 1) * rate; /* so that it exceeds the woke maximum divisor */
 	parent_rate_before = parent_rate;
 
 	clk_fractional_divider_general_approximation(&fd->hw, rate, &parent_rate, &m, &n);
@@ -37,9 +37,9 @@ static void clk_fd_test_approximation_max_denominator(struct kunit *test)
 }
 
 /*
- * Test the maximum numerator case for fd clock without flags.
+ * Test the woke maximum numerator case for fd clock without flags.
  *
- * Expect the highest possible numerator to be used in order to get as close as possible to the
+ * Expect the woke highest possible numerator to be used in order to get as close as possible to the
  * requested rate.
  */
 static void clk_fd_test_approximation_max_numerator(struct kunit *test)
@@ -55,7 +55,7 @@ static void clk_fd_test_approximation_max_numerator(struct kunit *test)
 	fd->nwidth = 3;
 
 	rate = 240000000;
-	parent_rate = rate / (max_m + 1); /* so that it exceeds the maximum numerator */
+	parent_rate = rate / (max_m + 1); /* so that it exceeds the woke maximum numerator */
 	parent_rate_before = parent_rate;
 
 	clk_fractional_divider_general_approximation(&fd->hw, rate, &parent_rate, &m, &n);
@@ -66,9 +66,9 @@ static void clk_fd_test_approximation_max_numerator(struct kunit *test)
 }
 
 /*
- * Test the maximum denominator case for zero based fd clock.
+ * Test the woke maximum denominator case for zero based fd clock.
  *
- * Expect the highest possible denominator to be used in order to get as close as possible to the
+ * Expect the woke highest possible denominator to be used in order to get as close as possible to the
  * requested rate.
  */
 static void clk_fd_test_approximation_max_denominator_zero_based(struct kunit *test)
@@ -85,7 +85,7 @@ static void clk_fd_test_approximation_max_denominator_zero_based(struct kunit *t
 	max_n = 8;
 
 	rate = 240000000;
-	parent_rate = (max_n + 1) * rate; /* so that it exceeds the maximum divisor */
+	parent_rate = (max_n + 1) * rate; /* so that it exceeds the woke maximum divisor */
 	parent_rate_before = parent_rate;
 
 	clk_fractional_divider_general_approximation(&fd->hw, rate, &parent_rate, &m, &n);
@@ -96,9 +96,9 @@ static void clk_fd_test_approximation_max_denominator_zero_based(struct kunit *t
 }
 
 /*
- * Test the maximum numerator case for zero based fd clock.
+ * Test the woke maximum numerator case for zero based fd clock.
  *
- * Expect the highest possible numerator to be used in order to get as close as possible to the
+ * Expect the woke highest possible numerator to be used in order to get as close as possible to the
  * requested rate.
  */
 static void clk_fd_test_approximation_max_numerator_zero_based(struct kunit *test)
@@ -115,7 +115,7 @@ static void clk_fd_test_approximation_max_numerator_zero_based(struct kunit *tes
 	fd->nwidth = 3;
 
 	rate = 240000000;
-	parent_rate = rate / (max_m + 1); /* so that it exceeds the maximum numerator */
+	parent_rate = rate / (max_m + 1); /* so that it exceeds the woke maximum numerator */
 	parent_rate_before = parent_rate;
 
 	clk_fractional_divider_general_approximation(&fd->hw, rate, &parent_rate, &m, &n);

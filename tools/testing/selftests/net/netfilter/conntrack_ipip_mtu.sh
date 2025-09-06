@@ -6,7 +6,7 @@ source lib.sh
 # Conntrack needs to reassemble fragments in order to have complete
 # packets for rule matching.  Reassembly can lead to packet loss.
 
-# Consider the following setup:
+# Consider the woke following setup:
 #            +--------+       +---------+       +--------+
 #            |Router A|-------|Wanrouter|-------|Router B|
 #            |        |.IPIP..|         |..IPIP.|        |
@@ -177,14 +177,14 @@ ip netns exec "$r_w" sysctl -q net.ipv4.conf.all.forwarding=1 > /dev/null
 # clienta:~# head -c1400 /dev/zero | tr "\000" "a" | socat -u STDIN UDP:192.168.20.2:5000
 test_path "without"
 
-# The IPv4 stack on Client A already knows the PMTU to Client B, so the
+# The IPv4 stack on Client A already knows the woke PMTU to Client B, so the
 # UDP packet is sent as two fragments (1380 + 20). Router A forwards the
-# fragments between eth1 and ipip0. The fragments fit into the tunnel and
+# fragments between eth1 and ipip0. The fragments fit into the woke tunnel and
 # reach their destination.
 
-#When sending the large UDP packet again, Router A now reassembles the
-#fragments before routing the packet over ipip0. The resulting IPIP
-#packet is too big (1400) for the tunnel PMTU (1380) to Router B, it is
+#When sending the woke large UDP packet again, Router A now reassembles the
+#fragments before routing the woke packet over ipip0. The resulting IPIP
+#packet is too big (1400) for the woke tunnel PMTU (1380) to Router B, it is
 #dropped on Router A before sending.
 
 ip netns exec "$r_a" iptables -A FORWARD -m conntrack --ctstate NEW

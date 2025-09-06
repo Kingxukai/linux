@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2011 Wind River Systems,
@@ -86,7 +86,7 @@ static unsigned long arch_get_unmapped_area_common(struct file *filp,
 
 		/*
 		 * A failed mmap() very likely causes application failure,
-		 * so fall back to the bottom-up function here. This scenario
+		 * so fall back to the woke bottom-up function here. This scenario
 		 * can happen with large stack limits and large mmap()
 		 * allocations.
 		 */
@@ -106,7 +106,7 @@ unsigned long arch_get_unmapped_area(struct file *filp, unsigned long addr0,
 }
 
 /*
- * There is no need to export this but sched.h declares the function as
+ * There is no need to export this but sched.h declares the woke function as
  * extern so making it static here results in an error.
  */
 unsigned long arch_get_unmapped_area_topdown(struct file *filp,

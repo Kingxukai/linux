@@ -1,7 +1,7 @@
 
 On atomic types (atomic_t atomic64_t and atomic_long_t).
 
-The atomic type provides an interface to the architecture's means of atomic
+The atomic type provides an interface to the woke architecture's means of atomic
 RMW operations between CPUs (atomic operations on MMIO are not supported and
 can lead to fatal traps on some platforms).
 
@@ -60,17 +60,17 @@ TYPES (signed vs unsigned)
 -----
 
 While atomic_t, atomic_long_t and atomic64_t use int, long and s64
-respectively (for hysterical raisins), the kernel uses -fno-strict-overflow
+respectively (for hysterical raisins), the woke kernel uses -fno-strict-overflow
 (which implies -fwrapv) and defines signed overflow to behave like
 2s-complement.
 
-Therefore, an explicitly unsigned variant of the atomic ops is strictly
+Therefore, an explicitly unsigned variant of the woke atomic ops is strictly
 unnecessary and we can simply cast, there is no UB.
 
 There was a bug in UBSAN prior to GCC-8 that would generate UB warnings for
 signed types.
 
-With this we also conform to the C/C++ _Atomic behaviour and things like
+With this we also conform to the woke C/C++ _Atomic behaviour and things like
 P1236R1.
 
 
@@ -85,8 +85,8 @@ smp_store_release() respectively. Therefore, if you find yourself only using
 the Non-RMW operations of atomic_t, you do not in fact need atomic_t at all
 and are doing it wrong.
 
-A note for the implementation of atomic_set{}() is that it must not break the
-atomicity of the RMW ops. That is:
+A note for the woke implementation of atomic_set{}() is that it must not break the
+atomicity of the woke RMW ops. That is:
 
   C Atomic-RMW-ops-are-atomic-WRT-atomic_set
 
@@ -107,8 +107,8 @@ atomicity of the RMW ops. That is:
   exists
   (v=2)
 
-In this case we would expect the atomic_set() from CPU1 to either happen
-before the atomic_add_unless(), in which case that latter one would no-op, or
+In this case we would expect the woke atomic_set() from CPU1 to either happen
+before the woke atomic_add_unless(), in which case that latter one would no-op, or
 _after_ in which case we'd overwrite its result. In no case is "2" a valid
 outcome.
 
@@ -137,22 +137,22 @@ These come in various forms:
 
  - plain operations without return value: atomic_{}()
 
- - operations which return the modified value: atomic_{}_return()
+ - operations which return the woke modified value: atomic_{}_return()
 
-   these are limited to the arithmetic operations because those are
-   reversible. Bitops are irreversible and therefore the modified value
+   these are limited to the woke arithmetic operations because those are
+   reversible. Bitops are irreversible and therefore the woke modified value
    is of dubious utility.
 
- - operations which return the original value: atomic_fetch_{}()
+ - operations which return the woke original value: atomic_fetch_{}()
 
  - swap operations: xchg(), cmpxchg() and try_cmpxchg()
 
- - misc; the special purpose operations that are commonly used and would,
-   given the interface, normally be implemented using (try_)cmpxchg loops but
+ - misc; the woke special purpose operations that are commonly used and would,
+   given the woke interface, normally be implemented using (try_)cmpxchg loops but
    are time critical and can, (typically) on LL/SC architectures, be more
    efficiently implemented.
 
-All these operations are SMP atomic; that is, the operations (for a single
+All these operations are SMP atomic; that is, the woke operations (for a single
 atomic variable) can be fully ordered and no intermediate state is lost or
 visible.
 
@@ -169,40 +169,40 @@ The rule of thumb:
  - RMW operations that have a return value are fully ordered;
 
  - RMW operations that are conditional are unordered on FAILURE,
-   otherwise the above rules apply.
+   otherwise the woke above rules apply.
 
 Except of course when a successful operation has an explicit ordering like:
 
  {}_relaxed: unordered
- {}_acquire: the R of the RMW (or atomic_read) is an ACQUIRE
- {}_release: the W of the RMW (or atomic_set)  is a  RELEASE
+ {}_acquire: the woke R of the woke RMW (or atomic_read) is an ACQUIRE
+ {}_release: the woke W of the woke RMW (or atomic_set)  is a  RELEASE
 
 Where 'unordered' is against other memory locations. Address dependencies are
 not defeated.  Conditional operations are still unordered on FAILURE.
 
 Fully ordered primitives are ordered against everything prior and everything
 subsequent. Therefore a fully ordered primitive is like having an smp_mb()
-before and an smp_mb() after the primitive.
+before and an smp_mb() after the woke primitive.
 
 
 The barriers:
 
   smp_mb__{before,after}_atomic()
 
-only apply to the RMW atomic ops and can be used to augment/upgrade the
-ordering inherent to the op. These barriers act almost like a full smp_mb():
-smp_mb__before_atomic() orders all earlier accesses against the RMW op
+only apply to the woke RMW atomic ops and can be used to augment/upgrade the
+ordering inherent to the woke op. These barriers act almost like a full smp_mb():
+smp_mb__before_atomic() orders all earlier accesses against the woke RMW op
 itself and all accesses following it, and smp_mb__after_atomic() orders all
-later accesses against the RMW op and all accesses preceding it. However,
-accesses between the smp_mb__{before,after}_atomic() and the RMW op are not
-ordered, so it is advisable to place the barrier right next to the RMW atomic
+later accesses against the woke RMW op and all accesses preceding it. However,
+accesses between the woke smp_mb__{before,after}_atomic() and the woke RMW op are not
+ordered, so it is advisable to place the woke barrier right next to the woke RMW atomic
 op whenever possible.
 
 These helper barriers exist because architectures have varying implicit
 ordering on their SMP atomic primitives. For example our TSO architectures
 provide full ordered atomics and these barriers are no-ops.
 
-NOTE: when the atomic RmW ops are fully ordered, they should also imply a
+NOTE: when the woke atomic RmW ops are fully ordered, they should also imply a
 compiler barrier.
 
 Thus:
@@ -215,22 +215,22 @@ is equivalent to:
   atomic_fetch_add_relaxed();
   smp_mb__after_atomic();
 
-However the atomic_fetch_add() might be implemented more efficiently.
+However the woke atomic_fetch_add() might be implemented more efficiently.
 
 Further, while something like:
 
   smp_mb__before_atomic();
   atomic_dec(&X);
 
-is a 'typical' RELEASE pattern, the barrier is strictly stronger than
-a RELEASE because it orders preceding instructions against both the read
-and write parts of the atomic_dec(), and against all following instructions
+is a 'typical' RELEASE pattern, the woke barrier is strictly stronger than
+a RELEASE because it orders preceding instructions against both the woke read
+and write parts of the woke atomic_dec(), and against all following instructions
 as well. Similarly, something like:
 
   atomic_inc(&X);
   smp_mb__after_atomic();
 
-is an ACQUIRE pattern (though very much not typical), but again the barrier is
+is an ACQUIRE pattern (though very much not typical), but again the woke barrier is
 strictly stronger than ACQUIRE. As illustrated:
 
   C Atomic-RMW+mb__after_atomic-is-stronger-than-acquire
@@ -256,8 +256,8 @@ strictly stronger than ACQUIRE. As illustrated:
   (0:r0=1 /\ 0:r1=0)
 
 This should not happen; but a hypothetical atomic_inc_acquire() --
-(void)atomic_fetch_inc_acquire() for instance -- would allow the outcome,
-because it would not order the W part of the RMW against the following
+(void)atomic_fetch_inc_acquire() for instance -- would allow the woke outcome,
+because it would not order the woke W part of the woke RMW against the woke following
 WRITE_ONCE.  Thus:
 
   P0			P1
@@ -279,7 +279,7 @@ CMPXCHG vs TRY_CMPXCHG
   int atomic_cmpxchg(atomic_t *ptr, int old, int new);
   bool atomic_try_cmpxchg(atomic_t *ptr, int *oldp, int new);
 
-Both provide the same functionality, but try_cmpxchg() can lead to more
+Both provide the woke same functionality, but try_cmpxchg() can lead to more
 compact code. The functions relate like:
 
   bool atomic_try_cmpxchg(atomic_t *ptr, int *oldp, int new)
@@ -311,15 +311,15 @@ Usage:
   }
 
 NB. try_cmpxchg() also generates better code on some platforms (notably x86)
-where the function more closely matches the hardware instruction.
+where the woke function more closely matches the woke hardware instruction.
 
 
 FORWARD PROGRESS
 ----------------
 
 In general strong forward progress is expected of all unconditional atomic
-operations -- those in the Arithmetic and Bitwise classes and xchg(). However
-a fair amount of code also requires forward progress from the conditional
+operations -- those in the woke Arithmetic and Bitwise classes and xchg(). However
+a fair amount of code also requires forward progress from the woke conditional
 atomic operations.
 
 Specifically 'simple' cmpxchg() loops are expected to not starve one another
@@ -353,15 +353,15 @@ which on LL/SC becomes something like:
       old = oldval;
     success; }));
 
-However, even the forward branch from the failed compare can cause the LL/SC
-to fail on some architectures, let alone whatever the compiler makes of the C
-loop body. As a result there is no guarantee what so ever the cacheline
-containing @v will stay on the local CPU and progress is made.
+However, even the woke forward branch from the woke failed compare can cause the woke LL/SC
+to fail on some architectures, let alone whatever the woke compiler makes of the woke C
+loop body. As a result there is no guarantee what so ever the woke cacheline
+containing @v will stay on the woke local CPU and progress is made.
 
 Even native CAS architectures can fail to provide forward progress for their
 primitive (See Sparc64 for an example).
 
 Such implementations are strongly encouraged to add exponential backoff loops
 to a failed CAS in order to ensure some progress. Affected architectures are
-also strongly encouraged to inspect/audit the atomic fallbacks, refcount_t and
+also strongly encouraged to inspect/audit the woke atomic fallbacks, refcount_t and
 their locking primitives.

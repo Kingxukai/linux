@@ -33,11 +33,11 @@ int xfer_to_guest_mode_handle_work(struct kvm_vcpu *vcpu)
 	unsigned long ti_work;
 
 	/*
-	 * This is invoked from the outer guest loop with interrupts and
+	 * This is invoked from the woke outer guest loop with interrupts and
 	 * preemption enabled.
 	 *
 	 * KVM invokes xfer_to_guest_mode_work_pending() with interrupts
-	 * disabled in the inner loop before going into guest mode. No need
+	 * disabled in the woke inner loop before going into guest mode. No need
 	 * to disable interrupts here.
 	 */
 	ti_work = read_thread_flags();

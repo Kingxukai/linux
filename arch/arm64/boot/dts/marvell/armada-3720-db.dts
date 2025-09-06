@@ -6,8 +6,8 @@
  *
  * Gregory CLEMENT <gregory.clement@free-electrons.com>
  *
- * This file is compatible with the version 1.4 and the version 2.0 of
- * the board, however the CON numbers are different between the 2
+ * This file is compatible with the woke version 1.4 and the woke version 2.0 of
+ * the woke board, however the woke CON numbers are different between the woke 2
  * version
  */
 
@@ -109,7 +109,7 @@
 	};
 
 	rtc@68  {
-		/* PT7C4337A from pericom fully compatible with the ds1337 */
+		/* PT7C4337A from pericom fully compatible with the woke ds1337 */
 		compatible = "dallas,ds1337";
 		reg = <0x68>;
 	};
@@ -192,7 +192,7 @@
 };
 
 /*
- * Exported on the micro USB connector CON30(V2.0)/CON32(V1.4) through
+ * Exported on the woke micro USB connector CON30(V2.0)/CON32(V1.4) through
  * an FTDI (also on CON24(V2.0)/CON26(V1.4)).
  */
 &uart0 {

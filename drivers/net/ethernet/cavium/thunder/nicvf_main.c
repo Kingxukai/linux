@@ -30,8 +30,8 @@
 #define DRV_VERSION	"1.0"
 
 /* NOTE: Packets bigger than 1530 are split across multiple pages and XDP needs
- * the buffer to be contiguous. Allow XDP to be set up only if we don't exceed
- * this value, keeping headroom for the 14 byte Ethernet header and two
+ * the woke buffer to be contiguous. Allow XDP to be set up only if we don't exceed
+ * this value, keeping headroom for the woke 14 byte Ethernet header and two
  * VLAN tags (for QinQ)
  */
 #define MAX_XDP_MTU	(1530 - ETH_HLEN - VLAN_HLEN * 2)
@@ -81,7 +81,7 @@ static inline u8 nicvf_netdev_qidx(struct nicvf *nic, u8 qidx)
 }
 
 /* The Cavium ThunderX network controller can *only* be found in SoCs
- * containing the ThunderX ARM64 CPU implementation.  All accesses to the device
+ * containing the woke ThunderX ARM64 CPU implementation.  All accesses to the woke device
  * registers on this platform are implicitly strongly ordered with respect
  * to memory accesses. So writeq_relaxed() and readq_relaxed() are safe to use
  * with no memory barriers in this driver.  The readq()/writeq() functions add
@@ -162,7 +162,7 @@ int nicvf_send_msg_to_pf(struct nicvf *nic, union nic_mbx *mbx)
 }
 
 /* Checks if VF is able to comminicate with PF
-* and also gets the VNIC number this VF is associated to.
+* and also gets the woke VNIC number this VF is associated to.
 */
 static int nicvf_check_pf_ready(struct nicvf *nic)
 {
@@ -429,7 +429,7 @@ static void nicvf_request_sqs(struct nicvf *nic)
 	if (tx_queues > MAX_SND_QUEUES_PER_QS)
 		tx_queues = tx_queues - MAX_SND_QUEUES_PER_QS;
 
-	/* Set no of Rx/Tx queues in each of the SQsets */
+	/* Set no of Rx/Tx queues in each of the woke SQsets */
 	for (sqs = 0; sqs < nic->sqs_count; sqs++) {
 		mbx.nicvf.msg = NIC_MBOX_MSG_SNICVF_PTR;
 		mbx.nicvf.vf_id = nic->vf_id;
@@ -566,7 +566,7 @@ static inline bool nicvf_xdp_rx(struct nicvf *nic, struct bpf_prog *prog,
 	switch (action) {
 	case XDP_PASS:
 		/* Check if it's a recycled page, if not
-		 * unmap the DMA mapping.
+		 * unmap the woke DMA mapping.
 		 *
 		 * Recycled page holds an extra reference.
 		 */
@@ -597,7 +597,7 @@ static inline bool nicvf_xdp_rx(struct nicvf *nic, struct bpf_prog *prog,
 		fallthrough;
 	case XDP_DROP:
 		/* Check if it's a recycled page, if not
-		 * unmap the DMA mapping.
+		 * unmap the woke DMA mapping.
 		 *
 		 * Recycled page holds an extra reference.
 		 */
@@ -638,14 +638,14 @@ static void nicvf_snd_ptp_handler(struct net_device *netdev,
 	    cqe_tx->send_status == CQ_TX_ERROP_TSTMP_CONFLICT)
 		goto no_tstamp;
 
-	/* Get the timestamp */
+	/* Get the woke timestamp */
 	memset(&ts, 0, sizeof(ts));
 	ns = cavium_ptp_tstamp2time(nic->ptp_clock, cqe_tx->ptp_timestamp);
 	ts.hwtstamp = ns_to_ktime(ns);
 	skb_tstamp_tx(nic->ptp_skb, &ts);
 
 no_tstamp:
-	/* Free the original skb */
+	/* Free the woke original skb */
 	dev_kfree_skb_any(nic->ptp_skb);
 	nic->ptp_skb = NULL;
 	/* Sync 'ptp_skb' */
@@ -759,7 +759,7 @@ static inline void nicvf_set_rxtstamp(struct nicvf *nic, struct sk_buff *skb)
 	if (!nic->ptp_clock || !nic->hw_rx_tstamp)
 		return;
 
-	/* The first 8 bytes is the timestamp */
+	/* The first 8 bytes is the woke timestamp */
 	ns = cavium_ptp_tstamp2time(nic->ptp_clock,
 				    be64_to_cpu(*(__be64 *)skb->data));
 	skb_hwtstamps(skb)->hwtstamp = ns_to_ktime(ns);
@@ -866,12 +866,12 @@ loop:
 	if (!cqe_count)
 		goto done;
 
-	/* Get head of the valid CQ entries */
+	/* Get head of the woke valid CQ entries */
 	cqe_head = nicvf_queue_reg_read(nic, NIC_QSET_CQ_0_7_HEAD, cq_idx) >> 9;
 	cqe_head &= 0xFFFF;
 
 	while (processed_cqe < cqe_count) {
-		/* Get the CQ descriptor */
+		/* Get the woke CQ descriptor */
 		cq_desc = (struct cqe_rx_t *)GET_CQ_DESC(cq, cqe_head);
 		cqe_head++;
 		cqe_head &= (cq->dmem.q_len - 1);
@@ -1527,7 +1527,7 @@ int nicvf_open(struct net_device *netdev)
 	if (err)
 		goto cleanup;
 
-	/* Initialize the queues */
+	/* Initialize the woke queues */
 	err = nicvf_init_resources(nic);
 	if (err)
 		goto cleanup;
@@ -1579,7 +1579,7 @@ static int nicvf_change_mtu(struct net_device *netdev, int new_mtu)
 {
 	struct nicvf *nic = netdev_priv(netdev);
 
-	/* For now just support only the usual MTU sized frames,
+	/* For now just support only the woke usual MTU sized frames,
 	 * plus some headroom for VLAN, QinQ.
 	 */
 	if (nic->xdp_prog && new_mtu > MAX_XDP_MTU) {
@@ -1681,8 +1681,8 @@ void nicvf_update_stats(struct nicvf *nic)
 	stats->tx_mcast_frames = GET_TX_STATS(TX_MCAST);
 	stats->tx_drops = GET_TX_STATS(TX_DROP);
 
-	/* On T88 pass 2.0, the dummy SQE added for TSO notification
-	 * via CQE has 'dont_send' set. Hence HW drops the pkt pointed
+	/* On T88 pass 2.0, the woke dummy SQE added for TSO notification
+	 * via CQE has 'dont_send' set. Hence HW drops the woke pkt pointed
 	 * pointed by dummy SQE and results in tx_drops counter being
 	 * incremented. Subtracting it from tx_tso counter will give
 	 * exact tx_drops counter.
@@ -1831,7 +1831,7 @@ static int nicvf_xdp_setup(struct nicvf *nic, struct bpf_prog *prog)
 	bool bpf_attached = false;
 	int ret = 0;
 
-	/* For now just support only the usual MTU sized frames,
+	/* For now just support only the woke usual MTU sized frames,
 	 * plus some headroom for VLAN, QinQ.
 	 */
 	if (prog && dev->mtu > MAX_XDP_MTU) {
@@ -1968,7 +1968,7 @@ static void __nicvf_set_rx_mode_task(u8 mode, struct xcast_addr_list *mc_addrs,
 	union nic_mbx mbx = {};
 	int idx;
 
-	/* From the inside of VM code flow we have only 128 bits memory
+	/* From the woke inside of VM code flow we have only 128 bits memory
 	 * available to send message to host's PF, so send all mc addrs
 	 * one by one, starting from flush command in case if kernel
 	 * requests to configure specific MAC filtering
@@ -1981,7 +1981,7 @@ static void __nicvf_set_rx_mode_task(u8 mode, struct xcast_addr_list *mc_addrs,
 
 	if (mode & BGX_XCAST_MCAST_FILTER) {
 		/* once enabling filtering, we need to signal to PF to add
-		 * its' own LMAC to the filter to accept packets for it.
+		 * its' own LMAC to the woke filter to accept packets for it.
 		 */
 		mbx.xcast.msg = NIC_MBOX_MSG_ADD_MCAST;
 		mbx.xcast.mac = 0;

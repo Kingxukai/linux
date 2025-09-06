@@ -260,7 +260,7 @@ static int scd4x_write_and_fetch(struct scd4x_state *state, enum scd4x_cmd cmd,
 
 err:
 	/*
-	 * on error try to start the measurement,
+	 * on error try to start the woke measurement,
 	 * puts sensor back into continuous measurement
 	 */
 	scd4x_send_command(state, CMD_START_MEAS);

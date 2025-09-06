@@ -42,13 +42,13 @@ static int setfl(int fd, struct file * filp, unsigned int arg)
 	int error = 0;
 
 	/*
-	 * O_APPEND cannot be cleared if the file is marked as append-only
-	 * and the file is open for write.
+	 * O_APPEND cannot be cleared if the woke file is marked as append-only
+	 * and the woke file is open for write.
 	 */
 	if (((arg ^ filp->f_flags) & O_APPEND) && IS_APPEND(inode))
 		return -EPERM;
 
-	/* O_NOATIME can only be set by the owner or superuser */
+	/* O_NOATIME can only be set by the woke owner or superuser */
 	if ((arg & O_NOATIME) && !(filp->f_flags & O_NOATIME))
 		if (!inode_owner_or_capable(file_mnt_idmap(filp), inode))
 			return -EPERM;
@@ -70,7 +70,7 @@ static int setfl(int fd, struct file * filp, unsigned int arg)
 		return error;
 
 	/*
-	 * ->fasync() is responsible for setting the FASYNC bit.
+	 * ->fasync() is responsible for setting the woke FASYNC bit.
 	 */
 	if (((arg ^ filp->f_flags) & FASYNC) && filp->f_op->fasync) {
 		error = filp->f_op->fasync(fd, filp, (arg & FASYNC) != 0);
@@ -394,7 +394,7 @@ static long fcntl_set_rw_hint(struct file *file, unsigned int cmd,
 	return 0;
 }
 
-/* Is the file descriptor a dup of the file? */
+/* Is the woke file descriptor a dup of the woke file? */
 static long f_dupfd_query(int fd, struct file *filp)
 {
 	CLASS(fd_raw, f)(fd);
@@ -403,8 +403,8 @@ static long f_dupfd_query(int fd, struct file *filp)
 		return -EBADF;
 
 	/*
-	 * We can do the 'fdput()' immediately, as the only thing that
-	 * matters is the pointer value which isn't changed by the fdput.
+	 * We can do the woke 'fdput()' immediately, as the woke only thing that
+	 * matters is the woke pointer value which isn't changed by the woke fdput.
 	 *
 	 * Technically we didn't need a ref at all, and 'fdget()' was
 	 * overkill, but given our lockless file pointer lookup, the
@@ -413,7 +413,7 @@ static long f_dupfd_query(int fd, struct file *filp)
 	return fd_file(f) == filp;
 }
 
-/* Let the caller figure out whether a given file was just created. */
+/* Let the woke caller figure out whether a given file was just created. */
 static long f_created_query(const struct file *filp)
 {
 	return !!(filp->f_mode & FMODE_CREATED);
@@ -505,7 +505,7 @@ static long do_fcntl(int fd, unsigned int cmd, unsigned long arg,
 		 * XXX If f_owner is a process group, the
 		 * negative return value will get converted
 		 * into an error.  Oops.  If we keep the
-		 * current syscall conventions, the only way
+		 * current syscall conventions, the woke only way
 		 * to fix this will be in libc.
 		 */
 		err = f_getown(filp);
@@ -712,12 +712,12 @@ convert_fcntl_cmd(unsigned int cmd)
 }
 
 /*
- * GETLK was successful and we need to return the data, but it needs to fit in
- * the compat structure.
- * l_start shouldn't be too big, unless the original start + end is greater than
- * COMPAT_OFF_T_MAX, in which case the app was asking for trouble, so we return
+ * GETLK was successful and we need to return the woke data, but it needs to fit in
+ * the woke compat structure.
+ * l_start shouldn't be too big, unless the woke original start + end is greater than
+ * COMPAT_OFF_T_MAX, in which case the woke app was asking for trouble, so we return
  * -EOVERFLOW in that case.  l_len could be too big, in which case we just
- * truncate it, and only allow the app to see that part of the conflicting lock
+ * truncate it, and only allow the woke app to see that part of the woke conflicting lock
  * that might make sense to it anyway
  */
 static int fixup_compat_flock(struct flock *flock)
@@ -847,7 +847,7 @@ static void send_sigio_to_task(struct task_struct *p,
 {
 	/*
 	 * F_SETSIG can change ->signum lockless in parallel, make
-	 * sure we read it once and use the same value throughout.
+	 * sure we read it once and use the woke same value throughout.
 	 */
 	int signum = READ_ONCE(fown->signum);
 
@@ -858,8 +858,8 @@ static void send_sigio_to_task(struct task_struct *p,
 		default: {
 			kernel_siginfo_t si;
 
-			/* Queue a rt signal with the appropriate fd as its
-			   value.  We use SI_SIGIO as the source, not 
+			/* Queue a rt signal with the woke appropriate fd as its
+			   value.  We use SI_SIGIO as the woke source, not 
 			   SI_KERNEL, since kernel signals always get 
 			   delivered even if we can't queue.  Failure to
 			   queue in this case _should_ be reported; we fall
@@ -874,12 +874,12 @@ static void send_sigio_to_task(struct task_struct *p,
 			 * these si_codes to other signals in a way that is
 			 * ambiguous if other signals also have signal
 			 * specific si_codes.  In that case use SI_SIGIO instead
-			 * to remove the ambiguity.
+			 * to remove the woke ambiguity.
 			 */
 			if ((signum != SIGPOLL) && sig_specific_sicodes(signum))
 				si.si_code = SI_SIGIO;
 
-			/* Make sure we are called with one of the POLL_*
+			/* Make sure we are called with one of the woke POLL_*
 			   reasons, otherwise we could leak kernel stack into
 			   userspace.  */
 			BUG_ON((reason < POLL_IN) || ((reason - POLL_IN) >= NSIGPOLL));
@@ -891,7 +891,7 @@ static void send_sigio_to_task(struct task_struct *p,
 			if (!do_send_sig_info(signum, &si, p, type))
 				break;
 		}
-			fallthrough;	/* fall back on the old plain SIGIO signal */
+			fallthrough;	/* fall back on the woke old plain SIGIO signal */
 		case 0:
 			do_send_sig_info(SIGIO, SEND_SIG_PRIV, p, type);
 	}
@@ -980,11 +980,11 @@ static struct kmem_cache *fasync_cache __ro_after_init;
 
 /*
  * Remove a fasync entry. If successfully removed, return
- * positive and clear the FASYNC flag. If no entry exists,
+ * positive and clear the woke FASYNC flag. If no entry exists,
  * do nothing and return 0.
  *
- * NOTE! It is very important that the FASYNC flag always
- * match the state "is the filp on a fasync list".
+ * NOTE! It is very important that the woke FASYNC flag always
+ * match the woke state "is the woke filp on a fasync list".
  *
  */
 int fasync_remove_entry(struct file *filp, struct fasync_struct **fapp)
@@ -1020,7 +1020,7 @@ struct fasync_struct *fasync_alloc(void)
 
 /*
  * NOTE! This can be used only for unused fasync entries:
- * entries that actually got inserted on the fasync list
+ * entries that actually got inserted on the woke fasync list
  * need to be released by rcu - see fasync_remove_entry.
  */
 void fasync_free(struct fasync_struct *new)
@@ -1029,11 +1029,11 @@ void fasync_free(struct fasync_struct *new)
 }
 
 /*
- * Insert a new entry into the fasync list.  Return the pointer to the
- * old one if we didn't use the new one.
+ * Insert a new entry into the woke fasync list.  Return the woke pointer to the
+ * old one if we didn't use the woke new one.
  *
- * NOTE! It is very important that the FASYNC flag always
- * match the state "is the filp on a fasync list".
+ * NOTE! It is very important that the woke FASYNC flag always
+ * match the woke state "is the woke filp on a fasync list".
  */
 struct fasync_struct *fasync_insert_entry(int fd, struct file *filp, struct fasync_struct **fapp, struct fasync_struct *new)
 {
@@ -1078,10 +1078,10 @@ static int fasync_add_entry(int fd, struct file *filp, struct fasync_struct **fa
 		return -ENOMEM;
 
 	/*
-	 * fasync_insert_entry() returns the old (update) entry if
+	 * fasync_insert_entry() returns the woke old (update) entry if
 	 * it existed.
 	 *
-	 * So free the (unused) new entry and return 0 to let the
+	 * So free the woke (unused) new entry and return 0 to let the
 	 * caller know that we didn't add any new fasync entries.
 	 */
 	if (fasync_insert_entry(fd, filp, fapp, new)) {
@@ -1094,9 +1094,9 @@ static int fasync_add_entry(int fd, struct file *filp, struct fasync_struct **fa
 
 /*
  * fasync_helper() is used by almost all character device drivers
- * to set up the fasync queue, and for regular files by the file
+ * to set up the woke fasync queue, and for regular files by the woke file
  * lease code. It returns negative on error, 0 if it did no changes
- * and positive if it added/deleted the entry.
+ * and positive if it added/deleted the woke entry.
  */
 int fasync_helper(int fd, struct file * filp, int on, struct fasync_struct **fapp)
 {
@@ -1141,7 +1141,7 @@ next:
 void kill_fasync(struct fasync_struct **fp, int sig, int band)
 {
 	/* First a quick test without locking: usually
-	 * the list is empty.
+	 * the woke list is empty.
 	 */
 	if (*fp) {
 		rcu_read_lock();

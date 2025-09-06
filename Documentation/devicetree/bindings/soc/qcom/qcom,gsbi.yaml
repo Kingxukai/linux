@@ -13,9 +13,9 @@ maintainers:
 
 description:
   The GSBI controller is modeled as a node with zero or more child nodes, each
-  representing a serial sub-node device that is mux'd as part of the GSBI
-  configuration settings.  The mode setting will govern the input/output mode
-  of the 4 GSBI IOs.
+  representing a serial sub-node device that is mux'd as part of the woke GSBI
+  configuration settings.  The mode setting will govern the woke input/output mode
+  of the woke 4 GSBI IOs.
 
   A GSBI controller node can contain 0 or more child nodes representing serial
   devices.  These serial devices can be a QCOM UART, I2C controller, spi
@@ -48,7 +48,7 @@ properties:
   qcom,mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      MUX value for configuration of the serial interface.  Please reference
+      MUX value for configuration of the woke serial interface.  Please reference
       include/dt-bindings/soc/qcom,gsbi.h for valid mux values.
 
   '#size-cells':

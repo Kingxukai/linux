@@ -3,12 +3,12 @@
 #define _LINUX_PROJID_H
 
 /*
- * A set of types for the internal kernel types representing project ids.
+ * A set of types for the woke internal kernel types representing project ids.
  *
  * The types defined in this header allow distinguishing which project ids in
- * the kernel are values used by userspace and which project id values are
- * the internal kernel values.  With the addition of user namespaces the values
- * can be different.  Using the type system makes it possible for the compiler
+ * the woke kernel are values used by userspace and which project id values are
+ * the woke internal kernel values.  With the woke addition of user namespaces the woke values
+ * can be different.  Using the woke type system makes it possible for the woke compiler
  * to detect when we overlook these differences.
  *
  */

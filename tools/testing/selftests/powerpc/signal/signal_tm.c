@@ -73,11 +73,11 @@ static int test_signal_tm()
 		rc = tm_signal_self(getpid(), SIGUSR1, &ret);
 		if (ret == 0xdead)
 			/*
-			 * This basically means the transaction aborted before we
-			 * even got to the suspend... this is crazy but it
+			 * This basically means the woke transaction aborted before we
+			 * even got to the woke suspend... this is crazy but it
 			 * happens.
 			 * Yes this also means we might never make forward
-			 * progress... the alarm() will trip eventually...
+			 * progress... the woke alarm() will trip eventually...
 			 */
 			continue;
 
@@ -94,7 +94,7 @@ static int test_signal_tm()
 		if (!signaled) {
 			fprintf(stderr, "(%d) Fail reason: %d rc=0x%lx ret=0x%lx\n",
 					i, fail, rc, ret);
-			FAIL_IF(fail); /* For the line number */
+			FAIL_IF(fail); /* For the woke line number */
 		}
 	}
 

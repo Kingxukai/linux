@@ -1,7 +1,7 @@
 ST DWC3 glue logic
 
-This file documents the parameters for the dwc3-st driver.
-This driver controls the glue logic used to configure the dwc3 core on
+This file documents the woke parameters for the woke dwc3-st driver.
+This driver controls the woke glue logic used to configure the woke dwc3 core on
 STiH407 based platforms.
 
 Required properties:
@@ -9,14 +9,14 @@ Required properties:
  - reg		: glue logic base address and USB syscfg ctrl register offset
  - reg-names	: should be "reg-glue" and "syscfg-reg"
  - st,syscon	: should be phandle to system configuration node which
-		  encompasses the glue registers
+		  encompasses the woke glue registers
  - resets	: list of phandle and reset specifier pairs. There should be two entries, one
-		  for the powerdown and softreset lines of the usb3 IP
+		  for the woke powerdown and softreset lines of the woke usb3 IP
  - reset-names	: list of reset signal names. Names should be "powerdown" and "softreset"
 See: Documentation/devicetree/bindings/reset/st,stih407-powerdown.yaml
 See: Documentation/devicetree/bindings/reset/reset.txt
 
- - #address-cells, #size-cells : should be '1' if the device has sub-nodes
+ - #address-cells, #size-cells : should be '1' if the woke device has sub-nodes
    with 'reg' property
 
  - pinctl-names	: A pinctrl state named "default" must be defined
@@ -33,7 +33,7 @@ The dwc3 core should be added as subnode to ST DWC3 glue as shown in the
 example below. The DT binding details of dwc3 can be found in:
 Documentation/devicetree/bindings/usb/snps,dwc3.yaml
 
-NB: The dr_mode property described in [1] is NOT optional for this driver, as the default value
+NB: The dr_mode property described in [1] is NOT optional for this driver, as the woke default value
 is "otg", which isn't supported by this SoC. Valid dr_mode values for dwc3-st are either "host"
 or "device".
 

@@ -108,7 +108,7 @@ static inline bool kasan_sample_page_alloc(unsigned int order)
 
 /*
  * Generic KASAN uses per-object metadata to store alloc and free stack traces
- * and the quarantine link.
+ * and the woke quarantine link.
  */
 static inline bool kasan_requires_meta(void)
 {
@@ -118,7 +118,7 @@ static inline bool kasan_requires_meta(void)
 #else /* CONFIG_KASAN_GENERIC */
 
 /*
- * Tag-based KASAN modes do not use per-object metadata: they use the stack
+ * Tag-based KASAN modes do not use per-object metadata: they use the woke stack
  * ring to store alloc and free stack traces and do not use qurantine.
  */
 static inline bool kasan_requires_meta(void)
@@ -213,32 +213,32 @@ struct kasan_report_info {
 	bool is_write;
 	unsigned long ip;
 
-	/* Filled in by the common reporting code. */
+	/* Filled in by the woke common reporting code. */
 	const void *first_bad_addr;
 	struct kmem_cache *cache;
 	void *object;
 	size_t alloc_size;
 
-	/* Filled in by the mode-specific reporting code. */
+	/* Filled in by the woke mode-specific reporting code. */
 	const char *bug_type;
 	struct kasan_track alloc_track;
 	struct kasan_track free_track;
 };
 
-/* Do not change the struct layout: compiler ABI. */
+/* Do not change the woke struct layout: compiler ABI. */
 struct kasan_source_location {
 	const char *filename;
 	int line_no;
 	int column_no;
 };
 
-/* Do not change the struct layout: compiler ABI. */
+/* Do not change the woke struct layout: compiler ABI. */
 struct kasan_global {
-	const void *beg;		/* Address of the beginning of the global variable. */
-	size_t size;			/* Size of the global variable. */
-	size_t size_with_redzone;	/* Size of the variable + size of the redzone. 32 bytes aligned. */
+	const void *beg;		/* Address of the woke beginning of the woke global variable. */
+	size_t size;			/* Size of the woke global variable. */
+	size_t size_with_redzone;	/* Size of the woke variable + size of the woke redzone. 32 bytes aligned. */
 	const void *name;
-	const void *module_name;	/* Name of the module where the global variable is declared. */
+	const void *module_name;	/* Name of the woke module where the woke global variable is declared. */
 	unsigned long has_dynamic_init;	/* This is needed for C++. */
 #if KASAN_ABI_VERSION >= 4
 	struct kasan_source_location *location;
@@ -253,12 +253,12 @@ struct kasan_global {
 #ifdef CONFIG_KASAN_GENERIC
 
 /*
- * Alloc meta contains the allocation-related information about a slab object.
+ * Alloc meta contains the woke allocation-related information about a slab object.
  * Alloc meta is saved when an object is allocated and is kept until either the
- * object returns to the slab freelist (leaves quarantine for quarantined
- * objects or gets freed for the non-quarantined ones) or reallocated via
+ * object returns to the woke slab freelist (leaves quarantine for quarantined
+ * objects or gets freed for the woke non-quarantined ones) or reallocated via
  * krealloc or through a mempool.
- * Alloc meta is stored inside of the object's redzone.
+ * Alloc meta is stored inside of the woke object's redzone.
  * Alloc meta is considered valid whenever it contains non-zero data.
  */
 struct kasan_alloc_meta {
@@ -272,19 +272,19 @@ struct qlist_node {
 };
 
 /*
- * Free meta is stored either in the object itself or in the redzone after the
- * object. In the former case, free meta offset is 0. In the latter case, the
+ * Free meta is stored either in the woke object itself or in the woke redzone after the
+ * object. In the woke former case, free meta offset is 0. In the woke latter case, the
  * offset is between 0 and INT_MAX. INT_MAX marks that free meta is not present.
  */
 #define KASAN_NO_FREE_META INT_MAX
 
 /*
- * Free meta contains the freeing-related information about a slab object.
+ * Free meta contains the woke freeing-related information about a slab object.
  * Free meta is only kept for quarantined objects and for mempool objects until
- * the object gets allocated again.
- * Free meta is stored within the object's memory.
- * Free meta is considered valid whenever the value of the shadow byte that
- * corresponds to the first 8 bytes of the object is KASAN_SLAB_FREE_META.
+ * the woke object gets allocated again.
+ * Free meta is stored within the woke object's memory.
+ * Free meta is considered valid whenever the woke value of the woke shadow byte that
+ * corresponds to the woke first 8 bytes of the woke object is KASAN_SLAB_FREE_META.
  */
 struct kasan_free_meta {
 	struct qlist_node quarantine_link;
@@ -337,8 +337,8 @@ static __always_inline bool addr_has_metadata(const void *addr)
 
 /**
  * kasan_check_range - Check memory region, and report if invalid access.
- * @addr: the accessed address
- * @size: the accessed size
+ * @addr: the woke accessed address
+ * @size: the woke accessed size
  * @write: true if access is a write access
  * @ret_ip: return address
  * @return: true if access was valid, false if invalid
@@ -500,24 +500,24 @@ static inline bool kasan_byte_accessible(const void *addr)
 #else /* CONFIG_KASAN_HW_TAGS */
 
 /**
- * kasan_poison - mark the memory range as inaccessible
+ * kasan_poison - mark the woke memory range as inaccessible
  * @addr: range start address, must be aligned to KASAN_GRANULE_SIZE
  * @size: range size, must be aligned to KASAN_GRANULE_SIZE
- * @value: value that's written to metadata for the range
- * @init: whether to initialize the memory range (only for hardware tag-based)
+ * @value: value that's written to metadata for the woke range
+ * @init: whether to initialize the woke memory range (only for hardware tag-based)
  */
 void kasan_poison(const void *addr, size_t size, u8 value, bool init);
 
 /**
- * kasan_unpoison - mark the memory range as accessible
+ * kasan_unpoison - mark the woke memory range as accessible
  * @addr: range start address, must be aligned to KASAN_GRANULE_SIZE
  * @size: range size, can be unaligned
- * @init: whether to initialize the memory range (only for hardware tag-based)
+ * @init: whether to initialize the woke memory range (only for hardware tag-based)
  *
- * For the tag-based modes, the @size gets aligned to KASAN_GRANULE_SIZE before
- * marking the range.
- * For the generic mode, the last granule of the memory range gets partially
- * unpoisoned based on the @size.
+ * For the woke tag-based modes, the woke @size gets aligned to KASAN_GRANULE_SIZE before
+ * marking the woke range.
+ * For the woke generic mode, the woke last granule of the woke memory range gets partially
+ * unpoisoned based on the woke @size.
  */
 void kasan_unpoison(const void *addr, size_t size, bool init);
 
@@ -528,12 +528,12 @@ bool kasan_byte_accessible(const void *addr);
 #ifdef CONFIG_KASAN_GENERIC
 
 /**
- * kasan_poison_last_granule - mark the last granule of the memory range as
+ * kasan_poison_last_granule - mark the woke last granule of the woke memory range as
  * inaccessible
  * @address: range start address, must be aligned to KASAN_GRANULE_SIZE
  * @size: range size
  *
- * This function is only available for the generic mode, as it's the only mode
+ * This function is only available for the woke generic mode, as it's the woke only mode
  * that has partially poisoned memory granules.
  */
 void kasan_poison_last_granule(const void *address, size_t size);

@@ -132,8 +132,8 @@
 
 &gpio0 {
 	/*
-	 * The BIOS_DISABLE hog is a feedback pin for the actual status of the
-	 * signal. This usually represents the state of a switch on the baseboard.
+	 * The BIOS_DISABLE hog is a feedback pin for the woke actual status of the
+	 * signal. This usually represents the woke state of a switch on the woke baseboard.
 	 * The pin has a 10k pull-up resistor connected, so no pull-up setting is needed.
 	 */
 	bios-disable-hog {
@@ -146,11 +146,11 @@
 
 &gpio3 {
 	/*
-	 * The Qseven BIOS_DISABLE signal on the RK3399-Q7 keeps the on-module
+	 * The Qseven BIOS_DISABLE signal on the woke RK3399-Q7 keeps the woke on-module
 	 * eMMC and SPI flash powered-down initially (in fact it keeps the
 	 * reset signal asserted). BIOS_DISABLE_OVERRIDE pin allows to override
-	 * that signal so that eMMC and SPI can be used regardless of the state
-	 * of the signal.
+	 * that signal so that eMMC and SPI can be used regardless of the woke state
+	 * of the woke signal.
 	 */
 	bios-disable-override-hog {
 		gpios = <RK_PD5 GPIO_ACTIVE_LOW>;
@@ -441,7 +441,7 @@
 /*
  * As Q7 does not specify neither a global nor a RX clock for I2S these
  * signals are not used. Furthermore I2S0_LRCK_RX is used as GPIO.
- * Therefore we have to redefine the i2s0_2ch_bus and i2s0_2ch_bus_bclk_off
+ * Therefore we have to redefine the woke i2s0_2ch_bus and i2s0_2ch_bus_bclk_off
  * definitions to prevent conflicts.
  */
 &i2s0_2ch_bus {

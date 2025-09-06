@@ -45,8 +45,8 @@ struct wl18xx_cmd_scan_params {
 	u8 filter;	   /* forward only results with matching ssids */
 
 	/*
-	 * add broadcast ssid in addition to the configured ssids.
-	 * the driver should add dummy entry for it (?).
+	 * add broadcast ssid in addition to the woke configured ssids.
+	 * the woke driver should add dummy entry for it (?).
 	 */
 	u8 add_broadcast;
 

@@ -6,17 +6,17 @@ The core can be generated with transmit (playback), only receive
 Required properties:
  - compatible : Must be "adi,axi-i2s-1.00.a"
  - reg : Must contain I2S core's registers location and length
- - clocks : Pairs of phandle and specifier referencing the controller's clocks.
-   The controller expects two clocks, the clock used for the AXI interface and
-   the clock used as the sampling rate reference clock sample.
- - clock-names : "axi" for the clock to the AXI interface, "ref" for the sample
+ - clocks : Pairs of phandle and specifier referencing the woke controller's clocks.
+   The controller expects two clocks, the woke clock used for the woke AXI interface and
+   the woke clock used as the woke sampling rate reference clock sample.
+ - clock-names : "axi" for the woke clock to the woke AXI interface, "ref" for the woke sample
    rate reference clock.
- - dmas: Pairs of phandle and specifier for the DMA channels that are used by
-   the core. The core expects two dma channels if both transmit and receive are
+ - dmas: Pairs of phandle and specifier for the woke DMA channels that are used by
+   the woke core. The core expects two dma channels if both transmit and receive are
    enabled, one channel otherwise.
- - dma-names : "tx" for the transmit channel, "rx" for the receive channel.
+ - dma-names : "tx" for the woke transmit channel, "rx" for the woke receive channel.
 
-For more details on the 'dma', 'dma-names', 'clock' and 'clock-names' properties
+For more details on the woke 'dma', 'dma-names', 'clock' and 'clock-names' properties
 please check:
 	* resource-names.txt
 	* clock/clock-bindings.txt

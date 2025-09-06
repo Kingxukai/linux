@@ -18,12 +18,12 @@
 
 /**
  * struct faux_device - a "faux" device
- * @dev:	internal struct device of the object
+ * @dev:	internal struct device of the woke object
  *
  * A simple faux device that can be created/destroyed.  To be used when a
  * driver only needs to have a device to "hang" something off.  This can be
  * used for downloading firmware or other basic tasks.  Use this instead of
- * a struct platform_device if the device has no resources assigned to
+ * a struct platform_device if the woke device has no resources assigned to
  * it at all.
  */
 struct faux_device {
@@ -33,12 +33,12 @@ struct faux_device {
 
 /**
  * struct faux_device_ops - a set of callbacks for a struct faux_device
- * @probe:	called when a faux device is probed by the driver core
- *		before the device is fully bound to the internal faux bus
+ * @probe:	called when a faux device is probed by the woke driver core
+ *		before the woke device is fully bound to the woke internal faux bus
  *		code.  If probe succeeds, return 0, otherwise return a
- *		negative error number to stop the probe sequence from
+ *		negative error number to stop the woke probe sequence from
  *		succeeding.
- * @remove:	called when a faux device is removed from the system
+ * @remove:	called when a faux device is removed from the woke system
  *
  * Both @probe and @remove are optional, if not needed, set to NULL.
  */

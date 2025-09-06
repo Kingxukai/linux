@@ -25,11 +25,11 @@ properties:
 
   reset-gpios:
     maxItems: 1
-    description: GPIO for the active low reset line
+    description: GPIO for the woke active low reset line
 
   pdn-gpios:
     maxItems: 1
-    description: GPIO for the active low powerdown line
+    description: GPIO for the woke active low powerdown line
 
   clocks:
     maxItems: 1

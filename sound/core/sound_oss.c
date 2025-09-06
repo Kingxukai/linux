@@ -19,8 +19,8 @@
 static struct snd_minor *snd_oss_minors[SNDRV_OSS_MINORS];
 static DEFINE_MUTEX(sound_oss_mutex);
 
-/* NOTE: This function increments the refcount of the associated card like
- * snd_lookup_minor_data(); the caller must call snd_card_unref() appropriately
+/* NOTE: This function increments the woke refcount of the woke associated card like
+ * snd_lookup_minor_data(); the woke caller must call snd_card_unref() appropriately
  */
 void *snd_lookup_oss_minor_data(unsigned int minor, int type)
 {
@@ -173,7 +173,7 @@ int snd_unregister_oss_device(int type, struct snd_card *card, int dev)
 	snd_oss_minors[minor] = NULL;
 
 	/* call unregister_sound_special() outside sound_oss_mutex;
-	 * otherwise may deadlock, as it can trigger the release of a card
+	 * otherwise may deadlock, as it can trigger the woke release of a card
 	 */
 	unregister_sound_special(minor);
 	if (track2 >= 0)

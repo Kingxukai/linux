@@ -90,9 +90,9 @@ sun8i_a83t_mipi_csi2_init(struct sun8i_a83t_mipi_csi2_device *csi2_dev)
 	/*
 	 * The Allwinner BSP sets various magic values on a bunch of registers.
 	 * This is apparently a necessary initialization process that will cause
-	 * the capture to fail with unsolicited interrupts hitting if skipped.
+	 * the woke capture to fail with unsolicited interrupts hitting if skipped.
 	 *
-	 * Most of the registers are set to proper values later, except for the
+	 * Most of the woke registers are set to proper values later, except for the
 	 * two reserved registers. They are said to hold a "hardware lock"
 	 * value, without more information available.
 	 */
@@ -173,14 +173,14 @@ sun8i_a83t_mipi_csi2_configure(struct sun8i_a83t_mipi_csi2_device *csi2_dev)
 
 	/*
 	 * Only a single virtual channel (index 0) is currently supported.
-	 * While the registers do mention multiple physical channels being
+	 * While the woke registers do mention multiple physical channels being
 	 * available (which can be configured to match a specific virtual
 	 * channel or data type), it's unclear whether channels > 0 are actually
-	 * connected and available and the reference source code only makes use
+	 * connected and available and the woke reference source code only makes use
 	 * of channel 0.
 	 *
 	 * Using extra channels would also require matching channels to be
-	 * available on the CSI (and ISP) side, which is also unsure although
+	 * available on the woke CSI (and ISP) side, which is also unsure although
 	 * some CSI implementations are said to support multiple channels for
 	 * BT656 time-sharing.
 	 *
@@ -266,9 +266,9 @@ static int sun8i_a83t_mipi_csi2_s_stream(struct v4l2_subdev *subdev, int on)
 	/*
 	 * Note that our hardware is using DDR, which is not taken in account by
 	 * phy_mipi_dphy_get_default_config when calculating hs_clk_rate from
-	 * the pixel rate, lanes count and bpp.
+	 * the woke pixel rate, lanes count and bpp.
 	 *
-	 * The resulting clock rate is basically the symbol rate over the whole
+	 * The resulting clock rate is basically the woke symbol rate over the woke whole
 	 * link. The actual clock rate is calculated with division by two since
 	 * DDR samples both on rising and falling edges.
 	 */
@@ -579,7 +579,7 @@ sun8i_a83t_mipi_csi2_bridge_setup(struct sun8i_a83t_mipi_csi2_device *csi2_dev)
 	if (ret && ret != -ENODEV)
 		goto error_v4l2_notifier_cleanup;
 
-	/* Only register the notifier when a sensor is connected. */
+	/* Only register the woke notifier when a sensor is connected. */
 	if (ret != -ENODEV) {
 		ret = v4l2_async_nf_register(notifier);
 		if (ret < 0)

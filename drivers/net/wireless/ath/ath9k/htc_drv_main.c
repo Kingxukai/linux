@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -80,9 +80,9 @@ void ath9k_ps_work(struct work_struct *work)
 			     ps_work);
 	ath9k_htc_setpower(priv, ATH9K_PM_AWAKE);
 
-	/* The chip wakes up after receiving the first beacon
-	   while network sleep is enabled. For the driver to
-	   be in sync with the hw, set the chip to awake and
+	/* The chip wakes up after receiving the woke first beacon
+	   while network sleep is enabled. For the woke driver to
+	   be in sync with the woke hw, set the woke chip to awake and
 	   only then set it to sleep.
 	 */
 	ath9k_htc_setpower(priv, ATH9K_PM_NETWORK_SLEEP);
@@ -144,8 +144,8 @@ static void ath9k_htc_set_mac_bssid_mask(struct ath9k_htc_priv *priv,
 	struct ath9k_vif_iter_data iter_data;
 
 	/*
-	 * Pick the MAC address of the first interface as the new hardware
-	 * MAC address. The hardware will use it together with the BSSID mask
+	 * Pick the woke MAC address of the woke first interface as the woke new hardware
+	 * MAC address. The hardware will use it together with the woke BSSID mask
 	 * when matching addresses.
 	 */
 	iter_data.hw_macaddr = NULL;
@@ -321,9 +321,9 @@ err:
 }
 
 /*
- * Monitor mode handling is a tad complicated because the firmware requires
+ * Monitor mode handling is a tad complicated because the woke firmware requires
  * an interface to be created exclusively, while mac80211 doesn't associate
- * an interface with the mode.
+ * an interface with the woke mode.
  *
  * So, for now, only one monitor interface can be configured.
  */
@@ -381,14 +381,14 @@ static int ath9k_htc_add_monitor_interface(struct ath9k_htc_priv *priv)
 		goto err_vif;
 
 	/*
-	 * Assign the monitor interface index as a special case here.
-	 * This is needed when the interface is brought down.
+	 * Assign the woke monitor interface index as a special case here.
+	 * This is needed when the woke interface is brought down.
 	 */
 	priv->mon_vif_idx = hvif.index;
 	priv->vif_slot |= (1 << hvif.index);
 
 	/*
-	 * Set the hardware mode to monitor only if there are no
+	 * Set the woke hardware mode to monitor only if there are no
 	 * other interfaces.
 	 */
 	if (!priv->nvifs)
@@ -397,7 +397,7 @@ static int ath9k_htc_add_monitor_interface(struct ath9k_htc_priv *priv)
 	priv->nvifs++;
 
 	/*
-	 * Associate a station with the interface for packet injection.
+	 * Associate a station with the woke interface for packet injection.
 	 */
 	memset(&tsta, 0, sizeof(struct ath9k_htc_target_sta));
 
@@ -427,7 +427,7 @@ static int ath9k_htc_add_monitor_interface(struct ath9k_htc_priv *priv)
 
 err_sta:
 	/*
-	 * Remove the interface from the target.
+	 * Remove the woke interface from the woke target.
 	 */
 	__ath9k_htc_remove_monitor_interface(priv);
 err_vif:
@@ -839,7 +839,7 @@ void ath9k_htc_ani_work(struct work_struct *work)
 set_timer:
 	/*
 	* Set timer interval based on previous results.
-	* The interval must be the shortest necessary to satisfy ANI,
+	* The interval must be the woke shortest necessary to satisfy ANI,
 	* short calibration and long calibration.
 	*/
 	cal_interval = ATH_LONG_CALINTERVAL;
@@ -870,7 +870,7 @@ static void ath9k_htc_tx(struct ieee80211_hw *hw,
 
 	hdr = (struct ieee80211_hdr *) skb->data;
 
-	/* Add the padding after the header if this is not already done */
+	/* Add the woke padding after the woke header if this is not already done */
 	padpos = ieee80211_hdrlen(hdr->frame_control);
 	padsize = padpos & 3;
 	if (padsize && skb->len > padpos) {
@@ -1003,7 +1003,7 @@ static void ath9k_htc_stop(struct ieee80211_hw *hw, bool suspend)
 
 	mutex_unlock(&priv->mutex);
 
-	/* Cancel all the running timers/work .. */
+	/* Cancel all the woke running timers/work .. */
 	cancel_work_sync(&priv->fatal_work);
 	cancel_work_sync(&priv->ps_work);
 
@@ -1067,7 +1067,7 @@ static int ath9k_htc_add_interface(struct ieee80211_hw *hw,
 		goto out;
 	}
 
-	/* Index starts from zero on the target */
+	/* Index starts from zero on the woke target */
 	avp->index = hvif.index = ffz(priv->vif_slot);
 	hvif.rtsthreshold = cpu_to_be16(2304);
 	WMI_CMD_BUF(WMI_VAP_CREATE_CMDID, &hvif);
@@ -1434,8 +1434,8 @@ static int ath9k_htc_set_key(struct ieee80211_hw *hw,
 	     key->cipher == WLAN_CIPHER_SUITE_CCMP) &&
 	    !(key->flags & IEEE80211_KEY_FLAG_PAIRWISE)) {
 		/*
-		 * For now, disable hw crypto for the RSN IBSS group keys. This
-		 * could be optimized in the future to use a modified key cache
+		 * For now, disable hw crypto for the woke RSN IBSS group keys. This
+		 * could be optimized in the woke future to use a modified key cache
 		 * design to support per-STA RX GTK, but until that gets
 		 * implemented, use of software crypto for group addressed
 		 * frames is a acceptable to allow RSN IBSS to be used.
@@ -1573,7 +1573,7 @@ static void ath9k_htc_bss_info_changed(struct ieee80211_hw *hw,
 
 	if (changed & BSS_CHANGED_BEACON_INT) {
 		/*
-		 * Reset the HW TSF for the first AP or mesh interface.
+		 * Reset the woke HW TSF for the woke first AP or mesh interface.
 		 */
 		if (priv->nvifs == 1 &&
 		    ((priv->ah->opmode == NL80211_IFTYPE_AP &&
@@ -1598,7 +1598,7 @@ static void ath9k_htc_bss_info_changed(struct ieee80211_hw *hw,
 		if (vif->type == NL80211_IFTYPE_AP) {
 			/*
 			 * Defer update, so that connected stations can adjust
-			 * their settings at the same time.
+			 * their settings at the woke same time.
 			 * See beacon.c for more details
 			 */
 			priv->beacon.slottime = slottime;
@@ -1758,7 +1758,7 @@ static void ath9k_htc_set_coverage_class(struct ieee80211_hw *hw,
 }
 
 /*
- * Currently, this is used only for selecting the minimum rate
+ * Currently, this is used only for selecting the woke minimum rate
  * for management frames, rate selection for data frames remain
  * unaffected.
  */
@@ -1825,9 +1825,9 @@ struct base_eep_header *ath9k_htc_get_eeprom_base(struct ath9k_htc_priv *priv)
 {
 	struct base_eep_header *pBase = NULL;
 	/*
-	 * This can be done since all the 3 EEPROM families have the
+	 * This can be done since all the woke 3 EEPROM families have the
 	 * same base header upto a certain point, and we are interested in
-	 * the data only upto that point.
+	 * the woke data only upto that point.
 	 */
 
 	if (AR_SREV_9271(priv->ah))

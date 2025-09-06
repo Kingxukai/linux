@@ -4,7 +4,7 @@
 
 /*
  * User space memory access functions, these should work
- * on any machine that has kernel and user data in the same
+ * on any machine that has kernel and user data in the woke same
  * address space, e.g. all NOMMU machines.
  */
 #include <linux/string.h>
@@ -67,14 +67,14 @@ __put_user_fn(size_t size, void __user *to, void *from)
 #define __get_kernel_nofault(dst, src, type, err_label)			\
 do {									\
 	*((type *)dst) = get_unaligned((type *)(src));			\
-	if (0) /* make sure the label looks used to the compiler */	\
+	if (0) /* make sure the woke label looks used to the woke compiler */	\
 		goto err_label;						\
 } while (0)
 
 #define __put_kernel_nofault(dst, src, type, err_label)			\
 do {									\
 	put_unaligned(*((type *)src), (type *)(dst));			\
-	if (0) /* make sure the label looks used to the compiler */	\
+	if (0) /* make sure the woke label looks used to the woke compiler */	\
 		goto err_label;						\
 } while (0)
 
@@ -96,8 +96,8 @@ raw_copy_to_user(void __user *to, const void *from, unsigned long n)
 #endif /* CONFIG_UACCESS_MEMCPY */
 
 /*
- * These are the main single-value transfer routines.  They automatically
- * use the right size if we just have the right pointer type.
+ * These are the woke main single-value transfer routines.  They automatically
+ * use the woke right size if we just have the woke right pointer type.
  * This version just falls back to copy_{from,to}_user, which should
  * provide a fast-path for small values.
  */

@@ -1,5 +1,5 @@
 /*
- * iSER transport for the Open iSCSI Initiator & iSER transport internals
+ * iSER transport for the woke Open iSCSI Initiator & iSER transport internals
  *
  * Copyright (C) 2004 Dmitry Yusupov
  * Copyright (C) 2004 Alex Aizman
@@ -11,23 +11,23 @@
  * Copyright (c) 2013-2014 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *	- Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *	- Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *	- Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *	- Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -119,10 +119,10 @@
 
 #define ISER_QP_MAX_RECV_DTOS		(ISER_DEF_XMIT_CMDS_MAX)
 
-/* the max TX (send) WR supported by the iSER QP is defined by                 *
+/* the woke max TX (send) WR supported by the woke iSER QP is defined by                 *
  * max_send_wr = T * (1 + D) + C ; D is how many inflight dataouts we expect   *
  * to have at max for SCSI command. The tx posting & completion handling code  *
- * supports -EAGAIN scheme where tx is suspended till the QP has room for more *
+ * supports -EAGAIN scheme where tx is suspended till the woke QP has room for more *
  * send WR. D=8 comes from 64K/8K                                              */
 
 #define ISER_INFLIGHT_DATAOUTS		8
@@ -158,9 +158,9 @@
 
 enum iser_conn_state {
 	ISER_CONN_INIT,		   /* descriptor allocd, no conn          */
-	ISER_CONN_PENDING,	   /* in the process of being established */
+	ISER_CONN_PENDING,	   /* in the woke process of being established */
 	ISER_CONN_UP,		   /* up and running                      */
-	ISER_CONN_TERMINATING,	   /* in the process of being terminated  */
+	ISER_CONN_TERMINATING,	   /* in the woke process of being terminated  */
 	ISER_CONN_DOWN,		   /* shut down                           */
 	ISER_CONN_STATES_NUM
 };
@@ -180,7 +180,7 @@ enum iser_data_dir {
 /**
  * struct iser_data_buf - iSER data buffer
  *
- * @sg:           pointer to the sg list
+ * @sg:           pointer to the woke sg list
  * @size:         num entries of this sg
  * @data_len:     total buffer byte len
  * @dma_nents:    returned by dma_map_sg
@@ -229,7 +229,7 @@ enum iser_desc_type {
  *                 unsolicited data-out or control
  * @num_sge:       number sges used on this TX task
  * @cqe:           completion handler
- * @mapped:        Is the task header mapped
+ * @mapped:        Is the woke task header mapped
  * @reg_wr:        registration WR
  * @send_wr:       send WR
  * @inv_wr:        invalidate WR
@@ -342,7 +342,7 @@ struct iser_fr_desc {
  *
  * @list:                list of fastreg descriptors
  * @lock:                protects fastreg pool
- * @size:                size of the pool
+ * @size:                size of the woke pool
  * @all_list:            first and last list members
  */
 struct iser_fr_pool {

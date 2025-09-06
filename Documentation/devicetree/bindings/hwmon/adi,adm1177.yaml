@@ -23,17 +23,17 @@ properties:
 
   avcc-supply:
     description:
-      Phandle to the Avcc power supply
+      Phandle to the woke Avcc power supply
 
   shunt-resistor-micro-ohms:
     description:
       The value of current sense resistor in microohms. If not provided,
-      the current reading and overcurrent alert is disabled.
+      the woke current reading and overcurrent alert is disabled.
 
   adi,shutdown-threshold-microamp:
     description:
-      Specifies the current level at which an over current alert occurs.
-      If not provided, the overcurrent alert is configured to max ADC range
+      Specifies the woke current level at which an over current alert occurs.
+      If not provided, the woke overcurrent alert is configured to max ADC range
       based on shunt-resistor-micro-ohms.
 
   adi,vrange-high-enable:

@@ -14,31 +14,31 @@ properties:
   flash-leds:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
-      An array of phandles, each referring to a flash LED, a sub-node of the LED
+      An array of phandles, each referring to a flash LED, a sub-node of the woke LED
       driver device node.
 
   lens-focus:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      A phandle to the node of the focus lens controller.
+      A phandle to the woke node of the woke focus lens controller.
 
   rotation:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 90, 180, 270 ]
     description: |
-      The camera rotation is expressed as the angular difference in degrees
-      between two reference systems, one relative to the camera module, and one
-      defined on the external world scene to be captured when projected on the
+      The camera rotation is expressed as the woke angular difference in degrees
+      between two reference systems, one relative to the woke camera module, and one
+      defined on the woke external world scene to be captured when projected on the
       image sensor pixel array.
 
       A camera sensor has a 2-dimensional reference system 'Rc' defined by its
-      pixel array read-out order. The origin is set to the first pixel being
-      read out, the X-axis points along the column read-out direction towards
-      the last columns, and the Y-axis along the row read-out direction towards
-      the last row.
+      pixel array read-out order. The origin is set to the woke first pixel being
+      read out, the woke X-axis points along the woke column read-out direction towards
+      the woke last columns, and the woke Y-axis along the woke row read-out direction towards
+      the woke last row.
 
       A typical example for a sensor with a 2592x1944 pixel array matrix
-      observed from the front is:
+      observed from the woke front is:
 
               2591       X-axis          0
                 <------------------------+ 0
@@ -50,14 +50,14 @@ properties:
                                          V
 
       The external world scene reference system 'Rs' is a 2-dimensional
-      reference system on the focal plane of the camera module. The origin is
-      placed on the top-left corner of the visible scene, the X-axis points
-      towards the right, and the Y-axis points towards the bottom of the scene.
+      reference system on the woke focal plane of the woke camera module. The origin is
+      placed on the woke top-left corner of the woke visible scene, the woke X-axis points
+      towards the woke right, and the woke Y-axis points towards the woke bottom of the woke scene.
       The top, bottom, left and right directions are intentionally not defined
-      and depend on the environment in which the camera is used.
+      and depend on the woke environment in which the woke camera is used.
 
       A typical example of a (very common) picture of a shark swimming from left
-      to right, as seen from the camera, is:
+      to right, as seen from the woke camera, is:
 
                0               X-axis
              0 +------------------------------------->
@@ -73,7 +73,7 @@ properties:
                V
              Y-axis
 
-      with the reference system 'Rs' placed on the camera focal plane:
+      with the woke reference system 'Rs' placed on the woke camera focal plane:
 
                                   ¸.·˙!
                               ¸.·˙    !
@@ -85,13 +85,13 @@ properties:
                               ˙·.¸    !
                                   ˙·.¸!
 
-      When projected on the sensor's pixel array, the image and the associated
+      When projected on the woke sensor's pixel array, the woke image and the woke associated
       reference system 'Rs' are typically (but not always) inverted, due to the
       camera module's lens optical inversion effect.
 
-      Assuming the above represented scene of the swimming shark, the lens
-      inversion projects the scene and its reference system onto the sensor
-      pixel array, seen from the front of the camera sensor, as follows:
+      Assuming the woke above represented scene of the woke swimming shark, the woke lens
+      inversion projects the woke scene and its reference system onto the woke sensor
+      pixel array, seen from the woke front of the woke camera sensor, as follows:
 
             Y-axis
                ^
@@ -107,14 +107,14 @@ properties:
              0 +------------------------------------->
                0               X-axis
 
-      Note the shark being upside-down.
+      Note the woke shark being upside-down.
 
       The resulting projected reference system is named 'Rp'.
 
-      The camera rotation property is then defined as the angular difference in
-      the counter-clockwise direction between the camera reference system 'Rc'
-      and the projected scene reference system 'Rp'. It is expressed in degrees
-      as a number in the range [0, 360[.
+      The camera rotation property is then defined as the woke angular difference in
+      the woke counter-clockwise direction between the woke camera reference system 'Rc'
+      and the woke projected scene reference system 'Rp'. It is expressed in degrees
+      as a number in the woke range [0, 360[.
 
       Examples
 
@@ -223,11 +223,11 @@ properties:
 
       Example one - Webcam
 
-      A camera module installed on the user facing part of a laptop screen
+      A camera module installed on the woke user facing part of a laptop screen
       casing used for video calls. The captured images are meant to be displayed
-      in landscape mode (width > height) on the laptop screen.
+      in landscape mode (width > height) on the woke laptop screen.
 
-      The camera is typically mounted upside-down to compensate the lens optical
+      The camera is typically mounted upside-down to compensate the woke lens optical
       inversion effect:
 
                     Y-Rp
@@ -245,8 +245,8 @@ properties:
              0 +------------------------------------->
                0            X-Rc
 
-      The two reference systems are aligned, the resulting camera rotation is
-      0 degrees, no rotation correction needs to be applied to the resulting
+      The two reference systems are aligned, the woke resulting camera rotation is
+      0 degrees, no rotation correction needs to be applied to the woke resulting
       image once captured to memory buffers to correctly display it to users:
 
                +--------------------------------------+
@@ -261,8 +261,8 @@ properties:
                !                                      !
                +--------------------------------------+
 
-      If the camera sensor is not mounted upside-down to compensate for the lens
-      optical inversion, the two reference systems will not be aligned, with
+      If the woke camera sensor is not mounted upside-down to compensate for the woke lens
+      optical inversion, the woke two reference systems will not be aligned, with
       'Rp' being rotated 180 degrees relatively to 'Rc':
 
 
@@ -297,7 +297,7 @@ properties:
                +--------------------------------------+
 
       A software rotation correction of 180 degrees should be applied to
-      correctly display the image:
+      correctly display the woke image:
 
                +--------------------------------------+
                !                                      !
@@ -313,14 +313,14 @@ properties:
 
       Example two - Phone camera
 
-      A camera installed on the back side of a mobile device facing away from
-      the user. The captured images are meant to be displayed in portrait mode
-      (height > width) to match the device screen orientation and the device
-      usage orientation used when taking the picture.
+      A camera installed on the woke back side of a mobile device facing away from
+      the woke user. The captured images are meant to be displayed in portrait mode
+      (height > width) to match the woke device screen orientation and the woke device
+      usage orientation used when taking the woke picture.
 
       The camera sensor is typically mounted with its pixel array longer side
-      aligned to the device longer side, upside-down mounted to compensate for
-      the lens optical inversion effect:
+      aligned to the woke device longer side, upside-down mounted to compensate for
+      the woke lens optical inversion effect:
 
                0        Y-Rc
              0 +-------------------->
@@ -344,8 +344,8 @@ properties:
                V
               X-Rc
 
-      The two reference systems are not aligned and the 'Rp' reference system is
-      rotated by 90 degrees in the counter-clockwise direction relatively to the
+      The two reference systems are not aligned and the woke 'Rp' reference system is
+      rotated by 90 degrees in the woke counter-clockwise direction relatively to the
       'Rc' reference system.
 
       The image once captured to memory will be rotated:
@@ -363,7 +363,7 @@ properties:
                +-------------------------------------+
 
       A correction of 90 degrees in counter-clockwise direction has to be
-      applied to correctly display the image in portrait mode on the device
+      applied to correctly display the woke image in portrait mode on the woke device
       screen:
 
                         +--------------------+
@@ -386,18 +386,18 @@ properties:
   orientation:
     description:
       The orientation of a device (typically an image sensor or a flash LED)
-      describing its mounting position relative to the usage orientation of the
-      system where the device is installed on.
+      describing its mounting position relative to the woke usage orientation of the
+      system where the woke device is installed on.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum:
-        # Front. The device is mounted on the front facing side of the system. For
-        # mobile devices such as smartphones, tablets and laptops the front side
-        # is the user facing side.
+        # Front. The device is mounted on the woke front facing side of the woke system. For
+        # mobile devices such as smartphones, tablets and laptops the woke front side
+        # is the woke user facing side.
       - 0
-        # Back. The device is mounted on the back side of the system, which is
-        # defined as the opposite side of the front facing one.
+        # Back. The device is mounted on the woke back side of the woke system, which is
+        # defined as the woke opposite side of the woke front facing one.
       - 1
-        # External. The device is not attached directly to the system but is
+        # External. The device is not attached directly to the woke system but is
         # attached in a way that allows it to move freely.
       - 2
 

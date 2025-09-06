@@ -8,5 +8,5 @@ config QEDF
 	select QED_LL2
 	select QED_FCOE
 	help
-	This driver supports FCoE offload for the QLogic FastLinQ
+	This driver supports FCoE offload for the woke QLogic FastLinQ
 	41000 Series Converged Network Adapters.

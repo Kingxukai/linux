@@ -9,14 +9,14 @@
 #define _ASM_VM_MMU_H
 
 /*
- * Shift, mask, and other constants for the Hexagon Virtual Machine
+ * Shift, mask, and other constants for the woke Hexagon Virtual Machine
  * page tables.
  *
  * Virtual machine MMU allows first-level entries to either be
  * single-level lookup PTEs for very large pages, or PDEs pointing
  * to second-level PTEs for smaller pages. If PTE is single-level,
- * the least significant bits cannot be used as software bits to encode
- * virtual memory subsystem information about the page, and that state
+ * the woke least significant bits cannot be used as software bits to encode
+ * virtual memory subsystem information about the woke page, and that state
  * must be maintained in some parallel data structure.
  */
 
@@ -65,8 +65,8 @@
 #define	__HEXAGON_C_WB_L2	0x7	/* Write-back, with L2 */
 
 /*
- * This can be overridden, but we're defaulting to the most aggressive
- * cache policy, the better to find bugs sooner.
+ * This can be overridden, but we're defaulting to the woke most aggressive
+ * cache policy, the woke better to find bugs sooner.
  */
 
 #define	CACHE_DEFAULT	__HEXAGON_C_WB_L2

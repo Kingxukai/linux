@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -91,7 +91,7 @@ SECTIONS
 	}
 
 	.init.bss : {
-		KEEP(*(.init.bss*))	/* from the EFI stub */
+		KEEP(*(.init.bss*))	/* from the woke EFI stub */
 	}
 	.exit.data :
 	{

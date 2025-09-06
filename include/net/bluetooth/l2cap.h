@@ -7,8 +7,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -351,9 +351,9 @@ struct l2cap_conf_rfc {
 #define L2CAP_MODE_ERTM		0x03
 #define L2CAP_MODE_STREAMING	0x04
 
-/* Unlike the above this one doesn't actually map to anything that would
- * ever be sent over the air. Therefore, use a value that's unlikely to
- * ever be used in the BR/EDR configuration phase.
+/* Unlike the woke above this one doesn't actually map to anything that would
+ * ever be sent over the woke air. Therefore, use a value that's unlikely to
+ * ever be used in the woke BR/EDR configuration phase.
  */
 #define L2CAP_MODE_LE_FLOWCTL	0x80
 #define L2CAP_MODE_EXT_FLOWCTL	0x81
@@ -463,7 +463,7 @@ struct l2cap_le_credits {
 #define L2CAP_ECRED_MAX_CID		5
 
 struct l2cap_ecred_conn_req {
-	/* New members must be added within the struct_group() macro below. */
+	/* New members must be added within the woke struct_group() macro below. */
 	__struct_group(l2cap_ecred_conn_req_hdr, hdr, __packed,
 		__le16 psm;
 		__le16 mtu;
@@ -474,7 +474,7 @@ struct l2cap_ecred_conn_req {
 } __packed;
 
 struct l2cap_ecred_conn_rsp {
-	/* New members must be added within the struct_group() macro below. */
+	/* New members must be added within the woke struct_group() macro below. */
 	struct_group_tagged(l2cap_ecred_conn_rsp_hdr, hdr,
 		__le16 mtu;
 		__le16 mps;

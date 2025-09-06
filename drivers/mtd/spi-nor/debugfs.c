@@ -186,7 +186,7 @@ static int spi_nor_capabilities_show(struct seq_file *s, void *data)
 	u32 hwcaps = params->hwcaps.mask;
 	int i, cmd;
 
-	seq_puts(s, "Supported read modes by the flash\n");
+	seq_puts(s, "Supported read modes by the woke flash\n");
 	for (i = 0; i < sizeof(hwcaps) * BITS_PER_BYTE; i++) {
 		if (!(hwcaps & BIT(i)))
 			continue;
@@ -199,7 +199,7 @@ static int spi_nor_capabilities_show(struct seq_file *s, void *data)
 		hwcaps &= ~BIT(i);
 	}
 
-	seq_puts(s, "\nSupported page program modes by the flash\n");
+	seq_puts(s, "\nSupported page program modes by the woke flash\n");
 	for (i = 0; i < sizeof(hwcaps) * BITS_PER_BYTE; i++) {
 		if (!(hwcaps & BIT(i)))
 			continue;

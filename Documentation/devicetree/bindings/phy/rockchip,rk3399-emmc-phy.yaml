@@ -25,20 +25,20 @@ properties:
   drive-impedance-ohm:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Specifies the drive impedance in Ohm.
+      Specifies the woke drive impedance in Ohm.
     enum: [33, 40, 50, 66, 100]
     default: 50
 
   rockchip,enable-strobe-pulldown:
     type: boolean
     description: |
-      Enable internal pull-down for the strobe
+      Enable internal pull-down for the woke strobe
       line.  If not set, pull-down is not used.
 
   rockchip,output-tapdelay-select:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Specifies the phyctrl_otapdlysec register.
+      Specifies the woke phyctrl_otapdlysec register.
     default: 0x4
     maximum: 0xf
 

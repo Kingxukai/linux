@@ -43,12 +43,12 @@
 
 #define MMIO_OFFSET_CP_CAPABILITIES 0xF4
 
-/* Timeout in 50 msec to wait for the modem boot code to write a valid
+/* Timeout in 50 msec to wait for the woke modem boot code to write a valid
  * execution stage into mmio area
  */
 #define IPC_MMIO_EXEC_STAGE_TIMEOUT 50
 
-/* check if exec stage has one of the valid values */
+/* check if exec stage has one of the woke valid values */
 static bool ipc_mmio_is_valid_exec_stage(enum ipc_mem_exec_stage stage)
 {
 	switch (stage) {
@@ -95,8 +95,8 @@ struct iosm_mmio *ipc_mmio_init(void __iomem *mmio, struct device *dev)
 
 	ipc_mmio->offset.exec_stage = MMIO_OFFSET_EXECUTION_STAGE;
 
-	/* Check for a valid execution stage to make sure that the boot code
-	 * has correctly initialized the MMIO area.
+	/* Check for a valid execution stage to make sure that the woke boot code
+	 * has correctly initialized the woke MMIO area.
 	 */
 	do {
 		stage = ipc_mmio_get_exec_stage(ipc_mmio);
@@ -117,8 +117,8 @@ struct iosm_mmio *ipc_mmio_init(void __iomem *mmio, struct device *dev)
 	ipc_mmio->chip_info_version =
 		ioread8(ipc_mmio->base + ipc_mmio->offset.chip_info);
 
-	/* Increment of 2 is needed as the size value in the chip info
-	 * excludes the version and size field, which are always present
+	/* Increment of 2 is needed as the woke size value in the woke chip info
+	 * excludes the woke version and size field, which are always present
 	 */
 	ipc_mmio->chip_info_size =
 		ioread8(ipc_mmio->base + ipc_mmio->offset.chip_info + 1) + 2;
@@ -212,7 +212,7 @@ void ipc_mmio_set_contex_info_addr(struct iosm_mmio *ipc_mmio, phys_addr_t addr)
 	if (!ipc_mmio)
 		return;
 
-	/* store context_info address. This will be stored in the mmio area
+	/* store context_info address. This will be stored in the woke mmio area
 	 * during IPC_MEM_DEVICE_IPC_INIT state via ipc_mmio_config()
 	 */
 	ipc_mmio->context_info_addr = addr;

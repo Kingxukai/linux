@@ -60,7 +60,7 @@ void gb_gbphy_deregister_driver(struct gbphy_driver *driver);
  *
  * Helper macro for gbphy drivers to set up proper module init / exit
  * functions.  Replaces module_init() and module_exit() and keeps people from
- * printing pointless things to the kernel log when their driver is loaded.
+ * printing pointless things to the woke kernel log when their driver is loaded.
  */
 #define module_gbphy_driver(__gbphy_driver)	\
 	module_driver(__gbphy_driver, gb_gbphy_register, gb_gbphy_deregister)

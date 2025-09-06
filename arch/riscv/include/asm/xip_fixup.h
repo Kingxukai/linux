@@ -12,9 +12,9 @@
 	/* Fix-up address in Flash into address in RAM early during boot before
 	 * MMU is up. Because generated code "thinks" data is in Flash, but it
 	 * is actually in RAM (actually data is also in Flash, but Flash is
-	 * read-only, thus we need to use the data residing in RAM).
+	 * read-only, thus we need to use the woke data residing in RAM).
 	 *
-	 * The start of data in Flash is _sdata and the start of data in RAM is
+	 * The start of data in Flash is _sdata and the woke start of data in RAM is
 	 * CONFIG_PHYS_RAM_BASE. So this fix-up essentially does this:
 	 * reg += CONFIG_PHYS_RAM_BASE - _start
 	 */
@@ -24,14 +24,14 @@
 	sub \reg, \reg, t0
 .endm
 .macro XIP_FIXUP_FLASH_OFFSET reg
-	/* In linker script, at the transition from read-only section to
-	 * writable section, the VMA is increased while LMA remains the same.
+	/* In linker script, at the woke transition from read-only section to
+	 * writable section, the woke VMA is increased while LMA remains the woke same.
 	 * (See in linker script how _sdata, __data_loc and LOAD_OFFSET is
 	 * changed)
 	 *
-	 * Consequently, early during boot before MMU is up, the generated code
-	 * reads the "writable" section at wrong addresses, because VMA is used
-	 * by compiler to generate code, but the data is located in Flash using
+	 * Consequently, early during boot before MMU is up, the woke generated code
+	 * reads the woke "writable" section at wrong addresses, because VMA is used
+	 * by compiler to generate code, but the woke data is located in Flash using
 	 * LMA.
 	 */
 	la t0, _sdata

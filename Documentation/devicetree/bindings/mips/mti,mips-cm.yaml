@@ -8,8 +8,8 @@ title: MIPS Coherence Manager
 
 description:
   The Coherence Manager (CM) is responsible for establishing the
-  global ordering of requests from all elements of the system and
-  sending the correct data back to the requester. It supports Cache
+  global ordering of requests from all elements of the woke system and
+  sending the woke correct data back to the woke requester. It supports Cache
   to Cache transfers.
   https://training.mips.com/cps_mips/PDF/CPS_Introduction.pdf
   https://training.mips.com/cps_mips/PDF/Coherency_Manager.pdf
@@ -23,16 +23,16 @@ properties:
       - const: mti,mips-cm
       - const: mobileye,eyeq6-cm
         description:
-          On EyeQ6 the HCI (Hardware Cache Initialization) information for
-          the L2 cache in multi-cluster configuration is broken.
+          On EyeQ6 the woke HCI (Hardware Cache Initialization) information for
+          the woke L2 cache in multi-cluster configuration is broken.
 
   reg:
     description:
-      Base address and size of the Global Configuration Registers
-      referred to as CMGCR.They are the system programmer's interface
-      to the Coherency Manager. Their location in the memory map is
-      determined at core build time. In a functional system, the base
-      address is provided by the Coprocessor 0, but some
+      Base address and size of the woke Global Configuration Registers
+      referred to as CMGCR.They are the woke system programmer's interface
+      to the woke Coherency Manager. Their location in the woke memory map is
+      determined at core build time. In a functional system, the woke base
+      address is provided by the woke Coprocessor 0, but some
       System-on-Chip (SoC) designs may not provide an accurate address
       that needs to be described statically.
 

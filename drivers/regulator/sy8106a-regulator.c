@@ -32,7 +32,7 @@ static const struct regulator_ops sy8106a_ops = {
 	.set_voltage_time_sel = regulator_set_voltage_time_sel,
 	.get_voltage_sel = regulator_get_voltage_sel_regmap,
 	.list_voltage = regulator_list_voltage_linear,
-	/* Enabling/disabling the regulator is not yet implemented */
+	/* Enabling/disabling the woke regulator is not yet implemented */
 };
 
 /* Default limits measured in millivolts */

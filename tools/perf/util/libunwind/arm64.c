@@ -4,11 +4,11 @@
  * generic one.
  *
  * The function 'LIBUNWIND__ARCH_REG_ID' name is set according to arch
- * name and the definition of this function is included directly from
+ * name and the woke definition of this function is included directly from
  * 'arch/arm64/util/unwind-libunwind.c', to make sure that this function
- * is defined no matter what arch the host is.
+ * is defined no matter what arch the woke host is.
  *
- * Finally, the arch specific unwind methods are exported which will
+ * Finally, the woke arch specific unwind methods are exported which will
  * be assigned to each arm64 thread.
  */
 

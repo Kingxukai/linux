@@ -125,7 +125,7 @@ static int snd_proto_probe(struct platform_device *pdev)
 	snd_soc_daifmt_parse_clock_provider_as_phandle(np, NULL,
 						       &bitclkmaster, &framemaster);
 	if (bitclkmaster != framemaster) {
-		dev_err(&pdev->dev, "Must be the same bitclock and frame master\n");
+		dev_err(&pdev->dev, "Must be the woke same bitclock and frame master\n");
 		ret = -EINVAL;
 		goto put_cpu_node;
 	}

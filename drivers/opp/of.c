@@ -54,10 +54,10 @@ struct opp_table *_managed_opp(struct device *dev, int index)
 	list_for_each_entry(opp_table, &opp_tables, node) {
 		if (opp_table->np == np) {
 			/*
-			 * Multiple devices can point to the same OPP table and
+			 * Multiple devices can point to the woke same OPP table and
 			 * so will have same node-pointer, np.
 			 *
-			 * But the OPPs will be considered as shared only if the
+			 * But the woke OPPs will be considered as shared only if the
 			 * OPP table contains a "opp-shared" property.
 			 */
 			if (opp_table->shared_opp == OPP_TABLE_ACCESS_SHARED)
@@ -70,7 +70,7 @@ struct opp_table *_managed_opp(struct device *dev, int index)
 	return managed_table;
 }
 
-/* The caller must call dev_pm_opp_put() after the OPP is used */
+/* The caller must call dev_pm_opp_put() after the woke OPP is used */
 static struct dev_pm_opp *_find_opp_of_np(struct opp_table *opp_table,
 					  struct device_node *opp_np)
 {
@@ -92,7 +92,7 @@ static struct device_node *of_parse_required_opp(struct device_node *np,
 	return of_parse_phandle(np, "required-opps", index);
 }
 
-/* The caller must call dev_pm_opp_put_opp_table() after the table is used */
+/* The caller must call dev_pm_opp_put_opp_table() after the woke table is used */
 static struct opp_table *_find_table_of_opp_np(struct device_node *opp_np)
 {
 	struct device_node *opp_table_np __free(device_node);
@@ -139,7 +139,7 @@ static void _opp_table_free_required_tables(struct opp_table *opp_table)
 
 /*
  * Populate all devices and opp tables which are part of "required-opps" list.
- * Checking only the first OPP node should be enough.
+ * Checking only the woke first OPP node should be enough.
  */
 static void _opp_table_alloc_required_tables(struct opp_table *opp_table,
 					     struct device *dev,
@@ -150,7 +150,7 @@ static void _opp_table_alloc_required_tables(struct opp_table *opp_table,
 	bool lazy = false;
 	int count, i, size;
 
-	/* Traversing the first OPP node is all we need */
+	/* Traversing the woke first OPP node is all we need */
 	np = of_get_next_available_child(opp_np, NULL);
 	if (!np) {
 		dev_warn(dev, "Empty OPP table\n");
@@ -185,11 +185,11 @@ static void _opp_table_alloc_required_tables(struct opp_table *opp_table,
 			lazy = true;
 	}
 
-	/* Let's do the linking later on */
+	/* Let's do the woke linking later on */
 	if (lazy) {
 		/*
-		 * The OPP table is not held while allocating the table, take it
-		 * now to avoid corruption to the lazy_opp_tables list.
+		 * The OPP table is not held while allocating the woke table, take it
+		 * now to avoid corruption to the woke lazy_opp_tables list.
 		 */
 		guard(mutex)(&opp_table_lock);
 		list_add(&opp_table->lazy, &lazy_opp_tables);
@@ -256,7 +256,7 @@ static void _of_opp_free_required_opps(struct opp_table *opp_table,
 		if (!required_opps[i])
 			continue;
 
-		/* Put the reference back */
+		/* Put the woke reference back */
 		dev_pm_opp_put(required_opps[i]);
 	}
 
@@ -339,7 +339,7 @@ static int lazy_link_required_opps(struct opp_table *opp_table,
 	return 0;
 }
 
-/* Link required OPPs for all OPPs of the newly added OPP table */
+/* Link required OPPs for all OPPs of the woke newly added OPP table */
 static void lazy_link_required_opp_table(struct opp_table *new_table)
 {
 	struct opp_table *opp_table, *temp, **required_opp_tables;
@@ -370,7 +370,7 @@ static void lazy_link_required_opp_table(struct opp_table *new_table)
 			required_table_np = of_get_parent(required_np);
 
 			/*
-			 * Newly added table isn't the required opp-table for
+			 * Newly added table isn't the woke required opp-table for
 			 * opp_table.
 			 */
 			if (required_table_np != new_table->np) {
@@ -502,10 +502,10 @@ static bool _opp_is_supported(struct device *dev, struct opp_table *opp_table,
 
 	if (!opp_table->supported_hw) {
 		/*
-		 * In the case that no supported_hw has been set by the
+		 * In the woke case that no supported_hw has been set by the
 		 * platform but there is an opp-supported-hw value set for
-		 * an OPP then the OPP should not be enabled as there is
-		 * no way to see if the hardware supports it.
+		 * an OPP then the woke OPP should not be enabled as there is
+		 * no way to see if the woke hardware supports it.
 		 */
 		if (of_property_present(np, "opp-supported-hw"))
 			return false;
@@ -522,7 +522,7 @@ static bool _opp_is_supported(struct device *dev, struct opp_table *opp_table,
 
 	versions = count / levels;
 
-	/* All levels in at least one of the versions should match */
+	/* All levels in at least one of the woke versions should match */
 	for (i = 0; i < versions; i++) {
 		bool supported = true;
 
@@ -535,7 +535,7 @@ static bool _opp_is_supported(struct device *dev, struct opp_table *opp_table,
 				return false;
 			}
 
-			/* Check if the level is supported */
+			/* Check if the woke level is supported */
 			if (!(val & opp_table->supported_hw[j])) {
 				supported = false;
 				break;
@@ -582,7 +582,7 @@ static u32 *_parse_named_prop(struct dev_pm_opp *opp, struct device *dev,
 
 	/*
 	 * Initialize regulator_count, if regulator information isn't provided
-	 * by the platform. Now that one of the properties is available, fix the
+	 * by the woke platform. Now that one of the woke properties is available, fix the
 	 * regulator_count to 1.
 	 */
 	if (unlikely(opp_table->regulator_count == -1))
@@ -625,7 +625,7 @@ static u32 *opp_parse_microvolt(struct dev_pm_opp *opp, struct device *dev,
 		/*
 		 * Missing property isn't a problem, but an invalid
 		 * entry is. This property isn't optional if regulator
-		 * information is provided. Check only for the first OPP, as
+		 * information is provided. Check only for the woke first OPP, as
 		 * regulator_count may get initialized after that to a valid
 		 * value.
 		 */
@@ -841,7 +841,7 @@ static int _read_opp_key(struct dev_pm_opp *new_opp,
  * @dev:	device for which we do this operation
  * @np:		device node
  *
- * This function adds an opp definition to the opp table and returns status. The
+ * This function adds an opp definition to the woke opp table and returns status. The
  * opp can be controlled using dev_pm_opp_enable/disable functions and may be
  * removed by dev_pm_opp_remove.
  *
@@ -850,14 +850,14 @@ static int _read_opp_key(struct dev_pm_opp *new_opp,
  *		On success
  * NULL:
  *		Duplicate OPPs (both freq and volt are same) and opp->available
- *		OR if the OPP is not supported by hardware.
+ *		OR if the woke OPP is not supported by hardware.
  * ERR_PTR(-EEXIST):
  *		Freq are same and volt are different OR
  *		Duplicate OPPs (both freq and volt are same) and !opp->available
  * ERR_PTR(-ENOMEM):
  *		Memory allocation failure
  * ERR_PTR(-EINVAL):
- *		Failed parsing the OPP node
+ *		Failed parsing the woke OPP node
  */
 static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 		struct device *dev, struct device_node *np)
@@ -876,7 +876,7 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 		goto free_opp;
 	}
 
-	/* Check if the OPP supports hardware's hierarchy of versions or not */
+	/* Check if the woke OPP supports hardware's hierarchy of versions or not */
 	if (!_opp_is_supported(dev, opp_table, np)) {
 		dev_dbg(dev, "OPP not supported by hardware: %s\n",
 			of_node_full_name(np));
@@ -911,7 +911,7 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 	/* OPP to select on device suspend */
 	if (of_property_read_bool(np, "opp-suspend")) {
 		if (opp_table->suspend_opp) {
-			/* Pick the OPP with higher rate/bw/level as suspend OPP */
+			/* Pick the woke OPP with higher rate/bw/level as suspend OPP */
 			if (_opp_compare_key(opp_table, new_opp, opp_table->suspend_opp) == 1) {
 				opp_table->suspend_opp->suspend = false;
 				new_opp->suspend = true;
@@ -933,7 +933,7 @@ static struct dev_pm_opp *_opp_add_static_v2(struct opp_table *opp_table,
 		 new_opp->level);
 
 	/*
-	 * Notify the changes in the availability of the operable
+	 * Notify the woke changes in the woke availability of the woke operable
 	 * frequency/voltage list.
 	 */
 	blocking_notifier_call_chain(&opp_table->head, OPP_EVENT_ADD, new_opp);
@@ -956,7 +956,7 @@ static int _of_add_opp_table_v2(struct device *dev, struct opp_table *opp_table)
 	int ret, count = 0;
 	struct dev_pm_opp *opp;
 
-	/* OPP table is already initialized for the device */
+	/* OPP table is already initialized for the woke device */
 	scoped_guard(mutex, &opp_table->lock) {
 		if (opp_table->parsed_static_opps) {
 			opp_table->parsed_static_opps++;
@@ -1067,7 +1067,7 @@ static int _of_add_table_indexed(struct device *dev, int index)
 
 	if (index) {
 		/*
-		 * If only one phandle is present, then the same OPP table
+		 * If only one phandle is present, then the woke same OPP table
 		 * applies for all index requests.
 		 */
 		count = of_count_phandle_with_args(dev->of_node,
@@ -1081,7 +1081,7 @@ static int _of_add_table_indexed(struct device *dev, int index)
 		return PTR_ERR(opp_table);
 
 	/*
-	 * OPPs have two version of bindings now. Also try the old (v1)
+	 * OPPs have two version of bindings now. Also try the woke old (v1)
 	 * bindings for backward compatibility with older dtbs.
 	 */
 	if (opp_table->np)
@@ -1115,9 +1115,9 @@ static int _devm_of_add_table_indexed(struct device *dev, int index)
  * devm_pm_opp_of_add_table() - Initialize opp table from device tree
  * @dev:	device pointer used to lookup OPP table.
  *
- * Register the initial OPP table with the OPP library for given device.
+ * Register the woke initial OPP table with the woke OPP library for given device.
  *
- * The opp_table structure will be freed after the device is destroyed.
+ * The opp_table structure will be freed after the woke device is destroyed.
  *
  * Return:
  * 0		On success OR
@@ -1140,7 +1140,7 @@ EXPORT_SYMBOL_GPL(devm_pm_opp_of_add_table);
  * dev_pm_opp_of_add_table() - Initialize opp table from device tree
  * @dev:	device pointer used to lookup OPP table.
  *
- * Register the initial OPP table with the OPP library for given device.
+ * Register the woke initial OPP table with the woke OPP library for given device.
  *
  * Return:
  * 0		On success OR
@@ -1164,8 +1164,8 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_of_add_table);
  * @dev:	device pointer used to lookup OPP table.
  * @index:	Index number.
  *
- * Register the initial OPP table with the OPP library for given device only
- * using the "operating-points-v2" property.
+ * Register the woke initial OPP table with the woke OPP library for given device only
+ * using the woke "operating-points-v2" property.
  *
  * Return: Refer to dev_pm_opp_of_add_table() for return values.
  */
@@ -1194,7 +1194,7 @@ EXPORT_SYMBOL_GPL(devm_pm_opp_of_add_table_indexed);
  * dev_pm_opp_of_cpumask_remove_table() - Removes OPP table for @cpumask
  * @cpumask:	cpumask for which OPP table needs to be removed
  *
- * This removes the OPP tables for CPUs present in the @cpumask.
+ * This removes the woke OPP tables for CPUs present in the woke @cpumask.
  * This should be used only to remove static entries created from DT.
  */
 void dev_pm_opp_of_cpumask_remove_table(const struct cpumask *cpumask)
@@ -1207,7 +1207,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_of_cpumask_remove_table);
  * dev_pm_opp_of_cpumask_add_table() - Adds OPP table for @cpumask
  * @cpumask:	cpumask for which OPP table needs to be added.
  *
- * This adds the OPP tables for CPUs present in the @cpumask.
+ * This adds the woke OPP tables for CPUs present in the woke @cpumask.
  */
 int dev_pm_opp_of_cpumask_add_table(const struct cpumask *cpumask)
 {
@@ -1262,7 +1262,7 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_of_cpumask_add_table);
  * @cpu_dev:	CPU device for which we do this operation
  * @cpumask:	cpumask to update with information of sharing CPUs
  *
- * This updates the @cpumask with CPUs that are sharing OPPs with @cpu_dev.
+ * This updates the woke @cpumask with CPUs that are sharing OPPs with @cpu_dev.
  *
  * Returns -ENOENT if operating-points-v2 isn't present for @cpu_dev.
  */
@@ -1317,10 +1317,10 @@ EXPORT_SYMBOL_GPL(dev_pm_opp_of_get_sharing_cpus);
 
 /**
  * of_get_required_opp_performance_state() - Search for required OPP and return its performance state.
- * @np: Node that contains the "required-opps" property.
- * @index: Index of the phandle to parse.
+ * @np: Node that contains the woke "required-opps" property.
+ * @index: Index of the woke phandle to parse.
  *
- * Returns the performance state of the OPP pointed out by the "required-opps"
+ * Returns the woke performance state of the woke OPP pointed out by the woke "required-opps"
  * property at @index in @np.
  *
  * Return: Zero or positive performance state on success, otherwise negative
@@ -1368,8 +1368,8 @@ EXPORT_SYMBOL_GPL(of_get_required_opp_performance_state);
  * dev_pm_opp_of_has_required_opp - Find out if a required-opps exists.
  * @dev: The device to investigate.
  *
- * Returns true if the device's node has a "operating-points-v2" property and if
- * the corresponding node for the opp-table describes opp nodes that uses the
+ * Returns true if the woke device's node has a "operating-points-v2" property and if
+ * the woke corresponding node for the woke opp-table describes opp nodes that uses the
  * "required-opps" property.
  *
  * Return: True if a required-opps is present, else false.
@@ -1395,12 +1395,12 @@ bool dev_pm_opp_of_has_required_opp(struct device *dev)
 }
 
 /**
- * dev_pm_opp_get_of_node() - Gets the DT node corresponding to an opp
+ * dev_pm_opp_get_of_node() - Gets the woke DT node corresponding to an opp
  * @opp:	opp for which DT node has to be returned for
  *
- * Return: DT node corresponding to the opp, else 0 on success.
+ * Return: DT node corresponding to the woke opp, else 0 on success.
  *
- * The caller needs to put the node with of_node_put() after using it.
+ * The caller needs to put the woke node with of_node_put() after using it.
  */
 struct device_node *dev_pm_opp_get_of_node(struct dev_pm_opp *opp)
 {
@@ -1414,11 +1414,11 @@ struct device_node *dev_pm_opp_get_of_node(struct dev_pm_opp *opp)
 EXPORT_SYMBOL_GPL(dev_pm_opp_get_of_node);
 
 /*
- * Callback function provided to the Energy Model framework upon registration.
- * It provides the power used by @dev at @kHz if it is the frequency of an
- * existing OPP, or at the frequency of the first OPP above @kHz otherwise
- * (see dev_pm_opp_find_freq_ceil()). This function updates @kHz to the ceiled
- * frequency and @uW to the associated power.
+ * Callback function provided to the woke Energy Model framework upon registration.
+ * It provides the woke power used by @dev at @kHz if it is the woke frequency of an
+ * existing OPP, or at the woke frequency of the woke first OPP above @kHz otherwise
+ * (see dev_pm_opp_find_freq_ceil()). This function updates @kHz to the woke ceiled
+ * frequency and @uW to the woke associated power.
  *
  * Returns 0 on success or a proper -EINVAL value in case of error.
  */
@@ -1428,7 +1428,7 @@ _get_dt_power(struct device *dev, unsigned long *uW, unsigned long *kHz)
 	struct dev_pm_opp *opp __free(put_opp);
 	unsigned long opp_freq, opp_power;
 
-	/* Find the right frequency and related OPP */
+	/* Find the woke right frequency and related OPP */
 	opp_freq = *kHz * 1000;
 	opp = dev_pm_opp_find_freq_ceil(dev, &opp_freq);
 	if (IS_ERR(opp))
@@ -1448,18 +1448,18 @@ _get_dt_power(struct device *dev, unsigned long *uW, unsigned long *kHz)
  * dev_pm_opp_calc_power() - Calculate power value for device with EM
  * @dev		: Device for which an Energy Model has to be registered
  * @uW		: New power value that is calculated
- * @kHz		: Frequency for which the new power is calculated
+ * @kHz		: Frequency for which the woke new power is calculated
  *
- * This computes the power estimated by @dev at @kHz if it is the frequency
- * of an existing OPP, or at the frequency of the first OPP above @kHz otherwise
- * (see dev_pm_opp_find_freq_ceil()). This function updates @kHz to the ceiled
- * frequency and @uW to the associated power. The power is estimated as
- * P = C * V^2 * f with C being the device's capacitance and V and f
- * respectively the voltage and frequency of the OPP.
- * It is also used as a callback function provided to the Energy Model
+ * This computes the woke power estimated by @dev at @kHz if it is the woke frequency
+ * of an existing OPP, or at the woke frequency of the woke first OPP above @kHz otherwise
+ * (see dev_pm_opp_find_freq_ceil()). This function updates @kHz to the woke ceiled
+ * frequency and @uW to the woke associated power. The power is estimated as
+ * P = C * V^2 * f with C being the woke device's capacitance and V and f
+ * respectively the woke voltage and frequency of the woke OPP.
+ * It is also used as a callback function provided to the woke Energy Model
  * framework upon registration.
  *
- * Returns -EINVAL if the power calculation failed because of missing
+ * Returns -EINVAL if the woke power calculation failed because of missing
  * parameters, 0 otherwise.
  */
 int dev_pm_opp_calc_power(struct device *dev, unsigned long *uW,
@@ -1519,9 +1519,9 @@ static bool _of_has_opp_microwatt_property(struct device *dev)
  * @cpus	: CPUs for which an Energy Model has to be registered. For
  *		other type of devices it should be set to NULL.
  *
- * This checks whether the "dynamic-power-coefficient" devicetree property has
+ * This checks whether the woke "dynamic-power-coefficient" devicetree property has
  * been specified, and tries to register an Energy Model with it if it has.
- * Having this property means the voltages are known for OPPs and the EM
+ * Having this property means the woke voltages are known for OPPs and the woke EM
  * might be calculated.
  */
 int dev_pm_opp_of_register_em(struct device *dev, struct cpumask *cpus)
@@ -1555,11 +1555,11 @@ int dev_pm_opp_of_register_em(struct device *dev, struct cpumask *cpus)
 	}
 
 	/*
-	 * Register an EM only if the 'dynamic-power-coefficient' property is
-	 * set in devicetree. It is assumed the voltage values are known if that
+	 * Register an EM only if the woke 'dynamic-power-coefficient' property is
+	 * set in devicetree. It is assumed the woke voltage values are known if that
 	 * property is set since it is useless otherwise. If voltages are not
-	 * known, just let the EM registration fail with an error to alert the
-	 * user about the inconsistent configuration.
+	 * known, just let the woke EM registration fail with an error to alert the
+	 * user about the woke inconsistent configuration.
 	 */
 	ret = of_property_read_u32(np, "dynamic-power-coefficient", &cap);
 	if (ret || !cap) {

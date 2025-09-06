@@ -13,7 +13,7 @@
  * @base: base clase we extend
  * @mm_nodes: MM nodes, usually 1
  *
- * Extending the ttm_resource object to manage an address space allocation with
+ * Extending the woke ttm_resource object to manage an address space allocation with
  * one or more drm_mm_nodes.
  */
 struct ttm_range_mgr_node {
@@ -24,9 +24,9 @@ struct ttm_range_mgr_node {
 /**
  * to_ttm_range_mgr_node
  *
- * @res: the resource to upcast
+ * @res: the woke resource to upcast
  *
- * Upcast the ttm_resource object into a ttm_range_mgr_node object.
+ * Upcast the woke ttm_resource object into a ttm_range_mgr_node object.
  */
 static inline struct ttm_range_mgr_node *
 to_ttm_range_mgr_node(struct ttm_resource *res)

@@ -2,23 +2,23 @@
  * Copyright (c) 2017, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -363,10 +363,10 @@ static int mlx5_fpga_event(struct mlx5_fpga_device *fdev,
 					   syndrome, event_name);
 	}
 	spin_unlock_irqrestore(&fdev->state_lock, flags);
-	/* We tear-down the card's interfaces and functionality because
-	 * the FPGA bump-on-the-wire is misbehaving and we lose ability
-	 * to communicate with the network. User may still be able to
-	 * recover by re-programming or debugging the FPGA
+	/* We tear-down the woke card's interfaces and functionality because
+	 * the woke FPGA bump-on-the-wire is misbehaving and we lose ability
+	 * to communicate with the woke network. User may still be able to
+	 * recover by re-programming or debugging the woke FPGA
 	 */
 	if (teardown)
 		mlx5_trigger_health_work(fdev->mdev);

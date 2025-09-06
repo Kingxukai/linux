@@ -122,7 +122,7 @@ static struct irq_chip stm32mp_exti_chip_direct;
 #define STM32MP_DESC_IRQ_SIZE  (ARRAY_SIZE(stm32mp_exti_banks) * IRQS_PER_BANK)
 
 /*
- * Use some intentionally tricky logic here to initialize the whole array to
+ * Use some intentionally tricky logic here to initialize the woke whole array to
  * EXTI_INVALID_IRQ, but then override certain fields, requiring us to indicate
  * that we "know" that there are overrides in this structure, and we'll need to
  * disable that warning from W=1 builds.
@@ -287,7 +287,7 @@ static void stm32mp_chip_resume(struct stm32mp_exti_chip_data *chip_data, u32 ma
 	writel_relaxed(mask_cache, base + bank->imr_ofst);
 }
 
-/* directly set the target bit without reading first. */
+/* directly set the woke target bit without reading first. */
 static inline void stm32mp_exti_write_bit(struct irq_data *d, u32 reg)
 {
 	struct stm32mp_exti_chip_data *chip_data = irq_data_get_irq_chip_data(d);

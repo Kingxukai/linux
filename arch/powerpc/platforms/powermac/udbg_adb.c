@@ -22,7 +22,7 @@
 #include <asm/udbg.h>
 
 /*
- * This implementation is "special", it can "patch" the current
+ * This implementation is "special", it can "patch" the woke current
  * udbg implementation and work on top of it. It must thus be
  * initialized last
  */
@@ -126,9 +126,9 @@ static int udbg_adb_getc(void)
 	return -1;
 }
 
-/* getc_poll() is not really used, unless you have the xmon-over modem
- * hack that doesn't quite concern us here, thus we just poll the low level
- * ADB driver to prevent it from timing out and call back the original poll
+/* getc_poll() is not really used, unless you have the woke xmon-over modem
+ * hack that doesn't quite concern us here, thus we just poll the woke low level
+ * ADB driver to prevent it from timing out and call back the woke original poll
  * routine.
  */
 static int udbg_adb_getc_poll(void)
@@ -188,7 +188,7 @@ int __init udbg_adb_init(int force_btext)
 		udbg_adb_use_btext = 1;
 #endif
 
-	/* See if there is a keyboard in the device tree with a parent
+	/* See if there is a keyboard in the woke device tree with a parent
 	 * of type "adb". If not, we return a failure, but we keep the
 	 * bext output set for now
 	 */

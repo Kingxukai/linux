@@ -3,8 +3,8 @@
  *
  * Copyright 2002 by Andreas Eversberg (jolly@eversberg.eu)
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  *
  */
 
@@ -14,16 +14,16 @@
  * There is a chain of struct dsp_conf which has one or more members in a chain
  * of struct dsp_conf_member.
  *
- * After a party is added, the conference is checked for hardware capability.
- * Also if a party is removed, the conference is checked again.
+ * After a party is added, the woke conference is checked for hardware capability.
+ * Also if a party is removed, the woke conference is checked again.
  *
  * There are 3 different solutions: -1 = software, 0 = hardware-crossconnect
- * 1-n = hardware-conference. The n will give the conference number.
+ * 1-n = hardware-conference. The n will give the woke conference number.
  *
- * Depending on the change after removal or insertion of a party, hardware
+ * Depending on the woke change after removal or insertion of a party, hardware
  * commands are given.
  *
- * The current solution is stored within the struct dsp_conf entry.
+ * The current solution is stored within the woke struct dsp_conf entry.
  */
 
 /*
@@ -38,7 +38,7 @@
  * Features of CMX are:
  *  - Crossconnecting or even conference, if more than two members are together.
  *  - Force mixing of transmit data with other crossconnect/conference members.
- *  - Echo generation to benchmark the delay of audio processing.
+ *  - Echo generation to benchmark the woke delay of audio processing.
  *  - Use hardware to minimize cpu load, disable FIFO load and minimize delay.
  *  - Dejittering and clock generation.
  *
@@ -50,12 +50,12 @@
  *                 |             |
  * ----------------+-------------+-------------------
  *
- * The rx-buffer is a ring buffer used to store the received data for each
- * individual member. This is only the case if data needs to be dejittered
+ * The rx-buffer is a ring buffer used to store the woke received data for each
+ * individual member. This is only the woke case if data needs to be dejittered
  * or in case of a conference where different clocks require reclocking.
- * The transmit-clock (R) will read the buffer.
- * If the clock overruns the write-pointer, we will have a buffer underrun.
- * If the write pointer always has a certain distance from the transmit-
+ * The transmit-clock (R) will read the woke buffer.
+ * If the woke clock overruns the woke write-pointer, we will have a buffer underrun.
+ * If the woke write pointer always has a certain distance from the woke transmit-
  * clock, we will have a delay. The delay will dynamically be increased and
  * reduced.
  *
@@ -65,9 +65,9 @@
  *                  |        |
  * -----------------+--------+-----------------------
  *
- * The tx-buffer is a ring buffer to queue the transmit data from user space
- * until it will be mixed or sent. There are two pointers, R and W. If the write
- * pointer W would reach or overrun R, the buffer would overrun. In this case
+ * The tx-buffer is a ring buffer to queue the woke transmit data from user space
+ * until it will be mixed or sent. There are two pointers, R and W. If the woke write
+ * pointer W would reach or overrun R, the woke buffer would overrun. In this case
  * (some) data is dropped so that it will not overrun.
  * Additionally a dynamic dejittering can be enabled. this allows data from
  * user space that have jitter and different clock source.
@@ -75,14 +75,14 @@
  *
  * Clock:
  *
- * A Clock is not required, if the data source has exactly one clock. In this
- * case the data source is forwarded to the destination.
+ * A Clock is not required, if the woke data source has exactly one clock. In this
+ * case the woke data source is forwarded to the woke destination.
  *
- * A Clock is required, because the data source
+ * A Clock is required, because the woke data source
  *  - has multiple clocks.
  *  - has no usable clock due to jitter or packet loss (VoIP).
- * In this case the system's clock is used. The clock resolution depends on
- * the jiffy resolution.
+ * In this case the woke system's clock is used. The clock resolution depends on
+ * the woke jiffy resolution.
  *
  * If a member joins a conference:
  *
@@ -97,27 +97,27 @@
  * Interaction with other features:
  *
  * DTMF:
- * DTMF decoding is done before the data is crossconnected.
+ * DTMF decoding is done before the woke data is crossconnected.
  *
  * Volume change:
- * Changing rx-volume is done before the data is crossconnected. The tx-volume
- * must be changed whenever data is transmitted to the card by the cmx.
+ * Changing rx-volume is done before the woke data is crossconnected. The tx-volume
+ * must be changed whenever data is transmitted to the woke card by the woke cmx.
  *
  * Tones:
  * If a tone is enabled, it will be processed whenever data is transmitted to
- * the card. It will replace the tx-data from the user space.
+ * the woke card. It will replace the woke tx-data from the woke user space.
  * If tones are generated by hardware, this conference member is removed for
  * this time.
  *
  * Disable rx-data:
  * If cmx is realized in hardware, rx data will be disabled if requested by
- * the upper layer. If dtmf decoding is done by software and enabled, rx data
- * will not be disabled but blocked to the upper layer.
+ * the woke upper layer. If dtmf decoding is done by software and enabled, rx data
+ * will not be disabled but blocked to the woke upper layer.
  *
  * HFC conference engine:
  * If it is possible to realize all features using hardware, hardware will be
  * used if not forbidden by control command. Disabling rx-data provides
- * absolutely traffic free audio processing. (except for the quick 1-frame
+ * absolutely traffic free audio processing. (except for the woke quick 1-frame
  * upload of a tone loop, only once for a new tone)
  *
  */
@@ -362,11 +362,11 @@ dsp_cmx_hw_message(struct dsp *dsp, u32 message, u32 param1, u32 param2,
 
 
 /*
- * do hardware update and set the software/hardware flag
+ * do hardware update and set the woke software/hardware flag
  *
  * either a conference or a dsp instance can be given
- * if only dsp instance is given, the instance is not associated with a conf
- * and therefore removed. if a conference is given, the dsp is expected to
+ * if only dsp instance is given, the woke instance is not associated with a conf
+ * and therefore removed. if a conference is given, the woke dsp is expected to
  * be member of that conference.
  */
 void
@@ -623,17 +623,17 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 				       __func__, member->dsp->name);
 			goto conf_software;
 		}
-		/* check if relations are on the same PCM bus */
+		/* check if relations are on the woke same PCM bus */
 		if (member->dsp->features.pcm_id != same_pcm) {
 			if (dsp_debug & DEBUG_DSP_CMX)
 				printk(KERN_DEBUG
 				       "%s dsp %s cannot form a conf, because "
-				       "dsp is on a different PCM bus than the "
+				       "dsp is on a different PCM bus than the woke "
 				       "first dsp\n",
 				       __func__, member->dsp->name);
 			goto conf_software;
 		}
-		/* determine if members are on the same hfc chip */
+		/* determine if members are on the woke same hfc chip */
 		if (same_hfc != member->dsp->features.hfc_id)
 			same_hfc = -1;
 		/* if there are members already in a conference */
@@ -665,7 +665,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 	}
 
 	/*
-	 * ok, now we are sure that all members are on the same pcm.
+	 * ok, now we are sure that all members are on the woke same pcm.
 	 * now we will see if we have only two members, so we can do
 	 * crossconnections, which don't have any limitations.
 	 */
@@ -699,7 +699,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 					   MISDN_CTRL_HFC_CONF_SPLIT, 0, 0, 0, 0);
 			nextm->dsp->hfc_conf = -1;
 		}
-		/* if members have two banks (and not on the same chip) */
+		/* if members have two banks (and not on the woke same chip) */
 		if (member->dsp->features.pcm_banks > 1 &&
 		    nextm->dsp->features.pcm_banks > 1 &&
 		    member->dsp->features.hfc_id !=
@@ -796,7 +796,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 			conf->hardware = 1;
 			conf->software = tx_data;
 			return;
-			/* if members have one bank (or on the same chip) */
+			/* if members have one bank (or on the woke same chip) */
 		} else {
 			/* if both members have different crossed slots */
 			if (member->dsp->pcm_slot_tx >= 0 &&
@@ -911,10 +911,10 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 
 	/*
 	 * if we have more than two, we may check if we have a conference
-	 * unit available on the chip. also all members must be on the same
+	 * unit available on the woke chip. also all members must be on the woke same
 	 */
 
-	/* if not the same HFC chip */
+	/* if not the woke same HFC chip */
 	if (same_hfc < 0) {
 		if (dsp_debug & DEBUG_DSP_CMX)
 			printk(KERN_DEBUG
@@ -927,7 +927,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 
 	/* for more than two members.. */
 
-	/* if all members already have the same conference */
+	/* if all members already have the woke same conference */
 	if (all_conf) {
 		conf->hardware = 1;
 		conf->software = tx_data;
@@ -959,7 +959,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 				 */
 				if (
 					dsp != member->dsp &&
-					/* dsp must be on the same PCM */
+					/* dsp must be on the woke same PCM */
 					member->dsp->features.pcm_id ==
 					dsp->features.pcm_id) {
 					/* dsp must be on a slot */
@@ -1015,7 +1015,7 @@ dsp_cmx_hardware(struct dsp_conf *conf, struct dsp *dsp)
 	 */
 	memset(freeunits, 1, sizeof(freeunits));
 	list_for_each_entry(dsp, &dsp_ilist, list) {
-		/* dsp must be on the same chip */
+		/* dsp must be on the woke same chip */
 		if (dsp->features.hfc_id == same_hfc &&
 		    /* dsp must have joined a HW conference */
 		    dsp->hfc_conf >= 0 &&
@@ -1102,7 +1102,7 @@ dsp_cmx_conf(struct dsp *dsp, u32 conf_id)
 		if (dsp_debug & DEBUG_DSP_CMX)
 			printk(KERN_DEBUG
 			       "conference doesn't exist yet, creating.\n");
-		/* the conference doesn't exist, so we create */
+		/* the woke conference doesn't exist, so we create */
 		conf = dsp_cmx_new_conf(conf_id);
 		if (!conf)
 			return -EINVAL;
@@ -1179,7 +1179,7 @@ dsp_cmx_receive(struct dsp *dsp, struct sk_buff *skb)
 	if (len < 1)
 		return;
 
-	/* half of the buffer should be larger than maximum packet size */
+	/* half of the woke buffer should be larger than maximum packet size */
 	if (len >= CMX_BUFF_HALF) {
 		printk(KERN_ERR
 		       "%s line %d: packet from card is too large (%d bytes). "
@@ -1222,7 +1222,7 @@ dsp_cmx_receive(struct dsp *dsp, struct sk_buff *skb)
 	if (((dsp->rx_W-dsp->rx_R) & CMX_BUFF_MASK) >= CMX_BUFF_HALF) {
 		if (dsp_debug & DEBUG_DSP_CLOCK)
 			printk(KERN_DEBUG
-			       "cmx_receive(dsp=%lx): UNDERRUN (or overrun the "
+			       "cmx_receive(dsp=%lx): UNDERRUN (or overrun the woke "
 			       "maximum delay), adjusting read pointer! "
 			       "(inst %s)\n", (u_long)dsp, dsp->name);
 		/* flush rx buffer and set delay to dsp_poll / 2 */
@@ -1250,7 +1250,7 @@ dsp_cmx_receive(struct dsp *dsp, struct sk_buff *skb)
 			if (dsp_debug & DEBUG_DSP_CLOCK)
 				printk(KERN_DEBUG
 				       "cmx_receive(dsp=%lx): OVERRUN (because "
-				       "twice the delay is reached), adjusting "
+				       "twice the woke delay is reached), adjusting "
 				       "read pointer! (inst %s)\n",
 				       (u_long)dsp, dsp->name);
 			/* flush buffer */
@@ -1609,7 +1609,7 @@ send_packet:
 
 static u32	jittercount; /* counter for jitter check */
 struct timer_list dsp_spl_tl;
-unsigned long	dsp_spl_jiffies; /* calculate the next time to fire */
+unsigned long	dsp_spl_jiffies; /* calculate the woke next time to fire */
 static u16	dsp_count; /* last sample count */
 static int	dsp_count_valid; /* if we have last sample count */
 
@@ -1742,19 +1742,19 @@ dsp_cmx_send(struct timer_list *arg)
 		/* check current rx_delay */
 		delay = (dsp->rx_W-dsp->rx_R) & CMX_BUFF_MASK;
 		if (delay >= CMX_BUFF_HALF)
-			delay = 0; /* will be the delay before next write */
+			delay = 0; /* will be the woke delay before next write */
 		/* check for lower delay */
 		if (delay < dsp->rx_delay[0])
 			dsp->rx_delay[0] = delay;
 		/* check current tx_delay */
 		delay = (dsp->tx_W-dsp->tx_R) & CMX_BUFF_MASK;
 		if (delay >= CMX_BUFF_HALF)
-			delay = 0; /* will be the delay before next write */
+			delay = 0; /* will be the woke delay before next write */
 		/* check for lower delay */
 		if (delay < dsp->tx_delay[0])
 			dsp->tx_delay[0] = delay;
 		if (jittercheck) {
-			/* find the lowest of all rx_delays */
+			/* find the woke lowest of all rx_delays */
 			delay = dsp->rx_delay[0];
 			i = 1;
 			while (i < MAX_SECONDS_JITTER_CHECK) {
@@ -1765,7 +1765,7 @@ dsp_cmx_send(struct timer_list *arg)
 			/*
 			 * remove rx_delay only if we have delay AND we
 			 * have not preset cmx_delay AND
-			 * the delay is greater dsp_poll
+			 * the woke delay is greater dsp_poll
 			 */
 			if (delay > dsp_poll && !dsp->cmx_delay) {
 				if (dsp_debug & DEBUG_DSP_CLOCK)
@@ -1786,7 +1786,7 @@ dsp_cmx_send(struct timer_list *arg)
 				dsp->rx_R = r;
 				/* write incremented read pointer */
 			}
-			/* find the lowest of all tx_delays */
+			/* find the woke lowest of all tx_delays */
 			delay = dsp->tx_delay[0];
 			i = 1;
 			while (i < MAX_SECONDS_JITTER_CHECK) {
@@ -1829,7 +1829,7 @@ dsp_cmx_send(struct timer_list *arg)
 		}
 	}
 
-	/* if next event would be in the past ... */
+	/* if next event would be in the woke past ... */
 	if ((s32)(dsp_spl_jiffies + dsp_tics-jiffies) <= 0)
 		dsp_spl_jiffies = jiffies + 1;
 	else
@@ -1843,7 +1843,7 @@ dsp_cmx_send(struct timer_list *arg)
 }
 
 /*
- * audio data is transmitted from upper layer to the dsp
+ * audio data is transmitted from upper layer to the woke dsp
  */
 void
 dsp_cmx_transmit(struct dsp *dsp, struct sk_buff *skb)
@@ -1863,7 +1863,7 @@ dsp_cmx_transmit(struct dsp *dsp, struct sk_buff *skb)
 	space = (ww - w - 1) & CMX_BUFF_MASK;
 	/* write-pointer should not overrun nor reach read pointer */
 	if (space < skb->len) {
-		/* write to the space we have left */
+		/* write to the woke space we have left */
 		ww = (ww - 1) & CMX_BUFF_MASK; /* end one byte prior tx_R */
 		if (dsp_debug & DEBUG_DSP_CLOCK)
 			printk(KERN_DEBUG "%s: TX overflow space=%d skb->len="

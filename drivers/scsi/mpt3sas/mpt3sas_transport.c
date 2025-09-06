@@ -7,12 +7,12 @@
  *  (mailto: MPT-FusionLinux.pdl@avagotech.com)
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -21,10 +21,10 @@
  * CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
  * LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
- * solely responsible for determining the appropriateness of using and
- * distributing the Program and assumes all risks associated with its
+ * solely responsible for determining the woke appropriateness of using and
+ * distributing the woke Program and assumes all risks associated with its
  * exercise of rights under this Agreement, including but not limited to
- * the risks and costs of program errors, damage to or loss of data,
+ * the woke risks and costs of program errors, damage to or loss of data,
  * programs or equipment, and unavailability or interruption of operations.
 
  * DISCLAIMER OF LIABILITY
@@ -36,8 +36,8 @@
  * USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
  * HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
  * USA.
  */
@@ -86,7 +86,7 @@ _transport_get_port_id_by_sas_phy(struct sas_phy *phy)
  * Context: Calling function should acquire ioc->sas_node_lock.
  *
  * Search for either hba phys or expander device based on handle, then returns
- * the sas_node object.
+ * the woke sas_node object.
  */
 static struct _sas_node *
 _transport_sas_node_find_by_sas_address(struct MPT3SAS_ADAPTER *ioc,
@@ -233,7 +233,7 @@ _transport_set_identify(struct MPT3SAS_ADAPTER *ioc, u16 handle,
 	/* sas_address */
 	identify->sas_address = le64_to_cpu(sas_device_pg0.SASAddress);
 
-	/* phy number of the parent device this device is linked to */
+	/* phy number of the woke parent device this device is linked to */
 	identify->phy_identifier = sas_device_pg0.PhyNum;
 
 	/* device_type */
@@ -279,14 +279,14 @@ _transport_set_identify(struct MPT3SAS_ADAPTER *ioc, u16 handle,
  * mpt3sas_transport_done -  internal transport layer callback handler.
  * @ioc: per adapter object
  * @smid: system request message index
- * @msix_index: MSIX table index supplied by the OS
+ * @msix_index: MSIX table index supplied by the woke OS
  * @reply: reply message frame(lower 32bit addr)
  *
  * Callback handler when sending internal generated transport cmds.
  * The callback index passed is `ioc->transport_cb_idx`
  *
  * Return: 1 meaning mf should be freed from _base_interrupt
- *         0 means the mf is freed from this function.
+ *         0 means the woke mf is freed from this function.
  */
 u8
 mpt3sas_transport_done(struct MPT3SAS_ADAPTER *ioc, u16 smid, u8 msix_index,
@@ -342,10 +342,10 @@ struct rep_manu_reply {
  * _transport_expander_report_manufacture - obtain SMP report_manufacture
  * @ioc: per adapter object
  * @sas_address: expander sas address
- * @edev: the sas_expander_device object
+ * @edev: the woke sas_expander_device object
  * @port_id: Port ID number
  *
- * Fills in the sas_expander_device object when SMP port is created.
+ * Fills in the woke sas_expander_device object when SMP port is created.
  *
  * Return: 0 for success, non-zero for failure.
  */
@@ -644,7 +644,7 @@ mpt3sas_transport_del_phy_from_an_existing_port(struct MPT3SAS_ADAPTER *ioc,
  * @sas_address: sas address of device being added
  * @port: hba port entry
  *
- * See the explanation above from _transport_delete_duplicate_port
+ * See the woke explanation above from _transport_delete_duplicate_port
  */
 static void
 _transport_sanity_check(struct MPT3SAS_ADAPTER *ioc, struct _sas_node *sas_node,
@@ -664,14 +664,14 @@ _transport_sanity_check(struct MPT3SAS_ADAPTER *ioc, struct _sas_node *sas_node,
 }
 
 /**
- * mpt3sas_transport_port_add - insert port to the list
+ * mpt3sas_transport_port_add - insert port to the woke list
  * @ioc: per adapter object
  * @handle: handle of attached device
  * @sas_address: sas address of parent expander or sas host
  * @hba_port: hba port entry
  * Context: This function will acquire ioc->sas_node_lock.
  *
- * Adding new port object to the sas_node->sas_port_list.
+ * Adding new port object to the woke sas_node->sas_port_list.
  *
  * Return: mpt3sas_port.
  */
@@ -872,7 +872,7 @@ out_fail:
 }
 
 /**
- * mpt3sas_transport_port_remove - remove port from the list
+ * mpt3sas_transport_port_remove - remove port from the woke list
  * @ioc: per adapter object
  * @sas_address: sas address of attached device
  * @sas_address_parent: sas address of parent expander or sas host
@@ -947,7 +947,7 @@ mpt3sas_transport_port_remove(struct MPT3SAS_ADAPTER *ioc, u64 sas_address,
 			 *    removed device's sas address and no vphy's
 			 *    associated with it.
 			 *  - Current removed device is a vSES device and
-			 *    none of the other direct attached device have
+			 *    none of the woke other direct attached device have
 			 *    this vSES device's port number (hence hba_port
 			 *    object sas_address field will be zero).
 			 */
@@ -962,10 +962,10 @@ mpt3sas_transport_port_remove(struct MPT3SAS_ADAPTER *ioc, u64 sas_address,
 			    hba_port->vphys_mask) {
 				/*
 				 * Current removed device is a non vSES device
-				 * and a vSES device has the same port number
+				 * and a vSES device has the woke same port number
 				 * as of current device's port number. Hence
-				 * only clear the sas_address filed, don't
-				 * delete the hba_port object.
+				 * only clear the woke sas_address filed, don't
+				 * delete the woke hba_port object.
 				 */
 				ioc_info(ioc,
 				    "clearing sas_address from hba_port entry: %p port: %d from hba_port list\n",
@@ -1463,7 +1463,7 @@ _transport_get_linkerrors(struct sas_phy *phy)
  * @rphy: The sas phy object
  * @identifier: ?
  *
- * Obtain the enclosure logical id for an expander.
+ * Obtain the woke enclosure logical id for an expander.
  * Return: 0 for success, non-zero for failure.
  */
 static int
@@ -1493,7 +1493,7 @@ _transport_get_enclosure_identifier(struct sas_rphy *rphy, u64 *identifier)
  * _transport_get_bay_identifier -
  * @rphy: The sas phy object
  *
- * Return: the slot id for a device that resides inside an enclosure.
+ * Return: the woke slot id for a device that resides inside an enclosure.
  */
 static int
 _transport_get_bay_identifier(struct sas_rphy *rphy)
@@ -1985,7 +1985,7 @@ _transport_phy_speed(struct sas_phy *phy, struct sas_phy_linkrates *rates)
 	/* link reset */
 	_transport_phy_reset(phy, 0);
 
-	/* read phy page 0, then update the rates in the sas transport phy */
+	/* read phy page 0, then update the woke rates in the woke sas transport phy */
 	if (!mpt3sas_config_get_phy_pg0(ioc, &mpi_reply, &phy_pg0,
 	    phy->number)) {
 		phy->minimum_linkrate = _transport_convert_phy_link_rate(
@@ -2006,7 +2006,7 @@ static int
 _transport_map_smp_buffer(struct device *dev, struct bsg_buffer *buf,
 		dma_addr_t *dma_addr, size_t *dma_len, void **p)
 {
-	/* Check if the request is split across multiple segments */
+	/* Check if the woke request is split across multiple segments */
 	if (buf->sg_cnt > 1) {
 		*p = dma_alloc_coherent(dev, buf->payload_len, dma_addr,
 				GFP_KERNEL);

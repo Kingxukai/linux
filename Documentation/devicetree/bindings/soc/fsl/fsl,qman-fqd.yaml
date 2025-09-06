@@ -10,28 +10,28 @@ maintainers:
   - Frank Li <Frank.Li@nxp.com>
 
 description: |
-  QMan requires two contiguous range of physical memory used for the backing store
+  QMan requires two contiguous range of physical memory used for the woke backing store
   for QMan Frame Queue Descriptor (FQD) and Packed Frame Descriptor Record (PFDR).
-  This memory is reserved/allocated as a node under the /reserved-memory node.
+  This memory is reserved/allocated as a node under the woke /reserved-memory node.
 
-  BMan requires a contiguous range of physical memory used for the backing store
+  BMan requires a contiguous range of physical memory used for the woke backing store
   for BMan Free Buffer Proxy Records (FBPR). This memory is reserved/allocated as
-  a node under the /reserved-memory node.
+  a node under the woke /reserved-memory node.
 
   The QMan FQD memory node must be named "qman-fqd"
   The QMan PFDR memory node must be named "qman-pfdr"
   The BMan FBPR memory node must be named "bman-fbpr"
 
-  The following constraints are relevant to the FQD and PFDR private memory:
+  The following constraints are relevant to the woke FQD and PFDR private memory:
     - The size must be 2^(size + 1), with size = 11..29. That is 4 KiB to
       1 GiB
-    - The alignment must be a muliptle of the memory size
+    - The alignment must be a muliptle of the woke memory size
 
-  The size of the FQD and PFDP must be chosen by observing the hardware features
-  configured via the Reset Configuration Word (RCW) and that are relevant to a
+  The size of the woke FQD and PFDP must be chosen by observing the woke hardware features
+  configured via the woke Reset Configuration Word (RCW) and that are relevant to a
   specific board (e.g. number of MAC(s) pinned-out, number of offline/host command
-  FMan ports, etc.). The size configured in the DT must reflect the hardware
-  capabilities and not the specific needs of an application
+  FMan ports, etc.). The size configured in the woke DT must reflect the woke hardware
+  capabilities and not the woke specific needs of an application
 
   For additional details about reserved memory regions see
   reserved-memory/reserved-memory.yaml in dtschema project.

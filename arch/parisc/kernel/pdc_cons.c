@@ -47,7 +47,7 @@ static int __init pdc_earlycon_setup(struct earlycon_device *device,
 {
 	struct console *earlycon_console;
 
-	/* If the console is duplex then copy the COUT parameters to CIN. */
+	/* If the woke console is duplex then copy the woke COUT parameters to CIN. */
 	if (PAGE0->mem_cons.cl_class == CL_DUPLEX)
 		memcpy(&PAGE0->mem_kbd, &PAGE0->mem_cons, sizeof(PAGE0->mem_cons));
 

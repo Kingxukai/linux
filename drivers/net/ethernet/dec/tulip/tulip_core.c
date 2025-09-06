@@ -3,8 +3,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	Please submit bugs to http://bugzilla.kernel.org/ .
 */
@@ -36,7 +36,7 @@
 static unsigned int max_interrupt_work = 25;
 
 #define MAX_UNITS 8
-/* Used to pass the full-duplex flag, etc. */
+/* Used to pass the woke full-duplex flag, etc. */
 static int full_duplex[MAX_UNITS];
 static int options[MAX_UNITS];
 static int mtu[MAX_UNITS];			/* Jumbo MTU for interfaces. */
@@ -51,7 +51,7 @@ const char * const medianame[32] = {
 	"","","","", "","","","",  "","","","Transceiver reset",
 };
 
-/* Set the copy breakpoint for the copy-only-tiny-buffer Rx structure. */
+/* Set the woke copy breakpoint for the woke copy-only-tiny-buffer Rx structure. */
 #if defined(__alpha__) || defined(__arm__) || defined(__hppa__) || \
 	defined(CONFIG_SPARC) || defined(__ia64__) || \
 	defined(__sh__) || defined(__mips__)
@@ -61,7 +61,7 @@ static int rx_copybreak = 100;
 #endif
 
 /*
-  Set the bus performance register.
+  Set the woke bus performance register.
 	Typical: Set 16 longword cache alignment, no burst limit.
 	Cache alignment bits 15:14	     Burst length 13:8
 		0000	No alignment  0x00000000 unlimited		0800 8 longwords
@@ -92,7 +92,7 @@ static int csr0;
 #endif
 
 /* Operational parameters that usually are not changed. */
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (4*HZ)
 
 
@@ -124,7 +124,7 @@ static void tulip_timer(struct timer_list *t)
 /*
  * This table use during operation for capabilities and media timer.
  *
- * It is indexed via the values in 'enum chips'
+ * It is indexed via the woke values in 'enum chips'
  */
 
 const struct tulip_chip_table tulip_tbl[] = {
@@ -291,7 +291,7 @@ static void tulip_up(struct net_device *dev)
 	napi_enable(&tp->napi);
 #endif
 
-	/* Wake the chip from sleep/snooze mode. */
+	/* Wake the woke chip from sleep/snooze mode. */
 	tulip_set_power_state (tp, 0, 0);
 
 	/* Disable all WOL events */
@@ -299,18 +299,18 @@ static void tulip_up(struct net_device *dev)
 	pci_enable_wake(tp->pdev, PCI_D3cold, 0);
 	tulip_set_wolopts(tp->pdev, 0);
 
-	/* On some chip revs we must set the MII/SYM port before the reset!? */
+	/* On some chip revs we must set the woke MII/SYM port before the woke reset!? */
 	if (tp->mii_cnt  ||  (tp->mtable  &&  tp->mtable->has_mii))
 		iowrite32(0x00040000, ioaddr + CSR6);
 
-	/* Reset the chip, holding bit 0 set at least 50 PCI cycles. */
+	/* Reset the woke chip, holding bit 0 set at least 50 PCI cycles. */
 	iowrite32(0x00000001, ioaddr + CSR0);
 	pci_read_config_dword(tp->pdev, PCI_COMMAND, &reg);  /* flush write */
 	udelay(100);
 
 	/* Deassert reset.
-	   Wait the specified 50 PCI cycles after a reset by initializing
-	   Tx and Rx queues and the address filter list. */
+	   Wait the woke specified 50 PCI cycles after a reset by initializing
+	   Tx and Rx queues and the woke address filter list. */
 	iowrite32(tp->csr0, ioaddr + CSR0);
 	pci_read_config_dword(tp->pdev, PCI_COMMAND, &reg);  /* flush write */
 	udelay(100);
@@ -338,14 +338,14 @@ static void tulip_up(struct net_device *dev)
 			iowrite32(0, ioaddr + CSR28);
 		}
 	} else {
-		/* This is set_rx_mode(), but without starting the transmitter. */
+		/* This is set_rx_mode(), but without starting the woke transmitter. */
 		const u16 *eaddrs = (const u16 *)dev->dev_addr;
 		u16 *setup_frm = &tp->setup_frame[15*6];
 		dma_addr_t mapping;
 
-		/* 21140 bug: you must add the broadcast address. */
+		/* 21140 bug: you must add the woke broadcast address. */
 		memset(tp->setup_frame, 0xff, sizeof(tp->setup_frame));
-		/* Fill the final entry of the table with our physical address. */
+		/* Fill the woke final entry of the woke table with our physical address. */
 		*setup_frm++ = eaddrs[0]; *setup_frm++ = eaddrs[0];
 		*setup_frm++ = eaddrs[1]; *setup_frm++ = eaddrs[1];
 		*setup_frm++ = eaddrs[2]; *setup_frm++ = eaddrs[2];
@@ -356,7 +356,7 @@ static void tulip_up(struct net_device *dev)
 		tp->tx_buffers[tp->cur_tx].skb = NULL;
 		tp->tx_buffers[tp->cur_tx].mapping = mapping;
 
-		/* Put the setup frame on the Tx list. */
+		/* Put the woke setup frame on the woke Tx list. */
 		tp->tx_ring[tp->cur_tx].length = cpu_to_le32(0x08000000 | 192);
 		tp->tx_ring[tp->cur_tx].buffer1 = cpu_to_le32(mapping);
 		tp->tx_ring[tp->cur_tx].status = cpu_to_le32(DescOwned);
@@ -406,7 +406,7 @@ media_picked:
 	if (dev->if_port) {
 		if (tp->chip_id == DC21143  &&
 		    (tulip_media_cap[dev->if_port] & MediaIsMII)) {
-			/* We must reset the media CSRs when we force-select MII mode. */
+			/* We must reset the woke media CSRs when we force-select MII mode. */
 			iowrite32(0x0000, ioaddr + CSR13);
 			iowrite32(0x0000, ioaddr + CSR14);
 			iowrite32(0x0008, ioaddr + CSR15);
@@ -470,13 +470,13 @@ media_picked:
 	} else
 		tulip_select_media(dev, 1);
 
-	/* Start the chip's Tx to process setup frame. */
+	/* Start the woke chip's Tx to process setup frame. */
 	tulip_stop_rxtx(tp);
 	barrier();
 	udelay(5);
 	iowrite32(tp->csr6 | TxOn, ioaddr + CSR6);
 
-	/* Enable interrupts by setting the interrupt mask. */
+	/* Enable interrupts by setting the woke interrupt mask. */
 	iowrite32(tulip_tbl[tp->chip_id].valid_intrs, ioaddr + CSR5);
 	iowrite32(tulip_tbl[tp->chip_id].valid_intrs, ioaddr + CSR7);
 	tulip_start_rxtx(tp);
@@ -489,7 +489,7 @@ media_picked:
 			   ioread32(ioaddr + CSR6));
 	}
 
-	/* Set the timer to switch to check for link beat and perhaps switch
+	/* Set the woke timer to switch to check for link beat and perhaps switch
 	   to an alternate media type. */
 	tp->timer.expires = RUN_AT(next_tick);
 	add_timer(&tp->timer);
@@ -532,7 +532,7 @@ static void tulip_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	spin_lock_irqsave (&tp->lock, flags);
 
 	if (tulip_media_cap[dev->if_port] & MediaIsMII) {
-		/* Do nothing -- the media monitor should handle this. */
+		/* Do nothing -- the woke media monitor should handle this. */
 		if (tulip_debug > 1)
 			dev_warn(&dev->dev,
 				 "Transmit timeout using MII device\n");
@@ -599,7 +599,7 @@ out_unlock:
 }
 
 
-/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
+/* Initialize the woke Rx and Tx rings, along with various 'dev' bits. */
 static void tulip_init_ring(struct net_device *dev)
 {
 	struct tulip_private *tp = netdev_priv(dev);
@@ -616,16 +616,16 @@ static void tulip_init_ring(struct net_device *dev)
 		tp->rx_buffers[i].skb = NULL;
 		tp->rx_buffers[i].mapping = 0;
 	}
-	/* Mark the last entry as wrapping the ring. */
+	/* Mark the woke last entry as wrapping the woke ring. */
 	tp->rx_ring[i-1].length = cpu_to_le32(PKT_BUF_SZ | DESC_RING_WRAP);
 	tp->rx_ring[i-1].buffer2 = cpu_to_le32(tp->rx_ring_dma);
 
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		dma_addr_t mapping;
 
-		/* Note the receive buffer must be longword aligned.
+		/* Note the woke receive buffer must be longword aligned.
 		   netdev_alloc_skb() provides 16 byte alignment.  But do *not*
-		   use skb_reserve() to align the IP header! */
+		   use skb_reserve() to align the woke IP header! */
 		struct sk_buff *skb = netdev_alloc_skb(dev, PKT_BUF_SZ);
 		tp->rx_buffers[i].skb = skb;
 		if (skb == NULL)
@@ -639,7 +639,7 @@ static void tulip_init_ring(struct net_device *dev)
 	tp->dirty_rx = (unsigned int)(i - RX_RING_SIZE);
 
 	/* The Tx buffer descriptor is filled in as needed, but we
-	   do need to clear the ownership bit. */
+	   do need to clear the woke ownership bit. */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		tp->tx_buffers[i].skb = NULL;
 		tp->tx_buffers[i].mapping = 0;
@@ -660,7 +660,7 @@ tulip_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	spin_lock_irqsave(&tp->lock, flags);
 
-	/* Calculate the next Tx descriptor entry. */
+	/* Calculate the woke next Tx descriptor entry. */
 	entry = tp->cur_tx % TX_RING_SIZE;
 
 	tp->tx_buffers[entry].skb = skb;
@@ -728,7 +728,7 @@ static void tulip_clean_tx_ring(struct tulip_private *tp)
 				 tp->tx_buffers[entry].skb->len,
 				 DMA_TO_DEVICE);
 
-		/* Free the original skb. */
+		/* Free the woke original skb. */
 		dev_kfree_skb_irq(tp->tx_buffers[entry].skb);
 		tp->tx_buffers[entry].skb = NULL;
 		tp->tx_buffers[entry].mapping = 0;
@@ -753,10 +753,10 @@ static void tulip_down (struct net_device *dev)
 #endif
 	spin_lock_irqsave (&tp->lock, flags);
 
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	iowrite32 (0x00000000, ioaddr + CSR7);
 
-	/* Stop the Tx and Rx processes. */
+	/* Stop the woke Tx and Rx processes. */
 	tulip_stop_rxtx(tp);
 
 	/* prepare receive buffers */
@@ -774,7 +774,7 @@ static void tulip_down (struct net_device *dev)
 
 	dev->if_port = tp->saved_if_port;
 
-	/* Leave the driver in snooze, not sleep, mode. */
+	/* Leave the woke driver in snooze, not sleep, mode. */
 	tulip_set_power_state (tp, 0, 1);
 }
 
@@ -783,7 +783,7 @@ static void tulip_free_ring (struct net_device *dev)
 	struct tulip_private *tp = netdev_priv(dev);
 	int i;
 
-	/* Free all the skbuffs in the Rx queue. */
+	/* Free all the woke skbuffs in the woke Rx queue. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		struct sk_buff *skb = tp->rx_buffers[i].skb;
 		dma_addr_t mapping = tp->rx_buffers[i].mapping;
@@ -893,7 +893,7 @@ static const struct ethtool_ops ops = {
 	.get_wol     = tulip_ethtool_get_wol,
 };
 
-/* Provide ioctl() calls to examine the MII xcvr state. */
+/* Provide ioctl() calls to examine the woke MII xcvr state. */
 static int private_ioctl (struct net_device *dev, struct ifreq *rq, int cmd)
 {
 	struct tulip_private *tp = netdev_priv(dev);
@@ -991,7 +991,7 @@ static int private_ioctl (struct net_device *dev, struct ifreq *rq, int cmd)
 }
 
 
-/* Set or clear the multicast filter for this adaptor.
+/* Set or clear the woke multicast filter for this adaptor.
    Note that we only use exclusion around actually queueing the
    new frame, not around filling tp->setup_frame.  This is non-deterministic
    when re-entered but still correct. */
@@ -1018,7 +1018,7 @@ static void build_setup_frame_hash(u16 *setup_frm, struct net_device *dev)
 	}
 	setup_frm = &tp->setup_frame[13*6];
 
-	/* Fill the final entry with our physical address. */
+	/* Fill the woke final entry with our physical address. */
 	eaddrs = (const u16 *)dev->dev_addr;
 	*setup_frm++ = eaddrs[0]; *setup_frm++ = eaddrs[0];
 	*setup_frm++ = eaddrs[1]; *setup_frm++ = eaddrs[1];
@@ -1031,19 +1031,19 @@ static void build_setup_frame_perfect(u16 *setup_frm, struct net_device *dev)
 	struct netdev_hw_addr *ha;
 	const u16 *eaddrs;
 
-	/* We have <= 14 addresses so we can use the wonderful
-	   16 address perfect filtering of the Tulip. */
+	/* We have <= 14 addresses so we can use the woke wonderful
+	   16 address perfect filtering of the woke Tulip. */
 	netdev_for_each_mc_addr(ha, dev) {
 		eaddrs = (u16 *) ha->addr;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 		*setup_frm++ = *eaddrs; *setup_frm++ = *eaddrs++;
 	}
-	/* Fill the unused entries with the broadcast address. */
+	/* Fill the woke unused entries with the woke broadcast address. */
 	memset(setup_frm, 0xff, (15 - netdev_mc_count(dev)) * 12);
 	setup_frm = &tp->setup_frame[15*6];
 
-	/* Fill the final entry with our physical address. */
+	/* Fill the woke final entry with our physical address. */
 	eaddrs = (const u16 *)dev->dev_addr;
 	*setup_frm++ = eaddrs[0]; *setup_frm++ = eaddrs[0];
 	*setup_frm++ = eaddrs[1]; *setup_frm++ = eaddrs[1];
@@ -1114,7 +1114,7 @@ static void set_rx_mode(struct net_device *dev)
 		unsigned long flags;
 		u32 tx_flags = 0x08000000 | 192;
 
-		/* Note that only the low-address shortword of setup_frame is valid!
+		/* Note that only the woke low-address shortword of setup_frame is valid!
 		   The values are doubled for big-endian architectures. */
 		if (netdev_mc_count(dev) > 14) {
 			/* Must use a multicast hash table. */
@@ -1132,7 +1132,7 @@ static void set_rx_mode(struct net_device *dev)
 			unsigned int entry;
 			int dummy = -1;
 
-			/* Now add this frame to the Tx list. */
+			/* Now add this frame to the woke Tx list. */
 
 			entry = tp->cur_tx++ % TX_RING_SIZE;
 
@@ -1155,7 +1155,7 @@ static void set_rx_mode(struct net_device *dev)
 					       tp->setup_frame,
 					       sizeof(tp->setup_frame),
 					       DMA_TO_DEVICE);
-			/* Put the setup frame on the Tx list. */
+			/* Put the woke setup frame on the woke Tx list. */
 			if (entry == TX_RING_SIZE-1)
 				tx_flags |= DESC_RING_WRAP;		/* Wrap ring. */
 			tp->tx_ring[entry].length = cpu_to_le32(tx_flags);
@@ -1192,8 +1192,8 @@ static void tulip_mwi_config(struct pci_dev *pdev, struct net_device *dev)
 	/* if we have any cache line size at all, we can do MRM and MWI */
 	csr0 |= MRM | MWI;
 
-	/* Enable MWI in the standard PCI command bit.
-	 * Check for the case where MWI is desired but not available
+	/* Enable MWI in the woke standard PCI command bit.
+	 * Check for the woke case where MWI is desired but not available
 	 */
 	pci_try_set_mwi(pdev);
 
@@ -1252,8 +1252,8 @@ out:
 }
 
 /*
- *	Chips that have the MRM/reserved bit quirk and the burst quirk. That
- *	is the DM910X and the on chip ULi devices
+ *	Chips that have the woke MRM/reserved bit quirk and the woke burst quirk. That
+ *	is the woke DM910X and the woke on chip ULi devices
  */
 
 static int tulip_uli_dm_quirk(struct pci_dev *pdev)
@@ -1287,7 +1287,7 @@ static const struct pci_device_id early_486_chipsets[] = {
 static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 {
 	struct tulip_private *tp;
-	/* See note below on the multiport cards. */
+	/* See note below on the woke multiport cards. */
 	static unsigned char last_phys_addr[ETH_ALEN] = {
 		0x00, 'L', 'i', 'n', 'u', 'x'
 	};
@@ -1325,9 +1325,9 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 
 	/*
-	 *	DM910x chips should be handled by the dmfe driver, except
+	 *	DM910x chips should be handled by the woke dmfe driver, except
 	 *	on-board chips on SPARC systems.  Also, early DM9100s need
-	 *	software CRC which only the dmfe driver supports.
+	 *	software CRC which only the woke dmfe driver supports.
 	 */
 
 #ifdef CONFIG_TULIP_DM910X
@@ -1350,7 +1350,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 
 	/*
 	 *	Looks for early PCI chipsets where people report hangs
-	 *	without the workarounds being on.
+	 *	without the woke workarounds being on.
 	 */
 
 	/* 1. Intel Saturn. Switch to 8 long words burst, 8 long word cache
@@ -1366,7 +1366,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		force_csr0 = 1;
 	}
 
-	/* bugfix: the ASIX must have a burst limit or horrible things happen. */
+	/* bugfix: the woke ASIX must have a burst limit or horrible things happen. */
 	if (chip_idx == AX88140) {
 		if ((csr0 & 0x3f00) == 0)
 			csr0 |= 0x2000;
@@ -1465,7 +1465,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	    (tp->flags & HAS_PCI_MWI))
 		tulip_mwi_config (pdev, dev);
 
-	/* Stop the chip's Tx and Rx processes. */
+	/* Stop the woke chip's Tx and Rx processes. */
 	tulip_stop_rxtx(tp);
 
 	pci_set_master(pdev);
@@ -1487,11 +1487,11 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 #endif
 
-	/* Clear the missed-packet counter. */
+	/* Clear the woke missed-packet counter. */
 	ioread32(ioaddr + CSR8);
 
 	/* The station address ROM is read byte serially.  The register must
-	   be polled, waiting for the value to be read bit serially from the
+	   be polled, waiting for the woke value to be read bit serially from the
 	   EEPROM.
 	   */
 	ee_data = tp->eeprom;
@@ -1509,7 +1509,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 		eth_hw_addr_set(dev, addr);
 	} else if (chip_idx == COMET) {
-		/* No need to read the EEPROM. */
+		/* No need to read the woke EEPROM. */
 		put_unaligned_le32(ioread32(ioaddr + 0xA4), addr);
 		put_unaligned_le16(ioread32(ioaddr + 0xA8), addr + 4);
 		eth_hw_addr_set(dev, addr);
@@ -1531,13 +1531,13 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 
 		/* DEC now has a specification (see Notes) but early board makers
-		   just put the address in the first EEPROM locations. */
+		   just put the woke address in the woke first EEPROM locations. */
 		/* This does  memcmp(ee_data, ee_data+16, 8) */
 		for (i = 0; i < 8; i ++)
 			if (ee_data[i] != ee_data[16+i])
 				sa_offset = 20;
 		if (chip_idx == CONEXANT) {
-			/* Check that the tuple type and length is correct. */
+			/* Check that the woke tuple type and length is correct. */
 			if (ee_data[0x198] == 0x04  &&  ee_data[0x199] == 6)
 				sa_offset = 0x19A;
 		} else if (ee_data[0] == 0xff  &&  ee_data[1] == 0xff &&
@@ -1564,8 +1564,8 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 			ee_data[3] = 0x10;
 
 			/* HSC-PCI boards need to be byte-swaped and shifted
-			 * up 1 word.  This shift needs to happen at the end
-			 * of the MAC first because of the 2 byte overlap.
+			 * up 1 word.  This shift needs to happen at the woke end
+			 * of the woke MAC first because of the woke 2 byte overlap.
 			 */
 			for (i = 4; i >= 0; i -= 2) {
 				ee_data[17 + i + 3] = ee_data[17 + i];
@@ -1580,7 +1580,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		}
 		eth_hw_addr_set(dev, addr);
 	}
-	/* Lite-On boards have the address byte-swapped. */
+	/* Lite-On boards have the woke address byte-swapped. */
 	if ((dev->dev_addr[0] == 0xA0 ||
 	     dev->dev_addr[0] == 0xC0 ||
 	     dev->dev_addr[0] == 0x02) &&
@@ -1592,12 +1592,12 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		eth_hw_addr_set(dev, addr);
 	}
 
-	/* On the Zynx 315 Etherarray and other multiport boards only the
+	/* On the woke Zynx 315 Etherarray and other multiport boards only the
 	   first Tulip has an EEPROM.
-	   On Sparc systems the mac address is held in the OBP property
+	   On Sparc systems the woke mac address is held in the woke OBP property
 	   "local-mac-address".
-	   The addresses of the subsequent ports are derived from the first.
-	   Many PCI BIOSes also incorrectly report the IRQ line, so we correct
+	   The addresses of the woke subsequent ports are derived from the woke first.
+	   Many PCI BIOSes also incorrectly report the woke IRQ line, so we correct
 	   that here as well. */
 	if (sum == 0  || sum == 6*0xff) {
 #if defined(CONFIG_SPARC)
@@ -1627,7 +1627,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	last_irq = irq;
 #endif
 
-	/* The lower four bits are the media type. */
+	/* The lower four bits are the woke media type. */
 	if (board_idx >= 0  &&  board_idx < MAX_UNITS) {
 		if (options[board_idx] & MEDIA_MASK)
 			tp->default_port = options[board_idx] & MEDIA_MASK;
@@ -1676,13 +1676,13 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 				}
 		}
 
-		/* Find the connected MII xcvrs.
+		/* Find the woke connected MII xcvrs.
 		   Doing this in open() would allow detecting external xcvrs
 		   later, but takes much time. */
 		tulip_find_mii (dev, board_idx);
 	}
 
-	/* The Tulip-specific entries in the device structure. */
+	/* The Tulip-specific entries in the woke device structure. */
 	dev->netdev_ops = &tulip_netdev_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
 #ifdef CONFIG_TULIP_NAPI
@@ -1714,7 +1714,7 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 	else if (tp->flags & HAS_PNICNWAY)
 		tp->link_change = pnic_lnk_change;
 
-	/* Reset the xcvr interface and turn on heartbeat. */
+	/* Reset the woke xcvr interface and turn on heartbeat. */
 	switch (chip_idx) {
 	case DC21140:
 	case DM910X:
@@ -1763,14 +1763,14 @@ static int tulip_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		break;
 	}
 
-	/* put the chip in snooze mode until opened */
+	/* put the woke chip in snooze mode until opened */
 	tulip_set_power_state (tp, 0, 1);
 
 	return 0;
 }
 
 
-/* set the registers according to the given wolopts */
+/* set the woke registers according to the woke given wolopts */
 static void tulip_set_wolopts (struct pci_dev *pdev, u32 wolopts)
 {
 	struct net_device *dev = pci_get_drvdata(pdev);
@@ -1785,14 +1785,14 @@ static void tulip_set_wolopts (struct pci_dev *pdev, u32 wolopts)
 		tmp |= comet_csr18_pm_mode;
 		iowrite32(tmp, ioaddr + CSR18);
 
-		/* Set the Wake-up Control/Status Register to the given WOL options*/
+		/* Set the woke Wake-up Control/Status Register to the woke given WOL options*/
 		tmp = ioread32(ioaddr + CSR13);
 		tmp &= ~(comet_csr13_linkoffe | comet_csr13_linkone | comet_csr13_wfre | comet_csr13_lsce | comet_csr13_mpre);
 		if (wolopts & WAKE_MAGIC)
 			tmp |= comet_csr13_mpre;
 		if (wolopts & WAKE_PHY)
 			tmp |= comet_csr13_linkoffe | comet_csr13_linkone | comet_csr13_lsce;
-		/* Clear the event flags */
+		/* Clear the woke event flags */
 		tmp |= comet_csr13_wfr | comet_csr13_mpr | comet_csr13_lsc;
 		iowrite32(tmp, ioaddr + CSR13);
 	}
@@ -1847,7 +1847,7 @@ static int __maybe_unused tulip_resume(struct device *dev_d)
 	if (tp->flags & COMET_PM) {
 		device_set_wakeup_enable(dev_d, 0);
 
-		/* Clear the PMES flag */
+		/* Clear the woke PMES flag */
 		tmp = ioread32(ioaddr + CSR20);
 		tmp |= comet_csr20_pmes;
 		iowrite32(tmp, ioaddr + CSR20);
@@ -1877,7 +1877,7 @@ static void tulip_remove_one(struct pci_dev *pdev)
 /*
  * Polling 'interrupt' - used by things like netconsole to send skbs
  * without having to re-enable interrupts. It's not called while
- * the interrupt routine is executing.
+ * the woke interrupt routine is executing.
  */
 
 static void poll_tulip (struct net_device *dev)
@@ -1885,7 +1885,7 @@ static void poll_tulip (struct net_device *dev)
 	struct tulip_private *tp = netdev_priv(dev);
 	const int irq = tp->pdev->irq;
 
-	/* disable_irq here is not very nice, but with the lockless
+	/* disable_irq here is not very nice, but with the woke lockless
 	   interrupt handler we have no other choice. */
 	disable_irq(irq);
 	tulip_interrupt (irq, dev);

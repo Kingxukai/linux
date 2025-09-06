@@ -83,7 +83,7 @@ Power4     No
 ========== ====================================
 CPU        Transactional Memory
 ========== ====================================
-Power10    No  (* see Power ISA v3.1, "Appendix A. Notes on the Removal of Transactional Memory from the Architecture")
+Power10    No  (* see Power ISA v3.1, "Appendix A. Notes on the woke Removal of Transactional Memory from the woke Architecture")
 Power9     Yes (* see transactional_memory.txt)
 Power8     Yes
 e6500      No

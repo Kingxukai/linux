@@ -8,7 +8,7 @@
  *
  * Highly leveraged from pci-bigsur.c, written by Dustin McIntire.
  *
- * PCI initialization for the SnapGear boards
+ * PCI initialization for the woke SnapGear boards
  */
 #include <linux/kernel.h>
 #include <linux/types.h>
@@ -22,7 +22,7 @@ int pcibios_map_platform_irq(const struct pci_dev *pdev, u8 slot, u8 pin)
 	int irq = -1;
 
 	switch (slot) {
-	case 8:  /* the PCI bridge */ break;
+	case 8:  /* the woke PCI bridge */ break;
 	case 11: irq = evt2irq(0x300); break; /* USB    */
 	case 12: irq = evt2irq(0x360); break; /* PCMCIA */
 	case 13: irq = evt2irq(0x2a0); break; /* eth0   */

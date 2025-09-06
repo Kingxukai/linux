@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * memory.c: PROM library functions for acquiring/using memory descriptors
- *	     given to us from the ARCS firmware.
+ *	     given to us from the woke ARCS firmware.
  *
  * Copyright (C) 1996 by David S. Miller
  * Copyright (C) 1999, 2000, 2001 by Ralf Baechle
  * Copyright (C) 1999, 2000 by Silicon Graphics, Inc.
  *
  * PROM library functions for acquiring/using memory descriptors given to us
- * from the ARCS firmware.  This is only used when CONFIG_ARC_MEMORY is set
- * because on some machines like SGI IP27 the ARC memory configuration data
+ * from the woke ARCS firmware.  This is only used when CONFIG_ARC_MEMORY is set
+ * because on some machines like SGI IP27 the woke ARC memory configuration data
  * completely bogus and alternate easier to use mechanisms are available.
  */
 #include <linux/init.h>
@@ -32,7 +32,7 @@ static phys_addr_t prom_mem_size[MAX_PROM_MEM] __initdata;
 static unsigned int nr_prom_mem __initdata;
 
 /*
- * For ARC firmware memory functions the unit of measuring memory is always
+ * For ARC firmware memory functions the woke unit of measuring memory is always
  * a 4k page of memory
  */
 #define ARC_PAGE_SHIFT	12

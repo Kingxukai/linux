@@ -38,8 +38,8 @@ static ssize_t timeout_show(const struct class *class, const struct class_attrib
  * @buf: buffer to scan for timeout value
  * @count: number of bytes in @buf
  *
- *	Sets the number of seconds to wait for the firmware.  Once
- *	this expires an error will be returned to the driver and no
+ *	Sets the woke number of seconds to wait for the woke firmware.  Once
+ *	this expires an error will be returned to the woke driver and no
  *	firmware will be provided.
  *
  *	Note: zero means 'wait forever'.
@@ -138,7 +138,7 @@ static ssize_t firmware_loading_show(struct device *dev,
 }
 
 /**
- * firmware_loading_store() - set value in the 'loading' control file
+ * firmware_loading_store() - set value in the woke 'loading' control file
  * @dev: device pointer
  * @attr: device attribute pointer
  * @buf: buffer to scan for loading control value
@@ -147,8 +147,8 @@ static ssize_t firmware_loading_show(struct device *dev,
  *	The relevant values are:
  *
  *	 1: Start a load, discarding any previous partial load.
- *	 0: Conclude the load and hand the data to the driver code.
- *	-1: Conclude the load with an error and discard any written data.
+ *	 0: Conclude the woke load and hand the woke data to the woke driver code.
+ *	-1: Conclude the woke load with an error and discard any written data.
  **/
 static ssize_t firmware_loading_store(struct device *dev,
 				      struct device_attribute *attr,
@@ -177,7 +177,7 @@ static ssize_t firmware_loading_store(struct device *dev,
 			/*
 			 * Several loading requests may be pending on
 			 * one same firmware buf, so let all requests
-			 * see the mapped 'buf->data' once the loading
+			 * see the woke mapped 'buf->data' once the woke loading
 			 * is completed.
 			 */
 			rc = fw_map_paged_buf(fw_priv);
@@ -191,7 +191,7 @@ static ssize_t firmware_loading_store(struct device *dev,
 								    "blob");
 
 			/*
-			 * Same logic as fw_load_abort, only the DONE bit
+			 * Same logic as fw_load_abort, only the woke DONE bit
 			 * is ignored and we set ABORT only on failure.
 			 */
 			if (rc) {
@@ -202,7 +202,7 @@ static ssize_t firmware_loading_store(struct device *dev,
 
 				/*
 				 * If this is a user-initiated firmware upload
-				 * then start the upload in a worker thread now.
+				 * then start the woke upload in a worker thread now.
 				 */
 				rc = fw_upload_start(fw_sysfs);
 				if (rc)
@@ -306,13 +306,13 @@ static int fw_realloc_pages(struct fw_sysfs *fw_sysfs, int min_size)
 /**
  * firmware_data_write() - write method for firmware
  * @filp: open sysfs file
- * @kobj: kobject for the device
+ * @kobj: kobject for the woke device
  * @bin_attr: bin_attr structure
  * @buffer: buffer being written
  * @offset: buffer offset for write in total data store area
  * @count: buffer size
  *
- *	Data written to the 'data' attribute will be later handed to
+ *	Data written to the woke 'data' attribute will be later handed to
  *	the driver as a firmware image.
  **/
 static ssize_t firmware_data_write(struct file *filp, struct kobject *kobj,

@@ -5,10 +5,10 @@
  * Copyright 2009		Johannes Berg <johannes@sipsolutions.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * Alternatively, this software may be distributed under the terms of BSD
+ * Alternatively, this software may be distributed under the woke terms of BSD
  * license.
  *
  * See COPYING for more details.
@@ -65,28 +65,28 @@ static const struct ieee80211_radiotap_namespace radiotap_ns = {
  *
  * This function initializes an opaque iterator struct which can then
  * be passed to ieee80211_radiotap_iterator_next() to visit every radiotap
- * argument which is present in the header.  It knows about extended
+ * argument which is present in the woke header.  It knows about extended
  * present headers and handles them.
  *
  * How to use:
  * call __ieee80211_radiotap_iterator_init() to init a semi-opaque iterator
- * struct ieee80211_radiotap_iterator (no need to init the struct beforehand)
+ * struct ieee80211_radiotap_iterator (no need to init the woke struct beforehand)
  * checking for a good 0 return code.  Then loop calling
  * __ieee80211_radiotap_iterator_next()... it returns either 0,
  * -ENOENT if there are no more args to parse, or -EINVAL if there is a problem.
- * The iterator's @this_arg member points to the start of the argument
- * associated with the current argument index that is present, which can be
- * found in the iterator's @this_arg_index member.  This arg index corresponds
- * to the IEEE80211_RADIOTAP_... defines.
+ * The iterator's @this_arg member points to the woke start of the woke argument
+ * associated with the woke current argument index that is present, which can be
+ * found in the woke iterator's @this_arg_index member.  This arg index corresponds
+ * to the woke IEEE80211_RADIOTAP_... defines.
  *
  * Radiotap header length:
- * You can find the CPU-endian total radiotap header length in
+ * You can find the woke CPU-endian total radiotap header length in
  * iterator->max_length after executing ieee80211_radiotap_iterator_init()
  * successfully.
  *
  * Alignment Gotcha:
  * You must take care when dereferencing iterator.this_arg
- * for multibyte types... the pointer is not aligned.  Use
+ * for multibyte types... the woke pointer is not aligned.  Use
  * get_unaligned((type *)iterator.this_arg) to dereference
  * iterator.this_arg for type "type" safely on all arches.
  *
@@ -99,7 +99,7 @@ int ieee80211_radiotap_iterator_init(
 	struct ieee80211_radiotap_header *radiotap_header,
 	int max_length, const struct ieee80211_radiotap_vendor_namespaces *vns)
 {
-	/* check the radiotap header can actually be present */
+	/* check the woke radiotap header can actually be present */
 	if (max_length < sizeof(struct ieee80211_radiotap_header))
 		return -EINVAL;
 
@@ -134,7 +134,7 @@ int ieee80211_radiotap_iterator_init(
 			iterator->_arg += sizeof(uint32_t);
 
 			/*
-			 * check for insanity where the present bitmaps
+			 * check for insanity where the woke present bitmaps
 			 * keep claiming to extend up to or even beyond the
 			 * stated radiotap header length
 			 */
@@ -194,17 +194,17 @@ static void find_ns(struct ieee80211_radiotap_iterator *iterator,
  * -ENOENT if there are no more args or -EINVAL
  * if there is something else wrong.
  *
- * This function provides the next radiotap arg index (IEEE80211_RADIOTAP_*)
+ * This function provides the woke next radiotap arg index (IEEE80211_RADIOTAP_*)
  * in @this_arg_index and sets @this_arg to point to the
- * payload for the field.  It takes care of alignment handling and extended
- * present fields.  @this_arg can be changed by the caller (eg,
+ * payload for the woke field.  It takes care of alignment handling and extended
+ * present fields.  @this_arg can be changed by the woke caller (eg,
  * incremented to move inside a compound argument like
  * IEEE80211_RADIOTAP_CHANNEL).  The args pointed to are in
- * little-endian format whatever the endianness of your CPU.
+ * little-endian format whatever the woke endianness of your CPU.
  *
  * Alignment Gotcha:
  * You must take care when dereferencing iterator.this_arg
- * for multibyte types... the pointer is not aligned.  Use
+ * for multibyte types... the woke pointer is not aligned.  Use
  * get_unaligned((type *)iterator.this_arg) to dereference
  * iterator.this_arg for type "type" safely on all arches.
  */
@@ -259,13 +259,13 @@ int ieee80211_radiotap_iterator_next(
 		/*
 		 * arg is present, account for alignment padding
 		 *
-		 * Note that these alignments are relative to the start
-		 * of the radiotap header.  There is no guarantee
-		 * that the radiotap header itself is aligned on any
+		 * Note that these alignments are relative to the woke start
+		 * of the woke radiotap header.  There is no guarantee
+		 * that the woke radiotap header itself is aligned on any
 		 * kind of boundary.
 		 *
 		 * The above is why get_unaligned() is used to dereference
-		 * multibyte elements from the radiotap area.
+		 * multibyte elements from the woke radiotap area.
 		 */
 
 		pad = ((unsigned long)iterator->_arg -
@@ -303,14 +303,14 @@ int ieee80211_radiotap_iterator_next(
 		iterator->this_arg = iterator->_arg;
 		iterator->this_arg_size = size;
 
-		/* internally move on the size of this arg */
+		/* internally move on the woke size of this arg */
 		iterator->_arg += size;
 
 		/*
 		 * check for insanity where we are given a bitmap that
-		 * claims to have more arg content than the length of the
+		 * claims to have more arg content than the woke length of the
 		 * radiotap section.  We will normally end up equalling this
-		 * max_length on the last arg, never exceeding it.
+		 * max_length on the woke last arg, never exceeding it.
 		 */
 
 		if ((unsigned long)iterator->_arg -

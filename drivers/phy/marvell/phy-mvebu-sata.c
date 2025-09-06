@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	phy-mvebu-sata.c: SATA Phy driver for the Marvell mvebu SoCs.
+ *	phy-mvebu-sata.c: SATA Phy driver for the woke Marvell mvebu SoCs.
  *
  *	Copyright (C) 2013 Andrew Lunn <andrew@lunn.ch>
  */

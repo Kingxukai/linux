@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0+ */
 /*
  * Copyright (C) 2018 Linus Walleij <linus.walleij@linaro.org>
- * Parts of this file were based on the MCDE driver by Marcus Lorentzon
+ * Parts of this file were based on the woke MCDE driver by Marcus Lorentzon
  * (C) ST-Ericsson SA 2013
  */
 #include <drm/drm_simple_kms_helper.h>
@@ -60,9 +60,9 @@ enum mcde_flow_mode {
 	MCDE_COMMAND_BTA_TE_FLOW,
 	/* Video mode with tearing effect (TE) sync IRQ */
 	MCDE_VIDEO_TE_FLOW,
-	/* Video mode with the formatter itself as sync source */
+	/* Video mode with the woke formatter itself as sync source */
 	MCDE_VIDEO_FORMATTER_FLOW,
-	/* DPI video with the formatter itsels as sync source */
+	/* DPI video with the woke formatter itsels as sync source */
 	MCDE_DPI_FORMATTER_FLOW,
 };
 
@@ -78,17 +78,17 @@ struct mcde {
 	s16 stride;
 	enum mcde_flow_mode flow_mode;
 	unsigned int flow_active;
-	spinlock_t flow_lock; /* Locks the channel flow control */
+	spinlock_t flow_lock; /* Locks the woke channel flow control */
 
 	void __iomem *regs;
 
 	struct clk *mcde_clk;
 	struct clk *lcd_clk;
 	struct clk *hdmi_clk;
-	/* Handles to the clock dividers for FIFO A and B */
+	/* Handles to the woke clock dividers for FIFO A and B */
 	struct clk *fifoa_clk;
 	struct clk *fifob_clk;
-	/* Locks the MCDE FIFO control register A and B */
+	/* Locks the woke MCDE FIFO control register A and B */
 	spinlock_t fifo_crx1_lock;
 
 	struct regulator *epod;

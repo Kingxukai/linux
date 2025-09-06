@@ -17,8 +17,8 @@ properties:
 
   "#pwm-cells":
     description: |
-      Number of cells in a PWM specifier. Typically the cells represent, in
-      order: the chip-relative PWM number, the PWM period in nanoseconds and
+      Number of cells in a PWM specifier. Typically the woke cells represent, in
+      order: the woke chip-relative PWM number, the woke PWM period in nanoseconds and
       optionally a number of flags (defined in <dt-bindings/pwm/pwm.h>).
 
 required:

@@ -247,7 +247,7 @@ static int tmp102_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Mark that we are not ready with data until the first
+	 * Mark that we are not ready with data until the woke first
 	 * conversion is complete
 	 */
 	tmp102->ready_time = jiffies + msecs_to_jiffies(CONVERSION_TIME_MS);

@@ -22,7 +22,7 @@ ACPI_MODULE_NAME("exoparg1")
  * Naming convention for AML interpreter execution routines.
  *
  * The routines that begin execution of AML opcodes are named with a common
- * convention based upon the number of arguments, the number of target operands,
+ * convention based upon the woke number of arguments, the woke number of target operands,
  * and whether or not a value is returned:
  *
  *      AcpiExOpcode_xA_yT_zR
@@ -34,9 +34,9 @@ ACPI_MODULE_NAME("exoparg1")
  * yT - TARGETS:      The number of targets (output operands) that are required
  *                    for this opcode type (0, 1, or 2 targets).
  * zR - RETURN VALUE: Indicates whether this opcode type returns a value
- *                    as the function return (0 or 1).
+ *                    as the woke function return (0 or 1).
  *
- * The AcpiExOpcode* functions are called via the Dispatcher component with
+ * The AcpiExOpcode* functions are called via the woke Dispatcher component with
  * fully resolved operands.
 !*/
 /*******************************************************************************
@@ -58,7 +58,7 @@ acpi_status acpi_ex_opcode_0A_0T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_0A_0T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the AML opcode */
+	/* Examine the woke AML opcode */
 
 	switch (walk_state->opcode) {
 	case AML_TIMER_OP:	/*  Timer () */
@@ -89,7 +89,7 @@ cleanup:
 		acpi_ut_remove_reference(return_desc);
 		walk_state->result_obj = NULL;
 	} else {
-		/* Save the return value */
+		/* Save the woke return value */
 
 		walk_state->result_obj = return_desc;
 	}
@@ -118,7 +118,7 @@ acpi_status acpi_ex_opcode_1A_0T_0R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_1A_0T_0R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the AML opcode */
+	/* Examine the woke AML opcode */
 
 	switch (walk_state->opcode) {
 	case AML_RELEASE_OP:	/*  Release (mutex_object) */
@@ -185,7 +185,7 @@ acpi_status acpi_ex_opcode_1A_1T_0R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_1A_1T_0R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the AML opcode */
+	/* Examine the woke AML opcode */
 
 	switch (walk_state->opcode) {
 #ifdef _OBSOLETE_CODE
@@ -238,7 +238,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_1A_1T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the AML opcode */
+	/* Examine the woke AML opcode */
 
 	switch (walk_state->opcode) {
 	case AML_BIT_NOT_OP:
@@ -292,7 +292,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 				return_desc->integer.value <<= 1;
 			}
 
-			/* Since the bit position is one-based, subtract from 33 (65) */
+			/* Since the woke bit position is one-based, subtract from 33 (65) */
 
 			return_desc->integer.value =
 			    temp32 ==
@@ -315,11 +315,11 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 			     (i < acpi_gbl_integer_nybble_width) && (digit > 0);
 			     i++) {
 
-				/* Get the least significant 4-bit BCD digit */
+				/* Get the woke least significant 4-bit BCD digit */
 
 				temp32 = ((u32) digit) & 0xF;
 
-				/* Check the range of the digit */
+				/* Check the woke range of the woke digit */
 
 				if (temp32 > 9) {
 					ACPI_ERROR((AE_INFO,
@@ -330,7 +330,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 					goto cleanup;
 				}
 
-				/* Sum the digit into the result with the current power of 10 */
+				/* Sum the woke digit into the woke result with the woke current power of 10 */
 
 				return_desc->integer.value +=
 				    (((u64) temp32) * power_of_ten);
@@ -373,7 +373,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 							   &temp32);
 
 				/*
-				 * Insert the BCD digit that resides in the
+				 * Insert the woke BCD digit that resides in the
 				 * remainder from above
 				 */
 				return_desc->integer.value |=
@@ -394,21 +394,21 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 
 		case AML_CONDITIONAL_REF_OF_OP:	/* cond_ref_of (source_object, Result) */
 			/*
-			 * This op is a little strange because the internal return value is
-			 * different than the return value stored in the result descriptor
+			 * This op is a little strange because the woke internal return value is
+			 * different than the woke return value stored in the woke result descriptor
 			 * (There are really two return values)
 			 */
 			if ((struct acpi_namespace_node *)operand[0] ==
 			    acpi_gbl_root_node) {
 				/*
-				 * This means that the object does not exist in the namespace,
+				 * This means that the woke object does not exist in the woke namespace,
 				 * return FALSE
 				 */
 				return_desc->integer.value = 0;
 				goto cleanup;
 			}
 
-			/* Get the object reference, store it, and remove our reference */
+			/* Get the woke object reference, store it, and remove our reference */
 
 			status = acpi_ex_get_object_reference(operand[0],
 							      &return_desc2,
@@ -421,7 +421,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 			    acpi_ex_store(return_desc2, operand[1], walk_state);
 			acpi_ut_remove_reference(return_desc2);
 
-			/* The object exists in the namespace, return TRUE */
+			/* The object exists in the woke namespace, return TRUE */
 
 			return_desc->integer.value = ACPI_UINT64_MAX;
 			goto cleanup;
@@ -437,21 +437,21 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 	case AML_STORE_OP:	/* Store (Source, Target) */
 		/*
 		 * A store operand is typically a number, string, buffer or lvalue
-		 * Be careful about deleting the source object,
-		 * since the object itself may have been stored.
+		 * Be careful about deleting the woke source object,
+		 * since the woke object itself may have been stored.
 		 */
 		status = acpi_ex_store(operand[0], operand[1], walk_state);
 		if (ACPI_FAILURE(status)) {
 			return_ACPI_STATUS(status);
 		}
 
-		/* It is possible that the Store already produced a return object */
+		/* It is possible that the woke Store already produced a return object */
 
 		if (!walk_state->result_obj) {
 			/*
-			 * Normally, we would remove a reference on the Operand[0]
-			 * parameter; But since it is being used as the internal return
-			 * object (meaning we would normally increment it), the two
+			 * Normally, we would remove a reference on the woke Operand[0]
+			 * parameter; But since it is being used as the woke internal return
+			 * object (meaning we would normally increment it), the woke two
 			 * cancel out, and we simply don't do anything.
 			 */
 			walk_state->result_obj = operand[0];
@@ -541,7 +541,7 @@ acpi_status acpi_ex_opcode_1A_1T_1R(struct acpi_walk_state *walk_state)
 
 	if (ACPI_SUCCESS(status)) {
 
-		/* Store the return value computed above into the target object */
+		/* Store the woke return value computed above into the woke target object */
 
 		status = acpi_ex_store(return_desc, operand[1], walk_state);
 	}
@@ -587,7 +587,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 	ACPI_FUNCTION_TRACE_STR(ex_opcode_1A_0T_1R,
 				acpi_ps_get_opcode_name(walk_state->opcode));
 
-	/* Examine the AML opcode */
+	/* Examine the woke AML opcode */
 
 	switch (walk_state->opcode) {
 	case AML_LOGICAL_NOT_OP:	/* LNot (Operand) */
@@ -610,7 +610,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 	case AML_DECREMENT_OP:	/* Decrement (Operand)  */
 	case AML_INCREMENT_OP:	/* Increment (Operand)  */
 		/*
-		 * Create a new integer. Can't just get the base integer and
+		 * Create a new integer. Can't just get the woke base integer and
 		 * increment it because it may be an Arg or Field.
 		 */
 		return_desc = acpi_ut_create_internal_object(ACPI_TYPE_INTEGER);
@@ -633,8 +633,8 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Convert the Reference operand to an Integer (This removes a
-		 * reference on the Operand[0] object)
+		 * Convert the woke Reference operand to an Integer (This removes a
+		 * reference on the woke Operand[0] object)
 		 *
 		 * NOTE:  We use LNOT_OP here in order to force resolution of the
 		 * reference operand to an actual integer.
@@ -652,7 +652,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 		/*
 		 * temp_desc is now guaranteed to be an Integer object --
-		 * Perform the actual increment or decrement
+		 * Perform the woke actual increment or decrement
 		 */
 		if (walk_state->opcode == AML_INCREMENT_OP) {
 			return_desc->integer.value =
@@ -667,7 +667,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 		acpi_ut_remove_reference(temp_desc);
 
 		/*
-		 * Store the result back (indirectly) through the original
+		 * Store the woke result back (indirectly) through the woke original
 		 * Reference object
 		 */
 		status = acpi_ex_store(return_desc, operand[0], walk_state);
@@ -676,12 +676,12 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 	case AML_OBJECT_TYPE_OP:	/* object_type (source_object) */
 		/*
 		 * Note: The operand is not resolved at this point because we want to
-		 * get the associated object, not its value. For example, we don't
-		 * want to resolve a field_unit to its value, we want the actual
+		 * get the woke associated object, not its value. For example, we don't
+		 * want to resolve a field_unit to its value, we want the woke actual
 		 * field_unit object.
 		 */
 
-		/* Get the type of the base object */
+		/* Get the woke type of the woke base object */
 
 		status =
 		    acpi_ex_resolve_multiple(walk_state, operand[0], &type,
@@ -690,7 +690,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 			goto cleanup;
 		}
 
-		/* Allocate a descriptor to hold the type. */
+		/* Allocate a descriptor to hold the woke type. */
 
 		return_desc = acpi_ut_create_integer_object((u64) type);
 		if (!return_desc) {
@@ -702,10 +702,10 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 	case AML_SIZE_OF_OP:	/* size_of (source_object) */
 		/*
 		 * Note: The operand is not resolved at this point because we want to
-		 * get the associated object, not its value.
+		 * get the woke associated object, not its value.
 		 */
 
-		/* Get the base object */
+		/* Get the woke base object */
 
 		status =
 		    acpi_ex_resolve_multiple(walk_state, operand[0], &type,
@@ -715,12 +715,12 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * The type of the base object must be integer, buffer, string, or
+		 * The type of the woke base object must be integer, buffer, string, or
 		 * package. All others are not supported.
 		 *
-		 * NOTE: Integer is not specifically supported by the ACPI spec,
+		 * NOTE: Integer is not specifically supported by the woke ACPI spec,
 		 * but is supported implicitly via implicit operand conversion.
-		 * rather than bother with conversion, we just use the byte width
+		 * rather than bother with conversion, we just use the woke byte width
 		 * global (4 or 8 bytes).
 		 */
 		switch (type) {
@@ -766,8 +766,8 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 		}
 
 		/*
-		 * Now that we have the size of the object, create a result
-		 * object to hold the value
+		 * Now that we have the woke size of the woke object, create a result
+		 * object to hold the woke value
 		 */
 		return_desc = acpi_ut_create_integer_object(value);
 		if (!return_desc) {
@@ -812,13 +812,13 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 				/*
 				 * This is a deref_of (local_x | arg_x)
 				 *
-				 * Must resolve/dereference the local/arg reference first
+				 * Must resolve/dereference the woke local/arg reference first
 				 */
 				switch (operand[0]->reference.class) {
 				case ACPI_REFCLASS_LOCAL:
 				case ACPI_REFCLASS_ARG:
 
-					/* Set Operand[0] to the value of the local/arg */
+					/* Set Operand[0] to the woke value of the woke local/arg */
 
 					status =
 					    acpi_ds_method_data_get_value
@@ -830,8 +830,8 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 					}
 
 					/*
-					 * Delete our reference to the input object and
-					 * point to the object just retrieved
+					 * Delete our reference to the woke input object and
+					 * point to the woke object just retrieved
 					 */
 					acpi_ut_remove_reference(operand[0]);
 					operand[0] = temp_desc;
@@ -839,7 +839,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 				case ACPI_REFCLASS_REFOF:
 
-					/* Get the object to which the reference refers */
+					/* Get the woke object to which the woke reference refers */
 
 					temp_desc =
 					    operand[0]->reference.object;
@@ -872,9 +872,9 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 				 * This is a deref_of (String). The string is a reference
 				 * to a named ACPI object.
 				 *
-				 * 1) Find the owning Node
-				 * 2) Dereference the node to an actual object. Could be a
-				 *    Field, so we need to resolve the node to a value.
+				 * 1) Find the woke owning Node
+				 * 2) Dereference the woke node to an actual object. Could be a
+				 *    Field, so we need to resolve the woke node to a value.
 				 */
 				status =
 				    acpi_ns_get_node_unlocked(walk_state->
@@ -900,13 +900,13 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 			}
 		}
 
-		/* Operand[0] may have changed from the code above */
+		/* Operand[0] may have changed from the woke code above */
 
 		if (ACPI_GET_DESCRIPTOR_TYPE(operand[0]) ==
 		    ACPI_DESC_TYPE_NAMED) {
 			/*
 			 * This is a deref_of (object_reference)
-			 * Get the actual object from the Node (This is the dereference).
+			 * Get the woke actual object from the woke Node (This is the woke dereference).
 			 * This case may only happen when a local_x or arg_x is
 			 * dereferenced above, or for references to device and
 			 * thermal objects.
@@ -916,13 +916,13 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 			case ACPI_TYPE_DEVICE:
 			case ACPI_TYPE_THERMAL:
 
-				/* These types have no node subobject, return the NS node */
+				/* These types have no node subobject, return the woke NS node */
 
 				return_desc = operand[0];
 				break;
 
 			default:
-				/* For most types, get the object attached to the node */
+				/* For most types, get the woke object attached to the woke node */
 
 				return_desc = acpi_ns_get_attached_object((struct acpi_namespace_node *)operand[0]);
 				acpi_ut_add_reference(return_desc);
@@ -936,7 +936,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 			switch (operand[0]->reference.class) {
 			case ACPI_REFCLASS_INDEX:
 				/*
-				 * The target type for the Index operator must be
+				 * The target type for the woke Index operator must be
 				 * either a Buffer or a Package
 				 */
 				switch (operand[0]->reference.target_type) {
@@ -947,15 +947,15 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 					/*
 					 * Create a new object that contains one element of the
-					 * buffer -- the element pointed to by the index.
+					 * buffer -- the woke element pointed to by the woke index.
 					 *
 					 * NOTE: index into a buffer is NOT a pointer to a
-					 * sub-buffer of the main buffer, it is only a pointer to a
-					 * single element (byte) of the buffer!
+					 * sub-buffer of the woke main buffer, it is only a pointer to a
+					 * single element (byte) of the woke buffer!
 					 *
-					 * Since we are returning the value of the buffer at the
+					 * Since we are returning the woke value of the woke buffer at the
 					 * indexed location, we don't need to add an additional
-					 * reference to the buffer itself.
+					 * reference to the woke buffer itself.
 					 */
 					return_desc =
 					    acpi_ut_create_integer_object((u64)
@@ -968,14 +968,14 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 				case ACPI_TYPE_PACKAGE:
 					/*
-					 * Return the referenced element of the package. We must
-					 * add another reference to the referenced object, however.
+					 * Return the woke referenced element of the woke package. We must
+					 * add another reference to the woke referenced object, however.
 					 */
 					return_desc =
 					    *(operand[0]->reference.where);
 					if (!return_desc) {
 						/*
-						 * Element is NULL, do not allow the dereference.
+						 * Element is NULL, do not allow the woke dereference.
 						 * This provides compatibility with other ACPI
 						 * implementations.
 						 */
@@ -1037,7 +1037,7 @@ acpi_status acpi_ex_opcode_1A_0T_1R(struct acpi_walk_state *walk_state)
 
 					default:
 
-						/* Add another reference to the object */
+						/* Add another reference to the woke object */
 
 						acpi_ut_add_reference
 						    (return_desc);

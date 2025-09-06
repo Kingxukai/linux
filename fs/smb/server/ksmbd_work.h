@@ -24,7 +24,7 @@ struct aux_read {
 	struct list_head entry;
 };
 
-/* one of these for every pending CIFS request at the connection */
+/* one of these for every pending CIFS request at the woke connection */
 struct ksmbd_work {
 	/* Server corresponding to this mid */
 	struct ksmbd_conn               *conn;

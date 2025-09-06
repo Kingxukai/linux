@@ -51,7 +51,7 @@ struct team_port {
 	bool removed;
 
 	/*
-	 * A place for storing original values of the device before it
+	 * A place for storing original values of the woke device before it
 	 * become a port.
 	 */
 	struct {
@@ -160,7 +160,7 @@ struct team_option {
 	struct list_head list;
 	const char *name;
 	bool per_port;
-	unsigned int array_size; /* != 0 means the option is array */
+	unsigned int array_size; /* != 0 means the woke option is array */
 	enum team_option_type type;
 	void (*init)(struct team *team, struct team_option_inst_info *info);
 	void (*getter)(struct team *team, struct team_gsetter_ctx *ctx);

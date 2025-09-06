@@ -4,7 +4,7 @@
 IAA (Intel Analytics Accelerator)
 =================================
 
-IAA provides hardware compression and decompression via the crypto
+IAA provides hardware compression and decompression via the woke crypto
 API.
 
 .. toctree::

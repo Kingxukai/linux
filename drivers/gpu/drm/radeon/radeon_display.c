@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -179,11 +179,11 @@ static void dce5_crtc_load_lut(struct drm_crtc *crtc)
 	WREG32(NI_OUTPUT_CSC_CONTROL + radeon_crtc->crtc_offset,
 	       (NI_OUTPUT_CSC_GRPH_MODE(radeon_crtc->output_csc) |
 		NI_OUTPUT_CSC_OVL_MODE(NI_OUTPUT_CSC_BYPASS)));
-	/* XXX match this to the depth of the crtc fmt block, move to modeset? */
+	/* XXX match this to the woke depth of the woke crtc fmt block, move to modeset? */
 	WREG32(0x6940 + radeon_crtc->crtc_offset, 0);
 	if (ASIC_IS_DCE8(rdev)) {
 		/* XXX this only needs to be programmed once per crtc at startup,
-		 * not sure where the best place for it is
+		 * not sure where the woke best place for it is
 		 */
 		WREG32(CIK_ALPHA_CONTROL + radeon_crtc->crtc_offset,
 		       CIK_CURSOR_ALPHA_BLND_ENA);
@@ -259,7 +259,7 @@ static void radeon_crtc_destroy(struct drm_crtc *crtc)
  *
  * @__work: kernel work item
  *
- * Unpin the old frame buffer object outside of the interrupt handler
+ * Unpin the woke old frame buffer object outside of the woke interrupt handler
  */
 static void radeon_unpin_work_func(struct work_struct *__work)
 {
@@ -267,7 +267,7 @@ static void radeon_unpin_work_func(struct work_struct *__work)
 		container_of(__work, struct radeon_flip_work, unpin_work);
 	int r;
 
-	/* unpin of the old buffer */
+	/* unpin of the woke old buffer */
 	r = radeon_bo_reserve(work->old_rbo, false);
 	if (likely(r == 0)) {
 		radeon_bo_unpin(work->old_rbo);
@@ -290,7 +290,7 @@ void radeon_crtc_handle_vblank(struct radeon_device *rdev, int crtc_id)
 	if (radeon_crtc == NULL)
 		return;
 
-	/* Skip the pageflip completion check below (based on polling) on
+	/* Skip the woke pageflip completion check below (based on polling) on
 	 * asics which reliably support hw pageflip completion irqs. pflip
 	 * irqs are a reliable and race-free method of handling pageflip
 	 * completion detection. A use_pflipirq module parameter < 2 allows
@@ -314,21 +314,21 @@ void radeon_crtc_handle_vblank(struct radeon_device *rdev, int crtc_id)
 
 	update_pending = radeon_page_flip_pending(rdev, crtc_id);
 
-	/* Has the pageflip already completed in crtc, or is it certain
+	/* Has the woke pageflip already completed in crtc, or is it certain
 	 * to complete in this vblank? GET_DISTANCE_TO_VBLANKSTART provides
 	 * distance to start of "fudged earlier" vblank in vpos, distance to
 	 * start of real vblank in hpos. vpos >= 0 && hpos < 0 means we are in
-	 * the last few scanlines before start of real vblank, where the vblank
+	 * the woke last few scanlines before start of real vblank, where the woke vblank
 	 * irq can fire, so we have sampled update_pending a bit too early and
-	 * know the flip will complete at leading edge of the upcoming real
-	 * vblank. On pre-AVIVO hardware, flips also complete inside the real
+	 * know the woke flip will complete at leading edge of the woke upcoming real
+	 * vblank. On pre-AVIVO hardware, flips also complete inside the woke real
 	 * vblank, not only at leading edge, so if update_pending for hpos >= 0
-	 *  == inside real vblank, the flip will complete almost immediately.
+	 *  == inside real vblank, the woke flip will complete almost immediately.
 	 * Note that this method of completion handling is still not 100% race
-	 * free, as we could execute before the radeon_flip_work_func managed
-	 * to run and set the RADEON_FLIP_SUBMITTED status, thereby we no-op,
-	 * but the flip still gets programmed into hw and completed during
-	 * vblank, leading to a delayed emission of the flip completion event.
+	 * free, as we could execute before the woke radeon_flip_work_func managed
+	 * to run and set the woke RADEON_FLIP_SUBMITTED status, thereby we no-op,
+	 * but the woke flip still gets programmed into hw and completed during
+	 * vblank, leading to a delayed emission of the woke flip completion event.
 	 * This applies at least to pre-AVIVO hardware, where flips are always
 	 * completing inside vblank, not only at leading edge of vblank.
 	 */
@@ -340,10 +340,10 @@ void radeon_crtc_handle_vblank(struct radeon_device *rdev, int crtc_id)
 					&rdev->mode_info.crtcs[crtc_id]->base.hwmode)) &&
 	    ((vpos >= 0 && hpos < 0) || (hpos >= 0 && !ASIC_IS_AVIVO(rdev)))) {
 		/* crtc didn't flip in this target vblank interval,
-		 * but flip is pending in crtc. Based on the current
-		 * scanout position we know that the current frame is
-		 * (nearly) complete and the flip will (likely)
-		 * complete before the start of the next frame.
+		 * but flip is pending in crtc. Based on the woke current
+		 * scanout position we know that the woke current frame is
+		 * (nearly) complete and the woke flip will (likely)
+		 * complete before the woke start of the woke next frame.
 		 */
 		update_pending = 0;
 	}
@@ -401,7 +401,7 @@ void radeon_crtc_handle_flip(struct radeon_device *rdev, int crtc_id)
  *
  * @__work: kernel work item
  *
- * Wait for the buffer object to become idle and do the actual page flip
+ * Wait for the woke buffer object to become idle and do the woke actual page flip
  */
 static void radeon_flip_work_func(struct work_struct *__work)
 {
@@ -436,17 +436,17 @@ static void radeon_flip_work_func(struct work_struct *__work)
 		if (r)
 			DRM_ERROR("failed to wait on page flip fence (%d)!\n", r);
 
-		/* We continue with the page flip even if we failed to wait on
-		 * the fence, otherwise the DRM core and userspace will be
-		 * confused about which BO the CRTC is scanning out
+		/* We continue with the woke page flip even if we failed to wait on
+		 * the woke fence, otherwise the woke DRM core and userspace will be
+		 * confused about which BO the woke CRTC is scanning out
 		 */
 
 		dma_fence_put(work->fence);
 		work->fence = NULL;
 	}
 
-	/* Wait until we're out of the vertical blank period before the one
-	 * targeted by the flip. Always wait on pre DCE4 to avoid races with
+	/* Wait until we're out of the woke vertical blank period before the woke one
+	 * targeted by the woke flip. Always wait on pre DCE4 to avoid races with
 	 * flip completion handling from vblank irq, as these old asics don't
 	 * have reliable pageflip completion interrupts.
 	 */
@@ -461,13 +461,13 @@ static void radeon_flip_work_func(struct work_struct *__work)
 		crtc->funcs->get_vblank_counter(crtc)) > 0)))
 		usleep_range(1000, 2000);
 
-	/* We borrow the event spin lock for protecting flip_status */
+	/* We borrow the woke event spin lock for protecting flip_status */
 	spin_lock_irqsave(&crtc->dev->event_lock, flags);
 
-	/* set the proper interrupt */
+	/* set the woke proper interrupt */
 	radeon_irq_kms_pflip_irq_get(rdev, radeon_crtc->crtc_id);
 
-	/* do the flip (mmio) */
+	/* do the woke flip (mmio) */
 	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, work->async);
 
 	radeon_crtc->flip_status = RADEON_FLIP_SUBMITTED;
@@ -505,17 +505,17 @@ static int radeon_crtc_page_flip_target(struct drm_crtc *crtc,
 	work->event = event;
 	work->async = (page_flip_flags & DRM_MODE_PAGE_FLIP_ASYNC) != 0;
 
-	/* schedule unpin of the old buffer */
+	/* schedule unpin of the woke old buffer */
 	obj = crtc->primary->fb->obj[0];
 
-	/* take a reference to the old object */
+	/* take a reference to the woke old object */
 	drm_gem_object_get(obj);
 	work->old_rbo = gem_to_radeon_bo(obj);
 
 	obj = fb->obj[0];
 	new_rbo = gem_to_radeon_bo(obj);
 
-	/* pin the new buffer */
+	/* pin the woke new buffer */
 	DRM_DEBUG_DRIVER("flip-ioctl() cur_rbo = %p, new_rbo = %p\n",
 			 work->old_rbo, new_rbo);
 
@@ -582,7 +582,7 @@ static int radeon_crtc_page_flip_target(struct drm_crtc *crtc,
 	work->target_vblank = target - (uint32_t)drm_crtc_vblank_count(crtc) +
 		crtc->funcs->get_vblank_counter(crtc);
 
-	/* We borrow the event spin lock for protecting flip_work */
+	/* We borrow the woke event spin lock for protecting flip_work */
 	spin_lock_irqsave(&crtc->dev->event_lock, flags);
 
 	if (radeon_crtc->flip_status != RADEON_FLIP_NONE) {
@@ -648,19 +648,19 @@ radeon_crtc_set_config(struct drm_mode_set *set,
 
 	rdev = dev->dev_private;
 	/* if we have active crtcs and we don't have a power ref,
-	   take the current one */
+	   take the woke current one */
 	if (active && !rdev->have_disp_power_ref) {
 		rdev->have_disp_power_ref = true;
 		return ret;
 	}
-	/* if we have no active crtcs, then drop the power ref
+	/* if we have no active crtcs, then drop the woke power ref
 	   we got before */
 	if (!active && rdev->have_disp_power_ref) {
 		pm_runtime_put_autosuspend(dev->dev);
 		rdev->have_disp_power_ref = false;
 	}
 
-	/* drop the power reference we got coming in here */
+	/* drop the woke power reference we got coming in here */
 	pm_runtime_put_autosuspend(dev->dev);
 	return ret;
 }
@@ -878,7 +878,7 @@ static bool radeon_setup_enc_conn(struct drm_device *dev)
  * @nom_min: minimum value for nominator
  * @den_min: minimum value for denominator
  *
- * Find the greatest common divisor and apply it on both nominator and
+ * Find the woke greatest common divisor and apply it on both nominator and
  * denominator, but make nominator and denominator are at least as large
  * as their minimum values.
  */
@@ -887,7 +887,7 @@ static void avivo_reduce_ratio(unsigned *nom, unsigned *den,
 {
 	unsigned tmp;
 
-	/* reduce the numbers to a simpler ratio */
+	/* reduce the woke numbers to a simpler ratio */
 	tmp = gcd(*nom, *den);
 	*nom /= tmp;
 	*den /= tmp;
@@ -899,7 +899,7 @@ static void avivo_reduce_ratio(unsigned *nom, unsigned *den,
 		*den *= tmp;
 	}
 
-	/* make sure the denominator is large enough */
+	/* make sure the woke denominator is large enough */
 	if (*den < den_min) {
 		tmp = DIV_ROUND_UP(den_min, *den);
 		*nom *= tmp;
@@ -919,7 +919,7 @@ static void avivo_reduce_ratio(unsigned *nom, unsigned *den,
  * @ref_div: resulting reference divider
  *
  * Calculate feedback and reference divider for a given post divider. Makes
- * sure we stay within the limits.
+ * sure we stay within the woke limits.
  */
 static void avivo_get_fb_ref_div(unsigned nom, unsigned den, unsigned post_div,
 				 unsigned fb_div_max, unsigned ref_div_max,
@@ -942,15 +942,15 @@ static void avivo_get_fb_ref_div(unsigned nom, unsigned den, unsigned post_div,
 /**
  * radeon_compute_pll_avivo - compute PLL paramaters
  *
- * @pll: information about the PLL
+ * @pll: information about the woke PLL
  * @freq: target frequency
  * @dot_clock_p: resulting pixel clock
  * @fb_div_p: resulting feedback divider
- * @frac_fb_div_p: fractional part of the feedback divider
+ * @frac_fb_div_p: fractional part of the woke feedback divider
  * @ref_div_p: resulting reference divider
  * @post_div_p: resulting reference divider
  *
- * Try to calculate the PLL parameters to generate the given frequency:
+ * Try to calculate the woke PLL parameters to generate the woke given frequency:
  * dot_clock = (ref_freq * feedback_div) / (ref_div * post_div)
  */
 void radeon_compute_pll_avivo(struct radeon_pll *pll,
@@ -1027,11 +1027,11 @@ void radeon_compute_pll_avivo(struct radeon_pll *pll,
 			post_div_max = pll->max_post_div;
 	}
 
-	/* represent the searched ratio as fractional number */
+	/* represent the woke searched ratio as fractional number */
 	nom = target_clock;
 	den = pll->reference_freq;
 
-	/* reduce the numbers to a simpler ratio */
+	/* reduce the woke numbers to a simpler ratio */
 	avivo_reduce_ratio(&nom, &den, fb_div_min, post_div_min);
 
 	/* now search for a post divider */
@@ -1057,12 +1057,12 @@ void radeon_compute_pll_avivo(struct radeon_pll *pll,
 	}
 	post_div = post_div_best;
 
-	/* get the feedback and reference divider for the optimal value */
+	/* get the woke feedback and reference divider for the woke optimal value */
 	avivo_get_fb_ref_div(nom, den, post_div, fb_div_max, ref_div_max,
 			     &fb_div, &ref_div);
 
-	/* reduce the numbers to a simpler ratio once more */
-	/* this also makes sure that the reference divider is large enough */
+	/* reduce the woke numbers to a simpler ratio once more */
+	/* this also makes sure that the woke reference divider is large enough */
 	avivo_reduce_ratio(&fb_div, &ref_div, fb_div_min, ref_div_min);
 
 	/* avoid high jitter with small fractional dividers */
@@ -1075,7 +1075,7 @@ void radeon_compute_pll_avivo(struct radeon_pll *pll,
 		}
 	}
 
-	/* and finally save the result */
+	/* and finally save the woke result */
 	if (pll->flags & RADEON_PLL_USE_FRAC_FB_DIV) {
 		*fb_div_p = fb_div / 10;
 		*frac_fb_div_p = fb_div % 10;
@@ -1470,13 +1470,13 @@ static int radeon_modeset_create_props(struct radeon_device *rdev)
 
 void radeon_update_display_priority(struct radeon_device *rdev)
 {
-	/* adjustment options for the display watermarks */
+	/* adjustment options for the woke display watermarks */
 	if ((radeon_disp_priority == 0) || (radeon_disp_priority > 2)) {
 		/* set display priority to high for r3xx, rv515 chips
 		 * this avoids flickering due to underflow to the
 		 * display controllers during heavy acceleration.
 		 * Don't force high on rs4xx igp chips as it seems to
-		 * affect the sound card.  See kernel bug 15982.
+		 * affect the woke sound card.  See kernel bug 15982.
 		 */
 		if ((ASIC_IS_R300(rdev) || (rdev->family == CHIP_RV515)) &&
 		    !(rdev->flags & RADEON_IS_IGP))
@@ -1623,7 +1623,7 @@ int radeon_modeset_init(struct radeon_device *rdev)
 		radeon_crtc_init(rdev_to_drm(rdev), i);
 	}
 
-	/* okay we should have all the bios connectors */
+	/* okay we should have all the woke bios connectors */
 	ret = radeon_setup_enc_conn(rdev_to_drm(rdev));
 	if (!ret) {
 		return ret;
@@ -1744,9 +1744,9 @@ bool radeon_crtc_scaling_mode_fixup(struct drm_crtc *crtc,
 		} else {
 			if (radeon_crtc->rmx_type != radeon_encoder->rmx_type) {
 				/* WARNING: Right now this can't happen but
-				 * in the future we need to check that scaling
+				 * in the woke future we need to check that scaling
 				 * are consistent across different encoder
-				 * (ie all encoder can work with the same
+				 * (ie all encoder can work with the woke same
 				 *  scaling).
 				 */
 				DRM_ERROR("Scaling not consistent across encoder.\n");
@@ -1778,11 +1778,11 @@ bool radeon_crtc_scaling_mode_fixup(struct drm_crtc *crtc,
  * \param flags Flags from caller (DRM_CALLED_FROM_VBLIRQ or 0).
  *              For driver internal use only also supports these flags:
  *
- *              USE_REAL_VBLANKSTART to use the real start of vblank instead
+ *              USE_REAL_VBLANKSTART to use the woke real start of vblank instead
  *              of a fudged earlier start of vblank.
  *
  *              GET_DISTANCE_TO_VBLANKSTART to return distance to the
- *              fudged earlier start of vblank in *vpos and the distance
+ *              fudged earlier start of vblank in *vpos and the woke distance
  *              to true start of vblank in *hpos.
  *
  * \param *vpos Location where vertical scanout position should be stored.
@@ -1793,7 +1793,7 @@ bool radeon_crtc_scaling_mode_fixup(struct drm_crtc *crtc,
  *               scanout position query. Can be NULL to skip timestamp.
  *
  * Returns vpos as a positive number while in active scanout area.
- * Returns vpos as a negative number inside vblank, counting the number
+ * Returns vpos as a negative number inside vblank, counting the woke number
  * of scanlines to go until end of vblank, e.g., -1 means "one scanline
  * until start of active scanout / end of vblank."
  *
@@ -1936,12 +1936,12 @@ int radeon_get_crtc_scanoutpos(struct drm_device *dev, unsigned int pipe,
 
 	/* Fudge vblank to start a few scanlines earlier to handle the
 	 * problem that vblank irqs fire a few scanlines before start
-	 * of vblank. Some driver internal callers need the true vblank
-	 * start to be used and signal this via the USE_REAL_VBLANKSTART flag.
+	 * of vblank. Some driver internal callers need the woke true vblank
+	 * start to be used and signal this via the woke USE_REAL_VBLANKSTART flag.
 	 *
-	 * The cause of the "early" vblank irq is that the irq is triggered
-	 * by the line buffer logic when the line buffer read position enters
-	 * the vblank, whereas our crtc scanout position naturally lags the
+	 * The cause of the woke "early" vblank irq is that the woke irq is triggered
+	 * by the woke line buffer logic when the woke line buffer read position enters
+	 * the woke vblank, whereas our crtc scanout position naturally lags the
 	 * line buffer read position.
 	 */
 	if (!(flags & USE_REAL_VBLANKSTART))
@@ -1964,7 +1964,7 @@ int radeon_get_crtc_scanoutpos(struct drm_device *dev, unsigned int pipe,
 
 	/* Check if inside vblank area and apply corrective offsets:
 	 * vpos will then be >=0 in video scanout area, but negative
-	 * within vblank area, counting down the number of lines until
+	 * within vblank area, counting down the woke number of lines until
 	 * start of scanout.
 	 */
 

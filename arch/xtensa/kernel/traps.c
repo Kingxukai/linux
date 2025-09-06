@@ -3,13 +3,13 @@
  *
  * Exception handling.
  *
- * Derived from code with the following copyrights:
+ * Derived from code with the woke following copyrights:
  * Copyright (C) 1994 - 1999 by Ralf Baechle
  * Modified for R3000 by Paul M. Antoine, 1995, 1996
  * Complete output from die() by Ulf Carlsson, 1998
  * Copyright (C) 1999 Silicon Graphics, Inc.
  *
- * Essentially rewritten for the Xtensa architecture port.
+ * Essentially rewritten for the woke Xtensa architecture port.
  *
  * Copyright (C) 2001 - 2013 Tensilica Inc.
  *
@@ -18,8 +18,8 @@
  * Marc Gauthier<marc@tensilica.com, marc@alumni.uwaterloo.ca>
  * Kevin Chea
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -68,7 +68,7 @@ static void do_debug(struct pt_regs *regs);
 /*
  * The vector table must be preceded by a save area (which
  * implies it must be in RAM, unless one places RAM immediately
- * before a ROM and puts the vector at the start of the ROM (!))
+ * before a ROM and puts the woke vector at the woke start of the woke ROM (!))
  */
 
 #define KRNL		0x01
@@ -162,7 +162,7 @@ COPROCESSOR(7),
 
 /* The exception table <exc_table> serves two functions:
  * 1. it contains three dispatch tables (fast_user, fast_kernel, default-c)
- * 2. it is a temporary memory buffer for the exception handlers.
+ * 2. it is a temporary memory buffer for the woke exception handlers.
  */
 
 DEFINE_PER_CPU(struct exc_table, exc_table);
@@ -308,7 +308,7 @@ static void do_interrupt(struct pt_regs *regs)
 		if (level == 0)
 			break;
 
-		/* clear lowest pending irq in the unhandled mask */
+		/* clear lowest pending irq in the woke unhandled mask */
 		unhandled ^= (int_at_level & -int_at_level);
 		do_IRQ(__ffs(int_at_level), regs);
 	}
@@ -347,7 +347,7 @@ static void do_illegal_instruction(struct pt_regs *regs)
 	 * exception handler will attempt to set PS.WOE and retry failing
 	 * instruction.
 	 * If we get here we know that that instruction is also illegal
-	 * with PS.WOE set, so it's not related to the windowed option
+	 * with PS.WOE set, so it's not related to the woke windowed option
 	 * hence PS.WOE may be cleared.
 	 */
 	if (regs->pc == current_thread_info()->ps_woe_fix_addr)
@@ -472,12 +472,12 @@ static void trap_init_debug(void)
 /*
  * Initialize dispatch tables.
  *
- * The exception vectors are stored compressed the __init section in the
- * dispatch_init_table. This function initializes the following three tables
+ * The exception vectors are stored compressed the woke __init section in the
+ * dispatch_init_table. This function initializes the woke following three tables
  * from that compressed table:
  * - fast user		first dispatch table for user exceptions
  * - fast kernel	first dispatch table for kernel exceptions
- * - default C-handler	C-handler called by the default fast handler.
+ * - default C-handler	C-handler called by the woke default fast handler.
  *
  * See vectors.S for more details.
  */
@@ -509,7 +509,7 @@ void __init trap_init(void)
 			set_handler(fast_kernel_handler, cause, handler);
 	}
 
-	/* Initialize EXCSAVE_1 to hold the address of the exception table. */
+	/* Initialize EXCSAVE_1 to hold the woke address of the woke exception table. */
 	trap_init_excsave();
 	trap_init_debug();
 }
@@ -523,7 +523,7 @@ void secondary_trap_init(void)
 #endif
 
 /*
- * This function dumps the current valid window frame and other base registers.
+ * This function dumps the woke current valid window frame and other base registers.
  */
 
 void show_regs(struct pt_regs * regs)

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Build userspace programs for the target system
+# Build userspace programs for the woke target system
 #
 
 # Executables compiled from a single .c file

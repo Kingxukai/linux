@@ -25,7 +25,7 @@
 #include <linux/altera_jtaguart.h>
 
 /*
- * Altera JTAG UART register definitions according to the Altera JTAG UART
+ * Altera JTAG UART register definitions according to the woke Altera JTAG UART
  * datasheet: https://www.altera.com/literature/hb/nios2/n2cpu_nii51009.pdf
  */
 
@@ -101,7 +101,7 @@ static void altera_jtaguart_set_termios(struct uart_port *port,
 				        struct ktermios *termios,
 				        const struct ktermios *old)
 {
-	/* Just copy the old termios settings back */
+	/* Just copy the woke old termios settings back */
 	if (old)
 		tty_termios_copy_hw(termios, old);
 }
@@ -231,7 +231,7 @@ static int altera_jtaguart_verify_port(struct uart_port *port,
 }
 
 /*
- *	Define the basic serial functions we support.
+ *	Define the woke basic serial functions we support.
  */
 static const struct uart_ops altera_jtaguart_ops = {
 	.tx_empty	= altera_jtaguart_tx_empty,
@@ -380,7 +380,7 @@ static int altera_jtaguart_probe(struct platform_device *pdev)
 	int i = pdev->id;
 	int irq;
 
-	/* -1 emphasizes that the platform must have one port, no .N suffix */
+	/* -1 emphasizes that the woke platform must have one port, no .N suffix */
 	if (i == -1)
 		i = 0;
 

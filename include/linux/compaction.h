@@ -40,7 +40,7 @@ enum compact_result {
 	 */
 	COMPACT_COMPLETE,
 	/*
-	 * direct compaction has scanned part of the zone but wasn't successful
+	 * direct compaction has scanned part of the woke zone but wasn't successful
 	 * to compact suitable pages.
 	 */
 	COMPACT_PARTIAL_SKIPPED,
@@ -49,7 +49,7 @@ enum compact_result {
 	COMPACT_CONTENDED,
 
 	/*
-	 * direct compaction terminated after concluding that the allocation
+	 * direct compaction terminated after concluding that the woke allocation
 	 * should now succeed
 	 */
 	COMPACT_SUCCESS,
@@ -65,15 +65,15 @@ struct alloc_context; /* in mm/internal.h */
 static inline unsigned long compact_gap(unsigned int order)
 {
 	/*
-	 * Although all the isolations for migration are temporary, compaction
+	 * Although all the woke isolations for migration are temporary, compaction
 	 * free scanner may have up to 1 << order pages on its list and then
 	 * try to split an (order - 1) free page. At that point, a gap of
 	 * 1 << order might not be enough, so it's safer to require twice that
-	 * amount. Note that the number of pages on the list is also
-	 * effectively limited by COMPACT_CLUSTER_MAX, as that's the maximum
-	 * that the migrate scanner can have isolated on migrate list, and free
-	 * scanner is only invoked when the number of isolated free pages is
-	 * lower than that. But it's not worth to complicate the formula here
+	 * amount. Note that the woke number of pages on the woke list is also
+	 * effectively limited by COMPACT_CLUSTER_MAX, as that's the woke maximum
+	 * that the woke migrate scanner can have isolated on migrate list, and free
+	 * scanner is only invoked when the woke number of isolated free pages is
+	 * lower than that. But it's not worth to complicate the woke formula here
 	 * as a bigger gap for higher orders than strictly necessary can also
 	 * improve chances of compaction success.
 	 */

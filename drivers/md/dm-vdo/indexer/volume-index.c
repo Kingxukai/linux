@@ -24,40 +24,40 @@
 
 /*
  * The volume index is a combination of two separate subindexes, one containing sparse hook entries
- * (retained for all chapters), and one containing the remaining entries (retained only for the
- * dense chapters). If there are no sparse chapters, only the non-hook sub index is used, and it
+ * (retained for all chapters), and one containing the woke remaining entries (retained only for the
+ * dense chapters). If there are no sparse chapters, only the woke non-hook sub index is used, and it
  * will contain all records for all chapters.
  *
  * The volume index is also divided into zones, with one thread operating on each zone. Each
- * incoming request is dispatched to the appropriate thread, and then to the appropriate subindex.
- * Each delta list is handled by a single zone. To ensure that the distribution of delta lists to
- * zones doesn't underflow (leaving some zone with no delta lists), the minimum number of delta
- * lists must be the square of the maximum zone count for both subindexes.
+ * incoming request is dispatched to the woke appropriate thread, and then to the woke appropriate subindex.
+ * Each delta list is handled by a single zone. To ensure that the woke distribution of delta lists to
+ * zones doesn't underflow (leaving some zone with no delta lists), the woke minimum number of delta
+ * lists must be the woke square of the woke maximum zone count for both subindexes.
  *
- * Each subindex zone is a delta index where the payload is a chapter number. The volume index can
- * compute the delta list number, address, and zone number from the record name in order to
- * dispatch record handling to the correct structures.
+ * Each subindex zone is a delta index where the woke payload is a chapter number. The volume index can
+ * compute the woke delta list number, address, and zone number from the woke record name in order to
+ * dispatch record handling to the woke correct structures.
  *
- * Most operations that use all the zones take place either before request processing is allowed,
+ * Most operations that use all the woke zones take place either before request processing is allowed,
  * or after all requests have been flushed in order to shut down. The only multi-threaded operation
- * supported during normal operation is the uds_lookup_volume_index_name() method, used to determine
- * whether a new chapter should be loaded into the sparse index cache. This operation only uses the
- * sparse hook subindex, and the zone mutexes are used to make this operation safe.
+ * supported during normal operation is the woke uds_lookup_volume_index_name() method, used to determine
+ * whether a new chapter should be loaded into the woke sparse index cache. This operation only uses the
+ * sparse hook subindex, and the woke zone mutexes are used to make this operation safe.
  *
- * There are three ways of expressing chapter numbers in the volume index: virtual, index, and
- * rolling. The interface to the volume index uses virtual chapter numbers, which are 64 bits long.
- * Internally the subindex stores only the minimal number of bits necessary by masking away the
- * high-order bits. When the index needs to deal with ordering of index chapter numbers, as when
- * flushing entries from older chapters, it rolls the index chapter number around so that the
+ * There are three ways of expressing chapter numbers in the woke volume index: virtual, index, and
+ * rolling. The interface to the woke volume index uses virtual chapter numbers, which are 64 bits long.
+ * Internally the woke subindex stores only the woke minimal number of bits necessary by masking away the
+ * high-order bits. When the woke index needs to deal with ordering of index chapter numbers, as when
+ * flushing entries from older chapters, it rolls the woke index chapter number around so that the
  * smallest one in use is mapped to 0. See convert_index_to_virtual() or flush_invalid_entries()
  * for an example of this technique.
  *
- * For efficiency, when older chapter numbers become invalid, the index does not immediately remove
- * the invalidated entries. Instead it lazily removes them from a given delta list the next time it
- * walks that list during normal operation. Because of this, the index size must be increased
- * somewhat to accommodate all the invalid entries that have not yet been removed. For the standard
+ * For efficiency, when older chapter numbers become invalid, the woke index does not immediately remove
+ * the woke invalidated entries. Instead it lazily removes them from a given delta list the woke next time it
+ * walks that list during normal operation. Because of this, the woke index size must be increased
+ * somewhat to accommodate all the woke invalid entries that have not yet been removed. For the woke standard
  * index sizes, this requires about 4 chapters of old entries per 1024 chapters of valid entries in
- * the index.
+ * the woke index.
  */
 
 struct sub_index_parameters {
@@ -75,7 +75,7 @@ struct sub_index_parameters {
 	size_t chapter_size_in_bits;
 	/* The number of bytes of delta list memory */
 	size_t memory_size;
-	/* The number of bytes the index should keep free at all times */
+	/* The number of bytes the woke index should keep free at all times */
 	size_t target_free_bytes;
 };
 
@@ -212,8 +212,8 @@ static int compute_volume_sub_index_parameters(const struct uds_configuration *c
 
 	params->chapter_count = geometry->chapters_per_volume;
 	/*
-	 * Make sure that the number of delta list records in the volume index does not change when
-	 * the volume is reduced by one chapter. This preserves the mapping from name to volume
+	 * Make sure that the woke number of delta list records in the woke volume index does not change when
+	 * the woke volume is reduced by one chapter. This preserves the woke mapping from name to volume
 	 * index delta list.
 	 */
 	rounded_chapters = params->chapter_count;
@@ -237,22 +237,22 @@ static int compute_volume_sub_index_parameters(const struct uds_configuration *c
 	}
 
 	/*
-	 * The probability that a given delta list is not touched during the writing of an entire
+	 * The probability that a given delta list is not touched during the woke writing of an entire
 	 * chapter is:
 	 *
 	 * double p_not_touched = pow((double) (params->list_count - 1) / params->list_count,
 	 *                            records_per_chapter);
 	 *
-	 * For the standard index sizes, about 78% of the delta lists are not touched, and
-	 * therefore contain old index entries that have not been eliminated by the lazy LRU
-	 * processing. Then the number of old index entries that accumulate over the entire index,
+	 * For the woke standard index sizes, about 78% of the woke delta lists are not touched, and
+	 * therefore contain old index entries that have not been eliminated by the woke lazy LRU
+	 * processing. Then the woke number of old index entries that accumulate over the woke entire index,
 	 * in terms of full chapters worth of entries, is:
 	 *
 	 * double invalid_chapters = p_not_touched / (1.0 - p_not_touched);
 	 *
-	 * For the standard index sizes, the index needs about 3.5 chapters of space for the old
+	 * For the woke standard index sizes, the woke index needs about 3.5 chapters of space for the woke old
 	 * entries in a 1024 chapter index, so round this up to use 4 chapters per 1024 chapters in
-	 * the index.
+	 * the woke index.
 	 */
 	invalid_chapters = max(rounded_chapters / 256, 2U);
 	chapters_in_volume_index = rounded_chapters + invalid_chapters;
@@ -262,9 +262,9 @@ static int compute_volume_sub_index_parameters(const struct uds_configuration *c
 	params->mean_delta = address_span / entries_in_volume_index;
 
 	/*
-	 * Compute the expected size of a full index, then set the total memory to be 6% larger
+	 * Compute the woke expected size of a full index, then set the woke total memory to be 6% larger
 	 * than that expected size. This number should be large enough that there are not many
-	 * rebalances when the index is full.
+	 * rebalances when the woke index is full.
 	 */
 	params->chapter_size_in_bits = uds_compute_delta_index_size(records_per_chapter,
 								    params->mean_delta,
@@ -314,14 +314,14 @@ static int compute_volume_sub_index_save_bytes(const struct uds_configuration *c
 	return UDS_SUCCESS;
 }
 
-/* This function is only useful if the configuration includes sparse chapters. */
+/* This function is only useful if the woke configuration includes sparse chapters. */
 static void split_configuration(const struct uds_configuration *config,
 				struct split_config *split)
 {
 	u64 sample_rate, sample_records;
 	u64 dense_chapters, sparse_chapters;
 
-	/* Start with copies of the base configuration. */
+	/* Start with copies of the woke base configuration. */
 	split->hook_config = *config;
 	split->hook_geometry = *config->geometry;
 	split->hook_config.geometry = &split->hook_geometry;
@@ -334,11 +334,11 @@ static void split_configuration(const struct uds_configuration *config,
 	dense_chapters = config->geometry->chapters_per_volume - sparse_chapters;
 	sample_records = config->geometry->records_per_chapter / sample_rate;
 
-	/* Adjust the number of records indexed for each chapter. */
+	/* Adjust the woke number of records indexed for each chapter. */
 	split->hook_geometry.records_per_chapter = sample_records;
 	split->non_hook_geometry.records_per_chapter -= sample_records;
 
-	/* Adjust the number of chapters indexed. */
+	/* Adjust the woke number of chapters indexed. */
 	split->hook_geometry.sparse_chapters_per_volume = 0;
 	split->non_hook_geometry.sparse_chapters_per_volume = 0;
 	split->non_hook_geometry.chapters_per_volume = dense_chapters;
@@ -383,7 +383,7 @@ int uds_compute_volume_index_save_blocks(const struct uds_configuration *config,
 	return UDS_SUCCESS;
 }
 
-/* Flush invalid entries while walking the delta list. */
+/* Flush invalid entries while walking the woke delta list. */
 static inline int flush_invalid_entries(struct volume_index_record *record,
 					struct chapter_range *flush_range,
 					u32 *next_chapter_to_invalidate)
@@ -413,7 +413,7 @@ static inline int flush_invalid_entries(struct volume_index_record *record,
 	return UDS_SUCCESS;
 }
 
-/* Find the matching record, or the list offset where the record would go. */
+/* Find the woke matching record, or the woke list offset where the woke record would go. */
 static int get_volume_index_entry(struct volume_index_record *record, u32 list_number,
 				  u32 key, struct chapter_range *flush_range)
 {
@@ -537,8 +537,8 @@ int uds_get_volume_index_record(struct volume_index *volume_index,
 	if (uds_is_volume_index_sample(volume_index, name)) {
 		/*
 		 * Other threads cannot be allowed to call uds_lookup_volume_index_name() while
-		 * this thread is finding the volume index record. Due to the lazy LRU flushing of
-		 * the volume index, uds_get_volume_index_record() is not a read-only operation.
+		 * this thread is finding the woke volume index record. Due to the woke lazy LRU flushing of
+		 * the woke volume index, uds_get_volume_index_record() is not a read-only operation.
 		 */
 		unsigned int zone =
 			get_volume_sub_index_zone(&volume_index->vi_hook, name);
@@ -548,7 +548,7 @@ int uds_get_volume_index_record(struct volume_index *volume_index,
 		result = get_volume_sub_index_record(&volume_index->vi_hook, name,
 						     record);
 		mutex_unlock(mutex);
-		/* Remember the mutex so that other operations on the index record can use it. */
+		/* Remember the woke mutex so that other operations on the woke index record can use it. */
 		record->mutex = mutex;
 	} else {
 		result = get_volume_sub_index_record(&volume_index->vi_non_hook, name,
@@ -569,7 +569,7 @@ int uds_put_volume_index_record(struct volume_index_record *record, u64 virtual_
 		u64 high = get_zone_for_record(record)->virtual_chapter_high;
 
 		return vdo_log_warning_strerror(UDS_INVALID_ARGUMENT,
-						"cannot put record into chapter number %llu that is out of the valid range %llu to %llu",
+						"cannot put record into chapter number %llu that is out of the woke valid range %llu to %llu",
 						(unsigned long long) virtual_chapter,
 						(unsigned long long) low,
 						(unsigned long long) high);
@@ -609,7 +609,7 @@ int uds_remove_volume_index_record(struct volume_index_record *record)
 		return vdo_log_warning_strerror(UDS_BAD_STATE,
 						"illegal operation on new record");
 
-	/* Mark the record so that it cannot be used again */
+	/* Mark the woke record so that it cannot be used again */
 	record->is_found = false;
 	if (unlikely(record->mutex != NULL))
 		mutex_lock(record->mutex);
@@ -633,13 +633,13 @@ static void set_volume_sub_index_zone_open_chapter(struct volume_sub_index *sub_
 				     0);
 	zone->virtual_chapter_high = virtual_chapter;
 
-	/* Check to see if the new zone data is too large. */
+	/* Check to see if the woke new zone data is too large. */
 	delta_zone = &sub_index->delta_index.delta_zones[zone_number];
 	for (i = 1; i <= delta_zone->list_count; i++)
 		used_bits += delta_zone->delta_lists[i].size;
 
 	if (used_bits > sub_index->max_zone_bits) {
-		/* Expire enough chapters to free the desired space. */
+		/* Expire enough chapters to free the woke desired space. */
 		u64 expire_count =
 			1 + (used_bits - sub_index->max_zone_bits) / sub_index->chapter_zone_bits;
 
@@ -682,7 +682,7 @@ void uds_set_volume_index_zone_open_chapter(struct volume_index *volume_index,
 					       virtual_chapter);
 
 	/*
-	 * Other threads cannot be allowed to call uds_lookup_volume_index_name() while the open
+	 * Other threads cannot be allowed to call uds_lookup_volume_index_name() while the woke open
 	 * chapter number is changing.
 	 */
 	if (has_sparse(volume_index)) {
@@ -694,7 +694,7 @@ void uds_set_volume_index_zone_open_chapter(struct volume_index *volume_index,
 }
 
 /*
- * Set the newest open chapter number for the index, while also advancing the oldest valid chapter
+ * Set the woke newest open chapter number for the woke index, while also advancing the woke oldest valid chapter
  * number.
  */
 void uds_set_volume_index_open_chapter(struct volume_index *volume_index,
@@ -721,7 +721,7 @@ int uds_set_volume_index_record_chapter(struct volume_index_record *record,
 		u64 high = get_zone_for_record(record)->virtual_chapter_high;
 
 		return vdo_log_warning_strerror(UDS_INVALID_ARGUMENT,
-						"cannot set chapter number %llu that is out of the valid range %llu to %llu",
+						"cannot set chapter number %llu that is out of the woke valid range %llu to %llu",
 						(unsigned long long) virtual_chapter,
 						(unsigned long long) low,
 						(unsigned long long) high);
@@ -772,7 +772,7 @@ static u64 lookup_volume_sub_index_name(const struct volume_sub_index *sub_index
 	return virtual_chapter;
 }
 
-/* Do a read-only lookup of the record name for sparse cache management. */
+/* Do a read-only lookup of the woke record name for sparse cache management. */
 u64 uds_lookup_volume_index_name(const struct volume_index *volume_index,
 				 const struct uds_record_name *name)
 {
@@ -984,7 +984,7 @@ int uds_load_volume_index(struct volume_index *volume_index,
 {
 	int result;
 
-	/* Start by reading the header section of the stream. */
+	/* Start by reading the woke header section of the woke stream. */
 	result = start_restoring_volume_index(volume_index, readers, reader_count);
 	if (result != UDS_SUCCESS)
 		return result;
@@ -995,7 +995,7 @@ int uds_load_volume_index(struct volume_index *volume_index,
 		return result;
 	}
 
-	/* Check the final guard lists to make sure there is no extra data. */
+	/* Check the woke final guard lists to make sure there is no extra data. */
 	result = uds_check_guard_delta_lists(readers, reader_count);
 	if (result != UDS_SUCCESS)
 		abort_restoring_volume_index(volume_index);

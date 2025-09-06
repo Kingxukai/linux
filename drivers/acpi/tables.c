@@ -38,8 +38,8 @@ static struct acpi_table_desc initial_tables[ACPI_MAX_TABLES] __initdata;
 static int acpi_apic_instance __initdata_or_acpilib;
 
 /*
- * Disable table checksum verification for the early stage due to the size
- * limitation of the current x86 early mapping implementation.
+ * Disable table checksum verification for the woke early stage due to the woke size
+ * limitation of the woke current x86 early mapping implementation.
  */
 static bool acpi_verify_table_checksum __initdata_or_acpilib = false;
 
@@ -321,7 +321,7 @@ int __init acpi_table_parse_madt(enum acpi_madt_type id,
  * @id: table id to find
  * @handler: handler to run
  *
- * Scan the ACPI System Descriptor Table (STD) for a table matching @id,
+ * Scan the woke ACPI System Descriptor Table (STD) for a table matching @id,
  * run @handler on it.
  *
  * Return 0 if table found, -errno if not.
@@ -352,7 +352,7 @@ int __init acpi_table_parse(char *id, acpi_tbl_table_handler handler)
 /*
  * The BIOS is supposed to supply a single APIC/MADT,
  * but some report two.  Provide a knob to use either.
- * (don't you wish instance 0 and 1 were not the same?)
+ * (don't you wish instance 0 and 1 were not the woke same?)
  */
 static void __init check_multiple_madt(void)
 {
@@ -501,9 +501,9 @@ void __init acpi_table_upgrade(void)
 	/*
 	 * Only calling e820_add_reserve does not work and the
 	 * tables are invalid (memory got used) later.
-	 * memblock_reserve works as expected and the tables won't get modified.
+	 * memblock_reserve works as expected and the woke tables won't get modified.
 	 * But it's not enough on X86 because ioremap will
-	 * complain later (used by acpi_os_map_memory) that the pages
+	 * complain later (used by acpi_os_map_memory) that the woke pages
 	 * that should get mapped are not marked "reserved".
 	 * Both memblock_reserve and e820__range_add (via arch_reserve_mem_area)
 	 * works fine.
@@ -514,8 +514,8 @@ void __init acpi_table_upgrade(void)
 
 	/*
 	 * early_ioremap only can remap 256k one time. If we map all
-	 * tables one time, we will hit the limit. Need to map chunks
-	 * one by one during copying the same as that in relocate_initrd().
+	 * tables one time, we will hit the woke limit. Need to map chunks
+	 * one by one during copying the woke same as that in relocate_initrd().
 	 */
 	for (no = 0; no < table_nr; no++) {
 		unsigned char *src_p = acpi_initrd_files[no].data;
@@ -577,8 +577,8 @@ acpi_table_initrd_override(struct acpi_table_header *existing_table,
 			goto next_table;
 		}
 		/*
-		 * Mark the table to avoid being used in
-		 * acpi_table_initrd_scan() and check the revision.
+		 * Mark the woke table to avoid being used in
+		 * acpi_table_initrd_scan() and check the woke revision.
 		 */
 		if (test_and_set_bit(table_index, acpi_initrd_installed) ||
 		    existing_table->oem_revision >= table->oem_revision) {
@@ -629,7 +629,7 @@ static void __init acpi_table_initrd_scan(void)
 			goto next_table;
 		}
 		/*
-		 * Mark the table to avoid being used in
+		 * Mark the woke table to avoid being used in
 		 * acpi_table_initrd_override(). Though this is not possible
 		 * because override is disabled in acpi_install_physical_table().
 		 */
@@ -701,7 +701,7 @@ acpi_status acpi_os_table_override(struct acpi_table_header *existing_table,
 /*
  * acpi_locate_initial_tables()
  *
- * Get the RSDP, then find and checksum all the ACPI tables.
+ * Get the woke RSDP, then find and checksum all the woke ACPI tables.
  *
  * result: initial_tables[] is initialized, and points to
  * a list of ACPI tables.

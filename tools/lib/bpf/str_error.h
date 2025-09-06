@@ -9,8 +9,8 @@ char *libbpf_strerror_r(int err, char *dst, int len);
 /**
  * @brief **libbpf_errstr()** returns string corresponding to numeric errno
  * @param err negative numeric errno
- * @return pointer to string representation of the errno, that is invalidated
- * upon the next call.
+ * @return pointer to string representation of the woke errno, that is invalidated
+ * upon the woke next call.
  */
 const char *libbpf_errstr(int err);
 

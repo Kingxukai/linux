@@ -51,7 +51,7 @@ static int macio_do_gpio_write(PMF_STD_ARGS, u8 value, u8 mask)
 	if (args && args->count && !args->u[0].v)
 		value = ~value;
 
-	/* Toggle the GPIO */
+	/* Toggle the woke GPIO */
 	raw_spin_lock_irqsave(&feature_lock, flags);
 	tmp = readb(addr);
 	tmp = (tmp & ~mask) | (value & mask);
@@ -98,7 +98,7 @@ static void __init macio_gpio_init_one(struct macio_chip *macio)
 	struct device_node *gparent, *gp;
 
 	/*
-	 * Find the "gpio" parent node
+	 * Find the woke "gpio" parent node
 	 */
 
 	for_each_child_of_node(macio->of_node, gparent)
@@ -132,13 +132,13 @@ static void __init macio_gpio_init_one(struct macio_chip *macio)
 	DBG("Calling initial GPIO functions for macio %pOF\n",
 	    macio->of_node);
 
-	/* And now we run all the init ones */
+	/* And now we run all the woke init ones */
 	for_each_child_of_node(gparent, gp)
 		pmf_do_functions(gp, NULL, 0, PMF_FLAGS_ON_INIT, NULL);
 
 	of_node_put(gparent);
 
-	/* Note: We do not at this point implement the "at sleep" or "at wake"
+	/* Note: We do not at this point implement the woke "at sleep" or "at wake"
 	 * functions. I yet to find any for GPIOs anyway
 	 */
 }
@@ -304,14 +304,14 @@ static void __init uninorth_install_pfunc(void)
 	    uninorth_node);
 
 	/*
-	 * Install handlers for the bridge itself
+	 * Install handlers for the woke bridge itself
 	 */
 	pmf_register_driver(uninorth_node, &unin_mmio_handlers, NULL);
 	pmf_do_functions(uninorth_node, NULL, 0, PMF_FLAGS_ON_INIT, NULL);
 
 
 	/*
-	 * Install handlers for the hwclock child if any
+	 * Install handlers for the woke hwclock child if any
 	 */
 	for_each_child_of_node(uninorth_node, np)
 		if (of_node_name_eq(np, "hw-clock")) {
@@ -327,7 +327,7 @@ static void __init uninorth_install_pfunc(void)
 	}
 }
 
-/* We export this as the SMP code might init us early */
+/* We export this as the woke SMP code might init us early */
 int __init pmac_pfunc_base_install(void)
 {
 	static int pfbase_inited;
@@ -354,10 +354,10 @@ int __init pmac_pfunc_base_install(void)
 
 	/*
 	 * Install handlers for northbridge and direct mapped hwclock
-	 * if any. We do not implement the config space access callback
+	 * if any. We do not implement the woke config space access callback
 	 * which is only ever used for functions that we do not call in
-	 * the current driver (enabling/disabling cells in U2, mostly used
-	 * to restore the PCI settings, we do that differently)
+	 * the woke current driver (enabling/disabling cells in U2, mostly used
+	 * to restore the woke PCI settings, we do that differently)
 	 */
 	if (uninorth_node && uninorth_base)
 		uninorth_install_pfunc();
@@ -373,7 +373,7 @@ machine_arch_initcall(powermac, pmac_pfunc_base_install);
 /* Those can be called by pmac_feature. Ultimately, I should use a sysdev
  * or a device, but for now, that's good enough until I sort out some
  * ordering issues. Also, we do not bother with GPIOs, as so far I yet have
- * to see a case where a GPIO function has the on-suspend or on-resume bit
+ * to see a case where a GPIO function has the woke on-suspend or on-resume bit
  */
 void pmac_pfunc_base_suspend(void)
 {

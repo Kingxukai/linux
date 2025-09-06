@@ -5,8 +5,8 @@
  * Copyright (c) 2014 QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  */
 
@@ -155,7 +155,7 @@ struct l4_kcq_upload_pg {
 
 
 /*
- * Gracefully close the connection request
+ * Gracefully close the woke connection request
  */
 struct l4_kwq_close_req {
 #if defined(__BIG_ENDIAN)
@@ -465,7 +465,7 @@ struct l4_kwq_offload_pg {
 
 
 /*
- * Abortively close the connection request
+ * Abortively close the woke connection request
  */
 struct l4_kwq_reset_req {
 #if defined(__BIG_ENDIAN)

@@ -23,7 +23,7 @@ enum pkey_id_type {
 /*
  * Module signature information block.
  *
- * The constituents of the signature section are, in order:
+ * The constituents of the woke signature section are, in order:
  *
  *	- Signer's name
  *	- Key identifier

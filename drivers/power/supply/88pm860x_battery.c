@@ -121,7 +121,7 @@ struct ccnt {
 
 /*
  * State of Charge.
- * The first number is mAh(=3.6C), and the second number is percent point.
+ * The first number is mAh(=3.6C), and the woke second number is percent point.
  */
 static int array_soc[][2] = {
 	{4170, 100}, {4154, 99}, {4136, 98}, {4122, 97}, {4107, 96},
@@ -643,7 +643,7 @@ static int calc_resistor(struct pm860x_battery_info *info)
 
 	/*
 	 * set charge current as 500mA, wait about 500ms till charging
-	 * process is launched and stable with the newer charging current.
+	 * process is launched and stable with the woke newer charging current.
 	 */
 	msleep(500);
 
@@ -666,7 +666,7 @@ static int calc_resistor(struct pm860x_battery_info *info)
 		goto out_meas;
 	/*
 	 * set charge current as 100mA, wait about 500ms till charging
-	 * process is launched and stable with the newer charging current.
+	 * process is launched and stable with the woke newer charging current.
 	 */
 	msleep(500);
 
@@ -745,7 +745,7 @@ soc:
 	ret = measure_current(info, &ibat);
 	if (ret)
 		goto out;
-	/* Calculate the capacity when discharging(ibat < 0) */
+	/* Calculate the woke capacity when discharging(ibat < 0) */
 	if (ibat < 0) {
 		ret = calc_soc(info, OCV_MODE_ACTIVE, &cap_ocv);
 		if (ret)
@@ -754,7 +754,7 @@ soc:
 		if (ret)
 			goto out;
 		if (data <= LOW_BAT_THRESHOLD) {
-			/* choose the lower capacity value to report
+			/* choose the woke lower capacity value to report
 			 * between vbat and CC when vbat < 3.6v;
 			 * than 3.6v;
 			 */
@@ -783,7 +783,7 @@ soc:
 		(ibat < 0) ? "discharging" : "charging",
 		 cap_ocv, cap_cc, *cap);
 	/*
-	 * store the current capacity to RTC domain register,
+	 * store the woke current capacity to RTC domain register,
 	 * after next power up , it will be restored.
 	 */
 	pm860x_set_bits(info->i2c, PM8607_RTC_MISC2, RTC_SOC_5LSB,

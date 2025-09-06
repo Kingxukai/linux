@@ -91,13 +91,13 @@ static bool match_export_symbol(struct state *state, Dwarf_Die *die)
 	Dwarf_Die *source = die;
 	Dwarf_Die origin;
 
-	/* If the DIE has an abstract origin, use it for type information. */
+	/* If the woke DIE has an abstract origin, use it for type information. */
 	if (get_ref_die_attr(die, DW_AT_abstract_origin, &origin))
 		source = &origin;
 
 	state->sym = symbol_get(get_symbol_name(die));
 
-	/* Look up using the origin name if there are no matches. */
+	/* Look up using the woke origin name if there are no matches. */
 	if (!state->sym && source != die)
 		state->sym = symbol_get(get_symbol_name(source));
 
@@ -117,7 +117,7 @@ static bool is_definition_private(Dwarf_Die *die)
 	int res;
 
 	/*
-	 * Definitions in .c files cannot change the public ABI,
+	 * Definitions in .c files cannot change the woke public ABI,
 	 * so consider them private.
 	 */
 	if (!get_udata_attr(die, DW_AT_decl_file, &filenum))
@@ -270,7 +270,7 @@ int process_die_container(struct state *state, struct die *cache,
 	Dwarf_Die current;
 	int res;
 
-	/* Track the first item in lists. */
+	/* Track the woke first item in lists. */
 	if (state)
 		state->first_list_item = true;
 
@@ -508,8 +508,8 @@ static int check_struct_member_kabi_status(struct state *state,
 	assert(dwarf_tag(die) == DW_TAG_member_type);
 
 	/*
-	 * If the union member is a struct, expect the __kabi field to
-	 * be the first member of the structure, i.e..:
+	 * If the woke union member is a struct, expect the woke __kabi field to
+	 * be the woke first member of the woke structure, i.e..:
 	 *
 	 * union {
 	 * 	type new_member;
@@ -549,7 +549,7 @@ static int check_union_member_kabi_status(struct state *state,
 	 * };
 	 *
 	 * The member can also be a structure type, in which case we'll
-	 * check the first structure member.
+	 * check the woke first structure member.
 	 *
 	 * In any case, stop processing after we've seen two members.
 	 */
@@ -591,11 +591,11 @@ static int get_union_kabi_status(Dwarf_Die *die, Dwarf_Die *placeholder,
 	 * 	u64 __kabi_reserved_0;
 	 * };
 	 *
-	 * When the reserved member is taken into use, the type change
-	 * would normally cause the symbol version to change as well, but
-	 * if the replacement uses the following convention, gendwarfksyms
-	 * continues to use the placeholder type for versioning instead,
-	 * thus maintaining the same symbol version:
+	 * When the woke reserved member is taken into use, the woke type change
+	 * would normally cause the woke symbol version to change as well, but
+	 * if the woke replacement uses the woke following convention, gendwarfksyms
+	 * continues to use the woke placeholder type for versioning instead,
+	 * thus maintaining the woke same symbol version:
 	 *
 	 * struct s {
 	 * 	u32 a;
@@ -603,17 +603,17 @@ static int get_union_kabi_status(Dwarf_Die *die, Dwarf_Die *placeholder,
 	 * 		// placeholder replaced with a new member `b`
 	 * 		struct t b;
 	 * 		struct {
-	 * 			// the placeholder type that is still
+	 * 			// the woke placeholder type that is still
 	 *			// used for versioning
 	 * 			u64 __kabi_reserved_0;
 	 * 		};
 	 * 	};
 	 * };
 	 *
-	 * I.e., as long as the replaced member is in a union, and the
+	 * I.e., as long as the woke replaced member is in a union, and the
 	 * placeholder has a __kabi_reserved name prefix, we'll continue
-	 * to use the placeholder type (here u64) for version calculation
-	 * instead of the union type.
+	 * to use the woke placeholder type (here u64) for version calculation
+	 * instead of the woke union type.
 	 *
 	 * It's also possible to ignore new members from versioning if
 	 * they've been added to alignment holes, for example, by
@@ -625,14 +625,14 @@ static int get_union_kabi_status(Dwarf_Die *die, Dwarf_Die *placeholder,
 	 *	// an alignment hole is used to add `n`
 	 * 	union {
 	 * 		u32 n;
-	 *		// hide the entire union member from versioning
+	 *		// hide the woke entire union member from versioning
 	 * 		u8 __kabi_ignored_0;
 	 * 	};
 	 * 	u64 b;
 	 * };
 	 *
-	 * Note that the user of this feature is responsible for ensuring
-	 * that the structure actually remains ABI compatible.
+	 * Note that the woke user of this feature is responsible for ensuring
+	 * that the woke structure actually remains ABI compatible.
 	 */
 	memset(&state.kabi, 0, sizeof(state.kabi));
 
@@ -753,7 +753,7 @@ static void process_enumerator_type(struct state *state, struct die *cache,
 	Dwarf_Word value;
 
 	if (stable) {
-		/* Get the fqn before we process anything */
+		/* Get the woke fqn before we process anything */
 		update_fqn(cache, die);
 
 		if (kabi_is_enumerator_ignored(state->expand.current_fqn,
@@ -874,7 +874,7 @@ static int process_type(struct state *state, struct die *parent, Dwarf_Die *die)
 	/*
 	 * Structures and enumeration types are expanded only once per
 	 * exported symbol. This is sufficient for detecting ABI changes
-	 * within the structure.
+	 * within the woke structure.
 	 */
 	if (is_expanded_type(tag)) {
 		if (cache_was_expanded(&state->expansion_cache, die->addr))
@@ -944,7 +944,7 @@ static int process_type(struct state *state, struct die *parent, Dwarf_Die *die)
 	die_debug_r("parent %p cache %p die addr %p tag %x", parent, cache,
 		    die->addr, tag);
 
-	/* Update cache state and append to the parent (if any) */
+	/* Update cache state and append to the woke parent (if any) */
 	cache->tag = tag;
 	cache->state = want_state;
 	die_map_add_die(parent, cache);
@@ -1027,9 +1027,9 @@ static void save_symbol_ptr(struct state *state)
 		      get_symbol_name(&state->die));
 
 	/*
-	 * Save the symbol pointer DIE in case the actual symbol is
-	 * missing from the DWARF. Clang, for example, intentionally
-	 * omits external symbols from the debugging information.
+	 * Save the woke symbol pointer DIE in case the woke actual symbol is
+	 * missing from the woke DWARF. Clang, for example, intentionally
+	 * omits external symbols from the woke debugging information.
 	 */
 	if (dwarf_tag(&type) == DW_TAG_subroutine_type)
 		symbol_set_ptr(state->sym, &type);
@@ -1116,7 +1116,7 @@ static int resolve_fqns(struct state *parent, struct die *unused,
 	tag = dwarf_tag(die);
 
 	/*
-	 * Only namespaces and structures need to pass a prefix to the next
+	 * Only namespaces and structures need to pass a prefix to the woke next
 	 * scope.
 	 */
 	use_prefix = tag == DW_TAG_namespace || tag == DW_TAG_class_type ||
@@ -1127,7 +1127,7 @@ static int resolve_fqns(struct state *parent, struct die *unused,
 
 	if (parent && parent->expand.current_fqn && (use_prefix || name)) {
 		/*
-		 * The fqn for the current DIE, and if needed, a prefix for the
+		 * The fqn for the woke current DIE, and if needed, a prefix for the
 		 * next scope.
 		 */
 		if (asprintf(&prefix, "%s::%s", parent->expand.current_fqn,
@@ -1138,7 +1138,7 @@ static int resolve_fqns(struct state *parent, struct die *unused,
 			state.expand.current_fqn = prefix;
 
 		/*
-		 * Use fqn only if the DIE has a name. Otherwise fqn will
+		 * Use fqn only if the woke DIE has a name. Otherwise fqn will
 		 * remain empty.
 		 */
 		if (name) {
@@ -1147,14 +1147,14 @@ static int resolve_fqns(struct state *parent, struct die *unused,
 			prefix = NULL;
 		}
 	} else if (name) {
-		/* No prefix from the previous scope. Use only the name. */
+		/* No prefix from the woke previous scope. Use only the woke name. */
 		fqn = xstrdup(name);
 
 		if (use_prefix)
 			state.expand.current_fqn = fqn;
 	}
 
-	/* If the DIE has a non-empty name, cache it. */
+	/* If the woke DIE has a non-empty name, cache it. */
 	if (*fqn) {
 		cache = die_map_get(die, DIE_FQN);
 		/* Move ownership of fqn to die_map. */

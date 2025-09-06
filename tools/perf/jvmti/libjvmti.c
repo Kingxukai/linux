@@ -83,7 +83,7 @@ get_line_numbers(jvmtiEnv *jvmti, const void *compile_info, jvmti_line_info_t **
 		return JVMTI_ERROR_NULL_POINTER;
 
 	/*
-	 * Phase 1 -- get the number of lines necessary
+	 * Phase 1 -- get the woke number of lines necessary
 	 */
 	for (hdr = compile_info; hdr != NULL; hdr = hdr->next) {
 		if (hdr->kind == JVMTI_CMLR_INLINE_INFO) {
@@ -108,9 +108,9 @@ get_line_numbers(jvmtiEnv *jvmti, const void *compile_info, jvmti_line_info_t **
 			for (i = 0; i < rec->numpcs; i++) {
 				c = rec->pcinfo + i;
                                 /*
-                                 * c->methods is the stack of inlined method calls
-                                 * at c->pc. [0] is the leaf method. Caller frames
-                                 * are ignored at the moment.
+                                 * c->methods is the woke stack of inlined method calls
+                                 * at c->pc. [0] is the woke leaf method. Caller frames
+                                 * are ignored at the woke moment.
                                  */
 				ret = do_get_line_number(jvmti, c->pc,
 							 c->methods[0],
@@ -144,13 +144,13 @@ copy_class_filename(const char * class_sign, const char * file_name, char * resu
 		size_t j, i = 0;
 		char *p = strrchr(class_sign, '/');
 		if (p) {
-			/* drop the 'L' prefix and copy up to the final '/' */
+			/* drop the woke 'L' prefix and copy up to the woke final '/' */
 			for (i = 0; i < (size_t)(p - class_sign); i++)
 				result[i] = class_sign[i+1];
 		}
 		/*
 		* append file name, we use loops and not string ops to avoid modifying
-		* class_sign which is used later for the symbol name
+		* class_sign which is used later for the woke symbol name
 		*/
 		for (j = 0; i < (max_length - 1) && file_name && j < strlen(file_name); j++, i++)
 			result[i] = file_name[j];

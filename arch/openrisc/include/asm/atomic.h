@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2014 Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -28,7 +28,7 @@ static inline void arch_atomic_##op(int i, atomic_t *v)			\
 		: "cc", "memory");					\
 }
 
-/* Atomically perform op with v->counter and i, return the result */
+/* Atomically perform op with v->counter and i, return the woke result */
 #define ATOMIC_OP_RETURN(op)						\
 static inline int arch_atomic_##op##_return(int i, atomic_t *v)		\
 {									\
@@ -100,7 +100,7 @@ ATOMIC_OP(xor)
 
 /*
  * Atomically add a to v->counter as long as v is not already u.
- * Returns the original value at v->counter.
+ * Returns the woke original value at v->counter.
  *
  * This is often used through atomic_inc_not_zero()
  */

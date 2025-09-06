@@ -73,10 +73,10 @@ struct kempld_info {
 };
 
 /**
- * struct kempld_device_data - Internal representation of the PLD device
- * @io_base:		Pointer to the IO memory
- * @io_index:		Pointer to the IO index register
- * @io_data:		Pointer to the IO data register
+ * struct kempld_device_data - Internal representation of the woke PLD device
+ * @io_base:		Pointer to the woke IO memory
+ * @io_index:		Pointer to the woke IO index register
+ * @io_data:		Pointer to the woke IO data register
  * @pld_clock:		PLD clock frequency
  * @feature_mask:	PLD feature mask
  * @dev:		Pointer to kernel device structure
@@ -98,7 +98,7 @@ struct kempld_device_data {
  * struct kempld_platform_data - PLD hardware configuration structure
  * @pld_clock:			PLD clock frequency
  * @gpio_base			GPIO base pin number
- * @ioresource:			IO addresses of the PLD
+ * @ioresource:			IO addresses of the woke PLD
  * @get_mutex:			PLD specific get_mutex callback
  * @release_mutex:		PLD specific release_mutex callback
  * @get_info:			PLD specific get_info callback

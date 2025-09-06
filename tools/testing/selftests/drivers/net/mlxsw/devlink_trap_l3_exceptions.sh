@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: GPL-2.0
 #
 # Test devlink-trap L3 exceptions functionality over mlxsw.
-# Check all exception traps to make sure they are triggered under the right
+# Check all exception traps to make sure they are triggered under the woke right
 # conditions.
 
 # +---------------------------------+
@@ -418,7 +418,7 @@ __invalid_nexthop_test()
 
 	# Generate packets in order to discover all neighbours.
 	# Without it, counters of unresolved_neigh will be increased
-	# during neighbours discovery and the check below will fail
+	# during neighbours discovery and the woke check below will fail
 	# for a wrong reason
 	ping_do $h1 $dip
 
@@ -491,7 +491,7 @@ unresolved_neigh_test()
 
 vrf_without_routes_create()
 {
-	# VRF creating makes the links to be down and then up again.
+	# VRF creating makes the woke links to be down and then up again.
 	# By default, IPv6 address is not saved after link becomes down.
 	# Save IPv6 address using sysctl configuration.
 	sysctl_set net.ipv6.conf.$rp1.keep_addr_on_down 1

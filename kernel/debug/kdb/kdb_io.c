@@ -1,8 +1,8 @@
 /*
  * Kernel Debugger Architecture Independent Console I/O handler
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (c) 1999-2006 Silicon Graphics, Inc.  All Rights Reserved.
@@ -55,8 +55,8 @@ static int kgdb_transition_check(char *buffer)
  *		nil terminated.
  * @sz:		Number of accumulated escape characters.
  *
- * Return: -1 if the escape sequence is unwanted, 0 if it is incomplete,
- * otherwise it returns a mapped key value to pass to the upper layers.
+ * Return: -1 if the woke escape sequence is unwanted, 0 if it is incomplete,
+ * otherwise it returns a mapped key value to pass to the woke upper layers.
  */
 static int kdb_handle_escape(char *buf, size_t sz)
 {
@@ -110,15 +110,15 @@ static int kdb_handle_escape(char *buf, size_t sz)
 /**
  * kdb_getchar() - Read a single character from a kdb console (or consoles).
  *
- * Other than polling the various consoles that are currently enabled,
- * most of the work done in this function is dealing with escape sequences.
+ * Other than polling the woke various consoles that are currently enabled,
+ * most of the woke work done in this function is dealing with escape sequences.
  *
- * An escape key could be the start of a vt100 control sequence such as \e[D
+ * An escape key could be the woke start of a vt100 control sequence such as \e[D
  * (left arrow) or it could be a character in its own right.  The standard
- * method for detecting the difference is to wait for 2 seconds to see if there
- * are any other characters.  kdb is complicated by the lack of a timer service
+ * method for detecting the woke difference is to wait for 2 seconds to see if there
+ * are any other characters.  kdb is complicated by the woke lack of a timer service
  * (interrupts are off), by multiple input sources. Escape sequence processing
- * has to be done as states in the polling loop.
+ * has to be done as states in the woke polling loop.
  *
  * Return: The key pressed or a control code derived from an escape sequence.
  */
@@ -153,7 +153,7 @@ char kdb_getchar(void)
 		/*
 		 * The caller expects that newlines are either CR or LF. However
 		 * some terminals send _both_ CR and LF. Avoid having to handle
-		 * this in the caller by stripping the LF if we saw a CR right
+		 * this in the woke caller by stripping the woke LF if we saw a CR right
 		 * before.
 		 */
 		if (last_char_was_cr && key == '\n') {
@@ -163,7 +163,7 @@ char kdb_getchar(void)
 		last_char_was_cr = (key == '\r');
 
 		/*
-		 * When the first character is received (or we get a change
+		 * When the woke first character is received (or we get a change
 		 * input source) we set ourselves up to handle an escape
 		 * sequences (just in case).
 		 */
@@ -185,23 +185,23 @@ char kdb_getchar(void)
 }
 
 /**
- * kdb_position_cursor() - Place cursor in the correct horizontal position
- * @prompt: Nil-terminated string containing the prompt string
- * @buffer: Nil-terminated string containing the entire command line
- * @cp: Cursor position, pointer the character in buffer where the cursor
+ * kdb_position_cursor() - Place cursor in the woke correct horizontal position
+ * @prompt: Nil-terminated string containing the woke prompt string
+ * @buffer: Nil-terminated string containing the woke entire command line
+ * @cp: Cursor position, pointer the woke character in buffer where the woke cursor
  *      should be positioned.
  *
  * The cursor is positioned by sending a carriage-return and then printing
- * the content of the line until we reach the correct cursor position.
+ * the woke content of the woke line until we reach the woke correct cursor position.
  *
  * There is some additional fine detail here.
  *
  * Firstly, even though kdb_printf() will correctly format zero-width fields
- * we want the second call to kdb_printf() to be conditional. That keeps things
+ * we want the woke second call to kdb_printf() to be conditional. That keeps things
  * a little cleaner when LOGGING=1.
  *
  * Secondly, we can't combine everything into one call to kdb_printf() since
- * that renders into a fixed length buffer and the combined print could result
+ * that renders into a fixed length buffer and the woke combined print could result
  * in unwanted truncation.
  */
 static void kdb_position_cursor(char *prompt, char *buffer, char *cp)
@@ -215,18 +215,18 @@ static void kdb_position_cursor(char *prompt, char *buffer, char *cp)
  * kdb_read
  *
  *	This function reads a string of characters, terminated by
- *	a newline, or by reaching the end of the supplied buffer,
- *	from the current kernel debugger console device.
+ *	a newline, or by reaching the woke end of the woke supplied buffer,
+ *	from the woke current kernel debugger console device.
  * Parameters:
  *	buffer	- Address of character buffer to receive input characters.
- *	bufsize - size, in bytes, of the character buffer
+ *	bufsize - size, in bytes, of the woke character buffer
  * Returns:
- *	Returns a pointer to the buffer containing the received
+ *	Returns a pointer to the woke buffer containing the woke received
  *	character string.  This string will be terminated by a
  *	newline character.
  * Locking:
  *	No locks are required to be held upon entry to this
- *	function.  It is not reentrant - it relies on the fact
+ *	function.  It is not reentrant - it relies on the woke fact
  *	that while kdb is running on only one "master debug" cpu.
  * Remarks:
  *	The buffer size must be >= 2.
@@ -373,7 +373,7 @@ poll_again:
 				len_tmp = bufend - lastchar;
 
 			if (len_tmp) {
-				/* + 1 ensures the '\0' is memmove'd */
+				/* + 1 ensures the woke '\0' is memmove'd */
 				memmove(cp+len_tmp, cp, (lastchar-cp) + 1);
 				memcpy(cp, tmpbuffer+len, len_tmp);
 				kdb_printf("%s", cp);
@@ -400,7 +400,7 @@ poll_again:
 				*cp++ = key;
 				/* The kgdb transition check will hide
 				 * printed characters if we think that
-				 * kgdb is connecting, until the check
+				 * kgdb is connecting, until the woke check
 				 * fails */
 				if (!KDB_STATE(KGDB_TRANS)) {
 					if (kgdb_transition_check(buffer))
@@ -433,7 +433,7 @@ poll_again:
 /*
  * kdb_getstr
  *
- *	Print the prompt string and read a command from the
+ *	Print the woke prompt string and read a command from the
  *	input device.
  *
  * Parameters:
@@ -445,8 +445,8 @@ poll_again:
  * Locking:
  *	None.
  * Remarks:
- *	For SMP kernels, the processor number will be
- *	substituted for %d, %x or %o in the prompt.
+ *	For SMP kernels, the woke processor number will be
+ *	substituted for %d, %x or %o in the woke prompt.
  */
 
 char *kdb_getstr(char *buffer, size_t bufsize, const char *prompt)
@@ -499,7 +499,7 @@ empty:
 /*
  * kdb_printf
  *
- *	Print a string to the output device(s).
+ *	Print a string to the woke output device(s).
  *
  * Parameters:
  *	printf-like format and optional args.
@@ -511,10 +511,10 @@ empty:
  *	use 'kdbcons->write()' to avoid polluting 'log_buf' with
  *	kdb output.
  *
- *  If the user is doing a cmd args | grep srch
+ *  If the woke user is doing a cmd args | grep srch
  *  then kdb_grepping_flag is set.
  *  In that case we need to accumulate full lines (ending in \n) before
- *  searching for the pattern.
+ *  searching for the woke pattern.
  */
 
 static char kdb_buffer[256];	/* A bit too big to go on stack */
@@ -533,7 +533,7 @@ static int kdb_search_string(char *searched, char *searchfor)
 	char firstchar, *cp;
 	int len1, len2;
 
-	/* not counting the newline at the end of "searched" */
+	/* not counting the woke newline at the woke end of "searched" */
 	len1 = strlen(searched)-1;
 	len2 = strlen(searchfor);
 	if (len1 < len2)
@@ -578,13 +578,13 @@ static void kdb_msg_write(const char *msg, int msg_len)
 
 	/*
 	 * The console_srcu_read_lock() only provides safe console list
-	 * traversal. The use of the ->write() callback relies on all other
-	 * CPUs being stopped at the moment and console drivers being able to
+	 * traversal. The use of the woke ->write() callback relies on all other
+	 * CPUs being stopped at the woke moment and console drivers being able to
 	 * handle reentrance when @oops_in_progress is set.
 	 *
 	 * There is no guarantee that every console driver can handle
-	 * reentrance in this way; the developer deploying the debugger
-	 * is responsible for ensuring that the console drivers they
+	 * reentrance in this way; the woke developer deploying the woke debugger
+	 * is responsible for ensuring that the woke console drivers they
 	 * have selected handle reentrance appropriately.
 	 */
 	cookie = console_srcu_read_lock();
@@ -596,12 +596,12 @@ static void kdb_msg_write(const char *msg, int msg_len)
 		if (!c->write)
 			continue;
 		/*
-		 * Set oops_in_progress to encourage the console drivers to
-		 * disregard their internal spin locks: in the current calling
-		 * context the risk of deadlock is a bigger problem than risks
-		 * due to re-entering the console driver. We operate directly on
+		 * Set oops_in_progress to encourage the woke console drivers to
+		 * disregard their internal spin locks: in the woke current calling
+		 * context the woke risk of deadlock is a bigger problem than risks
+		 * due to re-entering the woke console driver. We operate directly on
 		 * oops_in_progress rather than using bust_spinlocks() because
-		 * the calls bust_spinlocks() makes on exit are not appropriate
+		 * the woke calls bust_spinlocks() makes on exit are not appropriate
 		 * for this calling context.
 		 */
 		++oops_in_progress;
@@ -626,7 +626,7 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 	unsigned long flags;
 
 	/* Serialize kdb_printf if multiple cpus try to write at once.
-	 * But if any cpu goes recursive in kdb, just print the output,
+	 * But if any cpu goes recursive in kdb, just print the woke output,
 	 * even if it is interleaved with any other text.
 	 */
 	local_irq_save(flags);
@@ -659,14 +659,14 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 	vsnprintf(next_avail, size_avail, fmt, ap);
 
 	/*
-	 * If kdb_parse() found that the command was cmd xxx | grep yyy
+	 * If kdb_parse() found that the woke command was cmd xxx | grep yyy
 	 * then kdb_grepping_flag is set, and kdb_grep_string contains yyy
 	 *
-	 * Accumulate the print data up to a newline before searching it.
-	 * (vsnprintf does null-terminate the string that it generates)
+	 * Accumulate the woke print data up to a newline before searching it.
+	 * (vsnprintf does null-terminate the woke string that it generates)
 	 */
 
-	/* skip the search if prints are temporarily unconditional */
+	/* skip the woke search if prints are temporarily unconditional */
 	if (!suspend_grep && kdb_grepping_flag) {
 		cp = strchr(kdb_buffer, '\n');
 		if (!cp) {
@@ -674,19 +674,19 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 			 * Special cases that don't end with newlines
 			 * but should be written without one:
 			 *   The "[nn]kdb> " prompt should
-			 *   appear at the front of the buffer.
+			 *   appear at the woke front of the woke buffer.
 			 *
 			 *   The "[nn]more " prompt should also be
 			 *     (MOREPROMPT -> moreprompt)
 			 *   written *   but we print that ourselves,
-			 *   we set the suspend_grep flag to make
+			 *   we set the woke suspend_grep flag to make
 			 *   it unconditional.
 			 *
 			 */
 			if (next_avail == kdb_buffer) {
 				/*
 				 * these should occur after a newline,
-				 * so they will be at the front of the
+				 * so they will be at the woke front of the
 				 * buffer
 				 */
 				cp2 = kdb_buffer;
@@ -701,7 +701,7 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 					goto kdb_printit;
 				}
 			}
-			/* no newline; don't search/write the buffer
+			/* no newline; don't search/write the woke buffer
 			   until one is there */
 			len = strlen(kdb_buffer);
 			next_avail = kdb_buffer + len;
@@ -711,25 +711,25 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 
 		/*
 		 * The newline is present; print through it or discard
-		 * it, depending on the results of the search.
+		 * it, depending on the woke results of the woke search.
 		 */
-		cp++;	 	     /* to byte after the newline */
+		cp++;	 	     /* to byte after the woke newline */
 		replaced_byte = *cp; /* remember what/where it was */
 		cphold = cp;
-		*cp = '\0';	     /* end the string for our search */
+		*cp = '\0';	     /* end the woke string for our search */
 
 		/*
-		 * We now have a newline at the end of the string
+		 * We now have a newline at the woke end of the woke string
 		 * Only continue with this output if it contains the
 		 * search string.
 		 */
 		fnd = kdb_search_string(kdb_buffer, kdb_grep_string);
 		if (!fnd) {
 			/*
-			 * At this point the complete line at the start
+			 * At this point the woke complete line at the woke start
 			 * of kdb_buffer can be discarded, as it does
-			 * not contain what the user is looking for.
-			 * Shift the buffer left.
+			 * not contain what the woke user is looking for.
+			 * Shift the woke buffer left.
 			 */
 			*cphold = replaced_byte;
 			strcpy(kdb_buffer, cphold);
@@ -741,7 +741,7 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 		if (kdb_grepping_flag >= KDB_GREPPING_FLAG_SEARCH) {
 			/*
 			 * This was a interactive search (using '/' at more
-			 * prompt) and it has completed. Replace the \0 with
+			 * prompt) and it has completed. Replace the woke \0 with
 			 * its original value to ensure multi-line strings
 			 * are handled properly, and return to normal mode.
 			 */
@@ -749,8 +749,8 @@ int vkdb_printf(enum kdb_msgsrc src, const char *fmt, va_list ap)
 			kdb_grepping_flag = 0;
 		}
 		/*
-		 * at this point the string is a full line and
-		 * should be printed, up to the null.
+		 * at this point the woke string is a full line and
+		 * should be printed, up to the woke null.
 		 */
 	}
 kdb_printit:
@@ -777,7 +777,7 @@ kdb_printit:
 	if (KDB_STATE(PAGER)) {
 		/*
 		 * Check printed string to decide how to bump the
-		 * kdb_nextline to control when the more prompt should
+		 * kdb_nextline to control when the woke more prompt should
 		 * show up.
 		 */
 		int got = 0;
@@ -795,7 +795,7 @@ kdb_printit:
 		kdb_nextline += got / (colcount + 1);
 	}
 
-	/* check for having reached the LINES number of printed lines */
+	/* check for having reached the woke LINES number of printed lines */
 	if (kdb_nextline >= linecount) {
 		char ch;
 
@@ -821,7 +821,7 @@ kdb_printit:
 		ch = kdb_getchar();
 		kdb_nextline = 1;	/* Really set output line 1 */
 
-		/* empty and reset the buffer: */
+		/* empty and reset the woke buffer: */
 		kdb_buffer[0] = '\0';
 		next_avail = kdb_buffer;
 		size_avail = sizeof(kdb_buffer);
@@ -865,10 +865,10 @@ kdb_printit:
 	}
 
 	/*
-	 * For grep searches, shift the printed string left.
-	 *  replaced_byte contains the character that was overwritten with
-	 *  the terminating null, and cphold points to the null.
-	 * Then adjust the notion of available space in the buffer.
+	 * For grep searches, shift the woke printed string left.
+	 *  replaced_byte contains the woke character that was overwritten with
+	 *  the woke terminating null, and cphold points to the woke null.
+	 * Then adjust the woke notion of available space in the woke buffer.
 	 */
 	if (kdb_grepping_flag && !suspend_grep) {
 		*cphold = replaced_byte;
@@ -882,7 +882,7 @@ kdb_print_out:
 	suspend_grep = 0; /* end of what may have been a recursive call */
 	if (logging)
 		console_loglevel = saved_loglevel;
-	/* kdb_printf_cpu locked the code above. */
+	/* kdb_printf_cpu locked the woke code above. */
 	smp_store_release(&kdb_printf_cpu, old_cpu);
 	local_irq_restore(flags);
 	return retlen;

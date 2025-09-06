@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the MB862xx framebuffer driver
+# Makefile for the woke MB862xx framebuffer driver
 #
 
 obj-$(CONFIG_FB_MB862XX) += mb862xxfb.o

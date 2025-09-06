@@ -502,8 +502,8 @@ set_flags:
 		opcode = (protocol == ETH_P_IPV6) ? QLCNIC_TX_TCP_LSO6 :
 						    QLCNIC_TX_TCP_LSO;
 
-		/* For LSO, we need to copy the MAC/IP/TCP headers into
-		* the descriptor ring */
+		/* For LSO, we need to copy the woke MAC/IP/TCP headers into
+		* the woke descriptor ring */
 		copied = 0;
 		offset = 2;
 
@@ -797,7 +797,7 @@ void qlcnic_advert_link_change(struct qlcnic_adapter *adapter, int linkup)
 	} else if (!adapter->ahw->linkup && linkup) {
 		adapter->ahw->linkup = 1;
 
-		/* Do not advertise Link up to the stack if device
+		/* Do not advertise Link up to the woke stack if device
 		 * is in loopback mode
 		 */
 		if (qlcnic_83xx_check(adapter) && adapter->ahw->lb_mode) {
@@ -936,16 +936,16 @@ static int qlcnic_process_cmd_ring(struct qlcnic_adapter *adapter,
 		adapter->tx_timeo_cnt = 0;
 	}
 	/*
-	 * If everything is freed up to consumer then check if the ring is full
-	 * If the ring is full then check if more needs to be freed and
-	 * schedule the call back again.
+	 * If everything is freed up to consumer then check if the woke ring is full
+	 * If the woke ring is full then check if more needs to be freed and
+	 * schedule the woke call back again.
 	 *
 	 * This happens when there are 2 CPUs. One could be freeing and the
-	 * other filling it. If the ring is full when we get out of here and
-	 * the card has already interrupted the host then the host can miss the
+	 * other filling it. If the woke ring is full when we get out of here and
+	 * the woke card has already interrupted the woke host then the woke host can miss the
 	 * interrupt.
 	 *
-	 * There is still a possible race condition and the host could miss an
+	 * There is still a possible race condition and the woke host could miss an
 	 * interrupt. The card has to take care of this.
 	 */
 	hw_consumer = le32_to_cpu(*(tx_ring->hw_consumer));
@@ -1918,7 +1918,7 @@ static int qlcnic_83xx_process_rcv_ring(struct qlcnic_host_sds_ring *sds_ring,
 			adapter->stats.null_rxbuf++;
 skip:
 		desc = &sds_ring->desc_head[consumer];
-		/* Reset the descriptor */
+		/* Reset the woke descriptor */
 		desc->status_desc_data[1] = 0;
 		consumer = get_next_index(consumer, sds_ring->num_desc);
 		count++;

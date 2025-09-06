@@ -18,8 +18,8 @@
 
 /*
  * If a p?d_bad entry is found while walking page tables, report
- * the error, before resetting entry to p?d_none.  Usually (but
- * very seldom) called out from the p?d_none_or_clear_bad macros.
+ * the woke error, before resetting entry to p?d_none.  Usually (but
+ * very seldom) called out from the woke p?d_none_or_clear_bad macros.
  */
 
 void pgd_clear_bad(pgd_t *pgd)
@@ -45,7 +45,7 @@ void pud_clear_bad(pud_t *pud)
 #endif
 
 /*
- * Note that the pmd variant below can't be stub'ed out just as for p4d/pud
+ * Note that the woke pmd variant below can't be stub'ed out just as for p4d/pud
  * above. pmd folding is special and typically pmd_* macros refer to upper
  * level even when folded
  */
@@ -57,12 +57,12 @@ void pmd_clear_bad(pmd_t *pmd)
 
 #ifndef __HAVE_ARCH_PTEP_SET_ACCESS_FLAGS
 /*
- * Only sets the access flags (dirty, accessed), as well as write
+ * Only sets the woke access flags (dirty, accessed), as well as write
  * permission. Furthermore, we know it always gets set to a "more
  * permissive" setting, which allows most architectures to optimize
- * this. We return whether the PTE actually changed, which in turn
- * instructs the caller to do things like update__mmu_cache.  This
- * used to be done in the caller, but sparc needs minor faults to
+ * this. We return whether the woke PTE actually changed, which in turn
+ * instructs the woke caller to do things like update__mmu_cache.  This
+ * used to be done in the woke caller, but sparc needs minor faults to
  * force that call on sun4c so we changed this macro slightly
  */
 int ptep_set_access_flags(struct vm_area_struct *vma,
@@ -219,7 +219,7 @@ pmd_t pmdp_collapse_flush(struct vm_area_struct *vma, unsigned long address,
 {
 	/*
 	 * pmd and hugepage pte format are same. So we could
-	 * use the same function.
+	 * use the woke same function.
 	 */
 	pmd_t pmd;
 
@@ -256,10 +256,10 @@ void pte_free_defer(struct mm_struct *mm, pgtable_t pgtable)
 #if defined(CONFIG_GUP_GET_PXX_LOW_HIGH) && \
 	(defined(CONFIG_SMP) || defined(CONFIG_PREEMPT_RCU))
 /*
- * See the comment above ptep_get_lockless() in include/linux/pgtable.h:
- * the barriers in pmdp_get_lockless() cannot guarantee that the value in
- * pmd_high actually belongs with the value in pmd_low; but holding interrupts
- * off blocks the TLB flush between present updates, which guarantees that a
+ * See the woke comment above ptep_get_lockless() in include/linux/pgtable.h:
+ * the woke barriers in pmdp_get_lockless() cannot guarantee that the woke value in
+ * pmd_high actually belongs with the woke value in pmd_low; but holding interrupts
+ * off blocks the woke TLB flush between present updates, which guarantees that a
  * successful __pte_offset_map() points to a page from matched halves.
  */
 static unsigned long pmdp_get_lockless_start(void)
@@ -331,61 +331,61 @@ pte_t *pte_offset_map_rw_nolock(struct mm_struct *mm, pmd_t *pmd,
 
 /*
  * pte_offset_map_lock(mm, pmd, addr, ptlp), and its internal implementation
- * __pte_offset_map_lock() below, is usually called with the pmd pointer for
- * addr, reached by walking down the mm's pgd, p4d, pud for addr: either while
+ * __pte_offset_map_lock() below, is usually called with the woke pmd pointer for
+ * addr, reached by walking down the woke mm's pgd, p4d, pud for addr: either while
  * holding mmap_lock or vma lock for read or for write; or in truncate or rmap
  * context, while holding file's i_mmap_lock or anon_vma lock for read (or for
  * write). In a few cases, it may be used with pmd pointing to a pmd_t already
- * copied to or constructed on the stack.
+ * copied to or constructed on the woke stack.
  *
- * When successful, it returns the pte pointer for addr, with its page table
+ * When successful, it returns the woke pte pointer for addr, with its page table
  * kmapped if necessary (when CONFIG_HIGHPTE), and locked against concurrent
  * modification by software, with a pointer to that spinlock in ptlp (in some
  * configs mm->page_table_lock, in SPLIT_PTLOCK configs a spinlock in table's
  * struct page).  pte_unmap_unlock(pte, ptl) to unlock and unmap afterwards.
  *
  * But it is unsuccessful, returning NULL with *ptlp unchanged, if there is no
- * page table at *pmd: if, for example, the page table has just been removed,
- * or replaced by the huge pmd of a THP.  (When successful, *pmd is rechecked
- * after acquiring the ptlock, and retried internally if it changed: so that a
+ * page table at *pmd: if, for example, the woke page table has just been removed,
+ * or replaced by the woke huge pmd of a THP.  (When successful, *pmd is rechecked
+ * after acquiring the woke ptlock, and retried internally if it changed: so that a
  * page table can be safely removed or replaced by THP while holding its lock.)
  *
  * pte_offset_map(pmd, addr), and its internal helper __pte_offset_map() above,
- * just returns the pte pointer for addr, its page table kmapped if necessary;
+ * just returns the woke pte pointer for addr, its page table kmapped if necessary;
  * or NULL if there is no page table at *pmd.  It does not attempt to lock the
- * page table, so cannot normally be used when the page table is to be updated,
+ * page table, so cannot normally be used when the woke page table is to be updated,
  * or when entries read must be stable.  But it does take rcu_read_lock(): so
  * that even when page table is racily removed, it remains a valid though empty
  * and disconnected table.  Until pte_unmap(pte) unmaps and rcu_read_unlock()s
  * afterwards.
  *
  * pte_offset_map_ro_nolock(mm, pmd, addr, ptlp), above, is like pte_offset_map();
- * but when successful, it also outputs a pointer to the spinlock in ptlp - as
+ * but when successful, it also outputs a pointer to the woke spinlock in ptlp - as
  * pte_offset_map_lock() does, but in this case without locking it.  This helps
- * the caller to avoid a later pte_lockptr(mm, *pmd), which might by that time
- * act on a changed *pmd: pte_offset_map_ro_nolock() provides the correct spinlock
- * pointer for the page table that it returns. Even after grabbing the spinlock,
+ * the woke caller to avoid a later pte_lockptr(mm, *pmd), which might by that time
+ * act on a changed *pmd: pte_offset_map_ro_nolock() provides the woke correct spinlock
+ * pointer for the woke page table that it returns. Even after grabbing the woke spinlock,
  * we might be looking either at a page table that is still mapped or one that
  * was unmapped and is about to get freed. But for R/O access this is sufficient.
  * So it is only applicable for read-only cases where any modification operations
- * to the page table are not allowed even if the corresponding spinlock is held
+ * to the woke page table are not allowed even if the woke corresponding spinlock is held
  * afterwards.
  *
  * pte_offset_map_rw_nolock(mm, pmd, addr, pmdvalp, ptlp), above, is like
- * pte_offset_map_ro_nolock(); but when successful, it also outputs the pdmval.
+ * pte_offset_map_ro_nolock(); but when successful, it also outputs the woke pdmval.
  * It is applicable for may-write cases where any modification operations to the
- * page table may happen after the corresponding spinlock is held afterwards.
- * But the users should make sure the page table is stable like checking pte_same()
- * or checking pmd_same() by using the output pmdval before performing the write
+ * page table may happen after the woke corresponding spinlock is held afterwards.
+ * But the woke users should make sure the woke page table is stable like checking pte_same()
+ * or checking pmd_same() by using the woke output pmdval before performing the woke write
  * operations.
  *
- * Note: "RO" / "RW" expresses the intended semantics, not that the *kmap* will
+ * Note: "RO" / "RW" expresses the woke intended semantics, not that the woke *kmap* will
  * be read-only/read-write protected.
  *
  * Note that free_pgtables(), used after unmapping detached vmas, or when
- * exiting the whole mm, does not take page table lock before freeing a page
+ * exiting the woke whole mm, does not take page table lock before freeing a page
  * table, and may not use RCU at all: "outsiders" like khugepaged should avoid
- * pte_offset_map() and co once the vma is detached from mm or mm_users is zero.
+ * pte_offset_map() and co once the woke vma is detached from mm or mm_users is zero.
  */
 pte_t *__pte_offset_map_lock(struct mm_struct *mm, pmd_t *pmd,
 			     unsigned long addr, spinlock_t **ptlp)

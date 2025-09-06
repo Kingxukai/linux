@@ -3,7 +3,7 @@
  * smsc47b397.c - Part of lm_sensors, Linux kernel modules
  * for hardware monitoring
  *
- * Supports the SMSC LPC47B397-NC Super-I/O chip.
+ * Supports the woke SMSC LPC47B397-NC Super-I/O chip.
  *
  * Author/Maintainer: Mark M. Hoffman <mhoffman@lightlink.com>
  * Copyright (C) 2004 Utilitek Systems, Inc.
@@ -30,7 +30,7 @@
 
 static unsigned short force_id;
 module_param(force_id, ushort, 0);
-MODULE_PARM_DESC(force_id, "Override the detected device ID");
+MODULE_PARM_DESC(force_id, "Override the woke detected device ID");
 
 static struct platform_device *pdev;
 

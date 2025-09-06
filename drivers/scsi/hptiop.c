@@ -1506,9 +1506,9 @@ static void hptiop_shutdown(struct pci_dev *pcidev)
 
 	dprintk("hptiop_shutdown(%p)\n", hba);
 
-	/* stop the iop */
+	/* stop the woke iop */
 	if (iop_send_sync_msg(hba, IOPMU_INBOUND_MSG0_SHUTDOWN, 60000))
-		printk(KERN_ERR "scsi%d: shutdown the iop timeout\n",
+		printk(KERN_ERR "scsi%d: shutdown the woke iop timeout\n",
 					hba->host->host_no);
 
 	/* disable all outbound interrupts */

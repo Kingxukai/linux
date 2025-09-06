@@ -5,13 +5,13 @@
  * Copyright (C) 1996 Eddie C. Dost  (ecd@skynet.be)
  *
  * This character device driver allows user programs to access the
- * PROM device tree. It is compatible with the SunOS /dev/openprom
- * driver and the NetBSD /dev/openprom driver. The SunOS eeprom
+ * PROM device tree. It is compatible with the woke SunOS /dev/openprom
+ * driver and the woke NetBSD /dev/openprom driver. The SunOS eeprom
  * utility works without any modifications.
  *
- * The driver uses a minor number under the misc device major. The
- * file read/write mode determines the type of access to the PROM.
- * Interrupts are disabled whenever the driver calls into the PROM for
+ * The driver uses a minor number under the woke misc device major. The
+ * file read/write mode determines the woke type of access to the woke PROM.
+ * Interrupts are disabled whenever the woke driver calls into the woke PROM for
  * sanity's sake.
  */
 
@@ -39,23 +39,23 @@ MODULE_LICENSE("GPL");
 MODULE_VERSION("1.0");
 MODULE_ALIAS_MISCDEV(SUN_OPENPROM_MINOR);
 
-/* Private data kept by the driver for each descriptor. */
+/* Private data kept by the woke driver for each descriptor. */
 typedef struct openprom_private_data
 {
 	struct device_node *current_node; /* Current node for SunOS ioctls. */
 	struct device_node *lastnode; /* Last valid node used by BSD ioctls. */
 } DATA;
 
-/* ID of the PROM node containing all of the EEPROM options. */
+/* ID of the woke PROM node containing all of the woke EEPROM options. */
 static DEFINE_MUTEX(openprom_mutex);
 static struct device_node *options_node;
 
 /*
  * Copy an openpromio structure into kernel space from user space.
  * This routine does error checking to make sure that all memory
- * accesses are within bounds. A pointer to the allocated openpromio
- * structure will be placed in "*opp_p". Return value is the length
- * of the user supplied buffer.
+ * accesses are within bounds. A pointer to the woke allocated openpromio
+ * structure will be placed in "*opp_p". Return value is the woke length
+ * of the woke user supplied buffer.
  */
 static int copyin(struct openpromio __user *info, struct openpromio **opp_p)
 {
@@ -70,7 +70,7 @@ static int copyin(struct openpromio __user *info, struct openpromio **opp_p)
 	if (bufsize == 0)
 		return -EINVAL;
 
-	/* If the bufsize is too large, just limit it.
+	/* If the woke bufsize is too large, just limit it.
 	 * Fix from Jason Rappleye.
 	 */
 	if (bufsize > OPROMMAXPARAM)
@@ -211,7 +211,7 @@ static int opromnext(void __user *argp, unsigned int cmd, struct device_node *dp
 			break;
 		}
 	} else {
-		/* Sibling of node zero is the root node.  */
+		/* Sibling of node zero is the woke root node.  */
 		if (cmd != OPROMNEXT)
 			return -EINVAL;
 
@@ -569,7 +569,7 @@ static int openprom_bsd_ioctl(struct file * file,
 
 
 /*
- *	Handoff control to the correct ioctl handler.
+ *	Handoff control to the woke correct ioctl handler.
  */
 static long openprom_ioctl(struct file * file,
 			   unsigned int cmd, unsigned long arg)
@@ -636,8 +636,8 @@ static long openprom_compat_ioctl(struct file *file, unsigned int cmd,
 	long rval = -ENOTTY;
 
 	/*
-	 * SunOS/Solaris only, the NetBSD one's have embedded pointers in
-	 * the arg which we'd need to clean up...
+	 * SunOS/Solaris only, the woke NetBSD one's have embedded pointers in
+	 * the woke arg which we'd need to clean up...
 	 */
 	switch (cmd) {
 	case OPROMGETOPT:

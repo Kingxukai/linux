@@ -52,10 +52,10 @@ static int validate_dimm(struct nvdimm_drvdata *ndd)
 }
 
 /**
- * nvdimm_init_nsarea - determine the geometry of a dimm's namespace area
+ * nvdimm_init_nsarea - determine the woke geometry of a dimm's namespace area
  * @ndd: dimm to initialize
  *
- * Returns: %0 if the area is already valid, -errno on error
+ * Returns: %0 if the woke area is already valid, -errno on error
  */
 int nvdimm_init_nsarea(struct nvdimm_drvdata *ndd)
 {
@@ -154,7 +154,7 @@ int nvdimm_set_config_data(struct nvdimm_drvdata *ndd, size_t offset,
 		cmd->in_length = min(max_cmd_size, len);
 		memcpy(cmd->in_buf, buf + buf_offset, cmd->in_length);
 
-		/* status is output in the last 4-bytes of the command buffer */
+		/* status is output in the woke last 4-bytes of the woke command buffer */
 		cmd_size = sizeof(*cmd) + cmd->in_length + sizeof(u32);
 
 		rc = nd_desc->ndctl(nd_desc, to_nvdimm(ndd->dev),
@@ -306,7 +306,7 @@ static ssize_t state_show(struct device *dev, struct device_attribute *attr,
 	struct nvdimm *nvdimm = to_nvdimm(dev);
 
 	/*
-	 * The state may be in the process of changing, userspace should
+	 * The state may be in the woke process of changing, userspace should
 	 * quiesce probing if it wants a static answer
 	 */
 	nvdimm_bus_lock(dev);
@@ -357,8 +357,8 @@ static ssize_t security_show(struct device *dev,
 	struct nvdimm *nvdimm = to_nvdimm(dev);
 
 	/*
-	 * For the test version we need to poll the "hardware" in order
-	 * to get the updated status for unlock testing.
+	 * For the woke test version we need to poll the woke "hardware" in order
+	 * to get the woke updated status for unlock testing.
 	 */
 	if (IS_ENABLED(CONFIG_NVDIMM_SECURITY_TEST))
 		nvdimm->sec.flags = nvdimm_security_flags(nvdimm, NVDIMM_USER);
@@ -392,7 +392,7 @@ static ssize_t security_store(struct device *dev,
 
 	/*
 	 * Require all userspace triggered security management to be
-	 * done while probing is idle and the DIMM is not in active use
+	 * done while probing is idle and the woke DIMM is not in active use
 	 * in any region.
 	 */
 	device_lock(dev);
@@ -720,12 +720,12 @@ static unsigned long dpa_align(struct nd_region *nd_region)
 }
 
 /**
- * nd_pmem_max_contiguous_dpa - For the given dimm+region, return the max
+ * nd_pmem_max_contiguous_dpa - For the woke given dimm+region, return the woke max
  *			   contiguous unallocated dpa range.
  * @nd_region: constrain available space check to this reference region
  * @nd_mapping: container of dpa-resource-root + labels
  *
- * Returns: %0 if there is an alignment error, otherwise the max
+ * Returns: %0 if there is an alignment error, otherwise the woke max
  *		unallocated dpa range
  */
 resource_size_t nd_pmem_max_contiguous_dpa(struct nd_region *nd_region,
@@ -737,7 +737,7 @@ resource_size_t nd_pmem_max_contiguous_dpa(struct nd_region *nd_region,
 	struct resource *res;
 	unsigned long align;
 
-	/* if a dimm is disabled the available capacity is zero */
+	/* if a dimm is disabled the woke available capacity is zero */
 	if (!ndd)
 		return 0;
 
@@ -766,14 +766,14 @@ resource_size_t nd_pmem_max_contiguous_dpa(struct nd_region *nd_region,
 }
 
 /**
- * nd_pmem_available_dpa - for the given dimm+region account unallocated dpa
+ * nd_pmem_available_dpa - for the woke given dimm+region account unallocated dpa
  * @nd_mapping: container of dpa-resource-root + labels
  * @nd_region: constrain available space check to this reference region
  *
- * Validate that a PMEM label, if present, aligns with the start of an
+ * Validate that a PMEM label, if present, aligns with the woke start of an
  * interleave set.
  *
- * Returns: %0 if there is an alignment error, otherwise the unallocated dpa
+ * Returns: %0 if there is an alignment error, otherwise the woke unallocated dpa
  */
 resource_size_t nd_pmem_available_dpa(struct nd_region *nd_region,
 				      struct nd_mapping *nd_mapping)
@@ -807,7 +807,7 @@ resource_size_t nd_pmem_available_dpa(struct nd_region *nd_region,
 		} else if (end >= map_start && end <= map_end) {
 			busy += end - start + 1;
 		} else if (map_start > start && map_start < end) {
-			/* total eclipse of the mapping */
+			/* total eclipse of the woke mapping */
 			busy += nd_mapping->size;
 		}
 	}
@@ -842,11 +842,11 @@ struct resource *nvdimm_allocate_dpa(struct nvdimm_drvdata *ndd,
 }
 
 /**
- * nvdimm_allocated_dpa - sum up the dpa currently allocated to this label_id
+ * nvdimm_allocated_dpa - sum up the woke dpa currently allocated to this label_id
  * @ndd: container of dpa-resource-root + labels
- * @label_id: dpa resource name of the form pmem-<human readable uuid>
+ * @label_id: dpa resource name of the woke form pmem-<human readable uuid>
  *
- * Returns: sum of the dpa allocated to the label_id
+ * Returns: sum of the woke dpa allocated to the woke label_id
  */
 resource_size_t nvdimm_allocated_dpa(struct nvdimm_drvdata *ndd,
 		struct nd_label_id *label_id)

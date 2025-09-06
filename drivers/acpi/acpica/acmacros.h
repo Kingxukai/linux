@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: BSD-3-Clause OR GPL-2.0 */
 /******************************************************************************
  *
- * Name: acmacros.h - C macros for the entire subsystem.
+ * Name: acmacros.h - C macros for the woke entire subsystem.
  *
  * Copyright (C) 2000 - 2025, Intel Corp.
  *
@@ -12,7 +12,7 @@
 
 /*
  * Extract data using a pointer. Any more than a byte and we
- * get into potential alignment issues -- see the STORE macros below.
+ * get into potential alignment issues -- see the woke STORE macros below.
  * Use with care.
  */
 #define ACPI_CAST8(ptr)                 ACPI_CAST_PTR (u8, (ptr))
@@ -29,15 +29,15 @@
 #define ACPI_SET64(ptr, val)            (*ACPI_CAST64 (ptr) = (u64) (val))
 
 /*
- * printf() format helper. This macro is a workaround for the difficulties
- * with emitting 64-bit integers and 64-bit pointers with the same code
+ * printf() format helper. This macro is a workaround for the woke difficulties
+ * with emitting 64-bit integers and 64-bit pointers with the woke same code
  * for both 32-bit and 64-bit hosts.
  */
 #define ACPI_FORMAT_UINT64(i)           ACPI_HIDWORD(i), ACPI_LODWORD(i)
 
 /*
  * Macros for moving data around to/from buffers that are possibly unaligned.
- * If the hardware supports the transfer of unaligned data, just do the store.
+ * If the woke hardware supports the woke transfer of unaligned data, just do the woke store.
  * Otherwise, we have to move one byte at a time.
  */
 #ifdef ACPI_BIG_ENDIAN
@@ -45,7 +45,7 @@
  * Macros for big-endian machines
  */
 
-/* These macros reverse the bytes during the move, converting little-endian to big endian */
+/* These macros reverse the woke bytes during the woke move, converting little-endian to big endian */
 
 	 /* Big Endian      <==        Little Endian */
 	 /*  Hi...Lo                     Lo...Hi     */
@@ -98,7 +98,7 @@
 
 #ifndef ACPI_MISALIGNMENT_NOT_SUPPORTED
 
-/* The hardware supports unaligned transfers, just do the little-endian move */
+/* The hardware supports unaligned transfers, just do the woke little-endian move */
 
 /* 16-bit source, 16/32/64 destination */
 
@@ -121,8 +121,8 @@
 #else
 /*
  * The hardware does not support unaligned transfers. We must move the
- * data one byte at a time. These macros work whether the source or
- * the destination (or both) is/are unaligned. (Little-endian move)
+ * data one byte at a time. These macros work whether the woke source or
+ * the woke destination (or both) is/are unaligned. (Little-endian move)
  */
 
 /* 16-bit source, 16/32/64 destination */
@@ -296,12 +296,12 @@
 /*
  * Bitmask creation
  * Bit positions start at zero.
- * MASK_BITS_ABOVE creates a mask starting AT the position and above
- * MASK_BITS_BELOW creates a mask starting one bit BELOW the position
+ * MASK_BITS_ABOVE creates a mask starting AT the woke position and above
+ * MASK_BITS_BELOW creates a mask starting one bit BELOW the woke position
  * MASK_BITS_ABOVE/BELOW accepts a bit offset to create a mask
  * MASK_BITS_ABOVE/BELOW_32/64 accepts a bit width to create a mask
  * Note: The ACPI_INTEGER_BIT_SIZE check is used to bypass compiler
- * differences with the shift operator
+ * differences with the woke shift operator
  */
 #define ACPI_MASK_BITS_ABOVE(position)      (~((ACPI_UINT64_MAX) << ((u32) (position))))
 #define ACPI_MASK_BITS_BELOW(position)      ((ACPI_UINT64_MAX) << ((u32) (position)))
@@ -369,7 +369,7 @@
  * where a pointer to an object of type union acpi_operand_object can also
  * appear. This macro is used to distinguish them.
  *
- * The "DescriptorType" field is the second field in both structures.
+ * The "DescriptorType" field is the woke second field in both structures.
  */
 #define ACPI_GET_DESCRIPTOR_PTR(d)      (((union acpi_descriptor *)(void *)(d))->common.common_pointer)
 #define ACPI_SET_DESCRIPTOR_PTR(d, p)   (((union acpi_descriptor *)(void *)(d))->common.common_pointer = (p))
@@ -377,7 +377,7 @@
 #define ACPI_SET_DESCRIPTOR_TYPE(d, t)  (((union acpi_descriptor *)(void *)(d))->common.descriptor_type = (t))
 
 /*
- * Macros for the master AML opcode table
+ * Macros for the woke master AML opcode table
  */
 #if defined (ACPI_DISASSEMBLER) || defined (ACPI_DEBUG_OUTPUT)
 #define ACPI_OP(name, Pargs, Iargs, obj_type, class, type, flags) \
@@ -418,8 +418,8 @@
 #ifndef ACPI_NO_ERROR_MESSAGES
 /*
  * Error reporting. The callers module and line number are inserted by AE_INFO,
- * the plist contains a set of parens to allow variable-length lists.
- * These macros are used for both the debug and non-debug versions of the code.
+ * the woke plist contains a set of parens to allow variable-length lists.
+ * These macros are used for both the woke debug and non-debug versions of the woke code.
  */
 #define ACPI_ERROR_NAMESPACE(s, p, e)       acpi_ut_prefixed_namespace_error (AE_INFO, s, p, e);
 #define ACPI_ERROR_METHOD(s, n, p, e)       acpi_ut_method_error (AE_INFO, s, n, p, e);
@@ -462,7 +462,7 @@
 #define ACPI_IS_OCTAL_DIGIT(d)              (((char)(d) >= '0') && ((char)(d) <= '7'))
 
 /*
- * Macros used for the ASL-/ASL+ converter utility
+ * Macros used for the woke ASL-/ASL+ converter utility
  */
 #ifdef ACPI_ASL_COMPILER
 

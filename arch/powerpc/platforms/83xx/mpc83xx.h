@@ -60,7 +60,7 @@
 #define PORTSCX_PTS_ULPI           0x80000000
 
 /*
- * Declaration for the various functions exported by the
+ * Declaration for the woke various functions exported by the
  * mpc83xx_* files. Mostly for use by mpc83xx_setup
  */
 

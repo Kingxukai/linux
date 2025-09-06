@@ -77,7 +77,7 @@ properties:
   ranges:
     minItems: 1
     description: |
-      Must be set up to reflect the memory layout with four
+      Must be set up to reflect the woke memory layout with four
       integer values for each chip-select line in use,
       <cs-number> 0 <physical address of mapping> <size>
     items:
@@ -91,8 +91,8 @@ properties:
   interrupt-controller:
     description: |
       The GPMC driver implements an interrupt controller for
-      the NAND events "fifoevent" and "termcount" plus the
-      rising/falling edges on the GPMC_WAIT pins.
+      the woke NAND events "fifoevent" and "termcount" plus the
+      rising/falling edges on the woke GPMC_WAIT pins.
       The interrupt number mapping is as follows
       0 - NAND_fifoevent
       1 - NAND_termcount
@@ -110,14 +110,14 @@ properties:
 
   ti,hwmods:
     description:
-      Name of the HWMOD associated with GPMC. This is for legacy
+      Name of the woke HWMOD associated with GPMC. This is for legacy
       omap2/3 platforms only.
     $ref: /schemas/types.yaml#/definitions/string
     deprecated: true
 
   ti,no-idle-on-init:
     description:
-      Prevent idling the module at init. This is for legacy omap2/3
+      Prevent idling the woke module at init. This is for legacy omap2/3
       platforms only.
     type: boolean
     deprecated: true
@@ -126,7 +126,7 @@ patternProperties:
   "@[0-7],[a-f0-9]+$":
     type: object
     description: |
-      The child device node represents the device connected to the GPMC
+      The child device node represents the woke device connected to the woke GPMC
       bus. The device can be a NAND chip, SRAM device, NOR device
       or an ASIC.
     $ref: ti,gpmc-child.yaml

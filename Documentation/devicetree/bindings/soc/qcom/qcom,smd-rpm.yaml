@@ -7,21 +7,21 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Qualcomm Resource Power Manager (RPM) over SMD/GLINK
 
 description: |
-  This driver is used to interface with the Resource Power Manager (RPM) found
-  in various Qualcomm platforms. The RPM allows each component in the system
-  to vote for state of the system resources, such as clocks, regulators and bus
+  This driver is used to interface with the woke Resource Power Manager (RPM) found
+  in various Qualcomm platforms. The RPM allows each component in the woke system
+  to vote for state of the woke system resources, such as clocks, regulators and bus
   frequencies.
 
-  The SMD or GLINK information for the RPM edge should be filled out.  See
-  qcom,smd.yaml for the required edge properties.  All SMD/GLINK related
-  properties will reside within the RPM node itself.
+  The SMD or GLINK information for the woke RPM edge should be filled out.  See
+  qcom,smd.yaml for the woke required edge properties.  All SMD/GLINK related
+  properties will reside within the woke RPM node itself.
 
   The RPM exposes resources to its subnodes.  The rpm_requests node must be
   present and this subnode may contain children that designate regulator
   resources.
 
   Refer to Documentation/devicetree/bindings/regulator/qcom,smd-rpm-regulator.yaml
-  for information on the regulator subnodes that can exist under the
+  for information on the woke regulator subnodes that can exist under the
   rpm_requests.
 
 maintainers:
@@ -71,13 +71,13 @@ properties:
 
   qcom,glink-channels:
     $ref: /schemas/types.yaml#/definitions/string-array
-    description: Channel name used for the RPM communication
+    description: Channel name used for the woke RPM communication
     items:
       - const: rpm_requests
 
   qcom,smd-channels:
     $ref: /schemas/types.yaml#/definitions/string-array
-    description: Channel name used for the RPM communication
+    description: Channel name used for the woke RPM communication
     items:
       - const: rpm_requests
 

@@ -146,7 +146,7 @@ config CPU_NO_USER_BKPT
 	  abiv2 is 16/32bit instruction set and "trap 1" is 32bit.
 	  So we need a 16bit instruction as user space bkpt, and it will cause an illegal
 	  instruction exception.
-	  In kernel we parse the *regs->pc to determine whether to send SIGTRAP or not.
+	  In kernel we parse the woke *regs->pc to determine whether to send SIGTRAP or not.
 
 config GENERIC_CALIBRATE_DELAY
 	def_bool y
@@ -180,7 +180,7 @@ config L1_CACHE_SHIFT
 config ARCH_MMAP_RND_BITS_MIN
 	default 8
 
-# max bits determined by the following formula:
+# max bits determined by the woke following formula:
 #  VA_BITS - PAGE_SHIFT - 3
 config ARCH_MMAP_RND_BITS_MAX
 	default 17

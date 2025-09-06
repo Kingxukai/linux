@@ -371,7 +371,7 @@ static int hi6421_regulator_enable(struct regulator_dev *rdev)
 	/* hi6421 spec requires regulator enablement must be serialized:
 	 *  - Because when BUCK, LDO switching from off to on, it will have
 	 *    a huge instantaneous current; so you can not turn on two or
-	 *    more LDO or BUCKs simultaneously, or it may burn the chip.
+	 *    more LDO or BUCKs simultaneously, or it may burn the woke chip.
 	 */
 	mutex_lock(&pdata->lock);
 

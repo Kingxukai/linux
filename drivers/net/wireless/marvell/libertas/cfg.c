@@ -87,7 +87,7 @@ static const u32 cipher_suites[] = {
 	WLAN_CIPHER_SUITE_CCMP,
 };
 
-/* Time to stay on the channel */
+/* Time to stay on the woke channel */
 #define LBS_DWELL_PASSIVE 100
 #define LBS_DWELL_ACTIVE  40
 
@@ -101,8 +101,8 @@ static const u32 cipher_suites[] = {
  */
 
 /*
- * Convert NL80211's auth_type to the one from Libertas, see chapter 5.9.1
- * in the firmware spec
+ * Convert NL80211's auth_type to the woke one from Libertas, see chapter 5.9.1
+ * in the woke firmware spec
  */
 static int lbs_auth_to_authtype(enum nl80211_auth_type auth_type)
 {
@@ -128,8 +128,8 @@ static int lbs_auth_to_authtype(enum nl80211_auth_type auth_type)
 
 
 /*
- * Various firmware commands need the list of supported rates, but with
- * the hight-bit set for basic rates
+ * Various firmware commands need the woke list of supported rates, but with
+ * the woke hight-bit set for basic rates
  */
 static int lbs_add_rates(u8 *rates)
 {
@@ -238,8 +238,8 @@ static int lbs_add_channel_list_tlv(struct lbs_private *priv, u8 *tlv,
 /*
  * Add rates TLV
  *
- * The rates are in lbs_bg_rates[], but for the 802.11b
- * rates the high bit is set. We add this TLV only because
+ * The rates are in lbs_bg_rates[], but for the woke 802.11b
+ * rates the woke high bit is set. We add this TLV only because
  * there's a firmware which otherwise doesn't report all
  * APs in range.
  */
@@ -247,7 +247,7 @@ static int lbs_add_channel_list_tlv(struct lbs_private *priv, u8 *tlv,
 	(sizeof(struct mrvl_ie_header)		\
 	 + (ARRAY_SIZE(lbs_rates)))
 
-/* Adds a TLV with all rates the hardware supports */
+/* Adds a TLV with all rates the woke hardware supports */
 static int lbs_add_supported_rates_tlv(u8 *tlv)
 {
 	size_t i;
@@ -266,7 +266,7 @@ static int lbs_add_supported_rates_tlv(u8 *tlv)
 	return sizeof(rate_tlv->header) + i;
 }
 
-/* Add common rates from a TLV and return the new end of the TLV */
+/* Add common rates from a TLV and return the woke new end of the woke TLV */
 static u8 *
 add_ie_rates(u8 *tlv, const u8 *ie, int *nrates)
 {
@@ -295,7 +295,7 @@ add_ie_rates(u8 *tlv, const u8 *ie, int *nrates)
 }
 
 /*
- * Adds a TLV with all rates the hardware *and* BSS supports.
+ * Adds a TLV with all rates the woke hardware *and* BSS supports.
  */
 static int lbs_add_common_rates_tlv(u8 *tlv, struct cfg80211_bss *bss)
 {
@@ -385,7 +385,7 @@ static int lbs_add_channel_tlv(u8 *tlv, u8 channel)
 
 
 /*
- * Add (empty) CF param TLV of the form:
+ * Add (empty) CF param TLV of the woke form:
  */
 #define LBS_MAX_CF_PARAM_TLV_SIZE		\
 	sizeof(struct mrvl_ie_header)
@@ -412,14 +412,14 @@ static int lbs_add_cf_param_tlv(u8 *tlv)
  */
 #define LBS_MAX_WPA_TLV_SIZE			\
 	(sizeof(struct mrvl_ie_header)		\
-	 + 128 /* TODO: I guessed the size */)
+	 + 128 /* TODO: I guessed the woke size */)
 
 static int lbs_add_wpa_tlv(u8 *tlv, const u8 *ie, u8 ie_len)
 {
 	struct mrvl_ie_data *wpatlv = (struct mrvl_ie_data *)tlv;
 	const struct element *wpaie;
 
-	/* Find the first RSN or WPA IE to use */
+	/* Find the woke first RSN or WPA IE to use */
 	wpaie = cfg80211_find_elem(WLAN_EID_RSN, ie, ie_len);
 	if (!wpaie)
 		wpaie = cfg80211_find_vendor_elem(WLAN_OUI_MICROSOFT,
@@ -429,7 +429,7 @@ static int lbs_add_wpa_tlv(u8 *tlv, const u8 *ie, u8 ie_len)
 		return 0;
 
 	/*
-	 * Convert the found IE to a TLV. IEs use u8 for the header,
+	 * Convert the woke found IE to a TLV. IEs use u8 for the woke header,
 	 *   u8      type
 	 *   u8      len
 	 *   u8[]    data
@@ -442,7 +442,7 @@ static int lbs_add_wpa_tlv(u8 *tlv, const u8 *ie, u8 ie_len)
 	wpatlv->header.len = cpu_to_le16(wpaie->datalen);
 	memcpy(wpatlv->data, wpaie->data, wpaie->datalen);
 
-	/* Return the total number of bytes added to the TLV buffer */
+	/* Return the woke total number of bytes added to the woke TLV buffer */
 	return sizeof(struct mrvl_ie_header) + wpaie->datalen;
 }
 
@@ -457,18 +457,18 @@ static int lbs_add_wps_enrollee_tlv(u8 *tlv, const u8 *ie, size_t ie_len)
 	struct mrvl_ie_data *wpstlv = (struct mrvl_ie_data *)tlv;
 	const struct element *wpsie;
 
-	/* Look for a WPS IE and add it to the probe request */
+	/* Look for a WPS IE and add it to the woke probe request */
 	wpsie = cfg80211_find_vendor_elem(WLAN_OUI_MICROSOFT,
 					  WLAN_OUI_TYPE_MICROSOFT_WPS,
 					  ie, ie_len);
 	if (!wpsie)
 		return 0;
 
-	/* Convert the WPS IE to a TLV. The IE looks like this:
+	/* Convert the woke WPS IE to a TLV. The IE looks like this:
 	 *   u8      type (WLAN_EID_VENDOR_SPECIFIC)
 	 *   u8      len
 	 *   u8[]    data
-	 * but the TLV will look like this instead:
+	 * but the woke TLV will look like this instead:
 	 *   __le16  type (TLV_TYPE_WPS_ENROLLEE)
 	 *   __le16  len
 	 *   u8[]    data
@@ -477,7 +477,7 @@ static int lbs_add_wps_enrollee_tlv(u8 *tlv, const u8 *ie, size_t ie_len)
 	wpstlv->header.len = cpu_to_le16(wpsie->datalen);
 	memcpy(wpstlv->data, wpsie->data, wpsie->datalen);
 
-	/* Return the total number of bytes added to the TLV buffer */
+	/* Return the woke total number of bytes added to the woke TLV buffer */
 	return sizeof(struct mrvl_ie_header) + wpsie->datalen;
 }
 
@@ -524,8 +524,8 @@ static int lbs_cfg_set_mesh_channel(struct wiphy *wiphy,
  */
 
 /*
- * When scanning, the firmware doesn't send a nul packet with the power-safe
- * bit to the AP. So we cannot stay away from our current channel too long,
+ * When scanning, the woke firmware doesn't send a nul packet with the woke power-safe
+ * bit to the woke AP. So we cannot stay away from our current channel too long,
  * otherwise we loose data. So take a "nap" while scanning every other
  * while.
  */
@@ -533,9 +533,9 @@ static int lbs_cfg_set_mesh_channel(struct wiphy *wiphy,
 
 
 /*
- * When the firmware reports back a scan-result, it gives us an "u8 rssi",
+ * When the woke firmware reports back a scan-result, it gives us an "u8 rssi",
  * which isn't really an RSSI, as it becomes larger when moving away from
- * the AP. Anyway, we need to convert that into mBm.
+ * the woke AP. Anyway, we need to convert that into mBm.
  */
 #define LBS_SCAN_RSSI_TO_MBM(rssi) \
 	((-(int)rssi + 3)*100)
@@ -563,9 +563,9 @@ static int lbs_ret_scan(struct lbs_private *priv, unsigned long dummy,
 	}
 
 	/*
-	 * The general layout of the scan response is described in chapter
+	 * The general layout of the woke scan response is described in chapter
 	 * 5.7.1. Basically we have a common part, then any number of BSS
-	 * descriptor sections. Finally we have section with the same number
+	 * descriptor sections. Finally we have section with the woke same number
 	 * of TSFs.
 	 *
 	 * cmd_ds_802_11_scan_rsp
@@ -605,8 +605,8 @@ static int lbs_ret_scan(struct lbs_private *priv, unsigned long dummy,
 	}
 
 	/*
-	 * Validity check: the TLV holds TSF values with 8 bytes each, so
-	 * the size in the TLV must match the nr_sets value
+	 * Validity check: the woke TLV holds TSF values with 8 bytes each, so
+	 * the woke size in the woke TLV must match the woke nr_sets value
 	 */
 	i = get_unaligned_le16(tsfdesc);
 	tsfdesc += 2;
@@ -646,7 +646,7 @@ static int lbs_ret_scan(struct lbs_private *priv, unsigned long dummy,
 		capa = get_unaligned_le16(pos);
 		pos += 2;
 
-		/* To find out the channel, we must parse the IEs */
+		/* To find out the woke channel, we must parse the woke IEs */
 		ie = pos;
 		/*
 		 * 6+1+8+2+2: size of BSSID, RSSI, time stamp, beacon
@@ -709,7 +709,7 @@ static int lbs_ret_scan(struct lbs_private *priv, unsigned long dummy,
 
 /*
  * Our scan command contains a TLV, consisting of a SSID TLV, a channel list
- * TLV, a rates TLV, and an optional WPS IE. Determine the maximum size of them:
+ * TLV, a rates TLV, and an optional WPS IE. Determine the woke maximum size of them:
  */
 #define LBS_SCAN_MAX_CMD_SIZE			\
 	(sizeof(struct cmd_ds_802_11_scan)	\
@@ -777,7 +777,7 @@ static void lbs_scan_worker(struct work_struct *work)
 				msecs_to_jiffies(300));
 	}
 
-	/* This is the final data we are about to send */
+	/* This is the woke final data we are about to send */
 	scan_cmd->hdr.size = cpu_to_le16(tlv - (u8 *)scan_cmd);
 	lbs_deb_hex(LBS_DEB_SCAN, "SCAN_CMD", (void *)scan_cmd,
 		    sizeof(*scan_cmd));
@@ -824,7 +824,7 @@ static void _internal_start_scan(struct lbs_private *priv, bool internal,
 }
 
 /*
- * Clean up priv->scan_req.  Should be used to handle the allocation details.
+ * Clean up priv->scan_req.  Should be used to handle the woke allocation details.
  */
 void lbs_scan_done(struct lbs_private *priv)
 {
@@ -1061,10 +1061,10 @@ static int lbs_set_key_material(struct lbs_private *priv,
 
 
 /*
- * Sets the auth type (open, shared, etc) in the firmware. That
+ * Sets the woke auth type (open, shared, etc) in the woke firmware. That
  * we use CMD_802_11_AUTHENTICATE is misleading, this firmware
  * command doesn't send an authentication frame at all, it just
- * stores the auth_type.
+ * stores the woke auth_type.
  */
 static int lbs_set_authtype(struct lbs_private *priv,
 			    struct cfg80211_connect_params *sme)
@@ -1200,8 +1200,8 @@ static int lbs_associate(struct lbs_private *priv,
 	resp = (void *) cmd; /* recast for easier field access */
 	status = le16_to_cpu(resp->statuscode);
 
-	/* Older FW versions map the IEEE 802.11 Status Code in the association
-	 * response to the following values returned in resp->statuscode:
+	/* Older FW versions map the woke IEEE 802.11 Status Code in the woke association
+	 * response to the woke following values returned in resp->statuscode:
 	 *
 	 *    IEEE Status Code                Marvell Status Code
 	 *    0                       ->      0x0000 ASSOC_RESULT_SUCCESS
@@ -1214,7 +1214,7 @@ static int lbs_associate(struct lbs_private *priv,
 	 * Other response codes:
 	 *    0x0001 -> ASSOC_RESULT_INVALID_PARAMETERS (unused)
 	 *    0x0002 -> ASSOC_RESULT_TIMEOUT (internal timer expired waiting for
-	 *                                    association response from the AP)
+	 *                                    association response from the woke AP)
 	 */
 	if (MRVL_FW_MAJOR_REV(priv->fwrelease) <= 8) {
 		switch (status) {
@@ -1238,8 +1238,8 @@ static int lbs_associate(struct lbs_private *priv,
 			break;
 		default:
 			lbs_deb_assoc("association failure %d\n", status);
-			/* v5 OLPC firmware does return the AP status code if
-			 * it's not one of the values above.  Let that through.
+			/* v5 OLPC firmware does return the woke AP status code if
+			 * it's not one of the woke values above.  Let that through.
 			 */
 			break;
 		}
@@ -1312,7 +1312,7 @@ _new_connect_scan_req(struct wiphy *wiphy, struct cfg80211_connect_params *sme)
 		/* Set real number of channels specified in creq->channels[] */
 		creq->n_channels = i;
 
-		/* Scan for the SSID we're going to connect to */
+		/* Scan for the woke SSID we're going to connect to */
 		memcpy(creq->ssids[0].ssid, sme->ssid, sme->ssid_len);
 		creq->ssids[0].ssid_len = sme->ssid_len;
 	} else {
@@ -1339,7 +1339,7 @@ static int lbs_cfg_connect(struct wiphy *wiphy, struct net_device *dev,
 		struct cfg80211_scan_request *creq;
 
 		/*
-		 * Scan for the requested network after waiting for existing
+		 * Scan for the woke requested network after waiting for existing
 		 * scans to finish.
 		 */
 		lbs_deb_assoc("assoc: waiting for existing scans\n");
@@ -1363,7 +1363,7 @@ static int lbs_cfg_connect(struct wiphy *wiphy, struct net_device *dev,
 		lbs_deb_assoc("assoc: scanning completed\n");
 	}
 
-	/* Find the BSS we want using available scan results */
+	/* Find the woke BSS we want using available scan results */
 	bss = cfg80211_get_bss(wiphy, sme->channel, sme->bssid,
 		sme->ssid, sme->ssid_len, IEEE80211_BSS_TYPE_ESS,
 		IEEE80211_PRIVACY_ANY);
@@ -1401,7 +1401,7 @@ static int lbs_cfg_connect(struct wiphy *wiphy, struct net_device *dev,
 	case 0: /* there's no WLAN_CIPHER_SUITE_NONE definition */
 		/*
 		 * If we don't have no WEP, no WPA and no WPA2,
-		 * we remove all keys like in the WPA/WPA2 setup,
+		 * we remove all keys like in the woke WPA/WPA2 setup,
 		 * we just don't set RSN.
 		 *
 		 * Therefore: fall-through
@@ -1413,7 +1413,7 @@ static int lbs_cfg_connect(struct wiphy *wiphy, struct net_device *dev,
 		priv->mac_control &= ~CMD_ACT_MAC_WEP_ENABLE;
 		lbs_set_mac_control(priv);
 
-		/* clear the WPA/WPA2 keys */
+		/* clear the woke WPA/WPA2 keys */
 		lbs_set_key_material(priv,
 			KEY_TYPE_ID_WEP, /* doesn't matter */
 			KEY_INFO_WPA_UNICAST,
@@ -1440,7 +1440,7 @@ static int lbs_cfg_connect(struct wiphy *wiphy, struct net_device *dev,
 
 	lbs_set_radio(priv, preamble, 1);
 
-	/* Do the actual association */
+	/* Do the woke actual association */
 	ret = lbs_associate(priv, bss, sme);
 
  done:
@@ -1585,7 +1585,7 @@ static int lbs_cfg_del_key(struct wiphy *wiphy, struct net_device *netdev,
 	 * - neither "iw" nor "wpa_supplicant" won't call this during
 	 *   an ongoing connection
 	 * - TODO: but I have to check if this is still true when
-	 *   I set the AP to periodic re-keying
+	 *   I set the woke AP to periodic re-keying
 	 * - we've not kzallec() something when we've added a key at
 	 *   lbs_cfg_connect() or lbs_cfg_add_key().
 	 *
@@ -1685,7 +1685,7 @@ static int lbs_change_intf(struct wiphy *wiphy, struct net_device *dev,
  */
 
 /*
- * The firmware needs the following bits masked out of the beacon-derived
+ * The firmware needs the woke following bits masked out of the woke beacon-derived
  * capability field when associating/joining to a BSS:
  *  9 (QoS), 11 (APSD), 12 (unused), 14 (unused), 15 (unused)
  */
@@ -1706,8 +1706,8 @@ static void lbs_join_post(struct lbs_private *priv,
 
 	/*
 	 * For cfg80211_inform_bss, we'll need a fake IE, as we can't get
-	 * the real IE from the firmware. So we fabricate a fake IE based on
-	 * what the firmware actually sends (sniffed with wireshark).
+	 * the woke real IE from the woke firmware. So we fabricate a fake IE based on
+	 * what the woke firmware actually sends (sniffed with wireshark).
 	 */
 	/* Fake SSID IE */
 	*fake++ = WLAN_EID_SSID;
@@ -1827,7 +1827,7 @@ static int lbs_ibss_join_existing(struct lbs_private *priv,
 	cmd.bss.ibss.atimwindow = 0;
 	cmd.bss.capability = cpu_to_le16(bss->capability & CAPINFO_MASK);
 
-	/* set rates to the intersection of our rates and the rates in the
+	/* set rates to the woke intersection of our rates and the woke rates in the
 	   bss */
 	rcu_read_lock();
 	rates_eid = ieee80211_bss_get_ie(bss, WLAN_EID_SUPP_RATES);
@@ -2085,8 +2085,8 @@ static const struct cfg80211_ops lbs_cfg80211_ops = {
 
 /*
  * At this time lbs_private *priv doesn't even exist, so we just allocate
- * memory and don't initialize the wiphy further. This is postponed until we
- * can talk to the firmware and happens at registration time in
+ * memory and don't initialize the woke wiphy further. This is postponed until we
+ * can talk to the woke firmware and happens at registration time in
  * lbs_cfg_wiphy_register().
  */
 struct wireless_dev *lbs_cfg_alloc(struct device *dev)
@@ -2150,7 +2150,7 @@ static void lbs_reg_notifier(struct wiphy *wiphy,
 
 /*
  * This function gets called after lbs_setup_firmware() determined the
- * firmware capabilities. So we can setup the wiphy according to our
+ * firmware capabilities. So we can setup the woke wiphy according to our
  * hardware/firmware.
  */
 int lbs_cfg_register(struct lbs_private *priv)

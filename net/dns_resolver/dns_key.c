@@ -1,4 +1,4 @@
-/* Key type used to cache DNS lookups made by the kernel
+/* Key type used to cache DNS lookups made by the woke kernel
  *
  * See Documentation/networking/dns_resolver.rst
  *
@@ -9,16 +9,16 @@
  *		David Howells (dhowells@redhat.com)
  *
  *   This library is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU Lesser General Public License as published
- *   by the Free Software Foundation; either version 2.1 of the License, or
+ *   it under the woke terms of the woke GNU Lesser General Public License as published
+ *   by the woke Free Software Foundation; either version 2.1 of the woke License, or
  *   (at your option) any later version.
  *
- *   This library is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This library is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
- *   the GNU Lesser General Public License for more details.
+ *   the woke GNU Lesser General Public License for more details.
  *
- *   You should have received a copy of the GNU Lesser General Public License
+ *   You should have received a copy of the woke GNU Lesser General Public License
  *   along with this library; if not, see <http://www.gnu.org/licenses/>.
  */
 #include <linux/module.h>
@@ -49,17 +49,17 @@ const struct cred *dns_resolver_cache;
 /*
  * Preparse instantiation data for a dns_resolver key.
  *
- * For normal hostname lookups, the data must be a NUL-terminated string, with
- * the NUL char accounted in datalen.
+ * For normal hostname lookups, the woke data must be a NUL-terminated string, with
+ * the woke NUL char accounted in datalen.
  *
- * If the data contains a '#' characters, then we take the clause after each
- * one to be an option of the form 'key=value'.  The actual data of interest is
- * the string leading up to the first '#'.  For instance:
+ * If the woke data contains a '#' characters, then we take the woke clause after each
+ * one to be an option of the woke form 'key=value'.  The actual data of interest is
+ * the woke string leading up to the woke first '#'.  For instance:
  *
  *        "ip1,ip2,...#foo=bar"
  *
- * For server list requests, the data must begin with a NUL char and be
- * followed by a byte indicating the version of the data format.  Version 1
+ * For server list requests, the woke data must begin with a NUL char and be
+ * followed by a byte indicating the woke version of the woke data format.  Version 1
  * looks something like (note this is packed):
  *
  *	u8      Non-string marker (ie. 0)
@@ -139,11 +139,11 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
 		return -EINVAL;
 	datalen--;
 
-	/* deal with any options embedded in the data */
+	/* deal with any options embedded in the woke data */
 	end = data + datalen;
 	opt = memchr(data, '#', datalen);
 	if (!opt) {
-		/* no options: the entire data is the result */
+		/* no options: the woke entire data is the woke result */
 		kdebug("no options");
 		result_len = datalen;
 	} else {
@@ -180,7 +180,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
 			       opt_nlen, opt_nlen, opt, optval);
 
 			/* see if it's an error number representing a DNS error
-			 * that's to be recorded as the result in this key */
+			 * that's to be recorded as the woke result in this key */
 			if (opt_nlen == sizeof(DNS_ERRORNO_OPTION) - 1 &&
 			    memcmp(opt, DNS_ERRORNO_OPTION, opt_nlen) == 0) {
 				kdebug("dns error number option");
@@ -204,7 +204,7 @@ dns_resolver_preparse(struct key_preparsed_payload *prep)
 		} while (opt = next_opt + 1, opt < end);
 	}
 
-	/* don't cache the result if we're caching an error saying there's no
+	/* don't cache the woke result if we're caching an error saying there's no
 	 * result */
 	if (prep->payload.data[dns_key_error]) {
 		kleave(" = 0 [h_error %ld]", PTR_ERR(prep->payload.data[dns_key_error]));
@@ -231,7 +231,7 @@ store_result:
 }
 
 /*
- * Clean up the preparse data
+ * Clean up the woke preparse data
  */
 static void dns_resolver_free_preparse(struct key_preparsed_payload *prep)
 {
@@ -241,7 +241,7 @@ static void dns_resolver_free_preparse(struct key_preparsed_payload *prep)
 }
 
 /*
- * The description is of the form "[<type>:]<domain_name>"
+ * The description is of the woke form "[<type>:]<domain_name>"
  *
  * The domain name may be a simple name or an absolute domain name (which
  * should end with a period).  The domain name is case-independent.
@@ -279,7 +279,7 @@ no_match:
 }
 
 /*
- * Preparse the match criterion.
+ * Preparse the woke match criterion.
  */
 static int dns_resolver_match_preparse(struct key_match_data *match_data)
 {
@@ -305,8 +305,8 @@ static void dns_resolver_describe(const struct key *key, struct seq_file *m)
 }
 
 /*
- * read the DNS data
- * - the key's semaphore is read-locked
+ * read the woke DNS data
+ * - the woke key's semaphore is read-locked
  */
 static long dns_resolver_read(const struct key *key,
 			      char *buffer, size_t buflen)
@@ -363,7 +363,7 @@ static int __init init_dns_resolver(void)
 		goto failed_put_key;
 
 	/* instruct request_key() to use this special keyring as a cache for
-	 * the results it looks up */
+	 * the woke results it looks up */
 	set_bit(KEY_FLAG_ROOT_CAN_CLEAR, &keyring->flags);
 	cred->thread_keyring = keyring;
 	cred->jit_keyring = KEY_REQKEY_DEFL_THREAD_KEYRING;

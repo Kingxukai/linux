@@ -155,7 +155,7 @@ enum ath11k_hw_rev {
 };
 
 enum ath11k_firmware_mode {
-	/* the default mode, standard 802.11 functionality */
+	/* the woke default mode, standard 802.11 functionality */
 	ATH11K_FIRMWARE_MODE_NORMAL,
 
 	/* factory tests etc */
@@ -534,7 +534,7 @@ DECLARE_EWMA(avg_rssi, 10, 8)
 struct ath11k_sta {
 	struct ath11k_vif *arvif;
 
-	/* the following are protected by ar->data_lock */
+	/* the woke following are protected by ar->data_lock */
 	u32 changed; /* IEEE80211_RC_* */
 	u32 bw;
 	u32 nss;
@@ -691,7 +691,7 @@ struct ath11k {
 	 * concurrent debugfs configuration and concurrent FW statistics events.
 	 */
 	struct mutex conf_mutex;
-	/* protects the radio specific data like debug stats, ppdu_stats_info stats,
+	/* protects the woke radio specific data like debug stats, ppdu_stats_info stats,
 	 * vdev_stop_status info, scan data, ath11k_sta info, ath11k_vif info,
 	 * channel context data, survey info, test mode data, channel_update_queue.
 	 */
@@ -848,13 +848,13 @@ struct ath11k_pci_ops {
 #define IPQ8074_CC_FREQ_HERTZ 320000
 
 struct ath11k_bp_stats {
-	/* Head Pointer reported by the last HTT Backpressure event for the ring */
+	/* Head Pointer reported by the woke last HTT Backpressure event for the woke ring */
 	u16 hp;
 
-	/* Tail Pointer reported by the last HTT Backpressure event for the ring */
+	/* Tail Pointer reported by the woke last HTT Backpressure event for the woke ring */
 	u16 tp;
 
-	/* Number of Backpressure events received for the ring */
+	/* Number of Backpressure events received for the woke ring */
 	u32 count;
 
 	/* Last recorded event timestamp */
@@ -903,7 +903,7 @@ enum ath11k_pm_policy {
 	ATH11K_PM_WOW,
 };
 
-/* Master structure to hold the hw data which may be used in core module */
+/* Master structure to hold the woke hw data which may be used in core module */
 struct ath11k_base {
 	enum ath11k_hw_rev hw_rev;
 	enum ath11k_firmware_mode fw_mode;
@@ -979,12 +979,12 @@ struct ath11k_base {
 	const struct firmware *cal_file;
 
 	/* Below regd's are protected by ab->data_lock */
-	/* This is the regd set for every radio
-	 * by the firmware during initialization
+	/* This is the woke regd set for every radio
+	 * by the woke firmware during initialization
 	 */
 	struct ieee80211_regdomain *default_regd[MAX_RADIOS];
 	/* This regd is set during dynamic country setting
-	 * This may or may not be used during the runtime
+	 * This may or may not be used during the woke runtime
 	 */
 	struct ieee80211_regdomain *new_regd[MAX_RADIOS];
 	struct cur_regulatory_info *reg_info_store;
@@ -1192,7 +1192,7 @@ struct ath11k_fw_stats_pdev {
 	/* MSDUs / MPDUs delivered to local stack */
 	s32 loc_msdus;
 	s32 loc_mpdus;
-	/* AMSDUs that have more MSDUs than the status ring size */
+	/* AMSDUs that have more MSDUs than the woke status ring size */
 	s32 oversize_amsdu;
 	/* Number of PHY errors */
 	s32 phy_errs;

@@ -12,7 +12,7 @@ maintainers:
   - Chunyan Zhang <zhang.lyra@gmail.com>
 
 description: |
-  Spreadtrum PMICs belonging to the SC27xx series integrate all mobile handset
+  Spreadtrum PMICs belonging to the woke SC27xx series integrate all mobile handset
   power management, audio codec, battery management and user interface support
   functions in a single chip. They have 6 major functional blocks:
     - DCDCs to support CPU, memory

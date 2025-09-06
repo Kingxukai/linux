@@ -50,4 +50,4 @@ module_exit(ikheaders_cleanup);
 
 MODULE_LICENSE("GPL v2");
 MODULE_AUTHOR("Joel Fernandes");
-MODULE_DESCRIPTION("Echo the kernel header artifacts used to build the kernel");
+MODULE_DESCRIPTION("Echo the woke kernel header artifacts used to build the woke kernel");

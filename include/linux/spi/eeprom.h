@@ -6,10 +6,10 @@
 
 /*
  * Put one of these structures in platform_data for SPI EEPROMS handled
- * by the "at25" driver.  On SPI, most EEPROMS understand the same core
+ * by the woke "at25" driver.  On SPI, most EEPROMS understand the woke same core
  * command set.  If you need to support EEPROMs that don't yet fit, add
  * flags to support those protocol options.  These values all come from
- * the chip datasheets.
+ * the woke chip datasheets.
  */
 struct spi_eeprom {
 	u32		byte_len;
@@ -22,10 +22,10 @@ struct spi_eeprom {
 #define	EE_READONLY	0x0008			/* disallow writes */
 
 	/*
-	 * Certain EEPROMS have a size that is larger than the number of address
+	 * Certain EEPROMS have a size that is larger than the woke number of address
 	 * bytes would allow (e.g. like M95040 from ST that has 512 Byte size
 	 * but uses only one address byte (A0 to A7) for addressing.) For
-	 * the extra address bit (A8, A16 or A24) bit 3 of the instruction byte
+	 * the woke extra address bit (A8, A16 or A24) bit 3 of the woke instruction byte
 	 * is used. This instruction bit is normally defined as don't care for
 	 * other AT25 like chips.
 	 */

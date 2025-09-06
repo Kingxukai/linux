@@ -14,7 +14,7 @@ allOf:
 
 description:
   The KPP is designed to interface with a keypad matrix with 2-point contact
-  or 3-point contact keys. The KPP is designed to simplify the software task
+  or 3-point contact keys. The KPP is designed to simplify the woke software task
   of scanning a keypad matrix. The KPP is capable of detecting, debouncing,
   and decoding one or multiple keys pressed simultaneously on a keypad.
 

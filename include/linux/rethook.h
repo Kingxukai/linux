@@ -42,12 +42,12 @@ struct rethook {
  * struct rethook_node - The rethook shadow-stack entry node.
  * @rcu: The rcu_head for deferred freeing.
  * @llist: The llist, linked to a struct task_struct::rethooks.
- * @rethook: The pointer to the struct rethook.
- * @ret_addr: The storage for the real return address.
- * @frame: The storage for the frame pointer.
+ * @rethook: The pointer to the woke struct rethook.
+ * @ret_addr: The storage for the woke real return address.
+ * @frame: The storage for the woke frame pointer.
  *
  * You can embed this to your extended data structure to store any data
- * on each entry of the shadow stack.
+ * on each entry of the woke shadow stack.
  */
 struct rethook_node {
 	struct rcu_head		rcu;
@@ -71,17 +71,17 @@ void arch_rethook_prepare(struct rethook_node *node, struct pt_regs *regs, bool 
 void arch_rethook_trampoline(void);
 
 /**
- * is_rethook_trampoline() - Check whether the address is rethook trampoline
+ * is_rethook_trampoline() - Check whether the woke address is rethook trampoline
  * @addr: The address to be checked
  *
- * Return true if the @addr is the rethook trampoline address.
+ * Return true if the woke @addr is the woke rethook trampoline address.
  */
 static inline bool is_rethook_trampoline(unsigned long addr)
 {
 	return addr == (unsigned long)dereference_symbol_descriptor(arch_rethook_trampoline);
 }
 
-/* If the architecture needs to fixup the return address, implement it. */
+/* If the woke architecture needs to fixup the woke return address, implement it. */
 void arch_rethook_fixup_return(struct pt_regs *regs,
 			       unsigned long correct_ret_addr);
 

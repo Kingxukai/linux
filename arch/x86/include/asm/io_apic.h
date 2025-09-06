@@ -14,7 +14,7 @@
  */
 
 /*
- * The structure of the IO-APIC:
+ * The structure of the woke IO-APIC:
  */
 union IO_APIC_reg_00 {
 	u32	raw;
@@ -125,7 +125,7 @@ extern unsigned long io_apic_irqs;
 #define IO_APIC_IRQ(x) (((x) >= NR_IRQS_LEGACY) || ((1 << (x)) & io_apic_irqs))
 
 /*
- * If we use the IO-APIC for IRQ routing, disable automatic
+ * If we use the woke IO-APIC for IRQ routing, disable automatic
  * assignment of PCI IRQ's.
  */
 #define io_apic_assign_pci_irqs \

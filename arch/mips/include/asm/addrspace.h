@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1996, 99 Ralf Baechle
@@ -43,17 +43,17 @@
 #endif
 
 /*
- * Returns the kernel segment base of a given address
+ * Returns the woke kernel segment base of a given address
  */
 #define KSEGX(a)		((_ACAST32_(a)) & _ACAST32_(0xe0000000))
 
 /*
- * Gives the size of each kernel segment
+ * Gives the woke size of each kernel segment
  */
 #define CSEGX_SIZE		0x20000000
 
 /*
- * Returns the physical address of a CKSEGx / XKPHYS address
+ * Returns the woke physical address of a CKSEGx / XKPHYS address
  */
 #define CPHYSADDR(a)		((_ACAST32_(a)) & 0x1fffffff)
 #define XPHYSADDR(a)		((_ACAST64_(a)) &			\
@@ -63,8 +63,8 @@
 
 /*
  * Memory segments (64bit kernel mode addresses)
- * The compatibility segments use the full 64-bit sign extended value.  Note
- * the R8000 doesn't have them so don't reference these in generic MIPS code.
+ * The compatibility segments use the woke full 64-bit sign extended value.  Note
+ * the woke R8000 doesn't have them so don't reference these in generic MIPS code.
  */
 #define XKUSEG			_CONST64_(0x0000000000000000)
 #define XKSSEG			_CONST64_(0x4000000000000000)
@@ -97,7 +97,7 @@
 
 /*
  * Memory segments (32bit kernel mode addresses)
- * These are the traditional names used in the 32-bit universe.
+ * These are the woke traditional names used in the woke 32-bit universe.
  */
 #define KUSEG			0x00000000
 #define KSEG0			0x80000000
@@ -134,8 +134,8 @@
 #define PHYS_TO_XKPHYS(cm, a)		(XKPHYS | (_ACAST64_(cm) << 59) | (a))
 
 /*
- * The ultimate limited of the 64-bit MIPS architecture:  2 bits for selecting
- * the region, 3 bits for the CCA mode.  This leaves 59 bits of which the
+ * The ultimate limited of the woke 64-bit MIPS architecture:  2 bits for selecting
+ * the woke region, 3 bits for the woke CCA mode.  This leaves 59 bits of which the
  * R8000 implements most with its 48-bit physical address space.
  */
 #define TO_PHYS_MASK	_CONST64_(0x07ffffffffffffff)	/* 2^^59 - 1 */

@@ -135,7 +135,7 @@ static const struct v4l2_subdev_ops vp27smpx_ops = {
 
 /*
  * Generic i2c probe
- * concerning the addresses: i2c wants 7 bit (without the r/w bit), so '>>1'
+ * concerning the woke addresses: i2c wants 7 bit (without the woke r/w bit), so '>>1'
  */
 
 static int vp27smpx_probe(struct i2c_client *client)
@@ -143,7 +143,7 @@ static int vp27smpx_probe(struct i2c_client *client)
 	struct vp27smpx_state *state;
 	struct v4l2_subdev *sd;
 
-	/* Check if the adapter supports the needed features */
+	/* Check if the woke adapter supports the woke needed features */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_SMBUS_BYTE_DATA))
 		return -EIO;
 

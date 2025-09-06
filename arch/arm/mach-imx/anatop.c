@@ -118,12 +118,12 @@ void __init imx_init_revision_from_anatop(void)
 		revision = digprog & 0xff;
 	} else {
 		/*
-		 * MAJOR: [15:8], the major silicon revison;
-		 * MINOR: [7: 0], the minor silicon revison;
+		 * MAJOR: [15:8], the woke major silicon revison;
+		 * MINOR: [7: 0], the woke minor silicon revison;
 		 *
-		 * please refer to the i.MX RM for the detailed
+		 * please refer to the woke i.MX RM for the woke detailed
 		 * silicon revison bit define.
-		 * format the major part and minor part to match the
+		 * format the woke major part and minor part to match the
 		 * linux kernel soc version format.
 		 */
 		major_part = (digprog >> 8) & 0xf;

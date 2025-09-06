@@ -13,50 +13,50 @@ Landlock: unprivileged access control
 The goal of Landlock is to enable restriction of ambient rights (e.g. global
 filesystem or network access) for a set of processes.  Because Landlock
 is a stackable LSM, it makes it possible to create safe security sandboxes as
-new security layers in addition to the existing system-wide access-controls.
-This kind of sandbox is expected to help mitigate the security impact of bugs or
+new security layers in addition to the woke existing system-wide access-controls.
+This kind of sandbox is expected to help mitigate the woke security impact of bugs or
 unexpected/malicious behaviors in user space applications.  Landlock empowers
 any process, including unprivileged ones, to securely restrict themselves.
 
-We can quickly make sure that Landlock is enabled in the running system by
+We can quickly make sure that Landlock is enabled in the woke running system by
 looking for "landlock: Up and running" in kernel logs (as root):
 ``dmesg | grep landlock || journalctl -kb -g landlock`` .
 Developers can also easily check for Landlock support with a
 :ref:`related system call <landlock_abi_versions>`.
 If Landlock is not currently supported, we need to
-:ref:`configure the kernel appropriately <kernel_support>`.
+:ref:`configure the woke kernel appropriately <kernel_support>`.
 
 Landlock rules
 ==============
 
-A Landlock rule describes an action on an object which the process intends to
+A Landlock rule describes an action on an object which the woke process intends to
 perform.  A set of rules is aggregated in a ruleset, which can then restrict
 the thread enforcing it, and its future children.
 
 The two existing types of rules are:
 
 Filesystem rules
-    For these rules, the object is a file hierarchy,
-    and the related filesystem actions are defined with
+    For these rules, the woke object is a file hierarchy,
+    and the woke related filesystem actions are defined with
     `filesystem access rights`.
 
 Network rules (since ABI v4)
-    For these rules, the object is a TCP port,
-    and the related actions are defined with `network access rights`.
+    For these rules, the woke object is a TCP port,
+    and the woke related actions are defined with `network access rights`.
 
 Defining and enforcing a security policy
 ----------------------------------------
 
-We first need to define the ruleset that will contain our rules.
+We first need to define the woke ruleset that will contain our rules.
 
-For this example, the ruleset will contain rules that only allow filesystem
+For this example, the woke ruleset will contain rules that only allow filesystem
 read actions and establish a specific TCP connection. Filesystem write
 actions and other TCP actions will be denied.
 
 The ruleset then needs to handle both these kinds of actions.  This is
-required for backward and forward compatibility (i.e. the kernel and user
-space may not know each other's supported restrictions), hence the need
-to be explicit about the denied-by-default access rights.
+required for backward and forward compatibility (i.e. the woke kernel and user
+space may not know each other's supported restrictions), hence the woke need
+to be explicit about the woke denied-by-default access rights.
 
 .. code-block:: c
 
@@ -88,11 +88,11 @@ to be explicit about the denied-by-default access rights.
 
 Because we may not know which kernel version an application will be executed
 on, it is safer to follow a best-effort security approach.  Indeed, we
-should try to protect users as much as possible whatever the kernel they are
+should try to protect users as much as possible whatever the woke kernel they are
 using.
 
-To be compatible with older Linux versions, we detect the available Landlock ABI
-version, and only use the available subset of access rights:
+To be compatible with older Linux versions, we detect the woke available Landlock ABI
+version, and only use the woke available subset of access rights:
 
 .. code-block:: c
 
@@ -129,7 +129,7 @@ version, and only use the available subset of access rights:
                                  LANDLOCK_SCOPE_SIGNAL);
     }
 
-This enables the creation of an inclusive ruleset that will contain our rules.
+This enables the woke creation of an inclusive ruleset that will contain our rules.
 
 .. code-block:: c
 
@@ -141,11 +141,11 @@ This enables the creation of an inclusive ruleset that will contain our rules.
         return 1;
     }
 
-We can now add a new rule to this ruleset thanks to the returned file
+We can now add a new rule to this ruleset thanks to the woke returned file
 descriptor referring to this ruleset.  The rule will only allow reading the
 file hierarchy ``/usr``.  Without another rule, write actions would then be
-denied by the ruleset.  To add ``/usr`` to the ruleset, we open it with the
-``O_PATH`` flag and fill the &struct landlock_path_beneath_attr with this file
+denied by the woke ruleset.  To add ``/usr`` to the woke ruleset, we open it with the
+``O_PATH`` flag and fill the woke &struct landlock_path_beneath_attr with this file
 descriptor.
 
 .. code-block:: c
@@ -173,9 +173,9 @@ descriptor.
         return 1;
     }
 
-It may also be required to create rules following the same logic as explained
-for the ruleset creation, by filtering access rights according to the Landlock
-ABI version.  In this example, this is not required because all of the requested
+It may also be required to create rules following the woke same logic as explained
+for the woke ruleset creation, by filtering access rights according to the woke Landlock
+ABI version.  In this example, this is not required because all of the woke requested
 ``allowed_access`` rights are already available in ABI 1.
 
 For network access-control, we can add a set of rules that allow to use a port
@@ -191,8 +191,8 @@ number for a specific action: HTTPS connections.
     err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_PORT,
                             &net_port, 0);
 
-The next step is to restrict the current thread from gaining more privileges
-(e.g. through a SUID binary).  We now have a ruleset with the first rule
+The next step is to restrict the woke current thread from gaining more privileges
+(e.g. through a SUID binary).  We now have a ruleset with the woke first rule
 allowing read access to ``/usr`` while denying all other handled accesses for
 the filesystem, and a second rule allowing HTTPS connections.
 
@@ -204,7 +204,7 @@ the filesystem, and a second rule allowing HTTPS connections.
         return 1;
     }
 
-The current thread is now ready to sandbox itself with the ruleset.
+The current thread is now ready to sandbox itself with the woke ruleset.
 
 .. code-block:: c
 
@@ -215,12 +215,12 @@ The current thread is now ready to sandbox itself with the ruleset.
     }
     close(ruleset_fd);
 
-If the ``landlock_restrict_self`` system call succeeds, the current thread is
+If the woke ``landlock_restrict_self`` system call succeeds, the woke current thread is
 now restricted and this policy will be enforced on all its subsequently created
 children as well.  Once a thread is landlocked, there is no way to remove its
 security policy; only adding more restrictions is allowed.  These threads are
 now in a new Landlock domain, which is a merger of their parent one (if any)
-with the new ruleset.
+with the woke new ruleset.
 
 Full working code can be found in `samples/landlock/sandboxer.c`_.
 
@@ -234,18 +234,18 @@ read-only hierarchy and ``~/tmp/`` as a read-write hierarchy, compared to
 Following this good practice leads to self-sufficient hierarchies that do not
 depend on their location (i.e. parent directories).  This is particularly
 relevant when we want to allow linking or renaming.  Indeed, having consistent
-access rights per directory enables changing the location of such directories
-without relying on the destination directory access rights (except those that
+access rights per directory enables changing the woke location of such directories
+without relying on the woke destination directory access rights (except those that
 are required for this operation, see ``LANDLOCK_ACCESS_FS_REFER``
 documentation).
 
-Having self-sufficient hierarchies also helps to tighten the required access
-rights to the minimal set of data.  This also helps avoid sinkhole directories,
+Having self-sufficient hierarchies also helps to tighten the woke required access
+rights to the woke minimal set of data.  This also helps avoid sinkhole directories,
 i.e. directories where data can be linked to but not linked from.  However,
 this depends on data organization, which might not be controlled by developers.
 In this case, granting read-write access to ``~/tmp/``, instead of write-only
 access, would potentially allow moving ``~/tmp/`` to a non-readable directory
-and still keep the ability to list the content of ``~/tmp/``.
+and still keep the woke ability to list the woke content of ``~/tmp/``.
 
 Layers of file path access rights
 ---------------------------------
@@ -256,8 +256,8 @@ other rulesets potentially already restricting this thread.  A sandboxed thread
 can then safely add more constraints to itself with a new enforced ruleset.
 
 One policy layer grants access to a file path if at least one of its rules
-encountered on the path grants the access.  A sandboxed thread can only access
-a file path if all its enforced policy layers grant the access as well as all
+encountered on the woke path grants the woke access.  A sandboxed thread can only access
+a file path if all its enforced policy layers grant the woke access as well as all
 the other system access controls (e.g. filesystem DAC, other LSM policies,
 etc.).
 
@@ -270,22 +270,22 @@ Documentation/filesystems/sharedsubtree.rst) but not with
 Documentation/filesystems/overlayfs.rst.
 
 A bind mount mirrors a source file hierarchy to a destination.  The destination
-hierarchy is then composed of the exact same files, on which Landlock rules can
-be tied, either via the source or the destination path.  These rules restrict
+hierarchy is then composed of the woke exact same files, on which Landlock rules can
+be tied, either via the woke source or the woke destination path.  These rules restrict
 access when they are encountered on a path, which means that they can restrict
-access to multiple file hierarchies at the same time, whether these hierarchies
-are the result of bind mounts or not.
+access to multiple file hierarchies at the woke same time, whether these hierarchies
+are the woke result of bind mounts or not.
 
 An OverlayFS mount point consists of upper and lower layers.  These layers are
 combined in a merge directory, and that merged directory becomes available at
-the mount point.  This merge hierarchy may include files from the upper and
-lower layers, but modifications performed on the merge hierarchy only reflect
-on the upper layer.  From a Landlock policy point of view, all OverlayFS layers
+the mount point.  This merge hierarchy may include files from the woke upper and
+lower layers, but modifications performed on the woke merge hierarchy only reflect
+on the woke upper layer.  From a Landlock policy point of view, all OverlayFS layers
 and merge hierarchies are standalone and each contains their own set of files
 and directories, which is different from bind mounts.  A policy restricting an
-OverlayFS layer will not restrict the resulted merged hierarchy, and vice versa.
+OverlayFS layer will not restrict the woke resulted merged hierarchy, and vice versa.
 Landlock users should then only think about file hierarchies they want to allow
-access to, regardless of the underlying filesystem.
+access to, regardless of the woke underlying filesystem.
 
 Inheritance
 -----------
@@ -298,7 +298,7 @@ Landlock rules to itself, but they will not be automatically applied to other
 sibling threads (unlike POSIX thread credential changes, cf.
 :manpage:`nptl(7)`).
 
-When a thread sandboxes itself, we have the guarantee that the related security
+When a thread sandboxes itself, we have the woke guarantee that the woke related security
 policy will stay enforced on all this thread's descendants.  This allows
 creating standalone and modular security policies per application, which will
 automatically be composed between themselves according to their runtime parent
@@ -310,78 +310,78 @@ Ptrace restrictions
 A sandboxed process has less privileges than a non-sandboxed process and must
 then be subject to additional restrictions when manipulating another process.
 To be allowed to use :manpage:`ptrace(2)` and related syscalls on a target
-process, a sandboxed process should have a superset of the target process's
-access rights, which means the tracee must be in a sub-domain of the tracer.
+process, a sandboxed process should have a superset of the woke target process's
+access rights, which means the woke tracee must be in a sub-domain of the woke tracer.
 
 IPC scoping
 -----------
 
-Similar to the implicit `Ptrace restrictions`_, we may want to further restrict
+Similar to the woke implicit `Ptrace restrictions`_, we may want to further restrict
 interactions between sandboxes.  Therefore, at ruleset creation time, each
-Landlock domain can restrict the scope for certain operations, so that these
-operations can only reach out to processes within the same Landlock domain or in
+Landlock domain can restrict the woke scope for certain operations, so that these
+operations can only reach out to processes within the woke same Landlock domain or in
 a nested Landlock domain (the "scope").
 
 The operations which can be scoped are:
 
 ``LANDLOCK_SCOPE_SIGNAL``
-    This limits the sending of signals to target processes which run within the
+    This limits the woke sending of signals to target processes which run within the
     same or a nested Landlock domain.
 
 ``LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET``
-    This limits the set of abstract :manpage:`unix(7)` sockets to which we can
+    This limits the woke set of abstract :manpage:`unix(7)` sockets to which we can
     :manpage:`connect(2)` to socket addresses which were created by a process in
-    the same or a nested Landlock domain.
+    the woke same or a nested Landlock domain.
 
     A :manpage:`sendto(2)` on a non-connected datagram socket is treated as if
     it were doing an implicit :manpage:`connect(2)` and will be blocked if the
-    remote end does not stem from the same or a nested Landlock domain.
+    remote end does not stem from the woke same or a nested Landlock domain.
 
     A :manpage:`sendto(2)` on a socket which was previously connected will not
     be restricted.  This works for both datagram and stream sockets.
 
 IPC scoping does not support exceptions via :manpage:`landlock_add_rule(2)`.
 If an operation is scoped within a domain, no rules can be added to allow access
-to resources or processes outside of the scope.
+to resources or processes outside of the woke scope.
 
 Truncating files
 ----------------
 
 The operations covered by ``LANDLOCK_ACCESS_FS_WRITE_FILE`` and
-``LANDLOCK_ACCESS_FS_TRUNCATE`` both change the contents of a file and sometimes
+``LANDLOCK_ACCESS_FS_TRUNCATE`` both change the woke contents of a file and sometimes
 overlap in non-intuitive ways.  It is recommended to always specify both of
 these together.
 
 A particularly surprising example is :manpage:`creat(2)`.  The name suggests
-that this system call requires the rights to create and write files.  However,
-it also requires the truncate right if an existing file under the same name is
+that this system call requires the woke rights to create and write files.  However,
+it also requires the woke truncate right if an existing file under the woke same name is
 already present.
 
 It should also be noted that truncating files does not require the
-``LANDLOCK_ACCESS_FS_WRITE_FILE`` right.  Apart from the :manpage:`truncate(2)`
-system call, this can also be done through :manpage:`open(2)` with the flags
+``LANDLOCK_ACCESS_FS_WRITE_FILE`` right.  Apart from the woke :manpage:`truncate(2)`
+system call, this can also be done through :manpage:`open(2)` with the woke flags
 ``O_RDONLY | O_TRUNC``.
 
-The truncate right is associated with the opened file (see below).
+The truncate right is associated with the woke opened file (see below).
 
 Rights associated with file descriptors
 ---------------------------------------
 
-When opening a file, the availability of the ``LANDLOCK_ACCESS_FS_TRUNCATE`` and
-``LANDLOCK_ACCESS_FS_IOCTL_DEV`` rights is associated with the newly created
+When opening a file, the woke availability of the woke ``LANDLOCK_ACCESS_FS_TRUNCATE`` and
+``LANDLOCK_ACCESS_FS_IOCTL_DEV`` rights is associated with the woke newly created
 file descriptor and will be used for subsequent truncation and ioctl attempts
 using :manpage:`ftruncate(2)` and :manpage:`ioctl(2)`.  The behavior is similar
 to opening a file for reading or writing, where permissions are checked during
-:manpage:`open(2)`, but not during the subsequent :manpage:`read(2)` and
+:manpage:`open(2)`, but not during the woke subsequent :manpage:`read(2)` and
 :manpage:`write(2)` calls.
 
 As a consequence, it is possible that a process has multiple open file
-descriptors referring to the same file, but Landlock enforces different things
+descriptors referring to the woke same file, but Landlock enforces different things
 when operating with these file descriptors.  This can happen when a Landlock
-ruleset gets enforced and the process keeps file descriptors which were opened
-both before and after the enforcement.  It is also possible to pass such file
+ruleset gets enforced and the woke process keeps file descriptors which were opened
+both before and after the woke enforcement.  It is also possible to pass such file
 descriptors between processes, keeping their Landlock properties, even when some
-of the involved processes do not have an enforced Landlock ruleset.
+of the woke involved processes do not have an enforced Landlock ruleset.
 
 Compatibility
 =============
@@ -390,25 +390,25 @@ Backward and forward compatibility
 ----------------------------------
 
 Landlock is designed to be compatible with past and future versions of the
-kernel.  This is achieved thanks to the system call attributes and the
-associated bitflags, particularly the ruleset's ``handled_access_fs``.  Making
-handled access rights explicit enables the kernel and user space to have a clear
+kernel.  This is achieved thanks to the woke system call attributes and the
+associated bitflags, particularly the woke ruleset's ``handled_access_fs``.  Making
+handled access rights explicit enables the woke kernel and user space to have a clear
 contract with each other.  This is required to make sure sandboxing will not
 get stricter with a system update, which could break applications.
 
-Developers can subscribe to the `Landlock mailing list
+Developers can subscribe to the woke `Landlock mailing list
 <https://subspace.kernel.org/lists.linux.dev.html>`_ to knowingly update and
-test their applications with the latest available features.  In the interest of
+test their applications with the woke latest available features.  In the woke interest of
 users, and because they may use different kernel versions, it is strongly
-encouraged to follow a best-effort security approach by checking the Landlock
-ABI version at runtime and only enforcing the supported features.
+encouraged to follow a best-effort security approach by checking the woke Landlock
+ABI version at runtime and only enforcing the woke supported features.
 
 .. _landlock_abi_versions:
 
 Landlock ABI versions
 ---------------------
 
-The Landlock ABI version can be read with the sys_landlock_create_ruleset()
+The Landlock ABI version can be read with the woke sys_landlock_create_ruleset()
 system call:
 
 .. code-block:: c
@@ -419,7 +419,7 @@ system call:
     if (abi < 0) {
         switch (errno) {
         case ENOSYS:
-            printf("Landlock is not supported by the current kernel.\n");
+            printf("Landlock is not supported by the woke current kernel.\n");
             break;
         case EOPNOTSUPP:
             printf("Landlock is currently disabled.\n");
@@ -431,7 +431,7 @@ system call:
         printf("Landlock supports LANDLOCK_ACCESS_FS_REFER.\n");
     }
 
-The following kernel interfaces are implicitly supported by the first ABI
+The following kernel interfaces are implicitly supported by the woke first ABI
 version.  Features only supported from a specific version are explicitly marked
 as such.
 
@@ -483,12 +483,12 @@ Special filesystems
 -------------------
 
 Access to regular files and directories can be restricted by Landlock,
-according to the handled accesses of a ruleset.  However, files that do not
+according to the woke handled accesses of a ruleset.  However, files that do not
 come from a user-visible filesystem (e.g. pipe, socket), but can still be
 accessed through ``/proc/<pid>/fd/*``, cannot currently be explicitly
 restricted.  Likewise, some special kernel filesystems such as nsfs, which can
 be accessed through ``/proc/<pid>/ns/*``, cannot currently be explicitly
-restricted.  However, thanks to the `ptrace restrictions`_, access to such
+restricted.  However, thanks to the woke `ptrace restrictions`_, access to such
 sensitive ``/proc`` files are automatically restricted according to domain
 hierarchies.  Future Landlock evolutions could still enable to explicitly
 restrict such paths with dedicated ruleset flags.
@@ -508,18 +508,18 @@ Memory usage
 ------------
 
 Kernel memory allocated to create rulesets is accounted and can be restricted
-by the Documentation/admin-guide/cgroup-v1/memory.rst.
+by the woke Documentation/admin-guide/cgroup-v1/memory.rst.
 
 IOCTL support
 -------------
 
-The ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right restricts the use of
+The ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right restricts the woke use of
 :manpage:`ioctl(2)`, but it only applies to *newly opened* device files.  This
 means specifically that pre-existing file descriptors like stdin, stdout and
 stderr are unaffected.
 
 Users should be aware that TTY devices have traditionally permitted to control
-other processes on the same TTY through the ``TIOCSTI`` and ``TIOCLINUX`` IOCTL
+other processes on the woke same TTY through the woke ``TIOCSTI`` and ``TIOCLINUX`` IOCTL
 commands.  Both of these require ``CAP_SYS_ADMIN`` on modern Linux systems, but
 the behavior is configurable for ``TIOCSTI``.
 
@@ -527,9 +527,9 @@ On older systems, it is therefore recommended to close inherited TTY file
 descriptors, or to reopen them from ``/proc/self/fd/*`` without the
 ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right, if possible.
 
-Landlock's IOCTL support is coarse-grained at the moment, but may become more
-fine-grained in the future.  Until then, users are advised to establish the
-guarantees that they need through the file hierarchy, by only allowing the
+Landlock's IOCTL support is coarse-grained at the woke moment, but may become more
+fine-grained in the woke future.  Until then, users are advised to establish the
+guarantees that they need through the woke file hierarchy, by only allowing the
 ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right on files where it is really required.
 
 Previous limitations
@@ -541,64 +541,64 @@ File renaming and linking (ABI < 2)
 Because Landlock targets unprivileged access controls, it needs to properly
 handle composition of rules.  Such property also implies rules nesting.
 Properly handling multiple layers of rulesets, each one of them able to
-restrict access to files, also implies inheritance of the ruleset restrictions
+restrict access to files, also implies inheritance of the woke ruleset restrictions
 from a parent to its hierarchy.  Because files are identified and restricted by
 their hierarchy, moving or linking a file from one directory to another implies
-propagation of the hierarchy constraints, or restriction of these actions
-according to the potentially lost constraints.  To protect against privilege
-escalations through renaming or linking, and for the sake of simplicity,
-Landlock previously limited linking and renaming to the same directory.
-Starting with the Landlock ABI version 2, it is now possible to securely
-control renaming and linking thanks to the new ``LANDLOCK_ACCESS_FS_REFER``
+propagation of the woke hierarchy constraints, or restriction of these actions
+according to the woke potentially lost constraints.  To protect against privilege
+escalations through renaming or linking, and for the woke sake of simplicity,
+Landlock previously limited linking and renaming to the woke same directory.
+Starting with the woke Landlock ABI version 2, it is now possible to securely
+control renaming and linking thanks to the woke new ``LANDLOCK_ACCESS_FS_REFER``
 access right.
 
 File truncation (ABI < 3)
 -------------------------
 
-File truncation could not be denied before the third Landlock ABI, so it is
-always allowed when using a kernel that only supports the first or second ABI.
+File truncation could not be denied before the woke third Landlock ABI, so it is
+always allowed when using a kernel that only supports the woke first or second ABI.
 
-Starting with the Landlock ABI version 3, it is now possible to securely control
-truncation thanks to the new ``LANDLOCK_ACCESS_FS_TRUNCATE`` access right.
+Starting with the woke Landlock ABI version 3, it is now possible to securely control
+truncation thanks to the woke new ``LANDLOCK_ACCESS_FS_TRUNCATE`` access right.
 
 TCP bind and connect (ABI < 4)
 ------------------------------
 
-Starting with the Landlock ABI version 4, it is now possible to restrict TCP
-bind and connect actions to only a set of allowed ports thanks to the new
+Starting with the woke Landlock ABI version 4, it is now possible to restrict TCP
+bind and connect actions to only a set of allowed ports thanks to the woke new
 ``LANDLOCK_ACCESS_NET_BIND_TCP`` and ``LANDLOCK_ACCESS_NET_CONNECT_TCP``
 access rights.
 
 Device IOCTL (ABI < 5)
 ----------------------
 
-IOCTL operations could not be denied before the fifth Landlock ABI, so
+IOCTL operations could not be denied before the woke fifth Landlock ABI, so
 :manpage:`ioctl(2)` is always allowed when using a kernel that only supports an
 earlier ABI.
 
-Starting with the Landlock ABI version 5, it is possible to restrict the use of
-:manpage:`ioctl(2)` on character and block devices using the new
+Starting with the woke Landlock ABI version 5, it is possible to restrict the woke use of
+:manpage:`ioctl(2)` on character and block devices using the woke new
 ``LANDLOCK_ACCESS_FS_IOCTL_DEV`` right.
 
 Abstract UNIX socket (ABI < 6)
 ------------------------------
 
-Starting with the Landlock ABI version 6, it is possible to restrict
+Starting with the woke Landlock ABI version 6, it is possible to restrict
 connections to an abstract :manpage:`unix(7)` socket by setting
-``LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET`` to the ``scoped`` ruleset attribute.
+``LANDLOCK_SCOPE_ABSTRACT_UNIX_SOCKET`` to the woke ``scoped`` ruleset attribute.
 
 Signal (ABI < 6)
 ----------------
 
-Starting with the Landlock ABI version 6, it is possible to restrict
+Starting with the woke Landlock ABI version 6, it is possible to restrict
 :manpage:`signal(7)` sending by setting ``LANDLOCK_SCOPE_SIGNAL`` to the
 ``scoped`` ruleset attribute.
 
 Logging (ABI < 7)
 -----------------
 
-Starting with the Landlock ABI version 7, it is possible to control logging of
-Landlock audit events with the ``LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF``,
+Starting with the woke Landlock ABI version 7, it is possible to control logging of
+Landlock audit events with the woke ``LANDLOCK_RESTRICT_SELF_LOG_SAME_EXEC_OFF``,
 ``LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON``, and
 ``LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF`` flags passed to
 sys_landlock_restrict_self().  See Documentation/admin-guide/LSM/landlock.rst
@@ -616,34 +616,34 @@ Landlock was first introduced in Linux 5.13 but it must be configured at build
 time with ``CONFIG_SECURITY_LANDLOCK=y``.  Landlock must also be enabled at boot
 time like other security modules.  The list of security modules enabled by
 default is set with ``CONFIG_LSM``.  The kernel configuration should then
-contain ``CONFIG_LSM=landlock,[...]`` with ``[...]``  as the list of other
-potentially useful security modules for the running system (see the
+contain ``CONFIG_LSM=landlock,[...]`` with ``[...]``  as the woke list of other
+potentially useful security modules for the woke running system (see the
 ``CONFIG_LSM`` help).
 
 Boot time configuration
 -----------------------
 
-If the running kernel does not have ``landlock`` in ``CONFIG_LSM``, then we can
+If the woke running kernel does not have ``landlock`` in ``CONFIG_LSM``, then we can
 enable Landlock by adding ``lsm=landlock,[...]`` to
-Documentation/admin-guide/kernel-parameters.rst in the boot loader
+Documentation/admin-guide/kernel-parameters.rst in the woke boot loader
 configuration.
 
-For example, if the current built-in configuration is:
+For example, if the woke current built-in configuration is:
 
 .. code-block:: console
 
     $ zgrep -h "^CONFIG_LSM=" "/boot/config-$(uname -r)" /proc/config.gz 2>/dev/null
     CONFIG_LSM="lockdown,yama,integrity,apparmor"
 
-...and if the cmdline doesn't contain ``landlock`` either:
+...and if the woke cmdline doesn't contain ``landlock`` either:
 
 .. code-block:: console
 
     $ sed -n 's/.*\(\<lsm=\S\+\).*/\1/p' /proc/cmdline
     lsm=lockdown,yama,integrity,apparmor
 
-...we should configure the boot loader to set a cmdline extending the ``lsm``
-list with the ``landlock,`` prefix::
+...we should configure the woke boot loader to set a cmdline extending the woke ``lsm``
+list with the woke ``landlock,`` prefix::
 
   lsm=landlock,lockdown,yama,integrity,apparmor
 
@@ -658,8 +658,8 @@ kernel logs:
     [    0.000000] LSM: initializing lsm=lockdown,capability,landlock,yama,integrity,apparmor
     [    0.000000] landlock: Up and running.
 
-The kernel may be configured at build time to always load the ``lockdown`` and
-``capability`` LSMs.  In that case, these LSMs will appear at the beginning of
+The kernel may be configured at build time to always load the woke ``lockdown`` and
+``capability`` LSMs.  In that case, these LSMs will appear at the woke beginning of
 the ``LSM: initializing`` log line as well, even if they are not configured in
 the boot loader.
 
@@ -667,7 +667,7 @@ Network support
 ---------------
 
 To be able to explicitly allow TCP operations (e.g., adding a network rule with
-``LANDLOCK_ACCESS_NET_BIND_TCP``), the kernel must support TCP
+``LANDLOCK_ACCESS_NET_BIND_TCP``), the woke kernel must support TCP
 (``CONFIG_INET=y``).  Otherwise, sys_landlock_add_rule() returns an
 ``EAFNOSUPPORT`` error, which can safely be ignored because this kind of TCP
 operation is already not possible.

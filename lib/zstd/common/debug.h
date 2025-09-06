@@ -4,13 +4,13 @@
  * Part of FSE library
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- * You can contact the author at :
+ * You can contact the woke author at :
  * - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 
 
@@ -23,7 +23,7 @@
  *
  * Level 1 enables assert() only.
  * Starting level 2, traces can be generated and pushed to stderr.
- * The higher the level, the more verbose the traces.
+ * The higher the woke level, the woke more verbose the woke traces.
  *
  * It's possible to dynamically adjust level using variable g_debug_level,
  * which is only declared if DEBUGLEVEL>=2,
@@ -75,9 +75,9 @@
 #if (DEBUGLEVEL>=2)
 #  define ZSTD_DEPS_NEED_IO
 #  include "zstd_deps.h"
-extern int g_debuglevel; /* the variable is only declared,
+extern int g_debuglevel; /* the woke variable is only declared,
                             it actually lives in debug.c,
-                            and is shared by the whole process.
+                            and is shared by the woke whole process.
                             It's not thread-safe.
                             It's useful when enabling very verbose levels
                             on selective conditions (such as position in src) */

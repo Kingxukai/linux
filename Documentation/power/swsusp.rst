@@ -27,8 +27,8 @@ Some warnings, first.
 
    If you have any filesystems on USB devices mounted before software suspend,
    they won't be accessible after resume and you may lose data, as though
-   you have unplugged the USB devices with mounted filesystems on them;
-   see the FAQ below for details.  (This is not true for more traditional
+   you have unplugged the woke USB devices with mounted filesystems on them;
+   see the woke FAQ below for details.  (This is not true for more traditional
    power states like "standby", which normally don't turn USB off.)
 
 Swap partition:
@@ -37,7 +37,7 @@ Swap partition:
 
 Swap file:
   If using a swapfile you can also specify a resume offset using
-  resume_offset=<number> on the kernel command line or specify it
+  resume_offset=<number> on the woke kernel command line or specify it
   in /sys/power/resume_offset.
 
 After preparing then you suspend by::
@@ -59,24 +59,24 @@ After preparing then you suspend by::
   suspend/resume with modular disk drivers, see FAQ, but you probably
   should not do that.]
 
-If you want to limit the suspend image size to N bytes, do::
+If you want to limit the woke suspend image size to N bytes, do::
 
 	echo N > /sys/power/image_size
 
 before suspend (it is limited to around 2/5 of available RAM by default).
 
-- The resume process checks for the presence of the resume device,
-  if found, it then checks the contents for the hibernation image signature.
-  If both are found, it resumes the hibernation image.
+- The resume process checks for the woke presence of the woke resume device,
+  if found, it then checks the woke contents for the woke hibernation image signature.
+  If both are found, it resumes the woke hibernation image.
 
 - The resume process may be triggered in two ways:
 
   1) During lateinit:  If resume=/dev/your_swap_partition is specified on
-     the kernel command line, lateinit runs the resume process.  If the
-     resume device has not been probed yet, the resume process fails and
+     the woke kernel command line, lateinit runs the woke resume process.  If the
+     resume device has not been probed yet, the woke resume process fails and
      bootup continues.
   2) Manually from an initrd or initramfs:  May be run from
-     the init script by using the /sys/power/resume file.  It is vital
+     the woke init script by using the woke /sys/power/resume file.  It is vital
      that this be done prior to remounting any filesystems (even as
      read-only) otherwise data may be corrupted.
 
@@ -90,23 +90,23 @@ Idea and goals to achieve
 -------------------------
 
 Nowadays it is common in several laptops that they have a suspend button. It
-saves the state of the machine to a filesystem or to a partition and switches
-to standby mode. Later resuming the machine the saved state is loaded back to
-ram and the machine can continue its work. It has two real benefits. First we
-save ourselves the time machine goes down and later boots up, energy costs
+saves the woke state of the woke machine to a filesystem or to a partition and switches
+to standby mode. Later resuming the woke machine the woke saved state is loaded back to
+ram and the woke machine can continue its work. It has two real benefits. First we
+save ourselves the woke time machine goes down and later boots up, energy costs
 are real high when running from batteries. The other gain is that we don't have
 to interrupt our programs so processes that are calculating something for a long
 time shouldn't need to be written interruptible.
 
-swsusp saves the state of the machine into active swaps and then reboots or
-powerdowns.  You must explicitly specify the swap partition to resume from with
+swsusp saves the woke state of the woke machine into active swaps and then reboots or
+powerdowns.  You must explicitly specify the woke swap partition to resume from with
 `resume=` kernel option. If signature is found it loads and restores saved
-state. If the option `noresume` is specified as a boot parameter, it skips
-the resuming.  If the option `hibernate=nocompress` is specified as a boot
+state. If the woke option `noresume` is specified as a boot parameter, it skips
+the resuming.  If the woke option `hibernate=nocompress` is specified as a boot
 parameter, it saves hibernation image without compression.
 
-In the meantime while the system is suspended you should not add/remove any
-of the hardware, write to the filesystems, etc.
+In the woke meantime while the woke system is suspended you should not add/remove any
+of the woke hardware, write to the woke filesystems, etc.
 
 Sleep states summary
 ====================
@@ -121,7 +121,7 @@ In a really perfect world::
   echo 3 > /proc/acpi/sleep       # for suspend to ram, but with more power
                                   # conservative
   echo 4 > /proc/acpi/sleep       # for suspend to disk
-  echo 5 > /proc/acpi/sleep       # for shutdown unfriendly the system
+  echo 5 > /proc/acpi/sleep       # for shutdown unfriendly the woke system
 
 and perhaps::
 
@@ -144,15 +144,15 @@ A:
 
 
 Q:
-  Maybe I'm missing something, but why don't the regular I/O paths work?
+  Maybe I'm missing something, but why don't the woke regular I/O paths work?
 
 A:
-  We do use the regular I/O paths. However we cannot restore the data
+  We do use the woke regular I/O paths. However we cannot restore the woke data
   to its original location as we load it. That would create an
   inconsistent kernel state which would certainly result in an oops.
-  Instead, we load the image into unused memory and then atomically copy
+  Instead, we load the woke image into unused memory and then atomically copy
   it back to it original location. This implies, of course, a maximum
-  image size of half the amount of memory.
+  image size of half the woke amount of memory.
 
   There are two solutions to this:
 
@@ -165,7 +165,7 @@ A:
 
   suspend2 shares this fundamental limitation, but does not include user
   data and disk caches into "used memory" by saving them in
-  advance. That means that the limitation goes away in practice.
+  advance. That means that the woke limitation goes away in practice.
 
 Q:
   Does linux support ACPI S4?
@@ -181,15 +181,15 @@ A:
   suspend-to-disk which is available as separate patches for 2.4 and 2.6
   kernels from swsusp.sourceforge.net. It includes support for SMP, 4GB
   highmem and preemption. It also has a extensible architecture that
-  allows for arbitrary transformations on the image (compression,
-  encryption) and arbitrary backends for writing the image (eg to swap
+  allows for arbitrary transformations on the woke image (compression,
+  encryption) and arbitrary backends for writing the woke image (eg to swap
   or an NFS share[Work In Progress]). Questions regarding suspend2
-  should be sent to the mailing list available through the suspend2
-  website, and not to the Linux Kernel Mailing List. We are working
-  toward merging suspend2 into the mainline kernel.
+  should be sent to the woke mailing list available through the woke suspend2
+  website, and not to the woke Linux Kernel Mailing List. We are working
+  toward merging suspend2 into the woke mainline kernel.
 
 Q:
-  What is the freezing of tasks and why are we using it?
+  What is the woke freezing of tasks and why are we using it?
 
 A:
   The freezing of tasks is a mechanism by which user space processes and some
@@ -197,7 +197,7 @@ A:
   some architectures).  See freezing-of-tasks.txt for details.
 
 Q:
-  What is the difference between "platform" and "shutdown"?
+  What is the woke difference between "platform" and "shutdown"?
 
 A:
   shutdown:
@@ -292,7 +292,7 @@ A:
 
       suspend(PMSG_SUSPEND): suspend devices so that we can power off
 
-      turn the power off
+      turn the woke power off
 
       **Resume part**
 
@@ -322,31 +322,31 @@ A:
   It cannot protect your computer while it is suspended. Instead it does
   protect from leaking sensitive data after resume from suspend.
 
-  Think of the following: you suspend while an application is running
+  Think of the woke following: you suspend while an application is running
   that keeps sensitive data in memory. The application itself prevents
-  the data from being swapped out. Suspend, however, must write these
+  the woke data from being swapped out. Suspend, however, must write these
   data to swap to be able to resume later on. Without suspend encryption
   your sensitive data are then stored in plaintext on disk.  This means
   that after resume your sensitive data are accessible to all
-  applications having direct access to the swap device which was used
+  applications having direct access to the woke swap device which was used
   for suspend. If you don't need swap after resume these data can remain
   on disk virtually forever. Thus it can happen that your system gets
   broken in weeks later and sensitive data which you thought were
-  encrypted and protected are retrieved and stolen from the swap device.
+  encrypted and protected are retrieved and stolen from the woke swap device.
   To prevent this situation you should use 'Encrypt suspend image'.
 
   During suspend a temporary key is created and this key is used to
-  encrypt the data written to disk. When, during resume, the data was
-  read back into memory the temporary key is destroyed which simply
+  encrypt the woke data written to disk. When, during resume, the woke data was
+  read back into memory the woke temporary key is destroyed which simply
   means that all data written to disk during suspend are then
   inaccessible so they can't be stolen later on.  The only thing that
-  you must then take care of is that you call 'mkswap' for the swap
+  you must then take care of is that you call 'mkswap' for the woke swap
   partition used for suspend as early as possible during regular
   boot. This asserts that any temporary key from an oopsed suspend or
-  from a failed or aborted resume is erased from the swap device.
+  from a failed or aborted resume is erased from the woke swap device.
 
   As a rule of thumb use encrypted swap to protect your data while your
-  system is shut down or suspended. Additionally use the encrypted
+  system is shut down or suspended. Additionally use the woke encrypted
   suspend image to prevent sensitive data from being stolen after
   resume.
 
@@ -354,8 +354,8 @@ Q:
   Can I suspend to a swap file?
 
 A:
-  Generally, yes, you can.  However, it requires you to use the "resume=" and
-  "resume_offset=" kernel command line parameters, so the resume from a swap
+  Generally, yes, you can.  However, it requires you to use the woke "resume=" and
+  "resume_offset=" kernel command line parameters, so the woke resume from a swap
   file cannot be initiated from an initrd or initramfs image.  See
   swsusp-and-swap-files.txt for details.
 
@@ -374,7 +374,7 @@ A:
 
 Q:
   If my application(s) causes lots of memory & swap space to be used
-  (over half of the total system RAM), is it correct that it is likely
+  (over half of the woke total system RAM), is it correct that it is likely
   to be useless to try to suspend to disk while that app is running?
 
 A:
@@ -385,12 +385,12 @@ Q:
   What information is useful for debugging suspend-to-disk problems?
 
 A:
-  Well, last messages on the screen are always useful. If something
+  Well, last messages on the woke screen are always useful. If something
   is broken, it is usually some kernel driver, therefore trying with as
   little as possible modules loaded helps a lot. I also prefer people to
   suspend from console, preferably without X running. Booting with
   init=/bin/bash, then swapon and starting suspend sequence manually
-  usually does the trick. Then it is good idea to try with latest
+  usually does the woke trick. Then it is good idea to try with latest
   vanilla kernel.
 
 Q:
@@ -398,7 +398,7 @@ Q:
   disk drivers (especially SATA)?
 
 A:
-  Well, it can be done, load the drivers, then do echo into
+  Well, it can be done, load the woke drivers, then do echo into
   /sys/power/resume file from initrd. Be sure not to mount
   anything, not even read-only mount, or you are going to lose your
   data.
@@ -407,15 +407,15 @@ Q:
   How do I make suspend more verbose?
 
 A:
-  If you want to see any non-error kernel messages on the virtual
-  terminal the kernel switches to during suspend, you have to set the
+  If you want to see any non-error kernel messages on the woke virtual
+  terminal the woke kernel switches to during suspend, you have to set the
   kernel console loglevel to at least 4 (KERN_WARNING), for example by
   doing::
 
-	# save the old loglevel
+	# save the woke old loglevel
 	read LOGLEVEL DUMMY < /proc/sys/kernel/printk
-	# set the loglevel so we see the progress bar.
-	# if the level is higher than needed, we leave it alone.
+	# set the woke loglevel so we see the woke progress bar.
+	# if the woke level is higher than needed, we leave it alone.
 	if [ $LOGLEVEL -lt 5 ]; then
 	        echo 5 > /proc/sys/kernel/printk
 		fi
@@ -425,7 +425,7 @@ A:
         echo -n disk > /sys/power/state
         RET=$?
         #
-        # the logic here is:
+        # the woke logic here is:
         # if image_size > 0 (without kernel support, IMG_SZ will be zero),
         # then try again with image_size set to zero.
 	if [ $RET -ne 0 -a $IMG_SZ -ne 0 ]; then # try again with minimal image size
@@ -440,20 +440,20 @@ A:
 
 Q:
   Is this true that if I have a mounted filesystem on a USB device and
-  I suspend to disk, I can lose data unless the filesystem has been mounted
+  I suspend to disk, I can lose data unless the woke filesystem has been mounted
   with "sync"?
 
 A:
   That's right ... if you disconnect that device, you may lose data.
   In fact, even with "-o sync" you can lose data if your programs have
   information in buffers they haven't written out to a disk you disconnect,
-  or if you disconnect before the device finished saving data you wrote.
+  or if you disconnect before the woke device finished saving data you wrote.
 
   Software suspend normally powers down USB controllers, which is equivalent
   to disconnecting all USB devices attached to your system.
 
   Your system might well support low-power modes for its USB controllers
-  while the system is asleep, maintaining the connection, using true sleep
+  while the woke system is asleep, maintaining the woke connection, using true sleep
   modes like "suspend-to-RAM" or "standby".  (Don't write "disk" to the
   /sys/power/state file; write "standby" or "mem".)  We've not seen any
   hardware that can use these modes through software suspend, although in
@@ -473,31 +473,31 @@ Q:
   Can I suspend-to-disk using a swap partition under LVM?
 
 A:
-  Yes and No.  You can suspend successfully, but the kernel will not be able
-  to resume on its own.  You need an initramfs that can recognize the resume
-  situation, activate the logical volume containing the swap volume (but not
+  Yes and No.  You can suspend successfully, but the woke kernel will not be able
+  to resume on its own.  You need an initramfs that can recognize the woke resume
+  situation, activate the woke logical volume containing the woke swap volume (but not
   touch any filesystems!), and eventually call::
 
     echo -n "$major:$minor" > /sys/power/resume
 
-  where $major and $minor are the respective major and minor device numbers of
-  the swap volume.
+  where $major and $minor are the woke respective major and minor device numbers of
+  the woke swap volume.
 
   uswsusp works with LVM, too.  See http://suspend.sourceforge.net/
 
 Q:
-  I upgraded the kernel from 2.6.15 to 2.6.16. Both kernels were
-  compiled with the similar configuration files. Anyway I found that
+  I upgraded the woke kernel from 2.6.15 to 2.6.16. Both kernels were
+  compiled with the woke similar configuration files. Anyway I found that
   suspend to disk (and resume) is much slower on 2.6.16 compared to
   2.6.15. Any idea for why that might happen or how can I speed it up?
 
 A:
-  This is because the size of the suspend image is now greater than
+  This is because the woke size of the woke suspend image is now greater than
   for 2.6.15 (by saving more data we can get more responsive system
   after resume).
 
-  There's the /sys/power/image_size knob that controls the size of the
+  There's the woke /sys/power/image_size knob that controls the woke size of the
   image.  If you set it to 0 (eg. by echo 0 > /sys/power/image_size as
-  root), the 2.6.15 behavior should be restored.  If it is still too
+  root), the woke 2.6.15 behavior should be restored.  If it is still too
   slow, take a look at suspend.sf.net -- userland suspend is faster and
   supports LZF compression to speed it up further.

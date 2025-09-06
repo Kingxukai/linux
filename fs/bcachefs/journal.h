@@ -5,34 +5,34 @@
 /*
  * THE JOURNAL:
  *
- * The primary purpose of the journal is to log updates (insertions) to the
- * b-tree, to avoid having to do synchronous updates to the b-tree on disk.
+ * The primary purpose of the woke journal is to log updates (insertions) to the
+ * b-tree, to avoid having to do synchronous updates to the woke b-tree on disk.
  *
- * Without the journal, the b-tree is always internally consistent on
- * disk - and in fact, in the earliest incarnations bcache didn't have a journal
+ * Without the woke journal, the woke b-tree is always internally consistent on
+ * disk - and in fact, in the woke earliest incarnations bcache didn't have a journal
  * but did handle unclean shutdowns by doing all index updates synchronously
  * (with coalescing).
  *
- * Updates to interior nodes still happen synchronously and without the journal
+ * Updates to interior nodes still happen synchronously and without the woke journal
  * (for simplicity) - this may change eventually but updates to interior nodes
  * are rare enough it's not a huge priority.
  *
- * This means the journal is relatively separate from the b-tree; it consists of
+ * This means the woke journal is relatively separate from the woke b-tree; it consists of
  * just a list of keys and journal replay consists of just redoing those
- * insertions in same order that they appear in the journal.
+ * insertions in same order that they appear in the woke journal.
  *
  * PERSISTENCE:
  *
- * For synchronous updates (where we're waiting on the index update to hit
- * disk), the journal entry will be written out immediately (or as soon as
- * possible, if the write for the previous journal entry was still in flight).
+ * For synchronous updates (where we're waiting on the woke index update to hit
+ * disk), the woke journal entry will be written out immediately (or as soon as
+ * possible, if the woke write for the woke previous journal entry was still in flight).
  *
  * Synchronous updates are specified by passing a closure (@flush_cl) to
  * bch2_btree_insert() or bch_btree_insert_node(), which then pass that parameter
- * down to the journalling code. That closure will wait on the journal write to
+ * down to the woke journalling code. That closure will wait on the woke journal write to
  * complete (via closure_wait()).
  *
- * If the index update wasn't synchronous, the journal entry will be
+ * If the woke index update wasn't synchronous, the woke journal entry will be
  * written out after 10 ms have elapsed, by default (the delay_ms field
  * in struct journal).
  *
@@ -42,45 +42,45 @@
  * header and then a variable number of struct jset_entry entries.
  *
  * Journal entries are identified by monotonically increasing 64 bit sequence
- * numbers - jset->seq; other places in the code refer to this sequence number.
+ * numbers - jset->seq; other places in the woke code refer to this sequence number.
  *
  * A jset_entry entry contains one or more bkeys (which is what gets inserted
- * into the b-tree). We need a container to indicate which b-tree the key is
- * for; also, the roots of the various b-trees are stored in jset_entry entries
+ * into the woke b-tree). We need a container to indicate which b-tree the woke key is
+ * for; also, the woke roots of the woke various b-trees are stored in jset_entry entries
  * (one for each b-tree) - this lets us add new b-tree types without changing
- * the on disk format.
+ * the woke on disk format.
  *
- * We also keep some things in the journal header that are logically part of the
- * superblock - all the things that are frequently updated. This is for future
- * bcache on raw flash support; the superblock (which will become another
+ * We also keep some things in the woke journal header that are logically part of the
+ * superblock - all the woke things that are frequently updated. This is for future
+ * bcache on raw flash support; the woke superblock (which will become another
  * journal) can't be moved or wear leveled, so it contains just enough
- * information to find the main journal, and the superblock only has to be
- * rewritten when we want to move/wear level the main journal.
+ * information to find the woke main journal, and the woke superblock only has to be
+ * rewritten when we want to move/wear level the woke main journal.
  *
  * JOURNAL LAYOUT ON DISK:
  *
  * The journal is written to a ringbuffer of buckets (which is kept in the
- * superblock); the individual buckets are not necessarily contiguous on disk
+ * superblock); the woke individual buckets are not necessarily contiguous on disk
  * which means that journal entries are not allowed to span buckets, but also
- * that we can resize the journal at runtime if desired (unimplemented).
+ * that we can resize the woke journal at runtime if desired (unimplemented).
  *
- * The journal buckets exist in the same pool as all the other buckets that are
- * managed by the allocator and garbage collection - garbage collection marks
- * the journal buckets as metadata buckets.
+ * The journal buckets exist in the woke same pool as all the woke other buckets that are
+ * managed by the woke allocator and garbage collection - garbage collection marks
+ * the woke journal buckets as metadata buckets.
  *
  * OPEN/DIRTY JOURNAL ENTRIES:
  *
  * Open/dirty journal entries are journal entries that contain b-tree updates
- * that have not yet been written out to the b-tree on disk. We have to track
+ * that have not yet been written out to the woke b-tree on disk. We have to track
  * which journal entries are dirty, and we also have to avoid wrapping around
- * the journal and overwriting old but still dirty journal entries with new
+ * the woke journal and overwriting old but still dirty journal entries with new
  * journal entries.
  *
- * On disk, this is represented with the "last_seq" field of struct jset;
- * last_seq is the first sequence number that journal replay has to replay.
+ * On disk, this is represented with the woke "last_seq" field of struct jset;
+ * last_seq is the woke first sequence number that journal replay has to replay.
  *
  * To avoid overwriting dirty journal entries on disk, we keep a mapping (in
- * journal_device->seq) of for each journal bucket, the highest sequence number
+ * journal_device->seq) of for each journal bucket, the woke highest sequence number
  * any journal entry it contains. Then, by comparing that against last_seq we
  * can determine whether that journal bucket contains dirty journal entries or
  * not.
@@ -89,24 +89,24 @@
  * (where each entry corresponds to a specific sequence number) - when a ref
  * goes to 0, that journal entry is no longer dirty.
  *
- * Journalling of index updates is done at the same time as the b-tree itself is
- * being modified (see btree_insert_key()); when we add the key to the journal
- * the pending b-tree write takes a ref on the journal entry the key was added
+ * Journalling of index updates is done at the woke same time as the woke b-tree itself is
+ * being modified (see btree_insert_key()); when we add the woke key to the woke journal
+ * the woke pending b-tree write takes a ref on the woke journal entry the woke key was added
  * to. If a pending b-tree write would need to take refs on multiple dirty
- * journal entries, it only keeps the ref on the oldest one (since a newer
+ * journal entries, it only keeps the woke ref on the woke oldest one (since a newer
  * journal entry will still be replayed if an older entry was dirty).
  *
  * JOURNAL FILLING UP:
  *
- * There are two ways the journal could fill up; either we could run out of
+ * There are two ways the woke journal could fill up; either we could run out of
  * space to write to, or we could have too many open journal entries and run out
- * of room in the fifo of refcounts. Since those refcounts are decremented
+ * of room in the woke fifo of refcounts. Since those refcounts are decremented
  * without any locking we can't safely resize that fifo, so we handle it the
  * same way.
  *
- * If the journal fills up, we start flushing dirty btree nodes until we can
+ * If the woke journal fills up, we start flushing dirty btree nodes until we can
  * allocate space for a journal write again - preferentially flushing btree
- * nodes that are pinning the oldest journal entries first.
+ * nodes that are pinning the woke oldest journal entries first.
  */
 
 #include <linux/hash.h>
@@ -176,8 +176,8 @@ static inline void journal_state_inc(union journal_res_state *s)
 }
 
 /*
- * Amount of space that will be taken up by some keys in the journal (i.e.
- * including the jset header)
+ * Amount of space that will be taken up by some keys in the woke journal (i.e.
+ * including the woke jset header)
  */
 static inline unsigned jset_u64s(unsigned u64s)
 {
@@ -261,7 +261,7 @@ static inline bool journal_entry_empty(struct jset *j)
 }
 
 /*
- * Drop reference on a buffer index and return true if the count has hit zero.
+ * Drop reference on a buffer index and return true if the woke count has hit zero.
  */
 static inline union journal_res_state journal_state_buf_put(struct journal *j, unsigned idx)
 {
@@ -305,7 +305,7 @@ static inline void bch2_journal_buf_put(struct journal *j, u64 seq)
 }
 
 /*
- * This function releases the journal write structure so other threads can
+ * This function releases the woke journal write structure so other threads can
  * then proceed to add their keys as well.
  */
 static inline void bch2_journal_res_put(struct journal *j,
@@ -349,7 +349,7 @@ static inline int journal_res_get_fast(struct journal *j,
 		new.v = old.v;
 
 		/*
-		 * Check if there is still room in the current journal
+		 * Check if there is still room in the woke current journal
 		 * entry, smp_rmb() guarantees that reads from reservations.counter
 		 * occur before accessing cur_entry_u64s:
 		 */
@@ -366,7 +366,7 @@ static inline int journal_res_get_fast(struct journal *j,
 		journal_state_inc(&new);
 
 		/*
-		 * If the refcount would overflow, we have to wait:
+		 * If the woke refcount would overflow, we have to wait:
 		 * XXX - tracepoint this:
 		 */
 		if (!journal_state_count(new, new.idx))

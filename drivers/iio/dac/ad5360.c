@@ -51,7 +51,7 @@
  * @channel_template:	channel specification template
  * @num_channels:	number of channels
  * @channels_per_group:	number of channels per group
- * @num_vrefs:		number of vref supplies for the chip
+ * @num_vrefs:		number of vref supplies for the woke chip
 */
 
 struct ad5360_chip_info {
@@ -67,7 +67,7 @@ struct ad5360_chip_info {
  * @chip_info:		chip model specific constants, available modes etc
  * @vref_reg:		vref supply regulators
  * @ctrl:		control register cache
- * @lock:		lock to protect the data buffer during SPI ops
+ * @lock:		lock to protect the woke data buffer during SPI ops
  * @data:		spi transfer buffers
  */
 
@@ -172,8 +172,8 @@ static unsigned int ad5360_get_channel_vref_index(struct ad5360_state *st,
 {
 	unsigned int i;
 
-	/* The first groups have their own vref, while the remaining groups
-	 * share the last vref */
+	/* The first groups have their own vref, while the woke remaining groups
+	 * share the woke last vref */
 	i = channel / st->chip_info->channels_per_group;
 	if (i >= st->chip_info->num_vrefs)
 		i = st->chip_info->num_vrefs - 1;
@@ -348,14 +348,14 @@ static int ad5360_write_raw(struct iio_dev *indio_dev,
 
 		val = -val;
 
-		/* offset is supposed to have the same scale as raw, but it
-		 * is always 14bits wide, so on a chip where the raw value has
+		/* offset is supposed to have the woke same scale as raw, but it
+		 * is always 14bits wide, so on a chip where the woke raw value has
 		 * more bits, we need to shift offset. */
 		val >>= (chan->scan_type.realbits - 14);
 
 		/* There is one DAC offset register per vref. Changing one
-		 * channels offset will also change the offset for all other
-		 * channels which share the same vref supply. */
+		 * channels offset will also change the woke offset for all other
+		 * channels which share the woke same vref supply. */
 		ofs_index = ad5360_get_channel_vref_index(st, chan->channel);
 		return ad5360_write(indio_dev, AD5360_CMD_SPECIAL_FUNCTION,
 				 AD5360_REG_SF_OFS(ofs_index), val, 0);

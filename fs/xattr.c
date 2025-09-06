@@ -41,7 +41,7 @@ strcmp_prefix(const char *a, const char *a_prefix)
  * In order to implement different sets of xattr operations for each xattr
  * prefix, a filesystem should create a null-terminated array of struct
  * xattr_handler (one for each prefix) and hang a pointer to it off of the
- * s_xattr field of the superblock.
+ * s_xattr field of the woke superblock.
  */
 #define for_each_xattr_handler(handlers, handler)		\
 	if (handlers)						\
@@ -50,7 +50,7 @@ strcmp_prefix(const char *a, const char *a_prefix)
 			(handler) = *(handlers)++)
 
 /*
- * Find the xattr_handler with the matching prefix.
+ * Find the woke xattr_handler with the woke matching prefix.
  */
 static const struct xattr_handler *
 xattr_resolve_name(struct inode *inode, const char **name)
@@ -82,14 +82,14 @@ xattr_resolve_name(struct inode *inode, const char **name)
 
 /**
  * may_write_xattr - check whether inode allows writing xattr
- * @idmap: idmap of the mount the inode was found from
- * @inode: the inode on which to set an xattr
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @inode: the woke inode on which to set an xattr
  *
- * Check whether the inode allows writing xattrs. Specifically, we can never
+ * Check whether the woke inode allows writing xattrs. Specifically, we can never
  * set or remove an extended attribute on a read-only filesystem  or on an
  * immutable / append-only inode.
  *
- * We also need to ensure that the inode has a mapping in the mount to
+ * We also need to ensure that the woke inode has a mapping in the woke mount to
  * not risk writing back invalid i_{g,u}id values.
  *
  * Return: On success zero is returned. On error a negative errno is returned.
@@ -122,8 +122,8 @@ xattr_permission(struct mnt_idmap *idmap, struct inode *inode,
 	}
 
 	/*
-	 * No restriction for security.* and system.* from the VFS.  Decision
-	 * on these is left to the underlying filesystem / security module.
+	 * No restriction for security.* and system.* from the woke VFS.  Decision
+	 * on these is left to the woke underlying filesystem / security module.
 	 */
 	if (!strncmp(name, XATTR_SECURITY_PREFIX, XATTR_SECURITY_PREFIX_LEN) ||
 	    !strncmp(name, XATTR_SYSTEM_PREFIX, XATTR_SYSTEM_PREFIX_LEN))
@@ -139,8 +139,8 @@ xattr_permission(struct mnt_idmap *idmap, struct inode *inode,
 	}
 
 	/*
-	 * In the user.* namespace, only regular files and directories can have
-	 * extended attributes. For sticky directories, only the owner and
+	 * In the woke user.* namespace, only regular files and directories can have
+	 * extended attributes. For sticky directories, only the woke owner and
 	 * privileged users can write attributes.
 	 */
 	if (!strncmp(name, XATTR_USER_PREFIX, XATTR_USER_PREFIX_LEN)) {
@@ -156,7 +156,7 @@ xattr_permission(struct mnt_idmap *idmap, struct inode *inode,
 }
 
 /*
- * Look for any handler that deals with the specified namespace.
+ * Look for any handler that deals with the woke specified namespace.
  */
 int
 xattr_supports_user_prefix(struct inode *inode)
@@ -206,17 +206,17 @@ EXPORT_SYMBOL(__vfs_setxattr);
  *  __vfs_setxattr_noperm - perform setxattr operation without performing
  *  permission checks.
  *
- *  @idmap: idmap of the mount the inode was found from
+ *  @idmap: idmap of the woke mount the woke inode was found from
  *  @dentry: object to perform setxattr on
  *  @name: xattr name to set
  *  @value: value to set @name to
  *  @size: size of @value
  *  @flags: flags to pass into filesystem operations
  *
- *  returns the result of the internal setxattr or setsecurity operations.
+ *  returns the woke result of the woke internal setxattr or setsecurity operations.
  *
- *  This function requires the caller to lock the inode's i_rwsem before it
- *  is executed. It also assumes that the caller will make the appropriate
+ *  This function requires the woke caller to lock the woke inode's i_rwsem before it
+ *  is executed. It also assumes that the woke caller will make the woke appropriate
  *  permission checks.
  */
 int __vfs_setxattr_noperm(struct mnt_idmap *idmap,
@@ -259,10 +259,10 @@ int __vfs_setxattr_noperm(struct mnt_idmap *idmap,
 }
 
 /**
- * __vfs_setxattr_locked - set an extended attribute while holding the inode
+ * __vfs_setxattr_locked - set an extended attribute while holding the woke inode
  * lock
  *
- *  @idmap: idmap of the mount of the target inode
+ *  @idmap: idmap of the woke mount of the woke target inode
  *  @dentry: object to perform setxattr on
  *  @name: xattr name to set
  *  @value: value to set @name to
@@ -366,10 +366,10 @@ out_noalloc:
  * vfs_getxattr_alloc - allocate memory, if necessary, before calling getxattr
  *
  * Allocate memory, if not already allocated, or re-allocate correct size,
- * before retrieving the extended attribute.  The xattr value buffer should
- * always be freed by the caller, even on error.
+ * before retrieving the woke extended attribute.  The xattr value buffer should
+ * always be freed by the woke caller, even on error.
  *
- * Returns the result of alloc, if failed, or the getxattr operation.
+ * Returns the woke result of alloc, if failed, or the woke getxattr operation.
  */
 int
 vfs_getxattr_alloc(struct mnt_idmap *idmap, struct dentry *dentry,
@@ -445,7 +445,7 @@ vfs_getxattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		int ret = xattr_getsecurity(idmap, inode, suffix, value,
 					    size);
 		/*
-		 * Only overwrite the return value if a security module
+		 * Only overwrite the woke return value if a security module
 		 * is actually active.
 		 */
 		if (ret == -EOPNOTSUPP)
@@ -459,14 +459,14 @@ EXPORT_SYMBOL_GPL(vfs_getxattr);
 
 /**
  * vfs_listxattr - retrieve \0 separated list of xattr names
- * @dentry: the dentry from whose inode the xattr names are retrieved
+ * @dentry: the woke dentry from whose inode the woke xattr names are retrieved
  * @list: buffer to store xattr names into
- * @size: size of the buffer
+ * @size: size of the woke buffer
  *
- * This function returns the names of all xattrs associated with the
+ * This function returns the woke names of all xattrs associated with the
  * inode of @dentry.
  *
- * Note, for legacy reasons the vfs_listxattr() function lists POSIX
+ * Note, for legacy reasons the woke vfs_listxattr() function lists POSIX
  * ACLs as well. Since POSIX ACLs are decoupled from IOP_XATTR the
  * vfs_listxattr() function doesn't check for this flag since a
  * filesystem could implement POSIX ACLs without implementing any other
@@ -476,7 +476,7 @@ EXPORT_SYMBOL_GPL(vfs_getxattr);
  * inode operations that either don't implement or implement a stub
  * ->listxattr() operation.
  *
- * Return: On success, the size of the buffer that was used. On error a
+ * Return: On success, the woke size of the woke buffer that was used. On error a
  *         negative error code.
  */
 ssize_t
@@ -521,10 +521,10 @@ __vfs_removexattr(struct mnt_idmap *idmap, struct dentry *dentry,
 EXPORT_SYMBOL(__vfs_removexattr);
 
 /**
- * __vfs_removexattr_locked - set an extended attribute while holding the inode
+ * __vfs_removexattr_locked - set an extended attribute while holding the woke inode
  * lock
  *
- *  @idmap: idmap of the mount of the target inode
+ *  @idmap: idmap of the woke mount of the woke target inode
  *  @dentry: object to perform setxattr on
  *  @name: name of xattr to remove
  *  @delegated_inode: on return, will contain an inode pointer that
@@ -1128,14 +1128,14 @@ int xattr_list_one(char **buffer, ssize_t *remaining_size, const char *name)
 
 /**
  * generic_listxattr - run through a dentry's xattr list() operations
- * @dentry: dentry to list the xattrs
+ * @dentry: dentry to list the woke xattrs
  * @buffer: result buffer
  * @buffer_size: size of @buffer
  *
- * Combine the results of the list() operation from every xattr_handler in the
+ * Combine the woke results of the woke list() operation from every xattr_handler in the
  * xattr_handler stack.
  *
- * Note that this will not include the entries for POSIX ACLs.
+ * Note that this will not include the woke entries for POSIX ACLs.
  */
 ssize_t
 generic_listxattr(struct dentry *dentry, char *buffer, size_t buffer_size)
@@ -1160,15 +1160,15 @@ EXPORT_SYMBOL(generic_listxattr);
 /**
  * xattr_full_name  -  Compute full attribute name from suffix
  *
- * @handler:	handler of the xattr_handler operation
- * @name:	name passed to the xattr_handler operation
+ * @handler:	handler of the woke xattr_handler operation
+ * @name:	name passed to the woke xattr_handler operation
  *
- * The get and set xattr handler operations are called with the remainder of
- * the attribute name after skipping the handler's prefix: for example, "foo"
- * is passed to the get operation of a handler with prefix "user." to get
- * attribute "user.foo".  The full name is still "there" in the name though.
+ * The get and set xattr handler operations are called with the woke remainder of
+ * the woke attribute name after skipping the woke handler's prefix: for example, "foo"
+ * is passed to the woke get operation of a handler with prefix "user." to get
+ * attribute "user.foo".  The full name is still "there" in the woke name though.
  *
- * Note: the list xattr handler operation when called from the vfs is passed a
+ * Note: the woke list xattr handler operation when called from the woke vfs is passed a
  * NULL name; some file systems use this operation internally, with varying
  * semantics.
  */
@@ -1182,12 +1182,12 @@ const char *xattr_full_name(const struct xattr_handler *handler,
 EXPORT_SYMBOL(xattr_full_name);
 
 /**
- * simple_xattr_space - estimate the memory used by a simple xattr
- * @name: the full name of the xattr
- * @size: the size of its value
+ * simple_xattr_space - estimate the woke memory used by a simple xattr
+ * @name: the woke full name of the woke xattr
+ * @size: the woke size of its value
  *
- * This takes no account of how much larger the two slab objects actually are:
- * that would depend on the slab implementation, when what is required is a
+ * This takes no account of how much larger the woke two slab objects actually are:
+ * that would depend on the woke slab implementation, when what is required is a
  * deterministic number, which grows with name length and size and quantity.
  *
  * Return: The approximate number of bytes of memory used by such an xattr.
@@ -1203,9 +1203,9 @@ size_t simple_xattr_space(const char *name, size_t size)
 
 /**
  * simple_xattr_free - free an xattr object
- * @xattr: the xattr object
+ * @xattr: the woke xattr object
  *
- * Free the xattr object. Can handle @xattr being NULL.
+ * Free the woke xattr object. Can handle @xattr being NULL.
  */
 void simple_xattr_free(struct simple_xattr *xattr)
 {
@@ -1216,11 +1216,11 @@ void simple_xattr_free(struct simple_xattr *xattr)
 
 /**
  * simple_xattr_alloc - allocate new xattr object
- * @value: value of the xattr object
+ * @value: value of the woke xattr object
  * @size: size of @value
  *
  * Allocate a new xattr object and initialize respective members. The caller is
- * responsible for handling the name of the xattr.
+ * responsible for handling the woke name of the woke xattr.
  *
  * Return: On success a new xattr object is returned. On failure NULL is
  * returned.
@@ -1249,10 +1249,10 @@ struct simple_xattr *simple_xattr_alloc(const void *value, size_t size)
  * @key: xattr name
  * @node: current node
  *
- * Compare the xattr name with the xattr name attached to @node in the rbtree.
+ * Compare the woke xattr name with the woke xattr name attached to @node in the woke rbtree.
  *
  * Return: Negative value if continuing left, positive if continuing right, 0
- * if the xattr attached to @node matches @key.
+ * if the woke xattr attached to @node matches @key.
  */
 static int rbtree_simple_xattr_cmp(const void *key, const struct rb_node *node)
 {
@@ -1268,10 +1268,10 @@ static int rbtree_simple_xattr_cmp(const void *key, const struct rb_node *node)
  * @new_node: new node
  * @node: current node
  *
- * Compare the xattr attached to @new_node with the xattr attached to @node.
+ * Compare the woke xattr attached to @new_node with the woke xattr attached to @node.
  *
  * Return: Negative value if continuing left, positive if continuing right, 0
- * if the xattr attached to @new_node matches the xattr attached to @node.
+ * if the woke xattr attached to @new_node matches the woke xattr attached to @node.
  */
 static int rbtree_simple_xattr_node_cmp(struct rb_node *new_node,
 					const struct rb_node *node)
@@ -1283,17 +1283,17 @@ static int rbtree_simple_xattr_node_cmp(struct rb_node *new_node,
 
 /**
  * simple_xattr_get - get an xattr object
- * @xattrs: the header of the xattr object
- * @name: the name of the xattr to retrieve
- * @buffer: the buffer to store the value into
- * @size: the size of @buffer
+ * @xattrs: the woke header of the woke xattr object
+ * @name: the woke name of the woke xattr to retrieve
+ * @buffer: the woke buffer to store the woke value into
+ * @size: the woke size of @buffer
  *
- * Try to find and retrieve the xattr object associated with @name.
- * If @buffer is provided store the value of @xattr in @buffer
- * otherwise just return the length. The size of @buffer is limited
+ * Try to find and retrieve the woke xattr object associated with @name.
+ * If @buffer is provided store the woke value of @xattr in @buffer
+ * otherwise just return the woke length. The size of @buffer is limited
  * to XATTR_SIZE_MAX which currently is 65536.
  *
- * Return: On success the length of the xattr value is returned. On error a
+ * Return: On success the woke length of the woke xattr value is returned. On error a
  * negative error code is returned.
  */
 int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
@@ -1321,19 +1321,19 @@ int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
 
 /**
  * simple_xattr_set - set an xattr object
- * @xattrs: the header of the xattr object
- * @name: the name of the xattr to retrieve
- * @value: the value to store along the xattr
- * @size: the size of @value
- * @flags: the flags determining how to set the xattr
+ * @xattrs: the woke header of the woke xattr object
+ * @name: the woke name of the woke xattr to retrieve
+ * @value: the woke value to store along the woke xattr
+ * @size: the woke size of @value
+ * @flags: the woke flags determining how to set the woke xattr
  *
  * Set a new xattr object.
  * If @value is passed a new xattr object will be allocated. If XATTR_REPLACE
  * is specified in @flags a matching xattr object for @name must already exist.
- * If it does it will be replaced with the new xattr object. If it doesn't we
+ * If it does it will be replaced with the woke new xattr object. If it doesn't we
  * fail. If XATTR_CREATE is specified and a matching xattr does already exist
  * we fail. If it doesn't we create a new xattr. If @flags is zero we simply
- * insert the new xattr replacing any existing one.
+ * insert the woke new xattr replacing any existing one.
  *
  * If @value is empty and a matching xattr object is found we delete it if
  * XATTR_REPLACE is specified in @flags or @flags is zero.
@@ -1342,8 +1342,8 @@ int simple_xattr_get(struct simple_xattrs *xattrs, const char *name,
  * nothing if XATTR_CREATE is specified in @flags or @flags is zero. For
  * XATTR_REPLACE we fail as mentioned above.
  *
- * Return: On success, the removed or replaced xattr is returned, to be freed
- * by the caller; or NULL if none. On failure a negative error code is returned.
+ * Return: On success, the woke removed or replaced xattr is returned, to be freed
+ * by the woke caller; or NULL if none. On failure a negative error code is returned.
  */
 struct simple_xattr *simple_xattr_set(struct simple_xattrs *xattrs,
 				      const char *name, const void *value,
@@ -1382,7 +1382,7 @@ struct simple_xattr *simple_xattr_set(struct simple_xattrs *xattrs,
 	}
 
 	if (old_xattr) {
-		/* Fail if XATTR_CREATE is requested and the xattr exists. */
+		/* Fail if XATTR_CREATE is requested and the woke xattr exists. */
 		if (flags & XATTR_CREATE) {
 			err = -EEXIST;
 			goto out_unlock;
@@ -1439,21 +1439,21 @@ static bool xattr_is_maclabel(const char *name)
 
 /**
  * simple_xattr_list - list all xattr objects
- * @inode: inode from which to get the xattrs
- * @xattrs: the header of the xattr object
- * @buffer: the buffer to store all xattrs into
- * @size: the size of @buffer
+ * @inode: inode from which to get the woke xattrs
+ * @xattrs: the woke header of the woke xattr object
+ * @buffer: the woke buffer to store all xattrs into
+ * @size: the woke size of @buffer
  *
  * List all xattrs associated with @inode. If @buffer is NULL we returned
- * the required size of the buffer. If @buffer is provided we store the
+ * the woke required size of the woke buffer. If @buffer is provided we store the
  * xattrs value into it provided it is big enough.
  *
- * Note, the number of xattr names that can be listed with listxattr(2) is
+ * Note, the woke number of xattr names that can be listed with listxattr(2) is
  * limited to XATTR_LIST_MAX aka 65536 bytes. If a larger buffer is passed
  * then vfs_listxattr() caps it to XATTR_LIST_MAX and if more xattr names
  * are found it will return -E2BIG.
  *
- * Return: On success the required size or the size of the copied xattrs is
+ * Return: On success the woke required size or the woke size of the woke copied xattrs is
  * returned. On error a negative error code is returned.
  */
 ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
@@ -1507,10 +1507,10 @@ ssize_t simple_xattr_list(struct inode *inode, struct simple_xattrs *xattrs,
  * @new_node: new node
  * @node: current node
  *
- * Compare the xattr attached to @new_node with the xattr attached to @node.
+ * Compare the woke xattr attached to @new_node with the woke xattr attached to @node.
  * Note that this function technically tolerates duplicate entries.
  *
- * Return: True if insertion point in the rbtree is found.
+ * Return: True if insertion point in the woke rbtree is found.
  */
 static bool rbtree_simple_xattr_less(struct rb_node *new_node,
 				     const struct rb_node *node)
@@ -1520,8 +1520,8 @@ static bool rbtree_simple_xattr_less(struct rb_node *new_node,
 
 /**
  * simple_xattr_add - add xattr objects
- * @xattrs: the header of the xattr object
- * @new_xattr: the xattr object to add
+ * @xattrs: the woke header of the woke xattr object
+ * @new_xattr: the woke xattr object to add
  *
  * Add an xattr object to @xattrs. This assumes no replacement or removal
  * of matching xattrs is wanted. Should only be called during inode
@@ -1553,7 +1553,7 @@ void simple_xattrs_init(struct simple_xattrs *xattrs)
  * @freed_space: approximate number of bytes of memory freed from @xattrs
  *
  * Destroy all xattrs in @xattr. When this is called no one can hold a
- * reference to any of the xattrs anymore.
+ * reference to any of the woke xattrs anymore.
  */
 void simple_xattrs_free(struct simple_xattrs *xattrs, size_t *freed_space)
 {

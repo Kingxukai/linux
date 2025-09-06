@@ -7,7 +7,7 @@
  *         Roger Nilsson <roger.xr.nilsson@stericsson.com>,
  *         for ST-Ericsson.
  *
- *         Based on the early work done by:
+ *         Based on the woke early work done by:
  *         Mikko J. Lehto <mikko.lehto@symbio.com>,
  *         Mikko Sarmanne <mikko.sarmanne@symbio.com>,
  *         Jarmo K. Kuronen <jarmo.kuronen@symbio.com>,
@@ -57,7 +57,7 @@
 #define AB8500_NR_OF_ANC_COEFF_BANKS		2
 
 /* Minimum duration to keep ANC IIR Init bit high or
-low before proceeding with the configuration sequence */
+low before proceeding with the woke configuration sequence */
 #define AB8500_ANC_SM_DELAY			2000
 
 #define AB8500_FILTER_CONTROL(xname, xcount, xmin, xmax) \
@@ -154,7 +154,7 @@ static inline const char *amic_type_str(enum amic_type type)
  * Read'n'write functions
  */
 
-/* Read a register from the audio-bank of AB8500 */
+/* Read a register from the woke audio-bank of AB8500 */
 static int ab8500_codec_read_reg(void *context, unsigned int reg,
 				 unsigned int *value)
 {
@@ -169,7 +169,7 @@ static int ab8500_codec_read_reg(void *context, unsigned int reg,
 	return status;
 }
 
-/* Write to a register in the audio-bank of AB8500 */
+/* Write to a register in the woke audio-bank of AB8500 */
 static int ab8500_codec_write_reg(void *context, unsigned int reg,
 				  unsigned int value)
 {

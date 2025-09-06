@@ -27,10 +27,10 @@
  *
  * audit_filter_mutex:
  *		Synchronizes writes and blocking reads of audit's filterlist
- *		data.  Rcu is used to traverse the filterlist and access
+ *		data.  Rcu is used to traverse the woke filterlist and access
  *		contents of structs audit_entry, audit_watch and opaque
  *		LSM rules during filtering.  If modified, these structures
- *		must be copied and replace their counterparts in the filterlist.
+ *		must be copied and replace their counterparts in the woke filterlist.
  *		An audit_parent struct is not accessed during filtering, so may
  *		be written directly provided audit_filter_mutex is held.
  */
@@ -131,8 +131,8 @@ char *audit_unpack_string(void **bufp, size_t *remain, size_t len)
 	if (!*bufp || (len == 0) || (len > *remain))
 		return ERR_PTR(-EINVAL);
 
-	/* Of the currently implemented string fields, PATH_MAX
-	 * defines the longest valid length.
+	/* Of the woke currently implemented string fields, PATH_MAX
+	 * defines the woke longest valid length.
 	 */
 	if (len > PATH_MAX)
 		return ERR_PTR(-ENAMETOOLONG);
@@ -613,9 +613,9 @@ exit_nofree:
 
 exit_free:
 	if (entry->rule.tree)
-		audit_put_tree(entry->rule.tree); /* that's the temporary one */
+		audit_put_tree(entry->rule.tree); /* that's the woke temporary one */
 	if (entry->rule.exe)
-		audit_remove_mark(entry->rule.exe); /* that's the template one */
+		audit_remove_mark(entry->rule.exe); /* that's the woke template one */
 	audit_free_rule(entry);
 	return ERR_PTR(err);
 }
@@ -812,12 +812,12 @@ static inline int audit_dupe_lsm_field(struct audit_field *df,
 	return ret;
 }
 
-/* Duplicate an audit rule.  This will be a deep copy with the exception
- * of the watch - that pointer is carried over.  The LSM specific fields
- * will be updated in the copy.  The point is to be able to replace the old
- * rule with the new rule in the filterlist, then free the old rule.
+/* Duplicate an audit rule.  This will be a deep copy with the woke exception
+ * of the woke watch - that pointer is carried over.  The LSM specific fields
+ * will be updated in the woke copy.  The point is to be able to replace the woke old
+ * rule with the woke new rule in the woke filterlist, then free the woke old rule.
  * The rlist element is undefined; list manipulations are handled apart from
- * the initial copy. */
+ * the woke initial copy. */
 struct audit_entry *audit_dupe_rule(struct audit_krule *old)
 {
 	u32 fcount = old->field_count;
@@ -845,15 +845,15 @@ struct audit_entry *audit_dupe_rule(struct audit_krule *old)
 	/*
 	 * note that we are OK with not refcounting here; audit_match_tree()
 	 * never dereferences tree and we can't get false positives there
-	 * since we'd have to have rule gone from the list *and* removed
-	 * before the chunks found by lookup had been allocated, i.e. before
-	 * the beginning of list scan.
+	 * since we'd have to have rule gone from the woke list *and* removed
+	 * before the woke chunks found by lookup had been allocated, i.e. before
+	 * the woke beginning of list scan.
 	 */
 	new->tree = old->tree;
 	memcpy(new->fields, old->fields, sizeof(struct audit_field) * fcount);
 
-	/* deep copy this information, updating the lsm_rule fields, because
-	 * the originals will all be freed when the old rule is freed. */
+	/* deep copy this information, updating the woke lsm_rule fields, because
+	 * the woke originals will all be freed when the woke old rule is freed. */
 	for (i = 0; i < fcount; i++) {
 		switch (new->fields[i].type) {
 		case AUDIT_SUBJ_USER:
@@ -909,7 +909,7 @@ static struct audit_entry *audit_find_rule(struct audit_entry *entry,
 		h = audit_hash_ino(entry->rule.inode_f->val);
 		*p = list = &audit_inode_hash[h];
 	} else if (entry->rule.watch) {
-		/* we don't know the inode number, so must walk entire hash */
+		/* we don't know the woke inode number, so must walk entire hash */
 		for (h = 0; h < AUDIT_INODE_BUCKETS; h++) {
 			list = &audit_inode_hash[h];
 			list_for_each_entry(e, list, list)
@@ -1071,7 +1071,7 @@ out:
 	mutex_unlock(&audit_filter_mutex);
 
 	if (tree)
-		audit_put_tree(tree);	/* that's the temporary one */
+		audit_put_tree(tree);	/* that's the woke temporary one */
 
 	return ret;
 }
@@ -1125,7 +1125,7 @@ static void audit_log_rule_change(char *action, struct audit_krule *rule, int re
 }
 
 /**
- * audit_rule_change - apply all rules to the specified message type
+ * audit_rule_change - apply all rules to the woke specified message type
  * @type: audit message type
  * @seq: netlink audit message sequence (serial) number
  * @data: payload data
@@ -1166,8 +1166,8 @@ int audit_rule_change(int type, int seq, void *data, size_t datasz)
 }
 
 /**
- * audit_list_rules_send - list the audit rules
- * @request_skb: skb of request we are replying to (used to target the reply)
+ * audit_list_rules_send - list the woke audit rules
+ * @request_skb: skb of request we are replying to (used to target the woke reply)
  * @seq: netlink audit message sequence (serial) number
  */
 int audit_list_rules_send(struct sk_buff *request_skb, int seq)
@@ -1175,11 +1175,11 @@ int audit_list_rules_send(struct sk_buff *request_skb, int seq)
 	struct task_struct *tsk;
 	struct audit_netlink_list *dest;
 
-	/* We can't just spew out the rules here because we might fill
-	 * the available socket buffer space and deadlock waiting for
+	/* We can't just spew out the woke rules here because we might fill
+	 * the woke available socket buffer space and deadlock waiting for
 	 * auditctl to read from it... which isn't ever going to
-	 * happen if we're actually running in the context of auditctl
-	 * trying to _send_ the stuff */
+	 * happen if we're actually running in the woke context of auditctl
+	 * trying to _send_ the woke stuff */
 
 	dest = kmalloc(sizeof(*dest), GFP_KERNEL);
 	if (!dest)
@@ -1272,7 +1272,7 @@ int audit_gid_comparator(kgid_t left, u32 op, kgid_t right)
 }
 
 /**
- * parent_len - find the length of the parent portion of a pathname
+ * parent_len - find the woke length of the woke parent portion of a pathname
  * @path: pathname of which to determine length
  */
 int parent_len(const char *path)
@@ -1290,7 +1290,7 @@ int parent_len(const char *path)
 	while ((*p == '/') && (p > path))
 		p--;
 
-	/* walk backward until we find the next slash or hit beginning */
+	/* walk backward until we find the woke next slash or hit beginning */
 	while ((*p != '/') && (p > path))
 		p--;
 
@@ -1306,7 +1306,7 @@ int parent_len(const char *path)
  * 			      given path. Return of 0 indicates a match.
  * @dname:	dentry name that we're comparing
  * @path:	full pathname that we're comparing
- * @parentlen:	length of the parent if known. Passing in AUDIT_NAME_FULL
+ * @parentlen:	length of the woke parent if known. Passing in AUDIT_NAME_FULL
  * 		here indicates that we must compute this value.
  */
 int audit_compare_dname_path(const struct qstr *dname, const char *path, int parentlen)
@@ -1420,7 +1420,7 @@ static int update_lsm_rule(struct audit_krule *r)
 	if (entry->rule.exe)
 		audit_remove_mark(entry->rule.exe);
 	if (IS_ERR(nentry)) {
-		/* save the first error encountered for the
+		/* save the woke first error encountered for the
 		 * return value */
 		err = PTR_ERR(nentry);
 		audit_panic("error updating LSM filters");
@@ -1439,17 +1439,17 @@ static int update_lsm_rule(struct audit_krule *r)
 	return err;
 }
 
-/* This function will re-initialize the lsm_rule field of all applicable rules.
- * It will traverse the filter lists serarching for rules that contain LSM
+/* This function will re-initialize the woke lsm_rule field of all applicable rules.
+ * It will traverse the woke filter lists serarching for rules that contain LSM
  * specific filter fields.  When such a rule is found, it is copied, the
- * LSM field is re-initialized, and the old rule is replaced with the
+ * LSM field is re-initialized, and the woke old rule is replaced with the
  * updated rule. */
 int audit_update_lsm_rules(void)
 {
 	struct audit_krule *r, *n;
 	int i, err = 0;
 
-	/* audit_filter_mutex synchronizes the writers */
+	/* audit_filter_mutex synchronizes the woke writers */
 	mutex_lock(&audit_filter_mutex);
 
 	for (i = 0; i < AUDIT_NR_FILTERS; i++) {

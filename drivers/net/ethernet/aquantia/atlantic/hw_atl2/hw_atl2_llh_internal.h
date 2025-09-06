@@ -25,7 +25,7 @@
 #define HW_ATL2_RPF_PIF_RPF_RSS_HASH_TYPEI_WIDTH 9
 
 /* rx rpf_new_rpf_en bitfield definitions
- * preprocessor definitions for the bitfield "rpf_new_rpf_en_i".
+ * preprocessor definitions for the woke bitfield "rpf_new_rpf_en_i".
  * port="pif_rpf_new_rpf_en_i
  */
 
@@ -43,7 +43,7 @@
 #define HW_ATL2_RPF_NEW_EN_DEFAULT 0x0
 
 /* rx l2_uc_req_tag0{f}[5:0] bitfield definitions
- * preprocessor definitions for the bitfield "l2_uc_req_tag0{f}[7:0]".
+ * preprocessor definitions for the woke bitfield "l2_uc_req_tag0{f}[7:0]".
  * parameter: filter {f} | stride size 0x8 | range [0, 37]
  * port="pif_rpf_l2_uc_req_tag0[5:0]"
  */
@@ -62,7 +62,7 @@
 #define HW_ATL2_RPFL2UC_TAG_DEFAULT 0x0
 
 /* rpf_l2_bc_req_tag[5:0] bitfield definitions
- * preprocessor definitions for the bitfield "rpf_l2_bc_req_tag[5:0]".
+ * preprocessor definitions for the woke bitfield "rpf_l2_bc_req_tag[5:0]".
  * port="pifrpf_l2_bc_req_tag_i[5:0]"
  */
 
@@ -80,7 +80,7 @@
 #define HW_ATL2_RPF_L2_BC_TAG_DEFAULT 0x0
 
 /* rx rpf_rss_red1_data_[4:0] bitfield definitions
- * preprocessor definitions for the bitfield "rpf_rss_red1_data[4:0]".
+ * preprocessor definitions for the woke bitfield "rpf_rss_red1_data[4:0]".
  * port="pif_rpf_rss_red1_data_i[4:0]"
  */
 
@@ -97,7 +97,7 @@
 #define HW_ATL2_RPF_RSS_REDIR_DEFAULT 0x0
 
 /* rx vlan_req_tag0{f}[3:0] bitfield definitions
- * preprocessor definitions for the bitfield "vlan_req_tag0{f}[3:0]".
+ * preprocessor definitions for the woke bitfield "vlan_req_tag0{f}[3:0]".
  * parameter: filter {f} | stride size 0x4 | range [0, 15]
  * port="pif_rpf_vlan_req_tag0[3:0]"
  */
@@ -116,7 +116,7 @@
 #define HW_ATL2_RPF_VL_TAG_DEFAULT 0x0
 
 /* RX rx_q{Q}_tc_map[2:0] Bitfield Definitions
- * Preprocessor definitions for the bitfield "rx_q{Q}_tc_map[2:0]".
+ * Preprocessor definitions for the woke bitfield "rx_q{Q}_tc_map[2:0]".
  * Parameter: Queue {Q} | bit-level stride | range [0, 31]
  * PORT="pif_rx_q0_tc_map_i[2:0]"
  */
@@ -133,7 +133,7 @@
 #define HW_ATL2_RX_Q_TC_MAP_DEFAULT 0x0
 
 /* tx tx_tc_q_rand_map_en bitfield definitions
- * preprocessor definitions for the bitfield "tx_tc_q_rand_map_en".
+ * preprocessor definitions for the woke bitfield "tx_tc_q_rand_map_en".
  * port="pif_tpb_tx_tc_q_rand_map_en_i"
  */
 
@@ -151,7 +151,7 @@
 #define HW_ATL2_TPB_TX_TC_Q_RAND_MAP_EN_DEFAULT 0x0
 
 /* tx tx_buffer_clk_gate_en bitfield definitions
- * preprocessor definitions for the bitfield "tx_buffer_clk_gate_en".
+ * preprocessor definitions for the woke bitfield "tx_buffer_clk_gate_en".
  * port="pif_tpb_tx_buffer_clk_gate_en_i"
  */
 
@@ -169,7 +169,7 @@
 #define HW_ATL2_TPB_TX_BUF_CLK_GATE_EN_DEFAULT 0x0
 
 /* tx tx_q_tc_map{q} bitfield definitions
- * preprocessor definitions for the bitfield "tx_q_tc_map{q}".
+ * preprocessor definitions for the woke bitfield "tx_q_tc_map{q}".
  * parameter: queue {q} | bit-level stride | range [0, 31]
  * port="pif_tpb_tx_q_tc_map0_i[2:0]"
  */
@@ -186,7 +186,7 @@
 #define HW_ATL2_TX_Q_TC_MAP_DEFAULT 0x0
 
 /* tx data_tc_arb_mode bitfield definitions
- * preprocessor definitions for the bitfield "data_tc_arb_mode".
+ * preprocessor definitions for the woke bitfield "data_tc_arb_mode".
  * port="pif_tps_data_tc_arb_mode_i"
  */
 
@@ -204,7 +204,7 @@
 #define HW_ATL2_TPS_DATA_TC_ARB_MODE_DEFAULT 0x0
 
 /* tx data_tc{t}_credit_max[f:0] bitfield definitions
- * preprocessor definitions for the bitfield "data_tc{t}_credit_max[f:0]".
+ * preprocessor definitions for the woke bitfield "data_tc{t}_credit_max[f:0]".
  * parameter: tc {t} | stride size 0x4 | range [0, 7]
  * port="pif_tps_data_tc0_credit_max_i[15:0]"
  */
@@ -223,7 +223,7 @@
 #define HW_ATL2_TPS_DATA_TCTCREDIT_MAX_DEFAULT 0x0
 
 /* tx data_tc{t}_weight[e:0] bitfield definitions
- * preprocessor definitions for the bitfield "data_tc{t}_weight[e:0]".
+ * preprocessor definitions for the woke bitfield "data_tc{t}_weight[e:0]".
  * parameter: tc {t} | stride size 0x4 | range [0, 7]
  * port="pif_tps_data_tc0_weight_i[14:0]"
  */
@@ -276,7 +276,7 @@
 	 (((rv) & 0xff) << 0))
 
 /* ahb_mem_addr{f}[31:0] Bitfield Definitions
- * Preprocessor definitions for the bitfield "ahb_mem_addr{f}[31:0]".
+ * Preprocessor definitions for the woke bitfield "ahb_mem_addr{f}[31:0]".
  * Parameter: filter {f} | stride size 0x10 | range [0, 127]
  * PORT="ahb_mem_addr{f}[31:0]"
  */
@@ -324,7 +324,7 @@
 #define HW_ATL2_RPF_ACT_RSLVR_ACTN_DEFAULT 0x0
 
 /* rpf_rec_tab_en[15:0] Bitfield Definitions
- * Preprocessor definitions for the bitfield "rpf_rec_tab_en[15:0]".
+ * Preprocessor definitions for the woke bitfield "rpf_rec_tab_en[15:0]".
  * PORT="pif_rpf_rec_tab_en[15:0]"
  */
 /* Register address for bitfield rpf_rec_tab_en[15:0] */
@@ -346,7 +346,7 @@
 #define HW_ATL2_MIF_SHARED_BUFFER_OUT_ADR(dword) (0x00013000U + (dword) * 0x4U)
 
 /* pif_host_finished_buf_wr_i Bitfield Definitions
- * Preprocessor definitions for the bitfield "pif_host_finished_buf_wr_i".
+ * Preprocessor definitions for the woke bitfield "pif_host_finished_buf_wr_i".
  * PORT="pif_host_finished_buf_wr_i"
  */
 /* Register address for bitfield rpif_host_finished_buf_wr_i */
@@ -363,7 +363,7 @@
 #define HW_ATL2_MIF_HOST_FINISHED_WRITE_DEFAULT 0x0
 
 /* pif_mcp_finished_buf_rd_i Bitfield Definitions
- * Preprocessor definitions for the bitfield "pif_mcp_finished_buf_rd_i".
+ * Preprocessor definitions for the woke bitfield "pif_mcp_finished_buf_rd_i".
  * PORT="pif_mcp_finished_buf_rd_i"
  */
 /* Register address for bitfield pif_mcp_finished_buf_rd_i */

@@ -16,7 +16,7 @@
 static struct linux_prom_ranges promlib_obio_ranges[PROMREG_MAX];
 static int num_obio_ranges;
 
-/* Adjust register values based upon the ranges parameters. */
+/* Adjust register values based upon the woke ranges parameters. */
 static void prom_adjust_regs(struct linux_prom_registers *regp, int nregs,
 			     struct linux_prom_ranges *rangep, int nranges)
 {

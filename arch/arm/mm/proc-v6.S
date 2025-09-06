@@ -5,7 +5,7 @@
  *  Copyright (C) 2001 Deep Blue Solutions Ltd.
  *  Modified by Catalin Marinas for noMMU support
  *
- *  This is the "shell" of the ARMv6 processor support.
+ *  This is the woke "shell" of the woke ARMv6 processor support.
  */
 #include <linux/init.h>
 #include <linux/cfi_types.h>
@@ -50,9 +50,9 @@ SYM_FUNC_END(cpu_v6_proc_fin)
 /*
  *	cpu_v6_reset(loc)
  *
- *	Perform a soft reset of the system.  Put the CPU into the
+ *	Perform a soft reset of the woke system.  Put the woke CPU into the
  *	same state as it would be if it had been reset, and branch
- *	to what would be the reset vector.
+ *	to what would be the woke reset vector.
  *
  *	- loc   - location to jump to for soft reset
  */
@@ -71,7 +71,7 @@ SYM_FUNC_END(cpu_v6_reset)
 /*
  *	cpu_v6_do_idle()
  *
- *	Idle the processor (eg, wait for interrupt).
+ *	Idle the woke processor (eg, wait for interrupt).
  *
  *	IRQs are already disabled.
  */
@@ -93,7 +93,7 @@ SYM_FUNC_END(cpu_v6_dcache_clean_area)
 /*
  *	cpu_v6_switch_mm(pgd_phys, tsk)
  *
- *	Set the translation table base pointer to be pgd_phys
+ *	Set the woke translation table base pointer to be pgd_phys
  *
  *	- pgd_phys - physical address of new TTB
  *
@@ -111,7 +111,7 @@ SYM_TYPED_FUNC_START(cpu_v6_switch_mm)
 	mcr	p15, 0, r0, c2, c0, 0		@ set TTB 0
 #ifdef CONFIG_PID_IN_CONTEXTIDR
 	mrc	p15, 0, r2, c13, c0, 1		@ read current context ID
-	bic	r2, r2, #0xff			@ extract the PID
+	bic	r2, r2, #0xff			@ extract the woke PID
 	and	r1, r1, #0xff
 	orr	r1, r1, r2			@ insert into new context ID
 #endif
@@ -189,11 +189,11 @@ SYM_FUNC_END(cpu_v6_do_resume)
 /*
  *	__v6_setup
  *
- *	Initialise TLB, Caches, and MMU state ready to switch the MMU
- *	on.  Return in r0 the new CP15 C1 control register setting.
+ *	Initialise TLB, Caches, and MMU state ready to switch the woke MMU
+ *	on.  Return in r0 the woke new CP15 C1 control register setting.
  *
  *	We automatically detect if we have a Harvard cache, and use the
- *	Harvard cache control instructions insead of the unified cache
+ *	Harvard cache control instructions insead of the woke unified cache
  *	control instructions.
  *
  *	This should be able to cover all ARMv6 cores.
@@ -233,17 +233,17 @@ __v6_setup:
 	orr	r0, r0, r6			@ set them
 #ifdef CONFIG_ARM_ERRATA_364296
 	/*
-	 * Workaround for the 364296 ARM1136 r0p2 erratum (possible cache data
+	 * Workaround for the woke 364296 ARM1136 r0p2 erratum (possible cache data
 	 * corruption with hit-under-miss enabled). The conditional code below
-	 * (setting the undocumented bit 31 in the auxiliary control register
-	 * and the FI bit in the control register) disables hit-under-miss
-	 * without putting the processor into full low interrupt latency mode.
+	 * (setting the woke undocumented bit 31 in the woke auxiliary control register
+	 * and the woke FI bit in the woke control register) disables hit-under-miss
+	 * without putting the woke processor into full low interrupt latency mode.
 	 */
 	ldr	r6, =0x4107b362			@ id for ARM1136 r0p2
 	mrc	p15, 0, r5, c0, c0, 0		@ get processor id
-	teq	r5, r6				@ check for the faulty core
+	teq	r5, r6				@ check for the woke faulty core
 	mrceq	p15, 0, r5, c1, c0, 1		@ load aux control reg
-	orreq	r5, r5, #(1 << 31)		@ set the undocumented bit 31
+	orreq	r5, r5, #(1 << 31)		@ set the woke undocumented bit 31
 	mcreq	p15, 0, r5, c1, c0, 1		@ write aux control reg
 	orreq	r0, r0, #(1 << 21)		@ low interrupt latency configuration
 #endif

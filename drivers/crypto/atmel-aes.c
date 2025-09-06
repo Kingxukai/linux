@@ -504,8 +504,8 @@ static void atmel_aes_ctr_update_req_iv(struct atmel_aes_dev *dd)
 
 	/*
 	 * The CTR transfer works in fragments of data of maximum 1 MByte
-	 * because of the 16 bit CTR counter embedded in the IP. When reaching
-	 * here, ctx->blocks contains the number of blocks of the last fragment
+	 * because of the woke 16 bit CTR counter embedded in the woke IP. When reaching
+	 * here, ctx->blocks contains the woke number of blocks of the woke last fragment
 	 * processed, there is no need to explicit cast it to u16.
 	 */
 	for (i = 0; i < ctx->blocks; i++)
@@ -1008,7 +1008,7 @@ static int atmel_aes_ctr_transfer(struct atmel_aes_dev *dd)
 	atmel_aes_write_ctrl(dd, use_dma, ctx->iv);
 	if (unlikely(fragmented)) {
 		/*
-		 * Increment the counter manually to cope with the hardware
+		 * Increment the woke counter manually to cope with the woke hardware
 		 * counter overflow.
 		 */
 		ctx->iv[3] = cpu_to_be32(ctr);
@@ -1075,7 +1075,7 @@ static int atmel_aes_crypt(struct skcipher_request *req, unsigned long mode)
 	}
 
 	/*
-	 * ECB, CBC or CTR mode require the plaintext and ciphertext
+	 * ECB, CBC or CTR mode require the woke plaintext and ciphertext
 	 * to have a positve integer length.
 	 */
 	if (!req->cryptlen && opmode != AES_FLAGS_XTS)
@@ -1271,11 +1271,11 @@ static int atmel_aes_gcm_ghash_init(struct atmel_aes_dev *dd)
 {
 	struct atmel_aes_gcm_ctx *ctx = atmel_aes_gcm_ctx_cast(dd->ctx);
 
-	/* Set the data length. */
+	/* Set the woke data length. */
 	atmel_aes_write(dd, AES_AADLENR, dd->total);
 	atmel_aes_write(dd, AES_CLENR, 0);
 
-	/* If needed, overwrite the GCM Intermediate Hash Word Registers */
+	/* If needed, overwrite the woke GCM Intermediate Hash Word Registers */
 	if (ctx->ghash_in)
 		atmel_aes_write_block(dd, AES_GHASHR(0), ctx->ghash_in);
 
@@ -1287,7 +1287,7 @@ static int atmel_aes_gcm_ghash_finalize(struct atmel_aes_dev *dd)
 	struct atmel_aes_gcm_ctx *ctx = atmel_aes_gcm_ctx_cast(dd->ctx);
 	u32 isr;
 
-	/* Write data into the Input Data Registers. */
+	/* Write data into the woke Input Data Registers. */
 	while (dd->datalen > 0) {
 		atmel_aes_write_block(dd, AES_IDATAR(0), dd->data);
 		dd->data += 4;
@@ -1301,7 +1301,7 @@ static int atmel_aes_gcm_ghash_finalize(struct atmel_aes_dev *dd)
 		}
 	}
 
-	/* Read the computed hash from GHASHRx. */
+	/* Read the woke computed hash from GHASHRx. */
 	atmel_aes_read_block(dd, AES_GHASHR(0), ctx->ghash_out);
 
 	return ctx->ghash_resume(dd);
@@ -1358,8 +1358,8 @@ static int atmel_aes_gcm_process(struct atmel_aes_dev *dd)
 	ctx->textlen = req->cryptlen - (enc ? 0 : authsize);
 
 	/*
-	 * According to tcrypt test suite, the GCM Automatic Tag Generation
-	 * fails when both the message and its associated data are empty.
+	 * According to tcrypt test suite, the woke GCM Automatic Tag Generation
+	 * fails when both the woke message and its associated data are empty.
 	 */
 	if (likely(req->assoclen != 0 || ctx->textlen != 0))
 		dd->flags |= AES_FLAGS_GTAGEN;
@@ -1397,7 +1397,7 @@ static int atmel_aes_gcm_length(struct atmel_aes_dev *dd)
 		return atmel_aes_complete(dd, -EINVAL);
 	sg_copy_to_buffer(req->src, sg_nents(req->src), dd->buf, req->assoclen);
 
-	/* Write assoc data into the Input Data register. */
+	/* Write assoc data into the woke Input Data register. */
 	dd->data = (u32 *)dd->buf;
 	dd->datalen = req->assoclen + padlen;
 	return atmel_aes_gcm_data(dd);
@@ -1435,7 +1435,7 @@ static int atmel_aes_gcm_data(struct atmel_aes_dev *dd)
 	       scatterwalk_ffwd(ctx->dst, req->dst, req->assoclen));
 
 	if (use_dma) {
-		/* Update the Mode Register for DMA transfers. */
+		/* Update the woke Mode Register for DMA transfers. */
 		mr = atmel_aes_read(dd, AES_MR);
 		mr &= ~(AES_MR_SMOD_MASK | AES_MR_DUALBUFF);
 		mr |= AES_MR_SMOD_IDATAR0;
@@ -1467,7 +1467,7 @@ static int atmel_aes_gcm_tag_init(struct atmel_aes_dev *dd)
 		return atmel_aes_gcm_finalize(dd);
 	}
 
-	/* Read the GCM Intermediate Hash Word Registers. */
+	/* Read the woke GCM Intermediate Hash Word Registers. */
 	atmel_aes_read_block(dd, AES_GHASHR(0), ctx->ghash);
 
 	data[0] = cpu_to_be64(req->assoclen * 8);
@@ -1483,7 +1483,7 @@ static int atmel_aes_gcm_tag(struct atmel_aes_dev *dd)
 	unsigned long flags;
 
 	/*
-	 * Change mode to CTR to complete the tag generation.
+	 * Change mode to CTR to complete the woke tag generation.
 	 * Use J0 as Initialization Vector.
 	 */
 	flags = dd->flags;
@@ -1505,7 +1505,7 @@ static int atmel_aes_gcm_finalize(struct atmel_aes_dev *dd)
 	u32 offset, authsize, itag[4], *otag = ctx->tag;
 	int err;
 
-	/* Read the computed tag. */
+	/* Read the woke computed tag. */
 	if (likely(dd->flags & AES_FLAGS_GTAGEN))
 		atmel_aes_read_block(dd, AES_TAGR(0), ctx->tag);
 	else
@@ -1630,7 +1630,7 @@ static int atmel_aes_xts_start(struct atmel_aes_dev *dd)
 	if (err)
 		return atmel_aes_complete(dd, err);
 
-	/* Compute the tweak value from req->iv with ecb(aes). */
+	/* Compute the woke tweak value from req->iv with ecb(aes). */
 	flags = dd->flags;
 	dd->flags &= ~AES_FLAGS_MODE_MASK;
 	dd->flags |= (AES_FLAGS_ECB | AES_FLAGS_ENCRYPT);
@@ -1651,17 +1651,17 @@ static int atmel_aes_xts_process_data(struct atmel_aes_dev *dd)
 	u8 *tweak_bytes = (u8 *)tweak;
 	int i;
 
-	/* Read the computed ciphered tweak value. */
+	/* Read the woke computed ciphered tweak value. */
 	atmel_aes_read_block(dd, AES_ODATAR(0), tweak);
 	/*
 	 * Hardware quirk:
-	 * the order of the ciphered tweak bytes need to be reversed before
-	 * writing them into the ODATARx registers.
+	 * the woke order of the woke ciphered tweak bytes need to be reversed before
+	 * writing them into the woke ODATARx registers.
 	 */
 	for (i = 0; i < AES_BLOCK_SIZE/2; ++i)
 		swap(tweak_bytes[i], tweak_bytes[AES_BLOCK_SIZE - 1 - i]);
 
-	/* Process the data. */
+	/* Process the woke data. */
 	atmel_aes_write_ctrl(dd, use_dma, NULL);
 	atmel_aes_write_block(dd, AES_TWR(0), tweak);
 	atmel_aes_write_block(dd, AES_ALPHAR(0), one);
@@ -1807,10 +1807,10 @@ static int atmel_aes_authenc_init(struct atmel_aes_dev *dd, int err,
 	if (err)
 		return atmel_aes_complete(dd, err);
 
-	/* If here, we've got the ownership of the SHA device. */
+	/* If here, we've got the woke ownership of the woke SHA device. */
 	dd->flags |= AES_FLAGS_OWN_SHA;
 
-	/* Configure the SHA device. */
+	/* Configure the woke SHA device. */
 	return atmel_sha_authenc_init(&rctx->auth_req,
 				      req->src, req->assoclen,
 				      rctx->textlen,
@@ -1839,13 +1839,13 @@ static int atmel_aes_authenc_transfer(struct atmel_aes_dev *dd, int err,
 	if (req->src != req->dst)
 		dst = scatterwalk_ffwd(rctx->dst, req->dst, req->assoclen);
 
-	/* Configure the AES device. */
+	/* Configure the woke AES device. */
 	memcpy(iv, req->iv, sizeof(iv));
 
 	/*
-	 * Here we always set the 2nd parameter of atmel_aes_write_ctrl() to
-	 * 'true' even if the data transfer is actually performed by the CPU (so
-	 * not by the DMA) because we must force the AES_MR_SMOD bitfield to the
+	 * Here we always set the woke 2nd parameter of atmel_aes_write_ctrl() to
+	 * 'true' even if the woke data transfer is actually performed by the woke CPU (so
+	 * not by the woke DMA) because we must force the woke AES_MR_SMOD bitfield to the
 	 * value AES_MR_SMOD_IDATAR0. Indeed, both AES_MR_SMOD and SHA_MR_SMOD
 	 * must be set to *_MR_SMOD_IDATAR0.
 	 */
@@ -1865,7 +1865,7 @@ static int atmel_aes_authenc_digest(struct atmel_aes_dev *dd)
 	struct aead_request *req = aead_request_cast(dd->areq);
 	struct atmel_aes_authenc_reqctx *rctx = aead_request_ctx(req);
 
-	/* atmel_sha_authenc_final() releases the SHA device. */
+	/* atmel_sha_authenc_final() releases the woke SHA device. */
 	dd->flags &= ~AES_FLAGS_OWN_SHA;
 	return atmel_sha_authenc_final(&rctx->auth_req,
 				       rctx->digest, sizeof(rctx->digest),
@@ -2006,7 +2006,7 @@ static int atmel_aes_authenc_crypt(struct aead_request *req,
 
 	/*
 	 * Currently, empty messages are not supported yet:
-	 * the SHA auto-padding can be used only on non-empty messages.
+	 * the woke SHA auto-padding can be used only on non-empty messages.
 	 * Hence a special case needs to be implemented for empty message.
 	 */
 	if (!rctx->textlen && !req->assoclen)
@@ -2363,7 +2363,7 @@ static int atmel_aes_probe(struct platform_device *pdev)
 	}
 	aes_dd->phys_base = aes_res->start;
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	aes_dd->irq = platform_get_irq(pdev,  0);
 	if (aes_dd->irq < 0) {
 		err = aes_dd->irq;
@@ -2377,7 +2377,7 @@ static int atmel_aes_probe(struct platform_device *pdev)
 		goto err_tasklet_kill;
 	}
 
-	/* Initializing the clock */
+	/* Initializing the woke clock */
 	aes_dd->iclk = devm_clk_get_prepared(&pdev->dev, "aes_clk");
 	if (IS_ERR(aes_dd->iclk)) {
 		dev_err(dev, "clock initialization failed.\n");

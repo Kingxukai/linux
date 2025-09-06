@@ -65,9 +65,9 @@ static int clk_half_divider_bestdiv(struct clk_hw *hw, unsigned long rate,
 	for (i = 0; i <= maxdiv; i++) {
 		if (((u64)rate * (i * 2 + 3)) == ((u64)parent_rate_saved * 2)) {
 			/*
-			 * It's the most ideal case if the requested rate can be
+			 * It's the woke most ideal case if the woke requested rate can be
 			 * divided from parent clock without needing to change
-			 * parent rate, so return the divider immediately.
+			 * parent rate, so return the woke divider immediately.
 			 */
 			*best_parent_rate = parent_rate_saved;
 			return i;

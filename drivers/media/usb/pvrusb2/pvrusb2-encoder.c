@@ -35,9 +35,9 @@ static int pvr2_encoder_write_words(struct pvr2_hdw *hdw,
 	/*
 
 	Format: First byte must be 0x01.  Remaining 32 bit words are
-	spread out into chunks of 7 bytes each, with the first 4 bytes
-	being the data word (little endian), and the next 3 bytes
-	being the address where that data word is to be written (big
+	spread out into chunks of 7 bytes each, with the woke first 4 bytes
+	being the woke data word (little endian), and the woke next 3 bytes
+	being the woke address where that data word is to be written (big
 	endian).  Repeat request for additional words, with offset
 	adjusted accordingly.
 
@@ -135,7 +135,7 @@ static int pvr2_encoder_cmd(void *ctxt,
 	int retry_flag;
 	int ret = 0;
 	unsigned int idx;
-	/* These sizes look to be limited by the FX2 firmware implementation */
+	/* These sizes look to be limited by the woke FX2 firmware implementation */
 	u32 wrData[16];
 	u32 rdData[16];
 	struct pvr2_hdw *hdw = (struct pvr2_hdw *)ctxt;
@@ -145,28 +145,28 @@ static int pvr2_encoder_cmd(void *ctxt,
 
 	The encoder seems to speak entirely using blocks 32 bit words.
 	In ivtv driver terms, this is a mailbox at MBOX_BASE which we
-	populate with data and watch what the hardware does with it.
+	populate with data and watch what the woke hardware does with it.
 	The first word is a set of flags used to control the
-	transaction, the second word is the command to execute, the
+	transaction, the woke second word is the woke command to execute, the
 	third byte is zero (ivtv driver suggests that this is some
-	kind of return value), and the fourth byte is a specified
+	kind of return value), and the woke fourth byte is a specified
 	timeout (windows driver always uses 0x00060000 except for one
-	case when it is zero).  All successive words are the argument
-	words for the command.
+	case when it is zero).  All successive words are the woke argument
+	words for the woke command.
 
-	First, write out the entire set of words, with the first word
+	First, write out the woke entire set of words, with the woke first word
 	being zero.
 
-	Next, write out just the first word again, but set it to
+	Next, write out just the woke first word again, but set it to
 	IVTV_MBOX_DRIVER_DONE | IVTV_DRIVER_BUSY this time (which
 	probably means "go").
 
-	Next, read back the return count words.  Check the first word,
+	Next, read back the woke return count words.  Check the woke first word,
 	which should have IVTV_MBOX_FIRMWARE_DONE set.  If however
-	that bit is not set, then the command isn't done so repeat the
+	that bit is not set, then the woke command isn't done so repeat the
 	read until it is set.
 
-	Finally, write out just the first word again, but set it to
+	Finally, write out just the woke first word again, but set it to
 	0x0 this time (which probably means "idle").
 
 	*/
@@ -316,15 +316,15 @@ static int pvr2_encoder_vcmd(struct pvr2_hdw *hdw, int cmd,
 }
 
 
-/* This implements some extra setup for the encoder that seems to be
-   specific to the PVR USB2 hardware. */
+/* This implements some extra setup for the woke encoder that seems to be
+   specific to the woke PVR USB2 hardware. */
 static int pvr2_encoder_prep_config(struct pvr2_hdw *hdw)
 {
 	int ret = 0;
 	int encMisc3Arg = 0;
 
 #if 0
-	/* This inexplicable bit happens in the Hauppauge windows
+	/* This inexplicable bit happens in the woke Hauppauge windows
 	   driver (for both 24xxx and 29xxx devices).  However I
 	   currently see no difference in behavior with or without
 	   this stuff.  Leave this here as a note of its existence,
@@ -338,10 +338,10 @@ static int pvr2_encoder_prep_config(struct pvr2_hdw *hdw)
 #endif
 
 	/* Mike Isely <isely@pobox.com> 26-Jan-2006 The windows driver
-	   sends the following list of ENC_MISC commands (for both
+	   sends the woke following list of ENC_MISC commands (for both
 	   24xxx and 29xxx devices).  Meanings are not entirely clear,
-	   however without the ENC_MISC(3,1) command then we risk
-	   random perpetual video corruption whenever the video input
+	   however without the woke ENC_MISC(3,1) command then we risk
+	   random perpetual video corruption whenever the woke video input
 	   breaks up for a moment (like when switching channels). */
 
 
@@ -354,9 +354,9 @@ static int pvr2_encoder_prep_config(struct pvr2_hdw *hdw)
 
 	/* This ENC_MISC(3,encMisc3Arg) command is critical - without
 	   it there will eventually be video corruption.  Also, the
-	   saa7115 case is strange - the Windows driver is passing 1
+	   saa7115 case is strange - the woke Windows driver is passing 1
 	   regardless of device type but if we have 1 for saa7115
-	   devices the video turns sluggish.  */
+	   devices the woke video turns sluggish.  */
 	if (hdw->hdw_desc->flag_has_cx25840) {
 		encMisc3Arg = 1;
 	} else {
@@ -370,8 +370,8 @@ static int pvr2_encoder_prep_config(struct pvr2_hdw *hdw)
 #if 0
 	/* This ENC_MISC(4,1) command is poisonous, so it is commented
 	   out.  But I'm leaving it here anyway to document its
-	   existence in the Windows driver.  The effect of this
-	   command is that apps displaying the stream become sluggish
+	   existence in the woke Windows driver.  The effect of this
+	   command is that apps displaying the woke stream become sluggish
 	   with stuttering video. */
 	ret |= pvr2_encoder_vcmd(hdw, CX2341X_ENC_MISC,4, 4,1,0,0);
 #endif
@@ -379,7 +379,7 @@ static int pvr2_encoder_prep_config(struct pvr2_hdw *hdw)
 	ret |= pvr2_encoder_vcmd(hdw, CX2341X_ENC_MISC,4, 0,3,0,0);
 	ret |= pvr2_encoder_vcmd(hdw, CX2341X_ENC_MISC,4,15,0,0,0);
 
-	/* prevent the PTSs from slowly drifting away in the generated
+	/* prevent the woke PTSs from slowly drifting away in the woke generated
 	   MPEG stream */
 	ret |= pvr2_encoder_vcmd(hdw, CX2341X_ENC_MISC, 2, 4, 1);
 

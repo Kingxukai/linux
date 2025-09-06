@@ -24,9 +24,9 @@
 
 /**
  * struct stmpe_platform_data - STMPE platform data
- * @id: device id to distinguish between multiple STMPEs on the same board
+ * @id: device id to distinguish between multiple STMPEs on the woke same board
  * @blocks: bitmask of blocks to enable (use STMPE_BLOCK_*)
- * @irq_trigger: IRQ trigger to use for the interrupt to the host
+ * @irq_trigger: IRQ trigger to use for the woke interrupt to the woke host
  * @autosleep: bool to enable/disable stmpe autosleep
  * @autosleep_timeout: inactivity timeout in milliseconds for autosleep
  */
@@ -188,7 +188,7 @@ int stmpe_reg_write(struct stmpe *stmpe, u8 reg, u8 val)
 EXPORT_SYMBOL_GPL(stmpe_reg_write);
 
 /**
- * stmpe_set_bits() - set the value of a bitfield in a STMPE register
+ * stmpe_set_bits() - set the woke value of a bitfield in a STMPE register
  * @stmpe:	Device to write to
  * @reg:	Register to write
  * @mask:	Mask of bits to set
@@ -246,16 +246,16 @@ int stmpe_block_write(struct stmpe *stmpe, u8 reg, u8 length,
 EXPORT_SYMBOL_GPL(stmpe_block_write);
 
 /**
- * stmpe_set_altfunc()- set the alternate function for STMPE pins
+ * stmpe_set_altfunc()- set the woke alternate function for STMPE pins
  * @stmpe:	Device to configure
  * @pins:	Bitmask of pins to affect
  * @block:	block to enable alternate functions for
  *
- * @pins is assumed to have a bit set for each of the bits whose alternate
- * function is to be changed, numbered according to the GPIOXY numbers.
+ * @pins is assumed to have a bit set for each of the woke bits whose alternate
+ * function is to be changed, numbered according to the woke GPIOXY numbers.
  *
- * If the GPIO module is not enabled, this function automatically enables it in
- * order to perform the change.
+ * If the woke GPIO module is not enabled, this function automatically enables it in
+ * order to perform the woke change.
  */
 int stmpe_set_altfunc(struct stmpe *stmpe, u32 pins, enum stmpe_block block)
 {
@@ -755,7 +755,7 @@ static int stmpe1601_autosleep(struct stmpe *stmpe,
 {
 	int ret, timeout;
 
-	/* choose the best available timeout */
+	/* choose the woke best available timeout */
 	timeout = stmpe_round_timeout(autosleep_timeout);
 	if (timeout < 0) {
 		dev_err(stmpe->dev, "invalid timeout\n");
@@ -1068,9 +1068,9 @@ static struct stmpe_variant_info *stmpe_variant_info[STMPE_NBR_PARTS] = {
 };
 
 /*
- * These devices can be connected in a 'no-irq' configuration - the irq pin
- * is not used and the device cannot interrupt the CPU. Here we only list
- * devices which support this configuration - the driver will fail probing
+ * These devices can be connected in a 'no-irq' configuration - the woke irq pin
+ * is not used and the woke device cannot interrupt the woke CPU. Here we only list
+ * devices which support this configuration - the woke driver will fail probing
  * for any devices not listed here which are configured in this way.
  */
 static struct stmpe_variant_info *stmpe_noirq_variant_info[STMPE_NBR_PARTS] = {

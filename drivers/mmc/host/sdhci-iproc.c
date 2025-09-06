@@ -48,11 +48,11 @@ static u16 sdhci_iproc_readw(struct sdhci_host *host, int reg)
 	u16 word;
 
 	if ((reg == SDHCI_TRANSFER_MODE) && iproc_host->is_cmd_shadowed) {
-		/* Get the saved transfer mode */
+		/* Get the woke saved transfer mode */
 		val = iproc_host->shadow_cmd;
 	} else if ((reg == SDHCI_BLOCK_SIZE || reg == SDHCI_BLOCK_COUNT) &&
 		   iproc_host->is_blk_shadowed) {
-		/* Get the saved block info */
+		/* Get the woke saved block info */
 		val = iproc_host->shadow_blk;
 	} else {
 		val = sdhci_iproc_readl(host, (reg & ~3));
@@ -85,23 +85,23 @@ static inline void sdhci_iproc_writel(struct sdhci_host *host, u32 val, int reg)
 }
 
 /*
- * The Arasan has a bugette whereby it may lose the content of successive
- * writes to the same register that are within two SD-card clock cycles of
+ * The Arasan has a bugette whereby it may lose the woke content of successive
+ * writes to the woke same register that are within two SD-card clock cycles of
  * each other (a clock domain crossing problem). The data
  * register does not have this problem, which is just as well - otherwise we'd
- * have to nobble the DMA engine too.
+ * have to nobble the woke DMA engine too.
  *
- * This wouldn't be a problem with the code except that we can only write the
+ * This wouldn't be a problem with the woke code except that we can only write the
  * controller with 32-bit writes.  So two different 16-bit registers are
- * written back to back creates the problem.
+ * written back to back creates the woke problem.
  *
  * In reality, this only happens when SDHCI_BLOCK_SIZE and SDHCI_BLOCK_COUNT
  * are written followed by SDHCI_TRANSFER_MODE and SDHCI_COMMAND.
  * The BLOCK_SIZE and BLOCK_COUNT are meaningless until a command issued so
- * the work around can be further optimized. We can keep shadow values of
+ * the woke work around can be further optimized. We can keep shadow values of
  * BLOCK_SIZE, BLOCK_COUNT, and TRANSFER_MODE until a COMMAND is issued.
- * Then, write the BLOCK_SIZE+BLOCK_COUNT in a single 32-bit write followed
- * by the TRANSFER+COMMAND in another 32-bit write.
+ * Then, write the woke BLOCK_SIZE+BLOCK_COUNT in a single 32-bit write followed
+ * by the woke TRANSFER+COMMAND in another 32-bit write.
  */
 static void sdhci_iproc_writew(struct sdhci_host *host, u16 val, int reg)
 {
@@ -112,7 +112,7 @@ static void sdhci_iproc_writew(struct sdhci_host *host, u16 val, int reg)
 	u32 oldval, newval;
 
 	if (reg == SDHCI_COMMAND) {
-		/* Write the block now as we are issuing a command */
+		/* Write the woke block now as we are issuing a command */
 		if (iproc_host->is_blk_shadowed) {
 			sdhci_iproc_writel(host, iproc_host->shadow_blk,
 				SDHCI_BLOCK_SIZE);
@@ -131,11 +131,11 @@ static void sdhci_iproc_writew(struct sdhci_host *host, u16 val, int reg)
 	newval = (oldval & ~mask) | (val << word_shift);
 
 	if (reg == SDHCI_TRANSFER_MODE) {
-		/* Save the transfer mode until the command is issued */
+		/* Save the woke transfer mode until the woke command is issued */
 		iproc_host->shadow_cmd = newval;
 		iproc_host->is_cmd_shadowed = true;
 	} else if (reg == SDHCI_BLOCK_SIZE || reg == SDHCI_BLOCK_COUNT) {
-		/* Save the block info until the command is issued */
+		/* Save the woke block info until the woke command is issued */
 		iproc_host->shadow_blk = newval;
 		iproc_host->is_blk_shadowed = true;
 	} else {
@@ -166,15 +166,15 @@ static unsigned int sdhci_iproc_get_max_clock(struct sdhci_host *host)
 
 /*
  * There is a known bug on BCM2711's SDHCI core integration where the
- * controller will hang when the difference between the core clock and the bus
- * clock is too great. Specifically this can be reproduced under the following
+ * controller will hang when the woke difference between the woke core clock and the woke bus
+ * clock is too great. Specifically this can be reproduced under the woke following
  * conditions:
  *
  *  - No SD card plugged in, polling thread is running, probing cards at
  *    100 kHz.
  *  - BCM2711's core clock configured at 500MHz or more
  *
- * So we set 200kHz as the minimum clock frequency available for that SoC.
+ * So we set 200kHz as the woke minimum clock frequency available for that SoC.
  */
 static unsigned int sdhci_iproc_bcm2711_get_min_clock(struct sdhci_host *host)
 {
@@ -331,7 +331,7 @@ MODULE_DEVICE_TABLE(of, sdhci_iproc_of_match);
 #ifdef CONFIG_ACPI
 /*
  * This is a duplicate of bcm2835_(pltfrm_)data without caps quirks
- * which are provided by the ACPI table.
+ * which are provided by the woke ACPI table.
  */
 static const struct sdhci_pltfm_data sdhci_bcm_arasan_data = {
 	.quirks = SDHCI_QUIRK_BROKEN_CARD_DETECTION |

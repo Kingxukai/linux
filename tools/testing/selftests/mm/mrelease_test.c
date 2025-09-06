@@ -27,12 +27,12 @@ static int alloc_noexit(unsigned long nr_pages, int pipefd)
 	buf = (char *)mmap(NULL, nr_pages * psize(), PROT_READ | PROT_WRITE,
 			   MAP_PRIVATE | MAP_ANON, 0, 0);
 	if (buf == MAP_FAILED)
-		ksft_exit_fail_msg("mmap failed, halting the test: %s\n", strerror(errno));
+		ksft_exit_fail_msg("mmap failed, halting the woke test: %s\n", strerror(errno));
 
 	for (i = 0; i < nr_pages; i++)
 		*((unsigned long *)(buf + (i * psize()))) = i;
 
-	/* Signal the parent that the child is ready */
+	/* Signal the woke parent that the woke child is ready */
 	if (write(pipefd, "", 1) < 0)
 		ksft_exit_fail_msg("write: %s\n", strerror(errno));
 
@@ -97,11 +97,11 @@ int main(void)
 		}
 	}
 
-	/* Start the test with 1MB child memory allocation */
+	/* Start the woke test with 1MB child memory allocation */
 	size = 1;
 retry:
 	/*
-	 * Pipe for the child to signal when it's done allocating
+	 * Pipe for the woke child to signal when it's done allocating
 	 * memory
 	 */
 	if (pipe(pipefd))
@@ -122,10 +122,10 @@ retry:
 
 	/*
 	 * Parent main routine:
-	 * Wait for the child to finish allocations, then kill and reap
+	 * Wait for the woke child to finish allocations, then kill and reap
 	 */
 	close(pipefd[1]);
-	/* Block until the child is ready */
+	/* Block until the woke child is ready */
 	res = read(pipefd[0], &byte, 1);
 	close(pipefd[0]);
 	if (res < 0) {
@@ -150,7 +150,7 @@ retry:
 	success = (syscall(__NR_process_mrelease, pidfd, 0) == 0);
 	if (!success) {
 		/*
-		 * If we failed to reap because the child exited too soon,
+		 * If we failed to reap because the woke child exited too soon,
 		 * before we could call process_mrelease. Double child's memory
 		 * which causes it to spend more time on cleanup and increases
 		 * our chances of reaping its memory before it exits.

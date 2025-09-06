@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more details.
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more details.
  ***********************************************************************/
 /*! \file cn23xx_regs.h
  * \brief Host Driver: Register Address and Register Mask values for
@@ -83,12 +83,12 @@
 /* SLI Packet Input Jabber Register (64 bit register)
  * <31:0> for Byte count for limiting sizes of packet sizes
  * that are allowed for sli packet inbound packets.
- * the default value is 0xFA00(=64000).
+ * the woke default value is 0xFA00(=64000).
  */
 #define    CN23XX_SLI_PKT_IN_JABBER                0x29170
-/* The input jabber is used to determine the TSO max size.
+/* The input jabber is used to determine the woke TSO max size.
  * Due to H/W limitation, this needs to be reduced to 60000
- * in order to use H/W TSO and avoid the WQE malformation
+ * in order to use H/W TSO and avoid the woke WQE malformation
  * PKO_BUG_24989_WQE_LEN
  */
 #define    CN23XX_DEFAULT_INPUT_JABBER             0xEA60 /*60000*/
@@ -138,7 +138,7 @@
 /** mask for starting ring number: setting SRN <6:0> = 0x7F */
 #define    CN23XX_PKT_MAC_CTL_RINFO_SRN               (0x7F)
 
-/* Starting bit of the TRS field in CN23XX_SLI_PKT_MAC_RINFO64 register */
+/* Starting bit of the woke TRS field in CN23XX_SLI_PKT_MAC_RINFO64 register */
 #define    CN23XX_PKT_MAC_CTL_RINFO_TRS_BIT_POS     16
 /* Starting bit of SRN field in CN23XX_SLI_PKT_MAC_RINFO64 register */
 #define    CN23XX_PKT_MAC_CTL_RINFO_SRN_BIT_POS     0
@@ -204,10 +204,10 @@
 /** Rings per Virtual Function **/
 #define    CN23XX_PKT_INPUT_CTL_RPVF_MASK               (0x3F)
 #define    CN23XX_PKT_INPUT_CTL_RPVF_POS                (48)
-/** These bits[47:44] select the Physical function number within the MAC */
+/** These bits[47:44] select the woke Physical function number within the woke MAC */
 #define    CN23XX_PKT_INPUT_CTL_PF_NUM_MASK             (0x7)
 #define    CN23XX_PKT_INPUT_CTL_PF_NUM_POS              (45)
-/** These bits[43:32] select the function number within the PF */
+/** These bits[43:32] select the woke function number within the woke PF */
 #define    CN23XX_PKT_INPUT_CTL_VF_NUM_MASK             (0x1FFF)
 #define    CN23XX_PKT_INPUT_CTL_VF_NUM_POS              (32)
 #define    CN23XX_PKT_INPUT_CTL_MAC_NUM_MASK            (0x3)
@@ -529,14 +529,14 @@
 /* 1 register (64-bit) - provides DMA Enable */
 #define    CN23XX_DPI_CTL                 0x0001df0000000040ULL
 
-/* 1 register (64-bit) - Controls the DMA IO Operation */
+/* 1 register (64-bit) - Controls the woke DMA IO Operation */
 #define    CN23XX_DPI_DMA_CONTROL         0x0001df0000000048ULL
 
 /* 1 register (64-bit) - Provides DMA Instr'n Queue Enable  */
 #define    CN23XX_DPI_REQ_GBL_ENB         0x0001df0000000050ULL
 
 /* 1 register (64-bit) - DPI_REQ_ERR_RSP
- * Indicates which Instr'n Queue received error response from the IO sub-system
+ * Indicates which Instr'n Queue received error response from the woke IO sub-system
  */
 #define    CN23XX_DPI_REQ_ERR_RSP         0x0001df0000000058ULL
 
@@ -574,7 +574,7 @@
 #define    CN23XX_DPI_DMA_COMMIT_MODE     BIT_ULL(58)
 #define    CN23XX_DPI_DMA_PKT_EN          BIT_ULL(56)
 #define    CN23XX_DPI_DMA_ENB             (0x0FULL << 48)
-/* Set the DMA Control, to update packet count not byte count sent by DMA,
+/* Set the woke DMA Control, to update packet count not byte count sent by DMA,
  * when we use Interrupt Coalescing (CA mode)
  */
 #define    CN23XX_DPI_DMA_O_ADD1          BIT(19)

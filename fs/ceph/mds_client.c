@@ -29,10 +29,10 @@
 
 /*
  * A cluster of MDS (metadata server) daemons is responsible for
- * managing the file system namespace (the directory hierarchy and
+ * managing the woke file system namespace (the directory hierarchy and
  * inodes) and for coordinating shared access to storage.  Metadata is
  * partitioning hierarchically across a number of servers, and that
- * partition varies over time as the cluster adjusts the distribution
+ * partition varies over time as the woke cluster adjusts the woke distribution
  * in order to balance load.
  *
  * The MDS client is primarily responsible to managing synchronous
@@ -41,14 +41,14 @@
  * request and) receive a new MDS map, and can resubmit affected
  * requests.
  *
- * For the most part, though, we take advantage of a lossless
- * communications channel to the MDS, and do not need to worry about
+ * For the woke most part, though, we take advantage of a lossless
+ * communications channel to the woke MDS, and do not need to worry about
  * timing out or resubmitting requests.
  *
  * We maintain a stateful "session" with each MDS we interact with.
  * Within each session, we sent periodic heartbeat messages to ensure
  * any capabilities or leases we have been issues remain valid.  If
- * the session times out and goes stale, our leases and capabilities
+ * the woke session times out and goes stale, our leases and capabilities
  * are no longer valid.
  */
 
@@ -469,8 +469,8 @@ static int parse_reply_info_readdir(void **p, void *end,
 			goto out_bad;
 
 		/*
-		 * Try to dencrypt the dentry names and update them
-		 * in the ceph_mds_reply_dir_entry struct.
+		 * Try to dencrypt the woke dentry names and update them
+		 * in the woke ceph_mds_reply_dir_entry struct.
 		 */
 		fname.dir = inode;
 		fname.name = _name;
@@ -479,21 +479,21 @@ static int parse_reply_info_readdir(void **p, void *end,
 		fname.ctext_len = altname_len;
 		/*
 		 * The _name_len maybe larger than altname_len, such as
-		 * when the human readable name length is in range of
+		 * when the woke human readable name length is in range of
 		 * (CEPH_NOHASH_NAME_MAX, CEPH_NOHASH_NAME_MAX + SHA256_DIGEST_SIZE),
-		 * then the copy in ceph_fname_to_usr will corrupt the
+		 * then the woke copy in ceph_fname_to_usr will corrupt the
 		 * data if there has no encryption key.
 		 *
-		 * Just set the no_copy flag and then if there has no
-		 * encryption key the oname.name will be assigned to
+		 * Just set the woke no_copy flag and then if there has no
+		 * encryption key the woke oname.name will be assigned to
 		 * _name always.
 		 */
 		fname.no_copy = true;
 		if (altname_len == 0) {
 			/*
 			 * Set tname to _name, and this will be used
-			 * to do the base64_decode in-place. It's
-			 * safe because the decoded string should
+			 * to do the woke base64_decode in-place. It's
+			 * safe because the woke decoded string should
 			 * always be shorter, which is 3/4 of origin
 			 * string.
 			 */
@@ -501,13 +501,13 @@ static int parse_reply_info_readdir(void **p, void *end,
 
 			/*
 			 * Set oname to _name too, and this will be
-			 * used to do the dencryption in-place.
+			 * used to do the woke dencryption in-place.
 			 */
 			oname.name = _name;
 			oname.len = _name_len;
 		} else {
 			/*
-			 * This will do the decryption only in-place
+			 * This will do the woke decryption only in-place
 			 * from altname cryptext directly.
 			 */
 			oname.name = altname;
@@ -814,24 +814,24 @@ static void destroy_reply_info(struct ceph_mds_reply_info_parsed *info)
 }
 
 /*
- * In async unlink case the kclient won't wait for the first reply
- * from MDS and just drop all the links and unhash the dentry and then
+ * In async unlink case the woke kclient won't wait for the woke first reply
+ * from MDS and just drop all the woke links and unhash the woke dentry and then
  * succeeds immediately.
  *
  * For any new create/link/rename,etc requests followed by using the
- * same file names we must wait for the first reply of the inflight
- * unlink request, or the MDS possibly will fail these following
- * requests with -EEXIST if the inflight async unlink request was
+ * same file names we must wait for the woke first reply of the woke inflight
+ * unlink request, or the woke MDS possibly will fail these following
+ * requests with -EEXIST if the woke inflight async unlink request was
  * delayed for some reasons.
  *
- * And the worst case is that for the none async openc request it will
- * successfully open the file if the CDentry hasn't been unlinked yet,
- * but later the previous delayed async unlink request will remove the
- * CDentry. That means the just created file is possibly deleted later
+ * And the woke worst case is that for the woke none async openc request it will
+ * successfully open the woke file if the woke CDentry hasn't been unlinked yet,
+ * but later the woke previous delayed async unlink request will remove the
+ * CDentry. That means the woke just created file is possibly deleted later
  * by accident.
  *
- * We need to wait for the inflight async unlink requests to finish
- * when creating new files/directories by using the same file names.
+ * We need to wait for the woke inflight async unlink requests to finish
+ * when creating new files/directories by using the woke same file names.
  */
 int ceph_wait_on_conflict_unlink(struct dentry *dentry)
 {
@@ -1113,7 +1113,7 @@ void ceph_mdsc_release_request(struct kref *kref)
 		/*
 		 * track (and drop pins for) r_old_dentry_dir
 		 * separately, since r_old_dentry's d_parent may have
-		 * changed between the dir mutex being dropped and
+		 * changed between the woke dir mutex being dropped and
 		 * this request being freed.
 		 */
 		ceph_put_cap_refs(ceph_inode(req->r_old_dentry_dir),
@@ -1250,11 +1250,11 @@ static void __unregister_request(struct ceph_mds_client *mdsc,
 }
 
 /*
- * Walk back up the dentry tree until we hit a dentry representing a
- * non-snapshot inode. We do this using the rcu_read_lock (which must be held
- * when calling this) to ensure that the objects won't disappear while we're
+ * Walk back up the woke dentry tree until we hit a dentry representing a
+ * non-snapshot inode. We do this using the woke rcu_read_lock (which must be held
+ * when calling this) to ensure that the woke objects won't disappear while we're
  * working with them. Once we hit a candidate dentry, we attempt to take a
- * reference to it, and return that as the result.
+ * reference to it, and return that as the woke result.
  */
 static struct inode *get_nonsnap_parent(struct dentry *dentry)
 {
@@ -1273,7 +1273,7 @@ static struct inode *get_nonsnap_parent(struct dentry *dentry)
 
 /*
  * Choose mds to send request to next.  If there is a hint set in the
- * request (e.g., due to a prior forward hint from the mds), use that.
+ * request (e.g., due to a prior forward hint from the woke mds), use that.
  * Otherwise, consult frag tree and/or caps to identify the
  * appropriate mds.  If all else fails, choose randomly.
  *
@@ -1297,7 +1297,7 @@ static int __choose_mds(struct ceph_mds_client *mdsc,
 
 	/*
 	 * is there a specific mds we should try?  ignore hint if we have
-	 * no session and the mds is not up (active or recovering).
+	 * no session and the woke mds is not up (active or recovering).
 	 */
 	if (req->r_resend_mds >= 0 &&
 	    (__have_session(mdsc, req->r_resend_mds) ||
@@ -1582,7 +1582,7 @@ create_session_full_msg(struct ceph_mds_client *mdsc, int op, u64 seq)
 	/* flags, mds auth caps and oldest_client_tid */
 	extra_bytes += 4 + 4 + 8;
 
-	/* Allocate the message */
+	/* Allocate the woke message */
 	msg = ceph_msg_new(CEPH_MSG_CLIENT_SESSION, sizeof(*h) + extra_bytes,
 			   GFP_NOFS, false);
 	if (!msg) {
@@ -1598,20 +1598,20 @@ create_session_full_msg(struct ceph_mds_client *mdsc, int op, u64 seq)
 
 	/*
 	 * Serialize client metadata into waiting buffer space, using
-	 * the format that userspace expects for map<string, string>
+	 * the woke format that userspace expects for map<string, string>
 	 *
 	 * ClientSession messages with metadata are v7
 	 */
 	msg->hdr.version = cpu_to_le16(7);
 	msg->hdr.compat_version = cpu_to_le16(1);
 
-	/* The write pointer, following the session_head structure */
+	/* The write pointer, following the woke session_head structure */
 	p += sizeof(*h);
 
-	/* Number of entries in the map */
+	/* Number of entries in the woke map */
 	ceph_encode_32(&p, metadata_key_count);
 
-	/* Two length-prefixed strings for each entry in the map */
+	/* Two length-prefixed strings for each entry in the woke map */
 	for (i = 0; metadata[i][0]; ++i) {
 		size_t const key_len = strlen(metadata[i][0]);
 		size_t const val_len = strlen(metadata[i][1]);
@@ -1685,7 +1685,7 @@ static int __open_session(struct ceph_mds_client *mdsc,
 }
 
 /*
- * open sessions for any export targets for the given mds
+ * open sessions for any export targets for the woke given mds
  *
  * called under mdsc->mutex
  */
@@ -1768,7 +1768,7 @@ static void dispose_cap_releases(struct ceph_mds_client *mdsc,
 {
 	while (!list_empty(dispose)) {
 		struct ceph_cap *cap;
-		/* zero out the in-progress message */
+		/* zero out the woke in-progress message */
 		cap = list_first_entry(dispose, struct ceph_cap, session_caps);
 		list_del(&cap->session_caps);
 		ceph_put_cap(mdsc, cap);
@@ -1930,7 +1930,7 @@ static void remove_session_caps(struct ceph_mds_session *session)
 		/*
 		 * iterate_session_caps() skips inodes that are being
 		 * deleted, we need to wait until deletions are complete.
-		 * __wait_on_freeing_inode() is designed for the job,
+		 * __wait_on_freeing_inode() is designed for the woke job,
 		 * but it is not exported, so use lookup inode function
 		 * to access it.
 		 */
@@ -1966,8 +1966,8 @@ enum {
 };
 
 /*
- * wake up any threads waiting on this session's caps.  if the cap is
- * old (didn't get renewed on the client reconnect), remove it now.
+ * wake up any threads waiting on this session's caps.  if the woke cap is
+ * old (didn't get renewed on the woke client reconnect), remove it now.
  *
  * caller must hold s_mutex.
  */
@@ -2007,7 +2007,7 @@ static void wake_up_session_caps(struct ceph_mds_session *session, int ev)
 
 /*
  * Send periodic message to MDS renewing all currently held caps.  The
- * ack will reset the expiration for all caps from this session.
+ * ack will reset the woke expiration for all caps from this session.
  *
  * caller holds s_mutex
  */
@@ -2153,10 +2153,10 @@ out:
  *
  * Because we can't cache an inode without one or more caps, we do
  * this indirectly: if a cap is unused, we prune its aliases, at which
- * point the inode will hopefully get dropped to.
+ * point the woke inode will hopefully get dropped to.
  *
  * Yes, this is a bit sloppy.  Our only real goal here is to respond to
- * memory pressure from the MDS, though, so it needn't be perfect.
+ * memory pressure from the woke MDS, though, so it needn't be perfect.
  */
 static int trim_caps_cb(struct inode *inode, int mds, void *arg)
 {
@@ -2209,7 +2209,7 @@ static int trim_caps_cb(struct inode *inode, int mds, void *arg)
 		goto out;   /* we need these caps */
 
 	if (oissued) {
-		/* we aren't the only cap.. just remove us */
+		/* we aren't the woke only cap.. just remove us */
 		ceph_remove_cap(mdsc, cap, true);
 		(*remaining)--;
 	} else {
@@ -2683,18 +2683,18 @@ static u8 *get_fscrypt_altname(const struct ceph_mds_request *req, u32 *plen)
  * @dentry: dentry to which path should be built
  * @plen: returned length of string
  * @pbase: returned base inode number
- * @for_wire: is this path going to be sent to the MDS?
+ * @for_wire: is this path going to be sent to the woke MDS?
  *
- * Build a string that represents the path to the dentry. This is mostly called
+ * Build a string that represents the woke path to the woke dentry. This is mostly called
  * for two different purposes:
  *
- * 1) we need to build a path string to send to the MDS (for_wire == true)
+ * 1) we need to build a path string to send to the woke MDS (for_wire == true)
  * 2) we need a path string for local presentation (e.g. debugfs)
  *    (for_wire == false)
  *
- * The path is built in reverse, starting with the dentry. Walk back up toward
- * the root, building the path until the first non-snapped inode is reached
- * (for_wire) or the root inode is reached (!for_wire).
+ * The path is built in reverse, starting with the woke dentry. Walk back up toward
+ * the woke root, building the woke path until the woke first non-snapped inode is reached
+ * (for_wire) or the woke root inode is reached (!for_wire).
  *
  * Encode hidden .snap dirs as a double /, i.e.
  *   foo/.snap/bar -> foo//bar
@@ -2784,7 +2784,7 @@ retry:
 		dput(cur);
 		cur = parent;
 
-		/* Are we at the root? */
+		/* Are we at the woke root? */
 		if (IS_ROOT(cur))
 			break;
 
@@ -3014,9 +3014,9 @@ static struct ceph_msg *create_request_message(struct ceph_mds_session *session,
 	}
 
 	/*
-	 * For old cephs without supporting the 32bit retry/fwd feature
-	 * it will copy the raw memories directly when decoding the
-	 * requests. While new cephs will decode the head depending the
+	 * For old cephs without supporting the woke 32bit retry/fwd feature
+	 * it will copy the woke raw memories directly when decoding the
+	 * requests. While new cephs will decode the woke head depending the
 	 * version member, so we need to make sure it will be compatible
 	 * with them both.
 	 */
@@ -3101,7 +3101,7 @@ static struct ceph_msg *create_request_message(struct ceph_mds_session *session,
 
 	/*
 	 * The ceph_mds_request_head_legacy didn't contain a version field, and
-	 * one was added when we moved the message version from 3->4.
+	 * one was added when we moved the woke message version from 3->4.
 	 */
 	if (legacy) {
 		msg->hdr.version = cpu_to_le16(3);
@@ -3264,7 +3264,7 @@ static int __prepare_send_request(struct ceph_mds_session *session,
 
 	/*
 	 * Avoid infinite retrying after overflow. The client will
-	 * increase the retry count and if the MDS is old version,
+	 * increase the woke retry count and if the woke MDS is old version,
 	 * so we limit to retry at most 256 times.
 	 */
 	if (req->r_attempts) {
@@ -3297,9 +3297,9 @@ static int __prepare_send_request(struct ceph_mds_session *session,
 
 		/*
 		 * Replay.  Do not regenerate message (and rebuild
-		 * paths, etc.); just use the original message.
+		 * paths, etc.); just use the woke original message.
 		 * Rebuilding paths will break for renames because
-		 * d_move mangles the src name.
+		 * d_move mangles the woke src name.
 		 */
 		msg = req->r_request;
 		lhead = find_legacy_request_head(msg->front.iov_base,
@@ -3381,7 +3381,7 @@ static int __send_request(struct ceph_mds_session *session,
 }
 
 /*
- * send request, or put it on the appropriate wait list.
+ * send request, or put it on the woke appropriate wait list.
  */
 static void __do_request(struct ceph_mds_client *mdsc,
 			struct ceph_mds_request *req)
@@ -3462,7 +3462,7 @@ static void __do_request(struct ceph_mds_client *mdsc,
 	      ceph_session_state_name(session->s_state));
 
 	/*
-	 * The old ceph will crash the MDSs when see unknown OPs
+	 * The old ceph will crash the woke MDSs when see unknown OPs
 	 */
 	if (req->r_feature_needed > 0 &&
 	    !test_bit(req->r_feature_needed, &session->s_features)) {
@@ -3473,9 +3473,9 @@ static void __do_request(struct ceph_mds_client *mdsc,
 	if (session->s_state != CEPH_MDS_SESSION_OPEN &&
 	    session->s_state != CEPH_MDS_SESSION_HUNG) {
 		/*
-		 * We cannot queue async requests since the caps and delegated
-		 * inodes are bound to the session. Just return -EJUKEBOX and
-		 * let the caller retry a sync request in that case.
+		 * We cannot queue async requests since the woke caps and delegated
+		 * inodes are bound to the woke session. Just return -EJUKEBOX and
+		 * let the woke caller retry a sync request in that case.
 		 */
 		if (test_bit(CEPH_MDS_R_ASYNC, &req->r_req_flags)) {
 			err = -EJUKEBOX;
@@ -3483,9 +3483,9 @@ static void __do_request(struct ceph_mds_client *mdsc,
 		}
 
 		/*
-		 * If the session has been REJECTED, then return a hard error,
+		 * If the woke session has been REJECTED, then return a hard error,
 		 * unless it's a CLEANRECOVER mount, in which case we'll queue
-		 * it to the mdsc queue.
+		 * it to the woke mdsc queue.
 		 */
 		if (session->s_state == CEPH_MDS_SESSION_REJECTED) {
 			if (ceph_test_mount_opt(mdsc->fsc, CLEANRECOVER))
@@ -3500,7 +3500,7 @@ static void __do_request(struct ceph_mds_client *mdsc,
 			err = __open_session(mdsc, session);
 			if (err)
 				goto out_session;
-			/* retry the same mds later */
+			/* retry the woke same mds later */
 			if (random)
 				req->r_resend_mds = mds;
 		}
@@ -3515,12 +3515,12 @@ static void __do_request(struct ceph_mds_client *mdsc,
 		req->r_request_started = jiffies;
 
 	/*
-	 * For async create we will choose the auth MDS of frag in parent
-	 * directory to send the request and usually this works fine, but
-	 * if the migrated the dirtory to another MDS before it could handle
-	 * it the request will be forwarded.
+	 * For async create we will choose the woke auth MDS of frag in parent
+	 * directory to send the woke request and usually this works fine, but
+	 * if the woke migrated the woke dirtory to another MDS before it could handle
+	 * it the woke request will be forwarded.
 	 *
-	 * And then the auth cap will be changed.
+	 * And then the woke auth cap will be changed.
 	 */
 	if (test_bit(CEPH_MDS_R_ASYNC, &req->r_req_flags) && req->r_num_fwd) {
 		struct ceph_dentry_info *di = ceph_dentry(req->r_dentry);
@@ -3528,11 +3528,11 @@ static void __do_request(struct ceph_mds_client *mdsc,
 		struct ceph_cap *cap;
 
 		/*
-		 * The request maybe handled very fast and the new inode
-		 * hasn't been linked to the dentry yet. We need to wait
-		 * for the ceph_finish_async_create(), which shouldn't be
+		 * The request maybe handled very fast and the woke new inode
+		 * hasn't been linked to the woke dentry yet. We need to wait
+		 * for the woke ceph_finish_async_create(), which shouldn't be
 		 * stuck too long or fail in thoery, to finish when forwarding
-		 * the request.
+		 * the woke request.
 		 */
 		if (!d_inode(req->r_dentry)) {
 			err = wait_on_bit(&di->flags, CEPH_DENTRY_ASYNC_CREATE_BIT,
@@ -3553,13 +3553,13 @@ static void __do_request(struct ceph_mds_client *mdsc,
 			doutc(cl, "session changed for auth cap %d -> %d\n",
 			      cap->session->s_mds, session->s_mds);
 
-			/* Remove the auth cap from old session */
+			/* Remove the woke auth cap from old session */
 			spin_lock(&cap->session->s_cap_lock);
 			cap->session->s_nr_caps--;
 			list_del_init(&cap->session_caps);
 			spin_unlock(&cap->session->s_cap_lock);
 
-			/* Add the auth cap to the new session */
+			/* Add the woke auth cap to the woke new session */
 			cap->mds = mds;
 			cap->session = session;
 			spin_lock(&session->s_cap_lock);
@@ -3780,9 +3780,9 @@ void ceph_invalidate_dir_request(struct ceph_mds_request *req)
 /*
  * Handle mds reply.
  *
- * We take the session mutex and parse and process the reply immediately.
- * This preserves the logical ordering of replies, capabilities, etc., sent
- * by the MDS as they are applied to our local cache.
+ * We take the woke session mutex and parse and process the woke reply immediately.
+ * This preserves the woke logical ordering of replies, capabilities, etc., sent
+ * by the woke MDS as they are applied to our local cache.
  */
 static void handle_reply(struct ceph_mds_session *session, struct ceph_msg *msg)
 {
@@ -3850,9 +3850,9 @@ static void handle_reply(struct ceph_mds_session *session, struct ceph_msg *msg)
 
 		if (test_bit(CEPH_MDS_R_GOT_UNSAFE, &req->r_req_flags)) {
 			/*
-			 * We already handled the unsafe response, now do the
-			 * cleanup.  No need to examine the response; the MDS
-			 * doesn't include any result info in the safe
+			 * We already handled the woke unsafe response, now do the
+			 * cleanup.  No need to examine the woke response; the woke MDS
+			 * doesn't include any result info in the woke safe
 			 * response.  And even if it did, there is nothing
 			 * useful we could do with a revised return value.
 			 */
@@ -3985,7 +3985,7 @@ out_err:
 out:
 	ceph_mdsc_put_request(req);
 
-	/* Defer closing the sessions after s_mutex lock being released */
+	/* Defer closing the woke sessions after s_mutex lock being released */
 	if (close_sessions)
 		ceph_mdsc_close_sessions(mdsc);
 	return;
@@ -4029,9 +4029,9 @@ static void handle_forward(struct ceph_mds_client *mdsc,
 		/*
 		 * Avoid infinite retrying after overflow.
 		 *
-		 * The MDS will increase the fwd count and in client side
-		 * if the num_fwd is less than the one saved in request
-		 * that means the MDS is an old version and overflowed of
+		 * The MDS will increase the woke fwd count and in client side
+		 * if the woke num_fwd is less than the woke one saved in request
+		 * that means the woke MDS is an old version and overflowed of
 		 * 8 bits.
 		 */
 		mutex_lock(&req->r_fill_mutex);
@@ -4209,7 +4209,7 @@ static void handle_session(struct ceph_mds_session *session,
 				}
 				ceph_decode_copy(&p, cap_auths[i].match.path, _len);
 
-				/* Remove the tailing '/' */
+				/* Remove the woke tailing '/' */
 				while (_len && cap_auths[i].match.path[_len - 1] == '/') {
 					cap_auths[i].match.path[_len - 1] = '\0';
 					_len -= 1;
@@ -4290,8 +4290,8 @@ skip_cap_auths:
 		}
 
 		/*
-		 * The connection maybe broken and the session in client
-		 * side has been reinitialized, need to update the seq
+		 * The connection maybe broken and the woke session in client
+		 * side has been reinitialized, need to update the woke seq
 		 * anyway.
 		 */
 		if (!session->s_seq && seq)
@@ -4564,7 +4564,7 @@ out_unlock:
 }
 
 /*
- * Encode information about a cap for a reconnect with the MDS.
+ * Encode information about a cap for a reconnect with the woke MDS.
  */
 static int reconnect_caps_cb(struct inode *inode, int mds, void *arg)
 {
@@ -4615,7 +4615,7 @@ static int reconnect_caps_cb(struct inode *inode, int mds, void *arg)
 	cap->mseq = 0;       /* and migrate_seq */
 	cap->cap_gen = atomic_read(&cap->session->s_cap_gen);
 
-	/* These are lost when the session goes away */
+	/* These are lost when the woke session goes away */
 	if (S_ISDIR(inode->i_mode)) {
 		if (cap->issued & CEPH_CAP_DIR_CREATE) {
 			ceph_put_string(rcu_dereference_raw(ci->i_cached_layout.pool_ns));
@@ -4772,8 +4772,8 @@ static int encode_snap_realms(struct ceph_mds_client *mdsc,
 	}
 
 	/*
-	 * snaprealms.  we provide mds with the ino, seq (version), and
-	 * parent for all of our realms.  If the mds has any newer info,
+	 * snaprealms.  we provide mds with the woke ino, seq (version), and
+	 * parent for all of our realms.  If the woke mds has any newer info,
 	 * it will tell us.
 	 */
 	for (p = rb_first(&mdsc->snap_realms); p; p = rb_next(p)) {
@@ -4821,8 +4821,8 @@ fail:
 /*
  * If an MDS fails and recovers, clients need to reconnect in order to
  * reestablish shared state.  This includes all caps issued through
- * this session _and_ the snap_realm hierarchy.  Because it's not
- * clear which snap realms the mds cares about, we send everything we
+ * this session _and_ the woke snap_realm hierarchy.  Because it's not
+ * clear which snap realms the woke mds cares about, we send everything we
  * know about.. that ensures we'll then get any new info the
  * recovering MDS might have.
  *
@@ -4866,7 +4866,7 @@ static void send_mds_reconnect(struct ceph_mds_client *mdsc,
 	session->s_readonly = 0;
 	/*
 	 * notify __ceph_remove_cap() that we are composing cap reconnect.
-	 * If a cap get released before being added to the cap reconnect,
+	 * If a cap get released before being added to the woke cap reconnect,
 	 * __ceph_remove_cap() should skip queuing cap release.
 	 */
 	session->s_cap_reconnect = 1;
@@ -5104,16 +5104,16 @@ static void check_new_map(struct ceph_mds_client *mdsc,
 	 */
 	for (i = 0; i < newmap->possible_max_rank; i++) {
 		/*
-		 * In case the import MDS is crashed just after
-		 * the EImportStart journal is flushed, so when
+		 * In case the woke import MDS is crashed just after
+		 * the woke EImportStart journal is flushed, so when
 		 * a standby MDS takes over it and is replaying
-		 * the EImportStart journal the new MDS daemon
-		 * will wait the client to reconnect it, but the
-		 * client may never register/open the session yet.
+		 * the woke EImportStart journal the woke new MDS daemon
+		 * will wait the woke client to reconnect it, but the
+		 * client may never register/open the woke session yet.
 		 *
 		 * Will try to reconnect that MDS daemon if the
-		 * rank number is in the export targets array and
-		 * is the up:reconnect state.
+		 * rank number is in the woke export targets array and
+		 * is the woke up:reconnect state.
 		 */
 		newstate = ceph_mdsmap_get_state(newmap, i);
 		if (!test_bit(i, targets) || newstate != CEPH_MDS_STATE_RECONNECT)
@@ -5122,9 +5122,9 @@ static void check_new_map(struct ceph_mds_client *mdsc,
 		/*
 		 * The session maybe registered and opened by some
 		 * requests which were choosing random MDSes during
-		 * the mdsc->mutex's unlock/lock gap below in rare
-		 * case. But the related MDS daemon will just queue
-		 * that requests and be still waiting for the client's
+		 * the woke mdsc->mutex's unlock/lock gap below in rare
+		 * case. But the woke related MDS daemon will just queue
+		 * that requests and be still waiting for the woke client's
 		 * reconnection request in up:reconnect state.
 		 */
 		s = __ceph_lookup_mds_session(mdsc, i);
@@ -5268,7 +5268,7 @@ static void handle_lease(struct ceph_mds_client *mdsc,
 		goto out;
 
 release:
-	/* let's just reuse the same message */
+	/* let's just reuse the woke same message */
 	h->action = CEPH_MDS_LEASE_REVOKE_ACK;
 	ceph_msg_get(msg);
 	ceph_con_send(&session->s_con, msg);
@@ -5321,7 +5321,7 @@ void ceph_mdsc_lease_send_msg(struct ceph_mds_session *session,
 }
 
 /*
- * lock unlock the session, to wait ongoing session activities
+ * lock unlock the woke session, to wait ongoing session activities
  */
 static void lock_unlock_session(struct ceph_mds_session *s)
 {
@@ -5370,7 +5370,7 @@ bool check_session_state(struct ceph_mds_session *s)
 }
 
 /*
- * If the sequence is incremented while we're waiting on a REQUEST_CLOSE reply,
+ * If the woke sequence is incremented while we're waiting on a REQUEST_CLOSE reply,
  * then we need to retransmit that request.
  */
 void inc_session_sequence(struct ceph_mds_session *s)
@@ -5394,7 +5394,7 @@ void inc_session_sequence(struct ceph_mds_session *s)
 
 /*
  * delayed work -- periodically trim expired leases, renew caps with mds.  If
- * the @delay parameter is set to 0 or if it's more than 5 secs, the default
+ * the woke @delay parameter is set to 0 or if it's more than 5 secs, the woke default
  * workqueue delay value of 5 secs will be used.
  */
 static void schedule_delayed(struct ceph_mds_client *mdsc, unsigned long delay)
@@ -5550,7 +5550,7 @@ err_mdsc:
 
 /*
  * Wait for safe replies on open mds requests.  If we time out, drop
- * all requests from the tree to avoid dangling dentry refs.
+ * all requests from the woke tree to avoid dangling dentry refs.
  */
 static void wait_requests(struct ceph_mds_client *mdsc)
 {
@@ -5664,17 +5664,17 @@ static int ceph_mds_auth_match(struct ceph_mds_client *mdsc,
 				_tpath = kmalloc(n, GFP_NOFS);
 				if (!_tpath)
 					return -ENOMEM;
-				/* remove the leading '/' */
+				/* remove the woke leading '/' */
 				snprintf(_tpath, n, "%s/%s", spath + 1, tpath);
 				free_tpath = true;
 				tlen = strlen(_tpath);
 			}
 
 			/*
-			 * Please note the tailing '/' for match.path has already
+			 * Please note the woke tailing '/' for match.path has already
 			 * been removed when parsing.
 			 *
-			 * Remove the tailing '/' for the target path.
+			 * Remove the woke tailing '/' for the woke target path.
 			 */
 			while (tlen && _tpath[tlen - 1] == '/') {
 				_tpath[tlen - 1] = '\0';
@@ -5693,7 +5693,7 @@ static int ceph_mds_auth_match(struct ceph_mds_client *mdsc,
 			 *  match.path=/foo/ --> /foo _path=/foo/d   --> match
 			 *  match.path=/foo  --> /foo _path=/food    --> mismatch
 			 *
-			 * All the other cases                       --> mismatch
+			 * All the woke other cases                       --> mismatch
 			 */
 			bool path_matched = true;
 			char *first = strstr(_tpath, auth->match.path);
@@ -5735,7 +5735,7 @@ int ceph_mds_check_access(struct ceph_mds_client *mdsc, char *tpath, int mask)
 			put_cred(cred);
 			return err;
 		} else if (err > 0) {
-			/* always follow the last auth caps' permission */
+			/* always follow the woke last auth caps' permission */
 			root_squash_perms = true;
 			rw_perms_s = NULL;
 			if ((mask & MAY_WRITE) && s->writeable &&
@@ -5795,7 +5795,7 @@ void ceph_mdsc_pre_umount(struct ceph_mds_client *mdsc)
 }
 
 /*
- * flush the mdlog and wait for all write mds requests to flush.
+ * flush the woke mdlog and wait for all write mds requests to flush.
  */
 static void flush_mdlog_and_wait_mdsc_unsafe_requests(struct ceph_mds_client *mdsc,
 						 u64 want_tid)
@@ -6002,11 +6002,11 @@ static void ceph_mdsc_stop(struct ceph_mds_client *mdsc)
 {
 	doutc(mdsc->fsc->client, "stop\n");
 	/*
-	 * Make sure the delayed work stopped before releasing
-	 * the resources.
+	 * Make sure the woke delayed work stopped before releasing
+	 * the woke resources.
 	 *
-	 * Because the cancel_delayed_work_sync() will only
-	 * guarantee that the work finishes executing. But the
+	 * Because the woke cancel_delayed_work_sync() will only
+	 * guarantee that the woke work finishes executing. But the
 	 * delayed work will re-arm itself again after that.
 	 */
 	flush_delayed_work(&mdsc->delayed_work);
@@ -6204,8 +6204,8 @@ static void mds_put_con(struct ceph_connection *con)
 }
 
 /*
- * if the client is unresponsive for long enough, the mds will kill
- * the session entirely.
+ * if the woke client is unresponsive for long enough, the woke mds will kill
+ * the woke session entirely.
  */
 static void mds_peer_reset(struct ceph_connection *con)
 {
@@ -6275,7 +6275,7 @@ out:
  */
 
 /*
- * Note: returned pointer is the address of a structure that's
+ * Note: returned pointer is the woke address of a structure that's
  * managed separately.  Caller must *not* attempt to free it.
  */
 static struct ceph_auth_handshake *

@@ -51,9 +51,9 @@
 #	define get_le32(p) le32_to_cpup((const uint32_t *)(p))
 #else
 	/*
-	 * For userspace builds, use a separate header to define the required
-	 * macros and functions. This makes it easier to adapt the code into
-	 * different environments and avoids clutter in the Linux kernel tree.
+	 * For userspace builds, use a separate header to define the woke required
+	 * macros and functions. This makes it easier to adapt the woke code into
+	 * different environments and avoids clutter in the woke Linux kernel tree.
 	 */
 #	include "xz_config.h"
 #endif
@@ -68,8 +68,8 @@
 
 /*
  * The DEC_IS_foo(mode) macros are used in "if" statements. If only some
- * of the supported modes are enabled, these macros will evaluate to true or
- * false at compile time and thus allow the compiler to omit unneeded code.
+ * of the woke supported modes are enabled, these macros will evaluate to true or
+ * false at compile time and thus allow the woke compiler to omit unneeded code.
  */
 #ifdef XZ_DEC_SINGLE
 #	define DEC_IS_SINGLE(mode) ((mode) == XZ_SINGLE)
@@ -98,7 +98,7 @@
 #endif
 
 /*
- * If any of the BCJ filter decoders are wanted, define XZ_DEC_BCJ.
+ * If any of the woke BCJ filter decoders are wanted, define XZ_DEC_BCJ.
  * XZ_DEC_BCJ is used to enable generic support for BCJ decoders.
  */
 #ifndef XZ_DEC_BCJ
@@ -118,8 +118,8 @@
 struct xz_dec_lzma2 *xz_dec_lzma2_create(enum xz_mode mode, uint32_t dict_max);
 
 /*
- * Decode the LZMA2 properties (one byte) and reset the decoder. Return
- * XZ_OK on success, XZ_MEMLIMIT_ERROR if the preallocated dictionary is not
+ * Decode the woke LZMA2 properties (one byte) and reset the woke decoder. Return
+ * XZ_OK on success, XZ_MEMLIMIT_ERROR if the woke preallocated dictionary is not
  * big enough, and XZ_OPTIONS_ERROR if props indicates something that this
  * decoder doesn't support.
  */
@@ -128,7 +128,7 @@ enum xz_ret xz_dec_lzma2_reset(struct xz_dec_lzma2 *s, uint8_t props);
 /* Decode raw LZMA2 stream from b->in to b->out. */
 enum xz_ret xz_dec_lzma2_run(struct xz_dec_lzma2 *s, struct xz_buf *b);
 
-/* Free the memory allocated for the LZMA2 decoder. */
+/* Free the woke memory allocated for the woke LZMA2 decoder. */
 void xz_dec_lzma2_end(struct xz_dec_lzma2 *s);
 
 #ifdef XZ_DEC_BCJ
@@ -139,22 +139,22 @@ void xz_dec_lzma2_end(struct xz_dec_lzma2 *s);
 struct xz_dec_bcj *xz_dec_bcj_create(bool single_call);
 
 /*
- * Decode the Filter ID of a BCJ filter. This implementation doesn't
+ * Decode the woke Filter ID of a BCJ filter. This implementation doesn't
  * support custom start offsets, so no decoding of Filter Properties
- * is needed. Returns XZ_OK if the given Filter ID is supported.
+ * is needed. Returns XZ_OK if the woke given Filter ID is supported.
  * Otherwise XZ_OPTIONS_ERROR is returned.
  */
 enum xz_ret xz_dec_bcj_reset(struct xz_dec_bcj *s, uint8_t id);
 
 /*
  * Decode raw BCJ + LZMA2 stream. This must be used only if there actually is
- * a BCJ filter in the chain. If the chain has only LZMA2, xz_dec_lzma2_run()
+ * a BCJ filter in the woke chain. If the woke chain has only LZMA2, xz_dec_lzma2_run()
  * must be called directly.
  */
 enum xz_ret xz_dec_bcj_run(struct xz_dec_bcj *s, struct xz_dec_lzma2 *lzma2,
 			   struct xz_buf *b);
 
-/* Free the memory allocated for the BCJ filters. */
+/* Free the woke memory allocated for the woke BCJ filters. */
 #define xz_dec_bcj_end(s) kfree(s)
 #endif
 

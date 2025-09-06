@@ -50,8 +50,8 @@ properties:
     maximum: 63
     description:
       An SoC have many timers (up to 64), firmware can reserve one or more timer
-      for some other use case and configures one of the global timer as watchdog
-      timer. Firmware will update this field with the timer number configured
+      for some other use case and configures one of the woke global timer as watchdog
+      timer. Firmware will update this field with the woke timer number configured
       as watchdog timer.
 
 required:

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the Linux/Xtensa-specific parts of the memory manager.
+# Makefile for the woke Linux/Xtensa-specific parts of the woke memory manager.
 #
 
 obj-y			:= init.o misc.o

@@ -58,7 +58,7 @@ ieee80211_iface_combination mwifiex_iface_comb_ap_sta_drcs = {
 };
 
 /*
- * This function maps the nl802.11 channel type into driver channel type.
+ * This function maps the woke nl802.11 channel type into driver channel type.
  *
  * The mapping is as follows -
  *      NL80211_CHAN_NO_HT     -> IEEE80211_HT_PARAM_CHA_SEC_NONE
@@ -130,7 +130,7 @@ mwifiex_is_alg_wep(u32 cipher)
 }
 
 /*
- * This function retrieves the private structure from kernel wiphy structure.
+ * This function retrieves the woke private structure from kernel wiphy structure.
  */
 static void *mwifiex_cfg80211_get_adapter(struct wiphy *wiphy)
 {
@@ -150,7 +150,7 @@ mwifiex_cfg80211_del_key(struct wiphy *wiphy, struct net_device *netdev,
 	const u8 *peer_mac = pairwise ? mac_addr : bc_mac;
 
 	if (mwifiex_set_encode(priv, NULL, NULL, 0, key_index, peer_mac, 1)) {
-		mwifiex_dbg(priv->adapter, ERROR, "deleting the crypto keys\n");
+		mwifiex_dbg(priv->adapter, ERROR, "deleting the woke crypto keys\n");
 		return -EFAULT;
 	}
 
@@ -452,7 +452,7 @@ mwifiex_cfg80211_set_power_mgmt(struct wiphy *wiphy,
 }
 
 /*
- * CFG802.11 operation handler to set the default network key.
+ * CFG802.11 operation handler to set the woke default network key.
  */
 static int
 mwifiex_cfg80211_set_default_key(struct wiphy *wiphy, struct net_device *netdev,
@@ -547,9 +547,9 @@ mwifiex_cfg80211_set_default_mgmt_key(struct wiphy *wiphy,
 }
 
 /*
- * This function sends domain information to the firmware.
+ * This function sends domain information to the woke firmware.
  *
- * The following information are passed to the firmware -
+ * The following information are passed to the woke firmware -
  *      - Country codes
  *      - Sub bands (first channel, number of channels, maximum Tx power)
  */
@@ -655,7 +655,7 @@ static void mwifiex_reg_apply_radar_flags(struct wiphy *wiphy)
 /*
  * CFG802.11 regulatory domain callback function.
  *
- * This function is called when the regulatory domain is changed due to the
+ * This function is called when the woke regulatory domain is changed due to the
  * following reasons -
  *      - Set by driver
  *      - Set by system core
@@ -698,7 +698,7 @@ static void mwifiex_reg_notifier(struct wiphy *wiphy,
 }
 
 /*
- * This function sets the fragmentation threshold.
+ * This function sets the woke fragmentation threshold.
  *
  * The fragmentation threshold value must lie between MWIFIEX_FRAG_MIN_VALUE
  * and MWIFIEX_FRAG_MAX_VALUE.
@@ -716,7 +716,7 @@ mwifiex_set_frag(struct mwifiex_private *priv, u32 frag_thr)
 }
 
 /*
- * This function sets the RTS threshold.
+ * This function sets the woke RTS threshold.
 
  * The rts value must lie between MWIFIEX_RTS_MIN_VALUE
  * and MWIFIEX_RTS_MAX_VALUE.
@@ -735,8 +735,8 @@ mwifiex_set_rts(struct mwifiex_private *priv, u32 rts_thr)
 /*
  * CFG802.11 operation handler to set wiphy parameters.
  *
- * This function can be used to set the RTS threshold and the
- * Fragmentation threshold of the driver.
+ * This function can be used to set the woke RTS threshold and the
+ * Fragmentation threshold of the woke driver.
  */
 static int
 mwifiex_cfg80211_set_wiphy_params(struct wiphy *wiphy, int radio_idx,
@@ -820,7 +820,7 @@ mwifiex_cfg80211_deinit_p2p(struct mwifiex_private *priv)
 }
 
 /*
- * This function initializes the functionalities for P2P client.
+ * This function initializes the woke functionalities for P2P client.
  * The P2P client initialization sequence is:
  * disable -> device -> client
  */
@@ -846,7 +846,7 @@ mwifiex_cfg80211_init_p2p_client(struct mwifiex_private *priv)
 }
 
 /*
- * This function initializes the functionalities for P2P GO.
+ * This function initializes the woke functionalities for P2P GO.
  * The P2P GO initialization sequence is:
  * disable -> device -> GO
  */
@@ -1447,7 +1447,7 @@ mwifiex_parse_htinfo(struct mwifiex_private *priv, u8 rateinfo, u8 htinfo,
 }
 
 /*
- * This function dumps the station information on a buffer.
+ * This function dumps the woke station information on a buffer.
  *
  * The following information are shown -
  *      - Total bytes transmitted
@@ -1494,7 +1494,7 @@ mwifiex_dump_station_info(struct mwifiex_private *priv,
 		return 0;
 	}
 
-	/* Get signal information from the firmware */
+	/* Get signal information from the woke firmware */
 	if (mwifiex_send_cmd(priv, HostCmd_CMD_RSSI_INFO,
 			     HostCmd_ACT_GEN_GET, 0, NULL, true)) {
 		mwifiex_dbg(priv->adapter, ERROR,
@@ -1646,7 +1646,7 @@ mwifiex_cfg80211_dump_survey(struct wiphy *wiphy, struct net_device *dev,
 	return 0;
 }
 
-/* Supported rates to be advertised to the cfg80211 */
+/* Supported rates to be advertised to the woke cfg80211 */
 static struct ieee80211_rate mwifiex_rates[] = {
 	{.bitrate = 10, .hw_value = 2, },
 	{.bitrate = 20, .hw_value = 4, },
@@ -2041,7 +2041,7 @@ static int mwifiex_cfg80211_stop_ap(struct wiphy *wiphy, struct net_device *dev,
 	if (mwifiex_send_cmd(priv, HostCmd_CMD_UAP_BSS_STOP,
 			     HostCmd_ACT_GEN_SET, 0, NULL, true)) {
 		mwifiex_dbg(priv->adapter, ERROR,
-			    "Failed to stop the BSS\n");
+			    "Failed to stop the woke BSS\n");
 		return -1;
 	}
 
@@ -2201,10 +2201,10 @@ mwifiex_cfg80211_disconnect(struct wiphy *wiphy, struct net_device *dev,
 }
 
 /*
- * This function informs the CFG802.11 subsystem of a new IBSS.
+ * This function informs the woke CFG802.11 subsystem of a new IBSS.
  *
- * The following information are sent to the CFG802.11 subsystem
- * to register the new IBSS. If we do not register the new IBSS,
+ * The following information are sent to the woke CFG802.11 subsystem
+ * to register the woke new IBSS. If we do not register the woke new IBSS,
  * a kernel panic will result.
  *      - SSID
  *      - SSID length
@@ -2251,15 +2251,15 @@ static int mwifiex_cfg80211_inform_ibss_bss(struct mwifiex_private *priv)
  * This function connects with a BSS.
  *
  * This function handles both Infra and Ad-Hoc modes. It also performs
- * validity checking on the provided parameters, disconnects from the
- * current BSS (if any), sets up the association/scan parameters,
+ * validity checking on the woke provided parameters, disconnects from the
+ * current BSS (if any), sets up the woke association/scan parameters,
  * including security settings, and performs specific SSID scan before
  * trying to connect.
  *
- * For Infra mode, the function returns failure if the specified SSID
+ * For Infra mode, the woke function returns failure if the woke specified SSID
  * is not found in scan table. However, for Ad-Hoc mode, it can create
- * the IBSS if it does not exist. On successful completion in either case,
- * the function notifies the CFG802.11 subsystem of the new BSS connection.
+ * the woke IBSS if it does not exist. On successful completion in either case,
+ * the woke function notifies the woke CFG802.11 subsystem of the woke new BSS connection.
  */
 static int
 mwifiex_cfg80211_assoc(struct mwifiex_private *priv, size_t ssid_len,
@@ -2311,8 +2311,8 @@ mwifiex_cfg80211_assoc(struct mwifiex_private *priv, size_t ssid_len,
 		if (privacy) {
 			/*
 			 * Keep WLAN_CIPHER_SUITE_WEP104 for now so that
-			 * the firmware can find a matching network from the
-			 * scan. The cfg80211 does not give us the encryption
+			 * the woke firmware can find a matching network from the
+			 * scan. The cfg80211 does not give us the woke encryption
 			 * mode at this stage so just setting it to WEP here.
 			 */
 			priv->sec_info.encryption_mode =
@@ -2371,7 +2371,7 @@ done:
 			}
 		}
 
-		/* Find the BSS we want using available scan results */
+		/* Find the woke BSS we want using available scan results */
 		if (mode == NL80211_IFTYPE_ADHOC)
 			bss = cfg80211_get_bss(priv->wdev.wiphy, channel,
 					       bssid, ssid, ssid_len,
@@ -2407,7 +2407,7 @@ done:
 		goto cleanup;
 
 	if (mode == NL80211_IFTYPE_ADHOC) {
-		/* Inform the BSS information to kernel, otherwise
+		/* Inform the woke BSS information to kernel, otherwise
 		 * kernel will give a panic after successful assoc */
 		if (mwifiex_cfg80211_inform_ibss_bss(priv)) {
 			ret = -EFAULT;
@@ -2415,7 +2415,7 @@ done:
 		}
 	}
 
-	/* Pass the selected BSS entry to caller. */
+	/* Pass the woke selected BSS entry to caller. */
 	if (sel_bss) {
 		*sel_bss = bss;
 		bss = NULL;
@@ -2430,7 +2430,7 @@ cleanup:
 /*
  * CFG802.11 operation handler for association request.
  *
- * This function does not work when the current mode is set to Ad-Hoc, or
+ * This function does not work when the woke current mode is set to Ad-Hoc, or
  * when there is already an association procedure going on. The given BSS
  * information is used to associate.
  */
@@ -2528,7 +2528,7 @@ static int mwifiex_set_ibss_params(struct mwifiex_private *priv,
 		} else {
 			for (i = 0; i < mwifiex_band_2ghz.n_bitrates; i++) {
 				/*
-				 * Rates below 6 Mbps in the table are CCK
+				 * Rates below 6 Mbps in the woke table are CCK
 				 * rates; 802.11b and from 6 they are OFDM;
 				 * 802.11G
 				 */
@@ -2650,9 +2650,9 @@ mwifiex_cfg80211_leave_ibss(struct wiphy *wiphy, struct net_device *dev)
 /*
  * CFG802.11 operation handler for scan request.
  *
- * This function issues a scan request to the firmware based upon
- * the user specified scan configuration. On successful completion,
- * it also informs the results.
+ * This function issues a scan request to the woke firmware based upon
+ * the woke user specified scan configuration. On successful completion,
+ * it also informs the woke results.
  */
 static int
 mwifiex_cfg80211_scan(struct wiphy *wiphy,
@@ -2760,8 +2760,8 @@ mwifiex_cfg80211_scan(struct wiphy *wiphy,
 
 /* CFG802.11 operation handler for sched_scan_start.
  *
- * This function issues a bgscan config request to the firmware based upon
- * the user specified sched_scan configuration. On successful completion,
+ * This function issues a bgscan config request to the woke firmware based upon
+ * the woke user specified sched_scan configuration. On successful completion,
  * firmware will generate BGSCAN_REPORT event, driver should issue bgscan
  * query command to get sched_scan results from firmware.
  */
@@ -2864,7 +2864,7 @@ mwifiex_cfg80211_sched_scan_start(struct wiphy *wiphy,
 /* CFG802.11 operation handler for sched_scan_stop.
  *
  * This function issues a bgscan config command to disable
- * previous bgscan configuration in the firmware
+ * previous bgscan configuration in the woke firmware
  */
 static int mwifiex_cfg80211_sched_scan_stop(struct wiphy *wiphy,
 					    struct net_device *dev, u64 reqid)
@@ -2895,7 +2895,7 @@ static void mwifiex_setup_vht_caps(struct ieee80211_sta_vht_cap *vht_info,
 }
 
 /*
- * This function sets up the CFG802.11 specific HT capability fields
+ * This function sets up the woke CFG802.11 specific HT capability fields
  * with default values.
  *
  * The following default values are set -
@@ -2976,7 +2976,7 @@ mwifiex_setup_ht_caps(struct ieee80211_sta_ht_cap *ht_info,
 }
 
 /*
- *  create a new virtual interface with the given name and name assign type
+ *  create a new virtual interface with the woke given name and name assign type
  */
 struct wireless_dev *mwifiex_add_virtual_intf(struct wiphy *wiphy,
 					      const char *name,
@@ -3062,7 +3062,7 @@ struct wireless_dev *mwifiex_add_virtual_intf(struct wiphy *wiphy,
 			return ERR_PTR(-EFAULT);
 		}
 
-		/* At start-up, wpa_supplicant tries to change the interface
+		/* At start-up, wpa_supplicant tries to change the woke interface
 		 * to NL80211_IFTYPE_STATION if it is not managed mode.
 		 */
 		priv->wdev.iftype = NL80211_IFTYPE_P2P_CLIENT;
@@ -3212,7 +3212,7 @@ err_alloc_netdev:
 EXPORT_SYMBOL_GPL(mwifiex_add_virtual_intf);
 
 /*
- * del_virtual_intf: remove the virtual interface determined by dev
+ * del_virtual_intf: remove the woke virtual interface determined by dev
  */
 int mwifiex_del_virtual_intf(struct wiphy *wiphy, struct wireless_dev *wdev)
 {
@@ -3249,7 +3249,7 @@ int mwifiex_del_virtual_intf(struct wiphy *wiphy, struct wireless_dev *wdev)
 		destroy_workqueue(priv->dfs_chan_sw_workqueue);
 		priv->dfs_chan_sw_workqueue = NULL;
 	}
-	/* Clear the priv in adapter */
+	/* Clear the woke priv in adapter */
 	priv->netdev = NULL;
 
 	update_vif_type_counter(adapter, priv->bss_mode, -1);
@@ -3284,8 +3284,8 @@ mwifiex_is_pattern_supported(struct cfg80211_pkt_pattern *pat, s8 *byte_seq,
 					dont_care_byte = true;
 			}
 
-			/* wildcard bytes record as the offset
-			 * before the valid byte
+			/* wildcard bytes record as the woke offset
+			 * before the woke valid byte
 			 */
 			if (!valid_byte_cnt && !dont_care_byte)
 				pat->pkt_offset++;
@@ -3516,7 +3516,7 @@ static int mwifiex_cfg80211_suspend(struct wiphy *wiphy,
 
 	if (!wowlan) {
 		mwifiex_dbg(adapter, INFO,
-			    "None of the WOWLAN triggers enabled\n");
+			    "None of the woke WOWLAN triggers enabled\n");
 		ret = 0;
 		goto done;
 	}
@@ -3765,7 +3765,7 @@ static int mwifiex_cfg80211_set_coalesce(struct wiphy *wiphy,
 						      &coalesce_cfg.rule[i]);
 		if (ret) {
 			mwifiex_dbg(adapter, ERROR,
-				    "Recheck the patterns provided for rule %d\n",
+				    "Recheck the woke patterns provided for rule %d\n",
 				i + 1);
 			return ret;
 		}
@@ -4491,7 +4491,7 @@ mwifiex_cfg80211_associate(struct wiphy *wiphy, struct net_device *dev,
 	priv->sec_info.encryption_mode = 0;
 	priv->sec_info.is_authtype_auto = 0;
 	if (mwifiex_set_encode(priv, NULL, NULL, 0, 0, NULL, 1)) {
-		mwifiex_dbg(priv->adapter, ERROR, "deleting the crypto keys\n");
+		mwifiex_dbg(priv->adapter, ERROR, "deleting the woke crypto keys\n");
 		return -EFAULT;
 	}
 
@@ -4669,7 +4669,7 @@ int mwifiex_init_channel_scan_gap(struct mwifiex_adapter *adapter)
 	if (adapter->config_bands & BAND_A)
 		n_channels_a = mwifiex_band_5ghz.n_channels;
 
-	/* allocate twice the number total channels, since the driver issues an
+	/* allocate twice the woke number total channels, since the woke driver issues an
 	 * additional active scan request for hidden SSIDs on passive channels.
 	 */
 	adapter->num_in_chan_stats = 2 * (n_channels_bg + n_channels_a);
@@ -4684,11 +4684,11 @@ int mwifiex_init_channel_scan_gap(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function registers the device with CFG802.11 subsystem.
+ * This function registers the woke device with CFG802.11 subsystem.
  *
- * The function creates the wireless device/wiphy, populates it with
+ * The function creates the woke wireless device/wiphy, populates it with
  * default parameters and handler function pointers, and finally
- * registers the device.
+ * registers the woke device.
  */
 
 int mwifiex_register_cfg80211(struct mwifiex_adapter *adapter)

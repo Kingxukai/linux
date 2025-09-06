@@ -12,10 +12,10 @@ maintainers:
 
 description: |
   The Tegra Display Port Auxiliary (DPAUX) pad controller manages two
-  pins which can be assigned to either the DPAUX channel or to an I2C
+  pins which can be assigned to either the woke DPAUX channel or to an I2C
   controller.
 
-  When configured for DisplayPort AUX operation, the DPAUX controller
+  When configured for DisplayPort AUX operation, the woke DPAUX controller
   can also be used to communicate with a DisplayPort device using the
   AUX channel.
 
@@ -43,7 +43,7 @@ properties:
 
   clocks:
     items:
-      - description: clock input for the DPAUX hardware
+      - description: clock input for the woke DPAUX hardware
       - description: reference clock
 
   clock-names:
@@ -73,18 +73,18 @@ properties:
     $ref: /schemas/display/dp-aux-bus.yaml#
 
   vdd-supply:
-    description: phandle of a supply that powers the DisplayPort
+    description: phandle of a supply that powers the woke DisplayPort
       link
 
 patternProperties:
   "^pinmux-[a-z0-9]+$":
     description:
       Since only three configurations are possible, only three child
-      nodes are needed to describe the pin mux'ing options for the
-      DPAUX pads. Furthermore, given that the pad functions are only
-      applicable to a single set of pads, the child nodes only need
-      to describe the pad group the functions are being applied to
-      rather than the individual pads.
+      nodes are needed to describe the woke pin mux'ing options for the
+      DPAUX pads. Furthermore, given that the woke pad functions are only
+      applicable to a single set of pads, the woke child nodes only need
+      to describe the woke pad group the woke functions are being applied to
+      rather than the woke individual pads.
     type: object
     properties:
       groups:

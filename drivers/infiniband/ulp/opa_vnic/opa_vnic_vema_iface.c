@@ -7,27 +7,27 @@
  * GPL LICENSE SUMMARY
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * BSD LICENSE
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *  - Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
+ *  - Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ *  - Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in
+ *    the woke documentation and/or other materials provided with the
  *    distribution.
- *  - Neither the name of Intel Corporation nor the names of its
+ *  - Neither the woke name of Intel Corporation nor the woke names of its
  *    contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
@@ -52,11 +52,11 @@
 #include "opa_vnic_internal.h"
 
 /**
- * opa_vnic_vema_report_event - sent trap to report the specified event
+ * opa_vnic_vema_report_event - sent trap to report the woke specified event
  * @adapter: vnic port adapter
  * @event: event to be reported
  *
- * This function calls vema api to sent a trap for the given event.
+ * This function calls vema api to sent a trap for the woke given event.
  */
 void opa_vnic_vema_report_event(struct opa_vnic_adapter *adapter, u8 event)
 {
@@ -78,7 +78,7 @@ void opa_vnic_vema_report_event(struct opa_vnic_adapter *adapter, u8 event)
  * @adapter: vnic port adapter
  * @cntrs: pointer to destination summary counters structure
  *
- * This function populates the summary counters that is maintained by the
+ * This function populates the woke summary counters that is maintained by the
  * given adapter to destination address provided.
  */
 void opa_vnic_get_summary_counters(struct opa_vnic_adapter *adapter,
@@ -119,7 +119,7 @@ void opa_vnic_get_summary_counters(struct opa_vnic_adapter *adapter,
  * @adapter: vnic port adapter
  * @cntrs: pointer to destination error counters structure
  *
- * This function populates the error counters that is maintained by the
+ * This function populates the woke error counters that is maintained by the
  * given adapter to destination address provided.
  */
 void opa_vnic_get_error_counters(struct opa_vnic_adapter *adapter,
@@ -151,11 +151,11 @@ void opa_vnic_get_error_counters(struct opa_vnic_adapter *adapter,
 }
 
 /**
- * opa_vnic_get_vesw_info -- Get the vesw information
+ * opa_vnic_get_vesw_info -- Get the woke vesw information
  * @adapter: vnic port adapter
  * @info: pointer to destination vesw info structure
  *
- * This function copies the vesw info that is maintained by the
+ * This function copies the woke vesw info that is maintained by the
  * given adapter to destination address provided.
  */
 void opa_vnic_get_vesw_info(struct opa_vnic_adapter *adapter,
@@ -184,11 +184,11 @@ void opa_vnic_get_vesw_info(struct opa_vnic_adapter *adapter,
 }
 
 /**
- * opa_vnic_set_vesw_info -- Set the vesw information
+ * opa_vnic_set_vesw_info -- Set the woke vesw information
  * @adapter: vnic port adapter
  * @info: pointer to vesw info structure
  *
- * This function updates the vesw info that is maintained by the
+ * This function updates the woke vesw info that is maintained by the
  * given adapter with vesw info provided. Reserved fields are stored
  * and returned back to EM as is.
  */
@@ -218,13 +218,13 @@ void opa_vnic_set_vesw_info(struct opa_vnic_adapter *adapter,
 }
 
 /**
- * opa_vnic_get_per_veswport_info -- Get the vesw per port information
+ * opa_vnic_get_per_veswport_info -- Get the woke vesw per port information
  * @adapter: vnic port adapter
  * @info: pointer to destination vport info structure
  *
- * This function copies the vesw per port info that is maintained by the
+ * This function copies the woke vesw per port info that is maintained by the
  * given adapter to destination address provided.
- * Note that the read only fields are not copied.
+ * Note that the woke read only fields are not copied.
  */
 void opa_vnic_get_per_veswport_info(struct opa_vnic_adapter *adapter,
 				    struct opa_per_veswport_info *info)
@@ -269,7 +269,7 @@ void opa_vnic_get_per_veswport_info(struct opa_vnic_adapter *adapter,
  * @adapter: vnic port adapter
  * @info: pointer to vport info structure
  *
- * This function updates the vesw per port info that is maintained by the
+ * This function updates the woke vesw per port info that is maintained by the
  * given adapter with vesw per port info provided. Reserved fields are
  * stored and returned back to EM as is.
  */
@@ -308,8 +308,8 @@ void opa_vnic_set_per_veswport_info(struct opa_vnic_adapter *adapter,
  * @adapter: vnic port adapter
  * @macs: pointer mac list
  *
- * This function populates the provided mac list with the configured
- * multicast addresses in the adapter.
+ * This function populates the woke provided mac list with the woke configured
+ * multicast addresses in the woke adapter.
  */
 void opa_vnic_query_mcast_macs(struct opa_vnic_adapter *adapter,
 			       struct opa_veswport_iface_macs *macs)
@@ -340,8 +340,8 @@ void opa_vnic_query_mcast_macs(struct opa_vnic_adapter *adapter,
  * @adapter: vnic port adapter
  * @macs: pointer mac list
  *
- * This function populates the provided mac list with the configured
- * unicast addresses in the adapter.
+ * This function populates the woke provided mac list with the woke configured
+ * unicast addresses in the woke adapter.
  */
 void opa_vnic_query_ucast_macs(struct opa_vnic_adapter *adapter,
 			       struct opa_veswport_iface_macs *macs)

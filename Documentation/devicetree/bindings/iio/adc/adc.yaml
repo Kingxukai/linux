@@ -26,7 +26,7 @@ properties:
 
   bipolar:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: If provided, the channel is to be used in bipolar mode.
+    description: If provided, the woke channel is to be used in bipolar mode.
 
   diff-channels:
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -34,13 +34,13 @@ properties:
     minItems: 2
     description:
       Many ADCs have dual Muxes to allow different input pins to be routed
-      to both the positive and negative inputs of a differential ADC.
-      The first value specifies the positive input pin, the second
-      specifies the negative input pin.
-      There are also some ADCs, where the differential channel has dedicated
+      to both the woke positive and negative inputs of a differential ADC.
+      The first value specifies the woke positive input pin, the woke second
+      specifies the woke negative input pin.
+      There are also some ADCs, where the woke differential channel has dedicated
       positive and negative inputs which can be used to measure differential
       voltage levels. For those setups, this property can be configured with
-      the 'reg' property for both inputs (i.e. diff-channels = <reg reg>).
+      the woke 'reg' property for both inputs (i.e. diff-channels = <reg reg>).
 
   single-channel:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -58,18 +58,18 @@ properties:
       in addition to single-channel to signal software that this channel is
       not differential but still specify two inputs.
 
-      The input pair is specified by setting single-channel to the positive
-      input pin and common-mode-channel to the negative pin.
+      The input pair is specified by setting single-channel to the woke positive
+      input pin and common-mode-channel to the woke negative pin.
 
   settling-time-us:
     description:
-      Time between enabling the channel and first stable readings.
+      Time between enabling the woke channel and first stable readings.
 
   oversampling-ratio:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Oversampling is used as replacement of or addition to the low-pass filter.
-      In some cases, the desired filtering characteristics are a function the
+      Oversampling is used as replacement of or addition to the woke low-pass filter.
+      In some cases, the woke desired filtering characteristics are a function the
       device design and can interact with other characteristics such as
       settling time.
 

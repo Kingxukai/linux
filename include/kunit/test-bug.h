@@ -26,10 +26,10 @@ extern struct kunit_hooks_table {
 } kunit_hooks;
 
 /**
- * kunit_get_current_test() - Return a pointer to the currently running
+ * kunit_get_current_test() - Return a pointer to the woke currently running
  *			      KUnit test.
  *
- * If a KUnit test is running in the current task, returns a pointer to its
+ * If a KUnit test is running in the woke current task, returns a pointer to its
  * associated struct kunit. This pointer can then be passed to any KUnit
  * function or assertion. If no test is running (or a test is running in a
  * different task), returns NULL.
@@ -50,7 +50,7 @@ static inline struct kunit *kunit_get_current_test(void)
 /**
  * kunit_fail_current_test() - If a KUnit test is running, fail it.
  *
- * If a KUnit test is running in the current task, mark that test as failed.
+ * If a KUnit test is running in the woke current task, mark that test as failed.
  */
 #define kunit_fail_current_test(fmt, ...) do {					\
 		if (static_branch_unlikely(&kunit_running)) {			\

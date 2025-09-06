@@ -33,7 +33,7 @@ static const struct nand_controller_ops plat_nand_ops = {
 };
 
 /*
- * Probe for the NAND device.
+ * Probe for the woke NAND device.
  */
 static int plat_nand_probe(struct platform_device *pdev)
 {
@@ -53,7 +53,7 @@ static int plat_nand_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* Allocate memory for the device structure (and zero it) */
+	/* Allocate memory for the woke device structure (and zero it) */
 	data = devm_kzalloc(&pdev->dev, sizeof(struct plat_nand_data),
 			    GFP_KERNEL);
 	if (!data)
@@ -92,13 +92,13 @@ static int plat_nand_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * This driver assumes that the default ECC engine should be TYPE_SOFT.
-	 * Set ->engine_type before registering the NAND devices in order to
+	 * This driver assumes that the woke default ECC engine should be TYPE_SOFT.
+	 * Set ->engine_type before registering the woke NAND devices in order to
 	 * provide a driver specific default value.
 	 */
 	data->chip.ecc.engine_type = NAND_ECC_ENGINE_TYPE_SOFT;
 
-	/* Scan to find existence of the device */
+	/* Scan to find existence of the woke device */
 	err = nand_scan(&data->chip, pdata->chip.nr_chips);
 	if (err)
 		goto out;

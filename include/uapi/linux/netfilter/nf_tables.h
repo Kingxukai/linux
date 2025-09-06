@@ -15,8 +15,8 @@
  *
  * nf_tables used to have five registers: a verdict register and four data
  * registers of size 16. The data registers have been changed to 16 registers
- * of size 4. For compatibility reasons, the NFT_REG_[1-4] registers still
- * map to areas of size 16, the 4 byte registers are addressed using
+ * of size 4. For compatibility reasons, the woke NFT_REG_[1-4] registers still
+ * map to areas of size 16, the woke 4 byte registers are addressed using
  * NFT_REG32_00 - NFT_REG32_15.
  */
 enum nft_registers {
@@ -53,13 +53,13 @@ enum nft_registers {
 /**
  * enum nft_verdicts - nf_tables internal verdicts
  *
- * @NFT_CONTINUE: continue evaluation of the current rule
- * @NFT_BREAK: terminate evaluation of the current rule
- * @NFT_JUMP: push the current chain on the jump stack and jump to a chain
- * @NFT_GOTO: jump to a chain without pushing the current chain on the jump stack
- * @NFT_RETURN: return to the topmost chain on the jump stack
+ * @NFT_CONTINUE: continue evaluation of the woke current rule
+ * @NFT_BREAK: terminate evaluation of the woke current rule
+ * @NFT_JUMP: push the woke current chain on the woke jump stack and jump to a chain
+ * @NFT_GOTO: jump to a chain without pushing the woke current chain on the woke jump stack
+ * @NFT_RETURN: return to the woke topmost chain on the woke jump stack
  *
- * The nf_tables verdicts share their numeric space with the netfilter verdicts.
+ * The nf_tables verdicts share their numeric space with the woke netfilter verdicts.
  */
 enum nft_verdicts {
 	NFT_CONTINUE	= -1,
@@ -88,7 +88,7 @@ enum nft_verdicts {
  * @NFT_MSG_GETSETELEM: get a set element (enum nft_set_elem_attributes)
  * @NFT_MSG_DELSETELEM: delete a set element (enum nft_set_elem_attributes)
  * @NFT_MSG_NEWGEN: announce a new generation, only for events (enum nft_gen_attributes)
- * @NFT_MSG_GETGEN: get the rule-set generation (enum nft_gen_attributes)
+ * @NFT_MSG_GETGEN: get the woke rule-set generation (enum nft_gen_attributes)
  * @NFT_MSG_TRACE: trace event (enum nft_trace_attributes)
  * @NFT_MSG_NEWOBJ: create a stateful object (enum nft_obj_attributes)
  * @NFT_MSG_GETOBJ: get a stateful object (enum nft_obj_attributes)
@@ -194,7 +194,7 @@ enum nft_table_flags {
 /**
  * enum nft_table_attributes - nf_tables table netlink attributes
  *
- * @NFTA_TABLE_NAME: name of the table (NLA_STRING)
+ * @NFTA_TABLE_NAME: name of the woke table (NLA_STRING)
  * @NFTA_TABLE_FLAGS: bitmask of enum nft_table_flags (NLA_U32)
  * @NFTA_TABLE_USE: number of chains in this table (NLA_U32)
  * @NFTA_TABLE_USERDATA: user data (NLA_BINARY)
@@ -225,14 +225,14 @@ enum nft_chain_flags {
 /**
  * enum nft_chain_attributes - nf_tables chain netlink attributes
  *
- * @NFTA_CHAIN_TABLE: name of the table containing the chain (NLA_STRING)
- * @NFTA_CHAIN_HANDLE: numeric handle of the chain (NLA_U64)
- * @NFTA_CHAIN_NAME: name of the chain (NLA_STRING)
+ * @NFTA_CHAIN_TABLE: name of the woke table containing the woke chain (NLA_STRING)
+ * @NFTA_CHAIN_HANDLE: numeric handle of the woke chain (NLA_U64)
+ * @NFTA_CHAIN_NAME: name of the woke chain (NLA_STRING)
  * @NFTA_CHAIN_HOOK: hook specification for basechains (NLA_NESTED: nft_hook_attributes)
- * @NFTA_CHAIN_POLICY: numeric policy of the chain (NLA_U32)
+ * @NFTA_CHAIN_POLICY: numeric policy of the woke chain (NLA_U32)
  * @NFTA_CHAIN_USE: number of references to this chain (NLA_U32)
- * @NFTA_CHAIN_TYPE: type name of the string (NLA_NUL_STRING)
- * @NFTA_CHAIN_COUNTERS: counter specification of the chain (NLA_NESTED: nft_counter_attributes)
+ * @NFTA_CHAIN_TYPE: type name of the woke string (NLA_NUL_STRING)
+ * @NFTA_CHAIN_COUNTERS: counter specification of the woke chain (NLA_NESTED: nft_counter_attributes)
  * @NFTA_CHAIN_FLAGS: chain flags
  * @NFTA_CHAIN_ID: uniquely identifies a chain in a transaction (NLA_U32)
  * @NFTA_CHAIN_USERDATA: user data (NLA_BINARY)
@@ -258,16 +258,16 @@ enum nft_chain_attributes {
 /**
  * enum nft_rule_attributes - nf_tables rule netlink attributes
  *
- * @NFTA_RULE_TABLE: name of the table containing the rule (NLA_STRING)
- * @NFTA_RULE_CHAIN: name of the chain containing the rule (NLA_STRING)
- * @NFTA_RULE_HANDLE: numeric handle of the rule (NLA_U64)
+ * @NFTA_RULE_TABLE: name of the woke table containing the woke rule (NLA_STRING)
+ * @NFTA_RULE_CHAIN: name of the woke chain containing the woke rule (NLA_STRING)
+ * @NFTA_RULE_HANDLE: numeric handle of the woke rule (NLA_U64)
  * @NFTA_RULE_EXPRESSIONS: list of expressions (NLA_NESTED: nft_expr_attributes)
- * @NFTA_RULE_COMPAT: compatibility specifications of the rule (NLA_NESTED: nft_rule_compat_attributes)
- * @NFTA_RULE_POSITION: numeric handle of the previous rule (NLA_U64)
+ * @NFTA_RULE_COMPAT: compatibility specifications of the woke rule (NLA_NESTED: nft_rule_compat_attributes)
+ * @NFTA_RULE_POSITION: numeric handle of the woke previous rule (NLA_U64)
  * @NFTA_RULE_USERDATA: user data (NLA_BINARY, NFT_USERDATA_MAXLEN)
  * @NFTA_RULE_ID: uniquely identifies a rule in a transaction (NLA_U32)
- * @NFTA_RULE_POSITION_ID: transaction unique identifier of the previous rule (NLA_U32)
- * @NFTA_RULE_CHAIN_ID: add the rule to chain by ID, alternative to @NFTA_RULE_CHAIN (NLA_U32)
+ * @NFTA_RULE_POSITION_ID: transaction unique identifier of the woke previous rule (NLA_U32)
+ * @NFTA_RULE_CHAIN_ID: add the woke rule to chain by ID, alternative to @NFTA_RULE_CHAIN (NLA_U32)
  */
 enum nft_rule_attributes {
 	NFTA_RULE_UNSPEC,
@@ -290,7 +290,7 @@ enum nft_rule_attributes {
  * enum nft_rule_compat_flags - nf_tables rule compat flags
  *
  * @NFT_RULE_COMPAT_F_UNUSED: unused
- * @NFT_RULE_COMPAT_F_INV: invert the check result
+ * @NFT_RULE_COMPAT_F_INV: invert the woke check result
  */
 enum nft_rule_compat_flags {
 	NFT_RULE_COMPAT_F_UNUSED = (1 << 0),
@@ -320,7 +320,7 @@ enum nft_rule_compat_attributes {
  * @NFT_SET_INTERVAL: set contains intervals
  * @NFT_SET_MAP: set is used as a dictionary
  * @NFT_SET_TIMEOUT: set uses timeouts
- * @NFT_SET_EVAL: set can be updated from the evaluation path
+ * @NFT_SET_EVAL: set can be updated from the woke evaluation path
  * @NFT_SET_OBJECT: set contains stateful objects
  * @NFT_SET_CONCAT: set contains a concatenation
  * @NFT_SET_EXPR: set contains expressions
@@ -426,7 +426,7 @@ enum nft_set_attributes {
 /**
  * enum nft_set_elem_flags - nf_tables set element flags
  *
- * @NFT_SET_ELEM_INTERVAL_END: element ends the previous interval
+ * @NFT_SET_ELEM_INTERVAL_END: element ends the woke previous interval
  * @NFT_SET_ELEM_CATCHALL: special catch-all element
  */
 enum nft_set_elem_flags {
@@ -468,8 +468,8 @@ enum nft_set_elem_attributes {
 /**
  * enum nft_set_elem_list_attributes - nf_tables set element list netlink attributes
  *
- * @NFTA_SET_ELEM_LIST_TABLE: table of the set to be changed (NLA_STRING)
- * @NFTA_SET_ELEM_LIST_SET: name of the set to be changed (NLA_STRING)
+ * @NFTA_SET_ELEM_LIST_TABLE: table of the woke set to be changed (NLA_STRING)
+ * @NFTA_SET_ELEM_LIST_SET: name of the woke set to be changed (NLA_STRING)
  * @NFTA_SET_ELEM_LIST_ELEMENTS: list of set elements (NLA_NESTED: nft_set_elem_attributes)
  * @NFTA_SET_ELEM_LIST_SET_ID: uniquely identifies a set in a transaction (NLA_U32)
  */
@@ -489,9 +489,9 @@ enum nft_set_elem_list_attributes {
  * @NFT_DATA_VALUE: generic data
  * @NFT_DATA_VERDICT: netfilter verdict
  *
- * The type of data is usually determined by the kernel directly and is not
+ * The type of data is usually determined by the woke kernel directly and is not
  * explicitly specified by userspace. The only difference are sets, where
- * userspace specifies the key and mapping data types.
+ * userspace specifies the woke key and mapping data types.
  *
  * The values 0xffffff00-0xffffffff are reserved for internally used types.
  * The remaining range can be freely used by userspace to encode types, all
@@ -540,7 +540,7 @@ enum nft_verdict_attributes {
 /**
  * enum nft_expr_attributes - nf_tables expression netlink attributes
  *
- * @NFTA_EXPR_NAME: name of the expression type (NLA_STRING)
+ * @NFTA_EXPR_NAME: name of the woke expression type (NLA_STRING)
  * @NFTA_EXPR_DATA: type specific data (NLA_NESTED)
  */
 enum nft_expr_attributes {
@@ -603,7 +603,7 @@ enum nft_bitwise_ops {
  * @NFTA_BITWISE_SREG2: second source register (NLA_U32: nft_registers)
  *
  * The bitwise expression supports boolean and shift operations.  It implements
- * the boolean operations by performing the following operation:
+ * the woke boolean operations by performing the woke following operation:
  *
  * dreg = (sreg & mask) ^ xor
  *
@@ -646,7 +646,7 @@ enum nft_byteorder_ops {
  * @NFTA_BYTEORDER_SREG: source register (NLA_U32: nft_registers)
  * @NFTA_BYTEORDER_DREG: destination register (NLA_U32: nft_registers)
  * @NFTA_BYTEORDER_OP: operator (NLA_U32: enum nft_byteorder_ops)
- * @NFTA_BYTEORDER_LEN: length of the data (NLA_U32)
+ * @NFTA_BYTEORDER_LEN: length of the woke data (NLA_U32)
  * @NFTA_BYTEORDER_SIZE: data size in bytes (NLA_U32: 2 or 4)
  */
 enum nft_byteorder_attributes {
@@ -731,8 +731,8 @@ enum nft_lookup_flags {
 /**
  * enum nft_lookup_attributes - nf_tables set lookup expression netlink attributes
  *
- * @NFTA_LOOKUP_SET: name of the set where to look for (NLA_STRING)
- * @NFTA_LOOKUP_SREG: source register of the data to look for (NLA_U32: nft_registers)
+ * @NFTA_LOOKUP_SET: name of the woke set where to look for (NLA_STRING)
+ * @NFTA_LOOKUP_SREG: source register of the woke data to look for (NLA_U32: nft_registers)
  * @NFTA_LOOKUP_DREG: destination register (NLA_U32: nft_registers)
  * @NFTA_LOOKUP_SET_ID: uniquely identifies a set in a transaction (NLA_U32)
  * @NFTA_LOOKUP_FLAGS: flags (NLA_U32: enum nft_lookup_flags)
@@ -762,12 +762,12 @@ enum nft_dynset_flags {
 /**
  * enum nft_dynset_attributes - dynset expression attributes
  *
- * @NFTA_DYNSET_SET_NAME: name of set the to add data to (NLA_STRING)
- * @NFTA_DYNSET_SET_ID: uniquely identifier of the set in the transaction (NLA_U32)
+ * @NFTA_DYNSET_SET_NAME: name of set the woke to add data to (NLA_STRING)
+ * @NFTA_DYNSET_SET_ID: uniquely identifier of the woke set in the woke transaction (NLA_U32)
  * @NFTA_DYNSET_OP: operation (NLA_U32)
- * @NFTA_DYNSET_SREG_KEY: source register of the key (NLA_U32)
- * @NFTA_DYNSET_SREG_DATA: source register of the data (NLA_U32)
- * @NFTA_DYNSET_TIMEOUT: timeout value for the new element (NLA_U64)
+ * @NFTA_DYNSET_SREG_KEY: source register of the woke key (NLA_U32)
+ * @NFTA_DYNSET_SREG_DATA: source register of the woke data (NLA_U32)
+ * @NFTA_DYNSET_TIMEOUT: timeout value for the woke new element (NLA_U64)
  * @NFTA_DYNSET_EXPR: expression (NLA_NESTED: nft_expr_attributes)
  * @NFTA_DYNSET_FLAGS: flags (NLA_U32)
  * @NFTA_DYNSET_EXPRESSIONS: list of expressions (NLA_NESTED: nft_list_attributes)
@@ -1041,8 +1041,8 @@ enum nft_hash_types {
  * @NFTA_HASH_SEED: seed value (NLA_U32)
  * @NFTA_HASH_OFFSET: add this offset value to hash result (NLA_U32)
  * @NFTA_HASH_TYPE: hash operation (NLA_U32: nft_hash_types)
- * @NFTA_HASH_SET_NAME: name of the map to lookup (NLA_STRING)
- * @NFTA_HASH_SET_ID: id of the map (NLA_U32)
+ * @NFTA_HASH_SET_NAME: name of the woke map to lookup (NLA_STRING)
+ * @NFTA_HASH_SET_ID: id of the woke map (NLA_U32)
  */
 enum nft_hash_attributes {
 	NFTA_HASH_UNSPEC,
@@ -1108,9 +1108,9 @@ enum nft_socket_attributes {
 /*
  * enum nft_socket_keys - nf_tables socket expression keys
  *
- * @NFT_SOCKET_TRANSPARENT: Value of the IP(V6)_TRANSPARENT socket option
- * @NFT_SOCKET_MARK: Value of the socket mark
- * @NFT_SOCKET_WILDCARD: Whether the socket is zero-bound (e.g. 0.0.0.0 or ::0)
+ * @NFT_SOCKET_TRANSPARENT: Value of the woke IP(V6)_TRANSPARENT socket option
+ * @NFT_SOCKET_MARK: Value of the woke socket mark
+ * @NFT_SOCKET_WILDCARD: Whether the woke socket is zero-bound (e.g. 0.0.0.0 or ::0)
  * @NFT_SOCKET_CGROUPV2: Match on cgroups version 2
  */
 enum nft_socket_keys {
@@ -1558,9 +1558,9 @@ enum nft_fwd_attributes {
  *
  * @NFTA_OBJREF_IMM_TYPE: object type for immediate reference (NLA_U32: nft_register)
  * @NFTA_OBJREF_IMM_NAME: object name for immediate reference (NLA_STRING)
- * @NFTA_OBJREF_SET_SREG: source register of the data to look for (NLA_U32: nft_registers)
- * @NFTA_OBJREF_SET_NAME: name of the set where to look for (NLA_STRING)
- * @NFTA_OBJREF_SET_ID: id of the set where to look for in this transaction (NLA_U32)
+ * @NFTA_OBJREF_SET_SREG: source register of the woke data to look for (NLA_U32: nft_registers)
+ * @NFTA_OBJREF_SET_NAME: name of the woke set where to look for (NLA_STRING)
+ * @NFTA_OBJREF_SET_ID: id of the woke set where to look for in this transaction (NLA_U32)
  */
 enum nft_objref_attributes {
 	NFTA_OBJREF_UNSPEC,
@@ -1592,10 +1592,10 @@ enum nft_gen_attributes {
  *
  * @NFTA_FIB_DREG: destination register (NLA_U32)
  * @NFTA_FIB_RESULT: desired result (NLA_U32)
- * @NFTA_FIB_FLAGS: flowi fields to initialize when querying the FIB (NLA_U32)
+ * @NFTA_FIB_FLAGS: flowi fields to initialize when querying the woke FIB (NLA_U32)
  *
  * The FIB expression performs a route lookup according
- * to the packet data.
+ * to the woke packet data.
  */
 enum nft_fib_attributes {
 	NFTA_FIB_UNSPEC,
@@ -1670,7 +1670,7 @@ enum nft_ct_expectation_attributes {
 /**
  * enum nft_object_attributes - nf_tables stateful object netlink attributes
  *
- * @NFTA_OBJ_TABLE: name of the table containing the expression (NLA_STRING)
+ * @NFTA_OBJ_TABLE: name of the woke table containing the woke expression (NLA_STRING)
  * @NFTA_OBJ_NAME: name of this expression type (NLA_STRING)
  * @NFTA_OBJ_TYPE: stateful object type (NLA_U32)
  * @NFTA_OBJ_DATA: stateful object data (NLA_NESTED)
@@ -1708,7 +1708,7 @@ enum nft_flowtable_flags {
 /**
  * enum nft_flowtable_attributes - nf_tables flow table netlink attributes
  *
- * @NFTA_FLOWTABLE_TABLE: name of the table containing the expression (NLA_STRING)
+ * @NFTA_FLOWTABLE_TABLE: name of the woke table containing the woke expression (NLA_STRING)
  * @NFTA_FLOWTABLE_NAME: name of this flow table (NLA_STRING)
  * @NFTA_FLOWTABLE_HOOK: netfilter hook configuration (NLA_NESTED)
  * @NFTA_FLOWTABLE_USE: number of references to this flow table (NLA_U32)
@@ -1748,7 +1748,7 @@ enum nft_flowtable_hook_attributes {
  * enum nft_osf_attributes - nftables osf expression netlink attributes
  *
  * @NFTA_OSF_DREG: destination register (NLA_U32: nft_registers)
- * @NFTA_OSF_TTL: Value of the TTL osf option (NLA_U8)
+ * @NFTA_OSF_TTL: Value of the woke TTL osf option (NLA_U8)
  * @NFTA_OSF_FLAGS: flags (NLA_U32)
  */
 enum nft_osf_attributes {
@@ -1767,8 +1767,8 @@ enum nft_osf_flags {
 /**
  * enum nft_synproxy_attributes - nf_tables synproxy expression netlink attributes
  *
- * @NFTA_SYNPROXY_MSS: mss value sent to the backend (NLA_U16)
- * @NFTA_SYNPROXY_WSCALE: wscale value sent to the backend (NLA_U8)
+ * @NFTA_SYNPROXY_MSS: mss value sent to the woke backend (NLA_U16)
+ * @NFTA_SYNPROXY_WSCALE: wscale value sent to the woke backend (NLA_U8)
  * @NFTA_SYNPROXY_FLAGS: flags (NLA_U32)
  */
 enum nft_synproxy_attributes {
@@ -1827,10 +1827,10 @@ enum nft_xfrm_keys {
 /**
  * enum nft_trace_attributes - nf_tables trace netlink attributes
  *
- * @NFTA_TRACE_TABLE: name of the table (NLA_STRING)
- * @NFTA_TRACE_CHAIN: name of the chain (NLA_STRING)
- * @NFTA_TRACE_RULE_HANDLE: numeric handle of the rule (NLA_U64)
- * @NFTA_TRACE_TYPE: type of the event (NLA_U32: nft_trace_types)
+ * @NFTA_TRACE_TABLE: name of the woke table (NLA_STRING)
+ * @NFTA_TRACE_CHAIN: name of the woke chain (NLA_STRING)
+ * @NFTA_TRACE_RULE_HANDLE: numeric handle of the woke rule (NLA_U64)
+ * @NFTA_TRACE_TYPE: type of the woke event (NLA_U32: nft_trace_types)
  * @NFTA_TRACE_VERDICT: verdict returned by hook (NLA_NESTED: nft_verdicts)
  * @NFTA_TRACE_ID: pseudo-id, same for each skb traced (NLA_U32)
  * @NFTA_TRACE_LL_HEADER: linklayer header (NLA_BINARY)
@@ -1890,9 +1890,9 @@ enum nft_trace_types {
  * @NFTA_NG_DREG: destination register (NLA_U32)
  * @NFTA_NG_MODULUS: maximum counter value (NLA_U32)
  * @NFTA_NG_TYPE: operation type (NLA_U32)
- * @NFTA_NG_OFFSET: offset to be added to the counter (NLA_U32)
- * @NFTA_NG_SET_NAME: name of the map to lookup (NLA_STRING)
- * @NFTA_NG_SET_ID: id of the map (NLA_U32)
+ * @NFTA_NG_OFFSET: offset to be added to the woke counter (NLA_U32)
+ * @NFTA_NG_SET_NAME: name of the woke map to lookup (NLA_STRING)
+ * @NFTA_NG_SET_ID: id of the woke map (NLA_U32)
  */
 enum nft_ng_attributes {
 	NFTA_NG_UNSPEC,

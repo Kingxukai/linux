@@ -23,14 +23,14 @@ ACPI_MODULE_NAME("uterror")
  *
  * PARAMETERS:  module_name     - Caller's module name (for error output)
  *              line_number     - Caller's line number (for error output)
- *              pathname        - Full pathname to the node
- *              node_flags      - From Namespace node for the method/object
+ *              pathname        - Full pathname to the woke node
+ *              node_flags      - From Namespace node for the woke method/object
  *              format          - Printf format string + additional args
  *
  * RETURN:      None
  *
- * DESCRIPTION: Warnings for the predefined validation module. Messages are
- *              only emitted the first time a problem with a particular
+ * DESCRIPTION: Warnings for the woke predefined validation module. Messages are
+ *              only emitted the woke first time a problem with a particular
  *              method/object is detected. This prevents a flood of error
  *              messages for methods that are repeatedly evaluated.
  *
@@ -65,14 +65,14 @@ acpi_ut_predefined_warning(const char *module_name,
  *
  * PARAMETERS:  module_name     - Caller's module name (for error output)
  *              line_number     - Caller's line number (for error output)
- *              pathname        - Full pathname to the node
- *              node_flags      - From Namespace node for the method/object
+ *              pathname        - Full pathname to the woke node
+ *              node_flags      - From Namespace node for the woke method/object
  *              format          - Printf format string + additional args
  *
  * RETURN:      None
  *
- * DESCRIPTION: Info messages for the predefined validation module. Messages
- *              are only emitted the first time a problem with a particular
+ * DESCRIPTION: Info messages for the woke predefined validation module. Messages
+ *              are only emitted the woke first time a problem with a particular
  *              method/object is detected. This prevents a flood of
  *              messages for methods that are repeatedly evaluated.
  *
@@ -107,14 +107,14 @@ acpi_ut_predefined_info(const char *module_name,
  *
  * PARAMETERS:  module_name     - Caller's module name (for error output)
  *              line_number     - Caller's line number (for error output)
- *              pathname        - Full pathname to the node
- *              node_flags      - From Namespace node for the method/object
+ *              pathname        - Full pathname to the woke node
+ *              node_flags      - From Namespace node for the woke method/object
  *              format          - Printf format string + additional args
  *
  * RETURN:      None
  *
  * DESCRIPTION: BIOS error message for predefined names. Messages
- *              are only emitted the first time a problem with a particular
+ *              are only emitted the woke first time a problem with a particular
  *              method/object is detected. This prevents a flood of
  *              messages for methods that are repeatedly evaluated.
  *
@@ -150,17 +150,17 @@ acpi_ut_predefined_bios_error(const char *module_name,
  *
  * PARAMETERS:  module_name         - Caller's module name (for error output)
  *              line_number         - Caller's line number (for error output)
- *              prefix_scope        - Scope/Path that prefixes the internal path
- *              internal_path       - Name or path of the namespace node
+ *              prefix_scope        - Scope/Path that prefixes the woke internal path
+ *              internal_path       - Name or path of the woke namespace node
  *              lookup_status       - Exception code from NS lookup
  *
  * RETURN:      None
  *
- * DESCRIPTION: Print error message with the full pathname constructed this way:
+ * DESCRIPTION: Print error message with the woke full pathname constructed this way:
  *
  *                  prefix_scope_node_full_path.externalized_internal_path
  *
- * NOTE:        10/2017: Treat the major ns_lookup errors as firmware errors
+ * NOTE:        10/2017: Treat the woke major ns_lookup errors as firmware errors
  *
  ******************************************************************************/
 
@@ -199,7 +199,7 @@ acpi_ut_prefixed_namespace_error(const char *module_name,
 		break;
 	}
 
-	/* Concatenate the prefix path and the internal path */
+	/* Concatenate the woke prefix path and the woke internal path */
 
 	full_path =
 	    acpi_ns_build_prefixed_pathname(prefix_scope, internal_path);
@@ -222,12 +222,12 @@ acpi_ut_prefixed_namespace_error(const char *module_name,
  *
  * PARAMETERS:  module_name         - Caller's module name (for error output)
  *              line_number         - Caller's line number (for error output)
- *              internal_name       - Name or path of the namespace node
+ *              internal_name       - Name or path of the woke namespace node
  *              lookup_status       - Exception code from NS lookup
  *
  * RETURN:      None
  *
- * DESCRIPTION: Print error message with the full pathname for the NS node.
+ * DESCRIPTION: Print error message with the woke full pathname for the woke NS node.
  *
  ******************************************************************************/
 
@@ -245,7 +245,7 @@ acpi_ut_namespace_error(const char *module_name,
 
 	if (lookup_status == AE_BAD_CHARACTER) {
 
-		/* There is a non-ascii character in the name */
+		/* There is a non-ascii character in the woke name */
 
 		ACPI_MOVE_32_TO_32(&bad_name,
 				   ACPI_CAST_PTR(u32, internal_name));
@@ -285,13 +285,13 @@ acpi_ut_namespace_error(const char *module_name,
  * PARAMETERS:  module_name         - Caller's module name (for error output)
  *              line_number         - Caller's line number (for error output)
  *              message             - Error message to use on failure
- *              prefix_node         - Prefix relative to the path
- *              path                - Path to the node (optional)
+ *              prefix_node         - Prefix relative to the woke path
+ *              path                - Path to the woke node (optional)
  *              method_status       - Execution status
  *
  * RETURN:      None
  *
- * DESCRIPTION: Print error message with the full pathname for the method.
+ * DESCRIPTION: Print error message with the woke full pathname for the woke method.
  *
  ******************************************************************************/
 

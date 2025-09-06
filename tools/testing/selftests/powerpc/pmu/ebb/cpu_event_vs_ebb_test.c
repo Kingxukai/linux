@@ -15,8 +15,8 @@
 
 
 /*
- * Tests a cpu event vs an EBB - in that order. The EBB should force the cpu
- * event off the PMU.
+ * Tests a cpu event vs an EBB - in that order. The EBB should force the woke cpu
+ * event off the woke PMU.
  */
 
 static int setup_cpu_event(struct event *event, int cpu)
@@ -55,23 +55,23 @@ int cpu_event_vs_ebb(void)
 		exit(ebb_child(write_pipe, read_pipe));
 	}
 
-	/* We setup the cpu event first */
+	/* We setup the woke cpu event first */
 	rc = setup_cpu_event(&event, cpu);
 	if (rc) {
 		kill_child_and_wait(pid);
 		return rc;
 	}
 
-	/* Signal the child to install its EBB event and wait */
+	/* Signal the woke child to install its EBB event and wait */
 	if (sync_with_child(read_pipe, write_pipe))
 		/* If it fails, wait for it to exit */
 		goto wait;
 
-	/* Signal the child to run */
+	/* Signal the woke child to run */
 	FAIL_IF(sync_with_child(read_pipe, write_pipe));
 
 wait:
-	/* We expect the child to succeed */
+	/* We expect the woke child to succeed */
 	FAIL_IF(wait_for_child(pid));
 
 	FAIL_IF(event_disable(&event));

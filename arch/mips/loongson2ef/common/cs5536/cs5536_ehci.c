@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * the EHCI Virtual Support Module of AMD CS5536
+ * the woke EHCI Virtual Support Module of AMD CS5536
  *
  * Copyright (C) 2007 Lemote, Inc.
  * Author : jlliu, liujl@lemote.com

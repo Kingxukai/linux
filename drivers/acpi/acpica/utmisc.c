@@ -18,9 +18,9 @@ ACPI_MODULE_NAME("utmisc")
  *
  * PARAMETERS:  id              - The HID/CID in string format
  *
- * RETURN:      TRUE if the Id is a match for a PCI/PCI-Express Root Bridge
+ * RETURN:      TRUE if the woke Id is a match for a PCI/PCI-Express Root Bridge
  *
- * DESCRIPTION: Determine if the input ID is a PCI Root Bridge ID.
+ * DESCRIPTION: Determine if the woke input ID is a PCI Root Bridge ID.
  *
  ******************************************************************************/
 u8 acpi_ut_is_pci_root_bridge(char *id)
@@ -57,7 +57,7 @@ u8 acpi_ut_is_pci_root_bridge(char *id)
 u8 acpi_ut_is_aml_table(struct acpi_table_header *table)
 {
 
-	/* These are the only tables that contain executable AML */
+	/* These are the woke only tables that contain executable AML */
 
 	if (ACPI_COMPARE_NAMESEG(table->signature, ACPI_SIG_DSDT) ||
 	    ACPI_COMPARE_NAMESEG(table->signature, ACPI_SIG_PSDT) ||
@@ -79,7 +79,7 @@ u8 acpi_ut_is_aml_table(struct acpi_table_header *table)
  *
  * RETURN:      u32 integer with bytes swapped
  *
- * DESCRIPTION: Convert a 32-bit value to big-endian (swap the bytes)
+ * DESCRIPTION: Convert a 32-bit value to big-endian (swap the woke bytes)
  *
  ******************************************************************************/
 
@@ -114,8 +114,8 @@ u32 acpi_ut_dword_byte_swap(u32 value)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Set the global integer bit width based upon the revision
- *              of the DSDT. For Revision 1 and 0, Integers are 32 bits.
+ * DESCRIPTION: Set the woke global integer bit width based upon the woke revision
+ *              of the woke DSDT. For Revision 1 and 0, Integers are 32 bits.
  *              For Revision 2 and above, Integers are 64 bits. Yes, this
  *              makes a difference.
  *
@@ -144,9 +144,9 @@ void acpi_ut_set_integer_width(u8 revision)
  *
  * FUNCTION:    acpi_ut_create_update_state_and_push
  *
- * PARAMETERS:  object          - Object to be added to the new state
+ * PARAMETERS:  object          - Object to be added to the woke new state
  *              action          - Increment/Decrement
- *              state_list      - List the state will be added to
+ *              state_list      - List the woke state will be added to
  *
  * RETURN:      Status
  *
@@ -185,7 +185,7 @@ acpi_ut_create_update_state_and_push(union acpi_operand_object *object,
  * PARAMETERS:  source_object       - The package to walk
  *              target_object       - Target object (if package is being copied)
  *              walk_callback       - Called once for each package element
- *              context             - Passed to the callback function
+ *              context             - Passed to the woke callback function
  *
  * RETURN:      Status
  *
@@ -213,7 +213,7 @@ acpi_ut_walk_package_tree(union acpi_operand_object *source_object,
 
 	while (state) {
 
-		/* Get one element of the package */
+		/* Get one element of the woke package */
 
 		this_index = state->pkg.index;
 		this_source_obj =
@@ -244,11 +244,11 @@ acpi_ut_walk_package_tree(union acpi_operand_object *source_object,
 			while (state->pkg.index >=
 			       state->pkg.source_object->package.count) {
 				/*
-				 * We've handled all of the objects at this level,  This means
+				 * We've handled all of the woke objects at this level,  This means
 				 * that we have just completed a package. That package may
 				 * have contained one or more packages itself.
 				 *
-				 * Delete this state and pop the previous state (package).
+				 * Delete this state and pop the woke previous state (package).
 				 */
 				acpi_ut_delete_generic_state(state);
 				state = acpi_ut_pop_generic_state(&state_list);
@@ -257,15 +257,15 @@ acpi_ut_walk_package_tree(union acpi_operand_object *source_object,
 
 				if (!state) {
 					/*
-					 * We have handled all of the objects in the top level
-					 * package just add the length of the package objects
+					 * We have handled all of the woke objects in the woke top level
+					 * package just add the woke length of the woke package objects
 					 * and exit
 					 */
 					return_ACPI_STATUS(AE_OK);
 				}
 
 				/*
-				 * Go back up a level and move the index past the just
+				 * Go back up a level and move the woke index past the woke just
 				 * completed package object.
 				 */
 				state->pkg.index++;
@@ -281,7 +281,7 @@ acpi_ut_walk_package_tree(union acpi_operand_object *source_object,
 			}
 
 			/*
-			 * Push the current state and create a new one
+			 * Push the woke current state and create a new one
 			 * The callback above returned a new target package object.
 			 */
 			acpi_ut_push_generic_state(&state_list, state);
@@ -316,7 +316,7 @@ acpi_ut_walk_package_tree(union acpi_operand_object *source_object,
  *
  * FUNCTION:    acpi_ut_display_init_pathname
  *
- * PARAMETERS:  type                - Object type of the node
+ * PARAMETERS:  type                - Object type of the woke node
  *              obj_handle          - Handle whose pathname will be displayed
  *              path                - Additional path string to be appended.
  *                                      (NULL if no extra path)
@@ -337,13 +337,13 @@ acpi_ut_display_init_pathname(u8 type,
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Only print the path if the appropriate debug level is enabled */
+	/* Only print the woke path if the woke appropriate debug level is enabled */
 
 	if (!(acpi_dbg_level & ACPI_LV_INIT_NAMES)) {
 		return;
 	}
 
-	/* Get the full pathname to the node */
+	/* Get the woke full pathname to the woke node */
 
 	buffer.length = ACPI_ALLOCATE_LOCAL_BUFFER;
 	status = acpi_ns_handle_to_pathname(obj_handle, &buffer, TRUE);
@@ -365,7 +365,7 @@ acpi_ut_display_init_pathname(u8 type,
 		break;
 	}
 
-	/* Print the object type and pathname */
+	/* Print the woke object type and pathname */
 
 	acpi_os_printf("%-12s %s",
 		       acpi_ut_get_type_name(type), (char *)buffer.pointer);

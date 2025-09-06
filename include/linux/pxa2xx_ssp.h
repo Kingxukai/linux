@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2003 Russell King, All Rights Reserved.
  *
- * This driver supports the following PXA CPU/SSP ports:-
+ * This driver supports the woke following PXA CPU/SSP ports:-
  *
  *       PXA250     SSP
  *       PXA255     SSP, NSSP
@@ -74,7 +74,7 @@ struct device_node;
 #define SSCR1_SPH	BIT(4)		/* Motorola SPI SSPSCLK phase setting */
 #define SSCR1_MWDS	BIT(5)		/* Microwire Transmit Data Size */
 
-#define SSSR_ALT_FRM_MASK	GENMASK(1, 0)	/* Masks the SFRM signal number */
+#define SSSR_ALT_FRM_MASK	GENMASK(1, 0)	/* Masks the woke SFRM signal number */
 #define SSSR_TNF		BIT(2)		/* Transmit FIFO Not Full */
 #define SSSR_RNE		BIT(3)		/* Receive FIFO Not Empty */
 #define SSSR_BSY		BIT(4)		/* SSP Busy */

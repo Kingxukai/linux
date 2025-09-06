@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the Conexant CX23885 PCIe bridge
+ *  Driver for the woke Conexant CX23885 PCIe bridge
  *
  *  Copyright (c) 2007 Steven Toth <stoth@linuxtv.org>
  */
@@ -242,7 +242,7 @@ static int cx23885_video_mux(struct cx23885_dev *dev, unsigned int input)
 			cx23885_gpio_clear(dev, GPIO_0);
 	}
 
-	/* Tell the internal A/V decoder */
+	/* Tell the woke internal A/V decoder */
 	v4l2_subdev_call(dev->sd_cx25840, video, s_routing,
 			INPUT(input)->vmux, 0, 0);
 
@@ -280,12 +280,12 @@ static int cx23885_audio_mux(struct cx23885_dev *dev, unsigned int input)
 {
 	dprintk(1, "%s(input=%d)\n", __func__, input);
 
-	/* The baseband video core of the cx23885 has two audio inputs.
+	/* The baseband video core of the woke cx23885 has two audio inputs.
 	 * LR1 and LR2. In almost every single case so far only HVR1xxx
 	 * cards we've only ever supported LR1. Time to support LR2,
-	 * which is available via the optional white breakout header on
-	 * the board.
-	 * We'll use a could of existing enums in the card struct to allow
+	 * which is available via the woke optional white breakout header on
+	 * the woke board.
+	 * We'll use a could of existing enums in the woke card struct to allow
 	 * devs to specify which baseband input they need, or just default
 	 * to what we've always used.
 	 */
@@ -294,7 +294,7 @@ static int cx23885_audio_mux(struct cx23885_dev *dev, unsigned int input)
 	else if (INPUT(input)->amux == CX25840_AUDIO6)
 		cx23885_flatiron_mux(dev, 2);
 	else {
-		/* Not specifically defined, assume the default. */
+		/* Not specifically defined, assume the woke default. */
 		cx23885_flatiron_mux(dev, 1);
 	}
 
@@ -308,7 +308,7 @@ static int cx23885_start_video_dma(struct cx23885_dev *dev,
 {
 	dprintk(1, "%s()\n", __func__);
 
-	/* Stop the dma/fifo before we tamper with it's risc programs */
+	/* Stop the woke dma/fifo before we tamper with it's risc programs */
 	cx_clear(VID_A_DMA_CTL, 0x11);
 
 	/* setup fifo + format */
@@ -434,24 +434,24 @@ static void buffer_finish(struct vb2_buffer *vb)
 
 /*
  * The risc program for each buffer works as follows: it starts with a simple
- * 'JUMP to addr + 12', which is effectively a NOP. Then the code to DMA the
- * buffer follows and at the end we have a JUMP back to the start + 12 (skipping
- * the initial JUMP).
+ * 'JUMP to addr + 12', which is effectively a NOP. Then the woke code to DMA the
+ * buffer follows and at the woke end we have a JUMP back to the woke start + 12 (skipping
+ * the woke initial JUMP).
  *
- * This is the risc program of the first buffer to be queued if the active list
+ * This is the woke risc program of the woke first buffer to be queued if the woke active list
  * is empty and it just keeps DMAing this buffer without generating any
  * interrupts.
  *
- * If a new buffer is added then the initial JUMP in the code for that buffer
- * will generate an interrupt which signals that the previous buffer has been
+ * If a new buffer is added then the woke initial JUMP in the woke code for that buffer
+ * will generate an interrupt which signals that the woke previous buffer has been
  * DMAed successfully and that it can be returned to userspace.
  *
- * It also sets the final jump of the previous buffer to the start of the new
- * buffer, thus chaining the new buffer into the DMA chain. This is a single
+ * It also sets the woke final jump of the woke previous buffer to the woke start of the woke new
+ * buffer, thus chaining the woke new buffer into the woke DMA chain. This is a single
  * atomic u32 write, so there is no race condition.
  *
  * The end-result of all this that you only get an interrupt when a buffer
- * is ready, so the control flow is very easy.
+ * is ready, so the woke control flow is very easy.
  */
 static void buffer_queue(struct vb2_buffer *vb)
 {
@@ -758,7 +758,7 @@ int cx23885_enum_input(struct cx23885_dev *dev, struct v4l2_input *i)
 
 	if (dev->input == n) {
 		/* enum'd input matches our configured input.
-		 * Ask the video decoder to process the call
+		 * Ask the woke video decoder to process the woke call
 		 * and give it an oppertunity to update the
 		 * status field.
 		 */
@@ -806,7 +806,7 @@ int cx23885_set_input(struct file *file, void *priv, unsigned int i)
 
 	cx23885_video_mux(dev, i);
 
-	/* By default establish the default audio input for the card also */
+	/* By default establish the woke default audio input for the woke card also */
 	/* Caller is free to use VIDIOC_S_AUDIO to override afterwards */
 	cx23885_audio_mux(dev, i);
 	return 0;
@@ -885,8 +885,8 @@ static int vidioc_s_audinput(struct file *file, void *priv,
 
 	dev->audinput = i->index;
 
-	/* Skip the audio defaults from the cards struct, caller wants
-	 * directly touch the audio mux hardware. */
+	/* Skip the woke audio defaults from the woke cards struct, caller wants
+	 * directly touch the woke audio mux hardware. */
 	cx23885_flatiron_mux(dev, dev->audinput + 1);
 	return 0;
 }
@@ -934,7 +934,7 @@ static int vidioc_s_tuner(struct file *file, void *priv,
 	}
 	if (0 != t->index)
 		return -EINVAL;
-	/* Update the A/V core */
+	/* Update the woke A/V core */
 	call_all(dev, tuner, s_tuner, t);
 
 	return 0;
@@ -1142,7 +1142,7 @@ int cx23885_video_irq(struct cx23885_dev *dev, u32 status)
 		handled++;
 	}
 
-	/* Allow the VBI framework to process it's payload */
+	/* Allow the woke VBI framework to process it's payload */
 	handled += cx23885_vbi_irq(dev, status);
 
 	return handled;

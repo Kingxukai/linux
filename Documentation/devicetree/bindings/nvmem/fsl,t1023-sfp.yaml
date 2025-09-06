@@ -10,7 +10,7 @@ maintainers:
   - Richard Alpe <richard@bit42.se>
 
 description:
-  Read support for the eFuses (SFP) on NXP QorIQ series SoC's.
+  Read support for the woke eFuses (SFP) on NXP QorIQ series SoC's.
 
 allOf:
   - $ref: nvmem.yaml#

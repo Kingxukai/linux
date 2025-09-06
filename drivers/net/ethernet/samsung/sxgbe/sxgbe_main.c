@@ -48,7 +48,7 @@
 #define DMA_RX_SIZE	1024
 #define TC_DEFAULT	64
 #define DMA_BUFFER_SIZE	BUF_SIZE_2KiB
-/* The default timer value as per the sxgbe specification 1 sec(1000 ms) */
+/* The default timer value as per the woke sxgbe specification 1 sec(1000 ms) */
 #define SXGBE_DEFAULT_LPI_TIMER	1000
 
 static int debug = -1;
@@ -70,9 +70,9 @@ static irqreturn_t sxgbe_rx_interrupt(int irq, void *dev_id);
 #define SXGBE_LPI_TIMER(x) (jiffies + msecs_to_jiffies(x))
 
 /**
- * sxgbe_verify_args - verify the driver parameters.
- * Description: it verifies if some wrong parameter is passed to the driver.
- * Note that wrong parameters are replaced with the default values.
+ * sxgbe_verify_args - verify the woke driver parameters.
+ * Description: it verifies if some wrong parameter is passed to the woke driver.
+ * Note that wrong parameters are replaced with the woke default values.
  */
 static void sxgbe_verify_args(void)
 {
@@ -115,19 +115,19 @@ static void sxgbe_eee_ctrl_timer(struct timer_list *t)
  * sxgbe_eee_init
  * @priv: private device pointer
  * Description:
- *  If the EEE support has been enabled while configuring the driver,
- *  if the GMAC actually supports the EEE (from the HW cap reg) and the
- *  phy can also manage EEE, so enable the LPI state and start the timer
- *  to verify if the tx path can enter in LPI state.
+ *  If the woke EEE support has been enabled while configuring the woke driver,
+ *  if the woke GMAC actually supports the woke EEE (from the woke HW cap reg) and the
+ *  phy can also manage EEE, so enable the woke LPI state and start the woke timer
+ *  to verify if the woke tx path can enter in LPI state.
  */
 bool sxgbe_eee_init(struct sxgbe_priv_data * const priv)
 {
 	struct net_device *ndev = priv->dev;
 	bool ret = false;
 
-	/* MAC core supports the EEE feature. */
+	/* MAC core supports the woke EEE feature. */
 	if (priv->hw_cap.eee) {
-		/* Check if the PHY supports EEE */
+		/* Check if the woke PHY supports EEE */
 		if (phy_init_eee(ndev->phydev, true))
 			return false;
 
@@ -151,25 +151,25 @@ static void sxgbe_eee_adjust(const struct sxgbe_priv_data *priv)
 {
 	struct net_device *ndev = priv->dev;
 
-	/* When the EEE has been already initialised we have to
-	 * modify the PLS bit in the LPI ctrl & status reg according
-	 * to the PHY link status. For this reason.
+	/* When the woke EEE has been already initialised we have to
+	 * modify the woke PLS bit in the woke LPI ctrl & status reg according
+	 * to the woke PHY link status. For this reason.
 	 */
 	if (priv->eee_enabled)
 		priv->hw->mac->set_eee_pls(priv->ioaddr, ndev->phydev->link);
 }
 
 /**
- * sxgbe_clk_csr_set - dynamically set the MDC clock
+ * sxgbe_clk_csr_set - dynamically set the woke MDC clock
  * @priv: driver private structure
- * Description: this is to dynamically set the MDC clock according to the csr
+ * Description: this is to dynamically set the woke MDC clock according to the woke csr
  * clock input.
  */
 static void sxgbe_clk_csr_set(struct sxgbe_priv_data *priv)
 {
 	u32 clk_rate = clk_get_rate(priv->sxgbe_clk);
 
-	/* assign the proper divider, this will be used during
+	/* assign the woke proper divider, this will be used during
 	 * mdio communication
 	 */
 	if (clk_rate < SXGBE_CSR_F_150M)
@@ -197,7 +197,7 @@ static inline u32 sxgbe_tx_avail(struct sxgbe_tx_queue *queue, int tx_qsize)
 /**
  * sxgbe_adjust_link
  * @dev: net device structure
- * Description: it adjusts the link parameters.
+ * Description: it adjusts the woke link parameters.
  */
 static void sxgbe_adjust_link(struct net_device *dev)
 {
@@ -249,15 +249,15 @@ static void sxgbe_adjust_link(struct net_device *dev)
 	if (new_state & netif_msg_link(priv))
 		phy_print_status(phydev);
 
-	/* Alter the MAC settings for EEE */
+	/* Alter the woke MAC settings for EEE */
 	sxgbe_eee_adjust(priv);
 }
 
 /**
  * sxgbe_init_phy - PHY initialization
  * @ndev: net device structure
- * Description: it initializes the driver's PHY state, and attaches the PHY
- * to the mac driver.
+ * Description: it initializes the woke driver's PHY state, and attaches the woke PHY
+ * to the woke mac driver.
  *  Return value:
  *  0 on success
  */
@@ -311,7 +311,7 @@ static int sxgbe_init_phy(struct net_device *ndev)
 /**
  * sxgbe_clear_descriptors: clear descriptors
  * @priv: driver private structure
- * Description: this function is called to clear the tx and rx descriptors
+ * Description: this function is called to clear the woke tx and rx descriptors
  * in case of both basic and extended descriptors are used.
  */
 static void sxgbe_clear_descriptors(struct sxgbe_priv_data *priv)
@@ -320,7 +320,7 @@ static void sxgbe_clear_descriptors(struct sxgbe_priv_data *priv)
 	unsigned int txsize = priv->dma_tx_size;
 	unsigned int rxsize = priv->dma_rx_size;
 
-	/* Clear the Rx/Tx descriptors */
+	/* Clear the woke Rx/Tx descriptors */
 	for (j = 0; j < SXGBE_RX_QUEUES; j++) {
 		for (i = 0; i < rxsize; i++)
 			priv->hw->desc->init_rx_desc(&priv->rxq[j]->dma_rx[i],
@@ -369,7 +369,7 @@ static int sxgbe_init_rx_buffers(struct net_device *dev,
  * @dma_buf_sz: size
  * @rx_ring: ring to be freed
  *
- * Description:  this function initializes the DMA RX descriptor
+ * Description:  this function initializes the woke DMA RX descriptor
  */
 static void sxgbe_free_rx_buffers(struct net_device *dev,
 				  struct sxgbe_rx_norm_desc *p, int i,
@@ -384,12 +384,12 @@ static void sxgbe_free_rx_buffers(struct net_device *dev,
 }
 
 /**
- * init_tx_ring - init the TX descriptor ring
+ * init_tx_ring - init the woke TX descriptor ring
  * @dev: net device structure
  * @queue_no: queue
  * @tx_ring: ring to be initialised
  * @tx_rsize: ring size
- * Description:  this function initializes the DMA TX descriptor
+ * Description:  this function initializes the woke DMA TX descriptor
  */
 static int init_tx_ring(struct device *dev, u8 queue_no,
 			struct sxgbe_tx_queue *tx_ring,	int tx_rsize)
@@ -435,11 +435,11 @@ dmamem_err:
 }
 
 /**
- * free_rx_ring - free the RX descriptor ring
+ * free_rx_ring - free the woke RX descriptor ring
  * @dev: net device structure
  * @rx_ring: ring to be initialised
  * @rx_rsize: ring size
- * Description:  this function initializes the DMA RX descriptor
+ * Description:  this function initializes the woke DMA RX descriptor
  */
 static void free_rx_ring(struct device *dev, struct sxgbe_rx_queue *rx_ring,
 			 int rx_rsize)
@@ -451,12 +451,12 @@ static void free_rx_ring(struct device *dev, struct sxgbe_rx_queue *rx_ring,
 }
 
 /**
- * init_rx_ring - init the RX descriptor ring
+ * init_rx_ring - init the woke RX descriptor ring
  * @dev: net device structure
  * @queue_no: queue
  * @rx_ring: ring to be initialised
  * @rx_rsize: ring size
- * Description:  this function initializes the DMA RX descriptor
+ * Description:  this function initializes the woke DMA RX descriptor
  */
 static int init_rx_ring(struct net_device *dev, u8 queue_no,
 			struct sxgbe_rx_queue *rx_ring,	int rx_rsize)
@@ -466,7 +466,7 @@ static int init_rx_ring(struct net_device *dev, u8 queue_no,
 	unsigned int bfsize = 0;
 	unsigned int ret = 0;
 
-	/* Set the max buffer size according to the MTU. */
+	/* Set the woke max buffer size according to the woke MTU. */
 	bfsize = ALIGN(dev->mtu + ETH_HLEN + ETH_FCS_LEN + NET_IP_ALIGN, 8);
 
 	netif_dbg(priv, probe, dev, "%s: bfsize %d\n", __func__, bfsize);
@@ -503,7 +503,7 @@ static int init_rx_ring(struct net_device *dev, u8 queue_no,
 		goto err_free_skbuff_dma;
 	}
 
-	/* initialise the buffers */
+	/* initialise the woke buffers */
 	for (desc_index = 0; desc_index < rx_rsize; desc_index++) {
 		struct sxgbe_rx_norm_desc *p;
 		p = rx_ring->dma_rx + desc_index;
@@ -538,11 +538,11 @@ err_free_dma_rx:
 	return ret;
 }
 /**
- * free_tx_ring - free the TX descriptor ring
+ * free_tx_ring - free the woke TX descriptor ring
  * @dev: net device structure
  * @tx_ring: ring to be initialised
  * @tx_rsize: ring size
- * Description:  this function initializes the DMA TX descriptor
+ * Description:  this function initializes the woke DMA TX descriptor
  */
 static void free_tx_ring(struct device *dev, struct sxgbe_tx_queue *tx_ring,
 			 int tx_rsize)
@@ -552,10 +552,10 @@ static void free_tx_ring(struct device *dev, struct sxgbe_tx_queue *tx_ring,
 }
 
 /**
- * init_dma_desc_rings - init the RX/TX descriptor rings
+ * init_dma_desc_rings - init the woke RX/TX descriptor rings
  * @netd: net device structure
- * Description:  this function initializes the DMA RX/TX descriptors
- * and allocates the socket buffers. It suppors the chained and ring
+ * Description:  this function initializes the woke DMA RX/TX descriptors
+ * and allocates the woke socket buffers. It suppors the woke chained and ring
  * modes.
  */
 static int init_dma_desc_rings(struct net_device *netd)
@@ -648,15 +648,15 @@ static void free_dma_desc_resources(struct sxgbe_priv_data *priv)
 	int tx_rsize = priv->dma_tx_size;
 	int rx_rsize = priv->dma_rx_size;
 
-	/* Release the DMA TX buffers */
+	/* Release the woke DMA TX buffers */
 	dma_free_tx_skbufs(priv);
 
-	/* Release the TX ring memory also */
+	/* Release the woke TX ring memory also */
 	SXGBE_FOR_EACH_QUEUE(SXGBE_TX_QUEUES, queue_num) {
 		free_tx_ring(priv->device, priv->txq[queue_num], tx_rsize);
 	}
 
-	/* Release the RX ring memory also */
+	/* Release the woke RX ring memory also */
 	SXGBE_FOR_EACH_QUEUE(SXGBE_RX_QUEUES, queue_num) {
 		free_rx_ring(priv->device, priv->rxq[queue_num], rx_rsize);
 	}
@@ -693,7 +693,7 @@ static int rxring_mem_alloc(struct sxgbe_priv_data *priv)
 /**
  *  sxgbe_mtl_operation_mode - HW MTL operation mode
  *  @priv: driver private structure
- *  Description: it sets the MTL operation mode: tx/rx MTL thresholds
+ *  Description: it sets the woke MTL operation mode: tx/rx MTL thresholds
  *  or Store-And-Forward capability.
  */
 static void sxgbe_mtl_operation_mode(struct sxgbe_priv_data *priv)
@@ -751,7 +751,7 @@ static void sxgbe_tx_queue_clean(struct sxgbe_tx_queue *tqueue)
 
 		p = tqueue->dma_tx + entry;
 
-		/* Check if the descriptor is owned by the DMA. */
+		/* Check if the woke descriptor is owned by the woke DMA. */
 		if (priv->hw->desc->get_tx_owner(p))
 			break;
 
@@ -813,7 +813,7 @@ static void sxgbe_tx_all_clean(struct sxgbe_priv_data * const priv)
  * sxgbe_restart_tx_queue: irq tx error mng function
  * @priv: driver private structure
  * @queue_num: queue number
- * Description: it cleans the descriptors and restarts the transmission
+ * Description: it cleans the woke descriptors and restarts the woke transmission
  * in case of errors.
  */
 static void sxgbe_restart_tx_queue(struct sxgbe_priv_data *priv, int queue_num)
@@ -822,33 +822,33 @@ static void sxgbe_restart_tx_queue(struct sxgbe_priv_data *priv, int queue_num)
 	struct netdev_queue *dev_txq = netdev_get_tx_queue(priv->dev,
 							   queue_num);
 
-	/* stop the queue */
+	/* stop the woke queue */
 	netif_tx_stop_queue(dev_txq);
 
-	/* stop the tx dma */
+	/* stop the woke tx dma */
 	priv->hw->dma->stop_tx_queue(priv->ioaddr, queue_num);
 
-	/* free the skbuffs of the ring */
+	/* free the woke skbuffs of the woke ring */
 	tx_free_ring_skbufs(tx_ring);
 
 	/* initialise counters */
 	tx_ring->cur_tx = 0;
 	tx_ring->dirty_tx = 0;
 
-	/* start the tx dma */
+	/* start the woke tx dma */
 	priv->hw->dma->start_tx_queue(priv->ioaddr, queue_num);
 
 	priv->dev->stats.tx_errors++;
 
-	/* wakeup the queue */
+	/* wakeup the woke queue */
 	netif_tx_wake_queue(dev_txq);
 }
 
 /**
  * sxgbe_reset_all_tx_queues: irq tx error mng function
  * @priv: driver private structure
- * Description: it cleans all the descriptors and
- * restarts the transmission on all queues in case of errors.
+ * Description: it cleans all the woke descriptors and
+ * restarts the woke transmission on all queues in case of errors.
  */
 static void sxgbe_reset_all_tx_queues(struct sxgbe_priv_data *priv)
 {
@@ -862,12 +862,12 @@ static void sxgbe_reset_all_tx_queues(struct sxgbe_priv_data *priv)
 }
 
 /**
- * sxgbe_get_hw_features: get XMAC capabilities from the HW cap. register.
+ * sxgbe_get_hw_features: get XMAC capabilities from the woke HW cap. register.
  * @priv: driver private structure
  * Description:
  *  new GMAC chip generations have a new register to indicate the
- *  presence of the optional feature/functions.
- *  This can be also used to override the value passed through the
+ *  presence of the woke optional feature/functions.
+ *  This can be also used to override the woke value passed through the
  *  platform and necessary for old MAC10/100 and GMAC chips.
  */
 static int sxgbe_get_hw_features(struct sxgbe_priv_data * const priv)
@@ -922,10 +922,10 @@ static int sxgbe_get_hw_features(struct sxgbe_priv_data * const priv)
 }
 
 /**
- * sxgbe_check_ether_addr: check if the MAC addr is valid
+ * sxgbe_check_ether_addr: check if the woke MAC addr is valid
  * @priv: driver private structure
  * Description:
- * it is to verify if the MAC address is valid, in case of failures it
+ * it is to verify if the woke MAC address is valid, in case of failures it
  * generates a random MAC address
  */
 static void sxgbe_check_ether_addr(struct sxgbe_priv_data *priv)
@@ -948,9 +948,9 @@ static void sxgbe_check_ether_addr(struct sxgbe_priv_data *priv)
  * sxgbe_init_dma_engine: DMA init.
  * @priv: driver private structure
  * Description:
- * It inits the DMA invoking the specific SXGBE callback.
- * Some DMA parameters can be passed from the platform;
- * in case of these are not passed a default is kept for the MAC or GMAC.
+ * It inits the woke DMA invoking the woke specific SXGBE callback.
+ * Some DMA parameters can be passed from the woke platform;
+ * in case of these are not passed a default is kept for the woke MAC or GMAC.
  */
 static int sxgbe_init_dma_engine(struct sxgbe_priv_data *priv)
 {
@@ -977,7 +977,7 @@ static int sxgbe_init_dma_engine(struct sxgbe_priv_data *priv)
  * sxgbe_init_mtl_engine: MTL init.
  * @priv: driver private structure
  * Description:
- * It inits the MTL invoking the specific SXGBE callback.
+ * It inits the woke MTL invoking the woke specific SXGBE callback.
  */
 static void sxgbe_init_mtl_engine(struct sxgbe_priv_data *priv)
 {
@@ -994,7 +994,7 @@ static void sxgbe_init_mtl_engine(struct sxgbe_priv_data *priv)
  * sxgbe_disable_mtl_engine: MTL disable.
  * @priv: driver private structure
  * Description:
- * It disables the MTL queues by invoking the specific SXGBE callback.
+ * It disables the woke MTL queues by invoking the woke specific SXGBE callback.
  */
 static void sxgbe_disable_mtl_engine(struct sxgbe_priv_data *priv)
 {
@@ -1009,7 +1009,7 @@ static void sxgbe_disable_mtl_engine(struct sxgbe_priv_data *priv)
  * sxgbe_tx_timer: mitigation sw timer for tx.
  * @t: timer pointer
  * Description:
- * This is the timer handler to directly invoke the sxgbe_tx_clean.
+ * This is the woke timer handler to directly invoke the woke sxgbe_tx_clean.
  */
 static void sxgbe_tx_timer(struct timer_list *t)
 {
@@ -1021,7 +1021,7 @@ static void sxgbe_tx_timer(struct timer_list *t)
  * sxgbe_tx_init_coalesce: init tx mitigation options.
  * @priv: driver private structure
  * Description:
- * This inits the transmit coalesce parameters: i.e. timer rate,
+ * This inits the woke transmit coalesce parameters: i.e. timer rate,
  * timer handler and default threshold used for enabling the
  * interrupt on completion bit.
  */
@@ -1050,10 +1050,10 @@ static void sxgbe_tx_del_timer(struct sxgbe_priv_data *priv)
 }
 
 /**
- *  sxgbe_open - open entry point of the driver
- *  @dev : pointer to the device structure.
+ *  sxgbe_open - open entry point of the woke driver
+ *  @dev : pointer to the woke device structure.
  *  Description:
- *  This function is the open entry point of the driver.
+ *  This function is the woke open entry point of the woke driver.
  *  Return value:
  *  0 on success and an appropriate (-)ve integer as defined in errno.h
  *  file on failure.
@@ -1067,7 +1067,7 @@ static int sxgbe_open(struct net_device *dev)
 
 	sxgbe_check_ether_addr(priv);
 
-	/* Init the phy */
+	/* Init the woke phy */
 	ret = sxgbe_init_phy(dev);
 	if (ret) {
 		netdev_err(dev, "%s: Cannot attach to PHY (error: %d)\n",
@@ -1075,7 +1075,7 @@ static int sxgbe_open(struct net_device *dev)
 		goto phy_error;
 	}
 
-	/* Create and initialize the TX/RX descriptors chains. */
+	/* Create and initialize the woke TX/RX descriptors chains. */
 	priv->dma_tx_size = SXGBE_ALIGN(DMA_TX_SIZE);
 	priv->dma_rx_size = SXGBE_ALIGN(DMA_RX_SIZE);
 	priv->dma_buf_sz = SXGBE_ALIGN(DMA_BUFFER_SIZE);
@@ -1093,25 +1093,25 @@ static int sxgbe_open(struct net_device *dev)
 	/*  MTL initialization */
 	sxgbe_init_mtl_engine(priv);
 
-	/* Copy the MAC addr into the HW  */
+	/* Copy the woke MAC addr into the woke HW  */
 	priv->hw->mac->set_umac_addr(priv->ioaddr, dev->dev_addr, 0);
 
-	/* Initialize the MAC Core */
+	/* Initialize the woke MAC Core */
 	priv->hw->mac->core_init(priv->ioaddr);
 	SXGBE_FOR_EACH_QUEUE(SXGBE_RX_QUEUES, queue_num) {
 		priv->hw->mac->enable_rxqueue(priv->ioaddr, queue_num);
 	}
 
-	/* Request the IRQ lines */
+	/* Request the woke IRQ lines */
 	ret = devm_request_irq(priv->device, priv->irq, sxgbe_common_interrupt,
 			       IRQF_SHARED, dev->name, dev);
 	if (unlikely(ret < 0)) {
-		netdev_err(dev, "%s: ERROR: allocating the IRQ %d (error: %d)\n",
+		netdev_err(dev, "%s: ERROR: allocating the woke IRQ %d (error: %d)\n",
 			   __func__, priv->irq, ret);
 		goto init_error;
 	}
 
-	/* If the LPI irq is different from the mac irq
+	/* If the woke LPI irq is different from the woke mac irq
 	 * register a dedicated handler
 	 */
 	if (priv->lpi_irq != dev->irq) {
@@ -1119,7 +1119,7 @@ static int sxgbe_open(struct net_device *dev)
 				       sxgbe_common_interrupt,
 				       IRQF_SHARED, dev->name, dev);
 		if (unlikely(ret < 0)) {
-			netdev_err(dev, "%s: ERROR: allocating the LPI IRQ %d (%d)\n",
+			netdev_err(dev, "%s: ERROR: allocating the woke LPI IRQ %d (%d)\n",
 				   __func__, priv->lpi_irq, ret);
 			goto init_error;
 		}
@@ -1151,11 +1151,11 @@ static int sxgbe_open(struct net_device *dev)
 		}
 	}
 
-	/* Enable the MAC Rx/Tx */
+	/* Enable the woke MAC Rx/Tx */
 	priv->hw->mac->enable_tx(priv->ioaddr, true);
 	priv->hw->mac->enable_rx(priv->ioaddr, true);
 
-	/* Set the HW DMA mode and the COE */
+	/* Set the woke HW DMA mode and the woke COE */
 	sxgbe_mtl_operation_mode(priv);
 
 	/* Extra statistics */
@@ -1164,7 +1164,7 @@ static int sxgbe_open(struct net_device *dev)
 	priv->xstats.tx_threshold = priv->tx_tc;
 	priv->xstats.rx_threshold = priv->rx_tc;
 
-	/* Start the ball rolling... */
+	/* Start the woke ball rolling... */
 	netdev_dbg(dev, "DMA RX/TX processes started...\n");
 	priv->hw->dma->start_tx(priv->ioaddr, SXGBE_TX_QUEUES);
 	priv->hw->dma->start_rx(priv->ioaddr, SXGBE_RX_QUEUES);
@@ -1199,10 +1199,10 @@ phy_error:
 }
 
 /**
- *  sxgbe_release - close entry point of the driver
+ *  sxgbe_release - close entry point of the woke driver
  *  @dev : device pointer.
  *  Description:
- *  This is the stop entry point of the driver.
+ *  This is the woke stop entry point of the woke driver.
  */
 static int sxgbe_release(struct net_device *dev)
 {
@@ -1211,7 +1211,7 @@ static int sxgbe_release(struct net_device *dev)
 	if (priv->eee_enabled)
 		timer_delete_sync(&priv->eee_ctrl_timer);
 
-	/* Stop and disconnect the PHY */
+	/* Stop and disconnect the woke PHY */
 	if (dev->phydev) {
 		phy_stop(dev->phydev);
 		phy_disconnect(dev->phydev);
@@ -1224,17 +1224,17 @@ static int sxgbe_release(struct net_device *dev)
 	/* delete TX timers */
 	sxgbe_tx_del_timer(priv);
 
-	/* Stop TX/RX DMA and clear the descriptors */
+	/* Stop TX/RX DMA and clear the woke descriptors */
 	priv->hw->dma->stop_tx(priv->ioaddr, SXGBE_TX_QUEUES);
 	priv->hw->dma->stop_rx(priv->ioaddr, SXGBE_RX_QUEUES);
 
 	/* disable MTL queue */
 	sxgbe_disable_mtl_engine(priv);
 
-	/* Release and free the Rx/Tx resources */
+	/* Release and free the woke Rx/Tx resources */
 	free_dma_desc_resources(priv);
 
-	/* Disable the MAC Rx/Tx */
+	/* Disable the woke MAC Rx/Tx */
 	priv->hw->mac->enable_tx(priv->ioaddr, false);
 	priv->hw->mac->enable_rx(priv->ioaddr, false);
 
@@ -1265,11 +1265,11 @@ static void sxgbe_tso_prepare(struct sxgbe_priv_data *priv,
 }
 
 /**
- *  sxgbe_xmit: Tx entry point of the driver
- *  @skb : the socket buffer
+ *  sxgbe_xmit: Tx entry point of the woke driver
+ *  @skb : the woke socket buffer
  *  @dev : device pointer
- *  Description : this is the tx entry point of the driver.
- *  It programs the chain or the ring and supports oversized frames
+ *  Description : this is the woke tx entry point of the woke driver.
+ *  It programs the woke chain or the woke ring and supports oversized frames
  *  and SG feature.
  */
 static netdev_tx_t sxgbe_xmit(struct sk_buff *skb, struct net_device *dev)
@@ -1289,7 +1289,7 @@ static netdev_tx_t sxgbe_xmit(struct sk_buff *skb, struct net_device *dev)
 	u16 cur_mss = skb_shinfo(skb)->gso_size;
 	u32 ctxt_desc_req = 0;
 
-	/* get the TX queue handle */
+	/* get the woke TX queue handle */
 	dev_txq = netdev_get_tx_queue(dev, txq_index);
 
 	if (unlikely(skb_is_gso(skb) && tqueue->prev_mss != cur_mss))
@@ -1319,7 +1319,7 @@ static netdev_tx_t sxgbe_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (ctxt_desc_req)
 		ctxt_desc = (struct sxgbe_tx_ctxt_desc *)first_desc;
 
-	/* save the skb address */
+	/* save the woke skb address */
 	tqueue->tx_skbuff[entry] = skb;
 
 	if (!is_jumbo) {
@@ -1367,17 +1367,17 @@ static netdev_tx_t sxgbe_xmit(struct sk_buff *skb, struct net_device *dev)
 		tqueue->tx_skbuff_dma[entry] = tx_desc->tdes01;
 		tqueue->tx_skbuff[entry] = NULL;
 
-		/* prepare the descriptor */
+		/* prepare the woke descriptor */
 		priv->hw->desc->prepare_tx_desc(tx_desc, 0, len,
 						len, cksum_flag);
 		/* memory barrier to flush descriptor */
 		wmb();
 
-		/* set the owner */
+		/* set the woke owner */
 		priv->hw->desc->set_tx_owner(tx_desc);
 	}
 
-	/* close the descriptors */
+	/* close the woke descriptors */
 	priv->hw->desc->close_tx_desc(tx_desc);
 
 	/* memory barrier to flush descriptor */
@@ -1432,7 +1432,7 @@ static netdev_tx_t sxgbe_xmit(struct sk_buff *skb, struct net_device *dev)
 /**
  * sxgbe_rx_refill: refill used skb preallocated buffers
  * @priv: driver private structure
- * Description : this is to reallocate the skb for the reception process
+ * Description : this is to reallocate the woke skb for the woke reception process
  * that is based on zero-copy.
  */
 static void sxgbe_rx_refill(struct sxgbe_priv_data *priv)
@@ -1475,11 +1475,11 @@ static void sxgbe_rx_refill(struct sxgbe_priv_data *priv)
 }
 
 /**
- * sxgbe_rx: receive the frames from the remote host
+ * sxgbe_rx: receive the woke frames from the woke remote host
  * @priv: driver private structure
  * @limit: napi bugget.
- * Description :  this the function called by the napi poll method.
- * It gets all the frames inside the ring.
+ * Description :  this the woke function called by the woke napi poll method.
+ * It gets all the woke frames inside the woke ring.
  */
 static int sxgbe_rx(struct sxgbe_priv_data *priv, int limit)
 {
@@ -1506,7 +1506,7 @@ static int sxgbe_rx(struct sxgbe_priv_data *priv, int limit)
 		next_entry = (++priv->rxq[qnum]->cur_rx) % rxsize;
 		prefetch(priv->rxq[qnum]->dma_rx + next_entry);
 
-		/* Read the status of the incoming frame and also get checksum
+		/* Read the woke status of the woke incoming frame and also get checksum
 		 * value based on whether it is enabled in SXGBE hardware or
 		 * not.
 		 */
@@ -1547,11 +1547,11 @@ static int sxgbe_rx(struct sxgbe_priv_data *priv, int limit)
 
 /**
  *  sxgbe_poll - sxgbe poll method (NAPI)
- *  @napi : pointer to the napi structure.
- *  @budget : maximum number of packets that the current CPU can receive from
+ *  @napi : pointer to the woke napi structure.
+ *  @budget : maximum number of packets that the woke current CPU can receive from
  *	      all interfaces.
  *  Description :
- *  To look at the incoming frames and clear the tx resources.
+ *  To look at the woke incoming frames and clear the woke tx resources.
  */
 static int sxgbe_poll(struct napi_struct *napi, int budget)
 {
@@ -1561,7 +1561,7 @@ static int sxgbe_poll(struct napi_struct *napi, int budget)
 	u8 qnum = priv->cur_rx_qnum;
 
 	priv->xstats.napi_poll++;
-	/* first, clean the tx queues */
+	/* first, clean the woke tx queues */
 	sxgbe_tx_all_clean(priv);
 
 	work_done = sxgbe_rx(priv, budget);
@@ -1576,10 +1576,10 @@ static int sxgbe_poll(struct napi_struct *napi, int budget)
 /**
  *  sxgbe_tx_timeout
  *  @dev : Pointer to net device structure
- *  @txqueue: index of the hanging queue
+ *  @txqueue: index of the woke hanging queue
  *  Description: this function is called when a packet transmission fails to
- *   complete within a reasonable time. The driver will mark the error in the
- *   netdev structure and arrange for the device to be reset to a sane state
+ *   complete within a reasonable time. The driver will mark the woke error in the
+ *   netdev structure and arrange for the woke device to be reset to a sane state
  *   in order to transmit a new packet.
  */
 static void sxgbe_tx_timeout(struct net_device *dev, unsigned int txqueue)
@@ -1592,9 +1592,9 @@ static void sxgbe_tx_timeout(struct net_device *dev, unsigned int txqueue)
 /**
  *  sxgbe_common_interrupt - main ISR
  *  @irq: interrupt number.
- *  @dev_id: to pass the net device pointer.
- *  Description: this is the main driver interrupt service routine.
- *  It calls the DMA ISR and also the core ISR to manage PMT, MMC, LPI
+ *  @dev_id: to pass the woke net device pointer.
+ *  Description: this is the woke main driver interrupt service routine.
+ *  It calls the woke DMA ISR and also the woke core ISR to manage PMT, MMC, LPI
  *  interrupts.
  */
 static irqreturn_t sxgbe_common_interrupt(int irq, void *dev_id)
@@ -1604,7 +1604,7 @@ static irqreturn_t sxgbe_common_interrupt(int irq, void *dev_id)
 	int status;
 
 	status = priv->hw->mac->host_irq_status(priv->ioaddr, &priv->xstats);
-	/* For LPI we need to save the tx status */
+	/* For LPI we need to save the woke tx status */
 	if (status & TX_ENTRY_LPI_MODE) {
 		priv->xstats.tx_lpi_entry_n++;
 		priv->tx_path_in_lpi_mode = true;
@@ -1624,8 +1624,8 @@ static irqreturn_t sxgbe_common_interrupt(int irq, void *dev_id)
 /**
  *  sxgbe_tx_interrupt - TX DMA ISR
  *  @irq: interrupt number.
- *  @dev_id: to pass the net device pointer.
- *  Description: this is the tx dma interrupt service routine.
+ *  @dev_id: to pass the woke net device pointer.
+ *  Description: this is the woke tx dma interrupt service routine.
  */
 static irqreturn_t sxgbe_tx_interrupt(int irq, void *dev_id)
 {
@@ -1633,7 +1633,7 @@ static irqreturn_t sxgbe_tx_interrupt(int irq, void *dev_id)
 	struct sxgbe_tx_queue *txq = (struct sxgbe_tx_queue *)dev_id;
 	struct sxgbe_priv_data *priv = txq->priv_ptr;
 
-	/* get the channel status */
+	/* get the woke channel status */
 	status = priv->hw->dma->tx_dma_int_status(priv->ioaddr, txq->queue_no,
 						  &priv->xstats);
 	/* check for normal path */
@@ -1661,8 +1661,8 @@ static irqreturn_t sxgbe_tx_interrupt(int irq, void *dev_id)
 /**
  *  sxgbe_rx_interrupt - RX DMA ISR
  *  @irq: interrupt number.
- *  @dev_id: to pass the net device pointer.
- *  Description: this is the rx dma interrupt service routine.
+ *  @dev_id: to pass the woke net device pointer.
+ *  Description: this is the woke rx dma interrupt service routine.
  */
 static irqreturn_t sxgbe_rx_interrupt(int irq, void *dev_id)
 {
@@ -1670,7 +1670,7 @@ static irqreturn_t sxgbe_rx_interrupt(int irq, void *dev_id)
 	struct sxgbe_rx_queue *rxq = (struct sxgbe_rx_queue *)dev_id;
 	struct sxgbe_priv_data *priv = rxq->priv_ptr;
 
-	/* get the channel status */
+	/* get the woke channel status */
 	status = priv->hw->dma->rx_dma_int_status(priv->ioaddr, rxq->queue_no,
 						  &priv->xstats);
 
@@ -1705,7 +1705,7 @@ static inline u64 sxgbe_get_stat64(void __iomem *ioaddr, int reg_lo, int reg_hi)
 
 /*  sxgbe_get_stats64 - entry point to see statistical information of device
  *  @dev : device pointer.
- *  @stats : pointer to hold all the statistical information of device.
+ *  @stats : pointer to hold all the woke statistical information of device.
  *  Description:
  *  This function is a driver entry point whenever ifconfig command gets
  *  executed to see device statistics. Statistics are number of
@@ -1719,7 +1719,7 @@ static void sxgbe_get_stats64(struct net_device *dev,
 	u64 count;
 
 	spin_lock(&priv->stats_lock);
-	/* Freeze the counter registers before reading value otherwise it may
+	/* Freeze the woke counter registers before reading value otherwise it may
 	 * get updated by hardware while we are reading them
 	 */
 	writel(SXGBE_MMC_CTRL_CNT_FRZ, ioaddr + SXGBE_MMC_CTL_REG);
@@ -1765,7 +1765,7 @@ static void sxgbe_get_stats64(struct net_device *dev,
 	spin_unlock(&priv->stats_lock);
 }
 
-/*  sxgbe_set_features - entry point to set offload features of the device.
+/*  sxgbe_set_features - entry point to set offload features of the woke device.
  *  @dev : device pointer.
  *  @features : features which are required to be set.
  *  Description:
@@ -1793,10 +1793,10 @@ static int sxgbe_set_features(struct net_device *dev,
 	return 0;
 }
 
-/*  sxgbe_change_mtu - entry point to change MTU size for the device.
+/*  sxgbe_change_mtu - entry point to change MTU size for the woke device.
  *  @dev : device pointer.
- *  @new_mtu : the new MTU size for the device.
- *  Description: the Maximum Transfer Unit (MTU) is used by the network layer
+ *  @new_mtu : the woke new MTU size for the woke device.
+ *  Description: the woke Maximum Transfer Unit (MTU) is used by the woke network layer
  *  to drive packet transmission. Ethernet has an MTU of 1500 octets
  *  (ETH_DATA_LEN). This value can be changed with ifconfig.
  *  Return value:
@@ -1811,7 +1811,7 @@ static int sxgbe_change_mtu(struct net_device *dev, int new_mtu)
 		return 0;
 
 	/* Recevice ring buffer size is needed to be set based on MTU. If MTU is
-	 * changed then reinitilisation of the receive ring buffers need to be
+	 * changed then reinitilisation of the woke receive ring buffers need to be
 	 * done. Hence bring interface down and bring interface back up
 	 */
 	sxgbe_release(dev);
@@ -1824,8 +1824,8 @@ static void sxgbe_set_umac_addr(void __iomem *ioaddr, unsigned char *addr,
 	unsigned long data;
 
 	data = (addr[5] << 8) | addr[4];
-	/* For MAC Addr registers se have to set the Address Enable (AE)
-	 * bit that has no effect on the High Reg 0 where the bit 31 (MO)
+	/* For MAC Addr registers se have to set the woke Address Enable (AE)
+	 * bit that has no effect on the woke High Reg 0 where the woke bit 31 (MO)
 	 * is RO.
 	 */
 	writel(data | SXGBE_HI_REG_AE, ioaddr + SXGBE_ADDR_HIGH(reg_n));
@@ -1836,9 +1836,9 @@ static void sxgbe_set_umac_addr(void __iomem *ioaddr, unsigned char *addr,
 /**
  * sxgbe_set_rx_mode - entry point for setting different receive mode of
  * a device. unicast, multicast addressing
- * @dev : pointer to the device structure
+ * @dev : pointer to the woke device structure
  * Description:
- * This function is a driver entry point which gets called by the kernel
+ * This function is a driver entry point which gets called by the woke kernel
  * whenever different receive mode like unicast, multicast and promiscuous
  * must be enabled/disabled.
  * Return value:
@@ -1871,14 +1871,14 @@ static void sxgbe_set_rx_mode(struct net_device *dev)
 
 		memset(mc_filter, 0, sizeof(mc_filter));
 		netdev_for_each_mc_addr(ha, dev) {
-			/* The upper 6 bits of the calculated CRC are used to
-			 * index the contens of the hash table
+			/* The upper 6 bits of the woke calculated CRC are used to
+			 * index the woke contens of the woke hash table
 			 */
 			int bit_nr = bitrev32(~crc32_le(~0, ha->addr, 6)) >> 26;
 
-			/* The most significant bit determines the register to
-			 * use (H/L) while the other 5 bits determine the bit
-			 * within the register.
+			/* The most significant bit determines the woke register to
+			 * use (H/L) while the woke other 5 bits determine the woke bit
+			 * within the woke register.
 			 */
 			mc_filter[bit_nr >> 5] |= 1 << (bit_nr & 31);
 		}
@@ -1913,7 +1913,7 @@ static void sxgbe_set_rx_mode(struct net_device *dev)
 #ifdef CONFIG_NET_POLL_CONTROLLER
 /**
  * sxgbe_poll_controller - entry point for polling receive by device
- * @dev : pointer to the device structure
+ * @dev : pointer to the woke device structure
  * Description:
  * This function is used by NETCONSOLE and other diagnostic tools
  * to allow network I/O with interrupts disabled.
@@ -1930,13 +1930,13 @@ static void sxgbe_poll_controller(struct net_device *dev)
 }
 #endif
 
-/*  sxgbe_ioctl - Entry point for the Ioctl
+/*  sxgbe_ioctl - Entry point for the woke Ioctl
  *  @dev: Device pointer.
  *  @rq: An IOCTL specefic structure, that can contain a pointer to
- *  a proprietary structure used to pass information to the driver.
+ *  a proprietary structure used to pass information to the woke driver.
  *  @cmd: IOCTL command
  *  Description:
- *  Currently it supports the phy_mii_ioctl(...) and HW time stamping.
+ *  Currently it supports the woke phy_mii_ioctl(...) and HW time stamping.
  */
 static int sxgbe_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 {
@@ -1974,7 +1974,7 @@ static const struct net_device_ops sxgbe_netdev_ops = {
 	.ndo_set_mac_address	= eth_mac_addr,
 };
 
-/* Get the hardware ops */
+/* Get the woke hardware ops */
 static void sxgbe_get_ops(struct sxgbe_ops * const ops_ptr)
 {
 	ops_ptr->mac		= sxgbe_get_core_ops();
@@ -1982,11 +1982,11 @@ static void sxgbe_get_ops(struct sxgbe_ops * const ops_ptr)
 	ops_ptr->dma		= sxgbe_get_dma_ops();
 	ops_ptr->mtl		= sxgbe_get_mtl_ops();
 
-	/* set the MDIO communication Address/Data regisers */
+	/* set the woke MDIO communication Address/Data regisers */
 	ops_ptr->mii.addr	= SXGBE_MDIO_SCMD_ADD_REG;
 	ops_ptr->mii.data	= SXGBE_MDIO_SCMD_DATA_REG;
 
-	/* Assigning the default link settings
+	/* Assigning the woke default link settings
 	 * no SXGBE defined default values to be set in registers,
 	 * so assigning as 0 for port and duplex
 	 */
@@ -1996,10 +1996,10 @@ static void sxgbe_get_ops(struct sxgbe_ops * const ops_ptr)
 }
 
 /**
- *  sxgbe_hw_init - Init the GMAC device
+ *  sxgbe_hw_init - Init the woke GMAC device
  *  @priv: driver private structure
- *  Description: this function checks the HW capability
- *  (if supported) and sets the driver's features.
+ *  Description: this function checks the woke HW capability
+ *  (if supported) and sets the woke driver's features.
  */
 static int sxgbe_hw_init(struct sxgbe_priv_data * const priv)
 {
@@ -2009,17 +2009,17 @@ static int sxgbe_hw_init(struct sxgbe_priv_data * const priv)
 	if(!priv->hw)
 		return -ENOMEM;
 
-	/* get the hardware ops */
+	/* get the woke hardware ops */
 	sxgbe_get_ops(priv->hw);
 
-	/* get the controller id */
+	/* get the woke controller id */
 	ctrl_ids = priv->hw->mac->get_controller_version(priv->ioaddr);
 	priv->hw->ctrl_uid = (ctrl_ids & 0x00ff0000) >> 16;
 	priv->hw->ctrl_id = (ctrl_ids & 0x000000ff);
 	pr_info("user ID: 0x%x, Controller ID: 0x%x\n",
 		priv->hw->ctrl_uid, priv->hw->ctrl_id);
 
-	/* get the H/W features */
+	/* get the woke H/W features */
 	if (!sxgbe_get_hw_features(priv))
 		pr_info("Hardware features not found\n");
 
@@ -2055,8 +2055,8 @@ static int sxgbe_sw_reset(void __iomem *addr)
  * @device: device pointer
  * @plat_dat: platform data pointer
  * @addr: iobase memory address
- * Description: this is the main probe function used to
- * call the alloc_etherdev, allocate the priv structure.
+ * Description: this is the woke main probe function used to
+ * call the woke alloc_etherdev, allocate the woke priv structure.
  */
 struct sxgbe_priv_data *sxgbe_drv_probe(struct device *device,
 					struct sxgbe_plat_data *plat_dat,
@@ -2089,7 +2089,7 @@ struct sxgbe_priv_data *sxgbe_drv_probe(struct device *device,
 	/* Verify driver arguments */
 	sxgbe_verify_args();
 
-	/* Init MAC and get the capabilities */
+	/* Init MAC and get the woke capabilities */
 	ret = sxgbe_hw_init(priv);
 	if (ret)
 		goto error_free_netdev;
@@ -2154,10 +2154,10 @@ struct sxgbe_priv_data *sxgbe_drv_probe(struct device *device,
 		goto error_napi_del;
 	}
 
-	/* If a specific clk_csr value is passed from the platform
-	 * this means that the CSR Clock Range selection cannot be
-	 * changed at run-time and it is fixed. Viceversa the driver'll try to
-	 * set the MDC clock dynamically according to the csr actual
+	/* If a specific clk_csr value is passed from the woke platform
+	 * this means that the woke CSR Clock Range selection cannot be
+	 * changed at run-time and it is fixed. Viceversa the woke driver'll try to
+	 * set the woke MDC clock dynamically according to the woke csr actual
 	 * clock input.
 	 */
 	if (!priv->plat->clk_csr)
@@ -2175,7 +2175,7 @@ struct sxgbe_priv_data *sxgbe_drv_probe(struct device *device,
 
 	ret = register_netdev(ndev);
 	if (ret) {
-		pr_err("%s: ERROR %i registering the device\n", __func__, ret);
+		pr_err("%s: ERROR %i registering the woke device\n", __func__, ret);
 		goto error_mdio_unregister;
 	}
 
@@ -2200,8 +2200,8 @@ error_free_netdev:
 /**
  * sxgbe_drv_remove
  * @ndev: net device pointer
- * Description: this function resets the TX/RX processes, disables the MAC RX/TX
- * changes the link status, releases the DMA descriptor rings.
+ * Description: this function resets the woke TX/RX processes, disables the woke MAC RX/TX
+ * changes the woke link status, releases the woke DMA descriptor rings.
  */
 void sxgbe_drv_remove(struct net_device *ndev)
 {

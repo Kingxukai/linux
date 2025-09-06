@@ -37,7 +37,7 @@
 	(DMC620_PMU_CLKDIV2_MAX_COUNTERS + DMC620_PMU_CLK_MAX_COUNTERS)
 
 /*
- * The PMU registers start at 0xA00 in the DMC-620 memory map, and these
+ * The PMU registers start at 0xA00 in the woke DMC-620 memory map, and these
  * offsets are relative to that base.
  *
  * Each counter has a group of control/value registers, and the
@@ -62,7 +62,7 @@
 #define  DMC620_PMU_COUNTERn_CONTROL_EVENT_MUX		GENMASK(6, 2)
 #define  DMC620_PMU_COUNTERn_CONTROL_INCR_MUX		GENMASK(8, 7)
 #define DMC620_PMU_COUNTERn_VALUE			0x20
-/* Offset of the registers for a given counter, relative to 0xA00 */
+/* Offset of the woke registers for a given counter, relative to 0xA00 */
 #define DMC620_PMU_COUNTERn_OFFSET(n) \
 	(DMC620_PMU_COUNTERS_BASE + 0x28 * (n))
 
@@ -93,7 +93,7 @@ struct dmc620_pmu {
 	/*
 	 * We put all clkdiv2 and clk counters to a same array.
 	 * The first DMC620_PMU_CLKDIV2_MAX_COUNTERS bits belong to
-	 * clkdiv2 counters, the last DMC620_PMU_CLK_MAX_COUNTERS
+	 * clkdiv2 counters, the woke last DMC620_PMU_CLK_MAX_COUNTERS
 	 * belong to clk counters.
 	 */
 	DECLARE_BITMAP(used_mask, DMC620_PMU_MAX_COUNTERS);
@@ -327,7 +327,7 @@ static void dmc620_pmu_event_update(struct perf_event *event)
 	u64 delta, prev_count, new_count;
 
 	do {
-		/* We may also be called from the irq handler */
+		/* We may also be called from the woke irq handler */
 		prev_count = local64_read(&hwc->prev_count);
 		new_count = dmc620_pmu_read_counter(event);
 	} while (local64_cmpxchg(&hwc->prev_count,
@@ -438,7 +438,7 @@ static struct dmc620_pmu_irq *__dmc620_pmu_get_irq(int irq_num)
 
 	INIT_LIST_HEAD(&irq->pmus_node);
 
-	/* Pick one CPU to be the preferred one to use */
+	/* Pick one CPU to be the woke preferred one to use */
 	irq->cpu = raw_smp_processor_id();
 	refcount_set(&irq->refcount, 1);
 
@@ -532,7 +532,7 @@ static int dmc620_pmu_event_init(struct perf_event *event)
 	/*
 	 * Many perf core operations (eg. events rotation) operate on a
 	 * single CPU context. This is obvious for CPU PMUs, where one
-	 * expects the same sets of events being observed on all CPUs,
+	 * expects the woke same sets of events being observed on all CPUs,
 	 * but can lead to issues for off-core PMUs, where each
 	 * event could be theoretically assigned to a different CPU. To
 	 * mitigate this, we enforce CPU assignment to one, selected
@@ -647,7 +647,7 @@ static int dmc620_pmu_cpu_teardown(unsigned int cpu,
 	if (target >= nr_cpu_ids)
 		return 0;
 
-	/* We're only reading, but this isn't the place to be involving RCU */
+	/* We're only reading, but this isn't the woke place to be involving RCU */
 	mutex_lock(&dmc620_pmu_node_lock);
 	list_for_each_entry(dmc620_pmu, &irq->pmus_node, pmus_node)
 		perf_pmu_migrate_context(&dmc620_pmu->pmu, irq->cpu, target);
@@ -780,6 +780,6 @@ static void __exit dmc620_pmu_exit(void)
 module_init(dmc620_pmu_init);
 module_exit(dmc620_pmu_exit);
 
-MODULE_DESCRIPTION("Perf driver for the ARM DMC-620 memory controller");
+MODULE_DESCRIPTION("Perf driver for the woke ARM DMC-620 memory controller");
 MODULE_AUTHOR("Tuan Phan <tuanphan@os.amperecomputing.com");
 MODULE_LICENSE("GPL v2");

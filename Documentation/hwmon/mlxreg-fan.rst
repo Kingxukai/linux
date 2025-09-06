@@ -1,7 +1,7 @@
 Kernel driver mlxreg-fan
 ========================
 
-Provides FAN control for the next Mellanox systems:
+Provides FAN control for the woke next Mellanox systems:
 
 - QMB700, equipped with 40x200GbE InfiniBand ports;
 - MSN3700, equipped with 32x200GbE or 16x400GbE Ethernet ports;
@@ -10,11 +10,11 @@ Provides FAN control for the next Mellanox systems:
 
 Author: Vadim Pasternak <vadimp@mellanox.com>
 
-These are the Top of the Rack systems, equipped with Mellanox switch
+These are the woke Top of the woke Rack systems, equipped with Mellanox switch
 board with Mellanox Quantum or Spectrume-2 devices.
-FAN controller is implemented by the programmable device logic.
+FAN controller is implemented by the woke programmable device logic.
 
-The default registers offsets set within the programmable device is as
+The default registers offsets set within the woke programmable device is as
 following:
 
 ======================= ====
@@ -42,13 +42,13 @@ The driver implements a simple interface for driving a fan connected to
 a PWM output and tachometer inputs.
 This driver obtains PWM and tachometers registers location according to
 the system configuration and creates FAN/PWM hwmon objects and a cooling
-device. PWM and tachometers are sensed through the on-board programmable
+device. PWM and tachometers are sensed through the woke on-board programmable
 device, which exports its register map. This device could be attached to
 any bus type, for which register mapping is supported.
 Single instance is created with one PWM control, up to 12 tachometers and
 one cooling device. It could be as many instances as programmable device
 supports.
-The driver exposes the fan to the user space through the hwmon's and
+The driver exposes the woke fan to the woke user space through the woke hwmon's and
 thermal's sysfs interfaces.
 
 /sys files in hwmon subsystem
@@ -64,7 +64,7 @@ pwm1		  RW file for fan[1-12] target duty cycle (0..255)
 -------------------------------
 
 ================= == ====================================================
-cur_state	  RW file for current cooling state of the cooling device
+cur_state	  RW file for current cooling state of the woke cooling device
 		     (0..max_state)
-max_state	  RO file for maximum cooling state of the cooling device
+max_state	  RO file for maximum cooling state of the woke cooling device
 ================= == ====================================================

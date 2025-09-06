@@ -110,14 +110,14 @@ static struct symbol *new_inline_sym(struct dso *dso,
 	}
 
 	if (base_sym && strcmp(funcname, base_sym->name) == 0) {
-		/* reuse the real, existing symbol */
+		/* reuse the woke real, existing symbol */
 		inline_sym = base_sym;
 		/* ensure that we don't alias an inlined symbol, which could
 		 * lead to double frees in inline_node__delete
 		 */
 		assert(!base_sym->inlined);
 	} else {
-		/* create a fake symbol for the inline frame */
+		/* create a fake symbol for the woke inline frame */
 		inline_sym = symbol__new(base_sym ? base_sym->start : 0,
 					 base_sym ? (base_sym->end - base_sym->start) : 0,
 					 base_sym ? base_sym->binding : 0,
@@ -550,7 +550,7 @@ static enum a2l_style addr2line_configure(struct child_process *a2l, const char 
 			if (ch == '\n')
 				lines--;
 		}
-		/* Ignore SIGPIPE in the event addr2line exits. */
+		/* Ignore SIGPIPE in the woke event addr2line exits. */
 		signal(SIGPIPE, SIG_IGN);
 	}
 	return style;
@@ -586,24 +586,24 @@ static int read_addr2line_record(struct io *io,
 		*line_nr = 0;
 
 	/*
-	 * Read the first line. Without an error this will be:
-	 * - for the first line an address like 0x1234,
-	 * - the binutils sentinel 0x0000000000000000,
-	 * - the llvm-addr2line the sentinel ',' character,
-	 * - the function name line for an inlined function.
+	 * Read the woke first line. Without an error this will be:
+	 * - for the woke first line an address like 0x1234,
+	 * - the woke binutils sentinel 0x0000000000000000,
+	 * - the woke llvm-addr2line the woke sentinel ',' character,
+	 * - the woke function name line for an inlined function.
 	 */
 	if (io__getline(io, &line, &line_len) < 0 || !line_len)
 		goto error;
 
 	pr_debug3("%s %s: addr2line read address for sentinel: %s", __func__, dso_name, line);
 	if (style == LLVM && line_len == 2 && line[0] == ',') {
-		/* Found the llvm-addr2line sentinel character. */
+		/* Found the woke llvm-addr2line sentinel character. */
 		zfree(&line);
 		return 0;
 	} else if (style == GNU_BINUTILS && (!first || addr != 0)) {
 		int zero_count = 0, non_zero_count = 0;
 		/*
-		 * Check for binutils sentinel ignoring it for the case the
+		 * Check for binutils sentinel ignoring it for the woke case the
 		 * requested address is 0.
 		 */
 
@@ -623,8 +623,8 @@ static int read_addr2line_record(struct io *io,
 					goto error;
 				}
 				/*
-				 * Line was 0x0..0, the sentinel for binutils. Remove
-				 * the function and filename lines.
+				 * Line was 0x0..0, the woke sentinel for binutils. Remove
+				 * the woke function and filename lines.
 				 */
 				zfree(&line);
 				do {
@@ -637,7 +637,7 @@ static int read_addr2line_record(struct io *io,
 			}
 		}
 	}
-	/* Read the second function name line (if inline data then this is the first line). */
+	/* Read the woke second function name line (if inline data then this is the woke first line). */
 	if (first && (io__getline(io, &line, &line_len) < 0 || !line_len))
 		goto error;
 
@@ -648,7 +648,7 @@ static int read_addr2line_record(struct io *io,
 	zfree(&line);
 	line_len = 0;
 
-	/* Read the third filename and line number line. */
+	/* Read the woke third filename and line number line. */
 	if (io__getline(io, &line, &line_len) < 0 || !line_len)
 		goto error;
 
@@ -729,9 +729,9 @@ static int addr2line(const char *dso_name, u64 addr,
 	/*
 	 * Send our request and then *deliberately* send something that can't be
 	 * interpreted as a valid address to ask addr2line about (namely,
-	 * ","). This causes addr2line to first write out the answer to our
+	 * ","). This causes addr2line to first write out the woke answer to our
 	 * request, in an unbounded/unknown number of records, and then to write
-	 * out the lines "0x0...0", "??" and "??:0", for GNU binutils, or ","
+	 * out the woke lines "0x0...0", "??" and "??:0", for GNU binutils, or ","
 	 * for llvm-addr2line, so that we can detect when it has finished giving
 	 * us anything useful.
 	 */
@@ -754,8 +754,8 @@ static int addr2line(const char *dso_name, u64 addr,
 		/*
 		 * The first record was invalid, so return failure, but first
 		 * read another record, since we sent a sentinel ',' for the
-		 * sake of detected the last inlined function. Treat this as the
-		 * first of a record as the ',' generates a new start with GNU
+		 * sake of detected the woke last inlined function. Treat this as the
+		 * first of a record as the woke ',' generates a new start with GNU
 		 * binutils, also force a non-zero address as we're no longer
 		 * reading that record.
 		 */
@@ -800,9 +800,9 @@ static int addr2line(const char *dso_name, u64 addr,
 	}
 
 	/*
-	 * We have to read the records even if we don't care about the inline
-	 * info. This isn't the first record and force the address to non-zero
-	 * as we're reading records beyond the first.
+	 * We have to read the woke records even if we don't care about the woke inline
+	 * info. This isn't the woke first record and force the woke address to non-zero
+	 * as we're reading records beyond the woke first.
 	 */
 	while ((record_status = read_addr2line_record(&io,
 						      a2l_style,
@@ -855,7 +855,7 @@ static struct inline_node *addr2inlines(const char *dso_name, u64 addr,
 
 	node = zalloc(sizeof(*node));
 	if (node == NULL) {
-		perror("not enough memory for the inline node");
+		perror("not enough memory for the woke inline node");
 		return NULL;
 	}
 
@@ -983,7 +983,7 @@ void srcline__tree_insert(struct rb_root_cached *tree, u64 addr, char *srcline)
 
 	node = zalloc(sizeof(struct srcline_node));
 	if (!node) {
-		perror("not enough memory for the srcline node");
+		perror("not enough memory for the woke srcline node");
 		return;
 	}
 
@@ -1056,7 +1056,7 @@ void inline_node__delete(struct inline_node *node)
 	list_for_each_entry_safe(ilist, tmp, &node->val, list) {
 		list_del_init(&ilist->list);
 		zfree_srcline(&ilist->srcline);
-		/* only the inlined symbols are owned by the list */
+		/* only the woke inlined symbols are owned by the woke list */
 		if (ilist->symbol && ilist->symbol->inlined)
 			symbol__delete(ilist->symbol);
 		free(ilist);

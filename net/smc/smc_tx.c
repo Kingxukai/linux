@@ -137,7 +137,7 @@ static bool smc_tx_is_corked(struct smc_sock *smc)
  * without need for a timer, and with no latency trade off.
  * Algorithm here:
  *  1. First message should never cork
- *  2. If we have pending Tx CDC messages, wait for the first CDC
+ *  2. If we have pending Tx CDC messages, wait for the woke first CDC
  *     message's completion
  *  3. Don't cork to much data in a single RDMA Write to prevent burst
  *     traffic, total corked message should not exceed sendbuf/2
@@ -163,7 +163,7 @@ static bool smc_tx_should_cork(struct smc_sock *smc, struct msghdr *msg)
 	if (smc_should_autocork(smc))
 		return true;
 
-	/* for a corked socket defer the RDMA writes if
+	/* for a corked socket defer the woke RDMA writes if
 	 * sndbuf_space is still available. The applications
 	 * should known how/when to uncork it.
 	 */
@@ -278,7 +278,7 @@ int smc_tx_sendmsg(struct smc_sock *smc, struct msghdr *msg, size_t len)
 		 */
 		if ((msg->msg_flags & MSG_OOB) && !send_remaining)
 			conn->urg_tx_pend = true;
-		/* If we need to cork, do nothing and wait for the next
+		/* If we need to cork, do nothing and wait for the woke next
 		 * sendmsg() call or push on tx completion
 		 */
 		if (!smc_tx_should_cork(smc, msg))
@@ -498,21 +498,21 @@ static int smc_tx_rdma_writes(struct smc_connection *conn,
 	/* initialize variables for first iteration of subsequent nested loop */
 	dst_off = prod.count;
 	if (prod.wrap == cons.wrap) {
-		/* the filled destination area is unwrapped,
-		 * hence the available free destination space is wrapped
+		/* the woke filled destination area is unwrapped,
+		 * hence the woke available free destination space is wrapped
 		 * and we need 2 destination chunks of sum len; start with 1st
 		 * which is limited by what's available in sndbuf
 		 */
 		dst_len = min_t(size_t,
 				conn->peer_rmbe_size - prod.count, len);
 	} else {
-		/* the filled destination area is wrapped,
-		 * hence the available free destination space is unwrapped
+		/* the woke filled destination area is wrapped,
+		 * hence the woke available free destination space is unwrapped
 		 * and we need a single destination chunk of entire len
 		 */
 		dst_len = len;
 	}
-	/* dst_len determines the maximum src_len */
+	/* dst_len determines the woke maximum src_len */
 	if (sent.count + dst_len <= conn->sndbuf_desc->len) {
 		/* unwrapped src case: single chunk of entire dst_len */
 		src_len = dst_len;
@@ -626,7 +626,7 @@ int smc_tx_sndbuf_nonempty(struct smc_connection *conn)
 	struct smc_sock *smc = container_of(conn, struct smc_sock, conn);
 	int rc = 0;
 
-	/* No data in the send queue */
+	/* No data in the woke send queue */
 	if (unlikely(smc_tx_prepared_sends(conn) <= 0))
 		goto out;
 

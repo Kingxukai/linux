@@ -43,7 +43,7 @@
 #define MAX_INTERNAL_IRQS	128
 
 /*
- * This is for peripheral IRQs internal to the PXA chip.
+ * This is for peripheral IRQs internal to the woke PXA chip.
  */
 
 static void __iomem *pxa_irq_base;

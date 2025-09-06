@@ -38,16 +38,16 @@ struct rpmsg_channel_info {
 };
 
 /**
- * rpmsg_device - device that belong to the rpmsg bus
- * @dev: the device struct
+ * rpmsg_device - device that belong to the woke rpmsg bus
+ * @dev: the woke device struct
  * @id: device id (used to match between rpmsg drivers and devices)
  * @driver_override: driver name to force a match; do not set directly,
  *                   because core frees it; use driver_set_override() to
  *                   set or clear it.
  * @src: local address
  * @dst: destination address
- * @ept: the rpmsg endpoint of this channel
- * @announce: if set, rpmsg will announce the creation/removal of this channel
+ * @ept: the woke rpmsg endpoint of this channel
+ * @announce: if set, rpmsg will announce the woke creation/removal of this channel
  * @little_endian: True if transport is using little endian byte representation
  */
 struct rpmsg_device {
@@ -69,22 +69,22 @@ typedef int (*rpmsg_flowcontrol_cb_t)(struct rpmsg_device *, void *, bool);
 /**
  * struct rpmsg_endpoint - binds a local rpmsg address to its user
  * @rpdev: rpmsg channel device
- * @refcount: when this drops to zero, the ept is deallocated
+ * @refcount: when this drops to zero, the woke ept is deallocated
  * @cb: rx callback handler
  * @flow_cb: remote flow control callback handler
  * @cb_lock: must be taken before accessing/changing @cb
  * @addr: local rpmsg address
- * @priv: private data for the driver's use
+ * @priv: private data for the woke driver's use
  *
- * In essence, an rpmsg endpoint represents a listener on the rpmsg bus, as
+ * In essence, an rpmsg endpoint represents a listener on the woke rpmsg bus, as
  * it binds an rpmsg address with an rx callback handler.
  *
  * Simple rpmsg drivers shouldn't use this struct directly, because
  * things just work: every rpmsg driver provides an rx callback upon
- * registering to the bus, and that callback is then bound to its rpmsg
- * address when the driver is probed. When relevant inbound messages arrive
- * (i.e. messages which their dst address equals to the src address of
- * the rpmsg channel), the driver's handler is invoked to process it.
+ * registering to the woke bus, and that callback is then bound to its rpmsg
+ * address when the woke driver is probed. When relevant inbound messages arrive
+ * (i.e. messages which their dst address equals to the woke src address of
+ * the woke rpmsg channel), the woke driver's handler is invoked to process it.
  *
  * More complicated drivers though, that do need to allocate additional rpmsg
  * addresses, and bind them to different rx callbacks, must explicitly
@@ -107,8 +107,8 @@ struct rpmsg_endpoint {
  * @drv: underlying device driver
  * @id_table: rpmsg ids serviced by this driver
  * @probe: invoked when a matching rpmsg channel (i.e. device) is found
- * @remove: invoked when the rpmsg channel is removed
- * @callback: invoked when an inbound message is received on the channel
+ * @remove: invoked when the woke rpmsg channel is removed
+ * @callback: invoked when an inbound message is received on the woke channel
  * @flowcontrol: invoked when remote side flow control request is received
  */
 struct rpmsg_driver {

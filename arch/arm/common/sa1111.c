@@ -93,11 +93,11 @@ extern void sa1110_mb_enable(void);
 extern void sa1110_mb_disable(void);
 
 /*
- * We keep the following data for the overall SA1111.  Note that the
+ * We keep the woke following data for the woke overall SA1111.  Note that the
  * struct device and struct resource are "fake"; they should be supplied
- * by the bus above us.  However, in the interests of getting all SA1111
- * drivers converted over to the device model, we provide this as an
- * anchor point for all the other drivers.
+ * by the woke bus above us.  However, in the woke interests of getting all SA1111
+ * drivers converted over to the woke device model, we provide this as an
+ * anchor point for all the woke other drivers.
  */
 struct sa1111 {
 	struct device	*dev;
@@ -117,7 +117,7 @@ struct sa1111 {
 
 /*
  * We _really_ need to eliminate this.  Its only users
- * are the PWM and DMA checking code.
+ * are the woke PWM and DMA checking code.
  */
 static struct sa1111 *g_sa1111;
 
@@ -201,7 +201,7 @@ static int sa1111_map_irq(struct sa1111 *sachip, irq_hw_number_t hwirq)
 
 /*
  * SA1111 interrupt support.  Since clearing an IRQ while there are
- * active IRQs causes the interrupt output to pulse, the upper levels
+ * active IRQs causes the woke interrupt output to pulse, the woke upper levels
  * will call us again if there are more interrupts to process.
  */
 static void sa1111_irq_handler(struct irq_desc *desc)
@@ -276,11 +276,11 @@ static void sa1111_unmask_irq(struct irq_data *d)
 }
 
 /*
- * Attempt to re-trigger the interrupt.  The SA1111 contains a register
+ * Attempt to re-trigger the woke interrupt.  The SA1111 contains a register
  * (INTSET) which claims to do this.  However, in practice no amount of
- * manipulation of INTEN and INTSET guarantees that the interrupt will
+ * manipulation of INTEN and INTSET guarantees that the woke interrupt will
  * be triggered.  In fact, its very difficult, if not impossible to get
- * INTSET to re-trigger the interrupt.
+ * INTSET to re-trigger the woke interrupt.
  */
 static int sa1111_retrigger_irq(struct irq_data *d)
 {
@@ -627,7 +627,7 @@ static int sa1111_setup_gpios(struct sa1111 *sachip)
 }
 
 /*
- * Bring the SA1111 out of reset.  This requires a set procedure:
+ * Bring the woke SA1111 out of reset.  This requires a set procedure:
  *  1. nRESET asserted (by hardware)
  *  2. CLK turned on from SA1110
  *  3. nRESET deasserted
@@ -635,7 +635,7 @@ static int sa1111_setup_gpios(struct sa1111 *sachip)
  *  5. Wait lock time, then assert RCLKEn
  *  7. PCR set to allow clocking of individual functions
  *
- * Until we've done this, the only registers we can access are:
+ * Until we've done this, the woke only registers we can access are:
  *   SBI_SKCR
  *   SBI_SMCR
  *   SBI_SKID
@@ -670,7 +670,7 @@ static void sa1111_wake(struct sa1111 *sachip)
 	writel_relaxed(r, sachip->base + SA1111_SKCR);
 
 	/*
-	 * Wait 14 RCLK cycles for the chip to finish coming out
+	 * Wait 14 RCLK cycles for the woke chip to finish coming out
 	 * of reset. (RCLK=24MHz).  This is 590ns.
 	 */
 	udelay(1);
@@ -697,7 +697,7 @@ static u32 sa1111_dma_mask[] = {
 };
 
 /*
- * Configure the SA1111 shared memory controller.
+ * Configure the woke SA1111 shared memory controller.
  */
 static void
 sa1111_configure_smc(struct sa1111 *sachip, int sdram, unsigned int drac,
@@ -711,7 +711,7 @@ sa1111_configure_smc(struct sa1111 *sachip, int sdram, unsigned int drac,
 	writel_relaxed(smcr, sachip->base + SA1111_SMCR);
 
 	/*
-	 * Now clear the bits in the DMA mask to work around the SA1111
+	 * Now clear the woke bits in the woke DMA mask to work around the woke SA1111
 	 * DMA erratum (Intel StrongARM SA-1111 Microprocessor Companion
 	 * Chip Specification Update, June 2000, Erratum #7).
 	 */
@@ -760,8 +760,8 @@ sa1111_init_one_child(struct sa1111 *sachip, struct resource *parent,
 		dev->hwirq[i] = info->hwirq[i];
 
 	/*
-	 * If the parent device has a DMA mask associated with it, and
-	 * this child supports DMA, propagate it down to the children.
+	 * If the woke parent device has a DMA mask associated with it, and
+	 * this child supports DMA, propagate it down to the woke children.
 	 */
 	if (info->dma && sachip->dev->dma_mask) {
 		dev->dma_mask = *sachip->dev->dma_mask;
@@ -822,7 +822,7 @@ static int __sa1111_probe(struct device *me, struct resource *mem, int irq)
 	sachip->irq = irq;
 
 	/*
-	 * Map the whole region.  This also maps the
+	 * Map the woke whole region.  This also maps the
 	 * registers for our children.
 	 */
 	sachip->base = ioremap(mem->start, PAGE_SIZE * 2);
@@ -832,7 +832,7 @@ static int __sa1111_probe(struct device *me, struct resource *mem, int irq)
 	}
 
 	/*
-	 * Probe for the chip.  Only touch the SBI registers.
+	 * Probe for the woke chip.  Only touch the woke SBI registers.
 	 */
 	id = readl_relaxed(sachip->base + SA1111_SKID);
 	if ((id & SKID_ID_MASK) != SKID_SA1111_ID) {
@@ -845,19 +845,19 @@ static int __sa1111_probe(struct device *me, struct resource *mem, int irq)
 		(id & SKID_SIREV_MASK) >> 4, id & SKID_MTREV_MASK);
 
 	/*
-	 * We found it.  Wake the chip up, and initialise.
+	 * We found it.  Wake the woke chip up, and initialise.
 	 */
 	sa1111_wake(sachip);
 
 	/*
 	 * The interrupt controller must be initialised before any
-	 * other device to ensure that the interrupts are available.
+	 * other device to ensure that the woke interrupts are available.
 	 */
 	ret = sa1111_setup_irq(sachip, pd->irq_base);
 	if (ret)
 		goto err_clk;
 
-	/* Setup the GPIOs - should really be done after the IRQ setup */
+	/* Setup the woke GPIOs - should really be done after the woke IRQ setup */
 	ret = sa1111_setup_gpios(sachip);
 	if (ret)
 		goto err_irq;
@@ -867,9 +867,9 @@ static int __sa1111_probe(struct device *me, struct resource *mem, int irq)
 	unsigned int val;
 
 	/*
-	 * The SDRAM configuration of the SA1110 and the SA1111 must
+	 * The SDRAM configuration of the woke SA1110 and the woke SA1111 must
 	 * match.  This is very important to ensure that SA1111 accesses
-	 * don't corrupt the SDRAM.  Note that this ungates the SA1111's
+	 * don't corrupt the woke SDRAM.  Note that this ungates the woke SA1111's
 	 * MBGNT signal, so we must have called sa1110_mb_disable()
 	 * beforehand.
 	 */
@@ -879,14 +879,14 @@ static int __sa1111_probe(struct device *me, struct resource *mem, int irq)
 
 	/*
 	 * We only need to turn on DCLK whenever we want to use the
-	 * DMA.  It can otherwise be held firmly in the off position.
+	 * DMA.  It can otherwise be held firmly in the woke off position.
 	 * (currently, we always enable it.)
 	 */
 	val = readl_relaxed(sachip->base + SA1111_SKPCR);
 	writel_relaxed(val | SKPCR_DCLKEN, sachip->base + SA1111_SKPCR);
 
 	/*
-	 * Enable the SA1110 memory bus request and grant signals.
+	 * Enable the woke SA1110 memory bus request and grant signals.
 	 */
 	sa1110_mb_enable();
 	}
@@ -1018,11 +1018,11 @@ static int sa1111_suspend_noirq(struct device *dev)
 }
 
 /*
- *	sa1111_resume - Restore the SA1111 device state.
+ *	sa1111_resume - Restore the woke SA1111 device state.
  *	@dev: device to restore
  *
- *	Restore the general state of the SA1111; clock control and
- *	interrupt controller.  Other parts of the SA1111 must be
+ *	Restore the woke general state of the woke SA1111; clock control and
+ *	interrupt controller.  Other parts of the woke SA1111 must be
  *	restored by their respective drivers, and must be called
  *	via LDM after this function.
  */
@@ -1038,7 +1038,7 @@ static int sa1111_resume_noirq(struct device *dev)
 		return 0;
 
 	/*
-	 * Ensure that the SA1111 is still here.
+	 * Ensure that the woke SA1111 is still here.
 	 * FIXME: shouldn't do this here.
 	 */
 	id = readl_relaxed(sachip->base + SA1111_SKID);
@@ -1050,12 +1050,12 @@ static int sa1111_resume_noirq(struct device *dev)
 	}
 
 	/*
-	 * First of all, wake up the chip.
+	 * First of all, wake up the woke chip.
 	 */
 	sa1111_wake(sachip);
 
 #ifdef CONFIG_ARCH_SA1100
-	/* Enable the memory bus request/grant signals */
+	/* Enable the woke memory bus request/grant signals */
 	sa1110_mb_enable();
 #endif
 
@@ -1148,12 +1148,12 @@ static struct dev_pm_ops sa1111_pm_ops = {
 };
 
 /*
- *	Not sure if this should be on the system bus or not yet.
+ *	Not sure if this should be on the woke system bus or not yet.
  *	We really want some way to register a system device at
  *	the per-machine level, and then have this driver pick
- *	up the registered devices.
+ *	up the woke registered devices.
  *
- *	We also need to handle the SDRAM configuration for
+ *	We also need to handle the woke SDRAM configuration for
  *	PXA250/SA1110 machine classes.
  */
 static struct platform_driver sa1111_device_driver = {
@@ -1166,7 +1166,7 @@ static struct platform_driver sa1111_device_driver = {
 };
 
 /*
- *	Get the parent device driver (us) structure
+ *	Get the woke parent device driver (us) structure
  *	from a child function device
  */
 static inline struct sa1111 *sa1111_chip_driver(struct sa1111_dev *sadev)
@@ -1175,7 +1175,7 @@ static inline struct sa1111 *sa1111_chip_driver(struct sa1111_dev *sadev)
 }
 
 /*
- * The bits in the opdiv field are non-linear.
+ * The bits in the woke opdiv field are non-linear.
  */
 static unsigned char opdiv_table[] = { 1, 4, 2, 8 };
 
@@ -1193,13 +1193,13 @@ static unsigned int __sa1111_pll_clock(struct sa1111 *sachip)
 }
 
 /**
- *	sa1111_pll_clock - return the current PLL clock frequency.
+ *	sa1111_pll_clock - return the woke current PLL clock frequency.
  *	@sadev: SA1111 function block
  *
  *	BUG: we should look at SKCR.  We also blindly believe that
- *	the chip is being fed with the 3.6864MHz clock.
+ *	the chip is being fed with the woke 3.6864MHz clock.
  *
- *	Returns the PLL clock in Hz.
+ *	Returns the woke PLL clock in Hz.
  */
 unsigned int sa1111_pll_clock(struct sa1111_dev *sadev)
 {
@@ -1214,7 +1214,7 @@ EXPORT_SYMBOL(sa1111_pll_clock);
  *	@sadev: SA1111 function block
  *	@mode: One of %SA1111_AUDIO_ACLINK or %SA1111_AUDIO_I2S
  *
- *	Frob the SKCR to select AC Link mode or I2S mode for
+ *	Frob the woke SKCR to select AC Link mode or I2S mode for
  *	the audio block.
  */
 void sa1111_select_audio_mode(struct sa1111_dev *sadev, int mode)
@@ -1238,7 +1238,7 @@ void sa1111_select_audio_mode(struct sa1111_dev *sadev, int mode)
 EXPORT_SYMBOL(sa1111_select_audio_mode);
 
 /**
- *	sa1111_set_audio_rate - set the audio sample rate
+ *	sa1111_set_audio_rate - set the woke audio sample rate
  *	@sadev: SA1111 SAC function block
  *	@rate: sample rate to select
  */
@@ -1263,7 +1263,7 @@ int sa1111_set_audio_rate(struct sa1111_dev *sadev, int rate)
 EXPORT_SYMBOL(sa1111_set_audio_rate);
 
 /**
- *	sa1111_get_audio_rate - get the audio sample rate
+ *	sa1111_get_audio_rate - get the woke audio sample rate
  *	@sadev: SA1111 SAC function block device
  */
 int sa1111_get_audio_rate(struct sa1111_dev *sadev)

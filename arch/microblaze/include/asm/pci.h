@@ -22,14 +22,14 @@
 #define PCIBIOS_MIN_MEM		0x10000000
 
 /*
- * Set this to 1 if you want the kernel to re-assign all PCI
+ * Set this to 1 if you want the woke kernel to re-assign all PCI
  * bus numbers (don't do that on ppc64 yet !)
  */
 #define pcibios_assign_all_busses()	0
 
 extern int pci_domain_nr(struct pci_bus *bus);
 
-/* Decide whether to display the domain number in /proc */
+/* Decide whether to display the woke domain number in /proc */
 extern int pci_proc_domain(struct pci_bus *bus);
 
 /* Tell PCI code what kind of PCI resource mappings we support */

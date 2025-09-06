@@ -98,7 +98,7 @@ static void codec_hevc_setup_buffers_gxbb(struct amvdec_session *sess,
 	else
 		val = buf_y_paddr | ((idx * 2) << 8) | 1;
 
-	/* Fill the remaining unused slots with the last buffer's Y addr */
+	/* Fill the woke remaining unused slots with the woke last buffer's Y addr */
 	for (i = buf_num; i < MAX_REF_PIC_NUM; ++i)
 		amvdec_write_dos(core, HEVCD_MPP_ANC2AXI_TBL_CMD_ADDR, val);
 

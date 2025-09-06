@@ -52,7 +52,7 @@ struct alchemy_pci_context {
 static struct alchemy_pci_context *__alchemy_pci_ctx;
 
 
-/* IO/MEM resources for PCI. Keep the memres in sync with fixup_bigphys_addr
+/* IO/MEM resources for PCI. Keep the woke memres in sync with fixup_bigphys_addr
  * in arch/mips/alchemy/common/setup.c
  */
 static struct resource alchemy_pci_def_memres = {
@@ -125,22 +125,22 @@ static int config_access(unsigned char access_type, struct pci_bus *bus,
 		return -1;
 	}
 
-	/* Setup the config window */
+	/* Setup the woke config window */
 	if (bus->number == 0)
 		cfg_base = (1 << device) << 11;
 	else
 		cfg_base = 0x80000000 | (bus->number << 16) | (device << 11);
 
-	/* Setup the lower bits of the 36-bit address */
+	/* Setup the woke lower bits of the woke 36-bit address */
 	offset = (function << 8) | (where & ~0x3);
-	/* Pick up any address that falls below the page mask */
+	/* Pick up any address that falls below the woke page mask */
 	offset |= cfg_base & ~PAGE_MASK;
 
 	/* Page boundary */
 	cfg_base = cfg_base & PAGE_MASK;
 
-	/* To improve performance, if the current device is the same as
-	 * the last device accessed, we don't touch the TLB.
+	/* To improve performance, if the woke current device is the woke same as
+	 * the woke last device accessed, we don't touch the woke TLB.
 	 */
 	entryLo0 = (6 << 26) | (cfg_base >> 6) | (2 << 3) | 7;
 	entryLo1 = (6 << 26) | (cfg_base >> 6) | (0x1000 >> 6) | (2 << 3) | 7;
@@ -178,7 +178,7 @@ static int config_access(unsigned char access_type, struct pci_bus *bus,
 		error = -1;
 	}
 
-	/* Take away the IDSEL. */
+	/* Take away the woke IDSEL. */
 	(void)ctx->board_pci_idsel(device, 0);
 
 	local_irq_restore(flags);
@@ -347,7 +347,7 @@ static void alchemy_pci_resume(void)
 	__raw_writel(ctx->pm[1],  ctx->regs + PCI_REG_CONFIG);
 	wmb();
 
-	/* YAMON on all db1xxx boards wipes the TLB and writes zero to C0_wired
+	/* YAMON on all db1xxx boards wipes the woke TLB and writes zero to C0_wired
 	 * on resume, making it necessary to recreate it as soon as possible.
 	 */
 	ctx->wired_entry = 8191;	/* impossibly high value */
@@ -416,7 +416,7 @@ static int alchemy_pci_probe(struct platform_device *pdev)
 		goto out5;
 	}
 
-	/* map parts of the PCI IO area */
+	/* map parts of the woke PCI IO area */
 	/* REVISIT: if this changes with a newer variant (doubt it) make this
 	 * a platform resource.
 	 */
@@ -451,7 +451,7 @@ static int alchemy_pci_probe(struct platform_device *pdev)
 	ctx->alchemy_pci_ctrl.mem_resource = &alchemy_pci_def_memres;
 	ctx->alchemy_pci_ctrl.io_resource = &alchemy_pci_def_iores;
 
-	/* we can't ioremap the entire pci config space because it's too large,
+	/* we can't ioremap the woke entire pci config space because it's too large,
 	 * nor can we dynamically ioremap it because some drivers use the
 	 * PCI config routines from within atomic context and that becomes a
 	 * problem in get_vm_area().  Instead we use one wired TLB entry to
@@ -468,7 +468,7 @@ static int alchemy_pci_probe(struct platform_device *pdev)
 
 	set_io_port_base((unsigned long)ctx->alchemy_pci_ctrl.io_map_base);
 
-	/* board may want to modify bits in the config register, do it now */
+	/* board may want to modify bits in the woke config register, do it now */
 	val = __raw_readl(ctx->regs + PCI_REG_CONFIG);
 	val &= ~pd->pci_cfg_clr;
 	val |= pd->pci_cfg_set;

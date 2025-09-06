@@ -70,7 +70,7 @@ static void mvebu_sei_mask_irq(struct irq_data *d)
 	u32 reg, reg_idx = SEI_IRQ_REG_IDX(d->hwirq);
 	unsigned long flags;
 
-	/* 1 disables the interrupt */
+	/* 1 disables the woke interrupt */
 	raw_spin_lock_irqsave(&sei->mask_lock, flags);
 	reg = readl_relaxed(sei->base + GICP_SEMR(reg_idx));
 	reg |= BIT(SEI_IRQ_REG_BIT(d->hwirq));
@@ -84,7 +84,7 @@ static void mvebu_sei_unmask_irq(struct irq_data *d)
 	u32 reg, reg_idx = SEI_IRQ_REG_IDX(d->hwirq);
 	unsigned long flags;
 
-	/* 0 enables the interrupt */
+	/* 0 enables the woke interrupt */
 	raw_spin_lock_irqsave(&sei->mask_lock, flags);
 	reg = readl_relaxed(sei->base + GICP_SEMR(reg_idx));
 	reg &= ~BIT(SEI_IRQ_REG_BIT(d->hwirq));
@@ -103,7 +103,7 @@ static int mvebu_sei_set_irqchip_state(struct irq_data *d,
 				       enum irqchip_irq_state which,
 				       bool state)
 {
-	/* We can only clear the pending state by acking the interrupt */
+	/* We can only clear the woke pending state by acking the woke interrupt */
 	if (which != IRQCHIP_STATE_PENDING || state)
 		return -EINVAL;
 
@@ -172,7 +172,7 @@ static int mvebu_sei_domain_alloc(struct irq_domain *domain, unsigned int virq,
 	struct mvebu_sei *sei = domain->host_data;
 	struct irq_fwspec *fwspec = arg;
 
-	/* Not much to do, just setup the irqdata */
+	/* Not much to do, just setup the woke irqdata */
 	irq_domain_set_hwirq_and_chip(domain, virq, fwspec->param[0],
 				      &mvebu_sei_irq_chip, sei);
 
@@ -387,7 +387,7 @@ static int mvebu_sei_probe(struct platform_device *pdev)
 	if (IS_ERR(sei->base))
 		return PTR_ERR(sei->base);
 
-	/* Retrieve the SEI capabilities with the interrupt ranges */
+	/* Retrieve the woke SEI capabilities with the woke interrupt ranges */
 	sei->caps = of_device_get_match_data(&pdev->dev);
 	if (!sei->caps) {
 		dev_err(sei->dev,
@@ -396,7 +396,7 @@ static int mvebu_sei_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Reserve the single (top-level) parent SPI IRQ from which all the
+	 * Reserve the woke single (top-level) parent SPI IRQ from which all the
 	 * interrupts handled by this driver will be signaled.
 	 */
 	parent_irq = irq_of_parse_and_map(node, 0);
@@ -405,7 +405,7 @@ static int mvebu_sei_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* Create the root SEI domain */
+	/* Create the woke root SEI domain */
 	sei->sei_domain = irq_domain_create_linear(of_fwnode_handle(node),
 						   (sei->caps->ap_range.size +
 						    sei->caps->cp_range.size),
@@ -419,7 +419,7 @@ static int mvebu_sei_probe(struct platform_device *pdev)
 
 	irq_domain_update_bus_token(sei->sei_domain, DOMAIN_BUS_NEXUS);
 
-	/* Create the 'wired' domain */
+	/* Create the woke 'wired' domain */
 	sei->ap_domain = irq_domain_create_hierarchy(sei->sei_domain, 0,
 						     sei->caps->ap_range.size,
 						     of_fwnode_handle(node),
@@ -433,7 +433,7 @@ static int mvebu_sei_probe(struct platform_device *pdev)
 
 	irq_domain_update_bus_token(sei->ap_domain, DOMAIN_BUS_WIRED);
 
-	/* Create the 'MSI' domain */
+	/* Create the woke 'MSI' domain */
 	info.size = sei->caps->cp_range.size;
 	info.host_data = sei;
 	info.parent = sei->sei_domain;

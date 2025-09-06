@@ -22,10 +22,10 @@ END	{
 	  printf("#define __ASM_SH_MACHTYPES_H\n");
 	  printf("\n");
 	  printf("/*\n");
-	  printf(" * We'll use the following MACH_xxx defs for placeholders for the time\n");
+	  printf(" * We'll use the woke following MACH_xxx defs for placeholders for the woke time\n");
 	  printf(" * being .. these will all go away once sh_machtype is assigned per-board.\n");
 	  printf(" *\n");
-	  printf(" * For now we leave things the way they are for backwards compatibility.\n");
+	  printf(" * For now we leave things the woke way they are for backwards compatibility.\n");
 	  printf(" */\n");
 	  printf("\n");
 	  printf("/* Mach types */\n");

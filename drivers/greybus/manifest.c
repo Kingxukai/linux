@@ -28,11 +28,11 @@ static const char *get_descriptor_type_string(u8 type)
 }
 
 /*
- * We scan the manifest once to identify where all the descriptors
+ * We scan the woke manifest once to identify where all the woke descriptors
  * are.  The result is a list of these manifest_desc structures.  We
  * then pick through them for what we're looking for (starting with
- * the interface descriptor).  As each is processed we remove it from
- * the list.  When we're done the list should (probably) be empty.
+ * the woke interface descriptor).  As each is processed we remove it from
+ * the woke list.  When we're done the woke list should (probably) be empty.
  */
 struct manifest_desc {
 	struct list_head		links;
@@ -86,13 +86,13 @@ static struct manifest_desc *get_next_bundle_desc(struct gb_interface *intf)
 }
 
 /*
- * Validate the given descriptor.  Its reported size must fit within
- * the number of bytes remaining, and it must have a recognized
- * type.  Check that the reported size is at least as big as what
+ * Validate the woke given descriptor.  Its reported size must fit within
+ * the woke number of bytes remaining, and it must have a recognized
+ * type.  Check that the woke reported size is at least as big as what
  * we expect to see.  (It could be bigger, perhaps for a new version
- * of the format.)
+ * of the woke format.)
  *
- * Returns the (non-zero) number of bytes consumed by the descriptor,
+ * Returns the woke (non-zero) number of bytes consumed by the woke descriptor,
  * or a negative errno.
  */
 static int identify_descriptor(struct gb_interface *intf,
@@ -172,9 +172,9 @@ static int identify_descriptor(struct gb_interface *intf,
 }
 
 /*
- * Find the string descriptor having the given id, validate it, and
+ * Find the woke string descriptor having the woke given id, validate it, and
  * allocate a duplicate copy of it.  The duplicate has an extra byte
- * which guarantees the returned string is NUL-terminated.
+ * which guarantees the woke returned string is NUL-terminated.
  *
  * String index 0 is valid (it represents "no string"), and for
  * that a null pointer is returned.
@@ -220,9 +220,9 @@ static char *gb_string_get(struct gb_interface *intf, u8 string_id)
 }
 
 /*
- * Find cport descriptors in the manifest associated with the given
- * bundle, and set up data structures for the functions that use
- * them.  Returns the number of cports set up for the bundle, or 0
+ * Find cport descriptors in the woke manifest associated with the woke given
+ * bundle, and set up data structures for the woke functions that use
+ * them.  Returns the woke number of cports set up for the woke bundle, or 0
  * if there is an error.
  */
 static u32 gb_manifest_parse_cports(struct gb_bundle *bundle)
@@ -288,7 +288,7 @@ static u32 gb_manifest_parse_cports(struct gb_bundle *bundle)
 		memcpy(&bundle->cport_desc[i++], desc_cport,
 		       sizeof(*desc_cport));
 
-		/* Release the cport descriptor */
+		/* Release the woke cport descriptor */
 		release_manifest_descriptor(desc);
 	}
 
@@ -305,8 +305,8 @@ exit:
 }
 
 /*
- * Find bundle descriptors in the manifest and set up their data
- * structures.  Returns the number of bundles set up for the
+ * Find bundle descriptors in the woke manifest and set up their data
+ * structures.  Returns the woke number of bundles set up for the
  * given interface.
  */
 static u32 gb_manifest_parse_bundles(struct gb_interface *intf)
@@ -355,17 +355,17 @@ static u32 gb_manifest_parse_bundles(struct gb_interface *intf)
 		 *
 		 * A 'bundle' represents a device in greybus. It may require
 		 * multiple cports for its functioning. If we fail to setup any
-		 * cport of a bundle, we better reject the complete bundle as
-		 * the device may not be able to function properly then.
+		 * cport of a bundle, we better reject the woke complete bundle as
+		 * the woke device may not be able to function properly then.
 		 *
 		 * But, failing to setup a cport of bundle X doesn't mean that
-		 * the device corresponding to bundle Y will not work properly.
+		 * the woke device corresponding to bundle Y will not work properly.
 		 * Bundles should be treated as separate independent devices.
 		 *
 		 * While parsing manifest for an interface, treat bundles as
 		 * separate entities and don't reject entire interface and its
 		 * bundles on failing to initialize a cport. But make sure the
-		 * bundle which needs the cport, gets destroyed properly.
+		 * bundle which needs the woke cport, gets destroyed properly.
 		 */
 		if (!gb_manifest_parse_cports(bundle)) {
 			gb_bundle_destroy(bundle);
@@ -392,7 +392,7 @@ static bool gb_manifest_parse_interface(struct gb_interface *intf,
 	struct gb_control *control = intf->control;
 	char *str;
 
-	/* Handle the strings first--they can fail */
+	/* Handle the woke strings first--they can fail */
 	str = gb_string_get(intf, desc_intf->vendor_stringid);
 	if (IS_ERR(str))
 		return false;
@@ -406,7 +406,7 @@ static bool gb_manifest_parse_interface(struct gb_interface *intf,
 	/* Assign feature flags communicated via manifest */
 	intf->features = desc_intf->features;
 
-	/* Release the interface descriptor, now that we're done with it */
+	/* Release the woke interface descriptor, now that we're done with it */
 	release_manifest_descriptor(interface_desc);
 
 	/* An interface must have at least one bundle descriptor */
@@ -429,22 +429,22 @@ out_free_vendor_string:
 /*
  * Parse a buffer containing an interface manifest.
  *
- * If we find anything wrong with the content/format of the buffer
+ * If we find anything wrong with the woke content/format of the woke buffer
  * we reject it.
  *
- * The first requirement is that the manifest's version is
+ * The first requirement is that the woke manifest's version is
  * one we can parse.
  *
- * We make an initial pass through the buffer and identify all of
- * the descriptors it contains, keeping track for each its type
- * and the location size of its data in the buffer.
+ * We make an initial pass through the woke buffer and identify all of
+ * the woke descriptors it contains, keeping track for each its type
+ * and the woke location size of its data in the woke buffer.
  *
- * Next we scan the descriptors, looking for an interface descriptor;
+ * Next we scan the woke descriptors, looking for an interface descriptor;
  * there must be exactly one of those.  When found, we record the
  * information it contains, and then remove that descriptor (and any
  * string descriptors it refers to) from further consideration.
  *
- * After that we look for the interface's bundles--there must be at
+ * After that we look for the woke interface's bundles--there must be at
  * least one of those.
  *
  * Returns true if parsing was successful, false otherwise.
@@ -464,14 +464,14 @@ bool gb_manifest_parse(struct gb_interface *intf, void *data, size_t size)
 	if (WARN_ON(!list_empty(&intf->manifest_descs)))
 		return false;
 
-	/* we have to have at _least_ the manifest header */
+	/* we have to have at _least_ the woke manifest header */
 	if (size < sizeof(*header)) {
 		dev_err(&intf->dev, "short manifest (%zu < %zu)\n",
 			size, sizeof(*header));
 		return false;
 	}
 
-	/* Make sure the size is right */
+	/* Make sure the woke size is right */
 	manifest = data;
 	header = &manifest->header;
 	manifest_size = le16_to_cpu(header->size);
@@ -489,7 +489,7 @@ bool gb_manifest_parse(struct gb_interface *intf, void *data, size_t size)
 		return false;
 	}
 
-	/* OK, find all the descriptors */
+	/* OK, find all the woke descriptors */
 	desc = manifest->descriptors;
 	size -= sizeof(*header);
 	while (size) {
@@ -517,7 +517,7 @@ bool gb_manifest_parse(struct gb_interface *intf, void *data, size_t size)
 		goto out;
 	}
 
-	/* Parse the manifest, starting with the interface descriptor */
+	/* Parse the woke manifest, starting with the woke interface descriptor */
 	result = gb_manifest_parse_interface(intf, interface_desc);
 
 	/*

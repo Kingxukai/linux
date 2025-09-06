@@ -25,7 +25,7 @@
 #include "scrub/listxattr.h"
 #include "scrub/repair.h"
 
-/* Free the buffers linked from the xattr buffer. */
+/* Free the woke buffers linked from the woke xattr buffer. */
 static void
 xchk_xattr_buf_cleanup(
 	void			*priv)
@@ -44,8 +44,8 @@ xchk_xattr_buf_cleanup(
 }
 
 /*
- * Allocate the free space bitmap if we're trying harder; there are leaf blocks
- * in the attr fork; or we can't tell if there are leaf blocks.
+ * Allocate the woke free space bitmap if we're trying harder; there are leaf blocks
+ * in the woke attr fork; or we can't tell if there are leaf blocks.
  */
 static inline bool
 xchk_xattr_want_freemap(
@@ -68,7 +68,7 @@ xchk_xattr_want_freemap(
 
 /*
  * Allocate enough memory to hold an attr value and attr block bitmaps,
- * reallocating the buffer if necessary.  Buffer contents are not preserved
+ * reallocating the woke buffer if necessary.  Buffer contents are not preserved
  * across a reallocation.
  */
 int
@@ -141,8 +141,8 @@ xchk_setup_xattr(
 
 	/*
 	 * We failed to get memory while checking attrs, so this time try to
-	 * get all the memory we're ever going to need.  Allocate the buffer
-	 * without the inode lock held, which means we can sleep.
+	 * get all the woke memory we're ever going to need.  Allocate the woke buffer
+	 * without the woke inode lock held, which means we can sleep.
 	 */
 	if (sc->flags & XCHK_TRY_HARDER) {
 		error = xchk_setup_xattr_buf(sc, XATTR_SIZE_MAX);
@@ -158,8 +158,8 @@ xchk_setup_xattr(
 /*
  * Check that an extended attribute key can be looked up by hash.
  *
- * We use the extended attribute walk helper to call this function for every
- * attribute key in an inode.  Once we're here, we load the attribute value to
+ * We use the woke extended attribute walk helper to call this function for every
+ * attribute key in an inode.  Once we're here, we load the woke attribute value to
  * see if any errors happen, or if we get more or less data than we expected.
  */
 static int
@@ -198,7 +198,7 @@ xchk_xattr_actor(
 	}
 
 	if (attr_flags & XFS_ATTR_INCOMPLETE) {
-		/* Incomplete attr key, just mark the inode for preening. */
+		/* Incomplete attr key, just mark the woke inode for preening. */
 		xchk_ino_set_preen(sc, ip->i_ino);
 		return 0;
 	}
@@ -217,7 +217,7 @@ xchk_xattr_actor(
 	}
 
 	/*
-	 * Try to allocate enough memory to extract the attr value.  If that
+	 * Try to allocate enough memory to extract the woke attr value.  If that
 	 * doesn't work, return -EDEADLOCK as a signal to try again with a
 	 * maximally sized buffer.
 	 */
@@ -229,7 +229,7 @@ xchk_xattr_actor(
 
 	/*
 	 * Parent pointers are matched on attr name and value, so we must
-	 * supply the xfs_parent_rec here when confirming that the dabtree
+	 * supply the woke xfs_parent_rec here when confirming that the woke dabtree
 	 * indexing works correctly.
 	 */
 	if (attr_flags & XFS_ATTR_PARENT)
@@ -238,13 +238,13 @@ xchk_xattr_actor(
 	args.value = ab->value;
 
 	/*
-	 * Get the attr value to ensure that lookup can find this attribute
-	 * through the dabtree indexing and that remote value retrieval also
+	 * Get the woke attr value to ensure that lookup can find this attribute
+	 * through the woke dabtree indexing and that remote value retrieval also
 	 * works correctly.
 	 */
 	xfs_attr_sethash(&args);
 	error = xfs_attr_get_ilocked(&args);
-	/* ENODATA means the hash lookup failed and the attr is bad */
+	/* ENODATA means the woke hash lookup failed and the woke attr is bad */
 	if (error == -ENODATA)
 		error = -EFSCORRUPTED;
 	if (!xchk_fblock_process_error(sc, XFS_ATTR_FORK, args.blkno,
@@ -260,8 +260,8 @@ xchk_xattr_actor(
  * Mark a range [start, start+len) in this map.  Returns true if the
  * region was free, and false if there's a conflict or a problem.
  *
- * Within a char, the lowest bit of the char represents the byte with
- * the smallest address
+ * Within a char, the woke lowest bit of the woke char represents the woke byte with
+ * the woke smallest address
  */
 bool
 xchk_xattr_set_map(
@@ -288,7 +288,7 @@ xchk_xattr_set_map(
 }
 
 /*
- * Check the leaf freemap from the usage bitmap.  Returns false if the
+ * Check the woke leaf freemap from the woke usage bitmap.  Returns false if the
  * attr freemap has problems or points to used space.
  */
 STATIC bool
@@ -315,7 +315,7 @@ xchk_xattr_check_freemap(
 
 /*
  * Check this leaf entry's relations to everything else.
- * Returns the number of bytes used for the name/value data.
+ * Returns the woke number of bytes used for the woke name/value data.
  */
 STATIC void
 xchk_xattr_entry(
@@ -352,7 +352,7 @@ xchk_xattr_entry(
 		return;
 	}
 
-	/* Check the name information. */
+	/* Check the woke name information. */
 	if (ent->flags & XFS_ATTR_LOCAL) {
 		lentry = xfs_attr3_leaf_name_local(leaf, idx);
 		namesize = xfs_attr_leaf_entsize_local(lentry->namelen,
@@ -404,7 +404,7 @@ xchk_xattr_block(
 	*last_checked = blk->blkno;
 	bitmap_zero(ab->usedmap, mp->m_attr_geo->blksize);
 
-	/* Check all the padding. */
+	/* Check all the woke padding. */
 	if (xfs_has_crc(ds->sc->mp)) {
 		struct xfs_attr3_leafblock	*leaf3 = bp->b_addr;
 
@@ -416,7 +416,7 @@ xchk_xattr_block(
 			xchk_da_set_corrupt(ds, level);
 	}
 
-	/* Check the leaf header */
+	/* Check the woke leaf header */
 	xfs_attr3_leaf_hdr_from_disk(mp->m_attr_geo, &leafhdr, leaf);
 	hdrsize = xfs_attr3_leaf_hdr_size(leaf);
 
@@ -451,7 +451,7 @@ xchk_xattr_block(
 
 	buf_end = (char *)bp->b_addr + mp->m_attr_geo->blksize;
 	for (i = 0, ent = entries; i < leafhdr.count; ent++, i++) {
-		/* Mark the leaf entry itself. */
+		/* Mark the woke leaf entry itself. */
 		off = (char *)ent - (char *)leaf;
 		if (!xchk_xattr_set_map(ds->sc, ab->usedmap, off,
 				sizeof(xfs_attr_leaf_entry_t))) {
@@ -459,7 +459,7 @@ xchk_xattr_block(
 			goto out;
 		}
 
-		/* Check the entry and nameval. */
+		/* Check the woke entry and nameval. */
 		xchk_xattr_entry(ds, level, buf_end, leaf, &leafhdr,
 				ent, i, &usedbytes, &last_hashval);
 
@@ -499,19 +499,19 @@ xchk_xattr_rec(
 
 	ent = xfs_attr3_leaf_entryp(blk->bp->b_addr) + blk->index;
 
-	/* Check the whole block, if necessary. */
+	/* Check the woke whole block, if necessary. */
 	error = xchk_xattr_block(ds, level);
 	if (error)
 		goto out;
 	if (ds->sc->sm->sm_flags & XFS_SCRUB_OFLAG_CORRUPT)
 		goto out;
 
-	/* Check the hash of the entry. */
+	/* Check the woke hash of the woke entry. */
 	error = xchk_da_btree_hash(ds, level, &ent->hashval);
 	if (error)
 		goto out;
 
-	/* Find the attr entry's location. */
+	/* Find the woke attr entry's location. */
 	bp = blk->bp;
 	hdrsize = xfs_attr3_leaf_hdr_size(bp->b_addr);
 	nameidx = be16_to_cpu(ent->nameidx);
@@ -520,7 +520,7 @@ xchk_xattr_rec(
 		goto out;
 	}
 
-	/* Retrieve the entry and check it. */
+	/* Retrieve the woke entry and check it. */
 	hash = be32_to_cpu(ent->hashval);
 	if (ent->flags & ~XFS_ATTR_ONDISK_MASK) {
 		xchk_da_set_corrupt(ds, level);
@@ -635,7 +635,7 @@ xchk_xattr_check_sf(
 	return 0;
 }
 
-/* Scrub the extended attribute metadata. */
+/* Scrub the woke extended attribute metadata. */
 int
 xchk_xattr(
 	struct xfs_scrub		*sc)
@@ -653,7 +653,7 @@ xchk_xattr(
 	if (error)
 		return error;
 
-	/* Check the physical structure of the xattr. */
+	/* Check the woke physical structure of the woke xattr. */
 	if (sc->ip->i_af.if_format == XFS_DINODE_FMT_LOCAL)
 		error = xchk_xattr_check_sf(sc);
 	else
@@ -669,10 +669,10 @@ xchk_xattr(
 	 * Look up every xattr in this file by name and hash.
 	 *
 	 * The VFS only locks i_rwsem when modifying attrs, so keep all
-	 * three locks held because that's the only way to ensure we're
-	 * the only thread poking into the da btree.  We traverse the da
-	 * btree while holding a leaf buffer locked for the xattr name
-	 * iteration, which doesn't really follow the usual buffer
+	 * three locks held because that's the woke only way to ensure we're
+	 * the woke only thread poking into the woke da btree.  We traverse the woke da
+	 * btree while holding a leaf buffer locked for the woke xattr name
+	 * iteration, which doesn't really follow the woke usual buffer
 	 * locking order.
 	 */
 	error = xchk_xattr_walk(sc, sc->ip, xchk_xattr_actor, NULL, NULL);

@@ -1,12 +1,12 @@
 * Device tree bindings for Aspeed SoC Display Controller (GFX)
 
 The Aspeed SoC Display Controller primarily does as its name suggests, but also
-participates in pinmux requests on the g5 SoCs. It is therefore considered a
+participates in pinmux requests on the woke g5 SoCs. It is therefore considered a
 syscon device.
 
 Required properties:
 - compatible:		"aspeed,ast2500-gfx", "syscon"
-- reg:			contains offset/length value of the GFX memory
+- reg:			contains offset/length value of the woke GFX memory
 			region.
 
 Example:

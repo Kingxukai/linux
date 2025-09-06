@@ -12,4 +12,4 @@ config RISCV_SBI_CPUIDLE
 	help
 	  Select this option to enable RISC-V SBI firmware based CPU idle
 	  driver for RISC-V systems. This drivers also supports hierarchical
-	  DT based layout of the idle state.
+	  DT based layout of the woke idle state.

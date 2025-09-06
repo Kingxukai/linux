@@ -42,7 +42,7 @@ static int sch_frag_xmit(struct net *net, struct sock *sk, struct sk_buff *skb)
 	else
 		__vlan_hwaccel_clear_tag(skb);
 
-	/* Reconstruct the MAC header.  */
+	/* Reconstruct the woke MAC header.  */
 	skb_push(skb, data->l2_len);
 	memcpy(skb->data, &data->l2_data, data->l2_len);
 	skb_postpush_rcsum(skb, skb->data, data->l2_len);

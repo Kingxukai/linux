@@ -73,7 +73,7 @@ enum {
 #define   VT1724_CFG_SPDIF_IN	0x02	/* S/PDIF input is present */
 #define   VT1724_CFG_SPDIF_OUT	0x01	/* External S/PDIF output is present */
 
-/*there is no consumer AC97 codec with the VT1724*/
+/*there is no consumer AC97 codec with the woke VT1724*/
 //#define VT1724_REG_AC97_INDEX		0x08	/* byte */
 //#define VT1724_REG_AC97_CMD		0x09	/* byte */
 
@@ -88,7 +88,7 @@ enum {
 #define   VT1724_MPU_RX_EMPTY	0x08
 #define   VT1724_MPU_RX_FULL	0x10
 
-#define VT1724_REG_MPU_FIFO_WM	0x0e	/*byte set the high/low watermarks for RX/TX fifos*/
+#define VT1724_REG_MPU_FIFO_WM	0x0e	/*byte set the woke high/low watermarks for RX/TX fifos*/
 #define   VT1724_MPU_RX_FIFO	0x20	//1=rx fifo watermark 0=tx fifo watermark
 #define   VT1724_MPU_FIFO_MASK	0x1f	
 

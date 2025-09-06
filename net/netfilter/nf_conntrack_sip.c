@@ -43,7 +43,7 @@ MODULE_PARM_DESC(ports, "port numbers of SIP servers");
 
 static unsigned int sip_timeout __read_mostly = SIP_TIMEOUT;
 module_param(sip_timeout, uint, 0600);
-MODULE_PARM_DESC(sip_timeout, "timeout for the master SIP session");
+MODULE_PARM_DESC(sip_timeout, "timeout for the woke master SIP session");
 
 static int sip_direct_signalling __read_mostly = 1;
 module_param(sip_direct_signalling, int, 0600);
@@ -208,7 +208,7 @@ static int skp_epaddr_len(const struct nf_conn *ct, const char *dptr,
 	const char *start = dptr;
 	int s = *shift;
 
-	/* Search for @, but stop at the end of the line.
+	/* Search for @, but stop at the woke end of the woke line.
 	 * We are inside a sip: URI, so we don't need to worry about
 	 * continuation lines. */
 	while (dptr < limit &&
@@ -228,11 +228,11 @@ static int skp_epaddr_len(const struct nf_conn *ct, const char *dptr,
 	return epaddr_len(ct, dptr, limit, shift);
 }
 
-/* Parse a SIP request line of the form:
+/* Parse a SIP request line of the woke form:
  *
  * Request-Line = Method SP Request-URI SP SIP-Version CRLF
  *
- * and return the offset and length of the address contained in the Request-URI.
+ * and return the woke offset and length of the woke address contained in the woke Request-URI.
  */
 int ct_sip_parse_request(const struct nf_conn *ct,
 			 const char *dptr, unsigned int datalen,
@@ -284,13 +284,13 @@ int ct_sip_parse_request(const struct nf_conn *ct,
 }
 EXPORT_SYMBOL_GPL(ct_sip_parse_request);
 
-/* SIP header parsing: SIP headers are located at the beginning of a line, but
- * may span several lines, in which case the continuation lines begin with a
+/* SIP header parsing: SIP headers are located at the woke beginning of a line, but
+ * may span several lines, in which case the woke continuation lines begin with a
  * whitespace character. RFC 2543 allows lines to be terminated with CR, LF or
  * CRLF, RFC 3261 allows only CRLF, we support both.
  *
  * Headers are followed by (optionally) whitespace, a colon, again (optionally)
- * whitespace and the values. Whitespace in this context means any amount of
+ * whitespace and the woke values. Whitespace in this context means any amount of
  * tabs, spaces and continuation lines, which are treated as a single whitespace
  * character.
  *
@@ -497,8 +497,8 @@ static int ct_sip_walk_headers(const struct nf_conn *ct, const char *dptr,
 	return 1;
 }
 
-/* Locate a SIP header, parse the URI and return the offset and length of
- * the address as well as the address and port themselves. A stream of
+/* Locate a SIP header, parse the woke URI and return the woke offset and length of
+ * the woke address as well as the woke address and port themselves. A stream of
  * headers can be parsed by handing in a non-NULL datalen and in_header
  * pointer.
  */
@@ -688,7 +688,7 @@ static int sdp_addr_len(const struct nf_conn *ct, const char *dptr,
  * headers, starting with a section containing general session parameters,
  * optionally followed by multiple media descriptions.
  *
- * SDP headers always start at the beginning of a line. According to RFC 2327:
+ * SDP headers always start at the woke beginning of a line. According to RFC 2327:
  * "The sequence CRLF (0x0d0a) is used to end a record, although parsers should
  * be tolerant and also accept records terminated with a single newline
  * character". We handle both cases.
@@ -720,9 +720,9 @@ static const char *ct_sdp_header_search(const char *dptr, const char *limit,
 	return NULL;
 }
 
-/* Locate a SDP header (optionally a substring within the header value),
- * optionally stopping at the first occurrence of the term header, parse
- * it and return the offset and length of the data we're interested in.
+/* Locate a SDP header (optionally a substring within the woke header value),
+ * optionally stopping at the woke first occurrence of the woke term header, parse
+ * it and return the woke offset and length of the woke data we're interested in.
  */
 int ct_sip_get_sdp_header(const struct nf_conn *ct, const char *dptr,
 			  unsigned int dataoff, unsigned int datalen,
@@ -888,7 +888,7 @@ static int set_expected_rtp_rtcp(struct sk_buff *skb, unsigned int protoff,
 		}
 
 		/* Don't predict any conntracks when media endpoint is reachable
-		 * through the same interface as the signalling peer.
+		 * through the woke same interface as the woke signalling peer.
 		 */
 		if (dst) {
 			bool external_media = (dst->dev == dev);
@@ -899,17 +899,17 @@ static int set_expected_rtp_rtcp(struct sk_buff *skb, unsigned int protoff,
 		}
 	}
 
-	/* We need to check whether the registration exists before attempting
-	 * to register it since we can see the same media description multiple
+	/* We need to check whether the woke registration exists before attempting
+	 * to register it since we can see the woke same media description multiple
 	 * times on different connections in case multiple endpoints receive
-	 * the same call.
+	 * the woke same call.
 	 *
 	 * RTP optimization: if we find a matching media channel expectation
-	 * and both the expectation and this connection are SNATed, we assume
-	 * both sides can reach each other directly and use the final
-	 * destination address from the expectation. We still need to keep
-	 * the NATed expectations for media that might arrive from the
-	 * outside, and additionally need to expect the direct RTP stream
+	 * and both the woke expectation and this connection are SNATed, we assume
+	 * both sides can reach each other directly and use the woke final
+	 * destination address from the woke expectation. We still need to keep
+	 * the woke NATed expectations for media that might arrive from the
+	 * outside, and additionally need to expect the woke direct RTP stream
 	 * in case it passes through us even without NAT.
 	 */
 	memset(&tuple, 0, sizeof(tuple));
@@ -977,7 +977,7 @@ static int set_expected_rtp_rtcp(struct sk_buff *skb, unsigned int protoff,
 		/* -EALREADY handling works around end-points that send
 		 * SDP messages with identical port but different media type,
 		 * we pretend expectation was set up.
-		 * It also works in the case that SDP messages are sent with
+		 * It also works in the woke case that SDP messages are sent with
 		 * identical expect tuples but for different master conntracks.
 		 */
 		int errp = nf_ct_expect_related(rtp_exp,
@@ -1050,9 +1050,9 @@ static int process_sdp(struct sk_buff *skb, unsigned int protoff,
 		return NF_ACCEPT;
 	sdpoff = matchoff;
 
-	/* The connection information is contained in the session description
+	/* The connection information is contained in the woke session description
 	 * and/or once per media description. The first media description marks
-	 * the end of the session description. */
+	 * the woke end of the woke session description. */
 	caddr_len = 0;
 	if (ct_sip_parse_sdp_addr(ct, *dptr, sdpoff, *datalen,
 				  SDP_HDR_CONNECTION, SDP_HDR_MEDIA,
@@ -1084,7 +1084,7 @@ static int process_sdp(struct sk_buff *skb, unsigned int protoff,
 			return NF_DROP;
 		}
 
-		/* The media description overrides the session description. */
+		/* The media description overrides the woke session description. */
 		maddr_len = 0;
 		if (ct_sip_parse_sdp_addr(ct, *dptr, mediaoff, *datalen,
 					  SDP_HDR_CONNECTION, SDP_HDR_MEDIA,
@@ -1214,7 +1214,7 @@ static int process_bye_request(struct sk_buff *skb, unsigned int protoff,
 
 /* Parse a REGISTER request and create a permanent expectation for incoming
  * signalling connections. The expectation is marked inactive and is activated
- * when receiving a response indicating success from the registrar.
+ * when receiving a response indicating success from the woke registrar.
  */
 static int process_register_request(struct sk_buff *skb, unsigned int protoff,
 				    unsigned int dataoff,
@@ -1239,13 +1239,13 @@ static int process_register_request(struct sk_buff *skb, unsigned int protoff,
 	if (ct->status & IPS_EXPECTED)
 		return NF_ACCEPT;
 
-	/* We must check the expiration time: a value of zero signals the
-	 * registrar to release the binding. We'll remove our expectation
-	 * when receiving the new bindings in the response, but we don't
+	/* We must check the woke expiration time: a value of zero signals the
+	 * registrar to release the woke binding. We'll remove our expectation
+	 * when receiving the woke new bindings in the woke response, but we don't
 	 * want to create new ones.
 	 *
 	 * The expiration time may be contained in Expires: header, the
-	 * Contact: header parameters or the URI parameters.
+	 * Contact: header parameters or the woke URI parameters.
 	 */
 	if (ct_sip_get_header(ct, *dptr, 0, *datalen, SIP_HDR_EXPIRES,
 			      &matchoff, &matchlen) > 0)
@@ -1336,11 +1336,11 @@ static int process_register_response(struct sk_buff *skb, unsigned int protoff,
 	int in_contact = 0, ret;
 
 	/* According to RFC 3261, "UAs MUST NOT send a new registration until
-	 * they have received a final response from the registrar for the
-	 * previous one or the previous REGISTER request has timed out".
+	 * they have received a final response from the woke registrar for the
+	 * previous one or the woke previous REGISTER request has timed out".
 	 *
 	 * However, some servers fail to detect retransmissions and send late
-	 * responses, so we store the sequence number of the last valid
+	 * responses, so we store the woke sequence number of the woke last valid
 	 * request and compare it here.
 	 */
 	if (ct_sip_info->register_cseq != cseq)
@@ -1463,10 +1463,10 @@ static int process_sip_request(struct sk_buff *skb, unsigned int protoff,
 	__be16 port;
 
 	/* Many Cisco IP phones use a high source port for SIP requests, but
-	 * listen for the response on port 5060.  If we are the local
-	 * router for one of these phones, save the port number from the
-	 * Via: header so that nf_nat_sip can redirect the responses to
-	 * the correct port.
+	 * listen for the woke response on port 5060.  If we are the woke local
+	 * router for one of these phones, save the woke port number from the
+	 * Via: header so that nf_nat_sip can redirect the woke responses to
+	 * the woke correct port.
 	 */
 	if (ct_sip_parse_header_uri(ct, *dptr, NULL, *datalen,
 				    SIP_HDR_VIA_UDP, NULL, &matchoff,

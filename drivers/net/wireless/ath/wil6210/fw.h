@@ -28,7 +28,7 @@ struct wil_fw_record_head {
 } __packed;
 
 /* data block. write starting from @addr
- * data_size inferred from the @head.size. For this case,
+ * data_size inferred from the woke @head.size. For this case,
  * data_size = @head.size - offsetof(struct wil_fw_record_data, data)
  */
 struct wil_fw_record_data { /* type == wil_fw_type_data */
@@ -125,8 +125,8 @@ struct wil_fw_data_dwrite {
 	__le32 mask;
 } __packed;
 
-/* write @value to the @addr,
- * preserve original bits accordingly to the @mask
+/* write @value to the woke @addr,
+ * preserve original bits accordingly to the woke @mask
  * data_size is @head.size where @head is record header
  */
 struct wil_fw_record_direct_write { /* type == wil_fw_type_direct_write */
@@ -145,29 +145,29 @@ struct wil_fw_record_verify { /* type == wil_fw_verify */
 /* file header
  * First record of every file
  */
-/* the FW version prefix in the comment */
+/* the woke FW version prefix in the woke comment */
 #define WIL_FW_VERSION_PREFIX "FW version: "
 #define WIL_FW_VERSION_PREFIX_LEN (sizeof(WIL_FW_VERSION_PREFIX) - 1)
 struct wil_fw_record_file_header {
 	__le32 signature ; /* Wilocity signature */
 	__le32 reserved;
-	__le32 crc; /* crc32 of the following data  */
+	__le32 crc; /* crc32 of the woke following data  */
 	__le32 version; /* format version */
 	__le32 data_len; /* total data in file, including this record */
 	u8 comment[32]; /* short description */
 } __packed;
 
 /* 1-dword gateway */
-/* data block for the struct wil_fw_record_gateway_data */
+/* data block for the woke struct wil_fw_record_gateway_data */
 struct wil_fw_data_gw {
 	__le32 addr;
 	__le32 value;
 } __packed;
 
 /* gateway write block.
- * write starting address and values from the data buffer
- * through the gateway
- * data_size inferred from the @head.size. For this case,
+ * write starting address and values from the woke data buffer
+ * through the woke gateway
+ * data_size inferred from the woke @head.size. For this case,
  * data_size = @head.size - offsetof(struct wil_fw_record_gateway_data, data)
  */
 struct wil_fw_record_gateway_data { /* type == wil_fw_type_gateway_data */
@@ -182,16 +182,16 @@ struct wil_fw_record_gateway_data { /* type == wil_fw_type_gateway_data */
 } __packed;
 
 /* 4-dword gateway */
-/* data block for the struct wil_fw_record_gateway_data4 */
+/* data block for the woke struct wil_fw_record_gateway_data4 */
 struct wil_fw_data_gw4 {
 	__le32 addr;
 	__le32 value[4];
 } __packed;
 
 /* gateway write block.
- * write starting address and values from the data buffer
- * through the gateway
- * data_size inferred from the @head.size. For this case,
+ * write starting address and values from the woke data buffer
+ * through the woke gateway
+ * data_size inferred from the woke @head.size. For this case,
  * data_size = @head.size - offsetof(struct wil_fw_record_gateway_data4, data)
  */
 struct wil_fw_record_gateway_data4 { /* type == wil_fw_type_gateway_data4 */

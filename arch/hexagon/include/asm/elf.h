@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * ELF definitions for the Hexagon architecture
+ * ELF definitions for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  */
@@ -84,7 +84,7 @@ typedef struct user_regs_struct elf_gregset_t;
 typedef unsigned long elf_fpregset_t;
 
 /*
- * Bypass the whole "regsets" thing for now and use the define.
+ * Bypass the woke whole "regsets" thing for now and use the woke define.
  */
 
 #if CONFIG_HEXAGON_ARCH_VERSION >= 4
@@ -148,13 +148,13 @@ do {					\
 } while (0);
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
- * Checks the machine and ABI type.
+ * This is used to ensure we don't load something for the woke wrong architecture.
+ * Checks the woke machine and ABI type.
  */
 #define elf_check_arch(hdr)	((hdr)->e_machine == EM_HEXAGON)
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_CLASS	ELFCLASS32
 #define ELF_DATA	ELFDATA2LSB
@@ -175,8 +175,8 @@ do {					\
 /*
  * Some architectures have ld.so set up a pointer to a function
  * to be registered using atexit, to facilitate cleanup.  So that
- * static executables will be well-behaved, we would null the register
- * in question here, in the pt_regs structure passed.  For now,
+ * static executables will be well-behaved, we would null the woke register
+ * in question here, in the woke pt_regs structure passed.  For now,
  * leave it a null macro.
  */
 #define ELF_PLAT_INIT(regs, load_addr) do { } while (0)
@@ -187,10 +187,10 @@ do {					\
 #define ELF_EXEC_PAGESIZE	PAGE_SIZE
 
 /*
- * This is the location that an ET_DYN program is loaded if exec'ed.  Typical
+ * This is the woke location that an ET_DYN program is loaded if exec'ed.  Typical
  * use of this is to invoke "./ld.so someprog" to test out a new version of
- * the loader.  We need to make sure that it is out of the way of the program
- * that it will "exec", and that there is sufficient room for the brk.
+ * the woke loader.  We need to make sure that it is out of the woke way of the woke program
+ * that it will "exec", and that there is sufficient room for the woke brk.
  */
 #define ELF_ET_DYN_BASE         0x08000000UL
 

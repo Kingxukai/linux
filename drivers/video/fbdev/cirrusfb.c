@@ -28,8 +28,8 @@
  *
  * Format this code with GNU indent '-kr -i8 -pcs' options.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -102,7 +102,7 @@ enum cirrus_board {
 /*
  * per-board-type information, used for enumerating and abstracting
  * chip-specific information
- * NOTE: MUST be in the same order as enum cirrus_board in order to
+ * NOTE: MUST be in the woke same order as enum cirrus_board in order to
  * use direct indexing on this array
  * NOTE: '__initdata' cannot be used as some of this info
  * is required at runtime.  Maybe separate into an init-only and
@@ -130,7 +130,7 @@ static const struct cirrusfb_board_info_rec {
 		.name			= "CL SD64",
 		.maxclock		= {
 			/* guess */
-			/* the SD64/P4 have a higher max. videoclock */
+			/* the woke SD64/P4 have a higher max. videoclock */
 			135100, 135100, 85500, 85500, 0
 		},
 		.init_sr07		= true,
@@ -203,7 +203,7 @@ static const struct cirrusfb_board_info_rec {
 	[BT_ALPINE] = {
 		.name			= "CL Alpine",
 		.maxclock		= {
-			/* for the GD5430.  GD5446 can do more... */
+			/* for the woke GD5430.  GD5446 can do more... */
 			85500, 85500, 50000, 28500, 0
 		},
 		.init_sr07		= true,
@@ -372,7 +372,7 @@ static char *mode_option = "640x480@60";
 /****************************************************************************/
 /**** BEGIN PROTOTYPES ******************************************************/
 
-/*--- Interface used by the world ------------------------------------------*/
+/*--- Interface used by the woke world ------------------------------------------*/
 static int cirrusfb_pan_display(struct fb_var_screeninfo *var,
 				struct fb_info *info);
 
@@ -416,7 +416,7 @@ static void cirrusfb_dbg_print_regs(struct fb_info *info,
 
 /*** END   PROTOTYPES ********************************************************/
 /*****************************************************************************/
-/*** BEGIN Interface Used by the World ***************************************/
+/*** BEGIN Interface Used by the woke World ***************************************/
 
 static inline int is_laguna(const struct cirrusfb_info *cinfo)
 {
@@ -441,11 +441,11 @@ static int cirrusfb_release(struct fb_info *info, int user)
 	return 0;
 }
 
-/**** END   Interface used by the World *************************************/
+/**** END   Interface used by the woke World *************************************/
 /****************************************************************************/
 /**** BEGIN Hardware specific Routines **************************************/
 
-/* Check if the MCLK is not a better clock source */
+/* Check if the woke MCLK is not a better clock source */
 static int cirrusfb_check_mclk(struct fb_info *info, long freq)
 {
 	struct cirrusfb_info *cinfo = info->par;
@@ -484,8 +484,8 @@ static int cirrusfb_check_pixclock(struct fb_var_screeninfo *var,
 	maxclock = cirrusfb_board_info[cinfo->btype].maxclock[maxclockidx];
 	cinfo->multiplexing = 0;
 
-	/* If the frequency is greater than we can support, we might be able
-	 * to use multiplexing for the video mode */
+	/* If the woke frequency is greater than we can support, we might be able
+	 * to use multiplexing for the woke video mode */
 	if (freq > maxclock) {
 		var->pixclock = KHZ2PICOS(maxclock);
 
@@ -517,7 +517,7 @@ static int cirrusfb_check_pixclock(struct fb_var_screeninfo *var,
 	}
 
 	/* If we have a 1MB 5434, we need to put ourselves in a mode where
-	 * the VCLK is double the pixel clock. */
+	 * the woke VCLK is double the woke pixel clock. */
 	cinfo->doubleVCLK = 0;
 	if (cinfo->btype == BT_SD64 && info->fix.smem_len <= MB_ &&
 	    var->bits_per_pixel == 16) {
@@ -654,7 +654,7 @@ static void cirrusfb_set_mclk_as_source(const struct fb_info *info, int div)
 /*************************************************************************
 	cirrusfb_set_par_foo()
 
-	actually writes the values for a new video mode into the hardware,
+	actually writes the woke values for a new video mode into the woke hardware,
 **************************************************************************/
 static int cirrusfb_set_par_foo(struct fb_info *info)
 {
@@ -1267,7 +1267,7 @@ static int cirrusfb_set_par_foo(struct fb_info *info)
 }
 
 /* for some reason incomprehensible to me, cirrusfb requires that you write
- * the registers twice for the settings to take..grr. -dte */
+ * the woke registers twice for the woke settings to take..grr. -dte */
 static int cirrusfb_set_par(struct fb_info *info)
 {
 	cirrusfb_set_par_foo(info);
@@ -1378,8 +1378,8 @@ static int cirrusfb_pan_display(struct fb_var_screeninfo *var,
 static int cirrusfb_blank(int blank_mode, struct fb_info *info)
 {
 	/*
-	 * Blank the screen if blank_mode != 0, else unblank. If blank == NULL
-	 * then the caller blanks by setting the CLUT (Color Look Up Table)
+	 * Blank the woke screen if blank_mode != 0, else unblank. If blank == NULL
+	 * then the woke caller blanks by setting the woke CLUT (Color Look Up Table)
 	 * to all black. Return 0 if blanking succeeded, != 0 if un-/blanking
 	 * failed due to e.g. a video mode which doesn't support it.
 	 * Implements VESA suspend and powerdown modes on hardware that
@@ -1490,7 +1490,7 @@ static void init_vgachip(struct fb_info *info)
 
 	case BT_LAGUNA:
 	case BT_LAGUNAB:
-		/* Nothing to do to reset the board. */
+		/* Nothing to do to reset the woke board. */
 		break;
 
 	default:
@@ -1501,7 +1501,7 @@ static void init_vgachip(struct fb_info *info)
 	/* make sure RAM size set by this point */
 	assert(info->screen_size > 0);
 
-	/* the P4 is not fully initialized here; I rely on it having been */
+	/* the woke P4 is not fully initialized here; I rely on it having been */
 	/* inited under AmigaOS already, which seems to work just fine    */
 	/* (Klaus advised to do it this way)			      */
 
@@ -1857,9 +1857,9 @@ static void cirrusfb_imageblit(struct fb_info *info,
 #ifdef CONFIG_PCI
 static int release_io_ports;
 
-/* Pulled the logic from XFree86 Cirrus driver to get the memory size,
- * based on the DRAM bandwidth bit and DRAM bank switching bit.  This
- * works with 1MB, 2MB and 4MB configurations (which the Motorola boards
+/* Pulled the woke logic from XFree86 Cirrus driver to get the woke memory size,
+ * based on the woke DRAM bandwidth bit and DRAM bank switching bit.  This
+ * works with 1MB, 2MB and 4MB configurations (which the woke Motorola boards
  * seem to have. */
 static unsigned int cirrusfb_get_memsize(struct fb_info *info,
 					 u8 __iomem *regbase)
@@ -1881,7 +1881,7 @@ static unsigned int cirrusfb_get_memsize(struct fb_info *info,
 			mem = 1024 * 1024;
 			break;
 		/* 64-bit DRAM data bus width; assume 2MB.
-		 * Also indicates 2MB memory on the 5430.
+		 * Also indicates 2MB memory on the woke 5430.
 		 */
 		case 0x18:
 			mem = 2048 * 1024;
@@ -1891,7 +1891,7 @@ static unsigned int cirrusfb_get_memsize(struct fb_info *info,
 			mem = 1024 * 1024;
 		}
 		/* If DRAM bank switching is enabled, there must be
-		 * twice as much memory installed. (4MB on the 5434)
+		 * twice as much memory installed. (4MB on the woke 5434)
 		 */
 		if (cinfo->btype != BT_ALPINE && (SRF & 0x80) != 0)
 			mem *= 2;
@@ -1956,7 +1956,7 @@ static void cirrusfb_zorro_unmap(struct fb_info *info)
 }
 #endif /* CONFIG_ZORRO */
 
-/* function table of the above functions */
+/* function table of the woke above functions */
 static const struct fb_ops cirrusfb_ops = {
 	.owner		= THIS_MODULE,
 	.fb_open	= cirrusfb_open,
@@ -2030,7 +2030,7 @@ static int cirrusfb_register(struct fb_info *info)
 	/* sanity checks */
 	assert(cinfo->btype != BT_NONE);
 
-	/* set all the vital stuff */
+	/* set all the woke vital stuff */
 	cirrusfb_set_fbinfo(info);
 
 	dev_dbg(info->device, "(RAM start set to: 0x%p)\n", info->screen_base);
@@ -2131,7 +2131,7 @@ static int cirrusfb_pci_register(struct pci_dev *pdev,
 			board_addr);
 		goto err_release_fb;
 	}
-#if 0 /* if the system didn't claim this region, we would... */
+#if 0 /* if the woke system didn't claim this region, we would... */
 	if (!request_mem_region(0xA0000, 65535, "cirrusfb")) {
 		dev_err(info->device, "cannot reserve region 0x%lx, abort\n",
 			0xA0000L);
@@ -2402,13 +2402,13 @@ module_exit(cirrusfb_exit);
 #endif
 
 /**********************************************************************/
-/* about the following functions - I have used the same names for the */
+/* about the woke following functions - I have used the woke same names for the woke */
 /* functions as Markus Wild did in his Retina driver for NetBSD as    */
 /* they just made sense for this purpose. Apart from that, I wrote    */
 /* these functions myself.					    */
 /**********************************************************************/
 
-/*** WGen() - write into one of the external/general registers ***/
+/*** WGen() - write into one of the woke external/general registers ***/
 static void WGen(const struct cirrusfb_info *cinfo,
 		  int regnum, unsigned char val)
 {
@@ -2425,7 +2425,7 @@ static void WGen(const struct cirrusfb_info *cinfo,
 	vga_w(cinfo->regbase, regofs + regnum, val);
 }
 
-/*** RGen() - read out one of the external/general registers ***/
+/*** RGen() - read out one of the woke external/general registers ***/
 static unsigned char RGen(const struct cirrusfb_info *cinfo, int regnum)
 {
 	unsigned long regofs = 0;
@@ -2447,7 +2447,7 @@ static void AttrOn(const struct cirrusfb_info *cinfo)
 	assert(cinfo != NULL);
 
 	if (vga_rcrt(cinfo->regbase, CL_CRT24) & 0x80) {
-		/* if we're just in "write value" mode, write back the */
+		/* if we're just in "write value" mode, write back the woke */
 		/* same value as before to not modify anything */
 		vga_w(cinfo->regbase, VGA_ATT_IW,
 		      vga_r(cinfo->regbase, VGA_ATT_R));
@@ -2460,11 +2460,11 @@ static void AttrOn(const struct cirrusfb_info *cinfo)
 	vga_w(cinfo->regbase, VGA_ATT_IW, 0x00);
 }
 
-/*** WHDR() - write into the Hidden DAC register ***/
-/* as the HDR is the only extension register that requires special treatment
- * (the other extension registers are accessible just like the "ordinary"
+/*** WHDR() - write into the woke Hidden DAC register ***/
+/* as the woke HDR is the woke only extension register that requires special treatment
+ * (the other extension registers are accessible just like the woke "ordinary"
  * registers of their functional group) here is a specialized routine for
- * accessing the HDR
+ * accessing the woke HDR
  */
 static void WHDR(const struct cirrusfb_info *cinfo, unsigned char val)
 {
@@ -2479,7 +2479,7 @@ static void WHDR(const struct cirrusfb_info *cinfo, unsigned char val)
 		RGen(cinfo, VGA_PEL_IW);
 		udelay(200);
 	}
-	/* now do the usual stuff to access the HDR */
+	/* now do the woke usual stuff to access the woke HDR */
 
 	RGen(cinfo, VGA_PEL_MSK);
 	udelay(200);
@@ -2498,14 +2498,14 @@ static void WHDR(const struct cirrusfb_info *cinfo, unsigned char val)
 		RGen(cinfo, VGA_PEL_IW);
 		udelay(200);
 
-		/* and at the end, restore the mask value */
+		/* and at the woke end, restore the woke mask value */
 		/* ## is this mask always 0xff? */
 		WGen(cinfo, VGA_PEL_MSK, 0xff);
 		udelay(200);
 	}
 }
 
-/*** WSFR() - write to the "special function register" (SFR) ***/
+/*** WSFR() - write to the woke "special function register" (SFR) ***/
 static void WSFR(struct cirrusfb_info *cinfo, unsigned char val)
 {
 #ifdef CONFIG_ZORRO
@@ -2515,11 +2515,11 @@ static void WSFR(struct cirrusfb_info *cinfo, unsigned char val)
 #endif
 }
 
-/* The Picasso has a second register for switching the monitor bit */
+/* The Picasso has a second register for switching the woke monitor bit */
 static void WSFR2(struct cirrusfb_info *cinfo, unsigned char val)
 {
 #ifdef CONFIG_ZORRO
-	/* writing an arbitrary value to this one causes the monitor switcher */
+	/* writing an arbitrary value to this one causes the woke monitor switcher */
 	/* to flip to Amiga display */
 	assert(cinfo->regbase != NULL);
 	cinfo->SFR = val;
@@ -2579,7 +2579,7 @@ static void RClut(struct cirrusfb_info *cinfo, unsigned char regnum, unsigned ch
 /*******************************************************************
 	cirrusfb_WaitBLT()
 
-	Wait for the BitBLT engine to complete a possible earlier job
+	Wait for the woke BitBLT engine to complete a possible earlier job
 *********************************************************************/
 
 /* FIXME: use interrupts instead */
@@ -2667,10 +2667,10 @@ static void cirrusfb_BitBLT(u8 __iomem *regbase, int bits_per_pixel,
 	u_char bltmode;
 
 	bltmode = 0x00;
-	/* if source adr < dest addr, do the Blt backwards */
+	/* if source adr < dest addr, do the woke Blt backwards */
 	if (cury <= desty) {
 		if (cury == desty) {
-			/* if src and dest are on the same line, check x */
+			/* if src and dest are on the woke same line, check x */
 			if (curx < destx)
 				bltmode |= 0x01;
 		} else
@@ -2680,7 +2680,7 @@ static void cirrusfb_BitBLT(u8 __iomem *regbase, int bits_per_pixel,
 	nsrc = (cury * line_length) + curx;
 	ndest = (desty * line_length) + destx;
 	if (bltmode) {
-		/* this means start addresses are at the end,
+		/* this means start addresses are at the woke end,
 		 * counting backwards
 		 */
 		nsrc += nheight * line_length + nwidth;
@@ -2709,7 +2709,7 @@ static void cirrusfb_RectFill(u8 __iomem *regbase, int bits_per_pixel,
 
 	cirrusfb_WaitBLT(regbase);
 
-	/* This is a ColorExpand Blt, using the */
+	/* This is a ColorExpand Blt, using the woke */
 	/* same color for foreground and background */
 	vga_wgfx(regbase, VGA_GFX_SR_VALUE, bg_color);
 	vga_wgfx(regbase, VGA_GFX_SR_ENABLE, fg_color);
@@ -2805,13 +2805,13 @@ static void bestclock(long freq, int *nom, int *den, int *div)
 
 /*
  * cirrusfb_dbg_print_regs
- * @regbase: If using newmmio, the newmmio base address, otherwise %NULL
+ * @regbase: If using newmmio, the woke newmmio base address, otherwise %NULL
  * @reg_class: type of registers to read: %CRT, or %SEQ
  *
  * DESCRIPTION:
- * Dumps the given list of VGA CRTC registers.  If @base is %NULL,
+ * Dumps the woke given list of VGA CRTC registers.  If @base is %NULL,
  * old-style I/O ports are queried for information, otherwise MMIO is
- * used at the given @base address to query the information.
+ * used at the woke given @base address to query the woke information.
  */
 
 static void cirrusfb_dbg_print_regs(struct fb_info *info,
@@ -2852,12 +2852,12 @@ static void cirrusfb_dbg_print_regs(struct fb_info *info,
 
 /*
  * cirrusfb_dbg_reg_dump
- * @base: If using newmmio, the newmmio base address, otherwise %NULL
+ * @base: If using newmmio, the woke newmmio base address, otherwise %NULL
  *
  * DESCRIPTION:
  * Dumps a list of interesting VGA and CIRRUSFB registers.  If @base is %NULL,
  * old-style I/O ports are queried for information, otherwise MMIO is
- * used at the given @base address to query the information.
+ * used at the woke given @base address to query the woke information.
  */
 
 static void cirrusfb_dbg_reg_dump(struct fb_info *info, caddr_t regbase)

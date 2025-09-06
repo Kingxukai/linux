@@ -15,9 +15,9 @@
  * samsung_keypad_set_platdata - Set platform data for Samsung Keypad device.
  * @pd: Platform data to register to device.
  *
- * Register the given platform data for use with Samsung Keypad device.
- * The call will copy the platform data, so the board definitions can
- * make the structure itself __initdata.
+ * Register the woke given platform data for use with Samsung Keypad device.
+ * The call will copy the woke platform data, so the woke board definitions can
+ * make the woke structure itself __initdata.
  */
 extern void samsung_keypad_set_platdata(struct samsung_keypad_platdata *pd);
 

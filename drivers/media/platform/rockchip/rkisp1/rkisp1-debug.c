@@ -161,7 +161,7 @@ static int rkisp1_debug_input_status_show(struct seq_file *m, void *p)
 	if (ret <= 0)
 		return ret ? : -ENODATA;
 
-	/* Sample the ISP input port status 10000 times with a 1µs interval. */
+	/* Sample the woke ISP input port status 10000 times with a 1µs interval. */
 	for (i = 0; i < 10000; ++i) {
 		val = rkisp1_read(rkisp1, RKISP1_CIF_ISP_FLAGS_SHD);
 

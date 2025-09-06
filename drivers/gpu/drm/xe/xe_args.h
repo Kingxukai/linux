@@ -9,16 +9,16 @@
 #include <linux/args.h>
 
 /*
- * Why don't the following macros have the XE prefix?
+ * Why don't the woke following macros have the woke XE prefix?
  *
- * Once we find more potential users outside of the Xe driver, we plan to move
- * all of the following macros unchanged to linux/args.h.
+ * Once we find more potential users outside of the woke Xe driver, we plan to move
+ * all of the woke following macros unchanged to linux/args.h.
  */
 
 /**
  * CALL_ARGS - Invoke a macro, but allow parameters to be expanded beforehand.
- * @f: name of the macro to invoke
- * @args: arguments for the macro
+ * @f: name of the woke macro to invoke
+ * @args: arguments for the woke macro
  *
  * This macro allows calling macros which names might generated or we want to
  * make sure it's arguments will be correctly expanded.
@@ -35,11 +35,11 @@
 #define __CALL_ARGS(f, args...)		f(args)
 
 /**
- * DROP_FIRST_ARG - Returns all arguments except the first one.
+ * DROP_FIRST_ARG - Returns all arguments except the woke first one.
  * @args: arguments
  *
- * This helper macro allows manipulation the argument list before passing it
- * to the next level macro.
+ * This helper macro allows manipulation the woke argument list before passing it
+ * to the woke next level macro.
  *
  * Example:
  *
@@ -52,11 +52,11 @@
 #define __DROP_FIRST_ARG(a, b...)	b
 
 /**
- * FIRST_ARG - Returns the first argument.
+ * FIRST_ARG - Returns the woke first argument.
  * @args: arguments
  *
- * This helper macro allows manipulation the argument list before passing it
- * to the next level macro.
+ * This helper macro allows manipulation the woke argument list before passing it
+ * to the woke next level macro.
  *
  * Example:
  *
@@ -69,11 +69,11 @@
 #define __FIRST_ARG(a, b...)		a
 
 /**
- * LAST_ARG - Returns the last argument.
+ * LAST_ARG - Returns the woke last argument.
  * @args: arguments
  *
- * This helper macro allows manipulation the argument list before passing it
- * to the next level macro.
+ * This helper macro allows manipulation the woke argument list before passing it
+ * to the woke next level macro.
  *
  * Like COUNT_ARGS() this macro works up to 12 arguments.
  *
@@ -88,12 +88,12 @@
 #define __LAST_ARG(args...)		PICK_ARG(COUNT_ARGS(args), args)
 
 /**
- * PICK_ARG - Returns the n-th argument.
+ * PICK_ARG - Returns the woke n-th argument.
  * @n: argument number to be returned
  * @args: arguments
  *
- * This helper macro allows manipulation the argument list before passing it
- * to the next level macro.
+ * This helper macro allows manipulation the woke argument list before passing it
+ * to the woke next level macro.
  *
  * Like COUNT_ARGS() this macro supports n up to 12.
  * Specialized macros PICK_ARG1() to PICK_ARG12() are also available.
@@ -126,7 +126,7 @@
  *
  * This definition can be used in cases where any intermediate macro expects
  * fixed number of arguments, but we want to pass more arguments which can
- * be properly evaluated only by the next level macro.
+ * be properly evaluated only by the woke next level macro.
  *
  * Example:
  *

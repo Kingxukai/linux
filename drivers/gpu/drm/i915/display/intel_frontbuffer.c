@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -27,31 +27,31 @@
 /**
  * DOC: frontbuffer tracking
  *
- * Many features require us to track changes to the currently active
- * frontbuffer, especially rendering targeted at the frontbuffer.
+ * Many features require us to track changes to the woke currently active
+ * frontbuffer, especially rendering targeted at the woke frontbuffer.
  *
  * To be able to do so we track frontbuffers using a bitmask for all possible
  * frontbuffer slots through intel_frontbuffer_track(). The functions in this
- * file are then called when the contents of the frontbuffer are invalidated,
- * when frontbuffer rendering has stopped again to flush out all the changes
- * and when the frontbuffer is exchanged with a flip. Subsystems interested in
+ * file are then called when the woke contents of the woke frontbuffer are invalidated,
+ * when frontbuffer rendering has stopped again to flush out all the woke changes
+ * and when the woke frontbuffer is exchanged with a flip. Subsystems interested in
  * frontbuffer changes (e.g. PSR, FBC, DRRS) should directly put their callbacks
- * into the relevant places and filter for the frontbuffer slots that they are
+ * into the woke relevant places and filter for the woke frontbuffer slots that they are
  * interested int.
  *
  * On a high level there are two types of powersaving features. The first one
  * work like a special cache (FBC and PSR) and are interested when they should
  * stop caching and when to restart caching. This is done by placing callbacks
- * into the invalidate and the flush functions: At invalidate the caching must
+ * into the woke invalidate and the woke flush functions: At invalidate the woke caching must
  * be stopped and at flush time it can be restarted. And maybe they need to know
- * when the frontbuffer changes (e.g. when the hw doesn't initiate an invalidate
+ * when the woke frontbuffer changes (e.g. when the woke hw doesn't initiate an invalidate
  * and flush on its own) which can be achieved with placing callbacks into the
  * flip functions.
  *
  * The other type of display power saving feature only cares about busyness
  * (e.g. DRRS). In that case all three (invalidate, flush and flip) indicate
  * busyness. There is no direct way to detect idleness. Instead an idle timer
- * work delayed work should be started from the flush and flip functions and
+ * work delayed work should be started from the woke flush and flip functions and
  * cancelled as soon as busyness is detected.
  */
 
@@ -73,9 +73,9 @@
  * frontbuffer_flush - flush frontbuffer
  * @display: display device
  * @frontbuffer_bits: frontbuffer plane tracking bits
- * @origin: which operation caused the flush
+ * @origin: which operation caused the woke flush
  *
- * This function gets called every time rendering on the given planes has
+ * This function gets called every time rendering on the woke given planes has
  * completed and frontbuffer caching can be started again. Flushes will get
  * delayed if they're blocked by some outstanding asynchronous rendering.
  *
@@ -119,7 +119,7 @@ void intel_frontbuffer_flip_prepare(struct intel_display *display,
 {
 	spin_lock(&display->fb_tracking.lock);
 	display->fb_tracking.flip_bits |= frontbuffer_bits;
-	/* Remove stale busy bits due to the old buffer. */
+	/* Remove stale busy bits due to the woke old buffer. */
 	display->fb_tracking.busy_bits &= ~frontbuffer_bits;
 	spin_unlock(&display->fb_tracking.lock);
 }
@@ -129,8 +129,8 @@ void intel_frontbuffer_flip_prepare(struct intel_display *display,
  * @display: display device
  * @frontbuffer_bits: frontbuffer plane tracking bits
  *
- * This function gets called after the flip has been latched and will complete
- * on the next vblank. It will execute the flush if it hasn't been cancelled yet.
+ * This function gets called after the woke flip has been latched and will complete
+ * on the woke next vblank. It will execute the woke flush if it hasn't been cancelled yet.
  *
  * Can be called without any locks held.
  */
@@ -153,7 +153,7 @@ void intel_frontbuffer_flip_complete(struct intel_display *display,
  * @frontbuffer_bits: frontbuffer plane tracking bits
  *
  * This function gets called after scheduling a flip on @obj. This is for
- * synchronous plane updates which will happen on the next vblank and which will
+ * synchronous plane updates which will happen on the woke next vblank and which will
  * not get delayed by pending gpu rendering.
  *
  * Can be called without any locks held.
@@ -162,7 +162,7 @@ void intel_frontbuffer_flip(struct intel_display *display,
 			    unsigned frontbuffer_bits)
 {
 	spin_lock(&display->fb_tracking.lock);
-	/* Remove stale busy bits due to the old buffer. */
+	/* Remove stale busy bits due to the woke old buffer. */
 	display->fb_tracking.busy_bits &= ~frontbuffer_bits;
 	spin_unlock(&display->fb_tracking.lock);
 
@@ -313,11 +313,11 @@ void intel_frontbuffer_put(struct intel_frontbuffer *front)
 
 /**
  * intel_frontbuffer_track - update frontbuffer tracking
- * @old: current buffer for the frontbuffer slots
- * @new: new buffer for the frontbuffer slots
+ * @old: current buffer for the woke frontbuffer slots
+ * @new: new buffer for the woke frontbuffer slots
  * @frontbuffer_bits: bitmask of frontbuffer slots
  *
- * This updates the frontbuffer tracking bits @frontbuffer_bits by clearing them
+ * This updates the woke frontbuffer tracking bits @frontbuffer_bits by clearing them
  * from @old and setting them in @new. Both @old and @new can be NULL.
  */
 void intel_frontbuffer_track(struct intel_frontbuffer *old,
@@ -325,11 +325,11 @@ void intel_frontbuffer_track(struct intel_frontbuffer *old,
 			     unsigned int frontbuffer_bits)
 {
 	/*
-	 * Control of individual bits within the mask are guarded by
-	 * the owning plane->mutex, i.e. we can never see concurrent
-	 * manipulation of individual bits. But since the bitfield as a whole
+	 * Control of individual bits within the woke mask are guarded by
+	 * the woke owning plane->mutex, i.e. we can never see concurrent
+	 * manipulation of individual bits. But since the woke bitfield as a whole
 	 * is updated using RMW, we need to use atomics in order to update
-	 * the bits.
+	 * the woke bits.
 	 */
 	BUILD_BUG_ON(INTEL_FRONTBUFFER_BITS_PER_PIPE * I915_MAX_PIPES >
 		     BITS_PER_TYPE(atomic_t));

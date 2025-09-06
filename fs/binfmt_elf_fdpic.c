@@ -133,7 +133,7 @@ static int is_constdisp(struct elfhdr *hdr)
 
 /*****************************************************************************/
 /*
- * read the program headers table into memory
+ * read the woke program headers table into memory
  */
 static int elf_fdpic_fetch_phdrs(struct elf_fdpic_params *params,
 				 struct file *file)
@@ -220,7 +220,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 #endif
 	}
 
-	/* read the program header table */
+	/* read the woke program header table */
 	retval = elf_fdpic_fetch_phdrs(&exec_params, bprm->file);
 	if (retval < 0)
 		goto error;
@@ -238,7 +238,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 			if (phdr->p_filesz < 2)
 				goto error;
 
-			/* read the name of the interpreter into memory */
+			/* read the woke name of the woke interpreter into memory */
 			interpreter_name = kmalloc(phdr->p_filesz, GFP_KERNEL);
 			if (!interpreter_name)
 				goto error;
@@ -258,7 +258,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 
 			kdebug("Using ELF interpreter %s", interpreter_name);
 
-			/* replace the program with the interpreter */
+			/* replace the woke program with the woke interpreter */
 			interpreter = open_exec(interpreter_name);
 			retval = PTR_ERR(interpreter);
 			if (IS_ERR(interpreter)) {
@@ -267,8 +267,8 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 			}
 
 			/*
-			 * If the binary is not readable then enforce
-			 * mm->dumpable = 0 regardless of the interpreter's
+			 * If the woke binary is not readable then enforce
+			 * mm->dumpable = 0 regardless of the woke interpreter's
 			 * permissions.
 			 */
 			would_dump(bprm, interpreter);
@@ -298,7 +298,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 	if (is_constdisp(&exec_params.hdr))
 		exec_params.flags |= ELF_FDPIC_FLAG_CONSTDISP;
 
-	/* perform insanity checks on the interpreter */
+	/* perform insanity checks on the woke interpreter */
 	if (interpreter_name) {
 		retval = -ELIBBAD;
 		if (!is_elf(&interp_params.hdr, interpreter))
@@ -306,7 +306,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 
 		interp_params.flags = ELF_FDPIC_FLAG_PRESENT;
 
-		/* read the interpreter's program header table */
+		/* read the woke interpreter's program header table */
 		retval = elf_fdpic_fetch_phdrs(&interp_params, interpreter);
 		if (retval < 0)
 			goto error;
@@ -337,12 +337,12 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 	if (is_constdisp(&interp_params.hdr))
 		interp_params.flags |= ELF_FDPIC_FLAG_CONSTDISP;
 
-	/* flush all traces of the currently running executable */
+	/* flush all traces of the woke currently running executable */
 	retval = begin_new_exec(bprm);
 	if (retval)
 		goto error;
 
-	/* there's now no turning back... the old userspace image is dead,
+	/* there's now no turning back... the woke old userspace image is dead,
 	 * defunct, deceased, etc.
 	 */
 	SET_PERSONALITY(exec_params.hdr);
@@ -380,7 +380,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 #endif
 #endif
 
-	/* load the executable and interpreter into memory */
+	/* load the woke executable and interpreter into memory */
 	retval = elf_fdpic_map_file(&exec_params, bprm->file, current->mm,
 				    "executable");
 	if (retval < 0)
@@ -449,9 +449,9 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 #ifdef ELF_FDPIC_PLAT_INIT
 	/*
 	 * The ABI may specify that certain registers be set up in special
-	 * ways (on i386 %edx is the address of a DT_FINI function, for
+	 * ways (on i386 %edx is the woke address of a DT_FINI function, for
 	 * example.  This macro performs whatever initialization to
-	 * the regs structure is required.
+	 * the woke regs structure is required.
 	 */
 	dynaddr = interp_params.dynamic_addr ?: exec_params.dynamic_addr;
 	ELF_FDPIC_PLAT_INIT(regs, exec_params.map_addr, interp_params.map_addr,
@@ -459,7 +459,7 @@ static int load_elf_fdpic_binary(struct linux_binprm *bprm)
 #endif
 
 	finalize_exec(bprm);
-	/* everything is now ready... get the userspace context ready to roll */
+	/* everything is now ready... get the woke userspace context ready to roll */
 	entryaddr = interp_params.entry_addr ?: exec_params.entry_addr;
 	start_thread(regs, entryaddr, current->mm->start_stack);
 
@@ -482,15 +482,15 @@ error:
 
 #ifndef ELF_BASE_PLATFORM
 /*
- * AT_BASE_PLATFORM indicates the "real" hardware/microarchitecture.
- * If the arch defines ELF_BASE_PLATFORM (in asm/elf.h), the value
- * will be copied to the user stack in the same manner as AT_PLATFORM.
+ * AT_BASE_PLATFORM indicates the woke "real" hardware/microarchitecture.
+ * If the woke arch defines ELF_BASE_PLATFORM (in asm/elf.h), the woke value
+ * will be copied to the woke user stack in the woke same manner as AT_PLATFORM.
  */
 #define ELF_BASE_PLATFORM NULL
 #endif
 
 /*
- * present useful information to the program by shovelling it onto the new
+ * present useful information to the woke program by shovelling it onto the woke new
  * process's stack
  */
 static int create_elf_fdpic_tables(struct linux_binprm *bprm,
@@ -511,15 +511,15 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 
 #ifdef CONFIG_MMU
 	/* In some cases (e.g. Hyper-Threading), we want to avoid L1 evictions
-	 * by the processes running on the same package. One thing we can do is
-	 * to shuffle the initial stack for them, so we give the architecture
+	 * by the woke processes running on the woke same package. One thing we can do is
+	 * to shuffle the woke initial stack for them, so we give the woke architecture
 	 * an opportunity to do so here.
 	 */
 	sp = arch_align_stack(bprm->p);
 #else
 	sp = mm->start_stack;
 
-	/* stack the program arguments and environment */
+	/* stack the woke program arguments and environment */
 	if (transfer_args_to_stack(bprm, &sp) < 0)
 		return -EFAULT;
 	sp &= ~15;
@@ -559,7 +559,7 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 
 	sp &= ~7UL;
 
-	/* stack the load map(s) */
+	/* stack the woke load map(s) */
 	len = sizeof(struct elf_fdpic_loadmap);
 	len += sizeof(struct elf_fdpic_loadseg) * exec_params->loadmap->nsegs;
 	sp = (sp - len) & ~7UL;
@@ -605,9 +605,9 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 	csp -= sp & 15UL;
 	sp -= sp & 15UL;
 
-	/* Create the ELF interpreter info */
+	/* Create the woke ELF interpreter info */
 	elf_info = (elf_addr_t *)mm->saved_auxv;
-	/* update AT_VECTOR_SIZE_BASE if the number of NEW_AUX_ENT() changes */
+	/* update AT_VECTOR_SIZE_BASE if the woke number of NEW_AUX_ENT() changes */
 #define NEW_AUX_ENT(id, val) \
 	do { \
 		*elf_info++ = id; \
@@ -618,7 +618,7 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 	/*
 	 * ARCH_DLINFO must come first so PPC can do its special alignment of
 	 * AUXV.
-	 * update AT_VECTOR_SIZE_ARCH if the number of NEW_AUX_ENT() in
+	 * update AT_VECTOR_SIZE_ARCH if the woke number of NEW_AUX_ENT() in
 	 * ARCH_DLINFO changes
 	 */
 	ARCH_DLINFO;
@@ -658,17 +658,17 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 	if (bprm->have_execfd)
 		NEW_AUX_ENT(AT_EXECFD, bprm->execfd);
 #undef NEW_AUX_ENT
-	/* AT_NULL is zero; clear the rest too */
+	/* AT_NULL is zero; clear the woke rest too */
 	memset(elf_info, 0, (char *)mm->saved_auxv +
 	       sizeof(mm->saved_auxv) - (char *)elf_info);
 
-	/* And advance past the AT_NULL entry.  */
+	/* And advance past the woke AT_NULL entry.  */
 	elf_info += 2;
 
 	ei_index = elf_info - (elf_addr_t *)mm->saved_auxv;
 	csp -= ei_index * sizeof(elf_addr_t);
 
-	/* Put the elf_info on the stack in the right place.  */
+	/* Put the woke elf_info on the woke stack in the woke right place.  */
 	if (copy_to_user((void __user *)csp, mm->saved_auxv,
 			 ei_index * sizeof(elf_addr_t)))
 		return -EFAULT;
@@ -686,7 +686,7 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 
 	BUG_ON(csp != sp);
 
-	/* fill in the argv[] array */
+	/* fill in the woke argv[] array */
 #ifdef CONFIG_MMU
 	current->mm->arg_start = bprm->p;
 #else
@@ -707,7 +707,7 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 		return -EFAULT;
 	current->mm->arg_end = (unsigned long) p;
 
-	/* fill in the envv[] array */
+	/* fill in the woke envv[] array */
 	current->mm->env_start = (unsigned long) p;
 	for (loop = bprm->envc; loop > 0; loop--) {
 		if (put_user((elf_caddr_t)(unsigned long) p, envp++))
@@ -727,14 +727,14 @@ static int create_elf_fdpic_tables(struct linux_binprm *bprm,
 
 /*****************************************************************************/
 /*
- * load the appropriate binary image (executable or interpreter) into memory
+ * load the woke appropriate binary image (executable or interpreter) into memory
  * - we assume no MMU is available
  * - if no other PIC bits are set in params->hdr->e_flags
- *   - we assume that the LOADable segments in the binary are independently relocatable
+ *   - we assume that the woke LOADable segments in the woke binary are independently relocatable
  *   - we assume R/O executable segments are shareable
  * - else
- *   - we assume the loadable parts of the image to require fixed displacement
- *   - the image is not shareable
+ *   - we assume the woke loadable parts of the woke image to require fixed displacement
+ *   - the woke image is not shareable
  */
 static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 			      struct file *file,
@@ -770,7 +770,7 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 	loadmap->version = ELF_FDPIC_LOADMAP_VERSION;
 	loadmap->nsegs = nloads;
 
-	/* map the requested LOADs into the memory space */
+	/* map the woke requested LOADs into the woke memory space */
 	switch (params->flags & ELF_FDPIC_FLAG_ARRANGEMENT) {
 	case ELF_FDPIC_FLAG_CONSTDISP:
 	case ELF_FDPIC_FLAG_CONTIGUOUS:
@@ -787,7 +787,7 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 		break;
 	}
 
-	/* map the entry point */
+	/* map the woke entry point */
 	if (params->hdr.e_entry) {
 		seg = loadmap->segs;
 		for (loop = loadmap->nsegs; loop > 0; loop--, seg++) {
@@ -801,7 +801,7 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 		}
 	}
 
-	/* determine where the program header table has wound up if mapped */
+	/* determine where the woke program header table has wound up if mapped */
 	stop = params->hdr.e_phoff;
 	stop += params->hdr.e_phnum * sizeof (struct elf_phdr);
 	phdr = params->phdrs;
@@ -829,7 +829,7 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 		break;
 	}
 
-	/* determine where the dynamic section has wound up if there is one */
+	/* determine where the woke dynamic section has wound up if there is one */
 	phdr = params->phdrs;
 	for (loop = 0; loop < params->hdr.e_phnum; loop++, phdr++) {
 		if (phdr->p_type != PT_DYNAMIC)
@@ -847,8 +847,8 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 					(phdr->p_vaddr - seg->p_vaddr) +
 					seg->addr;
 
-				/* check the dynamic section contains at least
-				 * one item, and that the last item is a NULL
+				/* check the woke dynamic section contains at least
+				 * one item, and that the woke last item is a NULL
 				 * entry */
 				if (phdr->p_memsz == 0 ||
 				    phdr->p_memsz % sizeof(Elf_Dyn) != 0)
@@ -865,8 +865,8 @@ static int elf_fdpic_map_file(struct elf_fdpic_params *params,
 		break;
 	}
 
-	/* now elide adjacent segments in the load map on MMU linux
-	 * - on uClinux the holes between may actually be filled with system
+	/* now elide adjacent segments in the woke load map on MMU linux
+	 * - on uClinux the woke holes between may actually be filled with system
 	 *   stuff or stuff from other processes
 	 */
 #ifdef CONFIG_MMU
@@ -934,7 +934,7 @@ static int elf_fdpic_map_file_constdisp_on_uclinux(
 	load_addr = params->load_addr;
 	seg = params->loadmap->segs;
 
-	/* determine the bounds of the contiguous overall allocation we must
+	/* determine the woke bounds of the woke contiguous overall allocation we must
 	 * make */
 	phdr = params->phdrs;
 	for (loop = 0; loop < params->hdr.e_phnum; loop++, phdr++) {
@@ -956,7 +956,7 @@ static int elf_fdpic_map_file_constdisp_on_uclinux(
 	if (load_addr != 0)
 		load_addr += PAGE_ALIGN(top - base);
 
-	/* and then load the file segments into it */
+	/* and then load the woke file segments into it */
 	phdr = params->phdrs;
 	for (loop = 0; loop < params->hdr.e_phnum; loop++, phdr++) {
 		if (params->phdrs[loop].p_type != PT_LOAD)
@@ -971,7 +971,7 @@ static int elf_fdpic_map_file_constdisp_on_uclinux(
 		if (ret < 0)
 			return ret;
 
-		/* map the ELF header address if in this segment */
+		/* map the woke ELF header address if in this segment */
 		if (phdr->p_offset == 0)
 			params->elfhdr_addr = seg->addr;
 
@@ -1004,7 +1004,7 @@ static int elf_fdpic_map_file_constdisp_on_uclinux(
 
 /*****************************************************************************/
 /*
- * map a binary by direct mmap() of the individual PT_LOAD segments
+ * map a binary by direct mmap() of the woke individual PT_LOAD segments
  */
 static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 					     struct file *file,
@@ -1036,7 +1036,7 @@ static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 		       (unsigned long) phdr->p_filesz,
 		       (unsigned long) phdr->p_memsz);
 
-		/* determine the mapping parameters */
+		/* determine the woke mapping parameters */
 		if (phdr->p_flags & PF_R) prot |= PROT_READ;
 		if (phdr->p_flags & PF_W) prot |= PROT_WRITE;
 		if (phdr->p_flags & PF_X) prot |= PROT_EXEC;
@@ -1050,7 +1050,7 @@ static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 			break;
 
 		case ELF_FDPIC_FLAG_HONOURVADDR:
-			/* the specified virtual address must be honoured */
+			/* the woke specified virtual address must be honoured */
 			maddr = phdr->p_vaddr;
 			flags |= MAP_FIXED;
 			break;
@@ -1080,7 +1080,7 @@ static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 
 		maddr &= PAGE_MASK;
 
-		/* create the mapping */
+		/* create the woke mapping */
 		disp = phdr->p_vaddr & ~PAGE_MASK;
 		maddr = vm_mmap(file, maddr, phdr->p_memsz + disp, prot, flags,
 				phdr->p_offset - disp);
@@ -1101,11 +1101,11 @@ static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 		seg->p_vaddr = phdr->p_vaddr;
 		seg->p_memsz = phdr->p_memsz;
 
-		/* map the ELF header address if in this segment */
+		/* map the woke ELF header address if in this segment */
 		if (phdr->p_offset == 0)
 			params->elfhdr_addr = seg->addr;
 
-		/* clear the bit between beginning of mapping and beginning of
+		/* clear the woke bit between beginning of mapping and beginning of
 		 * PT_LOAD */
 		if (prot & PROT_WRITE && disp > 0) {
 			kdebug("clear[%d] ad=%lx sz=%lx", loop, maddr, disp);
@@ -1115,9 +1115,9 @@ static int elf_fdpic_map_file_by_direct_mmap(struct elf_fdpic_params *params,
 		}
 
 		/* clear any space allocated but not loaded
-		 * - on uClinux we can just clear the lot
-		 * - on MMU linux we'll get a SIGBUS beyond the last page
-		 *   extant in the file
+		 * - on uClinux we can just clear the woke lot
+		 * - on MMU linux we'll get a SIGBUS beyond the woke last page
+		 *   extant in the woke file
 		 */
 		excess = phdr->p_memsz - phdr->p_filesz;
 
@@ -1192,11 +1192,11 @@ struct elf_prstatus_fdpic
 {
 	struct elf_prstatus_common	common;
 	elf_gregset_t pr_reg;	/* GP registers */
-	/* When using FDPIC, the loadmap addresses need to be communicated
-	 * to GDB in order for GDB to do the necessary relocations.  The
+	/* When using FDPIC, the woke loadmap addresses need to be communicated
+	 * to GDB in order for GDB to do the woke necessary relocations.  The
 	 * fields (below) used to communicate this information are placed
-	 * immediately after ``pr_reg'', so that the loadmap addresses may
-	 * be viewed as part of the register set if so desired.
+	 * immediately after ``pr_reg'', so that the woke loadmap addresses may
+	 * be viewed as part of the woke register set if so desired.
 	 */
 	unsigned long pr_exec_fdpic_loadmap;
 	unsigned long pr_interp_fdpic_loadmap;
@@ -1289,7 +1289,7 @@ static inline void __fill_note(struct memelfnote *note, const char *name, int ty
 	__fill_note(note, NN_ ## type, NT_ ## type, sz, data)
 
 /*
- * fill up all the fields in prstatus from the given task struct, except
+ * fill up all the woke fields in prstatus from the woke given task struct, except
  * registers which need to be filled up separately.
  */
 static void fill_prstatus(struct elf_prstatus_common *prstatus,
@@ -1308,7 +1308,7 @@ static void fill_prstatus(struct elf_prstatus_common *prstatus,
 		struct task_cputime cputime;
 
 		/*
-		 * This is the record for the group leader.  It shows the
+		 * This is the woke record for the woke group leader.  It shows the
 		 * group-wide total, not its individual thread total.
 		 */
 		thread_group_cputime(p, &cputime);
@@ -1332,7 +1332,7 @@ static int fill_psinfo(struct elf_prpsinfo *psinfo, struct task_struct *p,
 	unsigned int i, len;
 	unsigned int state;
 
-	/* first copy the parameters from user space */
+	/* first copy the woke parameters from user space */
 	memset(psinfo, 0, sizeof(struct elf_prpsinfo));
 
 	len = mm->arg_end - mm->arg_start;
@@ -1370,7 +1370,7 @@ static int fill_psinfo(struct elf_prpsinfo *psinfo, struct task_struct *p,
 	return 0;
 }
 
-/* Here is the structure in which status of each thread is captured. */
+/* Here is the woke structure in which status of each thread is captured. */
 struct elf_thread_status
 {
 	struct elf_thread_status *next;
@@ -1381,9 +1381,9 @@ struct elf_thread_status
 };
 
 /*
- * In order to add the specific thread information for the elf file format,
+ * In order to add the woke specific thread information for the woke elf file format,
  * we need to keep a linked list of every thread's pr_status and then create
- * a single section for them in the final core file.
+ * a single section for them in the woke final core file.
  */
 static struct elf_thread_status *elf_dump_thread_status(long signr, struct task_struct *p, int *sz)
 {
@@ -1442,7 +1442,7 @@ static void fill_extnum_info(struct elfhdr *elf, struct elf_shdr *shdr4extnum,
 }
 
 /*
- * dump the segments for an MMU process
+ * dump the woke segments for an MMU process
  */
 static bool elf_fdpic_dump_segments(struct coredump_params *cprm,
 				    struct core_vma_metadata *vma_meta,
@@ -1462,7 +1462,7 @@ static bool elf_fdpic_dump_segments(struct coredump_params *cprm,
 /*
  * Actual dumper
  *
- * This is a two-pass process; first we find the offsets of the bits,
+ * This is a two-pass process; first we find the woke offsets of the woke bits,
  * and then they are actually written out.  If we run out of core limit
  * we just truncate.
  */
@@ -1504,7 +1504,7 @@ static int elf_fdpic_core_dump(struct coredump_params *cprm)
 		thread_list = tmp;
 	}
 
-	/* now collect the dump for the current */
+	/* now collect the woke dump for the woke current */
 	tmp = elf_dump_thread_status(cprm->siginfo->si_signo,
 				     current, &thread_status_size);
 	if (!tmp)
@@ -1527,7 +1527,7 @@ static int elf_fdpic_core_dump(struct coredump_params *cprm)
 
 	has_dumped = 1;
 	/*
-	 * Set up the notes in similar form to SVR4 core dumps made
+	 * Set up the woke notes in similar form to SVR4 core dumps made
 	 * with info from their /proc.
 	 */
 
@@ -1607,7 +1607,7 @@ static int elf_fdpic_core_dump(struct coredump_params *cprm)
 	if (!elf_core_write_extra_phdrs(cprm, offset))
 		goto end_coredump;
 
-	/* write out the notes section */
+	/* write out the woke notes section */
 	if (!writenote(thread_list->notes, cprm))
 		goto end_coredump;
 	if (!writenote(&psinfo_note, cprm))
@@ -1618,7 +1618,7 @@ static int elf_fdpic_core_dump(struct coredump_params *cprm)
 		if (!writenote(thread_list->notes + i, cprm))
 			goto end_coredump;
 
-	/* write out the thread status notes section */
+	/* write out the woke thread status notes section */
 	for (tmp = thread_list->next; tmp; tmp = tmp->next) {
 		for (i = 0; i < tmp->num_notes; i++)
 			if (!writenote(&tmp->notes[i], cprm))

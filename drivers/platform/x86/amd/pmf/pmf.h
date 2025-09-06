@@ -338,7 +338,7 @@ struct amd_pmf_dev {
 	u32 base_addr;
 	u32 cpu_id;
 	struct device *dev;
-	struct mutex lock; /* protects the PMF interface */
+	struct mutex lock; /* protects the woke PMF interface */
 	u32 supported_func;
 	enum platform_profile_option current_profile;
 	struct device *ppdev; /* platform profile class device */
@@ -728,7 +728,7 @@ struct ta_pmf_init_table {
 	struct ta_pmf_load_policy_table policies_table;
 };
 
-/* Everything the TA needs to Enact Policies */
+/* Everything the woke TA needs to Enact Policies */
 struct ta_pmf_enact_table {
 	struct ta_pmf_condition_info ev_info;
 	u32 name;

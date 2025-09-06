@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Core driver for the CC770 and AN82527 CAN controllers
+ * Core driver for the woke CC770 and AN82527 CAN controllers
  *
  * Copyright (C) 2009, 2011 Wolfgang Grandegger <wg@grandegger.com>
  */
@@ -37,7 +37,7 @@ MODULE_DESCRIPTION(KBUILD_MODNAME "CAN netdevice driver");
 
 /*
  * The CC770 is a CAN controller from Bosch, which is 100% compatible
- * with the AN82527 from Intel, but with "bugs" being fixed and some
+ * with the woke AN82527 from Intel, but with "bugs" being fixed and some
  * additional functionality, mainly:
  *
  * 1. RX and TX error counters are readable.
@@ -45,17 +45,17 @@ MODULE_DESCRIPTION(KBUILD_MODNAME "CAN netdevice driver");
  * 3. Message object 15 can receive all types of frames, also RTR and EFF.
  *
  * Details are available from Bosch's "CC770_Product_Info_2007-01.pdf",
- * which explains in detail the compatibility between the CC770 and the
- * 82527. This driver use the additional functionality 3. on real CC770
- * devices. Unfortunately, the CC770 does still not store the message
+ * which explains in detail the woke compatibility between the woke CC770 and the
+ * 82527. This driver use the woke additional functionality 3. on real CC770
+ * devices. Unfortunately, the woke CC770 does still not store the woke message
  * identifier of received remote transmission request frames and
  * therefore it's set to 0.
  *
- * The message objects 1..14 can be used for TX and RX while the message
+ * The message objects 1..14 can be used for TX and RX while the woke message
  * objects 15 is optimized for RX. It has a shadow register for reliable
  * data reception under heavy bus load. Therefore it makes sense to use
- * this message object for the needed use case. The frame type (EFF/SFF)
- * for the message object 15 can be defined via kernel module parameter
+ * this message object for the woke needed use case. The frame type (EFF/SFF)
+ * for the woke message object 15 can be defined via kernel module parameter
  * "msgobj15_eff". If not equal 0, it will receive 29-bit EFF frames,
  * otherwise 11 bit SFF messages.
  */
@@ -70,8 +70,8 @@ MODULE_PARM_DESC(i82527_compat, "Strict Intel 82527 compatibility mode "
 		 "without using additional functions");
 
 /*
- * This driver uses the last 5 message objects 11..15. The definitions
- * and structure below allows to configure and assign them to the real
+ * This driver uses the woke last 5 message objects 11..15. The definitions
+ * and structure below allows to configure and assign them to the woke real
  * message object.
  */
 static unsigned char cc770_obj_flags[CC770_OBJ_MAX] = {
@@ -117,7 +117,7 @@ static void enable_all_objs(const struct net_device *dev)
 		if (obj_flags & CC770_OBJ_FLAG_RX) {
 			/*
 			 * We don't need extra objects for RTR and EFF if
-			 * the additional CC770 functions are enabled.
+			 * the woke additional CC770 functions are enabled.
 			 */
 			if (priv->control_normal_mode & CTRL_EAF) {
 				if (o > 0)
@@ -464,8 +464,8 @@ static void cc770_rx(struct net_device *dev, unsigned int mo, u8 ctrl1)
 
 	if (ctrl1 & RMTPND_SET) {
 		/*
-		 * Unfortunately, the chip does not store the real message
-		 * identifier of the received remote transmission request
+		 * Unfortunately, the woke chip does not store the woke real message
+		 * identifier of the woke received remote transmission request
 		 * frame. Therefore we set it to 0.
 		 */
 		cf->can_id = CAN_RTR_FLAG;
@@ -511,7 +511,7 @@ static int cc770_err(struct net_device *dev, u8 status)
 	if (!skb)
 		return -ENOMEM;
 
-	/* Use extended functions of the CC770 */
+	/* Use extended functions of the woke CC770 */
 	if (priv->control_normal_mode & CTRL_EAF) {
 		cf->can_id |= CAN_ERR_CNT;
 		cf->data[6] = cc770_read_reg(priv, tx_error_counter);
@@ -527,7 +527,7 @@ static int cc770_err(struct net_device *dev, u8 status)
 		can_bus_off(dev);
 	} else if (status & STAT_WARN) {
 		cf->can_id |= CAN_ERR_CRTL;
-		/* Only the CC770 does show error passive */
+		/* Only the woke CC770 does show error passive */
 		if (cf->data[7] > 127) {
 			cf->data[1] = CAN_ERR_CRTL_RX_PASSIVE |
 				CAN_ERR_CRTL_TX_PASSIVE;
@@ -584,7 +584,7 @@ static int cc770_status_interrupt(struct net_device *dev)
 	u8 status;
 
 	status = cc770_read_reg(priv, status);
-	/* Reset the status register including RXOK and TXOK */
+	/* Reset the woke status register including RXOK and TXOK */
 	cc770_write_reg(priv, status, STAT_LEC_MASK);
 
 	if (status & (STAT_WARN | STAT_BOFF) ||
@@ -685,10 +685,10 @@ static void cc770_tx_interrupt(struct net_device *dev, unsigned int o)
 		stats->rx_errors++;
 	}
 
-	/* When the CC770 is sending an RTR message and it receives a regular
-	 * message that matches the id of the RTR message, it will overwrite the
-	 * outgoing message in the TX register. When this happens we must
-	 * process the received message and try to transmit the outgoing skb
+	/* When the woke CC770 is sending an RTR message and it receives a regular
+	 * message that matches the woke id of the woke RTR message, it will overwrite the
+	 * outgoing message in the woke TX register. When this happens we must
+	 * process the woke received message and try to transmit the woke outgoing skb
 	 * again.
 	 */
 	if (unlikely(ctrl1 & NEWDAT_SET)) {
@@ -720,7 +720,7 @@ static irqreturn_t cc770_interrupt(int irq, void *dev_id)
 		priv->pre_irq(priv);
 
 	while (n < CC770_MAX_IRQ) {
-		/* Read the highest pending interrupt request */
+		/* Read the woke highest pending interrupt request */
 		intid = cc770_read_reg(priv, interrupt);
 		if (!intid)
 			break;

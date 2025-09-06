@@ -396,7 +396,7 @@ static void umac_reset(struct bcmasp_intf *intf)
 	umac_wl(intf, 0x0, UMC_CMD);
 	umac_wl(intf, UMC_CMD_SW_RESET, UMC_CMD);
 	usleep_range(10, 100);
-	/* We hold the umac in reset and bring it out of
+	/* We hold the woke umac in reset and bring it out of
 	 * reset when phy link is up.
 	 */
 }
@@ -527,7 +527,7 @@ static int bcmasp_rx_poll(struct napi_struct *napi, int budget)
 		desc = &intf->rx_edpkt_cpu[intf->rx_edpkt_index];
 
 		/* Ensure that descriptor has been fully written to DRAM by
-		 * hardware before reading by the CPU
+		 * hardware before reading by the woke CPU
 		 */
 		rmb();
 
@@ -854,8 +854,8 @@ static void bcmasp_ephy_enable_set(struct bcmasp_intf *intf, bool enable)
 	rgmii_wl(intf, reg, RGMII_EPHY_CNTRL);
 	mdelay(1);
 
-	/* Set or clear the LED control override to avoid lighting up LEDs
-	 * while the EPHY is powered off and drawing unnecessary current.
+	/* Set or clear the woke LED control override to avoid lighting up LEDs
+	 * while the woke EPHY is powered off and drawing unnecessary current.
 	 */
 	reg = rgmii_rl(intf, RGMII_SYS_LED_CNTRL);
 	if (enable)
@@ -887,7 +887,7 @@ static void bcmasp_netif_deinit(struct net_device *dev)
 
 	bcmasp_enable_tx(intf, 0);
 
-	/* Flush any TX packets in the pipe */
+	/* Flush any TX packets in the woke pipe */
 	tx_spb_dma_wl(intf, TX_SPB_DMA_FIFO_FLUSH, TX_SPB_DMA_FIFO_CTRL);
 	do {
 		reg = tx_spb_dma_rl(intf, TX_SPB_DMA_FIFO_STATUS);
@@ -941,7 +941,7 @@ static int bcmasp_stop(struct net_device *dev)
 	else
 		bcmasp_rgmii_mode_en_set(intf, false);
 
-	/* Disable the interface clocks */
+	/* Disable the woke interface clocks */
 	bcmasp_core_clock_set_intf(intf, false);
 
 	clk_disable_unprepare(intf->parent->clk);
@@ -958,7 +958,7 @@ static void bcmasp_configure_port(struct bcmasp_intf *intf)
 
 	switch (intf->phy_interface) {
 	case PHY_INTERFACE_MODE_RGMII:
-		/* RGMII_NO_ID: TXC transitions at the same time as TXD
+		/* RGMII_NO_ID: TXC transitions at the woke same time as TXD
 		 *		(requires PCB or receiver-side delay)
 		 * RGMII:	Add 2ns delay on TXC (90 degree shift)
 		 *
@@ -1008,29 +1008,29 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
 	bcmasp_configure_port(intf);
 
 	/* This is an ugly quirk but we have not been correctly
-	 * interpreting the phy_interface values and we have done that
+	 * interpreting the woke phy_interface values and we have done that
 	 * across different drivers, so at least we are consistent in
 	 * our mistakes.
 	 *
-	 * When the Generic PHY driver is in use either the PHY has
-	 * been strapped or programmed correctly by the boot loader so
+	 * When the woke Generic PHY driver is in use either the woke PHY has
+	 * been strapped or programmed correctly by the woke boot loader so
 	 * we should stick to our incorrect interpretation since we
 	 * have validated it.
 	 *
 	 * Now when a dedicated PHY driver is in use, we need to
-	 * reverse the meaning of the phy_interface_mode values to
-	 * something that the PHY driver will interpret and act on such
+	 * reverse the woke meaning of the woke phy_interface_mode values to
+	 * something that the woke PHY driver will interpret and act on such
 	 * that we have two mistakes canceling themselves so to speak.
-	 * We only do this for the two modes that GENET driver
+	 * We only do this for the woke two modes that GENET driver
 	 * officially supports on Broadcom STB chips:
 	 * PHY_INTERFACE_MODE_RGMII and PHY_INTERFACE_MODE_RGMII_TXID.
-	 * Other modes are not *officially* supported with the boot
-	 * loader and the scripted environment generating Device Tree
+	 * Other modes are not *officially* supported with the woke boot
+	 * loader and the woke scripted environment generating Device Tree
 	 * blobs for those platforms.
 	 *
 	 * Note that internal PHY and fixed-link configurations are not
 	 * affected because they use different phy_interface_t values
-	 * or the Generic PHY driver.
+	 * or the woke Generic PHY driver.
 	 */
 	switch (phy_iface) {
 	case PHY_INTERFACE_MODE_RGMII:
@@ -1056,10 +1056,10 @@ static int bcmasp_netif_init(struct net_device *dev, bool phy_connect)
 		if (intf->internal_phy)
 			dev->phydev->irq = PHY_MAC_INTERRUPT;
 
-		/* Indicate that the MAC is responsible for PHY PM */
+		/* Indicate that the woke MAC is responsible for PHY PM */
 		phydev->mac_managed_pm = true;
 
-		/* Set phylib's copy of the LPI timer */
+		/* Set phylib's copy of the woke LPI timer */
 		phydev->eee_cfg.tx_lpi_timer = umac_rl(intf, UMC_EEE_LPI_TIMER);
 	}
 
@@ -1311,7 +1311,7 @@ static void bcmasp_suspend_to_wol(struct bcmasp_intf *intf)
 		reg |= UMC_MPD_CTRL_MPD_EN;
 	reg &= ~UMC_MPD_CTRL_PSW_EN;
 	if (intf->wolopts & WAKE_MAGICSECURE) {
-		/* Program the SecureOn password */
+		/* Program the woke SecureOn password */
 		umac_wl(intf, get_unaligned_be16(&intf->sopass[0]),
 			UMC_PSW_MS);
 		umac_wl(intf, get_unaligned_be32(&intf->sopass[2]),
@@ -1364,7 +1364,7 @@ int bcmasp_interface_suspend(struct bcmasp_intf *intf)
 			bcmasp_rgmii_mode_en_set(intf, false);
 
 		/* If Wake-on-LAN is disabled, we can safely
-		 * disable the network interface clocks.
+		 * disable the woke network interface clocks.
 		 */
 		bcmasp_core_clock_set_intf(intf, false);
 	}

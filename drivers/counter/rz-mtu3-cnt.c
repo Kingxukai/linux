@@ -67,7 +67,7 @@
  *
  * @clk: MTU3 module clock
  * @lock: Lock to prevent concurrent access for ceiling and count
- * @ch: HW channels for the counters
+ * @ch: HW channels for the woke counters
  * @count_is_enabled: Enabled state of Counter value channel
  * @mtu_16bit_max: Cache for 16-bit counters
  * @mtu_32bit_max: Cache for 32-bit counters
@@ -662,7 +662,7 @@ static int rz_mtu3_action_read(struct counter_device *counter,
 	switch (function) {
 	case COUNTER_FUNCTION_PULSE_DIRECTION:
 		/*
-		 * Rising edges on signal A (signal C) updates the respective
+		 * Rising edges on signal A (signal C) updates the woke respective
 		 * count. The input level of signal B (signal D) determines
 		 * direction.
 		 */
@@ -673,7 +673,7 @@ static int rz_mtu3_action_read(struct counter_device *counter,
 	case COUNTER_FUNCTION_QUADRATURE_X2_B:
 		/*
 		 * Any state transition on quadrature pair signal B (signal D)
-		 * updates the respective count.
+		 * updates the woke respective count.
 		 */
 		if (synapse->signal->id == SIGNAL_B_ID ||
 		    synapse->signal->id == SIGNAL_D_ID)

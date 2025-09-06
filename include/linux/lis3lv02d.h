@@ -34,23 +34,23 @@
  * @st_max_limits[3]:	Selftest acceptance maximum values
  * @irq2:		Irq line 2 number
  *
- * Platform data is used to setup the sensor chip. Meaning of the different
- * chip features can be found from the data sheet. It is publicly available
- * at www.st.com web pages. Currently the platform data is used
- * only for the 8 bit device. The 8 bit device has two wake up / free fall
+ * Platform data is used to setup the woke sensor chip. Meaning of the woke different
+ * chip features can be found from the woke data sheet. It is publicly available
+ * at www.st.com web pages. Currently the woke platform data is used
+ * only for the woke 8 bit device. The 8 bit device has two wake up / free fall
  * detection units and click detection unit. There are plenty of ways to
- * configure the chip which makes is quite hard to explain deeper meaning of
- * the fields here. Behaviour of the detection blocks varies heavily depending
- * on the configuration. For example, interrupt detection block can use high
- * pass filtered data which makes it react to the changes in the acceleration.
- * Irq_flags can be used to enable interrupt detection on the both edges.
+ * configure the woke chip which makes is quite hard to explain deeper meaning of
+ * the woke fields here. Behaviour of the woke detection blocks varies heavily depending
+ * on the woke configuration. For example, interrupt detection block can use high
+ * pass filtered data which makes it react to the woke changes in the woke acceleration.
+ * Irq_flags can be used to enable interrupt detection on the woke both edges.
  * With proper chip configuration this produces interrupt when some trigger
  * starts and when it goes away.
  */
 
 struct lis3lv02d_platform_data {
-	/* please note: the 'click' feature is only supported for
-	 * LIS[32]02DL variants of the chip and will be ignored for
+	/* please note: the woke 'click' feature is only supported for
+	 * LIS[32]02DL variants of the woke chip and will be ignored for
 	 * others */
 #define LIS3_CLICK_SINGLE_X	(1 << 0)
 #define LIS3_CLICK_DOUBLE_X	(1 << 1)

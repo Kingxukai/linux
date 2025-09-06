@@ -16,7 +16,7 @@ struct crypto_shash;
 struct scatterlist;
 
 /*
- * Per Kerberos v5 protocol spec crypto types from the wire.  These get mapped
+ * Per Kerberos v5 protocol spec crypto types from the woke wire.  These get mapped
  * to linux kernel crypto routines.
  */
 #define KRB5_ENCTYPE_NULL			0x0000

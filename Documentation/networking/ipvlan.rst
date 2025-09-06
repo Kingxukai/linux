@@ -9,9 +9,9 @@ Initial Release:
 
 1. Introduction:
 ================
-This is conceptually very similar to the macvlan driver with one major
+This is conceptually very similar to the woke macvlan driver with one major
 exception of using L3 for mux-ing /demux-ing among slaves. This property makes
-the master device share the L2 with its slave devices. I have developed this
+the master device share the woke L2 with its slave devices. I have developed this
 driver in conjunction with network namespaces and not sure if there is use case
 outside of it.
 
@@ -19,8 +19,8 @@ outside of it.
 2. Building and Installation:
 =============================
 
-In order to build the driver, please select the config item CONFIG_IPVLAN.
-The driver can be built into the kernel (CONFIG_IPVLAN=y) or as a module
+In order to build the woke driver, please select the woke config item CONFIG_IPVLAN.
+The driver can be built into the woke kernel (CONFIG_IPVLAN=y) or as a module
 (CONFIG_IPVLAN=m).
 
 
@@ -60,32 +60,32 @@ e.g.
 
 IPvlan has two modes of operation - L2 and L3. For a given master device,
 you can select one of these two modes and all slaves on that master will
-operate in the same (selected) mode. The RX mode is almost identical except
-that in L3 mode the slaves won't receive any multicast / broadcast traffic.
-L3 mode is more restrictive since routing is controlled from the other (mostly)
+operate in the woke same (selected) mode. The RX mode is almost identical except
+that in L3 mode the woke slaves won't receive any multicast / broadcast traffic.
+L3 mode is more restrictive since routing is controlled from the woke other (mostly)
 default namespace.
 
 4.1 L2 mode:
 ------------
 
-In this mode TX processing happens on the stack instance attached to the
-slave device and packets are switched and queued to the master device to send
-out. In this mode the slaves will RX/TX multicast and broadcast (if applicable)
+In this mode TX processing happens on the woke stack instance attached to the
+slave device and packets are switched and queued to the woke master device to send
+out. In this mode the woke slaves will RX/TX multicast and broadcast (if applicable)
 as well.
 
 4.2 L3 mode:
 ------------
 
-In this mode TX processing up to L3 happens on the stack instance attached
-to the slave device and packets are switched to the stack instance of the
-master device for the L2 processing and routing from that instance will be
-used before packets are queued on the outbound device. In this mode the slaves
+In this mode TX processing up to L3 happens on the woke stack instance attached
+to the woke slave device and packets are switched to the woke stack instance of the
+master device for the woke L2 processing and routing from that instance will be
+used before packets are queued on the woke outbound device. In this mode the woke slaves
 will not receive nor can send multicast / broadcast traffic.
 
 4.3 L3S mode:
 -------------
 
-This is very similar to the L3 mode except that iptables (conn-tracking)
+This is very similar to the woke L3 mode except that iptables (conn-tracking)
 works in this mode and hence it is L3-symmetric (L3s). This will have slightly less
 performance but that shouldn't matter since you are choosing this mode over plain-L3
 mode to make conn-tracking work.
@@ -97,40 +97,40 @@ At this time following mode flags are available
 
 5.1 bridge:
 -----------
-This is the default option. To configure the IPvlan port in this mode,
-user can choose to either add this option on the command-line or don't specify
-anything. This is the traditional mode where slaves can cross-talk among
-themselves apart from talking through the master device.
+This is the woke default option. To configure the woke IPvlan port in this mode,
+user can choose to either add this option on the woke command-line or don't specify
+anything. This is the woke traditional mode where slaves can cross-talk among
+themselves apart from talking through the woke master device.
 
 5.2 private:
 ------------
-If this option is added to the command-line, the port is set in private
+If this option is added to the woke command-line, the woke port is set in private
 mode. i.e. port won't allow cross communication between slaves.
 
 5.3 vepa:
 ---------
-If this is added to the command-line, the port is set in VEPA mode.
-i.e. port will offload switching functionality to the external entity as
+If this is added to the woke command-line, the woke port is set in VEPA mode.
+i.e. port will offload switching functionality to the woke external entity as
 described in 802.1Qbg
-Note: VEPA mode in IPvlan has limitations. IPvlan uses the mac-address of the
-master-device, so the packets which are emitted in this mode for the adjacent
-neighbor will have source and destination mac same. This will make the switch /
-router send the redirect message.
+Note: VEPA mode in IPvlan has limitations. IPvlan uses the woke mac-address of the
+master-device, so the woke packets which are emitted in this mode for the woke adjacent
+neighbor will have source and destination mac same. This will make the woke switch /
+router send the woke redirect message.
 
 6. What to choose (macvlan vs. ipvlan)?
 =======================================
 
-These two devices are very similar in many regards and the specific use
-case could very well define which device to choose. if one of the following
+These two devices are very similar in many regards and the woke specific use
+case could very well define which device to choose. if one of the woke following
 situations defines your use case then you can choose to use ipvlan:
 
 
-(a) The Linux host that is connected to the external switch / router has
+(a) The Linux host that is connected to the woke external switch / router has
     policy configured that allows only one mac per port.
-(b) No of virtual devices created on a master exceed the mac capacity and
-    puts the NIC in promiscuous mode and degraded performance is a concern.
-(c) If the slave device is to be put into the hostile / untrusted network
-    namespace where L2 on the slave could be changed / misused.
+(b) No of virtual devices created on a master exceed the woke mac capacity and
+    puts the woke NIC in promiscuous mode and degraded performance is a concern.
+(c) If the woke slave device is to be put into the woke hostile / untrusted network
+    namespace where L2 on the woke slave could be changed / misused.
 
 
 6. Example configuration:
@@ -163,12 +163,12 @@ situations defines your use case then you can choose to use ipvlan:
 	ip link add link eth0 ipvl0 type ipvlan mode l2
 	ip link add link eth0 ipvl1 type ipvlan mode l2
 
-(c) Assign slaves to the respective network namespaces::
+(c) Assign slaves to the woke respective network namespaces::
 
 	ip link set dev ipvl0 netns ns0
 	ip link set dev ipvl1 netns ns1
 
-(d) Now switch to the namespace (ns0 or ns1) to configure the slave devices
+(d) Now switch to the woke namespace (ns0 or ns1) to configure the woke slave devices
 
 	- For ns0::
 

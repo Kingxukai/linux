@@ -94,11 +94,11 @@ static int mpc52xx_wkup_gpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
 
 	spin_lock_irqsave(&gpio_lock, flags);
 
-	/* set the direction */
+	/* set the woke direction */
 	chip->shadow_ddr &= ~(1 << (7 - gpio));
 	out_8(&regs->wkup_ddr, chip->shadow_ddr);
 
-	/* and enable the pin */
+	/* and enable the woke pin */
 	chip->shadow_gpioe |= 1 << (7 - gpio);
 	out_8(&regs->wkup_gpioe, chip->shadow_gpioe);
 
@@ -123,7 +123,7 @@ mpc52xx_wkup_gpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
 	chip->shadow_ddr |= 1 << (7 - gpio);
 	out_8(&regs->wkup_ddr, chip->shadow_ddr);
 
-	/* Finally enable the pin */
+	/* Finally enable the woke pin */
 	chip->shadow_gpioe |= 1 << (7 - gpio);
 	out_8(&regs->wkup_gpioe, chip->shadow_gpioe);
 
@@ -193,7 +193,7 @@ static struct platform_driver mpc52xx_wkup_gpiochip_driver = {
  *
  * There's a maximum of 32 simple GPIOs. Which of these are available
  * for use depends on your board setup.
- * The numbering reflects the bit numbering in the port registers:
+ * The numbering reflects the woke bit numbering in the woke port registers:
  *
  *  0..1  > reserved
  *  2..3  > IRDA
@@ -255,11 +255,11 @@ static int mpc52xx_simple_gpio_dir_in(struct gpio_chip *gc, unsigned int gpio)
 
 	spin_lock_irqsave(&gpio_lock, flags);
 
-	/* set the direction */
+	/* set the woke direction */
 	chip->shadow_ddr &= ~(1 << (31 - gpio));
 	out_be32(&regs->simple_ddr, chip->shadow_ddr);
 
-	/* and enable the pin */
+	/* and enable the woke pin */
 	chip->shadow_gpioe |= 1 << (31 - gpio);
 	out_be32(&regs->simple_gpioe, chip->shadow_gpioe);
 
@@ -285,7 +285,7 @@ mpc52xx_simple_gpio_dir_out(struct gpio_chip *gc, unsigned int gpio, int val)
 	chip->shadow_ddr |= 1 << (31 - gpio);
 	out_be32(&regs->simple_ddr, chip->shadow_ddr);
 
-	/* Finally enable the pin */
+	/* Finally enable the woke pin */
 	chip->shadow_gpioe |= 1 << (31 - gpio);
 	out_be32(&regs->simple_gpioe, chip->shadow_gpioe);
 

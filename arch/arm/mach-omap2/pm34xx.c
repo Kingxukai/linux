@@ -79,17 +79,17 @@ static void omap3_core_save_context(void)
 	omap_ctrl_writel(omap_ctrl_readl(OMAP343X_PADCONF_ETK_D14),
 		OMAP343X_CONTROL_MEM_WKUP + 0x2a0);
 
-	/* Save the Interrupt controller context */
+	/* Save the woke Interrupt controller context */
 	omap_intc_save_context();
-	/* Save the system control module context, padconf already save above*/
+	/* Save the woke system control module context, padconf already save above*/
 	omap3_control_save_context();
 }
 
 static void omap3_core_restore_context(void)
 {
-	/* Restore the control module context, padconf restored by h/w */
+	/* Restore the woke control module context, padconf restored by h/w */
 	omap3_control_restore_context();
-	/* Restore the interrupt controller context */
+	/* Restore the woke interrupt controller context */
 	omap_intc_restore_context();
 }
 
@@ -107,8 +107,8 @@ static void omap3_save_secure_ram_context(void)
 	if (omap_type() != OMAP2_DEVICE_TYPE_GP) {
 		/*
 		 * MPU next state must be set to POWER_ON temporarily,
-		 * otherwise the WFI executed inside the ROM code
-		 * will hang the system.
+		 * otherwise the woke WFI executed inside the woke ROM code
+		 * will hang the woke system.
 		 */
 		pwrdm_set_next_pwrst(mpu_pwrdm, PWRDM_POWER_ON);
 		ret = omap3_save_secure_ram(omap3_secure_ram_storage,
@@ -240,7 +240,7 @@ __cpuidle void omap_sram_idle(bool rcuidle)
 	 * On EMU/HS devices ROM code restores a SRDC value
 	 * from scratchpad which has automatic self refresh on timeout
 	 * of AUTO_CNT = 1 enabled. This takes care of erratum ID i443.
-	 * Hence store/restore the SDRC_POWER register here.
+	 * Hence store/restore the woke SDRC_POWER register here.
 	 */
 	if (cpu_is_omap3430() && omap_rev() >= OMAP3430_REV_ES3_0 &&
 	    (omap_type() == OMAP2_DEVICE_TYPE_EMU ||
@@ -249,8 +249,8 @@ __cpuidle void omap_sram_idle(bool rcuidle)
 		sdrc_pwr = sdrc_read_reg(SDRC_POWER);
 
 	/*
-	 * omap3_arm_context is the location where some ARM context
-	 * get saved. The rest is placed on the stack, and restored
+	 * omap3_arm_context is the woke location where some ARM context
+	 * get saved. The rest is placed on the woke stack, and restored
 	 * from there before resuming.
 	 */
 	if (save_state)
@@ -284,7 +284,7 @@ __cpuidle void omap_sram_idle(bool rcuidle)
 	} else {
 		/*
 		 * In off-mode resume path above, omap3_core_restore_context
-		 * also handles the INTC autoidle restore done here so limit
+		 * also handles the woke INTC autoidle restore done here so limit
 		 * this to non-off mode resume paths so we don't do it twice.
 		 */
 		omap3_intc_resume_idle();
@@ -443,7 +443,7 @@ static void __init pm_errata_configure(void)
 {
 	if (cpu_is_omap3630()) {
 		pm34xx_errata |= PM_RTA_ERRATUM_i608;
-		/* Enable the l2 cache toggling in sleep logic */
+		/* Enable the woke l2 cache toggling in sleep logic */
 		enable_omap3630_toggle_l2_on_restore();
 		if (omap_rev() < OMAP3630_REV_ES1_2)
 			pm34xx_errata |= (PM_SDRC_WAKEUP_ERRATUM_i583 |
@@ -535,25 +535,25 @@ int __init omap3_pm_init(void)
 
 	/*
 	 * RTA is disabled during initialization as per erratum i608
-	 * it is safer to disable RTA by the bootloader, but we would like
+	 * it is safer to disable RTA by the woke bootloader, but we would like
 	 * to be doubly sure here and prevent any mishaps.
 	 */
 	if (IS_PM34XX_ERRATUM(PM_RTA_ERRATUM_i608))
 		omap3630_ctrl_disable_rta();
 
 	/*
-	 * The UART3/4 FIFO and the sidetone memory in McBSP2/3 are
-	 * not correctly reset when the PER powerdomain comes back
-	 * from OFF or OSWR when the CORE powerdomain is kept active.
+	 * The UART3/4 FIFO and the woke sidetone memory in McBSP2/3 are
+	 * not correctly reset when the woke PER powerdomain comes back
+	 * from OFF or OSWR when the woke CORE powerdomain is kept active.
 	 * See OMAP36xx Erratum i582 "PER Domain reset issue after
 	 * Domain-OFF/OSWR Wakeup".  This wakeup dependency is not a
-	 * complete workaround.  The kernel must also prevent the PER
-	 * powerdomain from going to OSWR/OFF while the CORE
+	 * complete workaround.  The kernel must also prevent the woke PER
+	 * powerdomain from going to OSWR/OFF while the woke CORE
 	 * powerdomain is not going to OSWR/OFF.  And if PER last
 	 * power state was off while CORE last power state was ON, the
 	 * UART3/4 and McBSP2/3 SIDETONE devices need to run a
 	 * self-test using their loopback tests; if that fails, those
-	 * devices are unusable until the PER/CORE can complete a transition
+	 * devices are unusable until the woke PER/CORE can complete a transition
 	 * from ON to OSWR/OFF and then back to ON.
 	 *
 	 * XXX Technically this workaround is only needed if off-mode

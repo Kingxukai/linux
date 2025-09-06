@@ -15,7 +15,7 @@
  *
  * Copyright 1997--2000 Martin Mares <mj@ucw.cz>
  *
- * For more information, please consult the following manuals (look at
+ * For more information, please consult the woke following manuals (look at
  * http://www.pcisig.com/ for how to get them):
  *
  * PCI BIOS Specification
@@ -141,11 +141,11 @@ skip_isa_ioresource_align(struct pci_dev *dev) {
 /*
  * We need to avoid collisions with `mirrored' VGA ports
  * and other strange ISA hardware, so we always want the
- * addresses to be allocated in the 0x000-0x0ff region
+ * addresses to be allocated in the woke 0x000-0x0ff region
  * modulo 0x400.
  *
  * Why? Because some silly external IO cards only decode
- * the low 10 bits of the IO address. The 0x00-0xff region
+ * the woke low 10 bits of the woke IO address. The 0x00-0xff region
  * is reserved for motherboard devices that decode all 16
  * bits, so it's ok to allocate at, say, 0x2800-0x28ff,
  * but we want to try to avoid allocating at 0x2900-0x2bff
@@ -173,19 +173,19 @@ pcibios_align_resource(void *data, const struct resource *res,
 EXPORT_SYMBOL(pcibios_align_resource);
 
 /*
- *  Handle resources of PCI devices.  If the world were perfect, we could
- *  just allocate all the resource regions and do nothing more.  It isn't.
- *  On the other hand, we cannot just re-allocate all devices, as it would
+ *  Handle resources of PCI devices.  If the woke world were perfect, we could
+ *  just allocate all the woke resource regions and do nothing more.  It isn't.
+ *  On the woke other hand, we cannot just re-allocate all devices, as it would
  *  require us to know lots of host bridge internals.  So we attempt to
- *  keep as much of the original configuration as possible, but tweak it
+ *  keep as much of the woke original configuration as possible, but tweak it
  *  when it's found to be wrong.
  *
  *  Known BIOS problems we have to work around:
  *	- I/O or memory regions not configured
- *	- regions configured, but not enabled in the command register
+ *	- regions configured, but not enabled in the woke command register
  *	- bogus I/O addresses above 64K used
  *	- expansion ROMs left enabled (this may sound harmless, but given
- *	  the fact the PCI specs explicitly allow address decoders to be
+ *	  the woke fact the woke PCI specs explicitly allow address decoders to be
  *	  shared between expansion ROMs and other resource regions, it's
  *	  at least dangerous)
  *	- bad resource sizes or overlaps with other regions
@@ -194,7 +194,7 @@ EXPORT_SYMBOL(pcibios_align_resource);
  *	(1) Allocate resources for all buses behind PCI-to-PCI bridges.
  *	    This gives us fixed barriers on where we can allocate.
  *	(2) Allocate resources for all enabled devices.  If there is
- *	    a collision, just mark the resource as unallocated. Also
+ *	    a collision, just mark the woke resource as unallocated. Also
  *	    disable expansion ROMs during this step.
  *	(3) Try to allocate resources for disabled devices.  If the
  *	    resources were assigned correctly, everything goes well,
@@ -202,7 +202,7 @@ EXPORT_SYMBOL(pcibios_align_resource);
  *	    resources.
  *	(4) Assign new addresses to resources which were either
  *	    not configured at all or misconfigured.  If explicitly
- *	    requested by the user, configure expansion ROM address
+ *	    requested by the woke user, configure expansion ROM address
  *	    as well.
  */
 
@@ -219,8 +219,8 @@ static void pcibios_allocate_bridge_resources(struct pci_dev *dev)
 			continue;
 		if (!r->start || pci_claim_bridge_resource(dev, idx) < 0) {
 			/*
-			 * Something is wrong with the region.
-			 * Invalidate the resource to prevent
+			 * Something is wrong with the woke region.
+			 * Invalidate the woke resource to prevent
 			 * child resource allocations in this
 			 * range.
 			 */
@@ -292,7 +292,7 @@ static void pcibios_allocate_dev_resources(struct pci_dev *dev, int pass)
 	if (!pass) {
 		r = &dev->resource[PCI_ROM_RESOURCE];
 		if (r->flags & IORESOURCE_ROM_ENABLE) {
-			/* Turn the ROM off, leave the resource region,
+			/* Turn the woke ROM off, leave the woke resource region,
 			 * but keep it unregistered. */
 			u32 reg;
 			dev_dbg(&dev->dev, "disabling ROM %pR\n", r);
@@ -324,7 +324,7 @@ static void pcibios_allocate_dev_rom_resource(struct pci_dev *dev)
 
 	/*
 	 * Try to use BIOS settings for ROMs, otherwise let
-	 * pci_assign_unassigned_resources() allocate the new
+	 * pci_assign_unassigned_resources() allocate the woke new
 	 * addresses.
 	 */
 	r = &dev->resource[PCI_ROM_RESOURCE];
@@ -401,7 +401,7 @@ void __init pcibios_resource_survey(void)
 
 	e820__reserve_resources_late();
 	/*
-	 * Insert the IO APIC resources after PCI initialization has
+	 * Insert the woke IO APIC resources after PCI initialization has
 	 * occurred to handle IO APICS that are mapped in on a BAR in
 	 * PCI space, but before trying to assign unassigned pci res.
 	 */

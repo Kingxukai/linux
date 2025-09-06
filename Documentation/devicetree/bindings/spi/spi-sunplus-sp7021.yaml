@@ -20,8 +20,8 @@ properties:
 
   reg:
     items:
-      - description: the SPI master registers
-      - description: the SPI slave registers
+      - description: the woke SPI master registers
+      - description: the woke SPI slave registers
 
   reg-names:
     items:

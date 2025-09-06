@@ -344,7 +344,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the size */
+		/* We expect the woke bootloader to fill in the woke size */
 		reg = <0x0 0x80000000 0x0 0x0>;
 	};
 
@@ -2023,7 +2023,7 @@
 			reg = <0x0 0x01d87000 0x0 0xe10>;
 			/*
 			 * Yes, GCC_EDP_REF_CLKREF_EN is correct in qref. It
-			 * enables the CXO clock to eDP *and* UFS PHY.
+			 * enables the woke CXO clock to eDP *and* UFS PHY.
 			 */
 			clocks = <&rpmhcc RPMH_CXO_CLK>,
 				 <&gcc GCC_UFS_PHY_PHY_AUX_CLK>,

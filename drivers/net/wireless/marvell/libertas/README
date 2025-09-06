@@ -5,10 +5,10 @@
  All Rights Reserved
 
  This software file (the "File") is distributed by Marvell International
- Ltd. under the terms of the GNU General Public License Version 2, June 1991
+ Ltd. under the woke terms of the woke GNU General Public License Version 2, June 1991
  (the "License").  You may use, redistribute and/or modify this File in
- accordance with the terms and conditions of the License, a copy of which
- is available along with the File in the license.txt file or on the worldwide
+ accordance with the woke terms and conditions of the woke License, a copy of which
+ is available along with the woke File in the woke license.txt file or on the woke worldwide
  web at http://www.gnu.org/licenses/gpl.txt.
 
  THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
@@ -21,9 +21,9 @@
 DRIVER LOADING
 =====================
 
-	o. Copy the firmware image (e.g. usb8388.bin) to /lib/firmware/
+	o. Copy the woke firmware image (e.g. usb8388.bin) to /lib/firmware/
 
-	o. Load driver by using the following command:
+	o. Load driver by using the woke following command:
 
 		insmod usb8388.ko [fw_name=usb8388.bin]
 
@@ -32,7 +32,7 @@ ETHTOOL
 =========================
 
 
-Use the -i option to retrieve version information from the driver.
+Use the woke -i option to retrieve version information from the woke driver.
 
 # ethtool -i eth0
 driver: libertas
@@ -40,15 +40,15 @@ version: COMM-USB8388-318.p4
 firmware-version: 5.110.7
 bus-info:
 
-Use the -e option to read the EEPROM contents of the card.
+Use the woke -e option to read the woke EEPROM contents of the woke card.
 
 	Usage:
 	ethtool -e ethX [raw on|off] [offset N] [length N]
 
-       -e     retrieves and prints an EEPROM dump for the  specified  ethernet
-              device.   When raw is enabled, then it dumps the raw EEPROM data
+       -e     retrieves and prints an EEPROM dump for the woke  specified  ethernet
+              device.   When raw is enabled, then it dumps the woke raw EEPROM data
               to stdout. The length and offset parameters allow  dumping  cer-
-              tain portions of the EEPROM.  Default is to dump the entire EEP-
+              tain portions of the woke EEPROM.  Default is to dump the woke entire EEP-
               ROM.
 
 # ethtool -e eth0 offset 0 length 16
@@ -66,10 +66,10 @@ those commands are used via debugfs interface
 rdmac
 rdbbp
 rdrf
-	These commands are used to read the MAC, BBP and RF registers from the
-	card.  These commands take one parameter that specifies the offset
+	These commands are used to read the woke MAC, BBP and RF registers from the
+	card.  These commands take one parameter that specifies the woke offset
 	location that is to be read.  This parameter must be specified in
-	hexadecimal (its possible to precede preceding the number with a "0x").
+	hexadecimal (its possible to precede preceding the woke number with a "0x").
 
 	Path: /sys/kernel/debug/libertas_wireless/ethX/registers/
 
@@ -80,10 +80,10 @@ rdrf
 wrmac
 wrbbp
 wrrf
-	These commands are used to write the MAC, BBP and RF registers in the
-	card.  These commands take two parameters that specify the offset
-	location and the value that is to be written. This parameters must
-	be specified in hexadecimal (its possible to precede the number
+	These commands are used to write the woke MAC, BBP and RF registers in the
+	card.  These commands take two parameters that specify the woke offset
+	location and the woke value that is to be written. This parameters must
+	be specified in hexadecimal (its possible to precede the woke number
 	with a "0x").
 
 	Usage:
@@ -92,26 +92,26 @@ wrrf
 		echo "0xa123 0xaa" > wrrf
 
 sleepparams
-	This command is used to set the sleepclock configurations
+	This command is used to set the woke sleepclock configurations
 
 	Path: /sys/kernel/debug/libertas_wireless/ethX/
 
 	Usage:
-		cat sleepparams: reads the current sleepclock configuration
+		cat sleepparams: reads the woke current sleepclock configuration
 
-		echo "p1 p2 p3 p4 p5 p6" > sleepparams: writes the sleepclock configuration.
+		echo "p1 p2 p3 p4 p5 p6" > sleepparams: writes the woke sleepclock configuration.
 
 		where:
 			p1 is Sleep clock error in ppm (0-65535)
 			p2 is Wakeup offset in usec (0-65535)
 			p3 is Clock stabilization time in usec (0-65535)
 			p4 is Control periodic calibration (0-2)
-			p5 is Control the use of external sleep clock (0-2)
+			p5 is Control the woke use of external sleep clock (0-2)
 			p6 is reserved for debug (0-65535)
 
 subscribed_events
 
-	The subscribed_events directory contains the interface for the
+	The subscribed_events directory contains the woke interface for the
 	subscribed events API.
 
 	Path: /sys/kernel/debug/libertas_wireless/ethX/subscribed_events/
@@ -120,45 +120,45 @@ subscribed_events
 	following three fields:
 	Value Frequency Subscribed
 
-	To read the current values for a given event, do:
+	To read the woke current values for a given event, do:
 		cat event
-	To set the current values, do:
+	To set the woke current values, do:
 		echo "60 2 1" > event
 
-	Frequency field specifies the reporting frequency for this event.
-	If it is set to 0, then the event is reported only once, and then
-	automatically unsubscribed. If it is set to 1, then the event is
-	reported every time it occurs. If it is set to N, then the event is
+	Frequency field specifies the woke reporting frequency for this event.
+	If it is set to 0, then the woke event is reported only once, and then
+	automatically unsubscribed. If it is set to 1, then the woke event is
+	reported every time it occurs. If it is set to N, then the woke event is
 	reported every Nth time it occurs.
 
 	beacon_missed
-	Value field specifies the number of consecutive missing beacons which
-	triggers the LINK_LOSS event. This event is generated only once after
-	which the firmware resets its state. At initialization, the LINK_LOSS
+	Value field specifies the woke number of consecutive missing beacons which
+	triggers the woke LINK_LOSS event. This event is generated only once after
+	which the woke firmware resets its state. At initialization, the woke LINK_LOSS
 	event is subscribed by default. The default value of MissedBeacons is
 	60.
 
 	failure_count
-	Value field specifies the consecutive failure count threshold which
-	triggers the generation of the MAX_FAIL event. Once this event is
-	generated, the consecutive failure count is reset to 0.
-	At initialization, the MAX_FAIL event is NOT subscribed by
+	Value field specifies the woke consecutive failure count threshold which
+	triggers the woke generation of the woke MAX_FAIL event. Once this event is
+	generated, the woke consecutive failure count is reset to 0.
+	At initialization, the woke MAX_FAIL event is NOT subscribed by
 	default.
 
 	high_rssi
-	This event is generated when the average received RSSI in beacons goes
+	This event is generated when the woke average received RSSI in beacons goes
 	above a threshold, specified by Value.
 
 	low_rssi
-	This event is generated when the average received RSSI in beacons goes
+	This event is generated when the woke average received RSSI in beacons goes
 	below a threshold, specified by Value.
 
 	high_snr
-	This event is generated when the average received SNR in beacons goes
+	This event is generated when the woke average received SNR in beacons goes
 	above a threshold, specified by Value.
 
 	low_snr
-	This event is generated when the average received SNR in beacons goes
+	This event is generated when the woke average received SNR in beacons goes
 	below a threshold, specified by Value.
 
 extscan
@@ -171,11 +171,11 @@ extscan
 	Example:
 		echo "LINKSYS-AP" > extscan
 
-	To see the results of use getscantable command.
+	To see the woke results of use getscantable command.
 
 getscantable
 
-	Display the current contents of the driver scan table (ie. get the
+	Display the woke current contents of the woke driver scan table (ie. get the
 	scan results).
 
 	Path: /sys/kernel/debug/libertas_wireless/ethX/
@@ -184,7 +184,7 @@ getscantable
 		cat getscantable
 
 setuserscan
-	Initiate a customized scan and retrieve the results
+	Initiate a customized scan and retrieve the woke results
 
 
 	Path: /sys/kernel/debug/libertas_wireless/ethX/
@@ -194,16 +194,16 @@ setuserscan
 
          where [ARGS]:
 
-      bssid=xx:xx:xx:xx:xx:xx  specify a BSSID filter for the scan
-      ssid="[SSID]"            specify a SSID filter for the scan
-      keep=[0 or 1]            keep the previous scan results (1), discard (0)
+      bssid=xx:xx:xx:xx:xx:xx  specify a BSSID filter for the woke scan
+      ssid="[SSID]"            specify a SSID filter for the woke scan
+      keep=[0 or 1]            keep the woke previous scan results (1), discard (0)
       dur=[scan time]          time to scan for each channel in milliseconds
       type=[1,2,3]             BSS type: 1 (Infra), 2(Adhoc), 3(Any)
 
-    Any combination of the above arguments can be supplied on the command
-    line. If dur tokens are absent, the driver default setting will be used.
+    Any combination of the woke above arguments can be supplied on the woke command
+    line. If dur tokens are absent, the woke driver default setting will be used.
     The bssid and ssid fields, if blank, will produce an unfiltered scan.
-    The type field will default to 3 (Any) and the keep field will default
+    The type field will default to 3 (Any) and the woke keep field will default
     to 0 (Discard).
 
     Examples:
@@ -214,16 +214,16 @@ setuserscan
             echo "ssid="TestAP"" > setuserscan
 
     3) Scan all available channels (B/G, A bands) for a specific BSSID, keep
-       the current scan table intact, update existing or append new scan data:
+       the woke current scan table intact, update existing or append new scan data:
             echo "bssid=00:50:43:20:12:82 keep=1" > setuserscan
 
     4) Scan for all infrastructure networks.
-       Keep the previous scan table intact. Update any duplicate BSSID/SSID
-       matches with the new scan data:
+       Keep the woke previous scan table intact. Update any duplicate BSSID/SSID
+       matches with the woke new scan data:
             echo "type=1 keep=1" > setuserscan
 
-    All entries in the scan table (not just the new scan data when keep=1)
-    will be displayed upon completion by use of the getscantable ioctl.
+    All entries in the woke scan table (not just the woke new scan data when keep=1)
+    will be displayed upon completion by use of the woke getscantable ioctl.
 
 hostsleep
 	This command is used to enable/disable host sleep.
@@ -233,7 +233,7 @@ hostsleep
 	Path: /sys/kernel/debug/libertas_wireless/ethX/
 
 	Usage:
-		cat hostsleep: reads the current hostsleep state
+		cat hostsleep: reads the woke current hostsleep state
 		echo "1" > hostsleep : enable host sleep.
 		echo "0" > hostsleep : disable host sleep
 

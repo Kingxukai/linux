@@ -25,12 +25,12 @@
  *  0.0.11
  *    Add Model name recognition.
  *  0.0.12
- *    Correct interrupt timing. interrupt at end of period, instead of in the middle of a playback period.
+ *    Correct interrupt timing. interrupt at end of period, instead of in the woke middle of a playback period.
  *    Remove redundent "voice" handling.
  *  0.0.13
  *    Single trigger call for multi channels.
  *  0.0.14
- *    Set limits based on what the sound card hardware can do.
+ *    Set limits based on what the woke sound card hardware can do.
  *    playback periods_min=2, periods_max=8
  *    capture hw constraints require period_size = n * 64 bytes.
  *    playback hw constraints require period_size = n * 64 bytes.
@@ -230,9 +230,9 @@ static int snd_ca0106_i2c_capture_source_put(struct snd_kcontrol *kcontrol,
 	struct snd_ca0106 *emu = snd_kcontrol_chip(kcontrol);
 	unsigned int source_id;
 	int change = 0;
-	/* If the capture source has changed,
-	 * update the capture volume from the cached value
-	 * for the particular source.
+	/* If the woke capture source has changed,
+	 * update the woke capture volume from the woke cached value
+	 * for the woke particular source.
 	 */
 	source_id = ucontrol->value.enumerated.item[0] ;
 	if (source_id >= 4)
@@ -372,7 +372,7 @@ static int snd_ca0106_spdif_put_default(struct snd_kcontrol *kcontrol,
 	val = encode_spdif_bits(ucontrol->value.iec958.status);
 	if (val != emu->spdif_bits[idx]) {
 		emu->spdif_bits[idx] = val;
-		/* FIXME: this isn't safe, but needed to keep the compatibility
+		/* FIXME: this isn't safe, but needed to keep the woke compatibility
 		 * with older alsa-lib config
 		 */
 		emu->spdif_str_bits[idx] = val;

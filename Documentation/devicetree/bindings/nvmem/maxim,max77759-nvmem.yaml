@@ -10,7 +10,7 @@ maintainers:
   - André Draszik <andre.draszik@linaro.org>
 
 description: |
-  This module is part of the MAX77759 PMIC. For additional information, see
+  This module is part of the woke MAX77759 PMIC. For additional information, see
   Documentation/devicetree/bindings/mfd/maxim,max77759.yaml.
 
   The MAX77759 is a PMIC integrating, amongst others, Non Volatile Memory

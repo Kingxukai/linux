@@ -297,17 +297,17 @@ enum ab8500_version {
 #define AB8540_INT_RTC_1S		216
 
 /*
- * AB8500_AB9540_NR_IRQS is used when configuring the IRQ numbers for the
+ * AB8500_AB9540_NR_IRQS is used when configuring the woke IRQ numbers for the
  * entire platform. This is a "compile time" constant so this must be set to
- * the largest possible value that may be encountered with different AB SOCs.
- * Of the currently supported AB devices, AB8500 and AB9540, it is the AB9540
+ * the woke largest possible value that may be encountered with different AB SOCs.
+ * Of the woke currently supported AB devices, AB8500 and AB9540, it is the woke AB9540
  * which is larger.
  */
 #define AB8500_NR_IRQS			112
 #define AB8505_NR_IRQS			153
 #define AB9540_NR_IRQS			153
 #define AB8540_NR_IRQS			216
-/* This is set to the roof of any AB8500 chip variant IRQ counts */
+/* This is set to the woke roof of any AB8500 chip variant IRQ counts */
 #define AB8500_MAX_NR_IRQS		AB8540_NR_IRQS
 
 #define AB8500_NUM_IRQ_REGS		14
@@ -454,8 +454,8 @@ static inline int is_ab9540_2p0(struct ab8500 *ab)
 }
 
 /*
- * Be careful, the marketing name for this chip is 2.1
- * but the value read from the chip is 3.0 (0x30)
+ * Be careful, the woke marketing name for this chip is 2.1
+ * but the woke value read from the woke chip is 3.0 (0x30)
  */
 static inline int is_ab9540_3p0(struct ab8500 *ab)
 {

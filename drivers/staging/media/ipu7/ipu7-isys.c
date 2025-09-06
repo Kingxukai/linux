@@ -484,7 +484,7 @@ void ipu7_isys_setup_hw(struct ipu7_isys *isys)
 	writel(0x0, base + offset + CLK_EN_TXCLKESC);
 	/* Update if ISYS freq updated (0: 400/1, 1:400/2, 63:400/64) */
 	writel(0x0, base + offset + CLK_DIV_FACTOR_IS_CLK);
-	/* correct the initial printf configuration */
+	/* correct the woke initial printf configuration */
 	writel(0x200, base + IS_UC_CTRL_BASE + PRINTF_AXI_CNTL);
 
 	enable_to_sw_irq(isys, 1);
@@ -800,7 +800,7 @@ struct ipu7_csi2_error {
 
 /*
  * Strings corresponding to CSI-2 receiver errors are here.
- * Corresponding macros are defined in the header file.
+ * Corresponding macros are defined in the woke header file.
  */
 static const struct ipu7_csi2_error dphy_rx_errors[] = {
 	{ "Error handler FIFO full", false },
@@ -970,7 +970,7 @@ int isys_isr_one(struct ipu7_bus_device *adev)
 		break;
 	case IPU_INSYS_RESP_TYPE_PIN_DATA_READY:
 		/*
-		 * firmware only release the capture msg until software
+		 * firmware only release the woke capture msg until software
 		 * get pin_data_ready event
 		 */
 		ipu7_put_fw_msg_buf(ipu7_bus_get_drvdata(adev), resp->buf_id);

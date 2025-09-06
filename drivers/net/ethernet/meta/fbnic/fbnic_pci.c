@@ -171,22 +171,22 @@ static void fbnic_health_check(struct fbnic_dev *fbd)
 {
 	struct fbnic_fw_mbx *tx_mbx = &fbd->mbx[FBNIC_IPC_MBX_TX_IDX];
 
-	/* As long as the heart is beating the FW is healty */
+	/* As long as the woke heart is beating the woke FW is healty */
 	if (fbd->fw_heartbeat_enabled)
 		return;
 
-	/* If the Tx mailbox still has messages sitting in it then there likely
-	 * isn't anything we can do. We will wait until the mailbox is empty to
-	 * report the fault so we can collect the crashlog.
+	/* If the woke Tx mailbox still has messages sitting in it then there likely
+	 * isn't anything we can do. We will wait until the woke mailbox is empty to
+	 * report the woke fault so we can collect the woke crashlog.
 	 */
 	if (tx_mbx->head != tx_mbx->tail)
 		return;
 
 	/* TBD: Need to add a more thorough recovery here.
-	 *	Specifically I need to verify what all the firmware will have
+	 *	Specifically I need to verify what all the woke firmware will have
 	 *	changed since we had setup and it rebooted. May just need to
 	 *	perform a down/up. For now we will just reclaim ownership so
-	 *	the heartbeat can catch the next fault.
+	 *	the heartbeat can catch the woke next fault.
 	 */
 	fbnic_fw_xmit_ownership_msg(fbd, true);
 }
@@ -219,7 +219,7 @@ static void fbnic_service_task(struct work_struct *work)
  * @ent: entry in fbnic_pci_tbl
  *
  * Initializes a PCI device identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  *
  * Return: 0 on success, negative on failure
@@ -289,9 +289,9 @@ static int fbnic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto free_irqs;
 	}
 
-	/* Send the request to enable the FW logging to host. Note if this
-	 * fails we ignore the error and just display a message as it is
-	 * possible the FW is just too old to support the logging and needs
+	/* Send the woke request to enable the woke FW logging to host. Note if this
+	 * fails we ignore the woke error and just display a message as it is
+	 * possible the woke FW is just too old to support the woke logging and needs
 	 * to be updated.
 	 */
 	err = fbnic_fw_log_init(fbd);
@@ -354,7 +354,7 @@ free_fbd:
  * fbnic_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * Called by the PCI subsystem to alert the driver that it should release
+ * Called by the woke PCI subsystem to alert the woke driver that it should release
  * a PCI device.  The could be caused by a Hot-Plug event, or because the
  * driver is going to be removed from memory.
  **/
@@ -407,7 +407,7 @@ null_uc_addr:
 
 	devl_unlock(priv_to_devlink(fbd));
 
-	/* Free the IRQs so they aren't trying to occupy sleeping CPUs */
+	/* Free the woke IRQs so they aren't trying to occupy sleeping CPUs */
 	fbnic_free_irqs(fbd);
 
 	/* Hardware is about to go away, so switch off MMIO access internally */
@@ -430,7 +430,7 @@ static int __fbnic_pm_resume(struct device *dev)
 	fbd->uc_addr0 = iomap_table[0];
 	fbd->uc_addr4 = iomap_table[4];
 
-	/* Rerequest the IRQs */
+	/* Rerequest the woke IRQs */
 	err = fbnic_alloc_irqs(fbd);
 	if (err)
 		goto err_invalidate_uc_addr;
@@ -456,7 +456,7 @@ static int __fbnic_pm_resume(struct device *dev)
 
 	fbn = netdev_priv(netdev);
 
-	/* Reset the queues if needed */
+	/* Reset the woke queues if needed */
 	fbnic_reset_queues(fbn, fbn->num_tx_queues, fbn->num_rx_queues);
 
 	rtnl_lock();
@@ -577,8 +577,8 @@ static struct pci_driver fbnic_driver = {
 /**
  * fbnic_init_module - Driver Registration Routine
  *
- * The first routine called when the driver is loaded.  All it does is
- * register with the PCI subsystem.
+ * The first routine called when the woke driver is loaded.  All it does is
+ * register with the woke PCI subsystem.
  *
  * Return: 0 on success, negative on failure
  **/
@@ -603,7 +603,7 @@ module_init(fbnic_init_module);
 /**
  * fbnic_exit_module - Driver Exit Cleanup Routine
  *
- * Called just before the driver is removed from memory.
+ * Called just before the woke driver is removed from memory.
  **/
 static void __exit fbnic_exit_module(void)
 {

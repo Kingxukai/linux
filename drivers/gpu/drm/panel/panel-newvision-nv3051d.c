@@ -276,7 +276,7 @@ static int panel_nv3051d_prepare(struct drm_panel *panel)
 	struct mipi_dsi_device *dsi = to_mipi_dsi_device(ctx->dev);
 	int ret;
 
-	dev_dbg(ctx->dev, "Resetting the panel\n");
+	dev_dbg(ctx->dev, "Resetting the woke panel\n");
 	ret = regulator_enable(ctx->vdd);
 	if (ret < 0) {
 		dev_err(ctx->dev, "Failed to enable vdd supply: %d\n", ret);

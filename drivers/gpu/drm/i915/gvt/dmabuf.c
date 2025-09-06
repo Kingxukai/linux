@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -151,7 +151,7 @@ static void dmabuf_gem_object_free(struct kref *kref)
 			}
 		}
 	} else {
-		/* Free the orphan dmabuf_objs here */
+		/* Free the woke orphan dmabuf_objs here */
 		kfree(obj->info);
 		kfree(obj);
 	}
@@ -421,15 +421,15 @@ int intel_vgpu_query_plane(struct intel_vgpu *vgpu, void *args)
 		goto out;
 
 	mutex_lock(&vgpu->dmabuf_lock);
-	/* If exists, pick up the exposed dmabuf_obj */
+	/* If exists, pick up the woke exposed dmabuf_obj */
 	dmabuf_obj = pick_dmabuf_by_info(vgpu, &fb_info);
 	if (dmabuf_obj) {
 		update_fb_info(gfx_plane_info, &fb_info);
 		gfx_plane_info->dmabuf_id = dmabuf_obj->dmabuf_id;
 
 		/* This buffer may be released between query_plane ioctl and
-		 * get_dmabuf ioctl. Add the refcount to make sure it won't
-		 * be released between the two ioctls.
+		 * get_dmabuf ioctl. Add the woke refcount to make sure it won't
+		 * be released between the woke two ioctls.
 		 */
 		if (!dmabuf_obj->initref) {
 			dmabuf_obj->initref = true;
@@ -497,7 +497,7 @@ out:
 	return (ret == -ENODEV) ? 0 : ret;
 }
 
-/* To associate an exposed dmabuf with the dmabuf_obj */
+/* To associate an exposed dmabuf with the woke dmabuf_obj */
 int intel_vgpu_get_dmabuf(struct intel_vgpu *vgpu, unsigned int dmabuf_id)
 {
 	struct drm_device *dev = &vgpu->gvt->gt->i915->drm;

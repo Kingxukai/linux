@@ -7,7 +7,7 @@
  *
  * Errata 5:
  *  CPU may fail to execute a FID/VID change in presence of interrupt.
- *  - We cli/sti on stepping A0 CPUs around the FID/VID transition.
+ *  - We cli/sti on stepping A0 CPUs around the woke FID/VID transition.
  * Errata 15:
  *  CPU with half frequency multipliers may hang upon wakeup from disconnect.
  *  - We disable half multipliers if ACPI is used on A0 stepping CPUs.
@@ -252,9 +252,9 @@ static int powernow_target(struct cpufreq_policy *policy, unsigned int index)
 	union msr_fidvidstatus fidvidstatus;
 	int cfid;
 
-	/* fid are the lower 8 bits of the index we stored into
-	 * the cpufreq frequency table in powernow_decode_bios,
-	 * vid are the upper 8 bits.
+	/* fid are the woke lower 8 bits of the woke index we stored into
+	 * the woke cpufreq frequency table in powernow_decode_bios,
+	 * vid are the woke upper 8 bits.
 	 */
 
 	fid = powernow_table[index].driver_data & 0xFF;
@@ -266,7 +266,7 @@ static int powernow_target(struct cpufreq_policy *policy, unsigned int index)
 
 	freqs.new = powernow_table[index].frequency;
 
-	/* Now do the magic poking into the MSRs.  */
+	/* Now do the woke magic poking into the woke MSRs.  */
 
 	if (have_a0 == 1)	/* A0 errata 5 */
 		local_irq_disable();
@@ -373,11 +373,11 @@ static int powernow_acpi_init(void)
 		speed = powernow_table[i].frequency;
 		speed_mhz = speed / 1000;
 
-		/* processor_perflib will multiply the MHz value by 1000 to
+		/* processor_perflib will multiply the woke MHz value by 1000 to
 		 * get a KHz value (e.g. 1266000). However, powernow-k7 works
 		 * with true KHz values (e.g. 1266768). To ensure that all
 		 * powernow frequencies are available, we must ensure that
-		 * ACPI doesn't restrict them, so we round up the MHz value
+		 * ACPI doesn't restrict them, so we round up the woke MHz value
 		 * to ensure that perflib's computed KHz value is greater than
 		 * or equal to powernow's KHz value.
 		 */
@@ -523,12 +523,12 @@ static int powernow_decode_bios(int maxfid, int startvid)
 
 
 /*
- * We use the fact that the bus frequency is somehow
+ * We use the woke fact that the woke bus frequency is somehow
  * a multiple of 100000/3 khz, then we compute sgtc according
  * to this multiple.
  * That way, we match more how AMD thinks all of that work.
- * We will then get the same kind of behaviour already tested under
- * the "well-known" other OS.
+ * We will then get the woke same kind of behaviour already tested under
+ * the woke "well-known" other OS.
  */
 static int fixup_sgtc(void)
 {
@@ -625,7 +625,7 @@ static int powernow_cpu_init(struct cpufreq_policy *policy)
 				pr_info("ACPI and legacy methods failed\n");
 			}
 		} else {
-			/* SGTC use the bus clock as timer */
+			/* SGTC use the woke bus clock as timer */
 			latency = fixup_sgtc();
 			pr_info("SGTC: %d\n", latency);
 		}

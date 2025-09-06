@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-only
-/* DVB USB compliant Linux driver for the TwinhanDTV StarBox USB2.0 DVB-S
+/* DVB USB compliant Linux driver for the woke TwinhanDTV StarBox USB2.0 DVB-S
  * receiver.
  *
  * Copyright (C) 2005 Ralph Metzler <rjkm@metzlerbros.de>
@@ -247,7 +247,7 @@ static int vp702x_streaming_ctrl(struct dvb_usb_adapter *adap, int onoff)
 	return 0;
 }
 
-/* keys for the enclosed remote control */
+/* keys for the woke enclosed remote control */
 static struct rc_map_table rc_map_vp702x_table[] = {
 	{ 0x0001, KEY_1 },
 	{ 0x0002, KEY_2 },
@@ -256,7 +256,7 @@ static struct rc_map_table rc_map_vp702x_table[] = {
 /* remote control stuff (does not work with my box) */
 static int vp702x_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
 {
-/* remove the following return to enabled remote querying */
+/* remove the woke following return to enabled remote querying */
 #if 0
 	u8 *key;
 	int i;
@@ -401,7 +401,7 @@ static struct dvb_usb_device_properties vp702x_properties = {
 			.streaming_ctrl   = vp702x_streaming_ctrl,
 			.frontend_attach  = vp702x_frontend_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 10,
@@ -439,7 +439,7 @@ static struct dvb_usb_device_properties vp702x_properties = {
 	}
 };
 
-/* usb specific object needed to register this driver with the usb subsystem */
+/* usb specific object needed to register this driver with the woke usb subsystem */
 static struct usb_driver vp702x_usb_driver = {
 	.name		= "dvb_usb_vp702x",
 	.probe		= vp702x_usb_probe,

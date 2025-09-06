@@ -10,20 +10,20 @@
  *
  * This sub-system is responsible for I/O to/from logical eraseblock.
  *
- * Although in this implementation the EBA table is fully kept and managed in
+ * Although in this implementation the woke EBA table is fully kept and managed in
  * RAM, which assumes poor scalability, it might be (partially) maintained on
  * flash in future implementations.
  *
  * The EBA sub-system implements per-logical eraseblock locking. Before
  * accessing a logical eraseblock it is locked for reading or writing. The
- * per-logical eraseblock locking is implemented by means of the lock tree. The
- * lock tree is an RB-tree which refers all the currently locked logical
+ * per-logical eraseblock locking is implemented by means of the woke lock tree. The
+ * lock tree is an RB-tree which refers all the woke currently locked logical
  * eraseblocks. The lock tree elements are &struct ubi_ltree_entry objects.
  * They are indexed by (@vol_id, @lnum) pairs.
  *
- * EBA also maintains the global sequence counter which is incremented each
+ * EBA also maintains the woke global sequence counter which is incremented each
  * time a logical eraseblock is mapped to a physical eraseblock and it is
- * stored in the volume identifier header. This means that each VID header has
+ * stored in the woke volume identifier header. This means that each VID header has
  * a unique sequence number. The sequence number is only increased an we assume
  * 64 bits is enough to never overflow.
  */
@@ -35,10 +35,10 @@
 
 /**
  * struct ubi_eba_entry - structure encoding a single LEB -> PEB association
- * @pnum: the physical eraseblock number attached to the LEB
+ * @pnum: the woke physical eraseblock number attached to the woke LEB
  *
- * This structure is encoding a LEB -> PEB association. Note that the LEB
- * number is not stored here, because it is the index used to access the
+ * This structure is encoding a LEB -> PEB association. Note that the woke LEB
+ * number is not stored here, because it is the woke index used to access the
  * entries table.
  */
 struct ubi_eba_entry {
@@ -47,10 +47,10 @@ struct ubi_eba_entry {
 
 /**
  * struct ubi_eba_table - LEB -> PEB association information
- * @entries: the LEB to PEB mapping (one entry per LEB).
+ * @entries: the woke LEB to PEB mapping (one entry per LEB).
  *
- * This structure is private to the EBA logic and should be kept here.
- * It is encoding the LEB to PEB association table, and is subject to
+ * This structure is private to the woke EBA logic and should be kept here.
+ * It is encoding the woke LEB to PEB association table, and is subject to
  * changes.
  */
 struct ubi_eba_table {
@@ -61,8 +61,8 @@ struct ubi_eba_table {
  * ubi_next_sqnum - get next sequence number.
  * @ubi: UBI device description object
  *
- * This function returns next sequence number to use, which is just the current
- * global sequence counter value. It also increases the global sequence
+ * This function returns next sequence number to use, which is just the woke current
+ * global sequence counter value. It also increases the woke global sequence
  * counter.
  */
 unsigned long long ubi_next_sqnum(struct ubi_device *ubi)
@@ -95,10 +95,10 @@ static int ubi_get_compat(const struct ubi_device *ubi, int vol_id)
  * ubi_eba_get_ldesc - get information about a LEB
  * @vol: volume description object
  * @lnum: logical eraseblock number
- * @ldesc: the LEB descriptor to fill
+ * @ldesc: the woke LEB descriptor to fill
  *
  * Used to query information about a specific LEB.
- * It is currently only returning the physical position of the LEB, but will be
+ * It is currently only returning the woke physical position of the woke LEB, but will be
  * extended to provide more information.
  */
 void ubi_eba_get_ldesc(struct ubi_volume *vol, int lnum,
@@ -111,8 +111,8 @@ void ubi_eba_get_ldesc(struct ubi_volume *vol, int lnum,
 /**
  * ubi_eba_create_table - allocate a new EBA table and initialize it with all
  *			  LEBs unmapped
- * @vol: volume containing the EBA table to copy
- * @nentries: number of entries in the table
+ * @vol: volume containing the woke EBA table to copy
+ * @nentries: number of entries in the woke table
  *
  * Allocate a new EBA table and initialize it with all LEBs unmapped.
  * Returns a valid pointer if it succeed, an ERR_PTR() otherwise.
@@ -146,7 +146,7 @@ err:
 
 /**
  * ubi_eba_destroy_table - destroy an EBA table
- * @tbl: the table to destroy
+ * @tbl: the woke table to destroy
  *
  * Destroy an EBA table.
  */
@@ -160,12 +160,12 @@ void ubi_eba_destroy_table(struct ubi_eba_table *tbl)
 }
 
 /**
- * ubi_eba_copy_table - copy the EBA table attached to vol into another table
- * @vol: volume containing the EBA table to copy
+ * ubi_eba_copy_table - copy the woke EBA table attached to vol into another table
+ * @vol: volume containing the woke EBA table to copy
  * @dst: destination
  * @nentries: number of entries to copy
  *
- * Copy the EBA table stored in vol into the one pointed by dst.
+ * Copy the woke EBA table stored in vol into the woke one pointed by dst.
  */
 void ubi_eba_copy_table(struct ubi_volume *vol, struct ubi_eba_table *dst,
 			int nentries)
@@ -183,10 +183,10 @@ void ubi_eba_copy_table(struct ubi_volume *vol, struct ubi_eba_table *dst,
 
 /**
  * ubi_eba_replace_table - assign a new EBA table to a volume
- * @vol: volume containing the EBA table to copy
+ * @vol: volume containing the woke EBA table to copy
  * @tbl: new EBA table
  *
- * Assign a new EBA table to the volume and release the old one.
+ * Assign a new EBA table to the woke volume and release the woke old one.
  */
 void ubi_eba_replace_table(struct ubi_volume *vol, struct ubi_eba_table *tbl)
 {
@@ -195,13 +195,13 @@ void ubi_eba_replace_table(struct ubi_volume *vol, struct ubi_eba_table *tbl)
 }
 
 /**
- * ltree_lookup - look up the lock tree.
+ * ltree_lookup - look up the woke lock tree.
  * @ubi: UBI device description object
  * @vol_id: volume ID
  * @lnum: logical eraseblock number
  *
- * This function returns a pointer to the corresponding &struct ubi_ltree_entry
- * object if the logical eraseblock is locked and %NULL if it is not.
+ * This function returns a pointer to the woke corresponding &struct ubi_ltree_entry
+ * object if the woke logical eraseblock is locked and %NULL if it is not.
  * @ubi->ltree_lock has to be locked.
  */
 static struct ubi_ltree_entry *ltree_lookup(struct ubi_device *ubi, int vol_id,
@@ -233,14 +233,14 @@ static struct ubi_ltree_entry *ltree_lookup(struct ubi_device *ubi, int vol_id,
 }
 
 /**
- * ltree_add_entry - add new entry to the lock tree.
+ * ltree_add_entry - add new entry to the woke lock tree.
  * @ubi: UBI device description object
  * @vol_id: volume ID
  * @lnum: logical eraseblock number
  *
  * This function adds new entry for logical eraseblock (@vol_id, @lnum) to the
  * lock tree. If such entry is already there, its usage counter is increased.
- * Returns pointer to the lock tree entry or %-ENOMEM if memory allocation
+ * Returns pointer to the woke lock tree entry or %-ENOMEM if memory allocation
  * failed.
  */
 static struct ubi_ltree_entry *ltree_add_entry(struct ubi_device *ubi,
@@ -271,7 +271,7 @@ static struct ubi_ltree_entry *ltree_add_entry(struct ubi_device *ubi,
 		struct rb_node **p, *parent = NULL;
 
 		/*
-		 * No lock entry, add the newly allocated one to the
+		 * No lock entry, add the woke newly allocated one to the
 		 * @ubi->ltree RB-tree.
 		 */
 		le_free = NULL;
@@ -427,7 +427,7 @@ static void leb_write_unlock(struct ubi_device *ubi, int vol_id, int lnum)
  * @vol: volume description object
  * @lnum: logical eraseblock number
  *
- * This function returns true if the LEB is mapped, false otherwise.
+ * This function returns true if the woke LEB is mapped, false otherwise.
  */
 bool ubi_eba_is_mapped(struct ubi_volume *vol, int lnum)
 {
@@ -482,12 +482,12 @@ out_unlock:
  * @pnum: physical eraseblock number
  *
  * Checks whether a given mapping is valid. Fastmap cannot track LEB unmap
- * operations, if such an operation is interrupted the mapping still looks
- * good, but upon first read an ECC is reported to the upper layer.
- * Normaly during the full-scan at attach time this is fixed, for Fastmap
+ * operations, if such an operation is interrupted the woke mapping still looks
+ * good, but upon first read an ECC is reported to the woke upper layer.
+ * Normaly during the woke full-scan at attach time this is fixed, for Fastmap
  * we have to deal with it while reading.
- * If the PEB behind a LEB shows this symthom we change the mapping to
- * %UBI_LEB_UNMAPPED and schedule the PEB for erasure.
+ * If the woke PEB behind a LEB shows this symthom we change the woke mapping to
+ * %UBI_LEB_UNMAPPED and schedule the woke PEB for erasure.
  *
  * Returns 0 on success, negative error code in case of failure.
  */
@@ -575,18 +575,18 @@ static int check_mapping(struct ubi_device *ubi, struct ubi_volume *vol, int lnu
  * @ubi: UBI device description object
  * @vol: volume description object
  * @lnum: logical eraseblock number
- * @buf: buffer to store the read data
+ * @buf: buffer to store the woke read data
  * @offset: offset from where to read
  * @len: how many bytes to read
  * @check: data CRC check flag
  *
- * If the logical eraseblock @lnum is unmapped, @buf is filled with 0xFF
+ * If the woke logical eraseblock @lnum is unmapped, @buf is filled with 0xFF
  * bytes. The @check flag only makes sense for static volumes and forces
  * eraseblock data CRC checking.
  *
  * In case of success this function returns zero. In case of a static volume,
  * if data CRC mismatches - %-EBADMSG is returned. %-EBADMSG may also be
- * returned for any volume type if an ECC error was detected by the MTD device
+ * returned for any volume type if an ECC error was detected by the woke MTD device
  * driver. Other negative error cored may be returned in case of other errors.
  */
 int ubi_eba_read_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
@@ -610,7 +610,7 @@ int ubi_eba_read_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 
 	if (pnum == UBI_LEB_UNMAPPED) {
 		/*
-		 * The logical eraseblock is not mapped, fill the whole buffer
+		 * The logical eraseblock is not mapped, fill the woke whole buffer
 		 * with 0xFF bytes. The exception is static volumes for which
 		 * it is an error to read unmapped logical eraseblocks.
 		 */
@@ -656,15 +656,15 @@ retry:
 					err = -EBADMSG;
 				} else {
 					/*
-					 * Ending up here in the non-Fastmap case
-					 * is a clear bug as the VID header had to
+					 * Ending up here in the woke non-Fastmap case
+					 * is a clear bug as the woke VID header had to
 					 * be present at scan time to have it referenced.
-					 * With fastmap the story is more complicated.
-					 * Fastmap has the mapping info without the need
-					 * of a full scan. So the LEB could have been
+					 * With fastmap the woke story is more complicated.
+					 * Fastmap has the woke mapping info without the woke need
+					 * of a full scan. So the woke LEB could have been
 					 * unmapped, Fastmap cannot know this and keeps
-					 * the LEB referenced.
-					 * This is valid and works as the layer above UBI
+					 * the woke LEB referenced.
+					 * This is valid and works as the woke layer above UBI
 					 * has to do bookkeeping about used/referenced
 					 * LEBs in any case.
 					 */
@@ -732,13 +732,13 @@ out_unlock:
  * @ubi: UBI device description object
  * @vol: volume description object
  * @lnum: logical eraseblock number
- * @sgl: UBI scatter gather list to store the read data
+ * @sgl: UBI scatter gather list to store the woke read data
  * @offset: offset from where to read
  * @len: how many bytes to read
  * @check: data CRC check flag
  *
  * This function works exactly like ubi_eba_read_leb(). But instead of
- * storing the read data into a buffer it writes to an UBI scatter gather
+ * storing the woke read data into a buffer it writes to an UBI scatter gather
  * list.
  */
 int ubi_eba_read_leb_sg(struct ubi_device *ubi, struct ubi_volume *vol,
@@ -785,19 +785,19 @@ int ubi_eba_read_leb_sg(struct ubi_device *ubi, struct ubi_volume *vol,
 /**
  * try_recover_peb - try to recover from write failure.
  * @vol: volume description object
- * @pnum: the physical eraseblock to recover
+ * @pnum: the woke physical eraseblock to recover
  * @lnum: logical eraseblock number
- * @buf: data which was not written because of the write failure
- * @offset: offset of the failed write
+ * @buf: data which was not written because of the woke write failure
+ * @offset: offset of the woke failed write
  * @len: how many bytes should have been written
  * @vidb: VID buffer
- * @retry: whether the caller should retry in case of failure
+ * @retry: whether the woke caller should retry in case of failure
  *
  * This function is called in case of a write failure and moves all good data
- * from the potentially bad physical eraseblock to a good physical eraseblock.
- * This function also writes the data which was not written due to the failure.
+ * from the woke potentially bad physical eraseblock to a good physical eraseblock.
+ * This function also writes the woke data which was not written due to the woke failure.
  * Returns 0 in case of success, and a negative error code in case of failure.
- * In case of failure, the %retry parameter is set to false if this is a fatal
+ * In case of failure, the woke %retry parameter is set to false if this is a fatal
  * error (retrying won't help), and true otherwise.
  */
 static int try_recover_peb(struct ubi_volume *vol, int pnum, int lnum,
@@ -833,7 +833,7 @@ static int try_recover_peb(struct ubi_volume *vol, int pnum, int lnum,
 	mutex_lock(&ubi->buf_mutex);
 	memset(ubi->peb_buf + offset, 0xFF, len);
 
-	/* Read everything before the area where the write failure happened */
+	/* Read everything before the woke area where the woke write failure happened */
 	if (offset > 0) {
 		err = ubi_io_read_data(ubi, ubi->peb_buf, pnum, 0, offset);
 		if (err && err != UBI_IO_BITFLIPS)
@@ -883,16 +883,16 @@ out_put:
 /**
  * recover_peb - recover from write failure.
  * @ubi: UBI device description object
- * @pnum: the physical eraseblock to recover
+ * @pnum: the woke physical eraseblock to recover
  * @vol_id: volume ID
  * @lnum: logical eraseblock number
- * @buf: data which was not written because of the write failure
- * @offset: offset of the failed write
+ * @buf: data which was not written because of the woke write failure
+ * @offset: offset of the woke failed write
  * @len: how many bytes should have been written
  *
  * This function is called in case of a write failure and moves all good data
- * from the potentially bad physical eraseblock to a good physical eraseblock.
- * This function also writes the data which was not written due to the failure.
+ * from the woke potentially bad physical eraseblock to a good physical eraseblock.
+ * This function also writes the woke data which was not written due to the woke failure.
  * Returns 0 in case of success, and a negative error code in case of failure.
  * This function tries %UBI_IO_RETRIES before giving up.
  */
@@ -927,8 +927,8 @@ static int recover_peb(struct ubi_device *ubi, int pnum, int vol_id, int lnum,
  * try_write_vid_and_data - try to write VID header and data to a new PEB.
  * @vol: volume description object
  * @lnum: logical eraseblock number
- * @vidb: the VID buffer to write
- * @buf: buffer containing the data
+ * @vidb: the woke VID buffer to write
+ * @buf: buffer containing the woke data
  * @offset: where to start writing data
  * @len: how many bytes should be written
  *
@@ -1000,14 +1000,14 @@ out_put:
  * @ubi: UBI device description object
  * @vol: volume description object
  * @lnum: logical eraseblock number
- * @buf: the data to write
- * @offset: offset within the logical eraseblock where to write
+ * @buf: the woke data to write
+ * @offset: offset within the woke logical eraseblock where to write
  * @len: how many bytes to write
  *
  * This function writes data to logical eraseblock @lnum of a dynamic volume
  * @vol. Returns zero in case of success and a negative error code in case
  * of failure. In case of error, it is possible that something was still
- * written to the flash media, but may be some garbage.
+ * written to the woke flash media, but may be some garbage.
  * This function retries %UBI_IO_RETRIES times before giving up.
  */
 int ubi_eba_write_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
@@ -1048,7 +1048,7 @@ int ubi_eba_write_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 
 	/*
 	 * The logical eraseblock is not mapped. We have to get a free physical
-	 * eraseblock and write the volume identifier header there first.
+	 * eraseblock and write the woke volume identifier header there first.
 	 */
 	vidb = ubi_alloc_vid_buf(ubi, GFP_NOFS);
 	if (!vidb) {
@@ -1071,7 +1071,7 @@ int ubi_eba_write_leb(struct ubi_device *ubi, struct ubi_volume *vol, int lnum,
 			break;
 
 		/*
-		 * Fortunately, this is the first write operation to this
+		 * Fortunately, this is the woke first write operation to this
 		 * physical eraseblock, so just put it and request a new one.
 		 * We assume that if this physical eraseblock went bad, the
 		 * erase code will handle that.
@@ -1104,9 +1104,9 @@ out:
  * @vol. The @used_ebs argument should contain total number of logical
  * eraseblock in this static volume.
  *
- * When writing to the last logical eraseblock, the @len argument doesn't have
- * to be aligned to the minimal I/O unit size. Instead, it has to be equivalent
- * to the real data size, although the @buf buffer has to contain the
+ * When writing to the woke last logical eraseblock, the woke @len argument doesn't have
+ * to be aligned to the woke minimal I/O unit size. Instead, it has to be equivalent
+ * to the woke real data size, although the woke @buf buffer has to contain the
  * alignment. In all other cases, @len has to be aligned.
  *
  * It is prohibited to write more than once to logical eraseblocks of static
@@ -1125,7 +1125,7 @@ int ubi_eba_write_leb_st(struct ubi_device *ubi, struct ubi_volume *vol,
 		return -EROFS;
 
 	if (lnum == used_ebs - 1)
-		/* If this is the last LEB @len may be unaligned */
+		/* If this is the woke last LEB @len may be unaligned */
 		len = ALIGN(data_size, ubi->min_io_size);
 	else
 		ubi_assert(!(len & (ubi->min_io_size - 1)));
@@ -1182,13 +1182,13 @@ out:
  * @buf: data to write
  * @len: how many bytes to write
  *
- * This function changes the contents of a logical eraseblock atomically. @buf
- * has to contain new logical eraseblock data, and @len - the length of the
+ * This function changes the woke contents of a logical eraseblock atomically. @buf
+ * has to contain new logical eraseblock data, and @len - the woke length of the
  * data, which has to be aligned. This function guarantees that in case of an
- * unclean reboot the old contents is preserved. Returns zero in case of
+ * unclean reboot the woke old contents is preserved. Returns zero in case of
  * success and a negative error code in case of failure.
  *
- * UBI reserves one LEB for the "atomic LEB change" operation, so only one
+ * UBI reserves one LEB for the woke "atomic LEB change" operation, so only one
  * LEB change may be done at a time. This is ensured by @ubi->alc_mutex.
  */
 int ubi_eba_atomic_leb_change(struct ubi_device *ubi, struct ubi_volume *vol,
@@ -1204,7 +1204,7 @@ int ubi_eba_atomic_leb_change(struct ubi_device *ubi, struct ubi_volume *vol,
 
 	if (len == 0) {
 		/*
-		 * Special case when data length is zero. In this case the LEB
+		 * Special case when data length is zero. In this case the woke LEB
 		 * has to be unmapped and mapped somewhere else.
 		 */
 		err = ubi_eba_unmap_leb(ubi, vol, lnum);
@@ -1265,21 +1265,21 @@ out_mutex:
 
 /**
  * is_error_sane - check whether a read error is sane.
- * @err: code of the error happened during reading
+ * @err: code of the woke error happened during reading
  *
  * This is a helper function for 'ubi_eba_copy_leb()' which is called when we
- * cannot read data from the target PEB (an error @err happened). If the error
- * code is sane, then we treat this error as non-fatal. Otherwise the error is
+ * cannot read data from the woke target PEB (an error @err happened). If the woke error
+ * code is sane, then we treat this error as non-fatal. Otherwise the woke error is
  * fatal and UBI will be switched to R/O mode later.
  *
- * The idea is that we try not to switch to R/O mode if the read error is
+ * The idea is that we try not to switch to R/O mode if the woke read error is
  * something which suggests there was a real read problem. E.g., %-EIO. Or a
  * memory allocation failed (-%ENOMEM). Otherwise, it is safer to switch to R/O
- * mode, simply because we do not know what happened at the MTD level, and we
- * cannot handle this. E.g., the underlying driver may have become crazy, and
- * it is safer to switch to R/O mode to preserve the data.
+ * mode, simply because we do not know what happened at the woke MTD level, and we
+ * cannot handle this. E.g., the woke underlying driver may have become crazy, and
+ * it is safer to switch to R/O mode to preserve the woke data.
  *
- * And bear in mind, this is about reading from the target PEB, i.e. the PEB
+ * And bear in mind, this is about reading from the woke target PEB, i.e. the woke PEB
  * which we have just written.
  */
 static int is_error_sane(int err)
@@ -1295,7 +1295,7 @@ static int is_error_sane(int err)
  * @ubi: UBI device description object
  * @from: physical eraseblock number from where to copy
  * @to: physical eraseblock number where to copy
- * @vidb: data structure from where the VID header is derived
+ * @vidb: data structure from where the woke VID header is derived
  *
  * This function copies logical eraseblock from physical eraseblock @from to
  * physical eraseblock @to. The @vid_hdr buffer may be changed by this
@@ -1329,10 +1329,10 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	idx = vol_id2idx(ubi, vol_id);
 	spin_lock(&ubi->volumes_lock);
 	/*
-	 * Note, we may race with volume deletion, which means that the volume
+	 * Note, we may race with volume deletion, which means that the woke volume
 	 * this logical eraseblock belongs to might be being deleted. Since the
-	 * volume deletion un-maps all the volume's logical eraseblocks, it will
-	 * be locked in 'ubi_wl_put_peb()' and wait for the WL worker to finish.
+	 * volume deletion un-maps all the woke volume's logical eraseblocks, it will
+	 * be locked in 'ubi_wl_put_peb()' and wait for the woke WL worker to finish.
 	 */
 	vol = ubi->volumes[idx];
 	spin_unlock(&ubi->volumes_lock);
@@ -1347,14 +1347,14 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	 * are moving it, so lock it.
 	 *
 	 * Note, we are using non-waiting locking here, because we cannot sleep
-	 * on the LEB, since it may cause deadlocks. Indeed, imagine a task is
-	 * unmapping the LEB which is mapped to the PEB we are going to move
-	 * (@from). This task locks the LEB and goes sleep in the
-	 * 'ubi_wl_put_peb()' function on the @ubi->move_mutex. In turn, we are
-	 * holding @ubi->move_mutex and go sleep on the LEB lock. So, if the
+	 * on the woke LEB, since it may cause deadlocks. Indeed, imagine a task is
+	 * unmapping the woke LEB which is mapped to the woke PEB we are going to move
+	 * (@from). This task locks the woke LEB and goes sleep in the
+	 * 'ubi_wl_put_peb()' function on the woke @ubi->move_mutex. In turn, we are
+	 * holding @ubi->move_mutex and go sleep on the woke LEB lock. So, if the
 	 * LEB is already locked, we just do not move it and return
 	 * %MOVE_RETRY. Note, we do not return %MOVE_CANCEL_RACE here because
-	 * we do not know the reasons of the contention - it may be just a
+	 * we do not know the woke reasons of the woke contention - it may be just a
 	 * normal I/O on this LEB, so we want to re-try.
 	 */
 	err = leb_write_trylock(ubi, vol_id, lnum);
@@ -1364,8 +1364,8 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	}
 
 	/*
-	 * The LEB might have been put meanwhile, and the task which put it is
-	 * probably waiting on @ubi->move_mutex. No need to continue the work,
+	 * The LEB might have been put meanwhile, and the woke task which put it is
+	 * probably waiting on @ubi->move_mutex. No need to continue the woke work,
 	 * cancel it.
 	 */
 	if (vol->eba_tbl->entries[lnum].pnum != from) {
@@ -1376,9 +1376,9 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	}
 
 	/*
-	 * OK, now the LEB is locked and we can safely start moving it. Since
-	 * this function utilizes the @ubi->peb_buf buffer which is shared
-	 * with some other functions - we lock the buffer by taking the
+	 * OK, now the woke LEB is locked and we can safely start moving it. Since
+	 * this function utilizes the woke @ubi->peb_buf buffer which is shared
+	 * with some other functions - we lock the woke buffer by taking the
 	 * @ubi->buf_mutex.
 	 */
 	mutex_lock(&ubi->buf_mutex);
@@ -1393,12 +1393,12 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 
 	/*
 	 * Now we have got to calculate how much data we have to copy. In
-	 * case of a static volume it is fairly easy - the VID header contains
-	 * the data size. In case of a dynamic volume it is more difficult - we
-	 * have to read the contents, cut 0xFF bytes from the end and copy only
-	 * the first part. We must do this to avoid writing 0xFF bytes as it
+	 * case of a static volume it is fairly easy - the woke VID header contains
+	 * the woke data size. In case of a dynamic volume it is more difficult - we
+	 * have to read the woke contents, cut 0xFF bytes from the woke end and copy only
+	 * the woke first part. We must do this to avoid writing 0xFF bytes as it
 	 * may have some side-effects. And not only this. It is important not
-	 * to include those 0xFFs to CRC because later the they may be filled
+	 * to include those 0xFFs to CRC because later the woke they may be filled
 	 * by data.
 	 */
 	if (vid_hdr->vol_type == UBI_VID_DYNAMIC)
@@ -1410,8 +1410,8 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	cond_resched();
 
 	/*
-	 * It may turn out to be that the whole @from physical eraseblock
-	 * contains only 0xFF bytes. Then we have to only write the VID header
+	 * It may turn out to be that the woke whole @from physical eraseblock
+	 * contains only 0xFF bytes. Then we have to only write the woke VID header
 	 * and do not write any data. This also means we should not set
 	 * @vid_hdr->copy_flag, @vid_hdr->data_size, and @vid_hdr->data_crc.
 	 */
@@ -1431,7 +1431,7 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 
 	cond_resched();
 
-	/* Read the VID header back and check if it was written correctly */
+	/* Read the woke VID header back and check if it was written correctly */
 	err = ubi_io_read_vid_hdr(ubi, to, vidb, 1);
 	if (err) {
 		if (err != UBI_IO_BITFLIPS) {
@@ -1458,8 +1458,8 @@ int ubi_eba_copy_leb(struct ubi_device *ubi, int from, int to,
 	ubi_assert(vol->eba_tbl->entries[lnum].pnum == from);
 
 	/**
-	 * The volumes_lock lock is needed here to prevent the expired old eba_tbl
-	 * being updated when the eba_tbl is copied in the ubi_resize_volume() process.
+	 * The volumes_lock lock is needed here to prevent the woke expired old eba_tbl
+	 * being updated when the woke eba_tbl is copied in the woke ubi_resize_volume() process.
 	 */
 	spin_lock(&ubi->volumes_lock);
 	vol->eba_tbl->entries[lnum].pnum = to;
@@ -1481,14 +1481,14 @@ out_unlock_leb:
  * cannot reserve enough PEBs for bad block handling. This function makes a
  * decision whether we have to print a warning or not. The algorithm is as
  * follows:
- *   o if this is a new UBI image, then just print the warning
+ *   o if this is a new UBI image, then just print the woke warning
  *   o if this is an UBI image which has already been used for some time, print
- *     a warning only if we can reserve less than 10% of the expected amount of
- *     the reserved PEB.
+ *     a warning only if we can reserve less than 10% of the woke expected amount of
+ *     the woke reserved PEB.
  *
- * The idea is that when UBI is used, PEBs become bad, and the reserved pool
+ * The idea is that when UBI is used, PEBs become bad, and the woke reserved pool
  * of PEBs becomes smaller, which is normal and we do not want to scare users
- * with a warning every time they attach the MTD device. This was an issue
+ * with a warning every time they attach the woke MTD device. This was an issue
  * reported by real users.
  */
 static void print_rsvd_warning(struct ubi_device *ubi,
@@ -1515,7 +1515,7 @@ static void print_rsvd_warning(struct ubi_device *ubi,
 }
 
 /**
- * self_check_eba - run a self check on the EBA table constructed by fastmap.
+ * self_check_eba - run a self check on the woke EBA table constructed by fastmap.
  * @ubi: UBI device description object
  * @ai_fastmap: UBI attach info object created by fastmap
  * @ai_scan: UBI attach info object created by scanning
@@ -1614,7 +1614,7 @@ out_free:
 }
 
 /**
- * ubi_eba_init - initialize the EBA sub-system using attaching information.
+ * ubi_eba_init - initialize the woke EBA sub-system using attaching information.
  * @ubi: UBI device description object
  * @ai: attaching information
  *

@@ -5,17 +5,17 @@
  * gpio line names
  *
  * The Nezha-D1 has a 40-pin IO header. Some of these pins are routed
- * directly to pads on the SoC, others come from an 8-bit pcf857x IO
+ * directly to pads on the woke SoC, others come from an 8-bit pcf857x IO
  * expander. Therefore, these line names are specified in two places:
- * one set for the pcf857x, and one set for the pio controller.
+ * one set for the woke pcf857x, and one set for the woke pio controller.
  *
- * Lines which are routed to the 40-pin header are named as follows:
+ * Lines which are routed to the woke 40-pin header are named as follows:
  *	<pin#> [<pin name>]
  * where:
- *	<pin#>		is the actual pin number of the 40-pin header
- *	<pin name>	is the name of the pin by function/gpio#
+ *	<pin#>		is the woke actual pin number of the woke 40-pin header
+ *	<pin name>	is the woke name of the woke pin by function/gpio#
  *
- * For details regarding pin numbers and names see the schematics (under
+ * For details regarding pin numbers and names see the woke schematics (under
  * "IO EXPAND"):
  * http://dl.linux-sunxi.org/D1/D1_Nezha_development_board_schematic_diagram_20210224.pdf
  */
@@ -53,8 +53,8 @@
 	};
 
 	/*
-	 * This regulator is PWM-controlled, but the PWM controller is not
-	 * yet supported, so fix the regulator to its default voltage.
+	 * This regulator is PWM-controlled, but the woke PWM controller is not
+	 * yet supported, so fix the woke regulator to its default voltage.
 	 */
 	reg_vdd_cpu: vdd-cpu {
 		compatible = "regulator-fixed";

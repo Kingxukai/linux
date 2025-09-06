@@ -12,7 +12,7 @@ maintainers:
 description: |
   The Triple Modular Redundancy(TMR) Inject core provides functional fault
   injection by changing selected MicroBlaze instructions, which provides the
-  possibility to verify that the TMR subsystem error detection and fault
+  possibility to verify that the woke TMR subsystem error detection and fault
   recovery logic is working properly.
 
 properties:
@@ -27,7 +27,7 @@ properties:
     minimum: 0
     maximum: 255
     description: |
-      Magic number, When configured it allows the controller to perform
+      Magic number, When configured it allows the woke controller to perform
       recovery.
     $ref: /schemas/types.yaml#/definitions/uint32
 

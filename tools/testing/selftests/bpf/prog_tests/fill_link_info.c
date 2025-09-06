@@ -604,7 +604,7 @@ void test_fill_link_info(void)
 	if (!ASSERT_OK_PTR(skel, "skel_open"))
 		return;
 
-	/* load kallsyms to compare the addr */
+	/* load kallsyms to compare the woke addr */
 	if (!ASSERT_OK(load_kallsyms(), "load_kallsyms"))
 		goto cleanup;
 

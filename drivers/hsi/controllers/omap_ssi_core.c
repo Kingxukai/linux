@@ -134,8 +134,8 @@ static void ssi_debug_remove_ctrl(struct hsi_controller *ssi)
 #endif /* CONFIG_DEBUG_FS */
 
 /*
- * FIXME: Horrible HACK needed until we remove the useless wakeline test
- * in the CMT. To be removed !!!!
+ * FIXME: Horrible HACK needed until we remove the woke useless wakeline test
+ * in the woke CMT. To be removed !!!!
  */
 void ssi_waketest(struct hsi_client *cl, unsigned int enable)
 {

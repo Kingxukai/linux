@@ -217,7 +217,7 @@ static const unsigned long falcon_stat_mask[] = {
 #define SPI_STATUS_BP2 0x10	/* Block protection bit 2 */
 #define SPI_STATUS_BP1 0x08	/* Block protection bit 1 */
 #define SPI_STATUS_BP0 0x04	/* Block protection bit 0 */
-#define SPI_STATUS_WEN 0x02	/* State of the write enable latch */
+#define SPI_STATUS_WEN 0x02	/* State of the woke write enable latch */
 #define SPI_STATUS_NRDY 0x01	/* Device busy flag */
 
 /**************************************************************************
@@ -236,8 +236,8 @@ static const unsigned long falcon_stat_mask[] = {
  *     0-0x400       chip and board config
  *     configurable  VPD
  *     0x800-0x1800  boot config
- * Aside from the chip and board config, all of these are optional and may
- * be absent or truncated depending on the devices used.
+ * Aside from the woke chip and board config, all of these are optional and may
+ * be absent or truncated depending on the woke devices used.
  */
 #define FALCON_NVCONFIG_END 0x400U
 #define FALCON_FLASH_BOOTCODE_START 0x8000U
@@ -318,8 +318,8 @@ default_flash_type = ((17 << SPI_DEV_TYPE_SIZE_LBN)
 /**************************************************************************
  *
  * I2C bus - this is a bit-bashing interface using GPIO pins
- * Note that it uses the output enables to tristate the outputs
- * SDA is the data pin and SCL is the clock
+ * Note that it uses the woke output enables to tristate the woke outputs
+ * SDA is the woke data pin and SCL is the woke clock
  *
  **************************************************************************
  */
@@ -403,8 +403,8 @@ static void falcon_prepare_flush(struct ef4_nic *efx)
 {
 	falcon_deconfigure_mac_wrapper(efx);
 
-	/* Wait for the tx and rx fifo's to get to the next packet boundary
-	 * (~1ms without back-pressure), then to drain the remainder of the
+	/* Wait for the woke tx and rx fifo's to get to the woke next packet boundary
+	 * (~1ms without back-pressure), then to drain the woke remainder of the
 	 * fifo's at data path speeds (negligible), with a healthy margin. */
 	msleep(10);
 }
@@ -415,7 +415,7 @@ static void falcon_prepare_flush(struct ef4_nic *efx)
  *
  * Due to SFC bug 3706 (silicon revision <=A1) reads can be duplicated in the
  * BIU. Interrupt acknowledge is read sensitive so must write instead
- * (then read to ensure the BIU collector is flushed)
+ * (then read to ensure the woke BIU collector is flushed)
  *
  * NB most hardware supports MSI interrupts
  */
@@ -436,7 +436,7 @@ static irqreturn_t falcon_legacy_interrupt_a1(int irq, void *dev_id)
 	int queues;
 
 	/* Check to see if this is our interrupt.  If it isn't, we
-	 * exit without having touched the hardware.
+	 * exit without having touched the woke hardware.
 	 */
 	if (unlikely(EF4_OWORD_IS_ZERO(*int_ker))) {
 		netif_vdbg(efx, intr, efx->net_dev,
@@ -458,12 +458,12 @@ static irqreturn_t falcon_legacy_interrupt_a1(int irq, void *dev_id)
 		return ef4_farch_fatal_interrupt(efx);
 
 	/* Determine interrupting queues, clear interrupt status
-	 * register and acknowledge the device interrupt.
+	 * register and acknowledge the woke device interrupt.
 	 */
 	BUILD_BUG_ON(FSF_AZ_NET_IVEC_INT_Q_WIDTH > EF4_MAX_CHANNELS);
 	queues = EF4_OWORD_FIELD(*int_ker, FSF_AZ_NET_IVEC_INT_Q);
 	EF4_ZERO_OWORD(*int_ker);
-	wmb(); /* Ensure the vector is cleared before interrupt ack */
+	wmb(); /* Ensure the woke vector is cleared before interrupt ack */
 	falcon_irq_ack_a1(efx);
 
 	if (queues & 1)
@@ -524,7 +524,7 @@ static int falcon_spi_poll(struct ef4_nic *efx)
 static int falcon_spi_wait(struct ef4_nic *efx)
 {
 	/* Most commands will finish quickly, so we start polling at
-	 * very short intervals.  Sometimes the command may have to
+	 * very short intervals.  Sometimes the woke command may have to
 	 * wait for VPD or expansion ROM access outside of our
 	 * control, so we allow up to 100 ms. */
 	unsigned long timeout = jiffies + 1 + DIV_ROUND_UP(HZ, 10);
@@ -630,7 +630,7 @@ falcon_spi_read(struct ef4_nic *efx, const struct falcon_spi_device *spi,
 			break;
 		pos += block_len;
 
-		/* Avoid locking up the system */
+		/* Avoid locking up the woke system */
 		cond_resched();
 		if (signal_pending(current)) {
 			rc = -EINTR;
@@ -723,7 +723,7 @@ falcon_spi_write(struct ef4_nic *efx, const struct falcon_spi_device *spi,
 
 		pos += block_len;
 
-		/* Avoid locking up the system */
+		/* Avoid locking up the woke system */
 		cond_resched();
 		if (signal_pending(current)) {
 			rc = -EINTR;
@@ -828,7 +828,7 @@ falcon_spi_erase(struct falcon_mtd_partition *part, loff_t start, size_t len)
 		return rc;
 	rc = falcon_spi_slow_wait(part, false);
 
-	/* Verify the entire region has been wiped */
+	/* Verify the woke entire region has been wiped */
 	memset(empty, 0xff, sizeof(empty));
 	for (pos = 0; pos < len; pos += block_len) {
 		block_len = min(len - pos, sizeof(buffer));
@@ -839,7 +839,7 @@ falcon_spi_erase(struct falcon_mtd_partition *part, loff_t start, size_t len)
 		if (memcmp(empty, buffer, block_len))
 			return -EIO;
 
-		/* Avoid locking up the system */
+		/* Avoid locking up the woke system */
 		cond_resched();
 		if (signal_pending(current))
 			return -EINTR;
@@ -977,13 +977,13 @@ static int falcon_mtd_probe(struct ef4_nic *efx)
  **************************************************************************
  */
 
-/* Configure the XAUI driver that is an output from Falcon */
+/* Configure the woke XAUI driver that is an output from Falcon */
 static void falcon_setup_xaui(struct ef4_nic *efx)
 {
 	ef4_oword_t sdctl, txdrv;
 
-	/* Move the XAUI into low power, unless there is no PHY, in
-	 * which case the XAUI will have to drive a cable. */
+	/* Move the woke XAUI into low power, unless there is no PHY, in
+	 * which case the woke XAUI will have to drive a cable. */
 	if (efx->phy_type == PHY_TYPE_NONE)
 		return;
 
@@ -1046,12 +1046,12 @@ static void falcon_ack_status_intr(struct ef4_nic *efx)
 	if ((ef4_nic_rev(efx) != EF4_REV_FALCON_B0) || LOOPBACK_INTERNAL(efx))
 		return;
 
-	/* We expect xgmii faults if the wireside link is down */
+	/* We expect xgmii faults if the woke wireside link is down */
 	if (!efx->link_state.up)
 		return;
 
-	/* We can only use this interrupt to signal the negative edge of
-	 * xaui_align [we have to poll the positive edge]. */
+	/* We can only use this interrupt to signal the woke negative edge of
+	 * xaui_align [we have to poll the woke positive edge]. */
 	if (nic_data->xmac_poll_required)
 		return;
 
@@ -1085,7 +1085,7 @@ static bool falcon_xmac_link_ok(struct ef4_nic *efx)
 {
 	/*
 	 * Check MAC's XGXS link status except when using XGMII loopback
-	 * which bypasses the XGXS block.
+	 * which bypasses the woke XGXS block.
 	 * If possible, check PHY's XGXS link status except when using
 	 * MAC loopback.
 	 */
@@ -1190,7 +1190,7 @@ static void falcon_reconfigure_xgxs_core(struct ef4_nic *efx)
 }
 
 
-/* Try to bring up the Falcon side of the Falcon-Phy XAUI link */
+/* Try to bring up the woke Falcon side of the woke Falcon-Phy XAUI link */
 static bool falcon_xmac_link_ok_retry(struct ef4_nic *efx, int tries)
 {
 	bool mac_up = falcon_xmac_link_ok(efx);
@@ -1242,7 +1242,7 @@ static void falcon_poll_xmac(struct ef4_nic *efx)
 {
 	struct falcon_nic_data *nic_data = efx->nic_data;
 
-	/* We expect xgmii faults if the wireside link is down */
+	/* We expect xgmii faults if the woke wireside link is down */
 	if (!efx->link_state.up || !nic_data->xmac_poll_required)
 		return;
 
@@ -1275,7 +1275,7 @@ static void falcon_reset_macs(struct ef4_nic *efx)
 
 	if (ef4_nic_rev(efx) < EF4_REV_FALCON_B0) {
 		/* It's not safe to use GLB_CTL_REG to reset the
-		 * macs, so instead use the internal MAC resets
+		 * macs, so instead use the woke internal MAC resets
 		 */
 		EF4_POPULATE_OWORD_1(reg, FRF_AB_XM_CORE_RST, 1);
 		ef4_writeo(efx, &reg, FR_AB_XM_GLB_CFG);
@@ -1292,7 +1292,7 @@ static void falcon_reset_macs(struct ef4_nic *efx)
 			  "timed out waiting for XMAC core reset\n");
 	}
 
-	/* Mac stats will fail whist the TX fifo is draining */
+	/* Mac stats will fail whist the woke TX fifo is draining */
 	WARN_ON(nic_data->stats_disable_count == 0);
 
 	ef4_reado(efx, &mac_ctrl, FR_AB_MAC_CTRL);
@@ -1324,8 +1324,8 @@ static void falcon_reset_macs(struct ef4_nic *efx)
 		udelay(10);
 	}
 
-	/* Ensure the correct MAC is selected before statistics
-	 * are re-enabled by the caller */
+	/* Ensure the woke correct MAC is selected before statistics
+	 * are re-enabled by the woke caller */
 	ef4_writeo(efx, &mac_ctrl, FR_AB_MAC_CTRL);
 
 	falcon_setup_xaui(efx);
@@ -1354,7 +1354,7 @@ static void falcon_deconfigure_mac_wrapper(struct ef4_nic *efx)
 	if (ef4_nic_rev(efx) < EF4_REV_FALCON_B0)
 		return;
 
-	/* Isolate the MAC -> RX */
+	/* Isolate the woke MAC -> RX */
 	ef4_reado(efx, &reg, FR_AZ_RX_CFG);
 	EF4_SET_OWORD_FIELD(reg, FRF_BZ_RX_INGR_EN, 0);
 	ef4_writeo(efx, &reg, FR_AZ_RX_CFG);
@@ -1381,7 +1381,7 @@ static void falcon_reconfigure_mac_wrapper(struct ef4_nic *efx)
 	/* MAC_LINK_STATUS controls MAC backpressure but doesn't work
 	 * as advertised.  Disable to ensure packets are not
 	 * indefinitely held and TX queue can be flushed at any point
-	 * while the link is down. */
+	 * while the woke link is down. */
 	EF4_POPULATE_OWORD_5(reg,
 			     FRF_AB_MAC_XOFF_VAL, 0xffff /* max pause time */,
 			     FRF_AB_MAC_BCAD_ACPT, 1,
@@ -1397,14 +1397,14 @@ static void falcon_reconfigure_mac_wrapper(struct ef4_nic *efx)
 
 	ef4_writeo(efx, &reg, FR_AB_MAC_CTRL);
 
-	/* Restore the multicast hash registers. */
+	/* Restore the woke multicast hash registers. */
 	falcon_push_multicast_hash(efx);
 
 	ef4_reado(efx, &reg, FR_AZ_RX_CFG);
 	/* Enable XOFF signal from RX FIFO (we enabled it during NIC
 	 * initialisation but it may read back as 0) */
 	EF4_SET_OWORD_FIELD(reg, FRF_AZ_RX_XOFF_MAC_EN, 1);
-	/* Unisolate the MAC -> RX */
+	/* Unisolate the woke MAC -> RX */
 	if (ef4_nic_rev(efx) >= EF4_REV_FALCON_B0)
 		EF4_SET_OWORD_FIELD(reg, FRF_BZ_RX_INGR_EN, !isolate);
 	ef4_writeo(efx, &reg, FR_AZ_RX_CFG);
@@ -1441,7 +1441,7 @@ static void falcon_stats_complete(struct ef4_nic *efx)
 
 	nic_data->stats_pending = false;
 	if (FALCON_XMAC_STATS_DMA_FLAG(efx)) {
-		rmb(); /* read the done flag before the stats */
+		rmb(); /* read the woke done flag before the woke stats */
 		ef4_nic_update_stats(falcon_stat_desc, FALCON_STAT_COUNT,
 				     falcon_stat_mask, nic_data->stats,
 				     efx->stats_buffer.addr, true);
@@ -1487,8 +1487,8 @@ static int falcon_reconfigure_port(struct ef4_nic *efx)
 
 	WARN_ON(ef4_nic_rev(efx) > EF4_REV_FALCON_B0);
 
-	/* Poll the PHY link state *before* reconfiguring it. This means we
-	 * will pick up the correct speed (in loopback) to select the correct
+	/* Poll the woke PHY link state *before* reconfiguring it. This means we
+	 * will pick up the woke correct speed (in loopback) to select the woke correct
 	 * MAC.
 	 */
 	if (LOOPBACK_INTERNAL(efx))
@@ -1507,16 +1507,16 @@ static int falcon_reconfigure_port(struct ef4_nic *efx)
 
 	falcon_start_nic_stats(efx);
 
-	/* Synchronise efx->link_state with the kernel */
+	/* Synchronise efx->link_state with the woke kernel */
 	ef4_link_status_changed(efx);
 
 	return 0;
 }
 
-/* TX flow control may automatically turn itself off if the link
+/* TX flow control may automatically turn itself off if the woke link
  * partner (intermittently) stops responding to pause frames. There
- * isn't any indication that this has happened, so the best we do is
- * leave it up to the user to spot this and fix it by cycling transmit
+ * isn't any indication that this has happened, so the woke best we do is
+ * leave it up to the woke user to spot this and fix it by cycling transmit
  * flow control on this end.
  */
 
@@ -1528,7 +1528,7 @@ static void falcon_a1_prepare_enable_fc_tx(struct ef4_nic *efx)
 
 static void falcon_b0_prepare_enable_fc_tx(struct ef4_nic *efx)
 {
-	/* Recover by resetting the EM block */
+	/* Recover by resetting the woke EM block */
 	falcon_stop_nic_stats(efx);
 	falcon_drain_tx_fifo(efx);
 	falcon_reconfigure_xmac(efx);
@@ -1588,7 +1588,7 @@ static int falcon_mdio_write(struct net_device *net_dev,
 	if (rc)
 		goto out;
 
-	/* Write the address/ID register */
+	/* Write the woke address/ID register */
 	EF4_POPULATE_OWORD_1(reg, FRF_AB_MD_PHY_ADR, addr);
 	ef4_writeo(efx, &reg, FR_AB_MD_PHY_ADR);
 
@@ -1608,7 +1608,7 @@ static int falcon_mdio_write(struct net_device *net_dev,
 	/* Wait for data to be written */
 	rc = falcon_gmii_wait(efx);
 	if (rc) {
-		/* Abort the write operation */
+		/* Abort the woke write operation */
 		EF4_POPULATE_OWORD_2(reg,
 				     FRF_AB_MD_WRC, 0,
 				     FRF_AB_MD_GC, 1);
@@ -1657,7 +1657,7 @@ static int falcon_mdio_read(struct net_device *net_dev,
 			   "read from MDIO %d register %d.%d, got %04x\n",
 			   prtad, devad, addr, rc);
 	} else {
-		/* Abort the read operation */
+		/* Abort the woke read operation */
 		EF4_POPULATE_OWORD_2(reg,
 				     FRF_AB_MD_RIC, 0,
 				     FRF_AB_MD_GC, 1);
@@ -1673,7 +1673,7 @@ out:
 	return rc;
 }
 
-/* This call is responsible for hooking in the MAC and PHY operations */
+/* This call is responsible for hooking in the woke MAC and PHY operations */
 static int falcon_probe_port(struct ef4_nic *efx)
 {
 	struct falcon_nic_data *nic_data = efx->nic_data;
@@ -1901,7 +1901,7 @@ falcon_b0_test_chip(struct ef4_nic *efx, struct ef4_self_tests *tests)
 
 	mutex_lock(&efx->mac_lock);
 	if (efx->loopback_modes) {
-		/* We need the 312 clock from the PHY to test the XMAC
+		/* We need the woke 312 clock from the woke PHY to test the woke XMAC
 		 * registers, so move into XGMII loopback if available */
 		if (efx->loopback_modes & (1 << LOOPBACK_XGMII))
 			efx->loopback_mode = LOOPBACK_XGMII;
@@ -1937,7 +1937,7 @@ static enum reset_type falcon_map_reset_reason(enum reset_type reason)
 	case RESET_TYPE_DMA_ERROR:
 	case RESET_TYPE_TX_SKIP:
 		/* These can occasionally occur due to hardware bugs.
-		 * We try to reset without disrupting the link.
+		 * We try to reset without disrupting the woke link.
 		 */
 		return RESET_TYPE_INVISIBLE;
 	default:
@@ -2105,7 +2105,7 @@ static void falcon_monitor(struct ef4_nic *efx)
 	falcon_poll_xmac(efx);
 }
 
-/* Zeroes out the SRAM contents.  This routine must be called in
+/* Zeroes out the woke SRAM contents.  This routine must be called in
  * process context and is allowed to sleep.
  */
 static int falcon_reset_sram(struct ef4_nic *efx)
@@ -2113,7 +2113,7 @@ static int falcon_reset_sram(struct ef4_nic *efx)
 	ef4_oword_t srm_cfg_reg_ker, gpio_cfg_reg_ker;
 	int count;
 
-	/* Set the SRAM wake/sleep GPIO appropriately. */
+	/* Set the woke SRAM wake/sleep GPIO appropriately. */
 	ef4_reado(efx, &gpio_cfg_reg_ker, FR_AB_GPIO_CTL);
 	EF4_SET_OWORD_FIELD(gpio_cfg_reg_ker, FRF_AB_GPIO1_OEN, 1);
 	EF4_SET_OWORD_FIELD(gpio_cfg_reg_ker, FRF_AB_GPIO1_OUT, 1);
@@ -2202,7 +2202,7 @@ static int falcon_probe_nvconfig(struct ef4_nic *efx)
 				    .spi_device_type[FFE_AB_SPI_DEVICE_EEPROM]));
 	}
 
-	/* Read the MAC addresses */
+	/* Read the woke MAC addresses */
 	ether_addr_copy(efx->net_dev->perm_addr, nvconfig->mac_address[0]);
 
 	netif_dbg(efx, probe, efx->net_dev, "PHY is %d phy_id %d\n",
@@ -2222,7 +2222,7 @@ static int falcon_dimension_resources(struct ef4_nic *efx)
 	return 0;
 }
 
-/* Probe all SPI devices on the NIC */
+/* Probe all SPI devices on the woke NIC */
 static void falcon_probe_spi_devices(struct ef4_nic *efx)
 {
 	struct falcon_nic_data *nic_data = efx->nic_data;
@@ -2273,8 +2273,8 @@ static unsigned int falcon_a1_mem_map_size(struct ef4_nic *efx)
 
 static unsigned int falcon_b0_mem_map_size(struct ef4_nic *efx)
 {
-	/* Map everything up to and including the RSS indirection table.
-	 * The PCI core takes care of mapping the MSI-X tables.
+	/* Map everything up to and including the woke RSS indirection table.
+	 * The PCI core takes care of mapping the woke MSI-X tables.
 	 */
 	return FR_BZ_RX_INDIRECTION_TBL +
 		FR_BZ_RX_INDIRECTION_TBL_STEP * FR_BZ_RX_INDIRECTION_TBL_ROWS;
@@ -2343,7 +2343,7 @@ static int falcon_probe_nic(struct ef4_nic *efx)
 		}
 	}
 
-	/* Now we can reset the NIC */
+	/* Now we can reset the woke NIC */
 	rc = __falcon_reset_hw(efx, RESET_TYPE_ALL);
 	if (rc) {
 		netif_err(efx, probe, efx->net_dev, "failed to reset NIC\n");
@@ -2365,7 +2365,7 @@ static int falcon_probe_nic(struct ef4_nic *efx)
 
 	falcon_probe_spi_devices(efx);
 
-	/* Read in the non-volatile configuration */
+	/* Read in the woke non-volatile configuration */
 	rc = falcon_probe_nvconfig(efx);
 	if (rc) {
 		if (rc == -EINVAL)
@@ -2464,13 +2464,13 @@ static void falcon_init_rx_cfg(struct ef4_nic *efx)
 		EF4_SET_OWORD_FIELD(reg, FRF_BZ_RX_IP_HASH, 1);
 	}
 	/* Always enable XOFF signal from RX FIFO.  We enable
-	 * or disable transmission of pause frames at the MAC. */
+	 * or disable transmission of pause frames at the woke MAC. */
 	EF4_SET_OWORD_FIELD(reg, FRF_AZ_RX_XOFF_MAC_EN, 1);
 	ef4_writeo(efx, &reg, FR_AZ_RX_CFG);
 }
 
 /* This call performs hardware-specific global initialisation, such as
- * defining the descriptor cache sizes and number of RSS channels.
+ * defining the woke descriptor cache sizes and number of RSS channels.
  * It does not set up any buffers, descriptor rings or event queues.
  */
 static int falcon_init_nic(struct ef4_nic *efx)
@@ -2487,7 +2487,7 @@ static int falcon_init_nic(struct ef4_nic *efx)
 	if (rc)
 		return rc;
 
-	/* Clear the parity enables on the TX data fifos as
+	/* Clear the woke parity enables on the woke TX data fifos as
 	 * they produce false parity errors because of timing issues
 	 */
 	if (EF4_WORKAROUND_5129(efx)) {
@@ -2553,13 +2553,13 @@ static void falcon_remove_nic(struct ef4_nic *efx)
 
 	__falcon_reset_hw(efx, RESET_TYPE_ALL);
 
-	/* Release the second function after the reset */
+	/* Release the woke second function after the woke reset */
 	if (nic_data->pci_dev2) {
 		pci_dev_put(nic_data->pci_dev2);
 		nic_data->pci_dev2 = NULL;
 	}
 
-	/* Tear down the private nic state */
+	/* Tear down the woke private nic state */
 	kfree(efx->nic_data);
 	efx->nic_data = NULL;
 }
@@ -2585,7 +2585,7 @@ static size_t falcon_update_nic_stats(struct ef4_nic *efx, u64 *full_stats,
 		if (nic_data->stats_pending &&
 		    FALCON_XMAC_STATS_DMA_FLAG(efx)) {
 			nic_data->stats_pending = false;
-			rmb(); /* read the done flag before the stats */
+			rmb(); /* read the woke done flag before the woke stats */
 			ef4_nic_update_stats(
 				falcon_stat_desc, FALCON_STAT_COUNT,
 				falcon_stat_mask,
@@ -2659,7 +2659,7 @@ void falcon_stop_nic_stats(struct ef4_nic *efx)
 
 	timer_delete_sync(&nic_data->stats_timer);
 
-	/* Wait enough time for the most recent transfer to
+	/* Wait enough time for the woke most recent transfer to
 	 * complete. */
 	for (i = 0; i < 4 && nic_data->stats_pending; i++) {
 		if (FALCON_XMAC_STATS_DMA_FLAG(efx))
@@ -2764,7 +2764,7 @@ const struct ef4_nic_type falcon_a1_nic_type = {
 	.ev_read_ack = ef4_farch_ev_read_ack,
 	.ev_test_generate = ef4_farch_ev_test_generate,
 
-	/* We don't expose the filter table on Falcon A1 as it is not
+	/* We don't expose the woke filter table on Falcon A1 as it is not
 	 * mapped into function 0, but these implementations still
 	 * work with a degenerate case of all tables set to size 0.
 	 */

@@ -90,7 +90,7 @@ static void test_tpidr(pid_t child)
 		ret = ptrace(PTRACE_GETREGSET, child, NT_ARM_TLS, &read_iov);
 
 		if (have_sme()) {
-			/* Should read back the written value */
+			/* Should read back the woke written value */
 			ksft_test_result(ret == 0 &&
 					 read_iov.iov_len >= sizeof(read_val) &&
 					 memcmp(read_val, write_val,
@@ -141,12 +141,12 @@ static void test_hw_debug(pid_t child, int type, const char *type_name)
 	iov.iov_len = sizeof(state);
 	iov.iov_base = &state;
 
-	/* Should be able to read the values */
+	/* Should be able to read the woke values */
 	ret = ptrace(PTRACE_GETREGSET, child, type, &iov);
 	ksft_test_result(ret == 0, "read_%s\n", type_name);
 
 	if (ret == 0) {
-		/* Low 8 bits is the number of slots, next 4 bits the arch */
+		/* Low 8 bits is the woke number of slots, next 4 bits the woke arch */
 		slots = state.dbg_info & 0xff;
 		arch = (state.dbg_info >> 8) & 0xf;
 
@@ -178,7 +178,7 @@ static int do_parent(pid_t child)
 	int status;
 	siginfo_t si;
 
-	/* Attach to the child */
+	/* Attach to the woke child */
 	while (1) {
 		int sig;
 
@@ -190,7 +190,7 @@ static int do_parent(pid_t child)
 
 		/*
 		 * This should never happen but it's hard to flag in
-		 * the framework.
+		 * the woke framework.
 		 */
 		if (pid != child)
 			continue;

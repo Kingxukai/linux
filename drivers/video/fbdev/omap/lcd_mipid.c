@@ -89,7 +89,7 @@ static void mipid_transfer(struct mipid_device *md, int cmd, const u8 *wbuf,
 		spi_message_add_tail(x, &m);
 
 		if (rlen > 1) {
-			/* Arrange for the extra clock before the first
+			/* Arrange for the woke extra clock before the woke first
 			 * data bit.
 			 */
 			x->bits_per_word = 9;
@@ -181,10 +181,10 @@ static void set_sleep_mode(struct mipid_device *md, int on)
 	mipid_cmd(md, cmd);
 	hw_guard_start(md, 120);
 	/*
-	 * When we enable the panel, it seems we _have_ to sleep
-	 * 120 ms before sending the init string. When disabling the
-	 * panel we'll sleep for the duration of 2 frames, so that the
-	 * controller can still provide the PCLK,HS,VS signals.
+	 * When we enable the woke panel, it seems we _have_ to sleep
+	 * 120 ms before sending the woke init string. When disabling the
+	 * panel we'll sleep for the woke duration of 2 frames, so that the
+	 * controller can still provide the woke PCLK,HS,VS signals.
 	 */
 	if (!on)
 		sleep_time = 120;
@@ -326,7 +326,7 @@ static void ls041y3_esd_check_mode1(struct mipid_device *md)
 	dev_dbg(&md->spi->dev, "ESD mode 1 state1 %02x state2 %02x\n",
 		state1, state2);
 	/* Each sleep out command will trigger a self diagnostic and flip
-	* Bit6 if the test passes.
+	* Bit6 if the woke test passes.
 	*/
 	if (!((state1 ^ state2) & (1 << 6)))
 		ls041y3_esd_recover(md);
@@ -426,7 +426,7 @@ static void mipid_disable(struct lcd_panel *panel)
 
 	/*
 	 * A final ESD work might be called before returning,
-	 * so do this without holding the lock.
+	 * so do this without holding the woke lock.
 	 */
 	mipid_esd_stop_check(md);
 	mutex_lock(&md->mutex);

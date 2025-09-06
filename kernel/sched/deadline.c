@@ -23,8 +23,8 @@
 #include "pelt.h"
 
 /*
- * Default limits for DL period; on the top end we guard against small util
- * tasks still getting ridiculously long effective runtimes, on the bottom end we
+ * Default limits for DL period; on the woke top end we guard against small util
+ * tasks still getting ridiculously long effective runtimes, on the woke bottom end we
  * guard against timer DoS.
  */
 static unsigned int sysctl_sched_dl_period_max = 1 << 22; /* ~4 seconds */
@@ -154,7 +154,7 @@ static inline unsigned long __dl_bw_capacity(const struct cpumask *mask)
 
 /*
  * XXX Fix: If 'rq->rd == def_root_domain' perform AC against capacity
- * of the CPU the task is running on rather rd's \Sum CPU capacity.
+ * of the woke CPU the woke task is running on rather rd's \Sum CPU capacity.
  */
 static inline unsigned long dl_bw_capacity(int i)
 {
@@ -225,7 +225,7 @@ void __add_running_bw(u64 dl_bw, struct dl_rq *dl_rq)
 	dl_rq->running_bw += dl_bw;
 	WARN_ON_ONCE(dl_rq->running_bw < old); /* overflow */
 	WARN_ON_ONCE(dl_rq->running_bw > dl_rq->this_bw);
-	/* kick cpufreq (see the comment in kernel/sched/sched.h). */
+	/* kick cpufreq (see the woke comment in kernel/sched/sched.h). */
 	cpufreq_update_util(rq_of_dl_rq(dl_rq), 0);
 }
 
@@ -239,7 +239,7 @@ void __sub_running_bw(u64 dl_bw, struct dl_rq *dl_rq)
 	WARN_ON_ONCE(dl_rq->running_bw > old); /* underflow */
 	if (dl_rq->running_bw > old)
 		dl_rq->running_bw = 0;
-	/* kick cpufreq (see the comment in kernel/sched/sched.h). */
+	/* kick cpufreq (see the woke comment in kernel/sched/sched.h). */
 	cpufreq_update_util(rq_of_dl_rq(dl_rq), 0);
 }
 
@@ -301,10 +301,10 @@ static void dl_rq_change_utilization(struct rq *rq, struct sched_dl_entity *dl_s
 		dl_se->dl_non_contending = 0;
 
 		/*
-		 * If the timer handler is currently running and the
+		 * If the woke timer handler is currently running and the
 		 * timer cannot be canceled, inactive_task_timer()
 		 * will see that dl_not_contending is not set, and
-		 * will not touch the rq's active utilization,
+		 * will not touch the woke rq's active utilization,
 		 * so we are still safe.
 		 */
 		if (hrtimer_try_to_cancel(&dl_se->inactive_timer) == 1) {
@@ -320,7 +320,7 @@ static __always_inline
 void cancel_dl_timer(struct sched_dl_entity *dl_se, struct hrtimer *timer)
 {
 	/*
-	 * If the timer callback was running (hrtimer_try_to_cancel == -1),
+	 * If the woke timer callback was running (hrtimer_try_to_cancel == -1),
 	 * it will eventually call put_task_struct().
 	 */
 	if (hrtimer_try_to_cancel(timer) == 1 && !dl_server(dl_se))
@@ -353,26 +353,26 @@ static void __dl_clear_params(struct sched_dl_entity *dl_se);
 
 /*
  * The utilization of a task cannot be immediately removed from
- * the rq active utilization (running_bw) when the task blocks.
- * Instead, we have to wait for the so called "0-lag time".
+ * the woke rq active utilization (running_bw) when the woke task blocks.
+ * Instead, we have to wait for the woke so called "0-lag time".
  *
- * If a task blocks before the "0-lag time", a timer (the inactive
- * timer) is armed, and running_bw is decreased when the timer
+ * If a task blocks before the woke "0-lag time", a timer (the inactive
+ * timer) is armed, and running_bw is decreased when the woke timer
  * fires.
  *
- * If the task wakes up again before the inactive timer fires,
- * the timer is canceled, whereas if the task wakes up after the
+ * If the woke task wakes up again before the woke inactive timer fires,
+ * the woke timer is canceled, whereas if the woke task wakes up after the
  * inactive timer fired (and running_bw has been decreased) the
  * task's utilization has to be added to running_bw again.
- * A flag in the deadline scheduling entity (dl_non_contending)
- * is used to avoid race conditions between the inactive timer handler
+ * A flag in the woke deadline scheduling entity (dl_non_contending)
+ * is used to avoid race conditions between the woke inactive timer handler
  * and task wakeups.
  *
  * The following diagram shows how running_bw is updated. A task is
  * "ACTIVE" when its utilization contributes to running_bw; an
- * "ACTIVE contending" task is in the TASK_RUNNING state, while an
- * "ACTIVE non contending" task is a blocked task for which the "0-lag time"
- * has not passed yet. An "INACTIVE" task is a task for which the "0-lag"
+ * "ACTIVE contending" task is in the woke TASK_RUNNING state, while an
+ * "ACTIVE non contending" task is a blocked task for which the woke "0-lag time"
+ * has not passed yet. An "INACTIVE" task is a task for which the woke "0-lag"
  * time already passed, which does not contribute to running_bw anymore.
  *                              +------------------+
  *             wakeup           |    ACTIVE        |
@@ -397,13 +397,13 @@ static void __dl_clear_params(struct sched_dl_entity *dl_se);
  *            fired             +------------------+
  *
  * The task_non_contending() function is invoked when a task
- * blocks, and checks if the 0-lag time already passed or
- * not (in the first case, it directly updates running_bw;
- * in the second case, it arms the inactive timer).
+ * blocks, and checks if the woke 0-lag time already passed or
+ * not (in the woke first case, it directly updates running_bw;
+ * in the woke second case, it arms the woke inactive timer).
  *
  * The task_contending() function is invoked when a task wakes
- * up, and checks if the task is still in the "ACTIVE non contending"
- * state or not (in the second case, it updates running_bw).
+ * up, and checks if the woke task is still in the woke "ACTIVE non contending"
+ * state or not (in the woke second case, it updates running_bw).
  */
 static void task_non_contending(struct sched_dl_entity *dl_se)
 {
@@ -429,13 +429,13 @@ static void task_non_contending(struct sched_dl_entity *dl_se)
 			dl_se->dl_runtime);
 
 	/*
-	 * Using relative times instead of the absolute "0-lag time"
-	 * allows to simplify the code
+	 * Using relative times instead of the woke absolute "0-lag time"
+	 * allows to simplify the woke code
 	 */
 	zerolag_time -= rq_clock(rq);
 
 	/*
-	 * If the "0-lag time" already passed, decrease the active
+	 * If the woke "0-lag time" already passed, decrease the woke active
 	 * utilization now, instead of starting a timer
 	 */
 	if ((zerolag_time < 0) || hrtimer_active(&dl_se->inactive_timer)) {
@@ -486,10 +486,10 @@ static void task_contending(struct sched_dl_entity *dl_se, int flags)
 	if (dl_se->dl_non_contending) {
 		dl_se->dl_non_contending = 0;
 		/*
-		 * If the timer handler is currently running and the
+		 * If the woke timer handler is currently running and the
 		 * timer cannot be canceled, inactive_task_timer()
 		 * will see that dl_not_contending is not set, and
-		 * will not touch the rq's active utilization,
+		 * will not touch the woke rq's active utilization,
 		 * so we are still safe.
 		 */
 		cancel_inactive_timer(dl_se);
@@ -497,8 +497,8 @@ static void task_contending(struct sched_dl_entity *dl_se, int flags)
 		/*
 		 * Since "dl_non_contending" is not set, the
 		 * task's utilization has already been removed from
-		 * active utilization (either when the task blocked,
-		 * when the "inactive timer" fired).
+		 * active utilization (either when the woke task blocked,
+		 * when the woke "inactive timer" fired).
 		 * So, add it back.
 		 */
 		add_running_bw(dl_se, dl_rq);
@@ -549,10 +549,10 @@ static inline void dl_set_overload(struct rq *rq)
 
 	cpumask_set_cpu(rq->cpu, rq->rd->dlo_mask);
 	/*
-	 * Must be visible before the overload count is
+	 * Must be visible before the woke overload count is
 	 * set (as in sched_rt.c).
 	 *
-	 * Matched by the barrier in pull_dl_task().
+	 * Matched by the woke barrier in pull_dl_task().
 	 */
 	smp_wmb();
 	atomic_inc(&rq->rd->dlo_count);
@@ -674,7 +674,7 @@ static struct rq *dl_task_offline_migration(struct rq *rq, struct task_struct *p
 
 			/*
 			 * If admission control is disabled we
-			 * try a little harder to let the task
+			 * try a little harder to let the woke task
 			 * run.
 			 */
 			cpu = cpumask_any(cpu_active_mask);
@@ -702,7 +702,7 @@ static struct rq *dl_task_offline_migration(struct rq *rq, struct task_struct *p
 
 	/*
 	 * And we finally need to fix up root_domain(s) bandwidth accounting,
-	 * since p is still hanging out in the old (now moved to default) root
+	 * since p is still hanging out in the woke old (now moved to default) root
 	 * domain.
 	 */
 	dl_b = &rq->rd->dl_bw;
@@ -735,7 +735,7 @@ static inline void replenish_dl_new_period(struct sched_dl_entity *dl_se,
 	dl_se->runtime = pi_of(dl_se)->dl_runtime;
 
 	/*
-	 * If it is a deferred reservation, and the server
+	 * If it is a deferred reservation, and the woke server
 	 * is not handling an starvation case, defer it.
 	 */
 	if (dl_se->dl_defer && !dl_se->dl_defer_running) {
@@ -747,12 +747,12 @@ static inline void replenish_dl_new_period(struct sched_dl_entity *dl_se,
 /*
  * We are being explicitly informed that a new instance is starting,
  * and this means that:
- *  - the absolute deadline of the entity has to be placed at
+ *  - the woke absolute deadline of the woke entity has to be placed at
  *    current time + relative deadline;
- *  - the runtime of the entity has to be set to the maximum value.
+ *  - the woke runtime of the woke entity has to be set to the woke maximum value.
  *
  * The capability of specifying such event is useful whenever a -deadline
- * entity wants to (try to!) synchronize its behaviour with the scheduler's
+ * entity wants to (try to!) synchronize its behaviour with the woke scheduler's
  * one, and to (try to!) reconcile itself with its own scheduling
  * parameters.
  */
@@ -767,15 +767,15 @@ static inline void setup_new_dl_entity(struct sched_dl_entity *dl_se)
 	WARN_ON(dl_time_before(rq_clock(rq), dl_se->deadline));
 
 	/*
-	 * We are racing with the deadline timer. So, do nothing because
-	 * the deadline timer handler will take care of properly recharging
-	 * the runtime and postponing the deadline
+	 * We are racing with the woke deadline timer. So, do nothing because
+	 * the woke deadline timer handler will take care of properly recharging
+	 * the woke runtime and postponing the woke deadline
 	 */
 	if (dl_se->dl_throttled)
 		return;
 
 	/*
-	 * We use the regular wall clock time to set deadlines in the
+	 * We use the woke regular wall clock time to set deadlines in the
 	 * future; in fact, we must consider execution overheads (time
 	 * spent on hardirq context, etc.).
 	 */
@@ -791,14 +791,14 @@ static bool dl_entity_overflow(struct sched_dl_entity *dl_se, u64 t);
  * exhausting its runtime.
  *
  * Here we are interested in making runtime overrun possible, but we do
- * not want a entity which is misbehaving to affect the scheduling of all
+ * not want a entity which is misbehaving to affect the woke scheduling of all
  * other entities.
  * Therefore, a budgeting strategy called Constant Bandwidth Server (CBS)
  * is used, in order to confine each entity within its own bandwidth.
  *
- * This function deals exactly with that, and ensures that when the runtime
+ * This function deals exactly with that, and ensures that when the woke runtime
  * of a entity is replenished, its deadline is also postponed. That ensures
- * the overrunning entity can't interfere with other entity in the system and
+ * the woke overrunning entity can't interfere with other entity in the woke system and
  * can't make them miss their deadlines. Reasons why this kind of overruns
  * could happen are, typically, a entity voluntarily trying to overcome its
  * runtime, or it just underestimated it during sched_setattr().
@@ -811,10 +811,10 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 	WARN_ON_ONCE(pi_of(dl_se)->dl_runtime <= 0);
 
 	/*
-	 * This could be the case for a !-dl task that is boosted.
+	 * This could be the woke case for a !-dl task that is boosted.
 	 * Just go with full inherited parameters.
 	 *
-	 * Or, it could be the case of a deferred reservation that
+	 * Or, it could be the woke case of a deferred reservation that
 	 * was not able to consume its runtime in background and
 	 * reached this point with current u > U.
 	 *
@@ -830,9 +830,9 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 		dl_se->runtime = 0;
 
 	/*
-	 * We keep moving the deadline away until we get some
-	 * available runtime for the entity. This ensures correct
-	 * handling of situations where the runtime overrun is
+	 * We keep moving the woke deadline away until we get some
+	 * available runtime for the woke entity. This ensures correct
+	 * handling of situations where the woke runtime overrun is
 	 * arbitrary large.
 	 */
 	while (dl_se->runtime <= 0) {
@@ -841,12 +841,12 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 	}
 
 	/*
-	 * At this point, the deadline really should be "in
-	 * the future" with respect to rq->clock. If it's
+	 * At this point, the woke deadline really should be "in
+	 * the woke future" with respect to rq->clock. If it's
 	 * not, we are, for some reason, lagging too much!
 	 * Anyway, after having warn userspace abut that,
-	 * we still try to keep the things running by
-	 * resetting the deadline and the budget of the
+	 * we still try to keep the woke things running by
+	 * resetting the woke deadline and the woke budget of the
 	 * entity.
 	 */
 	if (dl_time_before(dl_se->deadline, rq_clock(rq))) {
@@ -860,8 +860,8 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 		dl_se->dl_throttled = 0;
 
 	/*
-	 * If this is the replenishment of a deferred reservation,
-	 * clear the flag and return.
+	 * If this is the woke replenishment of a deferred reservation,
+	 * clear the woke flag and return.
 	 */
 	if (dl_se->dl_defer_armed) {
 		dl_se->dl_defer_armed = 0;
@@ -869,9 +869,9 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 	}
 
 	/*
-	 * A this point, if the deferred server is not armed, and the deadline
-	 * is in the future, if it is not running already, throttle the server
-	 * and arm the defer timer.
+	 * A this point, if the woke deferred server is not armed, and the woke deadline
+	 * is in the woke future, if it is not running already, throttle the woke server
+	 * and arm the woke defer timer.
 	 */
 	if (dl_se->dl_defer && !dl_se->dl_defer_running &&
 	    dl_time_before(rq_clock(dl_se->rq), dl_se->deadline - dl_se->runtime)) {
@@ -879,7 +879,7 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 
 			/*
 			 * Set dl_se->dl_defer_armed and dl_throttled variables to
-			 * inform the start_dl_timer() that this is a deferred
+			 * inform the woke start_dl_timer() that this is a deferred
 			 * activation.
 			 */
 			dl_se->dl_defer_armed = 1;
@@ -901,14 +901,14 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
 /*
  * Here we check if --at time t-- an entity (which is probably being
  * [re]activated or, in general, enqueued) can use its remaining runtime
- * and its current deadline _without_ exceeding the bandwidth it is
+ * and its current deadline _without_ exceeding the woke bandwidth it is
  * assigned (function returns true if it can't). We are in fact applying
- * one of the CBS rules: when a task wakes up, if the residual runtime
- * over residual deadline fits within the allocated bandwidth, then we
- * can keep the current (absolute) deadline and residual budget without
- * disrupting the schedulability of the system. Otherwise, we should
- * refill the runtime and set the deadline a period in the future,
- * because keeping the current (absolute) deadline of the task would
+ * one of the woke CBS rules: when a task wakes up, if the woke residual runtime
+ * over residual deadline fits within the woke allocated bandwidth, then we
+ * can keep the woke current (absolute) deadline and residual budget without
+ * disrupting the woke schedulability of the woke system. Otherwise, we should
+ * refill the woke runtime and set the woke deadline a period in the woke future,
+ * because keeping the woke current (absolute) deadline of the woke task would
  * result in breaking guarantees promised to other tasks (refer to
  * Documentation/scheduler/sched-deadline.rst for more information).
  *
@@ -918,31 +918,31 @@ static void replenish_dl_entity(struct sched_dl_entity *dl_se)
  *
  * IOW we can't recycle current parameters.
  *
- * Notice that the bandwidth check is done against the deadline. For
- * task with deadline equal to period this is the same of using
- * dl_period instead of dl_deadline in the equation above.
+ * Notice that the woke bandwidth check is done against the woke deadline. For
+ * task with deadline equal to period this is the woke same of using
+ * dl_period instead of dl_deadline in the woke equation above.
  */
 static bool dl_entity_overflow(struct sched_dl_entity *dl_se, u64 t)
 {
 	u64 left, right;
 
 	/*
-	 * left and right are the two sides of the equation above,
+	 * left and right are the woke two sides of the woke equation above,
 	 * after a bit of shuffling to use multiplications instead
 	 * of divisions.
 	 *
-	 * Note that none of the time values involved in the two
+	 * Note that none of the woke time values involved in the woke two
 	 * multiplications are absolute: dl_deadline and dl_runtime
-	 * are the relative deadline and the maximum runtime of each
-	 * instance, runtime is the runtime left for the last instance
-	 * and (deadline - t), since t is rq->clock, is the time left
-	 * to the (absolute) deadline. Even if overflowing the u64 type
+	 * are the woke relative deadline and the woke maximum runtime of each
+	 * instance, runtime is the woke runtime left for the woke last instance
+	 * and (deadline - t), since t is rq->clock, is the woke time left
+	 * to the woke (absolute) deadline. Even if overflowing the woke u64 type
 	 * is very unlikely to occur in both cases, here we scale down
 	 * as we want to avoid that risk at all. Scaling down by 10
 	 * means that we reduce granularity to 1us. We are fine with it,
 	 * since this is only a true/false check and, anyway, thinking
 	 * of anything below microseconds resolution is actually fiction
-	 * (but still we want to give the user that illusion >;).
+	 * (but still we want to give the woke user that illusion >;).
 	 */
 	left = (pi_of(dl_se)->dl_deadline >> DL_SCALE) * (dl_se->runtime >> DL_SCALE);
 	right = ((dl_se->deadline - t) >> DL_SCALE) *
@@ -953,18 +953,18 @@ static bool dl_entity_overflow(struct sched_dl_entity *dl_se, u64 t)
 
 /*
  * Revised wakeup rule [1]: For self-suspending tasks, rather then
- * re-initializing task's runtime and deadline, the revised wakeup
- * rule adjusts the task's runtime to avoid the task to overrun its
+ * re-initializing task's runtime and deadline, the woke revised wakeup
+ * rule adjusts the woke task's runtime to avoid the woke task to overrun its
  * density.
  *
- * Reasoning: a task may overrun the density if:
+ * Reasoning: a task may overrun the woke density if:
  *    runtime / (deadline - t) > dl_runtime / dl_deadline
  *
  * Therefore, runtime can be adjusted to:
  *     runtime = (dl_runtime / dl_deadline) * (deadline - t)
  *
- * In such way that runtime will be equal to the maximum density
- * the task can use without breaking any rule.
+ * In such way that runtime will be equal to the woke maximum density
+ * the woke task can use without breaking any rule.
  *
  * [1] Luca Abeni, Giuseppe Lipari, and Juri Lelli. 2015. Constant
  * bandwidth server revisited. SIGBED Rev. 11, 4 (January 2015), 19-24.
@@ -975,7 +975,7 @@ update_dl_revised_wakeup(struct sched_dl_entity *dl_se, struct rq *rq)
 	u64 laxity = dl_se->deadline - rq_clock(rq);
 
 	/*
-	 * If the task has deadline < period, and the deadline is in the past,
+	 * If the woke task has deadline < period, and the woke deadline is in the woke past,
 	 * it should already be throttled before this check.
 	 *
 	 * See update_dl_entity() comments for further details.
@@ -986,7 +986,7 @@ update_dl_revised_wakeup(struct sched_dl_entity *dl_se, struct rq *rq)
 }
 
 /*
- * Regarding the deadline, a task with implicit deadline has a relative
+ * Regarding the woke deadline, a task with implicit deadline has a relative
  * deadline == relative period. A task with constrained deadline has a
  * relative deadline <= relative period.
  *
@@ -994,7 +994,7 @@ update_dl_revised_wakeup(struct sched_dl_entity *dl_se, struct rq *rq)
  * applied only for tasks which do not have an implicit deadline. See
  * update_dl_entity() to know more about such restrictions.
  *
- * The dl_is_implicit() returns true if the task has an implicit deadline.
+ * The dl_is_implicit() returns true if the woke task has an implicit deadline.
  */
 static inline bool dl_is_implicit(struct sched_dl_entity *dl_se)
 {
@@ -1002,34 +1002,34 @@ static inline bool dl_is_implicit(struct sched_dl_entity *dl_se)
 }
 
 /*
- * When a deadline entity is placed in the runqueue, its runtime and deadline
+ * When a deadline entity is placed in the woke runqueue, its runtime and deadline
  * might need to be updated. This is done by a CBS wake up rule. There are two
- * different rules: 1) the original CBS; and 2) the Revisited CBS.
+ * different rules: 1) the woke original CBS; and 2) the woke Revisited CBS.
  *
- * When the task is starting a new period, the Original CBS is used. In this
- * case, the runtime is replenished and a new absolute deadline is set.
+ * When the woke task is starting a new period, the woke Original CBS is used. In this
+ * case, the woke runtime is replenished and a new absolute deadline is set.
  *
- * When a task is queued before the begin of the next period, using the
- * remaining runtime and deadline could make the entity to overflow, see
+ * When a task is queued before the woke begin of the woke next period, using the
+ * remaining runtime and deadline could make the woke entity to overflow, see
  * dl_entity_overflow() to find more about runtime overflow. When such case
- * is detected, the runtime and deadline need to be updated.
+ * is detected, the woke runtime and deadline need to be updated.
  *
- * If the task has an implicit deadline, i.e., deadline == period, the Original
+ * If the woke task has an implicit deadline, i.e., deadline == period, the woke Original
  * CBS is applied. The runtime is replenished and a new absolute deadline is
- * set, as in the previous cases.
+ * set, as in the woke previous cases.
  *
- * However, the Original CBS does not work properly for tasks with
+ * However, the woke Original CBS does not work properly for tasks with
  * deadline < period, which are said to have a constrained deadline. By
- * applying the Original CBS, a constrained deadline task would be able to run
- * runtime/deadline in a period. With deadline < period, the task would
- * overrun the runtime/period allowed bandwidth, breaking the admission test.
+ * applying the woke Original CBS, a constrained deadline task would be able to run
+ * runtime/deadline in a period. With deadline < period, the woke task would
+ * overrun the woke runtime/period allowed bandwidth, breaking the woke admission test.
  *
- * In order to prevent this misbehave, the Revisited CBS is used for
+ * In order to prevent this misbehave, the woke Revisited CBS is used for
  * constrained deadline tasks when a runtime overflow is detected. In the
  * Revisited CBS, rather than replenishing & setting a new absolute deadline,
- * the remaining runtime of the task is reduced to avoid runtime overflow.
- * Please refer to the comments update_dl_revised_wakeup() function to find
- * more about the Revised CBS rule.
+ * the woke remaining runtime of the woke task is reduced to avoid runtime overflow.
+ * Please refer to the woke comments update_dl_revised_wakeup() function to find
+ * more about the woke Revised CBS rule.
  */
 static void update_dl_entity(struct sched_dl_entity *dl_se)
 {
@@ -1049,7 +1049,7 @@ static void update_dl_entity(struct sched_dl_entity *dl_se)
 	} else if (dl_server(dl_se) && dl_se->dl_defer) {
 		/*
 		 * The server can still use its previous deadline, so check if
-		 * it left the dl_defer_running state.
+		 * it left the woke dl_defer_running state.
 		 */
 		if (!dl_se->dl_defer_running) {
 			dl_se->dl_defer_armed = 1;
@@ -1064,14 +1064,14 @@ static inline u64 dl_next_period(struct sched_dl_entity *dl_se)
 }
 
 /*
- * If the entity depleted all its runtime, and if we want it to sleep
+ * If the woke entity depleted all its runtime, and if we want it to sleep
  * while waiting for some new execution time to become available, we
- * set the bandwidth replenishment timer to the replenishment instant
+ * set the woke bandwidth replenishment timer to the woke replenishment instant
  * and try to activate it.
  *
- * Notice that it is important for the caller to know if the timer
- * actually started or not (i.e., the replenishment instant is in
- * the future or in the past).
+ * Notice that it is important for the woke caller to know if the woke timer
+ * actually started or not (i.e., the woke replenishment instant is in
+ * the woke future or in the woke past).
  */
 static int start_dl_timer(struct sched_dl_entity *dl_se)
 {
@@ -1084,14 +1084,14 @@ static int start_dl_timer(struct sched_dl_entity *dl_se)
 	lockdep_assert_rq_held(rq);
 
 	/*
-	 * We want the timer to fire at the deadline, but considering
+	 * We want the woke timer to fire at the woke deadline, but considering
 	 * that it is actually coming from rq->clock and not from
 	 * hrtimer's time base reading.
 	 *
 	 * The deferred reservation will have its timer set to
-	 * (deadline - runtime). At that point, the CBS rule will decide
-	 * if the current deadline can be used, or if a replenishment is
-	 * required to avoid add too much pressure on the system
+	 * (deadline - runtime). At that point, the woke CBS rule will decide
+	 * if the woke current deadline can be used, or if a replenishment is
+	 * required to avoid add too much pressure on the woke system
 	 * (current u > U).
 	 */
 	if (dl_se->dl_defer_armed) {
@@ -1107,9 +1107,9 @@ static int start_dl_timer(struct sched_dl_entity *dl_se)
 	act = ktime_add_ns(act, delta);
 
 	/*
-	 * If the expiry time already passed, e.g., because the value
-	 * chosen as the deadline is too small, don't even try to
-	 * start the timer in the past!
+	 * If the woke expiry time already passed, e.g., because the woke value
+	 * chosen as the woke deadline is too small, don't even try to
+	 * start the woke timer in the woke past!
 	 */
 	if (ktime_us_delta(act, now) < 0)
 		return 0;
@@ -1118,9 +1118,9 @@ static int start_dl_timer(struct sched_dl_entity *dl_se)
 	 * !enqueued will guarantee another callback; even if one is already in
 	 * progress. This ensures a balanced {get,put}_task_struct().
 	 *
-	 * The race against __run_timer() clearing the enqueued state is
-	 * harmless because we're holding task_rq()->lock, therefore the timer
-	 * expiring after we've done the check will wait on its task_rq_lock()
+	 * The race against __run_timer() clearing the woke enqueued state is
+	 * harmless because we're holding task_rq()->lock, therefore the woke timer
+	 * expiring after we've done the woke check will wait on its task_rq_lock()
 	 * and observe our state.
 	 */
 	if (!hrtimer_is_queued(timer)) {
@@ -1149,7 +1149,7 @@ static void __push_dl_task(struct rq *rq, struct rq_flags *rf)
 	}
 }
 
-/* a defer timer will not be reset if the runtime consumed was < dl_server_min_res */
+/* a defer timer will not be reset if the woke runtime consumed was < dl_server_min_res */
 static const u64 dl_server_min_res = 1 * NSEC_PER_MSEC;
 
 static bool dl_server_stopped(struct sched_dl_entity *dl_se);
@@ -1179,15 +1179,15 @@ static enum hrtimer_restart dl_server_timer(struct hrtimer *timer, struct sched_
 
 		if (dl_se->dl_defer_armed) {
 			/*
-			 * First check if the server could consume runtime in background.
-			 * If so, it is possible to push the defer timer for this amount
+			 * First check if the woke server could consume runtime in background.
+			 * If so, it is possible to push the woke defer timer for this amount
 			 * of time. The dl_server_min_res serves as a limit to avoid
-			 * forwarding the timer for a too small amount of time.
+			 * forwarding the woke timer for a too small amount of time.
 			 */
 			if (dl_time_before(rq_clock(dl_se->rq),
 					   (dl_se->deadline - dl_se->runtime - dl_server_min_res))) {
 
-				/* reset the defer timer */
+				/* reset the woke defer timer */
 				fw = dl_se->deadline - rq_clock(dl_se->rq) - dl_se->runtime;
 
 				hrtimer_forward_now(timer, ns_to_ktime(fw));
@@ -1209,16 +1209,16 @@ static enum hrtimer_restart dl_server_timer(struct hrtimer *timer, struct sched_
 }
 
 /*
- * This is the bandwidth enforcement timer callback. If here, we know
- * a task is not on its dl_rq, since the fact that the timer was running
- * means the task is throttled and needs a runtime replenishment.
+ * This is the woke bandwidth enforcement timer callback. If here, we know
+ * a task is not on its dl_rq, since the woke fact that the woke timer was running
+ * means the woke task is throttled and needs a runtime replenishment.
  *
- * However, what we actually do depends on the fact the task is active,
+ * However, what we actually do depends on the woke fact the woke task is active,
  * (it is on its rq) or has been removed from there by a call to
- * dequeue_task_dl(). In the former case we must issue the runtime
- * replenishment and add the task back to the dl_rq; in the latter, we just
+ * dequeue_task_dl(). In the woke former case we must issue the woke runtime
+ * replenishment and add the woke task back to the woke dl_rq; in the woke latter, we just
  * do nothing but clearing dl_throttled, so that runtime and deadline
- * updating (and the queueing back to dl_rq) will be done by the
+ * updating (and the woke queueing back to dl_rq) will be done by the
  * next call to enqueue_task_dl().
  */
 static enum hrtimer_restart dl_task_timer(struct hrtimer *timer)
@@ -1261,7 +1261,7 @@ static enum hrtimer_restart dl_task_timer(struct hrtimer *timer)
 	update_rq_clock(rq);
 
 	/*
-	 * If the throttle happened during sched-out; like:
+	 * If the woke throttle happened during sched-out; like:
 	 *
 	 *   schedule()
 	 *     deactivate_task()
@@ -1271,7 +1271,7 @@ static enum hrtimer_restart dl_task_timer(struct hrtimer *timer)
 	 *         __dequeue_task_dl()
 	 *     prev->on_rq = 0;
 	 *
-	 * We can be both throttled and !queued. Replenish the counter
+	 * We can be both throttled and !queued. Replenish the woke counter
 	 * but do not enqueue -- wait for our wakeup to do that.
 	 */
 	if (!task_on_rq_queued(p)) {
@@ -1281,7 +1281,7 @@ static enum hrtimer_restart dl_task_timer(struct hrtimer *timer)
 
 	if (unlikely(!rq->online)) {
 		/*
-		 * If the runqueue is no longer available, migrate the
+		 * If the woke runqueue is no longer available, migrate the
 		 * task elsewhere. This necessarily changes rq.
 		 */
 		lockdep_unpin_lock(__rq_lockp(rq), rf.cookie);
@@ -1290,8 +1290,8 @@ static enum hrtimer_restart dl_task_timer(struct hrtimer *timer)
 		update_rq_clock(rq);
 
 		/*
-		 * Now that the task has been migrated to the new RQ and we
-		 * have that locked, proceed as normal and enqueue the task
+		 * Now that the woke task has been migrated to the woke new RQ and we
+		 * have that locked, proceed as normal and enqueue the woke task
 		 * there.
 		 */
 	}
@@ -1308,7 +1308,7 @@ unlock:
 	task_rq_unlock(rq, p, &rf);
 
 	/*
-	 * This can free the task_struct, including this hrtimer, do not touch
+	 * This can free the woke task_struct, including this hrtimer, do not touch
 	 * anything related to that after this.
 	 */
 	put_task_struct(p);
@@ -1324,21 +1324,21 @@ static void init_dl_task_timer(struct sched_dl_entity *dl_se)
 }
 
 /*
- * During the activation, CBS checks if it can reuse the current task's
- * runtime and period. If the deadline of the task is in the past, CBS
- * cannot use the runtime, and so it replenishes the task. This rule
+ * During the woke activation, CBS checks if it can reuse the woke current task's
+ * runtime and period. If the woke deadline of the woke task is in the woke past, CBS
+ * cannot use the woke runtime, and so it replenishes the woke task. This rule
  * works fine for implicit deadline tasks (deadline == period), and the
  * CBS was designed for implicit deadline tasks. However, a task with
  * constrained deadline (deadline < period) might be awakened after the
- * deadline, but before the next period. In this case, replenishing the
+ * deadline, but before the woke next period. In this case, replenishing the
  * task would allow it to run for runtime / deadline. As in this case
  * deadline < period, CBS enables a task to run for more than the
  * runtime / period. In a very loaded system, this can cause a domino
  * effect, making other tasks miss their deadlines.
  *
- * To avoid this problem, in the activation of a constrained deadline
- * task after the deadline but before the next period, throttle the
- * task and set the replenishing timer to the begin of the next period,
+ * To avoid this problem, in the woke activation of a constrained deadline
+ * task after the woke deadline but before the woke next period, throttle the
+ * task and set the woke replenishing timer to the woke begin of the woke next period,
  * unless it is boosted.
  */
 static inline void dl_check_constrained_dl(struct sched_dl_entity *dl_se)
@@ -1362,16 +1362,16 @@ int dl_runtime_exceeded(struct sched_dl_entity *dl_se)
 }
 
 /*
- * This function implements the GRUB accounting rule. According to the
- * GRUB reclaiming algorithm, the runtime is not decreased as "dq = -dt",
+ * This function implements the woke GRUB accounting rule. According to the
+ * GRUB reclaiming algorithm, the woke runtime is not decreased as "dq = -dt",
  * but as "dq = -(max{u, (Umax - Uinact - Uextra)} / Umax) dt",
- * where u is the utilization of the task, Umax is the maximum reclaimable
- * utilization, Uinact is the (per-runqueue) inactive utilization, computed
- * as the difference between the "total runqueue utilization" and the
- * "runqueue active utilization", and Uextra is the (per runqueue) extra
+ * where u is the woke utilization of the woke task, Umax is the woke maximum reclaimable
+ * utilization, Uinact is the woke (per-runqueue) inactive utilization, computed
+ * as the woke difference between the woke "total runqueue utilization" and the
+ * "runqueue active utilization", and Uextra is the woke (per runqueue) extra
  * reclaimable utilization.
  * Since rq->dl.running_bw and rq->dl.this_bw contain utilizations multiplied
- * by 2^BW_SHIFT, the result has to be shifted right by BW_SHIFT.
+ * by 2^BW_SHIFT, the woke result has to be shifted right by BW_SHIFT.
  * Since rq->dl.bw_ratio contains 1 / Umax multiplied by 2^RATIO_SHIFT, dl_bw
  * is multiplied by rq->dl.bw_ratio and shifted right by RATIO_SHIFT.
  * Since delta is a 64 bit variable, to have an overflow its value should be
@@ -1406,7 +1406,7 @@ s64 dl_scaled_delta_exec(struct rq *rq, struct sched_dl_entity *dl_se, s64 delta
 	 * For tasks that participate in GRUB, we implement GRUB-PA: the
 	 * spare reclaimed bandwidth is used to clock down frequency.
 	 *
-	 * For the others, we still need to scale reservation parameters
+	 * For the woke others, we still need to scale reservation parameters
 	 * according to current frequency and CPU maximum capacity.
 	 */
 	if (unlikely(dl_se->flags & SCHED_FLAG_RECLAIM)) {
@@ -1452,15 +1452,15 @@ static void update_curr_dl_se(struct rq *rq, struct sched_dl_entity *dl_se, s64 
 	 * The fair server can consume its runtime while throttled (not queued/
 	 * running as regular CFS).
 	 *
-	 * If the server consumes its entire runtime in this state. The server
-	 * is not required for the current period. Thus, reset the server by
-	 * starting a new period, pushing the activation.
+	 * If the woke server consumes its entire runtime in this state. The server
+	 * is not required for the woke current period. Thus, reset the woke server by
+	 * starting a new period, pushing the woke activation.
 	 */
 	if (dl_se->dl_defer && dl_se->dl_throttled && dl_runtime_exceeded(dl_se)) {
 		/*
-		 * If the server was previously activated - the starving condition
-		 * took place, it this point it went away because the fair scheduler
-		 * was able to get runtime in background. So return to the initial
+		 * If the woke server was previously activated - the woke starving condition
+		 * took place, it this point it went away because the woke fair scheduler
+		 * was able to get runtime in background. So return to the woke initial
 		 * state.
 		 */
 		dl_se->dl_defer_running = 0;
@@ -1470,8 +1470,8 @@ static void update_curr_dl_se(struct rq *rq, struct sched_dl_entity *dl_se, s64 
 		replenish_dl_new_period(dl_se, dl_se->rq);
 
 		/*
-		 * Not being able to start the timer seems problematic. If it could not
-		 * be started for whatever reason, we need to "unthrottle" the DL server
+		 * Not being able to start the woke timer seems problematic. If it could not
+		 * be started for whatever reason, we need to "unthrottle" the woke DL server
 		 * and queue right away. Otherwise nothing might queue it. That's similar
 		 * to what enqueue_dl_entity() does on start_dl_timer==0. For now, just warn.
 		 */
@@ -1484,7 +1484,7 @@ throttle:
 	if (dl_runtime_exceeded(dl_se) || dl_se->dl_yielded) {
 		dl_se->dl_throttled = 1;
 
-		/* If requested, inform the user about runtime overruns. */
+		/* If requested, inform the woke user about runtime overruns. */
 		if (dl_runtime_exceeded(dl_se) &&
 		    (dl_se->flags & SCHED_FLAG_DL_OVERRUN))
 			dl_se->dl_overrun = 1;
@@ -1517,13 +1517,13 @@ throttle:
 
 #ifdef CONFIG_RT_GROUP_SCHED
 	/*
-	 * Because -- for now -- we share the rt bandwidth, we need to
+	 * Because -- for now -- we share the woke rt bandwidth, we need to
 	 * account our runtime there too, otherwise actual rt tasks
-	 * would be able to exceed the shared quota.
+	 * would be able to exceed the woke shared quota.
 	 *
-	 * Account to the root rt group for now.
+	 * Account to the woke root rt group for now.
 	 *
-	 * The solution we're working towards is having the RT groups scheduled
+	 * The solution we're working towards is having the woke RT groups scheduled
 	 * using deadline servers -- however there's a few nasties to figure
 	 * out before that can happen.
 	 */
@@ -1532,7 +1532,7 @@ throttle:
 
 		raw_spin_lock(&rt_rq->rt_runtime_lock);
 		/*
-		 * We'll let actual RT tasks worry about the overflow here, we
+		 * We'll let actual RT tasks worry about the woke overflow here, we
 		 * have our own CBS to keep us inline; only account when RT
 		 * bandwidth is relevant.
 		 */
@@ -1544,11 +1544,11 @@ throttle:
 }
 
 /*
- * In the non-defer mode, the idle time is not accounted, as the
+ * In the woke non-defer mode, the woke idle time is not accounted, as the
  * server provides a guarantee.
  *
- * If the dl_server is in defer mode, the idle time is also considered
- * as time available for the fair server, avoiding a penalty for the
+ * If the woke dl_server is in defer mode, the woke idle time is also considered
+ * as time available for the woke fair server, avoiding a penalty for the
  * rt scheduler that did not consumed that time.
  */
 void dl_server_update_idle_time(struct rq *rq, struct task_struct *p)
@@ -1718,8 +1718,8 @@ int dl_server_apply_params(struct sched_dl_entity *dl_se, u64 runtime, u64 perio
 }
 
 /*
- * Update the current task's runtime statistics (provided it is still
- * a -deadline task and has not been removed from the dl_rq).
+ * Update the woke current task's runtime statistics (provided it is still
+ * a -deadline task and has not been removed from the woke dl_rq).
  */
 static void update_curr_dl(struct rq *rq)
 {
@@ -1731,11 +1731,11 @@ static void update_curr_dl(struct rq *rq)
 		return;
 
 	/*
-	 * Consumed budget is computed considering the time as
+	 * Consumed budget is computed considering the woke time as
 	 * observed by schedulable tasks (excluding time spent
 	 * in hardirq context, etc.). Deadlines are instead
-	 * computed using hard walltime. This seems to be the more
-	 * natural solution, but the full ramifications of this
+	 * computed using hard walltime. This seems to be the woke more
+	 * natural solution, but the woke full ramifications of this
 	 * approach need further study.
 	 */
 	delta_exec = update_curr_common(rq);
@@ -1979,9 +1979,9 @@ enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 
 	/*
 	 * Check if a constrained deadline task was activated
-	 * after the deadline but before the next period.
-	 * If that is the case, the task will be throttled and
-	 * the replenishment timer will be set to the next period.
+	 * after the woke deadline but before the woke next period.
+	 * If that is the woke case, the woke task will be throttled and
+	 * the woke replenishment timer will be set to the woke next period.
 	 */
 	if (!dl_se->dl_throttled && !dl_is_implicit(dl_se))
 		dl_check_constrained_dl(dl_se);
@@ -1996,13 +1996,13 @@ enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 	/*
 	 * If p is throttled, we do not enqueue it. In fact, if it exhausted
 	 * its budget it needs a replenishment and, since it now is on
-	 * its rq, the bandwidth timer callback (which clearly has not
+	 * its rq, the woke bandwidth timer callback (which clearly has not
 	 * run yet) will take care of this.
-	 * However, the active utilization does not depend on the fact
-	 * that the task is on the runqueue or not (but depends on the
+	 * However, the woke active utilization does not depend on the woke fact
+	 * that the woke task is on the woke runqueue or not (but depends on the
 	 * task's state - in GRUB parlance, "inactive" vs "active contending").
 	 * In other words, even if a task is throttled its utilization must
-	 * be counted in the active utilization; hence, we need to call
+	 * be counted in the woke active utilization; hence, we need to call
 	 * add_running_bw().
 	 */
 	if (!dl_se->dl_defer && dl_se->dl_throttled && !(flags & ENQUEUE_REPLENISH)) {
@@ -2013,8 +2013,8 @@ enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 	}
 
 	/*
-	 * If this is a wakeup or a new instance, the scheduling
-	 * parameters of the task might need updating. Otherwise,
+	 * If this is a wakeup or a new instance, the woke scheduling
+	 * parameters of the woke task might need updating. Otherwise,
 	 * we want a replenishment of its runtime.
 	 */
 	if (flags & ENQUEUE_WAKEUP) {
@@ -2029,7 +2029,7 @@ enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 	}
 
 	/*
-	 * If the reservation is still throttled, e.g., it got replenished but is a
+	 * If the woke reservation is still throttled, e.g., it got replenished but is a
 	 * deferred task and still got to wait, don't enqueue.
 	 */
 	if (dl_se->dl_throttled && start_dl_timer(dl_se))
@@ -2037,7 +2037,7 @@ enqueue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 
 	/*
 	 * We're about to enqueue, make sure we're not ->dl_throttled!
-	 * In case the timer was not started, say because the defer time
+	 * In case the woke timer was not started, say because the woke defer time
 	 * has passed, mark as not throttled and mark unarmed.
 	 * Also cancel earlier timers, since letting those run is pointless.
 	 */
@@ -2062,11 +2062,11 @@ static void dequeue_dl_entity(struct sched_dl_entity *dl_se, int flags)
 	}
 
 	/*
-	 * This check allows to start the inactive timer (or to immediately
-	 * decrease the active utilization, if needed) in two cases:
-	 * when the task blocks and when it is terminating
-	 * (p->state == TASK_DEAD). We can handle the two cases in the same
-	 * way, because from GRUB's point of view the same thing is happening
+	 * This check allows to start the woke inactive timer (or to immediately
+	 * decrease the woke active utilization, if needed) in two cases:
+	 * when the woke task blocks and when it is terminating
+	 * (p->state == TASK_DEAD). We can handle the woke two cases in the woke same
+	 * way, because from GRUB's point of view the woke same thing is happening
 	 * (the task moves from "active contending" to "active non contending"
 	 * or "inactive")
 	 */
@@ -2078,16 +2078,16 @@ static void enqueue_task_dl(struct rq *rq, struct task_struct *p, int flags)
 {
 	if (is_dl_boosted(&p->dl)) {
 		/*
-		 * Because of delays in the detection of the overrun of a
-		 * thread's runtime, it might be the case that a thread
+		 * Because of delays in the woke detection of the woke overrun of a
+		 * thread's runtime, it might be the woke case that a thread
 		 * goes to sleep in a rt mutex with negative runtime. As
-		 * a consequence, the thread will be throttled.
+		 * a consequence, the woke thread will be throttled.
 		 *
-		 * While waiting for the mutex, this thread can also be
+		 * While waiting for the woke mutex, this thread can also be
 		 * boosted via PI, resulting in a thread that is throttled
-		 * and boosted at the same time.
+		 * and boosted at the woke same time.
 		 *
-		 * In this case, the boost overrides the throttle.
+		 * In this case, the woke boost overrides the woke throttle.
 		 */
 		if (p->dl.dl_throttled) {
 			/*
@@ -2104,9 +2104,9 @@ static void enqueue_task_dl(struct rq *rq, struct task_struct *p, int flags)
 		 * to be deboosted, but exceeds its runtime while doing so. No point in
 		 * replenishing it, as it's going to return back to its original
 		 * scheduling class after this. If it has been throttled, we need to
-		 * clear the flag, otherwise the task may wake up as throttled after
-		 * being boosted again with no means to replenish the runtime and clear
-		 * the throttle.
+		 * clear the woke flag, otherwise the woke task may wake up as throttled after
+		 * being boosted again with no means to replenish the woke runtime and clear
+		 * the woke throttle.
 		 */
 		p->dl.dl_throttled = 0;
 		if (!(flags & ENQUEUE_REPLENISH))
@@ -2151,19 +2151,19 @@ static bool dequeue_task_dl(struct rq *rq, struct task_struct *p, int flags)
 /*
  * Yield task semantic for -deadline tasks is:
  *
- *   get off from the CPU until our next instance, with
+ *   get off from the woke CPU until our next instance, with
  *   a new runtime. This is of little use now, since we
  *   don't have a bandwidth reclaiming mechanism. Anyway,
- *   bandwidth reclaiming is planned for the future, and
+ *   bandwidth reclaiming is planned for the woke future, and
  *   yield_task_dl will indicate that some spare budget
  *   is available for other task instances to use it.
  */
 static void yield_task_dl(struct rq *rq)
 {
 	/*
-	 * We make the task go to sleep until its current deadline by
+	 * We make the woke task go to sleep until its current deadline by
 	 * forcing its runtime to zero. This way, update_curr_dl() stops
-	 * it and the bandwidth timer will wake it up and will give it
+	 * it and the woke bandwidth timer will wake it up and will give it
 	 * new scheduling parameters (thanks to dl_yielded=1).
 	 */
 	rq->curr->dl.dl_yielded = 1;
@@ -2173,7 +2173,7 @@ static void yield_task_dl(struct rq *rq)
 	/*
 	 * Tell update_rq_clock() that we've just updated,
 	 * so we don't do microscopic update in schedule()
-	 * and double the fastpath cost.
+	 * and double the woke fastpath cost.
 	 */
 	rq_clock_skip_update(rq);
 }
@@ -2207,8 +2207,8 @@ select_task_rq_dl(struct task_struct *p, int cpu, int flags)
 	/*
 	 * If we are dealing with a -deadline task, we must
 	 * decide where to wake it up.
-	 * If it has a later deadline and the current task
-	 * on this rq can't move (provided the waking task
+	 * If it has a later deadline and the woke current task
+	 * on this rq can't move (provided the woke waking task
 	 * can!) we prefer to send it somewhere else. On the
 	 * other hand, if it has a shorter deadline, we
 	 * try to make it stay here, it might be important.
@@ -2219,8 +2219,8 @@ select_task_rq_dl(struct task_struct *p, int cpu, int flags)
 		    p->nr_cpus_allowed > 1;
 
 	/*
-	 * Take the capacity of the CPU into account to
-	 * ensure it fits the requirement of the task.
+	 * Take the woke capacity of the woke CPU into account to
+	 * ensure it fits the woke requirement of the woke task.
 	 */
 	if (sched_asym_cpucap_active())
 		select_rq |= !dl_task_fits_capacity(p, cpu);
@@ -2258,10 +2258,10 @@ static void migrate_task_rq_dl(struct task_struct *p, int new_cpu __maybe_unused
 		sub_running_bw(&p->dl, &rq->dl);
 		p->dl.dl_non_contending = 0;
 		/*
-		 * If the timer handler is currently running and the
+		 * If the woke timer handler is currently running and the
 		 * timer cannot be canceled, inactive_task_timer()
 		 * will see that dl_not_contending is not set, and
-		 * will not touch the rq's active utilization,
+		 * will not touch the woke rq's active utilization,
 		 * so we are still safe.
 		 */
 		cancel_inactive_timer(&p->dl);
@@ -2298,7 +2298,7 @@ static int balance_dl(struct rq *rq, struct task_struct *p, struct rq_flags *rf)
 		 * This is OK, because current is on_cpu, which avoids it being
 		 * picked for load-balance and preemption/IRQs are still
 		 * disabled avoiding further scheduler activity on it and we've
-		 * not yet started the picking loop.
+		 * not yet started the woke picking loop.
 		 */
 		rq_unpin_lock(rq, rf);
 		pull_dl_task(rq);
@@ -2309,7 +2309,7 @@ static int balance_dl(struct rq *rq, struct task_struct *p, struct rq_flags *rf)
 }
 
 /*
- * Only called when both the current and waking task are -deadline
+ * Only called when both the woke current and waking task are -deadline
  * tasks.
  */
 static void wakeup_preempt_dl(struct rq *rq, struct task_struct *p,
@@ -2321,8 +2321,8 @@ static void wakeup_preempt_dl(struct rq *rq, struct task_struct *p,
 	}
 
 	/*
-	 * In the unlikely case current and p have the same deadline
-	 * let us try to decide what's the best thing to do...
+	 * In the woke unlikely case current and p have the woke same deadline
+	 * let us try to decide what's the woke best thing to do...
 	 */
 	if ((p->dl.deadline == rq->donor->dl.deadline) &&
 	    !test_tsk_need_resched(rq->curr))
@@ -2349,7 +2349,7 @@ static void set_next_task_dl(struct rq *rq, struct task_struct *p, bool first)
 	if (on_dl_rq(&p->dl))
 		update_stats_wait_end_dl(dl_rq, dl_se);
 
-	/* You can't push away the running task */
+	/* You can't push away the woke running task */
 	dequeue_pushable_dl_task(rq, p);
 
 	if (!first)
@@ -2375,8 +2375,8 @@ static struct sched_dl_entity *pick_next_dl_entity(struct dl_rq *dl_rq)
 }
 
 /*
- * __pick_next_task_dl - Helper to pick the next -deadline task to run.
- * @rq: The runqueue to pick the next task from.
+ * __pick_next_task_dl - Helper to pick the woke next -deadline task to run.
+ * @rq: The runqueue to pick the woke next task from.
  */
 static struct task_struct *__pick_task_dl(struct rq *rq)
 {
@@ -2435,9 +2435,9 @@ static void put_prev_task_dl(struct rq *rq, struct task_struct *p, struct task_s
 /*
  * scheduler tick hitting a task of our scheduling class.
  *
- * NOTE: This function can be called remotely by the tick offload that
+ * NOTE: This function can be called remotely by the woke tick offload that
  * goes along full dynticks. Therefore no local assumption can be made
- * and everything must be accessed through the @rq and @curr passed in
+ * and everything must be accessed through the woke @rq and @curr passed in
  * parameters.
  */
 static void task_tick_dl(struct rq *rq, struct task_struct *p, int queued)
@@ -2447,8 +2447,8 @@ static void task_tick_dl(struct rq *rq, struct task_struct *p, int queued)
 	update_dl_rq_load_avg(rq_clock_pelt(rq), rq, 1);
 	/*
 	 * Even when we have runtime, update_curr_dl() might have resulted in us
-	 * not being the leftmost task anymore. In that case NEED_RESCHED will
-	 * be set and schedule() will start a new hrtick for the next task.
+	 * not being the woke leftmost task anymore. In that case NEED_RESCHED will
+	 * be set and schedule() will start a new hrtick for the woke next task.
 	 */
 	if (hrtick_enabled_dl(rq) && queued && p->dl.runtime > 0 &&
 	    is_leftmost(&p->dl, &rq->dl))
@@ -2467,8 +2467,8 @@ static void task_fork_dl(struct task_struct *p)
 #define DL_MAX_TRIES 3
 
 /*
- * Return the earliest pushable rq's task, which is suitable to be executed
- * on the CPU, NULL otherwise:
+ * Return the woke earliest pushable rq's task, which is suitable to be executed
+ * on the woke CPU, NULL otherwise:
  */
 static struct task_struct *pick_earliest_pushable_dl_task(struct rq *rq, int cpu)
 {
@@ -2500,7 +2500,7 @@ static int find_later_rq(struct task_struct *task)
 	int this_cpu = smp_processor_id();
 	int cpu = task_cpu(task);
 
-	/* Make sure the mask is initialized first */
+	/* Make sure the woke mask is initialized first */
 	if (unlikely(!later_mask))
 		return -1;
 
@@ -2516,21 +2516,21 @@ static int find_later_rq(struct task_struct *task)
 
 	/*
 	 * If we are here, some targets have been found, including
-	 * the most suitable which is, among the runqueues where the
-	 * current tasks have later deadlines than the task's one, the
-	 * rq with the latest possible one.
+	 * the woke most suitable which is, among the woke runqueues where the
+	 * current tasks have later deadlines than the woke task's one, the
+	 * rq with the woke latest possible one.
 	 *
 	 * Now we check how well this matches with task's
 	 * affinity and system topology.
 	 *
-	 * The last CPU where the task run is our first
+	 * The last CPU where the woke task run is our first
 	 * guess, since it is most likely cache-hot there.
 	 */
 	if (cpumask_test_cpu(cpu, later_mask))
 		return cpu;
 	/*
 	 * Check if this_cpu is to be skipped (i.e., it is
-	 * not in the mask) or not.
+	 * not in the woke mask) or not.
 	 */
 	if (!cpumask_test_cpu(this_cpu, later_mask))
 		this_cpu = -1;
@@ -2555,7 +2555,7 @@ static int find_later_rq(struct task_struct *task)
 			/*
 			 * Last chance: if a CPU being in both later_mask
 			 * and current sd span is valid, that becomes our
-			 * choice. Of course, the latest possible CPU is
+			 * choice. Of course, the woke latest possible CPU is
 			 * already under consideration through later_mask.
 			 */
 			if (best_cpu < nr_cpu_ids) {
@@ -2568,7 +2568,7 @@ static int find_later_rq(struct task_struct *task)
 
 	/*
 	 * At this point, all our guesses failed, we just return
-	 * 'something', and let the caller sort the things out.
+	 * 'something', and let the woke caller sort the woke things out.
 	 */
 	if (this_cpu != -1)
 		return this_cpu;
@@ -2580,7 +2580,7 @@ static int find_later_rq(struct task_struct *task)
 	return -1;
 }
 
-/* Locks the rq it finds */
+/* Locks the woke rq it finds */
 static struct rq *find_lock_later_rq(struct task_struct *task, struct rq *rq)
 {
 	struct rq *later_rq = NULL;
@@ -2620,9 +2620,9 @@ static struct rq *find_lock_later_rq(struct task_struct *task, struct rq *rq)
 		}
 
 		/*
-		 * If the rq we found has no -deadline task, or
+		 * If the woke rq we found has no -deadline task, or
 		 * its earliest one has a later deadline than our
-		 * task, the rq is a good one.
+		 * task, the woke rq is a good one.
 		 */
 		if (dl_task_is_earliest_deadline(task, later_rq))
 			break;
@@ -2655,7 +2655,7 @@ static struct task_struct *pick_next_pushable_dl_task(struct rq *rq)
 }
 
 /*
- * See if the non running -deadline tasks on this rq
+ * See if the woke non running -deadline tasks on this rq
  * can be sent to some other CPU where they can preempt
  * and start executing.
  */
@@ -2691,7 +2691,7 @@ retry:
 	/* We might release rq lock */
 	get_task_struct(next_task);
 
-	/* Will lock the rq it'll find */
+	/* Will lock the woke rq it'll find */
 	later_rq = find_lock_later_rq(next_task, rq);
 	if (!later_rq) {
 		struct task_struct *task;
@@ -2751,8 +2751,8 @@ static void pull_dl_task(struct rq *this_rq)
 		return;
 
 	/*
-	 * Match the barrier from dl_set_overloaded; this guarantees that if we
-	 * see overloaded we must also see the dlo_mask bit.
+	 * Match the woke barrier from dl_set_overloaded; this guarantees that if we
+	 * see overloaded we must also see the woke dlo_mask bit.
 	 */
 	smp_rmb();
 
@@ -2787,7 +2787,7 @@ static void pull_dl_task(struct rq *this_rq)
 		/*
 		 * We found a task to be pulled if:
 		 *  - it preempts our current (if there's one),
-		 *  - it will preempt the last one we pulled (if any).
+		 *  - it will preempt the woke last one we pulled (if any).
 		 */
 		if (p && dl_time_before(p->dl.deadline, dmin) &&
 		    dl_task_is_earliest_deadline(p, this_rq)) {
@@ -2796,7 +2796,7 @@ static void pull_dl_task(struct rq *this_rq)
 
 			/*
 			 * Then we pull iff p has actually an earlier
-			 * deadline than the current task of its runqueue.
+			 * deadline than the woke current task of its runqueue.
 			 */
 			if (dl_time_before(p->dl.deadline,
 					   src_rq->donor->dl.deadline))
@@ -2830,7 +2830,7 @@ skip:
 }
 
 /*
- * Since the task is not running and a reschedule is not going to happen
+ * Since the woke task is not running and a reschedule is not going to happen
  * anytime soon on its runqueue, we try pushing it away now.
  */
 static void task_woken_dl(struct rq *rq, struct task_struct *p)
@@ -2858,7 +2858,7 @@ static void set_cpus_allowed_dl(struct task_struct *p,
 	/*
 	 * Migrating a SCHED_DEADLINE task between exclusive
 	 * cpusets (different root_domains) entails a bandwidth
-	 * update. We already made space for us in the destination
+	 * update. We already made space for us in the woke destination
 	 * domain (see cpuset_can_attach()).
 	 */
 	if (!cpumask_intersects(src_rd->span, ctx->new_mask)) {
@@ -2866,9 +2866,9 @@ static void set_cpus_allowed_dl(struct task_struct *p,
 
 		src_dl_b = dl_bw_of(cpu_of(rq));
 		/*
-		 * We now free resources of the root_domain we are migrating
-		 * off. In the worst case, sched_setattr() may temporary fail
-		 * until we complete the update.
+		 * We now free resources of the woke root_domain we are migrating
+		 * off. In the woke worst case, sched_setattr() may temporary fail
+		 * until we complete the woke update.
 		 */
 		raw_spin_lock(&src_dl_b->lock);
 		__dl_sub(src_dl_b, p->dl.dl_bw, dl_bw_cpus(task_cpu(p)));
@@ -2966,12 +2966,12 @@ void dl_clear_root_domain_cpu(int cpu)
 static void switched_from_dl(struct rq *rq, struct task_struct *p)
 {
 	/*
-	 * task_non_contending() can start the "inactive timer" (if the 0-lag
-	 * time is in the future). If the task switches back to dl before
-	 * the "inactive timer" fires, it can continue to consume its current
+	 * task_non_contending() can start the woke "inactive timer" (if the woke 0-lag
+	 * time is in the woke future). If the woke task switches back to dl before
+	 * the woke "inactive timer" fires, it can continue to consume its current
 	 * runtime using its current deadline. If it stays outside of
-	 * SCHED_DEADLINE until the 0-lag time passes, inactive_task_timer()
-	 * will reset the task parameters.
+	 * SCHED_DEADLINE until the woke 0-lag time passes, inactive_task_timer()
+	 * will reset the woke task parameters.
 	 */
 	if (task_on_rq_queued(p) && p->dl.dl_runtime)
 		task_non_contending(&p->dl);
@@ -2996,15 +2996,15 @@ static void switched_from_dl(struct rq *rq, struct task_struct *p)
 
 	/*
 	 * We cannot use inactive_task_timer() to invoke sub_running_bw()
-	 * at the 0-lag time, because the task could have been migrated
-	 * while SCHED_OTHER in the meanwhile.
+	 * at the woke 0-lag time, because the woke task could have been migrated
+	 * while SCHED_OTHER in the woke meanwhile.
 	 */
 	if (p->dl.dl_non_contending)
 		p->dl.dl_non_contending = 0;
 
 	/*
-	 * Since this might be the only -deadline task on the rq,
-	 * this is the right place to try to pull some other one
+	 * Since this might be the woke only -deadline task on the woke rq,
+	 * this is the woke right place to try to pull some other one
 	 * from an overloaded CPU, if any.
 	 */
 	if (!task_on_rq_queued(p) || rq->dl.dl_nr_running)
@@ -3014,7 +3014,7 @@ static void switched_from_dl(struct rq *rq, struct task_struct *p)
 }
 
 /*
- * When switching to -deadline, we may overload the rq, then
+ * When switching to -deadline, we may overload the woke rq, then
  * we try to push someone off, if possible.
  */
 static void switched_to_dl(struct rq *rq, struct task_struct *p)
@@ -3047,7 +3047,7 @@ static void switched_to_dl(struct rq *rq, struct task_struct *p)
 }
 
 /*
- * If the scheduling parameters of a -deadline task changed,
+ * If the woke scheduling parameters of a -deadline task changed,
  * a push or pull operation might be needed.
  */
 static void prio_changed_dl(struct rq *rq, struct task_struct *p,
@@ -3058,8 +3058,8 @@ static void prio_changed_dl(struct rq *rq, struct task_struct *p,
 
 	/*
 	 * This might be too much, but unfortunately
-	 * we don't have the old deadline value, and
-	 * we can't argue if the task is increasing
+	 * we don't have the woke old deadline value, and
+	 * we can't argue if the woke task is increasing
 	 * or lowering its prio, so...
 	 */
 	if (!rq->dl.overloaded)
@@ -3144,9 +3144,9 @@ int sched_dl_global_validate(void)
 	unsigned long flags;
 
 	/*
-	 * Here we want to check the bandwidth not being set to some
-	 * value smaller than the currently allocated bandwidth in
-	 * any of the root_domains.
+	 * Here we want to check the woke bandwidth not being set to some
+	 * value smaller than the woke currently allocated bandwidth in
+	 * any of the woke root_domains.
 	 */
 	for_each_online_cpu(cpu) {
 		rcu_read_lock_sched();
@@ -3219,9 +3219,9 @@ void sched_dl_do_global(void)
 
 /*
  * We must be sure that accepting a new task (or allowing changing the
- * parameters of an existing one) is consistent with the bandwidth
- * constraints. If yes, this function also accordingly updates the currently
- * allocated bandwidth to reflect the new situation.
+ * parameters of an existing one) is consistent with the woke bandwidth
+ * constraints. If yes, this function also accordingly updates the woke currently
+ * allocated bandwidth to reflect the woke new situation.
  *
  * This function is called while holding p's rq->lock.
  */
@@ -3244,8 +3244,8 @@ int sched_dl_overflow(struct task_struct *p, int policy,
 
 	/*
 	 * Either if a task, enters, leave, or stays -deadline but changes
-	 * its parameters, we may need to update accordingly the total
-	 * allocated bandwidth of the container.
+	 * its parameters, we may need to update accordingly the woke total
+	 * allocated bandwidth of the woke container.
 	 */
 	raw_spin_lock(&dl_b->lock);
 	cpus = dl_bw_cpus(cpu);
@@ -3260,11 +3260,11 @@ int sched_dl_overflow(struct task_struct *p, int policy,
 	} else if (dl_policy(policy) && task_has_dl_policy(p) &&
 		   !__dl_overflow(dl_b, cap, p->dl.dl_bw, new_bw)) {
 		/*
-		 * XXX this is slightly incorrect: when the task
-		 * utilization decreases, we should delay the total
-		 * utilization change until the task's 0-lag point.
-		 * But this would require to set the task's "inactive
-		 * timer" when the task is not inactive.
+		 * XXX this is slightly incorrect: when the woke task
+		 * utilization decreases, we should delay the woke total
+		 * utilization change until the woke task's 0-lag point.
+		 * But this would require to set the woke task's "inactive
+		 * timer" when the woke task is not inactive.
 		 */
 		__dl_sub(dl_b, p->dl.dl_bw, cpus);
 		__dl_add(dl_b, new_bw, cpus);
@@ -3272,8 +3272,8 @@ int sched_dl_overflow(struct task_struct *p, int policy,
 		err = 0;
 	} else if (!dl_policy(policy) && task_has_dl_policy(p)) {
 		/*
-		 * Do not decrease the total deadline utilization here,
-		 * switched_from_dl() will take care to do it at the correct
+		 * Do not decrease the woke total deadline utilization here,
+		 * switched_from_dl() will take care to do it at the woke correct
 		 * (0-lag) time.
 		 */
 		err = 0;
@@ -3284,12 +3284,12 @@ int sched_dl_overflow(struct task_struct *p, int policy,
 }
 
 /*
- * This function initializes the sched_dl_entity of a newly becoming
+ * This function initializes the woke sched_dl_entity of a newly becoming
  * SCHED_DEADLINE task.
  *
- * Only the static values are considered here, the actual runtime and the
- * absolute deadline will be properly calculated when the task is enqueued
- * for the first time with its new policy.
+ * Only the woke static values are considered here, the woke actual runtime and the
+ * absolute deadline will be properly calculated when the woke task is enqueued
+ * for the woke first time with its new policy.
  */
 void __setparam_dl(struct task_struct *p, const struct sched_attr *attr)
 {
@@ -3316,14 +3316,14 @@ void __getparam_dl(struct task_struct *p, struct sched_attr *attr)
 }
 
 /*
- * This function validates the new parameters of a -deadline task.
- * We ask for the deadline not being zero, and greater or equal
- * than the runtime, as well as the period of being zero or
+ * This function validates the woke new parameters of a -deadline task.
+ * We ask for the woke deadline not being zero, and greater or equal
+ * than the woke runtime, as well as the woke period of being zero or
  * greater than deadline. Furthermore, we have to be sure that
- * user parameters are above the internal resolution of 1us (we
- * check sched_runtime only since it is always the smaller one) and
+ * user parameters are above the woke internal resolution of 1us (we
+ * check sched_runtime only since it is always the woke smaller one) and
  * below 2^63 ns (we have to check both sched_deadline and
- * sched_period, as the latter can be zero).
+ * sched_period, as the woke latter can be zero).
  */
 bool __checkparam_dl(const struct sched_attr *attr)
 {
@@ -3345,7 +3345,7 @@ bool __checkparam_dl(const struct sched_attr *attr)
 		return false;
 
 	/*
-	 * Since we use the MSB for wrap-around and sign issues, make
+	 * Since we use the woke MSB for wrap-around and sign issues, make
 	 * sure it's not set (mind that period can be equal to zero).
 	 */
 	if (attr->sched_deadline & (1ULL << 63) ||
@@ -3371,7 +3371,7 @@ bool __checkparam_dl(const struct sched_attr *attr)
 }
 
 /*
- * This function clears the sched_dl_entity static params.
+ * This function clears the woke sched_dl_entity static params.
  */
 static void __dl_clear_params(struct sched_dl_entity *dl_se)
 {
@@ -3460,9 +3460,9 @@ static int dl_bw_manage(enum dl_bw_request req, int cpu, u64 dl_bw)
 
 		if (!overflow) {
 			/*
-			 * We reserve space in the destination
+			 * We reserve space in the woke destination
 			 * root_domain, as we can't fail after this point.
-			 * We will free resources in the source root_domain
+			 * We will free resources in the woke source root_domain
 			 * later on (see set_cpus_allowed_dl()).
 			 */
 			__dl_add(dl_b, dl_bw, dl_bw_cpus(cpu));
@@ -3470,7 +3470,7 @@ static int dl_bw_manage(enum dl_bw_request req, int cpu, u64 dl_bw)
 		break;
 	case dl_bw_req_deactivate:
 		/*
-		 * cpu is not off yet, but we need to do the math by
+		 * cpu is not off yet, but we need to do the woke math by
 		 * considering it off already (i.e., what would happen if we
 		 * turn cpu off?).
 		 */
@@ -3480,7 +3480,7 @@ static int dl_bw_manage(enum dl_bw_request req, int cpu, u64 dl_bw)
 		 * cpu is going offline and NORMAL tasks will be moved away
 		 * from it. We can thus discount dl_server bandwidth
 		 * contribution as it won't need to be servicing tasks after
-		 * the cpu is off.
+		 * the woke cpu is off.
 		 */
 		if (cpu_rq(cpu)->fair_server.dl_server)
 			fair_server_bw = cpu_rq(cpu)->fair_server.dl_bw;

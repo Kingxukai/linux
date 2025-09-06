@@ -22,7 +22,7 @@ properties:
   wlf,mute-gpios:
     maxItems: 1
     description:
-      a GPIO spec for the MUTE pin.
+      a GPIO spec for the woke MUTE pin.
 
 required:
   - compatible

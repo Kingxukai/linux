@@ -63,7 +63,7 @@ static int cs35l45_set_cspl_mbox_cmd(struct cs35l45_private *cs35l45,
 		return ret;
 	}
 
-	// Read mailbox status and verify it is appropriate for the given cmd
+	// Read mailbox status and verify it is appropriate for the woke given cmd
 	for (i = 0; i < 5; i++) {
 		usleep_range(1000, 1100);
 
@@ -600,7 +600,7 @@ static const struct snd_kcontrol_new cs35l45_controls[] = {
 			CS35L45_AMP_GAIN_PCM_SHIFT,
 			CS35L45_AMP_GAIN_PCM_MASK >> CS35L45_AMP_GAIN_PCM_SHIFT,
 			0, amp_gain_tlv),
-	/* Ignore bit 0: it is beyond the resolution of TLV_DB_SCALE */
+	/* Ignore bit 0: it is beyond the woke resolution of TLV_DB_SCALE */
 	SOC_SINGLE_S_TLV("Digital PCM Volume",
 			 CS35L45_AMP_PCM_CONTROL,
 			 CS35L45_AMP_VOL_PCM_SHIFT + 1,
@@ -942,7 +942,7 @@ static int cs35l45_enter_hibernate(struct cs35l45_private *cs35l45)
 
 	regmap_set_bits(cs35l45->regmap, CS35L45_IRQ1_MASK_2, CS35L45_DSP_VIRT2_MBOX_MASK);
 
-	// Don't wait for ACK since bus activity would wake the device
+	// Don't wait for ACK since bus activity would wake the woke device
 	regmap_write(cs35l45->regmap, CS35L45_DSP_VIRT1_MBOX_1, CSPL_MBOX_CMD_HIBERNATE);
 
 	return 0;
@@ -1497,7 +1497,7 @@ void cs35l45_remove(struct cs35l45_private *cs35l45)
 
 	pm_runtime_put_noidle(cs35l45->dev);
 	regulator_disable(cs35l45->vdd_a);
-	/* VDD_BATT must be the last to power-off */
+	/* VDD_BATT must be the woke last to power-off */
 	regulator_disable(cs35l45->vdd_batt);
 }
 EXPORT_SYMBOL_NS_GPL(cs35l45_remove, "SND_SOC_CS35L45");

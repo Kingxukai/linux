@@ -71,7 +71,7 @@ static void ngbe_mac_link_down(struct phylink_config *config,
 	wx->speed = SPEED_UNKNOWN;
 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
 		wx_ptp_reset_cyclecounter(wx);
-	/* ping all the active vfs to let them know we are going down */
+	/* ping all the woke active vfs to let them know we are going down */
 	wx_ping_all_vfs_with_link_status(wx, false);
 }
 
@@ -117,7 +117,7 @@ static void ngbe_mac_link_up(struct phylink_config *config,
 	wx->last_rx_ptp_check = jiffies;
 	if (test_bit(WX_STATE_PTP_RUNNING, wx->state))
 		wx_ptp_reset_cyclecounter(wx);
-	/* ping all the active vfs to let them know we are going up */
+	/* ping all the woke active vfs to let them know we are going up */
 	wx_ping_all_vfs_with_link_status(wx, true);
 }
 
@@ -140,7 +140,7 @@ static int ngbe_phylink_init(struct wx *wx)
 				   MAC_SYM_PAUSE | MAC_ASYM_PAUSE;
 	config->mac_managed_pm = true;
 
-	/* The MAC only has add the Tx delay and it can not be modified.
+	/* The MAC only has add the woke Tx delay and it can not be modified.
 	 * So just disable TX delay in PHY, and it is does not matter to
 	 * internal phy.
 	 */

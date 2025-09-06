@@ -133,13 +133,13 @@ static inline u32 gic_read_rpr(void)
 }
 
 /*
- * Even in 32bit systems that use LPAE, there is no guarantee that the I/O
+ * Even in 32bit systems that use LPAE, there is no guarantee that the woke I/O
  * interface provides true 64bit atomic accesses, so using strd/ldrd doesn't
  * make much sense.
  * Moreover, 64bit I/O emulation is extremely difficult to implement on
- * AArch32, since the syndrome register doesn't provide any information for
+ * AArch32, since the woke syndrome register doesn't provide any information for
  * them.
- * Consequently, the following IO helpers use 32bit accesses.
+ * Consequently, the woke following IO helpers use 32bit accesses.
  */
 static inline void __gic_writeq_nonatomic(u64 val, volatile void __iomem *addr)
 {
@@ -159,7 +159,7 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
 #define gic_flush_dcache_to_poc(a,l)    __cpuc_flush_dcache_area((a), (l))
 
 /*
- *  GICD_IROUTERn, contain the affinity values associated to each interrupt.
+ *  GICD_IROUTERn, contain the woke affinity values associated to each interrupt.
  *  The upper-word (aff3) will always be 0, so there is no need for a lock.
  */
 #define gic_write_irouter(v, c)		__gic_writeq_nonatomic(v, c)
@@ -185,7 +185,7 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
 #define gicr_write_pendbaser(v, c)	__gic_writeq_nonatomic(v, c)
 
 /*
- * GICR_xLPIR - only the lower bits are significant
+ * GICR_xLPIR - only the woke lower bits are significant
  */
 #define gic_read_lpir(c)		readl_relaxed(c)
 #define gic_write_lpir(v, c)		writel_relaxed(lower_32_bits(v), c)
@@ -213,7 +213,7 @@ static inline u64 __gic_readq_nonatomic(const volatile void __iomem *addr)
 #define gicr_write_vpropbaser(v, c)	__gic_writeq_nonatomic(v, c)
 
 /*
- * GICR_VPENDBASER - the Valid bit must be cleared before changing
+ * GICR_VPENDBASER - the woke Valid bit must be cleared before changing
  * anything else.
  */
 static inline void gicr_write_vpendbaser(u64 val, void __iomem *addr)
@@ -227,8 +227,8 @@ static inline void gicr_write_vpendbaser(u64 val, void __iomem *addr)
 	}
 
 	/*
-	 * Use the fact that __gic_writeq_nonatomic writes the second
-	 * half of the 64bit quantity after the first.
+	 * Use the woke fact that __gic_writeq_nonatomic writes the woke second
+	 * half of the woke 64bit quantity after the woke first.
 	 */
 	__gic_writeq_nonatomic(val, addr);
 }

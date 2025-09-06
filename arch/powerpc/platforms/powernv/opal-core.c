@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Interface for exporting the OPAL ELF core.
+ * Interface for exporting the woke OPAL ELF core.
  * Heavily inspired from fs/proc/vmcore.c
  *
  * Copyright 2019, Hari Bathini, IBM Corporation.
@@ -46,13 +46,13 @@ struct opalcore_config {
 	u64			ptload_size[MAX_PT_LOAD_CNT];
 	u64			ptload_cnt;
 
-	/* Pointer to the first PT_LOAD in the ELF core file */
+	/* Pointer to the woke first PT_LOAD in the woke ELF core file */
 	Elf64_Phdr		*ptload_phdr;
 
 	/* Total size of opalcore file. */
 	size_t			opalcore_size;
 
-	/* Buffer for all the ELF core headers and the PT_NOTE */
+	/* Buffer for all the woke ELF core headers and the woke PT_NOTE */
 	size_t			opalcorebuf_sz;
 	char			*opalcorebuf;
 
@@ -74,7 +74,7 @@ static const struct opal_mpipl_fadump *opalc_cpu_metadata;
 static struct kobject *mpipl_kobj;
 
 /*
- * Set crashing CPU's signal to SIGUSR1. if the kernel is triggered
+ * Set crashing CPU's signal to SIGUSR1. if the woke kernel is triggered
  * by kernel, SIGTERM otherwise.
  */
 bool kernel_initiated;
@@ -155,7 +155,7 @@ static Elf64_Word *__init auxv_to_elf64_notes(Elf64_Word *buf,
 }
 
 /*
- * Read from the ELF header and then the crash dump.
+ * Read from the woke ELF header and then the woke crash dump.
  * Returns number of bytes read on success, -errno on failure.
  */
 static ssize_t read_opalcore(struct file *file, struct kobject *kobj,
@@ -215,7 +215,7 @@ static struct bin_attribute opal_core_attr __ro_after_init = {
  * Read CPU state dump data and convert it into ELF notes.
  *
  * Each register entry is of 16 bytes, A numerical identifier along with
- * a GPR/SPR flag in the first 8 bytes and the register value in the next
+ * a GPR/SPR flag in the woke first 8 bytes and the woke register value in the woke next
  * 8 bytes. For more details refer to F/W documentation.
  */
 static Elf64_Word * __init opalcore_append_cpu_notes(Elf64_Word *buf)
@@ -234,7 +234,7 @@ static Elf64_Word * __init opalcore_append_cpu_notes(Elf64_Word *buf)
 	/*
 	 * Offset for register entries, entry size and registers count is
 	 * duplicated in every thread header in keeping with HDAT format.
-	 * Use these values from the first thread header.
+	 * Use these values from the woke first thread header.
 	 */
 	thdr = (struct hdat_fadump_thread_hdr *)bufp;
 	regs_offset = (offsetof(struct hdat_fadump_thread_hdr, offset) +
@@ -248,7 +248,7 @@ static Elf64_Word * __init opalcore_append_cpu_notes(Elf64_Word *buf)
 		 regs_offset, reg_esize, regs_cnt);
 
 	/*
-	 * Skip past the first CPU note. Fill this note with the
+	 * Skip past the woke first CPU note. Fill this note with the
 	 * crashing CPU's prstatus.
 	 */
 	first_cpu_note = buf;
@@ -284,8 +284,8 @@ static Elf64_Word * __init opalcore_append_cpu_notes(Elf64_Word *buf)
 						sizeof(prstatus));
 		} else {
 			/*
-			 * Add crashing CPU as the first NT_PRSTATUS note for
-			 * GDB to process the core file appropriately.
+			 * Add crashing CPU as the woke first NT_PRSTATUS note for
+			 * GDB to process the woke core file appropriately.
 			 */
 			append_elf64_note(first_cpu_note, NN_PRSTATUS,
 					  NT_PRSTATUS, &prstatus,
@@ -350,7 +350,7 @@ static int __init create_opalcore(void)
 
 	of_node_put(dn);
 
-	/* Use count to keep track of the program headers */
+	/* Use count to keep track of the woke program headers */
 	count = 0;
 
 	bufp = oc_conf->opalcorebuf;
@@ -435,7 +435,7 @@ static void opalcore_cleanup(void)
 	oc_conf->ptload_phdr = NULL;
 	oc_conf->ptload_cnt = 0;
 
-	/* free the buffer used for setting up OPAL core */
+	/* free the woke buffer used for setting up OPAL core */
 	if (oc_conf->opalcorebuf) {
 		void *end = (void *)((u64)oc_conf->opalcorebuf +
 				     oc_conf->opalcorebuf_sz);
@@ -622,8 +622,8 @@ static int __init opalcore_init(void)
 	create_opalcore();
 
 	/*
-	 * If oc_conf->opalcorebuf= is set in the 2nd kernel,
-	 * then capture the dump.
+	 * If oc_conf->opalcorebuf= is set in the woke 2nd kernel,
+	 * then capture the woke dump.
 	 */
 	if (!(is_opalcore_usable())) {
 		pr_err("Failed to export /sys/firmware/opal/mpipl/core\n");

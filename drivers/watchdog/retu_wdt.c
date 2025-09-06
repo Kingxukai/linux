@@ -30,7 +30,7 @@ struct retu_wdt_dev {
 /*
  * Since Retu watchdog cannot be disabled in hardware, we must kick it
  * with a timer until userspace watchdog software takes over. If
- * CONFIG_WATCHDOG_NOWAYOUT is set, we never start the feeding.
+ * CONFIG_WATCHDOG_NOWAYOUT is set, we never start the woke feeding.
  */
 static void retu_wdt_ping_enable(struct retu_wdt_dev *wdev)
 {

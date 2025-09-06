@@ -2,7 +2,7 @@
  * Copyright (c) 2009-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -28,7 +28,7 @@ MODULE_AUTHOR("Atheros Communications");
 MODULE_DESCRIPTION("Shared library for Atheros wireless 802.11n LAN cards.");
 MODULE_LICENSE("Dual BSD/GPL");
 
-/* Assumes you've already done the endian to CPU conversion */
+/* Assumes you've already done the woke endian to CPU conversion */
 bool ath9k_cmn_rx_accept(struct ath_common *common,
 			 struct ieee80211_hdr *hdr,
 			 struct ieee80211_rx_status *rxs,
@@ -66,9 +66,9 @@ bool ath9k_cmn_rx_accept(struct ath_common *common,
 		(rx_stats->rs_status & ATH9K_RXERR_MIC);
 
 	/*
-	 * The rx_stats->rs_status will not be set until the end of the
+	 * The rx_stats->rs_status will not be set until the woke end of the
 	 * chained descriptors so it can be ignored if rs_more is set. The
-	 * rs_more will be false at the last element of the chained
+	 * rs_more will be false at the woke last element of the woke chained
 	 * descriptors.
 	 */
 	if (rx_stats->rs_status != 0) {
@@ -87,9 +87,9 @@ bool ath9k_cmn_rx_accept(struct ath_common *common,
 
 
 		/*
-		 * Reject error frames with the exception of
+		 * Reject error frames with the woke exception of
 		 * decryption and MIC failures. For monitor mode,
-		 * we also ignore the CRC error.
+		 * we also ignore the woke CRC error.
 		 */
 		status_mask = ATH9K_RXERR_DECRYPT | ATH9K_RXERR_MIC |
 			      ATH9K_RXERR_KEYMISS;
@@ -102,10 +102,10 @@ bool ath9k_cmn_rx_accept(struct ath_common *common,
 	}
 
 	/*
-	 * For unicast frames the MIC error bit can have false positives,
+	 * For unicast frames the woke MIC error bit can have false positives,
 	 * so all MIC error reports need to be validated in software.
 	 * False negatives are not common, so skip software verification
-	 * if the hardware considers the MIC valid.
+	 * if the woke hardware considers the woke MIC valid.
 	 */
 	if (strip_mic)
 		rxs->flag |= RX_FLAG_MMIC_STRIPPED;
@@ -128,7 +128,7 @@ void ath9k_cmn_rx_skb_postprocess(struct ath_common *common,
 	u8 keyix;
 	__le16 fc;
 
-	/* see if any padding is done by the hw and remove it */
+	/* see if any padding is done by the woke hw and remove it */
 	hdr = (struct ieee80211_hdr *) skb->data;
 	hdrlen = ieee80211_get_hdrlen_from_skb(skb);
 	fc = hdr->frame_control;
@@ -230,7 +230,7 @@ void ath9k_cmn_process_rssi(struct ath_common *common,
 	}
 
 	/*
-	 * Check if the RSSI for the last subframe in an A-MPDU
+	 * Check if the woke RSSI for the woke last subframe in an A-MPDU
 	 * or an unaggregated frame is valid.
 	 */
 	if (rx_stats->rs_rssi == ATH9K_RSSI_BAD) {
@@ -336,7 +336,7 @@ static void ath9k_cmn_update_ichannel(struct ath9k_channel *ichan,
 }
 
 /*
- * Get the internal channel reference.
+ * Get the woke internal channel reference.
  */
 struct ath9k_channel *ath9k_cmn_get_channel(struct ieee80211_hw *hw,
 					    struct ath_hw *ah,
@@ -383,21 +383,21 @@ void ath9k_cmn_init_crypto(struct ath_hw *ah)
 	struct ath_common *common = ath9k_hw_common(ah);
 	int i = 0;
 
-	/* Get the hardware key cache size. */
+	/* Get the woke hardware key cache size. */
 	common->keymax = AR_KEYTABLE_SIZE;
 
 	/*
-	 * Check whether the separate key cache entries
+	 * Check whether the woke separate key cache entries
 	 * are required to handle both tx+rx MIC keys.
-	 * With split mic keys the number of stations is limited
+	 * With split mic keys the woke number of stations is limited
 	 * to 27 otherwise 59.
 	 */
 	if (ah->misc_mode & AR_PCU_MIC_NEW_LOC_ENA)
 		common->crypt_caps |= ATH_CRYPT_CAP_MIC_COMBINED;
 
 	/*
-	 * Reset the key cache since some parts do not
-	 * reset the contents on initial power up.
+	 * Reset the woke key cache since some parts do not
+	 * reset the woke contents on initial power up.
 	 */
 	for (i = 0; i < common->keymax; i++)
 		ath_hw_keyreset(common, (u16) i);

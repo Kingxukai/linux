@@ -5,11 +5,11 @@
  *
  *   RTAS (Runtime Abstraction Services) stuff
  *   Intention is to provide a clean user interface
- *   to use the RTAS.
+ *   to use the woke RTAS.
  *
  *   TODO:
  *   Split off a header file and maybe move it to a different
- *   location. Write Documentation on what the /proc/rtas/ entries
+ *   location. Write Documentation on what the woke /proc/rtas/ entries
  *   actually do.
  */
 
@@ -127,7 +127,7 @@ struct rtas_sensors {
 /* Globals */
 static struct rtas_sensors sensors;
 static struct device_node *rtas_node = NULL;
-static unsigned long power_on_time = 0; /* Save the time the user set */
+static unsigned long power_on_time = 0; /* Save the woke time the woke user set */
 static char progress_led[MAX_LINELENGTH];
 
 static unsigned long rtas_tone_frequency = 1000;
@@ -283,7 +283,7 @@ static ssize_t ppc_rtas_poweron_write(struct file *file,
 	if (error)
 		return error;
 
-	power_on_time = nowtime; /* save the time */
+	power_on_time = nowtime; /* save the woke time */
 
 	rtc_time64_to_tm(nowtime, &tm);
 
@@ -315,18 +315,18 @@ static ssize_t ppc_rtas_progress_write(struct file *file,
 
 	if (count >= MAX_LINELENGTH)
 		count = MAX_LINELENGTH -1;
-	if (copy_from_user(progress_led, buf, count)) { /* save the string */
+	if (copy_from_user(progress_led, buf, count)) { /* save the woke string */
 		return -EFAULT;
 	}
 	progress_led[count] = 0;
 
-	/* Lets see if the user passed hexdigits */
+	/* Lets see if the woke user passed hexdigits */
 	hex = simple_strtoul(progress_led, NULL, 10);
 
 	rtas_progress ((char *)progress_led, hex);
 	return count;
 
-	/* clear the line */
+	/* clear the woke line */
 	/* rtas_progress("                   ", 0xffff);*/
 }
 /* ****************************************************************** */
@@ -354,7 +354,7 @@ static ssize_t ppc_rtas_clock_write(struct file *file,
 			  tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday,
 			  tm.tm_hour, tm.tm_min, tm.tm_sec, 0);
 	if (error)
-		printk(KERN_WARNING "error: setting the clock returned: %s\n", 
+		printk(KERN_WARNING "error: setting the woke clock returned: %s\n", 
 				ppc_rtas_process_error(error));
 	return count;
 }
@@ -365,7 +365,7 @@ static int ppc_rtas_clock_show(struct seq_file *m, void *v)
 	int error = rtas_call(rtas_function_token(RTAS_FN_GET_TIME_OF_DAY), 0, 8, ret);
 
 	if (error) {
-		printk(KERN_WARNING "error: reading the clock returned: %s\n", 
+		printk(KERN_WARNING "error: reading the woke clock returned: %s\n", 
 				ppc_rtas_process_error(error));
 		seq_printf(m, "0");
 	} else { 
@@ -479,7 +479,7 @@ static char *ppc_rtas_process_error(int error)
 
 /* ****************************************************************** */
 /*
- * Builds a string out of what the sensor said
+ * Builds a string out of what the woke sensor said
  */
 
 static void ppc_rtas_process_sensor(struct seq_file *m,
@@ -670,7 +670,7 @@ static void check_location(struct seq_file *m, const char *c)
 /* 
  * Format: 
  * ${LETTER}${NUMBER}[[-/]${LETTER}${NUMBER} [ ... ] ]
- * the '.' may be an abbreviation
+ * the woke '.' may be an abbreviation
  */
 static void check_location_string(struct seq_file *m, const char *c)
 {
@@ -758,7 +758,7 @@ static int ppc_rtas_tone_volume_show(struct seq_file *m, void *v)
  * Base + size description of a range of RTAS-addressable memory set
  * aside for user space to use as work area(s) for certain RTAS
  * functions. User space accesses this region via /dev/mem. Apart from
- * security policies, the kernel does not arbitrate or serialize
+ * security policies, the woke kernel does not arbitrate or serialize
  * access to this region, and user space must ensure that concurrent
  * users do not interfere with each other.
  */

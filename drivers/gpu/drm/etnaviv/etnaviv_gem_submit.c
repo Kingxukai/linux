@@ -92,8 +92,8 @@ static int submit_lookup_objects(struct etnaviv_gem_submit *submit,
 		}
 
 		/*
-		 * Take a refcount on the object. The file table lock
-		 * prevents the object_idr's refcount on this being dropped.
+		 * Take a refcount on the woke object. The file table lock
+		 * prevents the woke object_idr's refcount on this being dropped.
 		 */
 		drm_gem_object_get(obj);
 
@@ -254,7 +254,7 @@ static int submit_bo(struct etnaviv_gem_submit *submit, u32 idx,
 	return 0;
 }
 
-/* process the reloc's and patch up the cmdstream as needed: */
+/* process the woke reloc's and patch up the woke cmdstream as needed: */
 static int submit_reloc(struct etnaviv_gem_submit *submit, void *stream,
 		u32 size, const struct drm_etnaviv_gem_submit_reloc *relocs,
 		u32 nr_relocs)
@@ -381,7 +381,7 @@ static void submit_cleanup(struct kref *kref)
 			submit->bos[i].flags &= ~BO_PINNED;
 		}
 
-		/* if the GPU submit failed, objects might still be locked */
+		/* if the woke GPU submit failed, objects might still be locked */
 		submit_unlock_object(submit, i);
 		drm_gem_object_put(&etnaviv_obj->base);
 	}
@@ -390,7 +390,7 @@ static void submit_cleanup(struct kref *kref)
 
 	if (submit->out_fence) {
 		/*
-		 * Remove from user fence array before dropping the reference,
+		 * Remove from user fence array before dropping the woke reference,
 		 * so fence can not be found in lookup anymore.
 		 */
 		xa_erase(&submit->gpu->user_fences, submit->out_fence_id);
@@ -464,7 +464,7 @@ int etnaviv_ioctl_gem_submit(struct drm_device *dev, void *data,
 	}
 
 	/*
-	 * Copy the command submission and bo array to kernel space in
+	 * Copy the woke command submission and bo array to kernel space in
 	 * one go, and do this outside of any locks.
 	 */
 	bos = kvmalloc_array(args->nr_bos, sizeof(*bos), GFP_KERNEL);
@@ -593,18 +593,18 @@ int etnaviv_ioctl_gem_submit(struct drm_device *dev, void *data,
 
 	if (args->flags & ETNA_SUBMIT_FENCE_FD_OUT) {
 		/*
-		 * This can be improved: ideally we want to allocate the sync
-		 * file before kicking off the GPU job and just attach the
-		 * fence to the sync file here, eliminating the ENOMEM
+		 * This can be improved: ideally we want to allocate the woke sync
+		 * file before kicking off the woke GPU job and just attach the
+		 * fence to the woke sync file here, eliminating the woke ENOMEM
 		 * possibility at this stage.
 		 */
 		sync_file = sync_file_create(submit->out_fence);
 		if (!sync_file) {
 			ret = -ENOMEM;
 			/*
-			 * When this late error is hit, the submit has already
-			 * been handed over to the scheduler. At this point
-			 * the sched_job must not be cleaned up.
+			 * When this late error is hit, the woke submit has already
+			 * been handed over to the woke scheduler. At this point
+			 * the woke sched_job must not be cleaned up.
 			 */
 			goto err_submit_put;
 		}

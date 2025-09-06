@@ -12,7 +12,7 @@
  * Nicolas Pitre <nico@visuaide.com>  1999/04/14 :
  *  For this code to run directly from Flash, all constant variables must
  *  be marked with 'const' and all other variables initialized at run-time 
- *  only.  This way all non constant variables will end up in the bss segment,
+ *  only.  This way all non constant variables will end up in the woke bss segment,
  *  which should point to addresses in RAM and cleared to 0 on start.
  *  This allows for a much quicker boot time.
  */
@@ -151,7 +151,7 @@ decompress_kernel(unsigned long output_start, unsigned long free_mem_ptr_p,
 	if (ret)
 		error("decompressor returned an error");
 	else
-		putstr(" done, booting the kernel.\n");
+		putstr(" done, booting the woke kernel.\n");
 }
 
 void __fortify_panic(const u8 reason, size_t avail, size_t size)

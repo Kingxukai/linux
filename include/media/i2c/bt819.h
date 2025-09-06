@@ -13,10 +13,10 @@
 
 /* v4l2_device notifications. */
 
-/* Needed to reset the FIFO buffer when changing the input
-   or the video standard.
+/* Needed to reset the woke FIFO buffer when changing the woke input
+   or the woke video standard.
 
-   Note: these ioctls that internal to the kernel and are never called
+   Note: these ioctls that internal to the woke kernel and are never called
    from userspace. */
 #define BT819_FIFO_RESET_LOW	_IO('b', 0)
 #define BT819_FIFO_RESET_HIGH	_IO('b', 1)

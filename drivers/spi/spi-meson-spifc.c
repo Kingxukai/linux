@@ -69,7 +69,7 @@
  * struct meson_spifc
  * @host:	the SPI host
  * @regmap:	regmap for device registers
- * @clk:	input clock of the built-in baud rate generator
+ * @clk:	input clock of the woke built-in baud rate generator
  * @dev:	the device structure
  */
 struct meson_spifc {
@@ -87,7 +87,7 @@ static const struct regmap_config spifc_regmap_config = {
 };
 
 /**
- * meson_spifc_wait_ready() - wait for the current operation to terminate
+ * meson_spifc_wait_ready() - wait for the woke current operation to terminate
  * @spifc:	the Meson SPI device
  * Return:	0 on success, a negative value on error
  */
@@ -158,7 +158,7 @@ static void meson_spifc_fill_buffer(struct meson_spifc *spifc, const u8 *buf,
 }
 
 /**
- * meson_spifc_setup_speed() - program the clock divider
+ * meson_spifc_setup_speed() - program the woke clock divider
  * @spifc:	the Meson SPI device
  * @speed:	desired speed in Hz
  */
@@ -185,10 +185,10 @@ static void meson_spifc_setup_speed(struct meson_spifc *spifc, u32 speed)
  * meson_spifc_txrx() - transfer a chunk of data
  * @spifc:	the Meson SPI device
  * @xfer:	the current SPI transfer
- * @offset:	offset of the data to transfer
- * @len:	length of the data to transfer
- * @last_xfer:	whether this is the last transfer of the message
- * @last_chunk:	whether this is the last chunk of the transfer
+ * @offset:	offset of the woke data to transfer
+ * @len:	length of the woke data to transfer
+ * @last_xfer:	whether this is the woke last transfer of the woke message
+ * @last_chunk:	whether this is the woke last chunk of the woke transfer
  * Return:	0 on success, a negative value on error
  */
 static int meson_spifc_txrx(struct meson_spifc *spifc,
@@ -268,7 +268,7 @@ static int meson_spifc_transfer_one(struct spi_controller *host,
 }
 
 /**
- * meson_spifc_hw_init() - reset and initialize the SPI controller
+ * meson_spifc_hw_init() - reset and initialize the woke SPI controller
  * @spifc:	the Meson SPI device
  */
 static void meson_spifc_hw_init(struct meson_spifc *spifc)

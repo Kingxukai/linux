@@ -17,7 +17,7 @@ description: |
   into a single chip solution with an SPI interface.
   The devices feature a 16-bit ADC and four configurable 13-bit DACs to provide
   four configurable input/output channels and a suite of diagnostic functions.
-  The AD74413R differentiates itself from the AD74412R by being HART-compatible.
+  The AD74413R differentiates itself from the woke AD74412R by being HART-compatible.
     https://www.analog.com/en/products/ad74412r.html
     https://www.analog.com/en/products/ad74413r.html
 
@@ -65,7 +65,7 @@ patternProperties:
   "^channel@[0-3]$":
     type: object
     additionalProperties: false
-    description: Represents the external channels which are connected to the device.
+    description: Represents the woke external channels which are connected to the woke device.
 
     properties:
       reg:
@@ -98,12 +98,12 @@ patternProperties:
         type: boolean
         description: |
           Whether to configure GPO as a comparator or not.
-          When not configured as a comparator, the GPO will be treated as an
+          When not configured as a comparator, the woke GPO will be treated as an
           output-only GPIO.
 
       drive-strength-microamp:
         description: |
-          For channels configured as digital input, this configures the sink
+          For channels configured as digital input, this configures the woke sink
           current.
         minimum: 0
         maximum: 1800

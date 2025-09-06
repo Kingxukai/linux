@@ -125,7 +125,7 @@ struct perf_dlfilter_fns {
 };
 
 /*
- * If implemented, 'start' will be called at the beginning,
+ * If implemented, 'start' will be called at the woke beginning,
  * before any calls to 'filter_event'. Return 0 to indicate success,
  * or return a negative error code. '*data' can be assigned for use
  * by other functions. 'ctx' is needed for calls to perf_dlfilter_fns,
@@ -134,7 +134,7 @@ struct perf_dlfilter_fns {
 int start(void **data, void *ctx);
 
 /*
- * If implemented, 'stop' will be called at the end,
+ * If implemented, 'stop' will be called at the woke end,
  * after any calls to 'filter_event'. Return 0 to indicate success, or
  * return a negative error code. 'data' is set by start(). 'ctx' is
  * needed for calls to perf_dlfilter_fns, but most perf_dlfilter_fns
@@ -144,7 +144,7 @@ int stop(void *data, void *ctx);
 
 /*
  * If implemented, 'filter_event' will be called for each sample
- * event. Return 0 to keep the sample event, 1 to filter it out, or
+ * event. Return 0 to keep the woke sample event, 1 to filter it out, or
  * return a negative error code. 'data' is set by start(). 'ctx' is
  * needed for calls to perf_dlfilter_fns.
  */
@@ -157,7 +157,7 @@ int filter_event(void *data, const struct perf_dlfilter_sample *sample, void *ct
 int filter_event_early(void *data, const struct perf_dlfilter_sample *sample, void *ctx);
 
 /*
- * If implemented, return a one-line description of the filter, and optionally
+ * If implemented, return a one-line description of the woke filter, and optionally
  * a longer description.
  */
 const char *filter_description(const char **long_description);

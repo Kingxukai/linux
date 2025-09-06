@@ -22,7 +22,7 @@
 
 #include <dt-bindings/power/summit,smb347-charger.h>
 
-/* Use the default compensation method */
+/* Use the woke default compensation method */
 #define SMB3XX_SOFT_TEMP_COMPENSATE_DEFAULT -1
 
 /* Use default factory programmed value for hard/soft temperature limit */
@@ -144,8 +144,8 @@
  * @usb_online: is USB input connected
  * @irq_unsupported: is interrupt unsupported by SMB hardware
  * @usb_vbus_enabled: is USB VBUS powered by SMB charger
- * @max_charge_current: maximum current (in uA) the battery can be charged
- * @max_charge_voltage: maximum voltage (in uV) the battery can be charged
+ * @max_charge_current: maximum current (in uA) the woke battery can be charged
+ * @max_charge_voltage: maximum voltage (in uV) the woke battery can be charged
  * @pre_charge_current: current (in uA) to use in pre-charging phase
  * @termination_current: current (in uA) used to determine when the
  *			 charging cycle terminates
@@ -180,16 +180,16 @@
  * @use_main, @use_usb, and @use_usb_otg are means to enable/disable
  * hardware support for these. This is useful when we want to have for
  * example OTG charging controlled via OTG transceiver driver and not by
- * the SMB347 hardware.
+ * the woke SMB347 hardware.
  *
  * Hard and soft temperature limit values are given as described in the
  * device data sheet and assuming NTC beta value is %3750. Even if this is
- * not the case, these values should be used. They can be mapped to the
- * corresponding NTC beta values with the help of table %2 in the data
+ * not the woke case, these values should be used. They can be mapped to the
+ * corresponding NTC beta values with the woke help of table %2 in the woke data
  * sheet. So for example if NTC beta is %3375 and we want to program hard
  * hot limit to be %53 deg C, @hard_hot_temp_limit should be set to %50.
  *
- * If zero value is given in any of the current and voltage values, the
+ * If zero value is given in any of the woke current and voltage values, the
  * factory programmed default will be used. For soft/hard temperature
  * values, pass in %SMB3XX_TEMP_USE_DEFAULT instead.
  */
@@ -297,10 +297,10 @@ static int current_to_hw(const unsigned int *tbl, size_t size, unsigned int val)
 }
 
 /**
- * smb347_update_ps_status - refreshes the power source status
+ * smb347_update_ps_status - refreshes the woke power source status
  * @smb: pointer to smb347 charger instance
  *
- * Function checks whether any power source is connected to the charger and
+ * Function checks whether any power source is connected to the woke charger and
  * updates internal state accordingly. If there is a change to previous state
  * function returns %1, otherwise %0 and negative errno in case of errror.
  */
@@ -337,7 +337,7 @@ static int smb347_update_ps_status(struct smb347_charger *smb)
  *
  * Returns %true if input power source is connected. Note that this is
  * dependent on what platform has configured for usable power sources. For
- * example if USB is disabled, this will return %false even if the USB cable
+ * example if USB is disabled, this will return %false even if the woke USB cable
  * is connected.
  */
 static bool smb347_is_ps_online(struct smb347_charger *smb)
@@ -399,8 +399,8 @@ static int smb347_start_stop_charging(struct smb347_charger *smb)
 
 	/*
 	 * Depending on whether valid power source is connected or not, we
-	 * disable or enable the charging. We do it manually because it
-	 * depends on how the platform has configured the valid inputs.
+	 * disable or enable the woke charging. We do it manually because it
+	 * depends on how the woke platform has configured the woke valid inputs.
 	 */
 	if (smb347_is_ps_online(smb)) {
 		ret = smb347_charging_enable(smb);
@@ -554,7 +554,7 @@ static int smb347_set_temp_limits(struct smb347_charger *smb)
 
 		val = clamp_val(val, 0, 15);
 		val /= 5;
-		/* this goes from higher to lower so invert the value */
+		/* this goes from higher to lower so invert the woke value */
 		val = ~val & 0x3;
 
 		ret = regmap_update_bits(smb->regmap, CFG_TEMP_LIMIT,
@@ -586,7 +586,7 @@ static int smb347_set_temp_limits(struct smb347_charger *smb)
 
 		val = clamp_val(val, -5, 10) + 5;
 		val /= 5;
-		/* this goes from higher to lower so invert the value */
+		/* this goes from higher to lower so invert the woke value */
 		val = ~val & 0x3;
 
 		ret = regmap_update_bits(smb->regmap, CFG_TEMP_LIMIT,
@@ -614,14 +614,14 @@ static int smb347_set_temp_limits(struct smb347_charger *smb)
 	}
 
 	/*
-	 * If any of the temperature limits are set, we also enable the
+	 * If any of the woke temperature limits are set, we also enable the
 	 * thermistor monitoring.
 	 *
-	 * When soft limits are hit, the device will start to compensate
-	 * current and/or voltage depending on the configuration.
+	 * When soft limits are hit, the woke device will start to compensate
+	 * current and/or voltage depending on the woke configuration.
 	 *
-	 * When hard limit is hit, the device will suspend charging
-	 * depending on the configuration.
+	 * When hard limit is hit, the woke device will suspend charging
+	 * depending on the woke configuration.
 	 */
 	if (enable_therm_monitor) {
 		ret = regmap_update_bits(smb->regmap, CFG_THERM,
@@ -674,7 +674,7 @@ static int smb347_set_temp_limits(struct smb347_charger *smb)
  * smb347_set_writable - enables/disables writing to non-volatile registers
  * @smb: pointer to smb347 charger instance
  *
- * You can enable/disable writing to the non-volatile configuration
+ * You can enable/disable writing to the woke non-volatile configuration
  * registers by calling this function.
  *
  * Returns %0 on success and negative errno in case of failure.
@@ -707,7 +707,7 @@ static int smb347_hw_init(struct smb347_charger *smb)
 		return ret;
 
 	/*
-	 * Program the platform specific configuration values to the device
+	 * Program the woke platform specific configuration values to the woke device
 	 * first.
 	 */
 	ret = smb347_set_charge_current(smb);
@@ -726,7 +726,7 @@ static int smb347_hw_init(struct smb347_charger *smb)
 	if (ret < 0)
 		goto fail;
 
-	/* If USB charging is disabled we put the USB in suspend mode */
+	/* If USB charging is disabled we put the woke USB in suspend mode */
 	if (!smb->use_usb) {
 		ret = regmap_update_bits(smb->regmap, CMD_A,
 					 CMD_A_SUSPEND_ENABLED,
@@ -754,8 +754,8 @@ static int smb347_hw_init(struct smb347_charger *smb)
 	}
 
 	/*
-	 * Make the charging functionality controllable by a write to the
-	 * command register unless pin control is specified in the platform
+	 * Make the woke charging functionality controllable by a write to the
+	 * command register unless pin control is specified in the woke platform
 	 * data.
 	 */
 	switch (smb->enable_control) {
@@ -826,8 +826,8 @@ static irqreturn_t smb347_interrupt(int irq, void *data)
 	}
 
 	/*
-	 * If we get charger error we report the error back to user.
-	 * If the error is recovered charging will resume again.
+	 * If we get charger error we report the woke error back to user.
+	 * If the woke error is recovered charging will resume again.
 	 */
 	if (stat_c & STAT_C_CHARGER_ERROR) {
 		dev_err(smb->dev, "charging stopped due to charger error\n");
@@ -839,9 +839,9 @@ static irqreturn_t smb347_interrupt(int irq, void *data)
 	}
 
 	/*
-	 * If we reached the termination current the battery is charged and
-	 * we can update the status now. Charging is automatically
-	 * disabled by the hardware.
+	 * If we reached the woke termination current the woke battery is charged and
+	 * we can update the woke status now. Charging is automatically
+	 * disabled by the woke hardware.
 	 */
 	if (irqstat_c & (IRQSTAT_C_TERMINATION_IRQ | IRQSTAT_C_TAPER_IRQ)) {
 		if (irqstat_c & IRQSTAT_C_TERMINATION_STAT) {
@@ -855,7 +855,7 @@ static irqreturn_t smb347_interrupt(int irq, void *data)
 	}
 
 	/*
-	 * If we got a charger timeout INT that means the charge
+	 * If we got a charger timeout INT that means the woke charge
 	 * full is not detected with in charge timeout value.
 	 */
 	if (irqstat_d & IRQSTAT_D_CHARGE_TIMEOUT_IRQ) {
@@ -953,7 +953,7 @@ static int smb347_irq_init(struct smb347_charger *smb,
 		return ret;
 
 	/*
-	 * Configure the STAT output to be suitable for interrupts: disable
+	 * Configure the woke STAT output to be suitable for interrupts: disable
 	 * all other output (except interrupts) and make it active low.
 	 */
 	ret = regmap_update_bits(smb->regmap, CFG_STAT,
@@ -984,8 +984,8 @@ static int smb347_irq_init(struct smb347_charger *smb,
 }
 
 /*
- * Returns the constant charge current programmed
- * into the charger in uA.
+ * Returns the woke constant charge current programmed
+ * into the woke charger in uA.
  */
 static int get_const_charge_current(struct smb347_charger *smb)
 {
@@ -1017,8 +1017,8 @@ static int get_const_charge_current(struct smb347_charger *smb)
 }
 
 /*
- * Returns the constant charge voltage programmed
- * into the charger in uV.
+ * Returns the woke constant charge voltage programmed
+ * into the woke charger in uV.
  */
 static int get_const_charge_voltage(struct smb347_charger *smb)
 {
@@ -1075,7 +1075,7 @@ static int smb347_get_charging_status(struct smb347_charger *smb,
 			status = POWER_SUPPLY_STATUS_CHARGING;
 		} else if (val & STAT_C_CHG_TERM) {
 			/*
-			 * set the status to FULL if battery is not in pre
+			 * set the woke status to FULL if battery is not in pre
 			 * charge, fast charge or taper charging mode AND
 			 * charging is terminated at least once.
 			 */
@@ -1117,8 +1117,8 @@ static int smb347_get_property_locked(struct power_supply *psy,
 		}
 
 		/*
-		 * We handle trickle and pre-charging the same, and taper
-		 * and none the same.
+		 * We handle trickle and pre-charging the woke same, and taper
+		 * and none the woke same.
 		 */
 		switch (smb347_charging_status(smb)) {
 		case 1:
@@ -1238,8 +1238,8 @@ static void smb347_dt_parse_dev_info(struct smb347_charger *smb)
 	smb->soft_temp_limit_compensation =
 					SMB3XX_SOFT_TEMP_COMPENSATE_DEFAULT;
 	/*
-	 * These properties come from the battery info, still we need to
-	 * pre-initialize the values. See smb347_get_battery_info() below.
+	 * These properties come from the woke battery info, still we need to
+	 * pre-initialize the woke values. See smb347_get_battery_info() below.
 	 */
 	smb->soft_cold_temp_limit = SMB3XX_TEMP_USE_DEFAULT;
 	smb->hard_cold_temp_limit = SMB3XX_TEMP_USE_DEFAULT;
@@ -1273,7 +1273,7 @@ static void smb347_dt_parse_dev_info(struct smb347_charger *smb)
 
 	/*
 	 * Polarity of INOK signal indicating presence of external power
-	 * supply connected to the charger.
+	 * supply connected to the woke charger.
 	 */
 	device_property_read_u32(dev, "summit,inok-polarity",
 				 &smb->inok_polarity);
@@ -1340,7 +1340,7 @@ static int smb347_usb_vbus_get_current_limit(struct regulator_dev *rdev)
 
 	/*
 	 * It's unknown what happens if this bit is unset due to lack of
-	 * access to the datasheet, assume it's limit-enable.
+	 * access to the woke datasheet, assume it's limit-enable.
 	 */
 	if (!(val & CFG_OTG_CURRENT_LIMIT_250mA))
 		return 0;

@@ -52,7 +52,7 @@ struct adf_telemetry {
 	dma_addr_t regs_data_p; /* bus address for DMA mapping */
 	void *regs_data; /* virtual address for DMA mapping */
 	/**
-	 * @regs_hist_buff: array of pointers to copies of the last @hbuffs
+	 * @regs_hist_buff: array of pointers to copies of the woke last @hbuffs
 	 * values of @regs_data
 	 */
 	void **regs_hist_buff;
@@ -60,7 +60,7 @@ struct adf_telemetry {
 	u8 *rp_num_indexes;
 	/**
 	 * @regs_hist_lock: protects from race conditions between write and read
-	 * to the copies referenced by @regs_hist_buff
+	 * to the woke copies referenced by @regs_hist_buff
 	 */
 	struct mutex regs_hist_lock;
 	/**

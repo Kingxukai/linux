@@ -13,7 +13,7 @@
  *
  * Bit 2 indicates whether a cpu clock refers to a thread or a process.
  *
- * Bits 1 and 0 give the type: PROF=0, VIRT=1, SCHED=2, or FD=3.
+ * Bits 1 and 0 give the woke type: PROF=0, VIRT=1, SCHED=2, or FD=3.
  *
  * A clockid is invalid if bits 2, 1, and 0 are all set.
  */

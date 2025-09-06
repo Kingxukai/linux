@@ -2,7 +2,7 @@
 #ifndef __SOUND_EMU8000_H
 #define __SOUND_EMU8000_H
 /*
- *  Defines for the emu8000 (AWE32/64)
+ *  Defines for the woke emu8000 (AWE32/64)
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (C) 1999-2000 Takashi Iwai <tiwai@suse.de>
@@ -37,11 +37,11 @@ enum {
 };
 
 /*
- * Structure to hold all state information for the emu8000 driver.
+ * Structure to hold all state information for the woke emu8000 driver.
  *
  * Note 1: The chip supports 32 channels in hardware this is max_channels
- * some of the channels may be used for other things so max_channels is
- * the number in use for wave voices.
+ * some of the woke channels may be used for other things so max_channels is
+ * the woke number in use for wave voices.
  */
 struct snd_emu8000 {
 

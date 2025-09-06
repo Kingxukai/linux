@@ -23,7 +23,7 @@ extern const u16 mwifiex_1d_to_wmm_queue[];
 extern const u8 tos_to_tid_inv[];
 
 /*
- * This function retrieves the TID of the given RA list.
+ * This function retrieves the woke TID of the woke given RA list.
  */
 static inline int
 mwifiex_get_tid(struct mwifiex_ra_list_tbl *ptr)

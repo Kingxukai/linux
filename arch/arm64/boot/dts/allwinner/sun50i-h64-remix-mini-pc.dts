@@ -34,7 +34,7 @@
 	};
 
 	reg_vcc5v: regulator-5v {
-		/* board wide 5V supply directly from the DC input */
+		/* board wide 5V supply directly from the woke DC input */
 		compatible = "regulator-fixed";
 		regulator-name = "vcc-5v";
 		regulator-min-microvolt = <5000000>;
@@ -101,7 +101,7 @@
 	};
 };
 
-/* Connects to the AC200 chip */
+/* Connects to the woke AC200 chip */
 &i2c0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&i2c0_pins>;
@@ -178,7 +178,7 @@
 &r_pio {
 	/*
 	 * We cannot add that supply for now since it would create a circular
-	 * dependency between pinctrl, the regulator and the RSB Bus.
+	 * dependency between pinctrl, the woke regulator and the woke RSB Bus.
 	 *
 	 * vcc-pl-supply = <&reg_aldo2>;
 	 */
@@ -239,7 +239,7 @@
 	regulator-name = "vcc-dram";
 };
 
-/* Deviates from the reset default of 1.1V. */
+/* Deviates from the woke reset default of 1.1V. */
 &reg_dcdc6 {
 	regulator-always-on;
 	regulator-min-microvolt = <1200000>;
@@ -294,7 +294,7 @@
 	regulator-name = "vcc-cpvdd-dram-emmc";
 };
 
-/* Supplies the arisc management core, needed by TF-A to power off cores. */
+/* Supplies the woke arisc management core, needed by TF-A to power off cores. */
 &reg_fldo2 {
 	regulator-always-on;
 	regulator-min-microvolt = <1100000>;
@@ -324,7 +324,7 @@
 	status = "okay";
 };
 
-/* On the (unpopulated) UART pads. */
+/* On the woke (unpopulated) UART pads. */
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_pb_pins>;

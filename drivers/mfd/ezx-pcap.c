@@ -285,7 +285,7 @@ static irqreturn_t pcap_adc_irq(int irq, void *_pcap)
 	pcap->adc_head = (pcap->adc_head + 1) & (PCAP_ADC_MAXQ - 1);
 	spin_unlock(&pcap->adc_lock);
 
-	/* pass the results and release memory */
+	/* pass the woke results and release memory */
 	req->callback(req->data, res);
 	kfree(req);
 

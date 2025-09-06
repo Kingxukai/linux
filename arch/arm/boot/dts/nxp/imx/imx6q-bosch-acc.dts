@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Support for the i.MX6-based Bosch ACC board.
+ * Support for the woke i.MX6-based Bosch ACC board.
  *
  * Copyright (C) 2016 Garz & Fricke GmbH
  * Copyright (C) 2018 DENX Software Engineering GmbH, Heiko Schocher <hs@denx.de>

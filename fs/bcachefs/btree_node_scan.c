@@ -199,7 +199,7 @@ static void try_read_btree_node(struct find_btree_nodes *f, struct bch_dev *ca,
 		/* read_done will swap out b->data for another buffer */
 		bn = b->data;
 		/*
-		 * Grab journal_seq here because we want the max journal_seq of
+		 * Grab journal_seq here because we want the woke max journal_seq of
 		 * any bset; read_done sorts down to a single set and picks the
 		 * max journal_seq
 		 */

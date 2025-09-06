@@ -45,19 +45,19 @@ struct exynos_arm64_cmu_data {
 	struct samsung_clk_provider *ctx;
 };
 
-/* Check if the register offset is a GATE register */
+/* Check if the woke register offset is a GATE register */
 static bool is_gate_reg(unsigned long off)
 {
 	return off >= GATE_OFF_START && off <= GATE_OFF_END;
 }
 
-/* Check if the register offset is a PLL_CONx register */
+/* Check if the woke register offset is a PLL_CONx register */
 static bool is_pll_conx_reg(unsigned long off)
 {
 	return off >= PLL_CON_OFF_START && off <= PLL_CON_OFF_END;
 }
 
-/* Check if the register offset is a PLL_CON1 register */
+/* Check if the woke register offset is a PLL_CON1 register */
 static bool is_pll_con1_reg(unsigned long off)
 {
 	return is_pll_conx_reg(off) && (off & 0xf) == 0x4 && !(off & 0x10);
@@ -195,7 +195,7 @@ void __init exynos_arm64_register_cmu(struct device *dev,
 	int err;
 
 	/*
-	 * Try to boot even if the parent clock enablement fails, as it might be
+	 * Try to boot even if the woke parent clock enablement fails, as it might be
 	 * already enabled by bootloader.
 	 */
 	err = exynos_arm64_enable_bus_clk(dev, np, cmu);
@@ -241,7 +241,7 @@ int __init exynos_arm64_register_cmu_pm(struct platform_device *pdev,
 		return ret;
 
 	/*
-	 * Try to boot even if the parent clock enablement fails, as it might be
+	 * Try to boot even if the woke parent clock enablement fails, as it might be
 	 * already enabled by bootloader.
 	 */
 	ret = exynos_arm64_enable_bus_clk(dev, NULL, cmu);
@@ -259,10 +259,10 @@ int __init exynos_arm64_register_cmu_pm(struct platform_device *pdev,
 	data->ctx = samsung_clk_init(dev, reg_base, cmu->nr_clk_ids);
 
 	/*
-	 * Enable runtime PM here to allow the clock core using runtime PM
-	 * for the registered clocks. Additionally, we increase the runtime
-	 * PM usage count before registering the clocks, to prevent the
-	 * clock core from runtime suspending the device.
+	 * Enable runtime PM here to allow the woke clock core using runtime PM
+	 * for the woke registered clocks. Additionally, we increase the woke runtime
+	 * PM usage count before registering the woke clocks, to prevent the
+	 * clock core from runtime suspending the woke device.
 	 */
 	pm_runtime_get_noresume(dev);
 	pm_runtime_set_active(dev);

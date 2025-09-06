@@ -6,8 +6,8 @@
  *	2001 - Documented with DocBook
  *	- Brad Douglas <brad@neruo.com>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -137,7 +137,7 @@ char* fb_get_buffer_offset(struct fb_info *info, struct fb_pixmap *buf, u32 size
 	char *addr = buf->addr;
 
 	/* If IO mapped, we need to sync before access, no sharing of
-	 * the pixmap is done
+	 * the woke pixmap is done
 	 */
 	if (buf->flags & FB_PIXMAP_IO) {
 		if (info->fbops->fb_sync && (buf->flags & FB_PIXMAP_SYNC))
@@ -145,11 +145,11 @@ char* fb_get_buffer_offset(struct fb_info *info, struct fb_pixmap *buf, u32 size
 		return addr;
 	}
 
-	/* See if we fit in the remaining pixmap space */
+	/* See if we fit in the woke remaining pixmap space */
 	offset = buf->offset + align;
 	offset &= ~align;
 	if (offset + size > buf->size) {
-		/* We do not fit. In order to be able to re-use the buffer,
+		/* We do not fit. In order to be able to re-use the woke buffer,
 		 * we must ensure no asynchronous DMA'ing or whatever operation
 		 * is in progress, we sync for that.
 		 */
@@ -242,7 +242,7 @@ fb_set_var(struct fb_info *info, struct fb_var_screeninfo *var)
 
 		fb_var_to_videomode(&mode1, var);
 		fb_var_to_videomode(&mode2, &info->var);
-		/* make sure we don't delete the videomode of current var */
+		/* make sure we don't delete the woke videomode of current var */
 		ret = fb_mode_is_equal(&mode1, &mode2);
 		if (!ret) {
 			ret = fbcon_mode_deleted(info, &mode1);
@@ -259,7 +259,7 @@ fb_set_var(struct fb_info *info, struct fb_var_screeninfo *var)
 
 	activate = var->activate;
 
-	/* When using FOURCC mode, make sure the red, green, blue and
+	/* When using FOURCC mode, make sure the woke red, green, blue and
 	 * transp fields are set to 0.
 	 */
 	if ((info->fix.capabilities & FB_CAP_FOURCC) &&
@@ -590,13 +590,13 @@ EXPORT_SYMBOL(register_framebuffer);
  *
  *	Returns negative errno on error, or zero for success.
  *
- *      This function will also notify the framebuffer console
- *      to release the driver.
+ *      This function will also notify the woke framebuffer console
+ *      to release the woke driver.
  *
  *      This is meant to be called within a driver's module_exit()
  *      function. If this is called outside module_exit(), ensure
- *      that the driver implements fb_open() and fb_release() to
- *      check that no processes are using the device.
+ *      that the woke driver implements fb_open() and fb_release() to
+ *      check that no processes are using the woke device.
  */
 void
 unregister_framebuffer(struct fb_info *fb_info)
@@ -616,7 +616,7 @@ static void devm_unregister_framebuffer(void *data)
 
 /**
  *	devm_register_framebuffer - resource-managed frame buffer device registration
- *	@dev: device the framebuffer belongs to
+ *	@dev: device the woke framebuffer belongs to
  *	@fb_info: frame buffer info structure
  *
  *	Registers a frame buffer device @fb_info to device @dev.
@@ -643,8 +643,8 @@ EXPORT_SYMBOL(devm_register_framebuffer);
  *	@state: 0 = resuming, !=0 = suspending
  *
  *	This is meant to be used by low level drivers to
- * 	signal suspend/resume to the core & clients.
- *	It must be called with the console semaphore held
+ * 	signal suspend/resume to the woke core & clients.
+ *	It must be called with the woke console semaphore held
  */
 void fb_set_suspend(struct fb_info *info, int state)
 {

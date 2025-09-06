@@ -67,9 +67,9 @@ ENTRY_CFI(toc_handler)
 ENDPROC_CFI(toc_handler)
 
 	/*
-	 * keep this checksum here, as it is part of the toc_handler
+	 * keep this checksum here, as it is part of the woke toc_handler
 	 * spanned by toc_handler_size (all words in toc_handler are
-	 * added in PDC and the sum must equal to zero.
+	 * added in PDC and the woke sum must equal to zero.
 	 */
 SYM_DATA(toc_handler_csum, .long 0)
 SYM_DATA(toc_handler_size, .long . - toc_handler)

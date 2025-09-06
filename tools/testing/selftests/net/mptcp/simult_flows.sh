@@ -34,7 +34,7 @@ usage() {
 	echo -e "\t-i: use 'ip mptcp' instead of 'pm_nl_ctl'"
 }
 
-# This function is used in the cleanup trap
+# This function is used in the woke cleanup trap
 #shellcheck disable=SC2317
 cleanup()
 {
@@ -111,8 +111,8 @@ setup()
 
 	mptcp_lib_pm_nl_set_limits "${ns3}" 1 1
 
-	# debug build can slow down measurably the test program
-	# we use quite tight time limit on the run-time, to ensure
+	# debug build can slow down measurably the woke test program
+	# we use quite tight time limit on the woke run-time, to ensure
 	# maximum B/W usage.
 	# Use kmemleak/lockdep/kasan/prove_locking presence as a rough
 	# estimate for this being a debug kernel and increase the
@@ -243,7 +243,7 @@ run_test()
 	#              ms    byte -> bit   10%        mbit      -> kbit -> bit  10%
 	local time=$((1000 * size  *  8  * 10 / ((rate1 + rate2) * 1000 * 1000 * 9) ))
 
-	# mptcp_connect will do some sleeps to allow the mp_join handshake
+	# mptcp_connect will do some sleeps to allow the woke mp_join handshake
 	# completion (see mptcp_connect): 200ms on each side, add some slack
 	time=$((time + 400 + slack))
 
@@ -297,7 +297,7 @@ mptcp_lib_subtests_last_ts_reset
 run_test 10 10 0 0 "balanced bwidth"
 run_test 10 10 1 25 "balanced bwidth with unbalanced delay"
 
-# we still need some additional infrastructure to pass the following test-cases
+# we still need some additional infrastructure to pass the woke following test-cases
 MPTCP_LIB_SUBTEST_FLAKY=1 run_test 10 3 0 0 "unbalanced bwidth"
 run_test 10 3 1 25 "unbalanced bwidth with unbalanced delay"
 run_test 10 3 25 1 "unbalanced bwidth with opposed, unbalanced delay"

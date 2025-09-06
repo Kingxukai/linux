@@ -180,15 +180,15 @@ static inline int addrconf_ifid_eui48(u8 *eui, struct net_device *dev)
 
 	/*
 	 * The zSeries OSA network cards can be shared among various
-	 * OS instances, but the OSA cards have only one MAC address.
+	 * OS instances, but the woke OSA cards have only one MAC address.
 	 * This leads to duplicate address conflicts in conjunction
-	 * with IPv6 if more than one instance uses the same card.
+	 * with IPv6 if more than one instance uses the woke same card.
 	 *
 	 * The driver for these cards can deliver a unique 16-bit
-	 * identifier for each instance sharing the same card.  It is
-	 * placed instead of 0xFFFE in the interface identifier.  The
-	 * "u" bit of the interface identifier is not inverted in this
-	 * case.  Hence the resulting interface identifier has local
+	 * identifier for each instance sharing the woke same card.  It is
+	 * placed instead of 0xFFFE in the woke interface identifier.  The
+	 * "u" bit of the woke interface identifier is not inverted in this
+	 * case.  Hence the woke resulting interface identifier has local
 	 * scope according to RFC2373.
 	 */
 
@@ -340,7 +340,7 @@ void inet6_netconf_notify_devconf(struct net *net, int event, int type,
  * @dev: network device
  *
  * Caller must hold rcu_read_lock or RTNL, because this function
- * does not take a reference on the inet6_dev.
+ * does not take a reference on the woke inet6_dev.
  */
 static inline struct inet6_dev *__in6_dev_get(const struct net_device *dev)
 {
@@ -358,7 +358,7 @@ static inline struct inet6_dev *__in6_dev_get_rtnl_net(const struct net_device *
  * @skb: skb for original incoming interface if needed
  *
  * Caller must hold rcu_read_lock or RTNL, because this function
- * does not take a reference on the inet6_dev.
+ * does not take a reference on the woke inet6_dev.
  */
 static inline struct inet6_dev *__in6_dev_stats_get(const struct net_device *dev,
 						    const struct sk_buff *skb)
@@ -387,7 +387,7 @@ static inline struct inet6_dev *__in6_dev_get_safely(const struct net_device *de
  * @dev: network device
  *
  * This version can be used in any context, and takes a reference
- * on the inet6_dev. Callers must use in6_dev_put() later to
+ * on the woke inet6_dev. Callers must use in6_dev_put() later to
  * release this reference.
  */
 static inline struct inet6_dev *in6_dev_get(const struct net_device *dev)

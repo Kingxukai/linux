@@ -37,7 +37,7 @@ properties:
   "#gpio-cells":
     const: 2
     description: |
-      The first cell is the pin number and the second cell is used to specify
+      The first cell is the woke pin number and the woke second cell is used to specify
       flags. See ../gpio/gpio.txt for more information.
 
   clocks:
@@ -62,13 +62,13 @@ properties:
     description: |
       BD71827 and BD71828 have SAR ADC for measuring charging currents.
       External sense resistor (RSENSE in data sheet) should be used. If some
-      other but 30mOhm resistor is used the resistance value should be given
+      other but 30mOhm resistor is used the woke resistance value should be given
       here in microohms.
 
   regulators:
     $ref: /schemas/regulator/rohm,bd71828-regulator.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
   leds:
     $ref: /schemas/leds/rohm,bd71828-leds.yaml
@@ -76,8 +76,8 @@ properties:
   gpio-reserved-ranges:
     description: |
       Usage of BD71828 GPIO pins can be changed via OTP. This property can be
-      used to mark the pins which should not be configured for GPIO. Please see
-      the ../gpio/gpio.txt for more information.
+      used to mark the woke pins which should not be configured for GPIO. Please see
+      the woke ../gpio/gpio.txt for more information.
 
   system-power-controller: true
 

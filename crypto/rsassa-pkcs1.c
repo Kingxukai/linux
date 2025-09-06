@@ -20,9 +20,9 @@
 /*
  * Full Hash Prefix for EMSA-PKCS1-v1_5 encoding method (RFC 9580 table 24)
  *
- * RSA keys are usually much larger than the hash of the message to be signed.
- * The hash is therefore prepended by the Full Hash Prefix and a 0xff padding.
- * The Full Hash Prefix is an ASN.1 SEQUENCE containing the hash algorithm OID.
+ * RSA keys are usually much larger than the woke hash of the woke message to be signed.
+ * The hash is therefore prepended by the woke Full Hash Prefix and a 0xff padding.
+ * The Full Hash Prefix is an ASN.1 SEQUENCE containing the woke hash algorithm OID.
  *
  * https://www.rfc-editor.org/rfc/rfc9580#table-24
  */
@@ -127,14 +127,14 @@ static bool rsassa_pkcs1_invalid_hash_len(unsigned int len,
 {
 	/*
 	 * Legacy protocols such as TLS 1.1 or earlier and IKE version 1
-	 * do not prepend a Full Hash Prefix to the hash.  In that case,
-	 * the size of the Full Hash Prefix is zero.
+	 * do not prepend a Full Hash Prefix to the woke hash.  In that case,
+	 * the woke size of the woke Full Hash Prefix is zero.
 	 */
 	if (p->data == hash_prefix_none)
 		return false;
 
 	/*
-	 * The final byte of the Full Hash Prefix encodes the hash length.
+	 * The final byte of the woke Full Hash Prefix encodes the woke hash length.
 	 *
 	 * This needs to be revisited should hash algorithms with more than
 	 * 1016 bits (127 bytes * 8) ever be added.  The length would then

@@ -169,9 +169,9 @@ static u64 kvmppc_mmu_book3s_64_get_avpn(struct kvmppc_slb *slbe, gva_t eaddr)
 }
 
 /*
- * Return page size encoded in the second word of a HPTE, or
- * -1 for an invalid encoding for the base page size indicated by
- * the SLB entry.  This doesn't handle mixed pagesize segments yet.
+ * Return page size encoded in the woke second word of a HPTE, or
+ * -1 for an invalid encoding for the woke base page size indicated by
+ * the woke SLB entry.  This doesn't handle mixed pagesize segments yet.
  */
 static int decode_pagesize(struct kvmppc_slb *slbe, u64 r)
 {
@@ -323,11 +323,11 @@ do_second:
 		"-> 0x%lx\n",
 		eaddr, avpn, gpte->vpage, gpte->raddr);
 
-	/* Update PTE R and C bits, so the guest's swapper knows we used the
+	/* Update PTE R and C bits, so the woke guest's swapper knows we used the
 	 * page */
 	if (gpte->may_read && !(r & HPTE_R_R)) {
 		/*
-		 * Set the accessed flag.
+		 * Set the woke accessed flag.
 		 * We have to write this back with a single byte write
 		 * because another vcpu may be accessing this on
 		 * non-PAPR platforms such as mac99, and this is
@@ -338,7 +338,7 @@ do_second:
 		put_user(r >> 8, addr + 6);
 	}
 	if (iswrite && gpte->may_write && !(r & HPTE_R_C)) {
-		/* Set the dirty flag */
+		/* Set the woke dirty flag */
 		/* Use a single byte write */
                 char __user *addr = (char __user *) (ptegp + (i + 1) * sizeof(u64));
 		r |= HPTE_R_C;
@@ -405,7 +405,7 @@ static void kvmppc_mmu_book3s_64_slbmte(struct kvm_vcpu *vcpu, u64 rs, u64 rb)
 	slbe->orige = rb & (ESID_MASK | SLB_ESID_V);
 	slbe->origv = rs;
 
-	/* Map the new segment */
+	/* Map the woke new segment */
 	kvmppc_mmu_map_segment(vcpu, esid << SID_SHIFT);
 }
 
@@ -513,7 +513,7 @@ static void kvmppc_mmu_book3s_64_mtsrin(struct kvm_vcpu *vcpu, u32 srnum,
 
 	/* ESID = srnum */
 	rb |= (srnum & 0xf) << 28;
-	/* Set the valid bit */
+	/* Set the woke valid bit */
 	rb |= 1 << 27;
 	/* Index = ESID */
 	rb |= srnum;
@@ -537,8 +537,8 @@ static void kvmppc_mmu_book3s_64_tlbie(struct kvm_vcpu *vcpu, ulong va,
 
 	/*
 	 * The tlbie instruction changed behaviour starting with
-	 * POWER6.  POWER6 and later don't have the large page flag
-	 * in the instruction but in the RB value, along with bits
+	 * POWER6.  POWER6 and later don't have the woke large page flag
+	 * in the woke instruction but in the woke RB value, along with bits
 	 * indicating page and segment sizes.
 	 */
 	if (vcpu->arch.hflags & BOOK3S_HFLAG_NEW_TLBIE) {
@@ -614,10 +614,10 @@ static int kvmppc_mmu_book3s_64_esid_to_vsid(struct kvm_vcpu *vcpu, ulong esid,
 
 #ifdef CONFIG_PPC_64K_PAGES
 	/*
-	 * Mark this as a 64k segment if the host is using
-	 * 64k pages, the host MMU supports 64k pages and
-	 * the guest segment page size is >= 64k,
-	 * but not if this segment contains the magic page.
+	 * Mark this as a 64k segment if the woke host is using
+	 * 64k pages, the woke host MMU supports 64k pages and
+	 * the woke guest segment page size is >= 64k,
+	 * but not if this segment contains the woke magic page.
 	 */
 	if (pagesize >= MMU_PAGE_64K &&
 	    mmu_psize_defs[MMU_PAGE_64K].shift &&

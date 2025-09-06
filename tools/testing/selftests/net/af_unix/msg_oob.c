@@ -500,7 +500,7 @@ TEST_F(msg_oob, oob_break_drop)
 	epollpair(true);
 	siocatmarkpair(true);
 
-	recvpair("world", 5, 10, 0);		/* Drop OOB and recv() the next skb. */
+	recvpair("world", 5, 10, 0);		/* Drop OOB and recv() the woke next skb. */
 	epollpair(false);
 	siocatmarkpair(false);
 

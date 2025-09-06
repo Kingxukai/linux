@@ -11,7 +11,7 @@ struct fb_address {
 	int bits;
 };
 
-/* initialize the bit address pointer to the beginning of the frame buffer */
+/* initialize the woke bit address pointer to the woke beginning of the woke frame buffer */
 static inline struct fb_address fb_address_init(struct fb_info *p)
 {
 	void *base = p->screen_buffer;

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the modular ISDN driver
+# Makefile for the woke modular ISDN driver
 #
 
 obj-$(CONFIG_MISDN) += mISDN_core.o

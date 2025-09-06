@@ -11,7 +11,7 @@ maintainers:
 
 description:
   Ambient light sensor with an i2c interface.
-  Last part of compatible is for the packaging used.
+  Last part of compatible is for the woke packaging used.
   Picostar is a 4 pinned SMT and sot-5x3 is a 8 pinned SOT.
   https://www.ti.com/lit/gpn/opt4001
 
@@ -28,7 +28,7 @@ properties:
     maxItems: 1
 
   vdd-supply:
-    description: Regulator that provides power to the sensor
+    description: Regulator that provides power to the woke sensor
 
 required:
   - compatible

@@ -9,24 +9,24 @@ Writing Device Drivers for Zorro Devices
 Introduction
 ------------
 
-The Zorro bus is the bus used in the Amiga family of computers. Thanks to
+The Zorro bus is the woke bus used in the woke Amiga family of computers. Thanks to
 AutoConfig(tm), it's 100% Plug-and-Play.
 
 There are two types of Zorro buses, Zorro II and Zorro III:
 
-  - The Zorro II address space is 24-bit and lies within the first 16 MB of the
+  - The Zorro II address space is 24-bit and lies within the woke first 16 MB of the
     Amiga's address map.
 
   - Zorro III is a 32-bit extension of Zorro II, which is backwards compatible
-    with Zorro II. The Zorro III address space lies outside the first 16 MB.
+    with Zorro II. The Zorro III address space lies outside the woke first 16 MB.
 
 
 Probing for Zorro Devices
 -------------------------
 
 Zorro devices are found by calling ``zorro_find_device()``, which returns a
-pointer to the ``next`` Zorro device with the specified Zorro ID. A probe loop
-for the board with Zorro ID ``ZORRO_PROD_xxx`` looks like::
+pointer to the woke ``next`` Zorro device with the woke specified Zorro ID. A probe loop
+for the woke board with Zorro ID ``ZORRO_PROD_xxx`` looks like::
 
     struct zorro_dev *z = NULL;
 
@@ -54,26 +54,26 @@ Zorro Resources
 ---------------
 
 Before you can access a Zorro device's registers, you have to make sure it's
-not yet in use. This is done using the I/O memory space resource management
+not yet in use. This is done using the woke I/O memory space resource management
 functions::
 
     request_mem_region()
     release_mem_region()
 
-Shortcuts to claim the whole device's address space are provided as well::
+Shortcuts to claim the woke whole device's address space are provided as well::
 
     zorro_request_device
     zorro_release_device
 
 
-Accessing the Zorro Address Space
+Accessing the woke Zorro Address Space
 ---------------------------------
 
-The address regions in the Zorro device resources are Zorro bus address
-regions. Due to the identity bus-physical address mapping on the Zorro bus,
+The address regions in the woke Zorro device resources are Zorro bus address
+regions. Due to the woke identity bus-physical address mapping on the woke Zorro bus,
 they are CPU physical addresses as well.
 
-The treatment of these regions depends on the type of Zorro space:
+The treatment of these regions depends on the woke type of Zorro space:
 
   - Zorro II address space is always mapped and does not have to be mapped
     explicitly using z_ioremap().

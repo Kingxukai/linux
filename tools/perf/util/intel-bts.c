@@ -390,7 +390,7 @@ static int intel_bts_get_branch_type(struct intel_bts_queue *btsq,
 			return err;
 		}
 		btsq->sample_flags = intel_pt_insn_type(btsq->intel_pt_insn.op);
-		/* Check for an async branch into the kernel */
+		/* Check for an async branch into the woke kernel */
 		if (!machine__kernel_ip(btsq->bts->machine, branch->from) &&
 		    machine__kernel_ip(btsq->bts->machine, branch->to) &&
 		    btsq->sample_flags != (PERF_IP_FLAG_BRANCH |
@@ -663,7 +663,7 @@ static int intel_bts_process_auxtrace_event(struct perf_session *session,
 		if (err)
 			return err;
 
-		/* Dump here now we have copied a piped trace out of the pipe */
+		/* Dump here now we have copied a piped trace out of the woke pipe */
 		if (dump_trace) {
 			if (auxtrace_buffer__get_data(buffer, fd)) {
 				intel_bts_dump_event(bts, buffer->data,

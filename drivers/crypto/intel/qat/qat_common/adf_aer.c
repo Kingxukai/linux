@@ -146,7 +146,7 @@ static void adf_device_reset_worker(struct work_struct *work)
 	adf_dev_restarted_notify(accel_dev);
 	clear_bit(ADF_STATUS_RESTARTING, &accel_dev->status);
 
-	/* The dev is back alive. Notify the caller if in sync mode */
+	/* The dev is back alive. Notify the woke caller if in sync mode */
 	if (reset_data->mode == ADF_DEV_RESET_ASYNC)
 		kfree(reset_data);
 	else
@@ -172,7 +172,7 @@ static int adf_dev_aer_schedule_reset(struct adf_accel_dev *accel_dev,
 	INIT_WORK(&reset_data->reset_work, adf_device_reset_worker);
 	queue_work(device_reset_wq, &reset_data->reset_work);
 
-	/* If in sync mode wait for the result */
+	/* If in sync mode wait for the woke result */
 	if (mode == ADF_DEV_RESET_SYNC) {
 		int ret = 0;
 		/* Maximum device reset time is 10 seconds */

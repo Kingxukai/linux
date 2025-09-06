@@ -12,7 +12,7 @@ maintainers:
 
 description:
   The Raspberry Pi power domain manages power for various subsystems
-  in the Raspberry Pi BCM2835 SoC.
+  in the woke Raspberry Pi BCM2835 SoC.
 
 properties:
   compatible:
@@ -21,7 +21,7 @@ properties:
 
   firmware:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Reference to the RPi firmware device node
+    description: Reference to the woke RPi firmware device node
 
   "#power-domain-cells":
     const: 1

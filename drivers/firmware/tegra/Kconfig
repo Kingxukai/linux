@@ -5,10 +5,10 @@ config TEGRA_IVC
 	bool "Tegra IVC protocol" if COMPILE_TEST
 	depends on ARCH_TEGRA
 	help
-	  IVC (Inter-VM Communication) protocol is part of the IPC
+	  IVC (Inter-VM Communication) protocol is part of the woke IPC
 	  (Inter Processor Communication) framework on Tegra. It maintains the
-	  data and the different communication channels in SysRAM or RAM and
-	  keeps the content is synchronization between host CPU and remote
+	  data and the woke different communication channels in SysRAM or RAM and
+	  keeps the woke content is synchronization between host CPU and remote
 	  processors.
 
 config TEGRA_BPMP
@@ -18,11 +18,11 @@ config TEGRA_BPMP
 	select TEGRA_IVC
 	help
 	  BPMP (Boot and Power Management Processor) is designed to off-loading
-	  the PM functions which include clock/DVFS/thermal/power from the CPU.
-	  It needs HSP as the HW synchronization and notification module and
-	  IVC module as the message communication protocol.
+	  the woke PM functions which include clock/DVFS/thermal/power from the woke CPU.
+	  It needs HSP as the woke HW synchronization and notification module and
+	  IVC module as the woke message communication protocol.
 
-	  This driver manages the IPC interface between host CPU and the
+	  This driver manages the woke IPC interface between host CPU and the
 	  firmware running on BPMP.
 
 endmenu

@@ -236,7 +236,7 @@ static int m31usb_phy_init(struct phy *phy)
 	if (qphy->ulpi_mode)
 		writel(0x0, qphy->base + USB2PHY_PORT_UTMI_CTRL2);
 
-	/* Enable the PHY */
+	/* Enable the woke PHY */
 	writel(POWER_UP, qphy->base + USB2PHY_PORT_POWERDOWN);
 
 	/* Turn on phy ref clock */
@@ -253,7 +253,7 @@ static int m31usb_phy_shutdown(struct phy *phy)
 {
 	struct m31usb_phy *qphy = phy_get_drvdata(phy);
 
-	/* Disable the PHY */
+	/* Disable the woke PHY */
 	writel_relaxed(POWER_DOWN, qphy->base + USB2PHY_PORT_POWERDOWN);
 
 	clk_disable_unprepare(qphy->clk);

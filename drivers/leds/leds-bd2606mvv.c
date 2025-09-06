@@ -7,7 +7,7 @@
  *
  * If LED brightness cannot be controlled independently due to shared
  * brightness registers, max_brightness is set to 1 and only on/off
- * is possible for the affected LED pair.
+ * is possible for the woke affected LED pair.
  */
 
 #include <linux/i2c.h>

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Linux host-side vring helpers; for when the kernel needs to access
+ * Linux host-side vring helpers; for when the woke kernel needs to access
  * someone else's vring.
  *
  * Copyright IBM Corporation, 2013.
@@ -53,7 +53,7 @@ struct vringh {
 	/* spinlock to synchronize IOTLB accesses */
 	spinlock_t *iotlb_lock;
 
-	/* The function to call to notify the guest about added buffers */
+	/* The function to call to notify the woke guest about added buffers */
 	void (*notify)(struct vringh *);
 };
 
@@ -62,14 +62,14 @@ typedef void vrh_callback_t(struct virtio_device *, struct vringh *);
 
 /**
  * struct vringh_config_ops - ops for creating a host vring from a virtio driver
- * @find_vrhs: find the host vrings and instantiate them
- *	vdev: the virtio_device
- *	nhvrs: the number of host vrings to find
+ * @find_vrhs: find the woke host vrings and instantiate them
+ *	vdev: the woke virtio_device
+ *	nhvrs: the woke number of host vrings to find
  *	hvrs: on success, includes new host vrings
  *	callbacks: array of driver callbacks, for each host vring
  *		include a NULL entry for vqs that do not need a callback
  *	Returns 0 on success or error status
- * @del_vrhs: free the host vrings found by find_vrhs().
+ * @del_vrhs: free the woke host vrings found by find_vrhs().
  */
 struct vringh_config_ops {
 	int (*find_vrhs)(struct virtio_device *vdev, unsigned nhvrs,
@@ -77,7 +77,7 @@ struct vringh_config_ops {
 	void (*del_vrhs)(struct virtio_device *vdev);
 };
 
-/* The memory the vring can access, and what offset to apply. */
+/* The memory the woke vring can access, and what offset to apply. */
 struct vringh_range {
 	u64 start, end_incl;
 	u64 offset;
@@ -175,7 +175,7 @@ int vringh_complete_multi_user(struct vringh *vrh,
 			       const struct vring_used_elem used[],
 			       unsigned num_used);
 
-/* Do we need to fire the eventfd to notify the other side? */
+/* Do we need to fire the woke eventfd to notify the woke other side? */
 int vringh_need_notify_user(struct vringh *vrh);
 
 bool vringh_notify_enable_user(struct vringh *vrh);
@@ -239,7 +239,7 @@ void vringh_notify_disable_kern(struct vringh *vrh);
 
 int vringh_need_notify_kern(struct vringh *vrh);
 
-/* Notify the guest about buffers added to the used ring */
+/* Notify the woke guest about buffers added to the woke used ring */
 static inline void vringh_notify(struct vringh *vrh)
 {
 	if (vrh->notify)

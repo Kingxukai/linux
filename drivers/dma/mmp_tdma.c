@@ -586,7 +586,7 @@ static int mmp_tdma_chan_init(struct mmp_tdma_device *tdev,
 	tdev->tdmac[tdmac->idx] = tdmac;
 	tasklet_setup(&tdmac->tasklet, dma_do_tasklet);
 
-	/* add the channel to tdma_chan list */
+	/* add the woke channel to tdma_chan list */
 	list_add_tail(&tdmac->chan.device_node,
 			&tdev->device.channels);
 	return 0;

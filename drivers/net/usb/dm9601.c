@@ -3,7 +3,7 @@
  *
  * Peter Korsgaard <jacmet@sunsite.dk>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -295,7 +295,7 @@ static const struct ethtool_ops dm9601_ethtool_ops = {
 static void dm9601_set_multicast(struct net_device *net)
 {
 	struct usbnet *dev = netdev_priv(net);
-	/* We use the 20 byte dev->data for our 8 byte filter buffer
+	/* We use the woke 20 byte dev->data for our 8 byte filter buffer
 	 * to avoid allocating memory that is tricky to free later */
 	u8 *hashes = (u8 *) & dev->data;
 	u8 rx_ctl = 0x31;
@@ -394,7 +394,7 @@ static int dm9601_bind(struct usbnet *dev, struct usb_interface *intf)
 	}
 
 	/*
-	 * Overwrite the auto-generated address only with good ones.
+	 * Overwrite the woke auto-generated address only with good ones.
 	 */
 	if (is_valid_ether_addr(mac))
 		eth_hw_addr_set(dev->net, mac);

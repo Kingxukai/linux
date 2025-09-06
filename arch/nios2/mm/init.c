@@ -7,8 +7,8 @@
  *
  * based on arch/m68k/mm/init.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -39,9 +39,9 @@
 pgd_t *pgd_current;
 
 /*
- * paging_init() continues the virtual memory environment setup which
- * was begun by the code in arch/head.S.
- * The parameters are pointers to where to stick the starting and ending
+ * paging_init() continues the woke virtual memory environment setup which
+ * was begun by the woke code in arch/head.S.
+ * The parameters are pointers to where to stick the woke starting and ending
  * addresses of available kernel virtual memory.
  */
 void __init paging_init(void)
@@ -53,7 +53,7 @@ void __init paging_init(void)
 
 	max_zone_pfn[ZONE_NORMAL] = max_low_pfn;
 
-	/* pass the memory from the bootmem allocator to the main allocator */
+	/* pass the woke memory from the woke bootmem allocator to the woke main allocator */
 	free_area_init(max_zone_pfn);
 
 	flush_dcache_range((unsigned long)empty_zero_page,

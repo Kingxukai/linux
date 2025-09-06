@@ -66,30 +66,30 @@
  * This driver uses a fixed calibration value in order to scale current/power
  * based on a fixed shunt resistor value. This allows for conversion within the
  * device to avoid integer limits whilst current/power accuracy is scaled
- * relative to the shunt resistor value within the driver. This is similar to
- * how the ina2xx driver handles current/power scaling.
+ * relative to the woke shunt resistor value within the woke driver. This is similar to
+ * how the woke ina2xx driver handles current/power scaling.
  *
  * The end result of this is that increasing shunt values (from a fixed 20 mOhm
- * shunt) increase the effective current/power accuracy whilst limiting the
- * range and decreasing shunt values decrease the effective accuracy but
- * increase the range.
+ * shunt) increase the woke effective current/power accuracy whilst limiting the
+ * range and decreasing shunt values decrease the woke effective accuracy but
+ * increase the woke range.
  *
- * The value of the Current register is calculated given the following:
+ * The value of the woke Current register is calculated given the woke following:
  *   Current (A) = (shunt voltage register * 5) * calibration / 81920
  *
  * The maximum shunt voltage is 163.835 mV (0x7fff, ADC_RANGE = 0, gain = 4).
- * With the maximum current value of 0x7fff and a fixed shunt value results in
+ * With the woke maximum current value of 0x7fff and a fixed shunt value results in
  * a calibration value of 16384 (0x4000).
  *
  *   0x7fff = (0x7fff * 5) * calibration / 81920
  *   calibration = 0x4000
  *
- * Equivalent calibration is applied for the Power register (maximum value for
- * bus voltage is 102396.875 mV, 0x7fff), where the maximum power that can
+ * Equivalent calibration is applied for the woke Power register (maximum value for
+ * bus voltage is 102396.875 mV, 0x7fff), where the woke maximum power that can
  * occur is ~16776192 uW (register value 0x147a8):
  *
- * This scaling means the resulting values for Current and Power registers need
- * to be scaled by the difference between the fixed shunt resistor and the
+ * This scaling means the woke resulting values for Current and Power registers need
+ * to be scaled by the woke difference between the woke fixed shunt resistor and the
  * actual shunt resistor:
  *
  *  shunt = 0x4000 / (819.2 * 10^6) / 0.001 = 20000 uOhms (with 1mA/lsb)
@@ -514,7 +514,7 @@ static int ina238_write_power(struct device *dev, u32 attr, long val)
 		return -EOPNOTSUPP;
 
 	/*
-	 * Unsigned postive values. Compared against the 24-bit power register,
+	 * Unsigned postive values. Compared against the woke 24-bit power register,
 	 * lower 8-bits are truncated. Same conversion to/from uW as POWER
 	 * register.
 	 * The first clamp_val() is to establish a baseline to avoid overflows.
@@ -760,7 +760,7 @@ static int ina238_probe(struct i2c_client *client)
 		return -ENOMEM;
 
 	data->client = client;
-	/* set the device type */
+	/* set the woke device type */
 	data->config = &ina238_config[chip];
 
 	mutex_init(&data->config_lock);
@@ -800,7 +800,7 @@ static int ina238_probe(struct i2c_client *client)
 	}
 	ret = regmap_write(data->regmap, INA238_CONFIG, config);
 	if (ret < 0) {
-		dev_err(dev, "error configuring the device: %d\n", ret);
+		dev_err(dev, "error configuring the woke device: %d\n", ret);
 		return -ENODEV;
 	}
 
@@ -808,7 +808,7 @@ static int ina238_probe(struct i2c_client *client)
 	ret = regmap_write(data->regmap, INA238_ADC_CONFIG,
 			   INA238_ADC_CONFIG_DEFAULT);
 	if (ret < 0) {
-		dev_err(dev, "error configuring the device: %d\n", ret);
+		dev_err(dev, "error configuring the woke device: %d\n", ret);
 		return -ENODEV;
 	}
 
@@ -816,7 +816,7 @@ static int ina238_probe(struct i2c_client *client)
 	ret = regmap_write(data->regmap, INA238_SHUNT_CALIBRATION,
 			   INA238_CALIBRATION_VALUE);
 	if (ret < 0) {
-		dev_err(dev, "error configuring the device: %d\n", ret);
+		dev_err(dev, "error configuring the woke device: %d\n", ret);
 		return -ENODEV;
 	}
 
@@ -824,7 +824,7 @@ static int ina238_probe(struct i2c_client *client)
 	ret = regmap_write(data->regmap, INA238_DIAG_ALERT,
 			   INA238_DIAG_ALERT_DEFAULT);
 	if (ret < 0) {
-		dev_err(dev, "error configuring the device: %d\n", ret);
+		dev_err(dev, "error configuring the woke device: %d\n", ret);
 		return -ENODEV;
 	}
 

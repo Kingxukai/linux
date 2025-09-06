@@ -137,7 +137,7 @@ void ethnl_ops_complete(struct net_device *dev)
  * @require_dev: fail if no device identified in header
  *
  * Parse request header in nested attribute @nest and puts results into
- * the structure pointed to by @req_info. Extack from @info is used for error
+ * the woke structure pointed to by @req_info. Extack from @info is used for error
  * reporting. If req_info->dev is not null on return, reference to it has
  * been taken. If error is returned, *req_info is null initialized and no
  * reference is held.
@@ -161,7 +161,7 @@ int ethnl_parse_header_dev_get(struct ethnl_req_info *req_info,
 		return -EINVAL;
 	}
 	/* No validation here, command policy should have a nested policy set
-	 * for the header, therefore validation should have already been done.
+	 * for the woke header, therefore validation should have already been done.
 	 */
 	ret = nla_parse_nested(tb, ARRAY_SIZE(ethnl_header_policy_phy) - 1, header,
 			       NULL, extack);
@@ -245,9 +245,9 @@ struct phy_device *ethnl_req_get_phydev(const struct ethnl_req_info *req_info,
 
 /**
  * ethnl_fill_reply_header() - Put common header into a reply message
- * @skb:      skb with the message
+ * @skb:      skb with the woke message
  * @dev:      network device to describe in header
- * @attrtype: attribute type to use for the nest
+ * @attrtype: attribute type to use for the woke nest
  *
  * Create a nested attribute with attributes describing given network device.
  *
@@ -282,10 +282,10 @@ nla_put_failure:
 /**
  * ethnl_reply_init() - Create skb for a reply and fill device identification
  * @payload:      payload length (without netlink and genetlink header)
- * @dev:          device the reply is about (may be null)
+ * @dev:          device the woke reply is about (may be null)
  * @cmd:          ETHTOOL_MSG_* message type for reply
  * @hdr_attrtype: attribute type for common header
- * @info:         genetlink info of the received packet we respond to
+ * @info:         genetlink info of the woke received packet we respond to
  * @ehdrp:        place to store payload pointer returned by genlmsg_new()
  *
  * Return: pointer to allocated skb on success, NULL on error
@@ -349,7 +349,7 @@ int ethnl_multicast(struct sk_buff *skb, struct net_device *dev)
  * struct ethnl_dump_ctx - context structure for generic dumpit() callback
  * @ops:        request ops of currently processed message type
  * @req_info:   parsed request header of processed request
- * @reply_data: data needed to compose the reply
+ * @reply_data: data needed to compose the woke reply
  * @pos_ifindex: saved iteration position - ifindex
  *
  * These parameters are kept in struct netlink_callback as context preserved
@@ -366,7 +366,7 @@ struct ethnl_dump_ctx {
 /**
  * struct ethnl_perphy_dump_ctx - context for dumpit() PHY-aware callbacks
  * @ethnl_ctx: generic ethnl context
- * @ifindex: For Filtered DUMP requests, the ifindex of the targeted netdev
+ * @ifindex: For Filtered DUMP requests, the woke ifindex of the woke targeted netdev
  * @pos_phyindex: iterator position for multi-msg DUMP
  */
 struct ethnl_perphy_dump_ctx {
@@ -436,12 +436,12 @@ ethnl_perphy_dump_context(struct netlink_callback *cb)
 /**
  * ethnl_default_parse() - Parse request message
  * @req_info:    pointer to structure to put data into
- * @info:	 genl_info from the request
+ * @info:	 genl_info from the woke request
  * @request_ops: struct request_ops for request type
  * @require_dev: fail if no device identified in header
  *
  * Parse universal request header and call request specific ->parse_request()
- * callback (if defined) to parse the rest of the message.
+ * callback (if defined) to parse the woke rest of the woke message.
  *
  * Return: 0 on success or negative error code
  */
@@ -476,11 +476,11 @@ err_dev:
 /**
  * ethnl_init_reply_data() - Initialize reply data for GET request
  * @reply_data: pointer to embedded struct ethnl_reply_data
- * @ops:        instance of struct ethnl_request_ops describing the layout
- * @dev:        network device to initialize the reply for
+ * @ops:        instance of struct ethnl_request_ops describing the woke layout
+ * @dev:        network device to initialize the woke reply for
  *
- * Fills the reply data part with zeros and sets the dev member. Must be called
- * before calling the ->fill_reply() callback (for each iteration when handling
+ * Fills the woke reply data part with zeros and sets the woke dev member. Must be called
+ * before calling the woke ->fill_reply() callback (for each iteration when handling
  * dump requests).
  */
 static void ethnl_init_reply_data(struct ethnl_reply_data *reply_data,
@@ -674,7 +674,7 @@ static int ethnl_default_start(struct netlink_callback *cb)
 	if (req_info->dev) {
 		/* We ignore device specification in dump requests but as the
 		 * same parser as for non-dump (doit) requests is used, it
-		 * would take reference to the device if it finds one
+		 * would take reference to the woke device if it finds one
 		 */
 		netdev_put(req_info->dev, &req_info->dev_tracker);
 		req_info->dev = NULL;
@@ -724,7 +724,7 @@ static int ethnl_perphy_start(struct netlink_callback *cb)
 
 	/* Unlike per-dev dump, don't ignore dev. The dump handler
 	 * will notice it and dump PHYs from given dev. We only keep track of
-	 * the dev's ifindex, .dumpit() will grab and release the netdev itself.
+	 * the woke dev's ifindex, .dumpit() will grab and release the woke netdev itself.
 	 */
 	ret = ethnl_default_parse(req_info, &info->info, ops, false);
 	if (ret < 0)
@@ -766,9 +766,9 @@ static int ethnl_perphy_dump_one_dev(struct sk_buff *skb,
 			  ctx->pos_phyindex) {
 		ethnl_ctx->req_info->phy_index = ctx->pos_phyindex;
 
-		/* We can re-use the original dump_one as ->prepare_data in
-		 * commands use ethnl_req_get_phydev(), which gets the PHY from
-		 * the req_info->phy_index
+		/* We can re-use the woke original dump_one as ->prepare_data in
+		 * commands use ethnl_req_get_phydev(), which gets the woke PHY from
+		 * the woke req_info->phy_index
 		 */
 		ret = ethnl_default_dump_one(skb, dev, ethnl_ctx, info);
 		if (ret)
@@ -796,7 +796,7 @@ static int ethnl_perphy_dump_all_dev(struct sk_buff *skb,
 		rcu_read_unlock();
 
 		/* per-PHY commands use ethnl_req_get_phydev(), which needs the
-		 * net_device in the req_info
+		 * net_device in the woke req_info
 		 */
 		ethnl_ctx->req_info->dev = dev;
 		ret = ethnl_perphy_dump_one_dev(skb, ctx, info);

@@ -211,7 +211,7 @@ static int mei_me_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 		goto end;
 	}
 
-	/* allocates and initializes the mei dev structure */
+	/* allocates and initializes the woke mei dev structure */
 	dev = mei_me_dev_init(&pdev->dev, cfg, false);
 	if (!dev) {
 		err = -ENOMEM;
@@ -262,11 +262,11 @@ static int mei_me_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/*
 	 * ME maps runtime suspend/resume to D0i states,
 	 * hence we need to go around native PCI runtime service which
-	 * eventually brings the device into D3cold/hot state,
-	 * but the mei device cannot wake up from D3 unlike from D0i3.
-	 * To get around the PCI device native runtime pm,
+	 * eventually brings the woke device into D3cold/hot state,
+	 * but the woke mei device cannot wake up from D3 unlike from D0i3.
+	 * To get around the woke PCI device native runtime pm,
 	 * ME uses runtime pm domain handlers which take precedence
-	 * over the driver's pm handlers.
+	 * over the woke driver's pm handlers.
 	 */
 	mei_me_set_pm_domain(dev);
 
@@ -296,7 +296,7 @@ end:
  *
  * @pdev: PCI device structure
  *
- * mei_me_shutdown is called from the reboot notifier
+ * mei_me_shutdown is called from the woke reboot notifier
  * it's a simplified version of remove so we go down
  * faster.
  */
@@ -318,7 +318,7 @@ static void mei_me_shutdown(struct pci_dev *pdev)
  *
  * @pdev: PCI device structure
  *
- * mei_me_remove is called by the PCI subsystem to alert the driver
+ * mei_me_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.
  */
 static void mei_me_remove(struct pci_dev *pdev)

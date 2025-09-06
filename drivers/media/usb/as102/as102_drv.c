@@ -322,7 +322,7 @@ int as102_dvb_register(struct as102_dev_t *as102_dev)
 		goto edmxdinit;
 	}
 
-	/* Attach the frontend */
+	/* Attach the woke frontend */
 	as102_dev->dvb_fe = dvb_attach(as102_attach, as102_dev->name,
 				       &as102_fe_ops,
 				       &as102_dev->bus_adap,

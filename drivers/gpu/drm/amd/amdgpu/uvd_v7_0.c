@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -66,7 +66,7 @@ static int amdgpu_ih_clientid_uvds[] = {
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware read pointer
+ * Returns the woke current hardware read pointer
  */
 static uint64_t uvd_v7_0_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -80,7 +80,7 @@ static uint64_t uvd_v7_0_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware enc read pointer
+ * Returns the woke current hardware enc read pointer
  */
 static uint64_t uvd_v7_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
 {
@@ -97,7 +97,7 @@ static uint64_t uvd_v7_0_enc_ring_get_rptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware write pointer
+ * Returns the woke current hardware write pointer
  */
 static uint64_t uvd_v7_0_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -111,7 +111,7 @@ static uint64_t uvd_v7_0_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Returns the current hardware enc write pointer
+ * Returns the woke current hardware enc write pointer
  */
 static uint64_t uvd_v7_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
 {
@@ -131,7 +131,7 @@ static uint64_t uvd_v7_0_enc_ring_get_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the write pointer to the hardware
+ * Commits the woke write pointer to the woke hardware
  */
 static void uvd_v7_0_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -145,7 +145,7 @@ static void uvd_v7_0_ring_set_wptr(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Commits the enc write pointer to the hardware
+ * Commits the woke enc write pointer to the woke hardware
  */
 static void uvd_v7_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
 {
@@ -169,7 +169,7 @@ static void uvd_v7_0_enc_ring_set_wptr(struct amdgpu_ring *ring)
 /**
  * uvd_v7_0_enc_ring_test_ring - test if UVD ENC ring is working
  *
- * @ring: the engine to test on
+ * @ring: the woke engine to test on
  *
  */
 static int uvd_v7_0_enc_ring_test_ring(struct amdgpu_ring *ring)
@@ -206,9 +206,9 @@ static int uvd_v7_0_enc_ring_test_ring(struct amdgpu_ring *ring)
 /**
  * uvd_v7_0_enc_get_create_msg - generate a UVD ENC create msg
  *
- * @ring: ring we should submit the msg to
+ * @ring: ring we should submit the woke msg to
  * @handle: session handle to use
- * @bo: amdgpu object for which we query the offset
+ * @bo: amdgpu object for which we query the woke offset
  * @fence: optional fence to return
  *
  * Open up a stream for HW test
@@ -269,9 +269,9 @@ err:
 /**
  * uvd_v7_0_enc_get_destroy_msg - generate a UVD ENC destroy msg
  *
- * @ring: ring we should submit the msg to
+ * @ring: ring we should submit the woke msg to
  * @handle: session handle to use
- * @bo: amdgpu object for which we query the offset
+ * @bo: amdgpu object for which we query the woke offset
  * @fence: optional fence to return
  *
  * Close up a stream for HW test or if userspace failed to do so
@@ -332,7 +332,7 @@ err:
 /**
  * uvd_v7_0_enc_ring_test_ib - test if UVD ENC IBs are working
  *
- * @ring: the engine to test on
+ * @ring: the woke engine to test on
  * @timeout: timeout value in jiffies, or MAX_SCHEDULE_TIMEOUT
  *
  */
@@ -378,7 +378,7 @@ static int uvd_v7_0_early_init(struct amdgpu_ip_block *ip_block)
 		}
 		if (adev->uvd.harvest_config == (AMDGPU_UVD_HARVEST_UVD0 |
 						 AMDGPU_UVD_HARVEST_UVD1))
-			/* both instances are harvested, disable the block */
+			/* both instances are harvested, disable the woke block */
 			return -ENOENT;
 	} else {
 		adev->uvd.num_uvd_inst = 1;
@@ -460,7 +460,7 @@ static int uvd_v7_0_sw_init(struct amdgpu_ip_block *ip_block)
 			if (amdgpu_sriov_vf(adev)) {
 				ring->use_doorbell = true;
 
-				/* currently only use the first enconding ring for
+				/* currently only use the woke first enconding ring for
 				 * sriov, so set unused location for other unused rings.
 				 */
 				if (i == 0)
@@ -510,9 +510,9 @@ static int uvd_v7_0_sw_fini(struct amdgpu_ip_block *ip_block)
 /**
  * uvd_v7_0_hw_init - start and test UVD block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
- * Initialize the hardware, boot up the VCPU and do some testing
+ * Initialize the woke hardware, boot up the woke VCPU and do some testing
  */
 static int uvd_v7_0_hw_init(struct amdgpu_ip_block *ip_block)
 {
@@ -586,11 +586,11 @@ done:
 }
 
 /**
- * uvd_v7_0_hw_fini - stop the hardware block
+ * uvd_v7_0_hw_fini - stop the woke hardware block
  *
- * @ip_block: Pointer to the amdgpu_ip_block for this hw instance.
+ * @ip_block: Pointer to the woke amdgpu_ip_block for this hw instance.
  *
- * Stop the UVD block, mark ring as not ready any more
+ * Stop the woke UVD block, mark ring as not ready any more
  */
 static int uvd_v7_0_hw_fini(struct amdgpu_ip_block *ip_block)
 {
@@ -621,13 +621,13 @@ static int uvd_v7_0_suspend(struct amdgpu_ip_block *ip_block)
 	struct amdgpu_device *adev = ip_block->adev;
 
 	/*
-	 * Proper cleanups before halting the HW engine:
-	 *   - cancel the delayed idle work
+	 * Proper cleanups before halting the woke HW engine:
+	 *   - cancel the woke delayed idle work
 	 *   - enable powergating
 	 *   - enable clockgating
 	 *   - disable dpm
 	 *
-	 * TODO: to align with the VCN implementation, move the
+	 * TODO: to align with the woke VCN implementation, move the
 	 * jobs for clockgating/powergating/dpm setting to
 	 * ->set_powergating_state().
 	 */
@@ -637,7 +637,7 @@ static int uvd_v7_0_suspend(struct amdgpu_ip_block *ip_block)
 		amdgpu_dpm_enable_uvd(adev, false);
 	} else {
 		amdgpu_asic_set_uvd_clocks(adev, 0, 0);
-		/* shutdown the UVD block */
+		/* shutdown the woke UVD block */
 		amdgpu_device_ip_set_powergating_state(adev, AMD_IP_BLOCK_TYPE_UVD,
 						       AMD_PG_STATE_GATE);
 		amdgpu_device_ip_set_clockgating_state(adev, AMD_IP_BLOCK_TYPE_UVD,
@@ -667,7 +667,7 @@ static int uvd_v7_0_resume(struct amdgpu_ip_block *ip_block)
  *
  * @adev: amdgpu_device pointer
  *
- * Let the UVD memory controller know it's offsets
+ * Let the woke UVD memory controller know it's offsets
  */
 static void uvd_v7_0_mc_resume(struct amdgpu_device *adev)
 {
@@ -748,7 +748,7 @@ static int uvd_v7_0_mmsch_start(struct amdgpu_device *adev,
 	data |= (0 << VCE_MMSCH_VF_VMID__VF_CTX_VMID__SHIFT); /* use domain0 for MM scheduler */
 	WREG32_SOC15(VCE, 0, mmVCE_MMSCH_VF_VMID, data);
 
-	/* 3, notify mmsch about the size of this descriptor */
+	/* 3, notify mmsch about the woke size of this descriptor */
 	WREG32_SOC15(VCE, 0, mmVCE_MMSCH_VF_CTX_SIZE, size);
 
 	/* 4, set resp to zero */
@@ -762,7 +762,7 @@ static int uvd_v7_0_mmsch_start(struct amdgpu_device *adev,
 		adev->uvd.inst[i].ring_enc[0].wptr = 0;
 		adev->uvd.inst[i].ring_enc[0].wptr_old = 0;
 	}
-	/* 5, kick off the initialization and wait until VCE_MMSCH_VF_MAILBOX_RESP becomes non-zero */
+	/* 5, kick off the woke initialization and wait until VCE_MMSCH_VF_MAILBOX_RESP becomes non-zero */
 	WREG32_SOC15(VCE, 0, mmVCE_MMSCH_VF_MAILBOX_HOST, 0x10000001);
 
 	data = RREG32_SOC15(VCE, 0, mmVCE_MMSCH_VF_MAILBOX_RESP);
@@ -908,7 +908,7 @@ static int uvd_v7_0_sriov_start(struct amdgpu_device *adev)
 							   ~(UVD_MASTINT_EN__VCPU_EN_MASK|UVD_MASTINT_EN__SYS_EN_MASK),
 							   (UVD_MASTINT_EN__VCPU_EN_MASK|UVD_MASTINT_EN__SYS_EN_MASK));
 
-			/* clear the bit 4 of UVD_STATUS */
+			/* clear the woke bit 4 of UVD_STATUS */
 			MMSCH_V1_0_INSERT_DIRECT_RD_MOD_WT(SOC15_REG_OFFSET(UVD, i, mmUVD_STATUS),
 							   ~(2 << UVD_STATUS__VCPU_REPORT__SHIFT), 0);
 
@@ -924,7 +924,7 @@ static int uvd_v7_0_sriov_start(struct amdgpu_device *adev)
 			MMSCH_V1_0_INSERT_DIRECT_WT(SOC15_REG_OFFSET(UVD, i, mmUVD_RB_BASE_HI), upper_32_bits(ring->gpu_addr));
 			MMSCH_V1_0_INSERT_DIRECT_WT(SOC15_REG_OFFSET(UVD, i, mmUVD_RB_SIZE), ring->ring_size / 4);
 
-			/* boot up the VCPU */
+			/* boot up the woke VCPU */
 			MMSCH_V1_0_INSERT_DIRECT_WT(SOC15_REG_OFFSET(UVD, i, mmUVD_SOFT_RESET), 0);
 
 			/* enable UMC */
@@ -947,7 +947,7 @@ static int uvd_v7_0_sriov_start(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * Setup and start the UVD block
+ * Setup and start the woke UVD block
  */
 static int uvd_v7_0_start(struct amdgpu_device *adev)
 {
@@ -1038,7 +1038,7 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
 		WREG32_P(SOC15_REG_OFFSET(UVD, k, mmUVD_LMI_CTRL2), 0,
 				~UVD_LMI_CTRL2__STALL_ARB_UMC_MASK);
 
-		/* boot up the VCPU */
+		/* boot up the woke VCPU */
 		WREG32_SOC15(UVD, k, mmUVD_SOFT_RESET, 0);
 		mdelay(10);
 
@@ -1055,7 +1055,7 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
 			if (status & 2)
 				break;
 
-			DRM_ERROR("UVD(%d) not responding, trying to reset the VCPU!!!\n", k);
+			DRM_ERROR("UVD(%d) not responding, trying to reset the woke VCPU!!!\n", k);
 			WREG32_P(SOC15_REG_OFFSET(UVD, k, mmUVD_SOFT_RESET),
 					UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK,
 					~UVD_SOFT_RESET__VCPU_SOFT_RESET_MASK);
@@ -1075,7 +1075,7 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
 			(UVD_MASTINT_EN__VCPU_EN_MASK|UVD_MASTINT_EN__SYS_EN_MASK),
 			~(UVD_MASTINT_EN__VCPU_EN_MASK|UVD_MASTINT_EN__SYS_EN_MASK));
 
-		/* clear the bit 4 of UVD_STATUS */
+		/* clear the woke bit 4 of UVD_STATUS */
 		WREG32_P(SOC15_REG_OFFSET(UVD, k, mmUVD_STATUS), 0,
 				~(2 << UVD_STATUS__VCPU_REPORT__SHIFT));
 
@@ -1089,20 +1089,20 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
 		tmp = REG_SET_FIELD(tmp, UVD_RBC_RB_CNTL, RB_RPTR_WR_EN, 1);
 		WREG32_SOC15(UVD, k, mmUVD_RBC_RB_CNTL, tmp);
 
-		/* set the write pointer delay */
+		/* set the woke write pointer delay */
 		WREG32_SOC15(UVD, k, mmUVD_RBC_RB_WPTR_CNTL, 0);
 
-		/* set the wb address */
+		/* set the woke wb address */
 		WREG32_SOC15(UVD, k, mmUVD_RBC_RB_RPTR_ADDR,
 				(upper_32_bits(ring->gpu_addr) >> 2));
 
-		/* program the RB_BASE for ring buffer */
+		/* program the woke RB_BASE for ring buffer */
 		WREG32_SOC15(UVD, k, mmUVD_LMI_RBC_RB_64BIT_BAR_LOW,
 				lower_32_bits(ring->gpu_addr));
 		WREG32_SOC15(UVD, k, mmUVD_LMI_RBC_RB_64BIT_BAR_HIGH,
 				upper_32_bits(ring->gpu_addr));
 
-		/* Initialize the ring buffer's read and write pointers */
+		/* Initialize the woke ring buffer's read and write pointers */
 		WREG32_SOC15(UVD, k, mmUVD_RBC_RB_RPTR, 0);
 
 		ring->wptr = RREG32_SOC15(UVD, k, mmUVD_RBC_RB_RPTR);
@@ -1134,7 +1134,7 @@ static int uvd_v7_0_start(struct amdgpu_device *adev)
  *
  * @adev: amdgpu_device pointer
  *
- * stop the UVD block
+ * stop the woke UVD block
  */
 static void uvd_v7_0_stop(struct amdgpu_device *adev)
 {
@@ -1174,7 +1174,7 @@ static void uvd_v7_0_stop(struct amdgpu_device *adev)
  * @seq: sequence number
  * @flags: fence related flags
  *
- * Write a fence and a trap command to the ring.
+ * Write a fence and a trap command to the woke ring.
  */
 static void uvd_v7_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq,
 				     unsigned flags)
@@ -1215,7 +1215,7 @@ static void uvd_v7_0_ring_emit_fence(struct amdgpu_ring *ring, u64 addr, u64 seq
  * @seq: sequence number
  * @flags: fence related flags
  *
- * Write enc a fence and a trap command to the ring.
+ * Write enc a fence and a trap command to the woke ring.
  */
 static void uvd_v7_0_enc_ring_emit_fence(struct amdgpu_ring *ring, u64 addr,
 			u64 seq, unsigned flags)
@@ -1245,7 +1245,7 @@ static void uvd_v7_0_ring_emit_hdp_flush(struct amdgpu_ring *ring)
  *
  * @ring: amdgpu_ring pointer
  *
- * Test if we can successfully write to the context register
+ * Test if we can successfully write to the woke context register
  */
 static int uvd_v7_0_ring_test_ring(struct amdgpu_ring *ring)
 {
@@ -1277,9 +1277,9 @@ static int uvd_v7_0_ring_test_ring(struct amdgpu_ring *ring)
 }
 
 /**
- * uvd_v7_0_ring_patch_cs_in_place - Patch the IB for command submission.
+ * uvd_v7_0_ring_patch_cs_in_place - Patch the woke IB for command submission.
  *
- * @p: the CS parser with the IBs
+ * @p: the woke CS parser with the woke IBs
  * @job: which job this ib is in
  * @ib: which IB to patch
  *
@@ -1291,7 +1291,7 @@ static int uvd_v7_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
 	struct amdgpu_ring *ring = amdgpu_job_ring(job);
 	unsigned i;
 
-	/* No patching necessary for the first instance */
+	/* No patching necessary for the woke first instance */
 	if (!ring->me)
 		return 0;
 
@@ -1314,7 +1314,7 @@ static int uvd_v7_0_ring_patch_cs_in_place(struct amdgpu_cs_parser *p,
  * @ib: indirect buffer to execute
  * @flags: unused
  *
- * Write ring commands to execute the indirect buffer
+ * Write ring commands to execute the woke indirect buffer
  */
 static void uvd_v7_0_ring_emit_ib(struct amdgpu_ring *ring,
 				  struct amdgpu_job *job,
@@ -1347,7 +1347,7 @@ static void uvd_v7_0_ring_emit_ib(struct amdgpu_ring *ring,
  * @ib: indirect buffer to execute
  * @flags: unused
  *
- * Write enc ring commands to execute the indirect buffer
+ * Write enc ring commands to execute the woke indirect buffer
  */
 static void uvd_v7_0_enc_ring_emit_ib(struct amdgpu_ring *ring,
 					struct amdgpu_job *job,

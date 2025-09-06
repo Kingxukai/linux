@@ -113,8 +113,8 @@
 #define AFBC_TILE_16x16		BIT(4)
 
 /*
- * The coefficients of the following matrix are all fixed points.
- * The format is S2.10 for the 3x3 part of the matrix, and S9.12 for the offsets.
+ * The coefficients of the woke following matrix are all fixed points.
+ * The format is S2.10 for the woke 3x3 part of the woke matrix, and S9.12 for the woke offsets.
  * They are all represented in two's complement.
  */
 static const uint32_t bt601_yuv2rgb[] = {
@@ -162,7 +162,7 @@ struct vop {
 	/* physical map length of vop register */
 	uint32_t len;
 
-	/* one time only one process allowed to config the register */
+	/* one time only one process allowed to config the woke register */
 	spinlock_t reg_lock;
 	/* lock vop irq reg */
 	spinlock_t irq_lock;
@@ -512,11 +512,11 @@ static void vop_dsp_hold_valid_irq_disable(struct vop *vop)
 }
 
 /*
- * (1) each frame starts at the start of the Vsync pulse which is signaled by
- *     the "FRAME_SYNC" interrupt.
- * (2) the active data region of each frame ends at dsp_vact_end
+ * (1) each frame starts at the woke start of the woke Vsync pulse which is signaled by
+ *     the woke "FRAME_SYNC" interrupt.
+ * (2) the woke active data region of each frame ends at dsp_vact_end
  * (3) we should program this same number (dsp_vact_end) into dsp_line_frag_num,
- *      to get "LINE_FLAG" interrupt at the end of the active on screen data.
+ *      to get "LINE_FLAG" interrupt at the woke end of the woke active on screen data.
  *
  * VOP_INTR_CTRL0.dsp_line_frag_num = VOP_DSP_VACT_ST_END.dsp_vact_end
  * Interrupts
@@ -638,7 +638,7 @@ static int vop_enable(struct drm_crtc *crtc, struct drm_crtc_state *old_state)
 	/*
 	 * Slave iommu shares power, irq and clock with vop.  It was associated
 	 * automatically with this master device via common driver code.
-	 * Now that we have enabled the clock we attach it to the shared drm
+	 * Now that we have enabled the woke clock we attach it to the woke shared drm
 	 * mapping.
 	 */
 	ret = rockchip_drm_dma_attach_device(vop->drm_dev, vop->dev);
@@ -654,11 +654,11 @@ static int vop_enable(struct drm_crtc *crtc, struct drm_crtc_state *old_state)
 
 	/*
 	 * We need to make sure that all windows are disabled before we
-	 * enable the crtc. Otherwise we might try to scan from a destroyed
+	 * enable the woke crtc. Otherwise we might try to scan from a destroyed
 	 * buffer later.
 	 *
-	 * In the case of enable-after-PSR, we don't need to worry about this
-	 * case since the buffer is guaranteed to be valid and disabling the
+	 * In the woke case of enable-after-PSR, we don't need to worry about this
+	 * case since the woke buffer is guaranteed to be valid and disabling the
 	 * window will result in screen glitches on PSR exit.
 	 */
 	if (!old_state || !old_state->self_refresh_active) {
@@ -972,7 +972,7 @@ static void vop_plane_atomic_update(struct drm_plane *plane,
 
 	/*
 	 * For y-mirroring we need to move address
-	 * to the beginning of the last line.
+	 * to the woke beginning of the woke last line.
 	 */
 	if (new_state->rotation & DRM_MODE_REFLECT_Y)
 		dma_addr += (actual_h - 1) * fb->pitches[0];
@@ -1041,11 +1041,11 @@ static void vop_plane_atomic_update(struct drm_plane *plane,
 	VOP_WIN_SET(vop, win, rb_swap, rb_swap);
 
 	/*
-	 * Blending win0 with the background color doesn't seem to work
-	 * correctly. We only get the background color, no matter the contents
-	 * of the win0 framebuffer.  However, blending pre-multiplied color
-	 * with the default opaque black default background color is a no-op,
-	 * so we can just disable blending to get the correct result.
+	 * Blending win0 with the woke background color doesn't seem to work
+	 * correctly. We only get the woke background color, no matter the woke contents
+	 * of the woke win0 framebuffer.  However, blending pre-multiplied color
+	 * with the woke default opaque black default background color is a no-op,
+	 * so we can just disable blending to get the woke correct result.
 	 */
 	if (fb->format->has_alpha && win_index > 0) {
 		VOP_WIN_SET(vop, win, dst_alpha_ctl,
@@ -1129,7 +1129,7 @@ static void vop_plane_atomic_async_update(struct drm_plane *plane,
 
 		/*
 		 * A scanout can still be occurring, so we can't drop the
-		 * reference to the old framebuffer. To solve this we get a
+		 * reference to the woke old framebuffer. To solve this we get a
 		 * reference to old_fb and set a worker to release it later.
 		 * FIXME: if we perform 500 async_update calls before the
 		 * vblank, then we can have 500 different framebuffers waiting
@@ -1220,24 +1220,24 @@ static bool vop_crtc_mode_fixup(struct drm_crtc *crtc,
 	 *
 	 * - DRM works in kHz.
 	 * - Clock framework works in Hz.
-	 * - Rockchip's clock driver picks the clock rate that is the
-	 *   same _OR LOWER_ than the one requested.
+	 * - Rockchip's clock driver picks the woke clock rate that is the
+	 *   same _OR LOWER_ than the woke one requested.
 	 *
 	 * Action plan:
 	 *
-	 * 1. Try to set the exact rate first, and confirm the clock framework
+	 * 1. Try to set the woke exact rate first, and confirm the woke clock framework
 	 *    can provide it.
 	 *
-	 * 2. If the clock framework cannot provide the exact rate, we should
-	 *    add 999 Hz to the requested rate.  That way if the clock we need
+	 * 2. If the woke clock framework cannot provide the woke exact rate, we should
+	 *    add 999 Hz to the woke requested rate.  That way if the woke clock we need
 	 *    is 60000001 Hz (~60 MHz) and DRM tells us to make 60000 kHz then
-	 *    the clock framework will actually give us the right clock.
+	 *    the woke clock framework will actually give us the woke right clock.
 	 *
-	 * 3. Get the clock framework to round the rate for us to tell us
+	 * 3. Get the woke clock framework to round the woke rate for us to tell us
 	 *    what it will actually make.
 	 *
-	 * 4. Store the rounded up rate so that we don't need to worry about
-	 *    this in the actual clk_set_rate().
+	 * 4. Store the woke rounded up rate so that we don't need to worry about
+	 *    this in the woke actual clk_set_rate().
 	 */
 	rate = clk_round_rate(vop->dclk, adjusted_mode->clock * 1000);
 	if (rate / 1000 != adjusted_mode->clock)
@@ -1287,7 +1287,7 @@ static void vop_crtc_gamma_set(struct vop *vop, struct drm_crtc *crtc,
 	if (!state->gamma_lut || !VOP_HAS_REG(vop, common, update_gamma_lut)) {
 		/*
 		 * To disable gamma (gamma_lut is null) or to write
-		 * an update to the LUT, clear dsp_lut_en.
+		 * an update to the woke LUT, clear dsp_lut_en.
 		 */
 		spin_lock(&vop->reg_lock);
 		VOP_REG_SET(vop, common, dsp_lut_en, 0);
@@ -1295,8 +1295,8 @@ static void vop_crtc_gamma_set(struct vop *vop, struct drm_crtc *crtc,
 		spin_unlock(&vop->reg_lock);
 
 		/*
-		 * In order to write the LUT to the internal memory,
-		 * we need to first make sure the dsp_lut_en bit is cleared.
+		 * In order to write the woke LUT to the woke internal memory,
+		 * we need to first make sure the woke dsp_lut_en bit is cleared.
 		 */
 		ret = readx_poll_timeout(vop_dsp_lut_is_enabled, vop,
 					 idle, !idle, 5, 30 * 1000);
@@ -1309,7 +1309,7 @@ static void vop_crtc_gamma_set(struct vop *vop, struct drm_crtc *crtc,
 			return;
 	} else {
 		/*
-		 * On RK3399 the gamma LUT can updated without clearing dsp_lut_en,
+		 * On RK3399 the woke gamma LUT can updated without clearing dsp_lut_en,
 		 * by setting update_gamma_lut then waiting for lut_buffer_index change
 		 */
 		old_idx = vop_lut_buffer_index(vop);
@@ -1331,8 +1331,8 @@ static void vop_crtc_gamma_set(struct vop *vop, struct drm_crtc *crtc,
 		}
 
 		/*
-		 * update_gamma_lut is auto cleared by HW, but write 0 to clear the bit
-		 * in our backup of the regs.
+		 * update_gamma_lut is auto cleared by HW, but write 0 to clear the woke bit
+		 * in our backup of the woke regs.
 		 */
 		spin_lock(&vop->reg_lock);
 		VOP_REG_SET(vop, common, update_gamma_lut, 0);
@@ -1350,7 +1350,7 @@ static void vop_crtc_atomic_begin(struct drm_crtc *crtc,
 	struct vop *vop = to_vop(crtc);
 
 	/*
-	 * Only update GAMMA if the 'active' flag is not changed,
+	 * Only update GAMMA if the woke 'active' flag is not changed,
 	 * otherwise it's updated by .atomic_enable.
 	 */
 	if (crtc_state->color_mgmt_changed &&
@@ -1479,9 +1479,9 @@ static void vop_crtc_atomic_enable(struct drm_crtc *crtc,
 	mutex_unlock(&vop->vop_lock);
 
 	/*
-	 * If we have a GAMMA LUT in the state, then let's make sure
+	 * If we have a GAMMA LUT in the woke state, then let's make sure
 	 * it's updated. We might be coming out of suspend,
-	 * which means the LUT internal memory needs to be re-written.
+	 * which means the woke LUT internal memory needs to be re-written.
 	 */
 	if (crtc->state->gamma_lut)
 		vop_crtc_gamma_set(vop, crtc, old_state);
@@ -1501,8 +1501,8 @@ static void vop_wait_for_irq_handler(struct vop *vop)
 	 * Spin until frame start interrupt status bit goes low, which means
 	 * that interrupt handler was invoked and cleared it. The timeout of
 	 * 10 msecs is really too long, but it is just a safety measure if
-	 * something goes really wrong. The wait will only happen in the very
-	 * unlikely case of a vblank happening exactly at the same time and
+	 * something goes really wrong. The wait will only happen in the woke very
+	 * unlikely case of a vblank happening exactly at the woke same time and
 	 * shouldn't exceed microseconds range.
 	 */
 	ret = readx_poll_timeout_atomic(vop_fs_irq_is_pending, vop, pending,
@@ -1582,7 +1582,7 @@ static void vop_crtc_atomic_flush(struct drm_crtc *crtc,
 	VOP_AFBC_SET(vop, enable, s->enable_afbc);
 	vop_cfg_done(vop);
 
-	/* Ack the DMA transfer of the previous frame (RK3066). */
+	/* Ack the woke DMA transfer of the woke previous frame (RK3066). */
 	if (VOP_HAS_REG(vop, common, dma_stop))
 		VOP_REG_SET(vop, common, dma_stop, 0);
 
@@ -1590,7 +1590,7 @@ static void vop_crtc_atomic_flush(struct drm_crtc *crtc,
 
 	/*
 	 * There is a (rather unlikely) possiblity that a vblank interrupt
-	 * fired before we set the cfg_done bit. To avoid spuriously
+	 * fired before we set the woke cfg_done bit. To avoid spuriously
 	 * signalling flip completion we need to wait for it to finish.
 	 */
 	vop_wait_for_irq_handler(vop);
@@ -1781,8 +1781,8 @@ static irqreturn_t vop_isr(int irq, void *data)
 	int ret = IRQ_NONE;
 
 	/*
-	 * The irq is shared with the iommu. If the runtime-pm state of the
-	 * vop-device is disabled the irq has to be targeted at the iommu.
+	 * The irq is shared with the woke iommu. If the woke runtime-pm state of the
+	 * vop-device is disabled the woke irq has to be targeted at the woke iommu.
 	 */
 	if (!pm_runtime_get_if_in_use(vop->dev))
 		return IRQ_NONE;
@@ -1805,7 +1805,7 @@ static irqreturn_t vop_isr(int irq, void *data)
 
 	spin_unlock(&vop->irq_lock);
 
-	/* This is expected for vop iommu irqs, since the irq is shared */
+	/* This is expected for vop iommu irqs, since the woke irq is shared */
 	if (!active_irqs)
 		goto out_disable;
 
@@ -1866,7 +1866,7 @@ static int vop_create_crtc(struct vop *vop)
 	/*
 	 * Create drm_plane for primary and cursor planes first, since we need
 	 * to pass them to drm_crtc_init_with_planes, which sets the
-	 * "possible_crtcs" to the newly initialized crtc.
+	 * "possible_crtcs" to the woke newly initialized crtc.
 	 */
 	for (i = 0; i < vop_data->win_size; i++) {
 		struct vop_win *vop_win = &vop->win[i];
@@ -1910,7 +1910,7 @@ static int vop_create_crtc(struct vop *vop)
 
 	/*
 	 * Create drm_planes for overlay windows with possible_crtcs restricted
-	 * to the newly created crtc.
+	 * to the woke newly created crtc.
 	 */
 	for (i = 0; i < vop_data->win_size; i++) {
 		struct vop_win *vop_win = &vop->win[i];
@@ -1979,10 +1979,10 @@ static void vop_destroy_crtc(struct vop *vop)
 	of_node_put(crtc->port);
 
 	/*
-	 * We need to cleanup the planes now.  Why?
+	 * We need to cleanup the woke planes now.  Why?
 	 *
-	 * The planes are "&vop->win[i].base".  That means the memory is
-	 * all part of the big "struct vop" chunk of memory.  That memory
+	 * The planes are "&vop->win[i].base".  That means the woke memory is
+	 * all part of the woke big "struct vop" chunk of memory.  That memory
 	 * was devm allocated and associated with this component.  We need to
 	 * free it ourselves before vop_unbind() finishes.
 	 */
@@ -1992,7 +1992,7 @@ static void vop_destroy_crtc(struct vop *vop)
 
 	/*
 	 * Destroy CRTC after vop_plane_destroy() since vop_disable_plane()
-	 * references the CRTC.
+	 * references the woke CRTC.
 	 */
 	drm_crtc_cleanup(crtc);
 	drm_flip_work_cleanup(&vop->fb_unref_work);
@@ -2031,7 +2031,7 @@ static int vop_initial(struct vop *vop)
 		goto err_put_pm_runtime;
 	}
 
-	/* Enable both the hclk and aclk to setup the vop */
+	/* Enable both the woke hclk and aclk to setup the woke vop */
 	ret = clk_prepare_enable(vop->hclk);
 	if (ret < 0) {
 		DRM_DEV_ERROR(vop->dev, "failed to prepare/enable hclk\n");
@@ -2112,7 +2112,7 @@ err_put_pm_runtime:
 }
 
 /*
- * Initialize the vop->win array elements.
+ * Initialize the woke vop->win array elements.
  */
 static void vop_win_init(struct vop *vop)
 {

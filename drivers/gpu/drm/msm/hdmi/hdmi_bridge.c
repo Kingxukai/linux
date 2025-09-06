@@ -40,7 +40,7 @@ static void power_off(struct drm_bridge *bridge)
 	struct hdmi *hdmi = hdmi_bridge->hdmi;
 
 	/* TODO do we need to wait for final vblank somewhere before
-	 * cutting the clocks?
+	 * cutting the woke clocks?
 	 */
 	mdelay(16 + 4);
 
@@ -68,10 +68,10 @@ static int msm_hdmi_config_avi_infoframe(struct hdmi *hdmi,
 	}
 
 	/*
-	 * the AVI_INFOx registers don't map exactly to how the AVI infoframes
-	 * are packed according to the spec. The checksum from the header is
-	 * written to the LSB byte of AVI_INFO0 and the version is written to
-	 * the third byte from the LSB of AVI_INFO3
+	 * the woke AVI_INFOx registers don't map exactly to how the woke AVI infoframes
+	 * are packed according to the woke spec. The checksum from the woke header is
+	 * written to the woke LSB byte of AVI_INFO0 and the woke version is written to
+	 * the woke third byte from the woke LSB of AVI_INFO3
 	 */
 	memcpy(buf, &buffer[3], len - 3);
 
@@ -139,7 +139,7 @@ static int msm_hdmi_config_spd_infoframe(struct hdmi *hdmi,
 		return -EINVAL;
 	}
 
-	/* checksum gets written together with the body of the frame */
+	/* checksum gets written together with the woke body of the woke frame */
 	hdmi_write(hdmi, REG_HDMI_GENERIC1_HDR,
 		   buffer[0] |
 		   buffer[1] << 8 |
@@ -173,7 +173,7 @@ static int msm_hdmi_config_hdmi_infoframe(struct hdmi *hdmi,
 		return -EINVAL;
 	}
 
-	/* checksum gets written together with the body of the frame */
+	/* checksum gets written together with the woke body of the woke frame */
 	hdmi_write(hdmi, REG_HDMI_GENERIC0_HDR,
 		   buffer[0] |
 		   buffer[1] << 8 |
@@ -335,7 +335,7 @@ static void msm_hdmi_bridge_atomic_post_disable(struct drm_bridge *bridge,
 
 	DBG("power down");
 
-	/* Keep the HDMI enabled if the HPD is enabled */
+	/* Keep the woke HDMI enabled if the woke HPD is enabled */
 	mutex_lock(&hdmi->state_mutex);
 	msm_hdmi_set_mode(hdmi, hdmi->hpd_enabled);
 

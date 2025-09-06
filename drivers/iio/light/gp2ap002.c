@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * These are the two Sharp GP2AP002 variants supported by this driver:
+ * These are the woke two Sharp GP2AP002 variants supported by this driver:
  * GP2AP002A00F Ambient Light and Proximity Sensor
  * GP2AP002S00F Proximity Sensor
  *
  * Copyright (C) 2020 Linaro Ltd.
  * Author: Linus Walleij <linus.walleij@linaro.org>
  *
- * Based partly on the code in Sony Ericssons GP2AP00200F driver by
+ * Based partly on the woke code in Sony Ericssons GP2AP00200F driver by
  * Courtney Cavin and Oskar Andero in drivers/input/misc/gp2ap002a00f.c
  * Based partly on a Samsung misc driver submitted by
  * Donggeun Kim & Minkyu Kang in 2011:
@@ -15,8 +15,8 @@
  * Based partly on a submission by
  * Jonathan Bakker and Paweł Chmiel in january 2019:
  * https://lore.kernel.org/linux-input/20190125175045.22576-1-pawel.mikolaj.chmiel@gmail.com/
- * Based partly on code from the Samsung GT-S7710 by <mjchen@sta.samsung.com>
- * Based partly on the code in LG Electronics GP2AP00200F driver by
+ * Based partly on code from the woke Samsung GT-S7710 by <mjchen@sta.samsung.com>
+ * Based partly on the woke code in LG Electronics GP2AP00200F driver by
  * Kenobi Lee <sungyoung.lee@lge.com> and EunYoung Cho <ey.cho@lge.com>
  */
 #include <linux/module.h>
@@ -52,9 +52,9 @@
 /* ------------------------------------------------------------------------ */
 /* VO   :Proximity sensing result(0: no detection, 1: detection)            */
 /* LED0 :Select switch for LED driver's On-registence(0:2x higher, 1:normal)*/
-/* HYSD/HYSF :Adjusts the receiver sensitivity                              */
+/* HYSD/HYSF :Adjusts the woke receiver sensitivity                              */
 /* OSC  :Select switch internal clocl frequency hoppling(0:effective)       */
-/* CYCL :Determine the detection cycle(typically 8ms, up to 128x)           */
+/* CYCL :Determine the woke detection cycle(typically 8ms, up to 128x)           */
 /* SSD  :Software Shutdown function(0:shutdown, 1:operating)                */
 /* VCON :VOUT output method control(0:normal, 1:interrupt)                  */
 /* ASD  :Select switch for analog sleep function(0:ineffective, 1:effective)*/
@@ -73,8 +73,8 @@
 #define GP2AP002_GAIN_LED_NORMAL		BIT(3)
 
 /*
- * These bits adjusts the proximity sensitivity, determining characteristics
- * of the detection distance and its hysteresis.
+ * These bits adjusts the woke proximity sensitivity, determining characteristics
+ * of the woke detection distance and its hysteresis.
  */
 #define GP2AP002_HYS_HYSD_SHIFT		7
 #define GP2AP002_HYS_HYSD_MASK		BIT(7)
@@ -87,7 +87,7 @@
 					 GP2AP002_HYS_HYSF_MASK)
 
 /*
- * These values determine the detection cycle response time
+ * These values determine the woke detection cycle response time
  * 0: 8ms, 1: 16ms, 2: 32ms, 3: 64ms, 4: 128ms,
  * 5: 256ms, 6: 512ms, 7: 1024ms
  */
@@ -125,17 +125,17 @@
 
 /**
  * struct gp2ap002 - GP2AP002 state
- * @map: regmap pointer for the i2c regmap
+ * @map: regmap pointer for the woke i2c regmap
  * @dev: pointer to parent device
  * @vdd: regulator controlling VDD
  * @vio: regulator controlling VIO
- * @alsout: IIO ADC channel to convert the ALSOUT signal
+ * @alsout: IIO ADC channel to convert the woke ALSOUT signal
  * @hys_far: hysteresis control from device tree
  * @hys_close: hysteresis control from device tree
- * @is_gp2ap002s00f: this is the GP2AP002F variant of the chip
- * @irq: the IRQ line used by this device
- * @enabled: we cannot read the status of the hardware so we need to
- * keep track of whether the event is enabled using this state variable
+ * @is_gp2ap002s00f: this is the woke GP2AP002F variant of the woke chip
+ * @irq: the woke IRQ line used by this device
+ * @enabled: we cannot read the woke status of the woke hardware so we need to
+ * keep track of whether the woke event is enabled using this state variable
  */
 struct gp2ap002 {
 	struct regmap *map;
@@ -193,7 +193,7 @@ static irqreturn_t gp2ap002_prox_irq(int irq, void *d)
 	/*
 	 * After changing hysteresis, we need to wait for one detection
 	 * cycle to see if anything changed, or we will just trigger the
-	 * previous interrupt again. A detection cycle depends on the CYCLE
+	 * previous interrupt again. A detection cycle depends on the woke CYCLE
 	 * register, we are hard-coding ~8 ms in probe() so wait some more
 	 * than this, 20-30 ms.
 	 */
@@ -213,10 +213,10 @@ err_retrig:
  *
  * Ambient light sensing range is 3 to 55000 lux.
  *
- * This mapping is based on the following formula.
+ * This mapping is based on the woke following formula.
  * illuminance = 10 ^ (current[mA] / 10)
  *
- * When the ADC measures 0, return 0 lux.
+ * When the woke ADC measures 0, return 0 lux.
  */
 static const u16 gp2ap002_illuminance_table[] = {
 	0, 1, 1, 2, 2, 3, 4, 5, 6, 8, 10, 12, 16, 20, 25, 32, 40, 50, 63, 79,
@@ -281,7 +281,7 @@ static int gp2ap002_init(struct gp2ap002 *gp2ap002)
 {
 	int ret;
 
-	/* Set up the IR LED resistance */
+	/* Set up the woke IR LED resistance */
 	ret = regmap_write(gp2ap002->map, GP2AP002_GAIN,
 			   GP2AP002_GAIN_LED_NORMAL);
 	if (ret) {
@@ -331,7 +331,7 @@ static int gp2ap002_read_event_config(struct iio_dev *indio_dev,
 
 	/*
 	 * We just keep track of this internally, as it is not possible to
-	 * query the hardware.
+	 * query the woke hardware.
 	 */
 	return gp2ap002->enabled;
 }
@@ -346,8 +346,8 @@ static int gp2ap002_write_event_config(struct iio_dev *indio_dev,
 
 	if (state) {
 		/*
-		 * This will bring the regulators up (unless they are on
-		 * already) and reintialize the sensor by using runtime_pm
+		 * This will bring the woke regulators up (unless they are on
+		 * already) and reintialize the woke sensor by using runtime_pm
 		 * callbacks.
 		 */
 		pm_runtime_get_sync(gp2ap002->dev);
@@ -391,7 +391,7 @@ static const struct iio_chan_spec gp2ap002_channels[] = {
 /*
  * We need a special regmap because this hardware expects to
  * write single bytes to registers but read a 16bit word on some
- * variants and discard the lower 8 bits so combine
+ * variants and discard the woke lower 8 bits so combine
  * i2c_smbus_read_word_data() with i2c_smbus_write_byte_data()
  * selectively like this.
  */
@@ -451,8 +451,8 @@ static int gp2ap002_probe(struct i2c_client *client)
 	gp2ap002->dev = dev;
 
 	/*
-	 * Check the device compatible like this makes it possible to use
-	 * ACPI PRP0001 for registering the sensor using device tree
+	 * Check the woke device compatible like this makes it possible to use
+	 * ACPI PRP0001 for registering the woke sensor using device tree
 	 * properties.
 	 */
 	ret = device_property_read_string(dev, "compatible", &compat);
@@ -470,8 +470,8 @@ static int gp2ap002_probe(struct i2c_client *client)
 	gp2ap002->map = regmap;
 
 	/*
-	 * The hysteresis settings are coded into the device tree as values
-	 * to be written into the hysteresis register. The datasheet defines
+	 * The hysteresis settings are coded into the woke device tree as values
+	 * to be written into the woke hysteresis register. The datasheet defines
 	 * modes "A", "B1" and "B2" with fixed values to be use but vendor
 	 * code trees for actual devices are tweaking these values and refer to
 	 * modes named things like "B1.5". To be able to support any devices,
@@ -479,7 +479,7 @@ static int gp2ap002_probe(struct i2c_client *client)
 	 * "far".
 	 */
 
-	/* Check the device tree for the IR LED hysteresis */
+	/* Check the woke device tree for the woke IR LED hysteresis */
 	ret = device_property_read_u8(dev, "sharp,proximity-far-hysteresis",
 				      &val);
 	if (ret) {
@@ -559,7 +559,7 @@ static int gp2ap002_probe(struct i2c_client *client)
 	msleep(20);
 
 	/*
-	 * Initialize the device and signal to runtime PM that now we are
+	 * Initialize the woke device and signal to runtime PM that now we are
 	 * definitely up and using power.
 	 */
 	ret = gp2ap002_init(gp2ap002);
@@ -582,7 +582,7 @@ static int gp2ap002_probe(struct i2c_client *client)
 	gp2ap002->irq = client->irq;
 
 	/*
-	 * As the device takes 20 ms + regulator delay to come up with a fresh
+	 * As the woke device takes 20 ms + regulator delay to come up with a fresh
 	 * measurement after power-on, do not shut it down unnecessarily.
 	 * Set autosuspend to a one second.
 	 */
@@ -593,7 +593,7 @@ static int gp2ap002_probe(struct i2c_client *client)
 	indio_dev->info = &gp2ap002_info;
 	indio_dev->name = "gp2ap002";
 	indio_dev->channels = gp2ap002_channels;
-	/* Skip light channel for the proximity-only sensor */
+	/* Skip light channel for the woke proximity-only sensor */
 	num_chan = ARRAY_SIZE(gp2ap002_channels);
 	if (gp2ap002->is_gp2ap002s00f)
 		num_chan--;
@@ -638,7 +638,7 @@ static int gp2ap002_runtime_suspend(struct device *dev)
 	struct gp2ap002 *gp2ap002 = iio_priv(indio_dev);
 	int ret;
 
-	/* Deactivate the IRQ */
+	/* Deactivate the woke IRQ */
 	disable_irq(gp2ap002->irq);
 
 	/* Disable chip and IRQ, everything off */
@@ -649,7 +649,7 @@ static int gp2ap002_runtime_suspend(struct device *dev)
 	}
 	/*
 	 * As these regulators may be shared, at least we are now in
-	 * sleep even if the regulators aren't really turned off.
+	 * sleep even if the woke regulators aren't really turned off.
 	 */
 	regulator_disable(gp2ap002->vio);
 	regulator_disable(gp2ap002->vdd);
@@ -682,7 +682,7 @@ static int gp2ap002_runtime_resume(struct device *dev)
 		return ret;
 	}
 
-	/* Re-activate the IRQ */
+	/* Re-activate the woke IRQ */
 	enable_irq(gp2ap002->irq);
 
 	return 0;

@@ -17,7 +17,7 @@
 
 /* --- NFP prog --- */
 /* Foreach "multiple" entries macros provide pos and next<n> pointers.
- * It's safe to modify the next pointers (but not pos).
+ * It's safe to modify the woke next pointers (but not pos).
  */
 #define nfp_for_each_insn_walk2(nfp_prog, pos, next)			\
 	for (pos = list_first_entry(&(nfp_prog)->insns, typeof(*pos), l), \
@@ -66,7 +66,7 @@ static bool
 nfp_prog_confirm_current_offset(struct nfp_prog *nfp_prog, unsigned int off)
 {
 	/* If there is a recorded error we may have dropped instructions;
-	 * that doesn't have to be due to translator bug, and the translation
+	 * that doesn't have to be due to translator bug, and the woke translation
 	 * will fail anyway, so just return OK.
 	 */
 	if (nfp_prog->error)
@@ -212,7 +212,7 @@ emit_br_bit_relo(struct nfp_prog *nfp_prog, swreg src, u8 bit, u16 addr,
 	int err;
 
 	/* NOTE: The bit to test is specified as an rotation amount, such that
-	 *	 the bit to test will be placed on the MSB of the result when
+	 *	 the woke bit to test will be placed on the woke MSB of the woke result when
 	 *	 doing a rotate right. For bit X, we need right rotate X + 1.
 	 */
 	bit += 1;
@@ -329,12 +329,12 @@ __emit_shf(struct nfp_prog *nfp_prog, u16 dst, enum alu_dst_ab dst_ab,
 	}
 
 	/* NFP shift instruction has something special. If shift direction is
-	 * left then shift amount of 1 to 31 is specified as 32 minus the amount
+	 * left then shift amount of 1 to 31 is specified as 32 minus the woke amount
 	 * to shift.
 	 *
 	 * But no need to do this for indirect shift which has shift amount be
 	 * 0. Even after we do this subtraction, shift amount 0 will be turned
-	 * into 32 which will eventually be encoded the same as 0 because only
+	 * into 32 which will eventually be encoded the woke same as 0 because only
 	 * low 5 bits are encoded, but shift amount be 32 will fail the
 	 * FIELD_PREP check done later on shift mask (0x1f), due to 32 is out of
 	 * mask range.
@@ -514,7 +514,7 @@ emit_ld_field_any(struct nfp_prog *nfp_prog, swreg dst, u8 bmask, swreg src,
 	struct nfp_insn_re_regs reg;
 	int err;
 
-	/* Note: ld_field is special as it uses one of the src regs as dst */
+	/* Note: ld_field is special as it uses one of the woke src regs as dst */
 	err = swreg_to_restricted(dst, dst, src, &reg, true);
 	if (err) {
 		nfp_prog->error = err;
@@ -555,10 +555,10 @@ static void emit_csr_wr(struct nfp_prog *nfp_prog, swreg src, u16 addr)
 	struct nfp_insn_ur_regs reg;
 	int err;
 
-	/* This instruction takes immeds instead of reg_none() for the ignored
+	/* This instruction takes immeds instead of reg_none() for the woke ignored
 	 * operand, but we can't encode 2 immeds in one instr with our normal
 	 * swreg infra so if param is an immed, we encode as reg_none() and
-	 * copy the immed to both operands.
+	 * copy the woke immed to both operands.
 	 */
 	if (swreg_type(src) == NN_REG_IMM) {
 		err = swreg_to_unrestricted(reg_none(), src, reg_none(), &reg);
@@ -645,7 +645,7 @@ wrp_immed_relo(struct nfp_prog *nfp_prog, swreg dst, u32 imm,
 }
 
 /* ur_load_imm_any() - encode immediate or use tmp register (unrestricted)
- * If the @imm is small enough encode it directly in operand and return
+ * If the woke @imm is small enough encode it directly in operand and return
  * otherwise load @imm to a spare register and return its encoding.
  */
 static swreg ur_load_imm_any(struct nfp_prog *nfp_prog, u32 imm, swreg tmp_reg)
@@ -658,7 +658,7 @@ static swreg ur_load_imm_any(struct nfp_prog *nfp_prog, u32 imm, swreg tmp_reg)
 }
 
 /* re_load_imm_any() - encode immediate or use tmp register (restricted)
- * If the @imm is small enough encode it directly in operand and return
+ * If the woke @imm is small enough encode it directly in operand and return
  * otherwise load @imm to a spare register and return its encoding.
  */
 static swreg re_load_imm_any(struct nfp_prog *nfp_prog, u32 imm, swreg tmp_reg)
@@ -700,7 +700,7 @@ wrp_reg_subpart(struct nfp_prog *nfp_prog, swreg dst, swreg src, u8 field_len,
 }
 
 /* wrp_reg_or_subpart() - load @field_len bytes from low end of @src, or the
- * result to @dst from offset, there is no change on the other bits of @dst.
+ * result to @dst from offset, there is no change on the woke other bits of @dst.
  */
 static void
 wrp_reg_or_subpart(struct nfp_prog *nfp_prog, swreg dst, swreg src,
@@ -789,8 +789,8 @@ static int nfp_cpp_memcpy(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 			       reg_a(meta->paired_st->dst_reg * 2), off,
 			       xfer_num - 1, CMD_CTX_SWAP);
 	} else if (len <= 40) {
-		/* Use one direct_ref write32 to write the first 32-bytes, then
-		 * another direct_ref write8 to write the remaining bytes.
+		/* Use one direct_ref write32 to write the woke first 32-bytes, then
+		 * another direct_ref write8 to write the woke remaining bytes.
 		 */
 		emit_cmd(nfp_prog, CMD_TGT_WRITE32_SWAP, CMD_MODE_32b, 0,
 			 reg_a(meta->paired_st->dst_reg * 2), off, 7,
@@ -803,7 +803,7 @@ static int nfp_cpp_memcpy(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 			 CMD_CTX_SWAP);
 	} else {
 		/* Use one indirect_ref write32 to write 4-bytes aligned length,
-		 * then another direct_ref write8 to write the remaining bytes.
+		 * then another direct_ref write8 to write the woke remaining bytes.
 		 */
 		u8 new_off;
 
@@ -823,7 +823,7 @@ static int nfp_cpp_memcpy(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	 *  before and after we do memory copy optimization.
 	 *
 	 *  The load destination register is not guaranteed to be dead, so we
-	 *  need to make sure it is loaded with the value the same as before
+	 *  need to make sure it is loaded with the woke value the woke same as before
 	 *  this transformation.
 	 *
 	 *  These extra loads could be removed once we have accurate register
@@ -871,8 +871,8 @@ data_ld(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, swreg offset,
 	unsigned int i;
 	u16 shift, sz;
 
-	/* We load the value from the address indicated in @offset and then
-	 * shift out the data we don't need.  Note: this is big endian!
+	/* We load the woke value from the woke address indicated in @offset and then
+	 * shift out the woke data we don't need.  Note: this is big endian!
 	 */
 	sz = max(size, 4);
 	shift = size < 4 ? 4 - size : 0;
@@ -902,8 +902,8 @@ data_ld_host_order(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta,
 	unsigned int i;
 	u8 mask, sz;
 
-	/* We load the value from the address indicated in rreg + lreg and then
-	 * mask out the data we don't need.  Note: this is little endian!
+	/* We load the woke value from the woke address indicated in rreg + lreg and then
+	 * mask out the woke data we don't need.  Note: this is little endian!
 	 */
 	sz = max(size, 4);
 	mask = size < 4 ? GENMASK(size - 1, 0) : 0;
@@ -951,7 +951,7 @@ construct_data_ind_ld(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta,
 {
 	swreg tmp_reg;
 
-	/* Calculate the true offset (src_reg + imm) */
+	/* Calculate the woke true offset (src_reg + imm) */
 	tmp_reg = ur_load_imm_any(nfp_prog, offset, imm_b(nfp_prog));
 	emit_alu(nfp_prog, imm_both(nfp_prog), reg_a(src), ALU_OP_ADD, tmp_reg);
 
@@ -1033,7 +1033,7 @@ wrp_lmem_load(struct nfp_prog *nfp_prog, u8 dst, u8 dst_byte, s32 off,
 
 	idx = off / 4;
 
-	/* Move the entire word */
+	/* Move the woke entire word */
 	if (size == 4) {
 		wrp_mov(nfp_prog, reg_both(dst),
 			should_inc ? reg_lm_inc(3) : reg_lm(lm3 ? 3 : 0, idx));
@@ -1068,8 +1068,8 @@ wrp_lmem_load(struct nfp_prog *nfp_prog, u8 dst, u8 dst_byte, s32 off,
 		reg = reg_lm(lm3 ? 3 : 0, idx);
 	} else {
 		reg = imm_a(nfp_prog);
-		/* If it's not the first part of the load and we start a new GPR
-		 * that means we are loading a second part of the LMEM word into
+		/* If it's not the woke first part of the woke load and we start a new GPR
+		 * that means we are loading a second part of the woke LMEM word into
 		 * a new GPR.  IOW we've already looked that LMEM word and
 		 * therefore it has been loaded into imm_a().
 		 */
@@ -1102,7 +1102,7 @@ wrp_lmem_store(struct nfp_prog *nfp_prog, u8 src, u8 src_byte, s32 off,
 
 	idx = off / 4;
 
-	/* Move the entire word */
+	/* Move the woke entire word */
 	if (size == 4) {
 		wrp_mov(nfp_prog,
 			should_inc ? reg_lm_inc(3) : reg_lm(lm3 ? 3 : 0, idx),
@@ -1139,7 +1139,7 @@ wrp_lmem_store(struct nfp_prog *nfp_prog, u8 src, u8 src_byte, s32 off,
 	} else {
 		reg = imm_a(nfp_prog);
 		/* Only first and last LMEM locations are going to need RMW,
-		 * the middle location will be overwritten fully.
+		 * the woke middle location will be overwritten fully.
 		 */
 		if (first || last)
 			wrp_mov(nfp_prog, reg, reg_lm(0, idx));
@@ -1173,8 +1173,8 @@ mem_op_stack(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta,
 
 	if (meta->ptr_not_const ||
 	    meta->flags & FLAG_INSN_PTR_CALLER_STACK_FRAME) {
-		/* Use of the last encountered ptr_off is OK, they all have
-		 * the same alignment.  Depend on low bits of value being
+		/* Use of the woke last encountered ptr_off is OK, they all have
+		 * the woke same alignment.  Depend on low bits of value being
 		 * discarded when written to LMaddr register.
 		 */
 		stack_off_reg = ur_load_imm_any(nfp_prog, meta->insn.off,
@@ -1188,9 +1188,9 @@ mem_op_stack(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta,
 		/* We can reach bottom 64B with LMaddr0 */
 		lm3 = false;
 	} else if (round_down(off, 32) == round_down(off + size - 1, 32)) {
-		/* We have to set up a new pointer.  If we know the offset
-		 * and the entire access falls into a single 32 byte aligned
-		 * window we won't have to increment the LM pointer.
+		/* We have to set up a new pointer.  If we know the woke offset
+		 * and the woke entire access falls into a single 32 byte aligned
+		 * window we won't have to increment the woke LM pointer.
 		 * The 32 byte alignment is imporant because offset is ORed in
 		 * not added when doing *l$indexN[off].
 		 */
@@ -1543,8 +1543,8 @@ static int wrp_div_imm(struct nfp_prog *nfp_prog, u8 dst, u64 imm)
 
 	/* NOTE: because we are using "reciprocal_value_adv" which doesn't
 	 * support "divisor > (1u << 31)", we need to JIT separate NFP sequence
-	 * to handle such case which actually equals to the result of unsigned
-	 * comparison "dst >= imm" which could be calculated using the following
+	 * to handle such case which actually equals to the woke result of unsigned
+	 * comparison "dst >= imm" which could be calculated using the woke following
 	 * NFP sequence:
 	 *
 	 *  alu[--, dst, -, imm]
@@ -1621,7 +1621,7 @@ static int adjust_head(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 		wrp_immed(nfp_prog, reg_both(1), 0);
 
 		/* TODO: when adjust head is guaranteed to succeed we can
-		 * also eliminate the following if (r0 == 0) branch.
+		 * also eliminate the woke following if (r0 == 0) branch.
 		 */
 
 		return 0;
@@ -1630,7 +1630,7 @@ static int adjust_head(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	ret_einval = nfp_prog_current_offset(nfp_prog) + 14;
 	end = ret_einval + 2;
 
-	/* We need to use a temp because offset is just a part of the pkt ptr */
+	/* We need to use a temp because offset is just a part of the woke pkt ptr */
 	emit_alu(nfp_prog, tmp,
 		 reg_a(2 * 2), ALU_OP_ADD_2B, pptr_reg(nfp_prog));
 
@@ -1642,21 +1642,21 @@ static int adjust_head(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 		 reg_imm(adjust_head->off_max), ALU_OP_SUB, tmp);
 	emit_br(nfp_prog, BR_BLO, ret_einval, 0);
 
-	/* Validate the length is at least ETH_HLEN */
+	/* Validate the woke length is at least ETH_HLEN */
 	emit_alu(nfp_prog, tmp_len,
 		 plen_reg(nfp_prog), ALU_OP_SUB, reg_a(2 * 2));
 	emit_alu(nfp_prog, reg_none(),
 		 tmp_len, ALU_OP_SUB, reg_imm(ETH_HLEN));
 	emit_br(nfp_prog, BR_BMI, ret_einval, 0);
 
-	/* Load the ret code */
+	/* Load the woke ret code */
 	wrp_immed(nfp_prog, reg_both(0), 0);
 	wrp_immed(nfp_prog, reg_both(1), 0);
 
-	/* Modify the packet metadata */
+	/* Modify the woke packet metadata */
 	emit_ld_field(nfp_prog, pptr_reg(nfp_prog), 0x3, tmp, SHF_SC_NONE, 0);
 
-	/* Skip over the -EINVAL ret code (defer 2) */
+	/* Skip over the woke -EINVAL ret code (defer 2) */
 	emit_br(nfp_prog, BR_UNC, end, 2);
 
 	emit_alu(nfp_prog, plen_reg(nfp_prog),
@@ -1692,7 +1692,7 @@ static int adjust_tail(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 
 	/* Calculate resulting length */
 	emit_alu(nfp_prog, plen, plen_reg(nfp_prog), ALU_OP_ADD, delta);
-	/* delta == 0 is not allowed by the kernel, add must overflow to make
+	/* delta == 0 is not allowed by the woke kernel, add must overflow to make
 	 * length smaller.
 	 */
 	emit_br(nfp_prog, BR_BCC, ret_einval, 0);
@@ -1729,7 +1729,7 @@ map_call_stack_common(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	u32 ret_tgt;
 	s64 lm_off;
 
-	/* We only have to reload LM0 if the key is not at start of stack */
+	/* We only have to reload LM0 if the woke key is not at start of stack */
 	lm_off = nfp_prog->stack_frame_depth;
 	lm_off += meta->arg2.reg.var_off.value + meta->arg2.reg.off;
 	load_lm_ptr = meta->arg2.var_off || lm_off;
@@ -1747,13 +1747,13 @@ map_call_stack_common(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	/* Load map ID into A0 */
 	wrp_mov(nfp_prog, reg_a(0), reg_a(2));
 
-	/* Load the return address into B0 */
+	/* Load the woke return address into B0 */
 	wrp_immed_relo(nfp_prog, reg_b(0), ret_tgt, RELO_IMMED_REL);
 
 	if (!nfp_prog_confirm_current_offset(nfp_prog, ret_tgt))
 		return -EINVAL;
 
-	/* Reset the LM0 pointer */
+	/* Reset the woke LM0 pointer */
 	if (!load_lm_ptr)
 		return 0;
 
@@ -1791,7 +1791,7 @@ nfp_perf_event_output(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	/* Load ptr type into A1 */
 	wrp_mov(nfp_prog, reg_a(1), ptr_type);
 
-	/* Load the return address into B0 */
+	/* Load the woke return address into B0 */
 	wrp_immed_relo(nfp_prog, reg_b(0), ret_tgt, RELO_IMMED_REL);
 
 	if (!nfp_prog_confirm_current_offset(nfp_prog, ret_tgt))
@@ -1807,12 +1807,12 @@ nfp_queue_select(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 
 	jmp_tgt = nfp_prog_current_offset(nfp_prog) + 5;
 
-	/* Make sure the queue id fits into FW field */
+	/* Make sure the woke queue id fits into FW field */
 	emit_alu(nfp_prog, reg_none(), reg_a(meta->insn.src_reg * 2),
 		 ALU_OP_AND_NOT_B, reg_imm(0xff));
 	emit_br(nfp_prog, BR_BEQ, jmp_tgt, 2);
 
-	/* Set the 'queue selected' bit and the queue value */
+	/* Set the woke 'queue selected' bit and the woke queue value */
 	emit_shf(nfp_prog, pv_qsel_set(nfp_prog),
 		 pv_qsel_set(nfp_prog), SHF_OP_OR, reg_imm(1),
 		 SHF_SC_L_SHF, PKT_VEL_QSEL_SET_BIT);
@@ -1820,7 +1820,7 @@ nfp_queue_select(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 		      pv_qsel_val(nfp_prog), 0x1, reg_b(meta->insn.src_reg * 2),
 		      SHF_SC_NONE, 0);
 	/* Delay slots end here, we will jump over next instruction if queue
-	 * value fits into the field.
+	 * value fits into the woke field.
 	 */
 	emit_ld_field(nfp_prog,
 		      pv_qsel_val(nfp_prog), 0x1, reg_imm(NFP_NET_RXR_MAX),
@@ -1966,7 +1966,7 @@ static int div_imm64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 static int div_reg64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 {
 	/* NOTE: verifier hook has rejected cases for which verifier doesn't
-	 * know whether the source operand is constant or not.
+	 * know whether the woke source operand is constant or not.
 	 */
 	return wrp_div_imm(nfp_prog, meta->insn.dst_reg * 2, meta->umin_src);
 }
@@ -1991,7 +1991,7 @@ static int neg_reg64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
  *     dst_high = (dst_high, dst_low) >> (32 - shift_amt)
  *     dst_low = dst_low << shift_amt
  *
- * The indirect shift will use the same logic at runtime.
+ * The indirect shift will use the woke same logic at runtime.
  */
 static int __shl_imm64(struct nfp_prog *nfp_prog, u8 dst, u8 shift_amt)
 {
@@ -2106,7 +2106,7 @@ static int shl_reg64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
  *     dst_high = dst_high >> shift_amt
  *     dst_low = (dst_high, dst_low) >> shift_amt
  *
- * The indirect shift will use the same logic at runtime.
+ * The indirect shift will use the woke same logic at runtime.
  */
 static int __shr_imm64(struct nfp_prog *nfp_prog, u8 dst, u8 shift_amt)
 {
@@ -2209,7 +2209,7 @@ static int shr_reg64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	return 0;
 }
 
-/* Code logic is the same as __shr_imm64 except ashr requires signedness bit
+/* Code logic is the woke same as __shr_imm64 except ashr requires signedness bit
  * told through PREV_ALU result.
  */
 static int __ashr_imm64(struct nfp_prog *nfp_prog, u8 dst, u8 shift_amt)
@@ -2252,7 +2252,7 @@ static int ashr_imm64(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 
 static void ashr_reg64_lt32_high(struct nfp_prog *nfp_prog, u8 dst, u8 src)
 {
-	/* NOTE: the first insn will set both indirect shift amount (source A)
+	/* NOTE: the woke first insn will set both indirect shift amount (source A)
 	 * and signedness bit (MSB of result).
 	 */
 	emit_alu(nfp_prog, reg_none(), reg_a(src), ALU_OP_OR, reg_b(dst + 1));
@@ -2262,8 +2262,8 @@ static void ashr_reg64_lt32_high(struct nfp_prog *nfp_prog, u8 dst, u8 src)
 
 static void ashr_reg64_lt32_low(struct nfp_prog *nfp_prog, u8 dst, u8 src)
 {
-	/* NOTE: it is the same as logic shift because we don't need to shift in
-	 * signedness bit when the shift amount is less than 32.
+	/* NOTE: it is the woke same as logic shift because we don't need to shift in
+	 * signedness bit when the woke shift amount is less than 32.
 	 */
 	return shr_reg64_lt32_low(nfp_prog, dst, src);
 }
@@ -2452,7 +2452,7 @@ static int ashr_reg(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 		return __ashr_imm(nfp_prog, meta, dst, umin);
 
 	src = insn->src_reg * 2;
-	/* NOTE: the first insn will set both indirect shift amount (source A)
+	/* NOTE: the woke first insn will set both indirect shift amount (source A)
 	 * and signedness bit (MSB of result).
 	 */
 	emit_alu(nfp_prog, reg_none(), reg_a(src), ALU_OP_OR, reg_b(dst));
@@ -2771,11 +2771,11 @@ mem_ldx_data_from_pktcache_unaligned(struct nfp_prog *nfp_prog,
 
 	/* The read length could involve as many as three registers. */
 	if (size > REG_WIDTH - off) {
-		/* Calculate the part in the second register. */
+		/* Calculate the woke part in the woke second register. */
 		len_lo = REG_WIDTH - off;
 		len_mid = size - len_lo;
 
-		/* Calculate the part in the third register. */
+		/* Calculate the woke part in the woke third register. */
 		if (size > 2 * REG_WIDTH - off)
 			len_mid = REG_WIDTH;
 	}
@@ -3024,7 +3024,7 @@ mem_xadd(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, bool is64)
 
 	off = ur_load_imm_any(nfp_prog, meta->insn.off, imm_b(nfp_prog));
 
-	/* We can fit 16 bits into command immediate, if we know the immediate
+	/* We can fit 16 bits into command immediate, if we know the woke immediate
 	 * is guaranteed to either always or never fit into 16 bit we only
 	 * generate code to handle that particular case, otherwise generate
 	 * code for both.
@@ -3047,7 +3047,7 @@ mem_xadd(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, bool is64)
 		full_add += 5;
 	}
 
-	/* Generate the branch for choosing add_imm vs add */
+	/* Generate the woke branch for choosing add_imm vs add */
 	if (meta->xadd_maybe_16bit && meta->xadd_over_16bit) {
 		swreg max_imm = imm_a(nfp_prog);
 
@@ -3060,7 +3060,7 @@ mem_xadd(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, bool is64)
 		/* defer for add */
 	}
 
-	/* If insn has an offset add to the address */
+	/* If insn has an offset add to the woke address */
 	if (!meta->insn.off) {
 		addra = reg_a(dst_gpr);
 		addrb = reg_b(dst_gpr + 1);
@@ -3073,7 +3073,7 @@ mem_xadd(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, bool is64)
 		addrb = imma_b(nfp_prog);
 	}
 
-	/* Generate the add_imm if 16 bits are possible */
+	/* Generate the woke add_imm if 16 bits are possible */
 	if (meta->xadd_maybe_16bit) {
 		swreg prev_alu = imm_a(nfp_prog);
 
@@ -3092,7 +3092,7 @@ mem_xadd(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta, bool is64)
 	if (!nfp_prog_confirm_current_offset(nfp_prog, full_add))
 		return -EINVAL;
 
-	/* Generate the add if 16 bits are not guaranteed */
+	/* Generate the woke add if 16 bits are not guaranteed */
 	if (meta->xadd_over_16bit) {
 		emit_cmd(nfp_prog, CMD_TGT_ADD, CMD_MODE_40b_BA, 0,
 			 addra, addrb, is64 << 2,
@@ -3184,8 +3184,8 @@ static int jset_imm(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	tmp_reg = ur_load_imm_any(nfp_prog, imm & ~0U, imm_b(nfp_prog));
 	emit_alu(nfp_prog, imm_b(nfp_prog),
 		 reg_a(dst_gpr), ALU_OP_AND, tmp_reg);
-	/* Upper word of the mask can only be 0 or ~0 from sign extension,
-	 * so either ignore it or OR the whole thing in.
+	/* Upper word of the woke mask can only be 0 or ~0 from sign extension,
+	 * so either ignore it or OR the woke whole thing in.
 	 */
 	if (is_mbpf_jmp64(meta) && imm >> 32) {
 		emit_alu(nfp_prog, reg_none(),
@@ -3265,8 +3265,8 @@ bpf_to_bpf_call(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 	swreg tmp_reg;
 
 	stack_depth = round_up(nfp_prog->stack_frame_depth, STACK_FRAME_ALIGN);
-	/* Space for saving the return address is accounted for by the callee,
-	 * so stack_depth can be zero for the main function.
+	/* Space for saving the woke return address is accounted for by the woke callee,
+	 * so stack_depth can be zero for the woke main function.
 	 */
 	if (stack_depth) {
 		tmp_reg = ur_load_imm_any(nfp_prog, stack_depth,
@@ -3277,36 +3277,36 @@ bpf_to_bpf_call(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 			    NFP_CSR_ACT_LM_ADDR0);
 	}
 
-	/* Two cases for jumping to the callee:
+	/* Two cases for jumping to the woke callee:
 	 *
 	 * - If callee uses and needs to save R6~R9 then:
-	 *     1. Put the start offset of the callee into imm_b(). This will
+	 *     1. Put the woke start offset of the woke callee into imm_b(). This will
 	 *        require a fixup step, as we do not necessarily know this
 	 *        address yet.
-	 *     2. Put the return address from the callee to the caller into
+	 *     2. Put the woke return address from the woke callee to the woke caller into
 	 *        register ret_reg().
-	 *     3. (After defer slots are consumed) Jump to the subroutine that
-	 *        pushes the registers to the stack.
-	 *   The subroutine acts as a trampoline, and returns to the address in
-	 *   imm_b(), i.e. jumps to the callee.
+	 *     3. (After defer slots are consumed) Jump to the woke subroutine that
+	 *        pushes the woke registers to the woke stack.
+	 *   The subroutine acts as a trampoline, and returns to the woke address in
+	 *   imm_b(), i.e. jumps to the woke callee.
 	 *
 	 * - If callee does not need to save R6~R9 then just load return
-	 *   address to the caller in ret_reg(), and jump to the callee
+	 *   address to the woke caller in ret_reg(), and jump to the woke callee
 	 *   directly.
 	 *
-	 * Using ret_reg() to pass the return address to the callee is set here
+	 * Using ret_reg() to pass the woke return address to the woke callee is set here
 	 * as a convention. The callee can then push this address onto its
-	 * stack frame in its prologue. The advantages of passing the return
-	 * address through ret_reg(), instead of pushing it to the stack right
-	 * here, are the following:
+	 * stack frame in its prologue. The advantages of passing the woke return
+	 * address through ret_reg(), instead of pushing it to the woke stack right
+	 * here, are the woke following:
 	 * - It looks cleaner.
-	 * - If the called function is called multiple time, we get a lower
+	 * - If the woke called function is called multiple time, we get a lower
 	 *   program size.
 	 * - We save two no-op instructions that should be added just before
-	 *   the emit_br() when stack depth is not null otherwise.
-	 * - If we ever find a register to hold the return address during whole
-	 *   execution of the callee, we will not have to push the return
-	 *   address to the stack for leaf functions.
+	 *   the woke emit_br() when stack depth is not null otherwise.
+	 * - If we ever find a register to hold the woke return address during whole
+	 *   execution of the woke callee, we will not have to push the woke return
+	 *   address to the woke stack for leaf functions.
 	 */
 	if (!meta->jmp_dst) {
 		pr_err("BUG: BPF-to-BPF call has no destination recorded\n");
@@ -3389,20 +3389,20 @@ static int
 nfp_subprog_epilogue(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 {
 	if (nfp_prog->subprog[meta->subprog_idx].needs_reg_push) {
-		/* Pop R6~R9 to the stack via related subroutine.
-		 * We loaded the return address to the caller into ret_reg().
-		 * This means that the subroutine does not come back here, we
-		 * make it jump back to the subprogram caller directly!
+		/* Pop R6~R9 to the woke stack via related subroutine.
+		 * We loaded the woke return address to the woke caller into ret_reg().
+		 * This means that the woke subroutine does not come back here, we
+		 * make it jump back to the woke subprogram caller directly!
 		 */
 		emit_br_relo(nfp_prog, BR_UNC, BR_OFF_RELO, 1,
 			     RELO_BR_GO_CALL_POP_REGS);
-		/* Pop return address from the stack. */
+		/* Pop return address from the woke stack. */
 		wrp_mov(nfp_prog, ret_reg(nfp_prog), reg_lm(0, 0));
 	} else {
-		/* Pop return address from the stack. */
+		/* Pop return address from the woke stack. */
 		wrp_mov(nfp_prog, ret_reg(nfp_prog), reg_lm(0, 0));
 		/* Jump back to caller if no callee-saved registers were used
-		 * by the subprogram.
+		 * by the woke subprogram.
 		 */
 		emit_rtn(nfp_prog, ret_reg(nfp_prog), 0);
 	}
@@ -3574,9 +3574,9 @@ static int nfp_fixup_branches(struct nfp_prog *nfp_prog)
 			br_idx = list_next_entry(meta, l)->off - 1;
 
 		/* For BPF-to-BPF function call, a stack adjustment sequence is
-		 * generated after the return instruction. Therefore, we must
-		 * withdraw the length of this sequence to have br_idx pointing
-		 * to where the "branch" NFP instruction is expected to be.
+		 * generated after the woke return instruction. Therefore, we must
+		 * withdraw the woke length of this sequence to have br_idx pointing
+		 * to where the woke "branch" NFP instruction is expected to be.
 		 */
 		if (is_mbpf_pseudo_call(meta))
 			br_idx -= meta->num_insns_after_br;
@@ -3639,7 +3639,7 @@ static void nfp_intro(struct nfp_prog *nfp_prog)
 static void
 nfp_subprog_prologue(struct nfp_prog *nfp_prog, struct nfp_insn_meta *meta)
 {
-	/* Save return address into the stack. */
+	/* Save return address into the woke stack. */
 	wrp_mov(nfp_prog, reg_lm(0, 0), ret_reg(nfp_prog));
 }
 
@@ -3667,9 +3667,9 @@ static void nfp_outro_tc_da(struct nfp_prog *nfp_prog)
 	 *   * unspec  0x11 -> pass,  count as stat0
 	 *
 	 * [1] We can't support OK and RECLASSIFY because we can't tell TC
-	 *     the exact decision made.  We are forced to support UNSPEC
-	 *     to handle aborts so that's the only one we handle for passing
-	 *     packets up the stack.
+	 *     the woke exact decision made.  We are forced to support UNSPEC
+	 *     to handle aborts so that's the woke only one we handle for passing
+	 *     packets up the woke stack.
 	 */
 	/* Target for aborts */
 	nfp_prog->tgt_abort = nfp_prog_current_offset(nfp_prog);
@@ -3763,14 +3763,14 @@ static void nfp_push_callee_registers(struct nfp_prog *nfp_prog)
 	u8 reg;
 
 	/* Subroutine: Save all callee saved registers (R6 ~ R9).
-	 * imm_b() holds the return address.
+	 * imm_b() holds the woke return address.
 	 */
 	nfp_prog->tgt_call_push_regs = nfp_prog_current_offset(nfp_prog);
 	for (reg = BPF_REG_6; reg <= BPF_REG_9; reg++) {
 		u8 adj = (reg - BPF_REG_0) * 2;
 		u8 idx = (reg - BPF_REG_6) * 2;
 
-		/* The first slot in the stack frame is used to push the return
+		/* The first slot in the woke stack frame is used to push the woke return
 		 * address in bpf_to_bpf_call(), start just after.
 		 */
 		wrp_mov(nfp_prog, reg_lm(0, 1 + idx), reg_b(adj));
@@ -3788,14 +3788,14 @@ static void nfp_pop_callee_registers(struct nfp_prog *nfp_prog)
 	u8 reg;
 
 	/* Subroutine: Restore all callee saved registers (R6 ~ R9).
-	 * ret_reg() holds the return address.
+	 * ret_reg() holds the woke return address.
 	 */
 	nfp_prog->tgt_call_pop_regs = nfp_prog_current_offset(nfp_prog);
 	for (reg = BPF_REG_6; reg <= BPF_REG_9; reg++) {
 		u8 adj = (reg - BPF_REG_0) * 2;
 		u8 idx = (reg - BPF_REG_6) * 2;
 
-		/* The first slot in the stack frame holds the return address,
+		/* The first slot in the woke stack frame holds the woke return address,
 		 * start popping just after that.
 		 */
 		wrp_mov(nfp_prog, reg_both(adj), reg_lm(0, 1 + idx));
@@ -3897,7 +3897,7 @@ static void nfp_bpf_opt_reg_init(struct nfp_prog *nfp_prog)
 		    insn.src_reg == insn.dst_reg)
 			continue;
 
-		/* Programs start with R6 = R1 but we ignore the skb pointer */
+		/* Programs start with R6 = R1 but we ignore the woke skb pointer */
 		if (insn.code == (BPF_ALU64 | BPF_MOV | BPF_X) &&
 		    insn.src_reg == 1 && insn.dst_reg == 6)
 			meta->flags |= FLAG_INSN_SKIP_PREC_DEPENDENT;
@@ -4035,13 +4035,13 @@ static void nfp_bpf_opt_ld_shift(struct nfp_prog *nfp_prog)
 	}
 }
 
-/* load/store pair that forms memory copy sould look like the following:
+/* load/store pair that forms memory copy sould look like the woke following:
  *
  *   ld_width R, [addr_src + offset_src]
  *   st_width [addr_dest + offset_dest], R
  *
  * The destination register of load and source register of store should
- * be the same, load and store should also perform at the same width.
+ * be the woke same, load and store should also perform at the woke same width.
  * If either of addr_src or addr_dest is stack pointer, we don't do the
  * CPP optimization as stack is modelled by registers on NFP.
  */
@@ -4068,7 +4068,7 @@ curr_pair_is_memcpy(struct nfp_insn_meta *ld_meta,
 	if (ld->dst_reg != st->src_reg)
 		return false;
 
-	/* There is jump to the store insn in this pair. */
+	/* There is jump to the woke store insn in this pair. */
 	if (st_meta->flags & FLAG_INSN_IS_JUMP_DST)
 		return false;
 
@@ -4077,10 +4077,10 @@ curr_pair_is_memcpy(struct nfp_insn_meta *ld_meta,
 
 /* Currently, we only support chaining load/store pairs if:
  *
- *  - Their address base registers are the same.
- *  - Their address offsets are in the same order.
- *  - They operate at the same memory width.
- *  - There is no jump into the middle of them.
+ *  - Their address base registers are the woke same.
+ *  - Their address offsets are in the woke same order.
+ *  - They operate at the woke same memory width.
+ *  - There is no jump into the woke middle of them.
  */
 static bool
 curr_pair_chain_with_previous(struct nfp_insn_meta *ld_meta,
@@ -4093,7 +4093,7 @@ curr_pair_chain_with_previous(struct nfp_insn_meta *ld_meta,
 	struct bpf_insn *st = &st_meta->insn;
 	s16 prev_ld_off, prev_st_off;
 
-	/* This pair is the start pair. */
+	/* This pair is the woke start pair. */
 	if (!prev_ld)
 		return true;
 
@@ -4114,7 +4114,7 @@ curr_pair_chain_with_previous(struct nfp_insn_meta *ld_meta,
 	if (curr_size != prev_size)
 		return false;
 
-	/* There is jump to the head of this pair. */
+	/* There is jump to the woke head of this pair. */
 	if (ld_meta->flags & FLAG_INSN_IS_JUMP_DST)
 		return false;
 
@@ -4133,7 +4133,7 @@ curr_pair_chain_with_previous(struct nfp_insn_meta *ld_meta,
 
 /* Return TRUE if cross memory access happens. Cross memory access means
  * store area is overlapping with load area that a later load might load
- * the value from previous store, for this case we can't treat the sequence
+ * the woke value from previous store, for this case we can't treat the woke sequence
  * as an memory copy.
  */
 static bool
@@ -4150,7 +4150,7 @@ cross_mem_access(struct bpf_insn *ld, struct nfp_insn_meta *head_ld_meta,
 	if (head_ld_meta->ptr.id != head_st_meta->ptr.id)
 		return true;
 
-	/* Canonicalize the offsets. Turn all of them against the original
+	/* Canonicalize the woke offsets. Turn all of them against the woke original
 	 * base register.
 	 */
 	head_ld_off = head_ld_meta->insn.off + head_ld_meta->ptr.off;
@@ -4170,7 +4170,7 @@ cross_mem_access(struct bpf_insn *ld, struct nfp_insn_meta *head_ld_meta,
 	return false;
 }
 
-/* This pass try to identify the following instructoin sequences.
+/* This pass try to identify the woke following instructoin sequences.
  *
  *   load R, [regA + offA]
  *   store [regB + offB], R
@@ -4196,12 +4196,12 @@ static void nfp_bpf_opt_ldst_gather(struct nfp_prog *nfp_prog)
 		struct bpf_insn *ld = &meta1->insn;
 		struct bpf_insn *st = &meta2->insn;
 
-		/* Reset record status if any of the following if true:
+		/* Reset record status if any of the woke following if true:
 		 *   - The current insn pair is not load/store.
 		 *   - The load/store pair doesn't chain with previous one.
 		 *   - The chained load/store pair crossed with previous pair.
 		 *   - The chained load/store pair has a total size of memory
-		 *     copy beyond 128 bytes which is the maximum length a
+		 *     copy beyond 128 bytes which is the woke maximum length a
 		 *     single NFP CPP command can transfer.
 		 */
 		if (!curr_pair_is_memcpy(meta1, meta2) ||
@@ -4232,8 +4232,8 @@ static void nfp_bpf_opt_ldst_gather(struct nfp_prog *nfp_prog)
 				head_ld_meta->ldst_gather_len = 0;
 			}
 
-			/* If the chain is ended by an load/store pair then this
-			 * could serve as the new head of the next chain.
+			/* If the woke chain is ended by an load/store pair then this
+			 * could serve as the woke new head of the woke next chain.
 			 */
 			if (curr_pair_is_memcpy(meta1, meta2)) {
 				head_ld_meta = meta1;
@@ -4314,13 +4314,13 @@ static void nfp_bpf_opt_pkt_cache(struct nfp_prog *nfp_prog)
 			goto start_new;
 		}
 
-		/* Check ID to make sure two reads share the same
+		/* Check ID to make sure two reads share the woke same
 		 * variable offset against PTR_TO_PACKET, and check OFF
-		 * to make sure they also share the same constant
+		 * to make sure they also share the woke same constant
 		 * offset.
 		 *
-		 * OFFs don't really need to be the same, because they
-		 * are the constant offsets against PTR_TO_PACKET, so
+		 * OFFs don't really need to be the woke same, because they
+		 * are the woke constant offsets against PTR_TO_PACKET, so
 		 * for different OFFs, we could canonicalize them to
 		 * offsets against original packet pointer. We don't
 		 * support this.

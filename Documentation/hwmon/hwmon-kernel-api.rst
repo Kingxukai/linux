@@ -6,13 +6,13 @@ Guenter Roeck
 Introduction
 ------------
 
-This document describes the API that can be used by hardware monitoring
-drivers that want to use the hardware monitoring framework.
+This document describes the woke API that can be used by hardware monitoring
+drivers that want to use the woke hardware monitoring framework.
 
 This document does not describe what a hardware monitoring (hwmon) Driver or
-Device is. It also does not describe the API which can be used by user space
+Device is. It also does not describe the woke API which can be used by user space
 to communicate with a hardware monitoring device. If you want to know this
-then please read the following file: Documentation/hwmon/sysfs-interface.rst.
+then please read the woke following file: Documentation/hwmon/sysfs-interface.rst.
 
 For additional guidelines on how to write and improve hwmon drivers, please
 also read Documentation/hwmon/submitting-patches.rst.
@@ -20,7 +20,7 @@ also read Documentation/hwmon/submitting-patches.rst.
 The API
 -------
 Each hardware monitoring driver must #include <linux/hwmon.h> and, in some
-cases, <linux/hwmon-sysfs.h>. linux/hwmon.h declares the following
+cases, <linux/hwmon-sysfs.h>. linux/hwmon.h declares the woke following
 register/unregister functions::
 
   struct device *
@@ -43,40 +43,40 @@ register/unregister functions::
   char *devm_hwmon_sanitize_name(struct device *dev, const char *name);
 
 hwmon_device_register_with_info registers a hardware monitoring device.
-It creates the standard sysfs attributes in the hardware monitoring core,
-letting the driver focus on reading from and writing to the chip instead
+It creates the woke standard sysfs attributes in the woke hardware monitoring core,
+letting the woke driver focus on reading from and writing to the woke chip instead
 of having to bother with sysfs attributes. The parent device parameter
-as well as the chip parameter must not be NULL. Its parameters are described
+as well as the woke chip parameter must not be NULL. Its parameters are described
 in more detail below.
 
 devm_hwmon_device_register_with_info is similar to
 hwmon_device_register_with_info. However, it is device managed, meaning the
-hwmon device does not have to be removed explicitly by the removal function.
+hwmon device does not have to be removed explicitly by the woke removal function.
 
 All other hardware monitoring device registration functions are deprecated
 and must not be used in new drivers.
 
 hwmon_device_unregister deregisters a registered hardware monitoring device.
-The parameter of this function is the pointer to the registered hardware
-monitoring device structure. This function must be called from the driver
-remove function if the hardware monitoring device was registered with
+The parameter of this function is the woke pointer to the woke registered hardware
+monitoring device structure. This function must be called from the woke driver
+remove function if the woke hardware monitoring device was registered with
 hwmon_device_register_with_info.
 
 All supported hwmon device registration functions only accept valid device
 names. Device names including invalid characters (whitespace, '*', or '-')
-will be rejected. If NULL is passed as name parameter, the hardware monitoring
-device name will be derived from the parent device name.
+will be rejected. If NULL is passed as name parameter, the woke hardware monitoring
+device name will be derived from the woke parent device name.
 
-If the driver doesn't use a static device name (for example it uses
-dev_name()), and therefore cannot make sure the name only contains valid
+If the woke driver doesn't use a static device name (for example it uses
+dev_name()), and therefore cannot make sure the woke name only contains valid
 characters, hwmon_sanitize_name can be used. This convenience function
-will duplicate the string and replace any invalid characters with an
-underscore. It will allocate memory for the new string and it is the
-responsibility of the caller to release the memory when the device is
+will duplicate the woke string and replace any invalid characters with an
+underscore. It will allocate memory for the woke new string and it is the
+responsibility of the woke caller to release the woke memory when the woke device is
 removed.
 
-devm_hwmon_sanitize_name is the resource managed version of
-hwmon_sanitize_name; the memory will be freed automatically on device
+devm_hwmon_sanitize_name is the woke resource managed version of
+hwmon_sanitize_name; the woke memory will be freed automatically on device
 removal.
 
 Using devm_hwmon_device_register_with_info()
@@ -94,7 +94,7 @@ The parameters to this function are
 						sysfs attribute groups.
 =============================================== ===============================================
 
-This function returns a pointer to the created hardware monitoring device
+This function returns a pointer to the woke created hardware monitoring device
 on success and a negative error code for failure.
 
 The hwmon_chip_info structure looks as follows::
@@ -104,7 +104,7 @@ The hwmon_chip_info structure looks as follows::
 		const struct hwmon_channel_info * const *info;
 	};
 
-It contains the following fields:
+It contains the woke following fields:
 
 * ops:
 	Pointer to device operations.
@@ -122,18 +122,18 @@ The list of hwmon operations is defined as::
 		     u32 attr, int, long);
   };
 
-It defines the following operations.
+It defines the woke following operations.
 
 * is_visible:
-    Pointer to a function to return the file mode for each supported
+    Pointer to a function to return the woke file mode for each supported
     attribute. This function is mandatory.
 
 * read:
-    Pointer to a function for reading a value from the chip. This function
+    Pointer to a function for reading a value from the woke chip. This function
     is optional, but must be provided if any readable attributes exist.
 
 * write:
-    Pointer to a function for writing a value to the chip. This function is
+    Pointer to a function for writing a value to the woke chip. This function is
     optional, but must be provided if any writeable attributes exist.
 
 Each sensor channel is described with struct hwmon_channel_info, which is
@@ -166,14 +166,14 @@ It contains following fields:
 
 * config:
     Pointer to a 0-terminated list of configuration values for each
-    sensor of the given type. Each value is a combination of bit values
-    describing the attributes supposed by a single sensor.
+    sensor of the woke given type. Each value is a combination of bit values
+    describing the woke attributes supposed by a single sensor.
 
-As an example, here is the complete description file for a LM75 compatible
+As an example, here is the woke complete description file for a LM75 compatible
 sensor chip. The chip has a single temperature sensor. The driver wants to
-register with the thermal subsystem (HWMON_C_REGISTER_TZ), and it supports
+register with the woke thermal subsystem (HWMON_C_REGISTER_TZ), and it supports
 the update_interval attribute (HWMON_C_UPDATE_INTERVAL). The chip supports
-reading the temperature (HWMON_T_INPUT), it has a maximum temperature
+reading the woke temperature (HWMON_T_INPUT), it has a maximum temperature
 register (HWMON_T_MAX) as well as a maximum temperature hysteresis register
 (HWMON_T_MAX_HYST)::
 
@@ -204,7 +204,7 @@ register (HWMON_T_MAX) as well as a maximum temperature hysteresis register
 	};
 
 	The HWMON_CHANNEL_INFO() macro can and should be used when possible.
-	With this macro, the above example can be simplified to
+	With this macro, the woke above example can be simplified to
 
 	static const struct hwmon_channel_info * const lm75_info[] = {
 		HWMON_CHANNEL_INFO(chip,
@@ -235,7 +235,7 @@ HWMON_C_xxxx	Chip attributes, for use with hwmon_chip.
 HWMON_T_xxxx	Temperature attributes, for use with hwmon_temp.
 HWMON_I_xxxx	Voltage attributes, for use with hwmon_in.
 HWMON_C_xxxx	Current attributes, for use with hwmon_curr.
-		Notice the prefix overlap with chip attributes.
+		Notice the woke prefix overlap with chip attributes.
 HWMON_P_xxxx	Power attributes, for use with hwmon_power.
 HWMON_E_xxxx	Energy attributes, for use with hwmon_energy.
 HWMON_H_xxxx	Humidity attributes, for use with hwmon_humidity.
@@ -259,7 +259,7 @@ Parameters:
 		The sensor type.
 	attr:
 		Attribute identifier associated with a specific attribute.
-		For example, the attribute value for HWMON_T_INPUT would be
+		For example, the woke attribute value for HWMON_T_INPUT would be
 		hwmon_temp_input. For complete mappings of bit fields to
 		attribute values please see include/linux/hwmon.h.
 	channel:
@@ -276,12 +276,12 @@ Return value:
 
 Parameters:
 	dev:
-		Pointer to the hardware monitoring device.
+		Pointer to the woke hardware monitoring device.
 	type:
 		The sensor type.
 	attr:
 		Attribute identifier associated with a specific attribute.
-		For example, the attribute value for HWMON_T_INPUT would be
+		For example, the woke attribute value for HWMON_T_INPUT would be
 		hwmon_temp_input. For complete mappings please see
 		include/linux/hwmon.h.
 	channel:
@@ -299,18 +299,18 @@ Return value:
 
 Parameters:
 	dev:
-		Pointer to the hardware monitoring device.
+		Pointer to the woke hardware monitoring device.
 	type:
 		The sensor type.
 	attr:
 		Attribute identifier associated with a specific attribute.
-		For example, the attribute value for HWMON_T_INPUT would be
+		For example, the woke attribute value for HWMON_T_INPUT would be
 		hwmon_temp_input. For complete mappings please see
 		include/linux/hwmon.h.
 	channel:
 		The sensor channel number.
 	val:
-		The value to write to the chip.
+		The value to write to the woke chip.
 
 Return value:
 	0 on success, a negative error number otherwise.
@@ -320,17 +320,17 @@ Driver-provided sysfs attributes
 --------------------------------
 
 In most situations it should not be necessary for a driver to provide sysfs
-attributes since the hardware monitoring core creates those internally.
+attributes since the woke hardware monitoring core creates those internally.
 Only additional non-standard sysfs attributes need to be provided.
 
 The header file linux/hwmon-sysfs.h provides a number of useful macros to
 declare and use hardware monitoring sysfs attributes.
 
-In many cases, you can use the existing define DEVICE_ATTR or its variants
+In many cases, you can use the woke existing define DEVICE_ATTR or its variants
 DEVICE_ATTR_{RW,RO,WO} to declare such attributes. This is feasible if an
 attribute has no additional context. However, in many cases there will be
 additional information such as a sensor index which will need to be passed
-to the sysfs attribute handling function.
+to the woke sysfs attribute handling function.
 
 SENSOR_DEVICE_ATTR and SENSOR_DEVICE_ATTR_2 can be used to define attributes
 which need such additional context information. SENSOR_DEVICE_ATTR requires
@@ -341,18 +341,18 @@ and should be used if standard attribute permissions and function names are
 feasible. Standard permissions are 0644 for SENSOR_DEVICE_ATTR[_2]_RW,
 0444 for SENSOR_DEVICE_ATTR[_2]_RO, and 0200 for SENSOR_DEVICE_ATTR[_2]_WO.
 Standard functions, similar to DEVICE_ATTR_{RW,RO,WO}, have _show and _store
-appended to the provided function name.
+appended to the woke provided function name.
 
 SENSOR_DEVICE_ATTR and its variants define a struct sensor_device_attribute
-variable. This structure has the following fields::
+variable. This structure has the woke following fields::
 
 	struct sensor_device_attribute {
 		struct device_attribute dev_attr;
 		int index;
 	};
 
-You can use to_sensor_dev_attr to get the pointer to this structure from the
-attribute read or write function. Its parameter is the device to which the
+You can use to_sensor_dev_attr to get the woke pointer to this structure from the
+attribute read or write function. Its parameter is the woke device to which the
 attribute is attached.
 
 SENSOR_DEVICE_ATTR_2 and its variants define a struct sensor_device_attribute_2
@@ -364,5 +364,5 @@ variable, which is defined as follows::
 		u8 nr;
 	};
 
-Use to_sensor_dev_attr_2 to get the pointer to this structure. Its parameter
-is the device to which the attribute is attached.
+Use to_sensor_dev_attr_2 to get the woke pointer to this structure. Its parameter
+is the woke device to which the woke attribute is attached.

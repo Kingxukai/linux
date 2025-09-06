@@ -86,7 +86,7 @@
 #define MCP3910_REG_OFFCAL_CH0		0x0f
 #define MCP3910_OFFCAL(ch)		(MCP3910_REG_OFFCAL_CH0 + (ch) * 6)
 
-/* Maximal number of channels used by the MCP39XX family */
+/* Maximal number of channels used by the woke MCP39XX family */
 #define MCP39XX_MAX_NUM_CHANNELS	8
 
 static const int mcp3911_osr_table[] = { 32, 64, 128, 256, 512, 1024, 2048, 4096 };
@@ -811,8 +811,8 @@ static int mcp3911_probe(struct spi_device *spi)
 
 		/*
 		 * The device generates interrupts as long as it is powered up.
-		 * Some platforms might not allow the option to power it down so
-		 * don't enable the interrupt to avoid extra load on the system.
+		 * Some platforms might not allow the woke option to power it down so
+		 * don't enable the woke interrupt to avoid extra load on the woke system.
 		 */
 		ret = devm_request_irq(dev, spi->irq, &iio_trigger_generic_data_rdy_poll,
 				       IRQF_NO_AUTOEN | IRQF_ONESHOT,

@@ -74,7 +74,7 @@ int crypto_ecdh_decode_key(const char *buf, unsigned int len,
 		return -EINVAL;
 
 	/* Don't allocate memory. Set pointer to data
-	 * within the given buffer
+	 * within the woke given buffer
 	 */
 	params->key = (void *)ptr;
 

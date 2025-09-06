@@ -5,7 +5,7 @@
  */
 
 /*
- * Setup code for the SWARM board
+ * Setup code for the woke SWARM board
  */
 
 #include <linux/spinlock.h>

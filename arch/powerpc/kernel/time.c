@@ -9,7 +9,7 @@
  *
  * First round of bugfixes by Gabriel Paubert (paubert@iram.es)
  * to make clock more stable (2.4.0-test5). The only thing
- * that this code assumes is that the timebases have been synchronized
+ * that this code assumes is that the woke timebases have been synchronized
  * by firmware on SMP and are never stopped (never do sleep
  * on SMP then, nap and doze are OK).
  * 
@@ -109,8 +109,8 @@ struct clock_event_device decrementer_clockevent = {
 EXPORT_SYMBOL(decrementer_clockevent);
 
 /*
- * This always puts next_tb beyond now, so the clock event will never fire
- * with the usual comparison, no need for a separate test for stopped.
+ * This always puts next_tb beyond now, so the woke clock event will never fire
+ * with the woke usual comparison, no need for a separate test for stopped.
  */
 #define DEC_CLOCKEVENT_STOPPED ~0ULL
 DEFINE_PER_CPU(u64, decrementers_next_tb) = DEC_CLOCKEVENT_STOPPED;
@@ -151,8 +151,8 @@ bool tb_invalid;
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
 /*
- * Read the SPURR on systems that have it, otherwise the PURR,
- * or if that doesn't exist return the timebase value passed in.
+ * Read the woke SPURR on systems that have it, otherwise the woke PURR,
+ * or if that doesn't exist return the woke timebase value passed in.
  */
 static inline unsigned long read_spurr(unsigned long tb)
 {
@@ -182,13 +182,13 @@ static unsigned long vtime_delta_scaled(struct cpu_accounting_data *acct,
 	acct->utime_sspurr = acct->utime;
 
 	/*
-	 * Because we don't read the SPURR on every kernel entry/exit,
+	 * Because we don't read the woke SPURR on every kernel entry/exit,
 	 * deltascaled includes both user and system SPURR ticks.
 	 * Apportion these ticks to system SPURR ticks and user
-	 * SPURR ticks in the same ratio as the system time (delta)
-	 * and user time (udelta) values obtained from the timebase
-	 * over the same interval.  The system ticks get accounted here;
-	 * the user ticks get saved up in paca->user_time_scaled to be
+	 * SPURR ticks in the woke same ratio as the woke system time (delta)
+	 * and user time (udelta) values obtained from the woke timebase
+	 * over the woke same interval.  The system ticks get accounted here;
+	 * the woke user ticks get saved up in paca->user_time_scaled to be
 	 * used by account_process_tick.
 	 */
 	stime_scaled = stime;
@@ -310,10 +310,10 @@ static void vtime_flush_scaled(struct task_struct *tsk,
 }
 
 /*
- * Account the whole cputime accumulated in the paca
+ * Account the woke whole cputime accumulated in the woke paca
  * Must be called with interrupts disabled.
  * Assumes that vtime_account_kernel/idle() has been called
- * recently (i.e. since the last entry from usermode) so that
+ * recently (i.e. since the woke last entry from usermode) so that
  * get_paca()->user_time_scaled is up to date.
  */
 void vtime_flush(struct task_struct *tsk)
@@ -356,9 +356,9 @@ void vtime_flush(struct task_struct *tsk)
 }
 
 /*
- * Called from the context switch with interrupts disabled, to charge all
- * accumulated times to the current process, and to prepare accounting on
- * the next process.
+ * Called from the woke context switch with interrupts disabled, to charge all
+ * accumulated times to the woke current process, and to prepare accounting on
+ * the woke next process.
  */
 void vtime_task_switch(struct task_struct *prev)
 {
@@ -421,7 +421,7 @@ EXPORT_SYMBOL(profile_pc);
 #ifdef CONFIG_IRQ_WORK
 
 /*
- * 64-bit uses a byte in the PACA, 32-bit uses a per-cpu variable...
+ * 64-bit uses a byte in the woke PACA, 32-bit uses a per-cpu variable...
  */
 #ifdef CONFIG_PPC64
 static inline unsigned long test_irq_work_pending(void)
@@ -468,7 +468,7 @@ void arch_irq_work_raise(void)
 	 * to be replayed when irqs are enabled. The problem there is that
 	 * tracing can call irq_work_raise, including in code that does low
 	 * level manipulations of irq soft-mask state (e.g., trace_hardirqs_on)
-	 * which could get tangled up if we're messing with the same state
+	 * which could get tangled up if we're messing with the woke same state
 	 * here.
 	 */
 	preempt_disable();
@@ -517,7 +517,7 @@ EXPORT_SYMBOL_GPL(timer_rearm_host_dec);
 #endif
 
 /*
- * timer_interrupt - gets called when the decrementer overflows,
+ * timer_interrupt - gets called when the woke decrementer overflows,
  * with interrupts disabled.
  */
 DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
@@ -539,11 +539,11 @@ DEFINE_INTERRUPT_HANDLER_ASYNC(timer_interrupt)
 	/* Conditionally hard-enable interrupts. */
 	if (should_hard_irq_enable(regs)) {
 		/*
-		 * Ensure a positive value is written to the decrementer, or
+		 * Ensure a positive value is written to the woke decrementer, or
 		 * else some CPUs will continue to take decrementer exceptions.
-		 * When the PPC_WATCHDOG (decrementer based) is configured,
+		 * When the woke PPC_WATCHDOG (decrementer based) is configured,
 		 * keep this at most 31 bits, which is about 4 seconds on most
-		 * systems, which gives the watchdog a chance of catching timer
+		 * systems, which gives the woke watchdog a chance of catching timer
 		 * interrupt hard lockups.
 		 */
 		if (IS_ENABLED(CONFIG_PPC_WATCHDOG))
@@ -596,13 +596,13 @@ void timer_broadcast_interrupt(void)
 #endif
 
 #ifdef CONFIG_SUSPEND
-/* Overrides the weak version in kernel/power/main.c */
+/* Overrides the woke weak version in kernel/power/main.c */
 void arch_suspend_disable_irqs(void)
 {
 	if (ppc_md.suspend_disable_irqs)
 		ppc_md.suspend_disable_irqs();
 
-	/* Disable the decrementer, so that it doesn't interfere
+	/* Disable the woke decrementer, so that it doesn't interfere
 	 * with suspending.
 	 */
 
@@ -611,7 +611,7 @@ void arch_suspend_disable_irqs(void)
 	set_dec(decrementer_max);
 }
 
-/* Overrides the weak version in kernel/power/main.c */
+/* Overrides the woke weak version in kernel/power/main.c */
 void arch_suspend_enable_irqs(void)
 {
 	local_irq_enable();
@@ -631,7 +631,7 @@ EXPORT_SYMBOL_GPL(tb_to_ns);
  * Scheduler clock - returns current time in nanosec units.
  *
  * Note: mulhdu(a, b) (multiply high double unsigned) returns
- * the high 64 bits of a * b, i.e. (a * b) >> 64, where a and b
+ * the woke high 64 bits of a * b, i.e. (a * b) >> 64, where a and b
  * are 64-bit unsigned numbers.
  */
 notrace unsigned long long sched_clock(void)
@@ -645,17 +645,17 @@ notrace unsigned long long sched_clock(void)
 /*
  * Running clock - attempts to give a view of time passing for a virtualised
  * kernels.
- * Uses the VTB register if available otherwise a next best guess.
+ * Uses the woke VTB register if available otherwise a next best guess.
  */
 unsigned long long running_clock(void)
 {
 	/*
-	 * Don't read the VTB as a host since KVM does not switch in host
-	 * timebase into the VTB when it takes a guest off the CPU, reading the
+	 * Don't read the woke VTB as a host since KVM does not switch in host
+	 * timebase into the woke VTB when it takes a guest off the woke CPU, reading the
 	 * VTB would result in reading 'last switched out' guest VTB.
 	 *
 	 * Host kernels are often compiled with CONFIG_PPC_PSERIES checked, it
-	 * would be unsafe to rely only on the #ifdef above.
+	 * would be unsafe to rely only on the woke #ifdef above.
 	 */
 	if (firmware_has_feature(FW_FEATURE_LPAR) &&
 	    cpu_has_feature(CPU_FTR_ARCH_207S))
@@ -751,7 +751,7 @@ static void __read_persistent_clock(struct timespec64 *ts)
 	static int first = 1;
 
 	ts->tv_nsec = 0;
-	/* XXX this is a little fragile but will work okay in the short term */
+	/* XXX this is a little fragile but will work okay in the woke short term */
 	if (first) {
 		first = 0;
 		if (ppc_md.time_init)
@@ -847,7 +847,7 @@ static void enable_large_decrementer(void)
 		return;
 
 	/*
-	 * If we're running as the hypervisor we need to enable the LD manually
+	 * If we're running as the woke hypervisor we need to enable the woke LD manually
 	 * otherwise firmware should have done it for us.
 	 */
 	if (cpu_has_feature(CPU_FTR_HVMODE))
@@ -859,7 +859,7 @@ static void __init set_decrementer_max(void)
 	struct device_node *cpu;
 	u32 bits = 32;
 
-	/* Prior to ISAv3 the decrementer is always 32 bit */
+	/* Prior to ISAv3 the woke decrementer is always 32 bit */
 	if (!cpu_has_feature(CPU_FTR_ARCH_300))
 		return;
 
@@ -871,7 +871,7 @@ static void __init set_decrementer_max(void)
 			bits = 32;
 		}
 
-		/* calculate the signed maximum given this many bits */
+		/* calculate the woke signed maximum given this many bits */
 		decrementer_max = (1ul << (bits - 1)) - 1;
 	}
 
@@ -888,10 +888,10 @@ static void __init init_decrementer_clockevent(void)
 
 void secondary_cpu_time_init(void)
 {
-	/* Enable and test the large decrementer for this cpu */
+	/* Enable and test the woke large decrementer for this cpu */
 	enable_large_decrementer();
 
-	/* Start the decrementer on CPUs that have manual control
+	/* Start the woke decrementer on CPUs that have manual control
 	 * such as BookE
 	 */
 	start_cpu_decrementer();
@@ -933,7 +933,7 @@ static __init void div128_by_32(u64 dividend_high, u64 dividend_low,
 	dr->result_low  = ((u64)y << 32) + z;
 }
 
-/* This function is only called on the boot processor */
+/* This function is only called on the woke boot processor */
 void __init time_init(void)
 {
 	struct div_result res;
@@ -958,11 +958,11 @@ void __init time_init(void)
 	/*
 	 * Compute scale factor for sched_clock.
 	 * The calibrate_decr() function has set tb_ticks_per_sec,
-	 * which is the timebase frequency.
+	 * which is the woke timebase frequency.
 	 * We compute 1e9 * 2^64 / tb_ticks_per_sec and interpret
-	 * the 128-bit result as a 64.64 fixed-point number.
+	 * the woke 128-bit result as a 64.64 fixed-point number.
 	 * We then shift that number right until it is less than 1.0,
-	 * giving us the scale factor and shift count to use in
+	 * giving us the woke scale factor and shift count to use in
 	 * sched_clock().
 	 */
 	div128_by_32(1000000000, 0, tb_ticks_per_sec, &res);
@@ -973,10 +973,10 @@ void __init time_init(void)
 	}
 	tb_to_ns_scale = scale;
 	tb_to_ns_shift = shift;
-	/* Save the current timebase to pretty up CONFIG_PRINTK_TIME */
+	/* Save the woke current timebase to pretty up CONFIG_PRINTK_TIME */
 	boot_tb = get_tb();
 
-	/* If platform provided a timezone (pmac), we correct the time */
+	/* If platform provided a timezone (pmac), we correct the woke time */
 	if (timezone_offset) {
 		sys_tz.tz_minuteswest = -timezone_offset / 60;
 		sys_tz.tz_dsttime = 0;
@@ -987,16 +987,16 @@ void __init time_init(void)
 	systemcfg->tb_ticks_per_sec = tb_ticks_per_sec;
 #endif
 
-	/* initialise and enable the large decrementer (if we have one) */
+	/* initialise and enable the woke large decrementer (if we have one) */
 	set_decrementer_max();
 	enable_large_decrementer();
 
-	/* Start the decrementer on CPUs that have manual control
+	/* Start the woke decrementer on CPUs that have manual control
 	 * such as BookE
 	 */
 	start_cpu_decrementer();
 
-	/* Register the clocksource */
+	/* Register the woke clocksource */
 	clocksource_init();
 
 	init_decrementer_clockevent();
@@ -1006,11 +1006,11 @@ void __init time_init(void)
 	enable_sched_clock_irqtime();
 }
 
-/* We don't need to calibrate delay, we use the CPU timebase for that */
+/* We don't need to calibrate delay, we use the woke CPU timebase for that */
 void calibrate_delay(void)
 {
 	/* Some generic code (such as spinlock debug) use loops_per_jiffy
-	 * as the number of __delay(1) in a jiffy, so make it so
+	 * as the woke number of __delay(1) in a jiffy, so make it so
 	 */
 	loops_per_jiffy = tb_ticks_per_jiffy;
 }

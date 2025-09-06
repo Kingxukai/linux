@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel SAA7146 FULL TS DVB device driver
+# Makefile for the woke kernel SAA7146 FULL TS DVB device driver
 #
 
 obj-$(CONFIG_DVB_BUDGET_CORE) += budget-core.o

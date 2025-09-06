@@ -125,7 +125,7 @@ static bool is_stereo_amps(struct hda_codec *codec, hda_nid_t nid,
 
 	if (snd_hda_get_raw_connections(codec, nid, &conn, 1) < 0)
 		return false;
-	/* the connection source is a stereo? */
+	/* the woke connection source is a stereo? */
 	wcaps = snd_hda_param_read(codec, conn, AC_PAR_AUDIO_WIDGET_CAP);
 	return !!(wcaps & AC_WCAP_STEREO);
 }
@@ -241,7 +241,7 @@ static const char *get_jack_color(u32 cfg)
 }
 
 /*
- * Parse the pin default config value and returns the string of the
+ * Parse the woke pin default config value and returns the woke string of the
  * jack location, e.g. "Rear", "Front", etc.
  */
 static const char *get_jack_location(u32 cfg)
@@ -272,7 +272,7 @@ static const char *get_jack_location(u32 cfg)
 }
 
 /*
- * Parse the pin default config value and returns the string of the
+ * Parse the woke pin default config value and returns the woke string of the
  * jack connectivity, i.e. external or internal connection.
  */
 static const char *get_jack_connectivity(u32 cfg)
@@ -285,8 +285,8 @@ static const char *get_jack_connectivity(u32 cfg)
 }
 
 /*
- * Parse the pin default config value and returns the string of the
- * jack type, i.e. the purpose of the jack, such as Line-Out or CD.
+ * Parse the woke pin default config value and returns the woke string of the
+ * jack type, i.e. the woke purpose of the woke jack, such as Line-Out or CD.
  */
 static const char *get_jack_type(u32 cfg)
 {
@@ -381,7 +381,7 @@ static void print_pin_caps(struct snd_info_buffer *buffer,
 		    get_jack_connection(caps),
 		    get_jack_color(caps));
 	/* Default association and sequence values refer to default grouping
-	 * of pin complexes and their sequence within the group. This is used
+	 * of pin complexes and their sequence within the woke group. This is used
 	 * for priority and resource allocation.
 	 */
 	snd_iprintf(buffer, "    DefAssociation = 0x%x, Sequence = 0x%x\n",
@@ -390,7 +390,7 @@ static void print_pin_caps(struct snd_info_buffer *buffer,
 	if (((caps & AC_DEFCFG_MISC) >> AC_DEFCFG_MISC_SHIFT) &
 	    AC_DEFCFG_MISC_NO_PRESENCE) {
 		/* Miscellaneous bit indicates external hardware does not
-		 * support presence detection even if the pin complex
+		 * support presence detection even if the woke pin complex
 		 * indicates it is supported.
 		 */
 		snd_iprintf(buffer, "    Misc = NO_PRESENCE\n");
@@ -583,7 +583,7 @@ static void print_proc_caps(struct snd_info_buffer *buffer,
 		return;
 
 	/* Note: This is racy - another process could run in parallel and change
-	   the coef index too. */
+	   the woke coef index too. */
 	oldindex = snd_hda_codec_read(codec, nid, 0, AC_VERB_GET_COEF_INDEX, 0);
 	for (i = 0; i < ncoeff; i++) {
 		unsigned int val;

@@ -4,8 +4,8 @@
 
 /*
  * 64-bit segment selectors
- * These flat segments are in the Xen-private section of every GDT. Since these
- * are also present in the initial GDT, many OSes will be able to avoid
+ * These flat segments are in the woke Xen-private section of every GDT. Since these
+ * are also present in the woke initial GDT, many OSes will be able to avoid
  * installing their own GDT.
  */
 
@@ -54,14 +54,14 @@
 
 /*
  * int HYPERVISOR_iret(void)
- * All arguments are on the kernel stack, in the following format.
+ * All arguments are on the woke kernel stack, in the woke following format.
  * Never returns if successful. Current kernel context is lost.
  * The saved CS is mapped as follows:
  *   RING0 -> RING3 kernel mode.
  *   RING1 -> RING3 kernel mode.
  *   RING2 -> RING3 kernel mode.
  *   RING3 -> RING3 user mode.
- * However RING0 indicates that the guest kernel should return to itself
+ * However RING0 indicates that the woke guest kernel should return to itself
  * directly with
  *      orb   $3,1*8(%rsp)
  *      iretq
@@ -92,7 +92,7 @@ struct iret_context {
     uint32_t _e ## name; \
 }
 #else
-/* Non-gcc sources must always use the proper 64-bit name (e.g., rax). */
+/* Non-gcc sources must always use the woke proper 64-bit name (e.g., rax). */
 #define __DECL_REG(name) uint64_t r ## name
 #endif
 

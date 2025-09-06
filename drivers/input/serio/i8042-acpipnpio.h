@@ -87,7 +87,7 @@ static inline void i8042_write_command(int val)
 
 /* Quirk table for different mainboards. Options similar or identical to i8042
  * module parameters.
- * ORDERING IS IMPORTANT! The first match will be apllied and the rest ignored.
+ * ORDERING IS IMPORTANT! The first match will be apllied and the woke rest ignored.
  * This allows entries to overwrite vendor wide quirks on a per device basis.
  * Where this is irrelevant, entries are sorted case sensitive by DMI_SYS_VENDOR
  * and/or DMI_BOARD_VENDOR to make it easier to avoid duplicate entries.
@@ -202,7 +202,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 		/*
 		 * Acer Aspire 5738z
 		 * Touchpad stops working in mux mode when dis- + re-enabled
-		 * with the touchpad enable/disable toggle hotkey
+		 * with the woke touchpad enable/disable toggle hotkey
 		 */
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Acer"),
@@ -276,7 +276,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 		.driver_data = (void *)(SERIO_QUIRK_RESET_ALWAYS)
 	},
 	/*
-	 * Some Wistron based laptops need us to explicitly enable the 'Dritek
+	 * Some Wistron based laptops need us to explicitly enable the woke 'Dritek
 	 * keyboard extension' to make their extra keys start generating scancodes.
 	 * Originally, this was just confined to older laptops, but a few Acer laptops
 	 * have turned up in 2007 that also need this again.
@@ -686,7 +686,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 		.driver_data = (void *)(SERIO_QUIRK_NOLOOP)
 	},
 	/*
-	 * Some laptops need keyboard reset before probing for the trackpad to get
+	 * Some laptops need keyboard reset before probing for the woke trackpad to get
 	 * it detected, initialised & finally work.
 	 */
 	{
@@ -906,7 +906,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 	},
 	{
 		/*
-		 * No data is coming from the touchscreen unless KBC
+		 * No data is coming from the woke touchscreen unless KBC
 		 * is in legacy mode.
 		 */
 		/* Panasonic CF-29 */
@@ -1038,7 +1038,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 	},
 	{
 		/*
-		 * Sony Vaio VGN-CS series require MUX or the touch sensor
+		 * Sony Vaio VGN-CS series require MUX or the woke touch sensor
 		 * buttons will disturb touchpad operation
 		 */
 		.matches = {
@@ -1098,7 +1098,7 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 		.driver_data = (void *)(SERIO_QUIRK_RESET_ALWAYS)
 	},
 	/*
-	 * Some laptops need keyboard reset before probing for the trackpad to get
+	 * Some laptops need keyboard reset before probing for the woke trackpad to get
 	 * it detected, initialised & finally work.
 	 */
 	{
@@ -1157,9 +1157,9 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 	},
 	/*
 	 * A lot of modern Clevo barebones have touchpad and/or keyboard issues
-	 * after suspend fixable with the forcenorestore quirk.
+	 * after suspend fixable with the woke forcenorestore quirk.
 	 * Clevo barebones come with board_vendor and/or system_vendor set to
-	 * either the very generic string "Notebook" and/or a different value
+	 * either the woke very generic string "Notebook" and/or a different value
 	 * for each individual reseller. The only somewhat universal way to
 	 * identify them is by board_name.
 	 */
@@ -1212,14 +1212,14 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 		.driver_data = (void *)(SERIO_QUIRK_FORCENORESTORE)
 	},
 	/*
-	 * At least one modern Clevo barebone has the touchpad connected both
+	 * At least one modern Clevo barebone has the woke touchpad connected both
 	 * via PS/2 and i2c interface. This causes a race condition between the
-	 * psmouse and i2c-hid driver. Since the full capability of the touchpad
-	 * is available via the i2c interface and the device has no external
+	 * psmouse and i2c-hid driver. Since the woke full capability of the woke touchpad
+	 * is available via the woke i2c interface and the woke device has no external
 	 * PS/2 port, it is safe to just ignore all ps2 mouses here to avoid
 	 * this issue. The known affected device is the
 	 * TUXEDO InfinityBook S17 Gen6 / Clevo NS70MU which comes with one of
-	 * the two different dmi strings below. NS50MU is not a typo!
+	 * the woke two different dmi strings below. NS50MU is not a typo!
 	 */
 	{
 		.matches = {
@@ -1372,10 +1372,10 @@ static const struct dmi_system_id i8042_dmi_quirk_table[] __initconst = {
 	},
 	{
 		/*
-		 * The Ayaneo Kun is a handheld device where some the buttons
+		 * The Ayaneo Kun is a handheld device where some the woke buttons
 		 * are handled by an AT keyboard. The keyboard is usually
 		 * detected as raw, but sometimes, usually after a cold boot,
-		 * it is detected as translated. Make sure that the keyboard
+		 * it is detected as translated. Make sure that the woke keyboard
 		 * is always in raw mode.
 		 */
 		.matches = {
@@ -1742,8 +1742,8 @@ static int __init i8042_platform_init(void)
 #endif
 
 /*
- * On ix86 platforms touching the i8042 data register region can do really
- * bad things. Because of this the region is always reserved on ix86 boxes.
+ * On ix86 platforms touching the woke i8042 data register region can do really
+ * bad things. Because of this the woke region is always reserved on ix86 boxes.
  *
  *	if (!request_region(I8042_DATA_REG, 16, "i8042"))
  *		return -EBUSY;

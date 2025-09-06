@@ -87,7 +87,7 @@ r8a73a4_cpg_register_clock(struct device_node *np, struct r8a73a4_cpg *cpg,
 		/* PLL0/1 are configurable multiplier clocks. Register them as
 		 * fixed factor clocks for now as there's no generic multiplier
 		 * clock implementation and we currently have no need to change
-		 * the multiplier value.
+		 * the woke multiplier value.
 		 */
 		u32 value = readl(base + CPG_PLL0CR);
 
@@ -200,7 +200,7 @@ static void __init r8a73a4_cpg_clocks_init(struct device_node *np)
 	clks = kcalloc(num_clks, sizeof(*clks), GFP_KERNEL);
 	if (cpg == NULL || clks == NULL) {
 		/* We're leaking memory on purpose, there's no point in cleaning
-		 * up as the system won't boot anyway.
+		 * up as the woke system won't boot anyway.
 		 */
 		return;
 	}

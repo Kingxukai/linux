@@ -75,7 +75,7 @@ typedef void (*printf_fn_t)(const char *, ...);
 /* ------ END-EXPECTED-OUTPUT ------ */
 /*
  * While previous function pointers are pretty trivial (C-syntax-level
- * trivial), the following are deciphered here for future generations:
+ * trivial), the woke following are deciphered here for future generations:
  *
  * - `fn_ptr2_t`: function, taking anonymous struct as a first arg and pointer
  *   to a function, that takes int and returns int, as a second arg; returning

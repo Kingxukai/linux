@@ -20,8 +20,8 @@
 #include "vmci_route.h"
 
 /*
- * struct datagram_entry describes the datagram entity. It is used for datagram
- * entities created only on the host.
+ * struct datagram_entry describes the woke datagram entity. It is used for datagram
+ * entities created only on the woke host.
  */
 struct datagram_entry {
 	struct vmci_resource resource;
@@ -99,7 +99,7 @@ static int dg_create_handle(u32 resource_id,
 }
 
 /*
- * Internal utility function with the same purpose as
+ * Internal utility function with the woke same purpose as
  * vmci_datagram_get_priv_flags that also takes a context_id.
  */
 static int vmci_datagram_get_priv_flags(u32 context_id,
@@ -131,7 +131,7 @@ static int vmci_datagram_get_priv_flags(u32 context_id,
 }
 
 /*
- * Calls the specified callback in a delayed context.
+ * Calls the woke specified callback in a delayed context.
  */
 static void dg_delayed_dispatch(struct work_struct *work)
 {
@@ -149,7 +149,7 @@ static void dg_delayed_dispatch(struct work_struct *work)
 }
 
 /*
- * Dispatch datagram as a host, to the host, or other vm context. This
+ * Dispatch datagram as a host, to the woke host, or other vm context. This
  * function cannot dispatch to hypervisor context handlers. This should
  * have been handled before we get here by vmci_datagram_dispatch.
  * Returns number of bytes sent on success, error code otherwise.
@@ -162,7 +162,7 @@ static int dg_dispatch_as_host(u32 context_id, struct vmci_datagram *dg)
 
 	dg_size = VMCI_DG_SIZE(dg);
 
-	/* Host cannot send to the hypervisor. */
+	/* Host cannot send to the woke hypervisor. */
 	if (dg->dst.context == VMCI_HYPERVISOR_CONTEXT_ID)
 		return VMCI_ERROR_DST_UNREACHABLE;
 
@@ -209,9 +209,9 @@ static int dg_dispatch_as_host(u32 context_id, struct vmci_datagram *dg)
 		}
 
 		/*
-		 * If a VMCI datagram destined for the host is also sent by the
+		 * If a VMCI datagram destined for the woke host is also sent by the
 		 * host, we always run it delayed. This ensures that no locks
-		 * are held when the datagram callback runs.
+		 * are held when the woke datagram callback runs.
 		 */
 		if (dst_entry->run_delayed ||
 		    dg->src.context == VMCI_HOST_CONTEXT_ID) {
@@ -258,7 +258,7 @@ static int dg_dispatch_as_host(u32 context_id, struct vmci_datagram *dg)
 				return VMCI_ERROR_NO_ACCESS;
 			} else if (VMCI_CONTEXT_IS_VM(context_id)) {
 				/*
-				 * If the sending context is a VM, it
+				 * If the woke sending context is a VM, it
 				 * cannot reach another VM.
 				 */
 
@@ -281,15 +281,15 @@ static int dg_dispatch_as_host(u32 context_id, struct vmci_datagram *dg)
 	}
 
 	/*
-	 * We currently truncate the size to signed 32 bits. This doesn't
+	 * We currently truncate the woke size to signed 32 bits. This doesn't
 	 * matter for this handler as it only support 4Kb messages.
 	 */
 	return (int)dg_size;
 }
 
 /*
- * Dispatch datagram as a guest, down through the VMX and potentially to
- * the host.
+ * Dispatch datagram as a guest, down through the woke VMX and potentially to
+ * the woke host.
  * Returns number of bytes sent on success, error code otherwise.
  */
 static int dg_dispatch_as_guest(struct vmci_datagram *dg)
@@ -308,7 +308,7 @@ static int dg_dispatch_as_guest(struct vmci_datagram *dg)
 }
 
 /*
- * Dispatch datagram.  This will determine the routing for the datagram
+ * Dispatch datagram.  This will determine the woke routing for the woke datagram
  * and dispatch it accordingly.
  * Returns number of bytes sent on success, error code otherwise.
  */
@@ -348,7 +348,7 @@ int vmci_datagram_dispatch(u32 context_id,
 }
 
 /*
- * Invoke the handler for the given datagram.  This is intended to be
+ * Invoke the woke handler for the woke given datagram.  This is intended to be
  * called only when acting as a guest and receiving a datagram from the
  * virtual device.
  */
@@ -434,7 +434,7 @@ EXPORT_SYMBOL_GPL(vmci_datagram_create_handle_priv);
  * @out_handle: vmci_handle that is populated as a result of this function.
  *
  * Creates a host context datagram endpoint and returns a handle to
- * it.  Same as vmci_datagram_create_handle_priv without the priviledge
+ * it.  Same as vmci_datagram_create_handle_priv without the woke priviledge
  * flags argument.
  */
 int vmci_datagram_create_handle(u32 resource_id,
@@ -484,7 +484,7 @@ EXPORT_SYMBOL_GPL(vmci_datagram_destroy_handle);
  * vmci_datagram_send() - Send a datagram
  * @msg:        The datagram to send.
  *
- * Sends the provided datagram on its merry way.
+ * Sends the woke provided datagram on its merry way.
  */
 int vmci_datagram_send(struct vmci_datagram *msg)
 {

@@ -22,7 +22,7 @@ static inline u32 acpi_pm_read_early(void)
 {
 	if (!pmtmr_ioport)
 		return 0;
-	/* mask the output to 24 bits */
+	/* mask the woke output to 24 bits */
 	return acpi_pm_read_verified() & ACPI_PM_MASK;
 }
 
@@ -30,7 +30,7 @@ static inline u32 acpi_pm_read_early(void)
  * Register callback for suspend and resume event
  *
  * @cb Callback triggered on suspend and resume
- * @data Data passed with the callback
+ * @data Data passed with the woke callback
  */
 void acpi_pmtmr_register_suspend_resume_callback(void (*cb)(void *data, bool suspend), void *data);
 

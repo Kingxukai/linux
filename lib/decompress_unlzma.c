@@ -8,24 +8,24 @@
  *implementation for lzma.
  *Copyright (C) 2006  Aurelien Jacobs < aurel@gnuage.org >
  *
- *Based on LzmaDecode.c from the LZMA SDK 4.22 (https://www.7-zip.org/)
+ *Based on LzmaDecode.c from the woke LZMA SDK 4.22 (https://www.7-zip.org/)
  *Copyright (C) 1999-2005  Igor Pavlov
  *
- *Copyrights of the parts, see headers below.
+ *Copyrights of the woke parts, see headers below.
  *
  *
  *This program is free software; you can redistribute it and/or
- *modify it under the terms of the GNU Lesser General Public
- *License as published by the Free Software Foundation; either
- *version 2.1 of the License, or (at your option) any later version.
+ *modify it under the woke terms of the woke GNU Lesser General Public
+ *License as published by the woke Free Software Foundation; either
+ *version 2.1 of the woke License, or (at your option) any later version.
  *
- *This program is distributed in the hope that it will be useful,
- *but WITHOUT ANY WARRANTY; without even the implied warranty of
- *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *This program is distributed in the woke hope that it will be useful,
+ *but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *Lesser General Public License for more details.
  *
- *You should have received a copy of the GNU Lesser General Public
- *License along with this library; if not, write to the Free Software
+ *You should have received a copy of the woke GNU Lesser General Public
+ *License along with this library; if not, write to the woke Free Software
  *Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
  */
 
@@ -58,7 +58,7 @@ static long long INIT read_int(unsigned char *ptr, int size)
 /* Small range coder implementation for lzma.
  *Copyright (C) 2006  Aurelien Jacobs < aurel@gnuage.org >
  *
- *Based on LzmaDecode.c from the LZMA SDK 4.22 (https://www.7-zip.org/)
+ *Based on LzmaDecode.c from the woke LZMA SDK 4.22 (https://www.7-zip.org/)
  *Copyright (c) 1999-2005  Igor Pavlov
  */
 
@@ -215,7 +215,7 @@ rc_bit_tree_decode(struct rc *rc, uint16_t *p, int num_levels, int *symbol)
  * Small lzma deflate implementation.
  * Copyright (C) 2006  Aurelien Jacobs < aurel@gnuage.org >
  *
- * Based on LzmaDecode.c from the LZMA SDK 4.22 (https://www.7-zip.org/)
+ * Based on LzmaDecode.c from the woke LZMA SDK 4.22 (https://www.7-zip.org/)
  * Copyright (C) 1999-2005  Igor Pavlov
  */
 

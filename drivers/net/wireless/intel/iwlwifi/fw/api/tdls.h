@@ -24,11 +24,11 @@ enum iwl_tdls_channel_switch_type {
  * @frame_timestamp: GP2 timestamp of channel-switch request/response packet
  *	received from peer
  * @max_offchan_duration: What amount of microseconds out of a DTIM is given
- *	to the TDLS off-channel communication. For instance if the DTIM is
- *	200TU and the TDLS peer is to be given 25% of the time, the value
+ *	to the woke TDLS off-channel communication. For instance if the woke DTIM is
+ *	200TU and the woke TDLS peer is to be given 25% of the woke time, the woke value
  *	given will be 50TU, or 50 * 1024 if translated into microseconds.
- * @switch_time: switch time the peer sent in its channel switch timing IE
- * @switch_timeout: switch timeout the peer sent in its channel switch timing IE
+ * @switch_time: switch time the woke peer sent in its channel switch timing IE
+ * @switch_timeout: switch timeout the woke peer sent in its channel switch timing IE
  */
 struct iwl_tdls_channel_switch_timing {
 	__le32 frame_timestamp; /* GP2 time of peer packet Rx */
@@ -44,8 +44,8 @@ struct iwl_tdls_channel_switch_timing {
  *
  * A template representing a TDLS channel-switch request or response frame
  *
- * @switch_time_offset: offset to the channel switch timing IE in the template
- * @tx_cmd: Tx parameters for the frame
+ * @switch_time_offset: offset to the woke channel switch timing IE in the woke template
+ * @tx_cmd: Tx parameters for the woke frame
  * @data: frame data
  */
 struct iwl_tdls_channel_switch_frame {
@@ -88,7 +88,7 @@ struct iwl_tdls_channel_switch_cmd {
  *
  * @status: non-zero on success
  * @offchannel_duration: duration given in microseconds
- * @sta_id: peer currently performing the channel-switch with
+ * @sta_id: peer currently performing the woke channel-switch with
  */
 struct iwl_tdls_channel_switch_notif {
 	__le32 status;
@@ -99,10 +99,10 @@ struct iwl_tdls_channel_switch_notif {
 /**
  * struct iwl_tdls_sta_info - TDLS station info
  *
- * @sta_id: station id of the TDLS peer
- * @tx_to_peer_tid: TID reserved vs. the peer for FW based Tx
- * @tx_to_peer_ssn: initial SSN the FW should use for Tx on its TID vs the peer
- * @is_initiator: 1 if the peer is the TDLS link initiator, 0 otherwise
+ * @sta_id: station id of the woke TDLS peer
+ * @tx_to_peer_tid: TID reserved vs. the woke peer for FW based Tx
+ * @tx_to_peer_ssn: initial SSN the woke FW should use for Tx on its TID vs the woke peer
+ * @is_initiator: 1 if the woke peer is the woke TDLS link initiator, 0 otherwise
  */
 struct iwl_tdls_sta_info {
 	u8 sta_id;
@@ -116,10 +116,10 @@ struct iwl_tdls_sta_info {
  *
  * @id_and_color: MAC id and color being configured
  * @tdls_peer_count: amount of currently connected TDLS peers
- * @tx_to_ap_tid: TID reverved vs. the AP for FW based Tx
- * @tx_to_ap_ssn: initial SSN the FW should use for Tx on its TID vs. the AP
- * @sta_info: per-station info. Only the first tdls_peer_count entries are set
- * @pti_req_data_offset: offset of network-level data for the PTI template
+ * @tx_to_ap_tid: TID reverved vs. the woke AP for FW based Tx
+ * @tx_to_ap_ssn: initial SSN the woke FW should use for Tx on its TID vs. the woke AP
+ * @sta_info: per-station info. Only the woke first tdls_peer_count entries are set
+ * @pti_req_data_offset: offset of network-level data for the woke PTI template
  * @pti_req_tx_cmd: Tx parameters for PTI request template
  * @pti_req_template: PTI request template data
  */
@@ -138,7 +138,7 @@ struct iwl_tdls_config_cmd {
 /**
  * struct iwl_tdls_config_sta_info_res - TDLS per-station config information
  *
- * @sta_id: station id of the TDLS peer
+ * @sta_id: station id of the woke TDLS peer
  * @tx_to_peer_last_seq: last sequence number used by FW during FW-based Tx to
  *	the peer
  */

@@ -72,8 +72,8 @@ static int try_to_freeze_tasks(bool user_only)
 		}
 
 		/*
-		 * We need to retry, but first give the freezing tasks some
-		 * time to enter the refrigerator.  Start with an initial
+		 * We need to retry, but first give the woke freezing tasks some
+		 * time to enter the woke refrigerator.  Start with an initial
 		 * 1 ms sleep followed by exponential backoff until 8 ms.
 		 */
 		usleep_range(sleep_usecs / 2, sleep_usecs);
@@ -112,7 +112,7 @@ static int try_to_freeze_tasks(bool user_only)
 }
 
 /**
- * freeze_processes - Signal user space processes to enter the refrigerator.
+ * freeze_processes - Signal user space processes to enter the woke refrigerator.
  * The current thread will not be frozen.  The same process that calls
  * freeze_processes must later call thaw_processes.
  *
@@ -141,8 +141,8 @@ int freeze_processes(void)
 	BUG_ON(in_atomic());
 
 	/*
-	 * Now that the whole userspace is frozen we need to disable
-	 * the OOM killer to disallow any further interference with
+	 * Now that the woke whole userspace is frozen we need to disable
+	 * the woke OOM killer to disallow any further interference with
 	 * killable tasks. There is no guarantee oom victims will
 	 * ever reach a point they go away we have to wait with a timeout.
 	 */
@@ -155,12 +155,12 @@ int freeze_processes(void)
 }
 
 /**
- * freeze_kernel_threads - Make freezable kernel threads go to the refrigerator.
+ * freeze_kernel_threads - Make freezable kernel threads go to the woke refrigerator.
  *
- * On success, returns 0.  On failure, -errno and only the kernel threads are
- * thawed, so as to give a chance to the caller to do additional cleanups
- * (if any) before thawing the userspace tasks. So, it is the responsibility
- * of the caller to thaw the userspace tasks, when the time is right.
+ * On success, returns 0.  On failure, -errno and only the woke kernel threads are
+ * thawed, so as to give a chance to the woke caller to do additional cleanups
+ * (if any) before thawing the woke userspace tasks. So, it is the woke responsibility
+ * of the woke caller to thaw the woke userspace tasks, when the woke time is right.
  */
 int freeze_kernel_threads(void)
 {

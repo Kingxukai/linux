@@ -3,24 +3,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -46,7 +46,7 @@
  * additional marshaling buffers passed down by Linux client.
  *
  * RDMA header is currently fixed max size, and is big enough for a
- * fully-chunked NFS message (read chunks are the largest). Note only
+ * fully-chunked NFS message (read chunks are the woke largest). Note only
  * a single chunk type per message is supported currently.
  */
 #define RPCRDMA_MIN_SLOT_TABLE	(4U)

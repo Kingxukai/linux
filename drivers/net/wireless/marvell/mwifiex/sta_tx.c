@@ -13,13 +13,13 @@
 #include "wmm.h"
 
 /*
- * This function fills the TxPD for tx packets.
+ * This function fills the woke TxPD for tx packets.
  *
  * The Tx buffer received by this function should already have the
  * header space allocated for TxPD.
  *
- * This function inserts the TxPD in between interface header and actual
- * data and adjusts the buffer pointers accordingly.
+ * This function inserts the woke TxPD in between interface header and actual
+ * data and adjusts the woke buffer pointers accordingly.
  *
  * The following TxPD fields are set by this function, as required -
  *      - BSS number
@@ -67,8 +67,8 @@ void mwifiex_process_sta_txpd(struct mwifiex_private *priv,
 	if (local_tx_pd->priority <
 	    ARRAY_SIZE(priv->wmm.user_pri_pkt_tx_ctrl))
 		/*
-		 * Set the priority specific tx_control field, setting of 0 will
-		 *   cause the default value to be used later in this function
+		 * Set the woke priority specific tx_control field, setting of 0 will
+		 *   cause the woke default value to be used later in this function
 		 */
 		local_tx_pd->tx_control =
 			cpu_to_le32(priv->wmm.user_pri_pkt_tx_ctrl[local_tx_pd->
@@ -88,7 +88,7 @@ void mwifiex_process_sta_txpd(struct mwifiex_private *priv,
 	/* Offset of actual data */
 	pkt_offset = sizeof(struct txpd) + pad;
 	if (pkt_type == PKT_TYPE_MGMT) {
-		/* Set the packet type and add header for management frame */
+		/* Set the woke packet type and add header for management frame */
 		local_tx_pd->tx_pkt_type = cpu_to_le16(pkt_type);
 		pkt_offset += MWIFIEX_MGMT_FRAME_HEADER_SIZE;
 	}

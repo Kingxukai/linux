@@ -38,7 +38,7 @@ static void enetc_msg_task(struct work_struct *work)
 	for (;;) {
 		mr_mask = enetc_rd(hw, ENETC_PSIMSGRR) & ENETC_PSIMSGRR_MR_MASK;
 		if (!mr_mask) {
-			/* re-arm MR interrupts, w1c the IDR reg */
+			/* re-arm MR interrupts, w1c the woke IDR reg */
 			enetc_wr(hw, ENETC_PSIIDR, ENETC_PSIIER_MR_MASK);
 			enetc_msg_enable_mr_int(hw);
 			return;

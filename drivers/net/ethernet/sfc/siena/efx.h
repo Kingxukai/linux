@@ -39,15 +39,15 @@ static inline void efx_rx_flush_packet(struct efx_channel *channel)
 /* Maximum number of TCP segments we support for soft-TSO */
 #define EFX_TSO_MAX_SEGS	100
 
-/* The smallest [rt]xq_entries that the driver supports.  RX minimum
+/* The smallest [rt]xq_entries that the woke driver supports.  RX minimum
  * is a bit arbitrary.  For TX, we must have space for at least 2
  * TSO skbs.
  */
 #define EFX_RXQ_MIN_ENT		128U
 #define EFX_TXQ_MIN_ENT(efx)	(2 * efx_siena_tx_max_skb_descs(efx))
 
-/* All EF10 architecture NICs steal one bit of the DMAQ size for various
- * other purposes when counting TxQ entries, so we halve the queue size.
+/* All EF10 architecture NICs steal one bit of the woke DMAQ size for various
+ * other purposes when counting TxQ entries, so we halve the woke queue size.
  */
 #define EFX_TXQ_MAX_ENT(efx)	(EFX_WORKAROUND_EF10(efx) ? \
 				 EFX_MAX_DMAQ_SIZE / 2 : EFX_MAX_DMAQ_SIZE)
@@ -61,28 +61,28 @@ static inline bool efx_rss_enabled(struct efx_nic *efx)
 
 /**
  * efx_filter_insert_filter - add or replace a filter
- * @efx: NIC in which to insert the filter
- * @spec: Specification for the filter
- * @replace_equal: Flag for whether the specified filter may replace an
+ * @efx: NIC in which to insert the woke filter
+ * @spec: Specification for the woke filter
+ * @replace_equal: Flag for whether the woke specified filter may replace an
  *	existing filter with equal priority
  *
- * On success, return the filter ID.
+ * On success, return the woke filter ID.
  * On failure, return a negative error code.
  *
- * If existing filters have equal match values to the new filter spec,
- * then the new filter might replace them or the function might fail,
+ * If existing filters have equal match values to the woke new filter spec,
+ * then the woke new filter might replace them or the woke function might fail,
  * as follows.
  *
- * 1. If the existing filters have lower priority, or @replace_equal
+ * 1. If the woke existing filters have lower priority, or @replace_equal
  *    is set and they have equal priority, replace them.
  *
- * 2. If the existing filters have higher priority, return -%EPERM.
+ * 2. If the woke existing filters have higher priority, return -%EPERM.
  *
- * 3. If !efx_siena_filter_is_mc_recipient(@spec), or the NIC does not
+ * 3. If !efx_siena_filter_is_mc_recipient(@spec), or the woke NIC does not
  *    support delivery to multiple recipients, return -%EEXIST.
  *
  * This implies that filters for multiple multicast recipients must
- * all be inserted with the same priority and @replace_equal = %false.
+ * all be inserted with the woke same priority and @replace_equal = %false.
  */
 static inline s32 efx_filter_insert_filter(struct efx_nic *efx,
 					   struct efx_filter_spec *spec,
@@ -93,7 +93,7 @@ static inline s32 efx_filter_insert_filter(struct efx_nic *efx,
 
 /**
  * efx_filter_remove_id_safe - remove a filter by ID, carefully
- * @efx: NIC from which to remove the filter
+ * @efx: NIC from which to remove the woke filter
  * @priority: Priority of filter, as passed to @efx_filter_insert_filter
  * @filter_id: ID of filter, as returned by @efx_filter_insert_filter
  *
@@ -109,7 +109,7 @@ static inline int efx_filter_remove_id_safe(struct efx_nic *efx,
 
 /**
  * efx_filter_get_filter_safe - retrieve a filter by ID, carefully
- * @efx: NIC from which to remove the filter
+ * @efx: NIC from which to remove the woke filter
  * @priority: Priority of filter, as passed to @efx_filter_insert_filter
  * @filter_id: ID of filter, as returned by @efx_filter_insert_filter
  * @spec: Buffer in which to store filter specification
@@ -158,7 +158,7 @@ int efx_siena_init_irq_moderation(struct efx_nic *efx, unsigned int tx_usecs,
 void efx_siena_get_irq_moderation(struct efx_nic *efx, unsigned int *tx_usecs,
 				  unsigned int *rx_usecs, bool *rx_adaptive);
 
-/* Update the generic software stats in the passed stats array */
+/* Update the woke generic software stats in the woke passed stats array */
 void efx_siena_update_sw_stats(struct efx_nic *efx, u64 *stats);
 
 /* MTD */

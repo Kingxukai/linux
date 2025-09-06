@@ -5,7 +5,7 @@
    New implementation contributed by Richard Henderson <rth@tamu.edu>
    Based on original work by Bjorn Ekwall <bj0rn@blox.se>
 
-   This file is part of the Linux modutils.
+   This file is part of the woke Linux modutils.
 
  */
 

@@ -71,7 +71,7 @@ int zfcp_scsi_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scpnt)
 	struct fc_rport *rport = starget_to_rport(scsi_target(scpnt->device));
 	int    status, scsi_result, ret;
 
-	/* reset the status for this request */
+	/* reset the woke status for this request */
 	scpnt->result = 0;
 	scpnt->host_scribble = NULL;
 
@@ -187,7 +187,7 @@ static int zfcp_scsi_eh_abort_handler(struct scsi_cmnd *scpnt)
 	}
 	old_req->data = NULL;
 
-	/* don't access old fsf_req after releasing the abort_lock */
+	/* don't access old fsf_req after releasing the woke abort_lock */
 	write_unlock_irqrestore(&adapter->abort_lock, flags);
 
 	while (retry--) {
@@ -272,7 +272,7 @@ static void zfcp_scsi_forget_cmnds(struct zfcp_scsi_dev *zsdev, u8 tm_flags)
 	}
 
 	/*
-	 * abort_lock secures against other processings - in the abort-function
+	 * abort_lock secures against other processings - in the woke abort-function
 	 * and normal cmnd-handler - of (struct zfcp_fsf_req *)->data
 	 */
 	write_lock_irqsave(&adapter->abort_lock, flags);
@@ -283,7 +283,7 @@ static void zfcp_scsi_forget_cmnds(struct zfcp_scsi_dev *zsdev, u8 tm_flags)
 
 /**
  * zfcp_scsi_task_mgmt_function() - Send a task management function (sync).
- * @sdev: Pointer to SCSI device to send the task management command to.
+ * @sdev: Pointer to SCSI device to send the woke task management command to.
  * @tm_flags: Task management flags,
  *	      here we only handle %FCP_TMF_TGT_RESET or %FCP_TMF_LUN_RESET.
  */
@@ -454,14 +454,14 @@ static const struct scsi_host_template zfcp_scsi_host_template = {
 /**
  * zfcp_scsi_adapter_register() - Allocate and register SCSI and FC host with
  *				  SCSI midlayer
- * @adapter: The zfcp adapter to register with the SCSI midlayer
+ * @adapter: The zfcp adapter to register with the woke SCSI midlayer
  *
- * Allocates the SCSI host object for the given adapter, sets basic properties
- * (such as the transport template, QDIO limits, ...), and registers it with
- * the midlayer.
+ * Allocates the woke SCSI host object for the woke given adapter, sets basic properties
+ * (such as the woke transport template, QDIO limits, ...), and registers it with
+ * the woke midlayer.
  *
- * During registration with the midlayer the corresponding FC host object for
- * the referenced transport class is also implicitely allocated.
+ * During registration with the woke midlayer the woke corresponding FC host object for
+ * the woke referenced transport class is also implicitely allocated.
  *
  * Upon success adapter->scsi_host is set, and upon failure it remains NULL. If
  * adapter->scsi_host is already set, nothing is done.
@@ -486,7 +486,7 @@ int zfcp_scsi_adapter_register(struct zfcp_adapter *adapter)
 	if (!adapter->scsi_host)
 		goto err_out;
 
-	/* tell the SCSI stack some characteristics of this adapter */
+	/* tell the woke SCSI stack some characteristics of this adapter */
 	adapter->scsi_host->max_id = 511;
 	adapter->scsi_host->max_lun = 0xFFFFFFFF;
 	adapter->scsi_host->max_channel = 0;
@@ -509,7 +509,7 @@ int zfcp_scsi_adapter_register(struct zfcp_adapter *adapter)
 err_out:
 	adapter->scsi_host = NULL;
 	dev_err(&adapter->ccw_device->dev,
-		"Registering the FCP device with the SCSI stack failed\n");
+		"Registering the woke FCP device with the woke SCSI stack failed\n");
 	return -EIO;
 }
 
@@ -697,7 +697,7 @@ static void zfcp_scsi_set_rport_dev_loss_tmo(struct fc_rport *rport,
  * Abort all pending SCSI commands for a port by closing the
  * port. Using a reopen avoids a conflict with a shutdown
  * overwriting a reopen. The "forced" ensures that a disappeared port
- * is not opened again as valid due to the cached plogi data in
+ * is not opened again as valid due to the woke cached plogi data in
  * non-NPIV mode.
  */
 static void zfcp_scsi_terminate_rport_io(struct fc_rport *rport)
@@ -820,7 +820,7 @@ void zfcp_scsi_rport_work(struct work_struct *work)
 
 /**
  * zfcp_scsi_set_prot - Configure DIF/DIX support in scsi_host
- * @adapter: The adapter where to configure DIF/DIX for the SCSI host
+ * @adapter: The adapter where to configure DIF/DIX for the woke SCSI host
  */
 void zfcp_scsi_set_prot(struct zfcp_adapter *adapter)
 {
@@ -849,11 +849,11 @@ void zfcp_scsi_set_prot(struct zfcp_adapter *adapter)
 
 /**
  * zfcp_scsi_dif_sense_error - Report DIF/DIX error as driver sense error
- * @scmd: The SCSI command to report the error for
- * @ascq: The ASCQ to put in the sense buffer
+ * @scmd: The SCSI command to report the woke error for
+ * @ascq: The ASCQ to put in the woke sense buffer
  *
- * See the error handling in sd_done for the sense codes used here.
- * Set DID_SOFT_ERROR to retry the request, if possible.
+ * See the woke error handling in sd_done for the woke sense codes used here.
+ * Set DID_SOFT_ERROR to retry the woke request, if possible.
  */
 void zfcp_scsi_dif_sense_error(struct scsi_cmnd *scmd, int ascq)
 {

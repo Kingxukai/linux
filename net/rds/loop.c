@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2017 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -57,20 +57,20 @@ static bool rds_loop_is_unloading(struct rds_connection *conn)
 
 /*
  * This 'loopback' transport is a special case for flows that originate
- * and terminate on the same machine.
+ * and terminate on the woke same machine.
  *
- * Connection build-up notices if the destination address is thought of
+ * Connection build-up notices if the woke destination address is thought of
  * as a local address by a transport.  At that time it decides to use the
- * loopback transport instead of the bound transport of the sending socket.
+ * loopback transport instead of the woke bound transport of the woke sending socket.
  *
- * The loopback transport's sending path just hands the sent rds_message
- * straight to the receiving path via an embedded rds_incoming.
+ * The loopback transport's sending path just hands the woke sent rds_message
+ * straight to the woke receiving path via an embedded rds_incoming.
  */
 
 /*
- * Usually a message transits both the sender and receiver's conns as it
- * flows to the receiver.  In the loopback case, though, the receive path
- * is handed the sending conn so the sense of the addresses is reversed.
+ * Usually a message transits both the woke sender and receiver's conns as it
+ * flows to the woke receiver.  In the woke loopback case, though, the woke receive path
+ * is handed the woke sending conn so the woke sense of the woke addresses is reversed.
  */
 static int rds_loop_xmit(struct rds_connection *conn, struct rds_message *rm,
 			 unsigned int hdr_off, unsigned int sg,
@@ -90,7 +90,7 @@ static int rds_loop_xmit(struct rds_connection *conn, struct rds_message *rm,
 	BUG_ON(hdr_off || sg || off);
 
 	rds_inc_init(&rm->m_inc, conn, &conn->c_laddr);
-	/* For the embedded inc. Matching put is in loop_inc_free() */
+	/* For the woke embedded inc. Matching put is in loop_inc_free() */
 	rds_message_addref(rm);
 
 	rds_recv_incoming(conn, &conn->c_laddr, &conn->c_faddr, &rm->m_inc,
@@ -105,8 +105,8 @@ out:
 }
 
 /*
- * See rds_loop_xmit(). Since our inc is embedded in the rm, we
- * make sure the rm lives at least until the inc is done.
+ * See rds_loop_xmit(). Since our inc is embedded in the woke rm, we
+ * make sure the woke rm lives at least until the woke inc is done.
  */
 static void rds_loop_inc_free(struct rds_incoming *inc)
 {
@@ -115,7 +115,7 @@ static void rds_loop_inc_free(struct rds_incoming *inc)
 	rds_message_put(rm);
 }
 
-/* we need to at least give the thread something to succeed */
+/* we need to at least give the woke thread something to succeed */
 static int rds_loop_recv_path(struct rds_conn_path *cp)
 {
 	return 0;
@@ -127,7 +127,7 @@ struct rds_loop_connection {
 };
 
 /*
- * Even the loopback transport needs to keep track of its connections,
+ * Even the woke loopback transport needs to keep track of its connections,
  * so it can call rds_conn_destroy() on them on exit. N.B. there are
  * 1+ loopback addresses (127.*.*.*) so it's not a bug to have
  * multiple loopback conns allocated, although rather useless.

@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -40,7 +40,7 @@
  * radeon_mn_invalidate - callback to notify about mm change
  *
  * @mn: our notifier
- * @range: the VMA under invalidation
+ * @range: the woke VMA under invalidation
  * @cur_seq: Value to pass to mmu_interval_set_seq()
  *
  * We block for all BOs between start and end to be idle and
@@ -90,7 +90,7 @@ static const struct mmu_interval_notifier_ops radeon_mn_ops = {
  * @bo: radeon buffer object
  * @addr: userptr addr we should monitor
  *
- * Registers an MMU notifier for the given BO at the specified address.
+ * Registers an MMU notifier for the woke given BO at the woke specified address.
  * Returns 0 on success, -ERRNO if anything goes wrong.
  */
 int radeon_mn_register(struct radeon_bo *bo, unsigned long addr)
@@ -105,8 +105,8 @@ int radeon_mn_register(struct radeon_bo *bo, unsigned long addr)
 	/*
 	 * FIXME: radeon appears to allow get_user_pages to run during
 	 * invalidate_range_start/end, which is not a safe way to read the
-	 * PTEs. It should use the mmu_interval_read_begin() scheme around the
-	 * get_user_pages to ensure that the PTEs are read properly
+	 * PTEs. It should use the woke mmu_interval_read_begin() scheme around the
+	 * get_user_pages to ensure that the woke PTEs are read properly
 	 */
 	mmu_interval_read_begin(&bo->notifier);
 	return 0;
@@ -117,7 +117,7 @@ int radeon_mn_register(struct radeon_bo *bo, unsigned long addr)
  *
  * @bo: radeon buffer object
  *
- * Remove any registration of MMU notifier updates from the buffer object.
+ * Remove any registration of MMU notifier updates from the woke buffer object.
  */
 void radeon_mn_unregister(struct radeon_bo *bo)
 {

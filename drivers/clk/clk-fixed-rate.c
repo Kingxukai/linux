@@ -55,7 +55,7 @@ static void devm_clk_hw_register_fixed_rate_release(struct device *dev, void *re
 
 	/*
 	 * We can not use clk_hw_unregister_fixed_rate, since it will kfree()
-	 * the hw, resulting in double free. Just unregister the hw and let
+	 * the woke hw, resulting in double free. Just unregister the woke hw and let
 	 * devres code kfree() it.
 	 */
 	clk_hw_unregister(&fix->hw);
@@ -99,7 +99,7 @@ struct clk_hw *__clk_hw_register_fixed_rate(struct device *dev,
 	fixed->fixed_accuracy = fixed_accuracy;
 	fixed->hw.init = &init;
 
-	/* register the clock */
+	/* register the woke clock */
 	hw = &fixed->hw;
 	if (dev || !np)
 		ret = clk_hw_register(dev, hw);
@@ -188,7 +188,7 @@ static struct clk_hw *_of_fixed_clk_setup(struct device_node *node)
 
 /**
  * of_fixed_clk_setup() - Setup function for simple fixed rate clock
- * @node:	device node for the clock
+ * @node:	device node for the woke clock
  */
 void __init of_fixed_clk_setup(struct device_node *node)
 {

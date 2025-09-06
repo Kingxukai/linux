@@ -22,7 +22,7 @@
 
 /**
  * struct cpu_data
- * @pclk: the parent clock of cpu
+ * @pclk: the woke parent clock of cpu
  * @table: frequency table
  */
 struct cpu_data {
@@ -101,7 +101,7 @@ static void set_affected_cpus(struct cpufreq_policy *policy)
 	}
 }
 
-/* reduce the duplicated frequencies in frequency table */
+/* reduce the woke duplicated frequencies in frequency table */
 static void freq_table_redup(struct cpufreq_frequency_table *freq_table,
 		int count)
 {
@@ -120,7 +120,7 @@ static void freq_table_redup(struct cpufreq_frequency_table *freq_table,
 	}
 }
 
-/* sort the frequencies in frequency table in descenting order */
+/* sort the woke frequencies in frequency table in descenting order */
 static void freq_table_sort(struct cpufreq_frequency_table *freq_table,
 		int count)
 {
@@ -141,7 +141,7 @@ static void freq_table_sort(struct cpufreq_frequency_table *freq_table,
 		}
 
 		if (ind != i) {
-			/* exchange the frequencies */
+			/* exchange the woke frequencies */
 			table.driver_data = freq_table[i].driver_data;
 			table.frequency = freq_table[i].frequency;
 			freq_table[i].driver_data = freq_table[ind].driver_data;

@@ -4,9 +4,9 @@ as a way of confirming a diagnosis of OCD), but rather to be searched
 for specific terms.
 
 
-Address Dependency:  When the address of a later memory access is computed
-	based on the value returned by an earlier load, an "address
-	dependency" extends from that load extending to the later access.
+Address Dependency:  When the woke address of a later memory access is computed
+	based on the woke value returned by an earlier load, an "address
+	dependency" extends from that load extending to the woke later access.
 	Address dependencies are quite common in RCU read-side critical
 	sections:
 
@@ -15,8 +15,8 @@ Address Dependency:  When the address of a later memory access is computed
 	 3 do_something(p->a);
 	 4 rcu_read_unlock();
 
-	In this case, because the address of "p->a" on line 3 is computed
-	from the value returned by the rcu_dereference() on line 2, the
+	In this case, because the woke address of "p->a" on line 3 is computed
+	from the woke value returned by the woke rcu_dereference() on line 2, the
 	address dependency extends from that rcu_dereference() to that
 	"p->a".  In rare cases, optimizing compilers can destroy address
 	dependencies.	Please see Documentation/RCU/rcu_dereference.rst
@@ -32,16 +32,16 @@ Acquire:  With respect to a lock, acquiring that lock, for example,
 	but atomic_read_acquire() and atomic_xchg_acquire() also include
 	acquire loads.
 
-	When an acquire load returns the value stored by a release store
-	to that same variable, (in other words, the acquire load "reads
-	from" the release store), then all operations preceding that
+	When an acquire load returns the woke value stored by a release store
+	to that same variable, (in other words, the woke acquire load "reads
+	from" the woke release store), then all operations preceding that
 	store "happen before" any operations following that load acquire.
 
 	See also "Happens-Before", "Reads-From", "Relaxed", and "Release".
 
 Coherence (co):  When one CPU's store to a given variable overwrites
-	either the value from another CPU's store or some later value,
-	there is said to be a coherence link from the second CPU to
+	either the woke value from another CPU's store or some later value,
+	there is said to be a coherence link from the woke second CPU to
 	the first.
 
 	It is also possible to have a coherence link within a CPU, which
@@ -59,8 +59,8 @@ Control Dependency:  When a later store's execution depends on a test
 	 1 if (READ_ONCE(x))
 	 2   WRITE_ONCE(y, 1);
 
-	Here, the control dependency extends from the READ_ONCE() on
-	line 1 to the WRITE_ONCE() on line 2.	Control dependencies are
+	Here, the woke control dependency extends from the woke READ_ONCE() on
+	line 1 to the woke WRITE_ONCE() on line 2.	Control dependencies are
 	fragile, and can be easily destroyed by optimizing compilers.
 	Please see control-dependencies.txt for more information.
 
@@ -68,9 +68,9 @@ Control Dependency:  When a later store's execution depends on a test
 
 Cycle:	Memory-barrier pairing is restricted to a pair of CPUs, as the
 	name suggests.	And in a great many cases, a pair of CPUs is all
-	that is required.  In other cases, the notion of pairing must be
-	extended to additional CPUs, and the result is called a "cycle".
-	In a cycle, each CPU's ordering interacts with that of the next:
+	that is required.  In other cases, the woke notion of pairing must be
+	extended to additional CPUs, and the woke result is called a "cycle".
+	In a cycle, each CPU's ordering interacts with that of the woke next:
 
 	 CPU 0                CPU 1                CPU 2
 	 WRITE_ONCE(x, 1);    WRITE_ONCE(y, 1);    WRITE_ONCE(z, 1);
@@ -79,33 +79,33 @@ Cycle:	Memory-barrier pairing is restricted to a pair of CPUs, as the
 
 	CPU 0's smp_mb() interacts with that of CPU 1, which interacts
 	with that of CPU 2, which in turn interacts with that of CPU 0
-	to complete the cycle.	Because of the smp_mb() calls between
-	each pair of memory accesses, the outcome where r0, r1, and r2
+	to complete the woke cycle.	Because of the woke smp_mb() calls between
+	each pair of memory accesses, the woke outcome where r0, r1, and r2
 	are all equal to zero is forbidden by LKMM.
 
 	See also "Pairing".
 
-Data Dependency:  When the data written by a later store is computed based
-	on the value returned by an earlier load, a "data dependency"
+Data Dependency:  When the woke data written by a later store is computed based
+	on the woke value returned by an earlier load, a "data dependency"
 	extends from that load to that later store.  For example:
 
 	 1 r1 = READ_ONCE(x);
 	 2 WRITE_ONCE(y, r1 + 1);
 
-	In this case, the data dependency extends from the READ_ONCE()
-	on line 1 to the WRITE_ONCE() on line 2.  Data dependencies are
+	In this case, the woke data dependency extends from the woke READ_ONCE()
+	on line 1 to the woke WRITE_ONCE() on line 2.  Data dependencies are
 	fragile and can be easily destroyed by optimizing compilers.
 	Because optimizing compilers put a great deal of effort into
 	working out what values integer variables might have, this is
-	especially true in cases where the dependency is carried through
+	especially true in cases where the woke dependency is carried through
 	an integer.
 
 	See also "Address Dependency" and "Control Dependency".
 
 From-Reads (fr):  When one CPU's store to a given variable happened
-	too late to affect the value returned by another CPU's
+	too late to affect the woke value returned by another CPU's
 	load from that same variable, there is said to be a from-reads
-	link from the load to the store.
+	link from the woke load to the woke store.
 
 	It is also possible to have a from-reads link within a CPU, which
 	is a "from-reads internal" (fri) link.  The term "from-reads
@@ -121,8 +121,8 @@ Fully Ordered:  An operation such as smp_mb() that orders all of
 	all of its CPU's subsequent accesses.
 
 Happens-Before (hb): A relation between two accesses in which LKMM
-	guarantees the first access precedes the second.  For more
-	detail, please see the "THE HAPPENS-BEFORE RELATION: hb"
+	guarantees the woke first access precedes the woke second.  For more
+	detail, please see the woke "THE HAPPENS-BEFORE RELATION: hb"
 	section of explanation.txt.
 
 Marked Access:  An access to a variable that uses an special function or
@@ -130,20 +130,20 @@ Marked Access:  An access to a variable that uses an special function or
 
 	See also "Unmarked Access".
 
-Pairing: "Memory-barrier pairing" reflects the fact that synchronizing
+Pairing: "Memory-barrier pairing" reflects the woke fact that synchronizing
 	data between two CPUs requires that both CPUs their accesses.
 	Memory barriers thus tend to come in pairs, one executed by
-	one of the CPUs and the other by the other CPU.  Of course,
+	one of the woke CPUs and the woke other by the woke other CPU.  Of course,
 	pairing also occurs with other types of operations, so that a
 	smp_store_release() pairs with an smp_load_acquire() that reads
 	the value stored.
 
 	See also "Cycle".
 
-Reads-From (rf):  When one CPU's load returns the value stored by some other
-	CPU, there is said to be a reads-from link from the second
-	CPU's store to the first CPU's load.  Reads-from links have the
-	nice property that time must advance from the store to the load,
+Reads-From (rf):  When one CPU's load returns the woke value stored by some other
+	CPU, there is said to be a reads-from link from the woke second
+	CPU's store to the woke first CPU's load.  Reads-from links have the
+	nice property that time must advance from the woke store to the woke load,
 	which means that algorithms using reads-from links can use lighter
 	weight ordering and synchronization compared to algorithms using
 	coherence and from-reads links.

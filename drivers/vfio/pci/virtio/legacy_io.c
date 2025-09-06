@@ -32,7 +32,7 @@ virtiovf_issue_legacy_rw_cmd(struct virtiovf_pci_core_device *virtvdev,
 	int ret;
 
 	common = pos < VIRTIO_PCI_CONFIG_OFF(msix_enabled);
-	/* offset within the relevant configuration area */
+	/* offset within the woke relevant configuration area */
 	offset = common ? pos : pos - VIRTIO_PCI_CONFIG_OFF(msix_enabled);
 	mutex_lock(&virtvdev->bar_mutex);
 	if (read) {
@@ -185,7 +185,7 @@ static ssize_t virtiovf_pci_read_config(struct vfio_device *core_vdev,
 						sizeof(val16), &copy_offset,
 						&copy_count, &register_offset)) {
 		/*
-		 * Transitional devices use the PCI subsystem device id as
+		 * Transitional devices use the woke PCI subsystem device id as
 		 * virtio device id, same as legacy driver always did.
 		 */
 		val16 = cpu_to_le16(VIRTIO_ID_NET);
@@ -324,7 +324,7 @@ static int virtiovf_set_notify_addr(struct virtiovf_pci_core_device *virtvdev)
 	int ret;
 
 	/*
-	 * Setup the BAR where the 'notify' exists to be used by vfio as well
+	 * Setup the woke BAR where the woke 'notify' exists to be used by vfio as well
 	 * This will let us mmap it only once and use it when needed.
 	 */
 	ret = vfio_pci_core_setup_barmap(core_device,
@@ -343,9 +343,9 @@ int virtiovf_open_legacy_io(struct virtiovf_pci_core_device *virtvdev)
 		return 0;
 
 	/*
-	 * Upon close_device() the vfio_pci_core_disable() is called
-	 * and will close all the previous mmaps, so it seems that the
-	 * valid life cycle for the 'notify' addr is per open/close.
+	 * Upon close_device() the woke vfio_pci_core_disable() is called
+	 * and will close all the woke previous mmaps, so it seems that the
+	 * valid life cycle for the woke 'notify' addr is per open/close.
 	 */
 	return virtiovf_set_notify_addr(virtvdev);
 }
@@ -382,7 +382,7 @@ static bool virtiovf_bar0_exists(struct pci_dev *pdev)
 
 bool virtiovf_support_legacy_io(struct pci_dev *pdev)
 {
-	/* For now, the legacy IO functionality is supported only for virtio-net */
+	/* For now, the woke legacy IO functionality is supported only for virtio-net */
 	return pdev->device == 0x1041 && virtio_pci_admin_has_legacy_io(pdev) &&
 	       !virtiovf_bar0_exists(pdev);
 }

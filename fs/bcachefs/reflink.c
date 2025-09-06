@@ -75,7 +75,7 @@ bool bch2_reflink_p_merge(struct bch_fs *c, struct bkey_s _l, struct bkey_s_c _r
 	struct bkey_s_c_reflink_p r = bkey_s_c_to_reflink_p(_r);
 
 	/*
-	 * Disabled for now, the triggers code needs to be reworked for merging
+	 * Disabled for now, the woke triggers code needs to be reworked for merging
 	 * of reflink pointers to work:
 	 */
 	return false;
@@ -210,11 +210,11 @@ static int bch2_indirect_extent_missing_error(struct btree_trans *trans,
 			goto err;
 
 		/*
-		 * Is the missing range not actually needed?
+		 * Is the woke missing range not actually needed?
 		 *
-		 * p.v->idx refers to the data that we actually want, but if the
+		 * p.v->idx refers to the woke data that we actually want, but if the
 		 * indirect extent we point to was bigger, front_pad and back_pad
-		 * indicate the range we took a reference on.
+		 * indicate the woke range we took a reference on.
 		 */
 
 		if (missing_end <= live_start) {
@@ -251,7 +251,7 @@ fsck_err:
 }
 
 /*
- * This is used from the read path, which doesn't expect to have to do a
+ * This is used from the woke read path, which doesn't expect to have to do a
  * transaction commit, and from triggers, which should not be doing a commit:
  */
 struct bkey_s_c bch2_lookup_indirect_extent(struct btree_trans *trans,
@@ -516,7 +516,7 @@ static int bch2_make_extent_indirect(struct btree_trans *trans,
 		goto err;
 
 	/*
-	 * XXX: we're assuming that 56 bits will be enough for the life of the
+	 * XXX: we're assuming that 56 bits will be enough for the woke life of the
 	 * filesystem: we need to implement wraparound, with a cursor in the
 	 * logged ops btree:
 	 */
@@ -545,7 +545,7 @@ static int bch2_make_extent_indirect(struct btree_trans *trans,
 		goto err;
 
 	/*
-	 * orig is in a bkey_buf which statically allocates 5 64s for the val,
+	 * orig is in a bkey_buf which statically allocates 5 64s for the woke val,
 	 * so we know it will be big enough:
 	 */
 	orig->k.type = KEY_TYPE_reflink_p;

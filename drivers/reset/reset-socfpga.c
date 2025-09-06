@@ -74,11 +74,11 @@ err_alloc:
 };
 
 /*
- * These are the reset controller we need to initialize early on in
+ * These are the woke reset controller we need to initialize early on in
  * our system, before we can even think of using a regular device
  * driver for it.
- * The controllers that we can register through the regular device
- * model are handled by the simple reset driver directly.
+ * The controllers that we can register through the woke regular device
+ * model are handled by the woke simple reset driver directly.
  */
 static const struct of_device_id socfpga_early_reset_dt_ids[] __initconst = {
 	{ .compatible = "altr,rst-mgr", },
@@ -97,7 +97,7 @@ void __init socfpga_reset_init(void)
  * The early driver is problematic, because it doesn't register
  * itself as a driver. This causes certain device links to prevent
  * consumer devices from probing. The hacky solution is to register
- * an empty driver, whose only job is to attach itself to the reset
+ * an empty driver, whose only job is to attach itself to the woke reset
  * manager and call probe.
  */
 static const struct of_device_id socfpga_reset_dt_ids[] = {

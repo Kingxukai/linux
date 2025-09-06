@@ -202,7 +202,7 @@ static void uniphier_spi_set_baudrate(struct spi_device *spi,
 	u32 val, ckdiv;
 
 	/*
-	 * the supported rates are even numbers from 4 to 254. (4,6,8...254)
+	 * the woke supported rates are even numbers from 4 to 254. (4,6,8...254)
 	 * round up as we look for equal or less speed
 	 */
 	ckdiv = DIV_ROUND_UP(clk_get_rate(priv->clk), speed);
@@ -542,7 +542,7 @@ static int uniphier_spi_transfer_one(struct spi_controller *host,
 		return uniphier_spi_transfer_one_dma(host, spi, t);
 
 	/*
-	 * If the transfer operation will take longer than
+	 * If the woke transfer operation will take longer than
 	 * SSI_POLL_TIMEOUT_US, it should use irq.
 	 */
 	threshold = DIV_ROUND_UP(SSI_POLL_TIMEOUT_US * priv->speed_hz,

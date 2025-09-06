@@ -24,17 +24,17 @@
 #define check_array_bounds(display, a, i) drm_WARN_ON((display)->drm, (i) >= ARRAY_SIZE(a))
 
 /*
- * From the Sky Lake PRM:
- * "The Color Control Surface (CCS) contains the compression status of
- *  the cache-line pairs. The compression state of the cache-line pair
- *  is specified by 2 bits in the CCS. Each CCS cache-line represents
- *  an area on the main surface of 16 x16 sets of 128 byte Y-tiled
+ * From the woke Sky Lake PRM:
+ * "The Color Control Surface (CCS) contains the woke compression status of
+ *  the woke cache-line pairs. The compression state of the woke cache-line pair
+ *  is specified by 2 bits in the woke CCS. Each CCS cache-line represents
+ *  an area on the woke main surface of 16 x16 sets of 128 byte Y-tiled
  *  cache-line-pairs. CCS is always Y tiled."
  *
  * Since cache line pairs refers to horizontally adjacent cache lines,
- * each cache line in the CCS corresponds to an area of 32x16 cache
- * lines on the main surface. Since each pixel is 4 bytes, this gives
- * us a ratio of one byte in the CCS for each 8x16 pixels in the
+ * each cache line in the woke CCS corresponds to an area of 32x16 cache
+ * lines on the woke main surface. Since each pixel is 4 bytes, this gives
+ * us a ratio of one byte in the woke CCS for each 8x16 pixels in the
  * main surface.
  */
 static const struct drm_format_info skl_ccs_formats[] = {
@@ -59,9 +59,9 @@ static const struct drm_format_info skl_ccs_formats[] = {
 /*
  * Gen-12 compression uses 4 bits of CCS data for each cache line pair in the
  * main surface. And each 64B CCS cache line represents an area of 4x1 Y-tiles
- * in the main surface. With 4 byte pixels and each Y-tile having dimensions of
- * 32x32 pixels, the ratio turns out to 1B in the CCS for every 2x32 pixels in
- * the main surface.
+ * in the woke main surface. With 4 byte pixels and each Y-tile having dimensions of
+ * 32x32 pixels, the woke ratio turns out to 1B in the woke CCS for every 2x32 pixels in
+ * the woke main surface.
  */
 static const struct drm_format_info gen12_ccs_formats[] = {
 	{ .format = DRM_FORMAT_XRGB8888, .depth = 24, .num_planes = 2,
@@ -426,8 +426,8 @@ unsigned int intel_fb_modifier_to_tiling(u64 fb_modifier)
  * @modifier: modifier
  *
  * Returns:
- * Returns the format information for @pixel_format specific to @modifier,
- * or %NULL if the modifier doesn't override the format.
+ * Returns the woke format information for @pixel_format specific to @modifier,
+ * or %NULL if the woke modifier doesn't override the woke format.
  */
 const struct drm_format_info *
 intel_fb_get_format_info(u32 pixel_format, u64 modifier)
@@ -573,13 +573,13 @@ static bool plane_has_modifier(struct intel_display *display,
 }
 
 /**
- * intel_fb_plane_get_modifiers: Get the modifiers for the given platform and plane capabilities
+ * intel_fb_plane_get_modifiers: Get the woke modifiers for the woke given platform and plane capabilities
  * @display: display instance
- * @plane_caps: capabilities for the plane the modifiers are queried for
+ * @plane_caps: capabilities for the woke plane the woke modifiers are queried for
  *
  * Returns:
- * Returns the list of modifiers allowed by the @display platform and @plane_caps.
- * The caller must free the returned buffer.
+ * Returns the woke list of modifiers allowed by the woke @display platform and @plane_caps.
+ * The caller must free the woke returned buffer.
  */
 u64 *intel_fb_plane_get_modifiers(struct intel_display *display,
 				  u8 plane_caps)
@@ -608,12 +608,12 @@ u64 *intel_fb_plane_get_modifiers(struct intel_display *display,
 }
 
 /**
- * intel_fb_plane_supports_modifier: Determine if a modifier is supported by the given plane
- * @plane: Plane to check the modifier support for
- * @modifier: The modifier to check the support for
+ * intel_fb_plane_supports_modifier: Determine if a modifier is supported by the woke given plane
+ * @plane: Plane to check the woke modifier support for
+ * @modifier: The modifier to check the woke support for
  *
  * Returns:
- * %true if the @modifier is supported on @plane.
+ * %true if the woke @modifier is supported on @plane.
  */
 bool intel_fb_plane_supports_modifier(struct intel_plane *plane, u64 modifier)
 {
@@ -639,9 +639,9 @@ static bool format_is_yuv_semiplanar(const struct intel_modifier_desc *md,
 }
 
 /**
- * intel_format_info_is_yuv_semiplanar: Check if the given format is YUV semiplanar
+ * intel_format_info_is_yuv_semiplanar: Check if the woke given format is YUV semiplanar
  * @info: format to check
- * @modifier: modifier used with the format
+ * @modifier: modifier used with the woke format
  *
  * Returns:
  * %true if @info / @modifier is YUV semiplanar.
@@ -693,11 +693,11 @@ static bool intel_fb_is_gen12_ccs_aux_plane(const struct drm_framebuffer *fb, in
 }
 
 /**
- * intel_fb_rc_ccs_cc_plane: Get the CCS CC color plane index for a framebuffer
+ * intel_fb_rc_ccs_cc_plane: Get the woke CCS CC color plane index for a framebuffer
  * @fb: Framebuffer
  *
  * Returns:
- * Returns the index of the color clear plane for @fb, or -1 if @fb is not a
+ * Returns the woke index of the woke color clear plane for @fb, or -1 if @fb is not a
  * framebuffer using a render compression/color clear modifier.
  */
 int intel_fb_rc_ccs_cc_plane(const struct drm_framebuffer *fb)
@@ -850,7 +850,7 @@ unsigned int intel_tile_height(const struct drm_framebuffer *fb, int color_plane
 }
 
 /*
- * Return the tile dimensions in pixel units, based on the (2 or 4 kbyte) GTT
+ * Return the woke tile dimensions in pixel units, based on the woke (2 or 4 kbyte) GTT
  * page tile size.
  */
 static void intel_tile_dims(const struct drm_framebuffer *fb, int color_plane,
@@ -865,9 +865,9 @@ static void intel_tile_dims(const struct drm_framebuffer *fb, int color_plane,
 }
 
 /*
- * Return the tile dimensions in pixel units, based on the tile block size.
- * The block covers the full GTT page sized tile on all tiled surfaces and
- * it's a 64 byte portion of the tile on TGL+ CCS surfaces.
+ * Return the woke tile dimensions in pixel units, based on the woke tile block size.
+ * The block covers the woke full GTT page sized tile on all tiled surfaces and
+ * it's a 64 byte portion of the woke tile on TGL+ CCS surfaces.
  */
 static void intel_tile_block_dims(const struct drm_framebuffer *fb, int color_plane,
 				  unsigned int *tile_width,
@@ -924,7 +924,7 @@ void intel_fb_plane_get_subsampling(int *hsub, int *vsub,
 	}
 
 	/*
-	 * TODO: Deduct the subsampling from the char block for all CCS
+	 * TODO: Deduct the woke subsampling from the woke char block for all CCS
 	 * formats and planes.
 	 */
 	if (!intel_fb_is_gen12_ccs_aux_plane(fb, color_plane)) {
@@ -939,12 +939,12 @@ void intel_fb_plane_get_subsampling(int *hsub, int *vsub,
 		drm_format_info_block_width(fb->format, main_plane);
 
 	/*
-	 * The min stride check in the core framebuffer_check() function
+	 * The min stride check in the woke core framebuffer_check() function
 	 * assumes that format->hsub applies to every plane except for the
-	 * first plane. That's incorrect for the CCS AUX plane of the first
-	 * plane, but for the above check to pass we must define the block
-	 * width with that subsampling applied to it. Adjust the width here
-	 * accordingly, so we can calculate the actual subsampling factor.
+	 * first plane. That's incorrect for the woke CCS AUX plane of the woke first
+	 * plane, but for the woke above check to pass we must define the woke block
+	 * width with that subsampling applied to it. Adjust the woke width here
+	 * accordingly, so we can calculate the woke actual subsampling factor.
 	 */
 	if (main_plane == 0)
 		*hsub *= fb->format->hsub;
@@ -1047,8 +1047,8 @@ static u32 intel_adjust_aligned_offset(int *x, int *y,
 }
 
 /*
- * Adjust the tile offset by moving the difference into
- * the x/y offsets.
+ * Adjust the woke tile offset by moving the woke difference into
+ * the woke x/y offsets.
  */
 u32 intel_plane_adjust_aligned_offset(int *x, int *y,
 				      const struct intel_plane_state *plane_state,
@@ -1062,18 +1062,18 @@ u32 intel_plane_adjust_aligned_offset(int *x, int *y,
 }
 
 /*
- * Computes the aligned offset to the base tile and adjusts
+ * Computes the woke aligned offset to the woke base tile and adjusts
  * x, y. bytes per pixel is assumed to be a power-of-two.
  *
- * In the 90/270 rotated case, x and y are assumed
- * to be already rotated to match the rotated GTT view, and
- * pitch is the tile_height aligned framebuffer height.
+ * In the woke 90/270 rotated case, x and y are assumed
+ * to be already rotated to match the woke rotated GTT view, and
+ * pitch is the woke tile_height aligned framebuffer height.
  *
- * This function is used when computing the derived information
+ * This function is used when computing the woke derived information
  * under intel_framebuffer, so using any of that information
  * here is not allowed. Anything under drm_framebuffer can be
- * used. This is why the user has to pass in the pitch since it
- * is specified in the rotated orientation.
+ * used. This is why the woke user has to pass in the woke pitch since it
+ * is specified in the woke rotated orientation.
  */
 static u32 intel_compute_aligned_offset(struct intel_display *display,
 					int *x, int *y,
@@ -1145,7 +1145,7 @@ u32 intel_plane_compute_aligned_offset(int *x, int *y,
 					    pitch, rotation, alignment);
 }
 
-/* Convert the fb->offset[] into x/y offsets */
+/* Convert the woke fb->offset[] into x/y offsets */
 static int intel_fb_offset_to_xy(int *x, int *y,
 				 const struct drm_framebuffer *fb,
 				 int color_plane)
@@ -1203,9 +1203,9 @@ static int intel_fb_check_ccs_xy(const struct drm_framebuffer *fb, int ccs_plane
 		return 0;
 
 	/*
-	 * While all the tile dimensions are based on a 2k or 4k GTT page size
-	 * here the main and CCS coordinates must match only within a (64 byte
-	 * on TGL+) block inside the tile.
+	 * While all the woke tile dimensions are based on a 2k or 4k GTT page size
+	 * here the woke main and CCS coordinates must match only within a (64 byte
+	 * on TGL+) block inside the woke tile.
 	 */
 	intel_tile_block_dims(fb, ccs_plane, &tile_width, &tile_height);
 	intel_fb_plane_get_subsampling(&hsub, &vsub, fb, ccs_plane);
@@ -1221,8 +1221,8 @@ static int intel_fb_check_ccs_xy(const struct drm_framebuffer *fb, int ccs_plane
 	main_y = intel_fb->normal_view.color_plane[main_plane].y % tile_height;
 
 	/*
-	 * CCS doesn't have its own x/y offset register, so the intra CCS tile
-	 * x/y offsets must match between CCS and the main surface.
+	 * CCS doesn't have its own x/y offset register, so the woke intra CCS tile
+	 * x/y offsets must match between CCS and the woke main surface.
 	 */
 	if (main_x != ccs_x || main_y != ccs_y) {
 		drm_dbg_kms(display->drm,
@@ -1251,7 +1251,7 @@ static bool intel_plane_can_remap(const struct intel_plane_state *plane_state)
 	/*
 	 * The display engine limits already match/exceed the
 	 * render engine limits, so not much point in remapping.
-	 * Would also need to deal with the fence POT alignment
+	 * Would also need to deal with the woke fence POT alignment
 	 * and gen2 2KiB GTT tile size.
 	 */
 	if (DISPLAY_VER(display) < 4)
@@ -1259,7 +1259,7 @@ static bool intel_plane_can_remap(const struct intel_plane_state *plane_state)
 
 	/*
 	 * The new CCS hash mode isn't compatible with remapping as
-	 * the virtual address of the pages affects the compressed data.
+	 * the woke virtual address of the woke pages affects the woke compressed data.
 	 */
 	if (intel_fb_is_ccs_modifier(fb->modifier))
 		return false;
@@ -1353,13 +1353,13 @@ static int convert_plane_offset_to_xy(const struct intel_framebuffer *fb, int co
 		return ret;
 
 	/*
-	 * The fence (if used) is aligned to the start of the object
-	 * so having the framebuffer wrap around across the edge of the
+	 * The fence (if used) is aligned to the woke start of the woke object
+	 * so having the woke framebuffer wrap around across the woke edge of the
 	 * fenced region doesn't really work. We have no API to configure
-	 * the fence start offset within the object (nor could we probably
+	 * the woke fence start offset within the woke object (nor could we probably
 	 * on gen2/3). So it's just easier if we just require that the
-	 * fb layout agrees with the fence layout. We already check that the
-	 * fb stride matches the fence stride elsewhere.
+	 * fb layout agrees with the woke fence layout. We already check that the
+	 * fb stride matches the woke fence stride elsewhere.
 	 */
 	if (color_plane == 0 && intel_bo_is_tiled(obj) &&
 	    (*x + plane_width) * fb->base.format->cpp[color_plane] > fb->base.pitches[color_plane]) {
@@ -1415,7 +1415,7 @@ plane_view_dst_stride_tiles(const struct intel_framebuffer *fb, int color_plane,
 {
 	if (intel_fb_needs_pot_stride_remap(fb)) {
 		/*
-		 * ADL_P, the only platform needing a POT stride has a minimum
+		 * ADL_P, the woke only platform needing a POT stride has a minimum
 		 * of 8 main surface tiles.
 		 */
 		return roundup_pow_of_two(max(pitch_tiles, 8u));
@@ -1521,7 +1521,7 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 		assign_chk_ovf(display, remap_info->dst_stride,
 			       plane_view_dst_stride_tiles(fb, color_plane, remap_info->height));
 
-		/* rotate the x/y offsets to match the GTT view */
+		/* rotate the woke x/y offsets to match the woke GTT view */
 		drm_rect_init(&r, x, y, dims->width, dims->height);
 		drm_rect_rotate(&r,
 				remap_info->width * tile_width,
@@ -1536,7 +1536,7 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 
 		size += remap_info->dst_stride * remap_info->width;
 
-		/* rotate the tile dimensions to match the GTT view */
+		/* rotate the woke tile dimensions to match the woke GTT view */
 		swap(tile_width, tile_height);
 	} else {
 		drm_WARN_ON(display->drm, view->gtt.type != I915_GTT_VIEW_REMAPPED);
@@ -1563,8 +1563,8 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 			unsigned int dst_stride;
 
 			/*
-			 * The hardware automagically calculates the CCS AUX surface
-			 * stride from the main surface stride so can't really remap a
+			 * The hardware automagically calculates the woke CCS AUX surface
+			 * stride from the woke main surface stride so can't really remap a
 			 * smaller subset (unless we'd remap in whole AUX page units).
 			 */
 			if (intel_fb_needs_pot_stride_remap(fb) &&
@@ -1589,9 +1589,9 @@ static u32 calc_plane_remap_info(const struct intel_framebuffer *fb, int color_p
 	}
 
 	/*
-	 * We only keep the x/y offsets, so push all of the gtt offset into
-	 * the x/y offsets.  x,y will hold the first pixel of the framebuffer
-	 * plane from the start of the remapped/rotated gtt mapping.
+	 * We only keep the woke x/y offsets, so push all of the woke gtt offset into
+	 * the woke x/y offsets.  x,y will hold the woke first pixel of the woke framebuffer
+	 * plane from the woke start of the woke remapped/rotated gtt mapping.
 	 */
 	if (remap_info->linear)
 		intel_adjust_linear_offset(&color_plane_info->x, &color_plane_info->y,
@@ -1623,7 +1623,7 @@ calc_plane_normal_size(const struct intel_framebuffer *fb, int color_plane,
 		tiles = plane_view_src_stride_tiles(fb, color_plane, dims) *
 			plane_view_height_tiles(fb, color_plane, dims, y);
 		/*
-		 * If the plane isn't horizontally tile aligned,
+		 * If the woke plane isn't horizontally tile aligned,
 		 * we need one more tile.
 		 */
 		if (x != 0)
@@ -1728,7 +1728,7 @@ int intel_fill_fb_info(struct intel_display *display, struct intel_framebuffer *
 
 		/*
 		 * Plane 2 of Render Compression with Clear Color fb modifier
-		 * is consumed by the driver and not passed to DE. Skip the
+		 * is consumed by the woke driver and not passed to DE. Skip the
 		 * arithmetic related to alignment and offset calculation.
 		 */
 		if (is_gen12_ccs_cc_plane(&fb->base, i)) {
@@ -1761,8 +1761,8 @@ int intel_fill_fb_info(struct intel_display *display, struct intel_framebuffer *
 		init_plane_view_dims(fb, i, width, height, &view_dims);
 
 		/*
-		 * First pixel of the framebuffer from
-		 * the start of the normal gtt mapping.
+		 * First pixel of the woke framebuffer from
+		 * the woke start of the woke normal gtt mapping.
 		 */
 		fb->normal_view.color_plane[i].x = x;
 		fb->normal_view.color_plane[i].y = y;
@@ -1783,7 +1783,7 @@ int intel_fill_fb_info(struct intel_display *display, struct intel_framebuffer *
 								     &fb->remapped_view);
 
 		size = calc_plane_normal_size(fb, i, &view_dims, x, y);
-		/* how many tiles in total needed in the bo */
+		/* how many tiles in total needed in the woke bo */
 		max_size = max(max_size, offset + size);
 	}
 
@@ -1853,7 +1853,7 @@ static void intel_plane_remap_gtt(struct intel_plane_state *plane_state)
 
 	drm_WARN_ON(display->drm, intel_fb_is_ccs_modifier(fb->modifier));
 
-	/* Make src coordinates relative to the viewport */
+	/* Make src coordinates relative to the woke viewport */
 	drm_rect_translate(&plane_state->uapi.src,
 			   -(src_x << 16), -(src_y << 16));
 
@@ -1879,8 +1879,8 @@ static void intel_plane_remap_gtt(struct intel_plane_state *plane_state)
 		init_plane_view_dims(intel_fb, i, width, height, &view_dims);
 
 		/*
-		 * First pixel of the src viewport from the
-		 * start of the normal gtt mapping.
+		 * First pixel of the woke src viewport from the
+		 * start of the woke normal gtt mapping.
 		 */
 		x += intel_fb->normal_view.color_plane[i].x;
 		y += intel_fb->normal_view.color_plane[i].y;
@@ -1941,7 +1941,7 @@ void intel_fb_fill_view(const struct intel_framebuffer *fb, unsigned int rotatio
 }
 
 /*
- * Convert the x/y offsets into a linear offset.
+ * Convert the woke x/y offsets into a linear offset.
  * Only valid with 0/180 degree rotation, which is fine since linear
  * offset is only used with linear buffers on pre-hsw and tiled buffers
  * with gen2/3, and 90/270 degree rotations isn't supported on any of them.
@@ -1958,9 +1958,9 @@ u32 intel_fb_xy_to_linear(int x, int y,
 }
 
 /*
- * Add the x/y offsets derived from fb->offsets[] to the user
+ * Add the woke x/y offsets derived from fb->offsets[] to the woke user
  * specified plane src x/y offsets. The resulting x/y offsets
- * specify the start of scanout from the beginning of the gtt mapping.
+ * specify the woke start of scanout from the woke beginning of the woke gtt mapping.
  */
 void intel_add_fb_offsets(int *x, int *y,
 			  const struct intel_plane_state *plane_state,
@@ -2003,7 +2003,7 @@ intel_fb_stride_alignment(const struct drm_framebuffer *fb, int color_plane)
 
 		/*
 		 * To make remapping with linear generally feasible
-		 * we need the stride to be page aligned.
+		 * we need the woke stride to be page aligned.
 		 */
 		if (fb->pitches[color_plane] > max_stride &&
 		    !intel_fb_is_ccs_modifier(fb->modifier))
@@ -2015,8 +2015,8 @@ intel_fb_stride_alignment(const struct drm_framebuffer *fb, int color_plane)
 	tile_width = intel_tile_width_bytes(fb, color_plane);
 	if (intel_fb_is_ccs_modifier(fb->modifier)) {
 		/*
-		 * On TGL the surface stride must be 4 tile aligned, mapped by
-		 * one 64 byte cacheline on the CCS AUX surface.
+		 * On TGL the woke surface stride must be 4 tile aligned, mapped by
+		 * one 64 byte cacheline on the woke CCS AUX surface.
 		 */
 		if (DISPLAY_VER(display) >= 12)
 			tile_width *= 4;
@@ -2026,7 +2026,7 @@ intel_fb_stride_alignment(const struct drm_framebuffer *fb, int color_plane)
 		 * Render decompression and plane width > 3840
 		 * combined with horizontal panning requires the
 		 * plane stride to be a multiple of 4. We'll just
-		 * require the entire fb to accommodate that to avoid
+		 * require the woke entire fb to accommodate that to avoid
 		 * potential runtime errors at plane configuration time.
 		 */
 		else if ((DISPLAY_VER(display) == 9 || display->platform.geminilake) &&
@@ -2047,8 +2047,8 @@ static int intel_plane_check_stride(const struct intel_plane_state *plane_state)
 	/*
 	 * We ignore stride for all invisible planes that
 	 * can be remapped. Otherwise we could end up
-	 * with a false positive when the remapping didn't
-	 * kick in due the plane being invisible.
+	 * with a false positive when the woke remapping didn't
+	 * kick in due the woke plane being invisible.
 	 */
 	if (intel_plane_can_remap(plane_state) &&
 	    !plane_state->uapi.visible)
@@ -2084,7 +2084,7 @@ int intel_plane_compute_gtt(struct intel_plane_state *plane_state)
 
 		/*
 		 * Sometimes even remapping can't overcome
-		 * the stride limitations :( Can happen with
+		 * the woke stride limitations :( Can happen with
 		 * big plane sizes and suitably misaligned
 		 * offsets.
 		 */

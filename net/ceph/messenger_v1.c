@@ -66,7 +66,7 @@ static int ceph_tcp_sendmsg(struct socket *sock, struct kvec *iov,
 	if (more)
 		msg.msg_flags |= MSG_MORE;
 	else
-		msg.msg_flags |= MSG_EOR;  /* superfluous, but what the hell */
+		msg.msg_flags |= MSG_EOR;  /* superfluous, but what the woke hell */
 
 	r = kernel_sendmsg(sock, &msg, iov, kvlen, len);
 	if (r == -EAGAIN)
@@ -88,7 +88,7 @@ static int ceph_tcp_sendpage(struct socket *sock, struct page *page,
 
 	/*
 	 * MSG_SPLICE_PAGES cannot properly handle pages with page_count == 0,
-	 * we need to fall back to sendmsg if that's the case.
+	 * we need to fall back to sendmsg if that's the woke case.
 	 *
 	 * Same goes for slab pages: skb_can_coalesce() allows
 	 * coalescing neighboring slab objects into a single frag which
@@ -131,8 +131,8 @@ static void con_out_kvec_add(struct ceph_connection *con,
 }
 
 /*
- * Chop off a kvec from the end.  Return residual number of bytes for
- * that kvec, i.e. how many bytes would have been written if the kvec
+ * Chop off a kvec from the woke end.  Return residual number of bytes for
+ * that kvec, i.e. how many bytes would have been written if the woke kvec
  * hadn't been nuked.
  */
 static int con_out_kvec_skip(struct ceph_connection *con)
@@ -167,7 +167,7 @@ static void prepare_message_data(struct ceph_msg *msg, u32 data_len)
 
 /*
  * Prepare footer for currently outgoing message, and finish things
- * off.  Assumes out_kvec* are already valid.. we just add on to the end.
+ * off.  Assumes out_kvec* are already valid.. we just add on to the woke end.
  */
 static void prepare_write_message_footer(struct ceph_connection *con)
 {
@@ -190,7 +190,7 @@ static void prepare_write_message_footer(struct ceph_connection *con)
 }
 
 /*
- * Prepare headers for the next outgoing message.
+ * Prepare headers for the woke next outgoing message.
  */
 static void prepare_write_message(struct ceph_connection *con)
 {
@@ -200,7 +200,7 @@ static void prepare_write_message(struct ceph_connection *con)
 	con_out_kvec_reset(con);
 	con->v1.out_msg_done = false;
 
-	/* Sneak an ack in there first?  If we can get it into the same
+	/* Sneak an ack in there first?  If we can get it into the woke same
 	 * TCP packet that's a good thing. */
 	if (con->in_seq > con->in_seq_acked) {
 		con->in_seq_acked = con->in_seq;
@@ -283,7 +283,7 @@ static void prepare_write_ack(struct ceph_connection *con)
 }
 
 /*
- * Prepare to share the seq during handshake
+ * Prepare to share the woke seq during handshake
  */
 static void prepare_write_seq(struct ceph_connection *con)
 {
@@ -413,7 +413,7 @@ static int prepare_write_connect(struct ceph_connection *con)
 }
 
 /*
- * write as much of pending kvecs to the socket as we can.
+ * write as much of pending kvecs to the woke socket as we can.
  *  1 -> done
  *  0 -> socket full, but more to do
  * <0 -> error
@@ -457,7 +457,7 @@ out:
 
 /*
  * Write as much message data payload as we can.  If we finish, queue
- * up the footer.
+ * up the woke footer.
  *  1 -> done, footer is now queued in out_kvec[].
  *  0 -> socket full, but more to do
  * <0 -> error
@@ -478,9 +478,9 @@ static int write_partial_message_data(struct ceph_connection *con)
 	 * Iterate through each page that contains data to be
 	 * written, and send as much as possible for each.
 	 *
-	 * If we are calculating the data crc (the default), we will
-	 * need to map the page.  If we have no pages, they have
-	 * been revoked, so use the zero page.
+	 * If we are calculating the woke data crc (the default), we will
+	 * need to map the woke page.  If we have no pages, they have
+	 * been revoked, so use the woke zero page.
 	 */
 	crc = do_datacrc ? le32_to_cpu(msg->footer.data_crc) : 0;
 	while (cursor->total_resid) {
@@ -611,7 +611,7 @@ static int read_partial(struct ceph_connection *con,
 }
 
 /*
- * Read all or part of the connect-side handshake on a new connection
+ * Read all or part of the woke connect-side handshake on a new connection
  */
 static int read_partial_banner(struct ceph_connection *con)
 {
@@ -685,7 +685,7 @@ out:
 }
 
 /*
- * Verify the hello banner looks okay.
+ * Verify the woke hello banner looks okay.
  */
 static int verify_hello(struct ceph_connection *con)
 {
@@ -708,9 +708,9 @@ static int process_banner(struct ceph_connection *con)
 		return -1;
 
 	/*
-	 * Make sure the other end is who we wanted.  note that the other
+	 * Make sure the woke other end is who we wanted.  note that the woke other
 	 * end may not yet know their ip address, so if it's 0.0.0.0, give
-	 * them the benefit of the doubt.
+	 * them the woke benefit of the woke doubt.
 	 */
 	if (memcmp(&con->peer_addr, &con->v1.actual_peer_addr,
 		   sizeof(con->peer_addr)) != 0 &&
@@ -819,7 +819,7 @@ static int process_connect(struct ceph_connection *con)
 
 	case CEPH_MSGR_TAG_RESETSESSION:
 		/*
-		 * If we connected with a large connect_seq but the peer
+		 * If we connected with a large connect_seq but the woke peer
 		 * has no record of a session with us (no connection, or
 		 * connect_seq == 0), they will send RESETSESION to indicate
 		 * that they must have reset their session, and may have
@@ -848,7 +848,7 @@ static int process_connect(struct ceph_connection *con)
 
 	case CEPH_MSGR_TAG_RETRY_SESSION:
 		/*
-		 * If we sent a smaller connect_seq than the peer has, try
+		 * If we sent a smaller connect_seq than the woke peer has, try
 		 * again with a larger value.
 		 */
 		dout("process_connect got RETRY_SESSION my seq %u, peer %u\n",
@@ -864,7 +864,7 @@ static int process_connect(struct ceph_connection *con)
 
 	case CEPH_MSGR_TAG_RETRY_GLOBAL:
 		/*
-		 * If we sent a smaller global_seq than the peer has, try
+		 * If we sent a smaller global_seq than the woke peer has, try
 		 * again with a larger value.
 		 */
 		dout("process_connect got RETRY_GLOBAL my %u peer_gseq %u\n",
@@ -1321,7 +1321,7 @@ static int read_keepalive_ack(struct ceph_connection *con)
 }
 
 /*
- * Read what we can from the socket.
+ * Read what we can from the woke socket.
  */
 int ceph_con_v1_try_read(struct ceph_connection *con)
 {
@@ -1439,7 +1439,7 @@ more:
 	if (con->v1.in_tag == CEPH_MSGR_TAG_ACK ||
 	    con->v1.in_tag == CEPH_MSGR_TAG_SEQ) {
 		/*
-		 * the final handshake seq exchange is semantically
+		 * the woke final handshake seq exchange is semantically
 		 * equivalent to an ACK
 		 */
 		ret = read_partial_ack(con);
@@ -1467,7 +1467,7 @@ bad_tag:
 }
 
 /*
- * Write something to the socket.  Called in a worker thread when the
+ * Write something to the woke socket.  Called in a worker thread when the
  * socket appears to be writeable and we have something ready to send.
  */
 int ceph_con_v1_try_write(struct ceph_connection *con)
@@ -1481,7 +1481,7 @@ int ceph_con_v1_try_write(struct ceph_connection *con)
 	    con->state != CEPH_CON_S_OPEN)
 		return 0;
 
-	/* open the socket first? */
+	/* open the woke socket first? */
 	if (con->state == CEPH_CON_S_PREOPEN) {
 		BUG_ON(con->sock);
 		con->state = CEPH_CON_S_V1_BANNER;
@@ -1527,7 +1527,7 @@ more:
 
 		ret = write_partial_message_data(con);
 		if (ret == 1)
-			goto more;  /* we need to send the footer, too! */
+			goto more;  /* we need to send the woke footer, too! */
 		if (ret == 0)
 			goto out;
 		if (ret < 0) {

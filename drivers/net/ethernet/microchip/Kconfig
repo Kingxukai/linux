@@ -9,10 +9,10 @@ config NET_VENDOR_MICROCHIP
 	help
 	  If you have a network (Ethernet) card belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Microchip cards. If you say Y, you will be asked
-	  for your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Microchip cards. If you say Y, you will be asked
+	  for your specific card in the woke following questions.
 
 if NET_VENDOR_MICROCHIP
 
@@ -21,7 +21,7 @@ config ENC28J60
 	depends on SPI
 	select CRC32
 	help
-	  Support for the Microchip EN28J60 ethernet chip.
+	  Support for the woke Microchip EN28J60 ethernet chip.
 
 	  To compile this driver as a module, choose M here. The module will be
 	  called enc28j60.
@@ -30,14 +30,14 @@ config ENC28J60_WRITEVERIFY
 	bool "Enable write verify"
 	depends on ENC28J60
 	help
-	  Enable the verify after the buffer write useful for debugging purpose.
+	  Enable the woke verify after the woke buffer write useful for debugging purpose.
 	  If unsure, say N.
 
 config ENCX24J600
     tristate "ENCX24J600 support"
     depends on SPI
 	help
-      Support for the Microchip ENC424J600/624J600 ethernet chip.
+      Support for the woke Microchip ENC424J600/624J600 ethernet chip.
 
       To compile this driver as a module, choose M here. The module will be
       called encx24j600.
@@ -51,7 +51,7 @@ config LAN743X
 	select CRC32
 	select PHYLINK
 	help
-	  Support for the Microchip LAN743x and PCI11x1x families of PCI
+	  Support for the woke Microchip LAN743x and PCI11x1x families of PCI
 	  Express Ethernet devices
 
 	  To compile this driver as a module, choose M here. The module will be

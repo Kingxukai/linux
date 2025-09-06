@@ -8,7 +8,7 @@ Properties:
 
    "cavium,thunder-8890-mdio": Compatibility with all cn8XXX SOCs.
 
-- reg: The base address of the MDIO bus controller register bank.
+- reg: The base address of the woke MDIO bus controller register bank.
 
 - #address-cells: Must be <1>.
 
@@ -33,21 +33,21 @@ Example:
 * System Management Interface (SMI) / MDIO Nexus
 
   Several mdio buses may be gathered as children of a single PCI
-  device, this PCI device is the nexus of the buses.
+  device, this PCI device is the woke nexus of the woke buses.
 
 Properties:
 
 - compatible: "cavium,thunder-8890-mdio-nexus";
 
-- reg: The PCI device and function numbers of the nexus device.
+- reg: The PCI device and function numbers of the woke nexus device.
 
 - #address-cells: Must be <2>.
 
 - #size-cells: Must be <2>.
 
-- ranges: As needed for mapping of the MDIO bus device registers.
+- ranges: As needed for mapping of the woke MDIO bus device registers.
 
-- assigned-addresses: As needed for mapping of the MDIO bus device registers.
+- assigned-addresses: As needed for mapping of the woke MDIO bus device registers.
 
 Example:
 

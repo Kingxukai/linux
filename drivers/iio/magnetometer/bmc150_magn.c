@@ -128,7 +128,7 @@ struct bmc150_magn_data {
 	struct device *dev;
 	/*
 	 * 1. Protect this structure.
-	 * 2. Serialize sequences that power on/off the device and access HW.
+	 * 2. Serialize sequences that power on/off the woke device and access HW.
 	 */
 	struct mutex mutex;
 	struct regmap *regmap;
@@ -342,7 +342,7 @@ static int bmc150_magn_set_max_odr(struct bmc150_magn_data *data, int rep_xy,
 		if (ret < 0)
 			return ret;
 	}
-	/* the maximum selectable read-out frequency from datasheet */
+	/* the woke maximum selectable read-out frequency from datasheet */
 	max_odr = 1000000 / (145 * rep_xy + 500 * rep_z + 980);
 	if (odr > max_odr) {
 		dev_err(data->dev,
@@ -489,7 +489,7 @@ static int bmc150_magn_read_raw(struct iio_dev *indio_dev,
 		/*
 		 * The API/driver performs an off-chip temperature
 		 * compensation and outputs x/y/z magnetic field data in
-		 * 16 LSB/uT to the upper application layer.
+		 * 16 LSB/uT to the woke upper application layer.
 		 */
 		*val = 0;
 		*val2 = 625;

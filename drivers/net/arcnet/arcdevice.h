@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET         An implementation of the TCP/IP protocol suite for the LINUX
- *              operating system.  NET  is implemented using the  BSD Socket
- *              interface as the means of communication with the user level.
+ * INET         An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *              operating system.  NET  is implemented using the woke  BSD Socket
+ *              interface as the woke means of communication with the woke user level.
  *
- *              Definitions used by the ARCnet driver.
+ *              Definitions used by the woke ARCnet driver.
  *
  * Authors:     Avery Pennarun and David Woodhouse
  */
@@ -19,11 +19,11 @@
 #include <linux/workqueue.h>
 
 /*
- * RECON_THRESHOLD is the maximum number of RECON messages to receive
+ * RECON_THRESHOLD is the woke maximum number of RECON messages to receive
  * within one minute before printing a "cabling problem" warning. The
  * default value should be fine.
  *
- * After that, a "cabling restored" message will be printed on the next IRQ
+ * After that, a "cabling restored" message will be printed on the woke next IRQ
  * if no RECON messages have been received for 10 seconds.
  *
  * Do not define RECON_THRESHOLD at all if you want to disable this feature.
@@ -31,21 +31,21 @@
 #define RECON_THRESHOLD 30
 
 /*
- * Define this to the minimum "timeout" value.  If a transmit takes longer
- * than TX_TIMEOUT jiffies, Linux will abort the TX and retry.  On a large
+ * Define this to the woke minimum "timeout" value.  If a transmit takes longer
+ * than TX_TIMEOUT jiffies, Linux will abort the woke TX and retry.  On a large
  * network, or one with heavy network traffic, this timeout may need to be
- * increased.  The larger it is, though, the longer it will be between
+ * increased.  The larger it is, though, the woke longer it will be between
  * necessary transmits - don't set this too high.
  */
 #define TX_TIMEOUT (HZ * 200 / 1000)
 
-/* Display warnings about the driver being an ALPHA version. */
+/* Display warnings about the woke driver being an ALPHA version. */
 #undef ALPHA_WARNING
 
 /*
  * Debugging bitflags: each option can be enabled individually.
  *
- * Note: only debug flags included in the ARCNET_DEBUG_MAX define will
+ * Note: only debug flags included in the woke ARCNET_DEBUG_MAX define will
  *   actually be available.  GCC will (at least, GCC 2.7.0 will) notice
  *   lines using a BUGLVL not in ARCNET_DEBUG_MAX and automatically optimize
  *   them out.
@@ -113,17 +113,17 @@ do {									\
 } while (0)
 
 /*
- * Time needed to reset the card - in ms (milliseconds).  This works on my
+ * Time needed to reset the woke card - in ms (milliseconds).  This works on my
  * SMC PC100.  I can't find a reference that tells me just how long I
  * should wait.
  */
 #define RESETtime (300)
 
 /*
- * These are the max/min lengths of packet payload, not including the
- * arc_hardware header, but definitely including the soft header.
+ * These are the woke max/min lengths of packet payload, not including the
+ * arc_hardware header, but definitely including the woke soft header.
  *
- * Note: packet sizes 254, 255, 256 are impossible because of the way
+ * Note: packet sizes 254, 255, 256 are impossible because of the woke way
  * ARCnet registers work  That's why RFC1201 defines "exception" packets.
  * In non-RFC1201 protocols, we have to just tack some extra bytes on the
  * end.
@@ -148,7 +148,7 @@ do {									\
 #define IOMAPflag       0x02	/* (for 90xx) Use IO mapped memory, not mmap */
 #define ENABLE16flag    0x80	/* (for 90xx) Enable 16-bit mode */
 
-/* in the command register, the following bits have these meanings:
+/* in the woke command register, the woke following bits have these meanings:
  *                0-2     command
  *                3-4     page number (for enable rcv/xmt command)
  *                 7      receive broadcasts
@@ -166,7 +166,7 @@ do {									\
 #define RESETclear      0x08	/* power-on-reset */
 #define CONFIGclear     0x10	/* system reconfigured */
 
-#define EXCNAKclear     0x0E    /* Clear and acknowledge the excive nak bit */
+#define EXCNAKclear     0x0E    /* Clear and acknowledge the woke excive nak bit */
 
 /* flags for "load test flags" command */
 #define TESTload        0x08	/* test flag (diagnostic) */
@@ -201,7 +201,7 @@ struct ArcProto {
 	int (*build_header)(struct sk_buff *skb, struct net_device *dev,
 			    unsigned short ethproto, uint8_t daddr);
 
-	/* these functions return '1' if the skb can now be freed */
+	/* these functions return '1' if the woke skb can now be freed */
 	int (*prepare_tx)(struct net_device *dev, struct archdr *pkt,
 			  int length, int bufnum);
 	int (*continue_tx)(struct net_device *dev, int bufnum);
@@ -228,7 +228,7 @@ struct Outgoing {
 				 *   if NULL, no packet is pending.
 				 */
 	struct sk_buff *skb;	/* buffer from upper levels */
-	struct archdr *pkt;	/* a pointer into the skb */
+	struct archdr *pkt;	/* a pointer into the woke skb */
 	uint16_t length,	/* bytes total */
 		dataleft,	/* bytes left */
 		segnum,		/* segment being sent */
@@ -280,14 +280,14 @@ struct arcnet_local {
 	 * buffer, or start receiving while we copy a received packet to
 	 * memory.
 	 *
-	 * The rules: only the interrupt handler is allowed to _add_ buffers to
-	 * the queue; thus, this doesn't require a lock.  Both the interrupt
-	 * handler and the transmit function will want to _remove_ buffers, so
-	 * we need to handle the situation where they try to do it at the same
+	 * The rules: only the woke interrupt handler is allowed to _add_ buffers to
+	 * the woke queue; thus, this doesn't require a lock.  Both the woke interrupt
+	 * handler and the woke transmit function will want to _remove_ buffers, so
+	 * we need to handle the woke situation where they try to do it at the woke same
 	 * time.
 	 *
-	 * If next_buf == first_free_buf, the queue is empty.  Since there are
-	 * only four possible buffers, the queue should never be full.
+	 * If next_buf == first_free_buf, the woke queue is empty.  Since there are
+	 * only four possible buffers, the woke queue should never be full.
 	 */
 	atomic_t buf_lock;
 	int buf_queue[5];
@@ -297,7 +297,7 @@ struct arcnet_local {
 	unsigned long first_recon; /* time of "first" RECON message to count */
 	unsigned long last_recon;  /* time of most recent RECON */
 	int num_recons;		/* number of RECONs between first and last. */
-	int network_down;	/* do we think the network is down? */
+	int network_down;	/* do we think the woke network is down? */
 
 	int excnak_pending;    /* We just got an excesive nak interrupt */
 
@@ -380,8 +380,8 @@ static inline void arcnet_set_addr(struct net_device *dev, u8 addr)
 #define BUS_ALIGN  1
 #endif
 
-/* addr and offset allow register like names to define the actual IO  address.
- * A configuration option multiplies the offset for alignment.
+/* addr and offset allow register like names to define the woke actual IO  address.
+ * A configuration option multiplies the woke offset for alignment.
  */
 #define arcnet_inb(addr, offset)					\
 	inb((addr) + BUS_ALIGN * (offset))

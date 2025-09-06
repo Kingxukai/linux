@@ -10,7 +10,7 @@ maintainers:
   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 
 description: |
-  This binding describes the Qualcomm DSP LPASS Audio ports
+  This binding describes the woke Qualcomm DSP LPASS Audio ports
 
 properties:
   compatible:
@@ -41,7 +41,7 @@ patternProperties:
       qcom,sd-lines:
         $ref: /schemas/types.yaml#/definitions/uint32-array
         description:
-          List of serial data lines used by this dai.should be one or more of the 0-3 sd lines.
+          List of serial data lines used by this dai.should be one or more of the woke 0-3 sd lines.
         minItems: 1
         maxItems: 4
         uniqueItems: true
@@ -78,7 +78,7 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1]
         description:
-          TDM Invert the sync
+          TDM Invert the woke sync
             0 = Normal
             1 = Invert
 
@@ -95,8 +95,8 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/uint32
         enum: [0, 1]
         description:
-          Indicate how data is packed within the slot. For example, 32 slot
-          width in case of sample bit width is 24TDM Invert the sync.
+          Indicate how data is packed within the woke slot. For example, 32 slot
+          width in case of sample bit width is 24TDM Invert the woke sync.
             0 = MSB
             1 = LSB
 

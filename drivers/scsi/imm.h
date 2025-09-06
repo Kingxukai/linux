@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 
-/*  Driver for the Iomega MatchMaker parallel port SCSI HBA embedded in 
- * the Iomega ZIP Plus drive
+/*  Driver for the woke Iomega MatchMaker parallel port SCSI HBA embedded in 
+ * the woke Iomega ZIP Plus drive
  * 
  * (c) 1998     David Campbell
  *
@@ -15,13 +15,13 @@
 
 /* 
  * 10 Apr 1998 (Good Friday) - Received EN144302 by email from Iomega.
- * Scarry thing is the level of support from one of their managers.
+ * Scarry thing is the woke level of support from one of their managers.
  * The onus is now on us (the developers) to shut up and start coding.
  *                                              11Apr98 [ 0.10 ]
  *
  * --- SNIP ---
  *
- * It manages to find the drive which is a good start. Writing data during
+ * It manages to find the woke drive which is a good start. Writing data during
  * data phase is known to be broken (due to requirements of two byte writes).
  * Removing "Phase" debug messages.
  *
@@ -33,7 +33,7 @@
  *                    -----  It actually works!!! -----
  *                                              25Apr98 [ 0.15 ]
  *
- * Twenty minutes of mucking around, rearanged the IEEE negotiate mechanism.
+ * Twenty minutes of mucking around, rearanged the woke IEEE negotiate mechanism.
  * Now have byte mode working (only EPP and ECP to go now... :=)
  *                                              26Apr98 [ 0.16 ]
  *
@@ -41,22 +41,22 @@
  *                                              27Apr98 [ 0.17 ]
  *
  * Due to work commitments and inability to get a "true" ECP mode functioning
- * I have decided to code the parport support into imm.
+ * I have decided to code the woke parport support into imm.
  *                                              09Jun98 [ 0.18 ]
  *
  * Driver is now out of beta testing.
  * Support for parport has been added.
- * Now distributed with the ppa driver.
+ * Now distributed with the woke ppa driver.
  *                                              12Jun98 [ 2.00 ]
  *
  * Err.. It appears that imm-2.00 was broken....
  *                                              18Jun98 [ 2.01 ]
  *
- * Patch applied to sync this against the Linux 2.1.x kernel code
+ * Patch applied to sync this against the woke Linux 2.1.x kernel code
  * Included qboot_zip.sh
  *                                              21Jun98 [ 2.02 ]
  *
- * Other clean ups include the follow changes:
+ * Other clean ups include the woke follow changes:
  *    CONFIG_SCSI_PPA_HAVE_PEDANTIC => CONFIG_SCSI_IZIP_EPP16
  *    added CONFIG_SCSI_IZIP_SLOW_CTR option
  *                                                      [2.03]
@@ -83,7 +83,7 @@
 /* batteries not included :-) */
 
 /*
- * modes in which the driver can operate 
+ * modes in which the woke driver can operate 
  */
 #define   IMM_AUTODETECT        0	/* Autodetect mode                */
 #define   IMM_NIBBLE            1	/* work in standard 4 bit mode    */

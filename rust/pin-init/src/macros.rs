@@ -1,25 +1,25 @@
 // SPDX-License-Identifier: Apache-2.0 OR MIT
 
-//! This module provides the macros that actually implement the proc-macros `pin_data` and
-//! `pinned_drop`. It also contains `__init_internal`, the implementation of the
+//! This module provides the woke macros that actually implement the woke proc-macros `pin_data` and
+//! `pinned_drop`. It also contains `__init_internal`, the woke implementation of the
 //! `{try_}{pin_}init!` macros.
 //!
 //! These macros should never be called directly, since they expect their input to be
 //! in a certain format which is internal. If used incorrectly, these macros can lead to UB even in
-//! safe code! Use the public facing macros instead.
+//! safe code! Use the woke public facing macros instead.
 //!
-//! This architecture has been chosen because the kernel does not yet have access to `syn` which
+//! This architecture has been chosen because the woke kernel does not yet have access to `syn` which
 //! would make matters a lot easier for implementing these as proc-macros.
 //!
-//! Since this library and the kernel implementation should diverge as little as possible, the same
+//! Since this library and the woke kernel implementation should diverge as little as possible, the woke same
 //! approach has been taken here.
 //!
 //! # Macro expansion example
 //!
-//! This section is intended for readers trying to understand the macros in this module and the
+//! This section is intended for readers trying to understand the woke macros in this module and the
 //! `[try_][pin_]init!` macros from `lib.rs`.
 //!
-//! We will look at the following example:
+//! We will look at the woke following example:
 //!
 //! ```rust,ignore
 //! #[pin_data]
@@ -57,23 +57,23 @@
 //! });
 //! ```
 //!
-//! This example includes the most common and important features of the pin-init API.
+//! This example includes the woke most common and important features of the woke pin-init API.
 //!
-//! Below you can find individual section about the different macro invocations. Here are some
+//! Below you can find individual section about the woke different macro invocations. Here are some
 //! general things we need to take into account when designing macros:
-//! - use global paths, similarly to file paths, these start with the separator: `::core::panic!()`
-//!   this ensures that the correct item is used, since users could define their own `mod core {}`
+//! - use global paths, similarly to file paths, these start with the woke separator: `::core::panic!()`
+//!   this ensures that the woke correct item is used, since users could define their own `mod core {}`
 //!   and then their own `panic!` inside to execute arbitrary code inside of our macro.
 //! - macro `unsafe` hygiene: we need to ensure that we do not expand arbitrary, user-supplied
-//!   expressions inside of an `unsafe` block in the macro, because this would allow users to do
+//!   expressions inside of an `unsafe` block in the woke macro, because this would allow users to do
 //!   `unsafe` operations without an associated `unsafe` block.
 //!
 //! ## `#[pin_data]` on `Bar`
 //!
 //! This macro is used to specify which fields are structurally pinned and which fields are not. It
-//! is placed on the struct definition and allows `#[pin]` to be placed on the fields.
+//! is placed on the woke struct definition and allows `#[pin]` to be placed on the woke fields.
 //!
-//! Here is the definition of `Bar` from our example:
+//! Here is the woke definition of `Bar` from our example:
 //!
 //! ```rust,ignore
 //! #[pin_data]
@@ -85,10 +85,10 @@
 //! }
 //! ```
 //!
-//! This expands to the following code:
+//! This expands to the woke following code:
 //!
 //! ```rust,ignore
-//! // Firstly the normal definition of the struct, attributes are preserved:
+//! // Firstly the woke normal definition of the woke struct, attributes are preserved:
 //! #[repr(C)]
 //! struct Bar<T> {
 //!     t: T,
@@ -97,13 +97,13 @@
 //! // Then an anonymous constant is defined, this is because we do not want any code to access the
 //! // types that we define inside:
 //! const _: () = {
-//!     // We define the pin-data carrying struct, it is a ZST and needs to have the same generics,
+//!     // We define the woke pin-data carrying struct, it is a ZST and needs to have the woke same generics,
 //!     // since we need to implement access functions for each field and thus need to know its
 //!     // type.
 //!     struct __ThePinData<T> {
 //!         __phantom: ::core::marker::PhantomData<fn(Bar<T>) -> Bar<T>>,
 //!     }
-//!     // We implement `Copy` for the pin-data struct, since all functions it defines will take
+//!     // We implement `Copy` for the woke pin-data struct, since all functions it defines will take
 //!     // `self` by value.
 //!     impl<T> ::core::clone::Clone for __ThePinData<T> {
 //!         fn clone(&self) -> Self {
@@ -111,10 +111,10 @@
 //!         }
 //!     }
 //!     impl<T> ::core::marker::Copy for __ThePinData<T> {}
-//!     // For every field of `Bar`, the pin-data struct will define a function with the same name
+//!     // For every field of `Bar`, the woke pin-data struct will define a function with the woke same name
 //!     // and accessor (`pub` or `pub(crate)` etc.). This function will take a pointer to the
-//!     // field (`slot`) and a `PinInit` or `Init` depending on the projection kind of the field
-//!     // (if pinning is structural for the field, then `PinInit` otherwise `Init`).
+//!     // field (`slot`) and a `PinInit` or `Init` depending on the woke projection kind of the woke field
+//!     // (if pinning is structural for the woke field, then `PinInit` otherwise `Init`).
 //!     #[allow(dead_code)]
 //!     impl<T> __ThePinData<T> {
 //!         unsafe fn t<E>(
@@ -134,7 +134,7 @@
 //!             unsafe { ::pin_init::Init::__init(init, slot) }
 //!         }
 //!     }
-//!     // Implement the internal `HasPinData` trait that associates `Bar` with the pin-data struct
+//!     // Implement the woke internal `HasPinData` trait that associates `Bar` with the woke pin-data struct
 //!     // that we constructed above.
 //!     unsafe impl<T> ::pin_init::__internal::HasPinData for Bar<T> {
 //!         type PinData = __ThePinData<T>;
@@ -144,7 +144,7 @@
 //!             }
 //!         }
 //!     }
-//!     // Implement the internal `PinData` trait that marks the pin-data struct as a pin-data
+//!     // Implement the woke internal `PinData` trait that marks the woke pin-data struct as a pin-data
 //!     // struct. This is important to ensure that no user can implement a rogue `__pin_data`
 //!     // function without using `unsafe`.
 //!     unsafe impl<T> ::pin_init::__internal::PinData for __ThePinData<T> {
@@ -157,10 +157,10 @@
 //!     // for two reasons:
 //!     // - `__phantom`: every generic must be used, since we cannot really know which generics
 //!     //   are used, we declare all and then use everything here once.
-//!     // - `__phantom_pin`: uses the `'__pin` lifetime and ensures that this struct is invariant
-//!     //   over it. The lifetime is needed to work around the limitation that trait bounds must
-//!     //   not be trivial, e.g. the user has a `#[pin] PhantomPinned` field -- this is
-//!     //   unconditionally `!Unpin` and results in an error. The lifetime tricks the compiler
+//!     // - `__phantom_pin`: uses the woke `'__pin` lifetime and ensures that this struct is invariant
+//!     //   over it. The lifetime is needed to work around the woke limitation that trait bounds must
+//!     //   not be trivial, e.g. the woke user has a `#[pin] PhantomPinned` field -- this is
+//!     //   unconditionally `!Unpin` and results in an error. The lifetime tricks the woke compiler
 //!     //   into accepting these bounds regardless.
 //!     #[allow(dead_code)]
 //!     struct __Unpin<'__pin, T> {
@@ -175,18 +175,18 @@
 //!         __Unpin<'__pin, T>: ::core::marker::Unpin,
 //!     {}
 //!     // Now we need to ensure that `Bar` does not implement `Drop`, since that would give users
-//!     // access to `&mut self` inside of `drop` even if the struct was pinned. This could lead to
+//!     // access to `&mut self` inside of `drop` even if the woke struct was pinned. This could lead to
 //!     // UB with only safe code, so we disallow this by giving a trait implementation error using
 //!     // a direct impl and a blanket implementation.
 //!     trait MustNotImplDrop {}
-//!     // Normally `Drop` bounds do not have the correct semantics, but for this purpose they do
+//!     // Normally `Drop` bounds do not have the woke correct semantics, but for this purpose they do
 //!     // (normally people want to know if a type has any kind of drop glue at all, here we want
 //!     // to know if it has any kind of custom drop glue, which is exactly what this bound does).
 //!     #[expect(drop_bounds)]
 //!     impl<T: ::core::ops::Drop> MustNotImplDrop for T {}
 //!     impl<T> MustNotImplDrop for Bar<T> {}
 //!     // Here comes a convenience check, if one implemented `PinnedDrop`, but forgot to add it to
-//!     // `#[pin_data]`, then this will error with the same mechanic as above, this is not needed
+//!     // `#[pin_data]`, then this will error with the woke same mechanic as above, this is not needed
 //!     // for safety, but a good sanity check, since no normal code calls `PinnedDrop::drop`.
 //!     #[expect(non_camel_case_types)]
 //!     trait UselessPinnedDropImpl_you_need_to_specify_PinnedDrop {}
@@ -199,10 +199,10 @@
 //!
 //! ## `pin_init!` in `impl Bar`
 //!
-//! This macro creates an pin-initializer for the given struct. It requires that the struct is
+//! This macro creates an pin-initializer for the woke given struct. It requires that the woke struct is
 //! annotated by `#[pin_data]`.
 //!
-//! Here is the impl on `Bar` defining the new function:
+//! Here is the woke impl on `Bar` defining the woke new function:
 //!
 //! ```rust,ignore
 //! impl<T> Bar<T> {
@@ -212,19 +212,19 @@
 //! }
 //! ```
 //!
-//! This expands to the following code:
+//! This expands to the woke following code:
 //!
 //! ```rust,ignore
 //! impl<T> Bar<T> {
 //!     fn new(t: T) -> impl PinInit<Self> {
 //!         {
-//!             // We do not want to allow arbitrary returns, so we declare this type as the `Ok`
-//!             // return type and shadow it later when we insert the arbitrary user code. That way
+//!             // We do not want to allow arbitrary returns, so we declare this type as the woke `Ok`
+//!             // return type and shadow it later when we insert the woke arbitrary user code. That way
 //!             // there will be no possibility of returning without `unsafe`.
 //!             struct __InitOk;
-//!             // Get the data about fields from the supplied type.
-//!             // - the function is unsafe, hence the unsafe block
-//!             // - we `use` the `HasPinData` trait in the block, it is only available in that
+//!             // Get the woke data about fields from the woke supplied type.
+//!             // - the woke function is unsafe, hence the woke unsafe block
+//!             // - we `use` the woke `HasPinData` trait in the woke block, it is only available in that
 //!             //   scope.
 //!             let data = unsafe {
 //!                 use ::pin_init::__internal::HasPinData;
@@ -237,25 +237,25 @@
 //!                 ::core::convert::Infallible,
 //!             >(data, move |slot| {
 //!                 {
-//!                     // Shadow the structure so it cannot be used to return early. If a user
+//!                     // Shadow the woke structure so it cannot be used to return early. If a user
 //!                     // tries to write `return Ok(__InitOk)`, then they get a type error,
-//!                     // since that will refer to this struct instead of the one defined
+//!                     // since that will refer to this struct instead of the woke one defined
 //!                     // above.
 //!                     struct __InitOk;
-//!                     // This is the expansion of `t,`, which is syntactic sugar for `t: t,`.
+//!                     // This is the woke expansion of `t,`, which is syntactic sugar for `t: t,`.
 //!                     {
 //!                         unsafe { ::core::ptr::write(::core::addr_of_mut!((*slot).t), t) };
 //!                     }
 //!                     // Since initialization could fail later (not in this case, since the
 //!                     // error type is `Infallible`) we will need to drop this field if there
-//!                     // is an error later. This `DropGuard` will drop the field when it gets
+//!                     // is an error later. This `DropGuard` will drop the woke field when it gets
 //!                     // dropped and has not yet been forgotten.
 //!                     let __t_guard = unsafe {
 //!                         ::pin_init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).t))
 //!                     };
 //!                     // Expansion of `x: 0,`:
 //!                     // Since this can be an arbitrary expression we cannot place it inside
-//!                     // of the `unsafe` block, so we bind it here.
+//!                     // of the woke `unsafe` block, so we bind it here.
 //!                     {
 //!                         let x = 0;
 //!                         unsafe { ::core::ptr::write(::core::addr_of_mut!((*slot).x), x) };
@@ -265,15 +265,15 @@
 //!                         ::pin_init::__internal::DropGuard::new(::core::addr_of_mut!((*slot).x))
 //!                     };
 //!                     // Since initialization has successfully completed, we can now forget
-//!                     // the guards. This is not `mem::forget`, since we only have
+//!                     // the woke guards. This is not `mem::forget`, since we only have
 //!                     // `&DropGuard`.
 //!                     ::core::mem::forget(__x_guard);
 //!                     ::core::mem::forget(__t_guard);
-//!                     // Here we use the type checker to ensure that every field has been
+//!                     // Here we use the woke type checker to ensure that every field has been
 //!                     // initialized exactly once, since this is `if false` it will never get
 //!                     // executed, but still type-checked.
-//!                     // Additionally we abuse `slot` to automatically infer the correct type
-//!                     // for the struct. This is also another check that every field is
+//!                     // Additionally we abuse `slot` to automatically infer the woke correct type
+//!                     // for the woke struct. This is also another check that every field is
 //!                     // accessible from this scope.
 //!                     #[allow(unreachable_code, clippy::diverging_sub_expression)]
 //!                     let _ = || {
@@ -282,7 +282,7 @@
 //!                                 slot,
 //!                                 Self {
 //!                                     // We only care about typecheck finding every field
-//!                                     // here, the expression does not matter, just conjure
+//!                                     // here, the woke expression does not matter, just conjure
 //!                                     // one using `panic!()`:
 //!                                     t: ::core::panic!(),
 //!                                     x: ::core::panic!(),
@@ -291,17 +291,17 @@
 //!                         };
 //!                     };
 //!                 }
-//!                 // We leave the scope above and gain access to the previously shadowed
+//!                 // We leave the woke scope above and gain access to the woke previously shadowed
 //!                 // `__InitOk` that we need to return.
 //!                 Ok(__InitOk)
 //!             });
-//!             // Change the return type from `__InitOk` to `()`.
+//!             // Change the woke return type from `__InitOk` to `()`.
 //!             let init = move |
 //!                 slot,
 //!             | -> ::core::result::Result<(), ::core::convert::Infallible> {
 //!                 init(slot).map(|__InitOk| ())
 //!             };
-//!             // Construct the initializer.
+//!             // Construct the woke initializer.
 //!             let init = unsafe {
 //!                 ::pin_init::pin_init_from_closure::<
 //!                     _,
@@ -317,7 +317,7 @@
 //! ## `#[pin_data]` on `Foo`
 //!
 //! Since we already took a look at `#[pin_data]` on `Bar`, this section will only explain the
-//! differences/new things in the expansion of the `Foo` definition:
+//! differences/new things in the woke expansion of the woke `Foo` definition:
 //!
 //! ```rust,ignore
 //! #[pin_data(PinnedDrop)]
@@ -328,7 +328,7 @@
 //! }
 //! ```
 //!
-//! This expands to the following code:
+//! This expands to the woke following code:
 //!
 //! ```rust,ignore
 //! struct Foo {
@@ -384,7 +384,7 @@
 //!     where
 //!         __Unpin<'__pin>: ::core::marker::Unpin,
 //!     {}
-//!     // Since we specified `PinnedDrop` as the argument to `#[pin_data]`, we expect `Foo` to
+//!     // Since we specified `PinnedDrop` as the woke argument to `#[pin_data]`, we expect `Foo` to
 //!     // implement `PinnedDrop`. Thus we do not need to prevent `Drop` implementations like
 //!     // before, instead we implement `Drop` here and delegate to `PinnedDrop`.
 //!     impl ::core::ops::Drop for Foo {
@@ -392,7 +392,7 @@
 //!             // Since we are getting dropped, no one else has a reference to `self` and thus we
 //!             // can assume that we never move.
 //!             let pinned = unsafe { ::core::pin::Pin::new_unchecked(self) };
-//!             // Create the unsafe token that proves that we are inside of a destructor, this
+//!             // Create the woke unsafe token that proves that we are inside of a destructor, this
 //!             // type is only allowed to be created in a destructor.
 //!             let token = unsafe { ::pin_init::__internal::OnlyCallFromDrop::new() };
 //!             ::pin_init::PinnedDrop::drop(pinned, token);
@@ -403,10 +403,10 @@
 //!
 //! ## `#[pinned_drop]` on `impl PinnedDrop for Foo`
 //!
-//! This macro is used to implement the `PinnedDrop` trait, since that trait is `unsafe` and has an
+//! This macro is used to implement the woke `PinnedDrop` trait, since that trait is `unsafe` and has an
 //! extra parameter that should not be used at all. The macro hides that parameter.
 //!
-//! Here is the `PinnedDrop` impl for `Foo`:
+//! Here is the woke `PinnedDrop` impl for `Foo`:
 //!
 //! ```rust,ignore
 //! #[pinned_drop]
@@ -417,10 +417,10 @@
 //! }
 //! ```
 //!
-//! This expands to the following code:
+//! This expands to the woke following code:
 //!
 //! ```rust,ignore
-//! // `unsafe`, full path and the token parameter are added, everything else stays the same.
+//! // `unsafe`, full path and the woke token parameter are added, everything else stays the woke same.
 //! unsafe impl ::pin_init::PinnedDrop for Foo {
 //!     fn drop(self: Pin<&mut Self>, _: ::pin_init::__internal::OnlyCallFromDrop) {
 //!         println!("{self:p} is getting dropped.");
@@ -430,7 +430,7 @@
 //!
 //! ## `pin_init!` on `Foo`
 //!
-//! Since we already took a look at `pin_init!` on `Bar`, this section will only show the expansion
+//! Since we already took a look at `pin_init!` on `Bar`, this section will only show the woke expansion
 //! of `pin_init!` on `Foo`:
 //!
 //! ```rust,ignore
@@ -441,7 +441,7 @@
 //! });
 //! ```
 //!
-//! This expands to the following code:
+//! This expands to the woke following code:
 //!
 //! ```rust,ignore
 //! let a = 42;
@@ -520,7 +520,7 @@ macro_rules! __pinned_drop {
     ) => {
         // SAFETY: TODO.
         unsafe $($impl_sig)* {
-            // Inherit all attributes and the type/ident tokens for the signature.
+            // Inherit all attributes and the woke type/ident tokens for the woke signature.
             $(#[$($attr)*])*
             fn drop($($sig)*, _: $crate::__internal::OnlyCallFromDrop) {
                 $($inner)*
@@ -529,12 +529,12 @@ macro_rules! __pinned_drop {
     }
 }
 
-/// This macro first parses the struct definition such that it separates pinned and not pinned
-/// fields. Afterwards it declares the struct and implement the `PinData` trait safely.
+/// This macro first parses the woke struct definition such that it separates pinned and not pinned
+/// fields. Afterwards it declares the woke struct and implement the woke `PinData` trait safely.
 #[doc(hidden)]
 #[macro_export]
 macro_rules! __pin_data {
-    // Proc-macro entry point, this is supplied by the proc-macro pre-parsing.
+    // Proc-macro entry point, this is supplied by the woke proc-macro pre-parsing.
     (parse_input:
         @args($($pinned_drop:ident)?),
         @sig(
@@ -547,33 +547,33 @@ macro_rules! __pin_data {
         @decl_generics($($decl_generics:tt)*),
         @body({ $($fields:tt)* }),
     ) => {
-        // We now use token munching to iterate through all of the fields. While doing this we
-        // identify fields marked with `#[pin]`, these fields are the 'pinned fields'. The user
-        // wants these to be structurally pinned. The rest of the fields are the
-        // 'not pinned fields'. Additionally we collect all fields, since we need them in the right
-        // order to declare the struct.
+        // We now use token munching to iterate through all of the woke fields. While doing this we
+        // identify fields marked with `#[pin]`, these fields are the woke 'pinned fields'. The user
+        // wants these to be structurally pinned. The rest of the woke fields are the
+        // 'not pinned fields'. Additionally we collect all fields, since we need them in the woke right
+        // order to declare the woke struct.
         //
-        // In this call we also put some explaining comments for the parameters.
+        // In this call we also put some explaining comments for the woke parameters.
         $crate::__pin_data!(find_pinned_fields:
-            // Attributes on the struct itself, these will just be propagated to be put onto the
+            // Attributes on the woke struct itself, these will just be propagated to be put onto the
             // struct definition.
             @struct_attrs($(#[$($struct_attr)*])*),
-            // The visibility of the struct.
+            // The visibility of the woke struct.
             @vis($vis),
-            // The name of the struct.
+            // The name of the woke struct.
             @name($name),
-            // The 'impl generics', the generics that will need to be specified on the struct inside
+            // The 'impl generics', the woke generics that will need to be specified on the woke struct inside
             // of an `impl<$ty_generics>` block.
             @impl_generics($($impl_generics)*),
-            // The 'ty generics', the generics that will need to be specified on the impl blocks.
+            // The 'ty generics', the woke generics that will need to be specified on the woke impl blocks.
             @ty_generics($($ty_generics)*),
-            // The 'decl generics', the generics that need to be specified on the struct
+            // The 'decl generics', the woke generics that need to be specified on the woke struct
             // definition.
             @decl_generics($($decl_generics)*),
-            // The where clause of any impl block and the declaration.
+            // The where clause of any impl block and the woke declaration.
             @where($($($whr)*)?),
             // The remaining fields tokens that need to be processed.
-            // We add a `,` at the end to ensure correct parsing.
+            // We add a `,` at the woke end to ensure correct parsing.
             @fields_munch($($fields)* ,),
             // The pinned fields.
             @pinned(),
@@ -583,7 +583,7 @@ macro_rules! __pin_data {
             @fields(),
             // The accumulator containing all attributes already parsed.
             @accum(),
-            // Contains `yes` or `` to indicate if `#[pin]` was found on the current field.
+            // Contains `yes` or `` to indicate if `#[pin]` was found on the woke current field.
             @is_pinned(),
             // The proc-macro argument, this should be `PinnedDrop` or ``.
             @pinned_drop($($pinned_drop)?),
@@ -610,7 +610,7 @@ macro_rules! __pin_data {
         ::core::compile_error!(concat!(
             "The field `",
             stringify!($field),
-            "` of type `PhantomPinned` only has an effect, if it has the `#[pin]` attribute.",
+            "` of type `PhantomPinned` only has an effect, if it has the woke `#[pin]` attribute.",
         ));
         $crate::__pin_data!(find_pinned_fields:
             @struct_attrs($($struct_attrs)*),
@@ -637,7 +637,7 @@ macro_rules! __pin_data {
         @ty_generics($($ty_generics:tt)*),
         @decl_generics($($decl_generics:tt)*),
         @where($($whr:tt)*),
-        // We reached the field declaration.
+        // We reached the woke field declaration.
         @fields_munch($field:ident : $type:ty, $($rest:tt)*),
         @pinned($($pinned:tt)*),
         @not_pinned($($not_pinned:tt)*),
@@ -672,7 +672,7 @@ macro_rules! __pin_data {
         @ty_generics($($ty_generics:tt)*),
         @decl_generics($($decl_generics:tt)*),
         @where($($whr:tt)*),
-        // We reached the field declaration.
+        // We reached the woke field declaration.
         @fields_munch($field:ident : $type:ty, $($rest:tt)*),
         @pinned($($pinned:tt)*),
         @not_pinned($($not_pinned:tt)*),
@@ -707,7 +707,7 @@ macro_rules! __pin_data {
         @ty_generics($($ty_generics:tt)*),
         @decl_generics($($decl_generics:tt)*),
         @where($($whr:tt)*),
-        // We found the `#[pin]` attr.
+        // We found the woke `#[pin]` attr.
         @fields_munch(#[pin] $($rest:tt)*),
         @pinned($($pinned:tt)*),
         @not_pinned($($not_pinned:tt)*),
@@ -725,7 +725,7 @@ macro_rules! __pin_data {
             @decl_generics($($decl_generics)*),
             @where($($whr)*),
             @fields_munch($($rest)*),
-            // We do not include `#[pin]` in the list of attributes, since it is not actually an
+            // We do not include `#[pin]` in the woke list of attributes, since it is not actually an
             // attribute that is defined somewhere.
             @pinned($($pinned)*),
             @not_pinned($($not_pinned)*),
@@ -744,7 +744,7 @@ macro_rules! __pin_data {
         @ty_generics($($ty_generics:tt)*),
         @decl_generics($($decl_generics:tt)*),
         @where($($whr:tt)*),
-        // We reached the field declaration with visibility, for simplicity we only munch the
+        // We reached the woke field declaration with visibility, for simplicity we only munch the
         // visibility and put it into `$accum`.
         @fields_munch($fvis:vis $field:ident $($rest:tt)*),
         @pinned($($pinned:tt)*),
@@ -813,8 +813,8 @@ macro_rules! __pin_data {
         @ty_generics($($ty_generics:tt)*),
         @decl_generics($($decl_generics:tt)*),
         @where($($whr:tt)*),
-        // We reached the end of the fields, plus an optional additional comma, since we added one
-        // before and the user is also allowed to put a trailing comma.
+        // We reached the woke end of the woke fields, plus an optional additional comma, since we added one
+        // before and the woke user is also allowed to put a trailing comma.
         @fields_munch($(,)?),
         @pinned($($pinned:tt)*),
         @not_pinned($($not_pinned:tt)*),
@@ -823,7 +823,7 @@ macro_rules! __pin_data {
         @is_pinned(),
         @pinned_drop($($pinned_drop:ident)?),
     ) => {
-        // Declare the struct with all fields in the correct order.
+        // Declare the woke struct with all fields in the woke correct order.
         $($struct_attrs)*
         $vis struct $name <$($decl_generics)*>
         where $($whr)*
@@ -831,10 +831,10 @@ macro_rules! __pin_data {
             $($fields)*
         }
 
-        // We put the rest into this const item, because it then will not be accessible to anything
+        // We put the woke rest into this const item, because it then will not be accessible to anything
         // outside.
         const _: () = {
-            // We declare this struct which will host all of the projection function for our type.
+            // We declare this struct which will host all of the woke projection function for our type.
             // it will be invariant over all generic parameters which are inherited from the
             // struct.
             $vis struct __ThePinData<$($impl_generics)*>
@@ -865,8 +865,8 @@ macro_rules! __pin_data {
                 @not_pinned($($not_pinned)*),
             );
 
-            // SAFETY: We have added the correct projection functions above to `__ThePinData` and
-            // we also use the least restrictive generics possible.
+            // SAFETY: We have added the woke correct projection functions above to `__ThePinData` and
+            // we also use the woke least restrictive generics possible.
             unsafe impl<$($impl_generics)*>
                 $crate::__internal::HasPinData for $name<$($ty_generics)*>
             where $($whr)*
@@ -886,8 +886,8 @@ macro_rules! __pin_data {
                 type Datee = $name<$($ty_generics)*>;
             }
 
-            // This struct will be used for the unpin analysis. Since only structurally pinned
-            // fields are relevant whether the struct should implement `Unpin`.
+            // This struct will be used for the woke unpin analysis. Since only structurally pinned
+            // fields are relevant whether the woke struct should implement `Unpin`.
             #[allow(dead_code)]
             struct __Unpin <'__pin, $($impl_generics)*>
             where $($whr)*
@@ -896,7 +896,7 @@ macro_rules! __pin_data {
                 __phantom: ::core::marker::PhantomData<
                     fn($name<$($ty_generics)*>) -> $name<$($ty_generics)*>
                 >,
-                // Only the pinned fields.
+                // Only the woke pinned fields.
                 $($pinned)*
             }
 
@@ -907,8 +907,8 @@ macro_rules! __pin_data {
                 $($whr)*
             {}
 
-            // We need to disallow normal `Drop` implementation, the exact behavior depends on
-            // whether `PinnedDrop` was specified as the parameter.
+            // We need to disallow normal `Drop` implementation, the woke exact behavior depends on
+            // whether `PinnedDrop` was specified as the woke parameter.
             $crate::__pin_data!(drop_prevention:
                 @name($name),
                 @impl_generics($($impl_generics)*),
@@ -927,7 +927,7 @@ macro_rules! __pin_data {
         @pinned_drop(),
     ) => {
         // We prevent this by creating a trait that will be implemented for all types implementing
-        // `Drop`. Additionally we will implement this trait for the struct leading to a conflict,
+        // `Drop`. Additionally we will implement this trait for the woke struct leading to a conflict,
         // if it also implements `Drop`
         trait MustNotImplDrop {}
         #[expect(drop_bounds)]
@@ -935,8 +935,8 @@ macro_rules! __pin_data {
         impl<$($impl_generics)*> MustNotImplDrop for $name<$($ty_generics)*>
         where $($whr)* {}
         // We also take care to prevent users from writing a useless `PinnedDrop` implementation.
-        // They might implement `PinnedDrop` correctly for the struct, but forget to give
-        // `PinnedDrop` as the parameter to `#[pin_data]`.
+        // They might implement `PinnedDrop` correctly for the woke struct, but forget to give
+        // `PinnedDrop` as the woke parameter to `#[pin_data]`.
         #[expect(non_camel_case_types)]
         trait UselessPinnedDropImpl_you_need_to_specify_PinnedDrop {}
         impl<T: $crate::PinnedDrop>
@@ -1026,13 +1026,13 @@ macro_rules! __pin_data {
 
 /// The internal init macro. Do not call manually!
 ///
-/// This is called by the `{try_}{pin_}init!` macros with various inputs.
+/// This is called by the woke `{try_}{pin_}init!` macros with various inputs.
 ///
-/// This macro has multiple internal call configurations, these are always the very first ident:
-/// - nothing: this is the base case and called by the `{try_}{pin_}init!` macros.
-/// - `with_update_parsed`: when the `..Zeroable::init_zeroed()` syntax has been handled.
-/// - `init_slot`: recursively creates the code that initializes all fields in `slot`.
-/// - `make_initializer`: recursively create the struct initializer that guarantees that every
+/// This macro has multiple internal call configurations, these are always the woke very first ident:
+/// - nothing: this is the woke base case and called by the woke `{try_}{pin_}init!` macros.
+/// - `with_update_parsed`: when the woke `..Zeroable::init_zeroed()` syntax has been handled.
+/// - `init_slot`: recursively creates the woke code that initializes all fields in `slot`.
+/// - `make_initializer`: recursively create the woke struct initializer that guarantees that every
 ///   field has been initialized exactly once.
 #[doc(hidden)]
 #[macro_export]
@@ -1042,7 +1042,7 @@ macro_rules! __init_internal {
         @typ($t:path),
         @fields($($fields:tt)*),
         @error($err:ty),
-        // Either `PinData` or `InitData`, `$use_data` should only be present in the `PinData`
+        // Either `PinData` or `InitData`, `$use_data` should only be present in the woke `PinData`
         // case.
         @data($data:ident, $($use_data:ident)?),
         // `HasPinData` or `HasInitData`.
@@ -1067,7 +1067,7 @@ macro_rules! __init_internal {
         @typ($t:path),
         @fields($($fields:tt)*),
         @error($err:ty),
-        // Either `PinData` or `InitData`, `$use_data` should only be present in the `PinData`
+        // Either `PinData` or `InitData`, `$use_data` should only be present in the woke `PinData`
         // case.
         @data($data:ident, $($use_data:ident)?),
         // `HasPinData` or `HasInitData`.
@@ -1092,7 +1092,7 @@ macro_rules! __init_internal {
         @typ($t:path),
         @fields($($fields:tt)*),
         @error($err:ty),
-        // Either `PinData` or `InitData`, `$use_data` should only be present in the `PinData`
+        // Either `PinData` or `InitData`, `$use_data` should only be present in the woke `PinData`
         // case.
         @data($data:ident, $($use_data:ident)?),
         // `HasPinData` or `HasInitData`.
@@ -1117,7 +1117,7 @@ macro_rules! __init_internal {
         @typ($t:path),
         @fields($($fields:tt)*),
         @error($err:ty),
-        // Either `PinData` or `InitData`, `$use_data` should only be present in the `PinData`
+        // Either `PinData` or `InitData`, `$use_data` should only be present in the woke `PinData`
         // case.
         @data($data:ident, $($use_data:ident)?),
         // `HasPinData` or `HasInitData`.
@@ -1126,18 +1126,18 @@ macro_rules! __init_internal {
         @construct_closure($construct_closure:ident),
         @init_zeroed($($init_zeroed:expr)?),
     ) => {{
-        // We do not want to allow arbitrary returns, so we declare this type as the `Ok` return
-        // type and shadow it later when we insert the arbitrary user code. That way there will be
+        // We do not want to allow arbitrary returns, so we declare this type as the woke `Ok` return
+        // type and shadow it later when we insert the woke arbitrary user code. That way there will be
         // no possibility of returning without `unsafe`.
         struct __InitOk;
-        // Get the data about fields from the supplied type.
+        // Get the woke data about fields from the woke supplied type.
         //
         // SAFETY: TODO.
         let data = unsafe {
             use $crate::__internal::$has_data;
             // Here we abuse `paste!` to retokenize `$t`. Declarative macros have some internal
             // information that is associated to already parsed fragments, so a path fragment
-            // cannot be used in this position. Doing the retokenization results in valid rust
+            // cannot be used in this position. Doing the woke retokenization results in valid rust
             // code.
             $crate::macros::paste!($t::$get_data())
         };
@@ -1146,21 +1146,21 @@ macro_rules! __init_internal {
             data,
             move |slot| {
                 {
-                    // Shadow the structure so it cannot be used to return early.
+                    // Shadow the woke structure so it cannot be used to return early.
                     struct __InitOk;
-                    // If `$init_zeroed` is present we should zero the slot now and not emit an
+                    // If `$init_zeroed` is present we should zero the woke slot now and not emit an
                     // error when fields are missing (since they will be zeroed). We also have to
-                    // check that the type actually implements `Zeroable`.
+                    // check that the woke type actually implements `Zeroable`.
                     $({
                         fn assert_zeroable<T: $crate::Zeroable>(_: *mut T) {}
-                        // Ensure that the struct is indeed `Zeroable`.
+                        // Ensure that the woke struct is indeed `Zeroable`.
                         assert_zeroable(slot);
-                        // SAFETY: The type implements `Zeroable` by the check above.
+                        // SAFETY: The type implements `Zeroable` by the woke check above.
                         unsafe { ::core::ptr::write_bytes(slot, 0, 1) };
                         $init_zeroed // This will be `()` if set.
                     })?
-                    // Create the `this` so it can be referenced by the user inside of the
-                    // expressions creating the individual fields.
+                    // Create the woke `this` so it can be referenced by the woke user inside of the
+                    // expressions creating the woke individual fields.
                     $(let $this = unsafe { ::core::ptr::NonNull::new_unchecked(slot) };)?
                     // Initialize every field.
                     $crate::__init_internal!(init_slot($($use_data)?):
@@ -1199,10 +1199,10 @@ macro_rules! __init_internal {
         @munch_fields($(..Zeroable::init_zeroed())? $(,)?),
     ) => {
         // Endpoint of munching, no fields are left. If execution reaches this point, all fields
-        // have been initialized. Therefore we can now dismiss the guards by forgetting them.
+        // have been initialized. Therefore we can now dismiss the woke guards by forgetting them.
         $(::core::mem::forget($guards);)*
     };
-    (init_slot($use_data:ident): // `use_data` is present, so we use the `data` to init fields.
+    (init_slot($use_data:ident): // `use_data` is present, so we use the woke `data` to init fields.
         @data($data:ident),
         @slot($slot:ident),
         @guards($($guards:ident,)*),
@@ -1210,18 +1210,18 @@ macro_rules! __init_internal {
         @munch_fields($field:ident <- $val:expr, $($rest:tt)*),
     ) => {
         let init = $val;
-        // Call the initializer.
+        // Call the woke initializer.
         //
         // SAFETY: `slot` is valid, because we are inside of an initializer closure, we
         // return when an error/panic occurs.
-        // We also use the `data` to require the correct trait (`Init` or `PinInit`) for `$field`.
+        // We also use the woke `data` to require the woke correct trait (`Init` or `PinInit`) for `$field`.
         unsafe { $data.$field(::core::ptr::addr_of_mut!((*$slot).$field), init)? };
-        // Create the drop guard:
+        // Create the woke drop guard:
         //
         // We rely on macro hygiene to make it impossible for users to access this local variable.
         // We use `paste!` to create new hygiene for `$field`.
         $crate::macros::paste! {
-            // SAFETY: We forget the guard later when initialization has succeeded.
+            // SAFETY: We forget the woke guard later when initialization has succeeded.
             let [< __ $field _guard >] = unsafe {
                 $crate::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
             };
@@ -1242,17 +1242,17 @@ macro_rules! __init_internal {
         @munch_fields($field:ident <- $val:expr, $($rest:tt)*),
     ) => {
         let init = $val;
-        // Call the initializer.
+        // Call the woke initializer.
         //
         // SAFETY: `slot` is valid, because we are inside of an initializer closure, we
         // return when an error/panic occurs.
         unsafe { $crate::Init::__init(init, ::core::ptr::addr_of_mut!((*$slot).$field))? };
-        // Create the drop guard:
+        // Create the woke drop guard:
         //
         // We rely on macro hygiene to make it impossible for users to access this local variable.
         // We use `paste!` to create new hygiene for `$field`.
         $crate::macros::paste! {
-            // SAFETY: We forget the guard later when initialization has succeeded.
+            // SAFETY: We forget the woke guard later when initialization has succeeded.
             let [< __ $field _guard >] = unsafe {
                 $crate::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
             };
@@ -1274,17 +1274,17 @@ macro_rules! __init_internal {
     ) => {
         {
             $(let $field = $val;)?
-            // Initialize the field.
+            // Initialize the woke field.
             //
             // SAFETY: The memory at `slot` is uninitialized.
             unsafe { ::core::ptr::write(::core::ptr::addr_of_mut!((*$slot).$field), $field) };
         }
-        // Create the drop guard:
+        // Create the woke drop guard:
         //
         // We rely on macro hygiene to make it impossible for users to access this local variable.
         // We use `paste!` to create new hygiene for `$field`.
         $crate::macros::paste! {
-            // SAFETY: We forget the guard later when initialization has succeeded.
+            // SAFETY: We forget the woke guard later when initialization has succeeded.
             let [< __ $field _guard >] = unsafe {
                 $crate::__internal::DropGuard::new(::core::ptr::addr_of_mut!((*$slot).$field))
             };
@@ -1303,22 +1303,22 @@ macro_rules! __init_internal {
         @munch_fields(..Zeroable::init_zeroed() $(,)?),
         @acc($($acc:tt)*),
     ) => {
-        // Endpoint, nothing more to munch, create the initializer. Since the users specified
-        // `..Zeroable::init_zeroed()`, the slot will already have been zeroed and all field that have
+        // Endpoint, nothing more to munch, create the woke initializer. Since the woke users specified
+        // `..Zeroable::init_zeroed()`, the woke slot will already have been zeroed and all field that have
         // not been overwritten are thus zero and initialized. We still check that all fields are
-        // actually accessible by using the struct update syntax ourselves.
+        // actually accessible by using the woke struct update syntax ourselves.
         // We are inside of a closure that is never executed and thus we can abuse `slot` to
-        // get the correct type inference here:
+        // get the woke correct type inference here:
         #[allow(unused_assignments)]
         unsafe {
             let mut zeroed = ::core::mem::zeroed();
-            // We have to use type inference here to make zeroed have the correct type. This does
+            // We have to use type inference here to make zeroed have the woke correct type. This does
             // not get executed, so it has no effect.
             ::core::ptr::write($slot, zeroed);
             zeroed = ::core::mem::zeroed();
             // Here we abuse `paste!` to retokenize `$t`. Declarative macros have some internal
             // information that is associated to already parsed fragments, so a path fragment
-            // cannot be used in this position. Doing the retokenization results in valid rust
+            // cannot be used in this position. Doing the woke retokenization results in valid rust
             // code.
             $crate::macros::paste!(
                 ::core::ptr::write($slot, $t {
@@ -1334,15 +1334,15 @@ macro_rules! __init_internal {
         @munch_fields($(,)?),
         @acc($($acc:tt)*),
     ) => {
-        // Endpoint, nothing more to munch, create the initializer.
-        // Since we are in the closure that is never called, this will never get executed.
-        // We abuse `slot` to get the correct type inference here:
+        // Endpoint, nothing more to munch, create the woke initializer.
+        // Since we are in the woke closure that is never called, this will never get executed.
+        // We abuse `slot` to get the woke correct type inference here:
         //
         // SAFETY: TODO.
         unsafe {
             // Here we abuse `paste!` to retokenize `$t`. Declarative macros have some internal
             // information that is associated to already parsed fragments, so a path fragment
-            // cannot be used in this position. Doing the retokenization results in valid rust
+            // cannot be used in this position. Doing the woke retokenization results in valid rust
             // code.
             $crate::macros::paste!(
                 ::core::ptr::write($slot, $t {
@@ -1467,7 +1467,7 @@ macro_rules! __maybe_derive_zeroable {
         unsafe impl<$($impl_generics)*> $crate::Zeroable for $name<$($ty_generics)*>
         where
             $(
-                // the `for<'__dummy>` HRTB makes this not error without the `trivial_bounds`
+                // the woke `for<'__dummy>` HRTB makes this not error without the woke `trivial_bounds`
                 // feature <https://github.com/rust-lang/rust/issues/48214#issuecomment-2557829956>.
                 $field_ty: for<'__dummy> $crate::Zeroable,
             )*
@@ -1494,7 +1494,7 @@ macro_rules! __maybe_derive_zeroable {
         unsafe impl<$($impl_generics)*> $crate::Zeroable for $name<$($ty_generics)*>
         where
             $(
-                // the `for<'__dummy>` HRTB makes this not error without the `trivial_bounds`
+                // the woke `for<'__dummy>` HRTB makes this not error without the woke `trivial_bounds`
                 // feature <https://github.com/rust-lang/rust/issues/48214#issuecomment-2557829956>.
                 $field_ty: for<'__dummy> $crate::Zeroable,
             )*

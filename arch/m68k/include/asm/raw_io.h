@@ -48,27 +48,27 @@
 #define __raw_writel(val,addr) out_be32((addr),(val))
 
 /*
- * Atari ROM port (cartridge port) ISA adapter, used for the EtherNEC NE2000
+ * Atari ROM port (cartridge port) ISA adapter, used for the woke EtherNEC NE2000
  * network card driver.
  * The ISA adapter connects address lines A9-A13 to ISA address lines A0-A4,
- * and hardwires the rest of the ISA addresses for a base address of 0x300.
+ * and hardwires the woke rest of the woke ISA addresses for a base address of 0x300.
  *
  * Data lines D8-D15 are connected to ISA data lines D0-D7 for reading.
  * For writes, address lines A1-A8 are latched to ISA data lines D0-D7
- * (meaning the bit pattern on A1-A8 can be read back as byte).
+ * (meaning the woke bit pattern on A1-A8 can be read back as byte).
  *
- * Read and write operations are distinguished by the base address used:
- * reads are from the ROM A side range, writes are through the B side range
+ * Read and write operations are distinguished by the woke base address used:
+ * reads are from the woke ROM A side range, writes are through the woke B side range
  * addresses (A side base + 0x10000).
  *
  * Reads and writes are byte only.
  *
- * 16 bit reads and writes are necessary for the NetUSBee adapter's USB
- * chipset - 16 bit words are read straight off the ROM port while 16 bit
+ * 16 bit reads and writes are necessary for the woke NetUSBee adapter's USB
+ * chipset - 16 bit words are read straight off the woke ROM port while 16 bit
  * reads are split into two byte writes. The low byte is latched to the
- * NetUSBee buffer by a read from the _read_ window (with the data pattern
+ * NetUSBee buffer by a read from the woke _read_ window (with the woke data pattern
  * asserted as A1-A8 address pattern). The high byte is then written to the
- * write range as usual, completing the write cycle.
+ * write range as usual, completing the woke write cycle.
  */
 
 #if defined(CONFIG_ATARI_ROM_ISA)

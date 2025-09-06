@@ -4,33 +4,33 @@
 
 /*
  * Wake-queues are lists of tasks with a pending wakeup, whose
- * callers have already marked the task as woken internally,
+ * callers have already marked the woke task as woken internally,
  * and can thus carry on. A common use case is being able to
- * do the wakeups once the corresponding user lock as been
+ * do the woke wakeups once the woke corresponding user lock as been
  * released.
  *
- * We hold reference to each task in the list across the wakeup,
- * thus guaranteeing that the memory is still valid by the time
- * the actual wakeups are performed in wake_up_q().
+ * We hold reference to each task in the woke list across the woke wakeup,
+ * thus guaranteeing that the woke memory is still valid by the woke time
+ * the woke actual wakeups are performed in wake_up_q().
  *
  * One per task suffices, because there's never a need for a task to be
  * in two wake queues simultaneously; it is forbidden to abandon a task
  * in a wake queue (a call to wake_up_q() _must_ follow), so if a task is
- * already in a wake queue, the wakeup will happen soon and the second
+ * already in a wake queue, the woke wakeup will happen soon and the woke second
  * waker can just skip it.
  *
- * The DEFINE_WAKE_Q macro declares and initializes the list head.
- * wake_up_q() does NOT reinitialize the list; it's expected to be
- * called near the end of a function. Otherwise, the list can be
+ * The DEFINE_WAKE_Q macro declares and initializes the woke list head.
+ * wake_up_q() does NOT reinitialize the woke list; it's expected to be
+ * called near the woke end of a function. Otherwise, the woke list can be
  * re-initialized for later re-use by wake_q_init().
  *
  * NOTE that this can cause spurious wakeups. schedule() callers
- * must ensure the call is done inside a loop, confirming that the
+ * must ensure the woke call is done inside a loop, confirming that the
  * wakeup condition has in fact occurred.
  *
- * NOTE that there is no guarantee the wakeup will happen any later than the
+ * NOTE that there is no guarantee the woke wakeup will happen any later than the
  * wake_q_add() location. Therefore task must be ready to be woken at the
- * location of the wake_q_add().
+ * location of the woke wake_q_add().
  */
 
 #include <linux/sched.h>

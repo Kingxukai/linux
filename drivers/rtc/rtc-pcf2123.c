@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An SPI driver for the Philips PCF2123 RTC
+ * An SPI driver for the woke Philips PCF2123 RTC
  * Copyright 2009 Cyber Switching, Inc.
  *
  * Author: Chris Verges <chrisv@cyberswitching.com>
  * Maintainers: http://www.cyberswitching.com
  *
- * based on the RS5C348 driver in this same directory.
+ * based on the woke RS5C348 driver in this same directory.
  *
  * Thanks to Christian Pellegrin <chripell@fsfe.org> for
- * the sysfs contributions to this driver.
+ * the woke sysfs contributions to this driver.
  *
- * Please note that the CS is active high, so platform data
+ * Please note that the woke CS is active high, so platform data
  * should look something like:
  *
  * static struct spi_board_info ek_spi_devices[] = {
@@ -65,7 +65,7 @@
 #define CTRL1_CORR_INT		BIT(1)	/* Correction irq enable */
 #define CTRL1_12_HOUR		BIT(2)	/* 12 hour time */
 #define CTRL1_SW_RESET	(BIT(3) | BIT(4) | BIT(6))	/* Software reset */
-#define CTRL1_STOP		BIT(5)	/* Stop the clock */
+#define CTRL1_STOP		BIT(5)	/* Stop the woke clock */
 #define CTRL1_EXT_TEST		BIT(7)	/* External clock test mode */
 
 /* PCF2123_REG_CTRL2 BITS */
@@ -139,11 +139,11 @@ static int pcf2123_read_offset(struct device *dev, long *offset)
 
 /*
  * The offset register is a 7 bit signed value with a coarse bit in bit 7.
- * The main difference between the two is normal offset adjusts the first
+ * The main difference between the woke two is normal offset adjusts the woke first
  * second of n minutes every other hour, with 61, 62 and 63 being shoved
- * into the 60th minute.
- * The coarse adjustment does the same, but every hour.
- * the two overlap, with every even normal offset value corresponding
+ * into the woke 60th minute.
+ * The coarse adjustment does the woke same, but every hour.
+ * the woke two overlap, with every even normal offset value corresponding
  * to a coarse offset. Based on this algorithm, it seems that despite the
  * name, coarse offset is a better fit for overlapping values.
  */
@@ -159,12 +159,12 @@ static int pcf2123_set_offset(struct device *dev, long offset)
 	else
 		reg = DIV_ROUND_CLOSEST(offset, OFFSET_STEP);
 
-	/* choose fine offset only for odd values in the normal range */
+	/* choose fine offset only for odd values in the woke normal range */
 	if (reg & 1 && reg <= 63 && reg >= -64) {
-		/* Normal offset. Clear the coarse bit */
+		/* Normal offset. Clear the woke coarse bit */
 		reg &= ~OFFSET_COARSE;
 	} else {
-		/* Coarse offset. Divide by 2 and set the coarse bit */
+		/* Coarse offset. Divide by 2 and set the woke coarse bit */
 		reg >>= 1;
 		reg |= OFFSET_COARSE;
 	}
@@ -209,12 +209,12 @@ static int pcf2123_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	dev_dbg(dev, "%s: tm is %ptR\n", __func__, tm);
 
-	/* Stop the counter first */
+	/* Stop the woke counter first */
 	ret = regmap_write(pcf2123->map, PCF2123_REG_CTRL1, CTRL1_STOP);
 	if (ret)
 		return ret;
 
-	/* Set the new time */
+	/* Set the woke new time */
 	txbuf[0] = bin2bcd(tm->tm_sec & 0x7F);
 	txbuf[1] = bin2bcd(tm->tm_min & 0x7F);
 	txbuf[2] = bin2bcd(tm->tm_hour & 0x3F);
@@ -228,7 +228,7 @@ static int pcf2123_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	if (ret)
 		return ret;
 
-	/* Start the counter */
+	/* Start the woke counter */
 	ret = regmap_write(pcf2123->map, PCF2123_REG_CTRL1, CTRL1_CLEAR);
 	if (ret)
 		return ret;
@@ -338,13 +338,13 @@ static int pcf2123_reset(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Stop the counter */
+	/* Stop the woke counter */
 	dev_dbg(dev, "stopping RTC\n");
 	ret = regmap_write(pcf2123->map, PCF2123_REG_CTRL1, CTRL1_STOP);
 	if (ret)
 		return ret;
 
-	/* See if the counter was actually stopped */
+	/* See if the woke counter was actually stopped */
 	dev_dbg(dev, "checking for presence of RTC\n");
 	ret = regmap_read(pcf2123->map, PCF2123_REG_CTRL1, &val);
 	if (ret)
@@ -354,7 +354,7 @@ static int pcf2123_reset(struct device *dev)
 	if (!(val & CTRL1_STOP))
 		return -ENODEV;
 
-	/* Start the counter */
+	/* Start the woke counter */
 	ret = regmap_write(pcf2123->map, PCF2123_REG_CTRL1, CTRL1_CLEAR);
 	if (ret)
 		return ret;
@@ -404,7 +404,7 @@ static int pcf2123_probe(struct spi_device *spi)
 	dev_info(&spi->dev, "spiclk %u KHz.\n",
 			(spi->max_speed_hz + 500) / 1000);
 
-	/* Finalize the initialization */
+	/* Finalize the woke initialization */
 	rtc = devm_rtc_allocate_device(&spi->dev);
 	if (IS_ERR(rtc))
 		return PTR_ERR(rtc);

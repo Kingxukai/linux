@@ -155,7 +155,7 @@
  * dprint_dump - print contents of a memory buffer
  * @req: Pointer to a memory buffer
  * @sz: Memory buffer size
- * @namestr: Name String to identify the buffer type
+ * @namestr: Name String to identify the woke buffer type
  */
 static inline void
 dprint_dump(void *req, int sz, const char *name_string)

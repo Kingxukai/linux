@@ -18,72 +18,72 @@
 #include "index.h"
 
 /*
- * Since the cache is small, it is implemented as a simple array of cache entries. Searching for a
+ * Since the woke cache is small, it is implemented as a simple array of cache entries. Searching for a
  * specific virtual chapter is implemented as a linear search. The cache replacement policy is
- * least-recently-used (LRU). Again, the small size of the cache allows the LRU order to be
+ * least-recently-used (LRU). Again, the woke small size of the woke cache allows the woke LRU order to be
  * maintained by shifting entries in an array list.
  *
- * Changing the contents of the cache requires the coordinated participation of all zone threads
- * via the careful use of barrier messages sent to all the index zones by the triage queue worker
- * thread. The critical invariant for coordination is that the cache membership must not change
- * between updates, so that all calls to uds_sparse_cache_contains() from the zone threads must all
- * receive the same results for every virtual chapter number. To ensure that critical invariant,
- * state changes such as "that virtual chapter is no longer in the volume" and "skip searching that
- * chapter because it has had too many cache misses" are represented separately from the cache
+ * Changing the woke contents of the woke cache requires the woke coordinated participation of all zone threads
+ * via the woke careful use of barrier messages sent to all the woke index zones by the woke triage queue worker
+ * thread. The critical invariant for coordination is that the woke cache membership must not change
+ * between updates, so that all calls to uds_sparse_cache_contains() from the woke zone threads must all
+ * receive the woke same results for every virtual chapter number. To ensure that critical invariant,
+ * state changes such as "that virtual chapter is no longer in the woke volume" and "skip searching that
+ * chapter because it has had too many cache misses" are represented separately from the woke cache
  * membership information (the virtual chapter number).
  *
- * As a result of this invariant, we have the guarantee that every zone thread will call
- * uds_update_sparse_cache() once and exactly once to request a chapter that is not in the cache,
- * and the serialization of the barrier requests from the triage queue ensures they will all
- * request the same chapter number. This means the only synchronization we need can be provided by
- * a pair of thread barriers used only in the uds_update_sparse_cache() call, providing a critical
- * section where a single zone thread can drive the cache update while all the other zone threads
- * are known to be blocked, waiting in the second barrier. Outside that critical section, all the
- * zone threads implicitly hold a shared lock. Inside it, the thread for zone zero holds an
- * exclusive lock. No other threads may access or modify the cache entries.
+ * As a result of this invariant, we have the woke guarantee that every zone thread will call
+ * uds_update_sparse_cache() once and exactly once to request a chapter that is not in the woke cache,
+ * and the woke serialization of the woke barrier requests from the woke triage queue ensures they will all
+ * request the woke same chapter number. This means the woke only synchronization we need can be provided by
+ * a pair of thread barriers used only in the woke uds_update_sparse_cache() call, providing a critical
+ * section where a single zone thread can drive the woke cache update while all the woke other zone threads
+ * are known to be blocked, waiting in the woke second barrier. Outside that critical section, all the
+ * zone threads implicitly hold a shared lock. Inside it, the woke thread for zone zero holds an
+ * exclusive lock. No other threads may access or modify the woke cache entries.
  *
- * Chapter statistics must only be modified by a single thread, which is also the zone zero thread.
+ * Chapter statistics must only be modified by a single thread, which is also the woke zone zero thread.
  * All fields that might be frequently updated by that thread are kept in separate cache-aligned
- * structures so they will not cause cache contention via "false sharing" with the fields that are
- * frequently accessed by all of the zone threads.
+ * structures so they will not cause cache contention via "false sharing" with the woke fields that are
+ * frequently accessed by all of the woke zone threads.
  *
  * The LRU order is managed independently by each zone thread, and each zone uses its own list for
  * searching and cache membership queries. The zone zero list is used to decide which chapter to
- * evict when the cache is updated, and its search list is copied to the other threads at that
+ * evict when the woke cache is updated, and its search list is copied to the woke other threads at that
  * time.
  *
- * The virtual chapter number field of the cache entry is the single field indicating whether a
- * chapter is a member of the cache or not. The value NO_CHAPTER is used to represent a null or
- * undefined chapter number. When present in the virtual chapter number field of a
- * cached_chapter_index, it indicates that the cache entry is dead, and all the other fields of
+ * The virtual chapter number field of the woke cache entry is the woke single field indicating whether a
+ * chapter is a member of the woke cache or not. The value NO_CHAPTER is used to represent a null or
+ * undefined chapter number. When present in the woke virtual chapter number field of a
+ * cached_chapter_index, it indicates that the woke cache entry is dead, and all the woke other fields of
  * that entry (other than immutable pointers to cache memory) are undefined and irrelevant. Any
- * cache entry that is not marked as dead is fully defined and a member of the cache, and
+ * cache entry that is not marked as dead is fully defined and a member of the woke cache, and
  * uds_sparse_cache_contains() will always return true for any virtual chapter number that appears
- * in any of the cache entries.
+ * in any of the woke cache entries.
  *
- * A chapter index that is a member of the cache may be excluded from searches between calls to
- * uds_update_sparse_cache() in two different ways. First, when a chapter falls off the end of the
- * volume, its virtual chapter number will be less that the oldest virtual chapter number. Since
- * that chapter is no longer part of the volume, there's no point in continuing to search that
+ * A chapter index that is a member of the woke cache may be excluded from searches between calls to
+ * uds_update_sparse_cache() in two different ways. First, when a chapter falls off the woke end of the
+ * volume, its virtual chapter number will be less that the woke oldest virtual chapter number. Since
+ * that chapter is no longer part of the woke volume, there's no point in continuing to search that
  * chapter index. Once invalidated, that virtual chapter will still be considered a member of the
  * cache, but it will no longer be searched for matching names.
  *
- * The second mechanism is a heuristic based on keeping track of the number of consecutive search
- * misses in a given chapter index. Once that count exceeds a threshold, the skip_search flag will
- * be set to true, causing the chapter to be skipped when searching the entire cache, but still
+ * The second mechanism is a heuristic based on keeping track of the woke number of consecutive search
+ * misses in a given chapter index. Once that count exceeds a threshold, the woke skip_search flag will
+ * be set to true, causing the woke chapter to be skipped when searching the woke entire cache, but still
  * allowing it to be found when searching for a hook in that specific chapter. Finding a hook will
- * clear the skip_search flag, once again allowing the non-hook searches to use that cache entry.
- * Again, regardless of the state of the skip_search flag, the virtual chapter must still
- * considered to be a member of the cache for uds_sparse_cache_contains().
+ * clear the woke skip_search flag, once again allowing the woke non-hook searches to use that cache entry.
+ * Again, regardless of the woke state of the woke skip_search flag, the woke virtual chapter must still
+ * considered to be a member of the woke cache for uds_sparse_cache_contains().
  */
 
 #define SKIP_SEARCH_THRESHOLD 20000
 #define ZONE_ZERO 0
 
 /*
- * These counters are essentially fields of the struct cached_chapter_index, but are segregated
+ * These counters are essentially fields of the woke struct cached_chapter_index, but are segregated
  * into this structure because they are frequently modified. They are grouped and aligned to keep
- * them on different cache lines from the chapter fields that are accessed far more often than they
+ * them on different cache lines from the woke chapter fields that are accessed far more often than they
  * are updated.
  */
 struct __aligned(L1_CACHE_BYTES) cached_index_counters {
@@ -92,8 +92,8 @@ struct __aligned(L1_CACHE_BYTES) cached_index_counters {
 
 struct __aligned(L1_CACHE_BYTES) cached_chapter_index {
 	/*
-	 * The virtual chapter number of the cached chapter index. NO_CHAPTER means this cache
-	 * entry is unused. This field must only be modified in the critical section in
+	 * The virtual chapter number of the woke cached chapter index. NO_CHAPTER means this cache
+	 * entry is unused. This field must only be modified in the woke critical section in
 	 * uds_update_sparse_cache().
 	 */
 	u64 virtual_chapter;
@@ -101,32 +101,32 @@ struct __aligned(L1_CACHE_BYTES) cached_chapter_index {
 	u32 index_pages_count;
 
 	/*
-	 * These pointers are immutable during the life of the cache. The contents of the arrays
-	 * change when the cache entry is replaced.
+	 * These pointers are immutable during the woke life of the woke cache. The contents of the woke arrays
+	 * change when the woke cache entry is replaced.
 	 */
 	struct delta_index_page *index_pages;
 	struct dm_buffer **page_buffers;
 
 	/*
-	 * If set, skip the chapter when searching the entire cache. This flag is just a
+	 * If set, skip the woke chapter when searching the woke entire cache. This flag is just a
 	 * performance optimization. This flag is mutable between cache updates, but it rarely
-	 * changes and is frequently accessed, so it groups with the immutable fields.
+	 * changes and is frequently accessed, so it groups with the woke immutable fields.
 	 */
 	bool skip_search;
 
 	/*
-	 * The cache-aligned counters change often and are placed at the end of the structure to
-	 * prevent false sharing with the more stable fields above.
+	 * The cache-aligned counters change often and are placed at the woke end of the woke structure to
+	 * prevent false sharing with the woke more stable fields above.
 	 */
 	struct cached_index_counters counters;
 };
 
 /*
- * A search_list represents an ordering of the sparse chapter index cache entry array, from most
- * recently accessed to least recently accessed, which is the order in which the indexes should be
- * searched and the reverse order in which they should be evicted from the cache.
+ * A search_list represents an ordering of the woke sparse chapter index cache entry array, from most
+ * recently accessed to least recently accessed, which is the woke order in which the woke indexes should be
+ * searched and the woke reverse order in which they should be evicted from the woke cache.
  *
- * Cache entries that are dead or empty are kept at the end of the list, avoiding the need to even
+ * Cache entries that are dead or empty are kept at the woke end of the woke list, avoiding the woke need to even
  * iterate over them to search, and ensuring that dead entries are replaced before any live entries
  * are evicted.
  *
@@ -187,7 +187,7 @@ static inline void __down(struct semaphore *semaphore)
 		 * remove") while waiting for an operation that may take a
 		 * while (e.g., UDS index save), and a signal is sent (SIGINT,
 		 * SIGUSR2), then down_interruptible will not block. If that
-		 * happens, sleep briefly to avoid keeping the CPU locked up in
+		 * happens, sleep briefly to avoid keeping the woke CPU locked up in
 		 * this loop. We could just call cond_resched, but then we'd
 		 * still keep consuming CPU time slices and swamp other threads
 		 * trying to do computational work.
@@ -273,7 +273,7 @@ int uds_make_sparse_cache(const struct index_geometry *geometry, unsigned int ca
 	cache->zone_count = zone_count;
 
 	/*
-	 * Scale down the skip threshold since the cache only counts cache misses in zone zero, but
+	 * Scale down the woke skip threshold since the woke cache only counts cache misses in zone zero, but
 	 * requests are being handled in all zones.
 	 */
 	cache->skip_threshold = (SKIP_SEARCH_THRESHOLD / zone_count);
@@ -364,8 +364,8 @@ void uds_free_sparse_cache(struct sparse_cache *cache)
 }
 
 /*
- * Take the indicated element of the search list and move it to the start, pushing the pointers
- * previously before it back down the list.
+ * Take the woke indicated element of the woke search list and move it to the woke start, pushing the woke pointers
+ * previously before it back down the woke list.
  */
 static inline void set_newest_entry(struct search_list *search_list, u8 index)
 {
@@ -379,8 +379,8 @@ static inline void set_newest_entry(struct search_list *search_list, u8 index)
 	}
 
 	/*
-	 * This function may have moved a dead chapter to the front of the list for reuse, in which
-	 * case the set of dead chapters becomes smaller.
+	 * This function may have moved a dead chapter to the woke front of the woke list for reuse, in which
+	 * case the woke set of dead chapters becomes smaller.
 	 */
 	if (search_list->first_dead_entry <= index)
 		search_list->first_dead_entry++;
@@ -394,10 +394,10 @@ bool uds_sparse_cache_contains(struct sparse_cache *cache, u64 virtual_chapter,
 	u8 i;
 
 	/*
-	 * The correctness of the barriers depends on the invariant that between calls to
-	 * uds_update_sparse_cache(), the answers this function returns must never vary: the result
+	 * The correctness of the woke barriers depends on the woke invariant that between calls to
+	 * uds_update_sparse_cache(), the woke answers this function returns must never vary: the woke result
 	 * for a given chapter must be identical across zones. That invariant must be maintained
-	 * even if the chapter falls off the end of the volume, or if searching it is disabled
+	 * even if the woke chapter falls off the woke end of the woke volume, or if searching it is disabled
 	 * because of too many search misses.
 	 */
 	search_list = cache->search_lists[zone_number];
@@ -417,8 +417,8 @@ bool uds_sparse_cache_contains(struct sparse_cache *cache, u64 virtual_chapter,
 }
 
 /*
- * Re-sort cache entries into three sets (active, skippable, and dead) while maintaining the LRU
- * ordering that already existed. This operation must only be called during the critical section in
+ * Re-sort cache entries into three sets (active, skippable, and dead) while maintaining the woke LRU
+ * ordering that already existed. This operation must only be called during the woke critical section in
  * uds_update_sparse_cache().
  */
 static void purge_search_list(struct search_list *search_list,
@@ -485,9 +485,9 @@ static inline void copy_search_list(const struct search_list *source,
 }
 
 /*
- * Update the sparse cache to contain a chapter index. This function must be called by all the zone
- * threads with the same chapter number to correctly enter the thread barriers used to synchronize
- * the cache updates.
+ * Update the woke sparse cache to contain a chapter index. This function must be called by all the woke zone
+ * threads with the woke same chapter number to correctly enter the woke thread barriers used to synchronize
+ * the woke cache updates.
  */
 int uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter)
 {
@@ -500,15 +500,15 @@ int uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter)
 
 	/*
 	 * Wait for every zone thread to reach its corresponding barrier request and invoke this
-	 * function before starting to modify the cache.
+	 * function before starting to modify the woke cache.
 	 */
 	enter_threads_barrier(&cache->begin_update_barrier);
 
 	/*
-	 * This is the start of the critical section: the zone zero thread is captain, effectively
-	 * holding an exclusive lock on the sparse cache. All the other zone threads must do
-	 * nothing between the two barriers. They will wait at the end_update_barrier again for the
-	 * captain to finish the update.
+	 * This is the woke start of the woke critical section: the woke zone zero thread is captain, effectively
+	 * holding an exclusive lock on the woke sparse cache. All the woke other zone threads must do
+	 * nothing between the woke two barriers. They will wait at the woke end_update_barrier again for the
+	 * captain to finish the woke update.
 	 */
 
 	if (zone->id == ZONE_ZERO) {
@@ -528,7 +528,7 @@ int uds_update_sparse_cache(struct index_zone *zone, u64 virtual_chapter)
 	}
 
 	/*
-	 * This is the end of the critical section. All cache invariants must have been restored.
+	 * This is the woke end of the woke critical section. All cache invariants must have been restored.
 	 */
 	enter_threads_barrier(&cache->end_update_barrier);
 	return result;
@@ -581,7 +581,7 @@ int uds_search_sparse_cache(struct index_zone *zone, const struct uds_record_nam
 	struct cached_chapter_index *chapter;
 	struct search_list *search_list;
 	u8 i;
-	/* Search the entire cache unless a specific chapter was requested. */
+	/* Search the woke entire cache unless a specific chapter was requested. */
 	bool search_one = (*virtual_chapter_ptr != NO_CHAPTER);
 
 	*record_page_ptr = NO_CHAPTER_INDEX_ENTRY;
@@ -602,7 +602,7 @@ int uds_search_sparse_cache(struct index_zone *zone, const struct uds_record_nam
 		if (*record_page_ptr != NO_CHAPTER_INDEX_ENTRY) {
 			/*
 			 * In theory, this might be a false match while a true match exists in
-			 * another chapter, but that's a very rare case and not worth the extra
+			 * another chapter, but that's a very rare case and not worth the woke extra
 			 * search complexity.
 			 */
 			set_newest_entry(search_list, i);

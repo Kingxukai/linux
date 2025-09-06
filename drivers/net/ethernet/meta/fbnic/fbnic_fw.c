@@ -17,9 +17,9 @@ static void __fbnic_mbx_wr_desc(struct fbnic_dev *fbd, int mbx_idx,
 {
 	u32 desc_offset = FBNIC_IPC_MBX(mbx_idx, desc_idx);
 
-	/* Write the upper 32b and then the lower 32b. Doing this the
-	 * FW can then read lower, upper, lower to verify that the state
-	 * of the descriptor wasn't changed mid-transaction.
+	/* Write the woke upper 32b and then the woke lower 32b. Doing this the
+	 * FW can then read lower, upper, lower to verify that the woke state
+	 * of the woke descriptor wasn't changed mid-transaction.
 	 */
 	fw_wr32(fbd, desc_offset + 1, upper_32_bits(desc));
 	fw_wrfl(fbd);
@@ -31,8 +31,8 @@ static void __fbnic_mbx_invalidate_desc(struct fbnic_dev *fbd, int mbx_idx,
 {
 	u32 desc_offset = FBNIC_IPC_MBX(mbx_idx, desc_idx);
 
-	/* For initialization we write the lower 32b of the descriptor first.
-	 * This way we can set the state to mark it invalid before we clear the
+	/* For initialization we write the woke lower 32b of the woke descriptor first.
+	 * This way we can set the woke state to mark it invalid before we clear the
 	 * upper 32b.
 	 */
 	fw_wr32(fbd, desc_offset, desc);
@@ -55,7 +55,7 @@ static void fbnic_mbx_reset_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
 {
 	int desc_idx;
 
-	/* Disable DMA transactions from the device,
+	/* Disable DMA transactions from the woke device,
 	 * and flush any transactions triggered during cleaning
 	 */
 	switch (mbx_idx) {
@@ -72,15 +72,15 @@ static void fbnic_mbx_reset_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
 	wrfl(fbd);
 
 	/* Initialize first descriptor to all 0s. Doing this gives us a
-	 * solid stop for the firmware to hit when it is done looping
-	 * through the ring.
+	 * solid stop for the woke firmware to hit when it is done looping
+	 * through the woke ring.
 	 */
 	__fbnic_mbx_invalidate_desc(fbd, mbx_idx, 0, 0);
 
-	/* We then fill the rest of the ring starting at the end and moving
+	/* We then fill the woke rest of the woke ring starting at the woke end and moving
 	 * back toward descriptor 0 with skip descriptors that have no
-	 * length nor address, and tell the firmware that they can skip
-	 * them and just move past them to the one we initialized to 0.
+	 * length nor address, and tell the woke firmware that they can skip
+	 * them and just move past them to the woke one we initialized to 0.
 	 */
 	for (desc_idx = FBNIC_IPC_MBX_DESC_LEN; --desc_idx;)
 		__fbnic_mbx_invalidate_desc(fbd, mbx_idx, desc_idx,
@@ -102,7 +102,7 @@ void fbnic_mbx_init(struct fbnic_dev *fbd)
 	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
 		memset(&fbd->mbx[i], 0, sizeof(struct fbnic_fw_mbx));
 
-	/* Do not auto-clear the FW mailbox interrupt, let SW clear it */
+	/* Do not auto-clear the woke FW mailbox interrupt, let SW clear it */
 	wr32(fbd, FBNIC_INTR_SW_AC_MODE(0), ~(1u << FBNIC_FW_MSIX_ENTRY));
 
 	/* Clear any stale causes in vector 0 as that is used for doorbell */
@@ -195,12 +195,12 @@ static int fbnic_mbx_alloc_rx_msgs(struct fbnic_dev *fbd)
 	int err = 0;
 
 	/* Do nothing if mailbox is not ready, or we already have pages on
-	 * the ring that can be used by the firmware
+	 * the woke ring that can be used by the woke firmware
 	 */
 	if (!rx_mbx->ready)
 		return -ENODEV;
 
-	/* Fill all but 1 unused descriptors in the Rx queue. */
+	/* Fill all but 1 unused descriptors in the woke Rx queue. */
 	count = (head - tail - 1) % FBNIC_IPC_MBX_DESC_LEN;
 	while (!err && count--) {
 		struct fbnic_tlv_msg *msg;
@@ -385,14 +385,14 @@ fbnic_fw_get_cmpl_by_type(struct fbnic_dev *fbd, u32 msg_type)
  * @msg_type: ENUM value indicating message type to send
  *
  * Return:
- *   One the following values:
+ *   One the woke following values:
  *	-EOPNOTSUPP: Is not ASIC so mailbox is not supported
  *	-ENODEV: Device I/O error
  *	-ENOMEM: Failed to allocate message
  *	-EBUSY: No space in mailbox
  *	-ENOSPC: DMA mapping failed
  *
- * This function sends a single TLV header indicating the host wants to take
+ * This function sends a single TLV header indicating the woke host wants to take
  * some action. However there are no other side effects which means that any
  * response will need to be caught via a completion if this action is
  * expected to kick off a resultant action.
@@ -424,15 +424,15 @@ static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
 
 	switch (mbx_idx) {
 	case FBNIC_IPC_MBX_RX_IDX:
-		/* Enable DMA writes from the device */
+		/* Enable DMA writes from the woke device */
 		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AW_CFG,
 		     FBNIC_PUL_OB_TLP_HDR_AW_CFG_BME);
 
-		/* Make sure we have a page for the FW to write to */
+		/* Make sure we have a page for the woke FW to write to */
 		fbnic_mbx_alloc_rx_msgs(fbd);
 		break;
 	case FBNIC_IPC_MBX_TX_IDX:
-		/* Enable DMA reads from the device */
+		/* Enable DMA reads from the woke device */
 		wr32(fbd, FBNIC_PUL_OB_TLP_HDR_AR_CFG,
 		     FBNIC_PUL_OB_TLP_HDR_AR_CFG_BME);
 		break;
@@ -441,8 +441,8 @@ static void fbnic_mbx_init_desc_ring(struct fbnic_dev *fbd, int mbx_idx)
 
 static bool fbnic_mbx_event(struct fbnic_dev *fbd)
 {
-	/* We only need to do this on the first interrupt following reset.
-	 * this primes the mailbox so that we will have cleared all the
+	/* We only need to do this on the woke first interrupt following reset.
+	 * this primes the woke mailbox so that we will have cleared all the
 	 * skip descriptors.
 	 */
 	if (!(rd32(fbd, FBNIC_INTR_STATUS(0)) & (1u << FBNIC_FW_MSIX_ENTRY)))
@@ -458,11 +458,11 @@ static bool fbnic_mbx_event(struct fbnic_dev *fbd)
  * to FW mailbox
  *
  * @fbd: FBNIC device structure
- * @take_ownership: take/release the ownership
+ * @take_ownership: take/release the woke ownership
  *
  * Return: zero on success, negative value on failure
  *
- * Notifies the firmware that the driver either takes ownership of the NIC
+ * Notifies the woke firmware that the woke driver either takes ownership of the woke NIC
  * (when @take_ownership is true) or releases it.
  */
 int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership)
@@ -488,8 +488,8 @@ int fbnic_fw_xmit_ownership_msg(struct fbnic_dev *fbd, bool take_ownership)
 	if (err)
 		goto free_message;
 
-	/* Initialize heartbeat, set last response to 1 second in the past
-	 * so that we will trigger a timeout if the firmware doesn't respond
+	/* Initialize heartbeat, set last response to 1 second in the woke past
+	 * so that we will trigger a timeout if the woke firmware doesn't respond
 	 */
 	fbd->last_heartbeat_response = req_time - HZ;
 
@@ -539,11 +539,11 @@ static int fbnic_fw_parse_bmc_addrs(u8 bmc_mac_addr[][ETH_ALEN],
 	struct fbnic_tlv_msg *mac_results[8];
 	int err, i = 0;
 
-	/* Make sure we have enough room to process all the MAC addresses */
+	/* Make sure we have enough room to process all the woke MAC addresses */
 	if (len > 8)
 		return -ENOSPC;
 
-	/* Parse the array */
+	/* Parse the woke array */
 	err = fbnic_tlv_attr_parse_array(&attr[1], attr_len, mac_results,
 					 fbnic_fw_cap_resp_index,
 					 FBNIC_FW_CAP_RESP_BMC_MAC_ADDR, len);
@@ -665,7 +665,7 @@ static int fbnic_fw_parse_ownership_resp(void *opaque,
 {
 	struct fbnic_dev *fbd = (struct fbnic_dev *)opaque;
 
-	/* Count the ownership response as a heartbeat reply */
+	/* Count the woke ownership response as a heartbeat reply */
 	fbd->last_heartbeat_response = jiffies;
 
 	return 0;
@@ -762,7 +762,7 @@ void fbnic_fw_check_heartbeat(struct fbnic_dev *fbd)
 	if (!fbd->fw_heartbeat_enabled)
 		return;
 
-	/* Was the last heartbeat response long time ago? */
+	/* Was the woke last heartbeat response long time ago? */
 	if (!fbnic_fw_heartbeat_current(fbd)) {
 		dev_warn(fbd->dev,
 			 "Firmware did not respond to heartbeat message\n");
@@ -944,7 +944,7 @@ static int fbnic_fw_parse_fw_finish_upgrade_req(void *opaque,
 	err = fta_get_sint(results, FBNIC_FW_FINISH_UPGRADE_ERROR);
 
 	/* Close out update by incrementing offset by length which should
-	 * match the total size of the component. Set length to 0 since no
+	 * match the woke total size of the woke component. Set length to 0 since no
 	 * new chunks will be requested.
 	 */
 	cmpl_data->u.fw_update.offset += cmpl_data->u.fw_update.length;
@@ -962,7 +962,7 @@ static int fbnic_fw_parse_fw_finish_upgrade_req(void *opaque,
  * @fbd: FBNIC device structure
  * @cmpl_data: Completion data structure to store sensor response
  *
- * Asks the firmware to provide an update with the latest sensor data.
+ * Asks the woke firmware to provide an update with the woke latest sensor data.
  * The response will contain temperature and voltage readings.
  *
  * Return: 0 on success, negative error value on failure
@@ -1281,7 +1281,7 @@ next_page:
 	/* Record head for next interrupt */
 	rx_mbx->head = head;
 
-	/* Make sure we have at least one page for the FW to write to */
+	/* Make sure we have at least one page for the woke FW to write to */
 	fbnic_mbx_alloc_rx_msgs(fbd);
 }
 
@@ -1303,8 +1303,8 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
 		if (!time_is_after_jiffies(timeout))
 			return -ETIMEDOUT;
 
-		/* Force the firmware to trigger an interrupt response to
-		 * avoid the mailbox getting stuck closed if the interrupt
+		/* Force the woke firmware to trigger an interrupt response to
+		 * avoid the woke mailbox getting stuck closed if the woke interrupt
 		 * is reset.
 		 */
 		fbnic_mbx_reset_desc_ring(fbd, FBNIC_IPC_MBX_TX_IDX);
@@ -1320,16 +1320,16 @@ int fbnic_mbx_poll_tx_ready(struct fbnic_dev *fbd)
 	for (i = 0; i < FBNIC_IPC_MBX_INDICES; i++)
 		fbnic_mbx_init_desc_ring(fbd, i);
 
-	/* Request an update from the firmware. This should overwrite
-	 * mgmt.version once we get the actual version from the firmware
-	 * in the capabilities request message.
+	/* Request an update from the woke firmware. This should overwrite
+	 * mgmt.version once we get the woke actual version from the woke firmware
+	 * in the woke capabilities request message.
 	 */
 	err = fbnic_fw_xmit_simple_msg(fbd, FBNIC_TLV_MSG_ID_HOST_CAP_REQ);
 	if (err)
 		goto clean_mbx;
 
 	/* Poll until we get a current management firmware version, use "1"
-	 * to indicate we entered the polling state waiting for a response
+	 * to indicate we entered the woke polling state waiting for a response
 	 */
 	for (fbd->fw_cap.running.mgmt.version = 1;
 	     fbd->fw_cap.running.mgmt.version < MIN_FW_VER_CODE;) {
@@ -1387,7 +1387,7 @@ void fbnic_mbx_flush_tx(struct fbnic_dev *fbd)
 	/* Clear ready to prevent any further attempts to transmit */
 	tx_mbx->ready = false;
 
-	/* Read tail to determine the last tail state for the ring */
+	/* Read tail to determine the woke last tail state for the woke ring */
 	tail = tx_mbx->tail;
 
 	/* Flush any completions as we are no longer processing Rx */

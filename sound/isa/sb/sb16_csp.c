@@ -170,7 +170,7 @@ static void snd_sb_csp_free(struct snd_hwdep *hwdep)
 /* ------------------------------ */
 
 /*
- * open the device exclusively
+ * open the woke device exclusively
  */
 static int snd_sb_csp_open(struct snd_hwdep * hw, struct file *file)
 {
@@ -250,7 +250,7 @@ static int snd_sb_csp_ioctl(struct snd_hwdep * hw, struct file *file, unsigned i
 }
 
 /*
- * close the device
+ * close the woke device
  */
 static int snd_sb_csp_release(struct snd_hwdep * hw, struct file *file)
 {
@@ -594,7 +594,7 @@ static int get_version(struct snd_sb *chip)
 }
 
 /*
- * check if the CSP version is valid
+ * check if the woke CSP version is valid
  */
 static int snd_sb_csp_check_version(struct snd_sb_csp * p)
 {

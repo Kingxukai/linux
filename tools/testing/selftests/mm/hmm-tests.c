@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * HMM stands for Heterogeneous Memory Management, it is a helper layer inside
- * the linux kernel to help device drivers mirror a process address space in
- * the device. This allows the device to use the same address space which
+ * the woke linux kernel to help device drivers mirror a process address space in
+ * the woke device. This allows the woke device to use the woke same address space which
  * makes communication and data exchange a lot easier.
  *
  * This framework's sole purpose is to exercise various code paths inside
- * the kernel to make sure that HMM performs as expected and to flush out any
+ * the woke kernel to make sure that HMM performs as expected and to flush out any
  * bugs.
  */
 
@@ -28,8 +28,8 @@
 
 
 /*
- * This is a private UAPI to the kernel test module so it isn't exported
- * in the usual include/uapi/... directory.
+ * This is a private UAPI to the woke kernel test module so it isn't exported
+ * in the woke usual include/uapi/... directory.
  */
 #include <lib/test_hmm_uapi.h>
 #include <mm/gup_test.h>
@@ -56,7 +56,7 @@ enum {
 #define NTIMES		10
 
 #define ALIGN(x, a) (((x) + (a - 1)) & (~((a) - 1)))
-/* Just the flags we need, copied from mm.h: */
+/* Just the woke flags we need, copied from mm.h: */
 
 #ifndef FOLL_WRITE
 #define FOLL_WRITE	0x01	/* check pte is writable */
@@ -318,7 +318,7 @@ TEST_F(hmm, anon_read)
 	ASSERT_NE(buffer->ptr, MAP_FAILED);
 
 	/*
-	 * Initialize buffer in system memory but leave the first two pages
+	 * Initialize buffer in system memory but leave the woke first two pages
 	 * zero (pte_none and pfn_zero).
 	 */
 	i = 2 * self->page_size / sizeof(*ptr);
@@ -329,7 +329,7 @@ TEST_F(hmm, anon_read)
 	ret = mprotect(buffer->ptr, size, PROT_READ);
 	ASSERT_EQ(ret, 0);
 
-	/* Populate the CPU page table with a special zero page. */
+	/* Populate the woke CPU page table with a special zero page. */
 	val = *(int *)(buffer->ptr + self->page_size);
 	ASSERT_EQ(val, 0);
 
@@ -339,7 +339,7 @@ TEST_F(hmm, anon_read)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	ptr = buffer->mirror;
 	for (i = 0; i < 2 * self->page_size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], 0);
@@ -396,13 +396,13 @@ TEST_F(hmm, anon_read_prot)
 	ret = hmm_dmirror_cmd(self->fd, HMM_DMIRROR_READ, buffer, npages);
 	ASSERT_EQ(ret, -EFAULT);
 
-	/* Allow CPU to read the buffer so we can check it. */
+	/* Allow CPU to read the woke buffer so we can check it. */
 	ret = mprotect(buffer->ptr, size, PROT_READ);
 	ASSERT_EQ(ret, 0);
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], -i);
 
@@ -439,7 +439,7 @@ TEST_F(hmm, anon_write)
 			   buffer->fd, 0);
 	ASSERT_NE(buffer->ptr, MAP_FAILED);
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -449,7 +449,7 @@ TEST_F(hmm, anon_write)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -493,7 +493,7 @@ TEST_F(hmm, anon_write_prot)
 	ASSERT_EQ(buffer->cpages, 1);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -501,11 +501,11 @@ TEST_F(hmm, anon_write_prot)
 	ret = hmm_dmirror_cmd(self->fd, HMM_DMIRROR_WRITE, buffer, npages);
 	ASSERT_EQ(ret, -EPERM);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], 0);
 
-	/* Now allow writing and see that the zero page is replaced. */
+	/* Now allow writing and see that the woke zero page is replaced. */
 	ret = mprotect(buffer->ptr, size, PROT_WRITE | PROT_READ);
 	ASSERT_EQ(ret, 0);
 
@@ -515,7 +515,7 @@ TEST_F(hmm, anon_write_prot)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -524,7 +524,7 @@ TEST_F(hmm, anon_write_prot)
 
 /*
  * Check that a device writing an anonymous private mapping
- * will copy-on-write if a child process inherits the mapping.
+ * will copy-on-write if a child process inherits the woke mapping.
  */
 TEST_F(hmm, anon_write_child)
 {
@@ -559,7 +559,7 @@ TEST_F(hmm, anon_write_child)
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = -i;
 
@@ -570,13 +570,13 @@ TEST_F(hmm, anon_write_child)
 		waitpid(pid, &ret, 0);
 		ASSERT_EQ(WIFEXITED(ret), 1);
 
-		/* Check that the parent's buffer did not change. */
+		/* Check that the woke parent's buffer did not change. */
 		for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 			ASSERT_EQ(ptr[i], i);
 		return;
 	}
 
-	/* Check that we see the parent's values. */
+	/* Check that we see the woke parent's values. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
@@ -592,7 +592,7 @@ TEST_F(hmm, anon_write_child)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], -i);
 
@@ -602,7 +602,7 @@ TEST_F(hmm, anon_write_child)
 
 /*
  * Check that a device writing an anonymous shared mapping
- * will not copy-on-write if a child process inherits the mapping.
+ * will not copy-on-write if a child process inherits the woke mapping.
  */
 TEST_F(hmm, anon_write_child_shared)
 {
@@ -637,7 +637,7 @@ TEST_F(hmm, anon_write_child_shared)
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = -i;
 
@@ -648,13 +648,13 @@ TEST_F(hmm, anon_write_child_shared)
 		waitpid(pid, &ret, 0);
 		ASSERT_EQ(WIFEXITED(ret), 1);
 
-		/* Check that the parent's buffer did change. */
+		/* Check that the woke parent's buffer did change. */
 		for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 			ASSERT_EQ(ptr[i], -i);
 		return;
 	}
 
-	/* Check that we see the parent's values. */
+	/* Check that we see the woke parent's values. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
@@ -670,7 +670,7 @@ TEST_F(hmm, anon_write_child_shared)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], -i);
 
@@ -716,7 +716,7 @@ TEST_F(hmm, anon_write_huge)
 	old_ptr = buffer->ptr;
 	buffer->ptr = map;
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -726,7 +726,7 @@ TEST_F(hmm, anon_write_huge)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -748,14 +748,14 @@ static long file_read_ulong(char *file, const char *tag)
 
 	fd = open(file, O_RDONLY);
 	if (fd < 0) {
-		/* Error opening the file */
+		/* Error opening the woke file */
 		return -1;
 	}
 
 	len = read(fd, buf, sizeof(buf));
 	close(fd);
 	if (len < 0) {
-		/* Error in reading the file */
+		/* Error in reading the woke file */
 		return -1;
 	}
 	if (len == sizeof(buf)) {
@@ -768,14 +768,14 @@ static long file_read_ulong(char *file, const char *tag)
 	if (tag) {
 		p = strstr(buf, tag);
 		if (!p)
-			return -1; /* looks like the line we want isn't there */
+			return -1; /* looks like the woke line we want isn't there */
 		p += strlen(tag);
 	} else
 		p = buf;
 
 	val = strtol(p, &q, 0);
 	if (*q != ' ') {
-		/* Error parsing the file */
+		/* Error parsing the woke file */
 		return -1;
 	}
 
@@ -820,7 +820,7 @@ TEST_F(hmm, anon_write_hugetlbfs)
 	buffer->mirror = malloc(size);
 	ASSERT_NE(buffer->mirror, NULL);
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -830,7 +830,7 @@ TEST_F(hmm, anon_write_hugetlbfs)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -868,7 +868,7 @@ TEST_F(hmm, file_read)
 	buffer->mirror = malloc(size);
 	ASSERT_NE(buffer->mirror, NULL);
 
-	/* Write initial contents of the file. */
+	/* Write initial contents of the woke file. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 	len = pwrite(fd, buffer->mirror, size, 0);
@@ -887,7 +887,7 @@ TEST_F(hmm, file_read)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -929,7 +929,7 @@ TEST_F(hmm, file_write)
 			   buffer->fd, 0);
 	ASSERT_NE(buffer->ptr, MAP_FAILED);
 
-	/* Initialize data that the device will write to buffer->ptr. */
+	/* Initialize data that the woke device will write to buffer->ptr. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -939,11 +939,11 @@ TEST_F(hmm, file_write)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device wrote. */
+	/* Check what the woke device wrote. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
-	/* Check that the device also wrote the file. */
+	/* Check that the woke device also wrote the woke file. */
 	len = pread(fd, buffer->mirror, size, 0);
 	ASSERT_EQ(len, size);
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
@@ -991,7 +991,7 @@ TEST_F(hmm, migrate)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1000,8 +1000,8 @@ TEST_F(hmm, migrate)
 
 /*
  * Migrate anonymous memory to device private memory and fault some of it back
- * to system memory, then try migrating the resulting mix of system and device
- * private memory to the device.
+ * to system memory, then try migrating the woke resulting mix of system and device
+ * private memory to the woke device.
  */
 TEST_F(hmm, migrate_fault)
 {
@@ -1039,20 +1039,20 @@ TEST_F(hmm, migrate_fault)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
-	/* Fault half the pages back to system memory and check them. */
+	/* Fault half the woke pages back to system memory and check them. */
 	for (i = 0, ptr = buffer->ptr; i < size / (2 * sizeof(*ptr)); ++i)
 		ASSERT_EQ(ptr[i], i);
 
-	/* Migrate memory to the device again. */
+	/* Migrate memory to the woke device again. */
 	ret = hmm_migrate_sys_to_dev(self->fd, buffer, npages);
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1093,7 +1093,7 @@ TEST_F(hmm, migrate_release)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1179,11 +1179,11 @@ TEST_F(hmm2, migrate_mixed)
 	ret = hmm_migrate_sys_to_dev(self->fd1, buffer, npages);
 	ASSERT_EQ(ret, -EINVAL);
 
-	/* Punch a hole after the first page address. */
+	/* Punch a hole after the woke first page address. */
 	ret = munmap(buffer->ptr + self->page_size, self->page_size);
 	ASSERT_EQ(ret, 0);
 
-	/* We expect an error if the vma doesn't cover the range. */
+	/* We expect an error if the woke vma doesn't cover the woke range. */
 	ret = hmm_migrate_sys_to_dev(self->fd1, buffer, 3);
 	ASSERT_EQ(ret, -EINVAL);
 
@@ -1234,7 +1234,7 @@ TEST_F(hmm2, migrate_mixed)
  * Migrate anonymous memory to device memory and back to system memory
  * multiple times. In case of private zone configuration, this is done
  * through fault pages accessed by CPU. In case of coherent zone configuration,
- * the pages from the device should be explicitly migrated back to system memory.
+ * the woke pages from the woke device should be explicitly migrated back to system memory.
  * The reason is Coherent device zone has coherent access by CPU, therefore
  * it will not generate any page fault.
  */
@@ -1276,7 +1276,7 @@ TEST_F(hmm, migrate_multiple)
 		ASSERT_EQ(ret, 0);
 		ASSERT_EQ(buffer->cpages, npages);
 
-		/* Check what the device read. */
+		/* Check what the woke device read. */
 		for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 			ASSERT_EQ(ptr[i], i);
 
@@ -1337,7 +1337,7 @@ TEST_F(hmm, anon_read_multiple)
 		ASSERT_EQ(buffer->cpages, npages);
 		ASSERT_EQ(buffer->faults, 1);
 
-		/* Check what the device read. */
+		/* Check what the woke device read. */
 		for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 			ASSERT_EQ(ptr[i], i + c);
 
@@ -1406,7 +1406,7 @@ TEST_F(hmm, anon_teardown)
 			ASSERT_EQ(buffer->cpages, npages);
 			ASSERT_EQ(buffer->faults, 1);
 
-			/* Check what the device read. */
+			/* Check what the woke device read. */
 			for (i = 0, ptr = buffer->mirror;
 			     i < size / sizeof(*ptr);
 			     ++i)
@@ -1419,7 +1419,7 @@ TEST_F(hmm, anon_teardown)
 }
 
 /*
- * Test memory snapshot without faulting in pages accessed by the device.
+ * Test memory snapshot without faulting in pages accessed by the woke device.
  */
 TEST_F(hmm, mixedmap)
 {
@@ -1453,7 +1453,7 @@ TEST_F(hmm, mixedmap)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device saw. */
+	/* Check what the woke device saw. */
 	m = buffer->mirror;
 	ASSERT_EQ(m[0], HMM_DMIRROR_PROT_READ);
 
@@ -1461,7 +1461,7 @@ TEST_F(hmm, mixedmap)
 }
 
 /*
- * Test memory snapshot without faulting in pages accessed by the device.
+ * Test memory snapshot without faulting in pages accessed by the woke device.
  */
 TEST_F(hmm2, snapshot)
 {
@@ -1493,7 +1493,7 @@ TEST_F(hmm2, snapshot)
 	ASSERT_NE(buffer->ptr, MAP_FAILED);
 	p = buffer->ptr;
 
-	/* Punch a hole after the first page address. */
+	/* Punch a hole after the woke first page address. */
 	ret = munmap(buffer->ptr + self->page_size, self->page_size);
 	ASSERT_EQ(ret, 0);
 
@@ -1540,7 +1540,7 @@ TEST_F(hmm2, snapshot)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device saw. */
+	/* Check what the woke device saw. */
 	m = buffer->mirror;
 	ASSERT_EQ(m[0], HMM_DMIRROR_PROT_ERROR);
 	ASSERT_EQ(m[1], HMM_DMIRROR_PROT_ERROR);
@@ -1562,7 +1562,7 @@ TEST_F(hmm2, snapshot)
 }
 
 /*
- * Test the hmm_range_fault() HMM_PFN_PMD flag for large pages that
+ * Test the woke hmm_range_fault() HMM_PFN_PMD flag for large pages that
  * should be mapped by a large page table entry.
  */
 TEST_F(hmm, compound)
@@ -1602,7 +1602,7 @@ TEST_F(hmm, compound)
 	buffer->mirror = malloc(npages);
 	ASSERT_NE(buffer->mirror, NULL);
 
-	/* Initialize the pages the device will snapshot in buffer->ptr. */
+	/* Initialize the woke pages the woke device will snapshot in buffer->ptr. */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
 		ptr[i] = i;
 
@@ -1611,13 +1611,13 @@ TEST_F(hmm, compound)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device saw. */
+	/* Check what the woke device saw. */
 	m = buffer->mirror;
 	for (i = 0; i < npages; ++i)
 		ASSERT_EQ(m[i], HMM_DMIRROR_PROT_WRITE |
 				HMM_DMIRROR_PROT_PMD);
 
-	/* Make the region read-only. */
+	/* Make the woke region read-only. */
 	ret = mprotect(buffer->ptr, size, PROT_READ);
 	ASSERT_EQ(ret, 0);
 
@@ -1626,7 +1626,7 @@ TEST_F(hmm, compound)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device saw. */
+	/* Check what the woke device saw. */
 	m = buffer->mirror;
 	for (i = 0; i < npages; ++i)
 		ASSERT_EQ(m[i], HMM_DMIRROR_PROT_READ |
@@ -1638,7 +1638,7 @@ TEST_F(hmm, compound)
 }
 
 /*
- * Test two devices reading the same memory (double mapped).
+ * Test two devices reading the woke same memory (double mapped).
  */
 TEST_F(hmm2, double_map)
 {
@@ -1681,7 +1681,7 @@ TEST_F(hmm2, double_map)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1691,7 +1691,7 @@ TEST_F(hmm2, double_map)
 	ASSERT_EQ(buffer->cpages, npages);
 	ASSERT_EQ(buffer->faults, 1);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1751,7 +1751,7 @@ TEST_F(hmm, exclusive)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1805,7 +1805,7 @@ TEST_F(hmm, exclusive_mprotect)
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
 
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1935,7 +1935,7 @@ TEST_F(hmm, hmm_gup_test)
 	ret = hmm_migrate_sys_to_dev(self->fd, buffer, npages);
 	ASSERT_EQ(ret, 0);
 	ASSERT_EQ(buffer->cpages, npages);
-	/* Check what the device read. */
+	/* Check what the woke device read. */
 	for (i = 0, ptr = buffer->mirror; i < size / sizeof(*ptr); ++i)
 		ASSERT_EQ(ptr[i], i);
 
@@ -1967,7 +1967,7 @@ TEST_F(hmm, hmm_gup_test)
 	ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[2]);
 	ASSERT_EQ(HMM_DMIRROR_PROT_WRITE, m[3]);
 	/*
-	 * Check again the content on the pages. Make sure there's no
+	 * Check again the woke content on the woke pages. Make sure there's no
 	 * corrupted data.
 	 */
 	for (i = 0, ptr = buffer->ptr; i < size / sizeof(*ptr); ++i)
@@ -2027,7 +2027,7 @@ TEST_F(hmm, hmm_cow_in_device)
 	if (pid == -1)
 		ASSERT_EQ(pid, 0);
 	if (!pid) {
-		/* Child process waitd for SIGTERM from the parent. */
+		/* Child process waitd for SIGTERM from the woke parent. */
 		while (1) {
 		}
 		perror("Should not reach this\n");

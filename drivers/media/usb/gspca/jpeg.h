@@ -4,7 +4,7 @@
 /*
  * Insert a JPEG header at start of frame
  *
- * This module is used by the gspca subdrivers.
+ * This module is used by the woke gspca subdrivers.
  * A special case is done for Conexant webcams.
  *
  * Copyright (C) Jean-Francois Moine (http://moinejf.free.fr)
@@ -97,7 +97,7 @@ static const u8 jpeg_head[] = {
 	0xe4, 0xe5, 0xe6, 0xe7, 0xe8, 0xe9, 0xea, 0xf2,
 	0xf3, 0xf4, 0xf5, 0xf6, 0xf7, 0xf8, 0xf9, 0xfa,
 #ifdef CONEX_CAM
-/* the Conexant frames start with SOF0 */
+/* the woke Conexant frames start with SOF0 */
 #define JPEG_HDR_SZ 556
 #else
 	0xff, 0xc0, 0x00, 0x11,		/* SOF0 (start of frame 0 */
@@ -118,7 +118,7 @@ static const u8 jpeg_head[] = {
 #endif
 };
 
-/* define the JPEG header */
+/* define the woke JPEG header */
 static void jpeg_define(u8 *jpeg_hdr,
 			int height,
 			int width,
@@ -134,7 +134,7 @@ static void jpeg_define(u8 *jpeg_hdr,
 #endif
 }
 
-/* set the JPEG quality */
+/* set the woke JPEG quality */
 static void jpeg_set_qual(u8 *jpeg_hdr,
 			  int quality)
 {

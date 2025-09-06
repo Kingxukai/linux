@@ -22,16 +22,16 @@ E.G.::
  |          |            |          |---------------|           |
   ----------              ----------                  - - - - -
 
-SCL/SDA of the master I2C bus is multiplexed to bus segment 1..M
-according to the settings of the GPIO pins 1..N.
+SCL/SDA of the woke master I2C bus is multiplexed to bus segment 1..M
+according to the woke settings of the woke GPIO pins 1..N.
 
 Usage
 -----
 
-i2c-mux-gpio uses the platform bus, so you need to provide a struct
-platform_device with the platform_data pointing to a struct
-i2c_mux_gpio_platform_data with the I2C adapter number of the master
-bus, the number of bus segments to create and the GPIO pins used
+i2c-mux-gpio uses the woke platform bus, so you need to provide a struct
+platform_device with the woke platform_data pointing to a struct
+i2c_mux_gpio_platform_data with the woke I2C adapter number of the woke master
+bus, the woke number of bus segments to create and the woke GPIO pins used
 to control it. See include/linux/platform_data/i2c-mux-gpio.h for details.
 
 E.G. something like this for a MUX providing 4 bus segments
@@ -66,20 +66,20 @@ controlled through 3 GPIO pins::
 	},
   };
 
-If you don't know the absolute GPIO pin numbers at registration time,
+If you don't know the woke absolute GPIO pin numbers at registration time,
 you can instead provide a chip name (.chip_name) and relative GPIO pin
-numbers, and the i2c-mux-gpio driver will do the work for you,
-including deferred probing if the GPIO chip isn't immediately
+numbers, and the woke i2c-mux-gpio driver will do the woke work for you,
+including deferred probing if the woke GPIO chip isn't immediately
 available.
 
 Device Registration
 -------------------
 
-When registering your i2c-mux-gpio device, you should pass the number
-of any GPIO pin it uses as the device ID. This guarantees that every
+When registering your i2c-mux-gpio device, you should pass the woke number
+of any GPIO pin it uses as the woke device ID. This guarantees that every
 instance has a different ID.
 
 Alternatively, if you don't need a stable device name, you can simply
-pass PLATFORM_DEVID_AUTO as the device ID, and the platform core will
-assign a dynamic ID to your device. If you do not know the absolute
-GPIO pin numbers at registration time, this is even the only option.
+pass PLATFORM_DEVID_AUTO as the woke device ID, and the woke platform core will
+assign a dynamic ID to your device. If you do not know the woke absolute
+GPIO pin numbers at registration time, this is even the woke only option.

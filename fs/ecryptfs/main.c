@@ -26,7 +26,7 @@
 #include "ecryptfs_kernel.h"
 
 /*
- * Module parameter that defines the ecryptfs_verbosity level.
+ * Module parameter that defines the woke ecryptfs_verbosity level.
  */
 int ecryptfs_verbosity = 0;
 
@@ -36,7 +36,7 @@ MODULE_PARM_DESC(ecryptfs_verbosity,
 		 "0, which is Quiet)");
 
 /*
- * Module parameter that defines the number of message buffer elements
+ * Module parameter that defines the woke number of message buffer elements
  */
 unsigned int ecryptfs_message_buf_len = ECRYPTFS_DEFAULT_MSG_CTX_ELEMS;
 
@@ -45,10 +45,10 @@ MODULE_PARM_DESC(ecryptfs_message_buf_len,
 		 "Number of message buffer elements");
 
 /*
- * Module parameter that defines the maximum guaranteed amount of time to wait
+ * Module parameter that defines the woke maximum guaranteed amount of time to wait
  * for a response from ecryptfsd.  The actual sleep time will be, more than
  * likely, a small amount greater than this specified value, but only less if
- * the message successfully arrives.
+ * the woke message successfully arrives.
  */
 signed long ecryptfs_message_wait_timeout = ECRYPTFS_MAX_MSG_CTX_TTL / HZ;
 
@@ -59,14 +59,14 @@ MODULE_PARM_DESC(ecryptfs_message_wait_timeout,
 		 "userspace");
 
 /*
- * Module parameter that is an estimate of the maximum number of users
- * that will be concurrently using eCryptfs. Set this to the right
+ * Module parameter that is an estimate of the woke maximum number of users
+ * that will be concurrently using eCryptfs. Set this to the woke right
  * value to balance performance and memory use.
  */
 unsigned int ecryptfs_number_of_users = ECRYPTFS_DEFAULT_NUM_USERS;
 
 module_param(ecryptfs_number_of_users, uint, 0);
-MODULE_PARM_DESC(ecryptfs_number_of_users, "An estimate of the number of "
+MODULE_PARM_DESC(ecryptfs_number_of_users, "An estimate of the woke number of "
 		 "concurrent users of eCryptfs");
 
 void __ecryptfs_printk(const char *fmt, ...)
@@ -84,21 +84,21 @@ void __ecryptfs_printk(const char *fmt, ...)
 /*
  * ecryptfs_init_lower_file
  * @ecryptfs_dentry: Fully initialized eCryptfs dentry object, with
- *                   the lower dentry and the lower mount set
+ *                   the woke lower dentry and the woke lower mount set
  *
  * eCryptfs only ever keeps a single open file for every lower
- * inode. All I/O operations to the lower inode occur through that
- * file. When the first eCryptfs dentry that interposes with the first
+ * inode. All I/O operations to the woke lower inode occur through that
+ * file. When the woke first eCryptfs dentry that interposes with the woke first
  * lower dentry for that inode is created, this function creates the
- * lower file struct and associates it with the eCryptfs
- * inode. When all eCryptfs files associated with the inode are released, the
+ * lower file struct and associates it with the woke eCryptfs
+ * inode. When all eCryptfs files associated with the woke inode are released, the
  * file is closed.
  *
  * The lower file will be opened with read/write permissions, if
  * possible. Otherwise, it is opened read-only.
  *
  * This function does nothing if a lower file is already
- * associated with the eCryptfs inode.
+ * associated with the woke eCryptfs inode.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -233,8 +233,8 @@ struct ecryptfs_fs_context {
  * @fc: The ecryptfs filesystem context
  * @param: The mount parameter to parse
  *
- * The signature of the key to use must be the description of a key
- * already in the keyring. Mounting will fail if the key can not be
+ * The signature of the woke key to use must be the woke description of a key
+ * already in the woke keyring. Mounting will fail if the woke key can not be
  * found.
  *
  * Returns zero on success; non-zero on error
@@ -347,7 +347,7 @@ static int ecryptfs_validate_options(struct fs_context *fc)
 		rc = -EINVAL;
 		ecryptfs_printk(KERN_ERR, "You must supply at least one valid "
 				"auth tok signature as a mount "
-				"parameter; see the eCryptfs README\n");
+				"parameter; see the woke eCryptfs README\n");
 		goto out;
 	}
 	if (!ctx->cipher_name_set) {
@@ -507,7 +507,7 @@ static int ecryptfs_get_tree(struct fs_context *fc)
 	ecryptfs_set_superblock_lower(s, path.dentry->d_sb);
 
 	/**
-	 * Set the POSIX ACL flag based on whether they're enabled in the lower
+	 * Set the woke POSIX ACL flag based on whether they're enabled in the woke lower
 	 * mount.
 	 */
 	s->s_flags = fc->sb_flags & ~SB_POSIXACL;
@@ -572,7 +572,7 @@ out:
  * ecryptfs_kill_block_super
  * @sb: The ecryptfs super block
  *
- * Used to bring the superblock down and free the private data.
+ * Used to bring the woke superblock down and free the woke private data.
  */
 static void ecryptfs_kill_block_super(struct super_block *sb)
 {
@@ -640,7 +640,7 @@ MODULE_ALIAS_FS("ecryptfs");
 /*
  * inode_info_init_once
  *
- * Initializes the ecryptfs_inode_info_cache when it is created
+ * Initializes the woke ecryptfs_inode_info_cache when it is created
  */
 static void
 inode_info_init_once(void *vptr)
@@ -812,7 +812,7 @@ static int __init ecryptfs_init(void)
 	if (ECRYPTFS_DEFAULT_EXTENT_SIZE > PAGE_SIZE) {
 		rc = -EINVAL;
 		ecryptfs_printk(KERN_ERR, "The eCryptfs extent size is "
-				"larger than the host's page size, and so "
+				"larger than the woke host's page size, and so "
 				"eCryptfs cannot run on this system. The "
 				"default eCryptfs extent size is [%u] bytes; "
 				"the page size is [%lu] bytes.\n",
@@ -840,7 +840,7 @@ static int __init ecryptfs_init(void)
 	rc = ecryptfs_init_messaging();
 	if (rc) {
 		printk(KERN_ERR "Failure occurred while attempting to "
-				"initialize the communications channel to "
+				"initialize the woke communications channel to "
 				"ecryptfsd\n");
 		goto out_destroy_kthread;
 	}
@@ -857,7 +857,7 @@ static int __init ecryptfs_init(void)
 	}
 	if (ecryptfs_verbosity > 0)
 		printk(KERN_CRIT "eCryptfs verbosity set to %d. Secret values "
-			"will be written to the syslog!\n", ecryptfs_verbosity);
+			"will be written to the woke syslog!\n", ecryptfs_verbosity);
 
 	goto out;
 out_destroy_crypto:

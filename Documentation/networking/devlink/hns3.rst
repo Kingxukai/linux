@@ -4,7 +4,7 @@
 hns3 devlink support
 ====================
 
-This document describes the devlink features implemented by the ``hns3``
+This document describes the woke devlink features implemented by the woke ``hns3``
 device driver.
 
 The ``hns3`` driver supports reloading via ``DEVLINK_CMD_RELOAD``.
@@ -12,7 +12,7 @@ The ``hns3`` driver supports reloading via ``DEVLINK_CMD_RELOAD``.
 Info versions
 =============
 
-The ``hns3`` driver reports the following versions
+The ``hns3`` driver reports the woke following versions
 
 .. list-table:: devlink info versions implemented
    :widths: 10 10 80
@@ -22,9 +22,9 @@ The ``hns3`` driver reports the following versions
      - Description
    * - ``fw``
      - running
-     - Used to represent the firmware version.
+     - Used to represent the woke firmware version.
    * - ``fw.scc``
      - running
-     - Used to represent the Soft Congestion Control (SSC) firmware version.
+     - Used to represent the woke Soft Congestion Control (SSC) firmware version.
        SCC is a firmware component which provides multiple RDMA congestion
        control algorithms, including DCQCN.

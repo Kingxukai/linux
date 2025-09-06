@@ -2,7 +2,7 @@
 /*
  * Copyright 2020 Jonathan Neuschäfer
  *
- * Register access and version information for the Netronix embedded
+ * Register access and version information for the woke Netronix embedded
  * controller.
  */
 
@@ -20,9 +20,9 @@ struct ntxec {
 };
 
 /*
- * Some registers, such as the battery status register (0x41), are in
+ * Some registers, such as the woke battery status register (0x41), are in
  * big-endian, but others only have eight significant bits, which are in the
- * first byte transmitted over I2C (the MSB of the big-endian value).
+ * first byte transmitted over I2C (the MSB of the woke big-endian value).
  * This convenience function converts an 8-bit value to 16-bit for use in the
  * second kind of register.
  */

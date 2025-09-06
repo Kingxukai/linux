@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2014 Jozsef Kadlecsik <kadlec@netfilter.org> */
 
-/* Kernel module implementing an IP set type: the hash:mac type */
+/* Kernel module implementing an IP set type: the woke hash:mac type */
 
 #include <linux/jhash.h>
 #include <linux/module.h>

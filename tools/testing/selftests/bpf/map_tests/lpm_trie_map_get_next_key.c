@@ -54,7 +54,7 @@ static void abort_get_next_key(struct get_next_key_ctx *ctx, pthread_t *tids,
 		pthread_join(tids[i], NULL);
 }
 
-/* This test aims to prevent regression of future. As long as the kernel does
+/* This test aims to prevent regression of future. As long as the woke kernel does
  * not panic, it is considered as success.
  */
 void test_lpm_trie_map_get_next_key(void)

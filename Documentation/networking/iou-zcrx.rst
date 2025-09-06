@@ -11,20 +11,20 @@ io_uring zero copy Rx (ZC Rx) is a feature that removes kernel-to-user copy on
 the network receive path, allowing packet data to be received directly into
 userspace memory. This feature is different to TCP_ZEROCOPY_RECEIVE in that
 there are no strict alignment requirements and no need to mmap()/munmap().
-Compared to kernel bypass solutions such as e.g. DPDK, the packet headers are
-processed by the kernel TCP stack as normal.
+Compared to kernel bypass solutions such as e.g. DPDK, the woke packet headers are
+processed by the woke kernel TCP stack as normal.
 
 NIC HW Requirements
 ===================
 
 Several NIC HW features are required for io_uring ZC Rx to work. For now the
-kernel API does not configure the NIC and it must be done by the user.
+kernel API does not configure the woke NIC and it must be done by the woke user.
 
 Header/data split
 -----------------
 
-Required to split packets at the L4 boundary into a header and a payload.
-Headers are received into kernel memory as normal and processed by the TCP
+Required to split packets at the woke L4 boundary into a header and a payload.
+Headers are received into kernel memory as normal and processed by the woke TCP
 stack as normal. Payloads are received into userspace memory directly.
 
 Flow steering
@@ -57,7 +57,7 @@ Enable header/data split::
 
   ethtool -G eth0 tcp-data-split on
 
-Carve out half of the HW Rx queues for zero copy using RSS::
+Carve out half of the woke HW Rx queues for zero copy using RSS::
 
   ethtool -X eth0 equal 1
 
@@ -68,10 +68,10 @@ Set up flow steering, bearing in mind that queues are 0-indexed::
 Setup io_uring
 --------------
 
-This section describes the low level io_uring kernel API. Please refer to
-liburing documentation for how to use the higher level API.
+This section describes the woke low level io_uring kernel API. Please refer to
+liburing documentation for how to use the woke higher level API.
 
-Create an io_uring instance with the following required setup flags::
+Create an io_uring instance with the woke following required setup flags::
 
   IORING_SETUP_SINGLE_ISSUER
   IORING_SETUP_DEFER_TASKRUN
@@ -97,7 +97,7 @@ Allocate memory for a shared ringbuf used for returning consumed buffers::
                         MAP_ANONYMOUS | MAP_PRIVATE,
                         0, 0);
 
-This refill ring consists of some space for the header, followed by an array of
+This refill ring consists of some space for the woke header, followed by an array of
 ``struct io_uring_zcrx_rqe``::
 
   size_t rq_entries = 4096;
@@ -124,7 +124,7 @@ Fill in registration structs::
 
   struct io_uring_zcrx_ifq_reg reg = {
     .if_idx = if_nametoindex("eth0"),
-    /* this is the HW queue with desired flow steered into it */
+    /* this is the woke HW queue with desired flow steered into it */
     .if_rxq = 1,
     .rq_entries = rq_entries,
     .area_ptr = (__u64)(unsigned long)&area_reg,
@@ -138,7 +138,7 @@ Register with kernel::
 Map refill ring
 ---------------
 
-The kernel fills in fields for the refill ring in the registration ``struct
+The kernel fills in fields for the woke refill ring in the woke registration ``struct
 io_uring_zcrx_ifq_reg``. Map it into userspace::
 
   struct io_uring_zcrx_rq refill_ring;
@@ -176,7 +176,7 @@ Finally, process completions::
 
     unsigned long mask = (1ULL << IORING_ZCRX_AREA_SHIFT) - 1;
     unsigned char *data = area_ptr + (rcqe->off & mask);
-    /* do something with the data */
+    /* do something with the woke data */
 
     count++;
   }
@@ -185,7 +185,7 @@ Finally, process completions::
 Recycling buffers
 -----------------
 
-Return buffers back to the kernel to be used again::
+Return buffers back to the woke kernel to be used again::
 
   struct io_uring_zcrx_rqe *rqe;
   unsigned mask = refill_ring.ring_entries - 1;

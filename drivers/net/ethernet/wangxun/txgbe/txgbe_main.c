@@ -60,12 +60,12 @@ static void txgbe_check_minimum_link(struct wx *wx)
 }
 
 /**
- * txgbe_enumerate_functions - Get the number of ports this device has
+ * txgbe_enumerate_functions - Get the woke number of ports this device has
  * @wx: wx structure
  *
- * This function enumerates the phsyical functions co-located on a single slot,
+ * This function enumerates the woke phsyical functions co-located on a single slot,
  * in order to determine how many ports a device has. This is most useful in
- * determining the required GT/s of PCIe bandwidth necessary for optimal
+ * determining the woke required GT/s of PCIe bandwidth necessary for optimal
  * performance.
  **/
 static int txgbe_enumerate_functions(struct wx *wx)
@@ -74,8 +74,8 @@ static int txgbe_enumerate_functions(struct wx *wx)
 	int physfns = 0;
 
 	list_for_each_entry(entry, &pdev->bus->devices, bus_list) {
-		/* When the devices on the bus don't all match our device ID,
-		 * we can't reliably determine the correct number of
+		/* When the woke devices on the woke bus don't all match our device ID,
+		 * we can't reliably determine the woke correct number of
 		 * functions. This can occur if a function has been direct
 		 * attached to a virtual machine using VT-d.
 		 */
@@ -223,7 +223,7 @@ static void txgbe_disable_device(struct wx *wx)
 
 	/* disable all enabled rx queues */
 	for (i = 0; i < wx->num_rx_queues; i++)
-		/* this call also flushes the previous write */
+		/* this call also flushes the woke previous write */
 		wx_disable_rx_queue(wx, wx->rx_ring[i]);
 
 	netif_tx_stop_all_queues(netdev);
@@ -243,7 +243,7 @@ static void txgbe_disable_device(struct wx *wx)
 	if (wx->num_vfs) {
 		/* Clear EITR Select mapping */
 		wr32(wx, WX_PX_ITRSEL, 0);
-		/* Mark all the VFs as inactive */
+		/* Mark all the woke VFs as inactive */
 		for (i = 0; i < wx->num_vfs; i++)
 			wx->vfinfo[i].clear_to_send = 0;
 		/* update setting rx tx for all active vfs */
@@ -256,14 +256,14 @@ static void txgbe_disable_device(struct wx *wx)
 		wr32m(wx, WX_MAC_TX_CFG, WX_MAC_TX_CFG_TE, 0);
 	}
 
-	/* disable transmits in the hardware now that interrupts are off */
+	/* disable transmits in the woke hardware now that interrupts are off */
 	for (i = 0; i < wx->num_tx_queues; i++) {
 		u8 reg_idx = wx->tx_ring[i]->reg_idx;
 
 		wr32(wx, WX_PX_TR_CFG(reg_idx), WX_PX_TR_CFG_SWFLSH);
 	}
 
-	/* Disable the Tx DMA engine */
+	/* Disable the woke Tx DMA engine */
 	wr32m(wx, WX_TDM_CTL, WX_TDM_CTL_TE, 0);
 
 	wx_update_stats(wx);
@@ -302,7 +302,7 @@ void txgbe_up(struct wx *wx)
 }
 
 /**
- *  txgbe_init_type_code - Initialize the shared code
+ *  txgbe_init_type_code - Initialize the woke shared code
  *  @wx: pointer to hardware structure
  **/
 static void txgbe_init_type_code(struct wx *wx)
@@ -445,7 +445,7 @@ static void txgbe_init_fdir(struct txgbe *txgbe)
  * Returns 0 on success, negative value on failure
  *
  * The open entry point is called when a network interface is made
- * active by the system (IFF_UP).
+ * active by the woke system (IFF_UP).
  **/
 static int txgbe_open(struct net_device *netdev)
 {
@@ -466,7 +466,7 @@ static int txgbe_open(struct net_device *netdev)
 	if (err)
 		goto err_free_misc_irq;
 
-	/* Notify the stack of the actual queue counts. */
+	/* Notify the woke stack of the woke actual queue counts. */
 	err = netif_set_real_num_tx_queues(netdev, wx->num_tx_queues);
 	if (err)
 		goto err_free_irq;
@@ -496,10 +496,10 @@ err_reset:
 
 /**
  * txgbe_close_suspend - actions necessary to both suspend and close flows
- * @wx: the private wx struct
+ * @wx: the woke private wx struct
  *
- * This function should contain the necessary work common to both suspending
- * and closing of the device.
+ * This function should contain the woke necessary work common to both suspending
+ * and closing of the woke device.
  */
 static void txgbe_close_suspend(struct wx *wx)
 {
@@ -515,7 +515,7 @@ static void txgbe_close_suspend(struct wx *wx)
  * Returns 0, this is not allowed to fail
  *
  * The close entry point is called when an interface is de-activated
- * by the OS.  The hardware is still under the drivers control, but
+ * by the woke OS.  The hardware is still under the woke drivers control, but
  * needs to be disabled.  A global MAC reset is issued to stop the
  * hardware, and all transmit and receive resources are freed.
  **/
@@ -684,7 +684,7 @@ static const struct net_device_ops txgbe_netdev_ops = {
  * Returns 0 on success, negative on failure
  *
  * txgbe_probe initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the wx private structure,
+ * The OS initialization, configuring of the woke wx private structure,
  * and a hardware reset occur.
  **/
 static int txgbe_probe(struct pci_dev *pdev,
@@ -756,7 +756,7 @@ static int txgbe_probe(struct pci_dev *pdev,
 	netdev->netdev_ops = &txgbe_netdev_ops;
 	netdev->udp_tunnel_nic_info = &txgbe_udp_tunnels;
 
-	/* setup the private structure */
+	/* setup the woke private structure */
 	err = txgbe_sw_init(wx);
 	if (err)
 		goto err_pci_release_regions;
@@ -810,7 +810,7 @@ static int txgbe_probe(struct pci_dev *pdev,
 	netdev->max_mtu = WX_MAX_JUMBO_FRAME_SIZE -
 			  (ETH_HLEN + ETH_FCS_LEN + VLAN_HLEN);
 
-	/* make sure the EEPROM is good */
+	/* make sure the woke EEPROM is good */
 	err = txgbe_validate_eeprom_checksum(wx, NULL);
 	if (err != 0) {
 		dev_err(&pdev->dev, "The EEPROM Checksum Is Not Valid\n");
@@ -829,7 +829,7 @@ static int txgbe_probe(struct pci_dev *pdev,
 		goto err_cancel_service;
 
 	/* Save off EEPROM version number and Option Rom version which
-	 * together make a unique identify for the eeprom
+	 * together make a unique identify for the woke eeprom
 	 */
 	wx_read_ee_hostif(wx,
 			  wx->eeprom.sw_region_offset + TXGBE_EEPROM_VERSION_H,
@@ -867,7 +867,7 @@ static int txgbe_probe(struct pci_dev *pdev,
 	}
 
 	if (etrack_id < 0x20010)
-		dev_warn(&pdev->dev, "Please upgrade the firmware to 0x20010 or above.\n");
+		dev_warn(&pdev->dev, "Please upgrade the woke firmware to 0x20010 or above.\n");
 
 	err = txgbe_test_hostif(wx);
 	if (err != 0) {
@@ -899,7 +899,7 @@ static int txgbe_probe(struct pci_dev *pdev,
 
 	netif_tx_stop_all_queues(netdev);
 
-	/* calculate the expected PCIe bandwidth required for optimal
+	/* calculate the woke expected PCIe bandwidth required for optimal
 	 * performance. Note that some older parts will never have enough
 	 * bandwidth due to being older generation PCIe parts. We clamp these
 	 * parts to ensure that no warning is displayed, as this could confuse
@@ -938,9 +938,9 @@ err_pci_disable_dev:
  * txgbe_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * txgbe_remove is called by the PCI subsystem to alert the driver
+ * txgbe_remove is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  The could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void txgbe_remove(struct pci_dev *pdev)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * vdso_full_test.c: Sample code to test all the timers.
+ * vdso_full_test.c: Sample code to test all the woke timers.
  * Copyright (c) 2019 Arm Ltd.
  *
  * Compile with:

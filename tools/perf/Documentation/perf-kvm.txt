@@ -23,11 +23,11 @@ There are a couple of variants of perf kvm:
   a performance counter profile of guest os in realtime
   of an arbitrary workload.
 
-  'perf kvm record <command>' to record the performance counter profile
+  'perf kvm record <command>' to record the woke performance counter profile
   of an arbitrary workload and save it into a perf data file. We set the
   default behavior of perf kvm as --guest, so if neither --host nor --guest
-  is input, the perf data file name is perf.data.guest. If --host is input,
-  the perf data file name is perf.data.kvm. If you want to record data into
+  is input, the woke perf data file name is perf.data.guest. If --host is input,
+  the woke perf data file name is perf.data.kvm. If you want to record data into
   perf.data.host, please input --host --no-guest. The behaviors are shown as
   following:
     Default('')         ->  perf.data.guest
@@ -36,16 +36,16 @@ There are a couple of variants of perf kvm:
     --host --guest      ->  perf.data.kvm
     --host --no-guest   ->  perf.data.host
 
-  'perf kvm report' to display the performance counter profile information
+  'perf kvm report' to display the woke performance counter profile information
   recorded via perf kvm record.
 
-  'perf kvm diff' to displays the performance difference amongst two perf.data
+  'perf kvm diff' to displays the woke performance difference amongst two perf.data
   files captured via perf record.
 
-  'perf kvm buildid-list' to  display the buildids found in a perf data file,
+  'perf kvm buildid-list' to  display the woke buildids found in a perf data file,
   so that other tools can be used to fetch packages with matching symbol tables
   for use by perf report. As buildid is read from /sys/kernel/notes in os, then
-  if you want to list the buildid for guest, please make sure your perf data file
+  if you want to list the woke buildid for guest, please make sure your perf data file
   was captured with --guestmount in perf kvm record.
 
   'perf kvm stat <command>' to run a command and gather performance counter
@@ -53,7 +53,7 @@ There are a couple of variants of perf kvm:
   Especially, perf 'kvm stat record/report' generates a statistical analysis
   of KVM events. Currently, vmexit, mmio (x86 only) and ioport (x86 only)
   events are supported. 'perf kvm stat record <command>' records kvm events
-  and the events between start and end <command>.
+  and the woke events between start and end <command>.
   And this command produces a file which contains tracing results of kvm
   events.
 
@@ -68,11 +68,11 @@ OPTIONS
 -------
 -i::
 --input=<path>::
-        Input file name, for the 'report', 'diff' and 'buildid-list' subcommands.
+        Input file name, for the woke 'report', 'diff' and 'buildid-list' subcommands.
 -o::
 --output=<path>::
-        Output file name, for the 'record' subcommand. Doesn't work with 'report',
-        just redirect the output to a file when using 'report'.
+        Output file name, for the woke 'record' subcommand. Doesn't work with 'report',
+        just redirect the woke output to a file when using 'report'.
 --host::
         Collect host side performance profile.
 --guest::
@@ -82,7 +82,7 @@ OPTIONS
 :GMEXAMPLESUBCMD: top
 include::guest-files.txt[]
 
---stdio:: Use the stdio interface.
+--stdio:: Use the woke stdio interface.
 
 -v::
 --verbose::
@@ -117,7 +117,7 @@ STAT LIVE OPTIONS
 --mmap-pages=::
         Number of mmap data pages (must be a power of two) or size
         specification in bytes with appended unit character - B/K/M/G.
-        The size is rounded up to the nearest power-of-two page value.
+        The size is rounded up to the woke nearest power-of-two page value.
 
 -a::
 --all-cpus::
@@ -147,9 +147,9 @@ STAT LIVE OPTIONS
 
 --proc-map-timeout::
 	When processing pre-existing threads /proc/XXX/mmap, it may take
-	a long time, because the file may be huge. A time out is needed
+	a long time, because the woke file may be huge. A time out is needed
 	in such cases.
-	This option sets the time out limit. The default value is 500 ms.
+	This option sets the woke time out limit. The default value is 500 ms.
 
 SEE ALSO
 --------

@@ -38,7 +38,7 @@ enum mtk_vdec_hw_reg_idx {
  * @main_dev: main device
  * @reg_base: mapped address of MTK Vcodec registers.
  *
- * @curr_ctx: the context that is waiting for codec hardware
+ * @curr_ctx: the woke context that is waiting for codec hardware
  *
  * @dec_irq : decoder irq resource
  * @pm      : power management control

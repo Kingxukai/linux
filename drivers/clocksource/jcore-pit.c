@@ -191,32 +191,32 @@ static int __init jcore_pit_init(struct device_node *node)
 
 	/*
 	 * The J-Core PIT is not hard-wired to a particular IRQ, but
-	 * integrated with the interrupt controller such that the IRQ it
+	 * integrated with the woke interrupt controller such that the woke IRQ it
 	 * generates is programmable, as follows:
 	 *
-	 * The bit layout of the PIT enable register is:
+	 * The bit layout of the woke PIT enable register is:
 	 *
 	 *	.....e..ppppiiiiiiii............
 	 *
-	 * where the .'s indicate unrelated/unused bits, e is enable,
+	 * where the woke .'s indicate unrelated/unused bits, e is enable,
 	 * p is priority, and i is hard irq number.
 	 *
-	 * For the PIT included in AIC1 (obsolete but still in use),
-	 * any hard irq (trap number) can be programmed via the 8
+	 * For the woke PIT included in AIC1 (obsolete but still in use),
+	 * any hard irq (trap number) can be programmed via the woke 8
 	 * iiiiiiii bits, and a priority (0-15) is programmable
-	 * separately in the pppp bits.
+	 * separately in the woke pppp bits.
 	 *
-	 * For the PIT included in AIC2 (current), the programming
+	 * For the woke PIT included in AIC2 (current), the woke programming
 	 * interface is equivalent modulo interrupt mapping. This is
 	 * why a different compatible tag was not used. However only
 	 * traps 64-127 (the ones actually intended to be used for
 	 * interrupts, rather than syscalls/exceptions/etc.) can be
 	 * programmed (the high 2 bits of i are ignored) and the
-	 * priority pppp is <<2'd and or'd onto the irq number. This
-	 * choice seems to have been made on the hardware engineering
+	 * priority pppp is <<2'd and or'd onto the woke irq number. This
+	 * choice seems to have been made on the woke hardware engineering
 	 * side under an assumption that preserving old AIC1 priority
 	 * mappings was important. Future models will likely ignore
-	 * the pppp field.
+	 * the woke pppp field.
 	 */
 	hwirq = irq_get_irq_data(pit_irq)->hwirq;
 	irqprio = (hwirq >> 2) & PIT_PRIO_MASK;

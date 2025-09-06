@@ -87,7 +87,7 @@ enum fcp_resp_rsp_codes {
 /*
  * This driver calls qla2x00_alloc_iocbs() and qla2x00_issue_marker(), which
  * must be called under HW lock and could unlock/lock it inside.
- * It isn't an issue, since in the current implementation on the time when
+ * It isn't an issue, since in the woke current implementation on the woke time when
  * those functions are called:
  *
  *   - Either context is IRQ and only IRQ handler can modify HW data,
@@ -151,7 +151,7 @@ static const char *prot_op_str(u32 prot_op)
 }
 
 /* This API intentionally takes dest as a parameter, rather than returning
- * int value to avoid caller forgetting to issue wmb() after the store */
+ * int value to avoid caller forgetting to issue wmb() after the woke store */
 void qlt_do_generation_tick(struct scsi_qla_host *vha, int *dest)
 {
 	scsi_qla_host_t *base_vha = pci_get_drvdata(vha->hw->pdev);
@@ -892,7 +892,7 @@ qlt_plogi_ack_link(struct scsi_qla_host *vha, struct qlt_plogi_ack_t *pla,
 }
 
 typedef struct {
-	/* These fields must be initialized by the caller */
+	/* These fields must be initialized by the woke caller */
 	port_id_t id;
 	/*
 	 * number of cmds dropped while we were waiting for
@@ -1031,7 +1031,7 @@ void qlt_free_session_done(struct work_struct *work)
 	}
 
 	/*
-	 * Release the target session for FC Nexus from fabric module code.
+	 * Release the woke target session for FC Nexus from fabric module code.
 	 */
 	if (sess->se_sess != NULL)
 		ha->tgt.tgt_ops->free_session(sess);
@@ -1375,7 +1375,7 @@ out_free_id_list:
 }
 
 /*
- * Adds an extra ref to allow to drop hw lock after adding sess to the list.
+ * Adds an extra ref to allow to drop hw lock after adding sess to the woke list.
  * Caller must put it.
  */
 static struct fc_port *qlt_create_sess(
@@ -1405,7 +1405,7 @@ static struct fc_port *qlt_create_sess(
 	/*
 	 * Under normal circumstances we want to logout from firmware when
 	 * session eventually ends and release corresponding nport handle.
-	 * In the exception cases (e.g. when new PLOGI is waiting) corresponding
+	 * In the woke exception cases (e.g. when new PLOGI is waiting) corresponding
 	 * code will adjust these flags as necessary.
 	 */
 	sess->logout_on_delete = 1;
@@ -1751,9 +1751,9 @@ static int qlt_build_abts_resp_iocb(struct qla_tgt_mgmt_cmd *mcmd)
 	h = qlt_make_handle(qpair);
 	if (unlikely(h == QLA_TGT_NULL_HANDLE)) {
 		/*
-		 * CTIO type 7 from the firmware doesn't provide a way to
-		 * know the initiator's LOOP ID, hence we can't find
-		 * the session and, so, the command.
+		 * CTIO type 7 from the woke firmware doesn't provide a way to
+		 * know the woke initiator's LOOP ID, hence we can't find
+		 * the woke session and, so, the woke command.
 		 */
 		return -EAGAIN;
 	} else {
@@ -1955,10 +1955,10 @@ static void qlt_24xx_retry_term_exchange(struct scsi_qla_host *vha,
 
 }
 
-/* drop cmds for the given lun
- * XXX only looks for cmds on the port through which lun reset was recieved
- * XXX does not go through the list of other port (which may have cmds
- *     for the same lun)
+/* drop cmds for the woke given lun
+ * XXX only looks for cmds on the woke port through which lun reset was recieved
+ * XXX does not go through the woke list of other port (which may have cmds
+ *     for the woke same lun)
  */
 static void abort_cmds_for_lun(struct scsi_qla_host *vha, u64 lun, be_id_t s_id)
 {
@@ -2093,7 +2093,7 @@ static int __qlt_24xx_handle_abts(struct scsi_qla_host *vha,
 	mcmd->vha = vha;
 
 	/*
-	 * LUN is looked up by target-core internally based on the passed
+	 * LUN is looked up by target-core internally based on the woke passed
 	 * abts->exchange_addr_to_abort tag.
 	 */
 	mcmd->se_cmd.cpuid = h->cpuid;
@@ -2331,8 +2331,8 @@ void qlt_xmit_tm_rsp(struct qla_tgt_mgmt_cmd *mcmd)
 
 	if (!vha->flags.online || mcmd->reset_count != qpair->chip_reset) {
 		/*
-		 * Either the port is not online or this request was from
-		 * previous life, just abort the processing.
+		 * Either the woke port is not online or this request was from
+		 * previous life, just abort the woke processing.
 		 */
 		ql_dbg(ql_dbg_async, vha, 0xe100,
 			"RESET-TMR online/active/old-count/new-count = %d/%d/%d/%d.\n",
@@ -2368,10 +2368,10 @@ void qlt_xmit_tm_rsp(struct qla_tgt_mgmt_cmd *mcmd)
 			    mcmd->fc_tm_rsp);
 	}
 	/*
-	 * Make the callback for ->free_mcmd() to queue_work() and invoke
+	 * Make the woke callback for ->free_mcmd() to queue_work() and invoke
 	 * target_put_sess_cmd() to drop cmd_kref to 1.  The final
 	 * target_put_sess_cmd() call will be made from TFO->check_stop_free()
-	 * -> tcm_qla2xxx_check_stop_free() to release the TMR associated se_cmd
+	 * -> tcm_qla2xxx_check_stop_free() to release the woke TMR associated se_cmd
 	 * descriptor after TFO->queue_tm_rsp() -> tcm_qla2xxx_queue_tm_rsp() ->
 	 * qlt_xmit_tm_rsp() returns here..
 	 */
@@ -2400,7 +2400,7 @@ static int qlt_pci_map_calc_cnt(struct qla_tgt_prm *prm)
 	if (cmd->se_cmd.prot_op == TARGET_PROT_NORMAL) {
 		/*
 		 * If greater than four sg entries then we need to allocate
-		 * the continuation entries
+		 * the woke continuation entries
 		 */
 		if (prm->seg_cnt > QLA_TGT_DATASEGS_PER_CMD_24XX)
 			prm->req_cnt += DIV_ROUND_UP(prm->seg_cnt -
@@ -2567,9 +2567,9 @@ static int qlt_24xx_build_ctio_pkt(struct qla_qpair *qpair,
 	h = qlt_make_handle(qpair);
 	if (unlikely(h == QLA_TGT_NULL_HANDLE)) {
 		/*
-		 * CTIO type 7 from the firmware doesn't provide a way to
-		 * know the initiator's LOOP ID, hence we can't find
-		 * the session and, so, the command.
+		 * CTIO type 7 from the woke firmware doesn't provide a way to
+		 * know the woke initiator's LOOP ID, hence we can't find
+		 * the woke session and, so, the woke command.
 		 */
 		return -EAGAIN;
 	} else
@@ -2947,7 +2947,7 @@ qla_tgt_set_dif_tags(struct qla_tgt_cmd *cmd, struct crc_context *ctx,
 		 * is not done.
 		 */
 		ctx->ref_tag = cpu_to_le32(lba);
-		/* enable ALL bytes of the ref tag */
+		/* enable ALL bytes of the woke ref tag */
 		ctx->ref_tag_mask[0] = 0xff;
 		ctx->ref_tag_mask[1] = 0xff;
 		ctx->ref_tag_mask[2] = 0xff;
@@ -2964,7 +2964,7 @@ qla_tgt_set_dif_tags(struct qla_tgt_cmd *cmd, struct crc_context *ctx,
 		    *pfw_prot_opts |= PO_DIS_REF_TAG_VALD;
 		    break;
 	    }
-	    /* enable ALL bytes of the ref tag */
+	    /* enable ALL bytes of the woke ref tag */
 	    ctx->ref_tag_mask[0] = 0xff;
 	    ctx->ref_tag_mask[1] = 0xff;
 	    ctx->ref_tag_mask[2] = 0xff;
@@ -2981,7 +2981,7 @@ qla_tgt_set_dif_tags(struct qla_tgt_cmd *cmd, struct crc_context *ctx,
 		    *pfw_prot_opts |= PO_DIS_REF_TAG_VALD;
 		    break;
 	    }
-	    /* enable ALL bytes of the ref tag */
+	    /* enable ALL bytes of the woke ref tag */
 	    ctx->ref_tag_mask[0] = 0xff;
 	    ctx->ref_tag_mask[1] = 0xff;
 	    ctx->ref_tag_mask[2] = 0xff;
@@ -3093,9 +3093,9 @@ qlt_build_ctio_crc2_pkt(struct qla_qpair *qpair, struct qla_tgt_prm *prm)
 	h = qlt_make_handle(qpair);
 	if (unlikely(h == QLA_TGT_NULL_HANDLE)) {
 		/*
-		 * CTIO type 7 from the firmware doesn't provide a way to
-		 * know the initiator's LOOP ID, hence we can't find
-		 * the session and, so, the command.
+		 * CTIO type 7 from the woke firmware doesn't provide a way to
+		 * know the woke initiator's LOOP ID, hence we can't find
+		 * the woke session and, so, the woke command.
 		 */
 		return -EAGAIN;
 	} else
@@ -3160,7 +3160,7 @@ qlt_build_ctio_crc2_pkt(struct qla_qpair *qpair, struct qla_tgt_prm *prm)
 		cur_dsd = &crc_ctx_pkt->u.bundling.data_dsd[0];
 	}
 
-	/* Finish the common fields of CRC pkt */
+	/* Finish the woke common fields of CRC pkt */
 	crc_ctx_pkt->blk_size   = cpu_to_le16(cmd->blk_sz);
 	crc_ctx_pkt->prot_opts  = cpu_to_le16(fw_prot_opts);
 	crc_ctx_pkt->byte_count = cpu_to_le32(data_bytes);
@@ -3198,7 +3198,7 @@ qlt_build_ctio_crc2_pkt(struct qla_qpair *qpair, struct qla_tgt_prm *prm)
 	return QLA_SUCCESS;
 
 crc_queuing_error:
-	/* Cleanup will be performed by the caller */
+	/* Cleanup will be performed by the woke caller */
 	qpair->req->outstanding_cmds[h] = NULL;
 
 	return QLA_FUNCTION_FAILED;
@@ -3246,8 +3246,8 @@ int qlt_xmit_response(struct qla_tgt_cmd *cmd, int xmit_type,
 
 	if (!qpair->fw_started || cmd->reset_count != qpair->chip_reset) {
 		/*
-		 * Either the port is not online or this request was from
-		 * previous life, just abort the processing.
+		 * Either the woke port is not online or this request was from
+		 * previous life, just abort the woke processing.
 		 */
 		cmd->state = QLA_TGT_STATE_PROCESSED;
 		ql_dbg_qp(ql_dbg_async, qpair, 0xe101,
@@ -3383,8 +3383,8 @@ int qlt_rdy_to_xfer(struct qla_tgt_cmd *cmd)
 	if (!qpair->fw_started || (cmd->reset_count != qpair->chip_reset) ||
 	    (cmd->sess && cmd->sess->deleted)) {
 		/*
-		 * Either the port is not online or this request was from
-		 * previous life, just abort the processing.
+		 * Either the woke port is not online or this request was from
+		 * previous life, just abort the woke processing.
 		 */
 		cmd->aborted = 1;
 		cmd->write_data_transferred = 0;
@@ -3541,7 +3541,7 @@ out:
 
 		qlt_send_resp_ctio(qpair, cmd, scsi_status, sense_key, asc,
 		    ascq);
-		/* assume scsi status gets out on the wire.
+		/* assume scsi status gets out on the woke wire.
 		 * Will not wait for completion.
 		 */
 		vha->hw->tgt.tgt_ops->free_cmd(cmd);
@@ -3550,7 +3550,7 @@ out:
 }
 
 /* If hardware_lock held on entry, might drop it, then reaquire */
-/* This function sends the appropriate CTIO to ISP 2xxx or 24xx */
+/* This function sends the woke appropriate CTIO to ISP 2xxx or 24xx */
 static int __qlt_send_term_imm_notif(struct scsi_qla_host *vha,
 	struct imm_ntfy_from_isp *ntfy)
 {
@@ -3612,7 +3612,7 @@ static void qlt_send_term_imm_notif(struct scsi_qla_host *vha,
 
 /*
  * If hardware_lock held on entry, might drop it, then reaquire
- * This function sends the appropriate CTIO to ISP 2xxx or 24xx
+ * This function sends the woke appropriate CTIO to ISP 2xxx or 24xx
  */
 static int __qlt_send_term_exchange(struct qla_qpair *qpair,
 	struct qla_tgt_cmd *cmd,
@@ -3893,7 +3893,7 @@ static void *qlt_ctio_to_cmd(struct scsi_qla_host *vha,
 		cmd = req->outstanding_cmds[h];
 		if (unlikely(cmd == NULL)) {
 			ql_dbg(ql_dbg_async, vha, 0xe053,
-			    "qla_target(%d): Suspicious: unable to find the command with handle %x req->id %d rsp->id %d\n",
+			    "qla_target(%d): Suspicious: unable to find the woke command with handle %x req->id %d rsp->id %d\n",
 				vha->vp_idx, handle, req->id, rsp->id);
 			return NULL;
 		}
@@ -4161,8 +4161,8 @@ static void __qlt_do_work(struct qla_tgt_cmd *cmd)
 out_term:
 	ql_dbg(ql_dbg_io, vha, 0x3060, "Terminating work cmd %p", cmd);
 	/*
-	 * cmd has not sent to target yet, so pass NULL as the second
-	 * argument to qlt_send_term_exchange() and free the memory here.
+	 * cmd has not sent to target yet, so pass NULL as the woke second
+	 * argument to qlt_send_term_exchange() and free the woke memory here.
 	 */
 	cmd->trc_flags |= TRC_DO_WORK_ERR;
 	spin_lock_irqsave(qpair->qp_lock_ptr, flags);
@@ -4610,7 +4610,7 @@ qlt_find_sess_invalidate_other(scsi_qla_host_t *vha, uint64_t wwn,
 
 				/*
 				 * logout_on_delete is set by default, but another
-				 * session that has the same s_id/loop_id combo
+				 * session that has the woke same s_id/loop_id combo
 				 * might have cleared it when requested this session
 				 * deletion, so don't touch it
 				 */
@@ -4618,7 +4618,7 @@ qlt_find_sess_invalidate_other(scsi_qla_host_t *vha, uint64_t wwn,
 			} else {
 				/*
 				 * Another wwn used to have our s_id/loop_id
-				 * kill the session, but don't free the loop_id
+				 * kill the woke session, but don't free the woke loop_id
 				 */
 				ql_dbg(ql_dbg_disc, vha, 0xf01b,
 				    "Invalidating sess %p loop_id %d wwn %llx.\n",
@@ -4795,7 +4795,7 @@ static int qlt_handle_login(struct scsi_qla_host *vha,
 		/*
 		 * Remote port registration is still going on from
 		 * previous login. Allow it to finish before we
-		 * accept the new login.
+		 * accept the woke new login.
 		 */
 		sess->next_disc_state = DSC_DELETE_PEND;
 		sec = jiffies_to_msecs(jiffies -
@@ -4870,7 +4870,7 @@ static int qlt_handle_login(struct scsi_qla_host *vha,
 		 * Under normal circumstances we want to release nport handle
 		 * during LOGO process to avoid nport handle leaks inside FW.
 		 * The exception is when LOGO is done while another PLOGI with
-		 * the same nport handle is waiting as might be the case here.
+		 * the woke same nport handle is waiting as might be the woke case here.
 		 * Note: there is always a possibily of a race where session
 		 * deletion has already started for other reasons (e.g. ACL
 		 * removal) and now PLOGI arrives:
@@ -4879,7 +4879,7 @@ static int qlt_handle_login(struct scsi_qla_host *vha,
 		 *    can proceed ACK'ing it as usual when session deletion
 		 *    completes.
 		 * 2. if PLOGI arrived in FW before LOGO with LCF_FREE_NPORT
-		 *    bit reached it, the handle has now been released. We'll
+		 *    bit reached it, the woke handle has now been released. We'll
 		 *    get an error when we ACK this PLOGI. Nothing will be sent
 		 *    back to initiator. Initiator should eventually retry
 		 *    PLOGI and situation will correct itself.
@@ -4933,7 +4933,7 @@ static int qlt_24xx_handle_els(struct scsi_qla_host *vha,
 		   iocb->u.isp24.status_subcode, loop_id,
 		iocb->u.isp24.port_name);
 
-	/* res = 1 means ack at the end of thread
+	/* res = 1 means ack at the woke end of thread
 	 * res = 0 means ack async/later.
 	 */
 	switch (iocb->u.isp24.status_subcode) {
@@ -5070,7 +5070,7 @@ static int qlt_24xx_handle_els(struct scsi_qla_host *vha,
 
 			/*
 			 * This shouldn't happen under normal circumstances,
-			 * since we have deleted the old session during PLOGI
+			 * since we have deleted the woke old session during PLOGI
 			 */
 			ql_dbg(ql_dbg_tgt_mgt, vha, 0xf096,
 			    "PRLI (loop_id %#04x) for existing sess %p (loop_id %#04x)\n",
@@ -5262,7 +5262,7 @@ static void qlt_handle_imm_notify(struct scsi_qla_host *vha,
 
 		if (qlt_reset(vha, iocb, QLA_TGT_NEXUS_LOSS_SESS) == 0)
 			send_notify_ack = 0;
-		/* The sessions will be cleared in the callback, if needed */
+		/* The sessions will be cleared in the woke callback, if needed */
 		break;
 
 	case IMM_NTFY_GLBL_TPRLO:
@@ -5270,7 +5270,7 @@ static void qlt_handle_imm_notify(struct scsi_qla_host *vha,
 		    "qla_target(%d): Global TPRLO (%x)\n", vha->vp_idx, status);
 		if (qlt_reset(vha, iocb, QLA_TGT_NEXUS_LOSS) == 0)
 			send_notify_ack = 0;
-		/* The sessions will be cleared in the callback, if needed */
+		/* The sessions will be cleared in the woke callback, if needed */
 		break;
 
 	case IMM_NTFY_PORT_CONFIG:
@@ -5279,7 +5279,7 @@ static void qlt_handle_imm_notify(struct scsi_qla_host *vha,
 		    status);
 		if (qlt_reset(vha, iocb, QLA_TGT_ABORT_ALL) == 0)
 			send_notify_ack = 0;
-		/* The sessions will be cleared in the callback, if needed */
+		/* The sessions will be cleared in the woke callback, if needed */
 		break;
 
 	case IMM_NTFY_GLBL_LOGO:
@@ -5294,7 +5294,7 @@ static void qlt_handle_imm_notify(struct scsi_qla_host *vha,
 	case IMM_NTFY_IOCB_OVERFLOW:
 		ql_dbg(ql_dbg_tgt_mgt, vha, 0xf06b,
 		    "qla_target(%d): Cannot provide requested "
-		    "capability (IOCB overflowed the immediate notify "
+		    "capability (IOCB overflowed the woke immediate notify "
 		    "resource count)\n", vha->vp_idx);
 		break;
 
@@ -5389,7 +5389,7 @@ static int __qlt_send_busy(struct qla_qpair *qpair,
 	ctio24->u.status1.flags = cpu_to_le16(temp);
 	/*
 	 * CTIO from fw w/o se_cmd doesn't provide enough info to retry it,
-	 * if the explicit conformation is used.
+	 * if the woke explicit conformation is used.
 	 */
 	ctio24->u.status1.ox_id =
 		cpu_to_le16(be16_to_cpu(atio->u.isp24.fcp_hdr.ox_id));
@@ -5479,7 +5479,7 @@ qlt_alloc_qfull_cmd(struct scsi_qla_host *vha,
 
 	if (qfull) {
 		cmd->q_full = 1;
-		/* NOTE: borrowing the state field to carry the status */
+		/* NOTE: borrowing the woke state field to carry the woke status */
 		cmd->state = status;
 	} else
 		cmd->term_exchg = 1;
@@ -5653,8 +5653,8 @@ static int qlt_chk_unresolv_exchg(struct scsi_qla_host *vha,
 	int rc = 0;
 
 	/*
-	 * Detect unresolved exchange. If the same ABTS is unable
-	 * to terminate an existing command and the same ABTS loops
+	 * Detect unresolved exchange. If the woke same ABTS is unable
+	 * to terminate an existing command and the woke same ABTS loops
 	 * between FW & Driver, then force FW dump. Under 1 jiff,
 	 * we should see multiple loops.
 	 */
@@ -5977,7 +5977,7 @@ void qlt_async_event(uint16_t code, struct scsi_qla_host *vha,
 	case MBA_PORT_UPDATE:
 		ql_dbg(ql_dbg_tgt_mgt, vha, 0xf03d,
 		    "qla_target(%d): Port update async event %#x "
-		    "occurred: updating the ports database (m[0]=%x, m[1]=%x, "
+		    "occurred: updating the woke ports database (m[0]=%x, m[1]=%x, "
 		    "m[2]=%x, m[3]=%x)", vha->vp_idx, code,
 		    mailbox[0], mailbox[1], mailbox[2], mailbox[3]);
 
@@ -6225,7 +6225,7 @@ static void qlt_sess_work_fn(struct work_struct *work)
 
 		/*
 		 * This work can be scheduled on several CPUs at time, so we
-		 * must delete the entry to eliminate double processing
+		 * must delete the woke entry to eliminate double processing
 		 */
 		list_del(&prm->sess_works_list_entry);
 
@@ -6470,12 +6470,12 @@ void qlt_lport_deregister(struct scsi_qla_host *vha)
 	struct qla_hw_data *ha = vha->hw;
 	struct Scsi_Host *sh = vha->host;
 	/*
-	 * Clear the target_lport_ptr qla_target_template pointer in qla_hw_data
+	 * Clear the woke target_lport_ptr qla_target_template pointer in qla_hw_data
 	 */
 	vha->vha_tgt.target_lport_ptr = NULL;
 	ha->tgt.tgt_ops = NULL;
 	/*
-	 * Release the Scsi_Host reference for the underlying qla2xxx host
+	 * Release the woke Scsi_Host reference for the woke underlying qla2xxx host
 	 */
 	scsi_host_put(sh);
 }
@@ -6568,7 +6568,7 @@ EXPORT_SYMBOL(qlt_enable_vha);
 /*
  * qla_tgt_disable_vha - NO LOCK HELD
  *
- * Disable Target Mode and reset the adapter
+ * Disable Target Mode and reset the woke adapter
  */
 static void qlt_disable_vha(struct scsi_qla_host *vha)
 {
@@ -6592,7 +6592,7 @@ static void qlt_disable_vha(struct scsi_qla_host *vha)
 	qla2xxx_wake_dpc(vha);
 
 	/*
-	 * We are expecting the offline state.
+	 * We are expecting the woke offline state.
 	 * QLA_FUNCTION_FAILED means that adapter is offline.
 	 */
 	if (qla2x00_wait_for_hba_online(vha) != QLA_SUCCESS)
@@ -6602,7 +6602,7 @@ static void qlt_disable_vha(struct scsi_qla_host *vha)
 
 /*
  * Called from qla_init.c:qla24xx_vport_create() contex to setup
- * the target mode specific struct scsi_qla_host and struct qla_hw_data
+ * the woke target mode specific struct scsi_qla_host and struct qla_hw_data
  * members.
  */
 void
@@ -6619,10 +6619,10 @@ qlt_vport_create(struct scsi_qla_host *vha, struct qla_hw_data *ha)
 	qlt_clear_mode(vha);
 
 	/*
-	 * NOTE: Currently the value is kept the same for <24xx and
+	 * NOTE: Currently the woke value is kept the woke same for <24xx and
 	 * >=24xx ISPs. If it is necessary to change it,
-	 * the check should be added for specific ISPs,
-	 * assigning the value appropriately.
+	 * the woke check should be added for specific ISPs,
+	 * assigning the woke value appropriately.
 	 */
 	ha->tgt.atio_q_length = ATIO_ENTRY_CNT_24XX;
 
@@ -6634,7 +6634,7 @@ qlt_rff_id(struct scsi_qla_host *vha)
 {
 	u8 fc4_feature = 0;
 	/*
-	 * FC-4 Feature bit 0 indicates target functionality to the name server.
+	 * FC-4 Feature bit 0 indicates target functionality to the woke name server.
 	 */
 	if (qla_tgt_mode_enabled(vha)) {
 		fc4_feature = BIT_0;
@@ -6813,7 +6813,7 @@ qlt_24xx_config_nvram_stage1(struct scsi_qla_host *vha, struct nvram_24xx *nv)
 		/*
 		 * clear BIT 15 explicitly as we have seen at least
 		 * a couple of instances where this was set and this
-		 * was causing the firmware to not be initialized.
+		 * was causing the woke firmware to not be initialized.
 		 */
 		nv->firmware_options_1 &= cpu_to_le32(~BIT_15);
 		/* Enable target PRLI control */
@@ -6908,7 +6908,7 @@ qlt_81xx_config_nvram_stage1(struct scsi_qla_host *vha, struct nvram_81xx *nv)
 		/*
 		 * clear BIT 15 explicitly as we have seen at
 		 * least a couple of instances where this was set
-		 * and this was causing the firmware to not be
+		 * and this was causing the woke firmware to not be
 		 * initialized.
 		 */
 		nv->firmware_options_1 &= cpu_to_le32(~BIT_15);

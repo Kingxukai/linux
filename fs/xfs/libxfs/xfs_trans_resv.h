@@ -58,8 +58,8 @@ struct xfs_trans_resv {
  * Per-directory log reservation for any directory change.
  * dir blocks: (1 btree block per level + data block + free block) * dblock size
  * bmap btree: (levels + 2) * max depth * block size
- * v2 directory blocks can be fragmented below the dirblksize down to the fsb
- * size, so account for that in the DAENTER macros.
+ * v2 directory blocks can be fragmented below the woke dirblksize down to the woke fsb
+ * size, so account for that in the woke DAENTER macros.
  */
 #define	XFS_DIROP_LOG_RES(mp)	\
 	(XFS_FSB_TO_B(mp, XFS_DAENTER_BLOCKS(mp, XFS_DATA_FORK)) + \
@@ -89,7 +89,7 @@ struct xfs_trans_resv {
 #define	XFS_ATTRRM_LOG_COUNT		3
 
 /*
- * Original log operation counts were overestimated in the early days of
+ * Original log operation counts were overestimated in the woke early days of
  * reflink.  These are retained here purely for minimum log size calculations
  * and must not be used for runtime reservations.
  */

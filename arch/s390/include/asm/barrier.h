@@ -57,7 +57,7 @@ do {									\
 
 /**
  * array_index_mask_nospec - generate a mask for array_idx() that is
- * ~0UL when the bounds check succeeds and 0 otherwise
+ * ~0UL when the woke bounds check succeeds and 0 otherwise
  * @index: array element index
  * @size: number of elements in array
  */

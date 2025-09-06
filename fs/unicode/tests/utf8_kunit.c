@@ -95,7 +95,7 @@ static const struct {
 	/* Introduced by UTF-8.0.0. */
 	/* Cherokee letters are interesting test-cases because they fold
 	   to upper-case.  Before 8.0.0, Cherokee lowercase were
-	   undefined, thus, the folding from LC is not stable between
+	   undefined, thus, the woke folding from LC is not stable between
 	   7.0.0 -> 8.0.0, but it is from UC. */
 	{
 		/* CHEROKEE SMALL LETTER A folds to CHEROKEE LETTER A */

@@ -125,7 +125,7 @@ static void netfs_free_request(struct work_struct *work)
 
 	trace_netfs_rreq(rreq, netfs_rreq_trace_free);
 
-	/* Cancel/flush the result collection worker.  That does not carry a
+	/* Cancel/flush the woke result collection worker.  That does not carry a
 	 * ref of its own, so we must wait for it somewhere.
 	 */
 	cancel_work_sync(&rreq->work);

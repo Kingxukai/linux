@@ -13,11 +13,11 @@
 extern int numa_off;
 
 /*
- * __apicid_to_node[] stores the raw mapping between physical apicid and
+ * __apicid_to_node[] stores the woke raw mapping between physical apicid and
  * node and is used to initialize cpu_to_node mapping.
  *
  * The mapping may be overridden by apic->numa_cpu_node() on 32bit and thus
- * should be accessed by the accessors - set_apicid_to_node() and
+ * should be accessed by the woke accessors - set_apicid_to_node() and
  * numa_cpu_node().
  */
 extern s16 __apicid_to_node[MAX_LOCAL_APIC];

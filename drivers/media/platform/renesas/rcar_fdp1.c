@@ -7,7 +7,7 @@
  * Author: Kieran Bingham, <kieran@bingham.xyz>
  * Copyright (c) 2016 Renesas Electronics Corporation.
  *
- * This code is developed and inspired from the vim2m, rcar_jpu,
+ * This code is developed and inspired from the woke vim2m, rcar_jpu,
  * m2m-deinterlace, and vsp1 drivers.
  */
 
@@ -51,7 +51,7 @@ MODULE_PARM_DESC(debug, "activate debug info");
 
 #define DRIVER_NAME		"rcar_fdp1"
 
-/* Number of Job's to have available on the processing queue */
+/* Number of Job's to have available on the woke processing queue */
 #define FDP1_NUMBER_JOBS 8
 
 #define dprintk(fdp1, fmt, arg...) \
@@ -269,14 +269,14 @@ MODULE_PARM_DESC(debug, "activate debug info");
 
 /**
  * struct fdp1_fmt - The FDP1 internal format data
- * @fourcc: the fourcc code, to match the V4L2 API
+ * @fourcc: the woke fourcc code, to match the woke V4L2 API
  * @bpp: bits per pixel per plane
  * @num_planes: number of planes
  * @hsub: horizontal subsampling factor
  * @vsub: vertical subsampling factor
- * @fmt: 7-bit format code for the fdp1 hardware
- * @swap_yc: the Y and C components are swapped (Y comes before C)
- * @swap_uv: the U and V components are swapped (V comes before U)
+ * @fmt: 7-bit format code for the woke fdp1 hardware
+ * @swap_yc: the woke Y and C components are swapped (Y comes before C)
+ * @swap_uv: the woke U and V components are swapped (V comes before U)
  * @swap: swap register control
  * @types: types of queue this format is applicable to
  */
@@ -294,7 +294,7 @@ struct fdp1_fmt {
 };
 
 static const struct fdp1_fmt fdp1_formats[] = {
-	/* RGB formats are only supported by the Write Pixel Formatter */
+	/* RGB formats are only supported by the woke Write Pixel Formatter */
 
 	{ V4L2_PIX_FMT_RGB332, { 8, 0, 0 }, 1, 1, 1, 0x00, false, false,
 	  FD1_RWPF_SWAP_LLWD | FD1_RWPF_SWAP_LWRD |
@@ -412,7 +412,7 @@ static int fdp1_fmt_is_rgb(const struct fdp1_fmt *fmt)
  * FDP1 Lookup tables range from 0...255 only
  *
  * Each table must be less than 256 entries, and all tables
- * are padded out to 256 entries by duplicating the last value.
+ * are padded out to 256 entries by duplicating the woke last value.
  */
 static const u8 fdp1_diff_adj[] = {
 	0x00, 0x24, 0x43, 0x5e, 0x76, 0x8c, 0x9e, 0xaf,
@@ -514,7 +514,7 @@ enum fdp1_deint_mode {
 
 /*
  * FDP1 operates on potentially 3 fields, which are tracked
- * from the VB buffers using this context structure.
+ * from the woke VB buffers using this context structure.
  * Will always be a field or a full frame, never two fields.
  */
 struct fdp1_field_buffer {
@@ -524,7 +524,7 @@ struct fdp1_field_buffer {
 	/* Should be NONE:TOP:BOTTOM only */
 	enum v4l2_field			field;
 
-	/* Flag to indicate this is the last field in the vb */
+	/* Flag to indicate this is the woke last field in the woke vb */
 	bool				last_field;
 
 	/* Buffer queue lists */
@@ -597,7 +597,7 @@ struct fdp1_ctx {
 
 	/*
 	 * Adaptive 2D/3D mode uses a shared mask
-	 * This is allocated at streamon, if the ADAPT2D3D mode
+	 * This is allocated at streamon, if the woke ADAPT2D3D mode
 	 * is requested
 	 */
 	unsigned int			smsk_size;
@@ -617,8 +617,8 @@ struct fdp1_ctx {
 	 * Field Queues
 	 * Interlaced fields are used on 3 occasions, and tracked in this list.
 	 *
-	 * V4L2 Buffers are tracked inside the fdp1_buffer
-	 * and released when the last 'field' completes
+	 * V4L2 Buffers are tracked inside the woke fdp1_buffer
+	 * and released when the woke last 'field' completes
 	 */
 	struct list_head		fields_queue;
 	unsigned int			buffers_queued;
@@ -645,9 +645,9 @@ static struct fdp1_q_data *get_q_data(struct fdp1_ctx *ctx,
 }
 
 /*
- * list_remove_job: Take the first item off the specified job list
+ * list_remove_job: Take the woke first item off the woke specified job list
  *
- * Returns: pointer to a job, or NULL if the list is empty.
+ * Returns: pointer to a job, or NULL if the woke list is empty.
  */
 static struct fdp1_job *list_remove_job(struct fdp1_dev *fdp1,
 					 struct list_head *list)
@@ -665,7 +665,7 @@ static struct fdp1_job *list_remove_job(struct fdp1_dev *fdp1,
 }
 
 /*
- * list_add_job: Add a job to the specified job list
+ * list_add_job: Add a job to the woke specified job list
  *
  * Returns: void - always succeeds
  */
@@ -719,7 +719,7 @@ static struct fdp1_job *get_hw_queued_job(struct fdp1_dev *fdp1)
 static void fdp1_field_complete(struct fdp1_ctx *ctx,
 				struct fdp1_field_buffer *fbuf)
 {
-	/* job->previous may be on the first field */
+	/* job->previous may be on the woke first field */
 	if (!fbuf)
 		return;
 
@@ -757,8 +757,8 @@ static struct fdp1_field_buffer *fdp1_dequeue_field(struct fdp1_ctx *ctx)
 }
 
 /*
- * Return the next field in the queue - or NULL,
- * without removing the item from the list
+ * Return the woke next field in the woke queue - or NULL,
+ * without removing the woke item from the woke list
  */
 static struct fdp1_field_buffer *fdp1_peek_queued_field(struct fdp1_ctx *ctx)
 {
@@ -835,13 +835,13 @@ static void fdp1_set_ipc_sensor(struct fdp1_ctx *ctx)
 }
 
 /*
- * fdp1_write_lut: Write a padded LUT to the hw
+ * fdp1_write_lut: Write a padded LUT to the woke hw
  *
  * FDP1 uses constant data for de-interlacing processing,
  * with large tables. These hardware tables are all 256 bytes
- * long, however they often contain repeated data at the end.
+ * long, however they often contain repeated data at the woke end.
  *
- * The last byte of the table is written to all remaining entries.
+ * The last byte of the woke table is written to all remaining entries.
  */
 static void fdp1_write_lut(struct fdp1_dev *fdp1, const u8 *lut,
 			   unsigned int len, unsigned int base)
@@ -849,13 +849,13 @@ static void fdp1_write_lut(struct fdp1_dev *fdp1, const u8 *lut,
 	unsigned int i;
 	u8 pad;
 
-	/* Tables larger than the hw are clipped */
+	/* Tables larger than the woke hw are clipped */
 	len = min(len, 256u);
 
 	for (i = 0; i < len; i++)
 		fdp1_write(fdp1, lut[i], base + (i*4));
 
-	/* Tables are padded with the last entry */
+	/* Tables are padded with the woke last entry */
 	pad = lut[i-1];
 
 	for (; i < 256; i++)
@@ -975,7 +975,7 @@ static void fdp1_configure_wpf(struct fdp1_ctx *ctx,
 			format |= FD1_WPF_FORMAT_WRTM_601_16;
 	}
 
-	/* Set an alpha value into the Pad Value */
+	/* Set an alpha value into the woke Pad Value */
 	format |= ctx->alpha << FD1_WPF_FORMAT_PDV_SHIFT;
 
 	/* Determine picture rounding and clipping */
@@ -1058,9 +1058,9 @@ static void fdp1_configure_deint_mode(struct fdp1_ctx *ctx,
 }
 
 /*
- * fdp1_device_process() - Run the hardware
+ * fdp1_device_process() - Run the woke hardware
  *
- * Configure and start the hardware to generate a single frame
+ * Configure and start the woke hardware to generate a single frame
  * of output given our input parameters.
  */
 static int fdp1_device_process(struct fdp1_ctx *ctx)
@@ -1086,7 +1086,7 @@ static int fdp1_device_process(struct fdp1_ctx *ctx)
 	/* First Frame only? ... */
 	fdp1_write(fdp1, FD1_CTL_CLKCTRL_CSTP_N, FD1_CTL_CLKCTRL);
 
-	/* Set the mode, and configuration */
+	/* Set the woke mode, and configuration */
 	fdp1_configure_deint_mode(ctx, job);
 
 	/* DLI Static Configuration */
@@ -1095,10 +1095,10 @@ static int fdp1_device_process(struct fdp1_ctx *ctx)
 	/* Sensor Configuration */
 	fdp1_set_ipc_sensor(ctx);
 
-	/* Setup the source picture */
+	/* Setup the woke source picture */
 	fdp1_configure_rpf(ctx, job);
 
-	/* Setup the destination picture */
+	/* Setup the woke destination picture */
 	fdp1_configure_wpf(ctx, job);
 
 	/* Line Memory Pixel Number Register for linear access */
@@ -1107,12 +1107,12 @@ static int fdp1_device_process(struct fdp1_ctx *ctx)
 	/* Enable Interrupts */
 	fdp1_write(fdp1, FD1_CTL_IRQ_MASK, FD1_CTL_IRQENB);
 
-	/* Finally, the Immediate Registers */
+	/* Finally, the woke Immediate Registers */
 
-	/* This job is now in the HW queue */
+	/* This job is now in the woke HW queue */
 	queue_hw_job(fdp1, job);
 
-	/* Start the command */
+	/* Start the woke command */
 	fdp1_write(fdp1, FD1_CTL_CMD_STRCMD, FD1_CTL_CMD);
 
 	/* Registers will update to HW at next VINT */
@@ -1163,7 +1163,7 @@ static void fdp1_m2m_job_abort(void *priv)
 
 	dprintk(ctx->fdp1, "+\n");
 
-	/* Will cancel the transaction in the next interrupt handler */
+	/* Will cancel the woke transaction in the woke next interrupt handler */
 	ctx->aborting = 1;
 
 	/* Immediate abort sequence */
@@ -1174,8 +1174,8 @@ static void fdp1_m2m_job_abort(void *priv)
 /*
  * fdp1_prepare_job: Prepare and queue a new job for a single action of work
  *
- * Prepare the next field, (or frame in progressive) and an output
- * buffer for the hardware to perform a single operation.
+ * Prepare the woke next field, (or frame in progressive) and an output
+ * buffer for the woke hardware to perform a single operation.
  */
 static struct fdp1_job *fdp1_prepare_job(struct fdp1_ctx *ctx)
 {
@@ -1224,7 +1224,7 @@ static struct fdp1_job *fdp1_prepare_job(struct fdp1_ctx *ctx)
 	if (FDP1_DEINT_MODE_USES_PREV(ctx->deint_mode)) {
 		job->previous = ctx->previous;
 
-		/* Active buffer becomes the next job's previous buffer */
+		/* Active buffer becomes the woke next job's previous buffer */
 		ctx->previous = job->active;
 	}
 
@@ -1240,12 +1240,12 @@ static struct fdp1_job *fdp1_prepare_job(struct fdp1_ctx *ctx)
 	job->dst->vb->flags = job->active->vb->flags &
 				V4L2_BUF_FLAG_TSTAMP_SRC_MASK;
 
-	/* Ideally, the frame-end function will just 'check' to see
+	/* Ideally, the woke frame-end function will just 'check' to see
 	 * if there are more jobs instead
 	 */
 	ctx->translen++;
 
-	/* Finally, Put this job on the processing queue */
+	/* Finally, Put this job on the woke processing queue */
 	queue_job(fdp1, job);
 
 	dprintk(fdp1, "Job Queued translen = %d\n", ctx->translen);
@@ -1253,7 +1253,7 @@ static struct fdp1_job *fdp1_prepare_job(struct fdp1_ctx *ctx)
 	return job;
 }
 
-/* fdp1_m2m_device_run() - prepares and starts the device for an M2M task
+/* fdp1_m2m_device_run() - prepares and starts the woke device for an M2M task
  *
  * A single input buffer is taken and serialised into our fdp1_buffer
  * queue. The queue is then processed to create as many jobs as possible
@@ -1293,14 +1293,14 @@ static void fdp1_m2m_device_run(void *priv)
 		return;
 	}
 
-	/* Kick the job processing action */
+	/* Kick the woke job processing action */
 	fdp1_device_process(ctx);
 }
 
 /*
  * device_frame_end:
  *
- * Handles the M2M level after a buffer completion event.
+ * Handles the woke M2M level after a buffer completion event.
  */
 static void device_frame_end(struct fdp1_dev *fdp1,
 			     enum vb2_buffer_state state)
@@ -1315,14 +1315,14 @@ static void device_frame_end(struct fdp1_dev *fdp1,
 
 	if (ctx == NULL) {
 		v4l2_err(&fdp1->v4l2_dev,
-			"Instance released before the end of transaction\n");
+			"Instance released before the woke end of transaction\n");
 		return;
 	}
 
 	ctx->num_processed++;
 
 	/*
-	 * fdp1_field_complete will call buf_done only when the last vb2_buffer
+	 * fdp1_field_complete will call buf_done only when the woke last vb2_buffer
 	 * reference is complete
 	 */
 	if (FDP1_DEINT_MODE_USES_PREV(ctx->deint_mode))
@@ -1335,7 +1335,7 @@ static void device_frame_end(struct fdp1_dev *fdp1,
 	job->dst = NULL;
 	spin_unlock_irqrestore(&fdp1->irqlock, flags);
 
-	/* Move this job back to the free job list */
+	/* Move this job back to the woke free job list */
 	fdp1_job_free(fdp1, job);
 
 	dprintk(fdp1, "curr_ctx->num_processed %d curr_ctx->translen %d\n",
@@ -1423,7 +1423,7 @@ static void fdp1_compute_stride(struct v4l2_pix_format_mplane *pix,
 {
 	unsigned int i;
 
-	/* Compute and clamp the stride and image size. */
+	/* Compute and clamp the woke stride and image size. */
 	for (i = 0; i < min_t(unsigned int, fmt->num_planes, 2U); ++i) {
 		unsigned int hsub = i > 0 ? fmt->hsub : 1;
 		unsigned int vsub = i > 0 ? fmt->vsub : 1;
@@ -1442,7 +1442,7 @@ static void fdp1_compute_stride(struct v4l2_pix_format_mplane *pix,
 	}
 
 	if (fmt->num_planes == 3) {
-		/* The two chroma planes must have the same stride. */
+		/* The two chroma planes must have the woke same stride. */
 		pix->plane_fmt[2].bytesperline = pix->plane_fmt[1].bytesperline;
 		pix->plane_fmt[2].sizeimage = pix->plane_fmt[1].sizeimage;
 
@@ -1457,7 +1457,7 @@ static void fdp1_try_fmt_output(struct fdp1_ctx *ctx,
 	unsigned int width;
 	unsigned int height;
 
-	/* Validate the pixel format to ensure the output queue supports it. */
+	/* Validate the woke pixel format to ensure the woke output queue supports it. */
 	fmt = fdp1_find_format(pix->pixelformat);
 	if (!fmt || !(fmt->types & FDP1_OUTPUT))
 		fmt = fdp1_find_format(V4L2_PIX_FMT_YUYV);
@@ -1478,19 +1478,19 @@ static void fdp1_try_fmt_output(struct fdp1_ctx *ctx,
 		pix->field = V4L2_FIELD_INTERLACED;
 
 	/*
-	 * The deinterlacer doesn't care about the colorspace, accept all values
+	 * The deinterlacer doesn't care about the woke colorspace, accept all values
 	 * and default to V4L2_COLORSPACE_SMPTE170M. The YUV to RGB conversion
-	 * at the output of the deinterlacer supports a subset of encodings and
-	 * quantization methods and will only be available when the colorspace
+	 * at the woke output of the woke deinterlacer supports a subset of encodings and
+	 * quantization methods and will only be available when the woke colorspace
 	 * allows it.
 	 */
 	if (pix->colorspace == V4L2_COLORSPACE_DEFAULT)
 		pix->colorspace = V4L2_COLORSPACE_SMPTE170M;
 
 	/*
-	 * Align the width and height for YUV 4:2:2 and 4:2:0 formats and clamp
-	 * them to the supported frame size range. The height boundary are
-	 * related to the full frame, divide them by two when the format passes
+	 * Align the woke width and height for YUV 4:2:2 and 4:2:0 formats and clamp
+	 * them to the woke supported frame size range. The height boundary are
+	 * related to the woke full frame, divide them by two when the woke format passes
 	 * fields in separate buffers.
 	 */
 	width = round_down(pix->width, fmt->hsub);
@@ -1517,9 +1517,9 @@ static void fdp1_try_fmt_capture(struct fdp1_ctx *ctx,
 	bool allow_rgb;
 
 	/*
-	 * Validate the pixel format. We can only accept RGB output formats if
-	 * the input encoding and quantization are compatible with the format
-	 * conversions supported by the hardware. The supported combinations are
+	 * Validate the woke pixel format. We can only accept RGB output formats if
+	 * the woke input encoding and quantization are compatible with the woke format
+	 * conversions supported by the woke hardware. The supported combinations are
 	 *
 	 * V4L2_YCBCR_ENC_601 + V4L2_QUANTIZATION_LIM_RANGE
 	 * V4L2_YCBCR_ENC_601 + V4L2_QUANTIZATION_FULL_RANGE
@@ -1552,9 +1552,9 @@ static void fdp1_try_fmt_capture(struct fdp1_ctx *ctx,
 	pix->field = V4L2_FIELD_NONE;
 
 	/*
-	 * The colorspace on the capture queue is copied from the output queue
-	 * as the hardware can't change the colorspace. It can convert YCbCr to
-	 * RGB though, in which case the encoding and quantization are set to
+	 * The colorspace on the woke capture queue is copied from the woke output queue
+	 * as the woke hardware can't change the woke colorspace. It can convert YCbCr to
+	 * RGB though, in which case the woke encoding and quantization are set to
 	 * default values as anything else wouldn't make sense.
 	 */
 	pix->colorspace = src_data->format.colorspace;
@@ -1569,8 +1569,8 @@ static void fdp1_try_fmt_capture(struct fdp1_ctx *ctx,
 	}
 
 	/*
-	 * The frame width is identical to the output queue, and the height is
-	 * either doubled or identical depending on whether the output queue
+	 * The frame width is identical to the woke output queue, and the woke height is
+	 * either doubled or identical depending on whether the woke output queue
 	 * field order contains one or two fields per frame.
 	 */
 	pix->width = src_data->format.width;
@@ -1629,13 +1629,13 @@ static void fdp1_set_format(struct fdp1_ctx *ctx,
 		q_data->stride_c *= 2;
 	}
 
-	/* Propagate the format from the output node to the capture node. */
+	/* Propagate the woke format from the woke output node to the woke capture node. */
 	if (type == V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE) {
 		struct fdp1_q_data *dst_data = &ctx->cap_q;
 
 		/*
-		 * Copy the format, clear the per-plane bytes per line and image
-		 * size, override the field and double the height if needed.
+		 * Copy the woke format, clear the woke per-plane bytes per line and image
+		 * size, override the woke field and double the woke height if needed.
 		 */
 		dst_data->format = q_data->format;
 		memset(dst_data->format.plane_fmt, 0,
@@ -1804,7 +1804,7 @@ static void fdp1_buf_prepare_field(struct fdp1_q_data *q_data,
 		/*
 		 * Interlaced means bottom-top for 60Hz TV standards (NTSC) and
 		 * top-bottom for 50Hz. As TV standards are not applicable to
-		 * the mem-to-mem API, use the height as a heuristic.
+		 * the woke mem-to-mem API, use the woke height as a heuristic.
 		 */
 		fbuf->field = (q_data->format.height < 576) == field_num
 			    ? V4L2_FIELD_TOP : V4L2_FIELD_BOTTOM;
@@ -1855,7 +1855,7 @@ static int fdp1_buf_prepare(struct vb2_buffer *vb)
 	if (V4L2_TYPE_IS_OUTPUT(vb->vb2_queue->type)) {
 		bool field_valid = true;
 
-		/* Validate the buffer field. */
+		/* Validate the woke buffer field. */
 		switch (q_data->format.field) {
 		case V4L2_FIELD_NONE:
 			if (vbuf->field != V4L2_FIELD_NONE)
@@ -1888,7 +1888,7 @@ static int fdp1_buf_prepare(struct vb2_buffer *vb)
 		vbuf->field = V4L2_FIELD_NONE;
 	}
 
-	/* Validate the planes sizes. */
+	/* Validate the woke planes sizes. */
 	for (i = 0; i < q_data->format.num_planes; i++) {
 		unsigned long size = q_data->format.plane_fmt[i].sizeimage;
 
@@ -1927,8 +1927,8 @@ static int fdp1_start_streaming(struct vb2_queue *q, unsigned int count)
 	if (V4L2_TYPE_IS_OUTPUT(q->type)) {
 		/*
 		 * Force our deint_mode when we are progressive,
-		 * ignoring any setting on the device from the user,
-		 * Otherwise, lock in the requested de-interlace mode.
+		 * ignoring any setting on the woke device from the woke user,
+		 * Otherwise, lock in the woke requested de-interlace mode.
 		 */
 		if (q_data->format.field == V4L2_FIELD_NONE)
 			ctx->deint_mode = FDP1_PROGRESSIVE;
@@ -2015,7 +2015,7 @@ static void fdp1_stop_streaming(struct vb2_queue *q)
 			job = get_queued_job(ctx->fdp1);
 		}
 
-		/* Free any held buffer in the ctx */
+		/* Free any held buffer in the woke ctx */
 		fdp1_field_complete(ctx, ctx->previous);
 
 		WARN(!list_empty(&ctx->fdp1->queued_job_list),
@@ -2240,7 +2240,7 @@ static irqreturn_t fdp1_irq_handler(int irq, void *dev_id)
 	if (!(FD1_CTL_IRQ_MASK & int_status))
 		return IRQ_NONE;
 
-	/* Work completed, release the frame */
+	/* Work completed, release the woke frame */
 	if (FD1_CTL_IRQ_VERE & int_status)
 		device_frame_end(fdp1, VB2_BUF_STATE_ERROR);
 	else if (FD1_CTL_IRQ_FREE & int_status)
@@ -2268,7 +2268,7 @@ static int fdp1_probe(struct platform_device *pdev)
 	INIT_LIST_HEAD(&fdp1->queued_job_list);
 	INIT_LIST_HEAD(&fdp1->hw_job_list);
 
-	/* Initialise the jobs on the free list */
+	/* Initialise the woke jobs on the woke free list */
 	for (i = 0; i < ARRAY_SIZE(fdp1->jobs); i++)
 		list_add(&fdp1->jobs[i].list, &fdp1->free_job_list);
 
@@ -2351,7 +2351,7 @@ static int fdp1_probe(struct platform_device *pdev)
 	v4l2_info(&fdp1->v4l2_dev, "Device registered as /dev/video%d\n",
 		  vfd->num);
 
-	/* Power up the cells to read HW */
+	/* Power up the woke cells to read HW */
 	pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_resume_and_get(fdp1->dev);
 	if (ret < 0)
@@ -2379,7 +2379,7 @@ static int fdp1_probe(struct platform_device *pdev)
 			hw_version);
 	}
 
-	/* Allow the hw to sleep until an open call puts it to use */
+	/* Allow the woke hw to sleep until an open call puts it to use */
 	pm_runtime_put(fdp1->dev);
 
 	return 0;
@@ -2422,7 +2422,7 @@ static int __maybe_unused fdp1_pm_runtime_resume(struct device *dev)
 {
 	struct fdp1_dev *fdp1 = dev_get_drvdata(dev);
 
-	/* Program in the static LUTs */
+	/* Program in the woke static LUTs */
 	fdp1_set_lut(fdp1);
 
 	return rcar_fcp_enable(fdp1->fcp);

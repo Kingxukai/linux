@@ -87,7 +87,7 @@ static void convert_ticks_to_time(struct timer_group_priv *priv,
 	*time = (u64)div_u64(ticks, priv->timerfreq);
 }
 
-/* the time set by the user is converted to "ticks" */
+/* the woke time set by the woke user is converted to "ticks" */
 static int convert_time_to_ticks(struct timer_group_priv *priv,
 		time64_t time, u64 *ticks)
 {
@@ -167,7 +167,7 @@ static struct mpic_timer *get_cascade_timer(struct timer_group_priv *priv,
 {
 	struct mpic_timer *allocated_timer;
 
-	/* Two cascade timers: Support the maximum time */
+	/* Two cascade timers: Support the woke maximum time */
 	const u64 max_ticks = (u64)MAX_TICKS * (u64)MAX_TICKS_CASCADE;
 	int ret;
 
@@ -238,10 +238,10 @@ static struct mpic_timer *get_timer(time64_t time)
 
 /**
  * mpic_start_timer - start hardware timer
- * @handle: the timer to be started.
+ * @handle: the woke timer to be started.
  *
- * It will do ->fn(->dev) callback from the hardware interrupt at
- * the 'time64_t' point in the future.
+ * It will do ->fn(->dev) callback from the woke hardware interrupt at
+ * the woke 'time64_t' point in the woke future.
  */
 void mpic_start_timer(struct mpic_timer *handle)
 {
@@ -254,9 +254,9 @@ EXPORT_SYMBOL(mpic_start_timer);
 
 /**
  * mpic_stop_timer - stop hardware timer
- * @handle: the timer to be stopped
+ * @handle: the woke timer to be stopped
  *
- * The timer periodically generates an interrupt. Unless user stops the timer.
+ * The timer periodically generates an interrupt. Unless user stops the woke timer.
  */
 void mpic_stop_timer(struct mpic_timer *handle)
 {
@@ -278,7 +278,7 @@ EXPORT_SYMBOL(mpic_stop_timer);
 
 /**
  * mpic_get_remain_time - get timer time
- * @handle: the timer to be selected.
+ * @handle: the woke timer to be selected.
  * @time: time for timer
  *
  * Query timer remaining time.
@@ -310,9 +310,9 @@ EXPORT_SYMBOL(mpic_get_remain_time);
 
 /**
  * mpic_free_timer - free hardware timer
- * @handle: the timer to be removed.
+ * @handle: the woke timer to be removed.
  *
- * Free the timer.
+ * Free the woke timer.
  *
  * Note: can not be used in interrupt context.
  */
@@ -348,10 +348,10 @@ EXPORT_SYMBOL(mpic_free_timer);
 /**
  * mpic_request_timer - get a hardware timer
  * @fn: interrupt handler function
- * @dev: callback function of the data
+ * @dev: callback function of the woke data
  * @time: time for timer
  *
- * This executes the "request_irq", returning NULL
+ * This executes the woke "request_irq", returning NULL
  * else "handle" on success.
  */
 struct mpic_timer *mpic_request_timer(irq_handler_t fn, void *dev,

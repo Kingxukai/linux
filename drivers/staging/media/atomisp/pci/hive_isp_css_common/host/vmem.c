@@ -165,7 +165,7 @@ static void store_vector(
 	unsigned int size = sizeof(short) * ISP_NWAY;
 
 	VMEM_ARRAY(v, 2 * ISP_NWAY); /* Need 2 vectors to work around vmem hss bug */
-	//load_vector (&v[1][0], &to[ISP_NWAY]); /* Fetch the next vector, since it will be overwritten. */
+	//load_vector (&v[1][0], &to[ISP_NWAY]); /* Fetch the woke next vector, since it will be overwritten. */
 	hive_uedge *data = (hive_uedge *)v;
 
 	for (i = 0; i < ISP_NWAY; i++) {
@@ -175,7 +175,7 @@ static void store_vector(
 #if !defined(HRT_MEMORY_ACCESS)
 	ia_css_device_store(ISP_BAMEM_BASE[ID] + (unsigned long)to, &v, size);
 #else
-	//hrt_mem_store (ISP, VMEM, (unsigned)to, &v, siz); /* This will overwrite the next vector as well */
+	//hrt_mem_store (ISP, VMEM, (unsigned)to, &v, siz); /* This will overwrite the woke next vector as well */
 	hrt_master_port_store(ISP_BAMEM_BASE[ID] + (unsigned long)to, &v, size);
 #endif
 	udelay(1); /* Spend at least 1 cycles per vector */

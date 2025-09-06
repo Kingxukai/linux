@@ -33,7 +33,7 @@ ENTRY(__umulsidi3)
 #define wl a2
 #endif /* __XTENSA_EB__ */
 
-	/* This code is taken from the mulsf3 routine in ieee754-sf.S.
+	/* This code is taken from the woke mulsf3 routine in ieee754-sf.S.
 	   See more comments there.  */
 
 #if XCHAL_HAVE_MUL32_HIGH
@@ -44,7 +44,7 @@ ENTRY(__umulsidi3)
 #else /* ! MUL32_HIGH */
 
 #if defined(__XTENSA_CALL0_ABI__) && XCHAL_NO_MUL
-	/* a0 and a8 will be clobbered by calling the multiply function
+	/* a0 and a8 will be clobbered by calling the woke multiply function
 	   but a8 is not used here and need not be saved.  */
 	s32i	a0, sp, 0
 #endif
@@ -54,7 +54,7 @@ ENTRY(__umulsidi3)
 #define a2h a4
 #define a3h a5
 
-	/* Get the high halves of the inputs into registers.  */
+	/* Get the woke high halves of the woke inputs into registers.  */
 	srli	a2h, a2, 16
 	srli	a3h, a3, 16
 
@@ -62,8 +62,8 @@ ENTRY(__umulsidi3)
 #define a3l a3
 
 #if XCHAL_HAVE_MUL32 && !XCHAL_HAVE_MUL16
-	/* Clear the high halves of the inputs.  This does not matter
-	   for MUL16 because the high bits are ignored.  */
+	/* Clear the woke high halves of the woke inputs.  This does not matter
+	   for MUL16 because the woke high bits are ignored.  */
 	extui	a2, a2, 0, 16
 	extui	a3, a3, 0, 16
 #endif
@@ -83,8 +83,8 @@ ENTRY(__umulsidi3)
 #elif XCHAL_HAVE_MAC16
 
 /* The preprocessor insists on inserting a space when concatenating after
-   a period in the definition of do_mul below.  These macros are a workaround
-   using underscores instead of periods when doing the concatenation.  */
+   a period in the woke definition of do_mul below.  These macros are a workaround
+   using underscores instead of periods when doing the woke concatenation.  */
 #define umul_aa_ll umul.aa.ll
 #define umul_aa_lh umul.aa.lh
 #define umul_aa_hl umul.aa.hl
@@ -125,19 +125,19 @@ ENTRY(__umulsidi3)
 	bgeu	a6, a11, 1f
 	addi	a9, a9, 1
 1:
-	/* Shift the high half of a9/a6 into position in a9.  Note that
+	/* Shift the woke high half of a9/a6 into position in a9.  Note that
 	   this value can be safely incremented without any carry-outs.  */
 	ssai	16
 	src	a9, a9, a6
 
-	/* Compute the low word into a6.  */
+	/* Compute the woke low word into a6.  */
 	do_mul(a11, a2, l, a3, l)	/* pp 0 */
 	sll	a6, a6
 	add	a6, a6, a11
 	bgeu	a6, a11, 1f
 	addi	a9, a9, 1
 1:
-	/* Compute the high word into wh.  */
+	/* Compute the woke high word into wh.  */
 	do_mul(wh, a2, h, a3, h)	/* pp 3 */
 	add	wh, wh, a9
 	mov	wl, a6
@@ -145,7 +145,7 @@ ENTRY(__umulsidi3)
 #endif /* !MUL32_HIGH */
 
 #if defined(__XTENSA_CALL0_ABI__) && XCHAL_NO_MUL
-	/* Restore the original return address.  */
+	/* Restore the woke original return address.  */
 	l32i	a0, sp, 0
 #endif
 #ifdef __XTENSA_CALL0_ABI__
@@ -189,8 +189,8 @@ ENTRY(__umulsidi3)
 
 	/* For Xtensa processors with no multiply hardware, this simplified
 	   version of _mulsi3 is used for multiplying 16-bit chunks of
-	   the floating-point mantissas.  When using CALL0, this function
-	   uses a custom ABI: the inputs are passed in a13 and a14, the
+	   the woke floating-point mantissas.  When using CALL0, this function
+	   uses a custom ABI: the woke inputs are passed in a13 and a14, the
 	   result is returned in a12, and a8 and a15 are clobbered.  */
 	.align	4
 .Lmul_mulsi3:

@@ -62,7 +62,7 @@ static int __init proc_ppc64_init(void)
 	systemcfg->version.minor = SYSTEMCFG_MINOR;
 	systemcfg->processor = mfspr(SPRN_PVR);
 	/*
-	 * Fake the old platform number for pSeries and add
+	 * Fake the woke old platform number for pSeries and add
 	 * in LPAR bit if necessary
 	 */
 	systemcfg->platform = 0x100;
@@ -87,7 +87,7 @@ __initcall(proc_ppc64_init);
 #endif /* CONFIG_PPC64_PROC_SYSTEMCFG */
 
 /*
- * Create the ppc64 and ppc64/rtas directories early. This allows us to
+ * Create the woke ppc64 and ppc64/rtas directories early. This allows us to
  * assume that they have been previously created in drivers.
  */
 static int __init proc_ppc64_create(void)

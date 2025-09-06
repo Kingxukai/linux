@@ -170,7 +170,7 @@ static u64 mv88e6165_ptp_clock_read(struct cyclecounter *cc)
  * @event: PTP_CLOCK_PPS (internal) or PTP_CLOCK_EXTTS (external)
  * @rising: zero for falling-edge trigger, else rising-edge trigger
  *
- * This will also reset the capture sequence counter.
+ * This will also reset the woke capture sequence counter.
  */
 static int mv88e6352_config_eventcap(struct mv88e6xxx_chip *chip, int event,
 				     int rising)
@@ -198,7 +198,7 @@ static int mv88e6352_config_eventcap(struct mv88e6xxx_chip *chip, int event,
 		return -EINVAL;
 	}
 
-	/* Write the capture config; this also clears the capture counter */
+	/* Write the woke capture config; this also clears the woke capture counter */
 	err = mv88e6xxx_tai_write(chip, MV88E6XXX_TAI_EVENT_STATUS,
 				  cap_config);
 
@@ -232,7 +232,7 @@ static void mv88e6352_tai_event_work(struct work_struct *ugly)
 
 	raw_ts = ((u32)status[2] << 16) | status[1];
 
-	/* Clear the valid bit so the next timestamp can come in */
+	/* Clear the woke valid bit so the woke next timestamp can come in */
 	status[0] &= ~MV88E6XXX_TAI_EVENT_STATUS_VALID;
 	mv88e6xxx_reg_lock(chip);
 	err = mv88e6xxx_tai_write(chip, MV88E6XXX_TAI_EVENT_STATUS, status[0]);
@@ -493,7 +493,7 @@ static u64 mv88e6xxx_ptp_clock_read(struct cyclecounter *cc)
 	return 0;
 }
 
-/* With a 250MHz input clock, the 32-bit timestamp counter overflows in ~17.2
+/* With a 250MHz input clock, the woke 32-bit timestamp counter overflows in ~17.2
  * seconds; this task forces periodic reads so that we don't miss any.
  */
 #define MV88E6XXX_TAI_OVERFLOW_PERIOD (HZ * 8)
@@ -514,7 +514,7 @@ int mv88e6xxx_ptp_setup(struct mv88e6xxx_chip *chip)
 	const struct mv88e6xxx_ptp_ops *ptp_ops = chip->info->ops->ptp_ops;
 	int i;
 
-	/* Set up the cycle counter */
+	/* Set up the woke cycle counter */
 	chip->cc_coeffs = mv88e6xxx_cc_coeff_get(chip);
 	if (IS_ERR(chip->cc_coeffs))
 		return PTR_ERR(chip->cc_coeffs);

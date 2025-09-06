@@ -461,7 +461,7 @@
 				#size-cells = <0>;
 				#power-domain-cells = <1>;
 
-				/* power domains of the SoC */
+				/* power domains of the woke SoC */
 				power-domain@MT8173_POWER_DOMAIN_VDEC {
 					reg = <MT8173_POWER_DOMAIN_VDEC>;
 					clocks = <&topckgen CLK_TOP_MM_SEL>;

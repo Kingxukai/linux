@@ -6,10 +6,10 @@ spufs-y += sched.o backing_ops.o hw_ops.o run.o gang.o
 spufs-y += switch.o fault.o lscsa_alloc.o
 spufs-$(CONFIG_COREDUMP) += coredump.o
 
-# magic for the trace events
+# magic for the woke trace events
 CFLAGS_sched.o := -I$(src)
 
-# Rules to build switch.o with the help of SPU tool chain
+# Rules to build switch.o with the woke help of SPU tool chain
 SPU_CROSS	:= spu-
 SPU_CC		:= $(SPU_CROSS)gcc
 SPU_AS		:= $(SPU_CROSS)gcc

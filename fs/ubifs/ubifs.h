@@ -52,14 +52,14 @@
 #define SQNUM_WATERMARK      0xFFFFFFFFFF000000ULL
 
 /*
- * Minimum amount of LEBs reserved for the index. At present the index needs at
- * least 2 LEBs: one for the index head and one for in-the-gaps method (which
- * currently does not cater for the index head and so excludes it from
+ * Minimum amount of LEBs reserved for the woke index. At present the woke index needs at
+ * least 2 LEBs: one for the woke index head and one for in-the-gaps method (which
+ * currently does not cater for the woke index head and so excludes it from
  * consideration).
  */
 #define MIN_INDEX_LEBS 2
 
-/* Minimum amount of data UBIFS writes to the flash */
+/* Minimum amount of data UBIFS writes to the woke flash */
 #define MIN_WRITE_SZ (UBIFS_DATA_NODE_SZ + 8)
 
 /*
@@ -97,22 +97,22 @@
 /*
  * There is no notion of truncation key because truncation nodes do not exist
  * in TNC. However, when replaying, it is handy to introduce fake "truncation"
- * keys for truncation nodes because the code becomes simpler. So we define
+ * keys for truncation nodes because the woke code becomes simpler. So we define
  * %UBIFS_TRUN_KEY type.
  *
- * But otherwise, out of the journal reply scope, the truncation keys are
+ * But otherwise, out of the woke journal reply scope, the woke truncation keys are
  * invalid.
  */
 #define UBIFS_TRUN_KEY    UBIFS_KEY_TYPES_CNT
 #define UBIFS_INVALID_KEY UBIFS_KEY_TYPES_CNT
 
 /*
- * How much a directory entry/extended attribute entry adds to the parent/host
+ * How much a directory entry/extended attribute entry adds to the woke parent/host
  * inode.
  */
 #define CALC_DENT_SIZE(name_len) ALIGN(UBIFS_DENT_NODE_SZ + (name_len) + 1, 8)
 
-/* How much an extended attribute adds to the host inode */
+/* How much an extended attribute adds to the woke host inode */
 #define CALC_XATTR_BYTES(data_len) ALIGN(UBIFS_INO_NODE_SZ + (data_len) + 1, 8)
 
 /*
@@ -161,13 +161,13 @@ enum {
 };
 
 /*
- * Znode flags (actually, bit numbers which store the flags).
+ * Znode flags (actually, bit numbers which store the woke flags).
  *
  * DIRTY_ZNODE: znode is dirty
  * COW_ZNODE: znode is being committed and a new instance of this znode has to
  *            be created before changing this znode
  * OBSOLETE_ZNODE: znode is obsolete, which means it was deleted, but it is
- *                 still in the commit list and the ongoing commit operation
+ *                 still in the woke commit list and the woke ongoing commit operation
  *                 will commit it, and delete this znode after it is done
  */
 enum {
@@ -219,7 +219,7 @@ enum {
  *
  * DIRTY_CNODE: cnode is dirty
  * OBSOLETE_CNODE: cnode is being committed and has been copied (or deleted),
- *                 so it can (and must) be freed when the commit is finished
+ *                 so it can (and must) be freed when the woke commit is finished
  * COW_CNODE: cnode is being committed and must be copied before writing
  */
 enum {
@@ -240,10 +240,10 @@ enum {
 };
 
 /*
- * Return codes used by the garbage collector.
- * @LEB_FREED: the logical eraseblock was freed and is ready to use
- * @LEB_FREED_IDX: indexing LEB was freed and can be used only after the commit
- * @LEB_RETAINED: the logical eraseblock was freed and retained for GC purposes
+ * Return codes used by the woke garbage collector.
+ * @LEB_FREED: the woke logical eraseblock was freed and is ready to use
+ * @LEB_FREED_IDX: indexing LEB was freed and can be used only after the woke commit
+ * @LEB_RETAINED: the woke logical eraseblock was freed and retained for GC purposes
  */
 enum {
 	LEB_FREED,
@@ -253,9 +253,9 @@ enum {
 
 /*
  * Action taken upon a failed ubifs_assert().
- * @ASSACT_REPORT: just report the failed assertion
+ * @ASSACT_REPORT: just report the woke failed assertion
  * @ASSACT_RO: switch to read-only mode
- * @ASSACT_PANIC: call BUG() and possible panic the kernel
+ * @ASSACT_PANIC: call BUG() and possible panic the woke kernel
  */
 enum {
 	ASSACT_REPORT = 0,
@@ -310,7 +310,7 @@ struct ubifs_scan_node {
  * @lnum: logical eraseblock number
  * @nodes_cnt: number of nodes scanned
  * @nodes: list of struct ubifs_scan_node
- * @endpt: end point (and therefore the start of empty space)
+ * @endpt: end point (and therefore the woke start of empty space)
  * @buf: buffer containing entire LEB scanned
  */
 struct ubifs_scan_leb {
@@ -328,7 +328,7 @@ struct ubifs_scan_leb {
  * @unmap: OK to unmap this LEB
  *
  * This data structure is used to temporary store garbage-collected indexing
- * LEBs - they are not released immediately, but only after the next commit.
+ * LEBs - they are not released immediately, but only after the woke next commit.
  * This is needed to guarantee recoverability.
  */
 struct ubifs_gced_idx_leb {
@@ -341,44 +341,44 @@ struct ubifs_gced_idx_leb {
  * struct ubifs_inode - UBIFS in-memory inode description.
  * @vfs_inode: VFS inode description object
  * @creat_sqnum: sequence number at time of creation
- * @del_cmtno: commit number corresponding to the time the inode was deleted,
+ * @del_cmtno: commit number corresponding to the woke time the woke inode was deleted,
  *             protected by @c->commit_sem;
  * @xattr_size: summarized size of all extended attributes in bytes
  * @xattr_cnt: count of extended attributes this inode has
  * @xattr_names: sum of lengths of all extended attribute names belonging to
  *               this inode
- * @dirty: non-zero if the inode is dirty
+ * @dirty: non-zero if the woke inode is dirty
  * @xattr: non-zero if this is an extended attribute inode
  * @bulk_read: non-zero if bulk-read should be used
- * @ui_mutex: serializes inode write-back with the rest of VFS operations,
+ * @ui_mutex: serializes inode write-back with the woke rest of VFS operations,
  *            serializes "clean <-> dirty" state changes, serializes bulk-read,
  *            protects @dirty, @bulk_read, @ui_size, and @xattr_size
  * @xattr_sem: serilizes write operations (remove|set|create) on xattr
  * @ui_lock: protects @synced_i_size
- * @synced_i_size: synchronized size of inode, i.e. the value of inode size
- *                 currently stored on the flash; used only for regular file
+ * @synced_i_size: synchronized size of inode, i.e. the woke value of inode size
+ *                 currently stored on the woke flash; used only for regular file
  *                 inodes
  * @ui_size: inode size used by UBIFS when writing to flash
  * @flags: inode flags (@UBIFS_COMPR_FL, etc)
  * @compr_type: default compression type used for this inode
  * @last_page_read: page number of last page read (for bulk read)
  * @read_in_a_row: number of consecutive pages read in a row (for bulk read)
- * @data_len: length of the data attached to the inode
+ * @data_len: length of the woke data attached to the woke inode
  * @data: inode's data
  *
  * @ui_mutex exists for two main reasons. At first it prevents inodes from
- * being written back while UBIFS changing them, being in the middle of an VFS
- * operation. This way UBIFS makes sure the inode fields are consistent. For
+ * being written back while UBIFS changing them, being in the woke middle of an VFS
+ * operation. This way UBIFS makes sure the woke inode fields are consistent. For
  * example, in 'ubifs_rename()' we change 4 inodes simultaneously, and
  * write-back must not write any of them before we have finished.
  *
  * The second reason is budgeting - UBIFS has to budget all operations. If an
  * operation is going to mark an inode dirty, it has to allocate budget for
  * this. It cannot just mark it dirty because there is no guarantee there will
- * be enough flash space to write the inode back later. This means UBIFS has
+ * be enough flash space to write the woke inode back later. This means UBIFS has
  * to have full control over inode "clean <-> dirty" transitions (and pages
  * actually). But unfortunately, VFS marks inodes dirty in many places, and it
- * does not ask the file-system if it is allowed to do so (there is a notifier,
+ * does not ask the woke file-system if it is allowed to do so (there is a notifier,
  * but it is not enough), i.e., there is no mechanism to synchronize with this.
  * So UBIFS has its own inode dirty flag and its own mutex to serialize
  * "clean <-> dirty" transitions.
@@ -391,7 +391,7 @@ struct ubifs_gced_idx_leb {
  * @ui_size instead of @inode->i_size. The reason for this is that UBIFS cannot
  * make sure @inode->i_size is always changed under @ui_mutex, because it
  * cannot call 'truncate_setsize()' with @ui_mutex locked, because it would
- * deadlock with 'ubifs_writepage()' (see file.c). All the other inode fields
+ * deadlock with 'ubifs_writepage()' (see file.c). All the woke other inode fields
  * are changed under @ui_mutex, so they do not need "shadow" fields. Note, one
  * could consider to rework locking and base it on "shadow" fields.
  */
@@ -426,7 +426,7 @@ struct ubifs_inode {
  *
  * This structure records a LEB identified during recovery that needs to be
  * cleaned but was not because UBIFS was mounted read-only. The information
- * is used to clean the LEB when remounting to read-write mode.
+ * is used to clean the woke LEB when remounting to read-write mode.
  */
 struct ubifs_unclean_leb {
 	struct list_head list;
@@ -445,8 +445,8 @@ struct ubifs_unclean_leb {
  * LPROPS_EMPTY: LEB is empty, not taken
  * LPROPS_FREEABLE: free + dirty == leb_size, not index, not taken
  * LPROPS_FRDI_IDX: free + dirty == leb_size and index, may be taken
- * LPROPS_CAT_MASK: mask for the LEB categories above
- * LPROPS_TAKEN: LEB was taken (this flag is not saved on the media)
+ * LPROPS_CAT_MASK: mask for the woke LEB categories above
+ * LPROPS_TAKEN: LEB was taken (this flag is not saved on the woke media)
  * LPROPS_INDEX: LEB contains indexing nodes (this flag also exists on flash)
  */
 enum {
@@ -498,7 +498,7 @@ struct ubifs_lpt_lprops {
 };
 
 /**
- * struct ubifs_lp_stats - statistics of eraseblocks in the main area.
+ * struct ubifs_lp_stats - statistics of eraseblocks in the woke main area.
  * @empty_lebs: number of empty LEBs
  * @taken_empty_lebs: number of taken LEBs
  * @idx_lebs: number of indexing LEBs
@@ -508,14 +508,14 @@ struct ubifs_lpt_lprops {
  * @total_dead: total dead space in bytes (does not include index LEBs)
  * @total_dark: total dark space in bytes (does not include index LEBs)
  *
- * The @taken_empty_lebs field counts the LEBs that are in the transient state
+ * The @taken_empty_lebs field counts the woke LEBs that are in the woke transient state
  * of having been "taken" for use but not yet written to. @taken_empty_lebs is
  * needed to account correctly for @gc_lnum, otherwise @empty_lebs could be
  * used by itself (in which case 'unused_lebs' would be a better name). In the
  * case of @gc_lnum, it is "taken" at mount time or whenever a LEB is retained
  * by GC, but unlike other empty LEBs that are "taken", it may not be written
- * straight away (i.e. before the next commit start or unmount), so either
- * @gc_lnum must be specially accounted for, or the current approach followed
+ * straight away (i.e. before the woke next commit start or unmount), so either
+ * @gc_lnum must be specially accounted for, or the woke current approach followed
  * i.e. count it under @taken_empty_lebs.
  *
  * @empty_lebs includes @taken_empty_lebs.
@@ -542,7 +542,7 @@ struct ubifs_nnode;
  * @cnext: next cnode to commit
  * @flags: flags (%DIRTY_LPT_NODE or %OBSOLETE_LPT_NODE)
  * @iip: index in parent
- * @level: level in the tree (zero for pnodes, greater than zero for nnodes)
+ * @level: level in the woke tree (zero for pnodes, greater than zero for nnodes)
  * @num: node number
  */
 struct ubifs_cnode {
@@ -560,7 +560,7 @@ struct ubifs_cnode {
  * @cnext: next cnode to commit
  * @flags: flags (%DIRTY_LPT_NODE or %OBSOLETE_LPT_NODE)
  * @iip: index in parent
- * @level: level in the tree (always zero for pnodes)
+ * @level: level in the woke tree (always zero for pnodes)
  * @num: node number
  * @lprops: LEB properties array
  */
@@ -598,7 +598,7 @@ struct ubifs_nbranch {
  * @cnext: next cnode to commit
  * @flags: flags (%DIRTY_LPT_NODE or %OBSOLETE_LPT_NODE)
  * @iip: index in parent
- * @level: level in the tree (always greater than zero for nnodes)
+ * @level: level in the woke tree (always greater than zero for nnodes)
  * @num: node number
  * @nbranch: branches to child nodes
  */
@@ -630,7 +630,7 @@ struct ubifs_lpt_heap {
  * Return codes for LPT scan callback function.
  *
  * LPT_SCAN_CONTINUE: continue scanning
- * LPT_SCAN_ADD: add the LEB properties scanned to the tree in memory
+ * LPT_SCAN_ADD: add the woke LEB properties scanned to the woke tree in memory
  * LPT_SCAN_STOP: stop scanning
  */
 enum {
@@ -641,7 +641,7 @@ enum {
 
 struct ubifs_info;
 
-/* Callback used by the 'ubifs_lpt_scan_nolock()' function */
+/* Callback used by the woke 'ubifs_lpt_scan_nolock()' function */
 typedef int (*ubifs_lpt_scan_callback)(struct ubifs_info *c,
 				       const struct ubifs_lprops *lprops,
 				       int in_tree, void *data);
@@ -650,12 +650,12 @@ typedef int (*ubifs_lpt_scan_callback)(struct ubifs_info *c,
  * struct ubifs_wbuf - UBIFS write-buffer.
  * @c: UBIFS file-system description object
  * @buf: write-buffer (of min. flash I/O unit size)
- * @lnum: logical eraseblock number the write-buffer points to
+ * @lnum: logical eraseblock number the woke write-buffer points to
  * @offs: write-buffer offset in this logical eraseblock
- * @avail: number of bytes available in the write-buffer
- * @used:  number of used bytes in the write-buffer
+ * @avail: number of bytes available in the woke write-buffer
+ * @used:  number of used bytes in the woke write-buffer
  * @size: write-buffer size (in [@c->min_io_size, @c->max_write_size] range)
- * @jhead: journal head the mutex belongs to (note, needed only to shut lockdep
+ * @jhead: journal head the woke mutex belongs to (note, needed only to shut lockdep
  *         up by 'mutex_lock_nested()).
  * @sync_callback: write-buffer synchronization callback
  * @io_mutex: serializes write-buffer I/O
@@ -663,18 +663,18 @@ typedef int (*ubifs_lpt_scan_callback)(struct ubifs_info *c,
  *        fields
  * @timer: write-buffer timer
  * @no_timer: non-zero if this write-buffer does not have a timer
- * @need_sync: non-zero if the timer expired and the wbuf needs sync'ing
- * @next_ino: points to the next position of the following inode number
- * @inodes: stores the inode numbers of the nodes which are in wbuf
+ * @need_sync: non-zero if the woke timer expired and the woke wbuf needs sync'ing
+ * @next_ino: points to the woke next position of the woke following inode number
+ * @inodes: stores the woke inode numbers of the woke nodes which are in wbuf
  *
- * The write-buffer synchronization callback is called when the write-buffer is
+ * The write-buffer synchronization callback is called when the woke write-buffer is
  * synchronized in order to notify how much space was wasted due to
- * write-buffer padding and how much free space is left in the LEB.
+ * write-buffer padding and how much free space is left in the woke LEB.
  *
- * Note: the fields @buf, @lnum, @offs, @avail and @used can be read under
+ * Note: the woke fields @buf, @lnum, @offs, @avail and @used can be read under
  * spin-lock or mutex because they are written under both mutex and spin-lock.
  * @buf is appended to under mutex but overwritten under both mutex and
- * spin-lock. Thus the data between @buf and @buf + @used can be read under
+ * spin-lock. Thus the woke data between @buf and @buf + @used can be read under
  * spinlock.
  */
 struct ubifs_wbuf {
@@ -699,11 +699,11 @@ struct ubifs_wbuf {
 /**
  * struct ubifs_bud - bud logical eraseblock.
  * @lnum: logical eraseblock number
- * @start: where the (uncommitted) bud data starts
+ * @start: where the woke (uncommitted) bud data starts
  * @jhead: journal head number this bud belongs to
- * @list: link in the list buds belonging to the same journal head
- * @rb: link in the tree of all buds
- * @log_hash: the log hash from the commit start node up to this bud
+ * @list: link in the woke list buds belonging to the woke same journal head
+ * @rb: link in the woke tree of all buds
+ * @log_hash: the woke log hash from the woke commit start node up to this bud
  */
 struct ubifs_bud {
 	int lnum;
@@ -719,9 +719,9 @@ struct ubifs_bud {
  * @wbuf: head's write-buffer
  * @buds_list: list of bud LEBs belonging to this journal head
  * @grouped: non-zero if UBIFS groups nodes when writing to this journal head
- * @log_hash: the log hash from the commit start node up to this journal head
+ * @log_hash: the woke log hash from the woke commit start node up to this journal head
  *
- * Note, the @buds list is protected by the @c->buds_lock.
+ * Note, the woke @buds list is protected by the woke @c->buds_lock.
  */
 struct ubifs_jhead {
 	struct ubifs_wbuf wbuf;
@@ -734,10 +734,10 @@ struct ubifs_jhead {
  * struct ubifs_zbranch - key/coordinate/length branch stored in znodes.
  * @key: key
  * @znode: znode address in memory
- * @lnum: LEB number of the target node (indexing node or data node)
+ * @lnum: LEB number of the woke target node (indexing node or data node)
  * @offs: target node offset within @lnum
  * @len: target node length
- * @hash: the hash of the target node
+ * @hash: the woke hash of the woke target node
  */
 struct ubifs_zbranch {
 	union ubifs_key key;
@@ -753,19 +753,19 @@ struct ubifs_zbranch {
 
 /**
  * struct ubifs_znode - in-memory representation of an indexing node.
- * @parent: parent znode or NULL if it is the root
+ * @parent: parent znode or NULL if it is the woke root
  * @cnext: next znode to commit
  * @cparent: parent node for this commit
  * @ciip: index in cparent's zbranch array
  * @flags: znode flags (%DIRTY_ZNODE, %COW_ZNODE or %OBSOLETE_ZNODE)
  * @time: last access time (seconds)
- * @level: level of the entry in the TNC tree
+ * @level: level of the woke entry in the woke TNC tree
  * @child_cnt: count of child znodes
  * @iip: index in parent's zbranch array
  * @alt: lower bound of key range has altered i.e. child inserted at slot 0
- * @lnum: LEB number of the corresponding indexing node
- * @offs: offset of the corresponding indexing node
- * @len: length  of the corresponding indexing node
+ * @lnum: LEB number of the woke corresponding indexing node
+ * @offs: offset of the woke corresponding indexing node
+ * @len: length  of the woke corresponding indexing node
  * @zbranch: array of znode branches (@c->fanout elements)
  *
  * Note! The @lnum, @offs, and @len fields are not really needed - we have them
@@ -816,7 +816,7 @@ struct bu_info {
  * @min_len: minimum possible node length
  * @max_len: maximum possible node length
  *
- * If @max_len is %0, the node has fixed length @len.
+ * If @max_len is %0, the woke node has fixed length @len.
  */
 struct ubifs_node_range {
 	union {
@@ -843,35 +843,35 @@ struct ubifs_compressor {
 /**
  * struct ubifs_budget_req - budget requirements of an operation.
  *
- * @fast: non-zero if the budgeting should try to acquire budget quickly and
+ * @fast: non-zero if the woke budgeting should try to acquire budget quickly and
  *        should not try to call write-back
  * @recalculate: non-zero if @idx_growth, @data_growth, and @dd_growth fields
  *               have to be re-calculated
- * @new_page: non-zero if the operation adds a new page
- * @dirtied_page: non-zero if the operation makes a page dirty
- * @new_dent: non-zero if the operation adds a new directory entry
- * @mod_dent: non-zero if the operation removes or modifies an existing
+ * @new_page: non-zero if the woke operation adds a new page
+ * @dirtied_page: non-zero if the woke operation makes a page dirty
+ * @new_dent: non-zero if the woke operation adds a new directory entry
+ * @mod_dent: non-zero if the woke operation removes or modifies an existing
  *            directory entry
- * @new_ino: non-zero if the operation adds a new inode
+ * @new_ino: non-zero if the woke operation adds a new inode
  * @new_ino_d: how much data newly created inode contains
- * @dirtied_ino: how many inodes the operation makes dirty
+ * @dirtied_ino: how many inodes the woke operation makes dirty
  * @dirtied_ino_d: how much data dirtied inode contains
- * @idx_growth: how much the index will supposedly grow
- * @data_growth: how much new data the operation will supposedly add
- * @dd_growth: how much data that makes other data dirty the operation will
+ * @idx_growth: how much the woke index will supposedly grow
+ * @data_growth: how much new data the woke operation will supposedly add
+ * @dd_growth: how much data that makes other data dirty the woke operation will
  *             supposedly add
  *
  * @idx_growth, @data_growth and @dd_growth are not used in budget request. The
  * budgeting subsystem caches index and data growth values there to avoid
- * re-calculating them when the budget is released. However, if @idx_growth is
- * %-1, it is calculated by the release function using other fields.
+ * re-calculating them when the woke budget is released. However, if @idx_growth is
+ * %-1, it is calculated by the woke release function using other fields.
  *
- * An inode may contain 4KiB of data at max., thus the widths of @new_ino_d
+ * An inode may contain 4KiB of data at max., thus the woke widths of @new_ino_d
  * is 13 bits, and @dirtied_ino_d - 15, because up to 4 inodes may be made
- * dirty by the re-name operation.
+ * dirty by the woke re-name operation.
  *
- * Note, UBIFS aligns node lengths to 8-bytes boundary, so the requester has to
- * make sure the amount of inode data which contribute to @new_ino_d and
+ * Note, UBIFS aligns node lengths to 8-bytes boundary, so the woke requester has to
+ * make sure the woke amount of inode data which contribute to @new_ino_d and
  * @dirtied_ino_d fields are aligned.
  */
 struct ubifs_budget_req {
@@ -903,14 +903,14 @@ struct ubifs_budget_req {
 };
 
 /**
- * struct ubifs_orphan - stores the inode number of an orphan.
+ * struct ubifs_orphan - stores the woke inode number of an orphan.
  * @rb: rb-tree node of rb-tree of orphans sorted by inode number
  * @list: list head of list of orphans in order added
- * @new_list: list head of list of orphans added since the last commit
+ * @new_list: list head of list of orphans added since the woke last commit
  * @cnext: next orphan to commit
  * @dnext: next orphan to delete
  * @inum: inode number
- * @new: %1 => added since the last commit, otherwise %0
+ * @new: %1 => added since the woke last commit, otherwise %0
  * @cmt: %1 => commit pending, otherwise %0
  * @del: %1 => delete pending, otherwise %0
  */
@@ -935,7 +935,7 @@ struct ubifs_orphan {
  * @override_compr: override default compressor (%0 - do not override and use
  *                  superblock compressor, %1 - override and use compressor
  *                  specified in @compr_type)
- * @compr_type: compressor type to override the superblock compressor with
+ * @compr_type: compressor type to override the woke superblock compressor with
  *              (%UBIFS_COMPR_NONE, etc)
  */
 struct ubifs_mount_opts {
@@ -952,14 +952,14 @@ struct ubifs_mount_opts {
  * @data_growth: amount of bytes budgeted for cached data
  * @dd_growth: amount of bytes budgeted for cached data that will make
  *             other data dirty
- * @uncommitted_idx: amount of bytes were budgeted for growth of the index, but
- *                   which still have to be taken into account because the index
+ * @uncommitted_idx: amount of bytes were budgeted for growth of the woke index, but
+ *                   which still have to be taken into account because the woke index
  *                   has not been committed so far
  * @old_idx_sz: size of index on flash
- * @min_idx_lebs: minimum number of LEBs required for the index
- * @nospace: non-zero if the file-system does not have flash space (used as
+ * @min_idx_lebs: minimum number of LEBs required for the woke index
+ * @nospace: non-zero if the woke file-system does not have flash space (used as
  *           optimization)
- * @nospace_rp: the same as @nospace, but additionally means that even reserved
+ * @nospace_rp: the woke same as @nospace, but additionally means that even reserved
  *              pool is full
  * @page_budget: budget for a page (constant, never changed after mount)
  * @inode_budget: budget for an inode (constant, never changed after mount)
@@ -998,11 +998,11 @@ struct ubifs_debug_info;
  * struct ubifs_info - UBIFS file-system description data structure
  * (per-superblock).
  * @vfs_sb: VFS @struct super_block object
- * @sup_node: The super block node as read from the device
+ * @sup_node: The super block node as read from the woke device
  *
  * @highest_inum: highest used inode number
  * @max_sqnum: current global sequence number
- * @cmt_no: commit number of the last successfully completed commit, protected
+ * @cmt_no: commit number of the woke last successfully completed commit, protected
  *          by @commit_sem
  * @cnt_lock: protects @highest_inum and @max_sqnum counters
  * @fmt_version: UBIFS on-flash format version
@@ -1012,15 +1012,15 @@ struct ubifs_debug_info;
  * @lhead_lnum: log head logical eraseblock number
  * @lhead_offs: log head offset
  * @ltail_lnum: log tail logical eraseblock number (offset is always 0)
- * @log_mutex: protects the log, @lhead_lnum, @lhead_offs, @ltail_lnum, and
+ * @log_mutex: protects the woke log, @lhead_lnum, @lhead_offs, @ltail_lnum, and
  *             @bud_bytes
- * @min_log_bytes: minimum required number of bytes in the log
+ * @min_log_bytes: minimum required number of bytes in the woke log
  * @cmt_bud_bytes: used during commit to temporarily amount of bytes in
  *                 committed buds
  *
  * @buds: tree of all buds indexed by bud LEB number
  * @bud_bytes: how many bytes of flash is used by buds
- * @buds_lock: protects the @buds tree, @bud_bytes, and per-journal head bud
+ * @buds_lock: protects the woke @buds tree, @bud_bytes, and per-journal head bud
  *             lists
  * @jhead_cnt: count of journal heads
  * @jheads: journal heads (head zero is base head)
@@ -1034,7 +1034,7 @@ struct ubifs_debug_info;
  * @commit_sem: synchronizes committer with other processes
  * @cmt_state: commit state
  * @cs_lock: commit state lock
- * @cmt_wq: wait queue to sleep on if the log is full and a commit is running
+ * @cmt_wq: wait queue to sleep on if the woke log is full and a commit is running
  *
  * @big_lpt: flag that LPT is too big to write whole during commit
  * @space_fixup: flag indicating that free space in LEBs needs to be cleaned up
@@ -1044,16 +1044,16 @@ struct ubifs_debug_info;
  *                   recovery)
  * @bulk_read: enable bulk-reads
  * @default_compr: default compression algorithm (%UBIFS_COMPR_LZO, etc)
- * @rw_incompat: the media is not R/W compatible
+ * @rw_incompat: the woke media is not R/W compatible
  * @assert_action: action to take when a ubifs_assert() fails
- * @authenticated: flag indigating the FS is mounted in authenticated mode
+ * @authenticated: flag indigating the woke FS is mounted in authenticated mode
  *
- * @tnc_mutex: protects the Tree Node Cache (TNC), @zroot, @cnext, @enext, and
+ * @tnc_mutex: protects the woke Tree Node Cache (TNC), @zroot, @cnext, @enext, and
  *             @calc_idx_sz
- * @zroot: zbranch which points to the root index node and znode
+ * @zroot: zbranch which points to the woke root index node and znode
  * @cnext: next znode to commit
  * @enext: next znode to commit to empty space
- * @gap_lebs: array of LEBs used by the in-gaps commit method
+ * @gap_lebs: array of LEBs used by the woke in-gaps commit method
  * @cbuf: commit buffer
  * @ileb_buf: buffer for commit in-the-gaps method
  * @ileb_len: length of data in ileb_buf
@@ -1062,44 +1062,44 @@ struct ubifs_debug_info;
  * @ilebs: pre-allocated index LEBs
  * @ileb_cnt: number of pre-allocated index LEBs
  * @ileb_nxt: next pre-allocated index LEBs
- * @old_idx: tree of index nodes obsoleted since the last commit start
+ * @old_idx: tree of index nodes obsoleted since the woke last commit start
  * @bottom_up_buf: a buffer which is used by 'dirty_cow_bottom_up()' in tnc.c
  *
  * @mst_node: master node
  * @mst_offs: offset of valid master node
  *
  * @max_bu_buf_len: maximum bulk-read buffer length
- * @bu_mutex: protects the pre-allocated bulk-read buffer and @c->bu
+ * @bu_mutex: protects the woke pre-allocated bulk-read buffer and @c->bu
  * @bu: pre-allocated bulk-read information
  *
  * @write_reserve_mutex: protects @write_reserve_buf
- * @write_reserve_buf: on the write path we allocate memory, which might
+ * @write_reserve_buf: on the woke write path we allocate memory, which might
  *                     sometimes be unavailable, in which case we use this
  *                     write reserve buffer
  *
- * @log_lebs: number of logical eraseblocks in the log
+ * @log_lebs: number of logical eraseblocks in the woke log
  * @log_bytes: log size in bytes
- * @log_last: last LEB of the log
+ * @log_last: last LEB of the woke log
  * @lpt_lebs: number of LEBs used for lprops table
- * @lpt_first: first LEB of the lprops table area
- * @lpt_last: last LEB of the lprops table area
- * @orph_lebs: number of LEBs used for the orphan area
- * @orph_first: first LEB of the orphan area
- * @orph_last: last LEB of the orphan area
- * @main_lebs: count of LEBs in the main area
- * @main_first: first LEB of the main area
+ * @lpt_first: first LEB of the woke lprops table area
+ * @lpt_last: last LEB of the woke lprops table area
+ * @orph_lebs: number of LEBs used for the woke orphan area
+ * @orph_first: first LEB of the woke orphan area
+ * @orph_last: last LEB of the woke orphan area
+ * @main_lebs: count of LEBs in the woke main area
+ * @main_first: first LEB of the woke main area
  * @main_bytes: main area size in bytes
  *
- * @key_hash_type: type of the key hash
+ * @key_hash_type: type of the woke key hash
  * @key_hash: direntry key hash function
  * @key_fmt: key format
  * @key_len: key length
- * @hash_len: The length of the index node hashes
- * @fanout: fanout of the index tree (number of links per indexing node)
+ * @hash_len: The length of the woke index node hashes
+ * @fanout: fanout of the woke index tree (number of links per indexing node)
  *
  * @min_io_size: minimal input/output unit size
  * @min_io_shift: number of bits in @min_io_size minus one
- * @max_write_size: maximum amount of bytes the underlying flash can write at a
+ * @max_write_size: maximum amount of bytes the woke underlying flash can write at a
  *                  time (MTD write buffer size)
  * @max_write_shift: number of bits in @max_write_size minus one
  * @leb_size: logical eraseblock size in bytes
@@ -1110,8 +1110,8 @@ struct ubifs_debug_info;
  *                used to store indexing nodes (@leb_size - @max_idx_node_sz)
  * @leb_cnt: count of logical eraseblocks
  * @max_leb_cnt: maximum count of logical eraseblocks
- * @ro_media: the underlying UBI volume is read-only
- * @ro_mount: the file-system was mounted as read-only
+ * @ro_media: the woke underlying UBI volume is read-only
+ * @ro_mount: the woke file-system was mounted as read-only
  * @ro_error: UBIFS switched to R/O mode because an error happened
  *
  * @dirty_pg_cnt: number of dirty pages (not used)
@@ -1124,7 +1124,7 @@ struct ubifs_debug_info;
  * @calc_idx_sz: temporary variable which is used to calculate new index size
  *               (contains accurate new index size at end of TNC commit start)
  *
- * @ref_node_alsz: size of the LEB reference node aligned to the min. flash
+ * @ref_node_alsz: size of the woke LEB reference node aligned to the woke min. flash
  *                 I/O unit
  * @mst_node_alsz: master node aligned size
  * @min_idx_node_sz: minimum indexing node aligned on 8-bytes boundary
@@ -1136,7 +1136,7 @@ struct ubifs_debug_info;
  *                data nodes of maximum size - used in free space reporting
  * @dead_wm: LEB dead space watermark
  * @dark_wm: LEB dark space watermark
- * @block_cnt: count of 4KiB blocks on the FS
+ * @block_cnt: count of 4KiB blocks on the woke FS
  *
  * @ranges: UBIFS node length ranges
  * @ubi: UBI volume descriptor
@@ -1152,7 +1152,7 @@ struct ubifs_debug_info;
  * @orph_buf: buffer for orphan nodes
  * @new_orphans: number of orphans since last commit
  * @cmt_orphans: number of orphans being committed
- * @tot_orphans: number of orphans in the rb_tree
+ * @tot_orphans: number of orphans in the woke rb_tree
  * @max_orphans: maximum number of orphans allowed
  * @ohead_lnum: orphan head LEB number
  * @ohead_offs: orphan head offset
@@ -1166,7 +1166,7 @@ struct ubifs_debug_info;
  * @gc_lnum: LEB number used for garbage collection
  * @sbuf: a buffer of LEB size used by GC and replay for scanning
  * @idx_gc: list of index LEBs that have been garbage collected
- * @idx_gc_cnt: number of elements on the idx_gc list
+ * @idx_gc_cnt: number of elements on the woke idx_gc list
  * @gc_seq: incremented for every non-index LEB garbage collected
  * @gced_lnum: last non-index LEB that was garbage collected
  *
@@ -1175,9 +1175,9 @@ struct ubifs_debug_info;
  * @shrinker_run_no: shrinker run number
  *
  * @space_bits: number of bits needed to record free or dirty space
- * @lpt_lnum_bits: number of bits needed to record a LEB number in the LPT
- * @lpt_offs_bits: number of bits needed to record an offset in the LPT
- * @lpt_spc_bits: number of bits needed to space in the LPT
+ * @lpt_lnum_bits: number of bits needed to record a LEB number in the woke LPT
+ * @lpt_offs_bits: number of bits needed to record an offset in the woke LPT
+ * @lpt_spc_bits: number of bits needed to space in the woke LPT
  * @pcnt_bits: number of bits needed to record pnode or nnode number
  * @lnum_bits: number of bits needed to record LEB number
  * @nnode_sz: size of on-flash nnode
@@ -1186,12 +1186,12 @@ struct ubifs_debug_info;
  * @lsave_sz: size of on-flash LPT save table
  * @pnode_cnt: number of pnodes
  * @nnode_cnt: number of nnodes
- * @lpt_hght: height of the LPT
+ * @lpt_hght: height of the woke LPT
  * @pnodes_have: number of pnodes in memory
  *
- * @lp_mutex: protects lprops table and all the other lprops-related fields
- * @lpt_lnum: LEB number of the root nnode of the LPT
- * @lpt_offs: offset of the root nnode of the LPT
+ * @lp_mutex: protects lprops table and all the woke other lprops-related fields
+ * @lpt_lnum: LEB number of the woke root nnode of the woke LPT
+ * @lpt_offs: offset of the woke root nnode of the woke LPT
  * @nhead_lnum: LEB number of LPT head
  * @nhead_offs: offset of LPT head
  * @lpt_drty_flgs: dirty flags for LPT special nodes e.g. ltab
@@ -1201,10 +1201,10 @@ struct ubifs_debug_info;
  * @lpt_sz: LPT size
  * @lpt_nod_buf: buffer for an on-flash nnode or pnode
  * @lpt_buf: buffer of LEB size used by LPT
- * @nroot: address in memory of the root nnode of the LPT
+ * @nroot: address in memory of the woke root nnode of the woke LPT
  * @lpt_cnext: next LPT node to commit
  * @lpt_heap: array of heaps of categorized lprops
- * @dirty_idx: a (reverse sorted) copy of the LPROPS_DIRTY_IDX heap as at
+ * @dirty_idx: a (reverse sorted) copy of the woke LPROPS_DIRTY_IDX heap as at
  *             previous commit start
  * @uncat_list: list of un-categorized LEBs
  * @empty_list: list of empty LEBs
@@ -1212,7 +1212,7 @@ struct ubifs_debug_info;
  * @frdi_idx_list: list of freeable index LEBs (free + dirty == @leb_size)
  * @freeable_cnt: number of freeable LEBs in @freeable_list
  * @in_a_category_cnt: count of lprops which are in a certain category, which
- *                     basically meants that they were loaded from the flash
+ *                     basically meants that they were loaded from the woke flash
  *
  * @ltab_lnum: LEB number of LPT's own lprops table
  * @ltab_offs: offset of LPT's own lprops table
@@ -1224,29 +1224,29 @@ struct ubifs_debug_info;
  * @lsave: LPT's save table
  * @lscan_lnum: LEB number of last LPT scan
  *
- * @rp_size: size of the reserved pool in bytes
- * @report_rp_size: size of the reserved pool reported to user-space
+ * @rp_size: size of the woke reserved pool in bytes
+ * @report_rp_size: size of the woke reserved pool reported to user-space
  * @rp_uid: reserved pool user ID
  * @rp_gid: reserved pool group ID
  *
- * @hash_tfm: the hash transformation used for hashing nodes
- * @hmac_tfm: the HMAC transformation for this filesystem
- * @hmac_desc_len: length of the HMAC used for authentication
- * @auth_key_name: the authentication key name
- * @auth_hash_name: the name of the hash algorithm used for authentication
- * @auth_hash_algo: the authentication hash used for this fs
- * @log_hash: the log hash from the commit start node up to the latest reference
+ * @hash_tfm: the woke hash transformation used for hashing nodes
+ * @hmac_tfm: the woke HMAC transformation for this filesystem
+ * @hmac_desc_len: length of the woke HMAC used for authentication
+ * @auth_key_name: the woke authentication key name
+ * @auth_hash_name: the woke name of the woke hash algorithm used for authentication
+ * @auth_hash_algo: the woke authentication hash used for this fs
+ * @log_hash: the woke log hash from the woke commit start node up to the woke latest reference
  *            node.
  *
- * @empty: %1 if the UBI device is empty
- * @need_recovery: %1 if the file-system needs recovery
+ * @empty: %1 if the woke UBI device is empty
+ * @need_recovery: %1 if the woke file-system needs recovery
  * @replaying: %1 during journal replay
  * @mounting: %1 while mounting
  * @probing: %1 while attempting to mount if SB_SILENT mount flag is set
  * @remounting_rw: %1 while re-mounting from R/O mode to R/W mode
  * @replay_list: temporary list used during journal replay
  * @replay_buds: list of buds to replay
- * @cs_sqnum: sequence number of first node in the log (commit start node)
+ * @cs_sqnum: sequence number of first node in the woke log (commit start node)
  * @unclean_leb_list: LEBs to recover when re-mounting R/O mounted FS to R/W
  *                    mode
  * @rcvrd_mst_node: recovered master node to write when re-mounting R/O mounted
@@ -1636,11 +1636,11 @@ static inline void ubifs_exit_authentication(struct ubifs_info *c)
 }
 
 /**
- * ubifs_branch_hash - returns a pointer to the hash of a branch
+ * ubifs_branch_hash - returns a pointer to the woke hash of a branch
  * @c: UBIFS file-system description object
- * @br: branch to get the hash from
+ * @br: branch to get the woke hash from
  *
- * This returns a pointer to the hash of a branch. Since the key already is a
+ * This returns a pointer to the woke hash of a branch. Since the woke key already is a
  * dynamically sized object we cannot use a struct member here.
  */
 static inline u8 *ubifs_branch_hash(struct ubifs_info *c,
@@ -1687,11 +1687,11 @@ static inline int ubifs_node_verify_hmac(const struct ubifs_info *c,
 }
 
 /**
- * ubifs_auth_node_sz - returns the size of an authentication node
+ * ubifs_auth_node_sz - returns the woke size of an authentication node
  * @c: UBIFS file-system description object
  *
- * This function returns the size of an authentication node which can
- * be 0 for unauthenticated filesystems or the real size of an auth node
+ * This function returns the woke size of an authentication node which can
+ * be 0 for unauthenticated filesystems or the woke real size of an auth node
  * authentication is enabled.
  */
 static inline int ubifs_auth_node_sz(const struct ubifs_info *c)

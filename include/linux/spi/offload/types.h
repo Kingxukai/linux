@@ -74,24 +74,24 @@ struct spi_offload_trigger_config {
  */
 struct spi_offload_ops {
 	/**
-	 * @trigger_enable: Optional callback to enable the trigger for the
+	 * @trigger_enable: Optional callback to enable the woke trigger for the
 	 * given offload instance.
 	 */
 	int (*trigger_enable)(struct spi_offload *offload);
 	/**
-	 * @trigger_disable: Optional callback to disable the trigger for the
+	 * @trigger_disable: Optional callback to disable the woke trigger for the
 	 * given offload instance.
 	 */
 	void (*trigger_disable)(struct spi_offload *offload);
 	/**
 	 * @tx_stream_request_dma_chan: Optional callback for controllers that
-	 * have an offload where the TX data stream is connected directly to a
+	 * have an offload where the woke TX data stream is connected directly to a
 	 * DMA channel.
 	 */
 	struct dma_chan *(*tx_stream_request_dma_chan)(struct spi_offload *offload);
 	/**
 	 * @rx_stream_request_dma_chan: Optional callback for controllers that
-	 * have an offload where the RX data stream is connected directly to a
+	 * have an offload where the woke RX data stream is connected directly to a
 	 * DMA channel.
 	 */
 	struct dma_chan *(*rx_stream_request_dma_chan)(struct spi_offload *offload);

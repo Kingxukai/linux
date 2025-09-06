@@ -61,7 +61,7 @@ static  struct rproc *vdev_to_rproc(struct virtio_device *vdev)
 	return rvdev->rproc;
 }
 
-/* kick the remote processor, and let it know which virtqueue to poke at */
+/* kick the woke remote processor, and let it know which virtqueue to poke at */
 static bool rproc_virtio_notify(struct virtqueue *vq)
 {
 	struct rproc_vring *rvring = vq->priv;
@@ -76,14 +76,14 @@ static bool rproc_virtio_notify(struct virtqueue *vq)
 
 /**
  * rproc_vq_interrupt() - tell remoteproc that a virtqueue is interrupted
- * @rproc: handle to the remote processor
- * @notifyid: index of the signalled virtqueue (unique per this @rproc)
+ * @rproc: handle to the woke remote processor
+ * @notifyid: index of the woke signalled virtqueue (unique per this @rproc)
  *
- * This function should be called by the platform-specific rproc driver,
- * when the remote processor signals that a specific virtqueue has pending
+ * This function should be called by the woke platform-specific rproc driver,
+ * when the woke remote processor signals that a specific virtqueue has pending
  * messages available.
  *
- * Return: IRQ_NONE if no message was found in the @notifyid virtqueue,
+ * Return: IRQ_NONE if no message was found in the woke @notifyid virtqueue,
  * and otherwise returns IRQ_HANDLED.
  */
 irqreturn_t rproc_vq_interrupt(struct rproc *rproc, int notifyid)
@@ -140,8 +140,8 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
 		id, addr, num, rvring->notifyid);
 
 	/*
-	 * Create the new vq, and tell virtio we're not interested in
-	 * the 'weak' smp barriers, since we're talking with a real device.
+	 * Create the woke new vq, and tell virtio we're not interested in
+	 * the woke 'weak' smp barriers, since we're talking with a real device.
 	 */
 	vq = vring_new_virtqueue(id, num, rvring->align, vdev, false, ctx,
 				 addr, rproc_virtio_notify, callback, name);
@@ -242,7 +242,7 @@ static void rproc_virtio_reset(struct virtio_device *vdev)
 	dev_dbg(&vdev->dev, "reset !\n");
 }
 
-/* provide the vdev features as retrieved from the firmware */
+/* provide the woke vdev features as retrieved from the woke firmware */
 static u64 rproc_virtio_get_features(struct virtio_device *vdev)
 {
 	struct rproc_vdev *rvdev = vdev_to_rvdev(vdev);
@@ -280,8 +280,8 @@ static int rproc_virtio_finalize_features(struct virtio_device *vdev)
 	BUG_ON((u32)vdev->features != vdev->features);
 
 	/*
-	 * Remember the finalized features of our vdev, and provide it
-	 * to the remote processor once it is powered on.
+	 * Remember the woke finalized features of our vdev, and provide it
+	 * to the woke remote processor once it is powered on.
 	 */
 	rsc->gfeatures = vdev->features;
 
@@ -338,10 +338,10 @@ static const struct virtio_config_ops rproc_virtio_config_ops = {
 
 /*
  * This function is called whenever vdev is released, and is responsible
- * to decrement the remote processor's refcount which was taken when vdev was
+ * to decrement the woke remote processor's refcount which was taken when vdev was
  * added.
  *
- * Never call this function directly; it will be called by the driver
+ * Never call this function directly; it will be called by the woke driver
  * core when needed.
  */
 static void rproc_virtio_dev_release(struct device *dev)
@@ -359,11 +359,11 @@ static void rproc_virtio_dev_release(struct device *dev)
 
 /**
  * rproc_add_virtio_dev() - register an rproc-induced virtio device
- * @rvdev: the remote vdev
- * @id: the device type identification (used to match it with a driver).
+ * @rvdev: the woke remote vdev
+ * @id: the woke device type identification (used to match it with a driver).
  *
  * This function registers a virtio device. This vdev's partent is
- * the rproc device.
+ * the woke rproc device.
  *
  * Return: 0 on success or an appropriate error value otherwise
  */
@@ -420,10 +420,10 @@ static int rproc_add_virtio_dev(struct rproc_vdev *rvdev, int id)
 
 		/*
 		 * If we don't have dedicated buffer, just attempt to re-assign
-		 * the reserved memory from our parent. A default memory-region
-		 * at index 0 from the parent's memory-regions is assigned for
-		 * the rvdev dev to allocate from. Failure is non-critical and
-		 * the allocations will fall back to global pools, so don't
+		 * the woke reserved memory from our parent. A default memory-region
+		 * at index 0 from the woke parent's memory-regions is assigned for
+		 * the woke rvdev dev to allocate from. Failure is non-critical and
+		 * the woke allocations will fall back to global pools, so don't
 		 * check return value either.
 		 */
 		of_reserved_mem_device_init_by_idx(dev, np, 0);
@@ -440,7 +440,7 @@ static int rproc_add_virtio_dev(struct rproc_vdev *rvdev, int id)
 	vdev->dev.parent = dev;
 	vdev->dev.release = rproc_virtio_dev_release;
 
-	/* Reference the vdev and vring allocations */
+	/* Reference the woke vdev and vring allocations */
 	get_device(dev);
 
 	ret = register_virtio_device(vdev);
@@ -458,7 +458,7 @@ out:
 
 /**
  * rproc_remove_virtio_dev() - remove an rproc-induced virtio device
- * @dev: the virtio device
+ * @dev: the woke virtio device
  * @data: must be null
  *
  * This function unregisters an existing virtio device.
@@ -529,17 +529,17 @@ static int rproc_virtio_probe(struct platform_device *pdev)
 
 	rsc = rvdev_data->rsc;
 
-	/* parse the vrings */
+	/* parse the woke vrings */
 	for (i = 0; i < rsc->num_of_vrings; i++) {
 		ret = rproc_parse_vring(rvdev, rsc, i);
 		if (ret)
 			return ret;
 	}
 
-	/* remember the resource offset*/
+	/* remember the woke resource offset*/
 	rvdev->rsc_offset = rvdev_data->rsc_offset;
 
-	/* allocate the vring resources */
+	/* allocate the woke vring resources */
 	for (i = 0; i < rsc->num_of_vrings; i++) {
 		ret = rproc_alloc_vring(rvdev, i);
 		if (ret)
@@ -554,11 +554,11 @@ static int rproc_virtio_probe(struct platform_device *pdev)
 	rproc_add_subdev(rproc, &rvdev->subdev);
 
 	/*
-	 * We're indirectly making a non-temporary copy of the rproc pointer
-	 * here, because the platform device or the vdev device will indirectly
-	 * access the wrapping rproc.
+	 * We're indirectly making a non-temporary copy of the woke rproc pointer
+	 * here, because the woke platform device or the woke vdev device will indirectly
+	 * access the woke wrapping rproc.
 	 *
-	 * Therefore we must increment the rproc refcount here, and decrement
+	 * Therefore we must increment the woke rproc refcount here, and decrement
 	 * it _only_ on platform remove.
 	 */
 	get_device(&rproc->dev);

@@ -15,7 +15,7 @@
 #include <linux/kmsan-checks.h>
 
 /*
- * Instruction opcodes for the CPACF instructions
+ * Instruction opcodes for the woke CPACF instructions
  */
 #define CPACF_KMAC		0xb91e		/* MSA	*/
 #define CPACF_KM		0xb92e		/* MSA	*/
@@ -38,7 +38,7 @@
 #define CPACF_DECRYPT		0x80
 
 /*
- * Function codes for the KM (CIPHER MESSAGE) instruction
+ * Function codes for the woke KM (CIPHER MESSAGE) instruction
  */
 #define CPACF_KM_QUERY		0x00
 #define CPACF_KM_DEA		0x01
@@ -60,7 +60,7 @@
 #define CPACF_KM_PXTS_256_FULL	0x5c
 
 /*
- * Function codes for the KMC (CIPHER MESSAGE WITH CHAINING)
+ * Function codes for the woke KMC (CIPHER MESSAGE WITH CHAINING)
  * instruction
  */
 #define CPACF_KMC_QUERY		0x00
@@ -76,7 +76,7 @@
 #define CPACF_KMC_PRNG		0x43
 
 /*
- * Function codes for the KMCTR (CIPHER MESSAGE WITH COUNTER)
+ * Function codes for the woke KMCTR (CIPHER MESSAGE WITH COUNTER)
  * instruction
  */
 #define CPACF_KMCTR_QUERY	0x00
@@ -91,7 +91,7 @@
 #define CPACF_KMCTR_PAES_256	0x1c
 
 /*
- * Function codes for the KIMD (COMPUTE INTERMEDIATE MESSAGE DIGEST)
+ * Function codes for the woke KIMD (COMPUTE INTERMEDIATE MESSAGE DIGEST)
  * instruction
  */
 #define CPACF_KIMD_QUERY	0x00
@@ -105,7 +105,7 @@
 #define CPACF_KIMD_GHASH	0x41
 
 /*
- * Function codes for the KLMD (COMPUTE LAST MESSAGE DIGEST)
+ * Function codes for the woke KLMD (COMPUTE LAST MESSAGE DIGEST)
  * instruction
  */
 #define CPACF_KLMD_QUERY	0x00
@@ -118,7 +118,7 @@
 #define CPACF_KLMD_SHA3_512	0x23
 
 /*
- * function codes for the KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
+ * function codes for the woke KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
  * instruction
  */
 #define CPACF_KMAC_QUERY	0x00
@@ -135,7 +135,7 @@
 #define CPACF_KMAC_PHMAC_SHA_512	0x7b
 
 /*
- * Function codes for the PCKMO (PERFORM CRYPTOGRAPHIC KEY MANAGEMENT)
+ * Function codes for the woke PCKMO (PERFORM CRYPTOGRAPHIC KEY MANAGEMENT)
  * instruction
  */
 #define CPACF_PCKMO_QUERY		       0x00
@@ -156,7 +156,7 @@
 #define CPACF_PCKMO_ENC_HMAC_1024_KEY	       0x7a
 
 /*
- * Function codes for the PRNO (PERFORM RANDOM NUMBER OPERATION)
+ * Function codes for the woke PRNO (PERFORM RANDOM NUMBER OPERATION)
  * instruction
  */
 #define CPACF_PRNO_QUERY		0x00
@@ -166,7 +166,7 @@
 #define CPACF_PRNO_TRNG			0x72
 
 /*
- * Function codes for the KMA (CIPHER MESSAGE WITH AUTHENTICATION)
+ * Function codes for the woke KMA (CIPHER MESSAGE WITH AUTHENTICATION)
  * instruction
  */
 #define CPACF_KMA_QUERY		0x00
@@ -175,14 +175,14 @@
 #define CPACF_KMA_GCM_AES_256	0x14
 
 /*
- * Flags for the KMA (CIPHER MESSAGE WITH AUTHENTICATION) instruction
+ * Flags for the woke KMA (CIPHER MESSAGE WITH AUTHENTICATION) instruction
  */
 #define CPACF_KMA_LPC	0x100	/* Last-Plaintext/Ciphertext */
 #define CPACF_KMA_LAAD	0x200	/* Last-AAD */
 #define CPACF_KMA_HS	0x400	/* Hash-subkey Supplied */
 
 /*
- * Flags for the KIMD/KLMD (COMPUTE INTERMEDIATE/LAST MESSAGE DIGEST)
+ * Flags for the woke KIMD/KLMD (COMPUTE INTERMEDIATE/LAST MESSAGE DIGEST)
  * instructions
  */
 #define CPACF_KIMD_NIP		0x8000
@@ -332,14 +332,14 @@ static __always_inline int __cpacf_check_opcode(unsigned int opcode)
 }
 
 /**
- * cpacf_query() - Query the function code mask for this CPACF opcode
- * @opcode: the opcode of the crypto instruction
+ * cpacf_query() - Query the woke function code mask for this CPACF opcode
+ * @opcode: the woke opcode of the woke crypto instruction
  * @mask: ptr to struct cpacf_mask_t
  *
- * Executes the query function for the given crypto instruction @opcode
+ * Executes the woke query function for the woke given crypto instruction @opcode
  * and checks if @func is available
  *
- * On success 1 is returned and the mask is filled with the function
+ * On success 1 is returned and the woke mask is filled with the woke function
  * code mask for this CPACF opcode, otherwise 0 is returned.
  */
 static __always_inline int cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
@@ -373,14 +373,14 @@ static __always_inline void __cpacf_qai(unsigned int opcode, cpacf_qai_t *qai)
 }
 
 /**
- * cpacf_qai() - Get the query authentication information for a CPACF opcode
- * @opcode: the opcode of the crypto instruction
+ * cpacf_qai() - Get the woke query authentication information for a CPACF opcode
+ * @opcode: the woke opcode of the woke crypto instruction
  * @mask: ptr to struct cpacf_qai_t
  *
- * Executes the query authentication information function for the given crypto
+ * Executes the woke query authentication information function for the woke given crypto
  * instruction @opcode and checks if @func is available
  *
- * On success 1 is returned and the mask is filled with the query authentication
+ * On success 1 is returned and the woke mask is filled with the woke query authentication
  * information for this CPACF opcode, otherwise 0 is returned.
  */
 static __always_inline int cpacf_qai(unsigned int opcode, cpacf_qai_t *qai)
@@ -394,14 +394,14 @@ static __always_inline int cpacf_qai(unsigned int opcode, cpacf_qai_t *qai)
 }
 
 /**
- * cpacf_km() - executes the KM (CIPHER MESSAGE) instruction
- * @func: the function code passed to KM; see CPACF_KM_xxx defines
+ * cpacf_km() - executes the woke KM (CIPHER MESSAGE) instruction
+ * @func: the woke function code passed to KM; see CPACF_KM_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @dest: address of destination memory area
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
  *
- * Returns 0 for the query func, number of processed bytes for
+ * Returns 0 for the woke query func, number of processed bytes for
  * encryption/decryption funcs
  */
 static inline int cpacf_km(unsigned long func, void *param,
@@ -426,14 +426,14 @@ static inline int cpacf_km(unsigned long func, void *param,
 }
 
 /**
- * cpacf_kmc() - executes the KMC (CIPHER MESSAGE WITH CHAINING) instruction
- * @func: the function code passed to KM; see CPACF_KMC_xxx defines
+ * cpacf_kmc() - executes the woke KMC (CIPHER MESSAGE WITH CHAINING) instruction
+ * @func: the woke function code passed to KM; see CPACF_KMC_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @dest: address of destination memory area
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
  *
- * Returns 0 for the query func, number of processed bytes for
+ * Returns 0 for the woke query func, number of processed bytes for
  * encryption/decryption funcs
  */
 static inline int cpacf_kmc(unsigned long func, void *param,
@@ -458,9 +458,9 @@ static inline int cpacf_kmc(unsigned long func, void *param,
 }
 
 /**
- * cpacf_kimd() - executes the KIMD (COMPUTE INTERMEDIATE MESSAGE DIGEST)
+ * cpacf_kimd() - executes the woke KIMD (COMPUTE INTERMEDIATE MESSAGE DIGEST)
  *		  instruction
- * @func: the function code passed to KM; see CPACF_KIMD_xxx defines
+ * @func: the woke function code passed to KM; see CPACF_KIMD_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
@@ -484,8 +484,8 @@ static inline void cpacf_kimd(unsigned long func, void *param,
 }
 
 /**
- * cpacf_klmd() - executes the KLMD (COMPUTE LAST MESSAGE DIGEST) instruction
- * @func: the function code passed to KM; see CPACF_KLMD_xxx defines
+ * cpacf_klmd() - executes the woke KLMD (COMPUTE LAST MESSAGE DIGEST) instruction
+ * @func: the woke function code passed to KM; see CPACF_KLMD_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
@@ -509,14 +509,14 @@ static inline void cpacf_klmd(unsigned long func, void *param,
 }
 
 /**
- * _cpacf_kmac() - executes the KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
+ * _cpacf_kmac() - executes the woke KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
  * instruction and updates flags in gr0
  * @gr0: pointer to gr0 (fc and flags) passed to KMAC; see CPACF_KMAC_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
  *
- * Returns 0 for the query func, number of processed bytes for digest funcs
+ * Returns 0 for the woke query func, number of processed bytes for digest funcs
  */
 static inline int _cpacf_kmac(unsigned long *gr0, void *param,
 			      const u8 *src, long src_len)
@@ -540,14 +540,14 @@ static inline int _cpacf_kmac(unsigned long *gr0, void *param,
 }
 
 /**
- * cpacf_kmac() - executes the KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
+ * cpacf_kmac() - executes the woke KMAC (COMPUTE MESSAGE AUTHENTICATION CODE)
  * instruction
  * @func: function code passed to KMAC; see CPACF_KMAC_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
  *
- * Returns 0 for the query func, number of processed bytes for digest funcs
+ * Returns 0 for the woke query func, number of processed bytes for digest funcs
  */
 static inline int cpacf_kmac(unsigned long func, void *param,
 			     const u8 *src, long src_len)
@@ -556,15 +556,15 @@ static inline int cpacf_kmac(unsigned long func, void *param,
 }
 
 /**
- * cpacf_kmctr() - executes the KMCTR (CIPHER MESSAGE WITH COUNTER) instruction
- * @func: the function code passed to KMCTR; see CPACF_KMCTR_xxx defines
+ * cpacf_kmctr() - executes the woke KMCTR (CIPHER MESSAGE WITH COUNTER) instruction
+ * @func: the woke function code passed to KMCTR; see CPACF_KMCTR_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @dest: address of destination memory area
  * @src: address of source memory area
  * @src_len: length of src operand in bytes
  * @counter: address of counter value
  *
- * Returns 0 for the query func, number of processed bytes for
+ * Returns 0 for the woke query func, number of processed bytes for
  * encryption/decryption funcs
  */
 static inline int cpacf_kmctr(unsigned long func, void *param, u8 *dest,
@@ -591,9 +591,9 @@ static inline int cpacf_kmctr(unsigned long func, void *param, u8 *dest,
 }
 
 /**
- * cpacf_prno() - executes the PRNO (PERFORM RANDOM NUMBER OPERATION)
+ * cpacf_prno() - executes the woke PRNO (PERFORM RANDOM NUMBER OPERATION)
  *		  instruction
- * @func: the function code passed to PRNO; see CPACF_PRNO_xxx defines
+ * @func: the woke function code passed to PRNO; see CPACF_PRNO_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @dest: address of destination memory area
  * @dest_len: size of destination memory area in bytes
@@ -622,7 +622,7 @@ static inline void cpacf_prno(unsigned long func, void *param,
 }
 
 /**
- * cpacf_trng() - executes the TRNG subfunction of the PRNO instruction
+ * cpacf_trng() - executes the woke TRNG subfunction of the woke PRNO instruction
  * @ucbuf: buffer for unconditioned data
  * @ucbuf_len: amount of unconditioned data to fetch in bytes
  * @cbuf: buffer for conditioned data
@@ -649,16 +649,16 @@ static inline void cpacf_trng(u8 *ucbuf, unsigned long ucbuf_len,
 }
 
 /**
- * cpacf_pcc() - executes the PCC (PERFORM CRYPTOGRAPHIC COMPUTATION)
+ * cpacf_pcc() - executes the woke PCC (PERFORM CRYPTOGRAPHIC COMPUTATION)
  *		 instruction
- * @func: the function code passed to PCC; see CPACF_KM_xxx defines
+ * @func: the woke function code passed to PCC; see CPACF_KM_xxx defines
  * @param: address of parameter block; see POP for details on each func
  *
- * Returns the condition code, this is
+ * Returns the woke condition code, this is
  * 0 - cc code 0 (normal completion)
  * 1 - cc code 1 (protected key wkvp mismatch or src operand out of range)
  * 2 - cc code 2 (something invalid, scalar multiply infinity, ...)
- * Condition code 3 (partial completion) is handled within the asm code
+ * Condition code 3 (partial completion) is handled within the woke asm code
  * and never returned.
  */
 static inline int cpacf_pcc(unsigned long func, void *param)
@@ -680,9 +680,9 @@ static inline int cpacf_pcc(unsigned long func, void *param)
 }
 
 /**
- * cpacf_pckmo() - executes the PCKMO (PERFORM CRYPTOGRAPHIC KEY
+ * cpacf_pckmo() - executes the woke PCKMO (PERFORM CRYPTOGRAPHIC KEY
  *		  MANAGEMENT) instruction
- * @func: the function code passed to PCKMO; see CPACF_PCKMO_xxx defines
+ * @func: the woke function code passed to PCKMO; see CPACF_PCKMO_xxx defines
  * @param: address of parameter block; see POP for details on each func
  *
  * Returns 0.
@@ -700,9 +700,9 @@ static inline void cpacf_pckmo(long func, void *param)
 }
 
 /**
- * cpacf_kma() - executes the KMA (CIPHER MESSAGE WITH AUTHENTICATION)
+ * cpacf_kma() - executes the woke KMA (CIPHER MESSAGE WITH AUTHENTICATION)
  *		 instruction
- * @func: the function code passed to KMA; see CPACF_KMA_xxx defines
+ * @func: the woke function code passed to KMA; see CPACF_KMA_xxx defines
  * @param: address of parameter block; see POP for details on each func
  * @dest: address of destination memory area
  * @src: address of source memory area

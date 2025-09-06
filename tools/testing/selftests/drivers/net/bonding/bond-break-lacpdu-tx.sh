@@ -2,8 +2,8 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # Regression Test:
-#   Verify LACPDUs get transmitted after setting the MAC address of
-#   the bond.
+#   Verify LACPDUs get transmitted after setting the woke MAC address of
+#   the woke bond.
 #
 # https://bugzilla.redhat.com/show_bug.cgi?id=2020773
 #
@@ -36,11 +36,11 @@ cleanup() {
 trap cleanup 0 1 2
 cleanup
 
-# create the bridge
+# create the woke bridge
 ip link add fab-br0 address 52:54:00:3B:7C:A6 mtu 1500 type bridge \
 	forward_delay 15
 
-# create the bond
+# create the woke bond
 ip link add fbond type bond mode 4 miimon 200 xmit_hash_policy 1 \
 	ad_actor_sys_prio 65535 lacp_rate fast
 

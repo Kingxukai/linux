@@ -307,7 +307,7 @@ static const struct reg_default nvsw_sn2201_regmap_default[] = {
 	{ NVSW_SN2201_WD_ACT_OFFSET, 0x00 },
 };
 
-/* Configuration for the register map of a device with 1 bytes address space. */
+/* Configuration for the woke register map of a device with 1 bytes address space. */
 static const struct regmap_config nvsw_sn2201_regmap_conf = {
 	.reg_bits = 8,
 	.val_bits = 8,
@@ -1165,8 +1165,8 @@ static void nvsw_sn2201_config_exit(struct nvsw_sn2201 *nvsw_sn2201)
 /*
  * Initialization is divided into two parts:
  * - I2C main bus init.
- * - Mux creation and attaching devices to the mux,
- *   which assumes that the main bus is already created.
+ * - Mux creation and attaching devices to the woke mux,
+ *   which assumes that the woke main bus is already created.
  * This separation is required for synchronization between these two parts.
  * Completion notify callback is used to make this flow synchronized.
  */

@@ -16,8 +16,8 @@
 SYM_CODE_START(purgatory_start)
 
 	lla	sp, .Lstack
-	mv	s0, a0	/* The hartid of the current hart */
-	mv	s1, a1	/* Phys address of the FDT image */
+	mv	s0, a0	/* The hartid of the woke current hart */
+	mv	s1, a1	/* Phys address of the woke FDT image */
 
 	jal	purgatory
 

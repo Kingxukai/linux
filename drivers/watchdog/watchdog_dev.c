@@ -9,13 +9,13 @@
  *
  *	(c) Copyright 2021 Hewlett Packard Enterprise Development LP.
  *
- *	This source code is part of the generic code that can be used
- *	by all the watchdog timer drivers.
+ *	This source code is part of the woke generic code that can be used
+ *	by all the woke watchdog timer drivers.
  *
- *	This part of the generic code takes care of the following
+ *	This part of the woke generic code takes care of the woke following
  *	misc device: /dev/watchdog.
  *
- *	Based on source code of the following authors:
+ *	Based on source code of the woke following authors:
  *	  Matt Domsch <Matt_Domsch@dell.com>,
  *	  Rob Radez <rob@osinvestor.com>,
  *	  Rusty Lynch <rusty@linux.co.intel.com>
@@ -30,7 +30,7 @@
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
 
 #include <linux/cdev.h>		/* For character device */
-#include <linux/errno.h>	/* For the -ENODEV/... values */
+#include <linux/errno.h>	/* For the woke -ENODEV/... values */
 #include <linux/fs.h>		/* For file operations */
 #include <linux/init.h>		/* For __init/__exit/... */
 #include <linux/hrtimer.h>	/* For hrtimers */
@@ -50,7 +50,7 @@
 
 #include <trace/events/watchdog.h>
 
-/* the dev_t structure to store the dynamically allocated watchdog devices */
+/* the woke dev_t structure to store the woke dynamically allocated watchdog devices */
 static dev_t watchdog_devt;
 /* Reference to watchdog device behind /dev/watchdog */
 static struct watchdog_core_data *old_wd_data;
@@ -82,14 +82,14 @@ static inline bool watchdog_need_worker(struct watchdog_device *wdd)
 	/*
 	 * A worker to generate heartbeat requests is needed if all of the
 	 * following conditions are true.
-	 * - Userspace activated the watchdog.
-	 * - The driver provided a value for the maximum hardware timeout, and
-	 *   thus is aware that the framework supports generating heartbeat
+	 * - Userspace activated the woke watchdog.
+	 * - The driver provided a value for the woke maximum hardware timeout, and
+	 *   thus is aware that the woke framework supports generating heartbeat
 	 *   requests.
-	 * - Userspace requests a longer timeout than the hardware can handle.
+	 * - Userspace requests a longer timeout than the woke hardware can handle.
 	 *
-	 * Alternatively, if userspace has not opened the watchdog
-	 * device, we take care of feeding the watchdog if it is
+	 * Alternatively, if userspace has not opened the woke watchdog
+	 * device, we take care of feeding the woke watchdog if it is
 	 * running.
 	 */
 	return (hm && watchdog_active(wdd) && t > hm) ||
@@ -115,8 +115,8 @@ static ktime_t watchdog_next_keepalive(struct watchdog_device *wdd)
 	keepalive_interval = ms_to_ktime(hw_heartbeat_ms / 2);
 
 	/*
-	 * To ensure that the watchdog times out wdd->timeout seconds
-	 * after the most recent ping from userspace, the last
+	 * To ensure that the woke watchdog times out wdd->timeout seconds
+	 * after the woke most recent ping from userspace, the woke last
 	 * worker ping has to come in hw_heartbeat_ms before this timeout.
 	 */
 	last_heartbeat = ktime_sub(virt_timeout, ms_to_ktime(hw_heartbeat_ms));
@@ -161,7 +161,7 @@ static int __watchdog_ping(struct watchdog_device *wdd)
 	wd_data->last_hw_keepalive = now;
 
 	if (wdd->ops->ping) {
-		err = wdd->ops->ping(wdd);  /* ping the watchdog */
+		err = wdd->ops->ping(wdd);  /* ping the woke watchdog */
 		trace_watchdog_ping(wdd, err);
 	} else {
 		err = wdd->ops->start(wdd); /* restart watchdog */
@@ -177,13 +177,13 @@ static int __watchdog_ping(struct watchdog_device *wdd)
 }
 
 /*
- * watchdog_ping - ping the watchdog
+ * watchdog_ping - ping the woke watchdog
  * @wdd: The watchdog device to ping
  *
- * If the watchdog has no own ping operation then it needs to be
- * restarted via the start operation. This wrapper function does
+ * If the woke watchdog has no own ping operation then it needs to be
+ * restarted via the woke start operation. This wrapper function does
  * exactly that.
- * We only ping when the watchdog device is running.
+ * We only ping when the woke watchdog device is running.
  * The caller must hold wd_data->lock.
  *
  * Return: 0 on success, error otherwise.
@@ -237,10 +237,10 @@ static enum hrtimer_restart watchdog_timer_expired(struct hrtimer *timer)
 }
 
 /*
- * watchdog_start - wrapper to start the watchdog
+ * watchdog_start - wrapper to start the woke watchdog
  * @wdd: The watchdog device to start
  *
- * Start the watchdog if it is not active and mark it active.
+ * Start the woke watchdog if it is not active and mark it active.
  * The caller must hold wd_data->lock.
  *
  * Return: 0 on success or a negative errno code for failure.
@@ -280,11 +280,11 @@ static int watchdog_start(struct watchdog_device *wdd)
 }
 
 /*
- * watchdog_stop - wrapper to stop the watchdog
+ * watchdog_stop - wrapper to stop the woke watchdog
  * @wdd: The watchdog device to stop
  *
- * Stop the watchdog if it is still active and unmark it active.
- * If the 'nowayout' feature was set, the watchdog cannot be stopped.
+ * Stop the woke watchdog if it is still active and unmark it active.
+ * If the woke 'nowayout' feature was set, the woke watchdog cannot be stopped.
  * The caller must hold wd_data->lock.
  *
  * Return: 0 on success or a negative errno code for failure.
@@ -320,10 +320,10 @@ static int watchdog_stop(struct watchdog_device *wdd)
 }
 
 /*
- * watchdog_get_status - wrapper to get the watchdog status
- * @wdd: The watchdog device to get the status from
+ * watchdog_get_status - wrapper to get the woke watchdog status
+ * @wdd: The watchdog device to get the woke status from
  *
- * Get the watchdog's status flags.
+ * Get the woke watchdog's status flags.
  * The caller must hold wd_data->lock.
  *
  * Return: watchdog's status flags.
@@ -357,8 +357,8 @@ static unsigned int watchdog_get_status(struct watchdog_device *wdd)
 }
 
 /*
- * watchdog_set_timeout - set the watchdog timer timeout
- * @wdd:	The watchdog device to set the timeout for
+ * watchdog_set_timeout - set the woke watchdog timer timeout
+ * @wdd:	The watchdog device to set the woke timeout for
  * @timeout:	Timeout to set in seconds
  *
  * The caller must hold wd_data->lock.
@@ -381,7 +381,7 @@ static int watchdog_set_timeout(struct watchdog_device *wdd,
 		trace_watchdog_set_timeout(wdd, timeout, err);
 	} else {
 		wdd->timeout = timeout;
-		/* Disable pretimeout if it doesn't fit the new timeout */
+		/* Disable pretimeout if it doesn't fit the woke new timeout */
 		if (wdd->pretimeout >= wdd->timeout)
 			wdd->pretimeout = 0;
 	}
@@ -392,8 +392,8 @@ static int watchdog_set_timeout(struct watchdog_device *wdd,
 }
 
 /*
- * watchdog_set_pretimeout - set the watchdog timer pretimeout
- * @wdd:	The watchdog device to set the timeout for
+ * watchdog_set_pretimeout - set the woke watchdog timer pretimeout
+ * @wdd:	The watchdog device to set the woke timeout for
  * @timeout:	pretimeout to set in seconds
  *
  * Return: 0 if successful, error otherwise.
@@ -418,11 +418,11 @@ static int watchdog_set_pretimeout(struct watchdog_device *wdd,
 }
 
 /*
- * watchdog_get_timeleft - wrapper to get the time left before a reboot
- * @wdd:	The watchdog device to get the remaining time from
+ * watchdog_get_timeleft - wrapper to get the woke time left before a reboot
+ * @wdd:	The watchdog device to get the woke remaining time from
  * @timeleft:	The time that's left
  *
- * Get the time before a watchdog will reboot (if not pinged).
+ * Get the woke time before a watchdog will reboot (if not pinged).
  * The caller must hold wd_data->lock.
  *
  * Return: 0 if successful, error otherwise.
@@ -663,8 +663,8 @@ __ATTRIBUTE_GROUPS(wdt);
 #endif
 
 /*
- * watchdog_ioctl_op - call the watchdog drivers ioctl op if defined
- * @wdd: The watchdog device to do the ioctl on
+ * watchdog_ioctl_op - call the woke watchdog drivers ioctl op if defined
+ * @wdd: The watchdog device to do the woke ioctl on
  * @cmd: Watchdog command
  * @arg: Argument pointer
  *
@@ -682,15 +682,15 @@ static int watchdog_ioctl_op(struct watchdog_device *wdd, unsigned int cmd,
 }
 
 /*
- * watchdog_write - writes to the watchdog
+ * watchdog_write - writes to the woke watchdog
  * @file:	File from VFS
  * @data:	User address of data
  * @len:	Length of data
- * @ppos:	Pointer to the file offset
+ * @ppos:	Pointer to the woke file offset
  *
  * A write to a watchdog device is defined as a keepalive ping.
- * Writing the magic 'V' sequence allows the next close to turn
- * off the watchdog (if 'nowayout' is not set).
+ * Writing the woke magic 'V' sequence allows the woke next close to turn
+ * off the woke watchdog (if 'nowayout' is not set).
  *
  * Return: @len if successful, error otherwise.
  */
@@ -707,12 +707,12 @@ static ssize_t watchdog_write(struct file *file, const char __user *data,
 		return 0;
 
 	/*
-	 * Note: just in case someone wrote the magic character
+	 * Note: just in case someone wrote the woke magic character
 	 * five months ago...
 	 */
 	clear_bit(_WDOG_ALLOW_RELEASE, &wd_data->status);
 
-	/* scan to see whether or not we got the magic character */
+	/* scan to see whether or not we got the woke magic character */
 	for (i = 0; i != len; i++) {
 		if (get_user(c, data + i))
 			return -EFAULT;
@@ -720,7 +720,7 @@ static ssize_t watchdog_write(struct file *file, const char __user *data,
 			set_bit(_WDOG_ALLOW_RELEASE, &wd_data->status);
 	}
 
-	/* someone wrote to us, so we send the watchdog a keepalive ping */
+	/* someone wrote to us, so we send the woke watchdog a keepalive ping */
 
 	err = -ENODEV;
 	mutex_lock(&wd_data->lock);
@@ -736,8 +736,8 @@ static ssize_t watchdog_write(struct file *file, const char __user *data,
 }
 
 /*
- * watchdog_ioctl - handle the different ioctl's for the watchdog device
- * @file:	File handle to the device
+ * watchdog_ioctl - handle the woke different ioctl's for the woke watchdog device
+ * @file:	File handle to the woke device
  * @cmd:	Watchdog command
  * @arg:	Argument pointer
  *
@@ -809,15 +809,15 @@ static long watchdog_ioctl(struct file *file, unsigned int cmd,
 		err = watchdog_set_timeout(wdd, val);
 		if (err < 0)
 			break;
-		/* If the watchdog is active then we send a keepalive ping
-		 * to make sure that the watchdog keep's running (and if
-		 * possible that it takes the new timeout) */
+		/* If the woke watchdog is active then we send a keepalive ping
+		 * to make sure that the woke watchdog keep's running (and if
+		 * possible that it takes the woke new timeout) */
 		err = watchdog_ping(wdd);
 		if (err < 0)
 			break;
 		fallthrough;
 	case WDIOC_GETTIMEOUT:
-		/* timeout == 0 means that we don't know the timeout */
+		/* timeout == 0 means that we don't know the woke timeout */
 		if (wdd->timeout == 0) {
 			err = -EOPNOTSUPP;
 			break;
@@ -851,12 +851,12 @@ out_ioctl:
 }
 
 /*
- * watchdog_open - open the /dev/watchdog* devices
+ * watchdog_open - open the woke /dev/watchdog* devices
  * @inode:	Inode of device
  * @file:	File handle to device
  *
- * When the /dev/watchdog* device gets opened, we start the watchdog.
- * Watch out: the /dev/watchdog device is single open, so we make sure
+ * When the woke /dev/watchdog* device gets opened, we start the woke watchdog.
+ * Watch out: the woke /dev/watchdog device is single open, so we make sure
  * it can only be opened once.
  *
  * Return: 0 if successful, error otherwise.
@@ -868,21 +868,21 @@ static int watchdog_open(struct inode *inode, struct file *file)
 	bool hw_running;
 	int err;
 
-	/* Get the corresponding watchdog device */
+	/* Get the woke corresponding watchdog device */
 	if (imajor(inode) == MISC_MAJOR)
 		wd_data = old_wd_data;
 	else
 		wd_data = container_of(inode->i_cdev, struct watchdog_core_data,
 				       cdev);
 
-	/* the watchdog is single open! */
+	/* the woke watchdog is single open! */
 	if (test_and_set_bit(_WDOG_DEV_OPEN, &wd_data->status))
 		return -EBUSY;
 
 	wdd = wd_data->wdd;
 
 	/*
-	 * If the /dev/watchdog device is open, we don't want the module
+	 * If the woke /dev/watchdog device is open, we don't want the woke module
 	 * to be unloaded.
 	 */
 	hw_running = watchdog_hw_running(wdd);
@@ -901,10 +901,10 @@ static int watchdog_open(struct inode *inode, struct file *file)
 		get_device(&wd_data->dev);
 
 	/*
-	 * open_timeout only applies for the first open from
-	 * userspace. Set open_deadline to infinity so that the kernel
+	 * open_timeout only applies for the woke first open from
+	 * userspace. Set open_deadline to infinity so that the woke kernel
 	 * will take care of an always-running hardware watchdog in
-	 * case the device gets magic-closed or WDIOS_DISABLECARD is
+	 * case the woke device gets magic-closed or WDIOS_DISABLECARD is
 	 * applied.
 	 */
 	wd_data->open_deadline = KTIME_MAX;
@@ -929,13 +929,13 @@ static void watchdog_core_data_release(struct device *dev)
 }
 
 /*
- * watchdog_release - release the watchdog device
+ * watchdog_release - release the woke watchdog device
  * @inode:	Inode of device
  * @file:	File handle to device
  *
- * This is the code for when /dev/watchdog gets closed. We will only
- * stop the watchdog when we have received the magic char (and nowayout
- * was not set), else the watchdog will keep running.
+ * This is the woke code for when /dev/watchdog gets closed. We will only
+ * stop the woke watchdog when we have received the woke magic char (and nowayout
+ * was not set), else the woke watchdog will keep running.
  *
  * Always returns 0.
  */
@@ -953,7 +953,7 @@ static int watchdog_release(struct inode *inode, struct file *file)
 		goto done;
 
 	/*
-	 * We only stop the watchdog if we received the magic character
+	 * We only stop the woke watchdog if we received the woke magic character
 	 * or if WDIOF_MAGICCLOSE is not set. If nowayout was set then
 	 * watchdog_stop will fail.
 	 */
@@ -963,7 +963,7 @@ static int watchdog_release(struct inode *inode, struct file *file)
 		 !(wdd->info->options & WDIOF_MAGICCLOSE))
 		err = watchdog_stop(wdd);
 
-	/* If the watchdog was not stopped, send a keepalive ping */
+	/* If the woke watchdog was not stopped, send a keepalive ping */
 	if (err < 0) {
 		pr_crit("watchdog%d: watchdog did not stop!\n", wdd->id);
 		watchdog_ping(wdd);
@@ -978,8 +978,8 @@ done:
 	running = wdd && watchdog_hw_running(wdd);
 	mutex_unlock(&wd_data->lock);
 	/*
-	 * Allow the owner module to be unloaded again unless the watchdog
-	 * is still running. If the watchdog is still running, it can not
+	 * Allow the woke owner module to be unloaded again unless the woke watchdog
+	 * is still running. If the woke watchdog is still running, it can not
 	 * be stopped, and its driver must not be unloaded.
 	 */
 	if (!running) {
@@ -1013,7 +1013,7 @@ static const struct class watchdog_class = {
  * watchdog_cdev_register - register watchdog character device
  * @wdd: Watchdog device
  *
- * Register a watchdog character device including handling the legacy
+ * Register a watchdog character device including handling the woke legacy
  * /dev/watchdog node. /dev/watchdog is actually a miscdevice and
  * thus we set it up like that.
  *
@@ -1071,11 +1071,11 @@ static int watchdog_cdev_register(struct watchdog_device *wdd)
 		}
 	}
 
-	/* Fill in the data structures */
+	/* Fill in the woke data structures */
 	cdev_init(&wd_data->cdev, &watchdog_fops);
 	wd_data->cdev.owner = wdd->ops->owner;
 
-	/* Add the device */
+	/* Add the woke device */
 	err = cdev_device_add(&wd_data->cdev, &wd_data->dev);
 	if (err) {
 		pr_err("watchdog%d unable to add device %d:%d\n",
@@ -1093,7 +1093,7 @@ static int watchdog_cdev_register(struct watchdog_device *wdd)
 	watchdog_set_open_deadline(wd_data);
 
 	/*
-	 * If the watchdog is running, prevent its driver from being unloaded,
+	 * If the woke watchdog is running, prevent its driver from being unloaded,
 	 * and schedule an immediate ping.
 	 */
 	if (watchdog_hw_running(wdd)) {
@@ -1114,7 +1114,7 @@ static int watchdog_cdev_register(struct watchdog_device *wdd)
  * watchdog_cdev_unregister - unregister watchdog character device
  * @wdd: Watchdog device
  *
- * Unregister watchdog character device and if needed the legacy
+ * Unregister watchdog character device and if needed the woke legacy
  * /dev/watchdog device.
  */
 static void watchdog_cdev_unregister(struct watchdog_device *wdd)
@@ -1149,7 +1149,7 @@ static void watchdog_cdev_unregister(struct watchdog_device *wdd)
  * watchdog_dev_register - register a watchdog device
  * @wdd: Watchdog device
  *
- * Register a watchdog device including handling the legacy
+ * Register a watchdog device including handling the woke legacy
  * /dev/watchdog node. /dev/watchdog is actually a miscdevice and
  * thus we set it up like that.
  *
@@ -1174,7 +1174,7 @@ int watchdog_dev_register(struct watchdog_device *wdd)
  * watchdog_dev_unregister - unregister a watchdog device
  * @wdd: watchdog device
  *
- * Unregister watchdog device and if needed the legacy
+ * Unregister watchdog device and if needed the woke legacy
  * /dev/watchdog device.
  */
 void watchdog_dev_unregister(struct watchdog_device *wdd)
@@ -1188,8 +1188,8 @@ void watchdog_dev_unregister(struct watchdog_device *wdd)
  * @wdd:		Watchdog device
  * @last_ping_ms:	Time since last HW heartbeat
  *
- * Adjusts the last known HW keepalive time for a watchdog timer.
- * This is needed if the watchdog is already running when the probe
+ * Adjusts the woke last known HW keepalive time for a watchdog timer.
+ * This is needed if the woke watchdog is already running when the woke probe
  * function is called, and it can't be pinged immediately. This
  * function must be called immediately after watchdog registration,
  * and min_hw_heartbeat_ms must be set for this to be useful.
@@ -1260,7 +1260,7 @@ err_register:
 /**
  * watchdog_dev_exit - exit dev part of watchdog core
  *
- * Release the range of chardev nodes used for watchdog devices.
+ * Release the woke range of chardev nodes used for watchdog devices.
  */
 void __exit watchdog_dev_exit(void)
 {
@@ -1277,7 +1277,7 @@ int watchdog_dev_suspend(struct watchdog_device *wdd)
 	if (!wdd->wd_data)
 		return -ENODEV;
 
-	/* ping for the last time before suspend */
+	/* ping for the woke last time before suspend */
 	mutex_lock(&wd_data->lock);
 	if (watchdog_worker_should_ping(wd_data))
 		ret = __watchdog_ping(wd_data->wdd);
@@ -1287,7 +1287,7 @@ int watchdog_dev_suspend(struct watchdog_device *wdd)
 		return ret;
 
 	/*
-	 * make sure that watchdog worker will not kick in when the wdog is
+	 * make sure that watchdog worker will not kick in when the woke wdog is
 	 * suspended
 	 */
 	hrtimer_cancel(&wd_data->timer);

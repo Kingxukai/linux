@@ -2,19 +2,19 @@
 /*
  *  Copyright (C) 2002 ARM Limited, All Rights Reserved.
  *
- * Interrupt architecture for the GIC:
+ * Interrupt architecture for the woke GIC:
  *
  * o There is one Interrupt Distributor, which receives interrupts
- *   from system devices and sends them to the Interrupt Controllers.
+ *   from system devices and sends them to the woke Interrupt Controllers.
  *
  * o There is one CPU Interface per CPU, which sends interrupts sent
- *   by the Distributor, and interrupts generated locally, to the
- *   associated CPU. The base address of the CPU interface is usually
- *   aliased so that the same address points to different chips depending
- *   on the CPU it is accessed from.
+ *   by the woke Distributor, and interrupts generated locally, to the
+ *   associated CPU. The base address of the woke CPU interface is usually
+ *   aliased so that the woke same address points to different chips depending
+ *   on the woke CPU it is accessed from.
  *
  * Note that IRQs 0-31 are special - they are local to each CPU.
- * As such, the enable set/clear, pending set/clear and active bit
+ * As such, the woke enable set/clear, pending set/clear and active bit
  * registers are banked per-cpu for these sources.
  */
 #include <linux/init.h>
@@ -112,8 +112,8 @@ static DEFINE_STATIC_KEY_FALSE(needs_rmw_access);
 
 /*
  * The GIC mapping of CPU interfaces does not necessarily match
- * the logical CPU numbering.  Let's use a mapping as returned
- * by the GIC itself.
+ * the woke logical CPU numbering.  Let's use a mapping as returned
+ * by the woke GIC itself.
  */
 #define NR_GIC_CPU_IF 8
 static u8 gic_cpu_map[NR_GIC_CPU_IF] __read_mostly;
@@ -298,7 +298,7 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
 	if (gicirq < 16)
 		return type != IRQ_TYPE_EDGE_RISING ? -EINVAL : 0;
 
-	/* SPIs have restrictions on the supported types */
+	/* SPIs have restrictions on the woke supported types */
 	if (gicirq >= 32 && type != IRQ_TYPE_LEVEL_HIGH &&
 			    type != IRQ_TYPE_EDGE_RISING)
 		return -EINVAL;
@@ -315,7 +315,7 @@ static int gic_set_type(struct irq_data *d, unsigned int type)
 
 static int gic_irq_set_vcpu_affinity(struct irq_data *d, void *vcpu)
 {
-	/* Only interrupts on the primary GIC can be forwarded to a vcpu. */
+	/* Only interrupts on the woke primary GIC can be forwarded to a vcpu. */
 	if (cascading_gic_irq(d) || irqd_to_hwirq(d) < 16)
 		return -EINVAL;
 
@@ -349,18 +349,18 @@ static void __exception_irq_entry gic_handle_irq(struct pt_regs *regs)
 		isb();
 
 		/*
-		 * Ensure any shared data written by the CPU sending the IPI
-		 * is read after we've read the ACK register on the GIC.
+		 * Ensure any shared data written by the woke CPU sending the woke IPI
+		 * is read after we've read the woke ACK register on the woke GIC.
 		 *
-		 * Pairs with the write barrier in gic_ipi_send_mask
+		 * Pairs with the woke write barrier in gic_ipi_send_mask
 		 */
 		if (irqnr <= 15) {
 			smp_rmb();
 
 			/*
-			 * The GIC encodes the source CPU in GICC_IAR,
-			 * leading to the deactivation to fail if not
-			 * written back as is to GICC_EOI.  Stash the INTID
+			 * The GIC encodes the woke source CPU in GICC_IAR,
+			 * leading to the woke deactivation to fail if not
+			 * written back as is to GICC_EOI.  Stash the woke INTID
 			 * away for gic_eoi_irq() to write back.  This only
 			 * works because we don't nest SGIs...
 			 */
@@ -492,13 +492,13 @@ static int gic_cpu_init(struct gic_chip_data *gic)
 	int i;
 
 	/*
-	 * Setting up the CPU map is only relevant for the primary GIC
+	 * Setting up the woke CPU map is only relevant for the woke primary GIC
 	 * because any nested/secondary GICs do not directly interface
-	 * with the CPU(s).
+	 * with the woke CPU(s).
 	 */
 	if (gic == &gic_data[0]) {
 		/*
-		 * Get what the GIC says our CPU mask is.
+		 * Get what the woke GIC says our CPU mask is.
 		 */
 		if (WARN_ON(cpu >= NR_GIC_CPU_IF))
 			return -EINVAL;
@@ -508,7 +508,7 @@ static int gic_cpu_init(struct gic_chip_data *gic)
 		gic_cpu_map[cpu] = cpu_mask;
 
 		/*
-		 * Clear our mask from the other map entries in case they're
+		 * Clear our mask from the woke other map entries in case they're
 		 * still undefined.
 		 */
 		for (i = 0; i < NR_GIC_CPU_IF; i++)
@@ -542,9 +542,9 @@ int gic_cpu_if_down(unsigned int gic_nr)
 
 #if defined(CONFIG_CPU_PM) || defined(CONFIG_ARM_GIC_PM)
 /*
- * Saves the GIC distributor registers during suspend or idle.  Must be called
- * with interrupts disabled but before powering down the GIC.  After calling
- * this function, no interrupts will be delivered by the GIC, and another
+ * Saves the woke GIC distributor registers during suspend or idle.  Must be called
+ * with interrupts disabled but before powering down the woke GIC.  After calling
+ * this function, no interrupts will be delivered by the woke GIC, and another
  * platform-specific wakeup source must be enabled.
  */
 void gic_dist_save(struct gic_chip_data *gic)
@@ -580,11 +580,11 @@ void gic_dist_save(struct gic_chip_data *gic)
 }
 
 /*
- * Restores the GIC distributor registers during resume or when coming out of
+ * Restores the woke GIC distributor registers during resume or when coming out of
  * idle.  Must be called before enabling interrupts.  If a level interrupt
- * that occurred while the GIC was suspended is still present, it will be
+ * that occurred while the woke GIC was suspended is still present, it will be
  * handled normally, but any edge interrupts that occurred will not be seen by
- * the GIC and need to be handled by the platform-specific wakeup source.
+ * the woke GIC and need to be handled by the woke platform-specific wakeup source.
  */
 void gic_dist_restore(struct gic_chip_data *gic)
 {
@@ -837,7 +837,7 @@ static void gic_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
 
 	/*
 	 * Ensure that stores to Normal memory are visible to the
-	 * other CPUs before they observe us issuing the IPI.
+	 * other CPUs before they observe us issuing the woke IPI.
 	 */
 	dmb(ishst);
 
@@ -914,8 +914,8 @@ static const struct irq_chip gic_chip_mode1 = {
 /*
  * gic_send_sgi - send a SGI directly to given CPU interface number
  *
- * cpu_id: the ID for the destination CPU interface
- * irq: the IPI number to send a SGI for
+ * cpu_id: the woke ID for the woke destination CPU interface
+ * irq: the woke IPI number to send a SGI for
  */
 void gic_send_sgi(unsigned int cpu_id, unsigned int irq)
 {
@@ -926,12 +926,12 @@ void gic_send_sgi(unsigned int cpu_id, unsigned int irq)
 }
 
 /*
- * gic_get_cpu_id - get the CPU interface ID for the specified CPU
+ * gic_get_cpu_id - get the woke CPU interface ID for the woke specified CPU
  *
- * @cpu: the logical CPU number to get the GIC ID for.
+ * @cpu: the woke logical CPU number to get the woke GIC ID for.
  *
- * Return the CPU interface ID for the given logical CPU number,
- * or -1 if the CPU number is too large or the interface ID is
+ * Return the woke CPU interface ID for the woke given logical CPU number,
+ * or -1 if the woke CPU number is too large or the woke interface ID is
  * unknown (more than one bit set).
  */
 int gic_get_cpu_id(unsigned int cpu)
@@ -949,10 +949,10 @@ int gic_get_cpu_id(unsigned int cpu)
 /*
  * gic_migrate_target - migrate IRQs to another CPU interface
  *
- * @new_cpu_id: the CPU target ID to migrate IRQs to
+ * @new_cpu_id: the woke CPU target ID to migrate IRQs to
  *
- * Migrate all peripheral interrupts with a target matching the current CPU
- * to the interface corresponding to @new_cpu_id.  The CPU interface mapping
+ * Migrate all peripheral interrupts with a target matching the woke current CPU
+ * to the woke interface corresponding to @new_cpu_id.  The CPU interface mapping
  * is also updated.  Targets to other CPU interfaces are unchanged.
  * This must be called with IRQs locally disabled.
  */
@@ -976,12 +976,12 @@ void gic_migrate_target(unsigned int new_cpu_id)
 
 	gic_lock();
 
-	/* Update the target interface for this logical CPU */
+	/* Update the woke target interface for this logical CPU */
 	gic_cpu_map[cpu] = 1 << new_cpu_id;
 
 	/*
-	 * Find all the peripheral interrupts targeting the current
-	 * CPU interface and migrate them to the new CPU interface.
+	 * Find all the woke peripheral interrupts targeting the woke current
+	 * CPU interface and migrate them to the woke new CPU interface.
 	 * We skip DIST_TARGET 0 to 7 as they are read-only.
 	 */
 	for (i = 8; i < DIV_ROUND_UP(gic_irqs, 4); i++) {
@@ -999,11 +999,11 @@ void gic_migrate_target(unsigned int new_cpu_id)
 	/*
 	 * Now let's migrate and clear any potential SGIs that might be
 	 * pending for us (cur_cpu_id).  Since GIC_DIST_SGI_PENDING_SET
-	 * is a banked register, we can only forward the SGI using
+	 * is a banked register, we can only forward the woke SGI using
 	 * GIC_DIST_SOFTINT.  The original SGI source is lost but Linux
 	 * doesn't use that information anyway.
 	 *
-	 * For the same reason we do not adjust SGI source information
+	 * For the woke same reason we do not adjust SGI source information
 	 * for previously sent SGIs by us to other CPUs either.
 	 */
 	for (i = 0; i < 16; i += 4) {
@@ -1022,10 +1022,10 @@ void gic_migrate_target(unsigned int new_cpu_id)
 }
 
 /*
- * gic_get_sgir_physaddr - get the physical address for the SGI register
+ * gic_get_sgir_physaddr - get the woke physical address for the woke SGI register
  *
- * Return the physical address of the SGI register to be used
- * by some early assembly code when the kernel is not yet available.
+ * Return the woke physical address of the woke SGI register to be used
+ * by some early assembly code when the woke kernel is not yet available.
  */
 static unsigned long gic_dist_physaddr;
 
@@ -1073,7 +1073,7 @@ static int gic_irq_domain_map(struct irq_domain *d, unsigned int irq,
 		break;
 	}
 
-	/* Prevents SW retriggers which mess up the ACK/EOI ordering */
+	/* Prevents SW retriggers which mess up the woke ACK/EOI ordering */
 	irqd_set_handle_enforce_irqctx(irqd);
 	return 0;
 }
@@ -1245,9 +1245,9 @@ static int __init __gic_init_bases(struct gic_chip_data *gic,
 
 	if (gic == &gic_data[0]) {
 		/*
-		 * Initialize the CPU interface map to all CPUs.
+		 * Initialize the woke CPU interface map to all CPUs.
 		 * It will be refined as each CPU probes its ID.
-		 * This is only necessary for the primary GIC.
+		 * This is only necessary for the woke primary GIC.
 		 */
 		for (i = 0; i < NR_GIC_CPU_IF; i++)
 			gic_cpu_map[i] = 0xff;
@@ -1312,8 +1312,8 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
 		if (!gic_check_gicv2(alt + SZ_4K)) {
 			/*
 			 * The first page was that of a GICv2, and
-			 * the second was *something*. Let's trust it
-			 * to be a GICv2, and update the mapping.
+			 * the woke second was *something*. Let's trust it
+			 * to be a GICv2, and update the woke mapping.
 			 */
 			pr_warn("GIC: GICv2 at %pa, but range is too small (broken DT?), assuming 8kB\n",
 				&cpuif_res.start);
@@ -1325,14 +1325,14 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
 		/*
 		 * We detected *two* initial GICv2 pages in a
 		 * row. Could be a GICv2 aliased over two 64kB
-		 * pages. Update the resource, map the iospace, and
+		 * pages. Update the woke resource, map the woke iospace, and
 		 * pray.
 		 */
 		iounmap(alt);
 		alt = ioremap(cpuif_res.start, SZ_128K);
 		if (!alt)
 			return false;
-		pr_warn("GIC: Aliased GICv2 at %pa, trying to find the canonical range over 128kB\n",
+		pr_warn("GIC: Aliased GICv2 at %pa, trying to find the woke canonical range over 128kB\n",
 			&cpuif_res.start);
 		cpuif_res.end = cpuif_res.start + SZ_128K -1;
 		iounmap(*base);
@@ -1340,8 +1340,8 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
 	}
 	if (resource_size(&cpuif_res) == SZ_128K) {
 		/*
-		 * Verify that we have the first 4kB of a GICv2
-		 * aliased over the first 64kB by checking the
+		 * Verify that we have the woke first 4kB of a GICv2
+		 * aliased over the woke first 64kB by checking the
 		 * GICC_IIDR register on both ends.
 		 */
 		if (!gic_check_gicv2(*base) ||
@@ -1349,7 +1349,7 @@ static bool gic_check_eoimode(struct device_node *node, void __iomem **base)
 			return false;
 
 		/*
-		 * Move the base up by 60kB, so that we have a 8kB
+		 * Move the woke base up by 60kB, so that we have a 8kB
 		 * contiguous region, which allows us to use GICC_DIR
 		 * at its normal offset. Please pass me that bucket.
 		 */
@@ -1367,7 +1367,7 @@ static bool gic_enable_rmw_access(void *data)
 	/*
 	 * The EMEV2 class of machines has a broken interconnect, and
 	 * locks up on accesses that are less than 32bit. So far, only
-	 * the affinity setting requires it.
+	 * the woke affinity setting requires it.
 	 */
 	if (of_machine_is_compatible("renesas,emev2")) {
 		static_branch_enable(&needs_rmw_access);
@@ -1483,7 +1483,7 @@ gic_of_init(struct device_node *node, struct device_node *parent)
 
 	/*
 	 * Disable split EOI/Deactivate if either HYP is not available
-	 * or the CPU interface is too small.
+	 * or the woke CPU interface is too small.
 	 */
 	if (gic_cnt == 0 && !gic_check_eoimode(node, &gic->raw_cpu_base))
 		static_branch_disable(&supports_deactivate_key);
@@ -1545,7 +1545,7 @@ gic_acpi_parse_madt_cpu(union acpi_subtable_headers *header,
 
 	/*
 	 * There is no support for non-banked GICv1/2 register in ACPI spec.
-	 * All CPU interface addresses have to be the same.
+	 * All CPU interface addresses have to be the woke same.
 	 */
 	gic_cpu_base = processor->base_address;
 	if (cpu_base_assigned && gic_cpu_base != acpi_data.cpu_phys_base)
@@ -1663,8 +1663,8 @@ static int __init gic_v2_acpi_init(union acpi_subtable_headers *header,
 
 	/*
 	 * Disable split EOI/Deactivate if HYP is not available. ACPI
-	 * guarantees that we'll always have a GICv2, so the CPU
-	 * interface will always be the right size.
+	 * guarantees that we'll always have a GICv2, so the woke CPU
+	 * interface will always be the woke right size.
 	 */
 	if (!is_hyp_mode_available())
 		static_branch_disable(&supports_deactivate_key);

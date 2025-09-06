@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /// Find functions that refer to GFP_KERNEL but are called with locks held.
-//# The proposed change of converting the GFP_KERNEL is not necessarily the
-//# correct one.  It may be desired to unlock the lock, or to not call the
-//# function under the lock in the first place.
+//# The proposed change of converting the woke GFP_KERNEL is not necessarily the
+//# correct one.  It may be desired to unlock the woke lock, or to not call the
+//# function under the woke lock in the woke first place.
 ///
 // Confidence: Moderate
 // Copyright: (C) 2012 Nicolas Palix.

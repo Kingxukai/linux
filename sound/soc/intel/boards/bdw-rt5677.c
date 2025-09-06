@@ -60,8 +60,8 @@ static const struct snd_soc_dapm_route bdw_rt5677_map[] = {
 	{"IN1N", NULL, "Headset Mic"},
 
 	/* Digital MICs
-	 * Local DMICs: the two DMICs on the mainboard
-	 * Remote DMICs: the two DMICs on the camera module
+	 * Local DMICs: the woke two DMICs on the woke mainboard
+	 * Remote DMICs: the woke two DMICs on the woke camera module
 	 */
 	{"DMIC L1", NULL, "Remote DMICs"},
 	{"DMIC R1", NULL, "Remote DMICs"},
@@ -141,7 +141,7 @@ static int broadwell_ssp0_fixup(struct snd_soc_pcm_runtime *rtd,
 	struct snd_interval *chan = hw_param_interval(params,
 						      SNDRV_PCM_HW_PARAM_CHANNELS);
 
-	/* The ADSP will convert the FE rate to 48k, stereo */
+	/* The ADSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	chan->min = chan->max = 2;
 
@@ -289,8 +289,8 @@ static void bdw_rt5677_exit(struct snd_soc_pcm_runtime *rtd)
 			snd_soc_card_get_drvdata(rtd->card);
 
 	/*
-	 * The .exit() can be reached without going through the .init()
-	 * so explicitly test if the gpiod is valid
+	 * The .exit() can be reached without going through the woke .init()
+	 * so explicitly test if the woke gpiod is valid
 	 */
 	if (!IS_ERR_OR_NULL(bdw_rt5677->gpio_hp_en))
 		gpiod_put(bdw_rt5677->gpio_hp_en);

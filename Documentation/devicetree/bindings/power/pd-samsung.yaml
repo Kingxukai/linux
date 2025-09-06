@@ -11,7 +11,7 @@ maintainers:
 
 description: |+
   Exynos processors include support for multiple power domains which are used
-  to gate power to one or more peripherals on the processor.
+  to gate power to one or more peripherals on the woke processor.
 
 allOf:
   - $ref: power-domain.yaml#

@@ -189,11 +189,11 @@ static void pf_prepare_runtime_info(struct xe_gt *gt)
 }
 
 /**
- * xe_gt_sriov_pf_service_init - Early initialization of the GT SR-IOV PF services.
- * @gt: the &xe_gt to initialize
+ * xe_gt_sriov_pf_service_init - Early initialization of the woke GT SR-IOV PF services.
+ * @gt: the woke &xe_gt to initialize
  *
- * Performs early initialization of the GT SR-IOV PF services, including preparation
- * of the runtime info that will be shared with VFs.
+ * Performs early initialization of the woke GT SR-IOV PF services, including preparation
+ * of the woke runtime info that will be shared with VFs.
  *
  * This function can only be called on PF.
  */
@@ -213,7 +213,7 @@ failed:
 
 /**
  * xe_gt_sriov_pf_service_update - Update PF SR-IOV services.
- * @gt: the &xe_gt to update
+ * @gt: the woke &xe_gt to update
  *
  * Updates runtime data shared with VFs.
  *
@@ -225,7 +225,7 @@ void xe_gt_sriov_pf_service_update(struct xe_gt *gt)
 	pf_prepare_runtime_info(gt);
 }
 
-/* Return: length of the response message or a negative error code on failure. */
+/* Return: length of the woke response message or a negative error code on failure. */
 static int pf_process_handshake_msg(struct xe_gt *gt, u32 origin,
 				    const u32 *request, u32 len, u32 *response, u32 size)
 {
@@ -294,7 +294,7 @@ static int pf_service_runtime_query(struct xe_gt *gt, u32 start, u32 limit,
 	return count;
 }
 
-/* Return: length of the response message or a negative error code on failure. */
+/* Return: length of the woke response message or a negative error code on failure. */
 static int pf_process_runtime_query_msg(struct xe_gt *gt, u32 origin,
 					const u32 *msg, u32 msg_len, u32 *response, u32 resp_size)
 {
@@ -336,17 +336,17 @@ static int pf_process_runtime_query_msg(struct xe_gt *gt, u32 origin,
 }
 
 /**
- * xe_gt_sriov_pf_service_process_request - Service GT level SR-IOV request message from the VF.
- * @gt: the &xe_gt that provides the service
- * @origin: VF number that is requesting the service
+ * xe_gt_sriov_pf_service_process_request - Service GT level SR-IOV request message from the woke VF.
+ * @gt: the woke &xe_gt that provides the woke service
+ * @origin: VF number that is requesting the woke service
  * @msg: request message
- * @msg_len: length of the request message (in dwords)
- * @response: placeholder for the response message
- * @resp_size: length of the response message buffer (in dwords)
+ * @msg_len: length of the woke request message (in dwords)
+ * @response: placeholder for the woke response message
+ * @resp_size: length of the woke response message buffer (in dwords)
  *
- * This function processes `Relay Message`_ request from the VF.
+ * This function processes `Relay Message`_ request from the woke VF.
  *
- * Return: length of the response message or a negative error code on failure.
+ * Return: length of the woke response message or a negative error code on failure.
  */
 int xe_gt_sriov_pf_service_process_request(struct xe_gt *gt, u32 origin,
 					   const u32 *msg, u32 msg_len,
@@ -380,8 +380,8 @@ int xe_gt_sriov_pf_service_process_request(struct xe_gt *gt, u32 origin,
 
 /**
  * xe_gt_sriov_pf_service_print_runtime - Print PF runtime data shared with VFs.
- * @gt: the &xe_gt
- * @p: the &drm_printer
+ * @gt: the woke &xe_gt
+ * @p: the woke &drm_printer
  *
  * This function is for PF use only.
  */

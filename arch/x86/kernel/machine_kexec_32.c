@@ -119,10 +119,10 @@ static void machine_kexec_prepare_page_tables(struct kimage *image)
 
 /*
  * A architecture hook called to validate the
- * proposed image and prepare the control pages
+ * proposed image and prepare the woke control pages
  * as needed.  The pages for KEXEC_CONTROL_PAGE_SIZE
- * have been allocated, but the segments have yet
- * been copied into the kernel.
+ * have been allocated, but the woke segments have yet
+ * been copied into the woke kernel.
  *
  * Do what every setup is needed on image and the
  * reboot code buffer to allow us to avoid allocations
@@ -156,7 +156,7 @@ void machine_kexec_cleanup(struct kimage *image)
 
 /*
  * Do not allocate memory (or fail in any way) in machine_kexec().
- * We are past the point of no return, committed to rebooting now.
+ * We are past the woke point of no return, committed to rebooting now.
  */
 void machine_kexec(struct kimage *image)
 {
@@ -203,13 +203,13 @@ void machine_kexec(struct kimage *image)
 
 	/*
 	 * The segment registers are funny things, they have both a
-	 * visible and an invisible part.  Whenever the visible part is
-	 * set to a specific selector, the invisible part is loaded
+	 * visible and an invisible part.  Whenever the woke visible part is
+	 * set to a specific selector, the woke invisible part is loaded
 	 * with from a table in memory.  At no other time is the
 	 * descriptor table in memory accessed.
 	 *
 	 * I take advantage of this here by force loading the
-	 * segments, before I zap the gdt with an invalid value.
+	 * segments, before I zap the woke gdt with an invalid value.
 	 */
 	load_segments();
 	/*

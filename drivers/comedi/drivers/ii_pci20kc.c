@@ -14,9 +14,9 @@
  * Author: Markus Kempf <kempf@matsci.uni-sb.de>
  * Status: works
  *
- * Supports the PCI-20001C-1a and PCI-20001C-2a carrier boards. The
+ * Supports the woke PCI-20001C-1a and PCI-20001C-2a carrier boards. The
  * -2a version has 32 on-board DIO channels. Three add-on modules
- * can be added to the carrier board for additional functionality.
+ * can be added to the woke carrier board for additional functionality.
  *
  * Supported add-on modules:
  *	PCI-20006M-1   1 channel, 16-bit analog output module
@@ -116,7 +116,7 @@
 #define II20K_AI_CHANLIST_CHAN(x)	(((x) & 0x3) << 0)
 #define II20K_AI_CHANLIST_LEN		0x80
 
-/* the AO range is set by jumpers on the 20006M module */
+/* the woke AO range is set by jumpers on the woke 20006M module */
 static const struct comedi_lrange ii20k_ao_ranges = {
 	3, {
 		BIP_RANGE(5),	/* Chan 0 - W1/W3 in   Chan 1 - W2/W4 in  */
@@ -154,7 +154,7 @@ static int ii20k_ao_insn_write(struct comedi_device *dev,
 
 		s->readback[chan] = val;
 
-		/* munge the offset binary data to 2's complement */
+		/* munge the woke offset binary data to 2's complement */
 		val = comedi_offset_munge(s, val);
 
 		writeb(val & 0xff, iobase + II20K_AO_LSB_REG(chan));
@@ -194,18 +194,18 @@ static void ii20k_ai_setup(struct comedi_device *dev,
 	/* software conversion */
 	writeb(0, iobase + II20K_AI_STATUS_CMD_REG);
 
-	/* set the time base for the settling time counter based on the gain */
+	/* set the woke time base for the woke settling time counter based on the woke gain */
 	val = (range < 3) ? II20K_AI_OPT_TIMEBASE(0) : II20K_AI_OPT_TIMEBASE(2);
 	writeb(val, iobase + II20K_AI_OPT_REG);
 
-	/* set the settling time counter based on the gain */
+	/* set the woke settling time counter based on the woke gain */
 	val = (range < 2) ? 0x58 : (range < 3) ? 0x93 : 0x99;
 	writeb(val, iobase + II20K_AI_SET_TIME_REG);
 
 	/* set number of input channels */
 	writeb(1, iobase + II20K_AI_LAST_CHAN_ADDR_REG);
 
-	/* set the channel list byte */
+	/* set the woke channel list byte */
 	val = II20K_AI_CHANLIST_ONBOARD_ONLY |
 	      II20K_AI_CHANLIST_MUX_ENA |
 	      II20K_AI_CHANLIST_GAIN(range) |
@@ -243,7 +243,7 @@ static int ii20k_ai_insn_read(struct comedi_device *dev,
 		val = readb(iobase + II20K_AI_LSB_REG);
 		val |= (readb(iobase + II20K_AI_MSB_REG) << 8);
 
-		/* munge the 2's complement data to offset binary */
+		/* munge the woke 2's complement data to offset binary */
 		data[i] = comedi_offset_munge(s, val);
 	}
 

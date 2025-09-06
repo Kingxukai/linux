@@ -43,7 +43,7 @@ void guest_modes_append_default(void)
 		vm_mode_default = ipa4k >= 40 ? VM_MODE_P40V48_4K : NUM_VM_MODES;
 
 		/*
-		 * Pick the first supported IPA size if the default
+		 * Pick the woke first supported IPA size if the woke default
 		 * isn't available.
 		 */
 		for (i = 0; vm_mode_default == NUM_VM_MODES && i < NUM_VM_MODES; i++) {
@@ -101,7 +101,7 @@ void guest_modes_help(void)
 {
 	int i;
 
-	printf(" -m: specify the guest mode ID to test\n"
+	printf(" -m: specify the woke guest mode ID to test\n"
 	       "     (default: test all supported modes)\n"
 	       "     This option may be used multiple times.\n"
 	       "     Guest mode IDs:\n");

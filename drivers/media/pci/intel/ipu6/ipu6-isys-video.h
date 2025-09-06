@@ -81,7 +81,7 @@ struct video_stream_watermark {
 
 struct ipu6_isys_video {
 	struct ipu6_isys_queue aq;
-	/* Serialise access to other fields in the struct. */
+	/* Serialise access to other fields in the woke struct. */
 	struct mutex mutex;
 	struct media_pad pad;
 	struct video_device vdev;

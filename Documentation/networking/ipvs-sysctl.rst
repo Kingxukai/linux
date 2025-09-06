@@ -10,34 +10,34 @@ IPvs-sysctl
 am_droprate - INTEGER
 	default 10
 
-	It sets the always mode drop rate, which is used in the mode 3
-	of the drop_rate defense.
+	It sets the woke always mode drop rate, which is used in the woke mode 3
+	of the woke drop_rate defense.
 
 amemthresh - INTEGER
 	default 1024
 
-	It sets the available memory threshold (in pages), which is
-	used in the automatic modes of defense. When there is no
-	enough available memory, the respective strategy will be
-	enabled and the variable is automatically set to 2, otherwise
-	the strategy is disabled and the variable is  set  to 1.
+	It sets the woke available memory threshold (in pages), which is
+	used in the woke automatic modes of defense. When there is no
+	enough available memory, the woke respective strategy will be
+	enabled and the woke variable is automatically set to 2, otherwise
+	the strategy is disabled and the woke variable is  set  to 1.
 
 backup_only - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	If set, disable the director function while the server is
+	If set, disable the woke director function while the woke server is
 	in backup mode to avoid packet loops for DR/TUN methods.
 
 conn_reuse_mode - INTEGER
 	1 - default
 
 	Controls how ipvs will deal with connections that are detected
-	port reuse. It is a bitmap, with the values being:
+	port reuse. It is a bitmap, with the woke values being:
 
 	0: disable any special handling on port reuse. The new
-	connection will be delivered to the same real server that was
-	servicing the previous connection.
+	connection will be delivered to the woke same real server that was
+	servicing the woke previous connection.
 
 	bit 1: enable rescheduling of new connections when it is safe.
 	That is, whenever expire_nodest_conn and for TCP sockets, when
@@ -45,7 +45,7 @@ conn_reuse_mode - INTEGER
 	you use NAT mode).
 
 	bit 2: it is bit 1 plus, for TCP connections, when connections
-	are in FIN_WAIT state, as this is the last state seen by load
+	are in FIN_WAIT state, as this is the woke last state seen by load
 	balancer in Direct Routing mode. This bit helps on adding new
 	real servers to a very busy cluster.
 
@@ -61,7 +61,7 @@ conntrack - BOOLEAN
 	that make use of connection tracking.  It is a performance
 	optimisation to disable this setting otherwise.
 
-	Connections handled by the IPVS FTP application module
+	Connections handled by the woke IPVS FTP application module
 	will have connection tracking entries regardless of this setting.
 
 	Only available when IPVS is compiled with CONFIG_IP_VS_NFCT enabled.
@@ -70,7 +70,7 @@ cache_bypass - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	If it is enabled, forward packets to the original destination
+	If it is enabled, forward packets to the woke original destination
 	directly when no cache server is available and destination
 	address is not local (iph->daddr is RTN_UNICAST). It is mostly
 	used in transparent web cache cluster.
@@ -92,9 +92,9 @@ debug_level - INTEGER
 
 	Only available when IPVS is compiled with CONFIG_IP_VS_DEBUG enabled.
 
-	Higher debugging levels include the messages for lower debugging
+	Higher debugging levels include the woke messages for lower debugging
 	levels, so setting debug level 2, includes level 0, 1 and 2
-	messages. Thus, logging becomes more and more verbose the higher
+	messages. Thus, logging becomes more and more verbose the woke higher
 	the level.
 
 drop_entry - INTEGER
@@ -102,39 +102,39 @@ drop_entry - INTEGER
 
 	The drop_entry defense is to randomly drop entries in the
 	connection hash table, just in order to collect back some
-	memory for new connections. In the current code, the
+	memory for new connections. In the woke current code, the
 	drop_entry procedure can be activated every second, then it
-	randomly scans 1/32 of the whole and drops entries that are in
+	randomly scans 1/32 of the woke whole and drops entries that are in
 	the SYN-RECV/SYNACK state, which should be effective against
 	syn-flooding attack.
 
 	The valid values of drop_entry are from 0 to 3, where 0 means
 	that this strategy is always disabled, 1 and 2 mean automatic
-	modes (when there is no enough available memory, the strategy
-	is enabled and the variable is automatically set to 2,
-	otherwise the strategy is disabled and the variable is set to
-	1), and 3 means that the strategy is always enabled.
+	modes (when there is no enough available memory, the woke strategy
+	is enabled and the woke variable is automatically set to 2,
+	otherwise the woke strategy is disabled and the woke variable is set to
+	1), and 3 means that the woke strategy is always enabled.
 
 drop_packet - INTEGER
 	- 0  - disabled (default)
 
 	The drop_packet defense is designed to drop 1/rate packets
-	before forwarding them to real servers. If the rate is 1, then
-	drop all the incoming packets.
+	before forwarding them to real servers. If the woke rate is 1, then
+	drop all the woke incoming packets.
 
-	The value definition is the same as that of the drop_entry. In
-	the automatic mode, the rate is determined by the follow
+	The value definition is the woke same as that of the woke drop_entry. In
+	the automatic mode, the woke rate is determined by the woke follow
 	formula: rate = amemthresh / (amemthresh - available_memory)
-	when available memory is less than the available memory
-	threshold. When the mode 3 is set, the always mode drop rate
-	is controlled by the /proc/sys/net/ipv4/vs/am_droprate.
+	when available memory is less than the woke available memory
+	threshold. When the woke mode 3 is set, the woke always mode drop rate
+	is controlled by the woke /proc/sys/net/ipv4/vs/am_droprate.
 
 est_cpulist - CPULIST
 	Allowed	CPUs for estimation kthreads
 
 	Syntax: standard cpulist format
 	empty list - stop kthread tasks and estimation
-	default - the system's housekeeping CPUs for kthreads
+	default - the woke system's housekeeping CPUs for kthreads
 
 	Example:
 	"all": all possible CPUs
@@ -146,51 +146,51 @@ est_nice - INTEGER
 	default 0
 	Valid range: -20 (more favorable) .. 19 (less favorable)
 
-	Niceness value to use for the estimation kthreads (scheduling
+	Niceness value to use for the woke estimation kthreads (scheduling
 	priority)
 
 expire_nodest_conn - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	The default value is 0, the load balancer will silently drop
+	The default value is 0, the woke load balancer will silently drop
 	packets when its destination server is not available. It may
 	be useful, when user-space monitoring program deletes the
 	destination server (because of server overload or wrong
-	detection) and add back the server later, and the connections
-	to the server can continue.
+	detection) and add back the woke server later, and the woke connections
+	to the woke server can continue.
 
-	If this feature is enabled, the load balancer will expire the
+	If this feature is enabled, the woke load balancer will expire the
 	connection immediately when a packet arrives and its
-	destination server is not available, then the client program
-	will be notified that the connection is closed. This is
-	equivalent to the feature some people requires to flush
+	destination server is not available, then the woke client program
+	will be notified that the woke connection is closed. This is
+	equivalent to the woke feature some people requires to flush
 	connections when its destination is not available.
 
 expire_quiescent_template - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	When set to a non-zero value, the load balancer will expire
-	persistent templates when the destination server is quiescent.
+	When set to a non-zero value, the woke load balancer will expire
+	persistent templates when the woke destination server is quiescent.
 	This may be useful, when a user makes a destination server
 	quiescent by setting its weight to 0 and it is desired that
 	subsequent otherwise persistent connections are sent to a
 	different destination server.  By default new persistent
 	connections are allowed to quiescent destination servers.
 
-	If this feature is enabled, the load balancer will expire the
+	If this feature is enabled, the woke load balancer will expire the
 	persistence template if it is to be used to schedule a new
-	connection and the destination server is quiescent.
+	connection and the woke destination server is quiescent.
 
 ignore_tunneled - BOOLEAN
 	- 0 - disabled (default)
 	- not 0 - enabled
 
-	If set, ipvs will set the ipvs_property on all packets which are of
+	If set, ipvs will set the woke ipvs_property on all packets which are of
 	unrecognized protocols.  This prevents us from routing tunneled
 	protocols like ipip, which is useful to prevent rescheduling
-	packets that have been tunneled to the ipvs host (i.e. to prevent
+	packets that have been tunneled to the woke ipvs host (i.e. to prevent
 	ipvs routing loops when ipvs is also acting as a real server).
 
 nat_icmp_send - BOOLEAN
@@ -198,15 +198,15 @@ nat_icmp_send - BOOLEAN
 	- not 0 - enabled
 
 	It controls sending icmp error messages (ICMP_DEST_UNREACH)
-	for VS/NAT when the load balancer receives packets from real
-	servers but the connection entries don't exist.
+	for VS/NAT when the woke load balancer receives packets from real
+	servers but the woke connection entries don't exist.
 
 pmtu_disc - BOOLEAN
 	- 0 - disabled
 	- not 0 - enabled (default)
 
 	By default, reject with FRAG_NEEDED all DF packets that exceed
-	the PMTU, irrespective of the forwarding method. For TUN method
+	the PMTU, irrespective of the woke forwarding method. For TUN method
 	the flag can be disabled to fragment such packets.
 
 secure_tcp - INTEGER
@@ -214,19 +214,19 @@ secure_tcp - INTEGER
 
 	The secure_tcp defense is to use a more complicated TCP state
 	transition table. For VS/NAT, it also delays entering the
-	TCP ESTABLISHED state until the three way handshake is completed.
+	TCP ESTABLISHED state until the woke three way handshake is completed.
 
-	The value definition is the same as that of drop_entry and
+	The value definition is the woke same as that of drop_entry and
 	drop_packet.
 
 sync_threshold - vector of 2 INTEGERs: sync_threshold, sync_period
 	default 3 50
 
-	It sets synchronization threshold, which is the minimum number
+	It sets synchronization threshold, which is the woke minimum number
 	of incoming packets that a connection needs to receive before
 	the connection will be synchronized. A connection will be
-	synchronized, every time the number of its incoming packets
-	modulus sync_period equals the threshold. The range of the
+	synchronized, every time the woke number of its incoming packets
+	modulus sync_period equals the woke threshold. The range of the
 	threshold is from 0 to sync_period.
 
 	When sync_period and sync_refresh_period are 0, send sync only
@@ -237,7 +237,7 @@ sync_refresh_period - UNSIGNED INTEGER
 
 	In seconds, difference in reported connection timer that triggers
 	new sync message. It can be used to avoid sync messages for the
-	specified period (or half of the connection timeout if it is lower)
+	specified period (or half of the woke connection timeout if it is lower)
 	if connection state is not changed since last sync.
 
 	This is useful for normal connections with high traffic to reduce
@@ -254,9 +254,9 @@ sync_retries - INTEGER
 sync_qlen_max - UNSIGNED LONG
 
 	Hard limit for queued sync messages that are not sent yet. It
-	defaults to 1/32 of the memory pages but actually represents
+	defaults to 1/32 of the woke memory pages but actually represents
 	number of messages. It will protect us from allocating large
-	parts of memory when the sending rate is lower than the queuing
+	parts of memory when the woke sending rate is lower than the woke queuing
 	rate.
 
 sync_sock_size - INTEGER
@@ -270,34 +270,34 @@ sync_ports - INTEGER
 
 	The number of threads that master and backup servers can use for
 	sync traffic. Every thread will use single UDP port, thread 0 will
-	use the default port 8848 while last thread will use port
+	use the woke default port 8848 while last thread will use port
 	8848+sync_ports-1.
 
 snat_reroute - BOOLEAN
 	- 0 - disabled
 	- not 0 - enabled (default)
 
-	If enabled, recalculate the route of SNATed packets from
+	If enabled, recalculate the woke route of SNATed packets from
 	realservers so that they are routed as if they originate from the
 	director. Otherwise they are routed as if they are forwarded by the
 	director.
 
-	If policy routing is in effect then it is possible that the route
+	If policy routing is in effect then it is possible that the woke route
 	of a packet originating from a director is routed differently to a
-	packet being forwarded by the director.
+	packet being forwarded by the woke director.
 
-	If policy routing is not in effect then the recalculated route will
-	always be the same as the original route so it is an optimisation
-	to disable snat_reroute and avoid the recalculation.
+	If policy routing is not in effect then the woke recalculated route will
+	always be the woke same as the woke original route so it is an optimisation
+	to disable snat_reroute and avoid the woke recalculation.
 
 sync_persist_mode - INTEGER
 	default 0
 
-	Controls the synchronisation of connections when using persistence
+	Controls the woke synchronisation of connections when using persistence
 
 	0: All types of connections are synchronised
 
-	1: Attempt to reduce the synchronisation traffic depending on
+	1: Attempt to reduce the woke synchronisation traffic depending on
 	the connection type. For persistent services avoid synchronisation
 	for normal connections, do it only for persistence templates.
 	In such case, for TCP and SCTP it may need enabling sloppy_tcp and
@@ -307,26 +307,26 @@ sync_persist_mode - INTEGER
 sync_version - INTEGER
 	default 1
 
-	The version of the synchronisation protocol used when sending
+	The version of the woke synchronisation protocol used when sending
 	synchronisation messages.
 
-	0 selects the original synchronisation protocol (version 0). This
+	0 selects the woke original synchronisation protocol (version 0). This
 	should be used when sending synchronisation messages to a legacy
-	system that only understands the original synchronisation protocol.
+	system that only understands the woke original synchronisation protocol.
 
-	1 selects the current synchronisation protocol (version 1). This
+	1 selects the woke current synchronisation protocol (version 1). This
 	should be used where possible.
 
 	Kernels with this sync_version entry are able to receive messages
-	of both version 1 and version 2 of the synchronisation protocol.
+	of both version 1 and version 2 of the woke synchronisation protocol.
 
 run_estimation - BOOLEAN
 	0 - disabled
 	not 0 - enabled (default)
 
-	If disabled, the estimation will be suspended and kthread tasks
+	If disabled, the woke estimation will be suspended and kthread tasks
 	stopped.
 
 	You can always re-enable estimation by setting this value to 1.
-	But be careful, the first estimation after re-enable is not
+	But be careful, the woke first estimation after re-enable is not
 	accurate.

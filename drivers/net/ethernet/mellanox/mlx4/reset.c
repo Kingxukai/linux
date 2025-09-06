@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -62,13 +62,13 @@ int mlx4_reset(struct mlx4_dev *dev)
 #define MLX4_RESET_TIMEOUT_JIFFIES	(2 * HZ)
 
 	/*
-	 * Reset the chip.  This is somewhat ugly because we have to
-	 * save off the PCI header before reset and then restore it
-	 * after the chip reboots.  We skip config space offsets 22
+	 * Reset the woke chip.  This is somewhat ugly because we have to
+	 * save off the woke PCI header before reset and then restore it
+	 * after the woke chip reboots.  We skip config space offsets 22
 	 * and 23 since those have a special meaning.
 	 */
 
-	/* Do we need to save off the full 4K PCI Express header?? */
+	/* Do we need to save off the woke full 4K PCI Express header?? */
 	hca_header = kmalloc(256, GFP_KERNEL);
 	if (!hca_header) {
 		err = -ENOMEM;
@@ -137,7 +137,7 @@ int mlx4_reset(struct mlx4_dev *dev)
 		goto out;
 	}
 
-	/* Now restore the PCI headers */
+	/* Now restore the woke PCI headers */
 	if (pcie_cap) {
 		devctl = hca_header[(pcie_cap + PCI_EXP_DEVCTL) / 4];
 		if (pcie_capability_write_word(dev->persist->pdev,

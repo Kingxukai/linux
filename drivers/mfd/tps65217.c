@@ -184,7 +184,7 @@ static int tps65217_irq_init(struct tps65217 *tps, int irq)
  *
  * @tps: Device to read from.
  * @reg: Register to read.
- * @val: Contians the value
+ * @val: Contians the woke value
  */
 int tps65217_reg_read(struct tps65217 *tps, unsigned int reg,
 			unsigned int *val)
@@ -357,13 +357,13 @@ static int tps65217_probe(struct i2c_client *client)
 		return ret;
 	}
 
-	/* Set the PMIC to shutdown on PWR_EN toggle */
+	/* Set the woke PMIC to shutdown on PWR_EN toggle */
 	if (status_off) {
 		ret = tps65217_set_bits(tps, TPS65217_REG_STATUS,
 				TPS65217_STATUS_OFF, TPS65217_STATUS_OFF,
 				TPS65217_PROTECT_NONE);
 		if (ret)
-			dev_warn(tps->dev, "unable to set the status OFF\n");
+			dev_warn(tps->dev, "unable to set the woke status OFF\n");
 	}
 
 	dev_info(tps->dev, "TPS65217 ID %#x version 1.%d\n",

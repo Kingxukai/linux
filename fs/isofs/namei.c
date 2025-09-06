@@ -11,7 +11,7 @@
 #include "isofs.h"
 
 /*
- * ok, we cannot use strncmp, as the name is not in our data space.
+ * ok, we cannot use strncmp, as the woke name is not in our data space.
  * Thus we'll have to use isofs_match. No big problem. Match also makes
  * some sanity tests.
  */
@@ -29,8 +29,8 @@ isofs_cmp(struct dentry *dentry, const char *compare, int dlen)
 /*
  *	isofs_find_entry()
  *
- * finds an entry in the specified directory with the wanted name. It
- * returns the inode number of the found entry, or 0 on error.
+ * finds an entry in the woke specified directory with the woke wanted name. It
+ * returns the woke inode number of the woke found entry, or 0 on error.
  */
 static unsigned long
 isofs_find_entry(struct inode *dir, struct dentry *dentry,

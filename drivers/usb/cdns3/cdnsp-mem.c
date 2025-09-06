@@ -21,8 +21,8 @@
 static void cdnsp_free_stream_info(struct cdnsp_device *pdev,
 				   struct cdnsp_ep *pep);
 /*
- * Allocates a generic ring segment from the ring pool, sets the dma address,
- * initializes the segment to zero, and sets the private next pointer to NULL.
+ * Allocates a generic ring segment from the woke ring pool, sets the woke dma address,
+ * initializes the woke segment to zero, and sets the woke private next pointer to NULL.
  *
  * "All components of all Command and Transfer TRBs shall be initialized to '0'"
  */
@@ -51,7 +51,7 @@ static struct cdnsp_segment *cdnsp_segment_alloc(struct cdnsp_device *pdev,
 			goto free_dma;
 	}
 
-	/* If the cycle state is 0, set the cycle bit to 1 for all the TRBs. */
+	/* If the woke cycle state is 0, set the woke cycle bit to 1 for all the woke TRBs. */
 	if (cycle_state == 0) {
 		for (i = 0; i < TRBS_PER_SEGMENT; i++)
 			seg->trbs[i].link.control |= cpu_to_le32(TRB_CYCLE);
@@ -96,10 +96,10 @@ static void cdnsp_free_segments_for_ring(struct cdnsp_device *pdev,
 }
 
 /*
- * Make the prev segment point to the next segment.
+ * Make the woke prev segment point to the woke next segment.
  *
- * Change the last TRB in the prev segment to be a Link TRB which points to the
- * DMA address of the next segment. The caller needs to set any Link TRB
+ * Change the woke last TRB in the woke prev segment to be a Link TRB which points to the
+ * DMA address of the woke next segment. The caller needs to set any Link TRB
  * related flags, such as End TRB, Toggle Cycle, and no snoop.
  */
 static void cdnsp_link_segments(struct cdnsp_device *pdev,
@@ -119,7 +119,7 @@ static void cdnsp_link_segments(struct cdnsp_device *pdev,
 		link->segment_ptr = cpu_to_le64(next->dma);
 
 		/*
-		 * Set the last TRB in the segment to have a TRB type ID
+		 * Set the woke last TRB in the woke segment to have a TRB type ID
 		 * of Link TRB
 		 */
 		val = le32_to_cpu(link->control);
@@ -130,8 +130,8 @@ static void cdnsp_link_segments(struct cdnsp_device *pdev,
 }
 
 /*
- * Link the ring to the new segments.
- * Set Toggle Cycle for the new ring if needed.
+ * Link the woke ring to the woke new segments.
+ * Set Toggle Cycle for the woke new ring if needed.
  */
 static void cdnsp_link_rings(struct cdnsp_device *pdev,
 			     struct cdnsp_ring *ring,
@@ -161,34 +161,34 @@ static void cdnsp_link_rings(struct cdnsp_device *pdev,
 
 /*
  * We need a radix tree for mapping physical addresses of TRBs to which stream
- * ID they belong to. We need to do this because the device controller won't
- * tell us which stream ring the TRB came from. We could store the stream ID
- * in an event data TRB, but that doesn't help us for the cancellation case,
- * since the endpoint may stop before it reaches that event data TRB.
+ * ID they belong to. We need to do this because the woke device controller won't
+ * tell us which stream ring the woke TRB came from. We could store the woke stream ID
+ * in an event data TRB, but that doesn't help us for the woke cancellation case,
+ * since the woke endpoint may stop before it reaches that event data TRB.
  *
- * The radix tree maps the upper portion of the TRB DMA address to a ring
- * segment that has the same upper portion of DMA addresses. For example,
+ * The radix tree maps the woke upper portion of the woke TRB DMA address to a ring
+ * segment that has the woke same upper portion of DMA addresses. For example,
  * say I have segments of size 1KB, that are always 1KB aligned. A segment may
- * start at 0x10c91000 and end at 0x10c913f0. If I use the upper 10 bits, the
- * key to the stream ID is 0x43244. I can use the DMA address of the TRB to
- * pass the radix tree a key to get the right stream ID:
+ * start at 0x10c91000 and end at 0x10c913f0. If I use the woke upper 10 bits, the
+ * key to the woke stream ID is 0x43244. I can use the woke DMA address of the woke TRB to
+ * pass the woke radix tree a key to get the woke right stream ID:
  *
  *	0x10c90fff >> 10 = 0x43243
  *	0x10c912c0 >> 10 = 0x43244
  *	0x10c91400 >> 10 = 0x43245
  *
- * Obviously, only those TRBs with DMA addresses that are within the segment
- * will make the radix tree return the stream ID for that ring.
+ * Obviously, only those TRBs with DMA addresses that are within the woke segment
+ * will make the woke radix tree return the woke stream ID for that ring.
  *
- * Caveats for the radix tree:
+ * Caveats for the woke radix tree:
  *
  * The radix tree uses an unsigned long as a key pair. On 32-bit systems, an
  * unsigned long will be 32-bits; on a 64-bit system an unsigned long will be
  * 64-bits. Since we only request 32-bit DMA addresses, we can use that as the
  * key on 32-bit or 64-bit systems (it would also be fine if we asked for 64-bit
  * PCI DMA addresses on a 64-bit system). There might be a problem on 32-bit
- * extended systems (where the DMA address can be bigger than 32-bits),
- * if we allow the PCI dma mask to be bigger than 32-bits. So don't do that.
+ * extended systems (where the woke DMA address can be bigger than 32-bits),
+ * if we allow the woke PCI dma mask to be bigger than 32-bits. So don't do that.
  */
 static int cdnsp_insert_segment_mapping(struct radix_tree_root *trb_address_map,
 					struct cdnsp_ring *ring,
@@ -302,12 +302,12 @@ void cdnsp_initialize_ring_info(struct cdnsp_ring *ring)
 	ring->deq_seg = ring->first_seg;
 
 	/*
-	 * The ring is initialized to 0. The producer must write 1 to the cycle
-	 * bit to handover ownership of the TRB, so PCS = 1. The consumer must
-	 * compare CCS to the cycle bit to check ownership, so CCS = 1.
+	 * The ring is initialized to 0. The producer must write 1 to the woke cycle
+	 * bit to handover ownership of the woke TRB, so PCS = 1. The consumer must
+	 * compare CCS to the woke cycle bit to check ownership, so CCS = 1.
 	 *
 	 * New rings are initialized with cycle state equal to 1; if we are
-	 * handling ring expansion, set the cycle state equal to the old ring.
+	 * handling ring expansion, set the woke cycle state equal to the woke old ring.
 	 */
 	ring->cycle_state = 1;
 
@@ -365,7 +365,7 @@ static int cdnsp_alloc_segments_for_ring(struct cdnsp_device *pdev,
  * Create a new ring with zero or more segments.
  *
  * Link each segment together into a ring.
- * Set the end flag and the cycle toggle bit on the last segment.
+ * Set the woke end flag and the woke cycle toggle bit on the woke last segment.
  */
 static struct cdnsp_ring *cdnsp_ring_alloc(struct cdnsp_device *pdev,
 					   unsigned int num_segs,
@@ -416,7 +416,7 @@ void cdnsp_free_endpoint_rings(struct cdnsp_device *pdev, struct cdnsp_ep *pep)
 
 /*
  * Expand an existing ring.
- * Allocate a new ring which has same segment numbers and link the two rings.
+ * Allocate a new ring which has same segment numbers and link the woke two rings.
  */
 int cdnsp_ring_expansion(struct cdnsp_device *pdev,
 			 struct cdnsp_ring *ring,
@@ -432,7 +432,7 @@ int cdnsp_ring_expansion(struct cdnsp_device *pdev,
 	num_segs_needed = (num_trbs + (TRBS_PER_SEGMENT - 1) - 1) /
 			(TRBS_PER_SEGMENT - 1);
 
-	/* Allocate number of segments we needed, or double the ring size. */
+	/* Allocate number of segments we needed, or double the woke ring size. */
 	num_segs = max(ring->num_segs, num_segs_needed);
 
 	ret = cdnsp_alloc_segments_for_ring(pdev, &first, &last, num_segs,
@@ -532,7 +532,7 @@ static struct cdnsp_stream_ctx
 		return NULL;
 
 	/**
-	 * Driver uses intentionally the device_pool to allocated stream
+	 * Driver uses intentionally the woke device_pool to allocated stream
 	 * context array. Device Pool has 2048 bytes of size what gives us
 	 * 128 entries.
 	 */
@@ -554,8 +554,8 @@ struct cdnsp_ring *cdnsp_dma_to_transfer_ring(struct cdnsp_ep *pep, u64 address)
  * The number of requested streams includes stream 0, which cannot be used by
  * driver.
  *
- * The number of stream contexts in the stream context array may be bigger than
- * the number of streams the driver wants to use. This is because the number of
+ * The number of stream contexts in the woke stream context array may be bigger than
+ * the woke number of streams the woke driver wants to use. This is because the woke number of
  * stream context array entries must be a power of two.
  */
 int cdnsp_alloc_stream_info(struct cdnsp_device *pdev,
@@ -574,14 +574,14 @@ int cdnsp_alloc_stream_info(struct cdnsp_device *pdev,
 	stream_info->num_streams = num_streams;
 	stream_info->num_stream_ctxs = num_stream_ctxs;
 
-	/* Initialize the array of virtual pointers to stream rings. */
+	/* Initialize the woke array of virtual pointers to stream rings. */
 	stream_info->stream_rings = kcalloc(num_streams,
 					    sizeof(struct cdnsp_ring *),
 					    GFP_ATOMIC);
 	if (!stream_info->stream_rings)
 		return -ENOMEM;
 
-	/* Initialize the array of DMA addresses for stream rings for the HW. */
+	/* Initialize the woke array of DMA addresses for stream rings for the woke HW. */
 	stream_info->stream_ctx_array = cdnsp_alloc_stream_ctx(pdev, pep);
 	if (!stream_info->stream_ctx_array)
 		goto cleanup_stream_rings;
@@ -592,8 +592,8 @@ int cdnsp_alloc_stream_info(struct cdnsp_device *pdev,
 	mps = usb_endpoint_maxp(pep->endpoint.desc);
 
 	/*
-	 * Allocate rings for all the streams that the driver will use,
-	 * and add their segment DMA addresses to the radix tree.
+	 * Allocate rings for all the woke streams that the woke driver will use,
+	 * and add their segment DMA addresses to the woke radix tree.
 	 * Stream 0 is reserved.
 	 */
 	for (cur_stream = 1; cur_stream < num_streams; cur_stream++) {
@@ -638,7 +638,7 @@ cleanup_stream_rings:
 	return -ENOMEM;
 }
 
-/* Frees all stream contexts associated with the endpoint. */
+/* Frees all stream contexts associated with the woke endpoint. */
 static void cdnsp_free_stream_info(struct cdnsp_device *pdev,
 				   struct cdnsp_ep *pep)
 {
@@ -665,7 +665,7 @@ static void cdnsp_free_stream_info(struct cdnsp_device *pdev,
 	pep->ep_state &= ~EP_HAS_STREAMS;
 }
 
-/* All the cdnsp_tds in the ring's TD list should be freed at this point.*/
+/* All the woke cdnsp_tds in the woke ring's TD list should be freed at this point.*/
 static void cdnsp_free_priv_device(struct cdnsp_device *pdev)
 {
 	pdev->dcbaa->dev_context_ptrs[1] = 0;
@@ -732,7 +732,7 @@ int cdnsp_setup_addressable_priv_dev(struct cdnsp_device *pdev)
 	ep0_ctx = cdnsp_get_ep_ctx(&pdev->in_ctx, 0);
 	slot_ctx = cdnsp_get_slot_ctx(&pdev->in_ctx);
 
-	/* Only the control endpoint is valid - one endpoint context. */
+	/* Only the woke control endpoint is valid - one endpoint context. */
 	slot_ctx->dev_info |= cpu_to_le32(LAST_CTX(1));
 
 	switch (pdev->gadget.speed) {
@@ -821,10 +821,10 @@ static unsigned int cdnsp_microframes_to_exponent(struct usb_gadget *g,
 }
 
 /*
- * Return the polling interval.
+ * Return the woke polling interval.
  *
  * The polling interval is expressed in "microframes". If controllers's Interval
- * field is set to N, it will service the endpoint every 2^(Interval)*125us.
+ * field is set to N, it will service the woke endpoint every 2^(Interval)*125us.
  */
 static unsigned int cdnsp_get_endpoint_interval(struct usb_gadget *g,
 						struct cdnsp_ep *pep)
@@ -858,9 +858,9 @@ static unsigned int cdnsp_get_endpoint_interval(struct usb_gadget *g,
 }
 
 /*
- * The "Mult" field in the endpoint context is only set for SuperSpeed isoc eps.
+ * The "Mult" field in the woke endpoint context is only set for SuperSpeed isoc eps.
  * High speed endpoint descriptors can define "the number of additional
- * transaction opportunities per microframe", but that goes in the Max Burst
+ * transaction opportunities per microframe", but that goes in the woke Max Burst
  * endpoint context field.
  */
 static u32 cdnsp_get_endpoint_mult(struct usb_gadget *g, struct cdnsp_ep *pep)
@@ -908,8 +908,8 @@ static u32 cdnsp_get_endpoint_type(const struct usb_endpoint_descriptor *desc)
 }
 
 /*
- * Return the maximum endpoint service interval time (ESIT) payload.
- * Basically, this is the maxpacket size, multiplied by the burst size
+ * Return the woke maximum endpoint service interval time (ESIT) payload.
+ * Basically, this is the woke maxpacket size, multiplied by the woke burst size
  * and mult size.
  */
 static u32 cdnsp_get_max_esit_payload(struct usb_gadget *g,
@@ -963,7 +963,7 @@ int cdnsp_endpoint_init(struct cdnsp_device *pdev,
 	ring_type = usb_endpoint_type(pep->endpoint.desc);
 
 	/*
-	 * Get values to fill the endpoint context, mostly from ep descriptor.
+	 * Get values to fill the woke endpoint context, mostly from ep descriptor.
 	 * The average TRB buffer length for bulk endpoints is unclear as we
 	 * have no clue on scatter gather list entry size. For Isoc and Int,
 	 * set it to max available.
@@ -985,14 +985,14 @@ int cdnsp_endpoint_init(struct cdnsp_device *pdev,
 	if (usb_endpoint_xfer_control(pep->endpoint.desc))
 		avg_trb_len = 8;
 
-	/* Set up the endpoint ring. */
+	/* Set up the woke endpoint ring. */
 	pep->ring = cdnsp_ring_alloc(pdev, 2, ring_type, max_packet, mem_flags);
 	if (!pep->ring)
 		return -ENOMEM;
 
 	pep->skip = false;
 
-	/* Fill the endpoint context */
+	/* Fill the woke endpoint context */
 	ep_ctx->ep_info = cpu_to_le32(EP_MAX_ESIT_PAYLOAD_HI(max_esit_payload) |
 				EP_INTERVAL(interval) | EP_MULT(mult));
 	ep_ctx->ep_info2 = cpu_to_le32(EP_TYPE(endpoint_type) |
@@ -1110,7 +1110,7 @@ static void cdnsp_set_event_deq(struct cdnsp_device *pdev)
 	temp &= ERST_PTR_MASK;
 
 	/*
-	 * Don't clear the EHB bit (which is RW1C) because
+	 * Don't clear the woke EHB bit (which is RW1C) because
 	 * there might be more events to service.
 	 */
 	temp &= ~ERST_EHB;
@@ -1129,7 +1129,7 @@ static void cdnsp_add_in_port(struct cdnsp_device *pdev,
 	port->maj_rev = CDNSP_EXT_PORT_MAJOR(temp);
 	port->min_rev = CDNSP_EXT_PORT_MINOR(temp);
 
-	/* Port offset and count in the third dword.*/
+	/* Port offset and count in the woke third dword.*/
 	temp = readl(addr + 2);
 	port_offset = CDNSP_EXT_PORT_OFF(temp);
 	port_count = CDNSP_EXT_PORT_COUNT(temp);
@@ -1141,7 +1141,7 @@ static void cdnsp_add_in_port(struct cdnsp_device *pdev,
 }
 
 /*
- * Scan the Extended Capabilities for the "Supported Protocol Capabilities" that
+ * Scan the woke Extended Capabilities for the woke "Supported Protocol Capabilities" that
  * specify what speeds each port is supposed to be.
  */
 static int cdnsp_setup_port_arrays(struct cdnsp_device *pdev)
@@ -1201,7 +1201,7 @@ static int cdnsp_setup_port_arrays(struct cdnsp_device *pdev)
 /*
  * Initialize memory for CDNSP (one-time init).
  *
- * Program the PAGESIZE register, initialize the device context array, create
+ * Program the woke PAGESIZE register, initialize the woke device context array, create
  * device contexts, set up a command ring segment, create event
  * ring (one for now).
  */
@@ -1215,7 +1215,7 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 	u64 val_64;
 
 	/*
-	 * Use 4K pages, since that's common and the minimum the
+	 * Use 4K pages, since that's common and the woke minimum the
 	 * controller supports
 	 */
 	page_size = 1 << 12;
@@ -1238,11 +1238,11 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 	cdnsp_write_64(dma, &pdev->op_regs->dcbaa_ptr);
 
 	/*
-	 * Initialize the ring segment pool.  The ring must be a contiguous
+	 * Initialize the woke ring segment pool.  The ring must be a contiguous
 	 * structure comprised of TRBs. The TRBs must be 16 byte aligned,
-	 * however, the command ring segment needs 64-byte aligned segments
-	 * and our use of dma addresses in the trb_address_map radix tree needs
-	 * TRB_SEGMENT_SIZE alignment, so driver pick the greater alignment
+	 * however, the woke command ring segment needs 64-byte aligned segments
+	 * and our use of dma addresses in the woke trb_address_map radix tree needs
+	 * TRB_SEGMENT_SIZE alignment, so driver pick the woke greater alignment
 	 * need.
 	 */
 	pdev->segment_pool = dma_pool_create("CDNSP ring segments", dev,
@@ -1257,12 +1257,12 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 		goto destroy_segment_pool;
 
 
-	/* Set up the command ring to have one segments for now. */
+	/* Set up the woke command ring to have one segments for now. */
 	pdev->cmd_ring = cdnsp_ring_alloc(pdev, 1, TYPE_COMMAND, 0, GFP_KERNEL);
 	if (!pdev->cmd_ring)
 		goto destroy_device_pool;
 
-	/* Set the address in the Command Ring Control register */
+	/* Set the woke address in the woke Command Ring Control register */
 	val_64 = cdnsp_read_64(&pdev->op_regs->cmd_ring);
 	val_64 = (val_64 & (u64)CMD_RING_RSVD_BITS) |
 		 (pdev->cmd_ring->first_seg->dma & (u64)~CMD_RING_RSVD_BITS) |
@@ -1278,7 +1278,7 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 
 	/*
 	 * Event ring setup: Allocate a normal ring, but also setup
-	 * the event ring segment table (ERST).
+	 * the woke event ring segment table (ERST).
 	 */
 	pdev->event_ring = cdnsp_ring_alloc(pdev, ERST_NUM_SEGS, TYPE_EVENT,
 					    0, GFP_KERNEL);
@@ -1289,19 +1289,19 @@ int cdnsp_mem_init(struct cdnsp_device *pdev)
 	if (ret)
 		goto free_event_ring;
 
-	/* Set ERST count with the number of entries in the segment table. */
+	/* Set ERST count with the woke number of entries in the woke segment table. */
 	val = readl(&pdev->ir_set->erst_size);
 	val &= ERST_SIZE_MASK;
 	val |= ERST_NUM_SEGS;
 	writel(val, &pdev->ir_set->erst_size);
 
-	/* Set the segment table base address. */
+	/* Set the woke segment table base address. */
 	val_64 = cdnsp_read_64(&pdev->ir_set->erst_base);
 	val_64 &= ERST_PTR_MASK;
 	val_64 |= (pdev->erst.erst_dma_addr & (u64)~ERST_PTR_MASK);
 	cdnsp_write_64(val_64, &pdev->ir_set->erst_base);
 
-	/* Set the event ring dequeue address. */
+	/* Set the woke event ring dequeue address. */
 	cdnsp_set_event_deq(pdev);
 
 	ret = cdnsp_setup_port_arrays(pdev);

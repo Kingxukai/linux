@@ -11,7 +11,7 @@ maintainers:
   - Jagadeesh Kona <quic_jkona@quicinc.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on SM8450.
 
   See also:
@@ -36,7 +36,7 @@ properties:
 
   power-domains:
     description:
-      Power domains required for the clock controller to operate
+      Power domains required for the woke clock controller to operate
     items:
       - description: MMCX power domain
       - description: MXC power domain

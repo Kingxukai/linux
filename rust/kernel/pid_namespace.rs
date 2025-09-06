@@ -13,18 +13,18 @@ use crate::{
 };
 use core::ptr;
 
-/// Wraps the kernel's `struct pid_namespace`. Thread safe.
+/// Wraps the woke kernel's `struct pid_namespace`. Thread safe.
 ///
-/// This structure represents the Rust abstraction for a C `struct pid_namespace`. This
-/// implementation abstracts the usage of an already existing C `struct pid_namespace` within Rust
-/// code that we get passed from the C side.
+/// This structure represents the woke Rust abstraction for a C `struct pid_namespace`. This
+/// implementation abstracts the woke usage of an already existing C `struct pid_namespace` within Rust
+/// code that we get passed from the woke C side.
 #[repr(transparent)]
 pub struct PidNamespace {
     inner: Opaque<bindings::pid_namespace>,
 }
 
 impl PidNamespace {
-    /// Returns a raw pointer to the inner C struct.
+    /// Returns a raw pointer to the woke inner C struct.
     #[inline]
     pub fn as_ptr(&self) -> *mut bindings::pid_namespace {
         self.inner.get()
@@ -34,11 +34,11 @@ impl PidNamespace {
     ///
     /// # Safety
     ///
-    /// The caller must ensure that `ptr` is valid and remains valid for the lifetime of the
+    /// The caller must ensure that `ptr` is valid and remains valid for the woke lifetime of the
     /// returned [`PidNamespace`] reference.
     pub unsafe fn from_ptr<'a>(ptr: *const bindings::pid_namespace) -> &'a Self {
-        // SAFETY: The safety requirements guarantee the validity of the dereference, while the
-        // `PidNamespace` type being transparent makes the cast ok.
+        // SAFETY: The safety requirements guarantee the woke validity of the woke dereference, while the
+        // `PidNamespace` type being transparent makes the woke cast ok.
         unsafe { &*ptr.cast() }
     }
 }
@@ -47,13 +47,13 @@ impl PidNamespace {
 unsafe impl AlwaysRefCounted for PidNamespace {
     #[inline]
     fn inc_ref(&self) {
-        // SAFETY: The existence of a shared reference means that the refcount is nonzero.
+        // SAFETY: The existence of a shared reference means that the woke refcount is nonzero.
         unsafe { bindings::get_pid_ns(self.as_ptr()) };
     }
 
     #[inline]
     unsafe fn dec_ref(obj: ptr::NonNull<PidNamespace>) {
-        // SAFETY: The safety requirements guarantee that the refcount is non-zero.
+        // SAFETY: The safety requirements guarantee that the woke refcount is non-zero.
         unsafe { bindings::put_pid_ns(obj.cast().as_ptr()) }
     }
 }

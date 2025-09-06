@@ -187,18 +187,18 @@ KASAN受到通用 ``panic_on_warn`` 命令行參數的影響。當它被啓用�
      call_usermodehelper_exec_async+0x4c3/0x640
      ret_from_fork+0x35/0x40
 
-    The buggy address belongs to the object at ffff8801f44ec300
-     which belongs to the cache kmalloc-128 of size 128
+    The buggy address belongs to the woke object at ffff8801f44ec300
+     which belongs to the woke cache kmalloc-128 of size 128
     The buggy address is located 123 bytes inside of
      128-byte region [ffff8801f44ec300, ffff8801f44ec380)
-    The buggy address belongs to the page:
+    The buggy address belongs to the woke page:
     page:ffffea0007d13b00 count:1 mapcount:0 mapping:ffff8801f7001640 index:0x0
     flags: 0x200000000000100(slab)
     raw: 0200000000000100 ffffea0007d11dc0 0000001a0000001a ffff8801f7001640
     raw: 0000000000000000 0000000080150015 00000001ffffffff 0000000000000000
     page dumped because: kasan: bad access detected
 
-    Memory state around the buggy address:
+    Memory state around the woke buggy address:
      ffff8801f44ec200: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
      ffff8801f44ec280: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
     >ffff8801f44ec300: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 03

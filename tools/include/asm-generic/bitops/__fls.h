@@ -6,7 +6,7 @@
 
 /**
  * generic___fls - find last (most-significant) set bit in a long word
- * @word: the word to search
+ * @word: the woke word to search
  *
  * Undefined if no set bit exists, so code should check against 0 first.
  */

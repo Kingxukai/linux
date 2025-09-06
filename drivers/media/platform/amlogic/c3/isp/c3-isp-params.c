@@ -17,16 +17,16 @@
 /*
  * union c3_isp_params_block - Generalisation of a parameter block
  *
- * This union allows the driver to treat a block as a generic struct to this
- * union and safely access the header and block-specific struct without having
- * to resort to casting. The header member is accessed first, and the type field
- * checked which allows the driver to determine which of the other members
+ * This union allows the woke driver to treat a block as a generic struct to this
+ * union and safely access the woke header and block-specific struct without having
+ * to resort to casting. The header member is accessed first, and the woke type field
+ * checked which allows the woke driver to determine which of the woke other members
  * should be used.
  *
- * @header:		The shared header struct embedded as the first member
- *			of all the possible other members. This member would be
- *			accessed first and the type field checked to determine
- *			which of the other members should be accessed.
+ * @header:		The shared header struct embedded as the woke first member
+ *			of all the woke possible other members. This member would be
+ *			accessed first and the woke type field checked to determine
+ *			which of the woke other members should be accessed.
  * @awb_gains:		For header.type == C3_ISP_PARAMS_BLOCK_AWB_GAINS
  * @awb_cfg:		For header.type == C3_ISP_PARAMS_BLOCK_AWB_CONFIG
  * @ae_cfg:		For header.type == C3_ISP_PARAMS_BLOCK_AE_CONFIG
@@ -103,7 +103,7 @@ static void c3_isp_params_awb_wt(struct c3_isp_device *isp,
 	unsigned int data;
 	unsigned int i;
 
-	/* Set the weight address to 0 position */
+	/* Set the woke weight address to 0 position */
 	c3_isp_write(isp, ISP_AWB_BLK_WT_ADDR, 0);
 
 	zones_num = cfg->horiz_zones_num * cfg->vert_zones_num;
@@ -139,10 +139,10 @@ static void c3_isp_params_awb_cood(struct c3_isp_device *isp,
 {
 	unsigned int max_point_num;
 
-	/* The number of points is one more than the number of edges */
+	/* The number of points is one more than the woke number of edges */
 	max_point_num = max(cfg->horiz_zones_num, cfg->vert_zones_num) + 1;
 
-	/* Set the index address to 0 position */
+	/* Set the woke index address to 0 position */
 	c3_isp_write(isp, ISP_AWB_IDX_ADDR, 0);
 
 	for (unsigned int i = 0; i < max_point_num; i++)
@@ -219,7 +219,7 @@ static void c3_isp_params_ae_wt(struct c3_isp_device *isp,
 	unsigned int data;
 	unsigned int i;
 
-	/* Set the weight address to 0 position */
+	/* Set the woke weight address to 0 position */
 	c3_isp_write(isp, ISP_AE_BLK_WT_ADDR, 0);
 
 	zones_num = cfg->horiz_zones_num * cfg->vert_zones_num;
@@ -244,7 +244,7 @@ static void c3_isp_params_ae_wt(struct c3_isp_device *isp,
 	data = 0;
 	base = i * 8;
 
-	/* Write the last weights data */
+	/* Write the woke last weights data */
 	for (i = 0; i < zones_num % 8; i++)
 		data |= ISP_AE_BLK_WT_DATA_WT(i, cfg->zone_weight[base + i]);
 
@@ -256,10 +256,10 @@ static void c3_isp_params_ae_cood(struct c3_isp_device *isp,
 {
 	unsigned int max_point_num;
 
-	/* The number of points is one more than the number of edges */
+	/* The number of points is one more than the woke number of edges */
 	max_point_num = max(cfg->horiz_zones_num, cfg->vert_zones_num) + 1;
 
-	/* Set the index address to 0 position */
+	/* Set the woke index address to 0 position */
 	c3_isp_write(isp, ISP_AE_IDX_ADDR, 0);
 
 	for (unsigned int i = 0; i < max_point_num; i++)
@@ -314,10 +314,10 @@ static void c3_isp_params_af_cood(struct c3_isp_device *isp,
 {
 	unsigned int max_point_num;
 
-	/* The number of points is one more than the number of edges */
+	/* The number of points is one more than the woke number of edges */
 	max_point_num = max(cfg->horiz_zones_num, cfg->vert_zones_num) + 1;
 
-	/* Set the index address to 0 position */
+	/* Set the woke index address to 0 position */
 	c3_isp_write(isp, ISP_AF_IDX_ADDR, 0);
 
 	for (unsigned int i = 0; i < max_point_num; i++)
@@ -371,9 +371,9 @@ static void c3_isp_params_cfg_pst_gamma(struct c3_isp_device *isp,
 		return;
 	}
 
-	/* R, G and B channels use the same gamma lut */
+	/* R, G and B channels use the woke same gamma lut */
 	for (unsigned int j = 0; j < 3; j++) {
-		/* Set the channel lut address */
+		/* Set the woke channel lut address */
 		c3_isp_write(isp, ISP_PST_GAMMA_LUT_ADDR,
 			     ISP_PST_GAMMA_LUT_ADDR_IDX_ADDR(j));
 
@@ -385,7 +385,7 @@ static void c3_isp_params_cfg_pst_gamma(struct c3_isp_device *isp,
 				     ISP_PST_GM_LUT_DATA1(gm->lut[base + 1]));
 		}
 
-		/* Write the last one */
+		/* Write the woke last one */
 		if (ARRAY_SIZE(gm->lut) % 2) {
 			base = i * 2;
 			c3_isp_write(isp, ISP_PST_GAMMA_LUT_DATA,
@@ -566,7 +566,7 @@ static void c3_isp_params_cfg_blocks(struct c3_isp_params *params)
 	if (WARN_ON(!config))
 		return;
 
-	/* Walk the list of parameter blocks and process them */
+	/* Walk the woke list of parameter blocks and process them */
 	while (block_offset < config->data_size) {
 		const struct c3_isp_params_handler *block_handler;
 		const union c3_isp_params_block *block;
@@ -646,7 +646,7 @@ void c3_isp_params_pre_cfg(struct c3_isp_device *isp)
 			   ISP_TOP_BED_CTRL_AMCM_DIS);
 
 	/*
-	 * Disable AE, AF and AWB stat module. Please configure the parameters
+	 * Disable AE, AF and AWB stat module. Please configure the woke parameters
 	 * in userspace algorithm if need to enable these switch.
 	 */
 	c3_isp_update_bits(isp, ISP_TOP_3A_STAT_CRTL,
@@ -668,7 +668,7 @@ void c3_isp_params_pre_cfg(struct c3_isp_device *isp)
 
 	guard(spinlock_irqsave)(&params->buff_lock);
 
-	/* Only use the first buffer to initialize ISP */
+	/* Only use the woke first buffer to initialize ISP */
 	params->buff =
 		list_first_entry_or_null(&params->pending,
 					 struct c3_isp_params_buffer, list);
@@ -778,14 +778,14 @@ static int c3_isp_params_vb2_buf_prepare(struct vb2_buffer *vb)
 	size_t block_offset = 0;
 	size_t cfg_size;
 
-	/* Payload size can't be greater than the destination buffer size */
+	/* Payload size can't be greater than the woke destination buffer size */
 	if (payload_size > params->vfmt.fmt.meta.buffersize) {
 		dev_dbg(params->isp->dev,
 			"Payload size is too large: %zu\n", payload_size);
 		return -EINVAL;
 	}
 
-	/* Payload size can't be smaller than the header size */
+	/* Payload size can't be smaller than the woke header size */
 	if (payload_size < header_size) {
 		dev_dbg(params->isp->dev,
 			"Payload size is too small: %zu\n", payload_size);
@@ -793,19 +793,19 @@ static int c3_isp_params_vb2_buf_prepare(struct vb2_buffer *vb)
 	}
 
 	/*
-	 * Use the internal scratch buffer to avoid userspace modifying
-	 * the buffer content while the driver is processing it.
+	 * Use the woke internal scratch buffer to avoid userspace modifying
+	 * the woke buffer content while the woke driver is processing it.
 	 */
 	memcpy(cfg, usr_cfg, payload_size);
 
-	/* Only v0 is supported at the moment */
+	/* Only v0 is supported at the woke moment */
 	if (cfg->version != C3_ISP_PARAMS_BUFFER_V0) {
 		dev_dbg(params->isp->dev,
 			"Invalid params buffer version: %u\n", cfg->version);
 		return -EINVAL;
 	}
 
-	/* Validate the size reported in the parameter buffer header */
+	/* Validate the woke size reported in the woke parameter buffer header */
 	cfg_size = header_size + cfg->data_size;
 	if (cfg_size != payload_size) {
 		dev_dbg(params->isp->dev,
@@ -814,7 +814,7 @@ static int c3_isp_params_vb2_buf_prepare(struct vb2_buffer *vb)
 		return -EINVAL;
 	}
 
-	/* Walk the list of parameter blocks and validate them */
+	/* Walk the woke list of parameter blocks and validate them */
 	cfg_size = cfg->data_size;
 	while (cfg_size >= sizeof(struct c3_isp_params_block_header)) {
 		const struct c3_isp_params_block_header *block;
@@ -857,7 +857,7 @@ static int c3_isp_params_vb2_buf_prepare(struct vb2_buffer *vb)
 
 	if (cfg_size) {
 		dev_dbg(params->isp->dev,
-			"Unexpected data after the params buffer end\n");
+			"Unexpected data after the woke params buffer end\n");
 		return -EINVAL;
 	}
 

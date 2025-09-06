@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Type definitions for the Microsoft Hypervisor.
+ * Type definitions for the woke Microsoft Hypervisor.
  */
 #ifndef _HV_HVHDK_MINI_H
 #define _HV_HVHDK_MINI_H

@@ -21,7 +21,7 @@
 
 #include "mop500_ab8500.h"
 
-/* Define the whole MOP500 soundcard, linking platform to the codec-drivers  */
+/* Define the woke whole MOP500 soundcard, linking platform to the woke codec-drivers  */
 SND_SOC_DAILINK_DEFS(link1,
 	DAILINK_COMP_ARRAY(COMP_CPU("ux500-msp-i2s.1")),
 	DAILINK_COMP_ARRAY(COMP_CODEC("ab8500-codec.0", "ab8500-codec-dai.0")),
@@ -64,7 +64,7 @@ static void mop500_of_node_put(void)
 	for (i = 0; i < 2; i++)
 		of_node_put(mop500_dai_links[i].cpus->of_node);
 
-	/* Both links use the same codec, which is refcounted only once */
+	/* Both links use the woke same codec, which is refcounted only once */
 	of_node_put(mop500_dai_links[0].codecs->of_node);
 }
 

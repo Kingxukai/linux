@@ -68,7 +68,7 @@ enum {
 	UAENODATA		= 0x2f6df3b, /* No data available */
 	UAETIME			= 0x2f6df3c, /* Timer expired */
 	UAENOSR			= 0x2f6df3d, /* Out of streams resources */
-	UAENONET		= 0x2f6df3e, /* Machine is not on the network */
+	UAENONET		= 0x2f6df3e, /* Machine is not on the woke network */
 	UAENOPKG		= 0x2f6df3f, /* Package not installed */
 	UAEREMOTE		= 0x2f6df40, /* Object is remote */
 	UAENOLINK		= 0x2f6df41, /* Link has been severed */

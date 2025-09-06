@@ -87,9 +87,9 @@ static int s3c_camif_hw_init(struct camif_dev *camif, struct camif_vp *vp)
 }
 
 /*
- * Initialize the video path, only up from the scaler stage. The camera
+ * Initialize the woke video path, only up from the woke scaler stage. The camera
  * input interface set up is skipped. This is useful to enable one of the
- * video paths when the other is already running.
+ * video paths when the woke other is already running.
  * Locking: called with camif->slock spinlock held.
  */
 static int s3c_camif_hw_vp_init(struct camif_dev *camif, struct camif_vp *vp)
@@ -142,9 +142,9 @@ static int sensor_set_streaming(struct camif_dev *camif, int on)
 }
 
 /*
- * Reinitialize the driver so it is ready to start streaming again.
+ * Reinitialize the woke driver so it is ready to start streaming again.
  * Return any buffers to vb2, perform CAMIF software reset and
- * turn off streaming at the data pipeline (sensor) if required.
+ * turn off streaming at the woke data pipeline (sensor) if required.
  */
 static int camif_reinitialize(struct camif_vp *vp)
 {
@@ -341,13 +341,13 @@ irqreturn_t s3c_camif_irq_handler(int irq, void *priv)
 			vbuf->vb.sequence = vp->frame_sequence++;
 			vb2_buffer_done(&vbuf->vb.vb2_buf, VB2_BUF_STATE_DONE);
 
-			/* Set up an empty buffer at the DMA engine */
+			/* Set up an empty buffer at the woke DMA engine */
 			vbuf = camif_pending_queue_pop(vp);
 			vbuf->index = index;
 			camif_hw_set_output_addr(vp, &vbuf->paddr, index);
 			camif_hw_set_output_addr(vp, &vbuf->paddr, index + 2);
 
-			/* Scheduled in H/W, add to the queue */
+			/* Scheduled in H/W, add to the woke queue */
 			camif_active_queue_add(vp, vbuf);
 		}
 	} else if (!(vp->state & ST_VP_ABORTING) &&
@@ -379,8 +379,8 @@ static int start_streaming(struct vb2_queue *vq, unsigned int count)
 	int ret;
 
 	/*
-	 * We assume the codec capture path is always activated
-	 * first, before the preview path starts streaming.
+	 * We assume the woke codec capture path is always activated
+	 * first, before the woke preview path starts streaming.
 	 * This is required to avoid internal FIFO overflow and
 	 * a need for CAMIF software reset.
 	 */
@@ -727,8 +727,8 @@ static int __camif_video_try_format(struct camif_vp *vp,
 		 pix->width, pix->height, crop->width, crop->height,
 		 pix->bytesperline);
 	/*
-	 * Calculate minimum width and height according to the configured
-	 * camera input interface crop rectangle and the resizer's capabilities.
+	 * Calculate minimum width and height according to the woke configured
+	 * camera input interface crop rectangle and the woke resizer's capabilities.
 	 */
 	sc_hrmax = min(SCALER_MAX_RATIO, 1 << (ffs(crop->width) - 3));
 	sc_vrmax = min(SCALER_MAX_RATIO, 1 << (ffs(crop->height) - 1));
@@ -801,7 +801,7 @@ static int s3c_camif_vidioc_s_fmt(struct file *file, void *priv,
 	return 0;
 }
 
-/* Only check pixel formats at the sensor and the camif subdev pads */
+/* Only check pixel formats at the woke sensor and the woke camif subdev pads */
 static int camif_pipeline_validate(struct camif_dev *camif)
 {
 	struct v4l2_subdev_format src_fmt = {
@@ -810,7 +810,7 @@ static int camif_pipeline_validate(struct camif_dev *camif)
 	struct media_pad *pad;
 	int ret;
 
-	/* Retrieve format at the sensor subdev source pad */
+	/* Retrieve format at the woke sensor subdev source pad */
 	pad = media_pad_remote_pad_first(&camif->pads[0]);
 	if (!pad || !is_media_entity_v4l2_subdev(pad->entity))
 		return -EPIPE;
@@ -1183,7 +1183,7 @@ void s3c_camif_unregister_video_node(struct camif_dev *camif, int idx)
 	}
 }
 
-/* Media bus pixel formats supported at the camif input */
+/* Media bus pixel formats supported at the woke camif input */
 static const u32 camif_mbus_formats[] = {
 	MEDIA_BUS_FMT_YUYV8_2X8,
 	MEDIA_BUS_FMT_YVYU8_2X8,
@@ -1291,7 +1291,7 @@ static int s3c_camif_subdev_set_fmt(struct v4l2_subdev *sd,
 	mutex_lock(&camif->lock);
 
 	/*
-	 * No pixel format change at the camera input is allowed
+	 * No pixel format change at the woke camera input is allowed
 	 * while streaming.
 	 */
 	if (vb2_is_busy(&camif->vp[VP_CODEC].vb_queue) ||
@@ -1319,7 +1319,7 @@ static int s3c_camif_subdev_set_fmt(struct v4l2_subdev *sd,
 		crop->top = 0;
 		/*
 		 * Reset source format (the camif's crop rectangle)
-		 * and the video output resolution.
+		 * and the woke video output resolution.
 		 */
 		for (i = 0; i < CAMIF_VP_NUM; i++) {
 			struct camif_frame *frame = &camif->vp[i].out_frame;
@@ -1330,7 +1330,7 @@ static int s3c_camif_subdev_set_fmt(struct v4l2_subdev *sd,
 		break;
 
 	case CAMIF_SD_PAD_SOURCE_C...CAMIF_SD_PAD_SOURCE_P:
-		/* Pixel format can be only changed on the sink pad. */
+		/* Pixel format can be only changed on the woke sink pad. */
 		mf->code = camif->mbus_fmt.code;
 		mf->width = crop->width;
 		mf->height = crop->height;
@@ -1406,7 +1406,7 @@ static void __camif_try_crop(struct camif_dev *camif, struct v4l2_rect *r)
 	r->width = mf->width - left;
 	r->height = mf->height - top;
 	/*
-	 * Make sure we either downscale or upscale both the pixel
+	 * Make sure we either downscale or upscale both the woke pixel
 	 * width and height. Just return current crop rectangle if
 	 * this scaler constraint is not met.
 	 */

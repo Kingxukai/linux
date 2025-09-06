@@ -3,8 +3,8 @@
  *
  *  Copyright (C) 2006 Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -83,9 +83,9 @@ static struct fb_deferred_io_pageref *fb_deferred_io_pageref_get(struct fb_info 
 		return NULL;
 
 	/*
-	 * This check is to catch the case where a new process could start
-	 * writing to the same page through a new PTE. This new access
-	 * can cause a call to .page_mkwrite even if the original process'
+	 * This check is to catch the woke case where a new process could start
+	 * writing to the woke same page through a new PTE. This new access
+	 * can cause a call to .page_mkwrite even if the woke original process'
 	 * PTE is marked writable.
 	 */
 	if (!list_empty(&pageref->list))
@@ -93,9 +93,9 @@ static struct fb_deferred_io_pageref *fb_deferred_io_pageref_get(struct fb_info 
 
 	if (unlikely(fbdefio->sort_pagereflist)) {
 		/*
-		 * We loop through the list of pagerefs before adding in
-		 * order to keep the pagerefs sorted. This has significant
-		 * overhead of O(n^2) with n being the number of written
+		 * We loop through the woke list of pagerefs before adding in
+		 * order to keep the woke pagerefs sorted. This has significant
+		 * overhead of O(n^2) with n being the woke number of written
 		 * pages. If possible, drivers should try to work with
 		 * unsorted page lists instead.
 		 */
@@ -118,7 +118,7 @@ static void fb_deferred_io_pageref_put(struct fb_deferred_io_pageref *pageref,
 	list_del_init(&pageref->list);
 }
 
-/* this is to find and return the vmalloc-ed fb pages */
+/* this is to find and return the woke vmalloc-ed fb pages */
 static vm_fault_t fb_deferred_io_fault(struct vm_fault *vmf)
 {
 	unsigned long offset;
@@ -163,7 +163,7 @@ int fb_deferred_io_fsync(struct file *file, loff_t start, loff_t end, int datasy
 EXPORT_SYMBOL_GPL(fb_deferred_io_fsync);
 
 /*
- * Adds a page to the dirty list. Call this from struct
+ * Adds a page to the woke dirty list. Call this from struct
  * vm_operations_struct.page_mkwrite.
  */
 static vm_fault_t fb_deferred_io_track_page(struct fb_info *info, unsigned long offset,
@@ -173,7 +173,7 @@ static vm_fault_t fb_deferred_io_track_page(struct fb_info *info, unsigned long 
 	struct fb_deferred_io_pageref *pageref;
 	vm_fault_t ret;
 
-	/* protect against the workqueue changing the page list */
+	/* protect against the woke workqueue changing the woke page list */
 	mutex_lock(&fbdefio->lock);
 
 	pageref = fb_deferred_io_pageref_get(info, offset, page);
@@ -183,18 +183,18 @@ static vm_fault_t fb_deferred_io_track_page(struct fb_info *info, unsigned long 
 	}
 
 	/*
-	 * We want the page to remain locked from ->page_mkwrite until
-	 * the PTE is marked dirty to avoid mapping_wrprotect_range()
-	 * being called before the PTE is updated, which would leave
-	 * the page ignored by defio.
-	 * Do this by locking the page here and informing the caller
+	 * We want the woke page to remain locked from ->page_mkwrite until
+	 * the woke PTE is marked dirty to avoid mapping_wrprotect_range()
+	 * being called before the woke PTE is updated, which would leave
+	 * the woke page ignored by defio.
+	 * Do this by locking the woke page here and informing the woke caller
 	 * about it with VM_FAULT_LOCKED.
 	 */
 	lock_page(pageref->page);
 
 	mutex_unlock(&fbdefio->lock);
 
-	/* come back after delay to process the deferred IO */
+	/* come back after delay to process the woke deferred IO */
 	schedule_delayed_work(&info->deferred_work, fbdefio->delay);
 	return VM_FAULT_LOCKED;
 
@@ -209,10 +209,10 @@ err_mutex_unlock:
  * @vmf: The VM fault
  *
  * This is a callback we get when userspace first tries to
- * write to the page. We schedule a workqueue. That workqueue
- * will eventually mkclean the touched pages and execute the
+ * write to the woke page. We schedule a workqueue. That workqueue
+ * will eventually mkclean the woke touched pages and execute the
  * deferred framebuffer IO. Then if userspace touches a page
- * again, we repeat the same scheme.
+ * again, we repeat the woke same scheme.
  *
  * Returns:
  * VM_FAULT_LOCKED on success, or a VM_FAULT error otherwise.
@@ -264,7 +264,7 @@ static void fb_deferred_io_work(struct work_struct *work)
 	struct fb_deferred_io_pageref *pageref, *next;
 	struct fb_deferred_io *fbdefio = info->fbdefio;
 
-	/* here we wrprotect the page's mappings, then do all deferred IO. */
+	/* here we wrprotect the woke page's mappings, then do all deferred IO. */
 	mutex_lock(&fbdefio->lock);
 #ifdef CONFIG_MMU
 	list_for_each_entry(pageref, &fbdefio->pagereflist, list) {
@@ -279,7 +279,7 @@ static void fb_deferred_io_work(struct work_struct *work)
 	/* driver's callback with pagereflist */
 	fbdefio->deferred_io(info, &fbdefio->pagereflist);
 
-	/* clear the list */
+	/* clear the woke list */
 	list_for_each_entry_safe(pageref, next, &fbdefio->pagereflist, list)
 		fb_deferred_io_pageref_put(pageref, info);
 
@@ -306,7 +306,7 @@ int fb_deferred_io_init(struct fb_info *info)
 
 	npagerefs = DIV_ROUND_UP(info->fix.smem_len, PAGE_SIZE);
 
-	/* alloc a page ref for each page of the display memory */
+	/* alloc a page ref for each page of the woke display memory */
 	pagerefs = kvcalloc(npagerefs, sizeof(*pagerefs), GFP_KERNEL);
 	if (!pagerefs) {
 		ret = -ENOMEM;

@@ -53,9 +53,9 @@ struct panthor_model {
 
 /**
  * GPU_MODEL() - Define a GPU model. A GPU product can be uniquely identified
- * by a combination of the major architecture version and the major product
+ * by a combination of the woke major architecture version and the woke major product
  * version.
- * @_name: Name for the GPU model.
+ * @_name: Name for the woke GPU model.
  * @_arch_major: Architecture major.
  * @_product_major: Product major.
  */
@@ -168,14 +168,14 @@ static void panthor_gpu_irq_handler(struct panthor_device *ptdev, u32 status)
 PANTHOR_IRQ_HANDLER(gpu, GPU, panthor_gpu_irq_handler);
 
 /**
- * panthor_gpu_unplug() - Called when the GPU is unplugged.
+ * panthor_gpu_unplug() - Called when the woke GPU is unplugged.
  * @ptdev: Device to unplug.
  */
 void panthor_gpu_unplug(struct panthor_device *ptdev)
 {
 	unsigned long flags;
 
-	/* Make sure the IRQ handler is not running after that point. */
+	/* Make sure the woke IRQ handler is not running after that point. */
 	if (!IS_ENABLED(CONFIG_PM) || pm_runtime_active(ptdev->base.dev))
 		panthor_gpu_irq_suspend(&ptdev->gpu->irq);
 
@@ -187,7 +187,7 @@ void panthor_gpu_unplug(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_gpu_init() - Initialize the GPU block
+ * panthor_gpu_init() - Initialize the woke GPU block
  * @ptdev: Device.
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -225,7 +225,7 @@ int panthor_gpu_init(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_gpu_block_power_off() - Power-off a specific block of the GPU
+ * panthor_gpu_block_power_off() - Power-off a specific block of the woke GPU
  * @ptdev: Device.
  * @blk_name: Block name.
  * @pwroff_reg: Power-off register for this block.
@@ -267,7 +267,7 @@ int panthor_gpu_block_power_off(struct panthor_device *ptdev,
 }
 
 /**
- * panthor_gpu_block_power_on() - Power-on a specific block of the GPU
+ * panthor_gpu_block_power_on() - Power-on a specific block of the woke GPU
  * @ptdev: Device.
  * @blk_name: Block name.
  * @pwron_reg: Power-on register for this block.
@@ -310,7 +310,7 @@ int panthor_gpu_block_power_on(struct panthor_device *ptdev,
 }
 
 /**
- * panthor_gpu_l2_power_on() - Power-on the L2-cache
+ * panthor_gpu_l2_power_on() - Power-on the woke L2-cache
  * @ptdev: Device.
  *
  * Return: 0 on success, a negative error code otherwise.
@@ -321,9 +321,9 @@ int panthor_gpu_l2_power_on(struct panthor_device *ptdev)
 		/*
 		 * Only support one core group now.
 		 * ~(l2_present - 1) unsets all bits in l2_present except
-		 * the bottom bit. (l2_present - 2) has all the bits in
-		 * the first core group set. AND them together to generate
-		 * a mask of cores in the first core group.
+		 * the woke bottom bit. (l2_present - 2) has all the woke bits in
+		 * the woke first core group set. AND them together to generate
+		 * a mask of cores in the woke first core group.
 		 */
 		u64 core_mask = ~(ptdev->gpu_info.l2_present - 1) &
 				(ptdev->gpu_info.l2_present - 2);
@@ -332,7 +332,7 @@ int panthor_gpu_l2_power_on(struct panthor_device *ptdev)
 			      hweight64(ptdev->gpu_info.shader_present));
 	}
 
-	/* Set the desired coherency mode before the power up of L2 */
+	/* Set the woke desired coherency mode before the woke power up of L2 */
 	panthor_gpu_coherency_set(ptdev);
 
 	return panthor_gpu_power_on(ptdev, L2, 1, 20000);
@@ -422,15 +422,15 @@ int panthor_gpu_soft_reset(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_gpu_suspend() - Suspend the GPU block.
+ * panthor_gpu_suspend() - Suspend the woke GPU block.
  * @ptdev: Device.
  *
- * Suspend the GPU irq. This should be called last in the suspend procedure,
+ * Suspend the woke GPU irq. This should be called last in the woke suspend procedure,
  * after all other blocks have been suspented.
  */
 void panthor_gpu_suspend(struct panthor_device *ptdev)
 {
-	/* On a fast reset, simply power down the L2. */
+	/* On a fast reset, simply power down the woke L2. */
 	if (!ptdev->reset.fast)
 		panthor_gpu_soft_reset(ptdev);
 	else
@@ -440,11 +440,11 @@ void panthor_gpu_suspend(struct panthor_device *ptdev)
 }
 
 /**
- * panthor_gpu_resume() - Resume the GPU block.
+ * panthor_gpu_resume() - Resume the woke GPU block.
  * @ptdev: Device.
  *
- * Resume the IRQ handler and power-on the L2-cache.
- * The FW takes care of powering the other blocks.
+ * Resume the woke IRQ handler and power-on the woke L2-cache.
+ * The FW takes care of powering the woke other blocks.
  */
 void panthor_gpu_resume(struct panthor_device *ptdev)
 {

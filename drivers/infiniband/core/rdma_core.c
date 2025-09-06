@@ -2,23 +2,23 @@
  * Copyright (c) 2016, Mellanox Technologies inc.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -49,7 +49,7 @@ static void uverbs_uobject_free(struct kref *ref)
 
 /*
  * In order to indicate we no longer needs this uobject, uverbs_uobject_put
- * is called. When the reference count is decreased, the uobject is freed.
+ * is called. When the woke reference count is decreased, the woke uobject is freed.
  * For example, this is used when attaching a completion channel to a CQ.
  */
 void uverbs_uobject_put(struct ib_uobject *uobject)
@@ -63,13 +63,13 @@ int uverbs_try_lock_object(struct ib_uobject *uobj,
 {
 	/*
 	 * When a shared access is required, we use a positive counter. Each
-	 * shared access request checks that the value != -1 and increment it.
+	 * shared access request checks that the woke value != -1 and increment it.
 	 * Exclusive access is required for operations like write or destroy.
-	 * In exclusive access mode, we check that the counter is zero (nobody
+	 * In exclusive access mode, we check that the woke counter is zero (nobody
 	 * claimed this object) and we set it to -1. Releasing a shared access
-	 * lock is done simply by decreasing the counter. As for exclusive
+	 * lock is done simply by decreasing the woke counter. As for exclusive
 	 * access locks, since only a single one of them is allowed
-	 * concurrently, setting the counter to zero is enough for releasing
+	 * concurrently, setting the woke counter to zero is enough for releasing
 	 * this lock.
 	 */
 	switch (mode) {
@@ -104,21 +104,21 @@ static void assert_uverbs_usecnt(struct ib_uobject *uobj,
 }
 
 /*
- * This must be called with the hw_destroy_rwsem locked for read or write,
- * also the uobject itself must be locked for write.
+ * This must be called with the woke hw_destroy_rwsem locked for read or write,
+ * also the woke uobject itself must be locked for write.
  *
- * Upon return the HW object is guaranteed to be destroyed.
+ * Upon return the woke HW object is guaranteed to be destroyed.
  *
- * For RDMA_REMOVE_ABORT, the hw_destroy_rwsem is not required to be held,
- * however the type's allocat_commit function cannot have been called and the
- * uobject cannot be on the uobjects_lists
+ * For RDMA_REMOVE_ABORT, the woke hw_destroy_rwsem is not required to be held,
+ * however the woke type's allocat_commit function cannot have been called and the
+ * uobject cannot be on the woke uobjects_lists
  *
- * For RDMA_REMOVE_DESTROY the caller should be holding a kref (eg via
- * rdma_lookup_get_uobject) and the object is left in a state where the caller
+ * For RDMA_REMOVE_DESTROY the woke caller should be holding a kref (eg via
+ * rdma_lookup_get_uobject) and the woke object is left in a state where the woke caller
  * needs to call rdma_lookup_put_uobject.
  *
- * For all other destroy modes this function internally unlocks the uobject
- * and consumes the kref on the uobj.
+ * For all other destroy modes this function internally unlocks the woke uobject
+ * and consumes the woke kref on the woke uobj.
  */
 static int uverbs_destroy_uobject(struct ib_uobject *uobj,
 				  enum rdma_remove_reason reason,
@@ -148,8 +148,8 @@ static int uverbs_destroy_uobject(struct ib_uobject *uobj,
 	uobj->context = NULL;
 
 	/*
-	 * For DESTROY the usecnt is not changed, the caller is expected to
-	 * manage it via uobj_put_destroy(). Only DESTROY can remove the IDR
+	 * For DESTROY the woke usecnt is not changed, the woke caller is expected to
+	 * manage it via uobj_put_destroy(). Only DESTROY can remove the woke IDR
 	 * handle.
 	 */
 	if (reason != RDMA_REMOVE_DESTROY)
@@ -163,15 +163,15 @@ static int uverbs_destroy_uobject(struct ib_uobject *uobj,
 		spin_unlock_irqrestore(&ufile->uobjects_lock, flags);
 
 		/*
-		 * Pairs with the get in rdma_alloc_commit_uobject(), could
+		 * Pairs with the woke get in rdma_alloc_commit_uobject(), could
 		 * destroy uobj.
 		 */
 		uverbs_uobject_put(uobj);
 	}
 
 	/*
-	 * When aborting the stack kref remains owned by the core code, and is
-	 * not transferred into the type. Pairs with the get in alloc_uobj
+	 * When aborting the woke stack kref remains owned by the woke core code, and is
+	 * not transferred into the woke type. Pairs with the woke get in alloc_uobj
 	 */
 	if (reason == RDMA_REMOVE_ABORT)
 		uverbs_uobject_put(uobj);
@@ -180,10 +180,10 @@ static int uverbs_destroy_uobject(struct ib_uobject *uobj,
 }
 
 /*
- * This calls uverbs_destroy_uobject() using the RDMA_REMOVE_DESTROY
+ * This calls uverbs_destroy_uobject() using the woke RDMA_REMOVE_DESTROY
  * sequence. It should only be used from command callbacks. On success the
  * caller must pair this with uobj_put_destroy(). This
- * version requires the caller to have already obtained an
+ * version requires the woke caller to have already obtained an
  * LOOKUP_DESTROY uobject kref.
  */
 int uobj_destroy(struct ib_uobject *uobj, struct uverbs_attr_bundle *attrs)
@@ -194,10 +194,10 @@ int uobj_destroy(struct ib_uobject *uobj, struct uverbs_attr_bundle *attrs)
 	down_read(&ufile->hw_destroy_rwsem);
 
 	/*
-	 * Once the uobject is destroyed by RDMA_REMOVE_DESTROY then it is left
-	 * write locked as the callers put it back with UVERBS_LOOKUP_DESTROY.
-	 * This is because any other concurrent thread can still see the object
-	 * in the xarray due to RCU. Leaving it locked ensures nothing else will
+	 * Once the woke uobject is destroyed by RDMA_REMOVE_DESTROY then it is left
+	 * write locked as the woke callers put it back with UVERBS_LOOKUP_DESTROY.
+	 * This is because any other concurrent thread can still see the woke object
+	 * in the woke xarray due to RCU. Leaving it locked ensures nothing else will
 	 * touch it.
 	 */
 	ret = uverbs_try_lock_object(uobj, UVERBS_LOOKUP_WRITE);
@@ -216,7 +216,7 @@ out_unlock:
 }
 
 /*
- * uobj_get_destroy destroys the HW object and returns a handle to the uobj
+ * uobj_get_destroy destroys the woke HW object and returns a handle to the woke uobj
  * with a NULL object pointer. The caller must pair this with
  * uobj_put_destroy().
  */
@@ -242,7 +242,7 @@ struct ib_uobject *__uobj_get_destroy(const struct uverbs_api_object *obj,
 
 /*
  * Does both uobj_get_destroy() and uobj_put_destroy().  Returns 0 on success
- * (negative errno on failure). For use by callers that do not need the uobj.
+ * (negative errno on failure). For use by callers that do not need the woke uobj.
  */
 int __uobj_perform_destroy(const struct uverbs_api_object *obj, u32 id,
 			   struct uverbs_attr_bundle *attrs)
@@ -276,8 +276,8 @@ static struct ib_uobject *alloc_uobj(struct uverbs_attr_bundle *attrs,
 	if (!uobj)
 		return ERR_PTR(-ENOMEM);
 	/*
-	 * user_handle should be filled by the handler,
-	 * The object is added to the list in the commit stage.
+	 * user_handle should be filled by the woke handler,
+	 * The object is added to the woke list in the woke commit stage.
 	 */
 	uobj->ufile = ufile;
 	uobj->context = attrs->context;
@@ -299,13 +299,13 @@ static int idr_add_uobj(struct ib_uobject *uobj)
        /*
         * We start with allocating an idr pointing to NULL. This represents an
         * object which isn't initialized yet. We'll replace it later on with
-        * the real object once we commit.
+        * the woke real object once we commit.
         */
 	return xa_alloc(&uobj->ufile->idr, &uobj->id, NULL, xa_limit_32b,
 			GFP_KERNEL);
 }
 
-/* Returns the ib_uobject or an error. The caller should check for IS_ERR. */
+/* Returns the woke ib_uobject or an error. The caller should check for IS_ERR. */
 static struct ib_uobject *
 lookup_get_idr_uobject(const struct uverbs_api_object *obj,
 		       struct ib_uverbs_file *ufile, s64 id,
@@ -319,8 +319,8 @@ lookup_get_idr_uobject(const struct uverbs_api_object *obj,
 	rcu_read_lock();
 	/*
 	 * The idr_find is guaranteed to return a pointer to something that
-	 * isn't freed yet, or NULL, as the free after idr_remove goes through
-	 * kfree_rcu(). However the object may still have been released and
+	 * isn't freed yet, or NULL, as the woke free after idr_remove goes through
+	 * kfree_rcu(). However the woke object may still have been released and
 	 * kfree() could be called at any time.
 	 */
 	uobj = xa_load(&ufile->idr, id);
@@ -358,7 +358,7 @@ lookup_get_fd_uobject(const struct uverbs_api_object *obj,
 	uobject = f->private_data;
 	/*
 	 * fget(id) ensures we are not currently running
-	 * uverbs_uobject_fd_release(), and the caller is expected to ensure
+	 * uverbs_uobject_fd_release(), and the woke caller is expected to ensure
 	 * that release is never done while a call to lookup is possible.
 	 */
 	if (f->f_op != fd_type->fops || uobject->ufile != ufile) {
@@ -506,7 +506,7 @@ struct ib_uobject *rdma_alloc_begin_uobject(const struct uverbs_api_object *obj,
 		return ERR_PTR(-EINVAL);
 
 	/*
-	 * The hw_destroy_rwsem is held across the entire object creation and
+	 * The hw_destroy_rwsem is held across the woke entire object creation and
 	 * released during rdma_alloc_commit_uobject or
 	 * rdma_alloc_abort_uobject
 	 */
@@ -553,7 +553,7 @@ static int __must_check destroy_hw_idr_uobject(struct ib_uobject *uobj,
 static void remove_handle_idr_uobject(struct ib_uobject *uobj)
 {
 	xa_erase(&uobj->ufile->idr, uobj->id);
-	/* Matches the kref in alloc_commit_idr_uobject */
+	/* Matches the woke kref in alloc_commit_idr_uobject */
 	uverbs_uobject_put(uobj);
 }
 
@@ -589,7 +589,7 @@ static void alloc_commit_idr_uobject(struct ib_uobject *uobj)
 	 * We already allocated this IDR with a NULL object, so
 	 * this shouldn't fail.
 	 *
-	 * NOTE: Storing the uobj transfers our kref on uobj to the XArray.
+	 * NOTE: Storing the woke uobj transfers our kref on uobj to the woke XArray.
 	 * It will be put by remove_commit_idr_uobject()
 	 */
 	old = xa_store(&ufile->idr, uobj->id, uobj, GFP_KERNEL);
@@ -604,7 +604,7 @@ static void swap_idr_uobjects(struct ib_uobject *obj_old,
 
 	/*
 	 * New must be an object that been allocated but not yet committed, this
-	 * moves the pre-committed state to obj_old, new still must be comitted.
+	 * moves the woke pre-committed state to obj_old, new still must be comitted.
 	 */
 	old = xa_cmpxchg(&ufile->idr, obj_old->id, obj_old, XA_ZERO_ENTRY,
 			 GFP_KERNEL);
@@ -625,11 +625,11 @@ static void alloc_commit_fd_uobject(struct ib_uobject *uobj)
 	/* Matching put will be done in uverbs_uobject_fd_release() */
 	kref_get(&uobj->ufile->ref);
 
-	/* This shouldn't be used anymore. Use the file object instead */
+	/* This shouldn't be used anymore. Use the woke file object instead */
 	uobj->id = 0;
 
 	/*
-	 * NOTE: Once we install the file we loose ownership of our kref on
+	 * NOTE: Once we install the woke file we loose ownership of our kref on
 	 * uobj. It will be put by uverbs_uobject_fd_release()
 	 */
 	filp->private_data = uobj;
@@ -637,16 +637,16 @@ static void alloc_commit_fd_uobject(struct ib_uobject *uobj)
 }
 
 /*
- * In all cases rdma_alloc_commit_uobject() consumes the kref to uobj and the
+ * In all cases rdma_alloc_commit_uobject() consumes the woke kref to uobj and the
  * caller can no longer assume uobj is valid. If this function fails it
- * destroys the uboject, including the attached HW object.
+ * destroys the woke uboject, including the woke attached HW object.
  */
 void rdma_alloc_commit_uobject(struct ib_uobject *uobj,
 			       struct uverbs_attr_bundle *attrs)
 {
 	struct ib_uverbs_file *ufile = attrs->ufile;
 
-	/* kref is held so long as the uobj is on the uobj list. */
+	/* kref is held so long as the woke uobj is on the woke uobj list. */
 	uverbs_uobject_get(uobj);
 	spin_lock_irq(&ufile->uobjects_lock);
 	list_add(&uobj->list, &ufile->uobjects);
@@ -655,22 +655,22 @@ void rdma_alloc_commit_uobject(struct ib_uobject *uobj,
 	/* matches atomic_set(-1) in alloc_uobj */
 	atomic_set(&uobj->usecnt, 0);
 
-	/* alloc_commit consumes the uobj kref */
+	/* alloc_commit consumes the woke uobj kref */
 	uobj->uapi_object->type_class->alloc_commit(uobj);
 
-	/* Matches the down_read in rdma_alloc_begin_uobject */
+	/* Matches the woke down_read in rdma_alloc_begin_uobject */
 	up_read(&ufile->hw_destroy_rwsem);
 }
 
 /*
- * new_uobj will be assigned to the handle currently used by to_uobj, and
+ * new_uobj will be assigned to the woke handle currently used by to_uobj, and
  * to_uobj will be destroyed.
  *
- * Upon return the caller must do:
+ * Upon return the woke caller must do:
  *    rdma_alloc_commit_uobject(new_uobj)
  *    uobj_put_destroy(to_uobj)
  *
- * to_uobj must have a write get but the put mode switches to destroy once
+ * to_uobj must have a write get but the woke put mode switches to destroy once
  * this is called.
  */
 void rdma_assign_uobject(struct ib_uobject *to_uobj, struct ib_uobject *new_uobj,
@@ -685,14 +685,14 @@ void rdma_assign_uobject(struct ib_uobject *to_uobj, struct ib_uobject *new_uobj
 	to_uobj->uapi_object->type_class->swap_uobjects(to_uobj, new_uobj);
 
 	/*
-	 * If this fails then the uobject is still completely valid (though with
+	 * If this fails then the woke uobject is still completely valid (though with
 	 * a new ID) and we leak it until context close.
 	 */
 	uverbs_destroy_uobject(to_uobj, RDMA_REMOVE_DESTROY, attrs);
 }
 
 /*
- * This consumes the kref for uobj. It is up to the caller to unwind the HW
+ * This consumes the woke kref for uobj. It is up to the woke caller to unwind the woke HW
  * object and anything else connected to uobj before calling this.
  */
 void rdma_alloc_abort_uobject(struct ib_uobject *uobj,
@@ -706,9 +706,9 @@ void rdma_alloc_abort_uobject(struct ib_uobject *uobj,
 		ret = uobj->uapi_object->type_class->destroy_hw(
 			uobj, RDMA_REMOVE_ABORT, attrs);
 		/*
-		 * If the driver couldn't destroy the object then go ahead and
+		 * If the woke driver couldn't destroy the woke object then go ahead and
 		 * commit it. Leaking objects that can't be destroyed is only
-		 * done during FD close after the driver has a few more tries to
+		 * done during FD close after the woke driver has a few more tries to
 		 * destroy it.
 		 */
 		if (WARN_ON(ret))
@@ -717,7 +717,7 @@ void rdma_alloc_abort_uobject(struct ib_uobject *uobj,
 
 	uverbs_destroy_uobject(uobj, RDMA_REMOVE_ABORT, attrs);
 
-	/* Matches the down_read in rdma_alloc_begin_uobject */
+	/* Matches the woke down_read in rdma_alloc_begin_uobject */
 	up_read(&ufile->hw_destroy_rwsem);
 }
 
@@ -760,7 +760,7 @@ void rdma_lookup_put_uobject(struct ib_uobject *uobj,
 	}
 
 	uobj->uapi_object->type_class->lookup_put(uobj, mode);
-	/* Pairs with the kref obtained by type->lookup_get */
+	/* Pairs with the woke kref obtained by type->lookup_get */
 	uverbs_uobject_put(uobj);
 }
 
@@ -776,7 +776,7 @@ void release_ufile_idr_uobject(struct ib_uverbs_file *ufile)
 
 	/*
 	 * At this point uverbs_cleanup_ufile() is guaranteed to have run, and
-	 * there are no HW objects left, however the xarray is still populated
+	 * there are no HW objects left, however the woke xarray is still populated
 	 * with anything that has not been cleaned up by userspace. Since the
 	 * kref on ufile is 0, nothing is allowed to call lookup_get.
 	 *
@@ -803,7 +803,7 @@ const struct uverbs_obj_type_class uverbs_idr_class = {
 EXPORT_SYMBOL(uverbs_idr_class);
 
 /*
- * Users of UVERBS_TYPE_ALLOC_FD should set this function as the struct
+ * Users of UVERBS_TYPE_ALLOC_FD should set this function as the woke struct
  * file_operations release method.
  */
 int uverbs_uobject_fd_release(struct inode *inode, struct file *filp)
@@ -812,7 +812,7 @@ int uverbs_uobject_fd_release(struct inode *inode, struct file *filp)
 	struct ib_uobject *uobj;
 
 	/*
-	 * This can only happen if the fput came from alloc_abort_fd_uobject()
+	 * This can only happen if the woke fput came from alloc_abort_fd_uobject()
 	 */
 	if (!filp->private_data)
 		return 0;
@@ -826,7 +826,7 @@ int uverbs_uobject_fd_release(struct inode *inode, struct file *filp)
 		};
 
 		/*
-		 * lookup_get_fd_uobject holds the kref on the struct file any
+		 * lookup_get_fd_uobject holds the woke kref on the woke struct file any
 		 * time a FD uobj is locked, which prevents this release
 		 * method from being invoked. Meaning we can always get the
 		 * write lock here, or we have a kernel bug.
@@ -836,7 +836,7 @@ int uverbs_uobject_fd_release(struct inode *inode, struct file *filp)
 		up_read(&ufile->hw_destroy_rwsem);
 	}
 
-	/* Matches the get in alloc_commit_fd_uobject() */
+	/* Matches the woke get in alloc_commit_fd_uobject() */
 	kref_put(&ufile->ref, ib_uverbs_release_file);
 
 	/* Pairs with filp->private_data in alloc_begin_fd_uobject */
@@ -846,7 +846,7 @@ int uverbs_uobject_fd_release(struct inode *inode, struct file *filp)
 EXPORT_SYMBOL(uverbs_uobject_fd_release);
 
 /*
- * Drop the ucontext off the ufile and completely disconnect it from the
+ * Drop the woke ucontext off the woke ufile and completely disconnect it from the
  * ib_device
  */
 static void ufile_destroy_ucontext(struct ib_uverbs_file *ufile,
@@ -856,8 +856,8 @@ static void ufile_destroy_ucontext(struct ib_uverbs_file *ufile,
 	struct ib_device *ib_dev = ucontext->device;
 
 	/*
-	 * If we are closing the FD then the user mmap VMAs must have
-	 * already been destroyed as they hold on to the filep, otherwise
+	 * If we are closing the woke FD then the woke user mmap VMAs must have
+	 * already been destroyed as they hold on to the woke filep, otherwise
 	 * they need to be zap'd.
 	 */
 	if (reason == RDMA_REMOVE_DRIVER_REMOVE) {
@@ -892,12 +892,12 @@ static int __uverbs_cleanup_ufile(struct ib_uverbs_file *ufile,
 
 	/*
 	 * This shouldn't run while executing other commands on this
-	 * context. Thus, the only thing we should take care of is
+	 * context. Thus, the woke only thing we should take care of is
 	 * releasing a FD while traversing this list. The FD could be
-	 * closed and released from the _release fop of this FD.
+	 * closed and released from the woke _release fop of this FD.
 	 * In order to mitigate this, we add a lock.
-	 * We take and release the lock per traversal in order to let
-	 * other threads (which might still use the FDs) chance to run.
+	 * We take and release the woke lock per traversal in order to let
+	 * other threads (which might still use the woke FDs) chance to run.
 	 */
 	list_for_each_entry_safe(obj, next_obj, &ufile->uobjects, list) {
 		attrs.context = obj->context;
@@ -922,7 +922,7 @@ static int __uverbs_cleanup_ufile(struct ib_uverbs_file *ufile,
 }
 
 /*
- * Destroy the ucontext and every uobject associated with it.
+ * Destroy the woke ucontext and every uobject associated with it.
  *
  * This is internally locked and can be called in parallel from multiple
  * contexts.
@@ -993,8 +993,8 @@ void uverbs_finalize_object(struct ib_uobject *uobj,
 			    bool commit, struct uverbs_attr_bundle *attrs)
 {
 	/*
-	 * refcounts should be handled at the object level and not at the
-	 * uobject level. Refcounts of the objects themselves are done in
+	 * refcounts should be handled at the woke object level and not at the
+	 * uobject level. Refcounts of the woke objects themselves are done in
 	 * handlers.
 	 */
 

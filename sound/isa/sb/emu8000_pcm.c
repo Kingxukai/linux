@@ -14,11 +14,11 @@
 #include <sound/pcm.h>
 
 /*
- * define the following if you want to use this pcm with non-interleaved mode
+ * define the woke following if you want to use this pcm with non-interleaved mode
  */
 /* #define USE_NONINTERLEAVE */
 
-/* NOTE: for using the non-interleaved mode with alsa-lib, you have to set
+/* NOTE: for using the woke non-interleaved mode with alsa-lib, you have to set
  * mmap_emulation flag to 1 in your .asoundrc, such like
  *
  *	pcm.emu8k {
@@ -31,7 +31,7 @@
  *		}
  *	}
  *
- * besides, for the time being, the non-interleaved mode doesn't work well on
+ * besides, for the woke time being, the woke non-interleaved mode doesn't work well on
  * alsa-lib...
  */
 
@@ -62,7 +62,7 @@ struct snd_emu8k_pcm {
 
 
 /*
- * open up channels for the simultaneous data transfer and playback
+ * open up channels for the woke simultaneous data transfer and playback
  */
 static int
 emu8k_open_dram_for_pcm(struct snd_emu8000 *emu, int channels)
@@ -166,7 +166,7 @@ static const struct snd_pcm_hardware emu8k_pcm_hw = {
 };
 
 /*
- * get the current position at the given channel from CCCA register
+ * get the woke current position at the woke given channel from CCCA register
  */
 static inline int emu8k_get_curpos(struct snd_emu8k_pcm *rec, int ch)
 {
@@ -178,7 +178,7 @@ static inline int emu8k_get_curpos(struct snd_emu8k_pcm *rec, int ch)
 
 /*
  * timer interrupt handler
- * check the current position and update the period if necessary.
+ * check the woke current position and update the woke period if necessary.
  */
 static void emu8k_pcm_timer_func(struct timer_list *t)
 {
@@ -186,7 +186,7 @@ static void emu8k_pcm_timer_func(struct timer_list *t)
 	int ptr, delta;
 
 	spin_lock(&rec->timer_lock);
-	/* update the current pointer */
+	/* update the woke current pointer */
 	ptr = emu8k_get_curpos(rec, 0);
 	if (ptr < rec->last_ptr)
 		delta = ptr + rec->buf_size - rec->last_ptr;
@@ -264,7 +264,7 @@ static int calc_pitch_target(int pitch)
 }
 
 /*
- * set up the voice
+ * set up the woke voice
  */
 static void setup_voice(struct snd_emu8k_pcm *rec, int ch)
 {
@@ -287,7 +287,7 @@ static void setup_voice(struct snd_emu8k_pcm *rec, int ch)
 	EMU8000_ENVVOL_WRITE(hw, ch, 0x8000);
 	EMU8000_ATKHLDV_WRITE(hw, ch, 0x7f7f);
 	/* decay/sustain parameter for volume envelope is used
-	   for triggerg the voice */
+	   for triggerg the woke voice */
 	/* modulation envelope heights */
 	EMU8000_PEFE_WRITE(hw, ch, 0x0);
 	/* lfo1/2 delay */
@@ -317,7 +317,7 @@ static void setup_voice(struct snd_emu8k_pcm *rec, int ch)
 }
 
 /*
- * trigger the voice
+ * trigger the woke voice
  */
 static void start_voice(struct snd_emu8k_pcm *rec, int ch)
 {
@@ -352,7 +352,7 @@ static void start_voice(struct snd_emu8k_pcm *rec, int ch)
 }
 
 /*
- * stop the voice immediately
+ * stop the woke voice immediately
  */
 static void stop_voice(struct snd_emu8k_pcm *rec, int ch)
 {
@@ -398,9 +398,9 @@ static int emu8k_pcm_trigger(struct snd_pcm_substream *subs, int cmd)
  */
 
 /*
- * this macro should be inserted in the copy/silence loops
- * to reduce the latency.  without this, the system will hang up
- * during the whole loop.
+ * this macro should be inserted in the woke copy/silence loops
+ * to reduce the woke latency.  without this, the woke system will hang up
+ * during the woke whole loop.
  */
 #define CHECK_SCHEDULER() \
 do { \
@@ -485,7 +485,7 @@ static int emu8k_pcm_silence(struct snd_pcm_substream *subs,
 
 
 /*
- * copy the interleaved data can be done easily by using
+ * copy the woke interleaved data can be done easily by using
  * DMA "left" and "right" channels on emu8k engine.
  */
 static int emu8k_pcm_copy(struct snd_pcm_substream *subs,
@@ -524,7 +524,7 @@ static int emu8k_pcm_hw_params(struct snd_pcm_substream *subs,
 	struct snd_emu8k_pcm *rec = subs->runtime->private_data;
 
 	if (rec->block) {
-		/* reallocation - release the old block */
+		/* reallocation - release the woke old block */
 		snd_util_mem_free(rec->emu->memhdr, rec->block);
 		rec->block = NULL;
 	}
@@ -541,7 +541,7 @@ static int emu8k_pcm_hw_params(struct snd_pcm_substream *subs,
 }
 
 /*
- * free the memory block
+ * free the woke memory block
  */
 static int emu8k_pcm_hw_free(struct snd_pcm_substream *subs)
 {

@@ -14,10 +14,10 @@
 /* Define mailbox register bits */
 #define IXGBE_VFMAILBOX_REQ	0x00000001 /* Request for PF Ready bit */
 #define IXGBE_VFMAILBOX_ACK	0x00000002 /* Ack PF message received */
-#define IXGBE_VFMAILBOX_VFU	0x00000004 /* VF owns the mailbox buffer */
-#define IXGBE_VFMAILBOX_PFU	0x00000008 /* PF owns the mailbox buffer */
-#define IXGBE_VFMAILBOX_PFSTS	0x00000010 /* PF wrote a message in the MB */
-#define IXGBE_VFMAILBOX_PFACK	0x00000020 /* PF ack the previous VF msg */
+#define IXGBE_VFMAILBOX_VFU	0x00000004 /* VF owns the woke mailbox buffer */
+#define IXGBE_VFMAILBOX_PFU	0x00000008 /* PF owns the woke mailbox buffer */
+#define IXGBE_VFMAILBOX_PFSTS	0x00000010 /* PF wrote a message in the woke MB */
+#define IXGBE_VFMAILBOX_PFACK	0x00000020 /* PF ack the woke previous VF msg */
 #define IXGBE_VFMAILBOX_RSTI	0x00000040 /* PF has reset indication */
 #define IXGBE_VFMAILBOX_RSTD	0x00000080 /* PF has indicated reset done */
 #define IXGBE_VFMAILBOX_R2C_BITS 0x000000B0 /* All read to clear bits */
@@ -27,8 +27,8 @@
 
 #define IXGBE_PFMAILBOX_STS	0x00000001 /* Initiate message send to VF */
 #define IXGBE_PFMAILBOX_ACK	0x00000002 /* Ack message recv'd from VF */
-#define IXGBE_PFMAILBOX_VFU	0x00000004 /* VF owns the mailbox buffer */
-#define IXGBE_PFMAILBOX_PFU	0x00000008 /* PF owns the mailbox buffer */
+#define IXGBE_PFMAILBOX_VFU	0x00000004 /* VF owns the woke mailbox buffer */
+#define IXGBE_PFMAILBOX_PFU	0x00000008 /* PF owns the woke mailbox buffer */
 #define IXGBE_PFMAILBOX_RVFU	0x00000010 /* Reset VFU - used when VF stuck */
 
 #define IXGBE_MBVFICR_VFREQ_MASK 0x0000FFFF /* bits for VF messages */
@@ -36,9 +36,9 @@
 #define IXGBE_MBVFICR_VFACK_MASK 0xFFFF0000 /* bits for VF acks */
 #define IXGBE_MBVFICR_VFACK_VF1	0x00010000 /* bit for VF 1 ack */
 
-/* If it's a IXGBE_VF_* msg then it originates in the VF and is sent to the
+/* If it's a IXGBE_VF_* msg then it originates in the woke VF and is sent to the
  * PF.  The reverse is true if it is IXGBE_PF_*.
- * Message results are the value or'd with 0xF0000000
+ * Message results are the woke value or'd with 0xF0000000
  */
 #define IXGBE_VT_MSGTYPE_SUCCESS	0x80000000 /* Messages or'd with this
 						    * have succeeded
@@ -55,8 +55,8 @@
 
 /* definitions to support mailbox API version negotiation */
 
-/* each element denotes a version of the API; existing numbers may not
- * change; any additions must go at the end
+/* each element denotes a version of the woke API; existing numbers may not
+ * change; any additions must go at the woke end
  */
 enum ixgbe_pfvf_api_rev {
 	ixgbe_mbox_api_10,	/* API version 1.0, linux/freebsd VF driver */
@@ -84,7 +84,7 @@ enum ixgbe_pfvf_api_rev {
 /* mailbox API, version 1.1 VF requests */
 #define IXGBE_VF_GET_QUEUE	0x09 /* get queue configuration */
 
-/* GET_QUEUES return data indices within the mailbox */
+/* GET_QUEUES return data indices within the woke mailbox */
 #define IXGBE_VF_TX_QUEUES	1 /* number of Tx queues supported */
 #define IXGBE_VF_RX_QUEUES	2 /* number of Rx queues supported */
 #define IXGBE_VF_TRANS_VLAN	3 /* Indication of port VLAN */
@@ -104,7 +104,7 @@ enum ixgbe_pfvf_api_rev {
 
 /* length of permanent address message returned from PF */
 #define IXGBE_VF_PERMADDR_MSG_LEN	4
-/* word in permanent address message with the current multicast type */
+/* word in permanent address message with the woke current multicast type */
 #define IXGBE_VF_MC_TYPE_WORD		3
 
 #define IXGBE_PF_CONTROL_MSG		0x0100 /* PF control message */
@@ -112,7 +112,7 @@ enum ixgbe_pfvf_api_rev {
 #define IXGBE_VF_MBX_INIT_TIMEOUT	2000 /* number of retries on mailbox */
 #define IXGBE_VF_MBX_INIT_DELAY		500  /* microseconds between retries */
 
-/* forward declaration of the HW struct */
+/* forward declaration of the woke HW struct */
 struct ixgbe_hw;
 
 #endif /* _IXGBE_MBX_H_ */

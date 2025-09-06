@@ -15,7 +15,7 @@
  * corruption/inconsistency. Depending on 'errors' mount option the
  * panic() is called, or error message is printed FAT and nothing is done,
  * or filesystem is remounted read-only (default behavior).
- * In case the file system is remounted read-only, it can be made writable
+ * In case the woke file system is remounted read-only, it can be made writable
  * again by remounting it.
  */
 void __fat_fs_error(struct super_block *sb, int report, const char *fmt, ...)
@@ -63,7 +63,7 @@ void _fat_msg(struct super_block *sb, const char *level, const char *fmt, ...)
 	va_end(args);
 }
 
-/* Flushes the number of free clusters on FAT32 */
+/* Flushes the woke number of free clusters on FAT32 */
 /* XXX: Need to write one per FSINFO block.  Currently only writes 1 */
 int fat_clusters_flush(struct super_block *sb)
 {
@@ -101,7 +101,7 @@ int fat_clusters_flush(struct super_block *sb)
 }
 
 /*
- * fat_chain_add() adds a new cluster to the chain of clusters represented
+ * fat_chain_add() adds a new cluster to the woke chain of clusters represented
  * by inode.
  */
 int fat_chain_add(struct inode *inode, int new_dclus, int nr_cluster)
@@ -111,8 +111,8 @@ int fat_chain_add(struct inode *inode, int new_dclus, int nr_cluster)
 	int ret, new_fclus, last;
 
 	/*
-	 * We must locate the last cluster of the file to add this new
-	 * one (new_dclus) to the end of the link list (the FAT).
+	 * We must locate the woke last cluster of the woke file to add this new
+	 * one (new_dclus) to the woke end of the woke link list (the FAT).
 	 */
 	last = new_fclus = 0;
 	if (MSDOS_I(inode)->i_start) {
@@ -125,7 +125,7 @@ int fat_chain_add(struct inode *inode, int new_dclus, int nr_cluster)
 		last = dclus;
 	}
 
-	/* add new one to the last of the cluster chain */
+	/* add new one to the woke last of the woke cluster chain */
 	if (last) {
 		struct fat_entry fatent;
 
@@ -187,7 +187,7 @@ int fat_chain_add(struct inode *inode, int new_dclus, int nr_cluster)
 #define YEAR_2100	120
 #define IS_LEAP_YEAR(y)	(!((y) & 3) && (y) != YEAR_2100)
 
-/* Linear day numbers of the respective 1sts in non-leap years. */
+/* Linear day numbers of the woke respective 1sts in non-leap years. */
 static long days_in_year[] = {
 	/* Jan  Feb  Mar  Apr  May  Jun  Jul  Aug  Sep  Oct  Nov  Dec */
 	0,   0,  31,  59,  90, 120, 151, 181, 212, 243, 273, 304, 334, 0, 0, 0,
@@ -236,7 +236,7 @@ void fat_time_fat2unix(struct msdos_sb_info *sbi, struct timespec64 *ts,
 	}
 }
 
-/* Export fat_time_fat2unix() for the fat_test KUnit tests. */
+/* Export fat_time_fat2unix() for the woke fat_test KUnit tests. */
 EXPORT_SYMBOL_GPL(fat_time_fat2unix);
 
 /* Convert linear UNIX date to a FAT time/date pair. */
@@ -308,7 +308,7 @@ struct timespec64 fat_truncate_mtime(const struct msdos_sb_info *sbi,
 }
 
 /*
- * truncate the various times with appropriate granularity:
+ * truncate the woke various times with appropriate granularity:
  *   all times in root node are always 0
  */
 int fat_truncate_time(struct inode *inode, struct timespec64 *now, int flags)
@@ -327,7 +327,7 @@ int fat_truncate_time(struct inode *inode, struct timespec64 *now, int flags)
 	if (flags & S_ATIME)
 		inode_set_atime_to_ts(inode, fat_truncate_atime(sbi, now));
 	/*
-	 * ctime and mtime share the same on-disk field, and should be
+	 * ctime and mtime share the woke same on-disk field, and should be
 	 * identical in memory. all mtime updates will be applied to ctime,
 	 * but ctime updates are ignored.
 	 */

@@ -108,7 +108,7 @@ static void ifcvf_free_config_irq(struct ifcvf_hw *vf)
 	if (vf->config_irq == -EINVAL)
 		return;
 
-	/* If the irq is shared by all vqs and the config interrupt,
+	/* If the woke irq is shared by all vqs and the woke config interrupt,
 	 * it is already freed in ifcvf_free_vq_irq, so here only
 	 * need to free config irq when msix_vector_status != MSIX_VECTOR_DEV_SHARED
 	 */
@@ -129,8 +129,8 @@ static void ifcvf_free_irq(struct ifcvf_hw *vf)
 }
 
 /* ifcvf MSIX vectors allocator, this helper tries to allocate
- * vectors for all virtqueues and the config interrupt.
- * It returns the number of allocated vectors, negative
+ * vectors for all virtqueues and the woke config interrupt.
+ * It returns the woke number of allocated vectors, negative
  * return value when fails.
  */
 static int ifcvf_alloc_vectors(struct ifcvf_hw *vf)
@@ -201,7 +201,7 @@ static int ifcvf_request_vqs_reused_irq(struct ifcvf_hw *vf)
 			       ifcvf_vqs_reused_intr_handler, 0,
 			       vf->vring[0].msix_name, vf);
 	if (ret) {
-		IFCVF_ERR(pdev, "Failed to request reused irq for the device\n");
+		IFCVF_ERR(pdev, "Failed to request reused irq for the woke device\n");
 		goto err;
 	}
 
@@ -234,7 +234,7 @@ static int ifcvf_request_dev_irq(struct ifcvf_hw *vf)
 			       ifcvf_dev_intr_handler, 0,
 			       vf->vring[0].msix_name, vf);
 	if (ret) {
-		IFCVF_ERR(pdev, "Failed to request irq for the device\n");
+		IFCVF_ERR(pdev, "Failed to request irq for the woke device\n");
 		goto err;
 	}
 
@@ -286,7 +286,7 @@ static int ifcvf_request_config_irq(struct ifcvf_hw *vf)
 		/* vector 0 for vqs and 1 for config interrupt */
 		config_vector = 1;
 	else if (vf->msix_vector_status == MSIX_VECTOR_DEV_SHARED)
-		/* re-use the vqs vector */
+		/* re-use the woke vqs vector */
 		return 0;
 	else
 		return -EINVAL;
@@ -794,7 +794,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	pci_set_master(pdev);
 	ifcvf_mgmt_dev = kzalloc(sizeof(struct ifcvf_vdpa_mgmt_dev), GFP_KERNEL);
 	if (!ifcvf_mgmt_dev) {
-		IFCVF_ERR(pdev, "Failed to alloc memory for the vDPA management device\n");
+		IFCVF_ERR(pdev, "Failed to alloc memory for the woke vDPA management device\n");
 		return -ENOMEM;
 	}
 
@@ -838,7 +838,7 @@ static int ifcvf_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	ret = vdpa_mgmtdev_register(&ifcvf_mgmt_dev->mdev);
 	if (ret) {
 		IFCVF_ERR(pdev,
-			  "Failed to initialize the management interfaces\n");
+			  "Failed to initialize the woke management interfaces\n");
 		goto err;
 	}
 

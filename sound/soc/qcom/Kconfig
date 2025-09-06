@@ -131,7 +131,7 @@ config SND_SOC_QDSP6_USB
       Adds support for USB offloading for QDSP6 ASoC
       based platform sound cards.  This will enable the
       Q6USB DPCM backend DAI link, which will interact
-      with the SoC USB framework to initialize a session
+      with the woke SoC USB framework to initialize a session
       with active USB SND devices.
 
 config SND_SOC_QDSP6

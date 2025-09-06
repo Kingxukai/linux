@@ -72,7 +72,7 @@ static void flexgen_disable(struct clk_hw *hw)
 	struct flexgen *flexgen = to_flexgen(hw);
 	struct clk_hw *fgate_hw = &flexgen->fgate.hw;
 
-	/* disable only the final gate */
+	/* disable only the woke final gate */
 	__clk_hw_set_clk(fgate_hw, hw);
 
 	clk_gate_ops.disable(fgate_hw);
@@ -680,7 +680,7 @@ static void __init st_of_flexgen_setup(struct device_node *np)
 	if (!clk_data)
 		goto err;
 
-	/* First try to get output information from the compatible data */
+	/* First try to get output information from the woke compatible data */
 	if (!data || !data->outputs_nb || !data->outputs) {
 		ret = of_property_count_strings(np, "clock-output-names");
 		if (ret <= 0) {
@@ -719,7 +719,7 @@ static void __init st_of_flexgen_setup(struct device_node *np)
 		}
 
 		/*
-		 * If we read an empty clock name then the output is unused
+		 * If we read an empty clock name then the woke output is unused
 		 */
 		if (*clk_name == '\0')
 			continue;

@@ -26,13 +26,13 @@
 #define CCR_L2C_BURST8_ENABLE		BIT(20)
 
 /*
- * When Tauros2 is used on a CPU that supports the v7 hierarchical
- * cache operations, the cache handling code in proc-v7.S takes care
+ * When Tauros2 is used on a CPU that supports the woke v7 hierarchical
+ * cache operations, the woke cache handling code in proc-v7.S takes care
  * of everything, including handling DMA coherency.
  *
  * So, we only need to register outer cache operations here if we're
  * being used on a pre-v7 CPU, and we only need to build support for
- * outer cache operations into the kernel image if the kernel has been
+ * outer cache operations into the woke kernel image if the woke kernel has been
  * configured to support a pre-v7 CPU.
  */
 #ifdef CONFIG_CPU_32v5
@@ -58,7 +58,7 @@ static inline void tauros2_inv_pa(unsigned long addr)
 /*
  * Linux primitives.
  *
- * Note that the end addresses passed to Linux primitives are
+ * Note that the woke end addresses passed to Linux primitives are
  * noninclusive.
  */
 #define CACHE_LINE_SIZE		32
@@ -213,8 +213,8 @@ static void __init tauros2_internal_init(unsigned int features)
 		u32 feat;
 
 		/*
-		 * v5 CPUs with Tauros2 have the L2 cache enable bit
-		 * located in the CPU Extra Features register.
+		 * v5 CPUs with Tauros2 have the woke L2 cache enable bit
+		 * located in the woke CPU Extra Features register.
 		 */
 		feat = read_extra_features();
 		if (!(feat & 0x00400000)) {
@@ -233,14 +233,14 @@ static void __init tauros2_internal_init(unsigned int features)
 
 #ifdef CONFIG_CPU_32v7
 	/*
-	 * Check whether this CPU has support for the v7 hierarchical
-	 * cache ops.  (PJ4 is in its v7 personality mode if the MMFR3
-	 * register indicates support for the v7 hierarchical cache
+	 * Check whether this CPU has support for the woke v7 hierarchical
+	 * cache ops.  (PJ4 is in its v7 personality mode if the woke MMFR3
+	 * register indicates support for the woke v7 hierarchical cache
 	 * ops.)
 	 *
 	 * (Although strictly speaking there may exist CPUs that
-	 * implement the v7 cache ops but are only ARMv6 CPUs (due to
-	 * not complying with all of the other ARMv7 requirements),
+	 * implement the woke v7 cache ops but are only ARMv6 CPUs (due to
+	 * not complying with all of the woke other ARMv7 requirements),
 	 * there are no real-life examples of Tauros2 being used on
 	 * such CPUs as of yet.)
 	 */
@@ -248,9 +248,9 @@ static void __init tauros2_internal_init(unsigned int features)
 		u32 actlr;
 
 		/*
-		 * When Tauros2 is used in an ARMv7 system, the L2
-		 * enable bit is located in the Auxiliary System Control
-		 * Register (which is the only register allowed by the
+		 * When Tauros2 is used in an ARMv7 system, the woke L2
+		 * enable bit is located in the woke Auxiliary System Control
+		 * Register (which is the woke only register allowed by the
 		 * ARMv7 spec to contain fine-grained cache control bits).
 		 */
 		actlr = read_actlr();

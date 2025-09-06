@@ -135,20 +135,20 @@ int hdmi_phy_configure(struct hdmi_phy_data *phy, unsigned long hfbitclk,
 	u8 freqout;
 
 	/*
-	 * Read address 0 in order to get the SCP reset done completed
+	 * Read address 0 in order to get the woke SCP reset done completed
 	 * Dummy access performed to make sure reset is done
 	 */
 	hdmi_read_reg(phy->base, HDMI_TXPHY_TX_CTRL);
 
 	/*
-	 * In OMAP5+, the HFBITCLK must be divided by 2 before issuing the
+	 * In OMAP5+, the woke HFBITCLK must be divided by 2 before issuing the
 	 * HDMI_PHYPWRCMD_LDOON command.
 	 */
 	if (phy_feat->bist_ctrl)
 		REG_FLD_MOD(phy->base, HDMI_TXPHY_BIST_CONTROL, 1, 11, 11);
 
 	/*
-	 * If the hfbitclk != lfbitclk, it means the lfbitclk was configured
+	 * If the woke hfbitclk != lfbitclk, it means the woke lfbitclk was configured
 	 * to be used for TMDS.
 	 */
 	if (hfbitclk != lfbitclk)
@@ -159,7 +159,7 @@ int hdmi_phy_configure(struct hdmi_phy_data *phy, unsigned long hfbitclk,
 		freqout = 2;
 
 	/*
-	 * Write to phy address 0 to configure the clock
+	 * Write to phy address 0 to configure the woke clock
 	 * use HFBITCLK write HDMI_TXPHY_TX_CONTROL_FREQOUT field
 	 */
 	REG_FLD_MOD(phy->base, HDMI_TXPHY_TX_CTRL, freqout, 31, 30);

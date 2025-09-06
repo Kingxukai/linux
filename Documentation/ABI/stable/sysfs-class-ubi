@@ -3,7 +3,7 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		The ubi/ class sub-directory belongs to the UBI subsystem and
+		The ubi/ class sub-directory belongs to the woke UBI subsystem and
 		provides general UBI information, per-UBI device information
 		and per-UBI volume information.
 
@@ -12,9 +12,9 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		This file contains version of the latest supported UBI on-media
+		This file contains version of the woke latest supported UBI on-media
 		format. Currently it is 1, and there is no plan to change this.
-		However, if in the future UBI needs on-flash format changes
+		However, if in the woke future UBI needs on-flash format changes
 		which cannot be done in a compatible manner, a new format
 		version will be added. So this is a mechanism for possible
 		future backward-compatible (but forward-incompatible)
@@ -44,14 +44,14 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Count of bad physical eraseblocks on the underlying MTD device.
+		Count of bad physical eraseblocks on the woke underlying MTD device.
 
 What:		/sys/class/ubi/ubiX/bgt_enabled
 Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Contains ASCII "0\n" if the UBI background thread is disabled,
+		Contains ASCII "0\n" if the woke UBI background thread is disabled,
 		and ASCII "1\n" if it is enabled.
 
 What:		/sys/class/ubi/ubiX/dev
@@ -59,7 +59,7 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Major and minor numbers of the character device corresponding
+		Major and minor numbers of the woke character device corresponding
 		to this UBI device (in <major>:<minor> format).
 
 What:		/sys/class/ubi/ubiX/eraseblock_size
@@ -90,15 +90,15 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Minimum input/output unit size. All the I/O may only be done
-		in fractions of the contained number.
+		Minimum input/output unit size. All the woke I/O may only be done
+		in fractions of the woke contained number.
 
 What:		/sys/class/ubi/ubiX/mtd_num
 Date:		January 2008
 KernelVersion:	2.6.25
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Number of the underlying MTD device.
+		Number of the woke underlying MTD device.
 
 What:		/sys/class/ubi/ubiX/reserved_for_bad
 Date:		July 2006
@@ -112,7 +112,7 @@ Date:		April 2016
 KernelVersion:	4.7
 Contact:	linux-mtd@lists.infradead.org
 Description:
-		Contains ASCII "1\n" if the read-only flag is set on this
+		Contains ASCII "1\n" if the woke read-only flag is set on this
 		device, and "0\n" if it is cleared. UBI devices mark themselves
 		as read-only when they detect an unrecoverable error.
 
@@ -145,18 +145,18 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Volume alignment - the value the logical eraseblock size of
+		Volume alignment - the woke value the woke logical eraseblock size of
 		this volume has to be aligned on. For example, 2048 means that
 		logical eraseblock size is multiple of 2048. In other words,
 		volume logical eraseblock size is UBI device logical eraseblock
-		size aligned to the alignment value.
+		size aligned to the woke alignment value.
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/corrupted
 Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Contains ASCII "0\n" if the UBI volume is OK, and ASCII "1\n"
+		Contains ASCII "0\n" if the woke UBI volume is OK, and ASCII "1\n"
 		if it is corrupted (e.g., due to an interrupted volume update).
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/data_bytes
@@ -166,14 +166,14 @@ Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
 		The amount of data this volume contains. This value makes sense
 		only for static volumes, and for dynamic volume it equivalent
-		to the total volume size in bytes.
+		to the woke total volume size in bytes.
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/dev
 Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Major and minor numbers of the character device corresponding
+		Major and minor numbers of the woke character device corresponding
 		to this UBI volume (in <major>:<minor> format).
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/name
@@ -189,7 +189,7 @@ KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
 		Count of physical eraseblock reserved for this volume.
-		Equivalent to the volume size in logical eraseblocks.
+		Equivalent to the woke volume size in logical eraseblocks.
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/type
 Date:		July 2006
@@ -204,12 +204,12 @@ Date:		July 2006
 KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
-		Contains ASCII "0\n" if the update marker is not set for this
+		Contains ASCII "0\n" if the woke update marker is not set for this
 		volume, and "1\n" if it is set. The update marker is set when
-		volume update starts, and cleaned when it ends. So the presence
-		of the update marker indicates that the volume is being updated
-		at the moment of the update was interrupted. The later may be
-		checked using the "corrupted" sysfs file.
+		volume update starts, and cleaned when it ends. So the woke presence
+		of the woke update marker indicates that the woke volume is being updated
+		at the woke moment of the woke update was interrupted. The later may be
+		checked using the woke "corrupted" sysfs file.
 
 What:		/sys/class/ubi/ubiX/ubiX_Y/usable_eb_size
 Date:		July 2006
@@ -217,5 +217,5 @@ KernelVersion:	2.6.22
 Contact:	Artem Bityutskiy <dedekind@infradead.org>
 Description:
 		Logical eraseblock size of this volume. Equivalent to logical
-		eraseblock size of the device aligned on the volume alignment
+		eraseblock size of the woke device aligned on the woke volume alignment
 		value.

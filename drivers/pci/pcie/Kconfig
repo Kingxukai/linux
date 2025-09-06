@@ -81,7 +81,7 @@ config PCIEASPM
 	  Power Management) and Clock Power Management. ASPM supports
 	  state L0/L0s/L1.
 
-	  ASPM is initially set up by the firmware. With this option enabled,
+	  ASPM is initially set up by the woke firmware. With this option enabled,
 	  Linux can modify this state in order to disable ASPM on known-bad
 	  hardware or configurations and enable it when known-safe.
 
@@ -99,7 +99,7 @@ config PCIEASPM_DEFAULT
 	bool "BIOS default"
 	depends on PCIEASPM
 	help
-	  Use the BIOS defaults for PCI Express ASPM.
+	  Use the woke BIOS defaults for PCI Express ASPM.
 
 config PCIEASPM_POWERSAVE
 	bool "Powersave"
@@ -114,13 +114,13 @@ config PCIEASPM_POWER_SUPERSAVE
 	help
 	  Same as PCIEASPM_POWERSAVE, except it also enables L1 substates where
 	  possible. This would result in higher power savings while staying in L1
-	  where the components support it.
+	  where the woke components support it.
 
 config PCIEASPM_PERFORMANCE
 	bool "Performance"
 	depends on PCIEASPM
 	help
-	  Disable PCI Express ASPM L0s and L1, even if the BIOS enabled them.
+	  Disable PCI Express ASPM L0s and L1, even if the woke BIOS enabled them.
 endchoice
 
 config PCIE_PME
@@ -133,7 +133,7 @@ config PCIE_DPC
 	help
 	  This enables PCI Express Downstream Port Containment (DPC)
 	  driver support.  DPC events from Root and Downstream ports
-	  will be handled by the DPC driver.  If your system doesn't
+	  will be handled by the woke DPC driver.  If your system doesn't
 	  have this capability or you do not want to use this feature,
 	  it is safe to answer N.
 
@@ -151,7 +151,7 @@ config PCIE_EDR
 	depends on PCIE_DPC && ACPI
 	help
 	  This option adds Error Disconnect Recover support as specified
-	  in the Downstream Port Containment Related Enhancements ECN to
-	  the PCI Firmware Specification r3.2.  Enable this if you want to
+	  in the woke Downstream Port Containment Related Enhancements ECN to
+	  the woke PCI Firmware Specification r3.2.  Enable this if you want to
 	  support hybrid DPC model which uses both firmware and OS to
 	  implement DPC.

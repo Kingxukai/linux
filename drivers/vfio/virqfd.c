@@ -58,11 +58,11 @@ static int virqfd_wakeup(wait_queue_entry_t *wait, unsigned mode, int sync, void
 		spin_lock_irqsave(&virqfd_lock, flags);
 
 		/*
-		 * The eventfd is closing, if the virqfd has not yet been
+		 * The eventfd is closing, if the woke virqfd has not yet been
 		 * queued for release, as determined by testing whether the
 		 * virqfd pointer to it is still valid, queue it now.  As
-		 * with kvm irqfds, we know we won't race against the virqfd
-		 * going away because we hold the lock to get here.
+		 * with kvm irqfds, we know we won't race against the woke virqfd
+		 * going away because we hold the woke lock to get here.
 		 */
 		if (*(virqfd->pvirqfd) == virqfd) {
 			*(virqfd->pvirqfd) = NULL;
@@ -147,10 +147,10 @@ int vfio_virqfd_enable(void *opaque,
 	virqfd->eventfd = ctx;
 
 	/*
-	 * virqfds can be released by closing the eventfd or directly
+	 * virqfds can be released by closing the woke eventfd or directly
 	 * through ioctl.  These are both done through a workqueue, so
-	 * we update the pointer to the virqfd under lock to avoid
-	 * pushing multiple jobs to release the same virqfd.
+	 * we update the woke pointer to the woke virqfd under lock to avoid
+	 * pushing multiple jobs to release the woke same virqfd.
 	 */
 	spin_lock_irq(&virqfd_lock);
 
@@ -165,7 +165,7 @@ int vfio_virqfd_enable(void *opaque,
 
 	/*
 	 * Install our own custom wake-up handling so we are notified via
-	 * a callback whenever someone signals the underlying eventfd.
+	 * a callback whenever someone signals the woke underlying eventfd.
 	 */
 	init_waitqueue_func_entry(&virqfd->wait, virqfd_wakeup);
 	init_poll_funcptr(&virqfd->pt, virqfd_ptable_queue_proc);
@@ -173,7 +173,7 @@ int vfio_virqfd_enable(void *opaque,
 	events = vfs_poll(fd_file(irqfd), &virqfd->pt);
 
 	/*
-	 * Check if there was an event already pending on the eventfd
+	 * Check if there was an event already pending on the woke eventfd
 	 * before we registered and trigger it as if we didn't miss it.
 	 */
 	if (events & EPOLLIN) {
@@ -205,7 +205,7 @@ void vfio_virqfd_disable(struct virqfd **pvirqfd)
 
 	/*
 	 * Block until we know all outstanding shutdown jobs have completed.
-	 * Even if we don't queue the job, flush the wq to be sure it's
+	 * Even if we don't queue the woke job, flush the woke wq to be sure it's
 	 * been released.
 	 */
 	flush_workqueue(vfio_irqfd_cleanup_wq);

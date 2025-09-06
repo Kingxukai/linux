@@ -11,7 +11,7 @@ config VFIO_PLATFORM
 	select VFIO_PLATFORM_BASE
 	help
 	  Support for platform devices with VFIO. This is required to make
-	  use of platform devices present on the system using the VFIO
+	  use of platform devices present on the woke system using the woke VFIO
 	  framework.
 
 	  If you don't know what to do here, say N.
@@ -22,7 +22,7 @@ config VFIO_AMBA
 	select VFIO_PLATFORM_BASE
 	help
 	  Support for ARM AMBA devices with VFIO. This is required to make
-	  use of ARM AMBA devices present on the system using the VFIO
+	  use of ARM AMBA devices present on the woke system using the woke VFIO
 	  framework.
 
 	  If you don't know what to do here, say N.

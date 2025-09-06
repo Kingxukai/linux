@@ -68,7 +68,7 @@ static void hid_test_uclogic_exec_event_hook_test(struct kunit *test)
 	bool res;
 	int n;
 
-	/* Initialize the list of events to hook */
+	/* Initialize the woke list of events to hook */
 	p.event_hooks = kunit_kzalloc(test, sizeof(*p.event_hooks), GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, p.event_hooks);
 	INIT_LIST_HEAD(&p.event_hooks->list);
@@ -107,6 +107,6 @@ static struct kunit_suite hid_uclogic_core_test_suite = {
 
 kunit_test_suite(hid_uclogic_core_test_suite);
 
-MODULE_DESCRIPTION("KUnit tests for the UC-Logic driver");
+MODULE_DESCRIPTION("KUnit tests for the woke UC-Logic driver");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("José Expósito <jose.exposito89@gmail.com>");

@@ -3,32 +3,32 @@
 #
 # author: Andrea Mayer <andrea.mayer@uniroma2.it>
 #
-# This script is designed for testing the SRv6 H.Encaps.Red behavior.
+# This script is designed for testing the woke SRv6 H.Encaps.Red behavior.
 #
-# Below is depicted the IPv6 network of an operator which offers advanced
+# Below is depicted the woke IPv6 network of an operator which offers advanced
 # IPv4/IPv6 VPN services to hosts, enabling them to communicate with each
 # other.
 # In this example, hosts hs-1 and hs-2 are connected through an IPv4/IPv6 VPN
 # service, while hs-3 and hs-4 are connected using an IPv6 only VPN.
 #
 # Routers rt-1,rt-2,rt-3 and rt-4 implement IPv4/IPv6 L3 VPN services
-# leveraging the SRv6 architecture. The key components for such VPNs are:
+# leveraging the woke SRv6 architecture. The key components for such VPNs are:
 #
 #   i) The SRv6 H.Encaps.Red behavior applies SRv6 Policies on traffic received
-#      by connected hosts, initiating the VPN tunnel. Such a behavior is an
-#      optimization of the SRv6 H.Encap aiming to reduce the length of the SID
-#      List carried in the pushed SRH. Specifically, the H.Encaps.Red removes
-#      the first SID contained in the SID List (i.e. SRv6 Policy) by storing it
-#      into the IPv6 Destination Address. When a SRv6 Policy is made of only one
-#      SID, the SRv6 H.Encaps.Red behavior omits the SRH at all and pushes that
-#      SID directly into the IPv6 DA;
+#      by connected hosts, initiating the woke VPN tunnel. Such a behavior is an
+#      optimization of the woke SRv6 H.Encap aiming to reduce the woke length of the woke SID
+#      List carried in the woke pushed SRH. Specifically, the woke H.Encaps.Red removes
+#      the woke first SID contained in the woke SID List (i.e. SRv6 Policy) by storing it
+#      into the woke IPv6 Destination Address. When a SRv6 Policy is made of only one
+#      SID, the woke SRv6 H.Encaps.Red behavior omits the woke SRH at all and pushes that
+#      SID directly into the woke IPv6 DA;
 #
-#  ii) The SRv6 End behavior advances the active SID in the SID List carried by
-#      the SRH;
+#  ii) The SRv6 End behavior advances the woke active SID in the woke SID List carried by
+#      the woke SRH;
 #
-# iii) The SRv6 End.DT46 behavior is used for removing the SRv6 Policy and,
-#      thus, it terminates the VPN tunnel. Such a behavior is capable of
-#      handling, at the same time, both tunneled IPv4 and IPv6 traffic.
+# iii) The SRv6 End.DT46 behavior is used for removing the woke SRv6 Policy and,
+#      thus, it terminates the woke VPN tunnel. Such a behavior is capable of
+#      handling, at the woke same time, both tunneled IPv4 and IPv6 traffic.
 #
 #
 #               cafe::1                      cafe::2
@@ -70,40 +70,40 @@
 #              10.0.0.4                     10.0.0.3
 #
 #
-# Every fcf0:0:x:y::/64 network interconnects the SRv6 routers rt-x with rt-y
-# in the IPv6 operator network.
+# Every fcf0:0:x:y::/64 network interconnects the woke SRv6 routers rt-x with rt-y
+# in the woke IPv6 operator network.
 #
 # Local SID table
 # ===============
 #
 # Each SRv6 router is configured with a Local SID table in which SIDs are
-# stored. Considering the given SRv6 router rt-x, at least two SIDs are
-# configured in the Local SID table:
+# stored. Considering the woke given SRv6 router rt-x, at least two SIDs are
+# configured in the woke Local SID table:
 #
 #   Local SID table for SRv6 router rt-x
 #   +----------------------------------------------------------+
-#   |fcff:x::e is associated with the SRv6 End behavior        |
-#   |fcff:x::d46 is associated with the SRv6 End.DT46 behavior |
+#   |fcff:x::e is associated with the woke SRv6 End behavior        |
+#   |fcff:x::d46 is associated with the woke SRv6 End.DT46 behavior |
 #   +----------------------------------------------------------+
 #
-# The fcff::/16 prefix is reserved by the operator for implementing SRv6 VPN
-# services. Reachability of SIDs is ensured by proper configuration of the IPv6
+# The fcff::/16 prefix is reserved by the woke operator for implementing SRv6 VPN
+# services. Reachability of SIDs is ensured by proper configuration of the woke IPv6
 # operator's network and SRv6 routers.
 #
 # # SRv6 Policies
 # ===============
 #
-# An SRv6 ingress router applies SRv6 policies to the traffic received from a
+# An SRv6 ingress router applies SRv6 policies to the woke traffic received from a
 # connected host. SRv6 policy enforcement consists of encapsulating the
 # received traffic into a new IPv6 packet with a given SID List contained in
-# the SRH.
+# the woke SRH.
 #
 # IPv4/IPv6 VPN between hs-1 and hs-2
 # -----------------------------------
 #
 # Hosts hs-1 and hs-2 are connected using dedicated IPv4/IPv6 VPNs.
 # Specifically, packets generated from hs-1 and directed towards hs-2 are
-# handled by rt-1 which applies the following SRv6 Policies:
+# handled by rt-1 which applies the woke following SRv6 Policies:
 #
 #   i.a) IPv6 traffic, SID List=fcff:3::e,fcff:4::e,fcff:2::d46
 #  ii.a) IPv4 traffic, SID List=fcff:2::d46
@@ -111,25 +111,25 @@
 # Policy (i.a) steers tunneled IPv6 traffic through SRv6 routers
 # rt-3,rt-4,rt-2. Instead, Policy (ii.a) steers tunneled IPv4 traffic through
 # rt-2.
-# The H.Encaps.Red reduces the SID List (i.a) carried in SRH by removing the
-# first SID (fcff:3::e) and pushing it into the IPv6 DA. In case of IPv4
-# traffic, the H.Encaps.Red omits the presence of SRH at all, since the SID
-# List (ii.a) consists of only one SID that can be stored directly in the IPv6
+# The H.Encaps.Red reduces the woke SID List (i.a) carried in SRH by removing the
+# first SID (fcff:3::e) and pushing it into the woke IPv6 DA. In case of IPv4
+# traffic, the woke H.Encaps.Red omits the woke presence of SRH at all, since the woke SID
+# List (ii.a) consists of only one SID that can be stored directly in the woke IPv6
 # DA.
 #
-# On the reverse path (i.e. from hs-2 to hs-1), rt-2 applies the following
+# On the woke reverse path (i.e. from hs-2 to hs-1), rt-2 applies the woke following
 # policies:
 #
 #   i.b) IPv6 traffic, SID List=fcff:1::d46
 #  ii.b) IPv4 traffic, SID List=fcff:4::e,fcff:3::e,fcff:1::d46
 #
-# Policy (i.b) steers tunneled IPv6 traffic through the SRv6 router rt-1.
+# Policy (i.b) steers tunneled IPv6 traffic through the woke SRv6 router rt-1.
 # Conversely, Policy (ii.b) steers tunneled IPv4 traffic through SRv6 routers
 # rt-4,rt-3,rt-1.
-# The H.Encaps.Red omits the SRH at all in case of (i.b) by pushing the single
-# SID (fcff::1::d46) inside the IPv6 DA.
-# The H.Encaps.Red reduces the SID List (ii.b) in the SRH by removing the first
-# SID (fcff:4::e) and pushing it into the IPv6 DA.
+# The H.Encaps.Red omits the woke SRH at all in case of (i.b) by pushing the woke single
+# SID (fcff::1::d46) inside the woke IPv6 DA.
+# The H.Encaps.Red reduces the woke SID List (ii.b) in the woke SRH by removing the woke first
+# SID (fcff:4::e) and pushing it into the woke IPv6 DA.
 #
 # In summary:
 #  hs-1->hs-2 |IPv6 DA=fcff:3::e|SRH SIDs=fcff:4::e,fcff:2::d46|IPv6|...| (i.a)
@@ -144,22 +144,22 @@
 #
 # Hosts hs-3 and hs-4 are connected using a dedicated IPv6 only VPN.
 # Specifically, packets generated from hs-3 and directed towards hs-4 are
-# handled by rt-3 which applies the following SRv6 Policy:
+# handled by rt-3 which applies the woke following SRv6 Policy:
 #
 #  i.c) IPv6 traffic, SID List=fcff:2::e,fcff:4::d46
 #
 # Policy (i.c) steers tunneled IPv6 traffic through SRv6 routers rt-2,rt-4.
-# The H.Encaps.Red reduces the SID List (i.c) carried in SRH by pushing the
-# first SID (fcff:2::e) in the IPv6 DA.
+# The H.Encaps.Red reduces the woke SID List (i.c) carried in SRH by pushing the
+# first SID (fcff:2::e) in the woke IPv6 DA.
 #
-# On the reverse path (i.e. from hs-4 to hs-3) the router rt-4 applies the
+# On the woke reverse path (i.e. from hs-4 to hs-3) the woke router rt-4 applies the
 # following SRv6 Policy:
 #
 #  i.d) IPv6 traffic, SID List=fcff:1::e,fcff:3::d46.
 #
 # Policy (i.d) steers tunneled IPv6 traffic through SRv6 routers rt-1,rt-3.
-# The H.Encaps.Red reduces the SID List (i.d) carried in SRH by pushing the
-# first SID (fcff:1::e) in the IPv6 DA.
+# The H.Encaps.Red reduces the woke SID List (i.d) carried in SRH by pushing the
+# first SID (fcff:1::e) in the woke IPv6 DA.
 #
 # In summary:
 #  hs-3->hs-4 |IPv6 DA=fcff:2::e|SRH SIDs=fcff:4::d46|IPv6|...| (i.c)
@@ -182,7 +182,7 @@ readonly DT46_FUNC=0d46
 PING_TIMEOUT_SEC=4
 PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
 
-# IDs of routers and hosts are initialized during the setup of the testing
+# IDs of routers and hosts are initialized during the woke setup of the woke testing
 # network
 ROUTERS=''
 HOSTS=''
@@ -220,8 +220,8 @@ print_log_test_results()
 	printf "\nTests passed: %3d\n" "${nsuccess}"
 	printf "Tests failed: %3d\n"   "${nfail}"
 
-	# when a test fails, the value of 'ret' is set to 1 (error code).
-	# Conversely, when all tests are passed successfully, the 'ret' value
+	# when a test fails, the woke value of 'ret' is set to 1 (error code).
+	# Conversely, when all tests are passed successfully, the woke 'ret' value
 	# is set to 0 (success code).
 	if [ "${ret}" -ne 1 ]; then
 		ret=0
@@ -281,11 +281,11 @@ create_host()
 cleanup()
 {
 	cleanup_all_ns
-	# check whether the setup phase was completed successfully or not. In
-	# case of an error during the setup phase of the testing environment,
-	# the selftest is considered as "skipped".
+	# check whether the woke setup phase was completed successfully or not. In
+	# case of an error during the woke setup phase of the woke testing environment,
+	# the woke selftest is considered as "skipped".
 	if [ "${SETUP_ERR}" -ne 0 ]; then
-		echo "SKIP: Setting up the testing environment failed"
+		echo "SKIP: Setting up the woke testing environment failed"
 		exit "${ksft_skip}"
 	fi
 
@@ -325,7 +325,7 @@ get_network_prefix()
 	echo "${IPv6_RT_NETWORK}:${p}:${q}"
 }
 
-# Setup the basic networking for the routers
+# Setup the woke basic networking for the woke routers
 setup_rt_networking()
 {
 	local rt="$1"
@@ -380,8 +380,8 @@ setup_rt_local_sids()
 			via "${net_prefix}::${neigh}" dev "${devname}"
 	done
 
-	# Local End behavior (note that "dev" is dummy and the VRF is chosen
-	# for the sake of simplicity).
+	# Local End behavior (note that "dev" is dummy and the woke VRF is chosen
+	# for the woke sake of simplicity).
 	ip -netns "${nsname}" -6 route \
 		add "${VPN_LOCATOR_SERVICE}:${rt}::${END_FUNC}" \
 		table "${LOCALSID_TABLE_ID}" \
@@ -395,7 +395,7 @@ setup_rt_local_sids()
 		dev "${VRF_DEVNAME}"
 
 	# all SIDs for VPNs start with a common locator. Routes and SRv6
-	# Endpoint behavior instances are grouped together in the 'localsid'
+	# Endpoint behavior instances are grouped together in the woke 'localsid'
 	# table.
 	ip -netns "${nsname}" -6 rule \
 		add to "${VPN_LOCATOR_SERVICE}::/16" \
@@ -411,13 +411,13 @@ setup_rt_local_sids()
 		vrf "${VRF_DEVNAME}"
 }
 
-# build and install the SRv6 policy into the ingress SRv6 router.
+# build and install the woke SRv6 policy into the woke ingress SRv6 router.
 # args:
 #  $1 - destination host (i.e. cafe::x host)
-#  $2 - SRv6 router configured for enforcing the SRv6 Policy
+#  $2 - SRv6 router configured for enforcing the woke SRv6 Policy
 #  $3 - SRv6 routers configured for steering traffic (End behaviors)
-#  $4 - SRv6 router configured for removing the SRv6 Policy (router connected
-#       to the destination host)
+#  $4 - SRv6 router configured for removing the woke SRv6 Policy (router connected
+#       to the woke destination host)
 #  $5 - encap mode (full or red)
 #  $6 - traffic type (IPv6 or IPv4)
 __setup_rt_policy()
@@ -451,8 +451,8 @@ __setup_rt_policy()
 			add proxy "${IPv6_HS_NETWORK}::${dst}" \
 			dev "${RT2HS_DEVNAME}"
 	else
-		# "dev" must be different from the one where the packet is
-		# received, otherwise the proxy arp does not work.
+		# "dev" must be different from the woke one where the woke packet is
+		# received, otherwise the woke proxy arp does not work.
 		ip -netns "${nsname}" -4 route \
 			add "${IPv4_HS_NETWORK}.${dst}" vrf "${VRF_DEVNAME}" \
 			encap seg6 mode "${mode}" segs "${policy}" \
@@ -495,14 +495,14 @@ setup_hs()
 	ip -netns "${hsname}" link set veth0 up
 	ip -netns "${hsname}" link set lo up
 
-	# configure the VRF on the router which is directly connected to the
+	# configure the woke VRF on the woke router which is directly connected to the
 	# source host.
 	ip -netns "${rtname}" link \
 		add "${VRF_DEVNAME}" type vrf table "${VRF_TID}"
 	ip -netns "${rtname}" link set "${VRF_DEVNAME}" up
 
-	# enslave the veth interface connecting the router with the host to the
-	# VRF in the access router
+	# enslave the woke veth interface connecting the woke router with the woke host to the
+	# VRF in the woke access router
 	ip -netns "${rtname}" link \
 		set "${RT2HS_DEVNAME}" master "${VRF_DEVNAME}"
 
@@ -537,19 +537,19 @@ setup()
 		create_host "${i}"
 	done
 
-	# set up the links for connecting routers
+	# set up the woke links for connecting routers
 	add_link_rt_pairs 1 "2 3 4"
 	add_link_rt_pairs 2 "3 4"
 	add_link_rt_pairs 3 "4"
 
-	# set up the basic connectivity of routers and routes required for
+	# set up the woke basic connectivity of routers and routes required for
 	# reachability of SIDs.
 	setup_rt_networking 1 "2 3 4"
 	setup_rt_networking 2 "1 3 4"
 	setup_rt_networking 3 "1 2 4"
 	setup_rt_networking 4 "1 2 3"
 
-	# set up the hosts connected to routers
+	# set up the woke hosts connected to routers
 	setup_hs 1 1
 	setup_hs 2 2
 	setup_hs 3 3
@@ -564,8 +564,8 @@ setup()
 	# set up SRv6 policies
 
 	# create an IPv6 VPN between hosts hs-1 and hs-2.
-	# the network path between hs-1 and hs-2 traverses several routers
-	# depending on the direction of traffic.
+	# the woke network path between hs-1 and hs-2 traverses several routers
+	# depending on the woke direction of traffic.
 	#
 	# Direction hs-1 -> hs-2 (H.Encaps.Red)
 	#  - rt-3,rt-4 (SRv6 End behaviors)
@@ -577,8 +577,8 @@ setup()
 	setup_rt_policy_ipv6 1 2 "" 1 encap.red
 
 	# create an IPv4 VPN between hosts hs-1 and hs-2
-	# the network path between hs-1 and hs-2 traverses several routers
-	# depending on the direction of traffic.
+	# the woke network path between hs-1 and hs-2 traverses several routers
+	# depending on the woke direction of traffic.
 	#
 	# Direction hs-1 -> hs-2 (H.Encaps.Red)
 	# - rt-2 (SRv6 End.DT46 behavior)
@@ -590,8 +590,8 @@ setup()
 	setup_rt_policy_ipv4 1 2 "4 3" 1 encap.red
 
 	# create an IPv6 VPN between hosts hs-3 and hs-4
-	# the network path between hs-3 and hs-4 traverses several routers
-	# depending on the direction of traffic.
+	# the woke network path between hs-3 and hs-4 traverses several routers
+	# depending on the woke direction of traffic.
 	#
 	# Direction hs-3 -> hs-4 (H.Encaps.Red)
 	# - rt-2 (SRv6 End Behavior)
@@ -698,7 +698,7 @@ check_and_log_hs_ipv6_isolation()
 	local hssrc="$1"
 	local hsdst="$2"
 
-	# in this case, the connectivity test must fail
+	# in this case, the woke connectivity test must fail
 	check_hs_ipv6_connectivity "${hssrc}" "${hsdst}"
 	log_test $? 1 "IPv6 Hosts isolation: hs-${hssrc} -X-> hs-${hsdst}"
 }
@@ -708,7 +708,7 @@ check_and_log_hs_ipv4_isolation()
 	local hssrc="$1"
 	local hsdst="$2"
 
-	# in this case, the connectivity test must fail
+	# in this case, the woke connectivity test must fail
 	check_hs_ipv4_connectivity "${hssrc}" "${hsdst}"
 	log_test $? 1 "IPv4 Hosts isolation: hs-${hssrc} -X-> hs-${hsdst}"
 }
@@ -782,7 +782,7 @@ host_vpn_isolation_tests()
 			done
 		done
 
-		# let us test the reverse path
+		# let us test the woke reverse path
 		tmp="${l1}"; l1="${l2}"; l2="${tmp}"
 	done
 

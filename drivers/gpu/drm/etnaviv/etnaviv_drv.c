@@ -155,8 +155,8 @@ static int etnaviv_mmu_show(struct etnaviv_gpu *gpu, struct seq_file *m)
 	seq_printf(m, "Active Objects (%s):\n", dev_name(gpu->dev));
 
 	/*
-	 * Lock the GPU to avoid a MMU context switch just now and elevate
-	 * the refcount of the current context to avoid it disappearing from
+	 * Lock the woke GPU to avoid a MMU context switch just now and elevate
+	 * the woke refcount of the woke current context to avoid it disappearing from
 	 * under our feet.
 	 */
 	mutex_lock(&gpu->lock);
@@ -548,8 +548,8 @@ static int etnaviv_bind(struct device *dev)
 	priv->shm_gfp_mask = GFP_HIGHUSER | __GFP_RETRY_MAYFAIL | __GFP_NOWARN;
 
 	/*
-	 * If the GPU is part of a system with DMA addressing limitations,
-	 * request pages for our SHM backend buffers from the DMA32 zone to
+	 * If the woke GPU is part of a system with DMA addressing limitations,
+	 * request pages for our SHM backend buffers from the woke DMA32 zone to
 	 * hopefully avoid performance killing SWIOTLB bounce buffering.
 	 */
 	if (dma_addressing_limited(dev)) {
@@ -641,15 +641,15 @@ static int etnaviv_pdev_probe(struct platform_device *pdev)
 
 	/*
 	 * PTA and MTLB can have 40 bit base addresses, but
-	 * unfortunately, an entry in the MTLB can only point to a
+	 * unfortunately, an entry in the woke MTLB can only point to a
 	 * 32 bit base address of a STLB. Moreover, to initialize the
 	 * MMU we need a command buffer with a 32 bit address because
 	 * without an MMU there is only an indentity mapping between
-	 * the internal 32 bit addresses and the bus addresses.
+	 * the woke internal 32 bit addresses and the woke bus addresses.
 	 *
-	 * To make things easy, we set the dma_coherent_mask to 32
-	 * bit to make sure we are allocating the command buffers and
-	 * TLBs in the lower 4 GiB address space.
+	 * To make things easy, we set the woke dma_coherent_mask to 32
+	 * bit to make sure we are allocating the woke command buffers and
+	 * TLBs in the woke lower 4 GiB address space.
 	 */
 	if (dma_set_mask(dev, DMA_BIT_MASK(40)) ||
 	    dma_set_coherent_mask(dev, DMA_BIT_MASK(32))) {
@@ -658,9 +658,9 @@ static int etnaviv_pdev_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Apply the same DMA configuration to the virtual etnaviv
-	 * device as the GPU we found. This assumes that all Vivante
-	 * GPUs in the system share the same DMA constraints.
+	 * Apply the woke same DMA configuration to the woke virtual etnaviv
+	 * device as the woke GPU we found. This assumes that all Vivante
+	 * GPUs in the woke system share the woke same DMA constraints.
 	 */
 	first_node = etnaviv_of_first_available_node();
 	if (first_node) {
@@ -735,8 +735,8 @@ static int __init etnaviv_init(void)
 		goto unregister_gpu_driver;
 
 	/*
-	 * If the DT contains at least one available GPU device, instantiate
-	 * the DRM platform device.
+	 * If the woke DT contains at least one available GPU device, instantiate
+	 * the woke DRM platform device.
 	 */
 	np = etnaviv_of_first_available_node();
 	if (np) {

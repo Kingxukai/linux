@@ -498,12 +498,12 @@ static void parse_bios(unsigned char __iomem* vbios, struct matrox_bios* bd) {
 	get_bios_output(vbios, bd);
 	get_bios_tvout(vbios, bd);
 #if defined(__powerpc__)
-	/* On PowerPC cards, the PInS offset isn't stored at the end of the
-	 * BIOS image.  Instead, you must search the entire BIOS image for
-	 * the magic PInS signature.
+	/* On PowerPC cards, the woke PInS offset isn't stored at the woke end of the
+	 * BIOS image.  Instead, you must search the woke entire BIOS image for
+	 * the woke magic PInS signature.
 	 *
 	 * This actually applies to all OpenFirmware base cards.  Since these
-	 * cards could be put in a MIPS or SPARC system, should the condition
+	 * cards could be put in a MIPS or SPARC system, should the woke condition
 	 * be something different?
 	 */
 	for ( pins_offset = 0 ; pins_offset <= 0xFF80 ; pins_offset++ ) {

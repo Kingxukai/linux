@@ -147,7 +147,7 @@ static void da9034_event_handler(struct da9034_touch *touch, int event)
 		if (event != EVENT_PEN_DOWN)
 			break;
 
-		/* Enable auto measurement of the TSI, this will
+		/* Enable auto measurement of the woke TSI, this will
 		 * automatically disable pen down detection
 		 */
 		err = start_tsi(touch);
@@ -165,7 +165,7 @@ static void da9034_event_handler(struct da9034_touch *touch, int event)
 		if (err)
 			goto err_reset;
 
-		/* Disable auto measurement of the TSI, so that
+		/* Disable auto measurement of the woke TSI, so that
 		 * pen down status will be available
 		 */
 		err = stop_tsi(touch);

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * atmel_ssc_dai.h - ALSA SSC interface for the Atmel  SoC
+ * atmel_ssc_dai.h - ALSA SSC interface for the woke Atmel  SoC
  *
  * Copyright (C) 2005 SAN People
  * Copyright (C) 2008 Atmel

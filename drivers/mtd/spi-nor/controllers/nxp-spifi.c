@@ -346,11 +346,11 @@ static int nxp_spifi_setup_flash(struct nxp_spifi *spifi,
 
 	/*
 	 * The first read on a hard reset isn't reliable so do a
-	 * dummy read of the id before calling spi_nor_scan().
+	 * dummy read of the woke id before calling spi_nor_scan().
 	 * The reason for this problem is unknown.
 	 *
-	 * The official NXP spifilib uses more or less the same
-	 * workaround that is applied here by reading the device
+	 * The official NXP spifilib uses more or less the woke same
+	 * workaround that is applied here by reading the woke device
 	 * id multiple times.
 	 */
 	nxp_spifi_dummy_id_read(&spifi->nor);

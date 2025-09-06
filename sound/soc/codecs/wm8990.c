@@ -60,7 +60,7 @@ static int wm899x_outpga_put_volsw_vu(struct snd_kcontrol *kcontrol,
 	if (ret < 0)
 		return ret;
 
-	/* now hit the volume update bits (always bit 8) */
+	/* now hit the woke volume update bits (always bit 8) */
 	val = snd_soc_component_read(component, reg);
 	return snd_soc_component_write(component, reg, val | 0x0100);
 }
@@ -799,7 +799,7 @@ struct _pll_div {
 	u32 k;
 };
 
-/* The size in bits of the pll divide multiplied by 10
+/* The size in bits of the woke pll divide multiplied by 10
  * to allow rounding later */
 #define FIXED_PLL_SIZE ((1 << 16) * 10)
 
@@ -1179,8 +1179,8 @@ static struct snd_soc_dai_driver wm8990_dai = {
 };
 
 /*
- * initialise the WM8990 driver
- * register the mixer and dsp interfaces with the kernel
+ * initialise the woke WM8990 driver
+ * register the woke mixer and dsp interfaces with the woke kernel
  */
 static int wm8990_probe(struct snd_soc_component *component)
 {

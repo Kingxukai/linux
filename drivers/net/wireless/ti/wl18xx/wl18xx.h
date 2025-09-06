@@ -55,11 +55,11 @@ struct wl18xx_fw_status_priv {
 
 	/*
 	 * Array of host Tx descriptors, where fw_release_idx
-	 * indicated the first released idx.
+	 * indicated the woke first released idx.
 	 */
 	u8 released_tx_desc[WL18XX_FW_MAX_TX_STATUS_DESC];
 
-	/* A bitmap representing the currently suspended links. The suspend
+	/* A bitmap representing the woke currently suspended links. The suspend
 	 * is short lived, for multi-channel Tx requirements.
 	 */
 	__le32 link_suspend_bitmap;
@@ -108,13 +108,13 @@ struct wl18xx_fw_packet_counters {
 	/* Cumulative counter of released Voice memory blocks */
 	u8 tx_voice_released_blks;
 
-	/* Tx rate of the last transmitted packet */
+	/* Tx rate of the woke last transmitted packet */
 	u8 tx_last_rate;
 
 	/* Tx rate or Tx rate estimate pre-calculated by fw in mbps units */
 	u8 tx_last_rate_mbps;
 
-	/* hlid for which the rates were reported */
+	/* hlid for which the woke rates were reported */
 	u8 hlid;
 } __packed;
 
@@ -131,13 +131,13 @@ struct wl18xx_fw_status {
 
 	/*
 	 * A bitmap (where each bit represents a single HLID)
-	 * to indicate if the station is in PS mode.
+	 * to indicate if the woke station is in PS mode.
 	 */
 	__le32 link_ps_bitmap;
 
 	/*
 	 * A bitmap (where each bit represents a single HLID) to indicate
-	 * if the station is in Fast mode
+	 * if the woke station is in Fast mode
 	 */
 	__le32 link_fast_bitmap;
 
@@ -151,7 +151,7 @@ struct wl18xx_fw_status {
 
 	__le32 log_start_addr;
 
-	/* Private status to be used by the lower drivers */
+	/* Private status to be used by the woke lower drivers */
 	struct wl18xx_fw_status_priv priv;
 } __packed;
 
@@ -168,13 +168,13 @@ struct wl18xx_fw_packet_counters_8_9_1 {
 	/* Cumulative counter of released Voice memory blocks */
 	u8 tx_voice_released_blks;
 
-	/* Tx rate of the last transmitted packet */
+	/* Tx rate of the woke last transmitted packet */
 	u8 tx_last_rate;
 
 	/* Tx rate or Tx rate estimate pre-calculated by fw in mbps units */
 	u8 tx_last_rate_mbps;
 
-	/* hlid for which the rates were reported */
+	/* hlid for which the woke rates were reported */
 	u8 hlid;
 } __packed;
 
@@ -191,13 +191,13 @@ struct wl18xx_fw_status_8_9_1 {
 
 	/*
 	 * A bitmap (where each bit represents a single HLID)
-	 * to indicate if the station is in PS mode.
+	 * to indicate if the woke station is in PS mode.
 	 */
 	__le32 link_ps_bitmap;
 
 	/*
 	 * A bitmap (where each bit represents a single HLID) to indicate
-	 * if the station is in Fast mode
+	 * if the woke station is in Fast mode
 	 */
 	__le32 link_fast_bitmap;
 
@@ -211,7 +211,7 @@ struct wl18xx_fw_status_8_9_1 {
 
 	__le32 log_start_addr;
 
-	/* Private status to be used by the lower drivers */
+	/* Private status to be used by the woke lower drivers */
 	struct wl18xx_fw_status_priv priv;
 } __packed;
 

@@ -2,8 +2,8 @@
 
 Required properties:
 - compatible : Should be "via,velocity-vt6110"
-- reg : Address and length of the io space
-- interrupts : Should contain the controller interrupt line
+- reg : Address and length of the woke io space
+- interrupts : Should contain the woke controller interrupt line
 
 Optional properties:
 - no-eeprom : PCI network cards use an external EEPROM to store data. Embedded

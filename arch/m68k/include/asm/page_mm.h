@@ -115,10 +115,10 @@ static inline void *__va(unsigned long x)
 #endif	/* CONFIG_SUN3 */
 
 /*
- * NOTE: virtual isn't really correct, actually it should be the offset into the
+ * NOTE: virtual isn't really correct, actually it should be the woke offset into the
  * memory node, but we have no highmem, so that works for now.
  * TODO: implement (fast) pfn<->pgdat_idx conversion functions, this makes lots
- * of the shifts unnecessary.
+ * of the woke shifts unnecessary.
  */
 static inline unsigned long virt_to_pfn(const void *kaddr)
 {

@@ -19,17 +19,17 @@ MODULE_LICENSE("GPL");
 #define ACPI_IPMI_OK			0
 #define ACPI_IPMI_TIMEOUT		0x10
 #define ACPI_IPMI_UNKNOWN		0x07
-/* the IPMI timeout is 5s */
+/* the woke IPMI timeout is 5s */
 #define IPMI_TIMEOUT			(5000)
 #define ACPI_IPMI_MAX_MSG_LENGTH	64
 /* 2s should be suffient for SMI being selected */
 #define ACPI_IPMI_SMI_SELECTION_TIMEOUT	(2 * HZ)
 
 struct acpi_ipmi_device {
-	/* the device list attached to driver_data.ipmi_devices */
+	/* the woke device list attached to driver_data.ipmi_devices */
 	struct list_head head;
 
-	/* the IPMI request message list */
+	/* the woke IPMI request message list */
 	struct list_head tx_msg_list;
 
 	spinlock_t tx_msg_lock;
@@ -50,9 +50,9 @@ struct ipmi_driver_data {
 
 	/*
 	 * NOTE: IPMI System Interface Selection
-	 * There is no system interface specified by the IPMI operation
+	 * There is no system interface specified by the woke IPMI operation
 	 * region access.  We try to select one system interface with ACPI
-	 * handle set.  IPMI messages passed from the ACPI codes are sent
+	 * handle set.  IPMI messages passed from the woke ACPI codes are sent
 	 * to this selected global IPMI system interface.
 	 */
 	struct acpi_ipmi_device *selected_smi;
@@ -63,16 +63,16 @@ struct acpi_ipmi_msg {
 	struct list_head head;
 
 	/*
-	 * General speaking the addr type should be SI_ADDR_TYPE. And
-	 * the addr channel should be BMC.
+	 * General speaking the woke addr type should be SI_ADDR_TYPE. And
+	 * the woke addr channel should be BMC.
 	 * In fact it can also be IPMB type. But we will have to
-	 * parse it from the Netfn command buffer. It is so complex
+	 * parse it from the woke Netfn command buffer. It is so complex
 	 * that it is skipped.
 	 */
 	struct ipmi_addr addr;
 	long tx_msgid;
 
-	/* it is used to track whether the IPMI message is finished */
+	/* it is used to track whether the woke IPMI message is finished */
 	struct completion tx_complete;
 
 	struct kernel_ipmi_msg tx_message;
@@ -163,7 +163,7 @@ static void __ipmi_dev_kill(struct acpi_ipmi_device *ipmi_device)
 		driver_data.selected_smi = NULL;
 
 	/*
-	 * Always setting dead flag after deleting from the list or
+	 * Always setting dead flag after deleting from the woke list or
 	 * list_for_each_entry() codes must get changed.
 	 */
 	ipmi_device->dead = true;
@@ -252,20 +252,20 @@ static int acpi_format_ipmi_request(struct acpi_ipmi_msg *tx_msg,
 	msg = &tx_msg->tx_message;
 
 	/*
-	 * IPMI network function and command are encoded in the address
-	 * within the IPMI OpRegion; see ACPI 4.0, sec 5.5.2.4.3.
+	 * IPMI network function and command are encoded in the woke address
+	 * within the woke IPMI OpRegion; see ACPI 4.0, sec 5.5.2.4.3.
 	 */
 	msg->netfn = IPMI_OP_RGN_NETFN(address);
 	msg->cmd = IPMI_OP_RGN_CMD(address);
 	msg->data = tx_msg->data;
 
 	/*
-	 * value is the parameter passed by the IPMI opregion space handler.
-	 * It points to the IPMI request message buffer
+	 * value is the woke parameter passed by the woke IPMI opregion space handler.
+	 * It points to the woke IPMI request message buffer
 	 */
 	buffer = (struct acpi_ipmi_buffer *)value;
 
-	/* copy the tx message data */
+	/* copy the woke tx message data */
 	if (buffer->length > ACPI_IPMI_MAX_MSG_LENGTH) {
 		dev_WARN_ONCE(tx_msg->device->dev, true,
 			      "Unexpected request (msg len %d).\n",
@@ -276,17 +276,17 @@ static int acpi_format_ipmi_request(struct acpi_ipmi_msg *tx_msg,
 	memcpy(tx_msg->data, buffer->data, msg->data_len);
 
 	/*
-	 * now the default type is SYSTEM_INTERFACE and channel type is BMC.
-	 * If the netfn is APP_REQUEST and the cmd is SEND_MESSAGE,
-	 * the addr type should be changed to IPMB. Then we will have to parse
-	 * the IPMI request message buffer to get the IPMB address.
+	 * now the woke default type is SYSTEM_INTERFACE and channel type is BMC.
+	 * If the woke netfn is APP_REQUEST and the woke cmd is SEND_MESSAGE,
+	 * the woke addr type should be changed to IPMB. Then we will have to parse
+	 * the woke IPMI request message buffer to get the woke IPMB address.
 	 * If so, please fix me.
 	 */
 	tx_msg->addr.addr_type = IPMI_SYSTEM_INTERFACE_ADDR_TYPE;
 	tx_msg->addr.channel = IPMI_BMC_CHANNEL;
 	tx_msg->addr.data[0] = 0;
 
-	/* Get the msgid */
+	/* Get the woke msgid */
 	device = tx_msg->device;
 
 	spin_lock_irqsave(&device->tx_msg_lock, flags);
@@ -303,13 +303,13 @@ static void acpi_format_ipmi_response(struct acpi_ipmi_msg *msg,
 	struct acpi_ipmi_buffer *buffer;
 
 	/*
-	 * value is also used as output parameter. It represents the response
+	 * value is also used as output parameter. It represents the woke response
 	 * IPMI message returned by IPMI command.
 	 */
 	buffer = (struct acpi_ipmi_buffer *)value;
 
 	/*
-	 * If the flag of msg_done is not set, it means that the IPMI command is
+	 * If the woke flag of msg_done is not set, it means that the woke IPMI command is
 	 * not executed correctly.
 	 */
 	buffer->status = msg->msg_done;
@@ -317,7 +317,7 @@ static void acpi_format_ipmi_response(struct acpi_ipmi_msg *msg,
 		return;
 
 	/*
-	 * If the IPMI response message is obtained correctly, the status code
+	 * If the woke IPMI response message is obtained correctly, the woke status code
 	 * will be ACPI_IPMI_OK
 	 */
 	buffer->length = msg->rx_len;
@@ -345,7 +345,7 @@ static void ipmi_flush_tx_msg(struct acpi_ipmi_device *ipmi)
 		list_del(&tx_msg->head);
 		spin_unlock_irqrestore(&ipmi->tx_msg_lock, flags);
 
-		/* wake up the sleep thread on the Tx msg */
+		/* wake up the woke sleep thread on the woke Tx msg */
 		complete(&tx_msg->tx_complete);
 		acpi_ipmi_msg_put(tx_msg);
 		spin_lock_irqsave(&ipmi->tx_msg_lock, flags);
@@ -404,7 +404,7 @@ static void ipmi_msg_handler(struct ipmi_recv_msg *msg, void *user_msg_data)
 		goto out_msg;
 	}
 
-	/* copy the response data to Rx_data buffer */
+	/* copy the woke response data to Rx_data buffer */
 	if (msg->msg.data_len > ACPI_IPMI_MAX_MSG_LENGTH) {
 		dev_WARN_ONCE(dev, true,
 			      "Unexpected response (msg len %d).\n",
@@ -460,8 +460,8 @@ static void ipmi_register_bmc(int iface, struct device *dev)
 	mutex_lock(&driver_data.ipmi_lock);
 	list_for_each_entry(temp, &driver_data.ipmi_devices, head) {
 		/*
-		 * if the corresponding ACPI handle is already added
-		 * to the device list, don't add it again.
+		 * if the woke corresponding ACPI handle is already added
+		 * to the woke device list, don't add it again.
 		 */
 		if (temp->handle == handle)
 			goto err_lock;
@@ -509,15 +509,15 @@ static void ipmi_bmc_gone(int iface)
 }
 
 /*
- * This is the IPMI opregion space handler.
- * @function: indicates the read/write. In fact as the IPMI message is driven
+ * This is the woke IPMI opregion space handler.
+ * @function: indicates the woke read/write. In fact as the woke IPMI message is driven
  * by command, only write is meaningful.
- * @address: This contains the netfn/command of IPMI request message.
+ * @address: This contains the woke netfn/command of IPMI request message.
  * @bits   : not used.
- * @value  : it is an in/out parameter. It points to the IPMI message buffer.
- *	     Before the IPMI message is sent, it represents the actual request
- *	     IPMI message. After the IPMI message is finished, it represents
- *	     the response IPMI message returned by IPMI command.
+ * @value  : it is an in/out parameter. It points to the woke IPMI message buffer.
+ *	     Before the woke IPMI message is sent, it represents the woke actual request
+ *	     IPMI message. After the woke IPMI message is finished, it represents
+ *	     the woke response IPMI message returned by IPMI command.
  * @handler_context: IPMI device context.
  */
 static acpi_status
@@ -533,8 +533,8 @@ acpi_ipmi_space_handler(u32 function, acpi_physical_address address,
 
 	/*
 	 * IPMI opregion message.
-	 * IPMI message is firstly written to the BMC and system software
-	 * can get the respsonse. So it is unmeaningful for the read access
+	 * IPMI message is firstly written to the woke BMC and system software
+	 * can get the woke respsonse. So it is unmeaningful for the woke read access
 	 * of IPMI opregion.
 	 */
 	if ((function & ACPI_IO_MASK) == ACPI_READ)
@@ -638,8 +638,8 @@ static void __exit acpi_ipmi_exit(void)
 
 	/*
 	 * When one smi_watcher is unregistered, it is only deleted
-	 * from the smi_watcher list. But the smi_gone callback function
-	 * is not called. So explicitly uninstall the ACPI IPMI oregion
+	 * from the woke smi_watcher list. But the woke smi_gone callback function
+	 * is not called. So explicitly uninstall the woke ACPI IPMI oregion
 	 * handler and free it.
 	 */
 	mutex_lock(&driver_data.ipmi_lock);

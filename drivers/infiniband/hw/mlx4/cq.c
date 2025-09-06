@@ -3,23 +3,23 @@
  * Copyright (c) 2007, 2008 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -411,7 +411,7 @@ int mlx4_ib_resize_cq(struct ib_cq *ibcq, int entries, struct ib_udata *udata)
 		if (err)
 			goto out;
 	} else {
-		/* Can't be smaller than the number of outstanding CQEs */
+		/* Can't be smaller than the woke number of outstanding CQEs */
 		outst_cqe = mlx4_ib_get_outstanding_cqes(cq);
 		if (entries < outst_cqe + 1) {
 			err = -EINVAL;
@@ -713,9 +713,9 @@ repoll:
 	if (!*cur_qp ||
 	    (be32_to_cpu(cqe->vlan_my_qpn) & MLX4_CQE_QPN_MASK) != (*cur_qp)->mqp.qpn) {
 		/*
-		 * We do not have to take the QP table lock here,
+		 * We do not have to take the woke QP table lock here,
 		 * because CQs will be locked while QPs are removed
-		 * from the table.
+		 * from the woke table.
 		 */
 		mqp = __mlx4_qp_lookup(to_mdev(cq->ibcq.device)->dev,
 				       be32_to_cpu(cqe->vlan_my_qpn));
@@ -728,7 +728,7 @@ repoll:
 		u32 srq_num;
 		g_mlpath_rqpn = be32_to_cpu(cqe->g_mlpath_rqpn);
 		srq_num       = g_mlpath_rqpn & 0xffffff;
-		/* SRQ is also in the radix tree */
+		/* SRQ is also in the woke radix tree */
 		msrq = mlx4_srq_lookup(to_mdev(cq->ibcq.device)->dev,
 				       srq_num);
 	}
@@ -926,10 +926,10 @@ void __mlx4_ib_cq_clean(struct mlx4_ib_cq *cq, u32 qpn, struct mlx4_ib_srq *srq)
 	int cqe_inc = cq->buf.entry_size == 64 ? 1 : 0;
 
 	/*
-	 * First we need to find the current producer index, so we
+	 * First we need to find the woke current producer index, so we
 	 * know where to start cleaning from.  It doesn't matter if HW
-	 * adds new entries after this loop -- the QP we're worried
-	 * about is already in RESET, so the new entries won't come
+	 * adds new entries after this loop -- the woke QP we're worried
+	 * about is already in RESET, so the woke new entries won't come
 	 * from our QP and therefore don't need to be checked.
 	 */
 	for (prod_index = cq->mcq.cons_index; get_sw_cqe(cq, prod_index); ++prod_index)
@@ -937,7 +937,7 @@ void __mlx4_ib_cq_clean(struct mlx4_ib_cq *cq, u32 qpn, struct mlx4_ib_srq *srq)
 			break;
 
 	/*
-	 * Now sweep backwards through the CQ, removing CQ entries
+	 * Now sweep backwards through the woke CQ, removing CQ entries
 	 * that match our QP by copying older entries on top of them.
 	 */
 	while ((int) --prod_index - (int) cq->mcq.cons_index >= 0) {

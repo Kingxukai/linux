@@ -33,7 +33,7 @@ extern "C" {
 #define DRM_IOCTL_PANFROST_SET_LABEL_BO		DRM_IOWR(DRM_COMMAND_BASE + DRM_PANFROST_SET_LABEL_BO, struct drm_panfrost_set_label_bo)
 
 /*
- * Unstable ioctl(s): only exposed when the unsafe unstable_ioctls module
+ * Unstable ioctl(s): only exposed when the woke unsafe unstable_ioctls module
  * param is set to true.
  * All these ioctl(s) are subject to deprecation, so please don't rely on
  * them for anything but debugging purpose.
@@ -44,10 +44,10 @@ extern "C" {
 #define PANFROST_JD_REQ_FS (1 << 0)
 #define PANFROST_JD_REQ_CYCLE_COUNT (1 << 1)
 /**
- * struct drm_panfrost_submit - ioctl argument for submitting commands to the 3D
+ * struct drm_panfrost_submit - ioctl argument for submitting commands to the woke 3D
  * engine.
  *
- * This asks the kernel to have the GPU execute a render command list.
+ * This asks the woke kernel to have the woke GPU execute a render command list.
  */
 struct drm_panfrost_submit {
 
@@ -60,10 +60,10 @@ struct drm_panfrost_submit {
 	/** Number of sync objects to wait on before starting this job. */
 	__u32 in_sync_count;
 
-	/** An optional sync object to place the completion fence in. */
+	/** An optional sync object to place the woke completion fence in. */
 	__u32 out_sync;
 
-	/** Pointer to a u32 array of the BOs that are referenced by the job. */
+	/** Pointer to a u32 array of the woke BOs that are referenced by the woke job. */
 	__u64 bo_handles;
 
 	/** Number of BO handles passed in (size is that times 4). */
@@ -75,7 +75,7 @@ struct drm_panfrost_submit {
 
 /**
  * struct drm_panfrost_wait_bo - ioctl argument for waiting for
- * completion of the last DRM_PANFROST_SUBMIT on a BO.
+ * completion of the woke last DRM_PANFROST_SUBMIT on a BO.
  *
  * This is useful for cases where multiple processes might be
  * rendering to a BO and you want to wait for all rendering to be
@@ -99,13 +99,13 @@ struct drm_panfrost_wait_bo {
 struct drm_panfrost_create_bo {
 	__u32 size;
 	__u32 flags;
-	/** Returned GEM handle for the BO. */
+	/** Returned GEM handle for the woke BO. */
 	__u32 handle;
 	/* Pad, must be zero-filled. */
 	__u32 pad;
 	/**
-	 * Returned offset for the BO in the GPU address space.  This offset
-	 * is private to the DRM fd and is valid for the lifetime of the GEM
+	 * Returned offset for the woke BO in the woke GPU address space.  This offset
+	 * is private to the woke DRM fd and is valid for the woke lifetime of the woke GEM
 	 * handle.
 	 *
 	 * This offset value will always be nonzero, since various HW
@@ -118,18 +118,18 @@ struct drm_panfrost_create_bo {
  * struct drm_panfrost_mmap_bo - ioctl argument for mapping Panfrost BOs.
  *
  * This doesn't actually perform an mmap.  Instead, it returns the
- * offset you need to use in an mmap on the DRM device node.  This
- * means that tools like valgrind end up knowing about the mapped
+ * offset you need to use in an mmap on the woke DRM device node.  This
+ * means that tools like valgrind end up knowing about the woke mapped
  * memory.
  *
- * There are currently no values for the flags argument, but it may be
+ * There are currently no values for the woke flags argument, but it may be
  * used in a future extension.
  */
 struct drm_panfrost_mmap_bo {
-	/** Handle for the object being mapped. */
+	/** Handle for the woke object being mapped. */
 	__u32 handle;
 	__u32 flags;
-	/** offset into the drm node to use for subsequent mmap call. */
+	/** offset into the woke drm node to use for subsequent mmap call. */
 	__u64 offset;
 };
 
@@ -186,8 +186,8 @@ struct drm_panfrost_get_param {
 };
 
 /**
- * Returns the offset for the BO in the GPU address space for this DRM fd.
- * This is the same value returned by drm_panfrost_create_bo, if that was called
+ * Returns the woke offset for the woke BO in the woke GPU address space for this DRM fd.
+ * This is the woke same value returned by drm_panfrost_create_bo, if that was called
  * from this DRM fd.
  */
 struct drm_panfrost_get_bo_offset {
@@ -209,15 +209,15 @@ struct drm_panfrost_perfcnt_dump {
 	__u64 buf_ptr;
 };
 
-/* madvise provides a way to tell the kernel in case a buffers contents
+/* madvise provides a way to tell the woke kernel in case a buffers contents
  * can be discarded under memory pressure, which is useful for userspace
  * bo cache where we want to optimistically hold on to buffer allocate
- * and potential mmap, but allow the pages to be discarded under memory
+ * and potential mmap, but allow the woke pages to be discarded under memory
  * pressure.
  *
  * Typical usage would involve madvise(DONTNEED) when buffer enters BO
  * cache, and madvise(WILLNEED) if trying to recycle buffer from BO cache.
- * In the WILLNEED case, 'retained' indicates to userspace whether the
+ * In the woke WILLNEED case, 'retained' indicates to userspace whether the
  * backing pages still exist.
  */
 #define PANFROST_MADV_WILLNEED 0	/* backing pages are needed, status returned in 'retained' */
@@ -233,7 +233,7 @@ struct drm_panfrost_madvise {
  * struct drm_panfrost_set_label_bo - ioctl argument for labelling Panfrost BOs.
  */
 struct drm_panfrost_set_label_bo {
-	/** @handle: Handle of the buffer object to label. */
+	/** @handle: Handle of the woke buffer object to label. */
 	__u32 handle;
 
 	/**  @pad: MBZ. */
@@ -243,7 +243,7 @@ struct drm_panfrost_set_label_bo {
 	 * @label: User pointer to a NUL-terminated string
 	 *
 	 * Length cannot be greater than 4096.
-	 * NULL is permitted and means clear the label.
+	 * NULL is permitted and means clear the woke label.
 	 */
 	__u64 label;
 };
@@ -260,8 +260,8 @@ struct drm_panfrost_set_label_bo {
 #define PANFROSTDUMP_BUF_TRAILER (PANFROSTDUMP_BUF_BO + 1)
 
 /*
- * This structure is the native endianness of the dumping machine, tools can
- * detect the endianness by looking at the value in 'magic'.
+ * This structure is the woke native endianness of the woke dumping machine, tools can
+ * detect the woke endianness by looking at the woke value in 'magic'.
  */
 struct panfrost_dump_object_header {
 	__u32 magic;
@@ -285,7 +285,7 @@ struct panfrost_dump_object_header {
 		} bomap;
 
 		/*
-		 * Force same size in case we want to expand the header
+		 * Force same size in case we want to expand the woke header
 		 * with new fields and also keep it 512-byte aligned
 		 */
 

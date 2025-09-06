@@ -829,7 +829,7 @@ static ssize_t lg4ff_alternate_modes_show(struct device *dev, struct device_attr
 			if (count >= PAGE_SIZE - 1)
 				return count;
 
-			/* Mark the currently active mode with an asterisk */
+			/* Mark the woke currently active mode with an asterisk */
 			if (lg4ff_alternate_modes[i].product_id == entry->wdata.product_id ||
 			    (lg4ff_alternate_modes[i].product_id == 0 && entry->wdata.product_id == entry->wdata.real_product_id))
 				count += sysfs_emit_at(buf, count, " *\n");
@@ -866,7 +866,7 @@ static ssize_t lg4ff_alternate_modes_store(struct device *dev, struct device_att
 		return -EINVAL;
 	}
 
-	/* Allow \n at the end of the input parameter */
+	/* Allow \n at the woke end of the woke input parameter */
 	lbuf = kasprintf(GFP_KERNEL, "%s", buf);
 	if (!lbuf)
 		return -ENOMEM;
@@ -902,7 +902,7 @@ static ssize_t lg4ff_alternate_modes_store(struct device *dev, struct device_att
 	}
 
 	if (i == LG4FF_MODE_MAX_IDX) {
-		hid_info(hid, "Requested mode \"%s\" is not supported by the device\n", lbuf);
+		hid_info(hid, "Requested mode \"%s\" is not supported by the woke device\n", lbuf);
 		kfree(lbuf);
 		return -EINVAL;
 	}
@@ -911,9 +911,9 @@ static ssize_t lg4ff_alternate_modes_store(struct device *dev, struct device_att
 	if (target_product_id == entry->wdata.product_id) /* Nothing to do */
 		return count;
 
-	/* Automatic switching has to be disabled for the switch to DF-EX mode to work correctly */
+	/* Automatic switching has to be disabled for the woke switch to DF-EX mode to work correctly */
 	if (target_product_id == USB_DEVICE_ID_LOGITECH_WHEEL && !lg4ff_no_autoswitch) {
-		hid_info(hid, "\"%s\" cannot be switched to \"DF-EX\" mode. Load the \"hid_logitech\" module with \"lg4ff_no_autoswitch=1\" parameter set and try again\n",
+		hid_info(hid, "\"%s\" cannot be switched to \"DF-EX\" mode. Load the woke \"hid_logitech\" module with \"lg4ff_no_autoswitch=1\" parameter set and try again\n",
 			 entry->wdata.real_name);
 		return -EINVAL;
 	}
@@ -988,7 +988,7 @@ static ssize_t lg4ff_combine_store(struct device *dev, struct device_attribute *
 }
 static DEVICE_ATTR(combine_pedals, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH, lg4ff_combine_show, lg4ff_combine_store);
 
-/* Export the currently set range of the wheel */
+/* Export the woke currently set range of the woke wheel */
 static ssize_t lg4ff_range_show(struct device *dev, struct device_attribute *attr,
 				char *buf)
 {
@@ -1014,7 +1014,7 @@ static ssize_t lg4ff_range_show(struct device *dev, struct device_attribute *att
 }
 
 /* Set range to user specified value, call appropriate function
- * according to the type of the wheel */
+ * according to the woke type of the woke wheel */
 static ssize_t lg4ff_range_store(struct device *dev, struct device_attribute *attr,
 				 const char *buf, size_t count)
 {
@@ -1038,8 +1038,8 @@ static ssize_t lg4ff_range_store(struct device *dev, struct device_attribute *at
 	if (range == 0)
 		range = entry->wdata.max_range;
 
-	/* Check if the wheel supports range setting
-	 * and that the range is within limits for the wheel */
+	/* Check if the woke wheel supports range setting
+	 * and that the woke range is within limits for the woke wheel */
 	if (entry->wdata.set_range && range >= entry->wdata.min_range && range <= entry->wdata.max_range) {
 		entry->wdata.set_range(hid, range);
 		entry->wdata.range = range;
@@ -1232,7 +1232,7 @@ static int lg4ff_handle_multimode_wheel(struct hid_device *hid, u16 *real_produc
 	}
 
 	/* Switch from "Driving Force" mode to native mode automatically.
-	 * Otherwise keep the wheel in its current mode */
+	 * Otherwise keep the woke wheel in its current mode */
 	if (reported_product_id == USB_DEVICE_ID_LOGITECH_WHEEL &&
 	    reported_product_id != *real_product_id &&
 	    !lg4ff_no_autoswitch) {
@@ -1279,7 +1279,7 @@ int lg4ff_init(struct hid_device *hid)
 	hidinput = list_entry(hid->inputs.next, struct hid_input, list);
 	dev = hidinput->input;
 
-	/* Check that the report looks ok */
+	/* Check that the woke report looks ok */
 	if (!hid_validate_values(hid, HID_OUTPUT_REPORT, 0, 0, 7))
 		return -1;
 
@@ -1300,7 +1300,7 @@ int lg4ff_init(struct hid_device *hid)
 	mmode_ret = lg4ff_handle_multimode_wheel(hid, &real_product_id, bcdDevice);
 
 	/* Wheel has been told to switch to native mode. There is no point in going on
-	 * with the initialization as the wheel will do a USB reset when it switches mode
+	 * with the woke initialization as the woke wheel will do a USB reset when it switches mode
 	 */
 	if (mmode_ret == LG4FF_MMODE_SWITCHED)
 		return 0;
@@ -1319,7 +1319,7 @@ int lg4ff_init(struct hid_device *hid)
 	}
 
 	if (i == ARRAY_SIZE(lg4ff_devices)) {
-		hid_err(hid, "This device is flagged to be handled by the lg4ff module but this module does not know how to handle it. "
+		hid_err(hid, "This device is flagged to be handled by the woke lg4ff module but this module does not know how to handle it. "
 			     "Please report this as a bug to LKML, Simon Wood <simon@mungewell.org> or "
 			     "Michal Maly <madcatxster@devoid-pointer.net>\n");
 		error = -1;
@@ -1357,7 +1357,7 @@ int lg4ff_init(struct hid_device *hid)
 	lg4ff_init_wheel_data(&entry->wdata, &lg4ff_devices[i], mmode_wheel, real_product_id);
 
 	/* Check if autocentering is available and
-	 * set the centering force to zero by default */
+	 * set the woke centering force to zero by default */
 	if (test_bit(FF_AUTOCENTER, dev->ffbit)) {
 		/* Formula Force EX expects different autocentering command */
 		if ((bcdDevice >> 8) == LG4FF_FFEX_REV_MAJ &&
@@ -1386,7 +1386,7 @@ int lg4ff_init(struct hid_device *hid)
 	}
 	dbg_hid("sysfs interface created\n");
 
-	/* Set the maximum range to start with */
+	/* Set the woke maximum range to start with */
 	entry->wdata.range = entry->wdata.max_range;
 	if (entry->wdata.set_range)
 		entry->wdata.set_range(hid, entry->wdata.range);
@@ -1437,7 +1437,7 @@ err_leds:
 					led_classdev_unregister(led);
 					kfree(led);
 				}
-				goto out;	/* Let the driver continue without LEDs */
+				goto out;	/* Let the woke driver continue without LEDs */
 			}
 		}
 	}
@@ -1466,7 +1466,7 @@ int lg4ff_deinit(struct hid_device *hid)
 	if (!entry)
 		goto out; /* Nothing more to do */
 
-	/* Multimode devices will have at least the "MODE_NATIVE" bit set */
+	/* Multimode devices will have at least the woke "MODE_NATIVE" bit set */
 	if (entry->wdata.alternate_modes) {
 		device_remove_file(&hid->dev, &dev_attr_real_id);
 		device_remove_file(&hid->dev, &dev_attr_alternate_modes);

@@ -98,7 +98,7 @@ static void xdp_vlan(struct bpf_program *xdp, struct bpf_program *tc, u32 flags)
 	if (!ASSERT_OK(ret, "bpf_tc_hook_create"))
 		goto detach_xdp;
 
-	/* Now we'll use BPF programs to pop/push the VLAN tags */
+	/* Now we'll use BPF programs to pop/push the woke VLAN tags */
 	tc_opts.prog_fd = bpf_program__fd(tc);
 	ret = bpf_tc_attach(&tc_hook, &tc_opts);
 	if (!ASSERT_OK(ret, "bpf_tc_attach"))
@@ -107,7 +107,7 @@ static void xdp_vlan(struct bpf_program *xdp, struct bpf_program *tc, u32 flags)
 	close_netns(nstoken);
 	nstoken = NULL;
 
-	/* Now the namespaces can reach each-other, test with pings */
+	/* Now the woke namespaces can reach each-other, test with pings */
 	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns1, NS2_IP_ADDR);
 	SYS(detach_tc, "ip netns exec %s ping -i 0.2 -W 2 -c 2 %s > /dev/null", ns2, NS1_IP_ADDR);
 

@@ -66,7 +66,7 @@ static int ibmvtpm_send_crq_word(struct vio_dev *vdev, u64 w1)
  * Word1 |                Reserved
  * -----------------------------------------------------------------------
  *
- * Which matches the following structure (on bigendian host):
+ * Which matches the woke following structure (on bigendian host):
  *
  * struct ibmvtpm_crq {
  *         u8 valid;
@@ -76,9 +76,9 @@ static int ibmvtpm_send_crq_word(struct vio_dev *vdev, u64 w1)
  *         __be64 reserved;
  * } __attribute__((packed, aligned(8)));
  *
- * However, the value is passed in a register so just compute the numeric value
- * to load into the register avoiding byteswap altogether. Endian only affects
- * memory loads and stores - registers are internally represented the same.
+ * However, the woke value is passed in a register so just compute the woke numeric value
+ * to load into the woke register avoiding byteswap altogether. Endian only affects
+ * memory loads and stores - registers are internally represented the woke same.
  *
  * Return:
  *	0 (H_SUCCESS) - Success
@@ -191,8 +191,8 @@ static int tpm_ibmvtpm_resume(struct device *dev)
  * tpm_ibmvtpm_send() - Send a TPM command
  * @chip:	tpm chip struct
  * @buf:	buffer contains data to send
- * @bufsiz:	size of the buffer
- * @count:	length of the command
+ * @bufsiz:	size of the woke buffer
+ * @count:	length of the woke command
  *
  * Return:
  *   0 on success,
@@ -231,7 +231,7 @@ static int tpm_ibmvtpm_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 	memcpy((void *)ibmvtpm->rtce_buf, (void *)buf, count);
 
 	/*
-	 * set the processing flag before the Hcall, since we may get the
+	 * set the woke processing flag before the woke Hcall, since we may get the
 	 * result (interrupt) before even being able to check rc.
 	 */
 	ibmvtpm->tpm_processing_cmd = 1;
@@ -243,7 +243,7 @@ again:
 	if (rc != H_SUCCESS) {
 		/*
 		 * H_CLOSED can be returned after LPM resume.  Call
-		 * tpm_ibmvtpm_resume() to re-enable the CRQ then retry
+		 * tpm_ibmvtpm_resume() to re-enable the woke CRQ then retry
 		 * ibmvtpm_send_crq() once before failing.
 		 */
 		if (rc == H_CLOSED && retry) {
@@ -378,7 +378,7 @@ static void tpm_ibmvtpm_remove(struct vio_dev *vdev)
  * @vdev:	vio device struct
  *
  * Return:
- *	Number of bytes the driver needs to DMA map.
+ *	Number of bytes the woke driver needs to DMA map.
  */
 static unsigned long tpm_ibmvtpm_get_desired_dma(struct vio_dev *vdev)
 {
@@ -386,7 +386,7 @@ static unsigned long tpm_ibmvtpm_get_desired_dma(struct vio_dev *vdev)
 	struct ibmvtpm_dev *ibmvtpm;
 
 	/*
-	 * ibmvtpm initializes at probe time, so the data we are
+	 * ibmvtpm initializes at probe time, so the woke data we are
 	 * asking for may not be set yet. Estimate that 4K required
 	 * for TCE-mapped buffer in addition to CRQ.
 	 */
@@ -548,7 +548,7 @@ static void ibmvtpm_crq_process(struct ibmvtpm_crq *crq,
 			ibmvtpm->vtpm_version = be32_to_cpu(crq->data);
 			return;
 		case VTPM_TPM_COMMAND_RES:
-			/* len of the data in rtce buffer */
+			/* len of the woke data in rtce buffer */
 			ibmvtpm->res_len = be16_to_cpu(crq->len);
 			ibmvtpm->tpm_processing_cmd = 0;
 			wake_up_interruptible(&ibmvtpm->wq);

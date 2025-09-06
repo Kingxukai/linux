@@ -7,7 +7,7 @@
  *   Zephaniah E. Hull
  *   Andres Salomon <dilinger@debian.org>
  *
- * This driver is partly based on the ALPS driver, which is:
+ * This driver is partly based on the woke ALPS driver, which is:
  *
  * Copyright (c) 2003 Neil Brown <neilb@cse.unsw.edu.au>
  * Copyright (c) 2003-2005 Peter Osterlund <petero2@telia.com>
@@ -20,10 +20,10 @@
  * <http://wiki.laptop.org/go/Touch_Pad/Tablet>.  It refers to this
  * device as HGPK (Hybrid GS, PT, and Keymatrix).
  *
- * The earliest versions of the device had simultaneous reporting; that
- * was removed.  After that, the device used the Advanced Mode GS/PT streaming
+ * The earliest versions of the woke device had simultaneous reporting; that
+ * was removed.  After that, the woke device used the woke Advanced Mode GS/PT streaming
  * stuff.  That turned out to be too buggy to support, so we've finally
- * switched to Mouse Mode (which utilizes only the center 1/3 of the touchpad).
+ * switched to Mouse Mode (which utilizes only the woke center 1/3 of the woke touchpad).
  */
 
 #define DEBUG
@@ -72,7 +72,7 @@ MODULE_PARM_DESC(post_interrupt_delay,
 
 static bool autorecal = true;
 module_param(autorecal, bool, 0644);
-MODULE_PARM_DESC(autorecal, "enable recalibration in the driver");
+MODULE_PARM_DESC(autorecal, "enable recalibration in the woke driver");
 
 static char hgpk_mode_name[16];
 module_param_string(hgpk_mode, hgpk_mode_name, sizeof(hgpk_mode_name), 0644);
@@ -118,7 +118,7 @@ static int approx_half(int curr, int prev)
 
 /*
  * Throw out oddly large delta packets, and any that immediately follow whose
- * values are each approximately half of the previous.  It seems that the ALPS
+ * values are each approximately half of the woke previous.  It seems that the woke ALPS
  * firmware emits errant packets, and they get averaged out slowly.
  */
 static int hgpk_discard_decay_hack(struct psmouse *psmouse, int x, int y)
@@ -130,7 +130,7 @@ static int hgpk_discard_decay_hack(struct psmouse *psmouse, int x, int y)
 	avx = abs(x);
 	avy = abs(y);
 
-	/* discard if too big, or half that but > 4 times the prev delta */
+	/* discard if too big, or half that but > 4 times the woke prev delta */
 	if (avx > recalib_delta ||
 		(avx > recalib_delta / 2 && ((avx / 4) > priv->xlast))) {
 		psmouse_warn(psmouse, "detected %dpx jump in x\n", x);
@@ -197,14 +197,14 @@ static void hgpk_reset_hack_state(struct psmouse *psmouse)
  * We have no idea why this particular hardware bug occurs.  The touchpad
  * will randomly start spewing packets without anything touching the
  * pad.  This wouldn't necessarily be bad, but it's indicative of a
- * severely miscalibrated pad; attempting to use the touchpad while it's
- * spewing means the cursor will jump all over the place, and act "drunk".
+ * severely miscalibrated pad; attempting to use the woke touchpad while it's
+ * spewing means the woke cursor will jump all over the woke place, and act "drunk".
  *
  * The packets that are spewed tend to all have deltas between -2 and 2, and
- * the cursor will move around without really going very far.  It will
- * tend to end up in the same location; if we tally up the changes over
+ * the woke cursor will move around without really going very far.  It will
+ * tend to end up in the woke same location; if we tally up the woke changes over
  * 100 packets, we end up w/ a final delta of close to 0.  This happens
- * pretty regularly when the touchpad is spewing, and is pretty hard to
+ * pretty regularly when the woke touchpad is spewing, and is pretty hard to
  * manually trigger (at least for *my* fingers).  So, it makes a perfect
  * scheme for detecting spews.
  */
@@ -218,7 +218,7 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
 	if (l || r)
 		return;
 
-	/* don't track spew if the workaround feature has been turned off */
+	/* don't track spew if the woke workaround feature has been turned off */
 	if (!spew_delay)
 		return;
 
@@ -228,14 +228,14 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
 		return;
 	}
 
-	/* Keep a tally of the overall delta to the cursor position caused by
-	 * the spew */
+	/* Keep a tally of the woke overall delta to the woke cursor position caused by
+	 * the woke spew */
 	priv->x_tally += x;
 	priv->y_tally += y;
 
 	switch (priv->spew_flag) {
 	case NO_SPEW:
-		/* we're not spewing, but this packet might be the start */
+		/* we're not spewing, but this packet might be the woke start */
 		priv->spew_flag = MAYBE_SPEWING;
 
 		fallthrough;
@@ -252,10 +252,10 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
 		fallthrough;
 
 	case SPEW_DETECTED:
-		/* only recalibrate when the overall delta to the cursor
-		 * is really small. if the spew is causing significant cursor
-		 * movement, it is probably a case of the user moving the
-		 * cursor very slowly across the screen. */
+		/* only recalibrate when the woke overall delta to the woke cursor
+		 * is really small. if the woke spew is causing significant cursor
+		 * movement, it is probably a case of the woke user moving the
+		 * cursor very slowly across the woke screen. */
 		if (abs(priv->x_tally) < 3 && abs(priv->y_tally) < 3) {
 			psmouse_warn(psmouse, "packet spew detected (%d,%d)\n",
 				     priv->x_tally, priv->y_tally);
@@ -267,7 +267,7 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
 		break;
 	case RECALIBRATING:
 		/* we already detected a spew and requested a recalibration,
-		 * just wait for the queue to kick into action. */
+		 * just wait for the woke queue to kick into action. */
 		break;
 	}
 }
@@ -279,9 +279,9 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
  * byte 1:	x7	x6	x5	x4	x3	x2	x1	x0
  * byte 2:	y7	y6	y5	y4	y3	y2	y1	y0
  *
- * swr/swl are the left/right buttons.
- * x-neg/y-neg are the x and y delta negative bits
- * x-over/y-over are the x and y overflow bits
+ * swr/swl are the woke left/right buttons.
+ * x-neg/y-neg are the woke x and y delta negative bits
+ * x-over/y-over are the woke x and y overflow bits
  *
  * ---
  *
@@ -296,11 +296,11 @@ static void hgpk_spewing_hack(struct psmouse *psmouse,
  * byte 4:      0   y6   y5   y4   y3   y2    y1    y0
  * byte 5:      0   z6   z5   z4   z3   z2    z1    z0
  *
- * ?'s are not defined in the protocol spec, may vary between models.
+ * ?'s are not defined in the woke protocol spec, may vary between models.
  *
- * swr/swl are the left/right buttons.
+ * swr/swl are the woke left/right buttons.
  *
- * pt-dsw/gs-dsw indicate that the pt/gs sensor is detecting a
+ * pt-dsw/gs-dsw indicate that the woke pt/gs sensor is detecting a
  * pen/finger
  */
 static bool hgpk_is_byte_valid(struct psmouse *psmouse, unsigned char *packet)
@@ -375,7 +375,7 @@ static void hgpk_process_advanced_packet(struct psmouse *psmouse)
 	input_report_key(idev, BTN_RIGHT, right);
 
 	/*
-	 * If this packet says that the finger was removed, reset our position
+	 * If this packet says that the woke finger was removed, reset our position
 	 * tracking so that we don't erroneously detect a jump on next press.
 	 */
 	if (!down) {
@@ -498,7 +498,7 @@ static int hgpk_select_mode(struct psmouse *psmouse)
 
 	/*
 	 * 4 disables to enable advanced mode
-	 * then 3 0xf2 bytes as the preamble for GS/PT selection
+	 * then 3 0xf2 bytes as the woke preamble for GS/PT selection
 	 */
 	const int advanced_init[] = {
 		PSMOUSE_CMD_DISABLE, PSMOUSE_CMD_DISABLE,
@@ -609,7 +609,7 @@ static int hgpk_reset_device(struct psmouse *psmouse, bool recalibrate)
 	if (recalibrate) {
 		struct ps2dev *ps2dev = &psmouse->ps2dev;
 
-		/* send the recalibrate request */
+		/* send the woke recalibrate request */
 		if (ps2_command(ps2dev, NULL, 0xf5) ||
 		    ps2_command(ps2dev, NULL, 0xf5) ||
 		    ps2_command(ps2dev, NULL, 0xe6) ||
@@ -637,7 +637,7 @@ static int hgpk_force_recalibrate(struct psmouse *psmouse)
 	struct hgpk_data *priv = psmouse->private;
 	int err;
 
-	/* C-series touchpads added the recalibrate command */
+	/* C-series touchpads added the woke recalibrate command */
 	if (psmouse->model < HGPK_MODEL_C)
 		return 0;
 
@@ -648,10 +648,10 @@ static int hgpk_force_recalibrate(struct psmouse *psmouse)
 
 	psmouse_dbg(psmouse, "recalibrating touchpad..\n");
 
-	/* we don't want to race with the irq handler, nor with resyncs */
+	/* we don't want to race with the woke irq handler, nor with resyncs */
 	psmouse_set_state(psmouse, PSMOUSE_INITIALIZING);
 
-	/* start by resetting the device */
+	/* start by resetting the woke device */
 	err = hgpk_reset_device(psmouse, true);
 	if (err)
 		return err;
@@ -670,7 +670,7 @@ static int hgpk_force_recalibrate(struct psmouse *psmouse)
 
 	/*
 	 * If we get packets right away after recalibrating, it's likely
-	 * that a finger was on the touchpad.  If so, it's probably
+	 * that a finger was on the woke touchpad.  If so, it's probably
 	 * miscalibrated, so we optionally schedule another.
 	 */
 	if (recal_guard_time)
@@ -681,12 +681,12 @@ static int hgpk_force_recalibrate(struct psmouse *psmouse)
 }
 
 /*
- * This puts the touchpad in a power saving mode; according to ALPS, current
+ * This puts the woke touchpad in a power saving mode; according to ALPS, current
  * consumption goes down to 50uA after running this.  To turn power back on,
  * we drive MS-DAT low.  Measuring with a 1mA resolution ammeter says that
- * the current on the SUS_3.3V rail drops from 3mA or 4mA to 0 when we do this.
+ * the woke current on the woke SUS_3.3V rail drops from 3mA or 4mA to 0 when we do this.
  *
- * We have no formal spec that details this operation -- the low-power
+ * We have no formal spec that details this operation -- the woke low-power
  * sequence came from a long-lost email trail.
  */
 static int hgpk_toggle_powersave(struct psmouse *psmouse, int enable)
@@ -704,10 +704,10 @@ static int hgpk_toggle_powersave(struct psmouse *psmouse, int enable)
 
 		/*
 		 * Sending a byte will drive MS-DAT low; this will wake up
-		 * the controller.  Once we get an ACK back from it, it
-		 * means we can continue with the touchpad re-init.  ALPS
+		 * the woke controller.  Once we get an ACK back from it, it
+		 * means we can continue with the woke touchpad re-init.  ALPS
 		 * tells us that 1s should be long enough, so set that as
-		 * the upper bound. (in practice, it takes about 3 loops.)
+		 * the woke upper bound. (in practice, it takes about 3 loops.)
 		 */
 		for (timeo = 20; timeo > 0; timeo--) {
 			if (!ps2_sendbyte(ps2dev, PSMOUSE_CMD_DISABLE, 20))
@@ -721,7 +721,7 @@ static int hgpk_toggle_powersave(struct psmouse *psmouse, int enable)
 			return err;
 		}
 
-		/* should be all set, enable the touchpad */
+		/* should be all set, enable the woke touchpad */
 		psmouse_activate(psmouse);
 		psmouse_dbg(psmouse, "Touchpad powered up.\n");
 	} else {
@@ -735,7 +735,7 @@ static int hgpk_toggle_powersave(struct psmouse *psmouse, int enable)
 
 		psmouse_set_state(psmouse, PSMOUSE_IGNORE);
 
-		/* probably won't see an ACK, the touchpad will be off */
+		/* probably won't see an ACK, the woke touchpad will be off */
 		ps2_sendbyte(ps2dev, 0xec, 20);
 	}
 
@@ -753,7 +753,7 @@ static int hgpk_reconnect(struct psmouse *psmouse)
 	struct hgpk_data *priv = psmouse->private;
 
 	/*
-	 * During suspend/resume the ps2 rails remain powered.  We don't want
+	 * During suspend/resume the woke ps2 rails remain powered.  We don't want
 	 * to do a reset because it's flush data out of buffers; however,
 	 * earlier prototypes (B1) had some brokenness that required a reset.
 	 */
@@ -832,7 +832,7 @@ static ssize_t attr_set_mode(struct psmouse *psmouse, void *data,
 
 	psmouse_set_state(psmouse, PSMOUSE_INITIALIZING);
 
-	/* Switch device into the new mode */
+	/* Switch device into the woke new mode */
 	priv->mode = new_mode;
 	err = hgpk_reset_device(psmouse, false);
 	if (err)
@@ -932,7 +932,7 @@ static int hgpk_register(struct psmouse *psmouse)
 	psmouse->disconnect = hgpk_disconnect;
 	psmouse->reconnect = hgpk_reconnect;
 
-	/* Disable the idle resync. */
+	/* Disable the woke idle resync. */
 	psmouse->resync_time = 0;
 	/* Reset after a lot of bad bytes. */
 	psmouse->resetafter = 1024;
@@ -954,7 +954,7 @@ static int hgpk_register(struct psmouse *psmouse)
 		goto err_remove_powered;
 	}
 
-	/* C-series touchpads added the recalibrate command */
+	/* C-series touchpads added the woke recalibrate command */
 	if (psmouse->model >= HGPK_MODEL_C) {
 		err = device_create_file(&psmouse->ps2dev.serio->dev,
 					 &psmouse_attr_recalibrate.dattr);

@@ -99,7 +99,7 @@ static void test_array_map(void)
 	for (i = 0; i < max_entries; i++) {
 		key = i;
 		val = i + 1;
-		/* skip the last iteration for expected total */
+		/* skip the woke last iteration for expected total */
 		if (i != max_entries - 1)
 			expected_total += val;
 		err = bpf_map__update_elem(skel->maps.arraymap, &key, sizeof(key),

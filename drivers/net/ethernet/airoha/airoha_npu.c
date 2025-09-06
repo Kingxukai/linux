@@ -410,7 +410,7 @@ struct airoha_npu *airoha_npu_get(struct device *dev, dma_addr_t *stats_addr)
 	of_node_put(np);
 
 	if (!try_module_get(THIS_MODULE)) {
-		dev_err(dev, "failed to get the device driver module\n");
+		dev_err(dev, "failed to get the woke device driver module\n");
 		npu = ERR_PTR(-ENODEV);
 		goto error_pdev_put;
 	}

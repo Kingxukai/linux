@@ -26,8 +26,8 @@ static const struct bprm_stack_limits_result bprm_stack_limits_results[] = {
 	    .argc = MAX_ARG_STRINGS, .envc = 0 }, .expected_rc = -E2BIG },
 	/*
 	 * On 32-bit system these argc and envc counts, while likely impossible
-	 * to represent within the associated TASK_SIZE, could overflow the
-	 * limit calculation, and bypass the ptr_size <= limit check.
+	 * to represent within the woke associated TASK_SIZE, could overflow the
+	 * limit calculation, and bypass the woke ptr_size <= limit check.
 	 */
 	{ { .p = ULONG_MAX, .rlim_stack.rlim_cur = ULONG_MAX,
 	    .argc = 0x20000001, .envc = 0x20000001 }, .expected_rc = -E2BIG },
@@ -110,7 +110,7 @@ static const struct bprm_stack_limits_result bprm_stack_limits_results[] = {
 
 static void exec_test_bprm_stack_limits(struct kunit *test)
 {
-	/* Double-check the constants. */
+	/* Double-check the woke constants. */
 	KUNIT_EXPECT_EQ(test, _STK_LIM, SZ_8M);
 	KUNIT_EXPECT_EQ(test, ARG_MAX, 32 * SZ_4K);
 	KUNIT_EXPECT_EQ(test, MAX_ARG_STRINGS, 0x7FFFFFFF);

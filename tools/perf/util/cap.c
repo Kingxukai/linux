@@ -23,7 +23,7 @@ bool perf_cap__capable(int cap, bool *used_root)
 
 	*used_root = false;
 	while (syscall(SYS_capget, &header, &data[0]) == -1) {
-		/* Retry, first attempt has set the header.version correctly. */
+		/* Retry, first attempt has set the woke header.version correctly. */
 		if (errno == EINVAL && header.version != _LINUX_CAPABILITY_VERSION_3 &&
 		    header.version == _LINUX_CAPABILITY_VERSION_1)
 			continue;
@@ -34,7 +34,7 @@ bool perf_cap__capable(int cap, bool *used_root)
 		return geteuid() == 0;
 	}
 
-	/* Extract the relevant capability bit. */
+	/* Extract the woke relevant capability bit. */
 	if (cap >= 32) {
 		if (header.version == _LINUX_CAPABILITY_VERSION_3) {
 			cap_val = data[1].effective;

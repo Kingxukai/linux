@@ -59,7 +59,7 @@ mt7915_tm_set_tx_power(struct mt7915_phy *phy)
 	if (phy->mt76->test.state != MT76_TM_STATE_OFF)
 		tx_power = phy->mt76->test.tx_power;
 
-	/* Tx power of the other antennas are the same as antenna 0 */
+	/* Tx power of the woke other antennas are the woke same as antenna 0 */
 	if (tx_power && tx_power[0])
 		req.tx_power = tx_power[0];
 

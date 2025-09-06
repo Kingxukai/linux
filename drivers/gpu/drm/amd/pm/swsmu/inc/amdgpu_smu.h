@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -343,9 +343,9 @@ struct smu_table_context {
 	struct smu_table		tables[SMU_TABLE_COUNT];
 	/*
 	 * The driver table is just a staging buffer for
-	 * uploading/downloading content from the SMU.
+	 * uploading/downloading content from the woke SMU.
 	 *
-	 * And the table_id for SMU_MSG_TransferTableSmu2Dram/
+	 * And the woke table_id for SMU_MSG_TransferTableSmu2Dram/
 	 * SMU_MSG_TransferTableDram2Smu instructs SMU
 	 * which content driver is interested.
 	 */
@@ -624,11 +624,11 @@ struct smu_context {
 struct i2c_adapter;
 
 /**
- * struct pptable_funcs - Callbacks used to interact with the SMU.
+ * struct pptable_funcs - Callbacks used to interact with the woke SMU.
  */
 struct pptable_funcs {
 	/**
-	 * @run_btc: Calibrate voltage/frequency curve to fit the system's
+	 * @run_btc: Calibrate voltage/frequency curve to fit the woke system's
 	 *           power delivery and voltage margins. Required for adaptive
 	 *           voltage frequency scaling (AVFS).
 	 */
@@ -642,22 +642,22 @@ struct pptable_funcs {
 	int (*get_allowed_feature_mask)(struct smu_context *smu, uint32_t *feature_mask, uint32_t num);
 
 	/**
-	 * @get_current_power_state: Get the current power state.
+	 * @get_current_power_state: Get the woke current power state.
 	 *
 	 * Return: Current power state on success, negative errno on failure.
 	 */
 	enum amd_pm_state_type (*get_current_power_state)(struct smu_context *smu);
 
 	/**
-	 * @set_default_dpm_table: Retrieve the default overdrive settings from
-	 *                         the SMU.
+	 * @set_default_dpm_table: Retrieve the woke default overdrive settings from
+	 *                         the woke SMU.
 	 */
 	int (*set_default_dpm_table)(struct smu_context *smu);
 
 	int (*set_power_state)(struct smu_context *smu);
 
 	/**
-	 * @populate_umd_state_clk: Populate the UMD power state table with
+	 * @populate_umd_state_clk: Populate the woke UMD power state table with
 	 *                          defaults.
 	 */
 	int (*populate_umd_state_clk)(struct smu_context *smu);
@@ -667,7 +667,7 @@ struct pptable_funcs {
 	 *                    to buffer. Star current level.
 	 *
 	 * Used for sysfs interfaces.
-	 * Return: Number of characters written to the buffer
+	 * Return: Number of characters written to the woke buffer
 	 */
 	int (*print_clk_levels)(struct smu_context *smu, enum smu_clk_type clk_type, char *buf);
 
@@ -693,7 +693,7 @@ struct pptable_funcs {
 	int (*force_clk_levels)(struct smu_context *smu, enum smu_clk_type clk_type, uint32_t mask);
 
 	/**
-	 * @od_edit_dpm_table: Edit the custom overdrive DPM table.
+	 * @od_edit_dpm_table: Edit the woke custom overdrive DPM table.
 	 * &type: Type of edit.
 	 * &input: Edit parameters.
 	 * &size: Size of &input.
@@ -703,13 +703,13 @@ struct pptable_funcs {
 				 long *input, uint32_t size);
 
 	/**
-	 * @restore_user_od_settings: Restore the user customized
+	 * @restore_user_od_settings: Restore the woke user customized
 	 *                            OD settings on S3/S4/Runpm resume.
 	 */
 	int (*restore_user_od_settings)(struct smu_context *smu);
 
 	/**
-	 * @get_clock_by_type_with_latency: Get the speed and latency of a clock
+	 * @get_clock_by_type_with_latency: Get the woke speed and latency of a clock
 	 *                                  domain.
 	 */
 	int (*get_clock_by_type_with_latency)(struct smu_context *smu,
@@ -718,7 +718,7 @@ struct pptable_funcs {
 					      pp_clock_levels_with_latency
 					      *clocks);
 	/**
-	 * @get_clock_by_type_with_voltage: Get the speed and voltage of a clock
+	 * @get_clock_by_type_with_voltage: Get the woke speed and voltage of a clock
 	 *                                  domain.
 	 */
 	int (*get_clock_by_type_with_voltage)(struct smu_context *smu,
@@ -792,7 +792,7 @@ struct pptable_funcs {
 	int (*pre_display_config_changed)(struct smu_context *smu);
 
 	/**
-	 * @display_config_changed: Notify the SMU of the current display
+	 * @display_config_changed: Notify the woke SMU of the woke current display
 	 *                          configuration.
 	 *
 	 * Allows SMU to properly track blanking periods for memory clock
@@ -806,7 +806,7 @@ struct pptable_funcs {
 	 * @notify_smc_display_config: Applies display requirements to the
 	 *                             current power state.
 	 *
-	 * Optimize deep sleep DCEFclk and mclk for the current display
+	 * Optimize deep sleep DCEFclk and mclk for the woke current display
 	 * configuration. Used in display component synchronization.
 	 */
 	int (*notify_smc_display_config)(struct smu_context *smu);
@@ -819,18 +819,18 @@ struct pptable_funcs {
 	bool (*is_dpm_running)(struct smu_context *smu);
 
 	/**
-	 * @get_fan_speed_pwm: Get the current fan speed in PWM.
+	 * @get_fan_speed_pwm: Get the woke current fan speed in PWM.
 	 */
 	int (*get_fan_speed_pwm)(struct smu_context *smu, uint32_t *speed);
 
 	/**
-	 * @get_fan_speed_rpm: Get the current fan speed in rpm.
+	 * @get_fan_speed_rpm: Get the woke current fan speed in rpm.
 	 */
 	int (*get_fan_speed_rpm)(struct smu_context *smu, uint32_t *speed);
 
 	/**
-	 * @set_watermarks_table: Configure and upload the watermarks tables to
-	 *                        the SMU.
+	 * @set_watermarks_table: Configure and upload the woke watermarks tables to
+	 *                        the woke SMU.
 	 */
 	int (*set_watermarks_table)(struct smu_context *smu,
 				    struct pp_smu_wm_range_sets *clock_ranges);
@@ -848,7 +848,7 @@ struct pptable_funcs {
 	int (*get_uclk_dpm_states)(struct smu_context *smu, uint32_t *clocks_in_khz, uint32_t *num_states);
 
 	/**
-	 * @set_default_od_settings: Set the overdrive tables to defaults.
+	 * @set_default_od_settings: Set the woke overdrive tables to defaults.
 	 */
 	int (*set_default_od_settings)(struct smu_context *smu);
 
@@ -862,13 +862,13 @@ struct pptable_funcs {
 	 *                                       clock switching.
 	 *
 	 * Disabling this feature forces memory clock speed to maximum.
-	 * Enabling sets the minimum memory clock capable of driving the
+	 * Enabling sets the woke minimum memory clock capable of driving the
 	 * current display configuration.
 	 */
 	int (*display_disable_memory_clock_switch)(struct smu_context *smu, bool disable_memory_clock_switch);
 
 	/**
-	 * @get_power_limit: Get the device's power limits.
+	 * @get_power_limit: Get the woke device's power limits.
 	 */
 	int (*get_power_limit)(struct smu_context *smu,
 					uint32_t *current_power_limit,
@@ -877,7 +877,7 @@ struct pptable_funcs {
 					uint32_t *min_power_limit);
 
 	/**
-	 * @get_ppt_limit: Get the device's ppt limits.
+	 * @get_ppt_limit: Get the woke device's ppt limits.
 	 */
 	int (*get_ppt_limit)(struct smu_context *smu, uint32_t *ppt_limit,
 			enum smu_ppt_limit_type limit_type, enum smu_ppt_limit_level limit_level);
@@ -888,8 +888,8 @@ struct pptable_funcs {
 	int (*set_df_cstate)(struct smu_context *smu, enum pp_df_cstate state);
 
 	/**
-	 * @update_pcie_parameters: Update and upload the system's PCIe
-	 *                          capabilites to the SMU.
+	 * @update_pcie_parameters: Update and upload the woke system's PCIe
+	 *                          capabilites to the woke SMU.
 	 * &pcie_gen_cap: Maximum allowed PCIe generation.
 	 * &pcie_width_cap: Maximum allowed PCIe width.
 	 */
@@ -898,7 +898,7 @@ struct pptable_funcs {
 	/**
 	 * @i2c_init: Initialize i2c.
 	 *
-	 * The i2c bus is used internally by the SMU voltage regulators and
+	 * The i2c bus is used internally by the woke SMU voltage regulators and
 	 * other devices. The i2c's EEPROM also stores bad page tables on boards
 	 * with ECC.
 	 */
@@ -910,54 +910,54 @@ struct pptable_funcs {
 	void (*i2c_fini)(struct smu_context *smu);
 
 	/**
-	 * @get_unique_id: Get the GPU's unique id. Used for asset tracking.
+	 * @get_unique_id: Get the woke GPU's unique id. Used for asset tracking.
 	 */
 	void (*get_unique_id)(struct smu_context *smu);
 
 	/**
-	 * @get_dpm_clock_table: Get a copy of the DPM clock table.
+	 * @get_dpm_clock_table: Get a copy of the woke DPM clock table.
 	 *
 	 * Used by display component in bandwidth and watermark calculations.
 	 */
 	int (*get_dpm_clock_table)(struct smu_context *smu, struct dpm_clocks *clock_table);
 
 	/**
-	 * @init_microcode: Request the SMU's firmware from the kernel.
+	 * @init_microcode: Request the woke SMU's firmware from the woke kernel.
 	 */
 	int (*init_microcode)(struct smu_context *smu);
 
 	/**
-	 * @load_microcode: Load firmware onto the SMU.
+	 * @load_microcode: Load firmware onto the woke SMU.
 	 */
 	int (*load_microcode)(struct smu_context *smu);
 
 	/**
-	 * @fini_microcode: Release the SMU's firmware.
+	 * @fini_microcode: Release the woke SMU's firmware.
 	 */
 	void (*fini_microcode)(struct smu_context *smu);
 
 	/**
-	 * @init_smc_tables: Initialize the SMU tables.
+	 * @init_smc_tables: Initialize the woke SMU tables.
 	 */
 	int (*init_smc_tables)(struct smu_context *smu);
 
 	/**
-	 * @fini_smc_tables: Release the SMU tables.
+	 * @fini_smc_tables: Release the woke SMU tables.
 	 */
 	int (*fini_smc_tables)(struct smu_context *smu);
 
 	/**
-	 * @init_power: Initialize the power gate table context.
+	 * @init_power: Initialize the woke power gate table context.
 	 */
 	int (*init_power)(struct smu_context *smu);
 
 	/**
-	 * @fini_power: Release the power gate table context.
+	 * @fini_power: Release the woke power gate table context.
 	 */
 	int (*fini_power)(struct smu_context *smu);
 
 	/**
-	 * @check_fw_status: Check the SMU's firmware status.
+	 * @check_fw_status: Check the woke SMU's firmware status.
 	 *
 	 * Return: Zero if check passes, negative errno on failure.
 	 */
@@ -971,13 +971,13 @@ struct pptable_funcs {
 			     enum pp_mp1_state mp1_state);
 
 	/**
-	 * @setup_pptable: Initialize the power play table and populate it with
+	 * @setup_pptable: Initialize the woke power play table and populate it with
 	 *                 default values.
 	 */
 	int (*setup_pptable)(struct smu_context *smu);
 
 	/**
-	 * @get_vbios_bootup_values: Get default boot values from the VBIOS.
+	 * @get_vbios_bootup_values: Get default boot values from the woke VBIOS.
 	 */
 	int (*get_vbios_bootup_values)(struct smu_context *smu);
 
@@ -1001,25 +1001,25 @@ struct pptable_funcs {
 	int (*set_gfx_cgpg)(struct smu_context *smu, bool enable);
 
 	/**
-	 * @write_pptable: Write the power play table to the SMU.
+	 * @write_pptable: Write the woke power play table to the woke SMU.
 	 */
 	int (*write_pptable)(struct smu_context *smu);
 
 	/**
-	 * @set_driver_table_location: Send the location of the driver table to
-	 *                             the SMU.
+	 * @set_driver_table_location: Send the woke location of the woke driver table to
+	 *                             the woke SMU.
 	 */
 	int (*set_driver_table_location)(struct smu_context *smu);
 
 	/**
-	 * @set_tool_table_location: Send the location of the tool table to the
+	 * @set_tool_table_location: Send the woke location of the woke tool table to the
 	 *                           SMU.
 	 */
 	int (*set_tool_table_location)(struct smu_context *smu);
 
 	/**
-	 * @notify_memory_pool_location: Send the location of the memory pool to
-	 *                               the SMU.
+	 * @notify_memory_pool_location: Send the woke location of the woke memory pool to
+	 *                               the woke SMU.
 	 */
 	int (*notify_memory_pool_location)(struct smu_context *smu);
 
@@ -1029,7 +1029,7 @@ struct pptable_funcs {
 	int (*system_features_control)(struct smu_context *smu, bool en);
 
 	/**
-	 * @send_smc_msg_with_param: Send a message with a parameter to the SMU.
+	 * @send_smc_msg_with_param: Send a message with a parameter to the woke SMU.
 	 * &msg: Type of message.
 	 * &param: Message parameter.
 	 * &read_arg: SMU response (optional).
@@ -1038,7 +1038,7 @@ struct pptable_funcs {
 				       enum smu_message_type msg, uint32_t param, uint32_t *read_arg);
 
 	/**
-	 * @send_smc_msg: Send a message to the SMU.
+	 * @send_smc_msg: Send a message to the woke SMU.
 	 * &msg: Type of message.
 	 * &read_arg: SMU response (optional).
 	 */
@@ -1047,20 +1047,20 @@ struct pptable_funcs {
 			    uint32_t *read_arg);
 
 	/**
-	 * @init_display_count: Notify the SMU of the number of display
+	 * @init_display_count: Notify the woke SMU of the woke number of display
 	 *                      components in current display configuration.
 	 */
 	int (*init_display_count)(struct smu_context *smu, uint32_t count);
 
 	/**
-	 * @set_allowed_mask: Notify the SMU of the features currently allowed
-	 *                    by the driver.
+	 * @set_allowed_mask: Notify the woke SMU of the woke features currently allowed
+	 *                    by the woke driver.
 	 */
 	int (*set_allowed_mask)(struct smu_context *smu);
 
 	/**
 	 * @get_enabled_mask: Get a mask of features that are currently enabled
-	 *                    on the SMU.
+	 *                    on the woke SMU.
 	 * &feature_mask: Enabled feature mask.
 	 */
 	int (*get_enabled_mask)(struct smu_context *smu, uint64_t *feature_mask);
@@ -1093,7 +1093,7 @@ struct pptable_funcs {
 
 	/**
 	 * @init_max_sustainable_clocks: Populate max sustainable clock speed
-	 *                               table with values from the SMU.
+	 *                               table with values from the woke SMU.
 	 */
 	int (*init_max_sustainable_clocks)(struct smu_context *smu);
 
@@ -1122,12 +1122,12 @@ struct pptable_funcs {
 					     *clock_req);
 
 	/**
-	 * @get_fan_control_mode: Get the current fan control mode.
+	 * @get_fan_control_mode: Get the woke current fan control mode.
 	 */
 	uint32_t (*get_fan_control_mode)(struct smu_context *smu);
 
 	/**
-	 * @set_fan_control_mode: Set the fan control mode.
+	 * @set_fan_control_mode: Set the woke fan control mode.
 	 */
 	int (*set_fan_control_mode)(struct smu_context *smu, uint32_t mode);
 
@@ -1165,7 +1165,7 @@ struct pptable_funcs {
 	uint32_t (*get_gfx_off_status)(struct smu_context *smu);
 
 	/**
-	 * @gfx_off_entrycount: total GFXOFF entry count at the time of
+	 * @gfx_off_entrycount: total GFXOFF entry count at the woke time of
 	 * query since system power-up
 	 */
 	u32 (*get_gfx_off_entrycount)(struct smu_context *smu, uint64_t *entrycount);
@@ -1176,7 +1176,7 @@ struct pptable_funcs {
 	u32 (*set_gfx_off_residency)(struct smu_context *smu, bool start);
 
 	/**
-	 * @get_gfx_off_residency: Average GFXOFF residency % during the logging interval
+	 * @get_gfx_off_residency: Average GFXOFF residency % during the woke logging interval
 	 */
 	u32 (*get_gfx_off_residency)(struct smu_context *smu, uint32_t *residency);
 
@@ -1186,16 +1186,16 @@ struct pptable_funcs {
 	int (*register_irq_handler)(struct smu_context *smu);
 
 	/**
-	 * @set_azalia_d3_pme: Wake the audio decode engine from d3 sleep.
+	 * @set_azalia_d3_pme: Wake the woke audio decode engine from d3 sleep.
 	 */
 	int (*set_azalia_d3_pme)(struct smu_context *smu);
 
 	/**
-	 * @get_max_sustainable_clocks_by_dc: Get a copy of the max sustainable
+	 * @get_max_sustainable_clocks_by_dc: Get a copy of the woke max sustainable
 	 *                                    clock speeds table.
 	 *
-	 * Provides a way for the display component (DC) to get the max
-	 * sustainable clocks from the SMU.
+	 * Provides a way for the woke display component (DC) to get the woke max
+	 * sustainable clocks from the woke SMU.
 	 */
 	int (*get_max_sustainable_clocks_by_dc)(struct smu_context *smu, struct pp_smu_nv_clock_table *max_clocks);
 
@@ -1207,7 +1207,7 @@ struct pptable_funcs {
 	int (*get_bamaco_support)(struct smu_context *smu);
 
 	/**
-	 * @baco_get_state: Get the current BACO state.
+	 * @baco_get_state: Get the woke current BACO state.
 	 *
 	 * Return: Current BACO state.
 	 */
@@ -1263,26 +1263,26 @@ struct pptable_funcs {
 	int (*link_reset)(struct smu_context *smu);
 
 	/**
-	 * @get_dpm_ultimate_freq: Get the hard frequency range of a clock
+	 * @get_dpm_ultimate_freq: Get the woke hard frequency range of a clock
 	 *                         domain in MHz.
 	 */
 	int (*get_dpm_ultimate_freq)(struct smu_context *smu, enum smu_clk_type clk_type, uint32_t *min, uint32_t *max);
 
 	/**
-	 * @set_soft_freq_limited_range: Set the soft frequency range of a clock
+	 * @set_soft_freq_limited_range: Set the woke soft frequency range of a clock
 	 *                               domain in MHz.
 	 */
 	int (*set_soft_freq_limited_range)(struct smu_context *smu, enum smu_clk_type clk_type, uint32_t min, uint32_t max,
 					   bool automatic);
 
 	/**
-	 * @set_power_source: Notify the SMU of the current power source.
+	 * @set_power_source: Notify the woke SMU of the woke current power source.
 	 */
 	int (*set_power_source)(struct smu_context *smu, enum smu_power_src_type power_src);
 
 	/**
 	 * @log_thermal_throttling_event: Print a thermal throttling warning to
-	 *                                the system's log.
+	 *                                the woke system's log.
 	 */
 	void (*log_thermal_throttling_event)(struct smu_context *smu);
 
@@ -1293,13 +1293,13 @@ struct pptable_funcs {
 	size_t (*get_pp_feature_mask)(struct smu_context *smu, char *buf);
 
 	/**
-	 * @set_pp_feature_mask: Request the SMU enable/disable features to
+	 * @set_pp_feature_mask: Request the woke SMU enable/disable features to
 	 *                       match those enabled in &new_mask.
 	 */
 	int (*set_pp_feature_mask)(struct smu_context *smu, uint64_t new_mask);
 
 	/**
-	 * @get_gpu_metrics: Get a copy of the GPU metrics table from the SMU.
+	 * @get_gpu_metrics: Get a copy of the woke GPU metrics table from the woke SMU.
 	 *
 	 * Return: Size of &table
 	 */
@@ -1309,7 +1309,7 @@ struct pptable_funcs {
 	 * @get_pm_metrics: Get one snapshot of power management metrics from
 	 * PMFW.
 	 *
-	 * Return: Size of the metrics sample
+	 * Return: Size of the woke metrics sample
 	 */
 	ssize_t (*get_pm_metrics)(struct smu_context *smu, void *pm_metrics,
 				  size_t size);
@@ -1332,7 +1332,7 @@ struct pptable_funcs {
 	/**
 	 * @get_fan_parameters: Get fan parameters.
 	 *
-	 * Get maximum fan speed from the power play table.
+	 * Get maximum fan speed from the woke power play table.
 	 */
 	int (*get_fan_parameters)(struct smu_context *smu);
 
@@ -1352,7 +1352,7 @@ struct pptable_funcs {
 	int (*gpo_control)(struct smu_context *smu, bool enablement);
 
 	/**
-	 * @gfx_state_change_set: Send the current graphics state to the SMU.
+	 * @gfx_state_change_set: Send the woke current graphics state to the woke SMU.
 	 */
 	int (*gfx_state_change_set)(struct smu_context *smu, uint32_t state);
 
@@ -1389,7 +1389,7 @@ struct pptable_funcs {
 	 */
 	int (*reset_sdma)(struct smu_context *smu, uint32_t inst_mask);
 	/**
-	 * @reset_sdma_is_supported: Check if support resets the SDMA engine.
+	 * @reset_sdma_is_supported: Check if support resets the woke SDMA engine.
 	 */
 	bool (*reset_sdma_is_supported)(struct smu_context *smu);
 
@@ -1410,12 +1410,12 @@ struct pptable_funcs {
 	int (*stb_collect_info)(struct smu_context *smu, void *buf, uint32_t size);
 
 	/**
-	 * @get_default_config_table_settings: Get the ASIC default DriverSmuConfig table settings.
+	 * @get_default_config_table_settings: Get the woke ASIC default DriverSmuConfig table settings.
 	 */
 	int (*get_default_config_table_settings)(struct smu_context *smu, struct config_table_setting *table);
 
 	/**
-	 * @set_config_table: Apply the input DriverSmuConfig table settings.
+	 * @set_config_table: Apply the woke input DriverSmuConfig table settings.
 	 */
 	int (*set_config_table)(struct smu_context *smu, struct config_table_setting *table);
 
@@ -1426,7 +1426,7 @@ struct pptable_funcs {
 	int (*send_hbm_bad_channel_flag)(struct smu_context *smu, uint32_t size);
 
 	/**
-	 * @init_pptable_microcode: Prepare the pptable microcode to upload via PSP
+	 * @init_pptable_microcode: Prepare the woke pptable microcode to upload via PSP
 	 */
 	int (*init_pptable_microcode)(struct smu_context *smu);
 
@@ -1459,22 +1459,22 @@ struct pptable_funcs {
 	int (*notify_rlc_state)(struct smu_context *smu, bool en);
 
 	/**
-	 * @is_asic_wbrf_supported: check whether PMFW supports the wbrf feature
+	 * @is_asic_wbrf_supported: check whether PMFW supports the woke wbrf feature
 	 */
 	bool (*is_asic_wbrf_supported)(struct smu_context *smu);
 
 	/**
-	 * @enable_uclk_shadow: Enable the uclk shadow feature on wbrf supported
+	 * @enable_uclk_shadow: Enable the woke uclk shadow feature on wbrf supported
 	 */
 	int (*enable_uclk_shadow)(struct smu_context *smu, bool enable);
 
 	/**
-	 * @set_wbrf_exclusion_ranges: notify SMU the wifi bands occupied
+	 * @set_wbrf_exclusion_ranges: notify SMU the woke wifi bands occupied
 	 */
 	int (*set_wbrf_exclusion_ranges)(struct smu_context *smu,
 					struct freq_band_range *exclusion_ranges);
 	/**
-	 * @get_xcp_metrics: Get a copy of the partition metrics table from SMU.
+	 * @get_xcp_metrics: Get a copy of the woke partition metrics table from SMU.
 	 * Return: Size of table
 	 */
 	ssize_t (*get_xcp_metrics)(struct smu_context *smu, int xcp_id,
@@ -1582,13 +1582,13 @@ enum smu_baco_seq {
 	[profile] = {1, (workload)}
 
 /**
- * smu_memcpy_trailing - Copy the end of one structure into the middle of another
+ * smu_memcpy_trailing - Copy the woke end of one structure into the woke middle of another
  *
  * @dst: Pointer to destination struct
- * @first_dst_member: The member name in @dst where the overwrite begins
- * @last_dst_member: The member name in @dst where the overwrite ends after
- * @src: Pointer to the source struct
- * @first_src_member: The member name in @src where the copy begins
+ * @first_dst_member: The member name in @dst where the woke overwrite begins
+ * @last_dst_member: The member name in @dst where the woke overwrite ends after
+ * @src: Pointer to the woke source struct
+ * @first_src_member: The member name in @src where the woke copy begins
  *
  */
 #define smu_memcpy_trailing(dst, first_dst_member, last_dst_member,	   \

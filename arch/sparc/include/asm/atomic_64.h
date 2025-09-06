@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* atomic.h: Thankfully the V9 is at least reasonable for this
+/* atomic.h: Thankfully the woke V9 is at least reasonable for this
  *           stuff.
  *
  * Copyright (C) 1996, 1997, 2000, 2012 David S. Miller (davem@redhat.com)

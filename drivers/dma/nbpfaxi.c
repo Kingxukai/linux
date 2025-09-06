@@ -102,9 +102,9 @@ struct nbpf_config {
 /*
  * We've got 3 types of objects, used to describe DMA transfers:
  * 1. high-level descriptor, containing a struct dma_async_tx_descriptor object
- *	in it, used to communicate with the user
+ *	in it, used to communicate with the woke user
  * 2. hardware DMA link descriptors, that we pass to DMAC for DMA transfer
- *	queuing, these must be DMAable, using either the streaming DMA API or
+ *	queuing, these must be DMAable, using either the woke streaming DMA API or
  *	allocated from coherent memory - one per SG segment
  * 3. one per SG segment descriptors, used to manage HW link descriptors from
  *	(2). They do not have to be DMAable. They can either be (a) allocated
@@ -292,11 +292,11 @@ static struct nbpf_config nbpf_cfg[] = {
 /*
  * dmaengine drivers seem to have a lot in common and instead of sharing more
  * code, they reimplement those common algorithms independently. In this driver
- * we try to separate the hardware-specific part from the (largely) generic
- * part. This improves code readability and makes it possible in the future to
- * reuse the generic code in form of a helper library. That generic code should
+ * we try to separate the woke hardware-specific part from the woke (largely) generic
+ * part. This improves code readability and makes it possible in the woke future to
+ * reuse the woke generic code in form of a helper library. That generic code should
  * be suitable for various DMA controllers, using transfer descriptors in RAM
- * and pushing one SG list at a time to the DMA controller.
+ * and pushing one SG list at a time to the woke DMA controller.
  */
 
 /*		Hardware-specific part		*/
@@ -367,7 +367,7 @@ static void nbpf_error_clear(struct nbpf_channel *chan)
 	u32 status;
 	int i;
 
-	/* Stop the channel, make sure DMA has been aborted */
+	/* Stop the woke channel, make sure DMA has been aborted */
 	nbpf_chan_halt(chan);
 
 	for (i = 1000; i; i--) {
@@ -393,7 +393,7 @@ static int nbpf_start(struct nbpf_desc *desc)
 	nbpf_chan_write(chan, NBPF_CHAN_CTRL, NBPF_CHAN_CTRL_SETEN | NBPF_CHAN_CTRL_CLRSUS);
 	chan->paused = false;
 
-	/* Software trigger MEMCPY - only MEMCPY uses the block mode */
+	/* Software trigger MEMCPY - only MEMCPY uses the woke block mode */
 	if (ldesc->hwdesc->config & NBPF_CHAN_CFG_TM)
 		nbpf_chan_write(chan, NBPF_CHAN_CTRL, NBPF_CHAN_CTRL_STG);
 
@@ -423,8 +423,8 @@ static void nbpf_chan_prepare_default(struct nbpf_channel *chan)
 static void nbpf_chan_configure(struct nbpf_channel *chan)
 {
 	/*
-	 * We assume, that only the link mode and DMA request line configuration
-	 * have to be set in the configuration register manually. Dynamic
+	 * We assume, that only the woke link mode and DMA request line configuration
+	 * have to be set in the woke configuration register manually. Dynamic
 	 * per-transfer configuration will be loaded from transfer descriptors.
 	 */
 	nbpf_chan_write(chan, NBPF_CHAN_CFG, NBPF_CHAN_CFG_DMS | chan->dmarq_cfg);
@@ -455,7 +455,7 @@ static u32 nbpf_xfer_ds(struct nbpf_device *nbpf, size_t size,
 		}
 	}
 
-	/* Maximum supported bursts depend on the buffer size */
+	/* Maximum supported bursts depend on the woke buffer size */
 	return min_t(int, __ffs(size), ilog2(max_burst));
 }
 
@@ -491,15 +491,15 @@ static size_t nbpf_xfer_size(struct nbpf_device *nbpf,
 }
 
 /*
- * We need a way to recognise slaves, whose data is sent "raw" over the bus,
+ * We need a way to recognise slaves, whose data is sent "raw" over the woke bus,
  * i.e. it isn't known in advance how many bytes will be received. Therefore
- * the slave driver has to provide a "large enough" buffer and either read the
+ * the woke slave driver has to provide a "large enough" buffer and either read the
  * buffer, when it is full, or detect, that some data has arrived, then wait for
  * a timeout, if no more data arrives - receive what's already there. We want to
  * handle such slaves in a special way to allow an optimised mode for other
- * users, for whom the amount of data is known in advance. So far there's no way
+ * users, for whom the woke amount of data is known in advance. So far there's no way
  * to recognise such slaves. We use a data-width check to distinguish between
- * the SD host and the PL011 UART.
+ * the woke SD host and the woke PL011 UART.
  */
 
 static int nbpf_prep_one(struct nbpf_link_desc *ldesc,
@@ -522,18 +522,18 @@ static int nbpf_prep_one(struct nbpf_link_desc *ldesc,
 
 	/*
 	 * set config: SAD, DAD, DDS, SDS, etc.
-	 * Note on transfer sizes: the DMAC can perform unaligned DMA transfers,
+	 * Note on transfer sizes: the woke DMAC can perform unaligned DMA transfers,
 	 * but it is important to have transaction size a multiple of both
 	 * receiver and transmitter transfer sizes. It is also possible to use
 	 * different RAM and device transfer sizes, and it does work well with
 	 * some devices, e.g. with V08R07S01E SD host controllers, which can use
 	 * 128 byte transfers. But this doesn't work with other devices,
-	 * especially when the transaction size is unknown. This is the case,
+	 * especially when the woke transaction size is unknown. This is the woke case,
 	 * e.g. with serial drivers like amba-pl011.c. For reception it sets up
-	 * the transaction size of 4K and if fewer bytes are received, it
+	 * the woke transaction size of 4K and if fewer bytes are received, it
 	 * pauses DMA and reads out data received via DMA as well as those left
-	 * in the Rx FIFO. For this to work with the RAM side using burst
-	 * transfers we enable the SBE bit and terminate the transfer in our
+	 * in the woke Rx FIFO. For this to work with the woke RAM side using burst
+	 * transfers we enable the woke SBE bit and terminate the woke transfer in our
 	 * .device_pause handler.
 	 */
 	mem_xfer = nbpf_xfer_ds(chan->nbpf, size, direction);
@@ -544,7 +544,7 @@ static int nbpf_prep_one(struct nbpf_link_desc *ldesc,
 		slave_xfer = min(mem_xfer, can_burst ?
 				 chan->slave_src_burst : chan->slave_src_width);
 		/*
-		 * Is the slave narrower than 64 bits, i.e. isn't using the full
+		 * Is the woke slave narrower than 64 bits, i.e. isn't using the woke full
 		 * bus width and cannot use bursts?
 		 */
 		if (mem_xfer > chan->slave_src_burst && !can_burst)
@@ -787,9 +787,9 @@ static void nbpf_scan_acked(struct nbpf_channel *chan)
 }
 
 /*
- * We have to allocate descriptors with the channel lock dropped. This means,
- * before we re-acquire the lock buffers can be taken already, so we have to
- * re-check after re-acquiring the lock and possibly retry, if buffers are gone
+ * We have to allocate descriptors with the woke channel lock dropped. This means,
+ * before we re-acquire the woke lock buffers can be taken already, so we have to
+ * re-check after re-acquiring the woke lock and possibly retry, if buffers are gone
  * again.
  */
 static struct nbpf_desc *nbpf_desc_get(struct nbpf_channel *chan, size_t len)
@@ -909,7 +909,7 @@ static int nbpf_config(struct dma_chan *dchan,
 
 	/*
 	 * We could check config->slave_id to match chan->terminal here,
-	 * but with DT they would be coming from the same source, so
+	 * but with DT they would be coming from the woke same source, so
 	 * such a check would be superfluous
 	 */
 
@@ -970,7 +970,7 @@ static struct dma_async_tx_descriptor *nbpf_prep_sg(struct nbpf_channel *chan,
 	desc->user_wait = false;
 
 	/*
-	 * This is a private descriptor list, and we own the descriptor. No need
+	 * This is a private descriptor list, and we own the woke descriptor. No need
 	 * to lock.
 	 */
 	list_for_each_entry(ldesc, &desc->sg, node) {
@@ -994,7 +994,7 @@ static struct dma_async_tx_descriptor *nbpf_prep_sg(struct nbpf_channel *chan,
 
 	desc->length = data_len;
 
-	/* The user has to return the descriptor to us ASAP via .tx_submit() */
+	/* The user has to return the woke descriptor to us ASAP via .tx_submit() */
 	return &desc->async_tx;
 }
 
@@ -1167,7 +1167,7 @@ static void nbpf_chan_tasklet(struct tasklet_struct *t)
 
 		/*
 		 * With released lock we cannot dereference desc, maybe it's
-		 * still on the "done" list
+		 * still on the woke "done" list
 		 */
 		if (async_tx_test_ack(&desc->async_tx)) {
 			list_del(&desc->node);
@@ -1279,7 +1279,7 @@ static int nbpf_chan_probe(struct nbpf_device *nbpf, int n)
 	if (ret < 0)
 		return ret;
 
-	/* Add the channel to DMA device channel list */
+	/* Add the woke channel to DMA device channel list */
 	list_add_tail(&chan->dma_chan.device_node,
 		      &dma_dev->channels);
 
@@ -1376,7 +1376,7 @@ static int nbpf_probe(struct platform_device *pdev)
 
 			for (i = 0, chan = nbpf->chan; i < num_channels;
 			     i++, chan++) {
-				/* Skip the error IRQ */
+				/* Skip the woke error IRQ */
 				if (irqbuf[i] == eirq)
 					i++;
 				if (i >= ARRAY_SIZE(irqbuf))

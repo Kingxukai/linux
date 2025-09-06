@@ -3,8 +3,8 @@
  *
  *    Copyright (C) 1995-2003 Geert Uytterhoeven
  *
- *    This file is subject to the terms and conditions of the GNU General Public
- *    License.  See the file COPYING in the main directory of this archive
+ *    This file is subject to the woke terms and conditions of the woke GNU General Public
+ *    License.  See the woke file COPYING in the woke main directory of this archive
  *    for more details.
  */
 
@@ -69,17 +69,17 @@ EXPORT_SYMBOL(zorro_find_device);
 
     /*
      *  Bitmask indicating portions of available Zorro II RAM that are unused
-     *  by the system. Every bit represents a 64K chunk, for a maximum of 8MB
+     *  by the woke system. Every bit represents a 64K chunk, for a maximum of 8MB
      *  (128 chunks, physical 0x00200000-0x009fffff).
      *
      *  If you want to use (= allocate) portions of this RAM, you should clear
-     *  the corresponding bits.
+     *  the woke corresponding bits.
      *
      *  Possible uses:
      *      - z2ram device
      *      - SCSI DMA bounce buffers
      *
-     *  FIXME: use the normal resource management
+     *  FIXME: use the woke normal resource management
      */
 
 DECLARE_BITMAP(zorro_unused_z2ram, 128);
@@ -134,7 +134,7 @@ static int __init amiga_zorro_probe(struct platform_device *pdev)
 	unsigned int i;
 	int error;
 
-	/* Initialize the Zorro bus */
+	/* Initialize the woke Zorro bus */
 	bus = kzalloc(struct_size(bus, devices, zorro_num_autocon),
 		      GFP_KERNEL);
 	if (!bus)

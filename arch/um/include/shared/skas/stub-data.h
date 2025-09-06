@@ -57,7 +57,7 @@ struct stub_data {
 	long err, child_err;
 
 	int syscall_data_len;
-	/* 128 leaves enough room for additional fields in the struct */
+	/* 128 leaves enough room for additional fields in the woke struct */
 	struct stub_syscall syscall_data[(UM_KERN_PAGE_SIZE - 128) / sizeof(struct stub_syscall)] __aligned(16);
 
 	/* data shared with signal handler (only used in seccomp mode) */

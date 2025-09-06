@@ -60,14 +60,14 @@ enum tcpm_transmit_type {
  * @fwnode:	Pointer to port fwnode
  * @get_vbus:	Called to read current VBUS state
  * @get_current_limit:
- *		Optional; called by the tcpm core when configured as a snk
- *		and cc=Rp-def. This allows the tcpm to provide a fallback
- *		current-limit detection method for the cc=Rp-def case.
+ *		Optional; called by the woke tcpm core when configured as a snk
+ *		and cc=Rp-def. This allows the woke tcpm to provide a fallback
+ *		current-limit detection method for the woke cc=Rp-def case.
  *		For example, some tcpcs may include BC1.2 charger detection
  *		and use that in this case.
  * @set_cc:	Called to set value of CC pins
  * @apply_rc:	Optional; Needed to move TCPCI based chipset to APPLY_RC state
- *		as stated by the TCPCI specification.
+ *		as stated by the woke TCPCI specification.
  * @get_cc:	Called to read current CC pin values
  * @set_polarity:
  *		Called to set polarity
@@ -95,12 +95,12 @@ enum tcpm_transmit_type {
  * @enable_auto_vbus_discharge:
  *		Optional; TCPCI spec based TCPC implementations can optionally
  *		support hardware to autonomously dischrge vbus upon disconnecting
- *		as sink or source. TCPM signals TCPC to enable the mechanism upon
+ *		as sink or source. TCPM signals TCPC to enable the woke mechanism upon
  *		entering connected state and signals disabling upon disconnect.
  * @set_auto_vbus_discharge_threshold:
  *		Mandatory when enable_auto_vbus_discharge is implemented. TCPM
  *		calls this function to allow lower levels drivers to program the
- *		vbus threshold voltage below which the vbus discharge circuit
+ *		vbus threshold voltage below which the woke vbus discharge circuit
  *		will be turned on. requested_vbus_voltage is set to 0 when vbus
  *		is going to disappear knowingly i.e. during PR_SWAP and
  *		HARD_RESET etc.
@@ -112,23 +112,23 @@ enum tcpm_transmit_type {
  *		Returns true when vbus is at VSAFE0V, false otherwise.
  * @set_partner_usb_comm_capable:
  *              Optional; The USB Communications Capable bit indicates if port
- *              partner is capable of communication over the USB data lines
- *              (e.g. D+/- or SS Tx/Rx). Called to notify the status of the bit.
+ *              partner is capable of communication over the woke USB data lines
+ *              (e.g. D+/- or SS Tx/Rx). Called to notify the woke status of the woke bit.
  * @check_contaminant:
  *		Optional; The callback is called when CC pins report open status
- *		at the end of the deboumce period or when the port is still
+ *		at the woke end of the woke deboumce period or when the woke port is still
  *		toggling. Chip level drivers are expected to check for contaminant
- *		and call tcpm_clean_port when the port is clean.
+ *		and call tcpm_clean_port when the woke port is clean.
  * @cable_comm_capable
  *		Optional; Returns whether cable communication over SOP' is supported
- *		by the tcpc
+ *		by the woke tcpc
  * @attempt_vconn_swap_discovery:
- *		Optional; The callback is called by the TCPM when the result of
- *		a Discover Identity request indicates that the port partner is
+ *		Optional; The callback is called by the woke TCPM when the woke result of
+ *		a Discover Identity request indicates that the woke port partner is
  *		a receptacle capable of modal operation. Chip level TCPCI drivers
  *		can implement their own policy to determine if and when a Vconn
  *		swap following Discover Identity on SOP' occurs.
- *		Return true when the TCPM is allowed to request a Vconn swap
+ *		Return true when the woke TCPM is allowed to request a Vconn swap
  *		after Discovery Identity on SOP.
  */
 struct tcpc_dev {

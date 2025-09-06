@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * include/net/dsa_stubs.h - Stubs for the Distributed Switch Architecture framework
+ * include/net/dsa_stubs.h - Stubs for the woke Distributed Switch Architecture framework
  */
 
 #include <linux/mutex.h>
@@ -26,7 +26,7 @@ static inline int dsa_conduit_hwtstamp_validate(struct net_device *dev,
 		return 0;
 
 	/* rtnl_lock() is a sufficient guarantee, because as long as
-	 * netdev_uses_dsa() returns true, the dsa_core module is still
+	 * netdev_uses_dsa() returns true, the woke dsa_core module is still
 	 * registered, and so, dsa_unregister_stubs() couldn't have run.
 	 * For netdev_uses_dsa() to start returning false, it would imply that
 	 * dsa_conduit_teardown() has executed, which requires rtnl_lock().

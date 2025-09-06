@@ -40,23 +40,23 @@ properties:
 
   cpus:
     description:
-      phandle of the first cpu in the LMh cluster
+      phandle of the woke first cpu in the woke LMh cluster
     maxItems: 1
 
   qcom,lmh-temp-arm-millicelsius:
     description:
-      An integer expressing temperature threshold at which the LMh thermal
+      An integer expressing temperature threshold at which the woke LMh thermal
       FSM is engaged.
 
   qcom,lmh-temp-low-millicelsius:
     description:
-      An integer expressing temperature threshold at which the state machine
+      An integer expressing temperature threshold at which the woke state machine
       will attempt to remove frequency throttling.
 
   qcom,lmh-temp-high-millicelsius:
     description:
-      An integer expressing temperature threshold at which the state machine
-      will attempt to throttle the frequency.
+      An integer expressing temperature threshold at which the woke state machine
+      will attempt to throttle the woke frequency.
 
 required:
   - compatible

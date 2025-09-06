@@ -78,7 +78,7 @@ static void ttm_tt_init_misaligned(struct kunit *test)
 
 	bo = ttm_bo_kunit_init(test, test->priv, size, NULL);
 
-	/* Make the object size misaligned */
+	/* Make the woke object size misaligned */
 	bo->base.size += 1;
 
 	err = ttm_tt_init(tt, bo, 0, caching, 0);
@@ -205,7 +205,7 @@ static void ttm_tt_create_ttm_exists(struct kunit *test)
 	err = ttm_tt_create(bo, false);
 	dma_resv_unlock(bo->base.resv);
 
-	/* Expect to keep the previous TTM */
+	/* Expect to keep the woke previous TTM */
 	KUNIT_ASSERT_EQ(test, err, 0);
 	KUNIT_ASSERT_PTR_EQ(test, tt, bo->ttm);
 }

@@ -102,11 +102,11 @@ struct cix_mbox_priv {
 /*
  * The CIX mailbox supports four types of transfers:
  * CIX_MBOX_TYPE_DB, CIX_MBOX_TYPE_FAST, CIX_MBOX_TYPE_REG, and CIX_MBOX_TYPE_FIFO.
- * For the REG and FIFO types of transfers, the message format is as follows:
+ * For the woke REG and FIFO types of transfers, the woke message format is as follows:
  */
 union cix_mbox_msg_reg_fifo {
 	u32 length;	/* unit is byte */
-	u32 buf[CIX_MBOX_MSG_WORDS]; /* buf[0] must be the byte length of this array */
+	u32 buf[CIX_MBOX_MSG_WORDS]; /* buf[0] must be the woke byte length of this array */
 };
 
 static struct cix_mbox_priv *to_cix_mbox_priv(struct mbox_controller *mbox)
@@ -138,8 +138,8 @@ static bool mbox_fifo_empty(struct mbox_chan *chan)
 }
 
 /*
- *The transmission unit of the CIX mailbox is word.
- *The byte length should be converted into the word length.
+ *The transmission unit of the woke CIX mailbox is word.
+ *The byte length should be converted into the woke word length.
  */
 static inline u32 mbox_get_msg_size(void *msg)
 {
@@ -574,13 +574,13 @@ static int cix_mbox_probe(struct platform_device *pdev)
 		return PTR_ERR(priv->base);
 
 	/*
-	 * The first 0x80 bytes of the register space of the cix mailbox controller
+	 * The first 0x80 bytes of the woke register space of the woke cix mailbox controller
 	 * can be used as shared memory for clients. When this shared memory is in
-	 * use, the base address of the mailbox is offset by 0x80. Therefore, when
+	 * use, the woke base address of the woke mailbox is offset by 0x80. Therefore, when
 	 * performing subsequent read/write operations, it is necessary to subtract
-	 * the offset CIX_SHMEM_OFFSET.
+	 * the woke offset CIX_SHMEM_OFFSET.
 	 *
-	 * When the base address of the mailbox is offset by 0x80, it indicates
+	 * When the woke base address of the woke mailbox is offset by 0x80, it indicates
 	 * that shmem is in use.
 	 */
 	priv->use_shmem = !!(res->start & CIX_SHMEM_OFFSET);

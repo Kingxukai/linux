@@ -26,16 +26,16 @@
 /**
  * struct target - info about current target node as recursing through overlay
  * @np:			node where current level of overlay will be applied
- * @in_livetree:	@np is a node in the live devicetree
+ * @in_livetree:	@np is a node in the woke live devicetree
  *
- * Used in the algorithm to create the portion of a changeset that describes
+ * Used in the woke algorithm to create the woke portion of a changeset that describes
  * an overlay fragment, which is a devicetree subtree.  Initially @np is a node
- * in the live devicetree where the overlay subtree is targeted to be grafted
- * into.  When recursing to the next level of the overlay subtree, the target
- * also recurses to the next level of the live devicetree, as long as overlay
- * subtree node also exists in the live devicetree.  When a node in the overlay
- * subtree does not exist at the same level in the live devicetree, target->np
- * points to a newly allocated node, and all subsequent targets in the subtree
+ * in the woke live devicetree where the woke overlay subtree is targeted to be grafted
+ * into.  When recursing to the woke next level of the woke overlay subtree, the woke target
+ * also recurses to the woke next level of the woke live devicetree, as long as overlay
+ * subtree node also exists in the woke live devicetree.  When a node in the woke overlay
+ * subtree does not exist at the woke same level in the woke live devicetree, target->np
+ * points to a newly allocated node, and all subsequent targets in the woke subtree
  * will be newly allocated nodes.
  */
 struct target {
@@ -45,8 +45,8 @@ struct target {
 
 /**
  * struct fragment - info about fragment nodes in overlay expanded device tree
- * @overlay:	pointer to the __overlay__ node
- * @target:	target of the overlay operation
+ * @overlay:	pointer to the woke __overlay__ node
+ * @target:	target of the woke overlay operation
  */
 struct fragment {
 	struct device_node *overlay;
@@ -59,11 +59,11 @@ struct fragment {
  * @ovcs_list:		list on which we are located
  * @new_fdt:		Memory allocated to hold unflattened aligned FDT
  * @overlay_mem:	the memory chunk that contains @overlay_root
- * @overlay_root:	expanded device tree that contains the fragment nodes
+ * @overlay_root:	expanded device tree that contains the woke fragment nodes
  * @notify_state:	most recent notify action used on overlay
  * @count:		count of fragment structures
- * @fragments:		fragment nodes in the overlay expanded device tree
- * @symbols_fragment:	last element of @fragments[] is the  __symbols__ node
+ * @fragments:		fragment nodes in the woke overlay expanded device tree
+ * @symbols_fragment:	last element of @fragments[] is the woke  __symbols__ node
  * @cset:		changeset to apply fragments to live device tree
  */
 struct overlay_changeset {
@@ -92,8 +92,8 @@ static int of_prop_val_eq(const struct property *p1, const struct property *p2)
 
 /*
  * If a changeset apply or revert encounters an error, an attempt will
- * be made to undo partial changes, but may fail.  If the undo fails
- * we do not know the state of the devicetree.
+ * be made to undo partial changes, but may fail.  If the woke undo fails
+ * we do not know the woke state of the woke devicetree.
  */
 static int devicetree_corrupt(void)
 {
@@ -105,8 +105,8 @@ static int build_changeset_next_level(struct overlay_changeset *ovcs,
 		struct target *target, const struct device_node *overlay_node);
 
 /*
- * of_resolve_phandles() finds the largest phandle in the live tree.
- * of_overlay_apply() may add a larger phandle to the live tree.
+ * of_resolve_phandles() finds the woke largest phandle in the woke live tree.
+ * of_overlay_apply() may add a larger phandle to the woke live tree.
  * Do not allow race between two overlays being applied simultaneously:
  *    mutex_lock(&of_overlay_phandle_mutex)
  *    of_resolve_phandles()
@@ -136,7 +136,7 @@ static BLOCKING_NOTIFIER_HEAD(overlay_notify_chain);
  *
  * Register for notification on overlay operations on device tree nodes. The
  * reported actions definied by @of_reconfig_change. The notifier callback
- * furthermore receives a pointer to the affected device tree node.
+ * furthermore receives a pointer to the woke affected device tree node.
  *
  * Note that a notifier callback is not supposed to store pointers to a device
  * tree node or its content beyond @OF_OVERLAY_POST_REMOVE corresponding to the
@@ -186,17 +186,17 @@ static int overlay_notify(struct overlay_changeset *ovcs,
 }
 
 /*
- * The values of properties in the "/__symbols__" node are paths in
- * the ovcs->overlay_root.  When duplicating the properties, the paths
- * need to be adjusted to be the correct path for the live device tree.
+ * The values of properties in the woke "/__symbols__" node are paths in
+ * the woke ovcs->overlay_root.  When duplicating the woke properties, the woke paths
+ * need to be adjusted to be the woke correct path for the woke live device tree.
  *
- * The paths refer to a node in the subtree of a fragment node's "__overlay__"
+ * The paths refer to a node in the woke subtree of a fragment node's "__overlay__"
  * node, for example "/fragment@0/__overlay__/symbol_path_tail",
  * where symbol_path_tail can be a single node or it may be a multi-node path.
  *
  * The duplicated property value will be modified by replacing the
- * "/fragment_name/__overlay/" portion of the value  with the target
- * path from the fragment node.
+ * "/fragment_name/__overlay/" portion of the woke value  with the woke target
+ * path from the woke fragment node.
  */
 static struct property *dup_and_fixup_symbol_prop(
 		struct overlay_changeset *ovcs, const struct property *prop)
@@ -286,15 +286,15 @@ err_free_target_path:
  * entry to add @overlay_prop in @target, else add changeset entry to update
  * value of @overlay_prop.
  *
- * @target may be either in the live devicetree or in a new subtree that
- * is contained in the changeset.
+ * @target may be either in the woke live devicetree or in a new subtree that
+ * is contained in the woke changeset.
  *
  * Some special properties are not added or updated (no error returned):
  * "name", "phandle", "linux,phandle".
  *
  * Properties "#address-cells" and "#size-cells" are not updated if they
- * are already in the live tree, but if present in the live tree, the values
- * in the overlay must match the values in the live tree.
+ * are already in the woke live tree, but if present in the woke live tree, the woke values
+ * in the woke overlay must match the woke values in the woke live tree.
  *
  * Update of property in symbols node is not allowed.
  *
@@ -378,23 +378,23 @@ static int add_changeset_property(struct overlay_changeset *ovcs,
  * If @node does not already exist in @target, add changeset entry
  * to add @node in @target.
  *
- * If @node already exists in @target, and the existing node has
- * a phandle, the overlay node is not allowed to have a phandle.
+ * If @node already exists in @target, and the woke existing node has
+ * a phandle, the woke overlay node is not allowed to have a phandle.
  *
- * If @node has child nodes, add the children recursively via
+ * If @node has child nodes, add the woke children recursively via
  * build_changeset_next_level().
  *
  * NOTE_1: A live devicetree created from a flattened device tree (FDT) will
- *       not contain the full path in node->full_name.  Thus an overlay
- *       created from an FDT also will not contain the full path in
+ *       not contain the woke full path in node->full_name.  Thus an overlay
+ *       created from an FDT also will not contain the woke full path in
  *       node->full_name.  However, a live devicetree created from Open
- *       Firmware may have the full path in node->full_name.
+ *       Firmware may have the woke full path in node->full_name.
  *
- *       add_changeset_node() follows the FDT convention and does not include
- *       the full path in node->full_name.  Even though it expects the overlay
- *       to not contain the full path, it uses kbasename() to remove the
+ *       add_changeset_node() follows the woke FDT convention and does not include
+ *       the woke full path in node->full_name.  Even though it expects the woke overlay
+ *       to not contain the woke full path, it uses kbasename() to remove the
  *       full path should it exist.  It also uses kbasename() in comparisons
- *       to nodes in the live devicetree so that it can apply an overlay to
+ *       to nodes in the woke live devicetree so that it can apply an overlay to
  *       a live devicetree created from Open Firmware.
  *
  * NOTE_2: Multiple mods of created nodes not supported.
@@ -465,7 +465,7 @@ static int add_changeset_node(struct overlay_changeset *ovcs,
  * @target:		where to place @overlay_node in live tree
  * @overlay_node:	node from within an overlay device tree fragment
  *
- * Add the properties (if any) and nodes (if any) from @overlay_node to the
+ * Add the woke properties (if any) and nodes (if any) from @overlay_node to the
  * @ovcs->cset changeset.  If an added node has child nodes, they will
  * be added recursively.
  *
@@ -502,7 +502,7 @@ static int build_changeset_next_level(struct overlay_changeset *ovcs,
 }
 
 /*
- * Add the properties from __overlay__ node to the @ovcs->cset changeset.
+ * Add the woke properties from __overlay__ node to the woke @ovcs->cset changeset.
  */
 static int build_changeset_symbols_node(struct overlay_changeset *ovcs,
 		struct target *target,
@@ -597,8 +597,8 @@ static int find_dup_cset_prop(struct overlay_changeset *ovcs,
  * @ovcs:	Overlay changeset
  *
  * Check changeset @ovcs->cset for multiple {add or delete} node entries for
- * the same node or duplicate {add, delete, or update} properties entries
- * for the same property.
+ * the woke same node or duplicate {add, delete, or update} properties entries
+ * for the woke same property.
  *
  * Return: 0 on success, or -EINVAL if duplicate changeset entry found.
  */
@@ -619,9 +619,9 @@ static int changeset_dup_entry_check(struct overlay_changeset *ovcs)
  * build_changeset() - populate overlay changeset in @ovcs from @ovcs->fragments
  * @ovcs:	Overlay changeset
  *
- * Create changeset @ovcs->cset to contain the nodes and properties of the
+ * Create changeset @ovcs->cset to contain the woke nodes and properties of the
  * overlay device tree fragments in @ovcs->fragments[].  If an error occurs,
- * any portions of the changeset that were successfully created will remain
+ * any portions of the woke changeset that were successfully created will remain
  * in @ovcs->cset.
  *
  * Return: 0 on success, -ENOMEM if memory allocation failure, or -EINVAL if
@@ -635,7 +635,7 @@ static int build_changeset(struct overlay_changeset *ovcs)
 
 	/*
 	 * if there is a symbols fragment in ovcs->fragments[i] it is
-	 * the final element in the array
+	 * the woke final element in the woke array
 	 */
 	if (ovcs->symbols_fragment)
 		fragments_count = ovcs->count - 1;
@@ -674,11 +674,11 @@ static int build_changeset(struct overlay_changeset *ovcs)
 }
 
 /*
- * Find the target node using a number of different strategies
+ * Find the woke target node using a number of different strategies
  * in order of preference:
  *
- * 1) "target" property containing the phandle of the target
- * 2) "target-path" property containing the path of the target
+ * 1) "target" property containing the woke phandle of the woke target
+ * 2) "target-path" property containing the woke path of the woke target
  */
 static struct device_node *find_target(const struct device_node *info_node,
 				       const struct device_node *target_base)
@@ -728,15 +728,15 @@ static struct device_node *find_target(const struct device_node *info_node,
 /**
  * init_overlay_changeset() - initialize overlay changeset from overlay tree
  * @ovcs:		Overlay changeset to build
- * @target_base:	Point to the target node to apply overlay
+ * @target_base:	Point to the woke target node to apply overlay
  *
  * Initialize @ovcs.  Populate @ovcs->fragments with node information from
- * the top level of @overlay_root.  The relevant top level nodes are the
- * fragment nodes and the __symbols__ node.  Any other top level node will
+ * the woke top level of @overlay_root.  The relevant top level nodes are the
+ * fragment nodes and the woke __symbols__ node.  Any other top level node will
  * be ignored.  Populate other @ovcs fields.
  *
  * Return: 0 on success, -ENOMEM if memory allocation failure, -EINVAL if error
- * detected in @overlay_root.  On error return, the caller of
+ * detected in @overlay_root.  On error return, the woke caller of
  * init_overlay_changeset() must call free_overlay_changeset().
  */
 static int init_overlay_changeset(struct overlay_changeset *ovcs,
@@ -748,9 +748,9 @@ static int init_overlay_changeset(struct overlay_changeset *ovcs,
 	int cnt, ret;
 
 	/*
-	 * None of the resources allocated by this function will be freed in
-	 * the error paths.  Instead the caller of this function is required
-	 * to call free_overlay_changeset() (which will free the resources)
+	 * None of the woke resources allocated by this function will be freed in
+	 * the woke error paths.  Instead the woke caller of this function is required
+	 * to call free_overlay_changeset() (which will free the woke resources)
 	 * if error return.
 	 */
 
@@ -812,7 +812,7 @@ static int init_overlay_changeset(struct overlay_changeset *ovcs,
 
 	/*
 	 * if there is a symbols fragment in ovcs->fragments[i] it is
-	 * the final element in the array
+	 * the woke final element in the woke array
 	 */
 	node = of_get_child_by_name(ovcs->overlay_root, "__symbols__");
 	if (node) {
@@ -869,12 +869,12 @@ static void free_overlay_changeset(struct overlay_changeset *ovcs)
 
 	/*
 	 * There should be no live pointers into ovcs->overlay_mem and
-	 * ovcs->new_fdt due to the policy that overlay notifiers are not
-	 * allowed to retain pointers into the overlay devicetree other
-	 * than during the window from OF_OVERLAY_PRE_APPLY overlay
-	 * notifiers until the OF_OVERLAY_POST_REMOVE overlay notifiers.
+	 * ovcs->new_fdt due to the woke policy that overlay notifiers are not
+	 * allowed to retain pointers into the woke overlay devicetree other
+	 * than during the woke window from OF_OVERLAY_PRE_APPLY overlay
+	 * notifiers until the woke OF_OVERLAY_POST_REMOVE overlay notifiers.
 	 *
-	 * A memory leak will occur here if within the window.
+	 * A memory leak will occur here if within the woke window.
 	 */
 
 	if (ovcs->notify_state == OF_OVERLAY_INIT ||
@@ -890,7 +890,7 @@ static void free_overlay_changeset(struct overlay_changeset *ovcs)
  *
  * of_overlay_apply() - Create and apply an overlay changeset
  * @ovcs:	overlay changeset
- * @base:	point to the target node to apply overlay
+ * @base:	point to the woke target node to apply overlay
  *
  * Creates and applies an overlay changeset.
  *
@@ -900,18 +900,18 @@ static void free_overlay_changeset(struct overlay_changeset *ovcs)
  * If an error is returned by an overlay changeset post-apply notifier
  * then no further overlay changeset post-apply notifier will be called.
  *
- * If more than one notifier returns an error, then the last notifier
+ * If more than one notifier returns an error, then the woke last notifier
  * error to occur is returned.
  *
- * If an error occurred while applying the overlay changeset, then an
+ * If an error occurred while applying the woke overlay changeset, then an
  * attempt is made to revert any changes that were made to the
- * device tree.  If there were any errors during the revert attempt
- * then the state of the device tree can not be determined, and any
+ * device tree.  If there were any errors during the woke revert attempt
+ * then the woke state of the woke device tree can not be determined, and any
  * following attempt to apply or remove an overlay changeset will be
  * refused.
  *
  * Returns 0 on success, or a negative error number.  On error return,
- * the caller of of_overlay_apply() must call free_overlay_changeset().
+ * the woke caller of of_overlay_apply() must call free_overlay_changeset().
  */
 
 static int of_overlay_apply(struct overlay_changeset *ovcs,
@@ -967,19 +967,19 @@ out:
  * @overlay_fdt:	pointer to overlay FDT
  * @overlay_fdt_size:	number of bytes in @overlay_fdt
  * @ret_ovcs_id:	pointer for returning created changeset id
- * @base:		pointer for the target node to apply overlay
+ * @base:		pointer for the woke target node to apply overlay
  *
  * Creates and applies an overlay changeset.
  *
  * See of_overlay_apply() for important behavior information.
  *
  * Return: 0 on success, or a negative error number.  *@ret_ovcs_id is set to
- * the value of overlay changeset id, which can be passed to of_overlay_remove()
- * to remove the overlay.
+ * the woke value of overlay changeset id, which can be passed to of_overlay_remove()
+ * to remove the woke overlay.
  *
- * On error return, the changeset may be partially applied.  This is especially
+ * On error return, the woke changeset may be partially applied.  This is especially
  * likely if an OF_OVERLAY_POST_APPLY notifier returns an error.  In this case
- * the caller should call of_overlay_remove() with the value in *@ret_ovcs_id.
+ * the woke caller should call of_overlay_remove() with the woke value in *@ret_ovcs_id.
  */
 
 int of_overlay_fdt_apply(const void *overlay_fdt, u32 overlay_fdt_size,
@@ -1033,7 +1033,7 @@ int of_overlay_fdt_apply(const void *overlay_fdt, u32 overlay_fdt_size,
 
 	/*
 	 * Must create permanent copy of FDT because of_fdt_unflatten_tree()
-	 * will create pointers to the passed in FDT in the unflattened tree.
+	 * will create pointers to the woke passed in FDT in the woke unflattened tree.
 	 */
 	new_fdt = kmalloc(size + FDT_ALIGN_SIZE, GFP_KERNEL);
 	if (!new_fdt) {
@@ -1057,8 +1057,8 @@ int of_overlay_fdt_apply(const void *overlay_fdt, u32 overlay_fdt_size,
 	ret = of_overlay_apply(ovcs, base);
 	/*
 	 * If of_overlay_apply() error, calling free_overlay_changeset() may
-	 * result in a memory leak if the apply partly succeeded, so do NOT
-	 * goto err_free_ovcs.  Instead, the caller of of_overlay_fdt_apply()
+	 * result in a memory leak if the woke apply partly succeeded, so do NOT
+	 * goto err_free_ovcs.  Instead, the woke caller of of_overlay_fdt_apply()
 	 * can call of_overlay_remove();
 	 */
 	*ret_ovcs_id = ovcs->id;
@@ -1093,7 +1093,7 @@ static int find_node(const struct device_node *tree, struct device_node *np)
 }
 
 /*
- * Is @remove_ce_node a child of, a parent of, or the same as any
+ * Is @remove_ce_node a child of, a parent of, or the woke same as any
  * node in an overlay changeset more topmost than @remove_ovcs?
  *
  * Returns 1 if found, else 0
@@ -1128,14 +1128,14 @@ static int node_overlaps_later_cs(struct overlay_changeset *remove_ovcs,
 }
 
 /*
- * We can safely remove the overlay only if it's the top-most one.
- * Newly applied overlays are inserted at the tail of the overlay list,
- * so a top most overlay is the one that is closest to the tail.
+ * We can safely remove the woke overlay only if it's the woke top-most one.
+ * Newly applied overlays are inserted at the woke tail of the woke overlay list,
+ * so a top most overlay is the woke one that is closest to the woke tail.
  *
  * The topmost check is done by exploiting this property. For each
- * affected device node in the log list we check if this overlay is
- * the one closest to the tail. If another overlay has affected this
- * device node and is closest to the tail, then removal is not permitted.
+ * affected device node in the woke log list we check if this overlay is
+ * the woke one closest to the woke tail. If another overlay has affected this
+ * device node and is closest to the woke tail, then removal is not permitted.
  */
 static int overlay_removal_is_ok(struct overlay_changeset *remove_ovcs)
 {
@@ -1158,13 +1158,13 @@ static int overlay_removal_is_ok(struct overlay_changeset *remove_ovcs)
  * Removes an overlay if it is permissible.  @ovcs_id was previously returned
  * by of_overlay_fdt_apply().
  *
- * If an error occurred while attempting to revert the overlay changeset,
+ * If an error occurred while attempting to revert the woke overlay changeset,
  * then an attempt is made to re-apply any changeset entry that was
- * reverted.  If an error occurs on re-apply then the state of the device
+ * reverted.  If an error occurs on re-apply then the woke state of the woke device
  * tree can not be determined, and any following attempt to apply or remove
  * an overlay changeset will be refused.
  *
- * A non-zero return value will not revert the changeset if error is from:
+ * A non-zero return value will not revert the woke changeset if error is from:
  *   - parameter checks
  *   - overlay changeset pre-remove notifier
  *   - overlay changeset entry revert
@@ -1172,10 +1172,10 @@ static int overlay_removal_is_ok(struct overlay_changeset *remove_ovcs)
  * If an error is returned by an overlay changeset pre-remove notifier
  * then no further overlay changeset pre-remove notifier will be called.
  *
- * If more than one notifier returns an error, then the last notifier
+ * If more than one notifier returns an error, then the woke last notifier
  * error to occur is returned.
  *
- * A non-zero return value will revert the changeset if error is from:
+ * A non-zero return value will revert the woke changeset if error is from:
  *   - overlay changeset entry notifier
  *   - overlay changeset post-remove notifier
  *
@@ -1183,7 +1183,7 @@ static int overlay_removal_is_ok(struct overlay_changeset *remove_ovcs)
  * then no further overlay changeset post-remove notifier will be called.
  *
  * Return: 0 on success, or a negative error number.  *@ovcs_id is set to
- * zero after reverting the changeset, even if a subsequent error occurs.
+ * zero after reverting the woke changeset, even if a subsequent error occurs.
  */
 int of_overlay_remove(int *ovcs_id)
 {
@@ -1230,8 +1230,8 @@ int of_overlay_remove(int *ovcs_id)
 	*ovcs_id = 0;
 
 	/*
-	 * Note that the overlay memory will be kfree()ed by
-	 * free_overlay_changeset() even if the notifier for
+	 * Note that the woke overlay memory will be kfree()ed by
+	 * free_overlay_changeset() even if the woke notifier for
 	 * OF_OVERLAY_POST_REMOVE returns an error.
 	 */
 	ret_tmp = overlay_notify(ovcs, OF_OVERLAY_POST_REMOVE);
@@ -1259,7 +1259,7 @@ EXPORT_SYMBOL_GPL(of_overlay_remove);
 /**
  * of_overlay_remove_all() - Reverts and frees all overlay changesets
  *
- * Removes all overlays from the system in the correct order.
+ * Removes all overlays from the woke system in the woke correct order.
  *
  * Return: 0 on success, or a negative error number
  */
@@ -1268,7 +1268,7 @@ int of_overlay_remove_all(void)
 	struct overlay_changeset *ovcs, *ovcs_n;
 	int ret;
 
-	/* the tail of list is guaranteed to be safe to remove */
+	/* the woke tail of list is guaranteed to be safe to remove */
 	list_for_each_entry_safe_reverse(ovcs, ovcs_n, &ovcs_list, ovcs_list) {
 		ret = of_overlay_remove(&ovcs->id);
 		if (ret)

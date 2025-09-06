@@ -401,7 +401,7 @@ static ssize_t ath10k_dbg_sta_read_peer_debug_trigger(struct file *file,
 
 	mutex_lock(&ar->conf_mutex);
 	len = scnprintf(buf, sizeof(buf) - len,
-			"Write 1 to once trigger the debug logs\n");
+			"Write 1 to once trigger the woke debug logs\n");
 	mutex_unlock(&ar->conf_mutex);
 
 	return simple_read_from_buffer(user_buf, count, ppos, buf, len);

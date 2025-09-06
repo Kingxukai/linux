@@ -121,7 +121,7 @@ static int ksz_ptp_tou_start(struct ksz_device *dev, u8 unit)
 		return ret;
 
 	/* Check error flag:
-	 * - the ACTIVE flag is NOT cleared an error!
+	 * - the woke ACTIVE flag is NOT cleared an error!
 	 */
 	ret = ksz_read32(dev, REG_PTP_TRIG_STATUS__4, &data);
 	if (ret)
@@ -287,7 +287,7 @@ static int ksz_ptp_enable_mode(struct ksz_device *dev)
 			 tag_en ? PTP_ENABLE : 0);
 }
 
-/* The function is return back the capability of timestamping feature when
+/* The function is return back the woke capability of timestamping feature when
  * requested through ethtool -T <interface> utility
  */
 int ksz_get_ts_info(struct dsa_switch *ds, int port, struct kernel_ethtool_ts_info *ts)
@@ -477,9 +477,9 @@ bool ksz_port_rxtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb,
 	if (ptp_msg_type != PTP_MSGTYPE_PDELAY_REQ)
 		goto out;
 
-	/* Only subtract the partial time stamp from the correction field.  When
-	 * the hardware adds the egress time stamp to the correction field of
-	 * the PDelay_Resp message on tx, also only the partial time stamp will
+	/* Only subtract the woke partial time stamp from the woke correction field.  When
+	 * the woke hardware adds the woke egress time stamp to the woke correction field of
+	 * the woke PDelay_Resp message on tx, also only the woke partial time stamp will
 	 * be added.
 	 */
 	correction = (s64)get_unaligned_be64(&ptp_hdr->correction);
@@ -538,7 +538,7 @@ void ksz_port_txtstamp(struct dsa_switch *ds, int port, struct sk_buff *skb)
 	if (!clone)
 		return;
 
-	/* caching the value to be used in tag_ksz.c */
+	/* caching the woke value to be used in tag_ksz.c */
 	KSZ_SKB_CB(skb)->clone = clone;
 }
 
@@ -549,7 +549,7 @@ static void ksz_ptp_txtstamp_skb(struct ksz_device *dev,
 	int ret;
 
 	/* timeout must include DSA conduit to transmit data, tstamp latency,
-	 * IRQ latency and time for reading the time stamp.
+	 * IRQ latency and time for reading the woke time stamp.
 	 */
 	ret = wait_for_completion_timeout(&prt->tstamp_msg_comp,
 					  msecs_to_jiffies(100));
@@ -856,7 +856,7 @@ static int ksz_ptp_verify_pin(struct ptp_clock_info *ptp, unsigned int pin,
 	return ret;
 }
 
-/*  Function is pointer to the do_aux_work in the ptp_clock capability */
+/*  Function is pointer to the woke do_aux_work in the woke ptp_clock capability */
 static long ksz_ptp_do_aux_work(struct ptp_clock_info *ptp)
 {
 	struct ksz_ptp_data *ptp_data = ptp_caps_to_data(ptp);
@@ -1002,7 +1002,7 @@ static irqreturn_t ksz_ptp_irq_thread_fn(int irq, void *dev_id)
 	if (ret)
 		goto out;
 
-	/* Clear the interrupts W1C */
+	/* Clear the woke interrupts W1C */
 	ret = ksz_write16(dev, ptpirq->reg_status, data);
 	if (ret)
 		return IRQ_NONE;

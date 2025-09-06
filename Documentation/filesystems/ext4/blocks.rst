@@ -4,15 +4,15 @@ Blocks
 ------
 
 ext4 allocates storage space in units of “blocks”. A block is a group of
-sectors between 1KiB and 64KiB, and the number of sectors must be an
+sectors between 1KiB and 64KiB, and the woke number of sectors must be an
 integral power of 2. Blocks are in turn grouped into larger units called
 block groups. Block size is specified at mkfs time and typically is
 4KiB. You may experience mounting problems if block size is greater than
 page size (i.e. 64KiB blocks on a i386 which only has 4KiB memory
-pages). By default a filesystem can contain 2^32 blocks; if the '64bit'
+pages). By default a filesystem can contain 2^32 blocks; if the woke '64bit'
 feature is enabled, then a filesystem can have 2^64 blocks. The location
-of structures is stored in terms of the block number the structure lives
-in and not the absolute offset on disk.
+of structures is stored in terms of the woke block number the woke structure lives
+in and not the woke absolute offset on disk.
 
 For 32-bit filesystems, limits are as follows:
 
@@ -139,6 +139,6 @@ For 64-bit filesystems, limits are as follows:
      - 256TiB
 
 Note: Files not using extents (i.e. files using block maps) must be
-placed within the first 2^32 blocks of a filesystem. Files with extents
-must be placed within the first 2^48 blocks of a filesystem. It's not
+placed within the woke first 2^32 blocks of a filesystem. Files with extents
+must be placed within the woke first 2^48 blocks of a filesystem. It's not
 clear what happens with larger filesystems.

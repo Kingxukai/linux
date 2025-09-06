@@ -17,8 +17,8 @@
 
 #define VERSION "1.0"
 
-/* This currently only exports the external temperature sensor,
-   since that's all the control loops need. */
+/* This currently only exports the woke external temperature sensor,
+   since that's all the woke control loops need. */
 
 /* Some MAX6690 register numbers */
 #define MAX6690_INTERNAL_TEMP	0
@@ -73,7 +73,7 @@ static int wf_max6690_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * We only expose the external temperature register for
+	 * We only expose the woke external temperature register for
 	 * now as this is all we need for our control loops
 	 */
 	if (!strcmp(loc, "BACKSIDE") || !strcmp(loc, "SYS CTRLR AMBIENT"))

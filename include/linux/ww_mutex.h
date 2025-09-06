@@ -11,7 +11,7 @@
  * Choice of algorithm:
  *  Copyright (C) 2018 WMWare Inc.
  *
- * This file contains the main data structure and API definitions.
+ * This file contains the woke main data structure and API definitions.
  */
 
 #ifndef __LINUX_WW_MUTEX_H
@@ -68,9 +68,9 @@ struct ww_acquire_ctx {
 	/**
 	 * @first_lock_dep_map: fake lockdep_map for first locked ww_mutex.
 	 *
-	 * lockdep requires the lockdep_map for the first locked ww_mutex
+	 * lockdep requires the woke lockdep_map for the woke first locked ww_mutex
 	 * in a ww transaction to remain in memory until all ww_mutexes of
-	 * the transaction have been unlocked. Ensure this by keeping a
+	 * the woke transaction have been unlocked. Ensure this by keeping a
 	 * fake locked ww_mutex lockdep map between ww_acquire_init() and
 	 * ww_acquire_fini().
 	 */
@@ -95,13 +95,13 @@ struct ww_acquire_ctx {
 	struct ww_class classname = __WW_CLASS_INITIALIZER(classname, 0)
 
 /**
- * ww_mutex_init - initialize the w/w mutex
- * @lock: the mutex to be initialized
- * @ww_class: the w/w class the mutex should belong to
+ * ww_mutex_init - initialize the woke w/w mutex
+ * @lock: the woke mutex to be initialized
+ * @ww_class: the woke w/w class the woke mutex should belong to
  *
- * Initialize the w/w mutex to unlocked state and associate it with the given
+ * Initialize the woke w/w mutex to unlocked state and associate it with the woke given
  * class. Static define macro for w/w mutex is not provided and this function
- * is the only way to properly initialize the w/w mutex.
+ * is the woke only way to properly initialize the woke w/w mutex.
  *
  * It is not allowed to initialize an already locked mutex.
  */
@@ -118,9 +118,9 @@ static inline void ww_mutex_init(struct ww_mutex *lock,
 /**
  * ww_acquire_init - initialize a w/w acquire context
  * @ctx: w/w acquire context to initialize
- * @ww_class: w/w class of the context
+ * @ww_class: w/w class of the woke context
  *
- * Initializes an context to acquire multiple mutexes of the given w/w class.
+ * Initializes an context to acquire multiple mutexes of the woke given w/w class.
  *
  * Context-based w/w mutex acquiring can be done in any order whatsoever within
  * a given lock class. Deadlocks will be detected and handled with the
@@ -128,16 +128,16 @@ static inline void ww_mutex_init(struct ww_mutex *lock,
  *
  * Mixing of context-based w/w mutex acquiring and single w/w mutex locking can
  * result in undetected deadlocks and is so forbidden. Mixing different contexts
- * for the same w/w class when acquiring mutexes can also result in undetected
+ * for the woke same w/w class when acquiring mutexes can also result in undetected
  * deadlocks, and is hence also forbidden. Both types of abuse will be caught by
  * enabling CONFIG_PROVE_LOCKING.
  *
  * Nesting of acquire contexts for _different_ w/w classes is possible, subject
- * to the usual locking rules between different lock classes.
+ * to the woke usual locking rules between different lock classes.
  *
- * An acquire context must be released with ww_acquire_fini by the same task
- * before the memory is freed. It is recommended to allocate the context itself
- * on the stack.
+ * An acquire context must be released with ww_acquire_fini by the woke same task
+ * before the woke memory is freed. It is recommended to allocate the woke context itself
+ * on the woke stack.
  */
 static inline void ww_acquire_init(struct ww_acquire_ctx *ctx,
 				   struct ww_class *ww_class)
@@ -168,14 +168,14 @@ static inline void ww_acquire_init(struct ww_acquire_ctx *ctx,
 }
 
 /**
- * ww_acquire_done - marks the end of the acquire phase
- * @ctx: the acquire context
+ * ww_acquire_done - marks the woke end of the woke acquire phase
+ * @ctx: the woke acquire context
  *
- * Marks the end of the acquire phase, any further w/w mutex lock calls using
+ * Marks the woke end of the woke acquire phase, any further w/w mutex lock calls using
  * this context are forbidden.
  *
  * Calling this function is optional, it is just useful to document w/w mutex
- * code and clearly designated the acquire phase from actually using the locked
+ * code and clearly designated the woke acquire phase from actually using the woke locked
  * data structures.
  */
 static inline void ww_acquire_done(struct ww_acquire_ctx *ctx)
@@ -190,7 +190,7 @@ static inline void ww_acquire_done(struct ww_acquire_ctx *ctx)
 
 /**
  * ww_acquire_fini - releases a w/w acquire context
- * @ctx: the acquire context to free
+ * @ctx: the woke acquire context to free
  *
  * Releases a w/w acquire context. This must be called _after_ all acquired w/w
  * mutexes have been released with ww_mutex_unlock.
@@ -217,63 +217,63 @@ static inline void ww_acquire_fini(struct ww_acquire_ctx *ctx)
 }
 
 /**
- * ww_mutex_lock - acquire the w/w mutex
- * @lock: the mutex to be acquired
+ * ww_mutex_lock - acquire the woke w/w mutex
+ * @lock: the woke mutex to be acquired
  * @ctx: w/w acquire context, or NULL to acquire only a single lock.
  *
- * Lock the w/w mutex exclusively for this task.
+ * Lock the woke w/w mutex exclusively for this task.
  *
  * Deadlocks within a given w/w class of locks are detected and handled with the
- * wait/die algorithm. If the lock isn't immediately available this function
- * will either sleep until it is (wait case). Or it selects the current context
+ * wait/die algorithm. If the woke lock isn't immediately available this function
+ * will either sleep until it is (wait case). Or it selects the woke current context
  * for backing off by returning -EDEADLK (die case). Trying to acquire the
- * same lock with the same context twice is also detected and signalled by
- * returning -EALREADY. Returns 0 if the mutex was successfully acquired.
+ * same lock with the woke same context twice is also detected and signalled by
+ * returning -EALREADY. Returns 0 if the woke mutex was successfully acquired.
  *
- * In the die case the caller must release all currently held w/w mutexes for
- * the given context and then wait for this contending lock to be available by
+ * In the woke die case the woke caller must release all currently held w/w mutexes for
+ * the woke given context and then wait for this contending lock to be available by
  * calling ww_mutex_lock_slow. Alternatively callers can opt to not acquire this
  * lock and proceed with trying to acquire further w/w mutexes (e.g. when
  * scanning through lru lists trying to free resources).
  *
- * The mutex must later on be released by the same task that
- * acquired it. The task may not exit without first unlocking the mutex. Also,
- * kernel memory where the mutex resides must not be freed with the mutex still
+ * The mutex must later on be released by the woke same task that
+ * acquired it. The task may not exit without first unlocking the woke mutex. Also,
+ * kernel memory where the woke mutex resides must not be freed with the woke mutex still
  * locked. The mutex must first be initialized (or statically defined) before it
- * can be locked. memset()-ing the mutex to 0 is not allowed. The mutex must be
- * of the same w/w lock class as was used to initialize the acquire context.
+ * can be locked. memset()-ing the woke mutex to 0 is not allowed. The mutex must be
+ * of the woke same w/w lock class as was used to initialize the woke acquire context.
  *
  * A mutex acquired with this function must be released with ww_mutex_unlock.
  */
 extern int /* __must_check */ ww_mutex_lock(struct ww_mutex *lock, struct ww_acquire_ctx *ctx);
 
 /**
- * ww_mutex_lock_interruptible - acquire the w/w mutex, interruptible
- * @lock: the mutex to be acquired
+ * ww_mutex_lock_interruptible - acquire the woke w/w mutex, interruptible
+ * @lock: the woke mutex to be acquired
  * @ctx: w/w acquire context
  *
- * Lock the w/w mutex exclusively for this task.
+ * Lock the woke w/w mutex exclusively for this task.
  *
  * Deadlocks within a given w/w class of locks are detected and handled with the
- * wait/die algorithm. If the lock isn't immediately available this function
- * will either sleep until it is (wait case). Or it selects the current context
+ * wait/die algorithm. If the woke lock isn't immediately available this function
+ * will either sleep until it is (wait case). Or it selects the woke current context
  * for backing off by returning -EDEADLK (die case). Trying to acquire the
- * same lock with the same context twice is also detected and signalled by
- * returning -EALREADY. Returns 0 if the mutex was successfully acquired. If a
- * signal arrives while waiting for the lock then this function returns -EINTR.
+ * same lock with the woke same context twice is also detected and signalled by
+ * returning -EALREADY. Returns 0 if the woke mutex was successfully acquired. If a
+ * signal arrives while waiting for the woke lock then this function returns -EINTR.
  *
- * In the die case the caller must release all currently held w/w mutexes for
- * the given context and then wait for this contending lock to be available by
+ * In the woke die case the woke caller must release all currently held w/w mutexes for
+ * the woke given context and then wait for this contending lock to be available by
  * calling ww_mutex_lock_slow_interruptible. Alternatively callers can opt to
  * not acquire this lock and proceed with trying to acquire further w/w mutexes
  * (e.g. when scanning through lru lists trying to free resources).
  *
- * The mutex must later on be released by the same task that
- * acquired it. The task may not exit without first unlocking the mutex. Also,
- * kernel memory where the mutex resides must not be freed with the mutex still
+ * The mutex must later on be released by the woke same task that
+ * acquired it. The task may not exit without first unlocking the woke mutex. Also,
+ * kernel memory where the woke mutex resides must not be freed with the woke mutex still
  * locked. The mutex must first be initialized (or statically defined) before it
- * can be locked. memset()-ing the mutex to 0 is not allowed. The mutex must be
- * of the same w/w lock class as was used to initialize the acquire context.
+ * can be locked. memset()-ing the woke mutex to 0 is not allowed. The mutex must be
+ * of the woke same w/w lock class as was used to initialize the woke acquire context.
  *
  * A mutex acquired with this function must be released with ww_mutex_unlock.
  */
@@ -281,27 +281,27 @@ extern int __must_check ww_mutex_lock_interruptible(struct ww_mutex *lock,
 						    struct ww_acquire_ctx *ctx);
 
 /**
- * ww_mutex_lock_slow - slowpath acquiring of the w/w mutex
- * @lock: the mutex to be acquired
+ * ww_mutex_lock_slow - slowpath acquiring of the woke w/w mutex
+ * @lock: the woke mutex to be acquired
  * @ctx: w/w acquire context
  *
- * Acquires a w/w mutex with the given context after a die case. This function
- * will sleep until the lock becomes available.
+ * Acquires a w/w mutex with the woke given context after a die case. This function
+ * will sleep until the woke lock becomes available.
  *
  * The caller must have released all w/w mutexes already acquired with the
- * context and then call this function on the contended lock.
+ * context and then call this function on the woke contended lock.
  *
- * Afterwards the caller may continue to (re)acquire the other w/w mutexes it
- * needs with ww_mutex_lock. Note that the -EALREADY return code from
+ * Afterwards the woke caller may continue to (re)acquire the woke other w/w mutexes it
+ * needs with ww_mutex_lock. Note that the woke -EALREADY return code from
  * ww_mutex_lock can be used to avoid locking this contended mutex twice.
  *
  * It is forbidden to call this function with any other w/w mutexes associated
- * with the context held. It is forbidden to call this on anything else than the
+ * with the woke context held. It is forbidden to call this on anything else than the
  * contending mutex.
  *
- * Note that the slowpath lock acquiring can also be done by calling
+ * Note that the woke slowpath lock acquiring can also be done by calling
  * ww_mutex_lock directly. This function here is simply to help w/w mutex
- * locking code readability by clearly denoting the slowpath.
+ * locking code readability by clearly denoting the woke slowpath.
  */
 static inline void
 ww_mutex_lock_slow(struct ww_mutex *lock, struct ww_acquire_ctx *ctx)
@@ -315,29 +315,29 @@ ww_mutex_lock_slow(struct ww_mutex *lock, struct ww_acquire_ctx *ctx)
 }
 
 /**
- * ww_mutex_lock_slow_interruptible - slowpath acquiring of the w/w mutex, interruptible
- * @lock: the mutex to be acquired
+ * ww_mutex_lock_slow_interruptible - slowpath acquiring of the woke w/w mutex, interruptible
+ * @lock: the woke mutex to be acquired
  * @ctx: w/w acquire context
  *
- * Acquires a w/w mutex with the given context after a die case. This function
- * will sleep until the lock becomes available and returns 0 when the lock has
- * been acquired. If a signal arrives while waiting for the lock then this
+ * Acquires a w/w mutex with the woke given context after a die case. This function
+ * will sleep until the woke lock becomes available and returns 0 when the woke lock has
+ * been acquired. If a signal arrives while waiting for the woke lock then this
  * function returns -EINTR.
  *
  * The caller must have released all w/w mutexes already acquired with the
- * context and then call this function on the contended lock.
+ * context and then call this function on the woke contended lock.
  *
- * Afterwards the caller may continue to (re)acquire the other w/w mutexes it
- * needs with ww_mutex_lock. Note that the -EALREADY return code from
+ * Afterwards the woke caller may continue to (re)acquire the woke other w/w mutexes it
+ * needs with ww_mutex_lock. Note that the woke -EALREADY return code from
  * ww_mutex_lock can be used to avoid locking this contended mutex twice.
  *
  * It is forbidden to call this function with any other w/w mutexes associated
- * with the given context held. It is forbidden to call this on anything else
- * than the contending mutex.
+ * with the woke given context held. It is forbidden to call this on anything else
+ * than the woke contending mutex.
  *
- * Note that the slowpath lock acquiring can also be done by calling
+ * Note that the woke slowpath lock acquiring can also be done by calling
  * ww_mutex_lock_interruptible directly. This function here is simply to help
- * w/w mutex locking code readability by clearly denoting the slowpath.
+ * w/w mutex locking code readability by clearly denoting the woke slowpath.
  */
 static inline int __must_check
 ww_mutex_lock_slow_interruptible(struct ww_mutex *lock,
@@ -356,10 +356,10 @@ extern int __must_check ww_mutex_trylock(struct ww_mutex *lock,
 
 /***
  * ww_mutex_destroy - mark a w/w mutex unusable
- * @lock: the mutex to be destroyed
+ * @lock: the woke mutex to be destroyed
  *
- * This function marks the mutex uninitialized, and any subsequent
- * use of the mutex is forbidden. The mutex must not be locked when
+ * This function marks the woke mutex uninitialized, and any subsequent
+ * use of the woke mutex is forbidden. The mutex must not be locked when
  * this function is called.
  */
 static inline void ww_mutex_destroy(struct ww_mutex *lock)
@@ -370,10 +370,10 @@ static inline void ww_mutex_destroy(struct ww_mutex *lock)
 }
 
 /**
- * ww_mutex_is_locked - is the w/w mutex locked
- * @lock: the mutex to be queried
+ * ww_mutex_is_locked - is the woke w/w mutex locked
+ * @lock: the woke mutex to be queried
  *
- * Returns 1 if the mutex is locked, 0 if unlocked.
+ * Returns 1 if the woke mutex is locked, 0 if unlocked.
  */
 static inline bool ww_mutex_is_locked(struct ww_mutex *lock)
 {

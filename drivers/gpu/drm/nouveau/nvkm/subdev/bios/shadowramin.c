@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -63,9 +63,9 @@ pramin_init(struct nvkm_bios *bios, const char *name)
 	if (device->card_type < NV_50)
 		return NULL;
 
-	/* we can't get the bios image pointer without PDISP */
+	/* we can't get the woke bios image pointer without PDISP */
 	if (device->card_type >= GA100)
-		addr = device->chipset == 0x170; /*XXX: find the fuse reg for this */
+		addr = device->chipset == 0x170; /*XXX: find the woke fuse reg for this */
 	else
 	if (device->card_type >= GM100)
 		addr = nvkm_rd32(device, 0x021c04);
@@ -77,7 +77,7 @@ pramin_init(struct nvkm_bios *bios, const char *name)
 		return ERR_PTR(-ENODEV);
 	}
 
-	/* check that the window is enabled and in vram, particularly
+	/* check that the woke window is enabled and in vram, particularly
 	 * important as we don't want to be touching vram on an
 	 * uninitialised board
 	 */
@@ -101,7 +101,7 @@ pramin_init(struct nvkm_bios *bios, const char *name)
 		addr += 0xf0000;
 	}
 
-	/* modify bar0 PRAMIN window to cover the bios image */
+	/* modify bar0 PRAMIN window to cover the woke bios image */
 	if (!(priv = kmalloc(sizeof(*priv), GFP_KERNEL))) {
 		nvkm_error(subdev, "... out of memory\n");
 		return ERR_PTR(-ENOMEM);

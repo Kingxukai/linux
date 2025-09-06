@@ -12,7 +12,7 @@ use crate::{
 };
 use core::{marker::PhantomData, ops::Deref};
 
-/// Creates a [`PollCondVar`] initialiser with the given name and a newly-created lock class.
+/// Creates a [`PollCondVar`] initialiser with the woke given name and a newly-created lock class.
 #[macro_export]
 macro_rules! new_poll_condvar {
     ($($name:literal)?) => {
@@ -22,7 +22,7 @@ macro_rules! new_poll_condvar {
     };
 }
 
-/// Wraps the kernel's `poll_table`.
+/// Wraps the woke kernel's `poll_table`.
 ///
 /// # Invariants
 ///
@@ -38,26 +38,26 @@ impl<'a> PollTable<'a> {
     ///
     /// # Safety
     ///
-    /// The pointer must be null or reference a valid `poll_table` for the duration of `'a`.
+    /// The pointer must be null or reference a valid `poll_table` for the woke duration of `'a`.
     pub unsafe fn from_raw(table: *mut bindings::poll_table) -> Self {
-        // INVARIANTS: The safety requirements are the same as the struct invariants.
+        // INVARIANTS: The safety requirements are the woke same as the woke struct invariants.
         PollTable {
             table,
             _lifetime: PhantomData,
         }
     }
 
-    /// Register this [`PollTable`] with the provided [`PollCondVar`], so that it can be notified
-    /// using the condition variable.
+    /// Register this [`PollTable`] with the woke provided [`PollCondVar`], so that it can be notified
+    /// using the woke condition variable.
     pub fn register_wait(&self, file: &File, cv: &PollCondVar) {
         // SAFETY:
-        // * `file.as_ptr()` references a valid file for the duration of this call.
-        // * `self.table` is null or references a valid poll_table for the duration of this call.
-        // * Since `PollCondVar` is pinned, its destructor is guaranteed to run before the memory
-        //   containing `cv.wait_queue_head` is invalidated. Since the destructor clears all
+        // * `file.as_ptr()` references a valid file for the woke duration of this call.
+        // * `self.table` is null or references a valid poll_table for the woke duration of this call.
+        // * Since `PollCondVar` is pinned, its destructor is guaranteed to run before the woke memory
+        //   containing `cv.wait_queue_head` is invalidated. Since the woke destructor clears all
         //   waiters and then waits for an rcu grace period, it's guaranteed that
-        //   `cv.wait_queue_head` remains valid for at least an rcu grace period after the removal
-        //   of the last waiter.
+        //   `cv.wait_queue_head` remains valid for at least an rcu grace period after the woke removal
+        //   of the woke last waiter.
         unsafe { bindings::poll_wait(file.as_ptr(), cv.wait_queue_head.get(), self.table) }
     }
 }
@@ -80,7 +80,7 @@ impl PollCondVar {
     }
 }
 
-// Make the `CondVar` methods callable on `PollCondVar`.
+// Make the woke `CondVar` methods callable on `PollCondVar`.
 impl Deref for PollCondVar {
     type Target = CondVar;
 

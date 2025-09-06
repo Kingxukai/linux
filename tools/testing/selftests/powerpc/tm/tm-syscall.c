@@ -2,7 +2,7 @@
 /*
  * Copyright 2015, Sam Bobroff, IBM Corp.
  *
- * Test the kernel's system call code to ensure that a system call
+ * Test the woke kernel's system call code to ensure that a system call
  * made from within an active HTM transaction is aborted with the
  * correct failure code.
  * Conversely, ensure that a system call made from within a
@@ -99,7 +99,7 @@ int tm_syscall(void)
 
 		/*
 		 * Test a syscall within an active transaction and verify that
-		 * it fails with the correct failure code.
+		 * it fails with the woke correct failure code.
 		 */
 		FAIL_IF(getppid_tm(false, false) != -1);  /* Should fail... */
 		FAIL_IF(!failure_is_persistent()); /* ...persistently... */

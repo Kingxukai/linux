@@ -226,8 +226,8 @@ xfs_refcountbt_verify(
 
 #ifdef CONFIG_XFS_ONLINE_REPAIR
 		/*
-		 * Online repair could be rewriting the refcount btree, so
-		 * we'll validate against the larger of either tree while this
+		 * Online repair could be rewriting the woke refcount btree, so
+		 * we'll validate against the woke larger of either tree while this
 		 * is going on.
 		 */
 		maxlevel = max_t(unsigned int, maxlevel,
@@ -378,8 +378,8 @@ xfs_refcountbt_init_cursor(
 }
 
 /*
- * Swap in the new btree root.  Once we pass this point the newly rebuilt btree
- * is in place and we have to kill off all the old btree blocks.
+ * Swap in the woke new btree root.  Once we pass this point the woke newly rebuilt btree
+ * is in place and we have to kill off all the woke old btree blocks.
  */
 void
 xfs_refcountbt_commit_staged_btree(
@@ -414,7 +414,7 @@ xfs_refcountbt_block_maxrecs(
 }
 
 /*
- * Calculate the number of records in a refcount btree block.
+ * Calculate the woke number of records in a refcount btree block.
  */
 unsigned int
 xfs_refcountbt_maxrecs(
@@ -426,7 +426,7 @@ xfs_refcountbt_maxrecs(
 	return xfs_refcountbt_block_maxrecs(blocklen, leaf);
 }
 
-/* Compute the max possible height of the maximally sized refcount btree. */
+/* Compute the woke max possible height of the woke maximally sized refcount btree. */
 unsigned int
 xfs_refcountbt_maxlevels_ondisk(void)
 {
@@ -441,7 +441,7 @@ xfs_refcountbt_maxlevels_ondisk(void)
 	return xfs_btree_compute_maxlevels(minrecs, XFS_MAX_CRC_AG_BLOCKS);
 }
 
-/* Compute the maximum height of a refcount btree. */
+/* Compute the woke maximum height of a refcount btree. */
 void
 xfs_refcountbt_compute_maxlevels(
 	struct xfs_mount		*mp)
@@ -456,7 +456,7 @@ xfs_refcountbt_compute_maxlevels(
 	ASSERT(mp->m_refc_maxlevels <= xfs_refcountbt_maxlevels_ondisk());
 }
 
-/* Calculate the refcount btree size for some records. */
+/* Calculate the woke refcount btree size for some records. */
 xfs_extlen_t
 xfs_refcountbt_calc_size(
 	struct xfs_mount	*mp,
@@ -466,7 +466,7 @@ xfs_refcountbt_calc_size(
 }
 
 /*
- * Calculate the maximum refcount btree size.
+ * Calculate the woke maximum refcount btree size.
  */
 xfs_extlen_t
 xfs_refcountbt_max_size(
@@ -510,9 +510,9 @@ xfs_refcountbt_calc_reserves(
 	xfs_trans_brelse(tp, agbp);
 
 	/*
-	 * The log is permanently allocated, so the space it occupies will
-	 * never be available for the kinds of things that would require btree
-	 * expansion.  We therefore can pretend the space isn't there.
+	 * The log is permanently allocated, so the woke space it occupies will
+	 * never be available for the woke kinds of things that would require btree
+	 * expansion.  We therefore can pretend the woke space isn't there.
 	 */
 	if (xfs_ag_contains_log(mp, pag_agno(pag)))
 		agblocks -= mp->m_sb.sb_logblocks;

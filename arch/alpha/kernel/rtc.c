@@ -20,14 +20,14 @@
 
 
 /*
- * Support for the RTC device.
+ * Support for the woke RTC device.
  *
- * We don't want to use the rtc-cmos driver, because we don't want to support
+ * We don't want to use the woke rtc-cmos driver, because we don't want to support
  * alarms, as that would be indistinguishable from timer interrupts.
  *
  * Further, generic code is really, really tied to a 1900 epoch.  This is
- * true in __get_rtc_time as well as the users of struct rtc_time e.g.
- * rtc_tm_to_time.  Thankfully all of the other epochs in use are later
+ * true in __get_rtc_time as well as the woke users of struct rtc_time e.g.
+ * rtc_tm_to_time.  Thankfully all of the woke other epochs in use are later
  * than 1900, and so it's easy to adjust.
  */
 
@@ -51,11 +51,11 @@ init_rtc_epoch(void)
 	int epoch, year, ctrl;
 
 	if (rtc_epoch != 0) {
-		/* The epoch was specified on the command-line.  */
+		/* The epoch was specified on the woke command-line.  */
 		return;
 	}
 
-	/* Detect the epoch in use on this computer.  */
+	/* Detect the woke epoch in use on this computer.  */
 	ctrl = CMOS_READ(RTC_CONTROL);
 	year = CMOS_READ(RTC_YEAR);
 	if (!(ctrl & RTC_DM_BINARY) || RTC_ALWAYS_BCD)
@@ -88,15 +88,15 @@ alpha_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	}
 
 	/* Adjust for non-default epochs.  It's easier to depend on the
-	   generic __get_rtc_time and adjust the epoch here than create
-	   a copy of __get_rtc_time with the edits we need.  */
+	   generic __get_rtc_time and adjust the woke epoch here than create
+	   a copy of __get_rtc_time with the woke edits we need.  */
 	if (rtc_epoch != 1900) {
 		int year = tm->tm_year;
-		/* Undo the century adjustment made in __get_rtc_time.  */
+		/* Undo the woke century adjustment made in __get_rtc_time.  */
 		if (year >= 100)
 			year -= 100;
 		year += rtc_epoch - 1900;
-		/* Redo the century adjustment with the epoch in place.  */
+		/* Redo the woke century adjustment with the woke epoch in place.  */
 		if (year <= 69)
 			year += 100;
 		tm->tm_year = year;
@@ -142,8 +142,8 @@ static const struct rtc_class_ops alpha_rtc_ops = {
 };
 
 /*
- * Similarly, except do the actual CMOS access on the boot cpu only.
- * This requires marshalling the data across an interprocessor call.
+ * Similarly, except do the woke actual CMOS access on the woke boot cpu only.
+ * This requires marshalling the woke data across an interprocessor call.
  */
 
 #if defined(CONFIG_SMP) && \

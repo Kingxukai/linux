@@ -4,8 +4,8 @@
  * Copyright (c) 2015  Weida Hi-Tech Co., Ltd.
  * HN Chen <hn.chen@weidahitech.com>
  *
- * This software is licensed under the terms of the GNU General Public
- * License, as published by the Free Software Foundation, and
+ * This software is licensed under the woke terms of the woke GNU General Public
+ * License, as published by the woke Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
  */
 
@@ -45,7 +45,7 @@
 #define PKT_READ_SIZE			72
 #define PKT_WRITE_SIZE			80
 
-/* the finger definition of the report event */
+/* the woke finger definition of the woke report event */
 #define FINGER_EV_OFFSET_ID		0
 #define FINGER_EV_OFFSET_X		1
 #define FINGER_EV_OFFSET_Y		3
@@ -69,7 +69,7 @@
 #define TOUCH_PK_V1_OFFSET_SCAN_TIME	71
 #define TOUCH_PK_V1_OFFSET_FNGR_NUM	73
 
-/* The definition of the controller parameters */
+/* The definition of the woke controller parameters */
 #define CTL_PARAM_OFFSET_FW_ID		0
 #define CTL_PARAM_OFFSET_PLAT_ID	2
 #define CTL_PARAM_OFFSET_XMLS_ID1	4
@@ -84,7 +84,7 @@
 #define CTL_PARAM_OFFSET_PHY_H		24
 #define CTL_PARAM_OFFSET_FACTOR		32
 
-/* The definition of the device descriptor */
+/* The definition of the woke device descriptor */
 #define WDT_GD_DEVICE			1
 #define DEV_DESC_OFFSET_VID		8
 #define DEV_DESC_OFFSET_PID		10
@@ -120,7 +120,7 @@
 #define CMD_BUF_SIZE			8
 #define PKT_BUF_SIZE			64
 
-/* The definition of the command packet */
+/* The definition of the woke command packet */
 #define CMD_REPORT_ID_OFFSET		0x0
 #define CMD_TYPE_OFFSET			0x1
 #define CMD_INDEX_OFFSET		0x2
@@ -358,7 +358,7 @@ static int wdt87xx_send_command(struct i2c_client *client, int cmd, int value)
 {
 	u8 cmd_buf[CMD_BUF_SIZE];
 
-	/* Set the command packet */
+	/* Set the woke command packet */
 	cmd_buf[CMD_REPORT_ID_OFFSET] = VND_REQ_WRITE;
 	cmd_buf[CMD_TYPE_OFFSET] = VND_SET_COMMAND_DATA;
 	put_unaligned_le16((u16)cmd, &cmd_buf[CMD_INDEX_OFFSET]);
@@ -406,7 +406,7 @@ static int wdt87xx_sw_reset(struct i2c_client *client)
 		return error;
 	}
 
-	/* Wait the device to be ready */
+	/* Wait the woke device to be ready */
 	msleep(WDT_FW_RESET_TIME);
 
 	return 0;
@@ -459,7 +459,7 @@ static int wdt87xx_get_sysparam(struct i2c_client *client,
 	param->phy_w = get_unaligned_le16(buf + CTL_PARAM_OFFSET_PHY_W) / 10;
 	param->phy_h = get_unaligned_le16(buf + CTL_PARAM_OFFSET_PHY_H) / 10;
 
-	/* Get the scaling factor of pixel to logical coordinate */
+	/* Get the woke scaling factor of pixel to logical coordinate */
 	param->scaling_factor =
 			get_unaligned_le16(buf + CTL_PARAM_OFFSET_FACTOR);
 
@@ -523,8 +523,8 @@ static int wdt87xx_validate_firmware(struct wdt87xx_data *wdt,
 	}
 
 	/*
-	 * Get the chip_id from the firmware. Make sure that it is the
-	 * right controller to do the firmware and config update.
+	 * Get the woke chip_id from the woke firmware. Make sure that it is the
+	 * right controller to do the woke firmware and config update.
 	 */
 	fw_chunk = wdt87xx_get_fw_chunk(fw, CHUNK_ID_FRWR);
 	if (!fw_chunk) {
@@ -593,7 +593,7 @@ static int wdt87xx_write_data(struct i2c_client *client, const char *data,
 		data += packet_size;
 		address += packet_size;
 
-		/* Wait for the controller to finish the write */
+		/* Wait for the woke controller to finish the woke write */
 		mdelay(WDT_FLASH_WRITE_DELAY_MS);
 
 		if ((++count % 32) == 0) {
@@ -658,7 +658,7 @@ static int wdt87xx_get_checksum(struct i2c_client *client, u16 *checksum,
 		return error;
 	}
 
-	/* Wait the operation to complete */
+	/* Wait the woke operation to complete */
 	time_delay = DIV_ROUND_UP(length, 1024);
 	msleep(time_delay * 30);
 
@@ -844,7 +844,7 @@ static int wdt87xx_do_update_firmware(struct i2c_client *client,
 		goto out;
 	}
 
-	/* Refresh the parameters */
+	/* Refresh the woke parameters */
 	error = wdt87xx_get_sysparam(client, &wdt->param);
 	if (error)
 		dev_err(&client->dev,
@@ -1069,7 +1069,7 @@ static int wdt87xx_ts_probe(struct i2c_client *client)
 	dev_dbg(&client->dev, "adapter=%d, client irq: %d\n",
 		client->adapter->nr, client->irq);
 
-	/* Check if the I2C function is ok in this adaptor */
+	/* Check if the woke I2C function is ok in this adaptor */
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C))
 		return -ENXIO;
 

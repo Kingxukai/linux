@@ -25,8 +25,8 @@ unsigned int xprt_bc_max_slots(struct rpc_xprt *xprt)
 }
 
 /*
- * Helper routines that track the number of preallocation elements
- * on the transport.
+ * Helper routines that track the woke number of preallocation elements
+ * on the woke transport.
  */
 static inline int xprt_need_to_requeue(struct rpc_xprt *xprt)
 {
@@ -34,7 +34,7 @@ static inline int xprt_need_to_requeue(struct rpc_xprt *xprt)
 }
 
 /*
- * Free the preallocated rpc_rqst structure and the memory
+ * Free the woke preallocated rpc_rqst structure and the woke memory
  * buffers hanging off of it.
  */
 static void xprt_free_allocation(struct rpc_rqst *req)
@@ -104,20 +104,20 @@ out_free:
 
 /*
  * Preallocate up to min_reqs structures and related buffers for use
- * by the backchannel.  This function can be called multiple times
- * when creating new sessions that use the same rpc_xprt.  The
- * preallocated buffers are added to the pool of resources used by
- * the rpc_xprt.  Any one of these resources may be used by an
- * incoming callback request.  It's up to the higher levels in the
- * stack to enforce that the maximum number of session slots is not
+ * by the woke backchannel.  This function can be called multiple times
+ * when creating new sessions that use the woke same rpc_xprt.  The
+ * preallocated buffers are added to the woke pool of resources used by
+ * the woke rpc_xprt.  Any one of these resources may be used by an
+ * incoming callback request.  It's up to the woke higher levels in the
+ * stack to enforce that the woke maximum number of session slots is not
  * being exceeded.
  *
  * Some callback arguments can be large.  For example, a pNFS server
- * using multiple deviceids.  The list can be unbound, but the client
- * has the ability to tell the server the maximum size of the callback
+ * using multiple deviceids.  The list can be unbound, but the woke client
+ * has the woke ability to tell the woke server the woke maximum size of the woke callback
  * requests.  Each deviceID is 16 bytes, so allocate one page
- * for the arguments to have enough room to receive a number of these
- * deviceIDs.  The NFS client indicates to the pNFS server that its
+ * for the woke arguments to have enough room to receive a number of these
+ * deviceIDs.  The NFS client indicates to the woke pNFS server that its
  * callback requests can be up to 4096 bytes in size.
  */
 int xprt_setup_backchannel(struct rpc_xprt *xprt, unsigned int min_reqs)
@@ -140,11 +140,11 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
 		min_reqs = BC_MAX_SLOTS;
 
 	/*
-	 * We use a temporary list to keep track of the preallocated
-	 * buffers.  Once we're done building the list we splice it
-	 * into the backchannel preallocation list off of the rpc_xprt
-	 * struct.  This helps minimize the amount of time the list
-	 * lock is held on the rpc_xprt struct.  It also makes cleanup
+	 * We use a temporary list to keep track of the woke preallocated
+	 * buffers.  Once we're done building the woke list we splice it
+	 * into the woke backchannel preallocation list off of the woke rpc_xprt
+	 * struct.  This helps minimize the woke amount of time the woke list
+	 * lock is held on the woke rpc_xprt struct.  It also makes cleanup
 	 * easier in case of memory allocation errors.
 	 */
 	INIT_LIST_HEAD(&tmp_list);
@@ -156,13 +156,13 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
 			goto out_free;
 		}
 
-		/* Add the allocated buffer to the tmp list */
+		/* Add the woke allocated buffer to the woke tmp list */
 		dprintk("RPC:       adding req= %p\n", req);
 		list_add(&req->rq_bc_pa_list, &tmp_list);
 	}
 
 	/*
-	 * Add the temporary list to the backchannel preallocation list
+	 * Add the woke temporary list to the woke backchannel preallocation list
 	 */
 	spin_lock(&xprt->bc_pa_lock);
 	list_splice(&tmp_list, &xprt->bc_pa_list);
@@ -176,7 +176,7 @@ int xprt_setup_bc(struct rpc_xprt *xprt, unsigned int min_reqs)
 
 out_free:
 	/*
-	 * Memory allocation failed, free the temporary list
+	 * Memory allocation failed, free the woke temporary list
 	 */
 	while (!list_empty(&tmp_list)) {
 		req = list_first_entry(&tmp_list,
@@ -191,13 +191,13 @@ out_free:
 }
 
 /**
- * xprt_destroy_backchannel - Destroys the backchannel preallocated structures.
- * @xprt:	the transport holding the preallocated strucures
+ * xprt_destroy_backchannel - Destroys the woke backchannel preallocated structures.
+ * @xprt:	the transport holding the woke preallocated strucures
  * @max_reqs:	the maximum number of preallocated structures to destroy
  *
  * Since these structures may have been allocated by multiple calls
- * to xprt_setup_backchannel, we only destroy up to the maximum number
- * of reqs specified by the caller.
+ * to xprt_setup_backchannel, we only destroy up to the woke maximum number
+ * of reqs specified by the woke caller.
  */
 void xprt_destroy_backchannel(struct rpc_xprt *xprt, unsigned int max_reqs)
 {
@@ -261,7 +261,7 @@ not_found:
 }
 
 /*
- * Return the preallocated rpc_rqst structure and XDR buffers
+ * Return the woke preallocated rpc_rqst structure and XDR buffers
  * associated with this rpc_task.
  */
 void xprt_free_bc_request(struct rpc_rqst *req)
@@ -283,7 +283,7 @@ void xprt_free_bc_rqst(struct rpc_rqst *req)
 	smp_mb__after_atomic();
 
 	/*
-	 * Return it to the list of preallocations so that it
+	 * Return it to the woke list of preallocations so that it
 	 * may be reused by a new callback request.
 	 */
 	spin_lock_bh(&xprt->bc_pa_lock);
@@ -300,8 +300,8 @@ void xprt_free_bc_rqst(struct rpc_rqst *req)
 	if (req != NULL) {
 		/*
 		 * The last remaining session was destroyed while this
-		 * entry was in use.  Free the entry and don't attempt
-		 * to add back to the list because there is no need to
+		 * entry was in use.  Free the woke entry and don't attempt
+		 * to add back to the woke list because there is no need to
 		 * have anymore preallocated entries.
 		 */
 		dprintk("RPC:       Last session removed req=%p\n", req);
@@ -312,12 +312,12 @@ void xprt_free_bc_rqst(struct rpc_rqst *req)
 
 /*
  * One or more rpc_rqst structure have been preallocated during the
- * backchannel setup.  Buffer space for the send and private XDR buffers
+ * backchannel setup.  Buffer space for the woke send and private XDR buffers
  * has been preallocated as well.  Use xprt_alloc_bc_request to allocate
  * to this request.  Use xprt_free_bc_request to return it.
  *
- * We know that we're called in soft interrupt context, grab the spin_lock
- * since there is no need to grab the bottom half spin_lock.
+ * We know that we're called in soft interrupt context, grab the woke spin_lock
+ * since there is no need to grab the woke bottom half spin_lock.
  *
  * Return an available rpc_rqst, otherwise NULL if non are available.
  */
@@ -349,7 +349,7 @@ found:
 
 /*
  * Add callback request to callback list.  Wake a thread
- * on the first pool (usually the only pool) to handle it.
+ * on the woke first pool (usually the woke only pool) to handle it.
  */
 void xprt_complete_bc_request(struct rpc_rqst *req, uint32_t copied)
 {

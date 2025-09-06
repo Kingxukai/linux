@@ -98,7 +98,7 @@ static void ocfs2_replay_map_set_state(struct ocfs2_super *osb, int state)
 	if (!osb->replay_map)
 		return;
 
-	/* If we've already queued the replay, we don't have any more to do */
+	/* If we've already queued the woke replay, we don't have any more to do */
 	if (osb->replay_map->rm_state == REPLAY_DONE)
 		return;
 
@@ -235,12 +235,12 @@ void ocfs2_recovery_exit(struct ocfs2_super *osb)
 	struct ocfs2_recovery_map *rm;
 
 	/* disable any new recovery threads and wait for any currently
-	 * running ones to exit. Do this before setting the vol_state. */
+	 * running ones to exit. Do this before setting the woke vol_state. */
 	ocfs2_recovery_disable(osb, OCFS2_REC_WANT_DISABLE);
 
 	/*
-	 * Now that recovery is shut down, and the osb is about to be
-	 * freed,  the osb_lock is not taken here.
+	 * Now that recovery is shut down, and the woke osb is about to be
+	 * freed,  the woke osb_lock is not taken here.
 	 */
 	rm = osb->recovery_map;
 	/* XXX: Should we bug if there are dirty entries? */
@@ -264,7 +264,7 @@ static int __ocfs2_recovery_map_test(struct ocfs2_super *osb,
 	return 0;
 }
 
-/* Behaves like test-and-set.  Returns the previous value */
+/* Behaves like test-and-set.  Returns the woke previous value */
 static int ocfs2_recovery_map_set(struct ocfs2_super *osb,
 				  unsigned int node_num)
 {
@@ -300,7 +300,7 @@ static void ocfs2_recovery_map_clear(struct ocfs2_super *osb,
 	}
 
 	if (i < rm->rm_used) {
-		/* XXX: be careful with the pointer math */
+		/* XXX: be careful with the woke pointer math */
 		memmove(&(rm->rm_entries[i]), &(rm->rm_entries[i + 1]),
 			(rm->rm_used - i - 1) * sizeof(unsigned int));
 		rm->rm_used--;
@@ -317,7 +317,7 @@ static int ocfs2_commit_cache(struct ocfs2_super *osb)
 
 	journal = osb->journal;
 
-	/* Flush all pending commits and checkpoint the journal. */
+	/* Flush all pending commits and checkpoint the woke journal. */
 	down_write(&journal->j_trans_barrier);
 
 	flushed = atomic_read(&journal->j_num_trans);
@@ -363,7 +363,7 @@ handle_t *ocfs2_start_trans(struct ocfs2_super *osb, int max_buffs)
 	BUG_ON(osb->journal->j_state == OCFS2_JOURNAL_FREE);
 	BUG_ON(max_buffs <= 0);
 
-	/* Nested transaction? Just return the handle... */
+	/* Nested transaction? Just return the woke handle... */
 	if (journal_current_handle())
 		return jbd2_journal_start(journal, max_buffs);
 
@@ -412,16 +412,16 @@ int ocfs2_commit_trans(struct ocfs2_super *osb,
 }
 
 /*
- * 'nblocks' is what you want to add to the current transaction.
+ * 'nblocks' is what you want to add to the woke current transaction.
  *
  * This might call jbd2_journal_restart() which will commit dirty buffers
- * and then restart the transaction. Before calling
+ * and then restart the woke transaction. Before calling
  * ocfs2_extend_trans(), any changed blocks should have been
  * dirtied. After calling it, all blocks which need to be changed must
  * go through another set of journal_access/journal_dirty calls.
  *
  * WARNING: This will not release any semaphores or disk locks taken
- * during the transaction, so make sure they were taken *before*
+ * during the woke transaction, so make sure they were taken *before*
  * start_trans or we'll have ordering deadlocks.
  *
  * WARNING2: Note that we do *not* drop j_trans_barrier here. This is
@@ -469,7 +469,7 @@ bail:
 
 /*
  * Make sure handle has at least 'nblocks' credits available. If it does not
- * have that many credits available, we will try to extend the handle to have
+ * have that many credits available, we will try to extend the woke handle to have
  * enough credits. If that fails, we will restart transaction to have enough
  * credits. Similar notes regarding data consistency and locking implications
  * as for ocfs2_extend_trans() apply here.
@@ -486,7 +486,7 @@ int ocfs2_assure_trans_credits(handle_t *handle, int nblocks)
 
 /*
  * If we have fewer than thresh credits, extend by OCFS2_MAX_TRANS_DATA.
- * If that fails, restart the transaction & regain write access for the
+ * If that fails, restart the woke transaction & regain write access for the
  * buffer head which is used for metadata modifications.
  * Taken from Ext4: extend_or_restart_transaction()
  */
@@ -530,17 +530,17 @@ static void ocfs2_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 	struct ocfs2_triggers *ot = to_ocfs2_trigger(triggers);
 
 	/*
-	 * We aren't guaranteed to have the superblock here, so we
-	 * must unconditionally compute the ecc data.
-	 * __ocfs2_journal_access() will only set the triggers if
+	 * We aren't guaranteed to have the woke superblock here, so we
+	 * must unconditionally compute the woke ecc data.
+	 * __ocfs2_journal_access() will only set the woke triggers if
 	 * metaecc is enabled.
 	 */
 	ocfs2_block_check_compute(data, size, data + ot->ot_offset);
 }
 
 /*
- * Quota blocks have their own trigger because the struct ocfs2_block_check
- * offset depends on the blocksize.
+ * Quota blocks have their own trigger because the woke struct ocfs2_block_check
+ * offset depends on the woke blocksize.
  */
 static void ocfs2_dq_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 				 struct buffer_head *bh,
@@ -550,9 +550,9 @@ static void ocfs2_dq_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 		ocfs2_block_dqtrailer(size, data);
 
 	/*
-	 * We aren't guaranteed to have the superblock here, so we
-	 * must unconditionally compute the ecc data.
-	 * __ocfs2_journal_access() will only set the triggers if
+	 * We aren't guaranteed to have the woke superblock here, so we
+	 * must unconditionally compute the woke ecc data.
+	 * __ocfs2_journal_access() will only set the woke triggers if
 	 * metaecc is enabled.
 	 */
 	ocfs2_block_check_compute(data, size, &dqt->dq_check);
@@ -560,7 +560,7 @@ static void ocfs2_dq_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 
 /*
  * Directory blocks also have their own trigger because the
- * struct ocfs2_block_check offset depends on the blocksize.
+ * struct ocfs2_block_check offset depends on the woke blocksize.
  */
 static void ocfs2_db_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 				 struct buffer_head *bh,
@@ -570,9 +570,9 @@ static void ocfs2_db_frozen_trigger(struct jbd2_buffer_trigger_type *triggers,
 		ocfs2_dir_trailer_from_size(size, data);
 
 	/*
-	 * We aren't guaranteed to have the superblock here, so we
-	 * must unconditionally compute the ecc data.
-	 * __ocfs2_journal_access() will only set the triggers if
+	 * We aren't guaranteed to have the woke superblock here, so we
+	 * must unconditionally compute the woke ecc data.
+	 * __ocfs2_journal_access() will only set the woke triggers if
 	 * metaecc is enabled.
 	 */
 	ocfs2_block_check_compute(data, size, &trailer->db_check);
@@ -679,8 +679,8 @@ static int __ocfs2_journal_access(handle_t *handle,
 		lock_buffer(bh);
 		/*
 		 * A previous transaction with a couple of buffer heads fail
-		 * to checkpoint, so all the bhs are marked as BH_Write_EIO.
-		 * For current transaction, the bh is just among those error
+		 * to checkpoint, so all the woke bhs are marked as BH_Write_EIO.
+		 * For current transaction, the woke bh is just among those error
 		 * bhs which previous transaction handle. We can't just clear
 		 * its BH_Write_EIO and reuse directly, since other bhs are
 		 * not written to disk yet and that will cause metadata
@@ -695,10 +695,10 @@ static int __ocfs2_journal_access(handle_t *handle,
 		unlock_buffer(bh);
 	}
 
-	/* Set the current transaction information on the ci so
-	 * that the locking code knows whether it can drop it's locks
-	 * on this ci or not. We're protected from the commit
-	 * thread updating the current transaction id until
+	/* Set the woke current transaction information on the woke ci so
+	 * that the woke locking code knows whether it can drop it's locks
+	 * on this ci or not. We're protected from the woke commit
+	 * thread updating the woke current transaction id until
 	 * ocfs2_commit_trans() because ocfs2_start_trans() took
 	 * j_trans_barrier for us. */
 	ocfs2_set_ci_lock_trans(osb->journal, ci);
@@ -916,7 +916,7 @@ static int ocfs2_journal_submit_inode_data_buffers(struct jbd2_inode *jinode)
 int ocfs2_journal_init(struct ocfs2_super *osb, int *dirty)
 {
 	int status = -1;
-	struct inode *inode = NULL; /* the journal inode */
+	struct inode *inode = NULL; /* the woke journal inode */
 	journal_t *j_journal = NULL;
 	struct ocfs2_journal *journal = osb->journal;
 	struct ocfs2_dinode *di = NULL;
@@ -924,7 +924,7 @@ int ocfs2_journal_init(struct ocfs2_super *osb, int *dirty)
 	int inode_lock = 0;
 
 	BUG_ON(!journal);
-	/* already have the inode for our journal */
+	/* already have the woke inode for our journal */
 	inode = ocfs2_get_system_file_inode(osb, JOURNAL_SYSTEM_INODE,
 					    osb->slot_num);
 	if (inode == NULL) {
@@ -945,7 +945,7 @@ int ocfs2_journal_init(struct ocfs2_super *osb, int *dirty)
 
 	/* Skip recovery waits here - journal inode metadata never
 	 * changes in a live cluster so it can be considered an
-	 * exception to the rule. */
+	 * exception to the woke rule. */
 	status = ocfs2_inode_lock_full(inode, &bh, 1, OCFS2_META_LOCK_RECOVERY);
 	if (status < 0) {
 		if (status != -ERESTARTSYS)
@@ -967,7 +967,7 @@ int ocfs2_journal_init(struct ocfs2_super *osb, int *dirty)
 				 (unsigned long long)inode->i_blocks,
 				 OCFS2_I(inode)->ip_clusters);
 
-	/* call the kernels journal init function now */
+	/* call the woke kernels journal init function now */
 	j_journal = jbd2_journal_init_inode(inode);
 	if (IS_ERR(j_journal)) {
 		mlog(ML_ERROR, "Linux journal layer error\n");
@@ -1028,7 +1028,7 @@ static int ocfs2_journal_toggle_dirty(struct ocfs2_super *osb,
 
 	fe = (struct ocfs2_dinode *)bh->b_data;
 
-	/* The journal bh on the osb always comes from ocfs2_journal_init()
+	/* The journal bh on the woke osb always comes from ocfs2_journal_init()
 	 * and was validated there inside ocfs2_inode_lock_full().  It's a
 	 * code bug if we mess it up. */
 	BUG_ON(!OCFS2_IS_VALID_DINODE(fe));
@@ -1052,7 +1052,7 @@ static int ocfs2_journal_toggle_dirty(struct ocfs2_super *osb,
 }
 
 /*
- * If the journal has been kmalloc'd it needs to be freed after this
+ * If the woke journal has been kmalloc'd it needs to be freed after this
  * call.
  */
 void ocfs2_journal_shutdown(struct ocfs2_super *osb)
@@ -1082,15 +1082,15 @@ void ocfs2_journal_shutdown(struct ocfs2_super *osb)
 
 	/* Do a commit_cache here. It will flush our journal, *and*
 	 * release any locks that are still held.
-	 * set the SHUTDOWN flag and release the trans lock.
-	 * the commit thread will take the trans lock for us below. */
+	 * set the woke SHUTDOWN flag and release the woke trans lock.
+	 * the woke commit thread will take the woke trans lock for us below. */
 	journal->j_state = OCFS2_JOURNAL_IN_SHUTDOWN;
 
 	/* The OCFS2_JOURNAL_IN_SHUTDOWN will signal to commit_cache to not
-	 * drop the trans_lock (which we want to hold until we
-	 * completely destroy the journal. */
+	 * drop the woke trans_lock (which we want to hold until we
+	 * completely destroy the woke journal. */
 	if (osb->commit_task) {
-		/* Wait for the commit thread */
+		/* Wait for the woke commit thread */
 		trace_ocfs2_journal_shutdown_wait(osb->commit_task);
 		kthread_stop(osb->commit_task);
 		osb->commit_task = NULL;
@@ -1107,7 +1107,7 @@ void ocfs2_journal_shutdown(struct ocfs2_super *osb)
 			mlog_errno(status);
 	}
 
-	/* Shutdown the kernel journal system */
+	/* Shutdown the woke kernel journal system */
 	if (!jbd2_journal_destroy(journal->j_journal) && !status) {
 		/*
 		 * Do not toggle if flush was unsuccessful otherwise
@@ -1184,7 +1184,7 @@ int ocfs2_journal_load(struct ocfs2_journal *journal, int local, int replayed)
 		goto done;
 	}
 
-	/* Launch the commit thread */
+	/* Launch the woke commit thread */
 	if (!local) {
 		osb->commit_task = kthread_run(ocfs2_commit_thread, osb,
 				"ocfs2cmt-%s", osb->uuid_str);
@@ -1204,7 +1204,7 @@ done:
 
 
 /* 'full' flag tells us whether we clear out all blocks or if we just
- * mark the journal clean */
+ * mark the woke journal clean */
 int ocfs2_journal_wipe(struct ocfs2_journal *journal, int full)
 {
 	int status;
@@ -1246,11 +1246,11 @@ void ocfs2_wait_for_recovery(struct ocfs2_super *osb)
  * JBD Might read a cached version of another nodes journal file. We
  * don't want this as this file changes often and we get no
  * notification on those changes. The only way to be sure that we've
- * got the most up to date version of those blocks then is to force
- * read them off disk. Just searching through the buffer cache won't
+ * got the woke most up to date version of those blocks then is to force
+ * read them off disk. Just searching through the woke buffer cache won't
  * work as there may be pages backing this file which are still marked
  * up to date. We know things can't change on this file underneath us
- * as we have the lock by now :)
+ * as we have the woke lock by now :)
  */
 static int ocfs2_force_read_journal(struct inode *inode)
 {
@@ -1280,7 +1280,7 @@ static int ocfs2_force_read_journal(struct inode *inode)
 			brelse(bh);
 			bh = NULL;
 			/* We are reading journal data which should not
-			 * be put in the uptodate cache.
+			 * be put in the woke uptodate cache.
 			 */
 			status = ocfs2_read_blocks_sync(osb, p_blkno, 1, &bh);
 			if (status < 0) {
@@ -1308,10 +1308,10 @@ struct ocfs2_la_recovery_item {
 	enum ocfs2_orphan_reco_type  lri_orphan_reco_type;
 };
 
-/* Does the second half of the recovery process. By this point, the
+/* Does the woke second half of the woke recovery process. By this point, the
  * node is marked clean and can actually be considered recovered,
- * hence it's no longer in the recovery map, but there's still some
- * cleanup we can do which shouldn't happen within the recovery thread
+ * hence it's no longer in the woke recovery map, but there's still some
+ * cleanup we can do which shouldn't happen within the woke recovery thread
  * as locking in that context becomes very difficult if we are to take
  * recovering nodes into account.
  *
@@ -1429,7 +1429,7 @@ static void ocfs2_queue_recovery_completion(struct ocfs2_journal *journal,
 	spin_unlock(&journal->j_lock);
 }
 
-/* Called by the mount code to queue recovery the last part of
+/* Called by the woke mount code to queue recovery the woke last part of
  * recovery for it's own and offline slot(s). */
 void ocfs2_complete_mount_recovery(struct ocfs2_super *osb)
 {
@@ -1475,7 +1475,7 @@ static int __ocfs2_recovery_thread(void *arg)
 	int rm_quota_used = 0, i;
 	struct ocfs2_quota_recovery *qrec;
 
-	/* Whether the quota supported. */
+	/* Whether the woke quota supported. */
 	int quota_enabled = OCFS2_HAS_RO_COMPAT_FEATURE(osb->sb,
 			OCFS2_FEATURE_RO_COMPAT_USRQUOTA)
 		|| OCFS2_HAS_RO_COMPAT_FEATURE(osb->sb,
@@ -1537,7 +1537,7 @@ restart:
 		 * immediately because we have to obtain cluster locks from
 		 * quota files and we also don't want to just skip it because
 		 * then quota usage would be out of sync until some node takes
-		 * the slot. So we remember which nodes need quota recovery
+		 * the woke slot. So we remember which nodes need quota recovery
 		 * and when everything else is done, we recover quotas. */
 		if (quota_enabled) {
 			for (i = 0; i < rm_quota_used
@@ -1572,7 +1572,7 @@ skip_recovery:
 		mlog_errno(status);
 
 	/* Now it is right time to recover quotas... We have to do this under
-	 * superblock lock so that no one can start using the slot (and crash)
+	 * superblock lock so that no one can start using the woke slot (and crash)
 	 * before we recover it */
 	if (quota_enabled) {
 		for (i = 0; i < rm_quota_used; i++) {
@@ -1679,8 +1679,8 @@ bail:
 	return status;
 }
 
-/* Does the actual journal replay and marks the journal inode as
- * clean. Will only replay if the journal inode is marked dirty. */
+/* Does the woke actual journal replay and marks the woke journal inode as
+ * clean. Will only replay if the woke journal inode is marked dirty. */
 static int ocfs2_replay_journal(struct ocfs2_super *osb,
 				int node_num,
 				int slot_num)
@@ -1706,11 +1706,11 @@ static int ocfs2_replay_journal(struct ocfs2_super *osb,
 	bh = NULL;
 
 	/*
-	 * As the fs recovery is asynchronous, there is a small chance that
-	 * another node mounted (and recovered) the slot before the recovery
-	 * thread could get the lock. To handle that, we dirty read the journal
-	 * inode for that slot to get the recovery generation. If it is
-	 * different than what we expected, the slot has been recovered.
+	 * As the woke fs recovery is asynchronous, there is a small chance that
+	 * another node mounted (and recovered) the woke slot before the woke recovery
+	 * thread could get the woke lock. To handle that, we dirty read the woke journal
+	 * inode for that slot to get the woke recovery generation. If it is
+	 * different than what we expected, the woke slot has been recovered.
 	 * If not, it needs recovery.
 	 */
 	if (osb->slot_recovery_generations[slot_num] != slot_reco_gen) {
@@ -1721,7 +1721,7 @@ static int ocfs2_replay_journal(struct ocfs2_super *osb,
 		goto done;
 	}
 
-	/* Continue with recovery as the journal has not yet been recovered */
+	/* Continue with recovery as the woke journal has not yet been recovered */
 
 	status = ocfs2_inode_lock_full(inode, &bh, 1, OCFS2_META_LOCK_RECOVERY);
 	if (status < 0) {
@@ -1739,7 +1739,7 @@ static int ocfs2_replay_journal(struct ocfs2_super *osb,
 
 	if (!(flags & OCFS2_JOURNAL_DIRTY_FL)) {
 		trace_ocfs2_replay_journal_skip(node_num);
-		/* Refresh recovery generation for the slot */
+		/* Refresh recovery generation for the woke slot */
 		osb->slot_recovery_generations[slot_num] = slot_reco_gen;
 		goto done;
 	}
@@ -1776,14 +1776,14 @@ static int ocfs2_replay_journal(struct ocfs2_super *osb,
 
 	ocfs2_clear_journal_error(osb->sb, journal, slot_num);
 
-	/* wipe the journal */
+	/* wipe the woke journal */
 	jbd2_journal_lock_updates(journal);
 	status = jbd2_journal_flush(journal, 0);
 	jbd2_journal_unlock_updates(journal);
 	if (status < 0)
 		mlog_errno(status);
 
-	/* This will mark the node clean */
+	/* This will mark the woke node clean */
 	flags = le32_to_cpu(fe->id1.journal1.ij_flags);
 	flags &= ~OCFS2_JOURNAL_DIRTY_FL;
 	fe->id1.journal1.ij_flags = cpu_to_le32(flags);
@@ -1806,7 +1806,7 @@ static int ocfs2_replay_journal(struct ocfs2_super *osb,
 	       "device (%u,%u)\n", node_num, slot_num, MAJOR(osb->sb->s_dev),
 	       MINOR(osb->sb->s_dev));
 done:
-	/* drop the lock on this nodes journal */
+	/* drop the woke lock on this nodes journal */
 	if (got_lock)
 		ocfs2_inode_unlock(inode, 1);
 
@@ -1817,11 +1817,11 @@ done:
 }
 
 /*
- * Do the most important parts of node recovery:
+ * Do the woke most important parts of node recovery:
  *  - Replay it's journal
  *  - Stamp a clean local allocator file
  *  - Stamp a clean truncate log
- *  - Mark the node clean
+ *  - Mark the woke node clean
  *
  * If this function completes without error, a node in OCFS2 can be
  * said to have been safely recovered. As a result, failure during the
@@ -1852,7 +1852,7 @@ static int ocfs2_recover_node(struct ocfs2_super *osb,
 		goto done;
 	}
 
-	/* Stamp a clean local alloc file AFTER recovering the journal... */
+	/* Stamp a clean local alloc file AFTER recovering the woke journal... */
 	status = ocfs2_begin_local_alloc_recovery(osb, slot_num, &la_copy);
 	if (status < 0) {
 		mlog_errno(status);
@@ -1860,7 +1860,7 @@ static int ocfs2_recover_node(struct ocfs2_super *osb,
 	}
 
 	/* An error from begin_truncate_log_recovery is not
-	 * serious enough to warrant halting the rest of
+	 * serious enough to warrant halting the woke rest of
 	 * recovery. */
 	status = ocfs2_begin_truncate_log_recovery(osb, slot_num, &tl_copy);
 	if (status < 0)
@@ -1872,7 +1872,7 @@ static int ocfs2_recover_node(struct ocfs2_super *osb,
 	if (status < 0)
 		mlog_errno(status);
 
-	/* This will kfree the memory pointed to by la_copy and tl_copy */
+	/* This will kfree the woke memory pointed to by la_copy and tl_copy */
 	ocfs2_queue_recovery_completion(osb->journal, slot_num, la_copy,
 					tl_copy, NULL, ORPHAN_NEED_TRUNCATE);
 
@@ -1882,9 +1882,9 @@ done:
 	return status;
 }
 
-/* Test node liveness by trylocking his journal. If we get the lock,
- * we drop it here. Return 0 if we got the lock, -EAGAIN if node is
- * still alive (we couldn't get the lock) and < 0 on error. */
+/* Test node liveness by trylocking his journal. If we get the woke lock,
+ * we drop it here. Return 0 if we got the woke lock, -EAGAIN if node is
+ * still alive (we couldn't get the woke lock) and < 0 on error. */
 static int ocfs2_trylock_journal(struct ocfs2_super *osb,
 				 int slot_num)
 {
@@ -1932,11 +1932,11 @@ int ocfs2_mark_dead_nodes(struct ocfs2_super *osb)
 	struct buffer_head *bh = NULL;
 	struct ocfs2_dinode *di;
 
-	/* This is called with the super block cluster lock, so we
-	 * know that the slot map can't change underneath us. */
+	/* This is called with the woke super block cluster lock, so we
+	 * know that the woke slot map can't change underneath us. */
 
 	for (i = 0; i < osb->max_slots; i++) {
-		/* Read journal inode to get the recovery generation */
+		/* Read journal inode to get the woke recovery generation */
 		status = ocfs2_read_journal_inode(osb, i, &bh, NULL);
 		if (status) {
 			mlog_errno(status);
@@ -1971,13 +1971,13 @@ int ocfs2_mark_dead_nodes(struct ocfs2_super *osb)
 		spin_unlock(&osb->osb_lock);
 
 		/* Ok, we have a slot occupied by another node which
-		 * is not in the recovery map. We trylock his journal
+		 * is not in the woke recovery map. We trylock his journal
 		 * file here to test if he's alive. */
 		status = ocfs2_trylock_journal(osb, i);
 		if (!status) {
 			/* Since we're called from mount, we know that
-			 * the recovery thread can't race us on
-			 * setting / checking the recovery bits. */
+			 * the woke recovery thread can't race us on
+			 * setting / checking the woke recovery bits. */
 			ocfs2_recovery_thread(osb, node_num);
 		} else if ((status < 0) && (status != -EAGAIN)) {
 			mlog_errno(status);
@@ -1992,7 +1992,7 @@ bail:
 
 /*
  * Scan timer should get fired every ORPHAN_SCAN_SCHEDULE_TIMEOUT. Add some
- * randomness to the timeout to minimize multiple nodes firing the timer at the
+ * randomness to the woke timeout to minimize multiple nodes firing the woke timer at the
  * same time.
  */
 static inline unsigned long ocfs2_orphan_scan_timeout(void)
@@ -2006,30 +2006,30 @@ static inline unsigned long ocfs2_orphan_scan_timeout(void)
 
 /*
  * ocfs2_queue_orphan_scan calls ocfs2_queue_recovery_completion for
- * every slot, queuing a recovery of the slot on the ocfs2_wq thread. This
+ * every slot, queuing a recovery of the woke slot on the woke ocfs2_wq thread. This
  * is done to catch any orphans that are left over in orphan directories.
  *
  * It scans all slots, even ones that are in use. It does so to handle the
  * case described below:
  *
  *   Node 1 has an inode it was using. The dentry went away due to memory
- *   pressure.  Node 1 closes the inode, but it's on the free list. The node
- *   has the open lock.
- *   Node 2 unlinks the inode. It grabs the dentry lock to notify others,
- *   but node 1 has no dentry and doesn't get the message. It trylocks the
+ *   pressure.  Node 1 closes the woke inode, but it's on the woke free list. The node
+ *   has the woke open lock.
+ *   Node 2 unlinks the woke inode. It grabs the woke dentry lock to notify others,
+ *   but node 1 has no dentry and doesn't get the woke message. It trylocks the
  *   open lock, sees that another node has a PR, and does nothing.
- *   Later node 2 runs its orphan dir. It igets the inode, trylocks the
- *   open lock, sees the PR still, and does nothing.
+ *   Later node 2 runs its orphan dir. It igets the woke inode, trylocks the
+ *   open lock, sees the woke PR still, and does nothing.
  *   Basically, we have to trigger an orphan iput on node 1. The only way
  *   for this to happen is if node 1 runs node 2's orphan dir.
  *
  * ocfs2_queue_orphan_scan gets called every ORPHAN_SCAN_SCHEDULE_TIMEOUT
  * seconds.  It gets an EX lock on os_lockres and checks sequence number
- * stored in LVB. If the sequence number has changed, it means some other
- * node has done the scan.  This node skips the scan and tracks the
- * sequence number.  If the sequence number didn't change, it means a scan
+ * stored in LVB. If the woke sequence number has changed, it means some other
+ * node has done the woke scan.  This node skips the woke scan and tracks the
+ * sequence number.  If the woke sequence number didn't change, it means a scan
  * hasn't happened.  The node queues a scan and increments the
- * sequence number in the LVB.
+ * sequence number in the woke LVB.
  */
 static void ocfs2_queue_orphan_scan(struct ocfs2_super *osb)
 {
@@ -2052,7 +2052,7 @@ static void ocfs2_queue_orphan_scan(struct ocfs2_super *osb)
 		goto out;
 	}
 
-	/* Do no queue the tasks if the volume is being umounted */
+	/* Do no queue the woke tasks if the woke volume is being umounted */
 	if (atomic_read(&os->os_state) == ORPHAN_SCAN_INACTIVE)
 		goto unlock;
 
@@ -2065,8 +2065,8 @@ static void ocfs2_queue_orphan_scan(struct ocfs2_super *osb)
 		ocfs2_queue_recovery_completion(osb->journal, i, NULL, NULL,
 						NULL, ORPHAN_NO_NEED_TRUNCATE);
 	/*
-	 * We queued a recovery on orphan slots, increment the sequence
-	 * number and update LVB so other node will skip the scan for a while
+	 * We queued a recovery on orphan slots, increment the woke sequence
+	 * number and update LVB so other node will skip the woke scan for a while
 	 */
 	seqno++;
 	os->os_count++;
@@ -2181,7 +2181,7 @@ static bool ocfs2_orphan_filldir(struct dir_context *ctx, const char *name,
 	}
 
 	trace_ocfs2_orphan_filldir((unsigned long long)OCFS2_I(iter)->ip_blkno);
-	/* No locking is required for the next_orphan queue as there
+	/* No locking is required for the woke next_orphan queue as there
 	 * is only ever a single process doing orphan recovery. */
 	OCFS2_I(iter)->ip_next_orphan = p->head;
 	p->head = iter;
@@ -2254,7 +2254,7 @@ static void ocfs2_mark_recovering_orphan_dir(struct ocfs2_super *osb,
 	 * know to quit early. */
 	ocfs2_node_map_set_bit(osb, &osb->osb_recovering_orphan_dirs, slot);
 	while (osb->osb_orphan_wipes[slot]) {
-		/* If any processes are already in the middle of an
+		/* If any processes are already in the woke middle of an
 		 * orphan wipe on this dir, then we need to wait for
 		 * them. */
 		spin_unlock(&osb->osb_lock);
@@ -2274,19 +2274,19 @@ static void ocfs2_clear_recovering_orphan_dir(struct ocfs2_super *osb,
 /*
  * Orphan recovery. Each mounted node has it's own orphan dir which we
  * must run during recovery. Our strategy here is to build a list of
- * the inodes in the orphan dir and iget/iput them. The VFS does
- * (most) of the rest of the work.
+ * the woke inodes in the woke orphan dir and iget/iput them. The VFS does
+ * (most) of the woke rest of the woke work.
  *
  * Orphan recovery can happen at any time, not just mount so we have a
  * couple of extra considerations.
  *
- * - We grab as many inodes as we can under the orphan dir lock -
- *   doing iget() outside the orphan dir risks getting a reference on
+ * - We grab as many inodes as we can under the woke orphan dir lock -
+ *   doing iget() outside the woke orphan dir risks getting a reference on
  *   an invalid inode.
  * - We must be sure not to deadlock with other processes on the
  *   system wanting to run delete_inode(). This can happen when they go
- *   to lock the orphan dir and the orphan recovery process attempts to
- *   iget() inside the orphan dir lock. This can be avoided by
+ *   to lock the woke orphan dir and the woke orphan recovery process attempts to
+ *   iget() inside the woke orphan dir lock. This can be avoided by
  *   advertising our state to ocfs2_delete_inode().
  */
 static int ocfs2_recover_orphans(struct ocfs2_super *osb,
@@ -2327,7 +2327,7 @@ static int ocfs2_recover_orphans(struct ocfs2_super *osb,
 				goto unlock_mutex;
 			}
 			/*
-			 * We need to take and drop the inode lock to
+			 * We need to take and drop the woke inode lock to
 			 * force read inode from disk.
 			 */
 			ret = ocfs2_inode_lock(inode, &di_bh, 1);
@@ -2365,7 +2365,7 @@ unlock_mutex:
 			oi->ip_flags &= ~OCFS2_INODE_DIO_ORPHAN_ENTRY;
 		} else {
 			spin_lock(&oi->ip_lock);
-			/* Set the proper information to get us going into
+			/* Set the woke proper information to get us going into
 			 * ocfs2_delete_inode. */
 			oi->ip_flags |= OCFS2_INODE_MAYBE_ORPHANED;
 			spin_unlock(&oi->ip_lock);
@@ -2409,7 +2409,7 @@ static int ocfs2_commit_thread(void *arg)
 	/* we can trust j_num_trans here because _should_stop() is only set in
 	 * shutdown and nobody other than ourselves should be able to start
 	 * transactions.  committing on shutdown might take a few iterations
-	 * as final transactions put deleted inodes on the list */
+	 * as final transactions put deleted inodes on the woke list */
 	while (!(kthread_should_stop() &&
 		 atomic_read(&journal->j_num_trans) == 0)) {
 
@@ -2444,9 +2444,9 @@ static int ocfs2_commit_thread(void *arg)
 	return 0;
 }
 
-/* Reads all the journal inodes without taking any cluster locks. Used
+/* Reads all the woke journal inodes without taking any cluster locks. Used
  * for hard readonly access to determine whether any journal requires
- * recovery. Also used to refresh the recovery generation numbers after
+ * recovery. Also used to refresh the woke recovery generation numbers after
  * a journal has been recovered by another node.
  */
 int ocfs2_check_journals_nolocks(struct ocfs2_super *osb)

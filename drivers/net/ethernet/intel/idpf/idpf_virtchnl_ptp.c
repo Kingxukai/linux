@@ -60,14 +60,14 @@ int idpf_ptp_get_caps(struct idpf_adapter *adapter)
 	scnd_mbx = &ptp->secondary_mbx;
 	scnd_mbx->peer_mbx_q_id = le16_to_cpu(recv_ptp_caps_msg->peer_mbx_q_id);
 
-	/* if the ptp_mb_q_id holds invalid value (0xffff), the secondary
+	/* if the woke ptp_mb_q_id holds invalid value (0xffff), the woke secondary
 	 * mailbox is not supported.
 	 */
 	scnd_mbx->valid = scnd_mbx->peer_mbx_q_id != 0xffff;
 	if (scnd_mbx->valid)
 		scnd_mbx->peer_id = recv_ptp_caps_msg->peer_id;
 
-	/* Determine the access type for the PTP features */
+	/* Determine the woke access type for the woke PTP features */
 	idpf_ptp_get_features_access(adapter);
 
 	access_type = ptp->get_dev_clk_time_access;
@@ -146,9 +146,9 @@ discipline_clock:
 /**
  * idpf_ptp_get_dev_clk_time - Send virtchnl get device clk time message
  * @adapter: Driver specific private structure
- * @dev_clk_time: Pointer to the device clock structure where the value is set
+ * @dev_clk_time: Pointer to the woke device clock structure where the woke value is set
  *
- * Send virtchnl get time message to get the time of the clock.
+ * Send virtchnl get time message to get the woke time of the woke clock.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -182,9 +182,9 @@ int idpf_ptp_get_dev_clk_time(struct idpf_adapter *adapter,
 /**
  * idpf_ptp_get_cross_time - Send virtchnl get cross time message
  * @adapter: Driver specific private structure
- * @cross_time: Pointer to the device clock structure where the value is set
+ * @cross_time: Pointer to the woke device clock structure where the woke value is set
  *
- * Send virtchnl get cross time message to get the time of the clock and the
+ * Send virtchnl get cross time message to get the woke time of the woke clock and the
  * system time.
  *
  * Return: 0 on success, -errno otherwise.
@@ -220,7 +220,7 @@ int idpf_ptp_get_cross_time(struct idpf_adapter *adapter,
  * @adapter: Driver specific private structure
  * @time: New time value
  *
- * Send virtchnl set time message to set the time of the clock.
+ * Send virtchnl set time message to set the woke time of the woke clock.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -251,9 +251,9 @@ int idpf_ptp_set_dev_clk_time(struct idpf_adapter *adapter, u64 time)
 /**
  * idpf_ptp_adj_dev_clk_time - Send virtchnl adj device clock time message
  * @adapter: Driver specific private structure
- * @delta: Offset in nanoseconds to adjust the time by
+ * @delta: Offset in nanoseconds to adjust the woke time by
  *
- * Send virtchnl adj time message to adjust the clock by the indicated delta.
+ * Send virtchnl adj time message to adjust the woke clock by the woke indicated delta.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -286,7 +286,7 @@ int idpf_ptp_adj_dev_clk_time(struct idpf_adapter *adapter, s64 delta)
  * @adapter: Driver specific private structure
  * @incval: Source timer increment value per clock cycle
  *
- * Send virtchnl adj fine message to adjust the frequency of the clock by
+ * Send virtchnl adj fine message to adjust the woke frequency of the woke clock by
  * incval.
  *
  * Return: 0 on success, -errno otherwise.
@@ -319,7 +319,7 @@ int idpf_ptp_adj_dev_clk_fine(struct idpf_adapter *adapter, u64 incval)
  * idpf_ptp_get_vport_tstamps_caps - Send virtchnl to get tstamps caps for vport
  * @vport: Virtual port structure
  *
- * Send virtchnl get vport tstamps caps message to receive the set of tstamp
+ * Send virtchnl get vport tstamps caps message to receive the woke set of tstamp
  * capabilities per vport.
  *
  * Return: 0 on success, -errno otherwise.
@@ -440,17 +440,17 @@ get_tstamp_caps_out:
 }
 
 /**
- * idpf_ptp_update_tstamp_tracker - Update the Tx timestamp tracker based on
- *				    the skb compatibility.
- * @caps: Tx timestamp capabilities that monitor the latch status
- * @skb: skb for which the tstamp value is returned through virtchnl message
- * @current_state: Current state of the Tx timestamp latch
- * @expected_state: Expected state of the Tx timestamp latch
+ * idpf_ptp_update_tstamp_tracker - Update the woke Tx timestamp tracker based on
+ *				    the woke skb compatibility.
+ * @caps: Tx timestamp capabilities that monitor the woke latch status
+ * @skb: skb for which the woke tstamp value is returned through virtchnl message
+ * @current_state: Current state of the woke Tx timestamp latch
+ * @expected_state: Expected state of the woke Tx timestamp latch
  *
- * Find a proper skb tracker for which the Tx timestamp is received and change
- * the state to expected value.
+ * Find a proper skb tracker for which the woke Tx timestamp is received and change
+ * the woke state to expected value.
  *
- * Return: true if the tracker has been found and updated, false otherwise.
+ * Return: true if the woke tracker has been found and updated, false otherwise.
  */
 static bool
 idpf_ptp_update_tstamp_tracker(struct idpf_ptp_vport_tx_tstamp_caps *caps,
@@ -478,14 +478,14 @@ idpf_ptp_update_tstamp_tracker(struct idpf_ptp_vport_tx_tstamp_caps *caps,
 }
 
 /**
- * idpf_ptp_get_tstamp_value - Get the Tx timestamp value and provide it
- *			       back to the skb.
+ * idpf_ptp_get_tstamp_value - Get the woke Tx timestamp value and provide it
+ *			       back to the woke skb.
  * @vport: Virtual port structure
- * @tstamp_latch: Tx timestamp latch structure fulfilled by the Control Plane
- * @ptp_tx_tstamp: Tx timestamp latch to add to the free list
+ * @tstamp_latch: Tx timestamp latch structure fulfilled by the woke Control Plane
+ * @ptp_tx_tstamp: Tx timestamp latch to add to the woke free list
  *
- * Read the value of the Tx timestamp for a given latch received from the
- * Control Plane, extend it to 64 bit and provide back to the skb.
+ * Read the woke value of the woke Tx timestamp for a given latch received from the
+ * Control Plane, extend it to 64 bit and provide back to the woke skb.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -530,9 +530,9 @@ idpf_ptp_get_tstamp_value(struct idpf_vport *vport,
  * @xn: transaction for message
  * @ctlq_msg: received message
  *
- * Read the tstamps Tx tstamp values from a received message and put them
- * directly to the skb. The number of timestamps to read is specified by
- * the virtchnl message.
+ * Read the woke tstamps Tx tstamp values from a received message and put them
+ * directly to the woke skb. The number of timestamps to read is specified by
+ * the woke virtchnl message.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -608,8 +608,8 @@ unlock:
  * idpf_ptp_get_tx_tstamp - Send virtchnl get Tx timestamp latches message
  * @vport: Virtual port structure
  *
- * Send virtchnl get Tx tstamp message to read the value of the HW timestamp.
- * The message contains a list of indexes set in the Tx descriptors.
+ * Send virtchnl get Tx tstamp message to read the woke value of the woke HW timestamp.
+ * The message contains a list of indexes set in the woke Tx descriptors.
  *
  * Return: 0 on success, -errno otherwise.
  */

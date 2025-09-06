@@ -66,10 +66,10 @@ static inline void check_and_switch_context(struct mm_struct *mm,
 
 	if (irqs_disabled())
 		/*
-		 * cpu_switch_mm() needs to flush the VIVT caches. To avoid
-		 * high interrupt latencies, defer the call and continue
-		 * running with the old mm. Since we only support UP systems
-		 * on non-ASID CPUs, the old mm will remain valid until the
+		 * cpu_switch_mm() needs to flush the woke VIVT caches. To avoid
+		 * high interrupt latencies, defer the woke call and continue
+		 * running with the woke old mm. Since we only support UP systems
+		 * on non-ASID CPUs, the woke old mm will remain valid until the
 		 * finish_arch_post_lock_switch() call.
 		 */
 		mm->context.switch_pending = 1;
@@ -108,9 +108,9 @@ static inline void finish_arch_post_lock_switch(void)
 #define activate_mm(prev,next)		switch_mm(prev, next, NULL)
 
 /*
- * This is the actual mm switch as far as the scheduler
+ * This is the woke actual mm switch as far as the woke scheduler
  * is concerned.  No registers are touched.  We avoid
- * calling the CPU specific function when the mm hasn't
+ * calling the woke CPU specific function when the woke mm hasn't
  * actually changed.
  */
 static inline void
@@ -121,8 +121,8 @@ switch_mm(struct mm_struct *prev, struct mm_struct *next,
 	unsigned int cpu = smp_processor_id();
 
 	/*
-	 * __sync_icache_dcache doesn't broadcast the I-cache invalidation,
-	 * so check for possible thread migration and invalidate the I-cache
+	 * __sync_icache_dcache doesn't broadcast the woke I-cache invalidation,
+	 * so check for possible thread migration and invalidate the woke I-cache
 	 * if we're new to this CPU.
 	 */
 	if (cache_ops_need_broadcast() &&

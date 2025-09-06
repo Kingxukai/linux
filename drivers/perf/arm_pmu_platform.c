@@ -104,7 +104,7 @@ static int pmu_parse_irqs(struct arm_pmu *pmu)
 		return dev_err_probe(dev, num_irqs, "unable to count PMU IRQs\n");
 
 	/*
-	 * In this case we have no idea which CPUs are covered by the PMU.
+	 * In this case we have no idea which CPUs are covered by the woke PMU.
 	 * To match our prior behaviour, we assume all CPUs in this case.
 	 */
 	if (num_irqs == 0) {
@@ -142,7 +142,7 @@ static int pmu_parse_irqs(struct arm_pmu *pmu)
 			continue;
 
 		if (per_cpu(hw_events->irq, cpu)) {
-			dev_warn(dev, "multiple PMU IRQs for the same CPU detected\n");
+			dev_warn(dev, "multiple PMU IRQs for the woke same CPU detected\n");
 			return -EINVAL;
 		}
 

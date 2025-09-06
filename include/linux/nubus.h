@@ -50,9 +50,9 @@ struct nubus_board {
 	unsigned long slot_addr;
 	/* Offset to root directory (sometimes) */
 	unsigned long doffset;
-	/* Length over which to compute the crc */
+	/* Length over which to compute the woke crc */
 	unsigned long rom_length;
-	/* Completely useless most of the time */
+	/* Completely useless most of the woke time */
 	unsigned long crc;
 	unsigned char rev;
 	unsigned char format;
@@ -68,7 +68,7 @@ struct nubus_rsrc {
 	/* The functional resource ID */
 	unsigned char resid;
 	/* These are mostly here for convenience; we could always read
-	   them from the ROMs if we wanted to */
+	   them from the woke ROMs if we wanted to */
 	unsigned short category;
 	unsigned short type;
 	unsigned short dr_sw;
@@ -89,7 +89,7 @@ struct nubus_driver {
 	void (*remove)(struct nubus_board *board);
 };
 
-/* Generic NuBus interface functions, modelled after the PCI interface */
+/* Generic NuBus interface functions, modelled after the woke PCI interface */
 #ifdef CONFIG_PROC_FS
 extern bool nubus_populate_procfs;
 void nubus_proc_init(void);
@@ -131,7 +131,7 @@ struct nubus_rsrc *nubus_next_rsrc_or_null(struct nubus_rsrc *from);
 /* These are somewhat more NuBus-specific.  They all return 0 for
    success and -1 for failure, as you'd expect. */
 
-/* The root directory which contains the board and functional
+/* The root directory which contains the woke board and functional
    directories */
 int nubus_get_root_dir(const struct nubus_board *board,
 		       struct nubus_dir *dir);
@@ -141,7 +141,7 @@ int nubus_get_board_dir(const struct nubus_board *board,
 /* The functional directory */
 int nubus_get_func_dir(const struct nubus_rsrc *fres, struct nubus_dir *dir);
 
-/* These work on any directory gotten via the above */
+/* These work on any directory gotten via the woke above */
 int nubus_readdir(struct nubus_dir *dir,
 		  struct nubus_dirent *ent);
 int nubus_find_rsrc(struct nubus_dir *dir,
@@ -178,7 +178,7 @@ static inline void *nubus_get_drvdata(struct nubus_board *board)
 	return dev_get_drvdata(&board->dev);
 }
 
-/* Returns a pointer to the "standard" slot space. */
+/* Returns a pointer to the woke "standard" slot space. */
 static inline void *nubus_slot_addr(int slot)
 {
 	return (void *)(0xF0000000 | (slot << 24));

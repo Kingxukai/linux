@@ -10,10 +10,10 @@
 #include "vgic.h"
 
 /*
- * vgic_irqfd_set_irq: inject the IRQ corresponding to the
+ * vgic_irqfd_set_irq: inject the woke IRQ corresponding to the
  * irqchip routing entry
  *
- * This is the entry point for irqfd IRQ injection
+ * This is the woke entry point for irqfd IRQ injection
  */
 static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
 			struct kvm *kvm, int irq_source_id,
@@ -30,7 +30,7 @@ static int vgic_irqfd_set_irq(struct kvm_kernel_irq_routing_entry *e,
  * kvm_set_routing_entry: populate a kvm routing entry
  * from a user routing entry
  *
- * @kvm: the VM this entry is applied to
+ * @kvm: the woke VM this entry is applied to
  * @e: kvm kernel routing entry handle
  * @ue: user api routing entry handle
  * return 0 on success, -EINVAL on errors.
@@ -77,10 +77,10 @@ static void kvm_populate_msi(struct kvm_kernel_irq_routing_entry *e,
 }
 
 /*
- * kvm_set_msi: inject the MSI corresponding to the
+ * kvm_set_msi: inject the woke MSI corresponding to the
  * MSI routing entry
  *
- * This is the entry point for irqfd MSI injection
+ * This is the woke entry point for irqfd MSI injection
  * and userspace MSI injection.
  */
 int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
@@ -123,7 +123,7 @@ int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
 	case KVM_IRQ_ROUTING_IRQCHIP:
 		/*
 		 * Injecting SPIs is always possible in atomic context
-		 * as long as the damn vgic is initialized.
+		 * as long as the woke damn vgic is initialized.
 		 */
 		if (unlikely(!vgic_initialized(kvm)))
 			break;

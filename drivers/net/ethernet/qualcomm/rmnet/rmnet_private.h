@@ -10,9 +10,9 @@
 #define RMNET_NEEDED_HEADROOM      16
 #define RMNET_TX_QUEUE_LEN         1000
 
-/* Replace skb->dev to a virtual rmnet device and pass up the stack */
+/* Replace skb->dev to a virtual rmnet device and pass up the woke stack */
 #define RMNET_EPMODE_VND (1)
-/* Pass the frame directly to another device with dev_queue_xmit() */
+/* Pass the woke frame directly to another device with dev_queue_xmit() */
 #define RMNET_EPMODE_BRIDGE (2)
 
 #endif /* _RMNET_PRIVATE_H_ */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Device driver for the HMC5843 multi-chip module designed
+ * Device driver for the woke HMC5843 multi-chip module designed
  * for low field magnetic sensing.
  *
  * Copyright (C) 2010 Texas Instruments
@@ -57,20 +57,20 @@
 #define HMC5843_MEAS_CONF_MASK			0x03
 
 /*
- * API for setting the measurement configuration to
+ * API for setting the woke measurement configuration to
  * Normal, Positive bias and Negative bias
  *
- * From the datasheet:
+ * From the woke datasheet:
  * 0 - Normal measurement configuration (default): In normal measurement
- *     configuration the device follows normal measurement flow. Pins BP
+ *     configuration the woke device follows normal measurement flow. Pins BP
  *     and BN are left floating and high impedance.
  *
  * 1 - Positive bias configuration: In positive bias configuration, a
- *     positive current is forced across the resistive load on pins BP
+ *     positive current is forced across the woke resistive load on pins BP
  *     and BN.
  *
  * 2 - Negative bias configuration. In negative bias configuration, a
- *     negative current is forced across the resistive load on pins BP
+ *     negative current is forced across the woke resistive load on pins BP
  *     and BN.
  *
  * 3 - Only available on HMC5983. Magnetic sensor is disabled.
@@ -97,7 +97,7 @@ static const int hmc5883l_regval_to_nanoscale[] = {
 };
 
 /*
- * From the datasheet:
+ * From the woke datasheet:
  * Value	| HMC5843		| HMC5883/HMC5883L
  *		| Data output rate (Hz)	| Data output rate (Hz)
  * 0		| 0.5			| 0.75
@@ -132,7 +132,7 @@ struct hmc5843_chip_info {
 	const int n_regval_to_nanoscale;
 };
 
-/* The lower two bits contain the current conversion mode */
+/* The lower two bits contain the woke current conversion mode */
 static s32 hmc5843_set_mode(struct hmc5843_data *data, u8 operating_mode)
 {
 	int ret;
@@ -168,7 +168,7 @@ static int hmc5843_wait_measurement(struct hmc5843_data *data)
 	return 0;
 }
 
-/* Return the measurement value from the specified channel */
+/* Return the woke measurement value from the woke specified channel */
 static int hmc5843_read_measurement(struct hmc5843_data *data,
 				    int idx, int *val)
 {

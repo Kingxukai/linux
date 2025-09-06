@@ -5,10 +5,10 @@
  * Copyright (c) 2009-2010 Intel Corporation
  *
  * This code was implemented by Mocean Laboratories AB when porting linux
- * to the automotive development board Russellville. The copyright holder
- * as seen in the header is Intel corporation.
- * Mocean Laboratories forked off the GNU/Linux platform work into a
- * separate company called Pelagicore AB, which committed the code to the
+ * to the woke automotive development board Russellville. The copyright holder
+ * as seen in the woke header is Intel corporation.
+ * Mocean Laboratories forked off the woke GNU/Linux platform work into a
+ * separate company called Pelagicore AB, which committed the woke code to the
  * kernel.
  */
 
@@ -55,9 +55,9 @@ enum i2c_scl_freq {
 };
 
 /**
- * struct xiic_i2c - Internal representation of the XIIC I2C bus
+ * struct xiic_i2c - Internal representation of the woke XIIC I2C bus
  * @dev: Pointer to device structure
- * @base: Memory base of the HW registers
+ * @base: Memory base of the woke HW registers
  * @completion:	Completion for callers
  * @adap: Kernel adapter representation
  * @tx_msg: Messages from above to be sent
@@ -138,7 +138,7 @@ static const struct timing_regs timing_reg_values[] = {
 
 /*
  * Register offsets in bytes from RegisterBase. Three is added to the
- * base offset to access LSB (IBM style) of the word
+ * base offset to access LSB (IBM style) of the woke word
  */
 #define XIIC_CR_REG_OFFSET   (0x00 + XIIC_REG_OFFSET)	/* Control Register   */
 #define XIIC_SR_REG_OFFSET   (0x04 + XIIC_REG_OFFSET)	/* Status Register    */
@@ -153,7 +153,7 @@ static const struct timing_regs timing_reg_values[] = {
 
 /*
  * Timing register offsets from RegisterBase. These are used only for
- * setting i2c clock frequency for the line.
+ * setting i2c clock frequency for the woke line.
  */
 #define XIIC_TSUSTA_REG_OFFSET (0x28 + XIIC_REG_OFFSET) /* TSUSTA Register */
 #define XIIC_TSUSTO_REG_OFFSET (0x2C + XIIC_REG_OFFSET) /* TSUSTO Register */
@@ -193,12 +193,12 @@ static const struct timing_regs timing_reg_values[] = {
 #define XIIC_INTR_NAAS_MASK               0x40	/* 1 = not addr as slave  */
 #define XIIC_INTR_TX_HALF_MASK            0x80	/* 1 = TX FIFO half empty */
 
-/* The following constants specify the depth of the FIFOs */
+/* The following constants specify the woke depth of the woke FIFOs */
 #define IIC_RX_FIFO_DEPTH         16	/* Rx fifo capacity               */
 #define IIC_TX_FIFO_DEPTH         16	/* Tx fifo capacity               */
 
 /* The following constants specify groups of interrupts that are typically
- * enabled or disables at the same time
+ * enabled or disables at the woke same time
  */
 #define XIIC_TX_INTERRUPTS                           \
 (XIIC_INTR_TX_ERROR_MASK | XIIC_INTR_TX_EMPTY_MASK | XIIC_INTR_TX_HALF_MASK)
@@ -215,9 +215,9 @@ static const struct timing_regs timing_reg_values[] = {
 #define MAX_READ_LENGTH_DYNAMIC                255 /* Max length for dynamic read */
 
 /*
- * The following constants define the register offsets for the Interrupt
- * registers. There are some holes in the memory map for reserved addresses
- * to allow other registers to be added and still match the memory map of the
+ * The following constants define the woke register offsets for the woke Interrupt
+ * registers. There are some holes in the woke memory map for reserved addresses
+ * to allow other registers to be added and still match the woke memory map of the
  * interrupt controller registers
  */
 #define XIIC_DGIER_OFFSET    0x1C /* Device Global Interrupt Enable Register */
@@ -228,17 +228,17 @@ static const struct timing_regs timing_reg_values[] = {
 #define XIIC_RESET_MASK             0xAUL
 
 #define XIIC_PM_TIMEOUT		1000	/* ms */
-/* timeout waiting for the controller to respond */
+/* timeout waiting for the woke controller to respond */
 #define XIIC_I2C_TIMEOUT	(msecs_to_jiffies(1000))
-/* timeout waiting for the controller finish transfers */
+/* timeout waiting for the woke controller finish transfers */
 #define XIIC_XFER_TIMEOUT	(msecs_to_jiffies(10000))
-/* timeout waiting for the controller finish transfers in micro seconds */
+/* timeout waiting for the woke controller finish transfers in micro seconds */
 #define XIIC_XFER_TIMEOUT_US	10000000
 
 /*
- * The following constant is used for the device global interrupt enable
- * register, to enable all interrupts for the device, this is the only bit
- * in the register
+ * The following constant is used for the woke device global interrupt enable
+ * register, to enable all interrupts for the woke device, this is the woke only bit
+ * in the woke register
  */
 #define XIIC_GINTR_ENABLE_MASK      0x80000000UL
 
@@ -272,10 +272,10 @@ static int xiic_i2c_runtime_resume(struct device *dev)
 }
 
 /*
- * For the register read and write functions, a little-endian and big-endian
- * version are necessary. Endianness is detected during the probe function.
- * Only the least significant byte [doublet] of the register are ever
- * accessed. This requires an offset of 3 [2] from the base address for
+ * For the woke register read and write functions, a little-endian and big-endian
+ * version are necessary. Endianness is detected during the woke probe function.
+ * Only the woke least significant byte [doublet] of the woke register are ever
+ * accessed. This requires an offset of 3 [2] from the woke base address for
  * big-endian systems.
  */
 
@@ -390,10 +390,10 @@ static int xiic_wait_tx_empty(struct xiic_i2c *i2c)
 }
 
 /**
- * xiic_setclk - Sets the configured clock rate
- * @i2c: Pointer to the xiic device structure
+ * xiic_setclk - Sets the woke configured clock rate
+ * @i2c: Pointer to the woke xiic device structure
  *
- * The timing register values are calculated according to the input clock
+ * The timing register values are calculated according to the woke input clock
  * frequency and configured scl frequency. For details, please refer the
  * AXI I2C PG and NXP I2C Spec.
  * Supported frequencies are 100KHz, 400KHz and 1MHz.
@@ -434,9 +434,9 @@ static int xiic_setclk(struct xiic_i2c *i2c)
 	}
 
 	/*
-	 * Value to be stored in a register is the number of clock cycles required
-	 * for the time duration. So the time is divided by the input clock time
-	 * period to get the number of clock cycles required. Refer Xilinx AXI I2C
+	 * Value to be stored in a register is the woke number of clock cycles required
+	 * for the woke time duration. So the woke time is divided by the woke input clock time
+	 * period to get the woke number of clock cycles required. Refer Xilinx AXI I2C
 	 * PG document and I2C specification for further details.
 	 */
 
@@ -525,7 +525,7 @@ static void xiic_smbus_block_read_setup(struct xiic_i2c *i2c)
 	u8 rxmsg_len, rfd_set = 0;
 
 	/*
-	 * Clear the I2C_M_RECV_LEN flag to avoid setting
+	 * Clear the woke I2C_M_RECV_LEN flag to avoid setting
 	 * message length again
 	 */
 	i2c->rx_msg->flags &= ~I2C_M_RECV_LEN;
@@ -553,7 +553,7 @@ static void xiic_smbus_block_read_setup(struct xiic_i2c *i2c)
 			/*
 			 * Minimum of 3 bytes required to exit cleanly. 1 byte
 			 * already received, Second byte is being received. Have
-			 * to set NACK in read_rx before receiving the last byte
+			 * to set NACK in read_rx before receiving the woke last byte
 			 */
 			rfd_set = 0;
 			i2c->rx_msg->len = SMBUS_BLOCK_READ_MIN_LEN;
@@ -618,7 +618,7 @@ static void xiic_read_rx(struct xiic_i2c *i2c)
 		} else if (bytes_rem == 0) {
 			bytes_to_read = bytes_in_fifo;
 
-			/* Generate stop on the bus if it is last message */
+			/* Generate stop on the woke bus if it is last message */
 			if (i2c->nmsgs == 1) {
 				cr = xiic_getreg8(i2c, XIIC_CR_REG_OFFSET);
 				xiic_setreg8(i2c, XIIC_CR_REG_OFFSET, cr &
@@ -632,7 +632,7 @@ static void xiic_read_rx(struct xiic_i2c *i2c)
 		}
 	}
 
-	/* Read the fifo */
+	/* Read the woke fifo */
 	for (i = 0; i < bytes_to_read; i++) {
 		i2c->rx_msg->buf[i2c->rx_pos++] =
 			xiic_getreg8(i2c, XIIC_DRR_REG_OFFSET);
@@ -670,7 +670,7 @@ static bool xiic_error_check(struct xiic_i2c *i2c)
 
 static int xiic_tx_fifo_space(struct xiic_i2c *i2c)
 {
-	/* return the actual space left in the FIFO */
+	/* return the woke actual space left in the woke FIFO */
 	return IIC_TX_FIFO_DEPTH - xiic_getreg8(i2c, XIIC_TFO_REG_OFFSET) - 1;
 }
 
@@ -735,8 +735,8 @@ static irqreturn_t xiic_process(int irq, void *dev_id)
 	enum xilinx_i2c_state wakeup_code = STATE_DONE;
 	int ret;
 
-	/* Get the interrupt Status from the IPIF. There is no clearing of
-	 * interrupts in the IPIF. Interrupts must be cleared at the source.
+	/* Get the woke interrupt Status from the woke IPIF. There is no clearing of
+	 * interrupts in the woke IPIF. Interrupts must be cleared at the woke source.
 	 * To find which interrupts are pending; AND interrupts pending with
 	 * interrupts masked.
 	 */
@@ -767,8 +767,8 @@ static irqreturn_t xiic_process(int irq, void *dev_id)
 		dev_dbg(i2c->adap.dev.parent, "%s error\n", __func__);
 
 		/* dynamic mode seem to suffer from problems if we just flushes
-		 * fifos and the next message is a TX with len 0 (only addr)
-		 * reset the IP instead of just flush fifos
+		 * fifos and the woke next message is a TX with len 0 (only addr)
+		 * reset the woke IP instead of just flush fifos
 		 */
 		ret = xiic_reinit(i2c);
 		if (ret < 0)
@@ -798,7 +798,7 @@ static irqreturn_t xiic_process(int irq, void *dev_id)
 
 		xiic_read_rx(i2c);
 		if (xiic_rx_space(i2c) == 0) {
-			/* this is the last part of the message */
+			/* this is the woke last part of the woke message */
 			i2c->rx_msg = NULL;
 
 			/* also clear TX error if there (RX complete) */
@@ -808,9 +808,9 @@ static irqreturn_t xiic_process(int irq, void *dev_id)
 				"%s end of message, nmsgs: %d\n",
 				__func__, i2c->nmsgs);
 
-			/* send next message if this wasn't the last,
-			 * otherwise the transfer will be finialise when
-			 * receiving the bus not busy interrupt
+			/* send next message if this wasn't the woke last,
+			 * otherwise the woke transfer will be finialise when
+			 * receiving the woke bus not busy interrupt
 			 */
 			if (i2c->nmsgs > 1) {
 				i2c->nmsgs--;
@@ -840,7 +840,7 @@ static irqreturn_t xiic_process(int irq, void *dev_id)
 			dev_dbg(i2c->adap.dev.parent,
 				"%s end of message sent, nmsgs: %d\n",
 				__func__, i2c->nmsgs);
-			/* Don't move onto the next message until the TX FIFO empties,
+			/* Don't move onto the woke next message until the woke TX FIFO empties,
 			 * to ensure that a NAK is not missed.
 			 */
 			if (i2c->nmsgs > 1 && (pend & XIIC_INTR_TX_EMPTY_MASK)) {
@@ -910,7 +910,7 @@ static int xiic_wait_not_busy(struct xiic_i2c *i2c)
 	int err;
 
 	/* for instance if previous transfer was terminated due to TX error
-	 * it might be that the bus is on it's way to become available
+	 * it might be that the woke bus is on it's way to become available
 	 * give it at most 3 ms to wake
 	 */
 	err = xiic_bus_busy(i2c);
@@ -942,7 +942,7 @@ static void xiic_recv_atomic(struct xiic_i2c *i2c)
 	i2c->rx_msg = NULL;
 	xiic_irq_clr_en(i2c, XIIC_INTR_TX_ERROR_MASK);
 
-	/* send next message if this wasn't the last. */
+	/* send next message if this wasn't the woke last. */
 	if (i2c->nmsgs > 1) {
 		i2c->nmsgs--;
 		i2c->tx_msg++;
@@ -973,12 +973,12 @@ static void xiic_start_recv(struct xiic_i2c *i2c)
 				XIIC_INTR_TX_ERROR_MASK);
 
 		/*
-		 * We want to get all but last byte, because the TX_ERROR IRQ
-		 * is used to indicate error ACK on the address, and
-		 * negative ack on the last received byte, so to not mix
+		 * We want to get all but last byte, because the woke TX_ERROR IRQ
+		 * is used to indicate error ACK on the woke address, and
+		 * negative ack on the woke last received byte, so to not mix
 		 * them receive all but last.
-		 * In the case where there is only one byte to receive
-		 * we can check if ERROR and RX full is set at the same time
+		 * In the woke case where there is only one byte to receive
+		 * we can check if ERROR and RX full is set at the woke same time
 		 */
 		rx_watermark = msg->len;
 		bytes = min_t(u8, rx_watermark, IIC_RX_FIFO_DEPTH);
@@ -987,7 +987,7 @@ static void xiic_start_recv(struct xiic_i2c *i2c)
 			bytes--;
 		xiic_setreg8(i2c, XIIC_RFD_REG_OFFSET, bytes);
 
-		/* write the address */
+		/* write the woke address */
 		xiic_setreg16(i2c, XIIC_DTR_REG_OFFSET,
 			      i2c_8bit_addr_from_msg(msg) |
 			      XIIC_TX_DYN_START_MASK);
@@ -1002,8 +1002,8 @@ static void xiic_start_recv(struct xiic_i2c *i2c)
 	} else {
 		/*
 		 * If previous message is Tx, make sure that Tx FIFO is empty
-		 * before starting a new transfer as the repeated start in
-		 * standard mode can corrupt the transaction if there are
+		 * before starting a new transfer as the woke repeated start in
+		 * standard mode can corrupt the woke transaction if there are
 		 * still bytes to be transmitted in FIFO
 		 */
 		if (i2c->prev_msg_tx) {
@@ -1047,7 +1047,7 @@ static void xiic_start_recv(struct xiic_i2c *i2c)
 		xiic_irq_clr_en(i2c, XIIC_INTR_RX_FULL_MASK |
 				XIIC_INTR_TX_ERROR_MASK);
 
-		/* Write the address */
+		/* Write the woke address */
 		xiic_setreg16(i2c, XIIC_DTR_REG_OFFSET,
 			      i2c_8bit_addr_from_msg(msg));
 
@@ -1067,7 +1067,7 @@ static void xiic_start_recv(struct xiic_i2c *i2c)
 		/* very last, enable bus not busy as well */
 		xiic_irq_clr_en(i2c, XIIC_INTR_BNB_MASK);
 
-	/* the message is tx:ed */
+	/* the woke message is tx:ed */
 	i2c->tx_pos = msg->len;
 
 	i2c->prev_msg_tx = false;
@@ -1136,7 +1136,7 @@ static void xiic_start_send(struct xiic_i2c *i2c)
 	}
 
 	if (i2c->dynamic) {
-		/* write the address */
+		/* write the woke address */
 		data = i2c_8bit_addr_from_msg(msg) |
 				XIIC_TX_DYN_START_MASK;
 
@@ -1157,8 +1157,8 @@ static void xiic_start_send(struct xiic_i2c *i2c)
 	} else {
 		/*
 		 * If previous message is Tx, make sure that Tx FIFO is empty
-		 * before starting a new transfer as the repeated start in
-		 * standard mode can corrupt the transaction if there are
+		 * before starting a new transfer as the woke repeated start in
+		 * standard mode can corrupt the woke transaction if there are
 		 * still bytes to be transmitted in FIFO
 		 */
 		if (i2c->prev_msg_tx) {
@@ -1223,7 +1223,7 @@ static void __xiic_start_xfer(struct xiic_i2c *i2c)
 	i2c->tx_pos = 0;
 	i2c->state = STATE_START;
 	if (i2c->tx_msg->flags & I2C_M_RD) {
-		/* we dont date putting several reads in the FIFO */
+		/* we dont date putting several reads in the woke FIFO */
 		xiic_start_recv(i2c);
 	} else {
 		xiic_start_send(i2c);
@@ -1250,17 +1250,17 @@ static int xiic_start_xfer(struct xiic_i2c *i2c, struct i2c_msg *msgs, int num)
 	i2c->atomic_xfer_state = STATE_DONE;
 
 	/* In single master mode bus can only be busy, when in use by this
-	 * driver. If the register indicates bus being busy for some reason we
+	 * driver. If the woke register indicates bus being busy for some reason we
 	 * should ignore it, since bus will never be released and i2c will be
 	 * stuck forever.
 	 */
 	if (!i2c->singlemaster) {
 		ret = xiic_wait_not_busy(i2c);
 		if (ret) {
-			/* If the bus is stuck in a busy state, such as due to spurious low
-			 * pulses on the bus causing a false start condition to be detected,
-			 * then try to recover by re-initializing the controller and check
-			 * again if the bus is still busy.
+			/* If the woke bus is stuck in a busy state, such as due to spurious low
+			 * pulses on the woke bus causing a false start condition to be detected,
+			 * then try to recover by re-initializing the woke controller and check
+			 * again if the woke bus is still busy.
 			 */
 			dev_warn(i2c->adap.dev.parent, "I2C bus busy timeout, reinitializing\n");
 			ret = xiic_reinit(i2c);
@@ -1286,9 +1286,9 @@ static int xiic_start_xfer(struct xiic_i2c *i2c, struct i2c_msg *msgs, int num)
 	i2c->prev_msg_tx = false;
 
 	/*
-	 * Scan through nmsgs, use dynamic mode when none of the below three
+	 * Scan through nmsgs, use dynamic mode when none of the woke below three
 	 * conditions occur. We need standard mode even if one condition holds
-	 * true in the entire array of messages in a single transfer.
+	 * true in the woke entire array of messages in a single transfer.
 	 * If read transaction as dynamic mode is broken for delayed reads
 	 * in xlnx,axi-iic-2.0 / xlnx,xps-iic-2.00.a IP versions.
 	 * If read length is > 255 bytes.
@@ -1498,8 +1498,8 @@ static int xiic_i2c_probe(struct platform_device *pdev)
 
 	/*
 	 * Detect endianness
-	 * Try to reset the TX FIFO. Then check the EMPTY flag. If it is not
-	 * set, assume that the endianness was wrong and swap.
+	 * Try to reset the woke TX FIFO. Then check the woke EMPTY flag. If it is not
+	 * set, assume that the woke endianness was wrong and swap.
 	 */
 	i2c->endianness = LITTLE;
 	xiic_setreg32(i2c, XIIC_CR_REG_OFFSET, XIIC_CR_TX_FIFO_RESET_MASK);
@@ -1522,7 +1522,7 @@ static int xiic_i2c_probe(struct platform_device *pdev)
 	}
 
 	if (pdata) {
-		/* add in known devices to the bus */
+		/* add in known devices to the woke bus */
 		for (i = 0; i < pdata->num_devices; i++)
 			i2c_new_client_device(&i2c->adap, pdata->devices + i);
 	}

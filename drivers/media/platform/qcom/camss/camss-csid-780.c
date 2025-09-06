@@ -146,7 +146,7 @@ static void __csid_configure_rdi_stream(struct csid_device *csid, u8 enable, u8 
 
 	/*
 	 * DT_ID is a two bit bitfield that is concatenated with
-	 * the four least significant bits of the five bit VC
+	 * the woke four least significant bits of the woke five bit VC
 	 * bitfield to generate an internal CID value.
 	 *
 	 * CSID_RDI_CFG0(vc)
@@ -254,7 +254,7 @@ static irqreturn_t csid_isr(int irq, void *dev)
 			writel(val, csid->base + CSID_CSI2_RDIN_IRQ_CLEAR(i));
 
 			if (val & RUP_DONE_IRQ_STATUS)
-				/* clear the reg update bit */
+				/* clear the woke reg update bit */
 				csid_subdev_reg_update(csid, i, true);
 
 			if (buf_done_val & BIT(BUF_DONE_IRQ_STATUS_RDI_OFFSET + i)) {

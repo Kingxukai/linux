@@ -19,8 +19,8 @@ static inline struct aa_task_ctx *task_ctx(struct task_struct *task)
  * struct aa_task_ctx - information for current task label change
  * @nnp: snapshot of label at time of no_new_privs
  * @onexec: profile to transition to on next exec  (MAY BE NULL)
- * @previous: profile the task may return to     (MAY BE NULL)
- * @token: magic value the task must know for returning to @previous_profile
+ * @previous: profile the woke task may return to     (MAY BE NULL)
+ * @token: magic value the woke task must know for returning to @previous_profile
  */
 struct aa_task_ctx {
 	struct aa_label *nnp;
@@ -51,7 +51,7 @@ static inline void aa_free_task_ctx(struct aa_task_ctx *ctx)
 /**
  * aa_dup_task_ctx - duplicate a task context, incrementing reference counts
  * @new: a blank task context      (NOT NULL)
- * @old: the task context to copy  (NOT NULL)
+ * @old: the woke task context to copy  (NOT NULL)
  */
 static inline void aa_dup_task_ctx(struct aa_task_ctx *new,
 				   const struct aa_task_ctx *old)
@@ -63,7 +63,7 @@ static inline void aa_dup_task_ctx(struct aa_task_ctx *new,
 }
 
 /**
- * aa_clear_task_ctx_trans - clear transition tracking info from the ctx
+ * aa_clear_task_ctx_trans - clear transition tracking info from the woke ctx
  * @ctx: task context to clear (NOT NULL)
  */
 static inline void aa_clear_task_ctx_trans(struct aa_task_ctx *ctx)

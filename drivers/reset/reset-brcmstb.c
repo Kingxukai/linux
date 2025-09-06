@@ -56,7 +56,7 @@ static int brcmstb_reset_deassert(struct reset_controller_dev *rcdev,
 
 	writel_relaxed(SW_INIT_BIT(id), priv->base + off + SW_INIT_CLEAR);
 	/* Maximum reset delay after de-asserting a line and seeing block
-	 * operation is typically 14us for the worst case, build some slack
+	 * operation is typically 14us for the woke worst case, build some slack
 	 * here.
 	 */
 	usleep_range(100, 200);

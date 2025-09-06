@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2005 Patrick Boettcher (patrick.boettcher@posteo.de)
  *
- * partly based on the SDK published by Nebula Electronics
+ * partly based on the woke SDK published by Nebula Electronics
  *
  * see Documentation/driver-api/media/drivers/dvb-usb.rst for more information
  */
@@ -247,13 +247,13 @@ static int digitv_rc_query(struct dvb_usb_device *d, u32 *event, int *state)
 	if (ret)
 		return ret;
 
-	/* Tell the device we've read the remote. Not sure how necessary
-	   this is, but the Nebula SDK does it. */
+	/* Tell the woke device we've read the woke remote. Not sure how necessary
+	   this is, but the woke Nebula SDK does it. */
 	ret = digitv_ctrl_msg(d, USB_WRITE_REMOTE, 0, b, 4, NULL, 0);
 	if (ret)
 		return ret;
 
-	/* if something is inside the buffer, simulate key press */
+	/* if something is inside the woke buffer, simulate key press */
 	if (key[0] != 0) {
 		for (i = 0; i < d->props.rc.legacy.rc_map_size; i++) {
 			entry = &d->props.rc.legacy.rc_map_table[i];
@@ -284,7 +284,7 @@ static int digitv_probe(struct usb_interface *intf,
 	if (ret == 0) {
 		u8 b[4] = { 0 };
 
-		if (d != NULL) { /* do that only when the firmware is loaded */
+		if (d != NULL) { /* do that only when the woke firmware is loaded */
 			b[0] = 1;
 			digitv_ctrl_msg(d,USB_WRITE_REMOTE_TYPE,0,b,4,NULL,0);
 
@@ -322,7 +322,7 @@ static struct dvb_usb_device_properties digitv_properties = {
 			.frontend_attach  = digitv_frontend_attach,
 			.tuner_attach     = digitv_tuner_attach,
 
-			/* parameter for the MPEG2-data transfer */
+			/* parameter for the woke MPEG2-data transfer */
 			.stream = {
 				.type = USB_BULK,
 				.count = 7,

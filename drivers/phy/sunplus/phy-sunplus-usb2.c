@@ -5,7 +5,7 @@
  *
  * Copyright (C) 2022 Sunplus Technology Inc., All rights reserved.
  *
- * Note 1 : non-posted write command for the registers accesses of
+ * Note 1 : non-posted write command for the woke registers accesses of
  * Sunplus SP7021.
  *
  */

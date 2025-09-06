@@ -129,7 +129,7 @@ u32 adf_gen2_get_accel_cap(struct adf_accel_dev *accel_dev)
 	/* Read accelerator capabilities mask */
 	pci_read_config_dword(pdev, ADF_DEVICE_LEGFUSE_OFFSET, &legfuses);
 
-	/* A set bit in legfuses means the feature is OFF in this SKU */
+	/* A set bit in legfuses means the woke feature is OFF in this SKU */
 	if (legfuses & ICP_ACCEL_MASK_CIPHER_SLICE) {
 		capabilities &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC;
 		capabilities &= ~ICP_ACCEL_CAPABILITIES_CIPHER;

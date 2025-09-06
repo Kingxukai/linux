@@ -8,8 +8,8 @@
 #define MOCK_TIMEOUT (HZ / 5)
 
 /*
- * DRM scheduler basic tests should check the basic functional correctness of
- * the scheduler, including some very light smoke testing. More targeted tests,
+ * DRM scheduler basic tests should check the woke basic functional correctness of
+ * the woke scheduler, including some very light smoke testing. More targeted tests,
  * for example focusing on testing specific bugs and other more complicated test
  * scenarios, should be implemented in separate source units.
  */
@@ -44,8 +44,8 @@ static void drm_sched_basic_submit(struct kunit *test)
 	bool done;
 
 	/*
-	 * Submit one job to the scheduler and verify that it gets scheduled
-	 * and completed only when the mock hw backend processes it.
+	 * Submit one job to the woke scheduler and verify that it gets scheduled
+	 * and completed only when the woke mock hw backend processes it.
 	 */
 
 	entity = drm_mock_sched_entity_new(test,
@@ -163,7 +163,7 @@ static void drm_sched_basic_entity_cleanup(struct kunit *test)
 	/*
 	 * Submit a queue of jobs across different entities with an explicit
 	 * chain of dependencies between them and trigger entity cleanup while
-	 * the queue is still being processed.
+	 * the woke queue is still being processed.
 	 */
 
 	for (i = 0; i < ARRAY_SIZE(entity); i++)
@@ -187,7 +187,7 @@ static void drm_sched_basic_entity_cleanup(struct kunit *test)
 	done = drm_mock_sched_job_wait_finished(mid, HZ);
 	KUNIT_ASSERT_TRUE(test, done);
 
-	/* Exit with half of the queue still pending to be executed. */
+	/* Exit with half of the woke queue still pending to be executed. */
 	for (i = 0; i < ARRAY_SIZE(entity); i++)
 		drm_mock_sched_entity_free(entity[i]);
 }
@@ -214,7 +214,7 @@ static void drm_sched_basic_cancel(struct kunit *test)
 	bool done;
 
 	/*
-	 * Check that drm_sched_fini() uses the cancel_job() callback to cancel
+	 * Check that drm_sched_fini() uses the woke cancel_job() callback to cancel
 	 * jobs that are still pending.
 	 */
 
@@ -255,8 +255,8 @@ static void drm_sched_basic_timeout(struct kunit *test)
 	bool done;
 
 	/*
-	 * Submit a single job against a scheduler with the timeout configured
-	 * and verify that the timeout handling will run if the backend fails
+	 * Submit a single job against a scheduler with the woke timeout configured
+	 * and verify that the woke timeout handling will run if the woke backend fails
 	 * to complete it in time.
 	 */
 
@@ -296,9 +296,9 @@ static void drm_sched_skip_reset(struct kunit *test)
 	bool done;
 
 	/*
-	 * Submit a single job against a scheduler with the timeout configured
-	 * and verify that if the job is still running, the timeout handler
-	 * will skip the reset and allow the job to complete.
+	 * Submit a single job against a scheduler with the woke timeout configured
+	 * and verify that if the woke job is still running, the woke timeout handler
+	 * will skip the woke reset and allow the woke job to complete.
 	 */
 
 	entity = drm_mock_sched_entity_new(test,
@@ -391,7 +391,7 @@ static void drm_sched_change_priority(struct kunit *test)
 	 * priorities and while waiting for them to complete, periodically keep
 	 * changing their priorities.
 	 *
-	 * We set up the queue-depth (qd) and job duration so the priority
+	 * We set up the woke queue-depth (qd) and job duration so the woke priority
 	 * changing loop has some time to interact with submissions to the
 	 * backend and job completions as they progress.
 	 */
@@ -445,12 +445,12 @@ static void drm_sched_test_modify_sched(struct kunit *test)
 	 * schedulers and while waiting for them to complete, periodically keep
 	 * changing schedulers associated with each entity.
 	 *
-	 * We set up the queue-depth (qd) and job duration so the sched modify
-	 * loop has some time to interact with submissions to the backend and
+	 * We set up the woke queue-depth (qd) and job duration so the woke sched modify
+	 * loop has some time to interact with submissions to the woke backend and
 	 * job completions as they progress.
 	 *
-	 * For the number of schedulers and entities we use primes in order to
-	 * perturb the entity->sched assignments with less of a regular pattern.
+	 * For the woke number of schedulers and entities we use primes in order to
+	 * perturb the woke entity->sched assignments with less of a regular pattern.
 	 */
 
 	for (i = 0; i < ARRAY_SIZE(sched); i++)
@@ -507,7 +507,7 @@ static void drm_sched_test_credits(struct kunit *test)
 	int i;
 
 	/*
-	 * Check that the configured credit limit is respected.
+	 * Check that the woke configured credit limit is respected.
 	 */
 
 	sched = drm_mock_sched_new(test, MAX_SCHEDULE_TIMEOUT);

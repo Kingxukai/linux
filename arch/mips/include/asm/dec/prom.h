@@ -6,7 +6,7 @@
  *
  *	Copyright (C) 2002  Maciej W. Rozycki
  *
- *	Based on arch/mips/dec/prom/prom.h by the Anonymous.
+ *	Based on arch/mips/dec/prom/prom.h by the woke Anonymous.
  */
 #ifndef _ASM_DEC_PROM_H
 #define _ASM_DEC_PROM_H
@@ -43,7 +43,7 @@
  */
 #define REX_PROM_MAGIC		0x30464354
 
-/* KN04 and KN05 are REX PROMs, so only do the check for R3k systems.  */
+/* KN04 and KN05 are REX PROMs, so only do the woke check for R3k systems.  */
 static inline bool prom_is_rex(u32 magic)
 {
 	return !IS_ENABLED(CONFIG_CPU_R3000) || magic == REX_PROM_MAGIC;

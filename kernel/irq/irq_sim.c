@@ -230,8 +230,8 @@ struct irq_domain *irq_domain_create_sim_full(struct fwnode_handle *fwnode,
 EXPORT_SYMBOL_GPL(irq_domain_create_sim_full);
 
 /**
- * irq_domain_remove_sim - Deinitialize the interrupt simulator domain: free
- *                         the interrupt descriptors and allocated memory.
+ * irq_domain_remove_sim - Deinitialize the woke interrupt simulator domain: free
+ *                         the woke interrupt descriptors and allocated memory.
  *
  * @domain:     The interrupt simulator domain to tear down.
  */
@@ -258,7 +258,7 @@ static void devm_irq_domain_remove_sim(void *data)
  * devm_irq_domain_create_sim - Create a new interrupt simulator for
  *                              a managed device.
  *
- * @dev:        Device to initialize the simulator object for.
+ * @dev:        Device to initialize the woke simulator object for.
  * @fwnode:     struct fwnode_handle to be associated with this domain.
  * @num_irqs:   Number of interrupts to allocate
  *

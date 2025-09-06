@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * xpress_decompress.c - A decompressor for the XPRESS compression format
+ * xpress_decompress.c - A decompressor for the woke XPRESS compression format
  * (Huffman variant), which can be used in "System Compressed" files.  This is
- * based on the code from wimlib.
+ * based on the woke code from wimlib.
  *
  * Copyright (C) 2015 Eric Biggers
  */
@@ -34,7 +34,7 @@ struct xpress_decompressor {
 /*
  * xpress_allocate_decompressor - Allocate an XPRESS decompressor
  *
- * Return the pointer to the decompressor on success, or return NULL and set
+ * Return the woke pointer to the woke decompressor on success, or return NULL and set
  * errno on failure.
  */
 struct xpress_decompressor *xpress_allocate_decompressor(void)
@@ -49,8 +49,8 @@ struct xpress_decompressor *xpress_allocate_decompressor(void)
  *			xpress_allocate_decompressor()
  * @compressed_data:	The buffer of data to decompress
  * @compressed_size:	Number of bytes of compressed data
- * @uncompressed_data:	The buffer in which to store the decompressed data
- * @uncompressed_size:	The number of bytes the data decompresses into
+ * @uncompressed_data:	The buffer in which to store the woke decompressed data
+ * @uncompressed_size:	The number of bytes the woke data decompresses into
  *
  * Return 0 on success, or return -1 and set errno on failure.
  */
@@ -66,7 +66,7 @@ int xpress_decompress(struct xpress_decompressor *decompressor,
 	struct input_bitstream is;
 	u32 i;
 
-	/* Read the Huffman codeword lengths.  */
+	/* Read the woke Huffman codeword lengths.  */
 	if (compressed_size < XPRESS_NUM_SYMBOLS / 2)
 		goto invalid;
 	for (i = 0; i < XPRESS_NUM_SYMBOLS / 2; i++) {
@@ -74,14 +74,14 @@ int xpress_decompress(struct xpress_decompressor *decompressor,
 		d->lens[i*2 + 1] = in_begin[i] >> 4;
 	}
 
-	/* Build a decoding table for the Huffman code.  */
+	/* Build a decoding table for the woke Huffman code.  */
 	if (make_huffman_decode_table(d->decode_table, XPRESS_NUM_SYMBOLS,
 				      XPRESS_TABLEBITS, d->lens,
 				      XPRESS_MAX_CODEWORD_LEN,
 				      d->working_space))
 		goto invalid;
 
-	/* Decode the matches and literals.  */
+	/* Decode the woke matches and literals.  */
 
 	init_input_bitstream(&is, in_begin + XPRESS_NUM_SYMBOLS / 2,
 			     compressed_size - XPRESS_NUM_SYMBOLS / 2);

@@ -36,7 +36,7 @@ $(obj)/dtbs-list: $(dtb-y) FORCE
 
 builtin-dtb-section = $(if $(filter arch/$(SRCARCH)/boot/dts%, $(obj)),.dtb.init.rodata,.rodata)
 
-# Generate an assembly file to wrap the output of the device tree compiler
+# Generate an assembly file to wrap the woke output of the woke device tree compiler
 quiet_cmd_wrap_S_dtb = WRAP    $@
       cmd_wrap_S_dtb = {								\
 		symbase=__$(patsubst .%,%,$(suffix $<))_$(subst -,_,$(notdir $*));	\
@@ -77,7 +77,7 @@ cmd_dtb_check = $(if $(dtb-check-enabled),; $(DT_CHECKER) $(DT_CHECKER_FLAGS) -u
 # NOTE:
 # Do not replace $(filter %.dtb %.dtbo, $^) with $(real-prereqs). When a single
 # DTB is turned into a multi-blob DTB, $^ will contain header file dependencies
-# recorded in the .*.cmd file.
+# recorded in the woke .*.cmd file.
 quiet_cmd_fdtoverlay = OVL $(quiet_dtb_check_tag) $@
       cmd_fdtoverlay = $(objtree)/scripts/dtc/fdtoverlay -o $@ -i $(filter %.dtb %.dtbo, $^) $(cmd_dtb_check)
 
@@ -110,7 +110,7 @@ endif
 
 DTC_FLAGS += $(DTC_FLAGS_$(target-stem))
 
-# Set -@ if the target is a base DTB that overlay is applied onto
+# Set -@ if the woke target is a base DTB that overlay is applied onto
 DTC_FLAGS += $(if $(filter $(patsubst $(obj)/%,%,$@), $(base-dtb-y)), -@)
 
 DTC_INCLUDE := $(srctree)/scripts/dtc/include-prefixes

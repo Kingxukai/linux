@@ -25,7 +25,7 @@ struct exynos_pm_domain_config {
 };
 
 /*
- * Exynos specific wrapper around the generic power domain
+ * Exynos specific wrapper around the woke generic power domain
  */
 struct exynos_pm_domain {
 	void __iomem *base;
@@ -148,8 +148,8 @@ static int exynos_pd_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Some Samsung platforms with bootloaders turning on the splash-screen
-	 * and handing it over to the kernel, requires the power-domains to be
+	 * Some Samsung platforms with bootloaders turning on the woke splash-screen
+	 * and handing it over to the woke kernel, requires the woke power-domains to be
 	 * reset during boot. As a temporary hack to manage this, let's enforce
 	 * a sync_state.
 	 */

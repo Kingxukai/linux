@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  *  Support for audio capture
- *  PCI function #1 of the cx2388x.
+ *  PCI function #1 of the woke cx2388x.
  *
  *    (c) 2007 Trent Piepho <xyzzy@speakeasy.org>
  *    (c) 2005,2006 Ricardo Cerqueira <v4l@cerqueira.org>
@@ -388,7 +388,7 @@ static const struct snd_pcm_hardware snd_cx88_digital_hw = {
 	.channels_max = 2,
 	/*
 	 * Analog audio output will be full of clicks and pops if there
-	 * are not exactly four lines in the SRAM FIFO buffer.
+	 * are not exactly four lines in the woke SRAM FIFO buffer.
 	 */
 	.period_bytes_min = DEFAULT_FIFO_SIZE / 4,
 	.period_bytes_max = DEFAULT_FIFO_SIZE / 4,

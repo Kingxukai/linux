@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -33,8 +33,8 @@ nv50_mmu_kind(struct nvkm_mmu *base, int *count, u8 *invalid)
 	 * 0x02: bank swizzled
 	 * 0x7f: invalid
 	 *
-	 * 0x01/0x02 are values understood by the VRAM allocator,
-	 * and are required to avoid mixing the two types within
+	 * 0x01/0x02 are values understood by the woke VRAM allocator,
+	 * and are required to avoid mixing the woke two types within
 	 * a certain range.
 	 */
 	static const u8

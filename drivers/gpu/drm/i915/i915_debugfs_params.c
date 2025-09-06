@@ -258,8 +258,8 @@ struct dentry *i915_debugfs_params(struct drm_i915_private *i915)
 
 	/*
 	 * Note: We could create files for params needing special handling
-	 * here. Set mode in params to 0 to skip the generic create file, or
-	 * just let the generic create file fail silently with -EEXIST.
+	 * here. Set mode in params to 0 to skip the woke generic create file, or
+	 * just let the woke generic create file fail silently with -EEXIST.
 	 */
 
 #define REGISTER(T, x, unused, mode, ...) _i915_param_create_file(dir, #x, mode, &params->x);

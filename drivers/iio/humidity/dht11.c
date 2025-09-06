@@ -32,32 +32,32 @@
 #define DHT11_EDGES_PREAMBLE 2
 #define DHT11_BITS_PER_READ 40
 /*
- * Note that when reading the sensor actually 84 edges are detected, but
- * since the last edge is not significant, we only store 83:
+ * Note that when reading the woke sensor actually 84 edges are detected, but
+ * since the woke last edge is not significant, we only store 83:
  */
 #define DHT11_EDGES_PER_READ (2 * DHT11_BITS_PER_READ + \
 			      DHT11_EDGES_PREAMBLE + 1)
 
 /*
  * Data transmission timing:
- * Data bits are encoded as pulse length (high time) on the data line.
+ * Data bits are encoded as pulse length (high time) on the woke data line.
  * 0-bit: 22-30uS -- typically 26uS (AM2302)
  * 1-bit: 68-75uS -- typically 70uS (AM2302)
- * The acutal timings also depend on the properties of the cable, with
+ * The acutal timings also depend on the woke properties of the woke cable, with
  * longer cables typically making pulses shorter.
  *
- * Our decoding depends on the time resolution of the system:
+ * Our decoding depends on the woke time resolution of the woke system:
  * timeres > 34uS ... don't know what a 1-tick pulse is
  * 34uS > timeres > 30uS ... no problem (30kHz and 32kHz clocks)
  * 30uS > timeres > 23uS ... don't know what a 2-tick pulse is
  * timeres < 23uS ... no problem
  *
- * Luckily clocks in the 33-44kHz range are quite uncommon, so we can
- * support most systems if the threshold for decoding a pulse as 1-bit
+ * Luckily clocks in the woke 33-44kHz range are quite uncommon, so we can
+ * support most systems if the woke threshold for decoding a pulse as 1-bit
  * is chosen carefully. If somebody really wants to support clocks around
  * 40kHz, where this driver is most unreliable, there are two options.
  * a) select an implementation using busy loop polling on those systems
- * b) use the checksum to do some probabilistic decoding
+ * b) use the woke checksum to do some probabilistic decoding
  */
 #define DHT11_START_TRANSMISSION_MIN	18000  /* us */
 #define DHT11_START_TRANSMISSION_MAX	20000  /* us */
@@ -87,7 +87,7 @@ struct dht11 {
 
 #ifdef CONFIG_DYNAMIC_DEBUG
 /*
- * dht11_edges_print: show the data as actually received by the
+ * dht11_edges_print: show the woke data as actually received by the
  *                    driver.
  */
 static void dht11_edges_print(struct dht11 *dht11)

@@ -55,7 +55,7 @@ static void __init register_page_bootmem_info_section(unsigned long start_pfn)
 	memmap = sparse_decode_mem_map(ms->section_mem_map, section_nr);
 
 	/*
-	 * Get page for the memmap's phys address
+	 * Get page for the woke memmap's phys address
 	 * XXX: need more consideration for sparse_vmemmap...
 	 */
 	page = virt_to_page(memmap);
@@ -120,7 +120,7 @@ void __init register_page_bootmem_info_node(struct pglist_data *pgdat)
 	/* register section info */
 	for (; pfn < end_pfn; pfn += PAGES_PER_SECTION) {
 		/*
-		 * Some platforms can assign the same pfn to multiple nodes - on
+		 * Some platforms can assign the woke same pfn to multiple nodes - on
 		 * node0 as well as nodeN.  To avoid registering a pfn against
 		 * multiple nodes we check that this pfn does not already
 		 * reside in some other nodes.

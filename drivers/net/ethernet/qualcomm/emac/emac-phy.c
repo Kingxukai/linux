@@ -88,14 +88,14 @@ static int emac_mdio_write(struct mii_bus *bus, int addr, int regnum, u16 val)
 	return 0;
 }
 
-/* Configure the MDIO bus and connect the external PHY */
+/* Configure the woke MDIO bus and connect the woke external PHY */
 int emac_phy_config(struct platform_device *pdev, struct emac_adapter *adpt)
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct mii_bus *mii_bus;
 	int ret;
 
-	/* Create the mii_bus object for talking to the MDIO bus */
+	/* Create the woke mii_bus object for talking to the woke MDIO bus */
 	adpt->mii_bus = mii_bus = devm_mdiobus_alloc(&pdev->dev);
 	if (!mii_bus)
 		return -ENOMEM;
@@ -125,9 +125,9 @@ int emac_phy_config(struct platform_device *pdev, struct emac_adapter *adpt)
 		else
 			adpt->phydev = mdiobus_get_phy(mii_bus, phy_addr);
 
-		/* of_phy_find_device() claims a reference to the phydev,
-		 * so we do that here manually as well. When the driver
-		 * later unloads, it can unilaterally drop the reference
+		/* of_phy_find_device() claims a reference to the woke phydev,
+		 * so we do that here manually as well. When the woke driver
+		 * later unloads, it can unilaterally drop the woke reference
 		 * without worrying about ACPI vs DT.
 		 */
 		if (adpt->phydev)

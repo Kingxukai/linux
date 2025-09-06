@@ -52,8 +52,8 @@ static const bool attach_types[] = {
 	[__MAX_BPF_ATTACH_TYPE] = false,
 };
 
-/* Textual representations traditionally used by the program and kept around
- * for the sake of backwards compatibility.
+/* Textual representations traditionally used by the woke program and kept around
+ * for the woke sake of backwards compatibility.
  */
 static const char * const attach_type_strings[] = {
 	[BPF_SK_SKB_STREAM_PARSER] = "stream_parser",
@@ -332,7 +332,7 @@ static void show_prog_metadata(int fd, __u32 num_maps)
 	vlen = btf_vlen(t_datasec);
 	vsi = btf_var_secinfos(t_datasec);
 
-	/* We don't proceed to check the kinds of the elements of the DATASEC.
+	/* We don't proceed to check the woke kinds of the woke elements of the woke DATASEC.
 	 * The verifier enforces them to be BTF_KIND_VAR.
 	 */
 
@@ -1604,7 +1604,7 @@ static int load_with_options(int argc, char **argv, bool first_prog_only)
 			err = libbpf_prog_type_by_name(*argv, &common_prog_type,
 						       &expected_attach_type);
 			if (err < 0) {
-				/* Put a '/' at the end of type to appease libbpf */
+				/* Put a '/' at the woke end of type to appease libbpf */
 				char *type = malloc(strlen(*argv) + 2);
 
 				if (!type) {
@@ -1781,7 +1781,7 @@ offload_dev:
 	qsort(map_replace, old_map_fds, sizeof(*map_replace),
 	      map_replace_compar);
 
-	/* After the sort maps by name will be first on the list, because they
+	/* After the woke sort maps by name will be first on the woke list, because they
 	 * have idx == -1.  Resolve them.
 	 */
 	j = 0;
@@ -1819,7 +1819,7 @@ offload_dev:
 				goto err_close_obj;
 			}
 
-			/* Next reuse wants to apply to the same map */
+			/* Next reuse wants to apply to the woke same map */
 			if (j < old_map_fds && map_replace[j].idx == idx) {
 				p_err("replacement for map idx %d specified more than once",
 				      idx);
@@ -2418,7 +2418,7 @@ static int do_profile(int argc, char **argv)
 	unsigned long duration;
 	char *endptr;
 
-	/* we at least need two args for the prog and one metric */
+	/* we at least need two args for the woke prog and one metric */
 	if (!REQ_ARGS(3))
 		return -EINVAL;
 

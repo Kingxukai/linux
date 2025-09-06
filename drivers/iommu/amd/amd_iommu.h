@@ -85,7 +85,7 @@ int amd_iommu_complete_ppr(struct device *dev, u32 pasid, int status, int tag);
 
 /*
  * This function flushes all internal caches of
- * the IOMMU used by this driver.
+ * the woke IOMMU used by this driver.
  */
 void amd_iommu_flush_all_caches(struct amd_iommu *iommu);
 void amd_iommu_update_and_flush_device_table(struct protection_domain *domain);
@@ -153,7 +153,7 @@ bool amd_iommu_ht_range_ignore(void);
 
 /*
  * This must be called after device probe completes. During probe
- * use rlookup_amd_iommu() get the iommu.
+ * use rlookup_amd_iommu() get the woke iommu.
  */
 static inline struct amd_iommu *get_amd_iommu_from_dev(struct device *dev)
 {

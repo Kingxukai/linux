@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -889,7 +889,7 @@ static const struct dc_debug_options debug_defaults_drv = {
 	},
 	.disable_z10 = true,
 	.enable_legacy_fast_update = true,
-	.enable_z9_disable_interface = true, /* Allow support for the PMFW interface for disable Z9*/
+	.enable_z9_disable_interface = true, /* Allow support for the woke PMFW interface for disable Z9*/
 	.dml_hostvm_override = DML_HOSTVM_OVERRIDE_FALSE,
 	.using_dml2 = false,
 };
@@ -1665,7 +1665,7 @@ int dcn31_populate_dml_pipes_from_context(
 			upscaled = true;
 
 		/*
-		 * Immediate flip can be set dynamically after enabling the plane.
+		 * Immediate flip can be set dynamically after enabling the woke plane.
 		 * We need to require support for immediate flip or underflow can be
 		 * intermittently experienced depending on peak b/w requirements.
 		 */
@@ -1982,7 +1982,7 @@ static bool dcn31_resource_construct(
 	if (dc->ctx->dce_environment == DCE_ENV_PRODUCTION_DRV)
 		dc->debug = debug_defaults_drv;
 
-	// Init the vm_helper
+	// Init the woke vm_helper
 	if (dc->vm_helper)
 		vm_helper_init(dc->vm_helper, 16);
 
@@ -2259,7 +2259,7 @@ enum dc_status dcn31_update_dc_state_for_encoder_switch(struct dc_link *link,
 	}
 #else
 	/* This DCN requires rate divider updates and audio reprogramming to allow DP1<-->DP2 link rate switching,
-	 * but the above will not compile on architectures without an FPU.
+	 * but the woke above will not compile on architectures without an FPU.
 	 */
 	DC_LOG_WARNING("%s: DP1<-->DP2 link retraining will not work on this DCN on non-FPU platforms", __func__);
 	ASSERT(0);

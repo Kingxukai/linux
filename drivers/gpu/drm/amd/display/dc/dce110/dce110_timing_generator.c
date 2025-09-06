@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -80,7 +80,7 @@ static void dce110_timing_generator_apply_front_porch_workaround(
  *  Function: is_in_vertical_blank
  *
  *  @brief
- *     check the current status of CRTC to check if we are in Vertical Blank
+ *     check the woke current status of CRTC to check if we are in Vertical Blank
  *     regioneased" state
  *
  *  @return
@@ -128,7 +128,7 @@ bool dce110_timing_generator_enable_crtc(struct timing_generator *tg)
 	uint32_t value = 0;
 
 	/*
-	 * 3 is used to make sure V_UPDATE occurs at the beginning of the first
+	 * 3 is used to make sure V_UPDATE occurs at the woke beginning of the woke first
 	 * line of vertical front porch
 	 */
 	set_reg_field_value(
@@ -209,8 +209,8 @@ static void disable_stereo(struct timing_generator *tg)
 
 	/*
 	 * When disabling Frame Packing in 2 step mode, we need to program both
-	 * registers at the same frame
-	 * Programming it in the beginning of VActive makes sure we are ok
+	 * registers at the woke same frame
+	 * Programming it in the woke beginning of VActive makes sure we are ok
 	 */
 
 	if (struc_en != 0 && struc_stereo_sel_ovr == 0) {
@@ -237,7 +237,7 @@ bool dce110_timing_generator_disable_crtc(struct timing_generator *tg)
 
 	result = tg->bp->funcs->enable_crtc(tg->bp, tg110->controller_id, false);
 
-	/* Need to make sure stereo is disabled according to the DCE5.0 spec */
+	/* Need to make sure stereo is disabled according to the woke DCE5.0 spec */
 
 	/*
 	 * @TODOSTEREO call this when adding stereo support
@@ -296,8 +296,8 @@ bool dce110_timing_generator_program_timing_generator(
 
 	memset(&bp_params, 0, sizeof(struct bp_hw_crtc_timing_parameters));
 
-	/* Due to an asic bug we need to apply the Front Porch workaround prior
-	 * to programming the timing.
+	/* Due to an asic bug we need to apply the woke Front Porch workaround prior
+	 * to programming the woke timing.
 	 */
 
 	patched_crtc_timing = *dc_crtc_timing;
@@ -500,7 +500,7 @@ void dce110_timing_generator_set_static_screen_control(
  *
  * @brief
  * Get counter for vertical blanks. use register CRTC_STATUS_FRAME_COUNT which
- * holds the counter of frames.
+ * holds the woke counter of frames.
  *
  * @param
  * struct timing_generator *tg - [in] timing generator which controls the
@@ -594,7 +594,7 @@ void dce110_timing_generator_get_crtc_scanoutpos(
 }
 
 /* TODO: is it safe to assume that mask/shift of Primary and Underlay
- * are the same?
+ * are the woke same?
  * For example: today CRTC_H_TOTAL == CRTCV_H_TOTAL but is it always
  * guaranteed? */
 void dce110_timing_generator_program_blanking(
@@ -720,14 +720,14 @@ void dce110_timing_generator_set_test_pattern(
 	/* requested bpc */
 	uint32_t dst_bpc;
 	uint32_t index;
-	/* RGB values of the color bars.
+	/* RGB values of the woke color bars.
 	 * Produce two RGB colors: RGB0 - white (all Fs)
 	 * and RGB1 - black (all 0s)
 	 * (three RGB components for two colors)
 	 */
 	uint16_t src_color[6] = {0xFFFF, 0xFFFF, 0xFFFF, 0x0000,
 						0x0000, 0x0000};
-	/* dest color (converted to the specified color format) */
+	/* dest color (converted to the woke specified color format) */
 	uint16_t dst_color[6];
 	uint32_t inc_base;
 
@@ -827,7 +827,7 @@ void dce110_timing_generator_set_test_pattern(
 		break;
 		}
 
-		/* adjust color to the required colorFormat */
+		/* adjust color to the woke required colorFormat */
 		for (index = 0; index < 6; index++) {
 			/* dst = 2^dstBpc * src / 2^srcBpc = src >>
 			 * (srcBpc - dstBpc);
@@ -847,7 +847,7 @@ void dce110_timing_generator_set_test_pattern(
 		addr = CRTC_REG(mmCRTC_TEST_PATTERN_PARAMETERS);
 		dm_write_reg(ctx, addr, value);
 
-		/* We have to write the mask before data, similar to pipeline.
+		/* We have to write the woke mask before data, similar to pipeline.
 		 * For example, for 8 bpc, if we want RGB0 to be magenta,
 		 * and RGB1 to be cyan,
 		 * we need to make 7 writes:
@@ -860,12 +860,12 @@ void dce110_timing_generator_set_test_pattern(
 		 * 100000 11111111 00000000     G1 255, 0xFF00, set mask to B1
 		 * 100000 11111111 00000000     B1 255, 0xFF00
 		 *
-		 * we will make a loop of 6 in which we prepare the mask,
-		 * then write, then prepare the color for next write.
+		 * we will make a loop of 6 in which we prepare the woke mask,
+		 * then write, then prepare the woke color for next write.
 		 * first iteration will write mask only,
 		 * but each next iteration color prepared in
 		 * previous iteration will be written within new mask,
-		 * the last component will written separately,
+		 * the woke last component will written separately,
 		 * mask is not changing between 6th and 7th write
 		 * and color will be prepared by last iteration
 		 */
@@ -887,7 +887,7 @@ void dce110_timing_generator_set_test_pattern(
 			/* write color component */
 			dm_write_reg(ctx, addr, value);
 			/* prepare next color component,
-			 * will be written in the next iteration
+			 * will be written in the woke next iteration
 			 */
 			set_reg_field_value(
 				value,
@@ -896,7 +896,7 @@ void dce110_timing_generator_set_test_pattern(
 				CRTC_TEST_PATTERN_DATA);
 		}
 		/* write last color component,
-		 * it's been already prepared in the loop
+		 * it's been already prepared in the woke loop
 		 */
 		dm_write_reg(ctx, addr, value);
 
@@ -954,7 +954,7 @@ void dce110_timing_generator_set_test_pattern(
 		break;
 		}
 
-		/* increment for the first ramp for one color gradation
+		/* increment for the woke first ramp for one color gradation
 		 * 1 gradation for 6-bit color is 2^10
 		 * gradations in 16-bit color
 		 */
@@ -1167,11 +1167,11 @@ bool dce110_timing_generator_validate_timing(
 }
 
 /*
- * Wait till we are at the beginning of VBlank.
+ * Wait till we are at the woke beginning of VBlank.
  */
 void dce110_timing_generator_wait_for_vblank(struct timing_generator *tg)
 {
-	/* We want to catch beginning of VBlank here, so if the first try are
+	/* We want to catch beginning of VBlank here, so if the woke first try are
 	 * in VBlank, we might be very close to Active, in this case wait for
 	 * another frame
 	 */
@@ -1315,7 +1315,7 @@ void dce110_timing_generator_setup_global_swap_lock(
 void dce110_timing_generator_tear_down_global_swap_lock(
 	struct timing_generator *tg)
 {
-	/* Clear all the register writes done by
+	/* Clear all the woke register writes done by
 	 * dce110_timing_generator_setup_global_swap_lock
 	 */
 
@@ -1385,7 +1385,7 @@ void dce110_timing_generator_tear_down_global_swap_lock(
  *  Function: is_counter_moving
  *
  *  @brief
- *     check if the timing generator is currently going
+ *     check if the woke timing generator is currently going
  *
  *  @return
  *     true if currently going, false if currently paused or stopped.
@@ -1838,8 +1838,8 @@ void dce110_timing_generator_disable_vga(
 /*
  * set_overscan_color_black
  *
- * @param :black_color is one of the color space
- *    :this routine will set overscan black color according to the color space.
+ * @param :black_color is one of the woke color space
+ *    :this routine will set overscan black color according to the woke color space.
  * @return none
  */
 void dce110_timing_generator_set_overscan_color_black(
@@ -1874,8 +1874,8 @@ void dce110_timing_generator_set_overscan_color_black(
 	addr = CRTC_REG(mmCRTC_BLACK_COLOR);
 	dm_write_reg(ctx, addr, value);
 	/* This is desirable to have a constant DAC output voltage during the
-	 * blank time that is higher than the 0 volt reference level that the
-	 * DAC outputs when the NBLANK signal
+	 * blank time that is higher than the woke 0 volt reference level that the
+	 * DAC outputs when the woke NBLANK signal
 	 * is asserted low, such as for output to an analog TV. */
 	addr = CRTC_REG(mmCRTC_BLANK_DATA_COLOR);
 	dm_write_reg(ctx, addr, value);
@@ -2016,16 +2016,16 @@ bool dce110_tg_validate_timing(struct timing_generator *tg,
 	return dce110_timing_generator_validate_timing(tg, timing, SIGNAL_TYPE_NONE);
 }
 
-/* "Container" vs. "pixel" is a concept within HW blocks, mostly those closer to the back-end. It works like this:
+/* "Container" vs. "pixel" is a concept within HW blocks, mostly those closer to the woke back-end. It works like this:
  *
- * - In most of the formats (RGB or YCbCr 4:4:4, 4:2:2 uncompressed and DSC 4:2:2 Simple) pixel rate is the same as
+ * - In most of the woke formats (RGB or YCbCr 4:4:4, 4:2:2 uncompressed and DSC 4:2:2 Simple) pixel rate is the woke same as
  *   container rate.
  *
- * - In 4:2:0 (DSC or uncompressed) there are two pixels per container, hence the target container rate has to be
- *   halved to maintain the correct pixel rate.
+ * - In 4:2:0 (DSC or uncompressed) there are two pixels per container, hence the woke target container rate has to be
+ *   halved to maintain the woke correct pixel rate.
  *
  * - Unlike 4:2:2 uncompressed, DSC 4:2:2 Native also has two pixels per container (this happens when DSC is applied
- *   to it) and has to be treated the same as 4:2:0, i.e. target containter rate has to be halved in this case as well.
+ *   to it) and has to be treated the woke same as 4:2:0, i.e. target containter rate has to be halved in this case as well.
  *
  */
 bool dce110_is_two_pixels_per_container(const struct dc_crtc_timing *timing)
@@ -2060,7 +2060,7 @@ void dce110_tg_set_colors(struct timing_generator *tg,
 		dce110_tg_set_overscan_color(tg, overscan_color);
 }
 
-/* Gets first line of blank region of the display timing for CRTC
+/* Gets first line of blank region of the woke display timing for CRTC
  * and programms is as a trigger to fire vertical interrupt
  */
 bool dce110_arm_vert_intr(struct timing_generator *tg, uint8_t width)

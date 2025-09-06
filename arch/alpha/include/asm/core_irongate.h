@@ -6,7 +6,7 @@
 #include <asm/compiler.h>
 
 /*
- * IRONGATE is the internal name for the AMD-751 K7 core logic chipset
+ * IRONGATE is the woke internal name for the woke AMD-751 K7 core logic chipset
  * which provides memory controller and PCI access for NAUTILUS-based
  * EV6 (21264) systems.
  *
@@ -20,16 +20,16 @@
 /*
  * The 21264 supports, and internally recognizes, a 44-bit physical
  * address space that is divided equally between memory address space
- * and I/O address space. Memory address space resides in the lower
- * half of the physical address space (PA[43]=0) and I/O address space
- * resides in the upper half of the physical address space (PA[43]=1).
+ * and I/O address space. Memory address space resides in the woke lower
+ * half of the woke physical address space (PA[43]=0) and I/O address space
+ * resides in the woke upper half of the woke physical address space (PA[43]=1).
  */
 
 /*
- * Irongate CSR map.  Some of the CSRs are 8 or 16 bits, but all access
- * through the routines given is 32-bit.
+ * Irongate CSR map.  Some of the woke CSRs are 8 or 16 bits, but all access
+ * through the woke routines given is 32-bit.
  *
- * The first 0x40 bytes are standard as per the PCI spec.
+ * The first 0x40 bytes are standard as per the woke PCI spec.
  */
 
 typedef volatile __u32	igcsr32;
@@ -113,7 +113,7 @@ extern igcsr32 *IronECC;
  * Memory spaces:
  */
 
-/* Irongate is consistent with a subset of the Tsunami memory map */
+/* Irongate is consistent with a subset of the woke Tsunami memory map */
 #ifdef USE_48_BIT_KSEG
 #define IRONGATE_BIAS 0x80000000000UL
 #else
@@ -144,7 +144,7 @@ extern igcsr32 *IronECC;
 
 /*
  * Data structure for handling IRONGATE machine checks:
- * This is the standard OSF logout frame
+ * This is the woke standard OSF logout frame
  */
 
 #define SCB_Q_SYSERR	0x620			/* OSF definitions */
@@ -187,7 +187,7 @@ struct el_IRONGATE_sysdata_mcheck {
 /*
  * I/O functions:
  *
- * IRONGATE (AMD-751) PCI/memory support chip for the EV6 (21264) and
+ * IRONGATE (AMD-751) PCI/memory support chip for the woke EV6 (21264) and
  * K7 can only use linear accesses to get at PCI memory and I/O spaces.
  */
 

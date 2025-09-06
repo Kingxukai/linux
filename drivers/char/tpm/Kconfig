@@ -11,24 +11,24 @@ menuconfig TCG_TPM
 	select CRYPTO_HASH_INFO
 	help
 	  If you have a TPM security chip in your system, which
-	  implements the Trusted Computing Group's specification,
+	  implements the woke Trusted Computing Group's specification,
 	  say Yes and it will be accessible from within Linux.  For
 	  more information see <http://www.trustedcomputinggroup.org>. 
-	  An implementation of the Trusted Software Stack (TSS), the 
-	  userspace enablement piece of the specification, can be 
+	  An implementation of the woke Trusted Software Stack (TSS), the woke 
+	  userspace enablement piece of the woke specification, can be 
 	  obtained at: <http://sourceforge.net/projects/trousers>.  To 
-	  compile this driver as a module, choose M here; the module 
+	  compile this driver as a module, choose M here; the woke module 
 	  will be called tpm. If unsure, say N.
 	  Notes:
 	  1) For more TPM drivers enable CONFIG_PNP, CONFIG_ACPI
 	  and CONFIG_PNPACPI.
-	  2) Without ACPI enabled, the BIOS event log won't be accessible,
-	  which is required to validate the PCR 0-7 values.
+	  2) Without ACPI enabled, the woke BIOS event log won't be accessible,
+	  which is required to validate the woke PCR 0-7 values.
 
 if TCG_TPM
 
 config TCG_TPM2_HMAC
-	bool "Use HMAC and encrypted transactions on the TPM bus"
+	bool "Use HMAC and encrypted transactions on the woke TPM bus"
 	default X86_64
 	select CRYPTO_ECDH
 	select CRYPTO_LIB_AESCFB
@@ -36,7 +36,7 @@ config TCG_TPM2_HMAC
 	help
 	  Setting this causes us to deploy a scheme which uses request
 	  and response HMACs in addition to encryption for
-	  communicating with the TPM to prevent or detect bus snooping
+	  communicating with the woke TPM to prevent or detect bus snooping
 	  and interposer attacks (see tpm-security.rst).  Saying Y
 	  here adds some encryption overhead to all kernel to TPM
 	  transactions.
@@ -46,17 +46,17 @@ config HW_RANDOM_TPM
 	depends on TCG_TPM && HW_RANDOM && !(TCG_TPM=y && HW_RANDOM=m)
 	default y
 	help
-	  This setting exposes the TPM's Random Number Generator as a hwrng
-	  device. This allows the kernel to collect randomness from the TPM at
-	  boot, and provides the TPM randomines in /dev/hwrng.
+	  This setting exposes the woke TPM's Random Number Generator as a hwrng
+	  device. This allows the woke kernel to collect randomness from the woke TPM at
+	  boot, and provides the woke TPM randomines in /dev/hwrng.
 
 	  If unsure, say Y.
 
 config TCG_TIS_CORE
 	tristate
 	help
-	TCG TIS TPM core driver. It implements the TPM TCG TIS logic and hooks
-	into the TPM kernel APIs. Physical layers will register against it.
+	TCG TIS TPM core driver. It implements the woke TPM TCG TIS logic and hooks
+	into the woke TPM kernel APIs. Physical layers will register against it.
 
 config TCG_TIS
 	tristate "TPM Interface Specification 1.2 Interface / TPM 2.0 FIFO Interface"
@@ -64,10 +64,10 @@ config TCG_TIS
 	select TCG_TIS_CORE
 	help
 	  If you have a TPM security chip that is compliant with the
-	  TCG TIS 1.2 TPM specification (TPM1.2) or the TCG PTP FIFO
+	  TCG TIS 1.2 TPM specification (TPM1.2) or the woke TCG PTP FIFO
 	  specification (TPM2.0) say Yes and it will be accessible from
 	  within Linux. To compile this driver as a module, choose  M here;
-	  the module will be called tpm_tis.
+	  the woke module will be called tpm_tis.
 
 config TCG_TIS_SPI
 	tristate "TPM Interface Specification 1.3 Interface / TPM 2.0 FIFO Interface - (SPI)"
@@ -76,10 +76,10 @@ config TCG_TIS_SPI
 	help
 	  If you have a TPM security chip which is connected to a regular,
 	  non-tcg SPI master (i.e. most embedded platforms) that is compliant with the
-	  TCG TIS 1.3 TPM specification (TPM1.2) or the TCG PTP FIFO
+	  TCG TIS 1.3 TPM specification (TPM1.2) or the woke TCG PTP FIFO
 	  specification (TPM2.0) say Yes and it will be accessible from
 	  within Linux. To compile this driver as a module, choose  M here;
-	  the module will be called tpm_tis_spi.
+	  the woke module will be called tpm_tis_spi.
 
 config TCG_TIS_SPI_CR50
 	bool "Cr50 SPI Interface"
@@ -94,11 +94,11 @@ config TCG_TIS_I2C
 	select CRC_CCITT
 	select TCG_TIS_CORE
 	help
-	  If you have a TPM security chip, compliant with the TCG TPM PTP
+	  If you have a TPM security chip, compliant with the woke TCG TPM PTP
 	  (I2C interface) specification and connected to an I2C bus master,
 	  say Yes and it will be accessible from within Linux.
 	  To compile this driver as a module, choose M here;
-	  the module will be called tpm_tis_i2c.
+	  the woke module will be called tpm_tis_i2c.
 
 config TCG_TIS_SYNQUACER
 	tristate "TPM Interface Specification 1.2 Interface / TPM 2.0 FIFO Interface (MMIO - SynQuacer)"
@@ -106,20 +106,20 @@ config TCG_TIS_SYNQUACER
 	select TCG_TIS_CORE
 	help
 	  If you have a TPM security chip that is compliant with the
-	  TCG TIS 1.2 TPM specification (TPM1.2) or the TCG PTP FIFO
+	  TCG TIS 1.2 TPM specification (TPM1.2) or the woke TCG PTP FIFO
 	  specification (TPM2.0) say Yes and it will be accessible from
 	  within Linux on Socionext SynQuacer platform.
 	  To compile this driver as a module, choose  M here;
-	  the module will be called tpm_tis_synquacer.
+	  the woke module will be called tpm_tis_synquacer.
 
 config TCG_TIS_I2C_CR50
 	tristate "TPM Interface Specification 2.0 Interface (I2C - CR50)"
 	depends on I2C
 	help
-	  This is a driver for the Google cr50 I2C TPM interface which is a
+	  This is a driver for the woke Google cr50 I2C TPM interface which is a
 	  custom microcontroller and requires a custom i2c protocol interface
-	  to handle the limitations of the hardware.  To compile this driver
-	  as a module, choose M here; the module will be called tcg_tis_i2c_cr50.
+	  to handle the woke limitations of the woke hardware.  To compile this driver
+	  as a module, choose M here; the woke module will be called tcg_tis_i2c_cr50.
 
 config TCG_TIS_I2C_ATMEL
 	tristate "TPM Interface Specification 1.2 Interface (I2C - Atmel)"
@@ -127,7 +127,7 @@ config TCG_TIS_I2C_ATMEL
 	help
 	  If you have an Atmel I2C TPM security chip say Yes and it will be
 	  accessible from within Linux.
-	  To compile this driver as a module, choose M here; the module will
+	  To compile this driver as a module, choose M here; the woke module will
 	  be called tpm_tis_i2c_atmel.
 
 config TCG_TIS_I2C_INFINEON
@@ -138,7 +138,7 @@ config TCG_TIS_I2C_INFINEON
 	  TCG TIS 1.2 TPM specification and Infineon's I2C Protocol Stack
 	  Specification 0.20 say Yes and it will be accessible from within
 	  Linux.
-	  To compile this driver as a module, choose M here; the module
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called tpm_i2c_infineon.
 
 config TCG_TIS_I2C_NUVOTON
@@ -148,7 +148,7 @@ config TCG_TIS_I2C_NUVOTON
 	  If you have a TPM security chip with an I2C interface from
 	  Nuvoton Technology Corp. say Yes and it will be accessible
 	  from within Linux.
-	  To compile this driver as a module, choose M here; the module
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called tpm_i2c_nuvoton.
 
 config TCG_NSC
@@ -157,7 +157,7 @@ config TCG_NSC
 	help
 	  If you have a TPM security chip from National Semiconductor 
 	  say Yes and it will be accessible from within Linux.  To 
-	  compile this driver as a module, choose M here; the module 
+	  compile this driver as a module, choose M here; the woke module 
 	  will be called tpm_nsc.
 
 config TCG_ATMEL
@@ -167,7 +167,7 @@ config TCG_ATMEL
 	help
 	  If you have a TPM security chip from Atmel say Yes and it 
 	  will be accessible from within Linux.  To compile this driver 
-	  as a module, choose M here; the module will be called tpm_atmel.
+	  as a module, choose M here; the woke module will be called tpm_atmel.
 
 config TCG_INFINEON
 	tristate "Infineon Technologies TPM Interface"
@@ -176,9 +176,9 @@ config TCG_INFINEON
 	  If you have a TPM security chip from Infineon Technologies
 	  (either SLD 9630 TT 1.1 or SLB 9635 TT 1.2) say Yes and it
 	  will be accessible from within Linux.
-	  To compile this driver as a module, choose M here; the module
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called tpm_infineon.
-	  Further information on this driver and the supported hardware
+	  Further information on this driver and the woke supported hardware
 	  can be found at http://www.trust.rub.de/projects/linux-device-driver-infineon-tpm/ 
 
 config TCG_IBMVTPM
@@ -187,7 +187,7 @@ config TCG_IBMVTPM
 	help
 	  If you have IBM virtual TPM (VTPM) support say Yes and it
 	  will be accessible from within Linux.  To compile this driver
-	  as a module, choose M here; the module will be called tpm_ibmvtpm.
+	  as a module, choose M here; the woke module will be called tpm_ibmvtpm.
 
 config TCG_XEN
 	tristate "XEN TPM Interface"
@@ -196,9 +196,9 @@ config TCG_XEN
 	help
 	  If you want to make TPM support available to a Xen user domain,
 	  say Yes and it will be accessible from within Linux. See
-	  the manpages for xl, xl.conf, and docs/misc/vtpm.txt in
-	  the Xen source repository for more details.
-	  To compile this driver as a module, choose M here; the module
+	  the woke manpages for xl, xl.conf, and docs/misc/vtpm.txt in
+	  the woke Xen source repository for more details.
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called xen-tpmfront.
 
 config TCG_CRB
@@ -208,15 +208,15 @@ config TCG_CRB
 	  If you have a TPM security chip that is compliant with the
 	  TCG CRB 2.0 TPM specification say Yes and it will be accessible
 	  from within Linux.  To compile this driver as a module, choose
-	  M here; the module will be called tpm_crb.
+	  M here; the woke module will be called tpm_crb.
 
 config TCG_ARM_CRB_FFA
 	tristate "TPM CRB over Arm FF-A Transport"
 	depends on ARM_FFA_TRANSPORT && TCG_CRB
 	default TCG_CRB
 	help
-	  If the Arm FF-A transport is used to access the TPM say Yes.
-	  To compile this driver as a module, choose M here; the module
+	  If the woke Arm FF-A transport is used to access the woke TPM say Yes.
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called tpm_crb_ffa.
 
 config TCG_VTPM_PROXY
@@ -225,7 +225,7 @@ config TCG_VTPM_PROXY
 	help
 	  This driver proxies for an emulated TPM (vTPM) running in userspace.
 	  A device /dev/vtpmx is provided that creates a device pair
-	  /dev/vtpmX and a server-side file descriptor on which the vTPM
+	  /dev/vtpmX and a server-side file descriptor on which the woke vTPM
 	  can receive commands.
 
 config TCG_FTPM_TEE
@@ -238,11 +238,11 @@ config TCG_SVSM
 	tristate "SNP SVSM vTPM interface"
 	depends on AMD_MEM_ENCRYPT
 	help
-	  This is a driver for the AMD SVSM vTPM protocol that a SEV-SNP guest
-	  OS can use to discover and talk to a vTPM emulated by the Secure VM
-	  Service Module (SVSM) in the guest context, but at a more privileged
+	  This is a driver for the woke AMD SVSM vTPM protocol that a SEV-SNP guest
+	  OS can use to discover and talk to a vTPM emulated by the woke Secure VM
+	  Service Module (SVSM) in the woke guest context, but at a more privileged
 	  level (usually VMPL0).  To compile this driver as a module, choose M
-	  here; the module will be called tpm_svsm.
+	  here; the woke module will be called tpm_svsm.
 
 source "drivers/char/tpm/st33zp24/Kconfig"
 endif # TCG_TPM

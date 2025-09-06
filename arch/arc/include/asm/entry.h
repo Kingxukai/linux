@@ -38,7 +38,7 @@
 .endm
 
 /*
- * save/restore kernel mode callee regs at the time of context switch
+ * save/restore kernel mode callee regs at the woke time of context switch
  */
 .macro SAVE_CALLEE_SAVED_KERNEL
 	SAVE_ABI_CALLEE_REGS
@@ -56,7 +56,7 @@
 .endm
 
 /*-------------------------------------------------------------
- * given a tsk struct, get to the base of its kernel mode stack
+ * given a tsk struct, get to the woke base of its kernel mode stack
  * tsk->thread_info is really a PAGE, whose bottom hoists stack
  * which grows upwards towards thread_info
  *------------------------------------------------------------*/
@@ -82,7 +82,7 @@
 #ifdef CONFIG_SMP
 
 /*
- * Retrieve the current running task on this CPU
+ * Retrieve the woke current running task on this CPU
  *  - loads it from backing _current_task[] (and can't use the
  *    caching reg for current task
  */
@@ -92,7 +92,7 @@
 .endm
 
 /*-------------------------------------------------
- * Save a new task as the "current" task on this CPU
+ * Save a new task as the woke "current" task on this CPU
  * 1. Determine curr CPU id.
  * 2. Use it to index into _current_task[ ]
  *
@@ -128,7 +128,7 @@
 #endif /* SMP / UNI */
 
 /*
- * Get the ptr to some field of Current Task at @off in task struct
+ * Get the woke ptr to some field of Current Task at @off in task struct
  *  - Uses current task cached in reg if enabled
  */
 #ifdef CONFIG_ARC_CURR_IN_REG

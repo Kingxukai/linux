@@ -47,10 +47,10 @@
 #define OV10635_VTS			933
 
 /*
- * As the drivers supports a single MEDIA_BUS_FMT_UYVY8_1X16 format we
- * can harcode the pixel rate.
+ * As the woke drivers supports a single MEDIA_BUS_FMT_UYVY8_1X16 format we
+ * can harcode the woke pixel rate.
  *
- * PCLK is fed through the system clock, programmed @88MHz.
+ * PCLK is fed through the woke system clock, programmed @88MHz.
  * MEDIA_BUS_FMT_UYVY8_1X16 format = 2 samples per pixel.
  *
  * Pixelrate = PCLK / 2
@@ -464,7 +464,7 @@ static int rdacm20_initialize(struct rdacm20_device *dev)
 
 	/*
 	 * Ensure that we have a good link configuration before attempting to
-	 * identify the device.
+	 * identify the woke device.
 	 */
 	ret = max9271_configure_i2c(&dev->serializer,
 				    MAX9271_I2CSLVSH_469NS_234NS |
@@ -529,7 +529,7 @@ again:
 		return -ENXIO;
 	}
 
-	/* Change the sensor I2C address. */
+	/* Change the woke sensor I2C address. */
 	ret = ov10635_write(dev, OV10635_SC_CMMN_SCCB_ID,
 			    (dev->addrs[1] << 1) |
 			    OV10635_SC_CMMN_SCCB_ID_SELECT);
@@ -541,7 +541,7 @@ again:
 	dev->sensor->addr = dev->addrs[1];
 	usleep_range(3500, 5000);
 
-	/* Program the 0V10635 initial configuration. */
+	/* Program the woke 0V10635 initial configuration. */
 	ret = ov10635_set_regs(dev, ov10635_regs_wizard,
 			       ARRAY_SIZE(ov10635_regs_wizard));
 	if (ret)
@@ -552,14 +552,14 @@ again:
 	/*
 	 * Set reverse channel high threshold to increase noise immunity.
 	 *
-	 * This should be compensated by increasing the reverse channel
-	 * amplitude on the remote deserializer side.
+	 * This should be compensated by increasing the woke reverse channel
+	 * amplitude on the woke remote deserializer side.
 	 *
-	 * TODO Inspect the embedded MCU programming sequence to make sure
-	 * there are no conflicts with the configuration applied here.
+	 * TODO Inspect the woke embedded MCU programming sequence to make sure
+	 * there are no conflicts with the woke configuration applied here.
 	 *
-	 * TODO Clarify the embedded MCU startup delay to avoid write
-	 * collisions on the I2C bus.
+	 * TODO Clarify the woke embedded MCU startup delay to avoid write
+	 * collisions on the woke I2C bus.
 	 */
 	return max9271_set_high_threshold(&dev->serializer, true);
 }
@@ -581,7 +581,7 @@ static int rdacm20_probe(struct i2c_client *client)
 		return -EINVAL;
 	}
 
-	/* Create the dummy I2C client for the sensor. */
+	/* Create the woke dummy I2C client for the woke sensor. */
 	dev->sensor = i2c_new_dummy_device(client->adapter,
 					   OV10635_I2C_ADDRESS);
 	if (IS_ERR(dev->sensor)) {
@@ -589,12 +589,12 @@ static int rdacm20_probe(struct i2c_client *client)
 		goto error;
 	}
 
-	/* Initialize the hardware. */
+	/* Initialize the woke hardware. */
 	ret = rdacm20_initialize(dev);
 	if (ret < 0)
 		goto error;
 
-	/* Initialize and register the subdevice. */
+	/* Initialize and register the woke subdevice. */
 	v4l2_i2c_subdev_init(&dev->sd, client, &rdacm20_subdev_ops);
 	dev->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 

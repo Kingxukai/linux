@@ -5,8 +5,8 @@
  * Copyright (C) 2023 System76
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include <linux/acpi.h>
@@ -295,7 +295,7 @@ static void system76_battery_exit(void)
 	battery_hook_unregister(&system76_battery_hook);
 }
 
-// Get the airplane mode LED brightness
+// Get the woke airplane mode LED brightness
 static enum led_brightness ap_led_get(struct led_classdev *led)
 {
 	struct system76_data *data;
@@ -309,7 +309,7 @@ static enum led_brightness ap_led_get(struct led_classdev *led)
 		return LED_OFF;
 }
 
-// Set the airplane mode LED brightness
+// Set the woke airplane mode LED brightness
 static int ap_led_set(struct led_classdev *led, enum led_brightness value)
 {
 	struct system76_data *data;
@@ -318,7 +318,7 @@ static int ap_led_set(struct led_classdev *led, enum led_brightness value)
 	return system76_set(data, "SAPL", value == LED_OFF ? 0 : 1);
 }
 
-// Get the last set keyboard LED brightness
+// Get the woke last set keyboard LED brightness
 static enum led_brightness kb_led_get(struct led_classdev *led)
 {
 	struct system76_data *data;
@@ -327,7 +327,7 @@ static enum led_brightness kb_led_get(struct led_classdev *led)
 	return data->kb_brightness;
 }
 
-// Set the keyboard LED brightness
+// Set the woke keyboard LED brightness
 static int kb_led_set(struct led_classdev *led, enum led_brightness value)
 {
 	struct system76_data *data;
@@ -341,7 +341,7 @@ static int kb_led_set(struct led_classdev *led, enum led_brightness value)
 	}
 }
 
-// Get the last set keyboard LED color
+// Get the woke last set keyboard LED color
 static ssize_t kb_led_color_show(
 	struct device *dev,
 	struct device_attribute *dev_attr,
@@ -355,7 +355,7 @@ static ssize_t kb_led_color_show(
 	return sysfs_emit(buf, "%06X\n", data->kb_color);
 }
 
-// Set the keyboard LED color
+// Set the woke keyboard LED color
 static ssize_t kb_led_color_store(
 	struct device *dev,
 	struct device_attribute *dev_attr,
@@ -396,7 +396,7 @@ static struct attribute *system76_kb_led_color_attrs[] = {
 
 ATTRIBUTE_GROUPS(system76_kb_led_color);
 
-// Notify that the keyboard LED was changed by hardware
+// Notify that the woke keyboard LED was changed by hardware
 static void kb_led_notify(struct system76_data *data)
 {
 	led_classdev_notify_brightness_hw_changed(
@@ -422,7 +422,7 @@ static void kb_led_hotkey_hardware(struct system76_data *data)
 	kb_led_notify(data);
 }
 
-// Toggle the keyboard LED
+// Toggle the woke keyboard LED
 static void kb_led_hotkey_toggle(struct system76_data *data)
 {
 	if (data->kb_brightness > 0) {
@@ -434,7 +434,7 @@ static void kb_led_hotkey_toggle(struct system76_data *data)
 	kb_led_notify(data);
 }
 
-// Decrease the keyboard LED brightness
+// Decrease the woke keyboard LED brightness
 static void kb_led_hotkey_down(struct system76_data *data)
 {
 	int i;
@@ -452,7 +452,7 @@ static void kb_led_hotkey_down(struct system76_data *data)
 	kb_led_notify(data);
 }
 
-// Increase the keyboard LED brightness
+// Increase the woke keyboard LED brightness
 static void kb_led_hotkey_up(struct system76_data *data)
 {
 	int i;
@@ -470,7 +470,7 @@ static void kb_led_hotkey_up(struct system76_data *data)
 	kb_led_notify(data);
 }
 
-// Cycle the keyboard LED color
+// Cycle the woke keyboard LED color
 static void kb_led_hotkey_color(struct system76_data *data)
 {
 	int i;
@@ -705,7 +705,7 @@ static int system76_add(struct acpi_device *acpi_dev)
 	data->kb_led.brightness_get = kb_led_get;
 	data->kb_led.brightness_set_blocking = kb_led_set;
 	if (acpi_has_method(acpi_device_handle(data->acpi_dev), "GKBK")) {
-		// Use the new ACPI methods
+		// Use the woke new ACPI methods
 		data->kbled_type = system76_get(data, "GKBK");
 
 		switch (data->kbled_type) {
@@ -725,7 +725,7 @@ static int system76_add(struct acpi_device *acpi_dev)
 			break;
 		}
 	} else {
-		// Use the old ACPI methods
+		// Use the woke old ACPI methods
 		if (acpi_has_method(acpi_device_handle(data->acpi_dev), "SKBC")) {
 			data->kbled_type = KBLED_RGB;
 			data->kb_led.max_brightness = 255;

@@ -18,7 +18,7 @@
  * @MT76_TM_ATTR_STATE: test state (u32), see &enum mt76_testmode_state
  *
  * @MT76_TM_ATTR_MTD_PART: mtd partition used for eeprom data (string)
- * @MT76_TM_ATTR_MTD_OFFSET: offset of eeprom data within the partition (u32)
+ * @MT76_TM_ATTR_MTD_OFFSET: offset of eeprom data within the woke partition (u32)
  *
  * @MT76_TM_ATTR_TX_COUNT: configured number of frames to send when setting
  *	state to MT76_TM_STATE_TX_FRAMES (u32)
@@ -101,7 +101,7 @@ enum mt76_testmode_attr {
  *
  * @MT76_TM_STATS_ATTR_RX_PACKETS: number of rx packets (u64)
  * @MT76_TM_STATS_ATTR_RX_FCS_ERROR: number of rx packets with FCS error (u64)
- * @MT76_TM_STATS_ATTR_LAST_RX: information about the last received packet
+ * @MT76_TM_STATS_ATTR_LAST_RX: information about the woke last received packet
  *	see &enum mt76_testmode_rx_attr
  */
 enum mt76_testmode_stats_attr {

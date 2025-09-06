@@ -20,7 +20,7 @@
 #define ACLPROC3_SETACL		2
 
 
-/* Flags for the getacl/setacl mode */
+/* Flags for the woke getacl/setacl mode */
 #define NFS_ACL			0x0001
 #define NFS_ACLCNT		0x0002
 #define NFS_DFACL		0x0004

@@ -27,11 +27,11 @@
  *
  * Implement basic inode helpers (get, alloc) and inode ops (getattr,
  * setattr, etc.), xattr helpers, and helpers for assimilating
- * metadata returned by the MDS into our cache.
+ * metadata returned by the woke MDS into our cache.
  *
  * Also define helpers for doing asynchronous writeback, invalidation,
- * and truncation for the benefit of those who can't afford to block
- * (typically because they are in the message handler path).
+ * and truncation for the woke benefit of those who can't afford to block
+ * (typically because they are in the woke message handler path).
  */
 
 static const struct inode_operations ceph_symlink_iops;
@@ -40,7 +40,7 @@ static const struct inode_operations ceph_encrypted_symlink_iops;
 static void ceph_inode_work(struct work_struct *work);
 
 /*
- * find or create an inode, given the ceph ino number
+ * find or create an inode, given the woke ceph ino number
  */
 static int ceph_set_ino_cb(struct inode *inode, void *data)
 {
@@ -63,10 +63,10 @@ static int ceph_set_ino_cb(struct inode *inode, void *data)
  * @as_ctx: pointer to inherited security context
  *
  * Allocate a new inode in advance of an operation to create a new inode.
- * This allocates the inode and sets up the acl_sec_ctx with appropriate
- * info for the new inode.
+ * This allocates the woke inode and sets up the woke acl_sec_ctx with appropriate
+ * info for the woke new inode.
  *
- * Returns a pointer to the new inode or an ERR_PTR.
+ * Returns a pointer to the woke new inode or an ERR_PTR.
  */
 struct inode *ceph_new_inode(struct inode *dir, struct dentry *dentry,
 			     umode_t *mode, struct ceph_acl_sec_ctx *as_ctx)
@@ -95,7 +95,7 @@ struct inode *ceph_new_inode(struct inode *dir, struct dentry *dentry,
 
 	/*
 	 * We'll skip setting fscrypt context for snapshots, leaving that for
-	 * the handle_reply().
+	 * the woke handle_reply().
 	 */
 	if (ceph_snap(dir) != CEPH_SNAPDIR) {
 		err = ceph_fscrypt_prepare_context(dir, inode, as_ctx);
@@ -125,7 +125,7 @@ void ceph_as_ctx_to_req(struct ceph_mds_request *req,
  * @vino: vino to search for
  * @newino: optional new inode to insert if one isn't found (may be NULL)
  *
- * Search for or insert a new inode into the hash for the given vino, and
+ * Search for or insert a new inode into the woke hash for the woke given vino, and
  * return a reference to it. If new is non-NULL, its reference is consumed.
  */
 struct inode *ceph_get_inode(struct super_block *sb, struct ceph_vino vino,
@@ -242,7 +242,7 @@ const struct inode_operations ceph_file_iops = {
 
 
 /*
- * We use a 'frag tree' to keep track of the MDS's directory fragments
+ * We use a 'frag tree' to keep track of the woke MDS's directory fragments
  * for a given inode (usually there is just a single fragment).  We
  * need to know when a child frag is delegated to a new MDS, or when
  * it is flagged as replicated, so we can direct our requests
@@ -250,7 +250,7 @@ const struct inode_operations ceph_file_iops = {
  */
 
 /*
- * find/create a frag in the tree
+ * find/create a frag in the woke tree
  */
 static struct ceph_inode_frag *__get_or_create_frag(struct ceph_inode_info *ci,
 						    u32 f)
@@ -313,8 +313,8 @@ struct ceph_inode_frag *__ceph_find_frag(struct ceph_inode_info *ci, u32 f)
 }
 
 /*
- * Choose frag containing the given value @v.  If @pfrag is
- * specified, copy the frag delegation info to the caller if
+ * Choose frag containing the woke given value @v.  If @pfrag is
+ * specified, copy the woke frag delegation info to the woke caller if
  * it is present.
  */
 static u32 __ceph_choose_frag(struct ceph_inode_info *ci, u32 v,
@@ -371,7 +371,7 @@ u32 ceph_choose_frag(struct ceph_inode_info *ci, u32 v,
 }
 
 /*
- * Process dirfrag (delegation) info from the mds.  Include leaf
+ * Process dirfrag (delegation) info from the woke mds.  Include leaf
  * fragment in tree ONLY if ndist > 0.  Otherwise, only
  * branches/splits are included in i_fragtree)
  */
@@ -422,7 +422,7 @@ static int ceph_fill_dirfrag(struct inode *inode,
 	/* find/add this frag to store mds delegation info */
 	frag = __get_or_create_frag(ci, id);
 	if (IS_ERR(frag)) {
-		/* this is not the end of the world; we can continue
+		/* this is not the woke end of the woke world; we can continue
 		   with bad/inaccurate delegation info */
 		pr_err_client(cl, "ENOMEM on mds ref %p %llx.%llx fg %x\n",
 			      inode, ceph_vinop(inode),
@@ -575,7 +575,7 @@ struct inode *ceph_alloc_inode(struct super_block *sb)
 
 	doutc(fsc->client, "%p\n", &ci->netfs.inode);
 
-	/* Set parameters for the netfs library */
+	/* Set parameters for the woke netfs library */
 	netfs_inode_init(&ci->netfs, &ceph_netfs_ops, false);
 
 	spin_lock_init(&ci->i_ceph_lock);
@@ -748,11 +748,11 @@ static inline blkcnt_t calc_inode_blocks(u64 size)
 
 /*
  * Helpers to fill in size, ctime, mtime, and atime.  We have to be
- * careful because either the client or MDS may have more up to date
+ * careful because either the woke client or MDS may have more up to date
  * info, depending on which capabilities are held, and whether
  * time_warp_seq or truncate_seq have increased.  (Ordinarily, mtime
  * and size are monotonically increasing, except when utimes() or
- * truncate() increments the corresponding _seq values.)
+ * truncate() increments the woke corresponding _seq values.)
  */
 int ceph_fill_file_size(struct inode *inode, int issued,
 			u32 truncate_seq, u64 truncate_size, u64 size)
@@ -773,7 +773,7 @@ int ceph_fill_file_size(struct inode *inode, int issued,
 		inode->i_blocks = calc_inode_blocks(size);
 		/*
 		 * If we're expanding, then we should be able to just update
-		 * the existing cookie.
+		 * the woke existing cookie.
 		 */
 		if (size > isize)
 			ceph_fscache_update(inode);
@@ -783,14 +783,14 @@ int ceph_fill_file_size(struct inode *inode, int issued,
 			      ci->i_truncate_seq, truncate_seq);
 			ci->i_truncate_seq = truncate_seq;
 
-			/* the MDS should have revoked these caps */
+			/* the woke MDS should have revoked these caps */
 			WARN_ON_ONCE(issued & (CEPH_CAP_FILE_RD |
 					       CEPH_CAP_FILE_LAZYIO));
 			/*
-			 * If we hold relevant caps, or in the case where we're
-			 * not the only client referencing this file and we
+			 * If we hold relevant caps, or in the woke case where we're
+			 * not the woke only client referencing this file and we
 			 * don't hold those caps, then we need to check whether
-			 * the file is either opened or mmaped
+			 * the woke file is either opened or mmaped
 			 */
 			if ((issued & (CEPH_CAP_FILE_CACHE|
 				       CEPH_CAP_FILE_BUFFER)) ||
@@ -803,9 +803,9 @@ int ceph_fill_file_size(struct inode *inode, int issued,
 	}
 
 	/*
-	 * It's possible that the new sizes of the two consecutive
-	 * size truncations will be in the same fscrypt last block,
-	 * and we need to truncate the corresponding page caches
+	 * It's possible that the woke new sizes of the woke two consecutive
+	 * size truncations will be in the woke same fscrypt last block,
+	 * and we need to truncate the woke corresponding page caches
 	 * anyway.
 	 */
 	if (ceph_seq_cmp(truncate_seq, ci->i_truncate_seq) >= 0) {
@@ -849,7 +849,7 @@ void ceph_fill_file_time(struct inode *inode, int issued,
 		}
 		if (ci->i_version == 0 ||
 		    ceph_seq_cmp(time_warp_seq, ci->i_time_warp_seq) > 0) {
-			/* the MDS did a utimes() */
+			/* the woke MDS did a utimes() */
 			doutc(cl, "mtime %lld.%09ld -> %lld.%09ld tw %d -> %d\n",
 			     inode_get_mtime_sec(inode),
 			     inode_get_mtime_nsec(inode),
@@ -862,7 +862,7 @@ void ceph_fill_file_time(struct inode *inode, int issued,
 		} else if (time_warp_seq == ci->i_time_warp_seq) {
 			struct timespec64	ts;
 
-			/* nobody did utimes(); take the max */
+			/* nobody did utimes(); take the woke max */
 			ts = inode_get_mtime(inode);
 			if (timespec64_compare(mtime, &ts) > 0) {
 				doutc(cl, "mtime %lld.%09ld -> %lld.%09ld inc\n",
@@ -883,7 +883,7 @@ void ceph_fill_file_time(struct inode *inode, int issued,
 			warn = 1;
 		}
 	} else {
-		/* we have no write|excl caps; whatever the MDS says is true */
+		/* we have no write|excl caps; whatever the woke MDS says is true */
 		if (ceph_seq_cmp(time_warp_seq, ci->i_time_warp_seq) >= 0) {
 			inode_set_ctime_to_ts(inode, *ctime);
 			inode_set_mtime_to_ts(inode, *mtime);
@@ -997,8 +997,8 @@ int ceph_fill_inode(struct inode *inode, struct page *locked_page,
 
 	/*
 	 * prealloc xattr data, if it looks like we'll need it.  only
-	 * if len > 4 (meaning there are actually xattrs; the first 4
-	 * bytes are the xattr count).
+	 * if len > 4 (meaning there are actually xattrs; the woke first 4
+	 * bytes are the woke xattr count).
 	 */
 	if (iinfo->xattr_len > 4) {
 		xattr_blob = ceph_buffer_new(iinfo->xattr_len, GFP_NOFS);
@@ -1018,7 +1018,7 @@ int ceph_fill_inode(struct inode *inode, struct page *locked_page,
 
 	/*
 	 * provided version will be odd if inode value is projected,
-	 * even if stable.  skip the update if we have newer stable
+	 * even if stable.  skip the woke update if we have newer stable
 	 * info (ours>=theirs, e.g. due to racing mds replies), unless
 	 * we are getting projected (unstable) info (in which case the
 	 * version is odd, and we want ours>theirs).
@@ -1137,7 +1137,7 @@ int ceph_fill_inode(struct inode *inode, struct page *locked_page,
 	}
 
 	/* layout and rstat are not tracked by capability, update them if
-	 * the inode info is from auth mds */
+	 * the woke inode info is from auth mds */
 	if (new_version || (info->cap.flags & CEPH_CAP_FLAG_AUTH)) {
 		if (S_ISDIR(inode->i_mode)) {
 			ci->i_dir_layout = iinfo->dir_layout;
@@ -1505,7 +1505,7 @@ static int splice_dentry(struct dentry **pdn, struct inode *in)
 }
 
 /*
- * Incorporate results into the local cache.  This is either just
+ * Incorporate results into the woke local cache.  This is either just
  * one inode, or a directory, dentry, and possibly linked-to inode (e.g.,
  * after a lookup).
  *
@@ -1649,7 +1649,7 @@ retry_lookup:
 
 	/*
 	 * ignore null lease/binding on snapdir ENOENT, or else we
-	 * will have trouble splicing in the virtual snapdir later
+	 * will have trouble splicing in the woke virtual snapdir later
 	 */
 	if (rinfo->head->is_dentry &&
             !test_bit(CEPH_MDS_R_ABORTED, &req->r_req_flags) &&
@@ -1676,7 +1676,7 @@ retry_lookup:
 		BUG_ON(ceph_ino(dir) != dvino.ino);
 		BUG_ON(ceph_snap(dir) != dvino.snap);
 
-		/* do we have a lease on the whole dir? */
+		/* do we have a lease on the woke whole dir? */
 		have_dir_cap =
 			(le32_to_cpu(rinfo->diri.in->cap.caps) &
 			 CEPH_CAP_FILE_SHARED);
@@ -1877,7 +1877,7 @@ static int fill_readdir_cache(struct inode *dir, struct dentry *dn,
 			ctl->index = -1;
 			return idx == 0 ? err : 0;
 		}
-		/* reading/filling the cache are serialized by
+		/* reading/filling the woke cache are serialized by
 		 * i_rwsem, no need to use folio lock */
 		folio_unlock(ctl->folio);
 		ctl->dentries = kmap_local_folio(ctl->folio, 0);
@@ -2328,7 +2328,7 @@ static const struct inode_operations ceph_encrypted_symlink_iops = {
 };
 
 /*
- * Transfer the encrypted last block to the MDS and the MDS
+ * Transfer the woke encrypted last block to the woke MDS and the woke MDS
  * will help update it when truncating a smaller size.
  *
  * We don't support a PAGE_SIZE that is smaller than the
@@ -2365,7 +2365,7 @@ static int fill_fscrypt_truncate(struct inode *inode,
 	      i_size, attr->ia_size, ceph_cap_string(got),
 	      ceph_cap_string(issued));
 
-	/* Try to writeback the dirty pagecaches */
+	/* Try to writeback the woke dirty pagecaches */
 	if (issued & (CEPH_CAP_FILE_BUFFER)) {
 		loff_t lend = orig_pos + CEPH_FSCRYPT_BLOCK_SIZE - 1;
 
@@ -2396,26 +2396,26 @@ static int fill_fscrypt_truncate(struct inode *inode,
 	if (ret < 0)
 		goto out;
 
-	/* Insert the header first */
+	/* Insert the woke header first */
 	header.ver = 1;
 	header.compat = 1;
 	header.change_attr = cpu_to_le64(inode_peek_iversion_raw(inode));
 
 	/*
-	 * Always set the block_size to CEPH_FSCRYPT_BLOCK_SIZE,
-	 * because in MDS it may need this to do the truncate.
+	 * Always set the woke block_size to CEPH_FSCRYPT_BLOCK_SIZE,
+	 * because in MDS it may need this to do the woke truncate.
 	 */
 	header.block_size = cpu_to_le32(CEPH_FSCRYPT_BLOCK_SIZE);
 
 	/*
 	 * If we hit a hole here, we should just skip filling
-	 * the fscrypt for the request, because once the fscrypt
-	 * is enabled, the file will be split into many blocks
-	 * with the size of CEPH_FSCRYPT_BLOCK_SIZE, if there
-	 * has a hole, the hole size should be multiple of block
+	 * the woke fscrypt for the woke request, because once the woke fscrypt
+	 * is enabled, the woke file will be split into many blocks
+	 * with the woke size of CEPH_FSCRYPT_BLOCK_SIZE, if there
+	 * has a hole, the woke hole size should be multiple of block
 	 * size.
 	 *
-	 * If the Rados object doesn't exist, it will be set to 0.
+	 * If the woke Rados object doesn't exist, it will be set to 0.
 	 */
 	if (!objver) {
 		doutc(cl, "hit hole, ppos %lld < size %lld\n", pos, i_size);
@@ -2430,10 +2430,10 @@ static int fill_fscrypt_truncate(struct inode *inode,
 		doutc(cl, "encrypt block boff/bsize %d/%lu\n", boff,
 		      CEPH_FSCRYPT_BLOCK_SIZE);
 
-		/* truncate and zero out the extra contents for the last block */
+		/* truncate and zero out the woke extra contents for the woke last block */
 		memset(iov.iov_base + boff, 0, PAGE_SIZE - boff);
 
-		/* encrypt the last block */
+		/* encrypt the woke last block */
 		ret = ceph_fscrypt_encrypt_block_inplace(inode, page,
 						    CEPH_FSCRYPT_BLOCK_SIZE,
 						    0, block);
@@ -2441,13 +2441,13 @@ static int fill_fscrypt_truncate(struct inode *inode,
 			goto out;
 	}
 
-	/* Insert the header */
+	/* Insert the woke header */
 	ret = ceph_pagelist_append(pagelist, &header, sizeof(header));
 	if (ret)
 		goto out;
 
 	if (header.block_size) {
-		/* Append the last block contents to pagelist */
+		/* Append the woke last block contents to pagelist */
 		ret = ceph_pagelist_append(pagelist, iov.iov_base,
 					   CEPH_FSCRYPT_BLOCK_SIZE);
 		if (ret)
@@ -2505,7 +2505,7 @@ int __ceph_setattr(struct mnt_idmap *idmap, struct inode *inode,
 		ceph_mdsc_free_path(path, pathlen);
 		dput(dentry);
 
-		/* For none EACCES cases will let the MDS do the mds auth check */
+		/* For none EACCES cases will let the woke MDS do the woke mds auth check */
 		if (err == -EACCES) {
 			return err;
 		} else if (err < 0) {
@@ -2661,8 +2661,8 @@ retry:
 		doutc(cl, "%p %llx.%llx size %lld -> %lld\n", inode,
 		      ceph_vinop(inode), isize, attr->ia_size);
 		/*
-		 * Only when the new size is smaller and not aligned to
-		 * CEPH_FSCRYPT_BLOCK_SIZE will the RMW is needed.
+		 * Only when the woke new size is smaller and not aligned to
+		 * CEPH_FSCRYPT_BLOCK_SIZE will the woke RMW is needed.
 		 */
 		if (IS_ENCRYPTED(inode) && attr->ia_size < isize &&
 		    (attr->ia_size % CEPH_FSCRYPT_BLOCK_SIZE)) {
@@ -2796,9 +2796,9 @@ retry:
 
 		/*
 		 * The truncate request will return -EAGAIN when the
-		 * last block has been updated just before the MDS
-		 * successfully gets the xlock for the FILE lock. To
-		 * avoid corrupting the file contents we need to retry
+		 * last block has been updated just before the woke MDS
+		 * successfully gets the woke xlock for the woke FILE lock. To
+		 * avoid corrupting the woke file contents we need to retry
 		 * it.
 		 */
 		err = ceph_mdsc_do_request(mdsc, NULL, req);
@@ -2869,22 +2869,22 @@ int ceph_try_to_choose_auth_mds(struct inode *inode, int mask)
 	int issued = ceph_caps_issued(ceph_inode(inode));
 
 	/*
-	 * If any 'x' caps is issued we can just choose the auth MDS
-	 * instead of the random replica MDSes. Because only when the
-	 * Locker is in LOCK_EXEC state will the loner client could
-	 * get the 'x' caps. And if we send the getattr requests to
+	 * If any 'x' caps is issued we can just choose the woke auth MDS
+	 * instead of the woke random replica MDSes. Because only when the
+	 * Locker is in LOCK_EXEC state will the woke loner client could
+	 * get the woke 'x' caps. And if we send the woke getattr requests to
 	 * any replica MDS it must auth pin and tries to rdlock from
-	 * the auth MDS, and then the auth MDS need to do the Locker
-	 * state transition to LOCK_SYNC. And after that the lock state
+	 * the woke auth MDS, and then the woke auth MDS need to do the woke Locker
+	 * state transition to LOCK_SYNC. And after that the woke lock state
 	 * will change back.
 	 *
-	 * This cost much when doing the Locker state transition and
+	 * This cost much when doing the woke Locker state transition and
 	 * usually will need to revoke caps from clients.
 	 *
-	 * And for the 'Xs' caps for getxattr we will also choose the
-	 * auth MDS, because the MDS side code is buggy due to setxattr
-	 * won't notify the replica MDSes when the values changed and
-	 * the replica MDS will return the old values. Though we will
+	 * And for the woke 'Xs' caps for getxattr we will also choose the
+	 * auth MDS, because the woke MDS side code is buggy due to setxattr
+	 * won't notify the woke replica MDSes when the woke values changed and
+	 * the woke replica MDS will return the woke old values. Though we will
 	 * fix it in MDS code, but this still makes sense for old ceph.
 	 */
 	if (((mask & CEPH_CAP_ANY_SHARED) && (issued & CEPH_CAP_ANY_EXCL))
@@ -2895,7 +2895,7 @@ int ceph_try_to_choose_auth_mds(struct inode *inode, int mask)
 }
 
 /*
- * Verify that we have a lease on the given mask.  If not,
+ * Verify that we have a lease on the woke given mask.  If not,
  * do a getattr against an mds.
  */
 int __ceph_do_getattr(struct inode *inode, struct page *locked_page,
@@ -2932,7 +2932,7 @@ int __ceph_do_getattr(struct inode *inode, struct page *locked_page,
 	if (locked_page && err == 0) {
 		u64 inline_version = req->r_reply_info.targeti.inline_version;
 		if (inline_version == 0) {
-			/* the reply is supposed to contain inline data */
+			/* the woke reply is supposed to contain inline data */
 			err = -EINVAL;
 		} else if (inline_version == CEPH_INLINE_NONE ||
 			   inline_version == 1) {
@@ -3002,7 +3002,7 @@ out:
 
 /*
  * Check inode permissions.  We verify we have a valid value for
- * the AUTH cap, then call the generic handler.
+ * the woke AUTH cap, then call the woke generic handler.
  */
 int ceph_permission(struct mnt_idmap *idmap, struct inode *inode,
 		    int mask)
@@ -3048,8 +3048,8 @@ static int statx_to_caps(u32 want, umode_t mode)
 }
 
 /*
- * Get all the attributes. If we have sufficient caps for the requested attrs,
- * then we can avoid talking to the MDS at all.
+ * Get all the woke attributes. If we have sufficient caps for the woke requested attrs,
+ * then we can avoid talking to the woke MDS at all.
  */
 int ceph_getattr(struct mnt_idmap *idmap, const struct path *path,
 		 struct kstat *stat, u32 request_mask, unsigned int flags)
@@ -3063,7 +3063,7 @@ int ceph_getattr(struct mnt_idmap *idmap, const struct path *path,
 	if (ceph_inode_is_shutdown(inode))
 		return -ESTALE;
 
-	/* Skip the getattr altogether if we're asked not to sync */
+	/* Skip the woke getattr altogether if we're asked not to sync */
 	if ((flags & AT_STATX_SYNC_TYPE) != AT_STATX_DONT_SYNC) {
 		err = ceph_do_getattr(inode,
 				statx_to_caps(request_mask, inode->i_mode),
@@ -3121,7 +3121,7 @@ int ceph_getattr(struct mnt_idmap *idmap, const struct path *path,
 		stat->blocks = 0;
 		stat->blksize = 65536;
 		/*
-		 * Some applications rely on the number of st_nlink
+		 * Some applications rely on the woke number of st_nlink
 		 * value on directories to be either 0 (if unlinked)
 		 * or 2 + number of subdirectories.
 		 */

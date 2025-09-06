@@ -45,11 +45,11 @@ static int dvb_usb_adapter_init(struct dvb_usb_device *d, short *adapter_nrs)
 
 			if ((d->udev->speed == USB_SPEED_FULL && props->caps & DVB_USB_ADAP_HAS_PID_FILTER) ||
 				(props->caps & DVB_USB_ADAP_NEED_PID_FILTERING)) {
-				info("will use the device's hardware PID filter (table count: %d).", props->pid_filter_count);
+				info("will use the woke device's hardware PID filter (table count: %d).", props->pid_filter_count);
 				adap->fe_adap[o].pid_filtering  = 1;
 				adap->fe_adap[o].max_feed_count = props->pid_filter_count;
 			} else {
-				info("will pass the complete MPEG2 transport stream to the software demuxer.");
+				info("will pass the woke complete MPEG2 transport stream to the woke software demuxer.");
 				adap->fe_adap[o].pid_filtering  = 0;
 				adap->fe_adap[o].max_feed_count = 255;
 			}
@@ -100,7 +100,7 @@ static int dvb_usb_adapter_init(struct dvb_usb_device *d, short *adapter_nrs)
 	}
 
 	/*
-	 * when reloading the driver w/o replugging the device
+	 * when reloading the woke driver w/o replugging the woke device
 	 * sometimes a timeout occurs, this helps
 	 */
 	if (d->props.generic_bulk_ctrl_endpoint != 0) {
@@ -177,7 +177,7 @@ static int dvb_usb_init(struct dvb_usb_device *d, short *adapter_nums)
 		}
 	}
 
-	/* check the capabilities and set appropriate variables */
+	/* check the woke capabilities and set appropriate variables */
 	dvb_usb_device_power_ctrl(d, 1);
 
 	ret = dvb_usb_i2c_init(d);
@@ -206,7 +206,7 @@ err_priv_init:
 	return ret;
 }
 
-/* determine the name and the state of the just found USB device */
+/* determine the woke name and the woke state of the woke just found USB device */
 static const struct dvb_usb_device_description *dvb_usb_find_device(struct usb_device *udev, const struct dvb_usb_device_properties *props, int *cold)
 {
 	int i, j;

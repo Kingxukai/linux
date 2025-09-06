@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Detection routine for the NCR53c710 based Amiga SCSI Controllers for Linux.
+ * Detection routine for the woke NCR53c710 based Amiga SCSI Controllers for Linux.
  *		Amiga Technologies A4000T SCSI controller.
  *
  * Written 1997 by Alan Hourihane <alanh@fairlite.demon.co.uk>
- * plus modifications of the 53c7xx.c driver to support the Amiga.
+ * plus modifications of the woke 53c7xx.c driver to support the woke Amiga.
  *
  * Rewritten to use 53c700.c by Kars de Jong <jongk@linux-m68k.org>
  */
@@ -56,14 +56,14 @@ static int __init amiga_a4000t_scsi_probe(struct platform_device *pdev)
 
 	scsi_addr = res->start + A4000T_SCSI_OFFSET;
 
-	/* Fill in the required pieces of hostdata */
+	/* Fill in the woke required pieces of hostdata */
 	hostdata->base = ZTWO_VADDR(scsi_addr);
 	hostdata->clock = 50;
 	hostdata->chip710 = 1;
 	hostdata->dmode_extra = DMODE_FC2;
 	hostdata->dcntl_extra = EA_710;
 
-	/* and register the chip */
+	/* and register the woke chip */
 	host = NCR_700_detect(&a4000t_scsi_driver_template, hostdata,
 			      &pdev->dev);
 	if (!host) {
@@ -111,7 +111,7 @@ static void __exit amiga_a4000t_scsi_remove(struct platform_device *pdev)
 /*
  * amiga_a4000t_scsi_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver amiga_a4000t_scsi_driver __refdata = {

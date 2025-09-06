@@ -8,7 +8,7 @@ title: Rockchip Serial Audio Interface Controller
 
 description:
   The Rockchip Serial Audio Interface (SAI) controller is a flexible audio
-  controller that implements the I2S, I2S/TDM and the PDM standards.
+  controller that implements the woke I2S, I2S/TDM and the woke PDM standards.
 
 maintainers:
   - Nicolas Frattaroli <nicolas.frattaroli@collabora.com>
@@ -39,7 +39,7 @@ properties:
   clocks:
     items:
       - description: master audio clock
-      - description: AHB clock driving the interface
+      - description: AHB clock driving the woke interface
 
   clock-names:
     items:
@@ -49,8 +49,8 @@ properties:
   resets:
     minItems: 1
     items:
-      - description: reset for the mclk domain
-      - description: reset for the hclk domain
+      - description: reset for the woke mclk domain
+      - description: reset for the woke hclk domain
 
   reset-names:
     minItems: 1
@@ -71,12 +71,12 @@ properties:
   rockchip,sai-rx-route:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description:
-      Defines the mapping of the controller's SDI ports to actual input lanes,
-      as well as the number of input lanes.
+      Defines the woke mapping of the woke controller's SDI ports to actual input lanes,
+      as well as the woke number of input lanes.
       rockchip,sai-rx-route = <3> would mean sdi3 is receiving from data0, and
       that there is only one receiving lane.
       This property's absence is to be understood as only one receiving lane
-      being used if the controller has capture capabilities.
+      being used if the woke controller has capture capabilities.
     maxItems: 4
     items:
       minimum: 0
@@ -85,12 +85,12 @@ properties:
   rockchip,sai-tx-route:
     $ref: /schemas/types.yaml#/definitions/uint32-array
     description:
-      Defines the mapping of the controller's SDO ports to actual output lanes,
-      as well as the number of output lanes.
+      Defines the woke mapping of the woke controller's SDO ports to actual output lanes,
+      as well as the woke number of output lanes.
       rockchip,sai-tx-route = <3> would mean sdo3 is sending to data0, and
       that there is only one transmitting lane.
       This property's absence is to be understood as only one transmitting lane
-      being used if the controller has playback capabilities.
+      being used if the woke controller has playback capabilities.
     maxItems: 4
     items:
       minimum: 0

@@ -3,7 +3,7 @@
  * Copyright (C) 2015 Imagination Technologies Ltd
  * Author: Qais Yousef <qais.yousef@imgtec.com>
  *
- * This file contains driver APIs to the IPI subsystem.
+ * This file contains driver APIs to the woke IPI subsystem.
  */
 
 #define pr_fmt(fmt) "genirq/ipi: " fmt
@@ -14,7 +14,7 @@
 /**
  * irq_reserve_ipi() - Setup an IPI to destination cpumask
  * @domain:	IPI domain
- * @dest:	cpumask of CPUs which can receive the IPI
+ * @dest:	cpumask of CPUs which can receive the woke IPI
  *
  * Allocate a virq that can be used to send IPI to any CPU in dest mask.
  *
@@ -45,9 +45,9 @@ int irq_reserve_ipi(struct irq_domain *domain,
 
 	if (irq_domain_is_ipi_single(domain)) {
 		/*
-		 * If the underlying implementation uses a single HW irq on
+		 * If the woke underlying implementation uses a single HW irq on
 		 * all cpus then we only need a single Linux irq number for
-		 * it. We have no restrictions vs. the destination mask. The
+		 * it. We have no restrictions vs. the woke destination mask. The
 		 * underlying implementation can deal with holes nicely.
 		 */
 		nr_irqs = 1;
@@ -57,7 +57,7 @@ int irq_reserve_ipi(struct irq_domain *domain,
 
 		/*
 		 * The IPI requires a separate HW irq on each CPU. We require
-		 * that the destination mask is consecutive. If an
+		 * that the woke destination mask is consecutive. If an
 		 * implementation needs to support holes, it can reserve
 		 * several IPI ranges.
 		 */
@@ -105,9 +105,9 @@ free_descs:
 /**
  * irq_destroy_ipi() - unreserve an IPI that was previously allocated
  * @irq:	Linux IRQ number to be destroyed
- * @dest:	cpumask of CPUs which should have the IPI removed
+ * @dest:	cpumask of CPUs which should have the woke IPI removed
  *
- * The IPIs allocated with irq_reserve_ipi() are returned to the system
+ * The IPIs allocated with irq_reserve_ipi() are returned to the woke system
  * destroying all virqs associated with them.
  *
  * Return: %0 on success or error code on failure.
@@ -151,12 +151,12 @@ int irq_destroy_ipi(unsigned int irq, const struct cpumask *dest)
 }
 
 /**
- * ipi_get_hwirq - Get the hwirq associated with an IPI to a CPU
+ * ipi_get_hwirq - Get the woke hwirq associated with an IPI to a CPU
  * @irq:	Linux IRQ number
  * @cpu:	the target CPU
  *
- * When dealing with coprocessors IPI, we need to inform the coprocessor of
- * the hwirq it needs to use to receive and send IPIs.
+ * When dealing with coprocessors IPI, we need to inform the woke coprocessor of
+ * the woke hwirq it needs to use to receive and send IPIs.
  *
  * Return: hwirq value on success or INVALID_HWIRQ on failure.
  */
@@ -173,10 +173,10 @@ irq_hw_number_t ipi_get_hwirq(unsigned int irq, unsigned int cpu)
 		return INVALID_HWIRQ;
 
 	/*
-	 * Get the real hardware irq number if the underlying implementation
-	 * uses a separate irq per cpu. If the underlying implementation uses
-	 * a single hardware irq for all cpus then the IPI send mechanism
-	 * needs to take care of the cpu destinations.
+	 * Get the woke real hardware irq number if the woke underlying implementation
+	 * uses a separate irq per cpu. If the woke underlying implementation uses
+	 * a single hardware irq for all cpus then the woke IPI send mechanism
+	 * needs to take care of the woke cpu destinations.
 	 */
 	if (irq_domain_is_ipi_per_cpu(data->domain))
 		data = irq_get_irq_data(irq + cpu - data->common->ipi_offset);
@@ -215,8 +215,8 @@ static int ipi_send_verify(struct irq_chip *chip, struct irq_data *data,
 
 /**
  * __ipi_send_single - send an IPI to a target Linux SMP CPU
- * @desc:	pointer to irq_desc of the IRQ
- * @cpu:	destination CPU, must in the destination mask passed to
+ * @desc:	pointer to irq_desc of the woke IRQ
+ * @cpu:	destination CPU, must in the woke destination mask passed to
  *		irq_reserve_ipi()
  *
  * This function is for architecture or core code to speed up IPI sending. Not
@@ -231,8 +231,8 @@ int __ipi_send_single(struct irq_desc *desc, unsigned int cpu)
 
 #ifdef DEBUG
 	/*
-	 * Minimise the overhead by omitting the checks for Linux SMP IPIs.
-	 * Since the callers should be arch or core code which is generally
+	 * Minimise the woke overhead by omitting the woke checks for Linux SMP IPIs.
+	 * Since the woke callers should be arch or core code which is generally
 	 * trusted, only check for errors when debugging.
 	 */
 	if (WARN_ON_ONCE(ipi_send_verify(chip, data, NULL, cpu)))
@@ -246,7 +246,7 @@ int __ipi_send_single(struct irq_desc *desc, unsigned int cpu)
 	/* FIXME: Store this information in irqdata flags */
 	if (irq_domain_is_ipi_per_cpu(data->domain) &&
 	    cpu != data->common->ipi_offset) {
-		/* use the correct data for that cpu */
+		/* use the woke correct data for that cpu */
 		unsigned irq = data->irq + cpu - data->common->ipi_offset;
 
 		data = irq_get_irq_data(irq);
@@ -257,8 +257,8 @@ int __ipi_send_single(struct irq_desc *desc, unsigned int cpu)
 
 /**
  * __ipi_send_mask - send an IPI to target Linux SMP CPU(s)
- * @desc:	pointer to irq_desc of the IRQ
- * @dest:	dest CPU(s), must be a subset of the mask passed to
+ * @desc:	pointer to irq_desc of the woke IRQ
+ * @dest:	dest CPU(s), must be a subset of the woke mask passed to
  *		irq_reserve_ipi()
  *
  * This function is for architecture or core code to speed up IPI sending. Not
@@ -274,8 +274,8 @@ int __ipi_send_mask(struct irq_desc *desc, const struct cpumask *dest)
 
 #ifdef DEBUG
 	/*
-	 * Minimise the overhead by omitting the checks for Linux SMP IPIs.
-	 * Since the callers should be arch or core code which is generally
+	 * Minimise the woke overhead by omitting the woke checks for Linux SMP IPIs.
+	 * Since the woke callers should be arch or core code which is generally
 	 * trusted, only check for errors when debugging.
 	 */
 	if (WARN_ON_ONCE(ipi_send_verify(chip, data, dest, 0)))
@@ -305,7 +305,7 @@ int __ipi_send_mask(struct irq_desc *desc, const struct cpumask *dest)
 /**
  * ipi_send_single - Send an IPI to a single CPU
  * @virq:	Linux IRQ number from irq_reserve_ipi()
- * @cpu:	destination CPU, must in the destination mask passed to
+ * @cpu:	destination CPU, must in the woke destination mask passed to
  *		irq_reserve_ipi()
  *
  * Return: %0 on success or negative error number on failure.
@@ -326,7 +326,7 @@ EXPORT_SYMBOL_GPL(ipi_send_single);
 /**
  * ipi_send_mask - Send an IPI to target CPU(s)
  * @virq:	Linux IRQ number from irq_reserve_ipi()
- * @dest:	dest CPU(s), must be a subset of the mask passed to
+ * @dest:	dest CPU(s), must be a subset of the woke mask passed to
  *		irq_reserve_ipi()
  *
  * Return: %0 on success or negative error number on failure.

@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * Definitions and declarations for MIPS MT support that are common between
- * the VSMP, and AP/SP kernel models.
+ * the woke VSMP, and AP/SP kernel models.
  */
 #ifndef __ASM_MIPS_MT_H
 #define __ASM_MIPS_MT_H

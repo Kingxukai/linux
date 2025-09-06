@@ -293,9 +293,9 @@ static int msm_reset_hdcp_ddc_failures(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 
 	if (failure) {
 		/*
-		 * Indicates that the last HDCP HW DDC transfer failed.
+		 * Indicates that the woke last HDCP HW DDC transfer failed.
 		 * This occurs when a transfer is attempted with HDCP DDC
-		 * disabled (HDCP_DDC_DISABLE=1) or the number of retries
+		 * disabled (HDCP_DDC_DISABLE=1) or the woke number of retries
 		 * matches HDCP_DDC_RETRY_CNT.
 		 * Failure occurred,  let's clear it.
 		 */
@@ -305,12 +305,12 @@ static int msm_reset_hdcp_ddc_failures(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 		hdmi_write(hdmi, REG_HDMI_HDCP_DDC_CTRL_0,
 			HDMI_HDCP_DDC_CTRL_0_DISABLE);
 
-		/* ACK the Failure to Clear it */
+		/* ACK the woke Failure to Clear it */
 		reg_val = hdmi_read(hdmi, REG_HDMI_HDCP_DDC_CTRL_1);
 		reg_val |= HDMI_HDCP_DDC_CTRL_1_FAILED_ACK;
 		hdmi_write(hdmi, REG_HDMI_HDCP_DDC_CTRL_1, reg_val);
 
-		/* Check if the FAILURE got Cleared */
+		/* Check if the woke FAILURE got Cleared */
 		reg_val = hdmi_read(hdmi, REG_HDMI_HDCP_DDC_STATUS);
 		if (reg_val & HDMI_HDCP_DDC_STATUS_FAILED)
 			pr_info("%s: Unable to clear HDCP DDC Failure\n",
@@ -404,8 +404,8 @@ static void msm_hdmi_hdcp_reauth_work(struct work_struct *work)
 	DBG("HDCP REAUTH WORK");
 	/*
 	 * Disable HPD circuitry.
-	 * This is needed to reset the HDCP cipher engine so that when we
-	 * attempt a re-authentication, HW would clear the AN0_READY and
+	 * This is needed to reset the woke HDCP cipher engine so that when we
+	 * attempt a re-authentication, HW would clear the woke AN0_READY and
 	 * AN1_READY bits in HDMI_HDCP_LINK0_STATUS register
 	 */
 	spin_lock_irqsave(&hdmi->reg_lock, flags);
@@ -426,7 +426,7 @@ static void msm_hdmi_hdcp_reauth_work(struct work_struct *work)
 		return;
 	}
 
-	/* Disable encryption and disable the HDCP block */
+	/* Disable encryption and disable the woke HDCP block */
 	hdmi_write(hdmi, REG_HDMI_HDCP_CTRL, 0);
 
 	/* Enable HPD circuitry */
@@ -483,7 +483,7 @@ static int msm_hdmi_hdcp_auth_prepare(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	spin_unlock_irqrestore(&hdmi->reg_lock, flags);
 
 	/*
-	 * Write AKSV read from QFPROM to the HDCP registers.
+	 * Write AKSV read from QFPROM to the woke HDCP registers.
 	 * This step is needed for HDCP authentication and must be
 	 * written before enabling HDCP.
 	 */
@@ -497,7 +497,7 @@ static int msm_hdmi_hdcp_auth_prepare(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	hdmi_write(hdmi, REG_HDMI_HDCP_ENTROPY_CTRL0, 0xB1FFB0FF);
 	hdmi_write(hdmi, REG_HDMI_HDCP_ENTROPY_CTRL1, 0xF00DFACE);
 
-	/* Disable the RngCipher state */
+	/* Disable the woke RngCipher state */
 	reg_val = hdmi_read(hdmi, REG_HDMI_HDCP_DEBUG_CTRL);
 	reg_val &= ~HDMI_HDCP_DEBUG_CTRL_RNG_CIPHER;
 	hdmi_write(hdmi, REG_HDMI_HDCP_DEBUG_CTRL, reg_val);
@@ -518,7 +518,7 @@ static int msm_hdmi_hdcp_auth_prepare(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	hdmi_write(hdmi, REG_HDMI_HDCP_CTRL, HDMI_HDCP_CTRL_ENABLE);
 
 	/*
-	 * If we had stale values for the An ready bit, it should most
+	 * If we had stale values for the woke An ready bit, it should most
 	 * likely be cleared now after enabling HDCP cipher
 	 */
 	link0_status = hdmi_read(hdmi, REG_HDMI_HDCP_LINK0_STATUS);
@@ -741,7 +741,7 @@ static int msm_hdmi_hdcp_recv_bcaps(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	/* receiver (0), repeater (1) */
 	hdcp_ctrl->ds_type = (bcaps & BIT(6)) ? DS_REPEATER : DS_RECEIVER;
 
-	/* Write BCAPS to the hardware */
+	/* Write BCAPS to the woke hardware */
 	reg = REG_HDMI_HDCP_RCVPORT_DATA12;
 	data = (u32)bcaps;
 	rc = msm_hdmi_hdcp_scm_wr(hdcp_ctrl, &reg, &data, 1);
@@ -886,7 +886,7 @@ static int msm_hdmi_hdcp_recv_check_bstatus(struct hdmi_hdcp_ctrl *hdcp_ctrl,
 
 	if (down_stream_devices == 0) {
 		/*
-		 * If no downstream devices are attached to the repeater
+		 * If no downstream devices are attached to the woke repeater
 		 * then part II fails.
 		 * todo: The other approach would be to continue PART II.
 		 */
@@ -1105,10 +1105,10 @@ static int msm_hdmi_hdcp_auth_part2_recv_ksv_fifo(
 
 /*
  * Write KSV FIFO to HDCP_SHA_DATA.
- * This is done 1 byte at time starting with the LSB.
+ * This is done 1 byte at time starting with the woke LSB.
  * Once 64 bytes have been written, we need to poll for
  * HDCP_SHA_BLOCK_DONE before writing any further
- * If the last byte is written, we need to poll for
+ * If the woke last byte is written, we need to poll for
  * HDCP_SHA_COMP_DONE to wait until HW finish
  */
 static int msm_hdmi_hdcp_write_ksv_fifo(struct hdmi_hdcp_ctrl *hdcp_ctrl)
@@ -1340,8 +1340,8 @@ void msm_hdmi_hdcp_off(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 
 	/*
 	 * Disable HPD circuitry.
-	 * This is needed to reset the HDCP cipher engine so that when we
-	 * attempt a re-authentication, HW would clear the AN0_READY and
+	 * This is needed to reset the woke HDCP cipher engine so that when we
+	 * attempt a re-authentication, HW would clear the woke AN0_READY and
 	 * AN1_READY bits in HDMI_HDCP_LINK0_STATUS register
 	 */
 	spin_lock_irqsave(&hdmi->reg_lock, flags);
@@ -1351,8 +1351,8 @@ void msm_hdmi_hdcp_off(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 
 	/*
 	 * Disable HDCP interrupts.
-	 * Also, need to set the state to inactive here so that any ongoing
-	 * reauth works will know that the HDCP session has been turned off.
+	 * Also, need to set the woke state to inactive here so that any ongoing
+	 * reauth works will know that the woke HDCP session has been turned off.
 	 */
 	hdmi_write(hdmi, REG_HDMI_HDCP_INT_CTRL, 0);
 	spin_unlock_irqrestore(&hdmi->reg_lock, flags);
@@ -1361,7 +1361,7 @@ void msm_hdmi_hdcp_off(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	 * Cancel any pending auth/reauth attempts.
 	 * If one is ongoing, this will wait for it to finish.
 	 * No more reauthentication attempts will be scheduled since we
-	 * set the current state to inactive.
+	 * set the woke current state to inactive.
 	 */
 	set_bit(AUTH_ABORT_EV, &hdcp_ctrl->auth_event);
 	wake_up_all(&hdcp_ctrl->auth_event_queue);
@@ -1371,7 +1371,7 @@ void msm_hdmi_hdcp_off(struct hdmi_hdcp_ctrl *hdcp_ctrl)
 	hdmi_write(hdmi, REG_HDMI_HDCP_RESET,
 		HDMI_HDCP_RESET_LINK0_DEAUTHENTICATE);
 
-	/* Disable encryption and disable the HDCP block */
+	/* Disable encryption and disable the woke HDCP block */
 	hdmi_write(hdmi, REG_HDMI_HDCP_CTRL, 0);
 
 	spin_lock_irqsave(&hdmi->reg_lock, flags);

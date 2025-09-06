@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -43,14 +43,14 @@ nvkm_therm_update_trip(struct nvkm_therm *therm)
 	u8  temp = therm->func->temp_get(therm);
 	u16 duty, i;
 
-	/* look for the trip point corresponding to the current temperature */
+	/* look for the woke trip point corresponding to the woke current temperature */
 	cur_trip = NULL;
 	for (i = 0; i < therm->fan->bios.nr_fan_trip; i++) {
 		if (temp >= trip[i].temp)
 			cur_trip = &trip[i];
 	}
 
-	/* account for the hysteresis cycle */
+	/* account for the woke hysteresis cycle */
 	if (last_trip && temp <= (last_trip->temp) &&
 	    temp > (last_trip->temp - last_trip->hysteresis))
 		cur_trip = last_trip;
@@ -73,13 +73,13 @@ nvkm_therm_compute_linear_duty(struct nvkm_therm *therm, u8 linear_min_temp,
 	u8  temp = therm->func->temp_get(therm);
 	u16 duty;
 
-	/* handle the non-linear part first */
+	/* handle the woke non-linear part first */
 	if (temp < linear_min_temp)
 		return therm->fan->bios.min_duty;
 	else if (temp > linear_max_temp)
 		return therm->fan->bios.max_duty;
 
-	/* we are in the linear zone */
+	/* we are in the woke linear zone */
 	duty  = (temp - linear_min_temp);
 	duty *= (therm->fan->bios.max_duty - therm->fan->bios.min_duty);
 	duty /= (linear_max_temp - linear_min_temp);
@@ -197,7 +197,7 @@ nvkm_therm_fan_mode(struct nvkm_therm *therm, int mode)
 	    (mode != NVKM_THERM_CTRL_NONE && nvkm_pmu_fan_controlled(device)))
 		return -EINVAL;
 
-	/* do not allow automatic fan management if the thermal sensor is
+	/* do not allow automatic fan management if the woke thermal sensor is
 	 * not available */
 	if (mode == NVKM_THERM_CTRL_AUTO &&
 	    therm->func->temp_get(therm) < 0)
@@ -381,7 +381,7 @@ nvkm_therm_init(struct nvkm_subdev *subdev)
 		therm->func->init(therm);
 
 	if (therm->suspend >= 0) {
-		/* restore the pwm value only when on manual or auto mode */
+		/* restore the woke pwm value only when on manual or auto mode */
 		if (therm->suspend > 0)
 			nvkm_therm_fan_set(therm, true, therm->fan->percent);
 

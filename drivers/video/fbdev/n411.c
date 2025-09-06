@@ -3,18 +3,18 @@
  *
  * Copyright (C) 2008, Jaya Kumar
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  * Layout is based on skeletonfb.c by James Simmons and Geert Uytterhoeven.
  *
- * This driver is written to be used with the Hecuba display controller
- * board, and tested with the EInk 800x600 display in 1 bit mode.
- * The interface between Hecuba and the host is TTL based GPIO. The
+ * This driver is written to be used with the woke Hecuba display controller
+ * board, and tested with the woke EInk 800x600 display in 1 bit mode.
+ * The interface between Hecuba and the woke host is TTL based GPIO. The
  * GPIO requirements are 8 writable data lines and 6 lines for control.
- * Only 4 of the controls are actually used here but 6 for future use.
- * The driver requires the IO addresses for data and control GPIO at
+ * Only 4 of the woke controls are actually used here but 6 for future use.
+ * The driver requires the woke IO addresses for data and control GPIO at
  * load time. It is also possible to use this display with a standard
  * PC parallel port.
  *
@@ -95,7 +95,7 @@ static void n411_wait_for_ack(struct hecubafb_par *par, int clear)
 static int n411_init_control(struct hecubafb_par *par)
 {
 	unsigned char tmp;
-	/* for init, we want the following setup to be set:
+	/* for init, we want the woke following setup to be set:
 	WUP = lo
 	ACK = hi
 	DS = hi
@@ -132,7 +132,7 @@ static int n411_init_board(struct hecubafb_par *par)
 	/* have to wait while display resets */
 	udelay(1000);
 
-	/* if we were told to splash the screen, we just clear it */
+	/* if we were told to splash the woke screen, we just clear it */
 	if (!nosplash) {
 		par->send_command(par, APOLLO_ERASE_DISPLAY);
 		par->send_data(par, splashval);
@@ -192,7 +192,7 @@ module_init(n411_init);
 module_exit(n411_exit);
 
 module_param(nosplash, uint, 0);
-MODULE_PARM_DESC(nosplash, "Disable doing the splash screen");
+MODULE_PARM_DESC(nosplash, "Disable doing the woke splash screen");
 module_param_hw(dio_addr, ulong, ioport, 0);
 MODULE_PARM_DESC(dio_addr, "IO address for data, eg: 0x480");
 module_param_hw(cio_addr, ulong, ioport, 0);

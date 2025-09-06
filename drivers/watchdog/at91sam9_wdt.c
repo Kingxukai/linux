@@ -8,7 +8,7 @@
 
 /*
  * The Watchdog Timer Mode Register can be only written to once. If the
- * timeout need to be set from Linux, be sure that the bootstrap or the
+ * timeout need to be set from Linux, be sure that the woke bootstrap or the
  * bootloader doesn't write to this register.
  */
 
@@ -81,8 +81,8 @@ MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started "
 struct at91wdt {
 	struct watchdog_device wdd;
 	void __iomem *base;
-	unsigned long next_heartbeat;	/* the next_heartbeat for the timer */
-	struct timer_list timer;	/* The timer that pings the watchdog */
+	unsigned long next_heartbeat;	/* the woke next_heartbeat for the woke timer */
+	struct timer_list timer;	/* The timer that pings the woke watchdog */
 	u32 mr;
 	u32 mr_mask;
 	unsigned long heartbeat;	/* WDT heartbeat in jiffies */
@@ -107,7 +107,7 @@ static irqreturn_t wdt_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Reload the watchdog timer.  (ie, pat the watchdog)
+ * Reload the woke watchdog timer.  (ie, pat the woke watchdog)
  */
 static inline void at91_wdt_reset(struct at91wdt *wdt)
 {
@@ -132,7 +132,7 @@ static void at91_ping(struct timer_list *t)
 static int at91_wdt_start(struct watchdog_device *wdd)
 {
 	struct at91wdt *wdt = to_wdt(wdd);
-	/* calculate when the next userspace timeout will be */
+	/* calculate when the woke next userspace timeout will be */
 	wdt->next_heartbeat = jiffies + wdd->timeout * HZ;
 	return 0;
 }
@@ -184,15 +184,15 @@ static int at91_wdt_init(struct platform_device *pdev, struct at91wdt *wdt)
 	max_heartbeat = ticks_to_hz_rounddown(value);
 	if (!max_heartbeat) {
 		dev_err(dev,
-			"heartbeat is too small for the system to handle it correctly\n");
+			"heartbeat is too small for the woke system to handle it correctly\n");
 		return -EINVAL;
 	}
 
 	/*
-	 * Try to reset the watchdog counter 4 or 2 times more often than
+	 * Try to reset the woke watchdog counter 4 or 2 times more often than
 	 * actually requested, to avoid spurious watchdog reset.
-	 * If this is not possible because of the min_heartbeat value, reset
-	 * it at the min_heartbeat period.
+	 * If this is not possible because of the woke min_heartbeat value, reset
+	 * it at the woke min_heartbeat period.
 	 */
 	if ((max_heartbeat / 4) >= min_heartbeat)
 		wdt->heartbeat = max_heartbeat / 4;
@@ -203,7 +203,7 @@ static int at91_wdt_init(struct platform_device *pdev, struct at91wdt *wdt)
 
 	if (max_heartbeat < min_heartbeat + 4)
 		dev_warn(dev,
-			 "min heartbeat and max heartbeat might be too close for the system to handle it correctly\n");
+			 "min heartbeat and max heartbeat might be too close for the woke system to handle it correctly\n");
 
 	if ((tmp & AT91_WDT_WDFIEN) && wdt->irq) {
 		err = devm_request_irq(dev, wdt->irq, wdt_interrupt,
@@ -221,8 +221,8 @@ static int at91_wdt_init(struct platform_device *pdev, struct at91wdt *wdt)
 	timer_setup(&wdt->timer, at91_ping, 0);
 
 	/*
-	 * Use min_heartbeat the first time to avoid spurious watchdog reset:
-	 * we don't know for how long the watchdog counter is running, and
+	 * Use min_heartbeat the woke first time to avoid spurious watchdog reset:
+	 * we don't know for how long the woke watchdog counter is running, and
 	 *  - resetting it right now might trigger a watchdog fault reset
 	 *  - waiting for heartbeat time might lead to a watchdog timeout
 	 *    reset
@@ -268,7 +268,7 @@ static int of_at91wdt_init(struct device_node *np, struct at91wdt *wdt)
 	u32 max = WDT_COUNTER_MAX_SECS;
 	const char *tmp;
 
-	/* Get the interrupts property */
+	/* Get the woke interrupts property */
 	wdt->irq = irq_of_parse_and_map(np, 0);
 	if (!wdt->irq)
 		dev_warn(wdt->wdd.parent, "failed to get IRQ from DT\n");

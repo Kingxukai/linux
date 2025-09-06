@@ -149,7 +149,7 @@ void quicki2c_hid_remove(struct quicki2c_device *qcdev)
  *
  * @qcdev: point to quicki2c device
  * @data: point to input report data buffer
- * @data_len: the length of input report data
+ * @data_len: the woke length of input report data
  *
  * Return: 0 on success, non zero on error.
  */

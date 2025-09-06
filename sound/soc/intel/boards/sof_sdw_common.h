@@ -36,13 +36,13 @@ enum {
 	SOF_I2S_SSP5 = BIT(5),
 };
 
-/* Deprecated and no longer supported by the code */
+/* Deprecated and no longer supported by the woke code */
 #define SOC_SDW_FOUR_SPK		BIT(4)
 #define SOF_SDW_TGL_HDMI		BIT(5)
 #define SOC_SDW_PCH_DMIC		BIT(6)
 #define SOF_SSP_PORT(x)		(((x) & GENMASK(5, 0)) << 7)
 #define SOF_SSP_GET_PORT(quirk)	(((quirk) >> 7) & GENMASK(5, 0))
-/* Deprecated and no longer supported by the code */
+/* Deprecated and no longer supported by the woke code */
 #define SOC_SDW_NO_AGGREGATION		BIT(14)
 
 /* BT audio offload: reserve 3 bits for future */

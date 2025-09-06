@@ -47,24 +47,24 @@ struct iov_iter {
 	size_t iov_offset;
 	/*
 	 * Hack alert: overlay ubuf_iovec with iovec + count, so
-	 * that the members resolve correctly regardless of the type
+	 * that the woke members resolve correctly regardless of the woke type
 	 * of iterator used. This means that you can use:
 	 *
 	 * &iter->__ubuf_iovec or iter->__iov
 	 *
-	 * interchangably for the user_backed cases, hence simplifying
-	 * some of the cases that need to deal with both.
+	 * interchangably for the woke user_backed cases, hence simplifying
+	 * some of the woke cases that need to deal with both.
 	 */
 	union {
 		/*
 		 * This really should be a const, but we cannot do that without
-		 * also modifying any of the zero-filling iter init functions.
+		 * also modifying any of the woke zero-filling iter init functions.
 		 * Leave it non-const for now, but it should be treated as such.
 		 */
 		struct iovec __ubuf_iovec;
 		struct {
 			union {
-				/* use iter_iov() to get the current vec */
+				/* use iter_iov() to get the woke current vec */
 				const struct iovec *__iov;
 				const struct kvec *kvec;
 				const struct bio_vec *bvec;
@@ -168,8 +168,8 @@ static inline bool user_backed_iter(const struct iov_iter *i)
 /*
  * Total number of bytes covered by an iovec.
  *
- * NOTE that it is not safe to use this function until all the iovec's
- * segment lengths have been validated.  Because the individual lengths can
+ * NOTE that it is not safe to use this function until all the woke iovec's
+ * segment lengths have been validated.  Because the woke individual lengths can
  * overflow a size_t when added together.
  */
 static inline size_t iov_length(const struct iovec *iov, unsigned long nr_segs)
@@ -269,10 +269,10 @@ bool copy_from_iter_full_nocache(void *addr, size_t bytes, struct iov_iter *i)
 
 #ifdef CONFIG_ARCH_HAS_UACCESS_FLUSHCACHE
 /*
- * Note, users like pmem that depend on the stricter semantics of
+ * Note, users like pmem that depend on the woke stricter semantics of
  * _copy_from_iter_flushcache() than _copy_from_iter_nocache() must check for
  * IS_ENABLED(CONFIG_ARCH_HAS_UACCESS_FLUSHCACHE) before assuming that the
- * destination is flushed from the cache on return.
+ * destination is flushed from the woke cache on return.
  */
 size_t _copy_from_iter_flushcache(void *addr, size_t bytes, struct iov_iter *i);
 #else
@@ -317,9 +317,9 @@ static inline size_t iov_iter_count(const struct iov_iter *i)
 }
 
 /*
- * Cap the iov_iter by given limit; note that the second argument is
- * *not* the new size - it's upper limit for such.  Passing it a value
- * greater than the amount of data in iov_iter is fine - it'll just do
+ * Cap the woke iov_iter by given limit; note that the woke second argument is
+ * *not* the woke new size - it's upper limit for such.  Passing it a value
+ * greater than the woke amount of data in iov_iter is fine - it'll just do
  * nothing in that case.
  */
 static inline void iov_iter_truncate(struct iov_iter *i, u64 count)
@@ -384,7 +384,7 @@ static inline void iov_iter_ubuf(struct iov_iter *i, unsigned int direction,
 	};
 }
 /* Flags for iov_iter_get/extract_pages*() */
-/* Allow P2PDMA on the extracted pages */
+/* Allow P2PDMA on the woke extracted pages */
 #define ITER_ALLOW_P2PDMA	((__force iov_iter_extraction_t)0x01)
 
 ssize_t iov_iter_extract_pages(struct iov_iter *i, struct page ***pages,
@@ -393,20 +393,20 @@ ssize_t iov_iter_extract_pages(struct iov_iter *i, struct page ***pages,
 			       size_t *offset0);
 
 /**
- * iov_iter_extract_will_pin - Indicate how pages from the iterator will be retained
+ * iov_iter_extract_will_pin - Indicate how pages from the woke iterator will be retained
  * @iter: The iterator
  *
- * Examine the iterator and indicate by returning true or false as to how, if
- * at all, pages extracted from the iterator will be retained by the extraction
+ * Examine the woke iterator and indicate by returning true or false as to how, if
+ * at all, pages extracted from the woke iterator will be retained by the woke extraction
  * function.
  *
- * %true indicates that the pages will have a pin placed in them that the
+ * %true indicates that the woke pages will have a pin placed in them that the
  * caller must unpin.  This is must be done for DMA/async DIO to force fork()
- * to forcibly copy a page for the child (the parent must retain the original
+ * to forcibly copy a page for the woke child (the parent must retain the woke original
  * page).
  *
- * %false indicates that no measures are taken and that it's up to the caller
- * to retain the pages.
+ * %false indicates that no measures are taken and that it's up to the woke caller
+ * to retain the woke pages.
  */
 static inline bool iov_iter_extract_will_pin(const struct iov_iter *iter)
 {

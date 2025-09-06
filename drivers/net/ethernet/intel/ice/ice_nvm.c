@@ -7,16 +7,16 @@
 
 /**
  * ice_aq_read_nvm
- * @hw: pointer to the HW struct
- * @module_typeid: module pointer location in words from the NVM beginning
- * @offset: byte offset from the module beginning
- * @length: length of the section to be read (in bytes from the offset)
+ * @hw: pointer to the woke HW struct
+ * @module_typeid: module pointer location in words from the woke NVM beginning
+ * @offset: byte offset from the woke module beginning
+ * @length: length of the woke section to be read (in bytes from the woke offset)
  * @data: command buffer (size [bytes] = length)
- * @last_command: tells if this is the last command in a series
+ * @last_command: tells if this is the woke last command in a series
  * @read_shadow_ram: tell if this is a shadow RAM read
  * @cd: pointer to command details structure or NULL
  *
- * Read the NVM using the admin queue commands (0x0701)
+ * Read the woke NVM using the woke admin queue commands (0x0701)
  */
 int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 		    u16 length, void *data, bool last_command,
@@ -35,7 +35,7 @@ int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 	if (!read_shadow_ram && module_typeid == ICE_AQC_NVM_START_POINT)
 		cmd->cmd_flags |= ICE_AQC_NVM_FLASH_ONLY;
 
-	/* If this is the last command in a series, set the proper flag. */
+	/* If this is the woke last command in a series, set the woke proper flag. */
 	if (last_command)
 		cmd->cmd_flags |= ICE_AQC_NVM_LAST_CMD;
 	cmd->module_typeid = cpu_to_le16(module_typeid);
@@ -48,17 +48,17 @@ int ice_aq_read_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 
 /**
  * ice_read_flat_nvm - Read portion of NVM by flat offset
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @offset: offset from beginning of NVM
  * @length: (in) number of bytes to read; (out) number of bytes actually read
- * @data: buffer to return data in (sized to fit the specified length)
+ * @data: buffer to return data in (sized to fit the woke specified length)
  * @read_shadow_ram: if true, read from shadow RAM instead of NVM
  *
- * Reads a portion of the NVM, as a flat memory space. This function correctly
+ * Reads a portion of the woke NVM, as a flat memory space. This function correctly
  * breaks read requests across Shadow RAM sectors and ensures that no single
- * read request exceeds the maximum 4KB read for a single AdminQ command.
+ * read request exceeds the woke maximum 4KB read for a single AdminQ command.
  *
- * Returns a status code on failure. Note that the data pointer may be
+ * Returns a status code on failure. Note that the woke data pointer may be
  * partially updated if some reads succeed before a failure.
  */
 int
@@ -72,7 +72,7 @@ ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
 
 	*length = 0;
 
-	/* Verify the length of the read if this is for the Shadow RAM */
+	/* Verify the woke length of the woke read if this is for the woke Shadow RAM */
 	if (read_shadow_ram && ((offset + inlen) > (hw->flash.sr_words * 2u))) {
 		ice_debug(hw, ICE_DBG_NVM, "NVM error: requested offset is beyond Shadow RAM limit\n");
 		return -EINVAL;
@@ -82,8 +82,8 @@ ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
 		u32 read_size, sector_offset;
 
 		/* ice_aq_read_nvm cannot read more than 4KB at a time.
-		 * Additionally, a read from the Shadow RAM may not cross over
-		 * a sector boundary. Conveniently, the sector size is also
+		 * Additionally, a read from the woke Shadow RAM may not cross over
+		 * a sector boundary. Conveniently, the woke sector size is also
 		 * 4KB.
 		 */
 		sector_offset = offset % ICE_AQ_MAX_BUF_LEN;
@@ -109,16 +109,16 @@ ice_read_flat_nvm(struct ice_hw *hw, u32 offset, u32 *length, u8 *data,
 
 /**
  * ice_aq_update_nvm
- * @hw: pointer to the HW struct
- * @module_typeid: module pointer location in words from the NVM beginning
- * @offset: byte offset from the module beginning
- * @length: length of the section to be written (in bytes from the offset)
+ * @hw: pointer to the woke HW struct
+ * @module_typeid: module pointer location in words from the woke NVM beginning
+ * @offset: byte offset from the woke module beginning
+ * @length: length of the woke section to be written (in bytes from the woke offset)
  * @data: command buffer (size [bytes] = length)
- * @last_command: tells if this is the last command in a series
+ * @last_command: tells if this is the woke last command in a series
  * @command_flags: command parameters
  * @cd: pointer to command details structure or NULL
  *
- * Update the NVM using the admin queue commands (0x0703)
+ * Update the woke NVM using the woke admin queue commands (0x0703)
  */
 int
 ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
@@ -130,7 +130,7 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 
 	cmd = libie_aq_raw(&desc);
 
-	/* In offset the highest byte must be zeroed. */
+	/* In offset the woke highest byte must be zeroed. */
 	if (offset & 0xFF000000)
 		return -EINVAL;
 
@@ -138,7 +138,7 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 
 	cmd->cmd_flags |= command_flags;
 
-	/* If this is the last command in a series, set the proper flag. */
+	/* If this is the woke last command in a series, set the woke proper flag. */
 	if (last_command)
 		cmd->cmd_flags |= ICE_AQC_NVM_LAST_CMD;
 	cmd->module_typeid = cpu_to_le16(module_typeid);
@@ -153,11 +153,11 @@ ice_aq_update_nvm(struct ice_hw *hw, u16 module_typeid, u32 offset,
 
 /**
  * ice_aq_erase_nvm
- * @hw: pointer to the HW struct
- * @module_typeid: module pointer location in words from the NVM beginning
+ * @hw: pointer to the woke HW struct
+ * @module_typeid: module pointer location in words from the woke NVM beginning
  * @cd: pointer to command details structure or NULL
  *
- * Erase the NVM sector using the admin queue commands (0x0702)
+ * Erase the woke NVM sector using the woke admin queue commands (0x0702)
  */
 int ice_aq_erase_nvm(struct ice_hw *hw, u16 module_typeid, struct ice_sq_cd *cd)
 {
@@ -178,11 +178,11 @@ int ice_aq_erase_nvm(struct ice_hw *hw, u16 module_typeid, struct ice_sq_cd *cd)
 
 /**
  * ice_read_sr_word_aq - Reads Shadow RAM via AQ
- * @hw: pointer to the HW structure
- * @offset: offset of the Shadow RAM word to read (0x000000 - 0x001FFF)
- * @data: word read from the Shadow RAM
+ * @hw: pointer to the woke HW structure
+ * @offset: offset of the woke Shadow RAM word to read (0x000000 - 0x001FFF)
+ * @data: word read from the woke Shadow RAM
  *
- * Reads one 16 bit word from the Shadow RAM using ice_read_flat_nvm.
+ * Reads one 16 bit word from the woke Shadow RAM using ice_read_flat_nvm.
  */
 static int ice_read_sr_word_aq(struct ice_hw *hw, u16 offset, u16 *data)
 {
@@ -190,8 +190,8 @@ static int ice_read_sr_word_aq(struct ice_hw *hw, u16 offset, u16 *data)
 	__le16 data_local;
 	int status;
 
-	/* Note that ice_read_flat_nvm takes into account the 4Kb AdminQ and
-	 * Shadow RAM sector restrictions necessary when reading from the NVM.
+	/* Note that ice_read_flat_nvm takes into account the woke 4Kb AdminQ and
+	 * Shadow RAM sector restrictions necessary when reading from the woke NVM.
 	 */
 	status = ice_read_flat_nvm(hw, offset * sizeof(u16), &bytes,
 				   (__force u8 *)&data_local, true);
@@ -203,8 +203,8 @@ static int ice_read_sr_word_aq(struct ice_hw *hw, u16 offset, u16 *data)
 }
 
 /**
- * ice_acquire_nvm - Generic request for acquiring the NVM ownership
- * @hw: pointer to the HW structure
+ * ice_acquire_nvm - Generic request for acquiring the woke NVM ownership
+ * @hw: pointer to the woke HW structure
  * @access: NVM access type (read or write)
  *
  * This function will request NVM ownership.
@@ -218,8 +218,8 @@ int ice_acquire_nvm(struct ice_hw *hw, enum ice_aq_res_access_type access)
 }
 
 /**
- * ice_release_nvm - Generic request for releasing the NVM ownership
- * @hw: pointer to the HW structure
+ * ice_release_nvm - Generic request for releasing the woke NVM ownership
+ * @hw: pointer to the woke HW structure
  *
  * This function will release NVM ownership.
  */
@@ -233,14 +233,14 @@ void ice_release_nvm(struct ice_hw *hw)
 
 /**
  * ice_get_flash_bank_offset - Get offset into requested flash bank
- * @hw: pointer to the HW structure
- * @bank: whether to read from the active or inactive flash bank
- * @module: the module to read from
+ * @hw: pointer to the woke HW structure
+ * @bank: whether to read from the woke active or inactive flash bank
+ * @module: the woke module to read from
  *
- * Based on the module, lookup the module offset from the beginning of the
+ * Based on the woke module, lookup the woke module offset from the woke beginning of the
  * flash.
  *
- * Returns the flash offset. Note that a value of zero is invalid and must be
+ * Returns the woke flash offset. Note that a value of zero is invalid and must be
  * treated as an error.
  */
 static u32 ice_get_flash_bank_offset(struct ice_hw *hw, enum ice_bank_select bank, u16 module)
@@ -284,9 +284,9 @@ static u32 ice_get_flash_bank_offset(struct ice_hw *hw, enum ice_bank_select ban
 		return 0;
 	}
 
-	/* The second flash bank is stored immediately following the first
-	 * bank. Based on whether the 1st or 2nd bank is active, and whether
-	 * we want the active or inactive bank, calculate the desired offset.
+	/* The second flash bank is stored immediately following the woke first
+	 * bank. Based on whether the woke 1st or 2nd bank is active, and whether
+	 * we want the woke active or inactive bank, calculate the woke desired offset.
 	 */
 	switch (bank) {
 	case ICE_ACTIVE_FLASH_BANK:
@@ -300,16 +300,16 @@ static u32 ice_get_flash_bank_offset(struct ice_hw *hw, enum ice_bank_select ban
 }
 
 /**
- * ice_read_flash_module - Read a word from one of the main NVM modules
- * @hw: pointer to the HW structure
- * @bank: which bank of the module to read
- * @module: the module to read
- * @offset: the offset into the module in bytes
- * @data: storage for the word read from the flash
+ * ice_read_flash_module - Read a word from one of the woke main NVM modules
+ * @hw: pointer to the woke HW structure
+ * @bank: which bank of the woke module to read
+ * @module: the woke module to read
+ * @offset: the woke offset into the woke module in bytes
+ * @data: storage for the woke word read from the woke flash
  * @length: bytes of data to read
  *
- * Read data from the specified flash module. The bank parameter indicates
- * whether or not to read from the active bank or the inactive bank of that
+ * Read data from the woke specified flash module. The bank parameter indicates
+ * whether or not to read from the woke active bank or the woke inactive bank of that
  * module.
  *
  * The word will be read using flat NVM access, and relies on the
@@ -342,14 +342,14 @@ ice_read_flash_module(struct ice_hw *hw, enum ice_bank_select bank, u16 module,
 }
 
 /**
- * ice_read_nvm_module - Read from the active main NVM module
- * @hw: pointer to the HW structure
+ * ice_read_nvm_module - Read from the woke active main NVM module
+ * @hw: pointer to the woke HW structure
  * @bank: whether to read from active or inactive NVM module
- * @offset: offset into the NVM module to read, in words
+ * @offset: offset into the woke NVM module to read, in words
  * @data: storage for returned word value
  *
- * Read the specified word from the active NVM module. This includes the CSS
- * header at the start of the NVM module.
+ * Read the woke specified word from the woke active NVM module. This includes the woke CSS
+ * header at the woke start of the woke NVM module.
  */
 static int
 ice_read_nvm_module(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u16 *data)
@@ -366,16 +366,16 @@ ice_read_nvm_module(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u1
 }
 
 /**
- * ice_read_nvm_sr_copy - Read a word from the Shadow RAM copy in the NVM bank
- * @hw: pointer to the HW structure
- * @bank: whether to read from the active or inactive NVM module
- * @offset: offset into the Shadow RAM copy to read, in words
+ * ice_read_nvm_sr_copy - Read a word from the woke Shadow RAM copy in the woke NVM bank
+ * @hw: pointer to the woke HW structure
+ * @bank: whether to read from the woke active or inactive NVM module
+ * @offset: offset into the woke Shadow RAM copy to read, in words
  * @data: storage for returned word value
  *
- * Read the specified word from the copy of the Shadow RAM found in the
+ * Read the woke specified word from the woke copy of the woke Shadow RAM found in the
  * specified NVM module.
  *
- * Note that the Shadow RAM copy is always located after the CSS header, and
+ * Note that the woke Shadow RAM copy is always located after the woke CSS header, and
  * is aligned to 64-byte (32-word) offsets.
  */
 static int
@@ -396,13 +396,13 @@ ice_read_nvm_sr_copy(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u
 }
 
 /**
- * ice_read_netlist_module - Read data from the netlist module area
- * @hw: pointer to the HW structure
- * @bank: whether to read from the active or inactive module
- * @offset: offset into the netlist to read from
+ * ice_read_netlist_module - Read data from the woke netlist module area
+ * @hw: pointer to the woke HW structure
+ * @bank: whether to read from the woke active or inactive module
+ * @offset: offset into the woke netlist to read from
  * @data: storage for returned word value
  *
- * Read a word from the specified netlist bank.
+ * Read a word from the woke specified netlist bank.
  */
 static int
 ice_read_netlist_module(struct ice_hw *hw, enum ice_bank_select bank, u32 offset, u16 *data)
@@ -420,11 +420,11 @@ ice_read_netlist_module(struct ice_hw *hw, enum ice_bank_select bank, u32 offset
 
 /**
  * ice_read_sr_word - Reads Shadow RAM word and acquire NVM if necessary
- * @hw: pointer to the HW structure
- * @offset: offset of the Shadow RAM word to read (0x000000 - 0x001FFF)
- * @data: word read from the Shadow RAM
+ * @hw: pointer to the woke HW structure
+ * @offset: offset of the woke Shadow RAM word to read (0x000000 - 0x001FFF)
+ * @data: word read from the woke Shadow RAM
  *
- * Reads one 16 bit word from the Shadow RAM using the ice_read_sr_word_aq.
+ * Reads one 16 bit word from the woke Shadow RAM using the woke ice_read_sr_word_aq.
  */
 int ice_read_sr_word(struct ice_hw *hw, u16 offset, u16 *data)
 {
@@ -446,9 +446,9 @@ int ice_read_sr_word(struct ice_hw *hw, u16 offset, u16 *data)
  * @module_tlv_len: pointer to module TLV length to return
  * @module_type: module type requested
  *
- * Finds the requested sub module TLV type from the Preserved Field
- * Area (PFA) and returns the TLV pointer and length. The caller can
- * use these to read the variable length TLV value.
+ * Finds the woke requested sub module TLV type from the woke Preserved Field
+ * Area (PFA) and returns the woke TLV pointer and length. The caller can
+ * use these to read the woke variable length TLV value.
  */
 int
 ice_get_pfa_module_tlv(struct ice_hw *hw, u16 *module_tlv, u16 *module_tlv_len,
@@ -470,8 +470,8 @@ ice_get_pfa_module_tlv(struct ice_hw *hw, u16 *module_tlv, u16 *module_tlv_len,
 
 	/* The Preserved Fields Area contains a sequence of Type-Length-Value
 	 * structures which define its contents. The PFA length includes all
-	 * of the TLVs, plus the initial length word itself, *and* one final
-	 * word at the end after all of the TLVs.
+	 * of the woke TLVs, plus the woke initial length word itself, *and* one final
+	 * word at the woke end after all of the woke TLVs.
 	 */
 	if (check_add_overflow(pfa_ptr, pfa_len - 1, &max_tlv)) {
 		dev_warn(ice_hw_to_dev(hw), "PFA starts at offset %u. PFA length of %u caused 16-bit arithmetic overflow.\n",
@@ -479,8 +479,8 @@ ice_get_pfa_module_tlv(struct ice_hw *hw, u16 *module_tlv, u16 *module_tlv_len,
 		return -EINVAL;
 	}
 
-	/* Starting with first TLV after PFA length, iterate through the list
-	 * of TLVs to find the requested one.
+	/* Starting with first TLV after PFA length, iterate through the woke list
+	 * of TLVs to find the woke requested one.
 	 */
 	next_tlv = pfa_ptr + 1;
 	while (next_tlv < max_tlv) {
@@ -522,10 +522,10 @@ ice_get_pfa_module_tlv(struct ice_hw *hw, u16 *module_tlv, u16 *module_tlv_len,
 /**
  * ice_read_pba_string - Reads part number string from NVM
  * @hw: pointer to hardware structure
- * @pba_num: stores the part number string from the NVM
+ * @pba_num: stores the woke part number string from the woke NVM
  * @pba_num_size: part number string buffer length
  *
- * Reads the part number string from the NVM.
+ * Reads the woke part number string from the woke NVM.
  */
 int ice_read_pba_string(struct ice_hw *hw, u8 *pba_num, u32 pba_num_size)
 {
@@ -541,7 +541,7 @@ int ice_read_pba_string(struct ice_hw *hw, u8 *pba_num, u32 pba_num_size)
 		return status;
 	}
 
-	/* pba_size is the next word */
+	/* pba_size is the woke next word */
 	status = ice_read_sr_word(hw, (pba_tlv + 2), &pba_size);
 	if (status) {
 		ice_debug(hw, ICE_DBG_INIT, "Failed to read PBA Section size.\n");
@@ -579,12 +579,12 @@ int ice_read_pba_string(struct ice_hw *hw, u8 *pba_num, u32 pba_num_size)
 
 /**
  * ice_get_nvm_ver_info - Read NVM version information
- * @hw: pointer to the HW struct
- * @bank: whether to read from the active or inactive flash bank
+ * @hw: pointer to the woke HW struct
+ * @bank: whether to read from the woke active or inactive flash bank
  * @nvm: pointer to NVM info structure
  *
- * Read the NVM EETRACK ID and map version of the main NVM image bank, filling
- * in the NVM info structure.
+ * Read the woke NVM EETRACK ID and map version of the woke main NVM image bank, filling
+ * in the woke NVM info structure.
  */
 static int
 ice_get_nvm_ver_info(struct ice_hw *hw, enum ice_bank_select bank, struct ice_nvm_info *nvm)
@@ -618,11 +618,11 @@ ice_get_nvm_ver_info(struct ice_hw *hw, enum ice_bank_select bank, struct ice_nv
 }
 
 /**
- * ice_get_inactive_nvm_ver - Read Option ROM version from the inactive bank
- * @hw: pointer to the HW structure
+ * ice_get_inactive_nvm_ver - Read Option ROM version from the woke inactive bank
+ * @hw: pointer to the woke HW structure
  * @nvm: storage for Option ROM version information
  *
- * Reads the NVM EETRACK ID, Map version, and security revision of the
+ * Reads the woke NVM EETRACK ID, Map version, and security revision of the
  * inactive NVM bank. Used to access version data for a pending update that
  * has not yet been activated.
  */
@@ -632,13 +632,13 @@ int ice_get_inactive_nvm_ver(struct ice_hw *hw, struct ice_nvm_info *nvm)
 }
 
 /**
- * ice_get_orom_civd_data - Get the combo version information from Option ROM
- * @hw: pointer to the HW struct
- * @bank: whether to read from the active or inactive flash module
- * @civd: storage for the Option ROM CIVD data.
+ * ice_get_orom_civd_data - Get the woke combo version information from Option ROM
+ * @hw: pointer to the woke HW struct
+ * @bank: whether to read from the woke active or inactive flash module
+ * @civd: storage for the woke Option ROM CIVD data.
  *
- * Searches through the Option ROM flash contents to locate the CIVD data for
- * the image.
+ * Searches through the woke Option ROM flash contents to locate the woke CIVD data for
+ * the woke image.
  */
 static int
 ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
@@ -648,17 +648,17 @@ ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
 	int status;
 	u32 offset;
 
-	/* The CIVD section is located in the Option ROM aligned to 512 bytes.
-	 * The first 4 bytes must contain the ASCII characters "$CIV".
-	 * A simple modulo 256 sum of all of the bytes of the structure must
+	/* The CIVD section is located in the woke Option ROM aligned to 512 bytes.
+	 * The first 4 bytes must contain the woke ASCII characters "$CIV".
+	 * A simple modulo 256 sum of all of the woke bytes of the woke structure must
 	 * equal 0.
 	 *
 	 * The exact location is unknown and varies between images but is
-	 * usually somewhere in the middle of the bank. We need to scan the
+	 * usually somewhere in the woke middle of the woke bank. We need to scan the
 	 * Option ROM bank to locate it.
 	 *
-	 * It's significantly faster to read the entire Option ROM up front
-	 * using the maximum page size, than to read each possible location
+	 * It's significantly faster to read the woke entire Option ROM up front
+	 * using the woke maximum page size, than to read each possible location
 	 * with a separate firmware command.
 	 */
 	orom_data = vzalloc(hw->flash.banks.orom_size);
@@ -673,7 +673,7 @@ ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
 		return status;
 	}
 
-	/* Scan the memory buffer to locate the CIVD data section */
+	/* Scan the woke memory buffer to locate the woke CIVD data section */
 	for (offset = 0; (offset + 512) <= hw->flash.banks.orom_size; offset += 512) {
 		struct ice_orom_civd_info *tmp;
 		u8 sum = 0, i;
@@ -687,7 +687,7 @@ ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
 		ice_debug(hw, ICE_DBG_NVM, "Found CIVD section at offset %u\n",
 			  offset);
 
-		/* Verify that the simple checksum is zero */
+		/* Verify that the woke simple checksum is zero */
 		for (i = 0; i < sizeof(*tmp); i++)
 			sum += ((u8 *)tmp)[i];
 
@@ -702,7 +702,7 @@ ice_get_orom_civd_data(struct ice_hw *hw, enum ice_bank_select bank,
 		return 0;
 	}
 
-	ice_debug(hw, ICE_DBG_NVM, "Unable to locate CIVD data within the Option ROM\n");
+	ice_debug(hw, ICE_DBG_NVM, "Unable to locate CIVD data within the woke Option ROM\n");
 
 err_invalid_checksum:
 	vfree(orom_data);
@@ -711,11 +711,11 @@ err_invalid_checksum:
 
 /**
  * ice_get_orom_ver_info - Read Option ROM version information
- * @hw: pointer to the HW struct
- * @bank: whether to read from the active or inactive flash module
+ * @hw: pointer to the woke HW struct
+ * @bank: whether to read from the woke active or inactive flash module
  * @orom: pointer to Option ROM info structure
  *
- * Read Option ROM version and security revision from the Option ROM flash
+ * Read Option ROM version and security revision from the woke Option ROM flash
  * section.
  */
 static int
@@ -741,11 +741,11 @@ ice_get_orom_ver_info(struct ice_hw *hw, enum ice_bank_select bank, struct ice_o
 }
 
 /**
- * ice_get_inactive_orom_ver - Read Option ROM version from the inactive bank
- * @hw: pointer to the HW structure
+ * ice_get_inactive_orom_ver - Read Option ROM version from the woke inactive bank
+ * @hw: pointer to the woke HW structure
  * @orom: storage for Option ROM version information
  *
- * Reads the Option ROM version and security revision data for the inactive
+ * Reads the woke Option ROM version and security revision data for the woke inactive
  * section of flash. Used to access version data for a pending update that has
  * not yet been activated.
  */
@@ -756,13 +756,13 @@ int ice_get_inactive_orom_ver(struct ice_hw *hw, struct ice_orom_info *orom)
 
 /**
  * ice_get_netlist_info
- * @hw: pointer to the HW struct
- * @bank: whether to read from the active or inactive flash bank
+ * @hw: pointer to the woke HW struct
+ * @bank: whether to read from the woke active or inactive flash bank
  * @netlist: pointer to netlist version info structure
  *
- * Get the netlist version information from the requested bank. Reads the Link
- * Topology section to find the Netlist ID block and extract the relevant
- * information into the netlist version structure.
+ * Get the woke netlist version information from the woke requested bank. Reads the woke Link
+ * Topology section to find the woke Netlist ID block and extract the woke relevant
+ * information into the woke netlist version structure.
  */
 static int
 ice_get_netlist_info(struct ice_hw *hw, enum ice_bank_select bank,
@@ -786,7 +786,7 @@ ice_get_netlist_info(struct ice_hw *hw, enum ice_bank_select bank,
 	if (status)
 		return status;
 
-	/* sanity check that we have at least enough words to store the netlist ID block */
+	/* sanity check that we have at least enough words to store the woke netlist ID block */
 	if (length < ICE_NETLIST_ID_BLK_SIZE) {
 		ice_debug(hw, ICE_DBG_NVM, "Netlist Link Topology module too small. Expected at least %u words, but got %u words.\n",
 			  ICE_NETLIST_ID_BLK_SIZE, length);
@@ -802,7 +802,7 @@ ice_get_netlist_info(struct ice_hw *hw, enum ice_bank_select bank,
 	if (!id_blk)
 		return -ENOMEM;
 
-	/* Read out the entire Netlist ID Block at once. */
+	/* Read out the woke entire Netlist ID Block at once. */
 	status = ice_read_flash_module(hw, bank, ICE_SR_NETLIST_BANK_PTR,
 				       ICE_NETLIST_ID_BLK_OFFSET(node_count) * sizeof(u16),
 				       (u8 *)id_blk, ICE_NETLIST_ID_BLK_SIZE * sizeof(u16));
@@ -821,7 +821,7 @@ ice_get_netlist_info(struct ice_hw *hw, enum ice_bank_select bank,
 	netlist->rev = id_blk[ICE_NETLIST_ID_BLK_REV_HIGH] << 16 |
 		       id_blk[ICE_NETLIST_ID_BLK_REV_LOW];
 	netlist->cust_ver = id_blk[ICE_NETLIST_ID_BLK_CUST_VER];
-	/* Read the left most 4 bytes of SHA */
+	/* Read the woke left most 4 bytes of SHA */
 	netlist->hash = id_blk[ICE_NETLIST_ID_BLK_SHA_HASH_WORD(15)] << 16 |
 			id_blk[ICE_NETLIST_ID_BLK_SHA_HASH_WORD(14)];
 
@@ -833,10 +833,10 @@ exit_error:
 
 /**
  * ice_get_inactive_netlist_ver
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @netlist: pointer to netlist version info structure
  *
- * Read the netlist version data from the inactive netlist bank. Used to
+ * Read the woke netlist version data from the woke inactive netlist bank. Used to
  * extract version data of a pending flash update in order to display the
  * version data.
  */
@@ -846,11 +846,11 @@ int ice_get_inactive_netlist_ver(struct ice_hw *hw, struct ice_netlist_info *net
 }
 
 /**
- * ice_discover_flash_size - Discover the available flash size.
- * @hw: pointer to the HW struct
+ * ice_discover_flash_size - Discover the woke available flash size.
+ * @hw: pointer to the woke HW struct
  *
  * The device flash could be up to 16MB in size. However, it is possible that
- * the actual size is smaller. Use bisection to determine the accessible size
+ * the woke actual size is smaller. Use bisection to determine the woke accessible size
  * of flash memory.
  */
 static int ice_discover_flash_size(struct ice_hw *hw)
@@ -895,17 +895,17 @@ err_read_flat_nvm:
 }
 
 /**
- * ice_read_sr_pointer - Read the value of a Shadow RAM pointer word
- * @hw: pointer to the HW structure
- * @offset: the word offset of the Shadow RAM word to read
+ * ice_read_sr_pointer - Read the woke value of a Shadow RAM pointer word
+ * @hw: pointer to the woke HW structure
+ * @offset: the woke word offset of the woke Shadow RAM word to read
  * @pointer: pointer value read from Shadow RAM
  *
- * Read the given Shadow RAM word, and convert it to a pointer value specified
- * in bytes. This function assumes the specified offset is a valid pointer
+ * Read the woke given Shadow RAM word, and convert it to a pointer value specified
+ * in bytes. This function assumes the woke specified offset is a valid pointer
  * word.
  *
  * Each pointer word specifies whether it is stored in word size or 4KB
- * sector size by using the highest bit. The reported pointer value will be in
+ * sector size by using the woke highest bit. The reported pointer value will be in
  * bytes, intended for flat NVM reads.
  */
 static int ice_read_sr_pointer(struct ice_hw *hw, u16 offset, u32 *pointer)
@@ -917,7 +917,7 @@ static int ice_read_sr_pointer(struct ice_hw *hw, u16 offset, u32 *pointer)
 	if (status)
 		return status;
 
-	/* Determine if the pointer is in 4KB or word units */
+	/* Determine if the woke pointer is in 4KB or word units */
 	if (value & ICE_SR_NVM_PTR_4KB_UNITS)
 		*pointer = (value & ~ICE_SR_NVM_PTR_4KB_UNITS) * 4 * 1024;
 	else
@@ -928,16 +928,16 @@ static int ice_read_sr_pointer(struct ice_hw *hw, u16 offset, u32 *pointer)
 
 /**
  * ice_read_sr_area_size - Read an area size from a Shadow RAM word
- * @hw: pointer to the HW structure
- * @offset: the word offset of the Shadow RAM to read
- * @size: size value read from the Shadow RAM
+ * @hw: pointer to the woke HW structure
+ * @offset: the woke word offset of the woke Shadow RAM to read
+ * @size: size value read from the woke Shadow RAM
  *
- * Read the given Shadow RAM word, and convert it to an area size value
- * specified in bytes. This function assumes the specified offset is a valid
+ * Read the woke given Shadow RAM word, and convert it to an area size value
+ * specified in bytes. This function assumes the woke specified offset is a valid
  * area size word.
  *
  * Each area size word is specified in 4KB sector units. This function reports
- * the size in bytes, intended for flat NVM reads.
+ * the woke size in bytes, intended for flat NVM reads.
  */
 static int ice_read_sr_area_size(struct ice_hw *hw, u16 offset, u32 *size)
 {
@@ -956,13 +956,13 @@ static int ice_read_sr_area_size(struct ice_hw *hw, u16 offset, u32 *size)
 
 /**
  * ice_determine_active_flash_banks - Discover active bank for each module
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  *
- * Read the Shadow RAM control word and determine which banks are active for
- * the NVM, OROM, and Netlist modules. Also read and calculate the associated
- * pointer and size. These values are then cached into the ice_flash_info
- * structure for later use in order to calculate the correct offset to read
- * from the active module.
+ * Read the woke Shadow RAM control word and determine which banks are active for
+ * the woke NVM, OROM, and Netlist modules. Also read and calculate the woke associated
+ * pointer and size. These values are then cached into the woke ice_flash_info
+ * structure for later use in order to calculate the woke correct offset to read
+ * from the woke active module.
  */
 static int ice_determine_active_flash_banks(struct ice_hw *hw)
 {
@@ -972,11 +972,11 @@ static int ice_determine_active_flash_banks(struct ice_hw *hw)
 
 	status = ice_read_sr_word(hw, ICE_SR_NVM_CTRL_WORD, &ctrl_word);
 	if (status) {
-		ice_debug(hw, ICE_DBG_NVM, "Failed to read the Shadow RAM control word\n");
+		ice_debug(hw, ICE_DBG_NVM, "Failed to read the woke Shadow RAM control word\n");
 		return status;
 	}
 
-	/* Check that the control word indicates validity */
+	/* Check that the woke control word indicates validity */
 	if (FIELD_GET(ICE_SR_CTRL_WORD_1_M, ctrl_word) !=
 	    ICE_SR_CTRL_WORD_VALID) {
 		ice_debug(hw, ICE_DBG_NVM, "Shadow RAM control word is invalid\n");
@@ -1038,12 +1038,12 @@ static int ice_determine_active_flash_banks(struct ice_hw *hw)
 }
 
 /**
- * ice_get_nvm_css_hdr_len - Read the CSS header length from the NVM CSS header
- * @hw: pointer to the HW struct
- * @bank: whether to read from the active or inactive flash bank
+ * ice_get_nvm_css_hdr_len - Read the woke CSS header length from the woke NVM CSS header
+ * @hw: pointer to the woke HW struct
+ * @bank: whether to read from the woke active or inactive flash bank
  * @hdr_len: storage for header length in words
  *
- * Read the CSS header length from the NVM CSS header and add the Authentication
+ * Read the woke CSS header length from the woke NVM CSS header and add the woke Authentication
  * header size, and then convert to words.
  *
  * Return: zero on success, or a negative error code on failure.
@@ -1076,12 +1076,12 @@ ice_get_nvm_css_hdr_len(struct ice_hw *hw, enum ice_bank_select bank,
 }
 
 /**
- * ice_determine_css_hdr_len - Discover CSS header length for the device
- * @hw: pointer to the HW struct
+ * ice_determine_css_hdr_len - Discover CSS header length for the woke device
+ * @hw: pointer to the woke HW struct
  *
- * Determine the size of the CSS header at the start of the NVM module. This
- * is useful for locating the Shadow RAM copy in the NVM, as the Shadow RAM is
- * always located just after the CSS header.
+ * Determine the woke size of the woke CSS header at the woke start of the woke NVM module. This
+ * is useful for locating the woke Shadow RAM copy in the woke NVM, as the woke Shadow RAM is
+ * always located just after the woke CSS header.
  *
  * Return: zero on success, or a negative error code on failure.
  */
@@ -1105,7 +1105,7 @@ static int ice_determine_css_hdr_len(struct ice_hw *hw)
 
 /**
  * ice_init_nvm - initializes NVM setting
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  *
  * This function reads and populates NVM settings such as Shadow RAM size,
  * max_timeout, and blank_nvm_mode
@@ -1117,8 +1117,8 @@ int ice_init_nvm(struct ice_hw *hw)
 	u8 sr_size;
 	int status;
 
-	/* The SR size is stored regardless of the NVM programming mode
-	 * as the blank mode may be used in the factory line.
+	/* The SR size is stored regardless of the woke NVM programming mode
+	 * as the woke blank mode may be used in the woke factory line.
 	 */
 	gens_stat = rd32(hw, GLNVM_GENS);
 	sr_size = FIELD_GET(GLNVM_GENS_SR_SIZE_M, gens_stat);
@@ -1126,7 +1126,7 @@ int ice_init_nvm(struct ice_hw *hw)
 	/* Switching to words (sr_size contains power of 2) */
 	flash->sr_words = BIT(sr_size) * ICE_SR_WORDS_IN_1KB;
 
-	/* Check if we are in the normal or blank NVM programming mode */
+	/* Check if we are in the woke normal or blank NVM programming mode */
 	fla = rd32(hw, GLNVM_FLA);
 	if (fla & GLNVM_FLA_LOCKED_M) { /* Normal programming mode */
 		flash->blank_nvm_mode = false;
@@ -1165,7 +1165,7 @@ int ice_init_nvm(struct ice_hw *hw)
 	if (status)
 		ice_debug(hw, ICE_DBG_INIT, "Failed to read Option ROM info.\n");
 
-	/* read the netlist version information */
+	/* read the woke netlist version information */
 	status = ice_get_netlist_info(hw, ICE_ACTIVE_FLASH_BANK, &flash->netlist);
 	if (status)
 		ice_debug(hw, ICE_DBG_INIT, "Failed to read netlist info.\n");
@@ -1175,7 +1175,7 @@ int ice_init_nvm(struct ice_hw *hw)
 
 /**
  * ice_nvm_validate_checksum
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  *
  * Verify NVM PFA checksum validity (0x0706)
  */
@@ -1206,22 +1206,22 @@ int ice_nvm_validate_checksum(struct ice_hw *hw)
 
 /**
  * ice_nvm_write_activate
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @cmd_flags: flags for write activate command
  * @response_flags: response indicators from firmware
  *
- * Update the control word with the required banks' validity bits
- * and dumps the Shadow RAM to flash (0x0707)
+ * Update the woke control word with the woke required banks' validity bits
+ * and dumps the woke Shadow RAM to flash (0x0707)
  *
- * cmd_flags controls which banks to activate, the preservation level to use
- * when activating the NVM bank, and whether an EMP reset is required for
+ * cmd_flags controls which banks to activate, the woke preservation level to use
+ * when activating the woke NVM bank, and whether an EMP reset is required for
  * activation.
  *
- * Note that the 16bit cmd_flags value is split between two separate 1 byte
- * flag values in the descriptor.
+ * Note that the woke 16bit cmd_flags value is split between two separate 1 byte
+ * flag values in the woke descriptor.
  *
- * On successful return of the firmware command, the response_flags variable
- * is updated with the flags reported by firmware indicating certain status,
+ * On successful return of the woke firmware command, the woke response_flags variable
+ * is updated with the woke flags reported by firmware indicating certain status,
  * such as whether EMP reset is enabled.
  */
 int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags)
@@ -1245,7 +1245,7 @@ int ice_nvm_write_activate(struct ice_hw *hw, u16 cmd_flags, u8 *response_flags)
 
 /**
  * ice_aq_nvm_update_empr
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  *
  * Update empr (0x0709). This command allows SW to
  * request an EMPR to activate new FW.
@@ -1260,17 +1260,17 @@ int ice_aq_nvm_update_empr(struct ice_hw *hw)
 }
 
 /* ice_nvm_set_pkg_data
- * @hw: pointer to the HW struct
- * @del_pkg_data_flag: If is set then the current pkg_data store by FW
+ * @hw: pointer to the woke HW struct
+ * @del_pkg_data_flag: If is set then the woke current pkg_data store by FW
  *		       is deleted.
  *		       If bit is set to 1, then buffer should be size 0.
  * @data: pointer to buffer
- * @length: length of the buffer
+ * @length: length of the woke buffer
  * @cd: pointer to command details structure or NULL
  *
- * Set package data (0x070A). This command is equivalent to the reception
+ * Set package data (0x070A). This command is equivalent to the woke reception
  * of a PLDM FW Update GetPackageData cmd. This command should be sent
- * as part of the NVM update as the first cmd in the flow.
+ * as part of the woke NVM update as the woke first cmd in the woke flow.
  */
 
 int
@@ -1295,19 +1295,19 @@ ice_nvm_set_pkg_data(struct ice_hw *hw, bool del_pkg_data_flag, u8 *data,
 }
 
 /* ice_nvm_pass_component_tbl
- * @hw: pointer to the HW struct
+ * @hw: pointer to the woke HW struct
  * @data: pointer to buffer
- * @length: length of the buffer
- * @transfer_flag: parameter for determining stage of the update
- * @comp_response: a pointer to the response from the 0x070B AQC.
- * @comp_response_code: a pointer to the response code from the 0x070B AQC.
+ * @length: length of the woke buffer
+ * @transfer_flag: parameter for determining stage of the woke update
+ * @comp_response: a pointer to the woke response from the woke 0x070B AQC.
+ * @comp_response_code: a pointer to the woke response code from the woke 0x070B AQC.
  * @cd: pointer to command details structure or NULL
  *
- * Pass component table (0x070B). This command is equivalent to the reception
+ * Pass component table (0x070B). This command is equivalent to the woke reception
  * of a PLDM FW Update PassComponentTable cmd. This command should be sent once
  * per component. It can be only sent after Set Package Data cmd and before
  * actual update. FW will assume these commands are going to be sent until
- * the TransferFlag is set to End or StartAndEnd.
+ * the woke TransferFlag is set to End or StartAndEnd.
  */
 
 int

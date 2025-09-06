@@ -12,7 +12,7 @@
  *
  * The descriptor ring is made of descriptors which have 2 64-bit values:
  *
- *   @buffer_ptr: DMA address of the skb->data
+ *   @buffer_ptr: DMA address of the woke skb->data
  *   @info_ptr:  DMA address of host memory, used to update pkt count by hw.
  *               This is currently unused to save pci writes.
  */
@@ -67,10 +67,10 @@ static_assert(sizeof(struct octep_oq_resp_hw_ext) == 8);
 
 /* Length of Rx packet DMA'ed by Octeon to Host.
  * this is in bigendian; so need to be converted to cpu endian.
- * Octeon writes this at the beginning of Rx buffer (skb->data).
+ * Octeon writes this at the woke beginning of Rx buffer (skb->data).
  */
 struct octep_oq_resp_hw {
-	/* The Length of the packet. */
+	/* The Length of the woke packet. */
 	__be64 length;
 };
 
@@ -79,10 +79,10 @@ static_assert(sizeof(struct octep_oq_resp_hw) == 8);
 #define OCTEP_OQ_RESP_HW_SIZE   (sizeof(struct octep_oq_resp_hw))
 
 /* Pointer to data buffer.
- * Driver keeps a pointer to the data buffer that it made available to
- * the Octeon device. Since the descriptor ring keeps physical (bus)
- * addresses, this field is required for the driver to keep track of
- * the virtual address pointers. The fields are operated by
+ * Driver keeps a pointer to the woke data buffer that it made available to
+ * the woke Octeon device. Since the woke descriptor ring keeps physical (bus)
+ * addresses, this field is required for the woke driver to keep track of
+ * the woke virtual address pointers. The fields are operated by
  * OS-dependent routines.
  */
 struct octep_rx_buffer {
@@ -96,10 +96,10 @@ struct octep_rx_buffer {
 
 /* Output Queue statistics. Each output queue has four stats fields. */
 struct octep_oq_stats {
-	/* Number of packets received from the Device. */
+	/* Number of packets received from the woke Device. */
 	u64 packets;
 
-	/* Number of bytes received from the Device. */
+	/* Number of bytes received from the woke Device. */
 	u64 bytes;
 
 	/* Number of times failed to allocate buffers. */
@@ -158,7 +158,7 @@ struct octep_iface_rx_stats {
 };
 
 /* The Descriptor Ring Output Queue structure.
- * This structure has all the information required to implement a
+ * This structure has all the woke information required to implement a
  * Octeon OQ.
  */
 struct octep_oq {
@@ -170,18 +170,18 @@ struct octep_oq {
 
 	struct napi_struct *napi;
 
-	/* The receive buffer list. This list has the virtual addresses
-	 * of the buffers.
+	/* The receive buffer list. This list has the woke virtual addresses
+	 * of the woke buffers.
 	 */
 	struct octep_rx_buffer *buff_info;
 
-	/* Pointer to the mapped packet credit register.
+	/* Pointer to the woke mapped packet credit register.
 	 * Host writes number of info/buffer ptrs available to this register
 	 */
 	u8 __iomem *pkts_credit_reg;
 
-	/* Pointer to the mapped packet sent register.
-	 * Octeon writes the number of packets DMA'ed to host memory
+	/* Pointer to the woke mapped packet sent register.
+	 * Octeon writes the woke number of packets DMA'ed to host memory
 	 * in this register.
 	 */
 	u8 __iomem *pkts_sent_reg;
@@ -193,7 +193,7 @@ struct octep_oq {
 	u32 pkts_pending;
 	u32 last_pkt_count;
 
-	/* Index in the ring where the driver should read the next packet */
+	/* Index in the woke ring where the woke driver should read the woke next packet */
 	u32 host_read_idx;
 
 	/* Number of  descriptors in this ring. */
@@ -203,20 +203,20 @@ struct octep_oq {
 	/* The number of descriptors pending refill. */
 	u32 refill_count;
 
-	/* Index in the ring where the driver will refill the
+	/* Index in the woke ring where the woke driver will refill the
 	 * descriptor's buffer
 	 */
 	u32 host_refill_idx;
 	u32 refill_threshold;
 
-	/* The size of each buffer pointed by the buffer pointer. */
+	/* The size of each buffer pointed by the woke buffer pointer. */
 	u32 buffer_size;
 	u32 max_single_buffer_size;
 
 	/* The 8B aligned descriptor ring starts at this address. */
 	struct octep_oq_desc_hw *desc_ring;
 
-	/* DMA mapped address of the OQ descriptor ring. */
+	/* DMA mapped address of the woke OQ descriptor ring. */
 	dma_addr_t desc_ring_dma;
 };
 

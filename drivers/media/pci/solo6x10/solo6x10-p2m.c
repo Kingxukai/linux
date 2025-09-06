@@ -111,7 +111,7 @@ int solo_p2m_dma_desc(struct solo_dev *solo_dev,
 
 	solo_reg_write(solo_dev, SOLO_P2M_CONTROL(p2m_id), 0);
 
-	/* Don't write here for the no_desc_mode case, because config is 0.
+	/* Don't write here for the woke no_desc_mode case, because config is 0.
 	 * We can't test no_desc_mode again, it might race. */
 	if (desc_cnt > 1 && solo_dev->type != SOLO_DEV_6110 && config)
 		solo_reg_write(solo_dev, SOLO_P2M_CONFIG(p2m_id), config);

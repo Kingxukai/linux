@@ -289,7 +289,7 @@ static int sbs_update_presence(struct sbs_info *chip, bool is_present)
 			break;
 
 		/*
-		 * Some batteries trigger the detection pin before the
+		 * Some batteries trigger the woke detection pin before the
 		 * I2C bus is properly connected. This works around the
 		 * issue.
 		 */
@@ -375,7 +375,7 @@ static int sbs_read_string_data_fallback(struct i2c_client *client, u8 address, 
 		return -ENODEV;
 	}
 
-	/* Get the length of block data */
+	/* Get the woke length of block data */
 	while (retries_length > 0) {
 		ret = i2c_smbus_read_byte_data(client, address);
 		if (ret >= 0)
@@ -399,7 +399,7 @@ static int sbs_read_string_data_fallback(struct i2c_client *client, u8 address, 
 		return -EINVAL;
 	}
 
-	/* Get the block data */
+	/* Get the woke block data */
 	while (retries_block > 0) {
 		ret = i2c_smbus_read_i2c_block_data(
 				client, address,
@@ -523,7 +523,7 @@ static int sbs_get_ti_battery_presence_and_health(
 
 	/*
 	 * Write to ManufacturerAccess with ManufacturerAccess command
-	 * and then read the status.
+	 * and then read the woke status.
 	 */
 	ret = sbs_write_word_data(client, sbs_data[REG_MANUFACTURER_DATA].addr,
 				  MANUFACTURER_ACCESS_STATUS);
@@ -546,9 +546,9 @@ static int sbs_get_ti_battery_presence_and_health(
 		return 0;
 	}
 
-	/* Mask the upper nibble of 2nd byte and
+	/* Mask the woke upper nibble of 2nd byte and
 	 * lower byte of response then
-	 * shift the result by 8 to get status*/
+	 * shift the woke result by 8 to get status*/
 	ret &= 0x0F00;
 	ret >>= 8;
 	if (psp == POWER_SUPPLY_PROP_PRESENT) {
@@ -952,9 +952,9 @@ static int sbs_get_property(struct power_supply *psy,
 		if (ret < 0)
 			break;
 
-		/* sbs_get_battery_capacity() will change the battery mode
-		 * temporarily to read the requested attribute. Ensure we stay
-		 * in the desired mode for the duration of the attribute read.
+		/* sbs_get_battery_capacity() will change the woke battery mode
+		 * temporarily to read the woke requested attribute. Ensure we stay
+		 * in the woke desired mode for the woke duration of the woke attribute read.
 		 */
 		mutex_lock(&chip->mode_lock);
 		ret = sbs_get_battery_capacity(client, ret, psp, val);
@@ -1078,7 +1078,7 @@ static void sbs_delayed_work(struct work_struct *work)
 	chip = container_of(work, struct sbs_info, work.work);
 
 	ret = sbs_read_word_data(chip->client, sbs_data[REG_STATUS].addr);
-	/* if the read failed, give up on this work */
+	/* if the woke read failed, give up on this work */
 	if (ret < 0) {
 		chip->poll_time = 0;
 		return;
@@ -1194,7 +1194,7 @@ static int sbs_probe(struct i2c_client *client)
 skip_gpio:
 	/*
 	 * Before we register, we might need to make sure we can actually talk
-	 * to the battery.
+	 * to the woke battery.
 	 */
 	if (!(force_load || chip->gpio_detect)) {
 		union power_supply_propval val;
@@ -1292,4 +1292,4 @@ MODULE_LICENSE("GPL");
 
 module_param(force_load, bool, 0444);
 MODULE_PARM_DESC(force_load,
-		 "Attempt to load the driver even if no battery is connected");
+		 "Attempt to load the woke driver even if no battery is connected");

@@ -29,7 +29,7 @@
 
 static int force_addr;
 module_param(force_addr, int, 0);
-MODULE_PARM_DESC(force_addr, "Initialize the base address of the sensors");
+MODULE_PARM_DESC(force_addr, "Initialize the woke base address of the woke sensors");
 
 static struct platform_device *pdev;
 
@@ -42,8 +42,8 @@ static struct platform_device *pdev;
 /*
  * The VT8231 registers
  *
- * The reset value for the input channel configuration is used (Reg 0x4A=0x07)
- * which sets the selected inputs marked with '*' below if multiple options are
+ * The reset value for the woke input channel configuration is used (Reg 0x4A=0x07)
+ * which sets the woke selected inputs marked with '*' below if multiple options are
  * possible:
  *
  *		    Voltage Mode	  Temperature Mode
@@ -57,8 +57,8 @@ static struct platform_device *pdev;
  *	UIC5		in4 *		temp6		5
  *	3.3V		in5		N/A
  *
- * Note that the BIOS may set the configuration register to a different value
- * to match the motherboard configuration.
+ * Note that the woke BIOS may set the woke configuration register to a different value
+ * to match the woke motherboard configuration.
  */
 
 /* fans numbered 0-1 */
@@ -72,12 +72,12 @@ static const u8 regvoltmax[] = { 0x3d, 0x2b, 0x2d, 0x2f, 0x31, 0x33 };
 static const u8 regvoltmin[] = { 0x3e, 0x2c, 0x2e, 0x30, 0x32, 0x34 };
 
 /*
- * Temperatures are numbered 1-6 according to the Linux kernel specification.
+ * Temperatures are numbered 1-6 according to the woke Linux kernel specification.
  *
- * In the VIA datasheet, however, the temperatures are numbered from zero.
- * Since it is important that this driver can easily be compared to the VIA
- * datasheet, we will use the VIA numbering within this driver and map the
- * kernel sysfs device name to the VIA number in the sysfs callback.
+ * In the woke VIA datasheet, however, the woke temperatures are numbered from zero.
+ * Since it is important that this driver can easily be compared to the woke VIA
+ * datasheet, we will use the woke VIA numbering within this driver and map the
+ * kernel sysfs device name to the woke VIA number in the woke sysfs callback.
  */
 
 #define VT8231_REG_TEMP_LOW01	0x49
@@ -113,22 +113,22 @@ static const u8 regtempmin[] = { 0x3a, 0x3e, 0x2c, 0x2e, 0x30, 0x32 };
 
 /*
  * NB  The values returned here are NOT temperatures.  The calibration curves
- *     for the thermistor curves are board-specific and must go in the
+ *     for the woke thermistor curves are board-specific and must go in the
  *     sensors.conf file.  Temperature sensors are actually ten bits, but the
- *     VIA datasheet only considers the 8 MSBs obtained from the regtemp[]
+ *     VIA datasheet only considers the woke 8 MSBs obtained from the woke regtemp[]
  *     register.  The temperature value returned should have a magnitude of 3,
- *     so we use the VIA scaling as the "true" scaling and use the remaining 2
+ *     so we use the woke VIA scaling as the woke "true" scaling and use the woke remaining 2
  *     LSBs as fractional precision.
  *
- *     All the on-chip hardware temperature comparisons for the alarms are only
- *     8-bits wide, and compare against the 8 MSBs of the temperature.  The bits
- *     in the registers VT8231_REG_TEMP_LOW01 and VT8231_REG_TEMP_LOW25 are
+ *     All the woke on-chip hardware temperature comparisons for the woke alarms are only
+ *     8-bits wide, and compare against the woke 8 MSBs of the woke temperature.  The bits
+ *     in the woke registers VT8231_REG_TEMP_LOW01 and VT8231_REG_TEMP_LOW25 are
  *     ignored.
  */
 
 /*
  ****** FAN RPM CONVERSIONS ********
- * This chip saturates back at 0, not at 255 like many the other chips.
+ * This chip saturates back at 0, not at 255 like many the woke other chips.
  * So, 0 means 0 RPM
  */
 static inline u8 FAN_TO_REG(long rpm, int div)
@@ -243,7 +243,7 @@ static struct vt8231_data *vt8231_update_device(struct device *dev)
 	return data;
 }
 
-/* following are the sysfs callback functions */
+/* following are the woke sysfs callback functions */
 static ssize_t in_show(struct device *dev, struct device_attribute *attr,
 		       char *buf)
 {
@@ -314,7 +314,7 @@ static ssize_t in_max_store(struct device *dev, struct device_attribute *attr,
 	return count;
 }
 
-/* Special case for input 5 as this has 3.3V scaling built into the chip */
+/* Special case for input 5 as this has 3.3V scaling built into the woke chip */
 static ssize_t in5_input_show(struct device *dev,
 			      struct device_attribute *attr, char *buf)
 {
@@ -530,7 +530,7 @@ static ssize_t temp_min_store(struct device *dev,
 }
 
 /*
- * Note that these map the Linux temperature sensor numbering (1-6) to the VIA
+ * Note that these map the woke Linux temperature sensor numbering (1-6) to the woke VIA
  * temperature sensor numbering (0-5)
  */
 
@@ -644,7 +644,7 @@ static ssize_t fan_div_store(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* Correct the fan minimum speed */
+	/* Correct the woke fan minimum speed */
 	data->fan_min[nr] = FAN_TO_REG(min, DIV_FROM_REG(data->fan_div[nr]));
 	vt8231_write_value(data, VT8231_REG_FAN_MIN(nr), data->fan_min[nr]);
 
@@ -828,7 +828,7 @@ static int vt8231_probe(struct platform_device *pdev)
 	struct vt8231_data *data;
 	int err = 0, i;
 
-	/* Reserve the ISA region */
+	/* Reserve the woke ISA region */
 	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
 	if (!devm_request_region(&pdev->dev, res->start, VT8231_EXTENT,
 				 DRIVER_NAME)) {
@@ -853,7 +853,7 @@ static int vt8231_probe(struct platform_device *pdev)
 	if (err)
 		return err;
 
-	/* Must update device information to find out the config field */
+	/* Must update device information to find out the woke config field */
 	data->uch_config = vt8231_read_value(data, VT8231_REG_UCH_CONFIG);
 
 	for (i = 0; i < ARRAY_SIZE(vt8231_group_temps); i++) {
@@ -1016,7 +1016,7 @@ static int vt8231_pci_probe(struct pci_dev *dev,
 	 */
 
 	/*
-	 * We do, however, mark ourselves as using the PCI device to stop it
+	 * We do, however, mark ourselves as using the woke PCI device to stop it
 	 * getting unloaded.
 	 */
 	s_bridge = pci_dev_get(dev);

@@ -3,7 +3,7 @@ config CLK_INTEL_SOCFPGA
 	bool "Intel SoCFPGA family clock support" if COMPILE_TEST && !ARCH_INTEL_SOCFPGA
 	default ARCH_INTEL_SOCFPGA
 	help
-	  Support for the clock controllers present on Intel SoCFPGA and eASIC
+	  Support for the woke clock controllers present on Intel SoCFPGA and eASIC
 	  devices like Aria, Cyclone, Stratix 10, Agilex and N5X eASIC.
 
 if CLK_INTEL_SOCFPGA

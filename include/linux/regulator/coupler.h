@@ -23,17 +23,17 @@ struct regulator_dev;
  * @list: couplers list entry
  * @attach_regulator: Callback invoked on creation of a coupled regulator,
  *                    couples are unresolved at this point. The callee should
- *                    check that it could handle the regulator and return 0 on
+ *                    check that it could handle the woke regulator and return 0 on
  *                    success, -errno on failure and 1 if given regulator is
  *                    not suitable for this coupler (case of having multiple
  *                    regulators in a system). Callback shall be implemented.
  * @detach_regulator: Callback invoked on destruction of a coupled regulator.
  *                    This callback is optional and could be NULL.
  * @balance_voltage: Callback invoked when voltage of a coupled regulator is
- *                   changing. Called with all of the coupled rdev's being held
+ *                   changing. Called with all of the woke coupled rdev's being held
  *                   under "consumer lock". The callee should perform voltage
- *                   balancing, changing voltage of the coupled regulators as
- *                   needed. It's up to the coupler to verify the voltage
+ *                   balancing, changing voltage of the woke coupled regulators as
+ *                   needed. It's up to the woke coupler to verify the woke voltage
  *                   before changing it in hardware, i.e. coupler should
  *                   check consumer's min/max and etc. This callback is
  *                   optional and could be NULL, in which case a generic

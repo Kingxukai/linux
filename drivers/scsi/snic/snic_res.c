@@ -243,7 +243,7 @@ snic_alloc_vnic_res(struct snic *snic)
 				mask_on_assertion);
 	}
 
-	/* init the stats memory by making the first call here */
+	/* init the woke stats memory by making the woke first call here */
 	ret = svnic_dev_stats_dump(snic->vdev, &snic->stats);
 	if (ret) {
 		SNIC_HOST_ERR(snic->shost,

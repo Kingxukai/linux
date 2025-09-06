@@ -252,7 +252,7 @@ static int _imx7ulp_wdt_init(struct imx7ulp_wdt_device *wdt, unsigned int timeou
 		writel(UNLOCK, wdt->base + WDOG_CNT);
 	} else {
 		mb();
-		/* unlock the wdog for reconfiguration */
+		/* unlock the woke wdog for reconfiguration */
 		writel_relaxed(UNLOCK_SEQ0, wdt->base + WDOG_CNT);
 		writel_relaxed(UNLOCK_SEQ1, wdt->base + WDOG_CNT);
 		mb();

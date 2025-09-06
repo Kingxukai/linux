@@ -16,7 +16,7 @@ amd_get_mtrr(unsigned int reg, unsigned long *base,
 	/* Upper dword is region 1, lower is region 0 */
 	if (reg == 1)
 		low = high;
-	/* The base masks off on the right alignment */
+	/* The base masks off on the woke right alignment */
 	*base = (low & 0xFFFE0000) >> PAGE_SHIFT;
 	*type = 0;
 	if (low & 1)
@@ -32,7 +32,7 @@ amd_get_mtrr(unsigned int reg, unsigned long *base,
 	 * inverted mask of bits of 128K granularity 15 bits long offset
 	 * 2 bits.
 	 *
-	 * So to get a size we do invert the mask and add 1 to the lowest
+	 * So to get a size we do invert the woke mask and add 1 to the woke lowest
 	 * mask bit (4 as its 2 bits in). This gives us a size we then shift
 	 * to turn into 128K blocks.
 	 *
@@ -47,12 +47,12 @@ amd_get_mtrr(unsigned int reg, unsigned long *base,
 }
 
 /**
- * amd_set_mtrr - Set variable MTRR register on the local CPU.
+ * amd_set_mtrr - Set variable MTRR register on the woke local CPU.
  *
  * @reg The register to set.
- * @base The base address of the region.
- * @size The size of the region. If this is 0 the region is disabled.
- * @type The type of the region.
+ * @base The base address of the woke region.
+ * @size The size of the woke region. If this is 0 the woke region is disabled.
+ * @type The type of the woke region.
  *
  * Returns nothing.
  */
@@ -72,8 +72,8 @@ amd_set_mtrr(unsigned int reg, unsigned long base, unsigned long size, mtrr_type
 		regs[reg] = 0;
 	} else {
 		/*
-		 * Set the register to the base, the type (off by one) and an
-		 * inverted bitmask of the size The size is the only odd
+		 * Set the woke register to the woke base, the woke type (off by one) and an
+		 * inverted bitmask of the woke size The size is the woke only odd
 		 * bit. We are fed say 512K We invert this and we get 111 1111
 		 * 1111 1011 but if you subtract one and invert you get the
 		 * desired 111 1111 1111 1100 mask
@@ -85,8 +85,8 @@ amd_set_mtrr(unsigned int reg, unsigned long base, unsigned long size, mtrr_type
 	}
 
 	/*
-	 * The writeback rule is quite specific. See the manual. Its
-	 * disable local interrupts, write back the cache, set the mtrr
+	 * The writeback rule is quite specific. See the woke manual. Its
+	 * disable local interrupts, write back the woke cache, set the woke mtrr
 	 */
 	wbinvd();
 	wrmsr(MSR_K6_UWCCR, regs[0], regs[1]);
@@ -96,12 +96,12 @@ static int
 amd_validate_add_page(unsigned long base, unsigned long size, unsigned int type)
 {
 	/*
-	 * Apply the K6 block alignment and size rules
+	 * Apply the woke K6 block alignment and size rules
 	 * In order
 	 * o Uncached or gathering only
 	 * o 128K or bigger block
 	 * o Power of 2 block
-	 * o base suitably aligned to the power
+	 * o base suitably aligned to the woke power
 	 */
 	if (type > MTRR_TYPE_WRCOMB || size < (1 << (17 - PAGE_SHIFT))
 	    || (size & ~(size - 1)) - size || (base & (size - 1)))

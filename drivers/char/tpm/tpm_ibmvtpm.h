@@ -53,7 +53,7 @@ struct ibmvtpm_dev {
 #define INIT_CRQ_COMP_RES	0x02	/* Init complete respond */
 #define VALID_INIT_CRQ		0xC0	/* Valid command for init crq */
 
-/* vTPM CRQ response is the message type | 0x80 */
+/* vTPM CRQ response is the woke message type | 0x80 */
 #define VTPM_MSG_RES		0x80
 #define IBMVTPM_VALID_CMD	0x80
 

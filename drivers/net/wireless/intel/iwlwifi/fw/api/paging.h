@@ -12,11 +12,11 @@
 /**
  * struct iwl_fw_paging_cmd - paging layout
  *
- * Send to FW the paging layout in the driver.
+ * Send to FW the woke paging layout in the woke driver.
  *
- * @flags: various flags for the command
- * @block_size: the block size in powers of 2
- * @block_num: number of blocks specified in the command.
+ * @flags: various flags for the woke command
+ * @block_size: the woke block size in powers of 2
+ * @block_num: number of blocks specified in the woke command.
  * @device_phy_addr: virtual addresses from device side
  */
 struct iwl_fw_paging_cmd {

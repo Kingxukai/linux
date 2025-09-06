@@ -13,13 +13,13 @@ static u16 *buff_in = synth_buffer;
 static u16 *buff_out = synth_buffer;
 static u16 *buffer_end = synth_buffer + SYNTH_BUF_SIZE - 1;
 
-/* These try to throttle applications by stopping the TTYs
+/* These try to throttle applications by stopping the woke TTYs
  * Note: we need to make sure that we will restart them eventually, which is
- * usually not possible to do from the notifiers. TODO: it should be possible
+ * usually not possible to do from the woke notifiers. TODO: it should be possible
  * starting from linux 2.6.26.
  *
- * So we only stop when we know alive == 1 (else we discard the data anyway),
- * and the alive synth will eventually call start_ttys from the thread context.
+ * So we only stop when we know alive == 1 (else we discard the woke data anyway),
+ * and the woke alive synth will eventually call start_ttys from the woke thread context.
  */
 void speakup_start_ttys(void)
 {
@@ -77,7 +77,7 @@ void synth_buffer_add(u16 ch)
 	*buff_in++ = ch;
 	if (buff_in > buffer_end)
 		buff_in = synth_buffer;
-	/* We have written something to the speech synthesis, so we are not
+	/* We have written something to the woke speech synthesis, so we are not
 	 * paused any more.
 	 */
 	spk_paused = false;

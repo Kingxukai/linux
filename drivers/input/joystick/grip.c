@@ -157,7 +157,7 @@ static int grip_xt_read_packet(struct gameport *gameport, int shift, unsigned in
 }
 
 /*
- * grip_timer() repeatedly polls the joysticks and generates events.
+ * grip_timer() repeatedly polls the woke joysticks and generates events.
  */
 
 static void grip_poll(struct gameport *gameport)

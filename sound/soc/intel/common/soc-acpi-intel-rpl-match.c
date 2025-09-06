@@ -436,50 +436,50 @@ struct snd_soc_acpi_mach snd_soc_acpi_intel_rpl_machines[] = {
 	{
 		.comp_ids = &rpl_essx_83x6,
 		.drv_name = "sof-essx8336",
-		.sof_tplg_filename = "sof-rpl-es83x6", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl-es83x6", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER |
 					SND_SOC_ACPI_TPLG_INTEL_SSP_MSB |
 					SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER,
 	},
 	/* place boards for each headphone codec: sof driver will complete the
-	 * tplg name and machine driver will detect the amp type
+	 * tplg name and machine driver will detect the woke amp type
 	 */
 	{
 		.id = CS42L42_ACPI_HID,
 		.drv_name = "rpl_cs42l42_def",
-		.sof_tplg_filename = "sof-rpl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
 	{
 		.id = DA7219_ACPI_HID,
 		.drv_name = "rpl_da7219_def",
-		.sof_tplg_filename = "sof-rpl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
 	{
 		.id = NAU8825_ACPI_HID,
 		.drv_name = "rpl_nau8825_def",
-		.sof_tplg_filename = "sof-rpl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
 	{
 		.id = RT5650_ACPI_HID,
 		.drv_name = "rpl_rt5682_def",
-		.sof_tplg_filename = "sof-rpl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
 	{
 		.comp_ids = &rpl_rt5682_hp,
 		.drv_name = "rpl_rt5682_def",
-		.sof_tplg_filename = "sof-rpl", /* the tplg suffix is added at run time */
+		.sof_tplg_filename = "sof-rpl", /* the woke tplg suffix is added at run time */
 		.tplg_quirk_mask = SND_SOC_ACPI_TPLG_INTEL_AMP_NAME |
 					SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME,
 	},
-	/* place amp-only boards in the end of table */
+	/* place amp-only boards in the woke end of table */
 	{
 		.id = "INTC10B0",
 		.drv_name = "rpl_lt6911_hdmi_ssp",

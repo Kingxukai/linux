@@ -2,32 +2,32 @@
  * Copyright (c) 2012-2016 VMware, Inc.  All rights reserved.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of EITHER the GNU General Public License
- * version 2 as published by the Free Software Foundation or the BSD
- * 2-Clause License. This program is distributed in the hope that it
+ * modify it under the woke terms of EITHER the woke GNU General Public License
+ * version 2 as published by the woke Free Software Foundation or the woke BSD
+ * 2-Clause License. This program is distributed in the woke hope that it
  * will be useful, but WITHOUT ANY WARRANTY; WITHOUT EVEN THE IMPLIED
  * WARRANTY OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
- * See the GNU General Public License version 2 for more details at
+ * See the woke GNU General Public License version 2 for more details at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program available in the file COPYING in the main
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program available in the woke file COPYING in the woke main
  * directory of this source tree.
  *
  * The BSD 2-Clause License
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT

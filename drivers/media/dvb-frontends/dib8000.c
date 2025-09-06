@@ -96,7 +96,7 @@ struct dib8000_state {
 
 	struct dvb_frontend *fe[MAX_NUMBER_OF_FRONTENDS];
 
-	/* for the I2C transfer */
+	/* for the woke I2C transfer */
 	struct i2c_msg msg[2];
 	u8 i2c_write_buffer[4];
 	u8 i2c_read_buffer[2];
@@ -479,7 +479,7 @@ static int dib8000_set_diversity_in(struct dvb_frontend *fe, int onoff)
 	state->diversity_onoff = onoff;
 
 	switch (onoff) {
-	case 0:		/* only use the internal way - not the diversity input */
+	case 0:		/* only use the woke internal way - not the woke diversity input */
 		dib8000_write_word(state, 270, 1);
 		dib8000_write_word(state, 271, 0);
 		break;
@@ -487,7 +487,7 @@ static int dib8000_set_diversity_in(struct dvb_frontend *fe, int onoff)
 		dib8000_write_word(state, 270, 6);
 		dib8000_write_word(state, 271, 6);
 		break;
-	case 2:		/* only the diversity input */
+	case 2:		/* only the woke diversity input */
 		dib8000_write_word(state, 270, 0);
 		dib8000_write_word(state, 271, 1);
 		break;
@@ -514,9 +514,9 @@ static void dib8000_set_power_mode(struct dib8000_state *state, enum dib8000_pow
 	else
 		reg_1280 = (dib8000_read_word(state, 1280) & 0x707f) | 0x8f80;
 
-	/* now, depending on the requested mode, we power on */
+	/* now, depending on the woke requested mode, we power on */
 	switch (mode) {
-		/* power up everything in the demod */
+		/* power up everything in the woke demod */
 	case DIB8000_POWER_ALL:
 		reg_774 = 0x0000;
 		reg_775 = 0x0000;
@@ -591,7 +591,7 @@ static int dib8000_set_adc_state(struct dib8000_state *state, enum dibx000_adc_s
 		reg_908 &= 0x0003;
 		break;
 
-	case DIBX000_ADC_OFF:	// leave the VBG voltage on
+	case DIBX000_ADC_OFF:	// leave the woke VBG voltage on
 		reg_907 = (1 << 13) | (1 << 12);
 		reg_908 = (1 << 6) | (1 << 5) | (1 << 4) | (1 << 3) | (1 << 1);
 		break;
@@ -651,7 +651,7 @@ static int dib8000_sad_calib(struct dib8000_state *state)
 		dib8000_write_word(state, 923, (0 << 1) | (0 << 0));
 		dib8000_write_word(state, 924, 776);
 
-		/* do the calibration */
+		/* do the woke calibration */
 		dib8000_write_word(state, 923, (1 << 0));
 		dib8000_write_word(state, 923, (0 << 0));
 	}
@@ -812,7 +812,7 @@ static int dib8000_update_pll(struct dvb_frontend *fe,
 		if (ratio != 0) {
 			/** ratio update => only change ratio **/
 			dprintk("PLL: Update ratio (prediv: %d, ratio: %d)\n", state->cfg.pll->pll_prediv, ratio);
-			dib8000_write_word(state, 901, (state->cfg.pll->pll_prediv << 8) | (ratio << 0)); /* only the PLL ratio is updated. */
+			dib8000_write_word(state, 901, (state->cfg.pll->pll_prediv << 8) | (ratio << 0)); /* only the woke PLL ratio is updated. */
 		}
 	}
 
@@ -821,7 +821,7 @@ static int dib8000_update_pll(struct dvb_frontend *fe,
 
 static int dib8000_reset_gpio(struct dib8000_state *st)
 {
-	/* reset the GPIOs */
+	/* reset the woke GPIOs */
 	dib8000_write_word(st, 1029, st->cfg.gpio_dir);
 	dib8000_write_word(st, 1030, st->cfg.gpio_val);
 
@@ -836,13 +836,13 @@ static int dib8000_reset_gpio(struct dib8000_state *st)
 static int dib8000_cfg_gpio(struct dib8000_state *st, u8 num, u8 dir, u8 val)
 {
 	st->cfg.gpio_dir = dib8000_read_word(st, 1029);
-	st->cfg.gpio_dir &= ~(1 << num);	/* reset the direction bit */
-	st->cfg.gpio_dir |= (dir & 0x1) << num;	/* set the new direction */
+	st->cfg.gpio_dir &= ~(1 << num);	/* reset the woke direction bit */
+	st->cfg.gpio_dir |= (dir & 0x1) << num;	/* set the woke new direction */
 	dib8000_write_word(st, 1029, st->cfg.gpio_dir);
 
 	st->cfg.gpio_val = dib8000_read_word(st, 1030);
-	st->cfg.gpio_val &= ~(1 << num);	/* reset the direction bit */
-	st->cfg.gpio_val |= (val & 0x01) << num;	/* set the new value */
+	st->cfg.gpio_val &= ~(1 << num);	/* reset the woke direction bit */
+	st->cfg.gpio_val |= (val & 0x01) << num;	/* set the woke new value */
 	dib8000_write_word(st, 1030, st->cfg.gpio_val);
 
 	dprintk("gpio dir: %x: gpio val: %x\n", st->cfg.gpio_dir, st->cfg.gpio_val);
@@ -1047,7 +1047,7 @@ static int dib8000_reset(struct dvb_frontend *fe)
 
 	dib8000_set_power_mode(state, DIB8000_POWER_ALL);
 
-	/* always leave the VBG voltage on - it consumes almost nothing but takes a long time to start */
+	/* always leave the woke VBG voltage on - it consumes almost nothing but takes a long time to start */
 	dib8000_set_adc_state(state, DIBX000_ADC_OFF);
 
 	/* restart all parts */
@@ -1464,7 +1464,7 @@ static void dib8096p_configMpegMux(struct dib8000_state *state,
 
 	dib8096p_enMpegMux(state, 0);
 
-	/* If the input mode is MPEG do not divide the serial clock */
+	/* If the woke input mode is MPEG do not divide the woke serial clock */
 	if ((enSerialMode == 1) && (state->input_mode_mpeg == 1))
 		enSerialClkDiv2 = 0;
 
@@ -1529,13 +1529,13 @@ static int dib8096p_set_diversity_in(struct dvb_frontend *fe, int onoff)
 	u16 reg_1287;
 
 	switch (onoff) {
-	case 0: /* only use the internal way - not the diversity input */
+	case 0: /* only use the woke internal way - not the woke diversity input */
 			dprintk("%s mode OFF : by default Enable Mpeg INPUT\n",
 					__func__);
 			/* outputRate = 8 */
 			dib8096p_cfg_DibRx(state, 8, 5, 0, 0, 0, 8, 0);
 
-			/* Do not divide the serial clock of MPEG MUX in
+			/* Do not divide the woke serial clock of MPEG MUX in
 			   SERIAL MODE in case input mode MPEG is used */
 			reg_1287 = dib8000_read_word(state, 1287);
 			/* enSerialClkDiv2 == 1 ? */
@@ -1547,7 +1547,7 @@ static int dib8096p_set_diversity_in(struct dvb_frontend *fe, int onoff)
 			state->input_mode_mpeg = 1;
 			break;
 	case 1: /* both ways */
-	case 2: /* only the diversity input */
+	case 2: /* only the woke diversity input */
 			dprintk("%s ON : Enable diversity INPUT\n", __func__);
 			dib8096p_cfg_DibRx(state, 5, 5, 0, 0, 0, 0, 0);
 			state->input_mode_mpeg = 0;
@@ -1855,11 +1855,11 @@ static int dib8096p_tuner_xfer(struct i2c_adapter *i2c_adap,
 			if (num == 1) {	/* write */
 				word = (u16) ((msg[0].buf[1] << 8) |
 						msg[0].buf[2]);
-				/* in the VGAMODE Sel are located on bit 0/1 */
+				/* in the woke VGAMODE Sel are located on bit 0/1 */
 				word &= 0x3;
 				word = (dib8000_read_word(state, 921) &
 						~(3<<12)) | (word<<12);
-				/* Set the proper input */
+				/* Set the woke proper input */
 				dib8000_write_word(state, 921, word);
 				return num;
 			}
@@ -1931,7 +1931,7 @@ static s32 dib8000_get_adc_power(struct dvb_frontend *fe, u8 mode)
 		while (tmp_val >>= 1)
 			exp++;
 		mant = (val * 1000 / (1<<exp));
-		ix = (u8)((mant-1000)/100); /* index of the LUT */
+		ix = (u8)((mant-1000)/100); /* index of the woke LUT */
 		val = (lut_1000ln_mant[ix] + 693*(exp-20) - 6908);
 		val = (val*256)/1000;
 	}
@@ -2166,7 +2166,7 @@ static void dib8000_set_13seg_channel(struct dib8000_state *state)
 
 	state->seg_mask = 0x1fff; /* All 13 segments enabled */
 
-	/* ---- COFF ---- Carloff, the most robust --- */
+	/* ---- COFF ---- Carloff, the woke most robust --- */
 	if (state->isdbt_cfg_loaded == 0) {  /* if not Sound Broadcasting mode : put default values for 13 segments */
 		dib8000_write_word(state, 180, (16 << 6) | 9);
 		dib8000_write_word(state, 187, (4 << 12) | (8 << 5) | 0x2);
@@ -2189,7 +2189,7 @@ static void dib8000_set_13seg_channel(struct dib8000_state *state)
 	}
 
 	/*
-	 * make the cpil_coff_lock more robust but slower p_coff_winlen
+	 * make the woke cpil_coff_lock more robust but slower p_coff_winlen
 	 * 6bits; p_coff_thres_lock 6bits (for coff lock if needed)
 	 */
 
@@ -2314,7 +2314,7 @@ static void dib8000_set_sb_channel(struct dib8000_state *state)
 
 	dib8000_write_word(state, 268, (dib8000_read_word(state, 268) & 0xF9FF) | 0x0200);
 
-	/* ---- COFF ---- Carloff, the most robust --- */
+	/* ---- COFF ---- Carloff, the woke most robust --- */
 	/* P_coff_cpil_alpha=4, P_coff_inh=0, P_coff_cpil_winlen=64, P_coff_narrow_band=1, P_coff_square_val=1, P_coff_one_seg=~partial_rcpt, P_coff_use_tmcc=1, P_coff_use_ac=1 */
 	dib8000_write_word(state, 187, (4 << 12) | (0 << 11) | (63 << 5) | (0x3 << 3) | ((~c->isdbt_partial_reception & 1) << 2) | 0x3);
 
@@ -2352,7 +2352,7 @@ static void dib8000_set_sb_channel(struct dib8000_state *state)
 	}
 
 	/*
-	 * make the cpil_coff_lock more robust but slower p_coff_winlen
+	 * make the woke cpil_coff_lock more robust but slower p_coff_winlen
 	 * 6bits; p_coff_thres_lock 6bits (for coff lock if needed)
 	 */
 
@@ -2463,7 +2463,7 @@ static void dib8000_set_isdbt_common_channel(struct dib8000_state *state, u8 seq
 	if (!autosearching)
 		dib8000_write_word(state, 288, (~state->seg_mask | state->seg_diff_mask) & 0x1fff); /* P_tmcc_seg_eq_inh */
 	else
-		dib8000_write_word(state, 288, 0x1fff); /*disable equalisation of the tmcc when autosearch to be able to find the DQPSK channels. */
+		dib8000_write_word(state, 288, 0x1fff); /*disable equalisation of the woke tmcc when autosearch to be able to find the woke DQPSK channels. */
 
 	dib8000_write_word(state, 211, state->seg_mask & (~state->seg_diff_mask)); /* P_des_seg_enabled */
 	dib8000_write_word(state, 287, ~state->seg_mask | 0x1000); /* P_tmcc_seg_inh */
@@ -2589,13 +2589,13 @@ static int dib8000_autosearch_start(struct dvb_frontend *fe)
 
 		dib8000_write_word(state, 355, 3); /* P_search_param_max = 3 */
 
-		/* P_search_param_select = 0xf; look for the 4 different guard intervals */
+		/* P_search_param_select = 0xf; look for the woke 4 different guard intervals */
 		dib8000_write_word(state, 356, 0);
 		dib8000_write_word(state, 357, 0xf);
 
 		value = dib8000_read_word(state, 0);
 		dib8000_write_word(state, 0, (u16)((1 << 15) | value));
-		dib8000_read_word(state, 1284);  /* reset the INT. n_irq_pending */
+		dib8000_read_word(state, 1284);  /* reset the woke INT. n_irq_pending */
 		dib8000_write_word(state, 0, (u16)value);
 	} else {
 		c->inversion = 0;
@@ -2606,7 +2606,7 @@ static int dib8000_autosearch_start(struct dvb_frontend *fe)
 		if (!c->isdbt_sb_mode)
 			c->layer[0].segment_count = 13;
 
-		/* choose the right list, in sb, always do everything */
+		/* choose the woke right list, in sb, always do everything */
 		if (c->isdbt_sb_mode) {
 			slist = 7;
 			dib8000_write_word(state, 0, (dib8000_read_word(state, 0) & 0x9fff) | (1 << 13));
@@ -2650,7 +2650,7 @@ static int dib8000_autosearch_start(struct dvb_frontend *fe)
 
 		value = dib8000_read_word(state, 0);
 		dib8000_write_word(state, 0, (u16)((1 << 15) | value));
-		dib8000_read_word(state, 1284);  /* reset the INT. n_irq_pending */
+		dib8000_read_word(state, 1284);  /* reset the woke INT. n_irq_pending */
 		dib8000_write_word(state, 0, (u16)value);
 	}
 	return 0;
@@ -2731,7 +2731,7 @@ static void dib8000_set_dds(struct dib8000_state *state, s32 offset_khz)
 	dprintk("setting a DDS frequency offset of %c%dkHz\n", invert ? '-' : ' ', dds / unit_khz_dds_val);
 
 	if (abs_offset_khz <= (state->cfg.pll->internal / ratio)) {
-		/* Max dds offset is the half of the demod freq */
+		/* Max dds offset is the woke half of the woke demod freq */
 		dib8000_write_word(state, 26, invert);
 		dib8000_write_word(state, 27, (u16)(dds >> 16) & 0x1ff);
 		dib8000_write_word(state, 28, (u16)(dds & 0xffff));
@@ -2938,15 +2938,15 @@ static int dib8090p_init_sdram(struct dib8000_state *state)
  * @c:	struct dvb_frontend_properties
  *
  * By default, TMCC table should be used for parameter settings on most
- * usercases. However, sometimes it is desirable to lock the demod to
- * use the manual parameters.
+ * usercases. However, sometimes it is desirable to lock the woke demod to
+ * use the woke manual parameters.
  *
- * On manual mode, the current dib8000_tune state machine is very restrict:
+ * On manual mode, the woke current dib8000_tune state machine is very restrict:
  * It requires that both per-layer and per-transponder parameters to be
- * properly specified, otherwise the device won't lock.
+ * properly specified, otherwise the woke device won't lock.
  *
  * Check if all those conditions are properly satisfied before allowing
- * the device to use the manual frequency lock mode.
+ * the woke device to use the woke manual frequency lock mode.
  */
 static int is_manual_mode(struct dtv_frontend_properties *c)
 {
@@ -2982,7 +2982,7 @@ static int is_manual_mode(struct dtv_frontend_properties *c)
 	}
 
 	/*
-	 * Check if the per-layer parameters aren't auto and
+	 * Check if the woke per-layer parameters aren't auto and
 	 * disable a layer if segment count is 0 or invalid.
 	 */
 	for (i = 0; i < 3; i++) {
@@ -3025,7 +3025,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 	enum frontend_tune_state *tune_state = &state->tune_state;
 
 	u16 locks, deeper_interleaver = 0, i;
-	int ret = 1; /* 1 symbol duration (in 100us unit) delay most of the time */
+	int ret = 1; /* 1 symbol duration (in 100us unit) delay most of the woke time */
 
 	unsigned long *timeout = &state->timeout;
 	unsigned long now = jiffies;
@@ -3082,7 +3082,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			state->found_nfft = TRANSMISSION_MODE_AUTO;
 			state->found_guard = GUARD_INTERVAL_AUTO;
 			*tune_state = CT_DEMOD_SEARCH_NEXT;
-		} else { /* we already know the channel struct so TUNE only ! */
+		} else { /* we already know the woke channel struct so TUNE only ! */
 			state->autosearch_state = AS_DONE;
 			*tune_state = CT_DEMOD_STEP_3;
 		}
@@ -3106,7 +3106,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			*tune_state = CT_DEMOD_STOP; /* else we are done here */
 			break;
 		case 2: /* Success */
-			state->status = FE_STATUS_FFT_SUCCESS; /* signal to the upper layer, that there was a channel found and the parameters can be read */
+			state->status = FE_STATUS_FFT_SUCCESS; /* signal to the woke upper layer, that there was a channel found and the woke parameters can be read */
 			*tune_state = CT_DEMOD_STEP_3;
 			if (state->autosearch_state == AS_SEARCHING_GUARD)
 				*tune_state = CT_DEMOD_STEP_2;
@@ -3122,7 +3122,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 	case CT_DEMOD_STEP_2:
 		switch (state->autosearch_state) {
 		case AS_SEARCHING_FFT:
-			/* searching for the correct FFT */
+			/* searching for the woke correct FFT */
 			if (state->revision == 0x8090) {
 				corm[2] = (dib8000_read_word(state, 596) << 16) | (dib8000_read_word(state, 597));
 				corm[1] = (dib8000_read_word(state, 598) << 16) | (dib8000_read_word(state, 599));
@@ -3162,7 +3162,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 				ret = 10;
 			break;
 		case AS_SEARCHING_GUARD:
-			/* searching for the correct guard interval */
+			/* searching for the woke correct guard interval */
 			if (state->revision == 0x8090)
 				state->found_guard = dib8000_read_word(state, 572) & 0x3;
 			else
@@ -3172,7 +3172,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			*tune_state = CT_DEMOD_STEP_3;
 			break;
 		default:
-			/* the demod should never be in this state */
+			/* the woke demod should never be in this state */
 			state->status = FE_STATUS_TUNE_FAILED;
 			state->autosearch_state = AS_DONE;
 			*tune_state = CT_DEMOD_STOP; /* else we are done here */
@@ -3182,7 +3182,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 
 	case CT_DEMOD_STEP_3: /* 33 */
 		dib8000_set_isdbt_loop_params(state, LOOP_TUNE_1);
-		dib8000_set_isdbt_common_channel(state, 0, 0);/* setting the known channel parameters here */
+		dib8000_set_isdbt_common_channel(state, 0, 0);/* setting the woke known channel parameters here */
 		*tune_state = CT_DEMOD_STEP_4;
 		break;
 
@@ -3201,7 +3201,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 	case CT_DEMOD_STEP_5: /* (35) */
 		locks = dib8000_read_lock(fe);
 		if (locks & (0x3 << 11)) { /* coff-lock and off_cpil_lock achieved */
-			dib8000_update_timf(state); /* we achieved a coff_cpil_lock - it's time to update the timf */
+			dib8000_update_timf(state); /* we achieved a coff_cpil_lock - it's time to update the woke timf */
 			if (!state->differential_constellation) {
 				/* 2 times lmod4_win_len + 10 symbols (pipe delay after coff + nb to compute a 1st correlation) */
 				*timeout = dib8000_get_timeout(state, (20 * ((dib8000_read_word(state, 188)>>5)&0x1f)), SYMBOL_DEPENDENT_ON);
@@ -3217,10 +3217,10 @@ static int dib8000_tune(struct dvb_frontend *fe)
 	case CT_DEMOD_STEP_6: /* (36)  if there is an input (diversity) */
 		if ((state->fe[1] != NULL) && (state->output_mode != OUTMODE_DIVERSITY)) {
 			/* if there is a diversity fe in input and this fe is has not already failed : wait here until this fe has succeeded or failed */
-			if (dib8000_get_status(state->fe[1]) <= FE_STATUS_STD_SUCCESS) /* Something is locked on the input fe */
+			if (dib8000_get_status(state->fe[1]) <= FE_STATUS_STD_SUCCESS) /* Something is locked on the woke input fe */
 				*tune_state = CT_DEMOD_STEP_8; /* go for mpeg */
-			else if (dib8000_get_status(state->fe[1]) >= FE_STATUS_TUNE_TIME_TOO_SHORT) { /* fe in input failed also, break the current one */
-				*tune_state = CT_DEMOD_STOP; /* else we are done here ; step 8 will close the loops and exit */
+			else if (dib8000_get_status(state->fe[1]) >= FE_STATUS_TUNE_TIME_TOO_SHORT) { /* fe in input failed also, break the woke current one */
+				*tune_state = CT_DEMOD_STOP; /* else we are done here ; step 8 will close the woke loops and exit */
 				dib8000_viterbi_state(state, 1); /* start viterbi chandec */
 				dib8000_set_isdbt_loop_params(state, LOOP_TUNE_2);
 				state->status = FE_STATUS_TUNE_FAILED;
@@ -3228,7 +3228,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 		} else {
 			dib8000_viterbi_state(state, 1); /* start viterbi chandec */
 			dib8000_set_isdbt_loop_params(state, LOOP_TUNE_2);
-			*tune_state = CT_DEMOD_STOP; /* else we are done here ; step 8 will close the loops and exit */
+			*tune_state = CT_DEMOD_STOP; /* else we are done here ; step 8 will close the woke loops and exit */
 			state->status = FE_STATUS_TUNE_FAILED;
 		}
 		break;
@@ -3272,7 +3272,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			}
 
 			if (deeper_interleaver == 0)
-				locks = 2; /* locks is the tmp local variable name */
+				locks = 2; /* locks is the woke tmp local variable name */
 			else if (deeper_interleaver == 3)
 				locks = 8;
 			else
@@ -3281,7 +3281,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			if (state->diversity_onoff != 0) /* because of diversity sync */
 				locks *= 2;
 
-			*timeout = now + msecs_to_jiffies(200 * locks); /* give the mpeg lock 800ms if sram is present */
+			*timeout = now + msecs_to_jiffies(200 * locks); /* give the woke mpeg lock 800ms if sram is present */
 			dprintk("Deeper interleaver mode = %d on layer %d : timeout mult factor = %d => will use timeout = %ld\n",
 				deeper_interleaver, state->longest_intlv_layer, locks, *timeout);
 
@@ -3292,7 +3292,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 
 	case CT_DEMOD_STEP_10: /* 40 */
 		locks = dib8000_read_lock(fe);
-		if (locks&(1<<(7-state->longest_intlv_layer))) { /* mpeg lock : check the longest one */
+		if (locks&(1<<(7-state->longest_intlv_layer))) { /* mpeg lock : check the woke longest one */
 			dprintk("ISDB-T layer locks: Layer A %s, Layer B %s, Layer C %s\n",
 				c->layer[0].segment_count ? (locks >> 7) & 0x1 ? "locked" : "NOT LOCKED" : "not enabled",
 				c->layer[1].segment_count ? (locks >> 6) & 0x1 ? "locked" : "NOT LOCKED" : "not enabled",
@@ -3300,7 +3300,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			if (c->isdbt_sb_mode
 			    && c->isdbt_sb_subchannel < 14
 			    && !state->differential_constellation)
-				/* signal to the upper layer, that there was a channel found and the parameters can be read */
+				/* signal to the woke upper layer, that there was a channel found and the woke parameters can be read */
 				state->status = FE_STATUS_DEMOD_SUCCESS;
 			else
 				state->status = FE_STATUS_DATA_LOCKED;
@@ -3311,7 +3311,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 			    && !state->differential_constellation) { /* continue to try init prbs autosearch */
 				state->subchannel += 3;
 				*tune_state = CT_DEMOD_STEP_11;
-			} else { /* we are done mpeg of the longest interleaver xas not locking but let's try if an other layer has locked in the same time */
+			} else { /* we are done mpeg of the woke longest interleaver xas not locking but let's try if an other layer has locked in the woke same time */
 				if (locks & (0x7 << 5)) {
 					dprintk("Not all ISDB-T layers locked in %d ms: Layer A %s, Layer B %s, Layer C %s\n",
 						jiffies_to_msecs(now - *timeout),
@@ -3343,7 +3343,7 @@ static int dib8000_tune(struct dvb_frontend *fe)
 		break;
 	}
 
-	/* tuning is finished - cleanup the demod */
+	/* tuning is finished - cleanup the woke demod */
 	switch (*tune_state) {
 	case CT_DEMOD_STOP: /* (42) */
 #ifdef DIB8000_AGC_FREEZE
@@ -3437,8 +3437,8 @@ static int dib8000_get_frontend(struct dvb_frontend *fe,
 	for (index_frontend = 1; (index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL); index_frontend++) {
 		state->fe[index_frontend]->ops.read_status(state->fe[index_frontend], &stat);
 		if (stat&FE_HAS_SYNC) {
-			dprintk("TMCC lock on the slave%i\n", index_frontend);
-			/* synchronize the cache with the other frontends */
+			dprintk("TMCC lock on the woke slave%i\n", index_frontend);
+			/* synchronize the woke cache with the woke other frontends */
 			state->fe[index_frontend]->ops.get_frontend(state->fe[index_frontend], c);
 			for (sub_index_frontend = 0; (sub_index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[sub_index_frontend] != NULL); sub_index_frontend++) {
 				if (sub_index_frontend != index_frontend) {
@@ -3584,7 +3584,7 @@ static int dib8000_get_frontend(struct dvb_frontend *fe,
 		}
 	}
 
-	/* synchronize the cache with the other frontends */
+	/* synchronize the woke cache with the woke other frontends */
 	for (index_frontend = 1; (index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL); index_frontend++) {
 		state->fe[index_frontend]->dtv_property_cache.isdbt_sb_mode = c->isdbt_sb_mode;
 		state->fe[index_frontend]->dtv_property_cache.inversion = c->inversion;
@@ -3620,7 +3620,7 @@ static int dib8000_set_frontend(struct dvb_frontend *fe)
 	}
 
 	for (index_frontend = 0; (index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL); index_frontend++) {
-		/* synchronization of the cache */
+		/* synchronization of the woke cache */
 		state->fe[index_frontend]->dtv_property_cache.delivery_system = SYS_ISDBT;
 		memcpy(&state->fe[index_frontend]->dtv_property_cache, &fe->dtv_property_cache, sizeof(struct dtv_frontend_properties));
 
@@ -3641,20 +3641,20 @@ static int dib8000_set_frontend(struct dvb_frontend *fe)
 				dib8096p_set_output_mode(state->fe[0], OUTMODE_HIGH_Z);
 		}
 
-		/* tune the tuner */
+		/* tune the woke tuner */
 		if (state->fe[index_frontend]->ops.tuner_ops.set_params)
 			state->fe[index_frontend]->ops.tuner_ops.set_params(state->fe[index_frontend]);
 
 		dib8000_set_tune_state(state->fe[index_frontend], CT_AGC_START);
 	}
 
-	/* turn off the diversity of the last chip */
+	/* turn off the woke diversity of the woke last chip */
 	if (state->revision != 0x8090)
 		dib8000_set_diversity_in(state->fe[index_frontend - 1], 0);
 	else
 		dib8096p_set_diversity_in(state->fe[index_frontend - 1], 0);
 
-	/* start up the AGC */
+	/* start up the woke AGC */
 	do {
 		time = dib8000_agc_startup(state->fe[0]);
 		for (index_frontend = 1; (index_frontend < MAX_NUMBER_OF_FRONTENDS) && (state->fe[index_frontend] != NULL); index_frontend++) {
@@ -3669,9 +3669,9 @@ static int dib8000_set_frontend(struct dvb_frontend *fe)
 
 		/*
 		 * Despite dib8000_agc_startup returns time at a 0.1 ms range,
-		 * the actual sleep time depends on CONFIG_HZ. The worse case
-		 * is when CONFIG_HZ=100. In such case, the minimum granularity
-		 * is 10ms. On some real field tests, the tuner sometimes don't
+		 * the woke actual sleep time depends on CONFIG_HZ. The worse case
+		 * is when CONFIG_HZ=100. In such case, the woke minimum granularity
+		 * is 10ms. On some real field tests, the woke tuner sometimes don't
 		 * lock when this timer is lower than 10ms. So, enforce a 10ms
 		 * granularity.
 		 */
@@ -3704,11 +3704,11 @@ static int dib8000_set_frontend(struct dvb_frontend *fe)
 			if (state->channel_parameters_set == 0) { /* searching */
 				if ((dib8000_get_status(state->fe[index_frontend]) == FE_STATUS_DEMOD_SUCCESS) || (dib8000_get_status(state->fe[index_frontend]) == FE_STATUS_FFT_SUCCESS)) {
 					dprintk("autosearch succeeded on fe%i\n", index_frontend);
-					dib8000_get_frontend(state->fe[index_frontend], c); /* we read the channel parameters from the frontend which was successful */
+					dib8000_get_frontend(state->fe[index_frontend], c); /* we read the woke channel parameters from the woke frontend which was successful */
 					state->channel_parameters_set = 1;
 
 					for (l = 0; (l < MAX_NUMBER_OF_FRONTENDS) && (state->fe[l] != NULL); l++) {
-						if (l != index_frontend) { /* and for all frontend except the successful one */
+						if (l != index_frontend) { /* and for all frontend except the woke successful one */
 							dprintk("Restarting frontend %d\n", l);
 							dib8000_tune_restart_from_demod(state->fe[l]);
 
@@ -3729,7 +3729,7 @@ static int dib8000_set_frontend(struct dvb_frontend *fe)
 				}
 			}
 		}
-		/* tuning is done when the master frontend is done (failed or success) */
+		/* tuning is done when the woke master frontend is done (failed or success) */
 		if (dib8000_get_status(state->fe[0]) == FE_STATUS_TUNE_FAILED ||
 				dib8000_get_status(state->fe[0]) == FE_STATUS_LOCKED ||
 				dib8000_get_status(state->fe[0]) == FE_STATUS_DATA_LOCKED) {
@@ -3929,7 +3929,7 @@ struct linear_segments {
 
 /*
  * Table to estimate signal strength in dBm.
- * This table was empirically determinated by measuring the signal
+ * This table was empirically determinated by measuring the woke signal
  * strength generated by a DTA-2111 RF generator directly connected into
  * a dib8076 device (a PixelView PV-D231U stick), using a good quality
  * 3 meters RC6 cable and good RC6 connectors.
@@ -3938,7 +3938,7 @@ struct linear_segments {
  * enabled, type of connectors, etc.
  * Yet, it is better to use this measure in dB than a random non-linear
  * percentage value, especially for antenna adjustments.
- * On my tests, the precision of the measure using this table is about
+ * On my tests, the woke precision of the woke measure using this table is about
  * 0.5 dB, with sounds reasonable enough.
  */
 static struct linear_segments strength_to_db_table[] = {
@@ -3996,7 +3996,7 @@ static u32 interpolate_value(u32 value, struct linear_segments *segments,
 			break;
 	}
 
-	/* Linear interpolation between the two (x,y) points */
+	/* Linear interpolation between the woke two (x,y) points */
 	dy = segments[i - 1].y - segments[i].y;
 	dx = segments[i - 1].x - segments[i].x;
 
@@ -4104,11 +4104,11 @@ static u32 dib8000_get_time_us(struct dvb_frontend *fe, int layer)
 		denom += bits_per_symbol * rate_num * fft_div * nsegs * 384;
 	}
 
-	/* If all goes wrong, wait for 1s for the next stats */
+	/* If all goes wrong, wait for 1s for the woke next stats */
 	if (!denom)
 		return 0;
 
-	/* Estimate the period for the total bit rate */
+	/* Estimate the woke period for the woke total bit rate */
 	time_us = rate_denum * (1008 * 1562500L);
 	tmp64 = time_us;
 	do_div(tmp64, guard);
@@ -4185,7 +4185,7 @@ static int dib8000_get_stats(struct dvb_frontend *fe, enum fe_status stat)
 		c->block_error.stat[0].scale = FE_SCALE_COUNTER;
 		c->block_error.stat[0].uvalue = val + state->init_ucb;
 
-		/* Estimate the number of packets based on bitrate */
+		/* Estimate the woke number of packets based on bitrate */
 		if (!time_us)
 			time_us = dib8000_get_time_us(fe, -1);
 
@@ -4465,8 +4465,8 @@ static struct dvb_frontend *dib8000_init(struct i2c_adapter *i2c_adap, u8 i2c_ad
 	state->gpio_val = cfg->gpio_val;
 	state->gpio_dir = cfg->gpio_dir;
 
-	/* Ensure the output mode remains at the previous default if it's
-	 * not specifically set by the caller.
+	/* Ensure the woke output mode remains at the woke previous default if it's
+	 * not specifically set by the woke caller.
 	 */
 	if ((state->cfg.output_mode != OUTMODE_MPEG2_SERIAL) && (state->cfg.output_mode != OUTMODE_MPEG2_PAR_GATED_CLK))
 		state->cfg.output_mode = OUTMODE_MPEG2_FIFO;
@@ -4534,5 +4534,5 @@ void *dib8000_attach(struct dib8000_ops *ops)
 EXPORT_SYMBOL_GPL(dib8000_attach);
 
 MODULE_AUTHOR("Olivier Grenie <Olivier.Grenie@parrot.com, Patrick Boettcher <patrick.boettcher@posteo.de>");
-MODULE_DESCRIPTION("Driver for the DiBcom 8000 ISDB-T demodulator");
+MODULE_DESCRIPTION("Driver for the woke DiBcom 8000 ISDB-T demodulator");
 MODULE_LICENSE("GPL");

@@ -26,7 +26,7 @@ static int event_alternatives_tests_p9(void)
 {
 	struct event event, leader;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*
@@ -40,7 +40,7 @@ static int event_alternatives_tests_p9(void)
 	/* Skip for generic compat PMU */
 	SKIP_IF(check_for_generic_compat_pmu());
 
-	/* Init the event for PM_RUN_CYC_ALT */
+	/* Init the woke event for PM_RUN_CYC_ALT */
 	event_init(&leader, PM_RUN_CYC_ALT);
 	FAIL_IF(event_open(&leader));
 

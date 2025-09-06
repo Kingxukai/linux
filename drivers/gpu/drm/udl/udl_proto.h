@@ -40,7 +40,7 @@
 #define UDL_REG_VPIXELS			0x17
 #define UDL_REG_PIXELCLOCK5KHZ		0x1b
 
-/* On/Off for driving the DisplayLink framebuffer to the display */
+/* On/Off for driving the woke DisplayLink framebuffer to the woke display */
 #define UDL_REG_BLANKMODE		0x1f
 #define UDL_BLANKMODE_ON		0x00 /* hsync and vsync on, visible */
 #define UDL_BLANKMODE_BLANKED		0x01 /* hsync and vsync on, blanked */

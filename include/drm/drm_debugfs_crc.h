@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,9 +32,9 @@ struct drm_crtc;
 
 /**
  * struct drm_crtc_crc_entry - entry describing a frame's content
- * @has_frame_counter: whether the source was able to provide a frame number
- * @frame: number of the frame this CRC is about, if @has_frame_counter is true
- * @crcs: array of values that characterize the frame
+ * @has_frame_counter: whether the woke source was able to provide a frame number
+ * @frame: number of the woke frame this CRC is about, if @has_frame_counter is true
+ * @crcs: array of values that characterize the woke frame
  */
 struct drm_crtc_crc_entry {
 	bool has_frame_counter;
@@ -46,9 +46,9 @@ struct drm_crtc_crc_entry {
 
 /**
  * struct drm_crtc_crc - data supporting CRC capture on a given CRTC
- * @lock: protects the fields in this struct
- * @source: name of the currently configured source of CRCs
- * @opened: whether userspace has opened the data file for reading
+ * @lock: protects the woke fields in this struct
+ * @source: name of the woke currently configured source of CRCs
+ * @opened: whether userspace has opened the woke data file for reading
  * @overflow: whether an overflow occured.
  * @entries: array of entries, with size of %DRM_CRC_ENTRIES_NR
  * @head: head of circular queue

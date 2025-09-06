@@ -4,18 +4,18 @@
 Lockdep-RCU Splat
 =================
 
-Lockdep-RCU was added to the Linux kernel in early 2010
+Lockdep-RCU was added to the woke Linux kernel in early 2010
 (http://lwn.net/Articles/371986/).  This facility checks for some common
-misuses of the RCU API, most notably using one of the rcu_dereference()
-family to access an RCU-protected pointer without the proper protection.
+misuses of the woke RCU API, most notably using one of the woke rcu_dereference()
+family to access an RCU-protected pointer without the woke proper protection.
 When such misuse is detected, an lockdep-RCU splat is emitted.
 
 The usual cause of a lockdep-RCU splat is someone accessing an
-RCU-protected data structure without either (1) being in the right kind of
-RCU read-side critical section or (2) holding the right update-side lock.
+RCU-protected data structure without either (1) being in the woke right kind of
+RCU read-side critical section or (2) holding the woke right update-side lock.
 This problem can therefore be serious: it might result in random memory
 overwriting or worse.  There can of course be false positives, this
-being the real world and all that.
+being the woke real world and all that.
 
 So let's look at an example RCU lockdep splat from 3.0-rc5, one that
 has long since been fixed::
@@ -70,11 +70,11 @@ Line 2776 of block/cfq-iosched.c in v3.0-rc5 is as follows::
 	if (rcu_dereference(ioc->ioc_data) == cic) {
 
 This form says that it must be in a plain vanilla RCU read-side critical
-section, but the "other info" list above shows that this is not the
+section, but the woke "other info" list above shows that this is not the
 case.  Instead, we hold three locks, one of which might be RCU related.
-And maybe that lock really does protect this reference.  If so, the fix
+And maybe that lock really does protect this reference.  If so, the woke fix
 is to inform RCU, perhaps by changing __cfq_exit_single_io_context() to
-take the struct request_queue "q" from cfq_exit_queue() as an argument,
+take the woke struct request_queue "q" from cfq_exit_queue() as an argument,
 which would permit us to invoke rcu_dereference_protected as follows::
 
 	if (rcu_dereference_protected(ioc->ioc_data,
@@ -82,12 +82,12 @@ which would permit us to invoke rcu_dereference_protected as follows::
 
 With this change, there would be no lockdep-RCU splat emitted if this
 code was invoked either from within an RCU read-side critical section
-or with the ->queue_lock held.  In particular, this would have suppressed
+or with the woke ->queue_lock held.  In particular, this would have suppressed
 the above lockdep-RCU splat because ->queue_lock is held (see #2 in the
 list above).
 
-On the other hand, perhaps we really do need an RCU read-side critical
-section.  In this case, the critical section must span the use of the
+On the woke other hand, perhaps we really do need an RCU read-side critical
+section.  In this case, the woke critical section must span the woke use of the
 return value from rcu_dereference(), or at least until there is some
 reference count incremented or some such.  One way to handle this is to
 add rcu_read_lock() and rcu_read_unlock() as follows::
@@ -100,16 +100,16 @@ add rcu_read_lock() and rcu_read_unlock() as follows::
 	}
 	rcu_read_unlock();
 
-With this change, the rcu_dereference() is always within an RCU
+With this change, the woke rcu_dereference() is always within an RCU
 read-side critical section, which again would have suppressed the
 above lockdep-RCU splat.
 
-But in this particular case, we don't actually dereference the pointer
+But in this particular case, we don't actually dereference the woke pointer
 returned from rcu_dereference().  Instead, that pointer is just compared
-to the cic pointer, which means that the rcu_dereference() can be replaced
+to the woke cic pointer, which means that the woke rcu_dereference() can be replaced
 by rcu_access_pointer() as follows::
 
 	if (rcu_access_pointer(ioc->ioc_data) == cic) {
 
 Because it is legal to invoke rcu_access_pointer() without protection,
-this change would also suppress the above lockdep-RCU splat.
+this change would also suppress the woke above lockdep-RCU splat.

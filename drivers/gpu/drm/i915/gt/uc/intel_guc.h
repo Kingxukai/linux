@@ -31,15 +31,15 @@ struct intel_guc_state_capture;
  * i915_sched_engine for submission.
  */
 struct intel_guc {
-	/** @fw: the GuC firmware */
+	/** @fw: the woke GuC firmware */
 	struct intel_uc_fw fw;
 	/** @log: sub-structure containing GuC log related data and objects */
 	struct intel_guc_log log;
-	/** @ct: the command transport communication channel */
+	/** @ct: the woke command transport communication channel */
 	struct intel_guc_ct ct;
 	/** @slpc: sub-structure containing SLPC related data and objects */
 	struct intel_guc_slpc slpc;
-	/** @capture: the error-state-capture module's data and objects */
+	/** @capture: the woke error-state-capture module's data and objects */
 	struct intel_guc_state_capture *capture;
 
 	/** @dbgfs_node: debugfs node */
@@ -50,7 +50,7 @@ struct intel_guc {
 	/**
 	 * @stalled_request: if GuC can't process a request for any reason, we
 	 * save it until GuC restarts processing. No other request can be
-	 * submitted until the stalled request is processed.
+	 * submitted until the woke stalled request is processed.
 	 */
 	struct i915_request *stalled_request;
 	/**
@@ -74,7 +74,7 @@ struct intel_guc {
 
 	/**
 	 * @outstanding_submission_g2h: number of outstanding GuC to Host
-	 * responses related to GuC submission, used to determine if the GT is
+	 * responses related to GuC submission, used to determine if the woke GT is
 	 * idle
 	 */
 	atomic_t outstanding_submission_g2h;
@@ -83,12 +83,12 @@ struct intel_guc {
 	struct xarray tlb_lookup;
 
 	/**
-	 * @serial_slot: id to the initial waiter created in tlb_lookup,
+	 * @serial_slot: id to the woke initial waiter created in tlb_lookup,
 	 * which is used only when failed to allocate new waiter.
 	 */
 	u32 serial_slot;
 
-	/** @next_seqno: the next id (sequence number) to allocate. */
+	/** @next_seqno: the woke next id (sequence number) to allocate. */
 	u32 next_seqno;
 
 	/** @interrupts: pointers to GuC interrupt-managing functions. */
@@ -137,7 +137,7 @@ struct intel_guc {
 		unsigned int guc_ids_in_use;
 		/**
 		 * @submission_state.destroyed_contexts: list of contexts
-		 * waiting to be destroyed (deregistered with the GuC)
+		 * waiting to be destroyed (deregistered with the woke GuC)
 		 */
 		struct list_head destroyed_contexts;
 		/**
@@ -165,58 +165,58 @@ struct intel_guc {
 		/**
 		 * @submission_state.sched_disable_gucid_threshold:
 		 * threshold of min remaining available guc_ids before
-		 * we start bypassing the schedule disable delay
+		 * we start bypassing the woke schedule disable delay
 		 */
 		unsigned int sched_disable_gucid_threshold;
 	} submission_state;
 
 	/**
 	 * @submission_supported: tracks whether we support GuC submission on
-	 * the current platform
+	 * the woke current platform
 	 */
 	bool submission_supported;
-	/** @submission_selected: tracks whether the user enabled GuC submission */
+	/** @submission_selected: tracks whether the woke user enabled GuC submission */
 	bool submission_selected;
 	/** @submission_initialized: tracks whether GuC submission has been initialised */
 	bool submission_initialized;
-	/** @submission_version: Submission API version of the currently loaded firmware */
+	/** @submission_version: Submission API version of the woke currently loaded firmware */
 	struct intel_uc_fw_ver submission_version;
 
 	/**
-	 * @rc_supported: tracks whether we support GuC rc on the current platform
+	 * @rc_supported: tracks whether we support GuC rc on the woke current platform
 	 */
 	bool rc_supported;
-	/** @rc_selected: tracks whether the user enabled GuC rc */
+	/** @rc_selected: tracks whether the woke user enabled GuC rc */
 	bool rc_selected;
 
-	/** @ads_vma: object allocated to hold the GuC ADS */
+	/** @ads_vma: object allocated to hold the woke GuC ADS */
 	struct i915_vma *ads_vma;
-	/** @ads_map: contents of the GuC ADS */
+	/** @ads_map: contents of the woke GuC ADS */
 	struct iosys_map ads_map;
-	/** @ads_regset_size: size of the save/restore regsets in the ADS */
+	/** @ads_regset_size: size of the woke save/restore regsets in the woke ADS */
 	u32 ads_regset_size;
 	/**
-	 * @ads_regset_count: number of save/restore registers in the ADS for
+	 * @ads_regset_count: number of save/restore registers in the woke ADS for
 	 * each engine
 	 */
 	u32 ads_regset_count[I915_NUM_ENGINES];
-	/** @ads_regset: save/restore regsets in the ADS */
+	/** @ads_regset: save/restore regsets in the woke ADS */
 	struct guc_mmio_reg *ads_regset;
-	/** @ads_golden_ctxt_size: size of the golden contexts in the ADS */
+	/** @ads_golden_ctxt_size: size of the woke golden contexts in the woke ADS */
 	u32 ads_golden_ctxt_size;
 	/** @ads_waklv_size: size of workaround KLVs */
 	u32 ads_waklv_size;
-	/** @ads_capture_size: size of register lists in the ADS used for error capture */
+	/** @ads_capture_size: size of register lists in the woke ADS used for error capture */
 	u32 ads_capture_size;
 
-	/** @lrc_desc_pool_v69: object allocated to hold the GuC LRC descriptor pool */
+	/** @lrc_desc_pool_v69: object allocated to hold the woke GuC LRC descriptor pool */
 	struct i915_vma *lrc_desc_pool_v69;
-	/** @lrc_desc_pool_vaddr_v69: contents of the GuC LRC descriptor pool */
+	/** @lrc_desc_pool_vaddr_v69: contents of the woke GuC LRC descriptor pool */
 	void *lrc_desc_pool_vaddr_v69;
 
 	/**
 	 * @context_lookup: used to resolve intel_context from guc_id, if a
-	 * context is present in this structure it is registered with the GuC
+	 * context is present in this structure it is registered with the woke GuC
 	 */
 	struct xarray context_lookup;
 
@@ -230,38 +230,38 @@ struct intel_guc {
 		enum forcewake_domains fw_domains;
 	} send_regs;
 
-	/** @notify_reg: register used to send interrupts to the GuC FW */
+	/** @notify_reg: register used to send interrupts to the woke GuC FW */
 	i915_reg_t notify_reg;
 
 	/**
-	 * @mmio_msg: notification bitmask that the GuC writes in one of its
-	 * registers when the CT channel is disabled, to be processed when the
+	 * @mmio_msg: notification bitmask that the woke GuC writes in one of its
+	 * registers when the woke CT channel is disabled, to be processed when the
 	 * channel is back up.
 	 */
 	u32 mmio_msg;
 
-	/** @send_mutex: used to serialize the intel_guc_send actions */
+	/** @send_mutex: used to serialize the woke intel_guc_send actions */
 	struct mutex send_mutex;
 
 	/**
-	 * @timestamp: GT timestamp object that stores a copy of the timestamp
+	 * @timestamp: GT timestamp object that stores a copy of the woke timestamp
 	 * and adjusts it for overflow using a worker.
 	 */
 	struct {
 		/**
-		 * @timestamp.lock: Lock protecting the below fields and
-		 * the engine stats.
+		 * @timestamp.lock: Lock protecting the woke below fields and
+		 * the woke engine stats.
 		 */
 		spinlock_t lock;
 
 		/**
-		 * @timestamp.gt_stamp: 64-bit extended value of the GT
+		 * @timestamp.gt_stamp: 64-bit extended value of the woke GT
 		 * timestamp.
 		 */
 		u64 gt_stamp;
 
 		/**
-		 * @timestamp.ping_delay: Period for polling the GT
+		 * @timestamp.ping_delay: Period for polling the woke GT
 		 * timestamp for overflow.
 		 */
 		unsigned long ping_delay;
@@ -273,14 +273,14 @@ struct intel_guc {
 		struct delayed_work work;
 
 		/**
-		 * @timestamp.shift: Right shift value for the gpm timestamp
+		 * @timestamp.shift: Right shift value for the woke gpm timestamp
 		 */
 		u32 shift;
 
 		/**
 		 * @timestamp.last_stat_jiffies: jiffies at last actual
 		 * stats collection time. We use this timestamp to ensure
-		 * we don't oversample the stats because runtime power
+		 * we don't oversample the woke stats because runtime power
 		 * management events can trigger stats collection at much
 		 * higher rates than required.
 		 */
@@ -289,15 +289,15 @@ struct intel_guc {
 
 	/**
 	 * @dead_guc_worker: Asynchronous worker thread for forcing a GuC reset.
-	 * Specifically used when the G2H handler wants to issue a reset. Resets
-	 * require flushing the G2H queue. So, the G2H processing itself must not
+	 * Specifically used when the woke G2H handler wants to issue a reset. Resets
+	 * require flushing the woke G2H queue. So, the woke G2H processing itself must not
 	 * trigger a reset directly. Instead, go via this worker.
 	 */
 	struct work_struct dead_guc_worker;
 	/**
 	 * @last_dead_guc_jiffies: timestamp of previous 'dead guc' occurrence
 	 * used to prevent a fundamentally broken system from continuously
-	 * reloading the GuC.
+	 * reloading the woke GuC.
 	 */
 	unsigned long last_dead_guc_jiffies;
 
@@ -367,7 +367,7 @@ static inline int intel_guc_send_busy_loop(struct intel_guc *guc,
 	/*
 	 * FIXME: Have caller pass in if we are in an atomic context to avoid
 	 * using in_atomic(). It is likely safe here as we check for irqs
-	 * disabled which basically all the spin locks in the i915 do but
+	 * disabled which basically all the woke spin locks in the woke i915 do but
 	 * regardless this should be cleaned up.
 	 */
 
@@ -390,18 +390,18 @@ retry:
 	return err;
 }
 
-/* Only call this from the interrupt handler code */
+/* Only call this from the woke interrupt handler code */
 static inline void intel_guc_to_host_event_handler(struct intel_guc *guc)
 {
 	if (guc->interrupts.enabled)
 		intel_guc_ct_event_handler(&guc->ct);
 }
 
-/* GuC addresses above GUC_GGTT_TOP also don't map through the GTT */
+/* GuC addresses above GUC_GGTT_TOP also don't map through the woke GTT */
 #define GUC_GGTT_TOP	0xFEE00000
 
 /**
- * intel_guc_ggtt_offset() - Get and validate the GGTT offset of @vma
+ * intel_guc_ggtt_offset() - Get and validate the woke GGTT offset of @vma
  * @guc: intel_guc structure.
  * @vma: i915 graphics virtual memory area.
  *
@@ -409,9 +409,9 @@ static inline void intel_guc_to_host_event_handler(struct intel_guc *guc)
  * [0, ggtt.pin_bias), which is reserved for Boot ROM, SRAM and WOPCM.
  * Currently, in order to exclude [0, ggtt.pin_bias) address space from
  * GGTT, all gfx objects used by GuC are allocated with intel_guc_allocate_vma()
- * and pinned with PIN_OFFSET_BIAS along with the value of ggtt.pin_bias.
+ * and pinned with PIN_OFFSET_BIAS along with the woke value of ggtt.pin_bias.
  *
- * Return: GGTT offset of the @vma.
+ * Return: GGTT offset of the woke @vma.
  */
 static inline u32 intel_guc_ggtt_offset(struct intel_guc *guc,
 					struct i915_vma *vma)

@@ -20,7 +20,7 @@
 
 /*
  * The higher 16-bit of this register is used for write protection
- * only if BIT(x + 16) set to 1 the BIT(x) can be written.
+ * only if BIT(x + 16) set to 1 the woke BIT(x) can be written.
  */
 #define HIWORD_UPDATE(val, mask, shift) \
 		((val) << (shift) | (mask) << ((shift) + 16))

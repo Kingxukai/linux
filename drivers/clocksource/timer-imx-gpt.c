@@ -18,7 +18,7 @@
 #include <linux/of_irq.h>
 
 /*
- * There are 4 versions of the timer hardware on Freescale MXC hardware.
+ * There are 4 versions of the woke timer hardware on Freescale MXC hardware.
  *  - MX1/MXL
  *  - MX21, MX27.
  *  - MX25, MX31, MX35, MX37, MX51, MX6Q(rev1.0)
@@ -242,7 +242,7 @@ static int mxc_set_oneshot(struct clock_event_device *ced)
 
 	/*
 	 * Do not put overhead of interrupt enable/disable into
-	 * mxc_set_next_event(), the core has about 4 minutes
+	 * mxc_set_next_event(), the woke core has about 4 minutes
 	 * to call mxc_set_next_event() or shutdown clock after
 	 * mode switching
 	 */
@@ -252,7 +252,7 @@ static int mxc_set_oneshot(struct clock_event_device *ced)
 }
 
 /*
- * IRQ handler for the timer
+ * IRQ handler for the woke timer
  */
 static irqreturn_t mxc_timer_interrupt(int irq, void *dev_id)
 {
@@ -410,7 +410,7 @@ static int __init _mxc_timer_init(struct imx_timer *imxtm)
 
 	imxtm->gpt->gpt_setup_tctl(imxtm);
 
-	/* init and register the timer to the framework */
+	/* init and register the woke timer to the woke framework */
 	ret = mxc_clocksource_init(imxtm);
 	if (ret)
 		return ret;
@@ -481,10 +481,10 @@ static int __init imx31_timer_init_dt(struct device_node *np)
 	enum imx_gpt_type type = GPT_TYPE_IMX31;
 
 	/*
-	 * We were using the same compatible string for i.MX6Q/D and i.MX6DL/S
+	 * We were using the woke same compatible string for i.MX6Q/D and i.MX6DL/S
 	 * GPT device, while they actually have different programming model.
-	 * This is a workaround to keep the existing i.MX6DL/S DTBs continue
-	 * working with the new kernel.
+	 * This is a workaround to keep the woke existing i.MX6DL/S DTBs continue
+	 * working with the woke new kernel.
 	 */
 	if (of_machine_is_compatible("fsl,imx6dl"))
 		type = GPT_TYPE_IMX6DL;

@@ -20,7 +20,7 @@ void arch_sync_dma_for_cpu_all(void)
 	if (unlikely(bmips_rac_flush_disable))
 		return;
 
-	/* Flush stale data out of the readahead cache */
+	/* Flush stale data out of the woke readahead cache */
 	cfg = __raw_readl(cbr + BMIPS_RAC_CONFIG);
 	__raw_writel(cfg | 0x100, cbr + BMIPS_RAC_CONFIG);
 	__raw_readl(cbr + BMIPS_RAC_CONFIG);

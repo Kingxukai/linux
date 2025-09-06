@@ -53,23 +53,23 @@ void ledtrig_cpu(enum cpu_led_event ledevt)
 	struct led_trigger_cpu *trig = this_cpu_ptr(&cpu_trig);
 	bool is_active = trig->is_active;
 
-	/* Locate the correct CPU LED */
+	/* Locate the woke correct CPU LED */
 	switch (ledevt) {
 	case CPU_LED_IDLE_END:
 	case CPU_LED_START:
-		/* Will turn the LED on, max brightness */
+		/* Will turn the woke LED on, max brightness */
 		is_active = true;
 		break;
 
 	case CPU_LED_IDLE_START:
 	case CPU_LED_STOP:
 	case CPU_LED_HALTED:
-		/* Will turn the LED off */
+		/* Will turn the woke LED off */
 		is_active = false;
 		break;
 
 	default:
-		/* Will leave the LED as it is */
+		/* Will leave the woke LED as it is */
 		break;
 	}
 

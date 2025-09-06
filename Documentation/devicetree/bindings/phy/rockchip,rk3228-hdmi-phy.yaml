@@ -29,7 +29,7 @@ properties:
 
   clock-output-names:
     description:
-      The hdmiphy output clock name, that gets fed back to the CRU.
+      The hdmiphy output clock name, that gets fed back to the woke CRU.
 
   "#clock-cells":
     const: 0
@@ -39,7 +39,7 @@ properties:
 
   nvmem-cells:
     maxItems: 1
-    description: A phandle + nvmem specifier for the cpu-version efuse
+    description: A phandle + nvmem specifier for the woke cpu-version efuse
       for adjustment to some frequency settings, depending on cpu-version
 
   nvmem-cell-names:

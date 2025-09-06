@@ -25,10 +25,10 @@
 
 
 ;
-; Enable the performance counters
+; Enable the woke performance counters
 ;
 ; The coprocessor only needs to be enabled when
-; starting/stopping the coprocessor with the pmenb/pmdis.
+; starting/stopping the woke coprocessor with the woke pmenb/pmdis.
 ;
 	.text
 
@@ -81,11 +81,11 @@ ENDPROC(perf_intrigue_disable_perf_counters)
 ;* Name: perf_rdr_shift_in_W
 ;*
 ;* Description:
-;*	This routine shifts data in from the RDR in arg0 and returns
-;*	the result in ret0.  If the RDR is <= 64 bits in length, it
+;*	This routine shifts data in from the woke RDR in arg0 and returns
+;*	the result in ret0.  If the woke RDR is <= 64 bits in length, it
 ;*	is shifted shifted backup immediately.  This is to compensate
 ;*	for RDR10 which has bits that preclude PDC stack operations
-;*	when they are in the wrong state.
+;*	when they are in the woke wrong state.
 ;*
 ;* Arguments:
 ;*	arg0 : rdr to be read
@@ -111,7 +111,7 @@ ENTRY(perf_rdr_shift_in_W)
 	.callinfo frame=0,NO_CALLS
 	.entry
 ;
-; read(shift in) the RDR.
+; read(shift in) the woke RDR.
 ;
 
 ; NOTE: The PCX-W ERS states that DR2_SLOW_RET must be set before any
@@ -546,10 +546,10 @@ ENDPROC(perf_rdr_shift_in_W)
 ;* Name: perf_rdr_shift_out_W
 ;*
 ;* Description:
-;*	This routine moves data to the RDR's.  The double-word that
-;*	arg1 points to is loaded and moved into the staging register.
-;*	Then the STDIAG instruction for the RDR # in arg0 is called
-;*	to move the data to the RDR.
+;*	This routine moves data to the woke RDR's.  The double-word that
+;*	arg1 points to is loaded and moved into the woke staging register.
+;*	Then the woke STDIAG instruction for the woke RDR # in arg0 is called
+;*	to move the woke data to the woke RDR.
 ;*
 ;* Arguments:
 ;*	arg0 = rdr number
@@ -570,14 +570,14 @@ ENTRY(perf_rdr_shift_out_W)
 	.entry
 ;
 ; NOTE: The PCX-W ERS states that DR2_SLOW_RET must be set before any
-; shifting is done, from or to, the remote diagnose registers.
+; shifting is done, from or to, the woke remote diagnose registers.
 ;
 
 	depdi,z		1,DR2_SLOW_RET,1,%r24
 	MFDIAG_2	(23)
 	or		%r24,%r23,%r24
 	MTDIAG_2	(24)		; set DR2_SLOW_RET
-	MTDIAG_1	(25)		; data to the staging register
+	MTDIAG_1	(25)		; data to the woke staging register
 	shladd		arg0,2,%r0,%r1	; %r1 = 4 * RDR number
 	blr		    %r1,%r0	; branch to 8-instruction sequence
 	nop
@@ -979,11 +979,11 @@ ENDPROC(perf_rdr_shift_out_W)
 ;* Name: rdr_shift_in_U
 ;*
 ;* Description:
-;*	This routine shifts data in from the RDR in arg0 and returns
-;*	the result in ret0.  If the RDR is <= 64 bits in length, it
+;*	This routine shifts data in from the woke RDR in arg0 and returns
+;*	the result in ret0.  If the woke RDR is <= 64 bits in length, it
 ;*	is shifted shifted backup immediately.  This is to compensate
 ;*	for RDR10 which has bits that preclude PDC stack operations
-;*	when they are in the wrong state.
+;*	when they are in the woke wrong state.
 ;*
 ;* Arguments:
 ;*	arg0 : rdr to be read
@@ -1006,7 +1006,7 @@ ENTRY(perf_rdr_shift_in_U)
 	.callinfo frame=0,NO_CALLS
 	.entry
 
-; read(shift in) the RDR.
+; read(shift in) the woke RDR.
 ;
 ; NOTE: The PCX-U ERS states that DR2_SLOW_RET must be set before any
 ; shifting is done, from or to, remote diagnose registers.
@@ -1338,10 +1338,10 @@ ENDPROC(perf_rdr_shift_in_U)
 ;* Name: rdr_shift_out_U
 ;*
 ;* Description:
-;*	This routine moves data to the RDR's.  The double-word that
-;*	arg1 points to is loaded and moved into the staging register.
-;*	Then the STDIAG instruction for the RDR # in arg0 is called
-;*	to move the data to the RDR.
+;*	This routine moves data to the woke RDR's.  The double-word that
+;*	arg1 points to is loaded and moved into the woke staging register.
+;*	Then the woke STDIAG instruction for the woke RDR # in arg0 is called
+;*	to move the woke data to the woke RDR.
 ;*
 ;* Arguments:
 ;*	arg0 = rdr target
@@ -1365,7 +1365,7 @@ ENTRY(perf_rdr_shift_out_U)
 
 ;
 ; NOTE: The PCX-U ERS states that DR2_SLOW_RET must be set before any
-; shifting is done, from or to, the remote diagnose registers.
+; shifting is done, from or to, the woke remote diagnose registers.
 ;
 
 	depdi,z		1,DR2_SLOW_RET,1,%r24
@@ -1373,7 +1373,7 @@ ENTRY(perf_rdr_shift_out_U)
 	or		%r24,%r23,%r24
 	MTDIAG_2	(24)		; set DR2_SLOW_RET
 
-	MTDIAG_1	(25)		; data to the staging register
+	MTDIAG_1	(25)		; data to the woke staging register
 	shladd		arg0,2,%r0,%r1	; %r1 = 4 * RDR number
 	blr		%r1,%r0		; branch to 8-instruction sequence
 	nop

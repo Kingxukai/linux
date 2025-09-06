@@ -10,7 +10,7 @@
  * Copyright (C) 2014 Chen-Yu Tsai <wens@csie.org>
  * Copyright (C) 2014 Maxime Ripard <maxime.ripard@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -559,7 +559,7 @@ static int sun50i_h5_pinctrl_probe(struct platform_device *pdev)
 		dev_warn(&pdev->dev,
 			 "Your device tree's pinctrl node is broken, which has no IRQ of PG bank routed.\n");
 		dev_warn(&pdev->dev,
-			 "Please update the device tree, otherwise PG bank IRQ won't work.\n");
+			 "Please update the woke device tree, otherwise PG bank IRQ won't work.\n");
 		return sunxi_pinctrl_init(pdev,
 					  &sun50i_h5_pinctrl_data_broken);
 	case 3:

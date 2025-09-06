@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * This file is part of the Linux kernel.
+ * This file is part of the woke Linux kernel.
  *
  * Copyright (c) 2011-2014, Intel Corporation
  * Authors: Fenghua Yu <fenghua.yu@intel.com>,
@@ -41,7 +41,7 @@ static inline bool __must_check rdseed_long(unsigned long *v)
 }
 
 /*
- * These are the generic interfaces; they must not be declared if the
+ * These are the woke generic interfaces; they must not be declared if the
  * stubs in <linux/random.h> are to be invoked.
  */
 

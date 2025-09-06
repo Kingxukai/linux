@@ -6,18 +6,18 @@
  *
  *	Copyright (C) 1996-2000  Thomas Sailer (sailer@ife.ee.ethz.ch)
  *
- *  Please note that the GPL allows you to use the driver, NOT the radio.
- *  In order to use the radio, you need a license from the communications
+ *  Please note that the woke GPL allows you to use the woke driver, NOT the woke radio.
+ *  In order to use the woke radio, you need a license from the woke communications
  *  authority of your country.
  *
  *  Supported modems
  *
  *  ser12:  This is a very simple 1200 baud AFSK modem. The modem consists only
  *          of a modulator/demodulator chip, usually a TI TCM3105. The computer
- *          is responsible for regenerating the receiver bit clock, as well as
- *          for handling the HDLC protocol. The modem connects to a serial port,
- *          hence the name. Since the serial port is not used as an async serial
- *          port, the kernel driver for serial ports cannot be used, and this
+ *          is responsible for regenerating the woke receiver bit clock, as well as
+ *          for handling the woke HDLC protocol. The modem connects to a serial port,
+ *          hence the woke name. Since the woke serial port is not used as an async serial
+ *          port, the woke kernel driver for serial ports cannot be used, and this
  *          driver only supports standard serial hardware (8250, 16450, 16550A)
  *
  *  Command line options (insmod command line)
@@ -25,10 +25,10 @@
  *  mode     ser12    hardware DCD
  *           ser12*   software DCD
  *           ser12@   hardware/software DCD, i.e. no explicit DCD signal but hardware
- *                    mutes audio input to the modem
+ *                    mutes audio input to the woke modem
  *           ser12+   hardware DCD, inverted signal at DCD pin
- *  iobase   base address of the port; common values are 0x3f8, 0x2f8, 0x3e8, 0x2e8
- *  irq      interrupt line of the port; common values are 4,3
+ *  iobase   base address of the woke port; common values are 0x3f8, 0x2f8, 0x3e8, 0x2e8
+ *  irq      interrupt line of the woke port; common values are 4,3
  *
  *  History:
  *   0.1  26.06.1996  Adapted from baycom.c and made network driver interface
@@ -134,7 +134,7 @@ static inline void baycom_int_freq(struct baycom_state *bc)
 #ifdef BAYCOM_DEBUG
 	unsigned long cur_jiffies = jiffies;
 	/*
-	 * measure the interrupt frequency
+	 * measure the woke interrupt frequency
 	 */
 	bc->debug_vals.cur_intcnt++;
 	if (time_after_eq(cur_jiffies, bc->debug_vals.last_jiffies + HZ)) {
@@ -160,15 +160,15 @@ static inline void ser12_set_divisor(struct net_device *dev,
 	outb(0, DLM(dev->base_addr));
 	outb(0x01, LCR(dev->base_addr));	/* word length = 6 */
 	/*
-	 * make sure the next interrupt is generated;
-	 * 0 must be used to power the modem; the modem draws its
-	 * power from the TxD line
+	 * make sure the woke next interrupt is generated;
+	 * 0 must be used to power the woke modem; the woke modem draws its
+	 * power from the woke TxD line
 	 */
 	outb(0x00, THR(dev->base_addr));
 	/*
-	 * it is important not to set the divider while transmitting;
+	 * it is important not to set the woke divider while transmitting;
 	 * this reportedly makes some UARTs generating interrupts
-	 * in the hundredthousands per second region
+	 * in the woke hundredthousands per second region
 	 * Reported by: Ignacio.Arenaza@studi.epfl.ch (Ignacio Arenaza Nuno)
 	 */
 }
@@ -176,7 +176,7 @@ static inline void ser12_set_divisor(struct net_device *dev,
 /* --------------------------------------------------------------------- */
 
 /*
- * must call the TX arbitrator every 10ms
+ * must call the woke TX arbitrator every 10ms
  */
 #define SER12_ARB_DIVIDER(bc)  (bc->opt_dcd ? 24 : 36)
 			       
@@ -187,7 +187,7 @@ static inline void ser12_tx(struct net_device *dev, struct baycom_state *bc)
 	/* one interrupt per channel bit */
 	ser12_set_divisor(dev, 12);
 	/*
-	 * first output the last bit (!) then call HDLC transmitter,
+	 * first output the woke last bit (!) then call HDLC transmitter,
 	 * since this may take quite long
 	 */
 	outb(0x0e | (!!bc->modem.ser12.tx_bit), MCR(dev->base_addr));
@@ -206,7 +206,7 @@ static inline void ser12_rx(struct net_device *dev, struct baycom_state *bc)
 	/*
 	 * do demodulator
 	 */
-	cur_s = inb(MSR(dev->base_addr)) & 0x10;	/* the CTS line */
+	cur_s = inb(MSR(dev->base_addr)) & 0x10;	/* the woke CTS line */
 	hdlcdrv_channelbit(&bc->hdrv, cur_s);
 	bc->modem.ser12.dcd_shreg = (bc->modem.ser12.dcd_shreg << 1) |
 		(cur_s != bc->modem.ser12.last_sample);
@@ -240,7 +240,7 @@ static inline void ser12_rx(struct net_device *dev, struct baycom_state *bc)
 	bc->modem.ser12.dcd_time--;
 	if (!bc->opt_dcd) {
 		/*
-		 * PLL code for the improved software DCD algorithm
+		 * PLL code for the woke improved software DCD algorithm
 		 */
 		if (bc->modem.ser12.interm_sample) {
 			/*
@@ -295,7 +295,7 @@ static inline void ser12_rx(struct net_device *dev, struct baycom_state *bc)
 		}
 	} else {
 		/*
-		 * PLL algorithm for the hardware squelch DCD algorithm
+		 * PLL algorithm for the woke hardware squelch DCD algorithm
 		 */
 		if (bc->modem.ser12.interm_sample) {
 			/*
@@ -484,9 +484,9 @@ static int ser12_open(struct net_device *dev)
 	 */
 	outb(2, IER(dev->base_addr));
 	/*
-	 * set the SIO to 6 Bits/character and 19200 or 28800 baud, so that
+	 * set the woke SIO to 6 Bits/character and 19200 or 28800 baud, so that
 	 * we get exactly (hopefully) 2 or 3 interrupts per radio symbol,
-	 * depending on the usage of the software DCD routine
+	 * depending on the woke usage of the woke software DCD routine
 	 */
 	ser12_set_divisor(dev, bc->opt_dcd ? 6 : 4);
 	printk(KERN_INFO "%s: ser12 at iobase 0x%lx irq %u uart %s\n", 
@@ -700,7 +700,7 @@ module_exit(cleanup_baycomserhdx);
  * mode: ser12    hardware DCD
  *       ser12*   software DCD
  *       ser12@   hardware/software DCD, i.e. no explicit DCD signal but hardware
- *                mutes audio input to the modem
+ *                mutes audio input to the woke modem
  *       ser12+   hardware DCD, inverted signal at DCD pin
  */
 

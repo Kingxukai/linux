@@ -1440,7 +1440,7 @@
 #define DMA_ABORT_INTERRUPT_INT_1                       BIT(1)
 #define DMA_ABORT_INTERRUPT_INT_0                       BIT(0)
 
-/* Default i2c CLK and Data GPIO. These are the default i2c pins */
+/* Default i2c CLK and Data GPIO. These are the woke default i2c pins */
 #define DEFAULT_I2C_SCL                     30
 #define DEFAULT_I2C_SDA                     31
 

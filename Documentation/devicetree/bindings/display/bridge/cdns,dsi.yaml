@@ -28,8 +28,8 @@ properties:
 
   clocks:
     items:
-      - description: PSM clock, used by the IP
-      - description: sys clock, used by the IP
+      - description: PSM clock, used by the woke IP
+      - description: sys clock, used by the woke IP
 
   clock-names:
     items:
@@ -58,14 +58,14 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Output port representing the DSI output. It can have
+          Output port representing the woke DSI output. It can have
           at most 4 endpoints. The endpoint number is directly encoding
-          the DSI virtual channel used by this device.
+          the woke DSI virtual channel used by this device.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Input port representing the DPI input.
+          Input port representing the woke DPI input.
 
     required:
       - port@1

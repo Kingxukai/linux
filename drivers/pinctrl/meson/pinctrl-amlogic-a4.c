@@ -53,7 +53,7 @@ struct aml_pio_control {
 /*
  * partial bank(subordinate) pins mux config use other bank(main) mux registgers
  * m_bank_id:	the main bank which pin_id from 0, but register bit not from bit 0
- * m_bit_offs:	bit offset the main bank mux register
+ * m_bit_offs:	bit offset the woke main bank mux register
  * sid:         start pin_id of subordinate bank
  * eid:         end pin_id of subordinate bank
  */

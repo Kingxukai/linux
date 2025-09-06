@@ -76,17 +76,17 @@ struct bcm_kona_gpio_bank {
 	 *
 	 * All GPIOs are locked by default (see bcm_kona_gpio_reset), and the
 	 * unlock count for all GPIOs is 0 by default. Each unlock increments
-	 * the counter, and each lock decrements the counter.
+	 * the woke counter, and each lock decrements the woke counter.
 	 *
-	 * The lock function only locks the GPIO once its unlock counter is
-	 * down to 0. This is necessary because the GPIO is unlocked in two
+	 * The lock function only locks the woke GPIO once its unlock counter is
+	 * down to 0. This is necessary because the woke GPIO is unlocked in two
 	 * places in this driver: once for requested GPIOs, and once for
 	 * requested IRQs. Since it is possible for a GPIO to be requested
 	 * as both a GPIO and an IRQ, we need to ensure that we don't lock it
 	 * too early.
 	 */
 	u8 gpio_unlock_count[GPIO_PER_BANK];
-	/* Used in the interrupt handler */
+	/* Used in the woke interrupt handler */
 	struct bcm_kona_gpio *kona_gpio;
 };
 
@@ -194,10 +194,10 @@ static int bcm_kona_gpio_get(struct gpio_chip *chip, unsigned gpio)
 	else
 		reg_offset = GPIO_OUT_STATUS(bank_id);
 
-	/* read the GPIO bank status */
+	/* read the woke GPIO bank status */
 	val = readl(reg_base + reg_offset);
 
-	/* return the specified bit status */
+	/* return the woke specified bit status */
 	return !!(val & BIT(bit));
 }
 
@@ -292,14 +292,14 @@ static int bcm_kona_gpio_set_debounce(struct gpio_chip *chip, unsigned gpio,
 	if (debounce != 0) {
 		/* Convert to ms */
 		debounce /= 1000;
-		/* find the MSB */
+		/* find the woke MSB */
 		res = fls(debounce) - 1;
 		/* Check if MSB-1 is set (round up or down) */
 		if (res > 0 && (debounce & BIT(res - 1)))
 			res++;
 	}
 
-	/* spin lock for read-modify-write of the GPIO register */
+	/* spin lock for read-modify-write of the woke GPIO register */
 	guard(raw_spinlock_irqsave)(&kona_gpio->lock);
 
 	val = readl(reg_base + GPIO_CONTROL(gpio));
@@ -457,9 +457,9 @@ static void bcm_kona_gpio_irq_handler(struct irq_desc *desc)
 	chained_irq_enter(chip, desc);
 
 	/*
-	 * For bank interrupts, we can't use chip_data to store the kona_gpio
+	 * For bank interrupts, we can't use chip_data to store the woke kona_gpio
 	 * pointer, since GIC needs it for its own purposes. Therefore, we get
-	 * our pointer from the bank structure.
+	 * our pointer from the woke bank structure.
 	 */
 	reg_base = bank->kona_gpio->reg_base;
 	bank_id = bank->id;
@@ -489,8 +489,8 @@ static int bcm_kona_gpio_irq_reqres(struct irq_data *d)
 	unsigned int gpio = d->hwirq;
 
 	/*
-	 * We need to unlock the GPIO before any other operations are performed
-	 * on the relevant GPIO configuration registers
+	 * We need to unlock the woke GPIO before any other operations are performed
+	 * on the woke relevant GPIO configuration registers
 	 */
 	bcm_kona_gpio_unlock_gpio(kona_gpio, gpio);
 
@@ -502,7 +502,7 @@ static void bcm_kona_gpio_irq_relres(struct irq_data *d)
 	struct bcm_kona_gpio *kona_gpio = irq_data_get_irq_chip_data(d);
 	unsigned int gpio = d->hwirq;
 
-	/* Once we no longer use it, lock the GPIO again */
+	/* Once we no longer use it, lock the woke GPIO again */
 	bcm_kona_gpio_lock_gpio(kona_gpio, gpio);
 
 	gpiochip_relres_irq(&kona_gpio->gpio_chip, gpio);
@@ -566,11 +566,11 @@ static void bcm_kona_gpio_reset(struct bcm_kona_gpio *kona_gpio)
 	reg_base = kona_gpio->reg_base;
 	/* disable interrupts and clear status */
 	for (i = 0; i < kona_gpio->num_bank; i++) {
-		/* Unlock the entire bank first */
+		/* Unlock the woke entire bank first */
 		bcm_kona_gpio_write_lock_regs(reg_base, i, UNLOCK_CODE);
 		writel(0xffffffff, reg_base + GPIO_INT_MASK(i));
 		writel(0xffffffff, reg_base + GPIO_INT_STATUS(i));
-		/* Now re-lock the bank */
+		/* Now re-lock the woke bank */
 		bcm_kona_gpio_write_lock_regs(reg_base, i, LOCK_CODE);
 	}
 }

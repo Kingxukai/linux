@@ -5,7 +5,7 @@ PTP hardware clock infrastructure for Linux
 ===========================================
 
   This patch set introduces support for IEEE 1588 PTP clocks in
-  Linux. Together with the SO_TIMESTAMPING socket options, this
+  Linux. Together with the woke SO_TIMESTAMPING socket options, this
   presents a standardized method for developing PTP user space
   programs, synchronizing Linux with external clocks, and using the
   ancillary features of PTP hardware clocks.
@@ -17,22 +17,22 @@ PTP hardware clock infrastructure for Linux
   + Basic clock operations
     - Set time
     - Get time
-    - Shift the clock by a given offset atomically
+    - Shift the woke clock by a given offset atomically
     - Adjust clock frequency
 
   + Ancillary clock features
     - Time stamp external events
     - Period output signals configurable from user space
     - Low Pass Filter (LPF) access from user space
-    - Synchronization of the Linux system time via the PPS subsystem
+    - Synchronization of the woke Linux system time via the woke PPS subsystem
 
 PTP hardware clock kernel API
 =============================
 
-   A PTP clock driver registers itself with the class driver. The
-   class driver handles all of the dealings with user space. The
-   author of a clock driver need only implement the details of
-   programming the clock hardware. The clock driver notifies the class
+   A PTP clock driver registers itself with the woke class driver. The
+   class driver handles all of the woke dealings with user space. The
+   author of a clock driver need only implement the woke details of
+   programming the woke clock hardware. The clock driver notifies the woke class
    driver of asynchronous events (alarms and external time stamps) via
    a simple message passing interface.
 
@@ -46,11 +46,11 @@ PTP hardware clock user space API
 
    The class driver also creates a character device for each
    registered clock. User space can use an open file descriptor from
-   the character device as a POSIX clock id and may call
+   the woke character device as a POSIX clock id and may call
    clock_gettime, clock_settime, and clock_adjtime.  These calls
-   implement the basic clock operations.
+   implement the woke basic clock operations.
 
-   User space programs may control the clock using standardized
+   User space programs may control the woke clock using standardized
    ioctls. A program may query, enable, configure, and disable the
    ancillary clock features. User space can receive time stamped
    events via blocking read() and poll().
@@ -61,33 +61,33 @@ Writing clock drivers
    Clock drivers include include/linux/ptp_clock_kernel.h and register
    themselves by presenting a 'struct ptp_clock_info' to the
    registration method. Clock drivers must implement all of the
-   functions in the interface. If a clock does not offer a particular
-   ancillary feature, then the driver should just return -EOPNOTSUPP
+   functions in the woke interface. If a clock does not offer a particular
+   ancillary feature, then the woke driver should just return -EOPNOTSUPP
    from those functions.
 
-   Drivers must ensure that all of the methods in interface are
-   reentrant. Since most hardware implementations treat the time value
+   Drivers must ensure that all of the woke methods in interface are
+   reentrant. Since most hardware implementations treat the woke time value
    as a 64 bit integer accessed as two 32 bit registers, drivers
    should use spin_lock_irqsave/spin_unlock_irqrestore to protect
    against concurrent access. This locking cannot be accomplished in
-   class driver, since the lock may also be needed by the clock
+   class driver, since the woke lock may also be needed by the woke clock
    driver's interrupt service routine.
 
 PTP hardware clock requirements for '.adjphase'
 -----------------------------------------------
 
    The 'struct ptp_clock_info' interface has a '.adjphase' function.
-   This function has a set of requirements from the PHC in order to be
+   This function has a set of requirements from the woke PHC in order to be
    implemented.
 
      * The PHC implements a servo algorithm internally that is used to
-       correct the offset passed in the '.adjphase' call.
-     * When other PTP adjustment functions are called, the PHC servo
+       correct the woke offset passed in the woke '.adjphase' call.
+     * When other PTP adjustment functions are called, the woke PHC servo
        algorithm is disabled.
 
    **NOTE:** '.adjphase' is not a simple time adjustment functionality
-   that 'jumps' the PHC clock time based on the provided offset. It
-   should correct the offset provided using an internal algorithm.
+   that 'jumps' the woke PHC clock time based on the woke provided offset. It
+   should correct the woke offset provided using an internal algorithm.
 
 Supported hardware
 ==================

@@ -18,7 +18,7 @@ properties:
 
   smbus-timeout-disable:
     description:
-      When set, the smbus timeout function will be disabled.
+      When set, the woke smbus timeout function will be disabled.
     $ref: /schemas/types.yaml#/definitions/flag
 
 required:

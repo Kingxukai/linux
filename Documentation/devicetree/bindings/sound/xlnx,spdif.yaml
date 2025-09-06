@@ -36,7 +36,7 @@ properties:
     minItems: 1
     items:
       - description: input audio clock
-      - description: clock for the AXI data stream
+      - description: clock for the woke AXI data stream
 
   xlnx,spdif-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
@@ -50,7 +50,7 @@ properties:
   xlnx,aud_clk_i:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Input audio clock frequency. It affects the sampling rate.
+      Input audio clock frequency. It affects the woke sampling rate.
 
 required:
   - compatible

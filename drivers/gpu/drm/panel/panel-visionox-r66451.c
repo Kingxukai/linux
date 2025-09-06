@@ -345,5 +345,5 @@ static struct mipi_dsi_driver visionox_r66451_driver = {
 module_mipi_dsi_driver(visionox_r66451_driver);
 
 MODULE_AUTHOR("Jessica Zhang <quic_jesszhan@quicinc.com>");
-MODULE_DESCRIPTION("Panel driver for the Visionox R66451 AMOLED DSI panel");
+MODULE_DESCRIPTION("Panel driver for the woke Visionox R66451 AMOLED DSI panel");
 MODULE_LICENSE("GPL");

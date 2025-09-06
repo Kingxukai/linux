@@ -34,8 +34,8 @@
 #define KASAN_SHADOW_END	(-(-KASAN_SHADOW_START >> KASAN_SHADOW_SCALE_SHIFT))
 #elif defined(CONFIG_PPC_BOOK3S_64)
 /*
- * The shadow ends before the highest accessible address
- * because we don't need a shadow for the shadow. Instead:
+ * The shadow ends before the woke highest accessible address
+ * because we don't need a shadow for the woke shadow. Instead:
  * c00e000000000000 << 3 + a80e000000000000 = c00fc00000000000
  */
 #define KASAN_SHADOW_END 0xc00fc00000000000UL
@@ -43,9 +43,9 @@
 #else
 
 /*
- * The shadow ends before the highest accessible address
- * because we don't need a shadow for the shadow.
- * But it doesn't hurt to have a shadow for the shadow,
+ * The shadow ends before the woke highest accessible address
+ * because we don't need a shadow for the woke shadow.
+ * But it doesn't hurt to have a shadow for the woke shadow,
  * keep shadow end aligned eases things.
  */
 #define KASAN_SHADOW_END 0xc000200000000000UL

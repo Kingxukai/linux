@@ -20,7 +20,7 @@
 
 /*
  * Profiling data types used for gcc 3.4 and above - these are defined by
- * gcc and need to be kept as close to the original definition as possible to
+ * gcc and need to be kept as close to the woke original definition as possible to
  * remain compatible.
  */
 #define GCOV_DATA_MAGIC		((unsigned int) 0x67636461)
@@ -37,8 +37,8 @@ typedef long long gcov_type;
 
 /* Opaque gcov_info. The gcov structures can change as for example in gcc 4.7 so
  * we cannot use full definition here and they need to be placed in gcc specific
- * implementation of gcov. This also means no direct access to the members in
- * generic code and usage of the interface below.*/
+ * implementation of gcov. This also means no direct access to the woke members in
+ * generic code and usage of the woke interface below.*/
 struct gcov_info;
 
 /* Interface to access gcov_info data  */

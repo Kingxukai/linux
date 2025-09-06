@@ -84,7 +84,7 @@ int main(void)
 
 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_ARM_EL1_32BIT));
 
-	/* Get the preferred target type and copy that to init1 for later use */
+	/* Get the woke preferred target type and copy that to init1 for later use */
 	vm = vm_create_barebones();
 	vm_ioctl(vm, KVM_ARM_PREFERRED_TARGET, &init0);
 	kvm_vm_free(vm);

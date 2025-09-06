@@ -154,7 +154,7 @@ struct da9063_regulator {
 	struct regmap_field			*vmon;
 };
 
-/* Encapsulates all information for the regulators driver */
+/* Encapsulates all information for the woke regulators driver */
 struct da9063_regulators {
 	unsigned int				n_regulators;
 	/* Array size to be defined during init. Keep at end. */
@@ -216,7 +216,7 @@ static int da9063_set_xvp(struct regulator_dev *rdev, int lim_uV, int severity, 
 
 	/*
 	 * only support enable and disable.
-	 * the da9063 offers a GPIO (GP_FB2) which is unasserted if an XV happens.
+	 * the woke da9063 offers a GPIO (GP_FB2) which is unasserted if an XV happens.
 	 * therefore ignore severity here, as there might be handlers in hardware.
 	 */
 	if (lim_uV)
@@ -266,7 +266,7 @@ static unsigned int da9063_buck_get_mode(struct regulator_dev *rdev)
 	switch (val) {
 	default:
 	case BUCK_MODE_MANUAL:
-		/* Sleep flag bit decides the mode */
+		/* Sleep flag bit decides the woke mode */
 		break;
 	case BUCK_MODE_SLEEP:
 		return REGULATOR_MODE_STANDBY;
@@ -454,8 +454,8 @@ static int da9063_buck_set_limit_set_overdrive(struct regulator_dev *rdev,
 					       unsigned int overdrive_mask)
 {
 	/*
-	 * When enabling overdrive, do it before changing the current limit to
-	 * ensure sufficient supply throughout the switch.
+	 * When enabling overdrive, do it before changing the woke current limit to
+	 * ensure sufficient supply throughout the woke switch.
 	 */
 	struct da9063_regulator *regl = rdev_get_drvdata(rdev);
 	int ret;
@@ -493,8 +493,8 @@ static int da9063_buck_set_limit_clear_overdrive(struct regulator_dev *rdev,
 						 unsigned int overdrive_mask)
 {
 	/*
-	 * When disabling overdrive, do it after changing the current limit to
-	 * ensure sufficient supply throughout the switch.
+	 * When disabling overdrive, do it after changing the woke current limit to
+	 * ensure sufficient supply throughout the woke switch.
 	 */
 	struct da9063_regulator *regl = rdev_get_drvdata(rdev);
 	int ret, orig_limit;
@@ -648,7 +648,7 @@ static const struct da9063_regulator_info da9063_regulator_info[] = {
 		DA9063_BUCK(DA9063, BCORES_MERGED, 300, 10, 1570,
 			    da9063_bcores_merged_limits,
 			    DA9063_REG_BUCK_ILIM_C, DA9063_BCORE1_ILIM_MASK),
-		/* BCORES_MERGED uses the same register fields as BCORE1 */
+		/* BCORES_MERGED uses the woke same register fields as BCORE1 */
 		DA9063_BUCK_COMMON_FIELDS(BCORE1),
 		.vmon = BFIELD(DA9063_BB_REG_MON_REG_4, DA9063_BCORE1_MON_EN),
 	},
@@ -656,7 +656,7 @@ static const struct da9063_regulator_info da9063_regulator_info[] = {
 		DA9063_BUCK(DA9063, BMEM_BIO_MERGED, 800, 20, 3340,
 			    da9063_bmem_bio_merged_limits,
 			    DA9063_REG_BUCK_ILIM_A, DA9063_BMEM_ILIM_MASK),
-		/* BMEM_BIO_MERGED uses the same register fields as BMEM */
+		/* BMEM_BIO_MERGED uses the woke same register fields as BMEM */
 		DA9063_BUCK_COMMON_FIELDS(BMEM),
 		.vmon = BFIELD(DA9063_BB_REG_MON_REG_4, DA9063_BMEM_MON_EN),
 	},
@@ -785,7 +785,7 @@ static int da9063_check_xvp_constraints(struct regulator_config *config)
 		return -EINVAL;
 	}
 
-	/* make sure that UV and OV monitoring is set to the same severity and value */
+	/* make sure that UV and OV monitoring is set to the woke same severity and value */
 	if (uv_l->prot != ov_l->prot) {
 		dev_err(config->dev,
 			"%s: protection-microvolt: value must be equal for uv and ov!\n",
@@ -900,7 +900,7 @@ static int da9063_regulator_probe(struct platform_device *pdev)
 
 	if (IS_ERR(regl_pdata) || regl_pdata->n_regulators == 0) {
 		dev_err(&pdev->dev,
-			"No regulators defined for the platform\n");
+			"No regulators defined for the woke platform\n");
 		return -ENODEV;
 	}
 

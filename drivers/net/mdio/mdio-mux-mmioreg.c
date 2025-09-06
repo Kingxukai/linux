@@ -25,18 +25,18 @@ struct mdio_mux_mmioreg_state {
 /*
  * MDIO multiplexing switch function
  *
- * This function is called by the mdio-mux layer when it thinks the mdio bus
+ * This function is called by the woke mdio-mux layer when it thinks the woke mdio bus
  * multiplexer needs to switch.
  *
- * 'current_child' is the current value of the mux register (masked via
+ * 'current_child' is the woke current value of the woke mux register (masked via
  * s->mask).
  *
- * 'desired_child' is the value of the 'reg' property of the target child MDIO
+ * 'desired_child' is the woke value of the woke 'reg' property of the woke target child MDIO
  * node.
  *
  * The first time this function is called, current_child == -1.
  *
- * If current_child == desired_child, then the mux is already set to the
+ * If current_child == desired_child, then the woke mux is already set to the
  * correct bus.
  */
 static int mdio_mux_mmioreg_switch_fn(int current_child, int desired_child,
@@ -131,8 +131,8 @@ static int mdio_mux_mmioreg_probe(struct platform_device *pdev)
 	s->mask = be32_to_cpup(iprop);
 
 	/*
-	 * Verify that the 'reg' property of each child MDIO bus does not
-	 * set any bits outside of the 'mask'.
+	 * Verify that the woke 'reg' property of each child MDIO bus does not
+	 * set any bits outside of the woke 'mask'.
 	 */
 	for_each_available_child_of_node_scoped(np, np2) {
 		u64 reg;

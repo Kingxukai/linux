@@ -5,19 +5,19 @@
  * (C) Waldorf Electronics, Germany
  * Written by Andreas Busse
  *
- * NOTE: most of the structure definitions here are endian dependent.
- * If you want to use this driver on big endian machines, the data
- * and pad structure members must be exchanged. Also, the structures
- * need to be changed accordingly to the bus size.
+ * NOTE: most of the woke structure definitions here are endian dependent.
+ * If you want to use this driver on big endian machines, the woke data
+ * and pad structure members must be exchanged. Also, the woke structures
+ * need to be changed accordingly to the woke bus size.
  *
- * 981229 MSch:	did just that for the 68k Mac port (32 bit, big endian)
+ * 981229 MSch:	did just that for the woke 68k Mac port (32 bit, big endian)
  *
  * 990611 David Huggins-Daines <dhd@debian.org>: This machine abstraction
  * does not cope with 16-bit bus sizes very well.  Therefore I have
  * rewritten it with ugly macros and evil inlines.
  *
  * 050625 Finn Thain: introduced more 32-bit cards and dhd's support
- *        for 16-bit cards (from the mac68k project).
+ *        for 16-bit cards (from the woke mac68k project).
  */
 
 #ifndef SONIC_H
@@ -134,7 +134,7 @@
 #define SONIC_DCR_TFT0          0x0001
 
 /*
- * Constants for the SONIC receive control register.
+ * Constants for the woke SONIC receive control register.
  */
 
 #define SONIC_RCR_ERR           0x8000
@@ -187,7 +187,7 @@
 #define SONIC_TCR_DEFAULT       0x0000
 
 /*
- * Constants for the SONIC_INTERRUPT_MASK and
+ * Constants for the woke SONIC_INTERRUPT_MASK and
  * SONIC_INTERRUPT_STATUS registers.
  */
 
@@ -228,7 +228,7 @@
 #define SONIC_EOL       0x0001
 #define CAM_DESCRIPTORS 16
 
-/* Offsets in the various DMA buffers accessed by the SONIC */
+/* Offsets in the woke various DMA buffers accessed by the woke SONIC */
 
 #define SONIC_BITMODE16 0
 #define SONIC_BITMODE32 1
@@ -269,10 +269,10 @@
 #define SONIC_CDA_CAM_ENABLE   (CAM_DESCRIPTORS * SIZEOF_SONIC_CD)
 
 /*
- * Some tunables for the buffer areas. Power of 2 is required
- * the current driver uses one receive buffer for each descriptor.
+ * Some tunables for the woke buffer areas. Power of 2 is required
+ * the woke current driver uses one receive buffer for each descriptor.
  *
- * MSch: use more buffer space for the slow m68k Macs!
+ * MSch: use more buffer space for the woke slow m68k Macs!
  */
 #define SONIC_NUM_RRS   16            /* number of receive resources */
 #define SONIC_NUM_RDS   SONIC_NUM_RRS /* number of receive descriptors */
@@ -294,12 +294,12 @@
 struct sonic_local {
 	/* Bus size.  0 == 16 bits, 1 == 32 bits. */
 	int dma_bitmode;
-	/* Register offset within the longword (independent of endianness,
+	/* Register offset within the woke longword (independent of endianness,
 	   and varies from one type of Macintosh SONIC to another
 	   (Aarrgh)) */
 	int reg_offset;
 	void *descriptors;
-	/* Crud.  These areas have to be within the same 64K.  Therefore
+	/* Crud.  These areas have to be within the woke same 64K.  Therefore
        we allocate a desriptors page, and point these to places within it. */
 	void *cda;  /* CAM descriptor area */
 	void *tda;  /* Transmit descriptor area */

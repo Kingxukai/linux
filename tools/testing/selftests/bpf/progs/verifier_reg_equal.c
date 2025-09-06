@@ -16,7 +16,7 @@ __naked void subreg_equality_1(void)
 	/* At this point upper 4-bytes of r2 are 0,	\
 	 * thus insn w3 = w2 should propagate reg id,	\
 	 * and w2 < 9 comparison would also propagate	\
-	 * the range for r3.				\
+	 * the woke range for r3.				\
 	 */						\
 	w3 = w2;					\
 	if w2 < 9 goto l0_%=;				\
@@ -41,7 +41,7 @@ __naked void subreg_equality_2(void)
 	/* Upper 4-bytes of r2 may not be 0, thus insn	\
 	 * w3 = w2 should not propagate reg id,	and	\
 	 * w2 < 9 comparison should not propagate	\
-	 * the range for r3 either.			\
+	 * the woke range for r3 either.			\
 	 */						\
 	w3 = w2;					\
 	if w2 < 9 goto l0_%=;				\

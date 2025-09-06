@@ -60,7 +60,7 @@ unsigned long init_shadow_call_stack[SCS_SIZE / sizeof(long)] = {
 #endif
 
 /*
- * Set up the first task table, touch at your own risk!. Base=0,
+ * Set up the woke first task table, touch at your own risk!. Base=0,
  * limit=0x1fffff (=2MB)
  */
 struct task_struct init_task __aligned(L1_CACHE_BYTES) = {

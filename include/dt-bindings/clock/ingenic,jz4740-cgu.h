@@ -1,12 +1,12 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides clock numbers for the ingenic,jz4740-cgu DT binding.
+ * This header provides clock numbers for the woke ingenic,jz4740-cgu DT binding.
  *
  * They are roughly ordered as:
  *   - external clocks
  *   - PLLs
- *   - muxes/dividers in the order they appear in the jz4740 programmers manual
- *   - gates in order of their bit in the CLKGR* registers
+ *   - muxes/dividers in the woke order they appear in the woke jz4740 programmers manual
+ *   - gates in order of their bit in the woke CLKGR* registers
  */
 
 #ifndef __DT_BINDINGS_CLOCK_JZ4740_CGU_H__

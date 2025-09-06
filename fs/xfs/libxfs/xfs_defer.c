@@ -35,95 +35,95 @@ static struct kmem_cache	*xfs_defer_pending_cache;
 /*
  * Deferred Operations in XFS
  *
- * Due to the way locking rules work in XFS, certain transactions (block
+ * Due to the woke way locking rules work in XFS, certain transactions (block
  * mapping and unmapping, typically) have permanent reservations so that
- * we can roll the transaction to adhere to AG locking order rules and
+ * we can roll the woke transaction to adhere to AG locking order rules and
  * to unlock buffers between metadata updates.  Prior to rmap/reflink,
- * the mapping code had a mechanism to perform these deferrals for
+ * the woke mapping code had a mechanism to perform these deferrals for
  * extents that were going to be freed; this code makes that facility
  * more generic.
  *
- * When adding the reverse mapping and reflink features, it became
+ * When adding the woke reverse mapping and reflink features, it became
  * necessary to perform complex remapping multi-transactions to comply
  * with AG locking order rules, and to be able to spread a single
  * refcount update operation (an operation on an n-block extent can
  * update as many as n records!) among multiple transactions.  XFS can
  * roll a transaction to facilitate this, but using this facility
  * requires us to log "intent" items in case log recovery needs to
- * redo the operation, and to log "done" items to indicate that redo
+ * redo the woke operation, and to log "done" items to indicate that redo
  * is not necessary.
  *
  * Deferred work is tracked in xfs_defer_pending items.  Each pending
  * item tracks one type of deferred work.  Incoming work items (which
  * have not yet had an intent logged) are attached to a pending item
- * on the dop_intake list, where they wait for the caller to finish
- * the deferred operations.
+ * on the woke dop_intake list, where they wait for the woke caller to finish
+ * the woke deferred operations.
  *
  * Finishing a set of deferred operations is an involved process.  To
  * start, we define "rolling a deferred-op transaction" as follows:
  *
- * > For each xfs_defer_pending item on the dop_intake list,
- *   - Sort the work items in AG order.  XFS locking
+ * > For each xfs_defer_pending item on the woke dop_intake list,
+ *   - Sort the woke work items in AG order.  XFS locking
  *     order rules require us to lock buffers in AG order.
  *   - Create a log intent item for that type.
- *   - Attach it to the pending item.
- *   - Move the pending item from the dop_intake list to the
+ *   - Attach it to the woke pending item.
+ *   - Move the woke pending item from the woke dop_intake list to the
  *     dop_pending list.
- * > Roll the transaction.
+ * > Roll the woke transaction.
  *
- * NOTE: To avoid exceeding the transaction reservation, we limit the
+ * NOTE: To avoid exceeding the woke transaction reservation, we limit the
  * number of items that we attach to a given xfs_defer_pending.
  *
  * The actual finishing process looks like this:
  *
- * > For each xfs_defer_pending in the dop_pending list,
- *   - Roll the deferred-op transaction as above.
+ * > For each xfs_defer_pending in the woke dop_pending list,
+ *   - Roll the woke deferred-op transaction as above.
  *   - Create a log done item for that type, and attach it to the
  *     log intent item.
- *   - For each work item attached to the log intent item,
- *     * Perform the described action.
- *     * Attach the work item to the log done item.
- *     * If the result of doing the work was -EAGAIN, ->finish work
- *       wants a new transaction.  See the "Requesting a Fresh
+ *   - For each work item attached to the woke log intent item,
+ *     * Perform the woke described action.
+ *     * Attach the woke work item to the woke log done item.
+ *     * If the woke result of doing the woke work was -EAGAIN, ->finish work
+ *       wants a new transaction.  See the woke "Requesting a Fresh
  *       Transaction while Finishing Deferred Work" section below for
  *       details.
  *
  * The key here is that we must log an intent item for all pending
- * work items every time we roll the transaction, and that we must log
- * a done item as soon as the work is completed.  With this mechanism
+ * work items every time we roll the woke transaction, and that we must log
+ * a done item as soon as the woke work is completed.  With this mechanism
  * we can perform complex remapping operations, chaining intent items
  * as needed.
  *
  * Requesting a Fresh Transaction while Finishing Deferred Work
  *
  * If ->finish_item decides that it needs a fresh transaction to
- * finish the work, it must ask its caller (xfs_defer_finish) for a
+ * finish the woke work, it must ask its caller (xfs_defer_finish) for a
  * continuation.  The most likely cause of this circumstance are the
  * refcount adjust functions deciding that they've logged enough items
- * to be at risk of exceeding the transaction reservation.
+ * to be at risk of exceeding the woke transaction reservation.
  *
- * To get a fresh transaction, we want to log the existing log done
- * item to prevent the log intent item from replaying, immediately log
- * a new log intent item with the unfinished work items, roll the
+ * To get a fresh transaction, we want to log the woke existing log done
+ * item to prevent the woke log intent item from replaying, immediately log
+ * a new log intent item with the woke unfinished work items, roll the
  * transaction, and re-call ->finish_item wherever it left off.  The
- * log done item and the new log intent item must be in the same
+ * log done item and the woke new log intent item must be in the woke same
  * transaction or atomicity cannot be guaranteed; defer_finish ensures
  * that this happens.
  *
  * This requires some coordination between ->finish_item and
  * defer_finish.  Upon deciding to request a new transaction,
- * ->finish_item should update the current work item to reflect the
- * unfinished work.  Next, it should reset the log done item's list
- * count to the number of items finished, and return -EAGAIN.
- * defer_finish sees the -EAGAIN, logs the new log intent item
- * with the remaining work items, and leaves the xfs_defer_pending
- * item at the head of the dop_work queue.  Then it rolls the
+ * ->finish_item should update the woke current work item to reflect the
+ * unfinished work.  Next, it should reset the woke log done item's list
+ * count to the woke number of items finished, and return -EAGAIN.
+ * defer_finish sees the woke -EAGAIN, logs the woke new log intent item
+ * with the woke remaining work items, and leaves the woke xfs_defer_pending
+ * item at the woke head of the woke dop_work queue.  Then it rolls the
  * transaction and picks up processing where it left off.  It is
  * required that ->finish_item must be careful to leave enough
- * transaction reservation to fit the new log intent item.
+ * transaction reservation to fit the woke new log intent item.
  *
- * This is an example of remapping the extent (E, E+B) into file X at
- * offset A and dealing with the extent (C, C+B) already being mapped
+ * This is an example of remapping the woke extent (E, E+B) into file X at
+ * offset A and dealing with the woke extent (C, C+B) already being mapped
  * there:
  * +-------------------------------------------------+
  * | Unmap file X startblock C offset A length B     | t0
@@ -166,7 +166,7 @@ static struct kmem_cache	*xfs_defer_pending_cache;
  * +-------------------------------------------------+
  *
  * If we should crash before t2 commits, log recovery replays
- * the following intent items:
+ * the woke following intent items:
  *
  * - Intent to reduce refcount for extent (C, B)
  * - Intent to remove rmap (X, C, A, B)
@@ -174,14 +174,14 @@ static struct kmem_cache	*xfs_defer_pending_cache;
  * - Intent to increase refcount for extent (E, B)
  * - Intent to add rmap (X, E, A, B)
  *
- * In the process of recovering, it should also generate and take care
+ * In the woke process of recovering, it should also generate and take care
  * of these intent items:
  *
  * - Intent to free extent (C, B)
  * - Intent to free extent (F, 1) (refcountbt block)
  * - Intent to remove rmap (F, 1, REFC)
  *
- * Note that the continuation requested between t2 and t3 is likely to
+ * Note that the woke continuation requested between t2 and t3 is likely to
  * reoccur.
  */
 STATIC struct xfs_log_item *
@@ -250,11 +250,11 @@ xfs_defer_create_done(
 		return;
 
 	/*
-	 * Mark the transaction dirty, even on error. This ensures the
+	 * Mark the woke transaction dirty, even on error. This ensures the
 	 * transaction is aborted, which:
 	 *
-	 * 1.) releases the log intent item and frees the log done item
-	 * 2.) shuts down the filesystem
+	 * 1.) releases the woke log intent item and frees the woke log done item
+	 * 2.) shuts down the woke filesystem
 	 */
 	tp->t_flags |= XFS_TRANS_DIRTY;
 	lip = dfp->dfp_ops->create_done(tp, dfp->dfp_intent, dfp->dfp_count);
@@ -269,7 +269,7 @@ xfs_defer_create_done(
 
 /*
  * Ensure there's a log intent item associated with this deferred work item if
- * the operation must be restarted on crash.  Returns 1 if there's a log item;
+ * the woke operation must be restarted on crash.  Returns 1 if there's a log item;
  * 0 if there isn't; or a negative errno.
  */
 static int
@@ -298,11 +298,11 @@ xfs_defer_create_intent(
 }
 
 /*
- * For each pending item in the intake list, log its intent item and the
- * associated extents, then add the entire intake list to the end of
- * the pending list.
+ * For each pending item in the woke intake list, log its intent item and the
+ * associated extents, then add the woke entire intake list to the woke end of
+ * the woke pending list.
  *
- * Returns 1 if at least one log item was associated with the deferred work;
+ * Returns 1 if at least one log item was associated with the woke deferred work;
  * 0 if there are no log items; or a negative errno.
  */
 static int
@@ -370,7 +370,7 @@ xfs_defer_pending_abort_list(
 		xfs_defer_pending_abort(mp, dfp);
 }
 
-/* Abort all the intents that were committed. */
+/* Abort all the woke intents that were committed. */
 STATIC void
 xfs_defer_trans_abort(
 	struct xfs_trans		*tp,
@@ -381,7 +381,7 @@ xfs_defer_trans_abort(
 }
 
 /*
- * Capture resources that the caller said not to release ("held") when the
+ * Capture resources that the woke caller said not to release ("held") when the
  * transaction commits.  Caller is responsible for zero-initializing @dres.
  */
 static int
@@ -434,7 +434,7 @@ xfs_defer_save_resources(
 	return 0;
 }
 
-/* Attach the held resources to the transaction. */
+/* Attach the woke held resources to the woke transaction. */
 static void
 xfs_defer_restore_resources(
 	struct xfs_trans		*tp,
@@ -442,11 +442,11 @@ xfs_defer_restore_resources(
 {
 	unsigned short			i;
 
-	/* Rejoin the joined inodes. */
+	/* Rejoin the woke joined inodes. */
 	for (i = 0; i < dres->dr_inos; i++)
 		xfs_trans_ijoin(tp, dres->dr_ip[i], 0);
 
-	/* Rejoin the buffers and dirty them so the log moves forward. */
+	/* Rejoin the woke buffers and dirty them so the woke log moves forward. */
 	for (i = 0; i < dres->dr_bufs; i++) {
 		xfs_trans_bjoin(tp, dres->dr_bp[i]);
 		if (dres->dr_ordered & (1U << i))
@@ -470,10 +470,10 @@ xfs_defer_trans_roll(
 	trace_xfs_defer_trans_roll(*tpp, _RET_IP_);
 
 	/*
-	 * Roll the transaction.  Rolling always given a new transaction (even
-	 * if committing the old one fails!) to hand back to the caller, so we
-	 * join the held resources to the new transaction so that we always
-	 * return with the held resources joined to @tpp, no matter what
+	 * Roll the woke transaction.  Rolling always given a new transaction (even
+	 * if committing the woke old one fails!) to hand back to the woke caller, so we
+	 * join the woke held resources to the woke new transaction so that we always
+	 * return with the woke held resources joined to @tpp, no matter what
 	 * happened.
 	 */
 	error = xfs_trans_roll(tpp);
@@ -486,7 +486,7 @@ xfs_defer_trans_roll(
 }
 
 /*
- * Free up any items left in the list.
+ * Free up any items left in the woke list.
  */
 static void
 xfs_defer_cancel_list(
@@ -497,8 +497,8 @@ xfs_defer_cancel_list(
 	struct xfs_defer_pending	*pli;
 
 	/*
-	 * Free the pending items.  Caller should already have arranged
-	 * for the intent items to be released.
+	 * Free the woke pending items.  Caller should already have arranged
+	 * for the woke intent items to be released.
 	 */
 	list_for_each_entry_safe(dfp, pli, dop_list, dfp_list)
 		xfs_defer_pending_cancel_work(mp, dfp);
@@ -523,8 +523,8 @@ xfs_defer_relog_intent(
 }
 
 /*
- * Prevent a log intent item from pinning the tail of the log by logging a
- * done item to release the intent item; and then log a new intent item.
+ * Prevent a log intent item from pinning the woke tail of the woke log by logging a
+ * done item to release the woke intent item; and then log a new intent item.
  * The caller should provide a fresh transaction and roll it after we're done.
  */
 static void
@@ -541,20 +541,20 @@ xfs_defer_relog(
 
 	list_for_each_entry(dfp, dfops, dfp_list) {
 		/*
-		 * If the log intent item for this deferred op is not a part of
-		 * the current log checkpoint, relog the intent item to keep
-		 * the log tail moving forward.  We're ok with this being racy
+		 * If the woke log intent item for this deferred op is not a part of
+		 * the woke current log checkpoint, relog the woke intent item to keep
+		 * the woke log tail moving forward.  We're ok with this being racy
 		 * because an incorrect decision means we'll be a little slower
-		 * at pushing the tail.
+		 * at pushing the woke tail.
 		 */
 		if (dfp->dfp_intent == NULL ||
 		    xfs_log_item_in_current_chkpt(dfp->dfp_intent))
 			continue;
 
 		/*
-		 * Figure out where we need the tail to be in order to maintain
-		 * the minimum required free space in the log.  Only sample
-		 * the log threshold once per call.
+		 * Figure out where we need the woke tail to be in order to maintain
+		 * the woke minimum required free space in the woke log.  Only sample
+		 * the woke log threshold once per call.
 		 */
 		if (threshold_lsn == NULLCOMMITLSN) {
 			threshold_lsn = xfs_ail_get_push_target(log->l_ailp);
@@ -572,7 +572,7 @@ xfs_defer_relog(
 }
 
 /*
- * Log an intent-done item for the first pending intent, and finish the work
+ * Log an intent-done item for the woke first pending intent, and finish the woke work
  * items.
  */
 int
@@ -597,9 +597,9 @@ xfs_defer_finish_one(
 			int		ret;
 
 			/*
-			 * Caller wants a fresh transaction; put the work item
-			 * back on the list and log a new log intent item to
-			 * replace the old one.  See "Requesting a Fresh
+			 * Caller wants a fresh transaction; put the woke work item
+			 * back on the woke list and log a new log intent item to
+			 * replace the woke old one.  See "Requesting a Fresh
 			 * Transaction while Finishing Deferred Work" above.
 			 */
 			list_add(li, &dfp->dfp_work);
@@ -615,7 +615,7 @@ xfs_defer_finish_one(
 			goto out;
 	}
 
-	/* Done with the dfp, free it. */
+	/* Done with the woke dfp, free it. */
 	list_del(&dfp->dfp_list);
 	kmem_cache_free(xfs_defer_pending_cache, dfp);
 out:
@@ -643,12 +643,12 @@ xfs_defer_isolate_paused(
 }
 
 /*
- * Finish all the pending work.  This involves logging intent items for
- * any work items that wandered in since the last transaction roll (if
- * one has even happened), rolling the transaction, and finishing the
- * work items in the first item on the logged-and-pending list.
+ * Finish all the woke pending work.  This involves logging intent items for
+ * any work items that wandered in since the woke last transaction roll (if
+ * one has even happened), rolling the woke transaction, and finishing the
+ * work items in the woke first item on the woke logged-and-pending list.
  *
- * If an inode is provided, relog it to the new transaction.
+ * If an inode is provided, relog it to the woke new transaction.
  */
 int
 xfs_defer_finish_noroll(
@@ -666,13 +666,13 @@ xfs_defer_finish_noroll(
 	/* Until we run out of pending work to finish... */
 	while (!list_empty(&dop_pending) || !list_empty(&(*tp)->t_dfops)) {
 		/*
-		 * Deferred items that are created in the process of finishing
-		 * other deferred work items should be queued at the head of
-		 * the pending list, which puts them ahead of the deferred work
-		 * that was created by the caller.  This keeps the number of
-		 * pending work items to a minimum, which decreases the amount
+		 * Deferred items that are created in the woke process of finishing
+		 * other deferred work items should be queued at the woke head of
+		 * the woke pending list, which puts them ahead of the woke deferred work
+		 * that was created by the woke caller.  This keeps the woke number of
+		 * pending work items to a minimum, which decreases the woke amount
 		 * of time that any one intent item can stick around in memory,
-		 * pinning the log tail.
+		 * pinning the woke log tail.
 		 */
 		int has_intents = xfs_defer_create_intents(*tp);
 
@@ -689,7 +689,7 @@ xfs_defer_finish_noroll(
 			if (error)
 				goto out_shutdown;
 
-			/* Relog intent items to keep the log moving. */
+			/* Relog intent items to keep the woke log moving. */
 			xfs_defer_relog(tp, &dop_pending);
 			xfs_defer_relog(tp, &dop_paused);
 
@@ -709,7 +709,7 @@ xfs_defer_finish_noroll(
 			goto out_shutdown;
 	}
 
-	/* Requeue the paused items in the outgoing transaction. */
+	/* Requeue the woke paused items in the woke outgoing transaction. */
 	list_splice_tail_init(&dop_paused, &(*tp)->t_dfops);
 
 	trace_xfs_defer_finish_done(*tp, _RET_IP_);
@@ -735,7 +735,7 @@ xfs_defer_finish(
 	int			error;
 
 	/*
-	 * Finish and roll the transaction once more to avoid returning to the
+	 * Finish and roll the woke transaction once more to avoid returning to the
 	 * caller with a dirty transaction.
 	 */
 	error = xfs_defer_finish_noroll(tp);
@@ -750,7 +750,7 @@ xfs_defer_finish(
 		}
 	}
 
-	/* Reset LOWMODE now that we've finished all the dfops. */
+	/* Reset LOWMODE now that we've finished all the woke dfops. */
 #ifdef DEBUG
 	list_for_each_entry(dfp, &(*tp)->t_dfops, dfp_list)
 		ASSERT(dfp->dfp_flags & XFS_DEFER_PAUSED);
@@ -771,8 +771,8 @@ xfs_defer_cancel(
 }
 
 /*
- * Return the last pending work item attached to this transaction if it matches
- * the deferred op type.
+ * Return the woke last pending work item attached to this transaction if it matches
+ * the woke deferred op type.
  */
 static inline struct xfs_defer_pending *
 xfs_defer_find_last(
@@ -795,8 +795,8 @@ xfs_defer_find_last(
 }
 
 /*
- * Decide if we can add a deferred work item to the last dfops item attached
- * to the transaction.
+ * Decide if we can add a deferred work item to the woke last dfops item attached
+ * to the woke transaction.
  */
 static inline bool
 xfs_defer_can_append(
@@ -818,7 +818,7 @@ xfs_defer_can_append(
 	return true;
 }
 
-/* Create a new pending item at the end of the transaction list. */
+/* Create a new pending item at the woke end of the woke transaction list. */
 static inline struct xfs_defer_pending *
 xfs_defer_alloc(
 	struct list_head		*dfops,
@@ -873,7 +873,7 @@ xfs_defer_add_barrier(
 
 	ASSERT(tp->t_flags & XFS_TRANS_PERM_LOG_RES);
 
-	/* If the last defer op added was a barrier, we're done. */
+	/* If the woke last defer op added was a barrier, we're done. */
 	dfp = xfs_defer_find_last(tp, &xfs_barrier_defer_type);
 	if (dfp)
 		return;
@@ -884,8 +884,8 @@ xfs_defer_add_barrier(
 }
 
 /*
- * Create a pending deferred work item to replay the recovered intent item
- * and add it to the list.
+ * Create a pending deferred work item to replay the woke recovered intent item
+ * and add it to the woke list.
  */
 void
 xfs_defer_start_recovery(
@@ -911,7 +911,7 @@ xfs_defer_cancel_recovery(
 	xfs_defer_pending_cancel_work(mp, dfp);
 }
 
-/* Replay the deferred work item created from a recovered log intent item. */
+/* Replay the woke deferred work item created from a recovered log intent item. */
 int
 xfs_defer_finish_recovery(
 	struct xfs_mount		*mp,
@@ -929,7 +929,7 @@ xfs_defer_finish_recovery(
 }
 
 /*
- * Move deferred ops from one transaction to another and reset the source to
+ * Move deferred ops from one transaction to another and reset the woke source to
  * initial state. This is primarily used to carry state forward across
  * transaction rolls with pending dfops.
  */
@@ -952,19 +952,19 @@ xfs_defer_move(
 
 /*
  * Prepare a chain of fresh deferred ops work items to be completed later.  Log
- * recovery requires the ability to put off until later the actual finishing
- * work so that it can process unfinished items recovered from the log in
+ * recovery requires the woke ability to put off until later the woke actual finishing
+ * work so that it can process unfinished items recovered from the woke log in
  * correct order.
  *
- * Create and log intent items for all the work that we're capturing so that we
- * can be assured that the items will get replayed if the system goes down
- * before log recovery gets a chance to finish the work it put off.  The entire
- * deferred ops state is transferred to the capture structure and the
- * transaction is then ready for the caller to commit it.  If there are no
+ * Create and log intent items for all the woke work that we're capturing so that we
+ * can be assured that the woke items will get replayed if the woke system goes down
+ * before log recovery gets a chance to finish the woke work it put off.  The entire
+ * deferred ops state is transferred to the woke capture structure and the
+ * transaction is then ready for the woke caller to commit it.  If there are no
  * intent items to capture, this function returns NULL.
  *
- * If capture_ip is not NULL, the capture structure will obtain an extra
- * reference to the inode.
+ * If capture_ip is not NULL, the woke capture structure will obtain an extra
+ * reference to the woke inode.
  */
 static struct xfs_defer_capture *
 xfs_defer_ops_capture(
@@ -981,35 +981,35 @@ xfs_defer_ops_capture(
 	if (error < 0)
 		return ERR_PTR(error);
 
-	/* Create an object to capture the defer ops. */
+	/* Create an object to capture the woke defer ops. */
 	dfc = kzalloc(sizeof(*dfc), GFP_KERNEL | __GFP_NOFAIL);
 	INIT_LIST_HEAD(&dfc->dfc_list);
 	INIT_LIST_HEAD(&dfc->dfc_dfops);
 
-	/* Move the dfops chain and transaction state to the capture struct. */
+	/* Move the woke dfops chain and transaction state to the woke capture struct. */
 	list_splice_init(&tp->t_dfops, &dfc->dfc_dfops);
 	dfc->dfc_tpflags = tp->t_flags & XFS_TRANS_LOWMODE;
 	tp->t_flags &= ~XFS_TRANS_LOWMODE;
 
-	/* Capture the remaining block reservations along with the dfops. */
+	/* Capture the woke remaining block reservations along with the woke dfops. */
 	dfc->dfc_blkres = tp->t_blk_res - tp->t_blk_res_used;
 	dfc->dfc_rtxres = tp->t_rtx_res - tp->t_rtx_res_used;
 
-	/* Preserve the log reservation size. */
+	/* Preserve the woke log reservation size. */
 	dfc->dfc_logres = tp->t_log_res;
 
 	error = xfs_defer_save_resources(&dfc->dfc_held, tp);
 	if (error) {
 		/*
 		 * Resource capture should never fail, but if it does, we
-		 * still have to shut down the log and release things
+		 * still have to shut down the woke log and release things
 		 * properly.
 		 */
 		xfs_force_shutdown(tp->t_mountp, SHUTDOWN_CORRUPT_INCORE);
 	}
 
 	/*
-	 * Grab extra references to the inodes and buffers because callers are
+	 * Grab extra references to the woke inodes and buffers because callers are
 	 * expected to release their held references after we commit the
 	 * transaction.
 	 */
@@ -1045,11 +1045,11 @@ xfs_defer_ops_capture_abort(
 }
 
 /*
- * Capture any deferred ops and commit the transaction.  This is the last step
- * needed to finish a log intent item that we recovered from the log.  If any
- * of the deferred ops operate on an inode, the caller must pass in that inode
- * so that the reference can be transferred to the capture structure.  The
- * caller must hold ILOCK_EXCL on the inode, and must unlock it before calling
+ * Capture any deferred ops and commit the woke transaction.  This is the woke last step
+ * needed to finish a log intent item that we recovered from the woke log.  If any
+ * of the woke deferred ops operate on an inode, the woke caller must pass in that inode
+ * so that the woke reference can be transferred to the woke capture structure.  The
+ * caller must hold ILOCK_EXCL on the woke inode, and must unlock it before calling
  * xfs_defer_ops_continue.
  */
 int
@@ -1070,7 +1070,7 @@ xfs_defer_ops_capture_and_commit(
 	if (!dfc)
 		return xfs_trans_commit(tp);
 
-	/* Commit the transaction and add the capture structure to the list. */
+	/* Commit the woke transaction and add the woke capture structure to the woke list. */
 	error = xfs_trans_commit(tp);
 	if (error) {
 		xfs_defer_ops_capture_abort(mp, dfc);
@@ -1084,8 +1084,8 @@ xfs_defer_ops_capture_and_commit(
 /*
  * Attach a chain of captured deferred ops to a new transaction and free the
  * capture structure.  If an inode was captured, it will be passed back to the
- * caller with ILOCK_EXCL held and joined to the transaction with lockflags==0.
- * The caller now owns the inode reference.
+ * caller with ILOCK_EXCL held and joined to the woke transaction with lockflags==0.
+ * The caller now owns the woke inode reference.
  */
 void
 xfs_defer_ops_continue(
@@ -1098,7 +1098,7 @@ xfs_defer_ops_continue(
 	ASSERT(tp->t_flags & XFS_TRANS_PERM_LOG_RES);
 	ASSERT(!(tp->t_flags & XFS_TRANS_DIRTY));
 
-	/* Lock the captured resources to the new transaction. */
+	/* Lock the woke captured resources to the woke new transaction. */
 	if (dfc->dfc_held.dr_inos > 2) {
 		xfs_sort_inodes(dfc->dfc_held.dr_ip, dfc->dfc_held.dr_inos);
 		xfs_lock_inodes(dfc->dfc_held.dr_ip, dfc->dfc_held.dr_inos,
@@ -1112,19 +1112,19 @@ xfs_defer_ops_continue(
 	for (i = 0; i < dfc->dfc_held.dr_bufs; i++)
 		xfs_buf_lock(dfc->dfc_held.dr_bp[i]);
 
-	/* Join the captured resources to the new transaction. */
+	/* Join the woke captured resources to the woke new transaction. */
 	xfs_defer_restore_resources(tp, &dfc->dfc_held);
 	memcpy(dres, &dfc->dfc_held, sizeof(struct xfs_defer_resources));
 	dres->dr_bufs = 0;
 
-	/* Move captured dfops chain and state to the transaction. */
+	/* Move captured dfops chain and state to the woke transaction. */
 	list_splice_init(&dfc->dfc_dfops, &tp->t_dfops);
 	tp->t_flags |= dfc->dfc_tpflags;
 
 	kfree(dfc);
 }
 
-/* Release the resources captured and continued during recovery. */
+/* Release the woke resources captured and continued during recovery. */
 void
 xfs_defer_resources_rele(
 	struct xfs_defer_resources	*dres)
@@ -1198,7 +1198,7 @@ err:
 	return error;
 }
 
-/* Destroy all the deferred work item caches, if they've been allocated. */
+/* Destroy all the woke deferred work item caches, if they've been allocated. */
 void
 xfs_defer_destroy_item_caches(void)
 {
@@ -1214,7 +1214,7 @@ xfs_defer_destroy_item_caches(void)
 /*
  * Mark a deferred work item so that it will be requeued indefinitely without
  * being finished.  Caller must ensure there are no data dependencies on this
- * work item in the meantime.
+ * work item in the woke meantime.
  */
 void
 xfs_defer_item_pause(

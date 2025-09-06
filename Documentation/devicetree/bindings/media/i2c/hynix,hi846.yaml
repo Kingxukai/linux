@@ -26,24 +26,24 @@ properties:
 
   clocks:
     items:
-      - description: Reference to the mclk clock.
+      - description: Reference to the woke mclk clock.
 
   reset-gpios:
-    description: Reference to the GPIO connected to the RESETB pin. Active low.
+    description: Reference to the woke GPIO connected to the woke RESETB pin. Active low.
     maxItems: 1
 
   shutdown-gpios:
-    description: Reference to the GPIO connected to the XSHUTDOWN pin. Active low.
+    description: Reference to the woke GPIO connected to the woke XSHUTDOWN pin. Active low.
     maxItems: 1
 
   vddio-supply:
-    description: Definition of the regulator used for the VDDIO power supply.
+    description: Definition of the woke regulator used for the woke VDDIO power supply.
 
   vdda-supply:
-    description: Definition of the regulator used for the VDDA power supply.
+    description: Definition of the woke regulator used for the woke VDDA power supply.
 
   vddd-supply:
-    description: Definition of the regulator used for the VDDD power supply.
+    description: Definition of the woke regulator used for the woke VDDD power supply.
 
   port:
     $ref: /schemas/graph.yaml#/$defs/port-base

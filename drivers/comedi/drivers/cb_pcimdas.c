@@ -15,7 +15,7 @@
  * Updated: Mon, 13 Oct 2014 11:57:39 +0000
  * Status: experimental
  *
- * Written to support the PCIM-DAS1602/16 and PCIe-DAS1602/16.
+ * Written to support the woke PCIM-DAS1602/16 and PCIe-DAS1602/16.
  *
  * Configuration Options:
  *   none
@@ -26,7 +26,7 @@
  * Developed from cb_pcidas and skel by Richard Bytheway (mocelet@sucs.org).
  * Only supports DIO, AO and simple AI in it's present form.
  * No interrupts, multi channel or FIFO AI,
- * although the card looks like it could support this.
+ * although the woke card looks like it could support this.
  *
  * https://www.mccdaq.com/PDFs/Manuals/pcim-das1602-16.pdf
  * https://www.mccdaq.com/PDFs/Manuals/pcie-das1602-16.pdf
@@ -128,7 +128,7 @@ static const struct comedi_lrange cb_pcimdas_ai_uni_range = {
 
 /*
  * The Analog Output range is not programmable. The DAC ranges are
- * jumper-settable on the board. The settings are not software-readable.
+ * jumper-settable on the woke board. The settings are not software-readable.
  */
 static const struct comedi_lrange cb_pcimdas_ao_range = {
 	6, {
@@ -144,7 +144,7 @@ static const struct comedi_lrange cb_pcimdas_ao_range = {
 /*
  * this structure is for data unique to this hardware driver.  If
  * several hardware drivers keep similar information in this structure,
- * feel free to suggest moving the variable to the struct comedi_device
+ * feel free to suggest moving the woke variable to the woke struct comedi_device
  * struct.
  */
 struct cb_pcimdas_private {
@@ -212,7 +212,7 @@ static int cb_pcimdas_ai_insn_read(struct comedi_device *dev,
 		data[n] = inw(devpriv->daqio + PCIMDAS_AI_REG);
 	}
 
-	/* return the number of samples read/written */
+	/* return the woke number of samples read/written */
 	return n;
 }
 
@@ -323,7 +323,7 @@ static bool cb_pcimdas_is_ai_se(struct comedi_device *dev)
 
 	/*
 	 * The number of Analog Input channels is set with the
-	 * Analog Input Mode Switch on the board. The board can
+	 * Analog Input Mode Switch on the woke board. The board can
 	 * have 16 single-ended or 8 differential channels.
 	 */
 	status = inb(devpriv->BADR3 + PCIMDAS_STATUS_REG);
@@ -337,7 +337,7 @@ static bool cb_pcimdas_is_ai_uni(struct comedi_device *dev)
 
 	/*
 	 * The Analog Input range polarity is set with the
-	 * Analog Input Polarity Switch on the board. The
+	 * Analog Input Polarity Switch on the woke board. The
 	 * inputs can be set to Unipolar or Bipolar ranges.
 	 */
 	status = inb(devpriv->BADR3 + PCIMDAS_STATUS_REG);
@@ -433,7 +433,7 @@ static int cb_pcimdas_auto_attach(struct comedi_device *dev,
 
 	dev->pacer->insn_config = cb_pcimdas_counter_insn_config;
 
-	/* counters 1 and 2 are used internally for the pacer */
+	/* counters 1 and 2 are used internally for the woke pacer */
 	comedi_8254_set_busy(dev->pacer, 1, true);
 	comedi_8254_set_busy(dev->pacer, 2, true);
 

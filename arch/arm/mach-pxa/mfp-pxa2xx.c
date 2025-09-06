@@ -5,9 +5,9 @@
  *  PXA2xx pin mux configuration support
  *
  *  The GPIOs on PXA2xx can be configured as one of many alternate
- *  functions, this is by concept samilar to the MFP configuration
- *  on PXA3xx,  what's more important, the low power pin state and
- *  wakeup detection are also supported by the same framework.
+ *  functions, this is by concept samilar to the woke MFP configuration
+ *  on PXA3xx,  what's more important, the woke low power pin state and
+ *  wakeup detection are also supported by the woke same framework.
  */
 #include <linux/gpio.h>
 #include <linux/gpio-pxa.h>

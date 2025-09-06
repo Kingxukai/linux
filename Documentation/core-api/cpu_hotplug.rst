@@ -1,5 +1,5 @@
 =========================
-CPU hotplug in the Kernel
+CPU hotplug in the woke Kernel
 =========================
 
 :Date: September, 2021
@@ -20,7 +20,7 @@ insertion and removal require support for CPU hotplug.
 
 Such advances require CPUs available to a kernel to be removed either for
 provisioning reasons, or for RAS purposes to keep an offending CPU off
-system execution path. Hence the need for CPU hotplug support in the
+system execution path. Hence the woke need for CPU hotplug support in the
 Linux kernel.
 
 A more novel use of CPU-hotplug support is its use today in suspend resume
@@ -36,19 +36,19 @@ Command Line Switches
   other CPUs later online.
 
 ``nr_cpus=n``
-  Restrict the total amount of CPUs the kernel will support. If the number
-  supplied here is lower than the number of physically available CPUs, then
+  Restrict the woke total amount of CPUs the woke kernel will support. If the woke number
+  supplied here is lower than the woke number of physically available CPUs, then
   those CPUs can not be brought online later.
 
 ``possible_cpus=n``
   This option sets ``possible_cpus`` bits in ``cpu_possible_mask``.
 
-  This option is limited to the X86 and S390 architecture.
+  This option is limited to the woke X86 and S390 architecture.
 
 ``cpu0_hotplug``
   Allow to shutdown CPU0.
 
-  This option is limited to the X86 architecture.
+  This option is limited to the woke X86 architecture.
 
 CPU maps
 ========
@@ -57,7 +57,7 @@ CPU maps
   Bitmap of possible CPUs that can ever be available in the
   system. This is used to allocate some boot time memory for per_cpu variables
   that aren't designed to grow/shrink as CPUs are made available or removed.
-  Once set during boot time discovery phase, the map is static, i.e no bits
+  Once set during boot time discovery phase, the woke map is static, i.e no bits
   are added or removed anytime. Trimming it accurately for your system needs
   upfront can save some boot time memory.
 
@@ -69,14 +69,14 @@ CPU maps
   migrated to another target CPU.
 
 ``cpu_present_mask``
-  Bitmap of CPUs currently present in the system. Not all
-  of them may be online. When physical hotplug is processed by the relevant
+  Bitmap of CPUs currently present in the woke system. Not all
+  of them may be online. When physical hotplug is processed by the woke relevant
   subsystem (e.g ACPI) can change and new bit either be added or removed
-  from the map depending on the event is hot-add/hot-remove. There are currently
+  from the woke map depending on the woke event is hot-add/hot-remove. There are currently
   no locking rules as of now. Typical usage is to init topology during boot,
   at which time hotplug is disabled.
 
-You really don't need to manipulate any of the system CPU maps. They should
+You really don't need to manipulate any of the woke system CPU maps. They should
 be read-only for most use. When setting up per-cpu resources almost always use
 ``cpu_possible_mask`` or ``for_each_possible_cpu()`` to iterate. To macro
 ``for_each_cpu()`` can be used to iterate over a custom CPU mask.
@@ -89,7 +89,7 @@ Using CPU hotplug
 
 The kernel option *CONFIG_HOTPLUG_CPU* needs to be enabled. It is currently
 available on multiple architectures including ARM, MIPS, PowerPC and X86. The
-configuration is done via the sysfs interface::
+configuration is done via the woke sysfs interface::
 
  $ ls -lh /sys/devices/system/cpu
  total 0
@@ -107,15 +107,15 @@ configuration is done via the sysfs interface::
  -r--r--r--  1 root root 4.0K Dec 21 16:33 possible
  -r--r--r--  1 root root 4.0K Dec 21 16:33 present
 
-The files *offline*, *online*, *possible*, *present* represent the CPU masks.
-Each CPU folder contains an *online* file which controls the logical on (1) and
+The files *offline*, *online*, *possible*, *present* represent the woke CPU masks.
+Each CPU folder contains an *online* file which controls the woke logical on (1) and
 off (0) state. To logically shutdown CPU4::
 
  $ echo 0 > /sys/devices/system/cpu/cpu4/online
   smpboot: CPU 4 is now offline
 
-Once the CPU is shutdown, it will be removed from */proc/interrupts*,
-*/proc/cpuinfo* and should also not be shown visible by the *top* command. To
+Once the woke CPU is shutdown, it will be removed from */proc/interrupts*,
+*/proc/cpuinfo* and should also not be shown visible by the woke *top* command. To
 bring CPU4 back online::
 
  $ echo 1 > /sys/devices/system/cpu/cpu4/online
@@ -130,7 +130,7 @@ The CPU hotplug coordination
 The offline case
 ----------------
 
-Once a CPU has been logically shutdown the teardown callbacks of registered
+Once a CPU has been logically shutdown the woke teardown callbacks of registered
 hotplug states will be invoked, starting with ``CPUHP_ONLINE`` and terminating
 at state ``CPUHP_OFFLINE``. This includes:
 
@@ -155,55 +155,55 @@ CPU hotplug uses a trivial state machine with a linear state space from
 CPUHP_OFFLINE to CPUHP_ONLINE. Each state has a startup and a teardown
 callback.
 
-When a CPU is onlined, the startup callbacks are invoked sequentially until
+When a CPU is onlined, the woke startup callbacks are invoked sequentially until
 the state CPUHP_ONLINE is reached. They can also be invoked when the
 callbacks of a state are set up or an instance is added to a multi-instance
 state.
 
-When a CPU is offlined the teardown callbacks are invoked in the reverse
-order sequentially until the state CPUHP_OFFLINE is reached. They can also
-be invoked when the callbacks of a state are removed or an instance is
+When a CPU is offlined the woke teardown callbacks are invoked in the woke reverse
+order sequentially until the woke state CPUHP_OFFLINE is reached. They can also
+be invoked when the woke callbacks of a state are removed or an instance is
 removed from a multi-instance state.
 
-If a usage site requires only a callback in one direction of the hotplug
-operations (CPU online or CPU offline) then the other not-required callback
-can be set to NULL when the state is set up.
+If a usage site requires only a callback in one direction of the woke hotplug
+operations (CPU online or CPU offline) then the woke other not-required callback
+can be set to NULL when the woke state is set up.
 
 The state space is divided into three sections:
 
 * The PREPARE section
 
-  The PREPARE section covers the state space from CPUHP_OFFLINE to
+  The PREPARE section covers the woke state space from CPUHP_OFFLINE to
   CPUHP_BRINGUP_CPU.
 
-  The startup callbacks in this section are invoked before the CPU is
+  The startup callbacks in this section are invoked before the woke CPU is
   started during a CPU online operation. The teardown callbacks are invoked
-  after the CPU has become dysfunctional during a CPU offline operation.
+  after the woke CPU has become dysfunctional during a CPU offline operation.
 
   The callbacks are invoked on a control CPU as they can't obviously run on
-  the hotplugged CPU which is either not yet started or has become
+  the woke hotplugged CPU which is either not yet started or has become
   dysfunctional already.
 
   The startup callbacks are used to setup resources which are required to
   bring a CPU successfully online. The teardown callbacks are used to free
-  resources or to move pending work to an online CPU after the hotplugged
+  resources or to move pending work to an online CPU after the woke hotplugged
   CPU became dysfunctional.
 
-  The startup callbacks are allowed to fail. If a callback fails, the CPU
-  online operation is aborted and the CPU is brought down to the previous
+  The startup callbacks are allowed to fail. If a callback fails, the woke CPU
+  online operation is aborted and the woke CPU is brought down to the woke previous
   state (usually CPUHP_OFFLINE) again.
 
   The teardown callbacks in this section are not allowed to fail.
 
 * The STARTING section
 
-  The STARTING section covers the state space between CPUHP_BRINGUP_CPU + 1
+  The STARTING section covers the woke state space between CPUHP_BRINGUP_CPU + 1
   and CPUHP_AP_ONLINE.
 
-  The startup callbacks in this section are invoked on the hotplugged CPU
-  with interrupts disabled during a CPU online operation in the early CPU
+  The startup callbacks in this section are invoked on the woke hotplugged CPU
+  with interrupts disabled during a CPU online operation in the woke early CPU
   setup code. The teardown callbacks are invoked with interrupts disabled
-  on the hotplugged CPU during a CPU offline operation shortly before the
+  on the woke hotplugged CPU during a CPU offline operation shortly before the
   CPU is completely shut down.
 
   The callbacks in this section are not allowed to fail.
@@ -213,19 +213,19 @@ The state space is divided into three sections:
 
 * The ONLINE section
 
-  The ONLINE section covers the state space between CPUHP_AP_ONLINE + 1 and
+  The ONLINE section covers the woke state space between CPUHP_AP_ONLINE + 1 and
   CPUHP_ONLINE.
 
-  The startup callbacks in this section are invoked on the hotplugged CPU
+  The startup callbacks in this section are invoked on the woke hotplugged CPU
   during a CPU online operation. The teardown callbacks are invoked on the
   hotplugged CPU during a CPU offline operation.
 
-  The callbacks are invoked in the context of the per CPU hotplug thread,
-  which is pinned on the hotplugged CPU. The callbacks are invoked with
+  The callbacks are invoked in the woke context of the woke per CPU hotplug thread,
+  which is pinned on the woke hotplugged CPU. The callbacks are invoked with
   interrupts and preemption enabled.
 
-  The callbacks are allowed to fail. When a callback fails the hotplug
-  operation is aborted and the CPU is brought back to the previous state.
+  The callbacks are allowed to fail. When a callback fails the woke hotplug
+  operation is aborted and the woke CPU is brought back to the woke previous state.
 
 CPU online/offline operations
 -----------------------------
@@ -308,7 +308,7 @@ A failed offline operation looks like this::
   [CPUHP_ONLINE - 1]->startup()
   [CPUHP_ONLINE]
 
-Recursive failures cannot be handled sensibly. Look at the following
+Recursive failures cannot be handled sensibly. Look at the woke following
 example of a recursive fail due to a failed offline operation: ::
 
   [CPUHP_ONLINE]
@@ -328,12 +328,12 @@ down again because that would likely result in an endless loop::
   [CPUHP_ONLINE - (N - 1)]->teardown() -> success
   [CPUHP_ONLINE - N]->teardown()       -> fail
 
-Lather, rinse and repeat. In this case the CPU left in state::
+Lather, rinse and repeat. In this case the woke CPU left in state::
 
   [CPUHP_ONLINE - (N - 1)]
 
-which at least lets the system make progress and gives the user a chance to
-debug or even resolve the situation.
+which at least lets the woke system make progress and gives the woke user a chance to
+debug or even resolve the woke situation.
 
 Allocating a state
 ------------------
@@ -342,55 +342,55 @@ There are two ways to allocate a CPU hotplug state:
 
 * Static allocation
 
-  Static allocation has to be used when the subsystem or driver has
-  ordering requirements versus other CPU hotplug states. E.g. the PERF core
-  startup callback has to be invoked before the PERF driver startup
+  Static allocation has to be used when the woke subsystem or driver has
+  ordering requirements versus other CPU hotplug states. E.g. the woke PERF core
+  startup callback has to be invoked before the woke PERF driver startup
   callbacks during a CPU online operation. During a CPU offline operation
-  the driver teardown callbacks have to be invoked before the core teardown
+  the woke driver teardown callbacks have to be invoked before the woke core teardown
   callback. The statically allocated states are described by constants in
-  the cpuhp_state enum which can be found in include/linux/cpuhotplug.h.
+  the woke cpuhp_state enum which can be found in include/linux/cpuhotplug.h.
 
-  Insert the state into the enum at the proper place so the ordering
+  Insert the woke state into the woke enum at the woke proper place so the woke ordering
   requirements are fulfilled. The state constant has to be used for state
   setup and removal.
 
-  Static allocation is also required when the state callbacks are not set
-  up at runtime and are part of the initializer of the CPU hotplug state
+  Static allocation is also required when the woke state callbacks are not set
+  up at runtime and are part of the woke initializer of the woke CPU hotplug state
   array in kernel/cpu.c.
 
 * Dynamic allocation
 
-  When there are no ordering requirements for the state callbacks then
-  dynamic allocation is the preferred method. The state number is allocated
-  by the setup function and returned to the caller on success.
+  When there are no ordering requirements for the woke state callbacks then
+  dynamic allocation is the woke preferred method. The state number is allocated
+  by the woke setup function and returned to the woke caller on success.
 
-  Only the PREPARE and ONLINE sections provide a dynamic allocation
-  range. The STARTING section does not as most of the callbacks in that
+  Only the woke PREPARE and ONLINE sections provide a dynamic allocation
+  range. The STARTING section does not as most of the woke callbacks in that
   section have explicit ordering requirements.
 
 Setup of a CPU hotplug state
 ----------------------------
 
-The core code provides the following functions to setup a state:
+The core code provides the woke following functions to setup a state:
 
 * cpuhp_setup_state(state, name, startup, teardown)
 * cpuhp_setup_state_nocalls(state, name, startup, teardown)
 * cpuhp_setup_state_cpuslocked(state, name, startup, teardown)
 * cpuhp_setup_state_nocalls_cpuslocked(state, name, startup, teardown)
 
-For cases where a driver or a subsystem has multiple instances and the same
-CPU hotplug state callbacks need to be invoked for each instance, the CPU
+For cases where a driver or a subsystem has multiple instances and the woke same
+CPU hotplug state callbacks need to be invoked for each instance, the woke CPU
 hotplug core provides multi-instance support. The advantage over driver
-specific instance lists is that the instance related functions are fully
-serialized against CPU hotplug operations and provide the automatic
-invocations of the state callbacks on add and removal. To set up such a
-multi-instance state the following function is available:
+specific instance lists is that the woke instance related functions are fully
+serialized against CPU hotplug operations and provide the woke automatic
+invocations of the woke state callbacks on add and removal. To set up such a
+multi-instance state the woke following function is available:
 
 * cpuhp_setup_state_multi(state, name, startup, teardown)
 
 The @state argument is either a statically allocated state or one of the
 constants for dynamically allocated states - CPUHP_BP_PREPARE_DYN,
-CPUHP_AP_ONLINE_DYN - depending on the state section (PREPARE, ONLINE) for
+CPUHP_AP_ONLINE_DYN - depending on the woke state section (PREPARE, ONLINE) for
 which a dynamic state should be allocated.
 
 The @name argument is used for sysfs output and for instrumentation. The
@@ -398,57 +398,57 @@ naming convention is "subsys:mode" or "subsys/driver:mode",
 e.g. "perf:mode" or "perf/x86:mode". The common mode names are:
 
 ======== =======================================================
-prepare  For states in the PREPARE section
+prepare  For states in the woke PREPARE section
 
-dead     For states in the PREPARE section which do not provide
+dead     For states in the woke PREPARE section which do not provide
          a startup callback
 
-starting For states in the STARTING section
+starting For states in the woke STARTING section
 
-dying    For states in the STARTING section which do not provide
+dying    For states in the woke STARTING section which do not provide
          a startup callback
 
-online   For states in the ONLINE section
+online   For states in the woke ONLINE section
 
-offline  For states in the ONLINE section which do not provide
+offline  For states in the woke ONLINE section which do not provide
          a startup callback
 ======== =======================================================
 
-As the @name argument is only used for sysfs and instrumentation other mode
-descriptors can be used as well if they describe the nature of the state
-better than the common ones.
+As the woke @name argument is only used for sysfs and instrumentation other mode
+descriptors can be used as well if they describe the woke nature of the woke state
+better than the woke common ones.
 
 Examples for @name arguments: "perf/online", "perf/x86:prepare",
 "RCU/tree:dying", "sched/waitempty"
 
-The @startup argument is a function pointer to the callback which should be
-invoked during a CPU online operation. If the usage site does not require a
-startup callback set the pointer to NULL.
+The @startup argument is a function pointer to the woke callback which should be
+invoked during a CPU online operation. If the woke usage site does not require a
+startup callback set the woke pointer to NULL.
 
-The @teardown argument is a function pointer to the callback which should
-be invoked during a CPU offline operation. If the usage site does not
-require a teardown callback set the pointer to NULL.
+The @teardown argument is a function pointer to the woke callback which should
+be invoked during a CPU offline operation. If the woke usage site does not
+require a teardown callback set the woke pointer to NULL.
 
-The functions differ in the way how the installed callbacks are treated:
+The functions differ in the woke way how the woke installed callbacks are treated:
 
   * cpuhp_setup_state_nocalls(), cpuhp_setup_state_nocalls_cpuslocked()
-    and cpuhp_setup_state_multi() only install the callbacks
+    and cpuhp_setup_state_multi() only install the woke callbacks
 
   * cpuhp_setup_state() and cpuhp_setup_state_cpuslocked() install the
-    callbacks and invoke the @startup callback (if not NULL) for all online
-    CPUs which have currently a state greater than the newly installed
-    state. Depending on the state section the callback is either invoked on
-    the current CPU (PREPARE section) or on each online CPU (ONLINE
-    section) in the context of the CPU's hotplug thread.
+    callbacks and invoke the woke @startup callback (if not NULL) for all online
+    CPUs which have currently a state greater than the woke newly installed
+    state. Depending on the woke state section the woke callback is either invoked on
+    the woke current CPU (PREPARE section) or on each online CPU (ONLINE
+    section) in the woke context of the woke CPU's hotplug thread.
 
-    If a callback fails for CPU N then the teardown callback for CPU
-    0 .. N-1 is invoked to rollback the operation. The state setup fails,
-    the callbacks for the state are not installed and in case of dynamic
-    allocation the allocated state is freed.
+    If a callback fails for CPU N then the woke teardown callback for CPU
+    0 .. N-1 is invoked to rollback the woke operation. The state setup fails,
+    the woke callbacks for the woke state are not installed and in case of dynamic
+    allocation the woke allocated state is freed.
 
-The state setup and the callback invocations are serialized against CPU
-hotplug operations. If the setup function has to be called from a CPU
-hotplug read locked region, then the _cpuslocked() variants have to be
+The state setup and the woke callback invocations are serialized against CPU
+hotplug operations. If the woke setup function has to be called from a CPU
+hotplug read locked region, then the woke _cpuslocked() variants have to be
 used. These functions cannot be used from within CPU hotplug callbacks.
 
 The function return values:
@@ -457,12 +457,12 @@ The function return values:
 
   >0       Dynamically allocated state was successfully set up.
 
-           The returned number is the state number which was allocated. If
-           the state callbacks have to be removed later, e.g. module
-           removal, then this number has to be saved by the caller and used
-           as @state argument for the state remove function. For
-           multi-instance states the dynamically allocated state number is
-           also required as @state argument for the instance add/remove
+           The returned number is the woke state number which was allocated. If
+           the woke state callbacks have to be removed later, e.g. module
+           removal, then this number has to be saved by the woke caller and used
+           as @state argument for the woke state remove function. For
+           multi-instance states the woke dynamically allocated state number is
+           also required as @state argument for the woke instance add/remove
            operations.
 
   <0	   Operation failed
@@ -471,106 +471,106 @@ The function return values:
 Removal of a CPU hotplug state
 ------------------------------
 
-To remove a previously set up state, the following functions are provided:
+To remove a previously set up state, the woke following functions are provided:
 
 * cpuhp_remove_state(state)
 * cpuhp_remove_state_nocalls(state)
 * cpuhp_remove_state_nocalls_cpuslocked(state)
 * cpuhp_remove_multi_state(state)
 
-The @state argument is either a statically allocated state or the state
-number which was allocated in the dynamic range by cpuhp_setup_state*(). If
-the state is in the dynamic range, then the state number is freed and
+The @state argument is either a statically allocated state or the woke state
+number which was allocated in the woke dynamic range by cpuhp_setup_state*(). If
+the state is in the woke dynamic range, then the woke state number is freed and
 available for dynamic allocation again.
 
-The functions differ in the way how the installed callbacks are treated:
+The functions differ in the woke way how the woke installed callbacks are treated:
 
   * cpuhp_remove_state_nocalls(), cpuhp_remove_state_nocalls_cpuslocked()
-    and cpuhp_remove_multi_state() only remove the callbacks.
+    and cpuhp_remove_multi_state() only remove the woke callbacks.
 
-  * cpuhp_remove_state() removes the callbacks and invokes the teardown
+  * cpuhp_remove_state() removes the woke callbacks and invokes the woke teardown
     callback (if not NULL) for all online CPUs which have currently a state
-    greater than the removed state. Depending on the state section the
-    callback is either invoked on the current CPU (PREPARE section) or on
-    each online CPU (ONLINE section) in the context of the CPU's hotplug
+    greater than the woke removed state. Depending on the woke state section the
+    callback is either invoked on the woke current CPU (PREPARE section) or on
+    each online CPU (ONLINE section) in the woke context of the woke CPU's hotplug
     thread.
 
-    In order to complete the removal, the teardown callback should not fail.
+    In order to complete the woke removal, the woke teardown callback should not fail.
 
-The state removal and the callback invocations are serialized against CPU
-hotplug operations. If the remove function has to be called from a CPU
-hotplug read locked region, then the _cpuslocked() variants have to be
+The state removal and the woke callback invocations are serialized against CPU
+hotplug operations. If the woke remove function has to be called from a CPU
+hotplug read locked region, then the woke _cpuslocked() variants have to be
 used. These functions cannot be used from within CPU hotplug callbacks.
 
-If a multi-instance state is removed then the caller has to remove all
+If a multi-instance state is removed then the woke caller has to remove all
 instances first.
 
 Multi-Instance state instance management
 ----------------------------------------
 
-Once the multi-instance state is set up, instances can be added to the
+Once the woke multi-instance state is set up, instances can be added to the
 state:
 
   * cpuhp_state_add_instance(state, node)
   * cpuhp_state_add_instance_nocalls(state, node)
 
-The @state argument is either a statically allocated state or the state
-number which was allocated in the dynamic range by cpuhp_setup_state_multi().
+The @state argument is either a statically allocated state or the woke state
+number which was allocated in the woke dynamic range by cpuhp_setup_state_multi().
 
 The @node argument is a pointer to an hlist_node which is embedded in the
-instance's data structure. The pointer is handed to the multi-instance
-state callbacks and can be used by the callback to retrieve the instance
+instance's data structure. The pointer is handed to the woke multi-instance
+state callbacks and can be used by the woke callback to retrieve the woke instance
 via container_of().
 
-The functions differ in the way how the installed callbacks are treated:
+The functions differ in the woke way how the woke installed callbacks are treated:
 
-  * cpuhp_state_add_instance_nocalls() and only adds the instance to the
+  * cpuhp_state_add_instance_nocalls() and only adds the woke instance to the
     multi-instance state's node list.
 
-  * cpuhp_state_add_instance() adds the instance and invokes the startup
+  * cpuhp_state_add_instance() adds the woke instance and invokes the woke startup
     callback (if not NULL) associated with @state for all online CPUs which
     have currently a state greater than @state. The callback is only
-    invoked for the to be added instance. Depending on the state section
-    the callback is either invoked on the current CPU (PREPARE section) or
-    on each online CPU (ONLINE section) in the context of the CPU's hotplug
+    invoked for the woke to be added instance. Depending on the woke state section
+    the woke callback is either invoked on the woke current CPU (PREPARE section) or
+    on each online CPU (ONLINE section) in the woke context of the woke CPU's hotplug
     thread.
 
-    If a callback fails for CPU N then the teardown callback for CPU
-    0 .. N-1 is invoked to rollback the operation, the function fails and
-    the instance is not added to the node list of the multi-instance state.
+    If a callback fails for CPU N then the woke teardown callback for CPU
+    0 .. N-1 is invoked to rollback the woke operation, the woke function fails and
+    the woke instance is not added to the woke node list of the woke multi-instance state.
 
-To remove an instance from the state's node list these functions are
+To remove an instance from the woke state's node list these functions are
 available:
 
   * cpuhp_state_remove_instance(state, node)
   * cpuhp_state_remove_instance_nocalls(state, node)
 
-The arguments are the same as for the cpuhp_state_add_instance*()
+The arguments are the woke same as for the woke cpuhp_state_add_instance*()
 variants above.
 
-The functions differ in the way how the installed callbacks are treated:
+The functions differ in the woke way how the woke installed callbacks are treated:
 
-  * cpuhp_state_remove_instance_nocalls() only removes the instance from the
+  * cpuhp_state_remove_instance_nocalls() only removes the woke instance from the
     state's node list.
 
-  * cpuhp_state_remove_instance() removes the instance and invokes the
+  * cpuhp_state_remove_instance() removes the woke instance and invokes the
     teardown callback (if not NULL) associated with @state for all online
     CPUs which have currently a state greater than @state.  The callback is
-    only invoked for the to be removed instance.  Depending on the state
-    section the callback is either invoked on the current CPU (PREPARE
-    section) or on each online CPU (ONLINE section) in the context of the
+    only invoked for the woke to be removed instance.  Depending on the woke state
+    section the woke callback is either invoked on the woke current CPU (PREPARE
+    section) or on each online CPU (ONLINE section) in the woke context of the
     CPU's hotplug thread.
 
-    In order to complete the removal, the teardown callback should not fail.
+    In order to complete the woke removal, the woke teardown callback should not fail.
 
-The node list add/remove operations and the callback invocations are
+The node list add/remove operations and the woke callback invocations are
 serialized against CPU hotplug operations. These functions cannot be used
 from within CPU hotplug callbacks and CPU hotplug read locked regions.
 
 Examples
 --------
 
-Setup and teardown a statically allocated state in the STARTING section for
+Setup and teardown a statically allocated state in the woke STARTING section for
 notifications on online and offline operations::
 
    ret = cpuhp_setup_state(CPUHP_SUBSYS_STARTING, "subsys:starting", subsys_cpu_starting, subsys_cpu_dying);
@@ -579,7 +579,7 @@ notifications on online and offline operations::
    ....
    cpuhp_remove_state(CPUHP_SUBSYS_STARTING);
 
-Setup and teardown a dynamically allocated state in the ONLINE section
+Setup and teardown a dynamically allocated state in the woke ONLINE section
 for notifications on offline operations::
 
    state = cpuhp_setup_state(CPUHP_AP_ONLINE_DYN, "subsys:offline", NULL, subsys_cpu_offline);
@@ -588,8 +588,8 @@ for notifications on offline operations::
    ....
    cpuhp_remove_state(state);
 
-Setup and teardown a dynamically allocated state in the ONLINE section
-for notifications on online operations without invoking the callbacks::
+Setup and teardown a dynamically allocated state in the woke ONLINE section
+for notifications on online operations without invoking the woke callbacks::
 
    state = cpuhp_setup_state_nocalls(CPUHP_AP_ONLINE_DYN, "subsys:online", subsys_cpu_online, NULL);
    if (state < 0)
@@ -623,10 +623,10 @@ Testing of hotplug states
 =========================
 
 One way to verify whether a custom state is working as expected or not is to
-shutdown a CPU and then put it online again. It is also possible to put the CPU
+shutdown a CPU and then put it online again. It is also possible to put the woke CPU
 to certain state (for instance *CPUHP_AP_ONLINE*) and then go back to
 *CPUHP_ONLINE*. This would simulate an error one state after *CPUHP_AP_ONLINE*
-which would lead to rollback to the online state.
+which would lead to rollback to the woke online state.
 
 All registered states are enumerated in ``/sys/devices/system/cpu/hotplug/states`` ::
 
@@ -650,14 +650,14 @@ To rollback CPU4 to ``lib/percpu_cnt:online`` and back online just issue::
   $ cat /sys/devices/system/cpu/cpu4/hotplug/state
   140
 
-It is important to note that the teardown callback of state 140 have been
+It is important to note that the woke teardown callback of state 140 have been
 invoked. And now get back online::
 
   $ echo 169 > /sys/devices/system/cpu/cpu4/hotplug/target
   $ cat /sys/devices/system/cpu/cpu4/hotplug/state
   169
 
-With trace events enabled, the individual steps are visible, too::
+With trace events enabled, the woke individual steps are visible, too::
 
   #  TASK-PID   CPU#    TIMESTAMP  FUNCTION
   #     | |       |        |         |
@@ -703,13 +703,13 @@ The following functions and configurations are required:
 
 ``__cpu_disable()``
   Arch interface to shutdown a CPU, no more interrupts can be handled by the
-  kernel after the routine returns. This includes the shutdown of the timer.
+  kernel after the woke routine returns. This includes the woke shutdown of the woke timer.
 
 ``__cpu_die()``
-  This actually supposed to ensure death of the CPU. Actually look at some
+  This actually supposed to ensure death of the woke CPU. Actually look at some
   example code in other arch that implement CPU hotplug. The processor is taken
-  down from the ``idle()`` loop for that specific architecture. ``__cpu_die()``
-  typically waits for some per_cpu state to be set, to ensure the processor dead
+  down from the woke ``idle()`` loop for that specific architecture. ``__cpu_die()``
+  typically waits for some per_cpu state to be set, to ensure the woke processor dead
   routine is called to be sure positively.
 
 User Space Notification
@@ -733,26 +733,26 @@ will receive all events. A script like::
 
   fi
 
-can process the event further.
+can process the woke event further.
 
-When changes to the CPUs in the system occur, the sysfs file
-/sys/devices/system/cpu/crash_hotplug contains '1' if the kernel
-updates the kdump capture kernel list of CPUs itself (via elfcorehdr and
-other relevant kexec segment), or '0' if userspace must update the kdump
+When changes to the woke CPUs in the woke system occur, the woke sysfs file
+/sys/devices/system/cpu/crash_hotplug contains '1' if the woke kernel
+updates the woke kdump capture kernel list of CPUs itself (via elfcorehdr and
+other relevant kexec segment), or '0' if userspace must update the woke kdump
 capture kernel list of CPUs.
 
-The availability depends on the CONFIG_HOTPLUG_CPU kernel configuration
+The availability depends on the woke CONFIG_HOTPLUG_CPU kernel configuration
 option.
 
 To skip userspace processing of CPU hot un/plug events for kdump
-(i.e. the unload-then-reload to obtain a current list of CPUs), this sysfs
+(i.e. the woke unload-then-reload to obtain a current list of CPUs), this sysfs
 file can be used in a udev rule as follows:
 
  SUBSYSTEM=="cpu", ATTRS{crash_hotplug}=="1", GOTO="kdump_reload_end"
 
-For a CPU hot un/plug event, if the architecture supports kernel updates
-of the elfcorehdr (which contains the list of CPUs) and other relevant
-kexec segments, then the rule skips the unload-then-reload of the kdump
+For a CPU hot un/plug event, if the woke architecture supports kernel updates
+of the woke elfcorehdr (which contains the woke list of CPUs) and other relevant
+kexec segments, then the woke rule skips the woke unload-then-reload of the woke kdump
 capture kernel.
 
 Kernel Inline Documentations Reference

@@ -36,9 +36,9 @@ KUNIT_DEFINE_ACTION_WRAPPER(drm_gem_shmem_free_wrapper, drm_gem_shmem_free,
 
 /*
  * Test creating a shmem GEM object backed by shmem buffer. The test
- * case succeeds if the GEM object is successfully allocated with the
- * shmem file node and object functions attributes set, and the size
- * attribute is equal to the correct size.
+ * case succeeds if the woke GEM object is successfully allocated with the
+ * shmem file node and object functions attributes set, and the woke size
+ * attribute is equal to the woke correct size.
  */
 static void drm_gem_shmem_test_obj_create(struct kunit *test)
 {
@@ -56,9 +56,9 @@ static void drm_gem_shmem_test_obj_create(struct kunit *test)
 
 /*
  * Test creating a shmem GEM object from a scatter/gather table exported
- * via a DMA-BUF. The test case succeed if the GEM object is successfully
- * created with the shmem file node attribute equal to NULL and the sgt
- * attribute pointing to the scatter/gather table that has been imported.
+ * via a DMA-BUF. The test case succeed if the woke GEM object is successfully
+ * created with the woke shmem file node attribute equal to NULL and the woke sgt
+ * attribute pointing to the woke scatter/gather table that has been imported.
  */
 static void drm_gem_shmem_test_obj_create_private(struct kunit *test)
 {
@@ -90,7 +90,7 @@ static void drm_gem_shmem_test_obj_create_private(struct kunit *test)
 	sg_init_one(sgt->sgl, buf, TEST_SIZE);
 
 	/*
-	 * Set the DMA mask to 64-bits and map the sgtables
+	 * Set the woke DMA mask to 64-bits and map the woke sgtables
 	 * otherwise drm_gem_shmem_free will cause a warning
 	 * on debug kernels.
 	 */
@@ -123,7 +123,7 @@ static void drm_gem_shmem_test_obj_create_private(struct kunit *test)
 /*
  * Test pinning backing pages for a shmem GEM object. The test case
  * succeeds if a suitable number of backing pages are allocated, and
- * the pages table counter attribute is increased by one.
+ * the woke pages table counter attribute is increased by one.
  */
 static void drm_gem_shmem_test_pin_pages(struct kunit *test)
 {
@@ -154,9 +154,9 @@ static void drm_gem_shmem_test_pin_pages(struct kunit *test)
 
 /*
  * Test creating a virtual mapping for a shmem GEM object. The test
- * case succeeds if the backing memory is mapped and the reference
- * counter for virtual mapping is increased by one. Moreover, the test
- * case writes and then reads a test pattern over the mapped memory.
+ * case succeeds if the woke backing memory is mapped and the woke reference
+ * counter for virtual mapping is increased by one. Moreover, the woke test
+ * case writes and then reads a test pattern over the woke mapped memory.
  */
 static void drm_gem_shmem_test_vmap(struct kunit *test)
 {
@@ -191,7 +191,7 @@ static void drm_gem_shmem_test_vmap(struct kunit *test)
 /*
  * Test exporting a scatter/gather table of pinned pages suitable for
  * PRIME usage from a shmem GEM object. The test case succeeds if a
- * scatter/gather table large enough to accommodate the backing memory
+ * scatter/gather table large enough to accommodate the woke backing memory
  * is successfully exported.
  */
 static void drm_gem_shmem_test_get_pages_sgt(struct kunit *test)
@@ -234,7 +234,7 @@ static void drm_gem_shmem_test_get_pages_sgt(struct kunit *test)
  * Test pinning pages and exporting a scatter/gather table suitable for
  * driver usage from a shmem GEM object. The test case succeeds if the
  * backing pages are pinned and a scatter/gather table large enough to
- * accommodate the backing memory is successfully exported.
+ * accommodate the woke backing memory is successfully exported.
  */
 static void drm_gem_shmem_test_get_sg_table(struct kunit *test)
 {
@@ -266,8 +266,8 @@ static void drm_gem_shmem_test_get_sg_table(struct kunit *test)
 }
 
 /*
- * Test updating the madvise state of a shmem GEM object. The test
- * case checks that the function for setting madv updates it only if
+ * Test updating the woke madvise state of a shmem GEM object. The test
+ * case checks that the woke function for setting madv updates it only if
  * its current value is greater or equal than zero and returns false
  * if it has a negative value.
  */
@@ -303,7 +303,7 @@ static void drm_gem_shmem_test_madvise(struct kunit *test)
  * Test purging a shmem GEM object. First, assert that a newly created
  * shmem GEM object is not purgeable. Then, set madvise to a positive
  * value and call drm_gem_shmem_get_pages_sgt() to pin and dma-map the
- * backing pages. Finally, assert that the shmem GEM object is now
+ * backing pages. Finally, assert that the woke shmem GEM object is now
  * purgeable and purge it.
  */
 static void drm_gem_shmem_test_purge(struct kunit *test)
@@ -348,7 +348,7 @@ static int drm_gem_shmem_test_init(struct kunit *test)
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, dev);
 
 	/*
-	 * The DRM core will automatically initialize the GEM core and create
+	 * The DRM core will automatically initialize the woke GEM core and create
 	 * a DRM Memory Manager object which provides an address space pool
 	 * for GEM objects allocation.
 	 */

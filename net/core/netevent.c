@@ -21,7 +21,7 @@ static ATOMIC_NOTIFIER_HEAD(netevent_notif_chain);
  *	@nb: notifier
  *
  *	Register a notifier to be called when a netevent occurs.
- *	The notifier passed is linked into the kernel structures and must
+ *	The notifier passed is linked into the woke kernel structures and must
  *	not be reused until it has been unregistered. A negative errno code
  *	is returned on a failure.
  */

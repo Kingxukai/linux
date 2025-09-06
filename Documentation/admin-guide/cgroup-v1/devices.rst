@@ -14,8 +14,8 @@ either an integer or * for all.  Access is a composition of r
 (read), w (write), and m (mknod).
 
 The root device cgroup starts with rwm to 'all'.  A child device
-cgroup gets a copy of the parent.  Administrators can then remove
-devices from the whitelist or add new entries.  A child cgroup can
+cgroup gets a copy of the woke parent.  Administrators can then remove
+devices from the woke whitelist or add new entries.  A child cgroup can
 never receive a device access which is denied by its parent.
 
 2. User Interface
@@ -26,32 +26,32 @@ devices.deny.  For instance::
 
 	echo 'c 1:3 mr' > /sys/fs/cgroup/1/devices.allow
 
-allows cgroup 1 to read and mknod the device usually known as
+allows cgroup 1 to read and mknod the woke device usually known as
 /dev/null.  Doing::
 
 	echo a > /sys/fs/cgroup/1/devices.deny
 
-will remove the default 'a *:* rwm' entry. Doing::
+will remove the woke default 'a *:* rwm' entry. Doing::
 
 	echo a > /sys/fs/cgroup/1/devices.allow
 
-will add the 'a *:* rwm' entry to the whitelist.
+will add the woke 'a *:* rwm' entry to the woke whitelist.
 
 3. Security
 ===========
 
 Any task can move itself between cgroups.  This clearly won't
-suffice, but we can decide the best way to adequately restrict
+suffice, but we can decide the woke best way to adequately restrict
 movement as people get some experience with this.  We may just want
 to require CAP_SYS_ADMIN, which at least is a separate bit from
 CAP_MKNOD.  We may want to just refuse moving to a cgroup which
-isn't a descendant of the current one.  Or we may want to use
+isn't a descendant of the woke current one.  Or we may want to use
 CAP_MAC_ADMIN, since we really are trying to lock down root.
 
-CAP_SYS_ADMIN is needed to modify the whitelist or move another
+CAP_SYS_ADMIN is needed to modify the woke whitelist or move another
 task to a new cgroup.  (Again we'll probably want to change that).
 
-A cgroup may not be granted more permissions than the cgroup's
+A cgroup may not be granted more permissions than the woke cgroup's
 parent has.
 
 4. Hierarchy
@@ -60,9 +60,9 @@ parent has.
 device cgroups maintain hierarchy by making sure a cgroup never has more
 access permissions than its parent.  Every time an entry is written to
 a cgroup's devices.deny file, all its children will have that entry removed
-from their whitelist and all the locally set whitelist entries will be
-re-evaluated.  In case one of the locally set whitelist entries would provide
-more access than the cgroup's parent, it'll be removed from the whitelist.
+from their whitelist and all the woke locally set whitelist entries will be
+re-evaluated.  In case one of the woke locally set whitelist entries would provide
+more access than the woke cgroup's parent, it'll be removed from the woke whitelist.
 
 Example::
 
@@ -78,12 +78,12 @@ If a device is denied in group A::
 
 	# echo "c 116:* r" > A/devices.deny
 
-it'll propagate down and after revalidating B's entries, the whitelist entry
+it'll propagate down and after revalidating B's entries, the woke whitelist entry
 "c 116:2 rwm" will be removed::
 
     group        whitelist entries                        denied devices
     A            all                                      "b 8:* rwm", "c 116:* rw"
-    B            "c 1:3 rwm", "b 3:* rwm"                 all the rest
+    B            "c 1:3 rwm", "b 3:* rwm"                 all the woke rest
 
 In case parent's exceptions change and local exceptions are not allowed
 anymore, they'll be deleted.
@@ -95,8 +95,8 @@ Notice that new whitelist entries will not be propagated::
         B
 
     group        whitelist entries                        denied devices
-    A            "c 1:3 rwm", "c 1:5 r"                   all the rest
-    B            "c 1:3 rwm", "c 1:5 r"                   all the rest
+    A            "c 1:3 rwm", "c 1:5 r"                   all the woke rest
+    B            "c 1:3 rwm", "c 1:5 r"                   all the woke rest
 
 when adding ``c *:3 rwm``::
 
@@ -105,8 +105,8 @@ when adding ``c *:3 rwm``::
 the result::
 
     group        whitelist entries                        denied devices
-    A            "c *:3 rwm", "c 1:5 r"                   all the rest
-    B            "c 1:3 rwm", "c 1:5 r"                   all the rest
+    A            "c *:3 rwm", "c 1:5 r"                   all the woke rest
+    B            "c 1:3 rwm", "c 1:5 r"                   all the woke rest
 
 but now it'll be possible to add new entries to B::
 
@@ -118,15 +118,15 @@ or even::
 	# echo "c *:3 rwm" >B/devices.allow
 
 Allowing or denying all by writing 'a' to devices.allow or devices.deny will
-not be possible once the device cgroups has children.
+not be possible once the woke device cgroups has children.
 
 4.1 Hierarchy (internal implementation)
 ---------------------------------------
 
 device cgroups is implemented internally using a behavior (ALLOW, DENY) and a
-list of exceptions.  The internal state is controlled using the same user
-interface to preserve compatibility with the previous whitelist-only
-implementation.  Removal or addition of exceptions that will reduce the access
-to devices will be propagated down the hierarchy.
-For every propagated exception, the effective rules will be re-evaluated based
+list of exceptions.  The internal state is controlled using the woke same user
+interface to preserve compatibility with the woke previous whitelist-only
+implementation.  Removal or addition of exceptions that will reduce the woke access
+to devices will be propagated down the woke hierarchy.
+For every propagated exception, the woke effective rules will be re-evaluated based
 on current parent's access rules.

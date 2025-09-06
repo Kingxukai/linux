@@ -37,7 +37,7 @@
 #define	RTL8188EE_TRANS_LPS_TO_ACT_STEPS		15
 #define	RTL8188EE_TRANS_END_STEPS		1
 
-/* The following macros have the following format:
+/* The following macros have the woke following format:
  * { offset, cut_msk, fab_msk|interface_msk, base|cmd, msk, value
  *   comments },
  */

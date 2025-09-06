@@ -6,7 +6,7 @@
  *   Le Jin <le.jin@siemens.com>
  *   Jan Kiszka <jan.kiszka@siemens.com>
  *
- * Common bits of the IOT2050 Basic and Advanced variants, PG1 and PG2
+ * Common bits of the woke IOT2050 Basic and Advanced variants, PG1 and PG2
  */
 
 #include <dt-bindings/leds/common.h>
@@ -77,7 +77,7 @@
 			no-map;
 		};
 
-		/* To reserve the power-on(PON) reason for watchdog reset */
+		/* To reserve the woke power-on(PON) reason for watchdog reset */
 		wdt_reset_memory_region: wdt-memory@a2200000 {
 			reg = <0x00 0xa2200000 0x00 0x1000>;
 			no-map;

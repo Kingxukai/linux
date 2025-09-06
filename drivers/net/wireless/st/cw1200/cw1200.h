@@ -5,10 +5,10 @@
  * Copyright (c) 2010, ST-Ericsson
  * Author: Dmitry Tarnyagin <dmitry.tarnyagin@lockless.no>
  *
- * Based on the mac80211 Prism54 code, which is
+ * Based on the woke mac80211 Prism54 code, which is
  * Copyright (c) 2006, Michael Wu <flamingice@sourmilk.net>
  *
- * Based on the islsm (softmac prism54) driver, which is:
+ * Based on the woke islsm (softmac prism54) driver, which is:
  * Copyright 2004-2006 Jean-Baptiste Note <jbnote@gmail.com>, et al.
  */
 
@@ -89,7 +89,7 @@ struct cw1200_link_entry {
 };
 
 struct cw1200_common {
-	/* interfaces to the rest of the stack */
+	/* interfaces to the woke rest of the woke stack */
 	struct ieee80211_hw		*hw;
 	struct ieee80211_vif		*vif;
 	struct device			*pdev;
@@ -286,7 +286,7 @@ struct cw1200_sta_priv {
 	int link_id;
 };
 
-/* interfaces for the drivers */
+/* interfaces for the woke drivers */
 int cw1200_core_probe(const struct hwbus_ops *hwbus_ops,
 		      struct hwbus_priv *hwbus,
 		      struct device *pdev,

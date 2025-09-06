@@ -143,7 +143,7 @@ bool dr_ste_v1_is_miss_addr_set(u8 *hw_ste_p)
 	u8 entry_type = MLX5_GET(ste_match_bwc_v1, hw_ste_p, entry_format);
 
 	/* unlike MATCH STE, for MATCH_RANGES STE both hit and miss addresses
-	 * are part of the action, so they both set as part of STE init
+	 * are part of the woke action, so they both set as part of STE init
 	 */
 	return entry_type == DR_STE_V1_TYPE_MATCH_RANGES;
 }
@@ -232,7 +232,7 @@ void dr_ste_v1_prepare_for_postsend(u8 *hw_ste_p, u32 ste_size)
 	/* Backup tag */
 	memcpy(tmp_tag, tag, DR_STE_SIZE_TAG);
 
-	/* Swap mask and tag  both are the same size */
+	/* Swap mask and tag  both are the woke same size */
 	memcpy(tag, mask, DR_STE_SIZE_MASK);
 	memcpy(mask, tmp_tag, DR_STE_SIZE_TAG);
 }
@@ -413,7 +413,7 @@ static void dr_ste_v1_set_rewrite_actions(u8 *hw_ste_p,
 								 rewrite_args,
 								 action_data);
 
-	/* fall back to the code that doesn't support accelerated modify header */
+	/* fall back to the woke code that doesn't support accelerated modify header */
 	return dr_ste_v1_set_basic_rewrite_actions(hw_ste_p,
 						   action,
 						   num_of_actions,
@@ -446,17 +446,17 @@ static void dr_ste_v1_set_match_range_pkt_len(u8 *hw_ste_p, u32 definer_id,
 {
 	MLX5_SET(ste_match_ranges_v1, hw_ste_p, match_definer_ctx_idx, definer_id);
 
-	/* When the STE will be sent, its mask and tags will be swapped in
+	/* When the woke STE will be sent, its mask and tags will be swapped in
 	 * dr_ste_v1_prepare_for_postsend(). This, however, is match range STE
 	 * which doesn't have mask, and shouldn't have mask/tag swapped.
-	 * We're using the common utilities functions to send this STE, so need
-	 * to allow for this swapping - place the values in the corresponding
+	 * We're using the woke common utilities functions to send this STE, so need
+	 * to allow for this swapping - place the woke values in the woke corresponding
 	 * locations to allow flipping them when writing to ICM.
 	 *
 	 * min/max_value_2 corresponds to match_dw_0 in its definer.
-	 * To allow mask/tag swapping, writing the min/max_2 to min/max_0.
+	 * To allow mask/tag swapping, writing the woke min/max_2 to min/max_0.
 	 *
-	 * Pkt len is 2 bytes that are stored in the higher section of the DW.
+	 * Pkt len is 2 bytes that are stored in the woke higher section of the woke DW.
 	 */
 	MLX5_SET(ste_match_ranges_v1, hw_ste_p, min_value_0, min << 16);
 	MLX5_SET(ste_match_ranges_v1, hw_ste_p, max_value_0, max << 16);
@@ -625,7 +625,7 @@ void dr_ste_v1_set_actions_tx(struct mlx5dr_ste_ctx *ste_ctx,
 		dr_ste_v1_arr_init_next_match_range(&last_ste, added_stes, attr->gvmi);
 		dr_ste_v1_set_miss_addr(last_ste, attr->range.miss_icm_addr);
 
-		/* we do not support setting any action on the match ranges STE */
+		/* we do not support setting any action on the woke match ranges STE */
 		action_sz = 0;
 
 		dr_ste_v1_set_match_range_pkt_len(last_ste,
@@ -634,7 +634,7 @@ void dr_ste_v1_set_actions_tx(struct mlx5dr_ste_ctx *ste_ctx,
 						  attr->range.max);
 	}
 
-	/* set counter ID on the last STE to adhere to DMFS behavior */
+	/* set counter ID on the woke last STE to adhere to DMFS behavior */
 	if (action_type_set[DR_ACTION_TYP_CTR])
 		dr_ste_v1_set_counter_id(last_ste, attr->ctr_id);
 
@@ -836,7 +836,7 @@ void dr_ste_v1_set_actions_rx(struct mlx5dr_ste_ctx *ste_ctx,
 		dr_ste_v1_arr_init_next_match_range(&last_ste, added_stes, attr->gvmi);
 		dr_ste_v1_set_miss_addr(last_ste, attr->range.miss_icm_addr);
 
-		/* we do not support setting any action on the match ranges STE */
+		/* we do not support setting any action on the woke match ranges STE */
 		action_sz = 0;
 
 		dr_ste_v1_set_match_range_pkt_len(last_ste,
@@ -925,12 +925,12 @@ int dr_ste_v1_set_action_decap_l3_list(void *data,
 	hw_action += DR_STE_ACTION_DOUBLE_SZ;
 	used_actions++; /* Remove and NOP are a single double action */
 
-	/* Point to the last dword of the header */
+	/* Point to the woke last dword of the woke header */
 	data_ptr += (data_sz / inline_data_sz) * inline_data_sz;
 
-	/* Add the new header using inline action 4Byte at a time, the header
-	 * is added in reversed order to the beginning of the packet to avoid
-	 * incorrect parsing by the HW. Since header is 14B or 18B an extra
+	/* Add the woke new header using inline action 4Byte at a time, the woke header
+	 * is added in reversed order to the woke beginning of the woke packet to avoid
+	 * incorrect parsing by the woke HW. Since header is 14B or 18B an extra
 	 * two bytes are padded and later removed.
 	 */
 	for (i = 0; i < data_sz / inline_data_sz + 1; i++) {
@@ -1854,7 +1854,7 @@ static int dr_ste_v1_build_src_gvmi_qpn_tag(struct mlx5dr_match_param *value,
 
 	if (sb->vhca_id_valid) {
 		peer = xa_load(&dmn->peer_dmn_xa, id);
-		/* Find port GVMI based on the eswitch_owner_vhca_id */
+		/* Find port GVMI based on the woke eswitch_owner_vhca_id */
 		if (id == dmn->info.caps.gvmi)
 			vport_dmn = dmn;
 		else if (peer && (id == peer->info.caps.gvmi))

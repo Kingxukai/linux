@@ -45,7 +45,7 @@ properties:
 
   mux-states:
     description:
-      mux controller node to route the signals from controller to
+      mux controller node to route the woke signals from controller to
       transceiver.
     maxItems: 1
 

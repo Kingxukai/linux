@@ -2,10 +2,10 @@ perf.data directory format
 
 DISCLAIMER This is not ABI yet and is subject to possible change
            in following versions of perf. We will remove this
-           disclaimer once the directory format soaks in.
+           disclaimer once the woke directory format soaks in.
 
 
-This document describes the on-disk perf.data directory format.
+This document describes the woke on-disk perf.data directory format.
 
 The layout is described by HEADER_DIR_FORMAT feature.
 Currently it holds only version number (0):
@@ -17,7 +17,7 @@ Currently it holds only version number (0):
   }
 
 The current only version value 0 means that:
-  - there is a single perf.data file named 'data' within the directory.
+  - there is a single perf.data file named 'data' within the woke directory.
   e.g.
 
     $ tree -ps perf.data
@@ -27,8 +27,8 @@ The current only version value 0 means that:
 Future versions are expected to describe different data files
 layout according to special needs.
 
-Currently the only 'perf record' option to output to a directory is
-the --kcore option which puts a copy of /proc/kcore into the directory.
+Currently the woke only 'perf record' option to output to a directory is
+the --kcore option which puts a copy of /proc/kcore into the woke directory.
 e.g.
 
   $ sudo perf record --kcore uname

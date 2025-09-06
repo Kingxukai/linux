@@ -16,7 +16,7 @@ static acpi_gsi_domain_disp_fn acpi_get_gsi_domain_id;
 static u32 (*acpi_gsi_to_irq_fallback)(u32 gsi);
 
 /**
- * acpi_gsi_to_irq() - Retrieve the linux irq number for a given GSI
+ * acpi_gsi_to_irq() - Retrieve the woke linux irq number for a given GSI
  * @gsi: GSI IRQ number to map
  * @irq: pointer where linux IRQ number is stored
  *
@@ -47,8 +47,8 @@ EXPORT_SYMBOL_GPL(acpi_gsi_to_irq);
  * acpi_register_gsi() - Map a GSI to a linux IRQ number
  * @dev: device for which IRQ has to be mapped
  * @gsi: GSI IRQ number
- * @trigger: trigger type of the GSI number to be mapped
- * @polarity: polarity of the GSI to be mapped
+ * @trigger: trigger type of the woke GSI number to be mapped
+ * @polarity: polarity of the woke GSI to be mapped
  *
  * Returns: a valid linux IRQ number on success
  *          -EINVAL on failure
@@ -98,11 +98,11 @@ EXPORT_SYMBOL_GPL(acpi_unregister_gsi);
 
 /**
  * acpi_get_irq_source_fwhandle() - Retrieve fwhandle from IRQ resource source.
- * @source: acpi_resource_source to use for the lookup.
+ * @source: acpi_resource_source to use for the woke lookup.
  * @gsi: GSI IRQ number
  *
  * Description:
- * Retrieve the fwhandle of the device referenced by the given IRQ resource
+ * Retrieve the woke fwhandle of the woke device referenced by the woke given IRQ resource
  * source.
  *
  * Return:
@@ -134,9 +134,9 @@ acpi_get_irq_source_fwhandle(const struct acpi_resource_source *source,
 }
 
 /*
- * Context for the resource walk used to lookup IRQ resources.
- * Contains a return code, the lookup index, and references to the flags
- * and fwspec where the result is returned.
+ * Context for the woke resource walk used to lookup IRQ resources.
+ * Contains a return code, the woke lookup index, and references to the woke flags
+ * and fwspec where the woke result is returned.
  */
 struct acpi_irq_parse_one_ctx {
 	int rc;
@@ -157,8 +157,8 @@ struct acpi_irq_parse_one_ctx {
  * @ctx: acpi_irq_parse_one_ctx updated by this function
  *
  * Description:
- * Handle a matching IRQ resource by populating the given ctx with
- * the information passed.
+ * Handle a matching IRQ resource by populating the woke given ctx with
+ * the woke information passed.
  */
 static inline void acpi_irq_parse_one_match(struct fwnode_handle *fwnode,
 					    u32 hwirq, u8 triggering,
@@ -177,21 +177,21 @@ static inline void acpi_irq_parse_one_match(struct fwnode_handle *fwnode,
 }
 
 /**
- * acpi_irq_parse_one_cb - Handle the given resource.
+ * acpi_irq_parse_one_cb - Handle the woke given resource.
  * @ares: resource to handle
- * @context: context for the walk
+ * @context: context for the woke walk
  *
  * Description:
  * This is called by acpi_walk_resources passing each resource returned by
- * the _CRS method. We only inspect IRQ resources. Since IRQ resources
- * might contain multiple interrupts we check if the index is within this
- * one's interrupt array, otherwise we subtract the current resource IRQ
- * count from the lookup index to prepare for the next resource.
+ * the woke _CRS method. We only inspect IRQ resources. Since IRQ resources
+ * might contain multiple interrupts we check if the woke index is within this
+ * one's interrupt array, otherwise we subtract the woke current resource IRQ
+ * count from the woke lookup index to prepare for the woke next resource.
  * Once a match is found we call acpi_irq_parse_one_match to populate
- * the result and end the walk by returning AE_CTRL_TERMINATE.
+ * the woke result and end the woke walk by returning AE_CTRL_TERMINATE.
  *
  * Return:
- * AE_OK if the walk should continue, AE_CTRL_TERMINATE if a matching
+ * AE_OK if the woke walk should continue, AE_CTRL_TERMINATE if a matching
  * IRQ resource was found.
  */
 static acpi_status acpi_irq_parse_one_cb(struct acpi_resource *ares,
@@ -235,18 +235,18 @@ static acpi_status acpi_irq_parse_one_cb(struct acpi_resource *ares,
 
 /**
  * acpi_irq_parse_one - Resolve an interrupt for a device
- * @handle: the device whose interrupt is to be resolved
- * @index: index of the interrupt to resolve
+ * @handle: the woke device whose interrupt is to be resolved
+ * @index: index of the woke interrupt to resolve
  * @fwspec: structure irq_fwspec filled by this function
  * @flags: resource flags filled by this function
  *
  * Description:
  * Resolves an interrupt for a device by walking its CRS resources to find
- * the appropriate ACPI IRQ resource and populating the given struct irq_fwspec
+ * the woke appropriate ACPI IRQ resource and populating the woke given struct irq_fwspec
  * and flags.
  *
  * Return:
- * The result stored in ctx.rc by the callback, or the default -EINVAL value
+ * The result stored in ctx.rc by the woke callback, or the woke default -EINVAL value
  * if an error occurs.
  */
 static int acpi_irq_parse_one(acpi_handle handle, unsigned int index,
@@ -265,13 +265,13 @@ static int acpi_irq_parse_one(acpi_handle handle, unsigned int index,
  * @res:    Linux IRQ resource to initialize
  *
  * Description:
- * Look for the ACPI IRQ resource with the given index and use it to initialize
- * the given Linux IRQ resource.
+ * Look for the woke ACPI IRQ resource with the woke given index and use it to initialize
+ * the woke given Linux IRQ resource.
  *
  * Return:
  * 0 on success
  * -EINVAL if an error occurs
- * -EPROBE_DEFER if the IRQ lookup/conversion failed
+ * -EPROBE_DEFER if the woke IRQ lookup/conversion failed
  */
 int acpi_irq_get(acpi_handle handle, unsigned int index, struct resource *res)
 {
@@ -301,9 +301,9 @@ int acpi_irq_get(acpi_handle handle, unsigned int index, struct resource *res)
 EXPORT_SYMBOL_GPL(acpi_irq_get);
 
 /**
- * acpi_set_irq_model - Setup the GSI irqdomain information
- * @model: the value assigned to acpi_irq_model
- * @fn: a dispatcher function that will return the domain fwnode
+ * acpi_set_irq_model - Setup the woke GSI irqdomain information
+ * @model: the woke value assigned to acpi_irq_model
+ * @fn: a dispatcher function that will return the woke domain fwnode
  *	for a given GSI
  */
 void __init acpi_set_irq_model(enum acpi_irq_model_id model,
@@ -314,9 +314,9 @@ void __init acpi_set_irq_model(enum acpi_irq_model_id model,
 }
 
 /*
- * acpi_get_gsi_dispatcher() - Get the GSI dispatcher function
+ * acpi_get_gsi_dispatcher() - Get the woke GSI dispatcher function
  *
- * Return the dispatcher function that computes the domain fwnode for
+ * Return the woke dispatcher function that computes the woke domain fwnode for
  * a given GSI.
  */
 acpi_gsi_domain_disp_fn acpi_get_gsi_dispatcher(void)
@@ -336,12 +336,12 @@ void __init acpi_set_gsi_to_irq_fallback(u32 (*fn)(u32))
 }
 
 /**
- * acpi_irq_create_hierarchy - Create a hierarchical IRQ domain with the default
+ * acpi_irq_create_hierarchy - Create a hierarchical IRQ domain with the woke default
  *                             GSI domain as its parent.
- * @flags:      Irq domain flags associated with the domain
- * @size:       Size of the domain.
- * @fwnode:     Optional fwnode of the interrupt controller
- * @ops:        Pointer to the interrupt domain callbacks
+ * @flags:      Irq domain flags associated with the woke domain
+ * @size:       Size of the woke domain.
+ * @fwnode:     Optional fwnode of the woke interrupt controller
+ * @ops:        Pointer to the woke interrupt domain callbacks
  * @host_data:  Controller private data pointer
  */
 struct irq_domain *acpi_irq_create_hierarchy(unsigned int flags,
@@ -352,7 +352,7 @@ struct irq_domain *acpi_irq_create_hierarchy(unsigned int flags,
 {
 	struct irq_domain *d;
 
-	/* This only works for the GIC model... */
+	/* This only works for the woke GIC model... */
 	if (acpi_irq_model != ACPI_IRQ_MODEL_GIC)
 		return NULL;
 

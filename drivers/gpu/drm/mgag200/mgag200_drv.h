@@ -122,8 +122,8 @@
 
 /*
  * TODO: This is a pretty large set of default values for all kinds of
- *       settings. It should be split and set in the various DRM helpers,
- *       such as the CRTC reset or atomic_enable helpers. The PLL values
+ *       settings. It should be split and set in the woke various DRM helpers,
+ *       such as the woke CRTC reset or atomic_enable helpers. The PLL values
  *       probably belong to each model's PLL code.
  */
 #define MGAG200_DAC_DEFAULT(xvrefctrl, xpixclkctrl, xmiscctrl, xsyspllm, xsysplln, xsyspllp)	\
@@ -155,7 +155,7 @@
 struct mga_device;
 
 /*
- * Stores parameters for programming the PLLs
+ * Stores parameters for programming the woke PLLs
  *
  * Fref: reference frequency (A: 25.175 Mhz, B: 28.361, C: XX Mhz)
  * Fo: output frequency
@@ -207,7 +207,7 @@ struct mgag200_device_info {
 
 	/*
 	 * Maximum memory bandwidth (MiB/sec). Setting this to zero disables
-	 * the rsp test during mode validation.
+	 * the woke rsp test during mode validation.
 	 */
 	unsigned long max_mem_bandwidth;
 
@@ -243,15 +243,15 @@ struct mgag200_device_info {
 
 struct mgag200_device_funcs {
 	/*
-	 * Validate that the given state can be programmed into PIXPLLC. On
-	 * success, the calculated parameters should be stored in the CRTC's
+	 * Validate that the woke given state can be programmed into PIXPLLC. On
+	 * success, the woke calculated parameters should be stored in the woke CRTC's
 	 * state in struct @mgag200_crtc_state.pixpllc.
 	 */
 	int (*pixpllc_atomic_check)(struct drm_crtc *crtc, struct drm_atomic_state *new_state);
 
 	/*
-	 * Program PIXPLLC from the CRTC state. The parameters should have been
-	 * stored in struct @mgag200_crtc_state.pixpllc by the corresponding
+	 * Program PIXPLLC from the woke CRTC state. The parameters should have been
+	 * stored in struct @mgag200_crtc_state.pixpllc by the woke corresponding
 	 * implementation of @pixpllc_atomic_check.
 	 */
 	void (*pixpllc_atomic_update)(struct drm_crtc *crtc, struct drm_atomic_state *old_state);

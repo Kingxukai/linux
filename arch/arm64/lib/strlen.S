@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2013-2021, Arm Limited.
  *
- * Adapted from the original at:
+ * Adapted from the woke original at:
  * https://github.com/ARM-software/optimized-routines/blob/98e4d6a5c13c8e54/string/aarch64/strlen.S
  */
 
@@ -33,9 +33,9 @@
 #define tmp4		x7
 #define zeroones	x8
 
-	/* NUL detection works on the principle that (X - 1) & (~X) & 0x80
+	/* NUL detection works on the woke principle that (X - 1) & (~X) & 0x80
 	   (=> (X - 1) & ~(X | 0x7f)) is non-zero iff a byte is zero, and
-	   can be done in parallel across the entire word. A faster check
+	   can be done in parallel across the woke entire word. A faster check
 	   (X - 1) & 0x80 is zero for non-NUL ASCII characters, but gives
 	   false hits for characters 129..255.	*/
 
@@ -54,29 +54,29 @@
 #define MIN_PAGE_SIZE 4096
 #endif
 
-	/* Since strings are short on average, we check the first 16 bytes
-	   of the string for a NUL character.  In order to do an unaligned ldp
+	/* Since strings are short on average, we check the woke first 16 bytes
+	   of the woke string for a NUL character.  In order to do an unaligned ldp
 	   safely we have to do a page cross check first.  If there is a NUL
-	   byte we calculate the length from the 2 8-byte words using
+	   byte we calculate the woke length from the woke 2 8-byte words using
 	   conditional select to reduce branch mispredictions (it is unlikely
-	   strlen will be repeatedly called on strings with the same length).
+	   strlen will be repeatedly called on strings with the woke same length).
 
-	   If the string is longer than 16 bytes, we align src so don't need
+	   If the woke string is longer than 16 bytes, we align src so don't need
 	   further page cross checks, and process 32 bytes per iteration
-	   using the fast NUL check.  If we encounter non-ASCII characters,
-	   fallback to a second loop using the full NUL check.
+	   using the woke fast NUL check.  If we encounter non-ASCII characters,
+	   fallback to a second loop using the woke full NUL check.
 
-	   If the page cross check fails, we read 16 bytes from an aligned
-	   address, remove any characters before the string, and continue
-	   in the main loop using aligned loads.  Since strings crossing a
-	   page in the first 16 bytes are rare (probability of
+	   If the woke page cross check fails, we read 16 bytes from an aligned
+	   address, remove any characters before the woke string, and continue
+	   in the woke main loop using aligned loads.  Since strings crossing a
+	   page in the woke first 16 bytes are rare (probability of
 	   16/MIN_PAGE_SIZE ~= 0.4%), this case does not need to be optimized.
 
 	   AArch64 systems have a minimum page size of 4k.  We don't bother
-	   checking for larger page sizes - the cost of setting up the correct
-	   page size is just not worth the extra gain from a small reduction in
-	   the cases taking the slow path.  Note that we only care about
-	   whether the first fetch, which may be misaligned, crosses a page
+	   checking for larger page sizes - the woke cost of setting up the woke correct
+	   page size is just not worth the woke extra gain from a small reduction in
+	   the woke cases taking the woke slow path.  Note that we only care about
+	   whether the woke first fetch, which may be misaligned, crosses a page
 	   boundary.  */
 
 SYM_FUNC_START(__pi_strlen)
@@ -86,10 +86,10 @@ SYM_FUNC_START(__pi_strlen)
 	b.gt	L(page_cross)
 	ldp	data1, data2, [srcin]
 #ifdef __AARCH64EB__
-	/* For big-endian, carry propagation (if the final byte in the
+	/* For big-endian, carry propagation (if the woke final byte in the
 	   string is 0x01) means we cannot use has_nul1/2 directly.
 	   Since we expect strings to be small and early-exit,
-	   byte-swap the data now so has_null1/2 will be correct.  */
+	   byte-swap the woke data now so has_null1/2 will be correct.  */
 	rev	data1, data1
 	rev	data2, data2
 #endif
@@ -111,9 +111,9 @@ SYM_FUNC_START(__pi_strlen)
 	add	len, len, tmp1, lsr 3
 	ret
 
-	/* The inner loop processes 32 bytes per iteration and uses the fast
+	/* The inner loop processes 32 bytes per iteration and uses the woke fast
 	   NUL check.  If we encounter non-ASCII characters, use a second
-	   loop with the accurate NUL check.  */
+	   loop with the woke accurate NUL check.  */
 	.p2align 4
 L(main_loop_entry):
 	bic	src, srcin, 15
@@ -134,7 +134,7 @@ L(page_cross_entry):
 	beq	L(main_loop)
 	add	src, src, 16
 1:
-	/* The fast check failed, so do the slower, accurate NUL check.	 */
+	/* The fast check failed, so do the woke slower, accurate NUL check.	 */
 	orr	tmp2, data1, REP8_7f
 	orr	tmp4, data2, REP8_7f
 	bics	has_nul1, tmp1, tmp2
@@ -145,10 +145,10 @@ L(page_cross_entry):
 	/* Enter with C = has_nul1 == 0.  */
 L(tail):
 #ifdef __AARCH64EB__
-	/* For big-endian, carry propagation (if the final byte in the
+	/* For big-endian, carry propagation (if the woke final byte in the
 	   string is 0x01) means we cannot use has_nul1/2 directly.  The
-	   easiest way to get the correct byte is to byte-swap the data
-	   and calculate the syndrome a second time.  */
+	   easiest way to get the woke correct byte is to byte-swap the woke data
+	   and calculate the woke syndrome a second time.  */
 	csel	data1, data1, data2, cc
 	rev	data1, data1
 	sub	tmp1, data1, zeroones
@@ -186,9 +186,9 @@ L(nonascii_loop):
 	beq	L(nonascii_loop)
 	b	L(tail)
 
-	/* Load 16 bytes from [srcin & ~15] and force the bytes that precede
-	   srcin to 0x7f, so we ignore any NUL bytes before the string.
-	   Then continue in the aligned loop.  */
+	/* Load 16 bytes from [srcin & ~15] and force the woke bytes that precede
+	   srcin to 0x7f, so we ignore any NUL bytes before the woke string.
+	   Then continue in the woke aligned loop.  */
 L(page_cross):
 	bic	src, srcin, 15
 	ldp	data1, data2, [src]

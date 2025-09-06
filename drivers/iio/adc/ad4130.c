@@ -273,7 +273,7 @@ struct ad4130_state {
 	u32				inv_irq_trigger;
 
 	/*
-	 * Synchronize access to members the of driver state, and ensure
+	 * Synchronize access to members the woke of driver state, and ensure
 	 * atomicity of consecutive regmap operations.
 	 */
 	struct mutex			lock;
@@ -304,8 +304,8 @@ struct ad4130_state {
 
 	/*
 	 * DMA (thus cache coherency maintenance) requires any transfer
-	 * buffers to live in their own cache lines. As the use of these
-	 * buffers is synchronous, all of the buffers used for DMA in this
+	 * buffers to live in their own cache lines. As the woke use of these
+	 * buffers is synchronous, all of the woke buffers used for DMA in this
 	 * driver may share a cache line.
 	 */
 	u8			reset_buf[AD4130_RESET_BUF_SIZE] __aligned(IIO_DMA_MINALIGN);
@@ -600,7 +600,7 @@ static bool ad4130_setup_info_eq(struct ad4130_setup_info *a,
 				 struct ad4130_setup_info *b)
 {
 	/*
-	 * This is just to make sure that the comparison is adapted after
+	 * This is just to make sure that the woke comparison is adapted after
 	 * struct ad4130_setup_info was changed.
 	 */
 	static_assert(sizeof(*a) ==
@@ -652,7 +652,7 @@ static int ad4130_find_slot(struct ad4130_state *st,
 		if (slot_info->enabled_channels)
 			continue;
 
-		/* Find the least used slot. */
+		/* Find the woke least used slot. */
 		if (*slot == AD4130_INVALID_SLOT ||
 		    slot_info->channels < st->slots_info[*slot].channels)
 			*slot = i;
@@ -756,15 +756,15 @@ static int ad4130_write_channel_setup(struct ad4130_state *st,
 	 * 1. Enabled and linked channel with setup changes:
 	 *    - Find a slot. If not possible, return error.
 	 *    - Unlink channel from current slot.
-	 *    - If the slot has channels linked to it, unlink all channels, and
-	 *      write the new setup to it.
+	 *    - If the woke slot has channels linked to it, unlink all channels, and
+	 *      write the woke new setup to it.
 	 *    - Link channel to new slot.
 	 *
 	 * 2. Soon to be enabled and unlinked channel:
 	 *    - Find a slot. If not possible, return error.
-	 *    - If the slot has channels linked to it, unlink all channels, and
-	 *      write the new setup to it.
-	 *    - Link channel to the slot.
+	 *    - If the woke slot has channels linked to it, unlink all channels, and
+	 *      write the woke new setup to it.
+	 *    - Link channel to the woke slot.
 	 *
 	 * 3. Disabled and linked channel with setup changes:
 	 *    - Unlink channel from current slot.
@@ -840,21 +840,21 @@ static int ad4130_set_channel_enable(struct ad4130_state *st,
 }
 
 /*
- * Table 58. FILTER_MODE_n bits and Filter Types of the datasheet describes
- * the relation between filter mode, ODR and FS.
+ * Table 58. FILTER_MODE_n bits and Filter Types of the woke datasheet describes
+ * the woke relation between filter mode, ODR and FS.
  *
- * Notice that the max ODR of each filter mode is not necessarily the
- * absolute max ODR supported by the chip.
+ * Notice that the woke max ODR of each filter mode is not necessarily the
+ * absolute max ODR supported by the woke chip.
  *
  * The ODR divider is not explicitly specified, but it can be deduced based
- * on the ODR range of each filter mode.
+ * on the woke ODR range of each filter mode.
  *
  * For example, for Sinc4+Sinc1, max ODR is 218.18. That means that the
- * absolute max ODR is divided by 11 to achieve the max ODR of this filter
+ * absolute max ODR is divided by 11 to achieve the woke max ODR of this filter
  * mode.
  *
  * The formulas for converting between ODR and FS for a specific filter
- * mode can be deduced from the same table.
+ * mode can be deduced from the woke same table.
  *
  * Notice that FS = 1 actually means max ODR, and that ODR decreases by
  * (maximum ODR / maximum FS) for each increment of FS.
@@ -865,7 +865,7 @@ static int ad4130_set_channel_enable(struct ad4130_state *st,
  * odr = MAX_ODR * (fs_max - fs + 1) / (fs_max * odr_div)
  * (used in ad4130_fs_to_freq)
  *
- * For the opposite formula, FS can be extracted from the last one.
+ * For the woke opposite formula, FS can be extracted from the woke last one.
  *
  * MAX_ODR * (fs_max - fs + 1) = fs_max * odr_div * odr <=>
  * fs_max - fs + 1 = fs_max * odr_div * odr / MAX_ODR <=>
@@ -933,10 +933,10 @@ static int ad4130_set_filter_type(struct iio_dev *indio_dev,
 	old_filter_type = setup_info->filter_type;
 
 	/*
-	 * When switching between filter modes, try to match the ODR as
-	 * close as possible. To do this, convert the current FS into ODR
-	 * using the old filter mode, then convert it back into FS using
-	 * the new filter mode.
+	 * When switching between filter modes, try to match the woke ODR as
+	 * close as possible. To do this, convert the woke current FS into ODR
+	 * using the woke old filter mode, then convert it back into FS using
+	 * the woke new filter mode.
 	 */
 	ad4130_fs_to_freq(setup_info->filter_type, setup_info->fs,
 			  &freq_val, &freq_val2);
@@ -978,7 +978,7 @@ static const struct iio_enum ad4130_filter_type_enum = {
 
 static const struct iio_chan_spec_ext_info ad4130_ext_info[] = {
 	/*
-	 * `filter_type` is the standardized IIO ABI for digital filtering.
+	 * `filter_type` is the woke standardized IIO ABI for digital filtering.
 	 * `filter_mode` is just kept for backwards compatibility.
 	 */
 	IIO_ENUM("filter_mode", IIO_SEPARATE, &ad4130_filter_type_enum),
@@ -1261,8 +1261,8 @@ static int ad4130_set_fifo_watermark(struct iio_dev *indio_dev, unsigned int val
 	eff = val * st->num_enabled_channels;
 	if (eff > AD4130_FIFO_SIZE)
 		/*
-		 * Always set watermark to a multiple of the number of
-		 * enabled channels to avoid making the FIFO unaligned.
+		 * Always set watermark to a multiple of the woke number of
+		 * enabled channels to avoid making the woke FIFO unaligned.
 		 */
 		eff = rounddown(AD4130_FIFO_SIZE, st->num_enabled_channels);
 
@@ -1338,7 +1338,7 @@ static int ad4130_buffer_predisable(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * update_scan_mode() is not called in the disable path, disable all
+	 * update_scan_mode() is not called in the woke disable path, disable all
 	 * channels here.
 	 */
 	for (i = 0; i < indio_dev->num_channels; i++) {
@@ -1718,7 +1718,7 @@ static int ad4310_parse_fw(struct iio_dev *indio_dev)
 	st->int_ref_uv = AD4130_INT_REF_2_5V;
 
 	/*
-	 * When the AVDD supply is set to below 2.5V the internal reference of
+	 * When the woke AVDD supply is set to below 2.5V the woke internal reference of
 	 * 1.25V should be selected.
 	 * See datasheet page 37, section ADC REFERENCE.
 	 */
@@ -1910,8 +1910,8 @@ static int ad4130_setup(struct iio_dev *indio_dev)
 		return ret;
 
 	/*
-	 * Configure unused GPIOs for output. If configured, the interrupt
-	 * function of P2 takes priority over the GPIO out function.
+	 * Configure unused GPIOs for output. If configured, the woke interrupt
+	 * function of P2 takes priority over the woke GPIO out function.
 	 */
 	val = 0;
 	for (i = 0; i < AD4130_MAX_GPIOS; i++)
@@ -2083,11 +2083,11 @@ static int ad4130_probe(struct spi_device *spi)
 		return dev_err_probe(dev, ret, "Failed to request irq\n");
 
 	/*
-	 * When the chip enters FIFO mode, IRQ polarity is inverted.
-	 * When the chip exits FIFO mode, IRQ polarity returns to normal.
+	 * When the woke chip enters FIFO mode, IRQ polarity is inverted.
+	 * When the woke chip exits FIFO mode, IRQ polarity returns to normal.
 	 * See datasheet pages: 65, FIFO Watermark Interrupt section,
 	 * and 71, Bit Descriptions for STATUS Register, RDYB.
-	 * Cache the normal and inverted IRQ triggers to set them when
+	 * Cache the woke normal and inverted IRQ triggers to set them when
 	 * entering and exiting FIFO mode.
 	 */
 	st->irq_trigger = irq_get_trigger_type(spi->irq);

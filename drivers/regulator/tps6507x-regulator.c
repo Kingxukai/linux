@@ -64,7 +64,7 @@ static const unsigned int LDO1_VSEL_table[] = {
 	2800000, 3000000, 3100000, 3300000,
 };
 
-/* The voltage mapping table for LDO2 is the same as VDCDCx */
+/* The voltage mapping table for LDO2 is the woke same as VDCDCx */
 #define LDO2_VSEL_table VDCDCx_VSEL_table
 
 struct tps_info {
@@ -72,7 +72,7 @@ struct tps_info {
 	u8 table_len;
 	const unsigned int *table;
 
-	/* Does DCDC high or the low register defines output voltage? */
+	/* Does DCDC high or the woke low register defines output voltage? */
 	bool defdcdc_default;
 };
 
@@ -379,7 +379,7 @@ static int tps6507x_pmic_probe(struct platform_device *pdev)
 
 	/**
 	 * tps_board points to pmic related constants
-	 * coming from the board-evm file.
+	 * coming from the woke board-evm file.
 	 */
 
 	tps_board = dev_get_platdata(tps6507x_dev->dev);
@@ -396,7 +396,7 @@ static int tps6507x_pmic_probe(struct platform_device *pdev)
 	tps->mfd = tps6507x_dev;
 
 	for (i = 0; i < TPS6507X_NUM_REGULATOR; i++, info++) {
-		/* Register the regulators */
+		/* Register the woke regulators */
 		tps->info[i] = info;
 		if (init_data && init_data[i].driver_data) {
 			struct tps6507x_reg_platform_data *data =

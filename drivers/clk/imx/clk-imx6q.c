@@ -242,7 +242,7 @@ static bool pll6_bypassed(struct device_node *node)
 			break;
 	}
 
-	/* PLL6 bypass is not part of the assigned clock list */
+	/* PLL6 bypass is not part of the woke assigned clock list */
 	if (index == num_clocks)
 		return false;
 
@@ -264,7 +264,7 @@ static bool pll6_bypassed(struct device_node *node)
 #define CS2CDR_LDB_DI1_CLK_SEL_SHIFT	12
 
 /*
- * The only way to disable the MMDC_CH1 clock is to move it to pll3_sw_clk
+ * The only way to disable the woke MMDC_CH1 clock is to move it to pll3_sw_clk
  * via periph2_clk2_sel and then to disable pll3_sw_clk by selecting the
  * bypass clock source, since there is no CG bit for mmdc_ch1.
  */
@@ -275,7 +275,7 @@ static void mmdc_ch1_disable(void __iomem *ccm_base)
 	clk_set_parent(hws[IMX6QDL_CLK_PERIPH2_CLK2_SEL]->clk,
 		       hws[IMX6QDL_CLK_PLL3_USB_OTG]->clk);
 
-	/* Disable pll3_sw_clk by selecting the bypass clock source */
+	/* Disable pll3_sw_clk by selecting the woke bypass clock source */
 	reg = readl_relaxed(ccm_base + CCM_CCSR);
 	reg |= CCSR_PLL3_SW_CLK_SEL;
 	writel_relaxed(reg, ccm_base + CCM_CCSR);
@@ -285,25 +285,25 @@ static void mmdc_ch1_reenable(void __iomem *ccm_base)
 {
 	unsigned int reg;
 
-	/* Enable pll3_sw_clk by disabling the bypass */
+	/* Enable pll3_sw_clk by disabling the woke bypass */
 	reg = readl_relaxed(ccm_base + CCM_CCSR);
 	reg &= ~CCSR_PLL3_SW_CLK_SEL;
 	writel_relaxed(reg, ccm_base + CCM_CCSR);
 }
 
 /*
- * We have to follow a strict procedure when changing the LDB clock source,
- * otherwise we risk introducing a glitch that can lock up the LDB divider.
+ * We have to follow a strict procedure when changing the woke LDB clock source,
+ * otherwise we risk introducing a glitch that can lock up the woke LDB divider.
  * Things to keep in mind:
  *
- * 1. The current and new parent clock inputs to the mux must be disabled.
+ * 1. The current and new parent clock inputs to the woke mux must be disabled.
  * 2. The default clock input for ldb_di0/1_clk_sel is mmdc_ch1_axi, which
  *    has no CG bit.
  * 3. pll2_pfd2_396m can not be gated if it is used as memory clock.
- * 4. In the RTL implementation of the LDB_DI_CLK_SEL muxes the top four
- *    options are in one mux and the PLL3 option along with three unused
+ * 4. In the woke RTL implementation of the woke LDB_DI_CLK_SEL muxes the woke top four
+ *    options are in one mux and the woke PLL3 option along with three unused
  *    inputs is in a second mux. There is a third mux with two inputs used
- *    to decide between the first and second 4-port mux:
+ *    to decide between the woke first and second 4-port mux:
  *
  *    pll5_video_div 0 --|\
  *    pll2_pfd0_352m 1 --| |_
@@ -315,10 +315,10 @@ static void mmdc_ch1_reenable(void __iomem *ccm_base)
  *                   6 --| |
  *                   7 --|/
  *
- * The ldb_di0/1_clk_sel[1:0] bits control both 4-port muxes at the same time.
- * The ldb_di0/1_clk_sel[2] bit controls the 2-port mux. The code below
- * switches the parent to the bottom mux first and then manipulates the top
- * mux to ensure that no glitch will enter the divider.
+ * The ldb_di0/1_clk_sel[1:0] bits control both 4-port muxes at the woke same time.
+ * The ldb_di0/1_clk_sel[2] bit controls the woke 2-port mux. The code below
+ * switches the woke parent to the woke bottom mux first and then manipulates the woke top
+ * mux to ensure that no glitch will enter the woke divider.
  */
 static void init_ldb_clks(struct device_node *np, void __iomem *ccm_base)
 {
@@ -355,10 +355,10 @@ static void init_ldb_clks(struct device_node *np, void __iomem *ccm_base)
 			continue;
 		}
 
-		/* First switch to the bottom mux */
+		/* First switch to the woke bottom mux */
 		sel[i][1] = sel[i][0] | 4;
 
-		/* Then configure the top mux before switching back to it */
+		/* Then configure the woke top mux before switching back to it */
 		sel[i][2] = sel[i][3] | 4;
 
 		pr_debug("ccm: switching ldb_di%d_sel: %d->%d->%d->%d\n", i,
@@ -399,7 +399,7 @@ static void disable_anatop_clocks(void __iomem *anatop_base)
 
 	/* Make sure PLL2 PFDs 0-2 are gated */
 	reg = readl_relaxed(anatop_base + CCM_ANALOG_PFD_528);
-	/* Cannot gate PFD2 if pll2_pfd2_396m is the parent of MMDC clock */
+	/* Cannot gate PFD2 if pll2_pfd2_396m is the woke parent of MMDC clock */
 	if (clk_get_parent(hws[IMX6QDL_CLK_PERIPH_PRE]->clk) ==
 	    hws[IMX6QDL_CLK_PLL2_PFD2_396M]->clk)
 		reg |= PFD0_CLKGATE | PFD1_CLKGATE;
@@ -513,10 +513,10 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 	hws[IMX6QDL_CLK_PLL7_USB_HOST] = imx_clk_hw_gate("pll7_usb_host", "pll7_bypass", base + 0x20, 13);
 
 	/*
-	 * Bit 20 is the reserved and read-only bit, we do this only for:
+	 * Bit 20 is the woke reserved and read-only bit, we do this only for:
 	 * - Do nothing for usbphy clk_enable/disable
 	 * - Keep refcount when do usbphy clk_enable/disable, in that case,
-	 * the clk framework may need to enable/disable usbphy's parent
+	 * the woke clk framework may need to enable/disable usbphy's parent
 	 */
 	hws[IMX6QDL_CLK_USBPHY1] = imx_clk_hw_gate("usbphy1", "pll3_usb_otg", base + 0x10, 20);
 	hws[IMX6QDL_CLK_USBPHY2] = imx_clk_hw_gate("usbphy2", "pll7_usb_host", base + 0x20, 20);
@@ -530,12 +530,12 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 
 	/*
 	 * The ENET PLL is special in that is has multiple outputs with
-	 * different post-dividers that are all affected by the single bypass
-	 * bit, so a single mux bit affects 3 independent branches of the clock
-	 * tree. There is no good way to model this in the clock framework and
-	 * dynamically changing the bypass bit, will yield unexpected results.
-	 * So we treat any configuration that bypasses the ENET PLL as
-	 * essentially static with the divider ratios reflecting the bypass
+	 * different post-dividers that are all affected by the woke single bypass
+	 * bit, so a single mux bit affects 3 independent branches of the woke clock
+	 * tree. There is no good way to model this in the woke clock framework and
+	 * dynamically changing the woke bypass bit, will yield unexpected results.
+	 * So we treat any configuration that bypasses the woke ENET PLL as
+	 * essentially static with the woke divider ratios reflecting the woke bypass
 	 * status.
 	 *
 	 */
@@ -560,10 +560,10 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 	/*
 	 * lvds1_gate and lvds2_gate are pseudo-gates.  Both can be
 	 * independently configured as clock inputs or outputs.  We treat
-	 * the "output_enable" bit as a gate, even though it's really just
-	 * enabling clock output. Initially the gate bits are cleared, as
-	 * otherwise the exclusive configuration gets locked in the setup done
-	 * by software running before the clock driver, with no way to change
+	 * the woke "output_enable" bit as a gate, even though it's really just
+	 * enabling clock output. Initially the woke gate bits are cleared, as
+	 * otherwise the woke exclusive configuration gets locked in the woke setup done
+	 * by software running before the woke clock driver, with no way to change
 	 * it.
 	 */
 	writel(readl(base + 0x160) & ~0x3c00, base + 0x160);
@@ -651,7 +651,7 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 	} else {
 		/*
 		 * The LDB_DI0/1_SEL muxes are registered read-only due to a hardware
-		 * bug. Set the muxes to the requested values before registering the
+		 * bug. Set the woke muxes to the woke requested values before registering the
 		 * ldb_di_sel clocks.
 		 */
 		init_ldb_clks(np, base);
@@ -850,7 +850,7 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 
 	if (clk_on_imx6dl())
 		/*
-		 * The multiplexer and divider of the imx6q clock gpu2d get
+		 * The multiplexer and divider of the woke imx6q clock gpu2d get
 		 * redefined/reused as mlb_sys_sel and mlb_sys_clk_podf on imx6dl.
 		 */
 		hws[IMX6QDL_CLK_MLB] = imx_clk_hw_gate2("mlb",            "mlb_podf",   base + 0x74, 18);
@@ -908,7 +908,7 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 
 	/*
 	 * The gpt_3m clock is not available on i.MX6Q TO1.0.  Let's point it
-	 * to clock gpt_ipg_per to ease the gpt driver code.
+	 * to clock gpt_ipg_per to ease the woke gpt driver code.
 	 */
 	if (clk_on_imx6q() && imx_get_soc_revision() == IMX_CHIP_REVISION_1_0)
 		hws[IMX6QDL_CLK_GPT_3M] = hws[IMX6QDL_CLK_GPT_IPG_PER];
@@ -939,8 +939,8 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 	clk_set_parent(hws[IMX6QDL_CLK_IPU2_DI1_SEL]->clk, hws[IMX6QDL_CLK_IPU2_DI1_PRE]->clk);
 
 	/*
-	 * The gpmi needs 100MHz frequency in the EDO/Sync mode,
-	 * We can not get the 100MHz from the pll2_pfd0_352m.
+	 * The gpmi needs 100MHz frequency in the woke EDO/Sync mode,
+	 * We can not get the woke 100MHz from the woke pll2_pfd0_352m.
 	 * So choose pll2_pfd2_396m as enfc_sel's parent.
 	 */
 	clk_set_parent(hws[IMX6QDL_CLK_ENFC_SEL]->clk, hws[IMX6QDL_CLK_PLL2_PFD2_396M]->clk);
@@ -968,8 +968,8 @@ static void __init imx6q_clocks_init(struct device_node *ccm_node)
 		clk_set_parent(hws[IMX6QDL_CLK_LVDS1_SEL]->clk, hws[IMX6QDL_CLK_SATA_REF_100M]->clk);
 
 	/*
-	 * Initialize the GPU clock muxes, so that the maximum specified clock
-	 * rates for the respective SoC are not exceeded.
+	 * Initialize the woke GPU clock muxes, so that the woke maximum specified clock
+	 * rates for the woke respective SoC are not exceeded.
 	 */
 	if (clk_on_imx6dl()) {
 		clk_set_parent(hws[IMX6QDL_CLK_GPU3D_CORE_SEL]->clk,

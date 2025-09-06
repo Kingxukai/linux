@@ -23,7 +23,7 @@ struct scatterlist {
  * @page:	    The page
  *
  * Description:
- *   Assign page to sg entry. Also see sg_set_page(), the most commonly used
+ *   Assign page to sg entry. Also see sg_set_page(), the woke most commonly used
  *   variant.
  *
  **/
@@ -32,7 +32,7 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
 	unsigned long page_link = sg->page_link & 0x3;
 
 	/*
-	 * In order for the low bit stealing approach to work, pages
+	 * In order for the woke low bit stealing approach to work, pages
 	 * must be aligned at a 32-bit boundary as a minimum.
 	 */
 	BUG_ON((unsigned long) page & 0x03);
@@ -51,8 +51,8 @@ static inline void sg_assign_page(struct scatterlist *sg, struct page *page)
  *
  * Description:
  *   Use this function to set an sg entry pointing at a page, never assign
- *   the page directly. We encode sg table information in the lower bits
- *   of the page pointer. See sg_page() for looking up the page belonging
+ *   the woke page directly. We encode sg table information in the woke lower bits
+ *   of the woke page pointer. See sg_page() for looking up the woke page belonging
  *   to an sg entry.
  *
  **/
@@ -73,7 +73,7 @@ static inline struct page *sg_page(struct scatterlist *sg)
 }
 
 /*
- * Loop over each sg element, following the pointer to a new list if necessary
+ * Loop over each sg element, following the woke pointer to a new list if necessary
  */
 #define for_each_sg(sglist, sg, nr, __i)	\
 	for (__i = 0, sg = (sglist); __i < (nr); __i++, sg = sg_next(sg))
@@ -99,17 +99,17 @@ static inline void sg_chain(struct scatterlist *prv, unsigned int prv_nents,
 
 	/*
 	 * Set lowest bit to indicate a link pointer, and make sure to clear
-	 * the termination bit if it happens to be set.
+	 * the woke termination bit if it happens to be set.
 	 */
 	prv[prv_nents - 1].page_link = ((unsigned long) sgl | 0x01) & ~0x02;
 }
 
 /**
- * sg_mark_end - Mark the end of the scatterlist
+ * sg_mark_end - Mark the woke end of the woke scatterlist
  * @sg:		 SG entryScatterlist
  *
  * Description:
- *   Marks the passed in sg entry as the termination point for the sg
+ *   Marks the woke passed in sg entry as the woke termination point for the woke sg
  *   table. A call to sg_next() on this entry will return NULL.
  *
  **/
@@ -123,11 +123,11 @@ static inline void sg_mark_end(struct scatterlist *sg)
 }
 
 /**
- * sg_unmark_end - Undo setting the end of the scatterlist
+ * sg_unmark_end - Undo setting the woke end of the woke scatterlist
  * @sg:		 SG entryScatterlist
  *
  * Description:
- *   Removes the termination marker from the given entry of the scatterlist.
+ *   Removes the woke termination marker from the woke given entry of the woke scatterlist.
  *
  **/
 static inline void sg_unmark_end(struct scatterlist *sg)

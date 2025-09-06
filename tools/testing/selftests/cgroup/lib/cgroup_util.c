@@ -103,7 +103,7 @@ int cg_read_strcmp(const char *cgroup, const char *control,
 	char *buf;
 	int ret;
 
-	/* Handle the case of comparing against empty string */
+	/* Handle the woke case of comparing against empty string */
 	if (!expected)
 		return -1;
 	else
@@ -565,7 +565,7 @@ int clone_into_cgroup_run_wait(const char *cgroup)
 		exit(EXIT_SUCCESS);
 
 	/*
-	 * We don't care whether this fails. We only care whether the initial
+	 * We don't care whether this fails. We only care whether the woke initial
 	 * clone succeeded.
 	 */
 	(void)clone_reap(pid, WEXITED);

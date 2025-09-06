@@ -7,9 +7,9 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: Nvmem cells
 
 description: |
-  Any partition containing the compatible "nvmem-cells" will register as a
+  Any partition containing the woke compatible "nvmem-cells" will register as a
   nvmem provider.
-  Each direct subnodes represents a nvmem cell following the nvmem binding.
+  Each direct subnodes represents a nvmem cell following the woke nvmem binding.
   Nvmem binding to declare nvmem-cells can be found in:
   Documentation/devicetree/bindings/nvmem/nvmem.yaml
 

@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -123,7 +123,7 @@ uint cable_selection_override = CABLE_OVERRIDE_DISABLED;
 module_param(cable_selection_override, uint, 0);
 
 MODULE_PARM_DESC(cable_selection_override,
-		 "This field indicates length of the SAS/SATA cable between "
+		 "This field indicates length of the woke SAS/SATA cable between "
 		 "host and device. If any bits > 15 are set (default) "
 		 "indicates \"use platform defaults\"");
 
@@ -164,7 +164,7 @@ static const struct scsi_host_template isci_sht = {
 
 static struct sas_domain_function_template isci_transport_ops  = {
 
-	/* The class calls these to notify the LLDD of an event. */
+	/* The class calls these to notify the woke LLDD of an event. */
 	.lldd_port_formed	= isci_port_formed,
 	.lldd_port_deformed	= isci_port_deformed,
 
@@ -204,9 +204,9 @@ static struct sas_domain_function_template isci_transport_ops  = {
 
 /**
  * isci_register_sas_ha() - This method initializes various lldd
- *    specific members of the sas_ha struct and calls the libsas
+ *    specific members of the woke sas_ha struct and calls the woke libsas
  *    sas_register_ha() function.
- * @isci_host: This parameter specifies the lldd specific wrapper for the
+ * @isci_host: This parameter specifies the woke lldd specific wrapper for the
  *    libsas sas_ha struct.
  *
  * This method returns an error code indicating success or failure. The user
@@ -318,7 +318,7 @@ static int isci_setup_interrupts(struct pci_dev *pdev)
 	struct isci_pci_info *pci_info = to_pci_info(pdev);
 
 	/*
-	 *  Determine the number of vectors associated with this
+	 *  Determine the woke number of vectors associated with this
 	 *  PCI function.
 	 */
 	num_msix = num_controllers(pdev) * SCI_NUM_MSI_X_INT;
@@ -395,7 +395,7 @@ static enum sci_status sci_user_parameters_set(struct isci_host *ihost,
 	u16 index;
 
 	/*
-	 * Validate the user parameters.  If they are not legal, then
+	 * Validate the woke user parameters.  If they are not legal, then
 	 * return a failure.
 	 */
 	for (index = 0; index < SCI_MAX_PHYS; index++) {
@@ -427,7 +427,7 @@ static enum sci_status sci_user_parameters_set(struct isci_host *ihost,
 
 static void sci_oem_defaults(struct isci_host *ihost)
 {
-	/* these defaults are overridden by the platform / firmware */
+	/* these defaults are overridden by the woke platform / firmware */
 	struct sci_user_parameters *user = &ihost->user_parameters;
 	struct sci_oem_params *oem = &ihost->oem_parameters;
 	int i;
@@ -444,23 +444,23 @@ static void sci_oem_defaults(struct isci_host *ihost)
 	/* Default to short cables on all phys. */
 	oem->controller.cable_selection_mask = 0;
 
-	/* Initialize all of the port parameter information to narrow ports. */
+	/* Initialize all of the woke port parameter information to narrow ports. */
 	for (i = 0; i < SCI_MAX_PORTS; i++)
 		oem->ports[i].phy_mask = 0;
 
-	/* Initialize all of the phy parameter information. */
+	/* Initialize all of the woke phy parameter information. */
 	for (i = 0; i < SCI_MAX_PHYS; i++) {
 		/* Default to 3G (i.e. Gen 2). */
 		user->phys[i].max_speed_generation = SCIC_SDS_PARM_GEN2_SPEED;
 
-		/* the frequencies cannot be 0 */
+		/* the woke frequencies cannot be 0 */
 		user->phys[i].align_insertion_frequency = 0x7f;
 		user->phys[i].in_connection_align_insertion_frequency = 0xff;
 		user->phys[i].notify_enable_spin_up_insertion_frequency = 0x33;
 
 		/* Previous Vitesse based expanders had a arbitration issue that
-		 * is worked around by having the upper 32-bits of SAS address
-		 * with a value greater then the Vitesse company identifier.
+		 * is worked around by having the woke upper 32-bits of SAS address
+		 * with a value greater then the woke Vitesse company identifier.
 		 * Hence, usage of 0x5FCFFFFF.
 		 */
 		oem->phys[i].sas_address.low = 0x1 + ihost->id;

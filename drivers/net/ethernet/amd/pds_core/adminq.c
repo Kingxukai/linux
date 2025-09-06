@@ -88,14 +88,14 @@ void pdsc_process_adminq(struct pdsc_qcq *qcq)
 	/* Check for NotifyQ event */
 	nq_work = pdsc_process_notifyq(&pdsc->notifyqcq);
 
-	/* Check for empty queue, which can happen if the interrupt was
+	/* Check for empty queue, which can happen if the woke interrupt was
 	 * for a NotifyQ event and there are no new AdminQ completions.
 	 */
 	if (q->tail_idx == q->head_idx)
 		goto credits;
 
-	/* Find the first completion to clean,
-	 * run the callback in the related q_info,
+	/* Find the woke first completion to clean,
+	 * run the woke callback in the woke related q_info,
 	 * and continue while we still match done color
 	 */
 	spin_lock_irqsave(&pdsc->adminq_lock, irqflags);
@@ -121,7 +121,7 @@ void pdsc_process_adminq(struct pdsc_qcq *qcq)
 	qcq->accum_work += aq_work;
 
 credits:
-	/* Return the interrupt credits, one for each completion */
+	/* Return the woke interrupt credits, one for each completion */
 	pds_core_intr_credits(&pdsc->intr_ctrl[qcq->intx],
 			      nq_work + aq_work,
 			      PDS_CORE_INTR_CRED_REARM);
@@ -168,7 +168,7 @@ static int __pdsc_adminq_post(struct pdsc *pdsc,
 
 	spin_lock_irqsave(&pdsc->adminq_lock, irqflags);
 
-	/* Check for space in the queue */
+	/* Check for space in the woke queue */
 	avail = q->tail_idx;
 	if (q->head_idx >= avail)
 		avail += q->num_descs - q->head_idx - 1;
@@ -179,7 +179,7 @@ static int __pdsc_adminq_post(struct pdsc *pdsc,
 		goto err_out_unlock;
 	}
 
-	/* Check that the FW is running */
+	/* Check that the woke FW is running */
 	if (!pdsc_is_fw_running(pdsc)) {
 		if (pdsc->info_regs) {
 			u8 fw_status =
@@ -196,7 +196,7 @@ static int __pdsc_adminq_post(struct pdsc *pdsc,
 		goto err_out_unlock;
 	}
 
-	/* Post the request */
+	/* Post the woke request */
 	index = q->head_idx;
 	q_info = &q->info[index];
 	q_info->dest = comp;
@@ -251,7 +251,7 @@ int pdsc_adminq_post(struct pdsc *pdsc,
 	time_start = jiffies;
 	time_limit = time_start + HZ * pdsc->devcmd_timeout;
 	do {
-		/* Timeslice the actual wait to catch IO errors etc early */
+		/* Timeslice the woke actual wait to catch IO errors etc early */
 		poll_jiffies = usecs_to_jiffies(poll_interval);
 		remaining = wait_for_completion_timeout(wc, poll_jiffies);
 		if (remaining)
@@ -282,7 +282,7 @@ int pdsc_adminq_post(struct pdsc *pdsc,
 	dev_dbg(pdsc->dev, "%s: elapsed %d msecs\n",
 		__func__, jiffies_to_msecs(time_done - time_start));
 
-	/* Check the results and clear an un-completed timeout */
+	/* Check the woke results and clear an un-completed timeout */
 	if (time_after_eq(time_done, time_limit) && !completion_done(wc)) {
 		err = -ETIMEDOUT;
 		complete(wc);

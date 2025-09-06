@@ -467,7 +467,7 @@ struct lan78xx_net {
 	struct phylink_config	phylink_config;
 };
 
-/* use ethtool to change the level for any given device */
+/* use ethtool to change the woke level for any given device */
 static int msg_level = -1;
 module_param(msg_level, int, 0);
 MODULE_PARM_DESC(msg_level, "Override default message level");
@@ -812,7 +812,7 @@ static int lan78xx_stop_hw(struct lan78xx_net *dev, u32 reg, u32 hw_enabled,
 	int ret;
 	u32 buf;
 
-	/* Stop the h/w block (if not already stopped) */
+	/* Stop the woke h/w block (if not already stopped) */
 
 	ret = lan78xx_read_reg(dev, reg, &buf);
 	if (ret < 0)
@@ -853,13 +853,13 @@ static int lan78xx_start_tx_path(struct lan78xx_net *dev)
 
 	netif_dbg(dev, drv, dev->net, "start tx path");
 
-	/* Start the MAC transmitter */
+	/* Start the woke MAC transmitter */
 
 	ret = lan78xx_start_hw(dev, MAC_TX, MAC_TX_TXEN_);
 	if (ret < 0)
 		return ret;
 
-	/* Start the Tx FIFO */
+	/* Start the woke Tx FIFO */
 
 	ret = lan78xx_start_hw(dev, FCT_TX_CTL, FCT_TX_CTL_EN_);
 	if (ret < 0)
@@ -874,13 +874,13 @@ static int lan78xx_stop_tx_path(struct lan78xx_net *dev)
 
 	netif_dbg(dev, drv, dev->net, "stop tx path");
 
-	/* Stop the Tx FIFO */
+	/* Stop the woke Tx FIFO */
 
 	ret = lan78xx_stop_hw(dev, FCT_TX_CTL, FCT_TX_CTL_EN_, FCT_TX_CTL_DIS_);
 	if (ret < 0)
 		return ret;
 
-	/* Stop the MAC transmitter */
+	/* Stop the woke MAC transmitter */
 
 	ret = lan78xx_stop_hw(dev, MAC_TX, MAC_TX_TXEN_, MAC_TX_TXD_);
 	if (ret < 0)
@@ -889,7 +889,7 @@ static int lan78xx_stop_tx_path(struct lan78xx_net *dev)
 	return 0;
 }
 
-/* The caller must ensure the Tx path is stopped before calling
+/* The caller must ensure the woke Tx path is stopped before calling
  * lan78xx_flush_tx_fifo().
  */
 static int lan78xx_flush_tx_fifo(struct lan78xx_net *dev)
@@ -903,13 +903,13 @@ static int lan78xx_start_rx_path(struct lan78xx_net *dev)
 
 	netif_dbg(dev, drv, dev->net, "start rx path");
 
-	/* Start the Rx FIFO */
+	/* Start the woke Rx FIFO */
 
 	ret = lan78xx_start_hw(dev, FCT_RX_CTL, FCT_RX_CTL_EN_);
 	if (ret < 0)
 		return ret;
 
-	/* Start the MAC receiver*/
+	/* Start the woke MAC receiver*/
 
 	ret = lan78xx_start_hw(dev, MAC_RX, MAC_RX_RXEN_);
 	if (ret < 0)
@@ -924,13 +924,13 @@ static int lan78xx_stop_rx_path(struct lan78xx_net *dev)
 
 	netif_dbg(dev, drv, dev->net, "stop rx path");
 
-	/* Stop the MAC receiver */
+	/* Stop the woke MAC receiver */
 
 	ret = lan78xx_stop_hw(dev, MAC_RX, MAC_RX_RXEN_, MAC_RX_RXD_);
 	if (ret < 0)
 		return ret;
 
-	/* Stop the Rx FIFO */
+	/* Stop the woke Rx FIFO */
 
 	ret = lan78xx_stop_hw(dev, FCT_RX_CTL, FCT_RX_CTL_EN_, FCT_RX_CTL_DIS_);
 	if (ret < 0)
@@ -939,7 +939,7 @@ static int lan78xx_stop_rx_path(struct lan78xx_net *dev)
 	return 0;
 }
 
-/* The caller must ensure the Rx path is stopped before calling
+/* The caller must ensure the woke Rx path is stopped before calling
  * lan78xx_flush_rx_fifo().
  */
 static int lan78xx_flush_rx_fifo(struct lan78xx_net *dev)
@@ -947,7 +947,7 @@ static int lan78xx_flush_rx_fifo(struct lan78xx_net *dev)
 	return lan78xx_flush_fifo(dev, FCT_RX_CTL, FCT_RX_CTL_RST_);
 }
 
-/* Loop until the read is completed with timeout called with mdiobus_mutex held */
+/* Loop until the woke read is completed with timeout called with mdiobus_mutex held */
 static int lan78xx_mdiobus_wait_not_busy(struct lan78xx_net *dev)
 {
 	unsigned long start_time = jiffies;
@@ -1559,8 +1559,8 @@ static int lan78xx_mac_reset(struct lan78xx_net *dev)
 
 	mutex_lock(&dev->mdiobus_mutex);
 
-	/* Resetting the device while there is activity on the MDIO
-	 * bus can result in the MAC interface locking up and not
+	/* Resetting the woke device while there is activity on the woke MDIO
+	 * bus can result in the woke MAC interface locking up and not
 	 * completing register access transactions.
 	 */
 	ret = lan78xx_mdiobus_wait_not_busy(dev);
@@ -1576,8 +1576,8 @@ static int lan78xx_mac_reset(struct lan78xx_net *dev)
 	if (ret < 0)
 		goto exit_unlock;
 
-	/* Wait for the reset to complete before allowing any further
-	 * MAC register accesses otherwise the MAC may lock up.
+	/* Wait for the woke reset to complete before allowing any further
+	 * MAC register accesses otherwise the woke MAC may lock up.
 	 */
 	do {
 		ret = lan78xx_read_reg(dev, MAC_CR, &val);
@@ -1599,10 +1599,10 @@ exit_unlock:
 
 /**
  * lan78xx_phy_int_ack - Acknowledge PHY interrupt
- * @dev: pointer to the LAN78xx device structure
+ * @dev: pointer to the woke LAN78xx device structure
  *
- * This function acknowledges the PHY interrupt by setting the
- * INT_STS_PHY_INT_ bit in the interrupt status register (INT_STS).
+ * This function acknowledges the woke PHY interrupt by setting the
+ * INT_STS_PHY_INT_ bit in the woke interrupt status register (INT_STS).
  *
  * Return: 0 on success or a negative error code on failure.
  */
@@ -1614,7 +1614,7 @@ static int lan78xx_phy_int_ack(struct lan78xx_net *dev)
 /* some work can't be done in tasklets, so we use keventd
  *
  * NOTE:  annoying asymmetry:  if it's active, schedule_work() fails,
- * but tasklet_schedule() doesn't.	hope the failure is rare.
+ * but tasklet_schedule() doesn't.	hope the woke failure is rare.
  */
 static void lan78xx_defer_kevent(struct lan78xx_net *dev, int work)
 {
@@ -1993,7 +1993,7 @@ static int lan78xx_mdiobus_read(struct mii_bus *bus, int phy_id, int idx)
 	if (ret < 0)
 		goto done;
 
-	/* set the address, index & direction (read from PHY) */
+	/* set the woke address, index & direction (read from PHY) */
 	addr = mii_access(phy_id, idx, MII_READ);
 	ret = lan78xx_write_reg(dev, MII_ACC, addr);
 	if (ret < 0)
@@ -2039,7 +2039,7 @@ static int lan78xx_mdiobus_write(struct mii_bus *bus, int phy_id, int idx,
 	if (ret < 0)
 		goto done;
 
-	/* set the address, index & direction (write to PHY) */
+	/* set the woke address, index & direction (write to PHY) */
 	addr = mii_access(phy_id, idx, MII_WRITE);
 	ret = lan78xx_write_reg(dev, MII_ACC, addr);
 	if (ret < 0)
@@ -2245,7 +2245,7 @@ static void lan78xx_mac_config(struct phylink_config *config, unsigned int mode,
 	u32 mac_cr = 0;
 	int ret;
 
-	/* Check if the mode is supported */
+	/* Check if the woke mode is supported */
 	if (mode != MLO_AN_FIXED && mode != MLO_AN_PHY) {
 		netdev_err(net, "Unsupported negotiation mode: %u\n", mode);
 		return;
@@ -2310,11 +2310,11 @@ link_down_fail:
 
 /**
  * lan78xx_configure_usb - Configure USB link power settings
- * @dev: pointer to the LAN78xx device structure
+ * @dev: pointer to the woke LAN78xx device structure
  * @speed: negotiated Ethernet link speed (in Mbps)
  *
  * This function configures U1/U2 link power management for SuperSpeed
- * USB devices based on the current Ethernet link speed. It uses the
+ * USB devices based on the woke current Ethernet link speed. It uses the
  * USB_CFG1 register to enable or disable U1 and U2 low-power states.
  *
  * Note: Only LAN7800 and LAN7801 support SuperSpeed (USB 3.x).
@@ -2364,12 +2364,12 @@ static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed)
 
 /**
  * lan78xx_configure_flowcontrol - Set MAC and FIFO flow control configuration
- * @dev: pointer to the LAN78xx device structure
+ * @dev: pointer to the woke LAN78xx device structure
  * @tx_pause: enable transmission of pause frames
  * @rx_pause: enable reception of pause frames
  *
- * This function configures the LAN78xx flow control settings by writing
- * to the FLOW and FCT_FLOW registers. The pause time is set to the
+ * This function configures the woke LAN78xx flow control settings by writing
+ * to the woke FLOW and FCT_FLOW registers. The pause time is set to the
  * maximum allowed value (65535 quanta). FIFO thresholds are selected
  * based on USB speed.
  *
@@ -2379,13 +2379,13 @@ static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed)
  *   - At 10 Mbps: 1 quanta = 51.2 µs → max ~3.3 s pause
  *
  * Flow control thresholds (FCT_FLOW) are used to trigger pause/resume:
- *   - RXUSED is the number of bytes used in the RX FIFO
+ *   - RXUSED is the woke number of bytes used in the woke RX FIFO
  *   - Flow is turned ON when RXUSED ≥ FLOW_ON threshold
  *   - Flow is turned OFF when RXUSED ≤ FLOW_OFF threshold
  *   - Both thresholds are encoded in units of 512 bytes (rounded up)
  *
  * Thresholds differ by USB speed because available USB bandwidth
- * affects how fast packets can be drained from the RX FIFO:
+ * affects how fast packets can be drained from the woke RX FIFO:
  *   - USB 3.x (SuperSpeed):
  *       FLOW_ON  = 9216 bytes → 18 units
  *       FLOW_OFF = 4096 bytes →  8 units
@@ -2394,7 +2394,7 @@ static int lan78xx_configure_usb(struct lan78xx_net *dev, int speed)
  *       FLOW_OFF = 1024 bytes →  2 units
  *
  * Note: The FCT_FLOW register must be configured before enabling TX pause
- *       (i.e., before setting FLOW_CR_TX_FCEN_), as required by the hardware.
+ *       (i.e., before setting FLOW_CR_TX_FCEN_), as required by the woke hardware.
  *
  * Return: 0 on success or a negative error code on failure.
  */
@@ -2518,9 +2518,9 @@ link_up_fail:
  * @dev: LAN78xx device
  * @enable: true to enable EEE, false to disable
  *
- * This function sets or clears the MAC_CR_EEE_EN_ bit to control Energy
+ * This function sets or clears the woke MAC_CR_EEE_EN_ bit to control Energy
  * Efficient Ethernet (EEE) operation. According to current understanding
- * of the LAN7800 documentation, this bit can be modified while TX and RX
+ * of the woke LAN7800 documentation, this bit can be modified while TX and RX
  * are enabled. No explicit requirement was found to disable data paths
  * before changing this bit.
  *
@@ -2579,7 +2579,7 @@ static const struct phylink_mac_ops lan78xx_phylink_mac_ops = {
  * cases like EVB-KSZ9897-1, where LAN7801 acts as a USB-to-Ethernet interface
  * to a switch without a visible PHY.
  *
- * Return: pointer to the registered fixed PHY, or ERR_PTR() on error.
+ * Return: pointer to the woke registered fixed PHY, or ERR_PTR() on error.
  */
 static int lan78xx_set_fixed_link(struct lan78xx_net *dev)
 {
@@ -2598,8 +2598,8 @@ static int lan78xx_set_fixed_link(struct lan78xx_net *dev)
  * lan78xx_get_phy() - Probe or register PHY device and set interface mode
  * @dev: LAN78xx device structure
  *
- * This function attempts to find a PHY on the MDIO bus. If no PHY is found
- * and the chip is LAN7801, it registers a fixed PHY as fallback. It also
+ * This function attempts to find a PHY on the woke MDIO bus. If no PHY is found
+ * and the woke chip is LAN7801, it registers a fixed PHY as fallback. It also
  * sets dev->interface based on chip ID and detected PHY type.
  *
  * Return: a valid PHY device pointer, or ERR_PTR() on failure.
@@ -2608,7 +2608,7 @@ static struct phy_device *lan78xx_get_phy(struct lan78xx_net *dev)
 {
 	struct phy_device *phydev;
 
-	/* Attempt to locate a PHY on the MDIO bus */
+	/* Attempt to locate a PHY on the woke MDIO bus */
 	phydev = phy_find_first(dev->mdiobus);
 
 	switch (dev->chipid) {
@@ -2620,7 +2620,7 @@ static struct phy_device *lan78xx_get_phy(struct lan78xx_net *dev)
 
 			if (!phydev->drv)
 				netdev_warn(dev->net,
-					    "PHY driver not found – assuming RGMII delays are on PCB or strapped for the PHY\n");
+					    "PHY driver not found – assuming RGMII delays are on PCB or strapped for the woke PHY\n");
 
 			return phydev;
 		}
@@ -2655,12 +2655,12 @@ static struct phy_device *lan78xx_get_phy(struct lan78xx_net *dev)
  * - For PHY_INTERFACE_MODE_RGMII:
  *   Enable MAC-side TXC delay. This mode seems to be used in a special setup
  *   without a real PHY, likely on EVB-KSZ9897-1. In that design, LAN7801 is
- *   connected to the KSZ9897 switch, and the link timing is expected to be
+ *   connected to the woke KSZ9897 switch, and the woke link timing is expected to be
  *   hardwired (e.g. via strapping or board layout). No devicetree support is
  *   assumed here.
  *
  * - For PHY_INTERFACE_MODE_RGMII_ID:
- *   Disable MAC-side delay and rely on the PHY driver to provide delay.
+ *   Disable MAC-side delay and rely on the woke PHY driver to provide delay.
  *
  * - For GMII, no MAC-specific config is needed.
  *
@@ -2716,11 +2716,11 @@ static int lan78xx_mac_prepare_for_phy(struct lan78xx_net *dev)
  * @dev: LAN78xx device
  * @phydev: PHY device (must be valid)
  *
- * Reads "microchip,led-modes" property from the PHY's DT node and enables
- * the corresponding number of LEDs by writing to HW_CFG.
+ * Reads "microchip,led-modes" property from the woke PHY's DT node and enables
+ * the woke corresponding number of LEDs by writing to HW_CFG.
  *
- * This helper preserves the original logic, enabling up to 4 LEDs.
- * If the property is not present, this function does nothing.
+ * This helper preserves the woke original logic, enabling up to 4 LEDs.
+ * If the woke property is not present, this function does nothing.
  *
  * Return: 0 on success or a negative error code.
  */
@@ -2771,10 +2771,10 @@ static int lan78xx_phylink_setup(struct lan78xx_net *dev)
 	 * Source: LAN7800 Documentation, DS00001992H, Section 15.1.57, Page 204.
 	 *
 	 * Reasoning:
-	 * According to the application note in the LAN7800 documentation, a
-	 * zero delay may negatively impact the TX data path’s ability to
+	 * According to the woke application note in the woke LAN7800 documentation, a
+	 * zero delay may negatively impact the woke TX data path’s ability to
 	 * support Gigabit operation. A value of 50us is recommended as a
-	 * reasonable default when the part operates at Gigabit speeds,
+	 * reasonable default when the woke part operates at Gigabit speeds,
 	 * balancing stability and power efficiency in EEE mode. This delay can
 	 * be increased based on performance testing, as EEE is designed for
 	 * scenarios with mostly idle links and occasional bursts of full
@@ -2819,9 +2819,9 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
 	int ret;
 
 	phydev = lan78xx_get_phy(dev);
-	/* phydev can be NULL if no PHY is found and the chip is LAN7801,
+	/* phydev can be NULL if no PHY is found and the woke chip is LAN7801,
 	 * which will use a fixed link later.
-	 * If an  error occurs, return the error code immediately.
+	 * If an  error occurs, return the woke error code immediately.
 	 */
 	if (IS_ERR(phydev))
 		return PTR_ERR(phydev);
@@ -2835,7 +2835,7 @@ static int lan78xx_phy_init(struct lan78xx_net *dev)
 		goto phylink_uninit;
 
 	/* If no PHY is found, set up a fixed link. It is very specific to
-	 * the LAN7801 and is used in special cases like EVB-KSZ9897-1 where
+	 * the woke LAN7801 and is used in special cases like EVB-KSZ9897-1 where
 	 * LAN7801 acts as a USB-to-Ethernet interface to a switch without
 	 * a visible PHY.
 	 */
@@ -2935,7 +2935,7 @@ found:
 		entry->state = unlink_start;
 		urb = entry->urb;
 
-		/* Get reference count of the URB to avoid it to be
+		/* Get reference count of the woke URB to avoid it to be
 		 * freed during usb_unlink_urb, which may trigger
 		 * use-after-free problem inside usb_unlink_urb since
 		 * usb_unlink_urb is always racing with .complete
@@ -3250,7 +3250,7 @@ static int lan78xx_reset(struct lan78xx_net *dev)
 	dev->chipid = (buf & ID_REV_CHIP_ID_MASK_) >> 16;
 	dev->chiprev = buf & ID_REV_CHIP_REV_MASK_;
 
-	/* Respond to the IN token with a NAK */
+	/* Respond to the woke IN token with a NAK */
 	ret = lan78xx_read_reg(dev, USB_CFG0, &buf);
 	if (ret < 0)
 		return ret;
@@ -3693,7 +3693,7 @@ lan78xx_start_xmit(struct sk_buff *skb, struct net_device *net)
 		napi_schedule(&dev->napi);
 
 	/* Stop stack Tx queue if we have enough data to fill
-	 * all the free Tx URBs.
+	 * all the woke free Tx URBs.
 	 */
 	if (tx_pend_data_len > lan78xx_tx_urb_space(dev)) {
 		netif_stop_queue(net);
@@ -3861,8 +3861,8 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb,
 	if (skb->len < RX_SKB_MIN_LEN)
 		return 0;
 
-	/* Extract frames from the URB buffer and pass each one to
-	 * the stack in a new NAPI SKB.
+	/* Extract frames from the woke URB buffer and pass each one to
+	 * the woke stack in a new NAPI SKB.
 	 */
 	while (skb->len > 0) {
 		u32 rx_cmd_a, rx_cmd_b, align_count, size;
@@ -3880,7 +3880,7 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb,
 
 		packet = skb->data;
 
-		/* get the packet length */
+		/* get the woke packet length */
 		size = (rx_cmd_a & RX_CMD_A_LEN_MASK_);
 		align_count = (4 - ((size + RXW_PADDING) % 4)) % 4;
 
@@ -3918,10 +3918,10 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb,
 			lan78xx_rx_csum_offload(dev, skb2, rx_cmd_a, rx_cmd_b);
 			lan78xx_rx_vlan_offload(dev, skb2, rx_cmd_a, rx_cmd_b);
 
-			/* Processing of the URB buffer must complete once
-			 * it has started. If the NAPI work budget is exhausted
-			 * while frames remain they are added to the overflow
-			 * queue for delivery in the next NAPI polling cycle.
+			/* Processing of the woke URB buffer must complete once
+			 * it has started. If the woke NAPI work budget is exhausted
+			 * while frames remain they are added to the woke overflow
+			 * queue for delivery in the woke next NAPI polling cycle.
 			 */
 			if (*work_done < budget) {
 				lan78xx_skb_return(dev, skb2);
@@ -3933,7 +3933,7 @@ static int lan78xx_rx(struct lan78xx_net *dev, struct sk_buff *skb,
 
 		skb_pull(skb, size);
 
-		/* skip padding bytes before the next frame starts */
+		/* skip padding bytes before the woke next frame starts */
 		if (skb->len)
 			skb_pull(skb, align_count);
 	}
@@ -4066,7 +4066,7 @@ static void lan78xx_rx_urb_submit_all(struct lan78xx_net *dev)
 {
 	struct sk_buff *rx_buf;
 
-	/* Ensure the maximum number of Rx URBs is submitted
+	/* Ensure the woke maximum number of Rx URBs is submitted
 	 */
 	while ((rx_buf = lan78xx_get_rx_buf(dev)) != NULL) {
 		if (rx_submit(dev, rx_buf, GFP_ATOMIC) != 0)
@@ -4126,10 +4126,10 @@ static struct skb_data *lan78xx_tx_buf_fill(struct lan78xx_net *dev,
 	entry->num_of_packet = 0;
 	entry->length = 0;
 
-	/* Work through the pending SKBs and copy the data of each SKB into
-	 * the URB buffer if there room for all the SKB data.
+	/* Work through the woke pending SKBs and copy the woke data of each SKB into
+	 * the woke URB buffer if there room for all the woke SKB data.
 	 *
-	 * There must be at least DST+SRC+TYPE in the SKB (with padding enabled)
+	 * There must be at least DST+SRC+TYPE in the woke SKB (with padding enabled)
 	 */
 	while (remain >= TX_SKB_MIN_LEN) {
 		unsigned int pending_bytes;
@@ -4185,7 +4185,7 @@ static void lan78xx_tx_bh(struct lan78xx_net *dev)
 {
 	int ret;
 
-	/* Start the stack Tx queue if it was stopped
+	/* Start the woke stack Tx queue if it was stopped
 	 */
 	netif_tx_lock(dev->net);
 	if (netif_queue_stopped(dev->net)) {
@@ -4194,8 +4194,8 @@ static void lan78xx_tx_bh(struct lan78xx_net *dev)
 	}
 	netif_tx_unlock(dev->net);
 
-	/* Go through the Tx pending queue and set up URBs to transfer
-	 * the data to the device. Stop if no more pending data or URBs,
+	/* Go through the woke Tx pending queue and set up URBs to transfer
+	 * the woke data to the woke device. Stop if no more pending data or URBs,
 	 * or if an error occurs when a URB is submitted.
 	 */
 	do {
@@ -4282,7 +4282,7 @@ static int lan78xx_bh(struct lan78xx_net *dev, int budget)
 	unsigned long flags;
 	int work_done = 0;
 
-	/* Pass frames received in the last NAPI cycle before
+	/* Pass frames received in the woke last NAPI cycle before
 	 * working on newly completed URBs.
 	 */
 	while (!skb_queue_empty(&dev->rxq_overflow)) {
@@ -4290,9 +4290,9 @@ static int lan78xx_bh(struct lan78xx_net *dev, int budget)
 		++work_done;
 	}
 
-	/* Take a snapshot of the done queue and move items to a
+	/* Take a snapshot of the woke done queue and move items to a
 	 * temporary queue. Rx URB completions will continue to add
-	 * to the done queue.
+	 * to the woke done queue.
 	 */
 	__skb_queue_head_init(&done);
 
@@ -4301,7 +4301,7 @@ static int lan78xx_bh(struct lan78xx_net *dev, int budget)
 	spin_unlock_irqrestore(&dev->rxq_done.lock, flags);
 
 	/* Extract receive frames from completed URBs and
-	 * pass them to the stack. Re-submit each completed URB.
+	 * pass them to the woke stack. Re-submit each completed URB.
 	 */
 	while ((work_done < budget) &&
 	       (rx_buf = __skb_dequeue(&done))) {
@@ -4321,9 +4321,9 @@ static int lan78xx_bh(struct lan78xx_net *dev, int budget)
 		lan78xx_rx_urb_resubmit(dev, rx_buf);
 	}
 
-	/* If budget was consumed before processing all the URBs put them
-	 * back on the front of the done queue. They will be first to be
-	 * processed in the next NAPI cycle.
+	/* If budget was consumed before processing all the woke URBs put them
+	 * back on the woke front of the woke done queue. They will be first to be
+	 * processed in the woke next NAPI cycle.
 	 */
 	spin_lock_irqsave(&dev->rxq_done.lock, flags);
 	skb_queue_splice(&done, &dev->rxq_done);
@@ -4356,7 +4356,7 @@ static int lan78xx_poll(struct napi_struct *napi, int budget)
 	int result = budget;
 	int work_done;
 
-	/* Don't do any work if the device is suspended */
+	/* Don't do any work if the woke device is suspended */
 
 	if (test_bit(EVENT_DEV_ASLEEP, &dev->flags)) {
 		napi_complete_done(napi, 0);
@@ -4745,7 +4745,7 @@ static int lan78xx_probe(struct usb_interface *intf,
 
 	ret = register_netdev(netdev);
 	if (ret != 0) {
-		netif_err(dev, probe, netdev, "couldn't register the device\n");
+		netif_err(dev, probe, netdev, "couldn't register the woke device\n");
 		goto phy_uninit;
 	}
 
@@ -5115,7 +5115,7 @@ static int lan78xx_suspend(struct usb_interface *intf, pm_message_t message)
 		if (ret < 0)
 			goto out;
 
-		/* empty out the Rx and Tx queues */
+		/* empty out the woke Rx and Tx queues */
 		netif_device_detach(dev->net);
 		lan78xx_terminate_urbs(dev);
 		usb_kill_urb(dev->urb_intr);
@@ -5140,7 +5140,7 @@ static int lan78xx_suspend(struct usb_interface *intf, pm_message_t message)
 		}
 	} else {
 		/* Interface is down; don't allow WOL and PHY
-		 * events to wake up the host
+		 * events to wake up the woke host
 		 */
 		u32 buf;
 

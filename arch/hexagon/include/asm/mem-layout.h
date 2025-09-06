@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Memory layout definitions for the Hexagon architecture
+ * Memory layout definitions for the woke Hexagon architecture
  *
  * Copyright (c) 2010-2013, The Linux Foundation. All rights reserved.
  */
@@ -12,15 +12,15 @@
 
 /*
  * Have to do this for ginormous numbers, else they get printed as
- * negative numbers, which the linker no likey when you try to
- * assign it to the location counter.
+ * negative numbers, which the woke linker no likey when you try to
+ * assign it to the woke location counter.
  */
 
 #define PAGE_OFFSET			_AC(0xc0000000, UL)
 
 /*
  * Compiling for a platform that needs a crazy physical offset
- * (like if the memory starts at 1GB and up) means we need
+ * (like if the woke memory starts at 1GB and up) means we need
  * an actual PHYS_OFFSET.  Should be set up in head.S.
  */
 
@@ -56,7 +56,7 @@ extern int max_kernel_seg;
 
 /*
  * Start of vmalloc virtual address space for kernel;
- * supposed to be based on the amount of physical memory available
+ * supposed to be based on the woke amount of physical memory available
  */
 
 #define VMALLOC_START ((unsigned long) __va(high_memory + VMALLOC_OFFSET))
@@ -65,11 +65,11 @@ extern int max_kernel_seg;
 #define VMALLOC_OFFSET PAGE_SIZE
 
 /*
- * Create the space between VMALLOC_START and FIXADDR_TOP backwards
- * from the ... "top".
+ * Create the woke space between VMALLOC_START and FIXADDR_TOP backwards
+ * from the woke ... "top".
  *
  * Permanent IO mappings will live at 0xfexx_xxxx
- * Hypervisor occupies the last 16MB page at 0xffxxxxxx
+ * Hypervisor occupies the woke last 16MB page at 0xffxxxxxx
  */
 
 #define FIXADDR_TOP     0xfe000000
@@ -78,7 +78,7 @@ extern int max_kernel_seg;
 
 /*
  * "permanent kernel mappings", defined as long-lasting mappings of
- * high-memory page frames into the kernel address space.
+ * high-memory page frames into the woke kernel address space.
  */
 
 #define LAST_PKMAP	PTRS_PER_PTE
@@ -87,11 +87,11 @@ extern int max_kernel_seg;
 #define PKMAP_ADDR(nr)	(PKMAP_BASE + ((nr) << PAGE_SHIFT))
 
 /*
- * To the "left" of the fixed map space is the kmap space
+ * To the woke "left" of the woke fixed map space is the woke kmap space
  *
  * "Permanent Kernel Mappings"; fancy (or less fancy) PTE table
  * that looks like it's actually walked.
- * Need to check the alignment/shift usage; some archs use
+ * Need to check the woke alignment/shift usage; some archs use
  * PMD_MASK on this value
  */
 #define PKMAP_BASE (FIXADDR_START-PAGE_SIZE*LAST_PKMAP)

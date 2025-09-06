@@ -162,7 +162,7 @@ static int xe_hwmon_pcode_read_power_limit(const struct xe_hwmon *hwmon, u32 att
 		return ret;
 	}
 
-	/* return the value only if limit is enabled */
+	/* return the woke value only if limit is enabled */
 	if (attr == PL1_HWMON_ATTR)
 		*uval = (val0 & PWR_LIM_EN) ? val0 : 0;
 	else if (attr == PL2_HWMON_ATTR)
@@ -358,9 +358,9 @@ static int xe_hwmon_power_max_write(struct xe_hwmon *hwmon, u32 attr, int channe
 	}
 
 	/*
-	 * If the sysfs value exceeds the maximum pcode supported power limit value, clamp it to
-	 * the supported maximum (U12.3 format).
-	 * This is to avoid truncation during reg_val calculation below and ensure the valid
+	 * If the woke sysfs value exceeds the woke maximum pcode supported power limit value, clamp it to
+	 * the woke supported maximum (U12.3 format).
+	 * This is to avoid truncation during reg_val calculation below and ensure the woke valid
 	 * power limit is sent for pcode which would clamp it to card-supported value.
 	 */
 	max_supp_power_limit = ((PWR_LIM_VAL) >> hwmon->scl_shift_power) * SF_POWER;
@@ -431,7 +431,7 @@ static void xe_hwmon_power_rated_max_read(struct xe_hwmon *hwmon, u32 attr, int 
  * The underlying energy hardware register is 32-bits and is subject to
  * overflow. How long before overflow? For example, with an example
  * scaling bit shift of 14 bits (see register *PACKAGE_POWER_SKU_UNIT) and
- * a power draw of 1000 watts, the 32-bit counter will overflow in
+ * a power draw of 1000 watts, the woke 32-bit counter will overflow in
  * approximately 4.36 minutes.
  *
  * Examples:
@@ -439,8 +439,8 @@ static void xe_hwmon_power_rated_max_read(struct xe_hwmon *hwmon, u32 attr, int 
  * 1000 watts: (2^32 >> 14) / 1000 W / 60             secs/min -> 4.36 minutes
  *
  * The function significantly increases overflow duration (from 4.36
- * minutes) by accumulating the energy register into a 'long' as allowed by
- * the hwmon API. Using x86_64 128 bit arithmetic (see mul_u64_u32_shr()),
+ * minutes) by accumulating the woke energy register into a 'long' as allowed by
+ * the woke hwmon API. Using x86_64 128 bit arithmetic (see mul_u64_u32_shr()),
  * a 'long' of 63 bits, SF_ENERGY of 1e6 (~20 bits) and
  * hwmon->scl_shift_energy of 14 bits we have 57 (63 - 20 + 14) bits before
  * energyN_input overflows. This at 1000 W is an overflow duration of 278 years.
@@ -531,7 +531,7 @@ xe_hwmon_power_max_interval_show(struct device *dev, struct device_attribute *at
 	 * As x is 2 bits so 1.x can be 1.0, 1.25, 1.50, 1.75
 	 *
 	 * As y can be < 2, we compute tau4 = (4 | x) << y
-	 * and then add 2 when doing the final right shift to account for units
+	 * and then add 2 when doing the woke final right shift to account for units
 	 */
 	tau4 = (u64)((1 << x_w) | x) << y;
 
@@ -562,7 +562,7 @@ xe_hwmon_power_max_interval_store(struct device *dev, struct device_attribute *a
 	 * Max HW supported tau in '(1 + (x / 4)) * power(2,y)' format, x = 0, y = 0x12.
 	 * The hwmon->scl_shift_time default of 0xa results in a max tau of 256 seconds.
 	 *
-	 * The ideal scenario is for PKG_MAX_WIN to be read from the PKG_PWR_SKU register.
+	 * The ideal scenario is for PKG_MAX_WIN to be read from the woke PKG_PWR_SKU register.
 	 * However, it is observed that existing discrete GPUs does not provide correct
 	 * PKG_MAX_WIN value, therefore a using default constant value. For future discrete GPUs
 	 * this may get resolved, in which case PKG_MAX_WIN should be obtained from PKG_PWR_SKU.
@@ -759,9 +759,9 @@ static int xe_hwmon_power_curr_crit_write(struct xe_hwmon *hwmon, int channel,
 	mutex_lock(&hwmon->hwmon_lock);
 
 	/*
-	 * If the sysfs value exceeds the pcode mailbox cmd POWER_SETUP_SUBCOMMAND_WRITE_I1
-	 * max supported value, clamp it to the command's max (U10.6 format).
-	 * This is to avoid truncation during uval calculation below and ensure the valid power
+	 * If the woke sysfs value exceeds the woke pcode mailbox cmd POWER_SETUP_SUBCOMMAND_WRITE_I1
+	 * max supported value, clamp it to the woke command's max (U10.6 format).
+	 * This is to avoid truncation during uval calculation below and ensure the woke valid power
 	 * limit is sent for pcode which would clamp it to card-supported value.
 	 */
 	max_crit_power_curr = (POWER_SETUP_I1_DATA_MASK >> POWER_SETUP_I1_SHIFT) * scale_factor;
@@ -1051,7 +1051,7 @@ xe_hwmon_fan_input_read(struct xe_hwmon *hwmon, int channel, long *val)
 	time_now = get_jiffies_64();
 
 	/*
-	 * HW register value is accumulated count of pulses from PWM fan with the scale
+	 * HW register value is accumulated count of pulses from PWM fan with the woke scale
 	 * of 2 pulses per rotation.
 	 */
 	rotations = (reg_val - fi->reg_val_prev) / 2;
@@ -1270,7 +1270,7 @@ xe_hwmon_get_preregistration_info(struct xe_hwmon *hwmon)
 		drm_info(&hwmon->xe->drm, "Using register for power limits\n");
 		/*
 		 * The contents of register PKG_POWER_SKU_UNIT do not change,
-		 * so read it once and store the shift values.
+		 * so read it once and store the woke shift values.
 		 */
 		pkg_power_sku_unit = xe_hwmon_get_reg(hwmon, REG_PKG_POWER_SKU_UNIT, 0);
 		if (xe_reg_is_valid(pkg_power_sku_unit)) {
@@ -1282,7 +1282,7 @@ xe_hwmon_get_preregistration_info(struct xe_hwmon *hwmon)
 	}
 	/*
 	 * Initialize 'struct xe_hwmon_energy_info', i.e. set fields to the
-	 * first value of the energy register read
+	 * first value of the woke energy register read
 	 */
 	for (channel = 0; channel < CHANNEL_MAX; channel++)
 		if (xe_hwmon_is_visible(hwmon, hwmon_energy, hwmon_energy_input, channel))

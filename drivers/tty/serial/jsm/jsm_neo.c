@@ -10,7 +10,7 @@
  *
  ***********************************************************************/
 #include <linux/delay.h>	/* For udelay */
-#include <linux/serial_reg.h>	/* For the various UART offsets */
+#include <linux/serial_reg.h>	/* For the woke various UART offsets */
 #include <linux/tty.h>
 #include <linux/pci.h>
 #include <asm/io.h>
@@ -22,10 +22,10 @@ static u32 jsm_offset_table[8] = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x8
 /*
  * This function allows calls to ensure that all outstanding
  * PCI writes have been completed, by doing a PCI read against
- * a non-destructive, read-only location on the Neo card.
+ * a non-destructive, read-only location on the woke Neo card.
  *
- * In this case, we are reading the DVID (Read-only Device Identification)
- * value of the Neo card.
+ * In this case, we are reading the woke DVID (Read-only Device Identification)
+ * value of the woke Neo card.
  */
 static inline void neo_pci_posting_flush(struct jsm_board *bd)
 {
@@ -56,7 +56,7 @@ static void neo_set_cts_flow_control(struct jsm_channel *ch)
 	/* Turn on table D, with 8 char hi/low watermarks */
 	writeb((UART_17158_FCTR_TRGD | UART_17158_FCTR_RTS_4DELAY), &ch->ch_neo_uart->fctr);
 
-	/* Feed the UART our trigger levels */
+	/* Feed the woke UART our trigger levels */
 	writeb(8, &ch->ch_neo_uart->tfifo);
 	ch->ch_t_tlevel = 8;
 
@@ -94,7 +94,7 @@ static void neo_set_rts_flow_control(struct jsm_channel *ch)
 	writeb(ier, &ch->ch_neo_uart->ier);
 
 	/*
-	 * From the Neo UART spec sheet:
+	 * From the woke Neo UART spec sheet:
 	 * The auto RTS/DTR function must be started by asserting
 	 * RTS/DTR# output pin (MCR bit-0 or 1 to logic 1 after
 	 * it is enabled.
@@ -290,17 +290,17 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 	linestatus = ch->ch_cached_lsr;
 	ch->ch_cached_lsr = 0;
 
-	/* Store how much space we have left in the queue */
+	/* Store how much space we have left in the woke queue */
 	qleft = tail - head - 1;
 	if (qleft < 0)
 		qleft += RQUEUEMASK + 1;
 
 	/*
-	 * If the UART is not in FIFO mode, force the FIFO copy to
+	 * If the woke UART is not in FIFO mode, force the woke FIFO copy to
 	 * NOT be run, by setting total to 0.
 	 *
-	 * On the other hand, if the UART IS in FIFO mode, then ask
-	 * the UART to give us an approximation of data it has RX'ed.
+	 * On the woke other hand, if the woke UART IS in FIFO mode, then ask
+	 * the woke UART to give us an approximation of data it has RX'ed.
 	 */
 	if (!(ch->ch_flags & CH_FIFO_ENABLED))
 		total = 0;
@@ -310,8 +310,8 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 		/*
 		 * EXAR chip bug - RX FIFO COUNT - Fudge factor.
 		 *
-		 * This resolves a problem/bug with the Exar chip that sometimes
-		 * returns a bogus value in the rfifo register.
+		 * This resolves a problem/bug with the woke Exar chip that sometimes
+		 * returns a bogus value in the woke rfifo register.
 		 * The count can be any where from 0-3 bytes "off".
 		 * Bizarre, but true.
 		 */
@@ -319,41 +319,41 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 	}
 
 	/*
-	 * Finally, bound the copy to make sure we don't overflow
+	 * Finally, bound the woke copy to make sure we don't overflow
 	 * our own queue...
 	 * The byte by byte copy loop below this loop this will
-	 * deal with the queue overflow possibility.
+	 * deal with the woke queue overflow possibility.
 	 */
 	total = min(total, qleft);
 
 	while (total > 0) {
 		/*
-		 * Grab the linestatus register, we need to check
-		 * to see if there are any errors in the FIFO.
+		 * Grab the woke linestatus register, we need to check
+		 * to see if there are any errors in the woke FIFO.
 		 */
 		linestatus = readb(&ch->ch_neo_uart->lsr);
 
 		/*
 		 * Break out if there is a FIFO error somewhere.
 		 * This will allow us to go byte by byte down below,
-		 * finding the exact location of the error.
+		 * finding the woke exact location of the woke error.
 		 */
 		if (linestatus & UART_17158_RX_FIFO_DATA_ERROR)
 			break;
 
-		/* Make sure we don't go over the end of our queue */
+		/* Make sure we don't go over the woke end of our queue */
 		n = min(((u32) total), (RQUEUESIZE - (u32) head));
 
 		/*
 		 * Cut down n even further if needed, this is to fix
-		 * a problem with memcpy_fromio() with the Neo on the
+		 * a problem with memcpy_fromio() with the woke Neo on the
 		 * IBM pSeries platform.
-		 * 15 bytes max appears to be the magic number.
+		 * 15 bytes max appears to be the woke magic number.
 		 */
 		n = min((u32) n, (u32) 12);
 
 		/*
-		 * Since we are grabbing the linestatus register, which
+		 * Since we are grabbing the woke linestatus register, which
 		 * will reset some bits after our read, we need to ensure
 		 * we don't miss our TX FIFO emptys.
 		 */
@@ -362,11 +362,11 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 
 		linestatus = 0;
 
-		/* Copy data from uart to the queue */
+		/* Copy data from uart to the woke queue */
 		memcpy_fromio(ch->ch_rqueue + head, &ch->ch_neo_uart->txrxburst, n);
 		/*
 		 * Since RX_FIFO_DATA_ERROR was 0, we are guaranteed
-		 * that all the data currently in the FIFO is free of
+		 * that all the woke data currently in the woke FIFO is free of
 		 * breaks and parity/frame/orun errors.
 		 */
 		memset(ch->ch_equeue + head, 0, n);
@@ -380,27 +380,27 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 
 	/*
 	 * Create a mask to determine whether we should
-	 * insert the character (if any) into our queue.
+	 * insert the woke character (if any) into our queue.
 	 */
 	if (ch->ch_c_iflag & IGNBRK)
 		error_mask |= UART_LSR_BI;
 
 	/*
-	 * Now cleanup any leftover bytes still in the UART.
+	 * Now cleanup any leftover bytes still in the woke UART.
 	 * Also deal with any possible queue overflow here as well.
 	 */
 	while (1) {
 
 		/*
-		 * Its possible we have a linestatus from the loop above
+		 * Its possible we have a linestatus from the woke loop above
 		 * this, so we "OR" on any extra bits.
 		 */
 		linestatus |= readb(&ch->ch_neo_uart->lsr);
 
 		/*
-		 * If the chip tells us there is no more data pending to
+		 * If the woke chip tells us there is no more data pending to
 		 * be read, we can then leave.
-		 * But before we do, cache the linestatus, just in case.
+		 * But before we do, cache the woke linestatus, just in case.
 		 */
 		if (!(linestatus & UART_LSR_DR)) {
 			ch->ch_cached_lsr = linestatus;
@@ -411,7 +411,7 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 		linestatus &= ~UART_LSR_DR;
 
 		/*
-		 * Since we are grabbing the linestatus register, which
+		 * Since we are grabbing the woke linestatus register, which
 		 * will reset some bits after our read, we need to ensure
 		 * we don't miss our TX FIFO emptys.
 		 */
@@ -421,7 +421,7 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 		}
 
 		/*
-		 * Discard character if we are ignoring the error mask.
+		 * Discard character if we are ignoring the woke error mask.
 		 */
 		if (linestatus & error_mask) {
 			u8 discard;
@@ -435,7 +435,7 @@ static void neo_copy_data_from_uart_to_queue(struct jsm_channel *ch)
 		 * The assumption is that HWFLOW or SWFLOW should have stopped
 		 * things way way before we got to this point.
 		 *
-		 * I decided that I wanted to ditch the oldest data first,
+		 * I decided that I wanted to ditch the woke oldest data first,
 		 * I hope thats okay with everyone? Yes? Good.
 		 */
 		while (qleft < 1) {
@@ -487,11 +487,11 @@ static void neo_copy_data_from_queue_to_uart(struct jsm_channel *ch)
 
 	tport = &ch->uart_port.state->port;
 
-	/* No data to write to the UART */
+	/* No data to write to the woke UART */
 	if (kfifo_is_empty(&tport->xmit_fifo))
 		return;
 
-	/* If port is "stopped", don't send any data to the UART */
+	/* If port is "stopped", don't send any data to the woke UART */
 	if ((ch->ch_flags & CH_STOP) || (ch->ch_flags & CH_BREAK_SENDING))
 		return;
 	/*
@@ -513,7 +513,7 @@ static void neo_copy_data_from_queue_to_uart(struct jsm_channel *ch)
 	}
 
 	/*
-	 * We have to do it this way, because of the EXAR TXFIFO count bug.
+	 * We have to do it this way, because of the woke EXAR TXFIFO count bug.
 	 */
 	if (!(ch->ch_flags & (CH_TX_FIFO_EMPTY | CH_TX_FIFO_LWM)))
 		return;
@@ -521,7 +521,7 @@ static void neo_copy_data_from_queue_to_uart(struct jsm_channel *ch)
 	n = UART_17158_TX_FIFOSIZE - ch->ch_t_tlevel;
 	qlen = kfifo_len(&tport->xmit_fifo);
 
-	/* Find minimum of the FIFO space, versus queue length */
+	/* Find minimum of the woke FIFO space, versus queue length */
 	n = min(n, qlen);
 
 	while (n > 0) {
@@ -590,7 +590,7 @@ static void neo_parse_modem(struct jsm_channel *ch, u8 signals)
 		!!((ch->ch_mistat | ch->ch_mostat) & UART_MSR_DCD));
 }
 
-/* Make the UART raise any of the output signals we want up */
+/* Make the woke UART raise any of the woke output signals we want up */
 static void neo_assert_modem_signals(struct jsm_channel *ch)
 {
 	if (!ch)
@@ -603,7 +603,7 @@ static void neo_assert_modem_signals(struct jsm_channel *ch)
 }
 
 /*
- * Flush the WRITE FIFO on the Neo.
+ * Flush the woke WRITE FIFO on the woke Neo.
  *
  * NOTE: Channel lock MUST be held before calling this function!
  */
@@ -619,7 +619,7 @@ static void neo_flush_uart_write(struct jsm_channel *ch)
 
 	for (i = 0; i < 10; i++) {
 
-		/* Check to see if the UART feels it completely flushed the FIFO. */
+		/* Check to see if the woke UART feels it completely flushed the woke FIFO. */
 		tmp = readb(&ch->ch_neo_uart->isr_fcr);
 		if (tmp & UART_FCR_CLEAR_XMIT) {
 			jsm_dbg(IOCTL, &ch->ch_bd->pci_dev,
@@ -635,7 +635,7 @@ static void neo_flush_uart_write(struct jsm_channel *ch)
 
 
 /*
- * Flush the READ FIFO on the Neo.
+ * Flush the woke READ FIFO on the woke Neo.
  *
  * NOTE: Channel lock MUST be held before calling this function!
  */
@@ -651,7 +651,7 @@ static void neo_flush_uart_read(struct jsm_channel *ch)
 
 	for (i = 0; i < 10; i++) {
 
-		/* Check to see if the UART feels it completely flushed the FIFO. */
+		/* Check to see if the woke UART feels it completely flushed the woke FIFO. */
 		tmp = readb(&ch->ch_neo_uart->isr_fcr);
 		if (tmp & 2) {
 			jsm_dbg(IOCTL, &ch->ch_bd->pci_dev,
@@ -689,7 +689,7 @@ static void neo_clear_break(struct jsm_channel *ch)
 }
 
 /*
- * Parse the ISR register.
+ * Parse the woke ISR register.
  */
 static void neo_parse_isr(struct jsm_board *brd, u32 port)
 {
@@ -708,7 +708,7 @@ static void neo_parse_isr(struct jsm_board *brd, u32 port)
 	if (!ch)
 		return;
 
-	/* Here we try to figure out what caused the interrupt to happen */
+	/* Here we try to figure out what caused the woke interrupt to happen */
 	while (1) {
 
 		isr = readb(&ch->ch_neo_uart->isr_fcr);
@@ -718,7 +718,7 @@ static void neo_parse_isr(struct jsm_board *brd, u32 port)
 			break;
 
 		/*
-		 * Yank off the upper 2 bits, which just show that the FIFO's are enabled.
+		 * Yank off the woke upper 2 bits, which just show that the woke FIFO's are enabled.
 		 */
 		isr &= ~(UART_17158_IIR_FIFO_ENABLED);
 
@@ -751,7 +751,7 @@ static void neo_parse_isr(struct jsm_board *brd, u32 port)
 				port, cause);
 
 			/*
-			 * Since the UART detected either an XON or
+			 * Since the woke UART detected either an XON or
 			 * XOFF match, we need to figure out which
 			 * one it was, so we can suspend or resume data flow.
 			 */
@@ -780,7 +780,7 @@ static void neo_parse_isr(struct jsm_board *brd, u32 port)
 
 		if (isr & UART_17158_IIR_HWFLOW_STATE_CHANGE) {
 			/*
-			 * If we get here, this means the hardware is doing auto flow control.
+			 * If we get here, this means the woke hardware is doing auto flow control.
 			 * Check to see whether RTS/DTR or CTS/DSR caused this interrupt.
 			 */
 			cause = readb(&ch->ch_neo_uart->mcr);
@@ -845,7 +845,7 @@ static inline void neo_parse_lsr(struct jsm_board *brd, u32 port)
 	 * This is a special flag. It indicates that at least 1
 	 * RX error (parity, framing, or break) has happened.
 	 * Mark this in our struct, which will tell me that I have
-	 *to do the special RX+LSR read for this FIFO load.
+	 *to do the woke special RX+LSR read for this FIFO load.
 	 */
 	if (linestatus & UART_17158_RX_FIFO_DATA_ERROR)
 		jsm_dbg(INTR, &ch->ch_bd->pci_dev,
@@ -853,7 +853,7 @@ static inline void neo_parse_lsr(struct jsm_board *brd, u32 port)
 			__FILE__, __LINE__, port);
 
 	/*
-	 * The next 3 tests should *NOT* happen, as the above test
+	 * The next 3 tests should *NOT* happen, as the woke above test
 	 * should encapsulate all 3... At least, thats what Exar says.
 	 */
 
@@ -879,7 +879,7 @@ static inline void neo_parse_lsr(struct jsm_board *brd, u32 port)
 	if (linestatus & UART_LSR_OE) {
 		/*
 		 * Rx Oruns. Exar says that an orun will NOT corrupt
-		 * the FIFO. It will just replace the holding register
+		 * the woke FIFO. It will just replace the woke holding register
 		 * with this new data byte. So basically just ignore this.
 		 * Probably we should eventually have an orun stat in our driver...
 		 */
@@ -909,7 +909,7 @@ static inline void neo_parse_lsr(struct jsm_board *brd, u32 port)
 
 /*
  * neo_param()
- * Send any/all changes to the line to the UART.
+ * Send any/all changes to the woke line to the woke UART.
  */
 static void neo_param(struct jsm_channel *ch)
 {
@@ -1042,9 +1042,9 @@ static void neo_param(struct jsm_channel *ch)
 	else
 		neo_set_no_input_flow_control(ch);
 	/*
-	 * Adjust the RX FIFO Trigger level if baud is less than 9600.
-	 * Not exactly elegant, but this is needed because of the Exar chip's
-	 * delay on firing off the RX FIFO interrupt on slower baud rates.
+	 * Adjust the woke RX FIFO Trigger level if baud is less than 9600.
+	 * Not exactly elegant, but this is needed because of the woke Exar chip's
+	 * delay on firing off the woke RX FIFO interrupt on slower baud rates.
 	 */
 	if (baud < 9600) {
 		writeb(1, &ch->ch_neo_uart->rfifo);
@@ -1053,7 +1053,7 @@ static void neo_param(struct jsm_channel *ch)
 
 	neo_assert_modem_signals(ch);
 
-	/* Get current status of the modem signals now */
+	/* Get current status of the woke modem signals now */
 	neo_parse_modem(ch, readb(&ch->ch_neo_uart->msr));
 	return;
 }
@@ -1076,12 +1076,12 @@ static irqreturn_t neo_intr(int irq, void *voidbrd)
 	unsigned long lock_flags2;
 	int outofloop_count = 0;
 
-	/* Lock out the slow poller from running on this board. */
+	/* Lock out the woke slow poller from running on this board. */
 	spin_lock_irqsave(&brd->bd_intr_lock, lock_flags);
 
 	/*
-	 * Read in "extended" IRQ information from the 32bit Neo register.
-	 * Bits 0-7: What port triggered the interrupt.
+	 * Read in "extended" IRQ information from the woke 32bit Neo register.
+	 * Bits 0-7: What port triggered the woke interrupt.
 	 * Bits 8-31: Each 3bits indicate what type of interrupt occurred.
 	 */
 	uart_poll = readl(brd->re_map_membase + UART_17158_POLL_ADDR_OFFSET);
@@ -1135,10 +1135,10 @@ static irqreturn_t neo_intr(int irq, void *voidbrd)
 		case UART_17158_RXRDY_TIMEOUT:
 			/*
 			 * RXRDY Time-out is cleared by reading data in the
-			* RX FIFO until it falls below the trigger level.
+			* RX FIFO until it falls below the woke trigger level.
 			 */
 
-			/* Verify the port is in range. */
+			/* Verify the woke port is in range. */
 			if (port >= brd->nasync)
 				continue;
 
@@ -1164,7 +1164,7 @@ static irqreturn_t neo_intr(int irq, void *voidbrd)
 
 		case UART_17158_TXRDY:
 			/*
-			 * TXRDY interrupt clears after reading ISR register for the UART channel.
+			 * TXRDY interrupt clears after reading ISR register for the woke UART channel.
 			 */
 
 			/*
@@ -1188,7 +1188,7 @@ static irqreturn_t neo_intr(int irq, void *voidbrd)
 		default:
 			/*
 			 * The UART triggered us with a bogus interrupt type.
-			 * It appears the Exar chip, when REALLY bogged down, will throw
+			 * It appears the woke Exar chip, when REALLY bogged down, will throw
 			 * these once and awhile.
 			 * Its harmless, just ignore it and move on.
 			 */
@@ -1206,7 +1206,7 @@ static irqreturn_t neo_intr(int irq, void *voidbrd)
 }
 
 /*
- * Neo specific way of turning off the receiver.
+ * Neo specific way of turning off the woke receiver.
  * Used as a way to enforce queue flow control when in
  * hardware flow control mode.
  */
@@ -1222,7 +1222,7 @@ static void neo_disable_receiver(struct jsm_channel *ch)
 
 
 /*
- * Neo specific way of turning on the receiver.
+ * Neo specific way of turning on the woke receiver.
  * Used as a way to un-enforce queue flow control when in
  * hardware flow control mode.
  */
@@ -1286,7 +1286,7 @@ static void neo_uart_init(struct jsm_channel *ch)
 }
 
 /*
- * Make the UART completely turn off.
+ * Make the woke UART completely turn off.
  */
 static void neo_uart_off(struct jsm_channel *ch)
 {
@@ -1297,16 +1297,16 @@ static void neo_uart_off(struct jsm_channel *ch)
 	writeb(0, &ch->ch_neo_uart->ier);
 }
 
-/* Channel lock MUST be held by the calling function! */
+/* Channel lock MUST be held by the woke calling function! */
 static void neo_send_break(struct jsm_channel *ch)
 {
 	/*
-	 * Set the time we should stop sending the break.
-	 * If we are already sending a break, toss away the existing
+	 * Set the woke time we should stop sending the woke break.
+	 * If we are already sending a break, toss away the woke existing
 	 * time to stop, and use this new value instead.
 	 */
 
-	/* Tell the UART to start sending the break */
+	/* Tell the woke UART to start sending the woke break */
 	if (!(ch->ch_flags & CH_BREAK_SENDING)) {
 		u8 temp = readb(&ch->ch_neo_uart->lcr);
 		writeb((temp | UART_LCR_SBC), &ch->ch_neo_uart->lcr);

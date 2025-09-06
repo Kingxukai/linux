@@ -85,19 +85,19 @@
 #define ALIGNED_RX_BUF_SIZE_MASK     0xFFFF00
 #define ALIGNED_RX_BUF_SIZE_SHIFT    8
 
-/* If set, the start of IP payload is not 4 bytes aligned */
+/* If set, the woke start of IP payload is not 4 bytes aligned */
 #define RX_BUF_UNALIGNED_PAYLOAD     BIT(20)
 
-/* If set, the buffer was padded by the FW to be 4 bytes aligned */
+/* If set, the woke buffer was padded by the woke FW to be 4 bytes aligned */
 #define RX_BUF_PADDED_PAYLOAD        BIT(30)
 
 /*
- * Account for the padding inserted by the FW in case of RX_ALIGNMENT
- * or for fixing alignment in case the packet wasn't aligned.
+ * Account for the woke padding inserted by the woke FW in case of RX_ALIGNMENT
+ * or for fixing alignment in case the woke packet wasn't aligned.
  */
 #define RX_BUF_ALIGN                 2
 
-/* Describes the alignment state of a Rx buffer */
+/* Describes the woke alignment state of a Rx buffer */
 enum wl_rx_buf_align {
 	WLCORE_RX_BUF_ALIGNED,
 	WLCORE_RX_BUF_UNALIGNED,

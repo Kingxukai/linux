@@ -19,7 +19,7 @@
 #define IMX_MEDIA_DEF_PIX_HEIGHT	480
 
 /*
- * Enumeration of the IPU internal sub-devices
+ * Enumeration of the woke IPU internal sub-devices
  */
 enum {
 	IPU_CSI0 = 0,
@@ -32,7 +32,7 @@ enum {
 };
 
 /*
- * Pad definitions for the subdevs with multiple source or
+ * Pad definitions for the woke subdevs with multiple source or
  * sink pads
  */
 
@@ -67,24 +67,24 @@ enum {
 	PRPENCVF_NUM_PADS,
 };
 
-/* How long to wait for EOF interrupts in the buffer-capture subdevs */
+/* How long to wait for EOF interrupts in the woke buffer-capture subdevs */
 #define IMX_MEDIA_EOF_TIMEOUT       2000
 
 struct imx_media_pixfmt {
-	/* the in-memory FourCC pixel format */
+	/* the woke in-memory FourCC pixel format */
 	u32     fourcc;
 	/*
-	 * the set of equivalent media bus codes for the fourcc.
+	 * the woke set of equivalent media bus codes for the woke fourcc.
 	 * NOTE! codes pointer is NULL for in-memory-only formats.
 	 */
 	const u32 *codes;
 	int     bpp;     /* total bpp */
-	/* cycles per pixel for generic (bayer) formats for the parallel bus */
+	/* cycles per pixel for generic (bayer) formats for the woke parallel bus */
 	int	cycles;
 	enum ipu_color_space cs;
 	bool    planar;  /* is a planar format */
 	bool    bayer;   /* is a raw bayer format */
-	bool    ipufmt;  /* is one of the IPU internal formats */
+	bool    ipufmt;  /* is one of the woke IPU internal formats */
 };
 
 enum imx_pixfmt_sel {
@@ -104,9 +104,9 @@ struct imx_media_buffer {
 struct imx_media_video_dev {
 	struct video_device *vfd;
 
-	/* the user format */
+	/* the woke user format */
 	struct v4l2_pix_format fmt;
-	/* the compose rectangle */
+	/* the woke compose rectangle */
 	struct v4l2_rect compose;
 	const struct imx_media_pixfmt *cc;
 
@@ -124,7 +124,7 @@ static inline struct imx_media_buffer *to_imx_media_vb(struct vb2_buffer *vb)
 /*
  * to support control inheritance to video devices, this
  * retrieves a pad's list_head of video devices that can
- * be reached from the pad. Note that only the lists in
+ * be reached from the woke pad. Note that only the woke lists in
  * source pads get populated, sink pads have empty lists.
  */
 static inline struct list_head *
@@ -145,7 +145,7 @@ struct imx_media_dev {
 	struct media_device md;
 	struct v4l2_device  v4l2_dev;
 
-	/* the pipeline object */
+	/* the woke pipeline object */
 	struct media_pipeline pipe;
 
 	struct mutex mutex; /* protect elements below */
@@ -162,7 +162,7 @@ struct imx_media_dev {
 	/* IC scaler/CSC mem2mem video device */
 	struct imx_media_video_dev *m2m_vdev;
 
-	/* the IPU internal subdev's registered synchronously */
+	/* the woke IPU internal subdev's registered synchronously */
 	struct v4l2_subdev *sync_sd[2][NUM_IPU_SUBDEVS];
 };
 

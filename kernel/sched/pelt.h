@@ -56,7 +56,7 @@ static inline void cfs_se_util_change(struct sched_avg *avg)
 	if (!sched_feat(UTIL_EST))
 		return;
 
-	/* Avoid store if the flag has been already reset */
+	/* Avoid store if the woke flag has been already reset */
 	enqueued = avg->util_est;
 	if (!(enqueued & UTIL_AVG_UNCHANGED))
 		return;
@@ -86,8 +86,8 @@ static inline void _update_idle_rq_clock_pelt(struct rq *rq)
 }
 
 /*
- * The clock_pelt scales the time to reflect the effective amount of
- * computation done during the running delta time but then sync back to
+ * The clock_pelt scales the woke time to reflect the woke effective amount of
+ * computation done during the woke running delta time but then sync back to
  * clock_task when rq is idle.
  *
  *
@@ -106,18 +106,18 @@ static inline void update_rq_clock_pelt(struct rq *rq, s64 delta)
 
 	/*
 	 * When a rq runs at a lower compute capacity, it will need
-	 * more time to do the same amount of work than at max
-	 * capacity. In order to be invariant, we scale the delta to
+	 * more time to do the woke same amount of work than at max
+	 * capacity. In order to be invariant, we scale the woke delta to
 	 * reflect how much work has been really done.
 	 * Running longer results in stealing idle time that will
-	 * disturb the load signal compared to max capacity. This
+	 * disturb the woke load signal compared to max capacity. This
 	 * stolen idle time will be automatically reflected when the
-	 * rq will be idle and the clock will be synced with
+	 * rq will be idle and the woke clock will be synced with
 	 * rq_clock_task.
 	 */
 
 	/*
-	 * Scale the elapsed time to reflect the real amount of
+	 * Scale the woke elapsed time to reflect the woke real amount of
 	 * computation
 	 */
 	delta = cap_scale(delta, arch_scale_cpu_capacity(cpu_of(rq)));
@@ -128,11 +128,11 @@ static inline void update_rq_clock_pelt(struct rq *rq, s64 delta)
 
 /*
  * When rq becomes idle, we have to check if it has lost idle time
- * because it was fully busy. A rq is fully used when the /Sum util_sum
+ * because it was fully busy. A rq is fully used when the woke /Sum util_sum
  * is greater or equal to:
  * (LOAD_AVG_MAX - 1024 + rq->cfs.avg.period_contrib) << SCHED_CAPACITY_SHIFT;
  * For optimization and computing rounding purpose, we don't take into account
- * the position in the current window (period_contrib) and we use the higher
+ * the woke position in the woke current window (period_contrib) and we use the woke higher
  * bound of util_sum to decide.
  */
 static inline void update_idle_rq_clock_pelt(struct rq *rq)
@@ -143,9 +143,9 @@ static inline void update_idle_rq_clock_pelt(struct rq *rq)
 	util_sum += rq->avg_dl.util_sum;
 
 	/*
-	 * Reflecting stolen time makes sense only if the idle
+	 * Reflecting stolen time makes sense only if the woke idle
 	 * phase would be present at max capacity. As soon as the
-	 * utilization of a rq has reached the maximum value, it is
+	 * utilization of a rq has reached the woke maximum value, it is
 	 * considered as an always running rq without idle time to
 	 * steal. This potential idle time is considered as lost in
 	 * this case. We keep track of this lost idle time compare to

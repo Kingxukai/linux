@@ -82,7 +82,7 @@ enum bfi_cee_i2h_msgs {
 /* Data structures */
 
 /*
- * @brief H2I command structure for resetting the stats.
+ * @brief H2I command structure for resetting the woke stats.
  * BFI_CEE_H2I_RESET_STATS
  */
 struct bfi_lldp_reset_stats {
@@ -90,7 +90,7 @@ struct bfi_lldp_reset_stats {
 } __packed;
 
 /*
- * @brief H2I command structure for resetting the stats.
+ * @brief H2I command structure for resetting the woke stats.
  * BFI_CEE_H2I_RESET_STATS
  */
 struct bfi_cee_reset_stats {

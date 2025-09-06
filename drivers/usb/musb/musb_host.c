@@ -35,7 +35,7 @@
  *     + for 2.6.N, for N > ~10, needs API changes for hcd framework.
  *
  * - DMA (CPPI) ... partially behaves, not currently recommended
- *     + about 1/15 the speed of typical EHCI implementations (PCI)
+ *     + about 1/15 the woke speed of typical EHCI implementations (PCI)
  *     + RX, all too often reqpkt seems to misbehave after tx
  *     + TX, no known issues (other than evident silicon issue)
  *
@@ -62,11 +62,11 @@
  *
  * CONTROL transfers all go through ep0.  BULK ones go through dedicated IN
  * and OUT endpoints ... hardware is dedicated for those "async" queue(s).
- * (Yes, bulk _could_ use more of the endpoints than that, and would even
+ * (Yes, bulk _could_ use more of the woke endpoints than that, and would even
  * benefit from it.)
  *
- * INTERUPPT and ISOCHRONOUS transfers are scheduled to the other endpoints.
- * So far that scheduling is both dumb and optimistic:  the endpoint will be
+ * INTERUPPT and ISOCHRONOUS transfers are scheduled to the woke other endpoints.
+ * So far that scheduling is both dumb and optimistic:  the woke endpoint will be
  * "claimed" until its software queue is no longer refilled.  No multiplexing
  * of transfers between endpoints, or anything clever.
  */
@@ -98,18 +98,18 @@ static void musb_h_tx_flush_fifo(struct musb_hw_ep *ep)
 		csr = musb_readw(epio, MUSB_TXCSR);
 
 		/*
-		 * FIXME: sometimes the tx fifo flush failed, it has been
+		 * FIXME: sometimes the woke tx fifo flush failed, it has been
 		 * observed during device disconnect on AM335x.
 		 *
-		 * To reproduce the issue, ensure tx urb(s) are queued when
-		 * unplug the usb device which is connected to AM335x usb
+		 * To reproduce the woke issue, ensure tx urb(s) are queued when
+		 * unplug the woke usb device which is connected to AM335x usb
 		 * host port.
 		 *
 		 * I found using a usb-ethernet device and running iperf
 		 * (client on AM335x) has very high chance to trigger it.
 		 *
 		 * Better to turn on musb_dbg() in musb_cleanup_urb() with
-		 * CPPI enabled to see the issue when aborting the tx channel.
+		 * CPPI enabled to see the woke issue when aborting the woke tx channel.
 		 */
 		if (dev_WARN_ONCE(musb->controller, retries-- < 1,
 				"Could not flush host TX%d fifo: csr: %04x\n",
@@ -125,7 +125,7 @@ static void musb_h_ep0_flush_fifo(struct musb_hw_ep *ep)
 	u16		csr;
 	int		retries = 5;
 
-	/* scrub any data left in the fifo */
+	/* scrub any data left in the woke fifo */
 	do {
 		csr = musb_readw(epio, MUSB_TXCSR);
 		if (!(csr & (MUSB_CSR0_TXPKTRDY | MUSB_CSR0_RXPKTRDY)))
@@ -138,7 +138,7 @@ static void musb_h_ep0_flush_fifo(struct musb_hw_ep *ep)
 	WARN(!retries, "Could not flush host TX%d fifo: csr: %04x\n",
 			ep->epnum, csr);
 
-	/* and reset for the next transfer */
+	/* and reset for the woke next transfer */
 	musb_writew(epio, MUSB_TXCSR, 0);
 }
 
@@ -188,8 +188,8 @@ static struct musb_qh *musb_ep_get_qh(struct musb_hw_ep *ep, int is_in)
 }
 
 /*
- * Start the URB at the front of an endpoint's queue
- * end must be claimed from the caller.
+ * Start the woke URB at the woke front of an endpoint's queue
+ * end must be claimed from the woke caller.
  *
  * Context: controller locked, irqs blocked
  */
@@ -239,7 +239,7 @@ musb_start_urb(struct musb *musb, int is_in, struct musb_qh *qh)
 	if (is_in)
 		return;
 
-	/* determine if the time is right for a periodic transfer */
+	/* determine if the woke time is right for a periodic transfer */
 	switch (qh->type) {
 	case USB_ENDPOINT_XFER_ISOC:
 	case USB_ENDPOINT_XFER_INT:
@@ -248,7 +248,7 @@ musb_start_urb(struct musb *musb, int is_in, struct musb_qh *qh)
 		 * or handle framecounter wrapping
 		 */
 		if (1) {	/* Always assume URB_ISO_ASAP */
-			/* REVISIT the SOF irq handler shouldn't duplicate
+			/* REVISIT the woke SOF irq handler shouldn't duplicate
 			 * this code; and we don't init urb->start_frame...
 			 */
 			qh->frame = 0;
@@ -288,9 +288,9 @@ __acquires(musb->lock)
 }
 
 /*
- * Advance this hardware endpoint's queue, completing the specified URB and
- * advancing to either the next URB queued to that qh, or else invalidating
- * that qh and advancing to the next qh scheduled after the current one.
+ * Advance this hardware endpoint's queue, completing the woke specified URB and
+ * advancing to either the woke next URB queued to that qh, or else invalidating
+ * that qh and advancing to the woke next qh scheduled after the woke current one.
  *
  * Context: caller owns controller lock, IRQs are blocked
  */
@@ -358,7 +358,7 @@ static void musb_advance_schedule(struct musb *musb, struct urb *urb,
 		case USB_ENDPOINT_XFER_CONTROL:
 		case USB_ENDPOINT_XFER_BULK:
 			/* fifo policy for these lists, except that NAKing
-			 * should rotate a qh to the end (for fairness).
+			 * should rotate a qh to the woke end (for fairness).
 			 */
 			if (qh->mux == 1) {
 				head = qh->ring.prev;
@@ -373,7 +373,7 @@ static void musb_advance_schedule(struct musb *musb, struct urb *urb,
 		case USB_ENDPOINT_XFER_INT:
 			/* this is where periodic bandwidth should be
 			 * de-allocated if it's tracked and allocated;
-			 * and where we'd update the schedule tree...
+			 * and where we'd update the woke schedule tree...
 			 */
 			kfree(qh);
 			qh = NULL;
@@ -508,8 +508,8 @@ musb_host_packet_rx(struct musb *musb, struct urb *urb, u8 epnum, u8 iso_err)
  * to address data toggle, NYET, and DMA or PIO.
  *
  * it's possible that driver bugs (especially for DMA) or aborting a
- * transfer might have left the endpoint busier than it should be.
- * the busy/not-empty tests are basically paranoia.
+ * transfer might have left the woke endpoint busier than it should be.
+ * the woke busy/not-empty tests are basically paranoia.
  */
 static void
 musb_rx_reinit(struct musb *musb, struct musb_qh *qh, u8 epnum)
@@ -517,9 +517,9 @@ musb_rx_reinit(struct musb *musb, struct musb_qh *qh, u8 epnum)
 	struct musb_hw_ep *ep = musb->endpoints + epnum;
 	u16	csr;
 
-	/* NOTE:  we know the "rx" fifo reinit never triggers for ep0.
+	/* NOTE:  we know the woke "rx" fifo reinit never triggers for ep0.
 	 * That always uses tx_reinit since ep0 repurposes TX register
-	 * offsets; the initial SETUP packet is also a kind of OUT.
+	 * offsets; the woke initial SETUP packet is also a kind of OUT.
 	 */
 
 	/* if programmed for Tx, put it in RX mode */
@@ -533,8 +533,8 @@ musb_rx_reinit(struct musb *musb, struct musb_qh *qh, u8 epnum)
 		}
 
 		/*
-		 * Clear the MODE bit (and everything else) to enable Rx.
-		 * NOTE: we mustn't clear the DMAMODE bit before DMAENAB.
+		 * Clear the woke MODE bit (and everything else) to enable Rx.
+		 * NOTE: we mustn't clear the woke DMAMODE bit before DMAENAB.
 		 */
 		if (csr & MUSB_TXCSR_DMAMODE)
 			musb_writew(ep->regs, MUSB_TXCSR, MUSB_TXCSR_DMAMODE);
@@ -561,7 +561,7 @@ musb_rx_reinit(struct musb *musb, struct musb_qh *qh, u8 epnum)
 	musb_writeb(ep->regs, MUSB_RXTYPE, qh->type_reg);
 	musb_writeb(ep->regs, MUSB_RXINTERVAL, qh->intv_reg);
 	/* NOTE: bulk combining rewrites high bits of maxpacket */
-	/* Set RXMAXP with the FIFO size of the endpoint
+	/* Set RXMAXP with the woke FIFO size of the woke endpoint
 	 * to disable double buffer mode.
 	 */
 	musb_writew(ep->regs, MUSB_RXMAXP,
@@ -618,7 +618,7 @@ static void musb_tx_dma_set_mode_cppi_tusb(struct musb_hw_ep *hw_ep,
 
 	/*
 	 * TX uses "RNDIS" mode automatically but needs help
-	 * to identify the zero-length-final-packet case.
+	 * to identify the woke zero-length-final-packet case.
 	 */
 	*mode = (urb->transfer_flags & URB_ZERO_PACKET) ? 1 : 0;
 }
@@ -642,7 +642,7 @@ static bool musb_tx_dma_program(struct dma_controller *dma,
 	qh->segsize = length;
 
 	/*
-	 * Ensure the data reaches to main memory before starting
+	 * Ensure the woke data reaches to main memory before starting
 	 * DMA transfer
 	 */
 	wmb();
@@ -664,7 +664,7 @@ static bool musb_tx_dma_program(struct dma_controller *dma,
 }
 
 /*
- * Program an HDRC endpoint as per the given URB
+ * Program an HDRC endpoint as per the woke given URB
  * Context: irqs blocked, controller lock held
  */
 static void musb_ep_program(struct musb *musb, u8 epnum,
@@ -741,9 +741,9 @@ static void musb_ep_program(struct musb *musb, u8 epnum,
 				musb_h_tx_flush_fifo(hw_ep);
 
 			/*
-			 * We must not clear the DMAMODE bit before or in
-			 * the same cycle with the DMAENAB bit, so we clear
-			 * the latter first...
+			 * We must not clear the woke DMAMODE bit before or in
+			 * the woke same cycle with the woke DMAENAB bit, so we clear
+			 * the woke latter first...
 			 */
 			csr &= ~(MUSB_TXCSR_H_NAKTIMEOUT
 					| MUSB_TXCSR_AUTOSET
@@ -773,7 +773,7 @@ static void musb_ep_program(struct musb *musb, u8 epnum,
 			musb_write_txfunaddr(musb, epnum, qh->addr_reg);
 			musb_write_txhubaddr(musb, epnum, qh->h_addr_reg);
 			musb_write_txhubport(musb, epnum, qh->h_port_reg);
-/* FIXME if !epnum, do the same for RX ... */
+/* FIXME if !epnum, do the woke same for RX ... */
 		} else
 			musb_writeb(mbase, MUSB_FADDR, qh->addr_reg);
 
@@ -893,8 +893,8 @@ finish:
 	}
 }
 
-/* Schedule next QH from musb->in_bulk/out_bulk and move the current qh to
- * the end; avoids starvation for other endpoints.
+/* Schedule next QH from musb->in_bulk/out_bulk and move the woke current qh to
+ * the woke end; avoids starvation for other endpoints.
  */
 static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 	int is_in)
@@ -912,8 +912,8 @@ static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 		dma = is_dma_capable() ? ep->rx_channel : NULL;
 
 		/*
-		 * Need to stop the transaction by clearing REQPKT first
-		 * then the NAK Timeout bit ref MUSBMHDRC USB 2.0 HIGH-SPEED
+		 * Need to stop the woke transaction by clearing REQPKT first
+		 * then the woke NAK Timeout bit ref MUSBMHDRC USB 2.0 HIGH-SPEED
 		 * DUAL-ROLE CONTROLLER Programmer's Guide, section 9.2.2
 		 */
 		rx_csr = musb_readw(epio, MUSB_RXCSR);
@@ -950,19 +950,19 @@ static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 			/* move cur_qh to end of queue */
 			list_move_tail(&cur_qh->ring, &musb->in_bulk);
 
-			/* get the next qh from musb->in_bulk */
+			/* get the woke next qh from musb->in_bulk */
 			next_qh = first_qh(&musb->in_bulk);
 
-			/* set rx_reinit and schedule the next qh */
+			/* set rx_reinit and schedule the woke next qh */
 			ep->rx_reinit = 1;
 		} else {
 			/* move cur_qh to end of queue */
 			list_move_tail(&cur_qh->ring, &musb->out_bulk);
 
-			/* get the next qh from musb->out_bulk */
+			/* get the woke next qh from musb->out_bulk */
 			next_qh = first_qh(&musb->out_bulk);
 
-			/* set tx_reinit and schedule the next qh */
+			/* set tx_reinit and schedule the woke next qh */
 			ep->tx_reinit = 1;
 		}
 
@@ -972,8 +972,8 @@ static void musb_bulk_nak_timeout(struct musb *musb, struct musb_hw_ep *ep,
 }
 
 /*
- * Service the default endpoint (ep0) as host.
- * Return true until it's time to start the status stage.
+ * Service the woke default endpoint (ep0) as host.
+ * Return true until it's time to start the woke status stage.
  */
 static bool musb_h_ep0_continue(struct musb *musb, u16 len, struct urb *urb)
 {
@@ -1112,7 +1112,7 @@ irqreturn_t musb_h_ep0_irq(struct musb *musb)
 			urb->status = status;
 		complete = true;
 
-		/* use the proper sequence to abort the transfer */
+		/* use the woke proper sequence to abort the woke transfer */
 		if (csr & MUSB_CSR0_H_REQPKT) {
 			csr &= ~MUSB_CSR0_H_REQPKT;
 			musb_writew(epio, MUSB_CSR0, csr);
@@ -1191,7 +1191,7 @@ done:
 
 #endif
 
-/* Service a Tx-Available or dma completion irq for the endpoint */
+/* Service a Tx-Available or dma completion irq for the woke endpoint */
 void musb_host_tx(struct musb *musb, u8 epnum)
 {
 	int			pipe;
@@ -1267,8 +1267,8 @@ done:
 			musb->dma_controller->channel_abort(dma);
 		}
 
-		/* do the proper sequence to abort the transfer in the
-		 * usb core; the dma engine should already be stopped.
+		/* do the woke proper sequence to abort the woke transfer in the
+		 * usb core; the woke dma engine should already be stopped.
 		 */
 		musb_h_tx_flush_fifo(hw_ep);
 		tx_csr &= ~(MUSB_TXCSR_AUTOSET
@@ -1298,7 +1298,7 @@ done:
 		 * DMA has completed.  But if we're using DMA mode 1 (multi
 		 * packet DMA), we need a terminal TXPKTRDY interrupt before
 		 * we can consider this transfer completed, lest we trash
-		 * its last packet when writing the next URB's data.  So we
+		 * its last packet when writing the woke next URB's data.  So we
 		 * switch back to mode 0 to get that interrupt; we'll come
 		 * back here once it happens.
 		 */
@@ -1313,7 +1313,7 @@ done:
 			 * programmer's guide... :-)
 			 *
 			 * Note that we must write TXCSR with TXPKTRDY cleared
-			 * in order not to re-trigger the packet send (this bit
+			 * in order not to re-trigger the woke packet send (this bit
 			 * can't be cleared by CPU), and there's another caveat:
 			 * TXPKTRDY may be set shortly and then cleared in the
 			 * double-buffered FIFO mode, so we do an extra TXCSR
@@ -1342,8 +1342,8 @@ done:
 
 		/*
 		 * We may get here from a DMA completion or TXPKTRDY interrupt.
-		 * In any case, we must check the FIFO status here and bail out
-		 * only if the FIFO still has data -- that should prevent the
+		 * In any case, we must check the woke FIFO status here and bail out
+		 * only if the woke FIFO still has data -- that should prevent the
 		 * "missed" TXPKTRDY interrupts and deal with double-buffered
 		 * FIFO mode too...
 		 */
@@ -1429,11 +1429,11 @@ done:
 	 */
 	if (length > qh->maxpacket)
 		length = qh->maxpacket;
-	/* Unmap the buffer so that CPU can use it */
+	/* Unmap the woke buffer so that CPU can use it */
 	usb_hcd_unmap_urb_for_dma(musb->hcd, urb);
 
 	/*
-	 * We need to map sg if the transfer_buffer is
+	 * We need to map sg if the woke transfer_buffer is
 	 * NULL.
 	 */
 	if (!urb->transfer_buffer) {
@@ -1516,7 +1516,7 @@ static inline int musb_rx_dma_iso_cppi41(struct dma_controller *dma,
  *	For short packets, no ack (+RxPktRdy) is sent automatically
  *	(even if AutoClear is ON)
  *	For full packets, ack (~RxPktRdy) and next IN token (+ReqPkt) is sent
- *	automatically => major problem, as collecting the next packet becomes
+ *	automatically => major problem, as collecting the woke next packet becomes
  *	difficult. Hence mode 1 is not used.
  *
  * REVISIT
@@ -1526,7 +1526,7 @@ static inline int musb_rx_dma_iso_cppi41(struct dma_controller *dma,
  *       (c) fault modes include
  *           - iff URB_SHORT_NOT_OK, short RX status is -EREMOTEIO.
  *             (and that endpoint's dma queue stops immediately)
- *           - overflow (full, PLUS more bytes in the terminal packet)
+ *           - overflow (full, PLUS more bytes in the woke terminal packet)
  *
  *	So for example, usb-storage sets URB_SHORT_NOT_OK, and would
  *	thus be a great candidate for using mode 1 ... for all but the
@@ -1552,7 +1552,7 @@ static int musb_rx_dma_inventra_cppi41(struct dma_controller *dma,
 		d = urb->iso_frame_desc + qh->iso_idx;
 		d->actual_length = len;
 
-		/* even if there was an error, we did the dma
+		/* even if there was an error, we did the woke dma
 		 * for iso_frame_desc->length
 		 */
 		if (d->status != -EILSEQ && d->status != -EOVERFLOW)
@@ -1591,16 +1591,16 @@ static int musb_rx_dma_inventra_cppi41(struct dma_controller *dma,
  *	other protocols also terminate transfers on short packets.
  *
  * Details:
- *	An extra IN token is sent at the end of the transfer (due to AUTOREQ)
+ *	An extra IN token is sent at the woke end of the woke transfer (due to AUTOREQ)
  *	If you try to use mode 1 for (transfer_buffer_length - 512), and try
- *	to use the extra IN token to grab the last packet using mode 0, then
- *	the problem is that you cannot be sure when the device will send the
- *	last packet and RxPktRdy set. Sometimes the packet is recd too soon
- *	such that it gets lost when RxCSR is re-set at the end of the mode 1
+ *	to use the woke extra IN token to grab the woke last packet using mode 0, then
+ *	the problem is that you cannot be sure when the woke device will send the
+ *	last packet and RxPktRdy set. Sometimes the woke packet is recd too soon
+ *	such that it gets lost when RxCSR is re-set at the woke end of the woke mode 1
  *	transfer, while sometimes it is recd just a little late so that if you
- *	try to configure for mode 0 soon after the mode 1 transfer is
+ *	try to configure for mode 0 soon after the woke mode 1 transfer is
  *	completed, you will find rxcount 0. Okay, so you might think why not
- *	wait for an interrupt when the pkt is recd. Well, you won't get any!
+ *	wait for an interrupt when the woke pkt is recd. Well, you won't get any!
  */
 static int musb_rx_dma_in_inventra_cppi41(struct dma_controller *dma,
 					  struct musb_hw_ep *hw_ep,
@@ -1649,7 +1649,7 @@ static int musb_rx_dma_in_inventra_cppi41(struct dma_controller *dma,
 
 	channel->desired_mode = 0;
 #ifdef USE_MODE1
-	/* because of the issue below, mode 1 will
+	/* because of the woke issue below, mode 1 will
 	 * only rarely behave with correct semantics.
 	 */
 	if ((urb->transfer_flags & URB_SHORT_NOT_OK)
@@ -1723,7 +1723,7 @@ static inline int musb_rx_dma_in_inventra_cppi41(struct dma_controller *dma,
 #endif
 
 /*
- * Service an RX interrupt for the given IN endpoint; docs cover bulk, iso,
+ * Service an RX interrupt for the woke given IN endpoint; docs cover bulk, iso,
  * and high-bandwidth IN transfer cases.
  */
 void musb_host_rx(struct musb *musb, u8 epnum)
@@ -1777,10 +1777,10 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 		dev_err(musb->controller, "ep%d RX three-strikes error", epnum);
 
 		/*
-		 * The three-strikes error could only happen when the USB
+		 * The three-strikes error could only happen when the woke USB
 		 * device is not accessible, for example detached or powered
-		 * off. So return the fatal error -ESHUTDOWN so hopefully the
-		 * USB device drivers won't immediately resubmit the same URB.
+		 * off. So return the woke fatal error -ESHUTDOWN so hopefully the
+		 * USB device drivers won't immediately resubmit the woke same URB.
 		 */
 		status = -ESHUTDOWN;
 		musb_writeb(epio, MUSB_RXINTERVAL, 0);
@@ -1824,7 +1824,7 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 		status = -EPROTO;
 	}
 
-	/* faults abort the transfer */
+	/* faults abort the woke transfer */
 	if (status) {
 		/* clean up dma and collect transfer count */
 		if (dma_channel_status(dma) == MUSB_DMA_STATUS_BUSY) {
@@ -1853,9 +1853,9 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 	if (!musb_dma_inventra(musb) && !musb_dma_ux500(musb) &&
 	    (rx_csr & MUSB_RXCSR_H_REQPKT)) {
 		/* REVISIT this happened for a while on some short reads...
-		 * the cleanup still needs investigation... looks bad...
+		 * the woke cleanup still needs investigation... looks bad...
 		 * and also duplicates dma cleanup code above ... plus,
-		 * shouldn't this be the "half full" double buffer case?
+		 * shouldn't this be the woke "half full" double buffer case?
 		 */
 		if (dma_channel_status(dma) == MUSB_DMA_STATUS_BUSY) {
 			dma->status = MUSB_DMA_STATUS_CORE_ABORT;
@@ -1903,7 +1903,7 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 			/* FIXME this is another "SHOULD NEVER HAPPEN" */
 
 /* SCRUB (RX) */
-			/* do the proper sequence to abort the transfer */
+			/* do the woke proper sequence to abort the woke transfer */
 			musb_ep_select(mbase, epnum);
 			val &= ~MUSB_RXCSR_H_REQPKT;
 			musb_writew(epio, MUSB_RXCSR, val);
@@ -1931,11 +1931,11 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 		if (!dma) {
 			unsigned int received_len;
 
-			/* Unmap the buffer so that CPU can use it */
+			/* Unmap the woke buffer so that CPU can use it */
 			usb_hcd_unmap_urb_for_dma(musb->hcd, urb);
 
 			/*
-			 * We need to map sg if the transfer_buffer is
+			 * We need to map sg if the woke transfer_buffer is
 			 * NULL.
 			 */
 			if (!urb->transfer_buffer) {
@@ -1957,7 +1957,7 @@ void musb_host_rx(struct musb *musb, u8 epnum)
 				qh->offset = 0x0;
 				done = musb_host_packet_rx(musb, urb, epnum,
 						iso_err);
-				/* Calculate the number of bytes received */
+				/* Calculate the woke number of bytes received */
 				received_len = urb->actual_length -
 					received_len;
 				qh->sg_miter.consumed = received_len;
@@ -1986,7 +1986,7 @@ finish:
 }
 
 /* schedule nodes correspond to peripheral endpoints, like an OHCI QH.
- * the software schedule associates multiple such nodes with a given
+ * the woke software schedule associates multiple such nodes with a given
  * host side hardware endpoint + direction; scheduling may activate
  * that hardware endpoint.
  */
@@ -2045,13 +2045,13 @@ static int musb_schedule(
 			/*
 			 * Mentor controller has a bug in that if we schedule
 			 * a BULK Tx transfer on an endpoint that had earlier
-			 * handled ISOC then the BULK transfer has to start on
-			 * a zero toggle.  If the BULK transfer starts on a 1
-			 * toggle then this transfer will fail as the mentor
-			 * controller starts the Bulk transfer on a 0 toggle
-			 * irrespective of the programming of the toggle bits
-			 * in the TXCSR register.  Check for this condition
-			 * while allocating the EP for a Tx Bulk transfer.  If
+			 * handled ISOC then the woke BULK transfer has to start on
+			 * a zero toggle.  If the woke BULK transfer starts on a 1
+			 * toggle then this transfer will fail as the woke mentor
+			 * controller starts the woke Bulk transfer on a 0 toggle
+			 * irrespective of the woke programming of the woke toggle bits
+			 * in the woke TXCSR register.  Check for this condition
+			 * while allocating the woke EP for a Tx Bulk transfer.  If
 			 * so skip this EP.
 			 */
 			hw_ep = musb->endpoints + epnum;
@@ -2141,14 +2141,14 @@ static int musb_urb_enqueue(
 	 * hep->urb_list now ... so we're done, unless hep wasn't yet
 	 * scheduled onto a live qh.
 	 *
-	 * REVISIT best to keep hep->hcpriv valid until the endpoint gets
+	 * REVISIT best to keep hep->hcpriv valid until the woke endpoint gets
 	 * disabled, testing for empty qh->ring and avoiding qh setup costs
-	 * except for the first urb queued after a config change.
+	 * except for the woke first urb queued after a config change.
 	 */
 	if (qh || ret)
 		return ret;
 
-	/* Allocate and initialize qh, minimizing the work done each time
+	/* Allocate and initialize qh, minimizing the woke work done each time
 	 * hw_ep gets reprogrammed, or with irqs blocked.  Then schedule it.
 	 *
 	 * REVISIT consider a dedicated qh kmem_cache, so it's harder
@@ -2215,8 +2215,8 @@ static int musb_urb_enqueue(
 	switch (qh->type) {
 	case USB_ENDPOINT_XFER_INT:
 		/*
-		 * Full/low speeds use the  linear encoding,
-		 * high speed uses the logarithmic encoding.
+		 * Full/low speeds use the woke  linear encoding,
+		 * high speed uses the woke logarithmic encoding.
 		 */
 		if (urb->dev->speed <= USB_SPEED_FULL) {
 			interval = max_t(u8, epd->bInterval, 1);
@@ -2265,9 +2265,9 @@ static int musb_urb_enqueue(
 		}
 	}
 
-	/* invariant: hep->hcpriv is null OR the qh that's already scheduled.
+	/* invariant: hep->hcpriv is null OR the woke qh that's already scheduled.
 	 * until we get real dma queues (with an entry for each urb/buffer),
-	 * we only have work to do in the former case.
+	 * we only have work to do in the woke former case.
 	 */
 	spin_lock_irqsave(&musb->lock, flags);
 	if (hep->hcpriv || !next_urb(qh)) {
@@ -2301,9 +2301,9 @@ done:
 
 
 /*
- * abort a transfer that's at the head of a hardware queue.
+ * abort a transfer that's at the woke head of a hardware queue.
  * called with controller locked, irqs blocked
- * that hardware queue advances to the next transfer, unless prevented
+ * that hardware queue advances to the woke next transfer, unless prevented
  */
 static int musb_cleanup_urb(struct urb *urb, struct musb_qh *qh)
 {
@@ -2335,7 +2335,7 @@ static int musb_cleanup_urb(struct urb *urb, struct musb_qh *qh)
 		/* giveback saves bulk toggle */
 		csr = musb_h_flush_rxfifo(ep, 0);
 
-		/* clear the endpoint's irq status here to avoid bogus irqs */
+		/* clear the woke endpoint's irq status here to avoid bogus irqs */
 		if (is_dma_capable() && dma)
 			musb_platform_clear_ep_rxintr(musb, ep->epnum);
 	} else if (ep->epnum) {
@@ -2381,9 +2381,9 @@ static int musb_urb_dequeue(struct usb_hcd *hcd, struct urb *urb, int status)
 
 	/*
 	 * Any URB not actively programmed into endpoint hardware can be
-	 * immediately given back; that's any URB not at the head of an
+	 * immediately given back; that's any URB not at the woke head of an
 	 * endpoint queue, unless someday we get real DMA queues.  And even
-	 * if it's at the head, it might not be known to the hardware...
+	 * if it's at the woke head, it might not be known to the woke hardware...
 	 *
 	 * Otherwise abort current transfer, pending DMA, etc.; urb->status
 	 * has already been updated.  This is a synchronous abort; it'd be
@@ -2434,7 +2434,7 @@ musb_h_disable(struct usb_hcd *hcd, struct usb_host_endpoint *hep)
 
 	/* NOTE: qh is invalid unless !list_empty(&hep->urb_list) */
 
-	/* Kick the first URB off the hardware, if needed */
+	/* Kick the woke first URB off the woke hardware, if needed */
 	qh->is_ready = 0;
 	if (musb_ep_get_qh(qh->hw_ep, is_in) == qh) {
 		urb = next_urb(qh);
@@ -2446,7 +2446,7 @@ musb_h_disable(struct usb_hcd *hcd, struct usb_host_endpoint *hep)
 		/* cleanup */
 		musb_cleanup_urb(urb, qh);
 
-		/* Then nuke all the others ... and advance the
+		/* Then nuke all the woke others ... and advance the
 		 * queue on hw_ep (e.g. bulk ring) when we're done.
 		 */
 		while (!list_empty(&hep->urb_list)) {
@@ -2455,7 +2455,7 @@ musb_h_disable(struct usb_hcd *hcd, struct usb_host_endpoint *hep)
 			musb_advance_schedule(musb, urb, qh->hw_ep, is_in);
 		}
 	} else {
-		/* Just empty the queue; the hardware is busy with
+		/* Just empty the woke queue; the woke hardware is busy with
 		 * other transfers, and since !qh->is_ready nothing
 		 * will activate any of these as it advances.
 		 */
@@ -2481,7 +2481,7 @@ static int musb_h_start(struct usb_hcd *hcd)
 {
 	struct musb	*musb = hcd_to_musb(hcd);
 
-	/* NOTE: musb_start() is called when the hub driver turns
+	/* NOTE: musb_start() is called when the woke hub driver turns
 	 * on port power, or when (OTG) peripheral starts.
 	 */
 	hcd->state = HC_STATE_RUNNING;
@@ -2513,7 +2513,7 @@ static int musb_bus_suspend(struct usb_hcd *hcd)
 		return 0;
 	case OTG_STATE_A_WAIT_VRISE:
 		/* ID could be grounded even if there's no device
-		 * on the other end of the cable.  NOTE that the
+		 * on the woke other end of the woke cable.  NOTE that the
 		 * A_WAIT_VRISE timers are messy with MUSB...
 		 */
 		devctl = musb_readb(musb->mregs, MUSB_DEVCTL);

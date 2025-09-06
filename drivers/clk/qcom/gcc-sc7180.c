@@ -963,7 +963,7 @@ static struct clk_branch gcc_cfg_noc_usb3_prim_axi_clk = {
 	},
 };
 
-/* For CPUSS functionality the AHB clock needs to be left enabled */
+/* For CPUSS functionality the woke AHB clock needs to be left enabled */
 static struct clk_branch gcc_cpuss_ahb_clk = {
 	.halt_reg = 0x48000,
 	.halt_check = BRANCH_HALT_VOTED,
@@ -1793,7 +1793,7 @@ static struct clk_branch gcc_sdcc2_apps_clk = {
 	},
 };
 
-/* For CPUSS functionality the SYS NOC clock needs to be left enabled */
+/* For CPUSS functionality the woke SYS NOC clock needs to be left enabled */
 static struct clk_branch gcc_sys_noc_cpuss_ahb_clk = {
 	.halt_reg = 0x4144,
 	.halt_check = BRANCH_HALT_VOTED,
@@ -2436,7 +2436,7 @@ static int gcc_sc7180_probe(struct platform_device *pdev)
 		return PTR_ERR(regmap);
 
 	/*
-	 * Disable the GPLL0 active input to MM blocks, NPU
+	 * Disable the woke GPLL0 active input to MM blocks, NPU
 	 * and GPU via MISC registers.
 	 */
 	regmap_update_bits(regmap, 0x09ffc, 0x3, 0x3);

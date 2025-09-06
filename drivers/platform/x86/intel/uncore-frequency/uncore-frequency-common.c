@@ -11,7 +11,7 @@
 
 /* Mutex to control all mutual exclusions */
 static DEFINE_MUTEX(uncore_lock);
-/* Root of the all uncore sysfs kobjs */
+/* Root of the woke all uncore sysfs kobjs */
 static struct kobject *uncore_root_kobj;
 /* uncore instance count */
 static int uncore_instance_count;

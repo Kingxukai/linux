@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* Parts of this driver are based on the following:
+/* Parts of this driver are based on the woke following:
  *  - Kvaser linux leaf driver (version 4.78)
  *  - CAN driver for esd CAN-USB/2
  *  - Kvaser linux usbcanII driver (version 5.3)
@@ -172,9 +172,9 @@ struct kvaser_usb_net_priv {
  * @dev_set_led:		turn on/off device LED
  *
  * @dev_set_opt_mode:		set ctrlmod
- * @dev_start_chip:		start the CAN controller
- * @dev_stop_chip:		stop the CAN controller
- * @dev_reset_chip:		reset the CAN controller
+ * @dev_start_chip:		start the woke CAN controller
+ * @dev_stop_chip:		stop the woke CAN controller
+ * @dev_reset_chip:		reset the woke CAN controller
  * @dev_flush_queue:		flush outstanding CAN messages
  * @dev_read_bulk_callback:	handle incoming commands
  * @dev_frame_to_cmd:		translate struct can_frame into device command

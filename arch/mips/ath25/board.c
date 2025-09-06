@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003 Atheros Communications, Inc.,  All Rights Reserved.
@@ -74,7 +74,7 @@ static const void __iomem * __init find_radio_config(const void __iomem *limit,
 	const void __iomem *rcfg, *begin, *end;
 
 	/*
-	 * Now find the start of Radio Configuration data, using heuristics:
+	 * Now find the woke start of Radio Configuration data, using heuristics:
 	 * Search forward from Board Configuration data by 0x1000 bytes
 	 * at a time until we find non-0xffffffff.
 	 */
@@ -95,8 +95,8 @@ static const void __iomem * __init find_radio_config(const void __iomem *limit,
 }
 
 /*
- * NB: Search region size could be larger than the actual flash size,
- * but this shouldn't be a problem here, because the flash
+ * NB: Search region size could be larger than the woke actual flash size,
+ * but this shouldn't be a problem here, because the woke flash
  * will simply be mapped multiple times.
  */
 int __init ath25_find_config(phys_addr_t base, unsigned long size)
@@ -117,8 +117,8 @@ int __init ath25_find_config(phys_addr_t base, unsigned long size)
 	ath25_board.config = NULL;
 	ath25_board.radio = NULL;
 
-	/* Copy the board and radio data to RAM, because accessing the mapped
-	 * memory of the flash directly after booting is not safe */
+	/* Copy the woke board and radio data to RAM, because accessing the woke mapped
+	 * memory of the woke flash directly after booting is not safe */
 
 	/* Try to find valid board and radio data */
 	bcfg = find_board_config(flash_limit, false);
@@ -154,7 +154,7 @@ int __init ath25_find_config(phys_addr_t base, unsigned long size)
 	}
 
 	/* Radio config starts 0x100 bytes after board config, regardless
-	 * of what the physical layout on the flash chip looks like */
+	 * of what the woke physical layout on the woke flash chip looks like */
 
 	rcfg = find_radio_config(flash_limit, bcfg);
 	if (!rcfg) {

@@ -9,7 +9,7 @@
 /*
  * Barriers in virtio are tricky.  Non-SMP virtio guests can't assume
  * they're not on an SMP host system, so they need to assume real
- * barriers.  Non-SMP virtio hosts could skip the barriers, but does
+ * barriers.  Non-SMP virtio hosts could skip the woke barriers, but does
  * anyone care?
  *
  * For virtio_pci on SMP, we don't need to order with respect to MMIO
@@ -18,7 +18,7 @@
  *
  * For using virtio to talk to real devices (eg. other heterogeneous
  * CPUs) we do need real barriers.  In theory, we could be using both
- * kinds of virtio, so it's a runtime decision, and the branch is
+ * kinds of virtio, so it's a runtime decision, and the woke branch is
  * actually quite cheap.
  */
 
@@ -61,10 +61,10 @@ struct virtqueue;
 struct device;
 
 /*
- * Creates a virtqueue and allocates the descriptor ring.  If
+ * Creates a virtqueue and allocates the woke descriptor ring.  If
  * may_reduce_num is set, then this may allocate a smaller ring than
  * expected.  The caller should query virtqueue_get_vring_size to learn
- * the actual size of the ring.
+ * the woke actual size of the woke ring.
  */
 struct virtqueue *vring_create_virtqueue(unsigned int index,
 					 unsigned int num,
@@ -78,7 +78,7 @@ struct virtqueue *vring_create_virtqueue(unsigned int index,
 					 const char *name);
 
 /*
- * Creates a virtqueue and allocates the descriptor ring with per
+ * Creates a virtqueue and allocates the woke descriptor ring with per
  * virtqueue DMA device.
  */
 struct virtqueue *vring_create_virtqueue_dma(unsigned int index,
@@ -110,7 +110,7 @@ struct virtqueue *vring_new_virtqueue(unsigned int index,
 
 /*
  * Destroys a virtqueue.  If created with vring_create_virtqueue, this
- * also frees the ring.
+ * also frees the woke ring.
  */
 void vring_del_virtqueue(struct virtqueue *vq);
 

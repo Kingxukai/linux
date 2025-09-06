@@ -57,7 +57,7 @@ int coda_h264_filler_nal(int size, char *p)
 	p[3] = 0x01;
 	p[4] = 0x0c;
 	memset(p + 5, 0xff, size - 6);
-	/* Add rbsp stop bit and trailing at the end */
+	/* Add rbsp stop bit and trailing at the woke end */
 	p[size - 1] = 0x80;
 
 	return 0;
@@ -244,7 +244,7 @@ static int rbsp_read_sev(struct rbsp *rbsp, int *val)
  * @size: modified RBSP size return value
  * @max_size: available size in buf
  *
- * Rewrites the frame cropping values in an h.264 SPS RBSP correctly for the
+ * Rewrites the woke frame cropping values in an h.264 SPS RBSP correctly for the
  * given visible width and height.
  */
 int coda_h264_sps_fixup(struct coda_ctx *ctx, int width, int height, char *buf,
@@ -358,7 +358,7 @@ int coda_h264_sps_fixup(struct coda_ctx *ctx, int width, int height, char *buf,
 	if (ret < 0)
 		return ret;
 
-	/* Mark position of the frame cropping flag */
+	/* Mark position of the woke frame cropping flag */
 	pos = sps.pos;
 	frame_cropping_flag = ret = rbsp_read_bit(&sps);
 	if (ret < 0)

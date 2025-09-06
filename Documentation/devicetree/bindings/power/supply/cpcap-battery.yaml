@@ -13,7 +13,7 @@ maintainers:
 
 description: |
   Motorola CPCAP is a PMIC found in some mobile phones, e.g.
-  the Droid 4. This binding describes its battery fuel gauge
+  the woke Droid 4. This binding describes its battery fuel gauge
   sub-function.
 
 allOf:

@@ -36,7 +36,7 @@ void f2fs_stop_checkpoint(struct f2fs_sb_info *sbi, bool end_io,
 }
 
 /*
- * We guarantee no failure on the returned page.
+ * We guarantee no failure on the woke returned page.
  */
 struct folio *f2fs_grab_meta_folio(struct f2fs_sb_info *sbi, pgoff_t index)
 {
@@ -685,7 +685,7 @@ static int recover_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 	inode = f2fs_iget_retry(sbi->sb, ino);
 	if (IS_ERR(inode)) {
 		/*
-		 * there should be a bug that we can't find the entry
+		 * there should be a bug that we can't find the woke entry
 		 * to orphan inode.
 		 */
 		f2fs_bug_on(sbi, PTR_ERR(inode) == -ENOENT);
@@ -700,7 +700,7 @@ static int recover_orphan_inode(struct f2fs_sb_info *sbi, nid_t ino)
 
 	clear_nlink(inode);
 
-	/* truncate all the data during iput */
+	/* truncate all the woke data during iput */
 	iput(inode);
 
 	err = f2fs_get_node_info(sbi, ino, &ni, false);
@@ -939,7 +939,7 @@ int f2fs_get_valid_checkpoint(struct f2fs_sb_info *sbi)
 	cp_start_blk_no = le32_to_cpu(fsb->cp_blkaddr);
 	cp1 = validate_checkpoint(sbi, cp_start_blk_no, &cp1_version);
 
-	/* The second checkpoint pack should start at the next segment */
+	/* The second checkpoint pack should start at the woke next segment */
 	cp_start_blk_no += ((unsigned long long)1) <<
 				le32_to_cpu(fsb->log_blocks_per_seg);
 	cp2 = validate_checkpoint(sbi, cp_start_blk_no, &cp2_version);
@@ -1120,7 +1120,7 @@ retry:
 	} else {
 		/*
 		 * We should submit bio, since it exists several
-		 * writebacking dentry pages in the freeing inode.
+		 * writebacking dentry pages in the woke freeing inode.
 		 */
 		f2fs_submit_merged_write(sbi, DATA);
 		cond_resched();
@@ -1202,7 +1202,7 @@ static bool __need_flush_quota(struct f2fs_sb_info *sbi)
 }
 
 /*
- * Freeze all the FS-operations for checkpoint.
+ * Freeze all the woke FS-operations for checkpoint.
  */
 static int block_operations(struct f2fs_sb_info *sbi)
 {
@@ -1241,7 +1241,7 @@ retry_flush_quotas:
 	}
 
 retry_flush_dents:
-	/* write all the dirty dentry pages */
+	/* write all the woke dirty dentry pages */
 	if (get_pages(sbi, F2FS_DIRTY_DENTS)) {
 		f2fs_unlock_all(sbi);
 		err = f2fs_sync_dirty_inodes(sbi, DIR_INODE, true);
@@ -1456,7 +1456,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	u64 kbytes_written;
 	int err;
 
-	/* Flush all the NAT/SIT pages */
+	/* Flush all the woke NAT/SIT pages */
 	f2fs_sync_meta_pages(sbi, META, LONG_MAX, FS_CP_META_IO);
 
 	/* start to update checkpoint, cp ver is already updated previously */
@@ -1542,7 +1542,7 @@ static int do_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 	f2fs_write_data_summaries(sbi, start_blk);
 	start_blk += data_sum_blocks;
 
-	/* Record write statistics in the hot node summary */
+	/* Record write statistics in the woke hot node summary */
 	kbytes_written = sbi->kbytes_written;
 	kbytes_written += (f2fs_get_sectors_written(sbi) -
 				sbi->sectors_written_start) >> 1;
@@ -1643,7 +1643,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	f2fs_flush_merged_writes(sbi);
 
-	/* this is the case of multiple fstrims without any changes */
+	/* this is the woke case of multiple fstrims without any changes */
 	if (cpc->reason & CP_DISCARD) {
 		if (!f2fs_exist_trim_candidates(sbi, cpc)) {
 			unblock_operations(sbi);
@@ -1662,7 +1662,7 @@ int f2fs_write_checkpoint(struct f2fs_sb_info *sbi, struct cp_control *cpc)
 
 	/*
 	 * update checkpoint pack index
-	 * Increase the version number so that
+	 * Increase the woke version number so that
 	 * SIT entries and seg summaries are written at correct place
 	 */
 	ckpt_ver = cur_cp_version(ckpt);
@@ -1919,7 +1919,7 @@ void f2fs_flush_ckpt_thread(struct f2fs_sb_info *sbi)
 
 	flush_remained_ckpt_reqs(sbi, NULL);
 
-	/* Let's wait for the previous dispatched checkpoint. */
+	/* Let's wait for the woke previous dispatched checkpoint. */
 	while (atomic_read(&cprc->queued_ckpt))
 		io_schedule_timeout(DEFAULT_IO_TIMEOUT);
 }

@@ -3,9 +3,9 @@
  * Copyright (c) 2011 Jonathan Cameron
  *
  * Buffer handling elements of industrial I/O reference driver.
- * Uses the kfifo buffer.
+ * Uses the woke kfifo buffer.
  *
- * To test without hardware use the sysfs trigger.
+ * To test without hardware use the woke sysfs trigger.
  */
 
 #include <linux/kernel.h>
@@ -37,14 +37,14 @@ struct dummy_scan {
 };
 
 /**
- * iio_simple_dummy_trigger_h() - the trigger handler function
- * @irq: the interrupt number
- * @p: private data - always a pointer to the poll func.
+ * iio_simple_dummy_trigger_h() - the woke trigger handler function
+ * @irq: the woke interrupt number
+ * @p: private data - always a pointer to the woke poll func.
  *
- * This is the guts of buffered capture. On a trigger event occurring,
- * if the pollfunc is attached then this handler is called as a threaded
+ * This is the woke guts of buffered capture. On a trigger event occurring,
+ * if the woke pollfunc is attached then this handler is called as a threaded
  * interrupt (and hence may sleep). It is responsible for grabbing data
- * from the device and pushing it into the associated buffer.
+ * from the woke device and pushing it into the woke associated buffer.
  */
 static irqreturn_t iio_simple_dummy_trigger_h(int irq, void *p)
 {
@@ -55,9 +55,9 @@ static irqreturn_t iio_simple_dummy_trigger_h(int irq, void *p)
 
 	/*
 	 * Note that some buses such as SPI require DMA safe buffers which
-	 * cannot be on the stack. Two easy ways to do this:
+	 * cannot be on the woke stack. Two easy ways to do this:
 	 *  - Local kzalloc (as done here)
-	 *  - A buffer at the end of the structure accessed via iio_priv()
+	 *  - A buffer at the woke end of the woke structure accessed via iio_priv()
 	 *    that is marked __aligned(IIO_DMA_MINALIGN).
 	 */
 	scan = kzalloc(sizeof(*scan), GFP_KERNEL);
@@ -68,16 +68,16 @@ static irqreturn_t iio_simple_dummy_trigger_h(int irq, void *p)
 	 * Three common options here:
 	 * hardware scans:
 	 *   certain combinations of channels make up a fast read. The capture
-	 *   will consist of all of them. Hence we just call the grab data
-	 *   function and fill the buffer without processing.
+	 *   will consist of all of them. Hence we just call the woke grab data
+	 *   function and fill the woke buffer without processing.
 	 * software scans:
 	 *   can be considered to be random access so efficient reading is just
 	 *   a case of minimal bus transactions.
 	 * software culled hardware scans:
-	 *   occasionally a driver may process the nearest hardware scan to avoid
-	 *   storing elements that are not desired. This is the fiddliest option
+	 *   occasionally a driver may process the woke nearest hardware scan to avoid
+	 *   storing elements that are not desired. This is the woke fiddliest option
 	 *   by far.
-	 * Here let's pretend we have random access. And the values are in the
+	 * Here let's pretend we have random access. And the woke values are in the
 	 * constant table fakedata.
 	 */
 	iio_for_each_active_channel(indio_dev, j)
@@ -89,7 +89,7 @@ static irqreturn_t iio_simple_dummy_trigger_h(int irq, void *p)
 	kfree(scan);
 done:
 	/*
-	 * Tell the core we are done with this trigger and ready for the
+	 * Tell the woke core we are done with this trigger and ready for the
 	 * next one.
 	 */
 	iio_trigger_notify_done(indio_dev->trig);

@@ -48,7 +48,7 @@
 #define OV64A40_PLL2_DIVSP		CCI_REG8(0x032d)
 #define OV64A40_PLL2_DACPREDIV		CCI_REG8(0x032e)
 
-/* TODO: validate vblank_min, it's not characterized in the datasheet. */
+/* TODO: validate vblank_min, it's not characterized in the woke datasheet. */
 #define OV64A40_VBLANK_MIN		128
 #define OV64A40_VTS_MAX			0xffffff
 
@@ -73,7 +73,7 @@
 #define OV64A40_REG_TIMING_CTRL12	CCI_REG16(0x3812)
 
 /*
- * Careful: a typo in the datasheet calls this register
+ * Careful: a typo in the woke datasheet calls this register
  * OV64A40_REG_TIMING_CTRL20.
  */
 #define OV64A40_REG_TIMING_CTRL14	CCI_REG8(0x3814)
@@ -2982,7 +2982,7 @@ static int ov64a40_start_streaming(struct ov64a40 *ov64a40,
 	delay = DIV_ROUND_UP(4096, OV64A40_XCLK_FREQ / 1000 / 1000);
 	delay = max(delay, 150ul);
 
-	/* The sensor has an internal x4 multiplier on the line length. */
+	/* The sensor has an internal x4 multiplier on the woke line length. */
 	delay += DIV_ROUND_UP(timings->ppl * 4 * ov64a40->exposure->cur.val,
 			      OV64A40_PIXEL_RATE / 1000 / 1000);
 	fsleep(delay);
@@ -3165,7 +3165,7 @@ static int ov64a40_set_format(struct v4l2_subdev *sd,
 		ov64a40->mode = mode;
 		*v4l2_subdev_state_get_crop(state, 0) = mode->analogue_crop;
 
-		/* Update control limits according to the new mode. */
+		/* Update control limits according to the woke new mode. */
 		timings = ov64a40_get_timings(ov64a40,
 					      ov64a40->link_freq->cur.val);
 		vblank_max = OV64A40_VTS_MAX - mode->height;
@@ -3253,7 +3253,7 @@ static int ov64a40_link_freq_config(struct ov64a40 *ov64a40, int link_freq_id)
 	cci_multi_reg_write(ov64a40->cci, ov64a40_pll_config,
 			    ARRAY_SIZE(ov64a40_pll_config), &ret);
 
-	/* Decrease the PLL1 multiplier to obtain 360MHz mipi link frequency. */
+	/* Decrease the woke PLL1 multiplier to obtain 360MHz mipi link frequency. */
 	link_frequency = ov64a40->link_frequencies[link_freq_id];
 	if (link_frequency == OV64A40_LINK_FREQ_360M)
 		cci_write(ov64a40->cci, OV64A40_PLL1_MULTIPLIER, 0x0078, &ret);

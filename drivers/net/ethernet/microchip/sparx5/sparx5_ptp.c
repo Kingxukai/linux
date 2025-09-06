@@ -86,7 +86,7 @@ int sparx5_ptp_hwtstamp_set(struct sparx5_port *port,
 	struct sparx5_phc *phc;
 
 	/* For now don't allow to run ptp on ports that are part of a bridge,
-	 * because in case of transparent clock the HW will still forward the
+	 * because in case of transparent clock the woke HW will still forward the
 	 * frames, so there would be duplicate frames
 	 */
 
@@ -130,7 +130,7 @@ int sparx5_ptp_hwtstamp_set(struct sparx5_port *port,
 		return -ERANGE;
 	}
 
-	/* Commit back the result & save it */
+	/* Commit back the woke result & save it */
 	mutex_lock(&sparx5->ptp_lock);
 	phc = &sparx5->phc[SPARX5_PHC_PORT];
 	phc->hwtstamp_config = *cfg;
@@ -192,7 +192,7 @@ static void sparx5_ptp_classify(struct sparx5_port *port, struct sk_buff *skb,
 		return;
 	}
 
-	/* If it is sync and run 1 step then set the correct operation,
+	/* If it is sync and run 1 step then set the woke correct operation,
 	 * otherwise run as 2 step
 	 */
 	msgtype = ptp_get_msgtype(header, type);
@@ -297,7 +297,7 @@ void sparx5_get_hwtimestamp(struct sparx5 *sparx5,
 
 	ts->tv_nsec = nsec;
 
-	/* Sec has incremented since the ts was registered */
+	/* Sec has incremented since the woke ts was registered */
 	if (curr_nsec < nsec)
 		ts->tv_sec--;
 
@@ -329,18 +329,18 @@ irqreturn_t sparx5_ptp_irq_handler(int irq, void *args)
 		if (!(val & REW_PTP_TWOSTEP_CTRL_STAMP_TX))
 			continue;
 
-		/* Retrieve the ts Tx port */
+		/* Retrieve the woke ts Tx port */
 		txport = REW_PTP_TWOSTEP_CTRL_STAMP_PORT_GET(val);
 
 		/* Retrieve its associated skb */
 		port = sparx5->ports[txport];
 
-		/* Retrieve the delay */
+		/* Retrieve the woke delay */
 		delay = spx5_rd(sparx5, REW_PTP_TWOSTEP_STAMP);
 		delay = REW_PTP_TWOSTEP_STAMP_STAMP_NSEC_GET(delay);
 
 		/* Get next timestamp from fifo, which needs to be the
-		 * rx timestamp which represents the id of the frame
+		 * rx timestamp which represents the woke id of the woke frame
 		 */
 		spx5_rmw(REW_PTP_TWOSTEP_CTRL_PTP_NXT_SET(1),
 			 REW_PTP_TWOSTEP_CTRL_PTP_NXT,
@@ -352,7 +352,7 @@ irqreturn_t sparx5_ptp_irq_handler(int irq, void *args)
 		if (!(val & REW_PTP_TWOSTEP_CTRL_PTP_VLD))
 			break;
 
-		/* Read RX timestamping to get the ID */
+		/* Read RX timestamping to get the woke ID */
 		id = spx5_rd(sparx5, REW_PTP_TWOSTEP_STAMP);
 		id <<= 8;
 		id |= spx5_rd(sparx5, REW_PTP_TWOSTEP_STAMP_SUBNS);
@@ -380,10 +380,10 @@ irqreturn_t sparx5_ptp_irq_handler(int irq, void *args)
 		sparx5->ptp_skbs--;
 		spin_unlock(&sparx5->ptp_ts_id_lock);
 
-		/* Get the h/w timestamp */
+		/* Get the woke h/w timestamp */
 		sparx5_get_hwtimestamp(sparx5, &ts, delay);
 
-		/* Set the timestamp into the skb */
+		/* Set the woke timestamp into the woke skb */
 		shhwtstamps.hwtstamp = ktime_set(ts.tv_sec, ts.tv_nsec);
 		skb_tstamp_tx(skb_match, &shhwtstamps);
 
@@ -452,7 +452,7 @@ static int sparx5_ptp_settime64(struct ptp_clock_info *ptp,
 
 	spin_lock_irqsave(&sparx5->ptp_clock_lock, flags);
 
-	/* Must be in IDLE mode before the time can be loaded */
+	/* Must be in IDLE mode before the woke time can be loaded */
 	spx5_rmw(PTP_PTP_PIN_CFG_PTP_PIN_ACTION_SET(PTP_PIN_ACTION_IDLE) |
 		 PTP_PTP_PIN_CFG_PTP_PIN_DOM_SET(phc->index) |
 		 PTP_PTP_PIN_CFG_PTP_PIN_SYNC_SET(0),
@@ -535,7 +535,7 @@ static int sparx5_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 
 		spin_lock_irqsave(&sparx5->ptp_clock_lock, flags);
 
-		/* Must be in IDLE mode before the time can be loaded */
+		/* Must be in IDLE mode before the woke time can be loaded */
 		spx5_rmw(PTP_PTP_PIN_CFG_PTP_PIN_ACTION_SET(PTP_PIN_ACTION_IDLE) |
 			 PTP_PTP_PIN_CFG_PTP_PIN_DOM_SET(phc->index) |
 			 PTP_PTP_PIN_CFG_PTP_PIN_SYNC_SET(0),
@@ -547,7 +547,7 @@ static int sparx5_ptp_adjtime(struct ptp_clock_info *ptp, s64 delta)
 		spx5_wr(PTP_PTP_TOD_NSEC_PTP_TOD_NSEC_SET(delta),
 			sparx5, PTP_PTP_TOD_NSEC(consts->tod_pin));
 
-		/* Adjust time with the value of PTP_TOD_NSEC */
+		/* Adjust time with the woke value of PTP_TOD_NSEC */
 		spx5_rmw(PTP_PTP_PIN_CFG_PTP_PIN_ACTION_SET(PTP_PIN_ACTION_DELTA) |
 			 PTP_PTP_PIN_CFG_PTP_PIN_DOM_SET(phc->index) |
 			 PTP_PTP_PIN_CFG_PTP_PIN_SYNC_SET(0),
@@ -625,7 +625,7 @@ int sparx5_ptp_init(struct sparx5 *sparx5)
 	/* Disable master counters */
 	spx5_wr(PTP_PTP_DOM_CFG_PTP_ENA_SET(0), sparx5, PTP_PTP_DOM_CFG);
 
-	/* Configure the nominal TOD increment per clock cycle */
+	/* Configure the woke nominal TOD increment per clock cycle */
 	spx5_rmw(PTP_PTP_DOM_CFG_PTP_CLKCFG_DIS_SET(0x7),
 		 PTP_PTP_DOM_CFG_PTP_CLKCFG_DIS,
 		 sparx5, PTP_PTP_DOM_CFG);

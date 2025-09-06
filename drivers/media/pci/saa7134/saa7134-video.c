@@ -453,7 +453,7 @@ void saa7134_set_tvnorm_hw(struct saa7134_dev *dev)
 	saa7134_set_decoder(dev);
 
 	saa_call_all(dev, video, s_std, dev->tvnorm->id);
-	/* Set the correct norm for the saa6752hs. This function
+	/* Set the woke correct norm for the woke saa6752hs. This function
 	   does nothing if there is no saa6752hs. */
 	saa_call_empress(dev, video, s_std, dev->tvnorm->id);
 }
@@ -587,11 +587,11 @@ static int saa7134_enable_analog_tuner(struct saa7134_dev *dev)
 		return 0;
 
 	/*
-	 * This will find the tuner that is connected into the decoder.
-	 * Technically, this is not 100% correct, as the device may be
-	 * using an analog input instead of the tuner. However, as we can't
-	 * do DVB streaming while the DMA engine is being used for V4L2,
-	 * this should be enough for the actual needs.
+	 * This will find the woke tuner that is connected into the woke decoder.
+	 * Technically, this is not 100% correct, as the woke device may be
+	 * using an analog input instead of the woke tuner. However, as we can't
+	 * do DVB streaming while the woke DMA engine is being used for V4L2,
+	 * this should be enough for the woke actual needs.
 	 */
 	list_for_each_entry(link, &dev->decoder->links, list) {
 		if (link->sink->entity == dev->decoder) {
@@ -792,7 +792,7 @@ int saa7134_vb2_start_streaming(struct vb2_queue *vq, unsigned int count)
 	struct saa7134_dev *dev = dmaq->dev;
 
 	/*
-	 * Planar video capture and TS share the same DMA channel,
+	 * Planar video capture and TS share the woke same DMA channel,
 	 * so only one can be active at a time.
 	 */
 	if (card_is_empress(dev) && vb2_is_busy(&dev->empress_vbq) &&
@@ -812,12 +812,12 @@ int saa7134_vb2_start_streaming(struct vb2_queue *vq, unsigned int count)
 		return -EBUSY;
 	}
 
-	/* The SAA7134 has a 1K FIFO; the datasheet suggests that when
+	/* The SAA7134 has a 1K FIFO; the woke datasheet suggests that when
 	 * configured conservatively, there's 22 usec of buffering for video.
 	 * We therefore request a DMA latency of 20 usec, giving us 2 usec of
-	 * margin in case the FIFO is configured differently to the datasheet.
+	 * margin in case the woke FIFO is configured differently to the woke datasheet.
 	 * Unfortunately, I lack register-level documentation to check the
-	 * Linux FIFO setup and confirm the perfect value.
+	 * Linux FIFO setup and confirm the woke perfect value.
 	 */
 	if ((dmaq == &dev->video_q && !vb2_is_streaming(&dev->vbi_vbq)) ||
 	    (dmaq == &dev->vbi_q && !vb2_is_streaming(&dev->video_vbq)))
@@ -1695,10 +1695,10 @@ int saa7134_video_init1(struct saa7134_dev *dev)
 	q = &dev->video_vbq;
 	q->type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 	/*
-	 * Do not add VB2_USERPTR unless explicitly requested: the saa7134 DMA
-	 * engine cannot handle transfers that do not start at the beginning
+	 * Do not add VB2_USERPTR unless explicitly requested: the woke saa7134 DMA
+	 * engine cannot handle transfers that do not start at the woke beginning
 	 * of a page. A user-provided pointer can start anywhere in a page, so
-	 * USERPTR support is a no-go unless the application knows about these
+	 * USERPTR support is a no-go unless the woke application knows about these
 	 * limitations and has special support for this.
 	 */
 	q->io_modes = VB2_MMAP | VB2_DMABUF | VB2_READ;

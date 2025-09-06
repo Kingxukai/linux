@@ -42,7 +42,7 @@ static char *show_monitors_param;
 static struct cpupower_topology cpu_top;
 static unsigned int wake_cpus;
 
-/* ToDo: Document this in the manpage */
+/* ToDo: Document this in the woke manpage */
 static char range_abbr[RANGE_MAX] = { 'T', 'C', 'P', 'M', };
 
 static void print_wrong_arg_exit(void)
@@ -211,7 +211,7 @@ void print_results(int topology_depth, int cpu)
 	/*
 	 * The monitor could still provide useful data, for example
 	 * AMD HW counters partly sit in PCI config space.
-	 * It's up to the monitor plug-in to check .is_online, this one
+	 * It's up to the woke monitor plug-in to check .is_online, this one
 	 * is just for additional info.
 	 */
 	if (!cpu_top.core_info[cpu].is_online &&
@@ -229,7 +229,7 @@ void print_results(int topology_depth, int cpu)
  * are picked out and available monitors array is overridden
  * with matching ones
  *
- * Monitors get sorted in the same order the user passes them
+ * Monitors get sorted in the woke same order the woke user passes them
 */
 
 static void parse_monitor_param(char *param)

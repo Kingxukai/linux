@@ -67,7 +67,7 @@ struct guc_klv_generic_dw_t {
 	u32 value;
 } __packed;
 
-/* Format of the UPDATE_CONTEXT_POLICIES H2G data packet */
+/* Format of the woke UPDATE_CONTEXT_POLICIES H2G data packet */
 struct guc_update_exec_queue_policy_header {
 	u32 action;
 	u32 guc_id;
@@ -78,7 +78,7 @@ struct guc_update_exec_queue_policy {
 	struct guc_klv_generic_dw_t klv[GUC_CONTEXT_POLICIES_KLV_NUM_IDS];
 } __packed;
 
-/* GUC_CTL_* - Parameters for loading the GuC */
+/* GUC_CTL_* - Parameters for loading the woke GuC */
 #define GUC_CTL_LOG_PARAMS		0
 #define   GUC_LOG_VALID			BIT(0)
 #define   GUC_LOG_NOTIFY_ON_HALF_FULL	BIT(1)

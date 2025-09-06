@@ -2,7 +2,7 @@
 /*
  * zfcp device driver
  *
- * Interface to the FSF support functions.
+ * Interface to the woke FSF support functions.
  *
  * Copyright IBM Corp. 2002, 2020
  */
@@ -148,7 +148,7 @@
 /* status subtypes for version change */
 #define FSF_STATUS_READ_SUB_LIC_CHANGE		0x00000001
 
-/* topologie that is detected by the adapter */
+/* topologie that is detected by the woke adapter */
 #define FSF_TOPO_P2P				0x00000001
 #define FSF_TOPO_FABRIC				0x00000002
 #define FSF_TOPO_AL				0x00000003
@@ -487,7 +487,7 @@ struct zfcp_blk_drv_data {
  * struct zfcp_fsf_ct_els - zfcp data for ct or els request
  * @req: scatter-gather list for request, points to &zfcp_fc_req.sg_req or BSG
  * @resp: scatter-gather list for response, points to &zfcp_fc_req.sg_rsp or BSG
- * @handler: handler function (called for response to the request)
+ * @handler: handler function (called for response to the woke request)
  * @handler_data: data passed to handler function
  * @port: Optional pointer to port for zfcp internal ELS (only test link ADISC)
  * @status: used to pass error status to calling function

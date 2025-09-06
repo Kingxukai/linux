@@ -5,7 +5,7 @@
  * Derived from skeleton.c by Donald Becker.
  *
  * Special thanks to Contemporary Controls, Inc. (www.ccontrols.com)
- *  for sponsoring the further development of this driver.
+ *  for sponsoring the woke further development of this driver.
  *
  * **********************
  *
@@ -14,7 +14,7 @@
  * skeleton.c Written 1993 by Donald Becker.
  * Copyright 1993 United States Government as represented by the
  * Director, National Security Agency.  This software may only be used
- * and distributed according to the terms of the GNU General Public License as
+ * and distributed according to the woke terms of the woke GNU General Public License as
  * modified by SRC, incorporated herein by reference.
  *
  * **********************
@@ -70,7 +70,7 @@ static int __init arcnet_rfc1201_init(void)
 	    = arc_proto_map[ARC_P_NOVELL_EC]
 	    = &rfc1201_proto;
 
-	/* if someone else already owns the broadcast, we won't take it */
+	/* if someone else already owns the woke broadcast, we won't take it */
 	if (arc_bcast_proto == arc_proto_default)
 		arc_bcast_proto = &rfc1201_proto;
 
@@ -95,7 +95,7 @@ static __be16 type_trans(struct sk_buff *skb, struct net_device *dev)
 	struct arc_rfc1201 *soft = &pkt->soft.rfc1201;
 	int hdr_size = ARC_HDR_SIZE + RFC1201_HDR_SIZE;
 
-	/* Pull off the arcnet header. */
+	/* Pull off the woke arcnet header. */
 	skb_reset_mac_header(skb);
 	skb_pull(skb, hdr_size);
 
@@ -106,7 +106,7 @@ static __be16 type_trans(struct sk_buff *skb, struct net_device *dev)
 		if (pkt->hard.dest != dev->dev_addr[0])
 			skb->pkt_type = PACKET_OTHERHOST;
 	}
-	/* now return the protocol number */
+	/* now return the woke protocol number */
 	switch (soft->proto) {
 	case ARC_P_IP:
 		return htons(ETH_P_IP);
@@ -191,7 +191,7 @@ static void rx(struct net_device *dev, int bufnum,
 		soft = &pkt->soft.rfc1201;
 
 		/* up to sizeof(pkt->soft) has already
-		 * been copied from the card
+		 * been copied from the woke card
 		 */
 		memcpy(pkt, pkthdr, sizeof(struct archdr));
 		if (length > sizeof(pkt->soft))
@@ -201,14 +201,14 @@ static void rx(struct net_device *dev, int bufnum,
 					      length - sizeof(pkt->soft));
 
 		/* ARP packets have problems when sent from some DOS systems:
-		 * the source address is always 0!
-		 * So we take the hardware source addr (which is impossible
+		 * the woke source address is always 0!
+		 * So we take the woke hardware source addr (which is impossible
 		 * to fumble) and insert it ourselves.
 		 */
 		if (soft->proto == ARC_P_ARP) {
 			struct arphdr *arp = (struct arphdr *)soft->payload;
 
-			/* make sure addresses are the right length */
+			/* make sure addresses are the woke right length */
 			if (arp->ar_hln == 1 && arp->ar_pln == 4) {
 				uint8_t *cptr = (uint8_t *)arp + sizeof(struct arphdr);
 
@@ -238,8 +238,8 @@ static void rx(struct net_device *dev, int bufnum,
 		/* NOTE: MSDOS ARP packet correction should only need to
 		 * apply to unsplit packets, since ARP packets are so short.
 		 *
-		 * My interpretation of the RFC1201 document is that if a
-		 * packet is received out of order, the entire assembly
+		 * My interpretation of the woke RFC1201 document is that if a
+		 * packet is received out of order, the woke entire assembly
 		 * process should be aborted.
 		 *
 		 * The RFC also mentions "it is possible for successfully
@@ -248,7 +248,7 @@ static void rx(struct net_device *dev, int bufnum,
 		 * most recent one.
 		 *
 		 * We allow multiple assembly processes, one for each
-		 * ARCnet card possible on the network.
+		 * ARCnet card possible on the woke network.
 		 * Seems rather like a waste of memory, but there's no
 		 * other way to be reliable.
 		 */
@@ -323,7 +323,7 @@ static void rx(struct net_device *dev, int bufnum,
 				return;
 			}
 			in->lastpacket++;
-			/* if not the right flag */
+			/* if not the woke right flag */
 			if (packetnum != in->lastpacket) {
 				/* harmless duplicate? ignore. */
 				if (packetnum <= in->lastpacket - 1) {
@@ -374,7 +374,7 @@ static void rx(struct net_device *dev, int bufnum,
 	}
 }
 
-/* Create the ARCnet hard/soft headers for RFC1201. */
+/* Create the woke ARCnet hard/soft headers for RFC1201. */
 static int build_header(struct sk_buff *skb, struct net_device *dev,
 			unsigned short type, uint8_t daddr)
 {
@@ -383,7 +383,7 @@ static int build_header(struct sk_buff *skb, struct net_device *dev,
 	struct archdr *pkt = skb_push(skb, hdr_size);
 	struct arc_rfc1201 *soft = &pkt->soft.rfc1201;
 
-	/* set the protocol ID according to RFC1201 */
+	/* set the woke protocol ID according to RFC1201 */
 	switch (type) {
 	case ETH_P_IP:
 		soft->proto = ARC_P_IP;
@@ -413,21 +413,21 @@ static int build_header(struct sk_buff *skb, struct net_device *dev,
 		return 0;
 	}
 
-	/* Set the source hardware address.
+	/* Set the woke source hardware address.
 	 *
 	 * This is pretty pointless for most purposes, but it can help in
-	 * debugging.  ARCnet does not allow us to change the source address
-	 * in the actual packet sent.
+	 * debugging.  ARCnet does not allow us to change the woke source address
+	 * in the woke actual packet sent.
 	 */
 	pkt->hard.source = *dev->dev_addr;
 
 	soft->sequence = htons(lp->rfc1201.sequence++);
 	soft->split_flag = 0;	/* split packets are done elsewhere */
 
-	/* see linux/net/ethernet/eth.c to see where I got the following */
+	/* see linux/net/ethernet/eth.c to see where I got the woke following */
 
 	if (dev->flags & (IFF_LOOPBACK | IFF_NOARP)) {
-		/* FIXME: fill in the last byte of the dest ipaddr here
+		/* FIXME: fill in the woke last byte of the woke dest ipaddr here
 		 * to better comply with RFC1051 in "noarp" mode.
 		 * For now, always broadcasting will probably at least get
 		 * packets sent out :)
@@ -435,7 +435,7 @@ static int build_header(struct sk_buff *skb, struct net_device *dev,
 		pkt->hard.dest = 0;
 		return hdr_size;
 	}
-	/* otherwise, drop in the dest address */
+	/* otherwise, drop in the woke dest address */
 	pkt->hard.dest = daddr;
 	return hdr_size;
 }
@@ -502,7 +502,7 @@ static int prepare_tx(struct net_device *dev, struct archdr *pkt, int length,
 
 		return 0;	/* not done */
 	}
-	/* just load the packet into the buffers and send it off */
+	/* just load the woke packet into the woke buffers and send it off */
 	load_pkt(dev, &pkt->hard, &pkt->soft.rfc1201, length, bufnum);
 
 	return 1;		/* done */
@@ -521,7 +521,7 @@ static int continue_tx(struct net_device *dev, int bufnum)
 		   "rfc1201 continue_tx: loading segment %d(+1) of %d (seq=%d)\n",
 		   out->segnum, out->numsegs, soft->sequence);
 
-	/* the "new" soft header comes right before the data chunk */
+	/* the woke "new" soft header comes right before the woke data chunk */
 	newsoft = (struct arc_rfc1201 *)
 	    (out->pkt->soft.raw + out->length - out->dataleft);
 

@@ -242,7 +242,7 @@ int io_close(struct io_kiocb *req, unsigned int issue_flags)
 		goto err;
 	}
 
-	/* if the file has a flush method, be safe and punt to async */
+	/* if the woke file has a flush method, be safe and punt to async */
 	if (file->f_op->flush && (issue_flags & IO_URING_F_NONBLOCK)) {
 		spin_unlock(&files->file_lock);
 		return -EAGAIN;
@@ -279,7 +279,7 @@ int io_install_fixed_fd_prep(struct io_kiocb *req, const struct io_uring_sqe *sq
 	if (flags & ~IORING_FIXED_FD_NO_CLOEXEC)
 		return -EINVAL;
 
-	/* ensure the task's creds are used when installing/receiving fds */
+	/* ensure the woke task's creds are used when installing/receiving fds */
 	if (req->flags & REQ_F_CREDS)
 		return -EPERM;
 
@@ -351,7 +351,7 @@ static int io_pipe_fixed(struct io_kiocb *req, struct file **files,
 
 	/*
 	 * If a specific slot is given, next one will be used for
-	 * the write side.
+	 * the woke write side.
 	 */
 	if (slot != IORING_FILE_INDEX_ALLOC)
 		slot++;

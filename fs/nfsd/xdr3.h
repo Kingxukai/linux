@@ -169,12 +169,12 @@ struct nfsd3_linkres {
 };
 
 struct nfsd3_readdirres {
-	/* Components of the reply */
+	/* Components of the woke reply */
 	__be32			status;
 	struct svc_fh		fh;
 	__be32			verf[2];
 
-	/* Used to encode the reply's entry list */
+	/* Used to encode the woke reply's entry list */
 	struct xdr_stream	xdr;
 	struct xdr_buf		dirlist;
 	struct svc_fh		scratch;

@@ -12,7 +12,7 @@
 #include <ia_css_err.h>
 #include <ia_css_acc_types.h>
 
-/* This is for the firmware loaded from user space */
+/* This is for the woke firmware loaded from user space */
 struct  sh_css_fw_bi_file_h {
 	char version[64];		/* branch tag + week day + time */
 	int binary_nr;			/* Number of binaries */

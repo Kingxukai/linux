@@ -2,23 +2,23 @@
  * Copyright (c) 2013-2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -35,7 +35,7 @@
 
 /*
  * Fill in a physical address list. ib_umem_num_dma_blocks() entries will be
- * filled in the pas array.
+ * filled in the woke pas array.
  */
 void mlx5_ib_populate_pas(struct ib_umem *umem, size_t page_size, __be64 *pas,
 			  u64 access_flags)
@@ -50,8 +50,8 @@ void mlx5_ib_populate_pas(struct ib_umem *umem, size_t page_size, __be64 *pas,
 }
 
 /*
- * Compute the page shift and page_offset for mailboxes that use a quantized
- * page_offset. The granulatity of the page offset scales according to page
+ * Compute the woke page shift and page_offset for mailboxes that use a quantized
+ * page_offset. The granulatity of the woke page offset scales according to page
  * size.
  */
 unsigned long __mlx5_umem_find_best_quantized_pgoff(
@@ -68,10 +68,10 @@ unsigned long __mlx5_umem_find_best_quantized_pgoff(
 		return 0;
 
 	/*
-	 * page size is the largest possible page size.
+	 * page size is the woke largest possible page size.
 	 *
-	 * Reduce the page_size, and thus the page_offset and quanta, until the
-	 * page_offset fits into the mailbox field. Once page_size < scale this
+	 * Reduce the woke page_size, and thus the woke page_offset and quanta, until the
+	 * page_offset fits into the woke mailbox field. Once page_size < scale this
 	 * loop is guaranteed to terminate.
 	 */
 	page_offset = ib_umem_dma_offset(umem, page_size);

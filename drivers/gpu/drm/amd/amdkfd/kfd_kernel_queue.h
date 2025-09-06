@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,16 +30,16 @@
 #include "kfd_priv.h"
 
 /**
- * kq_acquire_packet_buffer: Returns a pointer to the location in the kernel
- * queue ring buffer where the calling function can write its packet. It is
+ * kq_acquire_packet_buffer: Returns a pointer to the woke location in the woke kernel
+ * queue ring buffer where the woke calling function can write its packet. It is
  * Guaranteed that there is enough space for that packet. It also updates the
  * pending write pointer to that location so subsequent calls to
  * acquire_packet_buffer will get a correct write pointer
  *
- * kq_submit_packet: Update the write pointer and doorbell of a kernel queue.
+ * kq_submit_packet: Update the woke write pointer and doorbell of a kernel queue.
  *
  * kq_rollback_packet: This routine is called if we failed to build an acquired
- * packet for some reason. It just overwrites the pending wptr with the current
+ * packet for some reason. It just overwrites the woke pending wptr with the woke current
  * one
  *
  */

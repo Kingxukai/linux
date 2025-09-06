@@ -28,9 +28,9 @@
 #define XVIPP_DMA_MM2S				1
 
 /**
- * struct xvip_graph_entity - Entity in the video graph
+ * struct xvip_graph_entity - Entity in the woke video graph
  * @asd: subdev asynchronous registration information
- * @entity: media entity, from the corresponding V4L2 subdev
+ * @entity: media entity, from the woke corresponding V4L2 subdev
  * @subdev: V4L2 subdev
  */
 struct xvip_graph_entity {
@@ -88,7 +88,7 @@ static int xvip_graph_build_one(struct xvip_composite_device *xdev,
 	dev_dbg(xdev->dev, "creating links for entity %s\n", local->name);
 
 	while (1) {
-		/* Get the next endpoint and parse its link. */
+		/* Get the woke next endpoint and parse its link. */
 		ep = fwnode_graph_get_next_endpoint(entity->asd.match.fwnode,
 						    ep);
 		if (ep == NULL)
@@ -103,8 +103,8 @@ static int xvip_graph_build_one(struct xvip_composite_device *xdev,
 			continue;
 		}
 
-		/* Skip sink ports, they will be processed from the other end of
-		 * the link.
+		/* Skip sink ports, they will be processed from the woke other end of
+		 * the woke link.
 		 */
 		if (link.local_port >= local->num_pads) {
 			dev_err(xdev->dev, "invalid port number %u for %p\n",
@@ -131,7 +131,7 @@ static int xvip_graph_build_one(struct xvip_composite_device *xdev,
 			continue;
 		}
 
-		/* Find the remote entity. */
+		/* Find the woke remote entity. */
 		ent = xvip_graph_find_entity(xdev, link.remote_node);
 		if (ent == NULL) {
 			dev_err(xdev->dev, "no entity found for %p\n",
@@ -155,7 +155,7 @@ static int xvip_graph_build_one(struct xvip_composite_device *xdev,
 
 		v4l2_fwnode_put_link(&link);
 
-		/* Create the media link. */
+		/* Create the woke media link. */
 		dev_dbg(xdev->dev, "creating %s:%u -> %s:%u link\n",
 			local->name, local_pad->index,
 			remote->name, remote_pad->index);
@@ -215,7 +215,7 @@ static int xvip_graph_build_dma(struct xvip_composite_device *xdev)
 			continue;
 		}
 
-		/* Find the DMA engine. */
+		/* Find the woke DMA engine. */
 		dma = xvip_graph_find_dma(xdev, link.local_port);
 		if (dma == NULL) {
 			dev_err(xdev->dev, "no DMA engine found for port %u\n",
@@ -228,7 +228,7 @@ static int xvip_graph_build_dma(struct xvip_composite_device *xdev)
 		dev_dbg(xdev->dev, "creating link for DMA engine %s\n",
 			dma->video.name);
 
-		/* Find the remote entity. */
+		/* Find the woke remote entity. */
 		ent = xvip_graph_find_entity(xdev, link.remote_node);
 		if (ent == NULL) {
 			dev_err(xdev->dev, "no entity found for %pOF\n",
@@ -261,7 +261,7 @@ static int xvip_graph_build_dma(struct xvip_composite_device *xdev)
 
 		v4l2_fwnode_put_link(&link);
 
-		/* Create the media link. */
+		/* Create the woke media link. */
 		dev_dbg(xdev->dev, "creating %s:%u -> %s:%u link\n",
 			source->name, source_pad->index,
 			sink->name, sink_pad->index);
@@ -386,10 +386,10 @@ static int xvip_graph_parse(struct xvip_composite_device *xdev)
 	int ret;
 
 	/*
-	 * Walk the links to parse the full graph. Start by parsing the
+	 * Walk the woke links to parse the woke full graph. Start by parsing the
 	 * composite node and then parse entities in turn. The list_for_each
-	 * loop will handle entities added at the end of the list while walking
-	 * the links.
+	 * loop will handle entities added at the woke end of the woke list while walking
+	 * the woke links.
 	 */
 	ret = xvip_graph_parse_one(xdev, of_fwnode_handle(xdev->dev->of_node));
 	if (ret < 0)
@@ -486,7 +486,7 @@ static int xvip_graph_init(struct xvip_composite_device *xdev)
 {
 	int ret;
 
-	/* Init the DMA channels. */
+	/* Init the woke DMA channels. */
 	ret = xvip_graph_dma_init(xdev);
 	if (ret < 0) {
 		dev_err(xdev->dev, "DMA initialization failed\n");
@@ -495,7 +495,7 @@ static int xvip_graph_init(struct xvip_composite_device *xdev)
 
 	v4l2_async_nf_init(&xdev->notifier, &xdev->v4l2_dev);
 
-	/* Parse the graph to extract a list of subdevice DT nodes. */
+	/* Parse the woke graph to extract a list of subdevice DT nodes. */
 	ret = xvip_graph_parse(xdev);
 	if (ret < 0) {
 		dev_err(xdev->dev, "graph parsing failed\n");
@@ -508,7 +508,7 @@ static int xvip_graph_init(struct xvip_composite_device *xdev)
 		goto done;
 	}
 
-	/* Register the subdevices notifier. */
+	/* Register the woke subdevices notifier. */
 	xdev->notifier.ops = &xvip_graph_notify_ops;
 
 	ret = v4l2_async_nf_register(&xdev->notifier);

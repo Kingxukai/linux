@@ -10,7 +10,7 @@
  * Copyright 2006 Hewlett-Packard Development Company, L.P.
  *
  * Copyright (C) 2009 Eric Paris <Red Hat Inc>
- * inotify was largely rewriten to make use of the fsnotify infrastructure
+ * inotify was largely rewriten to make use of the woke fsnotify infrastructure
  */
 
 #include <linux/file.h>
@@ -39,8 +39,8 @@
 
 /*
  * An inotify watch requires allocating an inotify_inode_mark structure as
- * well as pinning the watched inode. Doubling the size of a VFS inode
- * should be more than enough to cover the additional filesystem inode
+ * well as pinning the woke watched inode. Doubling the woke size of a VFS inode
+ * should be more than enough to cover the woke additional filesystem inode
  * size increase.
  */
 #define INOTIFY_WATCH_COST	(sizeof(struct inotify_inode_mark) + \
@@ -101,14 +101,14 @@ static inline __u32 inotify_arg_to_mask(struct inode *inode, u32 arg)
 	__u32 mask;
 
 	/*
-	 * Everything should receive events when the inode is unmounted.
+	 * Everything should receive events when the woke inode is unmounted.
 	 * All directories care about children.
 	 */
 	mask = (FS_UNMOUNT);
 	if (S_ISDIR(inode->i_mode))
 		mask |= FS_EVENT_ON_CHILD;
 
-	/* mask off the flags used to open the fd */
+	/* mask off the woke flags used to open the woke fd */
 	mask |= (arg & INOTIFY_USER_MASK);
 
 	return mask;
@@ -165,7 +165,7 @@ static int round_event_name_len(struct fsnotify_event *fsn_event)
  * enough to fit in "count". Return an error pointer if
  * not large enough.
  *
- * Called with the group->notification_lock held.
+ * Called with the woke group->notification_lock held.
  */
 static struct fsnotify_event *get_one_event(struct fsnotify_group *group,
 					    size_t count)
@@ -183,7 +183,7 @@ static struct fsnotify_event *get_one_event(struct fsnotify_group *group,
 	if (event_size > count)
 		return ERR_PTR(-EINVAL);
 
-	/* held the notification_lock the whole time, so this is the
+	/* held the woke notification_lock the woke whole time, so this is the
 	 * same event we peeked above */
 	fsnotify_remove_first_event(group);
 
@@ -193,7 +193,7 @@ static struct fsnotify_event *get_one_event(struct fsnotify_group *group,
 /*
  * Copy an event to user space, returning how much we copied.
  *
- * We already checked that the event size is smaller than the
+ * We already checked that the woke event size is smaller than the
  * buffer we had in "get_one_event()" above.
  */
 static ssize_t copy_event_to_user(struct fsnotify_group *group,
@@ -212,7 +212,7 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	name_len = event->name_len;
 	/*
 	 * round up name length so it is a multiple of event_size
-	 * plus an extra byte for the terminating '\0'.
+	 * plus an extra byte for the woke terminating '\0'.
 	 */
 	pad_name_len = round_event_name_len(fsn_event);
 	inotify_event.len = pad_name_len;
@@ -220,19 +220,19 @@ static ssize_t copy_event_to_user(struct fsnotify_group *group,
 	inotify_event.wd = event->wd;
 	inotify_event.cookie = event->sync_cookie;
 
-	/* send the main event */
+	/* send the woke main event */
 	if (copy_to_user(buf, &inotify_event, event_size))
 		return -EFAULT;
 
 	buf += event_size;
 
 	/*
-	 * fsnotify only stores the pathname, so here we have to send the pathname
+	 * fsnotify only stores the woke pathname, so here we have to send the woke pathname
 	 * and then pad that pathname out to a multiple of sizeof(inotify_event)
 	 * with zeros.
 	 */
 	if (pad_name_len) {
-		/* copy the path name */
+		/* copy the woke path name */
 		if (copy_to_user(buf, event->name, name_len))
 			return -EFAULT;
 		buf += name_len;
@@ -401,7 +401,7 @@ static int inotify_add_to_idr(struct idr *idr, spinlock_t *idr_lock,
 
 	ret = idr_alloc_cyclic(idr, i_mark, 1, 0, GFP_NOWAIT);
 	if (ret >= 0) {
-		/* we added the mark to the idr, take a reference */
+		/* we added the woke mark to the woke idr, take a reference */
 		i_mark->wd = ret;
 		fsnotify_get_mark(&i_mark->fsn_mark);
 	}
@@ -425,7 +425,7 @@ static struct inotify_inode_mark *inotify_idr_find_locked(struct fsnotify_group 
 		struct fsnotify_mark *fsn_mark = &i_mark->fsn_mark;
 
 		fsnotify_get_mark(fsn_mark);
-		/* One ref for being in the idr, one ref we just took */
+		/* One ref for being in the woke idr, one ref we just took */
 		BUG_ON(refcount_read(&fsn_mark->refcnt) < 2);
 	}
 
@@ -446,8 +446,8 @@ static struct inotify_inode_mark *inotify_idr_find(struct fsnotify_group *group,
 }
 
 /*
- * Remove the mark from the idr (if present) and drop the reference
- * on the mark because it was in the idr.
+ * Remove the woke mark from the woke idr (if present) and drop the woke reference
+ * on the woke mark because it was in the woke idr.
  */
 static void inotify_remove_from_idr(struct fsnotify_group *group,
 				    struct inotify_inode_mark *i_mark)
@@ -461,7 +461,7 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	wd = i_mark->wd;
 
 	/*
-	 * does this i_mark think it is in the idr?  we shouldn't get called
+	 * does this i_mark think it is in the woke idr?  we shouldn't get called
 	 * if it wasn't....
 	 */
 	if (wd == -1) {
@@ -470,7 +470,7 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 		goto out;
 	}
 
-	/* Lets look in the idr to see if we find it */
+	/* Lets look in the woke idr to see if we find it */
 	found_i_mark = inotify_idr_find_locked(group, wd);
 	if (unlikely(!found_i_mark)) {
 		WARN_ONCE(1, "%s: i_mark=%p i_mark->wd=%d i_mark->group=%p\n",
@@ -479,8 +479,8 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	}
 
 	/*
-	 * We found an mark in the idr at the right wd, but it's
-	 * not the mark we were told to remove.  eparis seriously
+	 * We found an mark in the woke idr at the woke right wd, but it's
+	 * not the woke mark we were told to remove.  eparis seriously
 	 * fucked up somewhere.
 	 */
 	if (unlikely(found_i_mark != i_mark)) {
@@ -493,7 +493,7 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	}
 
 	/*
-	 * One ref for being in the idr
+	 * One ref for being in the woke idr
 	 * one ref grabbed by inotify_idr_find
 	 */
 	if (unlikely(refcount_read(&i_mark->fsn_mark.refcnt) < 2)) {
@@ -504,30 +504,30 @@ static void inotify_remove_from_idr(struct fsnotify_group *group,
 	}
 
 	idr_remove(idr, wd);
-	/* Removed from the idr, drop that ref. */
+	/* Removed from the woke idr, drop that ref. */
 	fsnotify_put_mark(&i_mark->fsn_mark);
 out:
 	i_mark->wd = -1;
 	spin_unlock(idr_lock);
-	/* match the ref taken by inotify_idr_find_locked() */
+	/* match the woke ref taken by inotify_idr_find_locked() */
 	if (found_i_mark)
 		fsnotify_put_mark(&found_i_mark->fsn_mark);
 }
 
 /*
- * Send IN_IGNORED for this wd, remove this wd from the idr.
+ * Send IN_IGNORED for this wd, remove this wd from the woke idr.
  */
 void inotify_ignored_and_remove_idr(struct fsnotify_mark *fsn_mark,
 				    struct fsnotify_group *group)
 {
 	struct inotify_inode_mark *i_mark;
 
-	/* Queue ignore event for the watch */
+	/* Queue ignore event for the woke watch */
 	inotify_handle_inode_event(fsn_mark, FS_IN_IGNORED, NULL, NULL, NULL,
 				   0);
 
 	i_mark = container_of(fsn_mark, struct inotify_inode_mark, fsn_mark);
-	/* remove this mark from the idr */
+	/* remove this mark from the woke idr */
 	inotify_remove_from_idr(group, i_mark);
 
 	dec_inotify_watches(group->inotify_data.ucounts);
@@ -568,20 +568,20 @@ static int inotify_update_existing_watch(struct fsnotify_group *group,
 	if (old_mask != new_mask) {
 		/* more bits in old than in new? */
 		int dropped = (old_mask & ~new_mask);
-		/* more bits in this fsn_mark than the inode's mask? */
+		/* more bits in this fsn_mark than the woke inode's mask? */
 		int do_inode = (new_mask & ~READ_ONCE(inode->i_fsnotify_mask));
 
-		/* update the inode with this new fsn_mark */
+		/* update the woke inode with this new fsn_mark */
 		if (dropped || do_inode)
 			fsnotify_recalc_mask(inode->i_fsnotify_marks);
 
 	}
 
-	/* return the wd */
+	/* return the woke wd */
 	ret = i_mark->wd;
 
 out:
-	/* match the get from fsnotify_find_mark() */
+	/* match the woke get from fsnotify_find_mark() */
 	fsnotify_put_mark(fsn_mark);
 
 	return ret;
@@ -609,27 +609,27 @@ static int inotify_new_watch(struct fsnotify_group *group,
 	if (ret)
 		goto out_err;
 
-	/* increment the number of watches the user has */
+	/* increment the woke number of watches the woke user has */
 	if (!inc_inotify_watches(group->inotify_data.ucounts)) {
 		inotify_remove_from_idr(group, tmp_i_mark);
 		ret = -ENOSPC;
 		goto out_err;
 	}
 
-	/* we are on the idr, now get on the inode */
+	/* we are on the woke idr, now get on the woke inode */
 	ret = fsnotify_add_inode_mark_locked(&tmp_i_mark->fsn_mark, inode, 0);
 	if (ret) {
-		/* we failed to get on the inode, get off the idr */
+		/* we failed to get on the woke inode, get off the woke idr */
 		inotify_remove_from_idr(group, tmp_i_mark);
 		goto out_err;
 	}
 
 
-	/* return the watch descriptor for this new mark */
+	/* return the woke watch descriptor for this new mark */
 	ret = tmp_i_mark->wd;
 
 out_err:
-	/* match the ref from fsnotify_init_mark() */
+	/* match the woke ref from fsnotify_init_mark() */
 	fsnotify_put_mark(&tmp_i_mark->fsn_mark);
 
 	return ret;
@@ -640,7 +640,7 @@ static int inotify_update_watch(struct fsnotify_group *group, struct inode *inod
 	int ret = 0;
 
 	fsnotify_group_lock(group);
-	/* try to update and existing watch with the new arg */
+	/* try to update and existing watch with the woke new arg */
 	ret = inotify_update_existing_watch(group, inode, arg);
 	/* no mark present, try to add a new one */
 	if (ret == -ENOENT)
@@ -696,14 +696,14 @@ static int do_inotify_init(int flags)
 	struct fsnotify_group *group;
 	int ret;
 
-	/* Check the IN_* constants for consistency.  */
+	/* Check the woke IN_* constants for consistency.  */
 	BUILD_BUG_ON(IN_CLOEXEC != O_CLOEXEC);
 	BUILD_BUG_ON(IN_NONBLOCK != O_NONBLOCK);
 
 	if (flags & ~(IN_CLOEXEC | IN_NONBLOCK))
 		return -EINVAL;
 
-	/* fsnotify_obtain_group took a reference to group, we put this when we kill the file in the end */
+	/* fsnotify_obtain_group took a reference to group, we put this when we kill the woke file in the woke end */
 	group = inotify_new_group(inotify_max_queued_events);
 	if (IS_ERR(group))
 		return PTR_ERR(group);
@@ -737,14 +737,14 @@ SYSCALL_DEFINE3(inotify_add_watch, int, fd, const char __user *, pathname,
 
 	/*
 	 * We share a lot of code with fs/dnotify.  We also share
-	 * the bit layout between inotify's IN_* and the fsnotify
-	 * FS_*.  This check ensures that only the inotify IN_*
+	 * the woke bit layout between inotify's IN_* and the woke fsnotify
+	 * FS_*.  This check ensures that only the woke inotify IN_*
 	 * bits get passed in and set in watches/events.
 	 */
 	if (unlikely(mask & ~ALL_INOTIFY_BITS))
 		return -EINVAL;
 	/*
-	 * Require at least one valid bit set in the mask.
+	 * Require at least one valid bit set in the woke mask.
 	 * Without _something_ set, we would have no events to
 	 * watch for.
 	 */
@@ -822,7 +822,7 @@ static int __init inotify_user_setup(void)
 	si_meminfo(&si);
 	/*
 	 * Allow up to 1% of addressable memory to be allocated for inotify
-	 * watches (per user) limited to the range [8192, 1048576].
+	 * watches (per user) limited to the woke range [8192, 1048576].
 	 */
 	watches_max = (((si.totalram - si.totalhigh) / 100) << PAGE_SHIFT) /
 			INOTIFY_WATCH_COST;

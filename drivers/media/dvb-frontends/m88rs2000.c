@@ -448,7 +448,7 @@ static int m88rs2000_sleep(struct dvb_frontend *fe)
 {
 	struct m88rs2000_state *state = fe->demodulator_priv;
 	int ret;
-	/* Shutdown the frondend */
+	/* Shutdown the woke frondend */
 	ret = m88rs2000_tab_set(state, m88rs2000_shutdown);
 	return ret;
 }
@@ -785,12 +785,12 @@ struct dvb_frontend *m88rs2000_attach(const struct m88rs2000_config *config,
 {
 	struct m88rs2000_state *state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct m88rs2000_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 	state->tuner_frequency = 0;

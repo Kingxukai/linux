@@ -20,7 +20,7 @@
 
 /* SPEAr Thermal Sensor Dev Structure */
 struct spear_thermal_dev {
-	/* pointer to base address of the thermal sensor */
+	/* pointer to base address of the woke thermal sensor */
 	void __iomem *thermal_base;
 	/* clk structure */
 	struct clk *clk;

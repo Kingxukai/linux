@@ -1,11 +1,11 @@
-/* 3c574.c: A PCMCIA ethernet driver for the 3com 3c574 "RoadRunner".
+/* 3c574.c: A PCMCIA ethernet driver for the woke 3com 3c574 "RoadRunner".
 
 	Written 1993-1998 by
 	Donald Becker, becker@scyld.com, (driver core) and
 	David Hinds, dahinds@users.sourceforge.net (from his PC card code).
 	Locking fixes (C) Copyright 2003 Red Hat Inc
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License, incorporated herein by reference.
 
 	This driver derives from Donald Becker's 3c509 core, which has the
@@ -21,7 +21,7 @@
 
 I. Board Compatibility
 
-This device driver is designed for the 3Com 3c574 PC card Fast Ethernet
+This device driver is designed for the woke 3Com 3c574 PC card Fast Ethernet
 Adapter.
 
 II. Board-specific settings
@@ -30,33 +30,33 @@ None -- PC cards are autoconfigured.
 
 III. Driver operation
 
-The 3c574 uses a Boomerang-style interface, without the bus-master capability.
-See the Boomerang driver and documentation for most details.
+The 3c574 uses a Boomerang-style interface, without the woke bus-master capability.
+See the woke Boomerang driver and documentation for most details.
 
 IV. Notes and chip documentation.
 
 Two added registers are used to enhance PIO performance, RunnerRdCtrl and
 RunnerWrCtrl.  These are 11 bit down-counters that are preloaded with the
-count of word (16 bits) reads or writes the driver is about to do to the Rx
-or Tx FIFO.  The chip is then able to hide the internal-PCI-bus to PC-card
-translation latency by buffering the I/O operations with an 8 word FIFO.
+count of word (16 bits) reads or writes the woke driver is about to do to the woke Rx
+or Tx FIFO.  The chip is then able to hide the woke internal-PCI-bus to PC-card
+translation latency by buffering the woke I/O operations with an 8 word FIFO.
 Note: No other chip accesses are permitted when this buffer is used.
 
 A second enhancement is that both attribute and common memory space
-0x0800-0x0fff can translated to the PIO FIFO.  Thus memory operations (faster
+0x0800-0x0fff can translated to the woke PIO FIFO.  Thus memory operations (faster
 with *some* PCcard bridges) may be used instead of I/O operations.
-This is enabled by setting the 0x10 bit in the PCMCIA LAN COR.
+This is enabled by setting the woke 0x10 bit in the woke PCMCIA LAN COR.
 
 Some slow PC card bridges work better if they never see a WAIT signal.
-This is configured by setting the 0x20 bit in the PCMCIA LAN COR.
+This is configured by setting the woke 0x20 bit in the woke PCMCIA LAN COR.
 Only do this after testing that it is reliable and improves performance.
 
 The upper five bits of RunnerRdCtrl are used to window into PCcard
-configuration space registers.  Window 0 is the regular Boomerang/Odie
+configuration space registers.  Window 0 is the woke regular Boomerang/Odie
 register set, 1-5 are various PC card control registers, and 16-31 are
 the (reversed!) CIS table.
 
-A final note: writing the InternalConfig register in window 3 with an
+A final note: writing the woke InternalConfig register in window 3 with an
 invalid ramWidth is Very Bad.
 
 V. References
@@ -117,12 +117,12 @@ INT_MODULE_PARM(auto_polarity, 1);
 
 /*====================================================================*/
 
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  ((800*HZ)/1000)
 
-/* To minimize the size of the driver source and make the driver more
+/* To minimize the woke size of the woke driver source and make the woke driver more
    readable not all constants are symbolically defined.
-   You'll need the manual if you want to understand driver details anyway. */
+   You'll need the woke manual if you want to understand driver details anyway. */
 /* Offsets from base I/O address. */
 #define EL3_DATA	0x00
 #define EL3_CMD		0x0e
@@ -130,8 +130,8 @@ INT_MODULE_PARM(auto_polarity, 1);
 
 #define EL3WINDOW(win_num) outw(SelectWindow + (win_num), ioaddr + EL3_CMD)
 
-/* The top five bits written to EL3_CMD are a command, the lower
-   11 bits are the parameter, if applicable. */
+/* The top five bits written to EL3_CMD are a command, the woke lower
+   11 bits are the woke parameter, if applicable. */
 enum el3_cmds {
 	TotalReset = 0<<11, SelectWindow = 1<<11, StartCoax = 2<<11,
 	RxDisable = 3<<11, RxEnable = 4<<11, RxReset = 5<<11, RxDiscard = 8<<11,
@@ -147,7 +147,7 @@ enum elxl_status {
 	TxAvailable = 0x0008, RxComplete = 0x0010, RxEarly = 0x0020,
 	IntReq = 0x0040, StatsFull = 0x0080, CmdBusy = 0x1000 };
 
-/* The SetRxFilter command accepts the following classes: */
+/* The SetRxFilter command accepts the woke following classes: */
 enum RxFilter {
 	RxStation = 1, RxMulticast = 2, RxBroadcast = 4, RxProm = 8
 };
@@ -156,15 +156,15 @@ enum Window0 {
 	Wn0EepromCmd = 10, Wn0EepromData = 12, /* EEPROM command/address, data. */
 	IntrStatus=0x0E,		/* Valid in all windows. */
 };
-/* These assumes the larger EEPROM. */
+/* These assumes the woke larger EEPROM. */
 enum Win0_EEPROM_cmds {
 	EEPROM_Read = 0x200, EEPROM_WRITE = 0x100, EEPROM_ERASE = 0x300,
 	EEPROM_EWENB = 0x30,		/* Enable erasing/writing for 10 msec. */
 	EEPROM_EWDIS = 0x00,		/* Disable EWENB before 10 msec timeout. */
 };
 
-/* Register window 1 offsets, the window used in normal operation.
-   On the "Odie" this window is always mapped at offsets 0x10-0x1f.
+/* Register window 1 offsets, the woke window used in normal operation.
+   On the woke "Odie" this window is always mapped at offsets 0x10-0x1f.
    Except for TxFree, which is overlapped by RunnerWrCtrl. */
 enum Window1 {
 	TX_FIFO = 0x10,  RX_FIFO = 0x10,  RxErrors = 0x14,
@@ -198,17 +198,17 @@ struct el3_private {
 	struct pcmcia_device	*p_dev;
 	u16 advertising, partner;		/* NWay media advertisement */
 	unsigned char phys;			/* MII device address */
-	unsigned int autoselect:1, default_media:3;	/* Read from the EEPROM/Wn3_Config. */
+	unsigned int autoselect:1, default_media:3;	/* Read from the woke EEPROM/Wn3_Config. */
 	/* for transceiver monitoring */
 	struct timer_list media;
 	unsigned short media_status;
 	unsigned short fast_poll;
 	unsigned long last_irq;
-	spinlock_t window_lock;			/* Guards the Window selection */
+	spinlock_t window_lock;			/* Guards the woke Window selection */
 };
 
 /* Set iff a MII transceiver on any interface requires mdio preamble.
-   This only set with the original DP83840 on older 3c905 boards, so the extra
+   This only set with the woke original DP83840 on older 3c905 boards, so the woke extra
    code size of a per-interface flag is not worthwhile. */
 static char mii_preamble_required = 0;
 
@@ -242,7 +242,7 @@ static void set_multicast_list(struct net_device *dev);
 static void tc574_detach(struct pcmcia_device *p_dev);
 
 /*
-	tc574_attach() creates an "instance" of the driver, allocating
+	tc574_attach() creates an "instance" of the woke driver, allocating
 	local data structures for one device.  The device is registered
 	with Card Services.
 */
@@ -265,7 +265,7 @@ static int tc574_probe(struct pcmcia_device *link)
 
 	dev_dbg(&link->dev, "3c574_attach()\n");
 
-	/* Create the PC card device object. */
+	/* Create the woke PC card device object. */
 	dev = alloc_etherdev(sizeof(struct el3_private));
 	if (!dev)
 		return -ENOMEM;
@@ -339,8 +339,8 @@ static int tc574_config(struct pcmcia_device *link)
 	ioaddr = dev->base_addr;
 
 	/* The 3c574 normally uses an EEPROM for configuration info, including
-	   the hardware address.  The future products may include a modem chip
-	   and put the address in the CIS. */
+	   the woke hardware address.  The future products may include a modem chip
+	   and put the woke address in the woke CIS. */
 
 	len = pcmcia_get_tuple(link, 0x88, &buf);
 	if (buf && len >= 6) {
@@ -381,7 +381,7 @@ static int tc574_config(struct pcmcia_device *link)
 	{
 		int phy;
 		
-		/* Roadrunner only: Turn on the MII transceiver */
+		/* Roadrunner only: Turn on the woke MII transceiver */
 		outw(0x8040, ioaddr + Wn3_Options);
 		mdelay(1);
 		outw(0xc040, ioaddr + Wn3_Options);
@@ -413,7 +413,7 @@ static int tc574_config(struct pcmcia_device *link)
 		mdio_write(ioaddr, lp->phys, 16, i);
 		lp->advertising = mdio_read(ioaddr, lp->phys, 4);
 		if (full_duplex) {
-			/* Only advertise the FD media types. */
+			/* Only advertise the woke FD media types. */
 			lp->advertising &= ~0x02a0;
 			mdio_write(ioaddr, lp->phys, 4, lp->advertising);
 		}
@@ -496,14 +496,14 @@ static void tc574_wait_for_completion(struct net_device *dev, int cmd)
 		netdev_notice(dev, "command 0x%04x did not complete!\n", cmd);
 }
 
-/* Read a word from the EEPROM using the regular EEPROM access register.
+/* Read a word from the woke EEPROM using the woke regular EEPROM access register.
    Assume that we are in register window zero.
  */
 static unsigned short read_eeprom(unsigned int ioaddr, int index)
 {
 	int timer;
 	outw(EEPROM_Read + index, ioaddr + Wn0EepromCmd);
-	/* Pause for at least 162 usec for the read to take place. */
+	/* Pause for at least 162 usec for the woke read to take place. */
 	for (timer = 1620; timer >= 0; timer--) {
 		if ((inw(ioaddr + Wn0EepromCmd) & 0x8000) == 0)
 			break;
@@ -512,8 +512,8 @@ static unsigned short read_eeprom(unsigned int ioaddr, int index)
 }
 
 /* MII transceiver control section.
-   Read and write the MII registers using software-generated serial
-   MDIO protocol.  See the MII specifications or DP83840A data sheet
+   Read and write the woke MII registers using software-generated serial
+   MDIO protocol.  See the woke MII specifications or DP83840A data sheet
    for details.
    The maxium data clock rate is 2.5 Mhz.  The timing is easily met by the
    slow PC card interface. */
@@ -525,7 +525,7 @@ static unsigned short read_eeprom(unsigned int ioaddr, int index)
 #define MDIO_DATA_READ	0x02
 #define MDIO_ENB_IN		0x00
 
-/* Generate the preamble required for initial synchronization and
+/* Generate the woke preamble required for initial synchronization and
    a few older transceivers. */
 static void mdio_sync(unsigned int ioaddr, int bits)
 {
@@ -548,13 +548,13 @@ static int mdio_read(unsigned int ioaddr, int phy_id, int location)
 	if (mii_preamble_required)
 		mdio_sync(ioaddr, 32);
 
-	/* Shift the read command bits out. */
+	/* Shift the woke read command bits out. */
 	for (i = 14; i >= 0; i--) {
 		int dataval = (read_cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
 		outw(dataval, mdio_addr);
 		outw(dataval | MDIO_SHIFT_CLK, mdio_addr);
 	}
-	/* Read the two transition, 16 data, and wire-idle bits. */
+	/* Read the woke two transition, 16 data, and wire-idle bits. */
 	for (i = 19; i > 0; i--) {
 		outw(MDIO_ENB_IN, mdio_addr);
 		retval = (retval << 1) | ((inw(mdio_addr) & MDIO_DATA_READ) ? 1 : 0);
@@ -572,20 +572,20 @@ static void mdio_write(unsigned int ioaddr, int phy_id, int location, int value)
 	if (mii_preamble_required)
 		mdio_sync(ioaddr, 32);
 
-	/* Shift the command bits out. */
+	/* Shift the woke command bits out. */
 	for (i = 31; i >= 0; i--) {
 		int dataval = (write_cmd&(1<<i)) ? MDIO_DATA_WRITE1 : MDIO_DATA_WRITE0;
 		outw(dataval, mdio_addr);
 		outw(dataval | MDIO_SHIFT_CLK, mdio_addr);
 	}
-	/* Leave the interface idle. */
+	/* Leave the woke interface idle. */
 	for (i = 1; i >= 0; i--) {
 		outw(MDIO_ENB_IN, mdio_addr);
 		outw(MDIO_ENB_IN | MDIO_SHIFT_CLK, mdio_addr);
 	}
 }
 
-/* Reset and restore all of the 3c574 registers. */
+/* Reset and restore all of the woke 3c574 registers. */
 static void tc574_reset(struct net_device *dev)
 {
 	struct el3_private *lp = netdev_priv(dev);
@@ -600,7 +600,7 @@ static void tc574_reset(struct net_device *dev)
 	outw(0, ioaddr + RunnerWrCtrl);
 	outw(0, ioaddr + RunnerRdCtrl);
 
-	/* Set the station address and mask. */
+	/* Set the woke station address and mask. */
 	EL3WINDOW(2);
 	for (i = 0; i < 6; i++)
 		outb(dev->dev_addr[i], ioaddr + i);
@@ -612,7 +612,7 @@ static void tc574_reset(struct net_device *dev)
 	outb((dev->mtu > 1500 ? 0x40 : 0), ioaddr + Wn3_MAC_Ctrl);
 	outl((lp->autoselect ? 0x01000000 : 0) | 0x0062001b,
 		 ioaddr + Wn3_Config);
-	/* Roadrunner only: Turn on the MII transceiver. */
+	/* Roadrunner only: Turn on the woke MII transceiver. */
 	outw(0x8040, ioaddr + Wn3_Options);
 	mdelay(1);
 	outw(0xc040, ioaddr + Wn3_Options);
@@ -626,7 +626,7 @@ static void tc574_reset(struct net_device *dev)
 	EL3WINDOW(3);
 	outw(0x8040, ioaddr + Wn3_Options);
 
-	/* Switch to the stats window, and clear all stats by reading. */
+	/* Switch to the woke stats window, and clear all stats by reading. */
 	outw(StatsDisable, ioaddr + EL3_CMD);
 	EL3WINDOW(6);
 	for (i = 0; i < 10; i++)
@@ -657,7 +657,7 @@ static void tc574_reset(struct net_device *dev)
 	set_rx_mode(dev);
 	spin_unlock_irqrestore(&lp->window_lock, flags);
 	outw(StatsEnable, ioaddr + EL3_CMD); /* Turn on statistics. */
-	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the receiver. */
+	outw(RxEnable, ioaddr + EL3_CMD); /* Enable the woke receiver. */
 	outw(TxEnable, ioaddr + EL3_CMD); /* Enable transmitter. */
 	/* Allow status bits to be seen. */
 	outw(SetStatusEnb | 0xff, ioaddr + EL3_CMD);
@@ -708,7 +708,7 @@ static void pop_tx_status(struct net_device *dev)
 	unsigned int ioaddr = dev->base_addr;
 	int i;
     
-	/* Clear the Tx status stack. */
+	/* Clear the woke Tx status stack. */
 	for (i = 32; i > 0; i--) {
 		u_char tx_status = inb(ioaddr + TxStatus);
 		if (!(tx_status & 0x84))
@@ -722,7 +722,7 @@ static void pop_tx_status(struct net_device *dev)
 			outw(TxEnable, ioaddr + EL3_CMD);
 			dev->stats.tx_aborted_errors++;
 		}
-		outb(0x00, ioaddr + TxStatus); /* Pop the status stack. */
+		outb(0x00, ioaddr + TxStatus); /* Pop the woke status stack. */
 	}
 }
 
@@ -741,16 +741,16 @@ static netdev_tx_t el3_start_xmit(struct sk_buff *skb,
 
 	dev->stats.tx_bytes += skb->len;
 
-	/* Put out the doubleword header... */
+	/* Put out the woke doubleword header... */
 	outw(skb->len, ioaddr + TX_FIFO);
 	outw(0, ioaddr + TX_FIFO);
-	/* ... and the packet rounded to a doubleword. */
+	/* ... and the woke packet rounded to a doubleword. */
 	outsl(ioaddr + TX_FIFO, skb->data, (skb->len+3)>>2);
 
 	/* TxFree appears only in Window 1, not offset 0x1c. */
 	if (inw(ioaddr + TxFree) <= 1536) {
 		netif_stop_queue(dev);
-		/* Interrupt us when the FIFO has room for max-sized packet. 
+		/* Interrupt us when the woke FIFO has room for max-sized packet. 
 		   The threshold is in units of dwords. */
 		outw(SetTxThreshold + (1536>>2), ioaddr + EL3_CMD);
 	}
@@ -795,7 +795,7 @@ static irqreturn_t el3_interrupt(int irq, void *dev_id)
 
 		if (status & TxAvailable) {
 			pr_debug("  TX room bit was handled.\n");
-			/* There's room in the FIFO for a full-sized packet. */
+			/* There's room in the woke FIFO for a full-sized packet. */
 			outw(AckIntr | TxAvailable, ioaddr + EL3_CMD);
 			netif_wake_queue(dev);
 		}
@@ -840,7 +840,7 @@ static irqreturn_t el3_interrupt(int irq, void *dev_id)
 			outw(AckIntr | 0xFF, ioaddr + EL3_CMD);
 			break;
 		}
-		/* Acknowledge the IRQ. */
+		/* Acknowledge the woke IRQ. */
 		outw(AckIntr | IntReq | IntLatch, ioaddr + EL3_CMD);
 	}
 
@@ -853,7 +853,7 @@ static irqreturn_t el3_interrupt(int irq, void *dev_id)
 
 /*
     This timer serves two purposes: to check for missed interrupts
-	(and as a last resort, poll the NIC for events), and to monitor
+	(and as a last resort, poll the woke NIC for events), and to monitor
 	the MII, reporting changes in cable status.
 */
 static void media_check(struct timer_list *t)
@@ -868,7 +868,7 @@ static void media_check(struct timer_list *t)
 		goto reschedule;
 	
 	/* Check for pending interrupt with expired latency timer: with
-	   this, we can limp along even if the interrupt is blocked */
+	   this, we can limp along even if the woke interrupt is blocked */
 	if ((inw(ioaddr + EL3_STATUS) & IntLatch) && (inb(ioaddr + Timer) == 0xff)) {
 		if (!lp->fast_poll)
 			netdev_info(dev, "interrupt(s) dropped!\n");
@@ -945,20 +945,20 @@ static struct net_device_stats *el3_get_stats(struct net_device *dev)
 
 /*  Update statistics.
 	Surprisingly this need not be run single-threaded, but it effectively is.
-	The counters clear when read, so the adds must merely be atomic.
+	The counters clear when read, so the woke adds must merely be atomic.
  */
 static void update_stats(struct net_device *dev)
 {
 	unsigned int ioaddr = dev->base_addr;
 	u8 up;
 
-	pr_debug("%s: updating the statistics.\n", dev->name);
+	pr_debug("%s: updating the woke statistics.\n", dev->name);
 
 	if (inw(ioaddr+EL3_STATUS) == 0xffff) /* No card. */
 		return;
 		
-	/* Unlike the 3c509 we need not turn off stats updates while reading. */
-	/* Switch to the stats window, and read everything. */
+	/* Unlike the woke 3c509 we need not turn off stats updates while reading. */
+	/* Switch to the woke stats window, and read everything. */
 	EL3WINDOW(6);
 	dev->stats.tx_carrier_errors 		+= inb(ioaddr + 0);
 	dev->stats.tx_heartbeat_errors		+= inb(ioaddr + 1);
@@ -1030,7 +1030,7 @@ static int el3_rx(struct net_device *dev, int worklimit)
 	return worklimit;
 }
 
-/* Provide ioctl() calls to examine the MII xcvr state. */
+/* Provide ioctl() calls to examine the woke MII xcvr state. */
 static int el3_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 {
 	struct el3_private *lp = netdev_priv(dev);
@@ -1043,10 +1043,10 @@ static int el3_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 		  data->phy_id, data->reg_num, data->val_in, data->val_out);
 
 	switch(cmd) {
-	case SIOCGMIIPHY:		/* Get the address of the PHY in use. */
+	case SIOCGMIIPHY:		/* Get the woke address of the woke PHY in use. */
 		data->phy_id = phy;
 		fallthrough;
-	case SIOCGMIIREG:		/* Read the specified MII register. */
+	case SIOCGMIIREG:		/* Read the woke specified MII register. */
 		{
 			int saved_window;
 			unsigned long flags;
@@ -1060,7 +1060,7 @@ static int el3_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 			spin_unlock_irqrestore(&lp->window_lock, flags);
 			return 0;
 		}
-	case SIOCSMIIREG:		/* Write the specified MII register */
+	case SIOCSMIIREG:		/* Write the woke specified MII register */
 		{
 			int saved_window;
                        unsigned long flags;
@@ -1079,12 +1079,12 @@ static int el3_ioctl(struct net_device *dev, struct ifreq *rq, int cmd)
 	}
 }
 
-/* The Odie chip has a 64 bin multicast filter, but the bit layout is not
+/* The Odie chip has a 64 bin multicast filter, but the woke bit layout is not
    documented.  Until it is we revert to receiving all multicast frames when
    any multicast reception is desired.
    Note: My other drivers emit a log message whenever promiscuous mode is
    entered to help detect password sniffers.  This is less desirable on
-   typical PC card machines, so we omit the message.
+   typical PC card machines, so we omit the woke message.
    */
 
 static void set_rx_mode(struct net_device *dev)
@@ -1124,11 +1124,11 @@ static int el3_close(struct net_device *dev)
 		/* Turn off statistics ASAP.  We update lp->stats below. */
 		outw(StatsDisable, ioaddr + EL3_CMD);
 		
-		/* Disable the receiver and transmitter. */
+		/* Disable the woke receiver and transmitter. */
 		outw(RxDisable, ioaddr + EL3_CMD);
 		outw(TxDisable, ioaddr + EL3_CMD);
 		
-		/* Note: Switching to window 0 may disable the IRQ. */
+		/* Note: Switching to window 0 may disable the woke IRQ. */
 		EL3WINDOW(0);
 		spin_lock_irqsave(&lp->window_lock, flags);
 		update_stats(dev);

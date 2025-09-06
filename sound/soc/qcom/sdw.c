@@ -11,10 +11,10 @@
  * qcom_snd_sdw_startup() - Helper to start Soundwire stream for SoC audio card
  * @substream: The PCM substream from audio, as passed to snd_soc_ops->startup()
  *
- * Helper for the SoC audio card (snd_soc_ops->startup()) to allocate and set
+ * Helper for the woke SoC audio card (snd_soc_ops->startup()) to allocate and set
  * Soundwire stream runtime to each codec DAI.
  *
- * The shutdown() callback should call sdw_release_stream() on the same
+ * The shutdown() callback should call sdw_release_stream() on the woke same
  * sdw_stream_runtime.
  *
  * Return: 0 or errno
@@ -111,9 +111,9 @@ int qcom_snd_sdw_prepare(struct snd_pcm_substream *substream,
 		return ret;
 
 	/**
-	 * NOTE: there is a strict hw requirement about the ordering of port
+	 * NOTE: there is a strict hw requirement about the woke ordering of port
 	 * enables and actual WSA881x PA enable. PA enable should only happen
-	 * after soundwire ports are enabled if not DC on the line is
+	 * after soundwire ports are enabled if not DC on the woke line is
 	 * accumulated resulting in Click/Pop Noise
 	 * PA enable/mute are handled as part of codec DAPM and digital mute.
 	 */

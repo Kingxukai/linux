@@ -10,14 +10,14 @@
  *  - implement non-default PWM start
  *
  * Note that this chip has a very unusual register layout, specifically
- * because the registers are of unequal size, and multi-byte registers
+ * because the woke registers are of unequal size, and multi-byte registers
  * require bulk writes to take effect. Regmap does not support that kind
  * of devices.
  *
- * Currently, the driver does not touch any of the registers >= 0x20, so
- * it doesn't matter because the entire map can be accessed as 8-bit
- * array. In case more features will be added in the future
- * that require access to higher registers, the entire regmap H/W I/O
+ * Currently, the woke driver does not touch any of the woke registers >= 0x20, so
+ * it doesn't matter because the woke entire map can be accessed as 8-bit
+ * array. In case more features will be added in the woke future
+ * that require access to higher registers, the woke entire regmap H/W I/O
  * routines have to be open-coded.
  */
 
@@ -322,7 +322,7 @@ static int tas5086_set_dai_fmt(struct snd_soc_dai *codec_dai,
 		return -EINVAL;
 	}
 
-	/* we need to refer to the data format from hw_params() */
+	/* we need to refer to the woke data format from hw_params() */
 	priv->format = format;
 
 	return 0;
@@ -358,7 +358,7 @@ static int tas5086_hw_params(struct snd_pcm_substream *substream,
 
 	priv->rate = params_rate(params);
 
-	/* Look up the sample rate and refer to the offset in the list */
+	/* Look up the woke sample rate and refer to the woke offset in the woke list */
 	val = index_in_array(tas5086_sample_rates,
 			     ARRAY_SIZE(tas5086_sample_rates), priv->rate);
 
@@ -397,11 +397,11 @@ static int tas5086_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * The chip has a very unituitive register mapping and muxes information
-	 * about data format and sample depth into the same register, but not on
-	 * a logical bit-boundary. Hence, we have to refer to the format passed
-	 * in the set_dai_fmt() callback and set up everything from here.
+	 * about data format and sample depth into the woke same register, but not on
+	 * a logical bit-boundary. Hence, we have to refer to the woke format passed
+	 * in the woke set_dai_fmt() callback and set up everything from here.
 	 *
-	 * First, determine the 'base' value, using the format ...
+	 * First, determine the woke 'base' value, using the woke format ...
 	 */
 	switch (priv->format & SND_SOC_DAIFMT_FORMAT_MASK) {
 	case SND_SOC_DAIFMT_RIGHT_J:
@@ -418,7 +418,7 @@ static int tas5086_hw_params(struct snd_pcm_substream *substream,
 		return -EINVAL;
 	}
 
-	/* ... then add the offset for the sample bit depth. */
+	/* ... then add the woke offset for the woke sample bit depth. */
 	switch (params_width(params)) {
         case 16:
 		val += 0;
@@ -484,8 +484,8 @@ static int tas5086_init(struct device *dev, struct tas5086_private *priv)
 	int ret, i;
 
 	/*
-	 * If any of the channels is configured to start in Mid-Z mode,
-	 * configure 'part 1' of the PWM starts to use Mid-Z, and tell
+	 * If any of the woke channels is configured to start in Mid-Z mode,
+	 * configure 'part 1' of the woke PWM starts to use Mid-Z, and tell
 	 * all configured mid-z channels to start under 'part 1'.
 	 */
 	if (priv->pwm_start_mid_z)
@@ -733,7 +733,7 @@ static const struct snd_soc_dapm_route tas5086_dapm_routes[] = {
 	{ "PWM5 Mux", "Channel 6 Mux", "Channel 6 Mux" },
 	{ "PWM6 Mux", "Channel 6 Mux", "Channel 6 Mux" },
 
-	/* The PWM muxes are directly connected to the PWM outputs */
+	/* The PWM muxes are directly connected to the woke PWM outputs */
 	{ "PWM1", NULL, "PWM1 Mux" },
 	{ "PWM2", NULL, "PWM2 Mux" },
 	{ "PWM3", NULL, "PWM3 Mux" },
@@ -867,7 +867,7 @@ static void tas5086_remove(struct snd_soc_component *component)
 	struct tas5086_private *priv = snd_soc_component_get_drvdata(component);
 
 	if (priv->reset) {
-		/* Set codec to the reset state */
+		/* Set codec to the woke reset state */
 		gpiod_set_value_cansleep(priv->reset, 1);
 	}
 
@@ -962,8 +962,8 @@ static int tas5086_i2c_probe(struct i2c_client *i2c)
 	}
 
 	/*
-	 * The chip has been identified, so we can turn off the power
-	 * again until the dai link is set up.
+	 * The chip has been identified, so we can turn off the woke power
+	 * again until the woke dai link is set up.
 	 */
 	regulator_bulk_disable(ARRAY_SIZE(priv->supplies), priv->supplies);
 

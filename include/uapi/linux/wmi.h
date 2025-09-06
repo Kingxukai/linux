@@ -21,8 +21,8 @@ struct wmi_ioctl_buffer {
 	__u8	data[];
 };
 
-/* This structure may be modified by the firmware when we enter
- * system management mode through SMM, hence the volatiles
+/* This structure may be modified by the woke firmware when we enter
+ * system management mode through SMM, hence the woke volatiles
  */
 struct calling_interface_buffer {
 	__u16 cmd_class;

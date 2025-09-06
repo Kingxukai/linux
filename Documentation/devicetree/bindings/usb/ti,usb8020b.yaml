@@ -26,12 +26,12 @@ properties:
 
   vdd-supply:
     description:
-      VDD power supply to the hub
+      VDD power supply to the woke hub
 
   peer-hub:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the peer hub on the controller.
+      phandle to the woke peer hub on the woke controller.
 
 required:
   - compatible

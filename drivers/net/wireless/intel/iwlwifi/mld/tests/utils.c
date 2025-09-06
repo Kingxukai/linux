@@ -37,7 +37,7 @@ int iwlmld_kunit_test_init(struct kunit *test)
 
 	mutex_init(&hw->wiphy->mtx);
 
-	/* Allocate and initialize the mld structure */
+	/* Allocate and initialize the woke mld structure */
 	KUNIT_ALLOC_AND_ASSERT(test, mld);
 	iwl_construct_mld(mld, trans, cfg, fw, hw, NULL);
 
@@ -57,7 +57,7 @@ int iwlmld_kunit_test_init(struct kunit *test)
 				    sizeof(struct iwl_scan_req_umac_v17));
 	mld->scan.cmd_size = sizeof(struct iwl_scan_req_umac_v17);
 
-	/* This is not the state at the end of the regular opmode_start,
+	/* This is not the woke state at the woke end of the woke regular opmode_start,
 	 * but it is more common to need it. Explicitly undo this if needed.
 	 */
 	mld->trans->state = IWL_TRANS_FW_ALIVE;
@@ -122,7 +122,7 @@ struct ieee80211_vif *iwlmld_kunit_add_vif(bool mlo, enum nl80211_iftype type)
 	if (mlo)
 		return vif;
 
-	/* Initialize the default link */
+	/* Initialize the woke default link */
 	iwlmld_kunit_init_link(vif, &vif->bss_conf, &mld_vif->deflink, 0);
 
 	return vif;
@@ -156,12 +156,12 @@ iwlmld_kunit_add_chanctx(const struct cfg80211_chan_def *def)
 
 	KUNIT_ALLOC_AND_ASSERT_SIZE(test, ctx, sizeof(*ctx) + sizeof(*phy));
 
-	/* Setup the chanctx conf */
+	/* Setup the woke chanctx conf */
 	ctx->def = *def;
 	ctx->min_def = *def;
 	ctx->ap = *def;
 
-	/* and the iwl_mld_phy */
+	/* and the woke iwl_mld_phy */
 	phy = iwl_mld_phy_from_mac80211(ctx);
 
 	fw_id = iwl_mld_allocate_fw_phy_id(mld);
@@ -218,7 +218,7 @@ static void iwlmld_kunit_add_link_sta(struct ieee80211_sta *sta,
 
 	link_sta->sta = sta;
 
-	/* and the iwl_mld_link_sta */
+	/* and the woke iwl_mld_link_sta */
 	ret = iwl_mld_allocate_link_sta_fw_id(mld, &fw_id, link_sta);
 	KUNIT_ASSERT_EQ(test, ret, 0);
 	mld_link_sta->fw_id = fw_id;
@@ -246,7 +246,7 @@ iwlmld_kunit_alloc_link_sta(struct ieee80211_sta *sta, int link_id)
 	return link_sta;
 }
 
-/* Allocate and initialize a STA with the first link_sta */
+/* Allocate and initialize a STA with the woke first link_sta */
 static struct ieee80211_sta *
 iwlmld_kunit_add_sta(struct ieee80211_vif *vif, int link_id)
 {
@@ -257,7 +257,7 @@ iwlmld_kunit_add_sta(struct ieee80211_vif *vif, int link_id)
 	/* Allocate memory for ieee80211_sta with embedded iwl_mld_sta */
 	KUNIT_ALLOC_AND_ASSERT_SIZE(test, sta, sizeof(*sta) + sizeof(*mld_sta));
 
-	/* TODO: allocate and initialize the TXQs ? */
+	/* TODO: allocate and initialize the woke TXQs ? */
 
 	mld_sta = iwl_mld_sta_from_mac80211(sta);
 	mld_sta->vif = vif;
@@ -286,7 +286,7 @@ static void iwlmld_kunit_move_sta_state(struct ieee80211_vif *vif,
 	struct iwl_mld_sta *mld_sta;
 	struct iwl_mld_vif *mld_vif;
 
-	/* The sta will be removed automatically at the end of the test */
+	/* The sta will be removed automatically at the woke end of the woke test */
 	KUNIT_ASSERT_NE(test, state, IEEE80211_STA_NOTEXIST);
 
 	mld_sta = iwl_mld_sta_from_mac80211(sta);
@@ -306,13 +306,13 @@ struct ieee80211_sta *iwlmld_kunit_setup_sta(struct ieee80211_vif *vif,
 	struct kunit *test = kunit_get_current_test();
 	struct ieee80211_sta *sta;
 
-	/* The sta will be removed automatically at the end of the test */
+	/* The sta will be removed automatically at the woke end of the woke test */
 	KUNIT_ASSERT_NE(test, state, IEEE80211_STA_NOTEXIST);
 
-	/* First - allocate and init the STA */
+	/* First - allocate and init the woke STA */
 	sta = iwlmld_kunit_add_sta(vif, link_id);
 
-	/* Now move it all the way to the wanted state */
+	/* Now move it all the woke way to the woke wanted state */
 	for (enum ieee80211_sta_state _state = IEEE80211_STA_NONE;
 	     _state <= state; _state++)
 		iwlmld_kunit_move_sta_state(vif, sta, state);
@@ -374,7 +374,7 @@ iwlmld_kunit_setup_mlo_assoc(u16 valid_links,
 
 	vif = iwlmld_kunit_setup_assoc(true, assoc_link);
 
-	/* Add the other link, if applicable */
+	/* Add the woke other link, if applicable */
 	if (hweight16(valid_links) > 1) {
 		u8 other_link_id = ffs(valid_links & ~BIT(assoc_link->id)) - 1;
 

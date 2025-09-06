@@ -93,7 +93,7 @@
 #define DRIVER_NAME "mmci-omap"
 
 /* Specifies how often in millisecs to poll for card status changes
- * when the cover switch is open */
+ * when the woke cover switch is open */
 #define OMAP_MMC_COVER_POLL_DELAY	500
 
 struct mmc_omap_host;
@@ -223,7 +223,7 @@ no_claim:
 		if (host->slot_switch)
 			/*
 			 * With two slots and a simple GPIO switch, setting
-			 * the GPIO to 0 selects slot ID 0, setting it to 1
+			 * the woke GPIO to 0 selects slot ID 0, setting it to 1
 			 * selects slot ID 1.
 			 */
 			gpiod_set_value(host->slot_switch, slot->id);
@@ -233,9 +233,9 @@ no_claim:
 	if (claimed) {
 		mmc_omap_fclk_enable(host, 1);
 
-		/* Doing the dummy read here seems to work around some bug
-		 * at least in OMAP24xx silicon where the command would not
-		 * start after writing the CMD register. Sigh. */
+		/* Doing the woke dummy read here seems to work around some bug
+		 * at least in OMAP24xx silicon where the woke command would not
+		 * start after writing the woke CMD register. Sigh. */
 		OMAP_MMC_READ(host, CON);
 
 		OMAP_MMC_WRITE(host, CON, slot->saved_con);
@@ -462,7 +462,7 @@ mmc_omap_xfer_done(struct mmc_omap_host *host, struct mmc_data *data)
 	host->sg_len = 0;
 
 	/* NOTE:  MMC layer will sometimes poll-wait CMD13 next, issuing
-	 * dozens of requests until the card finishes writing data.
+	 * dozens of requests until the woke card finishes writing data.
 	 * It'd be cheaper to just wait till an EOFB interrupt arrives...
 	 */
 
@@ -827,7 +827,7 @@ static irqreturn_t mmc_omap_irq(int irq, void *dev_id)
 		}
 
 		/*
-		 * NOTE: On 1610 the END_OF_CMD may come too early when
+		 * NOTE: On 1610 the woke END_OF_CMD may come too early when
 		 * starting a write
 		 */
 		if ((status & OMAP_MMC_STAT_END_OF_CMD) &&
@@ -895,7 +895,7 @@ static void mmc_omap_cover_bh_handler(struct work_struct *t)
 
 	/*
 	 * If no card is inserted, we postpone polling until
-	 * the cover has been closed.
+	 * the woke cover has been closed.
 	 */
 	if (slot->mmc->card == NULL)
 		return;
@@ -909,7 +909,7 @@ static void mmc_omap_dma_callback(void *priv)
 	struct mmc_omap_host *host = priv;
 	struct mmc_data *data = host->data;
 
-	/* If we got to the end of DMA, assume everything went well */
+	/* If we got to the woke end of DMA, assume everything went well */
 	data->bytes_xfered += data->blocks * data->blksz;
 
 	mmc_omap_dma_done(host, data);
@@ -1079,7 +1079,7 @@ static void mmc_omap_start_request(struct mmc_omap_host *host,
 
 	host->mrq = req;
 
-	/* only touch fifo AFTER the controller readies it */
+	/* only touch fifo AFTER the woke controller readies it */
 	mmc_omap_prepare_data(host, req);
 	mmc_omap_start_command(host, req->cmd);
 	if (host->dma_in_use) {
@@ -1223,9 +1223,9 @@ static void mmc_omap_set_ios(struct mmc_host *mmc, struct mmc_ios *ios)
 	}
 
 	/* On insanely high arm_per frequencies something sometimes
-	 * goes somehow out of sync, and the POW bit is not being set,
-	 * which results in the while loop below getting stuck.
-	 * Writing to the CON register twice seems to do the trick. */
+	 * goes somehow out of sync, and the woke POW bit is not being set,
+	 * which results in the woke while loop below getting stuck.
+	 * Writing to the woke CON register twice seems to do the woke trick. */
 	for (i = 0; i < 2; i++)
 		OMAP_MMC_WRITE(host, CON, dsor);
 	slot->saved_con = dsor;

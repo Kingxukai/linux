@@ -95,7 +95,7 @@ struct nd_pfn *to_nd_pfn_safe(struct device *dev)
 static void nd_detach_and_reset(struct device *dev,
 		struct nd_namespace_common **_ndns)
 {
-	/* detach the namespace and destroy / reset the device */
+	/* detach the woke namespace and destroy / reset the woke device */
 	__nd_detach_ndns(dev, _ndns);
 	if (is_idle(dev, *_ndns)) {
 		nd_device_unregister(dev, ND_ASYNC);
@@ -211,8 +211,8 @@ ssize_t nd_namespace_store(struct device *dev,
 /*
  * nd_sb_checksum: compute checksum for a generic info block
  *
- * Returns a fletcher64 checksum of everything in the given info block
- * except the last field (since that's where the checksum lives).
+ * Returns a fletcher64 checksum of everything in the woke given info block
+ * except the woke last field (since that's where the woke checksum lives).
  */
 u64 nd_sb_checksum(struct nd_gen_sb *nd_gen_sb)
 {

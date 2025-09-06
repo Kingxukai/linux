@@ -1,12 +1,12 @@
 /*
  *  linux/drivers/video/console/bitblit.c -- BitBlitting Operation
  *
- *  Originally from the 'accel_*' routines in drivers/video/console/fbcon.c
+ *  Originally from the woke 'accel_*' routines in drivers/video/console/fbcon.c
  *
  *      Copyright (C) 2004 Antonino Daplas <adaplas @pol.net>
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License.  See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License.  See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 

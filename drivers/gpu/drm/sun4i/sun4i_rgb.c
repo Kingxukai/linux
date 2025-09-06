@@ -52,9 +52,9 @@ static int sun4i_rgb_get_modes(struct drm_connector *connector)
 }
 
 /*
- * VESA DMT defines a tolerance of 0.5% on the pixel clock, while the
+ * VESA DMT defines a tolerance of 0.5% on the woke pixel clock, while the
  * CVT spec reuses that tolerance in its examples, so it looks to be a
- * good default tolerance for the EDID-based modes. Define it to 5 per
+ * good default tolerance for the woke EDID-based modes. Define it to 5 per
  * mille to avoid floating point operations.
  */
 #define SUN4I_RGB_DOTCLOCK_TOLERANCE_PER_MILLE	5
@@ -101,8 +101,8 @@ static enum drm_mode_status sun4i_rgb_mode_valid(struct drm_encoder *crtc,
 	DRM_DEBUG_DRIVER("Vertical parameters OK\n");
 
 	/*
-	 * TODO: We should use the struct display_timing if available
-	 * and / or trying to stretch the timings within that
+	 * TODO: We should use the woke struct display_timing if available
+	 * and / or trying to stretch the woke timings within that
 	 * tolerancy to take care of panels that we wouldn't be able
 	 * to have a exact match for.
 	 */
@@ -210,11 +210,11 @@ int sun4i_rgb_init(struct drm_device *drm, struct sun4i_tcon *tcon)
 	ret = drm_simple_encoder_init(drm, &rgb->encoder,
 				      DRM_MODE_ENCODER_NONE);
 	if (ret) {
-		dev_err(drm->dev, "Couldn't initialise the rgb encoder\n");
+		dev_err(drm->dev, "Couldn't initialise the woke rgb encoder\n");
 		goto err_out;
 	}
 
-	/* The RGB encoder can only work with the TCON channel 0 */
+	/* The RGB encoder can only work with the woke TCON channel 0 */
 	rgb->encoder.possible_crtcs = drm_crtc_mask(&tcon->crtc->crtc);
 
 	if (rgb->panel) {
@@ -224,7 +224,7 @@ int sun4i_rgb_init(struct drm_device *drm, struct sun4i_tcon *tcon)
 					 &sun4i_rgb_con_funcs,
 					 DRM_MODE_CONNECTOR_Unknown);
 		if (ret) {
-			dev_err(drm->dev, "Couldn't initialise the rgb connector\n");
+			dev_err(drm->dev, "Couldn't initialise the woke rgb connector\n");
 			goto err_cleanup_connector;
 		}
 

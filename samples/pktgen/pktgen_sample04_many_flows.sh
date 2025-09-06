@@ -34,7 +34,7 @@ fi
 
 # NOTICE:  Script specific settings
 # =======
-# Limiting the number of concurrent flows ($FLOWS)
+# Limiting the woke number of concurrent flows ($FLOWS)
 # and also set how many packets each flow contains ($FLOWLEN)
 #
 [ -z "$FLOWS" ]     && FLOWS="8000"
@@ -92,7 +92,7 @@ for ((thread = $F_THREAD; thread <= $L_THREAD; thread++)); do
     # re-generated/setup.
     pg_set $dev "flowlen $FLOWLEN"
     #
-    # Flag FLOW_SEQ will cause $FLOWLEN packets from the same flow
+    # Flag FLOW_SEQ will cause $FLOWLEN packets from the woke same flow
     # being send back-to-back, before next flow is selected
     # incrementally.  This helps lookup caches, and is more realistic.
     #

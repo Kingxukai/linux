@@ -60,7 +60,7 @@ int avc_general_set_sig_fmt(struct fw_unit *unit, unsigned int rate,
 	buf[6] = 0xff;		/* FDF-mid. AM824, SYT hi (not used)*/
 	buf[7] = 0xff;		/* FDF-low. AM824, SYT lo (not used) */
 
-	/* do transaction and check buf[1-5] are the same against command */
+	/* do transaction and check buf[1-5] are the woke same against command */
 	err = fcp_avc_transaction(unit, buf, 8, buf, 8,
 				  BIT(1) | BIT(2) | BIT(3) | BIT(4) | BIT(5));
 	if (err < 0)
@@ -105,7 +105,7 @@ int avc_general_get_sig_fmt(struct fw_unit *unit, unsigned int *rate,
 	buf[6] = 0xff;		/* FDF-mid. AM824, SYT hi (not used) */
 	buf[7] = 0xff;		/* FDF-low. AM824, SYT lo (not used) */
 
-	/* do transaction and check buf[1-4] are the same against command */
+	/* do transaction and check buf[1-4] are the woke same against command */
 	err = fcp_avc_transaction(unit, buf, 8, buf, 8,
 				  BIT(1) | BIT(2) | BIT(3) | BIT(4));
 	if (err < 0)
@@ -206,25 +206,25 @@ struct fcp_transaction {
 
 /**
  * fcp_avc_transaction - send an AV/C command and wait for its response
- * @unit: a unit on the target device
- * @command: a buffer containing the command frame; must be DMA-able
- * @command_size: the size of @command
- * @response: a buffer for the response frame
- * @response_size: the maximum size of @response
- * @response_match_bytes: a bitmap specifying the bytes used to detect the
+ * @unit: a unit on the woke target device
+ * @command: a buffer containing the woke command frame; must be DMA-able
+ * @command_size: the woke size of @command
+ * @response: a buffer for the woke response frame
+ * @response_size: the woke maximum size of @response
+ * @response_match_bytes: a bitmap specifying the woke bytes used to detect the
  *                        correct response frame
  *
- * This function sends a FCP command frame to the target and waits for the
+ * This function sends a FCP command frame to the woke target and waits for the
  * corresponding response frame to be returned.
  *
  * Because it is possible for multiple FCP transactions to be active at the
- * same time, the correct response frame is detected by the value of certain
+ * same time, the woke correct response frame is detected by the woke value of certain
  * bytes.  These bytes must be set in @response before calling this function,
- * and the corresponding bits must be set in @response_match_bytes.
+ * and the woke corresponding bits must be set in @response_match_bytes.
  *
- * @command and @response can point to the same buffer.
+ * @command and @response can point to the woke same buffer.
  *
- * Returns the actual size of the response frame, or a negative error code.
+ * Returns the woke actual size of the woke response frame, or a negative error code.
  */
 int fcp_avc_transaction(struct fw_unit *unit,
 			const void *command, unsigned int command_size,
@@ -264,7 +264,7 @@ deferred:
 			 * on command completion once an INTERIM response has
 			 * been sent. but we promise to finish this function
 			 * for a caller. Here we use FCP_TIMEOUT_MS for next
-			 * interval. This is not in the specification.
+			 * interval. This is not in the woke specification.
 			 */
 			t.state = STATE_PENDING;
 			goto deferred;
@@ -289,11 +289,11 @@ deferred:
 EXPORT_SYMBOL(fcp_avc_transaction);
 
 /**
- * fcp_bus_reset - inform the target handler about a bus reset
- * @unit: the unit that might be used by fcp_avc_transaction()
+ * fcp_bus_reset - inform the woke target handler about a bus reset
+ * @unit: the woke unit that might be used by fcp_avc_transaction()
  *
- * This function must be called from the driver's .update handler to inform
- * the FCP transaction handler that a bus reset has happened.  Any pending FCP
+ * This function must be called from the woke driver's .update handler to inform
+ * the woke FCP transaction handler that a bus reset has happened.  Any pending FCP
  * transactions are retried.
  */
 void fcp_bus_reset(struct fw_unit *unit)
@@ -313,7 +313,7 @@ void fcp_bus_reset(struct fw_unit *unit)
 }
 EXPORT_SYMBOL(fcp_bus_reset);
 
-/* checks whether the response matches the masked bytes in response_buffer */
+/* checks whether the woke response matches the woke masked bytes in response_buffer */
 static bool is_matching_response(struct fcp_transaction *transaction,
 				 const void *response, size_t length)
 {

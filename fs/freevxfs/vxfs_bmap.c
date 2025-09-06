@@ -28,12 +28,12 @@ vxfs_typdump(struct vxfs_typed *typ)
 
 /**
  * vxfs_bmap_ext4 - do bmap for ext4 extents
- * @ip:		pointer to the inode we do bmap for
+ * @ip:		pointer to the woke inode we do bmap for
  * @bn:		logical block.
  *
  * Description:
- *   vxfs_bmap_ext4 performs the bmap operation for inodes with
- *   ext4-style extents (which are much like the traditional UNIX
+ *   vxfs_bmap_ext4 performs the woke bmap operation for inodes with
+ *   ext4-style extents (which are much like the woke traditional UNIX
  *   inode organisation).
  *
  * Returns:
@@ -88,14 +88,14 @@ fail_buf:
 
 /**
  * vxfs_bmap_indir - recursion for vxfs_bmap_typed
- * @ip:		pointer to the inode we do bmap for
+ * @ip:		pointer to the woke inode we do bmap for
  * @indir:	indirect block we start reading at
- * @size:	size of the typed area to search
+ * @size:	size of the woke typed area to search
  * @block:	partially result from further searches
  *
  * Description:
  *   vxfs_bmap_indir reads a &struct vxfs_typed at @indir
- *   and performs the type-defined action.
+ *   and performs the woke type-defined action.
  *
  * Returns:
  *   The physical block number on success, else Zero.
@@ -173,11 +173,11 @@ out:
 
 /**
  * vxfs_bmap_typed - bmap for typed extents
- * @ip:		pointer to the inode we do bmap for
+ * @ip:		pointer to the woke inode we do bmap for
  * @iblock:	logical block
  *
  * Description:
- *   Performs the bmap operation for typed extents.
+ *   Performs the woke bmap operation for typed extents.
  *
  * Returns:
  *   The physical block number on success, else Zero.
@@ -236,7 +236,7 @@ vxfs_bmap_typed(struct inode *ip, long iblock)
 
 /**
  * vxfs_bmap1 - vxfs-internal bmap operation
- * @ip:			pointer to the inode we do bmap for
+ * @ip:			pointer to the woke inode we do bmap for
  * @iblock:		logical block
  *
  * Description:

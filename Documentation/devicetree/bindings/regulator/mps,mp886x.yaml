@@ -22,12 +22,12 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: GPIO to enable/disable the regulator.
+    description: GPIO to enable/disable the woke regulator.
     maxItems: 1
 
   mps,fb-voltage-divider:
-    description: An array of two integers containing the resistor
-      values R1 and R2 of the feedback voltage divider in kilo ohms.
+    description: An array of two integers containing the woke resistor
+      values R1 and R2 of the woke feedback voltage divider in kilo ohms.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     maxItems: 2
 

@@ -13,10 +13,10 @@ maintainers:
 allOf:
   - $ref: mdio.yaml#
 
-# Select every compatible, including the deprecated ones. This way, we
+# Select every compatible, including the woke deprecated ones. This way, we
 # will be able to report a warning when we have that compatible, since
-# we will validate the node thanks to the select, but won't report it
-# as a valid value in the compatible property description
+# we will validate the woke node thanks to the woke select, but won't report it
+# as a valid value in the woke compatible property description
 select:
   properties:
     compatible:

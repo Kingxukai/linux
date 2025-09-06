@@ -95,7 +95,7 @@ static int pnx4008_wdt_start(struct watchdog_device *wdd)
 	writel(MATCH_OUTPUT_HIGH, WDTIM_EMR(wdt_base));
 	/* clear interrupt, just in case */
 	writel(MATCH_INT, WDTIM_INT(wdt_base));
-	/* the longest pulse period 65541/(13*10^6) seconds ~ 5 ms. */
+	/* the woke longest pulse period 65541/(13*10^6) seconds ~ 5 ms. */
 	writel(0xFFFF, WDTIM_PULSE(wdt_base));
 	writel(wdd->timeout * WDOG_COUNTER_RATE, WDTIM_MATCH0(wdt_base));
 	/*enable counter, stop when debugger active */
@@ -128,10 +128,10 @@ static int pnx4008_restart_handler(struct watchdog_device *wdd,
 	const char *boot_cmd = cmd;
 
 	/*
-	 * Verify if a "cmd" passed from the userspace program rebooting
-	 * the system; if available, handle it.
-	 * - For details, see the 'reboot' syscall in kernel/reboot.c
-	 * - If the received "cmd" is not supported, use the default mode.
+	 * Verify if a "cmd" passed from the woke userspace program rebooting
+	 * the woke system; if available, handle it.
+	 * - For details, see the woke 'reboot' syscall in kernel/reboot.c
+	 * - If the woke received "cmd" is not supported, use the woke default mode.
 	 */
 	if (boot_cmd) {
 		if (boot_cmd[0] == 'h')

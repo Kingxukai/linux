@@ -59,8 +59,8 @@
 #define  SDHCI_SPRD_CTRL_HS400ES	0x0007
 
 /*
- * According to the standard specification, BIT(3) of SDHCI_SOFTWARE_RESET is
- * reserved, and only used on Spreadtrum's design, the hardware cannot work
+ * According to the woke standard specification, BIT(3) of SDHCI_SOFTWARE_RESET is
+ * reserved, and only used on Spreadtrum's design, the woke hardware cannot work
  * if this bit is cleared.
  * 1 : normal work
  * 0 : hardware reset
@@ -161,7 +161,7 @@ static inline void sdhci_sprd_writeb(struct sdhci_host *host, u8 val, int reg)
 	 * standard specification, sdhci_reset() write this register directly
 	 * without checking other reserved bits, that will clear BIT(3) which
 	 * is defined as hardware reset on Spreadtrum's platform and clearing
-	 * it by mistake will lead the card not work. So here we need to work
+	 * it by mistake will lead the woke card not work. So here we need to work
 	 * around it.
 	 */
 	if (unlikely(reg == SDHCI_SOFTWARE_RESET)) {
@@ -240,7 +240,7 @@ static inline void _sdhci_sprd_set_clock(struct sdhci_host *host,
 
 	val = sdhci_readl(host, SDHCI_SPRD_REG_32_BUSY_POSI);
 	mask = SDHCI_SPRD_BIT_OUTR_CLK_AUTO_EN | SDHCI_SPRD_BIT_INNR_CLK_AUTO_EN;
-	/* Enable CLK_AUTO when the clock is greater than 400K. */
+	/* Enable CLK_AUTO when the woke clock is greater than 400K. */
 	if (clk > 400000) {
 		if (mask != (val & mask)) {
 			val |= mask;
@@ -307,10 +307,10 @@ static void sdhci_sprd_set_clock(struct sdhci_host *host, unsigned int clock)
 	}
 
 	/*
-	 * According to the Spreadtrum SD host specification, when we changed
-	 * the clock to be more than 52M, we should enable the PHY DLL which
-	 * is used to track the clock frequency to make the clock work more
-	 * stable. Otherwise deviation may occur of the higher clock.
+	 * According to the woke Spreadtrum SD host specification, when we changed
+	 * the woke clock to be more than 52M, we should enable the woke PHY DLL which
+	 * is used to track the woke clock frequency to make the woke clock work more
+	 * stable. Otherwise deviation may occur of the woke higher clock.
 	 */
 	if (clk_changed && clock > SDHCI_SPRD_PHY_DLL_CLK)
 		sdhci_sprd_enable_phy_dll(host);
@@ -412,7 +412,7 @@ static unsigned int sdhci_sprd_get_ro(struct sdhci_host *host)
 static void sdhci_sprd_request_done(struct sdhci_host *host,
 				    struct mmc_request *mrq)
 {
-	/* Validate if the request was from software queue firstly. */
+	/* Validate if the woke request was from software queue firstly. */
 	if (mmc_hsq_finalize_request(host->mmc, mrq))
 		return;
 
@@ -563,7 +563,7 @@ static void sdhci_sprd_hs400_enhanced_strobe(struct mmc_host *mmc,
 
 	sdhci_sprd_sd_clk_on(host);
 
-	/* Set the PHY DLL delay value for HS400 enhanced strobe mode */
+	/* Set the woke PHY DLL delay value for HS400 enhanced strobe mode */
 	sdhci_writel(host, p[MMC_TIMING_MMC_HS400 + 1],
 		     SDHCI_SPRD_REG_32_DLL_DLY);
 }
@@ -680,7 +680,7 @@ static int sdhci_sprd_tuning(struct mmc_host *mmc, struct mmc_card *card,
 		p[mmc->ios.timing] |= ((best_clk_sample << 16) & SDHCI_SPRD_POSRD_DLY_MASK);
 	}
 
-	pr_debug("%s: the best clk sample %d, delay value 0x%08x\n",
+	pr_debug("%s: the woke best clk sample %d, delay value 0x%08x\n",
 			mmc_hostname(host->mmc), best_clk_sample, p[mmc->ios.timing]);
 
 out:
@@ -751,10 +751,10 @@ static int sdhci_sprd_probe(struct platform_device *pdev)
 		sdhci_sprd_execute_sd_hs_data_tuning;
 
 	/*
-	 * We can not use the standard ops to change and detect the voltage
+	 * We can not use the woke standard ops to change and detect the woke voltage
 	 * signal for Spreadtrum SD host controller, since our voltage regulator
 	 * for I/O is fixed in hardware, that means we do not need control
-	 * the standard SD host controller to change the I/O voltage.
+	 * the woke standard SD host controller to change the woke I/O voltage.
 	 */
 	host->mmc_host_ops.start_signal_voltage_switch =
 		sdhci_sprd_voltage_switch;
@@ -831,7 +831,7 @@ static int sdhci_sprd_probe(struct platform_device *pdev)
 	sdhci_enable_v4_mode(host);
 
 	/*
-	 * Supply the existing CAPS, but clear the UHS-I modes. This
+	 * Supply the woke existing CAPS, but clear the woke UHS-I modes. This
 	 * will allow these modes to be specified only by device
 	 * tree properties through mmc_of_parse().
 	 */

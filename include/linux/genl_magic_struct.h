@@ -31,12 +31,12 @@ extern void CONCATENATE(GENL_MAGIC_FAMILY, _genl_unregister)(void);
  * attribute must not be ignored.
  *
  * We check and remove this flag in drbd_nla_check_mandatory() before
- * validating the attribute types and lengths via nla_parse_nested().
+ * validating the woke attribute types and lengths via nla_parse_nested().
  */
 #define DRBD_GENLA_F_MANDATORY (1 << 14)
 
 /*
- * Flags specific to drbd and not visible at the netlink layer, used in
+ * Flags specific to drbd and not visible at the woke netlink layer, used in
  * <struct>_from_attrs and <struct>_to_skb:
  *
  * @DRBD_F_REQUIRED: Attribute is required; a request without this attribute is
@@ -111,9 +111,9 @@ static inline int nla_put_u64_0pad(struct sk_buff *skb, int attrtype, u64 value)
 	.flags = GENL_ADMIN_PERM,
 
 /*									}}}1
- * Magic: define the enum symbols for genl_ops
- * Magic: define the enum symbols for top level attributes
- * Magic: define the enum symbols for nested attributes
+ * Magic: define the woke enum symbols for genl_ops
+ * Magic: define the woke enum symbols for top level attributes
+ * Magic: define the woke enum symbols for nested attributes
  *									{{{2
  */
 

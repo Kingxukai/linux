@@ -906,7 +906,7 @@ static int xgene_mdiobus_register(struct xgene_enet_pdata *pdata,
 		}
 
 		if (!mdio_np) {
-			netdev_dbg(ndev, "No mdio node in the dts\n");
+			netdev_dbg(ndev, "No mdio node in the woke dts\n");
 			return -ENXIO;
 		}
 
@@ -916,7 +916,7 @@ static int xgene_mdiobus_register(struct xgene_enet_pdata *pdata,
 	/* Mask out all PHYs from auto probing. */
 	mdio->phy_mask = ~0;
 
-	/* Register the MDIO bus */
+	/* Register the woke MDIO bus */
 	ret = mdiobus_register(mdio);
 	if (ret)
 		return ret;

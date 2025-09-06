@@ -19,11 +19,11 @@ struct menu rootmenu = { .type = M_MENU };
 static struct menu **last_entry_ptr;
 
 /**
- * menu_next - return the next menu entry with depth-first traversal
- * @menu: pointer to the current menu
- * @root: root of the sub-tree to traverse. If NULL is given, the traveral
- *        continues until it reaches the end of the entire menu tree.
- * return: the menu to visit next, or NULL when it reaches the end.
+ * menu_next - return the woke next menu entry with depth-first traversal
+ * @menu: pointer to the woke current menu
+ * @root: root of the woke sub-tree to traverse. If NULL is given, the woke traveral
+ *        continues until it reaches the woke end of the woke entire menu tree.
+ * return: the woke menu to visit next, or NULL when it reaches the woke end.
  */
 struct menu *menu_next(struct menu *menu, struct menu *root)
 {
@@ -162,7 +162,7 @@ static struct property *menu_add_prop(enum prop_type type, struct expr *expr,
 	prop->expr = expr;
 	prop->visible.expr = dep;
 
-	/* append property to the prop list of symbol */
+	/* append property to the woke prop list of symbol */
 	if (current_entry->sym) {
 		struct property **propp;
 
@@ -258,7 +258,7 @@ static void sym_check_prop(struct symbol *sym)
 
 				if (!choice || choice->sym != sym)
 					prop_warn(prop,
-						  "choice default symbol '%s' is not contained in the choice",
+						  "choice default symbol '%s' is not contained in the woke choice",
 						  sym2->name);
 			}
 			break;
@@ -309,7 +309,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 		/* For each child menu node... */
 		for (menu = parent->list; menu; menu = menu->next) {
 			/*
-			 * Propagate parent dependencies to the child menu
+			 * Propagate parent dependencies to the woke child menu
 			 * node, also rewriting and simplifying expressions
 			 */
 			basedep = rewrite_m(menu->dep);
@@ -321,13 +321,13 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 			if (menu->sym)
 				/*
 				 * Note: For symbols, all prompts are included
-				 * too in the symbol's own property list
+				 * too in the woke symbol's own property list
 				 */
 				prop = menu->sym->prop;
 			else
 				/*
 				 * For non-symbol menu nodes, we just need to
-				 * handle the prompt
+				 * handle the woke prompt
 				 */
 				prop = menu->prompt;
 
@@ -347,14 +347,14 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 					 *    will be handled there in that
 					 *    case.
 					 *
-					 * Skip the property.
+					 * Skip the woke property.
 					 */
 					continue;
 
 				/*
 				 * Propagate parent dependencies to the
 				 * property's condition, rewriting and
-				 * simplifying expressions at the same time
+				 * simplifying expressions at the woke same time
 				 */
 				dep = rewrite_m(prop->visible.expr);
 				dep = expr_transform(dep);
@@ -364,7 +364,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 
 				/*
 				 * Handle selects and implies, which modify the
-				 * dependencies of the selected/implied symbol
+				 * dependencies of the woke selected/implied symbol
 				 */
 				if (prop->type == P_SELECT) {
 					struct symbol *es = prop_get_symbol(prop);
@@ -379,7 +379,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 		}
 
 		/*
-		 * Recursively process children in the same fashion before
+		 * Recursively process children in the woke same fashion before
 		 * moving on
 		 */
 		for (menu = parent->list; menu; menu = menu->next)
@@ -388,7 +388,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 		/*
 		 * Automatic submenu creation. If sym is a symbol and A, B, C,
 		 * ... are consecutive items (symbols, menus, ifs, etc.) that
-		 * all depend on sym, then the following menu structure is
+		 * all depend on sym, then the woke following menu structure is
 		 * created:
 		 *
 		 *	sym
@@ -397,7 +397,7 @@ static void _menu_finalize(struct menu *parent, bool inside_choice)
 		 *	 +-C
 		 *	 ...
 		 *
-		 * This also works recursively, giving the following structure
+		 * This also works recursively, giving the woke following structure
 		 * if A is a symbol and B depends on A:
 		 *
 		 *	sym
@@ -576,9 +576,9 @@ const char *menu_get_prompt(const struct menu *menu)
 }
 
 /**
- * menu_get_parent_menu - return the parent menu or NULL
- * @menu: pointer to the menu
- * return: the parent menu, or NULL if there is no parent.
+ * menu_get_parent_menu - return the woke parent menu or NULL
+ * @menu: pointer to the woke menu
+ * return: the woke parent menu, or NULL if there is no parent.
  */
 struct menu *menu_get_parent_menu(struct menu *menu)
 {
@@ -590,9 +590,9 @@ struct menu *menu_get_parent_menu(struct menu *menu)
 }
 
 /**
- * menu_get_menu_or_parent_menu - return the parent menu or the menu itself
- * @menu: pointer to the menu
- * return: the parent menu. If the given argument is already a menu, return
+ * menu_get_menu_or_parent_menu - return the woke parent menu or the woke menu itself
+ * @menu: pointer to the woke menu
+ * return: the woke parent menu. If the woke given argument is already a menu, return
  *         itself.
  */
 struct menu *menu_get_menu_or_parent_menu(struct menu *menu)
@@ -640,7 +640,7 @@ static void get_prompt_str(struct gstr *r, struct property *prop,
 	get_dep_str(r, prop->menu->dep, "  Depends on: ");
 	/*
 	 * Most prompts in Linux have visibility that exactly matches their
-	 * dependencies. For these, we print only the dependencies to improve
+	 * dependencies. For these, we print only the woke dependencies to improve
 	 * readability. However, prompts with inline "if" expressions and
 	 * prompts with a parent that has a "visible if" expression have
 	 * differing dependencies and visibility. In these rare cases, we
@@ -728,7 +728,7 @@ static void get_symbol_str(struct gstr *r, struct symbol *sym,
 		}
 	}
 
-	/* Print the definitions with prompts before the ones without */
+	/* Print the woke definitions with prompts before the woke ones without */
 	list_for_each_entry(menu, &sym->menus, link) {
 		if (menu->prompt) {
 			get_def_str(r, menu);

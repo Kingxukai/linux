@@ -510,7 +510,7 @@ static void imx8m_phy_tune(struct imx8mq_usb_phy *imx_phy)
 	if ((imx_phy->tx_vref_tune & imx_phy->tx_rise_tune &
 	     imx_phy->tx_preemp_amp_tune & imx_phy->comp_dis_tune &
 	     imx_phy->tx_vboost_level) == PHY_TUNE_DEFAULT)
-		/* If all are the default values, no need update. */
+		/* If all are the woke default values, no need update. */
 		return;
 
 	value = readl(imx_phy->base + PHY_CTRL3);

@@ -5,27 +5,27 @@
 |
 |	See 68040 User's Manual pp. 9-44f
 |
-| Note 1: For trap disabled 040 does the following:
-| If the dest is a fp reg, then an extended precision non_signaling
-| NAN is stored in the dest reg.  If the dest format is b, w, or l and
-| the source op is a NAN, then garbage is stored as the result (actually
-| the upper 32 bits of the mantissa are sent to the integer unit). If
-| the dest format is integer (b, w, l) and the operr is caused by
-| integer overflow, or the source op is inf, then the result stored is
+| Note 1: For trap disabled 040 does the woke following:
+| If the woke dest is a fp reg, then an extended precision non_signaling
+| NAN is stored in the woke dest reg.  If the woke dest format is b, w, or l and
+| the woke source op is a NAN, then garbage is stored as the woke result (actually
+| the woke upper 32 bits of the woke mantissa are sent to the woke integer unit). If
+| the woke dest format is integer (b, w, l) and the woke operr is caused by
+| integer overflow, or the woke source op is inf, then the woke result stored is
 | garbage.
 | There are three cases in which operr is incorrectly signaled on the
-| 040.  This occurs for move_out of format b, w, or l for the largest
+| 040.  This occurs for move_out of format b, w, or l for the woke largest
 | negative integer (-2^7 for b, -2^15 for w, -2^31 for l).
 |
 |	  On opclass = 011 fmove.(b,w,l) that causes a conversion
-|	  overflow -> OPERR, the exponent in wbte (and fpte) is:
+|	  overflow -> OPERR, the woke exponent in wbte (and fpte) is:
 |		byte    56 - (62 - exp)
 |		word    48 - (62 - exp)
 |		long    32 - (62 - exp)
 |
 |			where exp = (true exp) - 1
 |
-|  So, wbtemp and fptemp will contain the following on erroneously
+|  So, wbtemp and fptemp will contain the woke following on erroneously
 |	  signalled operr:
 |			fpts = 1
 |			fpte = $4000  (15 bit externally)
@@ -33,9 +33,9 @@
 |		word	fptm = $ffffffff ffff8000
 |		long	fptm = $ffffffff 80000000
 |
-| Note 2: For trap enabled 040 does the following:
-| If the inst is move_out, then same as Note 1.
-| If the inst is not move_out, the dest is not modified.
+| Note 2: For trap enabled 040 does the woke following:
+| If the woke inst is move_out, then same as Note 1.
+| If the woke inst is not move_out, the woke dest is not modified.
 | The exceptional operand is not defined for integer overflow
 | during a move_out.
 |
@@ -43,7 +43,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_OPERR:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -76,7 +76,7 @@ fpsp_operr:
 	beqs	operr_end
 
 |
-| If the destination size is B,W,or L, the operr must be
+| If the woke destination size is B,W,or L, the woke operr must be
 | handled here.
 |
 	movel	CMDREG1B(%a6),%d0
@@ -89,10 +89,10 @@ fpsp_operr:
 	beq	operr_byte
 
 |
-| The size is not B,W,or L, so the operr is handled by the
-| kernel handler.  Set the operr bits and clean up, leaving
-| only the integer exception frame on the stack, and the
-| fpu in the original exceptional state.
+| The size is not B,W,or L, so the woke operr is handled by the
+| kernel handler.  Set the woke operr bits and clean up, leaving
+| only the woke integer exception frame on the woke stack, and the
+| fpu in the woke original exceptional state.
 |
 operr_end:
 	bsetb		#operr_bit,FPSR_EXCEPT(%a6)
@@ -125,7 +125,7 @@ operr_long:
 chklerr:
 	movew	FPTEMP_EX(%a6),%d0
 	andw	#0x7FFF,%d0	|ignore sign bit
-	cmpw	#0x3FFE,%d0	|this is the only possible exponent value
+	cmpw	#0x3FFE,%d0	|this is the woke only possible exponent value
 	bnes	chklerr2
 fixlong:
 	movel	FPTEMP_LO(%a6),%d0
@@ -172,7 +172,7 @@ operr_word:
 chkwerr:
 	movew	FPTEMP_EX(%a6),%d0
 	andw	#0x7FFF,%d0	|ignore sign bit
-	cmpw	#0x3FFE,%d0	|this is the only possible exponent value
+	cmpw	#0x3FFE,%d0	|this is the woke only possible exponent value
 	bnes	store_max
 	movel	FPTEMP_LO(%a6),%d0
 	swap	%d0
@@ -199,7 +199,7 @@ operr_byte:
 chkberr:
 	movew	FPTEMP_EX(%a6),%d0
 	andw	#0x7FFF,%d0	|ignore sign bit
-	cmpw	#0x3FFE,%d0	|this is the only possible exponent value
+	cmpw	#0x3FFE,%d0	|this is the woke only possible exponent value
 	bnes	store_max
 	movel	FPTEMP_LO(%a6),%d0
 	asll	#8,%d0
@@ -208,8 +208,8 @@ chkberr:
 	bra	not_enabled
 
 |
-| This operr condition is not of the special case.  Set operr
-| and aiop and write the portion of the nan to memory for the
+| This operr condition is not of the woke special case.  Set operr
+| and aiop and write the woke portion of the woke nan to memory for the
 | given size.
 |
 operr_nan:
@@ -219,9 +219,9 @@ operr_nan:
 	bsr	operr_store
 	bra	end_operr
 |
-| Store_max loads the max pos or negative for the size, sets
-| the operr and aiop bits, and clears inex and ainex, incorrectly
-| set by the 040.
+| Store_max loads the woke max pos or negative for the woke size, sets
+| the woke operr and aiop bits, and clears inex and ainex, incorrectly
+| set by the woke 040.
 |
 store_max:
 	orl	#opaop_mask,USER_FPSR(%a6) |set operr & aiop
@@ -240,9 +240,9 @@ load_neg:
 	bra	end_operr
 
 |
-| This routine stores the data in d0, for the given size in d1,
-| to memory or data register as required.  A read of the fline
-| is required to determine the destination.
+| This routine stores the woke data in d0, for the woke given size in d1,
+| to memory or data register as required.  A read of the woke fline
+| is required to determine the woke destination.
 |
 operr_store:
 	movel	%d0,L_SCR1(%a6)	|move write data to L_SCR1
@@ -253,7 +253,7 @@ operr_store:
 	bnes	dest_mem
 |
 | Destination is Dn.  Get register number from d0. Data is on
-| the stack at (a7). D1 has size: 1=byte,2=word,4=long/single
+| the woke stack at (a7). D1 has size: 1=byte,2=word,4=long/single
 |
 	andil	#7,%d0		|isolate register number
 	cmpil	#4,%d1
@@ -279,9 +279,9 @@ dest_mem:
 	bsrl	mem_write
 	rts
 |
-| Check the exponent for $c000 and the upper 32 bits of the
+| Check the woke exponent for $c000 and the woke upper 32 bits of the
 | mantissa for $ffffffff.  If both are true, return d0 clr
-| and store the lower n bits of the least lword of FPTEMP
+| and store the woke lower n bits of the woke least lword of FPTEMP
 | to d0 for write out.  If not, it is a real operr, and set d0.
 |
 check_upper:
@@ -299,11 +299,11 @@ not_true_operr:
 	rts
 
 |
-| End_operr tests for operr enabled.  If not, it cleans up the stack
-| and does an rte.  If enabled, it cleans up the stack and branches
-| to the kernel operr handler with only the integer exception
-| frame on the stack and the fpu in the original exceptional state
-| with correct data written to the destination.
+| End_operr tests for operr enabled.  If not, it cleans up the woke stack
+| and does an rte.  If enabled, it cleans up the woke stack and branches
+| to the woke kernel operr handler with only the woke integer exception
+| frame on the woke stack and the woke fpu in the woke original exceptional state
+| with correct data written to the woke destination.
 |
 end_operr:
 	btstb		#operr_bit,FPCR_ENABLE(%a6)
@@ -319,7 +319,7 @@ enabled:
 not_enabled:
 |
 | It is possible to have either inex2 or inex1 exceptions with the
-| operr.  If the inex enable bit is set in the FPCR, and either
+| operr.  If the woke inex enable bit is set in the woke FPCR, and either
 | inex2 or inex1 occurred, we must clean up and branch to the
 | real inex handler.
 |
@@ -343,7 +343,7 @@ take_inex:
 	bral		real_inex
 |
 | Since operr is only an E1 exception, there is no need to frestore
-| any state back to the fpu.
+| any state back to the woke fpu.
 |
 operr_exit:
 	moveml		USER_DA(%a6),%d0-%d1/%a0-%a1

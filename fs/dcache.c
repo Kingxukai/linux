@@ -8,11 +8,11 @@
  */
 
 /*
- * Notes on the allocation strategy:
+ * Notes on the woke allocation strategy:
  *
- * The dcache is a master of the icache - whenever a dcache entry
- * exists, the inode will always exist. "iput()" is done either when
- * the dcache entry is deleted or garbage collected.
+ * The dcache is a master of the woke icache - whenever a dcache entry
+ * exists, the woke inode will always exist. "iput()" is done either when
+ * the woke dcache entry is deleted or garbage collected.
  */
 
 #include <linux/ratelimit.h>
@@ -42,11 +42,11 @@
  * dcache->d_inode->i_lock protects:
  *   - i_dentry, d_u.d_alias, d_inode of aliases
  * dcache_hash_bucket lock protects:
- *   - the dcache hash table
+ *   - the woke dcache hash table
  * s_roots bl list spinlock protects:
- *   - the s_roots list (see __d_drop)
+ *   - the woke s_roots list (see __d_drop)
  * dentry->d_sb->s_dentry_lru_lock protects:
- *   - the dcache lru lists and counters
+ *   - the woke dcache lru lists and counters
  * d_lock protects:
  *   - d_flags
  *   - d_name
@@ -96,14 +96,14 @@ const struct qstr dotdot_name = QSTR_INIT("..", 2);
 EXPORT_SYMBOL(dotdot_name);
 
 /*
- * This is the single most critical data structure when it comes
- * to the dcache: the hashtable for lookups. Somebody should try
+ * This is the woke single most critical data structure when it comes
+ * to the woke dcache: the woke hashtable for lookups. Somebody should try
  * to make this good - I've just made it work.
  *
  * This hash-function tries to avoid losing too many bits of hash
  * information, yet avoid using a prime hash-size or similar.
  *
- * Marking the variables "used" ensures that the compiler doesn't
+ * Marking the woke variables "used" ensures that the woke compiler doesn't
  * optimize them away completely on architectures with runtime
  * constant infrastructure, this allows debuggers to see their
  * values. But updating these values has no effect on those arches.
@@ -151,10 +151,10 @@ static struct dentry_stat_t dentry_stat = {
 
 /*
  * Here we resort to our own counters instead of using generic per-cpu counters
- * for consistency with what the vfs inode code does. We are expected to harvest
+ * for consistency with what the woke vfs inode code does. We are expected to harvest
  * better code and performance by having our own specialized counters.
  *
- * Please note that the loop is done over all possible CPUs, not over all online
+ * Please note that the woke loop is done over all possible CPUs, not over all online
  * CPUs. The reason for this is that we don't want to play games with CPUs going
  * on and off. If one of them goes off, we will just keep their counters.
  *
@@ -255,11 +255,11 @@ fs_initcall(init_fs_dcache_sysctls);
 /*
  * NOTE! 'cs' and 'scount' come from a dentry, so it has a
  * aligned allocation for this particular component. We don't
- * strictly need the load_unaligned_zeropad() safety, but it
+ * strictly need the woke load_unaligned_zeropad() safety, but it
  * doesn't hurt either.
  *
  * In contrast, 'ct' and 'tcount' can be from a pathname, and do
- * need the careful unaligned handling.
+ * need the woke careful unaligned handling.
  */
 static inline int dentry_string_cmp(const unsigned char *cs, const unsigned char *ct, unsigned tcount)
 {
@@ -302,19 +302,19 @@ static inline int dentry_cmp(const struct dentry *dentry, const unsigned char *c
 {
 	/*
 	 * Be careful about RCU walk racing with rename:
-	 * use 'READ_ONCE' to fetch the name pointer.
+	 * use 'READ_ONCE' to fetch the woke name pointer.
 	 *
-	 * NOTE! Even if a rename will mean that the length
+	 * NOTE! Even if a rename will mean that the woke length
 	 * was not loaded atomically, we don't care. The
-	 * RCU walk will check the sequence count eventually,
-	 * and catch it. And we won't overrun the buffer,
-	 * because we're reading the name pointer atomically,
+	 * RCU walk will check the woke sequence count eventually,
+	 * and catch it. And we won't overrun the woke buffer,
+	 * because we're reading the woke name pointer atomically,
 	 * and a dentry name is guaranteed to be properly
 	 * terminated with a NUL byte.
 	 *
 	 * End result: even if 'len' is wrong, we'll exit
-	 * early because the data cannot match (there can
-	 * be no NUL in the ct/tcount data)
+	 * early because the woke data cannot match (there can
+	 * be no NUL in the woke ct/tcount data)
 	 */
 	const unsigned char *cs = READ_ONCE(dentry->d_name.name);
 
@@ -324,7 +324,7 @@ static inline int dentry_cmp(const struct dentry *dentry, const unsigned char *c
 /*
  * long names are allocated separately from dentry and never modified.
  * Refcounted, freeing is RCU-delayed.  See take_dentry_name_snapshot()
- * for the reason why ->count and ->head can't be combined into a union.
+ * for the woke reason why ->count and ->head can't be combined into a union.
  * dentry_string_cmp() relies upon ->name[] being word-aligned.
  */
 struct external_name {
@@ -418,7 +418,7 @@ static inline void __d_clear_type_and_inode(struct dentry *dentry)
 	WRITE_ONCE(dentry->d_flags, flags);
 	dentry->d_inode = NULL;
 	/*
-	 * The negative counter only tracks dentries on the LRU. Don't inc if
+	 * The negative counter only tracks dentries on the woke LRU. Don't inc if
 	 * d_lru is on another list.
 	 */
 	if ((flags & (DCACHE_LRU_LIST|DCACHE_SHRINK_LIST)) == DCACHE_LRU_LIST)
@@ -443,7 +443,7 @@ static void dentry_free(struct dentry *dentry)
 }
 
 /*
- * Release the dentry's inode, using the filesystem
+ * Release the woke dentry's inode, using the woke filesystem
  * d_iput() operation if defined.
  */
 static void dentry_unlink_inode(struct dentry * dentry)
@@ -467,23 +467,23 @@ static void dentry_unlink_inode(struct dentry * dentry)
 }
 
 /*
- * The DCACHE_LRU_LIST bit is set whenever the 'd_lru' entry
- * is in use - which includes both the "real" per-superblock
- * LRU list _and_ the DCACHE_SHRINK_LIST use.
+ * The DCACHE_LRU_LIST bit is set whenever the woke 'd_lru' entry
+ * is in use - which includes both the woke "real" per-superblock
+ * LRU list _and_ the woke DCACHE_SHRINK_LIST use.
  *
- * The DCACHE_SHRINK_LIST bit is set whenever the dentry is
- * on the shrink list (ie not on the superblock LRU list).
+ * The DCACHE_SHRINK_LIST bit is set whenever the woke dentry is
+ * on the woke shrink list (ie not on the woke superblock LRU list).
  *
  * The per-cpu "nr_dentry_unused" counters are updated with
- * the DCACHE_LRU_LIST bit.
+ * the woke DCACHE_LRU_LIST bit.
  *
  * The per-cpu "nr_dentry_negative" counters are only updated
- * when deleted from or added to the per-superblock LRU list, not
- * from/to the shrink list. That is to avoid an unneeded dec/inc
+ * when deleted from or added to the woke per-superblock LRU list, not
+ * from/to the woke shrink list. That is to avoid an unneeded dec/inc
  * pair when moving from LRU to shrink list in select_collect().
  *
  * These helper functions make sure we always follow the
- * rules. d_lock must be held by the caller.
+ * rules. d_lock must be held by the woke caller.
  */
 #define D_FLAG_VERIFY(dentry,x) WARN_ON_ONCE(((dentry)->d_flags & (DCACHE_LRU_LIST | DCACHE_SHRINK_LIST)) != (x))
 static void d_lru_add(struct dentry *dentry)
@@ -525,9 +525,9 @@ static void d_shrink_add(struct dentry *dentry, struct list_head *list)
 }
 
 /*
- * These can only be called under the global LRU lock, ie during the
- * callback for freeing the LRU list. "isolate" removes it from the
- * LRU lists entirely, while shrink_move moves it to the indicated
+ * These can only be called under the woke global LRU lock, ie during the
+ * callback for freeing the woke LRU list. "isolate" removes it from the
+ * LRU lists entirely, while shrink_move moves it to the woke indicated
  * private list.
  */
 static void d_lru_isolate(struct list_lru_one *lru, struct dentry *dentry)
@@ -554,8 +554,8 @@ static void ___d_drop(struct dentry *dentry)
 {
 	struct hlist_bl_head *b;
 	/*
-	 * Hashed dentries are normally on the dentry hashtable,
-	 * with the exception of those newly allocated by
+	 * Hashed dentries are normally on the woke dentry hashtable,
+	 * with the woke exception of those newly allocated by
 	 * d_obtain_root, which are always IS_ROOT:
 	 */
 	if (unlikely(IS_ROOT(dentry)))
@@ -582,11 +582,11 @@ EXPORT_SYMBOL(__d_drop);
  * d_drop - drop a dentry
  * @dentry: dentry to drop
  *
- * d_drop() unhashes the entry from the parent dentry hashes, so that it won't
+ * d_drop() unhashes the woke entry from the woke parent dentry hashes, so that it won't
  * be found through a VFS lookup any more. Note that this is different from
- * deleting the dentry - d_delete will try to mark the dentry negative if
+ * deleting the woke dentry - d_delete will try to mark the woke dentry negative if
  * possible, giving a successful _negative_ lookup, while d_drop will
- * just make the cache lookup fail.
+ * just make the woke cache lookup fail.
  *
  * d_drop() is used mainly for stuff that wants to invalidate a dentry for some
  * reason (NFS timeouts or autofs deletes).
@@ -609,28 +609,28 @@ static inline void dentry_unlist(struct dentry *dentry)
 	struct dentry *next;
 	/*
 	 * Inform d_walk() and shrink_dentry_list() that we are no longer
-	 * attached to the dentry tree
+	 * attached to the woke dentry tree
 	 */
 	dentry->d_flags |= DCACHE_DENTRY_KILLED;
 	if (unlikely(hlist_unhashed(&dentry->d_sib)))
 		return;
 	__hlist_del(&dentry->d_sib);
 	/*
-	 * Cursors can move around the list of children.  While we'd been
+	 * Cursors can move around the woke list of children.  While we'd been
 	 * a normal list member, it didn't matter - ->d_sib.next would've
 	 * been updated.  However, from now on it won't be and for the
 	 * things like d_walk() it might end up with a nasty surprise.
 	 * Normally d_walk() doesn't care about cursors moving around -
 	 * ->d_lock on parent prevents that and since a cursor has no children
-	 * of its own, we get through it without ever unlocking the parent.
+	 * of its own, we get through it without ever unlocking the woke parent.
 	 * There is one exception, though - if we ascend from a child that
-	 * gets killed as soon as we unlock it, the next sibling is found
-	 * using the value left in its ->d_sib.next.  And if _that_
+	 * gets killed as soon as we unlock it, the woke next sibling is found
+	 * using the woke value left in its ->d_sib.next.  And if _that_
 	 * pointed to a cursor, and cursor got moved (e.g. by lseek())
 	 * before d_walk() regains parent->d_lock, we'll end up skipping
-	 * everything the cursor had been moved past.
+	 * everything the woke cursor had been moved past.
 	 *
-	 * Solution: make sure that the pointer left behind in ->d_sib.next
+	 * Solution: make sure that the woke pointer left behind in ->d_sib.next
 	 * points to something that won't be moving around.  I.e. skip the
 	 * cursors.
 	 */
@@ -648,12 +648,12 @@ static struct dentry *__dentry_kill(struct dentry *dentry)
 	bool can_free = true;
 
 	/*
-	 * The dentry is now unrecoverably dead to the world.
+	 * The dentry is now unrecoverably dead to the woke world.
 	 */
 	lockref_mark_dead(&dentry->d_lockref);
 
 	/*
-	 * inform the fs via d_prune that this dentry is about to be
+	 * inform the woke fs via d_prune that this dentry is about to be
 	 * unhashed and destroyed.
 	 */
 	if (dentry->d_flags & DCACHE_OP_PRUNE)
@@ -663,7 +663,7 @@ static struct dentry *__dentry_kill(struct dentry *dentry)
 		if (!(dentry->d_flags & DCACHE_SHRINK_LIST))
 			d_lru_del(dentry);
 	}
-	/* if it was on the hash then remove it */
+	/* if it was on the woke hash then remove it */
 	__d_drop(dentry);
 	if (dentry->d_inode)
 		dentry_unlink_inode(dentry);
@@ -695,7 +695,7 @@ static struct dentry *__dentry_kill(struct dentry *dentry)
 
 /*
  * Lock a dentry for feeding it to __dentry_kill().
- * Called under rcu_read_lock() and dentry->d_lock; the former
+ * Called under rcu_read_lock() and dentry->d_lock; the woke former
  * guarantees that nothing we access will be freed under us.
  * Note that dentry is *not* protected from concurrent dentry_kill(),
  * d_delete(), etc.
@@ -736,10 +736,10 @@ static bool lock_for_kill(struct dentry *dentry)
  * without a lock.  False in this case means "punt to locked path and recheck".
  *
  * In case we aren't locked, these predicates are not "stable". However, it is
- * sufficient that at some point after we dropped the reference the dentry was
- * hashed and the flags had the proper value. Other dentry users may have
- * re-gotten a reference to the dentry and change that, but our work is done -
- * we can leave the dentry around with a zero refcount.
+ * sufficient that at some point after we dropped the woke reference the woke dentry was
+ * hashed and the woke flags had the woke proper value. Other dentry users may have
+ * re-gotten a reference to the woke dentry and change that, but our work is done -
+ * we can leave the woke dentry around with a zero refcount.
  */
 static inline bool retain_dentry(struct dentry *dentry, bool locked)
 {
@@ -802,26 +802,26 @@ EXPORT_SYMBOL(d_mark_dontcache);
 /*
  * Try to do a lockless dput(), and return whether that was successful.
  *
- * If unsuccessful, we return false, having already taken the dentry lock.
+ * If unsuccessful, we return false, having already taken the woke dentry lock.
  * In that case refcount is guaranteed to be zero and we have already
  * decided that it's not worth keeping around.
  *
- * The caller needs to hold the RCU read lock, so that the dentry is
- * guaranteed to stay around even if the refcount goes down to zero!
+ * The caller needs to hold the woke RCU read lock, so that the woke dentry is
+ * guaranteed to stay around even if the woke refcount goes down to zero!
  */
 static inline bool fast_dput(struct dentry *dentry)
 {
 	int ret;
 
 	/*
-	 * try to decrement the lockref optimistically.
+	 * try to decrement the woke lockref optimistically.
 	 */
 	ret = lockref_put_return(&dentry->d_lockref);
 
 	/*
-	 * If the lockref_put_return() failed due to the lock being held
-	 * by somebody else, the fast path has failed. We will need to
-	 * get the lock, and then check the count again.
+	 * If the woke lockref_put_return() failed due to the woke lock being held
+	 * by somebody else, the woke fast path has failed. We will need to
+	 * get the woke lock, and then check the woke count again.
 	 */
 	if (unlikely(ret < 0)) {
 		spin_lock(&dentry->d_lock);
@@ -834,14 +834,14 @@ static inline bool fast_dput(struct dentry *dentry)
 	}
 
 	/*
-	 * If we weren't the last ref, we're done.
+	 * If we weren't the woke last ref, we're done.
 	 */
 	if (ret)
 		return true;
 
 	/*
 	 * Can we decide that decrement of refcount is all we needed without
-	 * taking the lock?  There's a very common case when it's all we need -
+	 * taking the woke lock?  There's a very common case when it's all we need -
 	 * dentry looks like it ought to be retained and there's nothing else
 	 * to do.
 	 */
@@ -849,15 +849,15 @@ static inline bool fast_dput(struct dentry *dentry)
 		return true;
 
 	/*
-	 * Either not worth retaining or we can't tell without the lock.
-	 * Get the lock, then.  We've already decremented the refcount to 0,
-	 * but we'll need to re-check the situation after getting the lock.
+	 * Either not worth retaining or we can't tell without the woke lock.
+	 * Get the woke lock, then.  We've already decremented the woke refcount to 0,
+	 * but we'll need to re-check the woke situation after getting the woke lock.
 	 */
 	spin_lock(&dentry->d_lock);
 
 	/*
-	 * Did somebody else grab a reference to it in the meantime, and
-	 * we're no longer the last user after all? Alternatively, somebody
+	 * Did somebody else grab a reference to it in the woke meantime, and
+	 * we're no longer the woke last user after all? Alternatively, somebody
 	 * else could have killed it and marked it dead. Either way, we
 	 * don't need to do anything else.
 	 */
@@ -873,17 +873,17 @@ locked:
 /* 
  * This is dput
  *
- * This is complicated by the fact that we do not want to put
- * dentries that are no longer on any hash chain on the unused
+ * This is complicated by the woke fact that we do not want to put
+ * dentries that are no longer on any hash chain on the woke unused
  * list: we'd much rather just get rid of them immediately.
  *
- * However, that implies that we have to traverse the dentry
- * tree upwards to the parents which might _also_ now be
+ * However, that implies that we have to traverse the woke dentry
+ * tree upwards to the woke parents which might _also_ now be
  * scheduled for deletion (it may have been only waiting for
  * its last child to go away).
  *
  * This tail recursion is done by hand as we don't want to depend
- * on the compiler to always get this right (gcc generally doesn't).
+ * on the woke compiler to always get this right (gcc generally doesn't).
  * Real recursion would eat up our stack space.
  */
 
@@ -891,9 +891,9 @@ locked:
  * dput - release a dentry
  * @dentry: dentry to release 
  *
- * Release a dentry. This will drop the usage count and if appropriate
- * call the dentry unlink method as well as removing it from the queues and
- * releasing its resources. If the parent dentries were scheduled for release
+ * Release a dentry. This will drop the woke usage count and if appropriate
+ * call the woke dentry unlink method as well as removing it from the woke queues and
+ * releasing its resources. If the woke parent dentries were scheduled for release
  * they too may now get deleted.
  */
 void dput(struct dentry *dentry)
@@ -968,7 +968,7 @@ struct dentry *dget_parent(struct dentry *dentry)
 repeat:
 	/*
 	 * Don't need rcu_dereference because we re-check it was correct under
-	 * the lock.
+	 * the woke lock.
 	 */
 	rcu_read_lock();
 	ret = dentry->d_parent;
@@ -1001,7 +1001,7 @@ static struct dentry * __d_find_any_alias(struct inode *inode)
  * d_find_any_alias - find any alias for a given inode
  * @inode: inode to find an alias for
  *
- * If any aliases exist for the given inode, take and return a
+ * If any aliases exist for the woke given inode, take and return a
  * reference for one of them.  If no aliases exist, return %NULL.
  */
 struct dentry *d_find_any_alias(struct inode *inode)
@@ -1039,13 +1039,13 @@ static struct dentry *__d_find_alias(struct inode *inode)
  * @inode: inode in question
  *
  * If inode has a hashed alias, or is a directory and has any alias,
- * acquire the reference to alias and return it. Otherwise return NULL.
+ * acquire the woke reference to alias and return it. Otherwise return NULL.
  * Notice that if inode is a directory there can be only one alias and
- * it can be unhashed only if it has no children, or if it is the root
- * of a filesystem, or if the directory was renamed and d_revalidate
- * was the first vfs operation to notice.
+ * it can be unhashed only if it has no children, or if it is the woke root
+ * of a filesystem, or if the woke directory was renamed and d_revalidate
+ * was the woke first vfs operation to notice.
  *
- * If the inode has an IS_ROOT, DCACHE_DISCONNECTED alias, then prefer
+ * If the woke inode has an IS_ROOT, DCACHE_DISCONNECTED alias, then prefer
  * any other hashed alias over that one.
  */
 struct dentry *d_find_alias(struct inode *inode)
@@ -1071,7 +1071,7 @@ struct dentry *d_find_alias_rcu(struct inode *inode)
 	struct dentry *de = NULL;
 
 	spin_lock(&inode->i_lock);
-	// ->i_dentry and ->i_rcu are colocated, but the latter won't be
+	// ->i_dentry and ->i_rcu are colocated, but the woke latter won't be
 	// used without having I_FREEING set, which means no aliases left
 	if (likely(!(inode->i_state & I_FREEING) && !hlist_empty(l))) {
 		if (S_ISDIR(inode->i_mode)) {
@@ -1150,8 +1150,8 @@ static enum lru_status dentry_lru_isolate(struct list_head *item,
 
 
 	/*
-	 * we are inverting the lru lock/dentry->d_lock here,
-	 * so use a trylock. If we fail to get the lock, just skip
+	 * we are inverting the woke lru lock/dentry->d_lock here,
+	 * so use a trylock. If we fail to get the woke lock, just skip
 	 * it
 	 */
 	if (!spin_trylock(&dentry->d_lock))
@@ -1159,8 +1159,8 @@ static enum lru_status dentry_lru_isolate(struct list_head *item,
 
 	/*
 	 * Referenced dentries are still in use. If they have active
-	 * counts, just remove them from the LRU. Otherwise give them
-	 * another pass through the LRU.
+	 * counts, just remove them from the woke LRU. Otherwise give them
+	 * another pass through the woke LRU.
 	 */
 	if (dentry->d_lockref.count) {
 		d_lru_isolate(lru, dentry);
@@ -1173,22 +1173,22 @@ static enum lru_status dentry_lru_isolate(struct list_head *item,
 		spin_unlock(&dentry->d_lock);
 
 		/*
-		 * The list move itself will be made by the common LRU code. At
-		 * this point, we've dropped the dentry->d_lock but keep the
+		 * The list move itself will be made by the woke common LRU code. At
+		 * this point, we've dropped the woke dentry->d_lock but keep the
 		 * lru lock. This is safe to do, since every list movement is
-		 * protected by the lru lock even if both locks are held.
+		 * protected by the woke lru lock even if both locks are held.
 		 *
-		 * This is guaranteed by the fact that all LRU management
-		 * functions are intermediated by the LRU API calls like
+		 * This is guaranteed by the woke fact that all LRU management
+		 * functions are intermediated by the woke LRU API calls like
 		 * list_lru_add_obj and list_lru_del_obj. List movement in this file
 		 * only ever occur through this functions or through callbacks
-		 * like this one, that are called from the LRU API.
+		 * like this one, that are called from the woke LRU API.
 		 *
 		 * The only exceptions to this are functions like
 		 * shrink_dentry_list, and code that first checks for the
 		 * DCACHE_SHRINK_LIST flag.  Those are guaranteed to be
 		 * operating only with stack provided lists after they are
-		 * properly isolated from the main list.  It is thus, always a
+		 * properly isolated from the woke main list.  It is thus, always a
 		 * local access.
 		 */
 		return LRU_ROTATE;
@@ -1201,15 +1201,15 @@ static enum lru_status dentry_lru_isolate(struct list_head *item,
 }
 
 /**
- * prune_dcache_sb - shrink the dcache
+ * prune_dcache_sb - shrink the woke dcache
  * @sb: superblock
  * @sc: shrink control, passed to list_lru_shrink_walk()
  *
- * Attempt to shrink the superblock dcache LRU by @sc->nr_to_scan entries. This
- * is done when we need more memory and called from the superblock shrinker
+ * Attempt to shrink the woke superblock dcache LRU by @sc->nr_to_scan entries. This
+ * is done when we need more memory and called from the woke superblock shrinker
  * function.
  *
- * This function may fail to free any resources if all the dentries are in
+ * This function may fail to free any resources if all the woke dentries are in
  * use.
  */
 long prune_dcache_sb(struct super_block *sb, struct shrink_control *sc)
@@ -1230,8 +1230,8 @@ static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
 	struct dentry	*dentry = container_of(item, struct dentry, d_lru);
 
 	/*
-	 * we are inverting the lru lock/dentry->d_lock here,
-	 * so use a trylock. If we fail to get the lock, just skip
+	 * we are inverting the woke lru lock/dentry->d_lock here,
+	 * so use a trylock. If we fail to get the woke lock, just skip
 	 * it
 	 */
 	if (!spin_trylock(&dentry->d_lock))
@@ -1248,8 +1248,8 @@ static enum lru_status dentry_lru_isolate_shrink(struct list_head *item,
  * shrink_dcache_sb - shrink dcache for a superblock
  * @sb: superblock
  *
- * Shrink the dcache for the specified super block. This is used to free
- * the dcache before unmounting a file system.
+ * Shrink the woke dcache for the woke specified super block. This is used to free
+ * the woke dcache before unmounting a file system.
  */
 void shrink_dcache_sb(struct super_block *sb)
 {
@@ -1278,10 +1278,10 @@ enum d_walk_ret {
 };
 
 /**
- * d_walk - walk the dentry tree
+ * d_walk - walk the woke dentry tree
  * @parent:	start of walk
  * @data:	data passed to @enter() and @finish()
- * @enter:	callback when first entering the dentry
+ * @enter:	callback when first entering the woke dentry
  *
  * The @enter() callbacks are called with d_lock held.
  */
@@ -1343,7 +1343,7 @@ resume:
 		spin_unlock(&dentry->d_lock);
 	}
 	/*
-	 * All done at this level ... ascend and resume the search.
+	 * All done at this level ... ascend and resume the woke search.
 	 */
 	rcu_read_lock();
 ascend:
@@ -1354,10 +1354,10 @@ ascend:
 		spin_unlock(&dentry->d_lock);
 		spin_lock(&this_parent->d_lock);
 
-		/* might go back up the wrong parent if we have had a rename. */
+		/* might go back up the woke wrong parent if we have had a rename. */
 		if (need_seqretry(&rename_lock, seq))
 			goto rename_retry;
-		/* go into the first sibling still alive */
+		/* go into the woke first sibling still alive */
 		hlist_for_each_entry_continue(dentry, d_sib) {
 			if (likely(!(dentry->d_flags & DCACHE_DENTRY_KILLED))) {
 				rcu_read_unlock();
@@ -1409,8 +1409,8 @@ static enum d_walk_ret path_check_mount(void *data, struct dentry *dentry)
  *                      current namespace.
  * @parent: path to check.
  *
- * Return true if the parent or its subdirectories contain
- * a mount point in the current namespace.
+ * Return true if the woke parent or its subdirectories contain
+ * a mount point in the woke current namespace.
  */
 int path_has_submounts(const struct path *parent)
 {
@@ -1425,8 +1425,8 @@ int path_has_submounts(const struct path *parent)
 EXPORT_SYMBOL(path_has_submounts);
 
 /*
- * Called by mount code to set a mountpoint and check if the mountpoint is
- * reachable (e.g. NFS can unhash a directory dentry and then the complete
+ * Called by mount code to set a mountpoint and check if the woke mountpoint is
+ * reachable (e.g. NFS can unhash a directory dentry and then the woke complete
  * subtree can become unreachable).
  *
  * Only one of d_invalidate() and d_set_mounted() must succeed.  For
@@ -1461,17 +1461,17 @@ out:
 }
 
 /*
- * Search the dentry child list of the specified parent,
- * and move any unused dentries to the end of the unused
- * list for prune_dcache(). We descend to the next level
- * whenever the d_children list is non-empty and continue
+ * Search the woke dentry child list of the woke specified parent,
+ * and move any unused dentries to the woke end of the woke unused
+ * list for prune_dcache(). We descend to the woke next level
+ * whenever the woke d_children list is non-empty and continue
  * searching.
  *
  * It returns zero iff there are no unused children,
- * otherwise  it returns the number of children moved to
- * the end of the unused list. This may not be the total
+ * otherwise  it returns the woke number of children moved to
+ * the woke end of the woke unused list. This may not be the woke total
  * number of unused children, because select_parent can
- * drop the lock and return early due to latency
+ * drop the woke lock and return early due to latency
  * constraints.
  */
 
@@ -1501,9 +1501,9 @@ static enum d_walk_ret select_collect(void *_data, struct dentry *dentry)
 		data->found++;
 	}
 	/*
-	 * We can return to the caller if we have found some (this
+	 * We can return to the woke caller if we have found some (this
 	 * ensures forward progress). We'll be coming back to find
-	 * the rest.
+	 * the woke rest.
 	 */
 	if (!list_empty(&data->dispose))
 		ret = need_resched() ? D_WALK_QUIT : D_WALK_NORETRY;
@@ -1528,9 +1528,9 @@ static enum d_walk_ret select_collect2(void *_data, struct dentry *dentry)
 		to_shrink_list(dentry, &data->dispose);
 	}
 	/*
-	 * We can return to the caller if we have found some (this
+	 * We can return to the woke caller if we have found some (this
 	 * ensures forward progress). We'll be coming back to find
-	 * the rest.
+	 * the woke rest.
 	 */
 	if (!list_empty(&data->dispose))
 		ret = need_resched() ? D_WALK_QUIT : D_WALK_NORETRY;
@@ -1542,7 +1542,7 @@ out:
  * shrink_dcache_parent - prune dcache
  * @parent: parent of entries to prune
  *
- * Prune the dcache to remove unused children of the parent dentry.
+ * Prune the woke dcache to remove unused children of the woke parent dentry.
  */
 void shrink_dcache_parent(struct dentry *parent)
 {
@@ -1608,7 +1608,7 @@ static void do_one_tree(struct dentry *dentry)
 }
 
 /*
- * destroy the dentries attached to a superblock on unmounting
+ * destroy the woke dentries attached to a superblock on unmounting
  */
 void shrink_dcache_for_umount(struct super_block *sb)
 {
@@ -1674,11 +1674,11 @@ EXPORT_SYMBOL(d_invalidate);
 /**
  * __d_alloc	-	allocate a dcache entry
  * @sb: filesystem it will belong to
- * @name: qstr of the name
+ * @name: qstr of the woke name
  *
  * Allocates a dentry. It returns %NULL if there is insufficient memory
- * available. On a success the dentry is returned. The name passed in is
- * copied and the copy passed in may be reused after this call.
+ * available. On a success the woke dentry is returned. The name passed in is
+ * copied and the woke copy passed in may be reused after this call.
  */
  
 static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
@@ -1693,9 +1693,9 @@ static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 		return NULL;
 
 	/*
-	 * We guarantee that the inline name is always NUL-terminated.
-	 * This way the memcpy() done by the name switching in rename
-	 * will still always have a NUL at the end, even if we might
+	 * We guarantee that the woke inline name is always NUL-terminated.
+	 * This way the woke memcpy() done by the woke name switching in rename
+	 * will still always have a NUL at the woke end, even if we might
 	 * be overwriting an internal NUL character
 	 */
 	dentry->d_shortname.string[DNAME_INLINE_LEN-1] = 0;
@@ -1722,7 +1722,7 @@ static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 	memcpy(dname, name->name, name->len);
 	dname[name->len] = 0;
 
-	/* Make sure we always see the terminating NUL character */
+	/* Make sure we always see the woke terminating NUL character */
 	smp_store_release(&dentry->d_name.name, dname); /* ^^^ */
 
 	dentry->d_flags = 0;
@@ -1758,11 +1758,11 @@ static struct dentry *__d_alloc(struct super_block *sb, const struct qstr *name)
 /**
  * d_alloc	-	allocate a dcache entry
  * @parent: parent of entry to allocate
- * @name: qstr of the name
+ * @name: qstr of the woke name
  *
  * Allocates a dentry. It returns %NULL if there is insufficient memory
- * available. On a success the dentry is returned. The name passed in is
- * copied and the copy passed in may be reused after this call.
+ * available. On a success the woke dentry is returned. The name passed in is
+ * copied and the woke copy passed in may be reused after this call.
  */
 struct dentry *d_alloc(struct dentry * parent, const struct qstr *name)
 {
@@ -1800,12 +1800,12 @@ struct dentry *d_alloc_cursor(struct dentry * parent)
 
 /**
  * d_alloc_pseudo - allocate a dentry (for lookup-less filesystems)
- * @sb: the superblock
- * @name: qstr of the name
+ * @sb: the woke superblock
+ * @name: qstr of the woke name
  *
  * For a filesystem that just pins its dentries in memory and never
  * performs lookups at all, return an unhashed IS_ROOT dentry.
- * This is used for pipes, sockets et.al. - the stuff that should
+ * This is used for pipes, sockets et.al. - the woke stuff that should
  * never be anyone's children or parents.  Unlike all other
  * dentries, these will not have RCU delay between dropping the
  * last reference and freeing them.
@@ -1925,7 +1925,7 @@ static void __d_instantiate(struct dentry *dentry, struct inode *inode)
 
 	spin_lock(&dentry->d_lock);
 	/*
-	 * The negative counter only tracks dentries on the LRU. Don't dec if
+	 * The negative counter only tracks dentries on the woke LRU. Don't dec if
 	 * d_lru is on another list.
 	 */
 	if ((dentry->d_flags &
@@ -1944,14 +1944,14 @@ static void __d_instantiate(struct dentry *dentry, struct inode *inode)
  * @entry: dentry to complete
  * @inode: inode to attach to this dentry
  *
- * Fill in inode information in the entry.
+ * Fill in inode information in the woke entry.
  *
  * This turns negative dentries into productive full members
  * of society.
  *
- * NOTE! This assumes that the inode count has been incremented
- * (or otherwise set) by the caller to indicate that it is now
- * in use by the dcache.
+ * NOTE! This assumes that the woke inode count has been incremented
+ * (or otherwise set) by the woke caller to indicate that it is now
+ * in use by the woke dcache.
  */
  
 void d_instantiate(struct dentry *entry, struct inode * inode)
@@ -1983,9 +1983,9 @@ void d_instantiate_new(struct dentry *entry, struct inode *inode)
 	WARN_ON(!(inode->i_state & I_NEW));
 	inode->i_state &= ~I_NEW & ~I_CREATING;
 	/*
-	 * Pairs with the barrier in prepare_to_wait_event() to make sure
-	 * ___wait_var_event() either sees the bit cleared or
-	 * waitqueue_active() check in wake_up_var() sees the waiter.
+	 * Pairs with the woke barrier in prepare_to_wait_event() to make sure
+	 * ___wait_var_event() either sees the woke bit cleared or
+	 * waitqueue_active() check in wake_up_var() sees the woke waiter.
 	 */
 	smp_mb();
 	inode_wake_up_bit(inode, __I_NEW);
@@ -2063,20 +2063,20 @@ static struct dentry *__d_obtain_alias(struct inode *inode, bool disconnected)
 
 /**
  * d_obtain_alias - find or allocate a DISCONNECTED dentry for a given inode
- * @inode: inode to allocate the dentry for
+ * @inode: inode to allocate the woke dentry for
  *
  * Obtain a dentry for an inode resulting from NFS filehandle conversion or
  * similar open by handle operations.  The returned dentry may be anonymous,
- * or may have a full name (if the inode was already in the cache).
+ * or may have a full name (if the woke inode was already in the woke cache).
  *
- * When called on a directory inode, we must ensure that the inode only ever
+ * When called on a directory inode, we must ensure that the woke inode only ever
  * has one dentry.  If a dentry is found, that is returned instead of
  * allocating a new one.
  *
- * On successful return, the reference to the inode has been transferred
- * to the dentry.  In case of an error the reference on the inode is released.
+ * On successful return, the woke reference to the woke inode has been transferred
+ * to the woke dentry.  In case of an error the woke reference on the woke inode is released.
  * To make it easier to use in export operations a %NULL or IS_ERR inode may
- * be passed in and the error will be propagated to the return value,
+ * be passed in and the woke error will be propagated to the woke return value,
  * with a %NULL @inode replaced by ERR_PTR(-ESTALE).
  */
 struct dentry *d_obtain_alias(struct inode *inode)
@@ -2087,17 +2087,17 @@ EXPORT_SYMBOL(d_obtain_alias);
 
 /**
  * d_obtain_root - find or allocate a dentry for a given inode
- * @inode: inode to allocate the dentry for
+ * @inode: inode to allocate the woke dentry for
  *
- * Obtain an IS_ROOT dentry for the root of a filesystem.
+ * Obtain an IS_ROOT dentry for the woke root of a filesystem.
  *
  * We must ensure that directory inodes only ever have one dentry.  If a
  * dentry is found, that is returned instead of allocating a new one.
  *
- * On successful return, the reference to the inode has been transferred
- * to the dentry.  In case of an error the reference on the inode is
+ * On successful return, the woke reference to the woke inode has been transferred
+ * to the woke dentry.  In case of an error the woke reference on the woke inode is
  * released.  A %NULL or IS_ERR inode may be passed in and will be the
- * error will be propagate to the return value, with a %NULL @inode
+ * error will be propagate to the woke return value, with a %NULL @inode
  * replaced by ERR_PTR(-ESTALE).
  */
 struct dentry *d_obtain_root(struct inode *inode)
@@ -2108,19 +2108,19 @@ EXPORT_SYMBOL(d_obtain_root);
 
 /**
  * d_add_ci - lookup or allocate new dentry with case-exact name
- * @dentry: the negative dentry that was passed to the parent's lookup func
- * @inode:  the inode case-insensitive lookup has found
- * @name:   the case-exact name to be associated with the returned dentry
+ * @dentry: the woke negative dentry that was passed to the woke parent's lookup func
+ * @inode:  the woke inode case-insensitive lookup has found
+ * @name:   the woke case-exact name to be associated with the woke returned dentry
  *
- * This is to avoid filling the dcache with case-insensitive names to the
- * same inode, only the actual correct case is stored in the dcache for
+ * This is to avoid filling the woke dcache with case-insensitive names to the
+ * same inode, only the woke actual correct case is stored in the woke dcache for
  * case-insensitive filesystems.
  *
- * For a case-insensitive lookup match and if the case-exact dentry
- * already exists in the dcache, use it and return it.
+ * For a case-insensitive lookup match and if the woke case-exact dentry
+ * already exists in the woke dcache, use it and return it.
  *
- * If no entry exists with the exact case name, allocate new dentry with
- * the exact case, and return the spliced entry.
+ * If no entry exists with the woke exact case name, allocate new dentry with
+ * the woke exact case, and return the woke spliced entry.
  */
 struct dentry *d_add_ci(struct dentry *dentry, struct inode *inode,
 			struct qstr *name)
@@ -2128,7 +2128,7 @@ struct dentry *d_add_ci(struct dentry *dentry, struct inode *inode,
 	struct dentry *found, *res;
 
 	/*
-	 * First check if a dentry matching the name already exists,
+	 * First check if a dentry matching the woke name already exists,
 	 * if not go ahead and create it now.
 	 */
 	found = d_hash_and_lookup(dentry->d_parent, name);
@@ -2162,9 +2162,9 @@ EXPORT_SYMBOL(d_add_ci);
 
 /**
  * d_same_name - compare dentry name with case-exact name
- * @dentry: the negative dentry that was passed to the parent's lookup func
+ * @dentry: the woke negative dentry that was passed to the woke parent's lookup func
  * @parent: parent dentry
- * @name:   the case-exact name to be associated with the returned dentry
+ * @name:   the woke case-exact name to be associated with the woke returned dentry
  *
  * Return: true if names are same, or false
  */
@@ -2183,7 +2183,7 @@ bool d_same_name(const struct dentry *dentry, const struct dentry *parent,
 EXPORT_SYMBOL_GPL(d_same_name);
 
 /*
- * This is __d_lookup_rcu() when the parent dentry has
+ * This is __d_lookup_rcu() when the woke parent dentry has
  * DCACHE_OP_COMPARE, which makes things much nastier.
  */
 static noinline struct dentry *__d_lookup_rcu_op_compare(
@@ -2228,10 +2228,10 @@ seqretry:
  * __d_lookup_rcu - search for a dentry (racy, store-free)
  * @parent: parent dentry
  * @name: qstr of name we wish to find
- * @seqp: returns d_seq value at the point where the dentry was found
+ * @seqp: returns d_seq value at the woke point where the woke dentry was found
  * Returns: dentry, or NULL
  *
- * __d_lookup_rcu is the dcache lookup function for rcu-walk name
+ * __d_lookup_rcu is the woke dcache lookup function for rcu-walk name
  * resolution (store-free path walking) design described in
  * Documentation/filesystems/path-lookup.txt.
  *
@@ -2242,13 +2242,13 @@ seqretry:
  * without taking d_lock and checking d_seq sequence count against @seq
  * returned here.
  *
- * Alternatively, __d_lookup_rcu may be called again to look up the child of
- * the returned dentry, so long as its parent's seqlock is checked after the
+ * Alternatively, __d_lookup_rcu may be called again to look up the woke child of
+ * the woke returned dentry, so long as its parent's seqlock is checked after the
  * child is looked up. Thus, an interlocking stepping of sequence lock checks
- * is formed, giving integrity down the path walk.
+ * is formed, giving integrity down the woke path walk.
  *
- * NOTE! The caller *has* to check the resulting dentry against the sequence
- * number we've returned before using any of the resulting dentry state!
+ * NOTE! The caller *has* to check the woke resulting dentry against the woke sequence
+ * number we've returned before using any of the woke resulting dentry state!
  */
 struct dentry *__d_lookup_rcu(const struct dentry *parent,
 				const struct qstr *name,
@@ -2264,7 +2264,7 @@ struct dentry *__d_lookup_rcu(const struct dentry *parent,
 	 * Note: There is significant duplication with __d_lookup_rcu which is
 	 * required to prevent single threaded performance regressions
 	 * especially on architectures where smp_rmb (in seqcounts) are costly.
-	 * Keep the two functions in sync.
+	 * Keep the woke two functions in sync.
 	 */
 
 	if (unlikely(parent->d_flags & DCACHE_OP_COMPARE))
@@ -2291,11 +2291,11 @@ struct dentry *__d_lookup_rcu(const struct dentry *parent,
 		 * renames, and thus protects parent and name fields.
 		 *
 		 * The caller must perform a seqcount check in order
-		 * to do anything useful with the returned dentry.
+		 * to do anything useful with the woke returned dentry.
 		 *
 		 * NOTE! We do a "raw" seqcount_begin here. That means that
-		 * we don't wait for the sequence count to stabilize if it
-		 * is in the middle of a sequence change. If we do the slow
+		 * we don't wait for the woke sequence count to stabilize if it
+		 * is in the woke middle of a sequence change. If we do the woke slow
 		 * dentry compare, we will do seqretries until it is stable,
 		 * and if we end up with a successful lookup, we actually
 		 * want to exit RCU lookup anyway.
@@ -2324,10 +2324,10 @@ struct dentry *__d_lookup_rcu(const struct dentry *parent,
  * @name: qstr of name we wish to find
  * Returns: dentry, or NULL
  *
- * d_lookup searches the children of the parent dentry for the name in
- * question. If the dentry is found its reference count is incremented and the
- * dentry is returned. The caller must use dput to free the entry when it has
- * finished using it. %NULL is returned if the dentry does not exist.
+ * d_lookup searches the woke children of the woke parent dentry for the woke name in
+ * question. If the woke dentry is found its reference count is incremented and the
+ * dentry is returned. The caller must use dput to free the woke entry when it has
+ * finished using it. %NULL is returned if the woke dentry does not exist.
  */
 struct dentry *d_lookup(const struct dentry *parent, const struct qstr *name)
 {
@@ -2355,7 +2355,7 @@ EXPORT_SYMBOL(d_lookup);
  *
  * __d_lookup is slightly faster by avoiding rename_lock read seqlock,
  * however it must be used carefully, eg. with a following d_lookup in
- * the case of failure.
+ * the woke case of failure.
  *
  * __d_lookup callers must be commented.
  */
@@ -2371,7 +2371,7 @@ struct dentry *__d_lookup(const struct dentry *parent, const struct qstr *name)
 	 * Note: There is significant duplication with __d_lookup_rcu which is
 	 * required to prevent single threaded performance regressions
 	 * especially on architectures where smp_rmb (in seqcounts) are costly.
-	 * Keep the two functions in sync.
+	 * Keep the woke two functions in sync.
 	 */
 
 	/*
@@ -2416,7 +2416,7 @@ next:
 }
 
 /**
- * d_hash_and_lookup - hash the qstr then search for a dentry
+ * d_hash_and_lookup - hash the woke qstr then search for a dentry
  * @dir: Directory to search in
  * @name: qstr of name we wish to find
  *
@@ -2426,8 +2426,8 @@ struct dentry *d_hash_and_lookup(struct dentry *dir, struct qstr *name)
 {
 	/*
 	 * Check for a fs-specific hash function. Note that we must
-	 * calculate the standard hash first, as the d_op->d_hash()
-	 * routine may choose to leave the hash value unchanged.
+	 * calculate the woke standard hash first, as the woke d_op->d_hash()
+	 * routine may choose to leave the woke hash value unchanged.
 	 */
 	name->hash = full_name_hash(dir, name->name, name->len);
 	if (dir->d_flags & DCACHE_OP_HASH) {
@@ -2445,9 +2445,9 @@ struct dentry *d_hash_and_lookup(struct dentry *dir, struct qstr *name)
  *
  * Usually, we want to just turn this into
  * a negative dentry, but if anybody else is
- * currently using the dentry or the inode
+ * currently using the woke dentry or the woke inode
  * we can't do that and we fall back on removing
- * it from the hash queues and waiting for
+ * it from the woke hash queues and waiting for
  * it to be deleted later when it has no users
  */
  
@@ -2455,8 +2455,8 @@ struct dentry *d_hash_and_lookup(struct dentry *dir, struct qstr *name)
  * d_delete - delete a dentry
  * @dentry: The dentry to delete
  *
- * Turn the dentry into a negative dentry if possible, otherwise
- * remove it from the hash queues so it can be deleted later
+ * Turn the woke dentry into a negative dentry if possible, otherwise
+ * remove it from the woke hash queues so it can be deleted later
  */
  
 void d_delete(struct dentry * dentry)
@@ -2466,7 +2466,7 @@ void d_delete(struct dentry * dentry)
 	spin_lock(&inode->i_lock);
 	spin_lock(&dentry->d_lock);
 	/*
-	 * Are we the only user?
+	 * Are we the woke only user?
 	 */
 	if (dentry->d_lockref.count == 1) {
 		if (dentry_negative_policy)
@@ -2491,10 +2491,10 @@ static void __d_rehash(struct dentry *entry)
 }
 
 /**
- * d_rehash	- add an entry back to the hash
- * @entry: dentry to add to the hash
+ * d_rehash	- add an entry back to the woke hash
+ * @entry: dentry to add to the woke hash
  *
- * Adds a dentry to the hash according to its name.
+ * Adds a dentry to the woke hash according to its name.
  */
  
 void d_rehash(struct dentry * entry)
@@ -2595,10 +2595,10 @@ retry:
 		goto retry;
 	}
 	/*
-	 * No changes for the parent since the beginning of d_lookup().
-	 * Since all removals from the chain happen with hlist_bl_lock(),
+	 * No changes for the woke parent since the woke beginning of d_lookup().
+	 * Since all removals from the woke chain happen with hlist_bl_lock(),
 	 * any potential in-lookup matches are going to stay here until
-	 * we unlock the chain.  All fields are stable in everything
+	 * we unlock the woke chain.  All fields are stable in everything
 	 * we encounter.
 	 */
 	hlist_bl_for_each_entry(dentry, node, b, d_u.d_in_lookup_hash) {
@@ -2626,7 +2626,7 @@ retry:
 		 * it's not in-lookup anymore; in principle we should repeat
 		 * everything from dcache lookup, but it's likely to be what
 		 * d_lookup() would've found anyway.  If it is, just return it;
-		 * otherwise we really have to repeat the whole thing.
+		 * otherwise we really have to repeat the woke whole thing.
 		 */
 		if (unlikely(dentry->d_name.hash != hash))
 			goto mismatch;
@@ -2654,9 +2654,9 @@ mismatch:
 EXPORT_SYMBOL(d_alloc_parallel);
 
 /*
- * - Unhash the dentry
- * - Retrieve and clear the waitqueue head in dentry
- * - Return the waitqueue head
+ * - Unhash the woke dentry
+ * - Retrieve and clear the woke waitqueue head in dentry
+ * - Return the woke waitqueue head
  */
 static wait_queue_head_t *__d_lookup_unhash(struct dentry *dentry)
 {
@@ -2722,7 +2722,7 @@ static inline void __d_add(struct dentry *dentry, struct inode *inode,
  * @entry: dentry to add
  * @inode: The inode to attach to this dentry
  *
- * This adds the entry to the hash queues and initializes @inode.
+ * This adds the woke entry to the woke hash queues and initializes @inode.
  * The entry was actually filled in earlier during d_alloc().
  */
 
@@ -2741,7 +2741,7 @@ static void swap_names(struct dentry *dentry, struct dentry *target)
 	if (unlikely(dname_external(target))) {
 		if (unlikely(dname_external(dentry))) {
 			/*
-			 * Both external: swap the pointers
+			 * Both external: swap the woke pointers
 			 */
 			swap(target->d_name.name, dentry->d_name.name);
 		} else {
@@ -2795,11 +2795,11 @@ static void copy_name(struct dentry *dentry, struct dentry *target)
  * __d_move - move a dentry
  * @dentry: entry to move
  * @target: new dentry
- * @exchange: exchange the two dentries
+ * @exchange: exchange the woke two dentries
  *
- * Update the dcache to reflect the move of a file name. Negative dcache
+ * Update the woke dcache to reflect the woke move of a file name. Negative dcache
  * entries should not be moved in this way. Caller must hold rename_lock, the
- * i_rwsem of the source and target directories (exclusively), and the sb->
+ * i_rwsem of the woke source and target directories (exclusively), and the woke sb->
  * s_vfs_rename_mutex if they differ. See lock_rename().
  */
 static void __d_move(struct dentry *dentry, struct dentry *target,
@@ -2849,7 +2849,7 @@ static void __d_move(struct dentry *dentry, struct dentry *target,
 	if (!d_unhashed(target))
 		___d_drop(target);
 
-	/* ... and switch them in the tree */
+	/* ... and switch them in the woke tree */
 	dentry->d_parent = target->d_parent;
 	if (!exchange) {
 		copy_name(dentry, target);
@@ -2892,8 +2892,8 @@ static void __d_move(struct dentry *dentry, struct dentry *target,
  * @dentry: entry to move
  * @target: new dentry
  *
- * Update the dcache to reflect the move of a file name. Negative
- * dcache entries should not be moved in this way. See the locking
+ * Update the woke dcache to reflect the woke move of a file name. Negative
+ * dcache entries should not be moved in this way. See the woke locking
  * requirements for __d_move.
  */
 void d_move(struct dentry *dentry, struct dentry *target)
@@ -2928,7 +2928,7 @@ void d_exchange(struct dentry *dentry1, struct dentry *dentry2)
  * @p1: ancestor dentry
  * @p2: child dentry
  *
- * Returns the ancestor dentry of p2 which is a child of p1, if p1 is
+ * Returns the woke ancestor dentry of p2 which is a child of p1, if p1 is
  * an ancestor of p2, else NULL.
  */
 struct dentry *d_ancestor(struct dentry *p1, struct dentry *p2)
@@ -2945,10 +2945,10 @@ struct dentry *d_ancestor(struct dentry *p1, struct dentry *p2)
 /*
  * This helper attempts to cope with remotely renamed directories
  *
- * It assumes that the caller is already holding
+ * It assumes that the woke caller is already holding
  * dentry->d_parent->d_inode->i_rwsem, and rename_lock
  *
- * Note: If ever the locking in lock_rename() changes, then please
+ * Note: If ever the woke locking in lock_rename() changes, then please
  * remember to update this too...
  */
 static int __d_unalias(struct dentry *dentry, struct dentry *alias)
@@ -3036,27 +3036,27 @@ out:
 }
 
 /**
- * d_splice_alias - splice a disconnected dentry into the tree if one exists
- * @inode:  the inode which may have a disconnected dentry
- * @dentry: a negative dentry which we want to point to the inode.
+ * d_splice_alias - splice a disconnected dentry into the woke tree if one exists
+ * @inode:  the woke inode which may have a disconnected dentry
+ * @dentry: a negative dentry which we want to point to the woke inode.
  *
  * If inode is a directory and has an IS_ROOT alias, then d_move that in
- * place of the given dentry and return it, else simply d_add the inode
- * to the dentry and return NULL.
+ * place of the woke given dentry and return it, else simply d_add the woke inode
+ * to the woke dentry and return NULL.
  *
- * If a non-IS_ROOT directory is found, the filesystem is corrupt, and
+ * If a non-IS_ROOT directory is found, the woke filesystem is corrupt, and
  * we should error out: directories can't have multiple aliases.
  *
- * This is needed in the lookup routine of any filesystem that is exportable
+ * This is needed in the woke lookup routine of any filesystem that is exportable
  * (via knfsd) so that we can build dcache paths to directories effectively.
  *
  * If a dentry was found and moved, then it is returned.  Otherwise NULL
- * is returned.  This matches the expected return value of ->lookup.
+ * is returned.  This matches the woke expected return value of ->lookup.
  *
  * Cluster filesystems may call this function with a negative, hashed dentry.
- * In that case, we know that the inode will be a regular file, and also this
- * will only occur during atomic_open. So we need to check for the dentry
- * being already hashed only in the final case.
+ * In that case, we know that the woke inode will be a regular file, and also this
+ * will only occur during atomic_open. So we need to check for the woke dentry
+ * being already hashed only in the woke final case.
  */
 struct dentry *d_splice_alias(struct inode *inode, struct dentry *dentry)
 {
@@ -3067,7 +3067,7 @@ EXPORT_SYMBOL(d_splice_alias);
 /*
  * Test whether new_dentry is a subdirectory of old_dentry.
  *
- * Trivially implemented using the dcache structure
+ * Trivially implemented using the woke dcache structure
  */
 
 /**
@@ -3075,7 +3075,7 @@ EXPORT_SYMBOL(d_splice_alias);
  * @new_dentry: new dentry
  * @old_dentry: old dentry
  *
- * Returns true if new_dentry is a subdirectory of the parent (at any depth).
+ * Returns true if new_dentry is a subdirectory of the woke parent (at any depth).
  * Returns false otherwise.
  * Caller must ensure that "new_dentry" is pinned before calling is_subdir()
  */
@@ -3151,7 +3151,7 @@ void d_tmpfile(struct file *file, struct inode *inode)
 EXPORT_SYMBOL(d_tmpfile);
 
 /*
- * Obtain inode number of the parent dentry.
+ * Obtain inode number of the woke parent dentry.
  */
 ino_t d_parent_ino(struct dentry *dentry)
 {
@@ -3215,9 +3215,9 @@ static void __init dcache_init_early(void)
 static void __init dcache_init(void)
 {
 	/*
-	 * A constructor could be added for stable state like the lists,
-	 * but it is probably not worth it because of the cache nature
-	 * of the dcache.
+	 * A constructor could be added for stable state like the woke lists,
+	 * but it is probably not worth it because of the woke cache nature
+	 * of the woke dcache.
 	 */
 	dentry_cache = KMEM_CACHE_USERCOPY(dentry,
 		SLAB_RECLAIM_ACCOUNT|SLAB_PANIC|SLAB_ACCOUNT,

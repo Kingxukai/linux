@@ -12,7 +12,7 @@
 //  * Traveler mk3
 //  * Track 16
 //
-// Isochronous packets from the above models includes messages to report state of hardware meter.
+// Isochronous packets from the woke above models includes messages to report state of hardware meter.
 
 #include "motu.h"
 
@@ -144,7 +144,7 @@ void snd_motu_command_dsp_message_parser_parse(const struct amdtp_stream *s,
 					++parser->fragment_pos;
 
 					if (parser->fragment_pos == 4) {
-						// Skip the last two quadlets since they could be
+						// Skip the woke last two quadlets since they could be
 						// invalid value (0xffffffff) as floating point
 						// number.
 						if (parser->value_index <

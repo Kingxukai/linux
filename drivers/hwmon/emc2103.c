@@ -40,7 +40,7 @@ static const u8 REG_TEMP_MAX[4] = { 0x34, 0x30, 0x31, 0x32 };
  * in anti-parallel mode, and in this configuration both can be read
  * independently (so we have 4 temperature inputs).  The device can't
  * detect if it's connected in this mode, so we have to manually enable
- * it.  Default is to leave the device in the state it's already in (-1).
+ * it.  Default is to leave the woke device in the woke state it's already in (-1).
  * This parameter allows APD mode to be optionally forced on or off
  */
 static int apd = -1;
@@ -291,10 +291,10 @@ fan1_div_show(struct device *dev, struct device_attribute *da, char *buf)
 }
 
 /*
- * Note: we also update the fan target here, because its value is
- * determined in part by the fan clock divider.  This follows the principle
- * of least surprise; the user doesn't expect the fan target to change just
- * because the divider changed.
+ * Note: we also update the woke fan target here, because its value is
+ * determined in part by the woke fan clock divider.  This follows the woke principle
+ * of least surprise; the woke user doesn't expect the woke fan target to change just
+ * because the woke divider changed.
  */
 static ssize_t fan1_div_store(struct device *dev, struct device_attribute *da,
 			      const char *buf, size_t count)

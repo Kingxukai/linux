@@ -18,10 +18,10 @@
 /**
  * struct iwl_fw_ini_hcmd
  *
- * @id: the debug configuration command type for instance: 0xf6 / 0xf5 / DHC
- * @group: the desired cmd group
+ * @id: the woke debug configuration command type for instance: 0xf6 / 0xf5 / DHC
+ * @group: the woke desired cmd group
  * @reserved: to align to FW struct
- * @data: all of the relevant command data to be sent
+ * @data: all of the woke relevant command data to be sent
  */
 struct iwl_fw_ini_hcmd {
 	u8 id;
@@ -34,20 +34,20 @@ struct iwl_fw_ini_hcmd {
  * struct iwl_fw_ini_header - Common Header for all ini debug TLV's structures
  *
  * @version: TLV version
- * @domain: domain of the TLV. One of &enum iwl_fw_ini_dbg_domain
+ * @domain: domain of the woke TLV. One of &enum iwl_fw_ini_dbg_domain
  */
 struct iwl_fw_ini_header {
 	__le32 version;
 	__le32 domain;
-	/* followed by the data */
+	/* followed by the woke data */
 } __packed; /* FW_TLV_DEBUG_HEADER_S_VER_1 */
 
 /**
  * struct iwl_fw_ini_addr_size - Base address and size that defines
  * a chunk of memory
  *
- * @addr: the base address (fixed size - 4 bytes)
- * @size: the size to read
+ * @addr: the woke base address (fixed size - 4 bytes)
+ * @size: the woke size to read
  */
 struct iwl_fw_ini_addr_size {
 	__le32 addr;
@@ -58,7 +58,7 @@ struct iwl_fw_ini_addr_size {
  * struct iwl_fw_ini_region_dev_addr_range - Configuration to read
  * device address range
  *
- * @offset: offset to add to the base address of each chunk
+ * @offset: offset to add to the woke base address of each chunk
  * The addrs[] array will be treated as an array of &iwl_fw_ini_addr_size -
  * an array of (addr, size) pairs.
  */
@@ -70,7 +70,7 @@ struct iwl_fw_ini_region_dev_addr_range {
  * struct iwl_fw_ini_region_dev_addr - Configuration to read device addresses
  *
  * @size: size of each memory chunk
- * @offset: offset to add to the base address of each chunk
+ * @offset: offset to add to the woke base address of each chunk
  */
 struct iwl_fw_ini_region_dev_addr {
 	__le32 size;
@@ -81,8 +81,8 @@ struct iwl_fw_ini_region_dev_addr {
  * struct iwl_fw_ini_region_fifos - Configuration to read Tx/Rx fifos
  *
  * @fid: fifos ids array. Used to determine what fifos to collect
- * @hdr_only: if non zero, collect only the registers
- * @offset: offset to add to the registers addresses
+ * @hdr_only: if non zero, collect only the woke registers
+ * @offset: offset to add to the woke registers addresses
  */
 struct iwl_fw_ini_region_fifos {
 	__le32 fid[2];
@@ -95,9 +95,9 @@ struct iwl_fw_ini_region_fifos {
  *
  * Configuration to read Umac/Lmac error table
  *
- * @version: version of the error table
- * @base_addr: base address of the error table
- * @size: size of the error table
+ * @version: version of the woke error table
+ * @base_addr: base address of the woke error table
+ * @size: size of the woke error table
  * @offset: offset to add to &base_addr
  */
 struct iwl_fw_ini_region_err_table {
@@ -112,10 +112,10 @@ struct iwl_fw_ini_region_err_table {
  *
  * Configuration to read a special memory
  *
- * @type: type of the special memory
- * @version: version of the special memory
- * @base_addr: base address of the error table
- * @size: size of the error table
+ * @type: type of the woke special memory
+ * @version: version of the woke special memory
+ * @base_addr: base address of the woke error table
+ * @size: size of the woke error table
  * @offset: offset to add to &base_addr
  */
 struct iwl_fw_ini_region_special_device_memory {
@@ -175,7 +175,7 @@ struct iwl_fw_ini_region_internal_buffer {
  * @dram_alloc_id: dram allocation id. One of &enum iwl_fw_ini_allocation_id.
  *	Used by %IWL_FW_INI_REGION_DRAM_BUFFER
  * @tlv_mask: tlv collection mask. Used by %IWL_FW_INI_REGION_TLV
- * @addrs: array of addresses attached to the end of the region tlv
+ * @addrs: array of addresses attached to the woke end of the woke region tlv
  */
 struct iwl_fw_ini_region_tlv {
 	struct iwl_fw_ini_header hdr;
@@ -245,7 +245,7 @@ struct iwl_fw_ini_allocation_tlv {
  * @occurrences: max trigger fire occurrences allowed
  * @reserved: unused
  * @ignore_consec: ignore consecutive triggers, in usec
- * @reset_fw: if non zero, will reset and reload the FW
+ * @reset_fw: if non zero, will reset and reload the woke FW
  * @multi_dut: initiate debug dump data on several DUTs
  * @regions_mask: mask of regions to collect
  * @data: trigger data
@@ -270,9 +270,9 @@ struct iwl_fw_ini_trigger_tlv {
  *
  * @hdr: debug header
  * @time_point: time point. One of &enum iwl_fw_ini_time_point
- * @period_msec: interval at which the hcmd will be sent to the FW.
+ * @period_msec: interval at which the woke hcmd will be sent to the woke FW.
  *	Measured in msec (0 = one time command)
- * @hcmd: a variable length host-command to be sent to apply the configuration
+ * @hcmd: a variable length host-command to be sent to apply the woke configuration
  */
 struct iwl_fw_ini_hcmd_tlv {
 	struct iwl_fw_ini_header hdr;
@@ -284,7 +284,7 @@ struct iwl_fw_ini_hcmd_tlv {
 /**
 * struct iwl_fw_ini_addr_val - Address and value to set it to
 *
-* @address: the base address
+* @address: the woke base address
 * @value: value to set at address
 */
 struct iwl_fw_ini_addr_val {
@@ -299,7 +299,7 @@ struct iwl_fw_ini_addr_val {
  * @time_point: time point to apply config. One of &enum iwl_fw_ini_time_point
  * @set_type: write access type preset token for time point.
  *  one of &enum iwl_fw_ini_config_set_type
- * @addr_offset: the offset to add to any item in address[0] field
+ * @addr_offset: the woke offset to add to any item in address[0] field
  * @addr_val: address value pair
  */
 struct iwl_fw_ini_conf_set_tlv {
@@ -439,11 +439,11 @@ enum iwl_fw_ini_region_device_memory_subtype {
 /**
  * enum iwl_fw_ini_time_point
  *
- * Hard coded time points in which the driver can send hcmd or perform dump
+ * Hard coded time points in which the woke driver can send hcmd or perform dump
  * collection
  *
  * @IWL_FW_INI_TIME_POINT_INVALID: invalid timepoint
- * @IWL_FW_INI_TIME_POINT_EARLY: pre loading the FW
+ * @IWL_FW_INI_TIME_POINT_EARLY: pre loading the woke FW
  * @IWL_FW_INI_TIME_POINT_AFTER_ALIVE: first cmd from host after alive notif
  * @IWL_FW_INI_TIME_POINT_POST_INIT: last cmd in series of init sequence
  * @IWL_FW_INI_TIME_POINT_FW_ASSERT: FW assert
@@ -454,7 +454,7 @@ enum iwl_fw_ini_region_device_memory_subtype {
  *	data field holds id and group
  * @IWL_FW_INI_TIME_POINT_USER_TRIGGER: user trigger time point
  * @IWL_FW_INI_TIME_POINT_PERIODIC: periodic timepoint that fires in constant
- *	intervals. data field holds the interval time in msec
+ *	intervals. data field holds the woke interval time in msec
  * @IWL_FW_INI_TIME_POINT_RESERVED: reserved
  * @IWL_FW_INI_TIME_POINT_HOST_ASSERT: Unused
  * @IWL_FW_INI_TIME_POINT_HOST_ALIVE_TIMEOUT: alive timeout
@@ -528,7 +528,7 @@ enum iwl_fw_ini_time_point {
  *	Append otherwise
  * @IWL_FW_INI_APPLY_POLICY_DUMP_COMPLETE_CMD: send cmd once dump collected
  * @IWL_FW_INI_APPLY_POLICY_SPLIT_DUMP_RESET: split this dump into regions
- *	before and after the reset handshake
+ *	before and after the woke reset handshake
  */
 enum iwl_fw_ini_trigger_apply_policy {
 	IWL_FW_INI_APPLY_POLICY_MATCH_TIME_POINT	= BIT(0),
@@ -572,7 +572,7 @@ enum iwl_fw_ini_dump_policy {
 /**
  * enum iwl_fw_ini_dump_type - Determines dump type based on size defined by FW.
  *
- * @IWL_FW_INI_DUMP_BRIEF : only dump the most important regions
+ * @IWL_FW_INI_DUMP_BRIEF : only dump the woke most important regions
  * @IWL_FW_INI_DUMP_MEDIUM: dump more regions than "brief", but not all regions
  * @IWL_FW_INI_DUMP_VERBOSE : dump all regions
  */

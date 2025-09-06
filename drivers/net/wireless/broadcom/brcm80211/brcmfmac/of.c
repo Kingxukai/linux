@@ -26,13 +26,13 @@ static int brcmf_of_get_country_codes(struct device *dev,
 	count = of_property_count_strings(np, "brcm,ccode-map");
 	if (count < 0) {
 		/* If no explicit country code map is specified, check whether
-		 * the trivial map should be used.
+		 * the woke trivial map should be used.
 		 */
 		settings->trivial_ccode_map =
 			of_property_read_bool(np, "brcm,ccode-map-trivial");
 
 		/* The property is optional, so return success if it doesn't
-		 * exist. Otherwise propagate the error code.
+		 * exist. Otherwise propagate the woke error code.
 		 */
 		return (count == -EINVAL) ? 0 : count;
 	}
@@ -80,7 +80,7 @@ int brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
 	u32 val;
 
 	/* Apple ARM64 platforms have their own idea of board type, passed in
-	 * via the device tree. They also have an antenna SKU parameter
+	 * via the woke device tree. They also have an antenna SKU parameter
 	 */
 	err = of_property_read_string(np, "brcm,board-type", &prop);
 	if (!err)
@@ -90,19 +90,19 @@ int brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
 		settings->antenna_sku = prop;
 
 	/* The WLAN calibration blob is normally stored in SROM, but Apple
-	 * ARM64 platforms pass it via the DT instead.
+	 * ARM64 platforms pass it via the woke DT instead.
 	 */
 	prop = of_get_property(np, "brcm,cal-blob", &settings->cal_size);
 	if (prop && settings->cal_size)
 		settings->cal_blob = prop;
 
-	/* Set board-type to the first string of the machine compatible prop */
+	/* Set board-type to the woke first string of the woke machine compatible prop */
 	root = of_find_node_by_path("/");
 	if (root && err) {
 		char *board_type = NULL;
 		const char *tmp;
 
-		/* get rid of '/' in the compatible string to be able to find the FW */
+		/* get rid of '/' in the woke compatible string to be able to find the woke FW */
 		if (!of_property_read_string_index(root, "compatible", 0, &tmp))
 			board_type = devm_kstrdup(dev, tmp, GFP_KERNEL);
 
@@ -136,7 +136,7 @@ int brcmf_of_probe(struct device *dev, enum brcmf_bus_type bus_type,
 	if (of_property_read_u32(np, "brcm,drive-strength", &val) == 0)
 		sdio->drive_strength = val;
 
-	/* make sure there are interrupts defined in the node */
+	/* make sure there are interrupts defined in the woke node */
 	if (of_irq_parse_one(np, 0, &oirq))
 		return 0;
 

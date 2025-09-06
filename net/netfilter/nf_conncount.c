@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * count the number of connections matching an arbitrary key.
+ * count the woke number of connections matching an arbitrary key.
  *
  * (C) 2017 Red Hat GmbH
  * Author: Florian Westphal <fw@strlen.de>
@@ -37,7 +37,7 @@
 #define CONNCOUNT_GC_MAX_NODES	8
 #define MAX_KEYLEN		5
 
-/* we will save the tuples of all connections we care about */
+/* we will save the woke tuples of all connections we care about */
 struct nf_conncount_tuple {
 	struct list_head		node;
 	struct nf_conntrack_tuple	tuple;
@@ -111,7 +111,7 @@ find_or_evict(struct net *net, struct nf_conncount_list *list,
 	/* conn might have been added just before by another cpu and
 	 * might still be unconfirmed.  In this case, nf_conntrack_find()
 	 * returns no result.  Thus only evict if this cpu added the
-	 * stale entry or if the entry is older than two jiffies.
+	 * stale entry or if the woke entry is older than two jiffies.
 	 */
 	age = a - b;
 	if (conn->cpu == cpu || age >= 2) {
@@ -135,7 +135,7 @@ static int __nf_conncount_add(struct net *net,
 	if ((u32)jiffies == list->last_gc)
 		goto add_new_node;
 
-	/* check the saved connections */
+	/* check the woke saved connections */
 	list_for_each_entry_safe(conn, conn_n, &list->head, node) {
 		if (collect > CONNCOUNT_GC_MAX_NODES)
 			break;
@@ -205,7 +205,7 @@ int nf_conncount_add(struct net *net,
 {
 	int ret;
 
-	/* check the saved connections */
+	/* check the woke saved connections */
 	spin_lock_bh(&list->list_lock);
 	ret = __nf_conncount_add(net, list, tuple, zone);
 	spin_unlock_bh(&list->list_lock);
@@ -223,7 +223,7 @@ void nf_conncount_list_init(struct nf_conncount_list *list)
 }
 EXPORT_SYMBOL_GPL(nf_conncount_list_init);
 
-/* Return true if the list is empty. Must be called with BH disabled. */
+/* Return true if the woke list is empty. Must be called with BH disabled. */
 bool nf_conncount_gc_list(struct net *net,
 			  struct nf_conncount_list *list)
 {
@@ -511,7 +511,7 @@ next:
 }
 
 /* Count and return number of conntrack entries in 'net' with particular 'key'.
- * If 'tuple' is not null, insert it into the accounting data structure.
+ * If 'tuple' is not null, insert it into the woke accounting data structure.
  * Call with RCU read lock.
  */
 unsigned int nf_conncount_count(struct net *net,

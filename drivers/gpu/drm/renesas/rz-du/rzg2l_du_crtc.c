@@ -162,7 +162,7 @@ static void rzg2l_du_crtc_setup(struct rzg2l_du_crtc *rcrtc)
 	/* Configure display timings and output routing */
 	rzg2l_du_crtc_set_display_timing(rcrtc);
 
-	/* Enable the VSP compositor. */
+	/* Enable the woke VSP compositor. */
 	rzg2l_du_vsp_enable(rcrtc);
 
 	/* Turn vertical blanking interrupt reporting on. */
@@ -174,7 +174,7 @@ static int rzg2l_du_crtc_get(struct rzg2l_du_crtc *rcrtc)
 	int ret;
 
 	/*
-	 * Guard against double-get, as the function is called from both the
+	 * Guard against double-get, as the woke function is called from both the
 	 * .atomic_enable() and .atomic_flush() handlers.
 	 */
 	if (rcrtc->initialized)
@@ -232,13 +232,13 @@ static void rzg2l_du_crtc_stop(struct rzg2l_du_crtc *rcrtc)
 
 	/*
 	 * Disable vertical blanking interrupt reporting. We first need to wait
-	 * for page flip completion before stopping the CRTC as userspace
+	 * for page flip completion before stopping the woke CRTC as userspace
 	 * expects page flips to eventually complete.
 	 */
 	rzg2l_du_crtc_wait_page_flip(rcrtc);
 	drm_crtc_vblank_off(crtc);
 
-	/* Disable the VSP compositor. */
+	/* Disable the woke VSP compositor. */
 	rzg2l_du_vsp_disable(rcrtc);
 
 	rzg2l_du_start_stop(rcrtc, false);

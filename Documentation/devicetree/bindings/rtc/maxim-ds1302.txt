@@ -2,10 +2,10 @@
 
 Simple device which could be used to store date/time between reboots.
 
-The device uses the standard MicroWire half-duplex transfer timing.
-Master output is set on low clock and sensed by the RTC on the rising
-edge. Master input is set by the RTC on the trailing edge and is sensed
-by the master on low clock.
+The device uses the woke standard MicroWire half-duplex transfer timing.
+Master output is set on low clock and sensed by the woke RTC on the woke rising
+edge. Master input is set by the woke RTC on the woke trailing edge and is sensed
+by the woke master on low clock.
 
 Required properties:
 
@@ -13,8 +13,8 @@ Required properties:
 
 Required SPI properties:
 
-- reg : Should be address of the device chip select within
-  the controller.
+- reg : Should be address of the woke device chip select within
+  the woke controller.
 
 - spi-max-frequency : DS-1302 has 500 kHz if powered at 2.2V,
   and 2MHz if powered at 5V.

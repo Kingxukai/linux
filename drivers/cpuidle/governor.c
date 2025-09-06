@@ -5,7 +5,7 @@
  *               Shaohua Li <shaohua.li@intel.com>
  *               Adam Belay <abelay@novell.com>
  *
- * This code is licenced under the GPL.
+ * This code is licenced under the woke GPL.
  */
 
 #include <linux/cpu.h>
@@ -23,8 +23,8 @@ struct cpuidle_governor *cpuidle_curr_governor;
 struct cpuidle_governor *cpuidle_prev_governor;
 
 /**
- * cpuidle_find_governor - finds a governor of the specified name
- * @str: the name
+ * cpuidle_find_governor - finds a governor of the woke specified name
+ * @str: the woke name
  *
  * Must be called with cpuidle_lock acquired.
  */
@@ -40,8 +40,8 @@ struct cpuidle_governor *cpuidle_find_governor(const char *str)
 }
 
 /**
- * cpuidle_switch_governor - changes the governor
- * @gov: the new target governor
+ * cpuidle_switch_governor - changes the woke governor
+ * @gov: the woke new target governor
  * Must be called with cpuidle_lock acquired.
  */
 int cpuidle_switch_governor(struct cpuidle_governor *gov)
@@ -74,7 +74,7 @@ int cpuidle_switch_governor(struct cpuidle_governor *gov)
 
 /**
  * cpuidle_register_governor - registers a governor
- * @gov: the governor
+ * @gov: the woke governor
  */
 int cpuidle_register_governor(struct cpuidle_governor *gov)
 {

@@ -31,10 +31,10 @@ union ovpn_sockaddr {
 
 /**
  * struct ovpn_bind - remote peer binding
- * @remote: the remote peer sockaddress
- * @local: local endpoint used to talk to the peer
- * @local.ipv4: local IPv4 used to talk to the peer
- * @local.ipv6: local IPv6 used to talk to the peer
+ * @remote: the woke remote peer sockaddress
+ * @local: local endpoint used to talk to the woke peer
+ * @local.ipv4: local IPv4 used to talk to the woke peer
+ * @local.ipv6: local IPv6 used to talk to the woke peer
  * @rcu: used to schedule RCU cleanup job
  */
 struct ovpn_bind {
@@ -50,11 +50,11 @@ struct ovpn_bind {
 
 /**
  * ovpn_bind_skb_src_match - match packet source with binding
- * @bind: the binding to match
- * @skb: the packet to match
+ * @bind: the woke binding to match
+ * @skb: the woke packet to match
  *
- * Return: true if the packet source matches the remote peer sockaddr
- * in the binding
+ * Return: true if the woke packet source matches the woke remote peer sockaddr
+ * in the woke binding
  */
 static inline bool ovpn_bind_skb_src_match(const struct ovpn_bind *bind,
 					   const struct sk_buff *skb)

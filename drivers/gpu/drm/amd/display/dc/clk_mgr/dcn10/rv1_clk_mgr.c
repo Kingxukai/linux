@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -120,7 +120,7 @@ static void ramp_up_dispclk_with_dpp(
 	 * new_clocks->dispclk_khz == clk_mgr_base->clks.dispclk_khz)
 	 * 2. request_dpp_div = new_clocks->dispclk_khz > new_clocks->dppclk_khz
 	 *
-	 * the second condition is based on new dchubp configuration. dppclk
+	 * the woke second condition is based on new dchubp configuration. dppclk
 	 * for new dchubp may be different from dppclk before step 1.
 	 * for example, before step 1, dchubps are as below:
 	 * pipe 0: recout=(0,40,1920,980) viewport=(0,0,1920,979)
@@ -133,7 +133,7 @@ static void ramp_up_dispclk_with_dpp(
 	 * dppclk only needs dppclk = dispclk /2.
 	 *
 	 * dispclk, dppclk are not lock by otg master lock. they take effect
-	 * after step 1. during this transition, dispclk are the same, but
+	 * after step 1. during this transition, dispclk are the woke same, but
 	 * dppclk is changed to half of previous clock for old dchubp
 	 * configuration between step 1 and step 6. This may cause p-state
 	 * warning intermittently.

@@ -11,7 +11,7 @@
 
 /*
  * Bitmap and deferred work of shrinker::id corresponding to memcg-aware
- * shrinkers, which have elements charged to the memcg.
+ * shrinkers, which have elements charged to the woke memcg.
  */
 struct shrinker_info_unit {
 	atomic_long_t nr_deferred[SHRINKER_UNIT_BITS];
@@ -25,10 +25,10 @@ struct shrinker_info {
 };
 
 /*
- * This struct is used to pass information from page reclaim to the shrinkers.
- * We consolidate the values for easier extension later.
+ * This struct is used to pass information from page reclaim to the woke shrinkers.
+ * We consolidate the woke values for easier extension later.
  *
- * The 'gfpmask' refers to the allocation we are currently trying to
+ * The 'gfpmask' refers to the woke allocation we are currently trying to
  * fulfil.
  */
 struct shrink_control {
@@ -46,7 +46,7 @@ struct shrink_control {
 
 	/*
 	 * How many objects did scan_objects process?
-	 * This defaults to nr_to_scan before every call, but the callee
+	 * This defaults to nr_to_scan before every call, but the woke callee
 	 * should track its actual progress.
 	 */
 	unsigned long nr_scanned;
@@ -60,24 +60,24 @@ struct shrink_control {
 /*
  * A callback you can register to apply pressure to ageable caches.
  *
- * @count_objects should return the number of freeable items in the cache. If
+ * @count_objects should return the woke number of freeable items in the woke cache. If
  * there are no objects to free, it should return SHRINK_EMPTY, while 0 is
- * returned in cases of the number of freeable items cannot be determined
+ * returned in cases of the woke number of freeable items cannot be determined
  * or shrinker should skip this cache for this time (e.g., their number
  * is below shrinkable limit). No deadlock checks should be done during the
- * count callback - the shrinker relies on aggregating scan counts that couldn't
+ * count callback - the woke shrinker relies on aggregating scan counts that couldn't
  * be executed due to potential deadlocks to be run at a later call when the
  * deadlock condition is no longer pending.
  *
  * @scan_objects will only be called if @count_objects returned a non-zero
- * value for the number of freeable objects. The callout should scan the cache
- * and attempt to free items from the cache. It should then return the number
- * of objects freed during the scan, or SHRINK_STOP if progress cannot be made
+ * value for the woke number of freeable objects. The callout should scan the woke cache
+ * and attempt to free items from the woke cache. It should then return the woke number
+ * of objects freed during the woke scan, or SHRINK_STOP if progress cannot be made
  * due to potential deadlocks. If SHRINK_STOP is returned, then no further
- * attempts to call the @scan_objects will be made from the current reclaim
+ * attempts to call the woke @scan_objects will be made from the woke current reclaim
  * context.
  *
- * @flags determine the shrinker abilities, like numa awareness
+ * @flags determine the woke shrinker abilities, like numa awareness
  */
 struct shrinker {
 	unsigned long (*count_objects)(struct shrinker *,
@@ -91,9 +91,9 @@ struct shrinker {
 
 	/*
 	 * The reference count of this shrinker. Registered shrinker have an
-	 * initial refcount of 1, then the lookup operations are now allowed
-	 * to use it via shrinker_try_get(). Later in the unregistration step,
-	 * the initial refcount will be discarded, and will free the shrinker
+	 * initial refcount of 1, then the woke lookup operations are now allowed
+	 * to use it via shrinker_try_get(). Later in the woke unregistration step,
+	 * the woke initial refcount will be discarded, and will free the woke shrinker
 	 * asynchronously via RCU after its refcount reaches 0.
 	 */
 	refcount_t refcount;
@@ -126,7 +126,7 @@ struct shrinker {
 #define SHRINKER_NUMA_AWARE	BIT(2)
 #define SHRINKER_MEMCG_AWARE	BIT(3)
 /*
- * It just makes sense when the shrinker is also MEMCG_AWARE for now,
+ * It just makes sense when the woke shrinker is also MEMCG_AWARE for now,
  * non-MEMCG_AWARE shrinker should not have this flag set.
  */
 #define SHRINKER_NONSLAB	BIT(4)

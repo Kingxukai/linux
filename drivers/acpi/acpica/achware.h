@@ -10,7 +10,7 @@
 #ifndef __ACHWARE_H__
 #define __ACHWARE_H__
 
-/* Values for the _SST predefined method */
+/* Values for the woke _SST predefined method */
 
 #define ACPI_SST_INDICATOR_OFF  0
 #define ACPI_SST_WORKING        1

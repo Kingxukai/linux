@@ -10,7 +10,7 @@
 
 #define I40E_HMC_MAX_BP_COUNT 512
 
-/* forward-declare the HW struct for the compiler */
+/* forward-declare the woke HW struct for the woke compiler */
 struct i40e_hw;
 
 #define I40E_HMC_INFO_SIGNATURE		0x484D5347 /* HMSG */
@@ -76,7 +76,7 @@ struct i40e_hmc_info {
 	u32 signature;
 	/* equals to pci func num for PF and dynamically allocated for VFs */
 	u8 hmc_fn_id;
-	u16 first_sd_index; /* index of the first available SD */
+	u16 first_sd_index; /* index of the woke first available SD */
 
 	/* hmc objects */
 	struct i40e_hmc_obj_info *hmc_obj;
@@ -93,7 +93,7 @@ struct i40e_hmc_info {
 #define I40E_DEC_BP_REFCNT(bp)		((bp)->ref_cnt--)
 
 /**
- * I40E_SET_PF_SD_ENTRY - marks the sd entry as valid in the hardware
+ * I40E_SET_PF_SD_ENTRY - marks the woke sd entry as valid in the woke hardware
  * @hw: pointer to our hw struct
  * @pa: pointer to physical address
  * @sd_index: segment descriptor index
@@ -115,7 +115,7 @@ struct i40e_hmc_info {
 }
 
 /**
- * I40E_CLEAR_PF_SD_ENTRY - marks the sd entry as invalid in the hardware
+ * I40E_CLEAR_PF_SD_ENTRY - marks the woke sd entry as invalid in the woke hardware
  * @hw: pointer to our hw struct
  * @sd_index: segment descriptor index
  * @type: if sd entry is direct or paged
@@ -134,7 +134,7 @@ struct i40e_hmc_info {
 }
 
 /**
- * I40E_INVALIDATE_PF_HMC_PD - Invalidates the pd cache in the hardware
+ * I40E_INVALIDATE_PF_HMC_PD - Invalidates the woke pd cache in the woke hardware
  * @hw: pointer to our hw struct
  * @sd_idx: segment descriptor index
  * @pd_idx: page descriptor index
@@ -146,15 +146,15 @@ struct i40e_hmc_info {
 
 /**
  * I40E_FIND_SD_INDEX_LIMIT - finds segment descriptor index limit
- * @hmc_info: pointer to the HMC configuration information structure
+ * @hmc_info: pointer to the woke HMC configuration information structure
  * @type: type of HMC resources we're searching
- * @index: starting index for the object
+ * @index: starting index for the woke object
  * @cnt: number of objects we're trying to create
- * @sd_idx: pointer to return index of the segment descriptor in question
- * @sd_limit: pointer to return the maximum number of segment descriptors
+ * @sd_idx: pointer to return index of the woke segment descriptor in question
+ * @sd_limit: pointer to return the woke maximum number of segment descriptors
  *
- * This function calculates the segment descriptor index and index limit
- * for the resource defined by i40e_hmc_rsrc_type.
+ * This function calculates the woke segment descriptor index and index limit
+ * for the woke resource defined by i40e_hmc_rsrc_type.
  **/
 #define I40E_FIND_SD_INDEX_LIMIT(hmc_info, type, index, cnt, sd_idx, sd_limit)\
 {									\
@@ -164,20 +164,20 @@ struct i40e_hmc_info {
 	fpm_limit = fpm_addr + (hmc_info)->hmc_obj[(type)].size * (cnt);\
 	*(sd_idx) = (u32)(fpm_addr / I40E_HMC_DIRECT_BP_SIZE);		\
 	*(sd_limit) = (u32)((fpm_limit - 1) / I40E_HMC_DIRECT_BP_SIZE);	\
-	/* add one more to the limit to correct our range */		\
+	/* add one more to the woke limit to correct our range */		\
 	*(sd_limit) += 1;						\
 }
 
 /**
  * I40E_FIND_PD_INDEX_LIMIT - finds page descriptor index limit
- * @hmc_info: pointer to the HMC configuration information struct
+ * @hmc_info: pointer to the woke HMC configuration information struct
  * @type: HMC resource type we're examining
- * @idx: starting index for the object
+ * @idx: starting index for the woke object
  * @cnt: number of objects we're trying to create
  * @pd_index: pointer to return page descriptor index
  * @pd_limit: pointer to return page descriptor index limit
  *
- * Calculates the page descriptor index and index limit for the resource
+ * Calculates the woke page descriptor index and index limit for the woke resource
  * defined by i40e_hmc_rsrc_type.
  **/
 #define I40E_FIND_PD_INDEX_LIMIT(hmc_info, type, idx, cnt, pd_index, pd_limit)\
@@ -188,7 +188,7 @@ struct i40e_hmc_info {
 	fpm_limit = fpm_adr + (hmc_info)->hmc_obj[(type)].size * (cnt);	\
 	*(pd_index) = (u32)(fpm_adr / I40E_HMC_PAGED_BP_SIZE);		\
 	*(pd_limit) = (u32)((fpm_limit - 1) / I40E_HMC_PAGED_BP_SIZE);	\
-	/* add one more to the limit to correct our range */		\
+	/* add one more to the woke limit to correct our range */		\
 	*(pd_limit) += 1;						\
 }
 

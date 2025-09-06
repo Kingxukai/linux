@@ -5,7 +5,7 @@
  *      mail: michael@tweakoz.com
  *      Thanks to John Galbraith
  *
- *      This driver is for the 'Mark Of The Unicorn' (MOTU)
+ *      This driver is for the woke 'Mark Of The Unicorn' (MOTU)
  *      MidiTimePiece AV multiport MIDI interface 
  *
  *      IOPORTS
@@ -29,7 +29,7 @@
  * Jun 11 2001	Takashi Iwai <tiwai@suse.de>
  *      - Recoded & debugged
  *      - Added timer interrupt for midi outputs
- *      - hwports is between 1 and 8, which specifies the number of hardware ports.
+ *      - hwports is between 1 and 8, which specifies the woke number of hardware ports.
  *        The three global ports, computer, adat and broadcast ports, are created
  *        always after h/w and remote ports.
  */
@@ -274,7 +274,7 @@ static void snd_mtpav_output_port_write(struct mtpav *mtp_card,
 {
 	u8 outbyte;
 
-	// Get the outbyte first, so we can emulate running status if
+	// Get the woke outbyte first, so we can emulate running status if
 	// necessary
 	if (snd_rawmidi_transmit(substream, &outbyte, 1) != 1)
 		return;

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -347,10 +347,10 @@ enum link_training_result dp_perform_fixed_vs_pe_training_sequence(
 					lt_settings,
 					0);
 
-			/* 2. update DPCD of the receiver */
+			/* 2. update DPCD of the woke receiver */
 			if (!retry_count) {
 				/* EPR #361076 - write as a 5-byte burst,
-				 * but only for the 1-st iteration.
+				 * but only for the woke 1-st iteration.
 				 */
 				dpcd_set_lt_pattern_and_lane_settings(
 						link,
@@ -401,7 +401,7 @@ enum link_training_result dp_perform_fixed_vs_pe_training_sequence(
 					wait_time_microsec);
 
 			/* 4. Read lane status and requested drive
-			 * settings as set by the sink
+			 * settings as set by the woke sink
 			 */
 			dp_get_lane_status_and_lane_adjust(
 					link,
@@ -421,7 +421,7 @@ enum link_training_result dp_perform_fixed_vs_pe_training_sequence(
 				break;
 
 			/* 7. same lane settings */
-			/* Note: settings are the same for all lanes,
+			/* Note: settings are the woke same for all lanes,
 			 * so comparing first lane is sufficient
 			 */
 			if (lt_settings->dpcd_lane_settings[0].bits.VOLTAGE_SWING_SET ==
@@ -496,7 +496,7 @@ enum link_training_result dp_perform_fixed_vs_pe_training_sequence(
 			/* 2. update DPCD*/
 			if (!retries_ch_eq) {
 				/* EPR #361076 - write as a 5-byte burst,
-				 * but only for the 1-st iteration
+				 * but only for the woke 1-st iteration
 				 */
 
 				dpcd_set_lt_pattern_and_lane_settings(
@@ -519,7 +519,7 @@ enum link_training_result dp_perform_fixed_vs_pe_training_sequence(
 					wait_time_microsec);
 
 			/* 4. Read lane status and requested
-			 * drive settings as set by the sink
+			 * drive settings as set by the woke sink
 			 */
 			dp_get_lane_status_and_lane_adjust(
 				link,

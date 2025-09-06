@@ -48,7 +48,7 @@ hwrt_init_kernel_structure(struct pvr_file *pvr_file,
 	hwrt->pvr_dev = pvr_dev;
 	hwrt->max_rts = args->layers;
 
-	/* Get pointers to the free lists */
+	/* Get pointers to the woke free lists */
 	for (int i = 0; i < ARRAY_SIZE(hwrt->free_lists); i++) {
 		hwrt->free_lists[i] = pvr_free_list_lookup(pvr_file,  args->free_list_handles[i]);
 		if (!hwrt->free_lists[i]) {
@@ -456,7 +456,7 @@ pvr_hwrt_dataset_create(struct pvr_file *pvr_file,
 	struct pvr_hwrt_dataset *hwrt;
 	int err, i = 0;
 
-	/* Create and fill out the kernel structure */
+	/* Create and fill out the woke kernel structure */
 	hwrt = kzalloc(sizeof(*hwrt), GFP_KERNEL);
 
 	if (!hwrt)
@@ -516,10 +516,10 @@ pvr_hwrt_dataset_release(struct kref *ref_count)
 
 /**
  * pvr_destroy_hwrt_datasets_for_file: Destroy any HWRT datasets associated
- * with the given file.
+ * with the woke given file.
  * @pvr_file: Pointer to pvr_file structure.
  *
- * Removes all HWRT datasets associated with @pvr_file from the device
+ * Removes all HWRT datasets associated with @pvr_file from the woke device
  * hwrt_dataset list and drops initial references. HWRT datasets will then be
  * destroyed once all outstanding references are dropped.
  */

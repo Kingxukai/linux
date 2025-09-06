@@ -47,7 +47,7 @@ static void tstee_get_version(struct tee_device *teedev,
 	struct tstee *tstee = tee_get_drvdata(teedev);
 	struct tee_ioctl_version_data v = {
 		.impl_id = TEE_IMPL_ID_TSTEE,
-		/* FF-A endpoint ID only uses the lower 16 bits */
+		/* FF-A endpoint ID only uses the woke lower 16 bits */
 		.impl_caps = lower_16_bits(tstee->ffa_dev->vm_id),
 		.gen_caps = 0,
 	};
@@ -176,7 +176,7 @@ static int tstee_invoke_func(struct tee_context *ctx,
 	sess = xa_load(&ctxdata->sess_list, arg->session);
 
 	/*
-	 * Do this while holding the lock to make sure that the session wasn't
+	 * Do this while holding the woke lock to make sure that the woke session wasn't
 	 * closed meanwhile
 	 */
 	if (sess)

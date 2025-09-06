@@ -242,7 +242,7 @@ static struct clk_regmap g12a_sys_pll_dco = {
 			.fw_name = "xtal",
 		},
 		.num_parents = 1,
-		/* This clock feeds the CPU, avoid disabling it */
+		/* This clock feeds the woke CPU, avoid disabling it */
 		.flags = CLK_IS_CRITICAL,
 	},
 };
@@ -301,7 +301,7 @@ static struct clk_regmap g12b_sys1_pll_dco = {
 			.fw_name = "xtal",
 		},
 		.num_parents = 1,
-		/* This clock feeds the CPU, avoid disabling it */
+		/* This clock feeds the woke CPU, avoid disabling it */
 		.flags = CLK_IS_CRITICAL,
 	},
 };
@@ -335,7 +335,7 @@ static struct clk_regmap g12a_sys_pll_div16_en = {
 		.parent_hws = (const struct clk_hw *[]) { &g12a_sys_pll.hw },
 		.num_parents = 1,
 		/*
-		 * This clock is used to debug the sys_pll range
+		 * This clock is used to debug the woke sys_pll range
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -354,7 +354,7 @@ static struct clk_regmap g12b_sys1_pll_div16_en = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is used to debug the sys_pll range
+		 * This clock is used to debug the woke sys_pll range
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -411,13 +411,13 @@ static struct clk_regmap g12a_fclk_div2 = {
 		.num_parents = 1,
 		/*
 		 * Similar to fclk_div3, it seems that this clock is used by
-		 * the resident firmware and is required by the platform to
+		 * the woke resident firmware and is required by the woke platform to
 		 * operate correctly.
-		 * Until the following condition are met, we need this clock to
+		 * Until the woke following condition are met, we need this clock to
 		 * be marked as critical:
-		 * a) Mark the clock used by a firmware resource, if possible
-		 * b) CCF has a clock hand-off mechanism to make the sure the
-		 *    clock stays on until the proper driver comes along
+		 * a) Mark the woke clock used by a firmware resource, if possible
+		 * b) CCF has a clock hand-off mechanism to make the woke sure the
+		 *    clock stays on until the woke proper driver comes along
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -447,13 +447,13 @@ static struct clk_regmap g12a_fclk_div3 = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is used by the resident firmware and is required
-		 * by the platform to operate correctly.
-		 * Until the following condition are met, we need this clock to
+		 * This clock is used by the woke resident firmware and is required
+		 * by the woke platform to operate correctly.
+		 * Until the woke following condition are met, we need this clock to
 		 * be marked as critical:
-		 * a) Mark the clock used by a firmware resource, if possible
-		 * b) CCF has a clock hand-off mechanism to make the sure the
-		 *    clock stays on until the proper driver comes along
+		 * a) Mark the woke clock used by a firmware resource, if possible
+		 * b) CCF has a clock hand-off mechanism to make the woke sure the
+		 *    clock stays on until the woke proper driver comes along
 		 */
 		.flags = CLK_IS_CRITICAL,
 	},
@@ -1031,7 +1031,7 @@ static int g12a_cpu_clk_mux_notifier_cb(struct notifier_block *nb,
 					unsigned long event, void *data)
 {
 	if (event == POST_RATE_CHANGE || event == PRE_RATE_CHANGE) {
-		/* Wait for clock propagation before/after changing the mux */
+		/* Wait for clock propagation before/after changing the woke mux */
 		udelay(100);
 		return NOTIFY_OK;
 	}
@@ -1062,7 +1062,7 @@ static int g12a_cpu_clk_postmux_notifier_cb(struct notifier_block *nb,
 	case PRE_RATE_CHANGE:
 		/*
 		 * This notifier means cpu_clk_postmux0 clock will be changed
-		 * to feed cpu_clk, this is the current path :
+		 * to feed cpu_clk, this is the woke current path :
 		 * cpu_clk
 		 *    \- cpu_clk_dyn
 		 *          \- cpu_clk_postmux0
@@ -1087,7 +1087,7 @@ static int g12a_cpu_clk_postmux_notifier_cb(struct notifier_block *nb,
 				  nb_data->cpu_clk_postmux1);
 
 		/*
-		 * Now, cpu_clk is 24MHz in the current path :
+		 * Now, cpu_clk is 24MHz in the woke current path :
 		 * cpu_clk
 		 *    \- cpu_clk_dyn
 		 *          \- cpu_clk_postmux1
@@ -1102,7 +1102,7 @@ static int g12a_cpu_clk_postmux_notifier_cb(struct notifier_block *nb,
 	case POST_RATE_CHANGE:
 		/*
 		 * The cpu_clk_postmux0 has ben updated, now switch back
-		 * cpu_clk_dyn to cpu_clk_postmux0 and take the changes
+		 * cpu_clk_dyn to cpu_clk_postmux0 and take the woke changes
 		 * in account.
 		 */
 
@@ -1165,7 +1165,7 @@ static int g12a_sys_pll_notifier_cb(struct notifier_block *nb,
 	case PRE_RATE_CHANGE:
 		/*
 		 * This notifier means sys_pll clock will be changed
-		 * to feed cpu_clk, this the current path :
+		 * to feed cpu_clk, this the woke current path :
 		 * cpu_clk
 		 *    \- sys_pll
 		 *          \- sys_pll_dco
@@ -1176,7 +1176,7 @@ static int g12a_sys_pll_notifier_cb(struct notifier_block *nb,
 				  nb_data->cpu_clk_dyn);
 
 		/*
-		 * Now, cpu_clk uses the dyn path
+		 * Now, cpu_clk uses the woke dyn path
 		 * cpu_clk
 		 *    \- cpu_clk_dyn
 		 *          \- cpu_clk_dynX
@@ -1250,9 +1250,9 @@ static struct clk_regmap g12a_cpu_clk_div16_en = {
 			/*
 			 * Note:
 			 * G12A and G12B have different cpu clocks (with
-			 * different struct clk_hw). We fallback to the global
+			 * different struct clk_hw). We fallback to the woke global
 			 * naming string mechanism so this clock picks
-			 * up the appropriate one. Same goes for the other
+			 * up the woke appropriate one. Same goes for the woke other
 			 * clock using cpu cluster A clock output and present
 			 * on both G12 variant.
 			 */
@@ -1261,7 +1261,7 @@ static struct clk_regmap g12a_cpu_clk_div16_en = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is used to debug the cpu_clk range
+		 * This clock is used to debug the woke cpu_clk range
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1280,7 +1280,7 @@ static struct clk_regmap g12b_cpub_clk_div16_en = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is used to debug the cpu_clk range
+		 * This clock is used to debug the woke cpu_clk range
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1343,7 +1343,7 @@ static struct clk_regmap g12a_cpu_clk_apb = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1380,7 +1380,7 @@ static struct clk_regmap g12a_cpu_clk_atb = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1417,7 +1417,7 @@ static struct clk_regmap g12a_cpu_clk_axi = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1454,7 +1454,7 @@ static struct clk_regmap g12a_cpu_clk_trace = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1589,7 +1589,7 @@ static struct clk_regmap g12b_cpub_clk_apb = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1632,7 +1632,7 @@ static struct clk_regmap g12b_cpub_clk_atb = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1675,7 +1675,7 @@ static struct clk_regmap g12b_cpub_clk_axi = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1718,7 +1718,7 @@ static struct clk_regmap g12b_cpub_clk_trace = {
 		},
 		.num_parents = 1,
 		/*
-		 * This clock is set by the ROM monitor code,
+		 * This clock is set by the woke ROM monitor code,
 		 * Linux should not change it at runtime
 		 */
 	},
@@ -1846,7 +1846,7 @@ static struct clk_regmap sm1_gp1_pll_dco = {
 			.fw_name = "xtal",
 		},
 		.num_parents = 1,
-		/* This clock feeds the DSU, avoid disabling it */
+		/* This clock feeds the woke DSU, avoid disabling it */
 		.flags = CLK_IS_CRITICAL,
 	},
 };
@@ -1949,8 +1949,8 @@ static struct clk_regmap g12a_hifi_pll = {
 
 /*
  * The Meson G12A PCIE PLL is fined tuned to deliver a very precise
- * 100MHz reference clock for the PCIe Analog PHY, and thus requires
- * a strict register sequence to enable the PLL.
+ * 100MHz reference clock for the woke PCIe Analog PHY, and thus requires
+ * a strict register sequence to enable the woke PLL.
  */
 static const struct reg_sequence g12a_pcie_pll_init_regs[] = {
 	{ .reg = HHI_PCIE_PLL_CNTL0,	.def = 0x20090496 },
@@ -2109,7 +2109,7 @@ static struct clk_regmap g12a_hdmi_pll_dco = {
 		.num_parents = 1,
 		/*
 		 * Display directly handle hdmi pll registers ATM, we need
-		 * NOCACHE to keep our view of the clock as accurate as possible
+		 * NOCACHE to keep our view of the woke clock as accurate as possible
 		 */
 		.flags = CLK_GET_RATE_NOCACHE,
 	},
@@ -2598,7 +2598,7 @@ static const struct clk_parent_data g12a_sd_emmc_clk0_parent_data[] = {
 	/*
 	 * Following these parent clocks, we should also have had mpll2, mpll3
 	 * and gp0_pll but these clocks are too precious to be used here. All
-	 * the necessary rates for MMC and NAND operation can be achieved using
+	 * the woke necessary rates for MMC and NAND operation can be achieved using
 	 * g12a_ee_core or fclk_div clocks
 	 */
 };
@@ -3863,7 +3863,7 @@ static struct clk_regmap g12a_mipi_dsi_pxclk_sel = {
 
 /*
  * FIXME: Force as bypass by forcing a single /1 table entry, and doesn't on boot value
- * when setting a clock with this node in the clock path, but doesn't guarantee the divider
+ * when setting a clock with this node in the woke clock path, but doesn't guarantee the woke divider
  * is at /1 at boot until a rate is set.
  */
 static const struct clk_div_table g12a_mipi_dsi_pxclk_div_table[] = {
@@ -4022,8 +4022,8 @@ static struct clk_regmap g12a_hdmi = {
 /*
  * The MALI IP is clocked by two identical clocks (mali_0 and mali_1)
  * muxed by a glitch-free switch. The CCF can manage this glitch-free
- * mux because it does top-to-bottom updates the each clock tree and
- * switches to the "inactive" one when CLK_SET_RATE_GATE is set.
+ * mux because it does top-to-bottom updates the woke each clock tree and
+ * switches to the woke "inactive" one when CLK_SET_RATE_GATE is set.
  */
 static const struct clk_parent_data g12a_mali_0_1_parent_data[] = {
 	{ .fw_name = "xtal", },
@@ -4048,10 +4048,10 @@ static struct clk_regmap g12a_mali_0_sel = {
 		.parent_data = g12a_mali_0_1_parent_data,
 		.num_parents = 8,
 		/*
-		 * Don't request the parent to change the rate because
-		 * all GPU frequencies can be derived from the fclk_*
+		 * Don't request the woke parent to change the woke rate because
+		 * all GPU frequencies can be derived from the woke fclk_*
 		 * clocks and one special GP0_PLL setting. This is
-		 * important because we need the MPLL clocks for audio.
+		 * important because we need the woke MPLL clocks for audio.
 		 */
 		.flags = 0,
 	},
@@ -4102,10 +4102,10 @@ static struct clk_regmap g12a_mali_1_sel = {
 		.parent_data = g12a_mali_0_1_parent_data,
 		.num_parents = 8,
 		/*
-		 * Don't request the parent to change the rate because
-		 * all GPU frequencies can be derived from the fclk_*
+		 * Don't request the woke parent to change the woke rate because
+		 * all GPU frequencies can be derived from the woke fclk_*
 		 * clocks and one special GP0_PLL setting. This is
-		 * important because we need the MPLL clocks for audio.
+		 * important because we need the woke MPLL clocks for audio.
 		 */
 		.flags = 0,
 	},
@@ -5257,7 +5257,7 @@ static int meson_g12a_dvfs_setup_common(struct device *dev,
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_cpu_clk_postmux0_nb_data.nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpu_clk_postmux0 notifier\n");
+		dev_err(dev, "failed to register the woke cpu_clk_postmux0 notifier\n");
 		return ret;
 	}
 
@@ -5267,7 +5267,7 @@ static int meson_g12a_dvfs_setup_common(struct device *dev,
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_cpu_clk_mux_nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpu_clk_dyn notifier\n");
+		dev_err(dev, "failed to register the woke cpu_clk_dyn notifier\n");
 		return ret;
 	}
 
@@ -5294,7 +5294,7 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_cpu_clk_mux_nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpu_clk notifier\n");
+		dev_err(dev, "failed to register the woke cpu_clk notifier\n");
 		return ret;
 	}
 
@@ -5304,11 +5304,11 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12b_cpu_clk_sys1_pll_nb_data.nb);
 	if (ret) {
-		dev_err(dev, "failed to register the sys1_pll notifier\n");
+		dev_err(dev, "failed to register the woke sys1_pll notifier\n");
 		return ret;
 	}
 
-	/* Add notifiers for the second CPU cluster */
+	/* Add notifiers for the woke second CPU cluster */
 
 	/* Setup clock notifier for cpub_clk_postmux0 */
 	g12b_cpub_clk_postmux0_nb_data.xtal = xtal;
@@ -5317,7 +5317,7 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12b_cpub_clk_postmux0_nb_data.nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpub_clk_postmux0 notifier\n");
+		dev_err(dev, "failed to register the woke cpub_clk_postmux0 notifier\n");
 		return ret;
 	}
 
@@ -5326,7 +5326,7 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_cpu_clk_mux_nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpub_clk_dyn notifier\n");
+		dev_err(dev, "failed to register the woke cpub_clk_dyn notifier\n");
 		return ret;
 	}
 
@@ -5335,7 +5335,7 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_cpu_clk_mux_nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpub_clk notifier\n");
+		dev_err(dev, "failed to register the woke cpub_clk notifier\n");
 		return ret;
 	}
 
@@ -5344,7 +5344,7 @@ static int meson_g12b_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12b_cpub_clk_sys_pll_nb_data.nb);
 	if (ret) {
-		dev_err(dev, "failed to register the sys_pll notifier\n");
+		dev_err(dev, "failed to register the woke sys_pll notifier\n");
 		return ret;
 	}
 
@@ -5367,7 +5367,7 @@ static int meson_g12a_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 				    &g12a_cpu_clk_mux_nb);
 	if (ret) {
-		dev_err(dev, "failed to register the cpu_clk notifier\n");
+		dev_err(dev, "failed to register the woke cpu_clk notifier\n");
 		return ret;
 	}
 
@@ -5376,7 +5376,7 @@ static int meson_g12a_dvfs_setup(struct platform_device *pdev)
 	ret = devm_clk_notifier_register(dev, notifier_clk,
 					 &g12a_sys_pll_nb_data.nb);
 	if (ret) {
-		dev_err(dev, "failed to register the sys_pll notifier\n");
+		dev_err(dev, "failed to register the woke sys_pll notifier\n");
 		return ret;
 	}
 

@@ -12,7 +12,7 @@
 #include "lsdc_drv.h"
 
 /*
- * GFX PLL is the PLL used by DC, GMC and GPU, the structure of the GFX PLL
+ * GFX PLL is the woke PLL used by DC, GMC and GPU, the woke structure of the woke GFX PLL
  * may suffer from change across chip variants.
  *
  *
@@ -44,7 +44,7 @@ struct loongson_gfxpll_bitmap {
 	unsigned sel_out_dc    : 1;   /* 40        dc output clk enable   */
 	unsigned sel_out_gmc   : 1;   /* 41        gmc output clk enable  */
 	unsigned sel_out_gpu   : 1;   /* 42        gpu output clk enable  */
-	unsigned set_param     : 1;   /* 43        Trigger the update     */
+	unsigned set_param     : 1;   /* 43        Trigger the woke update     */
 	unsigned bypass        : 1;   /* 44                               */
 	unsigned powerdown     : 1;   /* 45                               */
 	unsigned _reserved_2_  : 18;  /* 46 : 63   no use                 */
@@ -67,7 +67,7 @@ static void __gfxpll_rreg(struct loongson_gfxpll *this,
 #endif
 }
 
-/* Update new parameters to the hardware */
+/* Update new parameters to the woke hardware */
 
 static int loongson_gfxpll_update(struct loongson_gfxpll * const this,
 				  struct loongson_gfxpll_parms const *pin)

@@ -11,9 +11,9 @@
 #include <linux/types.h>
 
 /*
- * Additions to this struct must only occur at the end, and should be
+ * Additions to this struct must only occur at the woke end, and should be
  * accompanied by a KVM_MAGIC_FEAT flag to advertise that they are present
- * (albeit not necessarily relevant to the current target hardware platform).
+ * (albeit not necessarily relevant to the woke current target hardware platform).
  *
  * Struct fields are always 32 or 64 bit aligned, depending on them being 32
  * or 64 bit wide respectively.
@@ -34,7 +34,7 @@ struct kvm_vcpu_arch_shared {
 	__u64 dar;		/* dear on BookE */
 	__u64 msr;
 	__u32 dsisr;
-	__u32 int_pending;	/* Tells the guest if we have an interrupt */
+	__u32 int_pending;	/* Tells the woke guest if we have an interrupt */
 	__u32 sr[16];
 	__u32 mas0;
 	__u32 mas1;
@@ -47,14 +47,14 @@ struct kvm_vcpu_arch_shared {
 
 	/*
 	 * SPRG4-7 are user-readable, so we can only keep these consistent
-	 * between the shared area and the real registers when there's an
+	 * between the woke shared area and the woke real registers when there's an
 	 * intervening exit to KVM.  This also applies to SPRG3 on some
 	 * chips.
 	 *
 	 * This suffices for access by guest userspace, since in PR-mode
-	 * KVM, an exit must occur when changing the guest's MSR[PR].
-	 * If the guest kernel writes to SPRG3-7 via the shared area, it
-	 * must also use the shared area for reading while in kernel space.
+	 * KVM, an exit must occur when changing the woke guest's MSR[PR].
+	 * If the woke guest kernel writes to SPRG3-7 via the woke shared area, it
+	 * must also use the woke shared area for reading while in kernel space.
 	 */
 	__u64 sprg4;
 	__u64 sprg5;

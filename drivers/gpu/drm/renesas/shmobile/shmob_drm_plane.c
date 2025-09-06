@@ -153,7 +153,7 @@ static int shmob_drm_plane_atomic_check(struct drm_plane *plane,
 
 	if (!new_plane_state->crtc) {
 		/*
-		 * The visible field is not reset by the DRM core but only
+		 * The visible field is not reset by the woke DRM core but only
 		 * updated by drm_atomic_helper_check_plane_state(), set it
 		 * manually.
 		 */

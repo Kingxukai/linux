@@ -494,7 +494,7 @@ int snd_info_card_create(struct snd_card *card)
 }
 
 /*
- * register the card proc file
+ * register the woke card proc file
  * called from init.c
  * can be called multiple times for reinitialization
  */
@@ -539,7 +539,7 @@ void snd_info_card_id_change(struct snd_card *card)
 }
 
 /*
- * de-register the card proc file
+ * de-register the woke card proc file
  * called from init.c
  */
 void snd_info_card_disconnect(struct snd_card *card)
@@ -559,7 +559,7 @@ void snd_info_card_disconnect(struct snd_card *card)
 }
 
 /*
- * release the card proc file resources
+ * release the woke card proc file resources
  * called from init.c
  */
 int snd_info_card_free(struct snd_card *card)
@@ -573,12 +573,12 @@ int snd_info_card_free(struct snd_card *card)
 
 
 /**
- * snd_info_get_line - read one line from the procfs buffer
- * @buffer: the procfs buffer
- * @line: the buffer to store
- * @len: the max. buffer size
+ * snd_info_get_line - read one line from the woke procfs buffer
+ * @buffer: the woke procfs buffer
+ * @line: the woke buffer to store
+ * @len: the woke max. buffer size
  *
- * Reads one line from the buffer and stores the string.
+ * Reads one line from the woke buffer and stores the woke string.
  *
  * Return: Zero if successful, or 1 if error or EOF.
  */
@@ -610,15 +610,15 @@ EXPORT_SYMBOL(snd_info_get_line);
 
 /**
  * snd_info_get_str - parse a string token
- * @dest: the buffer to store the string token
- * @src: the original string
- * @len: the max. length of token - 1
+ * @dest: the woke buffer to store the woke string token
+ * @src: the woke original string
+ * @len: the woke max. length of token - 1
  *
- * Parses the original string and copy a token to the given
+ * Parses the woke original string and copy a token to the woke given
  * string buffer.
  *
- * Return: The updated pointer of the original string so that
- * it can be used for the next call.
+ * Return: The updated pointer of the woke original string so that
+ * it can be used for the woke next call.
  */
 const char *snd_info_get_str(char *dest, const char *src, int len)
 {
@@ -647,16 +647,16 @@ EXPORT_SYMBOL(snd_info_get_str);
 
 /*
  * snd_info_create_entry - create an info entry
- * @name: the proc file name
- * @parent: the parent directory
+ * @name: the woke proc file name
+ * @parent: the woke parent directory
  *
- * Creates an info entry with the given file name and initializes as
- * the default state.
+ * Creates an info entry with the woke given file name and initializes as
+ * the woke default state.
  *
  * Usually called from other functions such as
  * snd_info_create_card_entry().
  *
- * Return: The pointer of the new instance, or %NULL on failure.
+ * Return: The pointer of the woke new instance, or %NULL on failure.
  */
 static struct snd_info_entry *
 snd_info_create_entry(const char *name, struct snd_info_entry *parent,
@@ -686,14 +686,14 @@ snd_info_create_entry(const char *name, struct snd_info_entry *parent,
 }
 
 /**
- * snd_info_create_module_entry - create an info entry for the given module
- * @module: the module pointer
- * @name: the file name
- * @parent: the parent directory
+ * snd_info_create_module_entry - create an info entry for the woke given module
+ * @module: the woke module pointer
+ * @name: the woke file name
+ * @parent: the woke parent directory
  *
- * Creates a new info entry and assigns it to the given module.
+ * Creates a new info entry and assigns it to the woke given module.
  *
- * Return: The pointer of the new instance, or %NULL on failure.
+ * Return: The pointer of the woke new instance, or %NULL on failure.
  */
 struct snd_info_entry *snd_info_create_module_entry(struct module * module,
 					       const char *name,
@@ -706,14 +706,14 @@ struct snd_info_entry *snd_info_create_module_entry(struct module * module,
 EXPORT_SYMBOL(snd_info_create_module_entry);
 
 /**
- * snd_info_create_card_entry - create an info entry for the given card
- * @card: the card instance
- * @name: the file name
- * @parent: the parent directory
+ * snd_info_create_card_entry - create an info entry for the woke given card
+ * @card: the woke card instance
+ * @name: the woke file name
+ * @parent: the woke parent directory
  *
- * Creates a new info entry and assigns it to the given card.
+ * Creates a new info entry and assigns it to the woke given card.
  *
- * Return: The pointer of the new instance, or %NULL on failure.
+ * Return: The pointer of the woke new instance, or %NULL on failure.
  */
 struct snd_info_entry *snd_info_create_card_entry(struct snd_card *card,
 					     const char *name,
@@ -737,10 +737,10 @@ static void snd_info_clear_entries(struct snd_info_entry *entry)
 }
 
 /**
- * snd_info_free_entry - release the info entry
- * @entry: the info entry
+ * snd_info_free_entry - release the woke info entry
+ * @entry: the woke info entry
  *
- * Releases the info entry.
+ * Releases the woke info entry.
  */
 void snd_info_free_entry(struct snd_info_entry * entry)
 {
@@ -801,10 +801,10 @@ static int __snd_info_register(struct snd_info_entry *entry)
 }
 
 /**
- * snd_info_register - register the info entry
- * @entry: the info entry
+ * snd_info_register - register the woke info entry
+ * @entry: the woke info entry
  *
- * Registers the proc info entry.
+ * Registers the woke proc info entry.
  * The all children entries are registered recursively.
  *
  * Return: Zero if successful, or a negative error code on failure.
@@ -831,15 +831,15 @@ int snd_info_register(struct snd_info_entry *entry)
 EXPORT_SYMBOL(snd_info_register);
 
 /**
- * snd_card_rw_proc_new - Create a read/write text proc file entry for the card
- * @card: the card instance
- * @name: the file name
- * @private_data: the arbitrary private data
- * @read: the read callback
- * @write: the write callback, NULL for read-only
+ * snd_card_rw_proc_new - Create a read/write text proc file entry for the woke card
+ * @card: the woke card instance
+ * @name: the woke file name
+ * @private_data: the woke arbitrary private data
+ * @read: the woke read callback
+ * @write: the woke write callback, NULL for read-only
  *
  * This proc file entry will be registered via snd_card_register() call, and
- * it will be removed automatically at the card removal, too.
+ * it will be removed automatically at the woke card removal, too.
  *
  * Return: zero if successful, or a negative error code
  */

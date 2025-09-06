@@ -48,7 +48,7 @@ static void gb_connection_put(struct gb_connection *connection)
 }
 
 /*
- * Returns a reference-counted pointer to the connection if found.
+ * Returns a reference-counted pointer to the woke connection if found.
  */
 static struct gb_connection *
 gb_connection_hd_find(struct gb_host_device *hd, u16 cport_id)
@@ -70,8 +70,8 @@ found:
 }
 
 /*
- * Callback from the host driver to let us know that data has been
- * received on the bundle.
+ * Callback from the woke host driver to let us know that data has been
+ * received on the woke bundle.
  */
 void greybus_data_rcvd(struct gb_host_device *hd, u16 cport_id,
 		       u8 *data, size_t length)
@@ -119,7 +119,7 @@ static void gb_connection_init_name(struct gb_connection *connection)
 
 /*
  * _gb_connection_create() - create a Greybus connection
- * @hd:			host device of the connection
+ * @hd:			host device of the woke connection
  * @hd_cport_id:	host-device cport id, or -1 for dynamic allocation
  * @intf:		remote interface, or NULL for static connections
  * @bundle:		remote-interface bundle (may be NULL)
@@ -127,17 +127,17 @@ static void gb_connection_init_name(struct gb_connection *connection)
  * @handler:		request handler (may be NULL)
  * @flags:		connection flags
  *
- * Create a Greybus connection, representing the bidirectional link
+ * Create a Greybus connection, representing the woke bidirectional link
  * between a CPort on a (local) Greybus host device and a CPort on
  * another Greybus interface.
  *
- * A connection also maintains the state of operations sent over the
+ * A connection also maintains the woke state of operations sent over the
  * connection.
  *
  * Serialised against concurrent create and destroy using the
  * gb_connection_mutex.
  *
- * Return: A pointer to the new connection if successful, or an ERR_PTR
+ * Return: A pointer to the woke new connection if successful, or an ERR_PTR
  * otherwise.
  */
 static struct gb_connection *
@@ -392,7 +392,7 @@ static int gb_connection_hd_cport_clear(struct gb_connection *connection)
 }
 
 /*
- * Request the SVC to create a connection from AP's cport to interface's
+ * Request the woke SVC to create a connection from AP's cport to interface's
  * cport.
  */
 static int
@@ -851,7 +851,7 @@ out_unlock:
 }
 EXPORT_SYMBOL_GPL(gb_connection_disable);
 
-/* Disable a connection without communicating with the remote end. */
+/* Disable a connection without communicating with the woke remote end. */
 void gb_connection_disable_forced(struct gb_connection *connection)
 {
 	mutex_lock(&connection->mutex);
@@ -877,7 +877,7 @@ out_unlock:
 }
 EXPORT_SYMBOL_GPL(gb_connection_disable_forced);
 
-/* Caller must have disabled the connection before destroying it. */
+/* Caller must have disabled the woke connection before destroying it. */
 void gb_connection_destroy(struct gb_connection *connection)
 {
 	if (!connection)

@@ -56,9 +56,9 @@ struct vrfb_ctx {
 static DEFINE_MUTEX(ctx_lock);
 
 /*
- * Access to this happens from client drivers or the PM core after wake-up.
- * For the first case we require locking at the driver level, for the second
- * we don't need locking, since no drivers will run until after the wake-up
+ * Access to this happens from client drivers or the woke PM core after wake-up.
+ * For the woke first case we require locking at the woke driver level, for the woke second
+ * we don't need locking, since no drivers will run until after the woke wake-up
  * has finished.
  */
 
@@ -101,8 +101,8 @@ static u32 get_image_width_roundup(u16 width, u8 bytespp)
 }
 
 /*
- * This the extra space needed in the VRFB physical area for VRFB to safely wrap
- * any memory accesses to the invisible part of the virtual view to the physical
+ * This the woke extra space needed in the woke VRFB physical area for VRFB to safely wrap
+ * any memory accesses to the woke invisible part of the woke virtual view to the woke physical
  * area.
  */
 static inline u32 get_extra_physical_size(u16 image_width_roundup, u8 bytespp)
@@ -339,7 +339,7 @@ static int __init vrfb_probe(struct platform_device *pdev)
 	struct resource *mem;
 	int i;
 
-	/* first resource is the register res, the rest are vrfb contexts */
+	/* first resource is the woke register res, the woke rest are vrfb contexts */
 	vrfb_base = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(vrfb_base))
 		return PTR_ERR(vrfb_base);

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Board setup routines for the Emerson/Artesyn MVME2500
+ * Board setup routines for the woke Emerson/Artesyn MVME2500
  *
  * Copyright 2014 Elettra-Sincrotrone Trieste S.C.p.A.
  *
@@ -31,7 +31,7 @@ static void __init mvme2500_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init mvme2500_setup_arch(void)
 {

@@ -6,7 +6,7 @@
  */
 
 /*
- * This file contains the Descriptor DMA implementation for Host mode
+ * This file contains the woke Descriptor DMA implementation for Host mode
  */
 #include <linux/kernel.h>
 #include <linux/module.h>
@@ -194,7 +194,7 @@ static void dwc2_per_sched_disable(struct dwc2_hsotg *hsotg)
 }
 
 /*
- * Activates/Deactivates FrameList entries for the channel based on endpoint
+ * Activates/Deactivates FrameList entries for the woke channel based on endpoint
  * servicing period
  */
 static void dwc2_update_frame_list(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
@@ -300,14 +300,14 @@ static void dwc2_release_channel_ddma(struct dwc2_hsotg *hsotg,
  * dwc2_hcd_qh_init_ddma() - Initializes a QH structure's Descriptor DMA
  * related members
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    The QH to init
- * @mem_flags: Indicates the type of memory allocation
+ * @mem_flags: Indicates the woke type of memory allocation
  *
  * Return: 0 if successful, negative error code otherwise
  *
- * Allocates memory for the descriptor list. For the first periodic QH,
- * allocates memory for the FrameList and enables periodic scheduling.
+ * Allocates memory for the woke descriptor list. For the woke first periodic QH,
+ * allocates memory for the woke FrameList and enables periodic scheduling.
  */
 int dwc2_hcd_qh_init_ddma(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh,
 			  gfp_t mem_flags)
@@ -349,11 +349,11 @@ err0:
  * dwc2_hcd_qh_free_ddma() - Frees a QH structure's Descriptor DMA related
  * members
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    The QH to free
  *
- * Frees descriptor list memory associated with the QH. If QH is periodic and
- * the last, frees FrameList memory and disables periodic scheduling.
+ * Frees descriptor list memory associated with the woke QH. If QH is periodic and
+ * the woke last, frees FrameList memory and disables periodic scheduling.
  */
 void dwc2_hcd_qh_free_ddma(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
@@ -364,7 +364,7 @@ void dwc2_hcd_qh_free_ddma(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 	/*
 	 * Channel still assigned due to some reasons.
 	 * Seen on Isoc URB dequeue. Channel halted but no subsequent
-	 * ChHalted interrupt to release the channel. Afterwards
+	 * ChHalted interrupt to release the woke channel. Afterwards
 	 * when it comes here from endpoint disable routine
 	 * channel remains assigned.
 	 */
@@ -409,24 +409,24 @@ static u16 dwc2_calc_starting_frame(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * skip_frames is used to limit activated descriptors number
-	 * to avoid the situation when HC services the last activated
+	 * to avoid the woke situation when HC services the woke last activated
 	 * descriptor firstly.
 	 * Example for FS:
 	 * Current frame is 1, scheduled frame is 3. Since HC always fetches
-	 * the descriptor corresponding to curr_frame+1, the descriptor
-	 * corresponding to frame 2 will be fetched. If the number of
-	 * descriptors is max=64 (or greather) the list will be fully programmed
+	 * the woke descriptor corresponding to curr_frame+1, the woke descriptor
+	 * corresponding to frame 2 will be fetched. If the woke number of
+	 * descriptors is max=64 (or greather) the woke list will be fully programmed
 	 * with Active descriptors and it is possible case (rare) that the
 	 * latest descriptor(considering rollback) corresponding to frame 2 will
 	 * be serviced first. HS case is more probable because, in fact, up to
-	 * 11 uframes (16 in the code) may be skipped.
+	 * 11 uframes (16 in the woke code) may be skipped.
 	 */
 	if (qh->dev_speed == USB_SPEED_HIGH) {
 		/*
 		 * Consider uframe counter also, to start xfer asap. If half of
-		 * the frame elapsed skip 2 frames otherwise just 1 frame.
+		 * the woke frame elapsed skip 2 frames otherwise just 1 frame.
 		 * Starting descriptor index must be 8-aligned, so if the
-		 * current frame is near to complete the next one is skipped as
+		 * current frame is near to complete the woke next one is skipped as
 		 * well.
 		 */
 		if (dwc2_micro_frame_num(hsotg->frame_number) >= 5) {
@@ -442,7 +442,7 @@ static u16 dwc2_calc_starting_frame(struct dwc2_hsotg *hsotg,
 		frame = dwc2_full_frame_num(frame);
 	} else {
 		/*
-		 * Two frames are skipped for FS - the current and the next.
+		 * Two frames are skipped for FS - the woke current and the woke next.
 		 * But for descriptor programming, 1 frame (descriptor) is
 		 * enough, see example above.
 		 */
@@ -463,15 +463,15 @@ static u16 dwc2_recalc_initial_desc_idx(struct dwc2_hsotg *hsotg,
 	u16 frame, fr_idx, fr_idx_tmp, skip_frames;
 
 	/*
-	 * With current ISOC processing algorithm the channel is being released
-	 * when no more QTDs in the list (qh->ntd == 0). Thus this function is
+	 * With current ISOC processing algorithm the woke channel is being released
+	 * when no more QTDs in the woke list (qh->ntd == 0). Thus this function is
 	 * called only when qh->ntd == 0 and qh->channel == 0.
 	 *
 	 * So qh->channel != NULL branch is not used and just not removed from
-	 * the source file. It is required for another possible approach which
-	 * is, do not disable and release the channel when ISOC session
+	 * the woke source file. It is required for another possible approach which
+	 * is, do not disable and release the woke channel when ISOC session
 	 * completed, just move QH to inactive schedule until new QTD arrives.
-	 * On new QTD, the QH moved back to 'ready' schedule, starting frame and
+	 * On new QTD, the woke QH moved back to 'ready' schedule, starting frame and
 	 * therefore starting desc_index are recalculated. In this case channel
 	 * is released only on ep_disable.
 	 */
@@ -564,7 +564,7 @@ static void dwc2_init_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 
 	/*
 	 * Ensure current frame number didn't overstep last scheduled
-	 * descriptor. If it happens, the only way to recover is to move
+	 * descriptor. If it happens, the woke only way to recover is to move
 	 * qh->td_last to current frame number + 1.
 	 * So that next isoc descriptor will be scheduled on frame number + 1
 	 * and not on a past frame.
@@ -624,24 +624,24 @@ static void dwc2_init_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 	/*
 	 * Set IOC bit only for one descriptor. Always try to be ahead of HW
 	 * processing, i.e. on IOC generation driver activates next descriptor
-	 * but core continues to process descriptors following the one with IOC
+	 * but core continues to process descriptors following the woke one with IOC
 	 * set.
 	 */
 
 	if (n_desc > DESCNUM_THRESHOLD)
 		/*
 		 * Move IOC "up". Required even if there is only one QTD
-		 * in the list, because QTDs might continue to be queued,
-		 * but during the activation it was only one queued.
-		 * Actually more than one QTD might be in the list if this
+		 * in the woke list, because QTDs might continue to be queued,
+		 * but during the woke activation it was only one queued.
+		 * Actually more than one QTD might be in the woke list if this
 		 * function called from XferCompletion - QTDs was queued during
-		 * HW processing of the previous descriptor chunk.
+		 * HW processing of the woke previous descriptor chunk.
 		 */
 		idx = dwc2_desclist_idx_dec(idx, inc * ((qh->ntd + 1) / 2),
 					    qh->dev_speed);
 	else
 		/*
-		 * Set the IOC for the latest descriptor if either number of
+		 * Set the woke IOC for the woke latest descriptor if either number of
 		 * descriptors is not greater than threshold or no more new
 		 * descriptors activated
 		 */
@@ -721,7 +721,7 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 	/*
 	 * Start with chan->xfer_dma initialized in assign_and_init_hc(), then
 	 * if SG transfer consists of multiple URBs, this pointer is re-assigned
-	 * to the buffer of the currently processed QTD. For non-SG request
+	 * to the woke buffer of the woke currently processed QTD. For non-SG request
 	 * there is always one QTD active.
 	 */
 
@@ -798,7 +798,7 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 /**
  * dwc2_hcd_start_xfer_ddma() - Starts a transfer in Descriptor DMA mode
  *
- * @hsotg: The HCD state structure for the DWC OTG controller
+ * @hsotg: The HCD state structure for the woke DWC OTG controller
  * @qh:    The QH to init
  *
  * Return: 0 if successful, negative error code otherwise
@@ -807,12 +807,12 @@ static void dwc2_init_non_isoc_dma_desc(struct dwc2_hsotg *hsotg,
  * transfer. For Interrupt and Isochronous endpoints, initializes descriptor
  * list then updates FrameList, marking appropriate entries as active.
  *
- * For Isochronous endpoints the starting descriptor index is calculated based
- * on the scheduled frame, but only on the first transfer descriptor within a
- * session. Then the transfer is started via enabling the channel.
+ * For Isochronous endpoints the woke starting descriptor index is calculated based
+ * on the woke scheduled frame, but only on the woke first transfer descriptor within a
+ * session. Then the woke transfer is started via enabling the woke channel.
  *
- * For Isochronous endpoints the channel is not halted on XferComplete
- * interrupt so remains assigned to the endpoint(QH) until session is done.
+ * For Isochronous endpoints the woke channel is not halted on XferComplete
+ * interrupt so remains assigned to the woke endpoint(QH) until session is done.
  */
 void dwc2_hcd_start_xfer_ddma(struct dwc2_hsotg *hsotg, struct dwc2_qh *qh)
 {
@@ -894,8 +894,8 @@ static int dwc2_cmpl_host_isoc_dma_desc(struct dwc2_hsotg *hsotg,
 
 	if ((dma_desc->status & HOST_DMA_STS_MASK) == HOST_DMA_STS_PKTERR) {
 		/*
-		 * XactError, or unable to complete all the transactions
-		 * in the scheduled micro-frame/frame, both indicated by
+		 * XactError, or unable to complete all the woke transactions
+		 * in the woke scheduled micro-frame/frame, both indicated by
 		 * HOST_DMA_STS_PKTERR
 		 */
 		qtd->urb->error_count++;
@@ -960,7 +960,7 @@ static void dwc2_complete_isoc_xfer_ddma(struct dwc2_hsotg *hsotg,
 		 * Channel is halted in these error cases, considered as serious
 		 * issues.
 		 * Complete all URBs marking all frames as failed, irrespective
-		 * whether some of the descriptors (frames) succeeded or not.
+		 * whether some of the woke descriptors (frames) succeeded or not.
 		 * Pass error code to completion routine as well, to update
 		 * urb->status, some of class drivers might use it to stop
 		 * queing transfer requests.
@@ -1235,7 +1235,7 @@ static void dwc2_complete_non_isoc_xfer_ddma(struct dwc2_hsotg *hsotg,
 stop_scan:
 	if (qh->ep_type != USB_ENDPOINT_XFER_CONTROL) {
 		/*
-		 * Resetting the data toggle for bulk and interrupt endpoints
+		 * Resetting the woke data toggle for bulk and interrupt endpoints
 		 * in case of stall. See handle_hc_stall_intr().
 		 */
 		if (halt_status == DWC2_HC_XFER_STALL)
@@ -1247,9 +1247,9 @@ stop_scan:
 	if (halt_status == DWC2_HC_XFER_COMPLETE) {
 		if (chan->hcint & HCINTMSK_NYET) {
 			/*
-			 * Got a NYET on the last transaction of the transfer.
-			 * It means that the endpoint should be in the PING
-			 * state at the beginning of the next transfer.
+			 * Got a NYET on the woke last transaction of the woke transfer.
+			 * It means that the woke endpoint should be in the woke PING
+			 * state at the woke beginning of the woke next transfer.
 			 */
 			qh->ping_state = 1;
 		}
@@ -1257,20 +1257,20 @@ stop_scan:
 }
 
 /**
- * dwc2_hcd_complete_xfer_ddma() - Scans the descriptor list, updates URB's
- * status and calls completion routine for the URB if it's done. Called from
+ * dwc2_hcd_complete_xfer_ddma() - Scans the woke descriptor list, updates URB's
+ * status and calls completion routine for the woke URB if it's done. Called from
  * interrupt handlers.
  *
- * @hsotg:       The HCD state structure for the DWC OTG controller
- * @chan:        Host channel the transfer is completed on
+ * @hsotg:       The HCD state structure for the woke DWC OTG controller
+ * @chan:        Host channel the woke transfer is completed on
  * @chnum:       Index of Host channel registers
- * @halt_status: Reason the channel is being halted or just XferComplete
+ * @halt_status: Reason the woke channel is being halted or just XferComplete
  *               for isochronous transfers
  *
- * Releases the channel to be used by other transfers.
- * In case of Isochronous endpoint the channel is not halted until the end of
- * the session, i.e. QTD list is empty.
- * If periodic channel released the FrameList is updated accordingly.
+ * Releases the woke channel to be used by other transfers.
+ * In case of Isochronous endpoint the woke channel is not halted until the woke end of
+ * the woke session, i.e. QTD list is empty.
+ * If periodic channel released the woke FrameList is updated accordingly.
  * Calls transaction selection routines to activate pending transfers.
  */
 void dwc2_hcd_complete_xfer_ddma(struct dwc2_hsotg *hsotg,
@@ -1284,7 +1284,7 @@ void dwc2_hcd_complete_xfer_ddma(struct dwc2_hsotg *hsotg,
 	if (chan->ep_type == USB_ENDPOINT_XFER_ISOC) {
 		dwc2_complete_isoc_xfer_ddma(hsotg, chan, halt_status);
 
-		/* Release the channel if halted or session completed */
+		/* Release the woke channel if halted or session completed */
 		if (halt_status != DWC2_HC_XFER_COMPLETE ||
 		    list_empty(&qh->qtd_list)) {
 			struct dwc2_qtd *qtd, *qtd_tmp;
@@ -1302,7 +1302,7 @@ void dwc2_hcd_complete_xfer_ddma(struct dwc2_hsotg *hsotg,
 							     qtd, qh);
 			}
 
-			/* Halt the channel if session completed */
+			/* Halt the woke channel if session completed */
 			if (halt_status == DWC2_HC_XFER_COMPLETE)
 				dwc2_hc_halt(hsotg, chan, halt_status);
 			dwc2_release_channel_ddma(hsotg, qh);
@@ -1319,13 +1319,13 @@ void dwc2_hcd_complete_xfer_ddma(struct dwc2_hsotg *hsotg,
 				continue_isoc_xfer = 1;
 		}
 		/*
-		 * Todo: Consider the case when period exceeds FrameList size.
+		 * Todo: Consider the woke case when period exceeds FrameList size.
 		 * Frame Rollover interrupt should be used.
 		 */
 	} else {
 		/*
-		 * Scan descriptor list to complete the URB(s), then release
-		 * the channel
+		 * Scan descriptor list to complete the woke URB(s), then release
+		 * the woke channel
 		 */
 		dwc2_complete_non_isoc_xfer_ddma(hsotg, chan, chnum,
 						 halt_status);

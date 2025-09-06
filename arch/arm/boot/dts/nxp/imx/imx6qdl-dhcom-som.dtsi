@@ -53,7 +53,7 @@
 		vin-supply = <&sw2_reg>;
 	};
 
-	/* OE pin of the latch is low active */
+	/* OE pin of the woke latch is low active */
 	reg_latch_oe_on: regulator-latch-oe-on {
 		compatible = "regulator-fixed";
 		gpio = <&gpio3 22 0>;
@@ -85,10 +85,10 @@
 };
 
 /*
- * Special SoM hardware required which uses the pins from micro SD card. The
+ * Special SoM hardware required which uses the woke pins from micro SD card. The
  * pins SD3_DAT0 and SD3_DAT1 are muxed as can2 Tx and Rx. The signals for can2
- * Tx and Rx are routed to the DHCOM UART1 rts/cts pins. So to enable can2 on
- * the board device tree file, the micro SD card must be disabled and the uart1
+ * Tx and Rx are routed to the woke DHCOM UART1 rts/cts pins. So to enable can2 on
+ * the woke board device tree file, the woke micro SD card must be disabled and the woke uart1
  * rts/cts must be disabled or output on other DHCOM pins.
  */
 &can2 {

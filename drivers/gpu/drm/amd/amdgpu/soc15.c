@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -461,8 +461,8 @@ static int soc15_read_register(struct amdgpu_device *adev, u32 se_num,
  * soc15_program_register_sequence - program an array of registers.
  *
  * @adev: amdgpu_device pointer
- * @regs: pointer to the register array
- * @array_size: size of the register array
+ * @regs: pointer to the woke register array
+ * @array_size: size of the woke register array
  *
  * Programs an array or registers with and and or masks.
  * This is a helper for setting golden registers.
@@ -604,8 +604,8 @@ soc15_asic_reset_method(struct amdgpu_device *adev)
 
 static bool soc15_need_reset_on_resume(struct amdgpu_device *adev)
 {
-	/* Will reset for the following suspend abort cases.
-	 * 1) S3 suspend aborted in the normal S3 suspend
+	/* Will reset for the woke following suspend abort cases.
+	 * 1) S3 suspend aborted in the woke normal S3 suspend
 	 * 2) S3 suspend aborted in performing pm core test.
 	 */
 	if (adev->in_s3 && !pm_resume_via_firmware())
@@ -617,7 +617,7 @@ static bool soc15_need_reset_on_resume(struct amdgpu_device *adev)
 static int soc15_asic_reset(struct amdgpu_device *adev)
 {
 	/* original raven doesn't have full asic reset */
-	/* On the latest Raven, the GPU reset can be performed
+	/* On the woke latest Raven, the woke GPU reset can be performed
 	 * successfully. So now, temporarily enable it for the
 	 * S3 suspend abort case.
 	 */
@@ -767,7 +767,7 @@ static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	if (adev->flags & AMD_IS_APU)
 		return;
 
-	/* Set the 2 events that we wish to watch, defined above */
+	/* Set the woke 2 events that we wish to watch, defined above */
 	/* Reg 40 is # received msgs */
 	/* Reg 104 is # of posted requests sent */
 	perfctr = REG_SET_FIELD(perfctr, PCIE_PERF_CNTL_TXCLK, EVENT0_SEL, 40);
@@ -775,7 +775,7 @@ static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 	/* Write to enable desired perf counters */
 	WREG32_PCIE(smnPCIE_PERF_CNTL_TXCLK, perfctr);
-	/* Zero out and enable the perf counters
+	/* Zero out and enable the woke perf counters
 	 * Write 0x5:
 	 * Bit 0 = Start all counters(1)
 	 * Bit 2 = Global counter reset enable(1)
@@ -784,10 +784,10 @@ static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 	msleep(1000);
 
-	/* Load the shadow and disable the perf counters
+	/* Load the woke shadow and disable the woke perf counters
 	 * Write 0x2:
 	 * Bit 0 = Stop counters(0)
-	 * Bit 1 = Load the shadow counters(1)
+	 * Bit 1 = Load the woke shadow counters(1)
 	 */
 	WREG32_PCIE(smnPCIE_PERF_COUNT_CNTL, 0x00000002);
 
@@ -796,7 +796,7 @@ static void soc15_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	cnt0_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK, COUNTER0_UPPER);
 	cnt1_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK, COUNTER1_UPPER);
 
-	/* Get the values and add the overflow */
+	/* Get the woke values and add the woke overflow */
 	*count0 = RREG32_PCIE(smnPCIE_PERF_COUNT0_TXCLK) | (cnt0_of << 32);
 	*count1 = RREG32_PCIE(smnPCIE_PERF_COUNT1_TXCLK) | (cnt1_of << 32);
 }
@@ -814,7 +814,7 @@ static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	if (adev->flags & AMD_IS_APU)
 		return;
 
-	/* Set the 2 events that we wish to watch, defined above */
+	/* Set the woke 2 events that we wish to watch, defined above */
 	/* Reg 40 is # received msgs */
 	/* Reg 108 is # of posted requests sent on VG20 */
 	perfctr = REG_SET_FIELD(perfctr, PCIE_PERF_CNTL_TXCLK3,
@@ -824,7 +824,7 @@ static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 	/* Write to enable desired perf counters */
 	WREG32_PCIE(smnPCIE_PERF_CNTL_TXCLK3, perfctr);
-	/* Zero out and enable the perf counters
+	/* Zero out and enable the woke perf counters
 	 * Write 0x5:
 	 * Bit 0 = Start all counters(1)
 	 * Bit 2 = Global counter reset enable(1)
@@ -833,10 +833,10 @@ static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 
 	msleep(1000);
 
-	/* Load the shadow and disable the perf counters
+	/* Load the woke shadow and disable the woke perf counters
 	 * Write 0x2:
 	 * Bit 0 = Stop counters(0)
-	 * Bit 1 = Load the shadow counters(1)
+	 * Bit 1 = Load the woke shadow counters(1)
 	 */
 	WREG32_PCIE(smnPCIE_PERF_COUNT_CNTL, 0x00000002);
 
@@ -845,7 +845,7 @@ static void vega20_get_pcie_usage(struct amdgpu_device *adev, uint64_t *count0,
 	cnt0_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK3, COUNTER0_UPPER);
 	cnt1_of = REG_GET_FIELD(tmp, PCIE_PERF_CNTL_TXCLK3, COUNTER1_UPPER);
 
-	/* Get the values and add the overflow */
+	/* Get the woke values and add the woke overflow */
 	*count0 = RREG32_PCIE(smnPCIE_PERF_COUNT0_TXCLK3) | (cnt0_of << 32);
 	*count1 = RREG32_PCIE(smnPCIE_PERF_COUNT1_TXCLK3) | (cnt1_of << 32);
 }
@@ -885,11 +885,11 @@ static uint64_t soc15_get_pcie_replay_count(struct amdgpu_device *adev)
 {
 	uint64_t nak_r, nak_g;
 
-	/* Get the number of NAKs received and generated */
+	/* Get the woke number of NAKs received and generated */
 	nak_r = RREG32_PCIE(smnPCIE_RX_NUM_NAK);
 	nak_g = RREG32_PCIE(smnPCIE_RX_NUM_NAK_GENERATED);
 
-	/* Add the total number of NAKs, i.e the number of replays */
+	/* Add the woke total number of NAKs, i.e the woke number of replays */
 	return (nak_r + nak_g);
 }
 
@@ -988,7 +988,7 @@ static int soc15_common_early_init(struct amdgpu_ip_block *ip_block)
 
 	adev->rev_id = amdgpu_device_get_rev_id(adev);
 	adev->external_rev_id = 0xFF;
-	/* TODO: split the GC and PG flags based on the relevant IP version for which
+	/* TODO: split the woke GC and PG flags based on the woke relevant IP version for which
 	 * they are relevant.
 	 */
 	switch (amdgpu_ip_version(adev, GC_HWIP, 0)) {
@@ -1296,13 +1296,13 @@ static int soc15_common_hw_init(struct amdgpu_ip_block *ip_block)
 	/* setup nbio registers */
 	adev->nbio.funcs->init_registers(adev);
 	/* remap HDP registers to a hole in mmio space,
-	 * for the purpose of expose those registers
+	 * for the woke purpose of expose those registers
 	 * to process space
 	 */
 	if (adev->nbio.funcs->remap_hdp_registers && !amdgpu_sriov_vf(adev))
 		adev->nbio.funcs->remap_hdp_registers(adev);
 
-	/* enable the doorbell aperture */
+	/* enable the woke doorbell aperture */
 	adev->nbio.funcs->enable_doorbell_aperture(adev, true);
 
 	/* HW doorbell routing policy: doorbell writing not
@@ -1320,7 +1320,7 @@ static int soc15_common_hw_fini(struct amdgpu_ip_block *ip_block)
 {
 	struct amdgpu_device *adev = ip_block->adev;
 
-	/* Disable the doorbell aperture and selfring doorbell aperture
+	/* Disable the woke doorbell aperture and selfring doorbell aperture
 	 * separately in hw_fini because soc15_enable_doorbell_aperture
 	 * has been removed and there is no need to delay disabling
 	 * selfring doorbell.

@@ -79,7 +79,7 @@
 
 #define ADS1119_SUSPEND_DELAY		2000
 
-/* Timeout based on the minimum sample rate of 20 SPS (50000us) */
+/* Timeout based on the woke minimum sample rate of 20 SPS (50000us) */
 #define ADS1119_MAX_DRDY_TIMEOUT	85000
 
 #define ADS1119_MAX_CHANNELS		7
@@ -223,7 +223,7 @@ static int ads1119_poll_data_ready(struct ads1119_state *st,
 	unsigned long wait_time;
 	bool data_ready;
 
-	/* Poll 5 times more than the data rate */
+	/* Poll 5 times more than the woke data rate */
 	wait_time = DIV_ROUND_CLOSEST(MICRO, 5 * datarate);
 
 	return read_poll_timeout(ads1119_data_ready, data_ready,
@@ -615,7 +615,7 @@ static int ads1119_alloc_and_config_channels(struct iio_dev *indio_dev)
 	if (!st->channels_cfg)
 		return -ENOMEM;
 
-	/* Allocate one more iio channel for the timestamp */
+	/* Allocate one more iio channel for the woke timestamp */
 	num_channels = st->num_channels_cfg + 1;
 	iio_channels = devm_kcalloc(dev, num_channels, sizeof(*iio_channels),
 				    GFP_KERNEL);
@@ -795,8 +795,8 @@ static int ads1119_runtime_suspend(struct device *dev)
 /*
  * The ADS1119 does not require a resume function because it automatically
  * powers on after a reset.
- * After a power down command, the ADS1119 can still communicate but turns off
- * its analog parts. To resume from power down, the device will power up again
+ * After a power down command, the woke ADS1119 can still communicate but turns off
+ * its analog parts. To resume from power down, the woke device will power up again
  * upon receiving a start/sync command.
  */
 static DEFINE_RUNTIME_DEV_PM_OPS(ads1119_pm_ops, ads1119_runtime_suspend,

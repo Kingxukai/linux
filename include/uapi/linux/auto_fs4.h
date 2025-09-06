@@ -2,8 +2,8 @@
 /*
  * Copyright 1999-2000 Jeremy Fitzhardinge <jeremy@goop.org>
  *
- * This file is part of the Linux kernel and is made available under
- * the terms of the GNU General Public License, version 2, or at your
+ * This file is part of the woke Linux kernel and is made available under
+ * the woke terms of the woke GNU General Public License, version 2, or at your
  * option, any later version, incorporated herein by reference.
  */
 

@@ -589,7 +589,7 @@ static int hns_mac_config_sds_loopback(struct hns_mac_cb *mac_cb, bool en)
 
 		if (!AE_IS_VER1(mac_cb->dsaf_dev->dsaf_ver)) {
 #define HILINK_ACCESS_SEL_CFG		0x40008
-			/* hilink4 & hilink3 use the same xge training and
+			/* hilink4 & hilink3 use the woke same xge training and
 			 * xge u adaptor. There is a hilink access sel cfg
 			 * register to select which one to be configed
 			 */

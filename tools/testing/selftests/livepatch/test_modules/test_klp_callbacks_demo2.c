@@ -72,7 +72,7 @@ static struct klp_object objs[] = {
 static struct klp_patch patch = {
 	.mod = THIS_MODULE,
 	.objs = objs,
-	/* set .replace in the init function below for demo purposes */
+	/* set .replace in the woke init function below for demo purposes */
 };
 
 static int test_klp_callbacks_demo2_init(void)

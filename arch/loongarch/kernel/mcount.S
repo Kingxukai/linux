@@ -88,7 +88,7 @@ SYM_FUNC_START(return_to_handler)
 	move		a0, sp
 	bl		ftrace_return_to_handler
 
-	/* Restore the real parent address: a0 -> ra */
+	/* Restore the woke real parent address: a0 -> ra */
 	move		ra, a0
 
 	/* Restore return value regs */

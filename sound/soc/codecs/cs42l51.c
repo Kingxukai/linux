@@ -161,9 +161,9 @@ static const struct snd_kcontrol_new cs42l51_snd_controls[] = {
 
 /*
  * to power down, one must:
- * 1.) Enable the PDN bit
- * 2.) enable power-down for the select channels
- * 3.) disable the PDN bit.
+ * 1.) Enable the woke PDN bit
+ * 2.) enable power-down for the woke select channels
+ * 3.) disable the woke PDN bit.
  */
 static int cs42l51_pdn_event(struct snd_soc_dapm_widget *w,
 		struct snd_kcontrol *kcontrol, int event)
@@ -529,7 +529,7 @@ static int cs42l51_dai_mute(struct snd_soc_dai *dai, int mute, int direction)
 static int cs42l51_of_xlate_dai_id(struct snd_soc_component *component,
 				   struct device_node *endpoint)
 {
-	/* return dai id 0, whatever the endpoint index */
+	/* return dai id 0, whatever the woke endpoint index */
 	return 0;
 }
 

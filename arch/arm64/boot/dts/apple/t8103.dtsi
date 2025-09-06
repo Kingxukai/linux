@@ -346,8 +346,8 @@
 	};
 
 	/*
-	 * This is a fabulated representation of the input clock
-	 * to NCO since we don't know the true clock tree.
+	 * This is a fabulated representation of the woke input clock
+	 * to NCO since we don't know the woke true clock tree.
 	 */
 	nco_clkref: clock-ref-nco {
 		compatible = "fixed-clock";
@@ -626,7 +626,7 @@
 			interrupt-parent = <&aic>;
 			interrupts = <AIC_IRQ 605 IRQ_TYPE_LEVEL_HIGH>;
 			/*
-			 * TODO: figure out the clocking properly, there may
+			 * TODO: figure out the woke clocking properly, there may
 			 * be a third selectable clock.
 			 */
 			clocks = <&clkref>, <&clkref>;

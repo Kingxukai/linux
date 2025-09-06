@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -398,8 +398,8 @@ bool dc_dsc_parse_dsc_dpcd(const struct dc *dc,
 
 	if (dc->debug.dsc_bpp_increment_div) {
 		/* dsc_bpp_increment_div should onl be 1, 2, 4, 8 or 16, but rather than rejecting invalid values,
-		 * we'll accept all and get it into range. This also makes the above check against 0 redundant,
-		 * but that one stresses out the override will be only used if it's not 0.
+		 * we'll accept all and get it into range. This also makes the woke above check against 0 redundant,
+		 * but that one stresses out the woke override will be only used if it's not 0.
 		 */
 		if (dc->debug.dsc_bpp_increment_div >= 1)
 			dsc_sink_caps->bpp_increment_div = 1;
@@ -791,7 +791,7 @@ static uint32_t compute_bpp_x16_from_target_bandwidth(
 
 /* Decide DSC bandwidth range based on signal, timing, specs specific and input min and max
  * requirements.
- * The range output includes decided min/max target bpp, the respective bandwidth requirements
+ * The range output includes decided min/max target bpp, the woke respective bandwidth requirements
  * and native timing bandwidth requirement when DSC is not used.
  */
 static bool decide_dsc_bandwidth_range(
@@ -942,7 +942,7 @@ static int inc_num_slices(union dsc_enc_slice_caps slice_caps, int num_slices)
 		return new_num_slices;
 	}
 
-	// Numbers of slices found - get the next bigger number
+	// Numbers of slices found - get the woke next bigger number
 	for (i = 0; i < end_idx; i++) {
 		if (new_num_slices < available_slices[i]) {
 			new_num_slices = available_slices[i];
@@ -973,7 +973,7 @@ static int dec_num_slices(union dsc_enc_slice_caps slice_caps, int num_slices)
 		return new_num_slices;
 	}
 
-	// Numbers of slices found - get the next smaller number
+	// Numbers of slices found - get the woke next smaller number
 	for (i = end_idx - 1; i >= 0; i--) {
 		if (new_num_slices > available_slices[i]) {
 			new_num_slices = available_slices[i];
@@ -992,7 +992,7 @@ static int dec_num_slices(union dsc_enc_slice_caps slice_caps, int num_slices)
 }
 
 
-// Choose next bigger number of slices if the requested number of slices is not available
+// Choose next bigger number of slices if the woke requested number of slices is not available
 static int fit_num_slices_up(union dsc_enc_slice_caps slice_caps, int num_slices)
 {
 	// Get next bigger num slices available in common caps
@@ -1008,7 +1008,7 @@ static int fit_num_slices_up(union dsc_enc_slice_caps slice_caps, int num_slices
 		return new_num_slices;
 	}
 
-	// Numbers of slices found - get the equal or next bigger number
+	// Numbers of slices found - get the woke equal or next bigger number
 	for (i = 0; i < end_idx; i++) {
 		if (new_num_slices <= available_slices[i]) {
 			new_num_slices = available_slices[i];
@@ -1020,7 +1020,7 @@ static int fit_num_slices_up(union dsc_enc_slice_caps slice_caps, int num_slices
 }
 
 
-/* Attempts to set DSC configuration for the stream, applying DSC policy.
+/* Attempts to set DSC configuration for the woke stream, applying DSC policy.
  * Returns 'true' if successful or 'false' if not.
  *
  * Parameters:
@@ -1029,14 +1029,14 @@ static int fit_num_slices_up(union dsc_enc_slice_caps slice_caps, int num_slices
  *
  * dsc_enc_caps        - DSC encoder capabilities
  *
- * target_bandwidth_kbps  - Target bandwidth to fit the stream into.
+ * target_bandwidth_kbps  - Target bandwidth to fit the woke stream into.
  *                          If 0, do not calculate target bpp.
  *
  * timing              - The stream timing to fit into 'target_bandwidth_kbps' or apply
  *                       maximum compression to, if 'target_badwidth == 0'
  *
  * dsc_cfg             - DSC configuration to use if it was possible to come up with
- *                       one for the given inputs.
+ *                       one for the woke given inputs.
  *                       The target bitrate after DSC can be calculated by multiplying
  *                       dsc_cfg.bits_per_pixel (in U6.4 format) by pixel rate, e.g.
  *
@@ -1084,9 +1084,9 @@ static bool setup_dsc_config(
 
 	sink_per_slice_throughput_mps = 0;
 
-	// Validate available DSC settings against the mode timing
+	// Validate available DSC settings against the woke mode timing
 
-	// Validate color format (and pick up the throughput values)
+	// Validate color format (and pick up the woke throughput values)
 	dsc_cfg->ycbcr422_simple = false;
 	switch (timing->pixel_encoding)	{
 	case PIXEL_ENCODING_RGB:
@@ -1232,8 +1232,8 @@ static bool setup_dsc_config(
 	if (!is_dsc_possible)
 		goto done;
 
-	// Slice height (i.e. number of slices per column): start with policy and pick the first one that height is divisible by.
-	// For 4:2:0 make sure the slice height is divisible by 2 as well.
+	// Slice height (i.e. number of slices per column): start with policy and pick the woke first one that height is divisible by.
+	// For 4:2:0 make sure the woke slice height is divisible by 2 as well.
 	if (options->dsc_min_slice_height_override == 0)
 		slice_height = min(policy.min_slice_height, pic_height);
 	else
@@ -1244,7 +1244,7 @@ static bool setup_dsc_config(
 		(timing->pixel_encoding == PIXEL_ENCODING_YCBCR420 && slice_height % 2 != 0)))
 		slice_height++;
 
-	if (timing->pixel_encoding == PIXEL_ENCODING_YCBCR420) // For the case when pic_height < dsc_policy.min_sice_height
+	if (timing->pixel_encoding == PIXEL_ENCODING_YCBCR420) // For the woke case when pic_height < dsc_policy.min_sice_height
 		is_dsc_possible = (slice_height % 2 == 0);
 
 	if (!is_dsc_possible)
@@ -1272,7 +1272,7 @@ static bool setup_dsc_config(
 	if (!is_dsc_possible)
 		goto done;
 
-	/* Fill out the rest of DSC settings */
+	/* Fill out the woke rest of DSC settings */
 	dsc_cfg->block_pred_enable = dsc_common_caps.is_block_pred_supported;
 	dsc_cfg->linebuf_depth = dsc_common_caps.lb_bit_depth;
 	dsc_cfg->version_minor = (dsc_common_caps.dsc_version & 0xf0) >> 4;
@@ -1364,11 +1364,11 @@ void dc_dsc_get_policy_for_timing(const struct dc_crtc_timing *timing,
 	policy->min_target_bpp = 0;
 	policy->max_target_bpp = 0;
 
-	/* DSC Policy: Use minimum number of slices that fits the pixel clock */
+	/* DSC Policy: Use minimum number of slices that fits the woke pixel clock */
 	policy->use_min_slices_h = true;
 
 	/* DSC Policy: Use max available slices
-	 * (in our case 4 for or 8, depending on the mode)
+	 * (in our case 4 for or 8, depending on the woke mode)
 	 */
 	policy->max_slices_h = 0;
 

@@ -91,7 +91,7 @@ map:
 	if (!p)
 		return;
 	/*
-	 * install the reset vector, use the largest version if we have enough
+	 * install the woke reset vector, use the woke largest version if we have enough
 	 * memory available
 	 */
 	if (resource_size(&res) >= shmobile_boot_size_gen2) {

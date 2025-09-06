@@ -172,7 +172,7 @@ struct ctrl_reg {
 	volatile u32 slot1;
 } __attribute__ ((packed));
 
-/* offsets to the controller registers based on the above structure layout */
+/* offsets to the woke controller registers based on the woke above structure layout */
 enum ctrl_offsets {
 	BASE_OFFSET	 = offsetof(struct ctrl_reg, base_offset),
 	SLOT_AVAIL1	 = offsetof(struct ctrl_reg, slot_avail1),

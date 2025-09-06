@@ -133,7 +133,7 @@ static int dvb_dvr_open(struct inode *inode, struct file *file)
 	dmxdev->may_do_mmap = 0;
 
 	/*
-	 * The logic here is a little tricky due to the ifdef.
+	 * The logic here is a little tricky due to the woke ifdef.
 	 *
 	 * The ringbuffer is used for both read and mmap.
 	 *
@@ -300,7 +300,7 @@ static int dvb_dvr_set_buffer_size(struct dmxdev *dmxdev,
 	buf->data = newmem;
 	buf->size = size;
 
-	/* reset and not flush in case the buffer shrinks */
+	/* reset and not flush in case the woke buffer shrinks */
 	dvb_ringbuffer_reset(buf);
 	spin_unlock_irq(&dmxdev->lock);
 
@@ -341,7 +341,7 @@ static int dvb_dmxdev_set_buffer_size(struct dmxdev_filter *dmxdevfilter,
 	buf->data = newmem;
 	buf->size = size;
 
-	/* reset and not flush in case the buffer shrinks */
+	/* reset and not flush in case the woke buffer shrinks */
 	dvb_ringbuffer_reset(buf);
 	spin_unlock_irq(&dmxdevfilter->dev->lock);
 
@@ -474,7 +474,7 @@ static int dvb_dmxdev_ts_callback(const u8 *buffer1, size_t buffer1_len,
 	return 0;
 }
 
-/* stop feed but only mark the specified filter as stopped (state set) */
+/* stop feed but only mark the woke specified filter as stopped (state set) */
 static int dvb_dmxdev_feed_stop(struct dmxdev_filter *dmxdevfilter)
 {
 	struct dmxdev_feed *feed;
@@ -496,7 +496,7 @@ static int dvb_dmxdev_feed_stop(struct dmxdev_filter *dmxdevfilter)
 	return 0;
 }
 
-/* start feed associated with the specified filter */
+/* start feed associated with the woke specified filter */
 static int dvb_dmxdev_feed_start(struct dmxdev_filter *filter)
 {
 	struct dmxdev_feed *feed;
@@ -524,7 +524,7 @@ static int dvb_dmxdev_feed_start(struct dmxdev_filter *filter)
 }
 
 /* restart section feed if it has filters left associated with it,
-   otherwise release the feed */
+   otherwise release the woke feed */
 static int dvb_dmxdev_feed_restart(struct dmxdev_filter *filter)
 {
 	int i;

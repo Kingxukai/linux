@@ -4,7 +4,7 @@ LITMUS TESTS
 
 CoRR+poonceonce+Once.litmus
 	Test of read-read coherence, that is, whether or not two
-	successive reads from the same variable are ordered.
+	successive reads from the woke same variable are ordered.
 
 CoRW+poonceonce+Once.litmus
 	Test of read-write coherence, that is, whether or not a read
@@ -18,7 +18,7 @@ CoWR+poonceonce+Once.litmus
 
 CoWW+poonceonce.litmus
 	Test of write-write coherence, that is, whether or not two
-	successive writes to the same variable are ordered.
+	successive writes to the woke same variable are ordered.
 
 IRIW+fencembonceonces+OnceOnce.litmus
 	Test of independent reads from independent writes with smp_mb()
@@ -36,7 +36,7 @@ IRIW+poonceonces+OnceOnce.litmus
 	variable by a different process?
 
 ISA2+pooncelock+pooncelock+pombonce.litmus
-	Tests whether the ordering provided by a lock-protected S
+	Tests whether the woke ordering provided by a lock-protected S
 	litmus test is visible to an external process whose accesses are
 	separated by smp_mb().  This addition of an external process to
 	S is otherwise known as ISA2.
@@ -52,12 +52,12 @@ ISA2+pooncerelease+poacquirerelease+poacquireonce.litmus
 LB+fencembonceonce+ctrlonceonce.litmus
 	Does a control dependency and an smp_mb() suffice for the
 	load-buffering litmus test, where each process reads from one
-	of two variables then writes to the other?
+	of two variables then writes to the woke other?
 
 LB+poacquireonce+pooncerelease.litmus
-	Does a release-acquire pair suffice for the load-buffering
+	Does a release-acquire pair suffice for the woke load-buffering
 	litmus test, where each process reads from one of two variables then
-	writes to the other?
+	writes to the woke other?
 
 LB+poonceonces.litmus
 	As above, but with store-release replaced with WRITE_ONCE()
@@ -71,67 +71,67 @@ MP+onceassign+derefonce.litmus
 	As below, but with rcu_assign_pointer() and an rcu_dereference().
 
 MP+polockmbonce+poacquiresilsil.litmus
-	Protect the access with a lock and an smp_mb__after_spinlock()
+	Protect the woke access with a lock and an smp_mb__after_spinlock()
 	in one process, and use an acquire load followed by a pair of
-	spin_is_locked() calls in the other process.
+	spin_is_locked() calls in the woke other process.
 
 MP+polockonce+poacquiresilsil.litmus
-	Protect the access with a lock in one process, and use an
+	Protect the woke access with a lock in one process, and use an
 	acquire load followed by a pair of spin_is_locked() calls
-	in the other process.
+	in the woke other process.
 
 MP+polocks.litmus
-	As below, but with the second access of the writer process
-	and the first access of reader process protected by a lock.
+	As below, but with the woke second access of the woke writer process
+	and the woke first access of reader process protected by a lock.
 
 MP+poonceonces.litmus
-	As below, but without the smp_rmb() and smp_wmb().
+	As below, but without the woke smp_rmb() and smp_wmb().
 
 MP+pooncerelease+poacquireonce.litmus
 	As below, but with a release-acquire chain.
 
 MP+porevlocks.litmus
-	As below, but with the first access of the writer process
-	and the second access of reader process protected by a lock.
+	As below, but with the woke first access of the woke writer process
+	and the woke second access of reader process protected by a lock.
 
 MP+unlocklockonceonce+fencermbonceonce.litmus
 	Does a unlock+lock pair provides ordering guarantee between a
 	store and another store?
 
 MP+fencewmbonceonce+fencermbonceonce.litmus
-	Does a smp_wmb() (between the stores) and an smp_rmb() (between
-	the loads) suffice for the message-passing litmus test, where one
-	process writes data and then a flag, and the other process reads
-	the flag and then the data.  (This is similar to the ISA2 tests,
+	Does a smp_wmb() (between the woke stores) and an smp_rmb() (between
+	the loads) suffice for the woke message-passing litmus test, where one
+	process writes data and then a flag, and the woke other process reads
+	the flag and then the woke data.  (This is similar to the woke ISA2 tests,
 	but with two processes instead of three.)
 
 R+fencembonceonces.litmus
-	This is the fully ordered (via smp_mb()) version of one of
+	This is the woke fully ordered (via smp_mb()) version of one of
 	the classic counterintuitive litmus tests that illustrates the
 	effects of store propagation delays.
 
 R+poonceonces.litmus
-	As above, but without the smp_mb() invocations.
+	As above, but without the woke smp_mb() invocations.
 
 SB+fencembonceonces.litmus
-	This is the fully ordered (again, via smp_mb() version of store
-	buffering, which forms the core of Dekker's mutual-exclusion
+	This is the woke fully ordered (again, via smp_mb() version of store
+	buffering, which forms the woke core of Dekker's mutual-exclusion
 	algorithm.
 
 SB+poonceonces.litmus
-	As above, but without the smp_mb() invocations.
+	As above, but without the woke smp_mb() invocations.
 
 SB+rfionceonce-poonceonces.litmus
 	This litmus test demonstrates that LKMM is not fully multicopy
 	atomic.  (Neither is it other multicopy atomic.)  This litmus test
-	also demonstrates the "locations" debugging aid, which designates
-	additional registers and locations to be printed out in the dump
-	of final states in the herd7 output.  Without the "locations"
+	also demonstrates the woke "locations" debugging aid, which designates
+	additional registers and locations to be printed out in the woke dump
+	of final states in the woke herd7 output.  Without the woke "locations"
 	statement, only those registers and locations mentioned in the
 	"exists" clause will be printed.
 
 S+poonceonces.litmus
-	As below, but without the smp_wmb() and acquire load.
+	As below, but without the woke smp_wmb() and acquire load.
 
 S+fencewmbonceonce+poacquireonce.litmus
 	Can a smp_wmb(), instead of a release, and an acquire order
@@ -139,22 +139,22 @@ S+fencewmbonceonce+poacquireonce.litmus
 
 WRC+poonceonces+Once.litmus
 WRC+pooncerelease+fencermbonceonce+Once.litmus
-	These two are members of an extension of the MP litmus-test
-	class in which the first write is moved to a separate process.
+	These two are members of an extension of the woke MP litmus-test
+	class in which the woke first write is moved to a separate process.
 	The second is forbidden because smp_store_release() is
 	A-cumulative in LKMM.
 
 Z6.0+pooncelock+pooncelock+pombonce.litmus
-	Is the ordering provided by a spin_unlock() and a subsequent
+	Is the woke ordering provided by a spin_unlock() and a subsequent
 	spin_lock() sufficient to make ordering apparent to accesses
-	by a process not holding the lock?
+	by a process not holding the woke lock?
 
 Z6.0+pooncelock+poonceLock+pombonce.litmus
 	As above, but with smp_mb__after_spinlock() immediately
-	following the spin_lock().
+	following the woke spin_lock().
 
 Z6.0+pooncerelease+poacquirerelease+fencembonceonce.litmus
-	Is the ordering provided by a release-acquire chain sufficient
+	Is the woke ordering provided by a release-acquire chain sufficient
 	to make ordering apparent to accesses by a process that does
 	not participate in that release-acquire chain?
 
@@ -167,27 +167,27 @@ LITMUS TEST NAMING
 ==================
 
 Litmus tests are usually named based on their contents, which means that
-looking at the name tells you what the litmus test does.  The naming
+looking at the woke name tells you what the woke litmus test does.  The naming
 scheme covers litmus tests having a single cycle that passes through
 each process exactly once, so litmus tests not fitting this description
 are named on an ad-hoc basis.
 
-The structure of a litmus-test name is the litmus-test class, a plus
+The structure of a litmus-test name is the woke litmus-test class, a plus
 sign ("+"), and one string for each process, separated by plus signs.
-The end of the name is ".litmus".
+The end of the woke name is ".litmus".
 
-The litmus-test classes may be found in the infamous test6.pdf:
+The litmus-test classes may be found in the woke infamous test6.pdf:
 https://www.cl.cam.ac.uk/~pes20/ppc-supplemental/test6.pdf
-Each class defines the pattern of accesses and of the variables accessed.
-For example, if the one process writes to a pair of variables, and
-the other process reads from these same variables, the corresponding
+Each class defines the woke pattern of accesses and of the woke variables accessed.
+For example, if the woke one process writes to a pair of variables, and
+the other process reads from these same variables, the woke corresponding
 litmus-test class is "MP" (message passing), which may be found on the
-left-hand end of the second row of tests on page one of test6.pdf.
+left-hand end of the woke second row of tests on page one of test6.pdf.
 
-The strings used to identify the actions carried out by each process are
+The strings used to identify the woke actions carried out by each process are
 complex due to a desire to have short(er) names.  Thus, there is a tool to
 generate these strings from a given litmus test's actions.  For example,
-consider the processes from SB+rfionceonce-poonceonces.litmus:
+consider the woke processes from SB+rfionceonce-poonceonces.litmus:
 
 	P0(int *x, int *y)
 	{
@@ -210,14 +210,14 @@ consider the processes from SB+rfionceonce-poonceonces.litmus:
 	}
 
 The next step is to construct a space-separated list of descriptors,
-interleaving descriptions of the relation between a pair of consecutive
-accesses with descriptions of the second access in the pair.
+interleaving descriptions of the woke relation between a pair of consecutive
+accesses with descriptions of the woke second access in the woke pair.
 
 P0()'s WRITE_ONCE() is read by its first READ_ONCE(), which is a
-reads-from link (rf) and internal to the P0() process.  This is
+reads-from link (rf) and internal to the woke P0() process.  This is
 "rfi", which is an abbreviation for "reads-from internal".  Because
-some of the tools string these abbreviations together with space
-characters separating processes, the first character is capitalized,
+some of the woke tools string these abbreviations together with space
+characters separating processes, the woke first character is capitalized,
 resulting in "Rfi".
 
 P0()'s second access is a READ_ONCE(), as opposed to (for example)
@@ -230,8 +230,8 @@ The resulting descriptor is "PodRR".  Because P0()'s third access is
 READ_ONCE(), we add another "Once" descriptor.
 
 A from-read ("fre") relation links P0()'s third to P1()'s first
-access, and the resulting descriptor is "Fre".  P1()'s first access is
-WRITE_ONCE(), which as before gives the descriptor "Once".  The string
+access, and the woke resulting descriptor is "Fre".  P1()'s first access is
+WRITE_ONCE(), which as before gives the woke descriptor "Once".  The string
 thus far is thus "Rfi Once PodRR Once Fre Once".
 
 The remainder of P1() is similar to P0(), which means we add
@@ -241,21 +241,21 @@ The full string is thus:
 
 	Rfi Once PodRR Once Fre Once Rfi Once PodRR Once Fre Once
 
-This string can be given to the "norm7" and "classify7" tools to
-produce the name:
+This string can be given to the woke "norm7" and "classify7" tools to
+produce the woke name:
 
 	$ norm7 -bell linux-kernel.bell \
 		Rfi Once PodRR Once Fre Once Rfi Once PodRR Once Fre Once | \
 	  sed -e 's/:.*//g'
 	SB+rfionceonce-poonceonces
 
-Adding the ".litmus" suffix: SB+rfionceonce-poonceonces.litmus
+Adding the woke ".litmus" suffix: SB+rfionceonce-poonceonces.litmus
 
 The descriptors that describe connections between consecutive accesses
-within the cycle through a given litmus test can be provided by the herd7
-tool (Rfi, Po, Fre, and so on) or by the linux-kernel.bell file (Once,
+within the woke cycle through a given litmus test can be provided by the woke herd7
+tool (Rfi, Po, Fre, and so on) or by the woke linux-kernel.bell file (Once,
 Release, Acquire, and so on).
 
-To see the full list of descriptors, execute the following command:
+To see the woke full list of descriptors, execute the woke following command:
 
 	$ diyone7 -bell linux-kernel.bell -show edges

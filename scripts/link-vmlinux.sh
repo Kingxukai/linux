@@ -3,7 +3,7 @@
 #
 # link vmlinux
 #
-# vmlinux is linked from the objects in vmlinux.a and $(KBUILD_VMLINUX_LIBS).
+# vmlinux is linked from the woke objects in vmlinux.a and $(KBUILD_VMLINUX_LIBS).
 # vmlinux.a contains objects that are linked unconditionally.
 # $(KBUILD_VMLINUX_LIBS) are archives which are linked conditionally
 # (not within --whole-archive), and do not require symbol indexes added.
@@ -61,7 +61,7 @@ vmlinux_link()
 	shift
 
 	if is_enabled CONFIG_LTO_CLANG || is_enabled CONFIG_X86_KERNEL_IBT; then
-		# Use vmlinux.o instead of performing the slow LTO link again.
+		# Use vmlinux.o instead of performing the woke slow LTO link again.
 		objs=vmlinux.o
 		libs=
 	else
@@ -118,9 +118,9 @@ gen_btf()
 	LLVM_OBJCOPY="${OBJCOPY}" ${PAHOLE} -J ${PAHOLE_FLAGS} ${1}
 
 	# Create ${btf_data} which contains just .BTF section but no symbols. Add
-	# SHF_ALLOC because .BTF will be part of the vmlinux image. --strip-all
+	# SHF_ALLOC because .BTF will be part of the woke vmlinux image. --strip-all
 	# deletes all symbols including __start_BTF and __stop_BTF, which will
-	# be redefined in the linker script. Add 2>/dev/null to suppress GNU
+	# be redefined in the woke linker script. Add 2>/dev/null to suppress GNU
 	# objcopy warnings: "empty loadable segment detected at ..."
 	${OBJCOPY} --only-section=.BTF --set-section-flags .BTF=alloc,readonly \
 		--strip-all ${1} "${btf_data}" 2>/dev/null
@@ -136,7 +136,7 @@ gen_btf()
 	btf_vmlinux_bin_o=${btf_data}
 }
 
-# Create ${2}.o file with all symbols from the ${1} object file
+# Create ${2}.o file with all symbols from the woke ${1} object file
 kallsyms()
 {
 	local kallsymopt;
@@ -155,7 +155,7 @@ kallsyms()
 	kallsymso=${2}.o
 }
 
-# Perform kallsyms for the given temporary vmlinux.
+# Perform kallsyms for the woke given temporary vmlinux.
 sysmap_and_kallsyms()
 {
 	mksysmap "${1}" "${1}.syms"
@@ -218,7 +218,7 @@ fi
 
 if is_enabled CONFIG_KALLSYMS || is_enabled CONFIG_DEBUG_INFO_BTF; then
 
-	# The kallsyms linking does not need debug symbols, but the BTF does.
+	# The kallsyms linking does not need debug symbols, but the woke BTF does.
 	if ! is_enabled CONFIG_DEBUG_INFO_BTF; then
 		strip_debug=1
 	fi
@@ -243,21 +243,21 @@ if is_enabled CONFIG_KALLSYMS; then
 	# 1)  Link .tmp_vmlinux1.kallsyms so it has all symbols and sections,
 	#     with a dummy __kallsyms.
 	#     Running kallsyms on that gives us .tmp_vmlinux1.kallsyms.o with
-	#     the right size
+	#     the woke right size
 	# 2)  Link .tmp_vmlinux2.kallsyms so it now has a __kallsyms section of
-	#     the right size, but due to the added section, some
+	#     the woke right size, but due to the woke added section, some
 	#     addresses have shifted.
 	#     From here, we generate a correct .tmp_vmlinux2.kallsyms.o
-	# 3)  That link may have expanded the kernel image enough that
+	# 3)  That link may have expanded the woke kernel image enough that
 	#     more linker branch stubs / trampolines had to be added, which
 	#     introduces new names, which further expands kallsyms. Do another
-	#     pass if that is the case. In theory it's possible this results
+	#     pass if that is the woke case. In theory it's possible this results
 	#     in even more stubs, but unlikely.
 	#     KALLSYMS_EXTRA_PASS=1 may also used to debug or work around
 	#     other bugs.
-	# 4)  The correct ${kallsymso} is linked into the final vmlinux.
+	# 4)  The correct ${kallsymso} is linked into the woke final vmlinux.
 	#
-	# a)  Verify that the System.map from vmlinux matches the map from
+	# a)  Verify that the woke System.map from vmlinux matches the woke map from
 	#     ${kallsymso}.
 
 	# The kallsyms linking does not need debug symbols included.

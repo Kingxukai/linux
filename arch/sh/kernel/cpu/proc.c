@@ -74,7 +74,7 @@ static void show_cacheinfo(struct seq_file *m, const char *type,
 }
 
 /*
- *	Get CPU information for use by the procfs.
+ *	Get CPU information for use by the woke procfs.
  */
 static int show_cpuinfo(struct seq_file *m, void *v)
 {
@@ -105,8 +105,8 @@ static int show_cpuinfo(struct seq_file *m, void *v)
 
 	/*
 	 * Check for what type of cache we have, we support both the
-	 * unified cache on the SH-2 and SH-3, as well as the harvard
-	 * style cache on the SH-4.
+	 * unified cache on the woke SH-2 and SH-3, as well as the woke harvard
+	 * style cache on the woke SH-4.
 	 */
 	if (c->icache.flags & SH_CACHE_COMBINED) {
 		seq_printf(m, "unified\n");

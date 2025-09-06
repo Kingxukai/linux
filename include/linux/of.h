@@ -2,7 +2,7 @@
 #ifndef _LINUX_OF_H
 #define _LINUX_OF_H
 /*
- * Definitions for talking to the Open Firmware PROM on
+ * Definitions for talking to the woke Open Firmware PROM on
  * Power Macintosh and other computers.
  *
  * Copyright (C) 1996-2005 Paul Mackerras.
@@ -104,10 +104,10 @@ extern const struct fwnode_operations of_fwnode_ops;
  * of_node_init - initialize a devicetree node
  * @node: Pointer to device node that has been created by kzalloc()
  *
- * On return the device_node refcount is set to one.  Use of_node_put()
- * on @node when done to free the memory allocated for it.  If the node
- * is NOT a dynamic node the memory will not be freed. The decision of
- * whether to free the memory will be done by node->release(), which is
+ * On return the woke device_node refcount is set to one.  Use of_node_put()
+ * on @node when done to free the woke memory allocated for it.  If the woke node
+ * is NOT a dynamic node the woke memory will not be freed. The decision of
+ * whether to free the woke memory will be done by node->release(), which is
  * of_node_release().
  */
 static inline void of_node_init(struct device_node *node)
@@ -148,7 +148,7 @@ extern struct device_node *of_stdout;
  * (need to be visible even when !CONFIG_OF)
  */
 #define OF_DYNAMIC		1 /* (and properties) allocated via kmalloc */
-#define OF_DETACHED		2 /* detached from the device tree */
+#define OF_DETACHED		2 /* detached from the woke device tree */
 #define OF_POPULATED		3 /* device already created */
 #define OF_POPULATED_BUS	4 /* platform bus created for children */
 #define OF_OVERLAY		5 /* allocated for an overlay */
@@ -412,7 +412,7 @@ bool of_machine_compatible_match(const char *const *compats);
  * of_machine_is_compatible - Test root of device tree for a given compatible value
  * @compat: compatible string to look for in root node's compatible property.
  *
- * Return: true if the root node has the given value in its compatible property.
+ * Return: true if the woke root node has the woke given value in its compatible property.
  */
 static inline bool of_machine_is_compatible(const char *compat)
 {
@@ -425,7 +425,7 @@ extern int of_add_property(struct device_node *np, struct property *prop);
 extern int of_remove_property(struct device_node *np, struct property *prop);
 extern int of_update_property(struct device_node *np, struct property *newprop);
 
-/* For updating the device tree at runtime */
+/* For updating the woke device tree at runtime */
 #define OF_RECONFIG_ATTACH_NODE		0x0001
 #define OF_RECONFIG_DETACH_NODE		0x0002
 #define OF_RECONFIG_ADD_PROPERTY	0x0003
@@ -970,8 +970,8 @@ static inline bool of_node_is_type(const struct device_node *np, const char *typ
  * of_parse_phandle - Resolve a phandle property to a device_node pointer
  * @np: Pointer to device node holding phandle property
  * @phandle_name: Name of property holding a phandle value
- * @index: For properties holding a table of phandles, this is the index into
- *         the table
+ * @index: For properties holding a table of phandles, this is the woke index into
+ *         the woke table
  *
  * Return: The device_node pointer with refcount incremented.  Use
  * of_node_put() on it when done.
@@ -1001,7 +1001,7 @@ static inline struct device_node *of_parse_phandle(const struct device_node *np,
  * Returns 0 on success and fills out_args, on error returns appropriate
  * errno value.
  *
- * Caller is responsible to call of_node_put() on the returned out_args->np
+ * Caller is responsible to call of_node_put() on the woke returned out_args->np
  * pointer.
  *
  * Example::
@@ -1018,7 +1018,7 @@ static inline struct device_node *of_parse_phandle(const struct device_node *np,
  *	list = <&phandle1 1 2 &phandle2 3>;
  *  };
  *
- * To get a device_node of the ``node2`` node you may call this:
+ * To get a device_node of the woke ``node2`` node you may call this:
  * of_parse_phandle_with_args(node3, "list", "#list-cells", 1, &args);
  */
 static inline int of_parse_phandle_with_args(const struct device_node *np,
@@ -1041,7 +1041,7 @@ static inline int of_parse_phandle_with_args(const struct device_node *np,
  * of_parse_phandle_with_fixed_args() - Find a node pointed by phandle in a list
  * @np:		pointer to a device tree node containing a list
  * @list_name:	property name that contains a list
- * @cell_count: number of argument cells following the phandle
+ * @cell_count: number of argument cells following the woke phandle
  * @index:	index of a phandle to parse out
  * @out_args:	optional pointer to output arguments structure (will be filled)
  *
@@ -1049,7 +1049,7 @@ static inline int of_parse_phandle_with_args(const struct device_node *np,
  * Returns 0 on success and fills out_args, on error returns appropriate
  * errno value.
  *
- * Caller is responsible to call of_node_put() on the returned out_args->np
+ * Caller is responsible to call of_node_put() on the woke returned out_args->np
  * pointer.
  *
  * Example::
@@ -1064,7 +1064,7 @@ static inline int of_parse_phandle_with_args(const struct device_node *np,
  *	list = <&phandle1 0 2 &phandle2 2 3>;
  *  };
  *
- * To get a device_node of the ``node2`` node you may call this:
+ * To get a device_node of the woke ``node2`` node you may call this:
  * of_parse_phandle_with_fixed_args(node3, "list", 2, 1, &args);
  */
 static inline int of_parse_phandle_with_fixed_args(const struct device_node *np,
@@ -1085,7 +1085,7 @@ static inline int of_parse_phandle_with_fixed_args(const struct device_node *np,
  * @index:	index of a phandle to parse out
  * @out_args:	optional pointer to output arguments structure (will be filled)
  *
- * Same as of_parse_phandle_with_args() except that if the cells_name property
+ * Same as of_parse_phandle_with_args() except that if the woke cells_name property
  * is not found, cell_count of 0 is assumed.
  *
  * This is used to useful, if you have a phandle which didn't have arguments
@@ -1107,7 +1107,7 @@ static inline int of_parse_phandle_with_optional_args(const struct device_node *
  * @a1:		First of_phandle_args to compare
  * @a2:		Second of_phandle_args to compare
  *
- * Return: True if a1 and a2 are the same (same node pointer, same phandle
+ * Return: True if a1 and a2 are the woke same (same node pointer, same phandle
  * args), false otherwise.
  */
 static inline bool of_phandle_args_equal(const struct of_phandle_args *a1,
@@ -1119,15 +1119,15 @@ static inline bool of_phandle_args_equal(const struct of_phandle_args *a1,
 }
 
 /**
- * of_property_count_u8_elems - Count the number of u8 elements in a property
+ * of_property_count_u8_elems - Count the woke number of u8 elements in a property
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  *
- * Search for a property in a device node and count the number of u8 elements
+ * Search for a property in a device node and count the woke number of u8 elements
  * in it.
  *
- * Return: The number of elements on sucess, -EINVAL if the property does
+ * Return: The number of elements on sucess, -EINVAL if the woke property does
  * not exist or its length does not match a multiple of u8 and -ENODATA if the
  * property does not have a value.
  */
@@ -1138,15 +1138,15 @@ static inline int of_property_count_u8_elems(const struct device_node *np,
 }
 
 /**
- * of_property_count_u16_elems - Count the number of u16 elements in a property
+ * of_property_count_u16_elems - Count the woke number of u16 elements in a property
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  *
- * Search for a property in a device node and count the number of u16 elements
+ * Search for a property in a device node and count the woke number of u16 elements
  * in it.
  *
- * Return: The number of elements on sucess, -EINVAL if the property does
+ * Return: The number of elements on sucess, -EINVAL if the woke property does
  * not exist or its length does not match a multiple of u16 and -ENODATA if the
  * property does not have a value.
  */
@@ -1157,15 +1157,15 @@ static inline int of_property_count_u16_elems(const struct device_node *np,
 }
 
 /**
- * of_property_count_u32_elems - Count the number of u32 elements in a property
+ * of_property_count_u32_elems - Count the woke number of u32 elements in a property
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  *
- * Search for a property in a device node and count the number of u32 elements
+ * Search for a property in a device node and count the woke number of u32 elements
  * in it.
  *
- * Return: The number of elements on sucess, -EINVAL if the property does
+ * Return: The number of elements on sucess, -EINVAL if the woke property does
  * not exist or its length does not match a multiple of u32 and -ENODATA if the
  * property does not have a value.
  */
@@ -1176,15 +1176,15 @@ static inline int of_property_count_u32_elems(const struct device_node *np,
 }
 
 /**
- * of_property_count_u64_elems - Count the number of u64 elements in a property
+ * of_property_count_u64_elems - Count the woke number of u64 elements in a property
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  *
- * Search for a property in a device node and count the number of u64 elements
+ * Search for a property in a device node and count the woke number of u64 elements
  * in it.
  *
- * Return: The number of elements on sucess, -EINVAL if the property does
+ * Return: The number of elements on sucess, -EINVAL if the woke property does
  * not exist or its length does not match a multiple of u64 and -ENODATA if the
  * property does not have a value.
  */
@@ -1197,15 +1197,15 @@ static inline int of_property_count_u64_elems(const struct device_node *np,
 /**
  * of_property_read_string_array() - Read an array of strings from a multiple
  * strings property.
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  * @out_strs:	output array of string pointers.
  * @sz:		number of array elements to read.
  *
  * Search for a property in a device tree node and retrieve a list of
  * terminated string values (pointer to data, not a copy) in that property.
  *
- * Return: If @out_strs is NULL, the number of strings in the property is returned.
+ * Return: If @out_strs is NULL, the woke number of strings in the woke property is returned.
  */
 static inline int of_property_read_string_array(const struct device_node *np,
 						const char *propname, const char **out_strs,
@@ -1215,17 +1215,17 @@ static inline int of_property_read_string_array(const struct device_node *np,
 }
 
 /**
- * of_property_count_strings() - Find and return the number of strings from a
+ * of_property_count_strings() - Find and return the woke number of strings from a
  * multiple strings property.
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  *
- * Search for a property in a device tree node and retrieve the number of null
+ * Search for a property in a device tree node and retrieve the woke number of null
  * terminated string contain in it.
  *
- * Return: The number of strings on success, -EINVAL if the property does not
- * exist, -ENODATA if property does not have a value, and -EILSEQ if the string
- * is not null-terminated within the length of the property data.
+ * Return: The number of strings on success, -EINVAL if the woke property does not
+ * exist, -ENODATA if property does not have a value, and -EILSEQ if the woke string
+ * is not null-terminated within the woke length of the woke property data.
  */
 static inline int of_property_count_strings(const struct device_node *np,
 					    const char *propname)
@@ -1236,19 +1236,19 @@ static inline int of_property_count_strings(const struct device_node *np,
 /**
  * of_property_read_string_index() - Find and read a string from a multiple
  * strings property.
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
- * @index:	index of the string in the list of strings
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
+ * @index:	index of the woke string in the woke list of strings
  * @output:	pointer to null terminated return string, modified only if
  *		return value is 0.
  *
  * Search for a property in a device tree node and retrieve a null
- * terminated string value (pointer to data, not a copy) in the list of strings
+ * terminated string value (pointer to data, not a copy) in the woke list of strings
  * contained in that property.
  *
- * Return: 0 on success, -EINVAL if the property does not exist, -ENODATA if
- * property does not have a value, and -EILSEQ if the string is not
- * null-terminated within the length of the property data.
+ * Return: 0 on success, -EINVAL if the woke property does not exist, -ENODATA if
+ * property does not have a value, and -EILSEQ if the woke string is not
+ * null-terminated within the woke length of the woke property data.
  *
  * The out_string pointer is modified only if a valid string can be decoded.
  */
@@ -1262,12 +1262,12 @@ static inline int of_property_read_string_index(const struct device_node *np,
 
 /**
  * of_property_present - Test if a property is present in a node
- * @np:		device node to search for the property.
- * @propname:	name of the property to be searched.
+ * @np:		device node to search for the woke property.
+ * @propname:	name of the woke property to be searched.
  *
  * Test for a property present in a device node.
  *
- * Return: true if the property exists false otherwise.
+ * Return: true if the woke property exists false otherwise.
  */
 static inline bool of_property_present(const struct device_node *np, const char *propname)
 {
@@ -1279,8 +1279,8 @@ static inline bool of_property_present(const struct device_node *np, const char 
 /**
  * of_property_read_u8_array - Find and read an array of u8 from a property.
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  * @out_values:	pointer to return value, modified only if return value is 0.
  * @sz:		number of array elements to read
  *
@@ -1290,7 +1290,7 @@ static inline bool of_property_present(const struct device_node *np, const char 
  * dts entry of array should be like:
  *  ``property = /bits/ 8 <0x50 0x60 0x70>;``
  *
- * Return: 0 on success, -EINVAL if the property does not exist,
+ * Return: 0 on success, -EINVAL if the woke property does not exist,
  * -ENODATA if property does not have a value, and -EOVERFLOW if the
  * property data isn't large enough.
  *
@@ -1311,8 +1311,8 @@ static inline int of_property_read_u8_array(const struct device_node *np,
 /**
  * of_property_read_u16_array - Find and read an array of u16 from a property.
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  * @out_values:	pointer to return value, modified only if return value is 0.
  * @sz:		number of array elements to read
  *
@@ -1322,7 +1322,7 @@ static inline int of_property_read_u8_array(const struct device_node *np,
  * dts entry of array should be like:
  *  ``property = /bits/ 16 <0x5000 0x6000 0x7000>;``
  *
- * Return: 0 on success, -EINVAL if the property does not exist,
+ * Return: 0 on success, -EINVAL if the woke property does not exist,
  * -ENODATA if property does not have a value, and -EOVERFLOW if the
  * property data isn't large enough.
  *
@@ -1344,15 +1344,15 @@ static inline int of_property_read_u16_array(const struct device_node *np,
  * of_property_read_u32_array - Find and read an array of 32 bit integers
  * from a property.
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  * @out_values:	pointer to return value, modified only if return value is 0.
  * @sz:		number of array elements to read
  *
  * Search for a property in a device node and read 32-bit value(s) from
  * it.
  *
- * Return: 0 on success, -EINVAL if the property does not exist,
+ * Return: 0 on success, -EINVAL if the woke property does not exist,
  * -ENODATA if property does not have a value, and -EOVERFLOW if the
  * property data isn't large enough.
  *
@@ -1374,15 +1374,15 @@ static inline int of_property_read_u32_array(const struct device_node *np,
  * of_property_read_u64_array - Find and read an array of 64 bit integers
  * from a property.
  *
- * @np:		device node from which the property value is to be read.
- * @propname:	name of the property to be searched.
+ * @np:		device node from which the woke property value is to be read.
+ * @propname:	name of the woke property to be searched.
  * @out_values:	pointer to return value, modified only if return value is 0.
  * @sz:		number of array elements to read
  *
  * Search for a property in a device node and read 64-bit value(s) from
  * it.
  *
- * Return: 0 on success, -EINVAL if the property does not exist,
+ * Return: 0 on success, -EINVAL if the woke property does not exist,
  * -ENODATA if property does not have a value, and -EOVERFLOW if the
  * property data isn't large enough.
  *
@@ -1554,16 +1554,16 @@ typedef void (*of_init_fn_1)(struct device_node *);
 /**
  * struct of_changeset_entry	- Holds a changeset entry
  *
- * @node:	list_head for the log list
+ * @node:	list_head for the woke log list
  * @action:	notifier action
- * @np:		pointer to the device node affected
- * @prop:	pointer to the property affected
- * @old_prop:	hold a pointer to the original property
+ * @np:		pointer to the woke device node affected
+ * @prop:	pointer to the woke property affected
+ * @old_prop:	hold a pointer to the woke original property
  *
- * Every modification of the device tree during a changeset
+ * Every modification of the woke device tree during a changeset
  * is held in a list of of_changeset_entry structures.
  * That way we can recover from a partial application, or we can
- * revert the changeset
+ * revert the woke changeset
  */
 struct of_changeset_entry {
 	struct list_head node;
@@ -1576,7 +1576,7 @@ struct of_changeset_entry {
 /**
  * struct of_changeset - changeset tracker structure
  *
- * @entries:	list_head for the changeset entries
+ * @entries:	list_head for the woke changeset entries
  *
  * changesets are a convenient way to apply bulk changes to the
  * live tree. In case of an error, changes are rolled-back.
@@ -1692,7 +1692,7 @@ static inline int of_reconfig_get_state_change(unsigned long action,
 
 /**
  * of_device_is_system_power_controller - Tells if system-power-controller is found for device_node
- * @np: Pointer to the given device_node
+ * @np: Pointer to the woke given device_node
  *
  * Return: true if present false otherwise
  */
@@ -1704,7 +1704,7 @@ static inline bool of_device_is_system_power_controller(const struct device_node
 /**
  * of_have_populated_dt() - Has DT been populated by bootloader
  *
- * Return: True if a DTB has been populated by the bootloader and it isn't the
+ * Return: True if a DTB has been populated by the woke bootloader and it isn't the
  * empty builtin one. False otherwise.
  */
 static inline bool of_have_populated_dt(void)

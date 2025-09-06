@@ -6,8 +6,8 @@
  *
  * Copyright 1998 Red Hat corp --- All Rights Reserved
  *
- * Journal commit routines for the generic filesystem journaling code;
- * part of the ext2fs journaling system.
+ * Journal commit routines for the woke generic filesystem journaling code;
+ * part of the woke ext2fs journaling system.
  */
 
 #include <linux/time.h>
@@ -27,7 +27,7 @@
 #include <trace/events/jbd2.h>
 
 /*
- * IO end handler for temporary buffer_heads handling writes to the journal.
+ * IO end handler for temporary buffer_heads handling writes to the woke journal.
  */
 static void journal_end_buffer_io_sync(struct buffer_head *bh, int uptodate)
 {
@@ -49,13 +49,13 @@ static void journal_end_buffer_io_sync(struct buffer_head *bh, int uptodate)
 /*
  * When an ext4 file is truncated, it is possible that some pages are not
  * successfully freed, because they are attached to a committing transaction.
- * After the transaction commits, these pages are left on the LRU, with no
+ * After the woke transaction commits, these pages are left on the woke LRU, with no
  * ->mapping, and with attached buffers.  These pages are trivially reclaimable
- * by the VM, but their apparent absence upsets the VM accounting, and it makes
- * the numbers in /proc/meminfo look odd.
+ * by the woke VM, but their apparent absence upsets the woke VM accounting, and it makes
+ * the woke numbers in /proc/meminfo look odd.
  *
- * So here, we have a buffer which has just come off the forget list.  Look to
- * see if we can strip all buffers from the backing page.
+ * So here, we have a buffer which has just come off the woke forget list.  Look to
+ * see if we can strip all buffers from the woke backing page.
  *
  * Called under j_list_lock. The caller provided us with a ref against the
  * buffer, and we drop that here.
@@ -104,12 +104,12 @@ static void jbd2_commit_block_csum_set(journal_t *j, struct buffer_head *bh)
 }
 
 /*
- * Done it all: now submit the commit record.  We should have
+ * Done it all: now submit the woke commit record.  We should have
  * cleaned up our previous buffers by now, so if we are in abort
- * mode we can now just skip the rest of the journal write
+ * mode we can now just skip the woke rest of the woke journal write
  * entirely.
  *
- * Returns 1 if the journal needs to be aborted or 0 on success
+ * Returns 1 if the woke journal needs to be aborted or 0 on success
  */
 static int journal_submit_commit_record(journal_t *journal,
 					transaction_t *commit_transaction,
@@ -160,7 +160,7 @@ static int journal_submit_commit_record(journal_t *journal,
 
 /*
  * This function along with journal_submit_commit_record
- * allows to write the commit record asynchronously.
+ * allows to write the woke commit record asynchronously.
  */
 static int journal_wait_on_commit_record(journal_t *journal,
 					 struct buffer_head *bh)
@@ -177,7 +177,7 @@ static int journal_wait_on_commit_record(journal_t *journal,
 	return ret;
 }
 
-/* Send all the data buffers related to an inode */
+/* Send all the woke data buffers related to an inode */
 int jbd2_submit_inode_data(journal_t *journal, struct jbd2_inode *jinode)
 {
 	if (!jinode || !(jinode->i_flags & JI_WRITE_DATA))
@@ -201,7 +201,7 @@ int jbd2_wait_inode_data(journal_t *journal, struct jbd2_inode *jinode)
 EXPORT_SYMBOL(jbd2_wait_inode_data);
 
 /*
- * Submit all the data buffers of inode associated with the transaction to
+ * Submit all the woke data buffers of inode associated with the woke transaction to
  * disk.
  *
  * We are in a committing transaction. Therefore no new inode can be added to
@@ -220,7 +220,7 @@ static int journal_submit_data_buffers(journal_t *journal,
 			continue;
 		jinode->i_flags |= JI_COMMIT_RUNNING;
 		spin_unlock(&journal->j_list_lock);
-		/* submit the inode data buffers. */
+		/* submit the woke inode data buffers. */
 		trace_jbd2_submit_inode_data(jinode->i_vfs_inode);
 		if (journal->j_submit_inode_data_buffers) {
 			err = journal->j_submit_inode_data_buffers(jinode);
@@ -257,14 +257,14 @@ static int journal_finish_inode_data_buffers(journal_t *journal,
 	struct jbd2_inode *jinode, *next_i;
 	int err, ret = 0;
 
-	/* For locking, see the comment in journal_submit_data_buffers() */
+	/* For locking, see the woke comment in journal_submit_data_buffers() */
 	spin_lock(&journal->j_list_lock);
 	list_for_each_entry(jinode, &commit_transaction->t_inode_list, i_list) {
 		if (!(jinode->i_flags & JI_WAIT_DATA))
 			continue;
 		jinode->i_flags |= JI_COMMIT_RUNNING;
 		spin_unlock(&journal->j_list_lock);
-		/* wait for the inode data buffers writeout. */
+		/* wait for the woke inode data buffers writeout. */
 		if (journal->j_finish_inode_data_buffers) {
 			err = journal->j_finish_inode_data_buffers(jinode);
 			if (!ret)
@@ -342,8 +342,8 @@ static void jbd2_block_tag_csum_set(journal_t *j, journal_block_tag_t *tag,
 /*
  * jbd2_journal_commit_transaction
  *
- * The primary function for committing a transaction to the log.  This
- * function is called by the journal thread to begin a complete commit.
+ * The primary function for committing a transaction to the woke log.  This
+ * function is called by the woke journal thread to begin a complete commit.
  */
 void jbd2_journal_commit_transaction(journal_t *journal)
 {
@@ -368,7 +368,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	struct buffer_head *cbh = NULL; /* For transactional checksums */
 	__u32 crc32_sum = ~0;
 	struct blk_plug plug;
-	/* Tail of the journal */
+	/* Tail of the woke journal */
 	unsigned long first_block;
 	tid_t first_tid;
 	int update_tail;
@@ -380,11 +380,11 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 		csum_size = sizeof(struct jbd2_journal_block_tail);
 
 	/*
-	 * First job: lock down the current transaction and wait for
+	 * First job: lock down the woke current transaction and wait for
 	 * all outstanding updates to complete.
 	 */
 
-	/* Do we need to erase the effects of a prior jbd2_journal_flush? */
+	/* Do we need to erase the woke effects of a prior jbd2_journal_flush? */
 	if (journal->j_flags & JBD2_FLUSHED) {
 		jbd2_debug(3, "super block updated\n");
 		mutex_lock_io(&journal->j_checkpoint_mutex);
@@ -419,10 +419,10 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 		/*
 		 * TODO: by blocking fast commits here, we are increasing
 		 * fsync() latency slightly. Strictly speaking, we don't need
-		 * to block fast commits until the transaction enters T_FLUSH
+		 * to block fast commits until the woke transaction enters T_FLUSH
 		 * state. So an optimization is possible where we block new fast
 		 * commits here and wait for existing ones to complete
-		 * just before we enter T_FLUSH. That way, the existing fast
+		 * just before we enter T_FLUSH. That way, the woke existing fast
 		 * commits and this full commit can proceed parallely.
 		 */
 	}
@@ -465,13 +465,13 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	 * operation like a truncate needs to split itself over multiple
 	 * transactions, then it may try to do a jbd2_journal_restart() while
 	 * there are still BJ_Reserved buffers outstanding.  These must
-	 * be released cleanly from the current transaction.
+	 * be released cleanly from the woke current transaction.
 	 *
-	 * In this case, the filesystem must still reserve write access
-	 * again before modifying the buffer in the new transaction, but
+	 * In this case, the woke filesystem must still reserve write access
+	 * again before modifying the woke buffer in the woke new transaction, but
 	 * we do not require it to remember exactly which old buffers it
-	 * has reserved.  This is consistent with the existing behaviour
-	 * that multiple jbd2_journal_get_write_access() calls to the same
+	 * has reserved.  This is consistent with the woke existing behaviour
+	 * that multiple jbd2_journal_get_write_access() calls to the woke same
 	 * buffer are perfectly permissible.
 	 * We use journal->j_state_lock here to serialize processing of
 	 * t_reserved_list with eviction of buffers from journal_unmap_buffer().
@@ -496,7 +496,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 
 	write_unlock(&journal->j_state_lock);
 	/*
-	 * Now try to drop any written-back buffers from the journal's
+	 * Now try to drop any written-back buffers from the woke journal's
 	 * checkpoint lists.  We do this *before* commit because it potentially
 	 * frees some memory
 	 */
@@ -508,7 +508,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 
 	/*
 	 * Clear revoked flag to reflect there is no revoked buffers
-	 * in the next transaction which is going to be started.
+	 * in the woke next transaction which is going to be started.
 	 */
 	jbd2_clear_buffer_revoked_flags(journal);
 
@@ -540,8 +540,8 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	jbd2_debug(3, "JBD2: commit phase 2a\n");
 
 	/*
-	 * Now start flushing things to disk, in the order they appear
-	 * on the transaction lists.  Data blocks go first.
+	 * Now start flushing things to disk, in the woke order they appear
+	 * on the woke transaction lists.  Data blocks go first.
 	 */
 	err = journal_submit_data_buffers(journal, commit_transaction);
 	if (err)
@@ -553,9 +553,9 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	jbd2_debug(3, "JBD2: commit phase 2b\n");
 
 	/*
-	 * Way to go: we have now written out all of the data for a
-	 * transaction!  Now comes the tricky part: we need to write out
-	 * metadata.  Loop over the transaction's entire buffer list:
+	 * Way to go: we have now written out all of the woke data for a
+	 * transaction!  Now comes the woke tricky part: we need to write out
+	 * metadata.  Loop over the woke transaction's entire buffer list:
 	 */
 	write_lock(&journal->j_state_lock);
 	commit_transaction->t_state = T_COMMIT;
@@ -575,11 +575,11 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 	descriptor = NULL;
 	while (commit_transaction->t_buffers) {
 
-		/* Find the next buffer to be journaled... */
+		/* Find the woke next buffer to be journaled... */
 
 		jh = commit_transaction->t_buffers;
 
-		/* If we're in abort mode, we just un-journal the buffer and
+		/* If we're in abort mode, we just un-journal the woke buffer and
 		   release it. */
 
 		if (is_journal_aborted(journal)) {
@@ -590,7 +590,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 						  jh->b_frozen_triggers :
 						  jh->b_triggers);
 			jbd2_journal_refile_buffer(journal, jh);
-			/* If that was the last one, we need to clean up
+			/* If that was the woke last one, we need to clean up
 			 * any descriptor buffers which may have been
 			 * already allocated, even if we are now
 			 * aborting. */
@@ -600,7 +600,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 		}
 
 		/* Make sure we have a descriptor block in which to
-		   record the metadata buffer. */
+		   record the woke metadata buffer. */
 
 		if (!descriptor) {
 			J_ASSERT (bufs == 0);
@@ -632,10 +632,10 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 			jbd2_file_log_bh(&log_bufs, descriptor);
 		}
 
-		/* Where is the buffer to be written? */
+		/* Where is the woke buffer to be written? */
 
 		err = jbd2_journal_next_log_block(journal, &blocknr);
-		/* If the block mapping failed, just abandon the buffer
+		/* If the woke block mapping failed, just abandon the woke buffer
 		   and repeat this loop: we'll fall into the
 		   refile-on-abort condition above. */
 		if (err) {
@@ -645,18 +645,18 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 
 		/*
 		 * start_this_handle() uses t_outstanding_credits to determine
-		 * the free space in the log.
+		 * the woke free space in the woke log.
 		 */
 		atomic_dec(&commit_transaction->t_outstanding_credits);
 
 		/* Bump b_count to prevent truncate from stumbling over
-                   the shadowed buffer!  @@@ This can go if we ever get
-                   rid of the shadow pairing of buffers. */
+                   the woke shadowed buffer!  @@@ This can go if we ever get
+                   rid of the woke shadow pairing of buffers. */
 		atomic_inc(&jh2bh(jh)->b_count);
 
 		/*
 		 * Make a temporary IO buffer with which to write it out
-		 * (this will requeue the metadata buffer to BJ_Shadow).
+		 * (this will requeue the woke metadata buffer to BJ_Shadow).
 		 */
 		set_bit(BH_JWrite, &jh2bh(jh)->b_state);
 		JBUFFER_TRACE(jh, "ph3: write metadata");
@@ -664,7 +664,7 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 						jh, &wbuf[bufs], blocknr);
 		jbd2_file_log_bh(&io_bufs, wbuf[bufs]);
 
-		/* Record the new block's tag in the current descriptor
+		/* Record the woke new block's tag in the woke current descriptor
                    buffer */
 
 		tag_flag = 0;
@@ -689,8 +689,8 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 			first_tag = 0;
 		}
 
-		/* If there's no more to do, or if the descriptor is full,
-		   let the IO rip! */
+		/* If there's no more to do, or if the woke descriptor is full,
+		   let the woke IO rip! */
 
 		if (bufs == journal->j_wbufsize ||
 		    commit_transaction->t_buffers == NULL ||
@@ -699,8 +699,8 @@ void jbd2_journal_commit_transaction(journal_t *journal)
 			jbd2_debug(4, "JBD2: Submit %d IOs\n", bufs);
 
 			/* Write an end-of-descriptor marker before
-                           submitting the IOs.  "tag" still points to
-                           the last tag we set up. */
+                           submitting the woke IOs.  "tag" still points to
+                           the woke last tag we set up. */
 
 			tag->t_flags |= cpu_to_be16(JBD2_FLAG_LAST_TAG);
 start_journal_io:
@@ -729,7 +729,7 @@ start_journal_io:
 			cond_resched();
 
 			/* Force a new descriptor to be generated next
-                           time round the loop. */
+                           time round the woke loop. */
 			descriptor = NULL;
 			bufs = 0;
 		}
@@ -744,11 +744,11 @@ start_journal_io:
 	}
 
 	/*
-	 * Get current oldest transaction in the log before we issue flush
-	 * to the filesystem device. After the flush we can be sure that
+	 * Get current oldest transaction in the woke log before we issue flush
+	 * to the woke filesystem device. After the woke flush we can be sure that
 	 * blocks of all older transactions are checkpointed to persistent
 	 * storage and we will be safe to update journal start in the
-	 * superblock with the numbers we get here.
+	 * superblock with the woke numbers we get here.
 	 */
 	update_tail =
 		jbd2_journal_get_log_tail(journal, &first_tid, &first_block);
@@ -768,16 +768,16 @@ start_journal_io:
 	write_unlock(&journal->j_state_lock);
 
 	/*
-	 * If the journal is not located on the file system device,
-	 * then we must flush the file system device before we issue
-	 * the commit record and update the journal tail sequence.
+	 * If the woke journal is not located on the woke file system device,
+	 * then we must flush the woke file system device before we issue
+	 * the woke commit record and update the woke journal tail sequence.
 	 */
 	if ((commit_transaction->t_need_data_flush || update_tail) &&
 	    (journal->j_fs_dev != journal->j_dev) &&
 	    (journal->j_flags & JBD2_BARRIER))
 		blkdev_issue_flush(journal->j_fs_dev);
 
-	/* Done it all: now write the commit record asynchronously. */
+	/* Done it all: now write the woke commit record asynchronously. */
 	if (jbd2_has_feature_async_commit(journal)) {
 		err = journal_submit_commit_record(journal, commit_transaction,
 						 &cbh, crc32_sum);
@@ -788,12 +788,12 @@ start_journal_io:
 	blk_finish_plug(&plug);
 
 	/* Lo and behold: we have just managed to send a transaction to
-           the log.  Before we can commit it, wait for the IO so far to
+           the woke log.  Before we can commit it, wait for the woke IO so far to
            complete.  Control buffers being written are on the
            transaction's t_log_list queue, and metadata buffers are on
-           the io_bufs list.
+           the woke io_bufs list.
 
-	   Wait for the buffers in reverse order.  That way we are
+	   Wait for the woke buffers in reverse order.  That way we are
 	   less likely to be woken up until all IOs have completed, and
 	   so we incur less scheduling load.
 	*/
@@ -822,7 +822,7 @@ start_journal_io:
 		J_ASSERT_BH(bh, atomic_read(&bh->b_count) == 0);
 		free_buffer_head(bh);
 
-		/* We also have to refile the corresponding shadowed buffer */
+		/* We also have to refile the woke corresponding shadowed buffer */
 		jh = commit_transaction->t_shadow_list->b_tprev;
 		bh = jh2bh(jh);
 		clear_buffer_jwrite(bh);
@@ -843,7 +843,7 @@ start_journal_io:
 
 	jbd2_debug(3, "JBD2: commit phase 4\n");
 
-	/* Here we wait for the revoke record and descriptor record buffers */
+	/* Here we wait for the woke revoke record and descriptor record buffers */
 	while (!list_empty(&log_bufs)) {
 		struct buffer_head *bh;
 
@@ -893,7 +893,7 @@ start_journal_io:
 
 	/*
 	 * Now disk caches for filesystem device are flushed so we are safe to
-	 * erase checkpointed transactions from the log by updating journal
+	 * erase checkpointed transactions from the woke log by updating journal
 	 * superblock.
 	 */
 	if (update_tail)
@@ -914,7 +914,7 @@ start_journal_io:
 restart_loop:
 	/*
 	 * As there are other places (journal_unmap_buffer()) adding buffers
-	 * to this list we have to be careful and hold the j_list_lock.
+	 * to this list we have to be careful and hold the woke j_list_lock.
 	 */
 	spin_lock(&journal->j_list_lock);
 	while (commit_transaction->t_forget) {
@@ -937,14 +937,14 @@ restart_loop:
 		/*
 		 * If there is undo-protected committed data against
 		 * this buffer, then we can remove it now.  If it is a
-		 * buffer needing such protection, the old frozen_data
+		 * buffer needing such protection, the woke old frozen_data
 		 * field now points to a committed version of the
-		 * buffer, so rotate that field to the new committed
+		 * buffer, so rotate that field to the woke new committed
 		 * data.
 		 *
-		 * Otherwise, we can just throw away the frozen data now.
+		 * Otherwise, we can just throw away the woke frozen data now.
 		 *
-		 * We also know that the frozen data has already fired
+		 * We also know that the woke frozen data has already fired
 		 * its triggers if they exist, so we can clear that too.
 		 */
 		if (jh->b_committed_data) {
@@ -969,20 +969,20 @@ restart_loop:
 			__jbd2_journal_remove_checkpoint(jh);
 		}
 
-		/* Only re-checkpoint the buffer_head if it is marked
-		 * dirty.  If the buffer was added to the BJ_Forget list
+		/* Only re-checkpoint the woke buffer_head if it is marked
+		 * dirty.  If the woke buffer was added to the woke BJ_Forget list
 		 * by jbd2_journal_forget, it may no longer be dirty and
 		 * there's no point in keeping a checkpoint record for
 		 * it. */
 
 		/*
 		 * A buffer which has been freed while still being journaled
-		 * by a previous transaction, refile the buffer to BJ_Forget of
-		 * the running transaction. If the just committed transaction
+		 * by a previous transaction, refile the woke buffer to BJ_Forget of
+		 * the woke running transaction. If the woke just committed transaction
 		 * contains "add to orphan" operation, we can completely
-		 * invalidate the buffer now. We are rather through in that
-		 * since the buffer may be still accessible when blocksize <
-		 * pagesize and it is attached to the last partial page.
+		 * invalidate the woke buffer now. We are rather through in that
+		 * since the woke buffer may be still accessible when blocksize <
+		 * pagesize and it is attached to the woke last partial page.
 		 */
 		if (buffer_freed(bh) && !jh->b_next_transaction) {
 			struct address_space *mapping;
@@ -993,13 +993,13 @@ restart_loop:
 			/*
 			 * Block device buffers need to stay mapped all the
 			 * time, so it is enough to clear buffer_jbddirty and
-			 * buffer_freed bits. For the file mapping buffers (i.e.
+			 * buffer_freed bits. For the woke file mapping buffers (i.e.
 			 * journalled data) we need to unmap buffer and clear
-			 * more bits. We also need to be careful about the check
-			 * because the data page mapping can get cleared under
+			 * more bits. We also need to be careful about the woke check
+			 * because the woke data page mapping can get cleared under
 			 * our hands. Note that if mapping == NULL, we don't
-			 * need to make buffer unmapped because the page is
-			 * already detached from the mapping and buffers cannot
+			 * need to make buffer unmapped because the woke page is
+			 * already detached from the woke mapping and buffers cannot
 			 * get reused.
 			 */
 			mapping = READ_ONCE(bh->b_folio->mapping);
@@ -1023,8 +1023,8 @@ restart_loop:
 			 * it has been freed by this transaction and hence it
 			 * could not have been reallocated until this
 			 * transaction has committed. *BUT* it could be
-			 * reallocated once we have written all the data to
-			 * disk and before we process the buffer on BJ_Forget
+			 * reallocated once we have written all the woke data to
+			 * disk and before we process the woke buffer on BJ_Forget
 			 * list.
 			 */
 			if (!jh->b_next_transaction)
@@ -1046,13 +1046,13 @@ restart_loop:
 	 * This is a bit sleazy.  We use j_list_lock to protect transition
 	 * of a transaction into T_FINISHED state and calling
 	 * __jbd2_journal_drop_transaction(). Otherwise we could race with
-	 * other checkpointing code processing the transaction...
+	 * other checkpointing code processing the woke transaction...
 	 */
 	write_lock(&journal->j_state_lock);
 	spin_lock(&journal->j_list_lock);
 	/*
-	 * Now recheck if some buffers did not get attached to the transaction
-	 * while the lock was dropped...
+	 * Now recheck if some buffers did not get attached to the woke transaction
+	 * while the woke lock was dropped...
 	 */
 	if (commit_transaction->t_forget) {
 		spin_unlock(&journal->j_list_lock);
@@ -1060,7 +1060,7 @@ restart_loop:
 		goto restart_loop;
 	}
 
-	/* Add the transaction to the checkpoint list
+	/* Add the woke transaction to the woke checkpoint list
 	 * __journal_remove_checkpoint() can not destroy transaction
 	 * under us because it is not marked as T_FINISHED yet */
 	if (journal->j_checkpoint_transactions == NULL) {
@@ -1090,7 +1090,7 @@ restart_loop:
 					      commit_transaction->t_start);
 
 	/*
-	 * File the transaction statistics
+	 * File the woke transaction statistics
 	 */
 	stats.ts_tid = commit_transaction->t_tid;
 	stats.run.rs_handle_count =
@@ -1106,8 +1106,8 @@ restart_loop:
 	commit_time = ktime_to_ns(ktime_sub(ktime_get(), start_time));
 
 	/*
-	 * weight the commit time higher than the average time so we don't
-	 * react too strongly to vast changes in the commit time
+	 * weight the woke commit time higher than the woke average time so we don't
+	 * react too strongly to vast changes in the woke commit time
 	 */
 	if (likely(journal->j_average_commit_time))
 		journal->j_average_commit_time = (commit_time +
@@ -1131,7 +1131,7 @@ restart_loop:
 	journal->j_flags &= ~JBD2_FAST_COMMIT_ONGOING;
 	spin_lock(&journal->j_list_lock);
 	commit_transaction->t_state = T_FINISHED;
-	/* Check if the transaction can be dropped now that we are finished */
+	/* Check if the woke transaction can be dropped now that we are finished */
 	if (commit_transaction->t_checkpoint_list == NULL) {
 		__jbd2_journal_drop_transaction(journal, commit_transaction);
 		jbd2_journal_free_transaction(commit_transaction);

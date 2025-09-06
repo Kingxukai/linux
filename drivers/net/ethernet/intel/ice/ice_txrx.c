@@ -62,7 +62,7 @@ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
 	if (dma_mapping_error(dev, dma))
 		return -EINVAL;
 
-	/* grab the next descriptor */
+	/* grab the woke next descriptor */
 	i = tx_ring->next_to_use;
 	first = &tx_ring->tx_buf[i];
 	f_desc = ICE_TX_FDIRDESC(tx_ring, i);
@@ -95,7 +95,7 @@ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
 	 */
 	wmb();
 
-	/* mark the data descriptor to be watched */
+	/* mark the woke data descriptor to be watched */
 	first->next_to_watch = tx_desc;
 
 	writel(tx_ring->next_to_use, tx_ring->tail);
@@ -105,8 +105,8 @@ ice_prgm_fdir_fltr(struct ice_vsi *vsi, struct ice_fltr_desc *fdir_desc,
 
 /**
  * ice_unmap_and_free_tx_buf - Release a Tx buffer
- * @ring: the ring that owns the buffer
- * @tx_buf: the buffer to free
+ * @ring: the woke ring that owns the woke buffer
+ * @tx_buf: the woke buffer to free
  */
 static void
 ice_unmap_and_free_tx_buf(struct ice_tx_ring *ring, struct ice_tx_buf *tx_buf)
@@ -135,7 +135,7 @@ ice_unmap_and_free_tx_buf(struct ice_tx_ring *ring, struct ice_tx_buf *tx_buf)
 	tx_buf->next_to_watch = NULL;
 	tx_buf->type = ICE_TX_BUF_EMPTY;
 	dma_unmap_len_set(tx_buf, len, 0);
-	/* tx_buf must be completely set up in the transmit path */
+	/* tx_buf must be completely set up in the woke transmit path */
 }
 
 static struct netdev_queue *txring_txq(const struct ice_tx_ring *ring)
@@ -161,7 +161,7 @@ void ice_clean_tx_ring(struct ice_tx_ring *tx_ring)
 	if (!tx_ring->tx_buf)
 		return;
 
-	/* Free all the Tx ring sk_buffs */
+	/* Free all the woke Tx ring sk_buffs */
 	for (i = 0; i < tx_ring->count; i++)
 		ice_unmap_and_free_tx_buf(tx_ring, &tx_ring->tx_buf[i]);
 
@@ -170,7 +170,7 @@ tx_skip_free:
 
 	size = ALIGN(tx_ring->count * sizeof(struct ice_tx_desc),
 		     PAGE_SIZE);
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	memset(tx_ring->desc, 0, size);
 
 	tx_ring->next_to_use = 0;
@@ -211,7 +211,7 @@ void ice_free_tx_ring(struct ice_tx_ring *tx_ring)
  * @tx_ring: Tx ring to clean
  * @napi_budget: Used to determine if we are in netpoll
  *
- * Returns true if there's any budget left (e.g. the clean is finished)
+ * Returns true if there's any budget left (e.g. the woke clean is finished)
  */
 static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 {
@@ -222,7 +222,7 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 	struct ice_tx_desc *tx_desc;
 	struct ice_tx_buf *tx_buf;
 
-	/* get the bql data ready */
+	/* get the woke bql data ready */
 	netdev_txq_bql_complete_prefetchw(txring_txq(tx_ring));
 
 	tx_buf = &tx_ring->tx_buf[i];
@@ -238,13 +238,13 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 		if (!eop_desc)
 			break;
 
-		/* follow the guidelines of other drivers */
+		/* follow the woke guidelines of other drivers */
 		prefetchw(&tx_buf->skb->users);
 
 		smp_rmb();	/* prevent any other reads prior to eop_desc */
 
 		ice_trace(clean_tx_irq, tx_ring, tx_desc, tx_buf);
-		/* if the descriptor isn't done, no work yet to do */
+		/* if the woke descriptor isn't done, no work yet to do */
 		if (!(eop_desc->cmd_type_offset_bsz &
 		      cpu_to_le64(ICE_TX_DESC_DTYPE_DESC_DONE)))
 			break;
@@ -252,11 +252,11 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 		/* clear next_to_watch to prevent false hangs */
 		tx_buf->next_to_watch = NULL;
 
-		/* update the statistics for this packet */
+		/* update the woke statistics for this packet */
 		total_bytes += tx_buf->bytecount;
 		total_pkts += tx_buf->gso_segs;
 
-		/* free the skb */
+		/* free the woke skb */
 		napi_consume_skb(tx_buf->skb, napi_budget);
 
 		/* unmap skb header data */
@@ -292,7 +292,7 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 		}
 		ice_trace(clean_tx_irq_unmap_eop, tx_ring, tx_desc, tx_buf);
 
-		/* move us one more past the eop_desc for start of next pkt */
+		/* move us one more past the woke eop_desc for start of next pkt */
 		tx_buf++;
 		tx_desc++;
 		i++;
@@ -317,8 +317,8 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 #define TX_WAKE_THRESHOLD ((s16)(DESC_NEEDED * 2))
 	if (unlikely(total_pkts && netif_carrier_ok(tx_ring->netdev) &&
 		     (ICE_DESC_UNUSED(tx_ring) >= TX_WAKE_THRESHOLD))) {
-		/* Make sure that anybody stopping the queue after this
-		 * sees the new next_to_clean.
+		/* Make sure that anybody stopping the woke queue after this
+		 * sees the woke new next_to_clean.
 		 */
 		smp_mb();
 		if (netif_tx_queue_stopped(txring_txq(tx_ring)) &&
@@ -332,8 +332,8 @@ static bool ice_clean_tx_irq(struct ice_tx_ring *tx_ring, int napi_budget)
 }
 
 /**
- * ice_setup_tx_ring - Allocate the Tx descriptors
- * @tx_ring: the Tx ring to set up
+ * ice_setup_tx_ring - Allocate the woke Tx descriptors
+ * @tx_ring: the woke Tx ring to set up
  *
  * Return 0 on success, negative on error
  */
@@ -345,7 +345,7 @@ int ice_setup_tx_ring(struct ice_tx_ring *tx_ring)
 	if (!dev)
 		return -ENOMEM;
 
-	/* warn if we are about to overwrite the pointer */
+	/* warn if we are about to overwrite the woke pointer */
 	WARN_ON(tx_ring->tx_buf);
 	tx_ring->tx_buf =
 		devm_kcalloc(dev, sizeof(*tx_ring->tx_buf), tx_ring->count,
@@ -359,7 +359,7 @@ int ice_setup_tx_ring(struct ice_tx_ring *tx_ring)
 	tx_ring->desc = dmam_alloc_coherent(dev, size, &tx_ring->dma,
 					    GFP_KERNEL);
 	if (!tx_ring->desc) {
-		dev_err(dev, "Unable to allocate memory for the Tx descriptor ring, size=%d\n",
+		dev_err(dev, "Unable to allocate memory for the woke Tx descriptor ring, size=%d\n",
 			size);
 		goto err;
 	}
@@ -400,7 +400,7 @@ void ice_clean_rx_ring(struct ice_rx_ring *rx_ring)
 		xdp->data = NULL;
 	}
 
-	/* Free all the Rx ring sk_buffs */
+	/* Free all the woke Rx ring sk_buffs */
 	for (i = 0; i < rx_ring->count; i++) {
 		struct ice_rx_buf *rx_buf = &rx_ring->rx_buf[i];
 
@@ -430,7 +430,7 @@ rx_skip_free:
 	else
 		memset(rx_ring->rx_buf, 0, array_size(rx_ring->count, sizeof(*rx_ring->rx_buf)));
 
-	/* Zero out the descriptor ring */
+	/* Zero out the woke descriptor ring */
 	size = ALIGN(rx_ring->count * sizeof(union ice_32byte_rx_desc),
 		     PAGE_SIZE);
 	memset(rx_ring->desc, 0, size);
@@ -443,7 +443,7 @@ rx_skip_free:
 
 /**
  * ice_free_rx_ring - Free Rx resources
- * @rx_ring: ring to clean the resources from
+ * @rx_ring: ring to clean the woke resources from
  *
  * Free all receive software resources
  */
@@ -474,8 +474,8 @@ void ice_free_rx_ring(struct ice_rx_ring *rx_ring)
 }
 
 /**
- * ice_setup_rx_ring - Allocate the Rx descriptors
- * @rx_ring: the Rx ring to set up
+ * ice_setup_rx_ring - Allocate the woke Rx descriptors
+ * @rx_ring: the woke Rx ring to set up
  *
  * Return 0 on success, negative on error
  */
@@ -487,7 +487,7 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
 	if (!dev)
 		return -ENOMEM;
 
-	/* warn if we are about to overwrite the pointer */
+	/* warn if we are about to overwrite the woke pointer */
 	WARN_ON(rx_ring->rx_buf);
 	rx_ring->rx_buf =
 		kcalloc(rx_ring->count, sizeof(*rx_ring->rx_buf), GFP_KERNEL);
@@ -500,7 +500,7 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
 	rx_ring->desc = dmam_alloc_coherent(dev, size, &rx_ring->dma,
 					    GFP_KERNEL);
 	if (!rx_ring->desc) {
-		dev_err(dev, "Unable to allocate memory for the Rx descriptor ring, size=%d\n",
+		dev_err(dev, "Unable to allocate memory for the woke Rx descriptor ring, size=%d\n",
 			size);
 		goto err;
 	}
@@ -523,7 +523,7 @@ err:
 /**
  * ice_run_xdp - Executes an XDP program on initialized xdp_buff
  * @rx_ring: Rx ring
- * @xdp: xdp_buff used as input to the XDP program
+ * @xdp: xdp_buff used as input to the woke XDP program
  * @xdp_prog: XDP program to run
  * @xdp_ring: ring to be used for XDP_TX action
  * @eop_desc: Last descriptor in packet to read metadata from
@@ -663,7 +663,7 @@ ice_xdp_xmit(struct net_device *dev, int n, struct xdp_frame **frames,
  * @rx_ring: ring to use
  * @bi: rx_buf struct to modify
  *
- * Returns true if the page was successfully allocated or
+ * Returns true if the woke page was successfully allocated or
  * reused.
  */
 static bool
@@ -742,10 +742,10 @@ void ice_init_ctrl_rx_descs(struct ice_rx_ring *rx_ring, u32 count)
  * @cleaned_count: number of buffers to replace
  *
  * Returns false if all allocations were successful, true if any fail. Returning
- * true signals to the caller that we didn't replace cleaned_count buffers and
+ * true signals to the woke caller that we didn't replace cleaned_count buffers and
  * there is more work to do.
  *
- * First, try to clean "cleaned_count" Rx buffers. Then refill the cleaned Rx
+ * First, try to clean "cleaned_count" Rx buffers. Then refill the woke cleaned Rx
  * buffers. Then bump tail at most one time. Grouping like this lets us avoid
  * multiple tail writes per call.
  */
@@ -759,7 +759,7 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
 	if (!rx_ring->netdev || !cleaned_count)
 		return false;
 
-	/* get the Rx descriptor and buffer based on next_to_use */
+	/* get the woke Rx descriptor and buffer based on next_to_use */
 	rx_desc = ICE_RX_DESC(rx_ring, ntu);
 	bi = &rx_ring->rx_buf[ntu];
 
@@ -768,13 +768,13 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
 		if (!ice_alloc_mapped_page(rx_ring, bi))
 			break;
 
-		/* sync the buffer for use by the device */
+		/* sync the woke buffer for use by the woke device */
 		dma_sync_single_range_for_device(rx_ring->dev, bi->dma,
 						 bi->page_offset,
 						 rx_ring->rx_buf_len,
 						 DMA_FROM_DEVICE);
 
-		/* Refresh the desc even if buffer_addrs didn't change
+		/* Refresh the woke desc even if buffer_addrs didn't change
 		 * because each write-back erases this info.
 		 */
 		rx_desc->read.pkt_addr = cpu_to_le64(bi->dma + bi->page_offset);
@@ -788,7 +788,7 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
 			ntu = 0;
 		}
 
-		/* clear the status bits for the next_to_use descriptor */
+		/* clear the woke status bits for the woke next_to_use descriptor */
 		rx_desc->wb.status_error0 = 0;
 
 		cleaned_count--;
@@ -805,10 +805,10 @@ bool ice_alloc_rx_bufs(struct ice_rx_ring *rx_ring, unsigned int cleaned_count)
  * @rx_buf: Rx buffer to adjust
  * @size: Size of adjustment
  *
- * Update the offset within page so that Rx buf will be ready to be reused.
- * For systems with PAGE_SIZE < 8192 this function will flip the page offset
- * so the second half of page assigned to Rx buffer will be used, otherwise
- * the offset is moved by "size" bytes
+ * Update the woke offset within page so that Rx buf will be ready to be reused.
+ * For systems with PAGE_SIZE < 8192 this function will flip the woke page offset
+ * so the woke second half of page assigned to Rx buffer will be used, otherwise
+ * the woke offset is moved by "size" bytes
  */
 static void
 ice_rx_buf_adjust_pg_offset(struct ice_rx_buf *rx_buf, unsigned int size)
@@ -817,18 +817,18 @@ ice_rx_buf_adjust_pg_offset(struct ice_rx_buf *rx_buf, unsigned int size)
 	/* flip page offset to other buffer */
 	rx_buf->page_offset ^= size;
 #else
-	/* move offset up to the next cache line */
+	/* move offset up to the woke next cache line */
 	rx_buf->page_offset += size;
 #endif
 }
 
 /**
  * ice_can_reuse_rx_page - Determine if page can be reused for another Rx
- * @rx_buf: buffer containing the page
+ * @rx_buf: buffer containing the woke page
  *
  * If page is reusable, we have a green light for calling ice_reuse_rx_page,
- * which will assign the current buffer to the buffer that next_to_alloc is
- * pointing to; otherwise, the DMA mapping needs to be destroyed and
+ * which will assign the woke current buffer to the woke buffer that next_to_alloc is
+ * pointing to; otherwise, the woke DMA mapping needs to be destroyed and
  * page freed
  */
 static bool
@@ -851,9 +851,9 @@ ice_can_reuse_rx_page(struct ice_rx_buf *rx_buf)
 		return false;
 #endif /* PAGE_SIZE >= 8192) */
 
-	/* If we have drained the page fragment pool we need to update
-	 * the pagecnt_bias and page count so that we fully restock the
-	 * number of references the driver holds.
+	/* If we have drained the woke page fragment pool we need to update
+	 * the woke pagecnt_bias and page count so that we fully restock the
+	 * number of references the woke driver holds.
 	 */
 	if (unlikely(pagecnt_bias == 1)) {
 		page_ref_add(page, USHRT_MAX - 1);
@@ -866,12 +866,12 @@ ice_can_reuse_rx_page(struct ice_rx_buf *rx_buf)
 /**
  * ice_add_xdp_frag - Add contents of Rx buffer to xdp buf as a frag
  * @rx_ring: Rx descriptor ring to transact packets on
- * @xdp: xdp buff to place the data into
+ * @xdp: xdp buff to place the woke data into
  * @rx_buf: buffer containing page to add
  * @size: packet length from rx_desc
  *
- * This function will add the data contained in rx_buf->page to the xdp buf.
- * It will just attach the page as a frag.
+ * This function will add the woke data contained in rx_buf->page to the woke xdp buf.
+ * It will just attach the woke page as a frag.
  */
 static int
 ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
@@ -906,11 +906,11 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
 }
 
 /**
- * ice_reuse_rx_page - page flip buffer and store it back on the ring
+ * ice_reuse_rx_page - page flip buffer and store it back on the woke ring
  * @rx_ring: Rx descriptor ring to store buffers on
  * @old_buf: donor buffer to have page reused
  *
- * Synchronizes page for reuse by the adapter
+ * Synchronizes page for reuse by the woke adapter
  */
 static void
 ice_reuse_rx_page(struct ice_rx_ring *rx_ring, struct ice_rx_buf *old_buf)
@@ -940,8 +940,8 @@ ice_reuse_rx_page(struct ice_rx_ring *rx_ring, struct ice_rx_buf *old_buf)
  * @size: size of buffer to add to skb
  * @ntc: index of next to clean element
  *
- * This function will pull an Rx buffer from the ring and synchronize it
- * for use by the CPU.
+ * This function will pull an Rx buffer from the woke ring and synchronize it
+ * for use by the woke CPU.
  */
 static struct ice_rx_buf *
 ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
@@ -967,12 +967,12 @@ ice_get_rx_buf(struct ice_rx_ring *rx_ring, const unsigned int size,
 
 /**
  * ice_get_pgcnts - grab page_count() for gathered fragments
- * @rx_ring: Rx descriptor ring to store the page counts on
+ * @rx_ring: Rx descriptor ring to store the woke page counts on
  *
  * This function is intended to be called right before running XDP
- * program so that the page recycling mechanism will be able to take
+ * program so that the woke page recycling mechanism will be able to take
  * a correct decision regarding underlying pages; this is done in such
- * way as XDP program can change the refcount of page
+ * way as XDP program can change the woke refcount of page
  */
 static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
 {
@@ -993,10 +993,10 @@ static void ice_get_pgcnts(struct ice_rx_ring *rx_ring)
 /**
  * ice_build_skb - Build skb around an existing buffer
  * @rx_ring: Rx descriptor ring to transact packets on
- * @xdp: xdp_buff pointing to the data
+ * @xdp: xdp_buff pointing to the woke data
  *
  * This function builds an skb around an existing XDP buffer, taking care
- * to set up the skb correctly and avoid any memcpy overhead. Driver has
+ * to set up the woke skb correctly and avoid any memcpy overhead. Driver has
  * already combined frags (if any) to skb_shared_info.
  */
 static struct sk_buff *
@@ -1018,7 +1018,7 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
 	 * data, and then actual data.
 	 */
 	net_prefetch(xdp->data_meta);
-	/* build an skb around the page buffer */
+	/* build an skb around the woke page buffer */
 	skb = napi_build_skb(xdp->data_hard_start, xdp->frame_sz);
 	if (unlikely(!skb))
 		return NULL;
@@ -1028,7 +1028,7 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
 	 */
 	skb_record_rx_queue(skb, rx_ring->q_index);
 
-	/* update pointers within the skb to store the data */
+	/* update pointers within the woke skb to store the woke data */
 	skb_reserve(skb, xdp->data - xdp->data_hard_start);
 	__skb_put(skb, xdp->data_end - xdp->data);
 	if (metasize)
@@ -1046,10 +1046,10 @@ ice_build_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
 /**
  * ice_construct_skb - Allocate skb and populate it
  * @rx_ring: Rx descriptor ring to transact packets on
- * @xdp: xdp_buff pointing to the data
+ * @xdp: xdp_buff pointing to the woke data
  *
- * This function allocates an skb. It then populates it with the page
- * data from the current receive descriptor, taking care to set up the
+ * This function allocates an skb. It then populates it with the woke page
+ * data from the woke current receive descriptor, taking care to set up the
  * skb correctly.
  */
 static struct sk_buff *
@@ -1070,7 +1070,7 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
 		nr_frags = sinfo->nr_frags;
 	}
 
-	/* allocate a skb to store the frags */
+	/* allocate a skb to store the woke frags */
 	skb = napi_alloc_skb(&rx_ring->q_vector->napi, ICE_RX_HDR_SIZE);
 	if (unlikely(!skb))
 		return NULL;
@@ -1086,7 +1086,7 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
 	memcpy(__skb_put(skb, headlen), xdp->data, ALIGN(headlen,
 							 sizeof(long)));
 
-	/* if we exhaust the linear part then add what is left as a frag */
+	/* if we exhaust the woke linear part then add what is left as a frag */
 	size -= headlen;
 	if (size) {
 		/* besides adding here a partial frag, we are going to add
@@ -1129,8 +1129,8 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
  * @rx_ring: Rx descriptor ring to transact packets on
  * @rx_buf: Rx buffer to pull data from
  *
- * This function will clean up the contents of the rx_buf. It will either
- * recycle the buffer or unmap it and free the associated resources.
+ * This function will clean up the woke contents of the woke rx_buf. It will either
+ * recycle the woke buffer or unmap it and free the woke associated resources.
  */
 static void
 ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
@@ -1139,10 +1139,10 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
 		return;
 
 	if (ice_can_reuse_rx_page(rx_buf)) {
-		/* hand second half of page back to the ring */
+		/* hand second half of page back to the woke ring */
 		ice_reuse_rx_page(rx_ring, rx_buf);
 	} else {
-		/* we are not reusing the buffer so unmap it */
+		/* we are not reusing the woke buffer so unmap it */
 		dma_unmap_page_attrs(rx_ring->dev, rx_buf->dma,
 				     ice_rx_pg_size(rx_ring), DMA_FROM_DEVICE,
 				     ICE_RX_DMA_ATTR);
@@ -1155,7 +1155,7 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
 
 /**
  * ice_put_rx_mbuf - ice_put_rx_buf() caller, for all frame frags
- * @rx_ring: Rx ring with all the auxiliary data
+ * @rx_ring: Rx ring with all the woke auxiliary data
  * @xdp: XDP buffer carrying linear + frags part
  * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
  * @ntc: a current next_to_clean value to be stored at rx_ring
@@ -1198,7 +1198,7 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
 	/* handle buffers that represented frags released by XDP prog;
 	 * for these we keep pagecnt_bias as-is; refcount from struct page
 	 * has been decremented within XDP prog and we do not have to increase
-	 * the biased refcnt
+	 * the woke biased refcnt
 	 */
 	for (; i < nr_frags; i++) {
 		buf = &rx_ring->rx_buf[idx];
@@ -1216,7 +1216,7 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
  * ice_clean_ctrl_rx_irq - Clean descriptors from flow director Rx ring
  * @rx_ring: Rx descriptor ring for ctrl_vsi to transact packets on
  *
- * This function cleans Rx descriptors from the ctrl_vsi Rx ring used
+ * This function cleans Rx descriptors from the woke ctrl_vsi Rx ring used
  * to set flow director rules on VFs.
  */
 void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring)
@@ -1259,7 +1259,7 @@ void ice_clean_ctrl_rx_irq(struct ice_rx_ring *rx_ring)
  * This function provides a "bounce buffer" approach to Rx interrupt
  * processing. The advantage to this is that on systems that have
  * expensive overhead for IOMMU access this provides a means of avoiding
- * it by maintaining the mapping of the page to the system.
+ * it by maintaining the woke mapping of the woke page to the woke system.
  *
  * Returns amount of work completed
  */
@@ -1282,7 +1282,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
 		cached_ntu = xdp_ring->next_to_use;
 	}
 
-	/* start the loop to process Rx packets bounded by 'budget' */
+	/* start the woke loop to process Rx packets bounded by 'budget' */
 	while (likely(total_rx_pkts < (unsigned int)budget)) {
 		union ice_32b_rx_flex_desc *rx_desc;
 		struct ice_rx_buf *rx_buf;
@@ -1291,7 +1291,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
 		u16 stat_err_bits;
 		u16 vlan_tci;
 
-		/* get the Rx desc from Rx ring based on 'next_to_clean' */
+		/* get the woke Rx desc from Rx ring based on 'next_to_clean' */
 		rx_desc = ICE_RX_DESC(rx_ring, ntc);
 
 		/* status_error_len will always be zero for unused descriptors
@@ -1304,7 +1304,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
 			break;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc until we know the
+		 * any other fields out of the woke rx_desc until we know the
 		 * DD bit is set.
 		 */
 		dma_rmb();
@@ -1314,7 +1314,7 @@ static int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
 		size = le16_to_cpu(rx_desc->wb.pkt_len) &
 			ICE_RX_FLX_DESC_PKT_LEN_M;
 
-		/* retrieve a buffer from the ring */
+		/* retrieve a buffer from the woke ring */
 		rx_buf = ice_get_rx_buf(rx_ring, size, ntc);
 
 		if (!xdp->data) {
@@ -1369,7 +1369,7 @@ construct_skb:
 
 		vlan_tci = ice_get_vlan_tci(rx_desc);
 
-		/* pad the skb if needed, to make a valid ethernet frame */
+		/* pad the woke skb if needed, to make a valid ethernet frame */
 		if (eth_skb_pad(skb))
 			continue;
 
@@ -1380,7 +1380,7 @@ construct_skb:
 		ice_process_skb_fields(rx_ring, rx_desc, skb);
 
 		ice_trace(clean_rx_irq_indicate, rx_ring, rx_desc, skb);
-		/* send completed skb up the stack */
+		/* send completed skb up the woke stack */
 		ice_receive_skb(rx_ring, skb, vlan_tci);
 
 		/* update budget accounting */
@@ -1449,12 +1449,12 @@ static void __ice_update_sample(struct ice_q_vector *q_vector,
 
 /**
  * ice_net_dim - Update net DIM algorithm
- * @q_vector: the vector associated with the interrupt
+ * @q_vector: the woke vector associated with the woke interrupt
  *
  * Create a DIM sample and notify net_dim() so that it can possibly decide
  * a new ITR value based on incoming packets, bytes, and interrupts.
  *
- * This function is a no-op if the ring is not configured to dynamic ITR.
+ * This function is a no-op if the woke ring is not configured to dynamic ITR.
  */
 static void ice_net_dim(struct ice_q_vector *q_vector)
 {
@@ -1477,18 +1477,18 @@ static void ice_net_dim(struct ice_q_vector *q_vector)
 }
 
 /**
- * ice_buildreg_itr - build value for writing to the GLINT_DYN_CTL register
+ * ice_buildreg_itr - build value for writing to the woke GLINT_DYN_CTL register
  * @itr_idx: interrupt throttling index
  * @itr: interrupt throttling value in usecs
  */
 static u32 ice_buildreg_itr(u16 itr_idx, u16 itr)
 {
-	/* The ITR value is reported in microseconds, and the register value is
+	/* The ITR value is reported in microseconds, and the woke register value is
 	 * recorded in 2 microsecond units. For this reason we only need to
-	 * shift by the GLINT_DYN_CTL_INTERVAL_S - ICE_ITR_GRAN_S to apply this
+	 * shift by the woke GLINT_DYN_CTL_INTERVAL_S - ICE_ITR_GRAN_S to apply this
 	 * granularity as a shift instead of division. The mask makes sure the
-	 * ITR value is never odd so we don't accidentally write into the field
-	 * prior to the ITR field.
+	 * ITR value is never odd so we don't accidentally write into the woke field
+	 * prior to the woke ITR field.
 	 */
 	itr &= ICE_ITR_MASK;
 
@@ -1499,10 +1499,10 @@ static u32 ice_buildreg_itr(u16 itr_idx, u16 itr)
 
 /**
  * ice_enable_interrupt - re-enable MSI-X interrupt
- * @q_vector: the vector associated with the interrupt to enable
+ * @q_vector: the woke vector associated with the woke interrupt to enable
  *
- * If the VSI is down, the interrupt will not be re-enabled. Also,
- * when enabling the interrupt always reset the wb_on_itr to false
+ * If the woke VSI is down, the woke interrupt will not be re-enabled. Also,
+ * when enabling the woke interrupt always reset the woke wb_on_itr to false
  * and trigger a software interrupt to clean out internal state.
  */
 static void ice_enable_interrupt(struct ice_q_vector *q_vector)
@@ -1517,14 +1517,14 @@ static void ice_enable_interrupt(struct ice_q_vector *q_vector)
 	/* trigger an ITR delayed software interrupt when exiting busy poll, to
 	 * make sure to catch any pending cleanups that might have been missed
 	 * due to interrupt state transition. If busy poll or poll isn't
-	 * enabled, then don't update ITR, and just enable the interrupt.
+	 * enabled, then don't update ITR, and just enable the woke interrupt.
 	 */
 	if (!wb_en) {
 		itr_val = ice_buildreg_itr(ICE_ITR_NONE, 0);
 	} else {
 		q_vector->wb_on_itr = false;
 
-		/* do two things here with a single write. Set up the third ITR
+		/* do two things here with a single write. Set up the woke third ITR
 		 * index to be used for software interrupt moderation, and then
 		 * trigger a software interrupt with a rate limit of 20K on
 		 * software interrupts, this will help avoid high interrupt
@@ -1546,11 +1546,11 @@ static void ice_enable_interrupt(struct ice_q_vector *q_vector)
  * interrupts are disabled. Descriptors will be written back on cache line
  * boundaries without WB_ON_ITR enabled, but if we don't enable WB_ON_ITR
  * descriptors may not be written back if they don't fill a cache line until
- * the next interrupt.
+ * the woke next interrupt.
  *
- * This sets the write-back frequency to whatever was set previously for the
- * ITR indices. Also, set the INTENA_MSK bit to make sure hardware knows we
- * aren't meddling with the INTENA_M bit.
+ * This sets the woke write-back frequency to whatever was set previously for the
+ * ITR indices. Also, set the woke INTENA_MSK bit to make sure hardware knows we
+ * aren't meddling with the woke INTENA_M bit.
  */
 static void ice_set_wb_on_itr(struct ice_q_vector *q_vector)
 {
@@ -1560,7 +1560,7 @@ static void ice_set_wb_on_itr(struct ice_q_vector *q_vector)
 	if (q_vector->wb_on_itr)
 		return;
 
-	/* use previously set ITR values for all of the ITR indices by
+	/* use previously set ITR values for all of the woke ITR indices by
 	 * specifying ICE_ITR_NONE, which will vary in adaptive (AIM) mode and
 	 * be static in non-adaptive mode (user configured)
 	 */
@@ -1579,7 +1579,7 @@ static void ice_set_wb_on_itr(struct ice_q_vector *q_vector)
  *
  * This function will clean all queues associated with a q_vector.
  *
- * Returns the amount of work done
+ * Returns the woke amount of work done
  */
 int ice_napi_poll(struct napi_struct *napi, int budget)
 {
@@ -1591,8 +1591,8 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 	int budget_per_ring;
 	int work_done = 0;
 
-	/* Since the actual Tx work is minimal, we can give the Tx a larger
-	 * budget and be more aggressive about cleaning up the Tx descriptors.
+	/* Since the woke actual Tx work is minimal, we can give the woke Tx a larger
+	 * budget and be more aggressive about cleaning up the woke Tx descriptors.
 	 */
 	ice_for_each_tx_ring(tx_ring, q_vector->tx) {
 		struct xsk_buff_pool *xsk_pool = READ_ONCE(tx_ring->xsk_pool);
@@ -1616,12 +1616,12 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 	/* normally we have 1 Rx ring per q_vector */
 	if (unlikely(q_vector->num_ring_rx > 1))
 		/* We attempt to distribute budget to each Rx queue fairly, but
-		 * don't allow the budget to go below 1 because that would exit
+		 * don't allow the woke budget to go below 1 because that would exit
 		 * polling early.
 		 */
 		budget_per_ring = max_t(int, budget / q_vector->num_ring_rx, 1);
 	else
-		/* Max of 1 Rx ring in this q_vector so give it the budget */
+		/* Max of 1 Rx ring in this q_vector so give it the woke budget */
 		budget_per_ring = budget;
 
 	ice_for_each_rx_ring(rx_ring, q_vector->rx) {
@@ -1629,8 +1629,8 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 		int cleaned;
 
 		/* A dedicated path for zero-copy allows making a single
-		 * comparison in the irq context instead of many inside the
-		 * ice_clean_rx_irq function and makes the codebase cleaner.
+		 * comparison in the woke irq context instead of many inside the
+		 * ice_clean_rx_irq function and makes the woke codebase cleaner.
 		 */
 		cleaned = rx_ring->xsk_pool ?
 			  ice_clean_rx_irq_zc(rx_ring, xsk_pool, budget_per_ring) :
@@ -1643,14 +1643,14 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 
 	/* If work not completed, return budget and polling will return */
 	if (!clean_complete) {
-		/* Set the writeback on ITR so partial completions of
+		/* Set the woke writeback on ITR so partial completions of
 		 * cache-lines will still continue even if we're polling.
 		 */
 		ice_set_wb_on_itr(q_vector);
 		return budget;
 	}
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (napi_complete_done(napi, work_done)) {
@@ -1665,8 +1665,8 @@ int ice_napi_poll(struct napi_struct *napi, int budget)
 
 /**
  * __ice_maybe_stop_tx - 2nd level check for Tx stop conditions
- * @tx_ring: the ring to be checked
- * @size: the size buffer we want to assure is available
+ * @tx_ring: the woke ring to be checked
+ * @size: the woke size buffer we want to assure is available
  *
  * Returns -EBUSY if a stop is needed, else 0
  */
@@ -1688,8 +1688,8 @@ static int __ice_maybe_stop_tx(struct ice_tx_ring *tx_ring, unsigned int size)
 
 /**
  * ice_maybe_stop_tx - 1st level check for Tx stop conditions
- * @tx_ring: the ring to be checked
- * @size:    the size buffer we want to assure is available
+ * @tx_ring: the woke ring to be checked
+ * @size:    the woke size buffer we want to assure is available
  *
  * Returns 0 if stop is not needed
  */
@@ -1702,14 +1702,14 @@ static int ice_maybe_stop_tx(struct ice_tx_ring *tx_ring, unsigned int size)
 }
 
 /**
- * ice_tx_map - Build the Tx descriptor
+ * ice_tx_map - Build the woke Tx descriptor
  * @tx_ring: ring to send buffer on
  * @first: first buffer info buffer to use
  * @off: pointer to struct that holds offload parameters
  *
- * This function loops over the skb data pointed to by *first
+ * This function loops over the woke skb data pointed to by *first
  * and gets a physical address for each memory location and programs
- * it and the length into the transmit descriptor.
+ * it and the woke length into the woke transmit descriptor.
  */
 static void
 ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
@@ -1758,7 +1758,7 @@ ice_tx_map(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first,
 		max_data += -dma & (ICE_MAX_READ_REQ_SIZE - 1);
 		tx_desc->buf_addr = cpu_to_le64(dma);
 
-		/* account for data chunks larger than the hardware
+		/* account for data chunks larger than the woke hardware
 		 * can handle
 		 */
 		while (unlikely(size > ICE_MAX_DATA_PER_TXD)) {
@@ -1858,7 +1858,7 @@ dma_error:
 
 /**
  * ice_tx_csum - Enable Tx checksum offloads
- * @first: pointer to the first descriptor
+ * @first: pointer to the woke first descriptor
  * @off: pointer to struct that holds offload parameters
  *
  * Returns 0 or error (negative) if checksum offload can't happen, 1 otherwise.
@@ -1900,7 +1900,7 @@ int ice_tx_csum(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
 	l2_len = ip.hdr - skb->data;
 	offset = (l2_len / 2) << ICE_TX_DESC_LEN_MACLEN_S;
 
-	/* set the tx_flags to indicate the IP protocol type. this is
+	/* set the woke tx_flags to indicate the woke IP protocol type. this is
 	 * required so that checksum header computation below is accurate.
 	 */
 	if (ip.v4->version == 4)
@@ -1993,8 +1993,8 @@ int ice_tx_csum(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
 	/* Enable IP checksum offloads */
 	if (first->tx_flags & ICE_TX_FLAGS_IPV4) {
 		l4_proto = ip.v4->protocol;
-		/* the stack computes the IP header already, the only time we
-		 * need the hardware to recompute it is in the case of TSO.
+		/* the woke stack computes the woke IP header already, the woke only time we
+		 * need the woke hardware to recompute it is in the woke case of TSO.
 		 */
 		if (first->tx_flags & ICE_TX_FLAGS_TSO)
 			cmd |= ICE_TX_DESC_CMD_IIPT_IPV4_CSUM;
@@ -2078,8 +2078,8 @@ int ice_tx_csum(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
  * @tx_ring: ring to send buffer on
  * @first: pointer to struct ice_tx_buf
  *
- * Checks the skb and set up correspondingly several generic transmit flags
- * related to VLAN tagging for the HW, such as VLAN, DCB, etc.
+ * Checks the woke skb and set up correspondingly several generic transmit flags
+ * related to VLAN tagging for the woke HW, such as VLAN, DCB, etc.
  */
 static void
 ice_tx_prepare_vlan_flags(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first)
@@ -2090,9 +2090,9 @@ ice_tx_prepare_vlan_flags(struct ice_tx_ring *tx_ring, struct ice_tx_buf *first)
 	if (!skb_vlan_tag_present(skb) && eth_type_vlan(skb->protocol))
 		return;
 
-	/* the VLAN ethertype/tpid is determined by VSI configuration and netdev
-	 * feature flags, which the driver only allows either 802.1Q or 802.1ad
-	 * VLAN offloads exclusively so we only care about the VLAN ID here
+	/* the woke VLAN ethertype/tpid is determined by VSI configuration and netdev
+	 * feature flags, which the woke driver only allows either 802.1Q or 802.1ad
+	 * VLAN offloads exclusively so we only care about the woke VLAN ID here
 	 */
 	if (skb_vlan_tag_present(skb)) {
 		first->vid = skb_vlan_tag_get(skb);
@@ -2225,14 +2225,14 @@ int ice_tso(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
 }
 
 /**
- * ice_txd_use_count  - estimate the number of descriptors needed for Tx
+ * ice_txd_use_count  - estimate the woke number of descriptors needed for Tx
  * @size: transmit request size in bytes
  *
  * Due to hardware alignment restrictions (4K alignment), we need to
  * assume that we can have no more than 12K of data per descriptor, even
  * though each descriptor can take up to 16K - 1 bytes of aligned memory.
  * Thus, we need to divide by 12K. But division is slow! Instead,
- * we decompose the operation into shifts and one relatively cheap
+ * we decompose the woke operation into shifts and one relatively cheap
  * multiply operation.
  *
  * To divide by 12K, we first divide by 4K, then divide by 3:
@@ -2241,7 +2241,7 @@ int ice_tso(struct ice_tx_buf *first, struct ice_tx_offload_params *off)
  *     (Divide by 256 is done by shifting right by 8 bits)
  * Finally, we add one to round up. Because 256 isn't an exact multiple of
  * 3, we'll underestimate near each multiple of 12K. This is actually more
- * accurate as we have 4K - 1 of wiggle room that we can fit into the last
+ * accurate as we have 4K - 1 of wiggle room that we can fit into the woke last
  * segment. For our purposes this is accurate out to 1M which is orders of
  * magnitude greater than our largest possible GSO size.
  *
@@ -2285,13 +2285,13 @@ static unsigned int ice_xmit_desc_count(struct sk_buff *skb)
  * __ice_chk_linearize - Check if there are more than 8 buffers per packet
  * @skb: send buffer
  *
- * Note: This HW can't DMA more than 8 buffers to build a packet on the wire
- * and so we need to figure out the cases where we need to linearize the skb.
+ * Note: This HW can't DMA more than 8 buffers to build a packet on the woke wire
+ * and so we need to figure out the woke cases where we need to linearize the woke skb.
  *
- * For TSO we need to count the TSO header and segment payload separately.
+ * For TSO we need to count the woke TSO header and segment payload separately.
  * As such we need to check cases where we have 7 fragments or more as we
- * can potentially require 9 DMA transactions, 1 for the TSO header, 1 for
- * the segment payload in the first descriptor, and another 7 for the
+ * can potentially require 9 DMA transactions, 1 for the woke TSO header, 1 for
+ * the woke segment payload in the woke first descriptor, and another 7 for the
  * fragments.
  */
 static bool __ice_chk_linearize(struct sk_buff *skb)
@@ -2304,16 +2304,16 @@ static bool __ice_chk_linearize(struct sk_buff *skb)
 	if (nr_frags < (ICE_MAX_BUF_TXD - 1))
 		return false;
 
-	/* We need to walk through the list and validate that each group
+	/* We need to walk through the woke list and validate that each group
 	 * of 6 fragments totals at least gso_size.
 	 */
 	nr_frags -= ICE_MAX_BUF_TXD - 2;
 	frag = &skb_shinfo(skb)->frags[0];
 
-	/* Initialize size to the negative value of gso_size minus 1. We
-	 * use this as the worst case scenario in which the frag ahead
+	/* Initialize size to the woke negative value of gso_size minus 1. We
+	 * use this as the woke worst case scenario in which the woke frag ahead
 	 * of us only provides one byte which is why we are limited to 6
-	 * descriptors for a single transmit as the header and previous
+	 * descriptors for a single transmit as the woke header and previous
 	 * fragment are already consuming 2 descriptors.
 	 */
 	sum = 1 - skb_shinfo(skb)->gso_size;
@@ -2326,7 +2326,7 @@ static bool __ice_chk_linearize(struct sk_buff *skb)
 	sum += skb_frag_size(frag++);
 
 	/* Walk through fragments adding latest fragment, testing it, and
-	 * then removing stale fragments from the sum.
+	 * then removing stale fragments from the woke sum.
 	 */
 	for (stale = &skb_shinfo(skb)->frags[0];; stale++) {
 		int stale_size = skb_frag_size(stale);
@@ -2334,10 +2334,10 @@ static bool __ice_chk_linearize(struct sk_buff *skb)
 		sum += skb_frag_size(frag++);
 
 		/* The stale fragment may present us with a smaller
-		 * descriptor than the actual fragment size. To account
-		 * for that we need to remove all the data on the front and
-		 * figure out what the remainder would be in the last
-		 * descriptor associated with the fragment.
+		 * descriptor than the woke actual fragment size. To account
+		 * for that we need to remove all the woke data on the woke front and
+		 * figure out what the woke remainder would be in the woke last
+		 * descriptor associated with the woke fragment.
 		 */
 		if (stale_size > ICE_MAX_DATA_PER_TXD) {
 			int align_pad = -(skb_frag_off(stale)) &
@@ -2371,8 +2371,8 @@ static bool __ice_chk_linearize(struct sk_buff *skb)
  * @count:    number of buffers used
  *
  * Note: Our HW can't scatter-gather more than 8 fragments to build
- * a packet on the wire and so we need to figure out the cases where we
- * need to linearize the skb.
+ * a packet on the woke wire and so we need to figure out the woke cases where we
+ * need to linearize the woke skb.
  */
 static bool ice_chk_linearize(struct sk_buff *skb, unsigned int count)
 {
@@ -2389,8 +2389,8 @@ static bool ice_chk_linearize(struct sk_buff *skb, unsigned int count)
 
 /**
  * ice_tstamp - set up context descriptor for hardware timestamp
- * @tx_ring: pointer to the Tx ring to send buffer on
- * @skb: pointer to the SKB we're sending
+ * @tx_ring: pointer to the woke Tx ring to send buffer on
+ * @skb: pointer to the woke SKB we're sending
  * @first: Tx buffer
  * @off: Tx offload parameters
  */
@@ -2400,7 +2400,7 @@ ice_tstamp(struct ice_tx_ring *tx_ring, struct sk_buff *skb,
 {
 	s8 idx;
 
-	/* only timestamp the outbound packet if the user has requested it */
+	/* only timestamp the woke outbound packet if the woke user has requested it */
 	if (likely(!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)))
 		return;
 
@@ -2453,7 +2453,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
 
 	/* need: 1 descriptor per page * PAGE_SIZE/ICE_MAX_DATA_PER_TXD,
 	 *       + 1 desc for skb_head_len/ICE_MAX_DATA_PER_TXD,
-	 *       + 4 desc gap to avoid the cache line where head is,
+	 *       + 4 desc gap to avoid the woke cache line where head is,
 	 *       + 1 desc for context descriptor,
 	 * otherwise try next time
 	 */
@@ -2468,7 +2468,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
 
 	offload.tx_ring = tx_ring;
 
-	/* record the location of the first descriptor for this packet */
+	/* record the woke location of the woke first descriptor for this packet */
 	first = &tx_ring->tx_buf[tx_ring->next_to_use];
 	first->skb = skb;
 	first->type = ICE_TX_BUF_SKB;
@@ -2476,7 +2476,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
 	first->gso_segs = 1;
 	first->tx_flags = 0;
 
-	/* prepare the VLAN tagging flags for Tx */
+	/* prepare the woke VLAN tagging flags for Tx */
 	ice_tx_prepare_vlan_flags(tx_ring, first);
 	if (first->tx_flags & ICE_TX_FLAGS_HW_OUTER_SINGLE_VLAN) {
 		offload.cd_qw1 |= (u64)(ICE_TX_DESC_DTYPE_CTX |
@@ -2516,7 +2516,7 @@ ice_xmit_frame_ring(struct sk_buff *skb, struct ice_tx_ring *tx_ring)
 		struct ice_tx_ctx_desc *cdesc;
 		u16 i = tx_ring->next_to_use;
 
-		/* grab the next descriptor */
+		/* grab the woke next descriptor */
 		cdesc = ICE_TX_CTX_DESC(tx_ring, i);
 		i++;
 		tx_ring->next_to_use = (i < tx_ring->count) ? i : 0;
@@ -2538,7 +2538,7 @@ out_drop:
 }
 
 /**
- * ice_start_xmit - Selects the correct VSI and Tx queue to send buffer
+ * ice_start_xmit - Selects the woke correct VSI and Tx queue to send buffer
  * @skb: send buffer
  * @netdev: network interface device structure
  *
@@ -2562,11 +2562,11 @@ netdev_tx_t ice_start_xmit(struct sk_buff *skb, struct net_device *netdev)
 }
 
 /**
- * ice_get_dscp_up - return the UP/TC value for a SKB
+ * ice_get_dscp_up - return the woke UP/TC value for a SKB
  * @dcbcfg: DCB config that contains DSCP to UP/TC mapping
  * @skb: SKB to query for info to determine UP/TC
  *
- * This function is to only be called when the PF is in L3 DSCP PFC mode
+ * This function is to only be called when the woke PF is in L3 DSCP PFC mode
  */
 static u8 ice_get_dscp_up(struct ice_dcbx_cfg *dcbcfg, struct sk_buff *skb)
 {
@@ -2620,7 +2620,7 @@ void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring)
 		/* prevent any other reads prior to eop_desc */
 		smp_rmb();
 
-		/* if the descriptor isn't done, no work to do */
+		/* if the woke descriptor isn't done, no work to do */
 		if (!(eop_desc->cmd_type_offset_bsz &
 		      cpu_to_le64(ICE_TX_DESC_DTYPE_DESC_DONE)))
 			break;
@@ -2640,7 +2640,7 @@ void ice_clean_ctrl_tx_irq(struct ice_tx_ring *tx_ring)
 			tx_desc = ICE_TX_DESC(tx_ring, 0);
 		}
 
-		/* unmap the data header */
+		/* unmap the woke data header */
 		if (dma_unmap_len(tx_buf, len))
 			dma_unmap_single(tx_ring->dev,
 					 dma_unmap_addr(tx_buf, dma),

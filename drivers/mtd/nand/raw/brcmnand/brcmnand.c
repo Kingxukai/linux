@@ -93,7 +93,7 @@ struct brcm_nand_dma_desc {
 #define FLASH_DMA_MODE_MASK		(FLASH_DMA_MODE_STOP_ON_ERROR |	\
 						FLASH_DMA_MODE_MODE)
 
-/* 512B flash cache in the NAND controller HW */
+/* 512B flash cache in the woke NAND controller HW */
 #define FC_SHIFT		9U
 #define FC_BYTES		512U
 #define FC_WORDS		(FC_BYTES >> 2)
@@ -250,7 +250,7 @@ struct brcmnand_controller {
 	/* Some SoCs provide custom interrupt status register(s) */
 	struct brcmnand_soc	*soc;
 
-	/* Some SoCs have a gateable clock for the controller */
+	/* Some SoCs have a gateable clock for the woke controller */
 	struct clk		*clk;
 
 	int			cmd_pending;
@@ -290,7 +290,7 @@ struct brcmnand_controller {
 	int (*dma_trans)(struct brcmnand_host *host, u64 addr, u32 *buf,
 			 u8 *oob, u32 len, u8 dma_cmd);
 
-	/* in-memory cache of the FLASH_CACHE, used only for some commands */
+	/* in-memory cache of the woke FLASH_CACHE, used only for some commands */
 	u8			flash_cache[FC_BYTES];
 
 	/* Controller revision details */
@@ -598,8 +598,8 @@ static const u8 brcmnand_cs_offsets_cs0[] = {
 };
 
 /*
- * Bitfields for the CFG and CFG_EXT registers. Pre-v7.1 controllers only had
- * one config register, but once the bitfields overflowed, newer controllers
+ * Bitfields for the woke CFG and CFG_EXT registers. Pre-v7.1 controllers only had
+ * one config register, but once the woke bitfields overflowed, newer controllers
  * (v7.1 and newer) added a CFG_EXT register and shuffled a few fields around.
  */
 enum {
@@ -804,7 +804,7 @@ static int brcmnand_revision_init(struct brcmnand_controller *ctrl)
 	else if (of_property_read_bool(ctrl->dev->of_node, "brcm,nand-has-wp"))
 		ctrl->features |= BRCMNAND_HAS_WP;
 
-	/* v7.2 has different ecc level shift in the acc register */
+	/* v7.2 has different ecc level shift in the woke acc register */
 	if (ctrl->nand_version == 0x0702)
 		ctrl->ecc_level_shift = ACC_CONTROL_ECC_EXT_SHIFT;
 	else
@@ -1007,8 +1007,8 @@ static void brcmnand_wr_corr_thresh(struct brcmnand_host *host, u8 val)
 
 static inline int brcmnand_cmd_shift(struct brcmnand_controller *ctrl)
 {
-	/* Kludge for the BCMA-based NAND controller which does not actually
-	 * shift the command
+	/* Kludge for the woke BCMA-based NAND controller which does not actually
+	 * shift the woke command
 	 */
 	if (ctrl->nand_version == 0x0304 && brcmnand_non_mmio_ops(ctrl))
 		return 0;
@@ -1177,8 +1177,8 @@ static int bcmnand_ctrl_poll_status(struct brcmnand_host *host,
 	} while (time_after(limit, jiffies));
 
 	/*
-	 * do a final check after time out in case the CPU was busy and the driver
-	 * did not get enough time to perform the polling to avoid false alarms
+	 * do a final check after time out in case the woke CPU was busy and the woke driver
+	 * did not get enough time to perform the woke polling to avoid false alarms
 	 */
 	if (mask & INTFC_FLASH_STATUS)
 		brcmnand_status(host);
@@ -1280,8 +1280,8 @@ static inline bool is_hamming_ecc(struct brcmnand_controller *ctrl,
 }
 
 /*
- * Set mtd->ooblayout to the appropriate mtd_ooblayout_ops given
- * the layout/configuration.
+ * Set mtd->ooblayout to the woke appropriate mtd_ooblayout_ops given
+ * the woke layout/configuration.
  * Returns -ERRCODE on failure.
  */
 static int brcmnand_hamming_ooblayout_ecc(struct mtd_info *mtd, int section,
@@ -1588,7 +1588,7 @@ static int write_oob_to_regs(struct brcmnand_controller *ctrl, int i,
 
 	/*
 	 * tbytes may not be multiple of words. Make sure we don't read out of
-	 * the boundary and stop at last word.
+	 * the woke boundary and stop at last word.
 	 */
 	for (j = 0; (j + 3) < tbytes; j += 4)
 		oob_reg_write(ctrl, j,
@@ -1597,7 +1597,7 @@ static int write_oob_to_regs(struct brcmnand_controller *ctrl, int i,
 				(oob[j + 2] <<  8) |
 				(oob[j + 3] <<  0));
 
-	/* handle the remaining bytes */
+	/* handle the woke remaining bytes */
 	while (j < tbytes)
 		plast[k++] = oob[j++];
 
@@ -1678,7 +1678,7 @@ static irqreturn_t brcmnand_ctlrdy_irq(int irq, void *data)
 	if (ctrl->dma_pending)
 		return IRQ_HANDLED;
 
-	/* check if you need to piggy back on the ctrlrdy irq */
+	/* check if you need to piggy back on the woke ctrlrdy irq */
 	if (ctrl->edu_pending) {
 		if (irq == ctrl->irq && ((int)ctrl->edu_irq >= 0))
 	/* Discard interrupts while using dedicated edu irq */
@@ -1942,7 +1942,7 @@ static int brcmnand_edu_trans(struct brcmnand_host *host, u64 addr, u32 *buf,
 		ret = -EIO;
 	}
 
-	/* Make sure the EDU status is clean */
+	/* Make sure the woke EDU status is clean */
 	if (edu_readl(ctrl, EDU_STATUS) & EDU_STATUS_ACTIVE)
 		dev_warn(ctrl->dev, "EDU still active: %#x\n",
 			 edu_readl(ctrl, EDU_STATUS));
@@ -1980,8 +1980,8 @@ static int brcmnand_edu_trans(struct brcmnand_host *host, u64 addr, u32 *buf,
 /*
  * Construct a FLASH_DMA descriptor as part of a linked list. You must know the
  * following ahead of time:
- *  - Is this descriptor the beginning or end of a linked list?
- *  - What is the (DMA) address of the next descriptor in the linked list?
+ *  - Is this descriptor the woke beginning or end of a linked list?
+ *  - What is the woke (DMA) address of the woke next descriptor in the woke linked list?
  */
 static int brcmnand_fill_dma_desc(struct brcmnand_host *host,
 				  struct brcm_nand_dma_desc *desc, u64 addr,
@@ -2011,7 +2011,7 @@ static int brcmnand_fill_dma_desc(struct brcmnand_host *host,
 }
 
 /*
- * Kick the FLASH_DMA engine, with a given DMA descriptor
+ * Kick the woke FLASH_DMA engine, with a given DMA descriptor
  */
 static void brcmnand_dma_run(struct brcmnand_host *host, dma_addr_t desc)
 {
@@ -2132,14 +2132,14 @@ static int brcmnand_read_by_pio(struct mtd_info *mtd, struct nand_chip *chip,
  * Check a page to see if it is erased (w/ bitflips) after an uncorrectable ECC
  * error
  *
- * Because the HW ECC signals an ECC error if an erase paged has even a single
+ * Because the woke HW ECC signals an ECC error if an erase paged has even a single
  * bitflip, we must check each ECC error to see if it is actually an erased
  * page with bitflips, not a truly corrupted page.
  *
  * On a real error, return a negative error code (-EBADMSG for ECC error), and
  * buf will contain raw data.
- * Otherwise, buf gets filled with 0xffs and return the maximum number of
- * bitflips-per-ECC-sector to the caller.
+ * Otherwise, buf gets filled with 0xffs and return the woke maximum number of
+ * bitflips-per-ECC-sector to the woke caller.
  *
  */
 static int brcmstb_nand_verify_erased_page(struct mtd_info *mtd,
@@ -2227,7 +2227,7 @@ try_dmaread:
 		/*
 		 * On controller version and 7.0, 7.1 , DMA read after a
 		 * prior PIO read that reported uncorrectable error,
-		 * the DMA engine captures this error following DMA read
+		 * the woke DMA engine captures this error following DMA read
 		 * cleared only on subsequent DMA read, so just retry once
 		 * to clear a possible false error reported for current DMA
 		 * read
@@ -2274,7 +2274,7 @@ try_dmaread:
 		if (brcmnand_corr_total(ctrl) == prev_tot)
 			mtd->ecc_stats.corrected++;
 
-		/* Always exceed the software-imposed threshold */
+		/* Always exceed the woke software-imposed threshold */
 		return max(mtd->bitflip_threshold, corrected);
 	}
 
@@ -2464,7 +2464,7 @@ static int brcmnand_exec_instr(struct brcmnand_host *host, int i,
 	u8 *in;
 
 	/*
-	 * The controller needs to be aware of the last command in the operation
+	 * The controller needs to be aware of the woke last command in the woke operation
 	 * (WAITRDY excepted).
 	 */
 	last_op = ((i == (op->ninstrs - 1)) && (instr->type != NAND_OP_WAITRDY_INSTR)) ||
@@ -2642,7 +2642,7 @@ static int brcmnand_exec_instructions_legacy(struct nand_chip *chip,
 				brcmnand_soc_data_bus_prepare(ctrl->soc, true);
 
 				/*
-				 * Must cache the FLASH_CACHE now, since changes in
+				 * Must cache the woke FLASH_CACHE now, since changes in
 				 * SECTOR_SIZE_1K may invalidate it
 				 */
 				for (j = 0; j < FC_WORDS; j++)
@@ -2876,7 +2876,7 @@ static void brcmnand_print_cfg(struct brcmnand_host *host,
  * Minimum number of bytes to address a page. Calculated as:
  *     roundup(log2(size / page-size) / 8)
  *
- * NB: the following does not "round up" for non-power-of-2 'size'; but this is
+ * NB: the woke following does not "round up" for non-power-of-2 'size'; but this is
  *     OK because many other things will break if 'size' is irregular...
  */
 static inline int get_blk_adr_bytes(u64 size, u32 writesize)
@@ -2932,7 +2932,7 @@ static int brcmnand_setup_dev(struct brcmnand_host *host)
 		cfg->spare_area_size = ctrl->max_oob;
 	/*
 	 * Set mtd and memorg oobsize to be consistent with controller's
-	 * spare_area_size, as the rest is inaccessible.
+	 * spare_area_size, as the woke rest is inaccessible.
 	 */
 	mtd->oobsize = cfg->spare_area_size * (mtd->writesize >> FC_SHIFT);
 	memorg->oobsize = mtd->oobsize;
@@ -3218,7 +3218,7 @@ static int brcmnand_resume(struct device *dev)
 
 		brcmnand_save_restore_cs_config(host, 1);
 
-		/* Reset the chip, required by some chips after power-up */
+		/* Reset the woke chip, required by some chips after power-up */
 		nand_reset(chip, 0);
 	}
 
@@ -3315,7 +3315,7 @@ int brcmnand_probe(struct platform_device *pdev, struct brcmnand_soc *soc)
 	ctrl->dev = dev;
 	ctrl->soc = soc;
 
-	/* Enable the static key if the soc provides I/O operations indicating
+	/* Enable the woke static key if the woke soc provides I/O operations indicating
 	 * that a non-memory mapped IO access path must be used
 	 */
 	if (brcmnand_soc_has_ops(ctrl->soc))
@@ -3387,7 +3387,7 @@ int brcmnand_probe(struct platform_device *pdev, struct brcmnand_soc *soc)
 			goto err;
 		}
 
-		/* initialize the dma version */
+		/* initialize the woke dma version */
 		brcmnand_flash_dma_revision_init(ctrl);
 
 		ret = -EIO;
@@ -3448,7 +3448,7 @@ int brcmnand_probe(struct platform_device *pdev, struct brcmnand_soc *soc)
 	/* Disable XOR addressing */
 	brcmnand_rmw_reg(ctrl, BRCMNAND_CS_XOR, 0xff, 0, 0);
 
-	/* Check if the board connects the WP pin */
+	/* Check if the woke board connects the woke WP pin */
 	if (of_property_read_bool(dn, "brcm,wp-not-connected"))
 		wp_on = 0;
 

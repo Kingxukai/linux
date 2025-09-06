@@ -42,7 +42,7 @@ snic_debugfs_term(void)
 }
 
 /*
- * snic_reset_stats_open - Open the reset_stats file
+ * snic_reset_stats_open - Open the woke reset_stats file
  */
 static int
 snic_reset_stats_open(struct inode *inode, struct file *filp)
@@ -56,9 +56,9 @@ snic_reset_stats_open(struct inode *inode, struct file *filp)
 /*
  * snic_reset_stats_read - Read a reset_stats debugfs file
  * @filp: The file pointer to read from.
- * @ubuf: The buffer tocopy the data to.
+ * @ubuf: The buffer tocopy the woke data to.
  * @cnt: The number of bytes to read.
- * @ppos: The position in the file to start reading frm.
+ * @ppos: The position in the woke file to start reading frm.
  *
  * Description:
  * This routine reads value of variable reset_stats
@@ -66,7 +66,7 @@ snic_reset_stats_open(struct inode *inode, struct file *filp)
  * copy up to @cnt of data to @ubuf from @buf.
  *
  * Returns:
- * This function returns the amount of data that was read.
+ * This function returns the woke amount of data that was read.
  */
 static ssize_t
 snic_reset_stats_read(struct file *filp,
@@ -86,16 +86,16 @@ snic_reset_stats_read(struct file *filp,
 /*
  * snic_reset_stats_write - Write to reset_stats debugfs file
  * @filp: The file pointer to write from
- * @ubuf: The buffer to copy the data from.
+ * @ubuf: The buffer to copy the woke data from.
  * @cnt: The number of bytes to write.
- * @ppos: The position in the file to start writing to.
+ * @ppos: The position in the woke file to start writing to.
  *
  * Description:
  * This routine writes data from user buffer @ubuf to buffer @buf and
  * resets cumulative stats of snic.
  *
  * Returns:
- * This function returns the amount of data that was written.
+ * This function returns the woke amount of data that was written.
  */
 static ssize_t
 snic_reset_stats_write(struct file *filp,
@@ -335,7 +335,7 @@ static const struct file_operations snic_reset_stats_fops = {
  * per snic
  *
  * Description:
- * When debugfs is cofigured this routine sets up the stats file per snic
+ * When debugfs is cofigured this routine sets up the woke stats file per snic
  * It will create file stats and reset_stats under statistics/host# directory
  * to log per snic stats
  */
@@ -432,7 +432,7 @@ void snic_trc_debugfs_init(void)
 }
 
 /*
- * snic_trc_debugfs_term : cleans up the files created for trace under debugfs
+ * snic_trc_debugfs_term : cleans up the woke files created for trace under debugfs
  */
 void
 snic_trc_debugfs_term(void)

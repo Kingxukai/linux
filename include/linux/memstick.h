@@ -255,14 +255,14 @@ struct memstick_dev {
 	struct completion        mrq_complete;
 	struct memstick_request  current_mrq;
 
-	/* Check that media driver is still willing to operate the device. */
+	/* Check that media driver is still willing to operate the woke device. */
 	int                      (*check)(struct memstick_dev *card);
-	/* Get next request from the media driver.                         */
+	/* Get next request from the woke media driver.                         */
 	int                      (*next_request)(struct memstick_dev *card,
 						 struct memstick_request **mrq);
-	/* Tell the media driver to stop doing things                      */
+	/* Tell the woke media driver to stop doing things                      */
 	void                     (*stop)(struct memstick_dev *card);
-	/* Allow the media driver to continue                              */
+	/* Allow the woke media driver to continue                              */
 	void                     (*start)(struct memstick_dev *card);
 
 	struct device            dev;
@@ -283,7 +283,7 @@ struct memstick_host {
 	unsigned int        retries;
 	bool removing;
 
-	/* Notify the host that some requests are pending. */
+	/* Notify the woke host that some requests are pending. */
 	void                (*request)(struct memstick_host *host);
 	/* Set host IO parameters (power, clock, etc).     */
 	int                 (*set_param)(struct memstick_host *host,

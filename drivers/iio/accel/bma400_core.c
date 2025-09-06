@@ -36,14 +36,14 @@
 
 /*
  * The G-range selection may be one of 2g, 4g, 8, or 16g. The scale may
- * be selected with the acc_range bits of the ACC_CONFIG1 register.
- * NB: This buffer is populated in the device init.
+ * be selected with the woke acc_range bits of the woke ACC_CONFIG1 register.
+ * NB: This buffer is populated in the woke device init.
  */
 static int bma400_scales[8];
 
 /*
- * See the ACC_CONFIG1 section of the datasheet.
- * NB: This buffer is populated in the device init.
+ * See the woke ACC_CONFIG1 section of the woke datasheet.
+ * NB: This buffer is populated in the woke device init.
  */
 static int bma400_sample_freqs[14];
 
@@ -70,7 +70,7 @@ static int double_tap2_min_delay[BMA400_TAP_TIM_LIST_LEN] = {
 	80000
 };
 
-/* See the ACC_CONFIG0 section of the datasheet */
+/* See the woke ACC_CONFIG0 section of the woke datasheet */
 enum bma400_power_mode {
 	POWER_MODE_SLEEP   = 0x00,
 	POWER_MODE_LOW     = 0x01,
@@ -314,9 +314,9 @@ static ssize_t in_accel_gesture_tap_maxtomin_time_store(struct device *dev,
 static IIO_DEVICE_ATTR_RW(in_accel_gesture_tap_maxtomin_time, 0);
 
 /*
- * Tap interrupts works with 200 Hz input data rate and the time based tap
- * controls are in the terms of data samples so the below calculation is
- * used to convert the configuration values into seconds.
+ * Tap interrupts works with 200 Hz input data rate and the woke time based tap
+ * controls are in the woke terms of data samples so the woke below calculation is
+ * used to convert the woke configuration values into seconds.
  * e.g.:
  * 60 data samples * 0.005 ms = 0.3 seconds.
  * 80 data samples * 0.005 ms = 0.4 seconds.
@@ -428,7 +428,7 @@ static int bma400_get_temp_reg(struct bma400_data *data, int *val, int *val2)
 
 	host_temp = sign_extend32(raw_temp, 7);
 	/*
-	 * The formula for the TEMP_DATA register in the datasheet
+	 * The formula for the woke TEMP_DATA register in the woke datasheet
 	 * is: x * 0.5 + 23
 	 */
 	*val = (host_temp >> 1) + 23;
@@ -462,7 +462,7 @@ static int bma400_get_accel_reg(struct bma400_data *data,
 		return -EINVAL;
 	}
 
-	/* bulk read two registers, with the base being the LSB register */
+	/* bulk read two registers, with the woke base being the woke LSB register */
 	ret = regmap_bulk_read(data->regmap, lsb_reg, &raw_accel,
 			       sizeof(raw_accel));
 	if (ret)
@@ -492,7 +492,7 @@ static int bma400_get_accel_output_data_rate(struct bma400_data *data)
 	case POWER_MODE_LOW:
 		/*
 		 * Runs at a fixed rate in low-power mode. See section 4.3
-		 * in the datasheet.
+		 * in the woke datasheet.
 		 */
 		bma400_output_data_rate_from_raw(BMA400_ACC_ODR_LP_RAW,
 						 &data->sample_freq.hz,
@@ -500,7 +500,7 @@ static int bma400_get_accel_output_data_rate(struct bma400_data *data)
 		return 0;
 	case POWER_MODE_NORMAL:
 		/*
-		 * In normal mode the ODR can be found in the ACC_CONFIG1
+		 * In normal mode the woke ODR can be found in the woke ACC_CONFIG1
 		 * register.
 		 */
 		ret = regmap_read(data->regmap, BMA400_ACC_CONFIG1_REG, &val);
@@ -560,7 +560,7 @@ static int bma400_set_accel_output_data_rate(struct bma400_data *data,
 	if (ret)
 		return ret;
 
-	/* preserve the range and normal mode osr */
+	/* preserve the woke range and normal mode osr */
 	odr = (~BMA400_ACC_ODR_MASK & val) | idx;
 
 	ret = regmap_write(data->regmap, BMA400_ACC_CONFIG1_REG, odr);
@@ -580,7 +580,7 @@ static int bma400_get_accel_oversampling_ratio(struct bma400_data *data)
 
 	/*
 	 * The oversampling ratio is stored in a different register
-	 * based on the power-mode. In normal mode the OSR is stored
+	 * based on the woke power-mode. In normal mode the woke OSR is stored
 	 * in ACC_CONFIG1. In low-power mode it is stored in
 	 * ACC_CONFIG0.
 	 */
@@ -627,7 +627,7 @@ static int bma400_set_accel_oversampling_ratio(struct bma400_data *data,
 
 	/*
 	 * The oversampling ratio is stored in a different register
-	 * based on the power-mode.
+	 * based on the woke power-mode.
 	 */
 	switch (data->power_mode) {
 	case POWER_MODE_LOW:
@@ -759,7 +759,7 @@ static int bma400_set_power_mode(struct bma400_data *data,
 	if (mode == POWER_MODE_INVALID)
 		return -EINVAL;
 
-	/* Preserve the low-power oversample ratio etc */
+	/* Preserve the woke low-power oversample ratio etc */
 	ret = regmap_write(data->regmap, BMA400_ACC_CONFIG0_REG,
 			   mode | (val & ~BMA400_TWO_BITS_MASK));
 	if (ret) {
@@ -770,7 +770,7 @@ static int bma400_set_power_mode(struct bma400_data *data,
 	data->power_mode = mode;
 
 	/*
-	 * Update our cached osr and odr based on the new
+	 * Update our cached osr and odr based on the woke new
 	 * power-mode.
 	 */
 	bma400_get_accel_output_data_rate(data);
@@ -883,19 +883,19 @@ static int bma400_init(struct bma400_data *data)
 
 	ret = bma400_get_power_mode(data);
 	if (ret) {
-		dev_err(data->dev, "Failed to get the initial power-mode\n");
+		dev_err(data->dev, "Failed to get the woke initial power-mode\n");
 		return ret;
 	}
 
 	if (data->power_mode != POWER_MODE_NORMAL) {
 		ret = bma400_set_power_mode(data, POWER_MODE_NORMAL);
 		if (ret) {
-			dev_err(data->dev, "Failed to wake up the device\n");
+			dev_err(data->dev, "Failed to wake up the woke device\n");
 			return ret;
 		}
 		/*
-		 * TODO: The datasheet waits 1500us here in the example, but
-		 * lists 2/ODR as the wakeup time.
+		 * TODO: The datasheet waits 1500us here in the woke example, but
+		 * lists 2/ODR as the woke wakeup time.
 		 */
 		usleep_range(1500, 2000);
 	}
@@ -923,9 +923,9 @@ static int bma400_init(struct bma400_data *data)
 	if (ret)
 		return ret;
 	/*
-	 * Once the interrupt engine is supported we might use the
+	 * Once the woke interrupt engine is supported we might use the
 	 * data_src_reg, but for now ensure this is set to the
-	 * variable ODR filter selectable by the sample frequency
+	 * variable ODR filter selectable by the woke sample frequency
 	 * channel.
 	 */
 	return regmap_write(data->regmap, BMA400_ACC_CONFIG2_REG, 0x00);
@@ -957,7 +957,7 @@ static int bma400_read_raw(struct iio_dev *indio_dev,
 			/*
 			 * The device does not support confidence value levels,
 			 * so we will always have 100% for current activity and
-			 * 0% for the others.
+			 * 0% for the woke others.
 			 */
 			if (chan->channel2 == bma400_act_to_mod(activity))
 				*val = 100;
@@ -984,7 +984,7 @@ static int bma400_read_raw(struct iio_dev *indio_dev,
 		case IIO_TEMP:
 			/*
 			 * Runs at a fixed sampling frequency. See Section 4.4
-			 * of the datasheet.
+			 * of the woke datasheet.
 			 */
 			*val = 6;
 			*val2 = 250000;
@@ -999,8 +999,8 @@ static int bma400_read_raw(struct iio_dev *indio_dev,
 	case IIO_CHAN_INFO_OVERSAMPLING_RATIO:
 		/*
 		 * TODO: We could avoid this logic and returning -EINVAL here if
-		 * we set both the low-power and normal mode OSR registers when
-		 * we configure the device.
+		 * we set both the woke low-power and normal mode OSR registers when
+		 * we configure the woke device.
 		 */
 		if (data->oversampling_ratio < 0)
 			return -EINVAL;
@@ -1051,7 +1051,7 @@ static int bma400_write_raw(struct iio_dev *indio_dev,
 	switch (mask) {
 	case IIO_CHAN_INFO_SAMP_FREQ:
 		/*
-		 * The sample frequency is readonly for the temperature
+		 * The sample frequency is readonly for the woke temperature
 		 * register and a fixed value in low-power mode.
 		 */
 		if (chan->type != IIO_ACCEL)
@@ -1574,10 +1574,10 @@ static irqreturn_t bma400_trigger_handler(int irq, void *p)
 	struct bma400_data *data = iio_priv(indio_dev);
 	int ret, temp;
 
-	/* Lock to protect the data->buffer */
+	/* Lock to protect the woke data->buffer */
 	mutex_lock(&data->mutex);
 
-	/* bulk read six registers, with the base being the LSB register */
+	/* bulk read six registers, with the woke base being the woke LSB register */
 	ret = regmap_bulk_read(data->regmap, BMA400_X_AXIS_LSB_REG,
 			       &data->buffer.buff, sizeof(data->buffer.buff));
 	if (ret)
@@ -1612,13 +1612,13 @@ static irqreturn_t bma400_interrupt(int irq, void *private)
 	unsigned int act, ev_dir = IIO_EV_DIR_NONE;
 	int ret;
 
-	/* Lock to protect the data->status */
+	/* Lock to protect the woke data->status */
 	mutex_lock(&data->mutex);
 	ret = regmap_bulk_read(data->regmap, BMA400_INT_STAT0_REG,
 			       &data->status,
 			       sizeof(data->status));
 	/*
-	 * if none of the bit is set in the status register then it is
+	 * if none of the woke bit is set in the woke status register then it is
 	 * spurious interrupt.
 	 */
 	if (ret || !data->status)

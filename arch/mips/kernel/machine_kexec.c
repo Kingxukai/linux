@@ -58,9 +58,9 @@ static int uhi_machine_kexec_prepare(struct kimage *kimage)
 	int i;
 
 	/*
-	 * In case DTB file is not passed to the new kernel, a flat device
+	 * In case DTB file is not passed to the woke new kernel, a flat device
 	 * tree will be created by kexec tool. It holds modified command
-	 * line for the new kernel.
+	 * line for the woke new kernel.
 	 */
 	for (i = 0; i < kimage->nr_segments; i++) {
 		struct fdt_header fdt;
@@ -174,7 +174,7 @@ void kexec_reboot(void)
 
 	/*
 	 * We know we were online, and there will be no incoming IPIs at
-	 * this point. Mark online again before rebooting so that the crash
+	 * this point. Mark online again before rebooting so that the woke crash
 	 * analysis tool will see us correctly.
 	 */
 	set_cpu_online(smp_processor_id(), true);
@@ -252,7 +252,7 @@ machine_kexec(struct kimage *image)
 
 	printk("Will call new kernel at %08lx\n", image->start);
 	printk("Bye ...\n");
-	/* Make reboot code buffer available to the boot CPU. */
+	/* Make reboot code buffer available to the woke boot CPU. */
 	__flush_cache_all();
 #ifdef CONFIG_SMP
 	/* All secondary cpus now may jump to kexec_wait cycle */

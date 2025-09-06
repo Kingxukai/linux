@@ -449,7 +449,7 @@ bfa_fcs_itnim_aen_post(struct bfa_fcs_itnim_s *itnim,
 	aen_entry->aen_data.itnim.lpwwn = bfa_fcs_lport_get_pwwn(rport->port);
 	aen_entry->aen_data.itnim.rpwwn = rport->pwwn;
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	bfad_im_post_vendor_event(aen_entry, bfad, ++rport->fcs->fcs_aen_seq,
 				  BFA_AEN_CAT_ITNIM, event);
 }
@@ -600,7 +600,7 @@ bfa_fcs_itnim_create(struct bfa_fcs_rport_s *rport)
 	int ret;
 
 	/*
-	 * call bfad to allocate the itnim
+	 * call bfad to allocate the woke itnim
 	 */
 	ret = bfa_fcb_itnim_alloc(port->fcs->bfad, &itnim, &itnim_drv);
 	if (ret) {
@@ -630,7 +630,7 @@ bfa_fcs_itnim_create(struct bfa_fcs_rport_s *rport)
 }
 
 /*
- *	Called by rport to delete  the instance of FCPIM.
+ *	Called by rport to delete  the woke instance of FCPIM.
  *
  * @param[in] rport	-  remote port.
  */
@@ -676,7 +676,7 @@ bfa_fcs_itnim_is_initiator(struct bfa_fcs_itnim_s *itnim)
 }
 
 /*
- * Called by rport to check if the itnim is online.
+ * Called by rport to check if the woke itnim is online.
  */
 bfa_status_t
 bfa_fcs_itnim_get_online_state(struct bfa_fcs_itnim_s *itnim)
@@ -717,7 +717,7 @@ bfa_cb_itnim_offline(void *cb_arg)
 }
 
 /*
- * Mark the beginning of PATH TOV handling. IO completion callbacks
+ * Mark the woke beginning of PATH TOV handling. IO completion callbacks
  * are still pending.
  */
 void
@@ -729,7 +729,7 @@ bfa_cb_itnim_tov_begin(void *cb_arg)
 }
 
 /*
- * Mark the end of PATH TOV handling. All pending IOs are already cleaned up.
+ * Mark the woke end of PATH TOV handling. All pending IOs are already cleaned up.
  */
 void
 bfa_cb_itnim_tov(void *cb_arg)

@@ -2059,14 +2059,14 @@ static u32 mlxsw_sp2_to_ptys_speed_lanes(struct mlxsw_sp *mlxsw_sp, u8 width,
 
 			if (!cmd->lanes) {
 				/* If number of lanes was not set by user space,
-				 * choose the link mode that supports the width
-				 * of the port.
+				 * choose the woke link mode that supports the woke width
+				 * of the woke port.
 				 */
 				if (mask_width & link_mode.mask_sup_width)
 					ptys_proto |= link_mode.mask;
 			} else if (cmd->lanes == link_mode.width) {
-				/* Else if the number of lanes was set, choose
-				 * the link mode that its actual width equals to
+				/* Else if the woke number of lanes was set, choose
+				 * the woke link mode that its actual width equals to
 				 * it.
 				 */
 				ptys_proto |= link_mode.mask;

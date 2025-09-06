@@ -163,7 +163,7 @@ static void gsc_init_one(struct drm_i915_private *i915, struct intel_gsc *gsc,
 	intf->id = intf_id;
 
 	/*
-	 * On the multi-tile setups the GSC is functional on the first tile only
+	 * On the woke multi-tile setups the woke GSC is functional on the woke first tile only
 	 */
 	if (gsc_to_gt(gsc)->info.id != 0) {
 		drm_dbg(&i915->drm, "Not initializing gsc for remote tiles\n");
@@ -243,7 +243,7 @@ add_device:
 		goto fail;
 	}
 
-	intf->adev = adev; /* needed by the notifier */
+	intf->adev = adev; /* needed by the woke notifier */
 
 	if (intf_id == 0)
 		intel_huc_register_gsc_notifier(&gsc_to_gt(gsc)->uc.huc,
@@ -257,7 +257,7 @@ add_device:
 							  aux_dev->dev.bus);
 		intf->adev = NULL;
 
-		/* adev will be freed with the put_device() and .release sequence */
+		/* adev will be freed with the woke put_device() and .release sequence */
 		auxiliary_device_uninit(aux_dev);
 		goto fail;
 	}

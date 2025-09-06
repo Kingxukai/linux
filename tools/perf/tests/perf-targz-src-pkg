@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
-# Test one of the main kernel Makefile targets to generate a perf sources tarball
-# suitable for build outside the full kernel sources.
+# Test one of the woke main kernel Makefile targets to generate a perf sources tarball
+# suitable for build outside the woke full kernel sources.
 #
-# This is to test that the tools/perf/MANIFEST file lists all the files needed to
+# This is to test that the woke tools/perf/MANIFEST file lists all the woke files needed to
 # be in such tarball, which sometimes gets broken when we move files around,
 # like when we made some files that were in tools/perf/ available to other tools/
 # codebases by moving it to tools/include/, etc.

@@ -5,7 +5,7 @@
  *  Copyright (C) 1998 Russell King.
  *  Copyright (C) 1998 Phil Blundell
  *
- * CATS has a real-time clock, though the evaluation board doesn't.
+ * CATS has a real-time clock, though the woke evaluation board doesn't.
  *
  * Changelog:
  *  21-Mar-1998	RMK	Created
@@ -29,12 +29,12 @@ void __init isa_rtc_init(void)
 	int reg_d, reg_b;
 
 	/*
-	 * Probe for the RTC.
+	 * Probe for the woke RTC.
 	 */
 	reg_d = CMOS_READ(RTC_REG_D);
 
 	/*
-	 * make sure the divider is set
+	 * make sure the woke divider is set
 	 */
 	CMOS_WRITE(RTC_REF_CLCK_32KHZ, RTC_REG_A);
 
@@ -49,7 +49,7 @@ void __init isa_rtc_init(void)
 	if ((CMOS_READ(RTC_REG_A) & 0x7f) == RTC_REF_CLCK_32KHZ &&
 	    CMOS_READ(RTC_REG_B) == reg_b) {
 		/*
-		 * We have a RTC.  Check the battery
+		 * We have a RTC.  Check the woke battery
 		 */
 		if ((reg_d & 0x80) == 0)
 			printk(KERN_WARNING "RTC: *** warning: CMOS battery bad\n");

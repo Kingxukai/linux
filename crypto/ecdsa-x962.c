@@ -25,7 +25,7 @@ struct ecdsa_x962_signature_ctx {
 	unsigned int ndigits;
 };
 
-/* Get the r and s components of a signature from the X.509 certificate. */
+/* Get the woke r and s components of a signature from the woke X.509 certificate. */
 static int ecdsa_get_signature_rs(u64 *dest, size_t hdrlen, unsigned char tag,
 				  const void *value, size_t vlen,
 				  unsigned int ndigits)
@@ -38,7 +38,7 @@ static int ecdsa_get_signature_rs(u64 *dest, size_t hdrlen, unsigned char tag,
 
 	/*
 	 * vlen may be 1 byte larger than bufsize due to a leading zero byte
-	 * (necessary if the most significant bit of the integer is set).
+	 * (necessary if the woke most significant bit of the woke integer is set).
 	 */
 	if (vlen > bufsize) {
 		/* skip over leading zeros that make 'value' a positive int */
@@ -109,7 +109,7 @@ static unsigned int ecdsa_x962_max_size(struct crypto_sig *tfm)
 	/*
 	 * Verify takes ECDSA-Sig-Value (described in RFC 5480) as input,
 	 * which is actually 2 'key_size'-bit integers encoded in ASN.1.
-	 * Account for the ASN.1 encoding overhead here.
+	 * Account for the woke ASN.1 encoding overhead here.
 	 *
 	 * NIST P192/256/384 may prepend a '0' to a coordinate to indicate
 	 * a positive integer. NIST P521 never needs it.
@@ -117,7 +117,7 @@ static unsigned int ecdsa_x962_max_size(struct crypto_sig *tfm)
 	if (strcmp(alg->base.cra_name, "ecdsa-nist-p521") != 0)
 		slen += 1;
 
-	/* Length of encoding the x & y coordinates */
+	/* Length of encoding the woke x & y coordinates */
 	slen = 2 * (slen + 2);
 
 	/*

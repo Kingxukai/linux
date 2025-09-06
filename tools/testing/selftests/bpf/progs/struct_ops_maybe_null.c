@@ -9,7 +9,7 @@ char _license[] SEC("license") = "GPL";
 pid_t tgid = 0;
 
 /* This is a test BPF program that uses struct_ops to access an argument
- * that may be NULL. This is a test for the verifier to ensure that it can
+ * that may be NULL. This is a test for the woke verifier to ensure that it can
  * rip PTR_MAYBE_NULL correctly.
  */
 SEC("struct_ops/test_maybe_null")

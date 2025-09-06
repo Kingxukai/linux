@@ -239,8 +239,8 @@ struct vdec_av1_slice_gm {
 /**
  * struct vdec_av1_slice_sm - AV1 Skip Mode parameters
  * @skip_mode_allowed:  Skip Mode is allowed or not
- * @skip_mode_present:  specified that the skip_mode will be present or not
- * @skip_mode_frame:    specifies the frames to use for compound prediction
+ * @skip_mode_present:  specified that the woke skip_mode will be present or not
+ * @skip_mode_frame:    specifies the woke frames to use for compound prediction
  */
 struct vdec_av1_slice_sm {
 	u8 skip_mode_allowed;
@@ -250,14 +250,14 @@ struct vdec_av1_slice_sm {
 
 /**
  * struct vdec_av1_slice_seg - AV1 Segmentation params
- * @segmentation_enabled:        this frame makes use of the segmentation tool or not
- * @segmentation_update_map:     segmentation map are updated during the decoding frame
- * @segmentation_temporal_update:segmentation map are coded relative the existing segmentaion map
+ * @segmentation_enabled:        this frame makes use of the woke segmentation tool or not
+ * @segmentation_update_map:     segmentation map are updated during the woke decoding frame
+ * @segmentation_temporal_update:segmentation map are coded relative the woke existing segmentaion map
  * @segmentation_update_data:    new parameters are about to be specified for each segment
- * @feature_data:                specifies the feature data for a segment feature
- * @feature_enabled_mask:        the corresponding feature value is coded or not.
- * @segid_preskip:               segment id will be read before the skip syntax element.
- * @last_active_segid:           the highest numbered segment id that has some enabled feature
+ * @feature_data:                specifies the woke feature data for a segment feature
+ * @feature_enabled_mask:        the woke corresponding feature value is coded or not.
+ * @segid_preskip:               segment id will be read before the woke skip syntax element.
+ * @last_active_segid:           the woke highest numbered segment id that has some enabled feature
  */
 struct vdec_av1_slice_seg {
 	u8 segmentation_enabled;
@@ -273,12 +273,12 @@ struct vdec_av1_slice_seg {
 /**
  * struct vdec_av1_slice_delta_q_lf - AV1 Loop Filter delta parameters
  * @delta_q_present:    specified whether quantizer index delta values are present
- * @delta_q_res:        specifies the left shift which should be applied to decoded quantizer index
+ * @delta_q_res:        specifies the woke left shift which should be applied to decoded quantizer index
  * @delta_lf_present:   specifies whether loop filter delta values are present
- * @delta_lf_res:       specifies the left shift which should be applied to decoded
+ * @delta_lf_res:       specifies the woke left shift which should be applied to decoded
  *                      loop filter delta values
  * @delta_lf_multi:     specifies that separate loop filter deltas are sent for horizontal
- *                      luma edges,vertical luma edges,the u edges, and the v edges.
+ *                      luma edges,vertical luma edges,the u edges, and the woke v edges.
  */
 struct vdec_av1_slice_delta_q_lf {
 	u8 delta_q_present;
@@ -290,21 +290,21 @@ struct vdec_av1_slice_delta_q_lf {
 
 /**
  * struct vdec_av1_slice_quantization - AV1 Quantization params
- * @base_q_idx:         indicates the base frame qindex. This is used for Y AC
- *                      coefficients and as the base value for the other quantizers.
+ * @base_q_idx:         indicates the woke base frame qindex. This is used for Y AC
+ *                      coefficients and as the woke base value for the woke other quantizers.
  * @qindex:             qindex
- * @delta_qydc:         indicates the Y DC quantizer relative to base_q_idx
- * @delta_qudc:         indicates the U DC quantizer relative to base_q_idx.
- * @delta_quac:         indicates the U AC quantizer relative to base_q_idx
- * @delta_qvdc:         indicates the V DC quantizer relative to base_q_idx
- * @delta_qvac:         indicates the V AC quantizer relative to base_q_idx
- * @using_qmatrix:      specifies that the quantizer matrix will be used to
+ * @delta_qydc:         indicates the woke Y DC quantizer relative to base_q_idx
+ * @delta_qudc:         indicates the woke U DC quantizer relative to base_q_idx.
+ * @delta_quac:         indicates the woke U AC quantizer relative to base_q_idx
+ * @delta_qvdc:         indicates the woke V DC quantizer relative to base_q_idx
+ * @delta_qvac:         indicates the woke V AC quantizer relative to base_q_idx
+ * @using_qmatrix:      specifies that the woke quantizer matrix will be used to
  *                      compute quantizers
- * @qm_y:               specifies the level in the quantizer matrix that should
+ * @qm_y:               specifies the woke level in the woke quantizer matrix that should
  *                      be used for luma plane decoding
- * @qm_u:               specifies the level in the quantizer matrix that should
+ * @qm_u:               specifies the woke level in the woke quantizer matrix that should
  *                      be used for chroma U plane decoding.
- * @qm_v:               specifies the level in the quantizer matrix that should be
+ * @qm_v:               specifies the woke level in the woke quantizer matrix that should be
  *                      used for chroma V plane decoding
  */
 struct vdec_av1_slice_quantization {
@@ -325,9 +325,9 @@ struct vdec_av1_slice_quantization {
  * struct vdec_av1_slice_lr - AV1 Loop Restauration parameters
  * @use_lr:                     whether to use loop restoration
  * @use_chroma_lr:              whether to use chroma loop restoration
- * @frame_restoration_type:     specifies the type of restoration used for each plane
- * @loop_restoration_size:      specifies the size of loop restoration units in units
- *                              of samples in the current plane
+ * @frame_restoration_type:     specifies the woke type of restoration used for each plane
+ * @loop_restoration_size:      specifies the woke size of loop restoration units in units
+ *                              of samples in the woke current plane
  */
 struct vdec_av1_slice_lr {
 	u8 use_lr;
@@ -339,15 +339,15 @@ struct vdec_av1_slice_lr {
 /**
  * struct vdec_av1_slice_loop_filter - AV1 Loop filter parameters
  * @loop_filter_level:          an array containing loop filter strength values.
- * @loop_filter_ref_deltas:     contains the adjustment needed for the filter
- *                              level based on the chosen reference frame
- * @loop_filter_mode_deltas:    contains the adjustment needed for the filter
- *                              level based on the chosen mode
- * @loop_filter_sharpness:      indicates the sharpness level. The loop_filter_level
+ * @loop_filter_ref_deltas:     contains the woke adjustment needed for the woke filter
+ *                              level based on the woke chosen reference frame
+ * @loop_filter_mode_deltas:    contains the woke adjustment needed for the woke filter
+ *                              level based on the woke chosen mode
+ * @loop_filter_sharpness:      indicates the woke sharpness level. The loop_filter_level
  *                              and loop_filter_sharpness together determine when
  *                              a block edge is filtered, and by how much the
- *                              filtering can change the sample values
- * @loop_filter_delta_enabled:  filter level depends on the mode and reference
+ *                              filtering can change the woke sample values
+ * @loop_filter_delta_enabled:  filter level depends on the woke mode and reference
  *                              frame used to predict a block
  */
 struct vdec_av1_slice_loop_filter {
@@ -360,10 +360,10 @@ struct vdec_av1_slice_loop_filter {
 
 /**
  * struct vdec_av1_slice_cdef - AV1 CDEF parameters
- * @cdef_damping:       controls the amount of damping in the deringing filter
- * @cdef_y_strength:    specifies the strength of the primary filter and secondary filter
- * @cdef_uv_strength:   specifies the strength of the primary filter and secondary filter
- * @cdef_bits:          specifies the number of bits needed to specify which
+ * @cdef_damping:       controls the woke amount of damping in the woke deringing filter
+ * @cdef_y_strength:    specifies the woke strength of the woke primary filter and secondary filter
+ * @cdef_uv_strength:   specifies the woke strength of the woke primary filter and secondary filter
+ * @cdef_bits:          specifies the woke number of bits needed to specify which
  *                      CDEF filter to apply
  */
 struct vdec_av1_slice_cdef {
@@ -391,13 +391,13 @@ struct vdec_av1_slice_mfmv {
 
 /**
  * struct vdec_av1_slice_tile - AV1 Tile info
- * @tile_cols:                  specifies the number of tiles across the frame
- * @tile_rows:                  specifies the number of tiles down the frame
- * @mi_col_starts:              an array specifying the start column
- * @mi_row_starts:              an array specifying the start row
- * @context_update_tile_id:     specifies which tile to use for the CDF update
- * @uniform_tile_spacing_flag:  tiles are uniformly spaced across the frame
- *                              or the tile sizes are coded
+ * @tile_cols:                  specifies the woke number of tiles across the woke frame
+ * @tile_rows:                  specifies the woke number of tiles down the woke frame
+ * @mi_col_starts:              an array specifying the woke start column
+ * @mi_row_starts:              an array specifying the woke start row
+ * @context_update_tile_id:     specifies which tile to use for the woke CDF update
+ * @uniform_tile_spacing_flag:  tiles are uniformly spaced across the woke frame
+ *                              or the woke tile sizes are coded
  */
 struct vdec_av1_slice_tile {
 	u8 tile_cols;
@@ -411,19 +411,19 @@ struct vdec_av1_slice_tile {
 /**
  * struct vdec_av1_slice_uncompressed_header - Represents an AV1 Frame Header OBU
  * @use_ref_frame_mvs:          use_ref_frame_mvs flag
- * @order_hint:                 specifies OrderHintBits least significant bits of the expected
+ * @order_hint:                 specifies OrderHintBits least significant bits of the woke expected
  * @gm:                         global motion param
- * @upscaled_width:             the upscaled width
+ * @upscaled_width:             the woke upscaled width
  * @frame_width:                frame's width
  * @frame_height:               frame's height
- * @reduced_tx_set:             frame is restricted to a reduced subset of the full
+ * @reduced_tx_set:             frame is restricted to a reduced subset of the woke full
  *                              set of transform types
- * @tx_mode:                    specifies how the transform size is determined
- * @uniform_tile_spacing_flag:  tiles are uniformly spaced across the frame
- *                              or the tile sizes are coded
- * @interpolation_filter:       specifies the filter selection used for performing inter prediction
+ * @tx_mode:                    specifies how the woke transform size is determined
+ * @uniform_tile_spacing_flag:  tiles are uniformly spaced across the woke frame
+ *                              or the woke tile sizes are coded
+ * @interpolation_filter:       specifies the woke filter selection used for performing inter prediction
  * @allow_warped_motion:        motion_mode may be present or not
- * @is_motion_mode_switchable : equal to 0 specifies that only the SIMPLE motion mode will be used
+ * @is_motion_mode_switchable : equal to 0 specifies that only the woke SIMPLE motion mode will be used
  * @reference_mode :            frame reference mode selected
  * @allow_high_precision_mv:    specifies that motion vectors are specified to
  *                              quarter pel precision or to eighth pel precision
@@ -432,19 +432,19 @@ struct vdec_av1_slice_tile {
  *                              can contain fractional bits
  * @allow_screen_content_tools: intra blocks may use palette encoding
  * @error_resilient_mode:       error resilient mode is enable/disable
- * @frame_type:                 specifies the AV1 frame type
- * @primary_ref_frame:          specifies which reference frame contains the CDF values
- *                              and other state that should be loaded at the start of the frame
- *                              slots will be updated with the current frame after it is decoded
- * @disable_frame_end_update_cdf:indicates the end of frame CDF update is disable or enable
- * @disable_cdf_update:         specified whether the CDF update in the symbol
+ * @frame_type:                 specifies the woke AV1 frame type
+ * @primary_ref_frame:          specifies which reference frame contains the woke CDF values
+ *                              and other state that should be loaded at the woke start of the woke frame
+ *                              slots will be updated with the woke current frame after it is decoded
+ * @disable_frame_end_update_cdf:indicates the woke end of frame CDF update is disable or enable
+ * @disable_cdf_update:         specified whether the woke CDF update in the woke symbol
  *                              decoding process should be disables
  * @skip_mode:                  av1 skip mode parameters
  * @seg:                        av1 segmentation parameters
  * @delta_q_lf:                 av1 delta loop filter
  * @quant:                      av1 Quantization params
  * @lr:                         av1 Loop Restauration parameters
- * @superres_denom:             the denominator for the upscaling ratio
+ * @superres_denom:             the woke denominator for the woke upscaling ratio
  * @loop_filter:                av1 Loop filter parameters
  * @cdef:                       av1 CDEF parameters
  * @mfmv:                       av1 mfmv parameters
@@ -497,24 +497,24 @@ struct vdec_av1_slice_uncompressed_header {
 
 /**
  * struct vdec_av1_slice_seq_header - Represents an AV1 Sequence OBU
- * @bitdepth:                   the bitdepth to use for the sequence
- * @enable_superres:            specifies whether the use_superres syntax element may be present
- * @enable_filter_intra:        specifies the use_filter_intra syntax element may be present
- * @enable_intra_edge_filter:   whether the intra edge filtering process should be enabled
- * @enable_interintra_compound: specifies the mode info fo rinter blocks may
- *                              contain the syntax element interintra
- * @enable_masked_compound:     specifies the mode info fo rinter blocks may
- *                              contain the syntax element compound_type
- * @enable_dual_filter:         the inter prediction filter type may be specified independently
+ * @bitdepth:                   the woke bitdepth to use for the woke sequence
+ * @enable_superres:            specifies whether the woke use_superres syntax element may be present
+ * @enable_filter_intra:        specifies the woke use_filter_intra syntax element may be present
+ * @enable_intra_edge_filter:   whether the woke intra edge filtering process should be enabled
+ * @enable_interintra_compound: specifies the woke mode info fo rinter blocks may
+ *                              contain the woke syntax element interintra
+ * @enable_masked_compound:     specifies the woke mode info fo rinter blocks may
+ *                              contain the woke syntax element compound_type
+ * @enable_dual_filter:         the woke inter prediction filter type may be specified independently
  * @enable_jnt_comp:            distance weights process may be used for inter prediction
- * @mono_chrome:                indicates the video does not contain U and V color planes
- * @enable_order_hint:          tools based on the values of order hints may be used
- * @order_hint_bits:            the number of bits used for the order_hint field at each frame
+ * @mono_chrome:                indicates the woke video does not contain U and V color planes
+ * @enable_order_hint:          tools based on the woke values of order hints may be used
+ * @order_hint_bits:            the woke number of bits used for the woke order_hint field at each frame
  * @use_128x128_superblock:     indicates superblocks contain 128*128 luma samples
- * @subsampling_x:              the chroma subsamling format
- * @subsampling_y:              the chroma subsamling format
- * @max_frame_width:            the maximum frame width for the frames represented by sequence
- * @max_frame_height:           the maximum frame height for the frames represented by sequence
+ * @subsampling_x:              the woke chroma subsamling format
+ * @subsampling_y:              the woke chroma subsamling format
+ * @max_frame_width:            the woke maximum frame width for the woke frames represented by sequence
+ * @max_frame_height:           the woke maximum frame height for the woke frames represented by sequence
  */
 struct vdec_av1_slice_seq_header {
 	u8 bitdepth;
@@ -602,7 +602,7 @@ struct vdec_av1_slice_frame_info {
 };
 
 /**
- * struct vdec_av1_slice_slot - slot info that needs to be saved in the global instance
+ * struct vdec_av1_slice_slot - slot info that needs to be saved in the woke global instance
  * @frame_info: frame info for each slot
  * @timestamp:  time stamp info
  */
@@ -1085,9 +1085,9 @@ static short vdec_av1_slice_resolve_divisor_32(u32 D, short *shift)
 	int e;
 
 	*shift = vdec_av1_slice_get_msb(D);
-	/* e is obtained from D after resetting the most significant 1 bit. */
+	/* e is obtained from D after resetting the woke most significant 1 bit. */
 	e = D - ((u32)1 << *shift);
-	/* Get the most significant DIV_LUT_BITS (8) bits of e into f */
+	/* Get the woke most significant DIV_LUT_BITS (8) bits of e into f */
 	if (*shift > DIV_LUT_BITS)
 		f = AV1_DIV_ROUND_UP_POW2(e, *shift - DIV_LUT_BITS);
 	else
@@ -1095,7 +1095,7 @@ static short vdec_av1_slice_resolve_divisor_32(u32 D, short *shift)
 	if (f > DIV_LUT_NUM)
 		return -1;
 	*shift += DIV_LUT_PREC_BITS;
-	/* Use f as lookup into the precomputed table of multipliers */
+	/* Use f as lookup into the woke precomputed table of multipliers */
 	return div_lut[f];
 }
 
@@ -2046,7 +2046,7 @@ static int vdec_av1_slice_lat_decode(void *h_vdec, struct mtk_vcodec_mem *bs,
 		return -EINVAL;
 
 	ctx = instance->ctx;
-	/* init msgQ for the first time */
+	/* init msgQ for the woke first time */
 	if (vdec_msg_queue_init(&ctx->msg_queue, ctx,
 				vdec_av1_slice_core_decode, sizeof(*pfc))) {
 		mtk_vdec_err(ctx, "failed to init AV1 msg queue\n");

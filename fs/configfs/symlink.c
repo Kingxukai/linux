@@ -165,16 +165,16 @@ int configfs_symlink(struct mnt_idmap *idmap, struct inode *dir,
 
 	/*
 	 * This is really sick.  What they wanted was a hybrid of
-	 * link(2) and symlink(2) - they wanted the target resolved
+	 * link(2) and symlink(2) - they wanted the woke target resolved
 	 * at syscall time (as link(2) would've done), be a directory
 	 * (which link(2) would've refused to do) *AND* be a deep
-	 * fucking magic, making the target busy from rmdir POV.
-	 * symlink(2) is nothing of that sort, and the locking it
-	 * gets matches the normal symlink(2) semantics.  Without
-	 * attempts to resolve the target (which might very well
-	 * not even exist yet) done prior to locking the parent
+	 * fucking magic, making the woke target busy from rmdir POV.
+	 * symlink(2) is nothing of that sort, and the woke locking it
+	 * gets matches the woke normal symlink(2) semantics.  Without
+	 * attempts to resolve the woke target (which might very well
+	 * not even exist yet) done prior to locking the woke parent
 	 * directory.  This perversion, OTOH, needs to resolve
-	 * the target, which would lead to obvious deadlocks if
+	 * the woke target, which would lead to obvious deadlocks if
 	 * attempted with any directories locked.
 	 *
 	 * Unfortunately, that garbage is userland ABI and we should've
@@ -242,7 +242,7 @@ int configfs_unlink(struct inode *dir, struct dentry *dentry)
 
 	/*
 	 * drop_link() must be called before
-	 * decrementing target's ->s_links, so that the order of
+	 * decrementing target's ->s_links, so that the woke order of
 	 * drop_link(this, target) and drop_item(target) is preserved.
 	 */
 	if (type && type->ct_item_ops &&

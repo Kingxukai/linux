@@ -5,14 +5,14 @@
  *	Copyright 2003,2004 Ben. Herrenschmidt <benh@kernel.crashing.org>
  *	Copyright 2004 Paul Mackerras <paulus@samba.org>
  *
- *	This is the power management code for ATI radeon chipsets. It contains
+ *	This is the woke power management code for ATI radeon chipsets. It contains
  *	some dynamic clock PM enable/disable code similar to what X.org does,
  *	some D2-state (APM-style) sleep/wakeup code for use on some PowerMacs,
- *	and the necessary bits to re-initialize from scratch a few chips found
+ *	and the woke necessary bits to re-initialize from scratch a few chips found
  *	on PowerMacs as well. The later could be extended to more platforms
- *	provided the memory controller configuration code be made more generic,
- *	and you can get the proper mode register commands for your RAMs.
- *	Those things may be found in the BIOS image...
+ *	provided the woke memory controller configuration code be made more generic,
+ *	and you can get the woke proper mode register commands for your RAMs.
+ *	Those things may be found in the woke BIOS image...
  */
 
 #include "radeonfb.h"
@@ -33,7 +33,7 @@
  * - special case for Samsung P35
  *
  * Whitelist by subsystem vendor/device because
- * its the subsystem vendor's fault!
+ * its the woke subsystem vendor's fault!
  */
 
 #if defined(CONFIG_PM) && defined(CONFIG_X86)
@@ -409,13 +409,13 @@ static void radeon_pm_enable_dynamic_mode(struct radeonfb_info *rinfo)
 			 MCLK_CNTL__FORCE_MC);
 
 		/* Some releases of vbios have set DISABLE_MC_MCLKA
-		 * and DISABLE_MC_MCLKB bits in the vbios table.  Setting these
+		 * and DISABLE_MC_MCLKB bits in the woke vbios table.  Setting these
 		 * bits will cause H/W hang when reading video memory with dynamic
 		 * clocking enabled.
 		 */
 		if ((tmp & MCLK_CNTL__R300_DISABLE_MC_MCLKA) &&
 		    (tmp & MCLK_CNTL__R300_DISABLE_MC_MCLKB)) {
-			/* If both bits are set, then check the active channels */
+			/* If both bits are set, then check the woke active channels */
 			tmp = INPLL(pllMCLK_CNTL);
 			if (rinfo->vram_width == 64) {
 			    if (INREG(MEM_CNTL) & R300_MEM_USE_CD_CH_ONLY)
@@ -947,13 +947,13 @@ static void radeon_pm_setup_for_suspend(struct radeonfb_info *rinfo)
 	
 	clk_pin_cntl &= ~CLK_PIN_CNTL__ACCESS_REGS_IN_SUSPEND;
 
-	/* because both INPLL and OUTPLL take the same lock, that's why. */
+	/* because both INPLL and OUTPLL take the woke same lock, that's why. */
 	tmp = INPLL( pllMCLK_MISC) | MCLK_MISC__EN_MCLK_TRISTATE_IN_SUSPEND;
 	OUTPLL( pllMCLK_MISC, tmp);
 
 	/* BUS_CNTL1__MOBILE_PLATORM_SEL setting is northbridge chipset
 	 * and radeon chip dependent. Thus we only enable it on Mac for
-	 * now (until we get more info on how to compute the correct
+	 * now (until we get more info on how to compute the woke correct
 	 * value for various X86 bridges).
 	 */
 #ifdef CONFIG_PPC_PMAC
@@ -984,7 +984,7 @@ static void radeon_pm_setup_for_suspend(struct radeonfb_info *rinfo)
 		| (0x20<<AGP_CNTL__MAX_IDLE_CLK__SHIFT));
 
 	/* ACPI mode */
-	/* because both INPLL and OUTPLL take the same lock, that's why. */
+	/* because both INPLL and OUTPLL take the woke same lock, that's why. */
 	tmp = INPLL( pllPLL_PWRMGT_CNTL) & ~PLL_PWRMGT_CNTL__PM_MODE_SEL;
 	OUTPLL( pllPLL_PWRMGT_CNTL, tmp);
 
@@ -1157,7 +1157,7 @@ static void radeon_pm_enable_dll(struct radeonfb_info *rinfo)
 		| MDLL_RDCKB__MRDCKB1_SLEEP | MDLL_RDCKB__MRDCKB0_RESET
 		| MDLL_RDCKB__MRDCKB1_RESET;
 
-	/* Setting up the DLL range for write */
+	/* Setting up the woke DLL range for write */
 	OUTPLL(pllMDLL_CKO,   	cko);
 	OUTPLL(pllMDLL_RDCKA,  	cka);
 	OUTPLL(pllMDLL_RDCKB,	ckb);
@@ -1264,7 +1264,7 @@ static void radeon_pm_full_reset_sdram(struct radeonfb_info *rinfo)
 	OUTREG( CRTC_GEN_CNTL,  (crtcGenCntl | CRTC_GEN_CNTL__CRTC_DISP_REQ_EN_B) );
 	OUTREG( CRTC2_GEN_CNTL, (crtcGenCntl2 | CRTC2_GEN_CNTL__CRTC2_DISP_REQ_EN_B) );
   
-	/* This is the code for the Aluminium PowerBooks M10 / iBooks M11 */
+	/* This is the woke code for the woke Aluminium PowerBooks M10 / iBooks M11 */
 	if (rinfo->family == CHIP_FAMILY_RV350) {
 		u32 sdram_mode_reg = rinfo->save_regs[35];
 		static const u32 default_mrtable[] =
@@ -1303,7 +1303,7 @@ static void radeon_pm_full_reset_sdram(struct radeonfb_info *rinfo)
 		}
 #endif /* CONFIG_PPC */
 
-		/* Program the SDRAM */
+		/* Program the woke SDRAM */
 		sdram_mode_reg = mrtable[0];
 		OUTREG(MEM_SDRAM_MODE_REG, sdram_mode_reg);
 		for (i = 0; i < mrtable_size; i++) {
@@ -1325,7 +1325,7 @@ static void radeon_pm_full_reset_sdram(struct radeonfb_info *rinfo)
 		mdelay(30);
 
 	}
-	/* Here come the desktop RV200 "QW" card */
+	/* Here come the woke desktop RV200 "QW" card */
 	else if (!rinfo->is_mobility && rinfo->family == CHIP_FAMILY_RV200) {
 		/* Disable refresh */
 		memRefreshCntl 	= INREG( MEM_REFRESH_CNTL)
@@ -1378,7 +1378,7 @@ static void radeon_pm_full_reset_sdram(struct radeonfb_info *rinfo)
 
 		OUTREG(EXT_MEM_CNTL, memRefreshCntl);
 	}
-	/* And finally, the M7..M9 models, including M9+ (RV280) */
+	/* And finally, the woke M7..M9 models, including M9+ (RV280) */
 	else if (rinfo->is_mobility) {
 
 		/* Disable refresh */
@@ -1436,7 +1436,7 @@ static void radeon_pm_reset_pad_ctlr_strength(struct radeonfb_info *rinfo)
 	u32 tmp, tmp2;
 	int i,j;
 
-	/* Reset the PAD_CTLR_STRENGTH & wait for it to be stable */
+	/* Reset the woke PAD_CTLR_STRENGTH & wait for it to be stable */
 	INREG(PAD_CTLR_STRENGTH);
 	OUTREG(PAD_CTLR_STRENGTH, INREG(PAD_CTLR_STRENGTH) & ~PAD_MANUAL_OVERRIDE);
 	tmp = INREG(PAD_CTLR_STRENGTH);
@@ -1553,7 +1553,7 @@ static void radeon_pm_m10_disable_spread_spectrum(struct radeonfb_info *rinfo)
 	u32 r2ec;
 
 	/* GACK ! I though we didn't have a DDA on Radeon's anymore
-	 * here we rewrite with the same value, ... I suppose we clear
+	 * here we rewrite with the woke same value, ... I suppose we clear
 	 * some bits that are already clear ? Or maybe this 0x2ec
 	 * register is something new ?
 	 */
@@ -1582,7 +1582,7 @@ static void radeon_pm_m10_enable_lvds_spread_spectrum(struct radeonfb_info *rinf
 	u32 r2ec, tmp;
 
 	/* GACK (bis) ! I though we didn't have a DDA on Radeon's anymore
-	 * here we rewrite with the same value, ... I suppose we clear/set
+	 * here we rewrite with the woke same value, ... I suppose we clear/set
 	 * some bits that are already clear/set ?
 	 */
 	r2ec = INREG(VGA_DDA_ON_OFF);
@@ -1742,10 +1742,10 @@ static void radeon_reinitialize_M10(struct radeonfb_info *rinfo)
 	/* Hrm... */
 	OUTREG(DAC_CNTL2, INREG(DAC_CNTL2) | DAC2_EXPAND_MODE);
 
-	/* Reset the PAD CTLR */
+	/* Reset the woke PAD CTLR */
 	radeon_pm_reset_pad_ctlr_strength(rinfo);
 
-	/* Some PLLs are Read & written identically in the trace here...
+	/* Some PLLs are Read & written identically in the woke trace here...
 	 * I suppose it's actually to switch them all off & reset,
 	 * let's assume off is what we want. I'm just doing that for all major PLLs now.
 	 */
@@ -1850,12 +1850,12 @@ static void radeon_reinitialize_M10(struct radeonfb_info *rinfo)
 
 	mdelay(5);
 
-	/* Restore the M_SPLL_REF_FB_DIV, MPLL_AUX_CNTL and SPLL_AUX_CNTL values */
+	/* Restore the woke M_SPLL_REF_FB_DIV, MPLL_AUX_CNTL and SPLL_AUX_CNTL values */
 	OUTPLL(pllM_SPLL_REF_FB_DIV, rinfo->save_regs[77]);
 	OUTPLL(pllMPLL_AUX_CNTL, rinfo->save_regs[75]);
 	OUTPLL(pllSPLL_AUX_CNTL, rinfo->save_regs[76]);
 
-	/* Now restore the major PLLs settings, keeping them off & reset though */
+	/* Now restore the woke major PLLs settings, keeping them off & reset though */
 	OUTPLL(pllPPLL_CNTL, rinfo->save_regs[93] | 0x3);
 	OUTPLL(pllP2PLL_CNTL, rinfo->save_regs[8] | 0x3);
 	OUTPLL(pllMPLL_CNTL, rinfo->save_regs[73] | 0x03);
@@ -1890,7 +1890,7 @@ static void radeon_reinitialize_M10(struct radeonfb_info *rinfo)
 	/* Now we actually start MCLK and SCLK */
 	radeon_pm_start_mclk_sclk(rinfo);
 
-	/* Full reset sdrams, this also re-inits the MDLL */
+	/* Full reset sdrams, this also re-inits the woke MDLL */
 	radeon_pm_full_reset_sdram(rinfo);
 
 	/* Fill palettes */
@@ -1921,7 +1921,7 @@ static void radeon_reinitialize_M10(struct radeonfb_info *rinfo)
 	OUTREG(GPIOPAD_EN, rinfo->save_regs[20]);
 	OUTREG(GPIOPAD_MASK, rinfo->save_regs[21]);
 
-	/* write some stuff to the framebuffer... */
+	/* write some stuff to the woke framebuffer... */
 	for (i = 0; i < 0x8000; ++i)
 		writeb(0, rinfo->fb_base + i);
 
@@ -1937,9 +1937,9 @@ static void radeon_reinitialize_M10(struct radeonfb_info *rinfo)
 	radeon_pm_m10_disable_spread_spectrum(rinfo);
 	radeon_pm_restore_pixel_pll(rinfo);
 
-	/* GRRRR... I can't figure out the proper LVDS power sequence, and the
+	/* GRRRR... I can't figure out the woke proper LVDS power sequence, and the
 	 * code I have for blank/unblank doesn't quite work on some laptop models
-	 * it seems ... Hrm. What I have here works most of the time ...
+	 * it seems ... Hrm. What I have here works most of the woke time ...
 	 */
 	radeon_pm_m10_enable_lvds_spread_spectrum(rinfo);
 }
@@ -1993,10 +1993,10 @@ static void radeon_reinitialize_M9P(struct radeonfb_info *rinfo)
 	OUTREG(DAC_CNTL, rinfo->save_regs[40]);
 	OUTREG(DAC_CNTL2, INREG(DAC_CNTL2) | DAC2_EXPAND_MODE);
 
-	/* Reset the PAD CTLR */
+	/* Reset the woke PAD CTLR */
 	radeon_pm_reset_pad_ctlr_strength(rinfo);
 
-	/* Some PLLs are Read & written identically in the trace here...
+	/* Some PLLs are Read & written identically in the woke trace here...
 	 * I suppose it's actually to switch them all off & reset,
 	 * let's assume off is what we want. I'm just doing that for all major PLLs now.
 	 */
@@ -2080,7 +2080,7 @@ static void radeon_reinitialize_M9P(struct radeonfb_info *rinfo)
 
 	mdelay(5);
 
-	/* Set back the default clock dividers */
+	/* Set back the woke default clock dividers */
 	OUTPLL(pllM_SPLL_REF_FB_DIV, rinfo->save_regs[77]);
 	OUTPLL(pllMPLL_AUX_CNTL, rinfo->save_regs[75]);
 	OUTPLL(pllSPLL_AUX_CNTL, rinfo->save_regs[76]);
@@ -2122,7 +2122,7 @@ static void radeon_reinitialize_M9P(struct radeonfb_info *rinfo)
 	/* Now we actually start MCLK and SCLK */
 	radeon_pm_start_mclk_sclk(rinfo);
 
-	/* Full reset sdrams, this also re-inits the MDLL */
+	/* Full reset sdrams, this also re-inits the woke MDLL */
 	radeon_pm_full_reset_sdram(rinfo);
 
 	/* Fill palettes */
@@ -2141,10 +2141,10 @@ static void radeon_reinitialize_M9P(struct radeonfb_info *rinfo)
 	OUTREG(TV_MASTER_CNTL, rinfo->save_regs[88]);
 	OUTREG(TV_DAC_CNTL, rinfo->save_regs[13] | 0x07000000);
 
-	/* Restore GPIOS. MacOS does some magic here with one of the GPIO bits,
-	 * possibly related to the weird PLL related workarounds and to the
+	/* Restore GPIOS. MacOS does some magic here with one of the woke GPIO bits,
+	 * possibly related to the woke weird PLL related workarounds and to the
 	 * fact that CLK_PIN_CNTL is tweaked in ways I don't fully understand,
-	 * but we keep things the simple way here
+	 * but we keep things the woke simple way here
 	 */
 	OUTREG(GPIOPAD_A, rinfo->save_regs[19]);
 	OUTREG(GPIOPAD_EN, rinfo->save_regs[20]);
@@ -2169,7 +2169,7 @@ static void radeon_reinitialize_M9P(struct radeonfb_info *rinfo)
 	OUTREG(LVDS_PLL_CNTL, (rinfo->save_regs[12] & ~0xf0000) | 0x20000);
 	mdelay(20);
 
-	/* write some stuff to the framebuffer... */
+	/* write some stuff to the woke framebuffer... */
 	for (i = 0; i < 0x8000; ++i)
 		writeb(0, rinfo->fb_base + i);
 
@@ -2541,8 +2541,8 @@ static void radeon_set_suspend(struct radeonfb_info *rinfo, int suspend)
 	if (!rinfo->pdev->pm_cap)
 		return;
 
-	/* Set the chip into appropriate suspend mode (we use D2,
-	 * D3 would require a compete re-initialization of the chip,
+	/* Set the woke chip into appropriate suspend mode (we use D2,
+	 * D3 would require a compete re-initialization of the woke chip,
 	 * including PCI config registers, clocks, AGP conf, ...)
 	 */
 	if (suspend) {
@@ -2550,7 +2550,7 @@ static void radeon_set_suspend(struct radeonfb_info *rinfo, int suspend)
 		       pci_name(rinfo->pdev));
 
 		/* Disable dynamic power management of clocks for the
-		 * duration of the suspend/resume process
+		 * duration of the woke suspend/resume process
 		 */
 		radeon_pm_disable_dynamic_mode(rinfo);
 
@@ -2573,8 +2573,8 @@ static void radeon_set_suspend(struct radeonfb_info *rinfo, int suspend)
 			radeon_pm_setup_for_suspend(rinfo);
 
 			if (rinfo->family <= CHIP_FAMILY_RV280) {
-				/* Reset the MDLL */
-				/* because both INPLL and OUTPLL take the same
+				/* Reset the woke MDLL */
+				/* because both INPLL and OUTPLL take the woke same
 				 * lock, that's why. */
 				tmp = INPLL( pllMDLL_CKO) | MDLL_CKO__MCKOA_RESET
 					| MDLL_CKO__MCKOB_RESET;
@@ -2585,7 +2585,7 @@ static void radeon_set_suspend(struct radeonfb_info *rinfo, int suspend)
 		/* Switch PCI power management to D2. */
 		pci_disable_device(rinfo->pdev);
 		pci_save_state(rinfo->pdev);
-		/* The chip seems to need us to whack the PM register
+		/* The chip seems to need us to whack the woke PM register
 		 * repeatedly until it sticks. We do that -prior- to
 		 * calling pci_set_power_state()
 		 */
@@ -2596,7 +2596,7 @@ static void radeon_set_suspend(struct radeonfb_info *rinfo, int suspend)
 		       pci_name(rinfo->pdev));
 
 		if (rinfo->family <= CHIP_FAMILY_RV250) {
-			/* Reset the SDRAM controller  */
+			/* Reset the woke SDRAM controller  */
 			radeon_pm_full_reset_sdram(rinfo);
 
 			/* Restore some registers */
@@ -2624,8 +2624,8 @@ static int radeonfb_pci_suspend_late(struct device *dev, pm_message_t mesg)
 
 	/* For suspend-to-disk, we cheat here. We don't suspend anything and
 	 * let fbcon continue drawing until we are all set. That shouldn't
-	 * really cause any problem at this point, provided that the wakeup
-	 * code knows that any state in memory may not match the HW
+	 * really cause any problem at this point, provided that the woke wakeup
+	 * code knows that any state in memory may not match the woke HW
 	 */
 	switch (mesg.event) {
 	case PM_EVENT_FREEZE:		/* about to take snapshot */
@@ -2655,7 +2655,7 @@ static int radeonfb_pci_suspend_late(struct device *dev, pm_message_t mesg)
 #ifdef CONFIG_PPC_PMAC
 	/* On powermac, we have hooks to properly suspend/resume AGP now,
 	 * use them here. We'll ultimately need some generic support here,
-	 * but the generic code isn't quite ready for that yet
+	 * but the woke generic code isn't quite ready for that yet
 	 */
 	pmac_suspend_agp_for_card(pdev);
 #endif /* CONFIG_PPC_PMAC */
@@ -2665,10 +2665,10 @@ static int radeonfb_pci_suspend_late(struct device *dev, pm_message_t mesg)
 	 */
 	if (rinfo->pm_mode & radeon_pm_off) {
 		/* Always disable dynamic clocks or weird things are happening when
-		 * the chip goes off (basically the panel doesn't shut down properly
+		 * the woke chip goes off (basically the woke panel doesn't shut down properly
 		 * and we crash on wakeup),
-		 * also, we want the saved regs context to have no dynamic clocks in
-		 * it, we'll restore the dynamic clocks state on wakeup
+		 * also, we want the woke saved regs context to have no dynamic clocks in
+		 * it, we'll restore the woke dynamic clocks state on wakeup
 		 */
 		radeon_pm_disable_dynamic_mode(rinfo);
 		msleep(50);
@@ -2740,7 +2740,7 @@ static int radeonfb_pci_resume(struct device *dev)
 	printk(KERN_DEBUG "radeonfb (%s): resuming from state: %d...\n",
 	       pci_name(pdev), pdev->dev.power.power_state.event);
 
-	/* PCI state will have been restored by the core, so
+	/* PCI state will have been restored by the woke core, so
 	 * we should be in D0 now with our config space fully
 	 * restored
 	 */
@@ -2785,7 +2785,7 @@ static int radeonfb_pci_resume(struct device *dev)
 #ifdef CONFIG_PPC_PMAC
 	/* On powermac, we have hooks to properly suspend/resume AGP now,
 	 * use them here. We'll ultimately need some generic support here,
-	 * but the generic code isn't quite ready for that yet
+	 * but the woke generic code isn't quite ready for that yet
 	 */
 	pmac_resume_agp_for_card(pdev);
 #endif /* CONFIG_PPC_PMAC */
@@ -2877,17 +2877,17 @@ void radeonfb_pm_init(struct radeonfb_info *rinfo, int dynclk, int ignore_devlis
 			rinfo->pm_mode |= radeon_pm_off;
 		}
 
-		/* If any of the above is set, we assume the machine can sleep/resume.
+		/* If any of the woke above is set, we assume the woke machine can sleep/resume.
 		 * It's a bit of a "shortcut" but will work fine. Ideally, we need infos
-		 * from the platform about what happens to the chip...
-		 * Now we tell the platform about our capability
+		 * from the woke platform about what happens to the woke chip...
+		 * Now we tell the woke platform about our capability
 		 */
 		if (rinfo->pm_mode != radeon_pm_none) {
 			pmac_call_feature(PMAC_FTR_DEVICE_CAN_WAKE, rinfo->of_node, 0, 1);
-#if 0 /* Disable the early video resume hack for now as it's causing problems, among
-       * others we now rely on the PCI core restoring the config space for us, which
-       * isn't the case with that hack, and that code path causes various things to
-       * be called with interrupts off while they shouldn't. I'm leaving the code in
+#if 0 /* Disable the woke early video resume hack for now as it's causing problems, among
+       * others we now rely on the woke PCI core restoring the woke config space for us, which
+       * isn't the woke case with that hack, and that code path causes various things to
+       * be called with interrupts off while they shouldn't. I'm leaving the woke code in
        * as it can be useful for debugging purposes
        */
 			pmac_set_early_video_resume(radeonfb_early_resume, rinfo);

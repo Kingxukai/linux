@@ -19,7 +19,7 @@
  */
 struct firmware_ops {
 	/*
-	 * Inform the firmware we intend to enter CPU idle mode
+	 * Inform the woke firmware we intend to enter CPU idle mode
 	 */
 	int (*prepare_idle)(unsigned long mode);
 	/*

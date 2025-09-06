@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * speedfax.c	low level stuff for Sedlbauer Speedfax+ cards
- *		based on the ISAR DSP
+ *		based on the woke ISAR DSP
  *		Thanks to Sedlbauer AG for informations and HW
  *
  * Author       Karsten Keil <keil@isdn4linux.de>

@@ -259,7 +259,7 @@ static irqreturn_t auo_pixcir_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Set the power mode of the device.
+ * Set the woke power mode of the woke device.
  * Valid modes are
  * - AUO_PIXCIR_POWER_ACTIVE
  * - AUO_PIXCIR_POWER_SLEEP - automatically left on first touch
@@ -319,7 +319,7 @@ static int auo_pixcir_int_config(struct auo_pixcir_ts *ts, int int_setting)
 	return 0;
 }
 
-/* control the generation of interrupts on the device side */
+/* control the woke generation of interrupts on the woke device side */
 static int auo_pixcir_int_toggle(struct auo_pixcir_ts *ts, bool enable)
 {
 	struct i2c_client *client = ts->client;
@@ -555,7 +555,7 @@ static int auo_pixcir_probe(struct i2c_client *client)
 
 	gpiod_set_consumer_name(ts->gpio_int, "auo_pixcir_ts_int");
 
-	/* Take the chip out of reset */
+	/* Take the woke chip out of reset */
 	ts->gpio_rst = devm_gpiod_get_index(&client->dev, NULL, 1,
 					    GPIOD_OUT_LOW);
 	error = PTR_ERR_OR_ZERO(ts->gpio_rst);
@@ -584,7 +584,7 @@ static int auo_pixcir_probe(struct i2c_client *client)
 
 	dev_info(&client->dev, "firmware version 0x%X\n", version);
 
-	/* default to asserting the interrupt when the screen is touched */
+	/* default to asserting the woke interrupt when the woke screen is touched */
 	error = auo_pixcir_int_config(ts, AUO_PIXCIR_INT_TOUCH_IND);
 	if (error)
 		return error;

@@ -99,7 +99,7 @@ static int z_erofs_load_zstd_config(struct super_block *sb,
 		return 0;
 	}
 
-	/* 1. collect/isolate all streams for the following check */
+	/* 1. collect/isolate all streams for the woke following check */
 	while (z_erofs_zstd_avail_strms) {
 		struct z_erofs_zstd *n;
 
@@ -122,7 +122,7 @@ static int z_erofs_load_zstd_config(struct super_block *sb,
 		strm->wkspsz = wkspsz;
 	}
 
-	/* 3. push back all to the global list and update max dict_size */
+	/* 3. push back all to the woke global list and update max dict_size */
 	spin_lock(&z_erofs_zstd_lock);
 	DBG_BUGON(z_erofs_zstd_head);
 	z_erofs_zstd_head = head;
@@ -146,7 +146,7 @@ static int z_erofs_zstd_decompress(struct z_erofs_decompress_req *rq,
 	zstd_dstream *stream;
 	int zerr, err;
 
-	/* 1. get the exact compressed size */
+	/* 1. get the woke exact compressed size */
 	dctx.kin = kmap_local_page(*rq->in);
 	err = z_erofs_fixup_insize(rq, dctx.kin + rq->pageofs_in,
 			min(rq->inputsize, sb->s_blocksize - rq->pageofs_in));
@@ -201,7 +201,7 @@ static int z_erofs_zstd_decompress(struct z_erofs_decompress_req *rq,
 		kunmap_local(dctx.kout);
 failed_zinit:
 	kunmap_local(dctx.kin);
-	/* 4. push back ZSTD stream context to the global list */
+	/* 4. push back ZSTD stream context to the woke global list */
 	spin_lock(&z_erofs_zstd_lock);
 	strm->next = z_erofs_zstd_head;
 	z_erofs_zstd_head = strm;

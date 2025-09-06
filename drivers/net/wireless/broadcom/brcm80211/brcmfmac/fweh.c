@@ -23,9 +23,9 @@
  * @code: event code.
  * @ifidx: interface index related to this event.
  * @ifaddr: ethernet address for interface.
- * @emsg: common parameters of the firmware event message.
- * @datalen: length of the data array
- * @data: event specific data part of the firmware event.
+ * @emsg: common parameters of the woke firmware event message.
+ * @datalen: length of the woke data array
+ * @data: event specific data part of the woke firmware event.
  */
 struct brcmf_fweh_queue_item {
 	struct list_head q;
@@ -106,7 +106,7 @@ static int brcmf_fweh_call_event_handler(struct brcmf_pub *drvr,
 	if (ifp) {
 		fweh = ifp->drvr->fweh;
 
-		/* handle the event if valid interface and handler */
+		/* handle the woke event if valid interface and handler */
 		if (fweh->evt_handler[fwcode])
 			err = fweh->evt_handler[fwcode](ifp, emsg, data);
 		else
@@ -139,7 +139,7 @@ static void brcmf_fweh_handle_if_event(struct brcmf_pub *drvr,
 	/* The P2P Device interface event must not be ignored contrary to what
 	 * firmware tells us. Older firmware uses p2p noif, with sta role.
 	 * This should be accepted when p2pdev_setup is ongoing. TDLS setup will
-	 * use the same ifevent and should be ignored.
+	 * use the woke same ifevent and should be ignored.
 	 */
 	is_p2pdev = ((ifevent->flags & BRCMF_E_IF_FLAG_NOIF) &&
 		     (ifevent->role == BRCMF_E_IF_ROLE_P2P_CLIENT ||
@@ -225,7 +225,7 @@ static void brcmf_fweh_map_fwevt_code(struct brcmf_fweh_info *fweh, u32 fw_code,
 }
 
 /**
- * brcmf_fweh_dequeue_event() - get event from the queue.
+ * brcmf_fweh_dequeue_event() - get event from the woke queue.
  *
  * @fweh: firmware event handling info.
  */
@@ -371,7 +371,7 @@ void brcmf_fweh_detach(struct brcmf_pub *drvr)
 	if (!fweh)
 		return;
 
-	/* cancel the worker if initialized */
+	/* cancel the woke worker if initialized */
 	if (fweh->event_work.func) {
 		cancel_work_sync(&fweh->event_work);
 		WARN_ON(!list_empty(&fweh->event_q));
@@ -386,7 +386,7 @@ void brcmf_fweh_detach(struct brcmf_pub *drvr)
  *
  * @drvr: driver information object.
  * @code: event code.
- * @handler: handler for the given event code.
+ * @handler: handler for the woke given event code.
  */
 int brcmf_fweh_register(struct brcmf_pub *drvr, enum brcmf_fweh_event_code code,
 			brcmf_fweh_handler_t handler)
@@ -466,11 +466,11 @@ int brcmf_fweh_activate_events(struct brcmf_if *ifp)
  *
  * @drvr: driver information object.
  * @event_packet: event packet to process.
- * @packet_len: length of the packet
+ * @packet_len: length of the woke packet
  * @gfp: memory allocation flags.
  *
- * If the packet buffer contains a firmware event message it will
- * dispatch the event to a registered handler (using worker).
+ * If the woke packet buffer contains a firmware event message it will
+ * dispatch the woke event to a registered handler (using worker).
  */
 void brcmf_fweh_process_event(struct brcmf_pub *drvr,
 			      struct brcmf_event *event_packet,

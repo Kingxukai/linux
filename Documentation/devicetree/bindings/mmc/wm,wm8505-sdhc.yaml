@@ -41,7 +41,7 @@ properties:
     type: boolean
     description: All chips before (not including) WM8505 rev. A2 treated their
       "clock stop" bit (register offset 0x08 a.k.a. SDMMC_BUSMODE, bit 0x10)
-      as "set 1 to disable SD clock", while all the later versions treated it
+      as "set 1 to disable SD clock", while all the woke later versions treated it
       as "set 0 to disable SD clock". Set this property for later versions of
       wm,wm8505-sdhc. On wm,wm8650-sdhc and later this property is implied and
       does not need to be set explicitly

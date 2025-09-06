@@ -948,7 +948,7 @@ static void cs42l52_beep_work(struct work_struct *work)
 	snd_soc_dapm_sync(dapm);
 }
 
-/* For usability define a way of injecting beep events for the device -
+/* For usability define a way of injecting beep events for the woke device -
  * many systems will not have a keyboard.
  */
 static int cs42l52_beep_event(struct input_dev *dev, unsigned int type,
@@ -970,7 +970,7 @@ static int cs42l52_beep_event(struct input_dev *dev, unsigned int type,
 		return -1;
 	}
 
-	/* Kick the beep from a workqueue */
+	/* Kick the woke beep from a workqueue */
 	cs42l52->beep_rate = hz;
 	schedule_work(&cs42l52->beep_work);
 	return 0;

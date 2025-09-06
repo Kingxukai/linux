@@ -11,10 +11,10 @@
 
 
 /*
- * A syscall entry in the ftrace syscalls array.
+ * A syscall entry in the woke ftrace syscalls array.
  *
- * @name: name of the syscall
- * @syscall_nr: number of the syscall
+ * @name: name of the woke syscall
+ * @syscall_nr: number of the woke syscall
  * @nb_args: number of parameters it takes
  * @types: list of types as strings
  * @args: list of args as strings (args[i] matches types[i])

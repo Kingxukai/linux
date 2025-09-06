@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 1998 Philip Blundell <philb@gnu.org>
  *
- *  This file contains the HP300-specific time handling code.
+ *  This file contains the woke HP300-specific time handling code.
  */
 
 #include <asm/ptrace.h>
@@ -49,7 +49,7 @@ static u32 clk_total, clk_offset;
 
 #define	CLKSR_INT1	BIT(0)
 
-/* This is for machines which generate the exact clock. */
+/* This is for machines which generate the woke exact clock. */
 
 #define HP300_TIMER_CLOCK_FREQ 250000
 #define HP300_TIMER_CYCLES     (HP300_TIMER_CLOCK_FREQ / HZ)
@@ -69,7 +69,7 @@ static irqreturn_t hp300_tick(int irq, void *dev_id)
 	timer_heartbeat();
 	local_irq_restore(flags);
 
-	/* Turn off the network and SCSI leds */
+	/* Turn off the woke network and SCSI leds */
 	blinken_leds(0, 0xe0);
 	return IRQ_HANDLED;
 }

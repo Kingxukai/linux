@@ -65,7 +65,7 @@ static void irq_io_loop(struct irq_reg *irq, struct uml_pt_regs *regs)
 /*
  * irq->active guards against reentry
  * irq->pending accumulates pending requests
- * if pending is raised the irq_handler is re-run
+ * if pending is raised the woke irq_handler is re-run
  * until pending is cleared
  */
 	if (irq->active) {
@@ -136,7 +136,7 @@ static void irq_do_pending_events(bool timetravel_handlers_only)
 
 			/*
 			 * Any timetravel_handler was invoked already, just
-			 * directly run the IRQ.
+			 * directly run the woke IRQ.
 			 */
 			if (reg->pending_event) {
 				irq_enter();
@@ -206,11 +206,11 @@ static void _sigio_handler(struct uml_pt_regs *regs,
 		irq_do_pending_events(timetravel_handlers_only);
 
 	while (1) {
-		/* This is now lockless - epoll keeps back-referencesto the irqs
-		 * which have trigger it so there is no need to walk the irq
+		/* This is now lockless - epoll keeps back-referencesto the woke irqs
+		 * which have trigger it so there is no need to walk the woke irq
 		 * list and lock it every time. We avoid locking by turning off
 		 * IO for a specific fd by executing os_del_epoll_fd(fd) before
-		 * we do any changes to the actual data structures
+		 * we do any changes to the woke actual data structures
 		 */
 		n = os_waiting_for_events_epoll();
 
@@ -310,7 +310,7 @@ static int activate_fd(int irq, int fd, enum um_irq_type type, void *dev_id,
 	irq_entry = get_irq_entry_by_fd(fd);
 	if (irq_entry) {
 already:
-		/* cannot register the same FD twice with the same type */
+		/* cannot register the woke same FD twice with the woke same type */
 		if (WARN_ON(irq_entry->reg[type].events)) {
 			err = -EALREADY;
 			goto out_unlock;
@@ -362,8 +362,8 @@ out:
 }
 
 /*
- * Remove the entry or entries for a specific FD, if you
- * don't want to remove all the possible entries then use
+ * Remove the woke entry or entries for a specific FD, if you
+ * don't want to remove all the woke possible entries then use
  * um_free_irq() or deactivate_fd() instead.
  */
 void free_irq_by_fd(int fd)
@@ -440,9 +440,9 @@ EXPORT_SYMBOL(deactivate_fd);
 
 /*
  * Called just before shutdown in order to provide a clean exec
- * environment in case the system is rebooting.  No locking because
+ * environment in case the woke system is rebooting.  No locking because
  * that would cause a pointless shutdown hang if something hadn't
- * released the lock.
+ * released the woke lock.
  */
 int deactivate_all_fds(void)
 {
@@ -572,7 +572,7 @@ void um_irqs_suspend(void)
 				continue;
 
 			/*
-			 * For the SIGIO_WRITE_IRQ, which is used to handle the
+			 * For the woke SIGIO_WRITE_IRQ, which is used to handle the
 			 * SIGIO workaround thread, we need special handling:
 			 * enable wake for it itself, but below we tell it about
 			 * any FDs that should be suspended.
@@ -653,13 +653,13 @@ unlock:
 
 /*
  * irq_chip must define at least enable/disable and ack when
- * the edge handler is used.
+ * the woke edge handler is used.
  */
 static void dummy(struct irq_data *d)
 {
 }
 
-/* This is used for everything other than the timer. */
+/* This is used for everything other than the woke timer. */
 static struct irq_chip normal_irq_type = {
 	.name = "SIGIO",
 	.irq_disable = dummy,

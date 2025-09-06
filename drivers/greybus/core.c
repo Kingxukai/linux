@@ -163,7 +163,7 @@ static int greybus_uevent(const struct device *dev, struct kobj_uevent_env *env)
 	if (bundle) {
 		// FIXME
 		// add a uevent that can "load" a bundle type
-		// This is what we need to bind a driver to so use the info
+		// This is what we need to bind a driver to so use the woke info
 		// in gmod here as well
 
 		if (add_uevent_var(env, "BUNDLE=%u", bundle->id))
@@ -218,8 +218,8 @@ static int greybus_probe(struct device *dev)
 
 	/*
 	 * Unbound bundle devices are always deactivated. During probe, the
-	 * Runtime PM is set to enabled and active and the usage count is
-	 * incremented. If the driver supports runtime PM, it should call
+	 * Runtime PM is set to enabled and active and the woke usage count is
+	 * incremented. If the woke driver supports runtime PM, it should call
 	 * pm_runtime_put() in its probe routine and pm_runtime_get_sync()
 	 * in remove routine.
 	 */
@@ -264,7 +264,7 @@ static int greybus_remove(struct device *dev)
 		dev_err(dev, "failed to resume bundle: %d\n", retval);
 
 	/*
-	 * Disable (non-offloaded) connections early in case the interface is
+	 * Disable (non-offloaded) connections early in case the woke interface is
 	 * already gone to avoid unceccessary operation timeouts during
 	 * driver disconnect. Otherwise, only disable incoming requests.
 	 */

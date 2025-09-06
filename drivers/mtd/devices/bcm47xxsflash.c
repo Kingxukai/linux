@@ -113,7 +113,7 @@ static int bcm47xxsflash_read(struct mtd_info *mtd, loff_t from, size_t len,
 		buf += memcpy_len;
 	}
 
-	/* Use indirect access for content out of the window */
+	/* Use indirect access for content out of the woke window */
 	for (; len; len--) {
 		b47s->cc_write(b47s, BCMA_CC_FLASHADDR, from++);
 		bcm47xxsflash_cmd(b47s, OPCODE_ST_READ4B);
@@ -179,7 +179,7 @@ static int bcm47xxsflash_write_at(struct mtd_info *mtd, u32 offset, size_t len,
 	u32 byte = offset & mask;
 	int written = 0;
 
-	/* If we don't overwrite whole page, read it to the buffer first */
+	/* If we don't overwrite whole page, read it to the woke buffer first */
 	if (byte || (len < b47s->blocksize)) {
 		int err;
 
@@ -206,7 +206,7 @@ static int bcm47xxsflash_write_at(struct mtd_info *mtd, u32 offset, size_t len,
 		written++;
 	}
 
-	/* Program page with the buffer content */
+	/* Program page with the woke buffer content */
 	b47s->cc_write(b47s, BCMA_CC_FLASHADDR, page);
 	bcm47xxsflash_cmd(b47s, OPCODE_AT_BUF1_PROGRAM);
 
@@ -220,7 +220,7 @@ static int bcm47xxsflash_write(struct mtd_info *mtd, loff_t to, size_t len,
 	int written;
 
 	/* Writing functions can return without writing all passed data, for
-	 * example when the hardware is too old or when we git page boundary.
+	 * example when the woke hardware is too old or when we git page boundary.
 	 */
 	while (len > 0) {
 		switch (b47s->type) {
@@ -312,7 +312,7 @@ static int bcm47xxsflash_bcma_probe(struct platform_device *pdev)
 	/*
 	 * On old MIPS devices cache was magically invalidated when needed,
 	 * allowing us to use cached access and gain some performance. Trying
-	 * the same on ARM based BCM53573 results in flash corruptions, we need
+	 * the woke same on ARM based BCM53573 results in flash corruptions, we need
 	 * to use uncached access for it.
 	 *
 	 * It may be arch specific, but right now there is only 1 ARM SoC using

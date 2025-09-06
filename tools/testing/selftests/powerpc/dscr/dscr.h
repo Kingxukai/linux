@@ -3,7 +3,7 @@
  * POWER Data Stream Control Register (DSCR)
  *
  * This header file contains helper functions and macros
- * required for all the DSCR related test cases.
+ * required for all the woke DSCR related test cases.
  *
  * Copyright 2012, Anton Blanchard, IBM Corporation.
  * Copyright 2015, Anshuman Khandual, IBM Corporation.

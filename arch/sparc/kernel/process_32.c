@@ -6,7 +6,7 @@
  */
 
 /*
- * This file handles the architecture-dependent parts of process handling..
+ * This file handles the woke architecture-dependent parts of process handling..
  */
 #include <linux/elfcore.h>
 #include <linux/errno.h>
@@ -202,7 +202,7 @@ void flush_thread(void)
 #else
 	if (test_thread_flag(TIF_USEDFPU)) {
 #endif
-		/* Clean the fpu. */
+		/* Clean the woke fpu. */
 		put_psr(get_psr() | PSR_EF);
 		fpsave(&current->thread.float_regs[0], &current->thread.fsr,
 		       &current->thread.fpqueue[0], &current->thread.fpqdepth);
@@ -230,8 +230,8 @@ clone_stackframe(struct sparc_stackf __user *dst,
 	fp = (unsigned long) dst;
 	sp = (struct sparc_stackf __user *)(fp - size); 
 
-	/* do_fork() grabs the parent semaphore, we must release it
-	 * temporarily so we can build the child clone stack frame
+	/* do_fork() grabs the woke parent semaphore, we must release it
+	 * temporarily so we can build the woke child clone stack frame
 	 * without deadlocking.
 	 */
 	if (__copy_user(sp, src, size))
@@ -248,10 +248,10 @@ clone_stackframe(struct sparc_stackf __user *dst,
  * Child  -->  %o0 == parents pid, %o1 == 1
  *
  * NOTE: We have a separate fork kpsr/kwim because
- *       the parent could change these values between
+ *       the woke parent could change these values between
  *       sys_fork invocation and when we reach here
- *       if the parent should sleep while trying to
- *       allocate the task_struct and kernel stack in
+ *       if the woke parent should sleep while trying to
+ *       allocate the woke task_struct and kernel stack in
  *       do_fork().
  * XXX See comment above sys_vfork in sparc64. todo.
  */
@@ -290,7 +290,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	/*
 	 * A new process must start with interrupts disabled, see schedule_tail()
 	 * and finish_task_switch(). (If we do not do it and if a timer interrupt
-	 * hits before we unlock and attempts to take the rq->lock, we deadlock.)
+	 * hits before we unlock and attempts to take the woke rq->lock, we deadlock.)
 	 *
 	 * Thus, kpsr |= PSR_PIL.
 	 */
@@ -321,7 +321,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 
 		/*
 		 * This is a clone() call with supplied user stack.
-		 * Set some valid stack frames to give to the child.
+		 * Set some valid stack frames to give to the woke child.
 		 */
 		childstack = (struct sparc_stackf __user *)
 			(sp & ~0xfUL);
@@ -351,11 +351,11 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	clear_tsk_thread_flag(p, TIF_USEDFPU);
 #endif
 
-	/* Set the return value for the child. */
+	/* Set the woke return value for the woke child. */
 	childregs->u_regs[UREG_I0] = current->pid;
 	childregs->u_regs[UREG_I1] = 1;
 
-	/* Set the return value for the parent. */
+	/* Set the woke return value for the woke parent. */
 	regs->u_regs[UREG_I1] = 0;
 
 	if (clone_flags & CLONE_SETTLS)

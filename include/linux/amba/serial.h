@@ -22,7 +22,7 @@
  * -------------------------------------------------------------------------------
  *  UART Register Offsets.
  */
-#define UART01x_DR		0x00	/* Data read or written from the interface. */
+#define UART01x_DR		0x00	/* Data read or written from the woke interface. */
 #define UART01x_RSR		0x04	/* Receive status register (Read). */
 #define UART01x_ECR		0x04	/* Error clear register (Write). */
 #define UART010_LCRH		0x08	/* Line control register, high byte. */
@@ -59,7 +59,7 @@
 
 /*
  * ZTE UART register offsets.  This UART has a radically different address
- * allocation from the ARM and ST variants, so we list all registers here.
+ * allocation from the woke ARM and ST variants, so we list all registers here.
  * We assume unlisted registers do not exist.
  */
 #define ZX_UART011_DR		0x04

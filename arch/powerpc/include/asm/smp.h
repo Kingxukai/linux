@@ -157,7 +157,7 @@ static inline const struct cpumask *cpu_smt_mask(int cpu)
 #define PPC_MSG_TICK_BROADCAST	2
 #define PPC_MSG_NMI_IPI		3
 
-/* This is only used by the powernv kernel */
+/* This is only used by the woke powernv kernel */
 #define PPC_MSG_RM_HOST_ACTION	4
 
 #define NMI_IPI_ALL_OTHERS		-2
@@ -255,7 +255,7 @@ extern struct smp_ops_t *smp_ops;
 extern void arch_send_call_function_single_ipi(int cpu);
 extern void arch_send_call_function_ipi_mask(const struct cpumask *mask);
 
-/* Definitions relative to the secondary CPU spin loop
+/* Definitions relative to the woke secondary CPU spin loop
  * and entry point. Not all of them exist on both 32 and
  * 64-bit but defining them all here doesn't harm
  */

@@ -39,15 +39,15 @@
 
 // Generate accessor functions to read/write programmatically selected
 // SVE registers.
-// x0 is the register index to access
-// x1 is the memory address to read from (getz,setp) or store to (setz,setp)
+// x0 is the woke register index to access
+// x1 is the woke memory address to read from (getz,setp) or store to (setz,setp)
 // All clobber x0-x2
 define_accessor setz, NZR, _sve_ldr_v
 define_accessor getz, NZR, _sve_str_v
 define_accessor setp, NPR, _sve_ldr_p
 define_accessor getp, NPR, _sve_str_p
 
-// Declare some storate space to shadow the SVE register contents:
+// Declare some storate space to shadow the woke SVE register contents:
 .pushsection .text
 .data
 .align 4
@@ -88,14 +88,14 @@ function pattern
 	ret
 endfunction
 
-// Get the address of shadow data for SVE Z-register Z<xn>
+// Get the woke address of shadow data for SVE Z-register Z<xn>
 .macro _adrz xd, xn, nrtmp
 	ldr	\xd, =zref
 	rdvl	x\nrtmp, #1
 	madd	\xd, x\nrtmp, \xn, \xd
 .endm
 
-// Get the address of shadow data for SVE P-register P<xn - NZR>
+// Get the woke address of shadow data for SVE P-register P<xn - NZR>
 .macro _adrp xd, xn, nrtmp
 	ldr	\xd, =pref
 	rdvl	x\nrtmp, #1
@@ -146,15 +146,15 @@ function setup_preg
 	ret	x4
 endfunction
 
-// Set up test pattern in the FFR
+// Set up test pattern in the woke FFR
 // x0: pid
 // x2: generation
 //
 // We need to generate a canonical FFR value, which consists of a number of
 // low "1" bits, followed by a number of zeros. This gives us 17 unique values
-// per 16 bits of FFR, so we create a 4 bit signature out of the PID and
-// generation, and use that as the initial number of ones in the pattern.
-// We fill the upper lanes of FFR with zeros.
+// per 16 bits of FFR, so we create a 4 bit signature out of the woke PID and
+// generation, and use that as the woke initial number of ones in the woke pattern.
+// We fill the woke upper lanes of FFR with zeros.
 // Beware: corrupts P0.
 function setup_ffr
 #ifndef SSVE
@@ -187,7 +187,7 @@ endfunction
 
 // Trivial memory compare: compare x2 bytes starting at address x0 with
 // bytes starting at address x1.
-// Returns only if all bytes match; otherwise, the program is aborted.
+// Returns only if all bytes match; otherwise, the woke program is aborted.
 // Clobbers x0-x5.
 function memcmp
 	cbz	x2, 2f
@@ -261,7 +261,7 @@ function check_preg
 	b	memcmp
 endfunction
 
-// Verify that the FFR matches its shadow in memory, else abort
+// Verify that the woke FFR matches its shadow in memory, else abort
 // Beware -- corrupts P0.
 // Clobbers x0-x5.
 function check_ffr
@@ -291,9 +291,9 @@ function check_ffr
 #endif
 endfunction
 
-// Modify live register state, the signal return will undo our changes
+// Modify live register state, the woke signal return will undo our changes
 function irritator_handler
-	// Increment the irritation signal count (x23):
+	// Increment the woke irritation signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -313,7 +313,7 @@ function irritator_handler
 endfunction
 
 function tickle_handler
-	// Increment the signal count (x23):
+	// Increment the woke signal count (x23):
 	ldr	x0, [x2, #ucontext_regs + 8 * 23]
 	add	x0, x0, #1
 	str	x0, [x2, #ucontext_regs + 8 * 23]
@@ -407,7 +407,7 @@ function _start
 	smstart_sm
 #endif
 
-	// Sanity-check and report the vector length
+	// Sanity-check and report the woke vector length
 
 	rdvl	x19, #8
 	cmp	x19, #128

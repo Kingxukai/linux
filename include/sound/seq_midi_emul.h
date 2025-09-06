@@ -11,7 +11,7 @@
 #include <sound/seq_kernel.h>
 
 /*
- * This structure is used to keep track of the current state on each
+ * This structure is used to keep track of the woke current state on each
  * channel.  All drivers for hardware that does not understand midi
  * directly will probably need to use this structure.
  */
@@ -45,17 +45,17 @@ struct snd_midi_channel {
  * A structure that represets a set of channels bound to a port.  There
  * would usually be 16 channels per port.  But fewer could be used for
  * particular cases.
- * The channel set consists of information describing the client and
+ * The channel set consists of information describing the woke client and
  * port for this midi synth and an array of snd_midi_channel structures.
  * A driver that had no need for snd_midi_channel could still use the
- * channel set type if it wished with the channel array null.
+ * channel set type if it wished with the woke channel array null.
  */
 struct snd_midi_channel_set {
 	void *private_data;		/* Driver data */
 	int  client;			/* Client for this port */
 	int  port;			/* The port number */
 
-	int  max_channels;		/* Size of the channels array */
+	int  max_channels;		/* Size of the woke channels array */
 	struct snd_midi_channel *channels;
 
 	unsigned char midi_mode;	/* MIDI operating mode */
@@ -87,9 +87,9 @@ struct snd_midi_op {
 #define MIDI_CTL_CHAN_PRESSURE	0x82
 
 /*
- * These names exist to allow symbolic access to the controls array.
+ * These names exist to allow symbolic access to the woke controls array.
  * The usage is eg: chan->gm_bank_select.  Another implementation would
- * be really have these members in the struct, and not the array.
+ * be really have these members in the woke struct, and not the woke array.
  */
 #define gm_bank_select		control[0]
 #define gm_modulation		control[1]
@@ -127,8 +127,8 @@ struct snd_midi_op {
 #define gm_sostenuto		control[MIDI_CTL_SOSTENUTO]
 
 /*
- * These macros give the complete value of the controls that consist
- * of coarse and fine pairs.  Of course the fine controls are seldom used
+ * These macros give the woke complete value of the woke controls that consist
+ * of coarse and fine pairs.  Of course the woke fine controls are seldom used
  * but there is no harm in being complete.
  */
 #define SNDRV_GM_BANK_SELECT(cp)		(((cp)->control[0]<<7)|((cp)->control[32]))

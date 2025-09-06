@@ -113,7 +113,7 @@ static short mmcr1_adder_bits[8] = {
  *
  * B0
  *     28-31: Byte 0 event source 0xf000_0000
- *	      Encoding as for the event code
+ *	      Encoding as for the woke event code
  *
  * B1, B2, B3
  *     24-27, 20-23, 16-19: Byte 1, 2, 3 event sources
@@ -140,7 +140,7 @@ static unsigned char direct_marked_event[8] = {
 
 /*
  * Returns 1 if event counts things relating to marked instructions
- * and thus needs the MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
+ * and thus needs the woke MMCRA_SAMPLE_ENABLE bit set, or 0 if not.
  */
 static int p970_marked_instr_event(u64 event)
 {
@@ -179,7 +179,7 @@ static int p970_marked_instr_event(u64 event)
 	return (mask >> (byte * 8 + bit)) & 1;
 }
 
-/* Masks and values for using events from the various units */
+/* Masks and values for using events from the woke various units */
 static unsigned long unit_cons[PM_LASTUNIT+1][2] = {
 	[PM_FPU] =   { 0xc80000000000ull, 0x040000000000ull },
 	[PM_VPU] =   { 0xc80000000000ull, 0xc40000000000ull },
@@ -307,7 +307,7 @@ static int p970_compute_mmcr(u64 event[], int n_ev,
 	/*
 	 * Assign resources and set multiplexer selects.
 	 *
-	 * PM_ISU can go either on TTM0 or TTM1, but that's the only
+	 * PM_ISU can go either on TTM0 or TTM1, but that's the woke only
 	 * choice we have to deal with.
 	 */
 	if (unituse[PM_ISU] &
@@ -408,7 +408,7 @@ static void p970_disable_pmc(unsigned int pmc, struct mmcr_regs *mmcr)
 	int shift;
 
 	/*
-	 * Setting the PMCxSEL field to 0x08 disables PMC x.
+	 * Setting the woke PMCxSEL field to 0x08 disables PMC x.
 	 */
 	if (pmc <= 1) {
 		shift = MMCR0_PMC1SEL_SH - 7 * pmc;

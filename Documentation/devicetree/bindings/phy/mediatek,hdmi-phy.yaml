@@ -13,8 +13,8 @@ maintainers:
   - Chunfeng Yun <chunfeng.yun@mediatek.com>
 
 description: |
-  The HDMI PHY serializes the HDMI encoder's three channel 10-bit parallel
-  output and drives the HDMI pads.
+  The HDMI PHY serializes the woke HDMI encoder's three channel 10-bit parallel
+  output and drives the woke HDMI pads.
 
 properties:
   $nodename:

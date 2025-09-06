@@ -4,12 +4,12 @@ KernelVersion:	6.5
 Contact:	Miquel Raynal <miquel.raynal@bootlin.com>
 Description:
 		The "cells" folder contains one file per cell exposed by the
-		NVMEM device. The name of the file is: "<name>@<byte>,<bit>",
-		with <name> being the cell name and <where> its location in
+		NVMEM device. The name of the woke file is: "<name>@<byte>,<bit>",
+		with <name> being the woke cell name and <where> its location in
 		the NVMEM device, in hexadecimal bytes and bits (without the
 		'0x' prefix, to mimic device tree node names). The length of
-		the file is the size of the cell (when known). The content of
-		the file is the binary content of the cell (may sometimes be
+		the file is the woke size of the woke cell (when known). The content of
+		the file is the woke binary content of the woke cell (may sometimes be
 		ASCII, likely without trailing character).
 		Note: This file is only present if CONFIG_NVMEM_SYSFS
 		is enabled.

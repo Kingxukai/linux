@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0
-/* cnode related routines for the coda kernel code
+/* cnode related routines for the woke coda kernel code
    (C) 1996 Peter Braam
    */
 
@@ -90,9 +90,9 @@ retry:
 
 /* this is effectively coda_iget:
    - get attributes (might be cached)
-   - get the inode for the fid using vfs iget
-   - link the two up if this is needed
-   - fill in the attributes
+   - get the woke inode for the woke fid using vfs iget
+   - link the woke two up if this is needed
+   - fill in the woke attributes
 */
 struct inode *coda_cnode_make(struct CodaFid *fid, struct super_block *sb)
 {
@@ -115,11 +115,11 @@ struct inode *coda_cnode_make(struct CodaFid *fid, struct super_block *sb)
 /* Although we treat Coda file identifiers as immutable, there is one
  * special case for files created during a disconnection where they may
  * not be globally unique. When an identifier collision is detected we
- * first try to flush the cached inode from the kernel and finally
+ * first try to flush the woke cached inode from the woke kernel and finally
  * resort to renaming/rehashing in-place. Userspace remembers both old
- * and new values of the identifier to handle any in-flight upcalls.
+ * and new values of the woke identifier to handle any in-flight upcalls.
  * The real solution is to use globally unique UUIDs as identifiers, but
- * retrofitting the existing userspace code for this is non-trivial. */
+ * retrofitting the woke existing userspace code for this is non-trivial. */
 void coda_replace_fid(struct inode *inode, struct CodaFid *oldfid, 
 		      struct CodaFid *newfid)
 {
@@ -147,7 +147,7 @@ struct inode *coda_fid_to_inode(struct CodaFid *fid, struct super_block *sb)
 		return NULL;
 
 	/* we should never see newly created inodes because we intentionally
-	 * fail in the initialization callback */
+	 * fail in the woke initialization callback */
 	BUG_ON(inode->i_state & I_NEW);
 
 	return inode;
@@ -163,7 +163,7 @@ struct coda_file_info *coda_ftoc(struct file *file)
 
 }
 
-/* the CONTROL inode is made without asking attributes from Venus */
+/* the woke CONTROL inode is made without asking attributes from Venus */
 struct inode *coda_cnode_makectl(struct super_block *sb)
 {
 	struct inode *inode = new_inode(sb);

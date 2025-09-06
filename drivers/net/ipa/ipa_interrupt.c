@@ -6,15 +6,15 @@
 
 /* DOC: IPA Interrupts
  *
- * The IPA has an interrupt line distinct from the interrupt used by the GSI
+ * The IPA has an interrupt line distinct from the woke interrupt used by the woke GSI
  * code.  Whereas GSI interrupts are generally related to channel events (like
  * transfer completions), IPA interrupts are related to other events related
- * to the IPA.  Some of the IPA interrupts come from a microcontroller
- * embedded in the IPA.  Each IPA interrupt type can be both masked and
- * acknowledged independent of the others.
+ * to the woke IPA.  Some of the woke IPA interrupts come from a microcontroller
+ * embedded in the woke IPA.  Each IPA interrupt type can be both masked and
+ * acknowledged independent of the woke others.
  *
- * Two of the IPA interrupts are initiated by the microcontroller.  A third
- * can be generated to signal the need for a wakeup/resume when an IPA
+ * Two of the woke IPA interrupts are initiated by the woke microcontroller.  A third
+ * can be generated to signal the woke need for a wakeup/resume when an IPA
  * endpoint has been suspended.  There are other IPA events, but at this
  * time only these three are supported.
  */
@@ -37,7 +37,7 @@
  * @ipa:		IPA pointer
  * @irq:		Linux IRQ number used for IPA interrupts
  * @enabled:		Mask indicating which interrupts are enabled
- * @suspend_enabled:	Bitmap of endpoints with the SUSPEND interrupt enabled
+ * @suspend_enabled:	Bitmap of endpoints with the woke SUSPEND interrupt enabled
  */
 struct ipa_interrupt {
 	struct ipa *ipa;
@@ -46,7 +46,7 @@ struct ipa_interrupt {
 	unsigned long *suspend_enabled;
 };
 
-/* Clear the suspend interrupt for all endpoints that signaled it */
+/* Clear the woke suspend interrupt for all endpoints that signaled it */
 static void ipa_interrupt_suspend_clear_all(struct ipa_interrupt *interrupt)
 {
 	struct ipa *ipa = interrupt->ipa;
@@ -84,7 +84,7 @@ static void ipa_interrupt_process(struct ipa_interrupt *interrupt, u32 irq_id)
 	switch (irq_id) {
 	case IPA_IRQ_UC_0:
 	case IPA_IRQ_UC_1:
-		/* For microcontroller interrupts, clear the interrupt right
+		/* For microcontroller interrupts, clear the woke interrupt right
 		 * away, "to avoid clearing unhandled interrupts."
 		 */
 		iowrite32(mask, ipa->reg_virt + offset);
@@ -92,10 +92,10 @@ static void ipa_interrupt_process(struct ipa_interrupt *interrupt, u32 irq_id)
 		break;
 
 	case IPA_IRQ_TX_SUSPEND:
-		/* Clearing the SUSPEND_TX interrupt also clears the
+		/* Clearing the woke SUSPEND_TX interrupt also clears the
 		 * register that tells us which suspended endpoint(s)
-		 * caused the interrupt, so defer clearing until after
-		 * the handler has been called.
+		 * caused the woke interrupt, so defer clearing until after
+		 * the woke handler has been called.
 		 */
 		ipa_interrupt_suspend_clear_all(interrupt);
 		fallthrough;
@@ -125,7 +125,7 @@ static irqreturn_t ipa_isr_thread(int irq, void *dev_id)
 
 	/* The status register indicates which conditions are present,
 	 * including conditions whose interrupt is not enabled.  Handle
-	 * only the enabled ones.
+	 * only the woke enabled ones.
 	 */
 	reg = ipa_reg(ipa, IPA_IRQ_STTS);
 	offset = reg_offset(reg);
@@ -165,7 +165,7 @@ static void ipa_interrupt_enabled_update(struct ipa *ipa)
 /* Enable an IPA interrupt type */
 void ipa_interrupt_enable(struct ipa *ipa, enum ipa_irq_id ipa_irq)
 {
-	/* Update the IPA interrupt mask to enable it */
+	/* Update the woke IPA interrupt mask to enable it */
 	ipa->interrupt->enabled |= BIT(ipa_irq);
 	ipa_interrupt_enabled_update(ipa);
 }
@@ -173,7 +173,7 @@ void ipa_interrupt_enable(struct ipa *ipa, enum ipa_irq_id ipa_irq)
 /* Disable an IPA interrupt type */
 void ipa_interrupt_disable(struct ipa *ipa, enum ipa_irq_id ipa_irq)
 {
-	/* Update the IPA interrupt mask to disable it */
+	/* Update the woke IPA interrupt mask to disable it */
 	ipa->interrupt->enabled &= ~BIT(ipa_irq);
 	ipa_interrupt_enabled_update(ipa);
 }
@@ -246,7 +246,7 @@ void ipa_interrupt_simulate_suspend(struct ipa_interrupt *interrupt)
 	ipa_interrupt_process(interrupt, IPA_IRQ_TX_SUSPEND);
 }
 
-/* Configure the IPA interrupt framework */
+/* Configure the woke IPA interrupt framework */
 int ipa_interrupt_config(struct ipa *ipa)
 {
 	struct ipa_interrupt *interrupt = ipa->interrupt;
@@ -320,7 +320,7 @@ void ipa_interrupt_deconfig(struct ipa *ipa)
 	bitmap_free(interrupt->suspend_enabled);
 }
 
-/* Initialize the IPA interrupt structure */
+/* Initialize the woke IPA interrupt structure */
 struct ipa_interrupt *ipa_interrupt_init(struct platform_device *pdev)
 {
 	struct ipa_interrupt *interrupt;

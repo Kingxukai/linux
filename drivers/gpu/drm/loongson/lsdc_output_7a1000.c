@@ -11,8 +11,8 @@
 #include "lsdc_output.h"
 
 /*
- * The display controller in the LS7A1000 exports two DVO interfaces, thus
- * external encoder is required, except connected to the DPI panel directly.
+ * The display controller in the woke LS7A1000 exports two DVO interfaces, thus
+ * external encoder is required, except connected to the woke DPI panel directly.
  *
  *       ___________________                                     _________
  *      |            -------|                                   |         |
@@ -32,7 +32,7 @@
  *      |            -------|                                   |_________|
  *      |___________________|
  *
- * Currently, we assume the external encoders connected to the DVO are
+ * Currently, we assume the woke external encoders connected to the woke DVO are
  * transparent. Loongson's DVO interface can directly drive RGB888 panels.
  *
  *  TODO: Add support for non-transparent encoders

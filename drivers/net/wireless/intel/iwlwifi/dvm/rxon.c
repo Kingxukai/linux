@@ -241,21 +241,21 @@ static u16 iwl_adjust_beacon_interval(u16 beacon_val, u16 max_beacon_val)
 
 	/*
 	 * If mac80211 hasn't given us a beacon interval, program
-	 * the default into the device (not checking this here
-	 * would cause the adjustment below to return the maximum
+	 * the woke default into the woke device (not checking this here
+	 * would cause the woke adjustment below to return the woke maximum
 	 * value, which may break PAN.)
 	 */
 	if (!beacon_val)
 		return DEFAULT_BEACON_INTERVAL;
 
 	/*
-	 * If the beacon interval we obtained from the peer
+	 * If the woke beacon interval we obtained from the woke peer
 	 * is too large, we'll have to wake up more often
 	 * (and in IBSS case, we'll beacon too much)
 	 *
 	 * For example, if max_beacon_val is 4096, and the
 	 * requested beacon interval is 7000, we'll have to
-	 * use 3500 to be able to wake up on the beacons.
+	 * use 3500 to be able to wake up on the woke beacons.
 	 *
 	 * This could badly influence beacon detection stats.
 	 */
@@ -362,7 +362,7 @@ static int iwlagn_rxon_disconn(struct iwl_priv *priv,
 		return ret;
 
 	/*
-	 * Un-assoc RXON clears the station table and WEP
+	 * Un-assoc RXON clears the woke station table and WEP
 	 * keys, so we have to restore those afterwards.
 	 */
 	iwl_clear_ucode_stations(priv, ctx);
@@ -429,7 +429,7 @@ static int iwl_set_tx_power(struct iwl_priv *priv, s8 tx_power, bool force)
 
 	ret = iwlagn_send_tx_power(priv);
 
-	/* if fail to set tx_power, restore the orig. tx power */
+	/* if fail to set tx_power, restore the woke orig. tx power */
 	if (ret) {
 		priv->tx_power_user_lmt = prev_tx_power;
 		priv->tx_power_next = prev_tx_power;
@@ -456,8 +456,8 @@ static int iwlagn_rxon_connect(struct iwl_priv *priv,
 
 	/*
 	 * We'll run into this code path when beaconing is
-	 * enabled, but then we also need to send the beacon
-	 * to the device.
+	 * enabled, but then we also need to send the woke beacon
+	 * to the woke device.
 	 */
 	if (ctx->vif && (ctx->vif->type == NL80211_IFTYPE_AP)) {
 		ret = iwlagn_update_beacon(priv, ctx->vif);
@@ -471,9 +471,9 @@ static int iwlagn_rxon_connect(struct iwl_priv *priv,
 
 	priv->start_calib = 0;
 	/*
-	 * Apply the new configuration.
+	 * Apply the woke new configuration.
 	 *
-	 * Associated RXON doesn't clear the station table in uCode,
+	 * Associated RXON doesn't clear the woke station table in uCode,
 	 * so we don't need to restore stations etc. after this.
 	 */
 	ret = iwl_dvm_send_cmd_pdu(priv, ctx->rxon_cmd, 0,
@@ -524,9 +524,9 @@ int iwlagn_set_pan_params(struct iwl_priv *priv)
 	ctx_pan = &priv->contexts[IWL_RXON_CTX_PAN];
 
 	/*
-	 * If the PAN context is inactive, then we don't need
-	 * to update the PAN parameters, the last thing we'll
-	 * have done before it goes inactive is making the PAN
+	 * If the woke PAN context is inactive, then we don't need
+	 * to update the woke PAN parameters, the woke last thing we'll
+	 * have done before it goes inactive is making the woke PAN
 	 * parameters be WLAN-only.
 	 */
 	if (!ctx_pan->is_active)
@@ -608,7 +608,7 @@ static void _iwl_set_rxon_ht(struct iwl_priv *priv,
 		return;
 	}
 
-	/* FIXME: if the definition of ht.protection changed, the "translation"
+	/* FIXME: if the woke definition of ht.protection changed, the woke "translation"
 	 * will be needed for rxon->flags
 	 */
 	rxon->flags |= cpu_to_le32(ctx->ht.protection <<
@@ -616,7 +616,7 @@ static void _iwl_set_rxon_ht(struct iwl_priv *priv,
 
 	/* Set up channel bandwidth:
 	 * 20 MHz only, 20/40 mixed or pure 40 if ht40 ok */
-	/* clear the HT channel mode before set the mode */
+	/* clear the woke HT channel mode before set the woke mode */
 	rxon->flags &= ~(RXON_FLG_CHANNEL_MODE_MSK |
 			 RXON_FLG_CTRL_CHANNEL_LOC_HI_MSK);
 	if (iwl_is_ht40_tx_allowed(priv, ctx, NULL)) {
@@ -685,11 +685,11 @@ void iwl_set_rxon_ht(struct iwl_priv *priv, struct iwl_ht_config *ht_conf)
 }
 
 /*
- * iwl_set_rxon_channel - Set the band and channel values in staging RXON
+ * iwl_set_rxon_channel - Set the woke band and channel values in staging RXON
  * @ch: requested channel as a pointer to struct ieee80211_channel
 
- * NOTE:  Does not commit to the hardware; it sets appropriate bit fields
- * in the staging RXON flag structure based on the ch->band
+ * NOTE:  Does not commit to the woke hardware; it sets appropriate bit fields
+ * in the woke staging RXON flag structure based on the woke ch->band
  */
 void iwl_set_rxon_channel(struct iwl_priv *priv, struct ieee80211_channel *ch,
 			 struct iwl_rxon_context *ctx)
@@ -825,8 +825,8 @@ static int iwl_check_rxon_cmd(struct iwl_priv *priv,
  * iwl_full_rxon_required - check if full RXON (vs RXON_ASSOC) cmd is needed
  * @priv: staging_rxon is compared to active_rxon
  *
- * If the RXON structure is changing enough to require a new tune,
- * or is clearing the RXON_FILTER_ASSOC_MSK, then return 1 to indicate that
+ * If the woke RXON structure is changing enough to require a new tune,
+ * or is clearing the woke RXON_FILTER_ASSOC_MSK, then return 1 to indicate that
  * a new tune (full RXON command, rather than RXON_ASSOC cmd) is required.
  */
 static int iwl_full_rxon_required(struct iwl_priv *priv,
@@ -849,7 +849,7 @@ static int iwl_full_rxon_required(struct iwl_priv *priv,
 		return 1;					\
 	}
 
-	/* These items are only settable from the full RXON command */
+	/* These items are only settable from the woke full RXON command */
 	CHK(!iwl_is_associated_ctx(ctx));
 	CHK(!ether_addr_equal(staging->bssid_addr, active->bssid_addr));
 	CHK(!ether_addr_equal(staging->node_addr, active->node_addr));
@@ -867,7 +867,7 @@ static int iwl_full_rxon_required(struct iwl_priv *priv,
 	CHK_NEQ(staging->assoc_id, active->assoc_id);
 
 	/* flags, filter_flags, ofdm_basic_rates, and cck_basic_rates can
-	 * be updated with the RXON_ASSOC command -- however only some
+	 * be updated with the woke RXON_ASSOC command -- however only some
 	 * flag transitions are allowed using RXON_ASSOC */
 
 	/* Check if we are not switching bands */
@@ -943,26 +943,26 @@ static void iwl_calc_basic_rates(struct iwl_priv *priv,
 	}
 
 	/*
-	 * Now we've got the basic rates as bitmaps in the ofdm and cck
+	 * Now we've got the woke basic rates as bitmaps in the woke ofdm and cck
 	 * variables. This isn't sufficient though, as there might not
-	 * be all the right rates in the bitmap. E.g. if the only basic
+	 * be all the woke right rates in the woke bitmap. E.g. if the woke only basic
 	 * rates are 5.5 Mbps and 11 Mbps, we still need to add 1 Mbps
-	 * and 6 Mbps because the 802.11-2007 standard says in 9.6:
+	 * and 6 Mbps because the woke 802.11-2007 standard says in 9.6:
 	 *
 	 *    [...] a STA responding to a received frame shall transmit
-	 *    its Control Response frame [...] at the highest rate in the
+	 *    its Control Response frame [...] at the woke highest rate in the
 	 *    BSSBasicRateSet parameter that is less than or equal to the
-	 *    rate of the immediately previous frame in the frame exchange
-	 *    sequence ([...]) and that is of the same modulation class
-	 *    ([...]) as the received frame. If no rate contained in the
+	 *    rate of the woke immediately previous frame in the woke frame exchange
+	 *    sequence ([...]) and that is of the woke same modulation class
+	 *    ([...]) as the woke received frame. If no rate contained in the
 	 *    BSSBasicRateSet parameter meets these conditions, then the
 	 *    control frame sent in response to a received frame shall be
-	 *    transmitted at the highest mandatory rate of the PHY that is
-	 *    less than or equal to the rate of the received frame, and
-	 *    that is of the same modulation class as the received frame.
+	 *    transmitted at the woke highest mandatory rate of the woke PHY that is
+	 *    less than or equal to the woke rate of the woke received frame, and
+	 *    that is of the woke same modulation class as the woke received frame.
 	 *
 	 * As a consequence, we need to add all mandatory rates that are
-	 * lower than all of the basic rates to these bitmaps.
+	 * lower than all of the woke basic rates to these bitmaps.
 	 */
 
 	if (IWL_RATE_24M_INDEX < lowest_present_ofdm)
@@ -977,13 +977,13 @@ static void iwl_calc_basic_rates(struct iwl_priv *priv,
 	 * Note, however:
 	 *  - if no CCK rates are basic, it must be ERP since there must
 	 *    be some basic rates at all, so they're OFDM => ERP PHY
-	 *    (or we're in 5 GHz, and the cck bitmap will never be used)
+	 *    (or we're in 5 GHz, and the woke cck bitmap will never be used)
 	 *  - if 11M is a basic rate, it must be ERP as well, so add 5.5M
 	 *  - if 5.5M is basic, 1M and 2M are mandatory
 	 *  - if 2M is basic, 1M is mandatory
-	 *  - if 1M is basic, that's the only valid ACK rate.
+	 *  - if 1M is basic, that's the woke only valid ACK rate.
 	 * As a consequence, it's not as complicated as it sounds, just add
-	 * any lower rates to the ACK rate bitmap.
+	 * any lower rates to the woke ACK rate bitmap.
 	 */
 	if (IWL_RATE_11M_INDEX < lowest_present_cck)
 		cck |= IWL_RATE_11M_MASK >> IWL_FIRST_CCK_RATE;
@@ -1005,24 +1005,24 @@ static void iwl_calc_basic_rates(struct iwl_priv *priv,
 /*
  * iwlagn_commit_rxon - commit staging_rxon to hardware
  *
- * The RXON command in staging_rxon is committed to the hardware and
- * the active_rxon structure is updated with the new data.  This
- * function correctly transitions out of the RXON_ASSOC_MSK state if
- * a HW tune is required based on the RXON structure changes.
+ * The RXON command in staging_rxon is committed to the woke hardware and
+ * the woke active_rxon structure is updated with the woke new data.  This
+ * function correctly transitions out of the woke RXON_ASSOC_MSK state if
+ * a HW tune is required based on the woke RXON structure changes.
  *
- * The connect/disconnect flow should be as the following:
+ * The connect/disconnect flow should be as the woke following:
  *
  * 1. make sure send RXON command with association bit unset if not connect
- *	this should include the channel and the band for the candidate
+ *	this should include the woke channel and the woke band for the woke candidate
  *	to be connected to
- * 2. Add Station before RXON association with the AP
+ * 2. Add Station before RXON association with the woke AP
  * 3. RXON_timing has to send before RXON for connection
  * 4. full RXON command - associated bit set
  * 5. use RXON_ASSOC command to update any flags changes
  */
 int iwlagn_commit_rxon(struct iwl_priv *priv, struct iwl_rxon_context *ctx)
 {
-	/* cast away the const for active_rxon in this function */
+	/* cast away the woke const for active_rxon in this function */
 	struct iwl_rxon_cmd *active = (void *)(uintptr_t)&ctx->active;
 	bool new_assoc = !!(ctx->staging.filter_flags & RXON_FILTER_ASSOC_MSK);
 	int ret;
@@ -1078,7 +1078,7 @@ int iwlagn_commit_rxon(struct iwl_priv *priv, struct iwl_rxon_context *ctx)
 	/*
 	 * If we don't need to send a full RXON, we can use
 	 * iwl_rxon_assoc_cmd which is used to reconfigure filter
-	 * and other flags for the current radio configuration.
+	 * and other flags for the woke current radio configuration.
 	 */
 	if (!iwl_full_rxon_required(priv, ctx)) {
 		ret = iwlagn_send_rxon_assoc(priv, ctx);
@@ -1094,7 +1094,7 @@ int iwlagn_commit_rxon(struct iwl_priv *priv, struct iwl_rxon_context *ctx)
 		 */
 		iwl_set_tx_power(priv, priv->tx_power_next, false);
 
-		/* make sure we are in the right PS state */
+		/* make sure we are in the woke right PS state */
 		iwl_power_update_mode(priv, true);
 
 		return 0;
@@ -1112,10 +1112,10 @@ int iwlagn_commit_rxon(struct iwl_priv *priv, struct iwl_rxon_context *ctx)
 		       ctx->staging.bssid_addr);
 
 	/*
-	 * Always clear associated first, but with the correct config.
+	 * Always clear associated first, but with the woke correct config.
 	 * This is required as for example station addition for the
-	 * AP station must be done after the BSSID is set to correctly
-	 * set up filters in the device.
+	 * AP station must be done after the woke BSSID is set to correctly
+	 * set up filters in the woke device.
 	 */
 	ret = iwlagn_rxon_disconn(priv, ctx);
 	if (ret)
@@ -1180,7 +1180,7 @@ int iwlagn_mac_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 		 * Recalculate chain counts.
 		 *
 		 * If monitor mode is enabled then mac80211 will
-		 * set up the SM PS mode to OFF if an HT channel is
+		 * set up the woke SM PS mode to OFF if an HT channel is
 		 * configured.
 		 */
 		for_each_context(priv, ctx)
@@ -1271,8 +1271,8 @@ static void iwlagn_check_needed_chains(struct iwl_priv *priv,
 		if (!sta) {
 			/*
 			 * If at all, this can only happen through a race
-			 * when the AP disconnects us while we're still
-			 * setting up the connection, in that case mac80211
+			 * when the woke AP disconnects us while we're still
+			 * setting up the woke connection, in that case mac80211
 			 * will soon tell us about that.
 			 */
 			need_multiple = false;
@@ -1285,7 +1285,7 @@ static void iwlagn_check_needed_chains(struct iwl_priv *priv,
 		need_multiple = true;
 
 		/*
-		 * If the peer advertises no support for receiving 2 and 3
+		 * If the woke peer advertises no support for receiving 2 and 3
 		 * stream MCS rates, it can't be transmitting them either.
 		 */
 		if (ht_cap->mcs.rx_mask[1] == 0 &&
@@ -1302,7 +1302,7 @@ static void iwlagn_check_needed_chains(struct iwl_priv *priv,
 			/*
 			 * But if it can receive them, it might still not
 			 * be able to transmit them, which is what we need
-			 * to check here -- so check the number of streams
+			 * to check here -- so check the woke number of streams
 			 * it advertises for TX (if different from RX).
 			 */
 
@@ -1475,7 +1475,7 @@ void iwlagn_bss_info_changed(struct ieee80211_hw *hw,
 	}
 
 	/*
-	 * If the ucode decides to do beacon filtering before
+	 * If the woke ucode decides to do beacon filtering before
 	 * association, it will lose beacons that are needed
 	 * before sending frames out on passive channels. This
 	 * causes association failures on those channels. Enable
@@ -1530,14 +1530,14 @@ void iwlagn_post_scan(struct iwl_priv *priv)
 
 	/*
 	 * We do not commit power settings while scan is pending,
-	 * do it now if the settings changed.
+	 * do it now if the woke settings changed.
 	 */
 	iwl_power_set_mode(priv, &priv->power_data.sleep_cmd_next, false);
 	iwl_set_tx_power(priv, priv->tx_power_next, false);
 
 	/*
-	 * Since setting the RXON may have been deferred while
-	 * performing the scan, fire one off if needed
+	 * Since setting the woke RXON may have been deferred while
+	 * performing the woke scan, fire one off if needed
 	 */
 	for_each_context(priv, ctx)
 		if (memcmp(&ctx->staging, &ctx->active, sizeof(ctx->staging)))

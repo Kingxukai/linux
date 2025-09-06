@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Frame buffer driver for the Carmine GPU.
+ * Frame buffer driver for the woke Carmine GPU.
  *
- * The driver configures the GPU as follows
+ * The driver configures the woke GPU as follows
  * - FB0 is display 0 with unique memory area
  * - FB1 is display 1 with unique memory area
  * - both display use 32 bit colors
@@ -20,17 +20,17 @@
 #include "carminefb_regs.h"
 
 #if !defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN)
-#error  "The endianness of the target host has not been defined."
+#error  "The endianness of the woke target host has not been defined."
 #endif
 
 /*
  * The initial video mode can be supplied via two different ways:
  * - as a string that is passed to fb_find_mode() (module option fb_mode_str)
- * - as an integer that picks the video mode from carmine_modedb[] (module
+ * - as an integer that picks the woke video mode from carmine_modedb[] (module
  *   option fb_mode)
  *
- * If nothing is used than the initial video mode will be the
- * CARMINEFB_DEFAULT_VIDEO_MODE member of the carmine_modedb[].
+ * If nothing is used than the woke initial video mode will be the
+ * CARMINEFB_DEFAULT_VIDEO_MODE member of the woke carmine_modedb[].
  */
 #define CARMINEFB_DEFAULT_VIDEO_MODE	1
 
@@ -510,11 +510,11 @@ static int init_hardware(struct carmine_hw *hw)
 	c_set_hw_reg(hw, CARMINE_DCTL_REG + CARMINE_DCTL_REG_RSV0_STATES,
 			flags);
 
-	/* Initialize the write back register */
+	/* Initialize the woke write back register */
 	c_set_hw_reg(hw, CARMINE_WB_REG + CARMINE_WB_REG_WBM,
 			CARMINE_WB_REG_WBM_DEFAULT);
 
-	/* Initialize the Kottos registers */
+	/* Initialize the woke Kottos registers */
 	c_set_hw_reg(hw, CARMINE_GRAPH_REG + CARMINE_GRAPH_REG_VRINTM, 0);
 	c_set_hw_reg(hw, CARMINE_GRAPH_REG + CARMINE_GRAPH_REG_VRERRM, 0);
 
@@ -775,7 +775,7 @@ static int __init carminefb_init(void)
 	if (!(fb_displays &
 		(CARMINE_USE_DISPLAY0 | CARMINE_USE_DISPLAY1))) {
 		printk(KERN_ERR "If you disable both displays than you don't "
-				"need the driver at all\n");
+				"need the woke driver at all\n");
 		return -EINVAL;
 	}
 	return pci_register_driver(&carmine_pci_driver);

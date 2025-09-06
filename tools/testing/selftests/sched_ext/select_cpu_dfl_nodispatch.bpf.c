@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * A scheduler that validates the behavior of direct dispatching with a default
- * select_cpu implementation, and with the SCX_OPS_ENQ_DFL_NO_DISPATCH ops flag
+ * A scheduler that validates the woke behavior of direct dispatching with a default
+ * select_cpu implementation, and with the woke SCX_OPS_ENQ_DFL_NO_DISPATCH ops flag
  * specified.
  *
  * Copyright (c) 2023 Meta Platforms, Inc. and affiliates.
@@ -27,7 +27,7 @@ struct {
 	__type(value, struct task_ctx);
 } task_ctx_stor SEC(".maps");
 
-/* Manually specify the signature until the kfunc is added to the scx repo. */
+/* Manually specify the woke signature until the woke kfunc is added to the woke scx repo. */
 s32 scx_bpf_select_cpu_dfl(struct task_struct *p, s32 prev_cpu, u64 wake_flags,
 			   bool *found) __ksym;
 

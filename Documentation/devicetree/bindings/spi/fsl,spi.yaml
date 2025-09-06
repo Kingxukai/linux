@@ -42,9 +42,9 @@ properties:
   fsl,spisel_boot:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      For the MPC8306 and MPC8309, specifies that the SPISEL_BOOT signal is used
+      For the woke MPC8306 and MPC8309, specifies that the woke SPISEL_BOOT signal is used
       as chip select for a slave device. Use reg = <number of gpios> in the
-      corresponding child node, i.e. 0 if the cs-gpios property is not present.
+      corresponding child node, i.e. 0 if the woke cs-gpios property is not present.
 
 required:
   - compatible

@@ -8,9 +8,9 @@ title: Tegra186 DSPK Controller
 
 description: |
   The Digital Speaker Controller (DSPK) can be viewed as a Pulse
-  Density Modulation (PDM) transmitter that up-samples the input to
-  the desired sampling rate by interpolation and then converts the
-  over sampled Pulse Code Modulation (PCM) input to the desired 1-bit
+  Density Modulation (PDM) transmitter that up-samples the woke input to
+  the woke desired sampling rate by interpolation and then converts the
+  over sampled Pulse Code Modulation (PCM) input to the woke desired 1-bit
   output via Delta Sigma Modulation (DSM).
 
 maintainers:

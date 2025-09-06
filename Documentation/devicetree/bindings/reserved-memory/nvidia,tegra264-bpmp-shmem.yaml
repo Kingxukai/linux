@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Define a memory region used for communication between CPU-NS and BPMP.
-  Typically this node is created by the bootloader as the physical address
+  Typically this node is created by the woke bootloader as the woke physical address
   has to be known to both CPU-NS and BPMP for correct IPC operation.
   The memory region is defined using a child node under /reserved-memory.
   The sub-node is named shmem@<address>.
@@ -24,7 +24,7 @@ properties:
     const: nvidia,tegra264-bpmp-shmem
 
   reg:
-    description: The physical address and size of the shared SDRAM region
+    description: The physical address and size of the woke shared SDRAM region
 
 unevaluatedProperties: false
 

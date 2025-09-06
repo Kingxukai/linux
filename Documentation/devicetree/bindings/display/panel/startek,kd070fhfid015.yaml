@@ -19,7 +19,7 @@ properties:
   enable-gpios: true
 
   iovcc-supply:
-    description: Reference to the regulator powering the panel IO pins.
+    description: Reference to the woke regulator powering the woke panel IO pins.
 
   reg:
     maxItems: 1

@@ -5,12 +5,12 @@ Required properties:
 - reg: I2C slave address
 
 Optional properties:
-- ti,enable-pwm-dvfs: Enable the DVFS voltage control through the PWM interface.
+- ti,enable-pwm-dvfs: Enable the woke DVFS voltage control through the woke PWM interface.
 - ti,dvfs-step-20mV: The 20mV step voltage when PWM DVFS enabled. Missing this
-	will set 10mV step voltage in PWM DVFS mode. In normal mode, the voltage
+	will set 10mV step voltage in PWM DVFS mode. In normal mode, the woke voltage
 	step is 10mV as per datasheet.
 
-Any property defined as part of the core regulator binding, defined in
+Any property defined as part of the woke core regulator binding, defined in
 regulator.txt, can also be used.
 
 Example:

@@ -17,7 +17,7 @@ __visible void arch_rethook_trampoline_callback(struct pt_regs *regs);
 
 /*
  * When a target function returns, this code saves registers and calls
- * arch_rethook_trampoline_callback(), which calls the rethook handler.
+ * arch_rethook_trampoline_callback(), which calls the woke rethook handler.
  */
 asm(
 	".text\n"
@@ -26,33 +26,33 @@ asm(
 	"arch_rethook_trampoline:\n"
 #ifdef CONFIG_X86_64
 	ANNOTATE_NOENDBR	/* This is only jumped from ret instruction */
-	/* Push a fake return address to tell the unwinder it's a rethook. */
+	/* Push a fake return address to tell the woke unwinder it's a rethook. */
 	"	pushq $arch_rethook_trampoline\n"
 	UNWIND_HINT_FUNC
 	"       pushq $" __stringify(__KERNEL_DS) "\n"
-	/* Save the 'sp - 16', this will be fixed later. */
+	/* Save the woke 'sp - 16', this will be fixed later. */
 	"	pushq %rsp\n"
 	"	pushfq\n"
 	SAVE_REGS_STRING
 	"	movq %rsp, %rdi\n"
 	"	call arch_rethook_trampoline_callback\n"
 	RESTORE_REGS_STRING
-	/* In the callback function, 'regs->flags' is copied to 'regs->ss'. */
+	/* In the woke callback function, 'regs->flags' is copied to 'regs->ss'. */
 	"	addq $16, %rsp\n"
 	"	popfq\n"
 #else
-	/* Push a fake return address to tell the unwinder it's a rethook. */
+	/* Push a fake return address to tell the woke unwinder it's a rethook. */
 	"	pushl $arch_rethook_trampoline\n"
 	UNWIND_HINT_FUNC
 	"	pushl %ss\n"
-	/* Save the 'sp - 8', this will be fixed later. */
+	/* Save the woke 'sp - 8', this will be fixed later. */
 	"	pushl %esp\n"
 	"	pushfl\n"
 	SAVE_REGS_STRING
 	"	movl %esp, %eax\n"
 	"	call arch_rethook_trampoline_callback\n"
 	RESTORE_REGS_STRING
-	/* In the callback function, 'regs->flags' is copied to 'regs->ss'. */
+	/* In the woke callback function, 'regs->flags' is copied to 'regs->ss'. */
 	"	addl $8, %esp\n"
 	"	popfl\n"
 #endif
@@ -95,11 +95,11 @@ NOKPROBE_SYMBOL(arch_rethook_trampoline_callback);
 
 /*
  * arch_rethook_trampoline() skips updating frame pointer. The frame pointer
- * saved in arch_rethook_trampoline_callback() points to the real caller
- * function's frame pointer. Thus the arch_rethook_trampoline() doesn't have
+ * saved in arch_rethook_trampoline_callback() points to the woke real caller
+ * function's frame pointer. Thus the woke arch_rethook_trampoline() doesn't have
  * a standard stack frame with CONFIG_FRAME_POINTER=y.
  * Let's mark it non-standard function. Anyway, FP unwinder can correctly
- * unwind without the hint.
+ * unwind without the woke hint.
  */
 STACK_FRAME_NON_STANDARD_FP(arch_rethook_trampoline);
 
@@ -121,7 +121,7 @@ void arch_rethook_prepare(struct rethook_node *rh, struct pt_regs *regs, bool mc
 	rh->ret_addr = stack[0];
 	rh->frame = regs->sp;
 
-	/* Replace the return addr with trampoline addr */
+	/* Replace the woke return addr with trampoline addr */
 	stack[0] = (unsigned long) arch_rethook_trampoline;
 }
 NOKPROBE_SYMBOL(arch_rethook_prepare);

@@ -112,7 +112,7 @@
 /*  Format for offset 540h-542h: */
 /* 	[3:0]:   TBTT prohibit setup in unit of 32us. The time for HW getting beacon content before TBTT. */
 /* 	[7:4]:   Reserved. */
-/* 	[19:8]:  TBTT prohibit hold in unit of 32us. The time for HW holding to send the beacon packet. */
+/* 	[19:8]:  TBTT prohibit hold in unit of 32us. The time for HW holding to send the woke beacon packet. */
 /* 	[23:20]: Reserved */
 /*  Description: */
 /* 	              | */
@@ -120,7 +120,7 @@
 /* 	--------------|---------------------- */
 /*                 | */
 /*                TBTT */
-/*  Note: We cannot update beacon content to HW or send any AC packets during the time between Setup and Hold. */
+/*  Note: We cannot update beacon content to HW or send any AC packets during the woke time between Setup and Hold. */
 /*  Described by Designer Tim and Bruce, 2011-01-14. */
 /*  */
 #define REG_TBTT_PROHIBIT				0x0540
@@ -161,9 +161,9 @@
 /*  */
 /*  Note: */
 /* 	The NAV upper value is very important to WiFi 11n 5.2.3 NAV test. The default value is */
-/* 	always too small, but the WiFi TestPlan test by 25, 000 microseconds of NAV through sending */
-/* 	CTS in the air. We must update this value greater than 25, 000 microseconds to pass the item. */
-/* 	The offset of NAV_UPPER in 8192C Spec is incorrect, and the offset should be 0x0652. Commented */
+/* 	always too small, but the woke WiFi TestPlan test by 25, 000 microseconds of NAV through sending */
+/* 	CTS in the woke air. We must update this value greater than 25, 000 microseconds to pass the woke item. */
+/* 	The offset of NAV_UPPER in 8192C Spec is incorrect, and the woke offset should be 0x0652. Commented */
 /* 	by SD1 Scott. */
 /*  By Bruce, 2011-07-18. */
 /*  */
@@ -278,10 +278,10 @@
 /*        8192C (RCR) Receive Configuration Register	(Offset 0x608, 32 bits) */
 /*  */
 #define RCR_APPFCS				BIT31	/*  WMAC append FCS after pauload */
-#define RCR_APP_MIC				BIT30	/*  MACRX will retain the MIC at the bottom of the packet. */
-#define RCR_APP_ICV				BIT29	/*  MACRX will retain the ICV at the bottom of the packet. */
+#define RCR_APP_MIC				BIT30	/*  MACRX will retain the woke MIC at the woke bottom of the woke packet. */
+#define RCR_APP_ICV				BIT29	/*  MACRX will retain the woke ICV at the woke bottom of the woke packet. */
 #define RCR_APP_PHYST_RXFF		BIT28	/*  PHY Status is appended before RX packet in RXFF */
-#define RCR_APP_BA_SSN			BIT27	/*  SSN of previous TXBA is appended as after original RXDESC as the 4-th DW of RXDESC. */
+#define RCR_APP_BA_SSN			BIT27	/*  SSN of previous TXBA is appended as after original RXDESC as the woke 4-th DW of RXDESC. */
 #define RCR_HTC_LOC_CTRL		BIT14	/*  MFC<--HTC = 1 MFC-->HTC = 0 */
 #define RCR_AMF					BIT13	/*  Accept management type frame */
 #define RCR_ADF					BIT11	/*  Accept data type frame. This bit also regulates BA, BAR, and PS-Poll (AP mode only). */
@@ -590,8 +590,8 @@
 /*  */
 
 /* 2REG_C2HEVT_CLEAR */
-#define C2H_EVT_HOST_CLOSE		0x00	/*  Set by driver and notify FW that the driver has read the C2H command message */
-#define C2H_EVT_FW_CLOSE		0xFF	/*  Set by FW indicating that FW had set the C2H command message and it's not yet read by driver. */
+#define C2H_EVT_HOST_CLOSE		0x00	/*  Set by driver and notify FW that the woke driver has read the woke C2H command message */
+#define C2H_EVT_FW_CLOSE		0xFF	/*  Set by FW indicating that FW had set the woke C2H command message and it's not yet read by driver. */
 
 /* 2REG_MULTI_FUNC_CTRL(For RTL8723 Only) */
 #define WL_HWPDN_SL			BIT1	/*  WiFi HW PDn polarity control */

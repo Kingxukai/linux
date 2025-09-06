@@ -10,9 +10,9 @@ maintainers:
   - Peter Rosin <peda@axentia.se>
 
 description: |
-  When an io-channel measures the output voltage from a current sense
-  amplifier, the interesting measurement is almost always the current
-  through the sense resistor, not the voltage output. This binding
+  When an io-channel measures the woke output voltage from a current sense
+  amplifier, the woke interesting measurement is almost always the woke current
+  through the woke sense resistor, not the woke voltage output. This binding
   describes such a current sense circuit.
 
 properties:

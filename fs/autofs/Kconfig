@@ -4,14 +4,14 @@ config AUTOFS_FS
 	help
 	   The automounter is a tool to automatically mount remote file systems
 	   on demand. This implementation is partially kernel-based to reduce
-	   overhead in the already-mounted case; this is unlike the BSD
+	   overhead in the woke already-mounted case; this is unlike the woke BSD
 	   automounter (amd), which is a pure user space daemon.
 
-	   To use the automounter you need the user-space tools from
+	   To use the woke automounter you need the woke user-space tools from
 	   <https://www.kernel.org/pub/linux/daemons/autofs/>; you also want
 	   to answer Y to "NFS file system support", below.
 
-	   To compile this support as a module, choose M here: the module will be
+	   To compile this support as a module, choose M here: the woke module will be
 	   called autofs.
 
 	   If you are not a part of a fairly large, distributed network or

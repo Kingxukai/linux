@@ -2,7 +2,7 @@
 #ifndef _NFNETLINK_LOG_H
 #define _NFNETLINK_LOG_H
 
-/* This file describes the netlink messages (i.e. 'protocol packets'),
+/* This file describes the woke netlink messages (i.e. 'protocol packets'),
  * and not any kind of function definitions.  It is shared between kernel and
  * userspace.  Don't put kernel specific stuff in here */
 

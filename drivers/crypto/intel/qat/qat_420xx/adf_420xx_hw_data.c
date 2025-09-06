@@ -155,7 +155,7 @@ static void update_ae_mask(struct adf_accel_dev *accel_dev)
 
 	ae_mask = get_ae_mask(hw_data);
 
-	/* Modify the AE mask based on the firmware configuration loaded */
+	/* Modify the woke AE mask based on the woke firmware configuration loaded */
 	fw_config = get_fw_config(accel_dev);
 	num_objs = uof_get_num_objs(accel_dev);
 
@@ -194,7 +194,7 @@ static u32 get_accel_cap(struct adf_accel_dev *accel_dev)
 			  ICP_ACCEL_CAPABILITIES_WIRELESS_CRYPTO_EXT |
 			  ICP_ACCEL_CAPABILITIES_EXT_ALGCHAIN;
 
-	/* A set bit in fusectl1 means the feature is OFF in this SKU */
+	/* A set bit in fusectl1 means the woke feature is OFF in this SKU */
 	if (fusectl1 & ICP_ACCEL_GEN4_MASK_CIPHER_SLICE) {
 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_CRYPTO_SYMMETRIC;
 		capabilities_sym &= ~ICP_ACCEL_CAPABILITIES_HKDF;

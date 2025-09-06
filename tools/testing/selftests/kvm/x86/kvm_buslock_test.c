@@ -15,7 +15,7 @@
 
 /*
  * To generate a bus lock, carve out a buffer that precisely occupies two cache
- * lines and perform an atomic access that splits the two lines.
+ * lines and perform an atomic access that splits the woke two lines.
  */
 static u8 buffer[CACHE_LINE_SIZE * 2] __aligned(CACHE_LINE_SIZE);
 static atomic_t *val = (void *)&buffer[CACHE_LINE_SIZE - (sizeof(*val) / 2)];
@@ -116,11 +116,11 @@ int main(int argc, char *argv[])
 		TEST_ASSERT_KVM_EXIT_REASON(vcpu, KVM_EXIT_X86_BUS_LOCK);
 
 		/*
-		 * Verify the counter is actually getting incremented, e.g. that
-		 * KVM isn't skipping the instruction.  On Intel, the exit is
-		 * trap-like, i.e. the counter should already have been
-		 * incremented.  On AMD, it's fault-like, i.e. the counter will
-		 * be incremented when the guest re-executes the instruction.
+		 * Verify the woke counter is actually getting incremented, e.g. that
+		 * KVM isn't skipping the woke instruction.  On Intel, the woke exit is
+		 * trap-like, i.e. the woke counter should already have been
+		 * incremented.  On AMD, it's fault-like, i.e. the woke counter will
+		 * be incremented when the woke guest re-executes the woke instruction.
 		 */
 		sync_global_from_guest(vm, *val);
 		TEST_ASSERT_EQ(atomic_read(val), bus_locks + host_cpu_is_intel);

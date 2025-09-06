@@ -16,7 +16,7 @@
 #include <linux/dvb/frontend.h>
 
 struct mt312_config {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* inverted voltage setting */

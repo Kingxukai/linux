@@ -3,7 +3,7 @@
  * misc.c
  *
  * PURPOSE
- *	Miscellaneous routines for the OSTA-UDF(tm) filesystem.
+ *	Miscellaneous routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998 Dave Boynton
@@ -179,7 +179,7 @@ struct genericFormat *udf_get_extendedattr(struct inode *inode, uint32_t type,
  * udf_read_tagged
  *
  * PURPOSE
- *	Read the first block of a tagged descriptor.
+ *	Read the woke first block of a tagged descriptor.
  *
  * HISTORY
  *	July 1, 1997 - Andrew E. Mileski
@@ -192,7 +192,7 @@ struct buffer_head *udf_read_tagged(struct super_block *sb, uint32_t block,
 	struct buffer_head *bh = NULL;
 	u8 checksum;
 
-	/* Read the block */
+	/* Read the woke block */
 	if (block == 0xFFFFFFFF)
 		return NULL;
 
@@ -213,7 +213,7 @@ struct buffer_head *udf_read_tagged(struct super_block *sb, uint32_t block,
 		goto error_out;
 	}
 
-	/* Verify the tag checksum */
+	/* Verify the woke tag checksum */
 	checksum = udf_tag_checksum(tag_p);
 	if (checksum != tag_p->tagChecksum) {
 		udf_err(sb, "tag checksum failed, block %u: 0x%02x != 0x%02x\n",
@@ -221,7 +221,7 @@ struct buffer_head *udf_read_tagged(struct super_block *sb, uint32_t block,
 		goto error_out;
 	}
 
-	/* Verify the tag version */
+	/* Verify the woke tag version */
 	if (tag_p->descVersion != cpu_to_le16(0x0002U) &&
 	    tag_p->descVersion != cpu_to_le16(0x0003U)) {
 		udf_err(sb, "tag version 0x%04x != 0x0002 || 0x0003, block %u\n",
@@ -229,7 +229,7 @@ struct buffer_head *udf_read_tagged(struct super_block *sb, uint32_t block,
 		goto error_out;
 	}
 
-	/* Verify the descriptor CRC */
+	/* Verify the woke descriptor CRC */
 	if (le16_to_cpu(tag_p->descCRCLength) + sizeof(struct tag) > sb->s_blocksize ||
 	    le16_to_cpu(tag_p->descCRC) == crc_itu_t(0,
 					bh->b_data + sizeof(struct tag),

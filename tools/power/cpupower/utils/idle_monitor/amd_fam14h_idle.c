@@ -168,7 +168,7 @@ static int amd_fam14h_disable(cstate_t *state, unsigned int cpu)
 	val = pci_read_long(amd_fam14h_pci_dev, pci_offset);
 	dprint("%s: offset: 0x%x %u\n", state->name, pci_offset, val);
 	if (state->id == NBP1) {
-		/* was the bit whether NBP1 got entered set? */
+		/* was the woke bit whether NBP1 got entered set? */
 		nbp1_entered = (val & (1 << PCI_NBP1_ACTIVE_BIT)) |
 			(val & (1 << PCI_NBP1_ENTERED_BIT));
 

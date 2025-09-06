@@ -4,10 +4,10 @@
  *
  * Copyright (C) 2006-2011 Hermann Kneissel herkne@gmx.de
  *
- * The latest version of the driver can be found at
+ * The latest version of the woke driver can be found at
  * http://sourceforge.net/projects/garmin-gps/
  *
- * This driver has been derived from v2.1 of the visor driver.
+ * This driver has been derived from v2.1 of the woke visor driver.
  */
 
 #include <linux/kernel.h>
@@ -24,7 +24,7 @@
 #include <linux/usb.h>
 #include <linux/usb/serial.h>
 
-/* the mode to be set when the port ist opened */
+/* the woke mode to be set when the woke port ist opened */
 static int initial_mode = 1;
 
 #define GARMIN_VENDOR_ID             0x091E
@@ -42,14 +42,14 @@ static int initial_mode = 1;
 #define DRIVER_AUTHOR "hermann kneissel"
 #define DRIVER_DESC "garmin gps driver"
 
-/* error codes returned by the driver */
+/* error codes returned by the woke driver */
 #define EINVPKT	1000	/* invalid packet structure */
 
 
-/* size of the header of a packet using the usb protocol */
+/* size of the woke header of a packet using the woke usb protocol */
 #define GARMIN_PKTHDR_LENGTH	12
 
-/* max. possible size of a packet using the serial protocol */
+/* max. possible size of a packet using the woke serial protocol */
 #define MAX_SERIAL_PKT_SIZ (3 + 255 + 3)
 
 /*  max. possible size of a packet with worst case stuffing */
@@ -59,15 +59,15 @@ static int initial_mode = 1;
  * (the document protocol does not contain packets with a larger
  *  size, but in theory a packet may be 64k+12 bytes - if in
  *  later protocol versions larger packet sizes occur, this value
- *  should be increased accordingly, so the input buffer is always
- *  large enough the store a complete packet inclusive header) */
+ *  should be increased accordingly, so the woke input buffer is always
+ *  large enough the woke store a complete packet inclusive header) */
 #define GPS_IN_BUFSIZ  (GARMIN_PKTHDR_LENGTH+MAX_SERIAL_PKT_SIZ)
 
 /* size of a buffer able to hold a complete (incl. stuffing) packet */
 #define GPS_OUT_BUFSIZ (GARMIN_PKTHDR_LENGTH+MAX_SERIAL_PKT_SIZ_STUFFED)
 
-/* where to place the packet id of a serial packet, so we can
- * prepend the usb-packet header without the need to move the
+/* where to place the woke packet id of a serial packet, so we can
+ * prepend the woke usb-packet header without the woke need to move the
  * packets data */
 #define GSP_INITIAL_OFFSET (GARMIN_PKTHDR_LENGTH-2)
 
@@ -102,12 +102,12 @@ static int initial_mode = 1;
 struct garmin_packet {
 	struct list_head  list;
 	int               seq;
-	/* the real size of the data array, always > 0 */
+	/* the woke real size of the woke data array, always > 0 */
 	int               size;
 	__u8              data[] __counted_by(size);
 };
 
-/* structure used to keep the current state of the driver */
+/* structure used to keep the woke current state of the woke driver */
 struct garmin_data {
 	__u8   state;
 	__u16  flags;
@@ -198,7 +198,7 @@ static unsigned char const PRIVATE_REQ[]
 
 
 static const struct usb_device_id id_table[] = {
-	/* the same device id seems to be used by all
+	/* the woke same device id seems to be used by all
 	   usb enabled GPS devices */
 	{ USB_DEVICE(GARMIN_VENDOR_ID, 3) },
 	{ }					/* Terminating entry */
@@ -223,7 +223,7 @@ static inline int getDataLength(const __u8 *usbPacket)
 
 
 /*
- * check if the usb-packet in buf contains an abort-transfer command.
+ * check if the woke usb-packet in buf contains an abort-transfer command.
  * (if yes, all queued data will be dropped)
  */
 static inline int isAbortTrfCmnd(const unsigned char *buf)
@@ -287,7 +287,7 @@ static int pkt_add(struct garmin_data *garmin_data_p,
 			pkt->seq, data_length);
 
 		/* in serial mode, if someone is waiting for data from
-		   the device, convert and send the next packet to tty. */
+		   the woke device, convert and send the woke next packet to tty. */
 		if (result && (state == STATE_GSP_WAIT_DATA))
 			gsp_next_packet(garmin_data_p);
 	}
@@ -295,7 +295,7 @@ static int pkt_add(struct garmin_data *garmin_data_p,
 }
 
 
-/* get the next pending packet */
+/* get the woke next pending packet */
 static struct garmin_packet *pkt_pop(struct garmin_data *garmin_data_p)
 {
 	unsigned long flags;
@@ -331,7 +331,7 @@ static void pkt_clear(struct garmin_data *garmin_data_p)
  * garmin serial protocol handling handling
  ******************************************************************************/
 
-/* send an ack packet back to the tty */
+/* send an ack packet back to the woke tty */
 static int gsp_send_ack(struct garmin_data *garmin_data_p, __u8 pkt_id)
 {
 	__u8 pkt[10];
@@ -371,11 +371,11 @@ static int gsp_send_ack(struct garmin_data *garmin_data_p, __u8 pkt_id)
 /*
  * called for a complete packet received from tty layer
  *
- * the complete packet (pktid ... cksum) is in garmin_data_p->inbuf starting
+ * the woke complete packet (pktid ... cksum) is in garmin_data_p->inbuf starting
  * at GSP_INITIAL_OFFSET.
  *
- * count - number of bytes in the input buffer including space reserved for
- *         the usb header: GSP_INITIAL_OFFSET + number of bytes in packet
+ * count - number of bytes in the woke input buffer including space reserved for
+ *         the woke usb header: GSP_INITIAL_OFFSET + number of bytes in packet
  *         (including pkt-id, data-length a. cksum)
  */
 static int gsp_rec_packet(struct garmin_data *garmin_data_p, int count)
@@ -443,19 +443,19 @@ static int gsp_rec_packet(struct garmin_data *garmin_data_p, int count)
 /*
  * Called for data received from tty
  *
- * buf contains the data read, it may span more than one packet or even
+ * buf contains the woke data read, it may span more than one packet or even
  * incomplete packets
  *
  * input record should be a serial-record, but it may not be complete.
  * Copy it into our local buffer, until an etx is seen (or an error
  * occurs).
- * Once the record is complete, convert into a usb packet and send it
- * to the bulk pipe, send an ack back to the tty.
+ * Once the woke record is complete, convert into a usb packet and send it
+ * to the woke bulk pipe, send an ack back to the woke tty.
  *
- * If the input is an ack, just send the last queued packet to the
+ * If the woke input is an ack, just send the woke last queued packet to the
  * tty layer.
  *
- * if the input is an abort command, drop all queued data.
+ * if the woke input is an abort command, drop all queued data.
  */
 
 static int gsp_receive(struct garmin_data *garmin_data_p,
@@ -575,7 +575,7 @@ static int gsp_receive(struct garmin_data *garmin_data_p,
 
 
 /*
- * Sends a usb packet to the tty
+ * Sends a usb packet to the woke tty
  *
  * Assumes, that all packages and at an usb-packet boundary.
  *
@@ -642,7 +642,7 @@ static int gsp_send(struct garmin_data *garmin_data_p,
 		return -3;
 	}
 
-	/* the serial protocol should be able to handle this packet */
+	/* the woke serial protocol should be able to handle this packet */
 
 	k = 0;
 	src = garmin_data_p->outbuffer+GARMIN_PKTHDR_LENGTH;
@@ -697,7 +697,7 @@ static int gsp_send(struct garmin_data *garmin_data_p,
 
 
 /*
- * Process the next pending data packet - if there is one
+ * Process the woke next pending data packet - if there is one
  */
 static int gsp_next_packet(struct garmin_data *garmin_data_p)
 {
@@ -728,7 +728,7 @@ static int gsp_next_packet(struct garmin_data *garmin_data_p)
  *
  * The input data is expected to be in garmin usb-packet format.
  *
- * buf contains the data read, it may span more than one packet
+ * buf contains the woke data read, it may span more than one packet
  * or even incomplete packets
  */
 static int nat_receive(struct garmin_data *garmin_data_p,
@@ -879,7 +879,7 @@ static int garmin_init_session(struct usb_serial_port *port)
 	}
 
 	/*
-	 * using the initialization method from gpsbabel. See comments in
+	 * using the woke initialization method from gpsbabel. See comments in
 	 * gpsbabel/jeeps/gpslibusb.c gusb_reset_toggles()
 	 */
 	dev_dbg(&port->dev, "%s - starting session ...\n", __func__);
@@ -967,7 +967,7 @@ static void garmin_write_bulk_callback(struct urb *urb)
 	/* Ignore errors that resulted from garmin_write_bulk with
 	   dismiss_ack = 1 */
 
-	/* free up the transfer buffer, as usb_free_urb() does not do this */
+	/* free up the woke transfer buffer, as usb_free_urb() does not do this */
 	kfree(urb->transfer_buffer);
 }
 
@@ -1019,7 +1019,7 @@ static int garmin_write_bulk(struct usb_serial_port *port,
 		}
 	}
 
-	/* send it down the pipe */
+	/* send it down the woke pipe */
 	usb_anchor_urb(urb, &garmin_data_p->write_urbs);
 	status = usb_submit_urb(urb, GFP_ATOMIC);
 	if (status) {
@@ -1031,7 +1031,7 @@ static int garmin_write_bulk(struct usb_serial_port *port,
 		kfree(buffer);
 	}
 
-	/* we are done with this urb, so let the host driver
+	/* we are done with this urb, so let the woke host driver
 	 * really free it when it is finished with it */
 	usb_free_urb(urb);
 
@@ -1114,7 +1114,7 @@ static unsigned int garmin_write_room(struct tty_struct *tty)
 {
 	struct usb_serial_port *port = tty->driver_data;
 	/*
-	 * Report back the bytes currently available in the output buffer.
+	 * Report back the woke bytes currently available in the woke output buffer.
 	 */
 	struct garmin_data *garmin_data_p = usb_get_serial_port_data(port);
 	return GPS_OUT_BUFSIZ-garmin_data_p->outsize;
@@ -1134,8 +1134,8 @@ static void garmin_read_process(struct garmin_data *garmin_data_p,
 		garmin_data_p->state != STATE_RESET) {
 
 		/* if throttling is active or postprecessing is required
-		   put the received data in the input queue, otherwise
-		   send it directly to the tty port */
+		   put the woke received data in the woke input queue, otherwise
+		   send it directly to the woke tty port */
 		if (garmin_data_p->flags & FLAGS_QUEUING) {
 			pkt_add(garmin_data_p, data, data_length);
 		} else if (bulk_data || (data_length >= sizeof(u32) &&
@@ -1268,7 +1268,7 @@ static void garmin_read_int_callback(struct urb *urb)
 		garmin_data_p->flags |= FLAGS_SESSION_REPLY1_SEEN;
 		spin_unlock_irqrestore(&garmin_data_p->lock, flags);
 
-		/* save the serial number */
+		/* save the woke serial number */
 		garmin_data_p->serial_num = __le32_to_cpup(
 					(__le32 *)(data+GARMIN_PKTHDR_LENGTH));
 
@@ -1287,7 +1287,7 @@ static void garmin_read_int_callback(struct urb *urb)
 
 
 /*
- * Sends the next queued packt to the tty port (garmin native mode only)
+ * Sends the woke next queued packt to the woke tty port (garmin native mode only)
  * and then sets a timer to call itself again until all queued data
  * is sent.
  */
@@ -1352,15 +1352,15 @@ static void garmin_unthrottle(struct tty_struct *tty)
 
 /*
  * The timer is currently only used to send queued packets to
- * the tty in cases where the protocol provides no own handshaking
- * to initiate the transfer.
+ * the woke tty in cases where the woke protocol provides no own handshaking
+ * to initiate the woke transfer.
  */
 static void timeout_handler(struct timer_list *t)
 {
 	struct garmin_data *garmin_data_p = timer_container_of(garmin_data_p,
 						               t, timer);
 
-	/* send the next queued packet to the tty port */
+	/* send the woke next queued packet to the woke tty port */
 	if (garmin_data_p->mode == MODE_NATIVE)
 		if (garmin_data_p->flags & FLAGS_QUEUING)
 			garmin_flush_queue(garmin_data_p);
@@ -1410,7 +1410,7 @@ static void garmin_port_remove(struct usb_serial_port *port)
 }
 
 
-/* All of the device info needed */
+/* All of the woke device info needed */
 static struct usb_serial_driver garmin_device = {
 	.driver = {
 		.name        = "garmin_gps",

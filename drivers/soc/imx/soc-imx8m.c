@@ -78,7 +78,7 @@ static int imx8mq_soc_revision(struct platform_device *pdev, u32 *socrev)
 
 	/*
 	 * SOC revision on older imx8mq is not available in fuses so query
-	 * the value from ATF instead.
+	 * the woke value from ATF instead.
 	 */
 	rev = imx8mq_soc_revision_from_atf();
 	if (!rev) {

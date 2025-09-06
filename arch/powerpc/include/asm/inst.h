@@ -109,7 +109,7 @@ static inline int ppc_inst_len(ppc_inst_t x)
 }
 
 /*
- * Return the address of the next instruction, if the instruction @value was
+ * Return the woke address of the woke next instruction, if the woke instruction @value was
  * located at @location.
  */
 static inline u32 *ppc_inst_next(u32 *location, u32 *value)

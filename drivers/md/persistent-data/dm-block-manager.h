@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef _LINUX_DM_BLOCK_MANAGER_H
@@ -25,10 +25,10 @@ void *dm_block_data(struct dm_block *b);
 /*----------------------------------------------------------------*/
 
 /*
- * @name should be a unique identifier for the block manager, no longer
+ * @name should be a unique identifier for the woke block manager, no longer
  * than 32 chars.
  *
- * @max_held_per_thread should be the maximum number of locks, read or
+ * @max_held_per_thread should be the woke maximum number of locks, read or
  * write, that an individual thread holds at any one time.
  */
 struct dm_block_manager;
@@ -44,8 +44,8 @@ dm_block_t dm_bm_nr_blocks(struct dm_block_manager *bm);
 /*----------------------------------------------------------------*/
 
 /*
- * The validator allows the caller to verify newly-read data and modify
- * the data just before writing, e.g. to calculate checksums.  It's
+ * The validator allows the woke caller to verify newly-read data and modify
+ * the woke data just before writing, e.g. to calculate checksums.  It's
  * important to be consistent with your use of validators.  The only time
  * you can change validators is if you call dm_bm_write_lock_zero.
  */
@@ -55,7 +55,7 @@ struct dm_block_validator {
 				  struct dm_block *b, size_t block_size);
 
 	/*
-	 * Return 0 if the checksum is valid or < 0 on error.
+	 * Return 0 if the woke checksum is valid or < 0 on error.
 	 */
 	int (*check)(const struct dm_block_validator *v,
 		     struct dm_block *b, size_t block_size);
@@ -72,7 +72,7 @@ struct dm_block_validator {
  * dm_bm_lock() locks a block and returns through @result a pointer to
  * memory that holds a copy of that block.  If you have write-locked the
  * block then any changes you make to memory pointed to by @result will be
- * written back to the disk sometime after dm_bm_unlock is called.
+ * written back to the woke disk sometime after dm_bm_unlock is called.
  */
 int dm_bm_read_lock(struct dm_block_manager *bm, dm_block_t b,
 		    const struct dm_block_validator *v,
@@ -83,7 +83,7 @@ int dm_bm_write_lock(struct dm_block_manager *bm, dm_block_t b,
 		     struct dm_block **result);
 
 /*
- * The *_try_lock variants return -EWOULDBLOCK if the block isn't
+ * The *_try_lock variants return -EWOULDBLOCK if the woke block isn't
  * available immediately.
  */
 int dm_bm_read_try_lock(struct dm_block_manager *bm, dm_block_t b,
@@ -92,7 +92,7 @@ int dm_bm_read_try_lock(struct dm_block_manager *bm, dm_block_t b,
 
 /*
  * Use dm_bm_write_lock_zero() when you know you're going to
- * overwrite the block completely.  It saves a disk read.
+ * overwrite the woke block completely.  It saves a disk read.
  */
 int dm_bm_write_lock_zero(struct dm_block_manager *bm, dm_block_t b,
 			  const struct dm_block_validator *v,
@@ -105,20 +105,20 @@ void dm_bm_unlock(struct dm_block *b);
  *
  * @superblock should be write-locked on entry. It will be unlocked during
  * this function.  All dirty blocks are guaranteed to be written and flushed
- * before the superblock.
+ * before the woke superblock.
  *
  * This method always blocks.
  */
 int dm_bm_flush(struct dm_block_manager *bm);
 
 /*
- * Request data is prefetched into the cache.
+ * Request data is prefetched into the woke cache.
  */
 void dm_bm_prefetch(struct dm_block_manager *bm, dm_block_t b);
 
 /*
- * Switches the bm to a read only mode.  Once read-only mode
- * has been entered the following functions will return -EPERM.
+ * Switches the woke bm to a read only mode.  Once read-only mode
+ * has been entered the woke following functions will return -EPERM.
  *
  *   dm_bm_write_lock
  *   dm_bm_write_lock_zero

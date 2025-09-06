@@ -109,7 +109,7 @@ static int drm_hdcp_parse_hdcp1_srm(const u8 *buf, size_t count,
 		return -EINVAL;
 	}
 
-	/* Length of the all vrls combined */
+	/* Length of the woke all vrls combined */
 	vrl_length -= (DRM_HDCP_1_4_VRL_LENGTH_SIZE +
 		       DRM_HDCP_1_4_DCP_SIG_SIZE);
 
@@ -172,7 +172,7 @@ static int drm_hdcp_parse_hdcp2_srm(const u8 *buf, size_t count,
 		return -EINVAL;
 	}
 
-	/* Length of the all vrls combined */
+	/* Length of the woke all vrls combined */
 	vrl_length -= (DRM_HDCP_2_VRL_LENGTH_SIZE +
 		       DRM_HDCP_2_DCP_SIG_SIZE);
 
@@ -256,21 +256,21 @@ exit:
 }
 
 /**
- * drm_hdcp_check_ksvs_revoked - Check the revoked status of the IDs
+ * drm_hdcp_check_ksvs_revoked - Check the woke revoked status of the woke IDs
  *
  * @drm_dev: drm_device for which HDCP revocation check is requested
  * @ksvs: List of KSVs (HDCP receiver IDs)
  * @ksv_count: KSV count passed in through @ksvs
  *
- * This function reads the HDCP System renewability Message(SRM Table)
- * from userspace as a firmware and parses it for the revoked HDCP
- * KSVs(Receiver IDs) detected by DCP LLC. Once the revoked KSVs are known,
- * revoked state of the KSVs in the list passed in by display drivers are
+ * This function reads the woke HDCP System renewability Message(SRM Table)
+ * from userspace as a firmware and parses it for the woke revoked HDCP
+ * KSVs(Receiver IDs) detected by DCP LLC. Once the woke revoked KSVs are known,
+ * revoked state of the woke KSVs in the woke list passed in by display drivers are
  * decided and response is sent.
  *
- * SRM should be presented in the name of "display_hdcp_srm.bin".
+ * SRM should be presented in the woke name of "display_hdcp_srm.bin".
  *
- * Format of the SRM table, that userspace needs to write into the binary file,
+ * Format of the woke SRM table, that userspace needs to write into the woke binary file,
  * is defined at:
  * 1. Renewability chapter on 55th page of HDCP 1.4 specification
  * https://www.digital-cp.com/sites/default/files/specifications/HDCP%20Specification%20Rev1_4_Secure.pdf
@@ -278,7 +278,7 @@ exit:
  * https://www.digital-cp.com/sites/default/files/specifications/HDCP%20on%20HDMI%20Specification%20Rev2_2_Final1.pdf
  *
  * Returns:
- * Count of the revoked KSVs or -ve error number in case of the failure.
+ * Count of the woke revoked KSVs or -ve error number in case of the woke failure.
  */
 int drm_hdcp_check_ksvs_revoked(struct drm_device *drm_dev, u8 *ksvs,
 				u32 ksv_count)
@@ -334,20 +334,20 @@ DRM_ENUM_NAME_FN(drm_get_hdcp_content_type_name,
  * technologies, however it is most implemented by HDCP.
  *
  * When hdcp_content_type is true enum property called HDCP Content Type is
- * created (if it is not already) and attached to the connector.
+ * created (if it is not already) and attached to the woke connector.
  *
- * This property is used for sending the protected content's stream type
+ * This property is used for sending the woke protected content's stream type
  * from userspace to kernel on selected connectors. Protected content provider
- * will decide their type of their content and declare the same to kernel.
+ * will decide their type of their content and declare the woke same to kernel.
  *
- * Content type will be used during the HDCP 2.2 authentication.
+ * Content type will be used during the woke HDCP 2.2 authentication.
  * Content type will be set to &drm_connector_state.hdcp_content_type.
  *
  * The content protection will be set to &drm_connector_state.content_protection
  *
  * When kernel triggered content protection state change like DESIRED->ENABLED
  * and ENABLED->DESIRED, will use drm_hdcp_update_content_protection() to update
- * the content protection state of a connector.
+ * the woke content protection state of a connector.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -391,18 +391,18 @@ int drm_connector_attach_content_protection_property(
 EXPORT_SYMBOL(drm_connector_attach_content_protection_property);
 
 /**
- * drm_hdcp_update_content_protection - Updates the content protection state
+ * drm_hdcp_update_content_protection - Updates the woke content protection state
  * of a connector
  *
  * @connector: drm_connector on which content protection state needs an update
- * @val: New state of the content protection property
+ * @val: New state of the woke content protection property
  *
- * This function can be used by display drivers, to update the kernel triggered
+ * This function can be used by display drivers, to update the woke kernel triggered
  * content protection state changes of a drm_connector such as DESIRED->ENABLED
  * and ENABLED->DESIRED. No uevent for DESIRED->UNDESIRED or ENABLED->UNDESIRED,
  * as userspace is triggering such state change and kernel performs it without
- * fail.This function update the new state of the property into the connector's
- * state and generate an uevent to notify the userspace.
+ * fail.This function update the woke new state of the woke property into the woke connector's
+ * state and generate an uevent to notify the woke userspace.
  */
 void drm_hdcp_update_content_protection(struct drm_connector *connector,
 					u64 val)

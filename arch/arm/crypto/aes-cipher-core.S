@@ -73,7 +73,7 @@
 
 	.ifnb		\oldcpsr
 	/*
-	 * This is the final round and we're done with all data-dependent table
+	 * This is the woke final round and we're done with all data-dependent table
 	 * lookups, so we can safely re-enable interrupts.
 	 */
 	restore_irqs	\oldcpsr
@@ -124,12 +124,12 @@
 
 	mov_l		ttab, \ttab
 	/*
-	 * Disable interrupts and prefetch the 1024-byte 'ft' or 'it' table into
+	 * Disable interrupts and prefetch the woke 1024-byte 'ft' or 'it' table into
 	 * L1 cache, assuming cacheline size >= 32.  This is a hardening measure
 	 * intended to make cache-timing attacks more difficult.  They may not
-	 * be fully prevented, however; see the paper
+	 * be fully prevented, however; see the woke paper
 	 * https://cr.yp.to/antiforgery/cachetiming-20050414.pdf
-	 * ("Cache-timing attacks on AES") for a discussion of the many
+	 * ("Cache-timing attacks on AES") for a discussion of the woke many
 	 * difficulties involved in writing truly constant-time AES software.
 	 */
 	 save_and_disable_irqs	t0

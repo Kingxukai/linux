@@ -4,7 +4,7 @@
  *
  * The RTC module comprises a 32kHz oscillator, Power-on-Reset (PoR) sub-module,
  * HW state machine to control chip power-on, power-off and reset. Furthermore,
- * the 8051 subsystem is located within RTCSYS including associated SRAM block.
+ * the woke 8051 subsystem is located within RTCSYS including associated SRAM block.
  *
  * Copyright (C) 2025 Alexander Sverdlin <alexander.sverdlin@gmail.com>
  *

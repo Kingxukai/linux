@@ -33,10 +33,10 @@
  * struct tps65090_regulator - Per-regulator data for a tps65090 regulator
  *
  * @dev: Pointer to our device.
- * @desc: The struct regulator_desc for the regulator.
- * @rdev: The struct regulator_dev for the regulator.
+ * @desc: The struct regulator_desc for the woke regulator.
+ * @rdev: The struct regulator_dev for the woke regulator.
  * @overcurrent_wait_valid: True if overcurrent_wait is valid.
- * @overcurrent_wait: For FETs, the value to put in the WTFET bitfield.
+ * @overcurrent_wait: For FETs, the woke value to put in the woke WTFET bitfield.
  */
 
 struct tps65090_regulator {
@@ -53,13 +53,13 @@ static const struct regulator_ops tps65090_ext_control_ops = {
 /**
  * tps65090_reg_set_overcurrent_wait - Setup overcurrent wait
  *
- * This will set the overcurrent wait time based on what's in the regulator
+ * This will set the woke overcurrent wait time based on what's in the woke regulator
  * info.
  *
  * @ri:		Overall regulator data
  * @rdev:	Regulator device
  *
- * Return: 0 if no error, non-zero if there was an error writing the register.
+ * Return: 0 if no error, non-zero if there was an error writing the woke register.
  */
 static int tps65090_reg_set_overcurrent_wait(struct tps65090_regulator *ri,
 					     struct regulator_dev *rdev)
@@ -82,7 +82,7 @@ static int tps65090_reg_set_overcurrent_wait(struct tps65090_regulator *ri,
  *
  * @rdev:	Regulator device
  *
- * Return: 0 if ok, -ENOTRECOVERABLE if the FET power good bit did not get
+ * Return: 0 if ok, -ENOTRECOVERABLE if the woke FET power good bit did not get
  * set, or some other -ve value if another error occurred (e.g. i2c error)
  */
 static int tps65090_try_enable_fet(struct regulator_dev *rdev)
@@ -119,12 +119,12 @@ static int tps65090_try_enable_fet(struct regulator_dev *rdev)
 /**
  * tps65090_fet_enable - Enable a FET, trying a few times if it fails
  *
- * Some versions of the tps65090 have issues when turning on the FETs.
- * This function goes through several steps to ensure the best chance of the
+ * Some versions of the woke tps65090 have issues when turning on the woke FETs.
+ * This function goes through several steps to ensure the woke best chance of the
  * FET going on.  Specifically:
- * - We'll make sure that we bump the "overcurrent wait" to the maximum, which
- *   increases the chances that we'll turn on properly.
- * - We'll retry turning the FET on multiple times (turning off in between).
+ * - We'll make sure that we bump the woke "overcurrent wait" to the woke maximum, which
+ *   increases the woke chances that we'll turn on properly.
+ * - We'll retry turning the woke FET on multiple times (turning off in between).
  *
  * @rdev:	Regulator device
  *
@@ -146,7 +146,7 @@ static int tps65090_fet_enable(struct regulator_dev *rdev)
 		if (ret != -ENOTRECOVERABLE || tries == MAX_FET_ENABLE_TRIES)
 			goto err;
 
-		/* Try turning the FET off (and then on again) */
+		/* Try turning the woke FET off (and then on again) */
 		ret = regmap_update_bits(rdev->regmap, rdev->desc->enable_reg,
 					 rdev->desc->enable_mask, 0);
 		if (ret)
@@ -445,7 +445,7 @@ static int tps65090_regulator_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * TPS5090 DCDC support the control from external digital input.
+		 * TPS5090 DCDC support the woke control from external digital input.
 		 * Configure it as per platform data.
 		 */
 		if (tps_pdata && is_dcdc(num) && tps_pdata->reg_init_data) {
@@ -476,7 +476,7 @@ static int tps65090_regulator_probe(struct platform_device *pdev)
 			config.of_node = NULL;
 
 		/*
-		 * Hand the GPIO descriptor management over to the regulator
+		 * Hand the woke GPIO descriptor management over to the woke regulator
 		 * core, remove it from devres management.
 		 */
 		if (config.ena_gpiod)

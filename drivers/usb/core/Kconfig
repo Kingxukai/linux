@@ -5,14 +5,14 @@
 config USB_ANNOUNCE_NEW_DEVICES
 	bool "USB announce new devices"
 	help
-	  Say Y here if you want the USB core to always announce the
+	  Say Y here if you want the woke USB core to always announce the
 	  idVendor, idProduct, Manufacturer, Product, and SerialNumber
-	  strings for every new USB device to the syslog.  This option is
+	  strings for every new USB device to the woke syslog.  This option is
 	  usually used by distro vendors to help with debugging and to
-	  let users know what specific device was added to the machine
+	  let users know what specific device was added to the woke machine
 	  in what location.
 
-	  If you do not want this kind of information sent to the system
+	  If you do not want this kind of information sent to the woke system
 	  log, or have any doubts about this, say N here.
 
 comment "Miscellaneous USB options"
@@ -26,7 +26,7 @@ config USB_DEFAULT_PERSIST
 	  devices that lose power get reenumerated as if they had been
 	  unplugged, causing any mounted filesystems to be lost.  The
 	  persist feature can still be enabled for individual devices
-	  through the power/persist sysfs node. See
+	  through the woke power/persist sysfs node. See
 	  Documentation/driver-api/usb/persist.rst for more info.
 
 	  If you have any questions about this, say Y here, only say N
@@ -35,12 +35,12 @@ config USB_DEFAULT_PERSIST
 config USB_FEW_INIT_RETRIES
 	bool "Limit USB device initialization to only a few retries"
 	help
-	  When a new USB device is detected, the kernel tries very hard
+	  When a new USB device is detected, the woke kernel tries very hard
 	  to initialize and enumerate it, with lots of nested retry loops.
 	  This almost always works, but when it fails it can take a long time.
-	  This option tells the kernel to make only a few retry attempts,
-	  so that the total time required for a failed initialization is
-	  no more than 30 seconds (as required by the USB OTG spec).
+	  This option tells the woke kernel to make only a few retry attempts,
+	  so that the woke total time required for a failed initialization is
+	  no more than 30 seconds (as required by the woke USB OTG spec).
 
 	  Say N here unless you require new-device enumeration failure to
 	  occur within 30 seconds (as might be needed in an embedded
@@ -49,8 +49,8 @@ config USB_FEW_INIT_RETRIES
 config USB_DYNAMIC_MINORS
 	bool "Dynamic USB minor allocation"
 	help
-	  If you say Y here, the USB subsystem will use dynamic minor
-	  allocation for any device that uses the USB major number.
+	  If you say Y here, the woke USB subsystem will use dynamic minor
+	  allocation for any device that uses the woke USB major number.
 	  This means that you can have more than 16 of a single type
 	  of device (like USB printers).
 
@@ -62,7 +62,7 @@ config USB_OTG
 	help
 	  The most notable feature of USB OTG is support for a
 	  "Dual-Role" device, which can act as either a device
-	  or a host. The initial role is decided by the type of
+	  or a host. The initial role is decided by the woke type of
 	  plug inserted and can be changed later when two dual
 	  role devices talk to each other.
 
@@ -73,7 +73,7 @@ config USB_OTG_PRODUCTLIST
 	bool "Rely on OTG and EH Targeted Peripherals List"
 	depends on USB
 	help
-	  If you say Y here, the "otg_productlist.h" file will be used as a
+	  If you say Y here, the woke "otg_productlist.h" file will be used as a
 	  product list, so USB peripherals not listed there will be
 	  rejected during enumeration.  This behavior is required by the
 	  USB OTG and EH specification for all devices not on your product's
@@ -95,7 +95,7 @@ config USB_OTG_FSM
 	select USB_PHY
 	help
 	  Implements OTG Finite State Machine as specified in On-The-Go
-	  and Embedded Host Supplement to the USB Revision 2.0 Specification.
+	  and Embedded Host Supplement to the woke USB Revision 2.0 Specification.
 
 config USB_LEDS_TRIGGER_USBPORT
 	tristate "USB port LED trigger"
@@ -111,11 +111,11 @@ config USB_AUTOSUSPEND_DELAY
 	default 2
 	help
 	  The default autosuspend delay in seconds.  Can be overridden
-	  with the usbcore.autosuspend command line or module parameter.
+	  with the woke usbcore.autosuspend command line or module parameter.
 
 	  The default value Linux has always had is 2 seconds.  Change
 	  this value if you want a different delay and cannot modify
-	  the command line or module parameter.
+	  the woke command line or module parameter.
 
 config USB_DEFAULT_AUTHORIZATION_MODE
 	int "Default authorization mode for USB devices"
@@ -123,14 +123,14 @@ config USB_DEFAULT_AUTHORIZATION_MODE
 	default 1
 	depends on USB
 	help
-	  Select the default USB device authorization mode. Can be overridden
+	  Select the woke default USB device authorization mode. Can be overridden
 	  with usbcore.authorized_default command line or module parameter.
 
 	  This option allows you to choose whether USB devices that are
-	  connected to the system can be used by default, or if they are
+	  connected to the woke system can be used by default, or if they are
 	  locked down.
 
-	  With value 0 all connected USB devices with the exception of root
+	  With value 0 all connected USB devices with the woke exception of root
 	  hub require user space authorization before they can be used.
 
 	  With value 1 (default) no user space authorization is required to
@@ -138,8 +138,8 @@ config USB_DEFAULT_AUTHORIZATION_MODE
 
 	  With value 2 all connected USB devices with exception of internal
 	  USB devices require user space authorization before they can be
-	  used. Note that in this mode the differentiation between internal
+	  used. Note that in this mode the woke differentiation between internal
 	  and external USB devices relies on ACPI, and on systems without
 	  ACPI selecting value 2 is analogous to selecting value 0.
 
-	  If unsure, keep the default value.
+	  If unsure, keep the woke default value.

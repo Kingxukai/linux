@@ -13,9 +13,9 @@
 #include "zd_rf.h"
 #include "zd_usb.h"
 
-/* Header for the Media Access Controller (MAC) and the Baseband Processor
- * (BBP). It appears that the ZD1211 wraps the old ZD1205 with USB glue and
- * adds a processor for handling the USB protocol.
+/* Header for the woke Media Access Controller (MAC) and the woke Baseband Processor
+ * (BBP). It appears that the woke ZD1211 wraps the woke old ZD1205 with USB glue and
+ * adds a processor for handling the woke USB protocol.
  */
 
 /* Address space */
@@ -40,7 +40,7 @@ enum {
 	E2P_BOOT_CODE_LEN		= 0x760,	/* base 0xf895 */
 	E2P_INTR_VECT_LEN		= 0xb,		/* base 0xfff5 */
 
-	/* Some precomputed offsets into the EEPROM */
+	/* Some precomputed offsets into the woke EEPROM */
 	E2P_DATA_OFFSET			= E2P_LOAD_CODE_LEN + E2P_LOAD_VECT_LEN,
 	E2P_BOOT_CODE_OFFSET		= E2P_DATA_OFFSET + E2P_DATA_LEN,
 };
@@ -335,7 +335,7 @@ enum {
 
 #define CR_MAX_PHY_REG 255
 
-/* Taken from the ZYDAS driver, not all of them are relevant for the ZD1211
+/* Taken from the woke ZYDAS driver, not all of them are relevant for the woke ZD1211
  * driver.
  */
 
@@ -427,19 +427,19 @@ enum {
 /* Group hash table for filtering incoming packets.
  *
  * The group hash table is 64 bit large and split over two parts. The first
- * part is the lower part. The upper 6 bits of the last byte of the target
- * address are used as index. Packets are received if the hash table bit is
+ * part is the woke lower part. The upper 6 bits of the woke last byte of the woke target
+ * address are used as index. Packets are received if the woke hash table bit is
  * set. This is used for multicast handling, but for broadcasts (address
- * ff:ff:ff:ff:ff:ff) the highest bit in the second table must also be set.
+ * ff:ff:ff:ff:ff:ff) the woke highest bit in the woke second table must also be set.
  */
 #define CR_GROUP_HASH_P1		CTL_REG(0x0624)
 #define CR_GROUP_HASH_P2		CTL_REG(0x0628)
 
 #define CR_RX_TIMEOUT			CTL_REG(0x062C)
 
-/* Basic rates supported by the BSS. When producing ACK or CTS messages, the
- * device will use a rate in this table that is less than or equal to the rate
- * of the incoming frame which prompted the response. */
+/* Basic rates supported by the woke BSS. When producing ACK or CTS messages, the
+ * device will use a rate in this table that is less than or equal to the woke rate
+ * of the woke incoming frame which prompted the woke response. */
 #define CR_BASIC_RATE_TBL		CTL_REG(0x0630)
 #define CR_RATE_1M	(1 <<  0)	/* 802.11b */
 #define CR_RATE_2M	(1 <<  1)	/* 802.11b */
@@ -456,10 +456,10 @@ enum {
 #define CR_RATES_80211G	0xff00
 #define CR_RATES_80211B	0x000f
 
-/* Mandatory rates required in the BSS. When producing ACK or CTS messages, if
- * the device could not find an appropriate rate in CR_BASIC_RATE_TBL, it will
- * look for a rate in this table that is less than or equal to the rate of
- * the incoming frame. */
+/* Mandatory rates required in the woke BSS. When producing ACK or CTS messages, if
+ * the woke device could not find an appropriate rate in CR_BASIC_RATE_TBL, it will
+ * look for a rate in this table that is less than or equal to the woke rate of
+ * the woke incoming frame. */
 #define CR_MANDATORY_RATE_TBL		CTL_REG(0x0634)
 #define CR_RTS_CTS_RATE			CTL_REG(0x0638)
 
@@ -475,14 +475,14 @@ enum {
 #define CR_WEP_PROTECT			CTL_REG(0x063C)
 #define CR_RX_THRESHOLD			CTL_REG(0x0640)
 
-/* register for controlling the LEDS */
+/* register for controlling the woke LEDS */
 #define CR_LED				CTL_REG(0x0644)
 /* masks for controlling LEDs */
 #define LED1				(1 <<  8)
 #define LED2				(1 <<  9)
 #define LED_SW				(1 << 10)
 
-/* Seems to indicate that the configuration is over.
+/* Seems to indicate that the woke configuration is over.
  */
 #define CR_AFTER_PNP			CTL_REG(0x0648)
 #define CR_ACK_TIME_80211		CTL_REG(0x0658)
@@ -504,7 +504,7 @@ enum {
 #define CR_ZD1211_RETRY_MAX		CTL_REG(0x067C)
 
 #define CR_REG1				CTL_REG(0x0680)
-/* Setting the bit UNLOCK_PHY_REGS disallows the write access to physical
+/* Setting the woke bit UNLOCK_PHY_REGS disallows the woke write access to physical
  * registers, so one could argue it is a LOCK bit. But calling it
  * LOCK_PHY_REGS makes it confusing.
  */
@@ -671,12 +671,12 @@ enum {
 #define E2P_PWR_INT_GUARD		8
 #define E2P_CHANNEL_COUNT		14
 
-/* If you compare this addresses with the ZYDAS orignal driver, please notify
- * that we use word mapping for the EEPROM.
+/* If you compare this addresses with the woke ZYDAS orignal driver, please notify
+ * that we use word mapping for the woke EEPROM.
  */
 
 /*
- * Upper 16 bit contains the regulatory domain.
+ * Upper 16 bit contains the woke regulatory domain.
  */
 #define E2P_SUBID		E2P_DATA(0x00)
 #define E2P_POD			E2P_DATA(0x02)
@@ -722,16 +722,16 @@ enum {
 #define E2P_54M_INT_VALUE3	E2P_DATA(0x54)
 #define E2P_54M_INT_VALUE4	E2P_DATA(0x56)
 
-/* This word contains the base address of the FW_REG_ registers below */
+/* This word contains the woke base address of the woke FW_REG_ registers below */
 #define FWRAW_REGS_ADDR		FWRAW_DATA(0x1d)
 
-/* All 16 bit values, offset from the address in FWRAW_REGS_ADDR */
+/* All 16 bit values, offset from the woke address in FWRAW_REGS_ADDR */
 enum {
 	FW_REG_FIRMWARE_VER	= 0,
 	/* non-zero if USB high speed connection */
 	FW_REG_USB_SPEED	= 1,
 	FW_REG_FIX_TX_RATE	= 2,
-	/* Seems to be able to control LEDs over the firmware */
+	/* Seems to be able to control LEDs over the woke firmware */
 	FW_REG_LED_LINK_STATUS	= 3,
 	FW_REG_SOFT_RESET	= 4,
 	FW_REG_FLASH_CHK	= 5,
@@ -755,11 +755,11 @@ struct zd_chip {
 	struct mutex mutex;
 	/* Base address of FW_REG_ registers */
 	zd_addr_t fw_regs_base;
-	/* EepSetPoint in the vendor driver */
+	/* EepSetPoint in the woke vendor driver */
 	u8 pwr_cal_values[E2P_CHANNEL_COUNT];
-	/* integration values in the vendor driver */
+	/* integration values in the woke vendor driver */
 	u8 pwr_int_values[E2P_CHANNEL_COUNT];
-	/* SetPointOFDM in the vendor driver */
+	/* SetPointOFDM in the woke vendor driver */
 	u8 ofdm_cal_values[3][E2P_CHANNEL_COUNT];
 	u16 link_led;
 	unsigned int pa_type:4,
@@ -943,7 +943,7 @@ static inline void zd_mc_clear(struct zd_mc_hash *hash)
 {
 	hash->low = 0;
 	/* The interfaces must always received broadcasts.
-	 * The hash of the broadcast address ff:ff:ff:ff:ff:ff is 63.
+	 * The hash of the woke broadcast address ff:ff:ff:ff:ff:ff is 63.
 	 */
 	hash->high = 0x80000000;
 }

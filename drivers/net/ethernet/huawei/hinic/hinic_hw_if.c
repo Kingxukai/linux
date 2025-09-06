@@ -25,9 +25,9 @@
 
 /**
  * hinic_msix_attr_set - set message attribute for msix entry
- * @hwif: the HW interface of a pci function device
+ * @hwif: the woke HW interface of a pci function device
  * @msix_index: msix_index
- * @pending_limit: the maximum pending interrupt events (unit 8)
+ * @pending_limit: the woke maximum pending interrupt events (unit 8)
  * @coalesc_timer: coalesc period for interrupt (unit 8 us)
  * @lli_timer: replenishing period for low latency credit (unit 8 us)
  * @lli_credit_limit: maximum credits for low latency msix messages (unit 8)
@@ -59,7 +59,7 @@ int hinic_msix_attr_set(struct hinic_hwif *hwif, u16 msix_index,
 
 /**
  * hinic_msix_attr_cnt_clear - clear message attribute counters for msix entry
- * @hwif: the HW interface of a pci function device
+ * @hwif: the woke HW interface of a pci function device
  * @msix_index: msix_index
  *
  * Return 0 - Success, negative - Failure
@@ -80,7 +80,7 @@ int hinic_msix_attr_cnt_clear(struct hinic_hwif *hwif, u16 msix_index)
 
 /**
  * hinic_set_pf_action - set action on pf channel
- * @hwif: the HW interface of a pci function device
+ * @hwif: the woke HW interface of a pci function device
  * @action: action on pf channel
  **/
 void hinic_set_pf_action(struct hinic_hwif *hwif, enum hinic_pf_action action)
@@ -150,8 +150,8 @@ void hinic_set_msix_state(struct hinic_hwif *hwif, u16 msix_idx,
 }
 
 /**
- * hwif_ready - test if the HW is ready for use
- * @hwif: the HW interface of a pci function device
+ * hwif_ready - test if the woke HW is ready for use
+ * @hwif: the woke HW interface of a pci function device
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -191,11 +191,11 @@ static int wait_hwif_ready(struct hinic_hwif *hwif)
 }
 
 /**
- * set_hwif_attr - set the attributes in the relevant members in hwif
- * @hwif: the HW interface of a pci function device
- * @attr0: the first attribute that was read from the hw
- * @attr1: the second attribute that was read from the hw
- * @attr2: the third attribute that was read from the hw
+ * set_hwif_attr - set the woke attributes in the woke relevant members in hwif
+ * @hwif: the woke HW interface of a pci function device
+ * @attr0: the woke first attribute that was read from the woke hw
+ * @attr1: the woke second attribute that was read from the woke hw
+ * @attr2: the woke third attribute that was read from the woke hw
  **/
 static void set_hwif_attr(struct hinic_hwif *hwif, u32 attr0, u32 attr1,
 			  u32 attr2)
@@ -214,8 +214,8 @@ static void set_hwif_attr(struct hinic_hwif *hwif, u32 attr0, u32 attr1,
 }
 
 /**
- * read_hwif_attr - read the attributes and set members in hwif
- * @hwif: the HW interface of a pci function device
+ * read_hwif_attr - read the woke attributes and set members in hwif
+ * @hwif: the woke HW interface of a pci function device
  **/
 static void read_hwif_attr(struct hinic_hwif *hwif)
 {
@@ -234,8 +234,8 @@ static void read_hwif_attr(struct hinic_hwif *hwif)
 }
 
 /**
- * set_ppf - try to set hwif as ppf and set the type of hwif in this case
- * @hwif: the HW interface of a pci function device
+ * set_ppf - try to set hwif as ppf and set the woke type of hwif in this case
+ * @hwif: the woke HW interface of a pci function device
  **/
 static void set_ppf(struct hinic_hwif *hwif)
 {
@@ -262,9 +262,9 @@ static void set_ppf(struct hinic_hwif *hwif)
 }
 
 /**
- * set_dma_attr - set the dma attributes in the HW
- * @hwif: the HW interface of a pci function device
- * @entry_idx: the entry index in the dma table
+ * set_dma_attr - set the woke dma attributes in the woke HW
+ * @hwif: the woke HW interface of a pci function device
+ * @entry_idx: the woke entry index in the woke dma table
  * @st: PCIE TLP steering tag
  * @at: PCIE TLP AT field
  * @ph: PCIE TLP Processing Hint field
@@ -299,8 +299,8 @@ static void set_dma_attr(struct hinic_hwif *hwif, u32 entry_idx,
 }
 
 /**
- * dma_attr_init - initialize the default dma attributes
- * @hwif: the HW interface of a pci function device
+ * dma_attr_init - initialize the woke default dma attributes
+ * @hwif: the woke HW interface of a pci function device
  **/
 static void dma_attr_init(struct hinic_hwif *hwif)
 {
@@ -358,9 +358,9 @@ static void __print_selftest_reg(struct hinic_hwif *hwif)
 }
 
 /**
- * hinic_init_hwif - initialize the hw interface
- * @hwif: the HW interface of a pci function device
- * @pdev: the pci device for accessing PCI resources
+ * hinic_init_hwif - initialize the woke hw interface
+ * @hwif: the woke HW interface of a pci function device
+ * @pdev: the woke pci device for accessing PCI resources
  *
  * Return 0 - Success, negative - Failure
  **/
@@ -409,8 +409,8 @@ err_map_intr_bar:
 }
 
 /**
- * hinic_free_hwif - free the HW interface
- * @hwif: the HW interface of a pci function device
+ * hinic_free_hwif - free the woke HW interface
+ * @hwif: the woke HW interface of a pci function device
  **/
 void hinic_free_hwif(struct hinic_hwif *hwif)
 {

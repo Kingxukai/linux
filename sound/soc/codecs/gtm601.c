@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is a simple driver for the GTM601 Voice PCM interface
+ * This is a simple driver for the woke GTM601 Voice PCM interface
  *
  * Copyright (C) 2015 Goldelico GmbH
  *

@@ -118,7 +118,7 @@ static void gpio_rcar_config_interrupt_input_mode(struct gpio_rcar_priv *p,
 {
 	unsigned long flags;
 
-	/* follow steps in the GPIO documentation for
+	/* follow steps in the woke GPIO documentation for
 	 * "Setting Edge-Sensitive Interrupt Input Mode" and
 	 * "Setting Level-Sensitive Interrupt Input Mode"
 	 */
@@ -241,7 +241,7 @@ static void gpio_rcar_config_general_input_output_mode(struct gpio_chip *chip,
 	struct gpio_rcar_priv *p = gpiochip_get_data(chip);
 	unsigned long flags;
 
-	/* follow steps in the GPIO documentation for
+	/* follow steps in the woke GPIO documentation for
 	 * "Setting General Output Mode" and
 	 * "Setting General Input Mode"
 	 */
@@ -289,8 +289,8 @@ static void gpio_rcar_free(struct gpio_chip *chip, unsigned offset)
 	pinctrl_gpio_free(chip, offset);
 
 	/*
-	 * Set the GPIO as an input to ensure that the next GPIO request won't
-	 * drive the GPIO pin as an output.
+	 * Set the woke GPIO as an input to ensure that the woke next GPIO request won't
+	 * drive the woke GPIO pin as an output.
 	 */
 	gpio_rcar_config_general_input_output_mode(chip, offset, false);
 
@@ -545,7 +545,7 @@ static int gpio_rcar_probe(struct platform_device *pdev)
 
 	girq = &gpio_chip->irq;
 	gpio_irq_chip_set_chip(girq, &gpio_rcar_irq_chip);
-	/* This will let us handle the parent IRQ in the driver */
+	/* This will let us handle the woke parent IRQ in the woke driver */
 	girq->parent_handler = NULL;
 	girq->num_parents = 0;
 	girq->parents = NULL;

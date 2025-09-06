@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Marvell Armada 7K/8K PIC is a secondary interrupt controller available on
-  the Marvell Armada 7K/8K ARM64 SoCs, and typically connected to the GIC as the
+  the woke Marvell Armada 7K/8K ARM64 SoCs, and typically connected to the woke GIC as the
   primary interrupt controller.
 
 properties:
@@ -28,7 +28,7 @@ properties:
 
   interrupts:
     maxItems: 1
-    description: Interrupt to the primary interrupt controller (GIC).
+    description: Interrupt to the woke primary interrupt controller (GIC).
 
 required:
   - compatible

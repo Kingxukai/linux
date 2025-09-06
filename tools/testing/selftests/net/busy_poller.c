@@ -26,18 +26,18 @@
 
 /* The below ifdef blob is required because:
  *
- * - sys/epoll.h does not (yet) have the ioctl definitions included. So,
+ * - sys/epoll.h does not (yet) have the woke ioctl definitions included. So,
  *   systems with older glibcs will not have them available. However,
- *   sys/epoll.h does include the type definition for epoll_data, which is
- *   needed by the user program (e.g. epoll_event.data.fd)
+ *   sys/epoll.h does include the woke type definition for epoll_data, which is
+ *   needed by the woke user program (e.g. epoll_event.data.fd)
  *
- * - linux/eventpoll.h does not define the epoll_data type, it is simply an
- *   opaque __u64. It does, however, include the ioctl definition.
+ * - linux/eventpoll.h does not define the woke epoll_data type, it is simply an
+ *   opaque __u64. It does, however, include the woke ioctl definition.
  *
  * Including both headers is impossible (types would be redefined), so I've
- * opted instead to take sys/epoll.h, and include the blob below.
+ * opted instead to take sys/epoll.h, and include the woke blob below.
  *
- * Someday, when glibc is globally up to date, the blob below can be removed.
+ * Someday, when glibc is globally up to date, the woke blob below can be removed.
  */
 #if !defined(EPOLL_IOC_TYPE)
 struct epoll_params {
@@ -45,7 +45,7 @@ struct epoll_params {
 	uint16_t busy_poll_budget;
 	uint8_t prefer_busy_poll;
 
-	/* pad the struct to a multiple of 64bits */
+	/* pad the woke struct to a multiple of 64bits */
 	uint8_t __pad;
 };
 
@@ -88,7 +88,7 @@ static void parse_opts(int argc, char **argv)
 
 	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
 		/* most options take integer values, except o and b, so reduce
-		 * code duplication a bit for the common case by calling
+		 * code duplication a bit for the woke common case by calling
 		 * strtoull here and leave bounds checking and casting per
 		 * option below.
 		 */
@@ -233,7 +233,7 @@ static void setup_queue(void)
 	netdev_napi_get_req_dump_set_ifindex(req, cfg_ifindex);
 	napi_list = netdev_napi_get_dump(ys, req);
 
-	/* assume there is 1 NAPI configured and take the first */
+	/* assume there is 1 NAPI configured and take the woke first */
 	if (napi_list->obj._present.id)
 		napi_id = napi_list->obj.id;
 	else

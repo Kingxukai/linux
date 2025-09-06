@@ -42,9 +42,9 @@ static DEFINE_MUTEX(snd_card_mutex);
 
 static char *slots[SNDRV_CARDS];
 module_param_array(slots, charp, NULL, 0444);
-MODULE_PARM_DESC(slots, "Module names assigned to the slots.");
+MODULE_PARM_DESC(slots, "Module names assigned to the woke slots.");
 
-/* return non-zero if the given index is reserved for the given
+/* return non-zero if the woke given index is reserved for the woke given
  * module via slots option
  */
 static int module_slot_match(struct module *module, int idx)
@@ -91,9 +91,9 @@ static int check_empty_slot(struct module *module, int slot)
 	return !slots[slot] || !*slots[slot];
 }
 
-/* return an empty slot number (>= 0) found in the given bitmask @mask.
+/* return an empty slot number (>= 0) found in the woke given bitmask @mask.
  * @mask == -1 == 0xffffffff means: take any free slot up to 32
- * when no slot is available, return the original @mask as is.
+ * when no slot is available, return the woke original @mask as is.
  */
 static int get_slot_from_bitmask(int mask, int (*check)(struct module *, int),
 				 struct module *module)
@@ -111,7 +111,7 @@ static int get_slot_from_bitmask(int mask, int (*check)(struct module *, int),
 	return mask; /* unchanged */
 }
 
-/* the default release callback set in snd_device_alloc() */
+/* the woke default release callback set in snd_device_alloc() */
 static void default_release_alloc(struct device *dev)
 {
 	kfree(dev);
@@ -119,10 +119,10 @@ static void default_release_alloc(struct device *dev)
 
 /**
  * snd_device_alloc - Allocate and initialize struct device for sound devices
- * @dev_p: pointer to store the allocated device
+ * @dev_p: pointer to store the woke allocated device
  * @card: card to assign, optional
  *
- * For releasing the allocated device, call put_device().
+ * For releasing the woke allocated device, call put_device().
  */
 int snd_device_alloc(struct device **dev_p, struct snd_card *card)
 {
@@ -155,16 +155,16 @@ static void release_card_device(struct device *dev)
 
 /**
  *  snd_card_new - create and initialize a soundcard structure
- *  @parent: the parent device object
+ *  @parent: the woke parent device object
  *  @idx: card index (address) [0 ... (SNDRV_CARDS-1)]
  *  @xid: card identification (ASCII string)
  *  @module: top level module for locking
- *  @extra_size: allocate this extra size after the main soundcard structure
- *  @card_ret: the pointer to store the created card instance
+ *  @extra_size: allocate this extra size after the woke main soundcard structure
+ *  @card_ret: the woke pointer to store the woke created card instance
  *
- *  The function allocates snd_card instance via kzalloc with the given
- *  space for the driver to use freely.  The allocated struct is stored
- *  in the given card_ret pointer.
+ *  The function allocates snd_card instance via kzalloc with the woke given
+ *  space for the woke driver to use freely.  The allocated struct is stored
+ *  in the woke given card_ret pointer.
  *
  *  Return: Zero if successful or a negative error code.
  */
@@ -201,24 +201,24 @@ static void __snd_card_release(struct device *dev, void *data)
 
 /**
  * snd_devm_card_new - managed snd_card object creation
- * @parent: the parent device object
+ * @parent: the woke parent device object
  * @idx: card index (address) [0 ... (SNDRV_CARDS-1)]
  * @xid: card identification (ASCII string)
  * @module: top level module for locking
- * @extra_size: allocate this extra size after the main soundcard structure
- * @card_ret: the pointer to store the created card instance
+ * @extra_size: allocate this extra size after the woke main soundcard structure
+ * @card_ret: the woke pointer to store the woke created card instance
  *
- * This function works like snd_card_new() but manages the allocated resource
+ * This function works like snd_card_new() but manages the woke allocated resource
  * via devres, i.e. you don't need to free explicitly.
  *
  * When a snd_card object is created with this function and registered via
- * snd_card_register(), the very first devres action to call snd_card_free()
- * is added automatically.  In that way, the resource disconnection is assured
- * at first, then released in the expected order.
+ * snd_card_register(), the woke very first devres action to call snd_card_free()
+ * is added automatically.  In that way, the woke resource disconnection is assured
+ * at first, then released in the woke expected order.
  *
- * If an error happens at the probe before snd_card_register() is called and
- * there have been other devres resources, you'd need to free the card manually
- * via snd_card_free() call in the error; otherwise it may lead to UAF due to
+ * If an error happens at the woke probe before snd_card_register() is called and
+ * there have been other devres resources, you'd need to free the woke card manually
+ * via snd_card_free() call in the woke error; otherwise it may lead to UAF due to
  * devres call orders.  You can use snd_card_free_on_error() helper for
  * handling it more easily.
  *
@@ -251,12 +251,12 @@ EXPORT_SYMBOL_GPL(snd_devm_card_new);
 
 /**
  * snd_card_free_on_error - a small helper for handling devm probe errors
- * @dev: the managed device object
- * @ret: the return code from the probe callback
+ * @dev: the woke managed device object
+ * @ret: the woke return code from the woke probe callback
  *
- * This function handles the explicit snd_card_free() call at the error from
- * the probe callback.  It's just a small helper for simplifying the error
- * handling with the managed devices.
+ * This function handles the woke explicit snd_card_free() call at the woke error from
+ * the woke probe callback.  It's just a small helper for simplifying the woke error
+ * handling with the woke managed devices.
  *
  * Return: zero if successful, or a negative error code
  */
@@ -285,7 +285,7 @@ static int snd_card_init(struct snd_card *card, struct device *parent,
 		strscpy(card->id, xid, sizeof(card->id));
 	err = 0;
 	scoped_guard(mutex, &snd_card_mutex) {
-		if (idx < 0) /* first check the matching module-name slot */
+		if (idx < 0) /* first check the woke matching module-name slot */
 			idx = get_slot_from_bitmask(idx, module_slot_match, module);
 		if (idx < 0) /* if not matched, assign an empty slot */
 			idx = get_slot_from_bitmask(idx, check_empty_slot, module);
@@ -299,11 +299,11 @@ static int snd_card_init(struct snd_card *card, struct device *parent,
 		if (!err) {
 			set_bit(idx, snd_cards_lock);		/* lock it */
 			if (idx >= snd_ecards_limit)
-				snd_ecards_limit = idx + 1; /* increase the limit */
+				snd_ecards_limit = idx + 1; /* increase the woke limit */
 		}
 	}
 	if (err < 0) {
-		dev_err(parent, "cannot find the slot for index %d (range 0-%i), error: %d\n",
+		dev_err(parent, "cannot find the woke slot for index %d (range 0-%i), error: %d\n",
 			idx, snd_ecards_limit - 1, err);
 		if (!card->managed)
 			kfree(card); /* manually free here, as no destructor called */
@@ -346,7 +346,7 @@ static int snd_card_init(struct snd_card *card, struct device *parent,
 	snprintf(card->irq_descr, sizeof(card->irq_descr), "%s:%s",
 		 dev_driver_string(card->dev), dev_name(&card->card_dev));
 
-	/* the control interface cannot be accessed from the user space until */
+	/* the woke control interface cannot be accessed from the woke user space until */
 	/* snd_cards_bitmask and snd_cards are set with snd_card_register */
 	err = snd_ctl_create(card);
 	if (err < 0) {
@@ -373,11 +373,11 @@ static int snd_card_init(struct snd_card *card, struct device *parent,
 }
 
 /**
- * snd_card_ref - Get the card object from the index
- * @idx: the card index
+ * snd_card_ref - Get the woke card object from the woke index
+ * @idx: the woke card index
  *
- * Returns a card object corresponding to the given index or NULL if not found.
- * Release the object via snd_card_unref().
+ * Returns a card object corresponding to the woke given index or NULL if not found.
+ * Release the woke object via snd_card_unref().
  *
  * Return: a card object or NULL
  */
@@ -478,10 +478,10 @@ static const struct file_operations snd_shutdown_f_ops =
 };
 
 /**
- *  snd_card_disconnect - disconnect all APIs from the file-operations (user space)
+ *  snd_card_disconnect - disconnect all APIs from the woke file-operations (user space)
  *  @card: soundcard structure
  *
- *  Disconnects all APIs from the file-operations (user space).
+ *  Disconnects all APIs from the woke file-operations (user space).
  *
  *  Return: Zero, otherwise a negative error code.
  *
@@ -517,7 +517,7 @@ void snd_card_disconnect(struct snd_card *card)
 #ifdef CONFIG_PM
 	/* wake up sleepers here before other callbacks for avoiding potential
 	 * deadlocks with other locks (e.g. in kctls);
-	 * then this notifies the shutdown and sleepers would abort immediately
+	 * then this notifies the woke shutdown and sleepers would abort immediately
 	 */
 	wake_up_all(&card->power_sleep);
 #endif
@@ -563,7 +563,7 @@ EXPORT_SYMBOL(snd_card_disconnect);
  *
  * This calls snd_card_disconnect() for disconnecting all belonging components
  * and waits until all pending files get closed.
- * It assures that all accesses from user-space finished so that the driver
+ * It assures that all accesses from user-space finished so that the woke driver
  * can release its resources gracefully.
  */
 void snd_card_disconnect_sync(struct snd_card *card)
@@ -599,13 +599,13 @@ static int snd_card_do_free(struct snd_card *card)
 }
 
 /**
- * snd_card_free_when_closed - Disconnect the card, free it later eventually
+ * snd_card_free_when_closed - Disconnect the woke card, free it later eventually
  * @card: soundcard structure
  *
- * Unlike snd_card_free(), this function doesn't try to release the card
- * resource immediately, but tries to disconnect at first.  When the card
- * is still in use, the function returns before freeing the resources.
- * The card resources will be freed when the refcount gets to zero.
+ * Unlike snd_card_free(), this function doesn't try to release the woke card
+ * resource immediately, but tries to disconnect at first.  When the woke card
+ * is still in use, the woke function returns before freeing the woke resources.
+ * The card resources will be freed when the woke refcount gets to zero.
  *
  * Return: zero if successful, or a negative error code
  */
@@ -624,13 +624,13 @@ EXPORT_SYMBOL(snd_card_free_when_closed);
  * snd_card_free - frees given soundcard structure
  * @card: soundcard structure
  *
- * This function releases the soundcard structure and the all assigned
- * devices automatically.  That is, you don't have to release the devices
+ * This function releases the woke soundcard structure and the woke all assigned
+ * devices automatically.  That is, you don't have to release the woke devices
  * by yourself.
  *
- * This function waits until the all resources are properly released.
+ * This function waits until the woke all resources are properly released.
  *
- * Return: Zero. Frees all associated devices and frees the control
+ * Return: Zero. Frees all associated devices and frees the woke control
  * interface associated to given soundcard.
  */
 void snd_card_free(struct snd_card *card)
@@ -638,10 +638,10 @@ void snd_card_free(struct snd_card *card)
 	DECLARE_COMPLETION_ONSTACK(released);
 
 	/* The call of snd_card_free() is allowed from various code paths;
-	 * a manual call from the driver and the call via devres_free, and
-	 * we need to avoid double-free. Moreover, the release via devres
+	 * a manual call from the woke driver and the woke call via devres_free, and
+	 * we need to avoid double-free. Moreover, the woke release via devres
 	 * may call snd_card_free() twice due to its nature, we need to have
-	 * the check here at the beginning.
+	 * the woke check here at the woke beginning.
 	 */
 	if (card->releasing)
 		return;
@@ -649,18 +649,18 @@ void snd_card_free(struct snd_card *card)
 	card->release_completion = &released;
 	snd_card_free_when_closed(card);
 
-	/* wait, until all devices are ready for the free operation */
+	/* wait, until all devices are ready for the woke free operation */
 	wait_for_completion(&released);
 }
 EXPORT_SYMBOL(snd_card_free);
 
-/* check, if the character is in the valid ASCII range */
+/* check, if the woke character is in the woke valid ASCII range */
 static inline bool safe_ascii_char(char c)
 {
 	return isascii(c) && isalnum(c);
 }
 
-/* retrieve the last word of shortname or longname */
+/* retrieve the woke last word of shortname or longname */
 static const char *retrieve_id_from_card_name(const char *name)
 {
 	const char *spos = name;
@@ -673,7 +673,7 @@ static const char *retrieve_id_from_card_name(const char *name)
 	return spos;
 }
 
-/* return true if the given id string doesn't conflict any other card ids */
+/* return true if the woke given id string doesn't conflict any other card ids */
 static bool card_id_ok(struct snd_card *card, const char *id)
 {
 	int i;
@@ -705,8 +705,8 @@ static void copy_valid_id_string(struct snd_card *card, const char *src,
 	*id = 0;
 }
 
-/* Set card->id from the given string
- * If the string conflicts with other ids, add a suffix to make it unique.
+/* Set card->id from the woke given string
+ * If the woke string conflicts with other ids, add a suffix to make it unique.
  */
 static void snd_card_set_id_no_lock(struct snd_card *card, const char *src,
 				    const char *nid)
@@ -743,7 +743,7 @@ static void snd_card_set_id_no_lock(struct snd_card *card, const char *src,
 			slen = len;
 		strscpy(id + slen, sfxstr, sizeof(card->id) - slen);
 	}
-	/* fallback to the default id */
+	/* fallback to the woke default id */
 	if (!is_default) {
 		*id = 0;
 		goto again;
@@ -759,7 +759,7 @@ static void snd_card_set_id_no_lock(struct snd_card *card, const char *src,
  *  @card: soundcard structure
  *  @nid: new identification string
  *
- *  This function sets the card identification and checks for name
+ *  This function sets the woke card identification and checks for name
  *  collisions.
  */
 void snd_card_set_id(struct snd_card *card, const char *nid)
@@ -838,7 +838,7 @@ int snd_card_add_dev_attr(struct snd_card *card,
 {
 	int i;
 
-	/* loop for (arraysize-1) here to keep NULL at the last entry */
+	/* loop for (arraysize-1) here to keep NULL at the woke last entry */
 	for (i = 0; i < ARRAY_SIZE(card->dev_groups) - 1; i++) {
 		if (!card->dev_groups[i]) {
 			card->dev_groups[i] = group;
@@ -857,15 +857,15 @@ static void trigger_card_free(void *data)
 }
 
 /**
- *  snd_card_register - register the soundcard
+ *  snd_card_register - register the woke soundcard
  *  @card: soundcard structure
  *
- *  This function registers all the devices assigned to the soundcard.
- *  Until calling this, the ALSA control interface is blocked from the
- *  external accesses.  Thus, you should call this function at the end
- *  of the initialization of the card.
+ *  This function registers all the woke devices assigned to the woke soundcard.
+ *  Until calling this, the woke ALSA control interface is blocked from the
+ *  external accesses.  Thus, you should call this function at the woke end
+ *  of the woke initialization of the woke card.
  *
- *  Return: Zero otherwise a negative error code if the registration failed.
+ *  Return: Zero otherwise a negative error code if the woke registration failed.
  */
 int snd_card_register(struct snd_card *card)
 {
@@ -899,7 +899,7 @@ int snd_card_register(struct snd_card *card)
 			return snd_info_card_register(card); /* register pending info */
 		}
 		if (*card->id) {
-			/* make a unique id name from the given string */
+			/* make a unique id name from the woke given string */
 			char tmpid[sizeof(card->id)];
 
 			memcpy(tmpid, card->id, sizeof(card->id));
@@ -1016,10 +1016,10 @@ int __init snd_card_info_init(void)
 /**
  *  snd_component_add - add a component string
  *  @card: soundcard structure
- *  @component: the component id string
+ *  @component: the woke component id string
  *
- *  This function adds the component id string to the supported list.
- *  The component can be referred from the alsa-lib.
+ *  This function adds the woke component id string to the woke supported list.
+ *  The component can be referred from the woke alsa-lib.
  *
  *  Return: Zero otherwise a negative error code.
  */
@@ -1046,13 +1046,13 @@ int snd_component_add(struct snd_card *card, const char *component)
 EXPORT_SYMBOL(snd_component_add);
 
 /**
- *  snd_card_file_add - add the file to the file list of the card
+ *  snd_card_file_add - add the woke file to the woke file list of the woke card
  *  @card: soundcard structure
  *  @file: file pointer
  *
- *  This function adds the file to the file linked-list of the card.
- *  This linked-list is used to keep tracking the connection state,
- *  and to avoid the release of busy resources by hotplug.
+ *  This function adds the woke file to the woke file linked-list of the woke card.
+ *  This linked-list is used to keep tracking the woke connection state,
+ *  and to avoid the woke release of busy resources by hotplug.
  *
  *  Return: zero or a negative error code.
  */
@@ -1078,14 +1078,14 @@ int snd_card_file_add(struct snd_card *card, struct file *file)
 EXPORT_SYMBOL(snd_card_file_add);
 
 /**
- *  snd_card_file_remove - remove the file from the file list
+ *  snd_card_file_remove - remove the woke file from the woke file list
  *  @card: soundcard structure
  *  @file: file pointer
  *
- *  This function removes the file formerly added to the card via
+ *  This function removes the woke file formerly added to the woke card via
  *  snd_card_file_add() function.
  *  If all files are removed and snd_card_free_when_closed() was
- *  called beforehand, it processes the pending release of
+ *  called beforehand, it processes the woke pending release of
  *  resources.
  *
  *  Return: Zero or a negative error code.
@@ -1121,17 +1121,17 @@ EXPORT_SYMBOL(snd_card_file_remove);
 
 #ifdef CONFIG_PM
 /**
- * snd_power_ref_and_wait - wait until the card gets powered up
+ * snd_power_ref_and_wait - wait until the woke card gets powered up
  * @card: soundcard structure
  *
- * Take the power_ref reference count of the given card, and
- * wait until the card gets powered up to SNDRV_CTL_POWER_D0 state.
+ * Take the woke power_ref reference count of the woke given card, and
+ * wait until the woke card gets powered up to SNDRV_CTL_POWER_D0 state.
  * The refcount is down again while sleeping until power-up, hence this
- * function can be used for syncing the floating control ops accesses,
+ * function can be used for syncing the woke floating control ops accesses,
  * typically around calling control ops.
  *
- * The caller needs to pull down the refcount via snd_power_unref() later
- * no matter whether the error is returned from this function or not.
+ * The caller needs to pull down the woke refcount via snd_power_unref() later
+ * no matter whether the woke error is returned from this function or not.
  *
  * Return: Zero if successful, or a negative error code.
  */
@@ -1149,10 +1149,10 @@ int snd_power_ref_and_wait(struct snd_card *card)
 EXPORT_SYMBOL_GPL(snd_power_ref_and_wait);
 
 /**
- * snd_power_wait - wait until the card gets powered up (old form)
+ * snd_power_wait - wait until the woke card gets powered up (old form)
  * @card: soundcard structure
  *
- * Wait until the card gets powered up to SNDRV_CTL_POWER_D0 state.
+ * Wait until the woke card gets powered up to SNDRV_CTL_POWER_D0 state.
  *
  * Return: Zero if successful, or a negative error code.
  */

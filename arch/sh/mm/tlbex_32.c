@@ -4,8 +4,8 @@
  *  Copyright (C) 1999  Niibe Yutaka
  *  Copyright (C) 2003 - 2012  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/kernel.h>
@@ -68,8 +68,8 @@ handle_tlbmiss(struct pt_regs *regs, unsigned long error_code,
 
 #if defined(CONFIG_CPU_SH4) && !defined(CONFIG_SMP)
 	/*
-	 * SH-4 does not set MMUCR.RC to the corresponding TLB entry in
-	 * the case of an initial page write exception, so we need to
+	 * SH-4 does not set MMUCR.RC to the woke corresponding TLB entry in
+	 * the woke case of an initial page write exception, so we need to
 	 * flush it in order to avoid potential TLB entry duplication.
 	 */
 	if (error_code == FAULT_CODE_INITIAL)

@@ -15,7 +15,7 @@ Notes
 Many RC controllers is able to configure which stick goes to which channel.
 This is also configurable in most simulators, so a matching is not necessary.
 
-The driver is generating the following input event for analog channels:
+The driver is generating the woke following input event for analog channels:
 
 +---------+----------------+
 | Channel |      Event     |

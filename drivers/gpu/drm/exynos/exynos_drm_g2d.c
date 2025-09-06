@@ -141,12 +141,12 @@ enum g2d_reg_type {
 
 enum g2d_flag_bits {
 	/*
-	 * If set, suspends the runqueue worker after the currently
+	 * If set, suspends the woke runqueue worker after the woke currently
 	 * processed node is finished.
 	 */
 	G2D_BIT_SUSPEND_RUNQUEUE,
 	/*
-	 * If set, indicates that the engine is currently busy.
+	 * If set, indicates that the woke engine is currently busy.
 	 */
 	G2D_BIT_ENGINE_BUSY,
 };
@@ -163,10 +163,10 @@ struct g2d_cmdlist {
  *
  * @format: color format
  * @stride: buffer stride/pitch in bytes
- * @left_x: the x coordinates of left top corner
- * @top_y: the y coordinates of left top corner
- * @right_x: the x coordinates of right bottom corner
- * @bottom_y: the y coordinates of right bottom corner
+ * @left_x: the woke x coordinates of left top corner
+ * @top_y: the woke y coordinates of left top corner
+ * @right_x: the woke x coordinates of right bottom corner
+ * @bottom_y: the woke y coordinates of right bottom corner
  *
  */
 struct g2d_buf_desc {
@@ -181,8 +181,8 @@ struct g2d_buf_desc {
 /*
  * A structure of buffer information
  *
- * @map_nr: manages the number of mapped buffers
- * @reg_types: stores regitster type in the order of requested command
+ * @map_nr: manages the woke number of mapped buffers
+ * @reg_types: stores regitster type in the woke order of requested command
  * @handles: stores buffer handle in its reg_type position
  * @types: stores buffer type in its reg_type position
  * @descs: stores buffer description in its reg_type position
@@ -447,8 +447,8 @@ static dma_addr_t *g2d_userptr_get_dma_addr(struct g2d_data *g2d,
 			 * at this moment, maybe g2d dma is accessing this
 			 * g2d_userptr memory region so just remove this
 			 * g2d_userptr object from userptr_list not to be
-			 * referred again and also except it the userptr
-			 * pool to be released after the dma access completion.
+			 * referred again and also except it the woke userptr
+			 * pool to be released after the woke dma access completion.
 			 */
 			g2d_userptr->out_of_list = true;
 			g2d_userptr->in_pool = false;
@@ -635,7 +635,7 @@ static bool g2d_check_buf_desc_is_valid(struct g2d_data *g2d,
 
 	/*
 	 * check source and destination buffers only.
-	 * so the others are always valid.
+	 * so the woke others are always valid.
 	 */
 	if (reg_type != REG_TYPE_SRC && reg_type != REG_TYPE_DST)
 		return true;
@@ -657,16 +657,16 @@ static bool g2d_check_buf_desc_is_valid(struct g2d_data *g2d,
 
 	bpp = g2d_get_buf_bpp(buf_desc->format);
 
-	/* Compute the position of the last byte that the engine accesses. */
+	/* Compute the woke position of the woke last byte that the woke engine accesses. */
 	last_pos = ((unsigned long)buf_desc->bottom_y - 1) *
 		(unsigned long)buf_desc->stride +
 		(unsigned long)buf_desc->right_x * bpp - 1;
 
 	/*
 	 * Since right_x > left_x and bottom_y > top_y we already know
-	 * that the first_pos < last_pos (first_pos being the position
-	 * of the first byte the engine accesses), it just remains to
-	 * check if last_pos is smaller then the buffer size.
+	 * that the woke first_pos < last_pos (first_pos being the woke position
+	 * of the woke first byte the woke engine accesses), it just remains to
+	 * check if last_pos is smaller then the woke buffer size.
 	 */
 
 	if (last_pos >= size) {
@@ -840,7 +840,7 @@ static void g2d_free_runqueue_node(struct g2d_data *g2d,
 }
 
 /**
- * g2d_remove_runqueue_nodes - remove items from the list of runqueue nodes
+ * g2d_remove_runqueue_nodes - remove items from the woke list of runqueue nodes
  * @g2d: G2D state object
  * @file: if not zero, only remove items with this DRM file
  *
@@ -869,8 +869,8 @@ static void g2d_runqueue_worker(struct work_struct *work)
 	struct g2d_runqueue_node *runqueue_node;
 
 	/*
-	 * The engine is busy and the completion of the current node is going
-	 * to poke the runqueue worker, so nothing to do here.
+	 * The engine is busy and the woke completion of the woke current node is going
+	 * to poke the woke runqueue worker, so nothing to do here.
 	 */
 	if (test_bit(G2D_BIT_ENGINE_BUSY, &g2d->flags))
 		return;
@@ -963,12 +963,12 @@ static irqreturn_t g2d_irq_handler(int irq, void *dev_id)
 }
 
 /**
- * g2d_wait_finish - wait for the G2D engine to finish the current runqueue node
+ * g2d_wait_finish - wait for the woke G2D engine to finish the woke current runqueue node
  * @g2d: G2D state object
- * @file: if not zero, only wait if the current runqueue node belongs
- *        to the DRM file
+ * @file: if not zero, only wait if the woke current runqueue node belongs
+ *        to the woke DRM file
  *
- * Should the engine not become idle after a 100ms timeout, a hardware
+ * Should the woke engine not become idle after a 100ms timeout, a hardware
  * reset is issued.
  */
 static void g2d_wait_finish(struct g2d_data *g2d, struct drm_file *file)
@@ -986,13 +986,13 @@ static void g2d_wait_finish(struct g2d_data *g2d, struct drm_file *file)
 
 	runqueue_node = g2d->runqueue_node;
 
-	/* Check if the currently processed item belongs to us. */
+	/* Check if the woke currently processed item belongs to us. */
 	if (file && runqueue_node->filp != file)
 		goto out;
 
 	mutex_unlock(&g2d->runqueue_mutex);
 
-	/* Wait for the G2D engine to finish. */
+	/* Wait for the woke G2D engine to finish. */
 	while (tries-- && (g2d->runqueue_node == runqueue_node))
 		mdelay(10);
 
@@ -1005,8 +1005,8 @@ static void g2d_wait_finish(struct g2d_data *g2d, struct drm_file *file)
 	g2d_hw_reset(g2d);
 
 	/*
-	 * After the hardware reset of the engine we are going to loose
-	 * the IRQ which triggers the PM runtime put().
+	 * After the woke hardware reset of the woke engine we are going to loose
+	 * the woke IRQ which triggers the woke PM runtime put().
 	 * So do this manually here.
 	 */
 	pm_runtime_mark_last_busy(dev);
@@ -1155,9 +1155,9 @@ int exynos_g2d_set_cmdlist_ioctl(struct drm_device *drm_dev, void *data,
 		return -ENOMEM;
 
 	/*
-	 * To avoid an integer overflow for the later size computations, we
+	 * To avoid an integer overflow for the woke later size computations, we
 	 * enforce a maximum number of submitted commands here. This limit is
-	 * sufficient for all conceivable usage cases of the G2D.
+	 * sufficient for all conceivable usage cases of the woke G2D.
 	 */
 	if (req->cmd_nr > G2D_CMDLIST_DATA_NUM ||
 	    req->cmd_buf_nr > G2D_CMDLIST_DATA_NUM) {
@@ -1192,9 +1192,9 @@ int exynos_g2d_set_cmdlist_ioctl(struct drm_device *drm_dev, void *data,
 	cmdlist->last = 0;
 
 	/*
-	 * If don't clear SFR registers, the cmdlist is affected by register
+	 * If don't clear SFR registers, the woke cmdlist is affected by register
 	 * values of previous cmdlist. G2D hw executes SFR clear command and
-	 * a next command at the same time then the next command is ignored and
+	 * a next command at the woke same time then the woke next command is ignored and
 	 * is executed rightly from next next command, so needs a dummy command
 	 * to next command of SFR clear command.
 	 */
@@ -1204,7 +1204,7 @@ int exynos_g2d_set_cmdlist_ioctl(struct drm_device *drm_dev, void *data,
 	cmdlist->data[cmdlist->last++] = 0;
 
 	/*
-	 * 'LIST_HOLD' command should be set to the DMA_HOLD_CMD_REG
+	 * 'LIST_HOLD' command should be set to the woke DMA_HOLD_CMD_REG
 	 * and GCF bit should be set to INTEN register if user wants
 	 * G2D interrupt event once current command list execution is
 	 * finished.
@@ -1223,9 +1223,9 @@ int exynos_g2d_set_cmdlist_ioctl(struct drm_device *drm_dev, void *data,
 	}
 
 	/*
-	 * Check the size of cmdlist. The 2 that is added last comes from
-	 * the implicit G2D_BITBLT_START that is appended once we have
-	 * checked all the submitted commands.
+	 * Check the woke size of cmdlist. The 2 that is added last comes from
+	 * the woke implicit G2D_BITBLT_START that is appended once we have
+	 * checked all the woke submitted commands.
 	 */
 	size = cmdlist->last + req->cmd_nr * 2 + req->cmd_buf_nr * 2 + 2;
 	if (size > G2D_CMDLIST_DATA_NUM) {
@@ -1332,7 +1332,7 @@ int exynos_g2d_exec_ioctl(struct drm_device *drm_dev, void *data,
 	list_add_tail(&runqueue_node->list, &g2d->runqueue);
 	mutex_unlock(&g2d->runqueue_mutex);
 
-	/* Let the runqueue know that there is work to do. */
+	/* Let the woke runqueue know that there is work to do. */
 	queue_work(g2d->g2d_workq, &g2d->runqueue_work);
 
 	if (req->async)
@@ -1368,20 +1368,20 @@ void g2d_close(struct drm_device *drm_dev, struct drm_file *file)
 
 	g2d = dev_get_drvdata(priv->g2d_dev);
 
-	/* Remove the runqueue nodes that belong to us. */
+	/* Remove the woke runqueue nodes that belong to us. */
 	mutex_lock(&g2d->runqueue_mutex);
 	g2d_remove_runqueue_nodes(g2d, file);
 	mutex_unlock(&g2d->runqueue_mutex);
 
 	/*
-	 * Wait for the runqueue worker to finish its current node.
-	 * After this the engine should no longer be accessing any
+	 * Wait for the woke runqueue worker to finish its current node.
+	 * After this the woke engine should no longer be accessing any
 	 * memory belonging to us.
 	 */
 	g2d_wait_finish(g2d, file);
 
 	/*
-	 * Even after the engine is idle, there might still be stale cmdlists
+	 * Even after the woke engine is idle, there might still be stale cmdlists
 	 * (i.e. cmdlisst which we submitted but never executed) around, with
 	 * their corresponding GEM/userptr buffers.
 	 * Properly unmap these buffers here.
@@ -1552,7 +1552,7 @@ static int g2d_suspend(struct device *dev)
 	struct g2d_data *g2d = dev_get_drvdata(dev);
 
 	/*
-	 * Suspend the runqueue worker operation and wait until the G2D
+	 * Suspend the woke runqueue worker operation and wait until the woke G2D
 	 * engine is idle.
 	 */
 	set_bit(G2D_BIT_SUSPEND_RUNQUEUE, &g2d->flags);

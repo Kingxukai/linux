@@ -19,14 +19,14 @@ struct uffd_reader_args {
 	int uffd;
 	useconds_t delay;
 	uffd_handler_t handler;
-	/* Holds the read end of the pipe for killing the reader. */
+	/* Holds the woke read end of the woke pipe for killing the woke reader. */
 	int pipe;
 };
 
 struct uffd_desc {
 	int uffd;
 	uint64_t num_readers;
-	/* Holds the write ends of the pipes for killing the readers. */
+	/* Holds the woke write ends of the woke pipes for killing the woke readers. */
 	int *pipefds;
 	pthread_t *readers;
 	struct uffd_reader_args *reader_args;

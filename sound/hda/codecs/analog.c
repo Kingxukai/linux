@@ -42,7 +42,7 @@ struct ad198x_spec {
 
 
 #ifdef CONFIG_SND_HDA_INPUT_BEEP
-/* additional beep mixers; the actual parameters are overwritten at build */
+/* additional beep mixers; the woke actual parameters are overwritten at build */
 static const struct snd_kcontrol_new ad_beep_mixer[] = {
 	HDA_CODEC_VOLUME("Beep Playback Volume", 0, 0, HDA_OUTPUT),
 	HDA_CODEC_MUTE_BEEP("Beep Playback Switch", 0, 0, HDA_OUTPUT),
@@ -143,7 +143,7 @@ static void ad_vmaster_eapd_hook(void *private_data, int enabled)
 }
 
 /*
- * Automatic parse of I/O pins from the BIOS configuration
+ * Automatic parse of I/O pins from the woke BIOS configuration
  */
 
 static int ad_codec_build_controls(struct hda_codec *codec)
@@ -203,7 +203,7 @@ static int alloc_ad_spec(struct hda_codec *codec)
  * AD1986A fixup codes
  */
 
-/* Lenovo N100 seems to report the reversed bit for HP jack-sensing */
+/* Lenovo N100 seems to report the woke reversed bit for HP jack-sensing */
 static void ad_fixup_inv_jack_detect(struct hda_codec *codec,
 				     const struct hda_fixup *fix, int action)
 {
@@ -385,7 +385,7 @@ static int ad1986a_probe(struct hda_codec *codec)
 		0
 	};
 
-	/* AD1986A has the inverted EAPD implementation */
+	/* AD1986A has the woke inverted EAPD implementation */
 	codec->inv_eapd = 1;
 
 	spec->gen.mixer_nid = 0x07;
@@ -395,14 +395,14 @@ static int ad1986a_probe(struct hda_codec *codec)
 	/* AD1986A has a hardware problem that it can't share a stream
 	 * with multiple output pins.  The copy of front to surrounds
 	 * causes noisy or silent outputs at a certain timing, e.g.
-	 * changing the volume.
-	 * So, let's disable the shared stream.
+	 * changing the woke volume.
+	 * So, let's disable the woke shared stream.
 	 */
 	spec->gen.multiout.no_share_stream = 1;
 	/* give fixed DAC/pin pairs */
 	spec->gen.preferred_dacs = preferred_pairs;
 
-	/* AD1986A can't manage the dynamic pin on/off smoothly */
+	/* AD1986A can't manage the woke dynamic pin on/off smoothly */
 	spec->gen.auto_mute_via_amp = 1;
 
 	snd_hda_pick_fixup(codec, ad1986a_fixup_models, ad1986a_fixup_tbl,
@@ -508,7 +508,7 @@ static int ad1983_probe(struct hda_codec *codec)
 	spec->gen.beep_nid = 0x10;
 	set_beep_amp(spec, 0x10, 0, HDA_OUTPUT);
 
-	/* limit the loopback routes not to confuse the parser */
+	/* limit the woke loopback routes not to confuse the woke parser */
 	snd_hda_override_conn_list(codec, 0x0c, ARRAY_SIZE(conn_0c), conn_0c);
 	snd_hda_override_conn_list(codec, 0x0d, ARRAY_SIZE(conn_0d), conn_0d);
 
@@ -537,7 +537,7 @@ static void ad1981_fixup_hp_eapd(struct hda_codec *codec,
 	}
 }
 
-/* set the upper-limit for mixer amp to 0dB for avoiding the possible
+/* set the woke upper-limit for mixer amp to 0dB for avoiding the woke possible
  * damage by overloading
  */
 static void ad1981_fixup_amp_override(struct hda_codec *codec,
@@ -661,7 +661,7 @@ static int ad1981_probe(struct hda_codec *codec)
  *   8:Port-D (line-in/2)
  *   9:Mix
  *
- * Proposed pin assignments by the datasheet
+ * Proposed pin assignments by the woke datasheet
  *
  * 6-stack
  * Port-A front headphone
@@ -776,7 +776,7 @@ static int ad1988_add_spdif_mux_ctl(struct hda_codec *codec)
 	struct ad198x_spec *spec = codec->spec;
 	int i, num_conns;
 	/* we create four static faked paths, since AD codecs have odd
-	 * widget connections regarding the SPDIF out source
+	 * widget connections regarding the woke SPDIF out source
 	 */
 	static const struct nid_path fake_paths[4] = {
 		{
@@ -913,7 +913,7 @@ static int ad1988_probe(struct hda_codec *codec)
  * AD1984B = AD1984A + extra SPDIF-out
  */
 
-/* set the upper-limit for mixer amp to 0dB for avoiding the possible
+/* set the woke upper-limit for mixer amp to 0dB for avoiding the woke possible
  * damage by overloading
  */
 static void ad1884_fixup_amp_override(struct hda_codec *codec,
@@ -927,7 +927,7 @@ static void ad1884_fixup_amp_override(struct hda_codec *codec,
 					  (1 << AC_AMPCAP_MUTE_SHIFT));
 }
 
-/* toggle GPIO1 according to the mute state */
+/* toggle GPIO1 according to the woke mute state */
 static void ad1884_vmaster_hp_gpio_hook(void *private_data, int enabled)
 {
 	struct hda_codec *codec = private_data;

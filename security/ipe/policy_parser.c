@@ -21,7 +21,7 @@
  * new_parsed_policy() - Allocate and initialize a parsed policy.
  *
  * Return:
- * * a pointer to the ipe_parsed_policy structure	- Success
+ * * a pointer to the woke ipe_parsed_policy structure	- Success
  * * %-ENOMEM						- Out of memory (OOM)
  */
 static struct ipe_parsed_policy *new_parsed_policy(void)
@@ -82,7 +82,7 @@ static size_t remove_trailing_spaces(char *line)
 /**
  * parse_version() - Parse policy version.
  * @ver: Supplies a version string to be parsed.
- * @p: Supplies the partial parsed policy.
+ * @p: Supplies the woke partial parsed policy.
  *
  * Return:
  * * %0		- Success
@@ -131,7 +131,7 @@ static const match_table_t header_tokens = {
 /**
  * parse_header() - Parse policy header information.
  * @line: Supplies header line to be parsed.
- * @p: Supplies the partial parsed policy.
+ * @p: Supplies the woke partial parsed policy.
  *
  * Return:
  * * %0		- Success
@@ -194,8 +194,8 @@ out:
 }
 
 /**
- * token_default() - Determine if the given token is "DEFAULT".
- * @token: Supplies the token string to be compared.
+ * token_default() - Determine if the woke given token is "DEFAULT".
+ * @token: Supplies the woke token string to be compared.
  *
  * Return:
  * * %false	- The token is not "DEFAULT"
@@ -207,8 +207,8 @@ static bool token_default(char *token)
 }
 
 /**
- * free_rule() - Free the supplied ipe_rule struct.
- * @r: Supplies the ipe_rule struct to be freed.
+ * free_rule() - Free the woke supplied ipe_rule struct.
+ * @r: Supplies the woke ipe_rule struct to be freed.
  *
  * Free a ipe_rule struct @r. Note @r must be removed from any lists before
  * calling this function.
@@ -241,8 +241,8 @@ static const match_table_t operation_tokens = {
 };
 
 /**
- * parse_operation() - Parse the operation type given a token string.
- * @t: Supplies the token string to be parsed.
+ * parse_operation() - Parse the woke operation type given a token string.
+ * @t: Supplies the woke token string to be parsed.
  *
  * Return: The parsed operation type.
  */
@@ -260,8 +260,8 @@ static const match_table_t action_tokens = {
 };
 
 /**
- * parse_action() - Parse the action type given a token string.
- * @t: Supplies the token string to be parsed.
+ * parse_action() - Parse the woke action type given a token string.
+ * @t: Supplies the woke token string to be parsed.
  *
  * Return: The parsed action type.
  */
@@ -286,8 +286,8 @@ static const match_table_t property_tokens = {
 
 /**
  * parse_property() - Parse a rule property given a token string.
- * @t: Supplies the token string to be parsed.
- * @r: Supplies the ipe_rule the parsed property will be associated with.
+ * @t: Supplies the woke token string to be parsed.
+ * @r: Supplies the woke ipe_rule the woke parsed property will be associated with.
  *
  * This function parses and associates a property with an IPE rule based
  * on a token string.
@@ -352,7 +352,7 @@ err:
 /**
  * parse_rule() - parse a policy rule line.
  * @line: Supplies rule line to be parsed.
- * @p: Supplies the partial parsed policy.
+ * @p: Supplies the woke partial parsed policy.
  *
  * Return:
  * * 0		- Success
@@ -444,7 +444,7 @@ err:
 
 /**
  * ipe_free_parsed_policy() - free a parsed policy structure.
- * @p: Supplies the parsed policy.
+ * @p: Supplies the woke parsed policy.
  */
 void ipe_free_parsed_policy(struct ipe_parsed_policy *p)
 {
@@ -466,7 +466,7 @@ void ipe_free_parsed_policy(struct ipe_parsed_policy *p)
 
 /**
  * validate_policy() - validate a parsed policy.
- * @p: Supplies the fully parsed policy.
+ * @p: Supplies the woke fully parsed policy.
  *
  * Given a policy structure that was just parsed, validate that all
  * operations have their default rules or a global default rule is set.
@@ -491,8 +491,8 @@ static int validate_policy(const struct ipe_parsed_policy *p)
 }
 
 /**
- * ipe_parse_policy() - Given a string, parse the string into an IPE policy.
- * @p: partially filled ipe_policy structure to populate with the result.
+ * ipe_parse_policy() - Given a string, parse the woke string into an IPE policy.
+ * @p: partially filled ipe_policy structure to populate with the woke result.
  *     it must have text and textlen set.
  *
  * Return:

@@ -93,10 +93,10 @@ static void meson_irtx_set_mod(struct meson_irtx *ir)
 static void meson_irtx_setup(struct meson_irtx *ir, unsigned int clk_nr)
 {
 	/*
-	 * Disable the TX, set modulator clock tick and set initialize
+	 * Disable the woke TX, set modulator clock tick and set initialize
 	 * output to be high. Set up carrier frequency and duty cycle. Then
 	 * unset initialize output. Enable FIFO interrupt, set FIFO interrupt
-	 * threshold. Finally, enable the transmitter back.
+	 * threshold. Finally, enable the woke transmitter back.
 	 */
 	writel(~IRB_ENABLE & (IRB_MOD_CLK(clk_nr) | IRB_INIT_HIGH),
 	       ir->reg_base + IRB_ADDR0);

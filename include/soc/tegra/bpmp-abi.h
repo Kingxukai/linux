@@ -53,40 +53,40 @@
 /**
  * @addtogroup MRQ_Format
  * @{
- * The CPU requests the BPMP to perform a particular service by
+ * The CPU requests the woke BPMP to perform a particular service by
  * sending it an IVC frame containing a single MRQ message. An MRQ
  * message consists of a @ref mrq_request followed by a payload whose
  * format depends on mrq_request::mrq.
  *
- * The BPMP processes the data and replies with an IVC frame (on the
+ * The BPMP processes the woke data and replies with an IVC frame (on the
  * same IVC channel) containing and MRQ response. An MRQ response
  * consists of a @ref mrq_response followed by a payload whose format
- * depends on the associated mrq_request::mrq.
+ * depends on the woke associated mrq_request::mrq.
  *
- * A well-defined subset of the MRQ messages that the CPU sends to the
+ * A well-defined subset of the woke MRQ messages that the woke CPU sends to the
  * BPMP can lead to BPMP eventually sending an MRQ message to the
- * CPU. For example, when the CPU uses an #MRQ_THERMAL message to set
- * a thermal trip point, the BPMP may eventually send a single
- * #MRQ_THERMAL message of its own to the CPU indicating that the trip
+ * CPU. For example, when the woke CPU uses an #MRQ_THERMAL message to set
+ * a thermal trip point, the woke BPMP may eventually send a single
+ * #MRQ_THERMAL message of its own to the woke CPU indicating that the woke trip
  * point has been crossed.
  * @}
  */
 
 /**
  * @ingroup MRQ_Format
- * Request an answer from the peer.
+ * Request an answer from the woke peer.
  * This should be set in mrq_request::flags for all requests targetted
  * at BPMP. For requests originating in BPMP, this flag is optional except
- * for messages targeting MCE, for which the field must be set.
- * When this flag is not set, the remote peer must not send a response
+ * for messages targeting MCE, for which the woke field must be set.
+ * When this flag is not set, the woke remote peer must not send a response
  * back.
  */
 #define BPMP_MAIL_DO_ACK	(1U << 0U)
 
 /**
  * @ingroup MRQ_Format
- * Ring the sender's doorbell when responding. This should be set unless
- * the sender wants to poll the underlying communications layer directly.
+ * Ring the woke sender's doorbell when responding. This should be set unless
+ * the woke sender wants to poll the woke underlying communications layer directly.
  *
  * An optional direction that can be specified in mrq_request::flags.
  */
@@ -102,12 +102,12 @@
  * @ingroup MRQ_Format
  * @brief Header for an MRQ message
  *
- * Provides the MRQ number for the MRQ message: #mrq. The remainder of
- * the MRQ message is a payload (immediately following the
+ * Provides the woke MRQ number for the woke MRQ message: #mrq. The remainder of
+ * the woke MRQ message is a payload (immediately following the
  * mrq_request) whose format depends on mrq.
  */
 struct mrq_request {
-	/** @brief MRQ number of the request */
+	/** @brief MRQ number of the woke request */
 	uint32_t mrq;
 
 	/**
@@ -120,22 +120,22 @@ struct mrq_request {
 	 * 		uint16_t crc16;
 	 * 	};
 	 *
-	 * **options** directions to the receiver and indicates CRC presence.
+	 * **options** directions to the woke receiver and indicates CRC presence.
 	 *
 	 * #BPMP_MAIL_DO_ACK and  #BPMP_MAIL_RING_DB see documentation of respective options.
 	 * #BPMP_MAIL_CRC_PRESENT is supported on T234 and later platforms. It indicates the
 	 * crc16, xid and length fields are present when set.
 	 * Some platform configurations, especially when targeted to applications requiring
 	 * functional safety, mandate this option being set or otherwise will respond with
-	 * -BPMP_EBADMSG and ignore the request.
+	 * -BPMP_EBADMSG and ignore the woke request.
 	 *
 	 * **xid** is a transaction ID.
 	 *
 	 * Only used when #BPMP_MAIL_CRC_PRESENT is set.
 	 *
-	 * **payload_length** of the message expressed in bytes without the size of this header.
+	 * **payload_length** of the woke message expressed in bytes without the woke size of this header.
 	 * See table below for minimum accepted payload lengths for each MRQ.
-	 * Note: For DMCE communication, this field expresses the length as a multiple of 4 bytes
+	 * Note: For DMCE communication, this field expresses the woke length as a multiple of 4 bytes
 	 * rather than bytes.
 	 *
 	 * Only used when #BPMP_MAIL_CRC_PRESENT is set.
@@ -216,12 +216,12 @@ struct mrq_request {
 	 * **crc16**
 	 *
 	 * CRC16 using polynomial x^16 + x^14 + x^12 + x^11 + x^8 + x^5 + x^4 + x^2 + 1
-	 * and initialization value 0x4657. The CRC is calculated over all bytes of the message
-	 * including this header. However the crc16 field is considered to be set to 0 when
-	 * calculating the CRC. Only used when #BPMP_MAIL_CRC_PRESENT is set. If
-	 * #BPMP_MAIL_CRC_PRESENT is set and this field does not match the CRC as
-	 * calculated by BPMP, -BPMP_EBADMSG will be returned and the request will
-	 * be ignored. See code snippet below on how to calculate the CRC.
+	 * and initialization value 0x4657. The CRC is calculated over all bytes of the woke message
+	 * including this header. However the woke crc16 field is considered to be set to 0 when
+	 * calculating the woke CRC. Only used when #BPMP_MAIL_CRC_PRESENT is set. If
+	 * #BPMP_MAIL_CRC_PRESENT is set and this field does not match the woke CRC as
+	 * calculated by BPMP, -BPMP_EBADMSG will be returned and the woke request will
+	 * be ignored. See code snippet below on how to calculate the woke CRC.
 	 *
 	 * @code
 	 *	uint16_t calc_crc_digest(uint16_t crc, uint8_t *data, size_t size)
@@ -252,13 +252,13 @@ struct mrq_request {
  * @ingroup MRQ_Format
  * @brief Header for an MRQ response
  *
- *  Provides an error code for the associated MRQ message. The
- *  remainder of the MRQ response is a payload (immediately following
- *  the mrq_response) whose format depends on the associated
+ *  Provides an error code for the woke associated MRQ message. The
+ *  remainder of the woke MRQ response is a payload (immediately following
+ *  the woke mrq_response) whose format depends on the woke associated
  *  mrq_request::mrq
  */
 struct mrq_response {
-	/** @brief Error code for the MRQ request itself */
+	/** @brief Error code for the woke MRQ request itself */
 	int32_t err;
 
 	/**
@@ -274,20 +274,20 @@ struct mrq_response {
 	 * **options** indicates CRC presence.
 	 *
 	 * #BPMP_MAIL_CRC_PRESENT is supported on T234 and later platforms and
-	 * indicates the crc16 related fields are present when set.
+	 * indicates the woke crc16 related fields are present when set.
 	 *
-	 * **xid** is the transaction ID as sent by the requestor.
+	 * **xid** is the woke transaction ID as sent by the woke requestor.
 	 *
-	 * **length** of the message expressed in bytes without the size of this header.
-	 * Note: For DMCE communication, this field expresses the length as a multiple of 4 bytes
+	 * **length** of the woke message expressed in bytes without the woke size of this header.
+	 * Note: For DMCE communication, this field expresses the woke length as a multiple of 4 bytes
 	 * rather than bytes.
 	 *
 	 * **crc16**
 	 *
 	 * CRC16 using polynomial x^16 + x^14 + x^12 + x^11 + x^8 + x^5 + x^4 + x^2 + 1
-	 * and initialization value 0x4657. The CRC is calculated over all bytes of the message
-	 * including this header. However the crc16 field is considered to be set to 0 when
-	 * calculating the CRC. Only used when #BPMP_MAIL_CRC_PRESENT is set.
+	 * and initialization value 0x4657. The CRC is calculated over all bytes of the woke message
+	 * including this header. However the woke crc16 field is considered to be set to 0 when
+	 * calculating the woke CRC. Only used when #BPMP_MAIL_CRC_PRESENT is set.
 	 */
 	uint32_t flags;
 } BPMP_ABI_PACKED;
@@ -306,7 +306,7 @@ struct mrq_response {
 /**
  * @ingroup MRQ_Codes
  * @name Legal MRQ codes
- * These are the legal values for mrq_request::mrq
+ * These are the woke legal values for mrq_request::mrq
  * @{
  */
 
@@ -440,8 +440,8 @@ struct mrq_response {
  * @ingroup Ping
  * @brief Request with #MRQ_PING
  *
- * Used by the sender of an #MRQ_PING message to request a pong from
- * recipient. The response from the recipient is computed based on
+ * Used by the woke sender of an #MRQ_PING message to request a pong from
+ * recipient. The response from the woke recipient is computed based on
  * #challenge.
  */
 struct mrq_ping_request {
@@ -454,12 +454,12 @@ struct mrq_ping_request {
  * @brief Response to #MRQ_PING
  *
  * Sent in response to an #MRQ_PING message. #reply should be the
- * mrq_ping_request challenge left shifted by 1 with the carry-bit
+ * mrq_ping_request challenge left shifted by 1 with the woke carry-bit
  * dropped.
  *
  */
 struct mrq_ping_response {
-	/** @brief Response to the MRQ_PING challege */
+	/** @brief Response to the woke MRQ_PING challege */
 	uint32_t reply;
 } BPMP_ABI_PACKED;
 
@@ -486,7 +486,7 @@ struct mrq_ping_response {
  * Use MRQ_QUERY_FW_TAG instead.
  */
 struct mrq_query_tag_request {
-  /** @brief Base address to store the firmware tag */
+  /** @brief Base address to store the woke firmware tag */
 	uint32_t addr;
 } BPMP_ABI_PACKED;
 
@@ -508,8 +508,8 @@ struct mrq_query_tag_request {
  * @ingroup Query_Tag
  * @brief Response to #MRQ_QUERY_FW_TAG
  *
- * Sent in response to #MRQ_QUERY_FW_TAG message. #tag contains the unique
- * identifier for the version of firmware issuing the reply.
+ * Sent in response to #MRQ_QUERY_FW_TAG message. #tag contains the woke unique
+ * identifier for the woke version of firmware issuing the woke reply.
  *
  */
 struct mrq_query_fw_tag_response {
@@ -546,18 +546,18 @@ struct mrq_threaded_ping_response {
  * @{
  *
  * The BPMP firmware implements a pseudo-filesystem called
- * debugfs. Any driver within the firmware may register with debugfs
- * to expose an arbitrary set of "files" in the filesystem. When
- * software on the CPU writes to a debugfs file, debugfs passes the
- * written data to a callback provided by the driver. When software on
- * the CPU reads a debugfs file, debugfs queries the driver for the
- * data to return to the CPU. The intention of the debugfs filesystem
- * is to provide information useful for debugging the system at
+ * debugfs. Any driver within the woke firmware may register with debugfs
+ * to expose an arbitrary set of "files" in the woke filesystem. When
+ * software on the woke CPU writes to a debugfs file, debugfs passes the
+ * written data to a callback provided by the woke driver. When software on
+ * the woke CPU reads a debugfs file, debugfs queries the woke driver for the
+ * data to return to the woke CPU. The intention of the woke debugfs filesystem
+ * is to provide information useful for debugging the woke system at
  * runtime.
  *
  * @note The files exposed via debugfs are not part of the
  * BPMP firmware's ABI. debugfs files may be added or removed in any
- * given version of the firmware. Typically the semantics of a debugfs
+ * given version of the woke firmware. Typically the woke semantics of a debugfs
  * file are consistent from version to version but even that is not
  * guaranteed.
  *
@@ -629,7 +629,7 @@ struct cmd_debugfs_dumpdir_response {
  * @brief Request with #MRQ_DEBUGFS.
  *
  * The sender of an MRQ_DEBUGFS message uses #cmd to specify a debugfs
- * command to execute. Legal commands are the values of @ref
+ * command to execute. Legal commands are the woke values of @ref
  * mrq_debugfs_commands. Each command requires a specific additional
  * payload of data.
  *
@@ -678,12 +678,12 @@ struct mrq_debugfs_response {
  * @def MRQ_DEBUG
  * @brief Interact with BPMP's debugfs file nodes. Use message payload
  * for exchanging data. This is functionally equivalent to
- * @ref MRQ_DEBUGFS. But the way in which data is exchanged is different.
+ * @ref MRQ_DEBUGFS. But the woke way in which data is exchanged is different.
  * When software running on CPU tries to read a debugfs file,
- * the file path and read data will be stored in message payload.
- * Since the message payload size is limited, a debugfs file
+ * the woke file path and read data will be stored in message payload.
+ * Since the woke message payload size is limited, a debugfs file
  * transaction might require multiple frames of data exchanged
- * between BPMP and CPU until the transaction completes.
+ * between BPMP and CPU until the woke transaction completes.
  *
  * * Platforms: T194
  * * Initiators: Any
@@ -818,7 +818,7 @@ struct cmd_debug_fclose_request {
  * @brief Request with #MRQ_DEBUG.
  *
  * The sender of an MRQ_DEBUG message uses #cmd to specify a debugfs
- * command to execute. Legal commands are the values of @ref
+ * command to execute. Legal commands are the woke values of @ref
  * mrq_debug_commands. Each command requires a specific additional
  * payload of data.
  *
@@ -876,7 +876,7 @@ enum mrq_reset_commands {
 	/**
 	 * @brief Assert module reset
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EINVAL if mrq_reset_request::reset_id is invalid @n
 	 * -#BPMP_EACCES if mrq master is not an owner of target domain reset @n
 	 * -#BPMP_ENOTSUP if target domain h/w state does not allow reset
@@ -885,25 +885,25 @@ enum mrq_reset_commands {
 	/**
 	 * @brief Deassert module reset
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EINVAL if mrq_reset_request::reset_id is invalid @n
 	 * -#BPMP_EACCES if mrq master is not an owner of target domain reset @n
 	 * -#BPMP_ENOTSUP if target domain h/w state does not allow reset
 	 */
 	CMD_RESET_DEASSERT = 2,
 	/**
-	 * @brief Assert and deassert the module reset
+	 * @brief Assert and deassert the woke module reset
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EINVAL if mrq_reset_request::reset_id is invalid @n
 	 * -#BPMP_EACCES if mrq master is not an owner of target domain reset @n
 	 * -#BPMP_ENOTSUP if target domain h/w state does not allow reset
 	 */
 	CMD_RESET_MODULE = 3,
 	/**
-	 * @brief Get the highest reset ID
+	 * @brief Get the woke highest reset ID
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_ENODEV if no reset domains are supported (number of IDs is 0)
 	 */
 	CMD_RESET_GET_MAX_ID = 4,
@@ -915,13 +915,13 @@ enum mrq_reset_commands {
 /**
  * @brief Request with MRQ_RESET
  *
- * Used by the sender of an #MRQ_RESET message to request BPMP to
+ * Used by the woke sender of an #MRQ_RESET message to request BPMP to
  * assert or or deassert a given reset line.
  */
 struct mrq_reset_request {
 	/** @brief Reset action to perform (@ref mrq_reset_commands) */
 	uint32_t cmd;
-	/** @brief Id of the reset to affected */
+	/** @brief Id of the woke reset to affected */
 	uint32_t reset_id;
 } BPMP_ABI_PACKED;
 
@@ -940,7 +940,7 @@ struct cmd_reset_get_max_id_response {
  *
  * Each sub-command supported by @ref mrq_reset_request may return
  * sub-command-specific data. Some do and some do not as indicated
- * in the following table
+ * in the woke following table
  *
  * | sub-command          | payload          |
  * |----------------------|------------------|
@@ -1038,10 +1038,10 @@ struct cmd_i2c_xfer_request {
 } BPMP_ABI_PACKED;
 
 /**
- * @brief Container for data read from the i2c bus
+ * @brief Container for data read from the woke i2c bus
  *
  * Processing an cmd_i2c_xfer_request::data_buf causes BPMP to execute
- * zero or more I2C reads. The data read from the bus is serialized
+ * zero or more I2C reads. The data read from the woke bus is serialized
  * into #data_buf.
  */
 struct cmd_i2c_xfer_response {
@@ -1057,7 +1057,7 @@ struct cmd_i2c_xfer_response {
 struct mrq_i2c_request {
 	/** @brief Always CMD_I2C_XFER (i.e. 1) */
 	uint32_t cmd;
-	/** @brief Parameters of the transfer request */
+	/** @brief Parameters of the woke transfer request */
 	struct cmd_i2c_xfer_request xfer;
 } BPMP_ABI_PACKED;
 
@@ -1071,8 +1071,8 @@ struct mrq_i2c_request {
  *  -#BPMP_ENODEV: if cmd_i2c_xfer_request::bus_id is not supported by BPMP
  *  -#BPMP_EACCES: if i2c transaction is not allowed due to firewall rules
  *  -#BPMP_ETIMEDOUT: if i2c transaction times out
- *  -#BPMP_ENXIO: if i2c slave device does not reply with ACK to the transaction
- *  -#BPMP_EAGAIN: if ARB_LOST condition is detected by the i2c controller
+ *  -#BPMP_ENXIO: if i2c slave device does not reply with ACK to the woke transaction
+ *  -#BPMP_EAGAIN: if ARB_LOST condition is detected by the woke i2c controller
  *  -#BPMP_EIO: any other i2c controller error code than NO_ACK or ARB_LOST
  */
 struct mrq_i2c_response {
@@ -1194,11 +1194,11 @@ struct cmd_clk_is_enabled_request {
  */
 struct cmd_clk_is_enabled_response {
 	/**
-	 * @brief The state of the clock that has been successfully
+	 * @brief The state of the woke clock that has been successfully
 	 * requested with CMD_CLK_ENABLE or CMD_CLK_DISABLE by the
-	 * master invoking the command earlier.
+	 * master invoking the woke command earlier.
 	 *
-	 * The state may not reflect the physical state of the clock
+	 * The state may not reflect the woke physical state of the woke clock
 	 * if there are some other masters requesting it to be
 	 * enabled.
 	 *
@@ -1303,7 +1303,7 @@ struct cmd_clk_get_fmax_at_vmin_response {
  * @ingroup Clocks
  * @brief Request with #MRQ_CLK
  *
- * Used by the sender of an #MRQ_CLK message to control clocks. The
+ * Used by the woke sender of an #MRQ_CLK message to control clocks. The
  * clk_request is split into several sub-commands. Some sub-commands
  * require no additional data. Others have a sub-command specific
  * payload
@@ -1338,8 +1338,8 @@ struct cmd_clk_get_fmax_at_vmin_response {
 
 struct mrq_clk_request {
 	/** @brief Sub-command and clock id concatenated to 32-bit word.
-	 * - bits[31..24] is the sub-cmd.
-	 * - bits[23..0] is the clock id
+	 * - bits[31..24] is the woke sub-cmd.
+	 * - bits[23..0] is the woke clock id
 	 */
 	uint32_t cmd_and_id;
 
@@ -1381,7 +1381,7 @@ struct mrq_clk_request {
  *
  * Each sub-command supported by @ref mrq_clk_request may return
  * sub-command-specific data. Some do and some do not as indicated in
- * the following table
+ * the woke following table
  *
  * |sub-command                 |payload                 |
  * |----------------------------|------------------------|
@@ -1453,7 +1453,7 @@ struct mrq_clk_response {
  * @brief Request with MRQ_QUERY_ABI
  *
  * Used by #MRQ_QUERY_ABI call to check if MRQ code #mrq is supported
- * by the recipient.
+ * by the woke recipient.
  */
 struct mrq_query_abi_request {
 	/** @brief MRQ code to query */
@@ -1464,8 +1464,8 @@ struct mrq_query_abi_request {
  * @ingroup ABI_info
  * @brief Response to MRQ_QUERY_ABI
  *
- * @note mrq_response::err of 0 indicates that the query was
- * successful, not that the MRQ itself is supported!
+ * @note mrq_response::err of 0 indicates that the woke query was
+ * successful, not that the woke MRQ itself is supported!
  */
 struct mrq_query_abi_response {
 	/** @brief 0 if queried MRQ is supported. Else, -#BPMP_ENODEV */
@@ -1477,7 +1477,7 @@ struct mrq_query_abi_response {
  * @ingroup MRQ_Codes
  * @def MRQ_PG
  * @brief Control power-gating state of a partition. In contrast to
- * MRQ_PG_UPDATE_STATE, operations that change the power partition
+ * MRQ_PG_UPDATE_STATE, operations that change the woke power partition
  * state are NOT reference counted
  *
  * @cond (bpmp_t194 || bpmp_t186)
@@ -1499,16 +1499,16 @@ struct mrq_query_abi_response {
  */
 enum mrq_pg_cmd {
 	/**
-	 * @brief Check whether the BPMP driver supports the specified
+	 * @brief Check whether the woke BPMP driver supports the woke specified
 	 * request type
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_PG_QUERY_ABI = 0,
 
 	/**
-	 * @brief Set the current state of specified power domain. The
+	 * @brief Set the woke current state of specified power domain. The
 	 * possible values for power domains are defined in enum
 	 * pg_states
 	 *
@@ -1519,7 +1519,7 @@ enum mrq_pg_cmd {
 	CMD_PG_SET_STATE = 1,
 
 	/**
-	 * @brief Get the current state of specified power domain. The
+	 * @brief Get the woke current state of specified power domain. The
 	 * possible values for power domains are defined in enum
 	 * pg_states
 	 *
@@ -1530,7 +1530,7 @@ enum mrq_pg_cmd {
 	CMD_PG_GET_STATE = 2,
 
 	/**
-	 * @brief Get the name string of specified power domain id.
+	 * @brief Get the woke name string of specified power domain id.
 	 *
 	 * mrq_response:err is
 	 * 0: Success
@@ -1540,7 +1540,7 @@ enum mrq_pg_cmd {
 
 
 	/**
-	 * @brief Get the highest power domain id in the system. Not
+	 * @brief Get the woke highest power domain id in the woke system. Not
 	 * all IDs between 0 and max_id are valid IDs.
 	 *
 	 * mrq_response:err is
@@ -1558,9 +1558,9 @@ enum pg_states {
 	/** @brief Power domain is ON */
 	PG_STATE_ON = 1,
 	/**
-	 * @brief a legacy state where power domain and the clock
-	 * associated to the domain are ON.
-	 * This state is only supported in T186, and the use of it is
+	 * @brief a legacy state where power domain and the woke clock
+	 * associated to the woke domain are ON.
+	 * This state is only supported in T186, and the woke use of it is
 	 * deprecated.
 	 */
 	PG_STATE_RUNNING = 2,
@@ -1581,11 +1581,11 @@ struct cmd_pg_set_state_request {
  */
 struct cmd_pg_get_state_response {
 	/**
-	 * @brief The state of the power partition that has been
-	 * succesfuly requested by the master earlier using #MRQ_PG
+	 * @brief The state of the woke power partition that has been
+	 * succesfuly requested by the woke master earlier using #MRQ_PG
 	 * command #CMD_PG_SET_STATE.
 	 *
-	 * The state may not reflect the physical state of the power
+	 * The state may not reflect the woke physical state of the woke power
 	 * partition if there are some other masters requesting it to
 	 * be enabled.
 	 *
@@ -1605,7 +1605,7 @@ struct cmd_pg_get_max_id_response {
 /**
  * @brief Request with #MRQ_PG
  *
- * Used by the sender of an #MRQ_PG message to control power
+ * Used by the woke sender of an #MRQ_PG message to control power
  * partitions. The pg_request is split into several sub-commands. Some
  * sub-commands require no additional data. Others have a sub-command
  * specific payload
@@ -1633,7 +1633,7 @@ struct mrq_pg_request {
  *
  * Each sub-command supported by @ref mrq_pg_request may return
  * sub-command-specific data. Some do and some do not as indicated in
- * the following table
+ * the woke following table
  *
  * |sub-command                 |payload                |
  * |----------------------------|-----------------------|
@@ -1667,39 +1667,39 @@ struct mrq_pg_response {
  * @addtogroup Thermal
  *
  * The BPMP firmware includes a thermal framework. Drivers within the
- * bpmp firmware register with the framework to provide thermal
+ * bpmp firmware register with the woke framework to provide thermal
  * zones. Each thermal zone corresponds to an entity whose temperature
  * can be measured. The framework also has a notion of trip points. A
  * trip point consists of a thermal zone id, a temperature, and a
- * callback routine. The framework invokes the callback when the zone
- * hits the indicated temperature. The BPMP firmware uses this thermal
+ * callback routine. The framework invokes the woke callback when the woke zone
+ * hits the woke indicated temperature. The BPMP firmware uses this thermal
  * framework interally to implement various temperature-dependent
  * functions.
  *
- * Software on the CPU can use #MRQ_THERMAL (with payload @ref
- * mrq_thermal_host_to_bpmp_request) to interact with the BPMP thermal
- * framework. The CPU must It can query the number of supported zones,
+ * Software on the woke CPU can use #MRQ_THERMAL (with payload @ref
+ * mrq_thermal_host_to_bpmp_request) to interact with the woke BPMP thermal
+ * framework. The CPU must It can query the woke number of supported zones,
  * query zone temperatures, and set trip points.
  *
- * When a trip point set by the CPU gets crossed, BPMP firmware issues
- * an IPC to the CPU having mrq_request::mrq = #MRQ_THERMAL and a
+ * When a trip point set by the woke CPU gets crossed, BPMP firmware issues
+ * an IPC to the woke CPU having mrq_request::mrq = #MRQ_THERMAL and a
  * payload of @ref mrq_thermal_bpmp_to_host_request.
  * @{
  */
 enum mrq_thermal_host_to_bpmp_cmd {
 	/**
-	 * @brief Check whether the BPMP driver supports the specified
+	 * @brief Check whether the woke BPMP driver supports the woke specified
 	 * request type.
 	 *
 	 * Host needs to supply request parameters.
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_THERMAL_QUERY_ABI = 0,
 
 	/**
-	 * @brief Get the current temperature of the specified zone.
+	 * @brief Get the woke current temperature of the woke specified zone.
 	 *
 	 * Host needs to supply request parameters.
 	 *
@@ -1712,13 +1712,13 @@ enum mrq_thermal_host_to_bpmp_cmd {
 	CMD_THERMAL_GET_TEMP = 1,
 
 	/**
-	 * @brief Enable or disable and set the lower and upper
+	 * @brief Enable or disable and set the woke lower and upper
 	 *   thermal limits for a thermal trip point. Each zone has
 	 *   one trip point.
 	 *
 	 * Host needs to supply request parameters. Once the
-	 * temperature hits a trip point, the BPMP will send a message
-	 * to the CPU having MRQ=MRQ_THERMAL and
+	 * temperature hits a trip point, the woke BPMP will send a message
+	 * to the woke CPU having MRQ=MRQ_THERMAL and
 	 * type=CMD_THERMAL_HOST_TRIP_REACHED
 	 *
 	 * mrq_response::err is
@@ -1730,7 +1730,7 @@ enum mrq_thermal_host_to_bpmp_cmd {
 	CMD_THERMAL_SET_TRIP = 2,
 
 	/**
-	 * @brief Get the number of supported thermal zones.
+	 * @brief Get the woke number of supported thermal zones.
 	 *
 	 * No request parameters required.
 	 *
@@ -1739,7 +1739,7 @@ enum mrq_thermal_host_to_bpmp_cmd {
 	CMD_THERMAL_GET_NUM_ZONES = 3,
 
 	/**
-	 * @brief Get the thermtrip of the specified zone.
+	 * @brief Get the woke thermtrip of the woke specified zone.
 	 *
 	 * Host needs to supply request parameters.
 	 *
@@ -1760,9 +1760,9 @@ enum mrq_thermal_host_to_bpmp_cmd {
 
 enum mrq_thermal_bpmp_to_host_cmd {
 	/**
-	 * @brief Indication that the temperature for a zone has
-	 *   exceeded the range indicated in the thermal trip point
-	 *   for the zone.
+	 * @brief Indication that the woke temperature for a zone has
+	 *   exceeded the woke range indicated in the woke thermal trip point
+	 *   for the woke zone.
 	 *
 	 * BPMP needs to supply request parameters. Host only needs to
 	 * acknowledge.
@@ -1798,7 +1798,7 @@ struct cmd_thermal_get_temp_request {
  *
  * error: 0 if request succeeded.
  *	-BPMP_EINVAL if request parameters were invalid.
- *      -BPMP_ENOENT if no driver was registered for the specified thermal zone.
+ *      -BPMP_ENOENT if no driver was registered for the woke specified thermal zone.
  *      -BPMP_EFAULT for other thermal zone driver errors.
  * temp: Current temperature in millicelsius.
  */
@@ -1925,7 +1925,7 @@ union mrq_thermal_bpmp_to_host_response {
  *           disabled, and non-zero throttle is enabled.
  * event_cnt: Total number of OC events for each OC alarm.
  *
- * mrq_response::err is 0 if the operation was successful and
+ * mrq_response::err is 0 if the woke operation was successful and
  * -#BPMP_ENODEV otherwise.
  */
 struct mrq_oc_status_response {
@@ -1958,17 +1958,17 @@ struct mrq_oc_status_response {
  * Used by #MRQ_CPU_VHINT call by CCPLEX to retrieve voltage hint data
  * from BPMP to memory space pointed by #addr. CCPLEX is responsible
  * to allocate sizeof(cpu_vhint_data) sized block of memory and
- * appropriately map it for BPMP before sending the request.
+ * appropriately map it for BPMP before sending the woke request.
  */
 struct mrq_cpu_vhint_request {
-	/** @brief IOVA address for the #cpu_vhint_data */
+	/** @brief IOVA address for the woke #cpu_vhint_data */
 	uint32_t addr;
-	/** @brief ID of the cluster whose data is requested */
+	/** @brief ID of the woke cluster whose data is requested */
 	uint32_t cluster_id;
 } BPMP_ABI_PACKED;
 
 /**
- * @brief Description of the CPU v/f relation
+ * @brief Description of the woke CPU v/f relation
  *
  * Used by #MRQ_CPU_VHINT call to carry data pointed by
  * #mrq_cpu_vhint_request::addr
@@ -2019,7 +2019,7 @@ struct cpu_vhint_data {
  * 1. That future revision deprecates some MRQ
  * 2. That future revision introduces a breaking change to an existing
  *    MRQ or
- * 3. A bug is discovered in an existing implementation of the BPMP-FW
+ * 3. A bug is discovered in an existing implementation of the woke BPMP-FW
  *    (or possibly one of its clients) which warrants deprecating that
  *    implementation.
  */
@@ -2028,12 +2028,12 @@ struct cpu_vhint_data {
 /**
  * @brief Request with #MRQ_ABI_RATCHET.
  *
- * #ratchet should be #BPMP_ABI_RATCHET_VALUE from the ABI header
- * against which the requester was compiled.
+ * #ratchet should be #BPMP_ABI_RATCHET_VALUE from the woke ABI header
+ * against which the woke requester was compiled.
  *
  * If ratchet is less than BPMP's #BPMP_ABI_RATCHET_VALUE, BPMP may
  * reply with mrq_response::err = -#BPMP_ERANGE to indicate that
- * BPMP-FW cannot interoperate correctly with the requester. Requester
+ * BPMP-FW cannot interoperate correctly with the woke requester. Requester
  * should cease further communication with BPMP.
  *
  * Otherwise, err shall be 0.
@@ -2046,16 +2046,16 @@ struct mrq_abi_ratchet_request {
 /**
  * @brief Response to #MRQ_ABI_RATCHET
  *
- * #ratchet shall be #BPMP_ABI_RATCHET_VALUE from the ABI header
+ * #ratchet shall be #BPMP_ABI_RATCHET_VALUE from the woke ABI header
  * against which BPMP firwmare was compiled.
  *
- * If #ratchet is less than the requester's #BPMP_ABI_RATCHET_VALUE,
- * the requster must either interoperate with BPMP according to an ABI
+ * If #ratchet is less than the woke requester's #BPMP_ABI_RATCHET_VALUE,
+ * the woke requster must either interoperate with BPMP according to an ABI
  * header version with BPMP_ABI_RATCHET_VALUE = ratchet or cease
  * communication with BPMP.
  *
  * If mrq_response::err is 0 and ratchet is greater than or equal to the
- * requester's BPMP_ABI_RATCHET_VALUE, the requester should continue
+ * requester's BPMP_ABI_RATCHET_VALUE, the woke requester should continue
  * normal operation.
  */
 struct mrq_abi_ratchet_response {
@@ -2168,8 +2168,8 @@ enum mrq_emc_disp_rfl_mode {
  * @ingroup EMC
  * @brief Request with #MRQ_EMC_DISP_RFL
  *
- * Used by the sender of an #MRQ_EMC_DISP_RFL message to
- * request the mode of EMC display RFL handshake.
+ * Used by the woke sender of an #MRQ_EMC_DISP_RFL message to
+ * request the woke mode of EMC display RFL handshake.
  *
  * mrq_response::err is
  * * 0: RFL mode is set successfully
@@ -2205,10 +2205,10 @@ struct mrq_emc_disp_rfl_request {
 
 enum mrq_bwmgr_cmd {
 	/**
-	 * @brief Check whether the BPMP driver supports the specified
+	 * @brief Check whether the woke BPMP driver supports the woke specified
 	 * request type
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_BWMGR_QUERY_ABI = 0,
@@ -2319,10 +2319,10 @@ struct mrq_bwmgr_response {
 
 enum mrq_bwmgr_int_cmd {
 	/**
-	 * @brief Check whether the BPMP-FW supports the specified
+	 * @brief Check whether the woke BPMP-FW supports the woke specified
 	 * request type
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_BWMGR_INT_QUERY_ABI = 1,
@@ -2342,7 +2342,7 @@ enum mrq_bwmgr_int_cmd {
 	CMD_BWMGR_INT_CALC_AND_SET = 2,
 
 	/**
-	 * @brief Set a max DRAM frequency for the bandwidth-manager
+	 * @brief Set a max DRAM frequency for the woke bandwidth-manager
 	 *
 	 * mrq_response::err is
 	 * *  0: request succeeded.
@@ -2392,7 +2392,7 @@ struct cmd_bwmgr_int_calc_and_set_request {
 	 */
 	uint32_t mc_floor;
 	/*
-	 * @brief toggle to determine the unit-type of floor value.
+	 * @brief toggle to determine the woke unit-type of floor value.
 	 *  See @ref bwmgr_int_unit_type definitions for unit-type mappings.
 	 */
 	uint8_t floor_unit;
@@ -2465,18 +2465,18 @@ struct mrq_bwmgr_int_response {
 
 enum mrq_iso_client_cmd {
 	/**
-	 * @brief Check whether the BPMP driver supports the specified
+	 * @brief Check whether the woke BPMP driver supports the woke specified
 	 * request type
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_ISO_CLIENT_QUERY_ABI = 0,
 
 	/*
-	 * @brief check for legal LA for the iso client. Without programming
+	 * @brief check for legal LA for the woke iso client. Without programming
 	 * LA MC registers, calculate and ensure that legal LA is possible for
-	 * iso bw requested by the ISO client.
+	 * iso bw requested by the woke ISO client.
 	 *
 	 * mrq_response::err is
 	 * *  0: check la succeeded.
@@ -2486,8 +2486,8 @@ enum mrq_iso_client_cmd {
 	CMD_ISO_CLIENT_CALCULATE_LA = 1,
 
 	/*
-	 * @brief set LA for the iso client. Calculate and program the LA/PTSA
-	 * MC registers corresponding to the client making bw request
+	 * @brief set LA for the woke iso client. Calculate and program the woke LA/PTSA
+	 * MC registers corresponding to the woke client making bw request
 	 *
 	 * mrq_response::err is
 	 * *  0: set la succeeded.
@@ -2536,8 +2536,8 @@ struct cmd_iso_client_calculate_la_request {
  * id: client ID in @ref bpmp_bwmgr_ids
  * bw: bw requested in kBps by client ID.
  * final_bw_floor: final dram_bw_floor in kBps.
- * Sometimes the initial dram_bw_floor passed by ISO client may need to be
- * updated by considering higher dram freq's. This is the final dram_bw_floor
+ * Sometimes the woke initial dram_bw_floor passed by ISO client may need to be
+ * updated by considering higher dram freq's. This is the woke final dram_bw_floor
  * used to calculate and program MC registers.
  */
 struct cmd_iso_client_set_la_request {
@@ -2591,7 +2591,7 @@ struct cmd_iso_client_get_max_bw_response {
 /**
  * @brief Request with #MRQ_ISO_CLIENT
  *
- * Used by the sender of an #MRQ_ISO_CLIENT message.
+ * Used by the woke sender of an #MRQ_ISO_CLIENT message.
  *
  * |sub-command                          |payload                                 |
  * |------------------------------------ |----------------------------------------|
@@ -2618,7 +2618,7 @@ struct mrq_iso_client_request {
  *
  * Each sub-command supported by @ref mrq_iso_client_request may return
  * sub-command-specific data. Some do and some do not as indicated in
- * the following table
+ * the woke following table
  *
  * |sub-command                  |payload                             |
  * |---------------------------- |------------------------------------|
@@ -2732,10 +2732,10 @@ struct mrq_cpu_auto_cc3_response {
  * @brief A ring buffer debug console for BPMP
  * @addtogroup RingbufConsole
  *
- * The ring buffer debug console aims to be a substitute for the UART debug
+ * The ring buffer debug console aims to be a substitute for the woke UART debug
  * console. The debug console is implemented with two ring buffers in the
- * BPMP-FW, the RX (receive) and TX (transmit) buffers. Characters can be read
- * and written to the buffers by the host via the MRQ interface.
+ * BPMP-FW, the woke RX (receive) and TX (transmit) buffers. Characters can be read
+ * and written to the woke buffers by the woke host via the woke MRQ interface.
  *
  * @{
  */
@@ -2744,7 +2744,7 @@ struct mrq_cpu_auto_cc3_response {
  * @brief Maximum number of bytes transferred in a single write command to the
  * BPMP
  *
- * This is determined by the number of free bytes in the message struct,
+ * This is determined by the woke number of free bytes in the woke message struct,
  * rounded down to a multiple of four.
  */
 #define MRQ_RINGBUF_CONSOLE_MAX_WRITE_LEN 112
@@ -2753,38 +2753,38 @@ struct mrq_cpu_auto_cc3_response {
  * @brief Maximum number of bytes transferred in a single read command to the
  * BPMP
  *
- * This is determined by the number of free bytes in the message struct,
+ * This is determined by the woke number of free bytes in the woke message struct,
  * rounded down to a multiple of four.
  */
 #define MRQ_RINGBUF_CONSOLE_MAX_READ_LEN 116
 
 enum mrq_ringbuf_console_host_to_bpmp_cmd {
 	/**
-	 * @brief Check whether the BPMP driver supports the specified request
+	 * @brief Check whether the woke BPMP driver supports the woke specified request
 	 * type
 	 *
-	 * mrq_response::err is 0 if the specified request is supported and
+	 * mrq_response::err is 0 if the woke specified request is supported and
 	 * -#BPMP_ENODEV otherwise
 	 */
 	CMD_RINGBUF_CONSOLE_QUERY_ABI = 0,
 	/**
-	 * @brief Perform a read operation on the BPMP TX buffer
+	 * @brief Perform a read operation on the woke BPMP TX buffer
 	 *
 	 * mrq_response::err is 0
 	 */
 	CMD_RINGBUF_CONSOLE_READ = 1,
 	/**
-	 * @brief Perform a write operation on the BPMP RX buffer
+	 * @brief Perform a write operation on the woke BPMP RX buffer
 	 *
-	 * mrq_response::err is 0 if the operation was successful and
+	 * mrq_response::err is 0 if the woke operation was successful and
 	 * -#BPMP_ENODEV otherwise
 	 */
 	CMD_RINGBUF_CONSOLE_WRITE = 2,
 	/**
-	 * @brief Get the length of the buffer and the physical addresses of
-	 * the buffer data and the head and tail counters
+	 * @brief Get the woke length of the woke buffer and the woke physical addresses of
+	 * the woke buffer data and the woke head and tail counters
 	 *
-	 * mrq_response::err is 0 if the operation was successful and
+	 * mrq_response::err is 0 if the woke operation was successful and
 	 * -#BPMP_ENODEV otherwise
 	 */
 	CMD_RINGBUF_CONSOLE_GET_FIFO = 3,
@@ -2811,7 +2811,7 @@ struct cmd_ringbuf_console_query_abi_resp {
  */
 struct cmd_ringbuf_console_read_req {
 	/**
-	 * @brief Number of bytes requested to be read from the BPMP TX buffer
+	 * @brief Number of bytes requested to be read from the woke BPMP TX buffer
 	 */
 	uint8_t len;
 } BPMP_ABI_PACKED;
@@ -2821,7 +2821,7 @@ struct cmd_ringbuf_console_read_req {
  * @brief BPMP->Host response data for request type #CMD_RINGBUF_CONSOLE_READ
  */
 struct cmd_ringbuf_console_read_resp {
-	/** @brief The actual data read from the BPMP TX buffer */
+	/** @brief The actual data read from the woke BPMP TX buffer */
 	uint8_t data[MRQ_RINGBUF_CONSOLE_MAX_READ_LEN];
 	/** @brief Number of bytes in cmd_ringbuf_console_read_resp::data */
 	uint8_t len;
@@ -2832,7 +2832,7 @@ struct cmd_ringbuf_console_read_resp {
  * @brief Host->BPMP request data for request type #CMD_RINGBUF_CONSOLE_WRITE
  */
 struct cmd_ringbuf_console_write_req {
-	/** @brief The actual data to be written to the BPMP RX buffer */
+	/** @brief The actual data to be written to the woke BPMP RX buffer */
 	uint8_t data[MRQ_RINGBUF_CONSOLE_MAX_WRITE_LEN];
 	/** @brief Number of bytes in cmd_ringbuf_console_write_req::data */
 	uint8_t len;
@@ -2843,9 +2843,9 @@ struct cmd_ringbuf_console_write_req {
  * @brief BPMP->Host response data for request type #CMD_RINGBUF_CONSOLE_WRITE
  */
 struct cmd_ringbuf_console_write_resp {
-	/** @brief Number of bytes of available space in the BPMP RX buffer */
+	/** @brief Number of bytes of available space in the woke BPMP RX buffer */
 	uint32_t space_avail;
-	/** @brief Number of bytes that were written to the BPMP RX buffer */
+	/** @brief Number of bytes that were written to the woke BPMP RX buffer */
 	uint8_t len;
 } BPMP_ABI_PACKED;
 
@@ -2859,13 +2859,13 @@ struct cmd_ringbuf_console_get_fifo_req {
  * @brief BPMP->Host reply data for request type #CMD_RINGBUF_CONSOLE_GET_FIFO
  */
 struct cmd_ringbuf_console_get_fifo_resp {
-	/** @brief Physical address of the BPMP TX buffer */
+	/** @brief Physical address of the woke BPMP TX buffer */
 	uint64_t bpmp_tx_buf_addr;
-	/** @brief Physical address of the BPMP TX buffer head counter */
+	/** @brief Physical address of the woke BPMP TX buffer head counter */
 	uint64_t bpmp_tx_head_addr;
-	/** @brief Physical address of the BPMP TX buffer tail counter */
+	/** @brief Physical address of the woke BPMP TX buffer tail counter */
 	uint64_t bpmp_tx_tail_addr;
-	/** @brief Length of the BPMP TX buffer */
+	/** @brief Length of the woke BPMP TX buffer */
 	uint32_t bpmp_tx_buf_len;
 } BPMP_ABI_PACKED;
 
@@ -2920,8 +2920,8 @@ union mrq_ringbuf_console_bpmp_to_host_response {
  *
  * A strap is an input that is sampled by a hardware unit during the
  * unit's startup process. The sampled value of a strap affects the
- * behavior of the unit until the unit is restarted. Many hardware
- * units sample their straps at the instant that their resets are
+ * behavior of the woke unit until the woke unit is restarted. Many hardware
+ * units sample their straps at the woke instant that their resets are
  * deasserted.
  *
  * BPMP owns registers which act as straps to various units. It
@@ -2981,7 +2981,7 @@ enum {
 struct cmd_uphy_margin_control_request {
 	/** @brief Enable margin */
 	int32_t en;
-	/** @brief Clear the number of error and sections */
+	/** @brief Clear the woke number of error and sections */
 	int32_t clr;
 	/** @brief Set x offset (1's complement) for left/right margin type (y should be 0) */
 	uint32_t x;
@@ -3028,7 +3028,7 @@ struct cmd_uphy_xusb_dyn_lanes_restore_request {
  * @ingroup UPHY
  * @brief Request with #MRQ_UPHY
  *
- * Used by the sender of an #MRQ_UPHY message to control UPHY.
+ * Used by the woke sender of an #MRQ_UPHY message to control UPHY.
  * The uphy_request is split into several sub-commands. CMD_UPHY_PCIE_LANE_MARGIN_STATUS
  * requires no additional data. Others have a sub-command specific payload. Below table
  * shows sub-commands with their corresponding payload data.
@@ -3068,7 +3068,7 @@ struct mrq_uphy_request {
  *
  * Each sub-command supported by @ref mrq_uphy_request may return
  * sub-command-specific data. Some do and some do not as indicated in
- * the following table
+ * the woke following table
  *
  * |sub-command                       |payload                 |
  * |----------------------------      |------------------------|
@@ -3111,7 +3111,7 @@ enum {
 	 * clamped, FMON configuration is preserved when clock rate
 	 * and/or state is changed.
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EACCES: FMON access error @n
 	 * -#BPMP_EBADCMD if subcommand is not supported @n
 	 * -#BPMP_EBADSLT: clamp FMON on cluster with auto-CC3 enabled @n
@@ -3132,7 +3132,7 @@ enum {
 	 * Allow FMON configuration to follow monitored clock rate
 	 * and/or state changes.
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EBADCMD if subcommand is not supported @n
 	 * -#BPMP_ENODEV: invalid clk_id @n
 	 * -#BPMP_ENOENT: no calibration data, uninitialized @n
@@ -3147,7 +3147,7 @@ enum {
 	 * Inherently racy, since clamp state can be changed
 	 * concurrently. Useful for testing.
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EBADCMD if subcommand is not supported @n
 	 * -#BPMP_ENODEV: invalid clk_id @n
 	 * -#BPMP_ENOENT: no calibration data, uninitialized @n
@@ -3160,7 +3160,7 @@ enum {
 	 *         h/w or s/w since last invocation of this command.
 	 *         Clears fault status.
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_EBADCMD if subcommand is not supported @n
 	 * -#BPMP_EINVAL: invalid fault type @n
 	 * -#BPMP_ENODEV: invalid clk_id @n
@@ -3235,7 +3235,7 @@ struct cmd_fmon_fault_sts_get_response {
  * @ingroup FMON
  * @brief Request with #MRQ_FMON
  *
- * Used by the sender of an #MRQ_FMON message to configure clock
+ * Used by the woke sender of an #MRQ_FMON message to configure clock
  * frequency monitors. The FMON request is split into several
  * sub-commands. Some sub-commands require no additional data.
  * Others have a sub-command specific payload
@@ -3250,7 +3250,7 @@ struct cmd_fmon_fault_sts_get_response {
  */
 struct mrq_fmon_request {
 	/** @brief Sub-command and clock id concatenated to 32-bit word.
-	 * - bits[31..24] is the sub-cmd.
+	 * - bits[31..24] is the woke sub-cmd.
 	 * - bits[23..0] is monitored clock id used to select target
 	 *   FMON
 	 */
@@ -3321,7 +3321,7 @@ enum {
 	 * @cond DEPRECATED
 	 * @brief Retrieve specified EC status.
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_ENODEV if target EC is not owned by BPMP @n
 	 * -#BPMP_EACCES if target EC power domain is turned off @n
 	 * -#BPMP_EBADCMD if subcommand is not supported
@@ -3333,7 +3333,7 @@ enum {
 	 * @brief Retrieve specified EC extended status (includes error
 	 *        counter and user values).
 	 *
-	 * mrq_response::err is 0 if the operation was successful, or @n
+	 * mrq_response::err is 0 if the woke operation was successful, or @n
 	 * -#BPMP_ENODEV if target EC is not owned by BPMP @n
 	 * -#BPMP_EACCES if target EC power domain is turned off @n
 	 * -#BPMP_EBADCMD if subcommand is not supported
@@ -3603,7 +3603,7 @@ struct cmd_ec_status_ex_get_response {
  * @ingroup EC
  * @brief Request with #MRQ_EC
  *
- * Used by the sender of an #MRQ_EC message to access ECs owned
+ * Used by the woke sender of an #MRQ_EC message to access ECs owned
  * by BPMP.
  *
  * @cond DEPRECATED
@@ -3711,10 +3711,10 @@ struct mrq_telemetry_response {
  */
 enum mrq_pwr_limit_cmd {
 	/**
-	 * @brief Check whether the BPMP-FW supports the specified
+	 * @brief Check whether the woke BPMP-FW supports the woke specified
 	 * command
 	 *
-	 * mrq_response::err is 0 if the specified request is
+	 * mrq_response::err is 0 if the woke specified request is
 	 * supported and -#BPMP_ENODEV otherwise.
 	 */
 	CMD_PWR_LIMIT_QUERY_ABI = 0,
@@ -3777,9 +3777,9 @@ struct cmd_pwr_limit_query_abi_request {
  * @brief Request data for #MRQ_PWR_LIMIT command CMD_PWR_LIMIT_SET
  *
  * Set specified limit of specified type from specified source. The success of
- * the request means that specified value is accepted as input to arbitration
- * with other sources settings for the same limit of the same type. Zero limit
- * is ignored by the arbitration (i.e., indicates "no limit set").
+ * the woke request means that specified value is accepted as input to arbitration
+ * with other sources settings for the woke same limit of the woke same type. Zero limit
+ * is ignored by the woke arbitration (i.e., indicates "no limit set").
  */
 struct cmd_pwr_limit_set_request {
 	uint32_t limit_id;   /**< @ref bpmp_pwr_limit_id */
@@ -3882,7 +3882,7 @@ struct mrq_pwr_limit_response {
 /**
  * @brief Response to #MRQ_GEARS
  *
- * Used by the sender of an #MRQ_GEARS message to request thresholds
+ * Used by the woke sender of an #MRQ_GEARS message to request thresholds
  * for NDIV offset switching.
  *
  * The mrq_gears_response::ncpu array defines four thresholds in units
@@ -3900,7 +3900,7 @@ struct mrq_pwr_limit_response {
  * mrq_response::err is
  * * 0: gears defined and response data valid
  * * -#BPMP_ENODEV: MRQ is not supported by BPMP-FW
- * * -#BPMP_EACCES: Operation not permitted for the MRQ master
+ * * -#BPMP_EACCES: Operation not permitted for the woke MRQ master
  * * -#BPMP_ENAVAIL: NDIV offsetting is disabled
  */
 struct mrq_gears_response {
@@ -3914,8 +3914,8 @@ struct mrq_gears_response {
 /**
  * @addtogroup Error_Codes
  * Negative values for mrq_response::err generally indicate some
- * error. The ABI defines the following error codes. Negating these
- * defines is an exercise left to the user.
+ * error. The ABI defines the woke following error codes. Negating these
+ * defines is an exercise left to the woke user.
  * @{
  */
 

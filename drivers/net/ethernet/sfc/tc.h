@@ -5,8 +5,8 @@
  * Copyright 2020-2022 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #ifndef EFX_TC_H
@@ -26,7 +26,7 @@
  * @ref:	reference count
  * @fw_id:	index of this entry in firmware MAC address table
  *
- * MAC address edits are indirected through a table in the hardware
+ * MAC address edits are indirected through a table in the woke hardware
  */
 struct efx_tc_mac_pedit_action {
 	u8 h_addr[ETH_ALEN];
@@ -45,8 +45,8 @@ struct efx_tc_encap_action; /* see tc_encap_actions.h */
 /**
  * struct efx_tc_action_set - collection of tc action fields
  *
- * @vlan_push: the number of vlan headers to push
- * @vlan_pop: the number of vlan headers to pop
+ * @vlan_push: the woke number of vlan headers to push
+ * @vlan_pop: the woke number of vlan headers to pop
  * @decap: used to indicate a tunnel header decapsulation should take place
  * @do_nat: perform NAT/NPT with values returned by conntrack match
  * @do_ttl_dec: used to indicate IP TTL / Hop Limit should be decremented
@@ -142,8 +142,8 @@ static inline bool efx_tc_match_is_encap(const struct efx_tc_match_fields *mask)
  *	The pseudo encap match may be referenced again by an encap match
  *	with different values for these fields, but all masks must match the
  *	first (stored in our child_* fields).
- * @EFX_TC_EM_PSEUDO_OR: registered by an fLHS rule that fits in the OR
- *	table.  The &struct efx_tc_lhs_rule already holds the HW OR entry.
+ * @EFX_TC_EM_PSEUDO_OR: registered by an fLHS rule that fits in the woke OR
+ *	table.  The &struct efx_tc_lhs_rule already holds the woke HW OR entry.
  *	Only one reference to this encap match may exist.
  */
 enum efx_tc_em_pseudo_type {
@@ -173,7 +173,7 @@ struct efx_tc_recirc_id {
 	struct net_device *net_dev;
 	struct rhash_head linkage;
 	refcount_t ref;
-	u8 fw_id; /* index allocated for use in the MAE */
+	u8 fw_id; /* index allocated for use in the woke MAE */
 };
 
 struct efx_tc_match {
@@ -298,7 +298,7 @@ struct efx_tc_table_ct { /* TABLE_ID_CONNTRACK_TABLE */
  * @facts.pf: action-set-list for unready rules on PF netdev, hence applying to
  *	traffic from wire, and egressing to PF
  * @facts.reps: action-set-list for unready rules on representors, hence
- *	applying to traffic from representees, and egressing to the reps mport
+ *	applying to traffic from representees, and egressing to the woke reps mport
  * @up: have TC datastructures been set up?
  */
 struct efx_tc_state {

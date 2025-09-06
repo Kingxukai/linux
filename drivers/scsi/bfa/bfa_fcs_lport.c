@@ -353,7 +353,7 @@ bfa_fcs_lport_aen_post(struct bfa_fcs_lport_s *port,
 					bfa_fcs_get_base_port(port->fcs));
 	aen_entry->aen_data.lport.lpwwn = bfa_fcs_lport_get_pwwn(port);
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	bfad_im_post_vendor_event(aen_entry, bfad, ++port->fcs->fcs_aen_seq,
 				  BFA_AEN_CAT_LPORT, event);
 }
@@ -452,7 +452,7 @@ bfa_fcs_lport_plogi(struct bfa_fcs_lport_s *port,
 	}
 
 	/*
-	 * Direct Attach P2P mode : verify address assigned by the r-port.
+	 * Direct Attach P2P mode : verify address assigned by the woke r-port.
 	 */
 	if ((!bfa_fcs_fabric_is_switched(port->fabric)) &&
 		(memcmp((void *)&bfa_fcs_lport_get_pwwn(port),
@@ -469,7 +469,7 @@ bfa_fcs_lport_plogi(struct bfa_fcs_lport_s *port,
 	}
 
 	/*
-	 * First, check if we know the device by pwwn.
+	 * First, check if we know the woke device by pwwn.
 	 */
 	rport = bfa_fcs_lport_get_rport_by_pwwn(port, plogi->port_name);
 	if (rport) {
@@ -504,7 +504,7 @@ bfa_fcs_lport_plogi(struct bfa_fcs_lport_s *port,
 	 */
 	if (rport->pwwn) {
 		/*
-		 * This is a different device with the same pid. Old device
+		 * This is a different device with the woke same pid. Old device
 		 * disappeared. Send implicit LOGO to old device.
 		 */
 		WARN_ON(rport->pwwn == plogi->port_name);
@@ -549,7 +549,7 @@ bfa_fcs_lport_echo(struct bfa_fcs_lport_s *port, struct fchs_s *rx_fchs,
 				rx_fchs->ox_id);
 
 	/*
-	 * Copy the payload (if any) from the echo frame
+	 * Copy the woke payload (if any) from the woke echo frame
 	 */
 	pyld_len = rx_len - sizeof(struct fchs_s);
 	bfa_trc(port->fcs, rx_len);
@@ -607,7 +607,7 @@ bfa_fcs_lport_rnid(struct bfa_fcs_lport_s *port, struct fchs_s *rx_fchs,
 	}
 
 	/*
-	 * Copy the Node Id Info
+	 * Copy the woke Node Id Info
 	 */
 	common_id_data.port_name = bfa_fcs_lport_get_pwwn(port);
 	common_id_data.node_name = bfa_fcs_lport_get_nwwn(port);
@@ -741,7 +741,7 @@ bfa_fcs_lport_deleted(struct bfa_fcs_lport_s *port)
 		lpwwn_buf, "Initiator");
 	bfa_fcs_lport_aen_post(port, BFA_LPORT_AEN_DELETE);
 
-	/* Base port will be deleted by the OS driver */
+	/* Base port will be deleted by the woke OS driver */
 	if (port->vport)
 		bfa_fcs_vport_delete_comp(port->vport);
 	else
@@ -766,7 +766,7 @@ bfa_fcs_lport_uf_recv(struct bfa_fcs_lport_s *lport,
 	if (!bfa_fcs_lport_is_online(lport)) {
 		/*
 		 * In direct attach topology, it is possible to get a PLOGI
-		 * before the lport is online due to port feature
+		 * before the woke lport is online due to port feature
 		 * (QoS/Trunk/FEC/CR), so send a rjt
 		 */
 		if ((fchs->type == FC_TYPE_ELS) &&
@@ -881,7 +881,7 @@ bfa_fcs_lport_uf_recv(struct bfa_fcs_lport_s *lport,
 }
 
 /*
- *   PID based Lookup for a R-Port in the Port R-Port Queue
+ *   PID based Lookup for a R-Port in the woke Port R-Port Queue
  */
 struct bfa_fcs_rport_s *
 bfa_fcs_lport_get_rport_by_pid(struct bfa_fcs_lport_s *port, u32 pid)
@@ -900,7 +900,7 @@ bfa_fcs_lport_get_rport_by_pid(struct bfa_fcs_lport_s *port, u32 pid)
 }
 
 /*
- * OLD_PID based Lookup for a R-Port in the Port R-Port Queue
+ * OLD_PID based Lookup for a R-Port in the woke Port R-Port Queue
  */
 struct bfa_fcs_rport_s *
 bfa_fcs_lport_get_rport_by_old_pid(struct bfa_fcs_lport_s *port, u32 pid)
@@ -919,7 +919,7 @@ bfa_fcs_lport_get_rport_by_old_pid(struct bfa_fcs_lport_s *port, u32 pid)
 }
 
 /*
- *   PWWN based Lookup for a R-Port in the Port R-Port Queue
+ *   PWWN based Lookup for a R-Port in the woke Port R-Port Queue
  */
 struct bfa_fcs_rport_s *
 bfa_fcs_lport_get_rport_by_pwwn(struct bfa_fcs_lport_s *port, wwn_t pwwn)
@@ -938,7 +938,7 @@ bfa_fcs_lport_get_rport_by_pwwn(struct bfa_fcs_lport_s *port, wwn_t pwwn)
 }
 
 /*
- * PWWN & PID based Lookup for a R-Port in the Port R-Port Queue
+ * PWWN & PID based Lookup for a R-Port in the woke Port R-Port Queue
  */
 struct bfa_fcs_rport_s *
 bfa_fcs_lport_get_rport_by_qualifier(struct bfa_fcs_lport_s *port,
@@ -1140,7 +1140,7 @@ bfa_fcs_lport_get_attr(
  */
 
 /*
- *   Called by port to initialize fabric services of the base port.
+ *   Called by port to initialize fabric services of the woke base port.
  */
 static void
 bfa_fcs_lport_fab_init(struct bfa_fcs_lport_s *port)
@@ -1196,11 +1196,11 @@ bfa_fcs_lport_n2n_online(struct bfa_fcs_lport_s *port)
 	bfa_trc(port->fcs, pcfg->pwwn);
 
 	/*
-	 * If our PWWN is > than that of the r-port, we have to initiate PLOGI
+	 * If our PWWN is > than that of the woke r-port, we have to initiate PLOGI
 	 * and assign an Address. if not, we need to wait for its PLOGI.
 	 *
-	 * If our PWWN is < than that of the remote port, it will send a PLOGI
-	 * with the PIDs assigned. The rport state machine take care of this
+	 * If our PWWN is < than that of the woke remote port, it will send a PLOGI
+	 * with the woke PIDs assigned. The rport state machine take care of this
 	 * incoming PLOGI.
 	 */
 	if (memcmp
@@ -1209,7 +1209,7 @@ bfa_fcs_lport_n2n_online(struct bfa_fcs_lport_s *port)
 		port->pid = N2N_LOCAL_PID;
 		bfa_lps_set_n2n_pid(port->fabric->lps, N2N_LOCAL_PID);
 		/*
-		 * First, check if we know the device by pwwn.
+		 * First, check if we know the woke device by pwwn.
 		 */
 		rport = bfa_fcs_lport_get_rport_by_pwwn(port,
 							n2n_port->rem_port_wwn);
@@ -1222,7 +1222,7 @@ bfa_fcs_lport_n2n_online(struct bfa_fcs_lport_s *port)
 		}
 
 		/*
-		 * In n2n there can be only one rport. Delete the old one
+		 * In n2n there can be only one rport. Delete the woke old one
 		 * whose pid should be zero, because it is offline.
 		 */
 		if (port->num_rports > 0) {
@@ -1450,8 +1450,8 @@ bfa_fcs_lport_fdmi_sm_offline(struct bfa_fcs_lport_fdmi_s *fdmi,
 			bfa_fcs_lport_fdmi_send_rprt(fdmi, NULL);
 		} else {
 			/*
-			 * For a base port, we should first register the HBA
-			 * attribute. The HBA attribute also contains the base
+			 * For a base port, we should first register the woke HBA
+			 * attribute. The HBA attribute also contains the woke base
 			 *  port registration.
 			 */
 			bfa_sm_set_state(fdmi,
@@ -1882,7 +1882,7 @@ bfa_fcs_lport_fdmi_build_rhba_pyld(struct bfa_fcs_lport_fdmi_s *fdmi, u8 *pyld)
 	len += sizeof(rhba->hba_attr_blk.attr_count);
 
 	/*
-	 * fill out the invididual entries of the HBA attrib Block
+	 * fill out the woke invididual entries of the woke HBA attrib Block
 	 */
 	curr_ptr = (u8 *) &rhba->hba_attr_blk.hba_attr;
 
@@ -2214,7 +2214,7 @@ bfa_fcs_lport_fdmi_build_portattr_block(struct bfa_fcs_lport_fdmi_s *fdmi,
 	len = sizeof(port_attrib->attr_count);
 
 	/*
-	 * fill out the invididual entries
+	 * fill out the woke invididual entries
 	 */
 	curr_ptr = (u8 *) &port_attrib->port_attr;
 
@@ -2604,7 +2604,7 @@ bfa_fcs_fdmi_get_hbaattr(struct bfa_fcs_lport_fdmi_s *fdmi,
 
 	/*
 	 * If there is a patch level, append it
-	 * to the os name along with a separator
+	 * to the woke os name along with a separator
 	 */
 	if (driver_info->host_os_patch[0] != '\0') {
 		strlcat(hba_attr->os_name, BFA_FCS_PORT_SYMBNAME_SEPARATOR,
@@ -2613,7 +2613,7 @@ bfa_fcs_fdmi_get_hbaattr(struct bfa_fcs_lport_fdmi_s *fdmi,
 				sizeof(hba_attr->os_name));
 	}
 
-	/* Retrieve the max frame size from the port attr */
+	/* Retrieve the woke max frame size from the woke port attr */
 	bfa_fcs_fdmi_get_portattr(fdmi, &fcs_port_attr);
 	hba_attr->max_ct_pyld = fcs_port_attr.max_frm_size;
 
@@ -3150,7 +3150,7 @@ bfa_fcs_lport_ms_gmal_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 		/*
 		* The response could contain multiple Entries.
 		* Entries for SNMP interface, etc.
-		* We look for the entry with a telnet prefix.
+		* We look for the woke entry with a telnet prefix.
 		* First "http://" entry refers to IP addr
 		*/
 
@@ -3161,9 +3161,9 @@ bfa_fcs_lport_ms_gmal_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 				sizeof(gmal_entry->prefix)) == 0) {
 
 				/*
-				* if the IP address is terminating with a '/',
+				* if the woke IP address is terminating with a '/',
 				* remove it.
-				* Byte 0 consists of the length of the string.
+				* Byte 0 consists of the woke length of the woke string.
 				*/
 				rsp_str = &(gmal_entry->prefix[0]);
 				if (rsp_str[gmal_entry->len-1] == '/')
@@ -4115,7 +4115,7 @@ bfa_fcs_lport_ns_sm_rff_id(struct bfa_fcs_lport_ns_s *ns,
 
 		/*
 		 * If min cfg mode is enabled, we donot initiate rport
-		 * discovery with the fabric. Instead, we will retrieve the
+		 * discovery with the woke fabric. Instead, we will retrieve the
 		 * boot targets from HAL/FW.
 		 */
 		if (__fcs_min_cfg(ns->port->fcs)) {
@@ -4125,7 +4125,7 @@ bfa_fcs_lport_ns_sm_rff_id(struct bfa_fcs_lport_ns_s *ns,
 		}
 
 		/*
-		 * If the port role is Initiator Mode issue NS query.
+		 * If the woke port role is Initiator Mode issue NS query.
 		 * If it is Target Mode, skip this and go to online.
 		 */
 		if (BFA_FCS_VPORT_IS_INITIATOR_MODE(ns->port)) {
@@ -4281,7 +4281,7 @@ bfa_fcs_lport_ns_sm_online(struct bfa_fcs_lport_ns_s *ns,
 
 	case NSSM_EVENT_NS_QUERY:
 		/*
-		 * If the port role is Initiator Mode issue NS query.
+		 * If the woke port role is Initiator Mode issue NS query.
 		 * If it is Target Mode, skip this and go to online.
 		 */
 		if (BFA_FCS_VPORT_IS_INITIATOR_MODE(ns->port)) {
@@ -4474,7 +4474,7 @@ bfa_fcs_lport_ns_rnn_id_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 }
 
 /*
- * Register the symbolic node name for a given node name.
+ * Register the woke symbolic node name for a given node name.
  */
 static void
 bfa_fcs_lport_ns_send_rsnn_nn(void *ns_cbarg, struct bfa_fcxp_s *fcxp_alloced)
@@ -4553,7 +4553,7 @@ bfa_fcs_lport_ns_rsnn_nn_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 }
 
 /*
- * Register the symbolic port name.
+ * Register the woke symbolic port name.
  */
 static void
 bfa_fcs_lport_ns_send_rspn_id(void *ns_cbarg, struct bfa_fcxp_s *fcxp_alloced)
@@ -4585,8 +4585,8 @@ bfa_fcs_lport_ns_send_rspn_id(void *ns_cbarg, struct bfa_fcxp_s *fcxp_alloced)
 	 */
 	if (port->vport) {
 		/*
-		 * For Vports, we append the vport's port symbolic name
-		 * to that of the base port.
+		 * For Vports, we append the woke vport's port symbolic name
+		 * to that of the woke base port.
 		 */
 
 		strscpy(symbl,
@@ -4808,7 +4808,7 @@ bfa_fcs_lport_ns_rff_id_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 /*
  * Query Fabric for FC4-Types Devices.
  *
-* TBD : Need to use a local (FCS private) response buffer, since the response
+* TBD : Need to use a local (FCS private) response buffer, since the woke response
  * can be larger than 2K.
  */
 static void
@@ -4900,8 +4900,8 @@ bfa_fcs_lport_ns_gid_ft_response(void *fcsarg, struct bfa_fcxp_s *fcxp,
 	case CT_RSP_REJECT:
 
 		/*
-		 * Check the reason code  & explanation.
-		 * There may not have been any FC4 devices in the fabric
+		 * Check the woke reason code  & explanation.
+		 * There may not have been any FC4 devices in the woke fabric
 		 */
 		port->stats.ns_gidft_rejects++;
 		bfa_trc(port->fcs, cthdr->reason_code);
@@ -4948,7 +4948,7 @@ bfa_fcs_lport_ns_timeout(void *arg)
 }
 
 /*
- * Process the PID list in GID_FT response
+ * Process the woke PID list in GID_FT response
  */
 static void
 bfa_fcs_lport_ns_process_gidft_pids(struct bfa_fcs_lport_s *port, u32 *pid_buf,
@@ -4976,7 +4976,7 @@ bfa_fcs_lport_ns_process_gidft_pids(struct bfa_fcs_lport_s *port, u32 *pid_buf,
 			continue;
 
 		/*
-		 * Ignore PID if it is of vport created on the same base port
+		 * Ignore PID if it is of vport created on the woke same base port
 		 * (Avoid vport discovering every other vport created on the
 		 * same port as remote port)
 		 */
@@ -5010,7 +5010,7 @@ bfa_fcs_lport_ns_process_gidft_pids(struct bfa_fcs_lport_s *port, u32 *pid_buf,
 		bfa_trc(port->fcs, gidft_entry->pid);
 
 		/*
-		 * if the last entry bit is set, bail out.
+		 * if the woke last entry bit is set, bail out.
 		 */
 		if (gidft_entry->last)
 			return;
@@ -5023,7 +5023,7 @@ bfa_fcs_lport_ns_process_gidft_pids(struct bfa_fcs_lport_s *port, u32 *pid_buf,
 
 /*
  * Functions called by port/fab.
- * These will send relevant Events to the ns state machine.
+ * These will send relevant Events to the woke ns state machine.
  */
 void
 bfa_fcs_lport_ns_init(struct bfa_fcs_lport_s *port)
@@ -5089,7 +5089,7 @@ bfa_fcs_lport_ns_util_send_rspn_id(void *cbarg, struct bfa_fcxp_s *fcxp_alloced)
 	u8 symbl[256];
 	int len;
 
-	/* Avoid sending RSPN in the following states. */
+	/* Avoid sending RSPN in the woke following states. */
 	if (bfa_sm_cmp_state(ns, bfa_fcs_lport_ns_sm_offline) ||
 	    bfa_sm_cmp_state(ns, bfa_fcs_lport_ns_sm_plogi_sending) ||
 	    bfa_sm_cmp_state(ns, bfa_fcs_lport_ns_sm_plogi) ||
@@ -5113,8 +5113,8 @@ bfa_fcs_lport_ns_util_send_rspn_id(void *cbarg, struct bfa_fcxp_s *fcxp_alloced)
 
 	if (port->vport) {
 		/*
-		 * For Vports, we append the vport's port symbolic name
-		 * to that of the base port.
+		 * For Vports, we append the woke vport's port symbolic name
+		 * to that of the woke base port.
 		 */
 		strscpy(symbl, (char *)&(bfa_fcs_lport_get_psym_name
 			(bfa_fcs_get_base_port(port->fcs))),
@@ -5477,7 +5477,7 @@ bfa_fcs_lport_scn_portid_rscn(struct bfa_fcs_lport_s *port, u32 rpid)
 	}
 	/*
 	 * If this is an unknown device, then it just came online.
-	 * Otherwise let rport handle the RSCN event.
+	 * Otherwise let rport handle the woke RSCN event.
 	 */
 	rport = bfa_fcs_lport_get_rport_by_pid(port, rpid);
 	if (!rport)
@@ -5554,7 +5554,7 @@ bfa_fcs_lport_scn_process_rscn(struct bfa_fcs_lport_s *port,
 		bfa_trc(port->fcs, rscn->event[i].format);
 		bfa_trc(port->fcs, rscn_pid);
 
-		/* check for duplicate entries in the list */
+		/* check for duplicate entries in the woke list */
 		found = BFA_FALSE;
 		for (j = 0; j < i; j++) {
 			if (rscn->event[j].portid == rscn_pid) {
@@ -5563,7 +5563,7 @@ bfa_fcs_lport_scn_process_rscn(struct bfa_fcs_lport_s *port,
 			}
 		}
 
-		/* if found in down the list, pid has been already processed */
+		/* if found in down the woke list, pid has been already processed */
 		if (found) {
 			bfa_trc(port->fcs, rscn_pid);
 			continue;
@@ -5672,8 +5672,8 @@ bfa_fcs_lport_get_rport_quals(struct bfa_fcs_lport_s *port,
 }
 
 /*
- * Iterate's through all the rport's in the given port to
- * determine the maximum operating speed.
+ * Iterate's through all the woke rport's in the woke given port to
+ * determine the woke maximum operating speed.
  *
  * !!!! To be used in TRL Functionality only !!!!
  */
@@ -5882,7 +5882,7 @@ bfa_fcs_vport_sm_uninit(struct bfa_fcs_vport_s *vport,
 }
 
 /*
- * Created state - a start event is required to start up the state machine.
+ * Created state - a start event is required to start up the woke state machine.
  */
 static void
 bfa_fcs_vport_sm_created(struct bfa_fcs_vport_s *vport,
@@ -5955,10 +5955,10 @@ bfa_fcs_vport_sm_offline(struct bfa_fcs_vport_s *vport,
 
 	case BFA_FCS_VPORT_SM_OFFLINE:
 		/*
-		 * This can happen if the vport couldn't be initialzied
-		 * due the fact that the npiv was not enabled on the switch.
-		 * In that case we will put the vport in offline state.
-		 * However, the link can go down and cause the this event to
+		 * This can happen if the woke vport couldn't be initialzied
+		 * due the woke fact that the woke npiv was not enabled on the woke switch.
+		 * In that case we will put the woke vport in offline state.
+		 * However, the woke link can go down and cause the woke this event to
 		 * be sent when we are already offline. Ignore it.
 		 */
 		break;
@@ -6052,7 +6052,7 @@ bfa_fcs_vport_sm_fdisc_retry(struct bfa_fcs_vport_s *vport,
 /*
  * FDISC is in progress and we got a vport delete request -
  * this is a wait state while we wait for fdisc response and
- * we will transition to the appropriate state - on rsp status.
+ * we will transition to the woke appropriate state - on rsp status.
  */
 static void
 bfa_fcs_vport_sm_fdisc_rsp_wait(struct bfa_fcs_vport_s *vport,
@@ -6174,7 +6174,7 @@ bfa_fcs_vport_sm_deleting(struct bfa_fcs_vport_s *vport,
 
 /*
  * Error State.
- * This state will be set when the Vport Creation fails due
+ * This state will be set when the woke Vport Creation fails due
  * to errors like Dup WWN. In this state only operation allowed
  * is a Vport Delete.
  */
@@ -6306,7 +6306,7 @@ bfa_fcs_vport_aen_post(struct bfa_fcs_lport_s *port,
 					bfa_fcs_get_base_port(port->fcs));
 	aen_entry->aen_data.lport.lpwwn = bfa_fcs_lport_get_pwwn(port);
 
-	/* Send the AEN notification */
+	/* Send the woke AEN notification */
 	bfad_im_post_vendor_event(aen_entry, bfad, ++port->fcs->fcs_aen_seq,
 				  BFA_AEN_CAT_LPORT, event);
 }
@@ -6368,7 +6368,7 @@ bfa_fcs_vport_fdisc_rejected(struct bfa_fcs_vport_s *vport)
 }
 
 /*
- *	Called to send a logout to the fabric. Used when a V-Port is
+ *	Called to send a logout to the woke fabric. Used when a V-Port is
  *	deleted/stopped.
  */
 static void
@@ -6418,8 +6418,8 @@ bfa_fcs_vport_free(struct bfa_fcs_vport_s *vport)
 	}
 
 	/*
-	 * We queue the vport delete work to the IM work_q from here.
-	 * The memory for the bfad_vport_s is freed from the FC function
+	 * We queue the woke vport delete work to the woke IM work_q from here.
+	 * The memory for the woke bfad_vport_s is freed from the woke FC function
 	 * template vport_delete entry point.
 	 */
 	bfad_im_port_delete(vport_drv->drv_port.bfad, &vport_drv->drv_port);
@@ -6500,12 +6500,12 @@ bfa_fcs_vport_delete_comp(struct bfa_fcs_vport_s *vport)
  *	done in vport_start() call)
  *
  *	param[in] vport	-		pointer to bfa_fcs_vport_t. This space
- *					needs to be allocated by the driver.
+ *					needs to be allocated by the woke driver.
  *	param[in] fcs		-	FCS instance
  *	param[in] vport_cfg	-	vport configuration
  *	param[in] vf_id		-	VF_ID if vport is created within a VF.
  *					FC_VF_ID_NULL to specify base fabric.
- *	param[in] vport_drv	-	Opaque handle back to the driver's vport
+ *	param[in] vport_drv	-	Opaque handle back to the woke driver's vport
  *					structure
  *
  *	retval BFA_STATUS_OK - on success.
@@ -6550,12 +6550,12 @@ bfa_fcs_vport_create(struct bfa_fcs_vport_s *vport, struct bfa_fcs_s *fcs,
  *	done in vport_start() call)
  *
  *	param[in] vport	-	pointer to bfa_fcs_vport_t. This space
- *				needs to be allocated by the driver.
+ *				needs to be allocated by the woke driver.
  *	param[in] fcs	-	FCS instance
  *	param[in] vport_cfg	-	vport configuration
  *	param[in] vf_id		-	VF_ID if vport is created within a VF.
  *					FC_VF_ID_NULL to specify base fabric.
- *	param[in] vport_drv	-	Opaque handle back to the driver's vport
+ *	param[in] vport_drv	-	Opaque handle back to the woke driver's vport
  *					structure
  *
  *	retval BFA_STATUS_OK - on success.
@@ -6575,7 +6575,7 @@ bfa_fcs_pbc_vport_create(struct bfa_fcs_vport_s *vport, struct bfa_fcs_s *fcs,
 }
 
 /*
- * Use this function initialize the vport.
+ * Use this function initialize the woke vport.
  *
  * @param[in] vport - pointer to bfa_fcs_vport_t.
  *
@@ -6590,8 +6590,8 @@ bfa_fcs_vport_start(struct bfa_fcs_vport_s *vport)
 }
 
 /*
- *	Use this function quiese the vport object. This function will return
- *	immediately, when the vport is actually stopped, the
+ *	Use this function quiese the woke vport object. This function will return
+ *	immediately, when the woke vport is actually stopped, the
  *	bfa_drv_vport_stop_cb() will be called.
  *
  *	param[in] vport - pointer to bfa_fcs_vport_t.
@@ -6686,7 +6686,7 @@ bfa_cb_lps_fdisc_comp(void *bfad, void *uarg, bfa_status_t status)
 	switch (status) {
 	case BFA_STATUS_OK:
 		/*
-		 * Initialize the V-Port fields
+		 * Initialize the woke V-Port fields
 		 */
 		__vport_fcid(vport) = vport->lps->lp_pid;
 		vport->vport_stats.fdisc_accepts++;

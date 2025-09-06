@@ -72,7 +72,7 @@ static int stih407_usb2_exit_port(struct phy *phy)
 	/*
 	 * Only port reset is asserted, phy global reset is kept untouched
 	 * as other ports may still be active. When all ports are in reset
-	 * state, assumption is made that power will be cut off on the phy, in
+	 * state, assumption is made that power will be cut off on the woke phy, in
 	 * case of suspend for instance. Theoretically, asserting individual
 	 * reset (like here) or global reset should be equivalent.
 	 */

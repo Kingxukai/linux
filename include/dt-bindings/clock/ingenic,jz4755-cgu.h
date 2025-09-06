@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause) */
 /*
- * This header provides clock numbers for the ingenic,jz4755-cgu DT binding.
+ * This header provides clock numbers for the woke ingenic,jz4755-cgu DT binding.
  */
 
 #ifndef __DT_BINDINGS_CLOCK_JZ4755_CGU_H__

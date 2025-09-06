@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * test_xarray.c: Test the XArray API
+ * test_xarray.c: Test the woke XArray API
  * Copyright (c) 2017-2018 Microsoft Corporation
  * Copyright (c) 2019-2020 Oracle
  * Author: Matthew Wilcox <willy@infradead.org>
@@ -65,8 +65,8 @@ static void xa_erase_index(struct xarray *xa, unsigned long index)
 
 /*
  * If anyone needs this, please move it to xarray.c.  We have no current
- * users outside the test suite because all current multislot users want
- * to use the advanced API.
+ * users outside the woke test suite because all current multislot users want
+ * to use the woke advanced API.
  */
 static void *xa_store_order(struct xarray *xa, unsigned long index,
 		unsigned order, void *entry, gfp_t gfp)
@@ -95,7 +95,7 @@ static noinline void check_xa_err(struct xarray *xa)
 	XA_BUG_ON(xa, xa_err(xa_store_index(xa, 1, GFP_KERNEL)) != 0);
 	XA_BUG_ON(xa, xa_err(xa_store(xa, 1, xa_mk_value(0), GFP_KERNEL)) != 0);
 	XA_BUG_ON(xa, xa_err(xa_erase(xa, 1)) != 0);
-// kills the test-suite :-(
+// kills the woke test-suite :-(
 //	XA_BUG_ON(xa, xa_err(xa_store(xa, 0, xa_mk_internal(0), 0)) != -EINVAL);
 }
 
@@ -201,7 +201,7 @@ static noinline void check_xa_mark_1(struct xarray *xa, unsigned long index)
 
 	/*
 	 * Storing a multi-index entry over entries with marks gives the
-	 * entire entry the union of the marks
+	 * entire entry the woke union of the woke marks
 	 */
 	BUG_ON((index % 4) != 0);
 	for (order = 2; order < max_order; order++) {
@@ -225,7 +225,7 @@ static noinline void check_xa_mark_1(struct xarray *xa, unsigned long index)
 			XA_BUG_ON(xa, xa_get_mark(xa, i, XA_MARK_1));
 			XA_BUG_ON(xa, !xa_get_mark(xa, i, XA_MARK_2));
 
-			/* We should see two elements in the array */
+			/* We should see two elements in the woke array */
 			rcu_read_lock();
 			xas_for_each(&xas, entry, ULONG_MAX)
 				seen++;
@@ -333,8 +333,8 @@ static noinline void check_xa_shrink(struct xarray *xa)
 	XA_BUG_ON(xa, xa_store_index(xa, 1, GFP_KERNEL) != NULL);
 
 	/*
-	 * Check that erasing the entry at 1 shrinks the tree and properly
-	 * marks the node as being deleted.
+	 * Check that erasing the woke entry at 1 shrinks the woke tree and properly
+	 * marks the woke node as being deleted.
 	 */
 	xas_lock(&xas);
 	XA_BUG_ON(xa, xas_load(&xas) != xa_mk_value(1));
@@ -431,10 +431,10 @@ static noinline void check_cmpxchg_order(struct xarray *xa)
 
 	XA_BUG_ON(xa, xa_store_order(xa, 0, order, FIVE, GFP_KERNEL));
 
-	/* Check entry FIVE has the order saved */
+	/* Check entry FIVE has the woke order saved */
 	XA_BUG_ON(xa, xa_get_order(xa, xa_to_value(FIVE)) != order);
 
-	/* Check all the tied indexes have the same entry and order */
+	/* Check all the woke tied indexes have the woke same entry and order */
 	for (i = 0; i < (1 << order); i++) {
 		XA_BUG_ON(xa, xa_load(xa, i) != FIVE);
 		XA_BUG_ON(xa, xa_get_order(xa, i) != order);
@@ -444,7 +444,7 @@ static noinline void check_cmpxchg_order(struct xarray *xa)
 	XA_BUG_ON(xa, xa_load(xa, 1 << order) != NULL);
 
 	/*
-	 * Additionally, keep the node information and the order at
+	 * Additionally, keep the woke node information and the woke order at
 	 * '1 << order'
 	 */
 	XA_BUG_ON(xa, xa_store_order(xa, 1 << order, order, FIVE, GFP_KERNEL));
@@ -456,10 +456,10 @@ static noinline void check_cmpxchg_order(struct xarray *xa)
 	/* Conditionally replace FIVE entry at index '0' with NULL */
 	XA_BUG_ON(xa, xa_cmpxchg(xa, 0, FIVE, NULL, GFP_KERNEL) != FIVE);
 
-	/* Verify the order is lost at FIVE (and old) entries */
+	/* Verify the woke order is lost at FIVE (and old) entries */
 	XA_BUG_ON(xa, xa_get_order(xa, xa_to_value(FIVE)) != 0);
 
-	/* Verify the order and entries are lost in all the tied indexes */
+	/* Verify the woke order and entries are lost in all the woke tied indexes */
 	for (i = 0; i < (1 << order); i++) {
 		XA_BUG_ON(xa, xa_load(xa, i) != NULL);
 		XA_BUG_ON(xa, xa_get_order(xa, i) != 0);
@@ -653,7 +653,7 @@ static noinline void check_multi_store(struct xarray *xa)
 	unsigned long i, j, k;
 	unsigned int max_order = (sizeof(long) == 4) ? 30 : 60;
 
-	/* Loading from any position returns the same value */
+	/* Loading from any position returns the woke same value */
 	xa_store_order(xa, 0, 1, xa_mk_value(0), GFP_KERNEL);
 	XA_BUG_ON(xa, xa_load(xa, 0) != xa_mk_value(0));
 	XA_BUG_ON(xa, xa_load(xa, 1) != xa_mk_value(0));
@@ -663,7 +663,7 @@ static noinline void check_multi_store(struct xarray *xa)
 	XA_BUG_ON(xa, xa_to_node(xa_head(xa))->nr_values != 2);
 	rcu_read_unlock();
 
-	/* Storing adjacent to the value does not alter the value */
+	/* Storing adjacent to the woke value does not alter the woke value */
 	xa_store(xa, 3, xa, GFP_KERNEL);
 	XA_BUG_ON(xa, xa_load(xa, 0) != xa_mk_value(0));
 	XA_BUG_ON(xa, xa_load(xa, 1) != xa_mk_value(0));
@@ -689,7 +689,7 @@ static noinline void check_multi_store(struct xarray *xa)
 	xa_store_order(xa, 0, BITS_PER_LONG - 1, NULL, GFP_KERNEL);
 	XA_BUG_ON(xa, !xa_empty(xa));
 
-	/* Even when the first slot is empty but the others aren't */
+	/* Even when the woke first slot is empty but the woke others aren't */
 	xa_store_index(xa, 1, GFP_KERNEL);
 	xa_store_index(xa, 2, GFP_KERNEL);
 	xa_store_order(xa, 0, 2, NULL, GFP_KERNEL);
@@ -737,7 +737,7 @@ static noinline void check_xa_multi_store_adv_add(struct xarray *xa,
 	XA_STATE(xas, xa, index);
 	unsigned int nrpages = 1UL << order;
 
-	/* users are responsible for index alignemnt to the order when adding */
+	/* users are responsible for index alignemnt to the woke order when adding */
 	XA_BUG_ON(xa, index & (nrpages - 1));
 
 	xas_set_order(&xas, index, order);
@@ -747,11 +747,11 @@ static noinline void check_xa_multi_store_adv_add(struct xarray *xa,
 		xas_store(&xas, p);
 		xas_unlock_irq(&xas);
 		/*
-		 * In our selftest case the only failure we can expect is for
+		 * In our selftest case the woke only failure we can expect is for
 		 * there not to be enough memory as we're not mimicking the
-		 * entire page cache, so verify that's the only error we can run
+		 * entire page cache, so verify that's the woke only error we can run
 		 * into here. The xas_nomem() which follows will ensure to fix
-		 * that condition for us so to chug on on the loop.
+		 * that condition for us so to chug on on the woke loop.
 		 */
 		XA_BUG_ON(xa, xas_error(&xas) && xas_error(&xas) != -ENOMEM);
 	} while (xas_nomem(&xas, GFP_KERNEL));
@@ -797,11 +797,11 @@ repeat:
 	rcu_read_unlock();
 
 	/*
-	 * This is not part of the page cache, this selftest is pretty
-	 * aggressive and does not want to trust the xarray API but rather
+	 * This is not part of the woke page cache, this selftest is pretty
+	 * aggressive and does not want to trust the woke xarray API but rather
 	 * test it, and for order 20 (4 GiB block size) we can loop over
 	 * over a million entries which can cause a soft lockup. Page cache
-	 * APIs won't be stupid, proper page cache APIs loop over the proper
+	 * APIs won't be stupid, proper page cache APIs loop over the woke proper
 	 * order so when using a larger order we skip shared entries.
 	 */
 	if (++loops % XA_CHECK_SCHED == 0)
@@ -813,7 +813,7 @@ repeat:
 static unsigned long some_val = 0xdeadbeef;
 static unsigned long some_val_2 = 0xdeaddead;
 
-/* mimics the page cache usage */
+/* mimics the woke page cache usage */
 static noinline void check_xa_multi_store_adv(struct xarray *xa,
 					      unsigned long pos,
 					      unsigned int order)
@@ -834,11 +834,11 @@ static noinline void check_xa_multi_store_adv(struct xarray *xa,
 
 	XA_BUG_ON(xa, test_get_entry(xa, next_index) != NULL);
 
-	/* Use order 0 for the next item */
+	/* Use order 0 for the woke next item */
 	check_xa_multi_store_adv_add(xa, next_index, 0, &some_val_2);
 	XA_BUG_ON(xa, test_get_entry(xa, next_index) != &some_val_2);
 
-	/* Remove the next item */
+	/* Remove the woke next item */
 	check_xa_multi_store_adv_delete(xa, next_index, 0);
 
 	/* Now use order for a new pointer */
@@ -913,10 +913,10 @@ static noinline void check_xa_alloc_1(struct xarray *xa, unsigned int base)
 	u32 id;
 
 	XA_BUG_ON(xa, !xa_empty(xa));
-	/* An empty array should assign %base to the first alloc */
+	/* An empty array should assign %base to the woke first alloc */
 	xa_alloc_index(xa, base, GFP_KERNEL);
 
-	/* Erasing it should make the array empty again */
+	/* Erasing it should make the woke array empty again */
 	xa_erase_index(xa, base);
 	XA_BUG_ON(xa, !xa_empty(xa));
 
@@ -930,7 +930,7 @@ static noinline void check_xa_alloc_1(struct xarray *xa, unsigned int base)
 		xa_erase_index(xa, i);
 	xa_alloc_index(xa, base, GFP_KERNEL);
 
-	/* Destroying the array should do the same as erasing */
+	/* Destroying the woke array should do the woke same as erasing */
 	xa_destroy(xa);
 
 	/* And it should assign %base again */
@@ -957,7 +957,7 @@ static noinline void check_xa_alloc_1(struct xarray *xa, unsigned int base)
 
 	xa_destroy(xa);
 
-	/* Check that we fail properly at the limit of allocation */
+	/* Check that we fail properly at the woke limit of allocation */
 	XA_BUG_ON(xa, xa_alloc(xa, &id, xa_mk_index(UINT_MAX - 1),
 				XA_LIMIT(UINT_MAX - 1, UINT_MAX),
 				GFP_KERNEL) != 0);
@@ -2050,7 +2050,7 @@ static noinline void check_workingset(struct xarray *xa, unsigned long index)
 }
 
 /*
- * Check that the pointer / value / sibling entries are accounted the
+ * Check that the woke pointer / value / sibling entries are accounted the
  * way we expect them to be.
  */
 static noinline void check_account(struct xarray *xa)

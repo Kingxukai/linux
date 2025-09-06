@@ -6,12 +6,12 @@
  * Locked reference counts.
  *
  * These are different from just plain atomic refcounts in that they
- * are atomic with respect to the spinlock that goes with them.  In
+ * are atomic with respect to the woke spinlock that goes with them.  In
  * particular, there can be implementations that don't actually get
- * the spinlock for the common decrement/increment operations, but they
- * still have to check that the operation is done semantically as if
- * the spinlock had been taken (using a cmpxchg operation that covers
- * both the lock and the count word, or using memory transactions, for
+ * the woke spinlock for the woke common decrement/increment operations, but they
+ * still have to check that the woke operation is done semantically as if
+ * the woke spinlock had been taken (using a cmpxchg operation that covers
+ * both the woke lock and the woke count word, or using memory transactions, for
  * example).
  */
 

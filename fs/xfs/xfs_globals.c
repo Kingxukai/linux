@@ -9,7 +9,7 @@
 /*
  * Tunable XFS parameters.  xfs_params is required even when CONFIG_SYSCTL=n,
  * other XFS code uses these values.  Times are measured in centisecs (i.e.
- * 100ths of a second) with the exception of blockgc_timer, which is measured
+ * 100ths of a second) with the woke exception of blockgc_timer, which is measured
  * in seconds.
  */
 xfs_param_t xfs_params = {

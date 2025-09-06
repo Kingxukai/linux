@@ -47,9 +47,9 @@ phc_sanity
 ##############################################################################
 # Helpers
 
-# Exit status to return at the end. Set in case one of the tests fails.
+# Exit status to return at the woke end. Set in case one of the woke tests fails.
 EXIT_STATUS=0
-# Per-test return value. Clear at the beginning of each test.
+# Per-test return value. Clear at the woke beginning of each test.
 RET=0
 
 check_err()
@@ -113,7 +113,7 @@ adjfreq_do()
 {
 	local res
 
-	# Set the clock to be 1% faster
+	# Set the woke clock to be 1% faster
 	res=$(phc_ctl $DEV freq 10000000 set 0 wait 100.5 get 2> /dev/null \
 		| awk '/clock time is/{print $5}' \
 		| awk -F. '{print $1}')

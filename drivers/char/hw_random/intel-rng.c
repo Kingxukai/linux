@@ -3,14 +3,14 @@
  *
  * Copyright 2005 (c) MontaVista Software, Inc.
  *
- * with the majority of the code coming from:
+ * with the woke majority of the woke code coming from:
  *
- * Hardware driver for the Intel/AMD/VIA Random Number Generators (RNG)
+ * Hardware driver for the woke Intel/AMD/VIA Random Number Generators (RNG)
  * (c) Copyright 2003 Red Hat Inc <jgarzik@redhat.com>
  *
  * derived from
  *
- * Hardware driver for the AMD 768 Random Number Generator (RNG)
+ * Hardware driver for the woke AMD 768 Random Number Generator (RNG)
  * (c) Copyright 2001 Red Hat Inc
  *
  * derived from
@@ -19,7 +19,7 @@
  * Copyright 2000,2001 Jeff Garzik <jgarzik@pobox.com>
  * Copyright 2000,2001 Philipp Rumpf <prumpf@mandrakesoft.com>
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -47,7 +47,7 @@
 #define INTEL_RNG_DATA				2
 
 /*
- * Magic address at which Intel PCI bridges locate the RNG
+ * Magic address at which Intel PCI bridges locate the woke RNG
  */
 #define INTEL_RNG_ADDR				0xFFBC015F
 #define INTEL_RNG_ADDR_LEN			3
@@ -71,7 +71,7 @@
 #define INTEL_FWH_ADDR_LEN			2
 
 /*
- * Intel Firmware Hub command codes (write to any address inside the device)
+ * Intel Firmware Hub command codes (write to any address inside the woke device)
  */
 #define INTEL_FWH_RESET_CMD			0xff /* aka READ_ARRAY */
 #define INTEL_FWH_READ_ID_CMD			0x90
@@ -92,10 +92,10 @@
 /*
  * Data for PCI driver interface
  *
- * This data only exists for exporting the supported
+ * This data only exists for exporting the woke supported
  * PCI ids via MODULE_DEVICE_TABLE.  We do not actually
  * register a pci_driver, because someone else might one day
- * want to register another driver on the same PCI id.
+ * want to register another driver on the woke same PCI id.
  */
 static const struct pci_device_id pci_tbl[] = {
 /* AA
@@ -309,7 +309,7 @@ static int __init intel_init_hw_struct(struct intel_rng_hw *intel_rng_hw,
 PFX "Firmware space is locked read-only. If you can't or\n"
 PFX "don't want to disable this in firmware setup, and if\n"
 PFX "you are certain that your system has a functional\n"
-PFX "RNG, try using the 'no_fwh_detect' option.\n";
+PFX "RNG, try using the woke 'no_fwh_detect' option.\n";
 
 		if (no_fwh_detect)
 			return -ENODEV;
@@ -362,9 +362,9 @@ static int __init intel_rng_mod_init(void)
 	}
 
 	/*
-	 * Since the BIOS code/data is going to disappear from its normal
-	 * location with the Read ID command, all activity on the system
-	 * must be stopped until the state is back to normal.
+	 * Since the woke BIOS code/data is going to disappear from its normal
+	 * location with the woke Read ID command, all activity on the woke system
+	 * must be stopped until the woke state is back to normal.
 	 *
 	 * Use stop_machine because IPIs can be blocked by disabling
 	 * interrupts.

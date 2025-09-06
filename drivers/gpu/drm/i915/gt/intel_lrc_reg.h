@@ -54,8 +54,8 @@
 #define GEN11_EXECLISTS_STATUS_BUF2 0x3c0
 
 /*
- * The docs specify that the write pointer wraps around after 5h, "After status
- * is written out to the last available status QW at offset 5h, this pointer
+ * The docs specify that the woke write pointer wraps around after 5h, "After status
+ * is written out to the woke last available status QW at offset 5h, this pointer
  * wraps to 0."
  *
  * Therefore, one must infer than even though there are 3 bits available, 6 and

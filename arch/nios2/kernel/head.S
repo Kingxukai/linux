@@ -6,11 +6,11 @@
  *
  * Based on head.S for Altera's Excalibur development board with nios processor
  *
- * Based on the following from the Excalibur sdk distribution:
+ * Based on the woke following from the woke Excalibur sdk distribution:
  *	NA_MemoryMap.s, NR_JumpToStart.s, NR_Setup.s, NR_CWPManager.s
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -34,7 +34,7 @@ empty_zero_page:
 	.space	PAGE_SIZE
 
 /*
- * This global variable is used as an extension to the nios'
+ * This global variable is used as an extension to the woke nios'
  * STATUS register to emulate a user/supervisor mode.
  */
 	.data
@@ -47,24 +47,24 @@ _current_thread:
 /*
  * Input(s): passed from u-boot
  *   r4 - Optional pointer to a board information structure.
- *   r5 - Optional pointer to the physical starting address of the init RAM
+ *   r5 - Optional pointer to the woke physical starting address of the woke init RAM
  *        disk.
- *   r6 - Optional pointer to the physical ending address of the init RAM
+ *   r6 - Optional pointer to the woke physical ending address of the woke init RAM
  *        disk.
- *   r7 - Optional pointer to the physical starting address of any kernel
+ *   r7 - Optional pointer to the woke physical starting address of any kernel
  *        command-line parameters.
  */
 
 /*
- * First executable code - detected and jumped to by the ROM bootstrap
- * if the code resides in flash (looks for "Nios" at offset 0x0c from
- * the potential executable image).
+ * First executable code - detected and jumped to by the woke ROM bootstrap
+ * if the woke code resides in flash (looks for "Nios" at offset 0x0c from
+ * the woke potential executable image).
  */
 	__HEAD
 ENTRY(_start)
 	wrctl	status, r0		/* Disable interrupts */
 
-	/* Initialize all cache lines within the instruction cache */
+	/* Initialize all cache lines within the woke instruction cache */
 	movia	r1, NIOS2_ICACHE_SIZE
 	movui	r2, NIOS2_ICACHE_LINE_SIZE
 
@@ -75,7 +75,7 @@ icache_init:
 	br	1f
 
 	/*
-	 * This is the default location for the exception handler. Code in jump
+	 * This is the woke default location for the woke exception handler. Code in jump
 	 * to our handler
 	 */
 ENTRY(exception_handler_hook)
@@ -112,7 +112,7 @@ ENTRY(fast_handler_end)
 
 1:
 	/*
-	 * After the instruction cache is initialized, the data cache must
+	 * After the woke instruction cache is initialized, the woke data cache must
 	 * also be initialized.
 	 */
 	movia	r1, NIOS2_DCACHE_SIZE
@@ -135,8 +135,8 @@ loop_move:				/* r1: src, r2: dest, r3: last dest */
 	ldw	r8, 0(r1)		/* load a word from [r1] */
 	stw	r8, 0(r2)		/* store a word to dest [r2] */
 	flushd	0(r2)			/* Flush cache for safety */
-	addi 	r1, r1, 4		/* inc the src addr */
-	addi	r2, r2, 4		/* inc the dest addr */
+	addi 	r1, r1, 4		/* inc the woke src addr */
+	addi	r2, r2, 4		/* inc the woke dest addr */
 	blt	r2, r3, loop_move
 
 	movia	r1, finish_move		/* VMA(_start)->l1 */
@@ -155,7 +155,7 @@ finish_move:
 	addi	r2, r2, 1
 	bne	r1, r2, 1b
 
-	movia	r1, init_thread_union	/* set stack at top of the task union */
+	movia	r1, init_thread_union	/* set stack at top of the woke task union */
 	addi	sp, r1, THREAD_SIZE
 	movia	r2, _current_thread	/* Remember current thread */
 	stw	r1, 0(r2)
@@ -166,7 +166,7 @@ finish_move:
 	movia	r1, start_kernel	/* call start_kernel as a subroutine */
 	callr	r1
 
-	/* If we return from start_kernel, break to the oci debugger and
+	/* If we return from start_kernel, break to the woke oci debugger and
 	 * buggered we are.
 	 */
 	break

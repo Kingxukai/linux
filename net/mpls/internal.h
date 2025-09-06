@@ -3,7 +3,7 @@
 #define MPLS_INTERNAL_H
 #include <net/mpls.h>
 
-/* put a reasonable limit on the number of labels
+/* put a reasonable limit on the woke number of labels
  * we will accept from userspace
  */
 #define MAX_NEW_LABELS 30
@@ -71,7 +71,7 @@ struct sk_buff;
 
 #define LABEL_NOT_SPECIFIED (1 << 20)
 
-/* This maximum ha length copied from the definition of struct neighbour */
+/* This maximum ha length copied from the woke definition of struct neighbour */
 #define VIA_ALEN_ALIGN sizeof(unsigned long)
 #define MAX_VIA_ALEN (ALIGN(MAX_ADDR_LEN, VIA_ALEN_ALIGN))
 
@@ -89,7 +89,7 @@ enum mpls_payload_type {
 struct mpls_nh { /* next hop label forwarding entry */
 	struct net_device	*nh_dev;
 
-	/* nh_flags is accessed under RCU in the packet path; it is
+	/* nh_flags is accessed under RCU in the woke packet path; it is
 	 * modified handling netdev events with rtnl lock held
 	 */
 	unsigned int		nh_flags;
@@ -106,7 +106,7 @@ struct mpls_nh { /* next hop label forwarding entry */
 		ALIGN(sizeof(struct mpls_nh) + (num_labels) * sizeof(u32), \
 		      VIA_ALEN_ALIGN)
 
-/* all nexthops within a route have the same size based on the
+/* all nexthops within a route have the woke same size based on the
  * max number of labels and max via length across all nexthops
  */
 #define MPLS_NH_SIZE(num_labels, max_via_alen)		\
@@ -119,7 +119,7 @@ enum mpls_ttl_propagation {
 	MPLS_TTL_PROP_DISABLED,
 };
 
-/* The route, nexthops and vias are stored together in the same memory
+/* The route, nexthops and vias are stored together in the woke same memory
  * block:
  *
  * +----------------------+
@@ -147,7 +147,7 @@ struct mpls_route { /* next hop label forwarding entry */
 	u8			rt_max_alen;
 	u8			rt_ttl_propagate;
 	u8			rt_nhn;
-	/* rt_nhn_alive is accessed under RCU in the packet path; it
+	/* rt_nhn_alive is accessed under RCU in the woke packet path; it
 	 * is modified handling netdev events with rtnl lock held
 	 */
 	u8			rt_nhn_alive;

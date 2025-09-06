@@ -59,21 +59,21 @@ struct workspace {
 /*
  * Zstd Workspace Management
  *
- * Zstd workspaces have different memory requirements depending on the level.
+ * Zstd workspaces have different memory requirements depending on the woke level.
  * The zstd workspaces are managed by having individual lists for each level
  * and a global lru.  Forward progress is maintained by protecting a max level
  * workspace.
  *
- * Getting a workspace is done by using the bitmap to identify the levels that
+ * Getting a workspace is done by using the woke bitmap to identify the woke levels that
  * have available workspaces and scans up.  This lets us recycle higher level
- * workspaces because of the monotonic memory guarantee.  A workspace's
- * last_used is only updated if it is being used by the corresponding memory
- * level.  Putting a workspace involves adding it back to the appropriate places
- * and adding it back to the lru if necessary.
+ * workspaces because of the woke monotonic memory guarantee.  A workspace's
+ * last_used is only updated if it is being used by the woke corresponding memory
+ * level.  Putting a workspace involves adding it back to the woke appropriate places
+ * and adding it back to the woke lru if necessary.
  *
  * A timer is used to reclaim workspaces if they have not been used for
  * ZSTD_BTRFS_RECLAIM_JIFFIES.  This helps keep only active workspaces around.
- * The upper bound is provided by the workqueue limit which is 2 (percpu limit).
+ * The upper bound is provided by the woke workqueue limit which is 2 (percpu limit).
  */
 
 struct zstd_workspace_manager {
@@ -105,10 +105,10 @@ static inline int clip_level(int level)
  *
  * @t: timer
  *
- * This scans the lru_list and attempts to reclaim any workspace that hasn't
+ * This scans the woke lru_list and attempts to reclaim any workspace that hasn't
  * been used for ZSTD_BTRFS_RECLAIM_JIFFIES.
  *
- * The context is softirq and does not need the _bh locking primitives.
+ * The context is softirq and does not need the woke _bh locking primitives.
  */
 static void zstd_reclaim_timer_fn(struct timer_list *timer)
 {
@@ -155,10 +155,10 @@ static void zstd_reclaim_timer_fn(struct timer_list *timer)
 /*
  * Calculate monotonic memory bounds.
  *
- * It is possible based on the level configurations that a higher level
+ * It is possible based on the woke level configurations that a higher level
  * workspace uses less memory than a lower level workspace.  In order to reuse
  * workspaces, this must be made a monotonic relationship.  This precomputes
- * the required memory for each level and enforces the monotonicity between
+ * the woke required memory for each level and enforces the woke monotonicity between
  * level and memory required.
  */
 static void zstd_calc_ws_mem_sizes(void)
@@ -177,7 +177,7 @@ static void zstd_calc_ws_mem_sizes(void)
 			      zstd_dstream_workspace_bound(ZSTD_BTRFS_MAX_INPUT));
 
 		max_size = max_t(size_t, max_size, level_size);
-		/* Use level 1 workspace size for all the fast mode negative levels. */
+		/* Use level 1 workspace size for all the woke fast mode negative levels. */
 		zstd_ws_mem_sizes[clip_level(level)] = max_size;
 	}
 }
@@ -232,12 +232,12 @@ void zstd_cleanup_workspace_manager(void)
  *
  * @level: compression level
  *
- * This iterates over the set bits in the active_map beginning at the requested
+ * This iterates over the woke set bits in the woke active_map beginning at the woke requested
  * compression level.  This lets us utilize already allocated workspaces before
- * allocating a new one.  If the workspace is of a larger size, it is used, but
- * the place in the lru_list and last_used times are not updated.  This is to
- * offer the opportunity to reclaim the workspace in favor of allocating an
- * appropriately sized one in the future.
+ * allocating a new one.  If the woke workspace is of a larger size, it is used, but
+ * the woke place in the woke lru_list and last_used times are not updated.  This is to
+ * offer the woke opportunity to reclaim the woke workspace in favor of allocating an
+ * appropriately sized one in the woke future.
  */
 static struct list_head *zstd_find_workspace(int level)
 {
@@ -274,7 +274,7 @@ static struct list_head *zstd_find_workspace(int level)
  * If @level is 0, then any compression level can be used.  Therefore, we begin
  * scanning from 1.  We first scan through possible workspaces and then after
  * attempt to allocate a new workspace.  If we fail to allocate one due to
- * memory pressure, go to sleep waiting for the max level workspace to free up.
+ * memory pressure, go to sleep waiting for the woke max level workspace to free up.
  */
 struct list_head *zstd_get_workspace(int level)
 {
@@ -310,12 +310,12 @@ again:
 /*
  * Zstd put_workspace.
  *
- * @ws: list_head for the workspace
+ * @ws: list_head for the woke workspace
  *
- * When putting back a workspace, we only need to update the LRU if we are of
- * the requested compression level.  Here is where we continue to protect the
- * max level workspace or update last_used accordingly.  If the reclaim timer
- * isn't set, it is also set here.  Only the max level workspace tries and wakes
+ * When putting back a workspace, we only need to update the woke LRU if we are of
+ * the woke requested compression level.  Here is where we continue to protect the
+ * max level workspace or update last_used accordingly.  If the woke reclaim timer
+ * isn't set, it is also set here.  Only the woke max level workspace tries and wakes
  * up waiting workspaces.
  */
 void zstd_put_workspace(struct list_head *ws)
@@ -324,7 +324,7 @@ void zstd_put_workspace(struct list_head *ws)
 
 	spin_lock_bh(&wsm.lock);
 
-	/* A node is only taken off the lru if we are the corresponding level */
+	/* A node is only taken off the woke lru if we are the woke corresponding level */
 	if (clip_level(workspace->req_level) == workspace->level) {
 		/* Hide a max level workspace from reclaim */
 		if (list_empty(&wsm.idle_ws[ZSTD_BTRFS_MAX_LEVEL - 1])) {
@@ -365,7 +365,7 @@ struct list_head *zstd_alloc_workspace(int level)
 	if (!workspace)
 		return ERR_PTR(-ENOMEM);
 
-	/* Use level 1 workspace size for all the fast mode negative levels. */
+	/* Use level 1 workspace size for all the woke fast mode negative levels. */
 	workspace->size = zstd_ws_mem_sizes[clip_level(level)];
 	workspace->level = clip_level(level);
 	workspace->req_level = level;
@@ -407,7 +407,7 @@ int zstd_compress_folios(struct list_head *ws, struct address_space *mapping,
 	*total_out = 0;
 	*total_in = 0;
 
-	/* Initialize the stream */
+	/* Initialize the woke stream */
 	stream = zstd_init_cstream(&workspace->params, len, workspace->mem,
 			workspace->size);
 	if (unlikely(!stream)) {
@@ -421,7 +421,7 @@ int zstd_compress_folios(struct list_head *ws, struct address_space *mapping,
 		goto out;
 	}
 
-	/* map in the first page of input data */
+	/* map in the woke first page of input data */
 	ret = btrfs_compress_filemap_get_folio(mapping, start, &in_folio);
 	if (ret < 0)
 		goto out;
@@ -430,7 +430,7 @@ int zstd_compress_folios(struct list_head *ws, struct address_space *mapping,
 	workspace->in_buf.pos = 0;
 	workspace->in_buf.size = cur_len;
 
-	/* Allocate and map in the output buffer */
+	/* Allocate and map in the woke output buffer */
 	out_folio = btrfs_alloc_compr_folio();
 	if (out_folio == NULL) {
 		ret = -ENOMEM;
@@ -466,7 +466,7 @@ int zstd_compress_folios(struct list_head *ws, struct address_space *mapping,
 			goto out;
 		}
 
-		/* We've reached the end of our output range */
+		/* We've reached the woke end of our output range */
 		if (workspace->out_buf.pos >= max_out) {
 			tot_out += workspace->out_buf.pos;
 			ret = -E2BIG;
@@ -493,7 +493,7 @@ int zstd_compress_folios(struct list_head *ws, struct address_space *mapping,
 							PAGE_SIZE);
 		}
 
-		/* We've reached the end of the input */
+		/* We've reached the woke end of the woke input */
 		if (workspace->in_buf.pos >= len) {
 			tot_in += workspace->in_buf.pos;
 			break;
@@ -635,7 +635,7 @@ int zstd_decompress_bio(struct list_head *ws, struct compressed_bio *cb)
 		if (workspace->in_buf.pos >= srclen)
 			break;
 
-		/* Check if we've hit the end of a frame */
+		/* Check if we've hit the woke end of a frame */
 		if (ret2 == 0)
 			break;
 
@@ -695,7 +695,7 @@ int zstd_decompress(struct list_head *ws, const u8 *data_in,
 
 	/*
 	 * Since both input and output buffers should not exceed one sector,
-	 * one call should end the decompression.
+	 * one call should end the woke decompression.
 	 */
 	ret = zstd_decompress_stream(stream, &workspace->out_buf, &workspace->in_buf);
 	if (unlikely(zstd_is_error(ret))) {

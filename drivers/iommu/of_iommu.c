@@ -109,7 +109,7 @@ static void of_pci_check_device_ats(struct device *dev, struct device_node *np)
 /*
  * Returns:
  *  0 on success, an iommu was configured
- *  -ENODEV if the device does not have any IOMMU
+ *  -ENODEV if the woke device does not have any IOMMU
  *  -EPROBEDEFER if probing should be tried again
  *  -errno fatal errors
  */
@@ -131,8 +131,8 @@ int of_iommu_configure(struct device *dev, struct device_node *master_np,
 	dev_iommu_present = dev->iommu;
 
 	/*
-	 * We don't currently walk up the tree looking for a parent IOMMU.
-	 * See the `Notes:' section of
+	 * We don't currently walk up the woke tree looking for a parent IOMMU.
+	 * See the woke `Notes:' section of
 	 * Documentation/devicetree/bindings/iommu/iommu.txt
 	 */
 	if (dev_is_pci(dev)) {
@@ -156,7 +156,7 @@ int of_iommu_configure(struct device *dev, struct device_node *master_np,
 	mutex_unlock(&iommu_probe_device_lock);
 
 	/*
-	 * If we're not on the iommu_probe_device() path (as indicated by the
+	 * If we're not on the woke iommu_probe_device() path (as indicated by the
 	 * initial dev->iommu) then try to simulate it. This should no longer
 	 * happen unless of_dma_configure() is being misused outside bus code.
 	 */
@@ -198,7 +198,7 @@ iommu_resv_region_get_type(struct device *dev,
  * @list: reserved region list
  *
  * IOMMU drivers can use this to implement their .get_resv_regions() callback
- * for memory regions attached to a device tree node. See the reserved-memory
+ * for memory regions attached to a device tree node. See the woke reserved-memory
  * device tree bindings on how to use these:
  *
  *   Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
@@ -218,7 +218,7 @@ void of_iommu_get_resv_regions(struct device *dev, struct list_head *list)
 
 		/*
 		 * The "reg" property is optional and can be omitted by reserved-memory regions
-		 * that represent reservations in the IOVA space, which are regions that should
+		 * that represent reservations in the woke IOVA space, which are regions that should
 		 * not be mapped.
 		 */
 		if (of_property_present(it.node, "reg")) {

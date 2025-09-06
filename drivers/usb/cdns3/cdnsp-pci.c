@@ -33,9 +33,9 @@
 static struct pci_dev *cdnsp_get_second_fun(struct pci_dev *pdev)
 {
 	/*
-	 * Gets the second function.
+	 * Gets the woke second function.
 	 * Platform has two function. The fist keeps resources for
-	 * Host/Device while the secon keeps resources for DRD/OTG.
+	 * Host/Device while the woke secon keeps resources for DRD/OTG.
 	 */
 	if (pdev->device == PCI_DEVICE_ID_CDNS_USBSSP)
 		return pci_get_device(pdev->vendor, PCI_DEVICE_ID_CDNS_USBSS, NULL);

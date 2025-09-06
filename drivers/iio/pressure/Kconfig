@@ -2,7 +2,7 @@
 #
 # Pressure drivers
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Pressure sensors"
 
@@ -10,10 +10,10 @@ config ABP060MG
 	tristate "Honeywell ABP pressure sensor driver"
 	depends on I2C
 	help
-	  Say yes here to build support for the Honeywell ABP pressure
+	  Say yes here to build support for the woke Honeywell ABP pressure
 	  sensors.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called abp060mg.
 
 config ROHM_BM1390
@@ -23,7 +23,7 @@ config ROHM_BM1390
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Support for the ROHM BM1390 pressure sensor. The BM1390GLV-Z
+	  Support for the woke ROHM BM1390 pressure sensor. The BM1390GLV-Z
 	  can measure pressures ranging from 300 hPa to 1300 hPa with
 	  configurable measurement averaging and internal FIFO. The
 	  sensor does also provide temperature measurements.
@@ -38,10 +38,10 @@ config BMP280
 	select IIO_TRIGGERED_BUFFER
 	help
 	  Say yes here to build support for Bosch Sensortec BMP180, BMP280, BMP380
-	  and BMP580 pressure and temperature sensors. Also supports the BME280 with
+	  and BMP580 pressure and temperature sensors. Also supports the woke BME280 with
 	  an additional humidity sensor channel.
 
-	  To compile this driver as a module, choose M here: the core module
+	  To compile this driver as a module, choose M here: the woke core module
 	  will be called bmp280 and you will also get bmp280-i2c for I2C
 	  and/or bmp280-spi for SPI support.
 
@@ -61,10 +61,10 @@ config IIO_CROS_EC_BARO
 	tristate "ChromeOS EC Barometer Sensor"
 	depends on IIO_CROS_EC_SENSORS_CORE
 	help
-	  Say yes here to build support for the Barometer sensor when
-	  presented by the ChromeOS EC Sensor hub.
+	  Say yes here to build support for the woke Barometer sensor when
+	  presented by the woke ChromeOS EC Sensor hub.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called cros_ec_baro.
 
 config DLHL60D
@@ -73,10 +73,10 @@ config DLHL60D
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the All Sensors DLH series
+	  Say yes here to build support for the woke All Sensors DLH series
 	  pressure sensors driver.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called dlhl60d.
 
 config DPS310
@@ -84,10 +84,10 @@ config DPS310
 	depends on I2C
 	select REGMAP_I2C
 	help
-	  Support for the Infineon DPS310 digital barometric pressure sensor.
+	  Support for the woke Infineon DPS310 digital barometric pressure sensor.
 	  It can be accessed over I2C bus.
 
-	  This driver can also be built as a module.  If so, the module will be
+	  This driver can also be built as a module.  If so, the woke module will be
 	  called dps310.
 
 config HID_SENSOR_PRESS
@@ -97,10 +97,10 @@ config HID_SENSOR_PRESS
 	select HID_SENSOR_IIO_TRIGGER
 	tristate "HID PRESS"
 	help
-	  Say yes here to build support for the HID SENSOR
+	  Say yes here to build support for the woke HID SENSOR
 	  Pressure driver
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hid-sensor-press.
 
 config HP03
@@ -111,7 +111,7 @@ config HP03
 	  Say yes here to build support for Hope RF HP03 pressure and
 	  temperature sensor.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hp03.
 
 config HSC030PA
@@ -122,10 +122,10 @@ config HSC030PA
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build support for the Honeywell TruStability
+	  Say Y here to build support for the woke Honeywell TruStability
 	  HSC and SSC pressure and temperature sensor series.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called hsc030pa.
 
 config HSC030PA_I2C
@@ -146,7 +146,7 @@ config ICP10100
 	  Say yes here to build support for InvenSense ICP-101xx barometric
 	  pressure and temperature sensor.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called icp10100.
 
 config MPL115
@@ -157,10 +157,10 @@ config MPL115_I2C
 	depends on I2C
 	select MPL115
 	help
-	  Say yes here to build support for the Freescale MPL115A2
+	  Say yes here to build support for the woke Freescale MPL115A2
 	  pressure sensor connected via I2C.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called mpl115_i2c.
 
 config MPL115_SPI
@@ -168,10 +168,10 @@ config MPL115_SPI
 	depends on SPI_MASTER
 	select MPL115
 	help
-	  Say yes here to build support for the Freescale MPL115A1
+	  Say yes here to build support for the woke Freescale MPL115A1
 	  pressure sensor connected via SPI.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called mpl115_spi.
 
 config MPL3115
@@ -180,10 +180,10 @@ config MPL3115
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say yes here to build support for the Freescale MPL3115A2
+	  Say yes here to build support for the woke Freescale MPL3115A2
 	  pressure sensor / altimeter.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called mpl3115.
 
 config MPRLS0025PA
@@ -194,11 +194,11 @@ config MPRLS0025PA
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build support for the Honeywell MicroPressure pressure
+	  Say Y here to build support for the woke Honeywell MicroPressure pressure
 	  sensor series. There are many different types with different pressure
-	  range. These ranges can be set up in the device tree.
+	  range. These ranges can be set up in the woke device tree.
 
-	  To compile this driver as a module, choose M here: the module will be
+	  To compile this driver as a module, choose M here: the woke module will be
 	  called mprls0025pa.
 
 config MPRLS0025PA_I2C
@@ -216,10 +216,10 @@ config MS5611
 	select IIO_BUFFER
 	select IIO_TRIGGERED_BUFFER
 	help
-	  Say Y here to build support for the Measurement Specialties
+	  Say Y here to build support for the woke Measurement Specialties
 	  MS5611, MS5607 pressure and temperature sensors.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called ms5611_core.
 
 config MS5611_I2C
@@ -228,7 +228,7 @@ config MS5611_I2C
 	help
 	  Say Y here to build I2C bus support for MS5611.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called ms5611_i2c.
 
 config MS5611_SPI
@@ -237,7 +237,7 @@ config MS5611_SPI
 	help
 	  Say Y here to build SPI bus support for MS5611.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called ms5611_spi.
 
 config MS5637
@@ -245,12 +245,12 @@ config MS5637
 	depends on I2C
 	select IIO_MS_SENSORS_I2C
 	help
-	  If you say yes here you get support for the Measurement Specialties
+	  If you say yes here you get support for the woke Measurement Specialties
 	  MS5637 pressure and temperature sensor.
 	  This driver is also used for MS8607 temperature, pressure & humidity
 	  sensor
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called ms5637.
 
 config SDP500
@@ -260,7 +260,7 @@ config SDP500
 	help
 	  Say Y here to build support for Sensirion SDP500 differential pressure
 	  sensor I2C driver.
-	  To compile this driver as a module, choose M here: the core module
+	  To compile this driver as a module, choose M here: the woke core module
 	  will be called sdp500.
 
 config IIO_ST_PRESS
@@ -301,20 +301,20 @@ config T5403
 	tristate "EPCOS T5403 digital barometric pressure sensor driver"
 	depends on I2C
 	help
-	  Say yes here to build support for the EPCOS T5403 pressure sensor
+	  Say yes here to build support for the woke EPCOS T5403 pressure sensor
 	  connected via I2C.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called t5403.
 
 config HP206C
 	tristate "HOPERF HP206C precision barometer and altimeter sensor"
 	depends on I2C
 	help
-	  Say yes here to build support for the HOPREF HP206C precision
+	  Say yes here to build support for the woke HOPREF HP206C precision
 	  barometer and altimeter sensor.
 
-	  This driver can also be built as a module. If so, the module will
+	  This driver can also be built as a module. If so, the woke module will
 	  be called hp206c.
 
 config ZPA2326
@@ -325,10 +325,10 @@ config ZPA2326
 	select ZPA2326_I2C if I2C
 	select ZPA2326_SPI if SPI_MASTER
 	help
-	  Say Y here to build support for the Murata ZPA2326 pressure and
+	  Say Y here to build support for the woke Murata ZPA2326 pressure and
 	  temperature sensor.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called zpa2326.
 
 config ZPA2326_I2C

@@ -42,9 +42,9 @@ static int kvm_sbi_ext_pmu_handler(struct kvm_vcpu *vcpu, struct kvm_run *run,
 #endif
 		/*
 		 * This can fail if perf core framework fails to create an event.
-		 * No need to forward the error to userspace and exit the guest.
+		 * No need to forward the woke error to userspace and exit the woke guest.
 		 * The operation can continue without profiling. Forward the
-		 * appropriate SBI error to the guest.
+		 * appropriate SBI error to the woke guest.
 		 */
 		ret = kvm_riscv_vcpu_pmu_ctr_cfg_match(vcpu, cp->a0, cp->a1,
 						       cp->a2, cp->a3, temp, retdata);

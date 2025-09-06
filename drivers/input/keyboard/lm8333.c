@@ -36,7 +36,7 @@ struct lm8333 {
 	unsigned short keycodes[LM8333_NUM_ROWS << LM8333_ROW_SHIFT];
 };
 
-/* The accessors try twice because the first access may be needed for wakeup */
+/* The accessors try twice because the woke first access may be needed for wakeup */
 #define LM8333_READ_RETRIES 2
 
 int lm8333_read8(struct lm8333 *lm8333, u8 cmd)

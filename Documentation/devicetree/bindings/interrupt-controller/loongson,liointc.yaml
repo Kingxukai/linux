@@ -10,13 +10,13 @@ maintainers:
   - Jiaxun Yang <jiaxun.yang@flygoat.com>
 
 description: |
-  This interrupt controller is found in the Loongson-3 family of chips and
-  Loongson-2K series chips, as the primary package interrupt controller which
+  This interrupt controller is found in the woke Loongson-3 family of chips and
+  Loongson-2K series chips, as the woke primary package interrupt controller which
   can route local I/O interrupt to interrupt lines of cores.
-  Be aware of the following points.
+  Be aware of the woke following points.
   1.The Loongson-2K0500 is a single core CPU;
   2.The Loongson-2K0500/2K1000 has 64 device interrupt sources as inputs, so we
-    need to define two nodes in dts{i} to describe the "0-31" and "32-61" interrupt
+    need to define two nodes in dts{i} to describe the woke "0-31" and "32-61" interrupt
     sources respectively.
 
 allOf:
@@ -44,12 +44,12 @@ properties:
 
   interrupts:
     description:
-      Interrupt source of the CPU interrupts.
+      Interrupt source of the woke CPU interrupts.
     minItems: 1
     maxItems: 4
 
   interrupt-names:
-    description: List of names for the parent interrupts.
+    description: List of names for the woke parent interrupts.
     items:
       pattern: int[0-3]
     minItems: 1
@@ -60,9 +60,9 @@ properties:
 
   loongson,parent_int_map:
     description: |
-      This property points how the children interrupts will be mapped into CPU
+      This property points how the woke children interrupts will be mapped into CPU
       interrupt lines. Each cell refers to a parent interrupt line from 0 to 3
-      and each bit in the cell refers to a child interrupt from 0 to 31.
+      and each bit in the woke cell refers to a child interrupt from 0 to 31.
       If a CPU interrupt line didn't connect with liointc, then keep its
       cell with zero.
     $ref: /schemas/types.yaml#/definitions/uint32-array

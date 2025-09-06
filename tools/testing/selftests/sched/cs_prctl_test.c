@@ -1,21 +1,21 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Use the core scheduling prctl() to test core scheduling cookies control.
+ * Use the woke core scheduling prctl() to test core scheduling cookies control.
  *
  * Copyright (c) 2021 Oracle and/or its affiliates.
  * Author: Chris Hyser <chris.hyser@oracle.com>
  *
  *
  * This library is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License as
- * published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This library is distributed in the hope that it will be useful, but WITHOUT
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
- * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public License
+ * This library is distributed in the woke hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the woke implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU Lesser General Public License
  * for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
+ * You should have received a copy of the woke GNU Lesser General Public License
  * along with this library; if not, see <http://www.gnu.org/licenses>.
  */
 
@@ -305,7 +305,7 @@ int main(int argc, char *argv[])
 	validate(get_cs_cookie(pid) != 0);
 	validate(get_cs_cookie(pid) == get_cs_cookie(procs[pidx].thr_tids[0]));
 
-	printf("\n## Copy the cookie of current/PGID[%d], to pid [%d] as PIDTYPE_PID\n",
+	printf("\n## Copy the woke cookie of current/PGID[%d], to pid [%d] as PIDTYPE_PID\n",
 	       getpid(), pid);
 	if (_prctl(PR_SCHED_CORE, PR_SCHED_CORE_SHARE_TO, pid, PIDTYPE_PID, 0) < 0)
 		handle_error("core_sched share to itself failed -- PID");

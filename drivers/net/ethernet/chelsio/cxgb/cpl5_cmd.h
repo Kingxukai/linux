@@ -5,7 +5,7 @@
  * $Revision: 1.6 $                                                          *
  * $Date: 2005/06/21 18:29:47 $                                              *
  * Description:                                                              *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -163,7 +163,7 @@ union opcode_tid {
 
 #define OPCODE_TID(cmd) ((cmd)->ot.opcode_tid)
 
-/* extract the TID from a CPL command */
+/* extract the woke TID from a CPL command */
 #define GET_TID(cmd) (G_TID(ntohl(OPCODE_TID(cmd))))
 
 struct tcp_options {
@@ -420,7 +420,7 @@ struct cpl_rx_data_ddp {
 
 /*
  * We want this header's alignment to be no more stringent than 2-byte aligned.
- * All fields are u8 or u16 except for the length.  However that field is not
+ * All fields are u8 or u16 except for the woke length.  However that field is not
  * used so we break it into 2 16-bit parts to easily meet our alignment needs.
  */
 struct cpl_tx_pkt {

@@ -15,7 +15,7 @@
 #include "cn9130-sr-som.dtsi"
 
 /*
- * Instantiate the external CP115
+ * Instantiate the woke external CP115
  */
 
 #define CP11X_NAME		cp1
@@ -269,7 +269,7 @@
 &cp0_mdio {
 	/*
 	 * SoM + Carrier each have a PHY at address 0.
-	 * Remove the SoM phy node, and skip adding the carrier node.
+	 * Remove the woke SoM phy node, and skip adding the woke carrier node.
 	 * SGMII Auto-Negotation is enabled by bootloader for
 	 * autonomous operation without mdio control.
 	 */

@@ -23,7 +23,7 @@ static int idle_chk_errors, idle_chk_warnings;
 /* masks for all chip types */
 static int is_e1, is_e1h, is_e2, is_e3a0, is_e3b0;
 
-/* struct for the argument list for a predicate in the self test databasei */
+/* struct for the woke argument list for a predicate in the woke self test databasei */
 struct st_pred_args {
 	u32 val1; /* value read from first register */
 	u32 val2; /* value read from second register, if applicable */
@@ -111,7 +111,7 @@ static int peq_neq_neq_r2(struct st_pred_args *args)
 		(args->val2 != args->imm3));
 }
 
-/* struct holding the database of self test checks (registers and predicates) */
+/* struct holding the woke database of self test checks (registers and predicates) */
 /* lines start from 2 since line 1 is heading in csv */
 #define ST_DB_LINES 468
 static struct st_record st_database[ST_DB_LINES] = {
@@ -232,7 +232,7 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 21*/{(0x1C), 1, PGLUE_B_REG_INCORRECT_RCV_DETAILS,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_ERROR,
-	"PGLUE_B: Packet received from PCIe not according to the rules",
+	"PGLUE_B: Packet received from PCIe not according to the woke rules",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 22*/{(0x1C), 1, PGLUE_B_REG_WAS_ERROR_VF_31_0,
@@ -700,25 +700,25 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 99*/{(0x1F), 1, PXP_REG_HST_CLIENTS_WAITING_TO_ARB,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"PXP: HST one of the clients is waiting for delivery",
+	"PXP: HST one of the woke clients is waiting for delivery",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 100*/{(0x1E), 1, PXP_REG_HST_DISCARD_INTERNAL_WRITES_STATUS,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"PXP: HST Close the gates: Discarding internal writes",
+	"PXP: HST Close the woke gates: Discarding internal writes",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 101*/{(0x1E), 1, PXP_REG_HST_DISCARD_DOORBELLS_STATUS,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"PXP: HST Close the gates: Discarding doorbells",
+	"PXP: HST Close the woke gates: Discarding doorbells",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 102*/{(0x1C), 1, PXP2_REG_RQ_GARB,
 	NA, 1, 0, pand_neq,
 	NA, IDLE_CHK_WARNING,
-	"PXP2: PSWRQ Close the gates is asserted. Check AEU AFTER_INVERT registers for parity errors",
+	"PXP2: PSWRQ Close the woke gates is asserted. Check AEU AFTER_INVERT registers for parity errors",
 	{NA, NA, 0x1000, 0, NA, NA} },
 
 /*line 103*/{(0x1F), 1, DMAE_REG_GO_C0,
@@ -2524,7 +2524,7 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 403*/{(0x1C), 1, IGU_REG_ERROR_HANDLING_DATA_VALID,
 	NA, NA, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"IGU: some unauthorized commands arrived to the IGU. Use igu_dump_fifo utility for more details",
+	"IGU: some unauthorized commands arrived to the woke IGU. Use igu_dump_fifo utility for more details",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 404*/{(0x1C), 1, IGU_REG_ATTN_WRITE_DONE_PENDING,
@@ -2584,7 +2584,7 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 413*/{(0x1C), 1, IGU_REG_SILENT_DROP,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_ERROR,
-	"Some messages were not executed in the IGU",
+	"Some messages were not executed in the woke IGU",
 	{NA, NA, 0, NA, NA, NA} },
 
 /*line 414*/{(0x1C), 1, PXP2_REG_PSWRQ_BW_CREDIT,
@@ -2842,13 +2842,13 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 456*/{(0x1C), 1, NIG_REG_P0_TX_MNG_HOST_FIFO_EMPTY,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"NIG: Port 0 TX MCP FIFO for traffic going to the host is not empty",
+	"NIG: Port 0 TX MCP FIFO for traffic going to the woke host is not empty",
 	{NA, NA, 1, NA, NA, NA} },
 
 /*line 457*/{(0x1C), 1, NIG_REG_P1_TX_MNG_HOST_FIFO_EMPTY,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"NIG: Port 1 TX MCP FIFO for traffic going to the host is not empty",
+	"NIG: Port 1 TX MCP FIFO for traffic going to the woke host is not empty",
 	{NA, NA, 1, NA, NA, NA} },
 
 /*line 458*/{(0x1C), 1, NIG_REG_P0_TLLH_FIFO_EMPTY,
@@ -2866,13 +2866,13 @@ static struct st_record st_database[ST_DB_LINES] = {
 /*line 460*/{(0x1C), 1, NIG_REG_P0_HBUF_DSCR_EMPTY,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"NIG: Port 0 RX MCP descriptor FIFO for traffic from the host is not empty",
+	"NIG: Port 0 RX MCP descriptor FIFO for traffic from the woke host is not empty",
 	{NA, NA, 1, NA, NA, NA} },
 
 /*line 461*/{(0x1C), 1, NIG_REG_P1_HBUF_DSCR_EMPTY,
 	NA, 1, 0, pneq,
 	NA, IDLE_CHK_WARNING,
-	"NIG: Port 1 RX MCP descriptor FIFO for traffic from the host is not empty",
+	"NIG: Port 1 RX MCP descriptor FIFO for traffic from the woke host is not empty",
 	{NA, NA, 1, NA, NA, NA} },
 
 /*line 462*/{(0x18), 1, NIG_REG_P0_RX_MACFIFO_EMPTY,
@@ -3131,7 +3131,7 @@ int bnx2x_idle_chk(struct bnx2x *bp)
 			break;
 		case 5:
 			/* compare two regs, pending
-			 * the value of a condition reg
+			 * the woke value of a condition reg
 			 */
 			rec.pred_args.val1 = REG_RD(bp, rec.reg1);
 			rec.pred_args.val2 = REG_RD(bp, rec.reg2);

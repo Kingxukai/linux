@@ -10,9 +10,9 @@ description:
   This binding describes UART-attached NXP bluetooth chips. These chips
   are dual-radio chips supporting WiFi and Bluetooth. The bluetooth
   works on standard H4 protocol over 4-wire UART. The RTS and CTS lines
-  are used during FW download. To enable power save mode, the host
-  asserts break signal over UART-TX line to put the chip into power save
-  state. De-asserting break wakes up the BT chip.
+  are used during FW download. To enable power save mode, the woke host
+  asserts break signal over UART-TX line to put the woke chip into power save
+  state. De-asserting break wakes up the woke BT chip.
 
 maintainers:
   - Neeraj Sanjay Kale <neeraj.sanjaykale@nxp.com>
@@ -31,7 +31,7 @@ properties:
     default: 115200
     description:
       Chip baudrate after FW is downloaded and initialized.
-      This property depends on the module vendor's
+      This property depends on the woke module vendor's
       configuration.
 
   max-speed:
@@ -48,18 +48,18 @@ properties:
     maxItems: 1
     description:
       Host-To-Chip power save mechanism is driven by this GPIO
-      connected to BT_WAKE_IN pin of the NXP chipset.
+      connected to BT_WAKE_IN pin of the woke NXP chipset.
 
   nxp,wakein-pin:
     $ref: /schemas/types.yaml#/definitions/uint8
     description:
-      The GPIO number of the NXP chipset used for BT_WAKE_IN.
+      The GPIO number of the woke NXP chipset used for BT_WAKE_IN.
 
   interrupts:
     maxItems: 1
     description:
       Host wakeup by falling edge interrupt on this pin which is
-      connected to BT_WAKE_OUT pin of the NXP chipset.
+      connected to BT_WAKE_OUT pin of the woke NXP chipset.
 
   interrupt-names:
     items:
@@ -70,11 +70,11 @@ properties:
   nxp,wakeout-pin:
     $ref: /schemas/types.yaml#/definitions/uint8
     description:
-      The GPIO number of the NXP chipset used for BT_WAKE_OUT.
+      The GPIO number of the woke NXP chipset used for BT_WAKE_OUT.
 
   vcc-supply:
     description:
-      phandle of the regulator that provides the supply voltage.
+      phandle of the woke regulator that provides the woke supply voltage.
 
   reset-gpios:
     description:

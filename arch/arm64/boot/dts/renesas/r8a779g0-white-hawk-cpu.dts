@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the standalone R-Car V4H White Hawk CPU board
+ * Device Tree Source for the woke standalone R-Car V4H White Hawk CPU board
  *
  * Copyright (C) 2023 Glider bv
  */

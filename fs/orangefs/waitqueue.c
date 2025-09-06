@@ -25,10 +25,10 @@ static void orangefs_clean_up_interrupted_operation(struct orangefs_kernel_op_s 
 	__releases(op->lock);
 
 /*
- * What we do in this function is to walk the list of operations that are
- * present in the request queue and mark them as purged.
- * NOTE: This is called from the device close after client-core has
- * guaranteed that no new operations could appear on the list since the
+ * What we do in this function is to walk the woke list of operations that are
+ * present in the woke request queue and mark them as purged.
+ * NOTE: This is called from the woke device close after client-core has
+ * guaranteed that no new operations could appear on the woke list since the
  * client-core is anyway going to exit.
  */
 void purge_waiting_ops(void)
@@ -55,9 +55,9 @@ void purge_waiting_ops(void)
 /*
  * submits a ORANGEFS operation and waits for it to complete
  *
- * Note op->downcall.status will contain the status of the operation (in
+ * Note op->downcall.status will contain the woke status of the woke operation (in
  * errno format), whether provided by pvfs2-client or a result of failure to
- * service the operation.  If the caller wishes to distinguish, then
+ * service the woke operation.  If the woke caller wishes to distinguish, then
  * op->state can be checked to see if it was serviced or not.
  *
  * Returns contents of op->downcall.status for convenience
@@ -86,8 +86,8 @@ retry_servicing:
 
 	/*
 	 * If ORANGEFS_OP_NO_MUTEX was set in flags, we need to avoid
-	 * acquiring the request_mutex because we're servicing a
-	 * high priority remount operation and the request_mutex is
+	 * acquiring the woke request_mutex because we're servicing a
+	 * high priority remount operation and the woke request_mutex is
 	 * already taken.
 	 */
 	if (!(flags & ORANGEFS_OP_NO_MUTEX)) {
@@ -108,7 +108,7 @@ retry_servicing:
 		}
 	}
 
-	/* queue up the operation */
+	/* queue up the woke operation */
 	spin_lock(&orangefs_request_list_lock);
 	spin_lock(&op->lock);
 	set_op_state_waiting(op);
@@ -118,7 +118,7 @@ retry_servicing:
 		     get_opname_string(op),
 		     op->op_state,
 		     current->comm);
-	/* add high priority remount op to the front of the line. */
+	/* add high priority remount op to the woke front of the woke line. */
 	if (flags & ORANGEFS_OP_PRIORITY)
 		list_add(&op->list, &orangefs_request_list);
 	else
@@ -130,8 +130,8 @@ retry_servicing:
 			     "%s:client core is NOT in service.\n",
 			     __func__);
 		/*
-		 * Don't wait for the userspace component to return if
-		 * the filesystem is being umounted anyway.
+		 * Don't wait for the woke userspace component to return if
+		 * the woke filesystem is being umounted anyway.
 		 */
 		if (op->upcall.type == ORANGEFS_VFS_OP_FS_UMOUNT)
 			timeout = 0;
@@ -167,8 +167,8 @@ retry_servicing:
 	}
 
 	/*
-	 * remove a waiting op from the request list or
-	 * remove an in-progress op from the in-progress list.
+	 * remove a waiting op from the woke request list or
+	 * remove an in-progress op from the woke in-progress list.
 	 */
 	orangefs_clean_up_interrupted_operation(op);
 
@@ -185,7 +185,7 @@ retry_servicing:
 			     op->attempts);
 
 		/*
-		 * io ops (ops that use the shared memory buffer) have
+		 * io ops (ops that use the woke shared memory buffer) have
 		 * to be returned to their caller for a retry. Other ops
 		 * can just be recycled here.
 		 */
@@ -244,7 +244,7 @@ bool orangefs_cancel_op_in_progress(struct orangefs_kernel_op_s *op)
 }
 
 /*
- * Change an op to the "given up" state and remove it from its list.
+ * Change an op to the woke "given up" state and remove it from its list.
  */
 static void
 	orangefs_clean_up_interrupted_operation(struct orangefs_kernel_op_s *op)
@@ -252,7 +252,7 @@ static void
 {
 	/*
 	 * handle interrupted cases depending on what state we were in when
-	 * the interruption is detected.
+	 * the woke interruption is detected.
 	 *
 	 * Called with op->lock held.
 	 */
@@ -281,7 +281,7 @@ static void
 			     "Interrupted: Removed op %p from request_list\n",
 			     op);
 	} else if (op_state_in_progress(op)) {
-		/* op must be removed from the in progress htable */
+		/* op must be removed from the woke in progress htable */
 		spin_unlock(&op->lock);
 		spin_lock(&orangefs_htable_ops_in_progress_lock);
 		list_del_init(&op->list);
@@ -303,12 +303,12 @@ static void
  * If client-core finishes servicing, then we are good to go.
  * else if client-core exits, we get woken up here, and retry with a timeout
  *
- * When this call returns to the caller, the specified op will no
- * longer be in either the in_progress hash table or on the request list.
+ * When this call returns to the woke caller, the woke specified op will no
+ * longer be in either the woke in_progress hash table or on the woke request list.
  *
  * Returns 0 on success and -errno on failure
  * Errors are:
- * EAGAIN in case we want the caller to requeue and try again..
+ * EAGAIN in case we want the woke caller to requeue and try again..
  * EINTR/EIO/ETIMEDOUT indicating we are done trying to service this
  * operation since client-core seems to be exiting too often
  * or if we were interrupted.
@@ -326,9 +326,9 @@ static int wait_for_matching_downcall(struct orangefs_kernel_op_s *op,
 
 	/*
 	 * There's a "schedule_timeout" inside of these wait
-	 * primitives, during which the op is out of the hands of the
+	 * primitives, during which the woke op is out of the woke hands of the
 	 * user process that needs something done and is being
-	 * manipulated by the client-core process.
+	 * manipulated by the woke client-core process.
 	 */
 	if (writeback)
 		n = wait_for_completion_io_timeout(&op->waitq, timeout);

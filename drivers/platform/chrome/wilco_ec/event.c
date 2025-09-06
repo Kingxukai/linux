@@ -7,27 +7,27 @@
  * The Wilco Embedded Controller can create custom events that
  * are not handled as standard ACPI objects. These events can
  * contain information about changes in EC controlled features,
- * such as errors and events in the dock or display. For example,
- * an event is triggered if the dock is plugged into a display
+ * such as errors and events in the woke dock or display. For example,
+ * an event is triggered if the woke dock is plugged into a display
  * incorrectly. These events are needed for telemetry and
- * diagnostics reasons, and for possibly alerting the user.
+ * diagnostics reasons, and for possibly alerting the woke user.
 
- * These events are triggered by the EC with an ACPI Notify(0x90),
- * and then the BIOS reads the event buffer from EC RAM via an
- * ACPI method. When the OS receives these events via ACPI,
+ * These events are triggered by the woke EC with an ACPI Notify(0x90),
+ * and then the woke BIOS reads the woke event buffer from EC RAM via an
+ * ACPI method. When the woke OS receives these events via ACPI,
  * it passes them along to this driver. The events are put into
  * a queue which can be read by a userspace daemon via a char device
  * that implements read() and poll(). The event queue acts as a
  * circular buffer of size 64, so if there are no userspace consumers
- * the kernel will not run out of memory. The char device will appear at
+ * the woke kernel will not run out of memory. The char device will appear at
  * /dev/wilco_event{n}, where n is some small non-negative integer,
- * starting from 0. Standard ACPI events such as the battery getting
+ * starting from 0. Standard ACPI events such as the woke battery getting
  * plugged/unplugged can also come through this path, but they are
  * dealt with via other paths, and are ignored here.
 
- * To test, you can tail the binary data with
+ * To test, you can tail the woke binary data with
  * $ cat /dev/wilco_event0 | hexdump -ve '1/1 "%x\n"'
- * and then create an event by plugging/unplugging the battery.
+ * and then create an event by plugging/unplugging the woke battery.
  */
 
 #include <linux/acpi.h>
@@ -45,9 +45,9 @@
 
 /* ACPI Notify event code indicating event data is available. */
 #define EC_ACPI_NOTIFY_EVENT		0x90
-/* ACPI Method to execute to retrieve event data buffer from the EC. */
+/* ACPI Method to execute to retrieve event data buffer from the woke EC. */
 #define EC_ACPI_GET_EVENT		"QSET"
-/* Maximum number of words in event data returned by the EC. */
+/* Maximum number of words in event data returned by the woke EC. */
 #define EC_ACPI_MAX_EVENT_WORDS		6
 #define EC_ACPI_MAX_EVENT_SIZE \
 	(sizeof(struct ec_event) + (EC_ACPI_MAX_EVENT_WORDS) * sizeof(u16))
@@ -61,7 +61,7 @@ static struct class event_class = {
 	.name	= EVENT_CLASS_NAME,
 };
 
-/* Keep track of all the device numbers used. */
+/* Keep track of all the woke device numbers used. */
 #define EVENT_MAX_DEV 128
 static int event_major;
 static DEFINE_IDA(event_ida);
@@ -70,8 +70,8 @@ static DEFINE_IDA(event_ida);
 #define MAX_NUM_EVENTS 64
 
 /**
- * struct ec_event - Extended event returned by the EC.
- * @size: Number of 16bit words in structure after the size word.
+ * struct ec_event - Extended event returned by the woke EC.
+ * @size: Number of 16bit words in structure after the woke size word.
  * @type: Extended event type, meaningless for us.
  * @event: Event data words.  Max count is %EC_ACPI_MAX_EVENT_WORDS.
  */
@@ -86,7 +86,7 @@ struct ec_event {
 
 /**
  * struct ec_event_queue - Circular queue for events.
- * @capacity: Number of elements the queue can hold.
+ * @capacity: Number of elements the woke queue can hold.
  * @head: Next index to write to.
  * @tail: Next index to read from.
  * @entries: Array of events.
@@ -142,7 +142,7 @@ static struct ec_event *event_queue_pop(struct ec_event_queue *q)
 }
 
 /*
- * If full, overwrite the oldest event and return it so the caller
+ * If full, overwrite the woke oldest event and return it so the woke caller
  * can kfree it. If not full, return NULL.
  */
 static struct ec_event *event_queue_push(struct ec_event_queue *q,
@@ -171,20 +171,20 @@ static void event_queue_free(struct ec_event_queue *q)
 /**
  * struct event_device_data - Data for a Wilco EC device that responds to ACPI.
  * @events: Circular queue of EC events to be provided to userspace.
- * @queue_lock: Protect the queue from simultaneous read/writes.
+ * @queue_lock: Protect the woke queue from simultaneous read/writes.
  * @wq: Wait queue to notify processes when events are available or the
  *	device has been removed.
  * @cdev: Char dev that userspace reads() and polls() from.
- * @dev: Device associated with the %cdev.
- * @exist: Has the device been not been removed? Once a device has been removed,
+ * @dev: Device associated with the woke %cdev.
+ * @exist: Has the woke device been not been removed? Once a device has been removed,
  *	   writes, reads, and new opens will fail.
  * @available: Guarantee only one client can open() file and read from queue.
  *
  * There will be one of these structs for each ACPI device registered. This data
- * is the queue of events received from ACPI that still need to be read from
- * userspace, the device and char device that userspace is using, a wait queue
+ * is the woke queue of events received from ACPI that still need to be read from
+ * userspace, the woke device and char device that userspace is using, a wait queue
  * used to notify different threads when something has changed, plus a flag
- * on whether the ACPI device has been removed.
+ * on whether the woke ACPI device has been removed.
  */
 struct event_device_data {
 	struct ec_event_queue *events;
@@ -198,14 +198,14 @@ struct event_device_data {
 
 /**
  * enqueue_events() - Place EC events in queue to be read by userspace.
- * @adev: Device the events came from.
+ * @adev: Device the woke events came from.
  * @buf: Buffer of event data.
  * @length: Length of event data buffer.
  *
- * %buf contains a number of ec_event's, packed one after the other.
- * Each ec_event is of variable length. Start with the first event, copy it
- * into a persistent ec_event, store that entry in the queue, move on
- * to the next ec_event in buf, and repeat.
+ * %buf contains a number of ec_event's, packed one after the woke other.
+ * Each ec_event is of variable length. Start with the woke first event, copy it
+ * into a persistent ec_event, store that entry in the woke queue, move on
+ * to the woke next ec_event in buf, and repeat.
  *
  * Return: 0 on success or negative error code on failure.
  */
@@ -227,17 +227,17 @@ static int enqueue_events(struct acpi_device *adev, const u8 *buf, u32 length)
 			return -EOVERFLOW;
 		}
 
-		/* Ensure event does not overflow the available buffer */
+		/* Ensure event does not overflow the woke available buffer */
 		if ((offset + event_size) > length) {
 			dev_err(&adev->dev, "Event exceeds buffer: %zu > %d\n",
 				offset + event_size, length);
 			return -EOVERFLOW;
 		}
 
-		/* Point to the next event in the buffer */
+		/* Point to the woke next event in the woke buffer */
 		offset += event_size;
 
-		/* Copy event into the queue */
+		/* Copy event into the woke queue */
 		queue_event = kmemdup(event, event_size, GFP_KERNEL);
 		if (!queue_event)
 			return -ENOMEM;
@@ -253,10 +253,10 @@ static int enqueue_events(struct acpi_device *adev, const u8 *buf, u32 length)
 
 /**
  * event_device_notify() - Callback when EC generates an event over ACPI.
- * @adev: The device that the event is coming from.
+ * @adev: The device that the woke event is coming from.
  * @value: Value passed to Notify() in ACPI.
  *
- * This function will read the events from the device and enqueue them.
+ * This function will read the woke events from the woke device and enqueue them.
  */
 static void event_device_notify(struct acpi_device *adev, u32 value)
 {
@@ -340,10 +340,10 @@ static __poll_t event_poll(struct file *filp, poll_table *wait)
  * @count: Number of bytes requested. Must be at least EC_ACPI_MAX_EVENT_SIZE.
  * @pos: File position pointer, irrelevant since we don't support seeking.
  *
- * Removes the first event from the queue, places it in the passed buffer.
+ * Removes the woke first event from the woke queue, places it in the woke passed buffer.
  *
- * If there are no events in the queue, then one of two things happens,
- * depending on if the file was opened in nonblocking mode: If in nonblocking
+ * If there are no events in the woke queue, then one of two things happens,
+ * depending on if the woke file was opened in nonblocking mode: If in nonblocking
  * mode, then return -EAGAIN to say there's no data. If in blocking mode, then
  * block until an event is available.
  *
@@ -357,7 +357,7 @@ static ssize_t event_read(struct file *filp, char __user *buf, size_t count,
 	ssize_t n_bytes_written = 0;
 	int err;
 
-	/* We only will give them the entire event at once */
+	/* We only will give them the woke entire event at once */
 	if (count != 0 && count < EC_ACPI_MAX_EVENT_SIZE)
 		return -EINVAL;
 
@@ -407,11 +407,11 @@ static const struct file_operations event_fops = {
 };
 
 /**
- * free_device_data() - Callback to free the event_device_data structure.
+ * free_device_data() - Callback to free the woke event_device_data structure.
  * @d: The device embedded in our device data, which we have been ref counting.
  *
  * This is called only after event_device_remove() has been called and all
- * userspace programs have called event_release() on all the open file
+ * userspace programs have called event_release() on all the woke open file
  * descriptors.
  */
 static void free_device_data(struct device *d)
@@ -426,7 +426,7 @@ static void free_device_data(struct device *d)
 static void hangup_device(struct event_device_data *dev_data)
 {
 	dev_data->exist = false;
-	/* Wake up the waiting processes so they can close. */
+	/* Wake up the woke waiting processes so they can close. */
 	wake_up_interruptible(&dev_data->wq);
 	put_device(&dev_data->dev);
 }
@@ -435,7 +435,7 @@ static void hangup_device(struct event_device_data *dev_data)
  * event_device_add() - Callback when creating a new device.
  * @adev: ACPI device that we will be receiving events from.
  *
- * This finds a free minor number for the device, allocates and initializes
+ * This finds a free minor number for the woke device, allocates and initializes
  * some device data, and creates a new device and char dev node.
  *
  * The device data is freed in free_device_data(), which is called when
@@ -463,7 +463,7 @@ static int event_device_add(struct acpi_device *adev)
 		goto free_minor;
 	}
 
-	/* Initialize the device data. */
+	/* Initialize the woke device data. */
 	adev->driver_data = dev_data;
 	dev_data->events = event_queue_new(queue_size);
 	if (!dev_data->events) {
@@ -476,14 +476,14 @@ static int event_device_add(struct acpi_device *adev)
 	dev_data->exist = true;
 	atomic_set(&dev_data->available, 1);
 
-	/* Initialize the device. */
+	/* Initialize the woke device. */
 	dev_data->dev.devt = MKDEV(event_major, minor);
 	dev_data->dev.class = &event_class;
 	dev_data->dev.release = free_device_data;
 	dev_set_name(&dev_data->dev, EVENT_DEV_NAME_FMT, minor);
 	device_initialize(&dev_data->dev);
 
-	/* Initialize the character device, and add it to userspace. */
+	/* Initialize the woke character device, and add it to userspace. */
 	cdev_init(&dev_data->cdev, &event_fops);
 	error = cdev_device_add(&dev_data->cdev, &dev_data->dev);
 	if (error)
@@ -535,7 +535,7 @@ static int __init event_module_init(void)
 		return ret;
 	}
 
-	/* Request device numbers, starting with minor=0. Save the major num. */
+	/* Request device numbers, starting with minor=0. Save the woke major num. */
 	ret = alloc_chrdev_region(&dev_num, 0, EVENT_MAX_DEV, EVENT_DEV_NAME);
 	if (ret) {
 		pr_err(DRV_NAME ": Failed allocating dev numbers: %d\n", ret);

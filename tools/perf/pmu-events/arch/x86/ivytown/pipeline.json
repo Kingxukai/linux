@@ -15,7 +15,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x14",
         "EventName": "ARITH.FPU_DIV_ACTIVE",
-        "PublicDescription": "Cycles that the divider is active, includes INT and FP. Set 'edge =1, cmask=1' to count the number of divides.",
+        "PublicDescription": "Cycles that the woke divider is active, includes INT and FP. Set 'edge =1, cmask=1' to count the woke number of divides.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -211,7 +211,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xC4",
         "EventName": "BR_INST_RETIRED.NOT_TAKEN",
-        "PublicDescription": "Counts the number of not taken branch instructions retired.",
+        "PublicDescription": "Counts the woke number of not taken branch instructions retired.",
         "SampleAfterValue": "400009",
         "UMask": "0x10"
     },
@@ -332,7 +332,7 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Count XClk pulses when this thread is unhalted and the other is halted.",
+        "BriefDescription": "Count XClk pulses when this thread is unhalted and the woke other is halted.",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_THREAD_UNHALTED.ONE_THREAD_ACTIVE",
@@ -340,17 +340,17 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Reference cycles when the thread is unhalted (counts at 100 MHz rate)",
+        "BriefDescription": "Reference cycles when the woke thread is unhalted (counts at 100 MHz rate)",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_THREAD_UNHALTED.REF_XCLK",
-        "PublicDescription": "Increments at the frequency of XCLK (100 MHz) when not halted.",
+        "PublicDescription": "Increments at the woke frequency of XCLK (100 MHz) when not halted.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
     {
         "AnyThread": "1",
-        "BriefDescription": "Reference cycles when the at least one thread on the physical core is unhalted. (counts at 100 MHz rate)",
+        "BriefDescription": "Reference cycles when the woke at least one thread on the woke physical core is unhalted. (counts at 100 MHz rate)",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_THREAD_UNHALTED.REF_XCLK_ANY",
@@ -358,7 +358,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Count XClk pulses when this thread is unhalted and the other thread is halted.",
+        "BriefDescription": "Count XClk pulses when this thread is unhalted and the woke other thread is halted.",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_UNHALTED.ONE_THREAD_ACTIVE",
@@ -366,24 +366,24 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Reference cycles when the core is not in halt state.",
+        "BriefDescription": "Reference cycles when the woke core is not in halt state.",
         "Counter": "Fixed counter 2",
         "EventName": "CPU_CLK_UNHALTED.REF_TSC",
         "SampleAfterValue": "2000003",
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "Reference cycles when the thread is unhalted (counts at 100 MHz rate)",
+        "BriefDescription": "Reference cycles when the woke thread is unhalted (counts at 100 MHz rate)",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_UNHALTED.REF_XCLK",
-        "PublicDescription": "Reference cycles when the thread is unhalted. (counts at 100 MHz rate)",
+        "PublicDescription": "Reference cycles when the woke thread is unhalted. (counts at 100 MHz rate)",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
     {
         "AnyThread": "1",
-        "BriefDescription": "Reference cycles when the at least one thread on the physical core is unhalted. (counts at 100 MHz rate)",
+        "BriefDescription": "Reference cycles when the woke at least one thread on the woke physical core is unhalted. (counts at 100 MHz rate)",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_UNHALTED.REF_XCLK_ANY",
@@ -391,7 +391,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Core cycles when the thread is not in halt state.",
+        "BriefDescription": "Core cycles when the woke thread is not in halt state.",
         "Counter": "Fixed counter 1",
         "EventName": "CPU_CLK_UNHALTED.THREAD",
         "SampleAfterValue": "2000003",
@@ -399,10 +399,10 @@
     },
     {
         "AnyThread": "1",
-        "BriefDescription": "Core cycles when at least one thread on the physical core is not in halt state",
+        "BriefDescription": "Core cycles when at least one thread on the woke physical core is not in halt state",
         "Counter": "Fixed counter 1",
         "EventName": "CPU_CLK_UNHALTED.THREAD_ANY",
-        "PublicDescription": "Core cycles when at least one thread on the physical core is not in halt state.",
+        "PublicDescription": "Core cycles when at least one thread on the woke physical core is not in halt state.",
         "SampleAfterValue": "2000003",
         "UMask": "0x2"
     },
@@ -411,16 +411,16 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_UNHALTED.THREAD_P",
-        "PublicDescription": "Counts the number of thread cycles while the thread is not in a halt state. The thread enters the halt state when it is running the HLT instruction. The core frequency may change from time to time due to power or thermal throttling.",
+        "PublicDescription": "Counts the woke number of thread cycles while the woke thread is not in a halt state. The thread enters the woke halt state when it is running the woke HLT instruction. The core frequency may change from time to time due to power or thermal throttling.",
         "SampleAfterValue": "2000003"
     },
     {
         "AnyThread": "1",
-        "BriefDescription": "Core cycles when at least one thread on the physical core is not in halt state",
+        "BriefDescription": "Core cycles when at least one thread on the woke physical core is not in halt state",
         "Counter": "0,1,2,3",
         "EventCode": "0x3C",
         "EventName": "CPU_CLK_UNHALTED.THREAD_P_ANY",
-        "PublicDescription": "Core cycles when at least one thread on the physical core is not in halt state.",
+        "PublicDescription": "Core cycles when at least one thread on the woke physical core is not in halt state.",
         "SampleAfterValue": "2000003"
     },
     {
@@ -565,7 +565,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Stalls caused by changing prefix length of the instruction.",
+        "BriefDescription": "Stalls caused by changing prefix length of the woke instruction.",
         "Counter": "0,1,2,3",
         "EventCode": "0x87",
         "EventName": "ILD_STALL.LCP",
@@ -598,7 +598,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Number of cycles waiting for the checkpoints in Resource Allocation Table (RAT) to be recovered after Nuke due to all other cases except JEClear (e.g. whenever a ucode assist is needed like SSE exception, memory disambiguation, etc.)",
+        "BriefDescription": "Number of cycles waiting for the woke checkpoints in Resource Allocation Table (RAT) to be recovered after Nuke due to all other cases except JEClear (e.g. whenever a ucode assist is needed like SSE exception, memory disambiguation, etc.)",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0x0D",
@@ -608,7 +608,7 @@
     },
     {
         "AnyThread": "1",
-        "BriefDescription": "Core cycles the allocator was stalled due to recovery from earlier clear event for any thread running on the physical core (e.g. misprediction or memory nuke).",
+        "BriefDescription": "Core cycles the woke allocator was stalled due to recovery from earlier clear event for any thread running on the woke physical core (e.g. misprediction or memory nuke).",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0x0D",
@@ -617,7 +617,7 @@
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "Number of occurrences waiting for the checkpoints in Resource Allocation Table (RAT) to be recovered after Nuke due to all other cases except JEClear (e.g. whenever a ucode assist is needed like SSE exception, memory disambiguation, etc.)",
+        "BriefDescription": "Number of occurrences waiting for the woke checkpoints in Resource Allocation Table (RAT) to be recovered after Nuke due to all other cases except JEClear (e.g. whenever a ucode assist is needed like SSE exception, memory disambiguation, etc.)",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EdgeDetect": "1",
@@ -627,11 +627,11 @@
         "UMask": "0x3"
     },
     {
-        "BriefDescription": "This event counts the number of times that split load operations are temporarily blocked because all resources for handling the split accesses are in use.",
+        "BriefDescription": "This event counts the woke number of times that split load operations are temporarily blocked because all resources for handling the woke split accesses are in use.",
         "Counter": "0,1,2,3",
         "EventCode": "0x03",
         "EventName": "LD_BLOCKS.NO_SR",
-        "PublicDescription": "The number of times that split load operations are temporarily blocked because all resources for handling the split accesses are in use.",
+        "PublicDescription": "The number of times that split load operations are temporarily blocked because all resources for handling the woke split accesses are in use.",
         "SampleAfterValue": "100003",
         "UMask": "0x8"
     },
@@ -672,27 +672,27 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Cycles 4 Uops delivered by the LSD, but didn't come from the decoder",
+        "BriefDescription": "Cycles 4 Uops delivered by the woke LSD, but didn't come from the woke decoder",
         "Counter": "0,1,2,3",
         "CounterMask": "4",
         "EventCode": "0xA8",
         "EventName": "LSD.CYCLES_4_UOPS",
-        "PublicDescription": "Cycles 4 Uops delivered by the LSD, but didn't come from the decoder.",
+        "PublicDescription": "Cycles 4 Uops delivered by the woke LSD, but didn't come from the woke decoder.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Cycles Uops delivered by the LSD, but didn't come from the decoder",
+        "BriefDescription": "Cycles Uops delivered by the woke LSD, but didn't come from the woke decoder",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0xA8",
         "EventName": "LSD.CYCLES_ACTIVE",
-        "PublicDescription": "Cycles Uops delivered by the LSD, but didn't come from the decoder.",
+        "PublicDescription": "Cycles Uops delivered by the woke LSD, but didn't come from the woke decoder.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Number of Uops delivered by the LSD.",
+        "BriefDescription": "Number of Uops delivered by the woke LSD.",
         "Counter": "0,1,2,3",
         "EventCode": "0xA8",
         "EventName": "LSD.UOPS",
@@ -710,11 +710,11 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "This event counts the number of executed Intel AVX masked load operations that refer to an illegal address range with the mask bits set to 0.",
+        "BriefDescription": "This event counts the woke number of executed Intel AVX masked load operations that refer to an illegal address range with the woke mask bits set to 0.",
         "Counter": "0,1,2,3",
         "EventCode": "0xC3",
         "EventName": "MACHINE_CLEARS.MASKMOV",
-        "PublicDescription": "Counts the number of executed AVX masked load operations that refer to an illegal address range with the mask bits set to 0.",
+        "PublicDescription": "Counts the woke number of executed AVX masked load operations that refer to an illegal address range with the woke mask bits set to 0.",
         "SampleAfterValue": "100003",
         "UMask": "0x20"
     },
@@ -795,16 +795,16 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Cycles when Reservation Station (RS) is empty for the thread",
+        "BriefDescription": "Cycles when Reservation Station (RS) is empty for the woke thread",
         "Counter": "0,1,2,3",
         "EventCode": "0x5E",
         "EventName": "RS_EVENTS.EMPTY_CYCLES",
-        "PublicDescription": "Cycles the RS is empty for the thread.",
+        "PublicDescription": "Cycles the woke RS is empty for the woke thread.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts end of periods where the Reservation Station (RS) was empty. Could be useful to precisely locate Frontend Latency Bound issues.",
+        "BriefDescription": "Counts end of periods where the woke Reservation Station (RS) was empty. Could be useful to precisely locate Frontend Latency Bound issues.",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EdgeDetect": "1",
@@ -928,7 +928,7 @@
         "UMask": "0x80"
     },
     {
-        "BriefDescription": "Number of uops executed on the core.",
+        "BriefDescription": "Number of uops executed on the woke core.",
         "Counter": "0,1,2,3",
         "EventCode": "0xB1",
         "EventName": "UOPS_EXECUTED.CORE",
@@ -1037,7 +1037,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of uops to be executed per-thread each cycle.",
+        "BriefDescription": "Counts the woke number of uops to be executed per-thread each cycle.",
         "Counter": "0,1,2,3",
         "EventCode": "0xB1",
         "EventName": "UOPS_EXECUTED.THREAD",
@@ -1050,7 +1050,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x0E",
         "EventName": "UOPS_ISSUED.ANY",
-        "PublicDescription": "Increments each cycle the # of Uops issued by the RAT to RS. Set Cmask = 1, Inv = 1, Any= 1to count stalled cycles of this core.",
+        "PublicDescription": "Increments each cycle the woke # of Uops issued by the woke RAT to RS. Set Cmask = 1, Inv = 1, Any= 1to count stalled cycles of this core.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -1094,13 +1094,13 @@
         "UMask": "0x20"
     },
     {
-        "BriefDescription": "Cycles when Resource Allocation Table (RAT) does not issue Uops to Reservation Station (RS) for the thread",
+        "BriefDescription": "Cycles when Resource Allocation Table (RAT) does not issue Uops to Reservation Station (RS) for the woke thread",
         "Counter": "0,1,2,3",
         "CounterMask": "1",
         "EventCode": "0x0E",
         "EventName": "UOPS_ISSUED.STALL_CYCLES",
         "Invert": "1",
-        "PublicDescription": "Cycles when Resource Allocation Table (RAT) does not issue Uops to Reservation Station (RS) for the thread.",
+        "PublicDescription": "Cycles when Resource Allocation Table (RAT) does not issue Uops to Reservation Station (RS) for the woke thread.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },

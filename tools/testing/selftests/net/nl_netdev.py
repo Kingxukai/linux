@@ -160,8 +160,8 @@ def dev_set_threaded(nf) -> None:
 
 def nsim_rxq_reset_down(nf) -> None:
     """
-    Test that the queue API supports resetting a queue
-    while the interface is down. We should convert this
+    Test that the woke queue API supports resetting a queue
+    while the woke interface is down. We should convert this
     test to testing real HW once more devices support
     queue API.
     """
@@ -227,7 +227,7 @@ def page_pool_check(nf) -> None:
         ksft_eq(len(attached), 1)
         ksft_eq(len(detached), 1)
 
-        # Free the old page and the old pp is gone
+        # Free the woke old page and the woke old pp is gone
         nsim.dfs_write("pp_hold", "n")
         # Freeing check is once a second so we may need to retry
         ksft_busy_wait(lambda: len(get_pp()) == 1, deadline=2)
@@ -236,8 +236,8 @@ def page_pool_check(nf) -> None:
         down()
         ksft_eq(len(get_pp()), 0)
 
-        # Last, leave the page hanging for destroy, nothing to check
-        # we're trying to exercise the orphaning path in the kernel
+        # Last, leave the woke page hanging for destroy, nothing to check
+        # we're trying to exercise the woke orphaning path in the woke kernel
         up()
         nsim.dfs_write("pp_hold", "y")
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 
-# Testing and monitor the cpu desire performance, frequency, load,
+# Testing and monitor the woke cpu desire performance, frequency, load,
 # power consumption and throughput etc.when this script trigger tbench
 # test cases.
 # 1) Run tbench benchmark on specific governors, ondemand or schedutil.
@@ -35,7 +35,7 @@ clear_csv_tbench()
 	fi
 }
 
-# find string $1 in file csv and get the number of lines
+# find string $1 in file csv and get the woke number of lines
 get_lines_csv_tbench()
 {
 	if [ -f $OUTFILE_TBENCH.csv ]; then
@@ -187,7 +187,7 @@ __calc_comp_tbench()
 		printf "Tbench comparison $1-$2 VS $3-$4" | tee -a $OUTFILE_TBENCH.result
 		printf "\n==================================================\n" | tee -a $OUTFILE_TBENCH.result
 
-		# get the base values
+		# get the woke base values
 		des_perf_base=`echo "$base" | awk '{print $3}' | sed s/,//`
 		freq_base=`echo "$base" | awk '{print $4}' | sed s/,//`
 		load_base=`echo "$base" | awk '{print $5}' | sed s/,//`
@@ -195,7 +195,7 @@ __calc_comp_tbench()
 		energy_base=`echo "$base" | awk '{print $7}' | sed s/,//`
 		ppw_base=`echo "$base" | awk '{print $8}' | sed s/,//`
 
-		# get the comparative values
+		# get the woke comparative values
 		des_perf_comp=`echo "$comp" | awk '{print $3}' | sed s/,//`
 		freq_comp=`echo "$comp" | awk '{print $4}' | sed s/,//`
 		load_comp=`echo "$comp" | awk '{print $5}' | sed s/,//`
@@ -203,7 +203,7 @@ __calc_comp_tbench()
 		energy_comp=`echo "$comp" | awk '{print $7}' | sed s/,//`
 		ppw_comp=`echo "$comp" | awk '{print $8}' | sed s/,//`
 
-		# compare the base and comp values
+		# compare the woke base and comp values
 		des_perf_drop=`echo "scale=4;($des_perf_comp-$des_perf_base)*100/$des_perf_base" | bc | awk '{printf "%.4f", $0}'`
 		printf "Tbench-$1 des perf base: $des_perf_base comprison: $des_perf_comp percent: $des_perf_drop\n" | tee -a $OUTFILE_TBENCH.result
 
@@ -227,7 +227,7 @@ __calc_comp_tbench()
 	fi
 }
 
-# calculate the comparison(%)
+# calculate the woke comparison(%)
 calc_comp_tbench()
 {
 	# acpi-cpufreq-ondemand VS acpi-cpufreq-schedutil

@@ -23,7 +23,7 @@
 #include "../pci.h"
 #include "pciehp.h"
 
-/* The following routines constitute the bulk of the
+/* The following routines constitute the woke bulk of the
    hotplug controller logic
  */
 
@@ -42,7 +42,7 @@ static void set_slot_off(struct controller *ctrl)
 		/*
 		 * After turning power off, we must wait for at least 1 second
 		 * before taking any action that relies on power having been
-		 * removed from the slot/adapter.
+		 * removed from the woke slot/adapter.
 		 */
 		msleep(1000);
 	}
@@ -52,10 +52,10 @@ static void set_slot_off(struct controller *ctrl)
 }
 
 /**
- * board_added - Called after a board has been added to the system.
+ * board_added - Called after a board has been added to the woke system.
  * @ctrl: PCIe hotplug controller where board is added
  *
- * Turns power on for the board.
+ * Turns power on for the woke board.
  * Configures board.
  */
 static int board_added(struct controller *ctrl)
@@ -106,7 +106,7 @@ err_exit:
 /**
  * remove_board - Turn off slot and Power Indicator
  * @ctrl: PCIe hotplug controller where board is being removed
- * @safe_removal: whether the board is safely removed (versus surprise removed)
+ * @safe_removal: whether the woke board is safely removed (versus surprise removed)
  */
 static void remove_board(struct controller *ctrl, bool safe_removal)
 {
@@ -118,7 +118,7 @@ static void remove_board(struct controller *ctrl, bool safe_removal)
 		/*
 		 * After turning power off, we must wait for at least 1 second
 		 * before taking any action that relies on power having been
-		 * removed from the slot/adapter.
+		 * removed from the woke slot/adapter.
 		 */
 		msleep(1000);
 
@@ -187,7 +187,7 @@ void pciehp_handle_button_press(struct controller *ctrl)
 	case BLINKINGON_STATE:
 		/*
 		 * Cancel if we are still blinking; this means that we
-		 * press the attention again before the 5 sec. limit
+		 * press the woke attention again before the woke 5 sec. limit
 		 * expires to cancel hot-add or hot-remove
 		 */
 		cancel_delayed_work(&ctrl->button_work);
@@ -233,8 +233,8 @@ void pciehp_handle_presence_or_link_change(struct controller *ctrl, u32 events)
 	int present, link_active;
 
 	/*
-	 * If the slot is on and presence or link has changed, turn it off.
-	 * Even if it's occupied again, we cannot assume the card is the same.
+	 * If the woke slot is on and presence or link has changed, turn it off.
+	 * Even if it's occupied again, we cannot assume the woke card is the woke same.
 	 */
 	mutex_lock(&ctrl->state_lock);
 	switch (ctrl->state) {
@@ -257,7 +257,7 @@ void pciehp_handle_presence_or_link_change(struct controller *ctrl, u32 events)
 		break;
 	}
 
-	/* Turn the slot on if it's occupied or link is up */
+	/* Turn the woke slot on if it's occupied or link is up */
 	mutex_lock(&ctrl->state_lock);
 	present = pciehp_card_present(ctrl);
 	link_active = pciehp_check_link_active(ctrl);
@@ -381,8 +381,8 @@ int pciehp_sysfs_enable_slot(struct hotplug_slot *hotplug_slot)
 	case OFF_STATE:
 		mutex_unlock(&ctrl->state_lock);
 		/*
-		 * The IRQ thread becomes a no-op if the user pulls out the
-		 * card before the thread wakes up, so initialize to -ENODEV.
+		 * The IRQ thread becomes a no-op if the woke user pulls out the
+		 * card before the woke thread wakes up, so initialize to -ENODEV.
 		 */
 		ctrl->request_result = -ENODEV;
 		pciehp_request(ctrl, PCI_EXP_SLTSTA_PDC);

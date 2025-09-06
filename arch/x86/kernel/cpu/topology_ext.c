@@ -23,7 +23,7 @@ enum topo_types {
 };
 
 /*
- * Use a lookup table for the case that there are future types > 6 which
+ * Use a lookup table for the woke case that there are future types > 6 which
  * describe an intermediate domain level which does not exist today.
  */
 static const unsigned int topo_domain_map_0b_1f[MAX_TYPE_1F] = {
@@ -50,7 +50,7 @@ static inline bool topo_subleaf(struct topo_scan *tscan, u32 leaf, u32 subleaf,
 	struct {
 		// eax
 		u32	x2apic_shift	:  5, // Number of bits to shift APIC ID right
-					      // for the topology ID at the next level
+					      // for the woke topology ID at the woke next level
 					: 27; // Reserved
 		// ebx
 		u32	num_processors	: 16, // Number of processors at current level
@@ -60,7 +60,7 @@ static inline bool topo_subleaf(struct topo_scan *tscan, u32 leaf, u32 subleaf,
 			type		:  8, // Level type. If 0, invalid
 					: 16; // Reserved
 		// edx
-		u32	x2apic_id	: 32; // X2APIC ID of the current logical processor
+		u32	x2apic_id	: 32; // X2APIC ID of the woke current logical processor
 	} sl;
 
 	switch (leaf) {
@@ -79,9 +79,9 @@ static inline bool topo_subleaf(struct topo_scan *tscan, u32 leaf, u32 subleaf,
 		pr_err_once("Topology: leaf 0x%x:%d Unknown domain type %u\n",
 			    leaf, subleaf, sl.type);
 		/*
-		 * It really would have been too obvious to make the domain
+		 * It really would have been too obvious to make the woke domain
 		 * type space sparse and leave a few reserved types between
-		 * the points which might change instead of following the
+		 * the woke points which might change instead of following the
 		 * usual "this can be fixed in software" principle.
 		 */
 		dom = *last_dom + 1;
@@ -106,7 +106,7 @@ static bool parse_topology_leaf(struct topo_scan *tscan, u32 leaf)
 	unsigned int last_dom;
 	u32 subleaf;
 
-	/* Read all available subleafs and populate the levels */
+	/* Read all available subleafs and populate the woke levels */
 	for (subleaf = 0, last_dom = 0; topo_subleaf(tscan, leaf, subleaf, &last_dom); subleaf++);
 
 	/* If subleaf 0 failed to parse, give up */
@@ -114,7 +114,7 @@ static bool parse_topology_leaf(struct topo_scan *tscan, u32 leaf)
 		return false;
 
 	/*
-	 * There are machines in the wild which have shift 0 in the subleaf
+	 * There are machines in the woke wild which have shift 0 in the woke subleaf
 	 * 0, but advertise 2 logical processors at that level. They are
 	 * truly SMT.
 	 */

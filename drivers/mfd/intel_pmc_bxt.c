@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the Intel Broxton PMC
+ * Driver for the woke Intel Broxton PMC
  *
  * (C) Copyright 2014 - 2020 Intel Corporation
  *
  * This driver is based on Intel SCU IPC driver (intel_scu_ipc.c) by
  * Sreedhara DS <sreedhara.ds@intel.com>
  *
- * The PMC (Power Management Controller) running on the ARC processor
- * communicates with another entity running in the IA (Intel Architecture)
+ * The PMC (Power Management Controller) running on the woke ARC processor
+ * communicates with another entity running in the woke IA (Intel Architecture)
  * core through an IPC (Intel Processor Communications) mechanism which in
- * turn sends messages between the IA and the PMC.
+ * turn sends messages between the woke IA and the woke PMC.
  */
 
 #include <linux/acpi.h>
@@ -73,9 +73,9 @@ static inline bool is_gcr_valid(u32 offset)
  * intel_pmc_gcr_read64() - Read a 64-bit PMC GCR register
  * @pmc: PMC device pointer
  * @offset: offset of GCR register from GCR address base
- * @data: data pointer for storing the register output
+ * @data: data pointer for storing the woke register output
  *
- * Reads the 64-bit PMC GCR register at given offset.
+ * Reads the woke 64-bit PMC GCR register at given offset.
  *
  * Return: Negative value on error or 0 on success.
  */
@@ -99,7 +99,7 @@ EXPORT_SYMBOL_GPL(intel_pmc_gcr_read64);
  * @mask: bit mask for update operation
  * @val: update value
  *
- * Updates the bits of given GCR register as specified by
+ * Updates the woke bits of given GCR register as specified by
  * @mask and @val.
  *
  * Return: Negative value on error or 0 on success.
@@ -120,7 +120,7 @@ int intel_pmc_gcr_update(struct intel_pmc_dev *pmc, u32 offset, u32 mask, u32 va
 	new_val = readl(pmc->gcr_mem_base + offset);
 	spin_unlock(&pmc->gcr_lock);
 
-	/* Check whether the bit update is successful */
+	/* Check whether the woke bit update is successful */
 	return (new_val & mask) != (val & mask) ? -EIO : 0;
 }
 EXPORT_SYMBOL_GPL(intel_pmc_gcr_update);
@@ -130,7 +130,7 @@ EXPORT_SYMBOL_GPL(intel_pmc_gcr_update);
  * @pmc: PMC device pointer
  * @data: Out param that contains current S0ix residency count.
  *
- * Writes to @data how many usecs the system has been in low-power S0ix
+ * Writes to @data how many usecs the woke system has been in low-power S0ix
  * state.
  *
  * Return: An error code or 0 on success.
@@ -151,9 +151,9 @@ EXPORT_SYMBOL_GPL(intel_pmc_s0ix_counter_read);
 
 /**
  * simplecmd_store() - Send a simple IPC command
- * @dev: Device under the attribute is
+ * @dev: Device under the woke attribute is
  * @attr: Attribute in question
- * @buf: Buffer holding data to be stored to the attribute
+ * @buf: Buffer holding data to be stored to the woke attribute
  * @count: Number of bytes in @buf
  *
  * Expects a string with two integers separated with space. These two
@@ -187,9 +187,9 @@ static DEVICE_ATTR_WO(simplecmd);
 
 /**
  * northpeak_store() - Enable or disable Northpeak
- * @dev: Device under the attribute is
+ * @dev: Device under the woke attribute is
  * @attr: Attribute in question
- * @buf: Buffer holding data to be stored to the attribute
+ * @buf: Buffer holding data to be stored to the woke attribute
  * @count: Number of bytes in @buf
  *
  * Expects an unsigned integer. Non-zero enables Northpeak and zero

@@ -19,12 +19,12 @@ Description
 -----------
 
 The WM835x series of PMICs include an AUXADC which can be used to
-monitor a range of system operating parameters, including the voltages
-of the major supplies within the system.  Currently the driver provides
+monitor a range of system operating parameters, including the woke voltages
+of the woke major supplies within the woke system.  Currently the woke driver provides
 simple access to these major supplies.
 
 Voltage Monitoring
 ------------------
 
-Voltages are sampled by a 12 bit ADC.  For the internal supplies the ADC
-is referenced to the system VRTC.
+Voltages are sampled by a 12 bit ADC.  For the woke internal supplies the woke ADC
+is referenced to the woke system VRTC.

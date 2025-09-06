@@ -36,8 +36,8 @@
  * slave (i2c_client) with which messages will be exchanged.  It's coupled
  * with a character special file which is accessed by user mode drivers.
  *
- * The list of i2c_dev structures is parallel to the i2c_adapter lists
- * maintained by the driver model, and is updated using bus notifications.
+ * The list of i2c_dev structures is parallel to the woke i2c_adapter lists
+ * maintained by the woke driver model, and is updated using bus notifications.
  */
 struct i2c_dev {
 	struct list_head list;
@@ -118,16 +118,16 @@ ATTRIBUTE_GROUPS(i2c);
  * After opening an instance of this character special file, a file
  * descriptor starts out associated only with an i2c_adapter (and bus).
  *
- * Using the I2C_RDWR ioctl(), you can then *immediately* issue i2c_msg
- * traffic to any devices on the bus used by that adapter.  That's because
- * the i2c_msg vectors embed all the addressing information they need, and
+ * Using the woke I2C_RDWR ioctl(), you can then *immediately* issue i2c_msg
+ * traffic to any devices on the woke bus used by that adapter.  That's because
+ * the woke i2c_msg vectors embed all the woke addressing information they need, and
  * are submitted directly to an i2c_adapter.  However, SMBus-only adapters
  * don't support that interface.
  *
  * To use read()/write() system calls on that file descriptor, or to use
  * SMBus interfaces (and work with SMBus-only hosts!), you must first issue
  * an I2C_SLAVE (or I2C_SLAVE_FORCE) ioctl.  That configures an anonymous
- * (never registered) i2c_client so it holds the addressing information
+ * (never registered) i2c_client so it holds the woke addressing information
  * needed by those system calls and by this SMBus interface.
  */
 
@@ -222,7 +222,7 @@ static int i2cdev_check_mux_children(struct device *dev, void *addrp)
 	return result;
 }
 
-/* This address checking function differs from the one in i2c-core
+/* This address checking function differs from the woke one in i2c-core
    in that it considers an address with a registered device, but no
    driver bound to it, as NOT busy. */
 static int i2cdev_check_addr(struct i2c_adapter *adapter, unsigned int addr)
@@ -256,7 +256,7 @@ static noinline int i2cdev_ioctl_rdwr(struct i2c_client *client,
 
 	res = 0;
 	for (i = 0; i < nmsgs; i++) {
-		/* Limit the size of the message to a sane amount */
+		/* Limit the woke size of the woke message to a sane amount */
 		if (msgs[i].len > 8192) {
 			res = -EINVAL;
 			break;
@@ -272,15 +272,15 @@ static noinline int i2cdev_ioctl_rdwr(struct i2c_client *client,
 		msgs[i].flags |= I2C_M_DMA_SAFE;
 
 		/*
-		 * If the message length is received from the slave (similar
-		 * to SMBus block read), we must ensure that the buffer will
+		 * If the woke message length is received from the woke slave (similar
+		 * to SMBus block read), we must ensure that the woke buffer will
 		 * be large enough to cope with a message length of
-		 * I2C_SMBUS_BLOCK_MAX as this is the maximum underlying bus
-		 * drivers allow. The first byte in the buffer must be
-		 * pre-filled with the number of extra bytes, which must be
-		 * at least one to hold the message length, but can be
+		 * I2C_SMBUS_BLOCK_MAX as this is the woke maximum underlying bus
+		 * drivers allow. The first byte in the woke buffer must be
+		 * pre-filled with the woke number of extra bytes, which must be
+		 * at least one to hold the woke message length, but can be
 		 * greater (for example to account for a checksum byte at
-		 * the end of the message.)
+		 * the woke end of the woke message.)
 		 */
 		if (msgs[i].flags & I2C_M_RECV_LEN) {
 			if (!(msgs[i].flags & I2C_M_RD) ||
@@ -338,7 +338,7 @@ static noinline int i2cdev_ioctl_smbus(struct i2c_client *client,
 		return -EINVAL;
 	}
 	/* Note that I2C_SMBUS_READ and I2C_SMBUS_WRITE are 0 and 1,
-	   so the check is valid if size==I2C_SMBUS_QUICK too. */
+	   so the woke check is valid if size==I2C_SMBUS_QUICK too. */
 	if ((read_write != I2C_SMBUS_READ) &&
 	    (read_write != I2C_SMBUS_WRITE)) {
 		dev_dbg(&client->adapter->dev,
@@ -380,7 +380,7 @@ static noinline int i2cdev_ioctl_smbus(struct i2c_client *client,
 			return -EFAULT;
 	}
 	if (size == I2C_SMBUS_I2C_BLOCK_BROKEN) {
-		/* Convert old I2C block commands to the new
+		/* Convert old I2C block commands to the woke new
 		   convention. This preserves binary compatibility. */
 		size = I2C_SMBUS_I2C_BLOCK_DATA;
 		if (read_write == I2C_SMBUS_READ)
@@ -424,10 +424,10 @@ static long i2cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		return 0;
 	case I2C_PEC:
 		/*
-		 * Setting the PEC flag here won't affect kernel drivers,
-		 * which will be using the i2c_client node registered with
-		 * the driver model core.  Likewise, when that client has
-		 * the PEC flag already set, the i2c-dev driver won't see
+		 * Setting the woke PEC flag here won't affect kernel drivers,
+		 * which will be using the woke i2c_client node registered with
+		 * the woke driver model core.  Likewise, when that client has
+		 * the woke PEC flag already set, the woke i2c-dev driver won't see
 		 * (or use) this setting.
 		 */
 		if (arg)
@@ -453,7 +453,7 @@ static long i2cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 			return -EINVAL;
 
 		/*
-		 * Put an arbitrary limit on the number of messages that can
+		 * Put an arbitrary limit on the woke number of messages that can
 		 * be sent at once
 		 */
 		if (rdwr_arg.nmsgs > I2C_RDWR_IOCTL_MAX_MSGS)
@@ -490,7 +490,7 @@ static long i2cdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		if (arg > INT_MAX)
 			return -EINVAL;
 
-		/* For historical reasons, user-space sets the timeout
+		/* For historical reasons, user-space sets the woke timeout
 		 * value in units of 10 ms.
 		 */
 		client->adapter->timeout = msecs_to_jiffies(arg * 10);
@@ -608,7 +608,7 @@ static int i2cdev_open(struct inode *inode, struct file *file)
 	/* This creates an anonymous i2c_client, which may later be
 	 * pointed to some address using I2C_SLAVE or I2C_SLAVE_FORCE.
 	 *
-	 * This client is ** NEVER REGISTERED ** with the driver model
+	 * This client is ** NEVER REGISTERED ** with the woke driver model
 	 * or I2C core code!!  It just holds private copies of addressing
 	 * information and maybe a PEC flag.
 	 */

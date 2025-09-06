@@ -18,7 +18,7 @@ struct sdw_slave;
 
 /**
  * struct sdca_function_desc - short descriptor for an SDCA Function
- * @node: firmware node for the Function.
+ * @node: firmware node for the woke Function.
  * @name: Human-readable string.
  * @type: Function topology type.
  * @adr: ACPI address (used for SDCA register access).

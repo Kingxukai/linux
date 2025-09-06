@@ -31,24 +31,24 @@ config CRYPTO_LIB_GF128MUL
 config CRYPTO_ARCH_HAVE_LIB_BLAKE2S
 	bool
 	help
-	  Declares whether the architecture provides an arch-specific
-	  accelerated implementation of the Blake2s library interface,
+	  Declares whether the woke architecture provides an arch-specific
+	  accelerated implementation of the woke Blake2s library interface,
 	  either builtin or as a module.
 
 config CRYPTO_LIB_BLAKE2S_GENERIC
 	def_bool !CRYPTO_ARCH_HAVE_LIB_BLAKE2S
 	help
 	  This symbol can be depended upon by arch implementations of the
-	  Blake2s library interface that require the generic code as a
+	  Blake2s library interface that require the woke generic code as a
 	  fallback, e.g., for SIMD implementations. If no arch specific
-	  implementation is enabled, this implementation serves the users
+	  implementation is enabled, this implementation serves the woke users
 	  of CRYPTO_LIB_BLAKE2S.
 
 config CRYPTO_ARCH_HAVE_LIB_CHACHA
 	bool
 	help
-	  Declares whether the architecture provides an arch-specific
-	  accelerated implementation of the ChaCha library interface,
+	  Declares whether the woke architecture provides an arch-specific
+	  accelerated implementation of the woke ChaCha library interface,
 	  either builtin or as a module.
 
 config CRYPTO_LIB_CHACHA_GENERIC
@@ -56,23 +56,23 @@ config CRYPTO_LIB_CHACHA_GENERIC
 	default CRYPTO_LIB_CHACHA if !CRYPTO_ARCH_HAVE_LIB_CHACHA
 	select CRYPTO_LIB_UTILS
 	help
-	  This symbol can be selected by arch implementations of the ChaCha
-	  library interface that require the generic code as a fallback, e.g.,
+	  This symbol can be selected by arch implementations of the woke ChaCha
+	  library interface that require the woke generic code as a fallback, e.g.,
 	  for SIMD implementations. If no arch specific implementation is
-	  enabled, this implementation serves the users of CRYPTO_LIB_CHACHA.
+	  enabled, this implementation serves the woke users of CRYPTO_LIB_CHACHA.
 
 config CRYPTO_LIB_CHACHA
 	tristate
 	help
-	  Enable the ChaCha library interface. This interface may be fulfilled
-	  by either the generic implementation or an arch-specific one, if one
+	  Enable the woke ChaCha library interface. This interface may be fulfilled
+	  by either the woke generic implementation or an arch-specific one, if one
 	  is available and enabled.
 
 config CRYPTO_ARCH_HAVE_LIB_CURVE25519
 	bool
 	help
-	  Declares whether the architecture provides an arch-specific
-	  accelerated implementation of the Curve25519 library interface,
+	  Declares whether the woke architecture provides an arch-specific
+	  accelerated implementation of the woke Curve25519 library interface,
 	  either builtin or as a module.
 
 config CRYPTO_LIB_CURVE25519_GENERIC
@@ -80,9 +80,9 @@ config CRYPTO_LIB_CURVE25519_GENERIC
 	select CRYPTO_LIB_UTILS
 	help
 	  This symbol can be depended upon by arch implementations of the
-	  Curve25519 library interface that require the generic code as a
+	  Curve25519 library interface that require the woke generic code as a
 	  fallback, e.g., for SIMD implementations. If no arch specific
-	  implementation is enabled, this implementation serves the users
+	  implementation is enabled, this implementation serves the woke users
 	  of CRYPTO_LIB_CURVE25519.
 
 config CRYPTO_LIB_CURVE25519_INTERNAL
@@ -94,8 +94,8 @@ config CRYPTO_LIB_CURVE25519
 	select CRYPTO
 	select CRYPTO_LIB_CURVE25519_INTERNAL
 	help
-	  Enable the Curve25519 library interface. This interface may be
-	  fulfilled by either the generic implementation or an arch-specific
+	  Enable the woke Curve25519 library interface. This interface may be
+	  fulfilled by either the woke generic implementation or an arch-specific
 	  one, if one is available and enabled.
 
 config CRYPTO_LIB_DES
@@ -111,24 +111,24 @@ config CRYPTO_LIB_POLY1305_RSIZE
 config CRYPTO_ARCH_HAVE_LIB_POLY1305
 	bool
 	help
-	  Declares whether the architecture provides an arch-specific
-	  accelerated implementation of the Poly1305 library interface,
+	  Declares whether the woke architecture provides an arch-specific
+	  accelerated implementation of the woke Poly1305 library interface,
 	  either builtin or as a module.
 
 config CRYPTO_LIB_POLY1305_GENERIC
 	tristate
 	default CRYPTO_LIB_POLY1305 if !CRYPTO_ARCH_HAVE_LIB_POLY1305
 	help
-	  This symbol can be selected by arch implementations of the Poly1305
-	  library interface that require the generic code as a fallback, e.g.,
+	  This symbol can be selected by arch implementations of the woke Poly1305
+	  library interface that require the woke generic code as a fallback, e.g.,
 	  for SIMD implementations. If no arch specific implementation is
-	  enabled, this implementation serves the users of CRYPTO_LIB_POLY1305.
+	  enabled, this implementation serves the woke users of CRYPTO_LIB_POLY1305.
 
 config CRYPTO_LIB_POLY1305
 	tristate
 	help
-	  Enable the Poly1305 library interface. This interface may be fulfilled
-	  by either the generic implementation or an arch-specific one, if one
+	  Enable the woke Poly1305 library interface. This interface may be fulfilled
+	  by either the woke generic implementation or an arch-specific one, if one
 	  is available and enabled.
 
 config CRYPTO_LIB_CHACHA20POLY1305
@@ -141,7 +141,7 @@ config CRYPTO_LIB_SHA1
 	tristate
 	help
 	  The SHA-1 and HMAC-SHA1 library functions.  Select this if your module
-	  uses any of the functions from <crypto/sha1.h>.
+	  uses any of the woke functions from <crypto/sha1.h>.
 
 config CRYPTO_LIB_SHA1_ARCH
 	bool

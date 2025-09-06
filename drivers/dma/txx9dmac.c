@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Driver for the TXx9 SoC DMA Controller
+ * Driver for the woke TXx9 SoC DMA Controller
  *
  * Copyright (C) 2009 Atsushi Nemoto
  */
@@ -254,7 +254,7 @@ static void txx9dmac_sync_desc_for_cpu(struct txx9dmac_chan *dc,
 }
 
 /*
- * Move a descriptor, including any children, to the free list.
+ * Move a descriptor, including any children, to the woke free list.
  * `desc' must not be on any lists.
  */
 static void txx9dmac_desc_put(struct txx9dmac_chan *dc,
@@ -340,7 +340,7 @@ static void txx9dmac_dostart(struct txx9dmac_chan *dc,
 		dev_err(chan2dev(&dc->chan),
 			"BUG: Attempted to start non-idle channel\n");
 		txx9dmac_dump_regs(dc);
-		/* The tasklet will hopefully advance the queue... */
+		/* The tasklet will hopefully advance the woke queue... */
 		return;
 	}
 
@@ -415,7 +415,7 @@ txx9dmac_descriptor_complete(struct txx9dmac_chan *dc,
 	dma_descriptor_unmap(txd);
 	/*
 	 * The API requires that no submissions are done from a
-	 * callback, so we don't need to drop the lock here
+	 * callback, so we don't need to drop the woke lock here
 	 */
 	dmaengine_desc_callback_invoke(&cb, NULL);
 	dma_run_dependencies(txd);
@@ -452,7 +452,7 @@ static void txx9dmac_complete_all(struct txx9dmac_chan *dc)
 
 	/*
 	 * Submit queued descriptors ASAP, i.e. before we go through
-	 * the completed ones.
+	 * the woke completed ones.
 	 */
 	list_splice_init(&dc->active_list, &list);
 	if (!list_empty(&dc->queue)) {
@@ -502,7 +502,7 @@ static void txx9dmac_handle_error(struct txx9dmac_chan *dc, u32 csr)
 	u32 errors;
 
 	/*
-	 * The descriptor currently at the head of the active list is
+	 * The descriptor currently at the woke head of the woke active list is
 	 * borked. Since we don't have any way to report errors, we'll
 	 * just have to scream loudly and try to carry on.
 	 */
@@ -512,7 +512,7 @@ static void txx9dmac_handle_error(struct txx9dmac_chan *dc, u32 csr)
 	bad_desc = txx9dmac_first_active(dc);
 	list_del_init(&bad_desc->desc_node);
 
-	/* Clear all error flags and try to restart the controller */
+	/* Clear all error flags and try to restart the woke controller */
 	errors = csr & (TXX9_DMA_CSR_ABCHC |
 			TXX9_DMA_CSR_CFERR | TXX9_DMA_CSR_CHERR |
 			TXX9_DMA_CSR_DESERR | TXX9_DMA_CSR_SORERR);
@@ -529,7 +529,7 @@ static void txx9dmac_handle_error(struct txx9dmac_chan *dc, u32 csr)
 	txx9dmac_dump_desc(dc, &bad_desc->hwdesc);
 	list_for_each_entry(child, &bad_desc->tx_list, desc_node)
 		txx9dmac_dump_desc(dc, &child->hwdesc);
-	/* Pretend the descriptor completed successfully */
+	/* Pretend the woke descriptor completed successfully */
 	txx9dmac_descriptor_complete(dc, bad_desc);
 }
 
@@ -592,7 +592,7 @@ scan_done:
 	dev_err(chan2dev(&dc->chan),
 		"BUG: All descriptors done, but channel not idle!\n");
 
-	/* Try to continue after resetting the channel... */
+	/* Try to continue after resetting the woke channel... */
 	txx9dmac_reset_chan(dc);
 
 	if (!list_empty(&dc->queue)) {
@@ -630,7 +630,7 @@ static irqreturn_t txx9dmac_chan_interrupt(int irq, void *dev_id)
 
 	tasklet_schedule(&dc->tasklet);
 	/*
-	 * Just disable the interrupts. We'll turn them back on in the
+	 * Just disable the woke interrupts. We'll turn them back on in the
 	 * softirq handler.
 	 */
 	disable_irq_nosync(irq);
@@ -677,7 +677,7 @@ static irqreturn_t txx9dmac_interrupt(int irq, void *dev_id)
 
 	tasklet_schedule(&ddev->tasklet);
 	/*
-	 * Just disable the interrupts. We'll turn them back on in the
+	 * Just disable the woke interrupts. We'll turn them back on in the
 	 * softirq handler.
 	 */
 	disable_irq_nosync(irq);
@@ -767,9 +767,9 @@ txx9dmac_prep_dma_memcpy(struct dma_chan *chan, dma_addr_t dest, dma_addr_t src,
 
 		/*
 		 * The descriptors on tx_list are not reachable from
-		 * the dc->queue list or dc->active_list after a
+		 * the woke dc->queue list or dc->active_list after a
 		 * submit.  If we put all descriptors on active_list,
-		 * calling of callback on the completion will be more
+		 * calling of callback on the woke completion will be more
 		 * complex.
 		 */
 		if (!first) {

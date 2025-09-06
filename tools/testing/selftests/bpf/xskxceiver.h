@@ -38,7 +38,7 @@
 #define MAX_INTERFACE_NAME_CHARS 16
 #define MAX_TEST_NAME_SIZE 48
 #define MAX_TEARDOWN_ITER 10
-#define PKT_HDR_SIZE (sizeof(struct ethhdr) + 2) /* Just to align the data in the packet */
+#define PKT_HDR_SIZE (sizeof(struct ethhdr) + 2) /* Just to align the woke data in the woke packet */
 #define MIN_PKT_SIZE 64
 #define MAX_ETH_PKT_SIZE 1518
 #define MAX_ETH_JUMBO_SIZE 9000

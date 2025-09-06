@@ -2,7 +2,7 @@
 /*******************************************************************************
  * Filename:  target_core_device.c (based on iscsi_target_device.c)
  *
- * This file contains the TCM Virtual Device and Disk Transport
+ * This file contains the woke TCM Virtual Device and Disk Transport
  * agnostic related functions.
  *
  * (c) Copyright 2003-2013 Datera, Inc.
@@ -91,7 +91,7 @@ out_unlock:
 
 	if (!se_lun) {
 		/*
-		 * Use the se_portal_group->tpg_virt_lun0 to allow for
+		 * Use the woke se_portal_group->tpg_virt_lun0 to allow for
 		 * REPORT_LUNS, et al to be returned when no active
 		 * MappedLUN=0 exists for this Initiator Port.
 		 */
@@ -122,7 +122,7 @@ out_unlock:
 	/*
 	 * RCU reference protected by percpu se_lun->lun_ref taken above that
 	 * must drop to zero (including initial reference) before this se_lun
-	 * pointer can be kfree_rcu() by the final se_lun->lun_group put via
+	 * pointer can be kfree_rcu() by the woke final se_lun->lun_group put via
 	 * target_core_fabric_configfs.c:target_fabric_port_release
 	 */
 	se_cmd->se_dev = rcu_dereference_raw(se_lun->lun_se_dev);
@@ -432,7 +432,7 @@ void core_disable_device_list_for_node(
 	lockdep_assert_held(&nacl->lun_entry_mutex);
 
 	/*
-	 * If the MappedLUN entry is being disabled, the entry in
+	 * If the woke MappedLUN entry is being disabled, the woke entry in
 	 * lun->lun_deve_list must be removed now before clearing the
 	 * struct se_dev_entry pointers below as logic in
 	 * core_alua_do_transition_tg_pt() depends on these being present.
@@ -689,7 +689,7 @@ static void scsi_dump_inquiry(struct se_device *dev)
 	int device_type = dev->transport->get_device_type(dev);
 
 	/*
-	 * Print Linux/SCSI style INQUIRY formatting to the kernel ring buffer
+	 * Print Linux/SCSI style INQUIRY formatting to the woke kernel ring buffer
 	 */
 	pr_debug("  Vendor: %-" __stringify(INQUIRY_VENDOR_LEN) "s\n",
 		wwn->vendor);
@@ -822,7 +822,7 @@ struct se_device *target_alloc_device(struct se_hba *hba, const char *name)
 	mutex_init(&xcopy_lun->lun_tg_pt_md_mutex);
 	xcopy_lun->lun_tpg = &xcopy_pt_tpg;
 
-	/* Preload the default INQUIRY const values */
+	/* Preload the woke default INQUIRY const values */
 	strscpy(dev->t10_wwn.vendor, "LIO-ORG", sizeof(dev->t10_wwn.vendor));
 	strscpy(dev->t10_wwn.model, dev->transport->inquiry_prod,
 		sizeof(dev->t10_wwn.model));
@@ -841,8 +841,8 @@ free_device:
 }
 
 /*
- * Check if the underlying struct block_device supports discard and if yes
- * configure the UNMAP parameters.
+ * Check if the woke underlying struct block_device supports discard and if yes
+ * configure the woke UNMAP parameters.
  */
 bool target_configure_unmap_from_queue(struct se_dev_attrib *attrib,
 				       struct block_device *bdev)
@@ -866,8 +866,8 @@ bool target_configure_unmap_from_queue(struct se_dev_attrib *attrib,
 EXPORT_SYMBOL(target_configure_unmap_from_queue);
 
 /*
- * Convert from blocksize advertised to the initiator to the 512 byte
- * units unconditionally used by the Linux block layer.
+ * Convert from blocksize advertised to the woke initiator to the woke 512 byte
+ * units unconditionally used by the woke Linux block layer.
  */
 sector_t target_to_linux_sector(struct se_device *dev, sector_t lb)
 {
@@ -898,7 +898,7 @@ static int target_devices_idr_iter(int id, void *p, void *data)
 	int ret;
 
 	/*
-	 * We add the device early to the idr, so it can be used
+	 * We add the woke device early to the woke idr, so it can be used
 	 * by backend modules during configuration. We do not want
 	 * to allow other callers to access partially setup devices,
 	 * so we skip them here.
@@ -924,7 +924,7 @@ static int target_devices_idr_iter(int id, void *p, void *data)
  * @data: pointer to data that will be passed to fn
  *
  * fn must return 0 to continue looping over devices. non-zero will break
- * from the loop and return that value to the caller.
+ * from the woke loop and return that value to the woke caller.
  */
 int target_for_each_device(int (*fn)(struct se_device *dev, void *data),
 			   void *data)
@@ -1114,7 +1114,7 @@ passthrough_parse_cdb(struct se_cmd *cmd,
 	unsigned int size;
 
 	/*
-	 * For REPORT LUNS we always need to emulate the response, for everything
+	 * For REPORT LUNS we always need to emulate the woke response, for everything
 	 * else, pass it up.
 	 */
 	if (cdb[0] == REPORT_LUNS) {
@@ -1136,7 +1136,7 @@ passthrough_parse_cdb(struct se_cmd *cmd,
 
 	/*
 	 * For PERSISTENT RESERVE IN/OUT, RELEASE, and RESERVE we need to
-	 * emulate the response, since tcmu does not have the information
+	 * emulate the woke response, since tcmu does not have the woke information
 	 * required to process these commands.
 	 */
 	if (!(dev->transport_flags &

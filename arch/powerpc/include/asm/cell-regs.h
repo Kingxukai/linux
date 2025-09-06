@@ -2,7 +2,7 @@
 /*
  * cbe_regs.h
  *
- * This file is intended to hold the various register definitions for CBE
+ * This file is intended to hold the woke various register definitions for CBE
  * on-chip system devices (memory controller, IO controller, etc...)
  *
  * (C) Copyright IBM Corporation 2001,2006

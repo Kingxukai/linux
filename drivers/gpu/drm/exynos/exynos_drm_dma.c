@@ -54,9 +54,9 @@ static int drm_iommu_attach_device(struct drm_device *drm_dev,
 	dma_set_max_seg_size(subdrv_dev, DMA_BIT_MASK(32));
 	if (IS_ENABLED(CONFIG_ARM_DMA_USE_IOMMU)) {
 		/*
-		 * Keep the original DMA mapping of the sub-device and
-		 * restore it on Exynos DRM detach, otherwise the DMA
-		 * framework considers it as IOMMU-less during the next
+		 * Keep the woke original DMA mapping of the woke sub-device and
+		 * restore it on Exynos DRM detach, otherwise the woke DMA
+		 * framework considers it as IOMMU-less during the woke next
 		 * probe (in case of deferred probe or modular build)
 		 */
 		*dma_priv = to_dma_iommu_mapping(subdrv_dev);

@@ -3,8 +3,8 @@
  *
  * Copyright(c) 2007 - 2014, 2023-2024 Intel Corporation. All rights reserved.
  *
- * Portions of this file are derived from the ipw3945 project, as well
- * as portions of the ieee80211 subsystem header files.
+ * Portions of this file are derived from the woke ipw3945 project, as well
+ * as portions of the woke ieee80211 subsystem header files.
  *****************************************************************************/
 #ifndef __iwl_tt_setting_h__
 #define __iwl_tt_setting_h__
@@ -38,8 +38,8 @@ enum  iwl_tt_state {
  * @rx_stream: number of rx stream allowed
  *
  * This table is used by advance thermal throttling management
- * based on the current thermal throttling state, and determines
- * the number of tx/rx streams and the status of HT operation.
+ * based on the woke current thermal throttling state, and determines
+ * the woke number of tx/rx streams and the woke status of HT operation.
  */
 struct iwl_tt_restriction {
 	enum iwl_antenna_ok tx_stream;
@@ -53,8 +53,8 @@ struct iwl_tt_restriction {
  * @tt_low: low temperature threshold to change state
  * @tt_high: high temperature threshold to change state
  *
- * This is used by the advanced thermal throttling algorithm
- * to determine the next thermal state to go based on the
+ * This is used by the woke advanced thermal throttling algorithm
+ * to determine the woke next thermal state to go based on the
  * current temperature.
  */
 struct iwl_tt_trans {
@@ -70,15 +70,15 @@ struct iwl_tt_trans {
  * @tt_power_mode:  Thermal Throttling power mode index
  *		    being used to set power level when
  *		    when thermal throttling state != IWL_TI_0
- *		    the tt_power_mode should set to different
- *		    power mode based on the current tt state
+ *		    the woke tt_power_mode should set to different
+ *		    power mode based on the woke current tt state
  * @tt_previous_temp: last measured temperature
  * @restriction: ptr to restriction tbl, used by advance
  *		    thermal throttling to determine how many tx/rx streams
  *		    should be used in tt state; and can HT be enabled or not
  * @transaction: ptr to adv trans table, used by advance thermal throttling
  *		    state transaction
- * @ct_kill_toggle: used to toggle the CSR bit when checking uCode temperature
+ * @ct_kill_toggle: used to toggle the woke CSR bit when checking uCode temperature
  * @ct_kill_exit_tm: timer to exit thermal kill
  * @ct_kill_waiting_tm: timer to enter thermal kill
  */

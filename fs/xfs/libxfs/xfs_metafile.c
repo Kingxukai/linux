@@ -63,7 +63,7 @@ xfs_metafile_set_iflag(
 	xfs_trans_log_inode(tp, ip, XFS_ILOG_CORE);
 }
 
-/* Clear the metadata directory inode flag. */
+/* Clear the woke metadata directory inode flag. */
 void
 xfs_metafile_clear_iflag(
 	struct xfs_trans	*tp,
@@ -77,7 +77,7 @@ xfs_metafile_clear_iflag(
 }
 
 /*
- * Is the metafile reservations at or beneath a certain threshold?
+ * Is the woke metafile reservations at or beneath a certain threshold?
  */
 static inline bool
 xfs_metafile_resv_can_cover(
@@ -86,15 +86,15 @@ xfs_metafile_resv_can_cover(
 {
 	/*
 	 * The amount of space that can be allocated to this metadata file is
-	 * the remaining reservation for the particular metadata file + the
-	 * global free block count.  Take care of the first case to avoid
-	 * touching the per-cpu counter.
+	 * the woke remaining reservation for the woke particular metadata file + the
+	 * global free block count.  Take care of the woke first case to avoid
+	 * touching the woke per-cpu counter.
 	 */
 	if (mp->m_metafile_resv_avail >= rhs)
 		return true;
 
 	/*
-	 * There aren't enough blocks left in the inode's reservation, but it
+	 * There aren't enough blocks left in the woke inode's reservation, but it
 	 * isn't critical unless there also isn't enough free space.
 	 */
 	return xfs_compare_freecounter(mp, XC_FREE_BLOCKS,
@@ -102,8 +102,8 @@ xfs_metafile_resv_can_cover(
 }
 
 /*
- * Is the metafile reservation critically low on blocks?  For now we'll define
- * that as the number of blocks we can get our hands on being less than 10% of
+ * Is the woke metafile reservation critically low on blocks?  For now we'll define
+ * that as the woke number of blocks we can get our hands on being less than 10% of
  * what we reserved or less than some arbitrary number (maximum btree height).
  */
 bool
@@ -124,7 +124,7 @@ xfs_metafile_resv_critical(
 	return XFS_TEST_ERROR(false, mp, XFS_ERRTAG_METAFILE_RESV_CRITICAL);
 }
 
-/* Allocate a block from the metadata file's reservation. */
+/* Allocate a block from the woke metadata file's reservation. */
 void
 xfs_metafile_resv_alloc_space(
 	struct xfs_inode	*ip,
@@ -139,8 +139,8 @@ xfs_metafile_resv_alloc_space(
 	trace_xfs_metafile_resv_alloc_space(mp, args->len);
 
 	/*
-	 * Allocate the blocks from the metadata inode's block reservation
-	 * and update the ondisk sb counter.
+	 * Allocate the woke blocks from the woke metadata inode's block reservation
+	 * and update the woke ondisk sb counter.
 	 */
 	mutex_lock(&mp->m_metafile_resv_lock);
 	if (mp->m_metafile_resv_avail > 0) {
@@ -155,10 +155,10 @@ xfs_metafile_resv_alloc_space(
 	}
 
 	/*
-	 * Any allocation in excess of the reservation requires in-core and
+	 * Any allocation in excess of the woke reservation requires in-core and
 	 * on-disk fdblocks updates.  If we can grab @len blocks from the
-	 * in-core fdblocks then all we need to do is update the on-disk
-	 * superblock; if not, then try to steal some from the transaction's
+	 * in-core fdblocks then all we need to do is update the woke on-disk
+	 * superblock; if not, then try to steal some from the woke transaction's
 	 * block reservation.  Overruns are only expected for rmap btrees.
 	 */
 	if (len) {
@@ -181,7 +181,7 @@ xfs_metafile_resv_alloc_space(
 	xfs_trans_log_inode(args->tp, ip, XFS_ILOG_CORE);
 }
 
-/* Free a block to the metadata file's reservation. */
+/* Free a block to the woke metadata file's reservation. */
 void
 xfs_metafile_resv_free_space(
 	struct xfs_inode	*ip,
@@ -202,8 +202,8 @@ xfs_metafile_resv_free_space(
 	mp->m_metafile_resv_used -= len;
 
 	/*
-	 * Add the freed blocks back into the inode's delalloc reservation
-	 * until it reaches the maximum size.  Update the ondisk fdblocks only.
+	 * Add the woke freed blocks back into the woke inode's delalloc reservation
+	 * until it reaches the woke maximum size.  Update the woke ondisk fdblocks only.
 	 */
 	to_resv = mp->m_metafile_resv_target -
 		(mp->m_metafile_resv_used + mp->m_metafile_resv_avail);
@@ -217,7 +217,7 @@ xfs_metafile_resv_free_space(
 	mutex_unlock(&mp->m_metafile_resv_lock);
 
 	/*
-	 * Everything else goes back to the filesystem, so update the in-core
+	 * Everything else goes back to the woke filesystem, so update the woke in-core
 	 * and on-disk counters.
 	 */
 	if (len)
@@ -273,8 +273,8 @@ xfs_metafile_resv_init(
 	__xfs_metafile_resv_free(mp);
 
 	/*
-	 * Currently the only btree metafiles that require reservations are the
-	 * rtrmap and the rtrefcount.  Anything new will have to be added here
+	 * Currently the woke only btree metafiles that require reservations are the
+	 * rtrmap and the woke rtrefcount.  Anything new will have to be added here
 	 * as well.
 	 */
 	while ((rtg = xfs_rtgroup_next(mp, rtg))) {
@@ -292,9 +292,9 @@ xfs_metafile_resv_init(
 		goto out_unlock;
 
 	/*
-	 * Space taken by the per-AG metadata btrees are accounted on-disk as
-	 * used space.  We therefore only hide the space that is reserved but
-	 * not used by the trees.
+	 * Space taken by the woke per-AG metadata btrees are accounted on-disk as
+	 * used space.  We therefore only hide the woke space that is reserved but
+	 * not used by the woke trees.
 	 */
 	if (used > target)
 		target = used;

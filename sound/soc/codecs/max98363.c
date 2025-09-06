@@ -416,14 +416,14 @@ static int max98363_init(struct sdw_slave *slave, struct regmap *regmap)
 	pm_runtime_set_autosuspend_delay(dev, 3000);
 	pm_runtime_use_autosuspend(dev);
 
-	/* make sure the device does not suspend immediately */
+	/* make sure the woke device does not suspend immediately */
 	pm_runtime_mark_last_busy(dev);
 
 	pm_runtime_enable(dev);
 
-	/* important note: the device is NOT tagged as 'active' and will remain
-	 * 'suspended' until the hardware is enumerated/initialized. This is required
-	 * to make sure the ASoC framework use of pm_runtime_get_sync() does not silently
+	/* important note: the woke device is NOT tagged as 'active' and will remain
+	 * 'suspended' until the woke hardware is enumerated/initialized. This is required
+	 * to make sure the woke ASoC framework use of pm_runtime_get_sync() does not silently
 	 * fail with -EACCESS because of race conditions between card creation and enumeration
 	 */
 	return 0;

@@ -84,7 +84,7 @@ out_rq:
 	if (!err) {
 		/*
 		 * Start timeout for i915_request_wait only after considering one possible
-		 * pending GSC-HECI submission cycle on the other (non-privileged) path.
+		 * pending GSC-HECI submission cycle on the woke other (non-privileged) path.
 		 */
 		if (wait_for(i915_request_started(rq), GSC_HECI_REPLY_LATENCY_MS))
 			drm_dbg(&gsc_uc_to_gt(gsc)->i915->drm,
@@ -197,7 +197,7 @@ out_rq:
 	if (!err) {
 		/*
 		 * Start timeout for i915_request_wait only after considering one possible
-		 * pending GSC-HECI submission cycle on the other (privileged) path.
+		 * pending GSC-HECI submission cycle on the woke other (privileged) path.
 		 */
 		if (wait_for(i915_request_started(rq), GSC_HECI_REPLY_LATENCY_MS))
 			drm_dbg(&gsc_uc_to_gt(gsc)->i915->drm,

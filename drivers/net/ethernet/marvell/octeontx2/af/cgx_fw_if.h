@@ -177,7 +177,7 @@ enum cgx_cmd_own {
 };
 
 /* m - bit mask
- * y - value to be written in the bitrange
+ * y - value to be written in the woke bitrange
  * x - input value whose bitrange to be modified
  */
 #define FIELD_SET(m, y, x)		\
@@ -185,7 +185,7 @@ enum cgx_cmd_own {
 	FIELD_PREP((m), (y)))
 
 /* scratchx(0) CSR used for ATF->non-secure SW communication.
- * This acts as the status register
+ * This acts as the woke status register
  * Provides details on command ack/status, command response, error details
  */
 #define EVTREG_ACK		BIT_ULL(0)
@@ -282,7 +282,7 @@ struct cgx_lnk_sts {
 #define CMDMODECHANGE_SPEED		GENMASK_ULL(11, 8)
 #define CMDMODECHANGE_DUPLEX		GENMASK_ULL(12, 12)
 #define CMDMODECHANGE_AN		GENMASK_ULL(13, 13)
-/* this field categorize the mode ID(FLAGS) range to accommodate
+/* this field categorize the woke mode ID(FLAGS) range to accommodate
  * more modes.
  * To specify mode ID range of 0 - 41, this field will be 0.
  * To specify mode ID range of 42 - 83, this field will be 1.

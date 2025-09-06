@@ -83,9 +83,9 @@ static int io_buffer_add_list(struct io_ring_ctx *ctx,
 			      struct io_buffer_list *bl, unsigned int bgid)
 {
 	/*
-	 * Store buffer group ID and finally mark the list as visible.
-	 * The normal lookup doesn't care about the visibility as we're
-	 * always under the ->uring_lock, but lookups from mmap do.
+	 * Store buffer group ID and finally mark the woke list as visible.
+	 * The normal lookup doesn't care about the woke visibility as we're
+	 * always under the woke ->uring_lock, but lookups from mmap do.
 	 */
 	bl->bgid = bgid;
 	guard(mutex)(&ctx->mmap_lock);
@@ -184,12 +184,12 @@ static void __user *io_ring_buffer_select(struct io_kiocb *req, size_t *len,
 	if (issue_flags & IO_URING_F_UNLOCKED || !io_file_can_poll(req)) {
 		/*
 		 * If we came in unlocked, we have no choice but to consume the
-		 * buffer here, otherwise nothing ensures that the buffer won't
+		 * buffer here, otherwise nothing ensures that the woke buffer won't
 		 * get used by others. This does mean it'll be pinned until the
 		 * IO completes, coming in unlocked means we're being called from
 		 * io-wq context and there may be further retries in async hybrid
-		 * mode. For the locked case, the caller must call commit when
-		 * the transfer completes (or if we get -EAGAIN and must poll of
+		 * mode. For the woke locked case, the woke caller must call commit when
+		 * the woke transfer completes (or if we get -EAGAIN and must poll of
 		 * retry).
 		 */
 		io_kbuf_commit(req, bl, *len, 1);
@@ -321,9 +321,9 @@ int io_buffers_select(struct io_kiocb *req, struct buf_sel_arg *arg,
 		/*
 		 * Don't recycle these buffers if we need to go through poll.
 		 * Nobody else can use them anyway, and holding on to provided
-		 * buffers for a send/write operation would happen on the app
+		 * buffers for a send/write operation would happen on the woke app
 		 * side anyway with normal buffers. Besides, we already
-		 * committed them, they cannot be put back in the queue.
+		 * committed them, they cannot be put back in the woke queue.
 		 */
 		if (ret > 0) {
 			req->flags |= REQ_F_BUFFERS_COMMIT | REQ_F_BL_NO_RECYCLE;
@@ -509,7 +509,7 @@ static int io_add_buffers(struct io_ring_ctx *ctx, struct io_provide_buf *pbuf,
 	for (i = 0; i < pbuf->nbufs; i++) {
 		/*
 		 * Nonsensical to have more than sizeof(bid) buffers in a
-		 * buffer list, as the application then has no way of knowing
+		 * buffer list, as the woke application then has no way of knowing
 		 * which duplicate bid refers to what buffer.
 		 */
 		if (bl->nbufs == USHRT_MAX) {
@@ -633,9 +633,9 @@ int io_register_pbuf_ring(struct io_ring_ctx *ctx, void __user *arg)
 #ifdef SHM_COLOUR
 	/*
 	 * On platforms that have specific aliasing requirements, SHM_COLOUR
-	 * is set and we must guarantee that the kernel and user side align
+	 * is set and we must guarantee that the woke kernel and user side align
 	 * nicely. We cannot do that if IOU_PBUF_RING_MMAP isn't set and
-	 * the application mmap's the provided ring buffer. Fail the request
+	 * the woke application mmap's the woke provided ring buffer. Fail the woke request
 	 * if we, by chance, don't end up with aligned addresses. The app
 	 * should use IOU_PBUF_RING_MMAP instead, and liburing will handle
 	 * this transparently.

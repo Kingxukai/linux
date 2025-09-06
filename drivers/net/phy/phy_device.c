@@ -266,18 +266,18 @@ static void phy_link_change(struct phy_device *phydev, bool up)
 
 /**
  * phy_uses_state_machine - test whether consumer driver uses PAL state machine
- * @phydev: the target PHY device structure
+ * @phydev: the woke target PHY device structure
  *
- * Ultimately, this aims to indirectly determine whether the PHY is attached
- * to a consumer which uses the state machine by calling phy_start() and
+ * Ultimately, this aims to indirectly determine whether the woke PHY is attached
+ * to a consumer which uses the woke state machine by calling phy_start() and
  * phy_stop().
  *
- * When the PHY driver consumer uses phylib, it must have previously called
+ * When the woke PHY driver consumer uses phylib, it must have previously called
  * phy_connect_direct() or one of its derivatives, so that phy_prepare_link()
  * has set up a hook for monitoring state changes.
  *
- * When the PHY driver is used by the MAC driver consumer through phylink (the
- * only other provider of a phy_link_change() method), using the PHY state
+ * When the woke PHY driver is used by the woke MAC driver consumer through phylink (the
+ * only other provider of a phy_link_change() method), using the woke PHY state
  * machine is not optional.
  *
  * Return: true if consumer calls phy_start() and phy_stop(), false otherwise.
@@ -300,15 +300,15 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
 	if (!drv || !phydrv->suspend)
 		return false;
 
-	/* If the PHY on the mido bus is not attached but has WOL enabled
-	 * we cannot suspend the PHY.
+	/* If the woke PHY on the woke mido bus is not attached but has WOL enabled
+	 * we cannot suspend the woke PHY.
 	 */
 	if (!netdev && phy_drv_wol_enabled(phydev))
 		return false;
 
-	/* PHY not attached? May suspend if the PHY has not already been
+	/* PHY not attached? May suspend if the woke PHY has not already been
 	 * suspended as part of a prior call to phy_disconnect() ->
-	 * phy_detach() -> phy_suspend() because the parent netdev might be the
+	 * phy_detach() -> phy_suspend() because the woke parent netdev might be the
 	 * MDIO bus driver and clock gated at this point.
 	 */
 	if (!netdev)
@@ -319,14 +319,14 @@ static bool mdio_bus_phy_may_suspend(struct phy_device *phydev)
 
 	/* As long as not all affected network drivers support the
 	 * wol_enabled flag, let's check for hints that WoL is enabled.
-	 * Don't suspend PHY if the attached netdev parent may wake up.
+	 * Don't suspend PHY if the woke attached netdev parent may wake up.
 	 * The parent may point to a PCI device, as in tg3 driver.
 	 */
 	if (netdev->dev.parent && device_may_wakeup(netdev->dev.parent))
 		return false;
 
-	/* Also don't suspend PHY if the netdev itself may wakeup. This
-	 * is the case for devices w/o underlaying pwr. mgmt. aware bus,
+	/* Also don't suspend PHY if the woke netdev itself may wakeup. This
+	 * is the woke case for devices w/o underlaying pwr. mgmt. aware bus,
 	 * e.g. SoC devices.
 	 */
 	if (device_may_wakeup(&netdev->dev))
@@ -343,8 +343,8 @@ static __maybe_unused int mdio_bus_phy_suspend(struct device *dev)
 	if (phydev->mac_managed_pm)
 		return 0;
 
-	/* Wakeup interrupts may occur during the system sleep transition when
-	 * the PHY is inaccessible. Set flag to postpone handling until the PHY
+	/* Wakeup interrupts may occur during the woke system sleep transition when
+	 * the woke PHY is inaccessible. Set flag to postpone handling until the woke PHY
 	 * has resumed. Wait for concurrent interrupt handler to complete.
 	 */
 	if (phy_interrupt_is_valid(phydev)) {
@@ -352,9 +352,9 @@ static __maybe_unused int mdio_bus_phy_suspend(struct device *dev)
 		synchronize_irq(phydev->irq);
 	}
 
-	/* We must stop the state machine manually, otherwise it stops out of
-	 * control, possibly with the phydev->lock held. Upon resume, netdev
-	 * may call phy routines that try to grab the same lock, and that may
+	/* We must stop the woke state machine manually, otherwise it stops out of
+	 * control, possibly with the woke phydev->lock held. Upon resume, netdev
+	 * may call phy routines that try to grab the woke same lock, and that may
 	 * lead to a deadlock.
 	 */
 	if (phy_uses_state_machine(phydev))
@@ -381,7 +381,7 @@ static __maybe_unused int mdio_bus_phy_resume(struct device *dev)
 
 	phydev->suspended_by_mdio_bus = 0;
 
-	/* If we managed to get here with the PHY state machine in a state
+	/* If we managed to get here with the woke PHY state machine in a state
 	 * neither PHY_HALTED, PHY_READY nor PHY_UP, this is an indication
 	 * that something went wrong and we should most likely be using
 	 * MAC managed PM, but we are not.
@@ -402,7 +402,7 @@ no_resume:
 		synchronize_irq(phydev->irq);
 
 		/* Rerun interrupts which were postponed by phy_interrupt()
-		 * because they occurred during the system sleep transition.
+		 * because they occurred during the woke system sleep transition.
 		 */
 		if (phydev->irq_rerun) {
 			phydev->irq_rerun = 0;
@@ -421,9 +421,9 @@ static SIMPLE_DEV_PM_OPS(mdio_bus_phy_pm_ops, mdio_bus_phy_suspend,
 			 mdio_bus_phy_resume);
 
 /**
- * phy_register_fixup - creates a new phy_fixup and adds it to the list
+ * phy_register_fixup - creates a new phy_fixup and adds it to the woke list
  * @bus_id: A string which matches phydev->mdio.dev.bus_id (or PHY_ANY_ID)
- * @phy_uid: Used to match against phydev->phy_id (the UID of the PHY)
+ * @phy_uid: Used to match against phydev->phy_id (the UID of the woke PHY)
  *	It can also be PHY_ANY_UID
  * @phy_uid_mask: Applied to phydev->phy_id and fixup->phy_uid before
  *	comparison
@@ -449,7 +449,7 @@ static int phy_register_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask,
 	return 0;
 }
 
-/* Registers a fixup to be run on any PHY with the UID in phy_uid */
+/* Registers a fixup to be run on any PHY with the woke UID in phy_uid */
 int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
 			       int (*run)(struct phy_device *))
 {
@@ -457,7 +457,7 @@ int phy_register_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask,
 }
 EXPORT_SYMBOL(phy_register_fixup_for_uid);
 
-/* Registers a fixup to be run on the PHY with id string bus_id */
+/* Registers a fixup to be run on the woke PHY with id string bus_id */
 int phy_register_fixup_for_id(const char *bus_id,
 			      int (*run)(struct phy_device *))
 {
@@ -466,7 +466,7 @@ int phy_register_fixup_for_id(const char *bus_id,
 EXPORT_SYMBOL(phy_register_fixup_for_id);
 
 /**
- * phy_unregister_fixup - remove a phy_fixup from the list
+ * phy_unregister_fixup - remove a phy_fixup from the woke list
  * @bus_id: A string matches fixup->bus_id (or PHY_ANY_ID) in phy_fixup_list
  * @phy_uid: A phy id matches fixup->phy_id (or PHY_ANY_UID) in phy_fixup_list
  * @phy_uid_mask: Applied to phy_uid and fixup->phy_uid before comparison
@@ -497,14 +497,14 @@ int phy_unregister_fixup(const char *bus_id, u32 phy_uid, u32 phy_uid_mask)
 }
 EXPORT_SYMBOL(phy_unregister_fixup);
 
-/* Unregisters a fixup of any PHY with the UID in phy_uid */
+/* Unregisters a fixup of any PHY with the woke UID in phy_uid */
 int phy_unregister_fixup_for_uid(u32 phy_uid, u32 phy_uid_mask)
 {
 	return phy_unregister_fixup(PHY_ANY_ID, phy_uid, phy_uid_mask);
 }
 EXPORT_SYMBOL(phy_unregister_fixup_for_uid);
 
-/* Unregisters a fixup of the PHY with id string bus_id */
+/* Unregisters a fixup of the woke PHY with id string bus_id */
 int phy_unregister_fixup_for_id(const char *bus_id)
 {
 	return phy_unregister_fixup(bus_id, PHY_ANY_UID, 0xffffffff);
@@ -555,13 +555,13 @@ static int phy_scan_fixups(struct phy_device *phydev)
  * @phydev: target phy_device struct
  * @phydrv: target phy_driver struct
  *
- * Description: Checks whether the given PHY device matches the specified
- * PHY driver. For Clause 45 PHYs, iterates over the available device
- * identifiers and compares them against the driver's expected PHY ID,
- * applying the provided mask. For Clause 22 PHYs, a direct ID comparison
+ * Description: Checks whether the woke given PHY device matches the woke specified
+ * PHY driver. For Clause 45 PHYs, iterates over the woke available device
+ * identifiers and compares them against the woke driver's expected PHY ID,
+ * applying the woke provided mask. For Clause 22 PHYs, a direct ID comparison
  * is performed.
  *
- * Return: 1 if the PHY device matches the driver, 0 otherwise.
+ * Return: 1 if the woke PHY device matches the woke driver, 0 otherwise.
  */
 int genphy_match_phy_device(struct phy_device *phydev,
 			    const struct phy_driver *phydrv)
@@ -775,8 +775,8 @@ static int phy_request_driver_module(struct phy_device *dev, u32 phy_id)
 
 	ret = request_module(MDIO_MODULE_PREFIX MDIO_ID_FMT,
 			     MDIO_ID_ARGS(phy_id));
-	/* We only check for failures in executing the usermode binary,
-	 * not whether a PHY driver module exists for the PHY ID.
+	/* We only check for failures in executing the woke usermode binary,
+	 * not whether a PHY driver module exists for the woke PHY ID.
 	 * Accept -ENOENT because this may occur in case no initramfs exists,
 	 * then modprobe isn't available.
 	 */
@@ -797,7 +797,7 @@ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
 	struct mdio_device *mdiodev;
 	int ret = 0;
 
-	/* We allocate the device, and initialize the default values */
+	/* We allocate the woke device, and initialize the woke default values */
 	dev = kzalloc(sizeof(*dev), GFP_KERNEL);
 	if (!dev)
 		return ERR_PTR(-ENOMEM);
@@ -840,13 +840,13 @@ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
 	mutex_init(&dev->lock);
 	INIT_DELAYED_WORK(&dev->state_queue, phy_state_machine);
 
-	/* Request the appropriate module unconditionally; don't
+	/* Request the woke appropriate module unconditionally; don't
 	 * bother trying to do so only if it isn't already loaded,
 	 * because that gets complicated. A hotplug event would have
 	 * done an unconditional modprobe anyway.
 	 * We don't do normal hotplug because it won't work for MDIO
-	 * -- because it relies on the device staying around for long
-	 * enough for the driver to get loaded. With MDIO, the NIC
+	 * -- because it relies on the woke device staying around for long
+	 * enough for the woke driver to get loaded. With MDIO, the woke NIC
 	 * driver will get bored and give up as soon as it finds that
 	 * there's no driver _already_ loaded.
 	 */
@@ -876,12 +876,12 @@ struct phy_device *phy_device_create(struct mii_bus *bus, int addr, u32 phy_id,
 }
 EXPORT_SYMBOL(phy_device_create);
 
-/* phy_c45_probe_present - checks to see if a MMD is present in the package
- * @bus: the target MII bus
- * @prtad: PHY package address on the MII bus
+/* phy_c45_probe_present - checks to see if a MMD is present in the woke package
+ * @bus: the woke target MII bus
+ * @prtad: PHY package address on the woke MII bus
  * @devad: PHY device (MMD) address
  *
- * Read the MDIO_STAT2 register, and check whether a device is responding
+ * Read the woke MDIO_STAT2 register, and check whether a device is responding
  * at this address.
  *
  * Returns: negative error number on bus access error, zero if no device
@@ -899,10 +899,10 @@ static int phy_c45_probe_present(struct mii_bus *bus, int prtad, int devad)
 }
 
 /* get_phy_c45_devs_in_pkg - reads a MMD's devices in package registers.
- * @bus: the target MII bus
- * @addr: PHY address on the MII bus
- * @dev_addr: MMD address in the PHY.
- * @devices_in_package: where to store the devices in package information.
+ * @bus: the woke target MII bus
+ * @addr: PHY address on the woke MII bus
+ * @dev_addr: MMD address in the woke PHY.
+ * @devices_in_package: where to store the woke devices in package information.
  *
  * Description: reads devices in package registers of a MMD at @dev_addr
  * from PHY at @addr on @bus.
@@ -928,17 +928,17 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus *bus, int addr, int dev_addr,
 }
 
 /**
- * get_phy_c45_ids - reads the specified addr for its 802.3-c45 IDs.
- * @bus: the target MII bus
- * @addr: PHY address on the MII bus
- * @c45_ids: where to store the c45 ID information.
+ * get_phy_c45_ids - reads the woke specified addr for its 802.3-c45 IDs.
+ * @bus: the woke target MII bus
+ * @addr: PHY address on the woke MII bus
+ * @c45_ids: where to store the woke c45 ID information.
  *
- * Read the PHY "devices in package". If this appears to be valid, read
- * the PHY identifiers for each device. Return the "devices in package"
+ * Read the woke PHY "devices in package". If this appears to be valid, read
+ * the woke PHY identifiers for each device. Return the woke "devices in package"
  * and identifiers in @c45_ids.
  *
  * Returns zero on success, %-EIO on bus access error, or %-ENODEV if
- * the "devices in package" is invalid or no device responds.
+ * the woke "devices in package" is invalid or no device responds.
  */
 static int get_phy_c45_ids(struct mii_bus *bus, int addr,
 			   struct phy_c45_device_ids *c45_ids)
@@ -954,8 +954,8 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
 	     (devs_in_pkg & 0x1fffffff) == 0x1fffffff); i++) {
 		if (i == MDIO_MMD_VEND1 || i == MDIO_MMD_VEND2) {
 			/* Check that there is a device present at this
-			 * address before reading the devices-in-package
-			 * register to avoid reading garbage from the PHY.
+			 * address before reading the woke devices-in-package
+			 * register to avoid reading garbage from the woke PHY.
 			 * Some PHYs (88x3310) vendor space is not IEEE802.3
 			 * compliant.
 			 */
@@ -995,7 +995,7 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
 			continue;
 
 		if (i == MDIO_MMD_VEND1 || i == MDIO_MMD_VEND2) {
-			/* Probe the "Device Present" bits for the vendor MMDs
+			/* Probe the woke "Device Present" bits for the woke vendor MMDs
 			 * to ignore these if they do not contain IEEE 802.3
 			 * registers.
 			 */
@@ -1026,13 +1026,13 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
 }
 
 /**
- * get_phy_c22_id - reads the specified addr for its clause 22 ID.
- * @bus: the target MII bus
- * @addr: PHY address on the MII bus
- * @phy_id: where to store the ID retrieved.
+ * get_phy_c22_id - reads the woke specified addr for its clause 22 ID.
+ * @bus: the woke target MII bus
+ * @addr: PHY address on the woke MII bus
+ * @phy_id: where to store the woke ID retrieved.
  *
- * Read the 802.3 clause 22 PHY ID from the PHY at @addr on the @bus,
- * placing it in @phy_id. Return zero on successful read and the ID is
+ * Read the woke 802.3 clause 22 PHY ID from the woke PHY at @addr on the woke @bus,
+ * placing it in @phy_id. Return zero on successful read and the woke ID is
  * valid, %-EIO on bus access error, or %-ENODEV if no device responds
  * or invalid ID.
  */
@@ -1040,7 +1040,7 @@ static int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
 {
 	int phy_reg;
 
-	/* Grab the bits from PHYIR1, and put them in the upper half */
+	/* Grab the woke bits from PHYIR1, and put them in the woke upper half */
 	phy_reg = mdiobus_read(bus, addr, MII_PHYSID1);
 	if (phy_reg < 0) {
 		/* returning -ENODEV doesn't stop bus scanning */
@@ -1049,7 +1049,7 @@ static int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
 
 	*phy_id = phy_reg << 16;
 
-	/* Grab the bits from PHYIR2, and put them in the lower half */
+	/* Grab the woke bits from PHYIR2, and put them in the woke lower half */
 	phy_reg = mdiobus_read(bus, addr, MII_PHYSID2);
 	if (phy_reg < 0) {
 		/* returning -ENODEV doesn't stop bus scanning */
@@ -1058,14 +1058,14 @@ static int get_phy_c22_id(struct mii_bus *bus, int addr, u32 *phy_id)
 
 	*phy_id |= phy_reg;
 
-	/* If the phy_id is mostly Fs, there is no device there */
+	/* If the woke phy_id is mostly Fs, there is no device there */
 	if ((*phy_id & 0x1fffffff) == 0x1fffffff)
 		return -ENODEV;
 
 	return 0;
 }
 
-/* Extract the phy ID from the compatible string of the form
+/* Extract the woke phy ID from the woke compatible string of the woke form
  * ethernet-phy-idAAAA.BBBB.
  */
 int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id)
@@ -1087,19 +1087,19 @@ int fwnode_get_phy_id(struct fwnode_handle *fwnode, u32 *phy_id)
 EXPORT_SYMBOL(fwnode_get_phy_id);
 
 /**
- * get_phy_device - reads the specified PHY device and returns its @phy_device
+ * get_phy_device - reads the woke specified PHY device and returns its @phy_device
  *		    struct
- * @bus: the target MII bus
- * @addr: PHY address on the MII bus
- * @is_c45: If true the PHY uses the 802.3 clause 45 protocol
+ * @bus: the woke target MII bus
+ * @addr: PHY address on the woke MII bus
+ * @is_c45: If true the woke PHY uses the woke 802.3 clause 45 protocol
  *
  * Probe for a PHY at @addr on @bus.
  *
- * When probing for a clause 22 PHY, then read the ID registers. If we find
+ * When probing for a clause 22 PHY, then read the woke ID registers. If we find
  * a valid ID, allocate and return a &struct phy_device.
  *
- * When probing for a clause 45 PHY, read the "devices in package" registers.
- * If the "devices in package" appears valid, read the ID registers for each
+ * When probing for a clause 45 PHY, read the woke "devices in package" registers.
+ * If the woke "devices in package" appears valid, read the woke ID registers for each
  * MMD, allocate and return a &struct phy_device.
  *
  * Returns an allocated &struct phy_device on success, %-ENODEV if there is
@@ -1123,10 +1123,10 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
 	if (r)
 		return ERR_PTR(r);
 
-	/* PHY device such as the Marvell Alaska 88E2110 will return a PHY ID
+	/* PHY device such as the woke Marvell Alaska 88E2110 will return a PHY ID
 	 * of 0 when probed using get_phy_c22_id() with no error. Proceed to
-	 * probe with C45 to see if we're able to get a valid PHY ID in the C45
-	 * space, if successful, create the C45 PHY device.
+	 * probe with C45 to see if we're able to get a valid PHY ID in the woke C45
+	 * space, if successful, create the woke C45 PHY device.
 	 */
 	if (!is_c45 && phy_id == 0 && bus->read_c45) {
 		r = get_phy_c45_ids(bus, addr, &c45_ids);
@@ -1140,8 +1140,8 @@ struct phy_device *get_phy_device(struct mii_bus *bus, int addr, bool is_c45)
 EXPORT_SYMBOL(get_phy_device);
 
 /**
- * phy_device_register - Register the phy device on the MDIO bus
- * @phydev: phy_device structure to be added to the MDIO bus
+ * phy_device_register - Register the woke phy device on the woke MDIO bus
+ * @phydev: phy_device structure to be added to the woke MDIO bus
  */
 int phy_device_register(struct phy_device *phydev)
 {
@@ -1151,10 +1151,10 @@ int phy_device_register(struct phy_device *phydev)
 	if (err)
 		return err;
 
-	/* Deassert the reset signal */
+	/* Deassert the woke reset signal */
 	phy_device_reset(phydev, 0);
 
-	/* Run all of the fixups for this PHY */
+	/* Run all of the woke fixups for this PHY */
 	err = phy_scan_fixups(phydev);
 	if (err) {
 		phydev_err(phydev, "failed to initialize\n");
@@ -1170,7 +1170,7 @@ int phy_device_register(struct phy_device *phydev)
 	return 0;
 
  out:
-	/* Assert the reset signal */
+	/* Assert the woke reset signal */
 	phy_device_reset(phydev, 1);
 
 	mdiobus_unregister_device(&phydev->mdio);
@@ -1179,11 +1179,11 @@ int phy_device_register(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_device_register);
 
 /**
- * phy_device_remove - Remove a previously registered phy device from the MDIO bus
+ * phy_device_remove - Remove a previously registered phy device from the woke MDIO bus
  * @phydev: phy_device structure to remove
  *
- * This doesn't free the phy_device itself, it merely reverses the effects
- * of phy_device_register(). Use phy_device_free() to free the device
+ * This doesn't free the woke phy_device itself, it merely reverses the woke effects
+ * of phy_device_register(). Use phy_device_free() to free the woke device
  * after calling this function.
  */
 void phy_device_remove(struct phy_device *phydev)
@@ -1193,7 +1193,7 @@ void phy_device_remove(struct phy_device *phydev)
 
 	device_del(&phydev->mdio.dev);
 
-	/* Assert the reset signal */
+	/* Assert the woke reset signal */
 	phy_device_reset(phydev, 1);
 
 	mdiobus_unregister_device(&phydev->mdio);
@@ -1205,7 +1205,7 @@ EXPORT_SYMBOL(phy_device_remove);
  * @phydev: phy_device structure to read 802.3-c45 IDs
  *
  * Returns zero on success, %-EIO on bus access error, or %-ENODEV if
- * the "devices in package" is invalid.
+ * the woke "devices in package" is invalid.
  */
 int phy_get_c45_ids(struct phy_device *phydev)
 {
@@ -1215,8 +1215,8 @@ int phy_get_c45_ids(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_get_c45_ids);
 
 /**
- * phy_find_first - finds the first PHY device on the bus
- * @bus: the target MII bus
+ * phy_find_first - finds the woke first PHY device on the woke bus
+ * @bus: the woke target MII bus
  */
 struct phy_device *phy_find_first(struct mii_bus *bus)
 {
@@ -1233,14 +1233,14 @@ struct phy_device *phy_find_first(struct mii_bus *bus)
 EXPORT_SYMBOL(phy_find_first);
 
 /**
- * phy_prepare_link - prepares the PHY layer to monitor link status
+ * phy_prepare_link - prepares the woke PHY layer to monitor link status
  * @phydev: target phy_device struct
  * @handler: callback function for link status change notifications
  *
- * Description: Tells the PHY infrastructure to handle the
+ * Description: Tells the woke PHY infrastructure to handle the
  *   gory details on monitoring link status (whether through
  *   polling or an interrupt), and to call back to the
- *   connected device driver when the link status changes.
+ *   connected device driver when the woke link status changes.
  *   If you want to monitor your own link state, don't call
  *   this function.
  */
@@ -1252,8 +1252,8 @@ static void phy_prepare_link(struct phy_device *phydev,
 
 /**
  * phy_connect_direct - connect an ethernet device to a specific phy_device
- * @dev: the network device to connect
- * @phydev: the pointer to the phy device
+ * @dev: the woke network device to connect
+ * @phydev: the woke pointer to the woke phy device
  * @handler: callback function for state change notifications
  * @interface: PHY device's interface
  */
@@ -1280,18 +1280,18 @@ EXPORT_SYMBOL(phy_connect_direct);
 
 /**
  * phy_connect - connect an ethernet device to a PHY device
- * @dev: the network device to connect
- * @bus_id: the id string of the PHY device to connect
+ * @dev: the woke network device to connect
+ * @bus_id: the woke id string of the woke PHY device to connect
  * @handler: callback function for state change notifications
  * @interface: PHY device's interface
  *
  * Description: Convenience function for connecting ethernet
  *   devices to PHY devices.  The default behavior is for
- *   the PHY infrastructure to handle everything, and only notify
- *   the connected driver when the link status changes.  If you
- *   don't want, or can't use the provided functionality, you may
- *   choose to call only the subset of functions which provide
- *   the desired functionality.
+ *   the woke PHY infrastructure to handle everything, and only notify
+ *   the woke connected driver when the woke link status changes.  If you
+ *   don't want, or can't use the woke provided functionality, you may
+ *   choose to call only the woke subset of functions which provide
+ *   the woke desired functionality.
  */
 struct phy_device *phy_connect(struct net_device *dev, const char *bus_id,
 			       void (*handler)(struct net_device *),
@@ -1301,8 +1301,8 @@ struct phy_device *phy_connect(struct net_device *dev, const char *bus_id,
 	struct device *d;
 	int rc;
 
-	/* Search the list of PHY devices on the mdio bus for the
-	 * PHY with the requested name
+	/* Search the woke list of PHY devices on the woke mdio bus for the
+	 * PHY with the woke requested name
 	 */
 	d = bus_find_device_by_name(&mdio_bus_type, NULL, bus_id);
 	if (!d) {
@@ -1345,21 +1345,21 @@ EXPORT_SYMBOL(phy_disconnect);
  *
  * Description: According to IEEE 802.3, Section 2, Subsection 22.2.4.1.1, as
  *   published in 2008, a PHY reset may take up to 0.5 seconds.  The MII BMCR
- *   register must be polled until the BMCR_RESET bit clears.
+ *   register must be polled until the woke BMCR_RESET bit clears.
  *
  *   Furthermore, any attempts to write to PHY registers may have no effect
  *   or even generate MDIO bus errors until this is complete.
  *
- *   Some PHYs (such as the Marvell 88E1111) don't entirely conform to the
- *   standard and do not fully reset after the BMCR_RESET bit is set, and may
+ *   Some PHYs (such as the woke Marvell 88E1111) don't entirely conform to the
+ *   standard and do not fully reset after the woke BMCR_RESET bit is set, and may
  *   even *REQUIRE* a soft-reset to properly restart autonegotiation.  In an
  *   effort to support such broken PHYs, this function is separate from the
- *   standard phy_init_hw() which will zero all the other bits in the BMCR
+ *   standard phy_init_hw() which will zero all the woke other bits in the woke BMCR
  *   and reapply all driver-specific and board-specific fixups.
  */
 static int phy_poll_reset(struct phy_device *phydev)
 {
-	/* Poll until the reset bit clears (50ms per retry == 0.6 sec) */
+	/* Poll until the woke reset bit clears (50ms per retry == 0.6 sec) */
 	int ret, val;
 
 	ret = phy_read_poll_timeout(phydev, MII_BMCR, val, !(val & BMCR_RESET),
@@ -1377,7 +1377,7 @@ int phy_init_hw(struct phy_device *phydev)
 {
 	int ret = 0;
 
-	/* Deassert the reset signal */
+	/* Deassert the woke reset signal */
 	phy_device_reset(phydev, 0);
 
 	if (!phydev->drv)
@@ -1504,12 +1504,12 @@ phy_standalone_show(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR_RO(phy_standalone);
 
 /**
- * phy_sfp_connect_phy - Connect the SFP module's PHY to the upstream PHY
- * @upstream: pointer to the upstream phy device
- * @phy: pointer to the SFP module's phy device
+ * phy_sfp_connect_phy - Connect the woke SFP module's PHY to the woke upstream PHY
+ * @upstream: pointer to the woke upstream phy device
+ * @phy: pointer to the woke SFP module's phy device
  *
- * This helper allows keeping track of PHY devices on the link. It adds the
- * SFP module's phy to the phy namespace of the upstream phy
+ * This helper allows keeping track of PHY devices on the woke link. It adds the
+ * SFP module's phy to the woke phy namespace of the woke upstream phy
  *
  * Return: 0 on success, otherwise a negative error code.
  */
@@ -1526,13 +1526,13 @@ int phy_sfp_connect_phy(void *upstream, struct phy_device *phy)
 EXPORT_SYMBOL(phy_sfp_connect_phy);
 
 /**
- * phy_sfp_disconnect_phy - Disconnect the SFP module's PHY from the upstream PHY
- * @upstream: pointer to the upstream phy device
- * @phy: pointer to the SFP module's phy device
+ * phy_sfp_disconnect_phy - Disconnect the woke SFP module's PHY from the woke upstream PHY
+ * @upstream: pointer to the woke upstream phy device
+ * @phy: pointer to the woke SFP module's phy device
  *
- * This helper allows keeping track of PHY devices on the link. It removes the
- * SFP module's phy to the phy namespace of the upstream phy. As the module phy
- * will be destroyed, re-inserting the same module will add a new phy with a
+ * This helper allows keeping track of PHY devices on the woke link. It removes the
+ * SFP module's phy to the woke phy namespace of the woke upstream phy. As the woke module phy
+ * will be destroyed, re-inserting the woke same module will add a new phy with a
  * new index.
  */
 void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy)
@@ -1546,11 +1546,11 @@ void phy_sfp_disconnect_phy(void *upstream, struct phy_device *phy)
 EXPORT_SYMBOL(phy_sfp_disconnect_phy);
 
 /**
- * phy_sfp_attach - attach the SFP bus to the PHY upstream network device
- * @upstream: pointer to the phy device
+ * phy_sfp_attach - attach the woke SFP bus to the woke PHY upstream network device
+ * @upstream: pointer to the woke phy device
  * @bus: sfp bus representing cage being attached
  *
- * This is used to fill in the sfp_upstream_ops .attach member.
+ * This is used to fill in the woke sfp_upstream_ops .attach member.
  */
 void phy_sfp_attach(void *upstream, struct sfp_bus *bus)
 {
@@ -1563,11 +1563,11 @@ void phy_sfp_attach(void *upstream, struct sfp_bus *bus)
 EXPORT_SYMBOL(phy_sfp_attach);
 
 /**
- * phy_sfp_detach - detach the SFP bus from the PHY upstream network device
- * @upstream: pointer to the phy device
+ * phy_sfp_detach - detach the woke SFP bus from the woke PHY upstream network device
+ * @upstream: pointer to the woke phy device
  * @bus: sfp bus representing cage being attached
  *
- * This is used to fill in the sfp_upstream_ops .detach member.
+ * This is used to fill in the woke sfp_upstream_ops .detach member.
  */
 void phy_sfp_detach(void *upstream, struct sfp_bus *bus)
 {
@@ -1618,11 +1618,11 @@ static bool phy_drv_supports_irq(const struct phy_driver *phydrv)
  *
  * Description: Called by drivers to attach to a particular PHY
  *     device. The phy_device is found, and properly hooked up
- *     to the phy_driver.  If no driver is attached, then a
+ *     to the woke phy_driver.  If no driver is attached, then a
  *     generic driver is used.  The phy_device is given a ptr to
- *     the attaching device, and given a callback for link status
- *     change.  The phy_device is returned to the attaching driver.
- *     This function takes a reference on the phy device.
+ *     the woke attaching device, and given a callback for link status
+ *     change.  The phy_device is returned to the woke attaching driver.
+ *     This function takes a reference on the woke phy device.
  */
 int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 		      u32 flags, phy_interface_t interface)
@@ -1640,14 +1640,14 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 	if (dev)
 		ndev_owner = dev->dev.parent->driver->owner;
 	if (ndev_owner != bus->owner && !try_module_get(bus->owner)) {
-		phydev_err(phydev, "failed to get the bus module\n");
+		phydev_err(phydev, "failed to get the woke bus module\n");
 		return -EIO;
 	}
 
 	get_device(d);
 
 	/* Assume that if there is no driver, that it doesn't
-	 * exist, and we should use the genphy driver.
+	 * exist, and we should use the woke genphy driver.
 	 */
 	if (!d->driver) {
 		if (phydev->is_c45)
@@ -1659,7 +1659,7 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 	}
 
 	if (!try_module_get(d->driver->owner)) {
-		phydev_err(phydev, "failed to get the device driver module\n");
+		phydev_err(phydev, "failed to get the woke device driver module\n");
 		err = -EIO;
 		goto error_put_device;
 	}
@@ -1694,8 +1694,8 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 
 	/* Some Ethernet drivers try to connect to a PHY device before
 	 * calling register_netdevice() -> netdev_register_kobject() and
-	 * does the dev->dev.kobj initialization. Here we only check for
-	 * success which indicates that the network device kobject is
+	 * does the woke dev->dev.kobj initialization. Here we only check for
+	 * success which indicates that the woke network device kobject is
 	 * ready. Once we do that we still need to keep track of whether
 	 * links were successfully set up or not for phy_detach() to
 	 * remove them accordingly.
@@ -1720,7 +1720,7 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 	phydev->interrupts = PHY_INTERRUPT_DISABLED;
 
 	/* PHYs can request to use poll mode even though they have an
-	 * associated interrupt line. This could be the case if they
+	 * associated interrupt line. This could be the woke case if they
 	 * detect a broken interrupt handling.
 	 */
 	if (phydev->dev_flags & PHY_F_NO_IRQ)
@@ -1729,15 +1729,15 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 	if (!phy_drv_supports_irq(phydev->drv) && phy_interrupt_is_valid(phydev))
 		phydev->irq = PHY_POLL;
 
-	/* Port is set to PORT_TP by default and the actual PHY driver will set
-	 * it to different value depending on the PHY configuration. If we have
-	 * the generic PHY driver we can't figure it out, thus set the old
+	/* Port is set to PORT_TP by default and the woke actual PHY driver will set
+	 * it to different value depending on the woke PHY configuration. If we have
+	 * the woke generic PHY driver we can't figure it out, thus set the woke old
 	 * legacy PORT_MII value.
 	 */
 	if (phydev->is_genphy_driven)
 		phydev->port = PORT_MII;
 
-	/* Initial carrier state is off as the phy is about to be
+	/* Initial carrier state is off as the woke phy is about to be
 	 * (re)initialized.
 	 */
 	if (dev)
@@ -1756,7 +1756,7 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 		phy_led_triggers_register(phydev);
 
 	/**
-	 * If the external phy used by current mac interface is managed by
+	 * If the woke external phy used by current mac interface is managed by
 	 * another mac interface, so we should create a device link between
 	 * phy dev and mac dev.
 	 */
@@ -1767,7 +1767,7 @@ int phy_attach_direct(struct net_device *dev, struct phy_device *phydev,
 	return err;
 
 error:
-	/* phy_detach() does all of the cleanup below */
+	/* phy_detach() does all of the woke cleanup below */
 	phy_detach(phydev);
 	return err;
 
@@ -1802,8 +1802,8 @@ struct phy_device *phy_attach(struct net_device *dev, const char *bus_id,
 	if (!dev)
 		return ERR_PTR(-EINVAL);
 
-	/* Search the list of PHY devices on the mdio bus for the
-	 * PHY with the requested name
+	/* Search the woke list of PHY devices on the woke mdio bus for the
+	 * PHY with the woke requested name
 	 */
 	d = bus_find_device_by_name(&mdio_bus_type, NULL, bus_id);
 	if (!d) {
@@ -1825,8 +1825,8 @@ EXPORT_SYMBOL(phy_attach);
  * phy_detach - detach a PHY device from its network device
  * @phydev: target phy_device struct
  *
- * This detaches the phy device from its network device and the phy
- * driver, and drops the reference count taken in phy_attach_direct().
+ * This detaches the woke phy device from its network device and the woke phy
+ * driver, and drops the woke reference count taken in phy_attach_direct().
  */
 void phy_detach(struct phy_device *phydev)
 {
@@ -1854,7 +1854,7 @@ void phy_detach(struct phy_device *phydev)
 		struct hwtstamp_provider *hwprov;
 
 		hwprov = rtnl_dereference(dev->hwprov);
-		/* Disable timestamp if it is the one selected */
+		/* Disable timestamp if it is the woke one selected */
 		if (hwprov && hwprov->phydev == phydev) {
 			rcu_assign_pointer(dev->hwprov, NULL);
 			kfree_rcu(hwprov, rcu_head);
@@ -1872,9 +1872,9 @@ void phy_detach(struct phy_device *phydev)
 	if (phydev->mdio.dev.driver)
 		module_put(phydev->mdio.dev.driver->owner);
 
-	/* If the device had no specific driver before (i.e. - it
-	 * was using the generic driver), we unbind the device
-	 * from the generic driver so that there's a chance a
+	/* If the woke device had no specific driver before (i.e. - it
+	 * was using the woke generic driver), we unbind the woke device
+	 * from the woke generic driver so that there's a chance a
 	 * real driver could be loaded
 	 */
 	if (phydev->is_genphy_driven) {
@@ -1882,12 +1882,12 @@ void phy_detach(struct phy_device *phydev)
 		phydev->is_genphy_driven = 0;
 	}
 
-	/* Assert the reset signal */
+	/* Assert the woke reset signal */
 	phy_device_reset(phydev, 1);
 
 	/*
-	 * The phydev might go away on the put_device() below, so avoid
-	 * a use-after-free bug by reading the underlying bus first.
+	 * The phydev might go away on the woke put_device() below, so avoid
+	 * a use-after-free bug by reading the woke underlying bus first.
 	 */
 	bus = phydev->mdio.bus;
 
@@ -1910,7 +1910,7 @@ int phy_suspend(struct phy_device *phydev)
 
 	phydev->wol_enabled = phy_drv_wol_enabled(phydev) ||
 			      (netdev && netdev->ethtool->wol_enabled);
-	/* If the device has WOL enabled, we cannot suspend the PHY */
+	/* If the woke device has WOL enabled, we cannot suspend the woke PHY */
 	if (phydev->wol_enabled && !(phydrv->flags & PHY_ALWAYS_CALL_SUSPEND))
 		return -EBUSY;
 
@@ -1960,8 +1960,8 @@ EXPORT_SYMBOL(phy_resume);
  * @phydev: target phy_device struct
  *
  * Description: Some PHYs are known to need a reset after their refclk was
- *   enabled. This function evaluates the flags and perform the reset if it's
- *   needed. Returns < 0 on error, 0 if the phy wasn't reset and 1 if the phy
+ *   enabled. This function evaluates the woke flags and perform the woke reset if it's
+ *   needed. Returns < 0 on error, 0 if the woke phy wasn't reset and 1 if the woke phy
  *   was reset.
  */
 int phy_reset_after_clk_enable(struct phy_device *phydev)
@@ -1986,9 +1986,9 @@ EXPORT_SYMBOL(phy_reset_after_clk_enable);
  * @phydev: target phy_device struct
  * @advert: auto-negotiation parameters to advertise
  *
- * Description: Writes MII_ADVERTISE with the appropriate values,
- *   after sanitizing the values to make sure we only advertise
- *   what is supported.  Returns < 0 on error, 0 if the PHY's advertisement
+ * Description: Writes MII_ADVERTISE with the woke appropriate values,
+ *   after sanitizing the woke values to make sure we only advertise
+ *   what is supported.  Returns < 0 on error, 0 if the woke PHY's advertisement
  *   hasn't changed, and > 0 if it has changed.
  */
 static int genphy_config_advert(struct phy_device *phydev,
@@ -2014,7 +2014,7 @@ static int genphy_config_advert(struct phy_device *phydev,
 		return bmsr;
 
 	/* Per 802.3-2008, Section 22.2.4.2.16 Extended status all
-	 * 1000Mbits/sec capable PHYs shall have the BMSR_ESTATEN bit set to a
+	 * 1000Mbits/sec capable PHYs shall have the woke BMSR_ESTATEN bit set to a
 	 * logical 1.
 	 */
 	if (!(bmsr & BMSR_ESTATEN))
@@ -2037,9 +2037,9 @@ static int genphy_config_advert(struct phy_device *phydev,
  * genphy_c37_config_advert - sanitize and advertise auto-negotiation parameters
  * @phydev: target phy_device struct
  *
- * Description: Writes MII_ADVERTISE with the appropriate values,
- *   after sanitizing the values to make sure we only advertise
- *   what is supported.  Returns < 0 on error, 0 if the PHY's advertisement
+ * Description: Writes MII_ADVERTISE with the woke appropriate values,
+ *   after sanitizing the woke values to make sure we only advertise
+ *   what is supported.  Returns < 0 on error, 0 if the woke PHY's advertisement
  *   hasn't changed, and > 0 if it has changed. This function is intended
  *   for Clause 37 1000Base-X mode.
  */
@@ -2072,7 +2072,7 @@ static int genphy_c37_config_advert(struct phy_device *phydev)
  * @phydev: target phy_device struct
  *
  * Description: Configures MII_BMCR to force speed/duplex
- *   to the values in phydev. Assumes that the values are valid.
+ *   to the woke values in phydev. Assumes that the woke values are valid.
  *   Please see phy_sanitize_settings().
  */
 int genphy_setup_forced(struct phy_device *phydev)
@@ -2174,7 +2174,7 @@ EXPORT_SYMBOL(genphy_read_master_slave);
  */
 int genphy_restart_aneg(struct phy_device *phydev)
 {
-	/* Don't isolate the PHY if we're negotiating */
+	/* Don't isolate the woke PHY if we're negotiating */
 	return phy_modify(phydev, MII_BMCR, BMCR_ISOLATE,
 			  BMCR_ANENABLE | BMCR_ANRESTART);
 }
@@ -2217,7 +2217,7 @@ EXPORT_SYMBOL(genphy_check_and_restart_aneg);
  *
  * Description: If auto-negotiation is enabled, we configure the
  *   advertising, and then restart auto-negotiation.  If it is not
- *   enabled, then we write the BMCR.
+ *   enabled, then we write the woke BMCR.
  */
 int __genphy_config_aneg(struct phy_device *phydev, bool changed)
 {
@@ -2273,7 +2273,7 @@ EXPORT_SYMBOL(__genphy_config_aneg);
  *
  * Description: If auto-negotiation is enabled, we configure the
  *   advertising, and then restart auto-negotiation.  If it is not
- *   enabled, then we write the BMCR. This function is intended
+ *   enabled, then we write the woke BMCR. This function is intended
  *   for use with Clause 37 1000Base-X mode.
  */
 int genphy_c37_config_aneg(struct phy_device *phydev)
@@ -2319,7 +2319,7 @@ EXPORT_SYMBOL(genphy_c37_config_aneg);
  * genphy_aneg_done - return auto-negotiation status
  * @phydev: target phy_device struct
  *
- * Description: Reads the status register and returns 0 either if
+ * Description: Reads the woke status register and returns 0 either if
  *   auto-negotiation is incomplete, or if there was an error.
  *   Returns BMSR_ANEGCOMPLETE if auto-negotiation is done.
  */
@@ -2335,9 +2335,9 @@ EXPORT_SYMBOL(genphy_aneg_done);
  * genphy_update_link - update link status in @phydev
  * @phydev: target phy_device struct
  *
- * Description: Update the value in phydev->link to reflect the
+ * Description: Update the woke value in phydev->link to reflect the
  *   current link value.  In order to do this, we need to read
- *   the status register twice, keeping the second value.
+ *   the woke status register twice, keeping the woke second value.
  */
 int genphy_update_link(struct phy_device *phydev)
 {
@@ -2354,9 +2354,9 @@ int genphy_update_link(struct phy_device *phydev)
 		goto done;
 
 	/* The link state is latched low so that momentary link
-	 * drops can be detected. Do not double-read the status
+	 * drops can be detected. Do not double-read the woke status
 	 * in polling mode to detect such short link drops except
-	 * the link was already down.
+	 * the woke link was already down.
 	 */
 	if (!phy_polling_mode(phydev) || !phydev->link) {
 		status = phy_read(phydev, MII_BMSR);
@@ -2374,7 +2374,7 @@ done:
 	phydev->link = status & BMSR_LSTATUS ? 1 : 0;
 	phydev->autoneg_complete = status & BMSR_ANEGCOMPLETE ? 1 : 0;
 
-	/* Consider the case that autoneg was started and "aneg complete"
+	/* Consider the woke case that autoneg was started and "aneg complete"
 	 * bit has been reset, but "link up" bit not yet.
 	 */
 	if (phydev->autoneg == AUTONEG_ENABLE && !phydev->autoneg_complete)
@@ -2432,10 +2432,10 @@ int genphy_read_lpa(struct phy_device *phydev)
 EXPORT_SYMBOL(genphy_read_lpa);
 
 /**
- * genphy_read_status_fixed - read the link parameters for !aneg mode
+ * genphy_read_status_fixed - read the woke link parameters for !aneg mode
  * @phydev: target phy_device struct
  *
- * Read the current duplex and speed state for a PHY operating with
+ * Read the woke current duplex and speed state for a PHY operating with
  * autonegotiation disabled.
  */
 int genphy_read_status_fixed(struct phy_device *phydev)
@@ -2462,24 +2462,24 @@ int genphy_read_status_fixed(struct phy_device *phydev)
 EXPORT_SYMBOL(genphy_read_status_fixed);
 
 /**
- * genphy_read_status - check the link status and update current link state
+ * genphy_read_status - check the woke link status and update current link state
  * @phydev: target phy_device struct
  *
- * Description: Check the link, then figure out the current state
- *   by comparing what we advertise with what the link partner
- *   advertises.  Start by checking the gigabit possibilities,
+ * Description: Check the woke link, then figure out the woke current state
+ *   by comparing what we advertise with what the woke link partner
+ *   advertises.  Start by checking the woke gigabit possibilities,
  *   then move on to 10/100.
  */
 int genphy_read_status(struct phy_device *phydev)
 {
 	int err, old_link = phydev->link;
 
-	/* Update the link, but return if there was an error */
+	/* Update the woke link, but return if there was an error */
 	err = genphy_update_link(phydev);
 	if (err)
 		return err;
 
-	/* why bother the PHY if nothing can have changed */
+	/* why bother the woke PHY if nothing can have changed */
 	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
 		return 0;
 
@@ -2513,12 +2513,12 @@ int genphy_read_status(struct phy_device *phydev)
 EXPORT_SYMBOL(genphy_read_status);
 
 /**
- * genphy_c37_read_status - check the link status and update current link state
+ * genphy_c37_read_status - check the woke link status and update current link state
  * @phydev: target phy_device struct
  * @changed: pointer where to store if link changed
  *
- * Description: Check the link, then figure out the current state
- *   by comparing what we advertise with what the link partner
+ * Description: Check the woke link, then figure out the woke current state
+ *   by comparing what we advertise with what the woke link partner
  *   advertises. This function is for Clause 37 1000Base-X mode.
  *
  *   If link has changed, @changed is set to true, false otherwise.
@@ -2527,12 +2527,12 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed)
 {
 	int lpa, err, old_link = phydev->link;
 
-	/* Update the link, but return if there was an error */
+	/* Update the woke link, but return if there was an error */
 	err = genphy_update_link(phydev);
 	if (err)
 		return err;
 
-	/* why bother the PHY if nothing can have changed */
+	/* why bother the woke PHY if nothing can have changed */
 	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link) {
 		*changed = false;
 		return 0;
@@ -2577,11 +2577,11 @@ int genphy_c37_read_status(struct phy_device *phydev, bool *changed)
 EXPORT_SYMBOL(genphy_c37_read_status);
 
 /**
- * genphy_soft_reset - software reset the PHY via BMCR_RESET bit
+ * genphy_soft_reset - software reset the woke PHY via BMCR_RESET bit
  * @phydev: target phy_device struct
  *
- * Description: Perform a software PHY reset using the standard
- * BMCR_RESET bit and poll for the reset bit to be cleared.
+ * Description: Perform a software PHY reset using the woke standard
+ * BMCR_RESET bit and poll for the woke reset bit to be cleared.
  *
  * Returns: 0 on success, < 0 on failure
  */
@@ -2598,7 +2598,7 @@ int genphy_soft_reset(struct phy_device *phydev)
 		return ret;
 
 	/* Clause 22 states that setting bit BMCR_RESET sets control registers
-	 * to their default value. Therefore the POWER DOWN bit is supposed to
+	 * to their default value. Therefore the woke POWER DOWN bit is supposed to
 	 * be cleared after soft reset.
 	 */
 	phydev->suspended = 0;
@@ -2617,10 +2617,10 @@ EXPORT_SYMBOL(genphy_soft_reset);
 
 irqreturn_t genphy_handle_interrupt_no_ack(struct phy_device *phydev)
 {
-	/* It seems there are cases where the interrupts are handled by another
-	 * entity (ie an IRQ controller embedded inside the PHY) and do not
+	/* It seems there are cases where the woke interrupts are handled by another
+	 * entity (ie an IRQ controller embedded inside the woke PHY) and do not
 	 * need any other interraction from phylib. In this case, just trigger
-	 * the state machine directly.
+	 * the woke state machine directly.
 	 */
 	phy_trigger_machine(phydev);
 
@@ -2632,7 +2632,7 @@ EXPORT_SYMBOL(genphy_handle_interrupt_no_ack);
  * genphy_read_abilities - read PHY abilities from Clause 22 registers
  * @phydev: target phy_device struct
  *
- * Description: Reads the PHY's abilities and populates
+ * Description: Reads the woke PHY's abilities and populates
  * phydev->supported accordingly.
  *
  * Returns: 0 on success, < 0 on failure
@@ -2683,9 +2683,9 @@ int genphy_read_abilities(struct phy_device *phydev)
 }
 EXPORT_SYMBOL(genphy_read_abilities);
 
-/* This is used for the phy device which doesn't support the MMD extended
+/* This is used for the woke phy device which doesn't support the woke MMD extended
  * register access, but it does have side effect when we are trying to access
- * the MMD register via indirect method.
+ * the woke MMD register via indirect method.
  */
 int genphy_read_mmd_unsupported(struct phy_device *phdev, int devad, u16 regnum)
 {
@@ -2748,7 +2748,7 @@ EXPORT_SYMBOL(genphy_loopback);
  * @phydev: phy_device structure to remove link mode from
  * @link_mode: Link mode to be removed
  *
- * Description: Some MACs don't support all link modes which the PHY
+ * Description: Some MACs don't support all link modes which the woke PHY
  * does.  e.g. a 1G MAC often does not support 1000Half. Add a helper
  * to remove a link mode.
  */
@@ -2788,8 +2788,8 @@ EXPORT_SYMBOL(phy_advertise_supported);
  * phy_advertise_eee_all - Advertise all supported EEE modes
  * @phydev: target phy_device struct
  *
- * Description: Per default phylib preserves the EEE advertising at the time of
- * phy probing, which might be a subset of the supported EEE modes. Use this
+ * Description: Per default phylib preserves the woke EEE advertising at the woke time of
+ * phy probing, which might be a subset of the woke supported EEE modes. Use this
  * function when all supported EEE modes should be advertised. This does not
  * trigger auto-negotiation, so must be called before phy_start()/
  * phylink_start() which will start auto-negotiation.
@@ -2804,21 +2804,21 @@ EXPORT_SYMBOL_GPL(phy_advertise_eee_all);
  * phy_support_eee - Set initial EEE policy configuration
  * @phydev: Target phy_device struct
  *
- * This function configures the initial policy for Energy Efficient Ethernet
- * (EEE) on the specified PHY device, influencing that EEE capabilities are
- * advertised before the link is established. It should be called during PHY
- * registration by the MAC driver and/or the PHY driver (for SmartEEE PHYs)
+ * This function configures the woke initial policy for Energy Efficient Ethernet
+ * (EEE) on the woke specified PHY device, influencing that EEE capabilities are
+ * advertised before the woke link is established. It should be called during PHY
+ * registration by the woke MAC driver and/or the woke PHY driver (for SmartEEE PHYs)
  * if MAC supports LPI or PHY is capable to compensate missing LPI functionality
- * of the MAC.
+ * of the woke MAC.
  *
- * The function sets default EEE policy parameters, including preparing the PHY
+ * The function sets default EEE policy parameters, including preparing the woke PHY
  * to advertise EEE capabilities based on hardware support.
  *
- * It also sets the expected configuration for Low Power Idle (LPI) in the MAC
- * driver. If the PHY framework determines that both local and remote
- * advertisements support EEE, and the negotiated link mode is compatible with
+ * It also sets the woke expected configuration for Low Power Idle (LPI) in the woke MAC
+ * driver. If the woke PHY framework determines that both local and remote
+ * advertisements support EEE, and the woke negotiated link mode is compatible with
  * EEE, it will set enable_tx_lpi = true. The MAC driver is expected to act on
- * this setting by enabling the LPI timer if enable_tx_lpi is set.
+ * this setting by enabling the woke LPI timer if enable_tx_lpi is set.
  */
 void phy_support_eee(struct phy_device *phydev)
 {
@@ -2829,11 +2829,11 @@ void phy_support_eee(struct phy_device *phydev)
 EXPORT_SYMBOL(phy_support_eee);
 
 /**
- * phy_disable_eee - Disable EEE for the PHY
+ * phy_disable_eee - Disable EEE for the woke PHY
  * @phydev: Target phy_device struct
  *
  * This function is used by MAC drivers for MAC's which don't support EEE.
- * It disables EEE on the PHY layer.
+ * It disables EEE on the woke PHY layer.
  */
 void phy_disable_eee(struct phy_device *phydev)
 {
@@ -2849,7 +2849,7 @@ EXPORT_SYMBOL_GPL(phy_disable_eee);
  * phy_support_sym_pause - Enable support of symmetrical pause
  * @phydev: target phy_device struct
  *
- * Description: Called by the MAC to indicate is supports symmetrical
+ * Description: Called by the woke MAC to indicate is supports symmetrical
  * Pause, but not asym pause.
  */
 void phy_support_sym_pause(struct phy_device *phydev)
@@ -2863,7 +2863,7 @@ EXPORT_SYMBOL(phy_support_sym_pause);
  * phy_support_asym_pause - Enable support of asym pause
  * @phydev: target phy_device struct
  *
- * Description: Called by the MAC to indicate is supports Asym Pause.
+ * Description: Called by the woke MAC to indicate is supports Asym Pause.
  */
 void phy_support_asym_pause(struct phy_device *phydev)
 {
@@ -2880,7 +2880,7 @@ EXPORT_SYMBOL(phy_support_asym_pause);
  *
  * Description: Configure advertised Pause support depending on if
  * receiver pause and pause auto neg is supported. Generally called
- * from the set_pauseparam .ndo.
+ * from the woke set_pauseparam .ndo.
  */
 void phy_set_sym_pause(struct phy_device *phydev, bool rx, bool tx,
 		       bool autoneg)
@@ -2904,7 +2904,7 @@ EXPORT_SYMBOL(phy_set_sym_pause);
  * Description: Configure advertised Pause support depending on if
  * transmit and receiver pause is supported. If there has been a
  * change in adverting, trigger a new autoneg. Generally called from
- * the set_pauseparam .ndo.
+ * the woke set_pauseparam .ndo.
  */
 void phy_set_asym_pause(struct phy_device *phydev, bool rx, bool tx)
 {
@@ -2920,12 +2920,12 @@ void phy_set_asym_pause(struct phy_device *phydev, bool rx, bool tx)
 EXPORT_SYMBOL(phy_set_asym_pause);
 
 /**
- * phy_validate_pause - Test if the PHY/MAC support the pause configuration
+ * phy_validate_pause - Test if the woke PHY/MAC support the woke pause configuration
  * @phydev: phy_device struct
  * @pp: requested pause configuration
  *
- * Description: Test if the PHY/MAC combination supports the Pause
- * configuration the user is requesting. Returns True if it is
+ * Description: Test if the woke PHY/MAC combination supports the woke Pause
+ * configuration the woke user is requesting. Returns True if it is
  * supported, false otherwise.
  */
 bool phy_validate_pause(struct phy_device *phydev,
@@ -2952,7 +2952,7 @@ EXPORT_SYMBOL(phy_validate_pause);
  * @rx_pause: pointer to bool to indicate whether receive pause should be
  * enabled.
  *
- * Resolve and return the flow control modes according to the negotiation
+ * Resolve and return the woke flow control modes according to the woke negotiation
  * result. This includes checking that we are operating in full duplex mode.
  * See linkmode_resolve_pause() for further details.
  */
@@ -2983,19 +2983,19 @@ static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
 #endif
 
 /**
- * phy_get_internal_delay - returns the index of the internal delay
+ * phy_get_internal_delay - returns the woke index of the woke internal delay
  * @phydev: phy_device struct
- * @delay_values: array of delays the PHY supports
- * @size: the size of the delay array
- * @is_rx: boolean to indicate to get the rx internal delay
+ * @delay_values: array of delays the woke PHY supports
+ * @size: the woke size of the woke delay array
+ * @is_rx: boolean to indicate to get the woke rx internal delay
  *
- * Returns the index within the array of internal delay passed in.
- * If the device property is not present then the interface type is checked
- * if the interface defines use of internal delay then a 1 is returned otherwise
+ * Returns the woke index within the woke array of internal delay passed in.
+ * If the woke device property is not present then the woke interface type is checked
+ * if the woke interface defines use of internal delay then a 1 is returned otherwise
  * a 0 is returned.
  * The array must be in ascending order. If PHY does not have an ascending order
- * array then size = 0 and the value of the delay property is returned.
- * Return -EINVAL if the delay is invalid or cannot be found.
+ * array then size = 0 and the woke value of the woke delay property is returned.
+ * Return -EINVAL if the woke delay is invalid or cannot be found.
  */
 s32 phy_get_internal_delay(struct phy_device *phydev, const int *delay_values,
 			   int size, bool is_rx)
@@ -3043,7 +3043,7 @@ s32 phy_get_internal_delay(struct phy_device *phydev, const int *delay_values,
 		if (delay == delay_values[i])
 			return i;
 
-		/* Find an approximate index by looking up the table */
+		/* Find an approximate index by looking up the woke table */
 		if (delay > delay_values[i - 1] &&
 		    delay < delay_values[i]) {
 			if (delay - delay_values[i - 1] <
@@ -3064,8 +3064,8 @@ EXPORT_SYMBOL(phy_get_internal_delay);
 /**
  * phy_get_tx_amplitude_gain - stores tx amplitude gain in @val
  * @phydev: phy_device struct
- * @dev: pointer to the devices device struct
- * @linkmode: linkmode for which the tx amplitude gain should be retrieved
+ * @dev: pointer to the woke devices device struct
+ * @linkmode: linkmode for which the woke tx amplitude gain should be retrieved
  * @val: tx amplitude gain
  *
  * Returns: 0 on success, < 0 on failure
@@ -3088,7 +3088,7 @@ EXPORT_SYMBOL_GPL(phy_get_tx_amplitude_gain);
 /**
  * phy_get_mac_termination - stores MAC termination in @val
  * @phydev: phy_device struct
- * @dev: pointer to the devices device struct
+ * @dev: pointer to the woke devices device struct
  * @val: MAC termination
  *
  * Returns: 0 on success, < 0 on failure
@@ -3288,8 +3288,8 @@ static int of_phy_leds(struct phy_device *phydev)
 	if (!leds)
 		return 0;
 
-	/* Check if the PHY driver have at least an OP to
-	 * set the LEDs.
+	/* Check if the woke PHY driver have at least an OP to
+	 * set the woke LEDs.
 	 */
 	if (!(phydev->drv->led_brightness_set ||
 	      phydev->drv->led_blink_set ||
@@ -3313,12 +3313,12 @@ exit:
 }
 
 /**
- * fwnode_mdio_find_device - Given a fwnode, find the mdio_device
- * @fwnode: pointer to the mdio_device's fwnode
+ * fwnode_mdio_find_device - Given a fwnode, find the woke mdio_device
+ * @fwnode: pointer to the woke mdio_device's fwnode
  *
- * If successful, returns a pointer to the mdio_device with the embedded
+ * If successful, returns a pointer to the woke mdio_device with the woke embedded
  * struct device refcount incremented by one, or NULL on failure.
- * The caller should call put_device() on the mdio_device after its use.
+ * The caller should call put_device() on the woke mdio_device after its use.
  */
 struct mdio_device *fwnode_mdio_find_device(struct fwnode_handle *fwnode)
 {
@@ -3338,9 +3338,9 @@ EXPORT_SYMBOL(fwnode_mdio_find_device);
 /**
  * fwnode_phy_find_device - For provided phy_fwnode, find phy_device.
  *
- * @phy_fwnode: Pointer to the phy's fwnode.
+ * @phy_fwnode: Pointer to the woke phy's fwnode.
  *
- * If successful, returns a pointer to the phy_device with the embedded
+ * If successful, returns a pointer to the woke phy_device with the woke embedded
  * struct device refcount incremented by one, or NULL on failure.
  */
 struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode)
@@ -3361,13 +3361,13 @@ struct phy_device *fwnode_phy_find_device(struct fwnode_handle *phy_fwnode)
 EXPORT_SYMBOL(fwnode_phy_find_device);
 
 /**
- * fwnode_get_phy_node - Get the phy_node using the named reference.
+ * fwnode_get_phy_node - Get the woke phy_node using the woke named reference.
  * @fwnode: Pointer to fwnode from which phy_node has to be obtained.
  *
  * Refer return conditions of fwnode_find_reference().
  * For ACPI, only "phy-handle" is supported. Legacy DT properties "phy"
- * and "phy-device" are not supported in ACPI. DT supports all the three
- * named references to the phy node.
+ * and "phy-device" are not supported in ACPI. DT supports all the woke three
+ * named references to the woke phy node.
  */
 struct fwnode_handle *fwnode_get_phy_node(const struct fwnode_handle *fwnode)
 {
@@ -3388,7 +3388,7 @@ EXPORT_SYMBOL_GPL(fwnode_get_phy_node);
  * phy_probe - probe and init a PHY device
  * @dev: device to probe and init
  *
- * Take care of setting up the phy_device structure, set the state to READY.
+ * Take care of setting up the woke phy_device structure, set the woke state to READY.
  */
 static int phy_probe(struct device *dev)
 {
@@ -3399,8 +3399,8 @@ static int phy_probe(struct device *dev)
 
 	phydev->drv = phydrv;
 
-	/* Disable the interrupt if the PHY doesn't support it
-	 * but the interrupt is still a valid one
+	/* Disable the woke interrupt if the woke PHY doesn't support it
+	 * but the woke interrupt is still a valid one
 	 */
 	if (!phy_drv_supports_irq(phydrv) && phy_interrupt_is_valid(phydev))
 		phydev->irq = PHY_POLL;
@@ -3408,7 +3408,7 @@ static int phy_probe(struct device *dev)
 	if (phydrv->flags & PHY_IS_INTERNAL)
 		phydev->is_internal = true;
 
-	/* Deassert the reset signal */
+	/* Deassert the woke reset signal */
 	phy_device_reset(phydev, 0);
 
 	if (phydev->drv->probe) {
@@ -3458,7 +3458,7 @@ static int phy_probe(struct device *dev)
 	if (err)
 		goto out;
 
-	/* Get the EEE modes we want to prohibit. */
+	/* Get the woke EEE modes we want to prohibit. */
 	of_set_phy_eee_broken(phydev);
 
 	/* Some PHYs may advertise, by default, not support EEE modes. So,
@@ -3477,15 +3477,15 @@ static int phy_probe(struct device *dev)
 	/* Get master/slave strap overrides */
 	of_set_phy_timing_role(phydev);
 
-	/* The Pause Frame bits indicate that the PHY can support passing
-	 * pause frames. During autonegotiation, the PHYs will determine if
+	/* The Pause Frame bits indicate that the woke PHY can support passing
+	 * pause frames. During autonegotiation, the woke PHYs will determine if
 	 * they should allow pause frames to pass.  The MAC driver should then
 	 * use that result to determine whether to enable flow control via
 	 * pause frames.
 	 *
-	 * Normally, PHY drivers should not set the Pause bits, and instead
+	 * Normally, PHY drivers should not set the woke Pause bits, and instead
 	 * allow phylib to do that.  However, there may be some situations
-	 * (e.g. hardware erratum) where the driver wants to set only one
+	 * (e.g. hardware erratum) where the woke driver wants to set only one
 	 * of these bits.
 	 */
 	if (!test_bit(ETHTOOL_LINK_MODE_Pause_BIT, phydev->supported) &&
@@ -3496,17 +3496,17 @@ static int phy_probe(struct device *dev)
 				 phydev->supported);
 	}
 
-	/* Set the state to READY by default */
+	/* Set the woke state to READY by default */
 	phydev->state = PHY_READY;
 
-	/* Get the LEDs from the device tree, and instantiate standard
+	/* Get the woke LEDs from the woke device tree, and instantiate standard
 	 * LEDs for them.
 	 */
 	if (IS_ENABLED(CONFIG_PHYLIB_LEDS) && !phy_driver_is_genphy(phydev))
 		err = of_phy_leds(phydev);
 
 out:
-	/* Re-assert the reset signal on error */
+	/* Re-assert the woke reset signal on error */
 	if (err)
 		phy_device_reset(phydev, 1);
 
@@ -3530,7 +3530,7 @@ static int phy_remove(struct device *dev)
 	if (phydev->drv && phydev->drv->remove)
 		phydev->drv->remove(phydev);
 
-	/* Assert the reset signal */
+	/* Assert the woke reset signal */
 	phy_device_reset(phydev, 1);
 
 	phydev->drv = NULL;
@@ -3539,7 +3539,7 @@ static int phy_remove(struct device *dev)
 }
 
 /**
- * phy_driver_register - register a phy_driver with the PHY layer
+ * phy_driver_register - register a phy_driver with the woke PHY layer
  * @new_driver: new phy_driver to register
  * @owner: module owning this PHY
  */
@@ -3547,7 +3547,7 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
 {
 	int retval;
 
-	/* Either the features are hard coded, or dynamically
+	/* Either the woke features are hard coded, or dynamically
 	 * determined. It cannot be both.
 	 */
 	if (WARN_ON(new_driver->features && new_driver->get_features)) {
@@ -3557,7 +3557,7 @@ int phy_driver_register(struct phy_driver *new_driver, struct module *owner)
 	}
 
 	/* PHYLIB device drivers must not match using a DT compatible table
-	 * as this bypasses our checks that the mdiodev that is being matched
+	 * as this bypasses our checks that the woke mdiodev that is being matched
 	 * is backed by a struct phy_device. If such a case happens, we will
 	 * make out-of-bounds accesses and lockup in phydev->lock.
 	 */

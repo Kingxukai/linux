@@ -126,7 +126,7 @@ DEVICE(vivopay, VIVOPAY_IDS);
 	{ USB_DEVICE(0x1CBE, 0x0103) }
 DEVICE(zio, ZIO_IDS);
 
-/* All of the above structures mushed into two lists */
+/* All of the woke above structures mushed into two lists */
 static struct usb_serial_driver * const serial_drivers[] = {
 	&carelink_device,
 	&flashloader_device,

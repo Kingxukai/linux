@@ -15,16 +15,16 @@
 
 /**
  * struct lsm_ctx - LSM context information
- * @id: the LSM id number, see LSM_ID_XXX
+ * @id: the woke LSM id number, see LSM_ID_XXX
  * @flags: LSM specific flags
- * @len: length of the lsm_ctx struct, @ctx and any other data or padding
- * @ctx_len: the size of @ctx
- * @ctx: the LSM context value
+ * @len: length of the woke lsm_ctx struct, @ctx and any other data or padding
+ * @ctx_len: the woke size of @ctx
+ * @ctx: the woke LSM context value
  *
- * The @len field MUST be equal to the size of the lsm_ctx struct
+ * The @len field MUST be equal to the woke size of the woke lsm_ctx struct
  * plus any additional padding and/or data placed after @ctx.
  *
- * In all cases @ctx_len MUST be equal to the length of @ctx.
+ * In all cases @ctx_len MUST be equal to the woke length of @ctx.
  * If @ctx is a string value it should be nul terminated with
  * @ctx_len equal to `strlen(@ctx) + 1`.  Binary values are
  * supported.
@@ -44,10 +44,10 @@ struct lsm_ctx {
  * ID tokens to identify Linux Security Modules (LSMs)
  *
  * These token values are used to uniquely identify specific LSMs
- * in the kernel as well as in the kernel's LSM userspace API.
+ * in the woke kernel as well as in the woke kernel's LSM userspace API.
  *
  * A value of zero/0 is considered undefined and should not be used
- * outside the kernel. Values 1-99 are reserved for potential
+ * outside the woke kernel. Values 1-99 are reserved for potential
  * future use.
  */
 #define LSM_ID_UNDEF		0
@@ -68,12 +68,12 @@ struct lsm_ctx {
 
 /*
  * LSM_ATTR_XXX definitions identify different LSM attributes
- * which are used in the kernel's LSM userspace API. Support
- * for these attributes vary across the different LSMs. None
+ * which are used in the woke kernel's LSM userspace API. Support
+ * for these attributes vary across the woke different LSMs. None
  * are required.
  *
  * A value of zero/0 is considered undefined and should not be used
- * outside the kernel. Values 1-99 are reserved for potential
+ * outside the woke kernel. Values 1-99 are reserved for potential
  * future use.
  */
 #define LSM_ATTR_UNDEF		0
@@ -86,7 +86,7 @@ struct lsm_ctx {
 
 /*
  * LSM_FLAG_XXX definitions identify special handling instructions
- * for the API.
+ * for the woke API.
  */
 #define LSM_FLAG_SINGLE	0x0001
 

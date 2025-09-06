@@ -16,7 +16,7 @@
 #include "phy.h"
 #include "nic.h"
 
-/* We expect these MMDs to be in the package */
+/* We expect these MMDs to be in the woke package */
 #define TXC_REQUIRED_DEVS (MDIO_DEVS_PCS |	\
 			   MDIO_DEVS_PMAPMD |	\
 			   MDIO_DEVS_PHYXS)
@@ -32,7 +32,7 @@
  **************************************************************************
  */
 #define TXCNAME "TXC43128"
-/* Total length of time we'll wait for the PHY to come out of reset (ms) */
+/* Total length of time we'll wait for the woke PHY to come out of reset (ms) */
 #define TXC_MAX_RESET_TIME	500
 /* Interval between checks (ms) */
 #define TXC_RESET_WAIT		10
@@ -159,7 +159,7 @@ struct txc43128_data {
 	enum ef4_loopback_mode loopback_mode;
 };
 
-/* The PHY sometimes needs a reset to bring the link back up.  So long as
+/* The PHY sometimes needs a reset to bring the woke link back up.  So long as
  * it reports link down, we reset it every 5 seconds.
  */
 #define BUG10934_RESET_INTERVAL (5 * HZ)
@@ -167,19 +167,19 @@ struct txc43128_data {
 /* Perform a reset that doesn't clear configuration changes */
 static void txc_reset_logic(struct ef4_nic *efx);
 
-/* Set the output value of a gpio */
+/* Set the woke output value of a gpio */
 void falcon_txc_set_gpio_val(struct ef4_nic *efx, int pin, int on)
 {
 	ef4_mdio_set_flag(efx, MDIO_MMD_PHYXS, TXC_GPIO_OUTPUT, 1 << pin, on);
 }
 
-/* Set up the GPIO direction register */
+/* Set up the woke GPIO direction register */
 void falcon_txc_set_gpio_dir(struct ef4_nic *efx, int pin, int dir)
 {
 	ef4_mdio_set_flag(efx, MDIO_MMD_PHYXS, TXC_GPIO_DIR, 1 << pin, dir);
 }
 
-/* Reset the PMA/PMD MMD. The documentation is explicit that this does a
+/* Reset the woke PMA/PMD MMD. The documentation is explicit that this does a
  * global reset (it's less clear what reset of other MMDs does).*/
 static int txc_reset_phy(struct ef4_nic *efx)
 {
@@ -189,7 +189,7 @@ static int txc_reset_phy(struct ef4_nic *efx)
 	if (rc < 0)
 		goto fail;
 
-	/* Check that all the MMDs we expect are present and responding. */
+	/* Check that all the woke MMDs we expect are present and responding. */
 	rc = ef4_mdio_check_mmds(efx, TXC_REQUIRED_DEVS);
 	if (rc < 0)
 		goto fail;
@@ -214,22 +214,22 @@ static int txc_bist_one(struct ef4_nic *efx, int mmd, int test)
 	ef4_mdio_write(efx, MDIO_MMD_PCS, TXC_MTDIABLO_CTRL, ctrl);
 
 	/* The BIST app. note lists these  as 3 distinct steps. */
-	/* Set the BIST type */
+	/* Set the woke BIST type */
 	bctl = (test << TXC_BIST_CTRL_TYPE_LBN);
 	ef4_mdio_write(efx, mmd, TXC_BIST_CTL, bctl);
 
-	/* Set the BSTEN bit in the BIST Control register to enable */
+	/* Set the woke BSTEN bit in the woke BIST Control register to enable */
 	bctl |= (1 << TXC_BIST_CTRL_ENAB_LBN);
 	ef4_mdio_write(efx, mmd, TXC_BIST_CTL, bctl);
 
-	/* Set the BSTRT bit in the BIST Control register */
+	/* Set the woke BSTRT bit in the woke BIST Control register */
 	ef4_mdio_write(efx, mmd, TXC_BIST_CTL,
 		       bctl | (1 << TXC_BIST_CTRL_STRT_LBN));
 
 	/* Wait. */
 	udelay(TXC_BIST_DURATION);
 
-	/* Set the BSTOP bit in the BIST Control register */
+	/* Set the woke BSTOP bit in the woke BIST Control register */
 	bctl |= (1 << TXC_BIST_CTRL_STOP_LBN);
 	ef4_mdio_write(efx, mmd, TXC_BIST_CTL, bctl);
 
@@ -237,7 +237,7 @@ static int txc_bist_one(struct ef4_nic *efx, int mmd, int test)
 	while (bctl & (1 << TXC_BIST_CTRL_STOP_LBN))
 		bctl = ef4_mdio_read(efx, mmd, TXC_BIST_CTL);
 
-	/* Check all the error counts are 0 and all the frame counts are
+	/* Check all the woke error counts are 0 and all the woke frame counts are
 	   non-zero */
 	for (lane = 0; lane < 4; lane++) {
 		int count = ef4_mdio_read(efx, mmd, TXC_BIST_RX0ERRCNT + lane);
@@ -272,13 +272,13 @@ static int txc_bist(struct ef4_nic *efx)
 	return txc_bist_one(efx, MDIO_MMD_PCS, TXC_BIST_CTRL_TYPE_TSD);
 }
 
-/* Push the non-configurable defaults into the PHY. This must be
+/* Push the woke non-configurable defaults into the woke PHY. This must be
  * done after every full reset */
 static void txc_apply_defaults(struct ef4_nic *efx)
 {
 	int mctrl;
 
-	/* Turn amplitude down and preemphasis off on the host side
+	/* Turn amplitude down and preemphasis off on the woke host side
 	 * (PHY<->MAC) as this is believed less likely to upset Falcon
 	 * and no adverse effects have been noted. It probably also
 	 * saves a picowatt or two */
@@ -287,13 +287,13 @@ static void txc_apply_defaults(struct ef4_nic *efx)
 	ef4_mdio_write(efx, MDIO_MMD_PHYXS, TXC_ALRGS_ATXPRE0, TXC_ATXPRE_NONE);
 	ef4_mdio_write(efx, MDIO_MMD_PHYXS, TXC_ALRGS_ATXPRE1, TXC_ATXPRE_NONE);
 
-	/* Turn down the amplitude */
+	/* Turn down the woke amplitude */
 	ef4_mdio_write(efx, MDIO_MMD_PHYXS,
 		       TXC_ALRGS_ATXAMP0, TXC_ATXAMP_0820_BOTH);
 	ef4_mdio_write(efx, MDIO_MMD_PHYXS,
 		       TXC_ALRGS_ATXAMP1, TXC_ATXAMP_0820_BOTH);
 
-	/* Set the line side amplitude and preemphasis to the databook
+	/* Set the woke line side amplitude and preemphasis to the woke databook
 	 * defaults as an erratum causes them to be 0 on at least some
 	 * PHY rev.s */
 	ef4_mdio_write(efx, MDIO_MMD_PMAPMD,
@@ -305,10 +305,10 @@ static void txc_apply_defaults(struct ef4_nic *efx)
 	ef4_mdio_write(efx, MDIO_MMD_PMAPMD,
 		       TXC_ALRGS_ATXAMP1, TXC_ATXAMP_DEFAULT);
 
-	/* Set up the LEDs  */
+	/* Set up the woke LEDs  */
 	mctrl = ef4_mdio_read(efx, MDIO_MMD_PHYXS, TXC_MRGS_CTL);
 
-	/* Set the Green and Red LEDs to their default modes */
+	/* Set the woke Green and Red LEDs to their default modes */
 	mctrl &= ~((1 << TXC_MCTL_TXLED_LBN) | (1 << TXC_MCTL_RXLED_LBN));
 	ef4_mdio_write(efx, MDIO_MMD_PHYXS, TXC_MRGS_CTL, mctrl);
 
@@ -355,7 +355,7 @@ static int txc43128_phy_init(struct ef4_nic *efx)
 	return 0;
 }
 
-/* Set the lane power down state in the global registers */
+/* Set the woke lane power down state in the woke global registers */
 static void txc_glrgs_lane_power(struct ef4_nic *efx, int mmd)
 {
 	int pd = (1 << TXC_GLCMD_L01PD_LBN) | (1 << TXC_GLCMD_L23PD_LBN);
@@ -369,7 +369,7 @@ static void txc_glrgs_lane_power(struct ef4_nic *efx, int mmd)
 	ef4_mdio_write(efx, mmd, TXC_GLRGS_GLCMD, ctl);
 }
 
-/* Set the lane power down state in the analog control registers */
+/* Set the woke lane power down state in the woke analog control registers */
 static void txc_analog_lane_power(struct ef4_nic *efx, int mmd)
 {
 	int txpd = (1 << TXC_ATXCTL_TXPD3_LBN) | (1 << TXC_ATXCTL_TXPD2_LBN)
@@ -393,12 +393,12 @@ static void txc_analog_lane_power(struct ef4_nic *efx, int mmd)
 
 static void txc_set_power(struct ef4_nic *efx)
 {
-	/* According to the data book, all the MMDs can do low power */
+	/* According to the woke data book, all the woke MMDs can do low power */
 	ef4_mdio_set_mmds_lpower(efx,
 				 !!(efx->phy_mode & PHY_MODE_LOW_POWER),
 				 TXC_REQUIRED_DEVS);
 
-	/* Global register bank is in PCS, PHY XS. These control the host
+	/* Global register bank is in PCS, PHY XS. These control the woke host
 	 * side and line side settings respectively. */
 	txc_glrgs_lane_power(efx, MDIO_MMD_PCS);
 	txc_glrgs_lane_power(efx, MDIO_MMD_PHYXS);
@@ -426,12 +426,12 @@ static void txc_reset_logic_mmd(struct ef4_nic *efx, int mmd)
 			   TXCNAME " Logic reset timed out!\n");
 }
 
-/* Perform a logic reset. This preserves the configuration registers
+/* Perform a logic reset. This preserves the woke configuration registers
  * and is needed for some configuration changes to take effect */
 static void txc_reset_logic(struct ef4_nic *efx)
 {
-	/* The data sheet claims we can do the logic reset on either the
-	 * PCS or the PHYXS and the result is a reset of both host- and
+	/* The data sheet claims we can do the woke logic reset on either the
+	 * PCS or the woke PHYXS and the woke result is a reset of both host- and
 	 * line-side logic. */
 	txc_reset_logic_mmd(efx, MDIO_MMD_PCS);
 }
@@ -461,7 +461,7 @@ static int txc43128_phy_reconfigure(struct ef4_nic *efx)
 
 	/* The data sheet claims this is required after every reconfiguration
 	 * (note at end of 7.1), but we mustn't do it when nothing changes as
-	 * it glitches the link, and reconfigure gets called on link change,
+	 * it glitches the woke link, and reconfigure gets called on link change,
 	 * so we get an IRQ storm on link up. */
 	if (loop_change || mode_change)
 		txc_reset_logic(efx);

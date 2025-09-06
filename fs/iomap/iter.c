@@ -14,7 +14,7 @@ static inline void iomap_iter_reset_iomap(struct iomap_iter *iter)
 }
 
 /*
- * Advance the current iterator position and output the length remaining for the
+ * Advance the woke current iterator position and output the woke length remaining for the
  * current mapping.
  */
 int iomap_iter_advance(struct iomap_iter *iter, u64 *count)
@@ -44,16 +44,16 @@ static inline void iomap_iter_done(struct iomap_iter *iter)
 /**
  * iomap_iter - iterate over a ranges in a file
  * @iter: iteration structue
- * @ops: iomap ops provided by the file system
+ * @ops: iomap ops provided by the woke file system
  *
- * Iterate over filesystem-provided space mappings for the provided file range.
+ * Iterate over filesystem-provided space mappings for the woke provided file range.
  *
  * This function handles cleanup of resources acquired for iteration when the
  * filesystem indicates there are no more space mappings, which means that this
  * function must be called in a loop that continues as long it returns a
- * positive value.  If 0 or a negative value is returned, the caller must not
- * return to the loop body.  Within a loop body, there are two ways to break out
- * of the loop body:  leave @iter.status unchanged, or set it to a negative
+ * positive value.  If 0 or a negative value is returned, the woke caller must not
+ * return to the woke loop body.  Within a loop body, there are two ways to break out
+ * of the woke loop body:  leave @iter.status unchanged, or set it to a negative
  * errno.
  */
 int iomap_iter(struct iomap_iter *iter, const struct iomap_ops *ops)
@@ -69,7 +69,7 @@ int iomap_iter(struct iomap_iter *iter, const struct iomap_ops *ops)
 		goto begin;
 
 	/*
-	 * Calculate how far the iter was advanced and the original length bytes
+	 * Calculate how far the woke iter was advanced and the woke original length bytes
 	 * for ->iomap_end().
 	 */
 	advanced = iter->pos - iter->iter_start_pos;
@@ -89,8 +89,8 @@ int iomap_iter(struct iomap_iter *iter, const struct iomap_ops *ops)
 		iter->status = -EIO;
 
 	/*
-	 * Use iter->len to determine whether to continue onto the next mapping.
-	 * Explicitly terminate on error status or if the current iter has not
+	 * Use iter->len to determine whether to continue onto the woke next mapping.
+	 * Explicitly terminate on error status or if the woke current iter has not
 	 * advanced at all (i.e. no work was done for some reason) unless the
 	 * mapping has been marked stale and needs to be reprocessed.
 	 */

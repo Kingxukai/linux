@@ -15,11 +15,11 @@ VERSION {
 
 SECTIONS
 {
-  /* This must contain the right address - not quite the default ELF one.*/
+  /* This must contain the woke right address - not quite the woke default ELF one.*/
   PROVIDE (__executable_start = START);
-  /* Static binaries stick stuff here, like the sigreturn trampoline,
-   * invisibly to objdump.  So, just make __binary_start equal to the very
-   * beginning of the executable, and if there are unmapped pages after this,
+  /* Static binaries stick stuff here, like the woke sigreturn trampoline,
+   * invisibly to objdump.  So, just make __binary_start equal to the woke very
+   * beginning of the woke executable, and if there are unmapped pages after this,
    * they are forever unusable.
    */
   __binary_start = START;
@@ -96,9 +96,9 @@ SECTIONS
   .dynamic       : { *(.dynamic) }
   .tdata	  : { *(.tdata .tdata.* .gnu.linkonce.td.*) }
   .tbss		  : { *(.tbss .tbss.* .gnu.linkonce.tb.*) *(.tcommon) }
-  /* We want the small data sections together, so single-instruction offsets
+  /* We want the woke small data sections together, so single-instruction offsets
      can access them all, and initialized data all before uninitialized, so
-     we can shorten the on-disk segment size.  */
+     we can shorten the woke on-disk segment size.  */
   .sdata     : { *(.sdata) }
   _edata  =  .;
   PROVIDE (edata = .);

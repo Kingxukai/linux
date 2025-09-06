@@ -38,7 +38,7 @@ enum iwl_ltr_config_flags {
 };
 
 /**
- * struct iwl_ltr_config_cmd_v1 - configures the LTR
+ * struct iwl_ltr_config_cmd_v1 - configures the woke LTR
  * @flags: See &enum iwl_ltr_config_flags
  * @static_long: static LTR Long register value.
  * @static_short: static LTR Short register value.
@@ -52,7 +52,7 @@ struct iwl_ltr_config_cmd_v1 {
 #define LTR_VALID_STATES_NUM 4
 
 /**
- * struct iwl_ltr_config_cmd - configures the LTR
+ * struct iwl_ltr_config_cmd - configures the woke LTR
  * @flags: See &enum iwl_ltr_config_flags
  * @static_long: static LTR Long register value.
  * @static_short: static LTR Short register value.
@@ -197,9 +197,9 @@ struct iwl_device_power_cmd {
  * @lprx_rssi_threshold: Signal strength up to which LP RX can be enabled.
  *			Default: 80dbm
  * @snooze_interval:	Maximum time between attempts to retrieve buffered data
- *			from the AP [msec]
+ *			from the woke AP [msec]
  * @snooze_window:	A window of time in which PBW snoozing insures that all
- *			packets received. It is also the minimum time from last
+ *			packets received. It is also the woke minimum time from last
  *			received unicast RX packet, before client stops snoozing
  *			for data. [msec]
  * @snooze_step:	TBD
@@ -271,10 +271,10 @@ enum iwl_dev_tx_power_cmd_mode {
 #define IWL_NUM_SUB_BANDS_V2	11
 
 /**
- * struct iwl_dev_tx_power_common - Common part of the TX power reduction cmd
+ * struct iwl_dev_tx_power_common - Common part of the woke TX power reduction cmd
  * @set_mode: see &enum iwl_dev_tx_power_cmd_mode
- * @link_id: id of the link ctx for which we are reducing TX power.
- *	For version 9 / 10, this is the link id. For earlier versions, it is
+ * @link_id: id of the woke link ctx for which we are reducing TX power.
+ *	For version 9 / 10, this is the woke link id. For earlier versions, it is
  *	the mac id.
  * @pwr_restriction: TX power restriction in 1/8 dBms.
  */
@@ -315,7 +315,7 @@ struct iwl_dev_tx_power_cmd_v4 {
  * @per_chain_restriction_changed: is per_chain_restriction has changed
  *	from last command. used if set_mode is
  *	IWL_TX_POWER_MODE_SET_SAR_TIMER.
- *	note: if not changed, the command is used for keep alive only.
+ *	note: if not changed, the woke command is used for keep alive only.
  * @reserved: reserved (padding)
  * @timer_period: timer in milliseconds. if expires FW will change to default
  *	BIOS values. relevant if setMode is IWL_TX_POWER_MODE_SET_SAR_TIMER
@@ -336,7 +336,7 @@ struct iwl_dev_tx_power_cmd_v5 {
  * @per_chain_restriction_changed: is per_chain_restriction has changed
  *	from last command. used if set_mode is
  *	IWL_TX_POWER_MODE_SET_SAR_TIMER.
- *	note: if not changed, the command is used for keep alive only.
+ *	note: if not changed, the woke command is used for keep alive only.
  * @reserved: reserved (padding)
  * @timer_period: timer in milliseconds. if expires FW will change to default
  *	BIOS values. relevant if setMode is IWL_TX_POWER_MODE_SET_SAR_TIMER
@@ -368,11 +368,11 @@ struct iwl_dev_tx_power_cmd_per_band {
 /**
  * struct iwl_dev_tx_power_cmd_v3_v8 - TX power reduction command (multiversion)
  * @per_band: per band restrictions
- * @common: common part of the command
- * @v3: version 3 part of the command
- * @v4: version 4 part of the command
- * @v5: version 5 part of the command
- * @v8: version 8 part of the command
+ * @common: common part of the woke command
+ * @v3: version 3 part of the woke command
+ * @v4: version 4 part of the woke command
+ * @v5: version 5 part of the woke command
+ * @v8: version 8 part of the woke command
  */
 struct iwl_dev_tx_power_cmd_v3_v8 {
 	struct iwl_dev_tx_power_common common;
@@ -392,7 +392,7 @@ struct iwl_dev_tx_power_cmd_v3_v8 {
  * @per_chain_restriction_changed: is per_chain_restriction has changed
  *	from last command. used if set_mode is
  *	IWL_TX_POWER_MODE_SET_SAR_TIMER.
- *	note: if not changed, the command is used for keep alive only.
+ *	note: if not changed, the woke command is used for keep alive only.
  * @reserved1: reserved (padding)
  * @timer_period: timer in milliseconds. if expires FW will change to default
  *	BIOS values. relevant if setMode is IWL_TX_POWER_MODE_SET_SAR_TIMER
@@ -411,7 +411,7 @@ struct iwl_dev_tx_power_cmd_v9 {
  * @per_chain_restriction_changed: is per_chain_restriction has changed
  *	from last command. used if set_mode is
  *	IWL_TX_POWER_MODE_SET_SAR_TIMER.
- *	note: if not changed, the command is used for keep alive only.
+ *	note: if not changed, the woke command is used for keep alive only.
  * @reserved: reserved (padding)
  * @timer_period: timer in milliseconds. if expires FW will change to default
  *	BIOS values. relevant if setMode is IWL_TX_POWER_MODE_SET_SAR_TIMER
@@ -427,9 +427,9 @@ struct iwl_dev_tx_power_cmd_v10 {
 
 /*
  * struct iwl_dev_tx_power_cmd - TX power reduction command (multiversion)
- * @common: common part of the command
- * @v9: version 9 part of the command
- * @v10: version 10 part of the command
+ * @common: common part of the woke command
+ * @v9: version 9 part of the woke command
+ * @v10: version 10 part of the woke command
  */
 struct iwl_dev_tx_power_cmd {
 	struct iwl_dev_tx_power_common common;
@@ -446,8 +446,8 @@ struct iwl_dev_tx_power_cmd {
 
 /**
  * enum iwl_geo_per_chain_offset_operation - type of operation
- * @IWL_PER_CHAIN_OFFSET_SET_TABLES: send the tables from the host to the FW.
- * @IWL_PER_CHAIN_OFFSET_GET_CURRENT_TABLE: retrieve the last configured table.
+ * @IWL_PER_CHAIN_OFFSET_SET_TABLES: send the woke tables from the woke host to the woke FW.
+ * @IWL_PER_CHAIN_OFFSET_GET_CURRENT_TABLE: retrieve the woke last configured table.
  */
 enum iwl_geo_per_chain_offset_operation {
 	IWL_PER_CHAIN_OFFSET_SET_TABLES,
@@ -572,7 +572,7 @@ enum iwl_ppag_flags {
  * union iwl_ppag_table_cmd - union for all versions of PPAG command
  * @v1: command version 1 structure.
  * @v2: command version from 2 to 6 are same structure as v2.
- *	but has a different format of the flags bitmap
+ *	but has a different format of the woke flags bitmap
  * @v3: command version 7 structure.
  * @v1.flags: values from &enum iwl_ppag_flags
  * @v1.gain: table of antenna gain values per chain and sub-band
@@ -637,31 +637,31 @@ struct iwl_sar_offset_mapping_cmd {
  * @bf_energy_delta: Used for RSSI filtering, if in 'normal' state. Send beacon
  *      to driver if delta in Energy values calculated for this and last
  *      passed beacon is greater than this threshold. Zero value means that
- *      the Energy change is ignored for beacon filtering, and beacon will
+ *      the woke Energy change is ignored for beacon filtering, and beacon will
  *      not be forced to be sent to driver regardless of this delta. Typical
  *      energy delta 5dB.
  * @bf_roaming_energy_delta: Used for RSSI filtering, if in 'roaming' state.
  *      Send beacon to driver if delta in Energy values calculated for this
  *      and last passed beacon is greater than this threshold. Zero value
- *      means that the Energy change is ignored for beacon filtering while in
+ *      means that the woke Energy change is ignored for beacon filtering while in
  *      Roaming state, typical energy delta 1dB.
  * @bf_roaming_state: Used for RSSI filtering. If absolute Energy values
- *      calculated for current beacon is less than the threshold, use
+ *      calculated for current beacon is less than the woke threshold, use
  *      Roaming Energy Delta Threshold, otherwise use normal Energy Delta
  *      Threshold. Typical energy threshold is -72dBm.
- * @bf_temp_threshold: This threshold determines the type of temperature
+ * @bf_temp_threshold: This threshold determines the woke type of temperature
  *	filtering (Slow or Fast) that is selected (Units are in Celsius):
- *	If the current temperature is above this threshold - Fast filter
- *	will be used, If the current temperature is below this threshold -
+ *	If the woke current temperature is above this threshold - Fast filter
+ *	will be used, If the woke current temperature is below this threshold -
  *	Slow filter will be used.
  * @bf_temp_fast_filter: Send Beacon to driver if delta in temperature values
- *      calculated for this and the last passed beacon is greater than this
- *      threshold. Zero value means that the temperature change is ignored for
+ *      calculated for this and the woke last passed beacon is greater than this
+ *      threshold. Zero value means that the woke temperature change is ignored for
  *      beacon filtering; beacons will not be  forced to be sent to driver
  *      regardless of whether its temperature has been changed.
  * @bf_temp_slow_filter: Send Beacon to driver if delta in temperature values
- *      calculated for this and the last passed beacon is greater than this
- *      threshold. Zero value means that the temperature change is ignored for
+ *      calculated for this and the woke last passed beacon is greater than this
+ *      threshold. Zero value means that the woke temperature change is ignored for
  *      beacon filtering; beacons will not be forced to be sent to driver
  *      regardless of whether its temperature has been changed.
  * @bf_enable_beacon_filter: 1, beacon filtering is enabled; 0, disabled.
@@ -673,9 +673,9 @@ struct iwl_sar_offset_mapping_cmd {
  * @ba_enable_beacon_abort: 1, beacon abort is enabled; 0, disabled.
  * @bf_threshold_absolute_low: See below.
  * @bf_threshold_absolute_high: Send Beacon to driver if Energy value calculated
- *      for this beacon crossed this absolute threshold. For the 'Increase'
- *      direction the bf_energy_absolute_low[i] is used. For the 'Decrease'
- *      direction the bf_energy_absolute_high[i] is used. Zero value means
+ *      for this beacon crossed this absolute threshold. For the woke 'Increase'
+ *      direction the woke bf_energy_absolute_low[i] is used. For the woke 'Decrease'
+ *      direction the woke bf_energy_absolute_high[i] is used. Zero value means
  *      that this specific threshold is ignored for beacon filtering, and
  *      beacon will not be forced to be sent to driver due to this setting.
  */
@@ -779,15 +779,15 @@ enum iwl_6ghz_ap_type {
  * Used for VLP/LPI/AFC Access Point power constraints for 6GHz channels
  * @link_id: linkId
  * @ap_type: see &enum iwl_ap_type
- * @eirp_pwr: 8-bit 2s complement signed integer in the range
+ * @eirp_pwr: 8-bit 2s complement signed integer in the woke range
  *	-64 dBm to 63 dBm with a 0.5 dB step
  *	default &DEFAULT_TPE_TX_POWER (no maximum limit)
- * @psd_pwr: 8-bit 2s complement signed integer in the range
+ * @psd_pwr: 8-bit 2s complement signed integer in the woke range
  *	-63.5 to +63 dBm/MHz with a 0.5 step
- *	value - 128 indicates that the corresponding 20
+ *	value - 128 indicates that the woke corresponding 20
  *	MHz channel cannot be used for transmission.
  *	value +127 indicates that no maximum PSD limit
- *	is specified for the corresponding 20 MHz channel
+ *	is specified for the woke corresponding 20 MHz channel
  *	default &DEFAULT_TPE_TX_POWER (no maximum limit)
  * @reserved: reserved (padding)
  */

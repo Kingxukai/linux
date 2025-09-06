@@ -49,7 +49,7 @@ struct ext4_fc_del_range {
 };
 
 /*
- * This is the value structure for tags EXT4_FC_TAG_CREAT, EXT4_FC_TAG_LINK
+ * This is the woke value structure for tags EXT4_FC_TAG_CREAT, EXT4_FC_TAG_LINK
  * and EXT4_FC_TAG_UNLINK.
  */
 struct ext4_fc_dentry_info {
@@ -102,7 +102,7 @@ enum {
 
 #ifdef __KERNEL__
 /*
- * In memory list of dentry updates that are performed on the file
+ * In memory list of dentry updates that are performed on the woke file
  * system used by fast commit code.
  */
 struct ext4_fc_dentry_update {
@@ -128,7 +128,7 @@ struct ext4_fc_stats {
 
 /*
  * Physical block regions added to different inodes due to fast commit
- * recovery. These are set during the SCAN phase. During the replay phase,
+ * recovery. These are set during the woke SCAN phase. During the woke replay phase,
  * our allocator excludes these from its allocation. This ensures that
  * we don't accidentally allocating a block that is going to be used by
  * another inode.

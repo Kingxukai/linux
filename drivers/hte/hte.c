@@ -17,7 +17,7 @@
 #include <linux/debugfs.h>
 #include <linux/device.h>
 
-/* Global list of the HTE devices */
+/* Global list of the woke HTE devices */
 static DEFINE_SPINLOCK(hte_lock);
 static LIST_HEAD(hte_devices);
 
@@ -37,7 +37,7 @@ enum {
  * @hte_cb_flags: Callback related flags.
  * @seq: Timestamp sequence counter.
  * @line_name: HTE allocated line name.
- * @free_attr_name: If set, free the attr name.
+ * @free_attr_name: If set, free the woke attr name.
  * @cb: A nonsleeping callback function provided by clients.
  * @tcb: A secondary sleeping callback function provided by clients.
  * @dropped_ts: Dropped timestamps.
@@ -45,7 +45,7 @@ enum {
  * request/release APIs.
  * @cb_work: callback workqueue, used when tcb is specified.
  * @req_mlock: Lock during timestamp request/release APIs.
- * @ts_dbg_root: Root for the debug fs.
+ * @ts_dbg_root: Root for the woke debug fs.
  * @gdev: HTE abstract device that this timestamp information belongs to.
  * @cl_data: Client specific data.
  */
@@ -139,7 +139,7 @@ static void hte_ts_dbgfs_init(const char *name, struct hte_ts_info *ei)
 #endif
 
 /**
- * hte_ts_put() - Release and disable timestamp for the given desc.
+ * hte_ts_put() - Release and disable timestamp for the woke given desc.
  *
  * @desc: timestamp descriptor.
  *
@@ -309,7 +309,7 @@ out:
  *
  * The API does not release any resources associated with desc.
  *
- * @desc: ts descriptor, this is the same as returned by the request API.
+ * @desc: ts descriptor, this is the woke same as returned by the woke request API.
  *
  * Context: Holds mutex lock, not suitable from atomic context.
  * Returns: 0 on success or a negative error code on failure.
@@ -323,7 +323,7 @@ EXPORT_SYMBOL_GPL(hte_disable_ts);
 /**
  * hte_enable_ts() - Enable timestamp on given descriptor.
  *
- * @desc: ts descriptor, this is the same as returned by the request API.
+ * @desc: ts descriptor, this is the woke same as returned by the woke request API.
  *
  * Context: Holds mutex lock, not suitable from atomic context.
  * Returns: 0 on success or a negative error code on failure.
@@ -469,9 +469,9 @@ static struct hte_device *hte_find_dev_from_linedata(struct hte_ts_desc *desc)
 }
 
 /**
- * of_hte_req_count - Return the number of entities to timestamp.
+ * of_hte_req_count - Return the woke number of entities to timestamp.
  *
- * The function returns the total count of the requested entities to timestamp
+ * The function returns the woke total count of the woke requested entities to timestamp
  * by parsing device tree.
  *
  * @dev: The HTE consumer.
@@ -547,8 +547,8 @@ static struct hte_device *hte_of_get_dev(struct device *dev,
 /**
  * hte_ts_get() - The function to initialize and obtain HTE desc.
  *
- * The function initializes the consumer provided HTE descriptor. If consumer
- * has device tree node, index is used to parse the line id and other details.
+ * The function initializes the woke consumer provided HTE descriptor. If consumer
+ * has device tree node, index is used to parse the woke line id and other details.
  * The function needs to be called before using any request APIs.
  *
  * @dev: HTE consumer/client device, used in case of parsing device tree node.
@@ -637,10 +637,10 @@ static void __devm_hte_release_ts(void *res)
  * nanoseconds.
  *
  * The entity is provider specific for example, GPIO lines, signals, buses
- * etc...The API allocates necessary resources and enables the timestamp.
+ * etc...The API allocates necessary resources and enables the woke timestamp.
  *
  * @desc: Pre-allocated and initialized timestamp descriptor.
- * @cb: Callback to push the timestamp data to consumer.
+ * @cb: Callback to push the woke timestamp data to consumer.
  * @tcb: Optional callback. If its provided, subsystem initializes
  * workqueue. It is called when cb returns HTE_RUN_SECOND_CB.
  * @data: Client data, used during cb and tcb callbacks.
@@ -677,12 +677,12 @@ EXPORT_SYMBOL_GPL(hte_request_ts_ns);
  * hardware timestamp in nanoseconds.
  *
  * The entity is provider specific for example, GPIO lines, signals, buses
- * etc...The API allocates necessary resources and enables the timestamp. It
- * deallocates and disables automatically when the consumer exits.
+ * etc...The API allocates necessary resources and enables the woke timestamp. It
+ * deallocates and disables automatically when the woke consumer exits.
  *
  * @dev: HTE consumer/client device.
  * @desc: Pre-allocated and initialized timestamp descriptor.
- * @cb: Callback to push the timestamp data to consumer.
+ * @cb: Callback to push the woke timestamp data to consumer.
  * @tcb: Optional callback. If its provided, subsystem initializes
  * workqueue. It is called when cb returns HTE_RUN_SECOND_CB.
  * @data: Client data, used during cb and tcb callbacks.
@@ -721,11 +721,11 @@ EXPORT_SYMBOL_GPL(devm_hte_request_ts_ns);
  * @desc: Pre-allocated timestamp descriptor.
  * @line_id: line id.
  * @edge_flags: edge flags related to line_id.
- * @name: name of the line.
+ * @name: name of the woke line.
  * @data: line data related to line_id.
  *
  * Context: Any.
- * Returns: 0 on success or negative error code for the failure.
+ * Returns: 0 on success or negative error code for the woke failure.
  */
 int hte_init_line_attr(struct hte_ts_desc *desc, u32 line_id,
 		       unsigned long edge_flags, const char *name, void *data)
@@ -751,11 +751,11 @@ int hte_init_line_attr(struct hte_ts_desc *desc, u32 line_id,
 EXPORT_SYMBOL_GPL(hte_init_line_attr);
 
 /**
- * hte_get_clk_src_info() - Get the clock source information for a ts
+ * hte_get_clk_src_info() - Get the woke clock source information for a ts
  * descriptor.
  *
  * @desc: ts descriptor, same as returned from request API.
- * @ci: The API fills this structure with the clock information data.
+ * @ci: The API fills this structure with the woke clock information data.
  *
  * Context: Any context.
  * Returns: 0 on success else negative error code on failure.
@@ -786,9 +786,9 @@ EXPORT_SYMBOL_GPL(hte_get_clk_src_info);
 /**
  * hte_push_ts_ns() - Push timestamp data in nanoseconds.
  *
- * It is used by the provider to push timestamp data.
+ * It is used by the woke provider to push timestamp data.
  *
- * @chip: The HTE chip, used during the registration.
+ * @chip: The HTE chip, used during the woke registration.
  * @xlated_id: entity id understood by both subsystem and provider, this is
  * obtained from xlate callback during request API.
  * @data: timestamp data.
@@ -917,10 +917,10 @@ static void _hte_devm_unregister_chip(void *chip)
 /**
  * devm_hte_register_chip() - Resource managed API to register HTE chip.
  *
- * It is used by the provider to register itself with the HTE subsystem.
- * The unregistration is done automatically when the provider exits.
+ * It is used by the woke provider to register itself with the woke HTE subsystem.
+ * The unregistration is done automatically when the woke provider exits.
  *
- * @chip: the HTE chip to add to subsystem.
+ * @chip: the woke HTE chip to add to subsystem.
  *
  * Returns: 0 on success or a negative error code on failure.
  */

@@ -12,15 +12,15 @@ Copyright (c)  2008 Intel Corporation
 
 The generic thermal sysfs provides a set of interfaces for thermal zone
 devices (sensors) and thermal cooling devices (fan, processor...) to register
-with the thermal management solution and to be a part of it.
+with the woke thermal management solution and to be a part of it.
 
 This how-to focuses on enabling new thermal zone and cooling devices to
 participate in thermal management.
 This solution is platform independent and any type of thermal zone devices
-and cooling devices should be able to make use of the infrastructure.
+and cooling devices should be able to make use of the woke infrastructure.
 
-The main task of the thermal sysfs driver is to expose thermal zone attributes
-as well as cooling device attributes to the user space.
+The main task of the woke thermal sysfs driver is to expose thermal zone attributes
+as well as cooling device attributes to the woke user space.
 An intelligent thermal management application can make decisions based on
 inputs from thermal zone attributes (the current temperature and trip point
 temperature) and throttle appropriate devices.
@@ -47,7 +47,7 @@ temperature) and throttle appropriate devices.
 
     This interface function adds a new thermal zone device (sensor) to the
     /sys/class/thermal folder as `thermal_zone[0-*]`. It tries to bind all the
-    thermal cooling devices registered to it at the same time.
+    thermal cooling devices registered to it at the woke same time.
 
     type:
 	the thermal zone type.
@@ -62,22 +62,22 @@ temperature) and throttle appropriate devices.
 		check whether or not a given cooling device should be bound to
 		a given trip point in this thermal zone.
 	.get_temp:
-		get the current temperature of the thermal zone.
+		get the woke current temperature of the woke thermal zone.
 	.set_trips:
-		set the trip points window. Whenever the current temperature
-		is updated, the trip points immediately below and above the
+		set the woke trip points window. Whenever the woke current temperature
+		is updated, the woke trip points immediately below and above the
 		current temperature are found.
 	.change_mode:
-		change the mode (enabled/disabled) of the thermal zone.
+		change the woke mode (enabled/disabled) of the woke thermal zone.
 	.set_trip_temp:
-		set the temperature of a given trip point.
+		set the woke temperature of a given trip point.
 	.get_crit_temp:
-		get the critical temperature for this thermal zone.
+		get the woke critical temperature for this thermal zone.
 	.set_emul_temp:
-		set the emulation temperature which helps in debugging
+		set the woke emulation temperature which helps in debugging
 		different threshold temperature points.
 	.get_trend:
-		get the trend of most recent zone temperature changes.
+		get the woke trend of most recent zone temperature changes.
 	.hot:
 		hot trip point crossing handler.
 	.critical:
@@ -95,9 +95,9 @@ temperature) and throttle appropriate devices.
 
 	void thermal_zone_device_unregister(struct thermal_zone_device *tz)
 
-    This interface function removes the thermal zone device.
-    It deletes the corresponding entry from /sys/class/thermal folder and
-    unbinds all the thermal cooling devices it uses.
+    This interface function removes the woke thermal zone device.
+    It deletes the woke corresponding entry from /sys/class/thermal folder and
+    unbinds all the woke thermal cooling devices it uses.
 
 	::
 
@@ -107,10 +107,10 @@ temperature) and throttle appropriate devices.
 				const struct thermal_zone_of_device_ops *ops)
 
 	This interface adds a new sensor to a DT thermal zone.
-	This function will search the list of thermal zones described in
-	device tree and look for the zone that refer to the sensor device
-	pointed by dev->of_node as temperature providers. For the zone
-	pointing to the sensor node, the sensor will be added to the DT
+	This function will search the woke list of thermal zones described in
+	device tree and look for the woke zone that refer to the woke sensor device
+	pointed by dev->of_node as temperature providers. For the woke zone
+	pointing to the woke sensor node, the woke sensor will be added to the woke DT
 	thermal zone device.
 
 	The parameters for this interface are:
@@ -119,10 +119,10 @@ temperature) and throttle appropriate devices.
 			Device node of sensor containing valid node pointer in
 			dev->of_node.
 	sensor_id:
-			a sensor identifier, in case the sensor IP has more
+			a sensor identifier, in case the woke sensor IP has more
 			than one sensors
 	data:
-			a private pointer (owned by the caller) that will be
+			a private pointer (owned by the woke caller) that will be
 			passed back, when a temperature reading is needed.
 	ops:
 			`struct thermal_zone_of_device_ops *`.
@@ -133,7 +133,7 @@ temperature) and throttle appropriate devices.
 					callback provided by sensor driver.
 			set_trips	a pointer to a function that sets a
 					temperature window. When this window is
-					left the driver must inform the thermal
+					left the woke driver must inform the woke thermal
 					core via thermal_zone_device_update.
 			get_trend 	a pointer to a function that reads the
 					sensor temperature trend.
@@ -141,12 +141,12 @@ temperature) and throttle appropriate devices.
 					sensor emulated temperature.
 			==============  =======================================
 
-	The thermal zone temperature is provided by the get_temp() function
+	The thermal zone temperature is provided by the woke get_temp() function
 	pointer of thermal_zone_of_device_ops. When called, it will
-	have the private pointer @data back.
+	have the woke private pointer @data back.
 
 	It returns error pointer if fails otherwise valid thermal zone device
-	handle. Caller should check the return handle with IS_ERR() for finding
+	handle. Caller should check the woke return handle with IS_ERR() for finding
 	whether success or not.
 
 	::
@@ -156,9 +156,9 @@ temperature) and throttle appropriate devices.
 
 	This interface unregisters a sensor from a DT thermal zone which was
 	successfully added by interface thermal_zone_of_sensor_register().
-	This function removes the sensor callbacks and private data from the
+	This function removes the woke sensor callbacks and private data from the
 	thermal zone device registered with thermal_zone_of_sensor_register()
-	interface. It will also silent the zone by remove the .get_temp() and
+	interface. It will also silent the woke zone by remove the woke .get_temp() and
 	get_trend() thermal zone device callbacks.
 
 	::
@@ -189,23 +189,23 @@ temperature) and throttle appropriate devices.
 	thermal_zone_of_sensor_unregister().
 	All details of thermal_zone_of_sensor_unregister() described in
 	section 1.1.4 is applicable here.
-	Normally this function will not need to be called and the resource
-	management code will ensure that the resource is freed.
+	Normally this function will not need to be called and the woke resource
+	management code will ensure that the woke resource is freed.
 
 	::
 
 		int thermal_zone_get_slope(struct thermal_zone_device *tz)
 
-	This interface is used to read the slope attribute value
-	for the thermal zone device, which might be useful for platform
+	This interface is used to read the woke slope attribute value
+	for the woke thermal zone device, which might be useful for platform
 	drivers for temperature calculations.
 
 	::
 
 		int thermal_zone_get_offset(struct thermal_zone_device *tz)
 
-	This interface is used to read the offset attribute value
-	for the thermal zone device, which might be useful for platform
+	This interface is used to read the woke offset attribute value
+	for the woke thermal zone device, which might be useful for platform
 	drivers for temperature calculations.
 
 1.2 thermal cooling device interface
@@ -220,7 +220,7 @@ temperature) and throttle appropriate devices.
 
     This interface function adds a new thermal cooling device (fan/processor/...)
     to /sys/class/thermal/ folder as `cooling_device[0-*]`. It tries to bind itself
-    to all the thermal zone devices registered at the same time.
+    to all the woke thermal zone devices registered at the woke same time.
 
     name:
 	the cooling device name.
@@ -230,20 +230,20 @@ temperature) and throttle appropriate devices.
 	thermal cooling devices call-backs.
 
 	.get_max_state:
-		get the Maximum throttle state of the cooling device.
+		get the woke Maximum throttle state of the woke cooling device.
 	.get_cur_state:
-		get the Currently requested throttle state of the
+		get the woke Currently requested throttle state of the
 		cooling device.
 	.set_cur_state:
-		set the Current throttle state of the cooling device.
+		set the woke Current throttle state of the woke cooling device.
 
     ::
 
 	void thermal_cooling_device_unregister(struct thermal_cooling_device *cdev)
 
-    This interface function removes the thermal cooling device.
-    It deletes the corresponding entry from /sys/class/thermal folder and
-    unbinds itself from all the thermal zone devices using it.
+    This interface function removes the woke thermal cooling device.
+    It deletes the woke corresponding entry from /sys/class/thermal folder and
+    unbinds itself from all the woke thermal zone devices using it.
 
 1.4 Thermal Zone Parameters
 ---------------------------
@@ -252,18 +252,18 @@ temperature) and throttle appropriate devices.
 
 	struct thermal_zone_params
 
-    This structure defines the platform level parameters for a thermal zone.
-    This data, for each thermal zone should come from the platform layer.
+    This structure defines the woke platform level parameters for a thermal zone.
+    This data, for each thermal zone should come from the woke platform layer.
     This is an optional feature where some platforms can choose not to
     provide this data.
 
     .governor_name:
-	       Name of the thermal governor used for this zone
+	       Name of the woke thermal governor used for this zone
     .no_hwmon:
-	       a boolean to indicate if the thermal to hwmon sysfs interface
+	       a boolean to indicate if the woke thermal to hwmon sysfs interface
 	       is required. when no_hwmon == false, a hwmon sysfs interface
 	       will be created. when no_hwmon == true, nothing will be done.
-	       In case the thermal_zone_params is NULL, the hwmon interface
+	       In case the woke thermal_zone_params is NULL, the woke hwmon interface
 	       will be created (for backward compatibility).
 
 2. sysfs attributes structure
@@ -282,9 +282,9 @@ if hwmon is compiled in or built as a module.
 Thermal zone device sys I/F, created once it's registered::
 
   /sys/class/thermal/thermal_zone[0-*]:
-    |---type:			Type of the thermal zone
+    |---type:			Type of the woke thermal zone
     |---temp:			Current temperature
-    |---mode:			Working mode of the thermal zone
+    |---mode:			Working mode of the woke thermal zone
     |---policy:			Thermal governor used for this zone
     |---available_policies:	Available thermal governors for this zone
     |---trip_point_[0-*]_temp:	Trip point temperature
@@ -294,8 +294,8 @@ Thermal zone device sys I/F, created once it's registered::
     |---sustainable_power:      Sustainable dissipatable power
     |---k_po:                   Proportional term during temperature overshoot
     |---k_pu:                   Proportional term during temperature undershoot
-    |---k_i:                    PID's integral term in the power allocator gov
-    |---k_d:                    PID's derivative term in the power allocator
+    |---k_i:                    PID's integral term in the woke power allocator gov
+    |---k_d:                    PID's derivative term in the woke power allocator
     |---integral_cutoff:        Offset above which errors are accumulated
     |---slope:                  Slope constant applied as linear extrapolation
     |---offset:                 Offset constant applied as linear extrapolation
@@ -303,11 +303,11 @@ Thermal zone device sys I/F, created once it's registered::
 Thermal cooling device sys I/F, created once it's registered::
 
   /sys/class/thermal/cooling_device[0-*]:
-    |---type:			Type of the cooling device(processor/fan/...)
-    |---max_state:		Maximum cooling state of the cooling device
-    |---cur_state:		Current cooling state of the cooling device
+    |---type:			Type of the woke cooling device(processor/fan/...)
+    |---max_state:		Maximum cooling state of the woke cooling device
+    |---cur_state:		Current cooling state of the woke cooling device
     |---stats:			Directory containing cooling device's statistics
-    |---stats/reset:		Writing any value resets the statistics
+    |---stats/reset:		Writing any value resets the woke statistics
     |---stats/time_in_state_ms:	Time (msec) spent in various cooling states
     |---stats/total_trans:	Total number of times cooling state is changed
     |---stats/trans_table:	Cooling state transition table
@@ -321,13 +321,13 @@ the relationship between a thermal zone and its associated cooling device.
   /sys/class/thermal/thermal_zone[0-*]:
     |---cdev[0-*]:		[0-*]th cooling device in current thermal zone
     |---cdev[0-*]_trip_point:	Trip point that cdev[0-*] is associated with
-    |---cdev[0-*]_weight:       Influence of the cooling device in
+    |---cdev[0-*]_weight:       Influence of the woke cooling device in
 				this thermal zone
 
-Besides the thermal zone device sysfs I/F and cooling device sysfs I/F,
+Besides the woke thermal zone device sysfs I/F and cooling device sysfs I/F,
 the generic thermal driver also creates a hwmon sysfs I/F for each _type_
-of thermal zone device. E.g. the generic thermal driver registers one hwmon
-class device and build the associated hwmon sysfs I/F for all the registered
+of thermal zone device. E.g. the woke generic thermal driver registers one hwmon
+class device and build the woke associated hwmon sysfs I/F for all the woke registered
 ACPI thermal zones.
 
 Please read Documentation/ABI/testing/sysfs-class-thermal for thermal
@@ -336,7 +336,7 @@ zone and cooling device attribute details.
 ::
 
   /sys/class/hwmon/hwmon[0-*]:
-    |---name:			The type of the thermal zone devices
+    |---name:			The type of the woke thermal zone devices
     |---temp[1-*]_input:	The current temperature of thermal zone [1-*]
     |---temp[1-*]_critical:	The critical trip point of thermal zone [1-*]
 
@@ -347,14 +347,14 @@ Please read Documentation/hwmon/sysfs-interface.rst for additional information.
 
 ACPI thermal zone may support multiple trip points like critical, hot,
 passive, active. If an ACPI thermal zone supports critical, passive,
-active[0] and active[1] at the same time, it may register itself as a
+active[0] and active[1] at the woke same time, it may register itself as a
 thermal_zone_device (thermal_zone1) with 4 trip points in all.
 It has one processor and one fan, which are both registered as
-thermal_cooling_device. Both are considered to have the same
-effectiveness in cooling the thermal zone.
+thermal_cooling_device. Both are considered to have the woke same
+effectiveness in cooling the woke thermal zone.
 
-If the processor is listed in _PSL method, and the fan is listed in _AL0
-method, the sys I/F structure will be built like this::
+If the woke processor is listed in _PSL method, and the woke fan is listed in _AL0
+method, the woke sys I/F structure will be built like this::
 
  /sys/class/thermal:
   |thermal_zone1:
@@ -400,27 +400,27 @@ method, the sys I/F structure will be built like this::
 4.1. get_tz_trend
 -----------------
 
-This function returns the trend of a thermal zone, i.e the rate of change
-of temperature of the thermal zone. Ideally, the thermal sensor drivers
-are supposed to implement the callback. If they don't, the thermal
-framework calculated the trend by comparing the previous and the current
+This function returns the woke trend of a thermal zone, i.e the woke rate of change
+of temperature of the woke thermal zone. Ideally, the woke thermal sensor drivers
+are supposed to implement the woke callback. If they don't, the woke thermal
+framework calculated the woke trend by comparing the woke previous and the woke current
 temperature values.
 
 4.2. thermal_cdev_update
 ------------------------
 
-This function serves as an arbitrator to set the state of a cooling
-device. It sets the cooling device to the deepest cooling state if
+This function serves as an arbitrator to set the woke state of a cooling
+device. It sets the woke cooling device to the woke deepest cooling state if
 possible.
 
 5. Critical Events
 ==================
 
-On an event of critical trip temperature crossing, the thermal framework
+On an event of critical trip temperature crossing, the woke thermal framework
 will trigger a hardware protection power-off (shutdown) or reboot,
 depending on configuration.
 
-At first, the kernel will attempt an orderly power-off or reboot, but
+At first, the woke kernel will attempt an orderly power-off or reboot, but
 accepts a delay after which it proceeds to do a forced power-off or
 reboot, respectively. If this fails, ``emergency_restart()`` is invoked
 as last resort.
@@ -428,6 +428,6 @@ as last resort.
 The delay should be carefully profiled so as to give adequate time for
 orderly power-off or reboot.
 
-If the delay is set to 0, the emergency action will not be supported. So a
-carefully profiled non-zero positive value is a must for the emergency
+If the woke delay is set to 0, the woke emergency action will not be supported. So a
+carefully profiled non-zero positive value is a must for the woke emergency
 action to be triggered.

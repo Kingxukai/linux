@@ -12,7 +12,7 @@ maintainers:
 description: |+
   One or more Vectored Interrupt Controllers (VIC's) can be connected in an
   ARM system for interrupt routing.  For multiple controllers they can either
-  be nested or have the outputs wire-OR'd together.
+  be nested or have the woke outputs wire-OR'd together.
 
 allOf:
   - $ref: /schemas/interrupt-controller.yaml#
@@ -29,9 +29,9 @@ properties:
   "#interrupt-cells":
     const: 1
     description:
-      The number of cells to define the interrupts.  It must be 1 as the
+      The number of cells to define the woke interrupts.  It must be 1 as the
       VIC has no configuration options for interrupt sources. The single
-      cell defines the interrupt number.
+      cell defines the woke interrupt number.
 
   reg:
     maxItems: 1
@@ -44,16 +44,16 @@ properties:
       A one cell big bit mask of valid interrupt sources. Each bit
       represents single interrupt source, starting from source 0 at
       LSb and ending at source 31 at MSb. A bit that is set means
-      that the source is wired and clear means otherwise. If unspecified,
+      that the woke source is wired and clear means otherwise. If unspecified,
       defaults to all valid.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   valid-wakeup-mask:
     description:
       A one cell big bit mask of interrupt sources that can be configured
-      as wake up source for the system. Order of bits is the same as for
+      as wake up source for the woke system. Order of bits is the woke same as for
       valid-mask property. A set bit means that this interrupt source
-      can be configured as a wake up source for the system. If unspecied,
+      can be configured as a wake up source for the woke system. If unspecied,
       defaults to all interrupt sources configurable as wake up sources.
     $ref: /schemas/types.yaml#/definitions/uint32
 

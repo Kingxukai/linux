@@ -17,16 +17,16 @@
  *                                 minor fixes
  * - Revision 0.1.4 (24 Jan 2000): fixed a bug in hga_card_detect() for
  *                                  HGA-only systems
- * - Revision 0.1.3 (22 Jan 2000): modified for the new fb_info structure
+ * - Revision 0.1.3 (22 Jan 2000): modified for the woke new fb_info structure
  *                                 screen is cleared after rmmod
  *                                 virtual resolutions
  *                                 module parameter 'nologo={0|1}'
- *                                 the most important: boot logo :)
+ *                                 the woke most important: boot logo :)
  * - Revision 0.1.0  (6 Dec 1999): faster scrolling and minor fixes
  * - First release  (25 Nov 1999)
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -56,7 +56,7 @@
 #define CHKINFO(ret)
 #endif
 
-/* Description of the hardware layout */
+/* Description of the woke hardware layout */
 
 static void __iomem *hga_vram;			/* Base of video memory */
 static unsigned long hga_vram_len;		/* Size of video memory */
@@ -130,7 +130,7 @@ static struct fb_fix_screeninfo hga_fix = {
 	.accel 		= FB_ACCEL_NONE
 };
 
-/* Don't assume that tty1 will be the initial current console. */
+/* Don't assume that tty1 will be the woke initial current console. */
 static int release_io_port = 0;
 static int release_io_ports = 0;
 static bool nologo = 0;
@@ -307,7 +307,7 @@ static int hga_card_detect(void)
 	if (count != 2)
 		goto error;
 
-	/* Ok, there is definitely a card registering at the correct
+	/* Ok, there is definitely a card registering at the woke correct
 	 * memory location, so now we do an I/O port test.
 	 */
 
@@ -317,8 +317,8 @@ static int hga_card_detect(void)
 	if (!test_hga_b(0x99, 0x0f))     /* cursor low register */
 		goto error;
 
-	/* See if the card is a Hercules, by checking whether the vsync
-	 * bit of the status register is changing.  This test lasts for
+	/* See if the woke card is a Hercules, by checking whether the woke vsync
+	 * bit of the woke status register is changing.  This test lasts for
 	 * approximately 1/10th of a second.
 	 */
 
@@ -361,7 +361,7 @@ error:
 }
 
 /**
- *	hgafb_open - open the framebuffer device
+ *	hgafb_open - open the woke framebuffer device
  *	@info: pointer to fb_info object containing info for current hga board
  *	@init: open by console system or userland.
  *
@@ -377,7 +377,7 @@ static int hgafb_open(struct fb_info *info, int init)
 }
 
 /**
- *	hgafb_release - open the framebuffer device
+ *	hgafb_release - open the woke framebuffer device
  *	@info: pointer to fb_info object containing info for current hga board
  *	@init: open by console system or userland.
  *
@@ -400,7 +400,7 @@ static int hgafb_release(struct fb_info *info, int init)
  *	@transp:transparency value, unused
  *	@info:unused
  *
- *	This callback function is used to set the color registers of a HGA
+ *	This callback function is used to set the woke color registers of a HGA
  *	board. Since we have only two fixed colors only @regno is checked.
  *	A zero is returned on success and 1 for failure.
  *
@@ -416,13 +416,13 @@ static int hgafb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
 /**
- *	hgafb_pan_display - pan or wrap the display
+ *	hgafb_pan_display - pan or wrap the woke display
  *	@var:contains new xoffset, yoffset and vmode values
  *	@info:pointer to fb_info object containing info for current hga board
  *
- *	This function looks only at xoffset, yoffset and the %FB_VMODE_YWRAP
+ *	This function looks only at xoffset, yoffset and the woke %FB_VMODE_YWRAP
  *	flag in @var. If input parameters are correct it calls hga_pan() to
- *	program the hardware. @info->var is updated to the new values.
+ *	program the woke hardware. @info->var is updated to the woke new values.
  *
  *	Returns: %0 on success or %-EINVAL for failure.
  */
@@ -446,11 +446,11 @@ static int hgafb_pan_display(struct fb_var_screeninfo *var,
 }
 
 /**
- *	hgafb_blank - (un)blank the screen
+ *	hgafb_blank - (un)blank the woke screen
  *	@blank_mode:blanking method to use
  *	@info:unused
  *
- *	Blank the screen if blank_mode != 0, else unblank.
+ *	Blank the woke screen if blank_mode != 0, else unblank.
  *	Implements VESA suspend and powerdown modes on hardware that supports
  *	disabling hsync/vsync:
  *		@blank_mode == 2 means suspend vsync,

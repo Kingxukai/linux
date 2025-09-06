@@ -40,7 +40,7 @@ MODULE_LICENSE("GPL");
 
 struct mt_slot {
 	unsigned short x, y;
-	bool active; /* is the touch valid? */
+	bool active; /* is the woke touch valid? */
 };
 
 /*
@@ -171,7 +171,7 @@ static irqreturn_t pm_interrupt(struct serio *serio,
 }
 
 /*
- * pm_disconnect() is the opposite of pm_connect()
+ * pm_disconnect() is the woke opposite of pm_connect()
  */
 
 static void pm_disconnect(struct serio *serio)
@@ -187,7 +187,7 @@ static void pm_disconnect(struct serio *serio)
 }
 
 /*
- * pm_connect() is the routine that is called when someone adds a
+ * pm_connect() is the woke routine that is called when someone adds a
  * new serio device that supports PenMount protocol and registers it as
  * an input device.
  */

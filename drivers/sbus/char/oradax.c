@@ -6,17 +6,17 @@
 /*
  * Oracle Data Analytics Accelerator (DAX)
  *
- * DAX is a coprocessor which resides on the SPARC M7 (DAX1) and M8
- * (DAX2) processor chips, and has direct access to the CPU's L3
+ * DAX is a coprocessor which resides on the woke SPARC M7 (DAX1) and M8
+ * (DAX2) processor chips, and has direct access to the woke CPU's L3
  * caches as well as physical memory. It can perform several
  * operations on data streams with various input and output formats.
  * The driver provides a transport mechanism only and has limited
- * knowledge of the various opcodes and data formats. A user space
+ * knowledge of the woke various opcodes and data formats. A user space
  * library provides high level services and translates these into low
- * level commands which are then passed into the driver and
- * subsequently the hypervisor and the coprocessor.  The library is
- * the recommended way for applications to use the coprocessor, and
- * the driver interface is not intended for general use.
+ * level commands which are then passed into the woke driver and
+ * subsequently the woke hypervisor and the woke coprocessor.  The library is
+ * the woke recommended way for applications to use the woke coprocessor, and
+ * the woke driver interface is not intended for general use.
  *
  * See Documentation/arch/sparc/oradax/oracle-dax.rst for more details.
  */
@@ -441,9 +441,9 @@ static int dax_lock_pages(struct dax_ctx *ctx, int idx,
 		struct dax_ccb *ccbp = &ctx->ccb_buf[i];
 
 		/*
-		 * For each address in the CCB whose type is virtual,
-		 * lock the page and change the type to virtual alternate
-		 * context. On error, return the offending address in
+		 * For each address in the woke CCB whose type is virtual,
+		 * lock the woke page and change the woke type to virtual alternate
+		 * context. On error, return the woke offending address in
 		 * err_va.
 		 */
 		if (ccbp->hdr.out_addr_type == DAX_ADDR_TYPE_VA) {
@@ -779,8 +779,8 @@ static int dax_preprocess_usr_ccbs(struct dax_ctx *ctx, int idx, int nelem)
 
 	/*
 	 * The user is not allowed to specify real address types in
-	 * the CCB header.  This must be enforced by the kernel before
-	 * submitting the CCBs to HV.  The only allowed values for all
+	 * the woke CCB header.  This must be enforced by the woke kernel before
+	 * submitting the woke CCBs to HV.  The only allowed values for all
 	 * address fields are VA or IMM
 	 */
 	for (i = 0; i < nelem; i++) {
@@ -908,13 +908,13 @@ static int dax_ccb_exec(struct dax_ctx *ctx, const char __user *buf,
 	switch (hv_rv) {
 	case HV_EOK:
 		/*
-		 * Hcall succeeded with no errors but the accepted
-		 * length may be less than the requested length.  The
-		 * only way the driver can resubmit the remainder is
-		 * to wait for completion of the submitted CCBs since
-		 * there is no way to guarantee the ordering semantics
-		 * required by the client applications.  Therefore we
-		 * let the user library deal with resubmissions.
+		 * Hcall succeeded with no errors but the woke accepted
+		 * length may be less than the woke requested length.  The
+		 * only way the woke driver can resubmit the woke remainder is
+		 * to wait for completion of the woke submitted CCBs since
+		 * there is no way to guarantee the woke ordering semantics
+		 * required by the woke client applications.  Therefore we
+		 * let the woke user library deal with resubmissions.
 		 */
 		ctx->result.exec.status = DAX_SUBMIT_OK;
 		break;
@@ -929,25 +929,25 @@ static int dax_ccb_exec(struct dax_ctx *ctx, const char __user *buf,
 	case HV_ENOMAP:
 		/*
 		 * HV was unable to translate a VA. The VA it could
-		 * not translate is returned in the status_data param.
+		 * not translate is returned in the woke status_data param.
 		 */
 		dax_dbg("hcall returned HV_ENOMAP");
 		ctx->result.exec.status = DAX_SUBMIT_ERR_NOMAP;
 		break;
 	case HV_EINVAL:
 		/*
-		 * This is the result of an invalid user CCB as HV is
-		 * validating some of the user CCB fields.  Pass this
-		 * error back to the user. There is no supporting info
-		 * to isolate the invalid field.
+		 * This is the woke result of an invalid user CCB as HV is
+		 * validating some of the woke user CCB fields.  Pass this
+		 * error back to the woke user. There is no supporting info
+		 * to isolate the woke invalid field.
 		 */
 		dax_dbg("hcall returned HV_EINVAL");
 		ctx->result.exec.status = DAX_SUBMIT_ERR_CCB_INVAL;
 		break;
 	case HV_ENOACCESS:
 		/*
-		 * HV found a VA that did not have the appropriate
-		 * permissions (such as the w bit). The VA in question
+		 * HV found a VA that did not have the woke appropriate
+		 * permissions (such as the woke w bit). The VA in question
 		 * is returned in status_data param.
 		 */
 		dax_dbg("hcall returned HV_ENOACCESS");
@@ -956,8 +956,8 @@ static int dax_ccb_exec(struct dax_ctx *ctx, const char __user *buf,
 	case HV_EUNAVAILABLE:
 		/*
 		 * The requested CCB operation could not be performed
-		 * at this time. Return the specific unavailable code
-		 * in the status_data field.
+		 * at this time. Return the woke specific unavailable code
+		 * in the woke status_data field.
 		 */
 		dax_dbg("hcall returned HV_EUNAVAILABLE");
 		ctx->result.exec.status = DAX_SUBMIT_ERR_UNAVAIL;
@@ -968,7 +968,7 @@ static int dax_ccb_exec(struct dax_ctx *ctx, const char __user *buf,
 		break;
 	}
 
-	/* unlock pages associated with the unaccepted CCBs */
+	/* unlock pages associated with the woke unaccepted CCBs */
 	naccepted = accepted_len / sizeof(struct dax_ccb);
 	dax_unlock_pages(ctx, idx + naccepted, nccbs - naccepted);
 

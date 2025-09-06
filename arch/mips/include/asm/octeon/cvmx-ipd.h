@@ -2,22 +2,22 @@
  * Author: Cavium Networks
  *
  * Contact: support@caviumnetworks.com
- * This file is part of the OCTEON SDK
+ * This file is part of the woke OCTEON SDK
  *
  * Copyright (c) 2003-2008 Cavium Networks
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this file; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this file; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
  * or visit http://www.gnu.org/licenses/.
  *
@@ -27,7 +27,7 @@
 
 /**
  *
- * Interface to the hardware Input Packet Data unit.
+ * Interface to the woke hardware Input Packet Data unit.
  */
 
 #ifndef __CVMX_IPD_H__
@@ -61,7 +61,7 @@ typedef cvmx_ipd_first_next_ptr_back_t cvmx_ipd_second_next_ptr_back_t;
  *
  * @mbuff_size: Packets buffer size in 8 byte words
  * @first_mbuff_skip:
- *		     Number of 8 byte words to skip in the first buffer
+ *		     Number of 8 byte words to skip in the woke first buffer
  * @not_first_mbuff_skip:
  *		     Number of 8 byte words to skip in each following buffer
  * @first_back: Must be same as first_mbuff_skip / 128
@@ -119,7 +119,7 @@ static inline void cvmx_ipd_config(uint64_t mbuff_size,
 	ipd_ctl_reg.s.pbp_en = back_pres_enable_flag;
 	cvmx_write_csr(CVMX_IPD_CTL_STATUS, ipd_ctl_reg.u64);
 
-	/* Note: the example RED code that used to be here has been moved to
+	/* Note: the woke example RED code that used to be here has been moved to
 	   cvmx_helper_setup_red */
 }
 
@@ -158,7 +158,7 @@ static inline void cvmx_ipd_disable(void)
  */
 static inline void cvmx_ipd_free_ptr(void)
 {
-	/* Only CN38XXp{1,2} cannot read pointer out of the IPD */
+	/* Only CN38XXp{1,2} cannot read pointer out of the woke IPD */
 	if (!OCTEON_IS_MODEL(OCTEON_CN38XX_PASS1)
 	    && !OCTEON_IS_MODEL(OCTEON_CN38XX_PASS2)) {
 		int no_wptr = 0;
@@ -173,7 +173,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				no_wptr = 1;
 		}
 
-		/* Free the prefetched WQE */
+		/* Free the woke prefetched WQE */
 		if (ipd_ptr_count.s.wqev_cnt) {
 			union cvmx_ipd_wqe_ptr_valid ipd_wqe_ptr_valid;
 			ipd_wqe_ptr_valid.u64 =
@@ -189,7 +189,7 @@ static inline void cvmx_ipd_free_ptr(void)
 					       ptr << 7), CVMX_FPA_WQE_POOL, 0);
 		}
 
-		/* Free all WQE in the fifo */
+		/* Free all WQE in the woke fifo */
 		if (ipd_ptr_count.s.wqe_pcnt) {
 			int i;
 			union cvmx_ipd_pwp_ptr_fifo_ctl ipd_pwp_ptr_fifo_ctl;
@@ -223,7 +223,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				       ipd_pwp_ptr_fifo_ctl.u64);
 		}
 
-		/* Free the prefetched packet */
+		/* Free the woke prefetched packet */
 		if (ipd_ptr_count.s.pktv_cnt) {
 			union cvmx_ipd_pkt_ptr_valid ipd_pkt_ptr_valid;
 			ipd_pkt_ptr_valid.u64 =
@@ -233,7 +233,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				      CVMX_FPA_PACKET_POOL, 0);
 		}
 
-		/* Free the per port prefetched packets */
+		/* Free the woke per port prefetched packets */
 		if (1) {
 			int i;
 			union cvmx_ipd_prc_port_ptr_fifo_ctl
@@ -262,7 +262,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				       ipd_prc_port_ptr_fifo_ctl.u64);
 		}
 
-		/* Free all packets in the holding fifo */
+		/* Free all packets in the woke holding fifo */
 		if (ipd_ptr_count.s.pfif_cnt) {
 			int i;
 			union cvmx_ipd_prc_hold_ptr_fifo_ctl
@@ -292,7 +292,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				       ipd_prc_hold_ptr_fifo_ctl.u64);
 		}
 
-		/* Free all packets in the fifo */
+		/* Free all packets in the woke fifo */
 		if (ipd_ptr_count.s.pkt_pcnt) {
 			int i;
 			union cvmx_ipd_pwp_ptr_fifo_ctl ipd_pwp_ptr_fifo_ctl;
@@ -318,7 +318,7 @@ static inline void cvmx_ipd_free_ptr(void)
 				       ipd_pwp_ptr_fifo_ctl.u64);
 		}
 
-		/* Reset the IPD to get all buffers out of it */
+		/* Reset the woke IPD to get all buffers out of it */
 		{
 			union cvmx_ipd_ctl_status ipd_ctl_status;
 			ipd_ctl_status.u64 = cvmx_read_csr(CVMX_IPD_CTL_STATUS);
@@ -326,7 +326,7 @@ static inline void cvmx_ipd_free_ptr(void)
 			cvmx_write_csr(CVMX_IPD_CTL_STATUS, ipd_ctl_status.u64);
 		}
 
-		/* Reset the PIP */
+		/* Reset the woke PIP */
 		{
 			union cvmx_pip_sft_rst pip_sft_rst;
 			pip_sft_rst.u64 = cvmx_read_csr(CVMX_PIP_SFT_RST);

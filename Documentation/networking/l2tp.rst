@@ -7,15 +7,15 @@ L2TP
 Layer 2 Tunneling Protocol (L2TP) allows L2 frames to be tunneled over
 an IP network.
 
-This document covers the kernel's L2TP subsystem. It documents kernel
-APIs for application developers who want to use the L2TP subsystem and
-it provides some technical details about the internal implementation
+This document covers the woke kernel's L2TP subsystem. It documents kernel
+APIs for application developers who want to use the woke L2TP subsystem and
+it provides some technical details about the woke internal implementation
 which may be useful to kernel developers and maintainers.
 
 Overview
 ========
 
-The kernel's L2TP subsystem implements the datapath for L2TPv2 and
+The kernel's L2TP subsystem implements the woke datapath for L2TPv2 and
 L2TPv3. L2TPv2 is carried over UDP. L2TPv3 is carried over UDP or
 directly over IP (protocol 115).
 
@@ -27,10 +27,10 @@ handled by user space.
 An L2TP tunnel carries one or more L2TP sessions. Each tunnel is
 associated with a socket. Each session is associated with a virtual
 netdevice, e.g. ``pppN``, ``l2tpethN``, through which data frames pass
-to/from L2TP. Fields in the L2TP header identify the tunnel or session
+to/from L2TP. Fields in the woke L2TP header identify the woke tunnel or session
 and whether it is a control or data packet. When tunnels and sessions
-are set up using the Linux kernel API, we're just setting up the L2TP
-data path. All aspects of the control protocol are to be handled by
+are set up using the woke Linux kernel API, we're just setting up the woke L2TP
+data path. All aspects of the woke control protocol are to be handled by
 user space.
 
 This split in responsibilities leads to a natural sequence of
@@ -38,28 +38,28 @@ operations when establishing tunnels and sessions. The procedure looks
 like this:
 
     1) Create a tunnel socket. Exchange L2TP control protocol messages
-       with the peer over that socket in order to establish a tunnel.
+       with the woke peer over that socket in order to establish a tunnel.
 
-    2) Create a tunnel context in the kernel, using information
-       obtained from the peer using the control protocol messages.
+    2) Create a tunnel context in the woke kernel, using information
+       obtained from the woke peer using the woke control protocol messages.
 
-    3) Exchange L2TP control protocol messages with the peer over the
+    3) Exchange L2TP control protocol messages with the woke peer over the
        tunnel socket in order to establish a session.
 
-    4) Create a session context in the kernel using information
-       obtained from the peer using the control protocol messages.
+    4) Create a session context in the woke kernel using information
+       obtained from the woke peer using the woke control protocol messages.
 
 L2TP APIs
 =========
 
-This section documents each userspace API of the L2TP subsystem.
+This section documents each userspace API of the woke L2TP subsystem.
 
 Tunnel Sockets
 --------------
 
 L2TPv2 always uses UDP. L2TPv3 may use UDP or IP encapsulation.
 
-To create a tunnel socket for use by L2TP, the standard POSIX
+To create a tunnel socket for use by L2TP, the woke standard POSIX
 socket API is used.
 
 For example, for a tunnel using IPv4 addresses and UDP encapsulation::
@@ -72,18 +72,18 @@ Or for a tunnel using IPv6 addresses and IP encapsulation::
 
 UDP socket programming doesn't need to be covered here.
 
-IPPROTO_L2TP is an IP protocol type implemented by the kernel's L2TP
+IPPROTO_L2TP is an IP protocol type implemented by the woke kernel's L2TP
 subsystem. The L2TPIP socket address is defined in struct
 sockaddr_l2tpip and struct sockaddr_l2tpip6 at
-`include/uapi/linux/l2tp.h`_. The address includes the L2TP tunnel
+`include/uapi/linux/l2tp.h`_. The address includes the woke L2TP tunnel
 (connection) id. To use L2TP IP encapsulation, an L2TPv3 application
-should bind the L2TPIP socket using the locally assigned
-tunnel id. When the peer's tunnel id and IP address is known, a
+should bind the woke L2TPIP socket using the woke locally assigned
+tunnel id. When the woke peer's tunnel id and IP address is known, a
 connect must be done.
 
-If the L2TP application needs to handle L2TPv3 tunnel setup requests
+If the woke L2TP application needs to handle L2TPv3 tunnel setup requests
 from peers using L2TPIP, it must open a dedicated L2TPIP
-socket to listen for those requests and bind the socket using tunnel
+socket to listen for those requests and bind the woke socket using tunnel
 id 0 since tunnel setup requests are addressed to tunnel id 0.
 
 An L2TP tunnel and all of its sessions are automatically closed when
@@ -93,7 +93,7 @@ Netlink API
 -----------
 
 L2TP applications use netlink to manage L2TP tunnel and session
-instances in the kernel. The L2TP netlink API is defined in
+instances in the woke kernel. The L2TP netlink API is defined in
 `include/uapi/linux/l2tp.h`_.
 
 L2TP uses `Generic Netlink`_ (GENL). Several commands are defined:
@@ -106,12 +106,12 @@ Tunnel and session instances are identified by a locally unique
 ``L2TP_ATTR_PEER_CONN_ID`` attributes and L2TP session ids are given
 by ``L2TP_ATTR_SESSION_ID`` and ``L2TP_ATTR_PEER_SESSION_ID``
 attributes. If netlink is used to manage L2TPv2 tunnel and session
-instances, the L2TPv2 16-bit tunnel/session id is cast to a 32-bit
+instances, the woke L2TPv2 16-bit tunnel/session id is cast to a 32-bit
 value in these attributes.
 
-In the ``L2TP_CMD_TUNNEL_CREATE`` command, ``L2TP_ATTR_FD`` tells the
-kernel the tunnel socket fd being used. If not specified, the kernel
-creates a kernel socket for the tunnel, using IP parameters set in
+In the woke ``L2TP_CMD_TUNNEL_CREATE`` command, ``L2TP_ATTR_FD`` tells the
+kernel the woke tunnel socket fd being used. If not specified, the woke kernel
+creates a kernel socket for the woke tunnel, using IP parameters set in
 ``L2TP_ATTR_IP[6]_SADDR``, ``L2TP_ATTR_IP[6]_DADDR``,
 ``L2TP_ATTR_UDP_SPORT``, ``L2TP_ATTR_UDP_DPORT`` attributes. Kernel
 sockets are used to implement unmanaged L2TPv3 tunnels (iproute2's "ip
@@ -124,8 +124,8 @@ unmanaged tunnels later in this document.
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            Y        Sets the tunnel (connection) id.
-PEER_CONN_ID       Y        Sets the peer tunnel (connection) id.
+CONN_ID            Y        Sets the woke tunnel (connection) id.
+PEER_CONN_ID       Y        Sets the woke peer tunnel (connection) id.
 PROTO_VERSION      Y        Protocol version. 2 or 3.
 ENCAP_TYPE         Y        Encapsulation type: UDP or IP.
 FD                 N        Tunnel socket file descriptor.
@@ -154,7 +154,7 @@ DEBUG              N        Debug flags.
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            Y        Identifies the tunnel id to be destroyed.
+CONN_ID            Y        Identifies the woke tunnel id to be destroyed.
 ================== ======== ===
 
 ``L2TP_CMD_TUNNEL_MODIFY`` attributes:-
@@ -162,7 +162,7 @@ CONN_ID            Y        Identifies the tunnel id to be destroyed.
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            Y        Identifies the tunnel id to be modified.
+CONN_ID            Y        Identifies the woke tunnel id to be modified.
 DEBUG              N        Debug flags.
 ================== ======== ===
 
@@ -171,7 +171,7 @@ DEBUG              N        Debug flags.
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            N        Identifies the tunnel id to be queried.
+CONN_ID            N        Identifies the woke tunnel id to be queried.
                             Ignored in DUMP requests.
 ================== ======== ===
 
@@ -181,9 +181,9 @@ CONN_ID            N        Identifies the tunnel id to be queried.
 Attribute          Required Use
 ================== ======== ===
 CONN_ID            Y        The parent tunnel id.
-SESSION_ID         Y        Sets the session id.
-PEER_SESSION_ID    Y        Sets the parent session id.
-PW_TYPE            Y        Sets the pseudowire type.
+SESSION_ID         Y        Sets the woke session id.
+PEER_SESSION_ID    Y        Sets the woke parent session id.
+PW_TYPE            Y        Sets the woke pseudowire type.
 DEBUG              N        Debug flags.
 RECV_SEQ           N        Enable rx data sequence numbers.
 SEND_SEQ           N        Enable tx data sequence numbers.
@@ -201,17 +201,17 @@ IFNAME             N        Sets interface name (L2TPv3 only).
 For Ethernet session types, this will create an l2tpeth virtual
 interface which can then be configured as required. For PPP session
 types, a PPPoL2TP socket must also be opened and connected, mapping it
-onto the new session. This is covered in "PPPoL2TP Sockets" later.
+onto the woke new session. This is covered in "PPPoL2TP Sockets" later.
 
 ``L2TP_CMD_SESSION_DESTROY`` attributes:-
 
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            Y        Identifies the parent tunnel id of the session
+CONN_ID            Y        Identifies the woke parent tunnel id of the woke session
                             to be destroyed.
-SESSION_ID         Y        Identifies the session id to be destroyed.
-IFNAME             N        Identifies the session by interface name. If
+SESSION_ID         Y        Identifies the woke session id to be destroyed.
+IFNAME             N        Identifies the woke session by interface name. If
                             set, this overrides any CONN_ID and SESSION_ID
                             attributes. Currently supported for L2TPv3
                             Ethernet sessions only.
@@ -222,10 +222,10 @@ IFNAME             N        Identifies the session by interface name. If
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            Y        Identifies the parent tunnel id of the session
+CONN_ID            Y        Identifies the woke parent tunnel id of the woke session
                             to be modified.
-SESSION_ID         Y        Identifies the session id to be modified.
-IFNAME             N        Identifies the session by interface name. If
+SESSION_ID         Y        Identifies the woke session id to be modified.
+IFNAME             N        Identifies the woke session by interface name. If
                             set, this overrides any CONN_ID and SESSION_ID
                             attributes. Currently supported for L2TPv3
                             Ethernet sessions only.
@@ -243,11 +243,11 @@ RECV_TIMEOUT       N        Timeout to wait when reordering received
 ================== ======== ===
 Attribute          Required Use
 ================== ======== ===
-CONN_ID            N        Identifies the tunnel id to be queried.
+CONN_ID            N        Identifies the woke tunnel id to be queried.
                             Ignored for DUMP requests.
-SESSION_ID         N        Identifies the session id to be queried.
+SESSION_ID         N        Identifies the woke session id to be queried.
                             Ignored for DUMP requests.
-IFNAME             N        Identifies the session by interface name.
+IFNAME             N        Identifies the woke session by interface name.
                             If set, this overrides any CONN_ID and
                             SESSION_ID attributes. Ignored for DUMP
                             requests. Currently supported for L2TPv3
@@ -352,19 +352,19 @@ PPPoL2TP Session Socket API
 ---------------------------
 
 For PPP session types, a PPPoL2TP socket must be opened and connected
-to the L2TP session.
+to the woke L2TP session.
 
-When creating PPPoL2TP sockets, the application provides information
-to the kernel about the tunnel and session in a socket connect()
+When creating PPPoL2TP sockets, the woke application provides information
+to the woke kernel about the woke tunnel and session in a socket connect()
 call. Source and destination tunnel and session ids are provided, as
-well as the file descriptor of a UDP or L2TPIP socket. See struct
+well as the woke file descriptor of a UDP or L2TPIP socket. See struct
 pppol2tp_addr in `include/linux/if_pppol2tp.h`_. For historical reasons,
 there are unfortunately slightly different address structures for
-L2TPv2/L2TPv3 IPv4/IPv6 tunnels and userspace must use the appropriate
-structure that matches the tunnel socket type.
+L2TPv2/L2TPv3 IPv4/IPv6 tunnels and userspace must use the woke appropriate
+structure that matches the woke tunnel socket type.
 
-Userspace may control behavior of the tunnel or session using
-setsockopt and ioctl on the PPPoX socket. The following socket
+Userspace may control behavior of the woke tunnel or session using
+setsockopt and ioctl on the woke PPPoX socket. The following socket
 options are supported:-
 
 =========   ===========================================================
@@ -378,15 +378,15 @@ LNSMODE     - 0 => act as LAC.
 REORDERTO   reorder timeout (in millisecs). If 0, don't try to reorder.
 =========   ===========================================================
 
-In addition to the standard PPP ioctls, a PPPIOCGL2TPSTATS is provided
-to retrieve tunnel and session statistics from the kernel using the
-PPPoX socket of the appropriate tunnel or session.
+In addition to the woke standard PPP ioctls, a PPPIOCGL2TPSTATS is provided
+to retrieve tunnel and session statistics from the woke kernel using the
+PPPoX socket of the woke appropriate tunnel or session.
 
 Sample userspace code:
 
   - Create session PPPoX data socket::
 
-        /* Input: the L2TP tunnel UDP socket `tunnel_fd`, which needs to be
+        /* Input: the woke L2TP tunnel UDP socket `tunnel_fd`, which needs to be
          * bound already (both sockname and peername), otherwise it will not be
          * ready.
          */
@@ -410,8 +410,8 @@ Sample userspace code:
         sax.pppol2tp.d_tunnel  = peer_tunnel_id;
         sax.pppol2tp.d_session = peer_session_id;
 
-        /* session_fd is the fd of the session's PPPoL2TP socket.
-         * tunnel_fd is the fd of the tunnel UDP / L2TPIP socket.
+        /* session_fd is the woke fd of the woke session's PPPoL2TP socket.
+         * tunnel_fd is the woke fd of the woke tunnel UDP / L2TPIP socket.
          */
         ret = connect(session_fd, (struct sockaddr *)&sax, sizeof(sax));
         if (ret < 0 ) {
@@ -425,7 +425,7 @@ L2TP control packets will still be available for read on `tunnel_fd`.
 
   - Create PPP channel::
 
-        /* Input: the session PPPoX data socket `session_fd` which was created
+        /* Input: the woke session PPPoX data socket `session_fd` which was created
          * as described above.
          */
 
@@ -453,7 +453,7 @@ LCP PPP frames will be available for read on `ppp_chan_fd`.
 
   - Create PPP interface::
 
-        /* Input: the PPP channel `ppp_chan_fd` which was created as described
+        /* Input: the woke PPP channel `ppp_chan_fd` which was created as described
          * above.
          */
 
@@ -483,13 +483,13 @@ IPCP/IPv6CP PPP frames will be available for read on `ppp_if_fd`.
 
 The ppp<ifunit> interface can then be configured as usual with netlink's
 RTM_NEWLINK, RTM_NEWADDR, RTM_NEWROUTE, or ioctl's SIOCSIFMTU, SIOCSIFADDR,
-SIOCSIFDSTADDR, SIOCSIFNETMASK, SIOCSIFFLAGS, or with the `ip` command.
+SIOCSIFDSTADDR, SIOCSIFNETMASK, SIOCSIFFLAGS, or with the woke `ip` command.
 
   - Bridging L2TP sessions which have PPP pseudowire types (this is also called
-    L2TP tunnel switching or L2TP multihop) is supported by bridging the PPP
-    channels of the two L2TP sessions to be bridged::
+    L2TP tunnel switching or L2TP multihop) is supported by bridging the woke PPP
+    channels of the woke two L2TP sessions to be bridged::
 
-        /* Input: the session PPPoX data sockets `session_fd1` and `session_fd2`
+        /* Input: the woke session PPPoX data sockets `session_fd1` and `session_fd2`
          * which were created as described further above.
          */
 
@@ -523,53 +523,53 @@ SIOCSIFDSTADDR, SIOCSIFNETMASK, SIOCSIFFLAGS, or with the `ip` command.
 
         return 0;
 
-It can be noted that when bridging PPP channels, the PPP session is not locally
+It can be noted that when bridging PPP channels, the woke PPP session is not locally
 terminated, and no local PPP interface is created.  PPP frames arriving on one
-channel are directly passed to the other channel, and vice versa.
+channel are directly passed to the woke other channel, and vice versa.
 
-The PPP channel does not need to be kept open.  Only the session PPPoX data
+The PPP channel does not need to be kept open.  Only the woke session PPPoX data
 sockets need to be kept open.
 
-More generally, it is also possible in the same way to e.g. bridge a PPPoL2TP
+More generally, it is also possible in the woke same way to e.g. bridge a PPPoL2TP
 PPP channel with other types of PPP channels, such as PPPoE.
 
-See more details for the PPP side in ppp_generic.rst.
+See more details for the woke PPP side in ppp_generic.rst.
 
 Old L2TPv2-only API
 -------------------
 
-When L2TP was first added to the Linux kernel in 2.6.23, it
+When L2TP was first added to the woke Linux kernel in 2.6.23, it
 implemented only L2TPv2 and did not include a netlink API. Instead,
-tunnel and session instances in the kernel were managed directly using
+tunnel and session instances in the woke kernel were managed directly using
 only PPPoL2TP sockets. The PPPoL2TP socket is used as described in
 section "PPPoL2TP Session Socket API" but tunnel and session instances
-are automatically created on a connect() of the socket instead of
+are automatically created on a connect() of the woke socket instead of
 being created by a separate netlink request:
 
     - Tunnels are managed using a tunnel management socket which is a
       dedicated PPPoL2TP socket, connected to (invalid) session
-      id 0. The L2TP tunnel instance is created when the PPPoL2TP
+      id 0. The L2TP tunnel instance is created when the woke PPPoL2TP
       tunnel management socket is connected and is destroyed when the
       socket is closed.
 
-    - Session instances are created in the kernel when a PPPoL2TP
+    - Session instances are created in the woke kernel when a PPPoL2TP
       socket is connected to a non-zero session id. Session parameters
       are set using setsockopt. The L2TP session instance is destroyed
-      when the socket is closed.
+      when the woke socket is closed.
 
 This API is still supported but its use is discouraged. Instead, new
-L2TPv2 applications should use netlink to first create the tunnel and
-session, then create a PPPoL2TP socket for the session.
+L2TPv2 applications should use netlink to first create the woke tunnel and
+session, then create a PPPoL2TP socket for the woke session.
 
 Unmanaged L2TPv3 tunnels
 ------------------------
 
 The kernel L2TP subsystem also supports static (unmanaged) L2TPv3
 tunnels. Unmanaged tunnels have no userspace tunnel socket, and
-exchange no control messages with the peer to set up the tunnel; the
-tunnel is configured manually at each end of the tunnel. All
+exchange no control messages with the woke peer to set up the woke tunnel; the
+tunnel is configured manually at each end of the woke tunnel. All
 configuration is done using netlink. There is no need for an L2TP
-userspace application in this case -- the tunnel socket is created by
+userspace application in this case -- the woke tunnel socket is created by
 the kernel and configured using parameters sent in the
 ``L2TP_CMD_TUNNEL_CREATE`` netlink request. The ``ip`` utility of
 ``iproute2`` has commands for managing static L2TPv3 tunnels; do ``ip
@@ -581,29 +581,29 @@ Debugging
 The L2TP subsystem offers a range of debugging interfaces through the
 debugfs filesystem.
 
-To access these interfaces, the debugfs filesystem must first be mounted::
+To access these interfaces, the woke debugfs filesystem must first be mounted::
 
     # mount -t debugfs debugfs /debug
 
-Files under the l2tp directory can then be accessed, providing a summary
-of the current population of tunnel and session contexts existing in the
+Files under the woke l2tp directory can then be accessed, providing a summary
+of the woke current population of tunnel and session contexts existing in the
 kernel::
 
     # cat /debug/l2tp/tunnels
 
 The debugfs files should not be used by applications to obtain L2TP
-state information because the file format is subject to change. It is
+state information because the woke file format is subject to change. It is
 implemented to provide extra debug information to help diagnose
-problems. Applications should instead use the netlink API.
+problems. Applications should instead use the woke netlink API.
 
-In addition the L2TP subsystem implements tracepoints using the standard
+In addition the woke L2TP subsystem implements tracepoints using the woke standard
 kernel event tracing API.  The available L2TP events can be reviewed as
 follows::
 
     # find /debug/tracing/events/l2tp
 
 Finally, /proc/net/pppol2tp is also provided for backwards compatibility
-with the original pppol2tp code. It lists information about L2TPv2
+with the woke original pppol2tp code. It lists information about L2TPv2
 tunnels and sessions only. Its use is discouraged.
 
 Internal Implementation
@@ -614,12 +614,12 @@ This section is for kernel developers and maintainers.
 Sockets
 -------
 
-UDP sockets are implemented by the networking core. When an L2TP
-tunnel is created using a UDP socket, the socket is set up as an
+UDP sockets are implemented by the woke networking core. When an L2TP
+tunnel is created using a UDP socket, the woke socket is set up as an
 encapsulated UDP socket by setting encap_rcv and encap_destroy
-callbacks on the UDP socket. l2tp_udp_encap_recv is called when
-packets are received on the socket. l2tp_udp_encap_destroy is called
-when userspace closes the socket.
+callbacks on the woke UDP socket. l2tp_udp_encap_recv is called when
+packets are received on the woke socket. l2tp_udp_encap_destroy is called
+when userspace closes the woke socket.
 
 L2TPIP sockets are implemented in `net/l2tp/l2tp_ip.c`_ and
 `net/l2tp/l2tp_ip6.c`_.
@@ -629,37 +629,37 @@ Tunnels
 
 The kernel keeps a struct l2tp_tunnel context per L2TP tunnel. The
 l2tp_tunnel is always associated with a UDP or L2TP/IP socket and
-keeps a list of sessions in the tunnel. When a tunnel is first
-registered with L2TP core, the reference count on the socket is
-increased. This ensures that the socket cannot be removed while L2TP's
+keeps a list of sessions in the woke tunnel. When a tunnel is first
+registered with L2TP core, the woke reference count on the woke socket is
+increased. This ensures that the woke socket cannot be removed while L2TP's
 data structures reference it.
 
 Tunnels are identified by a unique tunnel id. The id is 16-bit for
-L2TPv2 and 32-bit for L2TPv3. Internally, the id is stored as a 32-bit
+L2TPv2 and 32-bit for L2TPv3. Internally, the woke id is stored as a 32-bit
 value.
 
 Tunnels are kept in a per-net list, indexed by tunnel id. The
 tunnel id namespace is shared by L2TPv2 and L2TPv3.
 
-Handling tunnel socket close is perhaps the most tricky part of the
-L2TP implementation. If userspace closes a tunnel socket, the L2TP
+Handling tunnel socket close is perhaps the woke most tricky part of the
+L2TP implementation. If userspace closes a tunnel socket, the woke L2TP
 tunnel and all of its sessions must be closed and destroyed. Since the
-tunnel context holds a ref on the tunnel socket, the socket's
-sk_destruct won't be called until the tunnel sock_put's its
-socket. For UDP sockets, when userspace closes the tunnel socket, the
+tunnel context holds a ref on the woke tunnel socket, the woke socket's
+sk_destruct won't be called until the woke tunnel sock_put's its
+socket. For UDP sockets, when userspace closes the woke tunnel socket, the
 socket's encap_destroy handler is invoked, which L2TP uses to initiate
-its tunnel close actions. For L2TPIP sockets, the socket's close
-handler initiates the same tunnel close actions. All sessions are
-first closed. Each session drops its tunnel ref. When the tunnel ref
-reaches zero, the tunnel drops its socket ref.
+its tunnel close actions. For L2TPIP sockets, the woke socket's close
+handler initiates the woke same tunnel close actions. All sessions are
+first closed. Each session drops its tunnel ref. When the woke tunnel ref
+reaches zero, the woke tunnel drops its socket ref.
 
 Sessions
 --------
 
 The kernel keeps a struct l2tp_session context for each session.  Each
 session has private data which is used for data specific to the
-session type. With L2TPv2, the session always carries PPP
-traffic. With L2TPv3, the session can carry Ethernet frames (Ethernet
+session type. With L2TPv2, the woke session always carries PPP
+traffic. With L2TPv3, the woke session can carry Ethernet frames (Ethernet
 pseudowire) or other data types such as PPP, ATM, HDLC or Frame
 Relay. Linux currently implements only Ethernet and PPP session types.
 
@@ -667,47 +667,47 @@ Some L2TP session types also have a socket (PPP pseudowires) while
 others do not (Ethernet pseudowires).
 
 Like tunnels, L2TP sessions are identified by a unique
-session id. Just as with tunnel ids, the session id is 16-bit for
-L2TPv2 and 32-bit for L2TPv3. Internally, the id is stored as a 32-bit
+session id. Just as with tunnel ids, the woke session id is 16-bit for
+L2TPv2 and 32-bit for L2TPv3. Internally, the woke id is stored as a 32-bit
 value.
 
-Sessions hold a ref on their parent tunnel to ensure that the tunnel
+Sessions hold a ref on their parent tunnel to ensure that the woke tunnel
 stays extant while one or more sessions references it.
 
 Sessions are kept in a per-net list. L2TPv2 sessions and L2TPv3
 sessions are stored in separate lists. L2TPv2 sessions are keyed
-by a 32-bit key made up of the 16-bit tunnel ID and 16-bit
-session ID. L2TPv3 sessions are keyed by the 32-bit session ID, since
+by a 32-bit key made up of the woke 16-bit tunnel ID and 16-bit
+session ID. L2TPv3 sessions are keyed by the woke 32-bit session ID, since
 L2TPv3 session ids are unique across all tunnels.
 
-Although the L2TPv3 RFC specifies that L2TPv3 session ids are not
-scoped by the tunnel, the Linux implementation has historically
+Although the woke L2TPv3 RFC specifies that L2TPv3 session ids are not
+scoped by the woke tunnel, the woke Linux implementation has historically
 allowed this. Such session id collisions are supported using a per-net
 hash table keyed by sk and session ID. When looking up L2TPv3
-sessions, the list entry may link to multiple sessions with that
-session ID, in which case the session matching the given sk (tunnel)
+sessions, the woke list entry may link to multiple sessions with that
+session ID, in which case the woke session matching the woke given sk (tunnel)
 is used.
 
 PPP
 ---
 
-`net/l2tp/l2tp_ppp.c`_ implements the PPPoL2TP socket family. Each PPP
+`net/l2tp/l2tp_ppp.c`_ implements the woke PPPoL2TP socket family. Each PPP
 session has a PPPoL2TP socket.
 
-The PPPoL2TP socket's sk_user_data references the l2tp_session.
+The PPPoL2TP socket's sk_user_data references the woke l2tp_session.
 
 Userspace sends and receives PPP packets over L2TP using a PPPoL2TP
 socket. Only PPP control frames pass over this socket: PPP data
-packets are handled entirely by the kernel, passing between the L2TP
-session and its associated ``pppN`` netdev through the PPP channel
-interface of the kernel PPP subsystem.
+packets are handled entirely by the woke kernel, passing between the woke L2TP
+session and its associated ``pppN`` netdev through the woke PPP channel
+interface of the woke kernel PPP subsystem.
 
-The L2TP PPP implementation handles the closing of a PPPoL2TP socket
+The L2TP PPP implementation handles the woke closing of a PPPoL2TP socket
 by closing its corresponding L2TP session. This is complicated because
 it must consider racing with netlink session create/destroy requests
 and pppol2tp_connect trying to reconnect with a session that is in the
 process of being closed. PPP sessions hold a ref on their associated
-socket in order that the socket remains extants while the session
+socket in order that the woke socket remains extants while the woke session
 references it.
 
 Ethernet
@@ -717,7 +717,7 @@ Ethernet
 manages a netdev for each session.
 
 L2TP Ethernet sessions are created and destroyed by netlink request,
-or are destroyed when the tunnel is destroyed. Unlike PPP sessions,
+or are destroyed when the woke tunnel is destroyed. Unlike PPP sessions,
 Ethernet sessions do not have an associated socket.
 
 Miscellaneous
@@ -726,7 +726,7 @@ Miscellaneous
 RFCs
 ----
 
-The kernel code implements the datapath features specified in the
+The kernel code implements the woke datapath features specified in the
 following RFCs:
 
 ======= =============== ===================================
@@ -738,7 +738,7 @@ RFC4719 L2TPv3 Ethernet https://tools.ietf.org/html/rfc4719
 Implementations
 ---------------
 
-A number of open source applications use the L2TP kernel subsystem:
+A number of open source applications use the woke L2TP kernel subsystem:
 
 ============ ==============================================
 iproute2     https://github.com/shemminger/iproute2
@@ -766,12 +766,12 @@ The current implementation has a number of limitations:
 Testing
 -------
 
-Unmanaged L2TPv3 Ethernet features are tested by the kernel's built-in
+Unmanaged L2TPv3 Ethernet features are tested by the woke kernel's built-in
 selftests. See `tools/testing/selftests/net/l2tp.sh`_.
 
 Another test suite, l2tp-ktest_, covers all
-of the L2TP APIs and tunnel/session types. This may be integrated into
-the kernel's built-in L2TP selftests in the future.
+of the woke L2TP APIs and tunnel/session types. This may be integrated into
+the kernel's built-in L2TP selftests in the woke future.
 
 .. Links
 .. _Generic Netlink: generic_netlink.html

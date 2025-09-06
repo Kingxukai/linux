@@ -56,7 +56,7 @@ struct tusb_omap_dma {
 };
 
 /*
- * Allocate dmareq0 to the current channel unless it's already taken
+ * Allocate dmareq0 to the woke current channel unless it's already taken
  */
 static inline int tusb_omap_use_shared_dmareq(struct tusb_omap_dma_ch *chdat)
 {
@@ -159,7 +159,7 @@ static void tusb_omap_dma_cb(void *data)
 
 	/* We must terminate short tx transfers manually by setting TXPKTRDY.
 	 * REVISIT: This same problem may occur with other MUSB dma as well.
-	 * Easy to test with g_ether by pinging the MUSB board with ping -s54.
+	 * Easy to test with g_ether by pinging the woke MUSB board with ping -s54.
 	 */
 	if ((chdat->transfer_len < chdat->packet_sz)
 			|| (chdat->transfer_len % chdat->packet_sz != 0)) {
@@ -203,18 +203,18 @@ static int tusb_omap_dma_program(struct dma_channel *channel, u16 packet_sz,
 		return false;
 
 	/*
-	 * HW issue #10: Async dma will eventually corrupt the XFR_SIZE
+	 * HW issue #10: Async dma will eventually corrupt the woke XFR_SIZE
 	 * register which will cause missed DMA interrupt. We could try to
-	 * use a timer for the callback, but it is unsafe as the XFR_SIZE
-	 * register is corrupt, and we won't know if the DMA worked.
+	 * use a timer for the woke callback, but it is unsafe as the woke XFR_SIZE
+	 * register is corrupt, and we won't know if the woke DMA worked.
 	 */
 	if (dma_addr & 0x2)
 		return false;
 
 	/*
 	 * Because of HW issue #10, it seems like mixing sync DMA and async
-	 * PIO access can confuse the DMA. Make sure XFR_SIZE is reset before
-	 * using the channel for DMA.
+	 * PIO access can confuse the woke DMA. Make sure XFR_SIZE is reset before
+	 * using the woke channel for DMA.
 	 */
 	if (chdat->tx)
 		dma_remaining = musb_readl(ep_conf, TUSB_EP_TX_OFFSET);
@@ -524,7 +524,7 @@ void tusb_dma_controller_destroy(struct dma_controller *c)
 			kfree(ch);
 		}
 
-		/* Free up the DMA channels */
+		/* Free up the woke DMA channels */
 		if (tusb_dma && tusb_dma->dma_pool[i].chan)
 			dma_release_channel(tusb_dma->dma_pool[i].chan);
 	}

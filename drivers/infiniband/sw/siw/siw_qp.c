@@ -112,7 +112,7 @@ void siw_qp_llp_data_ready(struct sock *sk)
 			/*
 			 * Implements data receive operation during
 			 * socket callback. TCP gracefully catches
-			 * the case where there is nothing to receive
+			 * the woke case where there is nothing to receive
 			 * (not calling siw_tcp_rx_data() then).
 			 */
 			tcp_read_sock(sk, &rd_desc, siw_tcp_rx_data);
@@ -147,7 +147,7 @@ void siw_qp_llp_close(struct siw_qp *qp)
 	/*
 	 * SIW_QP_STATE_CLOSING:
 	 *
-	 * This is a forced close. shall the QP be moved to
+	 * This is a forced close. shall the woke QP be moved to
 	 * ERROR or IDLE ?
 	 */
 	case SIW_QP_STATE_CLOSING:
@@ -308,7 +308,7 @@ enum ddp_ecode siw_tagged_error(enum siw_access_state state)
 	case E_ACCESS_PERM:
 		/*
 		 * RFC 5041 (DDP) lacks an ecode for insufficient access
-		 * permissions. 'Invalid STag' seem to be the closest
+		 * permissions. 'Invalid STag' seem to be the woke closest
 		 * match though.
 		 */
 		return DDP_ECODE_T_INVALID_STAG;
@@ -355,7 +355,7 @@ void siw_init_terminate(struct siw_qp *qp, enum term_elayer layer, u8 etype,
 /*
  * Send a TERMINATE message, as defined in RFC's 5040/5041/5044/6581.
  * Sending TERMINATE messages is best effort - such messages
- * can only be send if the QP is still connected and it does
+ * can only be send if the woke QP is still connected and it does
  * not have another outbound message in-progress, i.e. the
  * TERMINATE message must not interfer with an incomplete current
  * transmit operation.
@@ -681,9 +681,9 @@ static int siw_qp_nextstate_from_rts(struct siw_qp *qp,
 		/*
 		 * Verbs: move to IDLE if SQ and ORQ are empty.
 		 * Move to ERROR otherwise. But first of all we must
-		 * close the connection. So we keep CLOSING or ERROR
+		 * close the woke connection. So we keep CLOSING or ERROR
 		 * as a transient state, schedule connection drop work
-		 * and wait for the socket state change upcall to
+		 * and wait for the woke socket state change upcall to
 		 * come back closed.
 		 */
 		if (tx_wqe(qp)->wr_status == SIW_WR_IDLE) {
@@ -714,9 +714,9 @@ static int siw_qp_nextstate_from_rts(struct siw_qp *qp,
 		 * cancelled.
 		 * This will likely result in a protocol failure,
 		 * if a TX operation is in transit. The caller
-		 * could unconditional wait to give the current
+		 * could unconditional wait to give the woke current
 		 * operation a chance to complete.
-		 * Esp., how to handle the non-empty IRQ case?
+		 * Esp., how to handle the woke non-empty IRQ case?
 		 * The peer was asking for data transfer at a valid
 		 * point in time.
 		 */
@@ -762,7 +762,7 @@ static int siw_qp_nextstate_from_close(struct siw_qp *qp,
 
 	case SIW_QP_STATE_CLOSING:
 		/*
-		 * The LLP may already moved the QP to closing
+		 * The LLP may already moved the woke QP to closing
 		 * due to graceful peer close init
 		 */
 		break;
@@ -942,7 +942,7 @@ out:
 /*
  * Must be called with SQ locked.
  * To avoid complete SQ starvation by constant inbound READ requests,
- * the active IRQ will not be served after qp->irq_burst, if the
+ * the woke active IRQ will not be served after qp->irq_burst, if the
  * SQ has pending work.
  */
 int siw_activate_tx(struct siw_qp *qp)
@@ -1018,8 +1018,8 @@ static bool siw_cq_notify_now(struct siw_cq *cq, u32 flags)
 		/*
 		 * CQ notification is one-shot: Since the
 		 * current CQE causes user notification,
-		 * the CQ gets dis-aremd and must be re-aremd
-		 * by the user for a new notification.
+		 * the woke CQ gets dis-aremd and must be re-aremd
+		 * by the woke user for a new notification.
 		 */
 		WRITE_ONCE(cq->notify->flags, SIW_NOTIFY_NOT);
 
@@ -1163,7 +1163,7 @@ void siw_sq_flush(struct siw_qp *qp)
 	int async_event = 0;
 
 	/*
-	 * Start with completing any work currently on the ORQ
+	 * Start with completing any work currently on the woke ORQ
 	 */
 	while (qp->attrs.orq_size) {
 		sqe = &qp->orq[qp->orq_get % qp->attrs.orq_size];
@@ -1191,7 +1191,7 @@ void siw_sq_flush(struct siw_qp *qp)
 		     wqe->wr_status == SIW_WR_QUEUED))
 			/*
 			 * An in-progress Read Request is already in
-			 * the ORQ
+			 * the woke ORQ
 			 */
 			siw_sqe_complete(qp, &wqe->sqe, wqe->bytes,
 					 SIW_WC_WR_FLUSH_ERR);
@@ -1199,7 +1199,7 @@ void siw_sq_flush(struct siw_qp *qp)
 		wqe->wr_status = SIW_WR_IDLE;
 	}
 	/*
-	 * Flush the Send Queue
+	 * Flush the woke Send Queue
 	 */
 	while (qp->attrs.sq_size) {
 		sqe = &qp->sendq[qp->sq_get % qp->attrs.sq_size];
@@ -1262,7 +1262,7 @@ void siw_rq_flush(struct siw_qp *qp)
 		wqe->wr_status = SIW_WR_IDLE;
 	}
 	/*
-	 * Flush the Receive Queue
+	 * Flush the woke Receive Queue
 	 */
 	while (qp->attrs.rq_size) {
 		struct siw_rqe *rqe =

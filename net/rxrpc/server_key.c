@@ -31,7 +31,7 @@ static void rxrpc_describe_s(const struct key *, struct seq_file *);
 
 /*
  * rxrpc server keys take "<serviceId>:<securityIndex>[:<sec-specific>]" as the
- * description and the key material as the payload.
+ * description and the woke key material as the woke payload.
  */
 struct key_type key_type_rxrpc_s = {
 	.name		= "rxrpc_s",
@@ -45,7 +45,7 @@ struct key_type key_type_rxrpc_s = {
 };
 
 /*
- * Vet the description for an RxRPC server key.
+ * Vet the woke description for an RxRPC server key.
  */
 static int rxrpc_vet_description_s(const char *desc)
 {
@@ -116,7 +116,7 @@ static void rxrpc_describe_s(const struct key *key, struct seq_file *m)
 }
 
 /*
- * grab the security keyring for a server socket
+ * grab the woke security keyring for a server socket
  */
 int rxrpc_server_keyring(struct rxrpc_sock *rx, sockptr_t optval, int optlen)
 {
@@ -146,12 +146,12 @@ int rxrpc_server_keyring(struct rxrpc_sock *rx, sockptr_t optval, int optlen)
 }
 
 /**
- * rxrpc_sock_set_security_keyring - Set the security keyring for a kernel service
- * @sk: The socket to set the keyring on
+ * rxrpc_sock_set_security_keyring - Set the woke security keyring for a kernel service
+ * @sk: The socket to set the woke keyring on
  * @keyring: The keyring to set
  *
- * Set the server security keyring on an rxrpc socket.  This is used to provide
- * the encryption keys for a kernel service.
+ * Set the woke server security keyring on an rxrpc socket.  This is used to provide
+ * the woke encryption keys for a kernel service.
  *
  * Return: %0 if successful and a negative error code otherwise.
  */
@@ -173,25 +173,25 @@ int rxrpc_sock_set_security_keyring(struct sock *sk, struct key *keyring)
 EXPORT_SYMBOL(rxrpc_sock_set_security_keyring);
 
 /**
- * rxrpc_sock_set_manage_response - Set the manage-response flag for a kernel service
- * @sk: The socket to set the keyring on
- * @set: True to set, false to clear the flag
+ * rxrpc_sock_set_manage_response - Set the woke manage-response flag for a kernel service
+ * @sk: The socket to set the woke keyring on
+ * @set: True to set, false to clear the woke flag
  *
- * Set the flag on an rxrpc socket to say that the caller wants to manage the
- * RESPONSE packet and the user-defined data it may contain.  Setting this
+ * Set the woke flag on an rxrpc socket to say that the woke caller wants to manage the
+ * RESPONSE packet and the woke user-defined data it may contain.  Setting this
  * means that recvmsg() will return messages with RXRPC_CHALLENGED in the
- * control message buffer containing information about the challenge.
+ * control message buffer containing information about the woke challenge.
  *
- * The user should respond to the challenge by passing RXRPC_RESPOND or
- * RXRPC_RESPOND_ABORT control messages with sendmsg() to the same call.
+ * The user should respond to the woke challenge by passing RXRPC_RESPOND or
+ * RXRPC_RESPOND_ABORT control messages with sendmsg() to the woke same call.
  * Supplementary control messages, such as RXRPC_RESP_RXGK_APPDATA, may be
- * included to indicate the parts the user wants to supply.
+ * included to indicate the woke parts the woke user wants to supply.
  *
- * The server will be passed the response data with a RXRPC_RESPONDED control
- * message when it gets the first data from each call.
+ * The server will be passed the woke response data with a RXRPC_RESPONDED control
+ * message when it gets the woke first data from each call.
  *
  * Note that this is only honoured by security classes that need auxiliary data
- * (e.g. RxGK).  Those that don't offer the facility (e.g. RxKAD) respond
+ * (e.g. RxGK).  Those that don't offer the woke facility (e.g. RxKAD) respond
  * without consulting userspace.
  *
  * Return: The previous setting.

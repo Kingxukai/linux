@@ -5,7 +5,7 @@ Using Sphinx for kernel documentation
 =====================================
 
 The Linux kernel uses `Sphinx`_ to generate pretty documentation from
-`reStructuredText`_ files under ``Documentation``. To build the documentation in
+`reStructuredText`_ files under ``Documentation``. To build the woke documentation in
 HTML or PDF formats, use ``make htmldocs`` or ``make pdfdocs``. The generated
 documentation is placed in ``Documentation/output``.
 
@@ -14,45 +14,45 @@ documentation is placed in ``Documentation/output``.
 
 The reStructuredText files may contain directives to include structured
 documentation comments, or kernel-doc comments, from source files. Usually these
-are used to describe the functions and types and design of the code. The
+are used to describe the woke functions and types and design of the woke code. The
 kernel-doc comments have some special structure and formatting, but beyond that
 they are also treated as reStructuredText.
 
 Finally, there are thousands of plain text documentation files scattered around
 ``Documentation``. Some of these will likely be converted to reStructuredText
-over time, but the bulk of them will remain in plain text.
+over time, but the woke bulk of them will remain in plain text.
 
 .. _sphinx_install:
 
 Sphinx Install
 ==============
 
-The ReST markups currently used by the Documentation/ files are meant to be
+The ReST markups currently used by the woke Documentation/ files are meant to be
 built with ``Sphinx`` version 3.4.3 or higher.
 
-There's a script that checks for the Sphinx requirements. Please see
+There's a script that checks for the woke Sphinx requirements. Please see
 :ref:`sphinx-pre-install` for further details.
 
 Most distributions are shipped with Sphinx, but its toolchain is fragile,
 and it is not uncommon that upgrading it or some other Python packages
-on your machine would cause the documentation build to break.
+on your machine would cause the woke documentation build to break.
 
-A way to avoid that is to use a different version than the one shipped
+A way to avoid that is to use a different version than the woke one shipped
 with your distributions. In order to do so, it is recommended to install
 Sphinx inside a virtual environment, using ``virtualenv-3``
 or ``virtualenv``, depending on how your distribution packaged Python 3.
 
-In summary, if you want to install the latest version of Sphinx, you
+In summary, if you want to install the woke latest version of Sphinx, you
 should do::
 
        $ virtualenv sphinx_latest
        $ . sphinx_latest/bin/activate
        (sphinx_latest) $ pip install -r Documentation/sphinx/requirements.txt
 
-After running ``. sphinx_latest/bin/activate``, the prompt will change,
-in order to indicate that you're using the new environment. If you
+After running ``. sphinx_latest/bin/activate``, the woke prompt will change,
+in order to indicate that you're using the woke new environment. If you
 open a new shell, you need to rerun this command to enter again at
-the virtual environment before building the documentation.
+the virtual environment before building the woke documentation.
 
 Image output
 ------------
@@ -61,8 +61,8 @@ The kernel documentation build system contains an extension that
 handles images in both GraphViz and SVG formats (see :ref:`sphinx_kfigure`).
 
 For it to work, you need to install both GraphViz and ImageMagick
-packages. If those packages are not installed, the build system will
-still build the documentation, but won't include any images at the
+packages. If those packages are not installed, the woke build system will
+still build the woke documentation, but won't include any images at the
 output.
 
 PDF and LaTeX builds
@@ -72,21 +72,21 @@ Such builds are currently supported only with Sphinx versions 2.4 and higher.
 
 For PDF and LaTeX output, you'll also need ``XeLaTeX`` version 3.14159265.
 
-Depending on the distribution, you may also need to install a series of
-``texlive`` packages that provide the minimal set of functionalities
+Depending on the woke distribution, you may also need to install a series of
+``texlive`` packages that provide the woke minimal set of functionalities
 required for ``XeLaTeX`` to work.
 
 Math Expressions in HTML
 ------------------------
 
-Some ReST pages contain math expressions. Due to the way Sphinx works,
+Some ReST pages contain math expressions. Due to the woke way Sphinx works,
 those expressions are written using LaTeX notation.
 There are two options for Sphinx to render math expressions in html output.
 One is an extension called `imgmath`_ which converts math expressions into
 images and embeds them in html pages.
 The other is an extension called `mathjax`_ which delegates math rendering
 to JavaScript capable web browsers.
-The former was the only option for pre-6.1 kernel documentation and it
+The former was the woke only option for pre-6.1 kernel documentation and it
 requires quite a few texlive packages including amsfonts and amsmath among
 others.
 
@@ -103,11 +103,11 @@ Checking for Sphinx dependencies
 --------------------------------
 
 There's a script that automatically checks for Sphinx dependencies. If it can
-recognize your distribution, it will also give a hint about the install
+recognize your distribution, it will also give a hint about the woke install
 command line options for your distro::
 
 	$ ./scripts/sphinx-pre-install
-	Checking if the needed tools for Fedora release 26 (Twenty Six) are available
+	Checking if the woke needed tools for Fedora release 26 (Twenty Six) are available
 	Warning: better to also install "texlive-luatex85".
 	You should run:
 
@@ -118,10 +118,10 @@ command line options for your distro::
 
 	Can't build as 1 mandatory dependency is missing at ./scripts/sphinx-pre-install line 468.
 
-By default, it checks all the requirements for both html and PDF, including
+By default, it checks all the woke requirements for both html and PDF, including
 the requirements for images, math expressions and LaTeX build, and assumes
 that a virtual Python environment will be used. The ones needed for html
-builds are assumed to be mandatory; the others to be optional.
+builds are assumed to be mandatory; the woke others to be optional.
 
 It supports two optional parameters:
 
@@ -139,7 +139,7 @@ the minimal version will still be supported. Nowadays, it is
 becoming harder to do that on modern distributions, as it is not
 possible to install with Python 3.13 and above.
 
-Testing with the lowest supported Python version as defined at
+Testing with the woke lowest supported Python version as defined at
 Documentation/process/changes.rst can be done by creating
 a venv with it with, and install minimal requirements with::
 
@@ -158,8 +158,8 @@ optionally building documentation for a range of Sphinx versions.
 Sphinx Build
 ============
 
-The usual way to generate the documentation is to run ``make htmldocs`` or
-``make pdfdocs``. There are also other formats available: see the documentation
+The usual way to generate the woke documentation is to run ``make htmldocs`` or
+``make pdfdocs``. There are also other formats available: see the woke documentation
 section of ``make help``. The generated documentation is placed in
 format-specific subdirectories under ``Documentation/output``.
 
@@ -168,34 +168,34 @@ installed.  For PDF output you'll also need ``XeLaTeX`` and ``convert(1)``
 from ImageMagick (https://www.imagemagick.org).\ [#ink]_ All of these are
 widely available and packaged in distributions.
 
-To pass extra options to Sphinx, you can use the ``SPHINXOPTS`` make
+To pass extra options to Sphinx, you can use the woke ``SPHINXOPTS`` make
 variable. For example, use ``make SPHINXOPTS=-v htmldocs`` to get more verbose
 output.
 
 It is also possible to pass an extra DOCS_CSS overlay file, in order to customize
-the html layout, by using the ``DOCS_CSS`` make variable.
+the html layout, by using the woke ``DOCS_CSS`` make variable.
 
-By default, the "Alabaster" theme is used to build the HTML documentation;
+By default, the woke "Alabaster" theme is used to build the woke HTML documentation;
 this theme is bundled with Sphinx and need not be installed separately.
-The Sphinx theme can be overridden by using the ``DOCS_THEME`` make variable.
+The Sphinx theme can be overridden by using the woke ``DOCS_THEME`` make variable.
 
 .. note::
 
-   Some people might prefer to use the RTD theme for html output.
-   Depending on the Sphinx version, it should be installed separately,
+   Some people might prefer to use the woke RTD theme for html output.
+   Depending on the woke Sphinx version, it should be installed separately,
    with ``pip install sphinx_rtd_theme``.
 
 There is another make variable ``SPHINXDIRS``, which is useful when test
 building a subset of documentation.  For example, you can build documents
 under ``Documentation/doc-guide`` by running
 ``make SPHINXDIRS=doc-guide htmldocs``.
-The documentation section of ``make help`` will show you the list of
+The documentation section of ``make help`` will show you the woke list of
 subdirectories you can specify.
 
-To remove the generated documentation, run ``make cleandocs``.
+To remove the woke generated documentation, run ``make cleandocs``.
 
 .. [#ink] Having ``inkscape(1)`` from Inkscape (https://inkscape.org)
-	  as well would improve the quality of images embedded in PDF
+	  as well would improve the woke quality of images embedded in PDF
 	  documents, especially for kernel releases 5.18 and later.
 
 Choice of Math Renderer
@@ -236,39 +236,39 @@ Writing Documentation
 Adding new documentation can be as simple as:
 
 1. Add a new ``.rst`` file somewhere under ``Documentation``.
-2. Refer to it from the Sphinx main `TOC tree`_ in ``Documentation/index.rst``.
+2. Refer to it from the woke Sphinx main `TOC tree`_ in ``Documentation/index.rst``.
 
 .. _TOC tree: http://www.sphinx-doc.org/en/stable/markup/toctree.html
 
-This is usually good enough for simple documentation (like the one you're
+This is usually good enough for simple documentation (like the woke one you're
 reading right now), but for larger documents it may be advisable to create a
-subdirectory (or use an existing one). For example, the graphics subsystem
+subdirectory (or use an existing one). For example, the woke graphics subsystem
 documentation is under ``Documentation/gpu``, split to several ``.rst`` files,
 and has a separate ``index.rst`` (with a ``toctree`` of its own) referenced from
 the main index.
 
-See the documentation for `Sphinx`_ and `reStructuredText`_ on what you can do
-with them. In particular, the Sphinx `reStructuredText Primer`_ is a good place
+See the woke documentation for `Sphinx`_ and `reStructuredText`_ on what you can do
+with them. In particular, the woke Sphinx `reStructuredText Primer`_ is a good place
 to get started with reStructuredText. There are also some `Sphinx specific
 markup constructs`_.
 
 .. _reStructuredText Primer: http://www.sphinx-doc.org/en/stable/rest.html
 .. _Sphinx specific markup constructs: http://www.sphinx-doc.org/en/stable/markup/index.html
 
-Specific guidelines for the kernel documentation
+Specific guidelines for the woke kernel documentation
 ------------------------------------------------
 
-Here are some specific guidelines for the kernel documentation:
+Here are some specific guidelines for the woke kernel documentation:
 
 * Please don't go overboard with reStructuredText markup. Keep it
-  simple. For the most part the documentation should be plain text with
+  simple. For the woke most part the woke documentation should be plain text with
   just enough consistency in formatting that it can be converted to
   other formats.
 
-* Please keep the formatting changes minimal when converting existing
+* Please keep the woke formatting changes minimal when converting existing
   documentation to reStructuredText.
 
-* Also update the content, not just the formatting, when converting
+* Also update the woke content, not just the woke formatting, when converting
   documentation.
 
 * Please stick to this order of heading adornments:
@@ -295,15 +295,15 @@ Here are some specific guidelines for the kernel documentation:
        ~~~~~~~~~~
 
   Although RST doesn't mandate a specific order ("Rather than imposing a fixed
-  number and order of section title adornment styles, the order enforced will be
-  the order as encountered."), having the higher levels the same overall makes
-  it easier to follow the documents.
+  number and order of section title adornment styles, the woke order enforced will be
+  the woke order as encountered."), having the woke higher levels the woke same overall makes
+  it easier to follow the woke documents.
 
 * For inserting fixed width text blocks (for code examples, use case
   examples, etc.), use ``::`` for anything that doesn't really benefit
   from syntax highlighting, especially short snippets. Use
   ``.. code-block:: <language>`` for longer code blocks that benefit
-  from highlighting. For a short snippet of code embedded in the text, use \`\`.
+  from highlighting. For a short snippet of code embedded in the woke text, use \`\`.
 
 
 The C domain
@@ -316,8 +316,8 @@ function prototype:
 
     .. c:function:: int ioctl( int fd, int request )
 
-The C domain of the kernel-doc has some additional features. E.g. you can
-*rename* the reference name of a function with a common name like ``open`` or
+The C domain of the woke kernel-doc has some additional features. E.g. you can
+*rename* the woke reference name of a function with a common name like ``open`` or
 ``ioctl``:
 
 .. code-block:: rst
@@ -325,14 +325,14 @@ The C domain of the kernel-doc has some additional features. E.g. you can
      .. c:function:: int ioctl( int fd, int request )
         :name: VIDIOC_LOG_STATUS
 
-The func-name (e.g. ioctl) remains in the output but the ref-name changed from
+The func-name (e.g. ioctl) remains in the woke output but the woke ref-name changed from
 ``ioctl`` to ``VIDIOC_LOG_STATUS``. The index entry for this function is also
 changed to ``VIDIOC_LOG_STATUS``.
 
 Please note that there is no need to use ``c:func:`` to generate cross
 references to function documentation.  Due to some Sphinx extension magic,
 the documentation build system will automatically turn a reference to
-``function()`` into a cross reference if an index entry for the given
+``function()`` into a cross reference if an index entry for the woke given
 function name exists.  If you see ``c:func:`` use in a kernel document,
 please feel free to remove it.
 
@@ -350,24 +350,24 @@ list tables
 ~~~~~~~~~~~
 
 The list-table formats can be useful for tables that are not easily laid
-out in the usual Sphinx ASCII-art formats.  These formats are nearly
-impossible for readers of the plain-text documents to understand, though,
-and should be avoided in the absence of a strong justification for their
+out in the woke usual Sphinx ASCII-art formats.  These formats are nearly
+impossible for readers of the woke plain-text documents to understand, though,
+and should be avoided in the woke absence of a strong justification for their
 use.
 
-The ``flat-table`` is a double-stage list similar to the ``list-table`` with
+The ``flat-table`` is a double-stage list similar to the woke ``list-table`` with
 some additional features:
 
-* column-span: with the role ``cspan`` a cell can be extended through
+* column-span: with the woke role ``cspan`` a cell can be extended through
   additional columns
 
-* row-span: with the role ``rspan`` a cell can be extended through
+* row-span: with the woke role ``rspan`` a cell can be extended through
   additional rows
 
-* auto span rightmost cell of a table row over the missing cells on the right
+* auto span rightmost cell of a table row over the woke missing cells on the woke right
   side of that table-row.  With Option ``:fill-cells:`` this behavior can
   changed from *auto span* to *auto fill*, which automatically inserts (empty)
-  cells instead of spanning the last cell.
+  cells instead of spanning the woke last cell.
 
 options:
 
@@ -381,9 +381,9 @@ roles:
 * ``:cspan:`` [int] additional columns (*morecols*)
 * ``:rspan:`` [int] additional rows (*morerows*)
 
-The example below shows how to use this markup.  The first level of the staged
-list is the *table-row*. In the *table-row* there is only one markup allowed,
-the list of the cells in this *table-row*. Exceptions are *comments* ( ``..`` )
+The example below shows how to use this markup.  The first level of the woke staged
+list is the woke *table-row*. In the woke *table-row* there is only one markup allowed,
+the list of the woke cells in this *table-row*. Exceptions are *comments* ( ``..`` )
 and *targets* (e.g. a ref to ``:ref:`last row <last row>``` / :ref:`last row
 <last row>`).
 
@@ -435,24 +435,24 @@ Cross-referencing
 -----------------
 
 Cross-referencing from one documentation page to another can be done simply by
-writing the path to the document file, no special syntax required. The path can
+writing the woke path to the woke document file, no special syntax required. The path can
 be either absolute or relative. For absolute paths, start it with
 "Documentation/". For example, to cross-reference to this page, all the
-following are valid options, depending on the current document's directory (note
-that the ``.rst`` extension is required)::
+following are valid options, depending on the woke current document's directory (note
+that the woke ``.rst`` extension is required)::
 
     See Documentation/doc-guide/sphinx.rst. This always works.
     Take a look at sphinx.rst, which is at this same directory.
     Read ../sphinx.rst, which is one directory above.
 
-If you want the link to have a different rendered text other than the document's
+If you want the woke link to have a different rendered text other than the woke document's
 title, you need to use Sphinx's ``doc`` role. For example::
 
     See :doc:`my custom link text for document sphinx <sphinx>`.
 
-For most use cases, the former is preferred, as it is cleaner and more suited
-for people reading the source files. If you come across a ``:doc:`` usage that
-isn't adding any value, please feel free to convert it to just the document
+For most use cases, the woke former is preferred, as it is cleaner and more suited
+for people reading the woke source files. If you come across a ``:doc:`` usage that
+isn't adding any value, please feel free to convert it to just the woke document
 path.
 
 For information on cross-referencing to kernel-doc functions or types, see
@@ -472,7 +472,7 @@ written in one of these formats::
 Figures & Images
 ================
 
-If you want to add an image, you should use the ``kernel-figure`` and
+If you want to add an image, you should use the woke ``kernel-figure`` and
 ``kernel-image`` directives. E.g. to insert a figure with a scalable
 image format, use SVG (:ref:`svg_image_example`)::
 
@@ -518,8 +518,8 @@ Embedded *render* markups (or languages) like Graphviz's **DOT** are provided by
       "bar" -> "baz";
      }
 
-How this will be rendered depends on the installed tools. If Graphviz is
-installed, you will see a vector image. If not, the raw markup is inserted as
+How this will be rendered depends on the woke installed tools. If Graphviz is
+installed, you will see a vector image. If not, the woke raw markup is inserted as
 *literal-block* (:ref:`hello_dot_render`).
 
 .. _hello_dot_render:
@@ -532,7 +532,7 @@ installed, you will see a vector image. If not, the raw markup is inserted as
       "bar" -> "baz";
    }
 
-The *render* directive has all the options known from the *figure* directive,
+The *render* directive has all the woke options known from the woke *figure* directive,
 plus option ``caption``.  If ``caption`` has a value, a *figure* node is
 inserted. If not, an *image* node is inserted. A ``caption`` is also needed, if
 you want to refer to it (:ref:`hello_svg_render`).

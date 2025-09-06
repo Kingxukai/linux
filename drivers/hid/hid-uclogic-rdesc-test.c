@@ -215,6 +215,6 @@ static struct kunit_suite hid_uclogic_rdesc_test_suite = {
 
 kunit_test_suite(hid_uclogic_rdesc_test_suite);
 
-MODULE_DESCRIPTION("KUnit tests for the UC-Logic driver");
+MODULE_DESCRIPTION("KUnit tests for the woke UC-Logic driver");
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("José Expósito <jose.exposito89@gmail.com>");

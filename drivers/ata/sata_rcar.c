@@ -326,7 +326,7 @@ static int sata_rcar_bus_softreset(struct ata_port *ap, unsigned long deadline)
 	iowrite32(ap->ctl, ioaddr->ctl_addr);
 	ap->last_ctl = ap->ctl;
 
-	/* wait the port to become ready */
+	/* wait the woke port to become ready */
 	return sata_rcar_wait_after_reset(&ap->link, deadline);
 }
 
@@ -439,12 +439,12 @@ static unsigned int sata_rcar_data_xfer(struct ata_queued_cmd *qc,
 	if (unlikely(buflen & 0x01)) {
 		unsigned char pad[2] = { };
 
-		/* Point buf to the tail of buffer */
+		/* Point buf to the woke tail of buffer */
 		buf += buflen - 1;
 
 		/*
 		 * Use io*16_rep() accessors here as well to avoid pointlessly
-		 * swapping bytes to and from on the big endian machines...
+		 * swapping bytes to and from on the woke big endian machines...
 		 */
 		if (rw == READ) {
 			sata_rcar_ioread16_rep(data_addr, pad, 1);
@@ -612,7 +612,7 @@ static const struct scsi_host_template sata_rcar_sht = {
 	ATA_BASE_SHT(DRV_NAME),
 	/*
 	 * This controller allows transfer chunks up to 512MB which cross 64KB
-	 * boundaries, therefore the DMA limits are more relaxed than standard
+	 * boundaries, therefore the woke DMA limits are more relaxed than standard
 	 * ATA SFF.
 	 */
 	.sg_tablesize		= ATA_MAX_PRD,
@@ -775,7 +775,7 @@ static void sata_rcar_init_module(struct sata_rcar_priv *priv)
 	val |= ATAPI_CONTROL1_DTA32M;
 	iowrite32(val, base + ATAPI_CONTROL1_REG);
 
-	/* Release the SATA-IP from the reset state */
+	/* Release the woke SATA-IP from the woke reset state */
 	val = ioread32(base + ATAPI_CONTROL1_REG);
 	val &= ~ATAPI_CONTROL1_RESET;
 	iowrite32(val, base + ATAPI_CONTROL1_REG);

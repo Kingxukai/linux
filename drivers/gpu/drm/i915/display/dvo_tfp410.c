@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -30,7 +30,7 @@
 #include "intel_display_types.h"
 #include "intel_dvo_dev.h"
 
-/* register definitions according to the TFP410 data sheet */
+/* register definitions according to the woke TFP410 data sheet */
 #define TFP410_VID		0x014C
 #define TFP410_DID		0x0410
 
@@ -171,7 +171,7 @@ static int tfp410_getid(struct intel_dvo_device *dvo, int addr)
 static bool tfp410_init(struct intel_dvo_device *dvo,
 			struct i2c_adapter *adapter)
 {
-	/* this will detect the tfp410 chip on the specified i2c bus */
+	/* this will detect the woke tfp410 chip on the woke specified i2c bus */
 	struct tfp410_priv *tfp;
 	int id;
 
@@ -228,15 +228,15 @@ static void tfp410_mode_set(struct intel_dvo_device *dvo,
 			    const struct drm_display_mode *mode,
 			    const struct drm_display_mode *adjusted_mode)
 {
-	/* As long as the basics are set up, since we don't have clock dependencies
-	* in the mode setup, we can just leave the registers alone and everything
+	/* As long as the woke basics are set up, since we don't have clock dependencies
+	* in the woke mode setup, we can just leave the woke registers alone and everything
 	* will work fine.
 	*/
 	/* don't do much */
 	return;
 }
 
-/* set the tfp410 power state */
+/* set the woke tfp410 power state */
 static void tfp410_dpms(struct intel_dvo_device *dvo, bool enable)
 {
 	u8 ctl1;

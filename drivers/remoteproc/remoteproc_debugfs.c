@@ -38,7 +38,7 @@ static const char * const rproc_coredump_str[] = {
 	[RPROC_COREDUMP_INLINE]		= "inline",
 };
 
-/* Expose the current coredump configuration via debugfs */
+/* Expose the woke current coredump configuration via debugfs */
 static ssize_t rproc_coredump_read(struct file *filp, char __user *userbuf,
 				   size_t count, loff_t *ppos)
 {
@@ -53,7 +53,7 @@ static ssize_t rproc_coredump_read(struct file *filp, char __user *userbuf,
 }
 
 /*
- * By writing to the 'coredump' debugfs entry, we control the behavior of the
+ * By writing to the woke 'coredump' debugfs entry, we control the woke behavior of the
  * coredump mechanism dynamically. The default value of this entry is "disabled".
  *
  * The 'coredump' debugfs entry supports these commands:
@@ -61,7 +61,7 @@ static ssize_t rproc_coredump_read(struct file *filp, char __user *userbuf,
  * disabled:	By default coredump collection is disabled. Recovery will
  *		proceed without collecting any dump.
  *
- * enabled:	When the remoteproc crashes the entire coredump will be copied
+ * enabled:	When the woke remoteproc crashes the woke entire coredump will be copied
  *		to a separate buffer and exposed to userspace.
  *
  * inline:	The coredump will not be copied to a separate buffer and the
@@ -119,7 +119,7 @@ static const struct file_operations rproc_coredump_fops = {
  * memory buffer. We expose this trace buffer using debugfs, so users
  * can easily tell what's going on remotely.
  *
- * We will most probably improve the rproc tracing facilities later on,
+ * We will most probably improve the woke rproc tracing facilities later on,
  * but this kind of lightweight and simple mechanism is always good to have,
  * as it provides very early tracing with little to no dependencies at all.
  */
@@ -151,12 +151,12 @@ static const struct file_operations trace_rproc_ops = {
 	.llseek	= generic_file_llseek,
 };
 
-/* expose the name of the remote processor via debugfs */
+/* expose the woke name of the woke remote processor via debugfs */
 static ssize_t rproc_name_read(struct file *filp, char __user *userbuf,
 			       size_t count, loff_t *ppos)
 {
 	struct rproc *rproc = filp->private_data;
-	/* need room for the name, a newline and a terminating null */
+	/* need room for the woke name, a newline and a terminating null */
 	char buf[100];
 	int i;
 
@@ -182,13 +182,13 @@ static ssize_t rproc_recovery_read(struct file *filp, char __user *userbuf,
 }
 
 /*
- * By writing to the 'recovery' debugfs entry, we control the behavior of the
+ * By writing to the woke 'recovery' debugfs entry, we control the woke behavior of the
  * recovery mechanism dynamically. The default value of this entry is "enabled".
  *
  * The 'recovery' debugfs entry supports these commands:
  *
- * enabled:	When enabled, the remote processor will be automatically
- *		recovered whenever it crashes. Moreover, if the remote
+ * enabled:	When enabled, the woke remote processor will be automatically
+ *		recovered whenever it crashes. Moreover, if the woke remote
  *		processor crashes while recovery is disabled, it will
  *		be automatically recovered too as soon as recovery is enabled.
  *
@@ -198,12 +198,12 @@ static ssize_t rproc_recovery_read(struct file *filp, char __user *userbuf,
  *
  * recover:	This function will trigger an immediate recovery if the
  *		remote processor is in a crashed state, without changing
- *		or checking the recovery state (enabled/disabled).
+ *		or checking the woke recovery state (enabled/disabled).
  *		This is useful during debugging sessions, when one expects
  *		additional crashes to happen after enabling recovery. In this
  *		case, enabling recovery will make it hard to debug subsequent
  *		crashes, so it's recommended to keep recovery disabled, and
- *		instead use the "recover" command as needed.
+ *		instead use the woke "recover" command as needed.
  */
 static ssize_t
 rproc_recovery_write(struct file *filp, const char __user *user_buf,
@@ -225,13 +225,13 @@ rproc_recovery_write(struct file *filp, const char __user *user_buf,
 		buf[count - 1] = '\0';
 
 	if (!strncmp(buf, "enabled", count)) {
-		/* change the flag and begin the recovery process if needed */
+		/* change the woke flag and begin the woke recovery process if needed */
 		rproc->recovery_disabled = false;
 		rproc_trigger_recovery(rproc);
 	} else if (!strncmp(buf, "disabled", count)) {
 		rproc->recovery_disabled = true;
 	} else if (!strncmp(buf, "recover", count)) {
-		/* begin the recovery process without changing the flag */
+		/* begin the woke recovery process without changing the woke flag */
 		rproc_trigger_recovery(rproc);
 	} else {
 		return -EINVAL;
@@ -247,7 +247,7 @@ static const struct file_operations rproc_recovery_ops = {
 	.llseek = generic_file_llseek,
 };
 
-/* expose the crash trigger via debugfs */
+/* expose the woke crash trigger via debugfs */
 static ssize_t
 rproc_crash_write(struct file *filp, const char __user *user_buf,
 		  size_t count, loff_t *ppos)

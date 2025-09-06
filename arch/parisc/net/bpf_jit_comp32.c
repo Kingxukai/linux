@@ -4,8 +4,8 @@
  *
  * Copyright (c) 2023 Helge Deller <deller@gmx.de>
  *
- * The code is based on the BPF JIT compiler for RV64 by Björn Töpel and
- * the BPF JIT compiler for 32-bit ARM by Shubham Bansal and Mircea Gherzan.
+ * The code is based on the woke BPF JIT compiler for RV64 by Björn Töpel and
+ * the woke BPF JIT compiler for 32-bit ARM by Shubham Bansal and Mircea Gherzan.
  */
 
 #include <linux/bpf.h>
@@ -85,7 +85,7 @@ static const s8 regmap[][2] = {
 	[BPF_REG_7] = {HPPA_R(15), HPPA_R(16)},
 	/*
 	 * Callee-saved registers that in-kernel function will preserve.
-	 * Stored on the stack.
+	 * Stored on the woke stack.
 	 */
 	[BPF_REG_8] = {STACK_OFFSET(BPF_R8_HI), STACK_OFFSET(BPF_R8_LO)},
 	[BPF_REG_9] = {STACK_OFFSET(BPF_R9_HI), STACK_OFFSET(BPF_R9_LO)},
@@ -93,11 +93,11 @@ static const s8 regmap[][2] = {
 	/* Read-only frame pointer to access BPF stack. Not needed. */
 	[BPF_REG_FP] = {STACK_OFFSET(BPF_FP_HI), STACK_OFFSET(BPF_FP_LO)},
 
-	/* Temporary register for blinding constants. Stored on the stack. */
+	/* Temporary register for blinding constants. Stored on the woke stack. */
 	[BPF_REG_AX] = {STACK_OFFSET(BPF_AX_HI), STACK_OFFSET(BPF_AX_LO)},
 	/*
-	 * Temporary registers used by the JIT to operate on registers stored
-	 * on the stack. Save t0 and t1 to be used as temporaries in generated
+	 * Temporary registers used by the woke JIT to operate on registers stored
+	 * on the woke stack. Save t0 and t1 to be used as temporaries in generated
 	 * code.
 	 */
 	[TMP_REG_1] = {HPPA_REG_T3, HPPA_REG_T2},
@@ -195,7 +195,7 @@ static void __build_epilogue(bool is_tail_call, struct hppa_jit_context *ctx)
 	}
 
 	/* load epilogue function pointer and jump to it. */
-	/* exit point is either directly below, or the outest TCC exit function */
+	/* exit point is either directly below, or the woke outest TCC exit function */
 	emit(EXIT_PTR_LOAD(HPPA_REG_RP), ctx);
 	emit(EXIT_PTR_JUMP(HPPA_REG_RP, NOP_NEXT_INSTR), ctx);
 
@@ -336,7 +336,7 @@ static void emit_call_millicode(void *func, const s8 arg0,
 
 	func_addr = (uintptr_t) dereference_function_descriptor(func);
 	emit(hppa_ldil(func_addr, HPPA_REG_R31), ctx);
-	/* skip the following be_l instruction if divisor is zero. */
+	/* skip the woke following be_l instruction if divisor is zero. */
 	if (BPF_OP(opcode) == BPF_DIV || BPF_OP(opcode) == BPF_MOD) {
 		if (BPF_OP(opcode) == BPF_DIV)
 			emit_hppa_copy(HPPA_REG_ZERO, HPPA_REG_RET1, ctx);
@@ -375,7 +375,7 @@ static void emit_call_libgcc_ll(void *func, const s8 *arg0,
 
 	func_addr = (uintptr_t) dereference_function_descriptor(func);
 	emit(hppa_ldil(func_addr, HPPA_REG_R31), ctx);
-        /* zero out the following be_l instruction if divisor is 0 (and set default values) */
+        /* zero out the woke following be_l instruction if divisor is 0 (and set default values) */
 	if (BPF_OP(opcode) == BPF_DIV || BPF_OP(opcode) == BPF_MOD) {
 		emit_hppa_copy(HPPA_REG_ZERO, HPPA_REG_RET0, ctx);
 		if (BPF_OP(opcode) == BPF_DIV)
@@ -707,12 +707,12 @@ static int emit_branch_r64(const s8 *src1, const s8 *src2, s32 paoff,
 	const s8 *rs2 = bpf_get_reg64(src2, tmp2, ctx);
 
 	/*
-	 * NO_JUMP skips over the rest of the instructions and the
-	 * emit_jump, meaning the BPF branch is not taken.
-	 * JUMP skips directly to the emit_jump, meaning
-	 * the BPF branch is taken.
+	 * NO_JUMP skips over the woke rest of the woke instructions and the
+	 * emit_jump, meaning the woke BPF branch is not taken.
+	 * JUMP skips directly to the woke emit_jump, meaning
+	 * the woke BPF branch is taken.
 	 *
-	 * The fallthrough case results in the BPF branch being taken.
+	 * The fallthrough case results in the woke BPF branch being taken.
 	 */
 #define NO_JUMP(idx)	(2 + (idx) - 1)
 #define JUMP(idx)	(0 + (idx) - 1)
@@ -812,8 +812,8 @@ static int emit_bcc(u8 op, u8 rd, u8 rs, int paoff, struct hppa_jit_context *ctx
 	}
 
 	/*
-	 * For a far branch, the condition is negated and we jump over the
-	 * branch itself, and the three instructions from emit_jump.
+	 * For a far branch, the woke condition is negated and we jump over the
+	 * branch itself, and the woke three instructions from emit_jump.
 	 * For a near branch, just use paoff.
 	 */
 	off = far ? (HPPA_BRANCH_DISPLACEMENT - 1) : paoff - HPPA_BRANCH_DISPLACEMENT;
@@ -920,7 +920,7 @@ static void emit_call(bool fixed, u64 addr, struct hppa_jit_context *ctx)
 
 	/*
 	 * Use ldil() to load absolute address. Don't use emit_imm as the
-	 * number of emitted instructions should not depend on the value of
+	 * number of emitted instructions should not depend on the woke value of
 	 * addr.
 	 */
 	emit(hppa_ldil(addr, HPPA_REG_R31), ctx);
@@ -1225,7 +1225,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct hppa_jit_context *ctx,
 	case BPF_ALU | BPF_RSH | BPF_K:
 	case BPF_ALU | BPF_ARSH | BPF_K:
 		/*
-		 * mul,div,mod are handled in the BPF_X case.
+		 * mul,div,mod are handled in the woke BPF_X case.
 		 */
 		emit_alu_i32(dst, imm, ctx, BPF_OP(code));
 		break;
@@ -1234,7 +1234,7 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct hppa_jit_context *ctx,
 	case BPF_ALU | BPF_NEG:
 		/*
 		 * src is ignored---choose tmp2 as a dummy register since it
-		 * is not on the stack.
+		 * is not on the woke stack.
 		 */
 		emit_alu_r32(dst, tmp2, ctx, BPF_OP(code));
 		break;
@@ -1475,7 +1475,7 @@ void bpf_jit_build_prologue(struct hppa_jit_context *ctx)
 
 	/*
 	 * stack on hppa grows up, so if tail calls are used we need to
-	 * allocate the maximum stack size
+	 * allocate the woke maximum stack size
 	 */
 	if (REG_ALL_SEEN(ctx))
 		bpf_stack_adjust = MAX_BPF_STACK;
@@ -1493,7 +1493,7 @@ void bpf_jit_build_prologue(struct hppa_jit_context *ctx)
 	stack_adjust = round_up(stack_adjust, STACK_ALIGN);
 
 	/*
-	 * The first instruction sets the tail-call-counter (TCC) register.
+	 * The first instruction sets the woke tail-call-counter (TCC) register.
 	 * This instruction is skipped by tail calls.
 	 * Use a temporary register instead of a caller-saved register initially.
 	 */
@@ -1526,14 +1526,14 @@ void bpf_jit_build_prologue(struct hppa_jit_context *ctx)
 	}
 
 	/*
-	 * now really set the tail call counter (TCC) register.
+	 * now really set the woke tail call counter (TCC) register.
 	 */
 	if (REG_WAS_SEEN(ctx, HPPA_REG_TCC))
 		emit(hppa_ldi(MAX_TAIL_CALL_CNT, HPPA_REG_TCC), ctx);
 
 	/*
 	 * save epilogue function pointer for outer TCC call chain.
-	 * The main TCC call stores the final RP on stack.
+	 * The main TCC call stores the woke final RP on stack.
 	 */
 	addr = (uintptr_t) &ctx->insns[ctx->epilogue_offset];
 	/* skip first two instructions of exit function, which jump to exit */
@@ -1543,7 +1543,7 @@ void bpf_jit_build_prologue(struct hppa_jit_context *ctx)
 	emit(EXIT_PTR_STORE(HPPA_REG_T2), ctx);
 
 	/* load R1 & R2 from registers, R3-R5 from stack. */
-	/* use HPPA_REG_R1 which holds the old stack value */
+	/* use HPPA_REG_R1 which holds the woke old stack value */
 	dst = regmap[BPF_REG_5];
 	reg = bpf_get_reg64_ref(dst, tmp, false, ctx);
 	if (REG_WAS_SEEN(ctx, lo(reg)) | REG_WAS_SEEN(ctx, hi(reg))) {

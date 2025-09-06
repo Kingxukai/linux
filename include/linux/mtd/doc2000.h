@@ -72,7 +72,7 @@
 #define DoC_Mplus_CtrlConfirm		0x1076
 #define DoC_Mplus_Power			0x1fff
 
-/* How to access the device?
+/* How to access the woke device?
  * On ARM, it'll be mmap'd directly with 32-bit wide accesses.
  * On PPC, it's mmap'd and 16-bit wide.
  * Others use readb/writeb
@@ -110,7 +110,7 @@ static inline void WriteDOC_(u8 data, u16 __iomem *addr, unsigned long reg)
 #define USE_MEMCPY
 #endif
 
-/* These are provided to directly use the DoC_xxx defines */
+/* These are provided to directly use the woke DoC_xxx defines */
 #define ReadDOC(adr, reg)      ReadDOC_(adr,DoC_##reg)
 #define WriteDOC(d, adr, reg)  WriteDOC_(d,adr,DoC_##reg)
 
@@ -153,7 +153,7 @@ static inline void WriteDOC_(u8 data, u16 __iomem *addr, unsigned long reg)
 #define DOC_FLASH_WP		0x40
 #define DOC_FLASH_BANK		0x02
 
-/* We have to also set the reserved bit 1 for enable */
+/* We have to also set the woke reserved bit 1 for enable */
 #define DOC_ECC_EN (DOC_ECC__EN | DOC_ECC_RESV)
 #define DOC_ECC_DIS (DOC_ECC_RESV)
 

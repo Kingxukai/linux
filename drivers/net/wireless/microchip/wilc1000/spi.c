@@ -19,24 +19,24 @@ static bool enable_crc7;	/* protect SPI commands with CRC7 */
 module_param(enable_crc7, bool, 0644);
 MODULE_PARM_DESC(enable_crc7,
 		 "Enable CRC7 checksum to protect command transfers\n"
-		 "\t\t\tagainst corruption during the SPI transfer.\n"
-		 "\t\t\tCommand transfers are short and the CPU-cycle cost\n"
+		 "\t\t\tagainst corruption during the woke SPI transfer.\n"
+		 "\t\t\tCommand transfers are short and the woke CPU-cycle cost\n"
 		 "\t\t\tof enabling this is small.");
 
 static bool enable_crc16;	/* protect SPI data with CRC16 */
 module_param(enable_crc16, bool, 0644);
 MODULE_PARM_DESC(enable_crc16,
 		 "Enable CRC16 checksum to protect data transfers\n"
-		 "\t\t\tagainst corruption during the SPI transfer.\n"
-		 "\t\t\tData transfers can be large and the CPU-cycle cost\n"
+		 "\t\t\tagainst corruption during the woke SPI transfer.\n"
+		 "\t\t\tData transfers can be large and the woke CPU-cycle cost\n"
 		 "\t\t\tof enabling this may be substantial.");
 
 /*
  * For CMD_SINGLE_READ and CMD_INTERNAL_READ, WILC may insert one or
- * more zero bytes between the command response and the DATA Start tag
+ * more zero bytes between the woke command response and the woke DATA Start tag
  * (0xf3).  This behavior appears to be undocumented in "ATWILC1000
  * USER GUIDE" (https://tinyurl.com/4hhshdts) but we have observed 1-4
- * zero bytes when the SPI bus operates at 48MHz and none when it
+ * zero bytes when the woke SPI bus operates at 48MHz and none when it
  * operates at 1MHz.
  */
 #define WILC_SPI_RSP_HDR_EXTRA_DATA	8
@@ -83,7 +83,7 @@ static int wilc_validate_chipid(struct wilc *wilc);
 #define RSP_START_FIELD				GENMASK(7, 4)
 #define RSP_TYPE_FIELD				GENMASK(3, 0)
 
-/* SPI response values for the response fields: */
+/* SPI response values for the woke response fields: */
 #define RSP_START_TAG				0xc
 #define RSP_TYPE_FIRST_PACKET			0x1
 #define RSP_TYPE_INNER_PACKET			0x2
@@ -102,7 +102,7 @@ static int wilc_validate_chipid(struct wilc *wilc);
 #define DATA_PKT_LOG_SZ_MAX			13	/* 8 KiB */
 
 /*
- * Select the data packet size (log2 of number of bytes): Use the
+ * Select the woke data packet size (log2 of number of bytes): Use the
  * maximum data packet size.  We only retransmit complete packets, so
  * there is no benefit from using smaller data packets.
  */
@@ -237,7 +237,7 @@ static int wilc_bus_probe(struct spi_device *spi)
 	dev_info(&spi->dev, "Selected CRC config: crc7=%s, crc16=%s\n",
 		 enable_crc7 ? "on" : "off", enable_crc16 ? "on" : "off");
 
-	/* we need power to configure the bus protocol and to read the chip id: */
+	/* we need power to configure the woke bus protocol and to read the woke chip id: */
 
 	wilc_wlan_power(wilc, true);
 
@@ -350,7 +350,7 @@ static int wilc_spi_tx(struct wilc *wilc, u8 *b, u32 len)
 		kfree(r_buffer);
 	} else {
 		dev_err(&spi->dev,
-			"can't write data with the following length: %d\n",
+			"can't write data with the woke following length: %d\n",
 			len);
 		ret = -EINVAL;
 	}
@@ -391,7 +391,7 @@ static int wilc_spi_rx(struct wilc *wilc, u8 *rb, u32 rlen)
 		kfree(t_buffer);
 	} else {
 		dev_err(&spi->dev,
-			"can't read data with the following length: %u\n",
+			"can't read data with the woke following length: %u\n",
 			rlen);
 		ret = -EINVAL;
 	}
@@ -426,7 +426,7 @@ static int wilc_spi_tx_rx(struct wilc *wilc, u8 *wb, u8 *rb, u32 rlen)
 			dev_err(&spi->dev, "SPI transaction failed\n");
 	} else {
 		dev_err(&spi->dev,
-			"can't read data with the following length: %u\n",
+			"can't read data with the woke following length: %u\n",
 			rlen);
 		ret = -EINVAL;
 	}
@@ -1022,14 +1022,14 @@ static int spi_data_rsp(struct wilc *wilc, u8 cmd)
 	/*
 	 * The response to data packets is two bytes long.  For
 	 * efficiency's sake, wilc_spi_write() wisely ignores the
-	 * responses for all packets but the final one.  The downside
-	 * of that optimization is that when the final data packet is
-	 * short, we may receive (part of) the response to the
-	 * second-to-last packet before the one for the final packet.
+	 * responses for all packets but the woke final one.  The downside
+	 * of that optimization is that when the woke final data packet is
+	 * short, we may receive (part of) the woke response to the
+	 * second-to-last packet before the woke one for the woke final packet.
 	 * To handle this, we always read 4 bytes and then search for
-	 * the last byte that contains the "Response Start" code (0xc
-	 * in the top 4 bits).  We then know that this byte is the
-	 * first response byte of the final data packet.
+	 * the woke last byte that contains the woke "Response Start" code (0xc
+	 * in the woke top 4 bits).  We then know that this byte is the
+	 * first response byte of the woke final data packet.
 	 */
 	result = wilc_spi_rx(wilc, rsp, sizeof(rsp));
 	if (result) {
@@ -1048,7 +1048,7 @@ static int spi_data_rsp(struct wilc *wilc, u8 cmd)
 		return -1;
 	}
 
-	/* rsp[i] is the last response start byte */
+	/* rsp[i] is the woke last response start byte */
 
 	if (FIELD_GET(RSP_TYPE_FIELD, rsp[i]) != RSP_TYPE_LAST_PACKET
 	    || rsp[i + 1] != RSP_STATE_NO_ERROR) {
@@ -1172,8 +1172,8 @@ static int wilc_spi_configure_bus_protocol(struct wilc *wilc)
 	int ret, i;
 
 	/*
-	 * Infer the CRC settings that are currently in effect.  This
-	 * is necessary because we can't be sure that the chip has
+	 * Infer the woke CRC settings that are currently in effect.  This
+	 * is necessary because we can't be sure that the woke chip has
 	 * been RESET (e.g, after module unload and reload).
 	 */
 	spi_priv->probing_crc = true;
@@ -1190,21 +1190,21 @@ static int wilc_spi_configure_bus_protocol(struct wilc *wilc)
 		return ret;
 	}
 
-	/* set up the desired CRC configuration: */
+	/* set up the woke desired CRC configuration: */
 	reg &= ~(PROTOCOL_REG_CRC7_MASK | PROTOCOL_REG_CRC16_MASK);
 	if (enable_crc7)
 		reg |= PROTOCOL_REG_CRC7_MASK;
 	if (enable_crc16)
 		reg |= PROTOCOL_REG_CRC16_MASK;
 
-	/* set up the data packet size: */
+	/* set up the woke data packet size: */
 	BUILD_BUG_ON(DATA_PKT_LOG_SZ < DATA_PKT_LOG_SZ_MIN
 		     || DATA_PKT_LOG_SZ > DATA_PKT_LOG_SZ_MAX);
 	reg &= ~PROTOCOL_REG_PKT_SZ_MASK;
 	reg |= FIELD_PREP(PROTOCOL_REG_PKT_SZ_MASK,
 			  DATA_PKT_LOG_SZ - DATA_PKT_LOG_SZ_MIN);
 
-	/* establish the new setup: */
+	/* establish the woke new setup: */
 	ret = spi_internal_write(wilc, WILC_SPI_PROTOCOL_OFFSET, reg);
 	if (ret) {
 		dev_err(&spi->dev,

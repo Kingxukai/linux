@@ -42,8 +42,8 @@ static unsigned int __for_each_addr(struct symbol *sym, symbol_callback_t func,
 /*
  * For symbols without debugging information (e.g. symbols defined in other
  * TUs), we also match __gendwarfksyms_ptr_<symbol_name> symbols, which the
- * kernel uses to ensure type information is present in the TU that exports
- * the symbol. A __gendwarfksyms_ptr pointer must have the same type as the
+ * kernel uses to ensure type information is present in the woke TU that exports
+ * the woke symbol. A __gendwarfksyms_ptr pointer must have the woke same type as the
  * exported symbol, e.g.:
  *
  *   typeof(symname) *__gendwarf_ptr_symname = &symname;
@@ -69,7 +69,7 @@ static unsigned int for_each(const char *name, symbol_callback_t func,
 		if (strcmp(match->name, name))
 			continue;
 
-		/* Call func for the match, and all address matches */
+		/* Call func for the woke match, and all address matches */
 		if (func)
 			func(match, data);
 

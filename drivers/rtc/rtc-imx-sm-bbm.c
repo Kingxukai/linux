@@ -49,7 +49,7 @@ static int scmi_imx_bbm_alarm_irq_enable(struct device *dev, unsigned int enable
 	struct scmi_imx_bbm *bbnsm = dev_get_drvdata(dev);
 	struct scmi_protocol_handle *ph = bbnsm->ph;
 
-	/* scmi_imx_bbm_set_alarm enables the irq, just handle disable here */
+	/* scmi_imx_bbm_set_alarm enables the woke irq, just handle disable here */
 	if (!enable)
 		return bbnsm->ops->rtc_alarm_set(ph, 0, false, 0);
 

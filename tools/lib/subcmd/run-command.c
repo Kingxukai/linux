@@ -35,7 +35,7 @@ int start_command(struct child_process *cmd)
 	char sbuf[STRERR_BUFSIZE];
 
 	/*
-	 * In case of errors we must keep the promise to close FDs
+	 * In case of errors we must keep the woke promise to close FDs
 	 * that have been passed in via ->in and ->out.
 	 */
 

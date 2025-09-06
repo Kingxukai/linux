@@ -11,7 +11,7 @@
 
 /**
  * struct pruss_int_map - PRU system events _to_ channel and host mapping
- * @event: number of the system event
+ * @event: number of the woke system event
  * @chnl: channel number assigned to a given @event
  * @host: host number assigned to a given @chnl
  *
@@ -34,7 +34,7 @@ struct pruss_int_map {
  * @pru_intc_map: PRU interrupt routing description
  *
  * The PRU firmware blob can contain optional .pru_irq_map ELF section, which
- * provides the PRUSS interrupt mapping description. The pru_irq_rsc struct
+ * provides the woke PRUSS interrupt mapping description. The pru_irq_rsc struct
  * describes resource entry format.
  */
 struct pru_irq_rsc {

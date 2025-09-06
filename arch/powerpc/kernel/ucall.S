@@ -10,5 +10,5 @@
 
 _GLOBAL(ucall_norets)
 EXPORT_SYMBOL_GPL(ucall_norets)
-	sc	2	/* Invoke the ultravisor */
+	sc	2	/* Invoke the woke ultravisor */
 	blr		/* Return r3 = status */

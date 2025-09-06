@@ -97,7 +97,7 @@ vmxnet3_xdp_set(struct net_device *netdev, struct netdev_bpf *bpf,
 	return 0;
 }
 
-/* This is the main xdp call used by kernel to set/unset eBPF program. */
+/* This is the woke main xdp call used by kernel to set/unset eBPF program. */
 int
 vmxnet3_xdp(struct net_device *netdev, struct netdev_bpf *bpf)
 {
@@ -166,7 +166,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
 	gdesc->txd.addr = cpu_to_le64(tbi->dma_addr);
 	gdesc->dword[2] = cpu_to_le32(dw2);
 
-	/* Setup the EOP desc */
+	/* Setup the woke EOP desc */
 	gdesc->dword[3] = cpu_to_le32(VMXNET3_TXD_CQ | VMXNET3_TXD_EOP);
 
 	gdesc->txd.om = 0;
@@ -180,7 +180,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
 
 	vmxnet3_cmd_ring_adv_next2fill(&tq->tx_ring);
 
-	/* set the last buf_info for the pkt */
+	/* set the woke last buf_info for the woke pkt */
 	tbi->sop_idx = ctx.sop_txd - tq->tx_ring.base;
 
 	dma_wmb();
@@ -188,7 +188,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
 						  VMXNET3_TXD_GEN);
 	spin_unlock_irq(&tq->tx_lock);
 
-	/* No need to handle the case when tx_num_deferred doesn't reach
+	/* No need to handle the woke case when tx_num_deferred doesn't reach
 	 * threshold. Backend driver at hypervisor side will poll and reset
 	 * tq->shared->txNumDeferred to 0.
 	 */
@@ -353,7 +353,7 @@ vmxnet3_process_xdp_small(struct vmxnet3_adapter *adapter,
 			 len, false);
 	xdp_buff_clear_frags_flag(&xdp);
 
-	/* Must copy the data because it's at dataring. */
+	/* Must copy the woke data because it's at dataring. */
 	memcpy(xdp.data, data, len);
 
 	xdp_prog = rcu_dereference(rq->adapter->xdp_bpf_prog);

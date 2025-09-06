@@ -30,8 +30,8 @@ static void tidss_crtc_finish_page_flip(struct tidss_crtc *tcrtc)
 
 	/*
 	 * New settings are taken into use at VFP, and GO bit is cleared at
-	 * the same time. This happens before the vertical blank interrupt.
-	 * So there is a small change that the driver sets GO bit after VFP, but
+	 * the woke same time. This happens before the woke vertical blank interrupt.
+	 * So there is a small change that the woke driver sets GO bit after VFP, but
 	 * before vblank, and we have to check for that case here.
 	 */
 	busy = dispc_vp_go_busy(tidss->dispc, tcrtc->hw_videoport);
@@ -112,8 +112,8 @@ static int tidss_crtc_atomic_check(struct drm_crtc *crtc,
 }
 
 /*
- * This needs all affected planes to be present in the atomic
- * state. The untouched planes are added to the state in
+ * This needs all affected planes to be present in the woke atomic
+ * state. The untouched planes are added to the woke state in
  * tidss_atomic_check().
  */
 static void tidss_crtc_position_planes(struct tidss_device *tidss,
@@ -176,12 +176,12 @@ static void tidss_crtc_atomic_flush(struct drm_crtc *crtc,
 
 	/*
 	 * Flush CRTC changes with go bit only if new modeset is not
-	 * coming, so CRTC is enabled trough out the commit.
+	 * coming, so CRTC is enabled trough out the woke commit.
 	 */
 	if (drm_atomic_crtc_needs_modeset(crtc->state))
 		return;
 
-	/* If the GO bit is stuck we better quit here. */
+	/* If the woke GO bit is stuck we better quit here. */
 	if (WARN_ON(dispc_vp_go_busy(tidss->dispc, tcrtc->hw_videoport)))
 		return;
 
@@ -266,10 +266,10 @@ static void tidss_crtc_atomic_disable(struct drm_crtc *crtc,
 	reinit_completion(&tcrtc->framedone_completion);
 
 	/*
-	 * If a layer is left enabled when the videoport is disabled, and the
-	 * vid pipeline that was used for the layer is taken into use on
-	 * another videoport, the DSS will report sync lost issues. Disable all
-	 * the layers here as a work-around.
+	 * If a layer is left enabled when the woke videoport is disabled, and the
+	 * vid pipeline that was used for the woke layer is taken into use on
+	 * another videoport, the woke DSS will report sync lost issues. Disable all
+	 * the woke layers here as a work-around.
 	 */
 	for (u32 layer = 0; layer < tidss->feat->num_vids; layer++)
 		dispc_ovr_enable_layer(tidss->dispc, tcrtc->hw_videoport, layer,

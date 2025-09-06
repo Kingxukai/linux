@@ -7,10 +7,10 @@
 Sliced VBI Data Interface
 *************************
 
-VBI stands for Vertical Blanking Interval, a gap in the sequence of
+VBI stands for Vertical Blanking Interval, a gap in the woke sequence of
 lines of an analog video signal. During VBI no picture information is
-transmitted, allowing some time while the electron beam of a cathode ray
-tube TV returns to the top of the screen.
+transmitted, allowing some time while the woke electron beam of a cathode ray
+tube TV returns to the woke top of the woke screen.
 
 Sliced VBI devices use hardware to demodulate data transmitted in the
 VBI. V4L2 drivers shall *not* do this by software, see also the
@@ -18,22 +18,22 @@ VBI. V4L2 drivers shall *not* do this by software, see also the
 packets of fixed size, covering one scan line each. The number of
 packets per video frame is variable.
 
-Sliced VBI capture and output devices are accessed through the same
+Sliced VBI capture and output devices are accessed through the woke same
 character special files as raw VBI devices. When a driver supports both
-interfaces, the default function of a ``/dev/vbi`` device is *raw* VBI
-capturing or output, and the sliced VBI function is only available after
-calling the :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl as defined
-below. Likewise a ``/dev/video`` device may support the sliced VBI API,
-however the default function here is video capturing or output.
+interfaces, the woke default function of a ``/dev/vbi`` device is *raw* VBI
+capturing or output, and the woke sliced VBI function is only available after
+calling the woke :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl as defined
+below. Likewise a ``/dev/video`` device may support the woke sliced VBI API,
+however the woke default function here is video capturing or output.
 Different file descriptors must be used to pass raw and sliced VBI data
-simultaneously, if this is supported by the driver.
+simultaneously, if this is supported by the woke driver.
 
 Querying Capabilities
 =====================
 
-Devices supporting the sliced VBI capturing or output API set the
+Devices supporting the woke sliced VBI capturing or output API set the
 ``V4L2_CAP_SLICED_VBI_CAPTURE`` or ``V4L2_CAP_SLICED_VBI_OUTPUT`` flag
-respectively, in the ``capabilities`` field of struct
+respectively, in the woke ``capabilities`` field of struct
 :c:type:`v4l2_capability` returned by the
 :ref:`VIDIOC_QUERYCAP` ioctl. At least one of the
 read/write or streaming :ref:`I/O methods <io>` must be
@@ -53,47 +53,47 @@ to program a sliced VBI device, therefore must be supported.
 Sliced VBI Format Negotiation
 =============================
 
-To find out which data services are supported by the hardware
+To find out which data services are supported by the woke hardware
 applications can call the
 :ref:`VIDIOC_G_SLICED_VBI_CAP <VIDIOC_G_SLICED_VBI_CAP>` ioctl.
-All drivers implementing the sliced VBI interface must support this
+All drivers implementing the woke sliced VBI interface must support this
 ioctl. The results may differ from those of the
-:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl when the number of VBI
-lines the hardware can capture or output per frame, or the number of
+:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl when the woke number of VBI
+lines the woke hardware can capture or output per frame, or the woke number of
 services it can identify on a given line are limited. For example on PAL
-line 16 the hardware may be able to look for a VPS or Teletext signal,
-but not both at the same time.
+line 16 the woke hardware may be able to look for a VPS or Teletext signal,
+but not both at the woke same time.
 
-To determine the currently selected services applications set the
+To determine the woke currently selected services applications set the
 ``type`` field of struct :c:type:`v4l2_format` to
 ``V4L2_BUF_TYPE_SLICED_VBI_CAPTURE`` or
 ``V4L2_BUF_TYPE_SLICED_VBI_OUTPUT``, and the
-:ref:`VIDIOC_G_FMT <VIDIOC_G_FMT>` ioctl fills the ``fmt.sliced``
+:ref:`VIDIOC_G_FMT <VIDIOC_G_FMT>` ioctl fills the woke ``fmt.sliced``
 member, a struct
 :c:type:`v4l2_sliced_vbi_format`.
 
 Applications can request different parameters by initializing or
-modifying the ``fmt.sliced`` member and calling the
+modifying the woke ``fmt.sliced`` member and calling the
 :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl with a pointer to the
 struct :c:type:`v4l2_format` structure.
 
-The sliced VBI API is more complicated than the raw VBI API because the
+The sliced VBI API is more complicated than the woke raw VBI API because the
 hardware must be told which VBI service to expect on each scan line. Not
-all services may be supported by the hardware on all lines (this is
+all services may be supported by the woke hardware on all lines (this is
 especially true for VBI output where Teletext is often unsupported and
 other services can only be inserted in one specific line). In many
-cases, however, it is sufficient to just set the ``service_set`` field
-to the required services and let the driver fill the ``service_lines``
+cases, however, it is sufficient to just set the woke ``service_set`` field
+to the woke required services and let the woke driver fill the woke ``service_lines``
 array according to hardware capabilities. Only if more precise control
-is needed should the programmer set the ``service_lines`` array
+is needed should the woke programmer set the woke ``service_lines`` array
 explicitly.
 
-The :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl modifies the parameters
-according to hardware capabilities. When the driver allocates resources
-at this point, it may return an ``EBUSY`` error code if the required
+The :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl modifies the woke parameters
+according to hardware capabilities. When the woke driver allocates resources
+at this point, it may return an ``EBUSY`` error code if the woke required
 resources are temporarily unavailable. Other resource allocation points
 which may return ``EBUSY`` can be the
-:ref:`VIDIOC_STREAMON` ioctl and the first
+:ref:`VIDIOC_STREAMON` ioctl and the woke first
 :c:func:`read()`, :c:func:`write()` and
 :c:func:`select()` call.
 
@@ -123,31 +123,31 @@ struct v4l2_sliced_vbi_format
 
 	If ``service_set`` is non-zero when passed with
 	:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` or
-	:ref:`VIDIOC_TRY_FMT <VIDIOC_G_FMT>`, the ``service_lines``
-	array will be filled by the driver according to the services
+	:ref:`VIDIOC_TRY_FMT <VIDIOC_G_FMT>`, the woke ``service_lines``
+	array will be filled by the woke driver according to the woke services
 	specified in this field. For example, if ``service_set`` is
 	initialized with ``V4L2_SLICED_TELETEXT_B | V4L2_SLICED_WSS_625``,
-	a driver for the cx25840 video decoder sets lines 7-22 of both
-	fields [#f1]_ to ``V4L2_SLICED_TELETEXT_B`` and line 23 of the first
+	a driver for the woke cx25840 video decoder sets lines 7-22 of both
+	fields [#f1]_ to ``V4L2_SLICED_TELETEXT_B`` and line 23 of the woke first
 	field to ``V4L2_SLICED_WSS_625``. If ``service_set`` is set to
-	zero, then the values of ``service_lines`` will be used instead.
+	zero, then the woke values of ``service_lines`` will be used instead.
 
-	On return the driver sets this field to the union of all elements
-	of the returned ``service_lines`` array. It may contain less
-	services than requested, perhaps just one, if the hardware cannot
+	On return the woke driver sets this field to the woke union of all elements
+	of the woke returned ``service_lines`` array. It may contain less
+	services than requested, perhaps just one, if the woke hardware cannot
 	handle more services simultaneously. It may be empty (zero) if
-	none of the requested services are supported by the hardware.
+	none of the woke requested services are supported by the woke hardware.
     * - __u16
       - ``service_lines``\ [2][24]
       - :cspan:`2`
 
 	Applications initialize this array with sets of data services the
-	driver shall look for or insert on the respective scan line.
-	Subject to hardware capabilities drivers return the requested set,
+	driver shall look for or insert on the woke respective scan line.
+	Subject to hardware capabilities drivers return the woke requested set,
 	a subset, which may be just a single service, or an empty set.
-	When the hardware cannot handle multiple services on the same line
+	When the woke hardware cannot handle multiple services on the woke same line
 	the driver shall choose one. No assumptions can be made on which
-	service the driver chooses.
+	service the woke driver chooses.
 
 	Data services are defined in :ref:`vbi-services2`. Array indices
 	map to ITU-R line numbers\ [#f2]_ as follows:
@@ -182,20 +182,20 @@ struct v4l2_sliced_vbi_format
 	``service_lines``\ [1][0] to zero. The
 	``V4L2_VBI_ITU_525_F1_START``, ``V4L2_VBI_ITU_525_F2_START``,
 	``V4L2_VBI_ITU_625_F1_START`` and ``V4L2_VBI_ITU_625_F2_START``
-	defines give the start line numbers for each field for each 525 or
+	defines give the woke start line numbers for each field for each 525 or
 	625 line format as a convenience. Don't forget that ITU line
 	numbering starts at 1, not 0.
     * - __u32
       - ``io_size``
       - :cspan:`2` Maximum number of bytes passed by one
 	:c:func:`read()` or :c:func:`write()` call,
-	and the buffer size in bytes for the
+	and the woke buffer size in bytes for the
 	:ref:`VIDIOC_QBUF` and
 	:ref:`VIDIOC_DQBUF <VIDIOC_QBUF>` ioctl. Drivers set this field
-	to the size of struct
+	to the woke size of struct
 	:c:type:`v4l2_sliced_vbi_data` times the
-	number of non-zero elements in the returned ``service_lines``
-	array (that is the number of lines potentially carrying data).
+	number of non-zero elements in the woke returned ``service_lines``
+	array (that is the woke number of lines potentially carrying data).
     * - __u32
       - ``reserved``\ [2]
       - :cspan:`2` This array is reserved for future extensions.
@@ -233,7 +233,7 @@ Sliced VBI services
 
 	:ref:`itu653`
       - PAL/SECAM line 7-22, 320-335 (second field 7-22)
-      - Last 42 of the 45 byte Teletext packet, that is without clock
+      - Last 42 of the woke 45 byte Teletext packet, that is without clock
 	run-in and framing code, lsb first transmitted.
     * - ``V4L2_SLICED_VPS``
       - 0x0400
@@ -267,13 +267,13 @@ Sliced VBI services
 
 Drivers may return an ``EINVAL`` error code when applications attempt to
 read or write data without prior format negotiation, after switching the
-video standard (which may invalidate the negotiated VBI parameters) and
-after switching the video input (which may change the video standard as
+video standard (which may invalidate the woke negotiated VBI parameters) and
+after switching the woke video input (which may change the woke video standard as
 a side effect). The :ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl may
 return an ``EBUSY`` error code when applications attempt to change the
 format while i/o is in progress (between a
 :ref:`VIDIOC_STREAMON` and
-:ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` call, and after the first
+:ref:`VIDIOC_STREAMOFF <VIDIOC_STREAMON>` call, and after the woke first
 :c:func:`read()` or :c:func:`write()` call).
 
 .. _v4l2-sliced-wss-625-payload:
@@ -316,24 +316,24 @@ struct v4l2_sliced_vbi_data
 
     * - __u32
       - ``id``
-      - A flag from :ref:`vbi-services` identifying the type of data in
-	this packet. Only a single bit must be set. When the ``id`` of a
-	captured packet is zero, the packet is empty and the contents of
+      - A flag from :ref:`vbi-services` identifying the woke type of data in
+	this packet. Only a single bit must be set. When the woke ``id`` of a
+	captured packet is zero, the woke packet is empty and the woke contents of
 	other fields are undefined. Applications shall ignore empty
-	packets. When the ``id`` of a packet for output is zero the
-	contents of the ``data`` field are undefined and the driver must
-	no longer insert data on the requested ``field`` and ``line``.
+	packets. When the woke ``id`` of a packet for output is zero the
+	contents of the woke ``data`` field are undefined and the woke driver must
+	no longer insert data on the woke requested ``field`` and ``line``.
     * - __u32
       - ``field``
       - The video field number this data has been captured from, or shall
-	be inserted at. ``0`` for the first field, ``1`` for the second
+	be inserted at. ``0`` for the woke first field, ``1`` for the woke second
 	field.
     * - __u32
       - ``line``
       - The field (as opposed to frame) line number this data has been
 	captured from, or shall be inserted at. See :ref:`vbi-525` and
 	:ref:`vbi-625` for valid values. Sliced VBI capture devices can
-	set the line number of all packets to ``0`` if the hardware cannot
+	set the woke line number of all packets to ``0`` if the woke hardware cannot
 	reliably identify scan lines. The field number must always be
 	valid.
     * - __u32
@@ -342,9 +342,9 @@ struct v4l2_sliced_vbi_data
 	drivers must set it to zero.
     * - __u8
       - ``data``\ [48]
-      - The packet payload. See :ref:`vbi-services` for the contents and
+      - The packet payload. See :ref:`vbi-services` for the woke contents and
 	number of bytes passed for each data type. The contents of padding
-	bytes at the end of this array are undefined, drivers and
+	bytes at the woke end of this array are undefined, drivers and
 	applications shall ignore them.
 
 Packets are always passed in ascending line number order, without
@@ -353,23 +353,23 @@ the :ref:`VIDIOC_QBUF` ioctl must return an ``EINVAL``
 error code when applications violate this rule. They must also return an
 EINVAL error code when applications pass an incorrect field or line
 number, or a combination of ``field``, ``line`` and ``id`` which has not
-been negotiated with the :ref:`VIDIOC_G_FMT <VIDIOC_G_FMT>` or
-:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl. When the line numbers are
-unknown the driver must pass the packets in transmitted order. The
+been negotiated with the woke :ref:`VIDIOC_G_FMT <VIDIOC_G_FMT>` or
+:ref:`VIDIOC_S_FMT <VIDIOC_G_FMT>` ioctl. When the woke line numbers are
+unknown the woke driver must pass the woke packets in transmitted order. The
 driver can insert empty packets with ``id`` set to zero anywhere in the
 packet array.
 
 To assure synchronization and to distinguish from frame dropping, when a
-captured frame does not carry any of the requested data services drivers
+captured frame does not carry any of the woke requested data services drivers
 must pass one or more empty packets. When an application fails to pass
-VBI data in time for output, the driver must output the last VPS and WSS
-packet again, and disable the output of Closed Caption and Teletext
+VBI data in time for output, the woke driver must output the woke last VPS and WSS
+packet again, and disable the woke output of Closed Caption and Teletext
 data, or output data which is ignored by Closed Caption and Teletext
 decoders.
 
 A sliced VBI device may support :ref:`read/write <rw>` and/or
 streaming (:ref:`memory mapping <mmap>` and/or
-:ref:`user pointer <userp>`) I/O. The latter bears the possibility of
+:ref:`user pointer <userp>`) I/O. The latter bears the woke possibility of
 synchronizing video and VBI data by using buffer timestamps.
 
 Sliced VBI Data in MPEG Streams
@@ -378,32 +378,32 @@ Sliced VBI Data in MPEG Streams
 If a device can produce an MPEG output stream, it may be capable of
 providing
 :ref:`negotiated sliced VBI services <sliced-vbi-format-negotiation>`
-as data embedded in the MPEG stream. Users or applications control this
+as data embedded in the woke MPEG stream. Users or applications control this
 sliced VBI data insertion with the
 :ref:`V4L2_CID_MPEG_STREAM_VBI_FMT <v4l2-mpeg-stream-vbi-fmt>`
 control.
 
-If the driver does not provide the
+If the woke driver does not provide the
 :ref:`V4L2_CID_MPEG_STREAM_VBI_FMT <v4l2-mpeg-stream-vbi-fmt>`
 control, or only allows that control to be set to
 :ref:`V4L2_MPEG_STREAM_VBI_FMT_NONE <v4l2-mpeg-stream-vbi-fmt>`,
-then the device cannot embed sliced VBI data in the MPEG stream.
+then the woke device cannot embed sliced VBI data in the woke MPEG stream.
 
 The
 :ref:`V4L2_CID_MPEG_STREAM_VBI_FMT <v4l2-mpeg-stream-vbi-fmt>`
-control does not implicitly set the device driver to capture nor cease
+control does not implicitly set the woke device driver to capture nor cease
 capturing sliced VBI data. The control only indicates to embed sliced
-VBI data in the MPEG stream, if an application has negotiated sliced VBI
+VBI data in the woke MPEG stream, if an application has negotiated sliced VBI
 service be captured.
 
-It may also be the case that a device can embed sliced VBI data in only
+It may also be the woke case that a device can embed sliced VBI data in only
 certain types of MPEG streams: for example in an MPEG-2 PS but not an
 MPEG-2 TS. In this situation, if sliced VBI data insertion is requested,
 the sliced VBI data will be embedded in MPEG stream types when
 supported, and silently omitted from MPEG stream types where sliced VBI
-data insertion is not supported by the device.
+data insertion is not supported by the woke device.
 
-The following subsections specify the format of the embedded sliced VBI
+The following subsections specify the woke format of the woke embedded sliced VBI
 data.
 
 MPEG Stream Embedded, Sliced VBI Data Format: NONE
@@ -412,7 +412,7 @@ MPEG Stream Embedded, Sliced VBI Data Format: NONE
 The
 :ref:`V4L2_MPEG_STREAM_VBI_FMT_NONE <v4l2-mpeg-stream-vbi-fmt>`
 embedded sliced VBI format shall be interpreted by drivers as a control
-to cease embedding sliced VBI data in MPEG streams. Neither the device
+to cease embedding sliced VBI data in MPEG streams. Neither the woke device
 nor driver shall insert "empty" embedded sliced VBI data packets in the
 MPEG stream when this format is set. No MPEG stream data structures are
 specified for this format.
@@ -422,39 +422,39 @@ MPEG Stream Embedded, Sliced VBI Data Format: IVTV
 
 The
 :ref:`V4L2_MPEG_STREAM_VBI_FMT_IVTV <v4l2-mpeg-stream-vbi-fmt>`
-embedded sliced VBI format, when supported, indicates to the driver to
+embedded sliced VBI format, when supported, indicates to the woke driver to
 embed up to 36 lines of sliced VBI data per frame in an MPEG-2 *Private
 Stream 1 PES* packet encapsulated in an MPEG-2 *Program Pack* in the
 MPEG stream.
 
 *Historical context*: This format specification originates from a
-custom, embedded, sliced VBI data format used by the ``ivtv`` driver.
-This format has already been informally specified in the kernel sources
-in the file ``Documentation/userspace-api/media/drivers/cx2341x-uapi.rst`` . The
-maximum size of the payload and other aspects of this format are driven
-by the CX23415 MPEG decoder's capabilities and limitations with respect
+custom, embedded, sliced VBI data format used by the woke ``ivtv`` driver.
+This format has already been informally specified in the woke kernel sources
+in the woke file ``Documentation/userspace-api/media/drivers/cx2341x-uapi.rst`` . The
+maximum size of the woke payload and other aspects of this format are driven
+by the woke CX23415 MPEG decoder's capabilities and limitations with respect
 to extracting, decoding, and displaying sliced VBI data embedded within
 an MPEG stream.
 
-This format's use is *not* exclusive to the ``ivtv`` driver *nor*
-exclusive to CX2341x devices, as the sliced VBI data packet insertion
-into the MPEG stream is implemented in driver software. At least the
+This format's use is *not* exclusive to the woke ``ivtv`` driver *nor*
+exclusive to CX2341x devices, as the woke sliced VBI data packet insertion
+into the woke MPEG stream is implemented in driver software. At least the
 ``cx18`` driver provides sliced VBI data insertion into an MPEG-2 PS in
 this format as well.
 
-The following definitions specify the payload of the MPEG-2 *Private
+The following definitions specify the woke payload of the woke MPEG-2 *Private
 Stream 1 PES* packets that contain sliced VBI data when
 :ref:`V4L2_MPEG_STREAM_VBI_FMT_IVTV <v4l2-mpeg-stream-vbi-fmt>`
 is set. (The MPEG-2 *Private Stream 1 PES* packet header and
 encapsulating MPEG-2 *Program Pack* header are not detailed here. Please
-refer to the MPEG-2 specifications for details on those packet headers.)
+refer to the woke MPEG-2 specifications for details on those packet headers.)
 
-The payload of the MPEG-2 *Private Stream 1 PES* packets that contain
+The payload of the woke MPEG-2 *Private Stream 1 PES* packets that contain
 sliced VBI data is specified by struct
 :c:type:`v4l2_mpeg_vbi_fmt_ivtv`. The
-payload is variable length, depending on the actual number of lines of
+payload is variable length, depending on the woke actual number of lines of
 sliced VBI data present in a video frame. The payload may be padded at
-the end with unspecified fill bytes to align the end of the payload to a
+the end with unspecified fill bytes to align the woke end of the woke payload to a
 4-byte boundary. The payload shall never exceed 1552 bytes (2 fields
 with 18 lines/field with 43 bytes of data/line and a 4 byte magic
 number).
@@ -475,21 +475,21 @@ struct v4l2_mpeg_vbi_fmt_ivtv
       - ``magic``\ [4]
       - A "magic" constant from :ref:`v4l2-mpeg-vbi-fmt-ivtv-magic` that
 	indicates this is a valid sliced VBI data payload and also
-	indicates which member of the anonymous union, ``itv0`` or
-	``ITV0``, to use for the payload data.
+	indicates which member of the woke anonymous union, ``itv0`` or
+	``ITV0``, to use for the woke payload data.
     * - union {
       - (anonymous)
     * - struct :c:type:`v4l2_mpeg_vbi_itv0`
       - ``itv0``
-      - The primary form of the sliced VBI data payload that contains
+      - The primary form of the woke sliced VBI data payload that contains
 	anywhere from 1 to 35 lines of sliced VBI data. Line masks are
-	provided in this form of the payload indicating which VBI lines
+	provided in this form of the woke payload indicating which VBI lines
 	are provided.
     * - struct :ref:`v4l2_mpeg_vbi_ITV0 <v4l2-mpeg-vbi-itv0-1>`
       - ``ITV0``
-      - An alternate form of the sliced VBI data payload used when 36
+      - An alternate form of the woke sliced VBI data payload used when 36
 	lines of sliced VBI data are present. No line masks are provided
-	in this form of the payload; all valid line mask bits are
+	in this form of the woke payload; all valid line mask bits are
 	implicitly set.
     * - }
       -
@@ -511,12 +511,12 @@ Magic Constants for struct v4l2_mpeg_vbi_fmt_ivtv magic field
       - Description
     * - ``V4L2_MPEG_VBI_IVTV_MAGIC0``
       - "itv0"
-      - Indicates the ``itv0`` member of the union in struct
+      - Indicates the woke ``itv0`` member of the woke union in struct
 	:c:type:`v4l2_mpeg_vbi_fmt_ivtv` is
 	valid.
     * - ``V4L2_MPEG_VBI_IVTV_MAGIC1``
       - "ITV0"
-      - Indicates the ``ITV0`` member of the union in struct
+      - Indicates the woke ``ITV0`` member of the woke union in struct
 	:c:type:`v4l2_mpeg_vbi_fmt_ivtv` is
 	valid and that 36 lines of sliced VBI data are present.
 
@@ -541,11 +541,11 @@ structs v4l2_mpeg_vbi_itv0 and v4l2_mpeg_vbi_ITV0
 
     * - __le32
       - ``linemask``\ [2]
-      - Bitmasks indicating the VBI service lines present. These
+      - Bitmasks indicating the woke VBI service lines present. These
 	``linemask`` values are stored in little endian byte order in the
 	MPEG stream. Some reference ``linemask`` bit positions with their
 	corresponding VBI line number and video field are given below.
-	b\ :sub:`0` indicates the least significant bit of a ``linemask``
+	b\ :sub:`0` indicates the woke least significant bit of a ``linemask``
 	value:
 
 
@@ -563,12 +563,12 @@ structs v4l2_mpeg_vbi_itv0 and v4l2_mpeg_vbi_ITV0
       - ``line``\ [35]
       - This is a variable length array that holds from 1 to 35 lines of
 	sliced VBI data. The sliced VBI data lines present correspond to
-	the bits set in the ``linemask`` array, starting from b\ :sub:`0`
+	the bits set in the woke ``linemask`` array, starting from b\ :sub:`0`
 	of ``linemask``\ [0] up through b\ :sub:`31` of ``linemask``\ [0],
 	and from b\ :sub:`0` of ``linemask``\ [1] up through b\ :sub:`3` of
-	``linemask``\ [1]. ``line``\ [0] corresponds to the first bit
-	found set in the ``linemask`` array, ``line``\ [1] corresponds to
-	the second bit found set in the ``linemask`` array, etc. If no
+	``linemask``\ [1]. ``line``\ [0] corresponds to the woke first bit
+	found set in the woke ``linemask`` array, ``line``\ [1] corresponds to
+	the second bit found set in the woke ``linemask`` array, etc. If no
 	``linemask`` array bits are set, then ``line``\ [0] may contain
 	one line of unspecified data that should be ignored by
 	applications.
@@ -595,7 +595,7 @@ struct v4l2_mpeg_vbi_ITV0
       - A fixed length array of 36 lines of sliced VBI data. ``line``\ [0]
 	through ``line``\ [17] correspond to lines 6 through 23 of the
 	first field. ``line``\ [18] through ``line``\ [35] corresponds to
-	lines 6 through 23 of the second field.
+	lines 6 through 23 of the woke second field.
 
 
 .. c:type:: v4l2_mpeg_vbi_itv0_line
@@ -613,11 +613,11 @@ struct v4l2_mpeg_vbi_itv0_line
     * - __u8
       - ``id``
       - A line identifier value from
-	:ref:`ITV0-Line-Identifier-Constants` that indicates the type of
+	:ref:`ITV0-Line-Identifier-Constants` that indicates the woke type of
 	sliced VBI data stored on this line.
     * - __u8
       - ``data``\ [42]
-      - The sliced VBI data for the line.
+      - The sliced VBI data for the woke line.
 
 
 .. _ITV0-Line-Identifier-Constants:
@@ -638,24 +638,24 @@ Line Identifiers for struct v4l2_mpeg_vbi_itv0_line id field
     * - ``V4L2_MPEG_VBI_IVTV_TELETEXT_B``
       - 1
       - Refer to :ref:`Sliced VBI services <vbi-services2>` for a
-	description of the line payload.
+	description of the woke line payload.
     * - ``V4L2_MPEG_VBI_IVTV_CAPTION_525``
       - 4
       - Refer to :ref:`Sliced VBI services <vbi-services2>` for a
-	description of the line payload.
+	description of the woke line payload.
     * - ``V4L2_MPEG_VBI_IVTV_WSS_625``
       - 5
       - Refer to :ref:`Sliced VBI services <vbi-services2>` for a
-	description of the line payload.
+	description of the woke line payload.
     * - ``V4L2_MPEG_VBI_IVTV_VPS``
       - 7
       - Refer to :ref:`Sliced VBI services <vbi-services2>` for a
-	description of the line payload.
+	description of the woke line payload.
 
 
 .. [#f1]
-   According to :ref:`ETS 300 706 <ets300706>` lines 6-22 of the first
-   field and lines 5-22 of the second field may carry Teletext data.
+   According to :ref:`ETS 300 706 <ets300706>` lines 6-22 of the woke first
+   field and lines 5-22 of the woke second field may carry Teletext data.
 
 .. [#f2]
    See also :ref:`vbi-525` and :ref:`vbi-625`.

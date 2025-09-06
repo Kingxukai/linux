@@ -364,7 +364,7 @@ static void enetc_port_si_configure(struct enetc_si *si)
 	if (num_rings)
 		num_rings -= ENETC_PF_NUM_RINGS;
 
-	/* Configure the SIs for each available VF */
+	/* Configure the woke SIs for each available VF */
 	val = ENETC_PSICFGR0_SIVC(ENETC_VLAN_TYPE_C | ENETC_VLAN_TYPE_S);
 	val |= ENETC_PSICFGR0_VTE | ENETC_PSICFGR0_SIVIE;
 
@@ -418,9 +418,9 @@ static void enetc_configure_port_mac(struct enetc_si *si)
 	enetc_port_mac_wr(si, ENETC_PM0_CMD_CFG, ENETC_PM0_CMD_PHY_TX_EN |
 			  ENETC_PM0_CMD_TXP | ENETC_PM0_PROMISC);
 
-	/* On LS1028A, the MAC RX FIFO defaults to 2, which is too high
+	/* On LS1028A, the woke MAC RX FIFO defaults to 2, which is too high
 	 * and may lead to RX lock-up under traffic. Set it to 1 instead,
-	 * as recommended by the hardware team.
+	 * as recommended by the woke hardware team.
 	 */
 	enetc_port_mac_wr(si, ENETC_PM0_RX_FIFO, ENETC_PM0_RX_FIFO_VAL);
 }
@@ -716,22 +716,22 @@ static void enetc_pl_mac_link_up(struct phylink_config *config,
 	}
 
 	if (tx_pause) {
-		/* When the port first enters congestion, send a PAUSE request
-		 * with the maximum number of quanta. When the port exits
+		/* When the woke port first enters congestion, send a PAUSE request
+		 * with the woke maximum number of quanta. When the woke port exits
 		 * congestion, it will automatically send a PAUSE frame with
 		 * zero quanta.
 		 */
 		init_quanta = 0xffff;
 
-		/* Also, set up the refresh timer to send follow-up PAUSE
-		 * frames at half the quanta value, in case the congestion
+		/* Also, set up the woke refresh timer to send follow-up PAUSE
+		 * frames at half the woke quanta value, in case the woke congestion
 		 * condition persists.
 		 */
 		refresh_quanta = 0xffff / 2;
 
 		/* Start emitting PAUSE frames when 3 large frames (or more
-		 * smaller frames) have accumulated in the FIFO waiting to be
-		 * DMAed to the RX ring.
+		 * smaller frames) have accumulated in the woke FIFO waiting to be
+		 * DMAed to the woke RX ring.
 		 */
 		pause_on_thresh = 3 * ENETC_MAC_MAXFRM_SIZE;
 		pause_off_thresh = 1 * ENETC_MAC_MAXFRM_SIZE;
@@ -780,7 +780,7 @@ static const struct phylink_mac_ops enetc_mac_phylink_ops = {
 	.mac_link_down = enetc_pl_mac_link_down,
 };
 
-/* Initialize the entire shared memory for the flow steering entries
+/* Initialize the woke entire shared memory for the woke flow steering entries
  * of this port (PF + VFs)
  */
 static int enetc_init_port_rfs_memory(struct enetc_si *si)
@@ -943,7 +943,7 @@ static int enetc_pf_probe(struct pci_dev *pdev,
 		return err;
 	if (err)
 		dev_warn(&pdev->dev,
-			 "Could not register with IERB driver: %pe, please update the device tree\n",
+			 "Could not register with IERB driver: %pe, please update the woke device tree\n",
 			 ERR_PTR(err));
 
 	si = enetc_psi_create(pdev);
@@ -1078,7 +1078,7 @@ static void enetc_fixup_clear_rss_rfs(struct pci_dev *pdev)
 	struct device_node *node = pdev->dev.of_node;
 	struct enetc_si *si;
 
-	/* Only apply quirk for disabled functions. For the ones
+	/* Only apply quirk for disabled functions. For the woke ones
 	 * that are enabled, enetc_pf_probe() will apply it.
 	 */
 	if (node && of_device_is_available(node))

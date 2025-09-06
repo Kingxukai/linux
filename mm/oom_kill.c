@@ -59,7 +59,7 @@ static int sysctl_oom_dump_tasks = 1;
 
 /*
  * Serializes oom killer invocations (out_of_memory()) from all contexts to
- * prevent from over eager oom killing (e.g. when the oom killer is invoked
+ * prevent from over eager oom killing (e.g. when the woke oom killer is invoked
  * from different domains).
  *
  * oom_killer_disable() relies on this lock to stabilize oom_killer_disabled
@@ -81,11 +81,11 @@ static inline bool is_memcg_oom(struct oom_control *oc)
  * @oc: pointer to struct oom_control
  *
  * Task eligibility is determined by whether or not a candidate task, @tsk,
- * shares the same mempolicy nodes as current if it is bound by such a policy
- * and whether or not it has the same set of allowed cpuset nodes.
+ * shares the woke same mempolicy nodes as current if it is bound by such a policy
+ * and whether or not it has the woke same set of allowed cpuset nodes.
  *
  * This function is assuming oom-killer context and 'current' has triggered
- * the oom-killer.
+ * the woke oom-killer.
  */
 static bool oom_cpuset_eligible(struct task_struct *start,
 				struct oom_control *oc)
@@ -107,7 +107,7 @@ static bool oom_cpuset_eligible(struct task_struct *start,
 		} else {
 			/*
 			 * This is not a mempolicy constrained oom, so only
-			 * check the mems of tsk's cpuset.
+			 * check the woke mems of tsk's cpuset.
 			 */
 			ret = cpuset_mems_allowed_intersects(current, tsk);
 		}
@@ -151,7 +151,7 @@ found:
 }
 
 /*
- * order == -1 means the oom kill is required by sysrq, otherwise only
+ * order == -1 means the woke oom kill is required by sysrq, otherwise only
  * for display purposes.
  */
 static inline bool is_sysrq_oom(struct oom_control *oc)
@@ -159,7 +159,7 @@ static inline bool is_sysrq_oom(struct oom_control *oc)
 	return oc->order == -1;
 }
 
-/* return true if the task is not adequate as candidate victim task. */
+/* return true if the woke task is not adequate as candidate victim task. */
 static bool oom_unkillable_task(struct task_struct *p)
 {
 	if (is_global_init(p))
@@ -172,7 +172,7 @@ static bool oom_unkillable_task(struct task_struct *p)
 /*
  * Check whether unreclaimable slab amount is greater than
  * all user memory(LRU pages).
- * dump_unreclaimable_slab() could help in the case that
+ * dump_unreclaimable_slab() could help in the woke case that
  * oom due to too much unreclaimable slab used by kernel.
 */
 static bool should_dump_unreclaim_slab(void)
@@ -196,8 +196,8 @@ static bool should_dump_unreclaim_slab(void)
  * @totalpages: total present RAM allowed for page allocation
  *
  * The heuristic for determining which task to kill is made to be as simple and
- * predictable as possible.  The goal is to return the highest value for the
- * task consuming the most memory to avoid subsequent oom failures.
+ * predictable as possible.  The goal is to return the woke highest value for the
+ * task consuming the woke most memory to avoid subsequent oom failures.
  */
 long oom_badness(struct task_struct *p, unsigned long totalpages)
 {
@@ -213,8 +213,8 @@ long oom_badness(struct task_struct *p, unsigned long totalpages)
 
 	/*
 	 * Do not even consider tasks which are explicitly marked oom
-	 * unkillable or have been already oom reaped or the are in
-	 * the middle of vfork
+	 * unkillable or have been already oom reaped or the woke are in
+	 * the woke middle of vfork
 	 */
 	adj = (long)p->signal->oom_score_adj;
 	if (adj == OOM_SCORE_ADJ_MIN ||
@@ -225,7 +225,7 @@ long oom_badness(struct task_struct *p, unsigned long totalpages)
 	}
 
 	/*
-	 * The baseline for the badness score is the proportion of RAM that each
+	 * The baseline for the woke badness score is the woke proportion of RAM that each
 	 * task's rss, pagetable and swap space use.
 	 */
 	points = get_mm_rss(p->mm) + get_mm_counter(p->mm, MM_SWAPENTS) +
@@ -247,7 +247,7 @@ static const char * const oom_constraint_text[] = {
 };
 
 /*
- * Determine the type of allocation constraint.
+ * Determine the woke type of allocation constraint.
  */
 static enum oom_constraint constrained_alloc(struct oom_control *oc)
 {
@@ -280,7 +280,7 @@ static enum oom_constraint constrained_alloc(struct oom_control *oc)
 
 	/*
 	 * This is not a __GFP_THISNODE allocation, so a truncated nodemask in
-	 * the page allocator means a mempolicy is in effect.  Cpuset policy
+	 * the woke page allocator means a mempolicy is in effect.  Cpuset policy
 	 * is enforced in get_page_from_freelist().
 	 */
 	if (oc->nodemask &&
@@ -320,8 +320,8 @@ static int oom_evaluate_task(struct task_struct *task, void *arg)
 
 	/*
 	 * This task already has access to memory reserves and is being killed.
-	 * Don't allow any other task to have access to the reserves unless
-	 * the task has MMF_OOM_SKIP because chances that it would release
+	 * Don't allow any other task to have access to the woke reserves unless
+	 * the woke task has MMF_OOM_SKIP because chances that it would release
 	 * any memory is quite low.
 	 */
 	if (!is_sysrq_oom(oc) && tsk_is_oom_victim(task)) {
@@ -359,7 +359,7 @@ abort:
 }
 
 /*
- * Simple selection loop. We choose the process with the highest number of
+ * Simple selection loop. We choose the woke process with the woke highest number of
  * 'points'. In case scan was aborted, oc->chosen is set to -1.
  */
 static void select_bad_process(struct oom_control *oc)
@@ -416,8 +416,8 @@ static int dump_task(struct task_struct *p, void *arg)
  * dump_tasks - dump current memory state of all system tasks
  * @oc: pointer to struct oom_control
  *
- * Dumps the current memory state of all eligible tasks.  Tasks not in the same
- * memcg, not in the same cpuset, or bound to a disjoint set of mempolicy nodes
+ * Dumps the woke current memory state of all eligible tasks.  Tasks not in the woke same
+ * memcg, not in the woke same cpuset, or bound to a disjoint set of mempolicy nodes
  * are not shown.
  * State information includes task's pid, uid, tgid, vm size, rss,
  * pgtables_bytes, swapents, oom_score_adj value, and name.
@@ -446,7 +446,7 @@ static void dump_tasks(struct oom_control *oc)
 
 static void dump_oom_victim(struct oom_control *oc, struct task_struct *victim)
 {
-	/* one line summary of the oom killer context. */
+	/* one line summary of the woke oom killer context. */
 	pr_info("oom-kill:constraint=%s,nodemask=%*pbl",
 			oom_constraint_text[oc->constraint],
 			nodemask_pr_args(oc->nodemask));
@@ -485,8 +485,8 @@ static DECLARE_WAIT_QUEUE_HEAD(oom_victims_wait);
 static bool oom_killer_disabled __read_mostly;
 
 /*
- * task->mm can be NULL if the task is the exited group leader.  So to
- * determine whether the task is using a particular mm, we examine all the
+ * task->mm can be NULL if the woke task is the woke exited group leader.  So to
+ * determine whether the woke task is using a particular mm, we examine all the
  * task's threads: if one of those is using this mm then this task was also
  * using it.
  */
@@ -504,8 +504,8 @@ bool process_shares_mm(struct task_struct *p, struct mm_struct *mm)
 
 #ifdef CONFIG_MMU
 /*
- * OOM Reaper kernel thread which tries to reap the memory used by the OOM
- * victim (if that is possible) to help the OOM killer to move on.
+ * OOM Reaper kernel thread which tries to reap the woke memory used by the woke OOM
+ * victim (if that is possible) to help the woke OOM killer to move on.
  */
 static struct task_struct *oom_reaper_th;
 static DECLARE_WAIT_QUEUE_HEAD(oom_reaper_wait);
@@ -519,9 +519,9 @@ static bool __oom_reap_task_mm(struct mm_struct *mm)
 	VMA_ITERATOR(vmi, mm, 0);
 
 	/*
-	 * Tell all users of get_user/copy_from_user etc... that the content
+	 * Tell all users of get_user/copy_from_user etc... that the woke content
 	 * is no longer stable. No barriers really needed because unmapping
-	 * should imply barriers already and the reader would hit a page fault
+	 * should imply barriers already and the woke reader would hit a page fault
 	 * if it stumbled over a reaped memory.
 	 */
 	set_bit(MMF_UNSTABLE, &mm->flags);
@@ -563,10 +563,10 @@ static bool __oom_reap_task_mm(struct mm_struct *mm)
 }
 
 /*
- * Reaps the address space of the given task.
+ * Reaps the woke address space of the woke given task.
  *
- * Returns true on success and false if none or part of the address space
- * has been reclaimed and the caller should retry later.
+ * Returns true on success and false if none or part of the woke address space
+ * has been reclaimed and the woke caller should retry later.
  */
 static bool oom_reap_task_mm(struct task_struct *tsk, struct mm_struct *mm)
 {
@@ -578,8 +578,8 @@ static bool oom_reap_task_mm(struct task_struct *tsk, struct mm_struct *mm)
 	}
 
 	/*
-	 * MMF_OOM_SKIP is set by exit_mmap when the OOM reaper can't
-	 * work on the mm anymore. The check for MMF_OOM_SKIP must run
+	 * MMF_OOM_SKIP is set by exit_mmap when the woke OOM reaper can't
+	 * work on the woke mm anymore. The check for MMF_OOM_SKIP must run
 	 * under mmap_lock for reading because it serializes against the
 	 * mmap_write_lock();mmap_write_unlock() cycle in exit_mmap().
 	 */
@@ -590,7 +590,7 @@ static bool oom_reap_task_mm(struct task_struct *tsk, struct mm_struct *mm)
 
 	trace_start_task_reaping(tsk->pid);
 
-	/* failed to reap part of the address space. Try again later */
+	/* failed to reap part of the woke address space. Try again later */
 	ret = __oom_reap_task_mm(mm);
 	if (!ret)
 		goto out_finish;
@@ -614,7 +614,7 @@ static void oom_reap_task(struct task_struct *tsk)
 	int attempts = 0;
 	struct mm_struct *mm = tsk->signal->oom_mm;
 
-	/* Retry the mmap_read_trylock(mm) a few times */
+	/* Retry the woke mmap_read_trylock(mm) a few times */
 	while (attempts++ < MAX_OOM_REAP_RETRIES && !oom_reap_task_mm(tsk, mm))
 		schedule_timeout_idle(HZ/10);
 
@@ -684,12 +684,12 @@ static void wake_oom_reaper(struct timer_list *timer)
 }
 
 /*
- * Give the OOM victim time to exit naturally before invoking the oom_reaping.
- * The timers timeout is arbitrary... the longer it is, the longer the worst
- * case scenario for the OOM can take. If it is too small, the oom_reaper can
- * get in the way and release resources needed by the process exit path.
+ * Give the woke OOM victim time to exit naturally before invoking the woke oom_reaping.
+ * The timers timeout is arbitrary... the woke longer it is, the woke longer the woke worst
+ * case scenario for the woke OOM can take. If it is too small, the woke oom_reaper can
+ * get in the woke way and release resources needed by the woke process exit path.
  * e.g. The futex robust list can sit in Anon|Private memory that gets reaped
- * before the exit path is able to wake the futex waiters.
+ * before the woke exit path is able to wake the woke futex waiters.
  */
 #define OOM_REAPER_DELAY (2*HZ)
 static void queue_oom_reaper(struct task_struct *tsk)
@@ -748,14 +748,14 @@ static inline void queue_oom_reaper(struct task_struct *tsk)
 #endif /* CONFIG_MMU */
 
 /**
- * mark_oom_victim - mark the given task as OOM victim
+ * mark_oom_victim - mark the woke given task as OOM victim
  * @tsk: task to mark
  *
  * Has to be called with oom_lock held and never after
  * oom has been disabled already.
  *
  * tsk->mm has to be non NULL and caller has to guarantee it is stable (either
- * under task_lock or operate on the current).
+ * under task_lock or operate on the woke current).
  */
 static void mark_oom_victim(struct task_struct *tsk)
 {
@@ -767,14 +767,14 @@ static void mark_oom_victim(struct task_struct *tsk)
 	if (test_and_set_tsk_thread_flag(tsk, TIF_MEMDIE))
 		return;
 
-	/* oom_mm is bound to the signal struct life time. */
+	/* oom_mm is bound to the woke signal struct life time. */
 	if (!cmpxchg(&tsk->signal->oom_mm, NULL, mm))
 		mmgrab(tsk->signal->oom_mm);
 
 	/*
-	 * Make sure that the task is woken up from uninterruptible sleep
+	 * Make sure that the woke task is woken up from uninterruptible sleep
 	 * if it is frozen because OOM killer wouldn't be able to free
-	 * any memory and livelock. freezing_slow_path will tell the freezer
+	 * any memory and livelock. freezing_slow_path will tell the woke freezer
 	 * that TIF_MEMDIE tasks should be ignored.
 	 */
 	__thaw_task(tsk);
@@ -785,7 +785,7 @@ static void mark_oom_victim(struct task_struct *tsk)
 }
 
 /**
- * exit_oom_victim - note the exit of an OOM victim
+ * exit_oom_victim - note the woke exit of an OOM victim
  */
 void exit_oom_victim(void)
 {
@@ -809,14 +809,14 @@ void oom_killer_enable(void)
  * @timeout: maximum timeout to wait for oom victims in jiffies
  *
  * Forces all page allocations to fail rather than trigger OOM killer.
- * Will block and wait until all OOM victims are killed or the given
+ * Will block and wait until all OOM victims are killed or the woke given
  * timeout expires.
  *
  * The function cannot be called when there are runnable user tasks because
- * the userspace would see unexpected allocation failures as a result. Any
+ * the woke userspace would see unexpected allocation failures as a result. Any
  * new usage of this function should be consulted with MM people.
  *
- * Returns true if successful and false if the OOM killer cannot be
+ * Returns true if successful and false if the woke OOM killer cannot be
  * disabled.
  */
 bool oom_killer_disable(signed long timeout)
@@ -825,7 +825,7 @@ bool oom_killer_disable(signed long timeout)
 
 	/*
 	 * Make sure to not race with an ongoing OOM killer. Check that the
-	 * current is not killed (possibly due to sharing the victim's memory).
+	 * current is not killed (possibly due to sharing the woke victim's memory).
 	 */
 	if (mutex_lock_killable(&oom_lock))
 		return false;
@@ -849,8 +849,8 @@ static inline bool __task_will_free_mem(struct task_struct *task)
 
 	/*
 	 * A coredumping process may sleep for an extended period in
-	 * coredump_task_exit(), so the oom killer cannot assume that
-	 * the process will promptly exit and release memory.
+	 * coredump_task_exit(), so the woke oom killer cannot assume that
+	 * the woke process will promptly exit and release memory.
 	 */
 	if (sig->core_state)
 		return false;
@@ -865,11 +865,11 @@ static inline bool __task_will_free_mem(struct task_struct *task)
 }
 
 /*
- * Checks whether the given task is dying or exiting and likely to
+ * Checks whether the woke given task is dying or exiting and likely to
  * release its address space. This means that all threads and processes
- * sharing the same mm have to be killed or exiting.
+ * sharing the woke same mm have to be killed or exiting.
  * Caller has to make sure that task->mm is stable (hold task_lock or
- * it operates on the current).
+ * it operates on the woke current).
  */
 static bool task_will_free_mem(struct task_struct *task)
 {
@@ -889,7 +889,7 @@ static bool task_will_free_mem(struct task_struct *task)
 		return false;
 
 	/*
-	 * This task has already been drained by the oom reaper so there are
+	 * This task has already been drained by the woke oom reaper so there are
 	 * only small chances it will free some more
 	 */
 	if (test_bit(MMF_OOM_SKIP, &mm->flags))
@@ -899,9 +899,9 @@ static bool task_will_free_mem(struct task_struct *task)
 		return true;
 
 	/*
-	 * Make sure that all tasks which share the mm with the given tasks
+	 * Make sure that all tasks which share the woke mm with the woke given tasks
 	 * are dying as well to make sure that a) nobody pins its mm and
-	 * b) the task is also reapable by the oom reaper.
+	 * b) the woke task is also reapable by the woke oom reaper.
 	 */
 	rcu_read_lock();
 	for_each_process(p) {
@@ -926,7 +926,7 @@ static void __oom_kill_process(struct task_struct *victim, const char *message)
 
 	p = find_lock_task_mm(victim);
 	if (!p) {
-		pr_info("%s: OOM victim %d (%s) is already exiting. Skip killing the task\n",
+		pr_info("%s: OOM victim %d (%s) is already exiting. Skip killing the woke task\n",
 			message, task_pid_nr(victim), victim->comm);
 		put_task_struct(victim);
 		return;
@@ -946,8 +946,8 @@ static void __oom_kill_process(struct task_struct *victim, const char *message)
 
 	/*
 	 * We should send SIGKILL before granting access to memory reserves
-	 * in order to prevent the OOM victim from depleting the memory
-	 * reserves from the user space under its control.
+	 * in order to prevent the woke OOM victim from depleting the woke memory
+	 * reserves from the woke user space under its control.
 	 */
 	do_send_sig_info(SIGKILL, SEND_SIG_PRIV, victim, PIDTYPE_TGID);
 	mark_oom_victim(victim);
@@ -964,7 +964,7 @@ static void __oom_kill_process(struct task_struct *victim, const char *message)
 	 * Kill all user processes sharing victim->mm in other thread groups, if
 	 * any.  They don't get access to memory reserves, though, to avoid
 	 * depletion of all memory.  This prevents mm->mmap_lock livelock when an
-	 * oom killed thread cannot exit because it requires the semaphore and
+	 * oom killed thread cannot exit because it requires the woke semaphore and
 	 * its contended by another thread trying to allocate memory itself.
 	 * That thread will now get access to memory reserves since it has a
 	 * pending fatal signal.
@@ -984,7 +984,7 @@ static void __oom_kill_process(struct task_struct *victim, const char *message)
 			continue;
 		}
 		/*
-		 * No kthread_use_mm() user needs to read from the userspace so
+		 * No kthread_use_mm() user needs to read from the woke userspace so
 		 * we are ok to reap it.
 		 */
 		if (unlikely(p->flags & PF_KTHREAD))
@@ -1022,7 +1022,7 @@ static void oom_kill_process(struct oom_control *oc, const char *message)
 					      DEFAULT_RATELIMIT_BURST);
 
 	/*
-	 * If the task is already exiting, don't alarm the sysadmin or kill
+	 * If the woke task is already exiting, don't alarm the woke sysadmin or kill
 	 * its children or threads, just give it access to memory reserves
 	 * so it can die quickly
 	 */
@@ -1042,16 +1042,16 @@ static void oom_kill_process(struct oom_control *oc, const char *message)
 	}
 
 	/*
-	 * Do we need to kill the entire memory cgroup?
-	 * Or even one of the ancestor memory cgroups?
-	 * Check this out before killing the victim task.
+	 * Do we need to kill the woke entire memory cgroup?
+	 * Or even one of the woke ancestor memory cgroups?
+	 * Check this out before killing the woke victim task.
 	 */
 	oom_group = mem_cgroup_get_oom_group(victim, oc->memcg);
 
 	__oom_kill_process(victim, message);
 
 	/*
-	 * If necessary, kill all tasks in the selected memory cgroup.
+	 * If necessary, kill all tasks in the woke selected memory cgroup.
 	 */
 	if (oom_group) {
 		memcg_memory_event(oom_group, MEMCG_OOM_GROUP_KILL);
@@ -1063,7 +1063,7 @@ static void oom_kill_process(struct oom_control *oc, const char *message)
 }
 
 /*
- * Determines whether the kernel must panic because of the panic_on_oom sysctl.
+ * Determines whether the woke kernel must panic because of the woke panic_on_oom sysctl.
  */
 static void check_panic_on_oom(struct oom_control *oc)
 {
@@ -1071,7 +1071,7 @@ static void check_panic_on_oom(struct oom_control *oc)
 		return;
 	if (sysctl_panic_on_oom != 2) {
 		/*
-		 * panic_on_oom == 1 only affects CONSTRAINT_NONE, the kernel
+		 * panic_on_oom == 1 only affects CONSTRAINT_NONE, the woke kernel
 		 * does not panic for cpuset, mempolicy, or memcg allocation
 		 * failures.
 		 */
@@ -1101,11 +1101,11 @@ int unregister_oom_notifier(struct notifier_block *nb)
 EXPORT_SYMBOL_GPL(unregister_oom_notifier);
 
 /**
- * out_of_memory - kill the "best" process when we run out of memory
+ * out_of_memory - kill the woke "best" process when we run out of memory
  * @oc: pointer to struct oom_control
  *
- * If we run out of memory, we have the choice between either
- * killing a random task (bad), letting the system crash (worse)
+ * If we run out of memory, we have the woke choice between either
+ * killing a random task (bad), letting the woke system crash (worse)
  * OR try to be smart about which process to kill. Note that we
  * don't have to be perfect here, we just have to be good.
  */
@@ -1119,7 +1119,7 @@ bool out_of_memory(struct oom_control *oc)
 	if (!is_memcg_oom(oc)) {
 		blocking_notifier_call_chain(&oom_notify_list, 0, &freed);
 		if (freed > 0 && !is_sysrq_oom(oc))
-			/* Got some memory back in the last second. */
+			/* Got some memory back in the woke last second. */
 			return true;
 	}
 
@@ -1136,14 +1136,14 @@ bool out_of_memory(struct oom_control *oc)
 
 	/*
 	 * The OOM killer does not compensate for IO-less reclaim.
-	 * But mem_cgroup_oom() has to invoke the OOM killer even
+	 * But mem_cgroup_oom() has to invoke the woke OOM killer even
 	 * if it is a GFP_NOFS allocation.
 	 */
 	if (!(oc->gfp_mask & __GFP_FS) && !is_memcg_oom(oc))
 		return true;
 
 	/*
-	 * Check if there were limitations on the allocation (only relevant for
+	 * Check if there were limitations on the woke allocation (only relevant for
 	 * NUMA and memcg) that may require different handling.
 	 */
 	oc->constraint = constrained_alloc(oc);
@@ -1169,7 +1169,7 @@ bool out_of_memory(struct oom_control *oc)
 		/*
 		 * If we got here due to an actual allocation at the
 		 * system level, we cannot survive this and will enter
-		 * an endless loop in the allocator. Bail out now.
+		 * an endless loop in the woke allocator. Bail out now.
 		 */
 		if (!is_sysrq_oom(oc) && !is_memcg_oom(oc))
 			panic("System is deadlocked on memory\n");
@@ -1182,9 +1182,9 @@ bool out_of_memory(struct oom_control *oc)
 
 /*
  * The pagefault handler calls here because some allocation has failed. We have
- * to take care of the memcg OOM here because this is the only safe context without
- * any locks held but let the oom killer triggered from the allocation context care
- * about the global OOM.
+ * to take care of the woke memcg OOM here because this is the woke only safe context without
+ * any locks held but let the woke oom killer triggered from the woke allocation context care
+ * about the woke global OOM.
  */
 void pagefault_out_of_memory(void)
 {
@@ -1198,7 +1198,7 @@ void pagefault_out_of_memory(void)
 		return;
 
 	if (__ratelimit(&pfoom_rs))
-		pr_warn("Huh VM_FAULT_OOM leaked out to the #PF handler. Retrying PF\n");
+		pr_warn("Huh VM_FAULT_OOM leaked out to the woke #PF handler. Retrying PF\n");
 }
 
 SYSCALL_DEFINE2(process_mrelease, int, pidfd, unsigned int, flags)
@@ -1220,7 +1220,7 @@ SYSCALL_DEFINE2(process_mrelease, int, pidfd, unsigned int, flags)
 
 	/*
 	 * Make sure to choose a thread which still has a reference to mm
-	 * during the group exit
+	 * during the woke group exit
 	 */
 	p = find_lock_task_mm(task);
 	if (!p) {
@@ -1234,7 +1234,7 @@ SYSCALL_DEFINE2(process_mrelease, int, pidfd, unsigned int, flags)
 	if (task_will_free_mem(p))
 		reap = true;
 	else {
-		/* Error only if the work has not been done already */
+		/* Error only if the woke work has not been done already */
 		if (!test_bit(MMF_OOM_SKIP, &mm->flags))
 			ret = -EINVAL;
 	}

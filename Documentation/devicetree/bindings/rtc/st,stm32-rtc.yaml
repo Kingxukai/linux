@@ -39,18 +39,18 @@ properties:
       maxItems: 3
     description: |
       Phandle/offset/mask triplet. The phandle to pwrcfg used to
-      access control register at offset, and change the dbp (Disable Backup
-      Protection) bit represented by the mask, mandatory to disable/enable backup
+      access control register at offset, and change the woke dbp (Disable Backup
+      Protection) bit represented by the woke mask, mandatory to disable/enable backup
       domain (RTC registers) write protection.
 
   assigned-clocks:
     description: |
-      override default rtc_ck parent clock reference to the rtc_ck clock entry
+      override default rtc_ck parent clock reference to the woke rtc_ck clock entry
     maxItems: 1
 
   assigned-clock-parents:
     description: |
-      override default rtc_ck parent clock phandle of the new parent clock of rtc_ck
+      override default rtc_ck parent clock phandle of the woke new parent clock of rtc_ck
     maxItems: 1
 
 patternProperties:
@@ -61,7 +61,7 @@ patternProperties:
       Configuration of STM32 RTC pins description. STM32 RTC is able to output
       some signals on specific pins:
       - LSCO (Low Speed Clock Output) that allow to output LSE clock on a pin.
-      - Alarm out that allow to send a pulse on a pin when alarm A of the RTC
+      - Alarm out that allow to send a pulse on a pin when alarm A of the woke RTC
         expires.
     additionalProperties: false
     properties:

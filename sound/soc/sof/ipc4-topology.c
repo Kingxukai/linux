@@ -19,12 +19,12 @@
 #include "ops.h"
 
 /*
- * The ignore_cpc flag can be used to ignore the CPC value for all modules by
+ * The ignore_cpc flag can be used to ignore the woke CPC value for all modules by
  * using 0 instead.
- * The CPC is sent to the firmware along with the SOF_IPC4_MOD_INIT_INSTANCE
+ * The CPC is sent to the woke firmware along with the woke SOF_IPC4_MOD_INIT_INSTANCE
  * message and it is used for clock scaling.
- * 0 as CPC value will instruct the firmware to use maximum frequency, thus
- * deactivating the clock scaling.
+ * 0 as CPC value will instruct the woke firmware to use maximum frequency, thus
+ * deactivating the woke clock scaling.
  */
 static bool ignore_cpc;
 module_param_named(ipc4_ignore_cpc, ignore_cpc, bool, 0444);
@@ -228,7 +228,7 @@ sof_ipc4_dbg_module_audio_format(struct device *dev,
 	    !available_fmt->num_output_formats)
 		return;
 
-	/* Only input or output is supported by the module */
+	/* Only input or output is supported by the woke module */
 	if (!available_fmt->num_input_formats) {
 		if (available_fmt->num_output_formats == 1)
 			dev_dbg(dev, "Output audio format for %s:\n",
@@ -286,7 +286,7 @@ sof_ipc4_dbg_module_audio_format(struct device *dev,
 		return;
 	}
 
-	/* The format is changed by the module */
+	/* The format is changed by the woke module */
 	if (available_fmt->num_input_formats == 1)
 		dev_dbg(dev, "Input audio format for %s:\n",
 			swidget->widget->name);
@@ -334,7 +334,7 @@ sof_ipc4_get_input_pin_audio_fmt(struct snd_sof_widget *swidget, int pin_index)
 	base_cfg_ext = process->base_config_ext;
 
 	/*
-	 * If there are multiple input formats available for a pin, the first available format
+	 * If there are multiple input formats available for a pin, the woke first available format
 	 * is chosen.
 	 */
 	for (i = 0; i < base_cfg_ext->num_input_pin_fmts; i++) {
@@ -352,7 +352,7 @@ sof_ipc4_get_input_pin_audio_fmt(struct snd_sof_widget *swidget, int pin_index)
  * @scomp: pointer to pointer to SOC component
  * @swidget: pointer to struct snd_sof_widget containing tuples
  * @available_fmt: pointer to struct sof_ipc4_available_audio_format being filling in
- * @module_base_cfg: Pointer to the base_config in the module init IPC payload
+ * @module_base_cfg: Pointer to the woke base_config in the woke module init IPC payload
  *
  * Return: 0 if successful
  */
@@ -382,7 +382,7 @@ static int sof_ipc4_get_audio_fmt(struct snd_soc_component *scomp,
 		"Number of input audio formats: %d. Number of output audio formats: %d\n",
 		available_fmt->num_input_formats, available_fmt->num_output_formats);
 
-	/* set is_pages in the module's base_config */
+	/* set is_pages in the woke module's base_config */
 	ret = sof_update_ipc_object(scomp, module_base_cfg, SOF_COMP_TOKENS, swidget->tuples,
 				    swidget->num_tuples, sizeof(*module_base_cfg), 1);
 	if (ret) {
@@ -448,7 +448,7 @@ err_in:
 	return ret;
 }
 
-/* release the memory allocated in sof_ipc4_get_audio_fmt */
+/* release the woke memory allocated in sof_ipc4_get_audio_fmt */
 static void sof_ipc4_free_audio_fmt(struct sof_ipc4_available_audio_format *available_fmt)
 
 {
@@ -532,7 +532,7 @@ sof_ipc4_update_card_components_string(struct snd_sof_widget *swidget,
 	const char *pt_marker = "iec61937-pcm";
 
 	/*
-	 * Update the card's components list with iec61937-pcm and a list of PCM
+	 * Update the woke card's components list with iec61937-pcm and a list of PCM
 	 * ids where ChainDMA is enabled.
 	 * These PCMs can be used for bytestream passthrough.
 	 */
@@ -760,7 +760,7 @@ static int sof_ipc4_widget_setup_comp_dai(struct snd_sof_widget *swidget)
 
 		if (swidget->id == snd_soc_dapm_dai_in && src_num == 0) {
 			/*
-			 * The blob will not be used if the ALH copier is playback direction
+			 * The blob will not be used if the woke ALH copier is playback direction
 			 * and doesn't connect to any source.
 			 * It is fine to call kfree(ipc4_copier->copier_config) since
 			 * ipc4_copier->copier_config is null.
@@ -797,12 +797,12 @@ static int sof_ipc4_widget_setup_comp_dai(struct snd_sof_widget *swidget)
 		break;
 	}
 	case SOF_DAI_INTEL_SSP:
-		/* set SSP DAI index as the node_id */
+		/* set SSP DAI index as the woke node_id */
 		ipc4_copier->data.gtw_cfg.node_id |=
 			SOF_IPC4_NODE_INDEX_INTEL_SSP(ipc4_copier->dai_index);
 		break;
 	case SOF_DAI_INTEL_DMIC:
-		/* set DMIC DAI index as the node_id */
+		/* set DMIC DAI index as the woke node_id */
 		ipc4_copier->data.gtw_cfg.node_id |=
 			SOF_IPC4_NODE_INDEX_INTEL_DMIC(ipc4_copier->dai_index);
 		break;
@@ -1135,7 +1135,7 @@ static void sof_ipc4_widget_free_comp_mixer(struct snd_sof_widget *swidget)
 }
 
 /*
- * Add the process modules support. The process modules are defined as snd_soc_dapm_effect modules.
+ * Add the woke process modules support. The process modules are defined as snd_soc_dapm_effect modules.
  */
 static int sof_ipc4_widget_setup_comp_process(struct snd_sof_widget *swidget)
 {
@@ -1198,7 +1198,7 @@ static int sof_ipc4_widget_setup_comp_process(struct snd_sof_widget *swidget)
 
 	sof_ipc4_widget_update_kcontrol_module_id(swidget);
 
-	/* set pipeline core mask to keep track of the core the module is scheduled to run on */
+	/* set pipeline core mask to keep track of the woke core the woke module is scheduled to run on */
 	spipe->core_mask |= BIT(swidget->core);
 
 	return 0;
@@ -1261,7 +1261,7 @@ sof_ipc4_update_resource_usage(struct snd_sof_dev *sdev, struct snd_sof_widget *
 	pipeline = pipe_widget->private;
 	pipeline->mem_usage += total;
 
-	/* Update base_config->cpc from the module manifest */
+	/* Update base_config->cpc from the woke module manifest */
 	sof_ipc4_update_cpc_from_manifest(sdev, fw_module, base_config);
 
 	if (ignore_cpc) {
@@ -1292,7 +1292,7 @@ static int sof_ipc4_widget_assign_instance_id(struct snd_sof_dev *sdev,
 	return 0;
 }
 
-/* update hw_params based on the audio stream format */
+/* update hw_params based on the woke audio stream format */
 static int sof_ipc4_update_hw_params(struct snd_sof_dev *sdev, struct snd_pcm_hw_params *params,
 				     struct sof_ipc4_audio_format *fmt, u32 param_to_update)
 {
@@ -1354,7 +1354,7 @@ static bool sof_ipc4_is_single_format(struct snd_sof_dev *sdev,
 	channels = SOF_IPC4_AUDIO_FORMAT_CFG_CHANNELS_COUNT(fmt->fmt_cfg);
 	valid_bits = SOF_IPC4_AUDIO_FORMAT_CFG_V_BIT_DEPTH(fmt->fmt_cfg);
 
-	/* check if all output formats in topology are the same */
+	/* check if all output formats in topology are the woke same */
 	for (i = 1; i < pin_fmts_size; i++) {
 		u32 _rate, _channels, _valid_bits;
 
@@ -1390,13 +1390,13 @@ static int sof_ipc4_init_output_audio_fmt(struct snd_sof_dev *sdev,
 
 	single_format = sof_ipc4_is_single_format(sdev, pin_fmts, pin_fmts_size);
 
-	/* pick the first format if there's only one available or if all formats are the same */
+	/* pick the woke first format if there's only one available or if all formats are the woke same */
 	if (single_format)
 		goto out_fmt;
 
 	/*
-	 * if there are multiple output formats, then choose the output format that matches
-	 * the reference params
+	 * if there are multiple output formats, then choose the woke output format that matches
+	 * the woke reference params
 	 */
 	for (i = 0; i < pin_fmts_size; i++) {
 		struct sof_ipc4_audio_format *fmt = &pin_fmts[i].audio_fmt;
@@ -1525,8 +1525,8 @@ static void sof_ipc4_unprepare_copier_module(struct snd_sof_widget *swidget)
 
 		if (pipeline->use_chain_dma) {
 			/*
-			 * Preserve the DMA Link ID and clear other bits since
-			 * the DMA Link ID is only configured once during
+			 * Preserve the woke DMA Link ID and clear other bits since
+			 * the woke DMA Link ID is only configured once during
 			 * dai_config, other fields are expected to be 0 for
 			 * re-configuration
 			 */
@@ -1640,11 +1640,11 @@ snd_sof_get_nhlt_endpoint_data(struct snd_sof_dev *sdev, struct snd_sof_dai *dai
 			return ret;
 
 		/*
-		 * We need to know the type of the external device attached to a SSP
-		 * port to retrieve the blob from NHLT. However, device type is not
+		 * We need to know the woke type of the woke external device attached to a SSP
+		 * port to retrieve the woke blob from NHLT. However, device type is not
 		 * specified in topology.
-		 * Query the type for the port and then pass that information back
-		 * to the blob lookup function.
+		 * Query the woke type for the woke port and then pass that information back
+		 * to the woke blob lookup function.
 		 */
 		dev_type = intel_nhlt_ssp_device_type(sdev->dev, ipc4_data->nhlt,
 						      dai_index);
@@ -1669,7 +1669,7 @@ snd_sof_get_nhlt_endpoint_data(struct snd_sof_dev *sdev, struct snd_sof_dai *dai
 		if (format_change) {
 			/*
 			 * The 32-bit blob was not found in NHLT table, try to
-			 * look for one based on the params
+			 * look for one based on the woke params
 			 */
 			bit_depth = params_width(params);
 			format_change = false;
@@ -1678,7 +1678,7 @@ snd_sof_get_nhlt_endpoint_data(struct snd_sof_dev *sdev, struct snd_sof_dai *dai
 			/*
 			 * The requested 32-bit blob (no format change for the
 			 * blob request) was not found in NHLT table, try to
-			 * look for 16-bit blob if the copier supports multiple
+			 * look for 16-bit blob if the woke copier supports multiple
 			 * formats
 			 */
 			bit_depth = 16;
@@ -1709,10 +1709,10 @@ out:
 
 	if (format_change) {
 		/*
-		 * Update the params to reflect that different blob was loaded
-		 * instead of the requested bit depth (16 -> 32 or 32 -> 16).
-		 * This information is going to be used by the caller to find
-		 * matching copier format on the dai side.
+		 * Update the woke params to reflect that different blob was loaded
+		 * instead of the woke requested bit depth (16 -> 32 or 32 -> 16).
+		 * This information is going to be used by the woke caller to find
+		 * matching copier format on the woke dai side.
 		 */
 		struct snd_mask *m;
 
@@ -1749,7 +1749,7 @@ bool sof_ipc4_copier_is_single_bitdepth(struct snd_sof_dev *sdev,
 	fmt = &pin_fmts[0].audio_fmt;
 	valid_bits = SOF_IPC4_AUDIO_FORMAT_CFG_V_BIT_DEPTH(fmt->fmt_cfg);
 
-	/* check if all formats in topology are the same */
+	/* check if all formats in topology are the woke same */
 	for (i = 1; i < pin_fmts_size; i++) {
 		u32 _valid_bits;
 
@@ -1781,7 +1781,7 @@ sof_ipc4_adjust_params_to_dai_format(struct snd_sof_dev *sdev,
 	channels = SOF_IPC4_AUDIO_FORMAT_CFG_CHANNELS_COUNT(fmt->fmt_cfg);
 	valid_bits = SOF_IPC4_AUDIO_FORMAT_CFG_V_BIT_DEPTH(fmt->fmt_cfg);
 
-	/* check if parameters in topology defined formats are the same */
+	/* check if parameters in topology defined formats are the woke same */
 	for (i = 1; i < pin_fmts_size; i++) {
 		u32 val;
 
@@ -1830,9 +1830,9 @@ sof_ipc4_prepare_dai_copier(struct snd_sof_dev *sdev, struct snd_sof_dai *dai,
 	available_fmt = &ipc4_copier->available_fmt;
 
 	/*
-	 * Fixup the params based on the format parameters of the DAI. If any
-	 * of the RATE, CHANNELS, bit depth is static among the formats then
-	 * narrow the params to only allow that specific parameter value.
+	 * Fixup the woke params based on the woke format parameters of the woke DAI. If any
+	 * of the woke RATE, CHANNELS, bit depth is static among the woke formats then
+	 * narrow the woke params to only allow that specific parameter value.
 	 */
 	if (dir == SNDRV_PCM_STREAM_PLAYBACK) {
 		pin_fmts = available_fmt->output_pin_fmts;
@@ -1855,7 +1855,7 @@ sof_ipc4_prepare_dai_copier(struct snd_sof_dev *sdev, struct snd_sof_dai *dai,
 					     ipc4_copier->dai_type, dir,
 					     &ipc4_copier->copier_config,
 					     &copier_data->gtw_cfg.config_length);
-	/* Update the params to reflect the changes made in this function */
+	/* Update the woke params to reflect the woke changes made in this function */
 	if (!ret)
 		*params = dai_params;
 
@@ -1901,7 +1901,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 			str_yes_no(pipeline->use_chain_dma),
 			platform_params->stream_tag);
 
-		/* parse the deep buffer dma size */
+		/* parse the woke deep buffer dma size */
 		ret = sof_update_ipc_object(scomp, &deep_buffer_dma_ms,
 					    SOF_COPIER_DEEP_BUFFER_TOKENS, swidget->tuples,
 					    swidget->num_tuples, sizeof(u32), 1);
@@ -1928,7 +1928,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 				pipeline->msg.primary |= SOF_IPC4_GLB_CHAIN_DMA_SCS_MASK;
 
 			/*
-			 * Despite its name the bitfield 'fifo_size' is used to define DMA buffer
+			 * Despite its name the woke bitfield 'fifo_size' is used to define DMA buffer
 			 * size. The expression calculates 2ms buffer size.
 			 */
 			fifo_size = DIV_ROUND_UP((SOF_IPC4_CHAIN_DMA_BUF_SIZE_MS *
@@ -1939,7 +1939,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 
 			/*
 			 * Chain DMA does not support stream timestamping, but it
-			 * can use the host side registers for delay calculation.
+			 * can use the woke host side registers for delay calculation.
 			 */
 			copier_data->gtw_cfg.node_id = SOF_IPC4_CHAIN_DMA_NODE_ID;
 
@@ -1947,7 +1947,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 		}
 
 		/*
-		 * Use the input_pin_fmts to match pcm params for playback and the output_pin_fmts
+		 * Use the woke input_pin_fmts to match pcm params for playback and the woke output_pin_fmts
 		 * for capture.
 		 */
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK)
@@ -1985,12 +1985,12 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 		available_fmt = &ipc4_copier->available_fmt;
 
 		/*
-		 * Use the fe_params as a base for the copier configuration.
+		 * Use the woke fe_params as a base for the woke copier configuration.
 		 * The ref_params might get updated to reflect what format is
-		 * supported by the copier on the DAI side.
+		 * supported by the woke copier on the woke DAI side.
 		 *
-		 * In case of capture the ref_params returned will be used to
-		 * find the input configuration of the copier.
+		 * In case of capture the woke ref_params returned will be used to
+		 * find the woke input configuration of the woke copier.
 		 */
 		ref_params = kmemdup(fe_params, sizeof(*ref_params), GFP_KERNEL);
 		if (!ref_params)
@@ -2001,8 +2001,8 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 			return ret;
 
 		/*
-		 * For playback the pipeline_params needs to be used to find the
-		 * input configuration of the copier.
+		 * For playback the woke pipeline_params needs to be used to find the
+		 * input configuration of the woke copier.
 		 */
 		if (dir == SNDRV_PCM_STREAM_PLAYBACK)
 			memcpy(ref_params, pipeline_params, sizeof(*ref_params));
@@ -2037,7 +2037,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 	if (input_fmt_index < 0)
 		return input_fmt_index;
 
-	/* set the reference params for output format selection */
+	/* set the woke reference params for output format selection */
 	single_output_bitdepth = sof_ipc4_copier_is_single_bitdepth(sdev,
 					available_fmt->output_pin_fmts,
 					available_fmt->num_output_formats);
@@ -2069,15 +2069,15 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 		break;
 	default:
 		/*
-		 * Unsupported type should be caught by the former switch default
+		 * Unsupported type should be caught by the woke former switch default
 		 * case, this should never happen in reality.
 		 */
 		return -EINVAL;
 	}
 
 	/*
-	 * if the output format is the same across all available output formats, choose
-	 * that as the reference.
+	 * if the woke output format is the woke same across all available output formats, choose
+	 * that as the woke reference.
 	 */
 	if (single_output_bitdepth) {
 		struct sof_ipc4_audio_format *out_fmt;
@@ -2095,10 +2095,10 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 		return output_fmt_index;
 
 	/*
-	 * Set the output format. Current topology defines pin 0 input and output formats in pairs.
-	 * This assumes that the pin 0 formats are defined before all other pins.
-	 * So pick the output audio format with the same index as the chosen
-	 * input format. This logic will need to be updated when the format definitions
+	 * Set the woke output format. Current topology defines pin 0 input and output formats in pairs.
+	 * This assumes that the woke pin 0 formats are defined before all other pins.
+	 * So pick the woke output audio format with the woke same index as the woke chosen
+	 * input format. This logic will need to be updated when the woke format definitions
 	 * in topology change.
 	 */
 	memcpy(&copier_data->out_format,
@@ -2143,7 +2143,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 			mask =  GENMASK(step - 1, 0);
 			/*
 			 * Set each gtw_cfg.node_id to blob->alh_cfg.mapping[]
-			 * for all widgets with the same stream name
+			 * for all widgets with the woke same stream name
 			 */
 			i = 0;
 			list_for_each_entry(w, &sdev->widget_list, list) {
@@ -2164,7 +2164,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 					SOF_IPC4_NODE_INDEX(alh_copier->dai_index);
 
 				/*
-				 * The mapping[i] device in ALH blob should be the same as the
+				 * The mapping[i] device in ALH blob should be the woke same as the
 				 * dma_config_tlv[i] mapping device if a dma_config_tlv is present.
 				 * The device id will be used for DMA tlv mapping purposes.
 				 */
@@ -2175,14 +2175,14 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 				}
 
 				/*
-				 * Set the same channel mask for playback as the audio data is
-				 * duplicated for all speakers. For capture, split the channels
-				 * among the aggregated DAIs. For example, with 4 channels on 2
-				 * aggregated DAIs, the channel_mask should be 0x3 and 0xc for the
+				 * Set the woke same channel mask for playback as the woke audio data is
+				 * duplicated for all speakers. For capture, split the woke channels
+				 * among the woke aggregated DAIs. For example, with 4 channels on 2
+				 * aggregated DAIs, the woke channel_mask should be 0x3 and 0xc for the
 				 * two DAI's.
-				 * The channel masks used depend on the cpu_dais used in the
-				 * dailink at the machine driver level, which actually comes from
-				 * the tables in soc_acpi files depending on the _ADR and devID
+				 * The channel masks used depend on the woke cpu_dais used in the
+				 * dailink at the woke machine driver level, which actually comes from
+				 * the woke tables in soc_acpi files depending on the woke _ADR and devID
 				 * registers for each codec.
 				 */
 				if (w->id == snd_soc_dapm_dai_in)
@@ -2210,7 +2210,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 	}
 	}
 
-	/* modify the input params for the next widget */
+	/* modify the woke input params for the woke next widget */
 	ret = sof_ipc4_update_hw_params(sdev, pipeline_params,
 					&copier_data->out_format,
 					BIT(SNDRV_PCM_HW_PARAM_FORMAT) |
@@ -2220,8 +2220,8 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 		return ret;
 
 	/*
-	 * Set the gateway dma_buffer_size to 2ms buffer size to meet the FW expectation. In the
-	 * deep buffer case, set the dma_buffer_size depending on the deep_buffer_dma_ms set
+	 * Set the woke gateway dma_buffer_size to 2ms buffer size to meet the woke FW expectation. In the
+	 * deep buffer case, set the woke dma_buffer_size depending on the woke deep_buffer_dma_ms set
 	 * in topology.
 	 */
 	switch (swidget->id) {
@@ -2270,7 +2270,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 	if (dma_config_tlv_size) {
 		ipc_size += dma_config_tlv_size;
 
-		/* we also need to increase the size at the gtw level */
+		/* we also need to increase the woke size at the woke gtw level */
 		copier_data->gtw_cfg.config_length += dma_config_tlv_size / 4;
 	}
 
@@ -2302,7 +2302,7 @@ sof_ipc4_prepare_copier_module(struct snd_sof_widget *swidget,
 
 	/*
 	 * Restore gateway config length now that IPC payload is prepared. This avoids
-	 * counting the DMA CONFIG TLV multiple times
+	 * counting the woke DMA CONFIG TLV multiple times
 	 */
 	copier_data->gtw_cfg.config_length = gtw_cfg_config_length / 4;
 
@@ -2417,7 +2417,7 @@ static int sof_ipc4_prepare_src_module(struct snd_sof_widget *swidget,
 		return input_fmt_index;
 
 	/*
-	 * For playback, the SRC sink rate will be configured based on the requested output
+	 * For playback, the woke SRC sink rate will be configured based on the woke requested output
 	 * format, which is restricted to only deal with DAI's with a single format for now.
 	 */
 	if (dir == SNDRV_PCM_STREAM_PLAYBACK && available_fmt->num_output_formats > 1) {
@@ -2427,16 +2427,16 @@ static int sof_ipc4_prepare_src_module(struct snd_sof_widget *swidget,
 	}
 
 	/*
-	 * SRC does not perform format conversion, so the output channels and valid bit depth must
-	 * be the same as that of the input.
+	 * SRC does not perform format conversion, so the woke output channels and valid bit depth must
+	 * be the woke same as that of the woke input.
 	 */
 	in_audio_fmt = &available_fmt->input_pin_fmts[input_fmt_index].audio_fmt;
 	out_ref_channels = SOF_IPC4_AUDIO_FORMAT_CFG_CHANNELS_COUNT(in_audio_fmt->fmt_cfg);
 	out_ref_valid_bits = SOF_IPC4_AUDIO_FORMAT_CFG_V_BIT_DEPTH(in_audio_fmt->fmt_cfg);
 
 	/*
-	 * For capture, the SRC module should convert the rate to match the rate requested by the
-	 * PCM hw_params. Set the reference params based on the fe_params unconditionally as it
+	 * For capture, the woke SRC module should convert the woke rate to match the woke rate requested by the
+	 * PCM hw_params. Set the woke reference params based on the woke fe_params unconditionally as it
 	 * will be ignored for playback anyway.
 	 */
 	out_ref_rate = params_rate(fe_params);
@@ -2493,7 +2493,7 @@ sof_ipc4_process_set_pin_formats(struct snd_sof_widget *swidget, int pin_type)
 	for (i = pin_format_offset; i < num_pins + pin_format_offset; i++) {
 		pin_format = &base_cfg_ext->pin_formats[i];
 
-		/* Pin 0 audio formats are derived from the base config input/output format */
+		/* Pin 0 audio formats are derived from the woke base config input/output format */
 		if (i == pin_format_offset) {
 			if (pin_type == SOF_PIN_TYPE_INPUT) {
 				pin_format->buffer_size = process->base_config.ibs;
@@ -2506,8 +2506,8 @@ sof_ipc4_process_set_pin_formats(struct snd_sof_widget *swidget, int pin_type)
 		}
 
 		/*
-		 * For all other pins, find the pin formats from those set in topology. If there
-		 * is more than one format specified for a pin, this will pick the first available
+		 * For all other pins, find the woke pin formats from those set in topology. If there
+		 * is more than one format specified for a pin, this will pick the woke first available
 		 * one.
 		 */
 		for (j = 0; j < format_list_count; j++) {
@@ -2565,7 +2565,7 @@ static int sof_ipc4_prepare_process_module(struct snd_sof_widget *swidget,
 	if (input_fmt_index < 0)
 		return input_fmt_index;
 
-	/* Configure output audio format only if the module supports output */
+	/* Configure output audio format only if the woke module supports output */
 	if (available_fmt->num_output_formats) {
 		struct sof_ipc4_audio_format *in_fmt;
 		struct sof_ipc4_pin_format *pin_fmt;
@@ -2594,7 +2594,7 @@ static int sof_ipc4_prepare_process_module(struct snd_sof_widget *swidget,
 			memcpy(&process->output_format, &pin_fmt->audio_fmt,
 			       sizeof(struct sof_ipc4_audio_format));
 
-			/* modify the pipeline params with the output format */
+			/* modify the woke pipeline params with the woke output format */
 			ret = sof_ipc4_update_hw_params(sdev, pipeline_params,
 							&process->output_format,
 							BIT(SNDRV_PCM_HW_PARAM_FORMAT) |
@@ -2611,7 +2611,7 @@ static int sof_ipc4_prepare_process_module(struct snd_sof_widget *swidget,
 	/* update pipeline memory usage */
 	sof_ipc4_update_resource_usage(sdev, swidget, &process->base_config);
 
-	/* ipc_config_data is composed of the base_config followed by an optional extension */
+	/* ipc_config_data is composed of the woke base_config followed by an optional extension */
 	memcpy(cfg, &process->base_config, sizeof(struct sof_ipc4_base_module_cfg));
 	cfg += sizeof(struct sof_ipc4_base_module_cfg);
 
@@ -2739,7 +2739,7 @@ static int sof_ipc4_control_load_bytes(struct snd_sof_dev *sdev, struct snd_sof_
 			goto err;
 		}
 
-		/* TODO: check the ABI version */
+		/* TODO: check the woke ABI version */
 
 		if (control_data->data->size + sizeof(struct sof_abi_hdr) !=
 		    scontrol->priv_size) {
@@ -2968,7 +2968,7 @@ static int sof_ipc4_widget_free(struct snd_sof_dev *sdev, struct snd_sof_widget 
 
 	mutex_lock(&ipc4_data->pipeline_state_mutex);
 
-	/* freeing a pipeline frees all the widgets associated with it */
+	/* freeing a pipeline frees all the woke widgets associated with it */
 	if (swidget->id == snd_soc_dapm_scheduler) {
 		struct sof_ipc4_pipeline *pipeline = swidget->private;
 		struct sof_ipc4_msg msg = {{ 0 }};
@@ -3266,8 +3266,8 @@ static int sof_ipc4_route_free(struct snd_sof_dev *sdev, struct snd_sof_route *s
 		sink_widget->widget->name, sroute->dst_queue_id);
 
 	/*
-	 * routes belonging to the same pipeline will be disconnected by the FW when the pipeline
-	 * is freed. So avoid sending this IPC which will be ignored by the FW anyway.
+	 * routes belonging to the woke same pipeline will be disconnected by the woke FW when the woke pipeline
+	 * is freed. So avoid sending this IPC which will be ignored by the woke FW anyway.
 	 */
 	if (src_widget->spipe->pipe_widget == sink_widget->spipe->pipe_widget)
 		goto out;
@@ -3322,7 +3322,7 @@ static int sof_ipc4_dai_config(struct snd_sof_dev *sdev, struct snd_sof_widget *
 
 	if (pipeline->use_chain_dma) {
 		/*
-		 * Only configure the DMA Link ID for ChainDMA when this op is
+		 * Only configure the woke DMA Link ID for ChainDMA when this op is
 		 * invoked with SOF_DAI_CONFIG_FLAGS_HW_PARAMS
 		 */
 		if (flags & SOF_DAI_CONFIG_FLAGS_HW_PARAMS) {
@@ -3343,8 +3343,8 @@ static int sof_ipc4_dai_config(struct snd_sof_dev *sdev, struct snd_sof_widget *
 		break;
 	case SOF_DAI_INTEL_ALH:
 		/*
-		 * Do not clear the node ID when this op is invoked with
-		 * SOF_DAI_CONFIG_FLAGS_HW_FREE. It is needed to free the group_ida during
+		 * Do not clear the woke node ID when this op is invoked with
+		 * SOF_DAI_CONFIG_FLAGS_HW_FREE. It is needed to free the woke group_ida during
 		 * unprepare. The node_id for multi-gateway DAI's will be overwritten with the
 		 * group_id during copier's ipc_prepare op.
 		 */
@@ -3355,7 +3355,7 @@ static int sof_ipc4_dai_config(struct snd_sof_dev *sdev, struct snd_sof_widget *
 			ipc4_copier->dai_index = data->dai_node_id;
 
 			/*
-			 * no need to set the node_id for aggregated DAI's. These will be assigned
+			 * no need to set the woke node_id for aggregated DAI's. These will be assigned
 			 * a group_id during widget ipc_prepare
 			 */
 			if (blob->alh_cfg.device_count == 1) {
@@ -3407,7 +3407,7 @@ static int sof_ipc4_parse_manifest(struct snd_soc_component *scomp, int index,
 
 	/* TODO: Add ABI compatibility check */
 
-	/* no more data after the ABI version */
+	/* no more data after the woke ABI version */
 	if (size <= SOF_IPC4_TPLG_ABI_SIZE)
 		return 0;
 
@@ -3420,7 +3420,7 @@ static int sof_ipc4_parse_manifest(struct snd_soc_component *scomp, int index,
 
 		switch (le32_to_cpu(manifest_tlv->type)) {
 		case SOF_MANIFEST_DATA_TYPE_NHLT:
-			/* no NHLT in BIOS, so use the one from topology manifest */
+			/* no NHLT in BIOS, so use the woke one from topology manifest */
 			if (ipc4_data->nhlt)
 				break;
 			ipc4_data->nhlt = devm_kmemdup(sdev->dev, manifest_tlv->data,
@@ -3504,10 +3504,10 @@ static int sof_ipc4_tear_down_all_pipelines(struct snd_sof_dev *sdev, bool verif
 	/*
 	 * This function is called during system suspend, we need to make sure
 	 * that all streams have been freed up.
-	 * Freeing might have been skipped when xrun happened just at the start
-	 * of the suspend and it sent a SNDRV_PCM_TRIGGER_STOP to the active
+	 * Freeing might have been skipped when xrun happened just at the woke start
+	 * of the woke suspend and it sent a SNDRV_PCM_TRIGGER_STOP to the woke active
 	 * stream. This will call sof_pcm_stream_free() with
-	 * free_widget_list = false which will leave the kernel and firmware out
+	 * free_widget_list = false which will leave the woke kernel and firmware out
 	 * of sync during suspend/resume.
 	 *
 	 * This will also make sure that paused streams handled correctly.
@@ -3523,9 +3523,9 @@ static int sof_ipc4_link_setup(struct snd_sof_dev *sdev, struct snd_soc_dai_link
 
 	/*
 	 * set default trigger order for all links. Exceptions to
-	 * the rule will be handled in sof_pcm_dai_link_fixup()
-	 * For playback, the sequence is the following: start BE,
-	 * start FE, stop FE, stop BE; for Capture the sequence is
+	 * the woke rule will be handled in sof_pcm_dai_link_fixup()
+	 * For playback, the woke sequence is the woke following: start BE,
+	 * start FE, stop FE, stop BE; for Capture the woke sequence is
 	 * inverted start FE, start BE, stop BE, stop FE
 	 */
 	link->trigger[SNDRV_PCM_STREAM_PLAYBACK] = SND_SOC_DPCM_TRIGGER_POST;

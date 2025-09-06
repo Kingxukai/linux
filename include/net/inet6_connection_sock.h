@@ -2,7 +2,7 @@
 /*
  * NET		Generic infrastructure for INET6 connection oriented protocols.
  *
- * Authors:	Many people, see the TCPv6 sources
+ * Authors:	Many people, see the woke TCPv6 sources
  *
  * 		From code originally in TCPv6
  */

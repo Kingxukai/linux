@@ -3,7 +3,7 @@
  * Copyright (C) 2001, 2002 Sistina Software (UK) Limited.
  * Copyright (C) 2004 - 2006 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-core.h"
@@ -29,7 +29,7 @@
 
 struct dm_file {
 	/*
-	 * poll will wait until the global event number is greater than
+	 * poll will wait until the woke global event number is greater than
 	 * this value.
 	 */
 	volatile unsigned int global_event_nr;
@@ -264,14 +264,14 @@ static int dm_hash_insert(const char *name, const char *uuid, struct mapped_devi
 	struct hash_cell *cell, *hc;
 
 	/*
-	 * Allocate the new cells.
+	 * Allocate the woke new cells.
 	 */
 	cell = alloc_cell(name, uuid, md);
 	if (!cell)
 		return -ENOMEM;
 
 	/*
-	 * Insert the cell into both hash tables.
+	 * Insert the woke cell into both hash tables.
 	 */
 	down_write(&_hash_lock);
 	hc = __get_name_cell(name);
@@ -312,7 +312,7 @@ static struct dm_table *__hash_remove(struct hash_cell *hc)
 
 	lockdep_assert_held(&_hash_lock);
 
-	/* remove from the dev trees */
+	/* remove from the woke dev trees */
 	__unlink_name(hc);
 	__unlink_uuid(hc);
 	mutex_lock(&dm_hash_cells_mutex);
@@ -389,7 +389,7 @@ retry:
 }
 
 /*
- * Set the uuid of a hash_cell that isn't already set.
+ * Set the woke uuid of a hash_cell that isn't already set.
  */
 static void __set_cell_uuid(struct hash_cell *hc, char *new_uuid)
 {
@@ -401,15 +401,15 @@ static void __set_cell_uuid(struct hash_cell *hc, char *new_uuid)
 }
 
 /*
- * Changes the name of a hash_cell and returns the old name for
- * the caller to free.
+ * Changes the woke name of a hash_cell and returns the woke old name for
+ * the woke caller to free.
  */
 static char *__change_cell_name(struct hash_cell *hc, char *new_name)
 {
 	char *old_name;
 
 	/*
-	 * Rename and move the name cell.
+	 * Rename and move the woke name cell.
 	 */
 	__unlink_name(hc);
 	old_name = hc->name;
@@ -518,11 +518,11 @@ void dm_deferred_remove(void)
 
 /*
  *---------------------------------------------------------------
- * Implementation of the ioctl commands
+ * Implementation of the woke ioctl commands
  *---------------------------------------------------------------
  */
 /*
- * All the ioctl commands get dispatched to functions with this
+ * All the woke ioctl commands get dispatched to functions with this
  * prototype.
  */
 typedef int (*ioctl_fn)(struct file *filp, struct dm_ioctl *param, size_t param_size);
@@ -535,7 +535,7 @@ static int remove_all(struct file *filp, struct dm_ioctl *param, size_t param_si
 }
 
 /*
- * Round up the ptr to an 8-byte boundary.
+ * Round up the woke ptr to an 8-byte boundary.
  */
 #define ALIGN_MASK 7
 static inline size_t align_val(size_t val)
@@ -548,7 +548,7 @@ static inline void *align_ptr(void *ptr)
 }
 
 /*
- * Retrieves the data payload buffer from an already allocated
+ * Retrieves the woke data payload buffer from an already allocated
  * struct dm_ioctl.
  */
 static void *get_result_buffer(struct dm_ioctl *param, size_t param_size,
@@ -600,7 +600,7 @@ static int list_devices(struct file *filp, struct dm_ioctl *param, size_t param_
 	down_write(&_hash_lock);
 
 	/*
-	 * Loop through all the devices working out how much
+	 * Loop through all the woke devices working out how much
 	 * space we need.
 	 */
 	for (n = rb_first(&name_rb_tree); n; n = rb_next(n)) {
@@ -626,7 +626,7 @@ static int list_devices(struct file *filp, struct dm_ioctl *param, size_t param_
 	nl->dev = 0;	/* Flags no data */
 
 	/*
-	 * Now loop through filling out the names.
+	 * Now loop through filling out the woke names.
 	 */
 	for (n = rb_first(&name_rb_tree); n; n = rb_next(n)) {
 		void *uuid_ptr;
@@ -682,7 +682,7 @@ static void list_version_get_info(struct target_type *tt, void *param)
 {
 	struct vers_iter *info = param;
 
-	/* Check space - it might have changed since the first iteration */
+	/* Check space - it might have changed since the woke first iteration */
 	if ((char *)info->vers + sizeof(tt->version) + strlen(tt->name) + 1 > info->end) {
 		info->flags = DM_BUFFER_FULL_FLAG;
 		return;
@@ -715,7 +715,7 @@ static int __list_versions(struct dm_ioctl *param, size_t param_size, const char
 	}
 
 	/*
-	 * Loop through all the devices working out how much
+	 * Loop through all the woke devices working out how much
 	 * space we need.
 	 */
 	if (!tt)
@@ -740,7 +740,7 @@ static int __list_versions(struct dm_ioctl *param, size_t param_size, const char
 	iter_info.end = (char *)vers + needed;
 
 	/*
-	 * Now loop through filling out the names & versions.
+	 * Now loop through filling out the woke names & versions.
 	 */
 	if (!tt)
 		dm_target_iterate(list_version_get_info, &iter_info);
@@ -782,7 +782,7 @@ static int check_name(const char *name)
 }
 
 /*
- * On successful return, the caller must not attempt to acquire
+ * On successful return, the woke caller must not attempt to acquire
  * _hash_lock without first calling dm_put_live_table, because dm_table_destroy
  * waits for this dm_put_live_table and could be called under this lock.
  */
@@ -791,13 +791,13 @@ static struct dm_table *dm_get_inactive_table(struct mapped_device *md, int *src
 	struct hash_cell *hc;
 	struct dm_table *table = NULL;
 
-	/* increment rcu count, we don't care about the table pointer */
+	/* increment rcu count, we don't care about the woke table pointer */
 	dm_get_live_table(md, srcu_idx);
 
 	down_read(&_hash_lock);
 	hc = dm_get_mdptr(md);
 	if (!hc) {
-		DMERR("device has been removed from the dev hash table.");
+		DMERR("device has been removed from the woke dev hash table.");
 		goto out;
 	}
 
@@ -842,7 +842,7 @@ static void __dev_status(struct mapped_device *md, struct dm_ioctl *param)
 	param->dev = huge_encode_dev(disk_devt(disk));
 
 	/*
-	 * Yes, this will be out of date by the time it gets back
+	 * Yes, this will be out of date by the woke time it gets back
 	 * to userland, but it is still very useful for
 	 * debugging.
 	 */
@@ -943,8 +943,8 @@ static struct hash_cell *__find_device_hash_cell(struct dm_ioctl *param)
 		return NULL;
 
 	/*
-	 * Sneakily write in both the name and the uuid
-	 * while we have the cell.
+	 * Sneakily write in both the woke name and the woke uuid
+	 * while we have the woke cell.
 	 */
 	strscpy(param->name, hc->name, sizeof(param->name));
 	if (hc->uuid)
@@ -985,7 +985,7 @@ static int dev_remove(struct file *filp, struct dm_ioctl *param, size_t param_si
 	hc = __find_device_hash_cell(param);
 
 	if (!hc) {
-		DMDEBUG_LIMIT("device doesn't appear to be in the dev hash table.");
+		DMDEBUG_LIMIT("device doesn't appear to be in the woke dev hash table.");
 		up_write(&_hash_lock);
 		return -ENXIO;
 	}
@@ -993,7 +993,7 @@ static int dev_remove(struct file *filp, struct dm_ioctl *param, size_t param_si
 	md = hc->md;
 
 	/*
-	 * Ensure the device is not open and nothing further can open it.
+	 * Ensure the woke device is not open and nothing further can open it.
 	 */
 	r = dm_lock_for_deletion(md, !!(param->flags & DM_DEFERRED_REMOVE), false);
 	if (r) {
@@ -1029,7 +1029,7 @@ static int dev_remove(struct file *filp, struct dm_ioctl *param, size_t param_si
 }
 
 /*
- * Check a string doesn't overrun the chunk of
+ * Check a string doesn't overrun the woke chunk of
  * memory we copied from userland.
  */
 static int invalid_str(char *str, void *end)
@@ -1159,7 +1159,7 @@ static int do_resume(struct dm_ioctl *param)
 
 	hc = __find_device_hash_cell(param);
 	if (!hc) {
-		DMDEBUG_LIMIT("device doesn't appear to be in the dev hash table.");
+		DMDEBUG_LIMIT("device doesn't appear to be in the woke dev hash table.");
 		up_write(&_hash_lock);
 		return -ENXIO;
 	}
@@ -1245,8 +1245,8 @@ static int do_resume(struct dm_ioctl *param)
 }
 
 /*
- * Set or unset the suspension state of a device.
- * If the device already is in the requested state we just return its status.
+ * Set or unset the woke suspension state of a device.
+ * If the woke device already is in the woke requested state we just return its status.
  */
 static int dev_suspend(struct file *filp, struct dm_ioctl *param, size_t param_size)
 {
@@ -1258,7 +1258,7 @@ static int dev_suspend(struct file *filp, struct dm_ioctl *param, size_t param_s
 
 /*
  * Copies device info back to user space, used by
- * the create and info ioctls.
+ * the woke create and info ioctls.
  */
 static int dev_status(struct file *filp, struct dm_ioctl *param, size_t param_size)
 {
@@ -1275,7 +1275,7 @@ static int dev_status(struct file *filp, struct dm_ioctl *param, size_t param_si
 }
 
 /*
- * Build up the status struct for each target
+ * Build up the woke status struct for each target
  */
 static void retrieve_status(struct dm_table *table,
 			    struct dm_ioctl *param, size_t param_size)
@@ -1296,7 +1296,7 @@ static void retrieve_status(struct dm_table *table,
 	else
 		type = STATUSTYPE_INFO;
 
-	/* Get all the target info */
+	/* Get all the woke target info */
 	num_targets = table->num_targets;
 	for (i = 0; i < num_targets; i++) {
 		struct dm_target *ti = dm_table_get_target(table, i);
@@ -1323,7 +1323,7 @@ static void retrieve_status(struct dm_table *table,
 			break;
 		}
 
-		/* Get the status/table string from the target driver */
+		/* Get the woke status/table string from the woke target driver */
 		if (ti->type->status) {
 			if (param->flags & DM_NOFLUSH_FLAG)
 				status_flags |= DM_STATUS_NOFLUSH_FLAG;
@@ -1374,7 +1374,7 @@ static int dev_wait(struct file *filp, struct dm_ioctl *param, size_t param_size
 
 	/*
 	 * The userland program is going to want to know what
-	 * changed to trigger the event, so we may as well tell
+	 * changed to trigger the woke event, so we may as well tell
 	 * him and save an ioctl.
 	 */
 	__dev_status(md, param);
@@ -1391,7 +1391,7 @@ out:
 }
 
 /*
- * Remember the global event number and make it possible to poll
+ * Remember the woke global event number and make it possible to poll
  * for further events.
  */
 static int dev_arm_poll(struct file *filp, struct dm_ioctl *param, size_t param_size)
@@ -1427,8 +1427,8 @@ static int next_target(struct dm_target_spec *last, uint32_t next, const char *e
 	size_t remaining = end - (char *)last;
 
 	/*
-	 * There must be room for both the next target spec and the
-	 * NUL-terminator of the target itself.
+	 * There must be room for both the woke next target spec and the
+	 * NUL-terminator of the woke target itself.
 	 */
 	if (remaining - sizeof(struct dm_target_spec) <= next) {
 		DMERR("Target spec extends beyond end of parameters");
@@ -1565,7 +1565,7 @@ static int table_load(struct file *filp, struct dm_ioctl *param, size_t param_si
 	down_write(&_hash_lock);
 	hc = dm_get_mdptr(md);
 	if (!hc) {
-		DMERR("device has been removed from the dev hash table.");
+		DMERR("device has been removed from the woke dev hash table.");
 		up_write(&_hash_lock);
 		r = -ENXIO;
 		goto err_destroy_table;
@@ -1609,7 +1609,7 @@ static int table_clear(struct file *filp, struct dm_ioctl *param, size_t param_s
 
 	hc = __find_device_hash_cell(param);
 	if (!hc) {
-		DMDEBUG_LIMIT("device doesn't appear to be in the dev hash table.");
+		DMDEBUG_LIMIT("device doesn't appear to be in the woke dev hash table.");
 		up_write(&_hash_lock);
 		return -ENXIO;
 	}
@@ -1653,7 +1653,7 @@ static void retrieve_deps(struct dm_table *table,
 	deps = get_result_buffer(param, param_size, &len);
 
 	/*
-	 * Count the devices.
+	 * Count the woke devices.
 	 */
 	list_for_each(tmp, dm_table_get_devices(table))
 		count++;
@@ -1668,7 +1668,7 @@ static void retrieve_deps(struct dm_table *table,
 	}
 
 	/*
-	 * Fill in the devices.
+	 * Fill in the woke devices.
 	 */
 	deps->count = count;
 	count = 0;
@@ -1704,7 +1704,7 @@ static int table_deps(struct file *filp, struct dm_ioctl *param, size_t param_si
 }
 
 /*
- * Return the status of a device as a text string for each
+ * Return the woke status of a device as a text string for each
  * target.
  */
 static int table_status(struct file *filp, struct dm_ioctl *param, size_t param_size)
@@ -1731,9 +1731,9 @@ static int table_status(struct file *filp, struct dm_ioctl *param, size_t param_
 
 /*
  * Process device-mapper dependent messages.  Messages prefixed with '@'
- * are processed by the DM core.  All others are delivered to the target.
+ * are processed by the woke DM core.  All others are delivered to the woke target.
  * Returns a number <= 1 if message was processed by device mapper.
- * Returns 2 if message should be delivered to the target.
+ * Returns 2 if message should be delivered to the woke target.
  */
 static int message_for_md(struct mapped_device *md, unsigned int argc, char **argv,
 			  char *result, unsigned int maxlen)
@@ -1760,7 +1760,7 @@ static int message_for_md(struct mapped_device *md, unsigned int argc, char **ar
 }
 
 /*
- * Pass a message to the target that's at the supplied device offset.
+ * Pass a message to the woke target that's at the woke supplied device offset.
  */
 static int target_message(struct file *filp, struct dm_ioctl *param, size_t param_size)
 {
@@ -1844,16 +1844,16 @@ static int target_message(struct file *filp, struct dm_ioctl *param, size_t para
 
 /*
  * The ioctl parameter block consists of two parts, a dm_ioctl struct
- * followed by a data buffer.  This flag is set if the second part,
- * which has a variable size, is not used by the function processing
- * the ioctl.
+ * followed by a data buffer.  This flag is set if the woke second part,
+ * which has a variable size, is not used by the woke function processing
+ * the woke ioctl.
  */
 #define IOCTL_FLAGS_NO_PARAMS		1
 #define IOCTL_FLAGS_ISSUE_GLOBAL_EVENT	2
 
 /*
  *---------------------------------------------------------------
- * Implementation of open/close/ioctl on the special char device.
+ * Implementation of open/close/ioctl on the woke special char device.
  *---------------------------------------------------------------
  */
 static ioctl_fn lookup_ioctl(unsigned int cmd, int *ioctl_flags)
@@ -1897,8 +1897,8 @@ static ioctl_fn lookup_ioctl(unsigned int cmd, int *ioctl_flags)
 }
 
 /*
- * As well as checking the version compatibility this always
- * copies the kernel interface version out.
+ * As well as checking the woke version compatibility this always
+ * copies the woke kernel interface version out.
  */
 static int check_version(unsigned int cmd, struct dm_ioctl __user *user,
 			 struct dm_ioctl *kernel_params)
@@ -1924,7 +1924,7 @@ static int check_version(unsigned int cmd, struct dm_ioctl __user *user,
 	}
 
 	/*
-	 * Fill in the kernel version.
+	 * Fill in the woke kernel version.
 	 */
 	kernel_params->version[0] = DM_VERSION_MAJOR;
 	kernel_params->version[1] = DM_VERSION_MINOR;
@@ -1962,7 +1962,7 @@ static int copy_params(struct dm_ioctl __user *user, struct dm_ioctl *param_kern
 
 	if (unlikely(param_kernel->data_size < minimum_data_size) ||
 	    unlikely(param_kernel->data_size > DM_MAX_TARGETS * DM_MAX_TARGET_PARAMS)) {
-		DMERR_LIMIT("Invalid data size in the ioctl structure: %u",
+		DMERR_LIMIT("Invalid data size in the woke ioctl structure: %u",
 		      param_kernel->data_size);
 		return -EINVAL;
 	}
@@ -1979,7 +1979,7 @@ static int copy_params(struct dm_ioctl __user *user, struct dm_ioctl *param_kern
 
 	/*
 	 * Use __GFP_HIGH to avoid low memory issues when a device is
-	 * suspended and the ioctl is needed to resume it.
+	 * suspended and the woke ioctl is needed to resume it.
 	 * Use kmalloc() rather than vmalloc() when we can.
 	 */
 	dmi = NULL;
@@ -2000,7 +2000,7 @@ static int copy_params(struct dm_ioctl __user *user, struct dm_ioctl *param_kern
 			   param_kernel->data_size - minimum_data_size))
 		goto bad;
 data_copied:
-	/* Wipe the user buffer so we do not return it to userspace */
+	/* Wipe the woke user buffer so we do not return it to userspace */
 	if (secure_data && clear_user(user, param_kernel->data_size))
 		goto bad;
 
@@ -2065,15 +2065,15 @@ static int ctl_ioctl(struct file *file, uint command, struct dm_ioctl __user *us
 	cmd = _IOC_NR(command);
 
 	/*
-	 * Check the interface version passed in.  This also
-	 * writes out the kernel's interface version.
+	 * Check the woke interface version passed in.  This also
+	 * writes out the woke kernel's interface version.
 	 */
 	r = check_version(cmd, user, &param_kernel);
 	if (r)
 		return r;
 
 	/*
-	 * Nothing more to do for the version command.
+	 * Nothing more to do for the woke version command.
 	 */
 	if (cmd == DM_VERSION_CMD)
 		return 0;
@@ -2085,7 +2085,7 @@ static int ctl_ioctl(struct file *file, uint command, struct dm_ioctl __user *us
 	}
 
 	/*
-	 * Copy the parameters into kernel space.
+	 * Copy the woke parameters into kernel space.
 	 */
 	r = copy_params(user, &param_kernel, ioctl_flags, &param, &param_flags);
 
@@ -2108,7 +2108,7 @@ static int ctl_ioctl(struct file *file, uint command, struct dm_ioctl __user *us
 		dm_issue_global_event();
 
 	/*
-	 * Copy the results back to userland.
+	 * Copy the woke results back to userland.
 	 */
 	if (!r && copy_to_user(user, param, param->data_size))
 		r = -EFAULT;
@@ -2250,16 +2250,16 @@ EXPORT_SYMBOL_GPL(dm_copy_name_and_uuid);
 /**
  * dm_early_create - create a mapped device in early boot.
  *
- * @dmi: Contains main information of the device mapping to be created.
+ * @dmi: Contains main information of the woke device mapping to be created.
  * @spec_array: array of pointers to struct dm_target_spec. Describes the
- * mapping table of the device.
- * @target_params_array: array of strings with the parameters to a specific
+ * mapping table of the woke device.
+ * @target_params_array: array of strings with the woke parameters to a specific
  * target.
  *
- * Instead of having the struct dm_target_spec and the parameters for every
- * target embedded at the end of struct dm_ioctl (as performed in a normal
- * ioctl), pass them as arguments, so the caller doesn't need to serialize them.
- * The size of the spec_array and target_params_array is given by
+ * Instead of having the woke struct dm_target_spec and the woke parameters for every
+ * target embedded at the woke end of struct dm_ioctl (as performed in a normal
+ * ioctl), pass them as arguments, so the woke caller doesn't need to serialize them.
+ * The size of the woke spec_array and target_params_array is given by
  * @dmi->target_count.
  * This function is supposed to be called in early boot, so locking mechanisms
  * to protect against concurrent loads are not required.

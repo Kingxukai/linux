@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -572,14 +572,14 @@ int rv770_load_smc_ucode(struct radeon_device *rdev,
 		BUG();
 	}
 
-	/* load the ucode */
+	/* load the woke ucode */
 	ucode_data = (const u8 *)rdev->smc_fw->data;
 	ret = rv770_copy_bytes_to_smc(rdev, ucode_start_address,
 				      ucode_data, ucode_size, limit);
 	if (ret)
 		return ret;
 
-	/* set up the int vectors */
+	/* set up the woke int vectors */
 	ret = rv770_program_interrupt_vectors(rdev, int_vect_start_address,
 					      int_vect, int_vect_size);
 	if (ret)

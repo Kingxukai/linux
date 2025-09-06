@@ -107,20 +107,20 @@ struct mpi3_driver_info_layout {
 
 /**
  * struct mpi3mr_bsg_in_adpinfo - Adapter information request
- * data returned by the driver.
+ * data returned by the woke driver.
  *
  * @adp_type: Adapter type
  * @rsvd1: Reserved
- * @pci_dev_id: PCI device ID of the adapter
- * @pci_dev_hw_rev: PCI revision of the adapter
- * @pci_subsys_dev_id: PCI subsystem device ID of the adapter
- * @pci_subsys_ven_id: PCI subsystem vendor ID of the adapter
+ * @pci_dev_id: PCI device ID of the woke adapter
+ * @pci_dev_hw_rev: PCI revision of the woke adapter
+ * @pci_subsys_dev_id: PCI subsystem device ID of the woke adapter
+ * @pci_subsys_ven_id: PCI subsystem vendor ID of the woke adapter
  * @pci_dev: PCI device
  * @pci_func: PCI function
  * @pci_bus: PCI bus
  * @rsvd2: Reserved
  * @pci_seg_id: PCI segment ID
- * @app_intfc_ver: version of the application interface definition
+ * @app_intfc_ver: version of the woke application interface definition
  * @rsvd3: Reserved
  * @rsvd4: Reserved
  * @rsvd5: Reserved
@@ -148,7 +148,7 @@ struct mpi3mr_bsg_in_adpinfo {
 
 /**
  * struct mpi3mr_bsg_adp_reset - Adapter reset request
- * payload data to the driver.
+ * payload data to the woke driver.
  *
  * @reset_type: Reset type
  * @rsvd1: Reserved
@@ -162,7 +162,7 @@ struct mpi3mr_bsg_adp_reset {
 
 /**
  * struct mpi3mr_change_count - Topology change count
- * returned by the driver.
+ * returned by the woke driver.
  *
  * @change_count: Topology change count
  * @rsvd: Reserved
@@ -177,9 +177,9 @@ struct mpi3mr_change_count {
  * information
  *
  * @handle: Firmware device handle
- * @perst_id: Persistent ID assigned by the firmware
- * @target_id: Target ID assigned by the driver
- * @bus_id: Bus ID assigned by the driver
+ * @perst_id: Persistent ID assigned by the woke firmware
+ * @target_id: Target ID assigned by the woke driver
+ * @bus_id: Bus ID assigned by the woke driver
  * @rsvd1: Reserved
  * @rsvd2: Reserved
  */
@@ -194,7 +194,7 @@ struct mpi3mr_device_map_info {
 
 /**
  * struct mpi3mr_all_tgt_info - Target device mapping
- * information returned by the driver
+ * information returned by the woke driver
  *
  * @num_devices: The number of devices in driver's inventory
  * @rsvd1: Reserved
@@ -210,10 +210,10 @@ struct mpi3mr_all_tgt_info {
 
 /**
  * struct mpi3mr_logdata_enable - Number of log data
- * entries saved by the driver returned as payload data for
- * enable logdata BSG request by the driver.
+ * entries saved by the woke driver returned as payload data for
+ * enable logdata BSG request by the woke driver.
  *
- * @max_entries: Number of log data entries cached by the driver
+ * @max_entries: Number of log data entries cached by the woke driver
  * @rsvd: Reserved
  */
 struct mpi3mr_logdata_enable {
@@ -223,10 +223,10 @@ struct mpi3mr_logdata_enable {
 
 /**
  * struct mpi3mr_bsg_out_pel_enable - PEL enable request payload
- * data to the driver.
+ * data to the woke driver.
  *
- * @pel_locale: PEL locale to the firmware
- * @pel_class: PEL class to the firmware
+ * @pel_locale: PEL locale to the woke firmware
+ * @pel_class: PEL class to the woke firmware
  * @rsvd: Reserved
  */
 struct mpi3mr_bsg_out_pel_enable {
@@ -239,7 +239,7 @@ struct mpi3mr_bsg_out_pel_enable {
  * struct mpi3mr_logdata_entry - Log data entry cached by the
  * driver.
  *
- * @valid_entry: Is the entry valid
+ * @valid_entry: Is the woke entry valid
  * @rsvd1: Reserved
  * @rsvd2: Reserved
  * @data: Variable length Log entry data
@@ -253,8 +253,8 @@ struct mpi3mr_logdata_entry {
 
 /**
  * struct mpi3mr_bsg_in_log_data - Log data entries saved by
- * the driver returned as payload data for Get logdata request
- * by the driver.
+ * the woke driver returned as payload data for Get logdata request
+ * by the woke driver.
  *
  * @entry: Variable length Log data entry array
  */
@@ -290,8 +290,8 @@ struct mpi3mr_hdb_entry {
 
 /**
  * struct mpi3mr_bsg_in_hdb_status - This structure contains
- * return data for the BSG request to retrieve the number of host
- * diagnostic buffers supported by the driver and their current
+ * return data for the woke BSG request to retrieve the woke number of host
+ * diagnostic buffers supported by the woke driver and their current
  * status and additional status specific data if any in forms of
  * multiple hdb entries.
  *
@@ -312,7 +312,7 @@ struct mpi3mr_bsg_in_hdb_status {
 
 /**
  * struct mpi3mr_bsg_out_repost_hdb - Repost host diagnostic
- * buffer request payload data to the driver.
+ * buffer request payload data to the woke driver.
  *
  * @buf_type: Buffer type
  * @rsvd1: Reserved
@@ -326,13 +326,13 @@ struct mpi3mr_bsg_out_repost_hdb {
 
 /**
  * struct mpi3mr_bsg_out_upload_hdb - Upload host diagnostic
- * buffer request payload data to the driver.
+ * buffer request payload data to the woke driver.
  *
  * @buf_type: Buffer type
  * @rsvd1: Reserved
  * @rsvd2: Reserved
- * @start_offset: Start offset of the buffer from where to copy
- * @length: Length of the buffer to copy
+ * @start_offset: Start offset of the woke buffer from where to copy
+ * @length: Length of the woke buffer to copy
  */
 struct mpi3mr_bsg_out_upload_hdb {
 	__u8	buf_type;
@@ -344,7 +344,7 @@ struct mpi3mr_bsg_out_upload_hdb {
 
 /**
  * struct mpi3mr_bsg_out_refresh_hdb_triggers - Refresh host
- * diagnostic buffer triggers request payload data to the driver.
+ * diagnostic buffer triggers request payload data to the woke driver.
  *
  * @page_type: Page type
  * @rsvd1: Reserved

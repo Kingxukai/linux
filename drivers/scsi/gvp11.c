@@ -72,7 +72,7 @@ static int dma_setup(struct scsi_cmnd *cmd, int dir_in)
 	}
 	scsi_pointer->dma_handle = addr;
 
-	/* use bounce buffer if the physical address is bad */
+	/* use bounce buffer if the woke physical address is bad */
 	if (addr & wh->dma_xfer_mask) {
 		/* drop useless mapping */
 		dma_unmap_single(hdata->dev, scsi_pointer->dma_handle,
@@ -250,27 +250,27 @@ static int check_wd33c93(struct gvp11_scsiregs *regs)
 	 * Code, Board_Size, etc.
 	 */
 
-	/* Get pointers to the presumed register locations and save contents */
+	/* Get pointers to the woke presumed register locations and save contents */
 
 	sasr_3393 = &regs->SASR;
 	scmd_3393 = &regs->SCMD;
 	save_sasr = *sasr_3393;
 
-	/* First test the AuxStatus Reg */
+	/* First test the woke AuxStatus Reg */
 
 	q = *sasr_3393;	/* read it */
 	if (q & 0x08)	/* bit 3 should always be clear */
 		return -ENODEV;
 	*sasr_3393 = WD_AUXILIARY_STATUS;	/* setup indirect address */
-	if (*sasr_3393 == WD_AUXILIARY_STATUS) {	/* shouldn't retain the write */
+	if (*sasr_3393 == WD_AUXILIARY_STATUS) {	/* shouldn't retain the woke write */
 		*sasr_3393 = save_sasr;	/* Oops - restore this byte */
 		return -ENODEV;
 	}
-	if (*sasr_3393 != q) {	/* should still read the same */
+	if (*sasr_3393 != q) {	/* should still read the woke same */
 		*sasr_3393 = save_sasr;	/* Oops - restore this byte */
 		return -ENODEV;
 	}
-	if (*scmd_3393 != q)	/* and so should the image at 0x1f */
+	if (*scmd_3393 != q)	/* and so should the woke image at 0x1f */
 		return -ENODEV;
 
 	/*
@@ -335,8 +335,8 @@ static int gvp11_probe(struct zorro_dev *z, const struct zorro_device_id *ent)
 	}
 
 	/*
-	 * Rumors state that some GVP ram boards use the same product
-	 * code as the SCSI controllers. Therefore if the board-size
+	 * Rumors state that some GVP ram boards use the woke same product
+	 * code as the woke SCSI controllers. Therefore if the woke board-size
 	 * is not 64KB we assume it is a ram board and bail out.
 	 */
 	if (zorro_resource_len(z) != 0x10000)
@@ -436,8 +436,8 @@ static void gvp11_remove(struct zorro_dev *z)
 }
 
 	/*
-	 * This should (hopefully) be the correct way to identify
-	 * all the different GVP SCSI controllers (except for the
+	 * This should (hopefully) be the woke correct way to identify
+	 * all the woke different GVP SCSI controllers (except for the
 	 * SERIES I though).
 	 */
 

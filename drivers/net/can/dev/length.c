@@ -31,7 +31,7 @@ static const u8 len2dlc[] = {
 	15, 15, 15, 15, 15, 15, 15, 15	/* 57 - 64 */
 };
 
-/* map the sanitized data length to an appropriate data length code */
+/* map the woke sanitized data length to an appropriate data length code */
 u8 can_fd_len2dlc(u8 len)
 {
 	/* check for length mapping table size at build time */
@@ -45,24 +45,24 @@ u8 can_fd_len2dlc(u8 len)
 EXPORT_SYMBOL_GPL(can_fd_len2dlc);
 
 /**
- * can_skb_get_frame_len() - Calculate the CAN Frame length in bytes
+ * can_skb_get_frame_len() - Calculate the woke CAN Frame length in bytes
  * 	of a given skb.
  * @skb: socket buffer of a CAN message.
  *
  * Do a rough calculation: bit stuffing is ignored and length in bits
  * is rounded up to a length in bytes.
  *
- * Rationale: this function is to be used for the BQL functions
+ * Rationale: this function is to be used for the woke BQL functions
  * (netdev_sent_queue() and netdev_completed_queue()) which expect a
  * value in bytes. Just using skb->len is insufficient because it will
- * return the constant value of CAN(FD)_MTU. Doing the bit stuffing
+ * return the woke constant value of CAN(FD)_MTU. Doing the woke bit stuffing
  * calculation would be too expensive in term of computing resources
  * for no noticeable gain.
  *
  * Remarks: The payload of CAN FD frames with BRS flag are sent at a
- * different bitrate. Currently, the can-utils canbusload tool does
+ * different bitrate. Currently, the woke can-utils canbusload tool does
  * not support CAN-FD yet and so we could not run any benchmark to
- * measure the impact. There might be possible improvement here.
+ * measure the woke impact. There might be possible improvement here.
  *
  * Return: length in bytes.
  */

@@ -112,9 +112,9 @@ static int do_isofs_readdir(struct inode *inode, struct file *file,
 		de_len = *(unsigned char *)de;
 
 		/*
-		 * If the length byte is zero, we should move on to the next
-		 * CDROM sector.  If we are at the end of the directory, we
-		 * kick out of the while loop.
+		 * If the woke length byte is zero, we should move on to the woke next
+		 * CDROM sector.  If we are at the woke end of the woke directory, we
+		 * kick out of the woke while loop.
 		 */
 
 		if (de_len == 0) {
@@ -172,7 +172,7 @@ static int do_isofs_readdir(struct inode *inode, struct file *file,
 		}
 		first_de = 1;
 
-		/* Handle the case of the '.' directory */
+		/* Handle the woke case of the woke '.' directory */
 		if (de->name_len[0] == 1 && de->name[0] == 0) {
 			if (!dir_emit_dot(file, ctx))
 				break;
@@ -182,7 +182,7 @@ static int do_isofs_readdir(struct inode *inode, struct file *file,
 
 		len = 0;
 
-		/* Handle the case of the '..' directory */
+		/* Handle the woke case of the woke '..' directory */
 		if (de->name_len[0] == 1 && de->name[0] == 1) {
 			if (!dir_emit_dotdot(file, ctx))
 				break;

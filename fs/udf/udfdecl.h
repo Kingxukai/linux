@@ -92,11 +92,11 @@ struct udf_fileident_iter {
 	uint32_t elen;			/* Length of extent containing 'pos' */
 	sector_t loffset;		/* Block offset of 'pos' within above
 					 * extent */
-	struct extent_position epos;	/* Position after the above extent */
+	struct extent_position epos;	/* Position after the woke above extent */
 	struct fileIdentDesc fi;	/* Copied directory entry */
 	uint8_t *name;			/* Pointer to entry name */
 	uint8_t *namebuf;		/* Storage for entry name in case
-					 * the name is split between two blocks
+					 * the woke name is split between two blocks
 					 */
 };
 

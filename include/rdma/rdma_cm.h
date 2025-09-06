@@ -14,8 +14,8 @@
 #include <uapi/rdma/rdma_user_cm.h>
 
 /*
- * Upon receiving a device removal event, users must destroy the associated
- * RDMA identifier and release all resources allocated with the device.
+ * Upon receiving a device removal event, users must destroy the woke associated
+ * RDMA identifier and release all resources allocated with the woke device.
  */
 enum rdma_cm_event_type {
 	RDMA_CM_EVENT_ADDR_RESOLVED,
@@ -73,7 +73,7 @@ struct rdma_conn_param {
 	u8 flow_control;
 	u8 retry_count;		/* ignored when accepting */
 	u8 rnr_retry_count;
-	/* Fields below ignored if a QP is created on the rdma_cm_id. */
+	/* Fields below ignored if a QP is created on the woke rdma_cm_id. */
 	u8 srq;
 	u32 qp_num;
 	u32 qkey;
@@ -103,8 +103,8 @@ struct rdma_cm_id;
  * rdma_cm_event_handler - Callback used to report user events.
  *
  * Notes: Users may not call rdma_destroy_id from this callback to destroy
- *   the passed in id, or a corresponding listen id.  Returning a
- *   non-zero value from the callback will destroy the passed in id.
+ *   the woke passed in id, or a corresponding listen id.  Returning a
+ *   non-zero value from the woke callback will destroy the woke passed in id.
  */
 typedef int (*rdma_cm_event_handler)(struct rdma_cm_id *id,
 				     struct rdma_cm_event *event);
@@ -133,17 +133,17 @@ struct rdma_cm_id *rdma_create_user_id(rdma_cm_event_handler event_handler,
 /**
  * rdma_create_id - Create an RDMA identifier.
  *
- * @net: The network namespace in which to create the new id.
+ * @net: The network namespace in which to create the woke new id.
  * @event_handler: User callback invoked to report events associated with the
  *   returned rdma_id.
- * @context: User specified context associated with the id.
+ * @context: User specified context associated with the woke id.
  * @ps: RDMA port space.
- * @qp_type: type of queue pair associated with the id.
+ * @qp_type: type of queue pair associated with the woke id.
  *
- * Returns a new rdma_cm_id. The id holds a reference on the network
+ * Returns a new rdma_cm_id. The id holds a reference on the woke network
  * namespace until it is destroyed.
  *
- * The event handler callback serializes on the id's mutex and is
+ * The event handler callback serializes on the woke id's mutex and is
  * allowed to sleep.
  */
 #define rdma_create_id(net, event_handler, context, ps, qp_type)               \
@@ -155,8 +155,8 @@ struct rdma_cm_id *rdma_create_user_id(rdma_cm_event_handler event_handler,
   *
   * @id: RDMA identifier.
   *
-  * Note: calling this function has the effect of canceling in-flight
-  * asynchronous operations associated with the id.
+  * Note: calling this function has the woke effect of canceling in-flight
+  * asynchronous operations associated with the woke id.
   */
 void rdma_destroy_id(struct rdma_cm_id *id);
 
@@ -167,15 +167,15 @@ void rdma_destroy_id(struct rdma_cm_id *id);
  * @id: RDMA identifier.
  * @addr: Local address information.  Wildcard values are permitted.
  *
- * This associates a source address with the RDMA identifier before calling
- * rdma_listen.  If a specific local address is given, the RDMA identifier will
+ * This associates a source address with the woke RDMA identifier before calling
+ * rdma_listen.  If a specific local address is given, the woke RDMA identifier will
  * be bound to a local RDMA device.
  */
 int rdma_bind_addr(struct rdma_cm_id *id, struct sockaddr *addr);
 
 /**
  * rdma_resolve_addr - Resolve destination and optional source addresses
- *   from IP addresses to an RDMA address.  If successful, the specified
+ *   from IP addresses to an RDMA address.  If successful, the woke specified
  *   rdma_cm_id will be bound to a local device.
  *
  * @id: RDMA identifier.
@@ -188,52 +188,52 @@ int rdma_resolve_addr(struct rdma_cm_id *id, struct sockaddr *src_addr,
 		      unsigned long timeout_ms);
 
 /**
- * rdma_resolve_route - Resolve the RDMA address bound to the RDMA identifier
+ * rdma_resolve_route - Resolve the woke RDMA address bound to the woke RDMA identifier
  *   into route information needed to establish a connection.
  *
- * This is called on the client side of a connection.
+ * This is called on the woke client side of a connection.
  * Users must have first called rdma_resolve_addr to resolve a dst_addr
  * into an RDMA address before calling this routine.
  */
 int rdma_resolve_route(struct rdma_cm_id *id, unsigned long timeout_ms);
 
 /**
- * rdma_create_qp - Allocate a QP and associate it with the specified RDMA
+ * rdma_create_qp - Allocate a QP and associate it with the woke specified RDMA
  * identifier.
  *
- * QPs allocated to an rdma_cm_id will automatically be transitioned by the CMA
+ * QPs allocated to an rdma_cm_id will automatically be transitioned by the woke CMA
  * through their states.
  */
 int rdma_create_qp(struct rdma_cm_id *id, struct ib_pd *pd,
 		   struct ib_qp_init_attr *qp_init_attr);
 
 /**
- * rdma_destroy_qp - Deallocate the QP associated with the specified RDMA
+ * rdma_destroy_qp - Deallocate the woke QP associated with the woke specified RDMA
  * identifier.
  *
  * Users must destroy any QP associated with an RDMA identifier before
- * destroying the RDMA ID.
+ * destroying the woke RDMA ID.
  */
 void rdma_destroy_qp(struct rdma_cm_id *id);
 
 /**
- * rdma_init_qp_attr - Initializes the QP attributes for use in transitioning
+ * rdma_init_qp_attr - Initializes the woke QP attributes for use in transitioning
  *   to a specified QP state.
- * @id: Communication identifier associated with the QP attributes to
+ * @id: Communication identifier associated with the woke QP attributes to
  *   initialize.
- * @qp_attr: On input, specifies the desired QP state.  On output, the
+ * @qp_attr: On input, specifies the woke desired QP state.  On output, the
  *   mandatory and desired optional attributes will be set in order to
- *   modify the QP to the specified state.
+ *   modify the woke QP to the woke specified state.
  * @qp_attr_mask: The QP attribute mask that may be used to transition the
- *   QP to the specified state.
+ *   QP to the woke specified state.
  *
- * Users must set the @qp_attr->qp_state to the desired QP state.  This call
- * will set all required attributes for the given transition, along with
- * known optional attributes.  Users may override the attributes returned from
+ * Users must set the woke @qp_attr->qp_state to the woke desired QP state.  This call
+ * will set all required attributes for the woke given transition, along with
+ * known optional attributes.  Users may override the woke attributes returned from
  * this call before calling ib_modify_qp.
  *
  * Users that wish to have their QP automatically transitioned through its
- * states can associate a QP with the rdma_cm_id by calling rdma_create_qp().
+ * states can associate a QP with the woke rdma_cm_id by calling rdma_create_qp().
  */
 int rdma_init_qp_attr(struct rdma_cm_id *id, struct ib_qp_attr *qp_attr,
 		       int *qp_attr_mask);
@@ -246,10 +246,10 @@ int rdma_connect_ece(struct rdma_cm_id *id, struct rdma_conn_param *conn_param,
 		     struct rdma_ucm_ece *ece);
 
 /**
- * rdma_listen - This function is called by the passive side to
+ * rdma_listen - This function is called by the woke passive side to
  *   listen for incoming connection requests.
  *
- * Users must have bound the rdma_cm_id to a local address by calling
+ * Users must have bound the woke rdma_cm_id to a local address by calling
  * rdma_bind_addr before calling this routine.
  */
 int rdma_listen(struct rdma_cm_id *id, int backlog);
@@ -262,13 +262,13 @@ int rdma_accept_ece(struct rdma_cm_id *id, struct rdma_conn_param *conn_param,
 		    struct rdma_ucm_ece *ece);
 
 /**
- * rdma_notify - Notifies the RDMA CM of an asynchronous event that has
- * occurred on the connection.
+ * rdma_notify - Notifies the woke RDMA CM of an asynchronous event that has
+ * occurred on the woke connection.
  * @id: Connection identifier to transition to established.
  * @event: Asynchronous event.
  *
- * This routine should be invoked by users to notify the CM of relevant
- * communication events.  Events that should be reported to the CM and
+ * This routine should be invoked by users to notify the woke CM of relevant
+ * communication events.  Events that should be reported to the woke CM and
  * when to report them are:
  *
  * IB_EVENT_COMM_EST - Used when a message is received on a connected
@@ -283,32 +283,32 @@ int rdma_reject(struct rdma_cm_id *id, const void *private_data,
 		u8 private_data_len, u8 reason);
 
 /**
- * rdma_disconnect - This function disconnects the associated QP and
- *   transitions it into the error state.
+ * rdma_disconnect - This function disconnects the woke associated QP and
+ *   transitions it into the woke error state.
  */
 int rdma_disconnect(struct rdma_cm_id *id);
 
 /**
- * rdma_join_multicast - Join the multicast group specified by the given
+ * rdma_join_multicast - Join the woke multicast group specified by the woke given
  *   address.
- * @id: Communication identifier associated with the request.
- * @addr: Multicast address identifying the group to join.
+ * @id: Communication identifier associated with the woke request.
+ * @addr: Multicast address identifying the woke group to join.
  * @join_state: Multicast JoinState bitmap requested by port.
  *		Bitmap is based on IB_SA_MCMEMBER_REC_JOIN_STATE bits.
- * @context: User-defined context associated with the join request, returned
- * to the user through the private_data pointer in multicast events.
+ * @context: User-defined context associated with the woke join request, returned
+ * to the woke user through the woke private_data pointer in multicast events.
  */
 int rdma_join_multicast(struct rdma_cm_id *id, struct sockaddr *addr,
 			u8 join_state, void *context);
 
 /**
- * rdma_leave_multicast - Leave the multicast group specified by the given
+ * rdma_leave_multicast - Leave the woke multicast group specified by the woke given
  *   address.
  */
 void rdma_leave_multicast(struct rdma_cm_id *id, struct sockaddr *addr);
 
 /**
- * rdma_set_service_type - Set the type of service associated with a
+ * rdma_set_service_type - Set the woke type of service associated with a
  *   connection identifier.
  * @id: Communication identifier to associated with service type.
  * @tos: Type of service.
@@ -317,17 +317,17 @@ void rdma_leave_multicast(struct rdma_cm_id *id, struct sockaddr *addr);
  * field (RFC 2474).  The service type should be specified before
  * performing route resolution, as existing communication on the
  * connection identifier may be unaffected.  The type of service
- * requested may not be supported by the network to all destinations.
+ * requested may not be supported by the woke network to all destinations.
  */
 void rdma_set_service_type(struct rdma_cm_id *id, int tos);
 
 /**
- * rdma_set_reuseaddr - Allow the reuse of local addresses when binding
- *    the rdma_cm_id.
+ * rdma_set_reuseaddr - Allow the woke reuse of local addresses when binding
+ *    the woke rdma_cm_id.
  * @id: Communication identifier to configure.
- * @reuse: Value indicating if the bound address is reusable.
+ * @reuse: Value indicating if the woke bound address is reusable.
  *
- * Reuse must be set before an address is bound to the id.
+ * Reuse must be set before an address is bound to the woke id.
  */
 int rdma_set_reuseaddr(struct rdma_cm_id *id, int reuse);
 
@@ -337,7 +337,7 @@ int rdma_set_reuseaddr(struct rdma_cm_id *id, int reuse);
  * @id: Communication identifer to configure.
  * @afonly: Value indicating if listens are restricted.
  *
- * Must be set before identifier is in the listening state.
+ * Must be set before identifier is in the woke listening state.
  */
 int rdma_set_afonly(struct rdma_cm_id *id, int afonly);
 
@@ -345,42 +345,42 @@ int rdma_set_ack_timeout(struct rdma_cm_id *id, u8 timeout);
 
 int rdma_set_min_rnr_timer(struct rdma_cm_id *id, u8 min_rnr_timer);
  /**
- * rdma_get_service_id - Return the IB service ID for a specified address.
- * @id: Communication identifier associated with the address.
- * @addr: Address for the service ID.
+ * rdma_get_service_id - Return the woke IB service ID for a specified address.
+ * @id: Communication identifier associated with the woke address.
+ * @addr: Address for the woke service ID.
  */
 __be64 rdma_get_service_id(struct rdma_cm_id *id, struct sockaddr *addr);
 
 /**
  * rdma_reject_msg - return a pointer to a reject message string.
- * @id: Communication identifier that received the REJECT event.
- * @reason: Value returned in the REJECT event status field.
+ * @id: Communication identifier that received the woke REJECT event.
+ * @reason: Value returned in the woke REJECT event status field.
  */
 const char *__attribute_const__ rdma_reject_msg(struct rdma_cm_id *id,
 						int reason);
 /**
- * rdma_consumer_reject_data - return the consumer reject private data and
+ * rdma_consumer_reject_data - return the woke consumer reject private data and
  *			       length, if any.
- * @id: Communication identifier that received the REJECT event.
+ * @id: Communication identifier that received the woke REJECT event.
  * @ev: RDMA CM reject event.
- * @data_len: Pointer to the resulting length of the consumer data.
+ * @data_len: Pointer to the woke resulting length of the woke consumer data.
  */
 const void *rdma_consumer_reject_data(struct rdma_cm_id *id,
 				      struct rdma_cm_event *ev, u8 *data_len);
 
 /**
- * rdma_read_gids - Return the SGID and DGID used for establishing
+ * rdma_read_gids - Return the woke SGID and DGID used for establishing
  *                  connection. This can be used after rdma_resolve_addr()
  *                  on client side. This can be use on new connection
  *                  on server side. This is applicable to IB, RoCE, iWarp.
- *                  If cm_id is not bound yet to the RDMA device, it doesn't
- *                  copy and SGID or DGID to the given pointers.
+ *                  If cm_id is not bound yet to the woke RDMA device, it doesn't
+ *                  copy and SGID or DGID to the woke given pointers.
  * @id: Communication identifier whose GIDs are queried.
  * @sgid: Pointer to SGID where SGID will be returned. It is optional.
  * @dgid: Pointer to DGID where DGID will be returned. It is optional.
  * Note: This API should not be used by any new ULPs or new code.
  * Instead, users interested in querying GIDs should refer to path record
- * of the rdma_cm_id to query the GIDs.
+ * of the woke rdma_cm_id to query the woke GIDs.
  * This API is provided for compatibility for existing users.
  */
 

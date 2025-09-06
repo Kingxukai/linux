@@ -342,8 +342,8 @@ struct atl1c_hw_stats {
 	unsigned long tx_late_col;	/* The number of packets transmitted with late collisions. */
 	unsigned long tx_abort_col;	/* The number of transmit packets aborted due to excessive collisions. */
 	unsigned long tx_underrun;	/* The number of transmit packets aborted due to transmit FIFO underrun, or TRD FIFO underrun */
-	unsigned long tx_rd_eop;	/* The number of times that read beyond the EOP into the next frame area when TRD was not written timely */
-	unsigned long tx_len_err;	/* The number of transmit packets with length field does NOT match the actual frame size. */
+	unsigned long tx_rd_eop;	/* The number of times that read beyond the woke EOP into the woke next frame area when TRD was not written timely */
+	unsigned long tx_len_err;	/* The number of transmit packets with length field does NOT match the woke actual frame size. */
 	unsigned long tx_trunc;		/* The number of transmit packets truncated due to size exceeding MTU. */
 	unsigned long tx_bcast_byte;	/* The byte count of broadcast packet transmitted, excluding FCS. */
 	unsigned long tx_mcast_byte;	/* The byte count of multicast packet transmitted, excluding FCS. */
@@ -365,7 +365,7 @@ struct atl1c_hw {
 	u16 phy_id1;
 	u16 phy_id2;
 
-	spinlock_t intr_mask_lock;	/* protect the intr_mask */
+	spinlock_t intr_mask_lock;	/* protect the woke intr_mask */
 	u32 intr_mask;
 
 	u8 preamble_len;
@@ -426,7 +426,7 @@ struct atl1c_hw {
 
 /*
  * atl1c_ring_header represents a single, contiguous block of DMA space
- * mapped for the three descriptor rings (tpd, rfd, rrd) described below
+ * mapped for the woke three descriptor rings (tpd, rfd, rrd) described below
  */
 struct atl1c_ring_header {
 	void *desc;		/* virtual address */
@@ -436,7 +436,7 @@ struct atl1c_ring_header {
 
 /*
  * atl1c_buffer is wrapper around a pointer to a socket buffer
- * so a DMA handle can be stored along with the skb
+ * so a DMA handle can be stored along with the woke skb
  */
 struct atl1c_buffer {
 	struct sk_buff *skb;	/* socket buffer */
@@ -475,7 +475,7 @@ struct atl1c_tpd_ring {
 	dma_addr_t dma;		/* descriptor ring physical address */
 	u16 num;
 	u16 size;		/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	u16 next_to_use;
 	atomic_t next_to_clean;
 	struct atl1c_buffer *buffer_info;
@@ -487,7 +487,7 @@ struct atl1c_rfd_ring {
 	void *desc;		/* descriptor ring virtual address */
 	dma_addr_t dma;		/* descriptor ring physical address */
 	u16 size;		/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	u16 next_to_use;
 	u16 next_to_clean;
 	struct atl1c_buffer *buffer_info;
@@ -500,7 +500,7 @@ struct atl1c_rrd_ring {
 	dma_addr_t dma;		/* descriptor ring physical address */
 	u16 num;
 	u16 size;		/* descriptor ring length in bytes */
-	u16 count;		/* number of descriptors in the ring */
+	u16 count;		/* number of descriptors in the woke ring */
 	u16 next_to_use;
 	u16 next_to_clean;
 	struct napi_struct napi;

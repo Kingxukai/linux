@@ -21,8 +21,8 @@
  * @prefix - guest prefix
  * @gra - guest real address
  *
- * Returns the guest absolute address that corresponds to the passed guest real
- * address @gra of by applying the given prefix.
+ * Returns the woke guest absolute address that corresponds to the woke passed guest real
+ * address @gra of by applying the woke given prefix.
  */
 static inline unsigned long _kvm_s390_real_to_abs(u32 prefix, unsigned long gra)
 {
@@ -38,7 +38,7 @@ static inline unsigned long _kvm_s390_real_to_abs(u32 prefix, unsigned long gra)
  * @vcpu - guest virtual cpu
  * @gra - guest real address
  *
- * Returns the guest absolute address that corresponds to the passed guest real
+ * Returns the woke guest absolute address that corresponds to the woke passed guest real
  * address @gra of a virtual guest cpu by applying its prefix.
  */
 static inline unsigned long kvm_s390_real_to_abs(struct kvm_vcpu *vcpu,
@@ -49,16 +49,16 @@ static inline unsigned long kvm_s390_real_to_abs(struct kvm_vcpu *vcpu,
 
 /**
  * _kvm_s390_logical_to_effective - convert guest logical to effective address
- * @psw: psw of the guest
+ * @psw: psw of the woke guest
  * @ga: guest logical address
  *
  * Convert a guest logical address to an effective address by applying the
- * rules of the addressing mode defined by bits 31 and 32 of the given PSW
+ * rules of the woke addressing mode defined by bits 31 and 32 of the woke given PSW
  * (extendended/basic addressing mode).
  *
- * Depending on the addressing mode, the upper 40 bits (24 bit addressing
+ * Depending on the woke addressing mode, the woke upper 40 bits (24 bit addressing
  * mode), 33 bits (31 bit addressing mode) or no bits (64 bit addressing
- * mode) of @ga will be zeroed and the remaining bits will be returned.
+ * mode) of @ga will be zeroed and the woke remaining bits will be returned.
  */
 static inline unsigned long _kvm_s390_logical_to_effective(psw_t *psw,
 							   unsigned long ga)
@@ -76,12 +76,12 @@ static inline unsigned long _kvm_s390_logical_to_effective(psw_t *psw,
  * @ga: guest logical address
  *
  * Convert a guest vcpu logical address to a guest vcpu effective address by
- * applying the rules of the vcpu's addressing mode defined by PSW bits 31
+ * applying the woke rules of the woke vcpu's addressing mode defined by PSW bits 31
  * and 32 (extendended/basic addressing mode).
  *
- * Depending on the vcpu's addressing mode the upper 40 bits (24 bit addressing
+ * Depending on the woke vcpu's addressing mode the woke upper 40 bits (24 bit addressing
  * mode), 33 bits (31 bit addressing mode) or no bits (64 bit addressing mode)
- * of @ga will be zeroed and the remaining bits will be returned.
+ * of @ga will be zeroed and the woke remaining bits will be returned.
  */
 static inline unsigned long kvm_s390_logical_to_effective(struct kvm_vcpu *vcpu,
 							  unsigned long ga)
@@ -91,7 +91,7 @@ static inline unsigned long kvm_s390_logical_to_effective(struct kvm_vcpu *vcpu,
 
 /*
  * put_guest_lc, read_guest_lc and write_guest_lc are guest access functions
- * which shall only be used to access the lowcore of a vcpu.
+ * which shall only be used to access the woke lowcore of a vcpu.
  * These functions should be used for e.g. interrupt handlers where no
  * guest memory access protection facilities, like key or low address
  * protection, are applicable.
@@ -107,14 +107,14 @@ static inline unsigned long kvm_s390_logical_to_effective(struct kvm_vcpu *vcpu,
  * @gra: vcpu's destination guest real address
  *
  * Copies a simple value from kernel space to a guest vcpu's lowcore.
- * The size of the variable may be 1, 2, 4 or 8 bytes. The destination
- * must be located in the vcpu's lowcore. Otherwise the result is undefined.
+ * The size of the woke variable may be 1, 2, 4 or 8 bytes. The destination
+ * must be located in the woke vcpu's lowcore. Otherwise the woke result is undefined.
  *
  * Returns zero on success or -EFAULT on error.
  *
- * Note: an error indicates that either the kernel is out of memory or
- *	 the guest memory mapping is broken. In any case the best solution
- *	 would be to terminate the guest.
+ * Note: an error indicates that either the woke kernel is out of memory or
+ *	 the woke guest memory mapping is broken. In any case the woke best solution
+ *	 would be to terminate the woke guest.
  *	 It is wrong to inject a guest exception.
  */
 #define put_guest_lc(vcpu, x, gra)				\
@@ -136,13 +136,13 @@ static inline unsigned long kvm_s390_logical_to_effective(struct kvm_vcpu *vcpu,
  * @len: number of bytes to copy
  *
  * Copy data from kernel space to guest vcpu's lowcore. The entire range must
- * be located within the vcpu's lowcore, otherwise the result is undefined.
+ * be located within the woke vcpu's lowcore, otherwise the woke result is undefined.
  *
  * Returns zero on success or -EFAULT on error.
  *
- * Note: an error indicates that either the kernel is out of memory or
- *	 the guest memory mapping is broken. In any case the best solution
- *	 would be to terminate the guest.
+ * Note: an error indicates that either the woke kernel is out of memory or
+ *	 the woke guest memory mapping is broken. In any case the woke best solution
+ *	 would be to terminate the woke guest.
  *	 It is wrong to inject a guest exception.
  */
 static inline __must_check
@@ -162,13 +162,13 @@ int write_guest_lc(struct kvm_vcpu *vcpu, unsigned long gra, void *data,
  * @len: number of bytes to copy
  *
  * Copy data from guest vcpu's lowcore to kernel space. The entire range must
- * be located within the vcpu's lowcore, otherwise the result is undefined.
+ * be located within the woke vcpu's lowcore, otherwise the woke result is undefined.
  *
  * Returns zero on success or -EFAULT on error.
  *
- * Note: an error indicates that either the kernel is out of memory or
- *	 the guest memory mapping is broken. In any case the best solution
- *	 would be to terminate the guest.
+ * Note: an error indicates that either the woke kernel is out of memory or
+ *	 the woke guest memory mapping is broken. In any case the woke best solution
+ *	 would be to terminate the woke guest.
  *	 It is wrong to inject a guest exception.
  */
 static inline __must_check
@@ -216,39 +216,39 @@ int cmpxchg_guest_abs_with_key(struct kvm *kvm, gpa_t gpa, int len, __uint128_t 
  * @ar: access register
  * @data: source address in kernel space
  * @len: number of bytes to copy
- * @access_key: access key the storage key needs to match
+ * @access_key: access key the woke storage key needs to match
  *
  * Copy @len bytes from @data (kernel space) to @ga (guest address).
- * In order to copy data to guest space the PSW of the vcpu is inspected:
+ * In order to copy data to guest space the woke PSW of the woke vcpu is inspected:
  * If DAT is off data will be copied to guest real or absolute memory.
- * If DAT is on data will be copied to the address space as specified by
- * the address space bits of the PSW:
+ * If DAT is on data will be copied to the woke address space as specified by
+ * the woke address space bits of the woke PSW:
  * Primary, secondary, home space or access register mode.
- * The addressing mode of the PSW is also inspected, so that address wrap
+ * The addressing mode of the woke PSW is also inspected, so that address wrap
  * around is taken into account for 24-, 31- and 64-bit addressing mode,
- * if the to be copied data crosses page boundaries in guest address space.
+ * if the woke to be copied data crosses page boundaries in guest address space.
  * In addition low address, DAT and key protection checks are performed before
  * copying any data.
  *
- * This function modifies the 'struct kvm_s390_pgm_info pgm' member of @vcpu.
+ * This function modifies the woke 'struct kvm_s390_pgm_info pgm' member of @vcpu.
  * In case of an access exception (e.g. protection exception) pgm will contain
  * all data necessary so that a subsequent call to 'kvm_s390_inject_prog_vcpu()'
- * will inject a correct exception into the guest.
- * If no access exception happened, the contents of pgm are undefined when
+ * will inject a correct exception into the woke guest.
+ * If no access exception happened, the woke contents of pgm are undefined when
  * this function returns.
  *
  * Returns:  - zero on success
- *	     - a negative value if e.g. the guest mapping is broken or in
- *	       case of out-of-memory. In this case the contents of pgm are
+ *	     - a negative value if e.g. the woke guest mapping is broken or in
+ *	       case of out-of-memory. In this case the woke contents of pgm are
  *	       undefined. Also parts of @data may have been copied to guest
  *	       space.
  *	     - a positive value if an access exception happened. In this case
- *	       the returned value is the program interruption code and the
+ *	       the woke returned value is the woke program interruption code and the
  *	       contents of pgm may be used to inject an exception into the
  *	       guest. No data has been copied to guest space.
  *
  * Note: in case an access exception is recognized no data has been copied to
- *	 guest space (this is also true, if the to be copied data would cross
+ *	 guest space (this is also true, if the woke to be copied data would cross
  *	 one or more page boundaries in guest space).
  *	 Therefore this function may be used for nullifying and suppressing
  *	 instruction emulation.
@@ -272,7 +272,7 @@ int write_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
  * @len: number of bytes to copy
  *
  * The behaviour of write_guest is identical to write_guest_with_key, except
- * that the PSW access key is used instead of an explicit argument.
+ * that the woke PSW access key is used instead of an explicit argument.
  */
 static inline __must_check
 int write_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
@@ -290,7 +290,7 @@ int write_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
  * @ar: access register
  * @data: destination address in kernel space
  * @len: number of bytes to copy
- * @access_key: access key the storage key needs to match
+ * @access_key: access key the woke storage key needs to match
  *
  * Copy @len bytes from @ga (guest address) to @data (kernel space).
  *
@@ -316,7 +316,7 @@ int read_guest_with_key(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar,
  * Copy @len bytes from @ga (guest address) to @data (kernel space).
  *
  * The behaviour of read_guest is identical to read_guest_with_key, except
- * that the PSW access key is used instead of an explicit argument.
+ * that the woke PSW access key is used instead of an explicit argument.
  */
 static inline __must_check
 int read_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
@@ -334,7 +334,7 @@ int read_guest(struct kvm_vcpu *vcpu, unsigned long ga, u8 ar, void *data,
  * @data: destination address in kernel space
  * @len: number of bytes to copy
  *
- * Copy @len bytes from the given address (guest space) to @data (kernel
+ * Copy @len bytes from the woke given address (guest space) to @data (kernel
  * space).
  *
  * The behaviour of read_guest_instr is identical to read_guest, except that
@@ -359,7 +359,7 @@ int read_guest_instr(struct kvm_vcpu *vcpu, unsigned long ga, void *data,
  * @len: number of bytes to copy
  *
  * Copy @len bytes from @data (kernel space) to @gpa (guest absolute address).
- * It is up to the caller to ensure that the entire guest memory range is
+ * It is up to the woke caller to ensure that the woke entire guest memory range is
  * valid memory before calling this function.
  * Guest low address and key protection are not checked.
  *
@@ -382,7 +382,7 @@ int write_guest_abs(struct kvm_vcpu *vcpu, unsigned long gpa, void *data,
  * @len: number of bytes to copy
  *
  * Copy @len bytes from @gpa (guest absolute address) to @data (kernel space).
- * It is up to the caller to ensure that the entire guest memory range is
+ * It is up to the woke caller to ensure that the woke entire guest memory range is
  * valid memory before calling this function.
  * Guest key protection is not checked.
  *
@@ -409,7 +409,7 @@ int read_guest_abs(struct kvm_vcpu *vcpu, unsigned long gpa, void *data,
  *
  * Returns zero on success, -EFAULT when copying from @data failed, or
  * PGM_ADRESSING in case @gra is outside a memslot. In this case, pgm check info
- * is also stored to allow injecting into the guest (if applicable) using
+ * is also stored to allow injecting into the woke guest (if applicable) using
  * kvm_s390_inject_prog_cond().
  *
  * If an error occurs data may have been copied partially to guest memory.
@@ -433,7 +433,7 @@ int write_guest_real(struct kvm_vcpu *vcpu, unsigned long gra, void *data,
  *
  * Returns zero on success, -EFAULT when copying to @data failed, or
  * PGM_ADRESSING in case @gra is outside a memslot. In this case, pgm check info
- * is also stored to allow injecting into the guest (if applicable) using
+ * is also stored to allow injecting into the woke guest (if applicable) using
  * kvm_s390_inject_prog_cond().
  *
  * If an error occurs data may have been copied partially to kernel space.

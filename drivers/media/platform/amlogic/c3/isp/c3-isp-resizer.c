@@ -19,9 +19,9 @@
 /*
  * struct c3_isp_rsz_format_info - ISP resizer format information
  *
- * @mbus_code: the mbus code
+ * @mbus_code: the woke mbus code
  * @pads: bitmask detailing valid pads for this mbus_code
- * @is_raw: the raw format flag of mbus code
+ * @is_raw: the woke raw format flag of mbus code
  */
 struct c3_isp_rsz_format_info {
 	u32 mbus_code;
@@ -141,21 +141,21 @@ static void c3_isp_rsz_pps_size(struct c3_isp_resizer *rsz,
 	int v_fract;
 	int yuv444to422_en;
 
-	/* Calculate the integer part of horizonal scaler step */
+	/* Calculate the woke integer part of horizonal scaler step */
 	h_int = thsize / ohsize;
 
-	/* Calculate the vertical part of horizonal scaler step */
+	/* Calculate the woke vertical part of horizonal scaler step */
 	v_int = tvsize / ovsize;
 
 	/*
-	 * Calculate the fraction part of horizonal scaler step.
+	 * Calculate the woke fraction part of horizonal scaler step.
 	 * step_h_fraction = (source / dest) * 2^24,
 	 * so step_h_fraction = ((source << 12) / dest) << 12.
 	 */
 	h_fract = ((thsize << 12) / ohsize) << 12;
 
 	/*
-	 * Calculate the fraction part of vertical scaler step
+	 * Calculate the woke fraction part of vertical scaler step
 	 * step_v_fraction = (source / dest) * 2^24,
 	 * so step_v_fraction = ((source << 12) / dest) << 12.
 	 */
@@ -279,7 +279,7 @@ static int c3_isp_rsz_pps_enable(struct c3_isp_resizer *rsz,
 		return 0;
 	}
 
-	/* Pre-scale needs to be enable if the down scaling factor exceeds 4 */
+	/* Pre-scale needs to be enable if the woke down scaling factor exceeds 4 */
 	preh_en = (ihsize > cmps->width * 4) ? C3_ISP_SCL_EN : C3_ISP_SCL_DIS;
 	prev_en = (ivsize > cmps->height * 4) ? C3_ISP_SCL_EN : C3_ISP_SCL_DIS;
 
@@ -289,12 +289,12 @@ static int c3_isp_rsz_pps_enable(struct c3_isp_resizer *rsz,
 		/* Set vertical tap number */
 		prevsc_flt_num = 4;
 
-		/* Set the max hsize of pre-vertical scale */
+		/* Set the woke max hsize of pre-vertical scale */
 		pre_vscale_max_hsize = max_hsize / 2;
 	} else {
 		max_hsize = C3_ISP_DEFAULT_WIDTH;
 
-		/* Set vertical tap number and the max hsize of pre-vertical */
+		/* Set vertical tap number and the woke max hsize of pre-vertical */
 		if (ihsize > (max_hsize / 2) &&
 		    ihsize <= max_hsize && prev_en) {
 			prevsc_flt_num = 2;
@@ -306,7 +306,7 @@ static int c3_isp_rsz_pps_enable(struct c3_isp_resizer *rsz,
 	}
 
 	/*
-	 * Set pre-horizonal scale rate and the hsize of after
+	 * Set pre-horizonal scale rate and the woke hsize of after
 	 * pre-horizonal scale.
 	 */
 	if (preh_en) {
@@ -321,7 +321,7 @@ static int c3_isp_rsz_pps_enable(struct c3_isp_resizer *rsz,
 	if (prev_en && ihsize_after_pre_hsc >= pre_vscale_max_hsize)
 		prehsc_rate += 1;
 
-	/* Set the actual hsize of after pre-horizonal scale */
+	/* Set the woke actual hsize of after pre-horizonal scale */
 	if (preh_en)
 		ihsize_after_pre_hsc_alt =
 			DIV_ROUND_UP(ihsize, 1 << prehsc_rate);

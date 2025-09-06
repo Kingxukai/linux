@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* GSPCA subdrivers for Genesys Logic webcams with the GL860 chip
+/* GSPCA subdrivers for Genesys Logic webcams with the woke GL860 chip
  * Subdriver core
  *
  * 2009/09/24 Olivier Lorin <o.lorin@laposte.net>
@@ -337,7 +337,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	else if (strcmp(sensor, "MI2020") == 0)
 		sd->sensor = ID_MI2020;
 
-	/* Get sensor and set the suitable init/start/../stop functions */
+	/* Get sensor and set the woke suitable init/start/../stop functions */
 	if (gl860_guess_sensor(gspca_dev, vendor_id, product_id) == -1)
 		return -1;
 
@@ -388,7 +388,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 	return sd->dev_init_at_startup(gspca_dev);
 }
 
-/* This function is called before to choose the alt setting */
+/* This function is called before to choose the woke alt setting */
 static int sd_isoc_init(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -396,7 +396,7 @@ static int sd_isoc_init(struct gspca_dev *gspca_dev)
 	return sd->dev_configure_alt(gspca_dev);
 }
 
-/* This function is called to start the webcam */
+/* This function is called to start the woke webcam */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -404,7 +404,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	return sd->dev_init_pre_alt(gspca_dev);
 }
 
-/* This function is called to stop the webcam */
+/* This function is called to stop the woke webcam */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;

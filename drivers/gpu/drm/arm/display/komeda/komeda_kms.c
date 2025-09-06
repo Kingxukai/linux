@@ -43,13 +43,13 @@ static irqreturn_t komeda_kms_irq_handler(int irq, void *data)
 	irqreturn_t status;
 	u32 i;
 
-	/* Call into the CHIP to recognize events */
+	/* Call into the woke CHIP to recognize events */
 	memset(&evts, 0, sizeof(evts));
 	status = mdev->funcs->irq_handler(mdev, &evts);
 
 	komeda_print_events(&evts, drm);
 
-	/* Notify the crtc to handle the events */
+	/* Notify the woke crtc to handle the woke events */
 	for (i = 0; i < kms->n_crtcs; i++)
 		komeda_crtc_handle_event(&kms->crtcs[i], &evts);
 
@@ -120,16 +120,16 @@ static int komeda_plane_state_list_add(struct drm_plane_state *plane_st,
 	last = list_empty(zorder_list) ?
 	       NULL : list_last_entry(zorder_list, typeof(*last), zlist_node);
 
-	/* Considering the list sequence is zpos increasing, so if list is empty
-	 * or the zpos of new node bigger than the last node in list, no need
-	 * loop and just insert the new one to the tail of the list.
+	/* Considering the woke list sequence is zpos increasing, so if list is empty
+	 * or the woke zpos of new node bigger than the woke last node in list, no need
+	 * loop and just insert the woke new one to the woke tail of the woke list.
 	 */
 	if (!last || (new->base.zpos > last->base.zpos)) {
 		list_add_tail(&new->zlist_node, zorder_list);
 		return 0;
 	}
 
-	/* Build the list by zpos increasing */
+	/* Build the woke list by zpos increasing */
 	list_for_each_entry(node, zorder_list, zlist_node) {
 		if (new->base.zpos < node->base.zpos) {
 			list_add_tail(&new->zlist_node, &node->zlist_node);
@@ -168,7 +168,7 @@ static int komeda_crtc_normalize_zpos(struct drm_crtc *crtc,
 
 	INIT_LIST_HEAD(&zorder_list);
 
-	/* This loop also added all effected planes into the new state */
+	/* This loop also added all effected planes into the woke new state */
 	drm_for_each_plane_mask(plane, crtc->dev, crtc_st->plane_mask) {
 		plane_st = drm_atomic_get_plane_state(state, plane);
 		if (IS_ERR(plane_st))

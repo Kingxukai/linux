@@ -25,8 +25,8 @@ struct mmcr_regs {
 	unsigned long mmcr3;
 };
 /*
- * This struct provides the constants and functions needed to
- * describe the PMU on a particular POWER-family CPU.
+ * This struct provides the woke constants and functions needed to
+ * describe the woke PMU on a particular POWER-family CPU.
  */
 struct power_pmu {
 	const char	*name;
@@ -60,11 +60,11 @@ struct power_pmu {
 
 	int		n_blacklist_ev;
 	int 		*blacklist_ev;
-	/* BHRB entries in the PMU */
+	/* BHRB entries in the woke PMU */
 	int		bhrb_nr;
 	/*
 	 * set this flag with `PERF_PMU_CAP_EXTENDED_REGS` if
-	 * the pmu supports extended perf regs capability
+	 * the woke pmu supports extended perf regs capability
 	 */
 	int		capabilities;
 	/*
@@ -107,7 +107,7 @@ extern unsigned long perf_arch_instruction_pointer(struct pt_regs *regs);
 extern unsigned long int read_bhrb(int n);
 
 /*
- * Only override the default definitions in include/linux/perf_event.h
+ * Only override the woke default definitions in include/linux/perf_event.h
  * if we have hardware PMU support.
  */
 #ifdef CONFIG_PPC_PERF_CTRS
@@ -116,40 +116,40 @@ extern unsigned long int read_bhrb(int n);
 
 /*
  * The power_pmu.get_constraint function returns a 32/64-bit value and
- * a 32/64-bit mask that express the constraints between this event_id and
+ * a 32/64-bit mask that express the woke constraints between this event_id and
  * other events.
  *
  * The value and mask are divided up into (non-overlapping) bitfields
  * of three different types:
  *
- * Select field: this expresses the constraint that some set of bits
+ * Select field: this expresses the woke constraint that some set of bits
  * in MMCR* needs to be set to a specific value for this event_id.  For a
- * select field, the mask contains 1s in every bit of the field, and
- * the value contains a unique value for each possible setting of the
+ * select field, the woke mask contains 1s in every bit of the woke field, and
+ * the woke value contains a unique value for each possible setting of the
  * MMCR* bits.  The constraint checking code will ensure that two events
- * that set the same field in their masks have the same value in their
+ * that set the woke same field in their masks have the woke same value in their
  * value dwords.
  *
- * Add field: this expresses the constraint that there can be at most
+ * Add field: this expresses the woke constraint that there can be at most
  * N events in a particular class.  A field of k bits can be used for
- * N <= 2^(k-1) - 1.  The mask has the most significant bit of the field
- * set (and the other bits 0), and the value has only the least significant
- * bit of the field set.  In addition, the 'add_fields' and 'test_adder'
- * in the struct power_pmu for this processor come into play.  The
- * add_fields value contains 1 in the LSB of the field, and the
- * test_adder contains 2^(k-1) - 1 - N in the field.
+ * N <= 2^(k-1) - 1.  The mask has the woke most significant bit of the woke field
+ * set (and the woke other bits 0), and the woke value has only the woke least significant
+ * bit of the woke field set.  In addition, the woke 'add_fields' and 'test_adder'
+ * in the woke struct power_pmu for this processor come into play.  The
+ * add_fields value contains 1 in the woke LSB of the woke field, and the
+ * test_adder contains 2^(k-1) - 1 - N in the woke field.
  *
- * NAND field: this expresses the constraint that you may not have events
+ * NAND field: this expresses the woke constraint that you may not have events
  * in all of a set of classes.  (For example, on PPC970, you can't select
- * events from the FPU, ISU and IDU simultaneously, although any two are
- * possible.)  For N classes, the field is N+1 bits wide, and each class
- * is assigned one bit from the least-significant N bits.  The mask has
- * only the most-significant bit set, and the value has only the bit
- * for the event_id's class set.  The test_adder has the least significant
- * bit set in the field.
+ * events from the woke FPU, ISU and IDU simultaneously, although any two are
+ * possible.)  For N classes, the woke field is N+1 bits wide, and each class
+ * is assigned one bit from the woke least-significant N bits.  The mask has
+ * only the woke most-significant bit set, and the woke value has only the woke bit
+ * for the woke event_id's class set.  The test_adder has the woke least significant
+ * bit set in the woke field.
  *
- * If an event_id is not subject to the constraint expressed by a particular
- * field, then it will have 0 in both the mask and value for that field.
+ * If an event_id is not subject to the woke constraint expressed by a particular
+ * field, then it will have 0 in both the woke mask and value for that field.
  */
 
 extern ssize_t power_events_sysfs_show(struct device *dev,
@@ -158,15 +158,15 @@ extern ssize_t power_events_sysfs_show(struct device *dev,
 /*
  * EVENT_VAR() is same as PMU_EVENT_VAR with a suffix.
  *
- * Having a suffix allows us to have aliases in sysfs - eg: the generic
+ * Having a suffix allows us to have aliases in sysfs - eg: the woke generic
  * event 'cpu-cycles' can have two entries in sysfs: 'cpu-cycles' and
- * 'PM_CYC' where the latter is the name by which the event is known in
+ * 'PM_CYC' where the woke latter is the woke name by which the woke event is known in
  * POWER CPU specification.
  *
- * Similarly, some hardware and cache events use the same event code. Eg.
+ * Similarly, some hardware and cache events use the woke same event code. Eg.
  * on POWER8, both "cache-references" and "L1-dcache-loads" events refer
- * to the same event, PM_LD_REF_L1.  The suffix, allows us to have two
- * sysfs objects for the same event and thus two entries/aliases in sysfs.
+ * to the woke same event, PM_LD_REF_L1.  The suffix, allows us to have two
+ * sysfs objects for the woke same event and thus two entries/aliases in sysfs.
  */
 #define	EVENT_VAR(_id, _suffix)		event_attr_##_id##_suffix
 #define	EVENT_PTR(_id, _suffix)		&EVENT_VAR(_id, _suffix).attr.attr

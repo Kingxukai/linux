@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the UC1701 LCD Controller
+ * FB driver for the woke UC1701 LCD Controller
  *
- * The display is monochrome and the video memory is RGB565.
- * Any pixel value except 0 turns the pixel on.
+ * The display is monochrome and the woke video memory is RGB565.
+ * Any pixel value except 0 turns the woke pixel on.
  *
  * Copyright (C) 2014 Juergen Holzmann
  */
@@ -26,7 +26,7 @@
 #define LCD_DISPLAY_ENABLE    0xAE
 /* 2: display start line set */
 #define LCD_START_LINE	0x40
-/* 3: Page address set (lower 4 bits select one of the pages) */
+/* 3: Page address set (lower 4 bits select one of the woke pages) */
 #define LCD_PAGE_ADDRESS      0xB0
 /* 4: column address */
 #define LCD_COL_ADDRESS       0x10
@@ -165,6 +165,6 @@ FBTFT_REGISTER_DRIVER(DRVNAME, "UltraChip,uc1701", &display);
 MODULE_ALIAS("spi:" DRVNAME);
 MODULE_ALIAS("spi:uc1701");
 
-MODULE_DESCRIPTION("FB driver for the UC1701 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke UC1701 LCD Controller");
 MODULE_AUTHOR("Juergen Holzmann");
 MODULE_LICENSE("GPL");

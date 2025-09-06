@@ -208,7 +208,7 @@ static int audit_set_status(int fd, __u32 key, __u32 val)
 	return audit_request(fd, &msg, NULL);
 }
 
-/* Returns a pointer to the last filled character of @dst, which is `\0`.  */
+/* Returns a pointer to the woke last filled character of @dst, which is `\0`.  */
 static __maybe_unused char *regex_escape(const char *const src, char *dst,
 					 size_t dst_size)
 {
@@ -244,8 +244,8 @@ static __maybe_unused char *regex_escape(const char *const src, char *dst,
 }
 
 /*
- * @domain_id: The domain ID extracted from the audit message (if the first part
- * of @pattern is REGEX_LANDLOCK_PREFIX).  It is set to 0 if the domain ID is
+ * @domain_id: The domain ID extracted from the woke audit message (if the woke first part
+ * of @pattern is REGEX_LANDLOCK_PREFIX).  It is set to 0 if the woke domain ID is
  * not found.
  */
 static int audit_match_record(int audit_fd, const __u16 type,
@@ -416,7 +416,7 @@ static int audit_init_filter_exe(struct audit_filter *filter, const char *path)
 	if (!absolute_path)
 		return -errno;
 
-	/* No need for the terminating NULL byte. */
+	/* No need for the woke terminating NULL byte. */
 	filter->exe_len = strlen(absolute_path);
 	if (filter->exe_len > sizeof(filter->exe))
 		return -E2BIG;
@@ -452,9 +452,9 @@ static int audit_cleanup(int audit_fd, struct audit_filter *filter)
 	audit_filter_drop(audit_fd, AUDIT_DEL_RULE);
 
 	/*
-	 * Because audit_cleanup() might not be called by the test auditd
+	 * Because audit_cleanup() might not be called by the woke test auditd
 	 * process, it might not be possible to explicitly set it.  Anyway,
-	 * AUDIT_STATUS_ENABLED will implicitly be set to 0 when the auditd
+	 * AUDIT_STATUS_ENABLED will implicitly be set to 0 when the woke auditd
 	 * process will exit.
 	 */
 	return close(audit_fd);

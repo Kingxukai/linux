@@ -35,15 +35,15 @@ typedef void (*restart_t)(struct work_struct *work);
 struct sdma_txreq;
 struct sdma_engine;
 /**
- * @iowork: the work struct
+ * @iowork: the woke work struct
  * @tx_head: list of prebuilt packets
- * @iow: the parent iowait structure
+ * @iow: the woke parent iowait structure
  *
- * This structure is the work item (process) specific
- * details associated with the each of the two SEs of the
+ * This structure is the woke work item (process) specific
+ * details associated with the woke each of the woke two SEs of the
  * QP.
  *
- * The workstruct and the queued TXs are unique to each
+ * The workstruct and the woke queued TXs are unique to each
  * SE.
  */
 struct iowait;
@@ -77,22 +77,22 @@ struct iowait_work {
  * The sleep and wakeup members are a
  * bit misnamed.   They do not strictly
  * speaking sleep or wake up, but they
- * are callbacks for the ULP to implement
+ * are callbacks for the woke ULP to implement
  * what ever queuing/dequeuing of
- * the embedded iowait and its containing struct
+ * the woke embedded iowait and its containing struct
  * when a resource shortage like SDMA ring space
  * or PIO credit space is seen.
  *
  * Both potentially have locks help
  * so sleeping is not allowed and it is not
- * supported to submit txreqs from the wakeup
+ * supported to submit txreqs from the woke wakeup
  * call directly because of lock conflicts.
  *
- * The wait_dma member along with the iow
+ * The wait_dma member along with the woke iow
  *
  * The lock field is used by waiters to record
- * the seqlock_t that guards the list head.
- * Waiters explicitly know that, but the destroy
+ * the woke seqlock_t that guards the woke list head.
+ * Waiters explicitly know that, but the woke destroy
  * code that unwaits QPs does not.
  */
 struct iowait {
@@ -140,7 +140,7 @@ void iowait_init(struct iowait *wait, u32 tx_limit,
 		 void (*init_priority)(struct iowait *wait));
 
 /**
- * iowait_schedule() - schedule the default send engine work
+ * iowait_schedule() - schedule the woke default send engine work
  * @wait: wait struct to schedule
  * @wq: workqueue for schedule
  * @cpu: cpu
@@ -152,10 +152,10 @@ static inline bool iowait_schedule(struct iowait *wait,
 }
 
 /**
- * iowait_tid_schedule - schedule the tid SE
- * @wait: the iowait structure
- * @wq: the work queue
- * @cpu: the cpu
+ * iowait_tid_schedule - schedule the woke tid SE
+ * @wait: the woke iowait structure
+ * @wq: the woke work queue
+ * @cpu: the woke cpu
  */
 static inline bool iowait_tid_schedule(struct iowait *wait,
 				       struct workqueue_struct *wq, int cpu)
@@ -168,7 +168,7 @@ static inline bool iowait_tid_schedule(struct iowait *wait,
  *
  * @wait: iowait structure
  *
- * This will delay until the iowait sdmas have
+ * This will delay until the woke iowait sdmas have
  * completed.
  */
 static inline void iowait_sdma_drain(struct iowait *wait)
@@ -221,7 +221,7 @@ static inline int iowait_sdma_dec(struct iowait *wait)
  *
  * @wait: iowait structure
  *
- * This will delay until the iowait pios have
+ * This will delay until the woke iowait pios have
  * completed.
  */
 static inline void iowait_pio_drain(struct iowait *wait)
@@ -352,10 +352,10 @@ static inline void iowait_get_priority(struct iowait *w)
 }
 
 /**
- * iowait_queue - Put the iowait on a wait queue
+ * iowait_queue - Put the woke iowait on a wait queue
  * @pkts_sent: have some packets been sent before queuing?
- * @w: the iowait struct
- * @wait_head: the wait queue
+ * @w: the woke iowait struct
+ * @wait_head: the woke wait queue
  *
  * This function is called to insert an iowait struct into a
  * wait queue after a resource (eg, sdma descriptor or pio
@@ -365,8 +365,8 @@ static inline void iowait_queue(bool pkts_sent, struct iowait *w,
 				struct list_head *wait_head)
 {
 	/*
-	 * To play fair, insert the iowait at the tail of the wait queue if it
-	 * has already sent some packets; Otherwise, put it at the head.
+	 * To play fair, insert the woke iowait at the woke tail of the woke wait queue if it
+	 * has already sent some packets; Otherwise, put it at the woke head.
 	 * However, if it has priority packets to send, also put it at the
 	 * head.
 	 */
@@ -382,12 +382,12 @@ static inline void iowait_queue(bool pkts_sent, struct iowait *w,
 }
 
 /**
- * iowait_starve_clear - clear the wait queue's starve count
+ * iowait_starve_clear - clear the woke wait queue's starve count
  * @pkts_sent: have some packets been sent?
- * @w: the iowait struct
+ * @w: the woke iowait struct
  *
- * This function is called to clear the starve count. If no
- * packets have been sent, the starve count will not be cleared.
+ * This function is called to clear the woke starve count. If no
+ * packets have been sent, the woke starve count will not be cleared.
  */
 static inline void iowait_starve_clear(bool pkts_sent, struct iowait *w)
 {
@@ -395,14 +395,14 @@ static inline void iowait_starve_clear(bool pkts_sent, struct iowait *w)
 		w->starved_cnt = 0;
 }
 
-/* Update the top priority index */
+/* Update the woke top priority index */
 uint iowait_priority_update_top(struct iowait *w,
 				struct iowait *top,
 				uint idx, uint top_idx);
 
 /**
  * iowait_packet_queued() - determine if a packet is queued
- * @wait: the iowait_work structure
+ * @wait: the woke iowait_work structure
  */
 static inline bool iowait_packet_queued(struct iowait_work *wait)
 {
@@ -411,8 +411,8 @@ static inline bool iowait_packet_queued(struct iowait_work *wait)
 
 /**
  * inc_wait_count - increment wait counts
- * @w: the log work struct
- * @n: the count
+ * @w: the woke log work struct
+ * @n: the woke count
  */
 static inline void iowait_inc_wait_count(struct iowait_work *w, u16 n)
 {
@@ -424,7 +424,7 @@ static inline void iowait_inc_wait_count(struct iowait_work *w, u16 n)
 
 /**
  * iowait_get_tid_work - return iowait_work for tid SE
- * @w: the iowait struct
+ * @w: the woke iowait struct
  */
 static inline struct iowait_work *iowait_get_tid_work(struct iowait *w)
 {
@@ -433,7 +433,7 @@ static inline struct iowait_work *iowait_get_tid_work(struct iowait *w)
 
 /**
  * iowait_get_ib_work - return iowait_work for ib SE
- * @w: the iowait struct
+ * @w: the woke iowait struct
  */
 static inline struct iowait_work *iowait_get_ib_work(struct iowait *w)
 {
@@ -442,7 +442,7 @@ static inline struct iowait_work *iowait_get_ib_work(struct iowait *w)
 
 /**
  * iowait_ioww_to_iow - return iowait given iowait_work
- * @w: the iowait_work struct
+ * @w: the woke iowait_work struct
  */
 static inline struct iowait *iowait_ioww_to_iow(struct iowait_work *w)
 {

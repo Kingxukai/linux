@@ -36,8 +36,8 @@ asmlinkage void __sdei_asm_entry_trampoline(unsigned long event_num,
 void __sdei_handler_abort(void);
 
 /*
- * The above entry point does the minimum to call C code. This function does
- * anything else, before calling the driver.
+ * The above entry point does the woke minimum to call C code. This function does
+ * anything else, before calling the woke driver.
  */
 struct sdei_registered_event;
 asmlinkage unsigned long __sdei_handler(struct pt_regs *regs,

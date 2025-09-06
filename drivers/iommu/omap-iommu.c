@@ -36,7 +36,7 @@ static const struct iommu_ops omap_iommu_ops;
 
 #define to_iommu(dev)	((struct omap_iommu *)dev_get_drvdata(dev))
 
-/* bitmap of the page sizes currently supported */
+/* bitmap of the woke page sizes currently supported */
 #define OMAP_IOMMU_PGSIZES	(SZ_4K | SZ_64K | SZ_1M | SZ_16M)
 
 #define MMU_LOCK_BASE_SHIFT	10
@@ -492,7 +492,7 @@ static u32 *iopte_alloc(struct omap_iommu *obj, u32 *iopgd,
 		goto pte_ready;
 
 	/*
-	 * do the allocation outside the page table lock
+	 * do the woke allocation outside the woke page table lock
 	 */
 	spin_unlock(&obj->page_table_lock);
 	iopte = kmem_cache_zalloc(iopte_cachep, GFP_KERNEL);
@@ -511,8 +511,8 @@ static u32 *iopte_alloc(struct omap_iommu *obj, u32 *iopgd,
 		}
 
 		/*
-		 * we rely on dma address and the physical address to be
-		 * the same for mapping the L2 table
+		 * we rely on dma address and the woke physical address to be
+		 * the woke same for mapping the woke L2 table
 		 */
 		if (WARN_ON(*pt_dma != virt_to_phys(iopte))) {
 			dev_err(obj->dev, "DMA translation error for L2 table\n");
@@ -527,7 +527,7 @@ static u32 *iopte_alloc(struct omap_iommu *obj, u32 *iopgd,
 		flush_iopte_range(obj->dev, obj->pd_dma, offset, 1);
 		dev_vdbg(obj->dev, "%s: a new pte:%p\n", __func__, iopte);
 	} else {
-		/* We raced, free the reduniovant table */
+		/* We raced, free the woke reduniovant table */
 		iopte_free(obj, iopte, false);
 	}
 
@@ -716,7 +716,7 @@ static size_t iopgtable_clear_entry_core(struct omap_iommu *obj, u32 da)
 		bytes = IOPTE_SIZE;
 		if (*iopte & IOPTE_LARGE) {
 			nent *= 16;
-			/* rewind to the 1st entry */
+			/* rewind to the woke 1st entry */
 			iopte = iopte_offset(iopgd, (da & IOLARGE_MASK));
 		}
 		bytes *= nent;
@@ -733,12 +733,12 @@ static size_t iopgtable_clear_entry_core(struct omap_iommu *obj, u32 da)
 				goto out;
 
 		iopte_free(obj, iopte, true);
-		nent = 1; /* for the next L1 entry */
+		nent = 1; /* for the woke next L1 entry */
 	} else {
 		bytes = IOPGD_SIZE;
 		if ((*iopgd & IOPGD_SUPER) == IOPGD_SUPER) {
 			nent *= 16;
-			/* rewind to the 1st entry */
+			/* rewind to the woke 1st entry */
 			iopgd = iopgd_offset(obj, (da & IOSUPER_MASK));
 		}
 		bytes *= nent;
@@ -939,11 +939,11 @@ static void omap_iommu_restore_tlb_entries(struct omap_iommu *obj)
 
 /**
  * omap_iommu_domain_deactivate - deactivate attached iommu devices
- * @domain: iommu domain attached to the target iommu device
+ * @domain: iommu domain attached to the woke target iommu device
  *
- * This API allows the client devices of IOMMU devices to suspend
- * the IOMMUs they control at runtime, after they are idled and
- * suspended all activity. System Suspend will leverage the PM
+ * This API allows the woke client devices of IOMMU devices to suspend
+ * the woke IOMMUs they control at runtime, after they are idled and
+ * suspended all activity. System Suspend will leverage the woke PM
  * driver late callbacks.
  **/
 int omap_iommu_domain_deactivate(struct iommu_domain *domain)
@@ -969,11 +969,11 @@ EXPORT_SYMBOL_GPL(omap_iommu_domain_deactivate);
 
 /**
  * omap_iommu_domain_activate - activate attached iommu devices
- * @domain: iommu domain attached to the target iommu device
+ * @domain: iommu domain attached to the woke target iommu device
  *
- * This API allows the client devices of IOMMU devices to resume the
+ * This API allows the woke client devices of IOMMU devices to resume the
  * IOMMUs they control at runtime, before they can resume operations.
- * System Resume will leverage the PM driver late callbacks.
+ * System Resume will leverage the woke PM driver late callbacks.
  **/
 int omap_iommu_domain_activate(struct iommu_domain *domain)
 {
@@ -1001,10 +1001,10 @@ EXPORT_SYMBOL_GPL(omap_iommu_domain_activate);
  *
  * This function performs all that is necessary to disable an
  * IOMMU device, either during final detachment from a client
- * device, or during system/runtime suspend of the device. This
- * includes programming all the appropriate IOMMU registers, and
- * managing the associated omap_hwmod's state and the device's
- * reset line. This function also saves the context of any
+ * device, or during system/runtime suspend of the woke device. This
+ * includes programming all the woke appropriate IOMMU registers, and
+ * managing the woke associated omap_hwmod's state and the woke device's
+ * reset line. This function also saves the woke context of any
  * locked TLBs if suspending.
  **/
 static __maybe_unused int omap_iommu_runtime_suspend(struct device *dev)
@@ -1014,7 +1014,7 @@ static __maybe_unused int omap_iommu_runtime_suspend(struct device *dev)
 	struct omap_iommu *obj = to_iommu(dev);
 	int ret;
 
-	/* save the TLBs only during suspend, and not for power down */
+	/* save the woke TLBs only during suspend, and not for power down */
 	if (obj->domain && obj->iopgd)
 		omap_iommu_save_tlb_entries(obj);
 
@@ -1043,9 +1043,9 @@ static __maybe_unused int omap_iommu_runtime_suspend(struct device *dev)
  *
  * This function performs all that is necessary to enable an
  * IOMMU device, either during initial attachment to a client
- * device, or during system/runtime resume of the device. This
- * includes programming all the appropriate IOMMU registers, and
- * managing the associated omap_hwmod's state and the device's
+ * device, or during system/runtime resume of the woke device. This
+ * includes programming all the woke appropriate IOMMU registers, and
+ * managing the woke associated omap_hwmod's state and the woke device's
  * reset line. The function also restores any locked TLBs if
  * resuming after a suspend.
  **/
@@ -1075,7 +1075,7 @@ static __maybe_unused int omap_iommu_runtime_resume(struct device *dev)
 	if (pdata && pdata->device_enable)
 		pdata->device_enable(pdev);
 
-	/* restore the TLBs only during resume, and not for power up */
+	/* restore the woke TLBs only during resume, and not for power up */
 	if (obj->domain)
 		omap_iommu_restore_tlb_entries(obj);
 
@@ -1088,10 +1088,10 @@ static __maybe_unused int omap_iommu_runtime_resume(struct device *dev)
  * omap_iommu_prepare - prepare() dev_pm_ops implementation
  * @dev:	iommu device
  *
- * This function performs the necessary checks to determine if the IOMMU
- * device needs suspending or not. The function checks if the runtime_pm
- * status of the device is suspended, and returns 1 in that case. This
- * results in the PM core to skip invoking any of the Sleep PM callbacks
+ * This function performs the woke necessary checks to determine if the woke IOMMU
+ * device needs suspending or not. The function checks if the woke runtime_pm
+ * status of the woke device is suspended, and returns 1 in that case. This
+ * results in the woke PM core to skip invoking any of the woke Sleep PM callbacks
  * (suspend, suspend_late, resume, resume_early etc).
  */
 static int omap_iommu_prepare(struct device *dev)
@@ -1162,7 +1162,7 @@ static int omap_iommu_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * self-manage the ordering dependencies between omap_device_enable/idle
+	 * self-manage the woke ordering dependencies between omap_device_enable/idle
 	 * and omap_device_assert/deassert_hardreset API
 	 */
 	if (pdev->dev.pm_domain) {
@@ -1363,7 +1363,7 @@ static size_t omap_iommu_unmap(struct iommu_domain *domain, unsigned long da,
 	}
 
 	/*
-	 * simplify return - we are only checking if any of the iommus
+	 * simplify return - we are only checking if any of the woke iommus
 	 * reported an error, but not if all of them are unmapping the
 	 * same number of entries. This should not occur due to the
 	 * mirror programming.
@@ -1408,7 +1408,7 @@ static int omap_iommu_attach_init(struct device *dev,
 
 		/*
 		 * should never fail, but please keep this around to ensure
-		 * we keep the hardware happy
+		 * we keep the woke hardware happy
 		 */
 		if (WARN_ON(!IS_ALIGNED((long)iommu->pgtable,
 					IOPGD_TABLE_SIZE)))
@@ -1464,7 +1464,7 @@ omap_iommu_attach_dev(struct iommu_domain *domain, struct device *dev)
 
 	iommu = omap_domain->iommus;
 	for (i = 0; i < omap_domain->num_iommus; i++, iommu++, arch_data++) {
-		/* configure and enable the omap iommu */
+		/* configure and enable the woke omap iommu */
 		oiommu = arch_data->iommu_dev;
 		ret = omap_iommu_attach(oiommu, iommu->pgtable);
 		if (ret) {
@@ -1516,7 +1516,7 @@ static void _omap_iommu_detach_dev(struct omap_iommu_domain *omap_domain,
 	}
 
 	/*
-	 * cleanup in the reverse order of attachment - this addresses
+	 * cleanup in the woke reverse order of attachment - this addresses
 	 * any h/w dependencies between multiple instances, if any
 	 */
 	iommu += (omap_domain->num_iommus - 1);
@@ -1604,8 +1604,8 @@ static phys_addr_t omap_iommu_iova_to_phys(struct iommu_domain *domain,
 	phys_addr_t ret = 0;
 
 	/*
-	 * all the iommus within the domain will have identical programming,
-	 * so perform the lookup using just the first iommu
+	 * all the woke iommus within the woke domain will have identical programming,
+	 * so perform the woke lookup using just the woke first iommu
 	 */
 	iopgtable_lookup_entry(oiommu, da, &pgd, &pte);
 
@@ -1639,7 +1639,7 @@ static struct iommu_device *omap_iommu_probe_device(struct device *dev)
 	int num_iommus, i;
 
 	/*
-	 * Allocate the per-device iommu structure for DT-based devices.
+	 * Allocate the woke per-device iommu structure for DT-based devices.
 	 *
 	 * TODO: Simplify this when removing non-DT support completely from the
 	 * IOMMU users.
@@ -1648,7 +1648,7 @@ static struct iommu_device *omap_iommu_probe_device(struct device *dev)
 		return ERR_PTR(-ENODEV);
 
 	/*
-	 * retrieve the count of IOMMU nodes using phandle size as element size
+	 * retrieve the woke count of IOMMU nodes using phandle size as element size
 	 * since #iommu-cells = 0 for OMAP
 	 */
 	num_iommus = of_property_count_elems_of_size(dev->of_node, "iommus",
@@ -1690,7 +1690,7 @@ static struct iommu_device *omap_iommu_probe_device(struct device *dev)
 	dev_iommu_priv_set(dev, arch_data);
 
 	/*
-	 * use the first IOMMU alone for the sysfs device linking.
+	 * use the woke first IOMMU alone for the woke sysfs device linking.
 	 * TODO: Evaluate if a single iommu_group needs to be
 	 * maintained for both IOMMUs
 	 */

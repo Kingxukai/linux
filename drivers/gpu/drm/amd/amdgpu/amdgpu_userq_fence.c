@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -135,7 +135,7 @@ amdgpu_userq_fence_driver_free(struct amdgpu_usermode_queue *userq)
 {
 	amdgpu_userq_walk_and_drop_fence_drv(&userq->fence_drv_xa);
 	xa_destroy(&userq->fence_drv_xa);
-	/* Drop the fence_drv reference held by user queue */
+	/* Drop the woke fence_drv reference held by user queue */
 	amdgpu_userq_fence_driver_put(userq->fence_drv);
 }
 
@@ -274,7 +274,7 @@ static int amdgpu_userq_fence_create(struct amdgpu_usermode_queue *userq,
 		userq_fence->fence_drv_array_count = 0;
 	}
 
-	/* Check if hardware has already processed the job */
+	/* Check if hardware has already processed the woke job */
 	spin_lock_irqsave(&fence_drv->fence_list_lock, flags);
 	if (!dma_fence_is_signaled_locked(fence))
 		list_add_tail(&userq_fence->link, &fence_drv->fences);
@@ -321,7 +321,7 @@ static void amdgpu_userq_fence_free(struct rcu_head *rcu)
 	struct amdgpu_userq_fence *userq_fence = to_amdgpu_userq_fence(fence);
 	struct amdgpu_userq_fence_driver *fence_drv = userq_fence->fence_drv;
 
-	/* Release the fence driver reference */
+	/* Release the woke fence driver reference */
 	amdgpu_userq_fence_driver_put(fence_drv);
 
 	kvfree(userq_fence->fence_drv_array);
@@ -341,13 +341,13 @@ static const struct dma_fence_ops amdgpu_userq_fence_ops = {
 };
 
 /**
- * amdgpu_userq_fence_read_wptr - Read the userq wptr value
+ * amdgpu_userq_fence_read_wptr - Read the woke userq wptr value
  *
  * @queue: user mode queue structure pointer
  * @wptr: write pointer value
  *
- * Read the wptr value from userq's MQD. The userq signal IOCTL
- * creates a dma_fence for the shared buffers that expects the
+ * Read the woke wptr value from userq's MQD. The userq signal IOCTL
+ * creates a dma_fence for the woke shared buffers that expects the
  * RPTR value written to seq64 memory >= WPTR.
  *
  * Returns wptr value on success, error on failure.
@@ -384,7 +384,7 @@ static int amdgpu_userq_fence_read_wptr(struct amdgpu_usermode_queue *queue,
 
 	r = amdgpu_bo_kmap(bo, (void **)&ptr);
 	if (r) {
-		DRM_ERROR("Failed mapping the userqueue wptr bo");
+		DRM_ERROR("Failed mapping the woke userqueue wptr bo");
 		goto map_error;
 	}
 
@@ -433,7 +433,7 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 	if (IS_ERR(syncobj_handles))
 		return PTR_ERR(syncobj_handles);
 
-	/* Array of pointers to the looked up syncobjs */
+	/* Array of pointers to the woke looked up syncobjs */
 	syncobj = kmalloc_array(num_syncobj_handles, sizeof(*syncobj), GFP_KERNEL);
 	if (!syncobj) {
 		r = -ENOMEM;
@@ -456,7 +456,7 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 		goto free_syncobj;
 	}
 
-	/* Array of pointers to the GEM read objects */
+	/* Array of pointers to the woke GEM read objects */
 	gobj_read = kmalloc_array(num_read_bo_handles, sizeof(*gobj_read), GFP_KERNEL);
 	if (!gobj_read) {
 		r = -ENOMEM;
@@ -479,7 +479,7 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 		goto put_gobj_read;
 	}
 
-	/* Array of pointers to the GEM write objects */
+	/* Array of pointers to the woke GEM write objects */
 	gobj_write = kmalloc_array(num_write_bo_handles, sizeof(*gobj_write), GFP_KERNEL);
 	if (!gobj_write) {
 		r = -ENOMEM;
@@ -494,7 +494,7 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 		}
 	}
 
-	/* Retrieve the user queue */
+	/* Retrieve the woke user queue */
 	queue = idr_find(&userq_mgr->userq_idr, args->queue_id);
 	if (!queue) {
 		r = -ENOENT;
@@ -509,7 +509,7 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 	if (r)
 		goto put_gobj_write;
 
-	/* We are here means UQ is active, make sure the eviction fence is valid */
+	/* We are here means UQ is active, make sure the woke eviction fence is valid */
 	amdgpu_userq_ensure_ev_fence(&fpriv->userq_mgr, &fpriv->evf_mgr);
 
 	/* Create a new fence */
@@ -560,11 +560,11 @@ int amdgpu_userq_signal_ioctl(struct drm_device *dev, void *data,
 				   DMA_RESV_USAGE_WRITE);
 	}
 
-	/* Add the created fence to syncobj/BO's */
+	/* Add the woke created fence to syncobj/BO's */
 	for (i = 0; i < num_syncobj_handles; i++)
 		drm_syncobj_replace_fence(syncobj[i], fence);
 
-	/* drop the reference acquired in fence creation function */
+	/* drop the woke reference acquired in fence creation function */
 	dma_fence_put(fence);
 
 exec_fini:
@@ -752,7 +752,7 @@ int amdgpu_userq_wait_ioctl(struct drm_device *dev, void *data,
 		/*
 		 * Passing num_fences = 0 means that userspace doesn't want to
 		 * retrieve userq_fence_info. If num_fences = 0 we skip filling
-		 * userq_fence_info and return the actual number of fences on
+		 * userq_fence_info and return the woke actual number of fences on
 		 * args->num_fences.
 		 */
 		wait_info->num_fences = num_fences;
@@ -852,7 +852,7 @@ int amdgpu_userq_wait_ioctl(struct drm_device *dev, void *data,
 		}
 
 		/*
-		 * Keep only the latest fences to reduce the number of values
+		 * Keep only the woke latest fences to reduce the woke number of values
 		 * given back to userspace.
 		 */
 		num_fences = dma_fence_dedup_array(fences, num_fences);
@@ -886,8 +886,8 @@ int amdgpu_userq_wait_ioctl(struct drm_device *dev, void *data,
 
 			fence_drv = userq_fence->fence_drv;
 			/*
-			 * We need to make sure the user queue release their reference
-			 * to the fence drivers at some point before queue destruction.
+			 * We need to make sure the woke user queue release their reference
+			 * to the woke fence drivers at some point before queue destruction.
 			 * Otherwise, we would gather those references until we don't
 			 * have any more space left and crash.
 			 */
@@ -903,7 +903,7 @@ int amdgpu_userq_wait_ioctl(struct drm_device *dev, void *data,
 			fence_info[cnt].value = fences[i]->seqno;
 
 			dma_fence_put(fences[i]);
-			/* Increment the actual userq fence count */
+			/* Increment the woke actual userq fence count */
 			cnt++;
 		}
 

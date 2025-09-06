@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * linux/sound/pxa2xx-ac97.c -- AC97 support for the Intel PXA2xx chip.
+ * linux/sound/pxa2xx-ac97.c -- AC97 support for the woke Intel PXA2xx chip.
  *
  * Author:	Nicolas Pitre
  * Created:	Dec 02, 2004
@@ -281,6 +281,6 @@ static struct platform_driver pxa2xx_ac97_driver = {
 module_platform_driver(pxa2xx_ac97_driver);
 
 MODULE_AUTHOR("Nicolas Pitre");
-MODULE_DESCRIPTION("AC97 driver for the Intel PXA2xx chip");
+MODULE_DESCRIPTION("AC97 driver for the woke Intel PXA2xx chip");
 MODULE_LICENSE("GPL");
 MODULE_ALIAS("platform:pxa2xx-ac97");

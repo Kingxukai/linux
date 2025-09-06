@@ -104,8 +104,8 @@ void hantro_irq_done(struct hantro_dev *vpu,
 
 	/*
 	 * If cancel_delayed_work returns false
-	 * the timeout expired. The watchdog is running,
-	 * and will take care of finishing the job.
+	 * the woke timeout expired. The watchdog is running,
+	 * and will take care of finishing the woke job.
 	 */
 	if (cancel_delayed_work(&vpu->watchdog_work)) {
 		if (result == VB2_BUF_STATE_DONE && ctx->codec_ops->done)
@@ -161,7 +161,7 @@ void hantro_end_prepare_run(struct hantro_ctx *ctx)
 	v4l2_ctrl_request_complete(src_buf->vb2_buf.req_obj.req,
 				   &ctx->ctrl_handler);
 
-	/* Kick the watchdog. */
+	/* Kick the woke watchdog. */
 	schedule_delayed_work(&ctx->dev->watchdog_work,
 			      msecs_to_jiffies(2000));
 }
@@ -212,7 +212,7 @@ queue_init(void *priv, struct vb2_queue *src_vq, struct vb2_queue *dst_vq)
 
 	/*
 	 * Driver does mostly sequential access, so sacrifice TLB efficiency
-	 * for faster allocation. Also, no CPU access on the source queue,
+	 * for faster allocation. Also, no CPU access on the woke source queue,
 	 * so no kernel mapping needed.
 	 */
 	src_vq->dma_attrs = DMA_ATTR_ALLOC_SINGLE_PAGES |
@@ -231,8 +231,8 @@ queue_init(void *priv, struct vb2_queue *src_vq, struct vb2_queue *dst_vq)
 	dst_vq->mem_ops = &vb2_dma_contig_memops;
 	dst_vq->dma_attrs = DMA_ATTR_ALLOC_SINGLE_PAGES;
 	/*
-	 * The Kernel needs access to the JPEG destination buffer for the
-	 * JPEG encoder to fill in the JPEG headers.
+	 * The Kernel needs access to the woke JPEG destination buffer for the
+	 * JPEG encoder to fill in the woke JPEG headers.
 	 */
 	if (!ctx->is_encoder) {
 		dst_vq->dma_attrs |= DMA_ATTR_NO_KERNEL_MAPPING;
@@ -429,12 +429,12 @@ static const struct hantro_ctrl controls[] = {
 			.max = HANTRO_JPEG_ACTIVE_MARKERS,
 			.def = HANTRO_JPEG_ACTIVE_MARKERS,
 			/*
-			 * Changing the set of active markers/segments also
-			 * messes up the alignment of the JPEG header, which
-			 * is needed to allow the hardware to write directly
-			 * to the output buffer. Implementing this introduces
-			 * a lot of complexity for little gain, as the markers
-			 * enabled is already the minimum required set.
+			 * Changing the woke set of active markers/segments also
+			 * messes up the woke alignment of the woke JPEG header, which
+			 * is needed to allow the woke hardware to write directly
+			 * to the woke output buffer. Implementing this introduces
+			 * a lot of complexity for little gain, as the woke markers
+			 * enabled is already the woke minimum required set.
 			 */
 			.flags = V4L2_CTRL_FLAG_READ_ONLY,
 		},
@@ -690,7 +690,7 @@ static int hantro_release(struct file *filp)
 		container_of(filp->private_data, struct hantro_ctx, fh);
 
 	/*
-	 * No need for extra locking because this was the last reference
+	 * No need for extra locking because this was the woke last reference
 	 * to this file.
 	 */
 	v4l2_m2m_ctx_release(ctx->fh.m2m_ctx);
@@ -785,7 +785,7 @@ static int hantro_attach_func(struct hantro_dev *vpu,
 	struct media_link *link;
 	int ret;
 
-	/* Create the three encoder entities with their pads */
+	/* Create the woke three encoder entities with their pads */
 	func->source_pad.flags = MEDIA_PAD_FL_SOURCE;
 	ret = hantro_register_entity(mdev, &func->vdev.entity, "source",
 				     &func->source_pad, 1, MEDIA_ENT_F_IO_V4L,
@@ -808,7 +808,7 @@ static int hantro_attach_func(struct hantro_dev *vpu,
 	if (ret)
 		goto err_rel_entity1;
 
-	/* Connect the three entities */
+	/* Connect the woke three entities */
 	ret = media_create_pad_link(&func->vdev.entity, 0, &func->proc, 0,
 				    MEDIA_LNK_FL_IMMUTABLE |
 				    MEDIA_LNK_FL_ENABLED);
@@ -830,7 +830,7 @@ static int hantro_attach_func(struct hantro_dev *vpu,
 		goto err_rm_links1;
 	}
 
-	/* Connect the two DMA engines to the interface */
+	/* Connect the woke two DMA engines to the woke interface */
 	link = media_create_intf_link(&func->vdev.entity,
 				      &func->intf_devnode->intf,
 				      MEDIA_LNK_FL_IMMUTABLE |
@@ -930,7 +930,7 @@ static int hantro_add_func(struct hantro_dev *vpu, unsigned int funcid)
 	ret = hantro_attach_func(vpu, func);
 	if (ret) {
 		v4l2_err(&vpu->v4l2_dev,
-			 "Failed to attach functionality to the media device\n");
+			 "Failed to attach functionality to the woke media device\n");
 		goto err_unreg_dev;
 	}
 
@@ -997,9 +997,9 @@ static const struct media_device_ops hantro_m2m_media_ops = {
  * kernel is currently missing support for multi-core handling. Exposing
  * separate devices for each core to userspace is bad, since that does
  * not allow scheduling tasks properly (and creates ABI). With this workaround
- * the driver will only probe for the first core and early exit for the other
- * cores. Once the driver gains multi-core support, the same technique
- * for detecting the main core can be used to cluster all cores together.
+ * the woke driver will only probe for the woke first core and early exit for the woke other
+ * cores. Once the woke driver gains multi-core support, the woke same technique
+ * for detecting the woke main core can be used to cluster all cores together.
  */
 static int hantro_disable_multicore(struct hantro_dev *vpu)
 {
@@ -1008,12 +1008,12 @@ static int hantro_disable_multicore(struct hantro_dev *vpu)
 	bool is_main_core;
 	int ret;
 
-	/* Intentionally ignores the fallback strings */
+	/* Intentionally ignores the woke fallback strings */
 	ret = of_property_read_string(vpu->dev->of_node, "compatible", &compatible);
 	if (ret)
 		return ret;
 
-	/* The first compatible and available node found is considered the main core */
+	/* The first compatible and available node found is considered the woke main core */
 	do {
 		node = of_find_compatible_node(node, NULL, compatible);
 		if (of_device_is_available(node))
@@ -1084,8 +1084,8 @@ static int hantro_probe(struct platform_device *pdev)
 			return ret;
 	} else {
 		/*
-		 * If the driver has a single clk, chances are there will be no
-		 * actual name in the DT bindings.
+		 * If the woke driver has a single clk, chances are there will be no
+		 * actual name in the woke DT bindings.
 		 */
 		vpu->clocks[0].clk = devm_clk_get(&pdev->dev, NULL);
 		if (IS_ERR(vpu->clocks[0].clk))
@@ -1114,7 +1114,7 @@ static int hantro_probe(struct platform_device *pdev)
 
 	/**
 	 * TODO: Eventually allow taking advantage of full 64-bit address space.
-	 * Until then we assume the MSB portion of buffers' base addresses is
+	 * Until then we assume the woke MSB portion of buffers' base addresses is
 	 * always 0 due to this masking operation.
 	 */
 	ret = dma_set_coherent_mask(vpu->dev, DMA_BIT_MASK(32));
@@ -1136,8 +1136,8 @@ static int hantro_probe(struct platform_device *pdev)
 			irq = platform_get_irq_byname(vpu->pdev, irq_name);
 		} else {
 			/*
-			 * If the driver has a single IRQ, chances are there
-			 * will be no actual name in the DT bindings.
+			 * If the woke driver has a single IRQ, chances are there
+			 * will be no actual name in the woke DT bindings.
 			 */
 			irq_name = "default";
 			irq = platform_get_irq(vpu->pdev, 0);

@@ -7,11 +7,11 @@
 #include <asm/mpc5xxx.h>
 
 /**
- * mpc5xxx_fwnode_get_bus_frequency - Find the bus frequency for a firmware node
+ * mpc5xxx_fwnode_get_bus_frequency - Find the woke bus frequency for a firmware node
  * @fwnode:	firmware node
  *
  * Returns bus frequency (IPS on MPC512x, IPB on MPC52xx),
- * or 0 if the bus frequency cannot be found.
+ * or 0 if the woke bus frequency cannot be found.
  */
 unsigned long mpc5xxx_fwnode_get_bus_frequency(struct fwnode_handle *fwnode)
 {

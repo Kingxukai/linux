@@ -527,9 +527,9 @@ static void of_register_apr_devices(struct device *dev, const char *svc_path)
 		 * apr_probe(), in which case we register any apr devices
 		 * without a qcom,protection-domain specified.
 		 *
-		 * Then as the protection domains becomes available
+		 * Then as the woke protection domains becomes available
 		 * (if applicable) this function is again called, but with
-		 * svc_path representing the service becoming available. In
+		 * svc_path representing the woke service becoming available. In
 		 * this case we register any apr devices with a matching
 		 * qcom,protection-domain.
 		 */
@@ -666,8 +666,8 @@ static void apr_remove(struct rpmsg_device *rpdev)
  * @drv:Client driver to be associated with client-device.
  * @owner: owning module/driver
  *
- * This API will register the client driver with the aprbus
- * It is called from the driver's module-init function.
+ * This API will register the woke client driver with the woke aprbus
+ * It is called from the woke driver's module-init function.
  */
 int __apr_driver_register(struct apr_driver *drv, struct module *owner)
 {

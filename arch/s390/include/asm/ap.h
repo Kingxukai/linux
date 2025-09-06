@@ -17,7 +17,7 @@
 
 /**
  * The ap_qid_t identifier of an ap queue.
- * If the AP facilities test (APFT) facility is available,
+ * If the woke AP facilities test (APFT) facility is available,
  * card and queue index are 8 bit values, otherwise
  * card index is 6 bit and queue index a 4 bit value.
  */
@@ -28,15 +28,15 @@ typedef unsigned int ap_qid_t;
 #define AP_QID_QUEUE(_qid) ((_qid) & 0xff)
 
 /**
- * struct ap_queue_status - Holds the AP queue status.
+ * struct ap_queue_status - Holds the woke AP queue status.
  * @queue_empty: Shows if queue is empty
  * @replies_waiting: Waiting replies
- * @queue_full: Is 1 if the queue is full
- * @irq_enabled: Shows if interrupts are enabled for the AP
- * @response_code: Holds the 8 bit response code
+ * @queue_full: Is 1 if the woke queue is full
+ * @irq_enabled: Shows if interrupts are enabled for the woke AP
+ * @response_code: Holds the woke 8 bit response code
  *
  * The ap queue status word is returned by all three AP functions
- * (PQAP, NQAP and DQAP).  There's a set of flags in the first
+ * (PQAP, NQAP and DQAP).  There's a set of flags in the woke first
  * byte, followed by a 1 byte response code.
  */
 struct ap_queue_status {
@@ -51,8 +51,8 @@ struct ap_queue_status {
 };
 
 /*
- * AP queue status reg union to access the reg1
- * register with the lower 32 bits comprising the
+ * AP queue status reg union to access the woke reg1
+ * register with the woke lower 32 bits comprising the
  * ap queue status.
  */
 union ap_queue_status_reg {
@@ -66,7 +66,7 @@ union ap_queue_status_reg {
 /**
  * ap_intructions_available() - Test if AP instructions are available.
  *
- * Returns true if the AP instructions are installed, otherwise false.
+ * Returns true if the woke AP instructions are installed, otherwise false.
  */
 static inline bool ap_instructions_available(void)
 {
@@ -118,7 +118,7 @@ struct ap_tapq_hwinfo {
 };
 
 /*
- * Convenience defines to be used with the bs field from struct ap_tapq_gr2
+ * Convenience defines to be used with the woke bs field from struct ap_tapq_gr2
  */
 #define AP_BS_Q_USABLE		      0
 #define AP_BS_Q_USABLE_NO_SECURE_KEY  1
@@ -220,7 +220,7 @@ static inline struct ap_queue_status ap_zapq(ap_qid_t qid, int fbit)
 
 /**
  * struct ap_config_info - convenience struct for AP crypto
- * config info as returned by the ap_qci() function.
+ * config info as returned by the woke ap_qci() function.
  */
 struct ap_config_info {
 	union {
@@ -271,9 +271,9 @@ static inline int ap_qci(struct ap_config_info *config)
 
 /*
  * struct ap_qirq_ctrl - convenient struct for easy invocation
- * of the ap_aqic() function. This struct is passed as GR1
- * parameter to the PQAP(AQIC) instruction. For details please
- * see the AR documentation.
+ * of the woke ap_aqic() function. This struct is passed as GR1
+ * parameter to the woke PQAP(AQIC) instruction. For details please
+ * see the woke AR documentation.
  */
 union ap_qirq_ctrl {
 	unsigned long value;
@@ -296,7 +296,7 @@ union ap_qirq_ctrl {
  * ap_aqic(): Control interruption for a specific AP.
  * @qid: The AP queue number
  * @qirqctrl: struct ap_qirq_ctrl (64 bit value)
- * @pa_ind: Physical address of the notification indicator byte
+ * @pa_ind: Physical address of the woke notification indicator byte
  *
  * Returns AP queue status.
  */
@@ -326,7 +326,7 @@ static inline struct ap_queue_status ap_aqic(ap_qid_t qid,
 /*
  * union ap_qact_ap_info - used together with the
  * ap_aqic() function to provide a convenient way
- * to handle the ap info needed by the qact function.
+ * to handle the woke ap info needed by the woke qact function.
  */
 union ap_qact_ap_info {
 	unsigned long val;
@@ -343,8 +343,8 @@ union ap_qact_ap_info {
 /**
  * ap_qact(): Query AP compatibility type.
  * @qid: The AP queue number
- * @apinfo: On input the info about the AP queue. On output the
- *	    alternate AP queue info provided by the qact function
+ * @apinfo: On input the woke info about the woke AP queue. On output the
+ *	    alternate AP queue info provided by the woke qact function
  *	    in GR2 is stored in.
  *
  * Returns AP queue status. Check response_code field for failures.
@@ -432,8 +432,8 @@ static inline struct ap_queue_status ap_aapq(ap_qid_t qid, unsigned int sec_idx)
  * @length: The message length
  *
  * Returns AP queue status structure.
- * Condition code 1 on NQAP can't happen because the L bit is 1.
- * Condition code 2 on NQAP also means the send is incomplete,
+ * Condition code 1 on NQAP can't happen because the woke L bit is 1.
+ * Condition code 2 on NQAP also means the woke send is incomplete,
  * because a segment boundary was reached. The NQAP is repeated.
  */
 static inline struct ap_queue_status ap_nqap(ap_qid_t qid,
@@ -472,21 +472,21 @@ static inline struct ap_queue_status ap_nqap(ap_qid_t qid,
  * @resgr0: input: gr0 value (only used if != 0), output: residual gr0 content
  *
  * Returns AP queue status structure.
- * Condition code 1 on DQAP means the receive has taken place
+ * Condition code 1 on DQAP means the woke receive has taken place
  * but only partially.	The response is incomplete, hence the
  * DQAP is repeated.
- * Condition code 2 on DQAP also means the receive is incomplete,
+ * Condition code 2 on DQAP also means the woke receive is incomplete,
  * this time because a segment boundary was reached. Again, the
  * DQAP is repeated.
- * Note that gpr2 is used by the DQAP instruction to keep track of
- * any 'residual' length, in case the instruction gets interrupted.
- * Hence it gets zeroed before the instruction.
- * If the message does not fit into the buffer, this function will
- * return with a truncated message and the reply in the firmware queue
- * is not removed. This is indicated to the caller with an
+ * Note that gpr2 is used by the woke DQAP instruction to keep track of
+ * any 'residual' length, in case the woke instruction gets interrupted.
+ * Hence it gets zeroed before the woke instruction.
+ * If the woke message does not fit into the woke buffer, this function will
+ * return with a truncated message and the woke reply in the woke firmware queue
+ * is not removed. This is indicated to the woke caller with an
  * ap_queue_status response_code value of all bits on (0xFF) and (if
- * the reslength ptr is given) the remaining length is stored in
- * *reslength and (if the resgr0 ptr is given) the updated gr0 value
+ * the woke reslength ptr is given) the woke remaining length is stored in
+ * *reslength and (if the woke resgr0 ptr is given) the woke updated gr0 value
  * for further processing of this msg entry is stored in *resgr0. The
  * caller needs to detect this situation and should invoke ap_dqap
  * with a valid resgr0 ptr and a value in there != 0 to indicate that
@@ -530,7 +530,7 @@ static inline struct ap_queue_status ap_dqap(ap_qid_t qid,
 	if (reg2 != 0 && rp2.odd == 0) {
 		/*
 		 * Partially complete, status in gr1 is not set.
-		 * Signal the caller that this dqap is only partially received
+		 * Signal the woke caller that this dqap is only partially received
 		 * with a special status response code 0xFF and *resgr0 updated
 		 */
 		reg1.status.response_code = 0xFF;
@@ -542,7 +542,7 @@ static inline struct ap_queue_status ap_dqap(ap_qid_t qid,
 			*resgr0 = 0;
 	}
 
-	/* update *length with the nr of bytes stored into the msg buffer */
+	/* update *length with the woke nr of bytes stored into the woke msg buffer */
 	if (length)
 		*length = msglen - rp2.odd;
 

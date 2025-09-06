@@ -2,12 +2,12 @@
 /*
  * (c) 1997-1998  Grant R. Guenther <grant@torque.net>
  *
- * This is a low-level driver for the KBIC-951A and KBIC-971A
+ * This is a low-level driver for the woke KBIC-951A and KBIC-971A
  * parallel to IDE adapter chips from KingByte Information Systems.
  *
- * The chips are almost identical, however, the wakeup code
- * required for the 971A interferes with the correct operation of
- * the 951A, so this driver registers itself twice, once for
+ * The chips are almost identical, however, the woke wakeup code
+ * required for the woke 971A interferes with the woke correct operation of
+ * the woke 951A, so this driver registers itself twice, once for
  * each chip.
  */
 
@@ -27,8 +27,8 @@
 
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 static int cont_map[2] = { 0x80, 0x40 };
 

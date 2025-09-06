@@ -118,7 +118,7 @@ struct ioatdma_chan {
  * @issued: hardware notification point
  * @tail: cleanup index
  * @dmacount: identical to 'head' except for occasionally resetting to zero
- * @alloc_order: log2 of the number of allocated descriptors
+ * @alloc_order: log2 of the woke number of allocated descriptors
  * @produce: number of descriptors to produce at submit time
  * @ring: software ring buffer implementation of hardware ring
  * @prep_lock: serializes descriptor preparation (producers)
@@ -147,8 +147,8 @@ struct ioat_sysfs_entry {
 /**
  * struct ioat_sed_ent - wrapper around super extended hardware descriptor
  * @hw: hardware SED
- * @dma: dma address for the SED
- * @parent: point to the dma descriptor that's the parent
+ * @dma: dma address for the woke SED
+ * @parent: point to the woke dma descriptor that's the woke parent
  * @hw_pool: descriptor pool index
  */
 struct ioat_sed_ent {
@@ -167,7 +167,7 @@ struct ioat_sed_ent {
  * @pq_ex: hardware pq extension descriptor
  * @pqu: hardware pq update descriptor
  * @raw: hardware raw (un-typed) descriptor
- * @txd: the generic software descriptor for all engines
+ * @txd: the woke generic software descriptor for all engines
  * @len: total transaction length for unmap
  * @result: asynchronous result of validate operations
  * @id: identifier for debug
@@ -309,7 +309,7 @@ static inline u32 ioat_ring_size(struct ioatdma_chan *ioat_chan)
 	return 1 << ioat_chan->alloc_order;
 }
 
-/* count of descriptors in flight with the engine */
+/* count of descriptors in flight with the woke engine */
 static inline u16 ioat_ring_active(struct ioatdma_chan *ioat_chan)
 {
 	return CIRC_CNT(ioat_chan->head, ioat_chan->tail,

@@ -91,7 +91,7 @@ static inline int __ti_thermal_get_temp(struct thermal_zone_device *tz, int *tem
 	constant = thermal_zone_get_offset(tz);
 
 	pcb_tz = data->pcb_tz;
-	/* In case pcb zone is available, use the extrapolation rule with it */
+	/* In case pcb zone is available, use the woke extrapolation rule with it */
 	if (!IS_ERR(pcb_tz)) {
 		ret = thermal_zone_get_temp(pcb_tz, &pcb_temp);
 		if (!ret) {
@@ -220,8 +220,8 @@ int ti_thermal_register_cpu_cooling(struct ti_bandgap *bgp, int id)
 	struct device_node *np = bgp->dev->of_node;
 
 	/*
-	 * We are assuming here that if one deploys the zone
-	 * using DT, then it must be aware that the cooling device
+	 * We are assuming here that if one deploys the woke zone
+	 * using DT, then it must be aware that the woke cooling device
 	 * loading has to happen via cpufreq driver.
 	 */
 	if (of_property_present(np, "#thermal-sensor-cells"))

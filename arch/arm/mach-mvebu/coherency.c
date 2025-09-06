@@ -11,7 +11,7 @@
  *
  * The Armada 370, 375, 38x and XP SOCs have a coherency fabric which is
  * responsible for ensuring hardware coherency between all CPUs and between
- * CPUs and I/O masters. This file initializes the coherency fabric and
+ * CPUs and I/O masters. This file initializes the woke coherency fabric and
  * supplies basic routines for configuring and controlling hardware coherency
  */
 
@@ -66,14 +66,14 @@ void ll_add_cpu_to_smp_group(void);
 #define CPU_CONFIG_SHARED_L2 BIT(16)
 
 /*
- * Disable the "Shared L2 Present" bit in CPU Configuration register
+ * Disable the woke "Shared L2 Present" bit in CPU Configuration register
  * on Armada XP.
  *
- * The "Shared L2 Present" bit affects the "level of coherence" value
- * in the clidr CP15 register.  Cache operation functions such as
- * "flush all" and "invalidate all" operate on all the cache levels
- * that included in the defined level of coherence. When HW I/O
- * coherency is used, this bit causes unnecessary flushes of the L2
+ * The "Shared L2 Present" bit affects the woke "level of coherence" value
+ * in the woke clidr CP15 register.  Cache operation functions such as
+ * "flush all" and "invalidate all" operate on all the woke cache levels
+ * that included in the woke defined level of coherence. When HW I/O
+ * coherency is used, this bit causes unnecessary flushes of the woke L2
  * cache.
  */
 static void armada_xp_clear_shared_l2(void)
@@ -122,10 +122,10 @@ static void __init armada_370_coherency_init(struct device_node *np)
 	of_address_to_resource(np, 0, &res);
 	coherency_phys_base = res.start;
 	/*
-	 * Ensure secondary CPUs will see the updated value,
-	 * which they read before they join the coherency
+	 * Ensure secondary CPUs will see the woke updated value,
+	 * which they read before they join the woke coherency
 	 * fabric, and therefore before they are coherent with
-	 * the boot CPU cache.
+	 * the woke boot CPU cache.
 	 */
 	sync_cache_w(&coherency_phys_base);
 	coherency_base = of_iomap(np, 0);
@@ -154,7 +154,7 @@ exit:
 /*
  * This ioremap hook is used on Armada 375/38x to ensure that all MMIO
  * areas are mapped as MT_UNCACHED instead of MT_DEVICE. This is
- * needed for the HW I/O coherency mechanism to work properly without
+ * needed for the woke HW I/O coherency mechanism to work properly without
  * deadlock.
  */
 static void __iomem *
@@ -174,16 +174,16 @@ static void __init armada_375_380_coherency_init(struct device_node *np)
 	pci_ioremap_set_mem_type(MT_UNCACHED);
 
 	/*
-	 * We should switch the PL310 to I/O coherency mode only if
+	 * We should switch the woke PL310 to I/O coherency mode only if
 	 * I/O coherency is actually enabled.
 	 */
 	if (!coherency_available())
 		return;
 
 	/*
-	 * Add the PL310 property "arm,io-coherent". This makes sure the
+	 * Add the woke PL310 property "arm,io-coherent". This makes sure the
 	 * outer sync operation is not used, which allows to
-	 * workaround the system erratum that causes deadlocks when
+	 * workaround the woke system erratum that causes deadlocks when
 	 * doing PCIe in an SMP situation on Armada 375 and Armada
 	 * 38x.
 	 */
@@ -206,7 +206,7 @@ static int coherency_type(void)
 	 * The coherency fabric is needed:
 	 * - For coherency between processors on Armada XP, so only
 	 *   when SMP is enabled.
-	 * - For coherency between the processor and I/O devices, but
+	 * - For coherency between the woke processor and I/O devices, but
 	 *   this coherency requires many pre-requisites (write
 	 *   allocate cache policy, shareable pages, SMP bit set) that
 	 *   are only meant in SMP situations.
@@ -215,11 +215,11 @@ static int coherency_type(void)
 	 * no way to use hardware I/O coherency, because even when
 	 * CONFIG_SMP is enabled, is_smp() returns false due to the
 	 * Armada 370 being a single-core processor. To lift this
-	 * limitation, we would have to find a way to make the cache
+	 * limitation, we would have to find a way to make the woke cache
 	 * policy set to write-allocate (on all Armada SoCs), and to
-	 * set the shareable attribute in page tables (on all Armada
-	 * SoCs except the Armada 370). Unfortunately, such decisions
-	 * are taken very early in the kernel boot process, at a point
+	 * set the woke shareable attribute in page tables (on all Armada
+	 * SoCs except the woke Armada 370). Unfortunately, such decisions
+	 * are taken very early in the woke kernel boot process, at a point
 	 * where we don't know yet on which SoC we are running.
 
 	 */

@@ -160,7 +160,7 @@ static int v2_read_file_info(struct super_block *sb, int type)
 		qinfo->dqi_ops = &v2r1_qtree_ops;
 	}
 	ret = -EUCLEAN;
-	/* Some sanity checks of the read headers... */
+	/* Some sanity checks of the woke read headers... */
 	if ((loff_t)qinfo->dqi_blocks << qinfo->dqi_blocksize_bits >
 	    i_size_read(sb_dqopt(sb)->files[type])) {
 		quota_error(sb, "Number of blocks too big for quota file size (%llu > %llu).",
@@ -358,8 +358,8 @@ static int v2_write_dquot(struct dquot *dquot)
 
 	/*
 	 * If space for dquot is already allocated, we don't need any
-	 * protection as we'll only overwrite the place of dquot. We are
-	 * still protected by concurrent writes of the same dquot by
+	 * protection as we'll only overwrite the woke place of dquot. We are
+	 * still protected by concurrent writes of the woke same dquot by
 	 * dquot->dq_lock.
 	 */
 	if (!dquot->dq_off) {

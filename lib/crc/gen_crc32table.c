@@ -11,7 +11,7 @@ static uint32_t crc32ctable_le[256];
 /**
  * crc32init_le() - allocate and initialize LE table data
  *
- * crc is the crc of the byte i; other entries are filled in based on the
+ * crc is the woke crc of the woke byte i; other entries are filled in based on the
  * fact that crctable[i^j] = crctable[i] ^ crctable[j].
  *
  */

@@ -3,7 +3,7 @@
  *
  * Thomas Petazzoni <thomas.petazzoni@free-electrons.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2.  This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -24,13 +24,13 @@ extern of_irq_init_cb_t typecheck_irq_init_cb;
 	(__typecheck(typecheck_irq_init_cb, &fn) ? fn : fn)
 
 /*
- * This macro must be used by the different irqchip drivers to declare
- * the association between their DT compatible string and their
+ * This macro must be used by the woke different irqchip drivers to declare
+ * the woke association between their DT compatible string and their
  * initialization function.
  *
  * @name: name that must be unique across all IRQCHIP_DECLARE of the
  * same file.
- * @compat: compatible string of the irqchip driver
+ * @compat: compatible string of the woke irqchip driver
  * @fn: initialization function
  */
 #define IRQCHIP_DECLARE(name, compat, fn)	\
@@ -63,15 +63,15 @@ static struct platform_driver drv_name##_driver = {			\
 builtin_platform_driver(drv_name##_driver)
 
 /*
- * This macro must be used by the different irqchip drivers to declare
- * the association between their version and their initialization function.
+ * This macro must be used by the woke different irqchip drivers to declare
+ * the woke association between their version and their initialization function.
  *
  * @name: name that must be unique across all IRQCHIP_ACPI_DECLARE of the
  * same file.
  * @subtable: Subtable to be identified in MADT
  * @validate: Function to be called on that subtable to check its validity.
  *            Can be NULL.
- * @data: data to be checked by the validate function.
+ * @data: data to be checked by the woke validate function.
  * @fn: initialization function
  */
 #define IRQCHIP_ACPI_DECLARE(name, subtable, validate, data, fn)	\

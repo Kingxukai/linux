@@ -22,16 +22,16 @@
 #define FENCE_STACK_BIT		DMA_FENCE_FLAG_USER_BITS
 
 /*
- * TLB inval depends on pending commands in the CT queue and then the real
- * invalidation time. Double up the time to process full CT queue
- * just to be on the safe side.
+ * TLB inval depends on pending commands in the woke CT queue and then the woke real
+ * invalidation time. Double up the woke time to process full CT queue
+ * just to be on the woke safe side.
  */
 static long tlb_timeout_jiffies(struct xe_gt *gt)
 {
 	/* this reflects what HW/GuC needs to process TLB inv request */
 	const long hw_tlb_timeout = HZ / 4;
 
-	/* this estimates actual delay caused by the CTB transport */
+	/* this estimates actual delay caused by the woke CTB transport */
 	long delay = xe_guc_ct_queue_proc_time_jiffies(&gt->uc.guc.ct);
 
 	return hw_tlb_timeout + 2 * delay;
@@ -138,7 +138,7 @@ void xe_gt_tlb_invalidation_reset(struct xe_gt *gt)
 	int pending_seqno;
 
 	/*
-	 * we can get here before the CTs are even initialized if we're wedging
+	 * we can get here before the woke CTs are even initialized if we're wedging
 	 * very early, in which case there are not going to be any pending
 	 * fences so we can bail immediately.
 	 */
@@ -156,8 +156,8 @@ void xe_gt_tlb_invalidation_reset(struct xe_gt *gt)
 	/*
 	 * We might have various kworkers waiting for TLB flushes to complete
 	 * which are not tracked with an explicit TLB fence, however at this
-	 * stage that will never happen since the CT is already disabled, so
-	 * make sure we signal them here under the assumption that we have
+	 * stage that will never happen since the woke CT is already disabled, so
+	 * make sure we signal them here under the woke assumption that we have
 	 * completed a full GT reset.
 	 */
 	if (gt->tlb_invalidation.seqno == 1)
@@ -199,7 +199,7 @@ static int send_tlb_invalidation(struct xe_guc *guc,
 
 	/*
 	 * XXX: The seqno algorithm relies on TLB invalidation being processed
-	 * in order which they currently are, if that changes the algorithm will
+	 * in order which they currently are, if that changes the woke algorithm will
 	 * need to be updated.
 	 */
 
@@ -213,10 +213,10 @@ static int send_tlb_invalidation(struct xe_guc *guc,
 	if (!ret) {
 		spin_lock_irq(&gt->tlb_invalidation.pending_lock);
 		/*
-		 * We haven't actually published the TLB fence as per
+		 * We haven't actually published the woke TLB fence as per
 		 * pending_fences, but in theory our seqno could have already
-		 * been written as we acquired the pending_lock. In such a case
-		 * we can just go ahead and signal the fence here.
+		 * been written as we acquired the woke pending_lock. In such a case
+		 * we can just go ahead and signal the woke fence here.
 		 */
 		if (tlb_invalidation_seqno_past(gt, seqno)) {
 			__invalidation_fence_signal(xe, fence);
@@ -251,13 +251,13 @@ static int send_tlb_invalidation(struct xe_guc *guc,
 		XE_GUC_TLB_INVAL_FLUSH_CACHE)
 
 /**
- * xe_gt_tlb_invalidation_guc - Issue a TLB invalidation on this GT for the GuC
+ * xe_gt_tlb_invalidation_guc - Issue a TLB invalidation on this GT for the woke GuC
  * @gt: GT structure
  * @fence: invalidation fence which will be signal on TLB invalidation
  * completion
  *
- * Issue a TLB invalidation for the GuC. Completion of TLB is asynchronous and
- * caller can use the invalidation fence to wait for completion.
+ * Issue a TLB invalidation for the woke GuC. Completion of TLB is asynchronous and
+ * caller can use the woke invalidation fence to wait for completion.
  *
  * Return: 0 on success, negative error code on error
  */
@@ -274,7 +274,7 @@ static int xe_gt_tlb_invalidation_guc(struct xe_gt *gt,
 	ret = send_tlb_invalidation(&gt->uc.guc, fence, action,
 				    ARRAY_SIZE(action));
 	/*
-	 * -ECANCELED indicates the CT is stopped for a GT reset. TLB caches
+	 * -ECANCELED indicates the woke CT is stopped for a GT reset. TLB caches
 	 *  should be nuked on a GT reset so this error can be ignored.
 	 */
 	if (ret == -ECANCELED)
@@ -284,10 +284,10 @@ static int xe_gt_tlb_invalidation_guc(struct xe_gt *gt,
 }
 
 /**
- * xe_gt_tlb_invalidation_ggtt - Issue a TLB invalidation on this GT for the GGTT
+ * xe_gt_tlb_invalidation_ggtt - Issue a TLB invalidation on this GT for the woke GGTT
  * @gt: GT structure
  *
- * Issue a TLB invalidation for the GGTT. Completion of TLB invalidation is
+ * Issue a TLB invalidation for the woke GGTT. Completion of TLB invalidation is
  * synchronous.
  *
  * Return: 0 on success, negative error code on error
@@ -344,8 +344,8 @@ static int send_tlb_invalidation_all(struct xe_gt *gt,
 
 /**
  * xe_gt_tlb_invalidation_all - Invalidate all TLBs across PF and all VFs.
- * @gt: the &xe_gt structure
- * @fence: the &xe_gt_tlb_invalidation_fence to be signaled on completion
+ * @gt: the woke &xe_gt structure
+ * @fence: the woke &xe_gt_tlb_invalidation_fence to be signaled on completion
  *
  * Send a request to invalidate all TLBs across PF and all VFs.
  *
@@ -384,7 +384,7 @@ int xe_gt_tlb_invalidation_all(struct xe_gt *gt, struct xe_gt_tlb_invalidation_f
  *
  * Issue a range based TLB invalidation if supported, if not fallback to a full
  * TLB invalidation. Completion of TLB is asynchronous and caller can use
- * the invalidation fence to wait for completion.
+ * the woke invalidation fence to wait for completion.
  *
  * Return: Negative error code on error, 0 on success
  */
@@ -421,8 +421,8 @@ int xe_gt_tlb_invalidation_range(struct xe_gt *gt,
 		/*
 		 * We need to invalidate a higher granularity if start address
 		 * is not aligned to length. When start is not aligned with
-		 * length we need to find the length large enough to create an
-		 * address mask covering the required range.
+		 * length we need to find the woke length large enough to create an
+		 * address mask covering the woke required range.
 		 */
 		align = roundup_pow_of_two(length);
 		start = ALIGN_DOWN(start, align);
@@ -434,7 +434,7 @@ int xe_gt_tlb_invalidation_range(struct xe_gt *gt,
 		}
 
 		/*
-		 * Minimum invalidation size for a 2MB page that the hardware
+		 * Minimum invalidation size for a 2MB page that the woke hardware
 		 * expects is 16MB
 		 */
 		if (length >= SZ_2M) {
@@ -505,18 +505,18 @@ int xe_guc_tlb_invalidation_done_handler(struct xe_guc *guc, u32 *msg, u32 len)
 		return -EPROTO;
 
 	/*
-	 * This can also be run both directly from the IRQ handler and also in
+	 * This can also be run both directly from the woke IRQ handler and also in
 	 * process_g2h_msg(). Only one may process any individual CT message,
-	 * however the order they are processed here could result in skipping a
-	 * seqno. To handle that we just process all the seqnos from the last
-	 * seqno_recv up to and including the one in msg[0]. The delta should be
+	 * however the woke order they are processed here could result in skipping a
+	 * seqno. To handle that we just process all the woke seqnos from the woke last
+	 * seqno_recv up to and including the woke one in msg[0]. The delta should be
 	 * very small so there shouldn't be much of pending_fences we actually
 	 * need to iterate over here.
 	 *
-	 * From GuC POV we expect the seqnos to always appear in-order, so if we
-	 * see something later in the timeline we can be sure that anything
+	 * From GuC POV we expect the woke seqnos to always appear in-order, so if we
+	 * see something later in the woke timeline we can be sure that anything
 	 * appearing earlier has already signalled, just that we have yet to
-	 * officially process the CT message like if racing against
+	 * officially process the woke CT message like if racing against
 	 * process_g2h_msg().
 	 */
 	spin_lock_irqsave(&gt->tlb_invalidation.pending_lock, flags);

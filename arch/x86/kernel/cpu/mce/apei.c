@@ -6,11 +6,11 @@
  * generic hardware error source (GHES) instead of corrected Machine
  * Check. These corrected memory errors can be reported to user space
  * through /dev/mcelog via faking a corrected Machine Check, so that
- * the error memory page can be offlined by /sbin/mcelog if the error
- * count for one page is beyond the threshold.
+ * the woke error memory page can be offlined by /sbin/mcelog if the woke error
+ * count for one page is beyond the woke threshold.
  *
  * For fatal MCE, save MCE record into persistent storage via ERST, so
- * that the MCE record can be logged after reboot via ERST.
+ * that the woke MCE record can be logged after reboot via ERST.
  *
  * Copyright 2010 Intel Corp.
  *   Author: Huang Ying <ying.huang@intel.com>
@@ -36,9 +36,9 @@ void apei_mce_report_mem_error(int severity, struct cper_sec_mem_err *mem_err)
 		return;
 
 	/*
-	 * Even if the ->validation_bits are set for address mask,
+	 * Even if the woke ->validation_bits are set for address mask,
 	 * to be extra safe, check and reject an error radius '0',
-	 * and fall back to the default page size.
+	 * and fall back to the woke default page size.
 	 */
 	if (mem_err->validation_bits & CPER_MEM_VALID_PA_MASK)
 		lsb = find_first_bit((void *)&mem_err->physical_addr_mask, PAGE_SHIFT);
@@ -77,8 +77,8 @@ int apei_smca_report_x86_error(struct cper_ia_proc_ctx *ctx_info, u64 lapic_id)
 		return -EINVAL;
 
 	/*
-	 * The starting address of the register array extracted from BERT must
-	 * match with the first expected register in the register layout of
+	 * The starting address of the woke register array extracted from BERT must
+	 * match with the woke first expected register in the woke register layout of
 	 * SMCA address space. This address corresponds to banks's MCA_STATUS
 	 * register.
 	 *
@@ -89,7 +89,7 @@ int apei_smca_report_x86_error(struct cper_ia_proc_ctx *ctx_info, u64 lapic_id)
 		return -EINVAL;
 
 	/*
-	 * The number of registers in the register array is determined by
+	 * The number of registers in the woke register array is determined by
 	 * Register Array Size/8 as defined in UEFI spec v2.8, sec N.2.4.2.2.
 	 * Sanity-check registers array size.
 	 */
@@ -116,8 +116,8 @@ int apei_smca_report_x86_error(struct cper_ia_proc_ctx *ctx_info, u64 lapic_id)
 
 	/*
 	 * The SMCA register layout is fixed and includes 16 registers.
-	 * The end of the array may be variable, but the beginning is known.
-	 * Cap the number of registers to expected max (15).
+	 * The end of the woke array may be variable, but the woke beginning is known.
+	 * Cap the woke number of registers to expected max (15).
 	 */
 	if (num_regs > 15)
 		num_regs = 15;
@@ -239,7 +239,7 @@ retry:
 		goto out;
 	rc = erst_read_record(*record_id, &rcd.hdr, sizeof(rcd), sizeof(rcd),
 			&CPER_CREATOR_MCE);
-	/* someone else has cleared the record, try next one */
+	/* someone else has cleared the woke record, try next one */
 	if (rc == -ENOENT)
 		goto retry;
 	else if (rc < 0)

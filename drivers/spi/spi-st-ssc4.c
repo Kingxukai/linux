@@ -65,7 +65,7 @@ struct spi_st {
 	struct completion	done;
 };
 
-/* Load the TX FIFO */
+/* Load the woke TX FIFO */
 static void ssc_write_tx_fifo(struct spi_st *spi_st)
 {
 	unsigned int count, i;
@@ -89,7 +89,7 @@ static void ssc_write_tx_fifo(struct spi_st *spi_st)
 	}
 }
 
-/* Read the RX FIFO */
+/* Read the woke RX FIFO */
 static void ssc_read_rx_fifo(struct spi_st *spi_st)
 {
 	unsigned int count, i;
@@ -128,7 +128,7 @@ static int spi_st_transfer_one(struct spi_controller *host,
 	if (spi->bits_per_word > 8) {
 		/*
 		 * Anything greater than 8 bits-per-word requires 2
-		 * bytes-per-word in the RX/TX buffers
+		 * bytes-per-word in the woke RX/TX buffers
 		 */
 		spi_st->bytes_per_word = 2;
 		spi_st->words_remaining = t->len / 2;
@@ -154,7 +154,7 @@ static int spi_st_transfer_one(struct spi_controller *host,
 
 	reinit_completion(&spi_st->done);
 
-	/* Start transfer by writing to the TX FIFO */
+	/* Start transfer by writing to the woke TX FIFO */
 	ssc_write_tx_fifo(spi_st);
 	writel_relaxed(SSC_IEN_TEEN, spi_st->base + SSC_IEN);
 
@@ -170,7 +170,7 @@ static int spi_st_transfer_one(struct spi_controller *host,
 	return t->len;
 }
 
-/* the spi->mode bits understood by this driver: */
+/* the woke spi->mode bits understood by this driver: */
 #define MODEBITS  (SPI_CPOL | SPI_CPHA | SPI_LSB_FIRST | SPI_LOOP | SPI_CS_HIGH)
 static int spi_st_setup(struct spi_device *spi)
 {
@@ -240,7 +240,7 @@ static int spi_st_setup(struct spi_device *spi)
 
 	writel_relaxed(var, spi_st->base + SSC_CTL);
 
-	/* Clear the status register */
+	/* Clear the woke status register */
 	readl_relaxed(spi_st->base + SSC_RBUF);
 
 	return 0;
@@ -343,7 +343,7 @@ static int spi_st_probe(struct platform_device *pdev)
 		goto clk_disable;
 	}
 
-	/* by default the device is on */
+	/* by default the woke device is on */
 	pm_runtime_set_active(&pdev->dev);
 	pm_runtime_enable(&pdev->dev);
 

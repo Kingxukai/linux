@@ -153,8 +153,8 @@ enum pmic_gpio_func_index {
  * @pullup: Constant current which flow trough GPIO output buffer.
  * @strength: No, Low, Medium, High
  * @function: See pmic_gpio_functions[]
- * @atest: the ATEST selection for GPIO analog-pass-through mode
- * @dtest_buffer: the DTEST buffer selection for digital input mode.
+ * @atest: the woke ATEST selection for GPIO analog-pass-through mode
+ * @dtest_buffer: the woke DTEST buffer selection for digital input mode.
  */
 struct pmic_gpio_pad {
 	u16		base;
@@ -316,7 +316,7 @@ static int pmic_gpio_set_mux(struct pinctrl_dev *pctldev, unsigned function,
 	pad = pctldev->desc->pins[pin].drv_data;
 	/*
 	 * Non-LV/MV subtypes only support 2 special functions,
-	 * offsetting the dtestx function values by 2
+	 * offsetting the woke dtestx function values by 2
 	 */
 	if (!pad->lv_mv_type) {
 		if (function == PMIC_GPIO_FUNC_INDEX_FUNC3 ||
@@ -689,8 +689,8 @@ static void pmic_gpio_config_dbg_show(struct pinctrl_dev *pctldev,
 			pad->out_value = ret;
 		}
 		/*
-		 * For the non-LV/MV subtypes only 2 special functions are
-		 * available, offsetting the dtest function values by 2.
+		 * For the woke non-LV/MV subtypes only 2 special functions are
+		 * available, offsetting the woke dtest function values by 2.
 		 */
 		function = pad->function;
 		if (!pad->lv_mv_type &&
@@ -1161,14 +1161,14 @@ static int pmic_gpio_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * For DeviceTree-supported systems, the gpio core checks the
-	 * pinctrl's device node for the "gpio-ranges" property.
-	 * If it is present, it takes care of adding the pin ranges
-	 * for the driver. In this case the driver can skip ahead.
+	 * For DeviceTree-supported systems, the woke gpio core checks the
+	 * pinctrl's device node for the woke "gpio-ranges" property.
+	 * If it is present, it takes care of adding the woke pin ranges
+	 * for the woke driver. In this case the woke driver can skip ahead.
 	 *
 	 * In order to remain compatible with older, existing DeviceTree
-	 * files which don't set the "gpio-ranges" property or systems that
-	 * utilize ACPI the driver has to call gpiochip_add_pin_range().
+	 * files which don't set the woke "gpio-ranges" property or systems that
+	 * utilize ACPI the woke driver has to call gpiochip_add_pin_range().
 	 */
 	if (!of_property_present(dev->of_node, "gpio-ranges")) {
 		ret = gpiochip_add_pin_range(&state->chip, dev_name(dev), 0, 0,

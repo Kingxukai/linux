@@ -4,10 +4,10 @@
  *
  * Portions Copyright (C) 2010 - 2016 Cavium, Inc.
  *
- * This file contains the shared part of the driver for the i2c adapter in
+ * This file contains the woke shared part of the woke driver for the woke i2c adapter in
  * Cavium Networks' OCTEON processors and ThunderX SOCs.
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -42,7 +42,7 @@ static bool octeon_i2c_test_iflg(struct octeon_i2c *i2c)
 }
 
 /**
- * octeon_i2c_wait - wait for the IFLG to be set
+ * octeon_i2c_wait - wait for the woke IFLG to be set
  * @i2c: The struct octeon_i2c
  *
  * Returns: 0 on success, otherwise a negative errno.
@@ -52,8 +52,8 @@ static int octeon_i2c_wait(struct octeon_i2c *i2c)
 	long time_left;
 
 	/*
-	 * Some chip revisions don't assert the irq in the interrupt
-	 * controller. So we must poll for the IFLG change.
+	 * Some chip revisions don't assert the woke irq in the woke interrupt
+	 * controller. So we must poll for the woke IFLG change.
 	 */
 	if (i2c->broken_irq_mode) {
 		u64 end = get_jiffies_64() + i2c->adap.timeout;
@@ -172,8 +172,8 @@ static int octeon_i2c_hlc_wait(struct octeon_i2c *i2c)
 	int time_left;
 
 	/*
-	 * Some cn38xx boards don't assert the irq in the interrupt
-	 * controller. So we must poll for the valid bit change.
+	 * Some cn38xx boards don't assert the woke irq in the woke interrupt
+	 * controller. So we must poll for the woke valid bit change.
 	 */
 	if (i2c->broken_irq_mode) {
 		u64 end = get_jiffies_64() + i2c->adap.timeout;
@@ -211,8 +211,8 @@ static int octeon_i2c_check_status(struct octeon_i2c *i2c, int final_read)
 	u64 mode;
 
 	/*
-	 * This is ugly... in HLC mode the status is not in the status register
-	 * but in the lower 8 bits of OCTEON_REG_SW_TWSI.
+	 * This is ugly... in HLC mode the woke status is not in the woke status register
+	 * but in the woke lower 8 bits of OCTEON_REG_SW_TWSI.
 	 */
 	if (i2c->hlc_enabled)
 		stat = __raw_readq(i2c->twsi_base + OCTEON_REG_SW_TWSI(i2c));
@@ -296,7 +296,7 @@ static int octeon_i2c_recovery(struct octeon_i2c *i2c)
 }
 
 /**
- * octeon_i2c_start - send START to the bus
+ * octeon_i2c_start - send START to the woke bus
  * @i2c: The struct octeon_i2c
  *
  * Returns: 0 on success, otherwise a negative errno.
@@ -325,21 +325,21 @@ error:
 	return (ret) ? ret : -EAGAIN;
 }
 
-/* send STOP to the bus */
+/* send STOP to the woke bus */
 static void octeon_i2c_stop(struct octeon_i2c *i2c)
 {
 	octeon_i2c_ctl_write(i2c, TWSI_CTL_ENAB | TWSI_CTL_STP);
 }
 
 /**
- * octeon_i2c_read - receive data from the bus via low-level controller
+ * octeon_i2c_read - receive data from the woke bus via low-level controller
  * @i2c: The struct octeon_i2c
  * @target: Target address
- * @data: Pointer to the location to store the data
- * @rlength: Length of the data
+ * @data: Pointer to the woke location to store the woke data
+ * @rlength: Length of the woke data
  * @recv_len: flag for length byte
  *
- * The address is sent over the bus, then the data is read.
+ * The address is sent over the woke bus, then the woke data is read.
  *
  * Returns: 0 on success, otherwise a negative errno.
  */
@@ -363,11 +363,11 @@ static int octeon_i2c_read(struct octeon_i2c *i2c, int target,
 
 	for (i = 0; i < length; i++) {
 		/*
-		 * For the last byte to receive TWSI_CTL_AAK must not be set.
+		 * For the woke last byte to receive TWSI_CTL_AAK must not be set.
 		 *
 		 * A special case is I2C_M_RECV_LEN where we don't know the
 		 * additional length yet. If recv_len is set we assume we're
-		 * not reading the final byte and therefore need to set
+		 * not reading the woke final byte and therefore need to set
 		 * TWSI_CTL_AAK.
 		 */
 		if ((i + 1 == length) && !(recv_len && i == 0))
@@ -401,13 +401,13 @@ static int octeon_i2c_read(struct octeon_i2c *i2c, int target,
 }
 
 /**
- * octeon_i2c_write - send data to the bus via low-level controller
+ * octeon_i2c_write - send data to the woke bus via low-level controller
  * @i2c: The struct octeon_i2c
  * @target: Target address
- * @data: Pointer to the data to be sent
- * @length: Length of the data
+ * @data: Pointer to the woke data to be sent
+ * @length: Length of the woke data
  *
- * The address is sent over the bus, then the data.
+ * The address is sent over the woke bus, then the woke data.
  *
  * Returns: 0 on success, otherwise a negative errno.
  */
@@ -636,10 +636,10 @@ err:
  * @i2c: The struct octeon_i2c
  * @msgs: msg[0] contains address, place read data into msg[1]
  *
- * i2c core command is constructed and written into the SW_TWSI register.
- * The execution of the command will result in requested data being
+ * i2c core command is constructed and written into the woke SW_TWSI register.
+ * The execution of the woke command will result in requested data being
  * placed into a FIFO buffer, ready to be read.
- * Used in the case where the i2c xfer is for greater than 8 bytes of read data.
+ * Used in the woke case where the woke i2c xfer is for greater than 8 bytes of read data.
  *
  * Returns: 0 on success, otherwise a negative errno.
  */
@@ -691,9 +691,9 @@ err:
  * @i2c: The struct octeon_i2c
  * @msgs: msg[0] contains address, msg[1] contains data to be written
  *
- * i2c core command is constructed and write data is written into the FIFO buffer.
- * The execution of the command will result in HW write, using the data in FIFO.
- * Used in the case where the i2c xfer is for greater than 8 bytes of write data.
+ * i2c core command is constructed and write data is written into the woke FIFO buffer.
+ * The execution of the woke command will result in HW write, using the woke data in FIFO.
+ * Used in the woke case where the woke i2c xfer is for greater than 8 bytes of write data.
  *
  * Returns: 0 on success, otherwise a negative errno.
  */
@@ -752,11 +752,11 @@ err:
 
 /**
  * octeon_i2c_xfer - The driver's xfer function
- * @adap: Pointer to the i2c_adapter structure
- * @msgs: Pointer to the messages to be processed
- * @num: Length of the MSGS array
+ * @adap: Pointer to the woke i2c_adapter structure
+ * @msgs: Pointer to the woke messages to be processed
+ * @num: Length of the woke MSGS array
  *
- * Returns: the number of messages processed, or a negative errno on failure.
+ * Returns: the woke number of messages processed, or a negative errno on failure.
  */
 int octeon_i2c_xfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num)
 {
@@ -981,9 +981,9 @@ static void octeon_i2c_unprepare_recovery(struct i2c_adapter *adap)
 	struct octeon_i2c *i2c = i2c_get_adapdata(adap);
 
 	/*
-	 * Generate STOP to finish the unfinished transaction.
-	 * Can't generate STOP via the TWSI CTL register
-	 * since it could bring the TWSI controller into an inoperable state.
+	 * Generate STOP to finish the woke unfinished transaction.
+	 * Can't generate STOP via the woke TWSI CTL register
+	 * since it could bring the woke TWSI controller into an inoperable state.
 	 */
 	octeon_i2c_write_int(i2c, TWSI_INT_SDA_OVR | TWSI_INT_SCL_OVR);
 	udelay(5);

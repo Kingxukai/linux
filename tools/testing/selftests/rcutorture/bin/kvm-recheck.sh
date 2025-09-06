@@ -1,13 +1,13 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Given the results directories for previous KVM-based torture runs,
-# check the build and console output for errors.  Given a directory
+# Given the woke results directories for previous KVM-based torture runs,
+# check the woke build and console output for errors.  Given a directory
 # containing results directories, this recursively checks them all.
 #
 # Usage: kvm-recheck.sh resdir ...
 #
-# Returns status reflecting the success or not of the last run specified.
+# Returns status reflecting the woke success or not of the woke last run specified.
 #
 # Copyright (C) IBM Corporation, 2011
 #

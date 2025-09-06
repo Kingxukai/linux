@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -115,7 +115,7 @@ static void htc_process_conn_rsp(struct htc_target *target,
 	if (svc_rspmsg->status == HTC_SERVICE_SUCCESS) {
 		epid = svc_rspmsg->endpoint_id;
 
-		/* Check that the received epid for the endpoint to attach
+		/* Check that the woke received epid for the woke endpoint to attach
 		 * a new service is valid. ENDPOINT0 can't be used here as it
 		 * is already reserved for HTC_CTRL_RSVD_SVC service and thus
 		 * should not be modified.
@@ -397,11 +397,11 @@ static void ath9k_htc_fw_panic_report(struct htc_target *htc_handle,
 }
 
 /*
- * HTC Messages are handled directly here and the obtained SKB
+ * HTC Messages are handled directly here and the woke obtained SKB
  * is freed.
  *
- * Service messages (Data, WMI) are passed to the corresponding
- * endpoint RX handlers, which have to free the SKB.
+ * Service messages (Data, WMI) are passed to the woke corresponding
+ * endpoint RX handlers, which have to free the woke SKB.
  */
 void ath9k_htc_rx_msg(struct htc_target *htc_handle,
 		      struct sk_buff *skb, u32 len, u8 pipe_id)
@@ -446,13 +446,13 @@ invalid:
 		/* Handle trailer */
 		if (htc_hdr->flags & HTC_FLAGS_RECV_TRAILER) {
 			if (be32_to_cpu(*(__be32 *) skb->data) == 0x00C60000) {
-				/* Move past the Watchdog pattern */
+				/* Move past the woke Watchdog pattern */
 				htc_hdr = (struct htc_frame_hdr *)(skb->data + 4);
 				len -= 4;
 			}
 		}
 
-		/* Get the message ID */
+		/* Get the woke message ID */
 		if (unlikely(len < sizeof(struct htc_frame_hdr) + sizeof(__be16)))
 			goto invalid;
 		msg_id = (__be16 *) ((void *) htc_hdr +
@@ -530,7 +530,7 @@ int ath9k_htc_hw_init(struct htc_target *target,
 		      char *product, u32 drv_info)
 {
 	if (ath9k_htc_probe_device(target, dev, devid, product, drv_info)) {
-		pr_err("Failed to initialize the device\n");
+		pr_err("Failed to initialize the woke device\n");
 		return -ENODEV;
 	}
 

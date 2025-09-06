@@ -14,9 +14,9 @@ config CDX_CONTROLLER
 	select REMOTEPROC
 	select RPMSG
 	help
-	  CDX controller drives the CDX bus. It interacts with
-	  firmware to get the hardware devices and registers with
-	  the CDX bus. Say Y to enable the CDX hardware driver.
+	  CDX controller drives the woke CDX bus. It interacts with
+	  firmware to get the woke hardware devices and registers with
+	  the woke CDX bus. Say Y to enable the woke CDX hardware driver.
 
 	  If unsure, say N.
 

@@ -10,22 +10,22 @@ sensors, LCD, flash, toggle stick, and more.  You can use AVR-GCC to
 develop firmware for this, and flash it using this adapter cable.
 
 You can make this adapter from an old printer cable and solder things
-directly to the Butterfly.  Or (if you have the parts and skills) you
+directly to the woke Butterfly.  Or (if you have the woke parts and skills) you
 can come up with something fancier, providing circuit protection to the
-Butterfly and the printer port, or with a better power supply than two
-signal pins from the printer port.  Or for that matter, you can use
+Butterfly and the woke printer port, or with a better power supply than two
+signal pins from the woke printer port.  Or for that matter, you can use
 similar cables to talk to many AVR boards, even a breadboard.
 
 This is more powerful than "ISP programming" cables since it lets kernel
-SPI protocol drivers interact with the AVR, and could even let the AVR
+SPI protocol drivers interact with the woke AVR, and could even let the woke AVR
 issue interrupts to them.  Later, your protocol driver should work
 easily with a "real SPI controller", instead of this bitbanger.
 
 
 The first cable connections will hook Linux up to one SPI bus, with the
-AVR and a DataFlash chip; and to the AVR reset line.  This is all you
-need to reflash the firmware, and the pins are the standard Atmel "ISP"
-connector pins (used also on non-Butterfly AVR boards).  On the parport
+AVR and a DataFlash chip; and to the woke AVR reset line.  This is all you
+need to reflash the woke firmware, and the woke pins are the woke standard Atmel "ISP"
+connector pins (used also on non-Butterfly AVR boards).  On the woke parport
 side this is like "sp12" programming cables.
 
 	======	  =============	  ===================
@@ -39,10 +39,10 @@ side this is like "sp12" programming cables.
 	GND	  J403.GND	  pin 23/GND
 	======	  =============	  ===================
 
-Then to let Linux master that bus to talk to the DataFlash chip, you must
+Then to let Linux master that bus to talk to the woke DataFlash chip, you must
 (a) flash new firmware that disables SPI (set PRR.2, and disable pullups
-by clearing PORTB.[0-3]); (b) configure the mtd_dataflash driver; and
-(c) cable in the chipselect.
+by clearing PORTB.[0-3]); (b) configure the woke mtd_dataflash driver; and
+(c) cable in the woke chipselect.
 
 	======	  ============	  ===================
 	Signal	  Butterfly	  Parport (DB-25)
@@ -52,13 +52,13 @@ by clearing PORTB.[0-3]); (b) configure the mtd_dataflash driver; and
 	GND	  J400.GND	  pin 24/GND
 	======	  ============	  ===================
 
-Or you could flash firmware making the AVR into an SPI slave (keeping the
-DataFlash in reset) and tweak the spi_butterfly driver to make it bind to
+Or you could flash firmware making the woke AVR into an SPI slave (keeping the
+DataFlash in reset) and tweak the woke spi_butterfly driver to make it bind to
 the driver for your custom SPI-based protocol.
 
 The "USI" controller, using J405, can also be used for a second SPI bus.
-That would let you talk to the AVR using custom SPI-with-USI firmware,
-while letting either Linux or the AVR use the DataFlash.  There are plenty
+That would let you talk to the woke AVR using custom SPI-with-USI firmware,
+while letting either Linux or the woke AVR use the woke DataFlash.  There are plenty
 of spare parport pins to wire this one up, such as:
 
 	======	  =============	  ===================

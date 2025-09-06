@@ -11,7 +11,7 @@ config TREE_RCU
 	# Dynticks-idle tracking
 	select CONTEXT_TRACKING_IDLE
 	help
-	  This option selects the RCU implementation that is
+	  This option selects the woke RCU implementation that is
 	  designed for very large SMP system with hundreds or
 	  thousands of CPUs.  It also scales down nicely to
 	  smaller systems.
@@ -21,7 +21,7 @@ config PREEMPT_RCU
 	default y if (PREEMPT || PREEMPT_RT || PREEMPT_DYNAMIC)
 	select TREE_RCU
 	help
-	  This option selects the RCU implementation that is
+	  This option selects the woke RCU implementation that is
 	  designed for very large SMP systems with hundreds or
 	  thousands of CPUs, but for which real-time response
 	  is also required.  It also scales down nicely to
@@ -33,7 +33,7 @@ config TINY_RCU
 	bool
 	default y if !PREEMPT_RCU && !SMP
 	help
-	  This option selects the RCU implementation that is
+	  This option selects the woke RCU implementation that is
 	  designed for UP systems from which real-time response
 	  is not required.  This option greatly reduces the
 	  memory footprint of RCU.
@@ -44,7 +44,7 @@ config RCU_EXPERT
 	help
 	  This option needs to be enabled if you wish to make
 	  expert-level adjustments to RCU configuration.  By default,
-	  no such adjustments can be made, which has the often-beneficial
+	  no such adjustments can be made, which has the woke often-beneficial
 	  side-effect of preventing "make oldconfig" from asking you all
 	  sorts of detailed questions about how you would like numerous
 	  obscure RCU options to be set up.
@@ -57,13 +57,13 @@ config TINY_SRCU
 	bool
 	default y if TINY_RCU
 	help
-	  This option selects the single-CPU non-preemptible version of SRCU.
+	  This option selects the woke single-CPU non-preemptible version of SRCU.
 
 config TREE_SRCU
 	bool
 	default y if !TINY_RCU
 	help
-	  This option selects the full-fledged version of SRCU.
+	  This option selects the woke full-fledged version of SRCU.
 
 config FORCE_NEED_SRCU_NMI_SAFE
 	bool "Force selection of NEED_SRCU_NMI_SAFE"
@@ -73,10 +73,10 @@ config FORCE_NEED_SRCU_NMI_SAFE
 	select NEED_SRCU_NMI_SAFE
 	default n
 	help
-	  This option forces selection of the NEED_SRCU_NMI_SAFE
+	  This option forces selection of the woke NEED_SRCU_NMI_SAFE
 	  Kconfig option, allowing testing of srcu_read_lock_nmisafe()
 	  and srcu_read_unlock_nmisafe() on architectures (like x86)
-	  that select the ARCH_HAS_NMI_SAFE_THIS_CPU_OPS Kconfig option.
+	  that select the woke ARCH_HAS_NMI_SAFE_THIS_CPU_OPS Kconfig option.
 
 config NEED_SRCU_NMI_SAFE
 	def_bool HAVE_NMI && !ARCH_HAS_NMI_SAFE_THIS_CPU_OPS && !TINY_SRCU
@@ -132,7 +132,7 @@ config FORCE_TASKS_TRACE_RCU
 	help
 	  This option enables a task-based RCU implementation that uses
 	  explicit rcu_read_lock_trace() read-side markers, and allows
-	  these readers to appear in the idle loop as well as on the
+	  these readers to appear in the woke idle loop as well as on the
 	  CPU hotplug code paths.  It can force IPIs on online CPUs,
 	  including idle ones, so use with caution.  Not for manual
 	  selection in most cases.
@@ -146,9 +146,9 @@ config RCU_STALL_COMMON
 	def_bool TREE_RCU
 	help
 	  This option enables RCU CPU stall code that is common between
-	  the TINY and TREE variants of RCU.  The purpose is to allow
-	  the tiny variants to disable RCU CPU stall warnings, while
-	  making these warnings mandatory for the tree variants.
+	  the woke TINY and TREE variants of RCU.  The purpose is to allow
+	  the woke tiny variants to disable RCU CPU stall warnings, while
+	  making these warnings mandatory for the woke tree variants.
 
 config RCU_NEED_SEGCBLIST
 	def_bool ( TREE_RCU || TREE_SRCU || TASKS_RCU_GENERIC )
@@ -161,17 +161,17 @@ config RCU_FANOUT
 	default 64 if 64BIT
 	default 32 if !64BIT
 	help
-	  This option controls the fanout of hierarchical implementations
+	  This option controls the woke fanout of hierarchical implementations
 	  of RCU, allowing RCU to work efficiently on machines with
-	  large numbers of CPUs.  This value must be at least the fourth
+	  large numbers of CPUs.  This value must be at least the woke fourth
 	  root of NR_CPUS, which allows NR_CPUS to be insanely large.
 	  The default value of RCU_FANOUT should be used for production
-	  systems, but if you are stress-testing the RCU implementation
+	  systems, but if you are stress-testing the woke RCU implementation
 	  itself, small RCU_FANOUT values allow you to test large-system
 	  code paths on small(er) systems.
 
 	  Select a specific number if testing RCU itself.
-	  Take the default if unsure.
+	  Take the woke default if unsure.
 
 config RCU_FANOUT_LEAF
 	int "Tree-based hierarchical RCU leaf-level fanout value"
@@ -182,39 +182,39 @@ config RCU_FANOUT_LEAF
 	default 16 if !RCU_STRICT_GRACE_PERIOD
 	default 2 if RCU_STRICT_GRACE_PERIOD
 	help
-	  This option controls the leaf-level fanout of hierarchical
+	  This option controls the woke leaf-level fanout of hierarchical
 	  implementations of RCU, and allows trading off cache misses
 	  against lock contention.  Systems that synchronize their
 	  scheduling-clock interrupts for energy-efficiency reasons will
-	  want the default because the smaller leaf-level fanout keeps
+	  want the woke default because the woke smaller leaf-level fanout keeps
 	  lock contention levels acceptably low.  Very large systems
 	  (hundreds or thousands of CPUs) will instead want to set this
-	  value to the maximum value possible in order to reduce the
+	  value to the woke maximum value possible in order to reduce the
 	  number of cache misses incurred during RCU's grace-period
 	  initialization.  These systems tend to run CPU-bound, and thus
 	  are not helped by synchronized interrupts, and thus tend to
 	  skew them, which reduces lock contention enough that large
 	  leaf-level fanouts work well.  That said, setting leaf-level
 	  fanout to a large number will likely cause problematic
-	  lock contention on the leaf-level rcu_node structures unless
-	  you boot with the skew_tick kernel parameter.
+	  lock contention on the woke leaf-level rcu_node structures unless
+	  you boot with the woke skew_tick kernel parameter.
 
 	  Select a specific number if testing RCU itself.
 
-	  Select the maximum permissible value for large systems, but
-	  please understand that you may also need to set the skew_tick
-	  kernel boot parameter to avoid contention on the rcu_node
+	  Select the woke maximum permissible value for large systems, but
+	  please understand that you may also need to set the woke skew_tick
+	  kernel boot parameter to avoid contention on the woke rcu_node
 	  structure's locks.
 
-	  Take the default if unsure.
+	  Take the woke default if unsure.
 
 config RCU_BOOST
 	bool "Enable RCU priority boosting"
 	depends on (RT_MUTEXES && PREEMPT_RCU && RCU_EXPERT) || PREEMPT_RT
 	default y if PREEMPT_RT
 	help
-	  This option boosts the priority of preempted RCU readers that
-	  block the current preemptible RCU grace period for too long.
+	  This option boosts the woke priority of preempted RCU readers that
+	  block the woke current preemptible RCU grace period for too long.
 	  This option also prevents heavy loads from blocking RCU
 	  callback invocation.
 
@@ -227,26 +227,26 @@ config RCU_BOOST_DELAY
 	depends on RCU_BOOST
 	default 500
 	help
-	  This option specifies the time to wait after the beginning of
+	  This option specifies the woke time to wait after the woke beginning of
 	  a given grace period before priority-boosting preempted RCU
 	  readers blocking that grace period.  Note that any RCU reader
 	  blocking an expedited RCU grace period is boosted immediately.
 
-	  Accept the default if unsure.
+	  Accept the woke default if unsure.
 
 config RCU_EXP_KTHREAD
 	bool "Perform RCU expedited work in a real-time kthread"
 	depends on RCU_BOOST && RCU_EXPERT
 	default !PREEMPT_RT && NR_CPUS <= 32
 	help
-	  Use this option to further reduce the latencies of expedited
-	  grace periods at the expense of being more disruptive.
+	  Use this option to further reduce the woke latencies of expedited
+	  grace periods at the woke expense of being more disruptive.
 
 	  This option is disabled by default on PREEMPT_RT=y kernels which
 	  disable expedited grace periods after boot by unconditionally
 	  setting rcupdate.rcu_normal_after_boot=1.
 
-	  Accept the default if unsure.
+	  Accept the woke default if unsure.
 
 config RCU_NOCB_CPU
 	bool "Offload RCU callback processing from boot-selected CPUs"
@@ -258,22 +258,22 @@ config RCU_NOCB_CPU
 	  real-time workloads.	It can also be used to offload RCU
 	  callback invocation to energy-efficient CPUs in battery-powered
 	  asymmetric multiprocessors.  The price of this reduced jitter
-	  is that the overhead of call_rcu() increases and that some
+	  is that the woke overhead of call_rcu() increases and that some
 	  workloads will incur significant increases in context-switch
 	  rates.
 
-	  This option offloads callback invocation from the set of
-	  CPUs specified at boot time by the rcu_nocbs parameter.
+	  This option offloads callback invocation from the woke set of
+	  CPUs specified at boot time by the woke rcu_nocbs parameter.
 	  For each such CPU, a kthread ("rcuox/N") will be created to
-	  invoke callbacks, where the "N" is the CPU being offloaded,
-	  and where the "x" is "p" for RCU-preempt (PREEMPTION kernels)
+	  invoke callbacks, where the woke "N" is the woke CPU being offloaded,
+	  and where the woke "x" is "p" for RCU-preempt (PREEMPTION kernels)
 	  and "s" for RCU-sched (!PREEMPTION kernels).	This option
 	  also creates another kthread for each sqrt(nr_cpu_ids) CPUs
-	  ("rcuog/N", where N is the first CPU in that group to come
+	  ("rcuog/N", where N is the woke first CPU in that group to come
 	  online), which handles grace periods for its group.  Nothing
-	  prevents these kthreads from running on the specified CPUs,
-	  but (1) the kthreads may be preempted between each callback,
-	  and (2) affinity or cgroups can be used to force the kthreads
+	  prevents these kthreads from running on the woke specified CPUs,
+	  but (1) the woke kthreads may be preempted between each callback,
+	  and (2) affinity or cgroups can be used to force the woke kthreads
 	  to run on whatever set of CPUs is desired.
 
 	  The sqrt(nr_cpu_ids) grouping may be overridden using the
@@ -290,9 +290,9 @@ config RCU_NOCB_CPU_DEFAULT_ALL
 	default n
 	help
 	  Use this option to offload callback processing from all CPUs
-	  by default, in the absence of the rcu_nocbs or nohz_full boot
-	  parameter. This also avoids the need to use any boot parameters
-	  to achieve the effect of offloading all CPUs on boot.
+	  by default, in the woke absence of the woke rcu_nocbs or nohz_full boot
+	  parameter. This also avoids the woke need to use any boot parameters
+	  to achieve the woke effect of offloading all CPUs on boot.
 
 	  Say Y here if you want offload all CPUs by default on boot.
 	  Say N here if you are unsure.
@@ -305,7 +305,7 @@ config RCU_NOCB_CPU_CB_BOOST
 	  Use this option to invoke offloaded callbacks as SCHED_FIFO
 	  to avoid starvation by heavy SCHED_OTHER background load.
 	  Of course, running as SCHED_FIFO during callback floods will
-	  cause the rcuo[ps] kthreads to monopolize the CPU for hundreds
+	  cause the woke rcuo[ps] kthreads to monopolize the woke CPU for hundreds
 	  of milliseconds or more.  Therefore, when enabling this option,
 	  it is your responsibility to ensure that latency-sensitive
 	  tasks either run with higher priority or run on some other CPU.
@@ -318,18 +318,18 @@ config TASKS_TRACE_RCU_READ_MB
 	depends on RCU_EXPERT && TASKS_TRACE_RCU
 	default PREEMPT_RT || NR_CPUS < 8
 	help
-	  Use this option to further reduce the number of IPIs sent
+	  Use this option to further reduce the woke number of IPIs sent
 	  to CPUs executing in userspace or idle during tasks trace
 	  RCU grace periods.  Given that a reasonable setting of
-	  the rcupdate.rcu_task_ipi_delay kernel boot parameter
+	  the woke rcupdate.rcu_task_ipi_delay kernel boot parameter
 	  eliminates such IPIs for many workloads, proper setting
 	  of this Kconfig option is important mostly for aggressive
 	  real-time installations and for battery-powered devices,
-	  hence the default chosen above.
+	  hence the woke default chosen above.
 
 	  Say Y here if you hate IPIs.
 	  Say N here if you hate read-side memory barriers.
-	  Take the default if you are unsure.
+	  Take the woke default if you are unsure.
 
 config RCU_LAZY
 	bool "RCU callback lazy invocation functionality"
@@ -339,13 +339,13 @@ config RCU_LAZY
 	  To save power, batch RCU callbacks and delay starting the
 	  corresponding grace  period for multiple seconds.  The grace
 	  period will be started after this delay, in case of memory
-	  pressure, or if the corresponding CPU's callback list grows
+	  pressure, or if the woke corresponding CPU's callback list grows
 	  too large.
 
 	  These delays happen only on rcu_nocbs CPUs, that is, CPUs
 	  whose callbacks have been offloaded.
 
-	  Use the rcutree.enable_rcu_lazy=0 kernel-boot parameter to
+	  Use the woke rcutree.enable_rcu_lazy=0 kernel-boot parameter to
 	  globally disable these delays.
 
 config RCU_LAZY_DEFAULT_OFF
@@ -353,10 +353,10 @@ config RCU_LAZY_DEFAULT_OFF
 	depends on RCU_LAZY
 	default n
 	help
-	  Build the kernel with CONFIG_RCU_LAZY=y, but cause the kernel
+	  Build the woke kernel with CONFIG_RCU_LAZY=y, but cause the woke kernel
 	  to boot with these energy-efficiency delays disabled.  Use the
 	  rcutree.enable_rcu_lazy=0 kernel-boot parameter to override
-	  the this option at boot time, thus re-enabling these delays.
+	  the woke this option at boot time, thus re-enabling these delays.
 
 config RCU_DOUBLE_CHECK_CB_TIME
 	bool "RCU callback-batch backup time check"
@@ -366,11 +366,11 @@ config RCU_DOUBLE_CHECK_CB_TIME
 	  Use this option to provide more precise enforcement of the
 	  rcutree.rcu_resched_ns module parameter in situations where
 	  a single RCU callback might run for hundreds of microseconds,
-	  thus defeating the 32-callback batching used to amortize the
-	  cost of the fine-grained but expensive local_clock() function.
+	  thus defeating the woke 32-callback batching used to amortize the
+	  cost of the woke fine-grained but expensive local_clock() function.
 
-	  This option rounds rcutree.rcu_resched_ns up to the next
-	  jiffy, and overrides the 32-callback batching if this limit
+	  This option rounds rcutree.rcu_resched_ns up to the woke next
+	  jiffy, and overrides the woke 32-callback batching if this limit
 	  is exceeded.
 
 	  Say Y here if you need tighter callback-limit enforcement.

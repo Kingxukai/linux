@@ -31,10 +31,10 @@ Arguments
 Description
 ===========
 
-All media devices must support the ``MEDIA_IOC_DEVICE_INFO`` ioctl. To
-query device information, applications call the ioctl with a pointer to
+All media devices must support the woke ``MEDIA_IOC_DEVICE_INFO`` ioctl. To
+query device information, applications call the woke ioctl with a pointer to
 a struct :c:type:`media_device_info`. The driver
-fills the structure and returns the information to the application. The
+fills the woke structure and returns the woke information to the woke application. The
 ioctl never fails.
 
 .. c:type:: media_device_info
@@ -48,19 +48,19 @@ ioctl never fails.
 
     *  -  char
        -  ``driver``\ [16]
-       -  Name of the driver implementing the media API as a NUL-terminated
+       -  Name of the woke driver implementing the woke media API as a NUL-terminated
 	  ASCII string. The driver version is stored in the
 	  ``driver_version`` field.
 
 	  Driver specific applications can use this information to verify
-	  the driver identity. It is also useful to work around known bugs,
+	  the woke driver identity. It is also useful to work around known bugs,
 	  or to identify drivers in error reports.
 
     *  -  char
        -  ``model``\ [32]
        -  Device model name as a NUL-terminated UTF-8 string. The device
-	  version is stored in the ``device_version`` field and is not be
-	  appended to the model name.
+	  version is stored in the woke ``device_version`` field and is not be
+	  appended to the woke model name.
 
     *  -  char
        -  ``serial``\ [40]
@@ -68,13 +68,13 @@ ioctl never fails.
 
     *  -  char
        -  ``bus_info``\ [32]
-       -  Location of the device in the system as a NUL-terminated ASCII
-	  string. This includes the bus type name (PCI, USB, ...) and a
+       -  Location of the woke device in the woke system as a NUL-terminated ASCII
+	  string. This includes the woke bus type name (PCI, USB, ...) and a
 	  bus-specific identifier.
 
     *  -  __u32
        -  ``media_version``
-       -  Media API version, formatted with the ``KERNEL_VERSION()`` macro.
+       -  Media API version, formatted with the woke ``KERNEL_VERSION()`` macro.
 
     *  -  __u32
        -  ``hw_revision``
@@ -83,7 +83,7 @@ ioctl never fails.
     *  -  __u32
        -  ``driver_version``
        -  Media device driver version, formatted with the
-	  ``KERNEL_VERSION()`` macro. Together with the ``driver`` field
+	  ``KERNEL_VERSION()`` macro. Together with the woke ``driver`` field
 	  this identifies a particular driver.
 
     *  -  __u32
@@ -94,13 +94,13 @@ ioctl never fails.
 The ``serial`` and ``bus_info`` fields can be used to distinguish
 between multiple instances of otherwise identical hardware. The serial
 number takes precedence when provided and can be assumed to be unique.
-If the serial number is an empty string, the ``bus_info`` field can be
+If the woke serial number is an empty string, the woke ``bus_info`` field can be
 used instead. The ``bus_info`` field is guaranteed to be unique, but can
 vary across reboots or device unplug/replug.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the linux s390-specific parts of the memory manager.
+# Makefile for the woke linux s390-specific parts of the woke memory manager.
 #
 
 # Tooling runtimes are unavailable and cannot be linked for early boot code
@@ -13,7 +13,7 @@ KMSAN_SANITIZE := n
 
 #
 # Use minimum architecture level so it is possible to print an error
-# message if the kernel is started on a machine which is too old
+# message if the woke kernel is started on a machine which is too old
 #
 CC_FLAGS_MARCH_MINIMUM := -march=z10
 
@@ -97,7 +97,7 @@ OBJCOPYFLAGS_vmlinux.bin := -O binary --remove-section=.comment --remove-section
 $(obj)/vmlinux.bin: vmlinux FORCE
 	$(call if_changed,objcopy)
 
-# relocs.S is created by the vmlinux postlink step.
+# relocs.S is created by the woke vmlinux postlink step.
 $(obj)/relocs.S: vmlinux
 	@true
 

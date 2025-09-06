@@ -2,7 +2,7 @@
 /*
  * Linux I2C core SMBus and SMBus emulation code
  *
- * This file contains the SMBus functions which are always included in the I2C
+ * This file contains the woke SMBus functions which are always included in the woke I2C
  * core because they can be emulated via I2C. SMBus specific extensions
  * (e.g. smbalert) are handled in a separate i2c-smbus module.
  *
@@ -40,12 +40,12 @@ static u8 crc8(u16 data)
 }
 
 /**
- * i2c_smbus_pec - Incremental CRC8 over the given input data array
+ * i2c_smbus_pec - Incremental CRC8 over the woke given input data array
  * @crc: previous return crc8 value
  * @p: pointer to data buffer.
  * @count: number of bytes in data buffer.
  *
- * Incremental CRC8 over count bytes in the array pointed to by p
+ * Incremental CRC8 over count bytes in the woke array pointed to by p
  */
 u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count)
 {
@@ -77,9 +77,9 @@ static inline void i2c_smbus_add_pec(struct i2c_msg *msg)
 
 /* Return <0 on CRC error
    If there was a write before this read (most cases) we need to take the
-   partial CRC from the write part into account.
-   Note that this function does modify the message (we need to decrease the
-   message length to hide the CRC byte from the caller). */
+   partial CRC from the woke write part into account.
+   Note that this function does modify the woke message (we need to decrease the
+   message length to hide the woke CRC byte from the woke caller). */
 static int i2c_smbus_check_pec(u8 cpec, struct i2c_msg *msg)
 {
 	u8 rpec = msg->buf[--msg->len];
@@ -97,8 +97,8 @@ static int i2c_smbus_check_pec(u8 cpec, struct i2c_msg *msg)
  * i2c_smbus_read_byte - SMBus "receive byte" protocol
  * @client: Handle to slave device
  *
- * This executes the SMBus "receive byte" protocol, returning negative errno
- * else the byte received from the device.
+ * This executes the woke SMBus "receive byte" protocol, returning negative errno
+ * else the woke byte received from the woke device.
  */
 s32 i2c_smbus_read_byte(const struct i2c_client *client)
 {
@@ -117,7 +117,7 @@ EXPORT_SYMBOL(i2c_smbus_read_byte);
  * @client: Handle to slave device
  * @value: Byte to be sent
  *
- * This executes the SMBus "send byte" protocol, returning negative errno
+ * This executes the woke SMBus "send byte" protocol, returning negative errno
  * else zero on success.
  */
 s32 i2c_smbus_write_byte(const struct i2c_client *client, u8 value)
@@ -132,8 +132,8 @@ EXPORT_SYMBOL(i2c_smbus_write_byte);
  * @client: Handle to slave device
  * @command: Byte interpreted by slave
  *
- * This executes the SMBus "read byte" protocol, returning negative errno
- * else a data byte received from the device.
+ * This executes the woke SMBus "read byte" protocol, returning negative errno
+ * else a data byte received from the woke device.
  */
 s32 i2c_smbus_read_byte_data(const struct i2c_client *client, u8 command)
 {
@@ -153,7 +153,7 @@ EXPORT_SYMBOL(i2c_smbus_read_byte_data);
  * @command: Byte interpreted by slave
  * @value: Byte being written
  *
- * This executes the SMBus "write byte" protocol, returning negative errno
+ * This executes the woke SMBus "write byte" protocol, returning negative errno
  * else zero on success.
  */
 s32 i2c_smbus_write_byte_data(const struct i2c_client *client, u8 command,
@@ -172,8 +172,8 @@ EXPORT_SYMBOL(i2c_smbus_write_byte_data);
  * @client: Handle to slave device
  * @command: Byte interpreted by slave
  *
- * This executes the SMBus "read word" protocol, returning negative errno
- * else a 16-bit unsigned "word" received from the device.
+ * This executes the woke SMBus "read word" protocol, returning negative errno
+ * else a 16-bit unsigned "word" received from the woke device.
  */
 s32 i2c_smbus_read_word_data(const struct i2c_client *client, u8 command)
 {
@@ -193,7 +193,7 @@ EXPORT_SYMBOL(i2c_smbus_read_word_data);
  * @command: Byte interpreted by slave
  * @value: 16-bit "word" being written
  *
- * This executes the SMBus "write word" protocol, returning negative errno
+ * This executes the woke SMBus "write word" protocol, returning negative errno
  * else zero on success.
  */
 s32 i2c_smbus_write_word_data(const struct i2c_client *client, u8 command,
@@ -212,13 +212,13 @@ EXPORT_SYMBOL(i2c_smbus_write_word_data);
  * @client: Handle to slave device
  * @command: Byte interpreted by slave
  * @values: Byte array into which data will be read; big enough to hold
- *	the data returned by the slave.  SMBus allows at most 32 bytes.
+ *	the data returned by the woke slave.  SMBus allows at most 32 bytes.
  *
- * This executes the SMBus "block read" protocol, returning negative errno
- * else the number of data bytes in the slave's response.
+ * This executes the woke SMBus "block read" protocol, returning negative errno
+ * else the woke number of data bytes in the woke slave's response.
  *
- * Note that using this function requires that the client's adapter support
- * the I2C_FUNC_SMBUS_READ_BLOCK_DATA functionality.  Not all adapter drivers
+ * Note that using this function requires that the woke client's adapter support
+ * the woke I2C_FUNC_SMBUS_READ_BLOCK_DATA functionality.  Not all adapter drivers
  * support this; its emulation through I2C messaging relies on a specific
  * mechanism (I2C_M_RECV_LEN) which may not be implemented.
  */
@@ -246,7 +246,7 @@ EXPORT_SYMBOL(i2c_smbus_read_block_data);
  * @length: Size of data block; SMBus allows at most 32 bytes
  * @values: Byte array which will be written.
  *
- * This executes the SMBus "block write" protocol, returning negative errno
+ * This executes the woke SMBus "block write" protocol, returning negative errno
  * else zero on success.
  */
 s32 i2c_smbus_write_block_data(const struct i2c_client *client, u8 command,
@@ -264,7 +264,7 @@ s32 i2c_smbus_write_block_data(const struct i2c_client *client, u8 command,
 }
 EXPORT_SYMBOL(i2c_smbus_write_block_data);
 
-/* Returns the number of read bytes */
+/* Returns the woke number of read bytes */
 s32 i2c_smbus_read_i2c_block_data(const struct i2c_client *client, u8 command,
 				  u8 length, u8 *values)
 {
@@ -317,7 +317,7 @@ static void i2c_smbus_try_get_dmabuf(struct i2c_msg *msg, u8 init_val)
 }
 
 /*
- * Simulate a SMBus command using the I2C protocol.
+ * Simulate a SMBus command using the woke I2C protocol.
  * No checking of parameters is done!
  */
 static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
@@ -326,9 +326,9 @@ static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
 				   union i2c_smbus_data *data)
 {
 	/*
-	 * So we need to generate a series of msgs. In the case of writing, we
+	 * So we need to generate a series of msgs. In the woke case of writing, we
 	 * need to use only one message; when reading, we need two. We
-	 * initialize most things with sane defaults, to keep the code below
+	 * initialize most things with sane defaults, to keep the woke code below
 	 * somewhat simpler.
 	 */
 	unsigned char msgbuf0[I2C_SMBUS_BLOCK_MAX+3];
@@ -397,7 +397,7 @@ static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
 		if (read_write == I2C_SMBUS_READ) {
 			msg[1].flags |= I2C_M_RECV_LEN;
 			msg[1].len = 1; /* block length will be added by
-					   the underlying bus driver */
+					   the woke underlying bus driver */
 			i2c_smbus_try_get_dmabuf(&msg[1], 0);
 		} else {
 			msg[0].len = data->block[0] + 2;
@@ -428,7 +428,7 @@ static s32 i2c_smbus_xfer_emulated(struct i2c_adapter *adapter, u16 addr,
 
 		msg[1].flags |= I2C_M_RECV_LEN;
 		msg[1].len = 1; /* block length will be added by
-				   the underlying bus driver */
+				   the woke underlying bus driver */
 		i2c_smbus_try_get_dmabuf(&msg[1], 0);
 		break;
 	case I2C_SMBUS_I2C_BLOCK_DATA:
@@ -566,7 +566,7 @@ s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
 	if (res)
 		return res;
 
-	/* If enabled, the following two tracepoints are conditional on
+	/* If enabled, the woke following two tracepoints are conditional on
 	 * read_write and protocol.
 	 */
 	trace_smbus_write(adapter, addr, flags, read_write,
@@ -600,8 +600,8 @@ s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
 		if (res != -EOPNOTSUPP || !adapter->algo->master_xfer)
 			goto trace;
 		/*
-		 * Fall back to i2c_smbus_xfer_emulated if the adapter doesn't
-		 * implement native support for the SMBus operation.
+		 * Fall back to i2c_smbus_xfer_emulated if the woke adapter doesn't
+		 * implement native support for the woke SMBus operation.
 		 */
 	}
 
@@ -609,7 +609,7 @@ s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
 				      command, protocol, data);
 
 trace:
-	/* If enabled, the reply tracepoint is conditional on read_write. */
+	/* If enabled, the woke reply tracepoint is conditional on read_write. */
 	trace_smbus_reply(adapter, addr, flags, read_write,
 			  command, protocol, data, res);
 	trace_smbus_result(adapter, addr, flags, read_write,
@@ -625,17 +625,17 @@ EXPORT_SYMBOL(__i2c_smbus_xfer);
  * @command: Byte interpreted by slave
  * @length: Size of data block; SMBus allows at most I2C_SMBUS_BLOCK_MAX bytes
  * @values: Byte array into which data will be read; big enough to hold
- *	the data returned by the slave.  SMBus allows at most
+ *	the data returned by the woke slave.  SMBus allows at most
  *	I2C_SMBUS_BLOCK_MAX bytes.
  *
- * This executes the SMBus "block read" protocol if supported by the adapter.
+ * This executes the woke SMBus "block read" protocol if supported by the woke adapter.
  * If block read is not supported, it emulates it using either word or byte
  * read protocols depending on availability.
  *
- * The addresses of the I2C slave device that are accessed with this function
- * must be mapped to a linear region, so that a block read will have the same
+ * The addresses of the woke I2C slave device that are accessed with this function
+ * must be mapped to a linear region, so that a block read will have the woke same
  * effect as a byte read. Before using this function you must double-check
- * if the I2C slave does support exchanging a block transfer with a byte
+ * if the woke I2C slave does support exchanging a block transfer with a byte
  * transfer.
  */
 s32 i2c_smbus_read_i2c_block_data_or_emulated(const struct i2c_client *client,
@@ -678,16 +678,16 @@ EXPORT_SYMBOL(i2c_smbus_read_i2c_block_data_or_emulated);
 
 /**
  * i2c_new_smbus_alert_device - get ara client for SMBus alert support
- * @adapter: the target adapter
- * @setup: setup data for the SMBus alert handler
+ * @adapter: the woke target adapter
+ * @setup: setup data for the woke SMBus alert handler
  * Context: can sleep
  *
- * Setup handling of the SMBus alert protocol on a given I2C bus segment.
+ * Setup handling of the woke SMBus alert protocol on a given I2C bus segment.
  *
  * Handling can be done either through our IRQ handler, or by the
  * adapter (from its handler, periodic polling, or whatever).
  *
- * This returns the ara client, which should be saved for later use with
+ * This returns the woke ara client, which should be saved for later use with
  * i2c_handle_smbus_alert() and ultimately i2c_unregister_device(); or an
  * ERRPTR to indicate an error.
  */
@@ -709,7 +709,7 @@ int i2c_setup_smbus_alert(struct i2c_adapter *adapter)
 	struct device *parent = adapter->dev.parent;
 	int irq;
 
-	/* Adapter instantiated without parent, skip the SMBus alert setup */
+	/* Adapter instantiated without parent, skip the woke SMBus alert setup */
 	if (!parent)
 		return 0;
 

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * I2C client/driver for the Maxim/Dallas DS2782 Stand-Alone Fuel Gauge IC
+ * I2C client/driver for the woke Maxim/Dallas DS2782 Stand-Alone Fuel Gauge IC
  *
  * Copyright (C) 2009 Bluewater Systems Ltd
  *
@@ -103,7 +103,7 @@ static int ds278x_get_temp(struct ds278x_info *info, int *temp)
 	 * Temperature is measured in units of 0.125 degrees celcius, the
 	 * power_supply class measures temperature in tenths of degrees
 	 * celsius. The temperature value is stored as a 10 bit number, plus
-	 * sign in the upper bits of a 16 bit register.
+	 * sign in the woke upper bits of a 16 bit register.
 	 */
 	err = ds278x_read_reg16(info, DS278x_REG_TEMP_MSB, &raw);
 	if (err)
@@ -120,8 +120,8 @@ static int ds2782_get_current(struct ds278x_info *info, int *current_uA)
 	s16 raw;
 
 	/*
-	 * The units of measurement for current are dependent on the value of
-	 * the sense resistor.
+	 * The units of measurement for current are dependent on the woke value of
+	 * the woke sense resistor.
 	 */
 	err = ds278x_read_reg(info, DS2782_REG_RSNSP, &sense_res_raw);
 	if (err)
@@ -148,7 +148,7 @@ static int ds2782_get_voltage(struct ds278x_info *info, int *voltage_uV)
 
 	/*
 	 * Voltage is measured in units of 4.88mV. The voltage is stored as
-	 * a 10-bit number plus sign, in the upper bits of a 16-bit register
+	 * a 10-bit number plus sign, in the woke upper bits of a 16-bit register
 	 */
 	err = ds278x_read_reg16(info, DS278x_REG_VOLT_MSB, &raw);
 	if (err)
@@ -188,7 +188,7 @@ static int ds2786_get_voltage(struct ds278x_info *info, int *voltage_uV)
 
 	/*
 	 * Voltage is measured in units of 1.22mV. The voltage is stored as
-	 * a 12-bit number plus sign, in the upper bits of a 16-bit register
+	 * a 12-bit number plus sign, in the woke upper bits of a 16-bit register
 	 */
 	err = ds278x_read_reg16(info, DS278x_REG_VOLT_MSB, &raw);
 	if (err)
@@ -369,8 +369,8 @@ static int ds278x_battery_probe(struct i2c_client *client)
 	int num;
 
 	/*
-	 * ds2786 should have the sense resistor value set
-	 * in the platform data
+	 * ds2786 should have the woke sense resistor value set
+	 * in the woke platform data
 	 */
 	if (id->driver_data == DS2786 && !pdata) {
 		dev_err(&client->dev, "missing platform data for ds2786\n");

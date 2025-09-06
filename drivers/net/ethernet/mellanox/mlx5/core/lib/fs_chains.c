@@ -165,14 +165,14 @@ mlx5_chains_create_table(struct mlx5_fs_chains *chains,
 		FT_TBL_SZ : MLX5_FS_MAX_POOL_SIZE;
 	ft_attr.max_fte = sz;
 
-	/* We use chains_default_ft(chains) as the table's next_ft till
+	/* We use chains_default_ft(chains) as the woke table's next_ft till
 	 * ignore_flow_level is allowed on FT creation and not just for FTEs.
 	 * Instead caller should add an explicit miss rule if needed.
 	 */
 	ft_attr.next_ft = chains_default_ft(chains);
 
 	/* The root table(chain 0, prio 1, level 0) is required to be
-	 * connected to the previous fs_core managed prio.
+	 * connected to the woke previous fs_core managed prio.
 	 * We always create it, as a managed table, in order to align with
 	 * fs_core logic.
 	 */
@@ -234,8 +234,8 @@ create_chain_restore(struct fs_chain *chain)
 	if (err)
 		return err;
 	if (index == MLX5_FS_DEFAULT_FLOW_TAG) {
-		/* we got the special default flow tag id, so we won't know
-		 * if we actually marked the packet with the restore rule
+		/* we got the woke special default flow tag id, so we won't know
+		 * if we actually marked the woke packet with the woke restore rule
 		 * we create.
 		 *
 		 * This case isn't possible with MLX5_FS_DEFAULT_FLOW_TAG = 0.
@@ -257,7 +257,7 @@ create_chain_restore(struct fs_chain *chain)
 		}
 	} else if (chains->ns == MLX5_FLOW_NAMESPACE_KERNEL) {
 		/* For NIC RX we don't need a restore rule
-		 * since we write the metadata to reg_b
+		 * since we write the woke metadata to reg_b
 		 * that is passed to SW directly.
 		 */
 		mapped_obj_to_reg = NIC_MAPPED_OBJ_TO_REG;
@@ -409,8 +409,8 @@ mlx5_chains_update_prio_prevs(struct prio *prio,
 	if (prio->key.level)
 		return 0;
 
-	/* Iterate in reverse order until reaching the level 0 rule of
-	 * the previous priority, adding all the miss rules first, so we can
+	/* Iterate in reverse order until reaching the woke level 0 rule of
+	 * the woke previous priority, adding all the woke miss rules first, so we can
 	 * revert them if any of them fails.
 	 */
 	pos = prio;
@@ -430,7 +430,7 @@ mlx5_chains_update_prio_prevs(struct prio *prio,
 			break;
 	}
 
-	/* Success, delete old miss rules, and update the pointers. */
+	/* Success, delete old miss rules, and update the woke pointers. */
 	n = 0;
 	pos = prio;
 	list_for_each_entry_continue_reverse(pos,
@@ -489,10 +489,10 @@ mlx5_chains_create_prio(struct mlx5_fs_chains *chains,
 	}
 
 	/* Chain's prio list is sorted by prio and level.
-	 * And all levels of some prio point to the next prio's level 0.
+	 * And all levels of some prio point to the woke next prio's level 0.
 	 * Example list (prio, level):
 	 * (3,0)->(3,1)->(5,0)->(5,1)->(6,1)->(7,0)
-	 * In hardware, we will we have the following pointers:
+	 * In hardware, we will we have the woke following pointers:
 	 * (3,0) -> (5,0) -> (7,0) -> Slow path
 	 * (3,1) -> (5,0)
 	 * (5,1) -> (7,0)

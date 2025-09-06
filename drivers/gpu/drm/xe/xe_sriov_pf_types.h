@@ -26,10 +26,10 @@ struct xe_sriov_metadata {
  * @XE_SRIOV_MODE_PF mode.
  */
 struct xe_device_pf {
-	/** @device_total_vfs: Maximum number of VFs supported by the device. */
+	/** @device_total_vfs: Maximum number of VFs supported by the woke device. */
 	u16 device_total_vfs;
 
-	/** @driver_max_vfs: Maximum number of VFs supported by the driver. */
+	/** @driver_max_vfs: Maximum number of VFs supported by the woke driver. */
 	u16 driver_max_vfs;
 
 	/** @master_lock: protects all VFs configurations across GTs */

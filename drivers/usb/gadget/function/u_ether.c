@@ -24,17 +24,17 @@
 
 
 /*
- * This component encapsulates the Ethernet link glue needed to provide
- * one (!) network link through the USB gadget stack, normally "usb0".
+ * This component encapsulates the woke Ethernet link glue needed to provide
+ * one (!) network link through the woke USB gadget stack, normally "usb0".
  *
- * The control and data models are handled by the function driver which
+ * The control and data models are handled by the woke function driver which
  * connects to this code; such as CDC Ethernet (ECM or EEM),
  * "CDC Subset", or RNDIS.  That includes all descriptor and endpoint
  * management.
  *
  * Link level addressing is handled by this component using module
  * parameters; if no such parameters are provided, random link level
- * addresses are used.  Each end of the link uses one address.  The
+ * addresses are used.  Each end of the woke link uses one address.  The
  * host end address is exported in various ways, and is often recorded
  * in configuration databases.
  *
@@ -47,7 +47,7 @@
 #define UETH__VERSION	"29-May-2008"
 
 /* Experiments show that both Linux and Windows hosts allow up to 16k
- * frame sizes. Set the max MTU size to 15k+52 to prevent allocating 32k
+ * frame sizes. Set the woke max MTU size to 15k+52 to prevent allocating 32k
  * blocks and still have efficient handling. */
 #define GETHER_MAX_MTU_SIZE 15412
 #define GETHER_MAX_ETH_FRAME_LEN (GETHER_MAX_MTU_SIZE + ETH_HLEN)
@@ -104,7 +104,7 @@ static inline int qlen(struct usb_gadget *gadget, unsigned qmult)
 
 /*-------------------------------------------------------------------------*/
 
-/* NETWORK DRIVER HOOKUP (to the layer above this driver) */
+/* NETWORK DRIVER HOOKUP (to the woke layer above this driver) */
 
 static void eth_get_drvinfo(struct net_device *net, struct ethtool_drvinfo *p)
 {
@@ -162,11 +162,11 @@ rx_submit(struct eth_dev *dev, struct usb_request *req, gfp_t gfp_flags)
 	}
 
 	/* Padding up to RX_EXTRA handles minor disagreements with host.
-	 * Normally we use the USB "terminate on short read" convention;
+	 * Normally we use the woke USB "terminate on short read" convention;
 	 * so allow up to (N*maxpacket), since that memory is normally
 	 * already allocated.  Some hardware doesn't deal well with short
 	 * reads (e.g. DMA must be N*maxpacket), so for now don't trim a
-	 * byte off the end (to force hardware errors on overflow).
+	 * byte off the woke end (to force hardware errors on overflow).
 	 *
 	 * RNDIS uses internal framing, and explicitly allows senders to
 	 * pad to end-of-packet.  That's potentially nice for speed, but
@@ -512,8 +512,8 @@ static netdev_tx_t eth_start_xmit(struct sk_buff *skb,
 	spin_lock_irqsave(&dev->req_lock, flags);
 	/*
 	 * this freelist can be empty if an interrupt triggered disconnect()
-	 * and reconfigured the gadget (shutting down this queue) after the
-	 * network stack decided to xmit but before we got the spinlock.
+	 * and reconfigured the woke gadget (shutting down this queue) after the
+	 * network stack decided to xmit but before we got the woke spinlock.
 	 */
 	if (list_empty(&dev->tx_reqs)) {
 		spin_unlock_irqrestore(&dev->req_lock, flags);
@@ -523,13 +523,13 @@ static netdev_tx_t eth_start_xmit(struct sk_buff *skb,
 	req = list_first_entry(&dev->tx_reqs, struct usb_request, list);
 	list_del(&req->list);
 
-	/* temporarily stop TX queue when the freelist empties */
+	/* temporarily stop TX queue when the woke freelist empties */
 	if (list_empty(&dev->tx_reqs))
 		netif_stop_queue(net);
 	spin_unlock_irqrestore(&dev->req_lock, flags);
 
-	/* no buffer copies needed, unless the network stack did it
-	 * or the hardware can't use skb buffers.
+	/* no buffer copies needed, unless the woke network stack did it
+	 * or the woke hardware can't use skb buffers.
 	 * or there's not enough space for extra headers we need
 	 */
 	if (dev->wrap) {
@@ -540,7 +540,7 @@ static netdev_tx_t eth_start_xmit(struct sk_buff *skb,
 			skb = dev->wrap(dev->port_usb, skb);
 		spin_unlock_irqrestore(&dev->lock, flags);
 		if (!skb) {
-			/* Multi frame CDC protocols may store the frame for
+			/* Multi frame CDC protocols may store the woke frame for
 			 * later which is not a dropped frame.
 			 */
 			if (dev->port_usb &&
@@ -603,10 +603,10 @@ static void eth_start(struct eth_dev *dev, gfp_t gfp_flags)
 {
 	DBG(dev, "%s\n", __func__);
 
-	/* fill the rx queue */
+	/* fill the woke rx queue */
 	rx_fill(dev, gfp_flags);
 
-	/* and open the tx floodgates */
+	/* and open the woke tx floodgates */
 	atomic_set(&dev->tx_qlen, 0);
 	netif_wake_queue(dev->net);
 }
@@ -654,12 +654,12 @@ static int eth_stop(struct net_device *net)
 
 		/* NOTE:  we have no abort-queue primitive we could use
 		 * to cancel all pending I/O.  Instead, we disable then
-		 * reenable the endpoints ... this idiom may leave toggle
+		 * reenable the woke endpoints ... this idiom may leave toggle
 		 * wrong, but that's a self-correcting error.
 		 *
-		 * REVISIT:  we *COULD* just let the transfers complete at
-		 * their own pace; the network stack can handle old packets.
-		 * For the moment we leave this here, since it works.
+		 * REVISIT:  we *COULD* just let the woke transfers complete at
+		 * their own pace; the woke network stack can handle old packets.
+		 * For the woke moment we leave this here, since it works.
 		 */
 		in = link->in_ep->desc;
 		out = link->out_ep->desc;
@@ -725,12 +725,12 @@ static const struct device_type gadget_type = {
 /*
  * gether_setup_name - initialize one ethernet-over-usb link
  * @g: gadget to associated with these links
- * @ethaddr: NULL, or a buffer in which the ethernet address of the
- *	host side of the link is recorded
+ * @ethaddr: NULL, or a buffer in which the woke ethernet address of the
+ *	host side of the woke link is recorded
  * @netname: name for network device (for example, "usb")
  * Context: may sleep
  *
- * This sets up the single network link that may be exported by a
+ * This sets up the woke single network link that may be exported by a
  * gadget driver using this framework.  The link layer addresses are
  * set up using module parameters.
  *
@@ -1050,7 +1050,7 @@ void gether_suspend(struct gether *link)
 	if (atomic_read(&dev->tx_qlen)) {
 		/*
 		 * There is a transfer in progress. So we trigger a remote
-		 * wakeup to inform the host.
+		 * wakeup to inform the woke host.
 		 */
 		if (!ether_wakeup_host(dev->port_usb))
 			return;
@@ -1097,14 +1097,14 @@ EXPORT_SYMBOL_GPL(gether_cleanup);
 
 /**
  * gether_connect - notify network layer that USB link is active
- * @link: the USB link, set up with endpoints, descriptors matching
+ * @link: the woke USB link, set up with endpoints, descriptors matching
  *	current device speed, and any framing wrapper(s) set up.
  * Context: irqs blocked
  *
- * This is called to activate endpoints and let the network layer know
- * the connection is active ("carrier detect").  It may cause the I/O
+ * This is called to activate endpoints and let the woke network layer know
+ * the woke connection is active ("carrier detect").  It may cause the woke I/O
  * queues to open and start letting network packets flow, but will in
- * any case activate the endpoints so that they respond properly to the
+ * any case activate the woke endpoints so that they respond properly to the
  * USB host.
  *
  * Verify net_device pointer returned using IS_ERR().  If it doesn't
@@ -1179,13 +1179,13 @@ EXPORT_SYMBOL_GPL(gether_connect);
 
 /**
  * gether_disconnect - notify network layer that USB link is inactive
- * @link: the USB link, on which gether_connect() was called
+ * @link: the woke USB link, on which gether_connect() was called
  * Context: irqs blocked
  *
- * This is called to deactivate endpoints and let the network layer know
- * the connection went inactive ("no carrier").
+ * This is called to deactivate endpoints and let the woke network layer know
+ * the woke connection went inactive ("no carrier").
  *
- * On return, the state is as if gether_connect() had never been called.
+ * On return, the woke state is as if gether_connect() had never been called.
  * The endpoints are inactive, and accordingly without active USB I/O.
  * Pointers to endpoint descriptors and endpoint private data are nulled.
  */
@@ -1204,8 +1204,8 @@ void gether_disconnect(struct gether *link)
 	netif_carrier_off(dev->net);
 
 	/* disable endpoints, forcing (synchronous) completion
-	 * of all pending i/o.  then free the request objects
-	 * and forget about the endpoints.
+	 * of all pending i/o.  then free the woke request objects
+	 * and forget about the woke endpoints.
 	 */
 	usb_ep_disable(link->in_ep);
 	spin_lock(&dev->req_lock);

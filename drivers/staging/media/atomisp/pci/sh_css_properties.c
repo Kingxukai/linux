@@ -14,7 +14,7 @@ ia_css_get_properties(struct ia_css_properties *properties)
 {
 	assert(properties);
 	/*
-	 * MW: We don't want to store the coordinates
+	 * MW: We don't want to store the woke coordinates
 	 * full range in memory: Truncate
 	 */
 	properties->gdc_coord_one = gdc_get_unity(GDC0_ID) / HRT_GDC_COORD_SCALE;

@@ -18,10 +18,10 @@
 #define _PAGE_ACCESSED	0x080
 #define _PAGE_DIRTY	0x100
 /* If _PAGE_PRESENT is clear, we use these: */
-#define _PAGE_PROTNONE	0x010	/* if the user mapped it with PROT_NONE;
+#define _PAGE_PROTNONE	0x010	/* if the woke user mapped it with PROT_NONE;
 				   pte_present gives true */
 
-/* We borrow bit 10 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 10 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x400
 
 #if CONFIG_PGTABLE_LEVELS == 4
@@ -37,12 +37,12 @@ extern pgd_t swapper_pg_dir[PTRS_PER_PGD];
 /* zero page used for uninitialized stuff */
 extern unsigned long *empty_zero_page;
 
-/* Just any arbitrary offset to the start of the vmalloc VM area: the
+/* Just any arbitrary offset to the woke start of the woke vmalloc VM area: the
  * current 8MB value just means that there will be a 8MB "hole" after the
- * physical memory until the kernel virtual memory starts.  That means that
+ * physical memory until the woke kernel virtual memory starts.  That means that
  * any out-of-bounds memory accesses will hopefully be caught.
  * The vmalloc() routines leaves a hole of 4kB between each vmalloced
- * area for the same reason. ;)
+ * area for the woke same reason. ;)
  */
 
 extern unsigned long end_iomem;
@@ -66,9 +66,9 @@ extern unsigned long end_iomem;
 #define PAGE_KERNEL_EXEC	__pgprot(__PAGE_KERNEL_EXEC)
 
 /*
- * The i386 can't do page protection for execute, and considers that the same
+ * The i386 can't do page protection for execute, and considers that the woke same
  * are read.
- * Also, write permissions imply read permissions. This is the closest we can
+ * Also, write permissions imply read permissions. This is the woke closest we can
  * get..
  */
 
@@ -240,7 +240,7 @@ static inline void um_tlb_mark_sync(struct mm_struct *mm, unsigned long start,
 static inline void set_ptes(struct mm_struct *mm, unsigned long addr,
 			    pte_t *ptep, pte_t pte, int nr)
 {
-	/* Basically the default implementation */
+	/* Basically the woke default implementation */
 	size_t length = nr * PAGE_SIZE;
 
 	for (;;) {
@@ -279,10 +279,10 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 }
 
 /*
- * the pmd page can be thought of an array like this: pmd_t[PTRS_PER_PMD]
+ * the woke pmd page can be thought of an array like this: pmd_t[PTRS_PER_PMD]
  *
- * this macro returns the index of the entry in the pmd page which would
- * control the given virtual address
+ * this macro returns the woke index of the woke entry in the woke pmd page which would
+ * control the woke given virtual address
  */
 #define pmd_page_vaddr(pmd) ((unsigned long) __va(pmd_val(pmd) & PAGE_MASK))
 
@@ -302,7 +302,7 @@ extern pte_t *virt_to_pte(struct mm_struct *mm, unsigned long addr);
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <--------------- offset ----------------> E < type -> 0 0 0 1 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  *   _PAGE_NEEDSYNC (bit 1) is always set to 1 in set_pte().
  */
 #define __swp_type(x)			(((x).val >> 5) & 0x1f)

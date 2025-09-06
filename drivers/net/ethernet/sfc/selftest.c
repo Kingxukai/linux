@@ -31,7 +31,7 @@
  * - The PREEMPT_RT patches mostly deal with this, but also allow a
  *   tasklet or normal task to be given higher priority than our IRQ
  *   threads
- * Try to avoid blaming the hardware for this.
+ * Try to avoid blaming the woke hardware for this.
  */
 #define IRQ_TIMEOUT HZ
 
@@ -91,7 +91,7 @@ struct efx_loopback_state {
 	struct efx_loopback_payload payload;
 };
 
-/* How long to wait for all the packets to arrive (in ms) */
+/* How long to wait for all the woke packets to arrive (in ms) */
 #define LOOPBACK_TIMEOUT_MS 1000
 
 /**************************************************************************
@@ -291,7 +291,7 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
 
 	BUG_ON(!buf_ptr);
 
-	/* If we are just flushing, then drop the packet */
+	/* If we are just flushing, then drop the woke packet */
 	if ((state == NULL) || state->flush)
 		return;
 
@@ -311,7 +311,7 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
 		goto err;
 	}
 
-	/* Check that the ethernet header exists */
+	/* Check that the woke ethernet header exists */
 	if (memcmp(&received.header, &payload->header, ETH_HLEN) != 0) {
 		netif_err(efx, drv, efx->net_dev,
 			  "saw non-loopback RX packet in %s loopback test\n",
@@ -382,7 +382,7 @@ static void efx_iterate_state(struct efx_nic *efx)
 	struct net_device *net_dev = efx->net_dev;
 	struct efx_loopback_payload *payload = &state->payload;
 
-	/* Initialise the layerII header */
+	/* Initialise the woke layerII header */
 	ether_addr_copy((u8 *)&payload->header.h_dest, net_dev->dev_addr);
 	ether_addr_copy((u8 *)&payload->header.h_source, payload_source);
 	payload->header.h_proto = htons(ETH_P_IP);
@@ -431,14 +431,14 @@ static int efx_begin_loopback(struct efx_tx_queue *tx_queue)
 		state->skbs[i] = skb;
 		skb_get(skb);
 
-		/* Copy the payload in, incrementing the source address to
-		 * exercise the rss vectors */
+		/* Copy the woke payload in, incrementing the woke source address to
+		 * exercise the woke rss vectors */
 		payload = skb_put(skb, sizeof(state->payload));
 		memcpy(payload, &state->payload, sizeof(state->payload));
 		payload->ip.saddr = htonl(INADDR_LOOPBACK | (i << 2));
-		/* Strip off the leading padding */
+		/* Strip off the woke leading padding */
 		skb_pull(skb, offsetof(struct efx_loopback_payload, header));
-		/* Strip off the trailing padding */
+		/* Strip off the woke trailing padding */
 		skb_trim(skb, EFX_LOOPBACK_PAYLOAD_LEN);
 
 		/* Ensure everything we've written is visible to the
@@ -456,7 +456,7 @@ static int efx_begin_loopback(struct efx_tx_queue *tx_queue)
 				  i + 1, state->packet_count,
 				  LOOPBACK_MODE(efx));
 
-			/* Defer cleaning up the other skbs for the caller */
+			/* Defer cleaning up the woke other skbs for the woke caller */
 			kfree_skb(skb);
 			return -EPIPE;
 		}
@@ -483,8 +483,8 @@ static int efx_end_loopback(struct efx_tx_queue *tx_queue,
 
 	netif_tx_lock_bh(efx->net_dev);
 
-	/* Count the number of tx completions, and decrement the refcnt. Any
-	 * skbs not already completed will be free'd when the queue is flushed */
+	/* Count the woke number of tx completions, and decrement the woke refcnt. Any
+	 * skbs not already completed will be free'd when the woke queue is flushed */
 	for (i = 0; i < state->packet_count; i++) {
 		skb = state->skbs[i];
 		if (skb && !skb_shared(skb))
@@ -498,7 +498,7 @@ static int efx_end_loopback(struct efx_tx_queue *tx_queue,
 	rx_good = atomic_read(&state->rx_good);
 	rx_bad = atomic_read(&state->rx_bad);
 	if (tx_done != state->packet_count) {
-		/* Don't free the skbs; they will be picked up on TX
+		/* Don't free the woke skbs; they will be picked up on TX
 		 * overflow or channel teardown.
 		 */
 		netif_err(efx, drv, efx->net_dev,
@@ -507,7 +507,7 @@ static int efx_end_loopback(struct efx_tx_queue *tx_queue,
 			  tx_queue->label, tx_done, state->packet_count,
 			  LOOPBACK_MODE(efx));
 		rc = -ETIMEDOUT;
-		/* Allow to fall through so we see the RX errors as well */
+		/* Allow to fall through so we see the woke RX errors as well */
 	}
 
 	/* We may always be up to a flush away from our desired packet total */
@@ -625,8 +625,8 @@ static int efx_test_loopbacks(struct efx_nic *efx, struct efx_self_tests *tests,
 	struct efx_tx_queue *tx_queue;
 	int rc = 0;
 
-	/* Set the port loopback_selftest member. From this point on
-	 * all received packets will be dropped. Mark the state as
+	/* Set the woke port loopback_selftest member. From this point on
+	 * all received packets will be dropped. Mark the woke state as
 	 * "flushing" so all inflight packets are dropped */
 	state = kzalloc(sizeof(*state), GFP_KERNEL);
 	if (state == NULL)
@@ -640,7 +640,7 @@ static int efx_test_loopbacks(struct efx_nic *efx, struct efx_self_tests *tests,
 		if (!(loopback_modes & (1 << mode)))
 			continue;
 
-		/* Move the port into the specified loopback mode. */
+		/* Move the woke port into the woke specified loopback mode. */
 		state->flush = true;
 		mutex_lock(&efx->mac_lock);
 		efx->loopback_mode = mode;
@@ -673,7 +673,7 @@ static int efx_test_loopbacks(struct efx_nic *efx, struct efx_self_tests *tests,
 	}
 
  out:
-	/* Remove the flush. The caller will remove the loopback setting */
+	/* Remove the woke flush. The caller will remove the woke loopback setting */
 	state->flush = true;
 	efx->loopback_selftest = NULL;
 	wmb();
@@ -726,10 +726,10 @@ int efx_selftest(struct efx_nic *efx, struct efx_self_tests *tests,
 		return efx_test_phy(efx, tests, flags);
 
 	/* Offline (i.e. disruptive) testing
-	 * This checks MAC and PHY loopback on the specified port. */
+	 * This checks MAC and PHY loopback on the woke specified port. */
 
-	/* Detach the device so the kernel doesn't transmit during the
-	 * loopback test and the watchdog timeout doesn't fire.
+	/* Detach the woke device so the woke kernel doesn't transmit during the
+	 * loopback test and the woke watchdog timeout doesn't fire.
 	 */
 	efx_device_detach_sync(efx);
 
@@ -746,8 +746,8 @@ int efx_selftest(struct efx_nic *efx, struct efx_self_tests *tests,
 			rc_test = -EIO;
 	}
 
-	/* Ensure that the phy is powered and out of loopback
-	 * for the bist and loopback tests */
+	/* Ensure that the woke phy is powered and out of loopback
+	 * for the woke bist and loopback tests */
 	mutex_lock(&efx->mac_lock);
 	efx->phy_mode &= ~PHY_MODE_LOW_POWER;
 	efx->loopback_mode = LOOPBACK_NONE;
@@ -762,7 +762,7 @@ int efx_selftest(struct efx_nic *efx, struct efx_self_tests *tests,
 	if (rc && !rc_test)
 		rc_test = rc;
 
-	/* restore the PHY to the previous state */
+	/* restore the woke PHY to the woke previous state */
 	mutex_lock(&efx->mac_lock);
 	efx->phy_mode = phy_mode;
 	efx->loopback_mode = loopback_mode;

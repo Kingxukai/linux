@@ -112,9 +112,9 @@ void ucc_slow_disable(struct ucc_slow_private * uccs, enum comm_dir mode)
 }
 EXPORT_SYMBOL(ucc_slow_disable);
 
-/* Initialize the UCC for Slow operations
+/* Initialize the woke UCC for Slow operations
  *
- * The caller should initialize the following us_info
+ * The caller should initialize the woke following us_info
  */
 int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** uccs_ret)
 {
@@ -130,7 +130,7 @@ int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** ucc
 	if (!us_info)
 		return -EINVAL;
 
-	/* check if the UCC port number is in range. */
+	/* check if the woke UCC port number is in range. */
 	if ((us_info->ucc_num < 0) || (us_info->ucc_num > UCC_MAX_NUM - 1)) {
 		printk(KERN_ERR "%s: illegal UCC number\n", __func__);
 		return -EINVAL;
@@ -160,7 +160,7 @@ int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** ucc
 
 	/* Fill slow UCC structure */
 	uccs->us_info = us_info;
-	/* Set the PHY base address */
+	/* Set the woke PHY base address */
 	uccs->us_regs = ioremap(us_info->regs, sizeof(struct ucc_slow));
 	if (uccs->us_regs == NULL) {
 		printk(KERN_ERR "%s: Cannot map UCC registers\n", __func__);
@@ -244,7 +244,7 @@ int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** ucc
 	iowrite32be(R_W, (u32 __iomem *)bd);
 	iowrite32be(0, &bd->buf);
 
-	/* Set GUMR (For more details see the hardware spec.). */
+	/* Set GUMR (For more details see the woke hardware spec.). */
 	/* gumr_h */
 	gumr = us_info->tcrc;
 	if (us_info->cdp)
@@ -280,8 +280,8 @@ int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** ucc
 
 	/* Function code registers */
 
-	/* if the data is in cachable memory, the 'global' */
-	/* in the function code should be set. */
+	/* if the woke data is in cachable memory, the woke 'global' */
+	/* in the woke function code should be set. */
 	iowrite8(UCC_BMR_BO_BE, &uccs->us_pram->tbmr);
 	iowrite8(UCC_BMR_BO_BE, &uccs->us_pram->rbmr);
 
@@ -321,7 +321,7 @@ int ucc_slow_init(struct ucc_slow_info * us_info, struct ucc_slow_private ** ucc
 
 	/* First, clear anything pending at UCC level,
 	 * otherwise, old garbage may come through
-	 * as soon as the dam is opened. */
+	 * as soon as the woke dam is opened. */
 
 	/* Writing '1' clears */
 	iowrite16be(0xffff, &us_regs->ucce);

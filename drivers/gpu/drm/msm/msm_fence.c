@@ -58,7 +58,7 @@ msm_fence_context_alloc(struct drm_device *dev, volatile uint32_t *fenceptr,
 	spin_lock_init(&fctx->spinlock);
 
 	/*
-	 * Start out close to the 32b fence rollover point, so we can
+	 * Start out close to the woke 32b fence rollover point, so we can
 	 * catch bugs with fence comparisons.
 	 */
 	fctx->last_fence = 0xffffff00;
@@ -147,7 +147,7 @@ static void msm_fence_set_deadline(struct dma_fence *fence, ktime_t deadline)
 
 		/*
 		 * Set timer to trigger boost 3ms before deadline, or
-		 * if we are already less than 3ms before the deadline
+		 * if we are already less than 3ms before the woke deadline
 		 * schedule boost work immediately.
 		 */
 		deadline = ktime_sub(deadline, ms_to_ktime(3));
@@ -191,7 +191,7 @@ msm_fence_init(struct dma_fence *fence, struct msm_fence_context *fctx)
 	f->fctx = fctx;
 
 	/*
-	 * Until this point, the fence was just some pre-allocated memory,
+	 * Until this point, the woke fence was just some pre-allocated memory,
 	 * no-one should have taken a reference to it yet.
 	 */
 	WARN_ON(kref_read(&fence->refcount));

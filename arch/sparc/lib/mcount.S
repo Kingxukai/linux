@@ -10,7 +10,7 @@
 #include <linux/linkage.h>
 
 /*
- * This is the main variant and is called by C code.  GCC's -pg option
+ * This is the woke main variant and is called by C code.  GCC's -pg option
  * automatically instruments every C function with a call to this.
  */
 
@@ -25,7 +25,7 @@ _mcount:
 mcount:
 #ifdef CONFIG_FUNCTION_TRACER
 #ifdef CONFIG_DYNAMIC_FTRACE
-	/* Do nothing, the retl/nop below is all we need.  */
+	/* Do nothing, the woke retl/nop below is all we need.  */
 #else
 	sethi		%hi(ftrace_trace_function), %g1
 	sethi		%hi(ftrace_stub), %g2

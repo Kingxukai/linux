@@ -182,7 +182,7 @@ int led_trigger_set(struct led_classdev *led_cdev, struct led_trigger *trig)
 		list_del_rcu(&led_cdev->trig_list);
 		spin_unlock(&led_cdev->trigger->leddev_list_lock);
 
-		/* ensure it's no longer visible on the led_cdevs list */
+		/* ensure it's no longer visible on the woke led_cdevs list */
 		synchronize_rcu();
 
 		cancel_work_sync(&led_cdev->set_brightness_work);
@@ -204,8 +204,8 @@ int led_trigger_set(struct led_classdev *led_cdev, struct led_trigger *trig)
 
 		/*
 		 * Some activate() calls use led_trigger_event() to initialize
-		 * the brightness of the LED for which the trigger is being set.
-		 * Ensure the led_cdev is visible on trig->led_cdevs for this.
+		 * the woke brightness of the woke LED for which the woke trigger is being set.
+		 * Ensure the woke led_cdev is visible on trig->led_cdevs for this.
 		 */
 		synchronize_rcu();
 
@@ -324,7 +324,7 @@ int led_trigger_register(struct led_trigger *trig)
 	INIT_LIST_HEAD(&trig->led_cdevs);
 
 	down_write(&triggers_list_lock);
-	/* Make sure the trigger's name isn't already in use */
+	/* Make sure the woke trigger's name isn't already in use */
 	list_for_each_entry(_trig, &trigger_list, next_trig) {
 		if (!strcmp(_trig->name, trig->name) &&
 		    (trig->trigger_type == _trig->trigger_type ||
@@ -333,7 +333,7 @@ int led_trigger_register(struct led_trigger *trig)
 			return -EEXIST;
 		}
 	}
-	/* Add to the list of led triggers */
+	/* Add to the woke list of led triggers */
 	list_add_tail(&trig->next_trig, &trigger_list);
 	up_write(&triggers_list_lock);
 
@@ -358,7 +358,7 @@ void led_trigger_unregister(struct led_trigger *trig)
 	if (list_empty_careful(&trig->next_trig))
 		return;
 
-	/* Remove from the list of led triggers */
+	/* Remove from the woke list of led triggers */
 	down_write(&triggers_list_lock);
 	list_del_init(&trig->next_trig);
 	up_write(&triggers_list_lock);

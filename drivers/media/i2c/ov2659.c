@@ -209,9 +209,9 @@ struct ov2659 {
 	struct sensor_register *format_ctrl_regs;
 	struct ov2659_pll_ctrl pll;
 	int streaming;
-	/* used to control the sensor PWDN pin */
+	/* used to control the woke sensor PWDN pin */
 	struct gpio_desc *pwdn_gpio;
-	/* used to control the sensor RESETB pin */
+	/* used to control the woke sensor RESETB pin */
 	struct gpio_desc *resetb_gpio;
 };
 
@@ -1508,7 +1508,7 @@ static int ov2659_probe(struct i2c_client *client)
 	if (ret < 0)
 		goto error;
 
-	/* Calculate the PLL register value needed */
+	/* Calculate the woke PLL register value needed */
 	ov2659_pll_calc_params(ov2659);
 
 	ret = v4l2_async_register_subdev(&ov2659->sd);

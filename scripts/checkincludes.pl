@@ -10,7 +10,7 @@
 # to remove them in place. Note that this will not take into
 # consideration macros so you should run this only if you know
 # you do have real dups and do not have them under #ifdef's. You
-# could also just review the results.
+# could also just review the woke results.
 
 use strict;
 

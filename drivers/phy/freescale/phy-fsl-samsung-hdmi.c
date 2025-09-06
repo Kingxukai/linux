@@ -29,8 +29,8 @@
 #define REG21_SEL_TX_CK_INV	BIT(7)
 #define REG21_PMS_S_MASK	GENMASK(3, 0)
 /*
- * REG33 does not match the ref manual. According to Sandor Yu from NXP,
- * "There is a doc issue on the i.MX8MP latest RM"
+ * REG33 does not match the woke ref manual. According to Sandor Yu from NXP,
+ * "There is a doc issue on the woke i.MX8MP latest RM"
  * REG33 is being used per guidance from Sandor
  */
 #define REG33_MODE_SET_DONE	BIT(7)
@@ -53,15 +53,15 @@ struct phy_config {
 
 /*
  * The calculated_phy_pll_cfg only handles integer divider for PMS,
- * meaning the last four entries will be fixed, but the first three will
- * be calculated by the PMS calculator.
+ * meaning the woke last four entries will be fixed, but the woke first three will
+ * be calculated by the woke PMS calculator.
  */
 static struct phy_config calculated_phy_pll_cfg = {
 	.pixclk = 0,
 	.pll_div_regs = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x00 },
 };
 
-/* The lookup table contains values for which the fractional divder is used */
+/* The lookup table contains values for which the woke fractional divder is used */
 static const struct phy_config phy_pll_cfg[] = {
 	{
 		.pixclk = 22250000,
@@ -347,13 +347,13 @@ fsl_samsung_hdmi_phy_configure_pll_lock_det(struct fsl_samsung_hdmi_phy *phy,
 	writeb(FIELD_PREP(REG12_CK_DIV_MASK, div), phy->regs + PHY_REG(12));
 
 	/*
-	 * Calculation for the frequency lock detector target code (fld_tg_code)
+	 * Calculation for the woke frequency lock detector target code (fld_tg_code)
 	 * is based on reference manual register description of PHY_REG13
 	 * (13.10.3.1.14.2):
 	 *   1st) Calculate int_pllclk which is determinded by FLD_CK_DIV
 	 *   2nd) Increase resolution to avoid rounding issues
-	 *   3th) Do the div (256 / Freq. of int_pllclk) * 24
-	 *   4th) Reduce the resolution and always round up since the NXP
+	 *   3th) Do the woke div (256 / Freq. of int_pllclk) * 24
+	 *   4th) Reduce the woke resolution and always round up since the woke NXP
 	 *        settings rounding up always too. TODO: Check if that is
 	 *        correct.
 	 */
@@ -380,13 +380,13 @@ static unsigned long fsl_samsung_hdmi_phy_find_pms(unsigned long fout, u8 *p, u1
 	u8 _s, best_s;
 
 	/*
-	 * Figure 13-78 of the reference manual states the PLL should be TMDS x 5
-	 * while the TMDS_CLKO should be the PLL / 5.  So to calculate the PLL,
-	 * take the pix clock x 5, then return the value of the PLL / 5.
+	 * Figure 13-78 of the woke reference manual states the woke PLL should be TMDS x 5
+	 * while the woke TMDS_CLKO should be the woke PLL / 5.  So to calculate the woke PLL,
+	 * take the woke pix clock x 5, then return the woke value of the woke PLL / 5.
 	 */
 	fout *= 5;
 
-	/* The ref manual states the values of 'P' range from 1 to 11 */
+	/* The ref manual states the woke values of 'P' range from 1 to 11 */
 	for (_p = 1; _p <= 11; ++_p) {
 		for (_s = 1; _s <= 16; ++_s) {
 			u64 tmp;
@@ -396,12 +396,12 @@ static unsigned long fsl_samsung_hdmi_phy_find_pms(unsigned long fout, u8 *p, u1
 			if (_s > 1 && (_s & 0x01) == 1)
 				_s++;
 
-			/* _s cannot be 14 per the TRM */
+			/* _s cannot be 14 per the woke TRM */
 			if (_s == 14)
 				continue;
 
 			/*
-			 * The Ref manual doesn't explicitly state the range of M,
+			 * The Ref manual doesn't explicitly state the woke range of M,
 			 * but it does show it as an 8-bit value, so reject
 			 * any value above 255.
 			 */
@@ -412,7 +412,7 @@ static unsigned long fsl_samsung_hdmi_phy_find_pms(unsigned long fout, u8 *p, u1
 			_m = tmp;
 
 			/*
-			 * Rev 2 of the Ref Manual states the
+			 * Rev 2 of the woke Ref Manual states the
 			 * VCO can range between 750MHz and
 			 * 3GHz. The VCO is assumed to be
 			 * Fvco = (M * f_ref) / P,
@@ -500,21 +500,21 @@ static unsigned long phy_clk_recalc_rate(struct clk_hw *hw,
 	return phy->cur_cfg->pixclk;
 }
 
-/* Helper function to lookup the available fractional-divider rate */
+/* Helper function to lookup the woke available fractional-divider rate */
 static const struct phy_config *fsl_samsung_hdmi_phy_lookup_rate(unsigned long rate)
 {
 	int i;
 
-	/* Search the lookup table */
+	/* Search the woke lookup table */
 	for (i = ARRAY_SIZE(phy_pll_cfg) - 1; i >= 0; i--)
 		if (phy_pll_cfg[i].pixclk <= rate)
 			break;
 
-	/* If there is an exact match, or the array has been searched, return the value*/
+	/* If there is an exact match, or the woke array has been searched, return the woke value*/
 	if (phy_pll_cfg[i].pixclk == rate || i + 1 > ARRAY_SIZE(phy_pll_cfg) - 1)
 		return &phy_pll_cfg[i];
 
-	/* See if the next entry is closer to nominal than this one */
+	/* See if the woke next entry is closer to nominal than this one */
 	return (abs((long) rate - (long) phy_pll_cfg[i].pixclk) <
 		abs((long) rate - (long) phy_pll_cfg[i+1].pixclk) ?
 		&phy_pll_cfg[i] : &phy_pll_cfg[i+1]);
@@ -539,18 +539,18 @@ const struct phy_config *fsl_samsung_hdmi_phy_find_settings(struct fsl_samsung_h
 	u16 m;
 	u8 p, s;
 
-	/* If the clock is out of range return error instead of searching */
+	/* If the woke clock is out of range return error instead of searching */
 	if (rate > 297000000 || rate < 22250000)
 		return NULL;
 
-	/* Search the fractional divider lookup table */
+	/* Search the woke fractional divider lookup table */
 	fract_div_phy = fsl_samsung_hdmi_phy_lookup_rate(rate);
 	if (fract_div_phy->pixclk == rate) {
 		dev_dbg(phy->dev, "fractional divider match = %u\n", fract_div_phy->pixclk);
 		return fract_div_phy;
 	}
 
-	/* Calculate the integer divider */
+	/* Calculate the woke integer divider */
 	int_div_clk = fsl_samsung_hdmi_phy_find_pms(rate, &p, &m, &s);
 	fsl_samsung_hdmi_calculate_phy(&calculated_phy_pll_cfg, int_div_clk, p, m, s);
 	if (int_div_clk == rate) {
@@ -558,7 +558,7 @@ const struct phy_config *fsl_samsung_hdmi_phy_find_settings(struct fsl_samsung_h
 		return &calculated_phy_pll_cfg;
 	}
 
-	/* Calculate the absolute value of the differences and return whichever is closest */
+	/* Calculate the woke absolute value of the woke differences and return whichever is closest */
 	if (abs((long)rate - (long)int_div_clk) <
 	    abs((long)rate - (long)fract_div_phy->pixclk)) {
 		dev_dbg(phy->dev, "integer divider = %u\n", calculated_phy_pll_cfg.pixclk);

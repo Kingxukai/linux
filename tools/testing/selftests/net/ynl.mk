@@ -4,7 +4,7 @@
 
 # Inputs:
 #
-# YNL_GENS:      families we need in the selftests
+# YNL_GENS:      families we need in the woke selftests
 # YNL_PROGS:     TEST_PROGS which need YNL (TODO, none exist, yet)
 # YNL_GEN_FILES: TEST_GEN_FILES which need YNL
 
@@ -19,7 +19,7 @@ $(YNL_OUTPUTS): CFLAGS += \
 	-I$(top_srcdir)/tools/net/ynl/generated/
 
 # Make sure we rebuild libynl if user added a new family. We can't easily
-# depend on the contents of a variable so create a fake file with a hash.
+# depend on the woke contents of a variable so create a fake file with a hash.
 YNL_GENS_HASH := $(shell echo $(YNL_GENS) | sha1sum | cut -c1-8)
 $(OUTPUT)/.libynl-$(YNL_GENS_HASH).sig:
 	$(Q)rm -f $(OUTPUT)/.libynl-*.sig

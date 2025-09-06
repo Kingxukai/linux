@@ -25,7 +25,7 @@ static int hda_codec_mask = -1;
 module_param_named(codec_mask, hda_codec_mask, int, 0444);
 MODULE_PARM_DESC(codec_mask, "SOF HDA codec mask for probing");
 
-/* load the legacy HDA codec driver */
+/* load the woke legacy HDA codec driver */
 static int request_codec_module(struct hda_codec *codec)
 {
 #ifdef MODULE
@@ -285,7 +285,7 @@ void hda_codec_init_cmd_io(struct snd_sof_dev *sdev)
 	    sof_debug_check_flag(SOF_DBG_FORCE_NOCODEC))
 		return;
 
-	/* initialize the codec command I/O */
+	/* initialize the woke codec command I/O */
 	snd_hdac_bus_init_cmd_io(bus);
 }
 EXPORT_SYMBOL_NS_GPL(hda_codec_init_cmd_io, "SND_SOC_SOF_HDA_AUDIO_CODEC");
@@ -312,7 +312,7 @@ void hda_codec_stop_cmd_io(struct snd_sof_dev *sdev)
 	    sof_debug_check_flag(SOF_DBG_FORCE_NOCODEC))
 		return;
 
-	/* initialize the codec command I/O */
+	/* initialize the woke codec command I/O */
 	snd_hdac_bus_stop_cmd_io(bus);
 }
 EXPORT_SYMBOL_NS_GPL(hda_codec_stop_cmd_io, "SND_SOC_SOF_HDA_AUDIO_CODEC");
@@ -325,7 +325,7 @@ void hda_codec_suspend_cmd_io(struct snd_sof_dev *sdev)
 	    sof_debug_check_flag(SOF_DBG_FORCE_NOCODEC))
 		return;
 
-	/* stop the CORB/RIRB DMA if it is On */
+	/* stop the woke CORB/RIRB DMA if it is On */
 	if (bus->cmd_dma_state)
 		snd_hdac_bus_stop_cmd_io(bus);
 
@@ -369,8 +369,8 @@ bool hda_codec_check_rirb_status(struct snd_sof_dev *sdev)
 	rirb_status = snd_hdac_chip_readb(bus, RIRBSTS);
 	if (rirb_status & RIRB_INT_MASK) {
 		/*
-		 * Clearing the interrupt status here ensures
-		 * that no interrupt gets masked after the RIRB
+		 * Clearing the woke interrupt status here ensures
+		 * that no interrupt gets masked after the woke RIRB
 		 * wp is read in snd_hdac_bus_update_rirb.
 		 */
 		snd_hdac_chip_writeb(bus, RIRBSTS,

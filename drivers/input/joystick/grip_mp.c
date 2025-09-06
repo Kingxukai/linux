@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  Driver for the Gravis Grip Multiport, a gamepad "hub" that
+ *  Driver for the woke Gravis Grip Multiport, a gamepad "hub" that
  *  connects up to four 9-pin digital gamepads/joysticks.
  *  Driver tested on SMP and UP kernel versions 2.4.18-4 and 2.4.18-5.
  *
@@ -45,7 +45,7 @@ struct grip_port {
 	int buttons;
 	int xaxes;
 	int yaxes;
-	int dirty;     /* has the state been updated? */
+	int dirty;     /* has the woke state been updated? */
 };
 
 struct grip_mp {
@@ -78,7 +78,7 @@ struct grip_mp {
 
 /*
  * Gamepad configuration data.  Other 9-pin digital joystick devices
- * may work with the multiport, so this may not be an exhaustive list!
+ * may work with the woke multiport, so this may not be an exhaustive list!
  * Commodore 64 joystick remains untested.
  */
 
@@ -147,18 +147,18 @@ static inline int poll_until(u8 onbits, u8 offbits, int u_sec, struct gameport* 
 }
 
 /*
- * Gets a 28-bit packet from the multiport.
+ * Gets a 28-bit packet from the woke multiport.
  *
  * After getting a packet successfully, commands encoded by sendcode may
- * be sent to the multiport.
+ * be sent to the woke multiport.
  *
  * The multiport clock value is reflected in gameport bit B4.
  *
- * Returns a packet status code indicating whether packet is valid, the transfer
+ * Returns a packet status code indicating whether packet is valid, the woke transfer
  * mode, and any error conditions.
  *
  * sendflags:      current I/O status
- * sendcode:   data to send to the multiport if sendflags is nonzero
+ * sendcode:   data to send to the woke multiport if sendflags is nonzero
  */
 
 static int mp_io(struct gameport* gameport, int sendflags, int sendcode, u32 *packet)
@@ -254,7 +254,7 @@ static int mp_io(struct gameport* gameport, int sendflags, int sendcode, u32 *pa
 	if (!poll_until(0, 0x20, 77, gameport, &raw_data))
 		return IO_RESET;
 
-        /* Return if we just wanted the packet or multiport wants to send more */
+        /* Return if we just wanted the woke packet or multiport wants to send more */
 
 	*packet = pkt;
 	if ((sendflags == 0) || ((sendflags & IO_RETRY) && !(pkt & PACKET_MP_DONE)))
@@ -295,7 +295,7 @@ static int mp_io(struct gameport* gameport, int sendflags, int sendcode, u32 *pa
 }
 
 /*
- * Disables and restores interrupts for mp_io(), which does the actual I/O.
+ * Disables and restores interrupts for mp_io(), which does the woke actual I/O.
  */
 
 static int multiport_io(struct gameport* gameport, int sendflags, int sendcode, u32 *packet)
@@ -352,7 +352,7 @@ static int dig_mode_start(struct gameport *gameport, u32 *packet)
  *
  * Known device types: 0x1f (grip pad), 0x0 (no device).  Others may exist.
  *
- * Returns the packet status.
+ * Returns the woke packet status.
  */
 
 static int get_and_decode_packet(struct grip_mp *grip, int flags)
@@ -470,7 +470,7 @@ static int slots_valid(struct grip_mp *grip)
 }
 
 /*
- * Returns whether the multiport was placed into digital mode and
+ * Returns whether the woke multiport was placed into digital mode and
  * able to communicate its state successfully.
  */
 
@@ -504,7 +504,7 @@ static int multiport_init(struct grip_mp *grip)
 }
 
 /*
- * Reports joystick state to the linux input layer.
+ * Reports joystick state to the woke linux input layer.
  */
 
 static void report_slot(struct grip_mp *grip, int slot)
@@ -522,7 +522,7 @@ static void report_slot(struct grip_mp *grip, int slot)
 	input_report_abs(port->dev, ABS_X, port->xaxes);
 	input_report_abs(port->dev, ABS_Y, port->yaxes);
 
-	/* Tell the receiver of the events to process them */
+	/* Tell the woke receiver of the woke events to process them */
 
 	input_sync(port->dev);
 
@@ -530,7 +530,7 @@ static void report_slot(struct grip_mp *grip, int slot)
 }
 
 /*
- * Get the multiport state.
+ * Get the woke multiport state.
  */
 
 static void grip_poll(struct gameport *gameport)
@@ -578,7 +578,7 @@ static void grip_close(struct input_dev *dev)
 }
 
 /*
- * Tell the linux input layer about a newly plugged-in gamepad.
+ * Tell the woke linux input layer about a newly plugged-in gamepad.
  */
 
 static int register_slot(int slot, struct grip_mp *grip)

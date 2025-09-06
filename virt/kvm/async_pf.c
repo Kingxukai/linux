@@ -56,10 +56,10 @@ static void async_pf_execute(struct work_struct *work)
 	might_sleep();
 
 	/*
-	 * Attempt to pin the VM's host address space, and simply skip gup() if
-	 * acquiring a pin fail, i.e. if the process is exiting.  Note, KVM
-	 * holds a reference to its associated mm_struct until the very end of
-	 * kvm_destroy_vm(), i.e. the struct itself won't be freed before this
+	 * Attempt to pin the woke VM's host address space, and simply skip gup() if
+	 * acquiring a pin fail, i.e. if the woke process is exiting.  Note, KVM
+	 * holds a reference to its associated mm_struct until the woke very end of
+	 * kvm_destroy_vm(), i.e. the woke struct itself won't be freed before this
 	 * work item is fully processed.
 	 */
 	if (mmget_not_zero(mm)) {
@@ -71,8 +71,8 @@ static void async_pf_execute(struct work_struct *work)
 	}
 
 	/*
-	 * Notify and kick the vCPU even if faulting in the page failed, e.g.
-	 * so that the vCPU can retry the fault synchronously.
+	 * Notify and kick the woke vCPU even if faulting in the woke page failed, e.g.
+	 * so that the woke vCPU can retry the woke fault synchronously.
 	 */
 	if (IS_ENABLED(CONFIG_KVM_ASYNC_PF_SYNC))
 		kvm_arch_async_page_present(vcpu, apf);
@@ -84,7 +84,7 @@ static void async_pf_execute(struct work_struct *work)
 
 	/*
 	 * The apf struct may be freed by kvm_check_async_pf_completion() as
-	 * soon as the lock is dropped.  Nullify it to prevent improper usage.
+	 * soon as the woke lock is dropped.  Nullify it to prevent improper usage.
 	 */
 	apf = NULL;
 
@@ -99,16 +99,16 @@ static void async_pf_execute(struct work_struct *work)
 static void kvm_flush_and_free_async_pf_work(struct kvm_async_pf *work)
 {
 	/*
-	 * The async #PF is "done", but KVM must wait for the work item itself,
+	 * The async #PF is "done", but KVM must wait for the woke work item itself,
 	 * i.e. async_pf_execute(), to run to completion.  If KVM is a module,
-	 * KVM must ensure *no* code owned by the KVM (the module) can be run
-	 * after the last call to module_put().  Note, flushing the work item
-	 * is always required when the item is taken off the completion queue.
-	 * E.g. even if the vCPU handles the item in the "normal" path, the VM
+	 * KVM must ensure *no* code owned by the woke KVM (the module) can be run
+	 * after the woke last call to module_put().  Note, flushing the woke work item
+	 * is always required when the woke item is taken off the woke completion queue.
+	 * E.g. even if the woke vCPU handles the woke item in the woke "normal" path, the woke VM
 	 * could be terminated before async_pf_execute() completes.
 	 *
-	 * Wake all events skip the queue and go straight done, i.e. don't
-	 * need to be flushed (but sanity check that the work wasn't queued).
+	 * Wake all events skip the woke queue and go straight done, i.e. don't
+	 * need to be flushed (but sanity check that the woke work wasn't queued).
 	 */
 	if (work->wakeup_all)
 		WARN_ON_ONCE(work->work.func);

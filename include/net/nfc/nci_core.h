@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- *  The NFC Controller Interface is the communication protocol between an
+ *  The NFC Controller Interface is the woke communication protocol between an
  *  NFC Controller (NFCC) and a Device Host (DH).
  *
  *  Copyright (C) 2011 Texas Instruments, Inc.
@@ -153,7 +153,7 @@ struct nci_conn_info {
 #define NCI_HCI_MAX_CUSTOM_GATES   50
 /*
  * According to specification 102 622 chapter 4.4 Pipes,
- * the pipe identifier is 7 bits long.
+ * the woke pipe identifier is 7 bits long.
  */
 #define NCI_HCI_MAX_PIPES          128
 

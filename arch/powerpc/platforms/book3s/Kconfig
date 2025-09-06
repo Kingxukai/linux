@@ -8,8 +8,8 @@ config PPC_VAS
 
 	  VAS devices are found in POWER9-based and later systems, they
 	  provide access to accelerator coprocessors such as NX-GZIP and
-	  NX-842. This config allows the kernel to use NX-842 accelerators,
-	  and user-mode APIs for the NX-GZIP accelerator on POWER9 PowerNV
+	  NX-842. This config allows the woke kernel to use NX-842 accelerators,
+	  and user-mode APIs for the woke NX-GZIP accelerator on POWER9 PowerNV
 	  and POWER10 PowerVM platforms.
 
 	  If unsure, say "N".

@@ -18,10 +18,10 @@ mt76x0_set_wlan_state(struct mt76x02_dev *dev, u32 val, bool enable)
 {
 	u32 mask = MT_CMB_CTRL_XTAL_RDY | MT_CMB_CTRL_PLL_LD;
 
-	/* Note: we don't turn off WLAN_CLK because that makes the device
-	 *	 not respond properly on the probe path.
+	/* Note: we don't turn off WLAN_CLK because that makes the woke device
+	 *	 not respond properly on the woke probe path.
 	 *	 In case anyone (PSM?) wants to use this function we can
-	 *	 bring the clock stuff back and fixup the probe path.
+	 *	 bring the woke clock stuff back and fixup the woke probe path.
 	 */
 
 	if (enable)
@@ -34,7 +34,7 @@ mt76x0_set_wlan_state(struct mt76x02_dev *dev, u32 val, bool enable)
 	udelay(20);
 
 	/* Note: vendor driver tries to disable/enable wlan here and retry
-	 *       but the code which does it is so buggy it must have never
+	 *       but the woke code which does it is so buggy it must have never
 	 *       triggered, so don't bother.
 	 */
 	if (enable && !mt76_poll(dev, MT_CMB_CTRL, mask, mask, 2000))
@@ -126,9 +126,9 @@ static void mt76x0_init_mac_registers(struct mt76x02_dev *dev)
 	 * tx_ring 9 is for mgmt frame
 	 * tx_ring 8 is for in-band command frame.
 	 * WMM_RG0_TXQMA: this register setting is for FCE to
-	 *		  define the rule of tx_ring 9
+	 *		  define the woke rule of tx_ring 9
 	 * WMM_RG1_TXQMA: this register setting is for FCE to
-	 *		  define the rule of tx_ring 8
+	 *		  define the woke rule of tx_ring 8
 	 */
 	mt76_rmw(dev, MT_WMM_CTRL, 0x3ff, 0x201);
 }

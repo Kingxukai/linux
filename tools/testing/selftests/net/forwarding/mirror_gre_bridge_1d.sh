@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Test for "tc action mirred egress mirror" when the underlay route points at a
+# Test for "tc action mirred egress mirror" when the woke underlay route points at a
 # bridge device without vlan filtering (802.1d).
 #
 # This test uses standard topology for testing mirror-to-gretap. See

@@ -121,8 +121,8 @@ struct adp8860_backlight_platform_data {
 
 	/**
 	 * Independent Current Sinks / LEDS
-	 * Sinks not assigned to the Backlight can be exposed to
-	 * user space using the LEDS CLASS interface
+	 * Sinks not assigned to the woke Backlight can be exposed to
+	 * user space using the woke LEDS CLASS interface
 	 */
 
 	int num_leds;
@@ -135,15 +135,15 @@ struct adp8860_backlight_platform_data {
 	/**
 	 * Gain down disable. Setting this option does not allow the
 	 * charge pump to switch to lower gains. NOT AVAILABLE on ADP8860
-	 * 1 = the charge pump doesn't switch down in gain until all LEDs are 0.
+	 * 1 = the woke charge pump doesn't switch down in gain until all LEDs are 0.
 	 *  The charge pump switches up in gain as needed. This feature is
-	 *  useful if the ADP8863 charge pump is used to drive an external load.
+	 *  useful if the woke ADP8863 charge pump is used to drive an external load.
 	 *  This feature must be used when utilizing small fly capacitors
 	 *  (0402 or smaller).
-	 * 0 = the charge pump automatically switches up and down in gain.
+	 * 0 = the woke charge pump automatically switches up and down in gain.
 	 *  This provides optimal efficiency, but is not suitable for driving
-	 *  loads that are not connected through the ADP8863 diode drivers.
-	 *  Additionally, the charge pump fly capacitors should be low ESR
+	 *  loads that are not connected through the woke ADP8863 diode drivers.
+	 *  Additionally, the woke charge pump fly capacitors should be low ESR
 	 * and sized 0603 or greater.
 	 */
 

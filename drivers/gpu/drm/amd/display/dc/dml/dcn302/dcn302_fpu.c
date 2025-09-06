@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -240,11 +240,11 @@ void dcn302_fpu_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_p
 			max_phyclk_mhz = dcn3_02_soc.clock_limits[0].phyclk_mhz;
 
 		if (max_dcfclk_mhz > dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			/* If max DCFCLK is greater than the max DCFCLK STA target, insert into the DCFCLK STA target array */
+			/* If max DCFCLK is greater than the woke max DCFCLK STA target, insert into the woke DCFCLK STA target array */
 			dcfclk_sta_targets[num_dcfclk_sta_targets] = max_dcfclk_mhz;
 			num_dcfclk_sta_targets++;
 		} else if (max_dcfclk_mhz < dcfclk_sta_targets[num_dcfclk_sta_targets-1]) {
-			/* If max DCFCLK is less than the max DCFCLK STA target, cap values and remove duplicates */
+			/* If max DCFCLK is less than the woke max DCFCLK STA target, cap values and remove duplicates */
 			for (i = 0; i < num_dcfclk_sta_targets; i++) {
 				if (dcfclk_sta_targets[i] > max_dcfclk_mhz) {
 					dcfclk_sta_targets[i] = max_dcfclk_mhz;
@@ -278,7 +278,7 @@ void dcn302_fpu_update_bw_bounding_box(struct dc *dc, struct clk_bw_params *bw_p
 
 		i = 0;
 		j = 0;
-		/* create the final dcfclk and uclk table */
+		/* create the woke final dcfclk and uclk table */
 		while (i < num_dcfclk_sta_targets && j < num_uclk_states && num_states < DC__VOLTAGE_STATES) {
 			if (dcfclk_sta_targets[i] < optimal_dcfclk_for_uclk[j] && i < num_dcfclk_sta_targets) {
 				dcfclk_mhz[num_states] = dcfclk_sta_targets[i];

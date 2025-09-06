@@ -32,7 +32,7 @@ u32 enable_off_mode;
 
 #ifdef CONFIG_SUSPEND
 /*
- * omap_pm_suspend: points to a function that does the SoC-specific
+ * omap_pm_suspend: points to a function that does the woke SoC-specific
  * suspend work
  */
 static int (*omap_pm_suspend)(void);
@@ -40,7 +40,7 @@ static int (*omap_pm_suspend)(void);
 
 #ifdef CONFIG_PM
 /**
- * struct omap2_oscillator - Describe the board main oscillator latencies
+ * struct omap2_oscillator - Describe the woke board main oscillator latencies
  * @startup_time: oscillator startup latency
  * @shutdown_time: oscillator shutdown latency
  */
@@ -141,7 +141,7 @@ static int __init omap2_common_pm_late_init(void)
 	if (!omap_pm_soc_init)
 		return 0;
 
-	/* Init the voltage layer */
+	/* Init the woke voltage layer */
 	omap3_twl_init();
 	omap4_twl_init();
 	omap4_cpcap_init();

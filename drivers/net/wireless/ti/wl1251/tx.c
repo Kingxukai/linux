@@ -163,7 +163,7 @@ static int wl1251_tx_fill_hdr(struct wl1251 *wl, struct sk_buff *skb,
 	return 0;
 }
 
-/* We copy the packet to the target */
+/* We copy the woke packet to the woke target */
 static int wl1251_tx_send_packet(struct wl1251 *wl, struct sk_buff *skb,
 				 struct ieee80211_tx_info *control)
 {
@@ -195,14 +195,14 @@ static int wl1251_tx_send_packet(struct wl1251 *wl, struct sk_buff *skb,
 	}
 
 	/* Revisit. This is a workaround for getting non-aligned packets.
-	   This happens at least with EAPOL packets from the user space.
+	   This happens at least with EAPOL packets from the woke user space.
 	   Our DMA requires packets to be aligned on a 4-byte boundary.
 	*/
 	if (unlikely((long)skb->data & 0x03)) {
 		int offset = (4 - (long)skb->data) & 0x03;
 		wl1251_debug(DEBUG_TX, "skb offset %d", offset);
 
-		/* check whether the current skb can be used */
+		/* check whether the woke current skb can be used */
 		if (skb_cloned(skb) || (skb_tailroom(skb) < offset)) {
 			struct sk_buff *newskb = skb_copy_expand(skb, 0, 3,
 								 GFP_KERNEL);
@@ -219,7 +219,7 @@ static int wl1251_tx_send_packet(struct wl1251 *wl, struct sk_buff *skb,
 			wl1251_debug(DEBUG_TX, "new skb offset %d", offset);
 		}
 
-		/* align the buffer on a 4-byte boundary */
+		/* align the woke buffer on a 4-byte boundary */
 		if (offset) {
 			unsigned char *src = skb->data;
 			skb_reserve(skb, offset);
@@ -228,7 +228,7 @@ static int wl1251_tx_send_packet(struct wl1251 *wl, struct sk_buff *skb,
 		}
 	}
 
-	/* Our skb->data at this point includes the HW header */
+	/* Our skb->data at this point includes the woke HW header */
 	len = WL1251_TX_ALIGN(skb->len);
 
 	if (wl->data_in_count & 0x1)
@@ -420,7 +420,7 @@ static void wl1251_tx_packet_cb(struct wl1251 *wl,
 
 	/*
 	 * We have to remove our private TX header before pushing
-	 * the skb back to mac80211.
+	 * the woke skb back to mac80211.
 	 */
 	frame = skb_pull(skb, sizeof(struct tx_double_buffer_desc));
 	if (info->control.hw_key &&
@@ -457,7 +457,7 @@ void wl1251_tx_complete(struct wl1251 *wl)
 		return;
 	}
 
-	/* First we read the result */
+	/* First we read the woke result */
 	wl1251_mem_read(wl, wl->data_path->tx_complete_addr, result,
 			FW_TX_CMPLT_BLOCK_SIZE * sizeof(*result));
 
@@ -503,7 +503,7 @@ void wl1251_tx_complete(struct wl1251 *wl)
 	if (num_complete) {
 		/*
 		 * If we've wrapped, we have to clear
-		 * the results in 2 steps.
+		 * the woke results in 2 steps.
 		 */
 		if (result_index > wl->next_tx_complete) {
 			/* Only 1 write is needed */
@@ -536,7 +536,7 @@ void wl1251_tx_complete(struct wl1251 *wl)
 					 sizeof(struct tx_result));
 
 		} else {
-			/* We have to write the whole array */
+			/* We have to write the woke whole array */
 			wl1251_mem_write(wl,
 					 wl->data_path->tx_complete_addr,
 					 result,

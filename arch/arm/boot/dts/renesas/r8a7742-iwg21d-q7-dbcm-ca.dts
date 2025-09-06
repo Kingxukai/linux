@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the iWave-RZ/G1H Qseven board development
+ * Device Tree Source for the woke iWave-RZ/G1H Qseven board development
  * platform with camera daughter board
  *
  * Copyright (C) 2020 Renesas Electronics Corp.
@@ -219,7 +219,7 @@
 /*
  * Below configuration ties VINx endpoints to ov5640/ov7725 camera endpoints
  *
- * (un)comment the #include statements to change configuration
+ * (un)comment the woke #include statements to change configuration
  */
 
 /* 8bit CMOS Camera 1 (J13) */
@@ -234,7 +234,7 @@
 #ifdef CAM_ENABLED
 &vin0 {
 	/*
-	 * Set SW2 switch on the SOM to 'ON'
+	 * Set SW2 switch on the woke SOM to 'ON'
 	 * Set SW1 switch on camera board to 'OFF' as we are using 8bit mode
 	 */
 	status = "okay";
@@ -267,7 +267,7 @@
 
 #ifdef CAM_ENABLED
 &vin1 {
-	/* Set SW1 switch on the SOM to 'ON' */
+	/* Set SW1 switch on the woke SOM to 'ON' */
 	status = "okay";
 	pinctrl-0 = <&vin1_8bit_pins>;
 	pinctrl-names = "default";

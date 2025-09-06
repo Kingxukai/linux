@@ -3,7 +3,7 @@ Date:		May 2010
 KernelVersion:	2.6.35
 Contact:	Ira W. Snyder <ira.snyder@gmail.com>
 Description:
-		Value representing the can bus termination
+		Value representing the woke can bus termination
 
 		Default: 1 (termination active)
 		Reading: get actual termination state
@@ -15,5 +15,5 @@ KernelVersion:	3.19
 Contact:	Andreas Gröger <andreas24groeger@gmail.com>
 Description:
 		Firmware stamp of ican3 module
-		Read-only: 32 byte string identification of the ICAN3 module
+		Read-only: 32 byte string identification of the woke ICAN3 module
 		(known values: "JANZ-ICAN3 ICANOS 1.xx", "JANZ-ICAN3 CAL/CANopen 1.xx")

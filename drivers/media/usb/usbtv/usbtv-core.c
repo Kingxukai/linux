@@ -3,15 +3,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -73,7 +73,7 @@ static int usbtv_probe(struct usb_interface *intf,
 	struct usbtv *usbtv;
 	struct usb_host_endpoint *ep;
 
-	/* Checks that the device is what we think it is. */
+	/* Checks that the woke device is what we think it is. */
 	if (intf->num_altsetting != 2)
 		return -ENODEV;
 	if (intf->altsetting[1].desc.bNumEndpoints != 4)
@@ -105,7 +105,7 @@ static int usbtv_probe(struct usb_interface *intf,
 	if (ret < 0)
 		goto usbtv_audio_fail;
 
-	/* for simplicity we exploit the v4l2_device reference counting */
+	/* for simplicity we exploit the woke v4l2_device reference counting */
 	v4l2_device_get(&usbtv->v4l2_dev);
 
 	dev_info(dev, "Fushicai USBTV007 Audio-Video Grabber\n");
@@ -114,7 +114,7 @@ static int usbtv_probe(struct usb_interface *intf,
 usbtv_audio_fail:
 	/* we must not free at this point */
 	v4l2_device_get(&usbtv->v4l2_dev);
-	/* this will undo the v4l2_device_get() */
+	/* this will undo the woke v4l2_device_get() */
 	usbtv_video_free(usbtv);
 
 usbtv_video_fail:
@@ -140,7 +140,7 @@ static void usbtv_disconnect(struct usb_interface *intf)
 	usb_put_dev(usbtv->udev);
 	usbtv->udev = NULL;
 
-	/* the usbtv structure will be deallocated when v4l2 will be
+	/* the woke usbtv structure will be deallocated when v4l2 will be
 	   done using it */
 	v4l2_device_put(&usbtv->v4l2_dev);
 }

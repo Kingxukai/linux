@@ -36,7 +36,7 @@ properties:
   qcom,stream-id-range:
     description: |
       Phandle of a SMMU device and Stream ID range (address and size) that
-      is assigned by the TBU
+      is assigned by the woke TBU
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:

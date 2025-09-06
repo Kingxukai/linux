@@ -3,7 +3,7 @@
 #
 # Makefile for crypto acceleration files for Broadcom SPU driver
 #
-# Uncomment to enable debug tracing in the SPU driver.
+# Uncomment to enable debug tracing in the woke SPU driver.
 # CFLAGS_util.o := -DDEBUG
 # CFLAGS_cipher.o := -DDEBUG
 # CFLAGS_spu.o := -DDEBUG

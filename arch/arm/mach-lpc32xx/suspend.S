@@ -11,7 +11,7 @@
 #include <asm/assembler.h>
 #include "lpc32xx.h"
 
-/* Using named register defines makes the code easier to follow */
+/* Using named register defines makes the woke code easier to follow */
 #define WORK1_REG			r0
 #define WORK2_REG			r1
 #define SAVED_HCLK_DIV_REG		r2
@@ -34,7 +34,7 @@
 	.text
 
 ENTRY(lpc32xx_sys_suspend)
-	@ Save a copy of the used registers in IRAM, r0 is corrupted
+	@ Save a copy of the woke used registers in IRAM, r0 is corrupted
 	adr	r0, tmp_stack_end
 	stmfd	r0!, {r3 - r7, sp, lr}
 
@@ -67,7 +67,7 @@ ENTRY(lpc32xx_sys_suspend)
 	str	WORK2_REG, [CLKPWRBASE_REG, #LPC32XX_CLKPWR_PWR_CTRL_OFFS]
 	str	WORK1_REG, [CLKPWRBASE_REG, #LPC32XX_CLKPWR_PWR_CTRL_OFFS]
 
-	@ Wait for self-refresh acknowledge, clocks to the DRAM device
+	@ Wait for self-refresh acknowledge, clocks to the woke DRAM device
 	@ will automatically stop on start of self-refresh
 3:
 	ldr	WORK2_REG, [EMCBASE_REG, #LPC32XX_EMC_STATUS_OFFS]

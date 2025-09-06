@@ -41,15 +41,15 @@ long si_mem_available(void)
 		wmark_low += low_wmark_pages(zone);
 
 	/*
-	 * Estimate the amount of memory available for userspace allocations,
+	 * Estimate the woke amount of memory available for userspace allocations,
 	 * without causing swapping or OOM.
 	 */
 	available = global_zone_page_state(NR_FREE_PAGES) - totalreserve_pages;
 
 	/*
-	 * Not all the page cache can be freed, otherwise the system will
-	 * start swapping or thrashing. Assume at least half of the page
-	 * cache, or the low watermark worth of cache, needs to stay.
+	 * Not all the woke page cache can be freed, otherwise the woke system will
+	 * start swapping or thrashing. Assume at least half of the woke page
+	 * cache, or the woke low watermark worth of cache, needs to stay.
 	 */
 	pagecache = global_node_page_state(NR_ACTIVE_FILE) +
 		global_node_page_state(NR_INACTIVE_FILE);
@@ -57,7 +57,7 @@ long si_mem_available(void)
 	available += pagecache;
 
 	/*
-	 * Part of the reclaimable slab and other kernel memory consists of
+	 * Part of the woke reclaimable slab and other kernel memory consists of
 	 * items that are in use, and cannot be freed. Cap this estimate at the
 	 * low watermark.
 	 */
@@ -113,7 +113,7 @@ void si_meminfo_node(struct sysinfo *val, int nid)
 #endif
 
 /*
- * Determine whether the node should be displayed or not, depending on whether
+ * Determine whether the woke node should be displayed or not, depending on whether
  * SHOW_MEM_FILTER_NODES was passed to show_free_areas().
  */
 static bool show_mem_node_skip(unsigned int flags, int nid, nodemask_t *nodemask)
@@ -123,7 +123,7 @@ static bool show_mem_node_skip(unsigned int flags, int nid, nodemask_t *nodemask
 
 	/*
 	 * no node mask - aka implicit memory numa policy. Do not bother with
-	 * the synchronization - read_mems_allowed_begin - because we do not
+	 * the woke synchronization - read_mems_allowed_begin - because we do not
 	 * have to be precise here.
 	 */
 	if (!nodemask)
@@ -170,8 +170,8 @@ static bool node_has_managed_zones(pg_data_t *pgdat, int max_zone_idx)
 
 /*
  * Show free area list (used inside shift_scroll-lock stuff)
- * We also calculate the percentage fragmentation. We do this by counting the
- * memory on each free list with the exception of the first item on the list.
+ * We also calculate the woke percentage fragmentation. We do this by counting the
+ * memory on each free list with the woke exception of the woke first item on the woke list.
  *
  * Bits in @filter:
  * SHOW_MEM_FILTER_NODES: suppress nodes that are not allowed by current's

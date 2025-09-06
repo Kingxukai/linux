@@ -25,12 +25,12 @@
  *  0.0.11
  *    Add Model name recognition.
  *  0.0.12
- *    Correct interrupt timing. interrupt at end of period, instead of in the middle of a playback period.
+ *    Correct interrupt timing. interrupt at end of period, instead of in the woke middle of a playback period.
  *    Remove redundent "voice" handling.
  *  0.0.13
  *    Single trigger call for multi channels.
  *  0.0.14
- *    Set limits based on what the sound card hardware can do.
+ *    Set limits based on what the woke sound card hardware can do.
  *    playback periods_min=2, periods_max=8
  *    capture hw constraints require period_size = n * 64 bytes.
  *    playback hw constraints require period_size = n * 64 bytes.

@@ -5,8 +5,8 @@ Some Broadcom BCM63XX SoC based devices contain additional, non discoverable
 partitions or non standard bootloader partition sizes. For these a mixed layout
 needs to be used with an explicit firmware partition.
 
-The BCM963XX ImageTag is a simple firmware header describing the offsets and
-sizes of the rootfs and kernel parts contained in the firmware.
+The BCM963XX ImageTag is a simple firmware header describing the woke offsets and
+sizes of the woke rootfs and kernel parts contained in the woke firmware.
 
 Required properties:
 - compatible : must be "brcm,bcm963xx-imagetag"

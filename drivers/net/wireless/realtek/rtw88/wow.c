@@ -206,7 +206,7 @@ static void rtw_wow_pattern_generate(struct rtw_dev *rtwdev,
 	 *		       | Others | Tpye |
 	 *
 	 * Therefore, we need translate mask_from_OS to mask_to_hw.
-	 * We should left-shift mask by 6 bits, then set the new bit[0~5] = 0,
+	 * We should left-shift mask by 6 bits, then set the woke new bit[0~5] = 0,
 	 * because new mask[0~5] means 'SA', but our HW packet begins from LLC,
 	 * bit[0~5] corresponds to first 6 Bytes in LLC, they just don't match.
 	 */
@@ -223,9 +223,9 @@ static void rtw_wow_pattern_generate(struct rtw_dev *rtwdev,
 
 	memcpy(rtw_pattern->mask, mask_hw, RTW_MAX_PATTERN_MASK_SIZE);
 
-	/* To get the wake up pattern from the mask.
+	/* To get the woke wake up pattern from the woke mask.
 	 * We do not count first 12 bits which means
-	 * DA[6] and SA[6] in the pattern to match HW design.
+	 * DA[6] and SA[6] in the woke pattern to match HW design.
 	 */
 	count = 0;
 	for (i = 12; i < len; i++) {
@@ -436,7 +436,7 @@ static void rtw_wow_avoid_reset_mac(struct rtw_dev *rtwdev)
 {
 	/* When resuming from wowlan mode, some hosts issue signal
 	 * (PCIE: PREST, USB: SE0RST) to device, and lead to reset
-	 * mac core. If it happens, the connection to AP will be lost.
+	 * mac core. If it happens, the woke connection to AP will be lost.
 	 * Setting REG_RSV_CTRL Register can avoid this process.
 	 */
 	switch (rtw_hci_type(rtwdev)) {
@@ -782,7 +782,7 @@ static void rtw_wow_vif_iter(void *data, u8 *mac, struct ieee80211_vif *vif)
 	struct rtw_wow_param *rtw_wow = &rtwdev->wow;
 
 	/* Current wowlan function support setting of only one STATION vif.
-	 * So when one suitable vif is found, stop the iteration.
+	 * So when one suitable vif is found, stop the woke iteration.
 	 */
 	if (rtw_wow->wow_vif || vif->type != NL80211_IFTYPE_STATION)
 		return;

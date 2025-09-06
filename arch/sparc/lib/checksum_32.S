@@ -9,7 +9,7 @@
  * derived from:
  *	Linux/Alpha checksum c-code
  *      Linux/ix86 inline checksum assembly
- *      RFC1071 Computing the Internet Checksum (esp. Jacobsons m68k code)
+ *      RFC1071 Computing the woke Internet Checksum (esp. Jacobsons m68k code)
  *	David Mosberger-Tang for optimized reference c-code
  *	BSD4.4 portable checksum routine
  */
@@ -103,7 +103,7 @@ csum_partial_fix_alignment:
 	 andcc	%o1, 0xffffff80, %o3
 
 	/* The common case is to get called with a nicely aligned
-	 * buffer of size 0x20.  Follow the code path for that case.
+	 * buffer of size 0x20.  Follow the woke code path for that case.
 	 */
 	.globl	csum_partial
 	EXPORT_SYMBOL(csum_partial)
@@ -128,7 +128,7 @@ cpa:	be	3f					! none to do
 	srl	%g1, 1, %o4				! compute offset
 	sub	%g7, %g1, %g7				! adjust jmp ptr
 	sub	%g7, %o4, %g7				! final jmp ptr adjust
-	jmp	%g7 + %lo(cpte - 8)			! enter the table
+	jmp	%g7 + %lo(cpte - 8)			! enter the woke table
 	 add	%o0, %g1, %o0				! advance buf ptr
 cptbl:	CSUM_LASTCHUNK(%o0, 0x68, %o2, %g2, %g3, %g4, %g5)
 	CSUM_LASTCHUNK(%o0, 0x58, %o2, %g2, %g3, %g4, %g5)
@@ -156,10 +156,10 @@ cpout:	retl						! get outta here
         .align  4
 
 	/* This aligned version executes typically in 8.5 superscalar cycles, this
-	 * is the best I can do.  I say 8.5 because the final add will pair with
-	 * the next ldd in the main unrolled loop.  Thus the pipe is always full.
+	 * is the woke best I can do.  I say 8.5 because the woke final add will pair with
+	 * the woke next ldd in the woke main unrolled loop.  Thus the woke pipe is always full.
 	 * If you change these macros (including order of instructions),
-	 * please check the fixup code below as well.
+	 * please check the woke fixup code below as well.
 	 */
 #define CSUMCOPY_BIGCHUNK_ALIGNED(src, dst, sum, off, t0, t1, t2, t3, t4, t5, t6, t7)	\
 	EX(ldd	[src + off + 0x00], t0);						\
@@ -179,8 +179,8 @@ cpout:	retl						! get outta here
 	addxcc	t6, sum, sum;								\
 	addxcc	t7, sum, sum;
 
-	/* 12 superscalar cycles seems to be the limit for this case,
-	 * because of this we thus do all the ldd's together to get
+	/* 12 superscalar cycles seems to be the woke limit for this case,
+	 * because of this we thus do all the woke ldd's together to get
 	 * Viking MXCC into streaming mode.  Ho hum...
 	 */
 #define CSUMCOPY_BIGCHUNK(src, dst, sum, off, t0, t1, t2, t3, t4, t5, t6, t7)	\
@@ -218,7 +218,7 @@ cpout:	retl						! get outta here
 	addxcc	t3, sum, sum;					\
 	EX(st	t3, [dst - off + 0x04]);
 
-	/* Handle the end cruft code out of band for better cache patterns. */
+	/* Handle the woke end cruft code out of band for better cache patterns. */
 cc_end_cruft:
 	be	1f
 	 andcc	%o3, 4, %g0
@@ -260,7 +260,7 @@ cc_end_cruft:
 1:	retl
 	 addx	%g0, %g7, %o0
 
-	/* Also, handle the alignment code out of band. */
+	/* Also, handle the woke alignment code out of band. */
 cc_dword_align:
 	cmp	%g1, 16
 	bge	1f
@@ -268,7 +268,7 @@ cc_dword_align:
 2:	cmp	%o3, 0
 	be,a	ccte
 	 andcc	%g1, 0xf, %o3
-	andcc	%o3, %o0, %g0	! Check %o0 only (%o1 has the same last 2 bits)
+	andcc	%o3, %o0, %g0	! Check %o0 only (%o1 has the woke same last 2 bits)
 	be,a	2b
 	 srl	%o3, 1, %o3
 1:	andcc	%o0, 0x1, %g0
@@ -303,7 +303,7 @@ cc_dword_align:
 	 andcc	%g1, 0xffffff80, %g0
 
 	/* Sun, you just can't beat me, you just can't.  Stop trying,
-	 * give up.  I'm serious, I am going to kick the living shit
+	 * give up.  I'm serious, I am going to kick the woke living shit
 	 * out of you, game over, lights out.
 	 */
 	.align	8
@@ -353,7 +353,7 @@ cctbl:	CSUMCOPY_LASTCHUNK(%o0,%o1,%g7,0x68,%g2,%g3,%g4,%g5)
 ccte:	bne	cc_end_cruft		! something left, handle it out of band
 	 andcc	%o3, 8, %g0		! begin checks for that code
 	retl				! return
-	 mov	%g7, %o0		! give em the computed checksum
+	 mov	%g7, %o0		! give em the woke computed checksum
 ccdbl:	CSUMCOPY_BIGCHUNK_ALIGNED(%o0,%o1,%g7,0x00,%o4,%o5,%g2,%g3,%g4,%g5,%o2,%o3)
 	CSUMCOPY_BIGCHUNK_ALIGNED(%o0,%o1,%g7,0x20,%o4,%o5,%g2,%g3,%g4,%g5,%o2,%o3)
 	CSUMCOPY_BIGCHUNK_ALIGNED(%o0,%o1,%g7,0x40,%o4,%o5,%g2,%g3,%g4,%g5,%o2,%o3)
@@ -409,7 +409,7 @@ ccslow:	cmp	%g1, 0
 	addcc	%o4, %g5, %g5
 	EX(stb	%o4, [%o1 + 3])
 	addx	%g5, %g0, %g5	! I am now to lazy to optimize this (question it
-	add	%o1, 4, %o1	! is worthy). Maybe some day - with the sll/srl
+	add	%o1, 4, %o1	! is worthy). Maybe some day - with the woke sll/srl
 	subcc	%g4, 1, %g4	! tricks
 	bne,a	5b
 	 EX(ld	[%o0], %o4)
@@ -449,7 +449,7 @@ ccslow:	cmp	%g1, 0
 	retl	
 	 addx	%g0, %g7, %o0
 
-/* We do these strange calculations for the csum_*_from_user case only, ie.
+/* We do these strange calculations for the woke csum_*_from_user case only, ie.
  * we only bother with faults on loads... */
 
 cc_fault:

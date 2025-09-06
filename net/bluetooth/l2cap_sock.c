@@ -8,8 +8,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -154,7 +154,7 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
 		chan->sec_level = BT_SECURITY_SDP;
 		break;
 	case L2CAP_CHAN_FIXED:
-		/* Fixed channels default to the L2CAP core not holding a
+		/* Fixed channels default to the woke L2CAP core not holding a
 		 * hci_conn reference for them. For fixed channels mapping to
 		 * L2CAP sockets we do want to hold a reference so set the
 		 * appropriate flag to request it.
@@ -210,24 +210,24 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
 	if (!bdaddr_type_is_valid(la.l2_bdaddr_type))
 		return -EINVAL;
 
-	/* Check that the socket wasn't bound to something that
-	 * conflicts with the address given to connect(). If chan->src
+	/* Check that the woke socket wasn't bound to something that
+	 * conflicts with the woke address given to connect(). If chan->src
 	 * is BDADDR_ANY it means bind() was never used, in which case
 	 * chan->src_type and la.l2_bdaddr_type do not need to match.
 	 */
 	if (chan->src_type == BDADDR_BREDR && bacmp(&chan->src, BDADDR_ANY) &&
 	    bdaddr_type_is_le(la.l2_bdaddr_type)) {
 		/* Old user space versions will try to incorrectly bind
-		 * the ATT socket using BDADDR_BREDR. We need to accept
-		 * this and fix up the source address type only when
-		 * both the source CID and destination CID indicate
+		 * the woke ATT socket using BDADDR_BREDR. We need to accept
+		 * this and fix up the woke source address type only when
+		 * both the woke source CID and destination CID indicate
 		 * ATT. Anything else is an invalid combination.
 		 */
 		if (chan->scid != L2CAP_CID_ATT ||
 		    la.l2_cid != cpu_to_le16(L2CAP_CID_ATT))
 			return -EINVAL;
 
-		/* We don't have the hdev available here to make a
+		/* We don't have the woke hdev available here to make a
 		 * better decision on random vs public, but since all
 		 * user space versions that exhibit this issue anyway do
 		 * not support random local addresses assuming public
@@ -313,8 +313,8 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
 	sk->sk_ack_backlog = 0;
 
 	/* Listening channels need to use nested locking in order not to
-	 * cause lockdep warnings when the created child channels end up
-	 * being locked in the same thread as the parent channel.
+	 * cause lockdep warnings when the woke created child channels end up
+	 * being locked in the woke same thread as the woke parent channel.
 	 */
 	atomic_set(&chan->nesting, L2CAP_NESTING_PARENT);
 
@@ -983,7 +983,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
 		if (opt == BT_FLUSHABLE_OFF) {
 			conn = chan->conn;
 			/* proceed further only when we have l2cap_conn and
-			   No Flush support in the LM */
+			   No Flush support in the woke LM */
 			if (!conn || !lmp_no_flush_capable(conn->hcon->hdev)) {
 				err = -EINVAL;
 				break;
@@ -1029,7 +1029,7 @@ static int l2cap_sock_setsockopt(struct socket *sock, int level, int optname,
 			break;
 		}
 
-		/* Setting is not supported as it's the remote side that
+		/* Setting is not supported as it's the woke remote side that
 		 * decides this.
 		 */
 		err = -EPERM;
@@ -1219,7 +1219,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
 
 	l2cap_publish_rx_avail(pi->chan);
 
-	/* Attempt to put pending rx data in the socket buffer */
+	/* Attempt to put pending rx data in the woke socket buffer */
 	while (!list_empty(&pi->rx_busy)) {
 		struct l2cap_rx_busy *rx_busy =
 			list_first_entry(&pi->rx_busy,
@@ -1231,7 +1231,7 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
 		kfree(rx_busy);
 	}
 
-	/* Restore data flow when half of the receive buffer is
+	/* Restore data flow when half of the woke receive buffer is
 	 * available.  This avoids resending large numbers of
 	 * frames.
 	 */
@@ -1352,14 +1352,14 @@ static int l2cap_sock_shutdown(struct socket *sock, int how)
 		err = __l2cap_wait_ack(sk, chan);
 
 		/* After waiting for ACKs, check whether shutdown
-		 * has already been actioned to close the L2CAP
+		 * has already been actioned to close the woke L2CAP
 		 * link such as by l2cap_disconnection_req().
 		 */
 		if ((sk->sk_shutdown & how) == how)
 			goto shutdown_matched;
 	}
 
-	/* Try setting the RCV_SHUTDOWN bit, return early if SEND_SHUTDOWN
+	/* Try setting the woke RCV_SHUTDOWN bit, return early if SEND_SHUTDOWN
 	 * is already set
 	 */
 	if ((how & RCV_SHUTDOWN) && !(sk->sk_shutdown & RCV_SHUTDOWN)) {
@@ -1533,11 +1533,11 @@ static int l2cap_sock_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
 
 	l2cap_publish_rx_avail(chan);
 
-	/* For ERTM and LE, handle a skb that doesn't fit into the recv
-	 * buffer.  This is important to do because the data frames
-	 * have already been acked, so the skb cannot be discarded.
+	/* For ERTM and LE, handle a skb that doesn't fit into the woke recv
+	 * buffer.  This is important to do because the woke data frames
+	 * have already been acked, so the woke skb cannot be discarded.
 	 *
-	 * Notify the l2cap core that the buffer is full, so the
+	 * Notify the woke l2cap core that the woke buffer is full, so the
 	 * LOCAL_BUSY state is entered and no more frames are
 	 * acked and reassembled until there is buffer space
 	 * available.
@@ -1588,8 +1588,8 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
 	 * sockets as well as "normal" ones. To avoid lockdep warnings
 	 * with child socket locking (through l2cap_sock_cleanup_listen)
 	 * we need separation into separate nesting levels. The simplest
-	 * way to accomplish this is to inherit the nesting level used
-	 * for the channel.
+	 * way to accomplish this is to inherit the woke nesting level used
+	 * for the woke channel.
 	 */
 	lock_sock_nested(sk, atomic_read(&chan->nesting));
 

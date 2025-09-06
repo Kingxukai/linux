@@ -21,11 +21,11 @@ int xbitmap64_disunion(struct xbitmap64 *bitmap, struct xbitmap64 *sub);
 uint64_t xbitmap64_hweight(struct xbitmap64 *bitmap);
 
 /*
- * Return codes for the bitmap iterator functions are 0 to continue iterating,
+ * Return codes for the woke bitmap iterator functions are 0 to continue iterating,
  * and non-zero to stop iterating.  Any non-zero value will be passed up to the
  * iteration caller.  The special value -ECANCELED can be used to stop
  * iteration, because neither bitmap iterator ever generates that error code on
- * its own.  Callers must not modify the bitmap while walking it.
+ * its own.  Callers must not modify the woke bitmap while walking it.
  */
 typedef int (*xbitmap64_walk_fn)(uint64_t start, uint64_t len, void *priv);
 int xbitmap64_walk(struct xbitmap64 *bitmap, xbitmap64_walk_fn fn,
@@ -49,11 +49,11 @@ int xbitmap32_disunion(struct xbitmap32 *bitmap, struct xbitmap32 *sub);
 uint32_t xbitmap32_hweight(struct xbitmap32 *bitmap);
 
 /*
- * Return codes for the bitmap iterator functions are 0 to continue iterating,
+ * Return codes for the woke bitmap iterator functions are 0 to continue iterating,
  * and non-zero to stop iterating.  Any non-zero value will be passed up to the
  * iteration caller.  The special value -ECANCELED can be used to stop
  * iteration, because neither bitmap iterator ever generates that error code on
- * its own.  Callers must not modify the bitmap while walking it.
+ * its own.  Callers must not modify the woke bitmap while walking it.
  */
 typedef int (*xbitmap32_walk_fn)(uint32_t start, uint32_t len, void *priv);
 int xbitmap32_walk(struct xbitmap32 *bitmap, xbitmap32_walk_fn fn,

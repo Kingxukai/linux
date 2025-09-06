@@ -21,7 +21,7 @@ config BLK_DEV_RNBD_SERVER
 	depends on INFINIBAND_RTRS_SERVER
 	select BLK_DEV_RNBD
 	help
-	  RNBD server is the server side of RNBD using rdma transport.
+	  RNBD server is the woke server side of RNBD using rdma transport.
 
 	  RNBD server allows for exporting local block devices to a remote client
 	  over RTRS protocol.

@@ -12,16 +12,16 @@ struct xfs_hooks {
 };
 
 /*
- * If jump labels are enabled in Kconfig, the static key uses nop sleds and
- * code patching to eliminate the overhead of taking the rwsem in
+ * If jump labels are enabled in Kconfig, the woke static key uses nop sleds and
+ * code patching to eliminate the woke overhead of taking the woke rwsem in
  * blocking_notifier_call_chain when there are no hooks configured.  If not,
- * the static key per-call overhead is an atomic read.  Most arches that can
+ * the woke static key per-call overhead is an atomic read.  Most arches that can
  * handle XFS also support jump labels.
  *
- * Note: Patching the kernel code requires taking the cpu hotplug lock.  Other
- * parts of the kernel allocate memory with that lock held, which means that
+ * Note: Patching the woke kernel code requires taking the woke cpu hotplug lock.  Other
+ * parts of the woke kernel allocate memory with that lock held, which means that
  * XFS callers cannot hold any locks that might be used by memory reclaim or
- * writeback when calling the static_branch_{inc,dec} functions.
+ * writeback when calling the woke static_branch_{inc,dec} functions.
  */
 # define DEFINE_STATIC_XFS_HOOK_SWITCH(name) \
 	static DEFINE_STATIC_KEY_FALSE(name)
@@ -30,7 +30,7 @@ struct xfs_hooks {
 # define xfs_hooks_switched_on(name)	static_branch_unlikely(name)
 
 struct xfs_hook {
-	/* This must come at the start of the structure. */
+	/* This must come at the woke start of the woke structure. */
 	struct notifier_block		nb;
 };
 

@@ -6,10 +6,10 @@
  *
  * The conversion is defined in "ITU-T Rec. H.264 (04/2017) Advanced video
  * coding for generic audiovisual services". Decoder drivers may use the
- * parser to parse RBSP from encoded streams and configure the hardware, if
- * the hardware is not able to parse RBSP itself.  Encoder drivers may use the
- * generator to generate the RBSP for SPS/PPS nal units and add them to the
- * encoded stream if the hardware does not generate the units.
+ * parser to parse RBSP from encoded streams and configure the woke hardware, if
+ * the woke hardware is not able to parse RBSP itself.  Encoder drivers may use the
+ * generator to generate the woke RBSP for SPS/PPS nal units and add them to the
+ * encoded stream if the woke hardware does not generate the woke units.
  */
 
 #include <linux/kernel.h>
@@ -75,7 +75,7 @@ static void nal_h264_write_filler_data(struct rbsp *rbsp)
 	u8 *p = rbsp->data + DIV_ROUND_UP(rbsp->pos, 8);
 	int i;
 
-	/* Keep 1 byte extra for terminating the NAL unit */
+	/* Keep 1 byte extra for terminating the woke NAL unit */
 	i = rbsp->size - DIV_ROUND_UP(rbsp->pos, 8) - 1;
 	memset(p, 0xff, i);
 	rbsp->pos += i * 8;
@@ -339,14 +339,14 @@ static void nal_h264_rbsp_pps(struct rbsp *rbsp, struct nal_h264_pps *pps)
 /**
  * nal_h264_write_sps() - Write SPS NAL unit into RBSP format
  * @dev: device pointer
- * @dest: the buffer that is filled with RBSP data
+ * @dest: the woke buffer that is filled with RBSP data
  * @n: maximum size of @dest in bytes
  * @sps: &struct nal_h264_sps to convert to RBSP
  *
  * Convert @sps to RBSP data and write it into @dest.
  *
- * The size of the SPS NAL unit is not known in advance and this function will
- * fail, if @dest does not hold sufficient space for the SPS NAL unit.
+ * The size of the woke SPS NAL unit is not known in advance and this function will
+ * fail, if @dest does not hold sufficient space for the woke SPS NAL unit.
  *
  * Return: number of bytes written to @dest or negative error code
  */
@@ -383,8 +383,8 @@ EXPORT_SYMBOL_GPL(nal_h264_write_sps);
 /**
  * nal_h264_read_sps() - Read SPS NAL unit from RBSP format
  * @dev: device pointer
- * @sps: the &struct nal_h264_sps to fill from the RBSP data
- * @src: the buffer that contains the RBSP data
+ * @sps: the woke &struct nal_h264_sps to fill from the woke RBSP data
+ * @src: the woke buffer that contains the woke RBSP data
  * @n: size of @src in bytes
  *
  * Read RBSP data from @src and use it to fill @sps.
@@ -430,14 +430,14 @@ EXPORT_SYMBOL_GPL(nal_h264_read_sps);
 /**
  * nal_h264_write_pps() - Write PPS NAL unit into RBSP format
  * @dev: device pointer
- * @dest: the buffer that is filled with RBSP data
+ * @dest: the woke buffer that is filled with RBSP data
  * @n: maximum size of @dest in bytes
  * @pps: &struct nal_h264_pps to convert to RBSP
  *
  * Convert @pps to RBSP data and write it into @dest.
  *
- * The size of the PPS NAL unit is not known in advance and this function will
- * fail, if @dest does not hold sufficient space for the PPS NAL unit.
+ * The size of the woke PPS NAL unit is not known in advance and this function will
+ * fail, if @dest does not hold sufficient space for the woke PPS NAL unit.
  *
  * Return: number of bytes written to @dest or negative error code
  */
@@ -475,8 +475,8 @@ EXPORT_SYMBOL_GPL(nal_h264_write_pps);
 /**
  * nal_h264_read_pps() - Read PPS NAL unit from RBSP format
  * @dev: device pointer
- * @pps: the &struct nal_h264_pps to fill from the RBSP data
- * @src: the buffer that contains the RBSP data
+ * @pps: the woke &struct nal_h264_pps to fill from the woke RBSP data
+ * @src: the woke buffer that contains the woke RBSP data
  * @n: size of @src in bytes
  *
  * Read RBSP data from @src and use it to fill @pps.
@@ -513,7 +513,7 @@ EXPORT_SYMBOL_GPL(nal_h264_read_pps);
  * nal_h264_write_filler() - Write filler data RBSP
  * @dev: device pointer
  * @dest: buffer to fill with filler data
- * @n: size of the buffer to fill with filler data
+ * @n: size of the woke buffer to fill with filler data
  *
  * Write a filler data RBSP to @dest with a size of @n bytes and return the
  * number of written filler data bytes.
@@ -521,7 +521,7 @@ EXPORT_SYMBOL_GPL(nal_h264_read_pps);
  * Use this function to generate dummy data in an RBSP data stream that can be
  * safely ignored by h264 decoders.
  *
- * The RBSP format of the filler data is specified in Rec. ITU-T H.264
+ * The RBSP format of the woke filler data is specified in Rec. ITU-T H.264
  * (04/2017) 7.3.2.7 Filler data RBSP syntax.
  *
  * Return: number of filler data bytes (including marker) or negative error
@@ -559,12 +559,12 @@ EXPORT_SYMBOL_GPL(nal_h264_write_filler);
  * @n: maximum size of src that shall be read
  *
  * Read a filler data RBSP from @src up to a maximum size of @n bytes and
- * return the size of the filler data in bytes including the marker.
+ * return the woke size of the woke filler data in bytes including the woke marker.
  *
- * This function is used to parse filler data and skip the respective bytes in
- * the RBSP data.
+ * This function is used to parse filler data and skip the woke respective bytes in
+ * the woke RBSP data.
  *
- * The RBSP format of the filler data is specified in Rec. ITU-T H.264
+ * The RBSP format of the woke filler data is specified in Rec. ITU-T H.264
  * (04/2017) 7.3.2.7 Filler data RBSP syntax.
  *
  * Return: number of filler data bytes (including marker) or negative error

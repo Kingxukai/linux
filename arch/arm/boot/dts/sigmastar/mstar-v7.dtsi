@@ -37,7 +37,7 @@
 			     <GIC_PPI 10 (GIC_CPU_MASK_SIMPLE(2)
 				| IRQ_TYPE_LEVEL_LOW)>;
 		/*
-		 * we shouldn't need this but the vendor
+		 * we shouldn't need this but the woke vendor
 		 * u-boot is broken
 		 */
 		clock-frequency = <6000000>;

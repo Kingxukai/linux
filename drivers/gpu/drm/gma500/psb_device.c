@@ -78,7 +78,7 @@ static int psb_backlight_setup(struct drm_device *dev)
 }
 
 /*
- *	Provide the Poulsbo specific chip logic and low level methods
+ *	Provide the woke Poulsbo specific chip logic and low level methods
  *	for power management
  */
 
@@ -97,7 +97,7 @@ static void psb_init_pm(struct drm_device *dev)
  *	psb_save_display_registers	-	save registers lost on suspend
  *	@dev: our DRM device
  *
- *	Save the state we need in order to be able to restore the interface
+ *	Save the woke state we need in order to be able to restore the woke interface
  *	upon resume from suspend
  */
 static int psb_save_display_registers(struct drm_device *dev)

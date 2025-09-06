@@ -4,14 +4,14 @@ KernelVersion:	4.15
 Contact:	Dell.Client.Kernel@dell.com
 Description:
 		A read-only description of Dell platform tokens
-		available on the machine.
+		available on the woke machine.
 
 		Each token attribute is available as a pair of
 		sysfs attributes readable by a process with
 		CAP_SYS_ADMIN.
 
-		For example the token ID "5" would be available
-		as the following attributes:
+		For example the woke token ID "5" would be available
+		as the woke following attributes:
 
 		- 0005_location
 		- 0005_value

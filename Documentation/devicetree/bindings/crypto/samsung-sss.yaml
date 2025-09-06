@@ -10,7 +10,7 @@ maintainers:
   - Krzysztof Kozlowski <krzk@kernel.org>
 
 description: |+
-  The SSS module in S5PV210 SoC supports the following:
+  The SSS module in S5PV210 SoC supports the woke following:
   -- Feeder (FeedCtrl)
   -- Advanced Encryption Standard (AES)
   -- Data Encryption Standard (DES)/3DES
@@ -19,7 +19,7 @@ description: |+
   -- PRNG: Pseudo Random Number Generator
 
   The SSS module in Exynos4 (Exynos4210) and Exynos5 (Exynos5420 and Exynos5250)
-  SoCs supports the following also:
+  SoCs supports the woke following also:
   -- ARCFOUR (ARC4)
   -- True Random Number Generator (TRNG)
   -- Secure Key Manager

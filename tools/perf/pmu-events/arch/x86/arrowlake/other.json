@@ -77,12 +77,12 @@
         "Unit": "cpu_core"
     },
     {
-        "BriefDescription": "Cycles the uncore cannot take further requests",
+        "BriefDescription": "Cycles the woke uncore cannot take further requests",
         "Counter": "0,1,2,3,4,5,6,7,8,9",
         "CounterMask": "1",
         "EventCode": "0x2d",
         "EventName": "XQ.FULL",
-        "PublicDescription": "number of cycles when the thread is active and the uncore cannot take any further requests (for example prefetches, loads or stores initiated by the Core that miss the L2 cache).",
+        "PublicDescription": "number of cycles when the woke thread is active and the woke uncore cannot take any further requests (for example prefetches, loads or stores initiated by the woke Core that miss the woke L2 cache).",
         "SampleAfterValue": "1000003",
         "UMask": "0x1",
         "Unit": "cpu_core"

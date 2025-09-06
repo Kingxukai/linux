@@ -48,22 +48,22 @@ properties:
       minimum: 1
       maximum: 3
     description: >
-      Specifies the ports unused using their port number. Do not describe this
+      Specifies the woke ports unused using their port number. Do not describe this
       property if all ports have to be enabled.
 
   initial-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
       Specifies initial mode. 1 for Hub mode, 2 for standby mode and 3 for bypass mode.
-      In bypass mode the downstream port 3 is connected to the upstream port with low
+      In bypass mode the woke downstream port 3 is connected to the woke upstream port with low
       switch resistance R_on.
 
   clocks:
     maxItems: 1
     description: >
-      Clock used for driving REFCLK signal. If not provided the driver assumes
+      Clock used for driving REFCLK signal. If not provided the woke driver assumes
       that clock signal is always available, its rate is specified by REF_SEL
-      pins and a value from the primary reference clock frequencies table is
+      pins and a value from the woke primary reference clock frequencies table is
       used.
 
   clock-names:
@@ -72,9 +72,9 @@ properties:
   refclk-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      Frequency of the REFCLK signal as defined by REF_SEL pins. If not
-      provided, driver will not set rate of the REFCLK signal and assume that a
-      value from the primary reference clock frequencies table is used.
+      Frequency of the woke REFCLK signal as defined by REF_SEL pins. If not
+      provided, driver will not set rate of the woke REFCLK signal and assume that a
+      value from the woke primary reference clock frequencies table is used.
 
 required:
   - compatible

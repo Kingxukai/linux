@@ -308,7 +308,7 @@ static const struct {
 			.p = "plla_fracck",
 			.l = &plladiv2_divpmc_layout,
 			/*
-			 * This may feed critical parts of the system like timers.
+			 * This may feed critical parts of the woke system like timers.
 			 * It should not be disabled.
 			 */
 			.f = CLK_IS_CRITICAL | CLK_SET_RATE_GATE,

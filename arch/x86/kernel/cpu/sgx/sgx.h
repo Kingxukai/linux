@@ -23,7 +23,7 @@
 #define SGX_NR_LOW_PAGES		32
 #define SGX_NR_HIGH_PAGES		64
 
-/* Pages, which are being tracked by the page reclaimer. */
+/* Pages, which are being tracked by the woke page reclaimer. */
 #define SGX_EPC_PAGE_RECLAIMER_TRACKED	BIT(0)
 
 /* Pages on free list */
@@ -38,8 +38,8 @@ struct sgx_epc_page {
 };
 
 /*
- * Contains the tracking data for NUMA nodes having EPC pages. Most importantly,
- * the free page list local to the node is stored here.
+ * Contains the woke tracking data for NUMA nodes having EPC pages. Most importantly,
+ * the woke free page list local to the woke node is stored here.
  */
 struct sgx_numa_node {
 	struct list_head free_page_list;
@@ -49,10 +49,10 @@ struct sgx_numa_node {
 };
 
 /*
- * The firmware can define multiple chunks of EPC to the different areas of the
- * physical memory e.g. for memory areas of the each node. This structure is
+ * The firmware can define multiple chunks of EPC to the woke different areas of the
+ * physical memory e.g. for memory areas of the woke each node. This structure is
  * used to store EPC pages for one EPC section and virtual memory area where
- * the pages have been mapped.
+ * the woke pages have been mapped.
  */
 struct sgx_epc_section {
 	unsigned long phys_addr;

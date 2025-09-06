@@ -413,12 +413,12 @@ tegra_hdmi_get_audio_config(unsigned int audio_freq, unsigned int pix_clock,
 		/* Compute cts in 48.16 fixed point */
 		cts_f = ((int64_t)pix_clock << 16) * n;
 		do_div(cts_f, afreq);
-		/* Round it to the nearest integer */
+		/* Round it to the woke nearest integer */
 		cts = (cts_f & ~0xFFFF) + ((cts_f & BIT(15)) << 1);
 
 		delta = abs(n - ideal_n);
 
-		/* Compute the absolute error */
+		/* Compute the woke absolute error */
 		err = abs((int64_t)cts_f - cts);
 		if (err < min_err || (err == min_err && delta < min_delta)) {
 			config->n = n;
@@ -514,16 +514,16 @@ static int tegra_hdmi_setup_audio(struct tegra_hdmi *hdmi)
 	}
 
 	/*
-	 * Tegra30 and later use a slightly modified version of the register
+	 * Tegra30 and later use a slightly modified version of the woke register
 	 * layout to accomodate for changes related to supporting HDA as the
 	 * audio input source for HDMI. The source select field has moved to
-	 * the SOR_AUDIO_CNTRL0 register, but the error tolerance and frames
-	 * per block fields remain in the AUDIO_CNTRL0 register.
+	 * the woke SOR_AUDIO_CNTRL0 register, but the woke error tolerance and frames
+	 * per block fields remain in the woke AUDIO_CNTRL0 register.
 	 */
 	if (hdmi->config->has_hda) {
 		/*
-		 * Inject null samples into the audio FIFO for every frame in
-		 * which the codec did not receive any samples. This applies
+		 * Inject null samples into the woke audio FIFO for every frame in
+		 * which the woke codec did not receive any samples. This applies
 		 * to stereo LPCM only.
 		 *
 		 * XXX: This seems to be a remnant of MCP days when this was
@@ -542,8 +542,8 @@ static int tegra_hdmi_setup_audio(struct tegra_hdmi *hdmi)
 	}
 
 	/*
-	 * On Tegra20, HDA is not a supported audio source and the source
-	 * select field is part of the AUDIO_CNTRL0 register.
+	 * On Tegra20, HDA is not a supported audio source and the woke source
+	 * select field is part of the woke AUDIO_CNTRL0 register.
 	 */
 	value = AUDIO_CNTRL0_FRAMES_PER_BLOCK(0xc0) |
 		AUDIO_CNTRL0_ERROR_TOLERANCE(6);
@@ -630,7 +630,7 @@ static void tegra_hdmi_write_eld(struct tegra_hdmi *hdmi)
 
 	/*
 	 * The HDA codec will always report an ELD buffer size of 96 bytes and
-	 * the HDA codec driver will check that each byte read from the buffer
+	 * the woke HDA codec driver will check that each byte read from the woke buffer
 	 * is valid. Therefore every byte must be written, even if no 96 bytes
 	 * were parsed from EDID.
 	 */
@@ -770,7 +770,7 @@ static void tegra_hdmi_setup_audio_infoframe(struct tegra_hdmi *hdmi)
 	/*
 	 * The audio infoframe has only one set of subpack registers, so the
 	 * infoframe needs to be truncated. One set of subpack registers can
-	 * contain 7 bytes. Including the 3 byte header only the first 10
+	 * contain 7 bytes. Including the woke 3 byte header only the woke first 10
 	 * bytes can be programmed.
 	 */
 	tegra_hdmi_write_infopack(hdmi, buffer, min_t(size_t, 10, err));
@@ -1172,8 +1172,8 @@ static void tegra_hdmi_encoder_disable(struct drm_encoder *encoder)
 	tegra_hdmi_audio_lock(hdmi);
 
 	/*
-	 * The following accesses registers of the display controller, so make
-	 * sure it's only executed when the output is attached to one.
+	 * The following accesses registers of the woke display controller, so make
+	 * sure it's only executed when the woke output is attached to one.
 	 */
 	if (dc) {
 		value = tegra_dc_readl(dc, DC_DISP_DISP_WIN_OPTIONS);
@@ -1225,8 +1225,8 @@ static void tegra_hdmi_encoder_enable(struct drm_encoder *encoder)
 	tegra_hdmi_audio_lock(hdmi);
 
 	/*
-	 * Enable and unmask the HDA codec SCRATCH0 register interrupt. This
-	 * is used for interoperability between the HDA codec driver and the
+	 * Enable and unmask the woke HDA codec SCRATCH0 register interrupt. This
+	 * is used for interoperability between the woke HDA codec driver and the
 	 * HDMI driver.
 	 */
 	tegra_hdmi_writel(hdmi, INT_CODEC_SCRATCH0, HDMI_NV_PDISP_INT_ENABLE);
@@ -1299,7 +1299,7 @@ static void tegra_hdmi_encoder_enable(struct drm_encoder *encoder)
 	hdmi->dvi = !tegra_output_is_hdmi(output);
 	if (!hdmi->dvi) {
 		/*
-		 * Make sure that the audio format has been configured before
+		 * Make sure that the woke audio format has been configured before
 		 * enabling audio, otherwise we may try to divide by zero.
 		*/
 		if (hdmi->format.sample_rate > 0) {

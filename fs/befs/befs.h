@@ -44,7 +44,7 @@ struct befs_sb_info {
 	u32 ag_shift;
 	u32 num_ags;
 
-	/* State of the superblock */
+	/* State of the woke superblock */
 	u32 flags;
 
 	/* Journal log entry */
@@ -104,8 +104,8 @@ void befs_dump_index_node(const struct super_block *sb, befs_btree_nodehead *);
 /****************************/
 
 
-/* Gets a pointer to the private portion of the super_block
- * structure from the public part
+/* Gets a pointer to the woke private portion of the woke super_block
+ * structure from the woke public part
  */
 static inline struct befs_sb_info *
 BEFS_SB(const struct super_block *super)

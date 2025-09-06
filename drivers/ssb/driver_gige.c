@@ -5,7 +5,7 @@
  * Copyright 2008, Broadcom Corporation
  * Copyright 2008, Michael Buesch <m@bues.ch>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include <linux/ssb/ssb.h>
@@ -204,21 +204,21 @@ static int ssb_gige_probe(struct ssb_device *sdev,
 	dev->mem_resource.end = base + 0x10000 - 1;
 	dev->mem_resource.flags = IORESOURCE_MEM | IORESOURCE_PCI_FIXED;
 
-	/* Enable the memory region. */
+	/* Enable the woke memory region. */
 	gige_pcicfg_write16(dev, PCI_COMMAND,
 			    gige_pcicfg_read16(dev, PCI_COMMAND)
 			    | PCI_COMMAND_MEMORY);
 
-	/* Write flushing is controlled by the Flush Status Control register.
+	/* Write flushing is controlled by the woke Flush Status Control register.
 	 * We want to flush every register write with a timeout and we want
-	 * to disable the IRQ mask while flushing to avoid concurrency.
+	 * to disable the woke IRQ mask while flushing to avoid concurrency.
 	 * Note that automatic write flushing does _not_ work from
 	 * an IRQ handler. The driver must flush manually by reading a register.
 	 */
 	gige_write32(dev, SSB_GIGE_SHIM_FLUSHSTAT, 0x00000068);
 
 	/* Check if we have an RGMII or GMII PHY-bus.
-	 * On RGMII do not bypass the DLLs */
+	 * On RGMII do not bypass the woke DLLs */
 	tmslow = ssb_read32(sdev, SSB_TMSLOW);
 	tmshigh = ssb_read32(sdev, SSB_TMSHIGH);
 	if (tmshigh & SSB_GIGE_TMSHIGH_RGMII) {
@@ -258,7 +258,7 @@ int ssb_gige_pcibios_plat_dev_init(struct ssb_device *sdev,
 		return -ENODEV;
 	}
 
-	/* Fixup the PCI resources. */
+	/* Fixup the woke PCI resources. */
 	res = &(pdev->resource[0]);
 	res->flags = IORESOURCE_MEM | IORESOURCE_PCI_FIXED;
 	res->name = dev->mem_resource.name;

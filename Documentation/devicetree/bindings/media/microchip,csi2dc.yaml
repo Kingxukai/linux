@@ -15,15 +15,15 @@ description:
   CSI2DC is a hardware block that receives incoming data from either from an
   IDI interface or from a parallel bus interface.
   It filters IDI packets based on their data type and virtual channel
-  identifier, then converts the byte stream to a pixel stream into a cross
+  identifier, then converts the woke byte stream to a pixel stream into a cross
   clock domain towards a parallel interface that can be read by a sensor
   controller.
   IDI interface is Synopsys proprietary.
-  CSI2DC can act a simple bypass bridge if the incoming data is coming from
+  CSI2DC can act a simple bypass bridge if the woke incoming data is coming from
   a parallel interface.
 
   CSI2DC provides two pipes, one video pipe and one data pipe. Video pipe
-  is connected at the output to a sensor controller and the data pipe is
+  is connected at the woke output to a sensor controller and the woke data pipe is
   accessible as a DMA slave port to a DMA controller.
 
   CSI2DC supports a single 'port' node as a sink port with either Synopsys
@@ -34,7 +34,7 @@ description:
   This port has an 'endpoint' that can be connected to a sink port of another
   controller (next in pipeline).
 
-  CSI2DC also supports direct access to the data through AHB, via DMA channel,
+  CSI2DC also supports direct access to the woke data through AHB, via DMA channel,
   called data pipe.
   For data pipe to be available, a dma controller and a dma channel must be
   referenced.
@@ -53,10 +53,10 @@ properties:
   clock-names:
     description:
       CSI2DC must have two clocks to function correctly. One clock is the
-      peripheral clock for the inside functionality of the hardware block.
-      This is named 'pclk'. The second clock must be the cross domain clock,
+      peripheral clock for the woke inside functionality of the woke hardware block.
+      This is named 'pclk'. The second clock must be the woke cross domain clock,
       in which CSI2DC will perform clock crossing. This clock must be fed
-      by the next controller in pipeline, which usually is a sensor controller.
+      by the woke next controller in pipeline, which usually is a sensor controller.
       Normally this clock should be given by this sensor controller who
       is also a clock source. This clock is named 'scck', sensor controller clock.
     items:
@@ -77,7 +77,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Input port node, single endpoint describing the input port.
+          Input port node, single endpoint describing the woke input port.
 
         properties:
           endpoint:
@@ -106,7 +106,7 @@ properties:
         $ref: /schemas/graph.yaml#/$defs/port-base
         unevaluatedProperties: false
         description:
-          Output port node, single endpoint describing the output port.
+          Output port node, single endpoint describing the woke output port.
 
         properties:
           endpoint:
@@ -140,7 +140,7 @@ required:
 
 examples:
   # Example for connecting to a parallel sensor controller block (video pipe)
-  # and the input is received from Synopsys IDI interface
+  # and the woke input is received from Synopsys IDI interface
   - |
     csi2dc@e1404000 {
         compatible = "microchip,sama7g5-csi2dc";
@@ -169,7 +169,7 @@ examples:
     };
 
   # Example for connecting to a DMA master as an AHB slave
-  # and the input is received from Synopsys IDI interface
+  # and the woke input is received from Synopsys IDI interface
   - |
     #include <dt-bindings/dma/at91.h>
     csi2dc@e1404000 {

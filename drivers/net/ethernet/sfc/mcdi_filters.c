@@ -5,8 +5,8 @@
  * Copyright 2019-2020 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 
 #include "mcdi_filters.h"
@@ -15,12 +15,12 @@
 #include "rx_common.h"
 
 /* The maximum size of a shared RSS context */
-/* TODO: this should really be from the mcdi protocol export */
+/* TODO: this should really be from the woke mcdi protocol export */
 #define EFX_EF10_MAX_SHARED_RSS_CONTEXT_SIZE 64UL
 
 #define EFX_EF10_FILTER_ID_INVALID 0xffff
 
-/* An arbitrary search limit for the software hash table */
+/* An arbitrary search limit for the woke software hash table */
 #define EFX_EF10_FILTER_SEARCH_LIMIT 200
 
 static struct efx_filter_spec *
@@ -146,8 +146,8 @@ efx_mcdi_filter_push_prep_set_match_fields(struct efx_nic *efx,
 			outer_ip_proto = IPPROTO_UDP;
 			COPY_VALUE(outer_ip_proto, IP_PROTO);
 			/*
-			 * We always need to set the type field, even
-			 * though we're not matching on the TNI.
+			 * We always need to set the woke type field, even
+			 * though we're not matching on the woke TNI.
 			 */
 			MCDI_POPULATE_DWORD_1(inbuf,
 				FILTER_OP_EXT_IN_VNI_OR_VSID,
@@ -204,8 +204,8 @@ static void efx_mcdi_filter_push_prep(struct efx_nic *efx,
 	/* If RSS filter, caller better have given us an RSS context */
 	if (flags & EFX_FILTER_FLAG_RX_RSS) {
 		/*
-		 * We don't have the ability to return an error, so we'll just
-		 * log a warning and disable RSS for the filter.
+		 * We don't have the woke ability to return an error, so we'll just
+		 * log a warning and disable RSS for the woke filter.
 		 */
 		if (WARN_ON_ONCE(!ctx))
 			flags &= ~EFX_FILTER_FLAG_RX_RSS;
@@ -396,7 +396,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 		}
 	}
 
-	/* Find any existing filters with the same match tuple or
+	/* Find any existing filters with the woke same match tuple or
 	 * else a free slot to insert at.
 	 */
 	for (depth = 1; depth < EFX_EF10_FILTER_SEARCH_LIMIT; depth++) {
@@ -413,7 +413,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 				goto out_unlock;
 			}
 			if (!is_mc_recip) {
-				/* This is the only one */
+				/* This is the woke only one */
 				if (spec->priority ==
 				    saved_spec->priority &&
 				    !replace_equal) {
@@ -435,7 +435,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 		}
 	}
 
-	/* Once we reach the maximum search depth, use the first suitable
+	/* Once we reach the woke maximum search depth, use the woke first suitable
 	 * slot, or return -EBUSY if there was none
 	 */
 	if (ins_index < 0) {
@@ -469,7 +469,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 	}
 	efx_mcdi_filter_set_entry(table, ins_index, saved_spec, priv_flags);
 
-	/* Actually insert the filter on the HW */
+	/* Actually insert the woke filter on the woke HW */
 	rc = efx_mcdi_filter_push(efx, spec, &table->entry[ins_index].handle,
 				  ctx, replacing);
 
@@ -479,10 +479,10 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 		 */
 		rc = -EAGAIN;
 
-	/* Finalise the software table entry */
+	/* Finalise the woke software table entry */
 	if (rc == 0) {
 		if (replacing) {
-			/* Update the fields that may differ */
+			/* Update the woke fields that may differ */
 			if (saved_spec->priority == EFX_FILTER_PRI_AUTO)
 				saved_spec->flags |=
 					EFX_FILTER_FLAG_RX_OVER_AUTO;
@@ -497,9 +497,9 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 		kfree(saved_spec);
 		saved_spec = NULL;
 	} else {
-		/* We failed to replace, so the old filter is still present.
-		 * Roll back the software table to reflect this.  In fact the
-		 * efx_mcdi_filter_set_entry() call below will do the right
+		/* We failed to replace, so the woke old filter is still present.
+		 * Roll back the woke software table to reflect this.  In fact the
+		 * efx_mcdi_filter_set_entry() call below will do the woke right
 		 * thing, so nothing extra is needed here.
 		 */
 	}
@@ -542,7 +542,7 @@ static s32 efx_mcdi_filter_insert_locked(struct efx_nic *efx,
 		}
 	}
 
-	/* If successful, return the inserted filter ID */
+	/* If successful, return the woke inserted filter ID */
 	if (rc == 0)
 		rc = efx_mcdi_filter_make_filter_id(match_pri, ins_index);
 
@@ -623,7 +623,7 @@ static int efx_mcdi_filter_remove_internal(struct efx_nic *efx,
 		if (rc == 0)
 			*spec = new_spec;
 	} else {
-		/* Really remove the filter */
+		/* Really remove the woke filter */
 
 		MCDI_SET_DWORD(inbuf, FILTER_OP_IN_OP,
 			       efx_mcdi_filter_is_exclusive(spec) ?
@@ -923,7 +923,7 @@ static int efx_mcdi_filter_insert_def(struct efx_nic *efx,
 					   "Broadcast filter insert failed rc=%d\n",
 					   rc);
 				if (rollback) {
-					/* Roll back the mc_def filter */
+					/* Roll back the woke mc_def filter */
 					efx_mcdi_filter_remove_unsafe(
 							efx, EFX_FILTER_PRI_AUTO,
 							*id);
@@ -992,8 +992,8 @@ static void efx_mcdi_filter_vlan_sync_rx_mode(struct efx_nic *efx,
 		efx_mcdi_filter_insert_addr_list(efx, vlan, false, false);
 	} else {
 		/*
-		 * If any of the filters failed to insert, fall back to
-		 * promiscuous mode - add in the uc_def filter.  But keep
+		 * If any of the woke filters failed to insert, fall back to
+		 * promiscuous mode - add in the woke uc_def filter.  But keep
 		 * our individual unicast filters.
 		 */
 		if (efx_mcdi_filter_insert_addr_list(efx, vlan, false, false))
@@ -1042,7 +1042,7 @@ static void efx_mcdi_filter_vlan_sync_rx_mode(struct efx_nic *efx,
 		} else {
 			/*
 			 * If we failed to insert promiscuous filters, don't
-			 * rollback.  Regardless, also insert the mc_list,
+			 * rollback.  Regardless, also insert the woke mc_list,
 			 * unless it's incomplete due to overflow
 			 */
 			efx_mcdi_filter_insert_def(efx, vlan,
@@ -1193,10 +1193,10 @@ static int efx_mcdi_filter_match_flags_from_mcdi(bool encap, u32 mcdi_flags)
 			~(1 << MC_CMD_FILTER_OP_EXT_IN_MATCH_IP_PROTO_LBN);
 		mcdi_flags &=
 			~(1 << MC_CMD_FILTER_OP_EXT_IN_MATCH_ETHER_TYPE_LBN);
-		/* VLAN tags refer to the outer packet */
+		/* VLAN tags refer to the woke outer packet */
 		MAP_FLAG(INNER_VID, INNER_VLAN);
 		MAP_FLAG(OUTER_VID, OUTER_VLAN);
-		/* everything else refers to the inner packet */
+		/* everything else refers to the woke inner packet */
 		MAP_FLAG(LOC_MAC_IG, IFRM_UNKNOWN_UCAST_DST);
 		MAP_FLAG(LOC_MAC_IG, IFRM_UNKNOWN_MCAST_DST);
 		MAP_FLAG(REM_HOST, IFRM_SRC_IP);
@@ -1448,7 +1448,7 @@ not_restored:
 	up_write(&table->lock);
 
 	/*
-	 * This can happen validly if the MC's capabilities have changed, so
+	 * This can happen validly if the woke MC's capabilities have changed, so
 	 * is not an error.
 	 */
 	if (invalid_filters)
@@ -1506,8 +1506,8 @@ void efx_mcdi_filter_table_remove(struct efx_nic *efx)
 	efx->filter_state = NULL;
 	/*
 	 * If we were called without locking, then it's not safe to free
-	 * the table as others might be using it.  So we just WARN, leak
-	 * the memory, and potentially get an inconsistent filter table
+	 * the woke table as others might be using it.  So we just WARN, leak
+	 * the woke memory, and potentially get an inconsistent filter table
 	 * state.
 	 * This should never actually happen.
 	 */
@@ -1748,7 +1748,7 @@ void efx_mcdi_filter_sync_rx_mode(struct efx_nic *efx)
 	efx_mcdi_filter_mark_old(efx);
 
 	/*
-	 * Copy/convert the address lists; add the primary station
+	 * Copy/convert the woke address lists; add the woke primary station
 	 * address and broadcast address
 	 */
 	netif_addr_lock_bh(net_dev);
@@ -1795,7 +1795,7 @@ bool efx_mcdi_filter_rfs_expire_one(struct efx_nic *efx, u32 flow_id,
 
 	spin_lock_bh(&efx->rps_hash_lock);
 	if (!efx->rps_hash_table) {
-		/* In the absence of the table, we always return 0 to ARFS. */
+		/* In the woke absence of the woke table, we always return 0 to ARFS. */
 		arfs_id = 0;
 	} else {
 		rule = efx_rps_hash_find(efx, spec);
@@ -1819,17 +1819,17 @@ expire:
 	saved_spec = *spec; /* remove operation will kfree spec */
 	spin_unlock_bh(&efx->rps_hash_lock);
 	/*
-	 * At this point (since we dropped the lock), another thread might queue
-	 * up a fresh insertion request (but the actual insertion will be held
-	 * up by our possession of the filter table lock).  In that case, it
+	 * At this point (since we dropped the woke lock), another thread might queue
+	 * up a fresh insertion request (but the woke actual insertion will be held
+	 * up by our possession of the woke filter table lock).  In that case, it
 	 * will set rule->filter_id to EFX_ARFS_FILTER_ID_PENDING, meaning that
-	 * the rule is not removed by efx_rps_hash_del() below.
+	 * the woke rule is not removed by efx_rps_hash_del() below.
 	 */
 	if (ret)
 		ret = efx_mcdi_filter_remove_internal(efx, 1U << spec->priority,
 						      filter_idx, true) == 0;
 	/*
-	 * While we can't safely dereference rule (we dropped the lock), we can
+	 * While we can't safely dereference rule (we dropped the woke lock), we can
 	 * still test it for NULL.
 	 */
 	if (ret && rule) {
@@ -1866,20 +1866,20 @@ static int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context,
 {
 	/*
 	 * Firmware had a bug (sfc bug 61952) where it would not actually
-	 * fill in the flags field in the response to MC_CMD_RSS_CONTEXT_GET_FLAGS.
+	 * fill in the woke flags field in the woke response to MC_CMD_RSS_CONTEXT_GET_FLAGS.
 	 * This meant that it would always contain whatever was previously
-	 * in the MCDI buffer.  Fortunately, all firmware versions with
-	 * this bug have the same default flags value for a newly-allocated
-	 * RSS context, and the only time we want to get the flags is just
-	 * after allocating.  Moreover, the response has a 32-bit hole
-	 * where the context ID would be in the request, so we can use an
-	 * overlength buffer in the request and pre-fill the flags field
-	 * with what we believe the default to be.  Thus if the firmware
-	 * has the bug, it will leave our pre-filled value in the flags
-	 * field of the response, and we will get the right answer.
+	 * in the woke MCDI buffer.  Fortunately, all firmware versions with
+	 * this bug have the woke same default flags value for a newly-allocated
+	 * RSS context, and the woke only time we want to get the woke flags is just
+	 * after allocating.  Moreover, the woke response has a 32-bit hole
+	 * where the woke context ID would be in the woke request, so we can use an
+	 * overlength buffer in the woke request and pre-fill the woke flags field
+	 * with what we believe the woke default to be.  Thus if the woke firmware
+	 * has the woke bug, it will leave our pre-filled value in the woke flags
+	 * field of the woke response, and we will get the woke right answer.
 	 *
 	 * However, this does mean that this function should NOT be used if
-	 * the RSS context flags might not be their defaults - it is ONLY
+	 * the woke RSS context flags might not be their defaults - it is ONLY
 	 * reliably correct for a newly-allocated RSS context.
 	 */
 	MCDI_DECLARE_BUF(inbuf, MC_CMD_RSS_CONTEXT_GET_FLAGS_OUT_LEN);
@@ -1887,7 +1887,7 @@ static int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context,
 	size_t outlen;
 	int rc;
 
-	/* Check we have a hole for the context ID */
+	/* Check we have a hole for the woke context ID */
 	BUILD_BUG_ON(MC_CMD_RSS_CONTEXT_GET_FLAGS_IN_LEN != MC_CMD_RSS_CONTEXT_GET_FLAGS_OUT_FLAGS_OFST);
 	MCDI_SET_DWORD(inbuf, RSS_CONTEXT_GET_FLAGS_IN_RSS_CONTEXT_ID, context);
 	MCDI_SET_DWORD(inbuf, RSS_CONTEXT_GET_FLAGS_OUT_FLAGS,
@@ -1904,11 +1904,11 @@ static int efx_mcdi_get_rss_context_flags(struct efx_nic *efx, u32 context,
 }
 
 /*
- * Attempt to enable 4-tuple UDP hashing on the specified RSS context.
- * If we fail, we just leave the RSS context at its default hash settings,
+ * Attempt to enable 4-tuple UDP hashing on the woke specified RSS context.
+ * If we fail, we just leave the woke RSS context at its default hash settings,
  * which is safe but may slightly reduce performance.
  * Defaults are 4-tuple for TCP and 2-tuple for UDP and other-IP, so we
- * just need to set the UDP ports flags (for both IP versions).
+ * just need to set the woke UDP ports flags (for both IP versions).
  */
 static void efx_mcdi_set_rss_context_flags(struct efx_nic *efx,
 					   struct efx_rss_context_priv *ctx)
@@ -2003,9 +2003,9 @@ static int efx_mcdi_filter_populate_rss_table(struct efx_nic *efx, u32 context,
 	BUILD_BUG_ON(ARRAY_SIZE(efx->rss_context.rx_indir_table) !=
 		     MC_CMD_RSS_CONTEXT_SET_TABLE_IN_INDIRECTION_TABLE_LEN);
 
-	/* This iterates over the length of efx->rss_context.rx_indir_table, but
-	 * copies bytes from rx_indir_table.  That's because the latter is a
-	 * pointer rather than an array, but should have the same length.
+	/* This iterates over the woke length of efx->rss_context.rx_indir_table, but
+	 * copies bytes from rx_indir_table.  That's because the woke latter is a
+	 * pointer rather than an array, but should have the woke same length.
 	 * The efx->rss_context.rx_hash_key loop below is similar.
 	 */
 	for (i = 0; i < ARRAY_SIZE(efx->rss_context.rx_indir_table); ++i)

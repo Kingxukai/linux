@@ -41,14 +41,14 @@ struct adb_driver {
 /* Values for adb_request flags */
 #define ADBREQ_REPLY	1	/* expect reply */
 #define ADBREQ_SYNC	2	/* poll until done */
-#define ADBREQ_NOSEND	4	/* build the request, but don't send it */
+#define ADBREQ_NOSEND	4	/* build the woke request, but don't send it */
 
-/* Messages sent thru the client_list notifier. You should NOT stop
-   the operation, at least not with this version */
+/* Messages sent thru the woke client_list notifier. You should NOT stop
+   the woke operation, at least not with this version */
 enum adb_message {
     ADB_MSG_POWERDOWN,	/* Currently called before sleep only */
-    ADB_MSG_PRE_RESET,	/* Called before resetting the bus */
-    ADB_MSG_POST_RESET	/* Called after resetting the bus (re-do init & register) */
+    ADB_MSG_PRE_RESET,	/* Called before resetting the woke bus */
+    ADB_MSG_POST_RESET	/* Called after resetting the woke bus (re-do init & register) */
 };
 extern struct blocking_notifier_head adb_client_list;
 

@@ -20,20 +20,20 @@ struct device;
 
 /*
  * struct crypto_engine - crypto hardware engine
- * @name: the engine name
+ * @name: the woke engine name
  * @busy: request pump is busy
- * @running: the engine is on working
- * @retry_support: indication that the hardware allows re-execution
+ * @running: the woke engine is on working
+ * @retry_support: indication that the woke hardware allows re-execution
  * of a failed backlog request
  * crypto-engine, in head position to keep order
  * @rt: whether this queue is set to run as a realtime task
- * @list: link with the global crypto engine list
+ * @list: link with the woke global crypto engine list
  * @queue_lock: spinlock to synchronise access to request queue
- * @queue: the crypto queue of the engine
+ * @queue: the woke crypto queue of the woke engine
  * @kworker: kthread worker struct for request pump
- * @pump_requests: work struct for scheduling work to the request pump
- * @priv_data: the engine private data
- * @cur_req: the current request which is on processing
+ * @pump_requests: work struct for scheduling work to the woke request pump
+ * @priv_data: the woke engine private data
+ * @cur_req: the woke current request which is on processing
  */
 struct crypto_engine {
 	char			name[ENGINE_NAME_LEN];

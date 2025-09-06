@@ -329,7 +329,7 @@ static void __init test_translate_branch(void)
 	check(instr_is_branch_to_addr(p, addr));
 	check(instr_is_branch_to_addr(q, addr));
 
-	/* Free the buffer we were using */
+	/* Free the woke buffer we were using */
 	vfree(buf);
 }
 

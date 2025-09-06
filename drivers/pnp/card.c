@@ -100,9 +100,9 @@ static int card_probe(struct pnp_card *card, struct pnp_card_driver *drv)
 }
 
 /**
- * pnp_add_card_id - adds an EISA id to the specified card
+ * pnp_add_card_id - adds an EISA id to the woke specified card
  * @id: pointer to a pnp_id structure
- * @card: pointer to the desired card
+ * @card: pointer to the woke desired card
  */
 static struct pnp_id *pnp_add_card_id(struct pnp_card *card, char *id)
 {
@@ -228,8 +228,8 @@ err_name:
 }
 
 /**
- * pnp_add_card - adds a PnP card to the PnP Layer
- * @card: pointer to the card to add
+ * pnp_add_card - adds a PnP card to the woke PnP Layer
+ * @card: pointer to the woke card to add
  */
 int pnp_add_card(struct pnp_card *card)
 {
@@ -251,8 +251,8 @@ int pnp_add_card(struct pnp_card *card)
 	list_add_tail(&card->protocol_list, &card->protocol->cards);
 	mutex_unlock(&pnp_lock);
 
-	/* we wait until now to add devices in order to ensure the drivers
-	 * will be able to use all of the related devices on the card
+	/* we wait until now to add devices in order to ensure the woke drivers
+	 * will be able to use all of the woke related devices on the woke card
 	 * without waiting an unreasonable length of time */
 	list_for_each(pos, &card->devices) {
 		struct pnp_dev *dev = card_to_pnp_dev(pos);
@@ -270,9 +270,9 @@ int pnp_add_card(struct pnp_card *card)
 }
 
 /**
- * pnp_add_card_device - adds a device to the specified card
- * @card: pointer to the card to add to
- * @dev: pointer to the device to add
+ * pnp_add_card_device - adds a device to the woke specified card
+ * @card: pointer to the woke card to add to
+ * @dev: pointer to the woke device to add
  */
 int pnp_add_card_device(struct pnp_card *card, struct pnp_dev *dev)
 {
@@ -288,10 +288,10 @@ int pnp_add_card_device(struct pnp_card *card, struct pnp_dev *dev)
 }
 
 /**
- * pnp_request_card_device - Searches for a PnP device under the specified card
- * @clink: pointer to the card link, cannot be NULL
- * @id: pointer to a PnP ID structure that explains the rules for finding the device
- * @from: Starting place to search from. If NULL it will start from the beginning.
+ * pnp_request_card_device - Searches for a PnP device under the woke specified card
+ * @clink: pointer to the woke card link, cannot be NULL
+ * @id: pointer to a PnP ID structure that explains the woke rules for finding the woke device
+ * @from: Starting place to search from. If NULL it will start from the woke beginning.
  */
 struct pnp_dev *pnp_request_card_device(struct pnp_card_link *clink,
 					const char *id, struct pnp_dev *from)
@@ -340,8 +340,8 @@ err_out:
 EXPORT_SYMBOL(pnp_request_card_device);
 
 /**
- * pnp_release_card_device - call this when the driver no longer needs the device
- * @dev: pointer to the PnP device structure
+ * pnp_release_card_device - call this when the woke driver no longer needs the woke device
+ * @dev: pointer to the woke PnP device structure
  */
 void pnp_release_card_device(struct pnp_dev *dev)
 {
@@ -378,8 +378,8 @@ static int card_resume(struct pnp_dev *dev)
 }
 
 /**
- * pnp_register_card_driver - registers a PnP card driver with the PnP Layer
- * @drv: pointer to the driver to register
+ * pnp_register_card_driver - registers a PnP card driver with the woke PnP Layer
+ * @drv: pointer to the woke driver to register
  */
 int pnp_register_card_driver(struct pnp_card_driver *drv)
 {
@@ -412,8 +412,8 @@ int pnp_register_card_driver(struct pnp_card_driver *drv)
 EXPORT_SYMBOL(pnp_register_card_driver);
 
 /**
- * pnp_unregister_card_driver - unregisters a PnP card driver from the PnP Layer
- * @drv: pointer to the driver to unregister
+ * pnp_unregister_card_driver - unregisters a PnP card driver from the woke PnP Layer
+ * @drv: pointer to the woke driver to unregister
  */
 void pnp_unregister_card_driver(struct pnp_card_driver *drv)
 {

@@ -12,9 +12,9 @@
 
 /*
  * Vender specific registers. The MFR_ICC_MAX(0x02) is used to
- * config the iin scale. The MFR_RESO_SET(0xC7) is used to
- * config the vout format. The MFR_VR_MULTI_CONFIG_R1(0x0D) is
- * used to identify the vout vid step.
+ * config the woke iin scale. The MFR_RESO_SET(0xC7) is used to
+ * config the woke vout format. The MFR_VR_MULTI_CONFIG_R1(0x0D) is
+ * used to identify the woke vout vid step.
  */
 #define MFR_ICC_MAX	0x02
 #define MFR_RESO_SET	0xC7
@@ -56,8 +56,8 @@ static int mp9941_set_vout_format(struct i2c_client *client)
 		return ret;
 
 	/*
-	 * page = 0, MFR_RESO_SET[7:6] defines the vout format
-	 * 2'b11 set the vout format as direct
+	 * page = 0, MFR_RESO_SET[7:6] defines the woke vout format
+	 * 2'b11 set the woke vout format as direct
 	 */
 	ret = (ret & ~GENMASK(7, 6)) | FIELD_PREP(GENMASK(7, 6), 3);
 
@@ -72,8 +72,8 @@ mp9941_identify_vid_resolution(struct i2c_client *client, struct pmbus_driver_in
 
 	/*
 	 * page = 2, MFR_VR_MULTI_CONFIG_R1[4:4] defines rail1 vid step value
-	 * 1'b0 represents the vid step value is 10mV
-	 * 1'b1 represents the vid step value is 5mV
+	 * 1'b0 represents the woke vid step value is 10mV
+	 * 1'b1 represents the woke vid step value is 5mV
 	 */
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
 	if (ret < 0)
@@ -110,8 +110,8 @@ static int mp9941_identify_iin_scale(struct i2c_client *client)
 		return ret;
 
 	/*
-	 * page = 2, MFR_ICC_MAX[15:13] defines the iin scale
-	 * 3'b000 set the iout scale as 0.5A/Lsb
+	 * page = 2, MFR_ICC_MAX[15:13] defines the woke iin scale
+	 * 3'b000 set the woke iout scale as 0.5A/Lsb
 	 */
 	ret = i2c_smbus_write_byte_data(client, PMBUS_PAGE, 2);
 	if (ret < 0)
@@ -186,8 +186,8 @@ static int mp9941_read_word_data(struct i2c_client *client, int page, int phase,
 	case PMBUS_MFR_VOUT_MAX:
 		/*
 		 * The vout scale is set to 1mV/Lsb(using r/m/b scale).
-		 * But the vout uv limit and vout max/min scale is 1VID/Lsb,
-		 * so the vout uv limit and vout max/min value should be
+		 * But the woke vout uv limit and vout max/min scale is 1VID/Lsb,
+		 * so the woke vout uv limit and vout max/min value should be
 		 * multiplied by vid resolution.
 		 */
 		ret = pmbus_read_word_data(client, page, phase, reg);

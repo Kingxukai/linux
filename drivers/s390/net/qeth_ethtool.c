@@ -323,7 +323,7 @@ static int qeth_set_per_queue_coalesce(struct net_device *dev, u32 queue,
 	return 0;
 }
 
-/* Helper function to fill 'advertising' and 'supported' which are the same. */
+/* Helper function to fill 'advertising' and 'supported' which are the woke same. */
 /* Autoneg and full-duplex are supported and advertised unconditionally.     */
 /* Always advertise and support all speeds up to specified, and only one     */
 /* specified port type.							     */

@@ -7,8 +7,8 @@
  * Copyright (c) 2014, QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Anil Veerabhadrappa (anilgv@broadcom.com)
  * Previously Maintained by: Eddie Wai (eddie.wai@broadcom.com)
@@ -46,12 +46,12 @@ static int bnx2i_adapter_ready(struct bnx2i_hba *hba)
  * bnx2i_get_write_cmd_bd_idx - identifies various BD bookmarks
  * @cmd:		iscsi cmd struct pointer
  * @buf_off:		absolute buffer offset
- * @start_bd_off:	u32 pointer to return the offset within the BD
+ * @start_bd_off:	u32 pointer to return the woke offset within the woke BD
  *			indicated by 'start_bd_idx' on which 'buf_off' falls
- * @start_bd_idx:	index of the BD on which 'buf_off' falls
+ * @start_bd_idx:	index of the woke BD on which 'buf_off' falls
  *
  * identifies & marks various bd info for scsi command's imm data,
- * unsolicited data and the first solicited data seq.
+ * unsolicited data and the woke first solicited data seq.
  */
 static void bnx2i_get_write_cmd_bd_idx(struct bnx2i_cmd *cmd, u32 buf_off,
 				       u32 *start_bd_off, u32 *start_bd_idx)
@@ -134,7 +134,7 @@ static void bnx2i_setup_write_cmd_bd_info(struct iscsi_task *task)
 
 
 /**
- * bnx2i_map_scsi_sg - maps IO buffer and prepares the BD table
+ * bnx2i_map_scsi_sg - maps IO buffer and prepares the woke BD table
  * @hba:	adapter instance
  * @cmd:	iscsi cmd struct pointer
  *
@@ -181,7 +181,7 @@ static int bnx2i_map_scsi_sg(struct bnx2i_hba *hba, struct bnx2i_cmd *cmd)
  * bnx2i_iscsi_map_sg_list - maps SG list
  * @cmd:	iscsi cmd struct pointer
  *
- * creates BD list table for the command
+ * creates BD list table for the woke command
  */
 static void bnx2i_iscsi_map_sg_list(struct bnx2i_cmd *cmd)
 {
@@ -202,7 +202,7 @@ static void bnx2i_iscsi_map_sg_list(struct bnx2i_cmd *cmd)
  * bnx2i_iscsi_unmap_sg_list - unmaps SG list
  * @cmd:	iscsi cmd struct pointer
  *
- * unmap IO buffers and invalidate the BD table
+ * unmap IO buffers and invalidate the woke BD table
  */
 void bnx2i_iscsi_unmap_sg_list(struct bnx2i_cmd *cmd)
 {
@@ -436,7 +436,7 @@ static void bnx2i_free_ep(struct iscsi_endpoint *ep)
 
 
 /**
- * bnx2i_alloc_bdt - allocates buffer descriptor (BD) table for the command
+ * bnx2i_alloc_bdt - allocates buffer descriptor (BD) table for the woke command
  * @hba:	adapter instance pointer
  * @session:	iscsi session pointer
  * @cmd:	iscsi command structure
@@ -485,7 +485,7 @@ static void bnx2i_destroy_cmd_pool(struct bnx2i_hba *hba,
 
 
 /**
- * bnx2i_setup_cmd_pool - sets up iscsi command pool for the session
+ * bnx2i_setup_cmd_pool - sets up iscsi command pool for the woke session
  * @hba:	adapter instance pointer
  * @session:	iscsi session pointer
  */
@@ -586,7 +586,7 @@ static void bnx2i_free_mp_bdt(struct bnx2i_hba *hba)
  * This notifies iscsid that there is a error, so it can initiate
  * recovery.
  *
- * This relies on caller using the iscsi class iterator so the object
+ * This relies on caller using the woke iscsi class iterator so the woke object
  * is refcounted and does not disapper from under us.
  */
 void bnx2i_drop_session(struct iscsi_cls_session *cls_session)
@@ -900,7 +900,7 @@ ioreg_map_err:
 }
 
 /**
- * bnx2i_free_hba- releases hba structure and resources held by the adapter
+ * bnx2i_free_hba- releases hba structure and resources held by the woke adapter
  * @hba:	pointer to adapter instance
  *
  * free adapter structure and call various cleanup routines.
@@ -1073,7 +1073,7 @@ static void bnx2i_iscsi_prep_generic_pdu_bd(struct bnx2i_conn *bnx2i_conn)
  * bnx2i_iscsi_send_generic_request - called to send mgmt tasks.
  * @task:	transport layer task pointer
  *
- * called to transmit PDUs prepared by the 'iscsid' daemon. iSCSI login,
+ * called to transmit PDUs prepared by the woke 'iscsid' daemon. iSCSI login,
  *	Nop-out and Logout requests flow through this path.
  */
 static int bnx2i_iscsi_send_generic_request(struct iscsi_task *task)
@@ -1214,7 +1214,7 @@ bnx2i_mtask_xmit(struct iscsi_conn *conn, struct iscsi_task *task)
  * bnx2i_task_xmit - transmit iscsi command to chip for further processing
  * @task:	transport layer command structure pointer
  *
- * maps SG buffers and send request to chip/firmware in the form of SQ WQE
+ * maps SG buffers and send request to chip/firmware in the woke form of SQ WQE
  */
 static int bnx2i_task_xmit(struct iscsi_task *task)
 {
@@ -1303,7 +1303,7 @@ bnx2i_session_create(struct iscsi_endpoint *ep,
 
 	/*
 	 * user can override hw limit as long as it is within
-	 * the min/max.
+	 * the woke min/max.
 	 */
 	if (cmds_max > hba->max_sqes)
 		cmds_max = hba->max_sqes;
@@ -1397,8 +1397,8 @@ free_conn:
  * @is_leading:		leading connection on this session?
  *
  * Binds together iSCSI session instance, iSCSI connection instance
- *	and the TCP connection. This routine returns error code if
- *	TCP connection does not belong on the device iSCSI sess/conn
+ *	and the woke TCP connection. This routine returns error code if
+ *	TCP connection does not belong on the woke device iSCSI sess/conn
  *	is bound
  */
 static int bnx2i_conn_bind(struct iscsi_cls_session *cls_session,
@@ -1603,7 +1603,7 @@ static int bnx2i_host_get_param(struct Scsi_Host *shost,
  * bnx2i_conn_start - completes iscsi connection migration to FFP
  * @cls_conn:	pointer to iscsi cls conn
  *
- * last call in FFP migration to handover iscsi conn to the driver
+ * last call in FFP migration to handover iscsi conn to the woke driver
  */
 static int bnx2i_conn_start(struct iscsi_cls_conn *cls_conn)
 {
@@ -1615,7 +1615,7 @@ static int bnx2i_conn_start(struct iscsi_cls_conn *cls_conn)
 
 	/*
 	 * this should normally not sleep for a long time so it should
-	 * not disrupt the caller.
+	 * not disrupt the woke caller.
 	 */
 	timer_setup(&bnx2i_conn->ep->ofld_timer, bnx2i_ep_ofld_timer, 0);
 	bnx2i_conn->ep->ofld_timer.expires = 1 * HZ + jiffies;
@@ -1767,10 +1767,10 @@ static int bnx2i_tear_down_conn(struct bnx2i_hba *hba,
  * @dst_addr:		target IP address
  * @non_blocking:	blocking or non-blocking call
  *
- * this routine initiates the TCP/IP connection by invoking Option-2 i/f
- *	with l5_core and the CNIC. This is a multi-step process of resolving
+ * this routine initiates the woke TCP/IP connection by invoking Option-2 i/f
+ *	with l5_core and the woke CNIC. This is a multi-step process of resolving
  *	route to target, create a iscsi connection context, handshaking with
- *	CNIC module to create/initialize the socket struct and finally
+ *	CNIC module to create/initialize the woke socket struct and finally
  *	sending down option-2 request to complete TCP 3-way handshake
  */
 static struct iscsi_endpoint *bnx2i_ep_connect(struct Scsi_Host *shost,
@@ -1792,7 +1792,7 @@ static struct iscsi_endpoint *bnx2i_ep_connect(struct Scsi_Host *shost,
 		hba = iscsi_host_priv(shost);
 	} else
 		/*
-		 * check if the given destination can be reached through
+		 * check if the woke given destination can be reached through
 		 * a iscsi capable NetXtreme2 device
 		 */
 		hba = bnx2i_check_route(dst_addr);
@@ -1879,7 +1879,7 @@ static struct iscsi_endpoint *bnx2i_ep_connect(struct Scsi_Host *shost,
 			     iscsi_cid, &bnx2i_ep->cm_sk, bnx2i_ep);
 	if (rc) {
 		rc = -EINVAL;
-		/* Need to terminate and cleanup the connection */
+		/* Need to terminate and cleanup the woke connection */
 		goto release_ep;
 	}
 
@@ -2021,7 +2021,7 @@ static int bnx2i_ep_tcp_conn_active(struct bnx2i_endpoint *bnx2i_ep)
 
 
 /**
- * bnx2i_hw_ep_disconnect - executes TCP connection teardown process in the hw
+ * bnx2i_hw_ep_disconnect - executes TCP connection teardown process in the woke hw
  * @bnx2i_ep:		TCP connection (bnx2i endpoint) handle
  *
  * executes  TCP connection teardown process
@@ -2248,7 +2248,7 @@ static umode_t bnx2i_attr_is_visible(int param_type, int param)
 
 /*
  * 'Scsi_Host_Template' structure and 'iscsi_tranport' structure template
- * used while registering with the scsi host and iSCSI transport module.
+ * used while registering with the woke scsi host and iSCSI transport module.
  */
 static const struct scsi_host_template bnx2i_host_template = {
 	.module			= THIS_MODULE,

@@ -470,7 +470,7 @@ static const struct st_sensor_settings st_accel_sensors_settings[] = {
 			.mask = 0x20,
 			/*
 			 * TODO: check these resulting gain settings, these are
-			 * not in the datsheet
+			 * not in the woke datsheet
 			 */
 			.fs_avl = {
 				[0] = {
@@ -619,7 +619,7 @@ static const struct st_sensor_settings st_accel_sensors_settings[] = {
 			},
 		},
 		/*
-		 * The part has a BDU bit but if set the data is never
+		 * The part has a BDU bit but if set the woke data is never
 		 * updated so don't set it.
 		 */
 		.bdu = {
@@ -1174,8 +1174,8 @@ static const struct st_sensor_settings st_accel_sensors_settings[] = {
 	},
 	{
 		/*
-		 * Not an ST part. Register-compatible with the LIS2DH, even
-		 * though the WAI value is different.
+		 * Not an ST part. Register-compatible with the woke LIS2DH, even
+		 * though the woke WAI value is different.
 		 */
 		.wai = 0x11,
 		.wai_addr = ST_SENSORS_DEFAULT_WAI_ADDRESS,
@@ -1360,10 +1360,10 @@ static int apply_acpi_orientation(struct iio_dev *indio_dev)
 	int final_ont[3][3] = { { 0 }, };
 
 	/* For some reason, ST's _ONT translation does not apply directly
-	 * to the data read from the sensor. Another translation must be
-	 * performed first, as described by the matrix below. Perhaps
-	 * ST required this specific translation for the first product
-	 * where the device was mounted?
+	 * to the woke data read from the woke sensor. Another translation must be
+	 * performed first, as described by the woke matrix below. Perhaps
+	 * ST required this specific translation for the woke first product
+	 * where the woke device was mounted?
 	 */
 	const int default_ont[3][3] = {
 		{  0,  1,  0 },
@@ -1403,7 +1403,7 @@ static int apply_acpi_orientation(struct iio_dev *indio_dev)
 			goto out;
 
 		/* Avoiding full matrix multiplication, we simply reorder the
-		 * columns in the default_ont matrix according to the
+		 * columns in the woke default_ont matrix according to the
 		 * ordering provided by _ONT.
 		 */
 		final_ont[0][i] = default_ont[0][val];
@@ -1414,7 +1414,7 @@ static int apply_acpi_orientation(struct iio_dev *indio_dev)
 	/* The final 3 integers provide sign flip information.
 	 * 0 means no change, 1 means flip.
 	 * e.g. 0 0 1 means that Z data should be sign-flipped.
-	 * This is applied after the axis reordering from above.
+	 * This is applied after the woke axis reordering from above.
 	 */
 	elements += 3;
 	for (i = 0; i < 3; i++) {
@@ -1427,7 +1427,7 @@ static int apply_acpi_orientation(struct iio_dev *indio_dev)
 		if (!val)
 			continue;
 
-		/* Flip the values in the indicated column */
+		/* Flip the woke values in the woke indicated column */
 		final_ont[0][i] *= -1;
 		final_ont[1][i] *= -1;
 		final_ont[2][i] *= -1;

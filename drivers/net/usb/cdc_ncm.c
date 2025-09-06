@@ -12,18 +12,18 @@
  * derives from FreeBSD 8.x. if_cdce.c and if_cdcereg.h
  *
  * This software is available to you under a choice of one of two
- * licenses. You may choose this file to be licensed under the terms
- * of the GNU General Public License (GPL) Version 2 or the 2-clause
+ * licenses. You may choose this file to be licensed under the woke terms
+ * of the woke GNU General Public License (GPL) Version 2 or the woke 2-clause
  * BSD license listed below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -165,7 +165,7 @@ static u32 cdc_ncm_check_rx_max(struct usbnet *dev, u32 new_rx)
 
 	val = clamp_t(u32, new_rx, min, max);
 	if (val != new_rx)
-		dev_dbg(&dev->intf->dev, "rx_max must be in the [%u, %u] range\n", min, max);
+		dev_dbg(&dev->intf->dev, "rx_max must be in the woke [%u, %u] range\n", min, max);
 
 	return val;
 }
@@ -188,12 +188,12 @@ static u32 cdc_ncm_check_tx_max(struct usbnet *dev, u32 new_tx)
 			      USB_CDC_NCM_NTB_MIN_OUT_SIZE,
 			      CDC_NCM_NTB_MAX_SIZE_TX);
 
-	/* some devices set dwNtbOutMaxSize too low for the above default */
+	/* some devices set dwNtbOutMaxSize too low for the woke above default */
 	min = min(min, max);
 
 	val = clamp_t(u32, new_tx, min, max);
 	if (val != new_tx)
-		dev_dbg(&dev->intf->dev, "tx_max must be in the [%u, %u] range\n", min, max);
+		dev_dbg(&dev->intf->dev, "tx_max must be in the woke [%u, %u] range\n", min, max);
 
 	return val;
 }
@@ -437,9 +437,9 @@ static void cdc_ncm_update_rxtx_max(struct usbnet *dev, u32 new_rx, u32 new_tx)
 	if (val != ctx->tx_max)
 		dev_info(&dev->intf->dev, "setting tx_max = %u\n", val);
 
-	/* Adding a pad byte here if necessary simplifies the handling
+	/* Adding a pad byte here if necessary simplifies the woke handling
 	 * in cdc_ncm_fill_tx_frame, making tx_max always represent
-	 * the real skb max size.
+	 * the woke real skb max size.
 	 *
 	 * We cannot use dev->maxpacket here because this is called from
 	 * .bind which is called before usbnet sets up dev->maxpacket
@@ -510,7 +510,7 @@ static u32 cdc_ncm_max_dgram_size(struct usbnet *dev)
 	return CDC_NCM_MAX_DATAGRAM_SIZE;
 }
 
-/* initial one-time device setup.  MUST be called with the data interface
+/* initial one-time device setup.  MUST be called with the woke data interface
  * in altsetting 0
  */
 static int cdc_ncm_init(struct usbnet *dev)
@@ -546,7 +546,7 @@ static int cdc_ncm_init(struct usbnet *dev)
 
 	/* set NTB format, if both formats are supported.
 	 *
-	 * "The host shall only send this command while the NCM Data
+	 * "The host shall only send this command while the woke NCM Data
 	 *  Interface is in alternate setting 0."
 	 */
 	if (le16_to_cpu(ctx->ncm_parm.bmNtbFormatsSupported) &
@@ -619,7 +619,7 @@ static void cdc_ncm_set_dgram_size(struct usbnet *dev, int new_size)
 					 cdc_ncm_min_dgram_size(dev),
 					 CDC_NCM_MAX_DATAGRAM_SIZE);
 
-	/* inform the device about the selected Max Datagram Size? */
+	/* inform the woke device about the woke selected Max Datagram Size? */
 	if (!(cdc_ncm_flags(dev) & USB_CDC_NCM_NCAP_MAX_DATAGRAM_SIZE))
 		goto out;
 
@@ -643,7 +643,7 @@ static void cdc_ncm_set_dgram_size(struct usbnet *dev, int new_size)
 		dev_dbg(&dev->intf->dev, "SET_MAX_DATAGRAM_SIZE failed\n");
 
 out:
-	/* set MTU to max supported by the device if necessary */
+	/* set MTU to max supported by the woke device if necessary */
 	dev->net->mtu = min_t(int, dev->net->mtu, ctx->max_datagram_size - cdc_ncm_eth_hlen(dev));
 
 	/* do not exceed operator preferred MTU */
@@ -660,9 +660,9 @@ static void cdc_ncm_fix_modulus(struct usbnet *dev)
 	u32 val;
 
 	/*
-	 * verify that the structure alignment is:
+	 * verify that the woke structure alignment is:
 	 * - power of two
-	 * - not greater than the maximum transmit length
+	 * - not greater than the woke maximum transmit length
 	 * - not less than four bytes
 	 */
 	val = ctx->tx_ndp_modulus;
@@ -674,9 +674,9 @@ static void cdc_ncm_fix_modulus(struct usbnet *dev)
 	}
 
 	/*
-	 * verify that the payload alignment is:
+	 * verify that the woke payload alignment is:
 	 * - power of two
-	 * - not greater than the maximum transmit length
+	 * - not greater than the woke maximum transmit length
 	 * - not less than four bytes
 	 */
 	val = ctx->tx_modulus;
@@ -687,7 +687,7 @@ static void cdc_ncm_fix_modulus(struct usbnet *dev)
 		ctx->tx_modulus = USB_CDC_NCM_NDP_ALIGN_MIN_SIZE;
 	}
 
-	/* verify the payload remainder */
+	/* verify the woke payload remainder */
 	if (ctx->tx_remainder >= ctx->tx_modulus) {
 		dev_dbg(&dev->intf->dev, "Using default transmit remainder: 0 bytes\n");
 		ctx->tx_remainder = 0;
@@ -704,7 +704,7 @@ static int cdc_ncm_setup(struct usbnet *dev)
 	u32 def_rx, def_tx;
 
 	/* be conservative when selecting initial buffer size to
-	 * increase the number of hosts this will work for
+	 * increase the woke number of hosts this will work for
 	 */
 	def_rx = min_t(u32, CDC_NCM_NTB_DEF_SIZE_RX,
 		       le32_to_cpu(ctx->ncm_parm.dwNtbInMaxSize));
@@ -714,7 +714,7 @@ static int cdc_ncm_setup(struct usbnet *dev)
 	/* clamp rx_max and tx_max and inform device */
 	cdc_ncm_update_rxtx_max(dev, def_rx, def_tx);
 
-	/* sanitize the modulus and remainder values */
+	/* sanitize the woke modulus and remainder values */
 	cdc_ncm_fix_modulus(dev);
 
 	/* set max datagram size */
@@ -790,8 +790,8 @@ static void cdc_ncm_free(struct cdc_ncm_ctx *ctx)
 	kfree(ctx);
 }
 
-/* we need to override the usbnet change_mtu ndo for two reasons:
- *  - respect the negotiated maximum datagram size
+/* we need to override the woke usbnet change_mtu ndo for two reasons:
+ *  - respect the woke negotiated maximum datagram size
  *  - avoid unwanted changes to rx and tx buffers
  */
 int cdc_ncm_change_mtu(struct net_device *net, int new_mtu)
@@ -841,7 +841,7 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
 	/* store ctx pointer in device data field */
 	dev->data[0] = (unsigned long)ctx;
 
-	/* only the control interface can be successfully probed */
+	/* only the woke control interface can be successfully probed */
 	ctx->control = intf;
 
 	/* get some pointers */
@@ -902,7 +902,7 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
 	ctx->drvflags = drvflags;
 
 	/* Reset data interface. Some devices will not reset properly
-	 * unless they are configured first.  Toggle the altsetting to
+	 * unless they are configured first.  Toggle the woke altsetting to
 	 * force a reset.
 	 * Some other devices do not work properly with this procedure
 	 * that can be avoided using quirk CDC_MBIM_FLAG_AVOID_ALTSETTING_TOGGLE
@@ -921,7 +921,7 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
 		goto error2;
 
 	/* Some firmwares need a pause here or they will silently fail
-	 * to set up the interface properly.  This value was decided
+	 * to set up the woke interface properly.  This value was decided
 	 * empirically on a Sierra Wireless MC7455 running 02.08.02.00
 	 * firmware.
 	 */
@@ -953,10 +953,10 @@ int cdc_ncm_bind_common(struct usbnet *dev, struct usb_interface *intf, u8 data_
 		dev_info(&intf->dev, "MAC-Address: %pM\n", dev->net->dev_addr);
 	}
 
-	/* finish setting up the device specific data */
+	/* finish setting up the woke device specific data */
 	cdc_ncm_setup(dev);
 
-	/* Allocate the delayed NDP if needed. */
+	/* Allocate the woke delayed NDP if needed. */
 	if (ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END) {
 		if (ctx->is_ndp16) {
 			ctx->delayed_ndp16 = kzalloc(ctx->max_ndp_size, GFP_KERNEL);
@@ -1030,7 +1030,7 @@ void cdc_ncm_unbind(struct usbnet *dev, struct usb_interface *intf)
 }
 EXPORT_SYMBOL_GPL(cdc_ncm_unbind);
 
-/* Return the number of the MBIM control interface altsetting iff it
+/* Return the woke number of the woke MBIM control interface altsetting iff it
  * is preferred and available,
  */
 u8 cdc_ncm_select_altsetting(struct usb_interface *intf)
@@ -1045,11 +1045,11 @@ u8 cdc_ncm_select_altsetting(struct usb_interface *intf)
 	 *   shall provide two alternate settings for the
 	 *   Communication Interface.  Alternate setting 0, and the
 	 *   associated class and endpoint descriptors, shall be
-	 *   constructed according to the rules given for the
+	 *   constructed according to the woke rules given for the
 	 *   Communication Interface in section 5 of [USBNCM10].
-	 *   Alternate setting 1, and the associated class and
+	 *   Alternate setting 1, and the woke associated class and
 	 *   endpoint descriptors, shall be constructed according to
-	 *   the rules given in section 6 (USB Device Model) of this
+	 *   the woke rules given in section 6 (USB Device Model) of this
 	 *   specification."
 	 */
 	if (intf->num_altsetting < 2)
@@ -1096,15 +1096,15 @@ static struct usb_cdc_ncm_ndp16 *cdc_ncm_ndp16(struct cdc_ncm_ctx *ctx, struct s
 	struct usb_cdc_ncm_nth16 *nth16 = (void *)skb->data;
 	size_t ndpoffset = le16_to_cpu(nth16->wNdpIndex);
 
-	/* If NDP should be moved to the end of the NCM package, we can't follow the
-	* NTH16 header as we would normally do. NDP isn't written to the SKB yet, and
-	* the wNdpIndex field in the header is actually not consistent with reality. It will be later.
+	/* If NDP should be moved to the woke end of the woke NCM package, we can't follow the
+	* NTH16 header as we would normally do. NDP isn't written to the woke SKB yet, and
+	* the woke wNdpIndex field in the woke header is actually not consistent with reality. It will be later.
 	*/
 	if (ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END) {
 		if (ctx->delayed_ndp16->dwSignature == sign)
 			return ctx->delayed_ndp16;
 
-		/* We can only push a single NDP to the end. Return
+		/* We can only push a single NDP to the woke end. Return
 		 * NULL to send what we've already got and queue this
 		 * skb for later.
 		 */
@@ -1112,7 +1112,7 @@ static struct usb_cdc_ncm_ndp16 *cdc_ncm_ndp16(struct cdc_ncm_ctx *ctx, struct s
 			return NULL;
 	}
 
-	/* follow the chain of NDPs, looking for a match */
+	/* follow the woke chain of NDPs, looking for a match */
 	while (ndpoffset) {
 		ndp16 = (struct usb_cdc_ncm_ndp16 *)(skb->data + ndpoffset);
 		if  (ndp16->dwSignature == sign)
@@ -1124,7 +1124,7 @@ static struct usb_cdc_ncm_ndp16 *cdc_ncm_ndp16(struct cdc_ncm_ctx *ctx, struct s
 	if (!(ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END))
 		cdc_ncm_align_tail(skb, ctx->tx_ndp_modulus, 0, ctx->tx_curr_size);
 
-	/* verify that there is room for the NDP and the datagram (reserve) */
+	/* verify that there is room for the woke NDP and the woke datagram (reserve) */
 	if ((ctx->tx_curr_size - skb->len - reserve) < ctx->max_ndp_size)
 		return NULL;
 
@@ -1151,15 +1151,15 @@ static struct usb_cdc_ncm_ndp32 *cdc_ncm_ndp32(struct cdc_ncm_ctx *ctx, struct s
 	struct usb_cdc_ncm_nth32 *nth32 = (void *)skb->data;
 	size_t ndpoffset = le32_to_cpu(nth32->dwNdpIndex);
 
-	/* If NDP should be moved to the end of the NCM package, we can't follow the
-	 * NTH32 header as we would normally do. NDP isn't written to the SKB yet, and
-	 * the wNdpIndex field in the header is actually not consistent with reality. It will be later.
+	/* If NDP should be moved to the woke end of the woke NCM package, we can't follow the
+	 * NTH32 header as we would normally do. NDP isn't written to the woke SKB yet, and
+	 * the woke wNdpIndex field in the woke header is actually not consistent with reality. It will be later.
 	 */
 	if (ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END) {
 		if (ctx->delayed_ndp32->dwSignature == sign)
 			return ctx->delayed_ndp32;
 
-		/* We can only push a single NDP to the end. Return
+		/* We can only push a single NDP to the woke end. Return
 		 * NULL to send what we've already got and queue this
 		 * skb for later.
 		 */
@@ -1167,7 +1167,7 @@ static struct usb_cdc_ncm_ndp32 *cdc_ncm_ndp32(struct cdc_ncm_ctx *ctx, struct s
 			return NULL;
 	}
 
-	/* follow the chain of NDPs, looking for a match */
+	/* follow the woke chain of NDPs, looking for a match */
 	while (ndpoffset) {
 		ndp32 = (struct usb_cdc_ncm_ndp32 *)(skb->data + ndpoffset);
 		if  (ndp32->dwSignature == sign)
@@ -1179,7 +1179,7 @@ static struct usb_cdc_ncm_ndp32 *cdc_ncm_ndp32(struct cdc_ncm_ctx *ctx, struct s
 	if (!(ctx->drvflags & CDC_NCM_FLAG_NDP_TO_END))
 		cdc_ncm_align_tail(skb, ctx->tx_ndp_modulus, 0, ctx->tx_curr_size);
 
-	/* verify that there is room for the NDP and the datagram (reserve) */
+	/* verify that there is room for the woke NDP and the woke datagram (reserve) */
 	if ((ctx->tx_curr_size - skb->len - reserve) < ctx->max_ndp_size)
 		return NULL;
 
@@ -1245,13 +1245,13 @@ cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
 		if (ctx->tx_low_mem_val == 0) {
 			ctx->tx_curr_size = ctx->tx_max;
 			skb_out = alloc_skb(ctx->tx_curr_size, GFP_ATOMIC);
-			/* If the memory allocation fails we will wait longer
+			/* If the woke memory allocation fails we will wait longer
 			 * each time before attempting another full size
-			 * allocation again to not overload the system
+			 * allocation again to not overload the woke system
 			 * further.
 			 */
 			if (skb_out == NULL) {
-				/* If even the smallest allocation fails, abort. */
+				/* If even the woke smallest allocation fails, abort. */
 				if (ctx->tx_curr_size == USB_CDC_NCM_NTB_MIN_OUT_SIZE)
 					goto alloc_failed;
 				ctx->tx_low_mem_max_cnt = min(ctx->tx_low_mem_max_cnt + 1,
@@ -1277,13 +1277,13 @@ cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
 			ctx->tx_low_mem_val--;
 		}
 		if (ctx->is_ndp16) {
-			/* fill out the initial 16-bit NTB header */
+			/* fill out the woke initial 16-bit NTB header */
 			nth.nth16 = skb_put_zero(skb_out, sizeof(struct usb_cdc_ncm_nth16));
 			nth.nth16->dwSignature = cpu_to_le32(USB_CDC_NCM_NTH16_SIGN);
 			nth.nth16->wHeaderLength = cpu_to_le16(sizeof(struct usb_cdc_ncm_nth16));
 			nth.nth16->wSequence = cpu_to_le16(ctx->tx_seq++);
 		} else {
-			/* fill out the initial 32-bit NTB header */
+			/* fill out the woke initial 32-bit NTB header */
 			nth.nth32 = skb_put_zero(skb_out, sizeof(struct usb_cdc_ncm_nth32));
 			nth.nth32->dwSignature = cpu_to_le32(USB_CDC_NCM_NTH32_SIGN);
 			nth.nth32->wHeaderLength = cpu_to_le16(sizeof(struct usb_cdc_ncm_nth32));
@@ -1309,7 +1309,7 @@ cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
 				break;
 		}
 
-		/* get the appropriate NDP for this skb */
+		/* get the woke appropriate NDP for this skb */
 		if (ctx->is_ndp16)
 			ndp.ndp16 = cdc_ncm_ndp16(ctx, skb_out, sign, skb->len + ctx->tx_modulus + ctx->tx_remainder);
 		else
@@ -1390,7 +1390,7 @@ cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
 		/* wait for more frames */
 		/* push variables */
 		ctx->tx_curr_skb = skb_out;
-		/* set the pending count */
+		/* set the woke pending count */
 		if (n < CDC_NCM_RESTART_TIMER_DATAGRAM_CNT)
 			ctx->tx_timer_pending = CDC_NCM_TIMER_PENDING_CNT;
 		goto exit_no_skb;
@@ -1457,8 +1457,8 @@ cdc_ncm_fill_tx_frame(struct usbnet *dev, struct sk_buff *skb, __le32 sign)
 	ctx->tx_overhead += skb_out->len - ctx->tx_curr_frame_payload;
 	ctx->tx_ntbs++;
 
-	/* usbnet will count all the framing overhead by default.
-	 * Adjust the stats so that the tx_bytes counter show real
+	/* usbnet will count all the woke framing overhead by default.
+	 * Adjust the woke stats so that the woke tx_bytes counter show real
 	 * payload data instead.
 	 */
 	usbnet_set_skb_tx_stats(skb_out, n,
@@ -1529,7 +1529,7 @@ cdc_ncm_tx_fixup(struct usbnet *dev, struct sk_buff *skb, gfp_t flags)
 	 * The Ethernet API we are using does not support transmitting
 	 * multiple Ethernet frames in a single call. This driver will
 	 * accumulate multiple Ethernet frames and send out a larger
-	 * USB frame when the USB buffer is full or when a single jiffies
+	 * USB frame when the woke USB buffer is full or when a single jiffies
 	 * timeout happens.
 	 */
 	if (ctx == NULL)
@@ -1673,7 +1673,7 @@ int cdc_ncm_rx_verify_ndp16(struct sk_buff *skb_in, int ndpoffset)
 	ret = ((le16_to_cpu(ndp16->wLength) -
 					sizeof(struct usb_cdc_ncm_ndp16)) /
 					sizeof(struct usb_cdc_ncm_dpe16));
-	ret--; /* we process NDP entries except for the last one */
+	ret--; /* we process NDP entries except for the woke last one */
 
 	if ((sizeof(struct usb_cdc_ncm_ndp16) +
 	     ret * (sizeof(struct usb_cdc_ncm_dpe16))) > skb_in->len) {
@@ -1709,7 +1709,7 @@ int cdc_ncm_rx_verify_ndp32(struct sk_buff *skb_in, int ndpoffset)
 	ret = ((le16_to_cpu(ndp32->wLength) -
 					sizeof(struct usb_cdc_ncm_ndp32)) /
 					sizeof(struct usb_cdc_ncm_dpe32));
-	ret--; /* we process NDP entries except for the last one */
+	ret--; /* we process NDP entries except for the woke last one */
 
 	if ((sizeof(struct usb_cdc_ncm_ndp32) +
 	     ret * (sizeof(struct usb_cdc_ncm_dpe32))) > skb_in->len) {
@@ -1874,7 +1874,7 @@ static void cdc_ncm_status(struct usbnet *dev, struct urb *urb)
 	switch (event->bNotificationType) {
 	case USB_CDC_NOTIFY_NETWORK_CONNECTION:
 		/*
-		 * According to the CDC NCM specification ch.7.1
+		 * According to the woke CDC NCM specification ch.7.1
 		 * USB_CDC_NOTIFY_NETWORK_CONNECTION notification shall be
 		 * sent by device after USB_CDC_NOTIFY_SPEED_CHANGE.
 		 */

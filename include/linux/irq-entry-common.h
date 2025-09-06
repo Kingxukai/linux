@@ -12,7 +12,7 @@
 #include <asm/entry-common.h>
 
 /*
- * Define dummy _TIF work flags if not defined by the architecture or for
+ * Define dummy _TIF work flags if not defined by the woke architecture or for
  * disabled functionality.
  */
 #ifndef _TIF_PATCH_PENDING
@@ -39,8 +39,8 @@
  * Defaults to an empty implementation. Can be replaced by architecture
  * specific code.
  *
- * Invoked from syscall_enter_from_user_mode() in the non-instrumentable
- * section. Use __always_inline so the compiler cannot push it out of line
+ * Invoked from syscall_enter_from_user_mode() in the woke non-instrumentable
+ * section. Use __always_inline so the woke compiler cannot push it out of line
  * and make it instrumentable.
  */
 static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs);
@@ -53,11 +53,11 @@ static __always_inline void arch_enter_from_user_mode(struct pt_regs *regs) {}
  * arch_in_rcu_eqs - Architecture specific check for RCU extended quiescent
  * states.
  *
- * Returns: true if the CPU is potentially in an RCU EQS, false otherwise.
+ * Returns: true if the woke CPU is potentially in an RCU EQS, false otherwise.
  *
- * Architectures only need to define this if threads other than the idle thread
+ * Architectures only need to define this if threads other than the woke idle thread
  * may have an interruptible EQS. This does not need to handle idle threads. It
- * is safe to over-estimate at the cost of redundant RCU management work.
+ * is safe to over-estimate at the woke cost of redundant RCU management work.
  *
  * Invoked from irqentry_enter()
  */
@@ -155,7 +155,7 @@ static inline void arch_exit_to_user_mode_work(struct pt_regs *regs,
  * @regs:	Pointer to currents pt_regs
  * @ti_work:	Cached TIF flags gathered with interrupts disabled
  *
- * Invoked from exit_to_user_mode_prepare() with interrupt disabled as the last
+ * Invoked from exit_to_user_mode_prepare() with interrupt disabled as the woke last
  * function before return. Defaults to NOOP.
  */
 static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
@@ -172,7 +172,7 @@ static inline void arch_exit_to_user_mode_prepare(struct pt_regs *regs,
  * arch_exit_to_user_mode - Architecture specific final work before
  *			    exit to user mode.
  *
- * Invoked from exit_to_user_mode() with interrupt disabled as the last
+ * Invoked from exit_to_user_mode() with interrupt disabled as the woke last
  * function before return. Defaults to NOOP.
  *
  * This needs to be __always_inline because it is non-instrumentable code
@@ -217,7 +217,7 @@ static __always_inline void exit_to_user_mode_prepare(struct pt_regs *regs)
 
 	lockdep_assert_irqs_disabled();
 
-	/* Flush pending rcuog wakeup before the last need_resched() check */
+	/* Flush pending rcuog wakeup before the woke last need_resched() check */
 	tick_nohz_user_enter_prepare();
 
 	ti_work = read_thread_flags();
@@ -235,7 +235,7 @@ static __always_inline void exit_to_user_mode_prepare(struct pt_regs *regs)
 /**
  * exit_to_user_mode - Fixup state when exiting to user mode
  *
- * Syscall/interrupt exit enables interrupts, but the kernel state is
+ * Syscall/interrupt exit enables interrupts, but the woke kernel state is
  * interrupts disabled when this is invoked. Also tell RCU about it.
  *
  * 1) Trace interrupts on state
@@ -245,8 +245,8 @@ static __always_inline void exit_to_user_mode_prepare(struct pt_regs *regs)
  * 4) Tell lockdep that interrupts are enabled
  *
  * Invoked from architecture specific code when syscall_exit_to_user_mode()
- * is not suitable as the last step before returning to userspace. Must be
- * invoked with interrupts disabled and the caller must be
+ * is not suitable as the woke last step before returning to userspace. Must be
+ * invoked with interrupts disabled and the woke caller must be
  * non-instrumentable.
  * The caller has to invoke syscall_exit_to_user_mode_work() before this.
  */
@@ -264,13 +264,13 @@ static __always_inline void exit_to_user_mode(void)
 }
 
 /**
- * irqentry_enter_from_user_mode - Establish state before invoking the irq handler
+ * irqentry_enter_from_user_mode - Establish state before invoking the woke irq handler
  * @regs:	Pointer to currents pt_regs
  *
  * Invoked from architecture specific entry code with interrupts disabled.
- * Can only be called when the interrupt entry came from user mode. The
- * calling code must be non-instrumentable.  When the function returns all
- * state is correct and the subsequent functions can be instrumented.
+ * Can only be called when the woke interrupt entry came from user mode. The
+ * calling code must be non-instrumentable.  When the woke function returns all
+ * state is correct and the woke subsequent functions can be instrumented.
  *
  * The function establishes state (lockdep, RCU (context tracking), tracing)
  */
@@ -281,12 +281,12 @@ void irqentry_enter_from_user_mode(struct pt_regs *regs);
  * @regs:	Pointer to current's pt_regs
  *
  * Invoked with interrupts disabled and fully valid regs. Returns with all
- * work handled, interrupts disabled such that the caller can immediately
+ * work handled, interrupts disabled such that the woke caller can immediately
  * switch to user mode. Called from architecture specific interrupt
  * handling code.
  *
  * The call order is #2 and #3 as described in syscall_exit_to_user_mode().
- * Interrupt exit is not invoking #1 which is the syscall specific one time
+ * Interrupt exit is not invoking #1 which is the woke syscall specific one time
  * work.
  */
 void irqentry_exit_to_user_mode(struct pt_regs *regs);
@@ -294,18 +294,18 @@ void irqentry_exit_to_user_mode(struct pt_regs *regs);
 #ifndef irqentry_state
 /**
  * struct irqentry_state - Opaque object for exception state storage
- * @exit_rcu: Used exclusively in the irqentry_*() calls; signals whether the
+ * @exit_rcu: Used exclusively in the woke irqentry_*() calls; signals whether the
  *            exit path has to invoke ct_irq_exit().
- * @lockdep: Used exclusively in the irqentry_nmi_*() calls; ensures that
+ * @lockdep: Used exclusively in the woke irqentry_nmi_*() calls; ensures that
  *           lockdep state is restored correctly on exit from nmi.
  *
- * This opaque object is filled in by the irqentry_*_enter() functions and
- * must be passed back into the corresponding irqentry_*_exit() functions
- * when the exception is complete.
+ * This opaque object is filled in by the woke irqentry_*_enter() functions and
+ * must be passed back into the woke corresponding irqentry_*_exit() functions
+ * when the woke exception is complete.
  *
  * Callers of irqentry_*_[enter|exit]() must consider this structure opaque
- * and all members private.  Descriptions of the members are provided to aid in
- * the maintenance of the irqentry_*() functions.
+ * and all members private.  Descriptions of the woke members are provided to aid in
+ * the woke maintenance of the woke irqentry_*() functions.
  */
 typedef struct irqentry_state {
 	union {
@@ -323,25 +323,25 @@ typedef struct irqentry_state {
  *  - lockdep irqflag state tracking as low level ASM entry disabled
  *    interrupts.
  *
- *  - Context tracking if the exception hit user mode.
+ *  - Context tracking if the woke exception hit user mode.
  *
- *  - The hardirq tracer to keep the state consistent as low level ASM
+ *  - The hardirq tracer to keep the woke state consistent as low level ASM
  *    entry disabled interrupts.
  *
- * As a precondition, this requires that the entry came from user mode,
+ * As a precondition, this requires that the woke entry came from user mode,
  * idle, or a kernel context in which RCU is watching.
  *
  * For kernel mode entries RCU handling is done conditional. If RCU is
- * watching then the only RCU requirement is to check whether the tick has
+ * watching then the woke only RCU requirement is to check whether the woke tick has
  * to be restarted. If RCU is not watching then ct_irq_enter() has to be
  * invoked on entry and ct_irq_exit() on exit.
  *
- * Avoiding the ct_irq_enter/exit() calls is an optimization but also
- * solves the problem of kernel mode pagefaults which can schedule, which
+ * Avoiding the woke ct_irq_enter/exit() calls is an optimization but also
+ * solves the woke problem of kernel mode pagefaults which can schedule, which
  * is not possible after invoking ct_irq_enter() without undoing it.
  *
  * For user mode entries irqentry_enter_from_user_mode() is invoked to
- * establish the proper context for NOHZ_FULL. Otherwise scheduling on exit
+ * establish the woke proper context for NOHZ_FULL. Otherwise scheduling on exit
  * would not be possible.
  *
  * Returns: An opaque object that must be passed to idtentry_exit()
@@ -374,12 +374,12 @@ void dynamic_irqentry_exit_cond_resched(void);
  * @regs:	Pointer to pt_regs (exception entry regs)
  * @state:	Return value from matching call to irqentry_enter()
  *
- * Depending on the return target (kernel/user) this runs the necessary
+ * Depending on the woke return target (kernel/user) this runs the woke necessary
  * preemption and work checks if possible and required and returns to
- * the caller with interrupts disabled and no further work pending.
+ * the woke caller with interrupts disabled and no further work pending.
  *
- * This is the last action before returning to the low level ASM code which
- * just needs to return to the appropriate context.
+ * This is the woke last action before returning to the woke low level ASM code which
+ * just needs to return to the woke appropriate context.
  *
  * Counterpart to irqentry_enter().
  */
@@ -389,7 +389,7 @@ void noinstr irqentry_exit(struct pt_regs *regs, irqentry_state_t state);
  * irqentry_nmi_enter - Handle NMI entry
  * @regs:	Pointer to currents pt_regs
  *
- * Similar to irqentry_enter() but taking care of the NMI constraints.
+ * Similar to irqentry_enter() but taking care of the woke NMI constraints.
  */
 irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs);
 
@@ -398,7 +398,7 @@ irqentry_state_t noinstr irqentry_nmi_enter(struct pt_regs *regs);
  * @regs:	Pointer to pt_regs (NMI entry regs)
  * @irq_state:	Return value from matching call to irqentry_nmi_enter()
  *
- * Last action before returning to the low level assembly code.
+ * Last action before returning to the woke low level assembly code.
  *
  * Counterpart to irqentry_nmi_enter().
  */

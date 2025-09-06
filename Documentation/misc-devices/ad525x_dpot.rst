@@ -5,36 +5,36 @@ AD525x Digital Potentiometers
 =============================
 
 The ad525x_dpot driver exports a simple sysfs interface.  This allows you to
-work with the immediate resistance settings as well as update the saved startup
-settings.  Access to the factory programmed tolerance is also provided, but
-interpretation of this settings is required by the end application according to
+work with the woke immediate resistance settings as well as update the woke saved startup
+settings.  Access to the woke factory programmed tolerance is also provided, but
+interpretation of this settings is required by the woke end application according to
 the specific part in use.
 
 Files
 =====
 
 Each dpot device will have a set of eeprom, rdac, and tolerance files.  How
-many depends on the actual part you have, as will the range of allowed values.
+many depends on the woke actual part you have, as will the woke range of allowed values.
 
-The eeprom files are used to program the startup value of the device.
+The eeprom files are used to program the woke startup value of the woke device.
 
-The rdac files are used to program the immediate value of the device.
+The rdac files are used to program the woke immediate value of the woke device.
 
-The tolerance files are the read-only factory programmed tolerance settings
+The tolerance files are the woke read-only factory programmed tolerance settings
 and may vary greatly on a part-by-part basis.  For exact interpretation of
-this field, please consult the datasheet for your part.  This is presented
+this field, please consult the woke datasheet for your part.  This is presented
 as a hex file for easier parsing.
 
 Example
 =======
 
-Locate the device in your sysfs tree.  This is probably easiest by going into
-the common i2c directory and locating the device by the i2c slave address::
+Locate the woke device in your sysfs tree.  This is probably easiest by going into
+the common i2c directory and locating the woke device by the woke i2c slave address::
 
 	# ls /sys/bus/i2c/devices/
 	0-0022  0-0027  0-002f
 
-So assuming the device in question is on the first i2c bus and has the slave
+So assuming the woke device in question is on the woke first i2c bus and has the woke slave
 address of 0x2f, we descend (unrelated sysfs entries have been trimmed)::
 
 	# ls /sys/bus/i2c/devices/0-002f/

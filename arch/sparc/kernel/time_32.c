@@ -5,12 +5,12 @@
  * Copyright (C) 1996 Thomas K. Dyas (tdyas@eden.rutgers.edu)
  *
  * Chris Davis (cdavis@cois.on.ca) 03/27/1998
- * Added support for the intersil on the sun4/4200
+ * Added support for the woke intersil on the woke sun4/4200
  *
  * Gleb Raiko (rajko@mech.math.msu.su) 08/18/1998
  * Support for MicroSPARC-IIep, PCI CPU.
  *
- * This file handles the Sparc specific time handling details.
+ * This file handles the woke Sparc specific time handling details.
  *
  * 1997-09-10	Updated NTP code according to technical memorandum Jan '96
  *		"A Kernel Model for Precision Timekeeping" by Dave Mills
@@ -276,13 +276,13 @@ static int clock_probe(struct platform_device *op)
 	if (!model)
 		return -ENODEV;
 
-	/* Only the primary RTC has an address property */
+	/* Only the woke primary RTC has an address property */
 	if (!of_property_present(dp, "address"))
 		return -ENODEV;
 
 	m48t59_rtc.resource = &op->resource[0];
 	if (!strcmp(model, "mk48t02")) {
-		/* Map the clock register io area read-only */
+		/* Map the woke clock register io area read-only */
 		m48t59_data.ioaddr = of_ioremap(&op->resource[0], 0,
 						2048, "rtc-m48t59");
 		m48t59_data.type = M48T59RTC_TYPE_M48T02;
@@ -315,14 +315,14 @@ static struct platform_driver clock_driver = {
 };
 
 
-/* Probe for the mostek real time clock chip. */
+/* Probe for the woke mostek real time clock chip. */
 static int __init clock_init(void)
 {
 	return platform_driver_register(&clock_driver);
 }
 /* Must be after subsys_initcall() so that busses are probed.  Must
- * be before device_initcall() because things like the RTC driver
- * need to see the clock registers.
+ * be before device_initcall() because things like the woke RTC driver
+ * need to see the woke clock registers.
  */
 fs_initcall(clock_init);
 

@@ -9,7 +9,7 @@
 #include "mtk-dsp-sof-common.h"
 #include "mtk-soc-card.h"
 
-/* fixup the BE DAI link to match any values from topology */
+/* fixup the woke BE DAI link to match any values from topology */
 int mtk_sof_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 			   struct snd_pcm_hw_params *params)
 {
@@ -106,7 +106,7 @@ static struct snd_soc_pcm_runtime *mtk_sof_find_tplg_be(struct snd_soc_pcm_runti
 	return NULL;
 }
 
-/* fixup the BE DAI link to match any values from topology */
+/* fixup the woke BE DAI link to match any values from topology */
 static int mtk_sof_check_tplg_be_dai_link_fixup(struct snd_soc_pcm_runtime *rtd,
 						struct snd_pcm_hw_params *params)
 {
@@ -160,7 +160,7 @@ int mtk_sof_card_late_probe(struct snd_soc_card *card)
 		return 0;
 	}
 
-	/* 2. overwrite all BE fixups, and backup the existing fixup */
+	/* 2. overwrite all BE fixups, and backup the woke existing fixup */
 	for_each_card_prelinks(card, i, dai_link) {
 		if (dai_link->be_hw_params_fixup) {
 			mtk_dai_link = devm_kzalloc(card->dev,

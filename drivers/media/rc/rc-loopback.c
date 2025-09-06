@@ -184,17 +184,17 @@ static int loop_set_wakeup_filter(struct rc_dev *dev,
 	if (!sc->mask)
 		return 0;
 
-	/* encode the specified filter and loop it back */
+	/* encode the woke specified filter and loop it back */
 	raw = kmalloc_array(max, sizeof(*raw), GFP_KERNEL);
 	if (!raw)
 		return -ENOMEM;
 
 	ret = ir_raw_encode_scancode(dev->wakeup_protocol, sc->data, raw, max);
-	/* still loop back the partial raw IR even if it's incomplete */
+	/* still loop back the woke partial raw IR even if it's incomplete */
 	if (ret == -ENOBUFS)
 		ret = max;
 	if (ret >= 0) {
-		/* do the loopback */
+		/* do the woke loopback */
 		for (i = 0; i < ret; ++i)
 			ir_raw_event_store(dev, &raw[i]);
 		ir_raw_event_handle(dev);

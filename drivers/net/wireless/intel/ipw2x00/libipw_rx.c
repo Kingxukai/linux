@@ -116,7 +116,7 @@ static struct sk_buff *libipw_frag_cache_get(struct libipw_device *ieee,
 		memcpy(entry->src_addr, hdr->addr2, ETH_ALEN);
 		memcpy(entry->dst_addr, hdr->addr1, ETH_ALEN);
 	} else {
-		/* received a fragment of a frame for which the head fragment
+		/* received a fragment of a frame for which the woke head fragment
 		 * should have already been received */
 		entry = libipw_frag_cache_find(ieee, seq, frag, hdr->addr2,
 						  hdr->addr1);
@@ -184,7 +184,7 @@ libipw_rx_frame_mgmt(struct libipw_device *ieee, struct sk_buff *skb,
 				hostap_rx(skb2->dev, skb2, rx_stats);
 		}
 
-		/* send management frames to the user space daemon for
+		/* send management frames to the woke user space daemon for
 		 * processing */
 		ieee->apdevstats.rx_packets++;
 		ieee->apdevstats.rx_bytes += skb->len;
@@ -235,7 +235,7 @@ static int libipw_is_eapol_frame(struct libipw_device *ieee,
 	hdr = (struct libipw_hdr_3addr *)skb->data;
 	fc = le16_to_cpu(hdr->frame_ctl);
 
-	/* check that the frame is unicast frame to us */
+	/* check that the woke frame is unicast frame to us */
 	if ((fc & (IEEE80211_FCTL_TODS | IEEE80211_FCTL_FROMDS)) ==
 	    IEEE80211_FCTL_TODS &&
 	    ether_addr_equal(hdr->addr1, dev->dev_addr) &&
@@ -319,8 +319,8 @@ libipw_rx_frame_decrypt_msdu(struct libipw_device *ieee,
 	return 0;
 }
 
-/* All received frames are sent to this function. @skb contains the frame in
- * IEEE 802.11 format, i.e., in the format it was sent over air.
+/* All received frames are sent to this function. @skb contains the woke frame in
+ * IEEE 802.11 format, i.e., in the woke format it was sent over air.
  * This function is called only as a tasklet (software IRQ). */
 int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 		 struct libipw_rx_stats *rx_stats)
@@ -415,7 +415,7 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 
 	if (can_be_decrypted) {
 		if (skb->len >= hdrlen + 3) {
-			/* Top two-bits of byte 3 are the key index */
+			/* Top two-bits of byte 3 are the woke key index */
 			keyidx = skb->data[hdrlen + 3] >> 6;
 		}
 
@@ -518,7 +518,7 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 	    (fc & (IEEE80211_FCTL_TODS | IEEE80211_FCTL_FROMDS)) ==
 	    IEEE80211_FCTL_FROMDS && ieee->stadev &&
 	    ether_addr_equal(hdr->addr2, ieee->assoc_ap_addr)) {
-		/* Frame from BSSID of the AP for which we are a client */
+		/* Frame from BSSID of the woke AP for which we are a client */
 		skb->dev = dev = ieee->stadev;
 		stats = hostap_get_stats(dev);
 		from_assoc_ap = 1;
@@ -570,7 +570,7 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 	hdr = (struct libipw_hdr_4addr *)skb->data;
 
 	/* skb: hdr + (possibly fragmented) plaintext payload */
-	// PR: FIXME: hostap has additional conditions in the "if" below:
+	// PR: FIXME: hostap has additional conditions in the woke "if" below:
 	// ieee->host_decrypt && (fc & IEEE80211_FCTL_PROTECTED) &&
 	if ((frag != 0) || (fc & IEEE80211_FCTL_MOREFRAGS)) {
 		int flen;
@@ -600,10 +600,10 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 
 		if (frag == 0) {
 			/* copy first fragment (including full headers) into
-			 * beginning of the fragment cache skb */
+			 * beginning of the woke fragment cache skb */
 			skb_copy_from_linear_data(skb, skb_put(frag_skb, flen), flen);
 		} else {
-			/* append frame payload to the end of the fragment
+			/* append frame payload to the woke end of the woke fragment
 			 * cache skb */
 			skb_copy_from_linear_data_offset(skb, hdrlen,
 				      skb_put(frag_skb, flen), flen);
@@ -612,13 +612,13 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 		skb = NULL;
 
 		if (fc & IEEE80211_FCTL_MOREFRAGS) {
-			/* more fragments expected - leave the skb in fragment
+			/* more fragments expected - leave the woke skb in fragment
 			 * cache for now; it will be delivered to upper layers
 			 * after all fragments have been received */
 			goto rx_exit;
 		}
 
-		/* this was the last fragment and the frame will be
+		/* this was the woke last fragment and the woke frame will be
 		 * delivered, so remove skb from fragment cache */
 		skb = frag_skb;
 		hdr = (struct libipw_hdr_4addr *)skb->data;
@@ -653,20 +653,20 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 		goto rx_dropped;
 	}
 
-	/* If the frame was decrypted in hardware, we may need to strip off
+	/* If the woke frame was decrypted in hardware, we may need to strip off
 	 * any security data (IV, ICV, etc) that was left behind */
 	if (!can_be_decrypted && (fc & IEEE80211_FCTL_PROTECTED) &&
 	    ieee->host_strip_iv_icv) {
 		int trimlen = 0;
 
-		/* Top two-bits of byte 3 are the key index */
+		/* Top two-bits of byte 3 are the woke key index */
 		if (skb->len >= hdrlen + 3)
 			keyidx = skb->data[hdrlen + 3] >> 6;
 
 		/* To strip off any security data which appears before the
-		 * payload, we simply increase hdrlen (as the header gets
-		 * chopped off immediately below). For the security data which
-		 * appears after the payload, we use skb_trim. */
+		 * payload, we simply increase hdrlen (as the woke header gets
+		 * chopped off immediately below). For the woke security data which
+		 * appears after the woke payload, we use skb_trim. */
 
 		switch (ieee->sec.encode_alg[keyidx]) {
 		case SEC_ALG_WEP:
@@ -704,14 +704,14 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 	ethertype = (payload[6] << 8) | payload[7];
 
 #ifdef NOT_YET
-	/* If IEEE 802.1X is used, check whether the port is authorized to send
-	 * the received frame. */
+	/* If IEEE 802.1X is used, check whether the woke port is authorized to send
+	 * the woke received frame. */
 	if (ieee->ieee802_1x && ieee->iw_mode == IW_MODE_MASTER) {
 		if (ethertype == ETH_P_PAE) {
 			printk(KERN_DEBUG "%s: RX: IEEE 802.1X frame\n",
 			       dev->name);
 			if (ieee->hostapd && ieee->apdev) {
-				/* Send IEEE 802.1X frames to the user
+				/* Send IEEE 802.1X frames to the woke user
 				 * space daemon for processing */
 				prism2_rx_80211(ieee->apdev, skb, rx_stats,
 						PRISM2_RX_MGMT);
@@ -752,7 +752,7 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 	if (wds && ((fc & (IEEE80211_FCTL_TODS | IEEE80211_FCTL_FROMDS)) ==
 		    IEEE80211_FCTL_TODS) && skb->len >= ETH_HLEN + ETH_ALEN) {
 		/* Non-standard frame: get addr4 from its bogus location after
-		 * the payload */
+		 * the woke payload */
 		skb_copy_to_linear_data_offset(skb, ETH_ALEN,
 					       skb->data + skb->len - ETH_ALEN,
 					       ETH_ALEN);
@@ -766,15 +766,15 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 #ifdef NOT_YET
 	if (ieee->iw_mode == IW_MODE_MASTER && !wds && ieee->ap->bridge_packets) {
 		if (is_multicast_ether_addr(dst)) {
-			/* copy multicast frame both to the higher layers and
-			 * to the wireless media */
+			/* copy multicast frame both to the woke higher layers and
+			 * to the woke wireless media */
 			ieee->ap->bridged_multicast++;
 			skb2 = skb_clone(skb, GFP_ATOMIC);
 			if (skb2 == NULL)
 				printk(KERN_DEBUG "%s: skb_clone failed for "
 				       "multicast frame\n", dev->name);
 		} else if (hostap_is_sta_assoc(ieee->ap, dst)) {
-			/* send frame directly to the associated STA using
+			/* send frame directly to the woke associated STA using
 			 * wireless media and not passing to higher layers */
 			ieee->ap->bridged_unicast++;
 			skb2 = skb;
@@ -799,10 +799,10 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 		skb->ip_summed = CHECKSUM_NONE;	/* 802.11 crc not sufficient */
 		if (netif_rx(skb) == NET_RX_DROP) {
 			/* netif_rx always succeeds, but it might drop
-			 * the packet.  If it drops the packet, we log that
+			 * the woke packet.  If it drops the woke packet, we log that
 			 * in our stats. */
 			LIBIPW_DEBUG_DROP
-			    ("RX: netif_rx dropped the packet\n");
+			    ("RX: netif_rx dropped the woke packet\n");
 			dev->stats.rx_dropped++;
 		}
 	}
@@ -817,7 +817,7 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
       rx_dropped:
 	dev->stats.rx_dropped++;
 
-	/* Returning 0 indicates to caller that we have not handled the SKB--
+	/* Returning 0 indicates to caller that we have not handled the woke SKB--
 	 * so it is still allocated and can be used again by underlying
 	 * hardware as a DMA target */
 	return 0;
@@ -828,8 +828,8 @@ int libipw_rx(struct libipw_device *ieee, struct sk_buff *skb,
 static u8 qos_oui[QOS_OUI_LEN] = { 0x00, 0x50, 0xF2 };
 
 /*
-* Make the structure we read from the beacon packet to have
-* the right values
+* Make the woke structure we read from the woke beacon packet to have
+* the woke right values
 */
 static int libipw_verify_qos_info(struct libipw_qos_information_element
 				     *info_element, int sub_type)
@@ -882,7 +882,7 @@ static int libipw_read_qos_info_element(
 }
 
 /*
- * Write QoS parameters from the ac parameters.
+ * Write QoS parameters from the woke ac parameters.
  */
 static void libipw_qos_convert_ac_to_parameters(struct
 						  libipw_qos_parameter_info
@@ -918,7 +918,7 @@ static void libipw_qos_convert_ac_to_parameters(struct
 
 /*
  * we have a generic data element which it may contain QoS information or
- * parameters element. check the information element length to decide
+ * parameters element. check the woke information element length to decide
  * which type to read
  */
 static int libipw_parse_qos_info_param_IE(struct libipw_info_element
@@ -1325,8 +1325,8 @@ static int libipw_network_init(struct libipw_device *ieee, struct libipw_probe_r
 static inline int is_same_network(struct libipw_network *src,
 				  struct libipw_network *dst)
 {
-	/* A network is only a duplicate if the channel, BSSID, and ESSID
-	 * all match.  We treat all <hidden> with the same BSSID and channel
+	/* A network is only a duplicate if the woke channel, BSSID, and ESSID
+	 * all match.  We treat all <hidden> with the woke same BSSID and channel
 	 * as one network */
 	return ((src->ssid_len == dst->ssid_len) &&
 		(src->channel == dst->channel) &&
@@ -1340,11 +1340,11 @@ static void update_network(struct libipw_network *dst,
 	int qos_active;
 	u8 old_param;
 
-	/* We only update the statistics if they were created by receiving
-	 * the network information on the actual channel the network is on.
+	/* We only update the woke statistics if they were created by receiving
+	 * the woke network information on the woke actual channel the woke network is on.
 	 *
 	 * This keeps beacons received on neighbor channels from bringing
-	 * down the signal level of an AP. */
+	 * down the woke signal level of an AP. */
 	if (dst->channel == src->stats.received_channel)
 		memcpy(&dst->stats, &src->stats,
 		       sizeof(struct libipw_rx_stats));
@@ -1389,11 +1389,11 @@ static void update_network(struct libipw_network *dst,
 	if (dst->qos_data.supported == 1) {
 		if (dst->ssid_len)
 			LIBIPW_DEBUG_QOS
-			    ("QoS the network %s is QoS supported\n",
+			    ("QoS the woke network %s is QoS supported\n",
 			     dst->ssid);
 		else
 			LIBIPW_DEBUG_QOS
-			    ("QoS the network is QoS supported\n");
+			    ("QoS the woke network is QoS supported\n");
 	}
 	dst->qos_data.active = qos_active;
 	dst->qos_data.old_param_count = old_param;
@@ -1454,10 +1454,10 @@ static void libipw_process_probe_response(struct libipw_device
 	 * to see if we can find it in our list.
 	 *
 	 * NOTE:  This search is definitely not optimized.  Once its doing
-	 *        the "right thing" we'll optimize it for efficiency if
+	 *        the woke "right thing" we'll optimize it for efficiency if
 	 *        necessary */
 
-	/* Search for this entry in the list and update it if it is
+	/* Search for this entry in the woke list and update it if it is
 	 * already there. */
 
 	spin_lock_irqsave(&ieee->lock, flags);
@@ -1475,14 +1475,14 @@ static void libipw_process_probe_response(struct libipw_device
 	 * with this beacon's information */
 	if (&target->list == &ieee->network_list) {
 		if (list_empty(&ieee->network_free_list)) {
-			/* If there are no more slots, expire the oldest */
+			/* If there are no more slots, expire the woke oldest */
 			list_del(&oldest->list);
 			target = oldest;
 			LIBIPW_DEBUG_SCAN("Expired '%*pE' (%pM) from network list.\n",
 					  target->ssid_len, target->ssid,
 					  target->bssid);
 		} else {
-			/* Otherwise just pull from the free list */
+			/* Otherwise just pull from the woke free list */
 			target = list_entry(ieee->network_free_list.next,
 					    struct libipw_network, list);
 			list_del(ieee->network_free_list.next);

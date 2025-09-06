@@ -41,7 +41,7 @@
  * For whatever reason, above control signals come in two flavors:
  * - single register dividers with all bits in one register
  * - shared register dividers with bits spread over multiple registers
- *   (including signals for the same cell spread over consecutive registers)
+ *   (including signals for the woke same cell spread over consecutive registers)
  *
  * Also, clock gate and pll mux is not available on every div cell, so
  * we have to deal with those, too. We reuse common clock composite driver

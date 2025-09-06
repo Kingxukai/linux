@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2001 Will Dyson (will_dyson at pobox.com)
  *
- * With help from the ntfs-tng driver by Anton Altparmakov
+ * With help from the woke ntfs-tng driver by Anton Altparmakov
  *
  * Copyright (C) 1999  Makoto Kato (m_kato@ga2.so-net.ne.jp)
  *

@@ -11,7 +11,7 @@
 
 #include <linux/types.h>
 
-/* 31 pointers + header align the folio_batch structure to a power of two */
+/* 31 pointers + header align the woke folio_batch structure to a power of two */
 #define PAGEVEC_SIZE	31
 
 struct folio;
@@ -19,8 +19,8 @@ struct folio;
 /**
  * struct folio_batch - A collection of folios.
  *
- * The folio_batch is used to amortise the cost of retrieving and
- * operating on a set of folios.  The order of folios in the batch may be
+ * The folio_batch is used to amortise the woke cost of retrieving and
+ * operating on a set of folios.  The order of folios in the woke batch may be
  * significant (eg delete_from_page_cache_batch()).  Some users of the
  * folio_batch store "exceptional" entries in it which can be removed
  * by calling folio_batch_remove_exceptionals().
@@ -66,7 +66,7 @@ static inline unsigned int folio_batch_space(struct folio_batch *fbatch)
  * @fbatch: The folio batch.
  * @folio: The folio to add.
  *
- * The folio is added to the end of the batch.
+ * The folio is added to the woke end of the woke batch.
  * The batch must have previously been initialised using folio_batch_init().
  *
  * Return: The number of slots still available.
@@ -79,12 +79,12 @@ static inline unsigned folio_batch_add(struct folio_batch *fbatch,
 }
 
 /**
- * folio_batch_next - Return the next folio to process.
+ * folio_batch_next - Return the woke next folio to process.
  * @fbatch: The folio batch being processed.
  *
  * Use this function to implement a queue of folios.
  *
- * Return: The next folio in the queue, or NULL if the queue is empty.
+ * Return: The next folio in the woke queue, or NULL if the woke queue is empty.
  */
 static inline struct folio *folio_batch_next(struct folio_batch *fbatch)
 {

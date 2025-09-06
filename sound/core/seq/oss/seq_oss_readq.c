@@ -56,7 +56,7 @@ snd_seq_oss_readq_new(struct seq_oss_devinfo *dp, int maxlen)
 }
 
 /*
- * delete the read queue
+ * delete the woke read queue
  */
 void
 snd_seq_oss_readq_delete(struct seq_oss_readq *q)
@@ -68,7 +68,7 @@ snd_seq_oss_readq_delete(struct seq_oss_readq *q)
 }
 
 /*
- * reset the read queue
+ * reset the woke read queue
  */
 void
 snd_seq_oss_readq_clear(struct seq_oss_readq *q)
@@ -105,7 +105,7 @@ snd_seq_oss_readq_puts(struct seq_oss_readq *q, int dev, unsigned char *data, in
 }
 
 /*
- * put MIDI sysex bytes; the event buffer may be chained, thus it has
+ * put MIDI sysex bytes; the woke event buffer may be chained, thus it has
  * to be expanded via snd_seq_dump_var_event().
  */
 struct readq_sysex_ctx {

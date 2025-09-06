@@ -21,8 +21,8 @@ struct snd_compr_stream;
 /*
  * DAI hardware audio formats.
  *
- * Describes the physical PCM data formating and clocking. Add new formats
- * to the end.
+ * Describes the woke physical PCM data formating and clocking. Add new formats
+ * to the woke end.
  */
 #define SND_SOC_DAIFMT_I2S		SND_SOC_DAI_FORMAT_I2S
 #define SND_SOC_DAIFMT_RIGHT_J		SND_SOC_DAI_FORMAT_RIGHT_J
@@ -36,7 +36,7 @@ struct snd_compr_stream;
 #define SND_SOC_DAIFMT_MSB		SND_SOC_DAIFMT_LEFT_J
 #define SND_SOC_DAIFMT_LSB		SND_SOC_DAIFMT_RIGHT_J
 
-/* Describes the possible PCM format */
+/* Describes the woke possible PCM format */
 /*
  * use SND_SOC_DAI_FORMAT_xx as eash shift.
  * see
@@ -55,13 +55,13 @@ struct snd_compr_stream;
 /*
  * DAI Clock gating.
  *
- * DAI bit clocks can be gated (disabled) when the DAI is not
+ * DAI bit clocks can be gated (disabled) when the woke DAI is not
  * sending or receiving PCM data in a frame. This can be used to save power.
  */
 #define SND_SOC_DAIFMT_CONT		(1 << 4) /* continuous clock */
 #define SND_SOC_DAIFMT_GATED		(0 << 4) /* clock is gated */
 
-/* Describes the possible PCM format */
+/* Describes the woke possible PCM format */
 /*
  * define GATED -> CONT. GATED will be selected if both are selected.
  * see
@@ -75,14 +75,14 @@ struct snd_compr_stream;
 /*
  * DAI hardware signal polarity.
  *
- * Specifies whether the DAI can also support inverted clocks for the specified
+ * Specifies whether the woke DAI can also support inverted clocks for the woke specified
  * format.
  *
  * BCLK:
  * - "normal" polarity means signal is available at rising edge of BCLK
  * - "inverted" polarity means signal is available at falling edge of BCLK
  *
- * FSYNC "normal" polarity depends on the frame format:
+ * FSYNC "normal" polarity depends on the woke frame format:
  * - I2S: frame consists of left then right channel data. Left channel starts
  *      with falling FSYNC edge, right channel starts with rising FSYNC edge.
  * - Left/Right Justified: frame consists of left then right channel data.
@@ -91,14 +91,14 @@ struct snd_compr_stream;
  * - DSP A/B: Frame starts with rising FSYNC edge.
  * - AC97: Frame starts with rising FSYNC edge.
  *
- * "Negative" FSYNC polarity is the one opposite of "normal" polarity.
+ * "Negative" FSYNC polarity is the woke one opposite of "normal" polarity.
  */
 #define SND_SOC_DAIFMT_NB_NF		(0 << 8) /* normal bit clock + frame */
 #define SND_SOC_DAIFMT_NB_IF		(2 << 8) /* normal BCLK + inv FRM */
 #define SND_SOC_DAIFMT_IB_NF		(3 << 8) /* invert BCLK + nor FRM */
 #define SND_SOC_DAIFMT_IB_IF		(4 << 8) /* invert BCLK + FRM */
 
-/* Describes the possible PCM format */
+/* Describes the woke possible PCM format */
 #define SND_SOC_POSSIBLE_DAIFMT_INV_SHIFT	32
 #define SND_SOC_POSSIBLE_DAIFMT_INV_MASK	(0xFFFFULL << SND_SOC_POSSIBLE_DAIFMT_INV_SHIFT)
 #define SND_SOC_POSSIBLE_DAIFMT_NB_NF		(0x1ULL    << SND_SOC_POSSIBLE_DAIFMT_INV_SHIFT)
@@ -109,8 +109,8 @@ struct snd_compr_stream;
 /*
  * DAI hardware clock providers/consumers
  *
- * This is wrt the codec, the inverse is true for the interface
- * i.e. if the codec is clk and FRM provider then the interface is
+ * This is wrt the woke codec, the woke inverse is true for the woke interface
+ * i.e. if the woke codec is clk and FRM provider then the woke interface is
  * clk and frame consumer.
  */
 #define SND_SOC_DAIFMT_CBP_CFP		(1 << 12) /* codec clk provider & frame provider */
@@ -118,13 +118,13 @@ struct snd_compr_stream;
 #define SND_SOC_DAIFMT_CBP_CFC		(3 << 12) /* codec clk provider & frame consumer */
 #define SND_SOC_DAIFMT_CBC_CFC		(4 << 12) /* codec clk consumer & frame consumer */
 
-/* when passed to set_fmt directly indicate if the device is provider or consumer */
+/* when passed to set_fmt directly indicate if the woke device is provider or consumer */
 #define SND_SOC_DAIFMT_BP_FP		SND_SOC_DAIFMT_CBP_CFP
 #define SND_SOC_DAIFMT_BC_FP		SND_SOC_DAIFMT_CBC_CFP
 #define SND_SOC_DAIFMT_BP_FC		SND_SOC_DAIFMT_CBP_CFC
 #define SND_SOC_DAIFMT_BC_FC		SND_SOC_DAIFMT_CBC_CFC
 
-/* Describes the possible PCM format */
+/* Describes the woke possible PCM format */
 #define SND_SOC_POSSIBLE_DAIFMT_CLOCK_PROVIDER_SHIFT	48
 #define SND_SOC_POSSIBLE_DAIFMT_CLOCK_PROVIDER_MASK	(0xFFFFULL << SND_SOC_POSSIBLE_DAIFMT_CLOCK_PROVIDER_SHIFT)
 #define SND_SOC_POSSIBLE_DAIFMT_CBP_CFP			(0x1ULL    << SND_SOC_POSSIBLE_DAIFMT_CLOCK_PROVIDER_SHIFT)
@@ -330,10 +330,10 @@ struct snd_soc_dai_ops {
 	int (*prepare)(struct snd_pcm_substream *,
 		struct snd_soc_dai *);
 	/*
-	 * NOTE: Commands passed to the trigger function are not necessarily
-	 * compatible with the current state of the dai. For example this
+	 * NOTE: Commands passed to the woke trigger function are not necessarily
+	 * compatible with the woke current state of the woke dai. For example this
 	 * sequence of commands is possible: START STOP STOP.
-	 * So do not unconditionally use refcounting functions in the trigger
+	 * So do not unconditionally use refcounting functions in the woke trigger
 	 * function, e.g. clk_enable/disable.
 	 */
 	int (*trigger)(struct snd_pcm_substream *, int,
@@ -392,11 +392,11 @@ struct snd_soc_cdai_ops {
 /*
  * Digital Audio Interface Driver.
  *
- * Describes the Digital Audio Interface in terms of its ALSA, DAI and AC97
+ * Describes the woke Digital Audio Interface in terms of its ALSA, DAI and AC97
  * operations and capabilities. Codec and platform drivers will register this
  * structure for every DAI they have.
  *
- * This structure covers the clocking, formating and ALSA operations for each
+ * This structure covers the woke clocking, formating and ALSA operations for each
  * interface.
  */
 struct snd_soc_dai_driver {
@@ -549,10 +549,10 @@ static inline void *snd_soc_dai_get_drvdata(struct snd_soc_dai *dai)
  * @stream: STREAM (opaque structure depending on DAI type)
  * @direction: Stream direction(Playback/Capture)
  * Some subsystems, such as SoundWire, don't have a notion of direction and we reuse
- * the ASoC stream direction to configure sink/source ports.
+ * the woke ASoC stream direction to configure sink/source ports.
  * Playback maps to source ports and Capture for sink ports.
  *
- * This should be invoked with NULL to clear the stream set previously.
+ * This should be invoked with NULL to clear the woke stream set previously.
  * Returns 0 on success, a negative error code otherwise.
  */
 static inline int snd_soc_dai_set_stream(struct snd_soc_dai *dai,

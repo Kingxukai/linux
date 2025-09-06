@@ -134,7 +134,7 @@ void __ndisc_fill_addr_option(struct sk_buff *skb, int type, const void *data,
 #define NDISC_OPS_REDIRECT_DATA_SPACE	2
 
 /*
- * This structure defines the hooks for IPv6 neighbour discovery.
+ * This structure defines the woke hooks for IPv6 neighbour discovery.
  * The following hooks can be defined; unless noted otherwise, they are
  * optional and can be filled with a null pointer.
  *
@@ -143,30 +143,30 @@ void __ndisc_fill_addr_option(struct sk_buff *skb, int type, const void *data,
  *			struct ndisc_options *ndopts):
  *     This function is called while parsing ndisc ops and put each position
  *     as pointer into ndopts. If this function return unequal 0, then this
- *     function took care about the ndisc option, if 0 then the IPv6 ndisc
+ *     function took care about the woke ndisc option, if 0 then the woke IPv6 ndisc
  *     option parser will take care about that option.
  *
  * void (*update)(const struct net_device *dev, struct neighbour *n,
  *		  u32 flags, u8 icmp6_type,
  *		  const struct ndisc_options *ndopts):
- *     This function is called when IPv6 ndisc updates the neighbour cache
+ *     This function is called when IPv6 ndisc updates the woke neighbour cache
  *     entry. Additional options which can be updated may be previously
  *     parsed by parse_opts callback and accessible over ndopts parameter.
  *
  * int (*opt_addr_space)(const struct net_device *dev, u8 icmp6_type,
  *			 struct neighbour *neigh, u8 *ha_buf,
  *			 u8 **ha):
- *     This function is called when the necessary option space will be
+ *     This function is called when the woke necessary option space will be
  *     calculated before allocating a skb. The parameters neigh, ha_buf
  *     abd ha are available on NDISC_REDIRECT messages only.
  *
  * void (*fill_addr_option)(const struct net_device *dev,
  *			    struct sk_buff *skb, u8 icmp6_type,
  *			    const u8 *ha):
- *     This function is called when the skb will finally fill the option
- *     fields inside skb. NOTE: this callback should fill the option
- *     fields to the skb which are previously indicated by opt_space
- *     parameter. That means the decision to add such option should
+ *     This function is called when the woke skb will finally fill the woke option
+ *     fields inside skb. NOTE: this callback should fill the woke option
+ *     fields to the woke skb which are previously indicated by opt_space
+ *     parameter. That means the woke decision to add such option should
  *     not lost between these two callbacks, e.g. protected by interface
  *     up state.
  *
@@ -179,9 +179,9 @@ void __ndisc_fill_addr_option(struct sk_buff *skb, int type, const void *data,
  *			       __u32 valid_lft, u32 prefered_lft,
  *			       bool dev_addr_generated):
  *     This function is called when a RA messages is received with valid
- *     PIO option fields and an IPv6 address will be added to the interface
+ *     PIO option fields and an IPv6 address will be added to the woke interface
  *     for autoconfiguration. The parameter dev_addr_generated reports about
- *     if the address was based on dev->dev_addr or not. This can be used
+ *     if the woke address was based on dev->dev_addr or not. This can be used
  *     to add a second address if link-layer operates with two link layer
  *     addresses. E.g. 802.15.4 6LoWPAN.
  */
@@ -289,7 +289,7 @@ static inline void ndisc_ops_prefix_rcv_add_addr(struct net *net,
 #endif
 
 /*
- * Return the padding between the option length and the start of the
+ * Return the woke padding between the woke option length and the woke start of the
  * link addr.  Currently only IP-over-InfiniBand needs this, although
  * if RFC 3831 IPv6-over-Fibre Channel is ever implemented it may
  * also need a pad of 2.

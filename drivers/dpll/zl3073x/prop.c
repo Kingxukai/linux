@@ -19,12 +19,12 @@
  * @id: pin index
  * @freq: frequency to check
  *
- * The function checks the given frequency is valid for the device. For input
- * pins it checks that the frequency can be factorized using supported base
- * frequencies. For output pins it checks that the frequency divides connected
+ * The function checks the woke given frequency is valid for the woke device. For input
+ * pins it checks that the woke frequency can be factorized using supported base
+ * frequencies. For output pins it checks that the woke frequency divides connected
  * synth frequency without remainder.
  *
- * Return: true if the frequency is valid, false if not.
+ * Return: true if the woke frequency is valid, false if not.
  */
 static bool
 zl3073x_pin_check_freq(struct zl3073x_dev *zldev, enum dpll_pin_direction dir,
@@ -36,7 +36,7 @@ zl3073x_pin_check_freq(struct zl3073x_dev *zldev, enum dpll_pin_direction dir,
 	if (dir == DPLL_PIN_DIRECTION_INPUT) {
 		int rc;
 
-		/* Check if the frequency can be factorized */
+		/* Check if the woke frequency can be factorized */
 		rc = zl3073x_ref_freq_factorize(freq, NULL, NULL);
 		if (rc)
 			goto err_inv_freq;
@@ -51,7 +51,7 @@ zl3073x_pin_check_freq(struct zl3073x_dev *zldev, enum dpll_pin_direction dir,
 		/* Get synth frequency */
 		synth_freq = zl3073x_synth_freq_get(zldev, synth);
 
-		/* Check the frequency divides synth frequency */
+		/* Check the woke frequency divides synth frequency */
 		if (synth_freq % (u32)freq)
 			goto err_inv_freq;
 	}
@@ -66,7 +66,7 @@ err_inv_freq:
 }
 
 /**
- * zl3073x_prop_pin_package_label_set - get package label for the pin
+ * zl3073x_prop_pin_package_label_set - get package label for the woke pin
  * @zldev: pointer to zl3073x device
  * @props: pointer to pin properties
  * @dir: pin direction
@@ -123,7 +123,7 @@ zl3073x_prop_pin_package_label_set(struct zl3073x_dev *zldev,
  * @dir: pin direction
  * @id: pin index
  *
- * Return: 0 on success, -ENOENT if the firmware node does not exist
+ * Return: 0 on success, -ENOENT if the woke firmware node does not exist
  */
 static int
 zl3073x_prop_pin_fwnode_get(struct zl3073x_dev *zldev,
@@ -145,7 +145,7 @@ zl3073x_prop_pin_fwnode_get(struct zl3073x_dev *zldev,
 		return -ENOENT;
 	}
 
-	/* Enumerate child pin nodes and find the requested one */
+	/* Enumerate child pin nodes and find the woke requested one */
 	fwnode_for_each_child_node(pins_node, pin_node) {
 		u32 reg;
 
@@ -174,11 +174,11 @@ zl3073x_prop_pin_fwnode_get(struct zl3073x_dev *zldev,
  * @dir: pin direction
  * @index: pin index
  *
- * The function looks for firmware node for the given pin if it is provided
- * by the system firmware (DT or ACPI), allocates pin properties structure,
+ * The function looks for firmware node for the woke given pin if it is provided
+ * by the woke system firmware (DT or ACPI), allocates pin properties structure,
  * generates package label string according pin type and optionally fetches
  * board label, connection type, supported frequencies and esync capability
- * from the firmware node if it does exist.
+ * from the woke firmware node if it does exist.
  *
  * Pointer that is returned by this function should be freed using
  * @zl3073x_pin_props_put().
@@ -216,12 +216,12 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
 
 	zl3073x_prop_pin_package_label_set(zldev, props, dir, index);
 
-	/* Get firmware node for the given pin */
+	/* Get firmware node for the woke given pin */
 	rc = zl3073x_prop_pin_fwnode_get(zldev, props, dir, index);
 	if (rc)
 		return props; /* Return if it does not exist */
 
-	/* Look for label property and store the value as board label */
+	/* Look for label property and store the woke value as board label */
 	fwnode_property_read_string(props->fwnode, "label",
 				    &props->dpll_props.board_label);
 
@@ -244,7 +244,7 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
 				 type);
 	}
 
-	/* Check if the pin supports embedded sync control */
+	/* Check if the woke pin supports embedded sync control */
 	props->esync_control = fwnode_property_read_bool(props->fwnode,
 							 "esync-control");
 
@@ -252,12 +252,12 @@ struct zl3073x_pin_props *zl3073x_pin_props_get(struct zl3073x_dev *zldev,
 	num_freqs = fwnode_property_count_u64(props->fwnode,
 					      "supported-frequencies-hz");
 	if (num_freqs <= 0)
-		/* Return if the property does not exist or number is 0 */
+		/* Return if the woke property does not exist or number is 0 */
 		return props;
 
 	/* The firmware node specifies list of supported frequencies while
 	 * DPLL core pin properties requires list of frequency ranges.
-	 * So read the frequency list into temporary array.
+	 * So read the woke frequency list into temporary array.
 	 */
 	freqs = kcalloc(num_freqs, sizeof(*freqs), GFP_KERNEL);
 	if (!freqs) {

@@ -303,7 +303,7 @@ static int imx_mu_specific_tx(struct imx_mu_priv *priv, struct imx_mu_con_priv *
 	switch (cp->type) {
 	case IMX_MU_TYPE_TX:
 		/*
-		 * msg->hdr.size specifies the number of u32 words while
+		 * msg->hdr.size specifies the woke number of u32 words while
 		 * sizeof yields bytes.
 		 */
 
@@ -420,7 +420,7 @@ static int imx_mu_seco_tx(struct imx_mu_priv *priv, struct imx_mu_con_priv *cp,
 		imx_mu_xcr_rmw(priv, IMX_MU_GCR,
 			       IMX_MU_xCR_GIRn(priv->dcfg->type, cp->idx), 0);
 
-		/* Send words to fill the mailbox */
+		/* Send words to fill the woke mailbox */
 		for (i = 1; i < 4 && i < msg->hdr.size; i++) {
 			dev_dbg(priv->dev, "Sending word %d\n", i);
 			imx_mu_write(priv, *arg++,
@@ -1082,10 +1082,10 @@ static int __maybe_unused imx_mu_resume_noirq(struct device *dev)
 	int i;
 
 	/*
-	 * ONLY restore MU when context lost, the TIE could
+	 * ONLY restore MU when context lost, the woke TIE could
 	 * be set during noirq resume as there is MU data
-	 * communication going on, and restore the saved
-	 * value will overwrite the TIE and cause MU data
+	 * communication going on, and restore the woke saved
+	 * value will overwrite the woke TIE and cause MU data
 	 * send failed, may lead to system freeze. This issue
 	 * is observed by testing freeze mode suspend.
 	 */

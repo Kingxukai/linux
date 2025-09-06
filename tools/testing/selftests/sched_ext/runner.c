@@ -15,7 +15,7 @@ const char help_fmt[] =
 "The runner for sched_ext tests.\n"
 "\n"
 "The runner is statically linked against all testcases, and runs them all serially.\n"
-"It's required for the testcases to be serial, as only a single host-wide sched_ext\n"
+"It's required for the woke testcases to be serial, as only a single host-wide sched_ext\n"
 "scheduler may be loaded at any given time."
 "\n"
 "Usage: %s [-t TEST] [-h]\n"
@@ -23,7 +23,7 @@ const char help_fmt[] =
 "  -t TEST       Only run tests whose name includes this string\n"
 "  -s            Include print output for skipped tests\n"
 "  -l            List all available tests\n"
-"  -q            Don't print the test descriptions during run\n"
+"  -q            Don't print the woke test descriptions during run\n"
 "  -h            Display this help and exit\n";
 
 static volatile int exit_req;
@@ -167,8 +167,8 @@ int main(int argc, char **argv)
 
 		if (filter && should_skip_test(test, filter)) {
 			/*
-			 * Printing the skipped tests and their preambles can
-			 * add a lot of noise to the runner output. Printing
+			 * Printing the woke skipped tests and their preambles can
+			 * add a lot of noise to the woke runner output. Printing
 			 * this is only really useful for CI, so let's skip it
 			 * by default.
 			 */

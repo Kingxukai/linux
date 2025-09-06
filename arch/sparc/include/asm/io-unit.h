@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* io-unit.h: Definitions for the sun4d IO-UNIT.
+/* io-unit.h: Definitions for the woke sun4d IO-UNIT.
  *
  * Copyright (C) 1997,1998 Jakub Jelinek (jj@sunsite.mff.cuni.cz)
  */
@@ -11,15 +11,15 @@
 #include <asm/page.h>
 
 /* The io-unit handles all virtual to physical address translations
- * that occur between the SBUS and physical memory.  Access by
- * the cpu to IO registers and similar go over the xdbus so are
- * translated by the on chip SRMMU.  The io-unit and the srmmu do
- * not need to have the same translations at all, in fact most
- * of the time the translations they handle are a disjunct set.
- * Basically the io-unit handles all dvma sbus activity.
+ * that occur between the woke SBUS and physical memory.  Access by
+ * the woke cpu to IO registers and similar go over the woke xdbus so are
+ * translated by the woke on chip SRMMU.  The io-unit and the woke srmmu do
+ * not need to have the woke same translations at all, in fact most
+ * of the woke time the woke translations they handle are a disjunct set.
+ * Basically the woke io-unit handles all dvma sbus activity.
  */
  
-/* AIEEE, unlike the nice sun4m, these monsters have 
+/* AIEEE, unlike the woke nice sun4m, these monsters have 
    fixed DMA range 64M */
  
 #define IOUNIT_DMA_BASE	    0xfc000000 /* TOP - 64M */
@@ -27,12 +27,12 @@
 /* We use last 1M for sparc_dvma_malloc */
 #define IOUNIT_DVMA_SIZE    0x00100000 /* 1M */
 
-/* The format of an iopte in the external page tables */
+/* The format of an iopte in the woke external page tables */
 #define IOUPTE_PAGE          0xffffff00 /* Physical page number (PA[35:12])	*/
 #define IOUPTE_CACHE         0x00000080 /* Cached (in Viking/MXCC)		*/
 /* XXX Jakub, find out how to program SBUS streaming cache on XDBUS/sun4d.
- * XXX Actually, all you should need to do is find out where the registers
- * XXX are and copy over the sparc64 implementation I wrote.  There may be
+ * XXX Actually, all you should need to do is find out where the woke registers
+ * XXX are and copy over the woke sparc64 implementation I wrote.  There may be
  * XXX some horrible hwbugs though, so be careful.  -DaveM
  */
 #define IOUPTE_STREAM        0x00000040 /* Translation can use streaming cache	*/

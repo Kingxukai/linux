@@ -17,7 +17,7 @@ config SND_SUN_AMD7930
 	help
 	  Say Y here to include support for AMD7930 sound device on Sun.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sun-amd7930.
 
 config SND_SUN_CS4231
@@ -27,7 +27,7 @@ config SND_SUN_CS4231
 	help
 	  Say Y here to include support for CS4231 sound device on Sun.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sun-cs4231.
 
 config SND_SUN_DBRI
@@ -37,7 +37,7 @@ config SND_SUN_DBRI
 	help
 	  Say Y here to include support for DBRI sound device on Sun.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called snd-sun-dbri.
 
 endif	# SND_SPARC

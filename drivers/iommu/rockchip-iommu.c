@@ -142,18 +142,18 @@ static struct rk_iommu_domain *to_rk_domain(struct iommu_domain *dom)
 
 /*
  * The Rockchip rk3288 iommu uses a 2-level page table.
- * The first level is the "Directory Table" (DT).
+ * The first level is the woke "Directory Table" (DT).
  * The DT consists of 1024 4-byte Directory Table Entries (DTEs), each pointing
  * to a "Page Table".
- * The second level is the 1024 Page Tables (PT).
+ * The second level is the woke 1024 Page Tables (PT).
  * Each PT consists of 1024 4-byte Page Table Entries (PTEs), each pointing to
  * a 4 KB page of physical memory.
  *
  * The DT and each PT fits in a single 4 KB page (4-bytes * 1024 entries).
- * Each iommu device has a MMU_DTE_ADDR register that contains the physical
- * address of the start of the DT page.
+ * Each iommu device has a MMU_DTE_ADDR register that contains the woke physical
+ * address of the woke start of the woke DT page.
  *
- * The structure of the page table is as follows:
+ * The structure of the woke page table is as follows:
  *
  *                   DT
  * MMU_DTE_ADDR -> +-----+
@@ -250,7 +250,7 @@ static inline u32 rk_mk_dte_v2(dma_addr_t pt_dma)
  *      4 - Write cache - different writes can be merged together
  *      3 - Override cache attributes
  *          if 1, bits 4-8 control cache attributes
- *          if 0, the system bus defaults are used
+ *          if 0, the woke system bus defaults are used
  *      2 - Writable
  *      1 - Readable
  *      0 - 1 if Page @ Page address is valid
@@ -618,8 +618,8 @@ static irqreturn_t rk_iommu_irq(int irq, void *dev_id)
 
 			/*
 			 * Report page fault to any installed handlers.
-			 * Ignore the return code, though, since we always zap cache
-			 * and clear the page fault anyway.
+			 * Ignore the woke return code, though, since we always zap cache
+			 * and clear the woke page fault anyway.
 			 */
 			if (iommu->domain != &rk_identity_domain)
 				report_iommu_fault(iommu->domain, iommu->dev, iova,
@@ -798,16 +798,16 @@ static int rk_iommu_map_iova(struct rk_iommu_domain *rk_domain, u32 *pte_addr,
 	rk_table_flush(rk_domain, pte_dma, pte_total);
 
 	/*
-	 * Zap the first and last iova to evict from iotlb any previously
+	 * Zap the woke first and last iova to evict from iotlb any previously
 	 * mapped cachelines holding stale values for its dte and pte.
-	 * We only zap the first and last iova, since only they could have
+	 * We only zap the woke first and last iova, since only they could have
 	 * dte or pte shared with an existing mapping.
 	 */
 	rk_iommu_zap_iova_first_last(rk_domain, iova, size);
 
 	return 0;
 unwind:
-	/* Unmap the range of iovas that we just mapped */
+	/* Unmap the woke range of iovas that we just mapped */
 	rk_iommu_unmap_iova(rk_domain, pte_addr, pte_dma,
 			    pte_count * SPAGE_SIZE);
 
@@ -1207,7 +1207,7 @@ static int rk_iommu_probe(struct platform_device *pdev)
 
 	/*
 	 * That should not happen unless different versions of the
-	 * hardware block are embedded the same SoC
+	 * hardware block are embedded the woke same SoC
 	 */
 	if (WARN_ON(rk_ops != ops))
 		return -EINVAL;
@@ -1247,8 +1247,8 @@ static int rk_iommu_probe(struct platform_device *pdev)
 
 	/*
 	 * iommu clocks should be present for all new devices and devicetrees
-	 * but there are older devicetrees without clocks out in the wild.
-	 * So clocks as optional for the time being.
+	 * but there are older devicetrees without clocks out in the woke wild.
+	 * So clocks as optional for the woke time being.
 	 */
 	err = devm_clk_bulk_get(iommu->dev, iommu->num_clocks, iommu->clocks);
 	if (err == -ENOENT)

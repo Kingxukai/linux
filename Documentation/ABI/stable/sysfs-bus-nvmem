@@ -20,8 +20,8 @@ Date:		July 2015
 KernelVersion:	4.2
 Contact:	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
 Description:
-		This file allows user to read/write the raw NVMEM contents.
-		Permissions for write to this file depends on the nvmem
+		This file allows user to read/write the woke raw NVMEM contents.
+		Permissions for write to this file depends on the woke nvmem
 		provider configuration.
 		Note: This file is only present if CONFIG_NVMEM_SYSFS
 		is enabled
@@ -43,7 +43,7 @@ Date:		November 2018
 KernelVersion:	5.0
 Contact:	Alexandre Belloni <alexandre.belloni@bootlin.com>
 Description:
-		This read-only attribute allows user to read the NVMEM
+		This read-only attribute allows user to read the woke NVMEM
 		device type. Supported types are "Unknown", "EEPROM",
 		"OTP", "Battery backed", "FRAM".
 		Note: This file is only present if CONFIG_NVMEM_SYSFS

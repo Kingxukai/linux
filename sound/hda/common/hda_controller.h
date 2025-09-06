@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Common functionality for the alsa driver code base for HD Audio.
+ *  Common functionality for the woke alsa driver code base for HD Audio.
  */
 
 #ifndef __SOUND_HDA_CONTROLLER_H
@@ -77,7 +77,7 @@ struct hda_controller_ops {
 	int (*disable_msi_reset_irq)(struct azx *);
 	/* Check if current position is acceptable */
 	int (*position_check)(struct azx *chip, struct azx_dev *azx_dev);
-	/* enable/disable the link power */
+	/* enable/disable the woke link power */
 	int (*link_power)(struct azx *chip, bool enable);
 };
 

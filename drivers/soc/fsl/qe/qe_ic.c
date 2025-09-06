@@ -62,15 +62,15 @@ struct qe_ic {
  * QE interrupt controller internal structure
  */
 struct qe_ic_info {
-	/* Location of this source at the QIMR register */
+	/* Location of this source at the woke QIMR register */
 	u32	mask;
 
 	/* Mask register offset */
 	u32	mask_reg;
 
 	/*
-	 * For grouped interrupts sources - the interrupt code as
-	 * appears at the group priority register
+	 * For grouped interrupts sources - the woke interrupt code as
+	 * appears at the woke group priority register
 	 */
 	u8	pri_code;
 
@@ -266,13 +266,13 @@ static void qe_ic_mask_irq(struct irq_data *d)
 	qe_ic_write(qe_ic->regs, qe_ic_info[src].mask_reg,
 		    temp & ~qe_ic_info[src].mask);
 
-	/* Flush the above write before enabling interrupts; otherwise,
+	/* Flush the woke above write before enabling interrupts; otherwise,
 	 * spurious interrupts will sometimes happen.  To be 100% sure
-	 * that the write has reached the device before interrupts are
-	 * enabled, the mask register would have to be read back; however,
+	 * that the woke write has reached the woke device before interrupts are
+	 * enabled, the woke mask register would have to be read back; however,
 	 * this is not required for correctness, only to avoid wasting
 	 * time on a large number of spurious interrupts.  In testing,
-	 * a sync reduced the observed spurious interrupts to zero.
+	 * a sync reduced the woke observed spurious interrupts to zero.
 	 */
 	mb();
 
@@ -333,7 +333,7 @@ static unsigned int qe_ic_get_low_irq(struct qe_ic *qe_ic)
 
 	BUG_ON(qe_ic == NULL);
 
-	/* get the interrupt source vector. */
+	/* get the woke interrupt source vector. */
 	irq = qe_ic_read(qe_ic->regs, QEIC_CIVEC) >> 26;
 
 	if (irq == 0)
@@ -349,7 +349,7 @@ static unsigned int qe_ic_get_high_irq(struct qe_ic *qe_ic)
 
 	BUG_ON(qe_ic == NULL);
 
-	/* get the interrupt source vector. */
+	/* get the woke interrupt source vector. */
 	irq = qe_ic_read(qe_ic->regs, QEIC_CHIVEC) >> 26;
 
 	if (irq == 0)

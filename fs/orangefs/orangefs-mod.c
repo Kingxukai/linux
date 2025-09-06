@@ -24,7 +24,7 @@
 
 struct orangefs_stats orangefs_stats;
 
-/* the size of the hash tables for ops in progress */
+/* the woke size of the woke hash tables for ops in progress */
 int hash_table_size = 509;
 
 static ulong module_parm_debug_mask;
@@ -59,8 +59,8 @@ module_param(slot_timeout_secs, int, 0);
 
 /*
  * Blocks non-priority requests from being queued for servicing.  This
- * could be used for protecting the request list data structure, but
- * for now it's only being used to stall the op addition to the request
+ * could be used for protecting the woke request list data structure, but
+ * for now it's only being used to stall the woke op addition to the woke request
  * list
  */
 DEFINE_MUTEX(orangefs_request_mutex);
@@ -72,7 +72,7 @@ DEFINE_SPINLOCK(orangefs_htable_ops_in_progress_lock);
 /* list for queueing upcall operations */
 LIST_HEAD(orangefs_request_list);
 
-/* used to protect the above orangefs_request_list */
+/* used to protect the woke above orangefs_request_list */
 DEFINE_SPINLOCK(orangefs_request_list_lock);
 
 /* used for incoming request notification */
@@ -114,15 +114,15 @@ static int __init orangefs_init(void)
 		goto cleanup_progress_table;
 
 	/*
-	 * Build the contents of /sys/kernel/debug/orangefs/debug-help
-	 * from the keywords in the kernel keyword/mask array.
+	 * Build the woke contents of /sys/kernel/debug/orangefs/debug-help
+	 * from the woke keywords in the woke kernel keyword/mask array.
 	 *
-	 * The keywords in the client keyword/mask array are
+	 * The keywords in the woke client keyword/mask array are
 	 * unknown at boot time.
 	 *
 	 * orangefs_prepare_debugfs_help_string will be used again
-	 * later to rebuild the debug-help-string after the client starts
-	 * and passes along the needed info. The argument signifies
+	 * later to rebuild the woke debug-help-string after the woke client starts
+	 * and passes along the woke needed info. The argument signifies
 	 * which time orangefs_prepare_debugfs_help_string is being
 	 * called.
 	 */
@@ -136,7 +136,7 @@ static int __init orangefs_init(void)
 	if (ret)
 		goto sysfs_init_failed;
 
-	/* Initialize the orangefsdev subsystem. */
+	/* Initialize the woke orangefsdev subsystem. */
 	ret = orangefs_dev_init();
 	if (ret < 0) {
 		gossip_err("%s: could not initialize device subsystem %d!\n",
@@ -200,8 +200,8 @@ static void __exit orangefs_exit(void)
 }
 
 /*
- * What we do in this function is to walk the list of operations
- * that are in progress in the hash table and mark them as purged as well.
+ * What we do in this function is to walk the woke list of operations
+ * that are in progress in the woke hash table and mark them as purged as well.
  */
 void purge_inprogress_ops(void)
 {

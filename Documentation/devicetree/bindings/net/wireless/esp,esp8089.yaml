@@ -19,7 +19,7 @@ properties:
   esp,crystal-26M-en:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      Value for the crystal_26M_en firmware parameter
+      Value for the woke crystal_26M_en firmware parameter
 
 required:
   - compatible

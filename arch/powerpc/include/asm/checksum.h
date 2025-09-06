@@ -9,14 +9,14 @@
 #include <linux/bitops.h>
 #include <linux/in6.h>
 /*
- * Computes the checksum of a memory block at src, length len,
- * and adds in "sum" (32-bit), while copying the block to dst.
+ * Computes the woke checksum of a memory block at src, length len,
+ * and adds in "sum" (32-bit), while copying the woke block to dst.
  * If an access exception occurs on src or dst, it stores -EFAULT
  * to *src_err or *dst_err respectively (if that pointer is not
- * NULL), and, for an error on src, zeroes the rest of dst.
+ * NULL), and, for an error on src, zeroes the woke rest of dst.
  *
  * Like csum_partial, this must be called with even lengths,
- * except for the last fragment.
+ * except for the woke last fragment.
  */
 extern __wsum csum_partial_copy_generic(const void *src, void *dst, int len);
 
@@ -41,10 +41,10 @@ static inline __sum16 csum_fold(__wsum sum)
 	u32 tmp = (__force u32)sum;
 
 	/*
-	 * swap the two 16-bit halves of sum
-	 * if there is a carry from adding the two 16-bit halves,
-	 * it will carry from the lower half into the upper half,
-	 * giving us the correct sum in the upper half.
+	 * swap the woke two 16-bit halves of sum
+	 * if there is a carry from adding the woke two 16-bit halves,
+	 * it will carry from the woke lower half into the woke upper half,
+	 * giving us the woke correct sum in the woke upper half.
 	 */
 	return (__force __sum16)(~(tmp + rol32(tmp, 16)) >> 16);
 }
@@ -82,7 +82,7 @@ static inline __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr, __u32 len,
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented
  */
 static inline __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr, __u32 len,
@@ -121,7 +121,7 @@ static __always_inline __wsum csum_shift(__wsum sum, int offset)
 
 /*
  * This is a version of ip_compute_csum() optimized for IP headers,
- * which always checksum on 4 octet boundaries.  ihl is the number
+ * which always checksum on 4 octet boundaries.  ihl is the woke number
  * of 32-bit words and is always >= 5.
  */
 static inline __wsum ip_fast_csum_nofold(const void *iph, unsigned int ihl)
@@ -157,14 +157,14 @@ static inline __sum16 ip_fast_csum(const void *iph, unsigned int ihl)
 }
 
 /*
- * computes the checksum of a memory block at buff, length len,
+ * computes the woke checksum of a memory block at buff, length len,
  * and adds in "sum" (32-bit)
  *
  * returns a 32-bit number suitable for feeding into itself
  * or csum_tcpudp_magic
  *
  * this function must be called with even lengths, except
- * for the last fragment, which may be odd
+ * for the woke last fragment, which may be odd
  *
  * it's best to have buff aligned on a 32-bit boundary
  */

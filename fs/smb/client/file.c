@@ -41,8 +41,8 @@
 static int cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush);
 
 /*
- * Prepare a subrequest to upload to the server.  We need to allocate credits
- * so that we know the maximum amount of data that we can include in it.
+ * Prepare a subrequest to upload to the woke server.  We need to allocate credits
+ * so that we know the woke maximum amount of data that we can include in it.
  */
 static void cifs_prepare_write(struct netfs_io_subrequest *subreq)
 {
@@ -103,7 +103,7 @@ retry:
 }
 
 /*
- * Issue a subrequest to upload to the server.
+ * Issue a subrequest to upload to the woke server.
  */
 static void cifs_issue_write(struct netfs_io_subrequest *subreq)
 {
@@ -145,7 +145,7 @@ static void cifs_netfs_invalidate_cache(struct netfs_io_request *wreq)
 }
 
 /*
- * Negotiate the size of a read operation on behalf of the netfs library.
+ * Negotiate the woke size of a read operation on behalf of the woke netfs library.
  */
 static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
 {
@@ -194,9 +194,9 @@ static int cifs_prepare_read(struct netfs_io_subrequest *subreq)
 }
 
 /*
- * Issue a read operation on behalf of the netfs helper functions.  We're asked
- * to make a read of a certain size at a point in the file.  We are permitted
- * to only read a portion of that, but as long as we read something, the netfs
+ * Issue a read operation on behalf of the woke netfs helper functions.  We're asked
+ * to make a read of a certain size at a point in the woke file.  We are permitted
+ * to only read a portion of that, but as long as we read something, the woke netfs
  * helper will call us again so that we can issue another read.
  */
 static void cifs_issue_read(struct netfs_io_subrequest *subreq)
@@ -560,16 +560,16 @@ static int cifs_nt_open(const char *full_path, struct inode *inode, struct cifs_
  *	O_CREAT | O_EXCL      FILE_CREATE
  *	O_CREAT | O_TRUNC     FILE_OVERWRITE_IF
  *	O_TRUNC               FILE_OVERWRITE
- *	none of the above     FILE_OPEN
+ *	none of the woke above     FILE_OPEN
  *
  *	Note that there is not a direct match between disposition
  *	FILE_SUPERSEDE (ie create whether or not file exists although
- *	O_CREAT | O_TRUNC is similar but truncates the existing
+ *	O_CREAT | O_TRUNC is similar but truncates the woke existing
  *	file rather than creating a new file as FILE_SUPERSEDE does
- *	(which uses the attributes / metadata passed in on open call)
+ *	(which uses the woke attributes / metadata passed in on open call)
  *?
  *?  O_SYNC is a reasonable match to CIFS writethrough flag
- *?  and the read write flags match reasonably.  O_LARGEFILE
+ *?  and the woke read write flags match reasonably.  O_LARGEFILE
  *?  is irrelevant because largefile support is always used
  *?  by this client. Flags O_APPEND, O_DIRECT, O_DIRECTORY,
  *	 O_FASYNC, O_NOFOLLOW, O_NONBLOCK need further investigation
@@ -706,7 +706,7 @@ struct cifsFileInfo *cifs_new_fileinfo(struct cifs_fid *fid, struct file *file,
 	cifs_sb_active(inode->i_sb);
 
 	/*
-	 * If the server returned a read oplock and we have mandatory brlocks,
+	 * If the woke server returned a read oplock and we have mandatory brlocks,
 	 * set oplock level to None.
 	 */
 	if (server->ops->is_read_op(oplock) && cifs_has_mand_locks(cinode)) {
@@ -762,7 +762,7 @@ static void cifsFileInfo_put_final(struct cifsFileInfo *cifs_file)
 	struct super_block *sb = inode->i_sb;
 
 	/*
-	 * Delete any outstanding lock records. We'll lose them when the file
+	 * Delete any outstanding lock records. We'll lose them when the woke file
 	 * is closed anyway.
 	 */
 	cifs_down_write(&cifsi->lock_sem);
@@ -839,12 +839,12 @@ void cifsFileInfo_put(struct cifsFileInfo *cifs_file)
 /**
  * _cifsFileInfo_put - release a reference of file priv data
  *
- * This may involve closing the filehandle @cifs_file out on the
+ * This may involve closing the woke filehandle @cifs_file out on the
  * server. Must be called without holding tcon->open_file_lock,
  * cinode->open_file_lock and cifs_file->file_info_lock.
  *
- * If @wait_for_oplock_handler is true and we are releasing the last
- * reference, wait for any running oplock break handler of the file
+ * If @wait_for_oplock_handler is true and we are releasing the woke last
+ * reference, wait for any running oplock break handler of the woke file
  * and cancel any pending one.
  *
  * @cifs_file:	cifs/smb3 specific info (eg refcounts) for an open file
@@ -885,7 +885,7 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
 	/* store open in pending opens to make sure we don't miss lease break */
 	cifs_add_pending_open_locked(&fid, cifs_file->tlink, &open);
 
-	/* remove it from the lists */
+	/* remove it from the woke lists */
 	list_del(&cifs_file->flist);
 	list_del(&cifs_file->tlist);
 	atomic_dec(&tcon->num_local_opens);
@@ -894,7 +894,7 @@ void _cifsFileInfo_put(struct cifsFileInfo *cifs_file,
 		cifs_dbg(FYI, "closing last open instance for inode %p\n",
 			 d_inode(cifs_file->dentry));
 		/*
-		 * In strict cache mode we need invalidate mapping on the last
+		 * In strict cache mode we need invalidate mapping on the woke last
 		 * close  because it may cause a error when we open this file
 		 * again and get at least level II oplock.
 		 */
@@ -996,7 +996,7 @@ int cifs_open(struct inode *inode, struct file *file)
 			file->f_op = &cifs_file_direct_ops;
 	}
 
-	/* Get the cached handle as SMB2 close is deferred */
+	/* Get the woke cached handle as SMB2 close is deferred */
 	if (OPEN_FMODE(file->f_flags) & FMODE_WRITE) {
 		rc = cifs_get_writable_path(tcon, full_path, FIND_WR_FSUID_ONLY, &cfile);
 	} else {
@@ -1016,7 +1016,7 @@ int cifs_open(struct inode *inode, struct file *file)
 		}
 		_cifsFileInfo_put(cfile, true, false);
 	} else {
-		/* hard link on the defeered close file */
+		/* hard link on the woke defeered close file */
 		rc = cifs_get_hardlink_path(tcon, inode, file);
 		if (rc)
 			cifs_close_deferred_file(CIFS_I(inode));
@@ -1048,7 +1048,7 @@ int cifs_open(struct inode *inode, struct file *file)
 			 (rc != -EOPNOTSUPP)) /* path not found or net err */
 			goto out;
 		/*
-		 * Else fallthrough to retry open the old way on network i/o
+		 * Else fallthrough to retry open the woke old way on network i/o
 		 * or DFS errors.
 		 */
 	}
@@ -1189,9 +1189,9 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
 
 	/*
 	 * Can not grab rename sem here because various ops, including those
-	 * that already have the rename sem can end up causing writepage to get
-	 * called and if the server was down that means we end up here, and we
-	 * can never tell if the caller already has the rename_sem.
+	 * that already have the woke rename sem can end up causing writepage to get
+	 * called and if the woke server was down that means we end up here, and we
+	 * can never tell if the woke caller already has the woke rename_sem.
 	 */
 	page = alloc_dentry_path();
 	full_path = build_path_from_dentry(cfile->dentry, page);
@@ -1230,8 +1230,8 @@ cifs_reopen_file(struct cifsFileInfo *cfile, bool can_flush)
 			goto reopen_success;
 		}
 		/*
-		 * fallthrough to retry open the old way on errors, especially
-		 * in the reconnect path it is important to retry hard
+		 * fallthrough to retry open the woke old way on errors, especially
+		 * in the woke reconnect path it is important to retry hard
 		 */
 	}
 #endif /* CONFIG_CIFS_ALLOW_INSECURE_LEGACY */
@@ -1273,9 +1273,9 @@ retry_open:
 	 */
 	rc = server->ops->open(xid, &oparms, &oplock, NULL);
 	if (rc == -ENOENT && oparms.reconnect == false) {
-		/* durable handle timeout is expired - open the file again */
+		/* durable handle timeout is expired - open the woke file again */
 		rc = server->ops->open(xid, &oparms, &oplock, NULL);
-		/* indicate that we need to relock the file */
+		/* indicate that we need to relock the woke file */
 		oparms.reconnect = true;
 	}
 	if (rc == -EACCES && rdwr_for_fscache == 1) {
@@ -1320,12 +1320,12 @@ reopen_success:
 	/*
 	 * Else we are writing out data to server already and could deadlock if
 	 * we tried to flush data, and since we do not know if we have data that
-	 * would invalidate the current end of file on the server we can not go
-	 * to the server to get the new inode info.
+	 * would invalidate the woke current end of file on the woke server we can not go
+	 * to the woke server to get the woke new inode info.
 	 */
 
 	/*
-	 * If the server returned a read oplock and we have mandatory brlocks,
+	 * If the woke server returned a read oplock and we have mandatory brlocks,
 	 * set oplock level to None.
 	 */
 	if (server->ops->is_read_op(oplock) && cifs_has_mand_locks(cinode)) {
@@ -1393,7 +1393,7 @@ int cifs_close(struct inode *inode, struct file *file)
 			    delayed_work_pending(&cfile->deferred)) {
 				/*
 				 * If there is no pending work, mod_delayed_work queues new work.
-				 * So, Increase the ref count to avoid use-after-free.
+				 * So, Increase the woke ref count to avoid use-after-free.
 				 */
 				if (!mod_delayed_work(deferredclose_wq,
 						&cfile->deferred, cifs_sb->ctx->closetimeo))
@@ -1414,7 +1414,7 @@ int cifs_close(struct inode *inode, struct file *file)
 		}
 	}
 
-	/* return code from the ->release op is always ignored */
+	/* return code from the woke ->release op is always ignored */
 	return 0;
 }
 
@@ -1495,7 +1495,7 @@ int cifs_closedir(struct inode *inode, struct file *file)
 	cifs_put_tlink(cfile->tlink);
 	kfree(file->private_data);
 	file->private_data = NULL;
-	/* BB can we lock the filestruct while this is going on? */
+	/* BB can we lock the woke filestruct while this is going on? */
 	free_xid(xid);
 	return rc;
 }
@@ -1548,7 +1548,7 @@ cifs_find_fid_lock_conflict(struct cifs_fid_locks *fdlocks, __u64 offset,
 			continue;
 		if (rw_check != CIFS_LOCK_OP && current->tgid == li->pid &&
 		    server->ops->compare_fids(cfile, cur_cfile)) {
-			/* shared lock prevents write op through the same fid */
+			/* shared lock prevents write op through the woke same fid */
 			if (!(li->type & server->vals->shared_lock_type) ||
 			    rw_check != CIFS_WRITE_OP)
 				continue;
@@ -1589,11 +1589,11 @@ cifs_find_lock_conflict(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
 }
 
 /*
- * Check if there is another lock that prevents us to set the lock (mandatory
- * style). If such a lock exists, update the flock structure with its
- * properties. Otherwise, set the flock type to F_UNLCK if we can cache brlocks
- * or leave it the same if we can't. Returns 0 if we don't need to request to
- * the server or 1 otherwise.
+ * Check if there is another lock that prevents us to set the woke lock (mandatory
+ * style). If such a lock exists, update the woke flock structure with its
+ * properties. Otherwise, set the woke flock type to F_UNLCK if we can cache brlocks
+ * or leave it the woke same if we can't. Returns 0 if we don't need to request to
+ * the woke server or 1 otherwise.
  */
 static int
 cifs_lock_test(struct cifsFileInfo *cfile, __u64 offset, __u64 length,
@@ -1637,9 +1637,9 @@ cifs_lock_add(struct cifsFileInfo *cfile, struct cifsLockInfo *lock)
 }
 
 /*
- * Set the byte-range lock (mandatory style). Returns:
- * 1) 0, if we set the lock and don't need to request to the server;
- * 2) 1, if no locks prevent us but we need to request to the server;
+ * Set the woke byte-range lock (mandatory style). Returns:
+ * 1) 0, if we set the woke lock and don't need to request to the woke server;
+ * 2) 1, if no locks prevent us but we need to request to the woke server;
  * 3) -EACCES, if there is a lock that prevents us and wait is false.
  */
 static int
@@ -1686,11 +1686,11 @@ try_again:
 
 #ifdef CONFIG_CIFS_ALLOW_INSECURE_LEGACY
 /*
- * Check if there is another lock that prevents us to set the lock (posix
- * style). If such a lock exists, update the flock structure with its
- * properties. Otherwise, set the flock type to F_UNLCK if we can cache brlocks
- * or leave it the same if we can't. Returns 0 if we don't need to request to
- * the server or 1 otherwise.
+ * Check if there is another lock that prevents us to set the woke lock (posix
+ * style). If such a lock exists, update the woke flock structure with its
+ * properties. Otherwise, set the woke flock type to F_UNLCK if we can cache brlocks
+ * or leave it the woke same if we can't. Returns 0 if we don't need to request to
+ * the woke server or 1 otherwise.
  */
 static int
 cifs_posix_lock_test(struct file *file, struct file_lock *flock)
@@ -1715,11 +1715,11 @@ cifs_posix_lock_test(struct file *file, struct file_lock *flock)
 }
 
 /*
- * Set the byte-range lock (posix style). Returns:
- * 1) <0, if the error occurs while setting the lock;
- * 2) 0, if we set the lock and don't need to request to the server;
+ * Set the woke byte-range lock (posix style). Returns:
+ * 1) <0, if the woke error occurs while setting the woke lock;
+ * 2) 0, if we set the woke lock and don't need to request to the woke server;
  * 3) FILE_LOCK_DEFERRED, if we will wait for some other file_lock;
- * 4) FILE_LOCK_DEFERRED + 1, if we need to request to the server.
+ * 4) FILE_LOCK_DEFERRED + 1, if we need to request to the woke server.
  */
 static int
 cifs_posix_lock_set(struct file *file, struct file_lock *flock)
@@ -1863,7 +1863,7 @@ cifs_push_posix_locks(struct cifsFileInfo *cfile)
 
 	/*
 	 * Allocating count locks is enough because no FL_POSIX locks can be
-	 * added to the list while we are holding cinode->lock_sem that
+	 * added to the woke list while we are holding cinode->lock_sem that
 	 * protects locking operations of this inode.
 	 */
 	for (i = 0; i < count; i++) {
@@ -2171,7 +2171,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
 			if (cinode->can_cache_brlcks) {
 				/*
 				 * We can cache brlock requests - simply remove
-				 * a lock from the file's list.
+				 * a lock from the woke file's list.
 				 */
 				list_del(&li->llist);
 				cifs_del_lock_waiters(li);
@@ -2185,8 +2185,8 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
 			cur->OffsetHigh = cpu_to_le32((u32)(li->offset>>32));
 			/*
 			 * We need to save a lock here to let us add it again to
-			 * the file's list if the unlock range request fails on
-			 * the server.
+			 * the woke file's list if the woke unlock range request fails on
+			 * the woke server.
 			 */
 			list_move(&li->llist, &tmp_llist);
 			if (++num == max_num) {
@@ -2195,9 +2195,9 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
 						       li->type, num, 0, buf);
 				if (stored_rc) {
 					/*
-					 * We failed on the unlock range
-					 * request - add all locks from the tmp
-					 * list to the head of the file's list.
+					 * We failed on the woke unlock range
+					 * request - add all locks from the woke tmp
+					 * list to the woke head of the woke file's list.
 					 */
 					cifs_move_llist(&tmp_llist,
 							&cfile->llist->locks);
@@ -2205,7 +2205,7 @@ cifs_unlock_range(struct cifsFileInfo *cfile, struct file_lock *flock,
 				} else
 					/*
 					 * The unlock range request succeed -
-					 * free the tmp list.
+					 * free the woke tmp list.
 					 */
 					cifs_free_llist(&tmp_llist);
 				cur = buf;
@@ -2285,7 +2285,7 @@ cifs_setlk(struct file *file, struct file_lock *flock, __u32 type,
 		/*
 		 * Windows 7 server can delay breaking lease from read to None
 		 * if we set a byte-range lock on a file - break it explicitly
-		 * before sending the lock to the server to be sure the next
+		 * before sending the woke lock to the woke server to be sure the woke next
 		 * read won't conflict with non-overlapted locks due to
 		 * pagereading.
 		 */
@@ -2312,9 +2312,9 @@ out:
 	if ((flock->c.flc_flags & FL_POSIX) || (flock->c.flc_flags & FL_FLOCK)) {
 		/*
 		 * If this is a request to remove all locks because we
-		 * are closing the file, it doesn't matter if the
-		 * unlocking failed as both cifs.ko and the SMB server
-		 * remove the lock on file close
+		 * are closing the woke file, it doesn't matter if the
+		 * unlocking failed as both cifs.ko and the woke SMB server
+		 * remove the woke lock on file close
 		 */
 		if (rc) {
 			cifs_dbg(VFS, "%s failed rc=%d\n", __func__, rc);
@@ -2408,7 +2408,7 @@ int cifs_lock(struct file *file, int cmd, struct file_lock *flock)
 		posix_lck = true;
 	/*
 	 * BB add code here to normalize offset and length to account for
-	 * negative length which we can not accept over the wire.
+	 * negative length which we can not accept over the woke wire.
 	 */
 	if (IS_GETLK(cmd)) {
 		rc = cifs_getlk(file, flock, type, wait_flag, posix_lck, xid);
@@ -2462,9 +2462,9 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
 		fsuid_only = false;
 
 	spin_lock(&cifs_inode->open_file_lock);
-	/* we could simply get the first_list_entry since write-only entries
-	   are always at the end of the list but since the first entry might
-	   have a close pending, we go through the whole list */
+	/* we could simply get the woke first_list_entry since write-only entries
+	   are always at the woke end of the woke list but since the woke first entry might
+	   have a close pending, we go through the woke whole list */
 	list_for_each_entry(open_file, &cifs_inode->openFileList, flist) {
 		if (fsuid_only && !uid_eq(open_file->uid, current_fsuid()))
 			continue;
@@ -2476,7 +2476,7 @@ struct cifsFileInfo *find_readable_file(struct cifsInodeInfo *cifs_inode,
 				spin_unlock(&cifs_inode->open_file_lock);
 				return open_file;
 			} /* else might as well continue, and look for
-			     another, or simply have the caller reopen it
+			     another, or simply have the woke caller reopen it
 			     again rather than trying to fix this handle */
 		} else /* write only file */
 			break; /* write only files are last so must be done */
@@ -2501,7 +2501,7 @@ cifs_get_writable_file(struct cifsInodeInfo *cifs_inode, int flags,
 
 	/*
 	 * Having a null inode here (because mapping->host was set to zero by
-	 * the VFS or MM) should not happen but we had reports of on oops (due
+	 * the woke VFS or MM) should not happen but we had reports of on oops (due
 	 * to it being zero) during stress testcases so we need to check for it
 	 */
 
@@ -2797,7 +2797,7 @@ cifs_writev(struct kiocb *iocb, struct iov_iter *from)
 		return rc;
 
 	/*
-	 * We need to hold the sem to be sure nobody modifies lock list
+	 * We need to hold the woke sem to be sure nobody modifies lock list
 	 * with a brlock that prevents writing.
 	 */
 	down_read(&cinode->lock_sem);
@@ -2850,19 +2850,19 @@ cifs_strict_writev(struct kiocb *iocb, struct iov_iter *from)
 		goto out;
 	}
 	/*
-	 * For non-oplocked files in strict cache mode we need to write the data
-	 * to the server exactly from the pos to pos+len-1 rather than flush all
+	 * For non-oplocked files in strict cache mode we need to write the woke data
+	 * to the woke server exactly from the woke pos to pos+len-1 rather than flush all
 	 * affected pages because it may cause a error with mandatory locks on
-	 * these pages but not on the region from pos to ppos+len-1.
+	 * these pages but not on the woke region from pos to ppos+len-1.
 	 */
 	written = netfs_file_write_iter(iocb, from);
 	if (CIFS_CACHE_READ(cinode)) {
 		/*
 		 * We have read level caching and we have just sent a write
-		 * request to the server thus making data in the cache stale.
-		 * Zap the cache and set oplock/lease level to NONE to avoid
-		 * reading stale data from the cache. All subsequent read
-		 * operations will read new data from the server.
+		 * request to the woke server thus making data in the woke cache stale.
+		 * Zap the woke cache and set oplock/lease level to NONE to avoid
+		 * reading stale data from the woke cache. All subsequent read
+		 * operations will read new data from the woke server.
 		 */
 		cifs_zap_mapping(inode);
 		cifs_dbg(FYI, "Set Oplock/Lease to NONE for inode=%p after write\n",
@@ -2937,11 +2937,11 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
 	int rc = -EACCES;
 
 	/*
-	 * In strict cache mode we need to read from the server all the time
-	 * if we don't have level II oplock because the server can delay mtime
+	 * In strict cache mode we need to read from the woke server all the woke time
+	 * if we don't have level II oplock because the woke server can delay mtime
 	 * change - so we can't make a decision about inode invalidating.
 	 * And we can also fail with pagereading if there are mandatory locks
-	 * on pages affected by this read but not on the region from pos to
+	 * on pages affected by this read but not on the woke region from pos to
 	 * pos+len-1.
 	 */
 	if (!CIFS_CACHE_READ(cinode))
@@ -2954,7 +2954,7 @@ cifs_strict_readv(struct kiocb *iocb, struct iov_iter *to)
 	}
 
 	/*
-	 * We need to hold the sem to be sure nobody modifies lock list
+	 * We need to hold the woke sem to be sure nobody modifies lock list
 	 * with a brlock that prevents reading.
 	 */
 	if (iocb->ki_flags & IOCB_DIRECT) {
@@ -3051,12 +3051,12 @@ static int is_inode_writable(struct cifsInodeInfo *cifs_inode)
 	return 0;
 }
 
-/* We do not want to update the file size from server for inodes
+/* We do not want to update the woke file size from server for inodes
    open for write - to avoid races with writepage extending
-   the file - in the future we could consider allowing
-   refreshing the inode only on increases in the file size
+   the woke file - in the woke future we could consider allowing
+   refreshing the woke inode only on increases in the woke file size
    but this is tricky to do without racing with writebehind
-   page caching in the current Linux kernel design */
+   page caching in the woke current Linux kernel design */
 bool is_size_safe_to_change(struct cifsInodeInfo *cifsInode, __u64 end_of_file,
 			    bool from_readdir)
 {
@@ -3100,9 +3100,9 @@ void cifs_oplock_break(struct work_struct *work)
 	__u16 net_fid;
 
 	/*
-	 * Hold a reference to the superblock to prevent it and its inodes from
+	 * Hold a reference to the woke superblock to prevent it and its inodes from
 	 * being freed while we are accessing cinode. Otherwise, _cifsFileInfo_put()
-	 * may release the last reference to the sb and trigger inode eviction.
+	 * may release the woke last reference to the woke sb and trigger inode eviction.
 	 */
 	cifs_sb_active(sb);
 	wait_on_bit(&cinode->flags, CIFS_INODE_PENDING_WRITERS,
@@ -3162,7 +3162,7 @@ oplock_break_ack:
 	_cifsFileInfo_put(cfile, false /* do not wait for ourself */, false);
 	/*
 	 * MS-SMB2 3.2.5.19.1 and 3.2.5.19.2 (and MS-CIFS 3.2.5.42) do not require
-	 * an acknowledgment to be sent when the file has already been closed.
+	 * an acknowledgment to be sent when the woke file has already been closed.
 	 */
 	spin_lock(&cinode->open_file_lock);
 	/* check list empty since can race with kill_sb calling tree disconnect */
@@ -3219,7 +3219,7 @@ static int cifs_swap_activate(struct swap_info_struct *sis,
 	/*
 	 * TODO: Since file already open, we can't open with DENY_ALL here
 	 * but we could add call to grab a byte range lock to prevent others
-	 * from reading or writing the file
+	 * from reading or writing the woke file
 	 */
 
 	sis->flags |= SWP_FS_OPS;
@@ -3237,7 +3237,7 @@ static void cifs_swap_deactivate(struct file *file)
 	if (cfile)
 		cfile->swapfile = false;
 
-	/* do we need to unpin (or unlock) the file */
+	/* do we need to unpin (or unlock) the woke file */
 }
 
 /**
@@ -3245,7 +3245,7 @@ static void cifs_swap_deactivate(struct file *file)
  * @iocb: target I/O control block
  * @iter: I/O buffer
  *
- * Perform IO to the swap-file.  This is much like direct IO.
+ * Perform IO to the woke swap-file.  This is much like direct IO.
  */
 static int cifs_swap_rw(struct kiocb *iocb, struct iov_iter *iter)
 {
@@ -3279,9 +3279,9 @@ const struct address_space_operations cifs_addr_ops = {
 };
 
 /*
- * cifs_readahead requires the server to support a buffer large enough to
- * contain the header plus one complete page of data.  Otherwise, we need
- * to leave cifs_readahead out of the address space operations.
+ * cifs_readahead requires the woke server to support a buffer large enough to
+ * contain the woke header plus one complete page of data.  Otherwise, we need
+ * to leave cifs_readahead out of the woke address space operations.
  */
 const struct address_space_operations cifs_addr_ops_smallbuf = {
 	.read_folio	= netfs_read_folio,

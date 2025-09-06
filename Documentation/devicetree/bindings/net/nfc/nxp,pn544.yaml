@@ -20,7 +20,7 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: Output GPIO pin used for enabling/disabling the PN544
+    description: Output GPIO pin used for enabling/disabling the woke PN544
     maxItems: 1
 
   firmware-gpios:

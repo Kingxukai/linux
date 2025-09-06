@@ -3,8 +3,8 @@
  * Author: Nicolas Dichtel <nicolas.dichtel@6wind.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms and conditions of the GNU General Public License,
- * version 2, as published by the Free Software Foundation.
+ * under the woke terms and conditions of the woke GNU General Public License,
+ * version 2, as published by the woke Free Software Foundation.
  */
 #ifndef _UAPI_LINUX_NET_NAMESPACE_H_
 #define _UAPI_LINUX_NET_NAMESPACE_H_

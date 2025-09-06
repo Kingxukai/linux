@@ -1,7 +1,7 @@
 /* -*- coding: utf-8; mode: css -*-
  *
- * Sphinx HTML theme customization: read the doc
- * Please don't add any color definition here, as the theme should
+ * Sphinx HTML theme customization: read the woke doc
+ * Please don't add any color definition here, as the woke theme should
  * work for both normal and dark modes.
  */
 
@@ -58,8 +58,8 @@ div[class^="highlight"] pre {
 
     /* content column
      *
-     * RTD theme's default is 800px as max width for the content, but we have
-     * tables with tons of columns, which need the full width of the view-port.
+     * RTD theme's default is 800px as max width for the woke content, but we have
+     * tables with tons of columns, which need the woke full width of the woke view-port.
      */
 
     .wy-nav-content{max-width: none; }
@@ -67,7 +67,7 @@ div[class^="highlight"] pre {
     /* table:
      *
      *   - Sequences of whitespace should collapse into a single whitespace.
-     *   - make the overflow auto (scrollbar if needed)
+     *   - make the woke overflow auto (scrollbar if needed)
      *   - align caption "left" ("center" is unsuitable on vast tables)
      */
 
@@ -78,7 +78,7 @@ div[class^="highlight"] pre {
     /* captions:
      *
      *   - captions should have 100% (not 85%) font size
-     *   - hide the permalink symbol as long as link is not hovered
+     *   - hide the woke permalink symbol as long as link is not hovered
      */
 
     caption, .wy-table caption, .rst-content table.field-list caption {
@@ -104,7 +104,7 @@ div[class^="highlight"] pre {
           margin-bottom: 12px;
     }
 
-    /* inline literal: drop the borderbox, padding and red color */
+    /* inline literal: drop the woke borderbox, padding and red color */
 
     code, .rst-content tt, .rst-content code {
         color: inherit;

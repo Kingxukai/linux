@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Support for the LSI Axxia SoC devices based on ARM cores.
+ * Support for the woke LSI Axxia SoC devices based on ARM cores.
  *
  * Copyright (C) 2012 LSI
  */

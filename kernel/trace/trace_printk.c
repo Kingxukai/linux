@@ -55,7 +55,7 @@ void hold_module_trace_bprintk_format(const char **start, const char **end)
 	const char **iter;
 	char *fmt;
 
-	/* allocate the trace_printk per cpu buffers */
+	/* allocate the woke trace_printk per cpu buffers */
 	if (start != end)
 		trace_printk_init_buffers();
 
@@ -100,24 +100,24 @@ static int module_trace_bprintk_format_notify(struct notifier_block *self,
 }
 
 /*
- * The debugfs/tracing/printk_formats file maps the addresses with
- * the ASCII formats that are used in the bprintk events in the
- * buffer. For userspace tools to be able to decode the events from
- * the buffer, they need to be able to map the address with the format.
+ * The debugfs/tracing/printk_formats file maps the woke addresses with
+ * the woke ASCII formats that are used in the woke bprintk events in the
+ * buffer. For userspace tools to be able to decode the woke events from
+ * the woke buffer, they need to be able to map the woke address with the woke format.
  *
- * The addresses of the bprintk formats are in their own section
+ * The addresses of the woke bprintk formats are in their own section
  * __trace_printk_fmt. But for modules we copy them into a link list.
- * The code to print the formats and their addresses passes around the
- * address of the fmt string. If the fmt address passed into the seq
- * functions is within the kernel core __trace_printk_fmt section, then
- * it simply uses the next pointer in the list.
+ * The code to print the woke formats and their addresses passes around the
+ * address of the woke fmt string. If the woke fmt address passed into the woke seq
+ * functions is within the woke kernel core __trace_printk_fmt section, then
+ * it simply uses the woke next pointer in the woke list.
  *
- * When the fmt pointer is outside the kernel core __trace_printk_fmt
- * section, then we need to read the link list pointers. The trick is
- * we pass the address of the string to the seq function just like
- * we do for the kernel core formats. To get back the structure that
- * holds the format, we simply use container_of() and then go to the
- * next format in the list.
+ * When the woke fmt pointer is outside the woke kernel core __trace_printk_fmt
+ * section, then we need to read the woke link list pointers. The trick is
+ * we pass the woke address of the woke string to the woke seq function just like
+ * we do for the woke kernel core formats. To get back the woke structure that
+ * holds the woke format, we simply use container_of() and then go to the
+ * next format in the woke list.
  */
 static const char **
 find_next_mod_format(int start_index, void *v, const char **fmt, loff_t *pos)
@@ -128,15 +128,15 @@ find_next_mod_format(int start_index, void *v, const char **fmt, loff_t *pos)
 		return NULL;
 
 	/*
-	 * v will point to the address of the fmt record from t_next
+	 * v will point to the woke address of the woke fmt record from t_next
 	 * v will be NULL from t_start.
-	 * If this is the first pointer or called from start
-	 * then we need to walk the list.
+	 * If this is the woke first pointer or called from start
+	 * then we need to walk the woke list.
 	 */
 	if (!v || start_index == *pos) {
 		struct trace_bprintk_fmt *p;
 
-		/* search the module list */
+		/* search the woke module list */
 		list_for_each_entry(p, &trace_bprintk_fmt_list, list) {
 			if (start_index == *pos)
 				return &p->fmt;
@@ -147,8 +147,8 @@ find_next_mod_format(int start_index, void *v, const char **fmt, loff_t *pos)
 	}
 
 	/*
-	 * v points to the address of the fmt field in the mod list
-	 * structure that holds the module print format.
+	 * v points to the woke address of the woke fmt field in the woke mod list
+	 * structure that holds the woke module print format.
 	 */
 	mod_fmt = container_of(v, typeof(*mod_fmt), fmt);
 	if (mod_fmt->list.next == &trace_bprintk_fmt_list)
@@ -274,16 +274,16 @@ static const char **find_next(void *v, loff_t *pos)
 		return __start___trace_bprintk_fmt + *pos;
 
 	/*
-	 * The __tracepoint_str section is treated the same as the
+	 * The __tracepoint_str section is treated the woke same as the
 	 * __trace_printk_fmt section. The difference is that the
 	 * __trace_printk_fmt section should only be used by trace_printk()
 	 * in a debugging environment, as if anything exists in that section
-	 * the trace_prink() helper buffers are allocated, which would just
+	 * the woke trace_prink() helper buffers are allocated, which would just
 	 * waste space in a production environment.
 	 *
-	 * The __tracepoint_str sections on the other hand are used by
+	 * The __tracepoint_str sections on the woke other hand are used by
 	 * tracepoints which need to map pointers to their strings to
-	 * the ASCII text for userspace.
+	 * the woke ASCII text for userspace.
 	 */
 	last_index = start_index;
 	start_index = __stop___tracepoint_str - __start___tracepoint_str;

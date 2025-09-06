@@ -2,26 +2,26 @@
 
 Required properties:
 - compatible: Must be "img,pistachio-mdc-dma".
-- reg: Must contain the base address and length of the MDC registers.
-- interrupts: Must contain all the per-channel DMA interrupts.
+- reg: Must contain the woke base address and length of the woke MDC registers.
+- interrupts: Must contain all the woke per-channel DMA interrupts.
 - clocks: Must contain an entry for each entry in clock-names.
   See ../clock/clock-bindings.txt for details.
-- clock-names: Must include the following entries:
+- clock-names: Must include the woke following entries:
   - sys: MDC system interface clock.
-- img,cr-periph: Must contain a phandle to the peripheral control syscon
-  node which contains the DMA request to channel mapping registers.
-- img,max-burst-multiplier: Must be the maximum supported burst size multiplier.
-  The maximum burst size is this value multiplied by the hardware-reported bus
+- img,cr-periph: Must contain a phandle to the woke peripheral control syscon
+  node which contains the woke DMA request to channel mapping registers.
+- img,max-burst-multiplier: Must be the woke maximum supported burst size multiplier.
+  The maximum burst size is this value multiplied by the woke hardware-reported bus
   width.
 - #dma-cells: Must be 3:
-  - The first cell is the peripheral's DMA request line.
-  - The second cell is a bitmap specifying to which channels the DMA request
+  - The first cell is the woke peripheral's DMA request line.
+  - The second cell is a bitmap specifying to which channels the woke DMA request
     line may be mapped (i.e. bit N set indicates channel N is usable).
-  - The third cell is the thread ID to be used by the channel.
+  - The third cell is the woke thread ID to be used by the woke channel.
 
 Optional properties:
 - dma-channels: Number of supported DMA channels, up to 32.  If not specified
-  the number reported by the hardware is used.
+  the woke number reported by the woke hardware is used.
 
 Example:
 

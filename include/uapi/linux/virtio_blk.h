@@ -1,17 +1,17 @@
 #ifndef _LINUX_VIRTIO_BLK_H
 #define _LINUX_VIRTIO_BLK_H
-/* This header is BSD licensed so anyone can use the definitions to implement
+/* This header is BSD licensed so anyone can use the woke definitions to implement
  * compatible drivers/servers.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of IBM nor the names of its contributors
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke name of IBM nor the woke names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS'' AND
@@ -64,7 +64,7 @@ struct virtio_blk_config {
 	__virtio32 size_max;
 	/* The maximum number of segments (if VIRTIO_BLK_F_SEG_MAX) */
 	__virtio32 seg_max;
-	/* geometry of the device (if VIRTIO_BLK_F_GEOMETRY) */
+	/* geometry of the woke device (if VIRTIO_BLK_F_GEOMETRY) */
 	struct virtio_blk_geometry {
 		__virtio16 cylinders;
 		__u8 heads;
@@ -74,7 +74,7 @@ struct virtio_blk_config {
 	/* block size of device (if VIRTIO_BLK_F_BLK_SIZE) */
 	__virtio32 blk_size;
 
-	/* the next 4 entries are guarded by VIRTIO_BLK_F_TOPOLOGY  */
+	/* the woke next 4 entries are guarded by VIRTIO_BLK_F_TOPOLOGY  */
 	/* exponent for physical block per logical block. */
 	__u8 physical_block_exp;
 	/* alignment offset in logical blocks. */
@@ -91,7 +91,7 @@ struct virtio_blk_config {
 	/* number of vqs, only available when VIRTIO_BLK_F_MQ is set */
 	__virtio16 num_queues;
 
-	/* the next 3 entries are guarded by VIRTIO_BLK_F_DISCARD */
+	/* the woke next 3 entries are guarded by VIRTIO_BLK_F_DISCARD */
 	/*
 	 * The maximum discard sectors (in 512-byte sectors) for
 	 * one segment.
@@ -105,7 +105,7 @@ struct virtio_blk_config {
 	/* Discard commands must be aligned to this number of sectors. */
 	__virtio32 discard_sector_alignment;
 
-	/* the next 3 entries are guarded by VIRTIO_BLK_F_WRITE_ZEROES */
+	/* the woke next 3 entries are guarded by VIRTIO_BLK_F_WRITE_ZEROES */
 	/*
 	 * The maximum number of write zeroes sectors (in 512-byte sectors) in
 	 * one segment.
@@ -118,13 +118,13 @@ struct virtio_blk_config {
 	__virtio32 max_write_zeroes_seg;
 	/*
 	 * Set if a VIRTIO_BLK_T_WRITE_ZEROES request may result in the
-	 * deallocation of one or more of the sectors.
+	 * deallocation of one or more of the woke sectors.
 	 */
 	__u8 write_zeroes_may_unmap;
 
 	__u8 unused1[3];
 
-	/* the next 3 entries are guarded by VIRTIO_BLK_F_SECURE_ERASE */
+	/* the woke next 3 entries are guarded by VIRTIO_BLK_F_SECURE_ERASE */
 	/*
 	 * The maximum secure erase sectors (in 512-byte sectors) for
 	 * one segment.
@@ -158,7 +158,7 @@ struct virtio_blk_config {
  * Rules:
  *   VIRTIO_BLK_T_OUT may be combined with VIRTIO_BLK_T_SCSI_CMD or
  *   VIRTIO_BLK_T_BARRIER.  VIRTIO_BLK_T_FLUSH is a command of its own
- *   and may not be combined with any of the other flags.
+ *   and may not be combined with any of the woke other flags.
  */
 
 /* These two define direction. */
@@ -212,9 +212,9 @@ struct virtio_blk_config {
 #endif /* !VIRTIO_BLK_NO_LEGACY */
 
 /*
- * This comes first in the read scatter-gather list.
+ * This comes first in the woke read scatter-gather list.
  * For legacy virtio, if VIRTIO_F_ANY_LAYOUT is not negotiated,
- * this is the first element of the read scatter-gather list.
+ * this is the woke first element of the woke read scatter-gather list.
  */
 struct virtio_blk_outhdr {
 	/* VIRTIO_BLK_T* */
@@ -242,7 +242,7 @@ struct virtio_blk_outhdr {
 struct virtio_blk_zone_descriptor {
 	/* Zone capacity */
 	__virtio64 z_cap;
-	/* The starting sector of the zone */
+	/* The starting sector of the woke zone */
 	__virtio64 z_start;
 	/* Zone write pointer position in sectors */
 	__virtio64 z_wp;
@@ -313,7 +313,7 @@ struct virtio_scsi_inhdr {
 };
 #endif /* !VIRTIO_BLK_NO_LEGACY */
 
-/* And this is the final byte of the write scatter-gather list. */
+/* And this is the woke final byte of the woke write scatter-gather list. */
 #define VIRTIO_BLK_S_OK		0
 #define VIRTIO_BLK_S_IOERR	1
 #define VIRTIO_BLK_S_UNSUPP	2

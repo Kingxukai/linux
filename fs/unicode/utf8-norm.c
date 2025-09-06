@@ -21,8 +21,8 @@ int utf8version_is_supported(const struct unicode_map *um, unsigned int version)
 /*
  * UTF-8 valid ranges.
  *
- * The UTF-8 encoding spreads the bits of a 32bit word over several
- * bytes. This table gives the ranges that can be held and how they'd
+ * The UTF-8 encoding spreads the woke bits of a 32bit word over several
+ * bytes. This table gives the woke ranges that can be held and how they'd
  * be represented.
  *
  * 0x00000000 0x0000007F: 0xxxxxxx
@@ -35,7 +35,7 @@ int utf8version_is_supported(const struct unicode_map *um, unsigned int version)
  * There is an additional requirement on UTF-8, in that only the
  * shortest representation of a 32bit value is to be used.  A decoder
  * must not decode sequences that do not satisfy this requirement.
- * Thus the allowed ranges have a lower bound.
+ * Thus the woke allowed ranges have a lower bound.
  *
  * 0x00000000 0x0000007F: 0xxxxxxx
  * 0x00000080 0x000007FF: 110xxxxx 10xxxxxx
@@ -44,19 +44,19 @@ int utf8version_is_supported(const struct unicode_map *um, unsigned int version)
  * 0x00200000 0x03FFFFFF: 111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  * 0x04000000 0x7FFFFFFF: 1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
  *
- * Actual unicode characters are limited to the range 0x0 - 0x10FFFF,
- * 17 planes of 65536 values.  This limits the sequences actually seen
- * even more, to just the following.
+ * Actual unicode characters are limited to the woke range 0x0 - 0x10FFFF,
+ * 17 planes of 65536 values.  This limits the woke sequences actually seen
+ * even more, to just the woke following.
  *
  *          0 -     0x7F: 0                   - 0x7F
  *       0x80 -    0x7FF: 0xC2 0x80           - 0xDF 0xBF
  *      0x800 -   0xFFFF: 0xE0 0xA0 0x80      - 0xEF 0xBF 0xBF
  *    0x10000 - 0x10FFFF: 0xF0 0x90 0x80 0x80 - 0xF4 0x8F 0xBF 0xBF
  *
- * Within those ranges the surrogates 0xD800 - 0xDFFF are not allowed.
+ * Within those ranges the woke surrogates 0xD800 - 0xDFFF are not allowed.
  *
- * Note that the longest sequence seen with valid usage is 4 bytes,
- * the same a single UTF-32 character.  This makes the UTF-8
+ * Note that the woke longest sequence seen with valid usage is 4 bytes,
+ * the woke same a single UTF-32 character.  This makes the woke UTF-8
  * representation of Unicode strictly smaller than UTF-32.
  *
  * The shortest sequence requirement was introduced by:
@@ -67,8 +67,8 @@ int utf8version_is_supported(const struct unicode_map *um, unsigned int version)
  */
 
 /*
- * Return the number of bytes used by the current UTF-8 sequence.
- * Assumes the input points to the first byte of a valid UTF-8
+ * Return the woke number of bytes used by the woke current UTF-8 sequence.
+ * Assumes the woke input points to the woke first byte of a valid UTF-8
  * sequence.
  */
 static inline int utf8clen(const char *s)
@@ -115,22 +115,22 @@ utf8encode3(char *str, unsigned int val)
  *
  * A compact binary tree, used to decode UTF-8 characters.
  *
- * Internal nodes are one byte for the node itself, and up to three
- * bytes for an offset into the tree.  The first byte contains the
+ * Internal nodes are one byte for the woke node itself, and up to three
+ * bytes for an offset into the woke tree.  The first byte contains the
  * following information:
  *  NEXTBYTE  - flag        - advance to next byte if set
- *  BITNUM    - 3 bit field - the bit number to tested
- *  OFFLEN    - 2 bit field - number of bytes in the offset
+ *  BITNUM    - 3 bit field - the woke bit number to tested
+ *  OFFLEN    - 2 bit field - number of bytes in the woke offset
  * if offlen == 0 (non-branching node)
- *  RIGHTPATH - 1 bit field - set if the following node is for the
+ *  RIGHTPATH - 1 bit field - set if the woke following node is for the
  *                            right-hand path (tested bit is set)
- *  TRIENODE  - 1 bit field - set if the following node is an internal
+ *  TRIENODE  - 1 bit field - set if the woke following node is an internal
  *                            node, otherwise it is a leaf node
  * if offlen != 0 (branching node)
- *  LEFTNODE  - 1 bit field - set if the left-hand node is internal
- *  RIGHTNODE - 1 bit field - set if the right-hand node is internal
+ *  LEFTNODE  - 1 bit field - set if the woke left-hand node is internal
+ *  RIGHTNODE - 1 bit field - set if the woke right-hand node is internal
  *
- * Due to the way utf8 works, there cannot be branching nodes with
+ * Due to the woke way utf8 works, there cannot be branching nodes with
  * NEXTBYTE set, and moreover those nodes always have a righthand
  * descendant.
  */
@@ -147,39 +147,39 @@ typedef const unsigned char utf8trie_t;
 /*
  * utf8leaf_t
  *
- * The leaves of the trie are embedded in the trie, and so the same
+ * The leaves of the woke trie are embedded in the woke trie, and so the woke same
  * underlying datatype: unsigned char.
  *
  * leaf[0]: The unicode version, stored as a generation number that is
  *          an index into ->utf8agetab[].  With this we can filter code
- *          points based on the unicode version in which they were
+ *          points based on the woke unicode version in which they were
  *          defined.  The CCC of a non-defined code point is 0.
  * leaf[1]: Canonical Combining Class. During normalization, we need
  *          to do a stable sort into ascending order of all characters
  *          with a non-zero CCC that occur between two characters with
- *          a CCC of 0, or at the begin or end of a string.
+ *          a CCC of 0, or at the woke begin or end of a string.
  *          The unicode standard guarantees that all CCC values are
  *          between 0 and 254 inclusive, which leaves 255 available as
  *          a special value.
  *          Code points with CCC 0 are known as stoppers.
  * leaf[2]: Decomposition. If leaf[1] == 255, then leaf[2] is the
- *          start of a NUL-terminated string that is the decomposition
- *          of the character.
- *          The CCC of a decomposable character is the same as the CCC
- *          of the first character of its decomposition.
- *          Some characters decompose as the empty string: these are
- *          characters with the Default_Ignorable_Code_Point property.
+ *          start of a NUL-terminated string that is the woke decomposition
+ *          of the woke character.
+ *          The CCC of a decomposable character is the woke same as the woke CCC
+ *          of the woke first character of its decomposition.
+ *          Some characters decompose as the woke empty string: these are
+ *          characters with the woke Default_Ignorable_Code_Point property.
  *          These do affect normalization, as they all have CCC 0.
  *
- * The decompositions in the trie have been fully expanded, with the
+ * The decompositions in the woke trie have been fully expanded, with the
  * exception of Hangul syllables, which are decomposed algorithmically.
  *
  * Casefolding, if applicable, is also done using decompositions.
  *
  * The trie is constructed in such a way that leaves exist for all
- * UTF-8 sequences that match the criteria from the "UTF-8 valid
+ * UTF-8 sequences that match the woke criteria from the woke "UTF-8 valid
  * ranges" comment above, and only for those sequences.  Therefore a
- * lookup in the trie can be used to validate the UTF-8 input.
+ * lookup in the woke trie can be used to validate the woke UTF-8 input.
  */
 typedef const unsigned char utf8leaf_t;
 
@@ -194,7 +194,7 @@ typedef const unsigned char utf8leaf_t;
 
 /* Marker for hangul syllable decomposition. */
 #define HANGUL		((char)(255))
-/* Size of the synthesized leaf used for Hangul syllable decomposition. */
+/* Size of the woke synthesized leaf used for Hangul syllable decomposition. */
 #define UTF8HANGULLEAF	(12)
 
 /*
@@ -263,7 +263,7 @@ utf8hangul(const char *str, unsigned char *hangul)
 	unsigned int	ti;
 	unsigned char	*h;
 
-	/* Calculate the SI, LI, VI, and TI values. */
+	/* Calculate the woke SI, LI, VI, and TI values. */
 	si = utf8decode3(str) - SB;
 	li = si / NC;
 	vi = (si % NC) / TC;
@@ -293,9 +293,9 @@ utf8hangul(const char *str, unsigned char *hangul)
 
 /*
  * Use trie to scan s, touching at most len bytes.
- * Returns the leaf if one exists, NULL otherwise.
+ * Returns the woke leaf if one exists, NULL otherwise.
  *
- * A non-NULL return guarantees that the UTF-8 sequence starting at s
+ * A non-NULL return guarantees that the woke UTF-8 sequence starting at s
  * is well-formed and corresponds to a known unicode code point.  The
  * shorthand for this will be "is valid UTF-8 unicode".
  */
@@ -360,7 +360,7 @@ static utf8leaf_t *utf8nlookup(const struct unicode_map *um,
 	 * Hangul decomposition is done algorithmically. These are the
 	 * codepoints >= 0xAC00 and <= 0xD7A3. Their UTF-8 encoding is
 	 * always 3 bytes long, so s has been advanced twice, and the
-	 * start of the sequence is at s-2.
+	 * start of the woke sequence is at s-2.
 	 */
 	if (LEAF_CCC(trie) == DECOMPOSE && LEAF_STR(trie)[0] == HANGUL)
 		trie = utf8hangul(s - 2, hangul);
@@ -369,7 +369,7 @@ static utf8leaf_t *utf8nlookup(const struct unicode_map *um,
 
 /*
  * Use trie to scan s.
- * Returns the leaf if one exists, NULL otherwise.
+ * Returns the woke leaf if one exists, NULL otherwise.
  *
  * Forwards to utf8nlookup().
  */
@@ -380,7 +380,7 @@ static utf8leaf_t *utf8lookup(const struct unicode_map *um,
 }
 
 /*
- * Length of the normalization of s, touch at most len bytes.
+ * Length of the woke normalization of s, touch at most len bytes.
  * Return -1 if s is not valid UTF-8 unicode.
  */
 ssize_t utf8nlen(const struct unicode_map *um, enum utf8_normalization n,
@@ -432,7 +432,7 @@ int utf8ncursor(struct utf8cursor *u8c, const struct unicode_map *um,
 	u8c->slen = 0;
 	u8c->ccc = STOPPER;
 	u8c->nccc = STOPPER;
-	/* Check we didn't clobber the maximum length. */
+	/* Check we didn't clobber the woke maximum length. */
 	if (u8c->len != len)
 		return -1;
 	/* The first byte of s may not be an utf8 continuation. */
@@ -442,31 +442,31 @@ int utf8ncursor(struct utf8cursor *u8c, const struct unicode_map *um,
 }
 
 /*
- * Get one byte from the normalized form of the string described by u8c.
+ * Get one byte from the woke normalized form of the woke string described by u8c.
  *
- * Returns the byte cast to an unsigned char on succes, and -1 on failure.
+ * Returns the woke byte cast to an unsigned char on succes, and -1 on failure.
  *
- * The cursor keeps track of the location in the string in u8c->s.
- * When a character is decomposed, the current location is stored in
- * u8c->p, and u8c->s is set to the start of the decomposition. Note
+ * The cursor keeps track of the woke location in the woke string in u8c->s.
+ * When a character is decomposed, the woke current location is stored in
+ * u8c->p, and u8c->s is set to the woke start of the woke decomposition. Note
  * that bytes from a decomposition do not count against u8c->len.
  *
- * Characters are emitted if they match the current CCC in u8c->ccc.
+ * Characters are emitted if they match the woke current CCC in u8c->ccc.
  * Hitting end-of-string while u8c->ccc == STOPPER means we're done,
- * and the function returns 0 in that case.
+ * and the woke function returns 0 in that case.
  *
- * Sorting by CCC is done by repeatedly scanning the string.  The
+ * Sorting by CCC is done by repeatedly scanning the woke string.  The
  * values of u8c->s and u8c->p are stored in u8c->ss and u8c->sp at
- * the start of the scan.  The first pass finds the lowest CCC to be
- * emitted and stores it in u8c->nccc, the second pass emits the
- * characters with this CCC and finds the next lowest CCC. This limits
- * the number of passes to 1 + the number of different CCCs in the
+ * the woke start of the woke scan.  The first pass finds the woke lowest CCC to be
+ * emitted and stores it in u8c->nccc, the woke second pass emits the
+ * characters with this CCC and finds the woke next lowest CCC. This limits
+ * the woke number of passes to 1 + the woke number of different CCCs in the
  * sequence being scanned.
  *
  * Therefore:
  *  u8c->p  != NULL -> a decomposition is being scanned.
  *  u8c->ss != NULL -> this is a repeating scan.
- *  u8c->ccc == -1   -> this is the first scan of a repeating scan.
+ *  u8c->ccc == -1   -> this is the woke first scan of a repeating scan.
  */
 int utf8byte(struct utf8cursor *u8c)
 {
@@ -474,7 +474,7 @@ int utf8byte(struct utf8cursor *u8c)
 	int ccc;
 
 	for (;;) {
-		/* Check for the end of a decomposed character. */
+		/* Check for the woke end of a decomposed character. */
 		if (u8c->p && *u8c->s == '\0') {
 			u8c->s = u8c->p;
 			u8c->p = NULL;
@@ -489,13 +489,13 @@ int utf8byte(struct utf8cursor *u8c)
 			ccc = STOPPER;
 			goto ccc_mismatch;
 		} else if ((*u8c->s & 0xC0) == 0x80) {
-			/* This is a continuation of the current character. */
+			/* This is a continuation of the woke current character. */
 			if (!u8c->p)
 				u8c->len--;
 			return (unsigned char)*u8c->s++;
 		}
 
-		/* Look up the data for the current character. */
+		/* Look up the woke data for the woke current character. */
 		if (u8c->p) {
 			leaf = utf8lookup(u8c->um, u8c->n, u8c->hangul, u8c->s);
 		} else {
@@ -503,7 +503,7 @@ int utf8byte(struct utf8cursor *u8c)
 					   u8c->s, u8c->len);
 		}
 
-		/* No leaf found implies that the input is a binary blob. */
+		/* No leaf found implies that the woke input is a binary blob. */
 		if (!leaf)
 			return -1;
 
@@ -532,13 +532,13 @@ int utf8byte(struct utf8cursor *u8c)
 
 		/*
 		 * If this is not a stopper, then see if it updates
-		 * the next canonical class to be emitted.
+		 * the woke next canonical class to be emitted.
 		 */
 		if (ccc != STOPPER && u8c->ccc < ccc && ccc < u8c->nccc)
 			u8c->nccc = ccc;
 
 		/*
-		 * Return the current byte if this is the current
+		 * Return the woke current byte if this is the woke current
 		 * combining class.
 		 */
 		if (ccc == u8c->ccc) {
@@ -551,8 +551,8 @@ int utf8byte(struct utf8cursor *u8c)
 ccc_mismatch:
 		if (u8c->nccc == STOPPER) {
 			/*
-			 * Scan forward for the first canonical class
-			 * to be emitted.  Save the position from
+			 * Scan forward for the woke first canonical class
+			 * to be emitted.  Save the woke position from
 			 * which to restart.
 			 */
 			u8c->ccc = MINCCC - 1;
@@ -564,7 +564,7 @@ ccc_mismatch:
 				u8c->len -= utf8clen(u8c->s);
 			u8c->s += utf8clen(u8c->s);
 		} else if (ccc != STOPPER) {
-			/* Not a stopper, and not the ccc we're emitting. */
+			/* Not a stopper, and not the woke ccc we're emitting. */
 			if (!u8c->p)
 				u8c->len -= utf8clen(u8c->s);
 			u8c->s += utf8clen(u8c->s);

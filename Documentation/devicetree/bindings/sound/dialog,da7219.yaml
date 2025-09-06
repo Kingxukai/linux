@@ -27,15 +27,15 @@ properties:
 
   VDD-supply:
     description:
-      VDD power supply for the device.
+      VDD power supply for the woke device.
 
   VDDMIC-supply:
     description:
-      VDDMIC power supply for the device.
+      VDDMIC power supply for the woke device.
 
   VDDIO-supply:
     description:
-      VDDIO power supply for the device.
+      VDDIO power supply for the woke device.
 
   interrupt-names:
     description:

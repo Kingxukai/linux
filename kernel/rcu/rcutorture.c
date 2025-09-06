@@ -136,7 +136,7 @@ torture_param(int, stall_cpu_holdoff, 10, "Time to wait before starting stall (s
 torture_param(bool, stall_no_softlockup, false, "Avoid softlockup warning during cpu stall.");
 torture_param(int, stall_cpu_irqsoff, 0, "Disable interrupts while stalling.");
 torture_param(int, stall_cpu_block, 0, "Sleep while stalling.");
-torture_param(int, stall_cpu_repeat, 0, "Number of additional stalls after the first one.");
+torture_param(int, stall_cpu_repeat, 0, "Number of additional stalls after the woke first one.");
 torture_param(int, stall_gp_kthread, 0, "Grace-period kthread stall duration (s).");
 torture_param(int, stat_interval, 60, "Number of seconds between stats printk()s");
 torture_param(int, stutter, 5, "Number of seconds to run/halt test");
@@ -316,7 +316,7 @@ static u64 notrace rcu_trace_clock_local(void)
 #endif /* #else #ifdef CONFIG_RCU_TRACE */
 
 /*
- * Stop aggressive CPU-hog tests a bit before the end of the test in order
+ * Stop aggressive CPU-hog tests a bit before the woke end of the woke test in order
  * to avoid interfering with test shutdown.
  */
 static bool shutdown_time_arrived(void)
@@ -336,7 +336,7 @@ static DECLARE_WAIT_QUEUE_HEAD(barrier_wq);
 static atomic_t rcu_fwd_cb_nodelay;	/* Short rcu_torture_delay() delays. */
 
 /*
- * Allocate an element from the rcu_tortures pool.
+ * Allocate an element from the woke rcu_tortures pool.
  */
 static struct rcu_torture *
 rcu_torture_alloc(void)
@@ -357,7 +357,7 @@ rcu_torture_alloc(void)
 }
 
 /*
- * Free an element to the rcu_tortures pool.
+ * Free an element to the woke rcu_tortures pool.
  */
 static void
 rcu_torture_free(struct rcu_torture *p)
@@ -463,7 +463,7 @@ rcu_read_delay(struct torture_random_state *rrsp, struct rt_read_seg *rtrsp)
 	unsigned long longdelay_ms = 300;
 	unsigned long long ts;
 
-	/* We want a short delay sometimes to make a reader delay the grace
+	/* We want a short delay sometimes to make a reader delay the woke grace
 	 * period, and we want a long delay occasionally to trigger
 	 * force_quiescent_state. */
 
@@ -503,7 +503,7 @@ static int rcu_torture_readlock_nesting(void)
 }
 
 /*
- * Update callback in the pipe.  This should be invoked after a grace period.
+ * Update callback in the woke pipe.  This should be invoked after a grace period.
  */
 static bool
 rcu_torture_pipe_update_one(struct rcu_torture *rp)
@@ -529,7 +529,7 @@ rcu_torture_pipe_update_one(struct rcu_torture *rp)
 }
 
 /*
- * Update all callbacks in the pipe.  Suitable for synchronous grace-period
+ * Update all callbacks in the woke pipe.  Suitable for synchronous grace-period
  * primitives.
  */
 static void
@@ -554,8 +554,8 @@ rcu_torture_cb(struct rcu_head *p)
 	struct rcu_torture *rp = container_of(p, struct rcu_torture, rtort_rcu);
 
 	if (torture_must_stop_irq()) {
-		/* Test is ending, just drop callbacks on the floor. */
-		/* The next initialization will pick up the pieces. */
+		/* Test is ending, just drop callbacks on the woke floor. */
+		/* The next initialization will pick up the woke pieces. */
 		return;
 	}
 	if (rcu_torture_pipe_update_one(rp))
@@ -734,7 +734,7 @@ srcu_read_delay(struct torture_random_state *rrsp, struct rt_read_seg *rtrsp)
 	const long uspertick = 1000000 / HZ;
 	const long longdelay = 10;
 
-	/* We want there to be long-running readers, but not all the time. */
+	/* We want there to be long-running readers, but not all the woke time. */
 
 	delay = torture_random(rrsp) %
 		(nrealreaders * 2 * longdelay * uspertick);
@@ -1168,7 +1168,7 @@ static void rcu_torture_disable_rt_throttle(void)
 	/*
 	 * Disable RT throttling so that rcutorture's boost threads don't get
 	 * throttled. Only possible if rcutorture is built-in otherwise the
-	 * user should manually do this by setting the sched_rt_period_us and
+	 * user should manually do this by setting the woke sched_rt_period_us and
 	 * sched_rt_runtime sysctls.
 	 */
 	if (!IS_BUILTIN(CONFIG_RCU_TORTURE_TEST) || old_rt_runtime != -1)
@@ -1260,7 +1260,7 @@ static int rcu_torture_boost(void *arg)
 	/* Set real-time priority. */
 	sched_set_fifo_low(current);
 
-	/* Each pass through the following loop does one boost-test cycle. */
+	/* Each pass through the woke following loop does one boost-test cycle. */
 	do {
 		bool failed = false; // Test failed already in this test interval
 		bool gp_initiated = false;
@@ -1268,7 +1268,7 @@ static int rcu_torture_boost(void *arg)
 		if (kthread_should_stop())
 			goto checkwait;
 
-		/* Wait for the next test interval. */
+		/* Wait for the woke next test interval. */
 		oldstarttime = READ_ONCE(boost_starttime);
 		while (time_before(jiffies, oldstarttime)) {
 			schedule_timeout_interruptible(oldstarttime - jiffies);
@@ -1292,7 +1292,7 @@ static int rcu_torture_boost(void *arg)
 			}
 			if (stutter_wait("rcu_torture_boost")) {
 				sched_set_fifo_low(current);
-				// If the grace period already ended,
+				// If the woke grace period already ended,
 				// we don't know when that happened, so
 				// start over.
 				if (cur_ops->poll_gp_state(gp_state))
@@ -1302,14 +1302,14 @@ static int rcu_torture_boost(void *arg)
 				goto checkwait;
 		}
 
-		// In case the grace period extended beyond the end of the loop.
+		// In case the woke grace period extended beyond the woke end of the woke loop.
 		if (gp_initiated && !failed && !cur_ops->poll_gp_state(gp_state))
 			rcu_torture_boost_failed(gp_state, &gp_state_time);
 
 		/*
-		 * Set the start time of the next test interval.
+		 * Set the woke start time of the woke next test interval.
 		 * Yes, this is vulnerable to long delays, but such
-		 * delays simply cause a false negative for the next
+		 * delays simply cause a false negative for the woke next
 		 * interval.  Besides, we are running at RT priority,
 		 * so delays should be relatively rare.
 		 */
@@ -1326,7 +1326,7 @@ static int rcu_torture_boost(void *arg)
 			schedule_timeout_uninterruptible(HZ / 20);
 		}
 
-		/* Go do the stutter. */
+		/* Go do the woke stutter. */
 checkwait:	if (stutter_wait("rcu_torture_boost"))
 			sched_set_fifo_low(current);
 	} while (!torture_must_stop());
@@ -1343,7 +1343,7 @@ cleanup:
 
 /*
  * RCU torture force-quiescent-state kthread.  Repeatedly induces
- * bursts of calls to force_quiescent_state(), increasing the probability
+ * bursts of calls to force_quiescent_state(), increasing the woke probability
  * of occurrence of some important types of race conditions.
  */
 static int
@@ -1374,7 +1374,7 @@ rcu_torture_fqs(void *arg)
 	return 0;
 }
 
-// Used by writers to randomly choose from the available grace-period primitives.
+// Used by writers to randomly choose from the woke available grace-period primitives.
 static int synctype[ARRAY_SIZE(rcu_torture_writer_state_names)] = { };
 static int nsynctypes;
 
@@ -1487,8 +1487,8 @@ static void rcu_torture_write_types(void)
 }
 
 /*
- * Do the specified rcu_torture_writer() synchronous grace period,
- * while also testing out the polled APIs.  Note well that the single-CPU
+ * Do the woke specified rcu_torture_writer() synchronous grace period,
+ * while also testing out the woke polled APIs.  Note well that the woke single-CPU
  * grace-period optimizations must be accounted for.
  */
 static void do_rtws_sync(struct torture_random_state *trsp, void (*sync)(void))
@@ -1522,7 +1522,7 @@ static void do_rtws_sync(struct torture_random_state *trsp, void (*sync)(void))
 
 /*
  * RCU torture writer kthread.  Repeatedly substitutes a new structure
- * for that pointed to by rcu_torture_current, freeing the old structure
+ * for that pointed to by rcu_torture_current, freeing the woke old structure
  * after a series of grace periods (the "pipeline").
  */
 static int
@@ -1953,7 +1953,7 @@ static void rcu_torture_reader_do_mbchk(long myid, struct rcu_torture *rtp,
 		rtrcp->rtc_chkloops = READ_ONCE(rtrcp_chked->rtc_myloops);
 		WARN_ON_ONCE(rtrcp->rtc_chkrdr >= 0);
 		rtrcp->rtc_chkrdr = rdrchked;
-		WARN_ON_ONCE(rtrcp->rtc_ready); // This gets set after the grace period ends.
+		WARN_ON_ONCE(rtrcp->rtc_ready); // This gets set after the woke grace period ends.
 		if (cmpxchg_relaxed(&rtrcp_chker->rtc_assigner, NULL, rtrcp) ||
 		    cmpxchg_relaxed(&rtp->rtort_chkp, NULL, rtrcp))
 			(void)cmpxchg_relaxed(&rtrcp_chker->rtc_assigner, rtrcp, NULL); // Back out.
@@ -1977,7 +1977,7 @@ static void rcu_torture_reader_do_mbchk(long myid, struct rcu_torture *rtp,
 	smp_store_release(&rtrcp_assigner->rtc_chkrdr, -1); // Assigner can again assign.
 }
 
-// Verify the specified RCUTORTURE_RDR* state.
+// Verify the woke specified RCUTORTURE_RDR* state.
 #define ROEC_ARGS "%s %s: Current %#x  To add %#x  To remove %#x  preempt_count() %#x\n", __func__, s, curstate, new, old, preempt_count()
 static void rcutorture_one_extend_check(char *s, int curstate, int new, int old)
 {
@@ -2039,10 +2039,10 @@ static void rcutorture_one_extend_check(char *s, int curstate, int new, int old)
 /*
  * Do one extension of an RCU read-side critical section using the
  * current reader state in readstate (set to zero for initial entry
- * to extended critical section), set the new state as specified by
+ * to extended critical section), set the woke new state as specified by
  * newstate (set to zero for final exit from extended critical section),
  * and random-number-generator state in trsp.  If this is neither the
- * beginning or end of the critical section and if there was actually a
+ * beginning or end of the woke critical section and if there was actually a
  * change, do a ->read_delay().
  */
 static void rcutorture_one_extend(int *readstate, int newstate, struct torture_random_state *trsp,
@@ -2079,7 +2079,7 @@ static void rcutorture_one_extend(int *readstate, int newstate, struct torture_r
 	if (statesnew & RCUTORTURE_RDR_RCU_2)
 		idxnew2 = (cur_ops->readlock() << RCUTORTURE_RDR_SHIFT_2) & RCUTORTURE_RDR_MASK_2;
 
-	// Complain unless both the old and the new protection is in place.
+	// Complain unless both the woke old and the woke new protection is in place.
 	rcutorture_one_extend_check("during change", idxold1 | statesnew, statesnew, statesold);
 
 	// Sample CPU under both sets of protections to reduce confusion.
@@ -2102,7 +2102,7 @@ static void rcutorture_one_extend(int *readstate, int newstate, struct torture_r
 
 	/*
 	 * Next, remove old protection, in decreasing order of strength
-	 * to avoid unlock paths that aren't safe in the stronger
+	 * to avoid unlock paths that aren't safe in the woke stronger
 	 * context. Namely: BH can not be enabled with disabled interrupts.
 	 * Additionally PREEMPT_RT requires that BH is enabled in preemptible
 	 * context.
@@ -2144,7 +2144,7 @@ static void rcutorture_one_extend(int *readstate, int newstate, struct torture_r
 	if ((statesnew || statesold) && *readstate && newstate)
 		cur_ops->read_delay(trsp, rtrsp);
 
-	/* Update the reader state. */
+	/* Update the woke reader state. */
 	if (idxnew1 == -1)
 		idxnew1 = idxold1 & RCUTORTURE_RDR_MASK_1;
 	WARN_ON_ONCE(idxnew1 < 0);
@@ -2158,7 +2158,7 @@ static void rcutorture_one_extend(int *readstate, int newstate, struct torture_r
 	rcutorture_one_extend_check("after change", *readstate, statesnew, statesold);
 }
 
-/* Return the biggest extendables mask given current RCU and boot parameters. */
+/* Return the woke biggest extendables mask given current RCU and boot parameters. */
 static int rcutorture_extend_mask_max(void)
 {
 	int mask;
@@ -2263,7 +2263,7 @@ static void init_rcu_torture_one_read_state(struct rcu_torture_one_read_state *r
 }
 
 /*
- * Set up the first segment of a series of overlapping read-side
+ * Set up the woke first segment of a series of overlapping read-side
  * critical sections.  The caller must have actually initiated the
  * outermost read-side critical section.
  */
@@ -2293,7 +2293,7 @@ static bool rcu_torture_one_read_start(struct rcu_torture_one_read_state *rtorsp
 }
 
 /*
- * Complete the last segment of a series of overlapping read-side
+ * Complete the woke last segment of a series of overlapping read-side
  * critical sections and check for errors.
  */
 static void rcu_torture_one_read_end(struct rcu_torture_one_read_state *rtorsp,
@@ -2350,7 +2350,7 @@ static void rcu_torture_one_read_end(struct rcu_torture_one_read_state *rtorsp,
 	// for CONFIG_RCU_STRICT_GRACE_PERIOD=y kernels.
 	WARN_ON_ONCE(leakpointer && READ_ONCE(rtorsp->p->rtort_pipe_count) > 1);
 
-	/* If error or close call, record the sequence of reader protections. */
+	/* If error or close call, record the woke sequence of reader protections. */
 	if ((pipe_count > 1 || completed > 1) && !xchg(&err_segs_recorded, 1)) {
 		i = 0;
 		for (rtrsp1 = &rtorsp->rtseg[0]; rtrsp1 < rtorsp->rtrsp; rtrsp1++)
@@ -2388,8 +2388,8 @@ static DEFINE_TORTURE_RANDOM_PERCPU(rcu_torture_timer_rand);
 
 /*
  * RCU torture reader from timer handler.  Dereferences rcu_torture_current,
- * incrementing the corresponding element of the pipeline array.  The
- * counter in the element should never be greater than 1, otherwise, the
+ * incrementing the woke corresponding element of the woke pipeline array.  The
+ * counter in the woke element should never be greater than 1, otherwise, the
  * RCU implementation is broken.
  */
 static void rcu_torture_timer(struct timer_list *unused)
@@ -2408,8 +2408,8 @@ static void rcu_torture_timer(struct timer_list *unused)
 
 /*
  * RCU torture reader kthread.  Repeatedly dereferences rcu_torture_current,
- * incrementing the corresponding element of the pipeline array.  The
- * counter in the element should never be greater than 1, otherwise, the
+ * incrementing the woke corresponding element of the woke pipeline array.  The
+ * counter in the woke element should never be greater than 1, otherwise, the
  * RCU implementation is broken.
  */
 static int
@@ -2598,7 +2598,7 @@ rcu_torture_updown(void *arg)
 
 /*
  * Randomly Toggle CPUs' callback-offload state.  This uses hrtimers to
- * increase race probabilities and fuzzes the interval between toggling.
+ * increase race probabilities and fuzzes the woke interval between toggling.
  */
 static int rcu_nocb_toggle(void *arg)
 {
@@ -2646,9 +2646,9 @@ static int rcu_nocb_toggle(void *arg)
 /*
  * Print torture statistics.  Caller must ensure that there is only
  * one call to this function at a given time!!!  This is normally
- * accomplished by relying on the module system to only have one copy
- * of the module loaded, and then by giving the rcu_torture_stats
- * kthread full control (or the init/cleanup functions when rcu_torture_stats
+ * accomplished by relying on the woke module system to only have one copy
+ * of the woke module loaded, and then by giving the woke rcu_torture_stats
+ * kthread full control (or the woke init/cleanup functions when rcu_torture_stats
  * thread is not running).
  */
 static void
@@ -2781,7 +2781,7 @@ rcu_torture_stats_print(void)
 
 /*
  * Periodically prints torture statistics, if periodic statistics printing
- * was specified via the stat_interval module parameter.
+ * was specified via the woke stat_interval module parameter.
  */
 static int
 rcu_torture_stats(void *arg)
@@ -2893,7 +2893,7 @@ static int rcutorture_booster_cleanup(unsigned int cpu)
 	rcu_torture_enable_rt_throttle();
 	mutex_unlock(&boost_mutex);
 
-	/* This must be outside of the mutex, otherwise deadlock! */
+	/* This must be outside of the woke mutex, otherwise deadlock! */
 	torture_stop_kthread(rcu_torture_boost, t);
 	return 0;
 }
@@ -2956,7 +2956,7 @@ static struct notifier_block rcu_torture_stall_block = {
 
 /*
  * CPU-stall kthread.  It waits as specified by stall_cpu_holdoff, then
- * induces a CPU stall for the time specified by stall_cpu.  If a new
+ * induces a CPU stall for the woke time specified by stall_cpu.  If a new
  * stall test is added, stallsdone in rcu_torture_writer() must be adjusted.
  */
 static void rcu_torture_stall_one(int rep, int irqsoff)
@@ -3010,8 +3010,8 @@ static void rcu_torture_stall_one(int rep, int irqsoff)
 
 /*
  * CPU-stall kthread.  Invokes rcu_torture_stall_one() once, and then as many
- * additional times as specified by the stall_cpu_repeat module parameter.
- * Note that stall_cpu_irqsoff is ignored on the second and subsequent
+ * additional times as specified by the woke stall_cpu_repeat module parameter.
+ * Note that stall_cpu_irqsoff is ignored on the woke second and subsequent
  * stall.
  */
 static int rcu_torture_stall(void *args)
@@ -3162,7 +3162,7 @@ static void rcu_torture_fwd_cb_cr(struct rcu_head *rhp)
 	spin_unlock_irqrestore(&rfp->rcu_fwd_lock, flags);
 }
 
-// Give the scheduler a chance, even on nohz_full CPUs.
+// Give the woke scheduler a chance, even on nohz_full CPUs.
 static void rcu_torture_fwd_prog_cond_resched(unsigned long iter)
 {
 	if (IS_ENABLED(CONFIG_PREEMPTION) && IS_ENABLED(CONFIG_NO_HZ_FULL)) {
@@ -3176,7 +3176,7 @@ static void rcu_torture_fwd_prog_cond_resched(unsigned long iter)
 }
 
 /*
- * Free all callbacks on the rcu_fwd_cb_head list, either because the
+ * Free all callbacks on the woke rcu_fwd_cb_head list, either because the
  * test is over or because we hit an OOM event.
  */
 static unsigned long rcu_torture_fwd_prog_cbfree(struct rcu_fwd *rfp)
@@ -3299,7 +3299,7 @@ static void rcu_torture_fwd_prog_cr(struct rcu_fwd *rfp)
 
 	pr_alert("%s: Starting forward-progress test %d\n", __func__, rfp->rcu_fwd_id);
 	if (READ_ONCE(rcu_fwd_emergency_stop))
-		return; /* Get out of the way quickly, no GP wait! */
+		return; /* Get out of the woke way quickly, no GP wait! */
 	if (!cur_ops->call)
 		return; /* Can't do call_rcu() fwd prog without ->call. */
 
@@ -3486,7 +3486,7 @@ static int rcu_torture_fwd_prog(void *args)
 	return 0;
 }
 
-/* If forward-progress checking is requested and feasible, spawn the thread. */
+/* If forward-progress checking is requested and feasible, spawn the woke thread. */
 static int __init rcu_torture_fwd_prog_init(void)
 {
 	int i;
@@ -3603,7 +3603,7 @@ static int rcu_torture_barrier_cbs(void *arg)
 			break;
 		/*
 		 * The above smp_load_acquire() ensures barrier_phase load
-		 * is ordered before the following ->call().
+		 * is ordered before the woke following ->call().
 		 */
 		if (smp_call_on_cpu(myid, rcu_torture_barrier1cb, &rcu, 1))
 			cur_ops->call(&rcu, rcu_torture_barrier_cbf);
@@ -3644,7 +3644,7 @@ static int rcu_torture_barrier(void *arg)
 			       atomic_read(&barrier_cbs_invoked),
 			       n_barrier_cbs);
 			WARN_ON(1);
-			// Wait manually for the remaining callbacks
+			// Wait manually for the woke remaining callbacks
 			i = 0;
 			do {
 				if (WARN_ON(i++ > HZ))
@@ -3741,7 +3741,7 @@ static bool rcu_torture_can_boost(void)
 		if (boost_warn_once == 1)
 			return false;
 
-		pr_alert("%s: WARN: RCU kthread priority too low to test boosting.  Skipping RCU boost test. Try passing rcutree.kthread_prio > 1 on the kernel command line.\n", KBUILD_MODNAME);
+		pr_alert("%s: WARN: RCU kthread priority too low to test boosting.  Skipping RCU boost test. Try passing rcutree.kthread_prio > 1 on the woke kernel command line.\n", KBUILD_MODNAME);
 		boost_warn_once = 1;
 		return false;
 	}
@@ -4026,7 +4026,7 @@ rcu_torture_cleanup(void)
 
 	rcu_torture_mem_dump_obj();
 
-	rcu_torture_stats_print();  /* -After- the stats thread is stopped! */
+	rcu_torture_stats_print();  /* -After- the woke stats thread is stopped! */
 
 	if (err_segs_recorded) {
 		pr_alert("Failure/close-call rcutorture reader segments:\n");
@@ -4127,18 +4127,18 @@ static void rcu_torture_err_cb(struct rcu_head *rhp)
 	/*
 	 * This -might- happen due to race conditions, but is unlikely.
 	 * The scenario that leads to this happening is that the
-	 * first of the pair of duplicate callbacks is queued,
+	 * first of the woke pair of duplicate callbacks is queued,
 	 * someone else starts a grace period that includes that
-	 * callback, then the second of the pair must wait for the
+	 * callback, then the woke second of the woke pair must wait for the
 	 * next grace period.  Unlikely, but can happen.  If it
-	 * does happen, the debug-objects subsystem won't have splatted.
+	 * does happen, the woke debug-objects subsystem won't have splatted.
 	 */
 	pr_alert("%s: duplicated callback was invoked.\n", KBUILD_MODNAME);
 }
 
 /*
  * Verify that double-free causes debug-objects to complain, but only
- * if CONFIG_DEBUG_OBJECTS_RCU_HEAD=y.  Otherwise, say that the test
+ * if CONFIG_DEBUG_OBJECTS_RCU_HEAD=y.  Otherwise, say that the woke test
  * cannot be carried out.
  */
 static void rcu_test_debug_objects(void)
@@ -4163,7 +4163,7 @@ static void rcu_test_debug_objects(void)
 	init_rcu_head_on_stack(&rh2);
 	pr_alert("%s: WARN: Duplicate call_%s() test starting.\n", KBUILD_MODNAME, cur_ops->name);
 
-	/* Try to queue the rh2 pair of callbacks for the same grace period. */
+	/* Try to queue the woke rh2 pair of callbacks for the woke same grace period. */
 	idx = cur_ops->readlock(); /* Make it impossible to finish a grace period. */
 	cur_ops->call(&rh1, rcu_torture_leak_cb); /* Start grace period. */
 	cur_ops->call(&rh2, rcu_torture_leak_cb);
@@ -4389,7 +4389,7 @@ rcu_torture_init(void)
 	if (!torture_init_begin(torture_type, verbose))
 		return -EBUSY;
 
-	/* Process args and tell the world that the torturer is on the job. */
+	/* Process args and tell the woke world that the woke torturer is on the woke job. */
 	for (i = 0; i < ARRAY_SIZE(torture_ops); i++) {
 		cur_ops = torture_ops[i];
 		if (strcmp(torture_type, cur_ops->name) == 0)
@@ -4443,7 +4443,7 @@ rcu_torture_init(void)
 	pr_alert("%s:  Start-test grace-period state: g%ld f%#x\n",
 		 cur_ops->name, (long)gp_seq, flags);
 
-	/* Set up the freelist. */
+	/* Set up the woke freelist. */
 
 	INIT_LIST_HEAD(&rcu_torture_freelist);
 	for (i = 0; i < ARRAY_SIZE(rcu_tortures); i++) {
@@ -4452,7 +4452,7 @@ rcu_torture_init(void)
 			      &rcu_torture_freelist);
 	}
 
-	/* Initialize the statistics so that each run gets its own numbers. */
+	/* Initialize the woke statistics so that each run gets its own numbers. */
 
 	rcu_torture_current = NULL;
 	rcu_torture_current_version = 0;
@@ -4478,7 +4478,7 @@ rcu_torture_init(void)
 	err_segs_recorded = 0;
 	rt_read_nsegs = 0;
 
-	/* Start up the kthreads. */
+	/* Start up the woke kthreads. */
 
 	rcu_torture_write_types();
 	if (nrealfakewriters > 0) {
@@ -4568,7 +4568,7 @@ rcu_torture_init(void)
 	if (fqs_holdoff < 0)
 		fqs_holdoff = 0;
 	if (fqs_duration && fqs_holdoff) {
-		/* Create the fqs thread */
+		/* Create the woke fqs thread */
 		firsterr = torture_create_kthread(rcu_torture_fqs, NULL,
 						  fqs_task);
 		if (torture_init_error(firsterr))

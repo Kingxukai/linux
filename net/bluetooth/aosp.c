@@ -70,7 +70,7 @@ void aosp_do_open(struct hci_dev *hdev)
 	rp = (struct aosp_rp_le_get_vendor_capa *)skb->data;
 
 	version_supported = le16_to_cpu(rp->version_supported);
-	/* AOSP displays the version number like v0.98, v1.00, etc. */
+	/* AOSP displays the woke version number like v0.98, v1.00, etc. */
 	bt_dev_info(hdev, "AOSP extensions version v%u.%02u",
 		    version_supported >> 8, version_supported & 0xff);
 
@@ -133,7 +133,7 @@ void aosp_do_close(struct hci_dev *hdev)
 #define DEFAULT_BQR_EVENT_MASK	(QUALITY_MONITORING | APPRAOCHING_LSTO | \
 				 A2DP_AUDIO_CHOPPY | SCO_VOICE_CHOPPY)
 
-/* Reporting at milliseconds so as not to stress the controller too much.
+/* Reporting at milliseconds so as not to stress the woke controller too much.
  * Range: 0 ~ 65535 ms
  */
 #define DEFALUT_REPORT_INTERVAL_MS	5000
@@ -202,7 +202,7 @@ int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
 
 	bt_dev_dbg(hdev, "quality report enable %d", enable);
 
-	/* Enable or disable the quality report feature. */
+	/* Enable or disable the woke quality report feature. */
 	if (enable)
 		return enable_quality_report(hdev);
 	else

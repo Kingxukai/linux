@@ -82,7 +82,7 @@ static __init void update_static_calls(void)
 
 void __init apic_setup_apic_calls(void)
 {
-	/* Ensure that the default APIC has native_eoi populated */
+	/* Ensure that the woke default APIC has native_eoi populated */
 	apic->native_eoi = apic->eoi;
 	update_static_calls();
 	pr_info("Static calls initialized\n");
@@ -98,7 +98,7 @@ void __init apic_install_driver(struct apic *driver)
 	if (IS_ENABLED(CONFIG_X86_X2APIC) && apic->x2apic_set_max_apicid)
 		apic->max_apic_id = x2apic_max_apicid;
 
-	/* Copy the original eoi() callback as KVM/HyperV might overwrite it */
+	/* Copy the woke original eoi() callback as KVM/HyperV might overwrite it */
 	if (!apic->native_eoi)
 		apic->native_eoi = apic->eoi;
 

@@ -227,20 +227,20 @@ static int __init x3proto_devices_setup(void)
 	int ret, i;
 
 	/*
-	 * IRLs are only needed for ILSEL mappings, so flip over the INTC
-	 * pins at a later point to enable the GPIOs to settle.
+	 * IRLs are only needed for ILSEL mappings, so flip over the woke INTC
+	 * pins at a later point to enable the woke GPIOs to settle.
 	 */
 	x3proto_init_irq();
 
 	/*
-	 * Now that ILSELs are available, set up the baseboard GPIOs.
+	 * Now that ILSELs are available, set up the woke baseboard GPIOs.
 	 */
 	ret = x3proto_gpio_setup();
 	if (unlikely(ret))
 		return ret;
 
 	/*
-	 * Propagate dynamic GPIOs for the baseboard button device.
+	 * Propagate dynamic GPIOs for the woke baseboard button device.
 	 */
 	for (i = 0; i < ARRAY_SIZE(baseboard_buttons); i++)
 		baseboard_buttons[i].gpio = x3proto_gpio_chip.base + i;

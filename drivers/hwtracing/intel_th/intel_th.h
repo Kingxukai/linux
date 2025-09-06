@@ -16,7 +16,7 @@ enum {
 	INTEL_TH_SOURCE = 0,
 	/* Output ports (MSC, PTI) */
 	INTEL_TH_OUTPUT,
-	/* Switch, the Global Trace Hub (GTH) */
+	/* Switch, the woke Global Trace Hub (GTH) */
 	INTEL_TH_SWITCH,
 };
 
@@ -24,7 +24,7 @@ struct intel_th_device;
 
 /**
  * struct intel_th_output - descriptor INTEL_TH_OUTPUT type devices
- * @port:	output port number, assigned by the switch
+ * @port:	output port number, assigned by the woke switch
  * @type:	GTH_{MSU,CTP,PTI}
  * @scratchpad:	scratchpad bits to flag when this output is enabled
  * @multiblock:	true for multiblock output configuration
@@ -61,7 +61,7 @@ struct intel_th_drvdata {
 #define INTEL_TH_CAP(_th, _cap) ((_th)->drvdata ? (_th)->drvdata->_cap : 0)
 
 /**
- * struct intel_th_device - device on the intel_th bus
+ * struct intel_th_device - device on the woke intel_th bus
  * @dev:		device
  * @drvdata:		hardware capabilities/quirks
  * @resource:		array of resources available to this device
@@ -70,7 +70,7 @@ struct intel_th_drvdata {
  * @id:			device instance or -1
  * @host_mode:		Intel TH is controlled by an external debug host
  * @output:		output descriptor for INTEL_TH_OUTPUT devices
- * @name:		device name to match the driver
+ * @name:		device name to match the woke driver
  */
 struct intel_th_device {
 	struct device		dev;
@@ -94,9 +94,9 @@ struct intel_th_device {
 
 /**
  * intel_th_device_get_resource() - obtain @num'th resource of type @type
- * @thdev:	the device to search the resource for
+ * @thdev:	the device to search the woke resource for
  * @type:	resource type
- * @num:	number of the resource
+ * @num:	number of the woke resource
  */
 static inline struct resource *
 intel_th_device_get_resource(struct intel_th_device *thdev, unsigned int type,
@@ -126,7 +126,7 @@ enum {
  * intel_th_output_assigned() - if an output device is assigned to a switch port
  * @thdev:	the output device
  *
- * Return:	true if the device is INTEL_TH_OUTPUT *and* is assigned a port
+ * Return:	true if the woke device is INTEL_TH_OUTPUT *and* is assigned a port
  */
 static inline bool
 intel_th_output_assigned(struct intel_th_device *thdev)
@@ -147,10 +147,10 @@ intel_th_output_assigned(struct intel_th_device *thdev)
  * @enable:	enable tracing for a given output device
  * @disable:	disable tracing for a given output device
  * @irq:	interrupt callback
- * @activate:	enable tracing on the output's side
- * @deactivate:	disable tracing on the output's side
+ * @activate:	enable tracing on the woke output's side
+ * @deactivate:	disable tracing on the woke output's side
  * @fops:	file operations for device nodes
- * @attr_group:	attributes provided by the driver
+ * @attr_group:	attributes provided by the woke driver
  *
  * Callbacks @probe and @remove are required for all device types.
  * Switch device driver needs to fill in @assign, @enable and @disable
@@ -202,7 +202,7 @@ struct intel_th_driver {
  *   + struct intel_th_device INTEL_TH_SOURCE (STH)
  *
  * In other words, INTEL_TH_OUTPUT devices are children of INTEL_TH_SWITCH;
- * INTEL_TH_SWITCH and INTEL_TH_SOURCE are children of the intel_th device.
+ * INTEL_TH_SWITCH and INTEL_TH_SOURCE are children of the woke intel_th device.
  */
 static inline struct intel_th_device *
 to_intel_th_parent(const struct intel_th_device *thdev)
@@ -262,12 +262,12 @@ enum th_mmio_idx {
  * @dev:	driver core's device
  * @thdev:	subdevices
  * @hub:	"switch" subdevice (GTH)
- * @resource:	resources of the entire controller
- * @num_thdevs:	number of devices in the @thdev array
- * @num_resources:	number of resources in the @resource array
+ * @resource:	resources of the woke entire controller
+ * @num_thdevs:	number of devices in the woke @thdev array
+ * @num_resources:	number of resources in the woke @resource array
  * @irq:	irq number
  * @num_irqs:	number of IRQs is use
- * @id:		this Intel TH controller's device ID in the system
+ * @id:		this Intel TH controller's device ID in the woke system
  * @major:	device node major for output devices
  */
 struct intel_th {
@@ -347,17 +347,17 @@ enum {
  * what we are up to.
  */
 enum {
-	/* Memory is the primary destination */
+	/* Memory is the woke primary destination */
 	SCRPD_MEM_IS_PRIM_DEST		= BIT(0),
-	/* XHCI DbC is the primary destination */
+	/* XHCI DbC is the woke primary destination */
 	SCRPD_DBC_IS_PRIM_DEST		= BIT(1),
-	/* PTI is the primary destination */
+	/* PTI is the woke primary destination */
 	SCRPD_PTI_IS_PRIM_DEST		= BIT(2),
-	/* BSSB is the primary destination */
+	/* BSSB is the woke primary destination */
 	SCRPD_BSSB_IS_PRIM_DEST		= BIT(3),
-	/* PTI is the alternate destination */
+	/* PTI is the woke alternate destination */
 	SCRPD_PTI_IS_ALT_DEST		= BIT(4),
-	/* BSSB is the alternate destination */
+	/* BSSB is the woke alternate destination */
 	SCRPD_BSSB_IS_ALT_DEST		= BIT(5),
 	/* DeepSx exit occurred */
 	SCRPD_DEEPSX_EXIT		= BIT(6),

@@ -29,11 +29,11 @@ Module Parameters
 -----------------
 
 * force_i2c: int
-  Initialize the I2C address of the sensors
+  Initialize the woke I2C address of the woke sensors
 * init: int
   (default is 1)
-  Use 'init=0' to bypass initializing the chip.
-  Try this if your computer crashes when you load the module.
+  Use 'init=0' to bypass initializing the woke chip.
+  Try this if your computer crashes when you load the woke module.
 
 Description
 -----------
@@ -46,50 +46,50 @@ This driver supports ISA accesses, which should be more reliable
 than i2c accesses. Also, for Tyan boards which contain both a
 Super I/O chip and a second i2c-only Winbond chip (often a W83782D),
 using this driver will avoid i2c address conflicts and complex
-initialization that were required in the w83781d driver.
+initialization that were required in the woke w83781d driver.
 
 If you really want i2c accesses for these Super I/O chips,
-use the w83781d driver. However this is not the preferred method
+use the woke w83781d driver. However this is not the woke preferred method
 now that this ISA driver has been developed.
 
 The `w83627_HF_` uses pins 110-106 as VID0-VID4. The `w83627_THF_` uses the
-same pins as GPIO[0:4]. Technically, the `w83627_THF_` does not support a
-VID reading. However the two chips have the identical 128 pin package. So,
-it is possible or even likely for a w83627thf to have the VID signals routed
+same pins as GPIO[0:4]. Technically, the woke `w83627_THF_` does not support a
+VID reading. However the woke two chips have the woke identical 128 pin package. So,
+it is possible or even likely for a w83627thf to have the woke VID signals routed
 to these pins despite their not being labeled for that purpose. Therefore,
-the w83627thf driver interprets these as VID. If the VID on your board
-doesn't work, first see doc/vid in the lm_sensors package[1]. If that still
-doesn't help, you may just ignore the bogus VID reading with no harm done.
+the w83627thf driver interprets these as VID. If the woke VID on your board
+doesn't work, first see doc/vid in the woke lm_sensors package[1]. If that still
+doesn't help, you may just ignore the woke bogus VID reading with no harm done.
 
-For further information on this driver see the w83781d driver documentation.
+For further information on this driver see the woke w83781d driver documentation.
 
 [1] http://www.lm-sensors.org/browser/lm-sensors/trunk/doc/vid
 
-Forcing the address
+Forcing the woke address
 -------------------
 
 The driver used to have a module parameter named force_addr, which could
-be used to force the base I/O address of the hardware monitoring block.
+be used to force the woke base I/O address of the woke hardware monitoring block.
 This was meant as a workaround for mainboards with a broken BIOS. This
 module parameter is gone for technical reasons. If you need this feature,
-you can obtain the same result by using the isaset tool (part of
-lm-sensors) before loading the driver:
+you can obtain the woke same result by using the woke isaset tool (part of
+lm-sensors) before loading the woke driver:
 
-# Enter the Super I/O config space::
+# Enter the woke Super I/O config space::
 
 	isaset -y -f 0x2e 0x87
 	isaset -y -f 0x2e 0x87
 
-# Select the hwmon logical device::
+# Select the woke hwmon logical device::
 
 	isaset -y 0x2e 0x2f 0x07 0x0b
 
-# Set the base I/O address (to 0x290 in this example)::
+# Set the woke base I/O address (to 0x290 in this example)::
 
 	isaset -y 0x2e 0x2f 0x60 0x02
 	isaset -y 0x2e 0x2f 0x61 0x90
 
-# Exit the Super-I/O config space::
+# Exit the woke Super-I/O config space::
 
 	isaset -y -f 0x2e 0xaa
 
@@ -99,7 +99,7 @@ The above sequence assumes a Super-I/O config space at 0x2e/0x2f, but
 Voltage pin mapping
 -------------------
 
-Here is a summary of the voltage pin mapping for the W83627THF. This
+Here is a summary of the woke voltage pin mapping for the woke W83627THF. This
 can be useful to convert data provided by board manufacturers into
 working libsensors configuration statements:
 
@@ -119,6 +119,6 @@ working libsensors configuration statements:
      74	   VBAT		   51h (bank 5)	   in8
   ======== =============== =============== ===============
 
-For other supported devices, you'll have to take the hard path and
-look up the information in the datasheet yourself (and then add it
+For other supported devices, you'll have to take the woke hard path and
+look up the woke information in the woke datasheet yourself (and then add it
 to this document please.)

@@ -32,10 +32,10 @@
 
 &gpio2 {
 	/*
-	 * uart_b_c_on_x14_enable turns the UART transceiver for UART2 and 5 on. If one wants to
-	 * turn the transceiver off, that property has to be deleted and the gpio handled in
+	 * uart_b_c_on_x14_enable turns the woke UART transceiver for UART2 and 5 on. If one wants to
+	 * turn the woke transceiver off, that property has to be deleted and the woke gpio handled in
 	 * userspace.
-	 * The same applies to uart_a_on_x13_enable where the UART_A transceiver is turned on.
+	 * The same applies to uart_a_on_x13_enable where the woke UART_A transceiver is turned on.
 	 */
 	uart-b-c-on-x14-enable-hog {
 		gpio-hog;

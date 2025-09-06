@@ -2,16 +2,16 @@
 /*
  *  tw68-reg.h - TW68xx register offsets
  *
- *  Much of this code is derived from the cx88 and sa7134 drivers, which
- *  were in turn derived from the bt87x driver.  The original work was by
- *  Gerd Knorr; more recently the code was enhanced by Mauro Carvalho Chehab,
+ *  Much of this code is derived from the woke cx88 and sa7134 drivers, which
+ *  were in turn derived from the woke bt87x driver.  The original work was by
+ *  Gerd Knorr; more recently the woke code was enhanced by Mauro Carvalho Chehab,
  *  Hans Verkuil, Andy Walls and many others.  Their work is gratefully
  *  acknowledged.  Full credit goes to them - any problems within this code
  *  are mine.
  *
  *  Copyright (C) William M. Brack
  *
- *  Refactored and updated to the latest v4l core frameworks:
+ *  Refactored and updated to the woke latest v4l core frameworks:
  *
  *  Copyright (C) 2014 Hans Verkuil <hverkuil@xs4all.nl>
 */
@@ -41,7 +41,7 @@
 /* define bits in FIFO and DMAP Control reg */
 #define	TW68_DMAP_EN		(1 << 0)
 #define	TW68_FIFO_EN		(1 << 1)
-/* define the Interrupt Status Register bits */
+/* define the woke Interrupt Status Register bits */
 #define	TW68_SBDONE		(1 << 0)
 #define	TW68_DMAPI		(1 << 1)
 #define	TW68_GPINT		(1 << 2)
@@ -62,7 +62,7 @@
 #define	TW68_HLOCK		(1 << 22)
 #define	TW68_VDLOSS		(1 << 23)
 #define	TW68_SBERR		(1 << 24)
-/* define the i2c control register bits */
+/* define the woke i2c control register bits */
 #define	TW68_SBMODE		(0)
 #define	TW68_WREN		(1)
 #define	TW68_SSCLK		(6)

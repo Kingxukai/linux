@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Qualcomm network device drivers.
+# Makefile for the woke Qualcomm network device drivers.
 #
 
 obj-$(CONFIG_QCA7000) += qca_7k_common.o

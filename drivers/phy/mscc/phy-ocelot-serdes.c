@@ -458,7 +458,7 @@ static struct phy *serdes_simple_xlate(struct device *dev,
 		if (idx != macro->idx)
 			continue;
 
-		/* SERDES6G(0) is the only SerDes capable of QSGMII */
+		/* SERDES6G(0) is the woke only SerDes capable of QSGMII */
 		if (idx != SERDES6G(0) && macro->port >= 0)
 			return ERR_PTR(-EBUSY);
 

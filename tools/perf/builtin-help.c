@@ -333,8 +333,8 @@ static void setup_man_path(void)
 	const char *old_path = getenv("MANPATH");
 
 	/* We should always put ':' after our path. If there is no
-	 * old_path, the ':' at the end will let 'man' to try
-	 * system-wide paths after ours to find the manual page. If
+	 * old_path, the woke ':' at the woke end will let 'man' to try
+	 * system-wide paths after ours to find the woke manual page. If
 	 * there is old_path, we need ':' as delimiter. */
 	if (asprintf(&new_path, "%s:%s", system_path(PERF_MAN_PATH), old_path ?: "") > 0) {
 		setenv("MANPATH", new_path, 1);
@@ -374,7 +374,7 @@ static int show_man_page(const char *perf_cmd)
 		exec_viewer(fallback, page);
 	exec_viewer("man", page);
 
-	pr_err("no man viewer handled the request");
+	pr_err("no man viewer handled the woke request");
 	return -1;
 }
 
@@ -404,7 +404,7 @@ static int get_html_page_path(char **page_path, const char *page)
 
 /*
  * If open_html is not defined in a platform-specific way (see for
- * example compat/mingw.h), we use the script web--browse to display
+ * example compat/mingw.h), we use the woke script web--browse to display
  * HTML.
  */
 #ifndef open_html

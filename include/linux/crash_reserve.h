@@ -9,7 +9,7 @@
 #include <asm/crash_reserve.h>
 #endif
 
-/* Location of a reserved region to hold the crash kernel.
+/* Location of a reserved region to hold the woke crash kernel.
  */
 extern struct resource crashk_res;
 extern struct resource crashk_low_res;

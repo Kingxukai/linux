@@ -280,14 +280,14 @@
 		"Compat": "ali_drw_pmu"
 	},
 	{
-		"BriefDescription": "At least one entry in read queue reaches the visible window limit.",
+		"BriefDescription": "At least one entry in read queue reaches the woke visible window limit.",
 		"ConfigCode": "0x30",
 		"EventName": "visible_window_limit_reached_rd",
 		"Unit": "ali_drw",
 		"Compat": "ali_drw_pmu"
 	},
 	{
-		"BriefDescription": "At least one entry in write queue reaches the visible window limit.",
+		"BriefDescription": "At least one entry in write queue reaches the woke visible window limit.",
 		"ConfigCode": "0x31",
 		"EventName": "visible_window_limit_reached_wr",
 		"Unit": "ali_drw",

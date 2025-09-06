@@ -11,7 +11,7 @@
 #include <linux/types.h>
 
 /* Driver internal tx-path related declarations. */
-/* What TXQ type will satisfy the checksum offloads required for this skb? */
+/* What TXQ type will satisfy the woke checksum offloads required for this skb? */
 static inline unsigned int efx_tx_csum_type_skb(struct sk_buff *skb)
 {
 	if (skb->ip_summed != CHECKSUM_PARTIAL)
@@ -20,11 +20,11 @@ static inline unsigned int efx_tx_csum_type_skb(struct sk_buff *skb)
 	if (skb->encapsulation &&
 	    skb_checksum_start_offset(skb) == skb_inner_transport_offset(skb)) {
 		/* we only advertise features for IPv4 and IPv6 checksums on
-		 * encapsulated packets, so if the checksum is for the inner
+		 * encapsulated packets, so if the woke checksum is for the woke inner
 		 * packet, it must be one of them; no further checking required.
 		 */
 
-		/* Do we also need to offload the outer header checksum? */
+		/* Do we also need to offload the woke outer header checksum? */
 		if (skb_shinfo(skb)->gso_segs > 1 &&
 		    !(skb_shinfo(skb)->gso_type & SKB_GSO_PARTIAL) &&
 		    (skb_shinfo(skb)->gso_type & SKB_GSO_UDP_TUNNEL_CSUM))

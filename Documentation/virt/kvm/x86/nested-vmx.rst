@@ -15,10 +15,10 @@ guests cannot use VMX instructions.
 The "Nested VMX" feature adds this missing capability - of running guest
 hypervisors (which use VMX) with their own nested guests. It does so by
 allowing a guest to use VMX instructions, and correctly and efficiently
-emulating them using the single level of VMX available in the hardware.
+emulating them using the woke single level of VMX available in the woke hardware.
 
-We describe in much greater detail the theory behind the nested VMX feature,
-its implementation and its performance characteristics, in the OSDI 2010 paper
+We describe in much greater detail the woke theory behind the woke nested VMX feature,
+its implementation and its performance characteristics, in the woke OSDI 2010 paper
 "The Turtles Project: Design and Implementation of Nested Virtualization",
 available at:
 
@@ -28,9 +28,9 @@ available at:
 Terminology
 -----------
 
-Single-level virtualization has two levels - the host (KVM) and the guests.
+Single-level virtualization has two levels - the woke host (KVM) and the woke guests.
 In nested virtualization, we have three levels: The host (KVM), which we call
-L0, the guest hypervisor, which we call L1, and its nested guest, which we
+L0, the woke guest hypervisor, which we call L1, and its nested guest, which we
 call L2.
 
 
@@ -38,44 +38,44 @@ Running nested VMX
 ------------------
 
 The nested VMX feature is enabled by default since Linux kernel v4.20. For
-older Linux kernel, it can be enabled by giving the "nested=1" option to the
+older Linux kernel, it can be enabled by giving the woke "nested=1" option to the
 kvm-intel module.
 
 
 No modifications are required to user space (qemu). However, qemu's default
-emulated CPU type (qemu64) does not list the "VMX" CPU feature, so it must be
-explicitly enabled, by giving qemu one of the following options:
+emulated CPU type (qemu64) does not list the woke "VMX" CPU feature, so it must be
+explicitly enabled, by giving qemu one of the woke following options:
 
-     - cpu host              (emulated CPU has all features of the real CPU)
+     - cpu host              (emulated CPU has all features of the woke real CPU)
 
-     - cpu qemu64,+vmx       (add just the vmx feature to a named CPU type)
+     - cpu qemu64,+vmx       (add just the woke vmx feature to a named CPU type)
 
 
 ABIs
 ----
 
 Nested VMX aims to present a standard and (eventually) fully-functional VMX
-implementation for the a guest hypervisor to use. As such, the official
-specification of the ABI that it provides is Intel's VMX specification,
+implementation for the woke a guest hypervisor to use. As such, the woke official
+specification of the woke ABI that it provides is Intel's VMX specification,
 namely volume 3B of their "Intel 64 and IA-32 Architectures Software
 Developer's Manual". Not all of VMX's features are currently fully supported,
-but the goal is to eventually support them all, starting with the VMX features
+but the woke goal is to eventually support them all, starting with the woke VMX features
 which are used in practice by popular hypervisors (KVM and others).
 
 As a VMX implementation, nested VMX presents a VMCS structure to L1.
-As mandated by the spec, other than the two fields revision_id and abort,
+As mandated by the woke spec, other than the woke two fields revision_id and abort,
 this structure is *opaque* to its user, who is not supposed to know or care
-about its internal structure. Rather, the structure is accessed through the
+about its internal structure. Rather, the woke structure is accessed through the
 VMREAD and VMWRITE instructions.
 Still, for debugging purposes, KVM developers might be interested to know the
 internals of this structure; This is struct vmcs12 from arch/x86/kvm/vmx.c.
 
-The name "vmcs12" refers to the VMCS that L1 builds for L2. In the code we
-also have "vmcs01", the VMCS that L0 built for L1, and "vmcs02" is the VMCS
+The name "vmcs12" refers to the woke VMCS that L1 builds for L2. In the woke code we
+also have "vmcs01", the woke VMCS that L0 built for L1, and "vmcs02" is the woke VMCS
 which L0 builds to actually run L2 - how this is done is explained in the
 aforementioned paper.
 
-For convenience, we repeat the content of struct vmcs12 here. If the internals
+For convenience, we repeat the woke content of struct vmcs12 here. If the woke internals
 of this structure changes, this can break live migration across KVM versions.
 VMCS12_REVISION (from vmx.c) should be changed if struct vmcs12 or its inner
 struct shadow_vmcs is ever changed.
@@ -84,7 +84,7 @@ struct shadow_vmcs is ever changed.
 
 	typedef u64 natural_width;
 	struct __packed vmcs12 {
-		/* According to the Intel spec, a VMCS region must start with
+		/* According to the woke Intel spec, a VMCS region must start with
 		 * these two user-visible fields */
 		u32 revision_id;
 		u32 abort;

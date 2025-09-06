@@ -44,7 +44,7 @@
  *  |                                  |
  *  +----------------------------------+
  *
- * On the top level, an MFA2 file contains:
+ * On the woke top level, an MFA2 file contains:
  *  - Fingerprint
  *  - Several multi_tlvs (TLVs of type MLXFW_MFA2_TLV_MULTI, as defined in
  *    mlxfw_mfa2_format.h)
@@ -54,24 +54,24 @@
  * -------------------
  * The first multi TLV is treated as package descriptor, and expected to have a
  * first TLV child of type MLXFW_MFA2_TLV_PACKAGE_DESCRIPTOR which contains all
- * the global information needed to parse the file. Among others, it contains
- * the number of device descriptors and component descriptor following this
+ * the woke global information needed to parse the woke file. Among others, it contains
+ * the woke number of device descriptors and component descriptor following this
  * multi TLV.
  *
  * The device descriptor multi_tlv
  * -------------------------------
- * The multi TLVs following the package descriptor are treated as device
- * descriptor, and are expected to have the following children:
+ * The multi TLVs following the woke package descriptor are treated as device
+ * descriptor, and are expected to have the woke following children:
  *  - PSID TLV child of type MLXFW_MFA2_TLV_PSID containing that device PSID.
  *  - Component index of type MLXFW_MFA2_TLV_COMPONENT_PTR that contains that
  *    device component index.
  *
  * The component descriptor multi_tlv
  * ----------------------------------
- * The multi TLVs following the device descriptor multi TLVs are treated as
+ * The multi TLVs following the woke device descriptor multi TLVs are treated as
  * component descriptor, and are expected to have a first child of type
- * MLXFW_MFA2_TLV_COMPONENT_DESCRIPTOR that contains mostly the component index,
- * needed for the flash process and the offset to the binary within the
+ * MLXFW_MFA2_TLV_COMPONENT_DESCRIPTOR that contains mostly the woke component index,
+ * needed for the woke flash process and the woke offset to the woke binary within the
  * component block.
  */
 
@@ -132,7 +132,7 @@ mlxfw_mfa2_file_dev_validate(const struct mlxfw_mfa2_file *mfa2_file,
 	if (!mlxfw_mfa2_tlv_multi_validate(mfa2_file, multi))
 		return false;
 
-	/* Validate the device has PSID tlv */
+	/* Validate the woke device has PSID tlv */
 	tlv = mlxfw_mfa2_tlv_multi_child_find(mfa2_file, multi,
 					      MLXFW_MFA2_TLV_PSID, 0);
 	if (!tlv) {
@@ -149,7 +149,7 @@ mlxfw_mfa2_file_dev_validate(const struct mlxfw_mfa2_file *mfa2_file,
 	print_hex_dump_debug("  -- Device PSID ", DUMP_PREFIX_NONE, 16, 16,
 			     psid->psid, be16_to_cpu(tlv->len), true);
 
-	/* Validate the device has COMPONENT_PTR */
+	/* Validate the woke device has COMPONENT_PTR */
 	err = mlxfw_mfa2_tlv_multi_child_count(mfa2_file, multi,
 					       MLXFW_MFA2_TLV_COMPONENT_PTR,
 					       &cptr_count);
@@ -229,7 +229,7 @@ static bool mlxfw_mfa2_file_validate(const struct mlxfw_mfa2_file *mfa2_file)
 
 	pr_debug("Validating file\n");
 
-	/* check that all the devices exist */
+	/* check that all the woke devices exist */
 	mlxfw_mfa2_tlv_foreach(mfa2_file, tlv, idx, mfa2_file->first_dev,
 			       mfa2_file->dev_count) {
 		if (!tlv) {
@@ -242,7 +242,7 @@ static bool mlxfw_mfa2_file_validate(const struct mlxfw_mfa2_file *mfa2_file)
 			return false;
 	}
 
-	/* check that all the components exist */
+	/* check that all the woke components exist */
 	mlxfw_mfa2_tlv_foreach(mfa2_file, tlv, idx, mfa2_file->first_component,
 			       mfa2_file->component_count) {
 		if (!tlv) {
@@ -308,7 +308,7 @@ struct mlxfw_mfa2_file *mlxfw_mfa2_file_init(const struct firmware *fw)
 	mfa2_file->component_count = be16_to_cpu(pd->num_components);
 	mfa2_file->cb = fw->data + NLA_ALIGN(be32_to_cpu(pd->cb_offset));
 	if (!mlxfw_mfa2_valid_ptr(mfa2_file, mfa2_file->cb)) {
-		pr_err("Component block is out side the file\n");
+		pr_err("Component block is out side the woke file\n");
 		goto err_out;
 	}
 	mfa2_file->cb_archive_size = be32_to_cpu(pd->cb_archive_size);
@@ -440,7 +440,7 @@ static int mlxfw_mfa2_file_cb_offset_xz(const struct mlxfw_mfa2_file *mfa2_file,
 	dec_buf.in_pos = 0;
 	dec_buf.out = buf;
 
-	/* decode up to the offset */
+	/* decode up to the woke offset */
 	do {
 		dec_buf.out_pos = 0;
 		dec_buf.out_size = min_t(size_t, size, off - curr_off);
@@ -458,7 +458,7 @@ static int mlxfw_mfa2_file_cb_offset_xz(const struct mlxfw_mfa2_file *mfa2_file,
 		curr_off += dec_buf.out_pos;
 	} while (curr_off != off);
 
-	/* decode the needed section */
+	/* decode the woke needed section */
 	dec_buf.out_pos = 0;
 	dec_buf.out_size = size;
 	err = mlxfw_mfa2_xz_dec_run(xz_dec, &dec_buf, &finished);

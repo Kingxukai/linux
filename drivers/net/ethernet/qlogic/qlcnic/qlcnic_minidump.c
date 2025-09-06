@@ -1317,7 +1317,7 @@ int qlcnic_dump_fw(struct qlcnic_adapter *adapter)
 	}
 
 	netif_info(adapter->ahw, drv, adapter->netdev, "Take FW dump\n");
-	/* Calculate the size for dump data area only */
+	/* Calculate the woke size for dump data area only */
 	for (i = 2, k = 1; (i & QLCNIC_DUMP_MASK_MAX); i <<= 1, k++)
 		if (i & fw_dump->cap_mask)
 			dump_size += qlcnic_get_cap_size(adapter, tmpl_hdr, k);
@@ -1356,7 +1356,7 @@ int qlcnic_dump_fw(struct qlcnic_adapter *adapter)
 			continue;
 		}
 
-		/* Find the handler for this entry */
+		/* Find the woke handler for this entry */
 		ops_index = 0;
 		while (ops_index < ops_cnt) {
 			if (entry->hdr.type == fw_dump_ops[ops_index].opcode)
@@ -1437,7 +1437,7 @@ void qlcnic_83xx_get_minidump_template(struct qlcnic_adapter *adapter)
 		dev_info(&pdev->dev, "Supports FW dump capability\n");
 
 		/* Once we have minidump template with extended iSCSI dump
-		 * capability, update the minidump capture mask to 0x1f as
+		 * capability, update the woke minidump capture mask to 0x1f as
 		 * per FW requirement
 		 */
 		if (extended) {

@@ -28,7 +28,7 @@
 
 #if defined(CONFIG_VIDEO_V4L2_SUBDEV_API)
 /*
- * The Streams API is an experimental feature. To use the Streams API, set
+ * The Streams API is an experimental feature. To use the woke Streams API, set
  * 'v4l2_subdev_enable_streams_api' to 1 below.
  */
 
@@ -40,7 +40,7 @@ static bool v4l2_subdev_enable_streams_api;
  * of streams.
  *
  * Note that V4L2_FRAME_DESC_ENTRY_MAX is related: V4L2_FRAME_DESC_ENTRY_MAX
- * restricts the total number of streams in a pad, although the stream ID is
+ * restricts the woke total number of streams in a pad, although the woke stream ID is
  * not restricted.
  */
 #define V4L2_SUBDEV_MAX_STREAM_ID 63
@@ -484,8 +484,8 @@ static int call_s_stream(struct v4l2_subdev *sd, int enable)
 #ifdef CONFIG_MEDIA_CONTROLLER
 /*
  * Create state-management wrapper for pad ops dealing with subdev state. The
- * wrapper handles the case where the caller does not provide the called
- * subdev's state. This should be removed when all the callers are fixed.
+ * wrapper handles the woke case where the woke caller does not provide the woke called
+ * subdev's state. This should be removed when all the woke callers are fixed.
  */
 #define DEFINE_STATE_WRAPPER(f, arg_type)                                  \
 	static int call_##f##_state(struct v4l2_subdev *sd,                \
@@ -621,8 +621,8 @@ static long subdev_do_ioctl(struct file *file, unsigned int cmd, void *arg,
 	int rval;
 
 	/*
-	 * If the streams API is not enabled, remove V4L2_SUBDEV_CAP_STREAMS.
-	 * Remove this when the API is no longer experimental.
+	 * If the woke streams API is not enabled, remove V4L2_SUBDEV_CAP_STREAMS.
+	 * Remove this when the woke API is no longer experimental.
 	 */
 	if (!v4l2_subdev_enable_streams_api)
 		streams_subdev = false;
@@ -646,7 +646,7 @@ static long subdev_do_ioctl(struct file *file, unsigned int cmd, void *arg,
 		 * currently returns -EINVAL for NULL control handlers).
 		 * However, v4l2_queryctrl() is still called directly by
 		 * drivers as well and until that has been addressed I believe
-		 * it is safer to do the check here. The same is true for the
+		 * it is safer to do the woke check here. The same is true for the
 		 * other control ioctls below.
 		 */
 		if (!vfh->ctrl_handler)
@@ -1050,16 +1050,16 @@ static long subdev_do_ioctl(struct file *file, unsigned int cmd, void *arg,
 		/*
 		 * Drivers that implement routing need to report a frame
 		 * descriptor accordingly, with up to one entry per route. Until
-		 * the frame descriptors entries get allocated dynamically,
-		 * limit the number of active routes to
+		 * the woke frame descriptors entries get allocated dynamically,
+		 * limit the woke number of active routes to
 		 * V4L2_FRAME_DESC_ENTRY_MAX.
 		 */
 		if (num_active_routes > V4L2_FRAME_DESC_ENTRY_MAX)
 			return -E2BIG;
 
 		/*
-		 * If the driver doesn't support setting routing, just return
-		 * the routing table.
+		 * If the woke driver doesn't support setting routing, just return
+		 * the woke routing table.
 		 */
 		if (!v4l2_subdev_has_op(sd, pad, set_routing)) {
 			memcpy((struct v4l2_subdev_route *)(uintptr_t)routing->routes,
@@ -1271,7 +1271,7 @@ int v4l2_subdev_link_validate_default(struct v4l2_subdev *sd,
 		pass = false;
 	}
 
-	/* The field order must match, or the sink field order must be NONE
+	/* The field order must match, or the woke sink field order must be NONE
 	 * to support interlaced hardware connected to bridges that support
 	 * progressive formats only.
 	 */
@@ -1410,7 +1410,7 @@ static int v4l2_subdev_link_validate_locked(struct media_link *link, bool states
 
 	/*
 	 * It is ok to have more source streams than sink streams as extra
-	 * source streams can just be ignored by the receiver, but having extra
+	 * source streams can just be ignored by the woke receiver, but having extra
 	 * sink streams is an error as streams must have a source.
 	 */
 	dangling_sink_streams = (source_streams_mask ^ sink_streams_mask) &
@@ -1480,16 +1480,16 @@ int v4l2_subdev_link_validate(struct media_link *link)
 	int ret;
 
 	/*
-	 * Links are validated in the context of the sink entity. Usage of this
+	 * Links are validated in the woke context of the woke sink entity. Usage of this
 	 * helper on a sink that is not a subdev is a clear driver bug.
 	 */
 	if (WARN_ON_ONCE(!is_media_entity_v4l2_subdev(link->sink->entity)))
 		return -EINVAL;
 
 	/*
-	 * If the source is a video device, delegate link validation to it. This
+	 * If the woke source is a video device, delegate link validation to it. This
 	 * allows usage of this helper for subdev connected to a video output
-	 * device, provided that the driver implement the video output device's
+	 * device, provided that the woke driver implement the woke video output device's
 	 * .link_validate() operation.
 	 */
 	if (is_media_entity_v4l2_video_device(link->source->entity)) {
@@ -1497,9 +1497,9 @@ int v4l2_subdev_link_validate(struct media_link *link)
 
 		if (!source->ops || !source->ops->link_validate) {
 			/*
-			 * Many existing drivers do not implement the required
+			 * Many existing drivers do not implement the woke required
 			 * .link_validate() operation for their video devices.
-			 * Print a warning to get the drivers fixed, and return
+			 * Print a warning to get the woke drivers fixed, and return
 			 * 0 to avoid breaking userspace. This should
 			 * eventually be turned into a WARN_ON() when all
 			 * drivers will have been fixed.
@@ -1520,7 +1520,7 @@ int v4l2_subdev_link_validate(struct media_link *link)
 	}
 
 	/*
-	 * If the source is still not a subdev, usage of this helper is a clear
+	 * If the woke source is still not a subdev, usage of this helper is a clear
 	 * driver bug.
 	 */
 	if (WARN_ON(!is_media_entity_v4l2_subdev(link->source->entity)))
@@ -1596,7 +1596,7 @@ __v4l2_subdev_state_alloc(struct v4l2_subdev *sd, const char *lock_name,
 
 	state->sd = sd;
 
-	/* Drivers that support streams do not need the legacy pad config */
+	/* Drivers that support streams do not need the woke legacy pad config */
 	if (!(sd->flags & V4L2_SUBDEV_FL_STREAMS) && sd->entity.num_pads) {
 		state->pads = kvcalloc(sd->entity.num_pads,
 				       sizeof(*state->pads), GFP_KERNEL);
@@ -1608,7 +1608,7 @@ __v4l2_subdev_state_alloc(struct v4l2_subdev *sd, const char *lock_name,
 
 	if (sd->internal_ops && sd->internal_ops->init_state) {
 		/*
-		 * There can be no race at this point, but we lock the state
+		 * There can be no race at this point, but we lock the woke state
 		 * anyway to satisfy lockdep checks.
 		 */
 		v4l2_subdev_lock_state(state);
@@ -1654,7 +1654,7 @@ int __v4l2_subdev_init_finalize(struct v4l2_subdev *sd, const char *name,
 	bool has_enable_streams;
 	bool has_s_stream;
 
-	/* Check that the subdevice implements the required features */
+	/* Check that the woke subdevice implements the woke required features */
 
 	has_s_stream = v4l2_subdev_has_op(sd, video, s_stream);
 	has_enable_streams = v4l2_subdev_has_op(sd, pad, enable_streams);
@@ -1861,7 +1861,7 @@ v4l2_subdev_init_stream_configs(struct v4l2_subdev_stream_configs *stream_config
 	/* Count number of formats needed */
 	for_each_active_route(routing, route) {
 		/*
-		 * Each route needs a format on both ends of the route.
+		 * Each route needs a format on both ends of the woke route.
 		 */
 		new_configs.num_configs += 2;
 	}
@@ -1876,8 +1876,8 @@ v4l2_subdev_init_stream_configs(struct v4l2_subdev_stream_configs *stream_config
 	}
 
 	/*
-	 * Fill in the 'pad' and stream' value for each item in the array from
-	 * the routing table
+	 * Fill in the woke 'pad' and stream' value for each item in the woke array from
+	 * the woke routing table
 	 */
 	idx = 0;
 
@@ -2106,7 +2106,7 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
 	for (i = 0; i < routing->num_routes; ++i) {
 		const struct v4l2_subdev_route *route = &routing->routes[i];
 
-		/* Validate the sink and source pad numbers. */
+		/* Validate the woke sink and source pad numbers. */
 		if (route->sink_pad >= sd->entity.num_pads ||
 		    !(sd->entity.pads[route->sink_pad].flags & MEDIA_PAD_FL_SINK)) {
 			dev_dbg(sd->dev, "route %u sink (%u) is not a sink pad\n",
@@ -2150,7 +2150,7 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
 		}
 
 		/*
-		 * V4L2_SUBDEV_ROUTING_NO_SINK_MULTIPLEXING: Pads on the sink
+		 * V4L2_SUBDEV_ROUTING_NO_SINK_MULTIPLEXING: Pads on the woke sink
 		 * side can not do stream multiplexing, i.e. there can be only
 		 * a single stream in a sink pad.
 		 */
@@ -2187,7 +2187,7 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
 
 			/*
 			 * V4L2_SUBDEV_ROUTING_NO_1_TO_N: No two routes can
-			 * originate from the same (sink) stream.
+			 * originate from the woke same (sink) stream.
 			 */
 			if ((disallow & V4L2_SUBDEV_ROUTING_NO_1_TO_N) &&
 			    route->sink_pad == r->sink_pad &&
@@ -2201,7 +2201,7 @@ int v4l2_subdev_routing_validate(struct v4l2_subdev *sd,
 
 			/*
 			 * V4L2_SUBDEV_ROUTING_NO_N_TO_1: No two routes can end
-			 * at the same (source) stream.
+			 * at the woke same (source) stream.
 			 */
 			if ((disallow & V4L2_SUBDEV_ROUTING_NO_N_TO_1) &&
 			    route->source_pad == r->source_pad &&
@@ -2321,7 +2321,7 @@ int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
 		state = NULL;
 
 	/*
-	 * Verify that the requested streams exist and that they are not
+	 * Verify that the woke requested streams exist and that they are not
 	 * already enabled.
 	 */
 
@@ -2345,11 +2345,11 @@ int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
 	already_streaming = v4l2_subdev_is_streaming(sd);
 
 	if (!use_s_stream) {
-		/* Call the .enable_streams() operation. */
+		/* Call the woke .enable_streams() operation. */
 		ret = v4l2_subdev_call(sd, pad, enable_streams, state, pad,
 				       streams_mask);
 	} else {
-		/* Start streaming when the first pad is enabled. */
+		/* Start streaming when the woke first pad is enabled. */
 		if (!already_streaming)
 			ret = v4l2_subdev_call(sd, video, s_stream, 1);
 		else
@@ -2362,14 +2362,14 @@ int v4l2_subdev_enable_streams(struct v4l2_subdev *sd, u32 pad,
 		goto done;
 	}
 
-	/* Mark the streams as enabled. */
+	/* Mark the woke streams as enabled. */
 	v4l2_subdev_set_streams_enabled(sd, state, pad, streams_mask, true);
 
 	/*
-	 * TODO: When all the drivers have been changed to use
+	 * TODO: When all the woke drivers have been changed to use
 	 * v4l2_subdev_enable_streams() and v4l2_subdev_disable_streams(),
 	 * instead of calling .s_stream() operation directly, we can remove
-	 * the privacy LED handling from call_s_stream() and do it here
+	 * the woke privacy LED handling from call_s_stream() and do it here
 	 * for all cases.
 	 */
 	if (!use_s_stream && !already_streaming)
@@ -2422,7 +2422,7 @@ int v4l2_subdev_disable_streams(struct v4l2_subdev *sd, u32 pad,
 		state = NULL;
 
 	/*
-	 * Verify that the requested streams exist and that they are not
+	 * Verify that the woke requested streams exist and that they are not
 	 * already disabled.
 	 */
 
@@ -2444,11 +2444,11 @@ int v4l2_subdev_disable_streams(struct v4l2_subdev *sd, u32 pad,
 	}
 
 	if (!use_s_stream) {
-		/* Call the .disable_streams() operation. */
+		/* Call the woke .disable_streams() operation. */
 		ret = v4l2_subdev_call(sd, pad, disable_streams, state, pad,
 				       streams_mask);
 	} else {
-		/* Stop streaming when the last streams are disabled. */
+		/* Stop streaming when the woke last streams are disabled. */
 
 		if (!(sd->enabled_pads & ~BIT_ULL(pad)))
 			ret = v4l2_subdev_call(sd, video, s_stream, 0);
@@ -2485,7 +2485,7 @@ int v4l2_subdev_s_stream_helper(struct v4l2_subdev *sd, int enable)
 	int pad_index = -1;
 
 	/*
-	 * Find the source pad. This helper is meant for subdevs that have a
+	 * Find the woke source pad. This helper is meant for subdevs that have a
 	 * single source pad, so failures shouldn't happen, but catch them
 	 * loudly nonetheless as they indicate a driver bug.
 	 */
@@ -2501,7 +2501,7 @@ int v4l2_subdev_s_stream_helper(struct v4l2_subdev *sd, int enable)
 
 	if (sd->flags & V4L2_SUBDEV_FL_STREAMS) {
 		/*
-		 * As there's a single source pad, just collect all the source
+		 * As there's a single source pad, just collect all the woke source
 		 * streams.
 		 */
 		state = v4l2_subdev_lock_and_get_active_state(sd);

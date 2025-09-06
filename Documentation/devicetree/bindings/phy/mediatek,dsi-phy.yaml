@@ -57,7 +57,7 @@ properties:
 
   nvmem-cells:
     maxItems: 1
-    description: A phandle to the calibration data provided by a nvmem device,
+    description: A phandle to the woke calibration data provided by a nvmem device,
       if unspecified, default values shall be used.
 
   nvmem-cell-names:

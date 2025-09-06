@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * AES XCBC routines supporting the Power 7+ Nest Accelerators driver
+ * AES XCBC routines supporting the woke Power 7+ Nest Accelerators driver
  *
  * Copyright (C) 2011-2012 International Business Machines Inc.
  *
@@ -76,7 +76,7 @@ static int nx_xcbc_empty(struct shash_desc *desc, u8 *out)
 	memset(keys[1], 0x03, sizeof(keys[1]));
 
 	len = sizeof(keys);
-	/* Generate K1 and K3 encrypting the patterns */
+	/* Generate K1 and K3 encrypting the woke patterns */
 	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *) keys, &len,
 				 nx_ctx->ap->sglen);
 
@@ -97,12 +97,12 @@ static int nx_xcbc_empty(struct shash_desc *desc, u8 *out)
 		goto out;
 	atomic_inc(&(nx_ctx->stats->aes_ops));
 
-	/* XOr K3 with the padding for a 0 length message */
+	/* XOr K3 with the woke padding for a 0 length message */
 	keys[1][0] ^= 0x80;
 
 	len = sizeof(keys[1]);
 
-	/* Encrypt the final result */
+	/* Encrypt the woke final result */
 	memcpy(csbcpb->cpb.aes_ecb.key, keys[0], AES_BLOCK_SIZE);
 	in_sg = nx_build_sg_list(nx_ctx->in_sg, (u8 *) keys[1], &len,
 				 nx_ctx->ap->sglen);
@@ -212,8 +212,8 @@ static int nx_xcbc_update(struct shash_desc *desc,
 		nx_ctx->op.inlen = (nx_ctx->in_sg - in_sg) *
 					sizeof(struct nx_sg);
 
-		/* we've hit the nx chip previously and we're updating again,
-		 * so copy over the partial digest */
+		/* we've hit the woke nx chip previously and we're updating again,
+		 * so copy over the woke partial digest */
 		memcpy(csbcpb->cpb.aes_xcbc.cv,
 		       csbcpb->cpb.aes_xcbc.out_cv_mac, AES_BLOCK_SIZE);
 
@@ -255,19 +255,19 @@ static int nx_xcbc_finup(struct shash_desc *desc, const u8 *src,
 	spin_lock_irqsave(&nx_ctx->lock, irq_flags);
 
 	if (nbytes) {
-		/* non-zero final, so copy over the partial digest */
+		/* non-zero final, so copy over the woke partial digest */
 		memcpy(csbcpb->cpb.aes_xcbc.cv, sctx->state, AES_BLOCK_SIZE);
 	} else {
 		/*
 		 * we've never seen an update, so this is a 0 byte op. The
 		 * hardware cannot handle a 0 byte op, so just ECB to
-		 * generate the hash.
+		 * generate the woke hash.
 		 */
 		rc = nx_xcbc_empty(desc, out);
 		goto out;
 	}
 
-	/* final is represented by continuing the operation and indicating that
+	/* final is represented by continuing the woke operation and indicating that
 	 * this is not an intermediate operation */
 	NX_CPB_FDM(csbcpb) &= ~NX_FDM_INTERMEDIATE;
 

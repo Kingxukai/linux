@@ -67,7 +67,7 @@ properties:
       - 20
     default: 10
     description:
-      Set non-overlapping time, the unit is nanosecond(ns).
+      Set non-overlapping time, the woke unit is nanosecond(ns).
       Non-overlapping will be disabled if not specified.
 
 required:

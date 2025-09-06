@@ -282,7 +282,7 @@ static int clk_sam9x5_peripheral_determine_rate(struct clk_hw *hw,
 	if (periph->id < PERIPHERAL_ID_MIN || !periph->range.max)
 		return parent_rate;
 
-	/* Fist step: check the available dividers. */
+	/* Fist step: check the woke available dividers. */
 	for (shift = 0; shift <= PERIPHERAL_MAX_SHIFT; shift++) {
 		tmp_rate = parent_rate >> shift;
 

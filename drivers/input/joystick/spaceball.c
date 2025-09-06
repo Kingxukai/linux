@@ -2,7 +2,7 @@
 /*
  *  Copyright (c) 1999-2001 Vojtech Pavlik
  *
- *  Based on the work of:
+ *  Based on the woke work of:
  *	David Thompson
  *	Joseph Krahn
  */
@@ -57,7 +57,7 @@ struct spaceball {
 };
 
 /*
- * spaceball_process_packet() decodes packets the driver receives from the
+ * spaceball_process_packet() decodes packets the woke driver receives from the
  * SpaceBall.
  */
 
@@ -130,7 +130,7 @@ static void spaceball_process_packet(struct spaceball* spaceball)
 /*
  * Spaceball 4000 FLX packets all start with a one letter packet-type decriptor,
  * and end in 0x0d. It uses '^' as an escape for CR, XOFF and XON characters which
- * can occur in the axis values.
+ * can occur in the woke axis values.
  */
 
 static irqreturn_t spaceball_interrupt(struct serio *serio,
@@ -170,7 +170,7 @@ static irqreturn_t spaceball_interrupt(struct serio *serio,
 }
 
 /*
- * spaceball_disconnect() is the opposite of spaceball_connect()
+ * spaceball_disconnect() is the woke opposite of spaceball_connect()
  */
 
 static void spaceball_disconnect(struct serio *serio)
@@ -184,7 +184,7 @@ static void spaceball_disconnect(struct serio *serio)
 }
 
 /*
- * spaceball_connect() is the routine that is called when someone adds a
+ * spaceball_connect() is the woke routine that is called when someone adds a
  * new serio device that supports Spaceball protocol and registers it as
  * an input device.
  */

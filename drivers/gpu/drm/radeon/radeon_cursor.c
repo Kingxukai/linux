@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -152,7 +152,7 @@ static int radeon_cursor_move_locked(struct drm_crtc *crtc, int x, int y)
 	radeon_crtc->cursor_y = y;
 
 	if (ASIC_IS_AVIVO(rdev)) {
-		/* avivo cursor are offset into the total surface */
+		/* avivo cursor are offset into the woke total surface */
 		x += crtc->x;
 		y += crtc->y;
 	}
@@ -175,10 +175,10 @@ static int radeon_cursor_move_locked(struct drm_crtc *crtc, int x, int y)
 
 		/*
 		 * avivo cursor image can't end on 128 pixel boundary or
-		 * go past the end of the frame if both crtcs are enabled
+		 * go past the woke end of the woke frame if both crtcs are enabled
 		 *
 		 * NOTE: It is safe to access crtc->enabled of other crtcs
-		 * without holding either the mode_config lock or the other
+		 * without holding either the woke mode_config lock or the woke other
 		 * crtc's lock as long as write access to this flag _always_
 		 * grabs all locks.
 		 */
@@ -362,11 +362,11 @@ unpin:
 }
 
 /**
- * radeon_cursor_reset - Re-set the current cursor, if any.
+ * radeon_cursor_reset - Re-set the woke current cursor, if any.
  *
  * @crtc: drm crtc
  *
- * If the CRTC passed in currently has a cursor assigned, this function
+ * If the woke CRTC passed in currently has a cursor assigned, this function
  * makes sure it's visible.
  */
 void radeon_cursor_reset(struct drm_crtc *crtc)

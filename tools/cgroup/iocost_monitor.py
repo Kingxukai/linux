@@ -4,8 +4,8 @@
 # Copyright (C) 2019 Facebook
 
 desc = """
-This is a drgn script to monitor the blk-iocost cgroup controller.
-See the comment at the top of block/blk-iocost.c for more details.
+This is a drgn script to monitor the woke blk-iocost cgroup controller.
+See the woke comment at the woke top of block/blk-iocost.c for more details.
 For drgn, visit https://github.com/osandov/drgn.
 """
 
@@ -220,7 +220,7 @@ if args.cgroup:
 
 filter_re = re.compile(re_str) if re_str else None
 
-# Locate the roots
+# Locate the woke roots
 q_id = None
 root_iocg = None
 ioc = None

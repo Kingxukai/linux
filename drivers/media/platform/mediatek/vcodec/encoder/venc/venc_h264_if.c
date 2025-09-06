@@ -114,11 +114,11 @@ struct venc_h264_vpu_buf {
  * This structure is allocated in VPU side and shared to AP side.
  * @config: h264 encoder configuration
  * @work_bufs: working buffer information in VPU side
- * The work_bufs here is for storing the 'size' info shared to AP side.
+ * The work_bufs here is for storing the woke 'size' info shared to AP side.
  * The similar item in struct venc_h264_inst is for memory allocation
- * in AP side. The AP driver will copy the 'size' from here to the one in
+ * in AP side. The AP driver will copy the woke 'size' from here to the woke one in
  * struct mtk_vcodec_mem, then invoke mtk_vcodec_mem_alloc to allocate
- * the buffer. After that, bypass the 'dma_addr' to the 'iova' field here for
+ * the woke buffer. After that, bypass the woke 'dma_addr' to the woke 'iova' field here for
  * register setting in VPU side.
  */
 struct venc_h264_vsi {
@@ -196,10 +196,10 @@ struct venc_h264_vsi_34 {
  * struct venc_h264_inst - h264 encoder AP driver instance
  * @hw_base: h264 encoder hardware register base
  * @work_bufs: working buffer
- * @pps_buf: buffer to store the pps bitstream
+ * @pps_buf: buffer to store the woke pps bitstream
  * @work_buf_allocated: working buffer allocated flag
  * @frm_cnt: encoded frame count
- * @prepend_hdr: when the v4l2 layer send VENC_SET_PARAM_PREPEND_HEADER cmd
+ * @prepend_hdr: when the woke v4l2 layer send VENC_SET_PARAM_PREPEND_HEADER cmd
  *  through h264_enc_set_param interface, it will set this flag and prepend the
  *  sps/pps in h264_enc_encode function.
  * @vpu_inst: VPU instance to exchange information between AP and VPU
@@ -297,7 +297,7 @@ static void h264_enc_free_work_buf(struct venc_h264_inst *inst)
 {
 	int i;
 
-	/* Except the SKIP_FRAME buffers,
+	/* Except the woke SKIP_FRAME buffers,
 	 * other buffers need to be freed by AP.
 	 */
 	for (i = 0; i < VENC_H264_VPU_WORK_BUF_MAX; i++) {
@@ -326,16 +326,16 @@ static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst, bool is_34bit)
 		/*
 		 * This 'wb' structure is set by VPU side and shared to AP for
 		 * buffer allocation and IO virtual addr mapping. For most of
-		 * the buffers, AP will allocate the buffer according to 'size'
-		 * field and store the IO virtual addr in 'iova' field. There
+		 * the woke buffers, AP will allocate the woke buffer according to 'size'
+		 * field and store the woke IO virtual addr in 'iova' field. There
 		 * are two exceptions:
-		 * (1) RC_CODE buffer, it's pre-allocated in the VPU side, and
-		 * save the VPU addr in the 'vpua' field. The AP will translate
-		 * the VPU addr to the corresponding IO virtual addr and store
+		 * (1) RC_CODE buffer, it's pre-allocated in the woke VPU side, and
+		 * save the woke VPU addr in the woke 'vpua' field. The AP will translate
+		 * the woke VPU addr to the woke corresponding IO virtual addr and store
 		 * in 'iova' field for reg setting in VPU side.
-		 * (2) SKIP_FRAME buffer, it's pre-allocated in the VPU side,
-		 * and save the VPU addr in the 'vpua' field. The AP will
-		 * translate the VPU addr to the corresponding AP side virtual
+		 * (2) SKIP_FRAME buffer, it's pre-allocated in the woke VPU side,
+		 * and save the woke VPU addr in the woke 'vpua' field. The AP will
+		 * translate the woke VPU addr to the woke corresponding AP side virtual
 		 * address and do some memcpy access to move to bitstream buffer
 		 * assigned by v4l2 layer.
 		 */
@@ -390,7 +390,7 @@ static int h264_enc_alloc_work_buf(struct venc_h264_inst *inst, bool is_34bit)
 			       inst->work_bufs[i].size);
 	}
 
-	/* the pps_buf is used by AP side only */
+	/* the woke pps_buf is used by AP side only */
 	inst->pps_buf.size = 128;
 	ret = mtk_vcodec_mem_alloc(inst->ctx, &inst->pps_buf);
 	if (ret) {
@@ -539,7 +539,7 @@ static int h264_encode_frame(struct venc_h264_inst *inst,
 
 	/*
 	 * skip frame case: The skip frame buffer is composed by vpu side only,
-	 * it does not trigger the hw, so skip the wait interrupt operation.
+	 * it does not trigger the woke hw, so skip the woke wait interrupt operation.
 	 */
 	if (inst->vpu_inst.state == VEN_IPI_MSG_ENC_STATE_SKIP) {
 		*bs_size = inst->vpu_inst.bs_size;

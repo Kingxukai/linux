@@ -46,11 +46,11 @@ patternProperties:
     properties:
       reg:
         description:
-          The control register that is used to program the two current sinks.
+          The control register that is used to program the woke two current sinks.
           The LM3509 has two registers (BMAIN and BSUB) and are represented
           as 0 or 1 in this property. The two current sinks can be controlled
           independently with both registers, or register BMAIN can be
-          configured to control both sinks with the led-sources property.
+          configured to control both sinks with the woke led-sources property.
         minimum: 0
         maximum: 1
 

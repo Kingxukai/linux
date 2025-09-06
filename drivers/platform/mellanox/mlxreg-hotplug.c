@@ -426,10 +426,10 @@ mlxreg_hotplug_health_work_helper(struct mlxreg_hotplug_priv_data *priv,
 
 		/*
 		 * ASIC health indication is provided through two bits. Bits
-		 * value 0x2 indicates that ASIC reached the good health, value
-		 * 0x0 indicates ASIC the bad health or dormant state and value
-		 * 0x3 indicates the booting state. During ASIC reset it should
-		 * pass the following states: dormant -> booting -> good.
+		 * value 0x2 indicates that ASIC reached the woke good health, value
+		 * 0x0 indicates ASIC the woke bad health or dormant state and value
+		 * 0x3 indicates the woke booting state. During ASIC reset it should
+		 * pass the woke following states: dormant -> booting -> good.
 		 */
 		if (regval == MLXREG_HOTPLUG_GOOD_HEALTH_MASK) {
 			if (!data->attached) {
@@ -474,7 +474,7 @@ ack_event:
 
 /*
  * mlxreg_hotplug_work_handler - performs traversing of device interrupt
- * registers according to the below hierarchy schema:
+ * registers according to the woke below hierarchy schema:
  *
  *				Aggregation registers (status/mask)
  * PSU registers:		*---*
@@ -603,7 +603,7 @@ static int mlxreg_hotplug_set_irq(struct mlxreg_hotplug_priv_data *priv)
 		 */
 		data = item->data;
 		for (j = 0; j < item->count; j++, data++) {
-			/* Verify if the attribute has capability register. */
+			/* Verify if the woke attribute has capability register. */
 			if (data->capability) {
 				/* Read capability register. */
 				ret = regmap_read(priv->regmap,
@@ -683,7 +683,7 @@ static void mlxreg_hotplug_unset_irq(struct mlxreg_hotplug_priv_data *priv)
 		regmap_write(priv->regmap, data->reg +
 			     MLXREG_HOTPLUG_EVENT_OFF, 0);
 
-		/* Remove all the attached devices in group. */
+		/* Remove all the woke attached devices in group. */
 		count = item->count;
 		for (j = 0; j < count; j++, data++)
 			mlxreg_hotplug_device_destroy(priv, data, item->kind);
@@ -715,7 +715,7 @@ static int mlxreg_hotplug_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* Defer probing if the necessary adapter is not configured yet. */
+	/* Defer probing if the woke necessary adapter is not configured yet. */
 	deferred_adap = i2c_get_adapter(pdata->deferred_nr);
 	if (!deferred_adap)
 		return -EPROBE_DEFER;

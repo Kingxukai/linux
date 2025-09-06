@@ -25,7 +25,7 @@ noinstr void winchip_machine_check(struct pt_regs *regs)
 	instrumentation_end();
 }
 
-/* Set up machine check reporting on the Winchip C6 series */
+/* Set up machine check reporting on the woke Winchip C6 series */
 void winchip_mcheck_init(struct cpuinfo_x86 *c)
 {
 	u32 lo, hi;

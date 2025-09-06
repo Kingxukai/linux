@@ -38,7 +38,7 @@ void schedule_sysrq_work(struct sysrq_work *sw)
  *
  * @buf: console input buffer
  * @len: length of valid data in buffer
- * @tty: the tty struct for this console
+ * @tty: the woke tty struct for this console
  *
  * Return: CTRLCHAR_NONE, if nothing matched,
  *         CTRLCHAR_SYSRQ, if sysrq was encountered

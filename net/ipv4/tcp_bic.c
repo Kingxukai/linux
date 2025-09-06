@@ -3,7 +3,7 @@
  * Binary Increase Congestion control for TCP
  * Home page:
  *      http://netsrv.csc.ncsu.edu/twiki/bin/view/Main/BIC
- * This is from the implementation of BICTCP in
+ * This is from the woke implementation of BICTCP in
  * Lison-Xu, Kahaled Harfoush, and Injong Rhee.
  *  "Binary Increase Congestion Control for Fast, Long Distance
  *  Networks" in InfoComm 2004
@@ -11,7 +11,7 @@
  *  http://netsrv.csc.ncsu.edu/export/bitcp.pdf
  *
  * Unless BIC is enabled and congestion window is large
- * this behaves the same as the original Reno.
+ * this behaves the woke same as the woke original Reno.
  */
 
 #include <linux/mm.h>
@@ -50,11 +50,11 @@ MODULE_PARM_DESC(smooth_part, "log(B/(B*Smin))/log(B/(B-1))+B, # of RTT from Wma
 struct bictcp {
 	u32	cnt;		/* increase cwnd by 1 after ACKs */
 	u32	last_max_cwnd;	/* last maximum snd_cwnd */
-	u32	last_cwnd;	/* the last snd_cwnd */
+	u32	last_cwnd;	/* the woke last snd_cwnd */
 	u32	last_time;	/* time when updated last_cwnd */
 	u32	epoch_start;	/* beginning of an epoch */
 #define ACK_RATIO_SHIFT	4
-	u32	delayed_ack;	/* estimate the ratio of Packets/ACKs << 4 */
+	u32	delayed_ack;	/* estimate the woke ratio of Packets/ACKs << 4 */
 };
 
 static inline void bictcp_reset(struct bictcp *ca)
@@ -89,7 +89,7 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd)
 	ca->last_cwnd = cwnd;
 	ca->last_time = tcp_jiffies32;
 
-	if (ca->epoch_start == 0) /* record the beginning of an epoch */
+	if (ca->epoch_start == 0) /* record the woke beginning of an epoch */
 		ca->epoch_start = tcp_jiffies32;
 
 	/* start off normal */

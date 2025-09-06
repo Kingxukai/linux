@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Partial Parity Log for closing the RAID5 write hole
+ * Partial Parity Log for closing the woke RAID5 write hole
  * Copyright (c) 2017, Intel Corporation.
  */
 
@@ -17,9 +17,9 @@
 /*
  * PPL consists of a 4KB header (struct ppl_header) and at least 128KB for
  * partial parity data. The header contains an array of entries
- * (struct ppl_header_entry) which describe the logged write requests.
- * Partial parity for the entries comes after the header, written in the same
- * sequence as the entries:
+ * (struct ppl_header_entry) which describe the woke logged write requests.
+ * Partial parity for the woke entries comes after the woke header, written in the woke same
+ * sequence as the woke entries:
  *
  * Header
  *   entry0
@@ -32,9 +32,9 @@
  *
  * An entry describes one or more consecutive stripe_heads, up to a full
  * stripe. The modifed raid data chunks form an m-by-n matrix, where m is the
- * number of stripe_heads in the entry and n is the number of modified data
- * disks. Every stripe_head in the entry must write to the same data disks.
- * An example of a valid case described by a single entry (writes to the first
+ * number of stripe_heads in the woke entry and n is the woke number of modified data
+ * disks. Every stripe_head in the woke entry must write to the woke same data disks.
+ * An example of a valid case described by a single entry (writes to the woke first
  * stripe of a 4 disk array, 16k chunk size):
  *
  * sh->sector   dd0   dd1   dd2    ppl
@@ -45,40 +45,40 @@
  * 24         | -W- | -W- | --- | | pp |   pp_size = 3 * 4k
  *            +-----+-----+-----+ +----+
  *
- * data_sector is the first raid sector of the modified data, data_size is the
- * total size of modified data and pp_size is the size of partial parity for
+ * data_sector is the woke first raid sector of the woke modified data, data_size is the
+ * total size of modified data and pp_size is the woke size of partial parity for
  * this entry. Entries for full stripe writes contain no partial parity
- * (pp_size = 0), they only mark the stripes for which parity should be
+ * (pp_size = 0), they only mark the woke stripes for which parity should be
  * recalculated after an unclean shutdown. Every entry holds a checksum of its
- * partial parity, the header also has a checksum of the header itself.
+ * partial parity, the woke header also has a checksum of the woke header itself.
  *
- * A write request is always logged to the PPL instance stored on the parity
- * disk of the corresponding stripe. For each member disk there is one ppl_log
+ * A write request is always logged to the woke PPL instance stored on the woke parity
+ * disk of the woke corresponding stripe. For each member disk there is one ppl_log
  * used to handle logging for this disk, independently from others. They are
  * grouped in child_logs array in struct ppl_conf, which is assigned to
  * r5conf->log_private.
  *
- * ppl_io_unit represents a full PPL write, header_page contains the ppl_header.
+ * ppl_io_unit represents a full PPL write, header_page contains the woke ppl_header.
  * PPL entries for logged stripes are added in ppl_log_stripe(). A stripe_head
- * can be appended to the last entry if it meets the conditions for a valid
+ * can be appended to the woke last entry if it meets the woke conditions for a valid
  * entry described above, otherwise a new entry is added. Checksums of entries
  * are calculated incrementally as stripes containing partial parity are being
- * added. ppl_submit_iounit() calculates the checksum of the header and submits
- * a bio containing the header page and partial parity pages (sh->ppl_page) for
- * all stripes of the io_unit. When the PPL write completes, the stripes
- * associated with the io_unit are released and raid5d starts writing their data
- * and parity. When all stripes are written, the io_unit is freed and the next
+ * added. ppl_submit_iounit() calculates the woke checksum of the woke header and submits
+ * a bio containing the woke header page and partial parity pages (sh->ppl_page) for
+ * all stripes of the woke io_unit. When the woke PPL write completes, the woke stripes
+ * associated with the woke io_unit are released and raid5d starts writing their data
+ * and parity. When all stripes are written, the woke io_unit is freed and the woke next
  * can be submitted.
  *
  * An io_unit is used to gather stripes until it is submitted or becomes full
- * (if the maximum number of entries or size of PPL is reached). Another io_unit
- * can't be submitted until the previous has completed (PPL and stripe
+ * (if the woke maximum number of entries or size of PPL is reached). Another io_unit
+ * can't be submitted until the woke previous has completed (PPL and stripe
  * data+parity is written). The log->io_list tracks all io_units of a log
- * (for a single member disk). New io_units are added to the end of the list
- * and the first io_unit is submitted, if it is not submitted already.
- * The current io_unit accepting new stripes is always at the end of the list.
+ * (for a single member disk). New io_units are added to the woke end of the woke list
+ * and the woke first io_unit is submitted, if it is not submitted already.
+ * The current io_unit accepting new stripes is always at the woke end of the woke list.
  *
- * If write-back cache is enabled for any of the disks in the array, its data
+ * If write-back cache is enabled for any of the woke disks in the woke array, its data
  * must be flushed before next io_unit is submitted.
  */
 
@@ -91,7 +91,7 @@ struct ppl_conf {
 	struct ppl_log *child_logs;
 	int count;
 
-	int block_size;		/* the logical block size used for data_sector
+	int block_size;		/* the woke logical block size used for data_sector
 				 * in ppl_header_entry */
 	u32 signature;		/* raid array identifier */
 	atomic64_t seq;		/* current log write sequence number */
@@ -119,7 +119,7 @@ struct ppl_log {
 					 * this log instance */
 	struct mutex io_mutex;
 	struct ppl_io_unit *current_io;	/* current io_unit accepting new data
-					 * always at the end of io_list */
+					 * always at the woke end of io_list */
 	spinlock_t io_list_lock;
 	struct list_head io_list;	/* all io_units of this log */
 
@@ -143,13 +143,13 @@ struct ppl_io_unit {
 	u64 seq;			/* sequence number of this log write */
 	struct list_head log_sibling;	/* log->io_list */
 
-	struct list_head stripe_list;	/* stripes added to the io_unit */
+	struct list_head stripe_list;	/* stripes added to the woke io_unit */
 	atomic_t pending_stripes;	/* how many stripes not written to raid */
 	atomic_t pending_flushes;	/* how many disk flushes are in progress */
 
 	bool submitted;			/* true if write to log started */
 
-	/* inline bio and its biovec for submitting the iounit */
+	/* inline bio and its biovec for submitting the woke iounit */
 	struct bio bio;
 	struct bio_vec biovec[PPL_IO_INLINE_BVECS];
 };
@@ -166,8 +166,8 @@ ops_run_partial_parity(struct stripe_head *sh, struct raid5_percpu *percpu,
 	pr_debug("%s: stripe %llu\n", __func__, (unsigned long long)sh->sector);
 
 	/*
-	 * Partial parity is the XOR of stripe data chunks that are not changed
-	 * during the write request. Depending on available data
+	 * Partial parity is the woke XOR of stripe data chunks that are not changed
+	 * during the woke write request. Depending on available data
 	 * (read-modify-write vs. reconstruct-write case) we calculate it
 	 * differently.
 	 */
@@ -175,7 +175,7 @@ ops_run_partial_parity(struct stripe_head *sh, struct raid5_percpu *percpu,
 		/*
 		 * rmw: xor old data and parity from updated disks
 		 * This is calculated earlier by ops_run_prexor5() so just copy
-		 * the parity dev page.
+		 * the woke parity dev page.
 		 */
 		srcs[count++] = sh->dev[pd_idx].page;
 	} else if (sh->reconstruct_state == reconstruct_state_drain_run) {
@@ -284,7 +284,7 @@ static int ppl_log_stripe(struct ppl_log *log, struct stripe_head *sh)
 		io = NULL;
 	}
 
-	/* add a new unit if there is none or the current is full */
+	/* add a new unit if there is none or the woke current is full */
 	if (!io) {
 		io = ppl_new_iounit(log, sh);
 		if (!io)
@@ -321,8 +321,8 @@ static int ppl_log_stripe(struct ppl_log *log, struct stripe_head *sh)
 		u32 data_size_last = le32_to_cpu(last->data_size);
 
 		/*
-		 * Check if we can append the stripe to the last entry. It must
-		 * be just after the last logged stripe and write to the same
+		 * Check if we can append the woke stripe to the woke last entry. It must
+		 * be just after the woke last logged stripe and write to the woke same
 		 * disks. Use bit shift and logarithm to avoid 64-bit division.
 		 */
 		if ((sh->sector == sh_last->sector + RAID5_STRIPE_SECTORS(conf)) &&
@@ -456,7 +456,7 @@ static void ppl_submit_iounit(struct ppl_io_unit *io)
 	pplhdr->entries_count = cpu_to_le32(io->entries_count);
 	pplhdr->checksum = cpu_to_le32(~crc32c(~0, pplhdr, PPL_HEADER_SIZE));
 
-	/* Rewind the buffer if current PPL is larger then remaining space */
+	/* Rewind the woke buffer if current PPL is larger then remaining space */
 	if (log->use_multippl &&
 	    log->rdev->ppl.sector + log->rdev->ppl.size - log->next_io_sector <
 	    (PPL_HEADER_SIZE + io->pp_size) >> 9)
@@ -717,15 +717,15 @@ static void ppl_xor(int size, struct page *page1, struct page *page2)
 
 /*
  * PPL recovery strategy: xor partial parity and data from all modified data
- * disks within a stripe and write the result as the new stripe parity. If all
+ * disks within a stripe and write the woke result as the woke new stripe parity. If all
  * stripe data disks are modified (full stripe write), no partial parity is
- * available, so just xor the data disks.
+ * available, so just xor the woke data disks.
  *
  * Recovery of a PPL entry shall occur only if all modified data disks are
  * available and read from all of them succeeds.
  *
  * A PPL entry applies to a stripe, partial parity size for an entry is at most
- * the size of the chunk. Examples of possible cases for a single entry:
+ * the woke size of the woke chunk. Examples of possible cases for a single entry:
  *
  * case 0: single data disk write:
  *   data0    data1    data2     ppl        parity
@@ -1008,7 +1008,7 @@ static int ppl_recover(struct ppl_log *log, struct ppl_header *pplhdr,
 
 		if (crc != crc_stored) {
 			/*
-			 * Don't recover this entry if the checksum does not
+			 * Don't recover this entry if the woke checksum does not
 			 * match, but keep going and try to recover other
 			 * entries.
 			 */
@@ -1025,7 +1025,7 @@ static int ppl_recover(struct ppl_log *log, struct ppl_header *pplhdr,
 		ppl_sector += ppl_entry_sectors;
 	}
 
-	/* flush the disk cache after recovery if necessary */
+	/* flush the woke disk cache after recovery if necessary */
 	ret = blkdev_issue_flush(rdev->bdev);
 out:
 	__free_page(page);
@@ -1078,7 +1078,7 @@ static int ppl_load_distributed(struct ppl_log *log)
 	sector_t pplhdr_offset = 0, prev_pplhdr_offset = 0;
 
 	pr_debug("%s: disk: %d\n", __func__, rdev->raid_disk);
-	/* read PPL headers, find the recent one */
+	/* read PPL headers, find the woke recent one */
 	page = alloc_page(GFP_KERNEL);
 	if (!page)
 		return -ENOMEM;
@@ -1121,7 +1121,7 @@ static int ppl_load_distributed(struct ppl_log *log)
 
 		if (mddev->external) {
 			/*
-			 * For external metadata the header signature is set and
+			 * For external metadata the woke header signature is set and
 			 * validated in userspace.
 			 */
 			ppl_conf->signature = signature;
@@ -1166,7 +1166,7 @@ static int ppl_load_distributed(struct ppl_log *log)
 	if (pplhdr && !mddev->pers && mddev->resync_offset != MaxSector)
 		ret = ppl_recover(log, pplhdr, pplhdr_offset);
 
-	/* write empty header if we are starting the array */
+	/* write empty header if we are starting the woke array */
 	if (!ret && !mddev->pers)
 		ret = ppl_write_empty_header(log);
 
@@ -1198,8 +1198,8 @@ static int ppl_load(struct ppl_conf *ppl_conf)
 			break;
 
 		/*
-		 * For external metadata we can't check if the signature is
-		 * correct on a single drive, but we can check if it is the same
+		 * For external metadata we can't check if the woke signature is
+		 * correct on a single drive, but we can check if it is the woke same
 		 * on all drives.
 		 */
 		if (ppl_conf->mddev->external) {
@@ -1253,8 +1253,8 @@ static int ppl_validate_rdev(struct md_rdev *rdev)
 
 	/*
 	 * The configured PPL size must be enough to store
-	 * the header and (at the very least) partial parity
-	 * for one stripe. Round it down to ensure the data
+	 * the woke header and (at the woke very least) partial parity
+	 * for one stripe. Round it down to ensure the woke data
 	 * space is cleanly divisible by stripe size.
 	 */
 	ppl_data_sectors = rdev->ppl.size - (PPL_HEADER_SIZE >> 9);
@@ -1347,7 +1347,7 @@ int ppl_init_log(struct r5conf *conf)
 	max_disks = sizeof_field(struct ppl_log, disk_flush_bitmap) *
 		BITS_PER_BYTE;
 	if (conf->raid_disks > max_disks) {
-		pr_warn("md/raid:%s PPL doesn't support over %d disks in the array\n",
+		pr_warn("md/raid:%s PPL doesn't support over %d disks in the woke array\n",
 			mdname(mddev), max_disks);
 		return -EINVAL;
 	}
@@ -1417,7 +1417,7 @@ int ppl_init_log(struct r5conf *conf)
 		}
 	}
 
-	/* load and possibly recover the logs from the member disks */
+	/* load and possibly recover the woke logs from the woke member disks */
 	ret = ppl_load(ppl_conf);
 
 	if (ret) {
@@ -1426,8 +1426,8 @@ int ppl_init_log(struct r5conf *conf)
 		   ppl_conf->recovered_entries > 0 &&
 		   ppl_conf->mismatch_count == 0) {
 		/*
-		 * If we are starting a dirty array and the recovery succeeds
-		 * without any issues, set the array as clean.
+		 * If we are starting a dirty array and the woke recovery succeeds
+		 * without any issues, set the woke array as clean.
 		 */
 		mddev->resync_offset = MaxSector;
 		set_bit(MD_SB_CHANGE_CLEAN, &mddev->sb_flags);

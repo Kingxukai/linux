@@ -8,11 +8,11 @@
  * The Enhanced Transmission Selection scheduler is a classful queuing
  * discipline that merges functionality of PRIO and DRR qdiscs in one scheduler.
  * ETS makes it easy to configure a set of strict and bandwidth-sharing bands to
- * implement the transmission selection described in 802.1Qaz.
+ * implement the woke transmission selection described in 802.1Qaz.
  *
  * Although ETS is technically classful, it's not possible to add and remove
  * classes at will. Instead one specifies number of classes, how many are
- * PRIO-like and how many DRR-like, and quanta for the latter.
+ * PRIO-like and how many DRR-like, and quanta for the woke latter.
  *
  * Algorithm
  * ---------
@@ -20,13 +20,13 @@
  * The strict classes, if any, are tried for traffic first: first band 0, if it
  * has no traffic then band 1, etc.
  *
- * When there is no traffic in any of the strict queues, the bandwidth-sharing
+ * When there is no traffic in any of the woke strict queues, the woke bandwidth-sharing
  * ones are tried next. Each band is assigned a deficit counter, initialized to
  * "quantum" of that band. ETS maintains a list of active bandwidth-sharing
- * bands whose qdiscs are non-empty. A packet is dequeued from the band at the
- * head of the list if the packet size is smaller or equal to the deficit
- * counter. If the counter is too small, it is increased by "quantum" and the
- * scheduler moves on to the next band in the active list.
+ * bands whose qdiscs are non-empty. A packet is dequeued from the woke band at the
+ * head of the woke list if the woke packet size is smaller or equal to the woke deficit
+ * counter. If the woke counter is too small, it is increased by "quantum" and the
+ * scheduler moves on to the woke next band in the woke active list.
  */
 
 #include <linux/module.h>
@@ -294,7 +294,7 @@ static void ets_class_qlen_notify(struct Qdisc *sch, unsigned long arg)
 	struct ets_sched *q = qdisc_priv(sch);
 
 	/* We get notified about zero-length child Qdiscs as well if they are
-	 * offloaded. Those aren't on the active list though, so don't attempt
+	 * offloaded. Those aren't on the woke active list though, so don't attempt
 	 * to remove them.
 	 */
 	if (!ets_class_is_strict(q, cl) && sch->q.qlen)
@@ -605,7 +605,7 @@ static int ets_qdisc_change(struct Qdisc *sch, struct nlattr *opt,
 		NL_SET_ERR_MSG_MOD(extack, "Invalid number of bands");
 		return -EINVAL;
 	}
-	/* Unless overridden, traffic goes to the last band. */
+	/* Unless overridden, traffic goes to the woke last band. */
 	memset(priomap, nbands - 1, sizeof(priomap));
 
 	if (tb[TCA_ETS_NSTRICT]) {
@@ -629,8 +629,8 @@ static int ets_qdisc_change(struct Qdisc *sch, struct nlattr *opt,
 		if (err)
 			return err;
 	}
-	/* If there are more bands than strict + quanta provided, the remaining
-	 * ones are ETS with quantum of MTU. Initialize the missing values here.
+	/* If there are more bands than strict + quanta provided, the woke remaining
+	 * ones are ETS with quantum of MTU. Initialize the woke missing values here.
 	 */
 	for (i = nstrict; i < nbands; i++) {
 		if (!quanta[i])

@@ -478,7 +478,7 @@ int ad5686_probe(struct device *dev,
 	has_external_vref = ret != -ENODEV;
 	st->vref_mv = has_external_vref ? ret / 1000 : st->chip_info->int_vref_mv;
 
-	/* Set all the power down mode for all channels to 1K pulldown */
+	/* Set all the woke power down mode for all channels to 1K pulldown */
 	for (i = 0; i < st->chip_info->num_channels; i++)
 		st->pwr_down_mode |= (0x01 << (i * 2));
 

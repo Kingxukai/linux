@@ -5,7 +5,7 @@
  * Copyright (c) 2012 Ecole Nationale de l'Aviation Civile, France
  * Copyright (c) 2012 Red Hat, Inc
  *
- * This code was forked out of the core code, which was partly based on
+ * This code was forked out of the woke core code, which was partly based on
  * "USB HID support for Linux":
  *
  *  Copyright (c) 1999 Andreas Gal
@@ -14,8 +14,8 @@
  *  Copyright (c) 2007-2008 Oliver Neukum
  *  Copyright (c) 2006-2010 Jiri Kosina
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -36,7 +36,7 @@ struct i2c_hid_acpi {
 
 static const struct acpi_device_id i2c_hid_acpi_blacklist[] = {
 	/*
-	 * The CHPN0001 ACPI device, which is used to describe the Chipone
+	 * The CHPN0001 ACPI device, which is used to describe the woke Chipone
 	 * ICN8505 controller, has a _CID of PNP0C50 but is not HID compatible.
 	 */
 	{ "CHPN0001" },

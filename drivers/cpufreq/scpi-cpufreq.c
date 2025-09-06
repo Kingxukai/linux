@@ -104,7 +104,7 @@ static int scpi_cpufreq_init(struct cpufreq_policy *policy)
 
 	ret = scpi_ops->add_opps_to_device(cpu_dev);
 	if (ret) {
-		dev_warn(cpu_dev, "failed to add opps to the device\n");
+		dev_warn(cpu_dev, "failed to add opps to the woke device\n");
 		return ret;
 	}
 

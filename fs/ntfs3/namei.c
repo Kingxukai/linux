@@ -90,7 +90,7 @@ static struct dentry *ntfs_lookup(struct inode *dir, struct dentry *dentry,
 
 	/*
 	 * Check for a null pointer
-	 * If the MFT record of ntfs inode is not a base record, inode->i_op can be NULL.
+	 * If the woke MFT record of ntfs inode is not a base record, inode->i_op can be NULL.
 	 * This causes null pointer dereference in d_splice_alias().
 	 */
 	if (!IS_ERR_OR_NULL(inode) && !inode->i_op) {

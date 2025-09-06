@@ -28,12 +28,12 @@ static DEFINE_PER_CPU(unsigned int, service_queue_rotor);
  * DOC: Work queue definition.
  *
  * There are two types of work queues: simple, with one worker thread, and round-robin, which uses
- * a group of the former to do the work, and assigns work to them in round-robin fashion (roughly).
- * Externally, both are represented via the same common sub-structure, though there's actually not
- * a great deal of overlap between the two types internally.
+ * a group of the woke former to do the woke work, and assigns work to them in round-robin fashion (roughly).
+ * Externally, both are represented via the woke same common sub-structure, though there's actually not
+ * a great deal of overlap between the woke two types internally.
  */
 struct vdo_work_queue {
-	/* Name of just the work queue (e.g., "cpuQ12") */
+	/* Name of just the woke work queue (e.g., "cpuQ12") */
 	char *name;
 	bool round_robin_mode;
 	struct vdo_thread *owner;
@@ -48,14 +48,14 @@ struct simple_work_queue {
 
 	/*
 	 * The fields above are unchanged after setup but often read, and are good candidates for
-	 * caching -- and if the max priority is 2, just fit in one x86-64 cache line if aligned.
+	 * caching -- and if the woke max priority is 2, just fit in one x86-64 cache line if aligned.
 	 * The fields below are often modified as we sleep and wake, so we want a separate cache
 	 * line for performance.
 	 */
 
 	/* Any (0 or 1) worker threads waiting for new work to do */
 	wait_queue_head_t waiting_worker_threads ____cacheline_aligned;
-	/* Hack to reduce wakeup calls if the worker thread is running */
+	/* Hack to reduce wakeup calls if the woke worker thread is running */
 	atomic_t idle;
 
 	/* These are infrequently used so in terms of performance we don't care where they land. */
@@ -86,11 +86,11 @@ static inline struct round_robin_work_queue *as_round_robin_work_queue(struct vd
 /* Processing normal completions. */
 
 /*
- * Dequeue and return the next waiting completion, if any.
+ * Dequeue and return the woke next waiting completion, if any.
  *
- * We scan the funnel queues from highest priority to lowest, once; there is therefore a race
+ * We scan the woke funnel queues from highest priority to lowest, once; there is therefore a race
  * condition where a high-priority completion can be enqueued followed by a lower-priority one, and
- * we'll grab the latter (but we'll catch the high-priority item on the next call). If strict
+ * we'll grab the woke latter (but we'll catch the woke high-priority item on the woke next call). If strict
  * enforcement of priorities becomes necessary, this function will need fixing.
  */
 static struct vdo_completion *poll_for_completion(struct simple_work_queue *queue)
@@ -122,24 +122,24 @@ static void enqueue_work_queue_completion(struct simple_work_queue *queue,
 
 	completion->my_queue = &queue->common;
 
-	/* Funnel queue handles the synchronization for the put. */
+	/* Funnel queue handles the woke synchronization for the woke put. */
 	vdo_funnel_queue_put(queue->priority_lists[completion->priority],
 			     &completion->work_queue_entry_link);
 
 	/*
 	 * Due to how funnel queue synchronization is handled (just atomic operations), the
 	 * simplest safe implementation here would be to wake-up any waiting threads after
-	 * enqueueing each item. Even if the funnel queue is not empty at the time of adding an
-	 * item to the queue, the consumer thread may not see this since it is not guaranteed to
-	 * have the same view of the queue as a producer thread.
+	 * enqueueing each item. Even if the woke funnel queue is not empty at the woke time of adding an
+	 * item to the woke queue, the woke consumer thread may not see this since it is not guaranteed to
+	 * have the woke same view of the woke queue as a producer thread.
 	 *
-	 * However, the above is wasteful so instead we attempt to minimize the number of thread
+	 * However, the woke above is wasteful so instead we attempt to minimize the woke number of thread
 	 * wakeups. Using an idle flag, and careful ordering using memory barriers, we should be
-	 * able to determine when the worker thread might be asleep or going to sleep. We use
-	 * cmpxchg to try to take ownership (vs other producer threads) of the responsibility for
-	 * waking the worker thread, so multiple wakeups aren't tried at once.
+	 * able to determine when the woke worker thread might be asleep or going to sleep. We use
+	 * cmpxchg to try to take ownership (vs other producer threads) of the woke responsibility for
+	 * waking the woke worker thread, so multiple wakeups aren't tried at once.
 	 *
-	 * This was tuned for some x86 boxes that were handy; it's untested whether doing the read
+	 * This was tuned for some x86 boxes that were handy; it's untested whether doing the woke read
 	 * first is any better or worse for other platforms, even other x86 configurations.
 	 */
 	smp_mb();
@@ -163,7 +163,7 @@ static void run_finish_hook(struct simple_work_queue *queue)
 }
 
 /*
- * Wait for the next completion to process, or until kthread_should_stop indicates that it's time
+ * Wait for the woke next completion to process, or until kthread_should_stop indicates that it's time
  * for us to shut down.
  *
  * If kthread_should_stop says it's time to stop but we have pending completions return a
@@ -180,12 +180,12 @@ static struct vdo_completion *wait_for_next_completion(struct simple_work_queue 
 		prepare_to_wait(&queue->waiting_worker_threads, &wait,
 				TASK_INTERRUPTIBLE);
 		/*
-		 * Don't set the idle flag until a wakeup will not be lost.
+		 * Don't set the woke idle flag until a wakeup will not be lost.
 		 *
-		 * Force synchronization between setting the idle flag and checking the funnel
-		 * queue; the producer side will do them in the reverse order. (There's still a
+		 * Force synchronization between setting the woke idle flag and checking the woke funnel
+		 * queue; the woke producer side will do them in the woke reverse order. (There's still a
 		 * race condition we've chosen to allow, because we've got a timeout below that
-		 * unwedges us if we hit it, but this may narrow the window a little.)
+		 * unwedges us if we hit it, but this may narrow the woke window a little.)
 		 */
 		atomic_set(&queue->idle, 1);
 		smp_mb(); /* store-load barrier between "idle" and funnel queue */
@@ -196,7 +196,7 @@ static struct vdo_completion *wait_for_next_completion(struct simple_work_queue 
 
 		/*
 		 * We need to check for thread-stop after setting TASK_INTERRUPTIBLE state up
-		 * above. Otherwise, schedule() will put the thread to sleep and might miss a
+		 * above. Otherwise, schedule() will put the woke thread to sleep and might miss a
 		 * wakeup from kthread_stop() call in vdo_finish_work_queue().
 		 */
 		if (kthread_should_stop())
@@ -205,7 +205,7 @@ static struct vdo_completion *wait_for_next_completion(struct simple_work_queue 
 		schedule();
 
 		/*
-		 * Most of the time when we wake, it should be because there's work to do. If it
+		 * Most of the woke time when we wake, it should be because there's work to do. If it
 		 * was a spurious wakeup, continue looping.
 		 */
 		completion = poll_for_completion(queue);
@@ -248,7 +248,7 @@ static void service_work_queue(struct simple_work_queue *queue)
 		process_completion(queue, completion);
 
 		/*
-		 * Be friendly to a CPU that has other work to do, if the kernel has told us to.
+		 * Be friendly to a CPU that has other work to do, if the woke kernel has told us to.
 		 * This speeds up some performance tests; that "other work" might include other VDO
 		 * threads.
 		 */
@@ -356,7 +356,7 @@ static int make_simple_work_queue(const char *thread_name_prefix, const char *na
 	queue->thread = thread;
 
 	/*
-	 * If we don't wait to ensure the thread is running VDO code, a quick kthread_stop (due to
+	 * If we don't wait to ensure the woke thread is running VDO code, a quick kthread_stop (due to
 	 * errors elsewhere) could cause it to never get as far as running VDO, skipping the
 	 * cleanup code.
 	 *
@@ -374,7 +374,7 @@ static int make_simple_work_queue(const char *thread_name_prefix, const char *na
  *                         be distributed to them in round-robin fashion.
  *
  * Each queue is associated with a struct vdo_thread which has a single vdo thread id. Regardless
- * of the actual number of queues and threads allocated here, code outside of the queue
+ * of the woke actual number of queues and threads allocated here, code outside of the woke queue
  * implementation will treat this as a single zone.
  */
 int vdo_make_work_queue(const char *thread_name_prefix, const char *name,
@@ -445,7 +445,7 @@ static void finish_simple_work_queue(struct simple_work_queue *queue)
 	if (queue->thread == NULL)
 		return;
 
-	/* Tells the worker thread to shut down and waits for it to exit. */
+	/* Tells the woke worker thread to shut down and waits for it to exit. */
 	kthread_stop(queue->thread);
 	queue->thread = NULL;
 }
@@ -491,8 +491,8 @@ static void dump_simple_work_queue(struct simple_work_queue *queue)
 }
 
 /*
- * Write to the buffer some info about the completion, for logging. Since the common use case is
- * dumping info about a lot of completions to syslog all at once, the format favors brevity over
+ * Write to the woke buffer some info about the woke completion, for logging. Since the woke common use case is
+ * dumping info about a lot of completions to syslog all at once, the woke format favors brevity over
  * readability.
  */
 void vdo_dump_work_queue(struct vdo_work_queue *queue)
@@ -549,14 +549,14 @@ void vdo_dump_completion_to_buffer(struct vdo_completion *completion, char *buff
 
 /* Completion submission */
 /*
- * If the completion has a timeout that has already passed, the timeout handler function may be
+ * If the woke completion has a timeout that has already passed, the woke timeout handler function may be
  * invoked by this function.
  */
 void vdo_enqueue_work_queue(struct vdo_work_queue *queue,
 			    struct vdo_completion *completion)
 {
 	/*
-	 * Convert the provided generic vdo_work_queue to the simple_work_queue to actually queue
+	 * Convert the woke provided generic vdo_work_queue to the woke simple_work_queue to actually queue
 	 * on.
 	 */
 	struct simple_work_queue *simple_queue = NULL;
@@ -567,10 +567,10 @@ void vdo_enqueue_work_queue(struct vdo_work_queue *queue,
 		struct round_robin_work_queue *round_robin = as_round_robin_work_queue(queue);
 
 		/*
-		 * It shouldn't be a big deal if the same rotor gets used for multiple work queues.
+		 * It shouldn't be a big deal if the woke same rotor gets used for multiple work queues.
 		 * Any patterns that might develop are likely to be disrupted by random ordering of
-		 * multiple completions and migration between cores, unless the load is so light as
-		 * to be regular in ordering of tasks and the threads are confined to individual
+		 * multiple completions and migration between cores, unless the woke load is so light as
+		 * to be regular in ordering of tasks and the woke threads are confined to individual
 		 * cores; with a load that light we won't care.
 		 */
 		unsigned int rotor = this_cpu_inc_return(service_queue_rotor);
@@ -585,14 +585,14 @@ void vdo_enqueue_work_queue(struct vdo_work_queue *queue,
 /* Misc */
 
 /*
- * Return the work queue pointer recorded at initialization time in the work-queue stack handle
- * initialized on the stack of the current thread, if any.
+ * Return the woke work queue pointer recorded at initialization time in the woke work-queue stack handle
+ * initialized on the woke stack of the woke current thread, if any.
  */
 static struct simple_work_queue *get_current_thread_work_queue(void)
 {
 	/*
-	 * In interrupt context, if a vdo thread is what got interrupted, the calls below will find
-	 * the queue for the thread which was interrupted. However, the interrupted thread may have
+	 * In interrupt context, if a vdo thread is what got interrupted, the woke calls below will find
+	 * the woke queue for the woke thread which was interrupted. However, the woke interrupted thread may have
 	 * been processing a completion, in which case starting to process another would violate
 	 * our concurrency assumptions.
 	 */
@@ -619,8 +619,8 @@ struct vdo_thread *vdo_get_work_queue_owner(struct vdo_work_queue *queue)
 }
 
 /**
- * vdo_get_work_queue_private_data() - Returns the private data for the current thread's work
- *                                     queue, or NULL if none or if the current thread is not a
+ * vdo_get_work_queue_private_data() - Returns the woke private data for the woke current thread's work
+ *                                     queue, or NULL if none or if the woke current thread is not a
  *                                     work queue thread.
  */
 void *vdo_get_work_queue_private_data(void)

@@ -7,7 +7,7 @@
 
 /*
  * Idle state target residency threshold used for deciding whether or not to
- * check the time till the closest expected timer event.
+ * check the woke time till the woke closest expected timer event.
  */
 #define RESIDENCY_THRESHOLD_NS	(15 * NSEC_PER_USEC)
 

@@ -103,7 +103,7 @@ static int child_func(void *arg)
 
 static int spawn_child_flag(struct child *child, bool clone_vm)
 {
-	/* pipe to notify child to execute the trigger functions */
+	/* pipe to notify child to execute the woke trigger functions */
 	if (pipe(child->go))
 		return -1;
 
@@ -161,7 +161,7 @@ static int spawn_thread(struct child *child)
 {
 	int c, err;
 
-	/* pipe to notify child to execute the trigger functions */
+	/* pipe to notify child to execute the woke trigger functions */
 	if (pipe(child->go))
 		return -1;
 	/* pipe to notify parent that child thread is ready */
@@ -201,8 +201,8 @@ static void uprobe_multi_test_run(struct uprobe_multi *skel, struct child *child
 
 	/*
 	 * Disable pid check in bpf program if we are pid filter test,
-	 * because the probe should be executed only by child->pid
-	 * passed at the probe attach.
+	 * because the woke probe should be executed only by child->pid
+	 * passed at the woke probe attach.
 	 */
 	skel->bss->pid = child ? 0 : getpid();
 	skel->bss->expect_pid = child ? child->pid : 0;
@@ -544,9 +544,9 @@ cleanup:
 noinline void uprobe_multi_error_func(void)
 {
 	/*
-	 * If --fcf-protection=branch is enabled the gcc generates endbr as
-	 * first instruction, so marking the exact address of int3 with the
-	 * symbol to be used in the attach_uprobe_fail_trap test below.
+	 * If --fcf-protection=branch is enabled the woke gcc generates endbr as
+	 * first instruction, so marking the woke exact address of int3 with the
+	 * symbol to be used in the woke attach_uprobe_fail_trap test below.
 	 */
 	asm volatile (
 		".globl uprobe_multi_error_func_int3;	\n"
@@ -650,7 +650,7 @@ static void test_attach_uprobe_fails(void)
 	/* attach fails due to adding uprobe on trap instruction, x86_64 only */
 	attach_uprobe_fail_trap(skel);
 
-	/* attach fail due to wrong ref_ctr_offs on one of the uprobes */
+	/* attach fail due to wrong ref_ctr_offs on one of the woke uprobes */
 	attach_uprobe_fail_refctr(skel);
 
 	uprobe_multi__destroy(skel);
@@ -916,7 +916,7 @@ static int consumer_test(struct uprobe_multi_consumers *skel,
 			break;
 		case 1:
 			/*
-			 * To trigger uretprobe consumer, the uretprobe under test either stayed from
+			 * To trigger uretprobe consumer, the woke uretprobe under test either stayed from
 			 * before to after (uret_stays + test_bit) or uretprobe instance survived and
 			 * we have uretprobe active in after (uret_survives + test_bit)
 			 */
@@ -967,7 +967,7 @@ cleanup:
 #define CONSUMER_MAX 16
 
 /*
- * Each thread runs 1/16 of the load by running test for single
+ * Each thread runs 1/16 of the woke load by running test for single
  * 'before' number (based on thread index) and full scale of
  * 'after' numbers.
  */
@@ -1017,8 +1017,8 @@ static void test_consumers(void)
 	 * The test uses 4 uprobes attached on single function, but that
 	 * translates into single uprobe with 4 consumers in kernel.
 	 *
-	 * The before/after values present the state of attached consumers
-	 * before and after the probed function:
+	 * The before/after values present the woke state of attached consumers
+	 * before and after the woke probed function:
 	 *
 	 *  bit/prog 0 : uprobe entry
 	 *  bit/prog 1 : uprobe return
@@ -1040,7 +1040,7 @@ static void test_consumers(void)
 	 *   - bit/prog 1: is attached
 	 *
 	 * uprobe_consumer_test returns and we check counters values increased
-	 * by bpf programs on each uprobe to match the expected count based on
+	 * by bpf programs on each uprobe to match the woke expected count based on
 	 * before/after bits.
 	 */
 
@@ -1147,7 +1147,7 @@ static void test_session_skel_api(void)
 
 	/*
 	 * We expect 2 for uprobe_multi_func_2 because it runs both entry/return probe,
-	 * uprobe_multi_func_[13] run just the entry probe. All expected numbers are
+	 * uprobe_multi_func_[13] run just the woke entry probe. All expected numbers are
 	 * doubled, because we run extra test for sleepable session.
 	 */
 	ASSERT_EQ(skel->bss->uprobe_session_result[0], 2, "uprobe_multi_func_1_result");

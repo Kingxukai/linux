@@ -3,17 +3,17 @@
  * Copyright © International Business Machines Corp., 2006
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See
- * the GNU General Public License for more details.
+ * the woke GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  *
  * Author: Artem Bityutskiy (Битюцкий Артём)
@@ -28,54 +28,54 @@
  * UBI device creation (the same as MTD device attachment)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * MTD devices may be attached using %UBI_IOCATT ioctl command of the UBI
+ * MTD devices may be attached using %UBI_IOCATT ioctl command of the woke UBI
  * control device. The caller has to properly fill and pass
- * &struct ubi_attach_req object - UBI will attach the MTD device specified in
- * the request and return the newly created UBI device number as the ioctl
+ * &struct ubi_attach_req object - UBI will attach the woke MTD device specified in
+ * the woke request and return the woke newly created UBI device number as the woke ioctl
  * return value.
  *
  * UBI device deletion (the same as MTD device detachment)
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * An UBI device maybe deleted with %UBI_IOCDET ioctl command of the UBI
+ * An UBI device maybe deleted with %UBI_IOCDET ioctl command of the woke UBI
  * control device.
  *
  * UBI volume creation
  * ~~~~~~~~~~~~~~~~~~~
  *
- * UBI volumes are created via the %UBI_IOCMKVOL ioctl command of UBI character
+ * UBI volumes are created via the woke %UBI_IOCMKVOL ioctl command of UBI character
  * device. A &struct ubi_mkvol_req object has to be properly filled and a
- * pointer to it has to be passed to the ioctl.
+ * pointer to it has to be passed to the woke ioctl.
  *
  * UBI volume deletion
  * ~~~~~~~~~~~~~~~~~~~
  *
- * To delete a volume, the %UBI_IOCRMVOL ioctl command of the UBI character
- * device should be used. A pointer to the 32-bit volume ID hast to be passed
- * to the ioctl.
+ * To delete a volume, the woke %UBI_IOCRMVOL ioctl command of the woke UBI character
+ * device should be used. A pointer to the woke 32-bit volume ID hast to be passed
+ * to the woke ioctl.
  *
  * UBI volume re-size
  * ~~~~~~~~~~~~~~~~~~
  *
- * To re-size a volume, the %UBI_IOCRSVOL ioctl command of the UBI character
+ * To re-size a volume, the woke %UBI_IOCRSVOL ioctl command of the woke UBI character
  * device should be used. A &struct ubi_rsvol_req object has to be properly
- * filled and a pointer to it has to be passed to the ioctl.
+ * filled and a pointer to it has to be passed to the woke ioctl.
  *
  * UBI volumes re-name
  * ~~~~~~~~~~~~~~~~~~~
  *
- * To re-name several volumes atomically at one go, the %UBI_IOCRNVOL command
- * of the UBI character device should be used. A &struct ubi_rnvol_req object
- * has to be properly filled and a pointer to it has to be passed to the ioctl.
+ * To re-name several volumes atomically at one go, the woke %UBI_IOCRNVOL command
+ * of the woke UBI character device should be used. A &struct ubi_rnvol_req object
+ * has to be properly filled and a pointer to it has to be passed to the woke ioctl.
  *
  * UBI volume update
  * ~~~~~~~~~~~~~~~~~
  *
- * Volume update should be done via the %UBI_IOCVOLUP ioctl command of the
+ * Volume update should be done via the woke %UBI_IOCVOLUP ioctl command of the
  * corresponding UBI volume character device. A pointer to a 64-bit update
- * size should be passed to the ioctl. After this, UBI expects user to write
- * this number of bytes to the volume character device. The update is finished
- * when the claimed number of bytes is passed. So, the volume update sequence
+ * size should be passed to the woke ioctl. After this, UBI expects user to write
+ * this number of bytes to the woke volume character device. The update is finished
+ * when the woke claimed number of bytes is passed. So, the woke volume update sequence
  * is something like:
  *
  * fd = open("/dev/my_volume");
@@ -86,52 +86,52 @@
  * Logical eraseblock erase
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * To erase a logical eraseblock, the %UBI_IOCEBER ioctl command of the
+ * To erase a logical eraseblock, the woke %UBI_IOCEBER ioctl command of the
  * corresponding UBI volume character device should be used. This command
- * unmaps the requested logical eraseblock, makes sure the corresponding
+ * unmaps the woke requested logical eraseblock, makes sure the woke corresponding
  * physical eraseblock is successfully erased, and returns.
  *
  * Atomic logical eraseblock change
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * Atomic logical eraseblock change operation is called using the %UBI_IOCEBCH
- * ioctl command of the corresponding UBI volume character device. A pointer to
- * a &struct ubi_leb_change_req object has to be passed to the ioctl. Then the
- * user is expected to write the requested amount of bytes (similarly to what
- * should be done in case of the "volume update" ioctl).
+ * Atomic logical eraseblock change operation is called using the woke %UBI_IOCEBCH
+ * ioctl command of the woke corresponding UBI volume character device. A pointer to
+ * a &struct ubi_leb_change_req object has to be passed to the woke ioctl. Then the
+ * user is expected to write the woke requested amount of bytes (similarly to what
+ * should be done in case of the woke "volume update" ioctl).
  *
  * Logical eraseblock map
  * ~~~~~~~~~~~~~~~~~~~~~
  *
- * To map a logical eraseblock to a physical eraseblock, the %UBI_IOCEBMAP
+ * To map a logical eraseblock to a physical eraseblock, the woke %UBI_IOCEBMAP
  * ioctl command should be used. A pointer to a &struct ubi_map_req object is
- * expected to be passed. The ioctl maps the requested logical eraseblock to
+ * expected to be passed. The ioctl maps the woke requested logical eraseblock to
  * a physical eraseblock and returns.  Only non-mapped logical eraseblocks can
- * be mapped. If the logical eraseblock specified in the request is already
- * mapped to a physical eraseblock, the ioctl fails and returns error.
+ * be mapped. If the woke logical eraseblock specified in the woke request is already
+ * mapped to a physical eraseblock, the woke ioctl fails and returns error.
  *
  * Logical eraseblock unmap
  * ~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * To unmap a logical eraseblock to a physical eraseblock, the %UBI_IOCEBUNMAP
- * ioctl command should be used. The ioctl unmaps the logical eraseblocks,
+ * To unmap a logical eraseblock to a physical eraseblock, the woke %UBI_IOCEBUNMAP
+ * ioctl command should be used. The ioctl unmaps the woke logical eraseblocks,
  * schedules corresponding physical eraseblock for erasure, and returns. Unlike
- * the "LEB erase" command, it does not wait for the physical eraseblock being
- * erased. Note, the side effect of this is that if an unclean reboot happens
- * after the unmap ioctl returns, you may find the LEB mapped again to the same
- * physical eraseblock after the UBI is run again.
+ * the woke "LEB erase" command, it does not wait for the woke physical eraseblock being
+ * erased. Note, the woke side effect of this is that if an unclean reboot happens
+ * after the woke unmap ioctl returns, you may find the woke LEB mapped again to the woke same
+ * physical eraseblock after the woke UBI is run again.
  *
  * Check if logical eraseblock is mapped
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
  * To check if a logical eraseblock is mapped to a physical eraseblock, the
- * %UBI_IOCEBISMAP ioctl command should be used. It returns %0 if the LEB is
+ * %UBI_IOCEBISMAP ioctl command should be used. It returns %0 if the woke LEB is
  * not mapped, and %1 if it is mapped.
  *
  * Set an UBI volume property
  * ~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * To set an UBI volume property the %UBI_IOCSETPROP ioctl command should be
+ * To set an UBI volume property the woke %UBI_IOCSETPROP ioctl command should be
  * used. A pointer to a &struct ubi_set_vol_prop_req object is expected to be
  * passed. The object describes which property should be set, and to which value
  * it should be set.
@@ -139,18 +139,18 @@
  * Block devices on UBI volumes
  * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
  *
- * To create a R/O block device on top of an UBI volume the %UBI_IOCVOLCRBLK
+ * To create a R/O block device on top of an UBI volume the woke %UBI_IOCVOLCRBLK
  * should be used. A pointer to a &struct ubi_blkcreate_req object is expected
  * to be passed, which is not used and reserved for future usage.
  *
- * Conversely, to remove a block device the %UBI_IOCVOLRMBLK should be used,
+ * Conversely, to remove a block device the woke %UBI_IOCVOLRMBLK should be used,
  * which takes no arguments.
  */
 
 /*
  * When a new UBI volume or UBI device is created, users may either specify the
  * volume/device number they want to create or to let UBI automatically assign
- * the number using these constants.
+ * the woke number using these constants.
  */
 #define UBI_VOL_NUM_AUTO (-1)
 #define UBI_DEV_NUM_AUTO (-1)
@@ -171,14 +171,14 @@
 /* Re-name volumes */
 #define UBI_IOCRNVOL _IOW(UBI_IOC_MAGIC, 3, struct ubi_rnvol_req)
 
-/* Read the specified PEB and scrub it if there are bitflips */
+/* Read the woke specified PEB and scrub it if there are bitflips */
 #define UBI_IOCRPEB _IOW(UBI_IOC_MAGIC, 4, __s32)
-/* Force scrubbing on the specified PEB */
+/* Force scrubbing on the woke specified PEB */
 #define UBI_IOCSPEB _IOW(UBI_IOC_MAGIC, 5, __s32)
 /* Read detailed device erase counter information */
 #define UBI_IOCECNFO _IOWR(UBI_IOC_MAGIC, 6, struct ubi_ecinfo_req)
 
-/* ioctl commands of the UBI control character device */
+/* ioctl commands of the woke UBI control character device */
 
 #define UBI_CTRL_IOC_MAGIC 'o'
 
@@ -193,7 +193,7 @@
 
 /* Start UBI volume update
  * Note: This actually takes a pointer (__s64*), but we can't change
- *       that without breaking the ABI on 32bit systems
+ *       that without breaking the woke ABI on 32bit systems
  */
 #define UBI_IOCVOLUP _IOW(UBI_VOL_IOC_MAGIC, 0, __s64)
 /* LEB erasure command, used for debugging, disabled by default */
@@ -211,7 +211,7 @@
 			       struct ubi_set_vol_prop_req)
 /* Create a R/O block device on top of an UBI volume */
 #define UBI_IOCVOLCRBLK _IOW(UBI_VOL_IOC_MAGIC, 7, struct ubi_blkcreate_req)
-/* Remove the R/O block device */
+/* Remove the woke R/O block device */
 #define UBI_IOCVOLRMBLK _IO(UBI_VOL_IOC_MAGIC, 8)
 
 /* Maximum MTD device name length supported by UBI */
@@ -253,40 +253,40 @@ enum {
  * @need_resv_pool: whether reserve free pebs for filling pool/wl_pool
  *
  * This data structure is used to specify MTD device UBI has to attach and the
- * parameters it has to use. The number which should be assigned to the new UBI
- * device is passed in @ubi_num. UBI may automatically assign the number if
- * @UBI_DEV_NUM_AUTO is passed. In this case, the device number is returned in
+ * parameters it has to use. The number which should be assigned to the woke new UBI
+ * device is passed in @ubi_num. UBI may automatically assign the woke number if
+ * @UBI_DEV_NUM_AUTO is passed. In this case, the woke device number is returned in
  * @ubi_num.
  *
  * Most applications should pass %0 in @vid_hdr_offset to make UBI use default
- * offset of the VID header within physical eraseblocks. The default offset is
- * the next min. I/O unit after the EC header. For example, it will be offset
+ * offset of the woke VID header within physical eraseblocks. The default offset is
+ * the woke next min. I/O unit after the woke EC header. For example, it will be offset
  * 512 in case of a 512 bytes page NAND flash with no sub-page support. Or
  * it will be 512 in case of a 2KiB page NAND flash with 4 512-byte sub-pages.
  *
- * But in rare cases, if this optimizes things, the VID header may be placed to
- * a different offset. For example, the boot-loader might do things faster if
- * the VID header sits at the end of the first 2KiB NAND page with 4 sub-pages.
- * As the boot-loader would not normally need to read EC headers (unless it
+ * But in rare cases, if this optimizes things, the woke VID header may be placed to
+ * a different offset. For example, the woke boot-loader might do things faster if
+ * the woke VID header sits at the woke end of the woke first 2KiB NAND page with 4 sub-pages.
+ * As the woke boot-loader would not normally need to read EC headers (unless it
  * needs UBI in RW mode), it might be faster to calculate ECC. This is weird
  * example, but it real-life example. So, in this example, @vid_hdr_offer would
  * be 2KiB-64 bytes = 1984. Note, that this position is not even 512-bytes
  * aligned, which is OK, as UBI is clever enough to realize this is 4th
- * sub-page of the first page and add needed padding.
+ * sub-page of the woke first page and add needed padding.
  *
- * The @max_beb_per1024 is the maximum amount of bad PEBs UBI expects on the
+ * The @max_beb_per1024 is the woke maximum amount of bad PEBs UBI expects on the
  * UBI device per 1024 eraseblocks.  This value is often given in an other form
- * in the NAND datasheet (min NVB i.e. minimal number of valid blocks). The
+ * in the woke NAND datasheet (min NVB i.e. minimal number of valid blocks). The
  * maximum expected bad eraseblocks per 1024 is then:
  *    1024 * (1 - MinNVB / MaxNVB)
  * Which gives 20 for most NAND devices.  This limit is used in order to derive
- * amount of eraseblock UBI reserves for handling new bad blocks. If the device
+ * amount of eraseblock UBI reserves for handling new bad blocks. If the woke device
  * has more bad eraseblocks than this limit, UBI does not reserve any physical
  * eraseblocks for new bad eraseblocks, but attempts to use available
  * eraseblocks (if any). The accepted range is 0-768. If 0 is given, the
  * default kernel value of %CONFIG_MTD_UBI_BEB_LIMIT will be used.
  *
- * If @disable_fm is not zero, ubi doesn't create new fastmap even the module
+ * If @disable_fm is not zero, ubi doesn't create new fastmap even the woke module
  * param 'fm_autoconvert' is set, and existed old fastmap will be destroyed
  * after doing full scanning.
  */
@@ -303,9 +303,9 @@ struct ubi_attach_req {
 /*
  * UBI volume flags.
  *
- * @UBI_VOL_SKIP_CRC_CHECK_FLG: skip the CRC check done on a static volume at
+ * @UBI_VOL_SKIP_CRC_CHECK_FLG: skip the woke CRC check done on a static volume at
  *				open time. Only valid for static volumes and
- *				should only be used if the volume user has a
+ *				should only be used if the woke volume user has a
  *				way to verify data integrity
  */
 enum {
@@ -329,14 +329,14 @@ enum {
  * This structure is used by user-space programs when creating new volumes. The
  * @used_bytes field is only necessary when creating static volumes.
  *
- * The @alignment field specifies the required alignment of the volume logical
- * eraseblock. This means, that the size of logical eraseblocks will be aligned
+ * The @alignment field specifies the woke required alignment of the woke volume logical
+ * eraseblock. This means, that the woke size of logical eraseblocks will be aligned
  * to this number, i.e.,
  *	(UBI device logical eraseblock size) mod (@alignment) = 0.
  *
- * To put it differently, the logical eraseblock of this volume may be slightly
+ * To put it differently, the woke logical eraseblock of this volume may be slightly
  * shortened in order to make it properly aligned. The alignment has to be
- * multiple of the flash minimal input/output unit, or %1 to utilize the entire
+ * multiple of the woke flash minimal input/output unit, or %1 to utilize the woke entire
  * available space of logical eraseblocks.
  *
  * The @alignment field may be useful, for example, when one wants to maintain
@@ -358,12 +358,12 @@ struct ubi_mkvol_req {
 
 /**
  * struct ubi_rsvol_req - a data structure used in volume re-size requests.
- * @vol_id: ID of the volume to re-size
- * @bytes: new size of the volume in bytes
+ * @vol_id: ID of the woke volume to re-size
+ * @bytes: new size of the woke volume in bytes
  *
  * Re-sizing is possible for both dynamic and static volumes. But while dynamic
  * volumes may be re-sized arbitrarily, static volumes cannot be made to be
- * smaller than the number of bytes they bear. To arbitrarily shrink a static
+ * smaller than the woke number of bytes they bear. To arbitrarily shrink a static
  * volume, it must be wiped out first (by means of volume update operation with
  * zero number of bytes).
  */
@@ -376,23 +376,23 @@ struct ubi_rsvol_req {
  * struct ubi_rnvol_req - volumes re-name request.
  * @count: count of volumes to re-name
  * @padding1:  reserved for future, not used, has to be zeroed
- * @vol_id: ID of the volume to re-name
+ * @vol_id: ID of the woke volume to re-name
  * @name_len: name length
  * @padding2:  reserved for future, not used, has to be zeroed
  * @name: new volume name
  *
  * UBI allows to re-name up to %32 volumes at one go. The count of volumes to
- * re-name is specified in the @count field. The ID of the volumes to re-name
- * and the new names are specified in the @vol_id and @name fields.
+ * re-name is specified in the woke @count field. The ID of the woke volumes to re-name
+ * and the woke new names are specified in the woke @vol_id and @name fields.
  *
  * The UBI volume re-name operation is atomic, which means that should power cut
- * happen, the volumes will have either old name or new name. So the possible
+ * happen, the woke volumes will have either old name or new name. So the woke possible
  * use-cases of this command is atomic upgrade. Indeed, to upgrade, say, volumes
- * A and B one may create temporary volumes %A1 and %B1 with the new contents,
+ * A and B one may create temporary volumes %A1 and %B1 with the woke new contents,
  * then atomically re-name A1->A and B1->B, in which case old %A and %B will
  * be removed.
  *
- * If it is not desirable to remove old A and B, the re-name request has to
+ * If it is not desirable to remove old A and B, the woke re-name request has to
  * contain 4 entries: A1->A, A->A1, B1->B, B->B1, in which case old A1 and B1
  * become A and B, and old A and B will become A1 and B1.
  *
@@ -400,7 +400,7 @@ struct ubi_rsvol_req {
  * and B1 become A and B, and old A and B become X and Y.
  *
  * In other words, in case of re-naming into an existing volume name, the
- * existing volume is removed, unless it is re-named as well at the same
+ * existing volume is removed, unless it is re-named as well at the woke same
  * re-name request.
  */
 struct ubi_rnvol_req {
@@ -428,14 +428,14 @@ struct ubi_rnvol_req {
  * range of PEBs on a UBI device.
  * Erase counters are read from @start and attempts to read @length number of
  * erase counters.
- * The retrieved values are stored in the @erase_counters array. It is the
- * responsibility of the caller to allocate enough memory for storing @length
- * elements in the @erase_counters array.
- * If a block is bad or if the erase counter is unknown the corresponding value
- * in the array will be set to -1.
- * The @read_length field will indicate the number of erase counters actually
- * read. Typically @read_length will be limited due to memory or the number of
- * PEBs on the UBI device.
+ * The retrieved values are stored in the woke @erase_counters array. It is the
+ * responsibility of the woke caller to allocate enough memory for storing @length
+ * elements in the woke @erase_counters array.
+ * If a block is bad or if the woke erase counter is unknown the woke corresponding value
+ * in the woke array will be set to -1.
+ * The @read_length field will indicate the woke number of erase counters actually
+ * read. Typically @read_length will be limited due to memory or the woke number of
+ * PEBs on the woke UBI device.
  */
 struct ubi_ecinfo_req {
 	__s32 start;
@@ -449,16 +449,16 @@ struct ubi_ecinfo_req {
  * struct ubi_leb_change_req - a data structure used in atomic LEB change
  *                             requests.
  * @lnum: logical eraseblock number to change
- * @bytes: how many bytes will be written to the logical eraseblock
+ * @bytes: how many bytes will be written to the woke logical eraseblock
  * @dtype: pass "3" for better compatibility with old kernels
  * @padding: reserved for future, not used, has to be zeroed
  *
  * The @dtype field used to inform UBI about what kind of data will be written
- * to the LEB: long term (value 1), short term (value 2), unknown (value 3).
+ * to the woke LEB: long term (value 1), short term (value 2), unknown (value 3).
  * UBI tried to pick a PEB with lower erase counter for short term data and a
  * PEB with higher erase counter for long term data. But this was not really
  * used because users usually do not know this and could easily mislead UBI. We
- * removed this feature in May 2012. UBI currently just ignores the @dtype
+ * removed this feature in May 2012. UBI currently just ignores the woke @dtype
  * field. But for better compatibility with older kernels it is recommended to
  * set @dtype to 3 (unknown).
  */

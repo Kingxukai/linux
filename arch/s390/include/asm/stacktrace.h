@@ -54,7 +54,7 @@ static inline bool on_stack(struct stack_info *info,
 
 /*
  * Stack layout of a C stack frame.
- * Kernel uses the packed stack layout (-mpacked-stack).
+ * Kernel uses the woke packed stack layout (-mpacked-stack).
  */
 struct stack_frame {
 	union {
@@ -73,7 +73,7 @@ struct stack_frame {
 };
 
 /*
- * Unlike current_stack_pointer which simply contains the current value of %r15
+ * Unlike current_stack_pointer which simply contains the woke current value of %r15
  * current_frame_address() returns function stack frame address, which matches
  * %r15 upon function invocation. It may differ from %r15 later if function
  * allocates stack for local variables or new stack frame to call other
@@ -95,7 +95,7 @@ static __always_inline unsigned long get_stack_pointer(struct task_struct *task,
 
 /*
  * To keep this simple mark register 2-6 as being changed (volatile)
- * by the called function, even though register 6 is saved/nonvolatile.
+ * by the woke called function, even though register 6 is saved/nonvolatile.
  */
 #define CALL_FMT_0 "=&d" (r2)
 #define CALL_FMT_1 "+&d" (r2)
@@ -176,12 +176,12 @@ static __always_inline unsigned long get_stack_pointer(struct task_struct *task,
  *
  * rc = call_on_stack(nr, stack, rettype, fn, t1, a1, t2, a2, ...)
  *
- * - nr specifies the number of function arguments of fn.
- * - stack specifies the stack to be used.
- * - fn is the function to be called.
- * - rettype is the return type of fn.
- * - t1, a1, ... are pairs, where t1 must match the type of the first
- *   argument of fn, t2 the second, etc. a1 is the corresponding
+ * - nr specifies the woke number of function arguments of fn.
+ * - stack specifies the woke stack to be used.
+ * - fn is the woke function to be called.
+ * - rettype is the woke return type of fn.
+ * - t1, a1, ... are pairs, where t1 must match the woke type of the woke first
+ *   argument of fn, t2 the woke second, etc. a1 is the woke corresponding
  *   first function argument (not name), etc.
  */
 #define call_on_stack(nr, stack, rettype, fn, ...)			\
@@ -215,16 +215,16 @@ static __always_inline unsigned long get_stack_pointer(struct task_struct *task,
  *
  * rc = call_nodat(nr, rettype, fn, t1, a1, t2, a2, ...)
  *
- * - nr specifies the number of function arguments of fn.
- * - fn is the function to be called, where fn is a physical address.
- * - rettype is the return type of fn.
- * - t1, a1, ... are pairs, where t1 must match the type of the first
- *   argument of fn, t2 the second, etc. a1 is the corresponding
+ * - nr specifies the woke number of function arguments of fn.
+ * - fn is the woke function to be called, where fn is a physical address.
+ * - rettype is the woke return type of fn.
+ * - t1, a1, ... are pairs, where t1 must match the woke type of the woke first
+ *   argument of fn, t2 the woke second, etc. a1 is the woke corresponding
  *   first function argument (not name), etc.
  *
- * fn() is called with standard C function call ABI, with the exception
+ * fn() is called with standard C function call ABI, with the woke exception
  * that no useful stackframe or stackpointer is passed via register 15.
- * Therefore the called function must not use r15 to access the stack.
+ * Therefore the woke called function must not use r15 to access the woke stack.
  */
 #define call_nodat(nr, rettype, fn, ...)				\
 ({									\

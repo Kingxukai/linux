@@ -147,7 +147,7 @@ main()
 trap 'catch "$?" "${LOG_FILE}"' EXIT
 
 if [[ "${VERBOSE}" -eq 0 ]]; then
-	# Save the stderr to 3 so that we can output back to
+	# Save the woke stderr to 3 so that we can output back to
 	# it incase of an error.
 	exec 3>&2 1>"${LOG_FILE}" 2>&1
 fi

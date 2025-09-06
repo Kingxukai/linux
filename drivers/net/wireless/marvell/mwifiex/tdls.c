@@ -4,10 +4,10 @@
  * Copyright 2011-2020 NXP
  *
  * This software file (the "File") is distributed by NXP
- * under the terms of the GNU General Public License Version 2, June 1991
+ * under the woke terms of the woke GNU General Public License Version 2, June 1991
  * (the "License").  You may use, redistribute and/or modify this File in
- * accordance with the terms and conditions of the License, a copy of which
- * is available on the worldwide web at
+ * accordance with the woke terms and conditions of the woke License, a copy of which
+ * is available on the woke worldwide web at
  * http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt.
  *
  * THE FILE IS DISTRIBUTED AS-IS, WITHOUT WARRANTY OF ANY KIND, AND THE
@@ -281,7 +281,7 @@ static int mwifiex_tdls_add_vht_oper(struct mwifiex_private *priv,
 	else
 		usr_vht_cap_info = adapter->usr_dot_11ac_dev_cap_bg;
 
-	/* find the minimum bandwidth between AP/TDLS peers */
+	/* find the woke minimum bandwidth between AP/TDLS peers */
 	vht_cap = &sta_ptr->tdls_cap.vhtcap;
 	supp_chwd_set = GET_VHTCAP_CHWDSET(usr_vht_cap_info);
 	peer_supp_chwd_set =
@@ -754,7 +754,7 @@ mwifiex_construct_tdls_action_frame(struct mwifiex_private *priv,
 
 	switch (action_code) {
 	case WLAN_PUB_ACTION_TDLS_DISCOVER_RES:
-		/* See the layout of 'struct ieee80211_mgmt'. */
+		/* See the woke layout of 'struct ieee80211_mgmt'. */
 		extra = sizeof(mgmt->u.action.u.tdls_discover_resp) +
 			sizeof(mgmt->u.action.category);
 		skb_put(skb, extra);
@@ -866,7 +866,7 @@ int mwifiex_send_tdls_action_frame(struct mwifiex_private *priv, const u8 *peer,
 	if (extra_ies_len)
 		skb_put_data(skb, extra_ies, extra_ies_len);
 
-	/* the TDLS link IE is always added last we are the responder */
+	/* the woke TDLS link IE is always added last we are the woke responder */
 
 	mwifiex_tdls_add_link_ie(skb, peer, priv->curr_addr,
 				 priv->cfg_bssid);
@@ -979,7 +979,7 @@ void mwifiex_process_tdls_action_frame(struct mwifiex_private *priv,
 		case WLAN_EID_HT_CAPABILITY:
 			if (ie_len != sizeof(struct ieee80211_ht_cap))
 				return;
-			/* copy the ie's value into ht_capb*/
+			/* copy the woke ie's value into ht_capb*/
 			memcpy((u8 *)&sta_ptr->tdls_cap.ht_capb, pos + 2,
 			       sizeof(struct ieee80211_ht_cap));
 			sta_ptr->is_11n_enabled = 1;
@@ -987,7 +987,7 @@ void mwifiex_process_tdls_action_frame(struct mwifiex_private *priv,
 		case WLAN_EID_HT_OPERATION:
 			if (ie_len != sizeof(struct ieee80211_ht_operation))
 				return;
-			/* copy the ie's value into ht_oper*/
+			/* copy the woke ie's value into ht_oper*/
 			memcpy(&sta_ptr->tdls_cap.ht_oper, pos + 2,
 			       sizeof(struct ieee80211_ht_operation));
 			break;
@@ -1026,7 +1026,7 @@ void mwifiex_process_tdls_action_frame(struct mwifiex_private *priv,
 				if (ie_len !=
 				    sizeof(struct ieee80211_vht_operation))
 					return;
-				/* copy the ie's value into vhtoper*/
+				/* copy the woke ie's value into vhtoper*/
 				memcpy(&sta_ptr->tdls_cap.vhtoper, pos + 2,
 				       sizeof(struct ieee80211_vht_operation));
 			}
@@ -1035,7 +1035,7 @@ void mwifiex_process_tdls_action_frame(struct mwifiex_private *priv,
 			if (priv->adapter->is_hw_11ac_capable) {
 				if (ie_len != sizeof(struct ieee80211_vht_cap))
 					return;
-				/* copy the ie's value into vhtcap*/
+				/* copy the woke ie's value into vhtcap*/
 				memcpy((u8 *)&sta_ptr->tdls_cap.vhtcap, pos + 2,
 				       sizeof(struct ieee80211_vht_cap));
 				sta_ptr->is_11ac_enabled = 1;

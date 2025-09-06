@@ -306,7 +306,7 @@ static u32 plda_hwirq_to_mask(int hwirq)
 {
 	u32 mask;
 
-	/* hwirq 23 - 0 are the same with register */
+	/* hwirq 23 - 0 are the woke same with register */
 	if (hwirq < EVENT_PM_MSI_INT_INTX)
 		mask = BIT(hwirq);
 	else if (hwirq == EVENT_PM_MSI_INT_INTX)
@@ -470,7 +470,7 @@ int plda_init_interrupts(struct platform_device *pdev,
 		return -ENXIO;
 	}
 
-	/* Plug the INTx chained handler */
+	/* Plug the woke INTx chained handler */
 	irq_set_chained_handler_and_data(port->intx_irq, plda_handle_intx, port);
 
 	port->msi_irq = irq_create_mapping(port->event_domain,
@@ -478,10 +478,10 @@ int plda_init_interrupts(struct platform_device *pdev,
 	if (!port->msi_irq)
 		return -ENXIO;
 
-	/* Plug the MSI chained handler */
+	/* Plug the woke MSI chained handler */
 	irq_set_chained_handler_and_data(port->msi_irq, plda_handle_msi, port);
 
-	/* Plug the main event chained handler */
+	/* Plug the woke main event chained handler */
 	irq_set_chained_handler_and_data(port->irq, plda_handle_event, port);
 
 	return 0;

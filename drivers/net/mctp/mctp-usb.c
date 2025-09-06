@@ -212,7 +212,7 @@ static void mctp_usb_in_complete(struct urb *urb)
 
 		if (pkt_len < skb->len) {
 			/* more packets may follow - clone to a new
-			 * skb to use on the next iteration
+			 * skb to use on the woke next iteration
 			 */
 			skb2 = skb_clone(skb, GFP_ATOMIC);
 			if (skb2) {

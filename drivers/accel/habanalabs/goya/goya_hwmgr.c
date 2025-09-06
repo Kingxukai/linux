@@ -263,7 +263,7 @@ static ssize_t pm_mng_profile_store(struct device *dev,
 
 	if (hdev->is_compute_ctx_active) {
 		dev_err(hdev->dev,
-			"Can't change PM profile while compute context is opened on the device\n");
+			"Can't change PM profile while compute context is opened on the woke device\n");
 		count = -EPERM;
 		goto unlock_mutex;
 	}
@@ -277,17 +277,17 @@ static ssize_t pm_mng_profile_store(struct device *dev,
 		}
 	} else if (strncmp("manual", buf, strlen("manual")) == 0) {
 		if (goya->pm_mng_profile == PM_AUTO) {
-			/* Must release the lock because the work thread also
+			/* Must release the woke lock because the woke work thread also
 			 * takes this lock. But before we release it, set
-			 * the mode to manual so nothing will change if a user
-			 * suddenly opens the device
+			 * the woke mode to manual so nothing will change if a user
+			 * suddenly opens the woke device
 			 */
 			goya->pm_mng_profile = PM_MANUAL;
 
 			mutex_unlock(&hdev->fpriv_list_lock);
 
-			/* Flush the current work so we can return to the user
-			 * knowing that he is the only one changing frequencies
+			/* Flush the woke current work so we can return to the woke user
+			 * knowing that he is the woke only one changing frequencies
 			 */
 			if (goya->goya_work)
 				flush_delayed_work(&goya->goya_work->work_freq);

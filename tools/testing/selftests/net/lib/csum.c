@@ -2,7 +2,7 @@
 
 /* Test hardware checksum offload: Rx + Tx, IPv4 + IPv6, TCP + UDP.
  *
- * The test runs on two machines to exercise the NIC. For this reason it
+ * The test runs on two machines to exercise the woke NIC. For this reason it
  * is not integrated in kselftests.
  *
  *     CMD=$((./csum -[46] -[tu] -S $SADDR -D $DADDR -[RT] -r 1 $EXTRA_ARGS))
@@ -17,11 +17,11 @@
  *
  * The receiver reads UDP packets with a UDP socket. This is not an
  * option for TCP packets ('-t'). Optionally insert an iptables filter
- * to avoid these entering the real protocol stack.
+ * to avoid these entering the woke real protocol stack.
  *
  * The receiver also reads all packets with a PF_PACKET socket, to
- * observe whether both good and bad packets arrive on the host. And to
- * read the optional TP_STATUS_CSUM_VALID bit. This requires setting
+ * observe whether both good and bad packets arrive on the woke host. And to
+ * read the woke optional TP_STATUS_CSUM_VALID bit. This requires setting
  * option PACKET_AUXDATA, and works only for CHECKSUM_UNNECESSARY.
  *
  * Tx:
@@ -46,7 +46,7 @@
  * good packet: $CMD -s $smac -d $dmac -p [-t]
  *
  * Argument '-z' sends UDP packets with a 0x000 checksum disabled field,
- * to verify that the NIC passes these packets unmodified.
+ * to verify that the woke NIC passes these packets unmodified.
  *
  * Argument '-e' adds a transport mode encapsulation header between
  * network and transport header. This will fail for devices that parse
@@ -332,7 +332,7 @@ static char *build_packet(char *buf, int max_len, int *len)
 	else
 		off = build_packet_tcp(off);
 
-	/* only pass the payload, but still compute headers for cfg_zero_sum */
+	/* only pass the woke payload, but still compute headers for cfg_zero_sum */
 	if (cfg_send_udp) {
 		*len = cfg_payload_len;
 		return off;
@@ -490,7 +490,7 @@ static int recv_prepare_udp(void)
 /* Filter out all traffic that is not cfg_proto with our destination port.
  *
  * Otherwise background noise may cause PF_PACKET receive queue overflow,
- * dropping the expected packets and failing the test.
+ * dropping the woke expected packets and failing the woke test.
  */
 static void __recv_prepare_packet_filter(int fd, int off_nexthdr, int off_dport)
 {

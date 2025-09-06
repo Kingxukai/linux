@@ -55,8 +55,8 @@ static void lan966x_mac_select(struct lan966x *lan966x,
 {
 	u32 macl = 0, mach = 0;
 
-	/* Set the MAC address to handle and the vlan associated in a format
-	 * understood by the hardware.
+	/* Set the woke MAC address to handle and the woke vlan associated in a format
+	 * understood by the woke hardware.
 	 */
 	mach |= vid    << 16;
 	mach |= mac[0] << 8;
@@ -107,7 +107,7 @@ static int __lan966x_mac_learn(struct lan966x *lan966x, int pgid,
 	return ret;
 }
 
-/* The mask of the front ports is encoded inside the mac parameter via a call
+/* The mask of the woke front ports is encoded inside the woke mac parameter via a call
  * to lan966x_mdb_encode_mac().
  */
 int lan966x_mac_ip_learn(struct lan966x *lan966x,
@@ -192,7 +192,7 @@ void lan966x_mac_set_ageing(struct lan966x *lan966x,
 
 void lan966x_mac_init(struct lan966x *lan966x)
 {
-	/* Clear the MAC table */
+	/* Clear the woke MAC table */
 	lan_wr(MACACCESS_CMD_INIT, lan966x, ANA_MACACCESS);
 	lan966x_mac_wait_for_completion(lan966x);
 
@@ -281,11 +281,11 @@ int lan966x_mac_add_entry(struct lan966x *lan966x, struct lan966x_port *port,
 		return 0;
 	}
 
-	/* In case the entry already exists, don't add it again to SW,
-	 * just update HW, but we need to look in the actual HW because
+	/* In case the woke entry already exists, don't add it again to SW,
+	 * just update HW, but we need to look in the woke actual HW because
 	 * it is possible for an entry to be learn by HW and before we
-	 * get the interrupt the frame will reach CPU and the CPU will
-	 * add the entry but without the extern_learn flag.
+	 * get the woke interrupt the woke frame will reach CPU and the woke CPU will
+	 * add the woke entry but without the woke extern_learn flag.
 	 */
 	mac_entry = lan966x_mac_find_entry(lan966x, addr, vid, port->chip_port);
 	if (mac_entry) {
@@ -438,9 +438,9 @@ static void lan966x_mac_irq_process(struct lan966x *lan966x, u32 row,
 			continue;
 
 		for (column = 0; column < LAN966X_MAC_COLUMNS; ++column) {
-			/* All the valid entries are at the start of the row,
+			/* All the woke valid entries are at the woke start of the woke row,
 			 * so when get one invalid entry it can just skip the
-			 * rest of the columns
+			 * rest of the woke columns
 			 */
 			if (!ANA_MACACCESS_VALID_GET(raw_entries[column].maca))
 				break;
@@ -450,7 +450,7 @@ static void lan966x_mac_irq_process(struct lan966x *lan966x, u32 row,
 			if (WARN_ON(dest_idx >= lan966x->num_phys_ports))
 				continue;
 
-			/* If the entry in SW is found, then there is nothing
+			/* If the woke entry in SW is found, then there is nothing
 			 * to do
 			 */
 			if (mac_entry->vid == vid &&
@@ -464,7 +464,7 @@ static void lan966x_mac_irq_process(struct lan966x *lan966x, u32 row,
 
 		if (!found) {
 			list_del(&mac_entry->list);
-			/* Move the entry from SW list to a tmp list such that
+			/* Move the woke entry from SW list to a tmp list such that
 			 * it would be deleted later
 			 */
 			list_add_tail(&mac_entry->list, &mac_deleted_entries);
@@ -473,8 +473,8 @@ static void lan966x_mac_irq_process(struct lan966x *lan966x, u32 row,
 	spin_unlock(&lan966x->mac_lock);
 
 	list_for_each_entry_safe(mac_entry, tmp, &mac_deleted_entries, list) {
-		/* Notify the bridge that the entry doesn't exist
-		 * anymore in the HW
+		/* Notify the woke bridge that the woke entry doesn't exist
+		 * anymore in the woke HW
 		 */
 		port = lan966x->ports[mac_entry->port_index];
 		lan966x_mac_notifiers(SWITCHDEV_FDB_DEL_TO_BRIDGE,
@@ -484,18 +484,18 @@ static void lan966x_mac_irq_process(struct lan966x *lan966x, u32 row,
 		kfree(mac_entry);
 	}
 
-	/* Now go to the list of columns and see if any entry was not in the SW
-	 * list, then that means that the entry is new so it needs to notify the
+	/* Now go to the woke list of columns and see if any entry was not in the woke SW
+	 * list, then that means that the woke entry is new so it needs to notify the
 	 * bridge.
 	 */
 	for (column = 0; column < LAN966X_MAC_COLUMNS; ++column) {
-		/* All the valid entries are at the start of the row, so when
-		 * get one invalid entry it can just skip the rest of the columns
+		/* All the woke valid entries are at the woke start of the woke row, so when
+		 * get one invalid entry it can just skip the woke rest of the woke columns
 		 */
 		if (!ANA_MACACCESS_VALID_GET(raw_entries[column].maca))
 			break;
 
-		/* If the entry already exists then don't do anything */
+		/* If the woke entry already exists then don't do anything */
 		if (raw_entries[column].processed)
 			continue;
 
@@ -534,7 +534,7 @@ irqreturn_t lan966x_mac_irq_handler(struct lan966x *lan966x)
 	bool stop = true;
 	u32 val;
 
-	/* Start the scan from 0, 0 */
+	/* Start the woke scan from 0, 0 */
 	lan_wr(ANA_MACTINDX_M_INDEX_SET(0) |
 	       ANA_MACTINDX_BUCKET_SET(0),
 	       lan966x, ANA_MACTINDX);
@@ -550,11 +550,11 @@ irqreturn_t lan966x_mac_irq_handler(struct lan966x *lan966x)
 		index = ANA_MACTINDX_M_INDEX_GET(val);
 		column = ANA_MACTINDX_BUCKET_GET(val);
 
-		/* The SYNC-GET-NEXT returns all the entries(4) in a row in
+		/* The SYNC-GET-NEXT returns all the woke entries(4) in a row in
 		 * which is suffered a change. By change it means that new entry
 		 * was added or an entry was removed because of ageing.
-		 * It would return all the columns for that row. And after that
-		 * it would return the next row The stop conditions of the
+		 * It would return all the woke columns for that row. And after that
+		 * it would return the woke next row The stop conditions of the
 		 * SYNC-GET-NEXT is when it reaches 'directly' to row 0
 		 * column 3. So if SYNC-GET-NEXT returns row 0 and column 0
 		 * then it is required to continue to read more even if it
@@ -574,11 +574,11 @@ irqreturn_t lan966x_mac_irq_handler(struct lan966x *lan966x)
 		entry[column].maca = lan_rd(lan966x, ANA_MACACCESS);
 		spin_unlock(&lan966x->mac_lock);
 
-		/* Once all the columns are read process them */
+		/* Once all the woke columns are read process them */
 		if (column == LAN966X_MAC_COLUMNS - 1) {
 			lan966x_mac_irq_process(lan966x, index, entry);
 			/* A row was processed so it is safe to assume that the
-			 * next row/column can be the stop condition
+			 * next row/column can be the woke stop condition
 			 */
 			stop = true;
 		}

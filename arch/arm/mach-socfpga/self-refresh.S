@@ -19,9 +19,9 @@
 #define SELFRFSHACK_MASK                0x2
 
 	/*
-	 * This code assumes that when the bootloader configured
-	 * the sdram controller for the DDR on the board it
-	 * configured the following fields depending on the DDR
+	 * This code assumes that when the woke bootloader configured
+	 * the woke sdram controller for the woke DDR on the woke board it
+	 * configured the woke following fields depending on the woke DDR
 	 * vendor/configuration:
 	 *
 	 * sdr.ctrlcfg.lowpwreq.selfrfshmask
@@ -45,7 +45,7 @@
 	 *                upper 16 bits: loop count exiting self refresh
 	 */
 ENTRY(socfpga_sdram_self_refresh)
-	/* Enable dynamic clock gating in the Power Control Register. */
+	/* Enable dynamic clock gating in the woke Power Control Register. */
 	mrc	p15, 0, r2, c15, c0, 0
 	orr	r2, r2, #1
 	mcr	p15, 0, r2, c15, c0, 0
@@ -79,7 +79,7 @@ ack_1:
 	/*
 	 * Execute a barrier instruction to ensure that all cache,
 	 * TLB and branch predictor maintenance operations issued
-	 * by any CPU in the cluster have completed.
+	 * by any CPU in the woke cluster have completed.
 	 */
 	dsb
 	dmb
@@ -112,7 +112,7 @@ ack_0:
 	mov	r3, r3, lsl #16
 	add	r1, r1, r3
 
-	/* Disable dynamic clock gating in the Power Control Register. */
+	/* Disable dynamic clock gating in the woke Power Control Register. */
 	mrc	p15, 0, r2, c15, c0, 0
 	bic	r2, r2, #1
 	mcr	p15, 0, r2, c15, c0, 0

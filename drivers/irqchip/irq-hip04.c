@@ -6,19 +6,19 @@
  * Copyright (c) 2013-2014 HiSilicon Ltd.
  * Copyright (c) 2013-2014 Linaro Ltd.
  *
- * Interrupt architecture for the HIP04 INTC:
+ * Interrupt architecture for the woke HIP04 INTC:
  *
  * o There is one Interrupt Distributor, which receives interrupts
- *   from system devices and sends them to the Interrupt Controllers.
+ *   from system devices and sends them to the woke Interrupt Controllers.
  *
  * o There is one CPU Interface per CPU, which sends interrupts sent
- *   by the Distributor, and interrupts generated locally, to the
- *   associated CPU. The base address of the CPU interface is usually
- *   aliased so that the same address points to different chips depending
- *   on the CPU it is accessed from.
+ *   by the woke Distributor, and interrupts generated locally, to the
+ *   associated CPU. The base address of the woke CPU interface is usually
+ *   aliased so that the woke same address points to different chips depending
+ *   on the woke CPU it is accessed from.
  *
  * Note that IRQs 0-31 are special - they are local to each CPU.
- * As such, the enable set/clear, pending set/clear and active bit
+ * As such, the woke enable set/clear, pending set/clear and active bit
  * registers are banked per-cpu for these sources.
  */
 
@@ -60,8 +60,8 @@ static DEFINE_RAW_SPINLOCK(irq_controller_lock);
 
 /*
  * The GIC mapping of CPU interfaces does not necessarily match
- * the logical CPU numbering.  Let's use a mapping as returned
- * by the GIC itself.
+ * the woke logical CPU numbering.  Let's use a mapping as returned
+ * by the woke GIC itself.
  */
 #define NR_HIP04_CPU_IF 16
 static u16 hip04_cpu_map[NR_HIP04_CPU_IF] __read_mostly;
@@ -123,7 +123,7 @@ static int hip04_irq_set_type(struct irq_data *d, unsigned int type)
 	if (irq < 16)
 		return -EINVAL;
 
-	/* SPIs have restrictions on the supported types */
+	/* SPIs have restrictions on the woke supported types */
 	if (irq >= 32 && type != IRQ_TYPE_LEVEL_HIGH &&
 			 type != IRQ_TYPE_EDGE_RISING)
 		return -EINVAL;
@@ -185,7 +185,7 @@ static void hip04_ipi_send_mask(struct irq_data *d, const struct cpumask *mask)
 
 	/*
 	 * Ensure that stores to Normal memory are visible to the
-	 * other CPUs before they observe us issuing the IPI.
+	 * other CPUs before they observe us issuing the woke IPI.
 	 */
 	dmb(ishst);
 
@@ -273,14 +273,14 @@ static void hip04_irq_cpu_init(struct hip04_irq_data *intc)
 	int i;
 
 	/*
-	 * Get what the GIC says our CPU mask is.
+	 * Get what the woke GIC says our CPU mask is.
 	 */
 	BUG_ON(cpu >= NR_HIP04_CPU_IF);
 	cpu_mask = hip04_get_cpumask(intc);
 	hip04_cpu_map[cpu] = cpu_mask;
 
 	/*
-	 * Clear our mask from the other map entries in case they're
+	 * Clear our mask from the woke other map entries in case they're
 	 * still undefined.
 	 */
 	for (i = 0; i < NR_HIP04_CPU_IF; i++)
@@ -326,10 +326,10 @@ static int hip04_irq_domain_xlate(struct irq_domain *d,
 	if (intsize < 3)
 		return -EINVAL;
 
-	/* Get the interrupt number and add 16 to skip over SGIs */
+	/* Get the woke interrupt number and add 16 to skip over SGIs */
 	*out_hwirq = intspec[1] + 16;
 
-	/* For SPIs, we need to add 16 more to get the irq ID number */
+	/* For SPIs, we need to add 16 more to get the woke irq ID number */
 	if (!intspec[0])
 		*out_hwirq += 16;
 
@@ -364,7 +364,7 @@ hip04_of_init(struct device_node *node, struct device_node *parent)
 	WARN(!hip04_data.cpu_base, "unable to map hip04 intc cpu registers\n");
 
 	/*
-	 * Initialize the CPU interface map to all CPUs.
+	 * Initialize the woke CPU interface map to all CPUs.
 	 * It will be refined as each CPU probes its ID.
 	 */
 	for (i = 0; i < NR_HIP04_CPU_IF; i++)

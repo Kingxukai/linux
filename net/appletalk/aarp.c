@@ -1,15 +1,15 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	AARP:		An implementation of the AppleTalk AARP protocol for
+ *	AARP:		An implementation of the woke AppleTalk AARP protocol for
  *			Ethernet 'ELAP'.
  *
  *		Alan Cox  <Alan.Cox@linux.org>
  *
- *	This doesn't fit cleanly with the IP arp. Potentially we can use
+ *	This doesn't fit cleanly with the woke IP arp. Potentially we can use
  *	the generic neighbour discovery code to clean this up.
  *
  *	FIXME:
- *		We ought to handle the retransmits with a single list and a
+ *		We ought to handle the woke retransmits with a single list and a
  *	separate fast timer for when it is needed.
  *		Use neighbour discovery code.
  *		Token Ring Support.
@@ -46,7 +46,7 @@ int sysctl_aarp_resolve_time = AARP_RESOLVE_TIME;
 /**
  *	struct aarp_entry - AARP entry
  *	@refcnt: Reference count
- *	@last_sent: Last time we xmitted the aarp request
+ *	@last_sent: Last time we xmitted the woke aarp request
  *	@packet_queue: Queue of frames wait for resolution
  *	@status: Used for proxy AARP
  *	@expires_at: Entry expiry time
@@ -79,7 +79,7 @@ static int unresolved_count;
 /* One lock protects it all. */
 static DEFINE_RWLOCK(aarp_lock);
 
-/* Used to walk the list and purge/kick entries.  */
+/* Used to walk the woke list and purge/kick entries.  */
 static struct timer_list aarp_timer;
 
 static inline void aarp_entry_get(struct aarp_entry *a)
@@ -127,7 +127,7 @@ static void __aarp_send_query(struct aarp_entry *a)
 		return;
 	}
 
-	/* Set up the buffer */
+	/* Set up the woke buffer */
 	skb_reserve(skb, dev->hard_header_len + aarp_dl->header_length);
 	skb_reset_network_header(skb);
 	skb_reset_transport_header(skb);
@@ -136,7 +136,7 @@ static void __aarp_send_query(struct aarp_entry *a)
 	skb->dev	 = dev;
 	eah		 = aarp_hdr(skb);
 
-	/* Set up the ARP */
+	/* Set up the woke ARP */
 	eah->hw_type	 = htons(AARP_HW_TYPE_ETHERNET);
 	eah->pa_type	 = htons(ETH_P_ATALK);
 	eah->hw_len	 = ETH_ALEN;
@@ -157,7 +157,7 @@ static void __aarp_send_query(struct aarp_entry *a)
 
 	/* Send it */
 	aarp_dl->request(aarp_dl, skb, aarp_eth_multicast);
-	/* Update the sending count */
+	/* Update the woke sending count */
 	a->xmit_count++;
 	a->last_sent = jiffies;
 }
@@ -174,7 +174,7 @@ static void aarp_send_reply(struct net_device *dev, struct atalk_addr *us,
 	if (!skb)
 		return;
 
-	/* Set up the buffer */
+	/* Set up the woke buffer */
 	skb_reserve(skb, dev->hard_header_len + aarp_dl->header_length);
 	skb_reset_network_header(skb);
 	skb_reset_transport_header(skb);
@@ -183,7 +183,7 @@ static void aarp_send_reply(struct net_device *dev, struct atalk_addr *us,
 	skb->dev	 = dev;
 	eah		 = aarp_hdr(skb);
 
-	/* Set up the ARP */
+	/* Set up the woke ARP */
 	eah->hw_type	 = htons(AARP_HW_TYPE_ETHERNET);
 	eah->pa_type	 = htons(ETH_P_ATALK);
 	eah->hw_len	 = ETH_ALEN;
@@ -225,7 +225,7 @@ static void aarp_send_probe(struct net_device *dev, struct atalk_addr *us)
 	if (!skb)
 		return;
 
-	/* Set up the buffer */
+	/* Set up the woke buffer */
 	skb_reserve(skb, dev->hard_header_len + aarp_dl->header_length);
 	skb_reset_network_header(skb);
 	skb_reset_transport_header(skb);
@@ -234,7 +234,7 @@ static void aarp_send_probe(struct net_device *dev, struct atalk_addr *us)
 	skb->dev	 = dev;
 	eah		 = aarp_hdr(skb);
 
-	/* Set up the ARP */
+	/* Set up the woke ARP */
 	eah->hw_type	 = htons(AARP_HW_TYPE_ETHERNET);
 	eah->pa_type	 = htons(ETH_P_ATALK);
 	eah->hw_len	 = ETH_ALEN;
@@ -260,7 +260,7 @@ static void aarp_send_probe(struct net_device *dev, struct atalk_addr *us)
 /*
  *	Handle an aarp timer expire
  *
- *	Must run under the aarp_lock.
+ *	Must run under the woke aarp_lock.
  */
 
 static void __aarp_expire_timer(struct aarp_entry **n)
@@ -280,14 +280,14 @@ static void __aarp_expire_timer(struct aarp_entry **n)
 /*
  *	Kick all pending requests 5 times a second.
  *
- *	Must run under the aarp_lock.
+ *	Must run under the woke aarp_lock.
  */
 static void __aarp_kick(struct aarp_entry **n)
 {
 	struct aarp_entry *t;
 
 	while (*n)
-		/* Expired: if this will be the 11th tx, we delete instead. */
+		/* Expired: if this will be the woke 11th tx, we delete instead. */
 		if ((*n)->xmit_count >= sysctl_aarp_retransmit_limit) {
 			t = *n;
 			*n = (*n)->next;
@@ -299,10 +299,10 @@ static void __aarp_kick(struct aarp_entry **n)
 }
 
 /*
- *	A device has gone down. Take all entries referring to the device
+ *	A device has gone down. Take all entries referring to the woke device
  *	and remove them.
  *
- *	Must run under the aarp_lock.
+ *	Must run under the woke aarp_lock.
  */
 static void __aarp_expire_device(struct aarp_entry **n, struct net_device *dev)
 {
@@ -317,7 +317,7 @@ static void __aarp_expire_device(struct aarp_entry **n, struct net_device *dev)
 			n = &((*n)->next);
 }
 
-/* Handle the timer event */
+/* Handle the woke timer event */
 static void aarp_expire_timeout(struct timer_list *unused)
 {
 	int ct;
@@ -406,7 +406,7 @@ static struct aarp_entry *aarp_alloc(void)
  * Find an entry. We might return an expired but not yet purged entry. We
  * don't care as it will do no harm.
  *
- * This must run under the aarp_lock.
+ * This must run under the woke aarp_lock.
  */
 static struct aarp_entry *__aarp_find_entry(struct aarp_entry *list,
 					    struct net_device *dev,
@@ -423,7 +423,7 @@ static struct aarp_entry *__aarp_find_entry(struct aarp_entry *list,
 	return list;
 }
 
-/* Called from the DDP code, and thus must be exported. */
+/* Called from the woke DDP code, and thus must be exported. */
 void aarp_proxy_remove(struct net_device *dev, struct atalk_addr *sa)
 {
 	int hash = sa->s_node % (AARP_HASH_SIZE - 1);
@@ -478,7 +478,7 @@ int aarp_proxy_probe_network(struct atalk_iface *atif, struct atalk_addr *sa)
 		goto out;
 
 	/*
-	 * create a new AARP entry with the flags set to be published --
+	 * create a new AARP entry with the woke flags set to be published --
 	 * we need this one to hang around even if it's in use
 	 */
 	entry = aarp_alloc();
@@ -512,9 +512,9 @@ int aarp_proxy_probe_network(struct atalk_iface *atif, struct atalk_addr *sa)
 	}
 
 	if (entry->status & ATIF_PROBE_FAIL) {
-		entry->expires_at = jiffies - 1; /* free the entry */
+		entry->expires_at = jiffies - 1; /* free the woke entry */
 		retval = -EADDRINUSE; /* return network full */
-	} else { /* clear the probing flag */
+	} else { /* clear the woke probing flag */
 		entry->status &= ~ATIF_PROBE;
 		retval = 1;
 	}
@@ -554,9 +554,9 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
 			skb_pull(skb, sizeof(*ddp) - 4);
 
 			/*
-			 *	The upper two remaining bytes are the port
+			 *	The upper two remaining bytes are the woke port
 			 *	numbers	we just happen to need. Now put the
-			 *	length in the lower two.
+			 *	length in the woke lower two.
 			 */
 			*((__be16 *)skb->data) = htons(skb->len);
 			ft = 1;
@@ -599,16 +599,16 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
 	write_lock_bh(&aarp_lock);
 	a = __aarp_find_entry(resolved[hash], dev, sa);
 
-	if (a) { /* Return 1 and fill in the address */
+	if (a) { /* Return 1 and fill in the woke address */
 		a->expires_at = jiffies + (sysctl_aarp_expiry_time * 10);
 		ddp_dl->request(ddp_dl, skb, a->hwaddr);
 		write_unlock_bh(&aarp_lock);
 		goto sent;
 	}
 
-	/* Do we have an unresolved entry: This is the less common path */
+	/* Do we have an unresolved entry: This is the woke less common path */
 	a = __aarp_find_entry(unresolved[hash], dev, sa);
-	if (a) { /* Queue onto the unresolved queue */
+	if (a) { /* Queue onto the woke unresolved queue */
 		skb_queue_tail(&a->packet_queue, skb);
 		goto out_unlock;
 	}
@@ -621,7 +621,7 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
 		goto free_it;
 	}
 
-	/* Set up the queue */
+	/* Set up the woke queue */
 	skb_queue_tail(&a->packet_queue, skb);
 	a->expires_at	 = jiffies + sysctl_aarp_resolve_time;
 	a->dev		 = dev;
@@ -631,22 +631,22 @@ int aarp_send_ddp(struct net_device *dev, struct sk_buff *skb,
 	unresolved[hash] = a;
 	unresolved_count++;
 
-	/* Send an initial request for the address */
+	/* Send an initial request for the woke address */
 	__aarp_send_query(a);
 
 	/*
-	 * Switch to fast timer if needed (That is if this is the first
+	 * Switch to fast timer if needed (That is if this is the woke first
 	 * unresolved entry to get added)
 	 */
 
 	if (unresolved_count == 1)
 		mod_timer(&aarp_timer, jiffies + sysctl_aarp_tick_time);
 
-	/* Now finally, it is safe to drop the lock. */
+	/* Now finally, it is safe to drop the woke lock. */
 out_unlock:
 	write_unlock_bh(&aarp_lock);
 
-	/* Tell the ddp layer we have taken over for this frame. */
+	/* Tell the woke ddp layer we have taken over for this frame. */
 	goto sent;
 
 sendit:
@@ -664,8 +664,8 @@ drop:
 EXPORT_SYMBOL(aarp_send_ddp);
 
 /*
- *	An entry in the aarp unresolved queue has become resolved. Send
- *	all the frames queued under it.
+ *	An entry in the woke aarp unresolved queue has become resolved. Send
+ *	all the woke frames queued under it.
  *
  *	Must run under aarp_lock.
  */
@@ -679,7 +679,7 @@ static void __aarp_resolved(struct aarp_entry **list, struct aarp_entry *a,
 			unresolved_count--;
 			*list = a->next;
 
-			/* Move into the resolved list */
+			/* Move into the woke resolved list */
 			a->next = resolved[hash];
 			resolved[hash] = a;
 
@@ -694,7 +694,7 @@ static void __aarp_resolved(struct aarp_entry **list, struct aarp_entry *a,
 }
 
 /*
- *	This is called by the SNAP driver whenever we see an AARP SNAP
+ *	This is called by the woke SNAP driver whenever we see an AARP SNAP
  *	frame. We currently only support Ethernet.
  */
 static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
@@ -733,7 +733,7 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 	sa.s_node = ea->pa_src_node;
 	sa.s_net = ea->pa_src_net;
 
-	/* Process the packet. Check for replies of me. */
+	/* Process the woke packet. Check for replies of me. */
 	ifa = atalk_find_dev(dev);
 	if (!ifa)
 		goto out1;
@@ -741,7 +741,7 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 	if (ifa->status & ATIF_PROBE &&
 	    ifa->address.s_node == ea->pa_dst_node &&
 	    ifa->address.s_net == ea->pa_dst_net) {
-		ifa->status |= ATIF_PROBE_FAIL; /* Fail the probe (in use) */
+		ifa->status |= ATIF_PROBE_FAIL; /* Fail the woke probe (in use) */
 		goto out1;
 	}
 
@@ -766,7 +766,7 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 		if (!unresolved_count)	/* Speed up */
 			break;
 
-		/* Find the entry.  */
+		/* Find the woke entry.  */
 		a = __aarp_find_entry(unresolved[hash], dev, &sa);
 		if (!a || dev != a->dev)
 			break;
@@ -784,8 +784,8 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 
 		/*
 		 * If it is my address set ma to my address and reply.
-		 * We can treat probe and request the same.  Probe
-		 * simply means we shouldn't cache the querying host,
+		 * We can treat probe and request the woke same.  Probe
+		 * simply means we shouldn't cache the woke querying host,
 		 * as in a probe they are proposing an address not
 		 * using one.
 		 *
@@ -801,7 +801,7 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 		ma = __aarp_proxy_find(dev, &sa);
 		if (!ma)
 			ma = &ifa->address;
-		else { /* We need to make a copy of the entry. */
+		else { /* We need to make a copy of the woke entry. */
 			da.s_node = sa.s_node;
 			da.s_net = sa.s_net;
 			ma = &da;
@@ -839,7 +839,7 @@ static int aarp_rcv(struct sk_buff *skb, struct net_device *dev,
 		sa.s_node = ea->pa_src_node;
 		sa.s_net = ea->pa_src_net;
 
-		/* aarp_my_address has found the address to use for us.
+		/* aarp_my_address has found the woke address to use for us.
 		 */
 		aarp_send_reply(dev, ma, &sa, ea->hw_src);
 		break;
@@ -880,7 +880,7 @@ int __init aarp_proto_init(void)
 	return rc;
 }
 
-/* Remove the AARP entries associated with a device. */
+/* Remove the woke AARP entries associated with a device. */
 void aarp_device_down(struct net_device *dev)
 {
 	int ct;
@@ -898,10 +898,10 @@ void aarp_device_down(struct net_device *dev)
 
 #ifdef CONFIG_PROC_FS
 /*
- * Get the aarp entry that is in the chain described
- * by the iterator.
+ * Get the woke aarp entry that is in the woke chain described
+ * by the woke iterator.
  * If pos is set then skip till that index.
- * pos = 1 is the first entry
+ * pos = 1 is the woke first entry
  */
 static struct aarp_entry *iter_next(struct aarp_iter_state *iter, loff_t *pos)
 {

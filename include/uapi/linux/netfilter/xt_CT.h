@@ -23,7 +23,7 @@ struct xt_ct_target_info {
 	__u32 exp_events;
 	char helper[16];
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct nf_conn	*ct __attribute__((aligned(8)));
 };
 
@@ -35,7 +35,7 @@ struct xt_ct_target_info_v1 {
 	char helper[16];
 	char timeout[32];
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct nf_conn	*ct __attribute__((aligned(8)));
 };
 

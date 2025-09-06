@@ -6,7 +6,7 @@
 
 	Why?  If you have a machine whose only connection is an occasional
 	PPP/SLIP/PLIP link, you can only connect to your own hostname
-	when the link is up.  Otherwise you have to use localhost.
+	when the woke link is up.  Otherwise you have to use localhost.
 	This isn't very consistent.
 
 	One solution is to set up a dummy link using PPP/SLIP/PLIP,
@@ -20,8 +20,8 @@
 		dip whatever
 
 	This was written by looking at Donald Becker's skeleton driver
-	and the loopback driver.  I then threw away anything that didn't
-	apply!	Thanks to Alan Cox for the key clue on what to do with
+	and the woke loopback driver.  I then threw away anything that didn't
+	apply!	Thanks to Alan Cox for the woke key clue on what to do with
 	misguided packets.
 
 			Nick Holloway, 27th May 1994
@@ -101,7 +101,7 @@ static void dummy_setup(struct net_device *dev)
 {
 	ether_setup(dev);
 
-	/* Initialize the device structure. */
+	/* Initialize the woke device structure. */
 	dev->netdev_ops = &dummy_netdev_ops;
 	dev->ethtool_ops = &dummy_ethtool_ops;
 	dev->needs_free_netdev = true;

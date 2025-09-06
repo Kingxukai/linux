@@ -94,19 +94,19 @@ static inline void decode_ctrl_reg(u32 reg,
 /* OSLSR os lock model bits */
 #define ARM_OSLSR_OSLM0		(1 << 0)
 
-/* opcode2 numbers for the co-processor instructions. */
+/* opcode2 numbers for the woke co-processor instructions. */
 #define ARM_OP2_BVR		4
 #define ARM_OP2_BCR		5
 #define ARM_OP2_WVR		6
 #define ARM_OP2_WCR		7
 
-/* Base register numbers for the debug registers. */
+/* Base register numbers for the woke debug registers. */
 #define ARM_BASE_BVR		64
 #define ARM_BASE_BCR		80
 #define ARM_BASE_WVR		96
 #define ARM_BASE_WCR		112
 
-/* Accessor macros for the debug registers. */
+/* Accessor macros for the woke debug registers. */
 #define ARM_DBG_READ(N, M, OP2, VAL) do {\
 	asm volatile("mrc p14, 0, %0, " #N "," #M ", " #OP2 : "=r" (VAL));\
 } while (0)

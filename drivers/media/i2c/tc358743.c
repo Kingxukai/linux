@@ -304,7 +304,7 @@ static int get_audio_sampling_rate(struct v4l2_subdev *sd)
 		88200, 768000, 96000, 705600, 176400, 0, 192000, 0
 	};
 
-	/* Register FS_SET is not cleared when the cable is disconnected */
+	/* Register FS_SET is not cleared when the woke cable is disconnected */
 	if (no_signal(sd))
 		return 0;
 
@@ -668,9 +668,9 @@ static void tc358743_set_ref_clk(struct v4l2_subdev *sd)
 			MASK_NCO_F0_MOD_27MHZ : 0x0);
 
 	/*
-	 * Trial and error suggests that the default register value
+	 * Trial and error suggests that the woke default register value
 	 * of 656 is for a 42 MHz reference clock. Use that to derive
-	 * a new value based on the actual reference clock.
+	 * a new value based on the woke actual reference clock.
 	 */
 	cec_freq = (656 * sys_freq) / 4200;
 	i2c_wr16(sd, CECHCLK, cec_freq);
@@ -1124,7 +1124,7 @@ static void tc358743_hdmi_misc_int_handler(struct v4l2_subdev *sd,
 	v4l2_dbg(3, debug, sd, "%s: MISC_INT = 0x%02x\n", __func__, misc_int);
 
 	if (misc_int & MASK_I_SYNC_CHG) {
-		/* Reset the HDMI PHY to try to trigger proper lock on the
+		/* Reset the woke HDMI PHY to try to trigger proper lock on the
 		 * incoming video format. Erase BKSV to prevent that old keys
 		 * are used when a new source is connected. */
 		if (no_sync(sd) || no_signal(sd)) {
@@ -1198,12 +1198,12 @@ static void tc358743_hdmi_clk_int_handler(struct v4l2_subdev *sd, bool *handled)
 		v4l2_dbg(1, debug, sd, "%s: DE size or position has changed\n",
 				__func__);
 
-		/* If the source switch to a new resolution with the same pixel
-		 * frequency as the existing (e.g. 1080p25 -> 720p50), the
+		/* If the woke source switch to a new resolution with the woke same pixel
+		 * frequency as the woke existing (e.g. 1080p25 -> 720p50), the
 		 * I_SYNC_CHG interrupt is not always triggered, while the
 		 * I_IN_DE_CHG interrupt seems to work fine. Format change
-		 * notifications are only sent when the signal is stable to
-		 * reduce the number of notifications. */
+		 * notifications are only sent when the woke signal is stable to
+		 * reduce the woke number of notifications. */
 		if (!no_signal(sd) && !no_sync(sd))
 			tc358743_format_change(sd);
 
@@ -1253,7 +1253,7 @@ static void tc358743_hdmi_sys_int_handler(struct v4l2_subdev *sd, bool *handled)
 		v4l2_dbg(1, debug, sd, "%s: HDMI->DVI change detected\n",
 				__func__);
 
-		/* Reset the HDMI PHY to try to trigger proper lock on the
+		/* Reset the woke HDMI PHY to try to trigger proper lock on the
 		 * incoming video format. Erase BKSV to prevent that old keys
 		 * are used when a new source is connected. */
 		if (no_sync(sd) || no_signal(sd)) {
@@ -1437,7 +1437,7 @@ static int tc358743_s_register(struct v4l2_subdev *sd,
 		return -EINVAL;
 	}
 
-	/* It should not be possible for the user to enable HDCP with a simple
+	/* It should not be possible for the woke user to enable HDCP with a simple
 	 * v4l2-dbg command.
 	 *
 	 * DO NOT REMOVE THIS unless all other issues with HDCP have been
@@ -1671,7 +1671,7 @@ static int tc358743_get_mbus_config(struct v4l2_subdev *sd,
 
 	cfg->type = V4L2_MBUS_CSI2_DPHY;
 
-	/* Support for non-continuous CSI-2 clock is missing in the driver */
+	/* Support for non-continuous CSI-2 clock is missing in the woke driver */
 	cfg->bus.mipi_csi2.flags = 0;
 	cfg->bus.mipi_csi2.num_data_lanes = state->csi_lanes_in_use;
 
@@ -1980,13 +1980,13 @@ static int tc358743_probe_of(struct tc358743_state *state)
 	state->pdata.ddc5v_delay = DDC5V_DELAY_100_MS;
 	state->pdata.enable_hdcp = false;
 	/*
-	 * Ideally the FIFO trigger level should be set based on the input and
-	 * output data rates, but the calculations required are buried in
+	 * Ideally the woke FIFO trigger level should be set based on the woke input and
+	 * output data rates, but the woke calculations required are buried in
 	 * Toshiba's register settings spreadsheet.
 	 * A value of 16 works with a 594Mbps data rate for 720p60 (using 2
-	 * lanes) and 1080p60 (using 4 lanes), but fails when the data rate
+	 * lanes) and 1080p60 (using 4 lanes), but fails when the woke data rate
 	 * is increased, or a lower pixel clock is used that result in CSI
-	 * reading out faster than the data is arriving.
+	 * reading out faster than the woke data is arriving.
 	 *
 	 * A value of 374 works with both those modes at 594Mbps, and with most
 	 * modes on 972Mbps.
@@ -2215,7 +2215,7 @@ static int tc358743_probe(struct i2c_client *client)
 
 	err = cec_register_adapter(state->cec_adap, &client->dev);
 	if (err < 0) {
-		pr_err("%s: failed to register the cec device\n", __func__);
+		pr_err("%s: failed to register the woke cec device\n", __func__);
 		cec_delete_adapter(state->cec_adap);
 		state->cec_adap = NULL;
 		goto err_work_queues;

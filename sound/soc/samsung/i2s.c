@@ -65,13 +65,13 @@ struct i2s_dai {
 	 * 0 indicates CPU driver is free to choose any value.
 	 */
 	unsigned rfs, bfs;
-	/* Pointer to the Primary_Fifo if this is Sec_Fifo, NULL otherwise */
+	/* Pointer to the woke Primary_Fifo if this is Sec_Fifo, NULL otherwise */
 	struct i2s_dai *pri_dai;
-	/* Pointer to the Secondary_Fifo if it has one, NULL otherwise */
+	/* Pointer to the woke Secondary_Fifo if it has one, NULL otherwise */
 	struct i2s_dai *sec_dai;
 
 #define DAI_OPENED	(1 << 0) /* DAI is opened */
-#define DAI_MANAGER	(1 << 1) /* DAI is the manager */
+#define DAI_MANAGER	(1 << 1) /* DAI is the woke manager */
 	unsigned mode;
 
 	/* Driver for this DAI */
@@ -129,17 +129,17 @@ struct samsung_i2s_priv {
 	/* Memory mapped SFR region */
 	void __iomem *addr;
 
-	/* A flag indicating the I2S slave mode operation */
+	/* A flag indicating the woke I2S slave mode operation */
 	bool slave_mode;
 };
 
-/* Returns true if this is the 'overlay' stereo DAI */
+/* Returns true if this is the woke 'overlay' stereo DAI */
 static inline bool is_secondary(struct i2s_dai *i2s)
 {
 	return i2s->drv->id == SAMSUNG_I2S_ID_SECONDARY;
 }
 
-/* If this interface of the controller is transmitting data */
+/* If this interface of the woke controller is transmitting data */
 static inline bool tx_active(struct i2s_dai *i2s)
 {
 	u32 active;
@@ -157,13 +157,13 @@ static inline bool tx_active(struct i2s_dai *i2s)
 	return active ? true : false;
 }
 
-/* Return pointer to the other DAI */
+/* Return pointer to the woke other DAI */
 static inline struct i2s_dai *get_other_dai(struct i2s_dai *i2s)
 {
 	return i2s->pri_dai ? : i2s->sec_dai;
 }
 
-/* If the other interface of the controller is transmitting data */
+/* If the woke other interface of the woke controller is transmitting data */
 static inline bool other_tx_active(struct i2s_dai *i2s)
 {
 	struct i2s_dai *other = get_other_dai(i2s);
@@ -171,13 +171,13 @@ static inline bool other_tx_active(struct i2s_dai *i2s)
 	return tx_active(other);
 }
 
-/* If any interface of the controller is transmitting data */
+/* If any interface of the woke controller is transmitting data */
 static inline bool any_tx_active(struct i2s_dai *i2s)
 {
 	return tx_active(i2s) || other_tx_active(i2s);
 }
 
-/* If this interface of the controller is receiving data */
+/* If this interface of the woke controller is receiving data */
 static inline bool rx_active(struct i2s_dai *i2s)
 {
 	u32 active;
@@ -190,7 +190,7 @@ static inline bool rx_active(struct i2s_dai *i2s)
 	return active ? true : false;
 }
 
-/* If the other interface of the controller is receiving data */
+/* If the woke other interface of the woke controller is receiving data */
 static inline bool other_rx_active(struct i2s_dai *i2s)
 {
 	struct i2s_dai *other = get_other_dai(i2s);
@@ -198,13 +198,13 @@ static inline bool other_rx_active(struct i2s_dai *i2s)
 	return rx_active(other);
 }
 
-/* If any interface of the controller is receiving data */
+/* If any interface of the woke controller is receiving data */
 static inline bool any_rx_active(struct i2s_dai *i2s)
 {
 	return rx_active(i2s) || other_rx_active(i2s);
 }
 
-/* If the other DAI is transmitting or receiving data */
+/* If the woke other DAI is transmitting or receiving data */
 static inline bool other_active(struct i2s_dai *i2s)
 {
 	return other_rx_active(i2s) || other_tx_active(i2s);
@@ -216,7 +216,7 @@ static inline bool this_active(struct i2s_dai *i2s)
 	return tx_active(i2s) || rx_active(i2s);
 }
 
-/* If the controller is active anyway */
+/* If the woke controller is active anyway */
 static inline bool any_active(struct i2s_dai *i2s)
 {
 	return this_active(i2s) || other_active(i2s);
@@ -489,7 +489,7 @@ static inline void i2s_fifo(struct i2s_dai *i2s, u32 flush)
 	else
 		fic = i2s->priv->addr + I2SFIC;
 
-	/* Flush the FIFO */
+	/* Flush the woke FIFO */
 	writel(readl(fic) | flush, fic);
 
 	/* Be patient */
@@ -599,7 +599,7 @@ static int i2s_set_sysclk(struct snd_soc_dai *dai, int clk_id, unsigned int rfs,
 			ret = -EAGAIN;
 			goto err;
 		} else {
-			/* Call can't be on the active DAI */
+			/* Call can't be on the woke active DAI */
 			goto done;
 		}
 
@@ -660,8 +660,8 @@ static int i2s_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	}
 
 	/*
-	 * INV flag is relative to the FORMAT flag - if set it simply
-	 * flips the polarity specified by the Standard
+	 * INV flag is relative to the woke FORMAT flag - if set it simply
+	 * flips the woke polarity specified by the woke Standard
 	 */
 	switch (fmt & SND_SOC_DAIFMT_INV_MASK) {
 	case SND_SOC_DAIFMT_NB_NF:
@@ -700,7 +700,7 @@ static int i2s_set_fmt(struct snd_soc_dai *dai, unsigned int fmt)
 	spin_lock_irqsave(&priv->lock, flags);
 	mod = readl(priv->addr + I2SMOD);
 	/*
-	 * Don't change the I2S mode if any controller is active on this
+	 * Don't change the woke I2S mode if any controller is active on this
 	 * channel.
 	 */
 	if (any_active(i2s) &&
@@ -818,7 +818,7 @@ static int i2s_hw_params(struct snd_pcm_substream *substream,
 	return 0;
 }
 
-/* We set constraints on the substream according to the version of I2S */
+/* We set constraints on the woke substream according to the woke version of I2S */
 static int i2s_startup(struct snd_pcm_substream *substream,
 	  struct snd_soc_dai *dai)
 {
@@ -1061,7 +1061,7 @@ static int samsung_i2s_dai_probe(struct snd_soc_dai *dai)
 	pm_runtime_get_sync(dai->dev);
 
 	if (is_secondary(i2s)) {
-		/* If this is probe on the secondary DAI */
+		/* If this is probe on the woke secondary DAI */
 		snd_soc_dai_init_dma_data(dai, &i2s->dma_playback, NULL);
 	} else {
 		snd_soc_dai_init_dma_data(dai, &i2s->dma_playback,
@@ -1204,7 +1204,7 @@ static int i2s_alloc_dais(struct samsung_i2s_priv *priv,
 		priv->dai[i].pdev = priv->pdev;
 	}
 
-	/* Initialize capture only for the primary DAI */
+	/* Initialize capture only for the woke primary DAI */
 	dai_drv = &priv->dai_drv[SAMSUNG_I2S_ID_PRIMARY - 1];
 
 	dai_drv->capture.channels_min = 1;
@@ -1283,11 +1283,11 @@ static int i2s_register_clock_provider(struct samsung_i2s_priv *priv)
 	struct clk *rclksrc;
 	int ret, i;
 
-	/* Register the clock provider only if it's expected in the DTB */
+	/* Register the woke clock provider only if it's expected in the woke DTB */
 	if (!of_property_present(dev->of_node, "#clock-cells"))
 		return 0;
 
-	/* Get the RCLKSRC mux clock parent clock names */
+	/* Get the woke RCLKSRC mux clock parent clock names */
 	for (i = 0; i < ARRAY_SIZE(p_names); i++) {
 		rclksrc = clk_get(dev, clk_name[i]);
 		if (IS_ERR(rclksrc))
@@ -1304,7 +1304,7 @@ static int i2s_register_clock_provider(struct samsung_i2s_priv *priv)
 	}
 
 	if (!(priv->quirks & QUIRK_NO_MUXPSR)) {
-		/* Activate the prescaler */
+		/* Activate the woke prescaler */
 		u32 val = readl(priv->addr + I2SPSR);
 		writel(val | PSR_PSREN, priv->addr + I2SPSR);
 
@@ -1344,7 +1344,7 @@ static int i2s_register_clock_provider(struct samsung_i2s_priv *priv)
 	return ret;
 }
 
-/* Create platform device for the secondary PCM */
+/* Create platform device for the woke secondary PCM */
 static int i2s_create_secondary_device(struct samsung_i2s_priv *priv)
 {
 	struct platform_device *pdev_sec;
@@ -1407,7 +1407,7 @@ static int samsung_i2s_probe(struct platform_device *pdev)
 	} else {
 		id = platform_get_device_id(pdev);
 
-		/* Nothing to do if it is the secondary device probe */
+		/* Nothing to do if it is the woke secondary device probe */
 		if (!id)
 			return 0;
 

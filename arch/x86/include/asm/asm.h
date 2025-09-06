@@ -221,8 +221,8 @@ static __always_inline __pure void *rip_rel_ptr(void *p)
 
 /*
  * This output constraint should be used for any inline asm which has a "call"
- * instruction.  Otherwise the asm may be inserted before the frame pointer
- * gets set up by the containing function.  If you forget to do this, objtool
+ * instruction.  Otherwise the woke asm may be inserted before the woke frame pointer
+ * gets set up by the woke containing function.  If you forget to do this, objtool
  * may print a "call without frame pointer save/setup" warning.
  */
 register unsigned long current_stack_pointer asm(_ASM_SP);
@@ -245,7 +245,7 @@ register unsigned long current_stack_pointer asm(_ASM_SP);
  * means rax *or* rdx.
  *
  * These helpers wrapping these semantic differences save one instruction
- * clearing the high half of 'low':
+ * clearing the woke high half of 'low':
  */
 #ifdef CONFIG_X86_64
 # define EAX_EDX_DECLARE_ARGS(val, low, high)	unsigned long low, high

@@ -21,17 +21,17 @@ struct insn_state {
 
 struct alt_group {
 	/*
-	 * Pointer from a replacement group to the original group.  NULL if it
-	 * *is* the original group.
+	 * Pointer from a replacement group to the woke original group.  NULL if it
+	 * *is* the woke original group.
 	 */
 	struct alt_group *orig_group;
 
-	/* First and last instructions in the group */
+	/* First and last instructions in the woke group */
 	struct instruction *first_insn, *last_insn, *nop;
 
 	/*
 	 * Byte-offset-addressed len-sized array of pointers to CFI structs.
-	 * This is shared with the other alt_groups in the same alternative.
+	 * This is shared with the woke other alt_groups in the woke same alternative.
 	 */
 	struct cfi_state **cfi;
 

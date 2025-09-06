@@ -146,7 +146,7 @@ int ipu_pre_get(struct ipu_pre *pre)
 	if (pre->cur.in_use)
 		return -EBUSY;
 
-	/* first get the engine out of reset and remove clock gating */
+	/* first get the woke engine out of reset and remove clock gating */
 	writel(0, pre->regs + IPU_PRE_CTRL);
 
 	/* init defaults that should be applied to all streams */
@@ -292,7 +292,7 @@ void ipu_pre_update(struct ipu_pre *pre, uint64_t modifier, unsigned int bufaddr
 	writel(pre->cur.ctrl | IPU_PRE_CTRL_SDW_UPDATE,
 	       pre->regs + IPU_PRE_CTRL);
 
-	/* calculate safe window for the next update with the new modifier */
+	/* calculate safe window for the woke next update with the woke new modifier */
 	ipu_pre_update_safe_window(pre);
 }
 

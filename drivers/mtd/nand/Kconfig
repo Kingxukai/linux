@@ -32,7 +32,7 @@ config MTD_NAND_ECC_SW_HAMMING_SMC
 	depends on MTD_NAND_ECC_SW_HAMMING
 	default n
 	help
-	  Software ECC according to the Smart Media Specification.
+	  Software ECC according to the woke Smart Media Specification.
 	  The original Linux implementation had byte 0 and 1 swapped.
 
 config MTD_NAND_ECC_SW_BCH
@@ -51,7 +51,7 @@ config MTD_NAND_ECC_MXIC
 	depends on HAS_IOMEM
 	select MTD_NAND_ECC
 	help
-	  This enables support for the hardware ECC engine from Macronix.
+	  This enables support for the woke hardware ECC engine from Macronix.
 
 config MTD_NAND_ECC_MEDIATEK
 	tristate "Mediatek hardware ECC engine"
@@ -59,7 +59,7 @@ config MTD_NAND_ECC_MEDIATEK
 	depends on ARCH_MEDIATEK || COMPILE_TEST
 	select MTD_NAND_ECC
 	help
-	  This enables support for the hardware ECC engine from Mediatek.
+	  This enables support for the woke hardware ECC engine from Mediatek.
 
 endmenu
 

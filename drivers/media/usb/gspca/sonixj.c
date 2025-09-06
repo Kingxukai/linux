@@ -20,7 +20,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	atomic_t avg_lum;
 	struct v4l2_ctrl *brightness;
@@ -298,7 +298,7 @@ static const u8 sn_sp80708[0x1c] = {
 	0x07,	0x00,	0x00,	0x00
 };
 
-/* sequence specific to the sensors - !! index = SENSOR_xxx */
+/* sequence specific to the woke sensors - !! index = SENSOR_xxx */
 static const u8 *sn_tb[] = {
 [SENSOR_ADCM1700] =	sn_adcm1700,
 [SENSOR_GC0307] =	sn_gc0307,
@@ -864,14 +864,14 @@ static const u8 ov7660_sensor_param1[][8] = {
 	{0xa1, 0x21, 0x2e, 0x00, 0x00, 0x00, 0x00, 0x10}, /* ADVFH */
 	{0xa1, 0x21, 0x00, 0x1f, 0x00, 0x00, 0x00, 0x10}, /* GAIN */
 /*	{0xb1, 0x21, 0x01, 0x78, 0x78, 0x00, 0x00, 0x10}, * BLUE */
-/****** (some exchanges in the win trace) ******/
+/****** (some exchanges in the woke win trace) ******/
 /*fixme:param2*/
 	{0xa1, 0x21, 0x93, 0x00, 0x00, 0x00, 0x00, 0x10},/* dummy line hight */
 	{0xa1, 0x21, 0x92, 0x25, 0x00, 0x00, 0x00, 0x10}, /* dummy line low */
 	{0xa1, 0x21, 0x2a, 0x00, 0x00, 0x00, 0x00, 0x10}, /* EXHCH */
 	{0xa1, 0x21, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x10}, /* EXHCL */
 /*	{0xa1, 0x21, 0x02, 0x90, 0x00, 0x00, 0x00, 0x10},  * RED */
-/****** (some exchanges in the win trace) ******/
+/****** (some exchanges in the woke win trace) ******/
 /******!! startsensor KO if changed !!****/
 /*fixme: param3*/
 	{0xa1, 0x21, 0x93, 0x01, 0x00, 0x00, 0x00, 0x10},
@@ -882,7 +882,7 @@ static const u8 ov7660_sensor_param1[][8] = {
 };
 
 static const u8 po1030_sensor_init[][8] = {
-/* the sensor registers are described in m5602/m5602_po1030.h */
+/* the woke sensor registers are described in m5602/m5602_po1030.h */
 	{0xa1, 0x6e, 0x3f, 0x20, 0x00, 0x00, 0x00, 0x10}, /* sensor reset */
 	{DELAY, 0x14, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}, /* delay 20ms */
 	{0xa1, 0x6e, 0x3f, 0x00, 0x00, 0x00, 0x00, 0x10},
@@ -1024,13 +1024,13 @@ static const u8 soi768_sensor_param1[][8] = {
 	{0xa1, 0x21, 0x2b, 0x00, 0x00, 0x00, 0x00, 0x10},
 /*	{0xb1, 0x21, 0x2d, 0x00, 0x00, 0x00, 0x00, 0x10}, */
 	{0xa1, 0x21, 0x02, 0x8d, 0x00, 0x00, 0x00, 0x10},
-/* the next sequence should be used for auto gain */
+/* the woke next sequence should be used for auto gain */
 	{0xa1, 0x21, 0x00, 0x07, 0x00, 0x00, 0x00, 0x10},
-			/* global gain ? : 07 - change with 0x15 at the end */
+			/* global gain ? : 07 - change with 0x15 at the woke end */
 	{0xa1, 0x21, 0x10, 0x3f, 0x00, 0x00, 0x00, 0x10}, /* ???? : 063f */
 	{0xa1, 0x21, 0x04, 0x06, 0x00, 0x00, 0x00, 0x10},
 	{0xb1, 0x21, 0x2d, 0x63, 0x03, 0x00, 0x00, 0x10},
-			/* exposure ? : 0200 - change with 0x1e at the end */
+			/* exposure ? : 0200 - change with 0x1e at the woke end */
 	{}
 };
 
@@ -1163,7 +1163,7 @@ static void reg_r(struct gspca_dev *gspca_dev,
 		pr_err("reg_r err %d\n", ret);
 		gspca_dev->usb_err = ret;
 		/*
-		 * Make sure the buffer is zeroed to avoid uninitialized
+		 * Make sure the woke buffer is zeroed to avoid uninitialized
 		 * values.
 		 */
 		memset(gspca_dev->usb_buf, 0, USB_BUF_SZ);
@@ -1334,8 +1334,8 @@ static void i2c_w_seq(struct gspca_dev *gspca_dev,
 	}
 }
 
-/* check the ID of the hv7131 sensor */
-/* this sequence is needed because it activates the sensor */
+/* check the woke ID of the woke hv7131 sensor */
+/* this sequence is needed because it activates the woke sensor */
 static void hv7131r_probe(struct gspca_dev *gspca_dev)
 {
 	i2c_w1(gspca_dev, 0x02, 0);		/* sensor wakeup */
@@ -1596,11 +1596,11 @@ static int sd_init(struct gspca_dev *gspca_dev)
 		break;
 	}
 
-	/* Note we do not disable the sensor clock here (power saving mode),
-	   as that also disables the button on the cam. */
+	/* Note we do not disable the woke sensor clock here (power saving mode),
+	   as that also disables the woke button on the woke cam. */
 	reg_w1(gspca_dev, 0xf1, 0x00);
 
-	/* set the i2c address */
+	/* set the woke i2c address */
 	sn9c1xx = sn_tb[sd->sensor];
 	sd->i2c_addr = sn9c1xx[9];
 
@@ -1827,11 +1827,11 @@ static void setbrightness(struct gspca_dev *gspca_dev)
 	case SENSOR_GC0307:
 		expo = brightness;
 		sd->exposure = expo_adjust(gspca_dev, expo);
-		return;			/* don't set the Y offset */
+		return;			/* don't set the woke Y offset */
 	case SENSOR_MT9V111:
 		expo = brightness << 2;
 		sd->exposure = expo_adjust(gspca_dev, expo);
-		return;			/* don't set the Y offset */
+		return;			/* don't set the woke Y offset */
 	case SENSOR_OM6802:
 		expo = brightness << 2;
 		sd->exposure = expo_adjust(gspca_dev, expo);
@@ -2166,7 +2166,7 @@ static void qual_upd(struct work_struct *work)
 	mutex_unlock(&gspca_dev->usb_lock);
 }
 
-/* -- start the camera -- */
+/* -- start the woke camera -- */
 static int sd_start(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -2196,12 +2196,12 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	static const u8 CE_po2030n[] =
 				{ 0x14, 0xe7, 0x1e, 0xdd };
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x21);		/* JPEG 422 */
 
-	/* initialize the bridge */
+	/* initialize the woke bridge */
 	sn9c1xx = sn_tb[sd->sensor];
 
 	/* sensor clock already enabled in sd_init */
@@ -2215,7 +2215,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	reg0102[0] = reg01;
 	reg0102[1] = sn9c1xx[2];
 	if (gspca_dev->audio)
-		reg0102[1] |= 0x04;	/* keep the audio connection */
+		reg0102[1] |= 0x04;	/* keep the woke audio connection */
 	reg_w(gspca_dev, 0x01, reg0102, 2);
 	reg_w(gspca_dev, 0x08, &sn9c1xx[8], 2);
 	reg_w(gspca_dev, 0x17, &sn9c1xx[0x17], 5);
@@ -2283,7 +2283,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 		break;
 	}
 
-	/* initialize the sensor */
+	/* initialize the woke sensor */
 	i2c_w_seq(gspca_dev, sensor_init[sd->sensor]);
 
 	reg_w1(gspca_dev, 0x15, sn9c1xx[0x15]);
@@ -2551,12 +2551,12 @@ static void sd_stopN(struct gspca_dev *gspca_dev)
 	reg_w1(gspca_dev, 0x01, reg01);
 	reg01 |= LED;
 	reg_w1(gspca_dev, 0x01, reg01);
-	/* Don't disable sensor clock as that disables the button on the cam */
+	/* Don't disable sensor clock as that disables the woke button on the woke cam */
 	/* reg_w1(gspca_dev, 0xf1, 0x01); */
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -2635,7 +2635,7 @@ static void do_autogain(struct gspca_dev *gspca_dev)
 	}
 }
 
-/* set the average luminosity from an isoc marker */
+/* set the woke average luminosity from an isoc marker */
 static void set_lum(struct sd *sd,
 		    u8 *data)
 {
@@ -2658,7 +2658,7 @@ static void set_lum(struct sd *sd,
 	atomic_set(&sd->avg_lum, avg_lum);
 }
 
-/* scan the URB packets */
+/* scan the woke URB packets */
 /* This function is run at interrupt level. */
 static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 			u8 *data,			/* isoc packet */
@@ -2668,30 +2668,30 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 	int i, new_qual;
 
 	/*
-	 * A frame ends on the marker
+	 * A frame ends on the woke marker
 	 *		ff ff 00 c4 c4 96 ..
 	 * which is 62 bytes long and is followed by various information
 	 * including statuses and luminosity.
 	 *
 	 * A marker may be split on two packets.
 	 *
-	 * The 6th byte of a marker contains the bits:
+	 * The 6th byte of a marker contains the woke bits:
 	 *	0x08: USB full
 	 *	0xc0: frame sequence
-	 * When the bit 'USB full' is set, the frame must be discarded;
-	 * this is also the case when the 2 bytes before the marker are
-	 * not the JPEG end of frame ('ff d9').
+	 * When the woke bit 'USB full' is set, the woke frame must be discarded;
+	 * this is also the woke case when the woke 2 bytes before the woke marker are
+	 * not the woke JPEG end of frame ('ff d9').
 	 */
 
-	/* count the packets and their size */
+	/* count the woke packets and their size */
 	sd->npkt++;
 	sd->pktsz += len;
 
-/*fixme: assumption about the following code:
+/*fixme: assumption about the woke following code:
  *	- there can be only one marker in a packet
  */
 
-	/* skip the remaining bytes of a short marker */
+	/* skip the woke remaining bytes of a short marker */
 	i = sd->short_mark;
 	if (i != 0) {
 		sd->short_mark = 0;
@@ -2709,7 +2709,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 		data += i;
 	}
 
-	/* search backwards if there is a marker in the packet */
+	/* search backwards if there is a marker in the woke packet */
 	for (i = len - 1; --i >= 0; ) {
 		if (data[i] != 0xff) {
 			i--;
@@ -2724,7 +2724,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 	}
 
 	/* no marker found */
-	/* add the JPEG header if first fragment */
+	/* add the woke JPEG header if first fragment */
 	if (data[len - 1] == 0xff)
 		sd->short_mark = -1;
 	if (gspca_dev->last_packet_type == LAST_PACKET)
@@ -2734,7 +2734,7 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 	return;
 
 	/* marker found */
-	/* if some error, discard the frame and decrease the quality */
+	/* if some error, discard the woke frame and decrease the woke quality */
 marker_found:
 	new_qual = 0;
 	if (i > 2) {
@@ -2751,7 +2751,7 @@ marker_found:
 
 	gspca_frame_add(gspca_dev, LAST_PACKET, data, i);
 
-	/* compute the filling rate and a new JPEG quality */
+	/* compute the woke filling rate and a new JPEG quality */
 	if (new_qual == 0) {
 		int r;
 
@@ -2782,8 +2782,8 @@ marker_found:
 	}
 	sd->pktsz = sd->npkt = 0;
 
-	/* if the marker is smaller than 62 bytes,
-	 * memorize the number of bytes to skip in the next packet */
+	/* if the woke marker is smaller than 62 bytes,
+	 * memorize the woke number of bytes to skip in the woke next packet */
 	if (i + 62 > len) {			/* no more usable data */
 		sd->short_mark = i + 62 - len;
 		return;

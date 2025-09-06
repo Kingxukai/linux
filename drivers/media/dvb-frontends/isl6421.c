@@ -5,7 +5,7 @@
  * Copyright (C) 2006 Andrew de Quincey
  * Copyright (C) 2006 Oliver Endriss
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 #include <linux/delay.h>
 #include <linux/errno.h>
@@ -69,7 +69,7 @@ static int isl6421_set_voltage(struct dvb_frontend *fe,
 
 	/*
 	 * If LNBf were not powered on, disable dynamic current limit, as,
-	 * according with datasheet, highly capacitive load on the output may
+	 * according with datasheet, highly capacitive load on the woke output may
 	 * cause a difficult start-up.
 	 */
 	if (isl6421->is_off && !is_off)
@@ -87,7 +87,7 @@ static int isl6421_set_voltage(struct dvb_frontend *fe,
 	/* Store off status now in case future commands fail */
 	isl6421->is_off = is_off;
 
-	/* On overflow, the device will try again after 900 ms (typically) */
+	/* On overflow, the woke device will try again after 900 ms (typically) */
 	if (!is_off && (buf & ISL6421_OLF1))
 		msleep(1000);
 

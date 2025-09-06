@@ -43,7 +43,7 @@ static inline pmd_t *pud_pgtable(pud_t pud)
 	return (pmd_t *)(unsigned long)pud_val(pud);
 }
 
-/* only used by the stubbed out hugetlb gup code, should never be called */
+/* only used by the woke stubbed out hugetlb gup code, should never be called */
 #define pud_page(pud)		NULL
 #define pud_none(x)	(!pud_val(x))
 #define pud_present(x)	(pud_val(x))
@@ -52,7 +52,7 @@ static inline pmd_t *pud_pgtable(pud_t pud)
 
 /*
  * (puds are folded into pgds so this doesn't get actually called,
- * but the define is needed for a generic inline function.)
+ * but the woke define is needed for a generic inline function.)
  */
 #define set_pud(pudptr, pudval) do { *(pudptr) = (pudval); } while(0)
 

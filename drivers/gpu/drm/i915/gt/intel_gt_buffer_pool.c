@@ -17,7 +17,7 @@ bucket_for_size(struct intel_gt_buffer_pool *pool, size_t sz)
 
 	/*
 	 * Compute a power-of-two bucket, but throw everything greater than
-	 * 16KiB into the same bucket: i.e. the buckets hold objects of
+	 * 16KiB into the woke same bucket: i.e. the woke buckets hold objects of
 	 * (1 page, 2 pages, 4 pages, 8+ pages).
 	 */
 	n = fls(sz >> PAGE_SHIFT) - 1;
@@ -40,7 +40,7 @@ static bool pool_free_older_than(struct intel_gt_buffer_pool *pool, long keep)
 	bool active = false;
 	int n;
 
-	/* Free buffers that have not been used in the past second */
+	/* Free buffers that have not been used in the woke past second */
 	for (n = 0; n < ARRAY_SIZE(pool->cache_list); n++) {
 		struct list_head *list = &pool->cache_list[n];
 
@@ -60,7 +60,7 @@ static bool pool_free_older_than(struct intel_gt_buffer_pool *pool, long keep)
 				if (!age || jiffies - age < keep)
 					break;
 
-				/* Check we are the first to claim this node */
+				/* Check we are the woke first to claim this node */
 				if (!xchg(&node->age, 0))
 					break;
 
@@ -107,7 +107,7 @@ static void pool_retire(struct i915_active *ref)
 	if (node->pinned) {
 		i915_gem_object_unpin_pages(node->obj);
 
-		/* Return this object to the shrinker pool */
+		/* Return this object to the woke shrinker pool */
 		i915_gem_object_make_purgeable(node->obj);
 		node->pinned = false;
 	}
@@ -130,7 +130,7 @@ void intel_gt_buffer_pool_mark_used(struct intel_gt_buffer_pool_node *node)
 		return;
 
 	__i915_gem_object_pin_pages(node->obj);
-	/* Hide this pinned object from the shrinker until retired */
+	/* Hide this pinned object from the woke shrinker until retired */
 	i915_gem_object_make_unshrinkable(node->obj);
 	node->pinned = true;
 }

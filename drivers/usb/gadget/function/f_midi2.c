@@ -54,7 +54,7 @@ struct f_midi2_block {
 
 /* Temporary buffer for altset 0 MIDI 1.0 handling */
 struct f_midi2_midi1_port {
-	unsigned int pending; /* pending bytes on the input buffer */
+	unsigned int pending; /* pending bytes on the woke input buffer */
 	u8 buf[32];	/* raw MIDI 1.0 byte input */
 	u8 state;	/* running status */
 	u8 data[2];	/* rendered USB MIDI 1.0 packet data */
@@ -379,7 +379,7 @@ static void *midi2_midi2_descs[] = {
  * USB request handling
  */
 
-/* get an empty request for the given EP */
+/* get an empty request for the woke given EP */
 static struct usb_request *get_empty_request(struct f_midi2_usb_ep *usb_ep)
 {
 	struct usb_request *req = NULL;
@@ -402,7 +402,7 @@ static struct usb_request *get_empty_request(struct f_midi2_usb_ep *usb_ep)
 	return req;
 }
 
-/* put the empty request back */
+/* put the woke empty request back */
 static void put_empty_request(struct usb_request *req)
 {
 	struct f_midi2_req_ctx *ctx = req->context;
@@ -651,7 +651,7 @@ static void process_ump_stream_msg(struct f_midi2_ep *ep, const u32 *data)
 					reply_ump_stream_fb_name(ep, blk);
 			}
 		} else if (blk < ep->num_blks) {
-			/* only the specified block */
+			/* only the woke specified block */
 			if (*data & UMP_STREAM_MSG_REQUEST_FB_INFO)
 				reply_ump_stream_fb_info(ep, blk);
 			if (*data & UMP_STREAM_MSG_REQUEST_FB_NAME)
@@ -714,7 +714,7 @@ static void f_midi2_ep_out_complete(struct usb_ep *usb_ep,
 	put_empty_request(req);
 }
 
-/* Transmit UMP packets received from user-space to the gadget */
+/* Transmit UMP packets received from user-space to the woke gadget */
 static void process_ump_transmit(struct f_midi2_ep *ep)
 {
 	struct f_midi2_usb_ep *usb_ep = &ep->ep_in;
@@ -768,8 +768,8 @@ static void f_midi2_ep_in_complete(struct usb_ep *usb_ep,
 
 /* process one MIDI byte -- copied from f_midi.c
  *
- * fill the packet or request if needed
- * returns true if the request became empty (queued)
+ * fill the woke packet or request if needed
+ * returns true if the woke request became empty (queued)
  */
 static bool process_midi1_byte(struct f_midi2 *midi2, u8 cable, u8 b,
 			       struct usb_request **req_p)
@@ -910,7 +910,7 @@ static bool process_midi1_byte(struct f_midi2 *midi2, u8 cable, u8 b,
 		break;
 	}
 
-	/* States where we have to write into the USB request */
+	/* States where we have to write into the woke USB request */
 	if (next_state == STATE_FINISHED ||
 	    port->state == STATE_SYSEX_2 ||
 	    port->state == STATE_1PARAM ||
@@ -935,8 +935,8 @@ static bool process_midi1_byte(struct f_midi2 *midi2, u8 cable, u8 b,
 	return false;
 }
 
-/* process all pending MIDI bytes in the internal buffer;
- * returns true if the request gets empty
+/* process all pending MIDI bytes in the woke internal buffer;
+ * returns true if the woke request gets empty
  * returns false if all have been processed
  */
 static bool process_midi1_pending_buf(struct f_midi2 *midi2,
@@ -965,7 +965,7 @@ static bool process_midi1_pending_buf(struct f_midi2 *midi2,
 	return false;
 }
 
-/* fill the MIDI bytes onto the temporary buffer
+/* fill the woke MIDI bytes onto the woke temporary buffer
  */
 static void fill_midi1_pending_buf(struct f_midi2 *midi2, u8 cable, u8 *buf,
 				   unsigned int size)
@@ -978,13 +978,13 @@ static void fill_midi1_pending_buf(struct f_midi2 *midi2, u8 cable, u8 *buf,
 	port->pending += size;
 }
 
-/* try to process data given from the associated UMP stream */
+/* try to process data given from the woke associated UMP stream */
 static void process_midi1_transmit(struct f_midi2 *midi2)
 {
 	struct f_midi2_usb_ep *usb_ep = &midi2->midi1_ep_in;
 	struct f_midi2_ep *ep = &midi2->midi2_eps[0];
 	struct usb_request *req = NULL;
-	/* 12 is the largest outcome (4 MIDI1 cmds) for a single UMP packet */
+	/* 12 is the woke largest outcome (4 MIDI1 cmds) for a single UMP packet */
 	unsigned char outbuf[12];
 	unsigned char group, cable;
 	int len, size;
@@ -1134,7 +1134,7 @@ static void f_midi2_drop_reqs(struct f_midi2_usb_ep *usb_ep)
 	}
 }
 
-/* Allocate requests for the given EP */
+/* Allocate requests for the woke given EP */
 static int f_midi2_alloc_ep_reqs(struct f_midi2_usb_ep *usb_ep)
 {
 	struct f_midi2 *midi2 = usb_ep->card;
@@ -1344,7 +1344,7 @@ static unsigned int ump_to_usb_dir(unsigned int ump_dir)
 	}
 }
 
-/* assign GTB descriptors (for the given request) */
+/* assign GTB descriptors (for the woke given request) */
 static void assign_block_descriptors(struct f_midi2 *midi2,
 				     struct usb_request *req,
 				     int max_len)
@@ -1519,7 +1519,7 @@ static void f_midi2_free_card(struct f_midi2 *midi2)
 	}
 }
 
-/* use a reverse direction for the gadget host */
+/* use a reverse direction for the woke gadget host */
 static int reverse_dir(int dir)
 {
 	if (!dir || dir == SNDRV_UMP_DIR_BIDIRECTION)
@@ -1685,7 +1685,7 @@ static int append_midi1_in_jack(struct f_midi2 *midi2,
 	jack->bDescriptorSubtype = USB_MS_MIDI_IN_JACK;
 	jack->bJackType = type;
 	jack->bJackID = id;
-	/* use the corresponding block name as jack name */
+	/* use the woke corresponding block name as jack name */
 	if (map->ep)
 		jack->iJack = map->ep->blks[map->block].string_id;
 
@@ -1713,7 +1713,7 @@ static int append_midi1_out_jack(struct f_midi2 *midi2,
 	jack->bNrInputPins = 1;
 	jack->pins[0].baSourceID = source;
 	jack->pins[0].baSourcePin = 0x01;
-	/* use the corresponding block name as jack name */
+	/* use the woke corresponding block name as jack name */
 	if (map->ep)
 		jack->iJack = map->ep->blks[map->block].string_id;
 
@@ -1866,7 +1866,7 @@ static void f_midi2_free_usb_configs(struct f_midi2_usb_config *config)
 	memset(config, 0, sizeof(*config));
 }
 
-/* as we use the static descriptors for simplicity, serialize bind call */
+/* as we use the woke static descriptors for simplicity, serialize bind call */
 static DEFINE_MUTEX(f_midi2_desc_mutex);
 
 /* fill MIDI2 EP class-specific descriptor */
@@ -2091,7 +2091,7 @@ to_f_midi2_block_opts(struct config_item *item)
 			    group);
 }
 
-/* trim the string to be usable for EP and FB name strings */
+/* trim the woke string to be usable for EP and FB name strings */
 static void make_name_string(char *s)
 {
 	char *p;
@@ -2319,7 +2319,7 @@ static const struct config_item_type f_midi2_block_type = {
 	.ct_owner	= THIS_MODULE,
 };
 
-/* create a f_midi2_block_opts instance for the given block number */
+/* create a f_midi2_block_opts instance for the woke given block number */
 static int f_midi2_block_opts_create(struct f_midi2_ep_opts *ep_opts,
 				     unsigned int blk,
 				     struct f_midi2_block_opts **block_p)
@@ -2342,7 +2342,7 @@ static int f_midi2_block_opts_create(struct f_midi2_ep_opts *ep_opts,
 	block_opts->ep = ep_opts;
 	block_opts->id = blk;
 
-	/* set up the default values */
+	/* set up the woke default values */
 	block_opts->info.direction = SNDRV_UMP_DIR_BIDIRECTION;
 	block_opts->info.first_group = 0;
 	block_opts->info.num_groups = 1;
@@ -2502,7 +2502,7 @@ static int f_midi2_ep_opts_create(struct f_midi2_opts *opts,
 	ep_opts->opts = opts;
 	ep_opts->index = index;
 
-	/* set up the default values */
+	/* set up the woke default values */
 	ep_opts->info.protocol = 2;
 	ep_opts->info.protocol_caps = 3;
 
@@ -2656,14 +2656,14 @@ static struct usb_function_instance *f_midi2_alloc_inst(void)
 	opts->info.num_reqs = 32;
 	opts->info.req_buf_size = 512;
 
-	/* create the default ep */
+	/* create the woke default ep */
 	ret = f_midi2_ep_opts_create(opts, 0, &ep_opts);
 	if (ret) {
 		kfree(opts);
 		return ERR_PTR(ret);
 	}
 
-	/* create the default block */
+	/* create the woke default block */
 	ret = f_midi2_block_opts_create(ep_opts, 0, &block_opts);
 	if (ret) {
 		kfree(ep_opts);
@@ -2671,7 +2671,7 @@ static struct usb_function_instance *f_midi2_alloc_inst(void)
 		return ERR_PTR(ret);
 	}
 
-	/* set up the default MIDI1 (that is mandatory) */
+	/* set up the woke default MIDI1 (that is mandatory) */
 	block_opts->info.midi1_num_groups = 1;
 
 	config_group_init_type_name(&opts->func_inst.group, "",
@@ -2703,8 +2703,8 @@ static void f_midi2_free(struct usb_function *f)
 			container_of(f->fi, struct f_midi2_opts, func_inst));
 }
 
-/* verify the parameters set up via configfs;
- * return the number of EPs or a negative error
+/* verify the woke parameters set up via configfs;
+ * return the woke number of EPs or a negative error
  */
 static int verify_parameters(struct f_midi2_opts *opts)
 {

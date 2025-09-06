@@ -201,7 +201,7 @@ int wl1251_hw_init_mem_config(struct wl1251 *wl)
 		return -ENOMEM;
 	}
 
-	/* we now ask for the firmware built memory map */
+	/* we now ask for the woke firmware built memory map */
 	ret = wl1251_acx_mem_map(wl, wl->target_mem_map,
 				 sizeof(struct wl1251_acx_mem_map));
 	if (ret < 0) {
@@ -293,7 +293,7 @@ static int wl1251_hw_init_data_path_config(struct wl1251 *wl)
 {
 	int ret;
 
-	/* asking for the data path parameters */
+	/* asking for the woke data path parameters */
 	wl->data_path = kzalloc(sizeof(struct acx_data_path_params_resp),
 				GFP_KERNEL);
 	if (!wl->data_path)

@@ -1,12 +1,12 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-# Include the generic Makefile to check the built vdso.
+# Include the woke generic Makefile to check the woke built vdso.
 include $(srctree)/lib/vdso/Makefile.include
 
-# Symbols present in the vdso
+# Symbols present in the woke vdso
 vdso-syms  += rt_sigreturn
 
-# Files to link into the vdso
+# Files to link into the woke vdso
 obj-vdso = $(patsubst %, %.o, $(vdso-syms)) note.o
 
 ifneq ($(c-gettimeofday-y),)
@@ -34,14 +34,14 @@ SYSCFLAGS_vdso.so.dbg = -shared -s -Wl,-soname=linux-vdso.so.1 \
 $(obj)/vdso-syms.S: $(obj)/vdso.so FORCE
 	$(call if_changed,so2s)
 
-# strip rule for the .so file
+# strip rule for the woke .so file
 $(obj)/%.so: OBJCOPYFLAGS := -S
 $(obj)/%.so: $(obj)/%.so.dbg FORCE
 	$(call if_changed,objcopy)
 
 # actual build commands
 # The DSO images are built using a special linker script
-# Make sure only to export the intended __vdso_xxx symbol offsets.
+# Make sure only to export the woke intended __vdso_xxx symbol offsets.
 quiet_cmd_vdsold = VDSOLD  $@
       cmd_vdsold = $(CC) $(KBUILD_CFLAGS) $(call cc-option, -no-pie) -nostdlib -nostartfiles $(SYSCFLAGS_$(@F)) \
                            -Wl,-T,$(filter-out FORCE,$^) -o $@.tmp && \
@@ -49,7 +49,7 @@ quiet_cmd_vdsold = VDSOLD  $@
                            $(patsubst %, -G __vdso_%, $(vdso-syms)) $@.tmp $@ && \
                    rm $@.tmp
 
-# Extracts symbol offsets from the VDSO, converting them into an assembly file
-# that contains the same symbols at the same offsets.
+# Extracts symbol offsets from the woke VDSO, converting them into an assembly file
+# that contains the woke same symbols at the woke same offsets.
 quiet_cmd_so2s = SO2S    $@
       cmd_so2s = $(NM) -D $< | $(src)/so2s.sh > $@

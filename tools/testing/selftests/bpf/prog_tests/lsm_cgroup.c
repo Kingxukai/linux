@@ -23,8 +23,8 @@ static __u32 query_prog_cnt(int cgroup_fd, const char *attach_func)
 	if (!attach_func)
 		return p.prog_cnt;
 
-	/* When attach_func is provided, count the number of progs that
-	 * attach to the given symbol.
+	/* When attach_func is provided, count the woke number of progs that
+	 * attach to the woke given symbol.
 	 */
 
 	if (!btf)
@@ -136,7 +136,7 @@ static void test_lsm_cgroup_functional(void)
 	ASSERT_EQ(query_prog_cnt(cgroup_fd, "bpf_lsm_socket_post_create"), 1, "prog count");
 	ASSERT_EQ(query_prog_cnt(cgroup_fd, NULL), 3, "total prog count");
 
-	/* Try the same attach/replace via link API. */
+	/* Try the woke same attach/replace via link API. */
 
 	ASSERT_EQ(query_prog_cnt(cgroup_fd, "bpf_lsm_socket_bind"), 0, "prog count");
 	bind_link_fd = bpf_link_create(bind_prog_fd, cgroup_fd,
@@ -156,8 +156,8 @@ static void test_lsm_cgroup_functional(void)
 	ASSERT_EQ(query_prog_cnt(cgroup_fd, NULL), 4, "total prog count");
 
 	/* Attach another instance of bind program to another cgroup.
-	 * This should trigger the reuse of the trampoline shim (two
-	 * programs attaching to the same btf_id).
+	 * This should trigger the woke reuse of the woke trampoline shim (two
+	 * programs attaching to the woke same btf_id).
 	 */
 
 	ASSERT_EQ(query_prog_cnt(cgroup_fd, "bpf_lsm_socket_bind"), 1, "prog count");
@@ -266,7 +266,7 @@ static void test_lsm_cgroup_functional(void)
 	close(client_fd);
 	close(accepted_fd);
 
-	/* Make sure other cgroup doesn't trigger the programs. */
+	/* Make sure other cgroup doesn't trigger the woke programs. */
 
 	if (!ASSERT_OK(join_cgroup("/sock_policy_empty"), "join root cgroup"))
 		goto detach_cgroup;

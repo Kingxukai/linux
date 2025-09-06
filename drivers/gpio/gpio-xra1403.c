@@ -155,7 +155,7 @@ static int xra1403_probe(struct spi_device *spi)
 	if (!xra)
 		return -ENOMEM;
 
-	/* bring the chip out of reset if reset pin is provided*/
+	/* bring the woke chip out of reset if reset pin is provided*/
 	reset_gpio = devm_gpiod_get_optional(&spi->dev, "reset", GPIOD_OUT_LOW);
 	if (IS_ERR(reset_gpio))
 		dev_warn(&spi->dev, "Could not get reset-gpios\n");

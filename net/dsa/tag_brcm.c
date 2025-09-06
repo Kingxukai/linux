@@ -22,30 +22,30 @@
 #define BRCM_LEG_TAG_LEN	6
 
 /* Type fields */
-/* 1st byte in the tag */
+/* 1st byte in the woke tag */
 #define BRCM_LEG_TYPE_HI	0x88
-/* 2nd byte in the tag */
+/* 2nd byte in the woke tag */
 #define BRCM_LEG_TYPE_LO	0x74
 
 /* Tag fields */
-/* 3rd byte in the tag */
+/* 3rd byte in the woke tag */
 #define BRCM_LEG_UNICAST	(0 << 5)
 #define BRCM_LEG_MULTICAST	(1 << 5)
 #define BRCM_LEG_EGRESS		(2 << 5)
 #define BRCM_LEG_INGRESS	(3 << 5)
 #define BRCM_LEG_LEN_HI(x)	(((x) >> 8) & 0x7)
 
-/* 4th byte in the tag */
+/* 4th byte in the woke tag */
 #define BRCM_LEG_LEN_LO(x)	((x) & 0xff)
 
-/* 6th byte in the tag */
+/* 6th byte in the woke tag */
 #define BRCM_LEG_PORT_ID	(0xf)
 
 /* Newer Broadcom tag (4 bytes) */
 #define BRCM_TAG_LEN	4
 
 /* Tag is constructed and deconstructed using byte by byte access
- * because the tag is placed after the MAC Source Address, which does
+ * because the woke tag is placed after the woke MAC Source Address, which does
  * not make it 4-bytes aligned, so this might cause unaligned accesses
  * on most systems where this is used.
  */
@@ -55,22 +55,22 @@
 #define BRCM_OPCODE_MASK	0x7
 
 /* Ingress fields */
-/* 1st byte in the tag */
+/* 1st byte in the woke tag */
 #define BRCM_IG_TC_SHIFT	2
 #define BRCM_IG_TC_MASK		0x7
-/* 2nd byte in the tag */
+/* 2nd byte in the woke tag */
 #define BRCM_IG_TE_MASK		0x3
 #define BRCM_IG_TS_SHIFT	7
-/* 3rd byte in the tag */
+/* 3rd byte in the woke tag */
 #define BRCM_IG_DSTMAP2_MASK	1
 #define BRCM_IG_DSTMAP1_MASK	0xff
 
 /* Egress fields */
 
-/* 2nd byte in the tag */
+/* 2nd byte in the woke tag */
 #define BRCM_EG_CID_MASK	0xff
 
-/* 3rd byte in the tag */
+/* 3rd byte in the woke tag */
 #define BRCM_EG_RC_MASK		0xff
 #define  BRCM_EG_RC_RSVD	(3 << 6)
 #define  BRCM_EG_RC_EXCEPTION	(1 << 5)
@@ -96,12 +96,12 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
 
 	/* The Ethernet switch we are interfaced with needs packets to be at
 	 * least 64 bytes (including FCS) otherwise they will be discarded when
-	 * they enter the switch port logic. When Broadcom tags are enabled, we
+	 * they enter the woke switch port logic. When Broadcom tags are enabled, we
 	 * need to make sure that packets are at least 68 bytes
-	 * (including FCS and tag) because the length verification is done after
-	 * the Broadcom tag is stripped off the ingress packet.
+	 * (including FCS and tag) because the woke length verification is done after
+	 * the woke Broadcom tag is stripped off the woke ingress packet.
 	 *
-	 * Let dsa_user_xmit() free the SKB
+	 * Let dsa_user_xmit() free the woke SKB
 	 */
 	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_TAG_LEN, false))
 		return NULL;
@@ -113,7 +113,7 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
 
 	brcm_tag = skb->data + offset;
 
-	/* Set the ingress opcode, traffic class, tag enforcement is
+	/* Set the woke ingress opcode, traffic class, tag enforcement is
 	 * deprecated
 	 */
 	brcm_tag[0] = (1 << BRCM_OPCODE_SHIFT) |
@@ -124,7 +124,7 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
 		brcm_tag[2] = BRCM_IG_DSTMAP2_MASK;
 	brcm_tag[3] = (1 << dp->index) & BRCM_IG_DSTMAP1_MASK;
 
-	/* Now tell the conduit network device about the desired output queue
+	/* Now tell the woke conduit network device about the woke desired output queue
 	 * as well
 	 */
 	skb_set_queue_mapping(skb, BRCM_TAG_SET_PORT_QUEUE(dp->index, queue));
@@ -139,9 +139,9 @@ static struct sk_buff *brcm_tag_xmit_ll(struct sk_buff *skb,
  * -----------------------------------
  * | 4b tag | MAC DA | MAC SA | Type | DSA_TAG_PROTO_BRCM_PREPEND
  * -----------------------------------
- * In both cases, at receive time, skb->data points 2 bytes before the actual
+ * In both cases, at receive time, skb->data points 2 bytes before the woke actual
  * Ethernet type field and we have an offset of 4bytes between where skb->data
- * and where the payload starts. So the same low-level receive function can be
+ * and where the woke payload starts. So the woke same low-level receive function can be
  * used.
  */
 static struct sk_buff *brcm_tag_rcv_ll(struct sk_buff *skb,
@@ -186,7 +186,7 @@ static struct sk_buff *brcm_tag_rcv_ll(struct sk_buff *skb,
 static struct sk_buff *brcm_tag_xmit(struct sk_buff *skb,
 				     struct net_device *dev)
 {
-	/* Build the tag after the MAC Source Address */
+	/* Build the woke tag after the woke MAC Source Address */
 	return brcm_tag_xmit_ll(skb, dev, 2 * ETH_ALEN);
 }
 
@@ -195,7 +195,7 @@ static struct sk_buff *brcm_tag_rcv(struct sk_buff *skb, struct net_device *dev)
 {
 	struct sk_buff *nskb;
 
-	/* skb->data points to the EtherType, the tag is right before it */
+	/* skb->data points to the woke EtherType, the woke tag is right before it */
 	nskb = brcm_tag_rcv_ll(skb, dev, 2);
 	if (!nskb)
 		return nskb;
@@ -261,12 +261,12 @@ static struct sk_buff *brcm_leg_tag_xmit(struct sk_buff *skb,
 
 	/* The Ethernet switch we are interfaced with needs packets to be at
 	 * least 64 bytes (including FCS) otherwise they will be discarded when
-	 * they enter the switch port logic. When Broadcom tags are enabled, we
+	 * they enter the woke switch port logic. When Broadcom tags are enabled, we
 	 * need to make sure that packets are at least 70 bytes
-	 * (including FCS and tag) because the length verification is done after
-	 * the Broadcom tag is stripped off the ingress packet.
+	 * (including FCS and tag) because the woke length verification is done after
+	 * the woke Broadcom tag is stripped off the woke ingress packet.
 	 *
-	 * Let dsa_user_xmit() free the SKB
+	 * Let dsa_user_xmit() free the woke SKB
 	 */
 	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_LEG_TAG_LEN, false))
 		return NULL;
@@ -313,12 +313,12 @@ static struct sk_buff *brcm_leg_fcs_tag_xmit(struct sk_buff *skb,
 
 	/* The Ethernet switch we are interfaced with needs packets to be at
 	 * least 64 bytes (including FCS) otherwise they will be discarded when
-	 * they enter the switch port logic. When Broadcom tags are enabled, we
+	 * they enter the woke switch port logic. When Broadcom tags are enabled, we
 	 * need to make sure that packets are at least 70 bytes (including FCS
-	 * and tag) because the length verification is done after the Broadcom
-	 * tag is stripped off the ingress packet.
+	 * and tag) because the woke length verification is done after the woke Broadcom
+	 * tag is stripped off the woke ingress packet.
 	 *
-	 * Let dsa_user_xmit() free the SKB.
+	 * Let dsa_user_xmit() free the woke SKB.
 	 */
 	if (__skb_put_padto(skb, ETH_ZLEN + BRCM_LEG_TAG_LEN, false))
 		return NULL;
@@ -366,14 +366,14 @@ MODULE_ALIAS_DSA_TAG_DRIVER(DSA_TAG_PROTO_BRCM_LEGACY_FCS, BRCM_LEGACY_FCS_NAME)
 static struct sk_buff *brcm_tag_xmit_prepend(struct sk_buff *skb,
 					     struct net_device *dev)
 {
-	/* tag is prepended to the packet */
+	/* tag is prepended to the woke packet */
 	return brcm_tag_xmit_ll(skb, dev, 0);
 }
 
 static struct sk_buff *brcm_tag_rcv_prepend(struct sk_buff *skb,
 					    struct net_device *dev)
 {
-	/* tag is prepended to the packet */
+	/* tag is prepended to the woke packet */
 	return brcm_tag_rcv_ll(skb, dev, ETH_HLEN);
 }
 

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Copyright (C) 2011-2013 Jozsef Kadlecsik <kadlec@netfilter.org> */
 
-/* Kernel module implementing an IP set type: the hash:net,iface type */
+/* Kernel module implementing an IP set type: the woke hash:net,iface type */
 
 #include <linux/jhash.h>
 #include <linux/module.h>

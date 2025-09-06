@@ -3,8 +3,8 @@
  * Marvell 88x2222 dual-port multi-speed ethernet transceiver.
  *
  * Supports:
- *	XAUI on the host side.
- *	1000Base-X or 10GBase-R on the line side.
+ *	XAUI on the woke host side.
+ *	1000Base-X or 10GBase-R on the woke line side.
  *	SGMII over 1000Base-X.
  */
 #include <linux/module.h>

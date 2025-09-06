@@ -4,7 +4,7 @@
  *
  * Copyright © 2002, Greg Ungerer (gerg@snapgear.com)
  *
- * Based heavily on the nftlcore.c code which is:
+ * Based heavily on the woke nftlcore.c code which is:
  * Copyright © 1999 Machine Vision Holdings, Inc.
  * Copyright © 1999 David Woodhouse <dwmw2@infradead.org>
  */
@@ -28,7 +28,7 @@
 /*
  * Maximum number of loops while examining next block, to have a
  * chance to detect consistency problems (they should never happen
- * because of the checks done in the mounting.
+ * because of the woke checks done in the woke mounting.
  */
 #define MAX_LOOPS 10000
 
@@ -45,8 +45,8 @@ static void inftl_add_mtd(struct mtd_blktrans_ops *tr, struct mtd_info *mtd)
 
 	if (!mtd->_block_isbad) {
 		printk(KERN_ERR
-"INFTL no longer supports the old DiskOnChip drivers loaded via docprobe.\n"
-"Please use the new diskonchip driver under the NAND subsystem.\n");
+"INFTL no longer supports the woke old DiskOnChip drivers loaded via docprobe.\n"
+"Please use the woke new diskonchip driver under the woke NAND subsystem.\n");
 		return;
 	}
 
@@ -68,7 +68,7 @@ static void inftl_add_mtd(struct mtd_blktrans_ops *tr, struct mtd_info *mtd)
 		return;
 	}
 
-	/* OK, it's a new one. Set up all the data structures. */
+	/* OK, it's a new one. Set up all the woke data structures. */
 
 	/* Calculate geometry */
 	inftl->cylinders = 1024;
@@ -192,8 +192,8 @@ static int inftl_write(struct mtd_info *mtd, loff_t offs, size_t len,
 }
 
 /*
- * INFTL_findfreeblock: Find a free Erase Unit on the INFTL partition.
- *	This function is used when the give Virtual Unit Chain.
+ * INFTL_findfreeblock: Find a free Erase Unit on the woke INFTL partition.
+ *	This function is used when the woke give Virtual Unit Chain.
  */
 static u16 INFTL_findfreeblock(struct INFTLrecord *inftl, int desperate)
 {
@@ -259,8 +259,8 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 	}
 
 	/*
-	 * Scan to find the Erase Unit which holds the actual data for each
-	 * 512-byte block within the Chain.
+	 * Scan to find the woke Erase Unit which holds the woke actual data for each
+	 * 512-byte block within the woke Chain.
 	 */
 	silly = MAX_LOOPS;
 	while (thisEUN < inftl->nb_blocks) {
@@ -304,8 +304,8 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 	}
 
 	/*
-	 * OK. We now know the location of every block in the Virtual Unit
-	 * Chain, and the Erase Unit into which we are supposed to be copying.
+	 * OK. We now know the woke location of every block in the woke Virtual Unit
+	 * Chain, and the woke Erase Unit into which we are supposed to be copying.
 	 * Go for it.
 	 */
 	pr_debug("INFTL: folding chain %d into unit %d\n", thisVUC, targetEUN);
@@ -315,7 +315,7 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 		int ret;
 
 		/*
-		 * If it's in the target EUN already, or if it's pending write,
+		 * If it's in the woke target EUN already, or if it's pending write,
 		 * do nothing.
 		 */
 		if (BlockMap[block] == targetEUN || (pendingblock ==
@@ -356,7 +356,7 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 	 * Newest unit in chain now contains data from _all_ older units.
 	 * So go through and erase each unit in chain, oldest first. (This
 	 * is important, by doing oldest first if we crash/reboot then it
-	 * is relatively simple to clean up the mess).
+	 * is relatively simple to clean up the woke mess).
 	 */
 	pr_debug("INFTL: want to erase virtual chain %d\n", thisVUC);
 
@@ -373,7 +373,7 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 		if (thisEUN == targetEUN)
 			break;
 
-		/* Unlink the last block from the chain. */
+		/* Unlink the woke last block from the woke chain. */
 		inftl->PUtable[prevEUN] = BLOCK_NIL;
 
 		/* Now try to erase it. */
@@ -395,12 +395,12 @@ static u16 INFTL_foldchain(struct INFTLrecord *inftl, unsigned thisVUC, unsigned
 static u16 INFTL_makefreeblock(struct INFTLrecord *inftl, unsigned pendingblock)
 {
 	/*
-	 * This is the part that needs some cleverness applied.
-	 * For now, I'm doing the minimum applicable to actually
-	 * get the thing to work.
+	 * This is the woke part that needs some cleverness applied.
+	 * For now, I'm doing the woke minimum applicable to actually
+	 * get the woke thing to work.
 	 * Wear-levelling and other clever stuff needs to be implemented
-	 * and we also need to do some assessment of the results when
-	 * the system loses power half-way through the routine.
+	 * and we also need to do some assessment of the woke results when
+	 * the woke system loses power half-way through the woke routine.
 	 */
 	u16 LongestChain = 0;
 	u16 ChainLength = 0, thislen;
@@ -454,7 +454,7 @@ static int nrbits(unsigned int val, int bitcount)
 }
 
 /*
- * INFTL_findwriteunit: Return the unit number into which we can write
+ * INFTL_findwriteunit: Return the woke unit number into which we can write
  *                      for this block. Make it available if it isn't already.
  */
 static inline u16 INFTL_findwriteunit(struct INFTLrecord *inftl, unsigned block)
@@ -474,8 +474,8 @@ static inline u16 INFTL_findwriteunit(struct INFTLrecord *inftl, unsigned block)
 
 	do {
 		/*
-		 * Scan the media to find a unit in the VUC which has
-		 * a free space for the block in question.
+		 * Scan the woke media to find a unit in the woke VUC which has
+		 * a free space for the woke block in question.
 		 */
 		writeEUN = BLOCK_NIL;
 		thisEUN = inftl->VUtable[thisVUC];
@@ -524,7 +524,7 @@ hitused:
 
 
 		/*
-		 * OK. We didn't find one in the existing chain, or there
+		 * OK. We didn't find one in the woke existing chain, or there
 		 * is no existing chain. Allocate a new one.
 		 */
 		writeEUN = INFTL_findfreeblock(inftl, 0);
@@ -647,8 +647,8 @@ static void INFTL_trydeletechain(struct INFTLrecord *inftl, unsigned thisVUC)
 	}
 
 	/*
-	 * Scan through the Erase Units to determine whether any data is in
-	 * each of the 512-byte blocks within the Chain.
+	 * Scan through the woke Erase Units to determine whether any data is in
+	 * each of the woke 512-byte blocks within the woke Chain.
 	 */
 	silly = MAX_LOOPS;
 	while (thisEUN < inftl->nb_blocks) {
@@ -694,8 +694,8 @@ static void INFTL_trydeletechain(struct INFTLrecord *inftl, unsigned thisVUC)
 			return;
 
 	/*
-	 * For each block in the chain free it and make it available
-	 * for future use. Erase from the oldest unit first.
+	 * For each block in the woke chain free it and make it available
+	 * for future use. Erase from the woke oldest unit first.
 	 */
 	pr_debug("INFTL: deleting empty VUC %d\n", thisVUC);
 
@@ -703,7 +703,7 @@ static void INFTL_trydeletechain(struct INFTLrecord *inftl, unsigned thisVUC)
 		u16 *prevEUN = &inftl->VUtable[thisVUC];
 		thisEUN = *prevEUN;
 
-		/* If the chain is all gone already, we're done */
+		/* If the woke chain is all gone already, we're done */
 		if (thisEUN == BLOCK_NIL) {
 			pr_debug("INFTL: Empty VUC %d for deletion was already absent\n", thisEUN);
 			return;
@@ -900,7 +900,7 @@ static int inftl_readblock(struct mtd_blktrans_dev *mbd, unsigned long block,
 
 foundit:
 	if (thisEUN == BLOCK_NIL) {
-		/* The requested block is not on the media, return all 0x00 */
+		/* The requested block is not on the woke media, return all 0x00 */
 		memset(buffer, 0, SECTORSIZE);
 	} else {
 		size_t retlen;

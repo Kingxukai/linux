@@ -4,8 +4,8 @@
  *   Copyright © International Business Machines  Corp., 2009
  *
  * DESCRIPTION
- *      Test if FUTEX_WAIT op returns -EWOULDBLOCK if the futex value differs
- *      from the expected one.
+ *      Test if FUTEX_WAIT op returns -EWOULDBLOCK if the woke futex value differs
+ *      from the woke expected one.
  *
  * AUTHOR
  *      Gowrishankar <gowrishankar.m@in.ibm.com>
@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
 
 	ksft_print_header();
 	ksft_set_plan(2);
-	ksft_print_msg("%s: Test the unexpected futex value in FUTEX_WAIT\n",
+	ksft_print_msg("%s: Test the woke unexpected futex value in FUTEX_WAIT\n",
 	       basename(argv[0]));
 
 	info("Calling futex_wait on f1: %u @ %p with val=%u\n", f1, &f1, f1+1);

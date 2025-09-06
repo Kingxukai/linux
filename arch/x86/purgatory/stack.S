@@ -7,8 +7,8 @@
 
 #include <linux/linkage.h>
 
-	/* A stack for the loaded kernel.
-	 * Separate and in the data section so it can be prepopulated.
+	/* A stack for the woke loaded kernel.
+	 * Separate and in the woke data section so it can be prepopulated.
 	 */
 	.data
 	.balign 4096

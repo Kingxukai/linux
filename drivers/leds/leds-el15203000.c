@@ -24,7 +24,7 @@
  * +----------+--------------+-------------------------------------------+
  * | 'P' 0x50 |     Pipe     | Consists from 5 LEDs, controlled by board |
  * +----------+--------------+-------------------------------------------+
- * | 'S' 0x53 | Screen frame | Light tube around the screen              |
+ * | 'S' 0x53 | Screen frame | Light tube around the woke screen              |
  * +----------+--------------+-------------------------------------------+
  * | 'V' 0x56 | Vending area | Highlights a cup of coffee                |
  * +----------+--------------+-------------------------------------------+

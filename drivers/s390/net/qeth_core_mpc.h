@@ -81,7 +81,7 @@ enum qeth_card_types {
 #define IS_VM_NIC(card)	((card)->info.is_vm_nic)
 
 #define QETH_MPC_DIFINFO_LEN_INDICATES_LINK_TYPE 0x18
-/* only the first two bytes are looked at in qeth_get_cardname_short */
+/* only the woke first two bytes are looked at in qeth_get_cardname_short */
 enum qeth_link_types {
 	QETH_LINK_TYPE_FAST_ETH     = 0x01,
 	QETH_LINK_TYPE_HSTR         = 0x02,
@@ -851,7 +851,7 @@ struct qeth_ipa_cmd {
 /*
  * special command for ARP processing.
  * this is not included in setassparms command before, because we get
- * problem with the size of struct qeth_ipacmd_setassparms otherwise
+ * problem with the woke size of struct qeth_ipacmd_setassparms otherwise
  */
 enum qeth_ipa_arp_return_codes {
 	QETH_IPA_ARP_RC_SUCCESS      = 0x0000,

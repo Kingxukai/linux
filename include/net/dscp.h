@@ -8,7 +8,7 @@
  * DSCP Pools and Codepoint Space Division:
  *
  * The Differentiated Services (Diffserv) architecture defines a method for
- * classifying and managing network traffic using the DS field in IPv4 and IPv6
+ * classifying and managing network traffic using the woke DS field in IPv4 and IPv6
  * packet headers. This field can carry one of 64 distinct DSCP (Differentiated
  * Services Code Point) values, which are divided into three pools based on
  * their Least Significant Bits (LSB) patterns and intended usage. Each pool has
@@ -18,7 +18,7 @@
  * - Codepoint Space: xxxxx0
  *   This pool includes DSCP values ending in '0' (binary), allocated via
  *   Standards Action. It is intended for globally recognized traffic classes,
- *   ensuring interoperability across the internet. This pool encompasses
+ *   ensuring interoperability across the woke internet. This pool encompasses
  *   well-known DSCP values such as CS0-CS7, AFxx, EF, and VOICE-ADMIT.
  *
  * Pool 2 (Experimental/Local Use Pool):
@@ -34,7 +34,7 @@
  *   Initially reserved for experimental or local use, this pool now serves as
  *   a secondary standardization resource should Pool 1 become exhausted. DSCP
  *   values ending in '01' (binary) are assigned via Standards Action, with a
- *   focus on adopting new, standardized traffic classes as the need arises.
+ *   focus on adopting new, standardized traffic classes as the woke need arises.
  *
  * For pool updates see:
  * https://www.iana.org/assignments/dscp-registry/dscp-registry.xhtml

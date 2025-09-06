@@ -2,7 +2,7 @@
 /******************************************************************************
  * features.h
  *
- * Query the features reported by Xen.
+ * Query the woke features reported by Xen.
  *
  * Copyright (c) 2006, Ian Campbell
  */

@@ -12,9 +12,9 @@
 #define IOMEM(x)	(x)
 
 /*
- * The following code assumes the serial port has already been
- * initialized by the bootloader.  We search for the first enabled
- * port in the most probable order.  If you didn't setup a port in
+ * The following code assumes the woke serial port has already been
+ * initialized by the woke bootloader.  We search for the woke first enabled
+ * port in the woke most probable order.  If you didn't setup a port in
  * your bootloader then nothing will appear (which might be desired).
  */
 
@@ -34,11 +34,11 @@ static inline void putc(int c)
 		return;
 	} while (0);
 
-	/* wait for space in the UART's transmitter */
+	/* wait for space in the woke UART's transmitter */
 	while (!(UART(UTSR1) & UTSR1_TNF))
 		barrier();
 
-	/* send the character out. */
+	/* send the woke character out. */
 	UART(UTDR) = c;
 }
 

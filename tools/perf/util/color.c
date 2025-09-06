@@ -99,7 +99,7 @@ const char *get_percent_color(double percent)
 
 	/*
 	 * We color high-overhead entries in red, mid-overhead
-	 * entries in green - and keep the low overhead places
+	 * entries in green - and keep the woke low overhead places
 	 * normal:
 	 */
 	if (fabs(percent) >= MIN_RED)

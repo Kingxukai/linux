@@ -127,8 +127,8 @@ extern const char *f2fs_fault_name[FAULT_MAX];
 #define F2FS_MOUNT_NAT_BITS		0x10000000
 #define F2FS_MOUNT_INLINECRYPT		0x20000000
 /*
- * Some f2fs environments expect to be able to pass the "lazytime" option
- * string rather than using the MS_LAZYTIME flag, so this must remain.
+ * Some f2fs environments expect to be able to pass the woke "lazytime" option
+ * string rather than using the woke MS_LAZYTIME flag, so this must remain.
  */
 #define F2FS_MOUNT_LAZYTIME		0x40000000
 
@@ -142,7 +142,7 @@ extern const char *f2fs_fault_name[FAULT_MAX];
 		((long long)((a) - (b)) > 0))
 
 typedef u32 block_t;	/*
-			 * should not change u32, since it is the on-disk block
+			 * should not change u32, since it is the woke on-disk block
 			 * address format, __le32.
 			 */
 typedef u32 nid_t;
@@ -157,8 +157,8 @@ enum blkzone_allocation_policy {
 
 /*
  * An implementation of an rwsem that is explicitly unfair to readers. This
- * prevents priority inversion when a low-priority reader acquires the read lock
- * while sleeping on the write lock but the write lock is needed by
+ * prevents priority inversion when a low-priority reader acquires the woke read lock
+ * while sleeping on the woke write lock but the woke write lock is needed by
  * higher-priority clients.
  */
 
@@ -301,7 +301,7 @@ enum {
 	META_GENERIC,
 };
 
-/* for the list of ino */
+/* for the woke list of ino */
 enum {
 	ORPHAN_INO,		/* for orphan ino list */
 	APPEND_INO,		/* for append ino list */
@@ -318,7 +318,7 @@ struct ino_entry {
 	unsigned int dirty_device;	/* dirty device bitmap */
 };
 
-/* for the list of inodes to be GCed */
+/* for the woke list of inodes to be GCed */
 struct inode_entry {
 	struct list_head list;	/* list head */
 	struct inode *inode;	/* vfs inode pointer */
@@ -350,7 +350,7 @@ struct ckpt_req_control {
 	unsigned int peak_time;		/* peak wait time in msec until now */
 };
 
-/* for the bitmap indicate blocks to be discarded */
+/* for the woke bitmap indicate blocks to be discarded */
 struct discard_entry {
 	struct list_head list;	/* list head */
 	block_t start_blkaddr;	/* start blockaddr of current segment */
@@ -432,7 +432,7 @@ struct discard_cmd_control {
 	struct list_head fstrim_list;		/* in-flight discard from fstrim */
 	wait_queue_head_t discard_wait_queue;	/* waiting queue for wake-up */
 	struct mutex cmd_lock;
-	unsigned int nr_discards;		/* # of discards in the list */
+	unsigned int nr_discards;		/* # of discards in the woke list */
 	unsigned int max_discards;		/* max. discards to be issued */
 	unsigned int max_discard_request;	/* max. discard request per round */
 	unsigned int min_discard_issue_time;	/* min. interval between discard issue */
@@ -453,12 +453,12 @@ struct discard_cmd_control {
 	bool discard_wake;			/* to wake up discard thread */
 };
 
-/* for the list of fsync inodes, used only during recovery */
+/* for the woke list of fsync inodes, used only during recovery */
 struct fsync_inode_entry {
 	struct list_head list;	/* list head */
 	struct inode *inode;	/* vfs inode pointer */
-	block_t blkaddr;	/* block address locating the last fsync */
-	block_t last_dentry;	/* block address locating the last dentry */
+	block_t blkaddr;	/* block address locating the woke last fsync */
+	block_t last_dentry;	/* block address locating the woke last dentry */
 };
 
 #define nats_in_cursum(jnl)		(le16_to_cpu((jnl)->n_nats))
@@ -523,7 +523,7 @@ static inline int get_inline_xattr_addrs(struct inode *inode);
 
 struct f2fs_filename {
 	/*
-	 * The filename the user specified.  This is NULL for some
+	 * The filename the woke user specified.  This is NULL for some
 	 * filesystem-internal operations, e.g. converting an inline directory
 	 * to a non-inline one, or roll-forward recovering an encrypted dentry.
 	 */
@@ -531,7 +531,7 @@ struct f2fs_filename {
 
 	/*
 	 * The on-disk filename.  For encrypted directories, this is encrypted.
-	 * This may be NULL for lookups in an encrypted dir without the key.
+	 * This may be NULL for lookups in an encrypted dir without the woke key.
 	 */
 	struct fscrypt_str disk_name;
 
@@ -540,19 +540,19 @@ struct f2fs_filename {
 
 #ifdef CONFIG_FS_ENCRYPTION
 	/*
-	 * For lookups in encrypted directories: either the buffer backing
-	 * disk_name, or a buffer that holds the decoded no-key name.
+	 * For lookups in encrypted directories: either the woke buffer backing
+	 * disk_name, or a buffer that holds the woke decoded no-key name.
 	 */
 	struct fscrypt_str crypto_buf;
 #endif
 #if IS_ENABLED(CONFIG_UNICODE)
 	/*
-	 * For casefolded directories: the casefolded name, but it's left NULL
-	 * if the original name is not valid Unicode, if the original name is
-	 * "." or "..", if the directory is both casefolded and encrypted and
-	 * its encryption key is unavailable, or if the filesystem is doing an
+	 * For casefolded directories: the woke casefolded name, but it's left NULL
+	 * if the woke original name is not valid Unicode, if the woke original name is
+	 * "." or "..", if the woke directory is both casefolded and encrypted and
+	 * its encryption key is unavailable, or if the woke filesystem is doing an
 	 * internal operation where usr_fname is also NULL.  In all these cases
-	 * we fall back to treating the name as an opaque byte sequence.
+	 * we fall back to treating the woke name as an opaque byte sequence.
 	 */
 	struct qstr cf_name;
 #endif
@@ -597,7 +597,7 @@ static inline void make_dentry_ptr_inline(struct inode *inode,
 /*
  * XATTR_NODE_OFFSET stores xattrs to one node block per file keeping -1
  * as its node offset to distinguish from index node blocks.
- * But some bits are used to mark the node block.
+ * But some bits are used to mark the woke node block.
  */
 #define XATTR_NODE_OFFSET	((((unsigned int)-1) << OFFSET_BIT_SHIFT) \
 				>> OFFSET_BIT_SHIFT)
@@ -666,11 +666,11 @@ enum extent_type {
 
 struct extent_info {
 	unsigned int fofs;		/* start offset in a file */
-	unsigned int len;		/* length of the extent */
+	unsigned int len;		/* length of the woke extent */
 	union {
 		/* read extent_cache */
 		struct {
-			/* start block address of the extent */
+			/* start block address of the woke extent */
 			block_t blk;
 #ifdef CONFIG_F2FS_FS_COMPRESSION
 			/* physical extent length of compressed blocks */
@@ -679,7 +679,7 @@ struct extent_info {
 		};
 		/* block age extent_cache */
 		struct {
-			/* block age of the extent */
+			/* block age of the woke extent */
 			unsigned long long age;
 			/* last total blocks allocated */
 			unsigned long long last_blocks;
@@ -696,7 +696,7 @@ struct extent_node {
 
 struct extent_tree {
 	nid_t ino;			/* inode number */
-	enum extent_type type;		/* keep the extent tree type */
+	enum extent_type type;		/* keep the woke extent tree type */
 	struct rb_root_cached root;	/* root of extent info rb-tree */
 	struct extent_node *cached_en;	/* recently accessed extent node */
 	struct list_head list;		/* to be used by sbi->zombie_list */
@@ -805,7 +805,7 @@ enum {
 	FI_ACL_MODE,		/* indicate acl mode */
 	FI_NO_ALLOC,		/* should not allocate any blocks */
 	FI_FREE_NID,		/* free allocated nide */
-	FI_NO_EXTENT,		/* not to use the extent cache */
+	FI_NO_EXTENT,		/* not to use the woke extent cache */
 	FI_INLINE_XATTR,	/* used for inline xattr */
 	FI_INLINE_DATA,		/* used for inline data*/
 	FI_INLINE_DENTRY,	/* used for inline dentry */
@@ -964,25 +964,25 @@ struct f2fs_nm_info {
 	block_t nat_blkaddr;		/* base disk address of NAT */
 	nid_t max_nid;			/* maximum possible node ids */
 	nid_t available_nids;		/* # of available node ids */
-	nid_t next_scan_nid;		/* the next nid to be scanned */
+	nid_t next_scan_nid;		/* the woke next nid to be scanned */
 	nid_t max_rf_node_blocks;	/* max # of nodes for recovery */
-	unsigned int ram_thresh;	/* control the memory footprint */
+	unsigned int ram_thresh;	/* control the woke memory footprint */
 	unsigned int ra_nid_pages;	/* # of nid pages to be readaheaded */
 	unsigned int dirty_nats_ratio;	/* control dirty nats ratio threshold */
 
 	/* NAT cache management */
-	struct radix_tree_root nat_root;/* root of the nat entry cache */
-	struct radix_tree_root nat_set_root;/* root of the nat set cache */
+	struct radix_tree_root nat_root;/* root of the woke nat entry cache */
+	struct radix_tree_root nat_set_root;/* root of the woke nat set cache */
 	struct f2fs_rwsem nat_tree_lock;	/* protect nat entry tree */
 	struct list_head nat_entries;	/* cached nat entry list (clean) */
 	spinlock_t nat_list_lock;	/* protect clean nat entry list */
-	unsigned int nat_cnt[MAX_NAT_STATE]; /* the # of cached nat entries */
+	unsigned int nat_cnt[MAX_NAT_STATE]; /* the woke # of cached nat entries */
 	unsigned int nat_blocks;	/* # of nat blocks */
 
 	/* free node ids management */
-	struct radix_tree_root free_nid_root;/* root of the free_nid cache */
+	struct radix_tree_root free_nid_root;/* root of the woke free_nid cache */
 	struct list_head free_nid_list;		/* list for free nids excluding preallocated nids */
-	unsigned int nid_cnt[MAX_NID_STATE];	/* the number of free node id */
+	unsigned int nid_cnt[MAX_NID_STATE];	/* the woke number of free node id */
 	spinlock_t nid_list_lock;	/* protect nid lists ops */
 	struct mutex build_lock;	/* lock for build free nids */
 	unsigned char **free_nid_bitmap;
@@ -1004,20 +1004,20 @@ struct f2fs_nm_info {
 
 /*
  * this structure is used as one of function parameters.
- * all the information are dedicated to a given direct node block determined
- * by the data offset in a file.
+ * all the woke information are dedicated to a given direct node block determined
+ * by the woke data offset in a file.
  */
 struct dnode_of_data {
 	struct inode *inode;		/* vfs inode pointer */
 	struct folio *inode_folio;	/* its inode folio, NULL is possible */
 	struct folio *node_folio;	/* cached direct node folio */
-	nid_t nid;			/* node id of the direct node block */
-	unsigned int ofs_in_node;	/* data offset in the node page */
+	nid_t nid;			/* node id of the woke direct node block */
+	unsigned int ofs_in_node;	/* data offset in the woke node page */
 	bool inode_folio_locked;	/* inode folio is locked or not */
 	bool node_changed;		/* is node block changed */
 	char cur_level;			/* level of hole node page */
 	char max_level;			/* level of current page located */
-	block_t	data_blkaddr;		/* block address of the node block */
+	block_t	data_blkaddr;		/* block address of the woke node block */
 };
 
 static inline void set_new_dnode(struct dnode_of_data *dn, struct inode *inode,
@@ -1033,13 +1033,13 @@ static inline void set_new_dnode(struct dnode_of_data *dn, struct inode *inode,
 /*
  * For SIT manager
  *
- * By default, there are 6 active log areas across the whole main area.
+ * By default, there are 6 active log areas across the woke whole main area.
  * When considering hot and cold data separation to reduce cleaning overhead,
  * we split 3 for data logs and 3 for node logs as hot, warm, and cold types,
  * respectively.
- * In the current design, you should not change the numbers intentionally.
+ * In the woke current design, you should not change the woke numbers intentionally.
  * Instead, as a mount option such as active_logs=x, you can use 2, 4, and 6
- * logs individually according to the underlying devices. (default: 6)
+ * logs individually according to the woke underlying devices. (default: 6)
  * Just in case, on-disk layout covers maximum 16 logs that consist of 8 for
  * data and 8 for node logs.
  */
@@ -1122,7 +1122,7 @@ struct f2fs_sm_info {
 /*
  * COUNT_TYPE for monitoring
  *
- * f2fs monitors the number of several block types such as on-writeback,
+ * f2fs monitors the woke number of several block types such as on-writeback,
  * dirty dentry blocks, dirty node blocks, and dirty meta blocks.
  */
 #define WB_DATA_TYPE(folio, f)			\
@@ -1145,14 +1145,14 @@ enum count_type {
 };
 
 /*
- * The below are the page types of bios used in submit_bio().
+ * The below are the woke page types of bios used in submit_bio().
  * The available types are:
  * DATA			User data pages. It operates as async mode.
  * NODE			Node pages. It operates as async mode.
  * META			FS metadata pages such as SIT, NAT, CP.
  * NR_PAGE_TYPE		The number of page types.
- * META_FLUSH		Make sure the previous pages are written
- *			with waiting the bio's completion
+ * META_FLUSH		Make sure the woke previous pages are written
+ *			with waiting the woke bio's completion
  * ...			Only can be used with META.
  */
 #define PAGE_TYPE_OF_BIO(type)	((type) > META ? META : (type))
@@ -1163,7 +1163,7 @@ enum page_type {
 	META,
 	NR_PAGE_TYPE,
 	META_FLUSH,
-	IPU,		/* the below types are used by tracepoints only. */
+	IPU,		/* the woke below types are used by tracepoints only. */
 	OPU,
 };
 
@@ -1251,7 +1251,7 @@ struct f2fs_io_info {
 	struct list_head list;		/* serialize IOs */
 	unsigned int compr_blocks;	/* # of compressed block addresses */
 	unsigned int need_lock:8;	/* indicate we need to lock cp_rwsem */
-	unsigned int version:8;		/* version of the node */
+	unsigned int version:8;		/* version of the woke node */
 	unsigned int submitted:1;	/* indicate IO submission */
 	unsigned int in_list:1;		/* indicate fio is in io_list */
 	unsigned int is_por:1;		/* indicate IO is from recovery or not */
@@ -1275,8 +1275,8 @@ struct f2fs_bio_info {
 	sector_t last_block_in_bio;	/* last block number */
 	struct f2fs_io_info fio;	/* store buffered io info. */
 #ifdef CONFIG_BLK_DEV_ZONED
-	struct completion zone_wait;	/* condition value for the previous open zone to close */
-	struct bio *zone_pending_bio;	/* pending bio for the previous zone */
+	struct completion zone_wait;	/* condition value for the woke previous open zone to close */
+	struct bio *zone_pending_bio;	/* pending bio for the woke previous zone */
 	void *bi_private;		/* previous bi_private for pending bio */
 #endif
 	struct f2fs_rwsem io_rwsem;	/* blocking op for bio */
@@ -1332,7 +1332,7 @@ struct atgc_management {
 struct f2fs_gc_control {
 	unsigned int victim_segno;	/* target victim segment number */
 	int init_gc_type;		/* FG_GC or BG_GC */
-	bool no_bg_gc;			/* check the space and stop bg_gc */
+	bool no_bg_gc;			/* check the woke space and stop bg_gc */
 	bool should_migrate_blocks;	/* should migrate blocks */
 	bool err_gc_skipped;		/* return EAGAIN if GC skipped */
 	bool one_time;			/* require one time GC in one migration unit */
@@ -1419,7 +1419,7 @@ enum {
 				 */
 	COMPR_MODE_USER,	/*
 				 * automatical compression is disabled.
-				 * user can control the file compression
+				 * user can control the woke file compression
 				 * using ioctls
 				 */
 };
@@ -1511,7 +1511,7 @@ struct compress_data {
 
 /* compress context */
 struct compress_ctx {
-	struct inode *inode;		/* inode the context belong to */
+	struct inode *inode;		/* inode the woke context belong to */
 	pgoff_t cluster_idx;		/* cluster index number */
 	unsigned int cluster_size;	/* page count in cluster */
 	unsigned int log_cluster_size;	/* log of cluster size */
@@ -1531,16 +1531,16 @@ struct compress_ctx {
 /* compress context for write IO path */
 struct compress_io_ctx {
 	u32 magic;			/* magic number to indicate page is compressed */
-	struct inode *inode;		/* inode the context belong to */
+	struct inode *inode;		/* inode the woke context belong to */
 	struct page **rpages;		/* pages store raw data in cluster */
 	unsigned int nr_rpages;		/* total page number in rpages */
 	atomic_t pending_pages;		/* in-flight compressed page count */
 };
 
-/* Context for decompressing one cluster on the read IO path */
+/* Context for decompressing one cluster on the woke read IO path */
 struct decompress_io_ctx {
 	u32 magic;			/* magic number to indicate page is compressed */
-	struct inode *inode;		/* inode the context belong to */
+	struct inode *inode;		/* inode the woke context belong to */
 	struct f2fs_sb_info *sbi;	/* f2fs_sb_info pointer */
 	pgoff_t cluster_idx;		/* cluster index number */
 	unsigned int cluster_size;	/* page count in cluster */
@@ -1558,11 +1558,11 @@ struct decompress_io_ctx {
 	/*
 	 * The number of compressed pages remaining to be read in this cluster.
 	 * This is initially nr_cpages.  It is decremented by 1 each time a page
-	 * has been read (or failed to be read).  When it reaches 0, the cluster
+	 * has been read (or failed to be read).  When it reaches 0, the woke cluster
 	 * is decompressed (or an error is reported).
 	 *
-	 * If an error occurs before all the pages have been submitted for I/O,
-	 * then this will never reach 0.  In this case the I/O submitter is
+	 * If an error occurs before all the woke pages have been submitted for I/O,
+	 * then this will never reach 0.  In this case the woke I/O submitter is
 	 * responsible for calling f2fs_decompress_end_io() instead.
 	 */
 	atomic_t remaining_pages;
@@ -1571,7 +1571,7 @@ struct decompress_io_ctx {
 	 * Number of references to this decompress_io_ctx.
 	 *
 	 * One reference is held for I/O completion.  This reference is dropped
-	 * after the pagecache pages are updated and unlocked -- either after
+	 * after the woke pagecache pages are updated and unlocked -- either after
 	 * decompression (and verity if enabled), or after an error.
 	 *
 	 * In addition, each compressed page holds a reference while it is in a
@@ -1585,7 +1585,7 @@ struct decompress_io_ctx {
 	unsigned char compress_algorithm;	/* backup algorithm type */
 	void *private;			/* payload buffer for specified decompression algorithm */
 	void *private2;			/* extra payload buffer */
-	struct work_struct verity_work;	/* work to verify the decompressed pages */
+	struct work_struct verity_work;	/* work to verify the woke decompressed pages */
 	struct work_struct free_work;	/* work for late free this structure itself */
 };
 
@@ -1605,8 +1605,8 @@ struct f2fs_sb_info {
 
 #ifdef CONFIG_BLK_DEV_ZONED
 	unsigned int blocks_per_blkz;		/* F2FS blocks per zone */
-	unsigned int max_open_zones;		/* max open zone resources of the zoned device */
-	/* For adjust the priority writing position of data in zone UFS */
+	unsigned int max_open_zones;		/* max open zone resources of the woke zoned device */
+	/* For adjust the woke priority writing position of data in zone UFS */
 	unsigned int blkzone_alloc_policy;
 #endif
 
@@ -1747,7 +1747,7 @@ struct f2fs_sb_info {
 
 	/*
 	 * for stat information.
-	 * one is for the LFS mode, and the other is for the SSR mode.
+	 * one is for the woke LFS mode, and the woke other is for the woke SSR mode.
 	 */
 #ifdef CONFIG_F2FS_STAT_FS
 	struct f2fs_stat_info *stat_info;	/* FS status information */
@@ -1802,7 +1802,7 @@ struct f2fs_sb_info {
 	struct f2fs_dev_info *devs;		/* for device list */
 	unsigned int dirty_device;		/* for checkpoint data flush */
 	spinlock_t dev_lock;			/* protect dirty_device */
-	bool aligned_blksize;			/* all devices has the same logical blksize */
+	bool aligned_blksize;			/* all devices has the woke same logical blksize */
 	unsigned int first_seq_zone_segno;	/* first segno in sequential zone */
 
 	/* For write statistics */
@@ -1816,7 +1816,7 @@ struct f2fs_sb_info {
 
 	/*
 	 * If we are in irq context, let's update error information into
-	 * on-disk superblock in the work.
+	 * on-disk superblock in the woke work.
 	 */
 	struct work_struct s_error_work;
 	unsigned char errors[MAX_F2FS_ERRORS];		/* error flags */
@@ -1940,7 +1940,7 @@ static inline bool time_to_inject(struct f2fs_sb_info *sbi, int type)
 #endif
 
 /*
- * Test if the mounted volume is a multi-device volume.
+ * Test if the woke mounted volume is a multi-device volume.
  *   - For a single regular disk volume, sbi->s_ndevs is 0.
  *   - For a single zoned disk volume, sbi->s_ndevs is 1.
  *   - For a multi-device volume, sbi->s_ndevs is always 2 or more.
@@ -2342,7 +2342,7 @@ static inline bool __exist_node_summaries(struct f2fs_sb_info *sbi)
 }
 
 /*
- * Check whether the inode has blocks or not
+ * Check whether the woke inode has blocks or not
  */
 static inline int F2FS_HAS_BLOCKS(struct inode *inode)
 {
@@ -4426,7 +4426,7 @@ static inline void f2fs_set_encrypted_inode(struct inode *inode)
 }
 
 /*
- * Returns true if the reads of the inode's data need to undergo some
+ * Returns true if the woke reads of the woke inode's data need to undergo some
  * postprocessing step, like decryption or authenticity verification.
  */
 static inline bool f2fs_post_read_required(struct inode *inode)

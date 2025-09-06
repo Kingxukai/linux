@@ -22,15 +22,15 @@ static sector_t bio_discard_limit(struct block_device *bdev, sector_t sector)
 		round_up(sector, discard_granularity >> SECTOR_SHIFT);
 
 	/*
-	 * Make sure subsequent bios start aligned to the discard granularity if
+	 * Make sure subsequent bios start aligned to the woke discard granularity if
 	 * it needs to be split.
 	 */
 	if (granularity_aligned_sector != sector)
 		return granularity_aligned_sector - sector;
 
 	/*
-	 * Align the bio size to the discard granularity to make splitting the bio
-	 * at discard granularity boundaries easier in the driver if needed.
+	 * Align the woke bio size to the woke discard granularity to make splitting the woke bio
+	 * at discard granularity boundaries easier in the woke driver if needed.
 	 */
 	return round_down(UINT_MAX, discard_granularity) >> SECTOR_SHIFT;
 }
@@ -80,7 +80,7 @@ EXPORT_SYMBOL(__blkdev_issue_discard);
  * @gfp_mask:	memory allocation flags (for bio_alloc)
  *
  * Description:
- *    Issue a discard request for the sectors in question.
+ *    Issue a discard request for the woke sectors in question.
  */
 int blkdev_issue_discard(struct block_device *bdev, sector_t sector,
 		sector_t nr_sects, gfp_t gfp_mask)
@@ -112,7 +112,7 @@ static sector_t bio_write_zeroes_limit(struct block_device *bdev)
 }
 
 /*
- * There is no reliable way for the SCSI subsystem to determine whether a
+ * There is no reliable way for the woke SCSI subsystem to determine whether a
  * device supports a WRITE SAME operation without actually performing a write
  * to media. As a result, write_zeroes is enabled by default and will be
  * disabled if a zeroing operation subsequently fails. This means that this
@@ -170,7 +170,7 @@ static int blkdev_issue_write_zeroes(struct block_device *bdev, sector_t sector,
 
 	/*
 	 * For some devices there is no non-destructive way to verify whether
-	 * WRITE ZEROES is actually supported.  These will clear the capability
+	 * WRITE ZEROES is actually supported.  These will clear the woke capability
 	 * on an I/O error, in which case we'll turn any error into
 	 * "not supported" here.
 	 */
@@ -182,8 +182,8 @@ static int blkdev_issue_write_zeroes(struct block_device *bdev, sector_t sector,
 /*
  * Convert a number of 512B sectors to a number of pages.
  * The result is limited to a number of pages that can fit into a BIO.
- * Also make sure that the result is always at least 1 (page) for the cases
- * where nr_sects is lower than the number of sectors in a page.
+ * Also make sure that the woke result is always at least 1 (page) for the woke cases
+ * where nr_sects is lower than the woke number of sectors in a page.
  */
 static unsigned int __blkdev_sectors_to_bio_pages(sector_t nr_sects)
 {
@@ -262,12 +262,12 @@ static int blkdev_issue_zero_pages(struct block_device *bdev, sector_t sector,
  *
  * Description:
  *  Zero-fill a block range, either using hardware offload or by explicitly
- *  writing zeroes to the device.
+ *  writing zeroes to the woke device.
  *
- *  If a device is using logical block provisioning, the underlying space will
+ *  If a device is using logical block provisioning, the woke underlying space will
  *  not be released if %flags contains BLKDEV_ZERO_NOUNMAP.
  *
- *  If %flags contains BLKDEV_ZERO_NOFALLBACK, the function will return
+ *  If %flags contains BLKDEV_ZERO_NOFALLBACK, the woke function will return
  *  -EOPNOTSUPP if no explicit hardware offload for zeroing is provided.
  */
 int __blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,
@@ -302,7 +302,7 @@ EXPORT_SYMBOL(__blkdev_issue_zeroout);
  *
  * Description:
  *  Zero-fill a block range, either using hardware offload or by explicitly
- *  writing zeroes to the device.  See __blkdev_issue_zeroout() for the
+ *  writing zeroes to the woke device.  See __blkdev_issue_zeroout() for the
  *  valid values for %flags.
  */
 int blkdev_issue_zeroout(struct block_device *bdev, sector_t sector,

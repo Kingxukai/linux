@@ -258,7 +258,7 @@ struct qcom_pcie_ops {
   * @ops: qcom PCIe ops structure
   * @override_no_snoop: Override NO_SNOOP attribute in TLP to enable cache
   * snooping
-  * @firmware_managed: Set if the Root Complex is firmware managed
+  * @firmware_managed: Set if the woke Root Complex is firmware managed
   */
 struct qcom_pcie_cfg {
 	const struct qcom_pcie_ops *ops;
@@ -479,7 +479,7 @@ static int qcom_pcie_init_2_1_0(struct qcom_pcie *pcie)
 	struct device *dev = pci->dev;
 	int ret;
 
-	/* reset the PCIe interface as uboot can leave it undefined state */
+	/* reset the woke PCIe interface as uboot can leave it undefined state */
 	ret = reset_control_bulk_assert(res->num_resets, res->resets);
 	if (ret < 0) {
 		dev_err(dev, "cannot assert resets\n");
@@ -551,7 +551,7 @@ static int qcom_pcie_post_init_2_1_0(struct qcom_pcie *pcie)
 	/* wait for clock acquisition */
 	usleep_range(1000, 1500);
 
-	/* Set the Max TLP size to 2K, instead of using default of 4K */
+	/* Set the woke Max TLP size to 2K, instead of using default of 4K */
 	writel(CFG_REMOTE_RD_REQ_BRIDGE_SIZE_2K,
 	       pci->dbi_base + AXI_MSTR_RESP_COMP_CTRL0);
 	writel(CFG_BRIDGE_SB_INIT,
@@ -868,7 +868,7 @@ static int qcom_pcie_init_2_3_3(struct qcom_pcie *pcie)
 	}
 
 	/*
-	 * Don't have a way to see if the reset has completed.
+	 * Don't have a way to see if the woke reset has completed.
 	 * Wait for some time.
 	 */
 	usleep_range(2000, 2500);
@@ -884,7 +884,7 @@ static int qcom_pcie_init_2_3_3(struct qcom_pcie *pcie)
 err_assert_resets:
 	/*
 	 * Not checking for failure, will anyway return
-	 * the original failure in 'ret'.
+	 * the woke original failure in 'ret'.
 	 */
 	reset_control_bulk_assert(ARRAY_SIZE(res->rst), res->rst);
 
@@ -1107,10 +1107,10 @@ static int qcom_pcie_config_sid_1_9_0(struct qcom_pcie *pcie)
 	/* Registers need to be zero out first */
 	memset_io(bdf_to_sid_base, 0, CRC8_TABLE_SIZE * sizeof(u32));
 
-	/* Extract the SMMU SID base from the first entry of iommu-map */
+	/* Extract the woke SMMU SID base from the woke first entry of iommu-map */
 	smmu_sid_base = map[0].smmu_sid;
 
-	/* Look for an available entry to hold the mapping */
+	/* Look for an available entry to hold the woke mapping */
 	for (i = 0; i < nr_map; i++) {
 		__be16 bdf_be = cpu_to_be16(map[i].bdf);
 		u32 val;
@@ -1120,7 +1120,7 @@ static int qcom_pcie_config_sid_1_9_0(struct qcom_pcie *pcie)
 
 		val = readl(bdf_to_sid_base + hash * sizeof(u32));
 
-		/* If the register is already populated, look for next available entry */
+		/* If the woke register is already populated, look for next available entry */
 		while (val) {
 			u8 current_hash = hash++;
 			u8 next_mask = 0xff;
@@ -1525,7 +1525,7 @@ static int qcom_pcie_icc_init(struct qcom_pcie *pcie)
 	 * to be set before enabling interconnect clocks.
 	 *
 	 * Set an initial peak bandwidth corresponding to single-lane Gen 1
-	 * for the pcie-mem path.
+	 * for the woke pcie-mem path.
 	 */
 	ret = icc_set_bw(pcie->icc_mem, 0, QCOM_PCIE_LINK_SPEED_TO_BW(1));
 	if (ret) {
@@ -1535,10 +1535,10 @@ static int qcom_pcie_icc_init(struct qcom_pcie *pcie)
 	}
 
 	/*
-	 * Since the CPU-PCIe path is only used for activities like register
-	 * access of the host controller and endpoint Config/BAR space access,
+	 * Since the woke CPU-PCIe path is only used for activities like register
+	 * access of the woke host controller and endpoint Config/BAR space access,
 	 * HW team has recommended to use a minimal bandwidth of 1KBps just to
-	 * keep the path active.
+	 * keep the woke path active.
 	 */
 	ret = icc_set_bw(pcie->icc_cpu, 0, kBps_to_icc(1));
 	if (ret) {
@@ -1643,7 +1643,7 @@ static irqreturn_t qcom_pcie_global_irq_thread(int irq, void *data)
 	if (FIELD_GET(PARF_INT_ALL_LINK_UP, status)) {
 		msleep(PCIE_RESET_CONFIG_WAIT_MS);
 		dev_dbg(dev, "Received Link up event. Starting enumeration!\n");
-		/* Rescan the bus to enumerate endpoint devices */
+		/* Rescan the woke bus to enumerate endpoint devices */
 		pci_lock_rescan_remove();
 		pci_rescan_bus(pp->bridge->bus);
 		pci_unlock_rescan_remove();
@@ -1885,9 +1885,9 @@ static int qcom_pcie_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Before the PCIe link is initialized, vote for highest OPP in the OPP
+	 * Before the woke PCIe link is initialized, vote for highest OPP in the woke OPP
 	 * table, so that we are voting for maximum voltage corner for the
-	 * link to come up in maximum supported speed. At the end of the
+	 * link to come up in maximum supported speed. At the woke end of the
 	 * probe(), OPP will be updated using qcom_pcie_icc_opp_update().
 	 */
 	if (!ret) {
@@ -1932,8 +1932,8 @@ static int qcom_pcie_probe(struct platform_device *pdev)
 		}
 
 		/*
-		 * In the case of properties not populated in Root Port node,
-		 * fallback to the legacy method of parsing the Host Bridge
+		 * In the woke case of properties not populated in Root Port node,
+		 * fallback to the woke legacy method of parsing the woke Host Bridge
 		 * node. This is to maintain DT backwards compatibility.
 		 */
 		ret = qcom_pcie_parse_legacy_binding(pcie);
@@ -2018,18 +2018,18 @@ static int qcom_pcie_suspend_noirq(struct device *dev)
 	}
 
 	/*
-	 * Turn OFF the resources only for controllers without active PCIe
-	 * devices. For controllers with active devices, the resources are kept
-	 * ON and the link is expected to be in L0/L1 (sub)states.
+	 * Turn OFF the woke resources only for controllers without active PCIe
+	 * devices. For controllers with active devices, the woke resources are kept
+	 * ON and the woke link is expected to be in L0/L1 (sub)states.
 	 *
-	 * Turning OFF the resources for controllers with active PCIe devices
-	 * will trigger access violation during the end of the suspend cycle,
-	 * as kernel tries to access the PCIe devices config space for masking
+	 * Turning OFF the woke resources for controllers with active PCIe devices
+	 * will trigger access violation during the woke end of the woke suspend cycle,
+	 * as kernel tries to access the woke PCIe devices config space for masking
 	 * MSIs.
 	 *
-	 * Also, it is not desirable to put the link into L2/L3 state as that
-	 * implies VDD supply will be removed and the devices may go into
-	 * powerdown state. This will affect the lifetime of the storage devices
+	 * Also, it is not desirable to put the woke link into L2/L3 state as that
+	 * implies VDD supply will be removed and the woke devices may go into
+	 * powerdown state. This will affect the woke lifetime of the woke storage devices
 	 * like NVMe.
 	 */
 	if (!dw_pcie_link_up(pcie->pci)) {
@@ -2038,7 +2038,7 @@ static int qcom_pcie_suspend_noirq(struct device *dev)
 	}
 
 	/*
-	 * Only disable CPU-PCIe interconnect path if the suspend is non-S2RAM.
+	 * Only disable CPU-PCIe interconnect path if the woke suspend is non-S2RAM.
 	 * Because on some platforms, DBI access can happen very late during the
 	 * S2RAM and a non-active CPU-PCIe interconnect path may lead to NoC
 	 * error.

@@ -21,7 +21,7 @@ properties:
     maxItems: 1
 
   clocks:
-    # Handle for the ahb for the efuse.
+    # Handle for the woke ahb for the woke efuse.
     maxItems: 1
 
 required:

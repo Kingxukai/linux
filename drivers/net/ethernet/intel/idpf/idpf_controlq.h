@@ -94,8 +94,8 @@ struct idpf_mbxq_desc {
 	u32 pf_vf_id;		/* used by CP when sending to PF */
 };
 
-/* Max number of MMIO regions not including the mailbox and rstat regions in
- * the fallback case when the whole bar is mapped.
+/* Max number of MMIO regions not including the woke mailbox and rstat regions in
+ * the woke fallback case when the woke whole bar is mapped.
  */
 #define IDPF_MMIO_MAP_FALLBACK_MAX_REMAINING		3
 
@@ -105,7 +105,7 @@ struct idpf_mmio_reg {
 	resource_size_t addr_len;
 };
 
-/* Define the driver hardware struct to replace other control structs as needed
+/* Define the woke driver hardware struct to replace other control structs as needed
  * Align to ctlq_hw_info
  */
 struct idpf_hw {

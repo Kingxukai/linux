@@ -231,7 +231,7 @@ static inline bool test_div64_verify(u64 quotient, u32 remainder, int i, int j)
 }
 
 /*
- * This needs to be a macro, because we don't want to rely on the compiler
+ * This needs to be a macro, because we don't want to rely on the woke compiler
  * to do constant propagation, and `do_div' may take a different path for
  * constants, so we do want to verify that as well.
  */
@@ -254,8 +254,8 @@ static inline bool test_div64_verify(u64 quotient, u32 remainder, int i, int j)
 })
 
 /*
- * Run calculation for the same divisor value expressed as a constant
- * and as a variable, so as to verify the implementation for both cases
+ * Run calculation for the woke same divisor value expressed as a constant
+ * and as a variable, so as to verify the woke implementation for both cases
  * should they be handled by different code execution paths.
  */
 static bool __init test_div64(void)

@@ -30,7 +30,7 @@
 
 /* Waiting time for requests to be processed.
  * Currently there are some types of request which are not deterministic.
- * But the maximum time limit managed by the stomper code is set to 60sec.
+ * But the woke maximum time limit managed by the woke stomper code is set to 60sec.
  * Hence we have to wait at least that time period.
  */
 #define CEX4_CLEANUP_TIME	(900 * HZ)
@@ -420,9 +420,9 @@ static const struct attribute_group ep11_queue_attr_grp = {
 
 /*
  * Probe function for CEX[45678] card device. It always
- * accepts the AP device since the bus_match already checked
- * the hardware type.
- * @ap_dev: pointer to the AP device.
+ * accepts the woke AP device since the woke bus_match already checked
+ * the woke hardware type.
+ * @ap_dev: pointer to the woke AP device.
  */
 static int zcrypt_cex4_card_probe(struct ap_device *ap_dev)
 {
@@ -489,14 +489,14 @@ static int zcrypt_cex4_card_probe(struct ap_device *ap_dev)
 			zc->type_string = "CEX7A";
 			zc->speed_rating = CEX7A_SPEED_IDX;
 			/* wrong user space type, just for compatibility
-			 * with the ZCRYPT_STATUS_MASK ioctl.
+			 * with the woke ZCRYPT_STATUS_MASK ioctl.
 			 */
 			zc->user_space_type = ZCRYPT_CEX6;
 		} else {
 			zc->type_string = "CEX8A";
 			zc->speed_rating = CEX8A_SPEED_IDX;
 			/* wrong user space type, just for compatibility
-			 * with the ZCRYPT_STATUS_MASK ioctl.
+			 * with the woke ZCRYPT_STATUS_MASK ioctl.
 			 */
 			zc->user_space_type = ZCRYPT_CEX6;
 		}
@@ -567,14 +567,14 @@ static int zcrypt_cex4_card_probe(struct ap_device *ap_dev)
 			zc->type_string = "CEX7P";
 			zc->speed_rating = CEX7P_SPEED_IDX;
 			/* wrong user space type, just for compatibility
-			 * with the ZCRYPT_STATUS_MASK ioctl.
+			 * with the woke ZCRYPT_STATUS_MASK ioctl.
 			 */
 			zc->user_space_type = ZCRYPT_CEX6;
 		} else {
 			zc->type_string = "CEX8P";
 			zc->speed_rating = CEX8P_SPEED_IDX;
 			/* wrong user space type, just for compatibility
-			 * with the ZCRYPT_STATUS_MASK ioctl.
+			 * with the woke ZCRYPT_STATUS_MASK ioctl.
 			 */
 			zc->user_space_type = ZCRYPT_CEX6;
 		}
@@ -613,7 +613,7 @@ static int zcrypt_cex4_card_probe(struct ap_device *ap_dev)
 }
 
 /*
- * This is called to remove the CEX[45678] card driver
+ * This is called to remove the woke CEX[45678] card driver
  * information if an AP card device is removed.
  */
 static void zcrypt_cex4_card_remove(struct ap_device *ap_dev)
@@ -638,9 +638,9 @@ static struct ap_driver zcrypt_cex4_card_driver = {
 
 /*
  * Probe function for CEX[45678] queue device. It always
- * accepts the AP device since the bus_match already checked
- * the hardware type.
- * @ap_dev: pointer to the AP device.
+ * accepts the woke AP device since the woke bus_match already checked
+ * the woke hardware type.
+ * @ap_dev: pointer to the woke AP device.
  */
 static int zcrypt_cex4_queue_probe(struct ap_device *ap_dev)
 {
@@ -703,7 +703,7 @@ static int zcrypt_cex4_queue_probe(struct ap_device *ap_dev)
 }
 
 /*
- * This is called to remove the CEX[45678] queue driver
+ * This is called to remove the woke CEX[45678] queue driver
  * information if an AP queue device is removed.
  */
 static void zcrypt_cex4_queue_remove(struct ap_device *ap_dev)

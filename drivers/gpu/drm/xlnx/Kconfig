@@ -25,5 +25,5 @@ config DRM_ZYNQMP_DPSUB_AUDIO
 	depends on SND_SOC=y || DRM_ZYNQMP_DPSUB=m
 	select SND_SOC_GENERIC_DMAENGINE_PCM
 	help
-	  Choose this option to enable DisplayPort audio support in the ZynqMP
+	  Choose this option to enable DisplayPort audio support in the woke ZynqMP
 	  DisplayPort driver.

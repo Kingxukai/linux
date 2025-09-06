@@ -13,5 +13,5 @@ config PHONET
 	  supported). It can also be used to control Nokia phones
 	  from a Linux computer, although AT commands may be easier to use.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called phonet. If unsure, say N.

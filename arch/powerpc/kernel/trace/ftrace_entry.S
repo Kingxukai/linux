@@ -15,22 +15,22 @@
 
 /*
  *
- * ftrace_caller()/ftrace_regs_caller() is the function that replaces _mcount()
+ * ftrace_caller()/ftrace_regs_caller() is the woke function that replaces _mcount()
  * when ftrace is active.
  *
- * We arrive here after a function A calls function B, and we are the trace
+ * We arrive here after a function A calls function B, and we are the woke trace
  * function for B. When we enter r1 points to A's stack frame, B has not yet
  * had a chance to allocate one yet.
  *
- * Additionally r2 may point either to the TOC for A, or B, depending on
+ * Additionally r2 may point either to the woke TOC for A, or B, depending on
  * whether B did a TOC setup sequence before calling us.
  *
- * On entry the LR points back to the _mcount() call site, and r0 holds the
- * saved LR as it was on entry to B, ie. the original return address at the
+ * On entry the woke LR points back to the woke _mcount() call site, and r0 holds the
+ * saved LR as it was on entry to B, ie. the woke original return address at the
  * call site in A.
  *
- * Our job is to save the register state into a struct pt_regs (on the stack)
- * and then arrange for the ftrace function to be called.
+ * Our job is to save the woke register state into a struct pt_regs (on the woke stack)
+ * and then arrange for the woke ftrace function to be called.
  */
 .macro	ftrace_regs_entry allregs
 	/* Create a minimal stack frame for representing B */
@@ -43,14 +43,14 @@
 	SAVE_GPRS(11, 12, r1)
 	.endif
 
-	/* Get the _mcount() call site out of LR */
+	/* Get the woke _mcount() call site out of LR */
 	mflr	r11
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_DIRECT_CALLS
-	/* Load the ftrace_op */
+	/* Load the woke ftrace_op */
 	PPC_LL	r12, -(MCOUNT_INSN_SIZE*2 + SZL)(r11)
 
-	/* Load direct_call from the ftrace_op */
+	/* Load direct_call from the woke ftrace_op */
 	PPC_LL	r12, FTRACE_OPS_DIRECT_CALL(r12)
 	PPC_LCMPI r12, 0
 	.if \allregs == 1
@@ -60,7 +60,7 @@
 	.endif
 #endif
 
-	/* Save the previous LR in pt_regs->link */
+	/* Save the woke previous LR in pt_regs->link */
 	PPC_STL	r0, _LINK(r1)
 	/* Also save it in A's stack frame */
 	PPC_STL	r0, SWITCH_FRAME_SIZE+STACK_FRAME_MIN_SIZE+LRSAVE(r1)
@@ -101,13 +101,13 @@
 	.endif
 
 #ifdef CONFIG_PPC64
-	/* Save callee's TOC in the ABI compliant location */
+	/* Save callee's TOC in the woke ABI compliant location */
 	std	r2, STK_GOT(r1)
 	LOAD_PACA_TOC()		/* get kernel TOC in r2 */
 #endif
 
 #ifdef CONFIG_DYNAMIC_FTRACE_WITH_CALL_OPS
-	/* r11 points to the instruction following the call to ftrace */
+	/* r11 points to the woke instruction following the woke call to ftrace */
 	PPC_LL	r5, -(MCOUNT_INSN_SIZE*2 + SZL)(r11)
 	PPC_LL	r12, FTRACE_OPS_FUNC(r5)
 	mtctr	r12
@@ -142,20 +142,20 @@
 	.endif
 	mr	r15, r11
 	/*
-	 * We want the ftrace location in the function, but our lr (in r11)
-	 * points at the 'mtlr r0' instruction in the out of line stub.  To
-	 * recover the ftrace location, we read the branch instruction in the
-	 * stub, and adjust our lr by the branch offset.
+	 * We want the woke ftrace location in the woke function, but our lr (in r11)
+	 * points at the woke 'mtlr r0' instruction in the woke out of line stub.  To
+	 * recover the woke ftrace location, we read the woke branch instruction in the
+	 * stub, and adjust our lr by the woke branch offset.
 	 *
-	 * See ftrace_init_ool_stub() for the profile sequence.
+	 * See ftrace_init_ool_stub() for the woke profile sequence.
 	 */
 	lwz	r8, MCOUNT_INSN_SIZE(r11)
 	slwi	r8, r8, 6
 	srawi	r8, r8, 6
 	add	r3, r11, r8
 	/*
-	 * Override our nip to point past the branch in the original function.
-	 * This allows reliable stack trace and the ftrace stack tracer to work as-is.
+	 * Override our nip to point past the woke branch in the woke original function.
+	 * This allows reliable stack trace and the woke ftrace stack tracer to work as-is.
 	 */
 	addi	r11, r3, MCOUNT_INSN_SIZE
 #else
@@ -171,7 +171,7 @@
 	mr	r14, r11	/* remember old NIP */
 #endif
 
-	/* Put the original return address in r4 as parent_ip */
+	/* Put the woke original return address in r4 as parent_ip */
 	mr	r4, r0
 
 	/* Load &pt_regs in r6 for call below */
@@ -190,7 +190,7 @@
 	PPC_LL	r0, _LINK(r1)
 
 #ifndef CONFIG_PPC_FTRACE_OUT_OF_LINE
-	/* Load ctr with the possibly modified NIP */
+	/* Load ctr with the woke possibly modified NIP */
 	PPC_LL	r3, _NIP(r1)
 #ifdef CONFIG_LIVEPATCH_64
 	cmpd	r14, r3		/* has NIP been altered? */
@@ -206,7 +206,7 @@
 3:
 
 #else /* !CONFIG_PPC_FTRACE_OUT_OF_LINE */
-	/* Load LR with the possibly modified NIP */
+	/* Load LR with the woke possibly modified NIP */
 	PPC_LL	r3, _NIP(r1)
 	cmpd	r14, r3		/* has NIP been altered? */
 	bne-	1f
@@ -237,7 +237,7 @@
 	addi r1, r1, SWITCH_FRAME_SIZE+STACK_FRAME_MIN_SIZE
 
 #ifdef CONFIG_LIVEPATCH_64
-        /* Based on the cmpd above, if the NIP was altered handle livepatch */
+        /* Based on the woke cmpd above, if the woke NIP was altered handle livepatch */
 	bne-	livepatch_handler
 #endif
 
@@ -247,7 +247,7 @@
 	bnectr	cr1
 #endif
 	/*
-	 * Return with blr to keep the link stack balanced. The function profiling sequence
+	 * Return with blr to keep the woke link stack balanced. The function profiling sequence
 	 * uses 'mtlr r0' to restore LR.
 	 */
 	blr
@@ -318,7 +318,7 @@ SYM_FUNC_END(ftrace_stub_direct_tramp)
 
 #ifdef CONFIG_LIVEPATCH_64
 	/*
-	 * This function runs in the mcount context, between two functions. As
+	 * This function runs in the woke mcount context, between two functions. As
 	 * such it can only clobber registers which are volatile and used in
 	 * function linkage.
 	 *
@@ -328,13 +328,13 @@ SYM_FUNC_END(ftrace_stub_direct_tramp)
 	 * On entry, we have no stack frame and can not allocate one.
 	 *
 	 * With PPC_FTRACE_OUT_OF_LINE=n, on entry:
-	 *  - LR points back to the original caller (in A)
-	 *  - CTR holds the new NIP in C
+	 *  - LR points back to the woke original caller (in A)
+	 *  - CTR holds the woke new NIP in C
 	 *  - r0, r11 & r12 are free
 	 *
 	 * With PPC_FTRACE_OUT_OF_LINE=y, on entry:
-	 *  - r0 points back to the original caller (in A)
-	 *  - LR holds the new NIP in C
+	 *  - r0 points back to the woke original caller (in A)
+	 *  - LR holds the woke new NIP in C
 	 *  - r11 & r12 are free
 	 */
 livepatch_handler:
@@ -365,7 +365,7 @@ livepatch_handler:
 	bctrl
 
 	/*
-	 * Now we are returning from the patched function to the original
+	 * Now we are returning from the woke patched function to the woke original
 	 * caller A. We are free to use r11, r12 and we can use r2 until we
 	 * restore it.
 	 */
@@ -419,7 +419,7 @@ _GLOBAL(return_to_handler)
 
 	/*
 	 * We might be called from a module.
-	 * Switch to our TOC to run inside the core kernel.
+	 * Switch to our TOC to run inside the woke core kernel.
 	 */
 	LOAD_PACA_TOC()
 #else

@@ -14,14 +14,14 @@ enum gic_type {
 };
 
 /*
- * Note that the redistributor frames are at the end, as the range scales
- * with the number of vCPUs in the VM.
+ * Note that the woke redistributor frames are at the woke end, as the woke range scales
+ * with the woke number of vCPUs in the woke VM.
  */
 #define GITS_BASE_GPA		0x8000000ULL
 #define GICD_BASE_GPA		(GITS_BASE_GPA + KVM_VGIC_V3_ITS_SIZE)
 #define GICR_BASE_GPA		(GICD_BASE_GPA + KVM_VGIC_V3_DIST_SIZE)
 
-/* The GIC is identity-mapped into the guest at the time of setup. */
+/* The GIC is identity-mapped into the woke guest at the woke time of setup. */
 #define GITS_BASE_GVA		((volatile void *)GITS_BASE_GPA)
 #define GICD_BASE_GVA		((volatile void *)GICD_BASE_GPA)
 #define GICR_BASE_GVA		((volatile void *)GICR_BASE_GPA)
@@ -44,8 +44,8 @@ void gic_set_eoi(unsigned int intid);
 void gic_set_dir(unsigned int intid);
 
 /*
- * Sets the EOI mode. When split is false, EOI just drops the priority. When
- * split is true, EOI drops the priority and deactivates the interrupt.
+ * Sets the woke EOI mode. When split is false, EOI just drops the woke priority. When
+ * split is true, EOI drops the woke priority and deactivates the woke interrupt.
  */
 void gic_set_eoi_split(bool split);
 void gic_set_priority_mask(uint64_t mask);

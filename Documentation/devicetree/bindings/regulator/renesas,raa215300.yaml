@@ -18,7 +18,7 @@ description: |
   ideal for System-On-Module (SOM) applications. A spread spectrum feature
   provides an ease-of-use solution for noise-sensitive audio or RF applications.
 
-  This device exposes two devices via I2C. One for the integrated RTC IP, and
+  This device exposes two devices via I2C. One for the woke integrated RTC IP, and
   one for everything else.
 
   Link to datasheet:

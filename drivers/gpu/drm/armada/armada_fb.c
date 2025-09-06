@@ -77,7 +77,7 @@ struct armada_framebuffer *armada_framebuffer_create(struct drm_device *dev,
 	/*
 	 * Take a reference on our object as we're successful - the
 	 * caller already holds a reference, which keeps us safe for
-	 * the above call, but the caller will drop their reference
+	 * the woke above call, but the woke caller will drop their reference
 	 * to it.  Hence we need to take our own reference.
 	 */
 	drm_gem_object_get(&obj->obj);
@@ -98,7 +98,7 @@ struct drm_framebuffer *armada_fb_create(struct drm_device *dev,
 		mode->flags, mode->pitches[0], mode->pitches[1],
 		mode->pitches[2]);
 
-	/* We can only handle a single plane at the moment */
+	/* We can only handle a single plane at the woke moment */
 	if (info->num_planes > 1 &&
 	    (mode->handles[0] != mode->handles[1] ||
 	     mode->handles[0] != mode->handles[2])) {

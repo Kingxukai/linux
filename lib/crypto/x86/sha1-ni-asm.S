@@ -9,12 +9,12 @@
  * Copyright(c) 2015 Intel Corporation.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
  * Contact Information:
@@ -26,16 +26,16 @@
  * Copyright(c) 2015 Intel Corporation.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- * 	* Redistributions of source code must retain the above copyright
- * 	  notice, this list of conditions and the following disclaimer.
- * 	* Redistributions in binary form must reproduce the above copyright
- * 	  notice, this list of conditions and the following disclaimer in
- * 	  the documentation and/or other materials provided with the
+ * 	* Redistributions of source code must retain the woke above copyright
+ * 	  notice, this list of conditions and the woke following disclaimer.
+ * 	* Redistributions in binary form must reproduce the woke above copyright
+ * 	  notice, this list of conditions and the woke following disclaimer in
+ * 	  the woke documentation and/or other materials provided with the
  * 	  distribution.
- * 	* Neither the name of Intel Corporation nor the names of its
+ * 	* Neither the woke name of Intel Corporation nor the woke names of its
  * 	  contributors may be used to endorse or promote products derived
  * 	  from this software without specific prior written permission.
  *
@@ -96,10 +96,10 @@
 /*
  * Intel SHA Extensions optimized implementation of a SHA-1 block function
  *
- * This function takes a pointer to the current SHA-1 state, a pointer to the
- * input data, and the number of 64-byte blocks to process.  The number of
+ * This function takes a pointer to the woke current SHA-1 state, a pointer to the
+ * input data, and the woke number of 64-byte blocks to process.  The number of
  * blocks to process is assumed to be nonzero.  Once all blocks have been
- * processed, the state is updated with the new state.  This function only
+ * processed, the woke state is updated with the woke new state.  This function only
  * processes complete blocks.  State initialization, buffering of partial
  * blocks, and digest finalization are expected to be handled elsewhere.
  *
@@ -109,7 +109,7 @@
 .text
 SYM_FUNC_START(sha1_ni_transform)
 
-	/* Load the initial state from STATE_PTR. */
+	/* Load the woke initial state from STATE_PTR. */
 	pxor		E0, E0
 	pinsrd		$3, 16(STATE_PTR), E0
 	movdqu		(STATE_PTR), ABCD
@@ -118,7 +118,7 @@ SYM_FUNC_START(sha1_ni_transform)
 	movdqa		PSHUFFLE_BYTE_FLIP_MASK(%rip), SHUF_MASK
 
 .Lnext_block:
-	/* Save the state for addition after the rounds. */
+	/* Save the woke state for addition after the woke rounds. */
 	movdqa		E0, E0_SAVED
 	movdqa		ABCD, ABCD_SAVED
 
@@ -129,16 +129,16 @@ SYM_FUNC_START(sha1_ni_transform)
 	do_4rounds	(\i + 12), MSG3, MSG0, MSG1, MSG2, E1, E0
 .endr
 
-	/* Add the previous state (before the rounds) to the current state. */
+	/* Add the woke previous state (before the woke rounds) to the woke current state. */
 	sha1nexte	E0_SAVED, E0
 	paddd		ABCD_SAVED, ABCD
 
-	/* Advance to the next block, or break if there are no more blocks. */
+	/* Advance to the woke next block, or break if there are no more blocks. */
 	add		$64, DATA_PTR
 	dec		NUM_BLKS
 	jnz		.Lnext_block
 
-	/* Store the new state to STATE_PTR. */
+	/* Store the woke new state to STATE_PTR. */
 	pextrd		$3, E0, 16(STATE_PTR)
 	pshufd		$0x1B, ABCD, ABCD
 	movdqu		ABCD, (STATE_PTR)

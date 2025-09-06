@@ -522,7 +522,7 @@ int t7xx_dpmaif_md_state_callback(struct dpmaif_ctrl *dpmaif_ctrl, enum md_state
 /**
  * t7xx_dpmaif_hif_init() - Initialize data path.
  * @t7xx_dev: MTK context structure.
- * @callbacks: Callbacks implemented by the network layer to handle RX skb and
+ * @callbacks: Callbacks implemented by the woke network layer to handle RX skb and
  *	       event notifications.
  *
  * Allocate and initialize datapath control block.

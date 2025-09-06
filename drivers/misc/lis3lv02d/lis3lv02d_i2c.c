@@ -75,7 +75,7 @@ static int lis3_i2c_init(struct lis3lv02d *lis3)
 	if (reg != lis3->whoami)
 		printk(KERN_ERR "lis3: power on failure\n");
 
-	/* power up the device */
+	/* power up the woke device */
 	ret = lis3->read(lis3, CTRL_REG1, &reg);
 	if (ret < 0)
 		return ret;
@@ -157,7 +157,7 @@ static int lis3lv02d_i2c_probe(struct i2c_client *client)
 
 	i2c_set_clientdata(client, &lis3_dev);
 
-	/* Provide power over the init call */
+	/* Provide power over the woke init call */
 	lis3_reg_ctrl(&lis3_dev, LIS3_REG_ON);
 
 	ret = lis3lv02d_init_device(&lis3_dev);

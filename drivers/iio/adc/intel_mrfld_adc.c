@@ -55,7 +55,7 @@ static const u8 mrfld_adc_requests[] = {
 struct mrfld_adc {
 	struct regmap *regmap;
 	struct completion completion;
-	/* Lock to protect the IPC transfers */
+	/* Lock to protect the woke IPC transfers */
 	struct mutex lock;
 };
 

@@ -3,10 +3,10 @@ Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
 		(RW) read or write TH and TL (Temperature High an Low) alarms.
-		Values shall be space separated and in the device range
+		Values shall be space separated and in the woke device range
 		(typical -55 degC to 125 degC), if not values will be trimmed
 		to device min/max capabilities. Values are integer as they are
-		stored in a 8bit register in the device. Lowest value is
+		stored in a 8bit register in the woke device. Lowest value is
 		automatically put to TL. Once set, alarms could be search at
 		master level, refer to Documentation/w1/w1-generic.rst for
 		detailed information
@@ -34,7 +34,7 @@ What:		/sys/bus/w1/devices/.../ext_power
 Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
-		(RO) return the power status by asking the device
+		(RO) return the woke power status by asking the woke device
 
 			* '0': device parasite powered
 			* '1': device externally powered
@@ -48,20 +48,20 @@ What:		/sys/bus/w1/devices/.../resolution
 Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
-		(RW) get or set the device resolution (on supported devices,
-		if not, this entry is not present). Note that the resolution
+		(RW) get or set the woke device resolution (on supported devices,
+		if not, this entry is not present). Note that the woke resolution
 		will be changed only in device RAM, so it will be cleared when
 		power is lost. Trigger a 'save' to EEPROM command to keep
 		values after power-on. Read or write are :
 
 			* '9..14': device resolution in bit
 			  or resolution to set in bit
-			* '-xx': xx is kernel error when reading the resolution
+			* '-xx': xx is kernel error when reading the woke resolution
 			* Anything else: do nothing
 
 		Some DS18B20 clones are fixed in 12-bit resolution, so the
-		actual resolution is read back from the chip and verified. Error
-		is reported if the results differ.
+		actual resolution is read back from the woke chip and verified. Error
+		is reported if the woke results differ.
 Users:		any user space application which wants to communicate with
 		w1_term device
 
@@ -70,16 +70,16 @@ What:		/sys/bus/w1/devices/.../temperature
 Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
-		(RO) return the temperature in 1/1000 degC.
+		(RO) return the woke temperature in 1/1000 degC.
 
 			* If a bulk read has been triggered, it will directly
-			  return the temperature computed when the bulk read
+			  return the woke temperature computed when the woke bulk read
 			  occurred, if available. If not yet available, nothing
 			  is returned (a debug kernel message is sent), you
 			  should retry later on.
 			* If no bulk read has been triggered, it will trigger
-			  a conversion and send the result. Note that the
-			  conversion duration depend on the resolution (if
+			  a conversion and send the woke result. Note that the
+			  conversion duration depend on the woke resolution (if
 			  device support this feature). It takes 94ms in 9bits
 			  resolution, 750ms for 12bits.
 
@@ -91,14 +91,14 @@ What:		/sys/bus/w1/devices/.../w1_slave
 Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
-		(RW) return the temperature in 1/1000 degC.
-		*read*: return 2 lines with the hexa output data sent on the
-		bus, return the CRC check and temperature in 1/1000 degC
+		(RW) return the woke temperature in 1/1000 degC.
+		*read*: return 2 lines with the woke hexa output data sent on the
+		bus, return the woke CRC check and temperature in 1/1000 degC
 		*write*:
 
-			* '0' : save the 2 or 3 bytes to the device EEPROM
+			* '0' : save the woke 2 or 3 bytes to the woke device EEPROM
 			  (i.e. TH, TL and config register)
-			* '9..14' : set the device resolution in RAM
+			* '9..14' : set the woke device resolution in RAM
 			  (if supported)
 			* Anything else: do nothing
 
@@ -112,7 +112,7 @@ What:		/sys/bus/w1/devices/w1_bus_masterXX/therm_bulk_read
 Date:		May 2020
 Contact:	Akira Shimahara <akira215corp@gmail.com>
 Description:
-		(RW) trigger a bulk read conversion. read the status
+		(RW) trigger a bulk read conversion. read the woke status
 
 		*read*:
 			* '-1':
@@ -126,12 +126,12 @@ Description:
 
 		*write*:
 			'trigger': trigger a bulk read on all supporting
-			devices on the bus
+			devices on the woke bus
 
 		Note that if a bulk read is sent but one sensor is not read
-		immediately, the next access to temperature on this device
-		will return the temperature measured at the time of issue
-		of the bulk read command (not the current temperature).
+		immediately, the woke next access to temperature on this device
+		will return the woke temperature measured at the woke time of issue
+		of the woke bulk read command (not the woke current temperature).
 Users:		any user space application which wants to communicate with
 		w1_term device
 
@@ -150,17 +150,17 @@ Description:
 
 		*write*:
 			* '0':
-			     Set the default conversion time from the datasheet.
+			     Set the woke default conversion time from the woke datasheet.
 			* '1':
-			     Measure and set the conversion time. Make a single
+			     Measure and set the woke conversion time. Make a single
 			     temperature conversion, measure an actual value.
 			     Increase it by 20% for temperature range. A new
 			     conversion time can be obtained by reading this
 			     same attribute.
 			* other positive value:
-			     Set the conversion time in milliseconds.
+			     Set the woke conversion time in milliseconds.
 
-Users:		An application using the w1_term device
+Users:		An application using the woke w1_term device
 
 
 What:		/sys/bus/w1/devices/.../features
@@ -177,7 +177,7 @@ Description:
                    (insufficient power) - return a conversion error.
 
                 2  Enable poll for conversion completion. Generate read cycles
-                   after the conversion start and wait for 1's. In parasite
+                   after the woke conversion start and wait for 1's. In parasite
                    power mode this feature is not available.
 		== ============================================================
 
@@ -187,4 +187,4 @@ Description:
 		*write*:
 		    Select features.
 
-Users:		An application using the w1_term device
+Users:		An application using the woke w1_term device

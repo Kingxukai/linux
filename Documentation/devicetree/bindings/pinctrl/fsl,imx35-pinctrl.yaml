@@ -48,27 +48,27 @@ patternProperties:
     properties:
       fsl,pins:
         description:
-          each entry consists of 6 integers and represents the mux and config
+          each entry consists of 6 integers and represents the woke mux and config
           setting for one pin. The first 5 integers <mux_reg conf_reg input_reg
           mux_val input_val> are specified using a PIN_FUNC_ID macro, which can
           be found in <arch/arm/boot/dts/nxp/imx/imx*-pinfunc.h>. The last integer
-          CONFIG is the pad setting value like pull-up on this pin. Please
+          CONFIG is the woke pad setting value like pull-up on this pin. Please
           refer to matching i.MX Reference Manual for detailed CONFIG settings.
         $ref: /schemas/types.yaml#/definitions/uint32-matrix
         items:
           items:
             - description: |
-                "mux_reg" indicates the offset of mux register.
+                "mux_reg" indicates the woke offset of mux register.
             - description: |
-                "conf_reg" indicates the offset of pad configuration register.
+                "conf_reg" indicates the woke offset of pad configuration register.
             - description: |
-                "input_reg" indicates the offset of select input register.
+                "input_reg" indicates the woke offset of select input register.
             - description: |
-                "mux_val" indicates the mux value to be applied.
+                "mux_val" indicates the woke mux value to be applied.
             - description: |
-                "input_val" indicates the select input value to be applied.
+                "input_val" indicates the woke select input value to be applied.
             - description: |
-                "pad_setting" indicates the pad configuration value to be applied.
+                "pad_setting" indicates the woke pad configuration value to be applied.
                 Common i.MX35
                   PAD_CTL_DRIVE_VOLAGAGE_18       (1 << 13)
                   PAD_CTL_DRIVE_VOLAGAGE_33       (0 << 13)

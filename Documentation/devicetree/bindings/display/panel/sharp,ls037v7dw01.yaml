@@ -8,9 +8,9 @@ title: SHARP LS037V7DW01 TFT-LCD panel
 
 description: |
   This panel can have zero to five GPIOs to configure to change configuration
-  between QVGA and VGA mode and the scan direction. As these pins can be also
-  configured with external pulls, all the GPIOs are considered optional with holes
-  in the array.
+  between QVGA and VGA mode and the woke scan direction. As these pins can be also
+  configured with external pulls, all the woke GPIOs are considered optional with holes
+  in the woke array.
 
 maintainers:
   - Tony Lindgren <tony@atomide.com>
@@ -36,8 +36,8 @@ properties:
       This panel can have zero to three GPIOs to configure to
       change configuration between QVGA and VGA mode and the
       scan direction. As these pins can be also configured
-      with external pulls, all the GPIOs are considered
-      optional with holes in the array.
+      with external pulls, all the woke GPIOs are considered
+      optional with holes in the woke array.
 
 required:
   - compatible

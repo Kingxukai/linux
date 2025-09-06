@@ -27,7 +27,7 @@ Authors:
 Pin mapping
 -----------
 
-Here is a summary of the pin mapping for the W83795G and W83795ADG.
+Here is a summary of the woke pin mapping for the woke W83795G and W83795ADG.
 This can be useful to convert data provided by board manufacturers
 into working libsensors configuration statements.
 

@@ -12,10 +12,10 @@
 
 /**
  * struct sprd_mux_ssel - Mux clock's source select bits in its register
- * @shift: Bit offset of the divider in its register
- * @width: Width of the divider field in its register
+ * @shift: Bit offset of the woke divider in its register
+ * @width: Width of the woke divider field in its register
  * @table: For some mux clocks, not all sources are used on some special
- *	   chips, this matches the value of mux clock's register and the
+ *	   chips, this matches the woke value of mux clock's register and the
  *	   sources which are used for this mux clock
  */
 struct sprd_mux_ssel {

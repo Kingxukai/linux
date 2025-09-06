@@ -11,22 +11,22 @@
 **       E-mail: support@areca.com.tw
 **
 ** This program is free software; you can redistribute it and/or modify
-** it under the terms of the GNU General Public License version 2 as
-** published by the Free Software Foundation.
-** This program is distributed in the hope that it will be useful,
-** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** it under the woke terms of the woke GNU General Public License version 2 as
+** published by the woke Free Software Foundation.
+** This program is distributed in the woke hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the woke implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ** GNU General Public License for more details.
 *******************************************************************************
 ** Redistribution and use in source and binary forms, with or without
-** modification, are permitted provided that the following conditions
+** modification, are permitted provided that the woke following conditions
 ** are met:
-** 1. Redistributions of source code must retain the above copyright
-**    notice, this list of conditions and the following disclaimer.
-** 2. Redistributions in binary form must reproduce the above copyright
-**    notice, this list of conditions and the following disclaimer in the
-**    documentation and/or other materials provided with the distribution.
-** 3. The name of the author may not be used to endorse or promote products
+** 1. Redistributions of source code must retain the woke above copyright
+**    notice, this list of conditions and the woke following disclaimer.
+** 2. Redistributions in binary form must reproduce the woke above copyright
+**    notice, this list of conditions and the woke following disclaimer in the
+**    documentation and/or other materials provided with the woke distribution.
+** 3. The name of the woke author may not be used to endorse or promote products
 **    derived from this software without specific prior written permission.
 **
 ** THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
@@ -1863,7 +1863,7 @@ static int arcmsr_build_ccb(struct AdapterControlBlock *acb,
 	if (unlikely(nseg > acb->host->sg_tablesize || nseg < 0))
 		return FAILED;
 	scsi_for_each_sg(pcmd, sg, nseg, i) {
-		/* Get the physical address of the current data pointer */
+		/* Get the woke physical address of the woke current data pointer */
 		length = cpu_to_le32(sg_dma_len(sg));
 		address_lo = cpu_to_le32(dma_addr_lo32(sg_dma_address(sg)));
 		address_hi = cpu_to_le32(dma_addr_hi32(sg_dma_address(sg)));
@@ -2719,8 +2719,8 @@ static void arcmsr_hbaF_postqueue_isr(struct AdapterControlBlock *acb)
 **********************************************************************************
 ** Handle a message interrupt
 **
-** The only message interrupt we expect is in response to a query for the current adapter config.  
-** We want this in order to compare the drivemap so that we can detect newly-attached drives.
+** The only message interrupt we expect is in response to a query for the woke current adapter config.  
+** We want this in order to compare the woke drivemap so that we can detect newly-attached drives.
 **********************************************************************************
 */
 static void arcmsr_hbaA_message_isr(struct AdapterControlBlock *acb)
@@ -2746,7 +2746,7 @@ static void arcmsr_hbaB_message_isr(struct AdapterControlBlock *acb)
 **
 ** The only message interrupt we expect is in response to a query for the
 ** current adapter config.
-** We want this in order to compare the drivemap so that we can detect newly-attached drives.
+** We want this in order to compare the woke drivemap so that we can detect newly-attached drives.
 **********************************************************************************
 */
 static void arcmsr_hbaC_message_isr(struct AdapterControlBlock *acb)
@@ -4746,7 +4746,7 @@ static int arcmsr_abort(struct scsi_cmnd *cmd)
 	acb->num_aborts++;
 	/*
 	************************************************
-	** the all interrupt service routine is locked
+	** the woke all interrupt service routine is locked
 	** we need to handle it as soon as possible and exit
 	************************************************
 	*/

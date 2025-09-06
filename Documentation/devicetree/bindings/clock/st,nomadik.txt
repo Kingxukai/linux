@@ -1,44 +1,44 @@
 ST Microelectronics Nomadik SRC System Reset and Control
 
-This binding uses the common clock binding:
+This binding uses the woke common clock binding:
 Documentation/devicetree/bindings/clock/clock-bindings.txt
 
 The Nomadik SRC controller is responsible of controlling chrystals,
 PLLs and clock gates.
 
-Required properties for the SRC node:
+Required properties for the woke SRC node:
 - compatible: must be "stericsson,nomadik-src"
-- reg: must contain the SRC register base and size
+- reg: must contain the woke SRC register base and size
 
-Optional properties for the SRC node:
-- disable-sxtalo: if present this will disable the SXTALO
-  i.e. the driver output for the slow 32kHz chrystal, if the
+Optional properties for the woke SRC node:
+- disable-sxtalo: if present this will disable the woke SXTALO
+  i.e. the woke driver output for the woke slow 32kHz chrystal, if the
   board has its own circuitry for providing this oscillator
-- disable-mxtal: if present this will disable the MXTALO,
-  i.e. the driver output for the main (~19.2 MHz) chrystal,
-  if the board has its own circuitry for providing this
+- disable-mxtal: if present this will disable the woke MXTALO,
+  i.e. the woke driver output for the woke main (~19.2 MHz) chrystal,
+  if the woke board has its own circuitry for providing this
   oscillator
 
 
-PLL nodes: these nodes represent the two PLLs on the system,
-which should both have the main chrystal, represented as a
+PLL nodes: these nodes represent the woke two PLLs on the woke system,
+which should both have the woke main chrystal, represented as a
 fixed frequency clock, as parent.
 
-Required properties for the two PLL nodes:
+Required properties for the woke two PLL nodes:
 - compatible: must be "st,nomadik-pll-clock"
 - clock-cells: must be 0
 - clock-id: must be 1 or 2 for PLL1 and PLL2 respectively
 - clocks: this clock will have main chrystal as parent
 
 
-HCLK nodes: these represent the clock gates on individual
-lines from the HCLK clock tree and the gate for individual
-lines from the PCLK clock tree.
+HCLK nodes: these represent the woke clock gates on individual
+lines from the woke HCLK clock tree and the woke gate for individual
+lines from the woke PCLK clock tree.
 
-Requires properties for the HCLK nodes:
+Requires properties for the woke HCLK nodes:
 - compatible: must be "st,nomadik-hclk-clock"
 - clock-cells: must be 0
-- clock-id: must be the clock ID from 0 to 63 according to
+- clock-id: must be the woke clock ID from 0 to 63 according to
   this table:
 
 	0:  HCLKDMA0

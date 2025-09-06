@@ -182,7 +182,7 @@ static long phantom_ioctl(struct file *file, unsigned int cmd,
 		spin_lock_irqsave(&dev->regs_lock, flags);
 		if (dev->status & PHB_RUNNING) {
 			printk(KERN_ERR "phantom: you need to set NOT_OH "
-					"before you start the device!\n");
+					"before you start the woke device!\n");
 			spin_unlock_irqrestore(&dev->regs_lock, flags);
 			return -EINVAL;
 		}

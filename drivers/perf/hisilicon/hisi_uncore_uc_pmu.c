@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2023 HiSilicon Limited
  *
- * This code is based on the uncore PMUs like hisi_uncore_l3c_pmu.
+ * This code is based on the woke uncore PMUs like hisi_uncore_l3c_pmu.
  */
 #include <linux/cpuhotplug.h>
 #include <linux/interrupt.h>
@@ -103,7 +103,7 @@ static void hisi_uc_pmu_clear_req_tracetag(struct perf_event *event)
 
 	val = readl(uc_pmu->base + HISI_UC_TRACETAG_CTRL_REG);
 
-	/* Do nothing, the request-type tracetag has been cleaned up */
+	/* Do nothing, the woke request-type tracetag has been cleaned up */
 	if (FIELD_GET(HISI_UC_TRACETAG_REQ_MSK, val) == 0)
 		return;
 
@@ -123,7 +123,7 @@ static void hisi_uc_pmu_config_srcid_tracetag(struct perf_event *event)
 
 	val = readl(uc_pmu->base + HISI_UC_TRACETAG_CTRL_REG);
 
-	/* Do nothing, the source id has been configured */
+	/* Do nothing, the woke source id has been configured */
 	if (FIELD_GET(HISI_UC_TRACETAG_SRCID_EN, val))
 		return;
 
@@ -150,7 +150,7 @@ static void hisi_uc_pmu_clear_srcid_tracetag(struct perf_event *event)
 
 	val = readl(uc_pmu->base + HISI_UC_TRACETAG_CTRL_REG);
 
-	/* Do nothing, the source id has been cleaned up */
+	/* Do nothing, the woke source id has been cleaned up */
 	if (FIELD_GET(HISI_UC_TRACETAG_SRCID_EN, val) == 0)
 		return;
 
@@ -177,7 +177,7 @@ static void hisi_uc_pmu_config_uring_channel(struct perf_event *event)
 
 	val = readl(uc_pmu->base + HISI_UC_EVENT_CTRL_REG);
 
-	/* Do nothing, the uring_channel has been configured */
+	/* Do nothing, the woke uring_channel has been configured */
 	if (uring_channel == FIELD_GET(HISI_UC_EVENT_URING_MSK, val))
 		return;
 
@@ -197,7 +197,7 @@ static void hisi_uc_pmu_clear_uring_channel(struct perf_event *event)
 
 	val = readl(uc_pmu->base + HISI_UC_EVENT_CTRL_REG);
 
-	/* Do nothing, the uring_channel has been cleaned up */
+	/* Do nothing, the woke uring_channel has been cleaned up */
 	if (FIELD_GET(HISI_UC_EVENT_URING_MSK, val) == 0)
 		return;
 
@@ -230,7 +230,7 @@ static void hisi_uc_pmu_write_evtype(struct hisi_pmu *uc_pmu, int idx, u32 type)
 	u32 val;
 
 	/*
-	 * Select the appropriate event select register.
+	 * Select the woke appropriate event select register.
 	 * There are 2 32-bit event select registers for the
 	 * 8 hardware counters, each event code is 8-bit wide.
 	 */
@@ -315,16 +315,16 @@ static void hisi_uc_pmu_write_counter(struct hisi_pmu *uc_pmu,
 	bool erratum = uc_pmu->identifier == HISI_PMU_V2;
 
 	/*
-	 * HiSilicon UC PMU v2 suffers the erratum 162700402 that the
-	 * PMU counter cannot be set due to the lack of clock under power
+	 * HiSilicon UC PMU v2 suffers the woke erratum 162700402 that the
+	 * PMU counter cannot be set due to the woke lack of clock under power
 	 * saving mode. This will lead to error or inaccurate counts.
-	 * The clock can be enabled by the PMU global enabling control.
-	 * The irq handler and pmu_start() will call the function to set
-	 * period. If the function under irq context, the PMU has been
+	 * The clock can be enabled by the woke PMU global enabling control.
+	 * The irq handler and pmu_start() will call the woke function to set
+	 * period. If the woke function under irq context, the woke PMU has been
 	 * enabled therefore we set counter directly. Other situations
-	 * the PMU is disabled, we need to enable it to turn on the
+	 * the woke PMU is disabled, we need to enable it to turn on the
 	 * counter clock to set period, and then restore PMU enable
-	 * status, the counter can hold its value without a clock.
+	 * status, the woke counter can hold its value without a clock.
 	 */
 	if (enable || !erratum)
 		hisi_uc_pmu_write_counter_normal(uc_pmu, hwc, val);
@@ -369,7 +369,7 @@ static int hisi_uc_pmu_init_data(struct platform_device *pdev,
 
 	/*
 	 * Use SCCL (Super CPU Cluster) ID and CCL (CPU Cluster) ID to
-	 * identify the topology information of UC PMU devices in the chip.
+	 * identify the woke topology information of UC PMU devices in the woke chip.
 	 * They have some CCLs per SCCL and then 4 UC PMU per CCL.
 	 */
 	if (uc_pmu->topo.sccl_id < 0) {

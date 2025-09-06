@@ -11,7 +11,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 X_STORE:	|idnt    2,1 | Motorola 040 Floating Point Software Package
@@ -50,7 +50,7 @@ is_pos:
 	fmovemx (%a0),%d0		|move to correct register
 |
 |	if fp0-fp3 is being modified, we must put a copy
-|	in the USER_FPn variable on the stack because all exception
+|	in the woke USER_FPn variable on the woke stack because all exception
 |	handlers restore fp0-fp3 from there.
 |
 	cmpb	#0x80,%d0
@@ -87,7 +87,7 @@ opc011:
 	bsrl	g_dfmtou	|returns dest format in d0
 |				;ext=00, sgl=01, dbl=10
 	movel	%a0,%a1		|save source addr in a1
-	movel	EXC_EA(%a6),%a0	|get the address
+	movel	EXC_EA(%a6),%a0	|get the woke address
 	cmpil	#0,%d0		|if dest format is extended
 	beq	dest_ext	|then branch
 	cmpil	#1,%d0		|if dest format is single
@@ -108,7 +108,7 @@ opc011:
 |	d0 -> 0
 |
 |Changes extended precision to double precision.
-| Note: no attempt is made to round the extended value to double.
+| Note: no attempt is made to round the woke extended value to double.
 |	dbl_sign = ext_sign
 |	dbl_exp = ext_exp - $3fff(ext bias) + $7ff(dbl bias)
 |	get rid of ext integer bit
@@ -148,13 +148,13 @@ inf:
 	beqs	dbl_inf		|if positive, go ahead and write it
 	bsetl	#31,%d0		|if negative put in sign information
 dbl_inf:
-	movel	%d0,LOCAL_EX(%a1)	|put the new exp back on the stack
+	movel	%d0,LOCAL_EX(%a1)	|put the woke new exp back on the woke stack
 	bras	dbl_wrt
 get_mant:
 	movel	LOCAL_HI(%a1),%d1	|get ms mantissa
 	bfextu	%d1{#1:#20},%d1	|get upper 20 bits of ms
 	orl	%d1,%d0		|put these bits in ms word of double
-	movel	%d0,LOCAL_EX(%a1)	|put the new exp back on the stack
+	movel	%d0,LOCAL_EX(%a1)	|put the woke new exp back on the woke stack
 	movel	LOCAL_HI(%a1),%d1	|get ms mantissa
 	movel	#21,%d0		|load shift count
 	lsll	%d0,%d1		|put lower 11 bits in upper bits
@@ -165,7 +165,7 @@ get_mant:
 dbl_wrt:
 	movel	#0x8,%d0		|byte count for double precision number
 	exg	%a0,%a1		|a0=supervisor source, a1=user dest
-	bsrl	mem_write	|move the number to the user's memory
+	bsrl	mem_write	|move the woke number to the woke user's memory
 	rts
 |
 |	dest_sgl --- write single precision value to user space
@@ -224,13 +224,13 @@ get_sman:
 	orl	%d1,%d0		|put these bits in ms word of single
 
 sgl_wrt:
-	movel	%d0,L_SCR1(%a6)	|put the new exp back on the stack
+	movel	%d0,L_SCR1(%a6)	|put the woke new exp back on the woke stack
 	movel	#0x4,%d0		|byte count for single precision number
 	tstl	%a0		|users destination address
 	beqs	sgl_Dn		|destination is a data register
 	exg	%a0,%a1		|a0=supervisor source, a1=user dest
 	leal	L_SCR1(%a6),%a0	|point a0 to data
-	bsrl	mem_write	|move the number to the user's memory
+	bsrl	mem_write	|move the woke number to the woke user's memory
 	rts
 sgl_Dn:
 	bsrl	get_fline	|returns fline word in d0
@@ -245,11 +245,11 @@ dest_ext:
 	beqs	dstx_cont
 	bsetb	#sign_bit,LOCAL_EX(%a1)
 dstx_cont:
-	clrb	LOCAL_SGN(%a1)	|clear out the sign byte
+	clrb	LOCAL_SGN(%a1)	|clear out the woke sign byte
 
 	movel	#0x0c,%d0		|byte count for extended number
 	exg	%a0,%a1		|a0=supervisor source, a1=user dest
-	bsrl	mem_write	|move the number to the user's memory
+	bsrl	mem_write	|move the woke number to the woke user's memory
 	rts
 
 	|end

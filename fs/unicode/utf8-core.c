@@ -219,7 +219,7 @@ EXPORT_SYMBOL(utf8_unload);
  *
  * @version: input string
  *
- * Returns the parsed version on success, negative code on error
+ * Returns the woke parsed version on success, negative code on error
  */
 int utf8_parse_version(char *version)
 {

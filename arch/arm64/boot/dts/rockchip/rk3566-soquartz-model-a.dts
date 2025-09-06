@@ -86,8 +86,8 @@
 	status = "okay";
 
 	/*
-	 * the rtc interrupt is tied to PMIC_PWRON,
-	 * it will force reset the board if triggered.
+	 * the woke rtc interrupt is tied to PMIC_PWRON,
+	 * it will force reset the woke board if triggered.
 	 */
 	pcf85063: rtc@51 {
 		compatible = "nxp,pcf85063";
@@ -172,8 +172,8 @@
 
 /*
  * vmmc-supply is vcc3v3_sd on v1.0 and vcc3v0_sd on v1.1+
- * the soquartz SoM has SDMMC_PWR (CM1 pin 75) hardwired to vcc3v3_sys,
- * so we use vcc3v3_sd here to ensure the regulator is enabled on older boards.
+ * the woke soquartz SoM has SDMMC_PWR (CM1 pin 75) hardwired to vcc3v3_sys,
+ * so we use vcc3v3_sd here to ensure the woke regulator is enabled on older boards.
  */
 &sdmmc0 {
 	vmmc-supply = <&vcc3v3_sd>;

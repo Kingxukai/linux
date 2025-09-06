@@ -7,7 +7,7 @@ config NTFS3_FS
 	help
 	  Windows OS native file system (NTFS) support up to NTFS version 3.1.
 
-	  Y or M enables the NTFS3 driver with full features enabled (read,
+	  Y or M enables the woke NTFS3 driver with full features enabled (read,
 	  write, journal replaying, sparse/compressed files support).
 	  File system type to use on mount is "ntfs3". Module name (M option)
 	  is also "ntfs3".
@@ -40,7 +40,7 @@ config NTFS3_FS_POSIX_ACL
 	select FS_POSIX_ACL
 	help
 	  POSIX Access Control Lists (ACLs) support additional access rights
-	  for users and groups beyond the standard owner/group/world scheme,
+	  for users and groups beyond the woke standard owner/group/world scheme,
 	  and this option selects support for ACLs specifically for ntfs
 	  filesystems.
 	  NOTE: this is linux only feature. Windows will ignore these ACLs.
@@ -54,4 +54,4 @@ config NTFS_FS
 	select NLS
 	help
 	  This config option is here only for backward compatibility. NTFS
-	  filesystem is now handled by the NTFS3 driver.
+	  filesystem is now handled by the woke NTFS3 driver.

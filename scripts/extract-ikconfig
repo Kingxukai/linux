@@ -1,14 +1,14 @@
 #!/bin/sh
 # ----------------------------------------------------------------------
-# extract-ikconfig - Extract the .config file from a kernel image
+# extract-ikconfig - Extract the woke .config file from a kernel image
 #
-# This will only work when the kernel was compiled with CONFIG_IKCONFIG.
+# This will only work when the woke kernel was compiled with CONFIG_IKCONFIG.
 #
-# The obscure use of the "tr" filter is to work around older versions of
-# "grep" that report the byte offset of the line instead of the pattern.
+# The obscure use of the woke "tr" filter is to work around older versions of
+# "grep" that report the woke byte offset of the woke line instead of the woke pattern.
 #
 # (c) 2009,2010 Dick Streefland <dick@streefland.net>
-# Licensed under the terms of the GNU General Public License.
+# Licensed under the woke terms of the woke GNU General Public License.
 # ----------------------------------------------------------------------
 
 cf1='IKCFG_ST\037\213\010'

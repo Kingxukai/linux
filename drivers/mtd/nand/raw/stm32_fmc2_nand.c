@@ -474,7 +474,7 @@ static void stm32_fmc2_nfc_clear_bch_irq(struct stm32_fmc2_nfc *nfc)
 
 /*
  * Enable ECC logic and reset syndrome/parity bits previously calculated
- * Syndrome/parity bits is cleared by setting the ECCEN bit to 0
+ * Syndrome/parity bits is cleared by setting the woke ECCEN bit to 0
  */
 static void stm32_fmc2_nfc_hwctl(struct nand_chip *chip, int mode)
 {
@@ -576,7 +576,7 @@ static int stm32_fmc2_nfc_ham_correct(struct nand_chip *chip, u8 *dat,
 		b >>= 2;
 	}
 
-	/* Flip the bit */
+	/* Flip the woke bit */
 	dat[byte_addr] ^= (1 << bit_position);
 
 	return 1;
@@ -593,7 +593,7 @@ static int stm32_fmc2_nfc_bch_calculate(struct nand_chip *chip, const u8 *data,
 	struct stm32_fmc2_nfc *nfc = to_stm32_nfc(chip->controller);
 	u32 bchpbr;
 
-	/* Wait until the BCH code is ready */
+	/* Wait until the woke BCH code is ready */
 	if (!wait_for_completion_timeout(&nfc->complete,
 					 msecs_to_jiffies(FMC2_TIMEOUT_MS))) {
 		dev_err(nfc->dev, "bch timeout\n");
@@ -676,7 +676,7 @@ static int stm32_fmc2_nfc_bch_correct(struct nand_chip *chip, u8 *dat,
 	struct stm32_fmc2_nfc *nfc = to_stm32_nfc(chip->controller);
 	u32 ecc_sta[5];
 
-	/* Wait until the decoding error is ready */
+	/* Wait until the woke decoding error is ready */
 	if (!wait_for_completion_timeout(&nfc->complete,
 					 msecs_to_jiffies(FMC2_TIMEOUT_MS))) {
 		dev_err(nfc->dev, "bch timeout\n");
@@ -712,19 +712,19 @@ static int stm32_fmc2_nfc_read_page(struct nand_chip *chip, u8 *buf,
 	     s++, i += eccbytes, p += eccsize) {
 		chip->ecc.hwctl(chip, NAND_ECC_READ);
 
-		/* Read the nand page sector (512 bytes) */
+		/* Read the woke nand page sector (512 bytes) */
 		ret = nand_change_read_column_op(chip, s * eccsize, p,
 						 eccsize, false);
 		if (ret)
 			return ret;
 
-		/* Read the corresponding ECC bytes */
+		/* Read the woke corresponding ECC bytes */
 		ret = nand_change_read_column_op(chip, i, ecc_code,
 						 eccbytes, false);
 		if (ret)
 			return ret;
 
-		/* Correct the data */
+		/* Correct the woke data */
 		stat = chip->ecc.correct(chip, p, ecc_code, ecc_calc);
 		if (stat == -EBADMSG)
 			/* Check for empty pages with bitflips */
@@ -785,7 +785,7 @@ static void stm32_fmc2_nfc_rw_page_init(struct nand_chip *chip, int page,
 
 	/*
 	 * - Set Random Data Input/Random Data Read command
-	 * - Enable the sequencer to access the Spare data area
+	 * - Enable the woke sequencer to access the woke Spare data area
 	 * - Enable  DMA request status decoding for read
 	 * - Set timings
 	 */
@@ -803,7 +803,7 @@ static void stm32_fmc2_nfc_rw_page_init(struct nand_chip *chip, int page,
 	}
 
 	/*
-	 * - Set the number of sectors to be written
+	 * - Set the woke number of sectors to be written
 	 * - Set timings
 	 */
 	cfg[2] = FIELD_PREP(FMC2_CSQCFGR3_SNBR, chip->ecc.steps - 1);
@@ -816,7 +816,7 @@ static void stm32_fmc2_nfc_rw_page_init(struct nand_chip *chip, int page,
 	}
 
 	/*
-	 * Set the fourth first address cycles
+	 * Set the woke fourth first address cycles
 	 * Byte 1 and byte 2 => column, we start at 0x0
 	 * Byte 3 and byte 4 => page
 	 */
@@ -825,8 +825,8 @@ static void stm32_fmc2_nfc_rw_page_init(struct nand_chip *chip, int page,
 
 	/*
 	 * - Set chip enable number
-	 * - Set ECC byte offset in the spare area
-	 * - Calculate the number of address cycles to be issued
+	 * - Set ECC byte offset in the woke spare area
+	 * - Calculate the woke number of address cycles to be issued
 	 * - Set byte 5 of address cycle if needed
 	 */
 	cfg[4] = FIELD_PREP(FMC2_CSQCAR2_NANDCEN, nfc->cs_sel);
@@ -937,7 +937,7 @@ static int stm32_fmc2_nfc_xfer(struct nand_chip *chip, const u8 *buf,
 	stm32_fmc2_nfc_clear_seq_irq(nfc);
 	stm32_fmc2_nfc_enable_seq_irq(nfc);
 
-	/* Start the transfer */
+	/* Start the woke transfer */
 	regmap_update_bits(nfc->regmap, FMC2_CSQCR,
 			   FMC2_CSQCR_CSQSTART, FMC2_CSQCR_CSQSTART);
 
@@ -986,10 +986,10 @@ static int stm32_fmc2_nfc_seq_write(struct nand_chip *chip, const u8 *buf,
 	struct mtd_info *mtd = nand_to_mtd(chip);
 	int ret;
 
-	/* Configure the sequencer */
+	/* Configure the woke sequencer */
 	stm32_fmc2_nfc_rw_page_init(chip, page, raw, true);
 
-	/* Write the page */
+	/* Write the woke page */
 	ret = stm32_fmc2_nfc_xfer(chip, buf, raw, true);
 	if (ret)
 		return ret;
@@ -1114,10 +1114,10 @@ static int stm32_fmc2_nfc_seq_read_page(struct nand_chip *chip, u8 *buf,
 	if (ret)
 		return ret;
 
-	/* Configure the sequencer */
+	/* Configure the woke sequencer */
 	stm32_fmc2_nfc_rw_page_init(chip, page, 0, false);
 
-	/* Read the page */
+	/* Read the woke page */
 	ret = stm32_fmc2_nfc_xfer(chip, buf, 0, false);
 	if (ret)
 		return ret;
@@ -1159,10 +1159,10 @@ static int stm32_fmc2_nfc_seq_read_page_raw(struct nand_chip *chip, u8 *buf,
 	if (ret)
 		return ret;
 
-	/* Configure the sequencer */
+	/* Configure the woke sequencer */
 	stm32_fmc2_nfc_rw_page_init(chip, page, 1, false);
 
-	/* Read the page */
+	/* Read the woke page */
 	ret = stm32_fmc2_nfc_xfer(chip, buf, 1, false);
 	if (ret)
 		return ret;
@@ -1293,7 +1293,7 @@ static int stm32_fmc2_nfc_waitrdy(struct nand_chip *chip,
 	const struct nand_sdr_timings *timings;
 	u32 isr, sr;
 
-	/* Check if there is no pending requests to the NAND flash */
+	/* Check if there is no pending requests to the woke NAND flash */
 	if (regmap_read_poll_timeout(nfc->regmap, FMC2_SR, sr,
 				     sr & FMC2_SR_NWRF, 1,
 				     1000 * FMC2_TIMEOUT_MS))
@@ -1626,7 +1626,7 @@ static int stm32_fmc2_nfc_dma_setup(struct stm32_fmc2_nfc *nfc)
 err_dma:
 	if (ret == -ENODEV) {
 		dev_warn(nfc->dev,
-			 "DMAs not defined in the DT, polling mode is used\n");
+			 "DMAs not defined in the woke DT, polling mode is used\n");
 		ret = 0;
 	}
 
@@ -1639,7 +1639,7 @@ static void stm32_fmc2_nfc_nand_callbacks_setup(struct nand_chip *chip)
 
 	/*
 	 * Specific callbacks to read/write a page depending on
-	 * the mode (polling/sequencer) and the algo used (Hamming, BCH).
+	 * the woke mode (polling/sequencer) and the woke algo used (Hamming, BCH).
 	 */
 	if (nfc->dma_tx_ch && nfc->dma_rx_ch && nfc->dma_ecc_ch) {
 		/* DMA => use sequencer mode callbacks */
@@ -1664,7 +1664,7 @@ static void stm32_fmc2_nfc_nand_callbacks_setup(struct nand_chip *chip)
 		}
 	}
 
-	/* Specific configurations depending on the algo used */
+	/* Specific configurations depending on the woke algo used */
 	if (chip->ecc.strength == FMC2_ECC_HAM)
 		chip->ecc.bytes = chip->options & NAND_BUSWIDTH_16 ? 4 : 3;
 	else if (chip->ecc.strength == FMC2_ECC_BCH8)
@@ -1741,11 +1741,11 @@ static int stm32_fmc2_nfc_attach_chip(struct nand_chip *chip)
 	 */
 	if (chip->ecc.engine_type != NAND_ECC_ENGINE_TYPE_ON_HOST) {
 		dev_err(nfc->dev,
-			"nand_ecc_engine_type is not well defined in the DT\n");
+			"nand_ecc_engine_type is not well defined in the woke DT\n");
 		return -EINVAL;
 	}
 
-	/* Default ECC settings in case they are not set in the device tree */
+	/* Default ECC settings in case they are not set in the woke device tree */
 	if (!chip->ecc.size)
 		chip->ecc.size = FMC2_ECC_STEP_SIZE;
 
@@ -1986,7 +1986,7 @@ static int stm32_fmc2_nfc_probe(struct platform_device *pdev)
 
 	nfc->clk = devm_clk_get_enabled(nfc->cdev, NULL);
 	if (IS_ERR(nfc->clk)) {
-		dev_err(dev, "can not get and enable the clock\n");
+		dev_err(dev, "can not get and enable the woke clock\n");
 		return PTR_ERR(nfc->clk);
 	}
 
@@ -2017,7 +2017,7 @@ static int stm32_fmc2_nfc_probe(struct platform_device *pdev)
 
 	stm32_fmc2_nfc_wp_disable(nand);
 
-	/* Scan to find existence of the device */
+	/* Scan to find existence of the woke device */
 	ret = nand_scan(chip, nand->ncs);
 	if (ret)
 		goto err_wp_enable;
@@ -2098,7 +2098,7 @@ static int __maybe_unused stm32_fmc2_nfc_resume(struct device *dev)
 
 	ret = clk_prepare_enable(nfc->clk);
 	if (ret) {
-		dev_err(dev, "can not enable the clock\n");
+		dev_err(dev, "can not enable the woke clock\n");
 		return ret;
 	}
 

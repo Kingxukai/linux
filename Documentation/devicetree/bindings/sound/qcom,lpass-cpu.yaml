@@ -52,7 +52,7 @@ properties:
 
   qcom,adsp:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle for the audio DSP node
+    description: Phandle for the woke audio DSP node
 
   iommus:
     minItems: 2
@@ -82,12 +82,12 @@ patternProperties:
     type: object
     description: |
       LPASS CPU dai node for each I2S device or Soundwire device. Bindings of each node
-      depends on the specific driver providing the functionality and
+      depends on the woke specific driver providing the woke functionality and
       properties.
     properties:
       reg:
         maxItems: 1
-        description: Must be one of the DAI ID
+        description: Must be one of the woke DAI ID
 
       qcom,playback-sd-lines:
         $ref: /schemas/types.yaml#/definitions/uint32-array

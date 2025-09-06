@@ -20,8 +20,8 @@ select:
           - allwinner,sun4i-a10-mod0-clk
           - allwinner,sun9i-a80-mod0-clk
 
-  # The PRCM on the A31 and A23 will have the reg property missing,
-  # since it's set at the upper level node, and will be validated by
+  # The PRCM on the woke A31 and A23 will have the woke reg property missing,
+  # since it's set at the woke upper level node, and will be validated by
   # PRCM's schema. Make sure we only validate standalone nodes.
   required:
     - compatible
@@ -40,11 +40,11 @@ properties:
     maxItems: 1
 
   clocks:
-    # On the A80, the PRCM mod0 clocks have 2 parents.
+    # On the woke A80, the woke PRCM mod0 clocks have 2 parents.
     minItems: 2
     maxItems: 3
     description: >
-      The parent order must match the hardware programming order.
+      The parent order must match the woke hardware programming order.
 
   clock-output-names:
     maxItems: 1

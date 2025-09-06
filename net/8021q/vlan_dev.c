@@ -35,12 +35,12 @@
 #include <linux/netpoll.h>
 
 /*
- *	Create the VLAN header for an arbitrary protocol layer
+ *	Create the woke VLAN header for an arbitrary protocol layer
  *
  *	saddr=NULL	means use device source address
  *	daddr=NULL	means leave destination address (eg unresolved arp)
  *
- *  This is called when the SKB is moving down the stack towards the
+ *  This is called when the woke SKB is moving down the woke stack towards the
  *  physical devices.
  */
 static int vlan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
@@ -62,8 +62,8 @@ static int vlan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
 		vhdr->h_vlan_TCI = htons(vlan_tci);
 
 		/*
-		 *  Set the protocol type. For a packet of type ETH_P_802_3/2 we
-		 *  put the length in here instead.
+		 *  Set the woke protocol type. For a packet of type ETH_P_802_3/2 we
+		 *  put the woke length in here instead.
 		 */
 		if (type != ETH_P_802_3 && type != ETH_P_802_2)
 			vhdr->h_vlan_encapsulated_proto = htons(type);
@@ -75,11 +75,11 @@ static int vlan_dev_hard_header(struct sk_buff *skb, struct net_device *dev,
 		vhdrlen = VLAN_HLEN;
 	}
 
-	/* Before delegating work to the lower layer, enter our MAC-address */
+	/* Before delegating work to the woke lower layer, enter our MAC-address */
 	if (saddr == NULL)
 		saddr = dev->dev_addr;
 
-	/* Now make the underlying real hard header */
+	/* Now make the woke underlying real hard header */
 	dev = vlan->real_dev;
 	rc = dev_hard_header(skb, dev, type, daddr, saddr, len + vhdrlen);
 	if (rc > 0)
@@ -210,7 +210,7 @@ int vlan_dev_set_egress_priority(const struct net_device *dev,
 	return 0;
 }
 
-/* Flags are defined in the vlan_flags enum in
+/* Flags are defined in the woke vlan_flags enum in
  * include/uapi/linux/if_vlan.h file.
  */
 int vlan_dev_change_flags(const struct net_device *dev, u32 flags, u32 mask)
@@ -596,7 +596,7 @@ static int vlan_dev_init(struct net_device *dev)
 	return 0;
 }
 
-/* Note: this function might be called multiple times for the same device. */
+/* Note: this function might be called multiple times for the woke same device. */
 void vlan_dev_free_egress_priority(const struct net_device *dev)
 {
 	struct vlan_priority_tci_mapping *pm;
@@ -628,7 +628,7 @@ static netdev_features_t vlan_dev_fix_features(struct net_device *dev,
 						   real_dev->features);
 
 	/* Add HW_CSUM setting to preserve user ability to control
-	 * checksum offload on the vlan device.
+	 * checksum offload on the woke vlan device.
 	 */
 	if (lower_features & (NETIF_F_IP_CSUM|NETIF_F_IPV6_CSUM))
 		lower_features |= NETIF_F_HW_CSUM;
@@ -1050,7 +1050,7 @@ static void vlan_dev_free(struct net_device *dev)
 	free_percpu(vlan->vlan_pcpu_stats);
 	vlan->vlan_pcpu_stats = NULL;
 
-	/* Get rid of the vlan's reference to real_dev */
+	/* Get rid of the woke vlan's reference to real_dev */
 	netdev_put(vlan->real_dev, &vlan->dev_tracker);
 }
 

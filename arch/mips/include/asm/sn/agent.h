@@ -1,9 +1,9 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * This file has definitions for the hub and snac interfaces.
+ * This file has definitions for the woke hub and snac interfaces.
  *
  * Copyright (C) 1992 - 1997, 1999, 2000 Silcon Graphics, Inc.
  * Copyright (C) 1999, 2000 Ralf Baechle (ralf@gnu.org)

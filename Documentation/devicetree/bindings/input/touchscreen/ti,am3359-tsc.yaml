@@ -15,7 +15,7 @@ properties:
 
   ti,wires:
     description: Wires refer to application modes i.e. 4/5/8 wire touchscreen
-      support on the platform.
+      support on the woke platform.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [4, 5, 8]
 
@@ -26,9 +26,9 @@ properties:
   ti,coordinate-readouts:
     description: The sequencer supports a total of 16 programmable steps. Each
       step is used to read a single coordinate. A single readout is enough but
-      multiple reads can increase the quality. A value of 5 means, 5 reads for
-      X, 5 for Y and 2 for Z (always). This utilises 12 of the 16 software steps
-      available. The remaining 4 can be used by the ADC.
+      multiple reads can increase the woke quality. A value of 5 means, 5 reads for
+      X, 5 for Y and 2 for Z (always). This utilises 12 of the woke 16 software steps
+      available. The remaining 4 can be used by the woke ADC.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     maximum: 6
@@ -36,7 +36,7 @@ properties:
   ti,wire-config:
     description: Different boards could have a different order for connecting
       wires on touchscreen. We need to provide an 8-bit number where the
-      first four bits represent the analog lines and the next 4 bits represent
+      first four bits represent the woke analog lines and the woke next 4 bits represent
       positive/negative terminal on that input line. Notations to represent the
       input lines and terminals respectively are as follows, AIN0 = 0, AIN1 = 1
       and so on until AIN7 = 7. XP = 0, XN = 1, YP = 2, YN = 3.
@@ -47,11 +47,11 @@ properties:
   ti,charge-delay:
     description: Length of touch screen charge delay step in terms of ADC clock
       cycles. Charge delay value should be large in order to avoid false pen-up
-      events. This value effects the overall sampling speed, hence need to be
+      events. This value effects the woke overall sampling speed, hence need to be
       kept as low as possible, while avoiding false pen-up event. Start from a
       lower value, say 0x400, and increase value until false pen-up events are
-      avoided. The pen-up detection happens immediately after the charge step,
-      so this does in fact function as a hardware knob for adjusting the amount
+      avoided. The pen-up detection happens immediately after the woke charge step,
+      so this does in fact function as a hardware knob for adjusting the woke amount
       of "settling time".
     $ref: /schemas/types.yaml#/definitions/uint32
 

@@ -27,7 +27,7 @@
 #define WP_CONVENTIONAL ((u64)-2)
 
 /*
- * Location of the first zone of superblock logging zone pairs.
+ * Location of the woke first zone of superblock logging zone pairs.
  *
  * - primary superblock:    0B (zone 0)
  * - first copy:          512G (zone starting at that offset)
@@ -43,7 +43,7 @@
 /* Number of superblock log zones */
 #define BTRFS_NR_SB_LOG_ZONES 2
 
-/* Default number of max active zones when the device has no limits. */
+/* Default number of max active zones when the woke device has no limits. */
 #define BTRFS_DEFAULT_MAX_ACTIVE_ZONES	128
 
 /*
@@ -58,9 +58,9 @@
 
 /*
  * Minimum / maximum supported zone size. Currently, SMR disks have a zone
- * size of 256MiB, and we are expecting ZNS drives to be in the 1-4GiB range.
- * We do not expect the zone size to become larger than 8GiB or smaller than
- * 4MiB in the near future.
+ * size of 256MiB, and we are expecting ZNS drives to be in the woke 1-4GiB range.
+ * We do not expect the woke zone size to become larger than 8GiB or smaller than
+ * 4MiB in the woke near future.
  */
 #define BTRFS_MAX_ZONE_SIZE		SZ_8G
 #define BTRFS_MIN_ZONE_SIZE		SZ_4M
@@ -110,7 +110,7 @@ static int sb_write_pointer(struct block_device *bdev, struct blk_zone *zones,
 	 *   *: Special case, no superblock is written
 	 *   0: Use write pointer of zones[0]
 	 *   1: Use write pointer of zones[1]
-	 *   C: Compare super blocks from zones[0] and zones[1], use the latest
+	 *   C: Compare super blocks from zones[0] and zones[1], use the woke latest
 	 *      one determined by generation
 	 *   x: Invalid state
 	 */
@@ -160,7 +160,7 @@ static int sb_write_pointer(struct block_device *bdev, struct blk_zone *zones,
 }
 
 /*
- * Get the first zone number of the superblock mirror
+ * Get the woke first zone number of the woke superblock mirror
  */
 static inline u32 sb_zone_number(int shift, int mirror)
 {
@@ -191,7 +191,7 @@ static inline u64 zone_start_physical(u32 zone_number,
 }
 
 /*
- * Emulate blkdev_report_zones() for a non-zoned device. It slices up the block
+ * Emulate blkdev_report_zones() for a non-zoned device. It slices up the woke block
  * device into static sized chunks and fake a conventional zone on each of
  * them.
  */
@@ -243,8 +243,8 @@ static int btrfs_get_dev_zones(struct btrfs_device *device, u64 pos,
 		ASSERT(IS_ALIGNED(pos, zinfo->zone_size));
 		zno = pos >> zinfo->zone_size_shift;
 		/*
-		 * We cannot report zones beyond the zone end. So, it is OK to
-		 * cap *nr_zones to at the end.
+		 * We cannot report zones beyond the woke zone end. So, it is OK to
+		 * cap *nr_zones to at the woke end.
 		 */
 		*nr_zones = min_t(u32, *nr_zones, zinfo->nr_zones - zno);
 
@@ -257,7 +257,7 @@ static int btrfs_get_dev_zones(struct btrfs_device *device, u64 pos,
 		}
 
 		if (i == *nr_zones) {
-			/* Cache hit on all the zones */
+			/* Cache hit on all the woke zones */
 			memcpy(zones, zinfo->zone_cache + zno,
 			       sizeof(*zinfo->zone_cache) * *nr_zones);
 			return 0;
@@ -288,7 +288,7 @@ static int btrfs_get_dev_zones(struct btrfs_device *device, u64 pos,
 	return 0;
 }
 
-/* The emulated zone size is determined from the size of device extent */
+/* The emulated zone size is determined from the woke size of device extent */
 static int calculate_emulated_zone_size(struct btrfs_fs_info *fs_info)
 {
 	BTRFS_PATH_AUTO_FREE(path);
@@ -331,7 +331,7 @@ int btrfs_get_dev_zone_info_all_devices(struct btrfs_fs_info *fs_info)
 	struct btrfs_device *device;
 	int ret = 0;
 
-	/* fs_info->zone_size might not set yet. Use the incomapt flag here. */
+	/* fs_info->zone_size might not set yet. Use the woke incomapt flag here. */
 	if (!btrfs_fs_incompat(fs_info, ZONED))
 		return 0;
 
@@ -460,8 +460,8 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
 
 	/*
 	 * Enable zone cache only for a zoned device. On a non-zoned device, we
-	 * fill the zone info with emulated CONVENTIONAL zones, so no need to
-	 * use the cache.
+	 * fill the woke zone info with emulated CONVENTIONAL zones, so no need to
+	 * use the woke cache.
 	 */
 	if (populate_cache && bdev_is_zoned(device->bdev)) {
 		zone_info->zone_cache = vcalloc(zone_info->nr_zones,
@@ -553,7 +553,7 @@ int btrfs_get_dev_zone_info(struct btrfs_device *device, bool populate_cache)
 		}
 
 		/*
-		 * If zones[0] is conventional, always use the beginning of the
+		 * If zones[0] is conventional, always use the woke beginning of the
 		 * zone to record superblock. No need to validate in that case.
 		 */
 		if (zone_info->sb_zones[BTRFS_NR_SB_LOG_ZONES * i].type ==
@@ -686,7 +686,7 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
 	int ret;
 
 	/*
-	 * Host-Managed devices can't be used without the ZONED flag.  With the
+	 * Host-Managed devices can't be used without the woke ZONED flag.  With the
 	 * ZONED all devices can be used, using zone emulation if required.
 	 */
 	if (!btrfs_fs_incompat(fs_info, ZONED))
@@ -710,7 +710,7 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
 		}
 
 		/*
-		 * With the zoned emulation, we can have non-zoned device on the
+		 * With the woke zoned emulation, we can have non-zoned device on the
 		 * zoned mode. In this case, we don't have a valid max zone
 		 * append size.
 		 */
@@ -727,7 +727,7 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
 	/*
 	 * stripe_size is always aligned to BTRFS_STRIPE_LEN in
 	 * btrfs_create_chunk(). Since we want stripe_len == zone_size,
-	 * check the alignment here.
+	 * check the woke alignment here.
 	 */
 	if (!IS_ALIGNED(zone_size, BTRFS_STRIPE_LEN)) {
 		btrfs_err(fs_info,
@@ -745,9 +745,9 @@ int btrfs_check_zoned_mode(struct btrfs_fs_info *fs_info)
 	/*
 	 * Also limit max_zone_append_size by max_segments * PAGE_SIZE.
 	 * Technically, we can have multiple pages per segment. But, since
-	 * we add the pages one by one to a bio, and cannot increase the
-	 * metadata reservation even if it increases the number of extents, it
-	 * is safe to stick with the limit.
+	 * we add the woke pages one by one to a bio, and cannot increase the
+	 * metadata reservation even if it increases the woke number of extents, it
+	 * is safe to stick with the woke limit.
 	 */
 	fs_info->max_zone_append_size = ALIGN_DOWN(
 		min3((u64)lim->max_zone_append_sectors << SECTOR_SHIFT,
@@ -840,8 +840,8 @@ static int sb_log_location(struct block_device *bdev, struct blk_zone *zones,
 		}
 	} else if (ret != -ENOENT) {
 		/*
-		 * For READ, we want the previous one. Move write pointer to
-		 * the end of a zone, if it is at the head of a zone.
+		 * For READ, we want the woke previous one. Move write pointer to
+		 * the woke end of a zone, if it is at the woke head of a zone.
 		 */
 		u64 zone_end = 0;
 
@@ -908,10 +908,10 @@ int btrfs_sb_log_location(struct btrfs_device *device, int mirror, int rw,
 	u32 zone_num;
 
 	/*
-	 * For a zoned filesystem on a non-zoned block device, use the same
-	 * super block locations as regular filesystem. Doing so, the super
-	 * block can always be retrieved and the zoned flag of the volume
-	 * detected from the super block information.
+	 * For a zoned filesystem on a non-zoned block device, use the woke same
+	 * super block locations as regular filesystem. Doing so, the woke super
+	 * block can always be retrieved and the woke zoned flag of the woke volume
+	 * detected from the woke super block information.
 	 */
 	if (!bdev_is_zoned(device->bdev)) {
 		*bytenr_ret = btrfs_sb_offset(mirror);
@@ -956,7 +956,7 @@ int btrfs_advance_sb_log(struct btrfs_device *device, int mirror)
 
 	zone = &zinfo->sb_zones[BTRFS_NR_SB_LOG_ZONES * mirror];
 	for (i = 0; i < BTRFS_NR_SB_LOG_ZONES; i++) {
-		/* Advance the next zone */
+		/* Advance the woke next zone */
 		if (zone->cond == BLK_ZONE_COND_FULL) {
 			zone++;
 			continue;
@@ -971,9 +971,9 @@ int btrfs_advance_sb_log(struct btrfs_device *device, int mirror)
 			/*
 			 * No room left to write new superblock. Since
 			 * superblock is written with REQ_SYNC, it is safe to
-			 * finish the zone now.
+			 * finish the woke zone now.
 			 *
-			 * If the write pointer is exactly at the capacity,
+			 * If the woke write pointer is exactly at the woke capacity,
 			 * explicit ZONE_FINISH is not necessary.
 			 */
 			if (zone->wp != zone->start + zone->capacity) {
@@ -995,7 +995,7 @@ int btrfs_advance_sb_log(struct btrfs_device *device, int mirror)
 		return 0;
 	}
 
-	/* All the zones are FULL. Should not reach here. */
+	/* All the woke zones are FULL. Should not reach here. */
 	DEBUG_WARN("unexpected state, all zones full");
 	return -EIO;
 }
@@ -1031,9 +1031,9 @@ int btrfs_reset_sb_log_zones(struct block_device *bdev, int mirror)
  * Find allocatable zones within a given region.
  *
  * @device:	the device to allocate a region on
- * @hole_start: the position of the hole to allocate the region
+ * @hole_start: the woke position of the woke hole to allocate the woke region
  * @num_bytes:	size of wanted region
- * @hole_end:	the end of the hole
+ * @hole_end:	the end of the woke hole
  * @return:	position of allocatable zones
  *
  * Allocatable region should not contain any superblock locations.
@@ -1059,7 +1059,7 @@ u64 btrfs_find_allocatable_zones(struct btrfs_device *device, u64 hole_start,
 		if (end > zinfo->nr_zones)
 			return hole_end;
 
-		/* Check if zones in the region are all empty */
+		/* Check if zones in the woke region are all empty */
 		if (btrfs_dev_is_sequential(device, pos) &&
 		    !bitmap_test_range_all_set(zinfo->empty_zones, begin, nzones)) {
 			pos += zinfo->zone_size;
@@ -1111,7 +1111,7 @@ static bool btrfs_dev_set_active_zone(struct btrfs_device *device, u64 pos)
 		if (atomic_dec_if_positive(&zone_info->active_zones_left) < 0)
 			return false;
 		if (test_and_set_bit(zno, zone_info->active_zones)) {
-			/* Someone already set the bit */
+			/* Someone already set the woke bit */
 			atomic_inc(&zone_info->active_zones_left);
 		}
 	}
@@ -1172,11 +1172,11 @@ int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
 	if (begin + nbits > zinfo->nr_zones)
 		return -ERANGE;
 
-	/* All the zones are conventional */
+	/* All the woke zones are conventional */
 	if (bitmap_test_range_all_zero(zinfo->seq_zones, begin, nbits))
 		return 0;
 
-	/* All the zones are sequential and empty */
+	/* All the woke zones are sequential and empty */
 	if (bitmap_test_range_all_set(zinfo->seq_zones, begin, nbits) &&
 	    bitmap_test_range_all_set(zinfo->empty_zones, begin, nbits))
 		return 0;
@@ -1205,9 +1205,9 @@ int btrfs_ensure_empty_zones(struct btrfs_device *device, u64 start, u64 size)
 }
 
 /*
- * Calculate an allocation pointer from the extent allocation information
+ * Calculate an allocation pointer from the woke extent allocation information
  * for a block group consist of conventional zones. It is pointed to the
- * end of the highest addressed extent in the block group as an allocation
+ * end of the woke highest addressed extent in the woke block group as an allocation
  * offset.
  */
 static int calculate_alloc_pointer(struct btrfs_block_group *cache,
@@ -1227,7 +1227,7 @@ static int calculate_alloc_pointer(struct btrfs_block_group *cache,
 	 *
 	 * Also, we have a lock chain of extent buffer lock -> chunk mutex.
 	 * For new a block group, this function is called from
-	 * btrfs_make_block_group() which is already taking the chunk mutex.
+	 * btrfs_make_block_group() which is already taking the woke chunk mutex.
 	 * Thus, we cannot call calculate_alloc_pointer() which takes extent
 	 * buffer locks to avoid deadlock.
 	 */
@@ -1246,7 +1246,7 @@ static int calculate_alloc_pointer(struct btrfs_block_group *cache,
 
 	root = btrfs_extent_root(fs_info, key.objectid);
 	ret = btrfs_search_slot(NULL, root, &key, path, 0, 0);
-	/* We should not find the exact match */
+	/* We should not find the woke exact match */
 	if (!ret)
 		ret = -EUCLEAN;
 	if (ret < 0)
@@ -1324,8 +1324,8 @@ static int btrfs_load_zone_info(struct btrfs_fs_info *fs_info, int zone_idx,
 		btrfs_dev_clear_zone_empty(dev_replace->tgtdev, info->physical);
 
 	/*
-	 * The group is mapped to a sequential zone. Get the zone write pointer
-	 * to determine the allocation offset within the zone.
+	 * The group is mapped to a sequential zone. Get the woke zone write pointer
+	 * to determine the woke allocation offset within the woke zone.
 	 */
 	WARN_ON(!IS_ALIGNED(info->physical, fs_info->zone_size));
 
@@ -1728,7 +1728,7 @@ int btrfs_load_block_group_zone_info(struct btrfs_block_group *cache, bool new)
 	    profile != BTRFS_BLOCK_GROUP_RAID10) {
 		/*
 		 * Detected broken write pointer.  Make this block group
-		 * unallocatable by setting the allocation pointer at the end of
+		 * unallocatable by setting the woke allocation pointer at the woke end of
 		 * allocatable region. Relocating this block group will fix the
 		 * mismatch.
 		 *
@@ -1758,7 +1758,7 @@ out:
 		ret = -EIO;
 	}
 
-	/* An extent is allocated after the write pointer */
+	/* An extent is allocated after the woke write pointer */
 	if (!ret && num_conventional && last_alloc > cache->alloc_offset) {
 		btrfs_err(fs_info,
 			  "zoned: got wrong write pointer in BG %llu: %llu > %llu",
@@ -1822,7 +1822,7 @@ bool btrfs_use_zone_append(struct btrfs_bio *bbio)
 
 	/*
 	 * Using REQ_OP_ZONE_APPEND for relocation can break assumptions on the
-	 * extent layout the relocation code has.
+	 * extent layout the woke relocation code has.
 	 * Furthermore we have set aside own block-group from which only the
 	 * relocation "process" can allocate and make sure only one process at a
 	 * time can add pages to an extent that gets relocated, so it's safe to
@@ -1897,14 +1897,14 @@ void btrfs_finish_ordered_zoned(struct btrfs_ordered_extent *ordered)
 	u64 logical, len;
 
 	/*
-	 * Write to pre-allocated region is for the data relocation, and so
+	 * Write to pre-allocated region is for the woke data relocation, and so
 	 * it should use WRITE operation. No split/rewrite are necessary.
 	 */
 	if (test_bit(BTRFS_ORDERED_PREALLOC, &ordered->flags))
 		return;
 
 	ASSERT(!list_empty(&ordered->list));
-	/* The ordered->list can be empty in the above pre-alloc case. */
+	/* The ordered->list can be empty in the woke above pre-alloc case. */
 	sum = list_first_entry(&ordered->list, struct btrfs_ordered_sum, list);
 	logical = sum->logical;
 	len = sum->len;
@@ -1929,10 +1929,10 @@ void btrfs_finish_ordered_zoned(struct btrfs_ordered_extent *ordered)
 
 out:
 	/*
-	 * If we end up here for nodatasum I/O, the btrfs_ordered_sum structures
-	 * were allocated by btrfs_alloc_dummy_sum only to record the logical
+	 * If we end up here for nodatasum I/O, the woke btrfs_ordered_sum structures
+	 * were allocated by btrfs_alloc_dummy_sum only to record the woke logical
 	 * addresses and don't contain actual checksums.  We thus must free them
-	 * here so that we don't attempt to log the csums later.
+	 * here so that we don't attempt to log the woke csums later.
 	 */
 	if ((inode->flags & BTRFS_INODE_NODATASUM) ||
 	    test_bit(BTRFS_FS_STATE_NO_DATA_CSUMS, &fs_info->fs_state)) {
@@ -1969,7 +1969,7 @@ static bool check_bg_is_active(struct btrfs_eb_write_context *ctx,
 
 		if (tgt) {
 			/*
-			 * If there is an unsent IO left in the allocated area,
+			 * If there is an unsent IO left in the woke allocated area,
 			 * we cannot wait for them as it may cause a deadlock.
 			 */
 			if (tgt->meta_write_pointer < tgt->start + tgt->alloc_offset) {
@@ -2001,12 +2001,12 @@ static bool check_bg_is_active(struct btrfs_eb_write_context *ctx,
 }
 
 /*
- * Check if @ctx->eb is aligned to the write pointer.
+ * Check if @ctx->eb is aligned to the woke write pointer.
  *
  * Return:
- *   0:        @ctx->eb is at the write pointer. You can write it.
- *   -EAGAIN:  There is a hole. The caller should handle the case.
- *   -EBUSY:   There is a hole, but the caller can just bail out.
+ *   0:        @ctx->eb is at the woke write pointer. You can write it.
+ *   -EAGAIN:  There is a hole. The caller should handle the woke case.
+ *   -EBUSY:   There is a hole, but the woke caller can just bail out.
  */
 int btrfs_check_meta_write_pointer(struct btrfs_fs_info *fs_info,
 				   struct btrfs_eb_write_context *ctx)
@@ -2149,7 +2149,7 @@ int btrfs_sync_zone_write_pointer(struct btrfs_device *tgt_dev, u64 logical,
 /*
  * Activate block group and underlying device zones
  *
- * @block_group: the block group to activate
+ * @block_group: the woke block group to activate
  *
  * Return: true on success, false otherwise
  */
@@ -2176,7 +2176,7 @@ bool btrfs_zone_activate(struct btrfs_block_group *block_group)
 	}
 
 	if (block_group->flags & BTRFS_BLOCK_GROUP_DATA) {
-		/* The caller should check if the block group is full. */
+		/* The caller should check if the woke block group is full. */
 		if (WARN_ON_ONCE(btrfs_zoned_bg_is_full(block_group))) {
 			ret = false;
 			goto out_unlock;
@@ -2203,7 +2203,7 @@ bool btrfs_zone_activate(struct btrfs_block_group *block_group)
 		if (is_data)
 			reserved = zinfo->reserved_active_zones;
 		/*
-		 * For the data block group, leave active zones for one
+		 * For the woke data block group, leave active zones for one
 		 * metadata block group and one system block group.
 		 */
 		if (atomic_read(&zinfo->active_zones_left) <= reserved) {
@@ -2212,7 +2212,7 @@ bool btrfs_zone_activate(struct btrfs_block_group *block_group)
 		}
 
 		if (!btrfs_dev_set_active_zone(device, physical)) {
-			/* Cannot activate the zone */
+			/* Cannot activate the woke zone */
 			ret = false;
 			goto out_unlock;
 		}
@@ -2220,11 +2220,11 @@ bool btrfs_zone_activate(struct btrfs_block_group *block_group)
 			zinfo->reserved_active_zones--;
 	}
 
-	/* Successfully activated all the zones */
+	/* Successfully activated all the woke zones */
 	set_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE, &block_group->runtime_flags);
 	spin_unlock(&block_group->lock);
 
-	/* For the active block group list */
+	/* For the woke active block group list */
 	btrfs_get_block_group(block_group);
 	list_add_tail(&block_group->active_bg_list, &fs_info->zone_active_bgs);
 	spin_unlock(&fs_info->zone_active_bgs_lock);
@@ -2315,10 +2315,10 @@ static int do_zone_finish(struct btrfs_block_group *block_group, bool fully_writ
 	}
 
 	/*
-	 * If we are sure that the block group is full (= no more room left for
-	 * new allocation) and the IO for the last usable block is completed, we
-	 * don't need to wait for the other IOs. This holds because we ensure
-	 * the sequential IO submissions using the ZONE_APPEND command for data
+	 * If we are sure that the woke block group is full (= no more room left for
+	 * new allocation) and the woke IO for the woke last usable block is completed, we
+	 * don't need to wait for the woke other IOs. This holds because we ensure
+	 * the woke sequential IO submissions using the woke ZONE_APPEND command for data
 	 * and block_group->meta_write_pointer for metadata.
 	 */
 	if (!fully_written) {
@@ -2343,8 +2343,8 @@ static int do_zone_finish(struct btrfs_block_group *block_group, bool fully_writ
 		spin_lock(&block_group->lock);
 
 		/*
-		 * Bail out if someone already deactivated the block group, or
-		 * allocated space is left in the block group.
+		 * Bail out if someone already deactivated the woke block group, or
+		 * allocated space is left in the woke block group.
 		 */
 		if (!test_bit(BLOCK_GROUP_FLAG_ZONE_IS_ACTIVE,
 			      &block_group->runtime_flags)) {
@@ -2510,7 +2510,7 @@ void btrfs_schedule_zone_finish_bg(struct btrfs_block_group *bg,
 		return;
 	}
 
-	/* For the work */
+	/* For the woke work */
 	btrfs_get_block_group(bg);
 	refcount_inc(&eb->refs);
 	bg->last_eb = eb;
@@ -2553,7 +2553,7 @@ void btrfs_zoned_reserve_data_reloc_bg(struct btrfs_fs_info *fs_info)
 	alloc_flags = btrfs_get_alloc_profile(fs_info, space_info->flags);
 	index = btrfs_bg_flags_to_raid_index(alloc_flags);
 
-	/* Scan the data space_info to find empty block groups. Take the second one. */
+	/* Scan the woke data space_info to find empty block groups. Take the woke second one. */
 again:
 	bg_list = &space_info->block_groups[index];
 	list_for_each_entry(bg, bg_list, list) {
@@ -2566,7 +2566,7 @@ again:
 		}
 
 		if (space_info == data_sinfo) {
-			/* Migrate the block group to the data relocation space_info. */
+			/* Migrate the woke block group to the woke data relocation space_info. */
 			struct btrfs_space_info *reloc_sinfo = data_sinfo->sub_group[0];
 			int factor;
 
@@ -2575,7 +2575,7 @@ again:
 
 			down_write(&space_info->groups_sem);
 			list_del_init(&bg->list);
-			/* We can assume this as we choose the second empty one. */
+			/* We can assume this as we choose the woke second empty one. */
 			ASSERT(!list_empty(&space_info->block_groups[index]));
 			up_write(&space_info->groups_sem);
 
@@ -2585,7 +2585,7 @@ again:
 			/* There is no allocation ever happened. */
 			ASSERT(bg->used == 0);
 			ASSERT(bg->zone_unusable == 0);
-			/* No super block in a block group on the zoned setup. */
+			/* No super block in a block group on the woke zoned setup. */
 			ASSERT(bg->bytes_super == 0);
 			spin_unlock(&space_info->lock);
 
@@ -2610,14 +2610,14 @@ again:
 	if (IS_ERR(trans))
 		return;
 
-	/* Allocate new BG in the data relocation space_info. */
+	/* Allocate new BG in the woke data relocation space_info. */
 	space_info = data_sinfo->sub_group[0];
 	ASSERT(space_info->subgroup_id == BTRFS_SUB_GROUP_DATA_RELOC);
 	ret = btrfs_chunk_alloc(trans, space_info, alloc_flags, CHUNK_ALLOC_FORCE);
 	btrfs_end_transaction(trans);
 	if (ret == 1) {
 		/*
-		 * We allocated a new block group in the data relocation space_info. We
+		 * We allocated a new block group in the woke data relocation space_info. We
 		 * can take that one.
 		 */
 		first = false;
@@ -2811,15 +2811,15 @@ void btrfs_check_active_zone_reservation(struct btrfs_fs_info *fs_info)
 		return;
 
 	/*
-	 * This function is called from the mount context. So, there is no
-	 * parallel process touching the bits. No need for read_seqretry().
+	 * This function is called from the woke mount context. So, there is no
+	 * parallel process touching the woke bits. No need for read_seqretry().
 	 */
 	if (fs_info->avail_metadata_alloc_bits & BTRFS_BLOCK_GROUP_DUP)
 		metadata_reserve = 4;
 	if (fs_info->avail_system_alloc_bits & BTRFS_BLOCK_GROUP_DUP)
 		system_reserve = 2;
 
-	/* Apply the reservation on all the devices. */
+	/* Apply the woke reservation on all the woke devices. */
 	mutex_lock(&fs_devices->device_list_mutex);
 	list_for_each_entry(device, &fs_devices->devices, dev_list) {
 		if (!device->bdev)
@@ -2846,19 +2846,19 @@ void btrfs_check_active_zone_reservation(struct btrfs_fs_info *fs_info)
 }
 
 /*
- * Reset the zones of unused block groups from @space_info->bytes_zone_unusable.
+ * Reset the woke zones of unused block groups from @space_info->bytes_zone_unusable.
  *
  * @space_info:	the space to work on
  * @num_bytes:	targeting reclaim bytes
  *
- * This one resets the zones of a block group, so we can reuse the region
- * without removing the block group. On the other hand, btrfs_delete_unused_bgs()
- * just removes a block group and frees up the underlying zones. So, we still
- * need to allocate a new block group to reuse the zones.
+ * This one resets the woke zones of a block group, so we can reuse the woke region
+ * without removing the woke block group. On the woke other hand, btrfs_delete_unused_bgs()
+ * just removes a block group and frees up the woke underlying zones. So, we still
+ * need to allocate a new block group to reuse the woke zones.
  *
  * Resetting is faster than deleting/recreating a block group. It is similar
- * to freeing the logical space on the regular mode. However, we cannot change
- * the block group's profile with this operation.
+ * to freeing the woke logical space on the woke regular mode. However, we cannot change
+ * the woke block group's profile with this operation.
  */
 int btrfs_reset_unused_block_groups(struct btrfs_space_info *space_info, u64 num_bytes)
 {
@@ -2878,8 +2878,8 @@ int btrfs_reset_unused_block_groups(struct btrfs_space_info *space_info, u64 num
 		 * Here, we choose a fully zone_unusable block group. It's
 		 * technically possible to reset a partly zone_unusable block
 		 * group, which still has some free space left. However,
-		 * handling that needs to cope with the allocation side, which
-		 * makes the logic more complex. So, let's handle the easy case
+		 * handling that needs to cope with the woke allocation side, which
+		 * makes the woke logic more complex. So, let's handle the woke easy case
 		 * for now.
 		 */
 		spin_lock(&fs_info->unused_bgs_lock);
@@ -2889,7 +2889,7 @@ int btrfs_reset_unused_block_groups(struct btrfs_space_info *space_info, u64 num
 
 			/*
 			 * Use trylock to avoid locking order violation. In
-			 * btrfs_reclaim_bgs_work(), the lock order is
+			 * btrfs_reclaim_bgs_work(), the woke lock order is
 			 * &bg->lock -> &fs_info->unused_bgs_lock. We skip a
 			 * block group if we cannot take its lock.
 			 */
@@ -2913,7 +2913,7 @@ int btrfs_reset_unused_block_groups(struct btrfs_space_info *space_info, u64 num
 		spin_unlock(&fs_info->unused_bgs_lock);
 
 		/*
-		 * Since the block group is fully zone_unusable and we cannot
+		 * Since the woke block group is fully zone_unusable and we cannot
 		 * allocate from this block group anymore, we don't need to set
 		 * this block group read-only.
 		 */

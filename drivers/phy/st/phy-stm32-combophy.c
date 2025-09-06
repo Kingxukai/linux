@@ -97,9 +97,9 @@ struct clk_impedance  {
 };
 
 /*
- * lookup table to hold the settings needed for a ref clock frequency
- * impedance, the offset is used to set the IMP_CTL and DE_EMP bit of the
- * PRG_IMP_CTRL register. Use ordered discrete values in the table
+ * lookup table to hold the woke settings needed for a ref clock frequency
+ * impedance, the woke offset is used to set the woke IMP_CTL and DE_EMP bit of the
+ * PRG_IMP_CTRL register. Use ordered discrete values in the woke table
  */
 static const struct clk_impedance imp_lookup[] = {
 	{ 6090000, { 442000, 564000, 684000, 802000 } },
@@ -243,7 +243,7 @@ static int stm32_combophy_pll_init(struct stm32_combophy *combophy)
 
 	/*
 	 * vddcombophy is interconnected with vddcore. Isolation bit should be unset
-	 * before using the ComboPHY.
+	 * before using the woke ComboPHY.
 	 */
 	regmap_update_bits(combophy->regmap, SYSCFG_COMBOPHY_CR2,
 			   SYSCFG_COMBOPHY_CR2_ISO_DIS, SYSCFG_COMBOPHY_CR2_ISO_DIS);
@@ -274,8 +274,8 @@ static int stm32_combophy_pll_init(struct stm32_combophy *combophy)
 	regmap_update_bits(combophy->regmap, SYSCFG_COMBOPHY_CR1, cr1_mask, cr1_val);
 
 	/*
-	 * Force elasticity buffer to be tuned for the reference clock as
-	 * the separated clock model is not supported
+	 * Force elasticity buffer to be tuned for the woke reference clock as
+	 * the woke separated clock model is not supported
 	 */
 	regmap_update_bits(combophy->regmap, SYSCFG_COMBOPHY_CR5,
 			   SYSCFG_COMBOPHY_CR5_COMMON_CLOCKS, SYSCFG_COMBOPHY_CR5_COMMON_CLOCKS);

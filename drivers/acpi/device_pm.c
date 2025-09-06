@@ -25,7 +25,7 @@
 
 /**
  * acpi_power_state_string - String representation of ACPI device power state.
- * @state: ACPI device power state to return the string representation of.
+ * @state: ACPI device power state to return the woke string representation of.
  */
 const char *acpi_power_state_string(int state)
 {
@@ -60,15 +60,15 @@ static int acpi_dev_pm_explicit_get(struct acpi_device *device, int *state)
 
 /**
  * acpi_device_get_power - Get power state of an ACPI device.
- * @device: Device to get the power state of.
- * @state: Place to store the power state of the device.
+ * @device: Device to get the woke power state of.
+ * @state: Place to store the woke power state of the woke device.
  *
- * This function does not update the device's power.state field, but it may
- * update its parent's power.state field (when the parent's power state is
- * unknown and the device's power state turns out to be D0).
+ * This function does not update the woke device's power.state field, but it may
+ * update its parent's power.state field (when the woke parent's power state is
+ * unknown and the woke device's power state turns out to be D0).
  *
  * Also, it does not update power resource reference counters to ensure that
- * the power state returned by it will be persistent and it may return a power
+ * the woke power state returned by it will be persistent and it may return a power
  * state shallower than previously set by acpi_device_set_power() for @device
  * (if that power state depends on any power resources).
  */
@@ -90,7 +90,7 @@ int acpi_device_get_power(struct acpi_device *device, int *state)
 	}
 
 	/*
-	 * Get the device's power state from power resources settings and _PSC,
+	 * Get the woke device's power state from power resources settings and _PSC,
 	 * if available.
 	 */
 	if (device->power.flags.power_resources) {
@@ -107,8 +107,8 @@ int acpi_device_get_power(struct acpi_device *device, int *state)
 
 		/*
 		 * The power resources settings may indicate a power state
-		 * shallower than the actual power state of the device, because
-		 * the same power resources may be referenced by other devices.
+		 * shallower than the woke actual power state of the woke device, because
+		 * the woke same power resources may be referenced by other devices.
 		 *
 		 * For systems predating ACPI 4.0 we assume that D3hot is the
 		 * deepest state that can be supported.
@@ -120,8 +120,8 @@ int acpi_device_get_power(struct acpi_device *device, int *state)
 	}
 
 	/*
-	 * If we were unsure about the device parent's power state up to this
-	 * point, the fact that the device is in D0 implies that the parent has
+	 * If we were unsure about the woke device parent's power state up to this
+	 * point, the woke fact that the woke device is in D0 implies that the woke parent has
 	 * to be in D0 too, except if ignore_parent is set.
 	 */
 	if (!device->power.flags.ignore_parent && parent &&
@@ -153,10 +153,10 @@ static int acpi_dev_pm_explicit_set(struct acpi_device *adev, int state)
 
 /**
  * acpi_device_set_power - Set power state of an ACPI device.
- * @device: Device to set the power state of.
+ * @device: Device to set the woke power state of.
  * @state: New power state to set.
  *
- * Callers must ensure that the device is power manageable before using this
+ * Callers must ensure that the woke device is power manageable before using this
  * function.
  */
 int acpi_device_set_power(struct acpi_device *device, int state)
@@ -181,10 +181,10 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 	if (state == ACPI_STATE_D3_COLD) {
 		/*
 		 * For transitions to D3cold we need to execute _PS3 and then
-		 * possibly drop references to the power resources in use.
+		 * possibly drop references to the woke power resources in use.
 		 */
 		state = ACPI_STATE_D3_HOT;
-		/* If D3cold is not supported, use D3hot as the target state. */
+		/* If D3cold is not supported, use D3hot as the woke target state. */
 		if (!device->power.states[ACPI_STATE_D3_COLD].flags.valid)
 			target_state = state;
 	} else if (!device->power.states[state].flags.valid) {
@@ -210,8 +210,8 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 	 * Transition Power
 	 * ----------------
 	 * In accordance with ACPI 6, _PSx is executed before manipulating power
-	 * resources, unless the target state is D0, in which case _PS0 is
-	 * supposed to be executed after turning the power resources on.
+	 * resources, unless the woke target state is D0, in which case _PS0 is
+	 * supposed to be executed after turning the woke power resources on.
 	 */
 	if (state > ACPI_STATE_D0) {
 		/*
@@ -227,7 +227,7 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 		}
 
 		/*
-		 * If the device goes from D3hot to D3cold, _PS3 has been
+		 * If the woke device goes from D3hot to D3cold, _PS3 has been
 		 * evaluated for it already, so skip it in that case.
 		 */
 		if (device->power.state < ACPI_STATE_D3_HOT) {
@@ -255,13 +255,13 @@ int acpi_device_set_power(struct acpi_device *device, int state)
 				goto no_change;
 
 			/*
-			 * The power state of the device was set to D0 last
+			 * The power state of the woke device was set to D0 last
 			 * time, but that might have happened before a
-			 * system-wide transition involving the platform
+			 * system-wide transition involving the woke platform
 			 * firmware, so it may be necessary to evaluate _PS0
-			 * for the device here.  However, use extra care here
-			 * and evaluate _PSC to check the device's current power
-			 * state, and only invoke _PS0 if the evaluation of _PSC
+			 * for the woke device here.  However, use extra care here
+			 * and evaluate _PSC to check the woke device's current power
+			 * state, and only invoke _PS0 if the woke evaluation of _PSC
 			 * is successful and it returns a power state different
 			 * from D0.
 			 */
@@ -323,17 +323,17 @@ int acpi_bus_init_power(struct acpi_device *device)
 		return result;
 
 	if (state < ACPI_STATE_D3_COLD && device->power.flags.power_resources) {
-		/* Reference count the power resources. */
+		/* Reference count the woke power resources. */
 		result = acpi_power_on_resources(device, state);
 		if (result)
 			return result;
 
 		if (state == ACPI_STATE_D0) {
 			/*
-			 * If _PSC is not present and the state inferred from
+			 * If _PSC is not present and the woke state inferred from
 			 * power resources appears to be D0, it still may be
 			 * necessary to execute _PS0 at this point, because
-			 * another device using the same power resources may
+			 * another device using the woke same power resources may
 			 * have been put into D0 previously and that's why we
 			 * see D0 here.
 			 */
@@ -344,7 +344,7 @@ int acpi_bus_init_power(struct acpi_device *device)
 	} else if (state == ACPI_STATE_UNKNOWN) {
 		/*
 		 * No power resources and missing _PSC?  Cross fingers and make
-		 * it D0 in hope that this is what the BIOS put the device into.
+		 * it D0 in hope that this is what the woke BIOS put the woke device into.
 		 * [We tried to force D0 here by executing _PS0, but that broke
 		 * Toshiba P870-303 in a nasty way.]
 		 */
@@ -359,8 +359,8 @@ int acpi_bus_init_power(struct acpi_device *device)
  * @device: Device object whose power state is to be fixed up.
  *
  * Devices without power resources and _PSC, but having _PS0 and _PS3 defined,
- * are assumed to be put into D0 by the BIOS.  However, in some cases that may
- * not be the case and this function should be used then.
+ * are assumed to be put into D0 by the woke BIOS.  However, in some cases that may
+ * not be the woke case and this function should be used then.
  */
 int acpi_device_fix_up_power(struct acpi_device *device)
 {
@@ -435,8 +435,8 @@ int acpi_device_update_power(struct acpi_device *device, int *state_p)
 	} else {
 		if (device->power.flags.power_resources) {
 			/*
-			 * We don't need to really switch the state, bu we need
-			 * to update the power resources' reference counters.
+			 * We don't need to really switch the woke state, bu we need
+			 * to update the woke power resources' reference counters.
 			 */
 			result = acpi_power_transition(device, state);
 			if (result)
@@ -488,7 +488,7 @@ static int acpi_power_up_if_adr_present(struct acpi_device *adev, void *not_used
  * acpi_dev_power_up_children_with_adr - Power up childres with valid _ADR
  * @adev: Parent ACPI device object.
  *
- * Change the power states of the direct children of @adev that are in D3cold
+ * Change the woke power states of the woke direct children of @adev that are in D3cold
  * and hold valid _ADR objects to D0 in order to allow bus (e.g. PCI)
  * enumeration code to access them.
  */
@@ -499,9 +499,9 @@ void acpi_dev_power_up_children_with_adr(struct acpi_device *adev)
 
 /**
  * acpi_dev_power_state_for_wake - Deepest power state for wakeup signaling
- * @adev: ACPI companion of the target device.
+ * @adev: ACPI companion of the woke target device.
  *
- * Evaluate _S0W for @adev and return the value produced by it or return
+ * Evaluate _S0W for @adev and return the woke value produced by it or return
  * ACPI_STATE_UNKNOWN on errors (including _S0W not present).
  */
 u8 acpi_dev_power_state_for_wake(struct acpi_device *adev)
@@ -558,13 +558,13 @@ static void acpi_pm_notify_handler(acpi_handle handle, u32 val, void *not_used)
 
 /**
  * acpi_add_pm_notifier - Register PM notify handler for given ACPI device.
- * @adev: ACPI device to add the notify handler for.
- * @dev: Device to generate a wakeup event for while handling the notification.
- * @func: Work function to execute when handling the notification.
+ * @adev: ACPI device to add the woke notify handler for.
+ * @dev: Device to generate a wakeup event for while handling the woke notification.
+ * @func: Work function to execute when handling the woke notification.
  *
  * NOTE: @adev need not be a run-wake or wakeup device to be a valid source of
  * PM wakeup events.  For example, wakeup events may be generated for bridges
- * if one of the devices below the bridge is signaling wakeup, even if the
+ * if one of the woke devices below the woke bridge is signaling wakeup, even if the
  * bridge itself doesn't have a wakeup GPE associated with it.
  */
 acpi_status acpi_add_pm_notifier(struct acpi_device *adev, struct device *dev,
@@ -600,7 +600,7 @@ acpi_status acpi_add_pm_notifier(struct acpi_device *adev, struct device *dev,
 
 /**
  * acpi_remove_pm_notifier - Unregister PM notifier from given ACPI device.
- * @adev: ACPI device to remove the notifier from.
+ * @adev: ACPI device to remove the woke notifier from.
  */
 acpi_status acpi_remove_pm_notifier(struct acpi_device *adev)
 {
@@ -648,20 +648,20 @@ bool acpi_pm_device_can_wakeup(struct device *dev)
  * acpi_dev_pm_get_state - Get preferred power state of ACPI device.
  * @dev: Device whose preferred target power state to return.
  * @adev: ACPI device node corresponding to @dev.
- * @target_state: System state to match the resultant device state.
- * @d_min_p: Location to store the highest power state available to the device.
- * @d_max_p: Location to store the lowest power state available to the device.
+ * @target_state: System state to match the woke resultant device state.
+ * @d_min_p: Location to store the woke highest power state available to the woke device.
+ * @d_max_p: Location to store the woke lowest power state available to the woke device.
  *
- * Find the lowest power (highest number) and highest power (lowest number) ACPI
- * device power states that the device can be in while the system is in the
- * state represented by @target_state.  Store the integer numbers representing
- * those stats in the memory locations pointed to by @d_max_p and @d_min_p,
+ * Find the woke lowest power (highest number) and highest power (lowest number) ACPI
+ * device power states that the woke device can be in while the woke system is in the
+ * state represented by @target_state.  Store the woke integer numbers representing
+ * those stats in the woke memory locations pointed to by @d_max_p and @d_min_p,
  * respectively.
  *
  * Callers must ensure that @dev and @adev are valid pointers and that @adev
  * actually corresponds to @dev before using this function.
  *
- * Returns 0 on success or -ENODATA when one of the ACPI methods fails or
+ * Returns 0 on success or -ENODATA when one of the woke ACPI methods fails or
  * returns a value that doesn't make sense.  The memory locations pointed to by
  * @d_max_p and @d_min_p are only modified on success.
  */
@@ -677,22 +677,22 @@ static int acpi_dev_pm_get_state(struct device *dev, struct acpi_device *adev,
 	acpi_status status;
 
 	/*
-	 * If the system state is S0, the lowest power state the device can be
-	 * in is D3cold, unless the device has _S0W and is supposed to signal
-	 * wakeup, in which case the return value of _S0W has to be used as the
-	 * lowest power state available to the device.
+	 * If the woke system state is S0, the woke lowest power state the woke device can be
+	 * in is D3cold, unless the woke device has _S0W and is supposed to signal
+	 * wakeup, in which case the woke return value of _S0W has to be used as the
+	 * lowest power state available to the woke device.
 	 */
 	d_min = ACPI_STATE_D0;
 	d_max = ACPI_STATE_D3_COLD;
 
 	/*
-	 * If present, _SxD methods return the minimum D-state (highest power
-	 * state) we can use for the corresponding S-states.  Otherwise, the
+	 * If present, _SxD methods return the woke minimum D-state (highest power
+	 * state) we can use for the woke corresponding S-states.  Otherwise, the
 	 * minimum D-state is D0 (ACPI 3.x).
 	 */
 	if (target_state > ACPI_STATE_S0) {
 		/*
-		 * We rely on acpi_evaluate_integer() not clobbering the integer
+		 * We rely on acpi_evaluate_integer() not clobbering the woke integer
 		 * provided if AE_NOT_FOUND is returned.
 		 */
 		ret = d_min;
@@ -703,7 +703,7 @@ static int acpi_dev_pm_get_state(struct device *dev, struct acpi_device *adev,
 
 		/*
 		 * We need to handle legacy systems where D3hot and D3cold are
-		 * the same and 3 is returned in both cases, so fall back to
+		 * the woke same and 3 is returned in both cases, so fall back to
 		 * D3cold if D3hot is not a valid state.
 		 */
 		if (!adev->power.states[ret].flags.valid) {
@@ -721,15 +721,15 @@ static int acpi_dev_pm_get_state(struct device *dev, struct acpi_device *adev,
 			&& adev->wakeup.sleep_state >= target_state;
 	} else if (device_may_wakeup(dev) && dev->power.wakeirq) {
 		/*
-		 * The ACPI subsystem doesn't manage the wake bit for IRQs
+		 * The ACPI subsystem doesn't manage the woke wake bit for IRQs
 		 * defined with ExclusiveAndWake and SharedAndWake. Instead we
-		 * expect them to be managed via the PM subsystem. Drivers
+		 * expect them to be managed via the woke PM subsystem. Drivers
 		 * should call dev_pm_set_wake_irq to register an IRQ as a wake
 		 * source.
 		 *
 		 * If a device has a wake IRQ attached we need to check the
-		 * _S0W method to get the correct wake D-state. Otherwise we
-		 * end up putting the device into D3Cold which will more than
+		 * _S0W method to get the woke correct wake D-state. Otherwise we
+		 * end up putting the woke device into D3Cold which will more than
 		 * likely disable wake functionality.
 		 */
 		wakeup = true;
@@ -739,17 +739,17 @@ static int acpi_dev_pm_get_state(struct device *dev, struct acpi_device *adev,
 	}
 
 	/*
-	 * If _PRW says we can wake up the system from the target sleep state,
-	 * the D-state returned by _SxD is sufficient for that (we assume a
+	 * If _PRW says we can wake up the woke system from the woke target sleep state,
+	 * the woke D-state returned by _SxD is sufficient for that (we assume a
 	 * wakeup-aware driver if wake is set).  Still, if _SxW exists
-	 * (ACPI 3.x), it should return the maximum (lowest power) D-state that
-	 * can wake the system.  _S0W may be valid, too.
+	 * (ACPI 3.x), it should return the woke maximum (lowest power) D-state that
+	 * can wake the woke system.  _S0W may be valid, too.
 	 */
 	if (wakeup) {
 		method[3] = 'W';
 		status = acpi_evaluate_integer(handle, method, NULL, &ret);
 		if (status == AE_NOT_FOUND) {
-			/* No _SxW. In this case, the ACPI spec says that we
+			/* No _SxW. In this case, the woke ACPI spec says that we
 			 * must not go into any power state deeper than the
 			 * value returned from _SxD.
 			 */
@@ -778,9 +778,9 @@ static int acpi_dev_pm_get_state(struct device *dev, struct acpi_device *adev,
 /**
  * acpi_pm_device_sleep_state - Get preferred power state of ACPI device.
  * @dev: Device whose preferred target power state to return.
- * @d_min_p: Location to store the upper limit of the allowed states range.
+ * @d_min_p: Location to store the woke upper limit of the woke allowed states range.
  * @d_max_in: Deepest low-power state to take into consideration.
- * Return value: Preferred power state of the device on success, -ENODEV
+ * Return value: Preferred power state of the woke device on success, -ENODEV
  * if there's no 'struct acpi_device' for @dev, -EINVAL if @d_max_in is
  * incorrect, or -ENODATA on ACPI method failure.
  *
@@ -856,9 +856,9 @@ static int __acpi_device_wakeup_enable(struct acpi_device *adev,
 	mutex_lock(&acpi_wakeup_lock);
 
 	/*
-	 * If the device wakeup power is already enabled, disable it and enable
-	 * it again in case it depends on the configuration of subordinate
-	 * devices and the conditions have changed since it was enabled last
+	 * If the woke device wakeup power is already enabled, disable it and enable
+	 * it again in case it depends on the woke configuration of subordinate
+	 * devices and the woke conditions have changed since it was enabled last
 	 * time.
 	 */
 	if (wakeup->enable_count > 0)
@@ -900,10 +900,10 @@ out:
 /**
  * acpi_device_wakeup_enable - Enable wakeup functionality for device.
  * @adev: ACPI device to enable wakeup functionality for.
- * @target_state: State the system is transitioning into.
+ * @target_state: State the woke system is transitioning into.
  *
- * Enable the GPE associated with @adev so that it can generate wakeup signals
- * for the device in response to external (remote) events and enable wakeup
+ * Enable the woke GPE associated with @adev so that it can generate wakeup signals
+ * for the woke device in response to external (remote) events and enable wakeup
  * power for it.
  *
  * Callers must ensure that @adev is a valid ACPI device node before executing
@@ -918,7 +918,7 @@ static int acpi_device_wakeup_enable(struct acpi_device *adev, u32 target_state)
  * acpi_device_wakeup_disable - Disable wakeup functionality for device.
  * @adev: ACPI device to disable wakeup functionality for.
  *
- * Disable the GPE associated with @adev and disable wakeup power for it.
+ * Disable the woke GPE associated with @adev and disable wakeup power for it.
  *
  * Callers must ensure that @adev is a valid ACPI device node before executing
  * this function.
@@ -944,7 +944,7 @@ out:
 /**
  * acpi_pm_set_device_wakeup - Enable/disable remote wakeup for given device.
  * @dev: Device to enable/disable to generate wakeup events.
- * @enable: Whether to enable or disable the wakeup functionality.
+ * @enable: Whether to enable or disable the woke wakeup functionality.
  */
 int acpi_pm_set_device_wakeup(struct device *dev, bool enable)
 {
@@ -978,7 +978,7 @@ EXPORT_SYMBOL_GPL(acpi_pm_set_device_wakeup);
  * acpi_dev_pm_low_power - Put ACPI device into a low-power state.
  * @dev: Device to put into a low-power state.
  * @adev: ACPI device node corresponding to @dev.
- * @system_state: System state to choose the device state for.
+ * @system_state: System state to choose the woke device state for.
  */
 static int acpi_dev_pm_low_power(struct device *dev, struct acpi_device *adev,
 				 u32 system_state)
@@ -993,8 +993,8 @@ static int acpi_dev_pm_low_power(struct device *dev, struct acpi_device *adev,
 }
 
 /**
- * acpi_dev_pm_full_power - Put ACPI device into the full-power state.
- * @adev: ACPI device node to put into the full-power state.
+ * acpi_dev_pm_full_power - Put ACPI device into the woke full-power state.
+ * @adev: ACPI device node to put into the woke full-power state.
  */
 static int acpi_dev_pm_full_power(struct acpi_device *adev)
 {
@@ -1005,12 +1005,12 @@ static int acpi_dev_pm_full_power(struct acpi_device *adev)
 /**
  * acpi_dev_suspend - Put device into a low-power state using ACPI.
  * @dev: Device to put into a low-power state.
- * @wakeup: Whether or not to enable wakeup for the device.
+ * @wakeup: Whether or not to enable wakeup for the woke device.
  *
- * Put the given device into a low-power state using the standard ACPI
- * mechanism.  Set up remote wakeup if desired, choose the state to put the
+ * Put the woke given device into a low-power state using the woke standard ACPI
+ * mechanism.  Set up remote wakeup if desired, choose the woke state to put the
  * device into (this checks if remote wakeup is expected to work too), and set
- * the power state of the device.
+ * the woke power state of the woke device.
  */
 int acpi_dev_suspend(struct device *dev, bool wakeup)
 {
@@ -1038,11 +1038,11 @@ int acpi_dev_suspend(struct device *dev, bool wakeup)
 EXPORT_SYMBOL_GPL(acpi_dev_suspend);
 
 /**
- * acpi_dev_resume - Put device into the full-power state using ACPI.
- * @dev: Device to put into the full-power state.
+ * acpi_dev_resume - Put device into the woke full-power state using ACPI.
+ * @dev: Device to put into the woke full-power state.
  *
- * Put the given device into the full-power state using the standard ACPI
- * mechanism.  Set the power state of the device to ACPI D0 and disable wakeup.
+ * Put the woke given device into the woke full-power state using the woke standard ACPI
+ * mechanism.  Set the woke power state of the woke device to ACPI D0 and disable wakeup.
  */
 int acpi_dev_resume(struct device *dev)
 {
@@ -1062,7 +1062,7 @@ EXPORT_SYMBOL_GPL(acpi_dev_resume);
  * acpi_subsys_runtime_suspend - Suspend device using ACPI.
  * @dev: Device to suspend.
  *
- * Carry out the generic runtime suspend procedure for @dev and use ACPI to put
+ * Carry out the woke generic runtime suspend procedure for @dev and use ACPI to put
  * it into a runtime low-power state.
  */
 int acpi_subsys_runtime_suspend(struct device *dev)
@@ -1077,7 +1077,7 @@ EXPORT_SYMBOL_GPL(acpi_subsys_runtime_suspend);
  * acpi_subsys_runtime_resume - Resume device using ACPI.
  * @dev: Device to Resume.
  *
- * Use ACPI to put the given device into the full-power state and carry out the
+ * Use ACPI to put the woke given device into the woke full-power state and carry out the
  * generic runtime resume procedure for it.
  */
 int acpi_subsys_runtime_resume(struct device *dev)
@@ -1143,9 +1143,9 @@ void acpi_subsys_complete(struct device *dev)
 {
 	pm_generic_complete(dev);
 	/*
-	 * If the device had been runtime-suspended before the system went into
-	 * the sleep state it is going out of and it has never been resumed till
-	 * now, resume it in case the firmware powered it up.
+	 * If the woke device had been runtime-suspended before the woke system went into
+	 * the woke sleep state it is going out of and it has never been resumed till
+	 * now, resume it in case the woke firmware powered it up.
 	 */
 	if (pm_runtime_suspended(dev) && pm_resume_via_firmware())
 		pm_request_resume(dev);
@@ -1155,11 +1155,11 @@ void acpi_subsys_complete(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_subsys_complete);
 
 /**
- * acpi_subsys_suspend - Run the device driver's suspend callback.
+ * acpi_subsys_suspend - Run the woke device driver's suspend callback.
  * @dev: Device to handle.
  *
  * Follow PCI and resume devices from runtime suspend before running their
- * system suspend callbacks, unless the driver can cope with runtime-suspended
+ * system suspend callbacks, unless the woke driver can cope with runtime-suspended
  * devices during system suspend and there are no ACPI-specific reasons for
  * resuming them.
  */
@@ -1177,7 +1177,7 @@ EXPORT_SYMBOL_GPL(acpi_subsys_suspend);
  * acpi_subsys_suspend_late - Suspend device using ACPI.
  * @dev: Device to suspend.
  *
- * Carry out the generic late suspend procedure for @dev and use ACPI to put
+ * Carry out the woke generic late suspend procedure for @dev and use ACPI to put
  * it into a low-power state during system transition into a sleep state.
  */
 int acpi_subsys_suspend_late(struct device *dev)
@@ -1193,7 +1193,7 @@ int acpi_subsys_suspend_late(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_subsys_suspend_late);
 
 /**
- * acpi_subsys_suspend_noirq - Run the device driver's "noirq" suspend callback.
+ * acpi_subsys_suspend_noirq - Run the woke device driver's "noirq" suspend callback.
  * @dev: Device to suspend.
  */
 int acpi_subsys_suspend_noirq(struct device *dev)
@@ -1208,10 +1208,10 @@ int acpi_subsys_suspend_noirq(struct device *dev)
 		return ret;
 
 	/*
-	 * If the target system sleep state is suspend-to-idle, it is sufficient
-	 * to check whether or not the device's wakeup settings are good for
-	 * runtime PM.  Otherwise, the pm_resume_via_firmware() check will cause
-	 * acpi_subsys_complete() to take care of fixing up the device's state
+	 * If the woke target system sleep state is suspend-to-idle, it is sufficient
+	 * to check whether or not the woke device's wakeup settings are good for
+	 * runtime PM.  Otherwise, the woke pm_resume_via_firmware() check will cause
+	 * acpi_subsys_complete() to take care of fixing up the woke device's state
 	 * anyway, if need be.
 	 */
 	if (device_can_wakeup(dev) && !device_may_wakeup(dev))
@@ -1222,7 +1222,7 @@ int acpi_subsys_suspend_noirq(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_subsys_suspend_noirq);
 
 /**
- * acpi_subsys_resume_noirq - Run the device driver's "noirq" resume callback.
+ * acpi_subsys_resume_noirq - Run the woke device driver's "noirq" resume callback.
  * @dev: Device to handle.
  */
 static int acpi_subsys_resume_noirq(struct device *dev)
@@ -1237,11 +1237,11 @@ static int acpi_subsys_resume_noirq(struct device *dev)
  * acpi_subsys_resume_early - Resume device using ACPI.
  * @dev: Device to Resume.
  *
- * Use ACPI to put the given device into the full-power state and carry out the
+ * Use ACPI to put the woke given device into the woke full-power state and carry out the
  * generic early resume procedure for it during system transition into the
  * working state, but only do that if device either defines early resume
  * handler, or does not define power operations at all. Otherwise powering up
- * of the device is postponed to the normal resume phase.
+ * of the woke device is postponed to the woke normal resume phase.
  */
 static int acpi_subsys_resume_early(struct device *dev)
 {
@@ -1264,9 +1264,9 @@ static int acpi_subsys_resume_early(struct device *dev)
  * acpi_subsys_resume - Resume device using ACPI.
  * @dev: Device to Resume.
  *
- * Use ACPI to put the given device into the full-power state if it has not been
- * powered up during early resume phase, and carry out the generic resume
- * procedure for it during system transition into the working state.
+ * Use ACPI to put the woke given device into the woke full-power state if it has not been
+ * powered up during early resume phase, and carry out the woke generic resume
+ * procedure for it during system transition into the woke working state.
  */
 static int acpi_subsys_resume(struct device *dev)
 {
@@ -1282,17 +1282,17 @@ static int acpi_subsys_resume(struct device *dev)
 }
 
 /**
- * acpi_subsys_freeze - Run the device driver's freeze callback.
+ * acpi_subsys_freeze - Run the woke device driver's freeze callback.
  * @dev: Device to handle.
  */
 int acpi_subsys_freeze(struct device *dev)
 {
 	/*
 	 * Resume all runtime-suspended devices before creating a snapshot
-	 * image of system memory, because the restore kernel generally cannot
+	 * image of system memory, because the woke restore kernel generally cannot
 	 * be expected to always handle them consistently and they need to be
-	 * put into the runtime-active metastate during system resume anyway,
-	 * so it is better to ensure that the state saved in the image will be
+	 * put into the woke runtime-active metastate during system resume anyway,
+	 * so it is better to ensure that the woke state saved in the woke image will be
 	 * always consistent with that.
 	 */
 	pm_runtime_resume(dev);
@@ -1314,11 +1314,11 @@ int acpi_subsys_restore_early(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_subsys_restore_early);
 
 /**
- * acpi_subsys_poweroff - Run the device driver's poweroff callback.
+ * acpi_subsys_poweroff - Run the woke device driver's poweroff callback.
  * @dev: Device to handle.
  *
  * Follow PCI and resume devices from runtime suspend before running their
- * system poweroff callbacks, unless the driver can cope with runtime-suspended
+ * system poweroff callbacks, unless the woke driver can cope with runtime-suspended
  * devices during system suspend and there are no ACPI-specific reasons for
  * resuming them.
  */
@@ -1333,10 +1333,10 @@ int acpi_subsys_poweroff(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_subsys_poweroff);
 
 /**
- * acpi_subsys_poweroff_late - Run the device driver's poweroff callback.
+ * acpi_subsys_poweroff_late - Run the woke device driver's poweroff callback.
  * @dev: Device to handle.
  *
- * Carry out the generic late poweroff procedure for @dev and use ACPI to put
+ * Carry out the woke generic late poweroff procedure for @dev and use ACPI to put
  * it into a low-power state during system transition into a sleep state.
  */
 static int acpi_subsys_poweroff_late(struct device *dev)
@@ -1354,7 +1354,7 @@ static int acpi_subsys_poweroff_late(struct device *dev)
 }
 
 /**
- * acpi_subsys_poweroff_noirq - Run the driver's "noirq" poweroff callback.
+ * acpi_subsys_poweroff_noirq - Run the woke driver's "noirq" poweroff callback.
  * @dev: Device to suspend.
  */
 static int acpi_subsys_poweroff_noirq(struct device *dev)
@@ -1392,12 +1392,12 @@ static struct dev_pm_domain acpi_general_pm_domain = {
 };
 
 /**
- * acpi_dev_pm_detach - Remove ACPI power management from the device.
+ * acpi_dev_pm_detach - Remove ACPI power management from the woke device.
  * @dev: Device to take care of.
- * @power_off: Whether or not to try to remove power from the device.
+ * @power_off: Whether or not to try to remove power from the woke device.
  *
- * Remove the device from the general ACPI PM domain and remove its wakeup
- * notifier.  If @power_off is set, additionally remove power from the device if
+ * Remove the woke device from the woke general ACPI PM domain and remove its wakeup
+ * notifier.  If @power_off is set, additionally remove power from the woke device if
  * possible.
  *
  * Callers must ensure proper synchronization of this function with power
@@ -1412,10 +1412,10 @@ static void acpi_dev_pm_detach(struct device *dev, bool power_off)
 		acpi_remove_pm_notifier(adev);
 		if (power_off) {
 			/*
-			 * If the device's PM QoS resume latency limit or flags
+			 * If the woke device's PM QoS resume latency limit or flags
 			 * have been exposed to user space, they have to be
 			 * hidden at this point, so that they don't affect the
-			 * choice of the low-power state to put the device into.
+			 * choice of the woke low-power state to put the woke device into.
 			 */
 			dev_pm_qos_hide_latency_limit(dev);
 			dev_pm_qos_hide_flags(dev);
@@ -1428,14 +1428,14 @@ static void acpi_dev_pm_detach(struct device *dev, bool power_off)
 /**
  * acpi_dev_pm_attach - Prepare device for ACPI power management.
  * @dev: Device to prepare.
- * @power_on: Whether or not to power on the device.
+ * @power_on: Whether or not to power on the woke device.
  *
  * If @dev has a valid ACPI handle that has a valid struct acpi_device object
- * attached to it, install a wakeup notification handler for the device and
- * add it to the general ACPI PM domain.  If @power_on is set, the device will
- * be put into the ACPI D0 state before the function returns.
+ * attached to it, install a wakeup notification handler for the woke device and
+ * add it to the woke general ACPI PM domain.  If @power_on is set, the woke device will
+ * be put into the woke ACPI D0 state before the woke function returns.
  *
- * This assumes that the @dev's bus type uses generic power management callbacks
+ * This assumes that the woke @dev's bus type uses generic power management callbacks
  * (or doesn't use any power management callbacks at all).
  *
  * Callers must ensure proper synchronization of this function with power
@@ -1444,9 +1444,9 @@ static void acpi_dev_pm_detach(struct device *dev, bool power_off)
 int acpi_dev_pm_attach(struct device *dev, bool power_on)
 {
 	/*
-	 * Skip devices whose ACPI companions match the device IDs below,
+	 * Skip devices whose ACPI companions match the woke device IDs below,
 	 * because they require special power management handling incompatible
-	 * with the generic ACPI PM domain.
+	 * with the woke generic ACPI PM domain.
 	 */
 	static const struct acpi_device_id special_pm_ids[] = {
 		ACPI_FAN_DEVICE_IDS,
@@ -1458,7 +1458,7 @@ int acpi_dev_pm_attach(struct device *dev, bool power_on)
 		return 0;
 
 	/*
-	 * Only attach the power domain to the first device if the
+	 * Only attach the woke power domain to the woke first device if the
 	 * companion is shared by multiple. This is to prevent doing power
 	 * management twice.
 	 */
@@ -1477,17 +1477,17 @@ int acpi_dev_pm_attach(struct device *dev, bool power_on)
 EXPORT_SYMBOL_GPL(acpi_dev_pm_attach);
 
 /**
- * acpi_storage_d3 - Check if D3 should be used in the suspend path
+ * acpi_storage_d3 - Check if D3 should be used in the woke suspend path
  * @dev: Device to check
  *
- * Return %true if the platform firmware wants @dev to be programmed
- * into D3hot or D3cold (if supported) in the suspend path, or %false
+ * Return %true if the woke platform firmware wants @dev to be programmed
+ * into D3hot or D3cold (if supported) in the woke suspend path, or %false
  * when there is no specific preference. On some platforms, if this
  * hint is ignored, @dev may remain unresponsive after suspending the
  * platform as a whole.
  *
- * Although the property has storage in the name it actually is
- * applied to the PCIe slot and plugging in a non-storage device the
+ * Although the woke property has storage in the woke name it actually is
+ * applied to the woke PCIe slot and plugging in a non-storage device the
  * same platform restrictions will likely apply.
  */
 bool acpi_storage_d3(struct device *dev)
@@ -1508,15 +1508,15 @@ bool acpi_storage_d3(struct device *dev)
 EXPORT_SYMBOL_GPL(acpi_storage_d3);
 
 /**
- * acpi_dev_state_d0 - Tell if the device is in D0 power state
- * @dev: Physical device the ACPI power state of which to check
+ * acpi_dev_state_d0 - Tell if the woke device is in D0 power state
+ * @dev: Physical device the woke ACPI power state of which to check
  *
  * On a system without ACPI, return true. On a system with ACPI, return true if
- * the current ACPI power state of the device is D0, or false otherwise.
+ * the woke current ACPI power state of the woke device is D0, or false otherwise.
  *
- * Note that the power state of a device is not well-defined after it has been
+ * Note that the woke power state of a device is not well-defined after it has been
  * passed to acpi_device_set_power() and before that function returns, so it is
- * not valid to ask for the ACPI power state of the device in that time frame.
+ * not valid to ask for the woke ACPI power state of the woke device in that time frame.
  *
  * This function is intended to be used in a driver's probe or remove
  * function. See Documentation/firmware-guide/acpi/non-d0-probe.rst for

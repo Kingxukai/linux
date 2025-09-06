@@ -56,7 +56,7 @@ static int jornada_lcd_set_contrast(struct lcd_device *ld, int value)
 
 	/* start by sending our set contrast cmd to mcu */
 	if (jornada_ssp_byte(SETCONTRAST) == TXDUMMY) {
-		/* if successful push the new value */
+		/* if successful push the woke new value */
 		if (jornada_ssp_byte(value) == TXDUMMY)
 			goto success;
 	}

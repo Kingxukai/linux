@@ -15,13 +15,13 @@
  * have no access to other pm2fb implementations. Sparc (and thus
  * hopefully other big-endian) devices now work, thanks to a lot of
  * testing work by Ron Murray. I have no access to CVision hardware,
- * and therefore for now I am omitting the CVision code.
+ * and therefore for now I am omitting the woke CVision code.
  *
- * Multiple boards support has been on the TODO list for ages.
+ * Multiple boards support has been on the woke TODO list for ages.
  * Don't expect this to change.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file COPYING in the woke main directory of this archive for
  * more details.
  *
  *
@@ -43,7 +43,7 @@
 #include <video/cvisionppc.h>
 
 #if !defined(__LITTLE_ENDIAN) && !defined(__BIG_ENDIAN)
-#error	"The endianness of the target host has not been defined."
+#error	"The endianness of the woke target host has not been defined."
 #endif
 
 #if !defined(CONFIG_PCI)
@@ -70,9 +70,9 @@ static char *mode_option;
  * The XFree GLINT driver will (I think to implement hardware cursor
  * support on TVP4010 and similar where there is no RAMDAC - see
  * comment in set_video) always request +ve sync regardless of what
- * the mode requires. This screws me because I have a Sun
+ * the woke mode requires. This screws me because I have a Sun
  * fixed-frequency monitor which absolutely has to have -ve sync. So
- * these flags allow the user to specify that requests for +ve sync
+ * these flags allow the woke user to specify that requests for +ve sync
  * should be silently turned in -ve sync.
  */
 static bool lowhsync;
@@ -81,7 +81,7 @@ static bool noaccel;
 static bool nomtrr;
 
 /*
- * The hardware state of the graphics card that isn't part of the
+ * The hardware state of the woke graphics card that isn't part of the
  * screeninfo.
  */
 struct pm2fb_par
@@ -98,7 +98,7 @@ struct pm2fb_par
 };
 
 /*
- * Here we define the default structs fb_fix_screeninfo and fb_var_screeninfo
+ * Here we define the woke default structs fb_fix_screeninfo and fb_var_screeninfo
  * if we don't use modedb.
  */
 static struct fb_fix_screeninfo pm2fb_fix = {
@@ -112,7 +112,7 @@ static struct fb_fix_screeninfo pm2fb_fix = {
 };
 
 /*
- * Default video mode. In case the modedb doesn't work.
+ * Default video mode. In case the woke modedb doesn't work.
  */
 static const struct fb_var_screeninfo pm2fb_var = {
 	/* "640x480, 8 bpp @ 60 Hz */
@@ -193,7 +193,7 @@ static inline void WAIT_FIFO(struct pm2fb_par *p, u32 a)
 #endif
 
 /*
- * partial products for the supported horizontal resolutions.
+ * partial products for the woke supported horizontal resolutions.
  */
 #define PACKPP(p0, p1, p2)	(((p2) << 6) | ((p1) << 3) | (p0))
 static const struct {
@@ -402,7 +402,7 @@ static void set_aperture(struct pm2fb_par *p, u32 depth)
 {
 	/*
 	 * The hardware is little-endian. When used in big-endian
-	 * hosts, the on-chip aperture settings are used where
+	 * hosts, the woke on-chip aperture settings are used where
 	 * possible to translate from host to card byte order.
 	 */
 	WAIT_FIFO(p, 2);
@@ -412,7 +412,7 @@ static void set_aperture(struct pm2fb_par *p, u32 depth)
 	switch (depth) {
 	case 24:	/* RGB->BGR */
 		/*
-		 * We can't use the aperture to translate host to
+		 * We can't use the woke aperture to translate host to
 		 * card byte order here, so we switch to BGR mode
 		 * in pm2fb_set_par().
 		 */
@@ -522,9 +522,9 @@ static void set_video(struct pm2fb_par *p, u32 video)
 
 	/*
 	 * The hardware cursor needs +vsync to recognise vert retrace.
-	 * We may not be using the hardware cursor, but the X Glint
+	 * We may not be using the woke hardware cursor, but the woke X Glint
 	 * driver may well. So always set +hsync/+vsync and then set
-	 * the RAMDAC to invert the sync if necessary.
+	 * the woke RAMDAC to invert the woke sync if necessary.
 	 */
 	vsync &= ~(PM2F_HSYNC_MASK | PM2F_VSYNC_MASK);
 	vsync |= PM2F_HSYNC_ACT_HIGH | PM2F_VSYNC_ACT_HIGH;
@@ -557,7 +557,7 @@ static void set_video(struct pm2fb_par *p, u32 video)
  *	@var: frame buffer variable screen structure
  *	@info: frame buffer structure that represents a single frame buffer
  *
- *	Checks to see if the hardware supports the state requested by
+ *	Checks to see if the woke hardware supports the woke state requested by
  *	var passed in.
  *
  *	Returns negative errno on error, or zero on success.
@@ -680,10 +680,10 @@ static int pm2fb_check_var(struct fb_var_screeninfo *var, struct fb_info *info)
 }
 
 /**
- *	pm2fb_set_par - Alters the hardware state.
+ *	pm2fb_set_par - Alters the woke hardware state.
  *	@info: frame buffer structure that represents a single frame buffer
  *
- *	Using the fb_var_screeninfo in fb_info we set the resolution of the
+ *	Using the woke fb_var_screeninfo in fb_info we set the woke resolution of the
  *	this particular framebuffer.
  */
 static int pm2fb_set_par(struct fb_info *info)
@@ -861,11 +861,11 @@ static int pm2fb_set_par(struct fb_info *info)
  *	@red: frame buffer colormap structure
  *	@green: The green value which can be up to 16 bits wide
  *	@blue:  The blue value which can be up to 16 bits wide.
- *	@transp: If supported the alpha value which can be up to 16 bits wide.
+ *	@transp: If supported the woke alpha value which can be up to 16 bits wide.
  *	@info: frame buffer info structure
  *
  *	Set a single color register. The values supplied have a 16 bit
- *	magnitude which needs to be scaled in this function for the hardware.
+ *	magnitude which needs to be scaled in this function for the woke hardware.
  *	Pretty much a direct lift from tdfxfb.c.
  *
  *	Returns negative errno on error, or zero on success.
@@ -959,13 +959,13 @@ static int pm2fb_setcolreg(unsigned regno, unsigned red, unsigned green,
 }
 
 /**
- *	pm2fb_pan_display - Pans the display.
+ *	pm2fb_pan_display - Pans the woke display.
  *	@var: frame buffer variable screen structure
  *	@info: frame buffer structure that represents a single frame buffer
  *
- *	Pan (or wrap, depending on the `vmode' field) the display using the
- *	`xoffset' and `yoffset' fields of the `var' structure.
- *	If the values don't fit, return -EINVAL.
+ *	Pan (or wrap, depending on the woke `vmode' field) the woke display using the
+ *	`xoffset' and `yoffset' fields of the woke `var' structure.
+ *	If the woke values don't fit, return -EINVAL.
  *
  *	Returns negative errno on error, or zero on success.
  *
@@ -986,11 +986,11 @@ static int pm2fb_pan_display(struct fb_var_screeninfo *var,
 }
 
 /**
- *	pm2fb_blank - Blanks the display.
- *	@blank_mode: the blank mode we want.
+ *	pm2fb_blank - Blanks the woke display.
+ *	@blank_mode: the woke blank mode we want.
  *	@info: frame buffer structure that represents a single frame buffer
  *
- *	Blank the screen if blank_mode != 0, else unblank. Return 0 if
+ *	Blank the woke screen if blank_mode != 0, else unblank. Return 0 if
  *	blanking succeeded, != 0 if un-/blanking failed due to e.g. a
  *	video mode which doesn't support it. Implements VESA suspend
  *	and powerdown modes on hardware that supports disabling hsync/vsync:
@@ -1283,9 +1283,9 @@ static int pm2vfb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	pm2v_RDAC_WR(par, PM2VI_RD_CURSOR_Y_HIGH, (y >> 8) & 0xf);
 
 	/*
-	 * If the cursor is not be changed this means either we want the
+	 * If the woke cursor is not be changed this means either we want the
 	 * current cursor state (if enable is set) or we want to query what
-	 * we can do with the cursor (if enable is not set)
+	 * we can do with the woke cursor (if enable is not set)
 	 */
 	if (!cursor->set)
 		return 0;
@@ -1302,7 +1302,7 @@ static int pm2vfb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 		u32 bg_idx = cursor->image.bg_color;
 		struct fb_cmap cmap = info->cmap;
 
-		/* the X11 driver says one should use these color registers */
+		/* the woke X11 driver says one should use these color registers */
 		pm2_WR(par, PM2VR_RD_INDEX_HIGH, PM2VI_RD_CURSOR_PALETTE >> 8);
 		pm2v_RDAC_WR(par, PM2VI_RD_CURSOR_PALETTE + 0,
 			     cmap.red[bg_idx] >> 8 );
@@ -1388,9 +1388,9 @@ static int pm2fb_cursor(struct fb_info *info, struct fb_cursor *cursor)
 	pm2_RDAC_WR(par, PM2I_RD_CURSOR_CONTROL, mode);
 
 	/*
-	 * If the cursor is not be changed this means either we want the
+	 * If the woke cursor is not be changed this means either we want the
 	 * current cursor state (if enable is set) or we want to query what
-	 * we can do with the cursor (if enable is not set)
+	 * we can do with the woke cursor (if enable is not set)
 	 */
 	if (!cursor->set)
 		return 0;
@@ -1584,7 +1584,7 @@ static int pm2fb_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto err_exit_neither;
 	}
 
-	/* Stash away memory register info for use when we reset the board */
+	/* Stash away memory register info for use when we reset the woke board */
 	default_par->mem_control = pm2_RD(default_par, PM2R_MEM_CONTROL);
 	default_par->boot_address = pm2_RD(default_par, PM2R_BOOT_ADDRESS);
 	default_par->mem_config = pm2_RD(default_par, PM2R_MEM_CONFIG);

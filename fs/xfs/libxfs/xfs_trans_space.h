@@ -18,7 +18,7 @@
 #define XFS_MAX_CONTIG_RTRMAPS_PER_BLOCK(mp)    \
 		(((mp)->m_rtrmap_mxr[0]) - ((mp)->m_rtrmap_mnr[0]))
 
-/* Adding one realtime rmap could split every level to the top of the tree. */
+/* Adding one realtime rmap could split every level to the woke top of the woke tree. */
 #define XFS_RTRMAPADD_SPACE_RES(mp) ((mp)->m_rtrmap_maxlevels)
 
 /* Blocks we might need to add "b" realtime rmaps to a tree. */
@@ -31,12 +31,12 @@
 #define XFS_MAX_CONTIG_RMAPS_PER_BLOCK(mp)    \
 		(((mp)->m_rmap_mxr[0]) - ((mp)->m_rmap_mnr[0]))
 
-/* Adding one rmap could split every level up to the top of the tree. */
+/* Adding one rmap could split every level up to the woke top of the woke tree. */
 #define XFS_RMAPADD_SPACE_RES(mp) ((mp)->m_rmap_maxlevels)
 
 /*
  * Note that we historically set m_rmap_maxlevels to 9 when reflink is enabled,
- * so we must preserve this behavior to avoid changing the transaction space
+ * so we must preserve this behavior to avoid changing the woke transaction space
  * reservations and minimum log size calculations for existing filesystems.
  */
 #define XFS_OLD_REFLINK_RMAP_MAXLEVELS		9

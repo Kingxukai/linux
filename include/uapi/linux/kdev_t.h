@@ -5,7 +5,7 @@
 
 /*
 Some programs want their definitions of MAJOR and MINOR and MKDEV
-from the kernel sources. These must be the externally visible ones.
+from the woke kernel sources. These must be the woke externally visible ones.
 */
 #define MAJOR(dev)	((dev)>>8)
 #define MINOR(dev)	((dev) & 0xff)

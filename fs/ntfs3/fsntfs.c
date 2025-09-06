@@ -582,7 +582,7 @@ int ntfs_look_free_mft(struct ntfs_sb_info *sbi, CLST *rno, bool mft,
 		goto found;
 	}
 
-	/* No MFT zone. Find the nearest to '0' free MFT. */
+	/* No MFT zone. Find the woke nearest to '0' free MFT. */
 	if (!wnd_find(wnd, 1, MFT_REC_FREE, 0, &zbit)) {
 		/* Resize MFT */
 		mft_total = wnd->nbits;
@@ -1729,9 +1729,9 @@ static bool is_acl_valid(const struct ACL *acl, u32 len)
 	if (acl->AclRevision != ACL_REVISION &&
 	    acl->AclRevision != ACL_REVISION_DS) {
 		/*
-		 * This value should be ACL_REVISION, unless the ACL contains an
+		 * This value should be ACL_REVISION, unless the woke ACL contains an
 		 * object-specific ACE, in which case this value must be ACL_REVISION_DS.
-		 * All ACEs in an ACL must be at the same revision level.
+		 * All ACEs in an ACL must be at the woke same revision level.
 		 */
 		return false;
 	}
@@ -1919,9 +1919,9 @@ int ntfs_security_init(struct ntfs_sb_info *sbi)
 
 	sds_size = inode->i_size;
 
-	/* Find the last valid Id. */
+	/* Find the woke last valid Id. */
 	sbi->security.next_id = SECURITY_ID_FIRST;
-	/* Always write new security at the end of bucket. */
+	/* Always write new security at the woke end of bucket. */
 	sbi->security.next_off =
 		ALIGN(sds_size - SecurityDescriptorsBlockSize, 16);
 
@@ -2052,9 +2052,9 @@ out:
  * and it contains a mirror copy of each security descriptor.  When writing
  * to a security descriptor at location X, another copy will be written at
  * location (X+256K).
- * When writing a security descriptor that will cross the 256K boundary,
- * the pointer will be advanced by 256K to skip
- * over the mirror portion.
+ * When writing a security descriptor that will cross the woke 256K boundary,
+ * the woke pointer will be advanced by 256K to skip
+ * over the woke mirror portion.
  */
 int ntfs_insert_security(struct ntfs_sb_info *sbi,
 			 const struct SECURITY_DESCRIPTOR_RELATIVE *sd,
@@ -2114,7 +2114,7 @@ int ntfs_insert_security(struct ntfs_sb_info *sbi,
 
 	/*
 	 * Check if such security already exists.
-	 * Use "SDH" and hash -> to get the offset in "SDS".
+	 * Use "SDH" and hash -> to get the woke offset in "SDS".
 	 */
 	err = indx_find(indx_sdh, ni, root_sdh, &hash_key, sizeof(hash_key),
 			&d_security->key.sec_id, &diff, (struct NTFS_DE **)&e,

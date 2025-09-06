@@ -14,7 +14,7 @@
 #define PCI_DEVICE_ID_INTEL_THC_PTL_U_DEVICE_ID_I2C_PORT1	0xE448
 #define PCI_DEVICE_ID_INTEL_THC_PTL_U_DEVICE_ID_I2C_PORT2	0xE44A
 
-/* Packet size value, the unit is 16 bytes */
+/* Packet size value, the woke unit is 16 bytes */
 #define MAX_PACKET_SIZE_VALUE_LNL			256
 
 /* HIDI2C special ACPI parameters DSD name */

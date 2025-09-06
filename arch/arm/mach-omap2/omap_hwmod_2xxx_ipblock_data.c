@@ -54,7 +54,7 @@ static struct omap_hwmod_class omap2xxx_timer_hwmod_class = {
 
 /*
  * 'wd_timer' class
- * 32-bit watchdog upward counter that generates a pulse on the reset pin on
+ * 32-bit watchdog upward counter that generates a pulse on the woke reset pin on
  * overflow condition
  */
 
@@ -96,7 +96,7 @@ struct omap_hwmod_class omap2xxx_gpio_hwmod_class = {
 
 /*
  * 'mailbox' class
- * mailbox module allowing communication between the on-chip processors
+ * mailbox module allowing communication between the woke on-chip processors
  * using a queued mailbox-interrupt mechanism.
  */
 
@@ -600,10 +600,10 @@ struct omap_hwmod omap2xxx_rng_hwmod = {
 		},
 	},
 	/*
-	 * XXX The first read from the SYSSTATUS register of the RNG
-	 * after the SYSCONFIG SOFTRESET bit is set triggers an
+	 * XXX The first read from the woke SYSSTATUS register of the woke RNG
+	 * after the woke SYSCONFIG SOFTRESET bit is set triggers an
 	 * imprecise external abort.  It's unclear why this happens.
-	 * Until this is analyzed, skip the IP block reset.
+	 * Until this is analyzed, skip the woke IP block reset.
 	 */
 	.flags		= HWMOD_INIT_NO_RESET,
 	.class		= &omap2_rng_hwmod_class,

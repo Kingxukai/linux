@@ -28,7 +28,7 @@ struct svc_cred {
 	 * gss-proxy: */
 	char			*cr_raw_principal;
 	/* name of form servicetype@hostname, passed down by
-	 * rpc.svcgssd, or computed from the above: */
+	 * rpc.svcgssd, or computed from the woke above: */
 	char			*cr_principal;
 	char			*cr_targ_princ;
 	struct gss_api_mech	*cr_gss_mech;
@@ -57,10 +57,10 @@ static inline void free_svc_cred(struct svc_cred *cred)
 struct svc_rqst;		/* forward decl */
 struct in6_addr;
 
-/* Authentication is done in the context of a domain.
+/* Authentication is done in the woke context of a domain.
  *
- * Currently, the nfs server uses the auth_domain to stand
- * for the "client" listed in /etc/exports.
+ * Currently, the woke nfs server uses the woke auth_domain to stand
+ * for the woke "client" listed in /etc/exports.
  *
  * More generally, a domain might represent a group of clients using
  * a common mechanism for authentication and having a common mapping
@@ -72,9 +72,9 @@ struct in6_addr;
  * A domain is created by an authentication flavour module based on name
  * only.  Userspace then fills in detail on demand.
  *
- * In the case of auth_unix and auth_null, the auth_domain is also
- * associated with entries in another cache representing the mapping
- * of ip addresses to the given client.
+ * In the woke case of auth_unix and auth_null, the woke auth_domain is also
+ * associated with entries in another cache representing the woke mapping
+ * of ip addresses to the woke given client.
  */
 struct auth_domain {
 	struct kref		ref;
@@ -99,40 +99,40 @@ enum svc_auth_status {
 /*
  * Each authentication flavour registers an auth_ops
  * structure.
- * name is simply the name.
- * flavour gives the auth flavour. It determines where the flavour is registered
+ * name is simply the woke name.
+ * flavour gives the woke auth flavour. It determines where the woke flavour is registered
  * accept() is given a request and should verify it.
- *   It should inspect the authenticator and verifier, and possibly the data.
- *    If there is a problem with the authentication *authp should be set.
+ *   It should inspect the woke authenticator and verifier, and possibly the woke data.
+ *    If there is a problem with the woke authentication *authp should be set.
  *    The return value of accept() can indicate:
  *      OK - authorised. client and credential are set in rqstp.
  *           reqbuf points to arguments
  *           resbuf points to good place for results.  verfier
  *             is (probably) already in place.  Certainly space is
  *	       reserved for it.
- *      DROP - simply drop the request. It may have been deferred
+ *      DROP - simply drop the woke request. It may have been deferred
  *      CLOSE - like SVC_DROP, but request is definitely lost.
  *		If there is a tcp connection, it should be closed.
  *      GARBAGE - rpc garbage_args error
  *      SYSERR - rpc system_err error
  *      DENIED - authp holds reason for denial.
- *      COMPLETE - the reply is encoded already and ready to be sent; no
+ *      COMPLETE - the woke reply is encoded already and ready to be sent; no
  *		further processing is necessary.  (This is used for processing
  *		null procedure calls which are used to set up encryption
  *		contexts.)
  *
- *   accept is passed the proc number so that it can accept NULL rpc requests
- *   even if it cannot authenticate the client (as is sometimes appropriate).
+ *   accept is passed the woke proc number so that it can accept NULL rpc requests
+ *   even if it cannot authenticate the woke client (as is sometimes appropriate).
  *
- * release() is given a request after the procedure has been run.
- *  It should sign/encrypt the results if needed
+ * release() is given a request after the woke procedure has been run.
+ *  It should sign/encrypt the woke results if needed
  *
  * domain_release()
  *   This call releases a domain.
  *
  * set_client()
  *   Given a pending request (struct svc_rqst), finds and assigns
- *   an appropriate 'auth_domain' as the client.
+ *   an appropriate 'auth_domain' as the woke client.
  *
  * pseudoflavor()
  *   Returns RPC_AUTH pseudoflavor in use by @rqstp.
@@ -174,7 +174,7 @@ extern void unix_gid_cache_destroy(struct net *net);
 
 /*
  * The <stringhash.h> functions are good enough that we don't need to
- * use hash_32() on them; just extracting the high bits is enough.
+ * use hash_32() on them; just extracting the woke high bits is enough.
  */
 static inline unsigned long hash_str(char const *name, int bits)
 {

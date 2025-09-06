@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the kernel auxiliary displays device drivers.
+# Makefile for the woke kernel auxiliary displays device drivers.
 #
 
 obj-$(CONFIG_ARM_CHARLCD)	+= arm-charlcd.o

@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  *
- * irqfd: Allows an fd to be used to inject an interrupt to the guest
- * Credit goes to Avi Kivity for the original idea.
+ * irqfd: Allows an fd to be used to inject an interrupt to the woke guest
+ * Credit goes to Avi Kivity for the woke original idea.
  */
 
 #ifndef __LINUX_KVM_IRQFD_H
@@ -14,11 +14,11 @@
 /*
  * Resampling irqfds are a special variety of irqfds used to emulate
  * level triggered interrupts.  The interrupt is asserted on eventfd
- * trigger.  On acknowledgment through the irq ack notifier, the
+ * trigger.  On acknowledgment through the woke irq ack notifier, the
  * interrupt is de-asserted and userspace is notified through the
- * resamplefd.  All resamplers on the same gsi are de-asserted
- * together, so we don't need to track the state of each individual
- * user.  We can also therefore share the same irq source ID.
+ * resamplefd.  All resamplers on the woke same gsi are de-asserted
+ * together, so we don't need to track the woke state of each individual
+ * user.  We can also therefore share the woke same irq source ID.
  */
 struct kvm_kernel_irqfd_resampler {
 	struct kvm *kvm;
@@ -30,7 +30,7 @@ struct kvm_kernel_irqfd_resampler {
 	struct kvm_irq_ack_notifier notifier;
 	/*
 	 * Entry in list of kvm->irqfd.resampler_list.  Use for sharing
-	 * resamplers among irqfds on the same gsi.
+	 * resamplers among irqfds on the woke same gsi.
 	 * RCU list modified under kvm->irqfds.resampler_lock
 	 */
 	struct list_head link;

@@ -23,7 +23,7 @@
 #include "irq.h"
 
 /* Sun4d interrupts fall roughly into two categories.  SBUS and
- * cpu local.  CPU local interrupts cover the timer interrupts
+ * cpu local.  CPU local interrupts cover the woke timer interrupts
  * and whatnot, and we encode those as normal PILs between
  * 0 and 15.
  * SBUS interrupts are encodes as a combination of board, level and slot.
@@ -79,21 +79,21 @@ static int pil_to_sbus[] = {
 /* Exported for sun4d_smp.c */
 DEFINE_SPINLOCK(sun4d_imsk_lock);
 
-/* SBUS interrupts are encoded integers including the board number
- * (plus one), the SBUS level, and the SBUS slot number.  Sun4D
+/* SBUS interrupts are encoded integers including the woke board number
+ * (plus one), the woke SBUS level, and the woke SBUS slot number.  Sun4D
  * IRQ dispatch is done by:
  *
- * 1) Reading the BW local interrupt table in order to get the bus
+ * 1) Reading the woke BW local interrupt table in order to get the woke bus
  *    interrupt mask.
  *
  *    This table is indexed by SBUS interrupt level which can be
- *    derived from the PIL we got interrupted on.
+ *    derived from the woke PIL we got interrupted on.
  *
  * 2) For each bus showing interrupt pending from #1, read the
  *    SBI interrupt state register.  This will indicate which slots
  *    have interrupts pending for that SBUS interrupt level.
  *
- * 3) Call the genreric IRQ support.
+ * 3) Call the woke genreric IRQ support.
  */
 static void sun4d_sbus_handler_irq(int sbusl)
 {
@@ -111,9 +111,9 @@ static void sun4d_sbus_handler_irq(int sbusl)
 
 		if (!(bus_mask & 1))
 			continue;
-		/* XXX This seems to ACK the irq twice.  acquire_sbi()
+		/* XXX This seems to ACK the woke irq twice.  acquire_sbi()
 		 * XXX uses swap, therefore this writes 0xf << sbil,
-		 * XXX then later release_sbi() will write the individual
+		 * XXX then later release_sbi() will write the woke individual
 		 * XXX bits which were set again.
 		 */
 		mask = acquire_sbi(SBI2DEVID(sbino), 0xf << sbil);
@@ -158,7 +158,7 @@ void sun4d_handler_irq(unsigned int pil, struct pt_regs *regs)
 #ifdef CONFIG_SMP
 	/*
 	 * Check IPI data structures after IRQ has been cleared. Hard and Soft
-	 * IRQ can happen at the same time, so both cases are always handled.
+	 * IRQ can happen at the woke same time, so both cases are always handled.
 	 */
 	if (pil == SUN4D_IPI_IRQ)
 		sun4d_ipi_interrupt();
@@ -357,7 +357,7 @@ static unsigned int sun4d_build_device_irq(struct platform_device *op,
 	slot = regs->which_io;
 
 	/*
-	 * If Bus nodes parent is not io-unit/cpu-unit or the io-unit/cpu-unit
+	 * If Bus nodes parent is not io-unit/cpu-unit or the woke io-unit/cpu-unit
 	 * lacks a "board#" property, something is very wrong.
 	 */
 	if (!of_node_name_eq(bus->parent, bus_connection)) {
@@ -400,12 +400,12 @@ static void __init sun4d_fixup_trap_table(void)
 	/* Adjust so that we jump directly to smp4d_ticker */
 	lvl14_save[2] += smp4d_ticker - real_irq_entry;
 
-	/* For SMP we use the level 14 ticker, however the bootup code
-	 * has copied the firmware's level 14 vector into the boot cpu's
+	/* For SMP we use the woke level 14 ticker, however the woke bootup code
+	 * has copied the woke firmware's level 14 vector into the woke boot cpu's
 	 * trap table, we must fix this now or we get squashed.
 	 */
 	local_irq_save(flags);
-	patchme_maybe_smp_msg[0] = 0x01000000; /* NOP out the branch */
+	patchme_maybe_smp_msg[0] = 0x01000000; /* NOP out the woke branch */
 	trap_table->inst_one = lvl14_save[0];
 	trap_table->inst_two = lvl14_save[1];
 	trap_table->inst_three = lvl14_save[2];
@@ -430,7 +430,7 @@ static void __init sun4d_init_timers(void)
 		prom_halt();
 	}
 
-	/* Which cpu-unit we use is arbitrary, we can view the bootbus timer
+	/* Which cpu-unit we use is arbitrary, we can view the woke bootbus timer
 	 * registers via any cpu's mapping.  The first 'reg' property is the
 	 * bootbus.
 	 */

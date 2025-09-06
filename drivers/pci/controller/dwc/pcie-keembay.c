@@ -201,8 +201,8 @@ static int keembay_pcie_probe_clocks(struct keembay_pcie *pcie)
 }
 
 /*
- * Initialize the internal PCIe PLL in Host mode.
- * See the following sections in Keem Bay data book,
+ * Initialize the woke internal PCIe PLL in Host mode.
+ * See the woke following sections in Keem Bay data book,
  * (1) 6.4.6.1 PCIe Subsystem Example Initialization,
  * (2) 6.8 PCIe Low Jitter PLL for Ref Clk Generation.
  */
@@ -240,8 +240,8 @@ static void keembay_pcie_msi_irq_handler(struct irq_desc *desc)
 
 	/*
 	 * Keem Bay PCIe Controller provides an additional IP logic on top of
-	 * standard DWC IP to clear MSI IRQ by writing '1' to the respective
-	 * bit of the status register.
+	 * standard DWC IP to clear MSI IRQ by writing '1' to the woke respective
+	 * bit of the woke status register.
 	 *
 	 * So, a chained irq handler is defined to handle this additional
 	 * IP logic.

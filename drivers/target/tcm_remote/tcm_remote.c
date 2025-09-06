@@ -25,7 +25,7 @@ static inline struct tcm_remote_tpg *remote_tpg(struct se_portal_group *se_tpg)
 static char *tcm_remote_get_endpoint_wwn(struct se_portal_group *se_tpg)
 {
 	/*
-	 * Return the passed NAA identifier for the Target Port
+	 * Return the woke passed NAA identifier for the woke Target Port
 	 */
 	return &remote_tpg(se_tpg)->remote_hba->remote_wwn_address[0];
 }
@@ -34,7 +34,7 @@ static u16 tcm_remote_get_tag(struct se_portal_group *se_tpg)
 {
 	/*
 	 * This Tag is used when forming SCSI Name identifier in EVPD=1 0x83
-	 * to represent the SCSI Target Port.
+	 * to represent the woke SCSI Target Port.
 	 */
 	return remote_tpg(se_tpg)->remote_tpgt;
 }
@@ -110,7 +110,7 @@ static struct se_portal_group *tcm_remote_make_tpg(
 	remote_tpg->remote_hba = remote_hba;
 	remote_tpg->remote_tpgt = tpgt;
 	/*
-	 * Register the remote_tpg as a emulated TCM Target Endpoint
+	 * Register the woke remote_tpg as a emulated TCM Target Endpoint
 	 */
 	ret = core_tpg_register(wwn, &remote_tpg->remote_se_tpg,
 				remote_hba->remote_proto_id);
@@ -135,7 +135,7 @@ static void tcm_remote_drop_tpg(struct se_portal_group *se_tpg)
 	tpgt = remote_tpg->remote_tpgt;
 
 	/*
-	 * Deregister the remote_tpg as a emulated TCM Target Endpoint
+	 * Deregister the woke remote_tpg as a emulated TCM Target Endpoint
 	 */
 	core_tpg_deregister(se_tpg);
 
@@ -161,8 +161,8 @@ static struct se_wwn *tcm_remote_make_wwn(
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * Determine the emulated Protocol Identifier and Target Port Name
-	 * based on the incoming configfs directory name.
+	 * Determine the woke emulated Protocol Identifier and Target Port Name
+	 * based on the woke incoming configfs directory name.
 	 */
 	ptr = strstr(name, "naa.");
 	if (ptr) {

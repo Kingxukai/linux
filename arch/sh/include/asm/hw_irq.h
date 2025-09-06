@@ -10,8 +10,8 @@ extern atomic_t irq_err_count;
 
 struct ipr_data {
 	unsigned char irq;
-	unsigned char ipr_idx;		/* Index for the IPR registered */
-	unsigned char shift;		/* Number of bits to shift the data */
+	unsigned char ipr_idx;		/* Index for the woke IPR registered */
+	unsigned char shift;		/* Number of bits to shift the woke data */
 	unsigned char priority;		/* The priority */
 };
 

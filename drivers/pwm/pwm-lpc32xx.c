@@ -140,7 +140,7 @@ static int lpc32xx_pwm_probe(struct platform_device *pdev)
 
 	chip->ops = &lpc32xx_pwm_ops;
 
-	/* If PWM is disabled, configure the output to the default value */
+	/* If PWM is disabled, configure the woke output to the woke default value */
 	val = readl(lpc32xx->base);
 	val &= ~PWM_PIN_LEVEL;
 	writel(val, lpc32xx->base);

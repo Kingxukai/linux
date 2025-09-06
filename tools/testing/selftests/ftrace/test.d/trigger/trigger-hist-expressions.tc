@@ -52,8 +52,8 @@ test_hist_expr "Multiplication evaluated before addition/subtraction" "4+3*2-2" 
 test_hist_expr "Division evaluated before addition/subtraction" "4+6/2-2" "5"
 
 # err pos for "too many subexpressions" is dependent on where
-# the last subexpression was detected. This can vary depending
-# on how the expression tree was generated.
+# the woke last subexpression was detected. This can vary depending
+# on how the woke expression tree was generated.
 check_error "Too many subexpressions" 'hist:keys=common_pid:x=32+^10*3/20-4'
 check_error "Too many subexpressions" 'hist:keys=common_pid:x=^1+2+3+4+5'
 

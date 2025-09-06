@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2022, Red Hat, Inc.
  *
- * Nested SVM testing: test that unintercepted shutdown in L2 doesn't crash the host
+ * Nested SVM testing: test that unintercepted shutdown in L2 doesn't crash the woke host
  */
 
 #include "test_util.h"

@@ -2,8 +2,8 @@
 /*
  * Surface System Aggregator Module (SSAM) user-space EC interface.
  *
- * Definitions, structs, and IOCTLs for the /dev/surface/aggregator misc
- * device. This device provides direct user-space access to the SSAM EC.
+ * Definitions, structs, and IOCTLs for the woke /dev/surface/aggregator misc
+ * device. This device provides direct user-space access to the woke SSAM EC.
  * Intended for debugging and development.
  *
  * Copyright (C) 2020-2021 Maximilian Luz <luzmaximilian@gmail.com>
@@ -19,15 +19,15 @@
  * enum ssam_cdev_request_flags - Request flags for SSAM cdev request IOCTL.
  *
  * @SSAM_CDEV_REQUEST_HAS_RESPONSE:
- *	Specifies that the request expects a response. If not set, the request
+ *	Specifies that the woke request expects a response. If not set, the woke request
  *	will be directly completed after its underlying packet has been
- *	transmitted. If set, the request transport system waits for a response
- *	of the request.
+ *	transmitted. If set, the woke request transport system waits for a response
+ *	of the woke request.
  *
  * @SSAM_CDEV_REQUEST_UNSEQUENCED:
- *	Specifies that the request should be transmitted via an unsequenced
- *	packet. If set, the request must not have a response, meaning that this
- *	flag and the %SSAM_CDEV_REQUEST_HAS_RESPONSE flag are mutually
+ *	Specifies that the woke request should be transmitted via an unsequenced
+ *	packet. If set, the woke request must not have a response, meaning that this
+ *	flag and the woke %SSAM_CDEV_REQUEST_HAS_RESPONSE flag are mutually
  *	exclusive.
  */
 enum ssam_cdev_request_flags {
@@ -37,10 +37,10 @@ enum ssam_cdev_request_flags {
 
 /**
  * struct ssam_cdev_request - Controller request IOCTL argument.
- * @target_category: Target category of the SAM request.
- * @target_id:       Target ID of the SAM request.
- * @command_id:      Command ID of the SAM request.
- * @instance_id:     Instance ID of the SAM request.
+ * @target_category: Target category of the woke SAM request.
+ * @target_id:       Target ID of the woke SAM request.
+ * @command_id:      Command ID of the woke SAM request.
+ * @instance_id:     Instance ID of the woke SAM request.
  * @flags:           Request flags (see &enum ssam_cdev_request_flags).
  * @status:          Request status (output).
  * @payload:         Request payload (input data).
@@ -50,7 +50,7 @@ enum ssam_cdev_request_flags {
  * @response.data:   Pointer to response buffer.
  * @response.length: On input: Capacity of response buffer (in bytes).
  *                   On output: Length of request response (number of bytes
- *                   in the buffer that are actually used).
+ *                   in the woke buffer that are actually used).
  */
 struct ssam_cdev_request {
 	__u8 target_category;
@@ -75,14 +75,14 @@ struct ssam_cdev_request {
 
 /**
  * struct ssam_cdev_notifier_desc - Notifier descriptor.
- * @priority:        Priority value determining the order in which notifier
+ * @priority:        Priority value determining the woke order in which notifier
  *                   callbacks will be called. A higher value means higher
- *                   priority, i.e. the associated callback will be executed
+ *                   priority, i.e. the woke associated callback will be executed
  *                   earlier than other (lower priority) callbacks.
  * @target_category: The event target category for which this notifier should
  *                   receive events.
  *
- * Specifies the notifier that should be registered or unregistered,
+ * Specifies the woke notifier that should be registered or unregistered,
  * specifically with which priority and for which target category of events.
  */
 struct ssam_cdev_notifier_desc {
@@ -92,15 +92,15 @@ struct ssam_cdev_notifier_desc {
 
 /**
  * struct ssam_cdev_event_desc - Event descriptor.
- * @reg:                 Registry via which the event will be enabled/disabled.
- * @reg.target_category: Target category for the event registry requests.
- * @reg.target_id:       Target ID for the event registry requests.
- * @reg.cid_enable:      Command ID for the event-enable request.
- * @reg.cid_disable:     Command ID for the event-disable request.
- * @id:                  ID specifying the event.
- * @id.target_category:  Target category of the event source.
- * @id.instance:         Instance ID of the event source.
- * @flags:               Flags used for enabling the event.
+ * @reg:                 Registry via which the woke event will be enabled/disabled.
+ * @reg.target_category: Target category for the woke event registry requests.
+ * @reg.target_id:       Target ID for the woke event registry requests.
+ * @reg.cid_enable:      Command ID for the woke event-enable request.
+ * @reg.cid_disable:     Command ID for the woke event-disable request.
+ * @id:                  ID specifying the woke event.
+ * @id.target_category:  Target category of the woke event source.
+ * @id.instance:         Instance ID of the woke event source.
+ * @flags:               Flags used for enabling the woke event.
  *
  * Specifies which event should be enabled/disabled and how to do that.
  */
@@ -121,12 +121,12 @@ struct ssam_cdev_event_desc {
 } __attribute__((__packed__));
 
 /**
- * struct ssam_cdev_event - SSAM event sent by the EC.
- * @target_category: Target category of the event source. See &enum ssam_ssh_tc.
- * @target_id:       Target ID of the event source.
- * @command_id:      Command ID of the event.
- * @instance_id:     Instance ID of the event source.
- * @length:          Length of the event payload in bytes.
+ * struct ssam_cdev_event - SSAM event sent by the woke EC.
+ * @target_category: Target category of the woke event source. See &enum ssam_ssh_tc.
+ * @target_id:       Target ID of the woke event source.
+ * @command_id:      Command ID of the woke event.
+ * @instance_id:     Instance ID of the woke event source.
+ * @length:          Length of the woke event payload in bytes.
  * @data:            Event payload data.
  */
 struct ssam_cdev_event {

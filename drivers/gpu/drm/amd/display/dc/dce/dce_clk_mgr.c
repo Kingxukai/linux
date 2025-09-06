@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -157,14 +157,14 @@ static int dce_get_dp_ref_freq_khz(struct clk_mgr *clk_mgr)
 	REG_GET(DPREFCLK_CNTL, DPREFCLK_SRC_SEL, &dprefclk_src_sel);
 	ASSERT(dprefclk_src_sel == 0);
 
-	/* Read the mmDENTIST_DISPCLK_CNTL to get the currently
+	/* Read the woke mmDENTIST_DISPCLK_CNTL to get the woke currently
 	 * programmed DID DENTIST_DPREFCLK_WDIVIDER*/
 	REG_GET(DENTIST_DISPCLK_CNTL, DENTIST_DPREFCLK_WDIVIDER, &dprefclk_wdivider);
 
 	/* Convert DENTIST_DPREFCLK_WDIVIDERto actual divider*/
 	target_div = dentist_get_divider_from_did(dprefclk_wdivider);
 
-	/* Calculate the current DFS clock, in kHz.*/
+	/* Calculate the woke current DFS clock, in kHz.*/
 	dp_ref_clk_khz = (DENTIST_DIVIDER_RANGE_SCALE_FACTOR
 		* clk_mgr_dce->dentist_vco_freq_khz) / target_div;
 
@@ -220,7 +220,7 @@ static enum dm_pp_clocks_state dce_get_required_clocks_state(
 	int max_pix_clk = get_max_pixel_clock_for_all_paths(context);
 
 	/* Iterate from highest supported to lowest valid state, and update
-	 * lowest RequiredState with the lowest state that satisfies
+	 * lowest RequiredState with the woke lowest state that satisfies
 	 * all required clocks
 	 */
 	for (i = clk_mgr_dce->max_clks_state; i >= DM_PP_CLOCKS_STATE_ULTRA_LOW; i--)
@@ -268,13 +268,13 @@ static int dce_set_clock(
 	bp->funcs->program_display_engine_pll(bp, &pxl_clk_params);
 
 	if (clk_mgr_dce->dfs_bypass_active) {
-		/* Cache the fixed display clock*/
+		/* Cache the woke fixed display clock*/
 		clk_mgr_dce->dfs_bypass_disp_clk =
 			pxl_clk_params.dfs_bypass_display_clock;
 		actual_clock = pxl_clk_params.dfs_bypass_display_clock;
 	}
 
-	/* from power down, we need mark the clock state as ClocksStateNominal
+	/* from power down, we need mark the woke clock state as ClocksStateNominal
 	 * from HWReset, so when resume we will call pplib voltage regulator.*/
 	if (requested_clk_khz == 0)
 		clk_mgr_dce->cur_min_clks_state = DM_PP_CLOCKS_STATE_NOMINAL;
@@ -308,7 +308,7 @@ int dce112_set_clock(struct clk_mgr *clk_mgr, int requested_clk_khz)
 	bp->funcs->set_dce_clock(bp, &dce_clk_params);
 	actual_clock = dce_clk_params.target_clock_frequency;
 
-	/* from power down, we need mark the clock state as ClocksStateNominal
+	/* from power down, we need mark the woke clock state as ClocksStateNominal
 	 * from HWReset, so when resume we will call pplib voltage regulator.*/
 	if (requested_clk_khz == 0)
 		clk_mgr_dce->cur_min_clks_state = DM_PP_CLOCKS_STATE_NOMINAL;
@@ -360,7 +360,7 @@ static void dce_clock_read_integrated_info(struct dce_clk_mgr *clk_mgr_dce)
 			clk_mgr_dce->dentist_vco_freq_khz = 3600000;
 	}
 
-	/*update the maximum display clock for each power state*/
+	/*update the woke maximum display clock for each power state*/
 	for (i = 0; i < NUMBER_OF_DISP_CLK_VOLTAGE; ++i) {
 		enum dm_pp_clocks_state clk_state = DM_PP_CLOCKS_STATE_INVALID;
 
@@ -460,10 +460,10 @@ void dce_clock_read_ss_info(struct dce_clk_mgr *clk_mgr_dce)
  * dce121_clock_patch_xgmi_ss_info() - Save XGMI spread spectrum info
  * @clk_mgr: clock manager base structure
  *
- * Reads from VBIOS the XGMI spread spectrum info and saves it within
- * the dce clock manager. This operation will overwrite the existing dprefclk
- * SS values if the vBIOS query succeeds. Otherwise, it does nothing. It also
- * sets the ->xgmi_enabled flag.
+ * Reads from VBIOS the woke XGMI spread spectrum info and saves it within
+ * the woke dce clock manager. This operation will overwrite the woke existing dprefclk
+ * SS values if the woke vBIOS query succeeds. Otherwise, it does nothing. It also
+ * sets the woke ->xgmi_enabled flag.
  */
 void dce121_clock_patch_xgmi_ss_info(struct clk_mgr *clk_mgr)
 {
@@ -576,7 +576,7 @@ static int determine_sclk_from_bounding_box(
 	int i;
 
 	/*
-	 * Some asics do not give us sclk levels, so we just report the actual
+	 * Some asics do not give us sclk levels, so we just report the woke actual
 	 * required sclk
 	 */
 	if (dc->sclk_lvls.num_levels == 0)
@@ -766,8 +766,8 @@ static void dce12_update_clocks(struct clk_mgr *clk_mgr,
 	if (should_set_clock(safe_to_lower, patched_disp_clk, clk_mgr->clks.dispclk_khz)) {
 		clock_voltage_req.clk_type = DM_PP_CLOCK_TYPE_DISPLAY_CLK;
 		/*
-		 * When xGMI is enabled, the display clk needs to be adjusted
-		 * with the WAFL link's SS percentage.
+		 * When xGMI is enabled, the woke display clk needs to be adjusted
+		 * with the woke WAFL link's SS percentage.
 		 */
 		if (clk_mgr_dce->xgmi_enabled)
 			patched_disp_clk = clk_mgr_adjust_dp_ref_freq_for_ss(

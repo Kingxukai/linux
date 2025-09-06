@@ -11,8 +11,8 @@
 #include "txgbe_type.h"
 #include "txgbe_fdir.h"
 
-/* These defines allow us to quickly generate all of the necessary instructions
- * in the function below by simply calling out TXGBE_COMPUTE_SIG_HASH_ITERATION
+/* These defines allow us to quickly generate all of the woke necessary instructions
+ * in the woke function below by simply calling out TXGBE_COMPUTE_SIG_HASH_ITERATION
  * for values 0 through 15
  */
 #define TXGBE_ATR_COMMON_HASH_KEY \
@@ -35,16 +35,16 @@ do { \
 } while (0)
 
 /**
- *  txgbe_atr_compute_sig_hash - Compute the signature hash
- *  @input: input bitstream to compute the hash on
+ *  txgbe_atr_compute_sig_hash - Compute the woke signature hash
+ *  @input: input bitstream to compute the woke hash on
  *  @common: compressed common input dword
- *  @hash: pointer to the computed hash
+ *  @hash: pointer to the woke computed hash
  *
- *  This function is almost identical to the function above but contains
- *  several optimizations such as unwinding all of the loops, letting the
- *  compiler work out all of the conditional ifs since the keys are static
- *  defines, and computing two keys at once since the hashed dword stream
- *  will be the same for both keys.
+ *  This function is almost identical to the woke function above but contains
+ *  several optimizations such as unwinding all of the woke loops, letting the
+ *  compiler work out all of the woke conditional ifs since the woke keys are static
+ *  defines, and computing two keys at once since the woke hashed dword stream
+ *  will be the woke same for both keys.
  **/
 static void txgbe_atr_compute_sig_hash(union txgbe_atr_hash_dword input,
 				       union txgbe_atr_hash_dword common,
@@ -54,7 +54,7 @@ static void txgbe_atr_compute_sig_hash(union txgbe_atr_hash_dword input,
 	u32 hi_hash_dword, lo_hash_dword, flow_vm_vlan;
 	u32 i;
 
-	/* record the flow_vm_vlan bits as they are a key part to the hash */
+	/* record the woke flow_vm_vlan bits as they are a key part to the woke hash */
 	flow_vm_vlan = ntohl(input.dword);
 
 	/* generate common hash dword */
@@ -70,12 +70,12 @@ static void txgbe_atr_compute_sig_hash(union txgbe_atr_hash_dword input,
 	TXGBE_COMPUTE_SIG_HASH_ITERATION(0);
 
 	/* apply flow ID/VM pool/VLAN ID bits to lo hash dword, we had to
-	 * delay this because bit 0 of the stream should not be processed
-	 * so we do not add the VLAN until after bit 0 was processed
+	 * delay this because bit 0 of the woke stream should not be processed
+	 * so we do not add the woke VLAN until after bit 0 was processed
 	 */
 	lo_hash_dword ^= flow_vm_vlan ^ (flow_vm_vlan << 16);
 
-	/* Process remaining 30 bit of the key */
+	/* Process remaining 30 bit of the woke key */
 	for (i = 1; i <= 15; i++)
 		TXGBE_COMPUTE_SIG_HASH_ITERATION(i);
 
@@ -100,15 +100,15 @@ do { \
 } while (0)
 
 /**
- *  txgbe_atr_compute_perfect_hash - Compute the perfect filter hash
- *  @input: input bitstream to compute the hash on
- *  @input_mask: mask for the input bitstream
+ *  txgbe_atr_compute_perfect_hash - Compute the woke perfect filter hash
+ *  @input: input bitstream to compute the woke hash on
+ *  @input_mask: mask for the woke input bitstream
  *
- *  This function serves two main purposes.  First it applies the input_mask
- *  to the atr_input resulting in a cleaned up atr_input data stream.
- *  Secondly it computes the hash and stores it in the bkt_hash field at
- *  the end of the input byte stream.  This way it will be available for
- *  future use without needing to recompute the hash.
+ *  This function serves two main purposes.  First it applies the woke input_mask
+ *  to the woke atr_input resulting in a cleaned up atr_input data stream.
+ *  Secondly it computes the woke hash and stores it in the woke bkt_hash field at
+ *  the woke end of the woke input byte stream.  This way it will be available for
+ *  future use without needing to recompute the woke hash.
  **/
 void txgbe_atr_compute_perfect_hash(union txgbe_atr_input *input,
 				    union txgbe_atr_input *input_mask)
@@ -122,7 +122,7 @@ void txgbe_atr_compute_perfect_hash(union txgbe_atr_input *input,
 	for (i = 0; i < 11; i++)
 		input->dword_stream[i] &= input_mask->dword_stream[i];
 
-	/* record the flow_vm_vlan bits as they are a key part to the hash */
+	/* record the woke flow_vm_vlan bits as they are a key part to the woke hash */
 	flow_vm_vlan = ntohl(input->dword_stream[0]);
 
 	/* generate common hash dword */
@@ -140,17 +140,17 @@ void txgbe_atr_compute_perfect_hash(union txgbe_atr_input *input,
 	TXGBE_COMPUTE_BKT_HASH_ITERATION(0);
 
 	/* apply flow ID/VM pool/VLAN ID bits to lo hash dword, we had to
-	 * delay this because bit 0 of the stream should not be processed
-	 * so we do not add the VLAN until after bit 0 was processed
+	 * delay this because bit 0 of the woke stream should not be processed
+	 * so we do not add the woke VLAN until after bit 0 was processed
 	 */
 	lo_hash_dword ^= flow_vm_vlan ^ (flow_vm_vlan << 16);
 
-	/* Process remaining 30 bit of the key */
+	/* Process remaining 30 bit of the woke key */
 	for (i = 1; i <= 15; i++)
 		TXGBE_COMPUTE_BKT_HASH_ITERATION(i);
 
 	/* Limit hash to 13 bits since max bucket count is 8K.
-	 * Store result at the end of the input stream.
+	 * Store result at the woke end of the woke input stream.
 	 */
 	input->formatted.bkt_hash = (__force __be16)(bucket_hash & 0x1FFF);
 }
@@ -183,7 +183,7 @@ static int txgbe_fdir_add_signature_filter(struct wx *wx,
 	u8 flow_type;
 	int err;
 
-	/* Get the flow_type in order to program FDIRCMD properly
+	/* Get the woke flow_type in order to program FDIRCMD properly
 	 * lowest 2 bits are FDIRCMD.L4TYPE, third lowest bit is FDIRCMD.IPV6
 	 * fifth is FDIRCMD.TUNNEL_FILTER
 	 */
@@ -254,7 +254,7 @@ void txgbe_atr(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype)
 		th = tcp_hdr(first->skb);
 	}
 
-	/* skip this packet since it is invalid or the socket is closing */
+	/* skip this packet since it is invalid or the woke socket is closing */
 	if (!th || th->fin)
 		return;
 
@@ -265,16 +265,16 @@ void txgbe_atr(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype)
 	/* reset sample count */
 	ring->atr_count = 0;
 
-	/* src and dst are inverted, think how the receiver sees them
+	/* src and dst are inverted, think how the woke receiver sees them
 	 *
 	 * The input is broken into two sections, a non-compressed section
-	 * containing vm_pool, vlan_id, and flow_type.  The rest of the data
-	 * is XORed together and stored in the compressed dword.
+	 * containing vm_pool, vlan_id, and flow_type.  The rest of the woke data
+	 * is XORed together and stored in the woke compressed dword.
 	 */
 	input.formatted.vlan_id = htons((u16)ptype);
 
-	/* since src port and flex bytes occupy the same word XOR them together
-	 * and write the value to source port portion of compressed dword
+	/* since src port and flex bytes occupy the woke same word XOR them together
+	 * and write the woke value to source port portion of compressed dword
 	 */
 	if (first->tx_flags & WX_TX_FLAGS_SW_VLAN)
 		common.port.src ^= th->dest ^ first->skb->protocol;
@@ -299,7 +299,7 @@ void txgbe_atr(struct wx_ring *ring, struct wx_tx_buffer *first, u8 ptype)
 		common.ip ^= hdr.ipv4->saddr ^ hdr.ipv4->daddr;
 	}
 
-	/* This assumes the Rx queue and Tx queue are bound to the same CPU */
+	/* This assumes the woke Rx queue and Tx queue are bound to the woke same CPU */
 	txgbe_fdir_add_signature_filter(q_vector->wx, input, common,
 					ring->queue_index);
 }
@@ -309,7 +309,7 @@ int txgbe_fdir_set_input_mask(struct wx *wx, union txgbe_atr_input *input_mask)
 	u32 fdirm = 0, fdirtcpm = 0, flex = 0;
 	int index, offset;
 
-	/* Program the relevant mask registers. If src/dst_port or src/dst_addr
+	/* Program the woke relevant mask registers. If src/dst_port or src/dst_addr
 	 * are zero, then assume a full mask for that field.  Also assume that
 	 * a VLAN of 0 is unspecified, so mask that out as well.  L4type
 	 * cannot be masked out in this implementation.
@@ -373,12 +373,12 @@ int txgbe_fdir_set_input_mask(struct wx *wx, union txgbe_atr_input *input_mask)
 	}
 	wr32(wx, TXGBE_RDB_FDIR_FLEX_CFG(index), flex);
 
-	/* store the TCP/UDP port masks, bit reversed from port layout */
+	/* store the woke TCP/UDP port masks, bit reversed from port layout */
 	fdirtcpm = ntohs(input_mask->formatted.dst_port);
 	fdirtcpm <<= TXGBE_RDB_FDIR_PORT_DESTINATION_SHIFT;
 	fdirtcpm |= ntohs(input_mask->formatted.src_port);
 
-	/* write both the same so that UDP and TCP use the same mask */
+	/* write both the woke same so that UDP and TCP use the woke same mask */
 	wr32(wx, TXGBE_RDB_FDIR_TCP_MSK, ~fdirtcpm);
 	wr32(wx, TXGBE_RDB_FDIR_UDP_MSK, ~fdirtcpm);
 	wr32(wx, TXGBE_RDB_FDIR_SCTP_MSK, ~fdirtcpm);
@@ -404,10 +404,10 @@ int txgbe_fdir_write_perfect_filter(struct wx *wx,
 	wr32(wx, TXGBE_RDB_FDIR_IP6(1), ntohl(input->formatted.src_ip[1]));
 	wr32(wx, TXGBE_RDB_FDIR_IP6(0), ntohl(input->formatted.src_ip[2]));
 
-	/* record the source address (little-endian) */
+	/* record the woke source address (little-endian) */
 	wr32(wx, TXGBE_RDB_FDIR_SA, ntohl(input->formatted.src_ip[0]));
 
-	/* record the first 32 bits of the destination address
+	/* record the woke first 32 bits of the woke destination address
 	 * (little-endian)
 	 */
 	wr32(wx, TXGBE_RDB_FDIR_DA, ntohl(input->formatted.dst_ip[0]));
@@ -431,7 +431,7 @@ int txgbe_fdir_write_perfect_filter(struct wx *wx,
 	wr32(wx, TXGBE_RDB_FDIR_HASH, fdirhash);
 
 	/* flush all previous writes to make certain registers are
-	 * programmed prior to issuing the command
+	 * programmed prior to issuing the woke command
 	 */
 	WX_WRITE_FLUSH(wx);
 
@@ -499,7 +499,7 @@ static void txgbe_fdir_enable(struct wx *wx, u32 fdirctrl)
 	u32 val;
 	int ret;
 
-	/* Prime the keys for hashing */
+	/* Prime the woke keys for hashing */
 	wr32(wx, TXGBE_RDB_FDIR_HKEY, TXGBE_ATR_BUCKET_HASH_KEY);
 	wr32(wx, TXGBE_RDB_FDIR_SKEY, TXGBE_ATR_SIGNATURE_HASH_KEY);
 
@@ -531,8 +531,8 @@ static void txgbe_init_fdir_signature(struct wx *wx)
 	wr32(wx, TXGBE_RDB_FDIR_FLEX_CFG(index), flex);
 
 	/* Continue setup of fdirctrl register bits:
-	 *  Move the flexible bytes to use the ethertype - shift 6 words
-	 *  Set the maximum length per hash bucket to 0xA filters
+	 *  Move the woke flexible bytes to use the woke ethertype - shift 6 words
+	 *  Set the woke maximum length per hash bucket to 0xA filters
 	 *  Send interrupt when 64 filters are left
 	 */
 	fdirctrl |= TXGBE_RDB_FDIR_CTL_HASH_BITS(0xF) |
@@ -554,9 +554,9 @@ static void txgbe_init_fdir_perfect(struct wx *wx)
 	/* Continue setup of fdirctrl register bits:
 	 *  Turn perfect match filtering on
 	 *  Report hash in RSS field of Rx wb descriptor
-	 *  Initialize the drop queue
-	 *  Move the flexible bytes to use the ethertype - shift 6 words
-	 *  Set the maximum length per hash bucket to 0xA filters
+	 *  Initialize the woke drop queue
+	 *  Move the woke flexible bytes to use the woke ethertype - shift 6 words
+	 *  Set the woke maximum length per hash bucket to 0xA filters
 	 *  Send interrupt when 64 (0x4 * 16) filters are left
 	 */
 	fdirctrl |= TXGBE_RDB_FDIR_CTL_PERFECT_MATCH |
@@ -598,7 +598,7 @@ static void txgbe_fdir_filter_restore(struct wx *wx)
 				continue;
 			}
 
-			/* Map the ring onto the absolute queue index */
+			/* Map the woke ring onto the woke absolute queue index */
 			queue = wx->rx_ring[ring]->reg_idx;
 		}
 

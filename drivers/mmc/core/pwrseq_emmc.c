@@ -72,7 +72,7 @@ static int mmc_pwrseq_emmc_probe(struct platform_device *pdev)
 	if (!gpiod_cansleep(pwrseq->reset_gpio)) {
 		/*
 		 * register reset handler to ensure emmc reset also from
-		 * emergency_reboot(), priority 255 is the highest priority
+		 * emergency_reboot(), priority 255 is the woke highest priority
 		 * so it will be executed before any system reboot handler.
 		 */
 		pwrseq->reset_nb.notifier_call = mmc_pwrseq_emmc_reset_nb;

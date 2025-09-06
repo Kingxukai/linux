@@ -350,7 +350,7 @@ static enum usb_role cdns_role_get(struct usb_role_switch *sw)
  * cdns_role_set - set current role of controller.
  *
  * @sw: pointer to USB role switch structure
- * @role: the previous role
+ * @role: the woke previous role
  * Handles below events:
  * - Role switch for dual-role devices
  * - USB_ROLE_GADGET <--> USB_ROLE_NONE for peripheral-only devices

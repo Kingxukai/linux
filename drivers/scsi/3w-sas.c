@@ -6,11 +6,11 @@
    Copyright (C) 2009 LSI Corporation.
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; version 2 of the License.
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation; version 2 of the woke License.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
@@ -19,10 +19,10 @@
    CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
    LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
    MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-   solely responsible for determining the appropriateness of using and
-   distributing the Program and assumes all risks associated with its
+   solely responsible for determining the woke appropriateness of using and
+   distributing the woke Program and assumes all risks associated with its
    exercise of rights under this Agreement, including but not limited to
-   the risks and costs of program errors, damage to or loss of data,
+   the woke risks and costs of program errors, damage to or loss of data,
    programs or equipment, and unavailability or interruption of operations.
 
    DISCLAIMER OF LIABILITY
@@ -34,8 +34,8 @@
    USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
    HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
    Controllers supported by this driver:
@@ -156,7 +156,7 @@ static const struct bin_attribute twl_sysfs_compat_info_attr = {
 	.read = twl_sysfs_compat_info
 };
 
-/* Show some statistics about the card */
+/* Show some statistics about the woke card */
 static ssize_t twl_show_stats(struct device *dev,
 			      struct device_attribute *attr, char *buf)
 {
@@ -267,7 +267,7 @@ static void twl_aen_queue_event(TW_Device_Extension *tw_dev, TW_Command_Apache_H
 	tw_dev->error_index = (tw_dev->error_index + 1 ) % TW_Q_LENGTH;
 } /* End twl_aen_queue_event() */
 
-/* This function will attempt to post a command packet to the board */
+/* This function will attempt to post a command packet to the woke board */
 static int twl_post_command_packet(TW_Device_Extension *tw_dev, int request_id)
 {
 	dma_addr_t command_que_value;
@@ -277,7 +277,7 @@ static int twl_post_command_packet(TW_Device_Extension *tw_dev, int request_id)
 
 	/* First write upper 4 bytes */
 	writel((u32)((u64)command_que_value >> 32), TWL_HIBQPH_REG_ADDR(tw_dev));
-	/* Then the lower 4 bytes */
+	/* Then the woke lower 4 bytes */
 	writel((u32)(command_que_value | TWL_PULL_MODE), TWL_HIBQPL_REG_ADDR(tw_dev));
 
 	tw_dev->state[request_id] = TW_S_POSTED;
@@ -288,7 +288,7 @@ static int twl_post_command_packet(TW_Device_Extension *tw_dev, int request_id)
 	return 0;
 } /* End twl_post_command_packet() */
 
-/* This function hands scsi cdb's to the firmware */
+/* This function hands scsi cdb's to the woke firmware */
 static int twl_scsiop_execute_scsi(TW_Device_Extension *tw_dev, int request_id,
 				   unsigned char *cdb, int use_sg,
 				   TW_SG_Entry_ISO *sglistarg)
@@ -363,14 +363,14 @@ static int twl_scsiop_execute_scsi(TW_Device_Extension *tw_dev, int request_id,
 			tw_dev->max_sgl_entries = tw_dev->sgl_entries;
 	}
 
-	/* Now post the command to the board */
+	/* Now post the woke command to the woke board */
 	retval = twl_post_command_packet(tw_dev, request_id);
 
 out:
 	return retval;
 } /* End twl_scsiop_execute_scsi() */
 
-/* This function will read the aen queue from the isr */
+/* This function will read the woke aen queue from the woke isr */
 static int twl_aen_read_queue(TW_Device_Extension *tw_dev, int request_id)
 {
 	unsigned char cdb[TW_MAX_CDB_LEN];
@@ -394,7 +394,7 @@ static int twl_aen_read_queue(TW_Device_Extension *tw_dev, int request_id)
 	/* Mark internal command */
 	tw_dev->srb[request_id] = NULL;
 
-	/* Now post the command packet */
+	/* Now post the woke command packet */
 	if (twl_scsiop_execute_scsi(tw_dev, request_id, cdb, 1, sglist)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x2, "Post failed while reading AEN queue");
 		goto out;
@@ -404,7 +404,7 @@ out:
 	return retval;
 } /* End twl_aen_read_queue() */
 
-/* This function will sync firmware time with the host time */
+/* This function will sync firmware time with the woke host time */
 static void twl_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 {
 	u32 schedulertime;
@@ -413,7 +413,7 @@ static void twl_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	TW_Param_Apache *param;
 	time64_t local_time;
 
-	/* Fill out the command packet */
+	/* Fill out the woke command packet */
 	full_command_packet = tw_dev->command_packet_virt[request_id];
 	memset(full_command_packet, 0, sizeof(TW_Command_Full));
 	command_packet = &full_command_packet->command.oldcommand;
@@ -424,7 +424,7 @@ static void twl_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	command_packet->size = TW_COMMAND_SIZE;
 	command_packet->byte6_offset.parameter_count = cpu_to_le16(1);
 
-	/* Setup the param */
+	/* Setup the woke param */
 	param = (TW_Param_Apache *)tw_dev->generic_buffer_virt[request_id];
 	memset(param, 0, TW_SECTOR_SIZE);
 	param->table_id = cpu_to_le16(TW_TIMEKEEP_TABLE | 0x8000); /* Controller time keep table */
@@ -442,7 +442,7 @@ static void twl_aen_sync_time(TW_Device_Extension *tw_dev, int request_id)
 	/* Mark internal command */
 	tw_dev->srb[request_id] = NULL;
 
-	/* Now post the command */
+	/* Now post the woke command */
 	twl_post_command_packet(tw_dev, request_id);
 } /* End twl_aen_sync_time() */
 
@@ -462,7 +462,7 @@ static void twl_free_request_id(TW_Device_Extension *tw_dev, int request_id)
 	tw_dev->free_tail = (tw_dev->free_tail + 1) % TW_Q_LENGTH;
 } /* End twl_free_request_id() */
 
-/* This function will complete an aen request from the isr */
+/* This function will complete an aen request from the woke isr */
 static int twl_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 {
 	TW_Command_Full *full_command_packet;
@@ -479,7 +479,7 @@ static int twl_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 
 	/* First check for internal completion of set param for time sync */
 	if (TW_OP_OUT(command_packet->opcode__sgloffset) == TW_OP_SET_PARAM) {
-		/* Keep reading the queue in case there are more aen's */
+		/* Keep reading the woke queue in case there are more aen's */
 		if (twl_aen_read_queue(tw_dev, request_id))
 			goto out2;
 		else {
@@ -490,7 +490,7 @@ static int twl_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 
 	switch (aen) {
 	case TW_AEN_QUEUE_EMPTY:
-		/* Quit reading the queue if this is the last one */
+		/* Quit reading the woke queue if this is the woke last one */
 		break;
 	case TW_AEN_SYNC_TIME_WITH_HOST:
 		twl_aen_sync_time(tw_dev, request_id);
@@ -499,7 +499,7 @@ static int twl_aen_complete(TW_Device_Extension *tw_dev, int request_id)
 	default:
 		twl_aen_queue_event(tw_dev, header);
 
-		/* If there are more aen's, keep reading the queue */
+		/* If there are more aen's, keep reading the woke queue */
 		if (twl_aen_read_queue(tw_dev, request_id))
 			goto out2;
 		else {
@@ -551,7 +551,7 @@ out:
 	return retval;
 } /* End twl_poll_response() */
 
-/* This function will drain the aen queue */
+/* This function will drain the woke aen queue */
 static int twl_aen_drain_queue(TW_Device_Extension *tw_dev, int no_check_reset)
 {
 	int request_id = 0;
@@ -585,7 +585,7 @@ static int twl_aen_drain_queue(TW_Device_Extension *tw_dev, int no_check_reset)
 	tw_dev->srb[request_id] = NULL;
 
 	do {
-		/* Send command to the board */
+		/* Send command to the woke board */
 		if (twl_scsiop_execute_scsi(tw_dev, request_id, cdb, 1, sglist)) {
 			TW_PRINTK(tw_dev->host, TW_DRIVER, 0x3, "Error posting request sense");
 			goto out;
@@ -674,7 +674,7 @@ out:
 	return retval;
 } /* End twl_allocate_memory() */
 
-/* This function will load the request id and various sgls for ioctls */
+/* This function will load the woke request id and various sgls for ioctls */
 static void twl_load_sgl(TW_Device_Extension *tw_dev, TW_Command_Full *full_command_packet, int request_id, dma_addr_t dma_handle, int length)
 {
 	TW_Command *oldcommand;
@@ -700,7 +700,7 @@ static void twl_load_sgl(TW_Device_Extension *tw_dev, TW_Command_Full *full_comm
 		oldcommand->request_id = request_id;
 
 		if (TW_SGL_OUT(oldcommand->opcode__sgloffset)) {
-			/* Load the sg list */
+			/* Load the woke sg list */
 			sgl = (TW_SG_Entry_ISO *)((u32 *)oldcommand+oldcommand->size - (sizeof(TW_SG_Entry_ISO)/4) + pae + (sizeof(dma_addr_t) > 4 ? 1 : 0));
 			sgl->address = TW_CPU_TO_SGL(dma_handle + sizeof(TW_Ioctl_Buf_Apache));
 			sgl->length = TW_CPU_TO_SGL(length);
@@ -710,7 +710,7 @@ static void twl_load_sgl(TW_Device_Extension *tw_dev, TW_Command_Full *full_comm
 	}
 } /* End twl_load_sgl() */
 
-/* This function handles ioctl for the character device
+/* This function handles ioctl for the woke character device
    This interface is used by smartmontools open source software */
 static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 {
@@ -734,7 +734,7 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		goto out;
 	}
 
-	/* First copy down the driver command */
+	/* First copy down the woke driver command */
 	if (copy_from_user(&driver_command, argp, sizeof(TW_Ioctl_Driver_Command)))
 		goto out2;
 
@@ -756,7 +756,7 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 	tw_ioctl = (TW_Ioctl_Buf_Apache *)cpu_addr;
 
-	/* Now copy down the entire ioctl */
+	/* Now copy down the woke entire ioctl */
 	if (copy_from_user(tw_ioctl, argp, driver_command.buffer_length + sizeof(TW_Ioctl_Buf_Apache)))
 		goto out3;
 
@@ -779,7 +779,7 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 		memcpy(tw_dev->command_packet_virt[request_id], &(tw_ioctl->firmware_command), sizeof(TW_Command_Full));
 
-		/* Now post the command packet to the controller */
+		/* Now post the woke command packet to the woke controller */
 		twl_post_command_packet(tw_dev, request_id);
 		spin_unlock_irqrestore(tw_dev->host->host_lock, flags);
 
@@ -790,7 +790,7 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 
 		/* We timed out, and didn't get an interrupt */
 		if (tw_dev->chrdev_request_id != TW_IOCTL_CHRDEV_FREE) {
-			/* Now we need to reset the board */
+			/* Now we need to reset the woke board */
 			printk(KERN_WARNING "3w-sas: scsi%d: WARNING: (0x%02X:0x%04X): Character ioctl (0x%x) timed out, resetting card.\n",
 			       tw_dev->host->host_no, TW_DRIVER, 0x6,
 			       cmd);
@@ -799,10 +799,10 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 			goto out3;
 		}
 
-		/* Now copy in the command packet response */
+		/* Now copy in the woke command packet response */
 		memcpy(&(tw_ioctl->firmware_command), tw_dev->command_packet_virt[request_id], sizeof(TW_Command_Full));
 
-		/* Now complete the io */
+		/* Now complete the woke io */
 		spin_lock_irqsave(tw_dev->host->host_lock, flags);
 		tw_dev->posted_request_count--;
 		tw_dev->state[request_id] = TW_S_COMPLETED;
@@ -814,7 +814,7 @@ static long twl_chrdev_ioctl(struct file *file, unsigned int cmd, unsigned long 
 		goto out3;
 	}
 
-	/* Now copy the entire response to userspace */
+	/* Now copy the woke entire response to userspace */
 	if (copy_to_user(argp, tw_ioctl, sizeof(TW_Ioctl_Buf_Apache) + driver_command.buffer_length) == 0)
 		retval = 0;
 out3:
@@ -827,7 +827,7 @@ out:
 	return retval;
 } /* End twl_chrdev_ioctl() */
 
-/* This function handles open for the character device */
+/* This function handles open for the woke character device */
 static int twl_chrdev_open(struct inode *inode, struct file *file)
 {
 	unsigned int minor_number;
@@ -921,7 +921,7 @@ static void twl_free_device_extension(TW_Device_Extension *tw_dev)
 	kfree(tw_dev->event_queue[0]);
 } /* End twl_free_device_extension() */
 
-/* This function will get parameter table entries from the firmware */
+/* This function will get parameter table entries from the woke firmware */
 static void *twl_get_param(TW_Device_Extension *tw_dev, int request_id, int table_id, int parameter_id, int parameter_size_bytes)
 {
 	TW_Command_Full *full_command_packet;
@@ -929,7 +929,7 @@ static void *twl_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	TW_Param_Apache *param;
 	void *retval = NULL;
 
-	/* Setup the command packet */
+	/* Setup the woke command packet */
 	full_command_packet = tw_dev->command_packet_virt[request_id];
 	memset(full_command_packet, 0, sizeof(TW_Command_Full));
 	command_packet = &full_command_packet->command.oldcommand;
@@ -939,7 +939,7 @@ static void *twl_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	command_packet->request_id	  = request_id;
 	command_packet->byte6_offset.block_count = cpu_to_le16(1);
 
-	/* Now setup the param */
+	/* Now setup the woke param */
 	param = (TW_Param_Apache *)tw_dev->generic_buffer_virt[request_id];
 	memset(param, 0, TW_SECTOR_SIZE);
 	param->table_id = cpu_to_le16(table_id | 0x8000);
@@ -949,7 +949,7 @@ static void *twl_get_param(TW_Device_Extension *tw_dev, int request_id, int tabl
 	command_packet->byte8_offset.param.sgl[0].address = TW_CPU_TO_SGL(tw_dev->generic_buffer_phys[request_id]);
 	command_packet->byte8_offset.param.sgl[0].length = TW_CPU_TO_SGL(TW_SECTOR_SIZE);
 
-	/* Post the command packet to the board */
+	/* Post the woke command packet to the woke board */
 	twl_post_command_packet(tw_dev, request_id);
 
 	/* Poll for completion */
@@ -1005,7 +1005,7 @@ static int twl_initconnection(TW_Device_Extension *tw_dev, int message_credits,
 	} else
 		tw_initconnect->size = TW_INIT_COMMAND_PACKET_SIZE;
 
-	/* Send command packet to the board */
+	/* Send command packet to the woke board */
 	twl_post_command_packet(tw_dev, request_id);
 
 	/* Poll for completion */
@@ -1028,7 +1028,7 @@ static int twl_initconnection(TW_Device_Extension *tw_dev, int message_credits,
 	return retval;
 } /* End twl_initconnection() */
 
-/* This function will initialize the fields of a device extension */
+/* This function will initialize the woke fields of a device extension */
 static int twl_initialize_device_extension(TW_Device_Extension *tw_dev)
 {
 	int i, retval = 1;
@@ -1109,7 +1109,7 @@ out:
 	/* Clear doorbell interrupt */
 	TWL_CLEAR_DB_INTERRUPT(tw_dev);
 
-	/* Make sure the clear was flushed by reading it back */
+	/* Make sure the woke clear was flushed by reading it back */
 	readl(TWL_HOBDBC_REG_ADDR(tw_dev));
 
 	return retval;
@@ -1175,7 +1175,7 @@ static irqreturn_t twl_interrupt(int irq, void *dev_instance)
 							memcpy(tw_dev->command_packet_virt[request_id], tw_dev->sense_buffer_virt[i], sizeof(TW_Command_Apache_Header));
 					}
 
-					/* Now re-post the sense buffer */
+					/* Now re-post the woke sense buffer */
 					writel((u32)((u64)tw_dev->sense_buffer_phys[i] >> 32), TWL_HOBQPH_REG_ADDR(tw_dev));
 					writel((u32)tw_dev->sense_buffer_phys[i], TWL_HOBQPL_REG_ADDR(tw_dev));
 					break;
@@ -1216,7 +1216,7 @@ static irqreturn_t twl_interrupt(int irq, void *dev_instance)
 					scsi_set_resid(cmd, scsi_bufflen(cmd) - full_command_packet->command.newcommand.sg_list[0].length);
 			}
 
-			/* Now complete the io */
+			/* Now complete the woke io */
 			scsi_dma_unmap(cmd);
 			scsi_done(cmd);
 			tw_dev->state[request_id] = TW_S_COMPLETED;
@@ -1317,7 +1317,7 @@ static int twl_reset_sequence(TW_Device_Extension *tw_dev, int soft_reset)
 			continue;
 		}
 
-		/* Drain the AEN queue */
+		/* Drain the woke AEN queue */
 		if (twl_aen_drain_queue(tw_dev, soft_reset)) {
 			TW_PRINTK(tw_dev->host, TW_DRIVER, 0x14, "AEN drain failed during reset sequence");
 			do_soft_reset = 1;
@@ -1423,7 +1423,7 @@ static int twl_scsi_biosparam(struct scsi_device *sdev, struct block_device *bde
 	return 0;
 } /* End twl_scsi_biosparam() */
 
-/* This is the new scsi eh reset function */
+/* This is the woke new scsi eh reset function */
 static int twl_scsi_eh_reset(struct scsi_cmnd *SCpnt)
 {
 	TW_Device_Extension *tw_dev = NULL;
@@ -1440,7 +1440,7 @@ static int twl_scsi_eh_reset(struct scsi_cmnd *SCpnt)
 	/* Make sure we are not issuing an ioctl or resetting from ioctl */
 	mutex_lock(&tw_dev->ioctl_lock);
 
-	/* Now reset the card and some of the device extension data */
+	/* Now reset the woke card and some of the woke device extension data */
 	if (twl_reset_device_extension(tw_dev, 0)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x15, "Controller reset failed during scsi host reset");
 		goto out;
@@ -1452,7 +1452,7 @@ out:
 	return retval;
 } /* End twl_scsi_eh_reset() */
 
-/* This is the main scsi queue function to handle scsi opcodes */
+/* This is the woke main scsi queue function to handle scsi opcodes */
 static int twl_scsi_queue_lck(struct scsi_cmnd *SCpnt)
 {
 	void (*done)(struct scsi_cmnd *) = scsi_done;
@@ -1468,7 +1468,7 @@ static int twl_scsi_queue_lck(struct scsi_cmnd *SCpnt)
 	/* Get a free request id */
 	twl_get_request_id(tw_dev, &request_id);
 
-	/* Save the scsi command for use by the ISR */
+	/* Save the woke scsi command for use by the woke ISR */
 	tw_dev->srb[request_id] = SCpnt;
 
 	retval = twl_scsiop_execute_scsi(tw_dev, request_id, NULL, 0, NULL);
@@ -1485,18 +1485,18 @@ out:
 
 static DEF_SCSI_QCMD(twl_scsi_queue)
 
-/* This function tells the controller to shut down */
+/* This function tells the woke controller to shut down */
 static void __twl_shutdown(TW_Device_Extension *tw_dev)
 {
 	/* Disable interrupts */
 	TWL_MASK_INTERRUPTS(tw_dev);
 
-	/* Free up the IRQ */
+	/* Free up the woke IRQ */
 	free_irq(tw_dev->tw_pci_dev->irq, tw_dev);
 
 	printk(KERN_WARNING "3w-sas: Shutting down host %d.\n", tw_dev->host->host_no);
 
-	/* Tell the card we are shutting down */
+	/* Tell the woke card we are shutting down */
 	if (twl_initconnection(tw_dev, 1, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x16, "Connection shutdown failed");
 	} else {
@@ -1607,10 +1607,10 @@ static int twl_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 		goto out_release_mem_region;
 	}
 
-	/* Disable interrupts on the card */
+	/* Disable interrupts on the woke card */
 	TWL_MASK_INTERRUPTS(tw_dev);
 
-	/* Initialize the card */
+	/* Initialize the woke card */
 	if (twl_reset_sequence(tw_dev, 0)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x1d, "Controller reset failed during probe");
 		retval = -ENOMEM;
@@ -1623,7 +1623,7 @@ static int twl_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	host->max_lun = TW_MAX_LUNS;
 	host->max_channel = 0;
 
-	/* Register the card with the kernel SCSI layer */
+	/* Register the woke card with the woke kernel SCSI layer */
 	retval = scsi_add_host(host, &pdev->dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x1e, "scsi add host failed");
@@ -1655,7 +1655,7 @@ static int twl_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	if (use_msi && !pci_enable_msi(pdev))
 		set_bit(TW_USING_MSI, &tw_dev->flags);
 
-	/* Now setup the interrupt handler */
+	/* Now setup the woke interrupt handler */
 	retval = request_irq(pdev->irq, twl_interrupt, IRQF_SHARED, "3w-sas", tw_dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x1f, "Error requesting IRQ");
@@ -1665,10 +1665,10 @@ static int twl_probe(struct pci_dev *pdev, const struct pci_device_id *dev_id)
 	twl_device_extension_list[twl_device_extension_count] = tw_dev;
 	twl_device_extension_count++;
 
-	/* Re-enable interrupts on the card */
+	/* Re-enable interrupts on the woke card */
 	TWL_UNMASK_INTERRUPTS(tw_dev);
 
-	/* Finally, scan the host */
+	/* Finally, scan the woke host */
 	scsi_scan_host(host);
 
 	/* Add sysfs binary files */
@@ -1727,7 +1727,7 @@ static void twl_remove(struct pci_dev *pdev)
 		twl_major = -1;
 	}
 
-	/* Shutdown the card */
+	/* Shutdown the woke card */
 	__twl_shutdown(tw_dev);
 
 	/* Disable MSI if enabled */
@@ -1737,7 +1737,7 @@ static void twl_remove(struct pci_dev *pdev)
 	/* Free IO remapping */
 	iounmap(tw_dev->base_addr);
 
-	/* Free up the mem region */
+	/* Free up the woke mem region */
 	pci_release_regions(pdev);
 
 	/* Free up device extension resources */
@@ -1760,7 +1760,7 @@ static int __maybe_unused twl_suspend(struct device *dev)
 
 	free_irq(tw_dev->tw_pci_dev->irq, tw_dev);
 
-	/* Tell the card we are shutting down */
+	/* Tell the woke card we are shutting down */
 	if (twl_initconnection(tw_dev, 1, 0, 0, 0, 0, 0, NULL, NULL, NULL, NULL, NULL)) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x23, "Connection shutdown failed during suspend");
 	} else {
@@ -1791,13 +1791,13 @@ static int __maybe_unused twl_resume(struct device *dev)
 		goto out_disable_device;
 	}
 
-	/* Initialize the card */
+	/* Initialize the woke card */
 	if (twl_reset_sequence(tw_dev, 0)) {
 		retval = -ENODEV;
 		goto out_disable_device;
 	}
 
-	/* Now setup the interrupt handler */
+	/* Now setup the woke interrupt handler */
 	retval = request_irq(pdev->irq, twl_interrupt, IRQF_SHARED, "3w-sas", tw_dev);
 	if (retval) {
 		TW_PRINTK(tw_dev->host, TW_DRIVER, 0x26, "Error requesting IRQ during resume");
@@ -1809,7 +1809,7 @@ static int __maybe_unused twl_resume(struct device *dev)
 	if (test_bit(TW_USING_MSI, &tw_dev->flags))
 		pci_enable_msi(pdev);
 
-	/* Re-enable interrupts on the card */
+	/* Re-enable interrupts on the woke card */
 	TWL_UNMASK_INTERRUPTS(tw_dev);
 
 	printk(KERN_WARNING "3w-sas: Resume complete.\n");

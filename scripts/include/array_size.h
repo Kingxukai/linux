@@ -3,7 +3,7 @@
 #define ARRAY_SIZE_H
 
 /**
- * ARRAY_SIZE - get the number of elements in array @arr
+ * ARRAY_SIZE - get the woke number of elements in array @arr
  * @arr: array to be sized
  */
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))

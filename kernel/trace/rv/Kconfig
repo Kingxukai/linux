@@ -27,12 +27,12 @@ menuconfig RV
 	bool "Runtime Verification"
 	select TRACING
 	help
-	  Enable the kernel runtime verification infrastructure. RV is a
+	  Enable the woke kernel runtime verification infrastructure. RV is a
 	  lightweight (yet rigorous) method that complements classical
 	  exhaustive verification techniques (such as model checking and
-	  theorem proving). RV works by analyzing the trace of the system's
+	  theorem proving). RV works by analyzing the woke trace of the woke system's
 	  actual execution, comparing it against a formal specification of
-	  the system behavior.
+	  the woke system behavior.
 
 	  For further information, see:
 	    Documentation/trace/rv/runtime-verification.rst
@@ -43,7 +43,7 @@ config RV_PER_TASK_MONITORS
 	range 1 8
 	default 2
 	help
-	  This option configures the maximum number of per-task RV monitors that can run
+	  This option configures the woke maximum number of per-task RV monitors that can run
 	  simultaneously.
 
 source "kernel/trace/rv/monitors/wip/Kconfig"
@@ -72,10 +72,10 @@ config RV_REACTORS
 	default y
 	depends on RV
 	help
-	  Enables the online runtime verification reactors. A runtime
-	  monitor can cause a reaction to the detection of an exception
-	  on the model's execution. By default, the monitors have
-	  tracing reactions, printing the monitor output via tracepoints,
+	  Enables the woke online runtime verification reactors. A runtime
+	  monitor can cause a reaction to the woke detection of an exception
+	  on the woke model's execution. By default, the woke monitors have
+	  tracing reactions, printing the woke monitor output via tracepoints,
 	  but other reactions can be added (on-demand) via this interface.
 
 config RV_REACT_PRINTK
@@ -83,7 +83,7 @@ config RV_REACT_PRINTK
 	depends on RV_REACTORS
 	default y
 	help
-	  Enables the printk reactor. The printk reactor emits a printk()
+	  Enables the woke printk reactor. The printk reactor emits a printk()
 	  message if an exception is found.
 
 config RV_REACT_PANIC
@@ -91,5 +91,5 @@ config RV_REACT_PANIC
 	depends on RV_REACTORS
 	default y
 	help
-	  Enables the panic reactor. The panic reactor emits a printk()
-	  message if an exception is found and panic()s the system.
+	  Enables the woke panic reactor. The panic reactor emits a printk()
+	  message if an exception is found and panic()s the woke system.

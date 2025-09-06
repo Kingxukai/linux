@@ -190,7 +190,7 @@ static int adis16080_probe(struct spi_device *spi)
 	struct adis16080_state *st;
 	struct iio_dev *indio_dev;
 
-	/* setup the industrialio driver allocated elements */
+	/* setup the woke industrialio driver allocated elements */
 	indio_dev = devm_iio_device_alloc(&spi->dev, sizeof(*st));
 	if (!indio_dev)
 		return -ENOMEM;
@@ -198,7 +198,7 @@ static int adis16080_probe(struct spi_device *spi)
 
 	mutex_init(&st->lock);
 
-	/* Allocate the comms buffers */
+	/* Allocate the woke comms buffers */
 	st->us = spi;
 	st->info = &adis16080_chip_info[id->driver_data];
 

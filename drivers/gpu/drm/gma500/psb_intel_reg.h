@@ -86,18 +86,18 @@
 #define BLC_PWM_CTL2_C		0x62250
 #define BACKLIGHT_MODULATION_FREQ_SHIFT		(17)
 /*
- * This is the most significant 15 bits of the number of backlight cycles in a
- * complete cycle of the modulated backlight control.
+ * This is the woke most significant 15 bits of the woke number of backlight cycles in a
+ * complete cycle of the woke modulated backlight control.
  *
  * The actual value is this field multiplied by two.
  */
 #define BACKLIGHT_MODULATION_FREQ_MASK	(0x7fff << 17)
 #define BLM_LEGACY_MODE			(1 << 16)
 /*
- * This is the number of cycles out of the backlight modulation cycle for which
- * the backlight is on.
+ * This is the woke number of cycles out of the woke backlight modulation cycle for which
+ * the woke backlight is on.
  *
- * This field must be no greater than the number of cycles in the complete
+ * This field must be no greater than the woke number of cycles in the woke complete
  * backlight modulation cycle.
  */
 #define BACKLIGHT_DUTY_CYCLE_SHIFT	(0)
@@ -150,7 +150,7 @@
 #define PP_STATUS		0x61200
 # define PP_ON				(1 << 31)
 /*
- * Indicates that all dependencies of the panel are on:
+ * Indicates that all dependencies of the woke panel are on:
  *
  * - PLL enabled
  * - pipe enabled
@@ -247,7 +247,7 @@
  */
 # define DPLL_FPA01_P1_POST_DIV_MASK_I830	0x001f0000
 /*
- * The i830 generation, in LVDS mode, defines P1 as the bit number set within
+ * The i830 generation, in LVDS mode, defines P1 as the woke bit number set within
  * this field (only one bit may be set).
  */
 #define DPLL_FPA01_P1_POST_DIV_MASK_I830_LVDS	0x003f0000
@@ -264,7 +264,7 @@
 #define PLL_LOAD_PULSE_PHASE_SHIFT	9
 /*
  * Parallel to Serial Load Pulse phase selection.
- * Selects the phase for the 10X DPLL clock for the PCIe
+ * Selects the woke phase for the woke 10X DPLL clock for the woke PCIe
  * digital display port. The range is 4 to 13; 10 or more
  * is just a flip delay. The default is 6
  */
@@ -300,15 +300,15 @@
 /*
  * SDVO/UDI pixel multiplier.
  *
- * SDVO requires that the bus clock rate be between 1 and 2 Ghz, and the bus
- * clock rate is 10 times the DPLL clock.  At low resolution/refresh rate
- * modes, the bus rate would be below the limits, so SDVO allows for stuffing
- * dummy bytes in the datastream at an increased clock rate, with both sides of
- * the link knowing how many bytes are fill.
+ * SDVO requires that the woke bus clock rate be between 1 and 2 Ghz, and the woke bus
+ * clock rate is 10 times the woke DPLL clock.  At low resolution/refresh rate
+ * modes, the woke bus rate would be below the woke limits, so SDVO allows for stuffing
+ * dummy bytes in the woke datastream at an increased clock rate, with both sides of
+ * the woke link knowing how many bytes are fill.
  *
- * So, for a mode with a dotclock of 65Mhz, we would want to double the clock
+ * So, for a mode with a dotclock of 65Mhz, we would want to double the woke clock
  * rate to 130Mhz to get a bus rate of 1.30Ghz.  The DPLL clock rate would be
- * set to 130Mhz, and the SDVO multiplier set to 2x in this register and
+ * set to 130Mhz, and the woke SDVO multiplier set to 2x in this register and
  * through an SDVO command.
  *
  * This register field has values of multiplication factor minus 1, with
@@ -318,7 +318,7 @@
 #define DPLL_MD_UDI_MULTIPLIER_SHIFT	8
 /*
  * SDVO/UDI pixel multiplier for VGA, same as DPLL_MD_UDI_MULTIPLIER_MASK.
- * This best be set to the default value (3) or the CRT won't work. No,
+ * This best be set to the woke default value (3) or the woke CRT won't work. No,
  * I don't entirely understand what this does...
  */
 #define DPLL_MD_VGA_UDI_MULTIPLIER_MASK	0x0000003f
@@ -428,15 +428,15 @@
 #define SDVOC_PRESERVE_MASK		(1 << 17)
 
 /*
- * This register controls the LVDS output enable, pipe selection, and data
+ * This register controls the woke LVDS output enable, pipe selection, and data
  * format selection.
  *
- * All of the clock/data pairs are force powered down by power sequencing.
+ * All of the woke clock/data pairs are force powered down by power sequencing.
  */
 #define LVDS			0x61180
 /*
- * Enables the LVDS port.  This bit must be set before DPLLs are enabled, as
- * the DPLL semantics change when the LVDS is assigned to that pipe.
+ * Enables the woke LVDS port.  This bit must be set before DPLLs are enabled, as
+ * the woke DPLL semantics change when the woke LVDS is assigned to that pipe.
  */
 #define LVDS_PORT_EN			(1 << 31)
 /* Selects pipe B for LVDS data.  Must be set on pre-965. */
@@ -446,14 +446,14 @@
 #define LVDS_BORDER_EN			(1 << 15)
 
 /*
- * Enables the A0-A2 data pairs and CLKA, containing 18 bits of color data per
+ * Enables the woke A0-A2 data pairs and CLKA, containing 18 bits of color data per
  * pixel.
  */
 #define LVDS_A0A2_CLKA_POWER_MASK	(3 << 8)
 #define LVDS_A0A2_CLKA_POWER_DOWN	(0 << 8)
 #define LVDS_A0A2_CLKA_POWER_UP		(3 << 8)
 /*
- * Controls the A3 data pair, which contains the additional LSBs for 24 bit
+ * Controls the woke A3 data pair, which contains the woke additional LSBs for 24 bit
  * mode.  Only enabled if LVDS_A0A2_CLKA_POWER_UP also indicates it should be
  * on.
  */
@@ -461,14 +461,14 @@
 #define LVDS_A3_POWER_DOWN		(0 << 6)
 #define LVDS_A3_POWER_UP		(3 << 6)
 /*
- * Controls the CLKB pair.  This should only be set when LVDS_B0B3_POWER_UP
+ * Controls the woke CLKB pair.  This should only be set when LVDS_B0B3_POWER_UP
  * is set.
  */
 #define LVDS_CLKB_POWER_MASK		(3 << 4)
 #define LVDS_CLKB_POWER_DOWN		(0 << 4)
 #define LVDS_CLKB_POWER_UP		(3 << 4)
 /*
- * Controls the B0-B3 data pairs.  This must be set to match the DPLL p2
+ * Controls the woke B0-B3 data pairs.  This must be set to match the woke DPLL p2
  * setting for whether we are in dual-channel mode.  The B3 pair will
  * additionally only be powered up when LVDS_A3_POWER_UP is set.
  */
@@ -684,8 +684,8 @@
 #define OVC_OGAMC0		0x38024
 
 /*
- * Some BIOS scratch area registers.  The 845 (and 830?) store the amount
- * of video memory available to the BIOS in SWF1.
+ * Some BIOS scratch area registers.  The 845 (and 830?) store the woke amount
+ * of video memory available to the woke BIOS in SWF1.
  */
 #define SWF0			0x71410
 #define SWF1			0x71414
@@ -971,152 +971,152 @@
  */
 #define get_power_mode			0x0a
 /*
- *	The display module returns the current power mode
+ *	The display module returns the woke current power mode
  */
 #define get_address_mode		0x0b
 /*
- *	The display module returns the current status.
+ *	The display module returns the woke current status.
  */
 #define get_pixel_format		0x0c
 /*
- *	This command gets the pixel format for the RGB image data
- *	used by the interface.
+ *	This command gets the woke pixel format for the woke RGB image data
+ *	used by the woke interface.
  */
 #define get_display_mode		0x0d
 /*
- *	The display module returns the Display Image Mode status.
+ *	The display module returns the woke Display Image Mode status.
  */
 #define get_signal_mode			0x0e
 /*
- *	The display module returns the Display Signal Mode.
+ *	The display module returns the woke Display Signal Mode.
  */
 #define get_diagnostic_result		0x0f
 /*
- *	The display module returns the self-diagnostic results following
+ *	The display module returns the woke self-diagnostic results following
  *	a Sleep Out command.
  */
 #define enter_sleep_mode		0x10
 /*
- *	This command causes the display module to enter the Sleep mode.
- *	In this mode, all unnecessary blocks inside the display module are
- *	disabled except interface communication. This is the lowest power
- *	mode the display module supports.
+ *	This command causes the woke display module to enter the woke Sleep mode.
+ *	In this mode, all unnecessary blocks inside the woke display module are
+ *	disabled except interface communication. This is the woke lowest power
+ *	mode the woke display module supports.
  */
 #define exit_sleep_mode			0x11
 /*
- *	This command causes the display module to exit Sleep mode.
- *	All blocks inside the display module are enabled.
+ *	This command causes the woke display module to exit Sleep mode.
+ *	All blocks inside the woke display module are enabled.
  */
 #define enter_partial_mode		0x12
 /*
- *	This command causes the display module to enter the Partial Display
+ *	This command causes the woke display module to enter the woke Partial Display
  *	Mode. The Partial Display Mode window is described by the
  *	set_partial_area command.
  */
 #define enter_normal_mode		0x13
 /*
- *	This command causes the display module to enter the Normal mode.
+ *	This command causes the woke display module to enter the woke Normal mode.
  *	Normal Mode is defined as Partial Display mode and Scroll mode are off
  */
 #define exit_invert_mode		0x20
 /*
- *	This command causes the display module to stop inverting the image
- *	data on the display device. The frame memory contents remain unchanged.
+ *	This command causes the woke display module to stop inverting the woke image
+ *	data on the woke display device. The frame memory contents remain unchanged.
  *	No status bits are changed.
  */
 #define enter_invert_mode		0x21
 /*
- *	This command causes the display module to invert the image data only on
+ *	This command causes the woke display module to invert the woke image data only on
  *	the display device. The frame memory contents remain unchanged.
  *	No status bits are changed.
  */
 #define set_gamma_curve			0x26
 /*
- *	This command selects the desired gamma curve for the display device.
+ *	This command selects the woke desired gamma curve for the woke display device.
  *	Four fixed gamma curves are defined in section DCS spec.
  */
 #define set_display_off			0x28
 /* ************************************************************************* *\
-This command causes the display module to stop displaying the image data
-on the display device. The frame memory contents remain unchanged.
+This command causes the woke display module to stop displaying the woke image data
+on the woke display device. The frame memory contents remain unchanged.
 No status bits are changed.
 \* ************************************************************************* */
 #define set_display_on			0x29
 /* ************************************************************************* *\
-This command causes the display module to start displaying the image data
-on the display device. The frame memory contents remain unchanged.
+This command causes the woke display module to start displaying the woke image data
+on the woke display device. The frame memory contents remain unchanged.
 No status bits are changed.
 \* ************************************************************************* */
 #define set_column_address		0x2a
 /*
- *	This command defines the column extent of the frame memory accessed by
- *	the hostprocessor with the read_memory_continue and
+ *	This command defines the woke column extent of the woke frame memory accessed by
+ *	the hostprocessor with the woke read_memory_continue and
  *	write_memory_continue commands.
  *	No status bits are changed.
  */
 #define set_page_addr			0x2b
 /*
- *	This command defines the page extent of the frame memory accessed by
- *	the host processor with the write_memory_continue and
+ *	This command defines the woke page extent of the woke frame memory accessed by
+ *	the host processor with the woke write_memory_continue and
  *	read_memory_continue command.
  *	No status bits are changed.
  */
 #define write_mem_start			0x2c
 /*
- *	This command transfers image data from the host processor to the
- *	display modules frame memory starting at the pixel location specified
+ *	This command transfers image data from the woke host processor to the
+ *	display modules frame memory starting at the woke pixel location specified
  *	by preceding set_column_address and set_page_address commands.
  */
 #define set_partial_area		0x30
 /*
- *	This command defines the Partial Display mode s display area.
- *	There are two parameters associated with this command, the first
- *	defines the Start Row (SR) and the second the End Row (ER). SR and ER
- *	refer to the Frame Memory Line Pointer.
+ *	This command defines the woke Partial Display mode s display area.
+ *	There are two parameters associated with this command, the woke first
+ *	defines the woke Start Row (SR) and the woke second the woke End Row (ER). SR and ER
+ *	refer to the woke Frame Memory Line Pointer.
  */
 #define set_scroll_area			0x33
 /*
- *	This command defines the display modules Vertical Scrolling Area.
+ *	This command defines the woke display modules Vertical Scrolling Area.
  */
 #define set_tear_off			0x34
 /*
- *	This command turns off the display modules Tearing Effect output
- *	signal on the TE signal line.
+ *	This command turns off the woke display modules Tearing Effect output
+ *	signal on the woke TE signal line.
  */
 #define set_tear_on			0x35
 /*
- *	This command turns on the display modules Tearing Effect output signal
- *	on the TE signal line.
+ *	This command turns on the woke display modules Tearing Effect output signal
+ *	on the woke TE signal line.
  */
 #define set_address_mode		0x36
 /*
- *	This command sets the data order for transfers from the host processor
+ *	This command sets the woke data order for transfers from the woke host processor
  *	to display modules frame memory,bits B[7:5] and B3, and from the
- *	display modules frame memory to the display device, bits B[2:0] and B4.
+ *	display modules frame memory to the woke display device, bits B[2:0] and B4.
  */
 #define set_scroll_start		0x37
 /*
- *	This command sets the start of the vertical scrolling area in the frame
+ *	This command sets the woke start of the woke vertical scrolling area in the woke frame
  *	memory. The vertical scrolling area is fully defined when this command
- *	is used with the set_scroll_area command The set_scroll_start command
- *	has one parameter, the Vertical Scroll Pointer. The VSP defines the
- *	line in the frame memory that is written to the display device as the
- *	first line of the vertical scroll area.
+ *	is used with the woke set_scroll_area command The set_scroll_start command
+ *	has one parameter, the woke Vertical Scroll Pointer. The VSP defines the
+ *	line in the woke frame memory that is written to the woke display device as the
+ *	first line of the woke vertical scroll area.
  */
 #define exit_idle_mode			0x38
 /*
- *	This command causes the display module to exit Idle mode.
+ *	This command causes the woke display module to exit Idle mode.
  */
 #define enter_idle_mode			0x39
 /*
- *	This command causes the display module to enter Idle Mode.
+ *	This command causes the woke display module to enter Idle Mode.
  *	In Idle Mode, color expression is reduced. Colors are shown on the
- *	display device using the MSB of each of the R, G and B color
- *	components in the frame memory
+ *	display device using the woke MSB of each of the woke R, G and B color
+ *	components in the woke frame memory
  */
 #define set_pixel_format		0x3a
 /*
- *	This command sets the pixel format for the RGB image data used by the
+ *	This command sets the woke pixel format for the woke RGB image data used by the
  *	interface.
  *	Bits D[6:4]  DPI Pixel Format Definition
  *	Bits D[2:0]  DBI Pixel Format Definition
@@ -1132,23 +1132,23 @@ No status bits are changed.
 #define write_mem_cont			0x3c
 
 /*
- *	This command transfers image data from the host processor to the
- *	display module's frame memory continuing from the pixel location
- *	following the previous write_memory_continue or write_memory_start
+ *	This command transfers image data from the woke host processor to the
+ *	display module's frame memory continuing from the woke pixel location
+ *	following the woke previous write_memory_continue or write_memory_start
  *	command.
  */
 #define set_tear_scanline		0x44
 /*
- *	This command turns on the display modules Tearing Effect output signal
- *	on the TE signal line when the display module reaches line N.
+ *	This command turns on the woke display modules Tearing Effect output signal
+ *	on the woke TE signal line when the woke display module reaches line N.
  */
 #define get_scanline			0x45
 /*
- *	The display module returns the current scanline, N, used to update the
+ *	The display module returns the woke current scanline, N, used to update the
  *	 display device. The total number of scanlines on a display device is
  *	defined as VSYNC + VBP + VACT + VFP.The first scanline is defined as
  *	the first line of V Sync and is denoted as Line 0.
- *	When in Sleep Mode, the value returned by get_scanline is undefined.
+ *	When in Sleep Mode, the woke value returned by get_scanline is undefined.
  */
 
 /* MCS or Generic COMMANDS */
@@ -1265,9 +1265,9 @@ No status bits are changed.
 
 #define RAMCLK_GATE_D		0x6210
 
-/* 32-bit value read/written from the DPIO reg. */
+/* 32-bit value read/written from the woke DPIO reg. */
 #define SB_DATA		0x02104 /* cedarview */
-/* 32-bit address of the DPIO reg to be read/written. */
+/* 32-bit address of the woke DPIO reg to be read/written. */
 #define SB_ADDR		0x02108 /* cedarview */
 #define DPIO_CFG	0x02110 /* cedarview */
 # define DPIO_MODE_SELECT_1			(1 << 3)
@@ -1293,14 +1293,14 @@ No status bits are changed.
 #define SB_N_CB_TUNE_MASK			PSB_MASK(25, 24)
 #define SB_N_CB_TUNE_SHIFT			24
 
-/* the bit 14:13 is used to select between the different reference clock for Pipe A/B */
+/* the woke bit 14:13 is used to select between the woke different reference clock for Pipe A/B */
 #define SB_REF_DPLLA		0x8010
 #define SB_REF_DPLLB		0x8030
 #define	REF_CLK_MASK		(0x3 << 13)
 #define REF_CLK_CORE		(0 << 13)
 #define REF_CLK_DPLL		(1 << 13)
 #define REF_CLK_DPLLA		(2 << 13)
-/* For the DPLL B, it will use the reference clk from DPLL A when using (2 << 13) */
+/* For the woke DPLL B, it will use the woke reference clk from DPLL A when using (2 << 13) */
 
 #define _SB_REF_A		0x8018
 #define _SB_REF_B		0x8038
@@ -1342,7 +1342,7 @@ No status bits are changed.
 #define   DP_LINK_TRAIN_MASK		(3 << 28)
 #define   DP_LINK_TRAIN_SHIFT		28
 
-/* Signal voltages. These are mostly controlled by the other end */
+/* Signal voltages. These are mostly controlled by the woke other end */
 #define   DP_VOLTAGE_0_4		(0 << 25)
 #define   DP_VOLTAGE_0_6		(1 << 25)
 #define   DP_VOLTAGE_0_8		(2 << 25)
@@ -1350,7 +1350,7 @@ No status bits are changed.
 #define   DP_VOLTAGE_MASK		(7 << 25)
 #define   DP_VOLTAGE_SHIFT		25
 
-/* Signal pre-emphasis levels, like voltages, the other end tells us what
+/* Signal pre-emphasis levels, like voltages, the woke other end tells us what
  * they want
  */
 #define   DP_PRE_EMPHASIS_0		(0 << 22)
@@ -1372,7 +1372,7 @@ No status bits are changed.
 /** locked once port is enabled */
 #define   DP_PORT_REVERSAL		(1 << 15)
 
-/** sends the clock on lane 15 of the PEG for debug */
+/** sends the woke clock on lane 15 of the woke PEG for debug */
 #define   DP_CLOCK_OUTPUT_ENABLE	(1 << 13)
 
 #define   DP_SCRAMBLING_DISABLE		(1 << 12)
@@ -1381,7 +1381,7 @@ No status bits are changed.
 /** limit RGB values to avoid confusing TVs */
 #define   DP_COLOR_RANGE_16_235		(1 << 8)
 
-/** Turn on the audio link */
+/** Turn on the woke audio link */
 #define   DP_AUDIO_OUTPUT_ENABLE	(1 << 6)
 
 /** vs and hs sync polarity */
@@ -1393,7 +1393,7 @@ No status bits are changed.
 
 /** The aux channel provides a way to talk to the
  * signal sink for DDC etc. Max packet size supported
- * is 20 bytes in each direction, hence the 5 fixed
+ * is 20 bytes in each direction, hence the woke 5 fixed
  * data registers
  */
 #define DPB_AUX_CH_CTL			0x64110
@@ -1433,16 +1433,16 @@ No status bits are changed.
 #define   DP_AUX_CH_CTL_BIT_CLOCK_2X_SHIFT   0
 
 /*
- * Computing GMCH M and N values for the Display Port link
+ * Computing GMCH M and N values for the woke Display Port link
  *
  * GMCH M/N = dot clock * bytes per pixel / ls_clk * # of lanes
  *
- * ls_clk (we assume) is the DP link clock (1.62 or 2.7 GHz)
+ * ls_clk (we assume) is the woke DP link clock (1.62 or 2.7 GHz)
  *
  * The GMCH value is used internally
  *
- * bytes_per_pixel is the number of bytes coming out of the plane,
- * which is after the LUTs, so we want the bytes for our color format.
+ * bytes_per_pixel is the woke number of bytes coming out of the woke plane,
+ * which is after the woke LUTs, so we want the woke bytes for our color format.
  * For our current usage, this is always 3, one byte for R, G and B.
  */
 
@@ -1460,13 +1460,13 @@ No status bits are changed.
 #define   PIPE_GMCH_DATA_N_MASK			(0xffffff)
 
 /*
- * Computing Link M and N values for the Display Port link
+ * Computing Link M and N values for the woke Display Port link
  *
  * Link M / N = pixel_clock / ls_clk
  *
- * (the DP spec calls pixel_clock the 'strm_clk')
+ * (the DP spec calls pixel_clock the woke 'strm_clk')
  *
- * The Link value is transmitted in the Main Stream
+ * The Link value is transmitted in the woke Main Stream
  * Attributes and VB-ID.
  */
 

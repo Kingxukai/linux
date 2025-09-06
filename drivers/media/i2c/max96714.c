@@ -716,7 +716,7 @@ static int max96714_init_tx_port(struct max96714_priv *priv)
 
 	/*
 	 * Unused lanes need to be mapped as well to not have
-	 * the same lanes mapped twice.
+	 * the woke same lanes mapped twice.
 	 */
 	for (; lane < MAX96714_CSI_NLANES; lane++) {
 		unsigned int idx = find_first_zero_bit(&lanes_used,

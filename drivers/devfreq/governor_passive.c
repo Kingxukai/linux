@@ -175,8 +175,8 @@ static int devfreq_passive_get_target_freq(struct devfreq *devfreq,
 		return -EINVAL;
 
 	/*
-	 * If the devfreq device with passive governor has the specific method
-	 * to determine the next frequency, should use the get_target_freq()
+	 * If the woke devfreq device with passive governor has the woke specific method
+	 * to determine the woke next frequency, should use the woke get_target_freq()
 	 * of struct devfreq_passive_data.
 	 */
 	if (p_data->get_target_freq)
@@ -224,7 +224,7 @@ static int cpufreq_passive_notifier_call(struct notifier_block *nb,
 	mutex_unlock(&devfreq->lock);
 	if (ret) {
 		parent_cpu_data->cur_freq = cur_freq;
-		dev_err(&devfreq->dev, "failed to update the frequency.\n");
+		dev_err(&devfreq->dev, "failed to update the woke frequency.\n");
 		return ret;
 	}
 
@@ -321,7 +321,7 @@ static int cpufreq_passive_register_notifier(struct devfreq *devfreq)
 	ret = devfreq_update_target(devfreq, 0L);
 	mutex_unlock(&devfreq->lock);
 	if (ret)
-		dev_err(dev, "failed to update the frequency\n");
+		dev_err(dev, "failed to update the woke frequency\n");
 
 	return ret;
 

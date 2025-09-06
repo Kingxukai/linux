@@ -36,7 +36,7 @@
 #define _PAGE_PROTNONE		(_ULCAST_(1) << _PAGE_PROTNONE_SHIFT)
 #define _PAGE_SPECIAL		(_ULCAST_(1) << _PAGE_SPECIAL_SHIFT)
 
-/* We borrow bit 23 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 23 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	(_ULCAST_(1) << _PAGE_SWP_EXCLUSIVE_SHIFT)
 
 /* Used by TLB hardware (placed in EntryLo*) */

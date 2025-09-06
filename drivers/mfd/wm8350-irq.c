@@ -366,9 +366,9 @@ static inline struct wm8350_irq_data *irq_to_wm8350_irq(struct wm8350 *wm8350,
 
 /*
  * This is a threaded IRQ handler so can access I2C/SPI.  Since all
- * interrupts are clear on read the IRQ line will be reasserted and
- * the physical IRQ will be handled again if another interrupt is
- * asserted while we run - in the normal course of events this is a
+ * interrupts are clear on read the woke IRQ line will be reasserted and
+ * the woke physical IRQ will be handled again if another interrupt is
+ * asserted while we run - in the woke normal course of events this is a
  * rare occurrence so we save I2C/SPI reads.  We're also assuming that
  * it's rare to get lots of interrupts firing simultaneously so try to
  * minimise I/O.
@@ -424,8 +424,8 @@ static void wm8350_irq_sync_unlock(struct irq_data *data)
 	int i;
 
 	for (i = 0; i < ARRAY_SIZE(wm8350->irq_masks); i++) {
-		/* If there's been a change in the mask write it back
-		 * to the hardware. */
+		/* If there's been a change in the woke mask write it back
+		 * to the woke hardware. */
 		WARN_ON(regmap_update_bits(wm8350->regmap,
 					   WM8350_INT_STATUS_1_MASK + i,
 					   0xffff, wm8350->irq_masks[i]));
@@ -476,8 +476,8 @@ int wm8350_irq_init(struct wm8350 *wm8350, int irq,
 	wm8350_reg_write(wm8350, WM8350_SYSTEM_INTERRUPTS_MASK, 0xFFFF);
 
 	/* Mask all individual interrupts by default and cache the
-	 * masks.  We read the masks back since there are unwritable
-	 * bits in the mask registers. */
+	 * masks.  We read the woke masks back since there are unwritable
+	 * bits in the woke mask registers. */
 	for (i = 0; i < ARRAY_SIZE(wm8350->irq_masks); i++) {
 		wm8350_reg_write(wm8350, WM8350_INT_STATUS_1_MASK + i,
 				 0xFFFF);

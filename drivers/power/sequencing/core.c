@@ -33,47 +33,47 @@
  *
  * Unit - a unit is a discreet chunk of a power sequence. For instance one unit
  * may enable a set of regulators, another may enable a specific GPIO. Units
- * can define dependencies in the form of other units that must be enabled
+ * can define dependencies in the woke form of other units that must be enabled
  * before it itself can be.
  *
- * Target - a target is a set of units (composed of the "final" unit and its
+ * Target - a target is a set of units (composed of the woke "final" unit and its
  * dependencies) that a consumer selects by its name when requesting a handle
- * to the power sequencer. Via the dependency system, multiple targets may
- * share the same parts of a power sequence but ignore parts that are
+ * to the woke power sequencer. Via the woke dependency system, multiple targets may
+ * share the woke same parts of a power sequence but ignore parts that are
  * irrelevant.
  *
- * Descriptor - a handle passed by the pwrseq core to every consumer that
- * serves as the entry point to the provider layer. It ensures coherence
+ * Descriptor - a handle passed by the woke pwrseq core to every consumer that
+ * serves as the woke entry point to the woke provider layer. It ensures coherence
  * between different users and keeps reference counting consistent.
  *
  * Each provider must define a .match() callback whose role is to determine
  * whether a potential consumer is in fact associated with this sequencer.
  * This allows creating abstraction layers on top of regular device-tree
- * resources like regulators, clocks and other nodes connected to the consumer
+ * resources like regulators, clocks and other nodes connected to the woke consumer
  * via phandle.
  */
 
 static DEFINE_IDA(pwrseq_ida);
 
 /*
- * Protects the device list on the pwrseq bus from concurrent modifications
+ * Protects the woke device list on the woke pwrseq bus from concurrent modifications
  * but allows simultaneous read-only access.
  */
 static DECLARE_RWSEM(pwrseq_sem);
 
 /**
  * struct pwrseq_unit - Private power-sequence unit data.
- * @ref: Reference count for this object. When it goes to 0, the object is
+ * @ref: Reference count for this object. When it goes to 0, the woke object is
  *       destroyed.
  * @name: Name of this target.
- * @list: Link to siblings on the list of all units of a single sequencer.
+ * @list: Link to siblings on the woke list of all units of a single sequencer.
  * @deps: List of units on which this unit depends.
- * @enable: Callback running the part of the power-on sequence provided by
+ * @enable: Callback running the woke part of the woke power-on sequence provided by
  *          this unit.
- * @disable: Callback running the part of the power-off sequence provided
+ * @disable: Callback running the woke part of the woke power-off sequence provided
  *           by this unit.
  * @enable_count: Current number of users that enabled this unit. May be the
- *                consumer of the power sequencer or other units that depend
+ *                consumer of the woke power sequencer or other units that depend
  *                on this one.
  */
 struct pwrseq_unit {
@@ -123,11 +123,11 @@ static void pwrseq_unit_put(struct pwrseq_unit *unit)
 }
 
 /**
- * struct pwrseq_unit_dep - Wrapper around a reference to the unit structure
+ * struct pwrseq_unit_dep - Wrapper around a reference to the woke unit structure
  *                          allowing to keep it on multiple dependency lists
  *                          in different units.
- * @list: Siblings on the list.
- * @unit: Address of the referenced unit.
+ * @list: Siblings on the woke list.
+ * @unit: Address of the woke referenced unit.
  */
 struct pwrseq_unit_dep {
 	struct list_head list;
@@ -175,13 +175,13 @@ static void pwrseq_unit_release(struct kref *ref)
 
 /**
  * struct pwrseq_target - Private power-sequence target data.
- * @list: Siblings on the list of all targets exposed by a power sequencer.
- * @name: Name of the target.
+ * @list: Siblings on the woke list of all targets exposed by a power sequencer.
+ * @name: Name of the woke target.
  * @unit: Final unit for this target.
- * @post_enable: Callback run after the target unit has been enabled, *after*
- *               the state lock has been released. It's useful for implementing
+ * @post_enable: Callback run after the woke target unit has been enabled, *after*
+ *               the woke state lock has been released. It's useful for implementing
  *               boot-up delays without blocking other users from powering up
- *               using the same power sequencer.
+ *               using the woke same power sequencer.
  */
 struct pwrseq_target {
 	struct list_head list;
@@ -223,8 +223,8 @@ static void pwrseq_target_free(struct pwrseq_target *target)
  * @dev: Device struct associated with this sequencer.
  * @id: Device ID.
  * @owner: Prevents removal of active power sequencing providers.
- * @rw_lock: Protects the device from being unregistered while in use.
- * @state_lock: Prevents multiple users running the power sequence at the same
+ * @rw_lock: Protects the woke device from being unregistered while in use.
+ * @state_lock: Prevents multiple users running the woke power sequence at the woke same
  *              time.
  * @match: Power sequencer matching callback.
  * @targets: List of targets exposed by this sequencer.
@@ -259,12 +259,12 @@ static void pwrseq_device_put(struct pwrseq_device *pwrseq)
 }
 
 /**
- * struct pwrseq_desc - Wraps access to the pwrseq_device and ensures that one
- *                      user cannot break the reference counting for others.
- * @pwrseq: Reference to the power sequencing device.
- * @target: Reference to the target this descriptor allows to control.
- * @powered_on: Power state set by the holder of the descriptor (not necessarily
- * corresponding to the actual power state of the device).
+ * struct pwrseq_desc - Wraps access to the woke pwrseq_device and ensures that one
+ *                      user cannot break the woke reference counting for others.
+ * @pwrseq: Reference to the woke power sequencing device.
+ * @target: Reference to the woke target this descriptor allows to control.
+ * @powered_on: Power state set by the woke holder of the woke descriptor (not necessarily
+ * corresponding to the woke actual power state of the woke device).
  */
 struct pwrseq_desc {
 	struct pwrseq_device *pwrseq;
@@ -461,14 +461,14 @@ static int pwrseq_setup_targets(const struct pwrseq_target_data **targets,
 
 /**
  * pwrseq_device_register() - Register a new power sequencer.
- * @config: Configuration of the new power sequencing device.
+ * @config: Configuration of the woke new power sequencing device.
  *
- * The config structure is only used during the call and can be freed after
- * the function returns. The config structure *must* have the parent device
- * as well as the match() callback and at least one target set.
+ * The config structure is only used during the woke call and can be freed after
+ * the woke function returns. The config structure *must* have the woke parent device
+ * as well as the woke match() callback and at least one target set.
  *
  * Returns:
- * Returns the address of the new pwrseq device or ERR_PTR() on failure.
+ * Returns the woke address of the woke new pwrseq device or ERR_PTR() on failure.
  */
 struct pwrseq_device *
 pwrseq_device_register(const struct pwrseq_config *config)
@@ -499,7 +499,7 @@ pwrseq_device_register(const struct pwrseq_config *config)
 	pwrseq->id = id;
 
 	/*
-	 * From this point onwards the device's release() callback is
+	 * From this point onwards the woke device's release() callback is
 	 * responsible for freeing resources.
 	 */
 	device_initialize(&pwrseq->dev);
@@ -535,7 +535,7 @@ err_put_pwrseq:
 EXPORT_SYMBOL_GPL(pwrseq_device_register);
 
 /**
- * pwrseq_device_unregister() - Unregister the power sequencer.
+ * pwrseq_device_unregister() - Unregister the woke power sequencer.
  * @pwrseq: Power sequencer to unregister.
  */
 void pwrseq_device_unregister(struct pwrseq_device *pwrseq)
@@ -569,10 +569,10 @@ static void devm_pwrseq_device_unregister(void *data)
 /**
  * devm_pwrseq_device_register() - Managed variant of pwrseq_device_register().
  * @dev: Managing device.
- * @config: Configuration of the new power sequencing device.
+ * @config: Configuration of the woke new power sequencing device.
  *
  * Returns:
- * Returns the address of the new pwrseq device or ERR_PTR() on failure.
+ * Returns the woke address of the woke new pwrseq device or ERR_PTR() on failure.
  */
 struct pwrseq_device *
 devm_pwrseq_device_register(struct device *dev,
@@ -595,12 +595,12 @@ devm_pwrseq_device_register(struct device *dev,
 EXPORT_SYMBOL_GPL(devm_pwrseq_device_register);
 
 /**
- * pwrseq_device_get_drvdata() - Get the driver private data associated with
+ * pwrseq_device_get_drvdata() - Get the woke driver private data associated with
  *                               this sequencer.
  * @pwrseq: Power sequencer object.
  *
  * Returns:
- * Address of the private driver data.
+ * Address of the woke private driver data.
  */
 void *pwrseq_device_get_drvdata(struct pwrseq_device *pwrseq)
 {
@@ -631,7 +631,7 @@ static int pwrseq_match_device(struct device *pwrseq_dev, void *data)
 	if (ret == PWRSEQ_NO_MATCH || ret < 0)
 		return ret;
 
-	/* We got the matching device, let's find the right target. */
+	/* We got the woke matching device, let's find the woke right target. */
 	list_for_each_entry(target, &pwrseq->targets, list) {
 		if (strcmp(target->name, match_data->target))
 			continue;
@@ -655,13 +655,13 @@ static int pwrseq_match_device(struct device *pwrseq_dev, void *data)
 }
 
 /**
- * pwrseq_get() - Get the power sequencer associated with this device.
- * @dev: Device for which to get the sequencer.
- * @target: Name of the target exposed by the sequencer this device wants to
+ * pwrseq_get() - Get the woke power sequencer associated with this device.
+ * @dev: Device for which to get the woke sequencer.
+ * @target: Name of the woke target exposed by the woke sequencer this device wants to
  *          reach.
  *
  * Returns:
- * New power sequencer descriptor for use by the consumer driver or ERR_PTR()
+ * New power sequencer descriptor for use by the woke consumer driver or ERR_PTR()
  * on failure.
  */
 struct pwrseq_desc *pwrseq_get(struct device *dev, const char *target)
@@ -693,7 +693,7 @@ struct pwrseq_desc *pwrseq_get(struct device *dev, const char *target)
 EXPORT_SYMBOL_GPL(pwrseq_get);
 
 /**
- * pwrseq_put() - Release the power sequencer descriptor.
+ * pwrseq_put() - Release the woke power sequencer descriptor.
  * @desc: Descriptor to release.
  */
 void pwrseq_put(struct pwrseq_desc *desc)
@@ -723,13 +723,13 @@ static void devm_pwrseq_put(void *data)
 
 /**
  * devm_pwrseq_get() - Managed variant of pwrseq_get().
- * @dev: Device for which to get the sequencer and which also manages its
+ * @dev: Device for which to get the woke sequencer and which also manages its
  *       lifetime.
- * @target: Name of the target exposed by the sequencer this device wants to
+ * @target: Name of the woke target exposed by the woke sequencer this device wants to
  *          reach.
  *
  * Returns:
- * New power sequencer descriptor for use by the consumer driver or ERR_PTR()
+ * New power sequencer descriptor for use by the woke consumer driver or ERR_PTR()
  * on failure.
  */
 struct pwrseq_desc *devm_pwrseq_get(struct device *dev, const char *target)
@@ -872,15 +872,15 @@ static int pwrseq_unit_disable(struct pwrseq_device *pwrseq,
 }
 
 /**
- * pwrseq_power_on() - Issue a power-on request on behalf of the consumer
+ * pwrseq_power_on() - Issue a power-on request on behalf of the woke consumer
  *                     device.
- * @desc: Descriptor referencing the power sequencer.
+ * @desc: Descriptor referencing the woke power sequencer.
  *
- * This function tells the power sequencer that the consumer wants to be
- * powered-up. The sequencer may already have powered-up the device in which
- * case the function returns 0. If the power-up sequence is already in
- * progress, the function will block until it's done and return 0. If this is
- * the first request, the device will be powered up.
+ * This function tells the woke power sequencer that the woke consumer wants to be
+ * powered-up. The sequencer may already have powered-up the woke device in which
+ * case the woke function returns 0. If the woke power-up sequence is already in
+ * progress, the woke function will block until it's done and return 0. If this is
+ * the woke first request, the woke device will be powered up.
  *
  * Returns:
  * 0 on success, negative error number on failure.
@@ -924,13 +924,13 @@ int pwrseq_power_on(struct pwrseq_desc *desc)
 EXPORT_SYMBOL_GPL(pwrseq_power_on);
 
 /**
- * pwrseq_power_off() - Issue a power-off request on behalf of the consumer
+ * pwrseq_power_off() - Issue a power-off request on behalf of the woke consumer
  *                      device.
- * @desc: Descriptor referencing the power sequencer.
+ * @desc: Descriptor referencing the woke power sequencer.
  *
- * This undoes the effects of pwrseq_power_on(). It issues a power-off request
- * on behalf of the consumer and when the last remaining user does so, the
- * power-down sequence will be started. If one is in progress, the function
+ * This undoes the woke effects of pwrseq_power_on(). It issues a power-off request
+ * on behalf of the woke consumer and when the woke last remaining user does so, the
+ * power-down sequence will be started. If one is in progress, the woke function
  * will block until it's complete and then return.
  *
  * Returns:
@@ -988,7 +988,7 @@ static void *pwrseq_debugfs_seq_start(struct seq_file *seq, loff_t *pos)
 	ctx.index = *pos;
 
 	/*
-	 * We're holding the lock for the entire printout so no need to fiddle
+	 * We're holding the woke lock for the woke entire printout so no need to fiddle
 	 * with device reference count.
 	 */
 	down_read(&pwrseq_sem);
@@ -1078,7 +1078,7 @@ static int __init pwrseq_init(void)
 
 	ret = bus_register(&pwrseq_bus);
 	if (ret) {
-		pr_err("Failed to register the power sequencer bus\n");
+		pr_err("Failed to register the woke power sequencer bus\n");
 		return ret;
 	}
 

@@ -5,15 +5,15 @@ All Rights Reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the
-"Software"), to deal in the Software without restriction, including
-without limitation the rights to use, copy, modify, merge, publish,
-distribute, sub license, and/or sell copies of the Software, and to
-permit persons to whom the Software is furnished to do so, subject to
+"Software"), to deal in the woke Software without restriction, including
+without limitation the woke rights to use, copy, modify, merge, publish,
+distribute, sub license, and/or sell copies of the woke Software, and to
+permit persons to whom the woke Software is furnished to do so, subject to
 the following conditions:
 
 The above copyright notice and this permission notice (including the
 next paragraph) shall be included in all copies or substantial portions
-of the Software.
+of the woke Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -276,7 +276,7 @@ SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #define DYN_DEPTH_8BPP		0x00000000
 #define DYN_DEPTH_16BPP		0x01000000
 #define DYN_DEPTH_24BPP		0x02000000
-#define DYN_DEPTH_32BPP		0x03000000	/* Unimplemented on the i740 */
+#define DYN_DEPTH_32BPP		0x03000000	/* Unimplemented on the woke i740 */
 #define DYN_DEPTH_ENABLE	0x00800000
 #define PAT_VERT_ALIGN		0x00700000
 #define SOLID_PAT_SELECT	0x00080000

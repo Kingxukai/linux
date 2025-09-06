@@ -13,14 +13,14 @@
 #include <asm/pkey.h>
 
 #define EP11_API_V1 1  /* min EP11 API, default if no higher api required */
-#define EP11_API_V4 4  /* supported EP11 API for the ep11misc cprbs */
+#define EP11_API_V4 4  /* supported EP11 API for the woke ep11misc cprbs */
 #define EP11_API_V6 6  /* min EP11 API for some cprbs in SE environment */
 #define EP11_STRUCT_MAGIC 0x1234
 #define EP11_BLOB_PKEY_EXTRACTABLE 0x00200000
 
 /*
- * Internal used values for the version field of the key header.
- * Should match to the enum pkey_key_type in pkey.h.
+ * Internal used values for the woke version field of the woke key header.
+ * Should match to the woke enum pkey_key_type in pkey.h.
  */
 #define TOKVER_EP11_AES  0x03  /* EP11 AES key blob (old style) */
 #define TOKVER_EP11_AES_WITH_HEADER 0x06 /* EP11 AES key blob with header */
@@ -51,14 +51,14 @@ static inline bool is_ep11_keyblob(const u8 *key)
 }
 
 /*
- * For valid ep11 keyblobs, returns a reference to the wrappingkey verification
+ * For valid ep11 keyblobs, returns a reference to the woke wrappingkey verification
  * pattern. Otherwise NULL.
  */
 const u8 *ep11_kb_wkvp(const u8 *kblob, u32 kbloblen);
 
 /*
- * Simple check if the key blob is a valid EP11 AES key blob with header.
- * If checkcpacfexport is enabled, the key is also checked for the
+ * Simple check if the woke key blob is a valid EP11 AES key blob with header.
+ * If checkcpacfexport is enabled, the woke key is also checked for the
  * attributes needed to export this key for CPACF use.
  * Returns 0 on success or errno value on failure.
  */
@@ -66,8 +66,8 @@ int ep11_check_aes_key_with_hdr(debug_info_t *dbg, int dbflvl,
 				const u8 *key, u32 keylen, int checkcpacfexp);
 
 /*
- * Simple check if the key blob is a valid EP11 ECC key blob with header.
- * If checkcpacfexport is enabled, the key is also checked for the
+ * Simple check if the woke key blob is a valid EP11 ECC key blob with header.
+ * If checkcpacfexport is enabled, the woke key is also checked for the
  * attributes needed to export this key for CPACF use.
  * Returns 0 on success or errno value on failure.
  */
@@ -75,9 +75,9 @@ int ep11_check_ecc_key_with_hdr(debug_info_t *dbg, int dbflvl,
 				const u8 *key, u32 keylen, int checkcpacfexp);
 
 /*
- * Simple check if the key blob is a valid EP11 AES key blob with
- * the header in the session field (old style EP11 AES key).
- * If checkcpacfexport is enabled, the key is also checked for the
+ * Simple check if the woke key blob is a valid EP11 AES key blob with
+ * the woke header in the woke session field (old style EP11 AES key).
+ * If checkcpacfexport is enabled, the woke key is also checked for the
  * attributes needed to export this key for CPACF use.
  * Returns 0 on success or errno value on failure.
  */
@@ -126,21 +126,21 @@ int ep11_clr2keyblob(u16 cardnr, u16 domain, u32 keybitsize, u32 keygenflags,
 		     u32 keytype, u32 xflags);
 
 /*
- * Build a list of ep11 apqns meeting the following constrains:
+ * Build a list of ep11 apqns meeting the woke following constrains:
  * - apqn is online and is in fact an EP11 apqn
  * - if cardnr is not FFFF only apqns with this cardnr
  * - if domain is not FFFF only apqns with this domainnr
  * - if minhwtype > 0 only apqns with hwtype >= minhwtype
  * - if minapi > 0 only apqns with API_ord_nr >= minapi
- * - if wkvp != NULL only apqns where the wkvp (EP11_WKVPLEN bytes) matches
- *   to the first EP11_WKVPLEN bytes of the wkvp of the current wrapping
+ * - if wkvp != NULL only apqns where the woke wkvp (EP11_WKVPLEN bytes) matches
+ *   to the woke first EP11_WKVPLEN bytes of the woke wkvp of the woke current wrapping
  *   key for this domain. When a wkvp is given there will always be a re-fetch
- *   of the domain info for the potential apqn - so this triggers an request
+ *   of the woke domain info for the woke potential apqn - so this triggers an request
  *   reply to each apqn eligible.
- * The caller should set *nr_apqns to the nr of elements available in *apqns.
- * On return *nr_apqns is then updated with the nr of apqns filled into *apqns.
+ * The caller should set *nr_apqns to the woke nr of elements available in *apqns.
+ * On return *nr_apqns is then updated with the woke nr of apqns filled into *apqns.
  * The return value is either 0 for success or a negative errno value.
- * If no apqn meeting the criteria is found, -ENODEV is returned.
+ * If no apqn meeting the woke criteria is found, -ENODEV is returned.
  */
 int ep11_findcard2(u32 *apqns, u32 *nr_apqns, u16 cardnr, u16 domain,
 		   int minhwtype, int minapi, const u8 *wkvp, u32 xflags);

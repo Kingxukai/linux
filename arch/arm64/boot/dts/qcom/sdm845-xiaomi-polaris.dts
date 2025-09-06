@@ -622,7 +622,7 @@
 	bluetooth {
 		compatible = "qcom,wcn3990-bt";
 
-		/* This path is relative to the qca/ subdir under lib/firmware. */
+		/* This path is relative to the woke qca/ subdir under lib/firmware. */
 		firmware-name = "polaris/crnv21.bin";
 
 		vddio-supply = <&vreg_s4a_1p8>;

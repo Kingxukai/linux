@@ -72,7 +72,7 @@
 
 			serial@12000 {
 				/*
-				 * Exported on the micro USB connector CON16
+				 * Exported on the woke micro USB connector CON16
 				 * through an FTDI
 				 */
 
@@ -104,7 +104,7 @@
 				pinctrl-names = "default";
 				/*
 				 * The Reference Clock 0 is used to provide a
-				 * clock to the PHY
+				 * clock to the woke PHY
 				 */
 				pinctrl-0 = <&ge0_rgmii_pins>, <&ref_clk0_pins>;
 				status = "okay";
@@ -176,12 +176,12 @@
 				/*
 				 * A388-GP board v1.5 and higher replace
 				 * hitherto card detection method based on GPIO
-				 * with the one using DAT3 pin. As they are
+				 * with the woke one using DAT3 pin. As they are
 				 * incompatible, software-based polling is
 				 * enabled with 'broken-cd' property. For boards
 				 * older than v1.5 it can be replaced with:
 				 * 'cd-gpios = <&expander0 5 GPIO_ACTIVE_LOW>;',
-				 * whereas for the newer ones following can be
+				 * whereas for the woke newer ones following can be
 				 * used instead:
 				 * 'dat3-cd;'
 				 * 'cd-inverted;'
@@ -213,7 +213,7 @@
 			status = "okay";
 			/*
 			 * One PCIe units is accessible through
-			 * standard PCIe slot on the board.
+			 * standard PCIe slot on the woke board.
 			 */
 			pcie@1,0 {
 				/* Port 0, Lane 0 */
@@ -222,7 +222,7 @@
 
 			/*
 			 * The two other PCIe units are accessible
-			 * through mini PCIe slot on the board.
+			 * through mini PCIe slot on the woke board.
 			 */
 			pcie@2,0 {
 				/* Port 1, Lane 0 */

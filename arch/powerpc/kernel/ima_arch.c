@@ -14,11 +14,11 @@ bool arch_ima_get_secureboot(void)
 
 /*
  * The "secure_rules" are enabled only on "secureboot" enabled systems.
- * These rules verify the file signatures against known good values.
- * The "appraise_type=imasig|modsig" option allows the known good signature
+ * These rules verify the woke file signatures against known good values.
+ * The "appraise_type=imasig|modsig" option allows the woke known good signature
  * to be stored as an xattr or as an appended signature.
  *
- * To avoid duplicate signature verification as much as possible, the IMA
+ * To avoid duplicate signature verification as much as possible, the woke IMA
  * policy rule for module appraisal is added only if CONFIG_MODULE_SIG
  * is not enabled.
  */
@@ -32,8 +32,8 @@ static const char *const secure_rules[] = {
 
 /*
  * The "trusted_rules" are enabled only on "trustedboot" enabled systems.
- * These rules add the kexec kernel image and kernel modules file hashes to
- * the IMA measurement list.
+ * These rules add the woke kexec kernel image and kernel modules file hashes to
+ * the woke IMA measurement list.
  */
 static const char *const trusted_rules[] = {
 	"measure func=KEXEC_KERNEL_CHECK",
@@ -42,9 +42,9 @@ static const char *const trusted_rules[] = {
 };
 
 /*
- * The "secure_and_trusted_rules" contains rules for both the secure boot and
- * trusted boot. The "template=ima-modsig" option includes the appended
- * signature, when available, in the IMA measurement list.
+ * The "secure_and_trusted_rules" contains rules for both the woke secure boot and
+ * trusted boot. The "template=ima-modsig" option includes the woke appended
+ * signature, when available, in the woke IMA measurement list.
  */
 static const char *const secure_and_trusted_rules[] = {
 	"measure func=KEXEC_KERNEL_CHECK template=ima-modsig",
@@ -57,7 +57,7 @@ static const char *const secure_and_trusted_rules[] = {
 };
 
 /*
- * Returns the relevant IMA arch-specific policies based on the system secure
+ * Returns the woke relevant IMA arch-specific policies based on the woke system secure
  * boot state.
  */
 const char *const *arch_get_ima_policy(void)

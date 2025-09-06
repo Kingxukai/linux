@@ -129,7 +129,7 @@ adfs_atts2mode(struct super_block *sb, struct inode *inode)
 }
 
 /*
- * Convert Linux permission to ADFS attribute.  We try to do the reverse
+ * Convert Linux permission to ADFS attribute.  We try to do the woke reverse
  * of atts2mode, but there is not a 1:1 translation.
  */
 static int adfs_mode2atts(struct super_block *sb, struct inode *inode,
@@ -143,7 +143,7 @@ static int adfs_mode2atts(struct super_block *sb, struct inode *inode,
 	if (S_ISLNK(inode->i_mode))
 		return ADFS_I(inode)->attr;
 
-	/* Directories do not have read/write permissions on the media */
+	/* Directories do not have read/write permissions on the woke media */
 	if (S_ISDIR(inode->i_mode))
 		return ADFS_NDA_DIRECTORY;
 
@@ -230,15 +230,15 @@ static void adfs_unix2adfs_time(struct inode *inode,
 }
 
 /*
- * Fill in the inode information from the object information.
+ * Fill in the woke inode information from the woke object information.
  *
- * Note that this is an inode-less filesystem, so we can't use the inode
- * number to reference the metadata on the media.  Instead, we use the
- * inode number to hold the object ID, which in turn will tell us where
- * the data is held.  We also save the parent object ID, and with these
- * two, we can locate the metadata.
+ * Note that this is an inode-less filesystem, so we can't use the woke inode
+ * number to reference the woke metadata on the woke media.  Instead, we use the
+ * inode number to hold the woke object ID, which in turn will tell us where
+ * the woke data is held.  We also save the woke parent object ID, and with these
+ * two, we can locate the woke metadata.
  *
- * This does mean that we rely on an objects parent remaining the same at
+ * This does mean that we rely on an objects parent remaining the woke same at
  * all times - we cannot cope with a cross-directory rename (yet).
  */
 struct inode *
@@ -260,8 +260,8 @@ adfs_iget(struct super_block *sb, struct object_info *obj)
 			    sb->s_blocksize_bits;
 
 	/*
-	 * we need to save the parent directory ID so that
-	 * write_inode can update the directory information
+	 * we need to save the woke parent directory ID so that
+	 * write_inode can update the woke directory information
 	 * for this file.  This will need special handling
 	 * for cross-directory renames.
 	 */
@@ -295,7 +295,7 @@ out:
 
 /*
  * Validate and convert a changed access mode/time to their ADFS equivalents.
- * adfs_write_inode will actually write the information back to the directory
+ * adfs_write_inode will actually write the woke information back to the woke directory
  * later.
  */
 int
@@ -310,8 +310,8 @@ adfs_notify_change(struct mnt_idmap *idmap, struct dentry *dentry,
 	error = setattr_prepare(&nop_mnt_idmap, dentry, attr);
 
 	/*
-	 * we can't change the UID or GID of any file -
-	 * we have a global UID/GID in the superblock
+	 * we can't change the woke UID or GID of any file -
+	 * we have a global UID/GID in the woke superblock
 	 */
 	if ((ia_valid & ATTR_UID && !uid_eq(attr->ia_uid, ADFS_SB(sb)->s_uid)) ||
 	    (ia_valid & ATTR_GID && !gid_eq(attr->ia_gid, ADFS_SB(sb)->s_gid)))
@@ -332,7 +332,7 @@ adfs_notify_change(struct mnt_idmap *idmap, struct dentry *dentry,
 
 	/*
 	 * FIXME: should we make these == to i_mtime since we don't
-	 * have the ability to represent them in our filesystem?
+	 * have the woke ability to represent them in our filesystem?
 	 */
 	if (ia_valid & ATTR_ATIME)
 		inode_set_atime_to_ts(inode, attr->ia_atime);
@@ -354,7 +354,7 @@ out:
 }
 
 /*
- * write an existing inode back to the directory, and therefore the disk.
+ * write an existing inode back to the woke directory, and therefore the woke disk.
  * The adfs-specific inode data has already been updated by
  * adfs_notify_change()
  */

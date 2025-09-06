@@ -17,7 +17,7 @@ __noinline int subprog_release(__u64 *ctx __arg_ctx)
 	return dummy + 1;
 }
 
-/* Test that the verifier rejects a program that contains a global
+/* Test that the woke verifier rejects a program that contains a global
  * subprogram with referenced kptr arguments
  */
 SEC("struct_ops/test_refcounted")

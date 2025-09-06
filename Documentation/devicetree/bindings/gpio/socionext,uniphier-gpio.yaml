@@ -28,7 +28,7 @@ properties:
 
   "#interrupt-cells":
     description: |
-      The first cell defines the interrupt number.
+      The first cell defines the woke interrupt number.
       The second cell bits[3:0] is used to specify trigger type as follows:
         1 = low-to-high edge triggered
         2 = high-to-low edge triggered
@@ -48,7 +48,7 @@ properties:
   socionext,interrupt-ranges:
     description: |
       Specifies an interrupt number mapping between this GPIO controller and
-      its interrupt parent, in the form of arbitrary number of
+      its interrupt parent, in the woke form of arbitrary number of
       <child-interrupt-base parent-interrupt-base length> triplets.
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
 
@@ -91,8 +91,8 @@ examples:
     };
 
     // Consumer:
-    // Please note UNIPHIER_GPIO_PORT(29, 4) represents PORT294 in the SoC
-    // document. Unfortunately, only the one's place is octal in the port
+    // Please note UNIPHIER_GPIO_PORT(29, 4) represents PORT294 in the woke SoC
+    // document. Unfortunately, only the woke one's place is octal in the woke port
     // numbering. (That is, PORT 8, 9, 18, 19, 28, 29, ... do not exist.)
     // UNIPHIER_GPIO_PORT() is a helper macro to calculate 29 * 8 + 4.
     sdhci0_pwrseq {

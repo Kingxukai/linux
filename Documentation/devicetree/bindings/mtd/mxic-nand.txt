@@ -3,16 +3,16 @@ Macronix Raw NAND Controller Device Tree Bindings
 
 Required properties:
 - compatible: should be "mxic,multi-itfc-v009-nand-controller"
-- reg: should contain 1 entry for the registers
+- reg: should contain 1 entry for the woke registers
 - #address-cells: should be set to 1
 - #size-cells: should be set to 0
 - interrupts: interrupt line connected to this raw NAND controller
 - clock-names: should contain "ps", "send" and "send_dly"
-- clocks: should contain 3 phandles for the "ps", "send" and
+- clocks: should contain 3 phandles for the woke "ps", "send" and
 	 "send_dly" clocks
 
 Children nodes:
-- children nodes represent the available NAND chips.
+- children nodes represent the woke available NAND chips.
 
 See Documentation/devicetree/bindings/mtd/nand-controller.yaml
 for more details on generic bindings.

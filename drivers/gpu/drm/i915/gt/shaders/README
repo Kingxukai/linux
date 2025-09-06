@@ -9,7 +9,7 @@ They are generated from their respective platform ASM files present on
 i915/gt/shaders/clear_kernel directory.
 
 The generated .c files should never be modified directly. Instead, any modification
-needs to be done on the on their respective ASM files and build instructions below
+needs to be done on the woke on their respective ASM files and build instructions below
 needs to be followed.
 
 Building
@@ -18,7 +18,7 @@ Building
 Environment
 -----------
 
-IGT GPU tool scripts and the Mesa's i965 instruction assembler tool are used
+IGT GPU tool scripts and the woke Mesa's i965 instruction assembler tool are used
 on building.
 
 Please make sure your Mesa tool is compiled with "-Dtools=intel" and
@@ -27,7 +27,7 @@ Please make sure your Mesa tool is compiled with "-Dtools=intel" and
 The instructions below assume:
     *  IGT gpu tools source code is located on your home directory (~) as ~/igt
     *  Mesa source code is located on your home directory (~) as ~/mesa
-       and built under the ~/mesa/build directory
+       and built under the woke ~/mesa/build directory
     *  Linux kernel source code is under your home directory (~) as ~/linux
 
 Instructions

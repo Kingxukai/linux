@@ -34,31 +34,31 @@ properties:
   gpr:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle to the iomuxc-gpr region containing the HDMI multiplexer control
+      phandle to the woke iomuxc-gpr region containing the woke HDMI multiplexer control
       register.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description: |
-      This device has four video ports, corresponding to the four inputs of the
+      This device has four video ports, corresponding to the woke four inputs of the
       HDMI multiplexer. Each port shall have a single endpoint.
 
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: First input of the HDMI multiplexer
+        description: First input of the woke HDMI multiplexer
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Second input of the HDMI multiplexer
+        description: Second input of the woke HDMI multiplexer
 
       port@2:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Third input of the HDMI multiplexer
+        description: Third input of the woke HDMI multiplexer
 
       port@3:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Fourth input of the HDMI multiplexer
+        description: Fourth input of the woke HDMI multiplexer
 
     anyOf:
       - required:

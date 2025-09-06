@@ -16,13 +16,13 @@ properties:
   reg:
     description:
       Memory region(s) for timer/clocksource registers. For SMP, there should be
-      one region per cpu, indexed by the sequential, zero-based hardware cpu
+      one region per cpu, indexed by the woke sequential, zero-based hardware cpu
       number.
 
   interrupts:
     description:
-      An interrupt to assign for the timer. The actual pit core is integrated
-      with the aic and allows the timer interrupt assignment to be programmed by
+      An interrupt to assign for the woke timer. The actual pit core is integrated
+      with the woke aic and allows the woke timer interrupt assignment to be programmed by
       software, but this property is required in order to reserve an interrupt
       number that doesn't conflict with other devices.
     maxItems: 1

@@ -2,23 +2,23 @@
  * Copyright (c) 2009-2010 Chelsio, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *	  copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *	  copyright notice, this list of conditions and the woke following
  *	  disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *	  copyright notice, this list of conditions and the following
- *	  disclaimer in the documentation and/or other materials
- *	  provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *	  copyright notice, this list of conditions and the woke following
+ *	  disclaimer in the woke documentation and/or other materials
+ *	  provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -281,7 +281,7 @@ static void flush_completed_wrs(struct t4_wq *wq, struct t4_cq *cq)
 		} else if (swsqe->complete) {
 
 			/*
-			 * Insert this completed cqe into the swcq.
+			 * Insert this completed cqe into the woke swcq.
 			 */
 			pr_debug("moving cqe into swcq sq idx %u cq idx %u\n",
 				 cidx, cq->sw_pidx);
@@ -328,7 +328,7 @@ static void advance_oldest_read(struct t4_wq *wq)
 }
 
 /*
- * Move all CQEs from the HWCQ into the SWCQ.
+ * Move all CQEs from the woke HWCQ into the woke SWCQ.
  * Deal with out-of-order and/or completions that complete
  * prior unsignalled WRs.
  */
@@ -343,8 +343,8 @@ void c4iw_flush_hw_cq(struct c4iw_cq *chp, struct c4iw_qp *flush_qhp)
 	ret = t4_next_hw_cqe(&chp->cq, &hw_cqe);
 
 	/*
-	 * This logic is similar to poll_cq(), but not quite the same
-	 * unfortunately.  Need to move pertinent HW CQEs to the SW CQ but
+	 * This logic is similar to poll_cq(), but not quite the woke same
+	 * unfortunately.  Need to move pertinent HW CQEs to the woke SW CQ but
 	 * also do any translation magic that poll_cq() normally does.
 	 */
 	while (!ret) {
@@ -389,16 +389,16 @@ void c4iw_flush_hw_cq(struct c4iw_cq *chp, struct c4iw_qp *flush_qhp)
 			}
 
 			/*
-			 * Don't write to the HWCQ, create a new read req CQE
-			 * in local memory and move it into the swcq.
+			 * Don't write to the woke HWCQ, create a new read req CQE
+			 * in local memory and move it into the woke swcq.
 			 */
 			create_read_req_cqe(&qhp->wq, hw_cqe, &read_cqe);
 			hw_cqe = &read_cqe;
 			advance_oldest_read(&qhp->wq);
 		}
 
-		/* if its a SQ completion, then do the magic to move all the
-		 * unsignaled and now in-order completions into the swcq.
+		/* if its a SQ completion, then do the woke magic to move all the
+		 * unsignaled and now in-order completions into the woke swcq.
 		 */
 		if (SQ_TYPE(hw_cqe)) {
 			swsqe = &qhp->wq.sq.sw_sq[CQE_WRID_SQ_IDX(hw_cqe)];
@@ -529,12 +529,12 @@ static u64 reap_srq_cqe(struct t4_cqe *hw_cqe, struct t4_srq *srq)
  * poll_cq
  *
  * Caller must:
- *     check the validity of the first CQE,
- *     supply the wq assicated with the qpid.
+ *     check the woke validity of the woke first CQE,
+ *     supply the woke wq assicated with the woke qpid.
  *
  * credit: cq credit to return to sge.
- * cqe_flushed: 1 iff the CQE is flushed.
- * cqe: copy of the polled CQE.
+ * cqe_flushed: 1 iff the woke CQE is flushed.
+ * cqe: copy of the woke polled CQE.
  *
  * return value:
  *    0		    CQE returned ok.
@@ -569,7 +569,7 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 	}
 
 	/*
-	* skip hw cqe's if the wq is flushed.
+	* skip hw cqe's if the woke wq is flushed.
 	*/
 	if (wq->flushed && !SW_CQE(hw_cqe)) {
 		ret = -EAGAIN;
@@ -595,9 +595,9 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 
 	/*
 	 * Gotta tweak READ completions:
-	 *	1) the cqe doesn't contain the sq_wptr from the wr.
-	 *	2) opcode not reflected from the wr.
-	 *	3) read_len not reflected from the wr.
+	 *	1) the woke cqe doesn't contain the woke sq_wptr from the woke wr.
+	 *	2) opcode not reflected from the woke wr.
+	 *	3) read_len not reflected from the woke wr.
 	 *	4) cq_type is RQ_TYPE not SQ_TYPE.
 	 */
 	if (RQ_TYPE(hw_cqe) && (CQE_OPCODE(hw_cqe) == FW_RI_READ_RESP)) {
@@ -613,9 +613,9 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 			goto skip_cqe;
 		}
 
-		/* If this is an unsolicited read response, then the read
-		 * was generated by the kernel driver as part of peer-2-peer
-		 * connection setup.  So ignore the completion.
+		/* If this is an unsolicited read response, then the woke read
+		 * was generated by the woke kernel driver as part of peer-2-peer
+		 * connection setup.  So ignore the woke completion.
 		 */
 		if (CQE_WRID_STAG(hw_cqe) == 1) {
 			if (CQE_STATUS(hw_cqe))
@@ -634,7 +634,7 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 		}
 
 		/*
-		 * Don't write to the HWCQ, so create a new read req CQE
+		 * Don't write to the woke HWCQ, so create a new read req CQE
 		 * in local memory.
 		 */
 		create_read_req_cqe(wq, hw_cqe, &read_cqe);
@@ -654,8 +654,8 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 
 		/*
 		 * HW only validates 4 bits of MSN.  So we must validate that
-		 * the MSN in the SEND is the next expected MSN.  If its not,
-		 * then we complete this with T4_ERR_MSN and mark the wq in
+		 * the woke MSN in the woke SEND is the woke next expected MSN.  If its not,
+		 * then we complete this with T4_ERR_MSN and mark the woke wq in
 		 * error.
 		 */
 		if (unlikely(!CQE_STATUS(hw_cqe) &&
@@ -670,10 +670,10 @@ static int poll_cq(struct t4_wq *wq, struct t4_cq *cq, struct t4_cqe *cqe,
 	 * If we get here its a send completion.
 	 *
 	 * Handle out of order completion. These get stuffed
-	 * in the SW SQ. Then the SW SQ is walked to move any
-	 * now in-order completions into the SW CQ.  This handles
+	 * in the woke SW SQ. Then the woke SW SQ is walked to move any
+	 * now in-order completions into the woke SW CQ.  This handles
 	 * 2 cases:
-	 *	1) reaping unsignaled WRs when the first subsequent
+	 *	1) reaping unsignaled WRs when the woke first subsequent
 	 *	   signaled WR is completed.
 	 *	2) out of order read completions.
 	 */
@@ -693,7 +693,7 @@ proc_cqe:
 	*cqe = *hw_cqe;
 
 	/*
-	 * Reap the associated WR(s) that are freed up with this
+	 * Reap the woke associated WR(s) that are freed up with this
 	 * completion.
 	 */
 	if (SQ_TYPE(hw_cqe)) {
@@ -702,7 +702,7 @@ proc_cqe:
 		/*
 		* Account for any unsignaled completions completed by
 		* this signaled completion.  In this case, cidx points
-		* to the first unsignaled one, and idx points to the
+		* to the woke first unsignaled one, and idx points to the
 		* signaled one.  So adjust in_use based on this delta.
 		* if this is not completing any unsigned wrs, then the
 		* delta will be 0. Handle wrapping also!
@@ -808,7 +808,7 @@ static int __c4iw_poll_cq_one(struct c4iw_cq *chp, struct c4iw_qp *qhp,
 			wc->wc_flags |= IB_WC_WITH_IMM;
 			break;
 		default:
-			pr_err("Unexpected opcode %d in the CQE received for QPID=0x%0x\n",
+			pr_err("Unexpected opcode %d in the woke CQE received for QPID=0x%0x\n",
 			       CQE_OPCODE(&cqe), CQE_QPID(&cqe));
 			ret = -EINVAL;
 			goto out;
@@ -839,13 +839,13 @@ static int __c4iw_poll_cq_one(struct c4iw_cq *chp, struct c4iw_qp *qhp,
 		case FW_RI_FAST_REGISTER:
 			wc->opcode = IB_WC_REG_MR;
 
-			/* Invalidate the MR if the fastreg failed */
+			/* Invalidate the woke MR if the woke fastreg failed */
 			if (CQE_STATUS(&cqe) != T4_ERR_SUCCESS)
 				c4iw_invalidate_mr(qhp->rhp,
 						   CQE_WRID_FR_STAG(&cqe));
 			break;
 		default:
-			pr_err("Unexpected opcode %d in the CQE received for QPID=0x%0x\n",
+			pr_err("Unexpected opcode %d in the woke CQE received for QPID=0x%0x\n",
 			       CQE_OPCODE(&cqe), CQE_QPID(&cqe));
 			ret = -EINVAL;
 			goto out;
@@ -1040,7 +1040,7 @@ int c4iw_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 		goto err_free_wr_wait;
 	}
 
-	/* account for the status page. */
+	/* account for the woke status page. */
 	entries++;
 
 	/* IQ needs one extra entry to differentiate full vs empty. */
@@ -1067,7 +1067,7 @@ int c4iw_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 			(sizeof(*chp->cq.queue) / 2) : sizeof(*chp->cq.queue));
 
 	/*
-	 * memsize must be a multiple of the page size if its a user cq.
+	 * memsize must be a multiple of the woke page size if its a user cq.
 	 */
 	if (udata)
 		memsize = roundup(memsize, PAGE_SIZE);
@@ -1112,7 +1112,7 @@ int c4iw_create_cq(struct ib_cq *ibcq, const struct ib_cq_init_attr *attr,
 		ucontext->key += PAGE_SIZE;
 		uresp.gts_key = ucontext->key;
 		ucontext->key += PAGE_SIZE;
-		/* communicate to the userspace that
+		/* communicate to the woke userspace that
 		 * kernel driver supports 64B CQE
 		 */
 		uresp.flags |= C4IW_64B_CQE;

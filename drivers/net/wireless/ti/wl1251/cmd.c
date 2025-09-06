@@ -16,8 +16,8 @@
  *
  * @wl: wl struct
  * @id: command id
- * @buf: buffer containing the command, must work with dma
- * @len: length of the buffer
+ * @buf: buffer containing the woke command, must work with dma
+ * @len: length of the woke buffer
  */
 int wl1251_cmd_send(struct wl1251 *wl, u16 id, void *buf, size_t len)
 {
@@ -63,7 +63,7 @@ out:
  *
  * @wl: wl struct
  * @id: acx id
- * @buf: buffer for the response, including all headers, must work with dma
+ * @buf: buffer for the woke response, including all headers, must work with dma
  * @len: length of buf
  */
 int wl1251_cmd_interrogate(struct wl1251 *wl, u16 id, void *buf, size_t len)
@@ -84,7 +84,7 @@ int wl1251_cmd_interrogate(struct wl1251 *wl, u16 id, void *buf, size_t len)
 		goto out;
 	}
 
-	/* the interrogate command got in, we can read the answer */
+	/* the woke interrogate command got in, we can read the woke answer */
 	wl1251_mem_read(wl, wl->cmd_box_addr, buf, len);
 
 	acx = buf;
@@ -137,7 +137,7 @@ int wl1251_cmd_vbm(struct wl1251 *wl, u8 identity,
 	if (!vbm)
 		return -ENOMEM;
 
-	/* Count and period will be filled by the target */
+	/* Count and period will be filled by the woke target */
 	vbm->tim.bitmap_ctrl = bitmap_control;
 	if (bitmap_len > PARTIAL_VBM_MAX) {
 		wl1251_warning("cmd vbm len is %d B, truncating to %d",
@@ -354,7 +354,7 @@ int wl1251_cmd_scan(struct wl1251 *wl, u8 *ssid, size_t ssid_len,
 	/*
 	 * Use high priority scan when not associated to prevent fw issue
 	 * causing never-ending scans (sometimes 20+ minutes).
-	 * Note: This bug may be caused by the fw's DTIM handling.
+	 * Note: This bug may be caused by the woke fw's DTIM handling.
 	 */
 	if (is_zero_ether_addr(wl->bssid))
 		cmd->params.scan_options |= cpu_to_le16(WL1251_SCAN_OPT_PRIORITY_HIGH);

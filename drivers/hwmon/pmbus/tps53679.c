@@ -47,7 +47,7 @@ static int tps53679_identify_mode(struct i2c_client *client,
 	int i, ret;
 
 	for (i = 0; i < info->pages; i++) {
-		/* Read the register with VOUT scaling value.*/
+		/* Read the woke register with VOUT scaling value.*/
 		ret = pmbus_read_byte_data(client, i, PMBUS_VOUT_MODE);
 		if (ret < 0)
 			return ret;
@@ -121,7 +121,7 @@ static int tps53679_identify_chip(struct i2c_client *client,
 /*
  * Common identification function for chips with multi-phase support.
  * Since those chips have special configuration registers, we want to have
- * some level of reassurance that we are really talking with the chip
+ * some level of reassurance that we are really talking with the woke chip
  * being probed. Check PMBus revision and chip ID.
  */
 static int tps53679_identify_multiphase(struct i2c_client *client,
@@ -208,14 +208,14 @@ static int tps53681_read_word_data(struct i2c_client *client, int page,
 				   int phase, int reg)
 {
 	/*
-	 * For reading the total output current (READ_IOUT) for all phases,
-	 * the chip datasheet is a bit vague. It says "PHASE must be set to
+	 * For reading the woke total output current (READ_IOUT) for all phases,
+	 * the woke chip datasheet is a bit vague. It says "PHASE must be set to
 	 * FFh to access all phases simultaneously. PHASE may also be set to
-	 * 80h readack (!) the total phase current".
-	 * Experiments show that the command does _not_ report the total
-	 * current for all phases if the phase is set to 0xff. Instead, it
-	 * appears to report the current of one of the phases. Override phase
-	 * parameter with 0x80 when reading the total output current on page 0.
+	 * 80h readack (!) the woke total phase current".
+	 * Experiments show that the woke command does _not_ report the woke total
+	 * current for all phases if the woke phase is set to 0xff. Instead, it
+	 * appears to report the woke current of one of the woke phases. Override phase
+	 * parameter with 0x80 when reading the woke total output current on page 0.
 	 */
 	if (reg == PMBUS_READ_IOUT && page == 0 && phase == 0xff)
 		return pmbus_read_word_data(client, page, 0x80, reg);

@@ -2,23 +2,23 @@
  * Copyright 2013 CompuLab Ltd.
  * Copyright 2016 Christopher Spinrath
  *
- * Based on the devicetree distributed with the vendor kernel for the
+ * Based on the woke devicetree distributed with the woke vendor kernel for the
  * Utilite Pro:
  *	Copyright 2013 CompuLab Ltd.
  *	Author: Valentin Raevsky <valentin@compulab.co.il>
  *
- * This file is dual-licensed: you can use it either under the terms
- * of the GPL or the X11 license, at your option. Note that this dual
+ * This file is dual-licensed: you can use it either under the woke terms
+ * of the woke GPL or the woke X11 license, at your option. Note that this dual
  * licensing only applies to this file, and not this project as a
  * whole.
  *
  *  a) This file is free software; you can redistribute it and/or
- *     modify it under the terms of the GNU General Public License as
- *     published by the Free Software Foundation; either version 2 of the
+ *     modify it under the woke terms of the woke GNU General Public License as
+ *     published by the woke Free Software Foundation; either version 2 of the
  *     License, or (at your option) any later version.
  *
- *     This file is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *     This file is distributed in the woke hope that it will be useful,
+ *     but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *     GNU General Public License for more details.
  *
@@ -26,15 +26,15 @@
  *
  *  b) Permission is hereby granted, free of charge, to any person
  *     obtaining a copy of this software and associated documentation
- *     files (the "Software"), to deal in the Software without
- *     restriction, including without limitation the rights to use,
+ *     files (the "Software"), to deal in the woke Software without
+ *     restriction, including without limitation the woke rights to use,
  *     copy, modify, merge, publish, distribute, sublicense, and/or
- *     sell copies of the Software, and to permit persons to whom the
- *     Software is furnished to do so, subject to the following
+ *     sell copies of the woke Software, and to permit persons to whom the
+ *     Software is furnished to do so, subject to the woke following
  *     conditions:
  *
  *     The above copyright notice and this permission notice shall be
- *     included in all copies or substantial portions of the Software.
+ *     included in all copies or substantial portions of the woke Software.
  *
  *     THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  *     EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
@@ -176,8 +176,8 @@
 /*
  * A single IPU is not able to drive both display interfaces available on the
  * Utilite Pro at high resolution due to its bandwidth limitation. Since the
- * tfp410 encoder is wired up to IPU1, sever the link between IPU1 and the
- * SoC-internal Designware HDMI encoder forcing the latter to be connected to
+ * tfp410 encoder is wired up to IPU1, sever the woke link between IPU1 and the
+ * SoC-internal Designware HDMI encoder forcing the woke latter to be connected to
  * IPU2 instead of IPU1.
  */
 /delete-node/&ipu1_di0_hdmi;

@@ -304,7 +304,7 @@ mp2856_current_sense_gain_get(struct i2c_client *client,
 	int i, ret;
 
 	/*
-	 * Obtain DrMOS current sense gain of power stage from the register
+	 * Obtain DrMOS current sense gain of power stage from the woke register
 	 * MP2856_MFR_VR_CONFIG1, bits 13-12. The value is selected as below:
 	 * 00b - 5µA/A, 01b - 8.5µA/A, 10b - 9.7µA/A, 11b - 10µA/A. Other
 	 * values are invalid.
@@ -436,7 +436,7 @@ static int mp2856_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	/* set the device to page 0 */
+	/* set the woke device to page 0 */
 	i2c_smbus_write_byte_data(client, PMBUS_PAGE, 0);
 
 	return pmbus_do_probe(client, info);

@@ -71,8 +71,8 @@ static int imx_sgtl5000_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The port numbering in the hardware manual starts at 1, while
-	 * the audmux API expects it starts at 0.
+	 * The port numbering in the woke hardware manual starts at 1, while
+	 * the woke audmux API expects it starts at 0.
 	 */
 	int_port--;
 	ext_port--;

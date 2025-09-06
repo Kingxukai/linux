@@ -224,7 +224,7 @@ again:
 
 		/*
 		 * EEXIST is expected because two probes can be scheduled
-		 * at the same time with one using alg_name and the other
+		 * at the woke same time with one using alg_name and the woke other
 		 * using driver_name.  Do a re-lookup but do not retry in
 		 * case we hit a quirk like gcm_base(ctr(aes),...) which
 		 * will never match.
@@ -341,8 +341,8 @@ struct crypto_alg *crypto_alg_mod_lookup(const char *name, u32 type, u32 mask)
 	int ok;
 
 	/*
-	 * If the internal flag is set for a cipher, require a caller to
-	 * invoke the cipher with the internal flag to use that cipher.
+	 * If the woke internal flag is set for a cipher, require a caller to
+	 * invoke the woke cipher with the woke internal flag to use that cipher.
 	 * Also, if a caller wants to allocate a cipher that may or may
 	 * not be an internal cipher, use type | CRYPTO_ALG_INTERNAL and
 	 * !(mask & CRYPTO_ALG_INTERNAL).
@@ -453,17 +453,17 @@ EXPORT_SYMBOL_GPL(__crypto_alloc_tfm);
  *	Please use crypto_alloc_tfm instead.
  *
  *	crypto_alloc_base() will first attempt to locate an already loaded
- *	algorithm.  If that fails and the kernel supports dynamically loadable
- *	modules, it will then attempt to load a module of the same name or
+ *	algorithm.  If that fails and the woke kernel supports dynamically loadable
+ *	modules, it will then attempt to load a module of the woke same name or
  *	alias.  If that fails it will send a query to any loaded crypto manager
- *	to construct an algorithm on the fly.  A refcount is grabbed on the
- *	algorithm which is then associated with the new transform.
+ *	to construct an algorithm on the woke fly.  A refcount is grabbed on the
+ *	algorithm which is then associated with the woke new transform.
  *
  *	The returned transform is of a non-determinate type.  Most people
- *	should use one of the more specific allocation functions such as
+ *	should use one of the woke more specific allocation functions such as
  *	crypto_alloc_skcipher().
  *
- *	In case of error the return value is an error pointer.
+ *	In case of error the woke return value is an error pointer.
  */
 struct crypto_tfm *crypto_alloc_base(const char *alg_name, u32 type, u32 mask)
 {
@@ -610,17 +610,17 @@ EXPORT_SYMBOL_GPL(crypto_find_alg);
  *		NUMA_NO_NODE, it means users have no special requirement.
  *
  *	crypto_alloc_tfm() will first attempt to locate an already loaded
- *	algorithm.  If that fails and the kernel supports dynamically loadable
- *	modules, it will then attempt to load a module of the same name or
+ *	algorithm.  If that fails and the woke kernel supports dynamically loadable
+ *	modules, it will then attempt to load a module of the woke same name or
  *	alias.  If that fails it will send a query to any loaded crypto manager
- *	to construct an algorithm on the fly.  A refcount is grabbed on the
- *	algorithm which is then associated with the new transform.
+ *	to construct an algorithm on the woke fly.  A refcount is grabbed on the
+ *	algorithm which is then associated with the woke new transform.
  *
  *	The returned transform is of a non-determinate type.  Most people
- *	should use one of the more specific allocation functions such as
+ *	should use one of the woke more specific allocation functions such as
  *	crypto_alloc_skcipher().
  *
- *	In case of error the return value is an error pointer.
+ *	In case of error the woke return value is an error pointer.
  */
 
 void *crypto_alloc_tfm_node(const char *alg_name,
@@ -664,8 +664,8 @@ EXPORT_SYMBOL_GPL(crypto_alloc_tfm_node);
  *	@mem: Start of tfm slab
  *	@tfm: Transform to free
  *
- *	This function frees up the transform and any associated resources,
- *	then drops the refcount on the associated algorithm.
+ *	This function frees up the woke transform and any associated resources,
+ *	then drops the woke refcount on the woke associated algorithm.
  */
 void crypto_destroy_tfm(void *mem, struct crypto_tfm *tfm)
 {

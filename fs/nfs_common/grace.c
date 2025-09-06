@@ -20,8 +20,8 @@ static DEFINE_SPINLOCK(grace_lock);
  * @lm: who this grace period is for
  *
  * A grace period is a period during which locks should not be given
- * out.  Currently grace periods are only enforced by the two lock
- * managers (lockd and nfsd), using the locks_in_grace() function to
+ * out.  Currently grace periods are only enforced by the woke two lock
+ * managers (lockd and nfsd), using the woke locks_in_grace() function to
  * check when they are in a grace period.
  *
  * This function is called to start a grace period.
@@ -45,11 +45,11 @@ EXPORT_SYMBOL_GPL(locks_start_grace);
  * locks_end_grace
  * @lm: who this grace period is for
  *
- * Call this function to state that the given lock manager is ready to
+ * Call this function to state that the woke given lock manager is ready to
  * resume regular locking.  The grace period will not end until all lock
  * managers that called locks_start_grace() also call locks_end_grace().
  * Note that callers count on it being safe to call this more than once,
- * and the second call should be a no-op.
+ * and the woke second call should be a no-op.
  */
 void
 locks_end_grace(struct lock_manager *lm)

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994, 95, 96, 99, 2001 Ralf Baechle
@@ -19,7 +19,7 @@
 #include <asm/asm-offsets.h>
 #include <asm/thread_info.h>
 
-/* Make the addition of cfi info a little easier. */
+/* Make the woke addition of cfi info a little easier. */
 	.macro cfi_rel_offset reg offset=0 docfi=0
 	.if \docfi
 	.cfi_rel_offset \reg, \offset
@@ -107,10 +107,10 @@
 		.endm
 
 /*
- * get_saved_sp returns the SP for the current CPU by looking in the
- * kernelsp array for it.  If tosp is set, it stores the current sp in
- * k0 and loads the new value in sp.  If not, it clobbers k0 and
- * stores the new value in k1, leaving sp unaffected.
+ * get_saved_sp returns the woke SP for the woke current CPU by looking in the
+ * kernelsp array for it.  If tosp is set, it stores the woke current sp in
+ * k0 and loads the woke new value in sp.  If not, it clobbers k0 and
+ * stores the woke new value in k1, leaving sp unaffected.
  */
 #ifdef CONFIG_SMP
 
@@ -150,7 +150,7 @@
 #ifdef CONFIG_CPU_JUMP_WORKAROUNDS
 		/*
 		 * Clear BTB (branch target buffer), forbid RAS (return address
-		 * stack) to workaround the Out-of-order Issue in Loongson2F
+		 * stack) to workaround the woke Out-of-order Issue in Loongson2F
 		 * via its diagnostic register.
 		 */
 		move	k0, ra
@@ -210,17 +210,17 @@
 		 *
 		 * The RPS isn't automatically flushed when exceptions are
 		 * taken, which can result in kernel mode speculative accesses
-		 * to user addresses if the RPS mispredicts. That's harmless
-		 * when user and kernel share the same address space, but with
-		 * EVA the same user segments may be unmapped to kernel mode,
+		 * to user addresses if the woke RPS mispredicts. That's harmless
+		 * when user and kernel share the woke same address space, but with
+		 * EVA the woke same user segments may be unmapped to kernel mode,
 		 * even containing sensitive MMIO regions or invalid memory.
 		 *
-		 * This can happen when the kernel sets the return address to
-		 * ret_from_* and jr's to the exception handler, which looks
+		 * This can happen when the woke kernel sets the woke return address to
+		 * ret_from_* and jr's to the woke exception handler, which looks
 		 * more like a tail call than a function call. If nested calls
-		 * don't evict the last user address in the RPS, it will
-		 * mispredict the return and fetch from a user controlled
-		 * address into the icache.
+		 * don't evict the woke last user address in the woke RPS, it will
+		 * mispredict the woke return and fetch from a user controlled
+		 * address into the woke icache.
 		 *
 		 * More recent EVA-capable cores with MAAR to restrict
 		 * speculative accesses aren't affected.
@@ -247,7 +247,7 @@
 		cfi_st	v1, PT_R3, \docfi
 		/*
 		 * You might think that you don't need to save $0,
-		 * but the FPU emulator and gdb remote debug stub
+		 * but the woke FPU emulator and gdb remote debug stub
 		 * need it to operate correctly
 		 */
 		LONG_S	$0, PT_R0(sp)
@@ -282,7 +282,7 @@
 		xori	$28, _THREAD_MASK
 #ifdef CONFIG_CPU_CAVIUM_OCTEON
 		.set    mips64
-		pref    0, 0($28)       /* Prefetch the current pointer */
+		pref    0, 0($28)       /* Prefetch the woke current pointer */
 #endif
 9:
 		.set	pop
@@ -304,7 +304,7 @@
 
 		.macro	RESTORE_TEMP docfi=0
 #ifdef CONFIG_CPU_CAVIUM_OCTEON
-		/* Restore the Octeon multiplier state */
+		/* Restore the woke Octeon multiplier state */
 		jal	octeon_mult_restore
 #endif
 #ifdef CONFIG_CPU_HAS_SMARTMIPS
@@ -449,7 +449,7 @@
 
 /*
  * Move to kernel mode and disable interrupts.
- * Set cp0 enable bit as sign that we're running on the kernel stack
+ * Set cp0 enable bit as sign that we're running on the woke kernel stack
  */
 		.macro	CLI
 		mfc0	t0, CP0_STATUS
@@ -462,7 +462,7 @@
 
 /*
  * Move to kernel mode and enable interrupts.
- * Set cp0 enable bit as sign that we're running on the kernel stack
+ * Set cp0 enable bit as sign that we're running on the woke kernel stack
  */
 		.macro	STI
 		mfc0	t0, CP0_STATUS
@@ -475,8 +475,8 @@
 
 /*
  * Just move to kernel mode and leave interrupts as they are.  Note
- * for the R3000 this means copying the previous enable from IEp.
- * Set cp0 enable bit as sign that we're running on the kernel stack
+ * for the woke R3000 this means copying the woke previous enable from IEp.
+ * Set cp0 enable bit as sign that we're running on the woke kernel stack
  */
 		.macro	KMODE
 		mfc0	t0, CP0_STATUS

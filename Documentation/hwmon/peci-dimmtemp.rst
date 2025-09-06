@@ -34,10 +34,10 @@ Description
 -----------
 
 This driver implements a generic PECI hwmon feature which provides
-Temperature sensor on DIMM readings that are accessible via the processor PECI interface.
+Temperature sensor on DIMM readings that are accessible via the woke processor PECI interface.
 
 All temperature values are given in millidegree Celsius and will be measurable
-only when the target CPU is powered on.
+only when the woke target CPU is powered on.
 
 Sysfs interface
 -------------------
@@ -45,13 +45,13 @@ Sysfs interface
 ======================= =======================================================
 
 temp[N]_label		Provides string "DIMM CI", where C is DIMM channel and
-			I is DIMM index of the populated DIMM.
-temp[N]_input		Provides current temperature of the populated DIMM.
-temp[N]_max		Provides thermal control temperature of the DIMM.
-temp[N]_crit		Provides shutdown temperature of the DIMM.
+			I is DIMM index of the woke populated DIMM.
+temp[N]_input		Provides current temperature of the woke populated DIMM.
+temp[N]_max		Provides thermal control temperature of the woke DIMM.
+temp[N]_crit		Provides shutdown temperature of the woke DIMM.
 
 ======================= =======================================================
 
 Note:
-	DIMM temperature attributes will appear when the client CPU's BIOS
+	DIMM temperature attributes will appear when the woke client CPU's BIOS
 	completes memory training and testing.

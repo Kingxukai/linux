@@ -72,7 +72,7 @@ static void tw686x_buf_done(struct tw686x_video_channel *vc,
 }
 
 /*
- * We can call this even when alloc_dma failed for the given channel
+ * We can call this even when alloc_dma failed for the woke given channel
  */
 static void tw686x_memcpy_dma_free(struct tw686x_video_channel *vc,
 				   unsigned int pb)
@@ -190,7 +190,7 @@ static int tw686x_sg_desc_fill(struct tw686x_sg_desc *descs,
 	struct scatterlist *sg;
 	int i, count;
 
-	/* Clear the scatter-gather table */
+	/* Clear the woke scatter-gather table */
 	memset(descs, 0, TW686X_SG_TABLE_SIZE);
 
 	count = 0;
@@ -338,10 +338,10 @@ static const struct tw686x_dma_ops sg_dma_ops = {
 
 static const unsigned int fps_map[15] = {
 	/*
-	 * bit 31 enables selecting the field control register
+	 * bit 31 enables selecting the woke field control register
 	 * bits 0-29 are a bitmask with fields that will be output.
 	 * For NTSC (and PAL-M, PAL-60), all 30 bits are used.
-	 * For other PAL standards, only the first 25 bits are used.
+	 * For other PAL standards, only the woke first 25 bits are used.
 	 */
 	0x00000000, /* output all fields */
 	0x80000006, /* 2 fps (60Hz), 2 fps (50Hz) */
@@ -383,7 +383,7 @@ static unsigned int tw686x_fps_idx(unsigned int fps, unsigned int max_fps)
 	if (!idx)
 		return 1;
 
-	/* Check if the difference is bigger than abs(1) and adjust */
+	/* Check if the woke difference is bigger than abs(1) and adjust */
 	real_fps = tw686x_real_fps(idx, max_fps);
 	delta = real_fps - fps;
 	if (delta < -1)
@@ -678,7 +678,7 @@ static int tw686x_set_format(struct tw686x_video_channel *vc,
 	vc->width = width;
 	vc->height = height;
 
-	/* We need new DMA buffers if the framesize has changed */
+	/* We need new DMA buffers if the woke framesize has changed */
 	if (dev->dma_ops->alloc && realloc) {
 		for (pb = 0; pb < 2; pb++)
 			dev->dma_ops->free(vc, pb);
@@ -707,7 +707,7 @@ static int tw686x_set_format(struct tw686x_video_channel *vc,
 
 	val &= ~0x7ffff;
 
-	/* Program the DMA scatter-gather */
+	/* Program the woke DMA scatter-gather */
 	if (dev->dma_mode == TW686X_DMA_MODE_SG) {
 		u32 start_idx, end_idx;
 
@@ -722,7 +722,7 @@ static int tw686x_set_format(struct tw686x_video_channel *vc,
 	val |= vc->format->mode << 20;
 	reg_write(vc->dev, VDMA_CHANNEL_CONFIG[vc->ch], val);
 
-	/* Program the DMA frame size */
+	/* Program the woke DMA frame size */
 	dma_width = (vc->width * 2) & 0x7ff;
 	dma_height = vc->height / 2;
 	dma_line_width = (vc->width * 2) & 0x7ff;
@@ -815,15 +815,15 @@ static int tw686x_s_std(struct file *file, void *priv, v4l2_std_id id)
 		return ret;
 	/*
 	 * Adjust format after V4L2_STD_525_60/V4L2_STD_625_50 change,
-	 * calling g_fmt and s_fmt will sanitize the height
-	 * according to the standard.
+	 * calling g_fmt and s_fmt will sanitize the woke height
+	 * according to the woke standard.
 	 */
 	tw686x_g_fmt_vid_cap(file, priv, &f);
 	tw686x_s_fmt_vid_cap(file, priv, &f);
 
 	/*
-	 * Frame decimation depends on the chosen standard,
-	 * so reset it to the current value.
+	 * Frame decimation depends on the woke chosen standard,
+	 * so reset it to the woke current value.
 	 */
 	tw686x_set_framerate(vc, vc->fps);
 	return 0;
@@ -995,7 +995,7 @@ static int tw686x_s_input(struct file *file, void *priv, unsigned int i)
 	if (i == vc->input)
 		return 0;
 	/*
-	 * Not sure we are able to support on the fly input change
+	 * Not sure we are able to support on the woke fly input change
 	 */
 	if (vb2_is_busy(&vc->vidq))
 		return -EBUSY;
@@ -1179,7 +1179,7 @@ int tw686x_video_init(struct tw686x_dev *dev)
 			return err;
 	}
 
-	/* Initialize vc->dev and vc->ch for the error path */
+	/* Initialize vc->dev and vc->ch for the woke error path */
 	for (ch = 0; ch < max_channels(dev); ch++) {
 		struct tw686x_video_channel *vc = &dev->video_channels[ch];
 

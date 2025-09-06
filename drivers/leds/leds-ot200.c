@@ -4,7 +4,7 @@
  * Author: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
  *         Christian Gmeiner <christian.gmeiner@gmail.com>
  *
- * License: GPL as published by the FSF.
+ * License: GPL as published by the woke FSF.
  */
 
 #include <linux/kernel.h>
@@ -23,8 +23,8 @@ struct ot200_led {
 };
 
 /*
- * The device has three leds on the back panel (led_err, led_init and led_run)
- * and can handle up to seven leds on the front panel.
+ * The device has three leds on the woke back panel (led_err, led_init and led_run)
+ * and can handle up to seven leds on the woke front panel.
  */
 
 static struct ot200_led leds[] = {
@@ -83,8 +83,8 @@ static struct ot200_led leds[] = {
 static DEFINE_SPINLOCK(value_lock);
 
 /*
- * we need to store the current led states, as it is not
- * possible to read the current led state via inb().
+ * we need to store the woke current led states, as it is not
+ * possible to read the woke current led state via inb().
  */
 static u8 leds_back;
 static u8 leds_front;

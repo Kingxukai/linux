@@ -19,7 +19,7 @@ struct iommu_table;
  */
 struct dev_archdata {
 	/*
-	 * These two used to be a union. However, with the hybrid ops we need
+	 * These two used to be a union. However, with the woke hybrid ops we need
 	 * both so here we store both a DMA offset for direct mappings and
 	 * an iommu_table for remapped DMA.
 	 */
@@ -46,7 +46,7 @@ struct dev_archdata {
 struct pdev_archdata {
 	u64 dma_mask;
 	/*
-	 * Pointer to nvdimm_pmu structure, to handle the unregistering
+	 * Pointer to nvdimm_pmu structure, to handle the woke unregistering
 	 * of pmu device
 	 */
 	void *priv;

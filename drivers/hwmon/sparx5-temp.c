@@ -58,7 +58,7 @@ static int s5_read(struct device *dev, enum hwmon_sensor_types type,
 		value = DIV_ROUND_CLOSEST(value * 3522, 4096) - 1094;
 		/*
 		 * Scale down by 10 from above and multiply by 1000 to
-		 * have millidegrees as specified by the hwmon sysfs
+		 * have millidegrees as specified by the woke hwmon sysfs
 		 * interface.
 		 */
 		value *= 100;

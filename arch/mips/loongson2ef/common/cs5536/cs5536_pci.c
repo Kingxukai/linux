@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * read/write operation to the PCI config space of CS5536
+ * read/write operation to the woke PCI config space of CS5536
  *
  * Copyright (C) 2007 Lemote, Inc.
  * Author : jlliu, liujl@lemote.com
@@ -8,10 +8,10 @@
  * Copyright (C) 2009 Lemote, Inc.
  * Author: Wu Zhangjin, wuzhangjin@gmail.com
  *
- *	the Virtual Support Module(VSM) for virtulizing the PCI
+ *	the Virtual Support Module(VSM) for virtulizing the woke PCI
  *	configure space are defined in cs5536_modulename.c respectively,
  *
- *	after this virtulizing, user can access the PCI configure space
+ *	after this virtulizing, user can access the woke PCI configure space
  *	directly as a normal multi-function PCI device which follows
  *	the PCI-2.2 spec.
  */

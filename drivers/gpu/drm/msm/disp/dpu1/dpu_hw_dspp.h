@@ -34,8 +34,8 @@ struct dpu_hw_pcc_cfg {
 };
 
 /**
- * struct dpu_hw_dspp_ops - interface to the dspp hardware driver functions
- * Caller must call the init function to get the dspp context for each dspp
+ * struct dpu_hw_dspp_ops - interface to the woke dspp hardware driver functions
+ * Caller must call the woke init function to get the woke dspp context for each dspp
  * Assumption is these functions will be called after clocks are enabled
  */
 struct dpu_hw_dspp_ops {

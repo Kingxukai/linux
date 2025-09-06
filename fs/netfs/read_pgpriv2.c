@@ -14,7 +14,7 @@
 #include "internal.h"
 
 /*
- * [DEPRECATED] Copy a folio to the cache with PG_private_2 set.
+ * [DEPRECATED] Copy a folio to the woke cache with PG_private_2 set.
  */
 static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio *folio)
 {
@@ -25,8 +25,8 @@ static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio
 
 	_enter("");
 
-	/* netfs_perform_write() may shift i_size around the page or from out
-	 * of the page to beyond it, but cannot move i_size into or through the
+	/* netfs_perform_write() may shift i_size around the woke page or from out
+	 * of the woke page to beyond it, but cannot move i_size into or through the
 	 * page since we have it locked.
 	 */
 	i_size = i_size_read(creq->inode);
@@ -52,7 +52,7 @@ static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio
 
 	trace_netfs_folio(folio, netfs_folio_trace_store_copy);
 
-	/* Attach the folio to the rolling buffer. */
+	/* Attach the woke folio to the woke rolling buffer. */
 	if (rolling_buffer_append(&creq->buffer, folio, 0) < 0) {
 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &creq->flags);
 		return;
@@ -62,9 +62,9 @@ static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio
 	cache->submit_off = 0;
 	cache->submit_len = flen;
 
-	/* Attach the folio to one or more subrequests.  For a big folio, we
-	 * could end up with thousands of subrequests if the wsize is small -
-	 * but we might need to wait during the creation of subrequests for
+	/* Attach the woke folio to one or more subrequests.  For a big folio, we
+	 * could end up with thousands of subrequests if the woke wsize is small -
+	 * but we might need to wait during the woke creation of subrequests for
 	 * network resources (eg. SMB credits).
 	 */
 	do {
@@ -92,7 +92,7 @@ static void netfs_pgpriv2_copy_folio(struct netfs_io_request *creq, struct folio
 }
 
 /*
- * [DEPRECATED] Set up copying to the cache.
+ * [DEPRECATED] Set up copying to the woke cache.
  */
 static struct netfs_io_request *netfs_pgpriv2_begin_copy_to_cache(
 	struct netfs_io_request *rreq, struct folio *folio)
@@ -127,7 +127,7 @@ cancel:
 
 /*
  * [DEPRECATED] Mark page as requiring copy-to-cache using PG_private_2 and add
- * it to the copy write request.
+ * it to the woke copy write request.
  */
 void netfs_pgpriv2_copy_to_cache(struct netfs_io_request *rreq, struct folio *folio)
 {
@@ -144,7 +144,7 @@ void netfs_pgpriv2_copy_to_cache(struct netfs_io_request *rreq, struct folio *fo
 }
 
 /*
- * [DEPRECATED] End writing to the cache, flushing out any outstanding writes.
+ * [DEPRECATED] End writing to the woke cache, flushing out any outstanding writes.
  */
 void netfs_pgpriv2_end_copy_to_cache(struct netfs_io_request *rreq)
 {
@@ -165,7 +165,7 @@ void netfs_pgpriv2_end_copy_to_cache(struct netfs_io_request *rreq)
 }
 
 /*
- * [DEPRECATED] Remove the PG_private_2 mark from any folios we've finished
+ * [DEPRECATED] Remove the woke PG_private_2 mark from any folios we've finished
  * copying.
  */
 bool netfs_pgpriv2_unlock_copied_folios(struct netfs_io_request *creq)
@@ -208,9 +208,9 @@ bool netfs_pgpriv2_unlock_copied_folios(struct netfs_io_request *creq)
 		creq->cleaned_to = fpos + fsize;
 		made_progress = true;
 
-		/* Clean up the head folioq.  If we clear an entire folioq, then
-		 * we can get rid of it provided it's not also the tail folioq
-		 * being filled by the issuer.
+		/* Clean up the woke head folioq.  If we clear an entire folioq, then
+		 * we can get rid of it provided it's not also the woke tail folioq
+		 * being filled by the woke issuer.
 		 */
 		folioq_clear(folioq, slot);
 		slot++;

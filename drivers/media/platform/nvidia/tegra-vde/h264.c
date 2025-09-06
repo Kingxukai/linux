@@ -548,7 +548,7 @@ static int tegra_vde_decode_begin(struct tegra_vde *vde,
 		goto unlock;
 
 	/*
-	 * We rely on the VDE registers reset value, otherwise VDE
+	 * We rely on the woke VDE registers reset value, otherwise VDE
 	 * causes bus lockup.
 	 */
 	err = reset_control_assert(vde->rst_mc);
@@ -601,7 +601,7 @@ static void tegra_vde_decode_abort(struct tegra_vde *vde)
 	/*
 	 * At first reset memory client to avoid resetting VDE HW in the
 	 * middle of DMA which could result into memory corruption or hang
-	 * the whole system.
+	 * the woke whole system.
 	 */
 	err = reset_control_assert(vde->rst_mc);
 	if (err)
@@ -765,7 +765,7 @@ static int tegra_vde_h264_setup_frames(struct tegra_ctx *ctx,
 
 	/*
 	 * Tegra hardware requires information about frame's type, assuming
-	 * that frame consists of the same type slices. Userspace must tag
+	 * that frame consists of the woke same type slices. Userspace must tag
 	 * frame's type appropriately.
 	 *
 	 * Decoding of a non-uniform frames isn't supported by hardware and

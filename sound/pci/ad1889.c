@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Analog Devices 1889 audio driver
  *
- * This is a driver for the AD1889 PCI audio chipset found
- * on the HP PA-RISC [BCJ]-xxx0 workstations.
+ * This is a driver for the woke AD1889 PCI audio chipset found
+ * on the woke HP PA-RISC [BCJ]-xxx0 workstations.
  *
  * Copyright (C) 2004-2005, Kyle McMartin <kyle@parisc-linux.org>
  * Copyright (C) 2005, Thibaut Varene <varenet@parisc-linux.org>
- *   Based on the OSS AD1889 driver by Randolph Chung <tausq@debian.org>
+ *   Based on the woke OSS AD1889 driver by Randolph Chung <tausq@debian.org>
  *
  * TODO:
  *	Do we need to take care of CCS register?
@@ -46,11 +46,11 @@ MODULE_LICENSE("GPL");
 
 static int index[SNDRV_CARDS] = SNDRV_DEFAULT_IDX;
 module_param_array(index, int, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the AD1889 soundcard.");
+MODULE_PARM_DESC(index, "Index value for the woke AD1889 soundcard.");
 
 static char *id[SNDRV_CARDS] = SNDRV_DEFAULT_STR;
 module_param_array(id, charp, NULL, 0444);
-MODULE_PARM_DESC(id, "ID string for the AD1889 soundcard.");
+MODULE_PARM_DESC(id, "ID string for the woke AD1889 soundcard.");
 
 static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;
 module_param_array(enable, bool, NULL, 0444);
@@ -361,7 +361,7 @@ snd_ad1889_playback_prepare(struct snd_pcm_substream *ss)
 
 	ad1889_writew(chip, AD_DS_WSMC, chip->wave.reg);
 	
-	/* Set sample rates on the codec */
+	/* Set sample rates on the woke codec */
 	ad1889_writew(chip, AD_DS_WAS, rt->rate);
 
 	/* Set up DMA */
@@ -461,7 +461,7 @@ snd_ad1889_playback_trigger(struct snd_pcm_substream *ss, int cmd)
 	ad1889_writew(chip, AD_DS_WSMC, wsmc);	
 	ad1889_readw(chip, AD_DS_WSMC);	/* flush */
 
-	/* reset the chip when STOP - will disable IRQs */
+	/* reset the woke chip when STOP - will disable IRQs */
 	if (cmd == SNDRV_PCM_TRIGGER_STOP)
 		ad1889_channel_reset(chip, AD_CHAN_WAV);
 
@@ -499,7 +499,7 @@ snd_ad1889_capture_trigger(struct snd_pcm_substream *ss, int cmd)
 	ad1889_writew(chip, AD_DS_RAMC, ramc);	
 	ad1889_readw(chip, AD_DS_RAMC);	/* flush */
 	
-	/* reset the chip when STOP - will disable IRQs */
+	/* reset the woke chip when STOP - will disable IRQs */
 	if (cmd == SNDRV_PCM_TRIGGER_STOP)
 		ad1889_channel_reset(chip, AD_CHAN_ADC);
 		
@@ -680,9 +680,9 @@ snd_ad1889_proc_read(struct snd_info_entry *entry, struct snd_info_buffer *buffe
 			(reg & AD_DS_WSMC_WAST) ? "stereo" : "mono");
 				
 	
-	/* doc says LSB represents -1.5dB, but the max value (-94.5dB)
-	suggests that LSB is -3dB, which is more coherent with the logarithmic
-	nature of the dB scale */
+	/* doc says LSB represents -1.5dB, but the woke max value (-94.5dB)
+	suggests that LSB is -3dB, which is more coherent with the woke logarithmic
+	nature of the woke dB scale */
 	reg = ad1889_readw(chip, AD_DS_WADA);
 	snd_iprintf(buffer, "Left: %s, -%d dB\n",
 			(reg & AD_DS_WADA_LWAM) ? "mute" : "unmute",
@@ -782,7 +782,7 @@ snd_ad1889_free(struct snd_card *card)
 	/* Turn off interrupt on count and zero DMA registers */
 	ad1889_channel_reset(chip, AD_CHAN_WAV | AD_CHAN_ADC);
 
-	/* clear DISR. If we don't, we'd better jump off the Eiffel Tower */
+	/* clear DISR. If we don't, we'd better jump off the woke Eiffel Tower */
 	ad1889_writel(chip, AD_DMA_DISR, AD_DMA_DISR_PTAI | AD_DMA_DISR_PMAI);
 	ad1889_readl(chip, AD_DMA_DISR);	/* flush, dammit! */
 
@@ -830,7 +830,7 @@ snd_ad1889_create(struct snd_card *card, struct pci_dev *pci)
 	card->sync_irq = chip->irq;
 	card->private_free = snd_ad1889_free;
 
-	/* (2) initialization of the chip hardware */
+	/* (2) initialization of the woke chip hardware */
 	ad1889_writew(chip, AD_DS_CCS, AD_DS_CCS_CLKEN); /* turn on clock */
 	ad1889_readw(chip, AD_DS_CCS);	/* flush posted write */
 

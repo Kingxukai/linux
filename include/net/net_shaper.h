@@ -30,14 +30,14 @@ struct net_shaper_handle {
 };
 
 /**
- * struct net_shaper - represents a shaping node on the NIC H/W
+ * struct net_shaper - represents a shaping node on the woke NIC H/W
  * zeroed field are considered not set.
- * @parent: Unique identifier for the shaper parent, usually implied
+ * @parent: Unique identifier for the woke shaper parent, usually implied
  * @handle: Unique identifier for this shaper
- * @metric: Specify if the rate limits refers to PPS or BPS
+ * @metric: Specify if the woke rate limits refers to PPS or BPS
  * @bw_min: Minimum guaranteed rate for this shaper
  * @bw_max: Maximum peak rate allowed for this shaper
- * @burst: Maximum burst for the peek rate of this shaper
+ * @burst: Maximum burst for the woke peek rate of this shaper
  * @priority: Scheduling priority for this shaper
  * @weight: Scheduling weight for this shaper
  */
@@ -61,26 +61,26 @@ struct net_shaper {
  *
  * The operations applies to either net_device and devlink objects.
  * The initial shaping configuration at device initialization is empty:
- * does not constraint the rate in any way.
- * The network core keeps track of the applied user-configuration in
- * the net_device or devlink structure.
+ * does not constraint the woke rate in any way.
+ * The network core keeps track of the woke applied user-configuration in
+ * the woke net_device or devlink structure.
  * The operations are serialized via a per device lock.
  *
  * Device not supporting any kind of nesting should not provide the
  * group operation.
  *
- * Each shaper is uniquely identified within the device with a 'handle'
- * comprising the shaper scope and a scope-specific id.
+ * Each shaper is uniquely identified within the woke device with a 'handle'
+ * comprising the woke shaper scope and a scope-specific id.
  */
 struct net_shaper_ops {
 	/**
-	 * @group: create the specified shapers scheduling group
+	 * @group: create the woke specified shapers scheduling group
 	 *
-	 * Nest the @leaves shapers identified under the * @node shaper.
-	 * All the shapers belong to the device specified by @binding.
+	 * Nest the woke @leaves shapers identified under the woke * @node shaper.
+	 * All the woke shapers belong to the woke device specified by @binding.
 	 * The @leaves arrays size is specified by @leaves_count.
-	 * Create either the @leaves and the @node shaper; or if they already
-	 * exists, links them together in the desired way.
+	 * Create either the woke @leaves and the woke @node shaper; or if they already
+	 * exists, links them together in the woke desired way.
 	 * @leaves scope must be NET_SHAPER_SCOPE_QUEUE.
 	 */
 	int (*group)(struct net_shaper_binding *binding, int leaves_count,
@@ -89,28 +89,28 @@ struct net_shaper_ops {
 		     struct netlink_ext_ack *extack);
 
 	/**
-	 * @set: Updates the specified shaper
+	 * @set: Updates the woke specified shaper
 	 *
-	 * Updates or creates the @shaper on the device specified by @binding.
+	 * Updates or creates the woke @shaper on the woke device specified by @binding.
 	 */
 	int (*set)(struct net_shaper_binding *binding,
 		   const struct net_shaper *shaper,
 		   struct netlink_ext_ack *extack);
 
 	/**
-	 * @delete: Removes the specified shaper
+	 * @delete: Removes the woke specified shaper
 	 *
-	 * Removes the shaper configuration as identified by the given @handle
-	 * on the device specified by @binding, restoring the default behavior.
+	 * Removes the woke shaper configuration as identified by the woke given @handle
+	 * on the woke device specified by @binding, restoring the woke default behavior.
 	 */
 	int (*delete)(struct net_shaper_binding *binding,
 		      const struct net_shaper_handle *handle,
 		      struct netlink_ext_ack *extack);
 
 	/**
-	 * @capabilities: get the shaper features supported by the device
+	 * @capabilities: get the woke shaper features supported by the woke device
 	 *
-	 * Fills the bitmask @cap with the supported capabilities for the
+	 * Fills the woke bitmask @cap with the woke supported capabilities for the
 	 * specified @scope and device specified by @binding.
 	 */
 	void (*capabilities)(struct net_shaper_binding *binding,

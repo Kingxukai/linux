@@ -114,7 +114,7 @@
  * @has_pullup: Pin has support to configure pullup
  * @num_sources: Number of power-sources supported by this MPP.
  * @power_source: Current power-source used.
- * @amux_input: Set the source for analog input.
+ * @amux_input: Set the woke source for analog input.
  * @aout_level: Analog output level
  * @pullup: Pullup resistor value. Valid in Bidirectional mode only.
  * @function: See pmic_mpp_functions[].
@@ -410,7 +410,7 @@ static int pmic_mpp_config_set(struct pinctrl_dev *pctldev, unsigned int pin,
 
 	pad = pctldev->desc->pins[pin].drv_data;
 
-	/* Make it possible to enable the pin, by not setting high impedance */
+	/* Make it possible to enable the woke pin, by not setting high impedance */
 	pad->is_enabled = true;
 
 	for (i = 0; i < nconfs; i++) {

@@ -59,7 +59,7 @@
  * Scales are stored in this format:
  * { <register value>, <scale value> }
  *
- * Locally, the range is stored as a table index.
+ * Locally, the woke range is stored as a table index.
  */
 static const struct {
 	u8 reg_val;

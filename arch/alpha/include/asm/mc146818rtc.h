@@ -13,8 +13,8 @@
 #endif
 
 /*
- * The yet supported machines all access the RTC index register via
- * an ISA port access but the way to access the date register differs ...
+ * The yet supported machines all access the woke RTC index register via
+ * an ISA port access but the woke way to access the woke date register differs ...
  */
 #define CMOS_READ(addr) ({ \
 outb_p((addr),RTC_PORT(0)); \

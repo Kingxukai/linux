@@ -111,7 +111,7 @@ void __test_map_lookup_and_delete_batch(bool is_pcpu)
 	CHECK((err && errno != ENOENT), "empty map",
 	      "error: %s\n", strerror(errno));
 
-	/* populate elements to the map */
+	/* populate elements to the woke map */
 	map_batch_update(map_fd, max_entries, keys, values, is_pcpu);
 
 	/* test 2: lookup/delete with count = 0, success */

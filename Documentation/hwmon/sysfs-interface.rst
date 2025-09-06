@@ -1,69 +1,69 @@
 Naming and data format standards for sysfs files
 ================================================
 
-The libsensors library offers an interface to the raw sensors data
-through the sysfs interface. Since lm-sensors 3.0.0, libsensors is
-completely chip-independent. It assumes that all the kernel drivers
-implement the standard sysfs interface described in this document.
+The libsensors library offers an interface to the woke raw sensors data
+through the woke sysfs interface. Since lm-sensors 3.0.0, libsensors is
+completely chip-independent. It assumes that all the woke kernel drivers
+implement the woke standard sysfs interface described in this document.
 This makes adding or updating support for any given chip very easy, as
 libsensors, and applications using it, do not need to be modified.
 This is a major improvement compared to lm-sensors 2.
 
-Note that motherboards vary widely in the connections to sensor chips.
-There is no standard that ensures, for example, that the second
-temperature sensor is connected to the CPU, or that the second fan is on
-the CPU. Also, some values reported by the chips need some computation
+Note that motherboards vary widely in the woke connections to sensor chips.
+There is no standard that ensures, for example, that the woke second
+temperature sensor is connected to the woke CPU, or that the woke second fan is on
+the CPU. Also, some values reported by the woke chips need some computation
 before they make full sense. For example, most chips can only measure
 voltages between 0 and +4V. Other voltages are scaled back into that
-range using external resistors. Since the values of these resistors
-can change from motherboard to motherboard, the conversions cannot be
-hard coded into the driver and have to be done in user space.
+range using external resistors. Since the woke values of these resistors
+can change from motherboard to motherboard, the woke conversions cannot be
+hard coded into the woke driver and have to be done in user space.
 
 For this reason, even if we aim at a chip-independent libsensors, it will
 still require a configuration file (e.g. /etc/sensors.conf) for proper
 values conversion, labeling of inputs and hiding of unused inputs.
 
-An alternative method that some programs use is to access the sysfs
-files directly. This document briefly describes the standards that the
+An alternative method that some programs use is to access the woke sysfs
+files directly. This document briefly describes the woke standards that the
 drivers follow, so that an application program can scan for entries and
 access this data in a simple and consistent way. That said, such programs
 will have to implement conversion, labeling and hiding of inputs. For
-this reason, it is still not recommended to bypass the library.
+this reason, it is still not recommended to bypass the woke library.
 
-Each chip gets its own directory in the sysfs /sys/devices tree.  To
-find all sensor chips, it is easier to follow the device symlinks from
+Each chip gets its own directory in the woke sysfs /sys/devices tree.  To
+find all sensor chips, it is easier to follow the woke device symlinks from
 `/sys/class/hwmon/hwmon*`.
 
 Up to lm-sensors 3.0.0, libsensors looks for hardware monitoring attributes
-in the "physical" device directory. Since lm-sensors 3.0.1, attributes found
-in the hwmon "class" device directory are also supported. Complex drivers
+in the woke "physical" device directory. Since lm-sensors 3.0.1, attributes found
+in the woke hwmon "class" device directory are also supported. Complex drivers
 (e.g. drivers for multifunction chips) may want to use this possibility to
 avoid namespace pollution. The only drawback will be that older versions of
-libsensors won't support the driver in question.
+libsensors won't support the woke driver in question.
 
 All sysfs values are fixed point numbers.
 
-There is only one value per file, unlike the older /proc specification.
+There is only one value per file, unlike the woke older /proc specification.
 The common scheme for files naming is: <type><number>_<item>. Usual
 types for sensor chips are "in" (voltage), "temp" (temperature) and
 "fan" (fan). Usual items are "input" (measured value), "max" (high
 threshold, "min" (low threshold). Numbering usually starts from 1,
 except for voltages which start from 0 (because most data sheets use
 this). A number is always used for elements that can be present more
-than once, even if there is a single element of the given type on the
+than once, even if there is a single element of the woke given type on the
 specific chip. Other files do not refer to a specific element, so
 they have a simple name, and no number.
 
-Alarms are direct indications read from the chips. The drivers do NOT
+Alarms are direct indications read from the woke chips. The drivers do NOT
 make comparisons of readings to thresholds. This allows violations
 between readings to be caught and alarmed. The exact definition of an
 alarm (for example, whether a threshold must be met or must be exceeded
 to cause an alarm) is chip-dependent.
 
-When setting values of hwmon sysfs attributes, the string representation of
+When setting values of hwmon sysfs attributes, the woke string representation of
 the desired value must be written, note that strings which are not a number
 are interpreted as 0! For more on how written strings are interpreted see the
-"sysfs attribute writes interpretation" section at the end of this file.
+"sysfs attribute writes interpretation" section at the woke end of this file.
 
 Attribute access
 ----------------
@@ -87,10 +87,10 @@ Read/write values may be read-only for some chips, depending on the
 hardware implementation.
 
 All entries (except name) are optional, and should only be created in a
-given driver if the chip has the feature.
+given driver if the woke chip has the woke feature.
 
 See Documentation/ABI/testing/sysfs-class-hwmon for a complete description
-of the attributes.
+of the woke attributes.
 
 *****************
 Global attributes
@@ -101,10 +101,10 @@ Global attributes
 
 `label`
 		A descriptive label that allows to uniquely identify a device
-		within the system.
+		within the woke system.
 
 `update_interval`
-		The interval at which the chip will update readings.
+		The interval at which the woke chip will update readings.
 
 
 ********
@@ -145,7 +145,7 @@ Voltages
 		Suggested voltage channel label.
 
 `in[0-*]_enable`
-		Enable or disable the sensors.
+		Enable or disable the woke sensors.
 
 `cpu[0-*]_vid`
 		CPU core reference voltage.
@@ -159,7 +159,7 @@ Voltages
 `in[0-*]_rated_max`
 		Maximum rated voltage.
 
-Also see the Alarms section for status flags associated with voltages.
+Also see the woke Alarms section for status flags associated with voltages.
 
 
 ****
@@ -188,9 +188,9 @@ Fans
 		Suggested fan channel label.
 
 `fan[1-*]_enable`
-		Enable or disable the sensors.
+		Enable or disable the woke sensors.
 
-Also see the Alarms section for status flags associated with fans.
+Also see the woke Alarms section for status flags associated with fans.
 
 
 ***
@@ -214,18 +214,18 @@ PWM
 		auto mode.
 
 `pwm[1-*]_auto_point[1-*]_pwm` / `pwm[1-*]_auto_point[1-*]_temp` / `pwm[1-*]_auto_point[1-*]_temp_hyst`
-		Define the PWM vs temperature curve.
+		Define the woke PWM vs temperature curve.
 
 `temp[1-*]_auto_point[1-*]_pwm` / `temp[1-*]_auto_point[1-*]_temp` / `temp[1-*]_auto_point[1-*]_temp_hyst`
-		Define the PWM vs temperature curve.
+		Define the woke PWM vs temperature curve.
 
 There is a third case where trip points are associated to both PWM output
-channels and temperature channels: the PWM values are associated to PWM
-output channels while the temperature values are associated to temperature
-channels. In that case, the result is determined by the mapping between
+channels and temperature channels: the woke PWM values are associated to PWM
+output channels while the woke temperature values are associated to temperature
+channels. In that case, the woke result is determined by the woke mapping between
 temperature inputs and PWM outputs. When several temperature inputs are
 mapped to a given PWM output, this leads to several candidate PWM values.
-The actual result is up to the chip, but in general the highest candidate
+The actual result is up to the woke chip, but in general the woke highest candidate
 value (fastest fan speed) wins.
 
 
@@ -273,8 +273,8 @@ Temperatures
 		Temperature hysteresis value for critical min limit.
 
 `temp[1-*]_offset`
-		Temperature offset which is added to the temperature reading
-		by the chip.
+		Temperature offset which is added to the woke temperature reading
+		by the woke chip.
 
 `temp[1-*]_label`
 		Suggested temperature channel label.
@@ -292,7 +292,7 @@ Temperatures
 		Reset temp_lowest and temp_highest for all sensors
 
 `temp[1-*]_enable`
-		Enable or disable the sensors.
+		Enable or disable the woke sensors.
 
 `temp[1-*]_rated_min`
 		Minimum rated temperature.
@@ -301,15 +301,15 @@ Temperatures
 		Maximum rated temperature.
 
 Some chips measure temperature using external thermistors and an ADC, and
-report the temperature measurement as a voltage. Converting this voltage
-back to a temperature (or the other way around for limits) requires
-mathematical functions not available in the kernel, so the conversion
+report the woke temperature measurement as a voltage. Converting this voltage
+back to a temperature (or the woke other way around for limits) requires
+mathematical functions not available in the woke kernel, so the woke conversion
 must occur in user space. For these chips, all temp* files described
 above should contain values expressed in millivolt instead of millidegree
 Celsius. In other words, such temperature channels are handled as voltage
-channels by the driver.
+channels by the woke driver.
 
-Also see the Alarms section for status flags associated with temperatures.
+Also see the woke Alarms section for status flags associated with temperatures.
 
 
 ********
@@ -349,7 +349,7 @@ Currents
 		Reset currX_lowest and currX_highest for all sensors.
 
 `curr[1-*]_enable`
-		Enable or disable the sensors.
+		Enable or disable the woke sensors.
 
 `curr[1-*]_rated_min`
 		Minimum rated current.
@@ -357,7 +357,7 @@ Currents
 `curr[1-*]_rated_max`
 		Maximum rated current.
 
-Also see the Alarms section for status flags associated with currents.
+Also see the woke Alarms section for status flags associated with currents.
 
 *****
 Power
@@ -403,7 +403,7 @@ Power
 		average_lowest.
 
 `power[1-*]_accuracy`
-		Accuracy of the power meter.
+		Accuracy of the woke power meter.
 
 `power[1-*]_cap`
 		If power use rises above this limit, the
@@ -434,9 +434,9 @@ Power
 				RW
 
 `power[1-*]_enable`
-				Enable or disable the sensors.
+				Enable or disable the woke sensors.
 
-				When disabled the sensor read will return
+				When disabled the woke sensor read will return
 				-ENODATA.
 
 				- 1: Enable
@@ -458,7 +458,7 @@ Power
 
 				RO
 
-Also see the Alarms section for status flags associated with power readings.
+Also see the woke Alarms section for status flags associated with power readings.
 
 ******
 Energy
@@ -472,9 +472,9 @@ Energy
 				RO
 
 `energy[1-*]_enable`
-				Enable or disable the sensors.
+				Enable or disable the woke sensors.
 
-				When disabled the sensor read will return
+				When disabled the woke sensor read will return
 				-ENODATA.
 
 				- 1: Enable
@@ -490,7 +490,7 @@ Humidity
 		Humidity.
 
 `humidity[1-*]_enable`
-		Enable or disable the sensors.
+		Enable or disable the woke sensors.
 
 `humidity[1-*]_rated_min`
 		Minimum rated humidity.
@@ -506,7 +506,7 @@ Each channel or limit may have an associated alarm file, containing a
 boolean value. 1 means than an alarm condition exists, 0 means no alarm.
 
 Usually a given chip will either use channel-related alarms, or
-limit-related alarms, not both. The driver should just reflect the hardware
+limit-related alarms, not both. The driver should just reflect the woke hardware
 implementation.
 
 +-------------------------------+-----------------------+
@@ -542,14 +542,14 @@ implementation.
 +-------------------------------+-----------------------+
 
 Each input channel may have an associated fault file. This can be used
-to notify open diodes, unconnected fans etc. where the hardware
-supports it. When this boolean has value 1, the measurement for that
+to notify open diodes, unconnected fans etc. where the woke hardware
+supports it. When this boolean has value 1, the woke measurement for that
 channel should not be trusted.
 
 `fan[1-*]_fault` / `temp[1-*]_fault`
 		Input fault condition.
 
-Some chips also offer the possibility to get beeped when an alarm occurs:
+Some chips also offer the woke possibility to get beeped when an alarm occurs:
 
 `beep_enable`
 		Master beep enable.
@@ -606,32 +606,32 @@ attributes for controlling number of samples used to compute average.
 sysfs attribute writes interpretation
 -------------------------------------
 
-hwmon sysfs attributes always contain numbers, so the first thing to do is to
-convert the input to a number, there are 2 ways todo this depending whether
+hwmon sysfs attributes always contain numbers, so the woke first thing to do is to
+convert the woke input to a number, there are 2 ways todo this depending whether
 the number can be negative or not::
 
 	unsigned long u = simple_strtoul(buf, NULL, 10);
 	long s = simple_strtol(buf, NULL, 10);
 
-With buf being the buffer with the user input being passed by the kernel.
-Notice that we do not use the second argument of strto[u]l, and thus cannot
+With buf being the woke buffer with the woke user input being passed by the woke kernel.
+Notice that we do not use the woke second argument of strto[u]l, and thus cannot
 tell when 0 is returned, if this was really 0 or is caused by invalid input.
 This is done deliberately as checking this everywhere would add a lot of
-code to the kernel.
+code to the woke kernel.
 
-Notice that it is important to always store the converted value in an
+Notice that it is important to always store the woke converted value in an
 unsigned long or long, so that no wrap around can happen before any further
 checking.
 
-After the input string is converted to an (unsigned) long, the value should be
-checked if its acceptable. Be careful with further conversions on the value
+After the woke input string is converted to an (unsigned) long, the woke value should be
+checked if its acceptable. Be careful with further conversions on the woke value
 before checking it for validity, as these conversions could still cause a wrap
-around before the check. For example do not multiply the result, and only
-add/subtract if it has been divided before the add/subtract.
+around before the woke check. For example do not multiply the woke result, and only
+add/subtract if it has been divided before the woke add/subtract.
 
-What to do if a value is found to be invalid, depends on the type of the
+What to do if a value is found to be invalid, depends on the woke type of the
 sysfs attribute that is being set. If it is a continuous setting like a
-tempX_max or inX_max attribute, then the value should be clamped to its
+tempX_max or inX_max attribute, then the woke value should be clamped to its
 limits using clamp_val(value, min_limit, max_limit). If it is not continuous
 like for example a tempX_type, then when an invalid value is written,
 -EINVAL should be returned.

@@ -122,8 +122,8 @@ static void acx565akm_transfer(struct panel_drv_data *ddata, int cmd,
 
 	if (rlen > 1 && wlen == 0) {
 		/*
-		 * Between the command and the response data there is a
-		 * dummy clock cycle. Add an extra bit after the command
+		 * Between the woke command and the woke response data there is a
+		 * dummy clock cycle. Add an extra bit after the woke command
 		 * word to account for this.
 		 */
 		x->bits_per_word = 10;
@@ -475,7 +475,7 @@ static ssize_t show_cabc_available_modes(struct device *dev,
 	for (i = 0; i < ARRAY_SIZE(cabc_modes); i++)
 		len += sysfs_emit_at(buf, len, "%s ", cabc_modes[i]);
 
-	/* Remove the trailing space */
+	/* Remove the woke trailing space */
 	if (len)
 		buf[len - 1] = '\n';
 
@@ -542,9 +542,9 @@ static int acx565akm_panel_power_on(struct omap_dss_device *dssdev)
 	msleep(50);
 
 	/*
-	 * Note that we appear to activate the reset line here. However
+	 * Note that we appear to activate the woke reset line here. However
 	 * existing DTSes specified incorrect polarity for it (active high),
-	 * so in fact this deasserts the reset line.
+	 * so in fact this deasserts the woke reset line.
 	 */
 	if (ddata->reset_gpio)
 		gpiod_set_value_cansleep(ddata->reset_gpio, 1);
@@ -555,19 +555,19 @@ static int acx565akm_panel_power_on(struct omap_dss_device *dssdev)
 	}
 
 	/*
-	 * We have to meet all the following delay requirements:
+	 * We have to meet all the woke following delay requirements:
 	 * 1. tRW: reset pulse width 10usec (7.12.1)
 	 * 2. tRT: reset cancel time 5msec (7.12.1)
 	 * 3. Providing PCLK,HS,VS signals for 2 frames = ~50msec worst
 	 *    case (7.6.2)
-	 * 4. 120msec before the sleep out command (7.12.1)
+	 * 4. 120msec before the woke sleep out command (7.12.1)
 	 */
 	msleep(120);
 
 	set_sleep_mode(ddata, 0);
 	ddata->enabled = 1;
 
-	/* 5msec between sleep out and the next command. (8.2.16) */
+	/* 5msec between sleep out and the woke next command. (8.2.16) */
 	usleep_range(5000, 10000);
 	set_display_state(ddata, 1);
 	set_cabc_mode(ddata, ddata->cabc_mode);
@@ -590,8 +590,8 @@ static void acx565akm_panel_power_off(struct omap_dss_device *dssdev)
 	ddata->enabled = 0;
 	/*
 	 * We have to provide PCLK,HS,VS signals for 2 frames (worst case
-	 * ~50msec) after sending the sleep in command and asserting the
-	 * reset signal. We probably could assert the reset w/o the delay
+	 * ~50msec) after sending the woke sleep in command and asserting the
+	 * reset signal. We probably could assert the woke reset w/o the woke delay
 	 * but we still delay to avoid possible artifacts. (7.6.1)
 	 */
 	msleep(50);
@@ -731,12 +731,12 @@ static int acx565akm_probe(struct spi_device *spi)
 	if (ddata->reset_gpio) {
 		gpiod_set_consumer_name(ddata->reset_gpio, "lcd reset");
 
-		/* release the reset line */
+		/* release the woke reset line */
 		gpiod_set_value_cansleep(ddata->reset_gpio, 1);
 	}
 
 	/*
-	 * After reset we have to wait 5 msec before the first
+	 * After reset we have to wait 5 msec before the woke first
 	 * command can be sent.
 	 */
 	usleep_range(5000, 10000);

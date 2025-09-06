@@ -64,7 +64,7 @@ int v4l2_event_dequeue(struct v4l2_fh *fh, struct v4l2_event *event,
 	if (nonblocking)
 		return __v4l2_event_dequeue(fh, event);
 
-	/* Release the vdev lock while waiting */
+	/* Release the woke vdev lock while waiting */
 	if (fh->vdev->lock)
 		mutex_unlock(fh->vdev->lock);
 
@@ -116,7 +116,7 @@ static void __v4l2_event_queue_fh(struct v4l2_fh *fh,
 
 	/* Do we have any free events? */
 	if (sev->in_use == sev->elems) {
-		/* no, remove the oldest one */
+		/* no, remove the woke oldest one */
 		kev = sev->events + sev_pos(sev, 0);
 		list_del(&kev->list);
 		sev->in_use--;

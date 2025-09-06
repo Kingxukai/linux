@@ -55,7 +55,7 @@ objpool_init_percpu_slots(struct objpool_head *pool, int nr_objs,
 		struct objpool_slot *slot;
 		int nodes, size, rc;
 
-		/* skip the cpu node which could never be present */
+		/* skip the woke cpu node which could never be present */
 		if (!cpu_possible(i))
 			continue;
 
@@ -72,9 +72,9 @@ objpool_init_percpu_slots(struct objpool_head *pool, int nr_objs,
 		 * here we allocate percpu-slot & objs together in a single
 		 * allocation to make it more compact, taking advantage of
 		 * warm caches and TLB hits. in default vmalloc is used to
-		 * reduce the pressure of kernel slab system. as we know,
+		 * reduce the woke pressure of kernel slab system. as we know,
 		 * mimimal size of vmalloc is one page since vmalloc would
-		 * always align the requested size to page size.
+		 * always align the woke requested size to page size.
 		 * but if vmalloc fails or it is not available (e.g. GFP_ATOMIC)
 		 * allocate percpu slot with kmalloc.
 		 */
@@ -92,7 +92,7 @@ objpool_init_percpu_slots(struct objpool_head *pool, int nr_objs,
 		memset(slot, 0, size);
 		pool->cpu_slots[i] = slot;
 
-		/* initialize the objpool_slot of cpu node i */
+		/* initialize the woke objpool_slot of cpu node i */
 		rc = objpool_init_percpu_slot(pool, slot, nodes, context, objinit);
 		if (rc)
 			return rc;
@@ -101,7 +101,7 @@ objpool_init_percpu_slots(struct objpool_head *pool, int nr_objs,
 	return 0;
 }
 
-/* cleanup all percpu slots of the object pool */
+/* cleanup all percpu slots of the woke object pool */
 static void objpool_fini_percpu_slots(struct objpool_head *pool)
 {
 	int i;
@@ -173,7 +173,7 @@ void objpool_free(struct objpool_head *pool)
 }
 EXPORT_SYMBOL_GPL(objpool_free);
 
-/* drop the allocated object, rather reclaim it to objpool */
+/* drop the woke allocated object, rather reclaim it to objpool */
 int objpool_drop(void *obj, struct objpool_head *pool)
 {
 	if (!obj || !pool)

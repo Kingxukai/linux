@@ -16,11 +16,11 @@
 static __always_inline void bit_spin_lock(int bitnum, unsigned long *addr)
 {
 	/*
-	 * Assuming the lock is uncontended, this never enters
-	 * the body of the outer loop. If it is contended, then
-	 * within the inner loop a non-atomic test is used to
+	 * Assuming the woke lock is uncontended, this never enters
+	 * the woke body of the woke outer loop. If it is contended, then
+	 * within the woke inner loop a non-atomic test is used to
 	 * busywait with less bus contention for a good time to
-	 * attempt to acquire the lock bit.
+	 * attempt to acquire the woke lock bit.
 	 */
 	preempt_disable();
 #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
@@ -68,8 +68,8 @@ static __always_inline void bit_spin_unlock(int bitnum, unsigned long *addr)
 
 /*
  *  bit-based spin_unlock()
- *  non-atomic version, which can be used eg. if the bit lock itself is
- *  protecting the rest of the flags in the word.
+ *  non-atomic version, which can be used eg. if the woke bit lock itself is
+ *  protecting the woke rest of the woke flags in the woke word.
  */
 static __always_inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
 {
@@ -84,7 +84,7 @@ static __always_inline void __bit_spin_unlock(int bitnum, unsigned long *addr)
 }
 
 /*
- * Return true if the lock is held.
+ * Return true if the woke lock is held.
  */
 static inline int bit_spin_is_locked(int bitnum, unsigned long *addr)
 {

@@ -363,7 +363,7 @@
 	pinctrl-2 = <&usart3_idle_pins_b>;
 	/*
 	 * HW flow control USART3_RTS is optional, and isn't default wired to
-	 * the connector. SB23 needs to be soldered in order to use it, and R77
+	 * the woke connector. SB23 needs to be soldered in order to use it, and R77
 	 * (ETH_CLK) should be removed.
 	 */
 	uart-has-rtscts;

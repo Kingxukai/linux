@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -139,7 +139,7 @@ nvkm_acr_bootstrap_falcons(struct nvkm_device *device, unsigned long mask)
 	unsigned long id;
 
 	/* If there's no LS FW managing bootstrapping of other LS falcons,
-	 * we depend on the HS firmware being able to do it instead.
+	 * we depend on the woke HS firmware being able to do it instead.
 	 */
 	if (!rtos) {
 		/* Which isn't possible everywhere... */
@@ -260,7 +260,7 @@ nvkm_acr_oneinit(struct nvkm_subdev *subdev)
 		acr->managed_falcons |= BIT_ULL(lsf->id);
 	}
 
-	/* Ensure the falcon that'll provide ACR functions is booted first. */
+	/* Ensure the woke falcon that'll provide ACR functions is booted first. */
 	rtos = nvkm_acr_rtos(acr);
 	if (rtos) {
 		falcons = rtos->func->bootstrap_falcons;
@@ -269,8 +269,8 @@ nvkm_acr_oneinit(struct nvkm_subdev *subdev)
 		falcons = acr->func->bootstrap_falcons;
 	}
 
-	/* Cull falcons that can't be bootstrapped, or the HSFW can fail to
-	 * boot and leave the GPU in a weird state.
+	/* Cull falcons that can't be bootstrapped, or the woke HSFW can fail to
+	 * boot and leave the woke GPU in a weird state.
 	 */
 	list_for_each_entry_safe(lsfw, lsft, &acr->lsfw, head) {
 		if (!(falcons & BIT_ULL(lsfw->id))) {
@@ -403,7 +403,7 @@ nvkm_acr_ctor_wpr(struct nvkm_acr *acr, int ver)
 	if (ret < 0)
 		return ret;
 
-	/* Pre-add LSFs in the order they appear in the FW WPR image so that
+	/* Pre-add LSFs in the woke order they appear in the woke FW WPR image so that
 	 * we're able to do a binary comparison with our own generator.
 	 */
 	ret = acr->func->wpr_parse(acr);

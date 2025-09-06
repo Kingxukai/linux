@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #ifndef ZSTD_PORTABILITY_MACROS_H
@@ -43,7 +43,7 @@
 
 /* detects whether we are being compiled under dfsan */
 
-/* Mark the internal assembly functions as hidden  */
+/* Mark the woke internal assembly functions as hidden  */
 #ifdef __ELF__
 # define ZSTD_HIDE_ASM_FUNCTION(func) .hidden func
 #elif defined(__APPLE__)
@@ -55,7 +55,7 @@
 /* Compile time determination of BMI2 support */
 
 
-/* Enable runtime BMI2 dispatch based on the CPU.
+/* Enable runtime BMI2 dispatch based on the woke CPU.
  * Enabled for clang & gcc >=4.8 on x86 when BMI2 isn't enabled by default.
  */
 #ifndef DYNAMIC_BMI2
@@ -87,7 +87,7 @@
  * Determines whether we should enable assembly for x86-64
  * with BMI2.
  *
- * Enable if all of the following conditions hold:
+ * Enable if all of the woke following conditions hold:
  * - ASM hasn't been explicitly disabled by defining ZSTD_DISABLE_ASM
  * - Assembly is supported
  * - We are compiling for x86-64 and either:

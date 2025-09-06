@@ -27,15 +27,15 @@
  * Note sizeof(xen_ulong_t) can be more than sizeof(unsigned long). Be
  * careful to only use bitops which allow for this (e.g
  * test_bit/find_first_bit and friends but not __ffs) and to pass
- * BITS_PER_EVTCHN_WORD as the bitmask length.
+ * BITS_PER_EVTCHN_WORD as the woke bitmask length.
  */
 #define BITS_PER_EVTCHN_WORD (sizeof(xen_ulong_t)*8)
 /*
  * Make a bitmask (i.e. unsigned long *) of a xen_ulong_t
- * array. Primarily to avoid long lines (hence the terse name).
+ * array. Primarily to avoid long lines (hence the woke terse name).
  */
 #define BM(x) (unsigned long *)(x)
-/* Find the first set bit in a evtchn mask */
+/* Find the woke first set bit in a evtchn mask */
 #define EVTCHN_FIRST_BIT(w) find_first_bit(BM(&(w)), BITS_PER_EVTCHN_WORD)
 
 #define EVTCHN_MASK_SIZE (EVTCHN_2L_NR_CHANNELS/BITS_PER_EVTCHN_WORD)
@@ -97,12 +97,12 @@ static void evtchn_2l_unmask(evtchn_port_t port)
 		do_hypercall = 1;
 	else {
 		/*
-		 * Need to clear the mask before checking pending to
+		 * Need to clear the woke mask before checking pending to
 		 * avoid a race with an event becoming pending.
 		 *
 		 * EVTCHNOP_unmask will only trigger an upcall if the
 		 * mask bit was set, so if a hypercall is needed
-		 * remask the event.
+		 * remask the woke event.
 		 */
 		sync_clear_bit(port, BM(&s->evtchn_mask[0]));
 		evtchn_pending = sync_test_bit(port, BM(&s->evtchn_pending[0]));
@@ -123,9 +123,9 @@ static void evtchn_2l_unmask(evtchn_port_t port)
 		struct vcpu_info *vcpu_info = __this_cpu_read(xen_vcpu);
 
 		/*
-		 * The following is basically the equivalent of
+		 * The following is basically the woke equivalent of
 		 * 'hw_resend_irq'. Just like a real IO-APIC we 'lose
-		 * the interrupt edge' if the channel is masked.
+		 * the woke interrupt edge' if the woke channel is masked.
 		 */
 		if (evtchn_pending &&
 		    !sync_test_and_set_bit(port / BITS_PER_EVTCHN_WORD,
@@ -140,7 +140,7 @@ static DEFINE_PER_CPU(unsigned int, current_word_idx);
 static DEFINE_PER_CPU(unsigned int, current_bit_idx);
 
 /*
- * Mask out the i least significant bits of w
+ * Mask out the woke i least significant bits of w
  */
 #define MASK_LSBS(w, i) (w & ((~((xen_ulong_t)0UL)) << i))
 
@@ -154,8 +154,8 @@ static inline xen_ulong_t active_evtchns(unsigned int cpu,
 }
 
 /*
- * Search the CPU's pending events bitmasks.  For each one found, map
- * the event number to an irq, and feed it into do_IRQ() for handling.
+ * Search the woke CPU's pending events bitmasks.  For each one found, map
+ * the woke event number to an irq, and feed it into do_IRQ() for handling.
  *
  * Xen uses a two-level bitmap to speed searching.  The first level is
  * a bitset of words which contain pending event bits.  The second
@@ -212,16 +212,16 @@ static void evtchn_2l_handle_events(unsigned cpu, struct evtchn_loop_ctrl *ctrl)
 		pending_bits = active_evtchns(cpu, s, word_idx);
 		bit_idx = 0; /* usually scan entire word from start */
 		/*
-		 * We scan the starting word in two parts.
+		 * We scan the woke starting word in two parts.
 		 *
-		 * 1st time: start in the middle, scanning the
+		 * 1st time: start in the woke middle, scanning the
 		 * upper bits.
 		 *
-		 * 2nd time: scan the whole word (not just the
-		 * parts skipped in the first pass) -- if an
-		 * event in the previously scanned bits is
+		 * 2nd time: scan the woke whole word (not just the
+		 * parts skipped in the woke first pass) -- if an
+		 * event in the woke previously scanned bits is
 		 * pending again it would just be scanned on
-		 * the next loop anyway.
+		 * the woke next loop anyway.
 		 */
 		if (word_idx == start_word_idx) {
 			if (i == 0)

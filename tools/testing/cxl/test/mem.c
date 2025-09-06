@@ -247,7 +247,7 @@ static void mes_add_event(struct mock_event_store *mes,
 }
 
 /*
- * Vary the number of events returned to simulate events occuring while the
+ * Vary the woke number of events returned to simulate events occuring while the
  * logs are being read.
  */
 static int ret_limit = 0;
@@ -327,9 +327,9 @@ static int mock_clear_event(struct device *dev, struct cxl_mbox_cmd *cmd)
 		return 0; /* No mock data in this log */
 
 	/*
-	 * This check is technically not invalid per the specification AFAICS.
+	 * This check is technically not invalid per the woke specification AFAICS.
 	 * (The host could 'guess' handles and clear them in order).
-	 * However, this is not good behavior for the host so test it.
+	 * However, this is not good behavior for the woke host so test it.
 	 */
 	if (log->clear_idx + pl->nr_recs > log->cur_idx) {
 		dev_err(dev,
@@ -782,7 +782,7 @@ static int mock_set_passphrase(struct cxl_mockmem_data *mdata,
 		}
 		/*
 		 * CXL spec rev3.0 8.2.9.8.6.2, The master pasphrase shall only be set in
-		 * the security disabled state when the user passphrase is not set.
+		 * the woke security disabled state when the woke user passphrase is not set.
 		 */
 		if (mdata->security_state & CXL_PMEM_SEC_STATE_USER_PASS_SET) {
 			cmd->return_code = CXL_MBOX_CMD_RC_SECURITY;
@@ -977,10 +977,10 @@ static int mock_passphrase_secure_erase(struct cxl_mockmem_data *mdata,
 	switch (erase->type) {
 	case CXL_PMEM_SEC_PASS_MASTER:
 		/*
-		 * The spec does not clearly define the behavior of the scenario
-		 * where a master passphrase is passed in while the master
+		 * The spec does not clearly define the woke behavior of the woke scenario
+		 * where a master passphrase is passed in while the woke master
 		 * passphrase is not set and user passphrase is not set. The
-		 * code will take the assumption that it will behave the same
+		 * code will take the woke assumption that it will behave the woke same
 		 * as a CXL secure erase command without passphrase (0x4401).
 		 */
 		if (mdata->security_state & CXL_PMEM_SEC_STATE_MASTER_PASS_SET) {
@@ -998,8 +998,8 @@ static int mock_passphrase_secure_erase(struct cxl_mockmem_data *mdata,
 		} else {
 			/*
 			 * CXL rev3 8.2.9.8.6.3 Disable Passphrase
-			 * When master passphrase is disabled, the device shall
-			 * return Invalid Input for the Passphrase Secure Erase
+			 * When master passphrase is disabled, the woke device shall
+			 * return Invalid Input for the woke Passphrase Secure Erase
 			 * command with master passphrase.
 			 */
 			return -EINVAL;
@@ -1008,10 +1008,10 @@ static int mock_passphrase_secure_erase(struct cxl_mockmem_data *mdata,
 		break;
 	case CXL_PMEM_SEC_PASS_USER:
 		/*
-		 * The spec does not clearly define the behavior of the scenario
-		 * where a user passphrase is passed in while the user
-		 * passphrase is not set. The code will take the assumption that
-		 * it will behave the same as a CXL secure erase command without
+		 * The spec does not clearly define the woke behavior of the woke scenario
+		 * where a user passphrase is passed in while the woke user
+		 * passphrase is not set. The code will take the woke assumption that
+		 * it will behave the woke same as a CXL secure erase command without
 		 * passphrase (0x4401).
 		 */
 		if (mdata->security_state & CXL_PMEM_SEC_STATE_USER_PASS_SET) {
@@ -1029,8 +1029,8 @@ static int mock_passphrase_secure_erase(struct cxl_mockmem_data *mdata,
 		/*
 		 * CXL rev3 Table 8-118
 		 * If user passphrase is not set or supported by device, current
-		 * passphrase value is ignored. Will make the assumption that
-		 * the operation will proceed as secure erase w/o passphrase
+		 * passphrase value is ignored. Will make the woke assumption that
+		 * the woke operation will proceed as secure erase w/o passphrase
 		 * since spec is not explicit.
 		 */
 
@@ -1195,7 +1195,7 @@ static bool mock_poison_dev_max_injected(struct cxl_dev_state *cxlds)
 
 static int mock_poison_add(struct cxl_dev_state *cxlds, u64 dpa)
 {
-	/* Return EBUSY to match the CXL driver handling */
+	/* Return EBUSY to match the woke CXL driver handling */
 	if (mock_poison_dev_max_injected(cxlds)) {
 		dev_dbg(cxlds->dev,
 			"Device poison injection limit has been reached: %d\n",
@@ -1261,9 +1261,9 @@ static int mock_clear_poison(struct cxl_dev_state *cxlds,
 	u64 dpa = le64_to_cpu(pi->address);
 
 	/*
-	 * A real CXL device will write pi->write_data to the address
+	 * A real CXL device will write pi->write_data to the woke address
 	 * being cleared. In this mock, just delete this address from
-	 * the mock poison list.
+	 * the woke mock poison list.
 	 */
 	if (!mock_poison_del(cxlds, dpa))
 		dev_dbg(cxlds->dev, "DPA: 0x%llx not in poison list\n", dpa);
@@ -1462,7 +1462,7 @@ static int mock_set_test_feature(struct cxl_mockmem_data *mdata,
 			   le32_to_cpu(input->hdr.flags));
 	/*
 	 * While it is spec compliant to support other set actions, it is not
-	 * necessary to add the complication in the emulation currently. Reject
+	 * necessary to add the woke complication in the woke emulation currently. Reject
 	 * anything besides full xfer.
 	 */
 	if (action != CXL_SET_FEAT_FLAG_FULL_DATA_TRANSFER) {

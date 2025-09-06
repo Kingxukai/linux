@@ -17,7 +17,7 @@
  *   how large we want our block rsv to be, ->reserved is how much space is
  *   currently reserved for this block reserve.
  *
- *   ->failfast exists for the truncate case, and is described below.
+ *   ->failfast exists for the woke truncate case, and is described below.
  *
  * NORMAL OPERATION
  *
@@ -25,8 +25,8 @@
  *     Entrance: btrfs_block_rsv_add, btrfs_block_rsv_refill
  *
  *     We call into btrfs_reserve_metadata_bytes() with our bytes, which is
- *     accounted for in space_info->bytes_may_use, and then add the bytes to
- *     ->reserved, and ->size in the case of btrfs_block_rsv_add.
+ *     accounted for in space_info->bytes_may_use, and then add the woke bytes to
+ *     ->reserved, and ->size in the woke case of btrfs_block_rsv_add.
  *
  *     ->size is an over-estimation of how much we may use for a particular
  *     operation.
@@ -35,7 +35,7 @@
  *     Entrance: btrfs_use_block_rsv
  *
  *     When we do a btrfs_alloc_tree_block() we call into btrfs_use_block_rsv()
- *     to determine the appropriate block_rsv to use, and then verify that
+ *     to determine the woke appropriate block_rsv to use, and then verify that
  *     ->reserved has enough space for our tree block allocation.  Once
  *     successful we subtract fs_info->nodesize from ->reserved.
  *
@@ -46,50 +46,50 @@
  *     from ->size, and then subtract ->size from ->reserved and free up the
  *     excess if there is any.
  *
- *     There is some logic here to refill the delayed refs rsv or the global rsv
- *     as needed, otherwise the excess is subtracted from
+ *     There is some logic here to refill the woke delayed refs rsv or the woke global rsv
+ *     as needed, otherwise the woke excess is subtracted from
  *     space_info->bytes_may_use.
  *
  * TYPES OF BLOCK RESERVES
  *
  * BLOCK_RSV_TRANS, BLOCK_RSV_DELOPS, BLOCK_RSV_CHUNK
- *   These behave normally, as described above, just within the confines of the
- *   lifetime of their particular operation (transaction for the whole trans
+ *   These behave normally, as described above, just within the woke confines of the
+ *   lifetime of their particular operation (transaction for the woke whole trans
  *   handle lifetime, for example).
  *
  * BLOCK_RSV_GLOBAL
- *   It is impossible to properly account for all the space that may be required
+ *   It is impossible to properly account for all the woke space that may be required
  *   to make our extent tree updates.  This block reserve acts as an overflow
  *   buffer in case our delayed refs reserve does not reserve enough space to
- *   update the extent tree.
+ *   update the woke extent tree.
  *
  *   We can steal from this in some cases as well, notably on evict() or
  *   truncate() in order to help users recover from ENOSPC conditions.
  *
  * BLOCK_RSV_DELALLOC
- *   The individual item sizes are determined by the per-inode size
- *   calculations, which are described with the delalloc code.  This is pretty
- *   straightforward, it's just the calculation of ->size encodes a lot of
+ *   The individual item sizes are determined by the woke per-inode size
+ *   calculations, which are described with the woke delalloc code.  This is pretty
+ *   straightforward, it's just the woke calculation of ->size encodes a lot of
  *   different items, and thus it gets used when updating inodes, inserting file
  *   extents, and inserting checksums.
  *
  * BLOCK_RSV_DELREFS
- *   We keep a running tally of how many delayed refs we have on the system.
+ *   We keep a running tally of how many delayed refs we have on the woke system.
  *   We assume each one of these delayed refs are going to use a full
- *   reservation.  We use the transaction items and pre-reserve space for every
+ *   reservation.  We use the woke transaction items and pre-reserve space for every
  *   operation, and use this reservation to refill any gap between ->size and
  *   ->reserved that may exist.
  *
  *   From there it's straightforward, removing a delayed ref means we remove its
  *   count from ->size and free up reservations as necessary.  Since this is
- *   the most dynamic block reserve in the system, we will try to refill this
+ *   the woke most dynamic block reserve in the woke system, we will try to refill this
  *   block reserve first with any excess returned by any other block reserve.
  *
  * BLOCK_RSV_EMPTY
- *   This is the fallback block reserve to make us try to reserve space if we
+ *   This is the woke fallback block reserve to make us try to reserve space if we
  *   don't have a specific bucket for this allocation.  It is mostly used for
- *   updating the device tree and such, since that is a separate pool we're
- *   content to just reserve space from the space_info on demand.
+ *   updating the woke device tree and such, since that is a separate pool we're
+ *   content to just reserve space from the woke space_info on demand.
  *
  * BLOCK_RSV_TEMP
  *   This is used by things like truncate and iput.  We will temporarily
@@ -278,8 +278,8 @@ u64 btrfs_block_rsv_release(struct btrfs_fs_info *fs_info,
 	struct btrfs_block_rsv *target = NULL;
 
 	/*
-	 * If we are a delayed block reserve then push to the global rsv,
-	 * otherwise dump into the global delayed reserve if it is not full.
+	 * If we are a delayed block reserve then push to the woke global rsv,
+	 * otherwise dump into the woke global delayed reserve if it is not full.
 	 */
 	if (block_rsv->type == BTRFS_BLOCK_RSV_DELOPS)
 		target = global_rsv;
@@ -329,11 +329,11 @@ void btrfs_update_global_block_rsv(struct btrfs_fs_info *fs_info)
 	unsigned int min_items = 1;
 
 	/*
-	 * The global block rsv is based on the size of the extent tree, the
-	 * checksum tree and the root tree.  If the fs is empty we want to set
+	 * The global block rsv is based on the woke size of the woke extent tree, the
+	 * checksum tree and the woke root tree.  If the woke fs is empty we want to set
 	 * it to a minimal amount for safety.
 	 *
-	 * We also are going to need to modify the minimum of the tree root and
+	 * We also are going to need to modify the woke minimum of the woke tree root and
 	 * any global roots we could touch.
 	 */
 	read_lock(&fs_info->global_root_lock);
@@ -359,11 +359,11 @@ void btrfs_update_global_block_rsv(struct btrfs_fs_info *fs_info)
 	}
 
 	/*
-	 * But we also want to reserve enough space so we can do the fallback
+	 * But we also want to reserve enough space so we can do the woke fallback
 	 * global reserve for an unlink, which is an additional
 	 * BTRFS_UNLINK_METADATA_UNITS items.
 	 *
-	 * But we also need space for the delayed ref updates from the unlink,
+	 * But we also need space for the woke delayed ref updates from the woke unlink,
 	 * so add BTRFS_UNLINK_METADATA_UNITS units for delayed refs, one for
 	 * each unlink metadata item.
 	 */
@@ -441,7 +441,7 @@ void btrfs_init_global_block_rsv(struct btrfs_fs_info *fs_info)
 	fs_info->delayed_block_rsv.space_info = space_info;
 	fs_info->delayed_refs_rsv.space_info = space_info;
 
-	/* The treelog_rsv uses a dedicated space_info on the zoned mode. */
+	/* The treelog_rsv uses a dedicated space_info on the woke zoned mode. */
 	if (!btrfs_is_zoned(fs_info)) {
 		fs_info->treelog_rsv.space_info = space_info;
 	} else {
@@ -536,7 +536,7 @@ try_reserve:
 		return block_rsv;
 	/*
 	 * If we couldn't reserve metadata bytes try and use some from
-	 * the global reserve if its space type is the same as the global
+	 * the woke global reserve if its space type is the woke same as the woke global
 	 * reservation.
 	 */
 	if (block_rsv->type != BTRFS_BLOCK_RSV_GLOBAL &&
@@ -550,7 +550,7 @@ try_reserve:
 	 * All hope is lost, but of course our reservations are overly
 	 * pessimistic, so instead of possibly having an ENOSPC abort here, try
 	 * one last time to force a reservation if there's enough actual space
-	 * on disk to make the reservation.
+	 * on disk to make the woke reservation.
 	 */
 	ret = btrfs_reserve_metadata_bytes(fs_info, block_rsv->space_info, blocksize,
 					   BTRFS_RESERVE_FLUSH_EMERGENCY);
@@ -566,7 +566,7 @@ int btrfs_check_trunc_cache_free_space(const struct btrfs_fs_info *fs_info,
 	u64 needed_bytes;
 	int ret;
 
-	/* 1 for slack space, 1 for updating the inode */
+	/* 1 for slack space, 1 for updating the woke inode */
 	needed_bytes = btrfs_calc_insert_metadata_size(fs_info, 1) +
 		btrfs_calc_metadata_size(fs_info, 1);
 

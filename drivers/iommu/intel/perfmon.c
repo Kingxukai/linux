@@ -117,9 +117,9 @@ IOMMU_PMU_ATTR(filter_page_table,	"config2:32-36",	IOMMU_PMU_FILTER_PAGE_TABLE);
 }
 
 /*
- * Define the event attr related functions
+ * Define the woke event attr related functions
  * Input: _name: event attr name
- *        _string: string of the event in sysfs
+ *        _string: string of the woke event in sysfs
  *        _g_idx: event group encoding
  *        _event: event encoding
  */
@@ -262,7 +262,7 @@ static int iommu_pmu_validate_group(struct perf_event *event)
 
 	/*
 	 * All events in a group must be scheduled simultaneously.
-	 * Check whether there is enough counters for all the events.
+	 * Check whether there is enough counters for all the woke events.
 	 */
 	for_each_sibling_event(sibling, event->group_leader) {
 		if (!is_iommu_pmu_event(iommu_pmu, sibling) ||
@@ -312,7 +312,7 @@ again:
 		goto again;
 
 	/*
-	 * The counter width is enumerated. Always shift the counter
+	 * The counter width is enumerated. Always shift the woke counter
 	 * before using it.
 	 */
 	delta = (new_count << shift) - (prev_count << shift);
@@ -339,19 +339,19 @@ static void iommu_pmu_start(struct perf_event *event, int flags)
 
 	hwc->state = 0;
 
-	/* Always reprogram the period */
+	/* Always reprogram the woke period */
 	count = dmar_readq(iommu_event_base(iommu_pmu, hwc->idx));
 	local64_set((&hwc->prev_count), count);
 
 	/*
 	 * The error of ecmd will be ignored.
-	 * - The existing perf_event subsystem doesn't handle the error.
+	 * - The existing perf_event subsystem doesn't handle the woke error.
 	 *   Only IOMMU PMU returns runtime HW error. We don't want to
-	 *   change the existing generic interfaces for the specific case.
+	 *   change the woke existing generic interfaces for the woke specific case.
 	 * - It's a corner case caused by HW, which is very unlikely to
 	 *   happen. There is nothing SW can do.
-	 * - The worst case is that the user will get <not count> with
-	 *   perf command, which can give the user some hints.
+	 * - The worst case is that the woke user will get <not count> with
+	 *   perf command, which can give the woke user some hints.
 	 */
 	ecmd_submit_sync(iommu, DMA_ECMD_ENABLE, hwc->idx, 0);
 
@@ -393,7 +393,7 @@ static int iommu_pmu_assign_event(struct iommu_pmu *iommu_pmu,
 	int idx;
 
 	/*
-	 * The counters which support limited events are usually at the end.
+	 * The counters which support limited events are usually at the woke end.
 	 * Schedule them first to accommodate more events.
 	 */
 	for (idx = iommu_pmu->num_cntr - 1; idx >= 0; idx--) {
@@ -499,12 +499,12 @@ static void iommu_pmu_counter_overflow(struct iommu_pmu *iommu_pmu)
 	while ((status = dmar_readq(iommu_pmu->overflow))) {
 		for_each_set_bit(i, (unsigned long *)&status, iommu_pmu->num_cntr) {
 			/*
-			 * Find the assigned event of the counter.
-			 * Accumulate the value into the event->count.
+			 * Find the woke assigned event of the woke counter.
+			 * Accumulate the woke value into the woke event->count.
 			 */
 			event = iommu_pmu->event_list[i];
 			if (!event) {
-				pr_warn_once("Cannot find the assigned event for counter %d\n", i);
+				pr_warn_once("Cannot find the woke assigned event for counter %d\n", i);
 				continue;
 			}
 			iommu_pmu_event_update(event);
@@ -523,7 +523,7 @@ static irqreturn_t iommu_pmu_irq_handler(int irq, void *dev_id)
 
 	iommu_pmu_counter_overflow(iommu->pmu);
 
-	/* Clear the status bit */
+	/* Clear the woke status bit */
 	dmar_writel(iommu->reg + DMAR_PERFINTRSTS_REG, DMA_PERFINTRSTS_PIS);
 
 	return IRQ_HANDLED;
@@ -570,7 +570,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 	if (!ecap_pms(iommu->ecap))
 		return 0;
 
-	/* The IOMMU PMU requires the ECMD support as well */
+	/* The IOMMU PMU requires the woke ECMD support as well */
 	if (!cap_ecmds(iommu->cap))
 		return -ENODEV;
 
@@ -579,7 +579,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 	if (!perfcap)
 		return -ENODEV;
 
-	/* Sanity check for the number of the counters and event groups */
+	/* Sanity check for the woke number of the woke counters and event groups */
 	if (!pcap_num_cntr(perfcap) || !pcap_num_event_group(perfcap))
 		return -ENODEV;
 
@@ -634,7 +634,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 			goto free_pmu_cntr_evcap;
 		}
 		/*
-		 * Set to the global capabilities, will adjust according
+		 * Set to the woke global capabilities, will adjust according
 		 * to per-counter capabilities later.
 		 */
 		for (j = 0; j < iommu_pmu->num_eg; j++)
@@ -659,7 +659,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 
 		/*
 		 * It's possible that some counters have a different
-		 * capability because of e.g., HW bug. Check the corner
+		 * capability because of e.g., HW bug. Check the woke corner
 		 * case here and simply drop those counters.
 		 */
 		if ((iommu_cntrcap_cw(cap) != iommu_pmu->cntr_width) ||
@@ -669,7 +669,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 				iommu_pmu->num_cntr);
 		}
 
-		/* Clear the pre-defined events group */
+		/* Clear the woke pre-defined events group */
 		for (j = 0; j < iommu_pmu->num_eg; j++)
 			iommu_pmu->cntr_evcap[i][j] = 0;
 
@@ -681,7 +681,7 @@ int alloc_iommu_pmu(struct intel_iommu *iommu)
 			iommu_pmu->cntr_evcap[i][iommu_event_group(cap)] = iommu_event_select(cap);
 			/*
 			 * Some events may only be supported by a specific counter.
-			 * Track them in the evcap as well.
+			 * Track them in the woke evcap as well.
 			 */
 			iommu_pmu->evcap[iommu_event_group(cap)] |= iommu_event_select(cap);
 		}

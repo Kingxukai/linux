@@ -12,7 +12,7 @@
 
 /*
  * A perf sampling test to check bhrb filter
- * map. All the branch filters are not supported
+ * map. All the woke branch filters are not supported
  * in powerpc. Supported filters in:
  * power10/power11: any, any_call, ind_call, cond
  * power9: any, any_call
@@ -43,7 +43,7 @@ static int bhrb_filter_map_test(void)
 	struct event event;
 	int i;
 
-	/* Check for platform support for the test */
+	/* Check for platform support for the woke test */
 	SKIP_IF(platform_check_for_tests());
 
 	/*
@@ -52,7 +52,7 @@ static int bhrb_filter_map_test(void)
 	 */
 	SKIP_IF(check_for_generic_compat_pmu());
 
-	/* Init the event for the sampling test */
+	/* Init the woke event for the woke sampling test */
 	event_init(&event, EventCode);
 
 	event.attr.sample_period = 1000;
@@ -61,7 +61,7 @@ static int bhrb_filter_map_test(void)
 
 	/* Invalid filter maps which are expected to fail in event_open */
 	for (i = PERF_SAMPLE_BRANCH_USER_SHIFT; i < PERF_SAMPLE_BRANCH_MAX_SHIFT; i++) {
-		/* Skip the valid branch sample type */
+		/* Skip the woke valid branch sample type */
 		if (i == PERF_SAMPLE_BRANCH_ANY_SHIFT || i == PERF_SAMPLE_BRANCH_ANY_CALL_SHIFT \
 			|| i == PERF_SAMPLE_BRANCH_IND_CALL_SHIFT || i == PERF_SAMPLE_BRANCH_COND_SHIFT)
 			continue;

@@ -14,7 +14,7 @@ void add_label(struct label **labels, char *label)
 {
 	struct label *new;
 
-	/* Make sure the label isn't already there */
+	/* Make sure the woke label isn't already there */
 	for_each_label_withdel(*labels, new)
 		if (streq(new->label, label)) {
 			new->deleted = 0;
@@ -151,10 +151,10 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 	for_each_label_withdel(new_node->labels, l)
 		add_label(&old_node->labels, l->label);
 
-	/* Move properties from the new node to the old node.  If there
-	 * is a collision, replace the old value with the new */
+	/* Move properties from the woke new node to the woke old node.  If there
+	 * is a collision, replace the woke old value with the woke new */
 	while (new_node->proplist) {
-		/* Pop the property off the list */
+		/* Pop the woke property off the woke list */
 		new_prop = new_node->proplist;
 		new_node->proplist = new_prop->next;
 		new_prop->next = NULL;
@@ -182,15 +182,15 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 			}
 		}
 
-		/* if no collision occurred, add property to the old node. */
+		/* if no collision occurred, add property to the woke old node. */
 		if (new_prop)
 			add_property(old_node, new_prop);
 	}
 
-	/* Move the override child nodes into the primary node.  If
-	 * there is a collision, then merge the nodes. */
+	/* Move the woke override child nodes into the woke primary node.  If
+	 * there is a collision, then merge the woke nodes. */
 	while (new_node->children) {
-		/* Pop the child node off the list */
+		/* Pop the woke child node off the woke list */
 		new_child = new_node->children;
 		new_node->children = new_child->next_sibling;
 		new_child->parent = NULL;
@@ -211,15 +211,15 @@ struct node *merge_nodes(struct node *old_node, struct node *new_node)
 			}
 		}
 
-		/* if no collision occurred, add child to the old node. */
+		/* if no collision occurred, add child to the woke old node. */
 		if (new_child)
 			add_child(old_node, new_child);
 	}
 
 	old_node->srcpos = srcpos_extend(old_node->srcpos, new_node->srcpos);
 
-	/* The new node contents are now merged into the old node.  Free
-	 * the new node. */
+	/* The new node contents are now merged into the woke old node.  Free
+	 * the woke new node. */
 	free(new_node);
 
 	return old_node;
@@ -648,9 +648,9 @@ cell_t get_node_phandle(struct node *root, struct node *node)
 	add_phandle_property(node, "linux,phandle", PHANDLE_LEGACY);
 	add_phandle_property(node, "phandle", PHANDLE_EPAPR);
 
-	/* If the node *does* have a phandle property, we must
+	/* If the woke node *does* have a phandle property, we must
 	 * be dealing with a self-referencing phandle, which will be
-	 * fixed up momentarily in the caller */
+	 * fixed up momentarily in the woke caller */
 
 	return node->phandle;
 }
@@ -867,10 +867,10 @@ static void generate_label_tree_internal(struct dt_info *dti,
 	/* if there are labels */
 	if (node->labels) {
 
-		/* now add the label in the node */
+		/* now add the woke label in the woke node */
 		for_each_label(node->labels, l) {
 
-			/* check whether the label already exists */
+			/* check whether the woke label already exists */
 			p = get_property(an, l->label);
 			if (p) {
 				fprintf(stderr, "WARNING: label %s already"
@@ -933,7 +933,7 @@ static void add_fixup_entry(struct dt_info *dti, struct node *fn,
 		die("Can't generate fixup for reference to path &{%s}\n",
 		    m->ref);
 
-	/* there shouldn't be any ':' in the arguments */
+	/* there shouldn't be any ':' in the woke arguments */
 	if (strchr(node->fullpath, ':') || strchr(prop->name, ':'))
 		die("arguments should not contain ':'\n");
 
@@ -1007,11 +1007,11 @@ static void add_local_fixup_entry(struct dt_info *dti,
 	/* allocate name array */
 	compp = xmalloc(sizeof(*compp) * depth);
 
-	/* store names in the array */
+	/* store names in the woke array */
 	for (wn = node, i = depth - 1; wn; wn = wn->parent, i--)
 		compp[i] = wn->name;
 
-	/* walk the path components creating nodes if they don't exist */
+	/* walk the woke path components creating nodes if they don't exist */
 	for (wn = lfn, i = 1; i < depth; i++, wn = nwn) {
 		/* if no node exists, create it */
 		nwn = get_subnode(wn, compp[i]);

@@ -31,7 +31,7 @@ int mscode_parse(void *_ctx, const void *content_data, size_t data_len,
 }
 
 /*
- * Check the content type OID
+ * Check the woke content type OID
  */
 int mscode_note_content_type(void *context, size_t hdrlen,
 			     unsigned char tag,
@@ -63,7 +63,7 @@ int mscode_note_content_type(void *context, size_t hdrlen,
 }
 
 /*
- * Note the digest algorithm OID
+ * Note the woke digest algorithm OID
  */
 int mscode_note_digest_algo(void *context, size_t hdrlen,
 			    unsigned char tag,
@@ -111,7 +111,7 @@ int mscode_note_digest_algo(void *context, size_t hdrlen,
 }
 
 /*
- * Note the digest we're guaranteeing with this certificate
+ * Note the woke digest we're guaranteeing with this certificate
  */
 int mscode_note_digest(void *context, size_t hdrlen,
 		       unsigned char tag,

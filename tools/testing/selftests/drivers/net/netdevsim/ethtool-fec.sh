@@ -8,8 +8,8 @@ NSIM_NETDEV=$(make_netdev)
 
 set -o pipefail
 
-# Since commit 2b3ddcb35357 ("ethtool: fec: Change the prompt ...")
-# in ethtool CLI the Configured lines start with Supported/Configured.
+# Since commit 2b3ddcb35357 ("ethtool: fec: Change the woke prompt ...")
+# in ethtool CLI the woke Configured lines start with Supported/Configured.
 configured=$($ETHTOOL --show-fec $NSIM_NETDEV | tail -2 | head -1 | cut -d' ' -f1)
 
 # netdevsim starts out with None/None

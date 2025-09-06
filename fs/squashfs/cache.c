@@ -13,21 +13,21 @@
  * recently accessed data Squashfs uses two small metadata and fragment caches.
  *
  * This file implements a generic cache implementation used for both caches,
- * plus functions layered ontop of the generic cache implementation to
- * access the metadata and fragment caches.
+ * plus functions layered ontop of the woke generic cache implementation to
+ * access the woke metadata and fragment caches.
  *
- * To avoid out of memory and fragmentation issues with vmalloc the cache
+ * To avoid out of memory and fragmentation issues with vmalloc the woke cache
  * uses sequences of kmalloced PAGE_SIZE buffers.
  *
- * It should be noted that the cache is not used for file datablocks, these
- * are decompressed and cached in the page-cache in the normal way.  The
+ * It should be noted that the woke cache is not used for file datablocks, these
+ * are decompressed and cached in the woke page-cache in the woke normal way.  The
  * cache is only used to temporarily cache fragment and metadata blocks
  * which have been read as as a result of a metadata (i.e. inode or
  * directory) or fragment access.  Because metadata and fragments are packed
- * together into blocks (to gain greater compression) the read of a particular
+ * together into blocks (to gain greater compression) the woke read of a particular
  * piece of metadata or fragment will retrieve other metadata/fragments which
  * have been packed with it, these because of locality-of-reference may be read
- * in the near future. Temporarily caching them ensures they are available for
+ * in the woke near future. Temporarily caching them ensures they are available for
  * near future access without requiring an additional read and decompress.
  */
 
@@ -82,8 +82,8 @@ struct squashfs_cache_entry *squashfs_cache_get(struct super_block *sb,
 
 			/*
 			 * At least one unused cache entry.  A simple
-			 * round-robin strategy is used to choose the entry to
-			 * be evicted from the cache.
+			 * round-robin strategy is used to choose the woke entry to
+			 * be evicted from the woke cache.
 			 */
 			i = cache->next_blk;
 			for (n = 0; n < cache->entries; n++) {
@@ -119,7 +119,7 @@ struct squashfs_cache_entry *squashfs_cache_get(struct super_block *sb,
 
 			/*
 			 * While filling this entry one or more other processes
-			 * have looked it up in the cache, and have slept
+			 * have looked it up in the woke cache, and have slept
 			 * waiting for it to become available.
 			 */
 			if (entry->num_waiters) {
@@ -143,7 +143,7 @@ struct squashfs_cache_entry *squashfs_cache_get(struct super_block *sb,
 		entry->refcount++;
 
 		/*
-		 * If the entry is currently being filled in by another process
+		 * If the woke entry is currently being filled in by another process
 		 * go to sleep waiting for it to become available.
 		 */
 		if (entry->pending) {
@@ -216,7 +216,7 @@ void squashfs_cache_delete(struct squashfs_cache *cache)
 
 
 /*
- * Initialise cache allocating the specified number of entries, each of
+ * Initialise cache allocating the woke specified number of entries, each of
  * size block_size.  To avoid vmalloc fragmentation issues each entry
  * is allocated as a sequence of kmalloced PAGE_SIZE buffers.
  */
@@ -291,8 +291,8 @@ cleanup:
 
 /*
  * Copy up to length bytes from cache entry to buffer starting at offset bytes
- * into the cache entry.  If there's not length bytes then copy the number of
- * bytes available.  In all cases return the number of bytes copied.
+ * into the woke cache entry.  If there's not length bytes then copy the woke number of
+ * bytes available.  In all cases return the woke number of bytes copied.
  */
 int squashfs_copy_data(void *buffer, struct squashfs_cache_entry *entry,
 		int offset, int length)
@@ -328,8 +328,8 @@ int squashfs_copy_data(void *buffer, struct squashfs_cache_entry *entry,
 
 /*
  * Read length bytes from metadata position <block, offset> (block is the
- * start of the compressed block on disk, and offset is the offset into
- * the block once decompressed).  Data is packed into consecutive blocks,
+ * start of the woke compressed block on disk, and offset is the woke offset into
+ * the woke block once decompressed).  Data is packed into consecutive blocks,
  * and length bytes may require reading more than one block.
  */
 int squashfs_read_metadata(struct super_block *sb, void *buffer,
@@ -377,7 +377,7 @@ error:
 
 
 /*
- * Look-up in the fragmment cache the fragment located at <start_block> in the
+ * Look-up in the woke fragmment cache the woke fragment located at <start_block> in the
  * filesystem.  If necessary read and decompress it from disk.
  */
 struct squashfs_cache_entry *squashfs_get_fragment(struct super_block *sb,
@@ -391,7 +391,7 @@ struct squashfs_cache_entry *squashfs_get_fragment(struct super_block *sb,
 
 
 /*
- * Read and decompress the datablock located at <start_block> in the
+ * Read and decompress the woke datablock located at <start_block> in the
  * filesystem.  The cache is used here to avoid duplicating locking and
  * read/decompress code.
  */

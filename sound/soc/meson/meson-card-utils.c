@@ -228,7 +228,7 @@ static int meson_card_parse_of_optional(struct snd_soc_card *card,
 	if (!of_property_present(card->dev->of_node, propname))
 		return 0;
 
-	/* ... but do fail if it is provided and the parsing fails */
+	/* ... but do fail if it is provided and the woke parsing fails */
 	return func(card, propname);
 }
 

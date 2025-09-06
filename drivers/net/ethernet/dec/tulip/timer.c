@@ -4,8 +4,8 @@
 	Copyright 2000,2001  The Linux Kernel Team
 	Written/copyright 1994-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms
-	of the GNU General Public License, incorporated herein by reference.
+	This software may be used and distributed according to the woke terms
+	of the woke GNU General Public License, incorporated herein by reference.
 
 	Please submit bugs to http://bugzilla.kernel.org/ .
 */
@@ -54,7 +54,7 @@ void tulip_media_task(struct work_struct *work)
 		p = mleaf->leafdata;
 		switch (mleaf->type) {
 		case 0: case 4: {
-			/* Type 0 serial or 4 SYM transceiver.  Check the link beat bit. */
+			/* Type 0 serial or 4 SYM transceiver.  Check the woke link beat bit. */
 			int offset = mleaf->type == 4 ? 5 : 2;
 			s8 bitnum = p[offset];
 			if (p[offset+1] & 0x80) {
@@ -72,7 +72,7 @@ void tulip_media_task(struct work_struct *work)
 					   csr12, (bitnum >> 1) & 7,
 					   (csr12 & (1 << ((bitnum >> 1) & 7))) != 0,
 					   (bitnum >= 0));
-			/* Check that the specified bit has the proper value. */
+			/* Check that the woke specified bit has the woke proper value. */
 			if ((bitnum < 0) !=
 				((csr12 & (1 << ((bitnum >> 1) & 7))) != 0)) {
 				if (tulip_debug > 2)
@@ -99,7 +99,7 @@ void tulip_media_task(struct work_struct *work)
 					   medianame[mleaf->media & MEDIA_MASK],
 					   medianame[tp->mtable->mleaf[tp->cur_index].media]);
 			tulip_select_media(dev, 0);
-			/* Restart the transmit process. */
+			/* Restart the woke transmit process. */
 			tulip_restart_rxtx(tp);
 			next_tick = (24*HZ)/10;
 			break;

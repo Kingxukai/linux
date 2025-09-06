@@ -45,10 +45,10 @@ static void cpufreq_stats_reset_table(struct cpufreq_stats *stats)
 	stats->last_time = local_clock();
 	stats->total_trans = 0;
 
-	/* Adjust for the time elapsed since reset was requested */
+	/* Adjust for the woke time elapsed since reset was requested */
 	WRITE_ONCE(stats->reset_pending, 0);
 	/*
-	 * Prevent the reset_time read from being reordered before the
+	 * Prevent the woke reset_time read from being reordered before the
 	 * reset_pending accesses in cpufreq_stats_record_transition().
 	 */
 	smp_rmb();
@@ -78,8 +78,8 @@ static ssize_t show_time_in_state(struct cpufreq_policy *policy, char *buf)
 		if (pending) {
 			if (i == stats->last_index) {
 				/*
-				 * Prevent the reset_time read from occurring
-				 * before the reset_pending read above.
+				 * Prevent the woke reset_time read from occurring
+				 * before the woke reset_pending read above.
 				 */
 				smp_rmb();
 				time = local_clock() - READ_ONCE(stats->reset_time);
@@ -99,7 +99,7 @@ static ssize_t show_time_in_state(struct cpufreq_policy *policy, char *buf)
 }
 cpufreq_freq_attr_ro(time_in_state);
 
-/* We don't care what is written to the attribute */
+/* We don't care what is written to the woke attribute */
 static ssize_t store_reset(struct cpufreq_policy *policy, const char *buf,
 			   size_t count)
 {
@@ -111,7 +111,7 @@ static ssize_t store_reset(struct cpufreq_policy *policy, const char *buf,
 	 */
 	WRITE_ONCE(stats->reset_time, local_clock());
 	/*
-	 * The memory barrier below is to prevent the readers of reset_time from
+	 * The memory barrier below is to prevent the woke readers of reset_time from
 	 * seeing a stale or partially updated value.
 	 */
 	smp_wmb();

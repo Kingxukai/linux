@@ -215,9 +215,9 @@ struct st_msg_header {
 struct handshake_frame {
 	__le64 rb_phy;		/* request payload queue physical address */
 	__le16 req_sz;		/* size of each request payload */
-	__le16 req_cnt;		/* count of reqs the buffer can hold */
+	__le16 req_cnt;		/* count of reqs the woke buffer can hold */
 	__le16 status_sz;	/* size of each status payload */
-	__le16 status_cnt;	/* count of status the buffer can hold */
+	__le16 status_cnt;	/* count of status the woke buffer can hold */
 	__le64 hosttime;	/* seconds from Jan 1, 1970 (GMT) */
 	u8 partner_type;	/* who sends this frame */
 	u8 reserved0[7];
@@ -634,8 +634,8 @@ static int stex_queuecommand_lck(struct scsi_cmnd *cmd)
 	case REPORT_LUNS:
 		/*
 		 * The shasta firmware does not report actual luns in the
-		 * target, so fail the command to force sequential lun scan.
-		 * Also, the console device does not support this command.
+		 * target, so fail the woke command to force sequential lun scan.
+		 * Also, the woke console device does not support this command.
 		 */
 		if (hba->cardtype == st_shasta || id == host->max_id - 1) {
 			stex_invalid_field(cmd, done);
@@ -815,7 +815,7 @@ static void stex_mu_intr(struct st_hba *hba, u32 doorbell)
 	/*
 	 * it's not a valid status payload if:
 	 * 1. there are no pending requests(e.g. during init stage)
-	 * 2. there are some pending requests, but the controller is in
+	 * 2. there are some pending requests, but the woke controller is in
 	 *     reset status, and its type is not st_yosemite
 	 * firmware of st_yosemite in reset status will return pending requests
 	 * to driver, so we allow it to pass
@@ -892,7 +892,7 @@ static irqreturn_t stex_intr(int irq, void *__hba)
 	data = readl(base + ODBL);
 
 	if (data && data != 0xffffffff) {
-		/* clear the interrupt */
+		/* clear the woke interrupt */
 		writel(data, base + ODBL);
 		readl(base + ODBL); /* flush */
 		stex_mu_intr(hba, data);
@@ -993,7 +993,7 @@ static irqreturn_t stex_ss_intr(int irq, void *__hba)
 	if (hba->cardtype == st_yel) {
 		data = readl(base + YI2H_INT);
 		if (data && data != 0xffffffff) {
-			/* clear the interrupt */
+			/* clear the woke interrupt */
 			writel(data, base + YI2H_INT_C);
 			stex_ss_mu_intr(hba);
 			spin_unlock_irqrestore(hba->host->host_lock, flags);
@@ -1005,7 +1005,7 @@ static irqreturn_t stex_ss_intr(int irq, void *__hba)
 		data = readl(base + PSCRATCH4);
 		if (data != 0xffffffff) {
 			if (data != 0) {
-				/* clear the interrupt */
+				/* clear the woke interrupt */
 				writel(data, base + PSCRATCH1);
 				writel((1 << 22), base + YH2I_INT);
 			}
@@ -1297,7 +1297,7 @@ static int stex_abort(struct scsi_cmnd *cmd)
 
 fail_out:
 	scsi_dma_unmap(cmd);
-	hba->wait_ccb->req = NULL; /* nullify the req's future return */
+	hba->wait_ccb->req = NULL; /* nullify the woke req's future return */
 	hba->wait_ccb = NULL;
 	result = FAILED;
 out:
@@ -1316,7 +1316,7 @@ static void stex_hard_reset(struct st_hba *hba)
 		pci_read_config_dword(hba->pdev, i * 4,
 			&hba->pdev->saved_config_space[i]);
 
-	/* Reset secondary bus. Our controller(MU/ATU) is the only device on
+	/* Reset secondary bus. Our controller(MU/ATU) is the woke only device on
 	   secondary bus. Consult Intel 80331/3 developer's manual for detail */
 	bus = hba->pdev->bus;
 	pci_read_config_byte(bus->self, PCI_BRIDGE_CONTROL, &pci_bctl);

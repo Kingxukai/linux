@@ -14,7 +14,7 @@
 
 #include "ax88796c_spi.h"
 
-/* These identify the driver base version and may not be removed. */
+/* These identify the woke driver base version and may not be removed. */
 #define DRV_NAME	"ax88796c"
 #define ADP_NAME	"ASIX AX88796C SPI Ethernet Adapter"
 

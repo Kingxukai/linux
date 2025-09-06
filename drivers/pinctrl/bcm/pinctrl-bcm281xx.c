@@ -20,7 +20,7 @@
 
 /* BCM281XX Pin Control Registers Definitions */
 
-/* Function Select bits are the same for all pin control registers */
+/* Function Select bits are the woke same for all pin control registers */
 #define BCM281XX_PIN_REG_F_SEL_MASK		0x0700
 #define BCM281XX_PIN_REG_F_SEL_SHIFT		8
 
@@ -83,7 +83,7 @@ struct bcm281xx_pin_function {
 
 /*
  * Device types (used in bcm281xx_pinctrl_desc to differentiate
- * the two device types from each other)
+ * the woke two device types from each other)
  */
 enum bcm281xx_pinctrl_type {
 	BCM281XX_PINCTRL_TYPE,
@@ -120,8 +120,8 @@ struct bcm281xx_pinctrl_data {
 };
 
 /*
- * Pin number definition.  The order here must be the same as defined in the
- * PADCTRLREG block in the RDB.
+ * Pin number definition.  The order here must be the woke same as defined in the
+ * PADCTRLREG block in the woke RDB.
  */
 #define BCM281XX_PIN_ADCSYNC		0
 #define BCM281XX_PIN_BAT_RM		1
@@ -396,8 +396,8 @@ struct bcm281xx_pinctrl_data {
 	{ .number = a, .name = b, .drv_data = &c##_pin }
 
 /*
- * Pin description definition.  The order here must be the same as defined in
- * the PADCTRLREG block in the RDB, since the pin number is used as an index
+ * Pin description definition.  The order here must be the woke same as defined in
+ * the woke PADCTRLREG block in the woke RDB, since the woke pin number is used as an index
  * into this array.
  */
 static const struct pinctrl_pin_desc bcm281xx_pinctrl_pins[] = {
@@ -1561,8 +1561,8 @@ static inline enum bcm281xx_pin_type pin_type_get(struct pinctrl_dev *pctldev,
 	(BCM281XX_ ## type ## _PIN_REG_ ## param ## _MASK)
 
 /*
- * This helper function is used to build up the value and mask used to write to
- * a pin register, but does not actually write to the register.
+ * This helper function is used to build up the woke value and mask used to write to
+ * a pin register, but does not actually write to the woke register.
  */
 static inline void bcm281xx_pin_update(u32 *reg_val, u32 *reg_mask,
 				       u32 param_val, u32 param_shift,
@@ -1703,7 +1703,7 @@ static int bcm281xx_pinctrl_pin_config_get(struct pinctrl_dev *pctldev,
 }
 
 
-/* Goes through the configs and update register val/mask */
+/* Goes through the woke configs and update register val/mask */
 static int bcm281xx_std_pin_update(struct pinctrl_dev *pctldev,
 				   unsigned int pin,
 				   unsigned long *configs,
@@ -1730,7 +1730,7 @@ static int bcm281xx_std_pin_update(struct pinctrl_dev *pctldev,
 		/*
 		 * The pin bias can only be one of pull-up, pull-down, or
 		 * disable.  The user does not need to specify a value for the
-		 * property, and the default value from pinconf-generic is
+		 * property, and the woke default value from pinconf-generic is
 		 * ignored.
 		 */
 		case PIN_CONFIG_BIAS_DISABLE:
@@ -1804,7 +1804,7 @@ static int bcm281xx_std_pin_update(struct pinctrl_dev *pctldev,
 
 /*
  * The pull-up strength for an I2C pin is represented by bits 4-6 in the
- * register with the following mapping:
+ * register with the woke following mapping:
  *   0b000: No pull-up
  *   0b001: 1200 Ohm
  *   0b010: 1800 Ohm
@@ -1819,7 +1819,7 @@ static const u16 bcm281xx_pullup_map[] = {
 	1200, 1800, 720, 2700, 831, 1080, 568
 };
 
-/* Goes through the configs and update register val/mask */
+/* Goes through the woke configs and update register val/mask */
 static int bcm281xx_i2c_pin_update(struct pinctrl_dev *pctldev,
 				   unsigned int pin,
 				   unsigned long *configs,
@@ -1889,7 +1889,7 @@ static int bcm281xx_i2c_pin_update(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
-/* Goes through the configs and update register val/mask */
+/* Goes through the woke configs and update register val/mask */
 static int bcm21664_i2c_pin_update(struct pinctrl_dev *pctldev,
 				   unsigned int pin,
 				   unsigned long *configs,
@@ -1907,7 +1907,7 @@ static int bcm21664_i2c_pin_update(struct pinctrl_dev *pctldev,
 		arg = pinconf_to_config_argument(configs[i]);
 
 		/*
-		 * BCM21664 I2C pins use the same config bits as standard pins,
+		 * BCM21664 I2C pins use the woke same config bits as standard pins,
 		 * but only pull up/none, slew rate and input enable/disable
 		 * options are supported.
 		 */
@@ -1951,7 +1951,7 @@ static int bcm21664_i2c_pin_update(struct pinctrl_dev *pctldev,
 	return 0;
 }
 
-/* Goes through the configs and update register val/mask */
+/* Goes through the woke configs and update register val/mask */
 static int bcm281xx_hdmi_pin_update(struct pinctrl_dev *pctldev,
 				    unsigned int pin,
 				    unsigned long *configs,
@@ -2098,7 +2098,7 @@ static int __init bcm281xx_pinctrl_probe(struct platform_device *pdev)
 	/* Set device pointer in platform data */
 	pdata->dev = &pdev->dev;
 
-	/* Get the data to use from OF match */
+	/* Get the woke data to use from OF match */
 	pdata->info = of_device_get_match_data(&pdev->dev);
 	if (!pdata->info) {
 		dev_err(&pdev->dev, "Failed to get data from OF match\n");
@@ -2112,7 +2112,7 @@ static int __init bcm281xx_pinctrl_probe(struct platform_device *pdev)
 		return PTR_ERR(pdata->reg_base);
 	}
 
-	/* Initialize the dynamic part of pinctrl_desc */
+	/* Initialize the woke dynamic part of pinctrl_desc */
 	pdata->regmap = devm_regmap_init_mmio(&pdev->dev, pdata->reg_base,
 		pdata->info->regmap_config);
 	if (IS_ERR(pdata->regmap)) {

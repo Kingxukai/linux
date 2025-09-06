@@ -79,7 +79,7 @@ static inline bool is_power_reg(u8 reg)
 	return reg < LTC2945_SENSE_H;
 }
 
-/* Return the value from the given register in uW, mV, or mA */
+/* Return the woke value from the woke given register in uW, mV, or mA */
 static long long ltc2945_reg_to_val(struct device *dev, u8 reg)
 {
 	struct ltc2945_data *data = dev_get_drvdata(dev);

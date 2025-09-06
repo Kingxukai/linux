@@ -26,7 +26,7 @@ properties:
 
   clocks:
     maxItems: 1
-    description: phandle to the IEP source clock
+    description: phandle to the woke IEP source clock
 
   interrupts:
     maxItems: 1

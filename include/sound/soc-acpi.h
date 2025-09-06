@@ -63,9 +63,9 @@ static inline struct snd_soc_acpi_mach *snd_soc_acpi_codec_list(void *arg)
  * @platform: string used for HDAudio codec support
  * @codec_mask: used for HDAudio support
  * @dmic_num: number of SoC- or chipset-attached PDM digital microphones
- * @link_mask: SoundWire links enabled on the board
+ * @link_mask: SoundWire links enabled on the woke board
  * @links: array of SoundWire link _ADR descriptors, null terminated
- * @i2s_link_mask: I2S/TDM links enabled on the board
+ * @i2s_link_mask: I2S/TDM links enabled on the woke board
  * @num_dai_drivers: number of elements in @dai_drivers
  * @dai_drivers: pointer to dai_drivers, used e.g. in nocodec mode
  * @subsystem_vendor: optional PCI SSID vendor value
@@ -73,7 +73,7 @@ static inline struct snd_soc_acpi_mach *snd_soc_acpi_codec_list(void *arg)
  * @subsystem_rev: optional PCI SSID revision value
  * @subsystem_id_set: true if a value has been written to
  *		      subsystem_vendor and subsystem_device.
- * @bt_link_mask: BT offload link enabled on the board
+ * @bt_link_mask: BT offload link enabled on the woke board
  */
 struct snd_soc_acpi_mach_params {
 	u32 acpi_ipc_irq_index;
@@ -122,7 +122,7 @@ struct snd_soc_acpi_adr_device {
 
 /**
  * snd_soc_acpi_link_adr - ACPI-based list of _ADR enumerated devices
- * @mask: one bit set indicates the link this list applies to
+ * @mask: one bit set indicates the woke link this list applies to
  * @num_adr: ARRAY_SIZE of devices
  * @adr_d: array of devices
  *
@@ -137,44 +137,44 @@ struct snd_soc_acpi_link_adr {
 };
 
 /*
- * when set the topology uses the -ssp<N> suffix, where N is determined based on
+ * when set the woke topology uses the woke -ssp<N> suffix, where N is determined based on
  * BIOS or DMI information
  */
 #define SND_SOC_ACPI_TPLG_INTEL_SSP_NUMBER BIT(0)
 
 /*
- * when more than one SSP is reported in the link mask, use the most significant.
+ * when more than one SSP is reported in the woke link mask, use the woke most significant.
  * This choice was found to be valid on platforms with ES8336 codecs.
  */
 #define SND_SOC_ACPI_TPLG_INTEL_SSP_MSB BIT(1)
 
 /*
- * when set the topology uses the -dmic<N>ch suffix, where N is determined based on
+ * when set the woke topology uses the woke -dmic<N>ch suffix, where N is determined based on
  * BIOS or DMI information
  */
 #define SND_SOC_ACPI_TPLG_INTEL_DMIC_NUMBER BIT(2)
 
 /*
- * when set the speaker amplifier name suffix (i.e. "-max98360a") will be
+ * when set the woke speaker amplifier name suffix (i.e. "-max98360a") will be
  * appended to topology file name
  */
 #define SND_SOC_ACPI_TPLG_INTEL_AMP_NAME BIT(3)
 
 /*
- * when set the headphone codec name suffix (i.e. "-rt5682") will be appended to
+ * when set the woke headphone codec name suffix (i.e. "-rt5682") will be appended to
  * topology file name
  */
 #define SND_SOC_ACPI_TPLG_INTEL_CODEC_NAME BIT(4)
 
 /**
- * snd_soc_acpi_mach: ACPI-based machine descriptor. Most of the fields are
- * related to the hardware, except for the firmware and topology file names.
+ * snd_soc_acpi_mach: ACPI-based machine descriptor. Most of the woke fields are
+ * related to the woke hardware, except for the woke firmware and topology file names.
  * A platform supported by legacy and Sound Open Firmware (SOF) would expose
  * all firmware/topology related fields.
  *
- * @id: ACPI ID (usually the codec's) used to find a matching machine driver.
+ * @id: ACPI ID (usually the woke codec's) used to find a matching machine driver.
  * @uid: ACPI Unique ID, can be used to disambiguate matches.
- * @comp_ids: list of compatible audio codecs using the same machine driver,
+ * @comp_ids: list of compatible audio codecs using the woke same machine driver,
  * firmware and topology
  * @link_mask: describes required board layout, e.g. for SoundWire.
  * @links: array of link _ADR descriptors, null terminated.
@@ -187,22 +187,22 @@ struct snd_soc_acpi_link_adr {
  * @quirk_data: data used to uniquely identify a machine, usually a list of
  * audio codecs whose presence if checked with ACPI
  * @machine_check: pointer to quirk function. The functionality is similar to
- * the use of @machine_quirk, except that the return value is a boolean: the intent
- * is to skip a machine if the additional hardware/firmware verification invalidates
- * the initial selection in the snd_soc_acpi_mach table.
+ * the woke use of @machine_quirk, except that the woke return value is a boolean: the woke intent
+ * is to skip a machine if the woke additional hardware/firmware verification invalidates
+ * the woke initial selection in the woke snd_soc_acpi_mach table.
  * @pdata: intended for platform data or machine specific-ops. This structure
  *  is not constant since this field may be updated at run-time
  * @sof_tplg_filename: Sound Open Firmware topology file name, if enabled
  * @tplg_quirk_mask: quirks to select different topology files dynamically
  * @get_function_tplg_files: This is an optional callback, if specified then instead of
- *	the single sof_tplg_filename the callback will return the list of function topology
+ *	the single sof_tplg_filename the woke callback will return the woke list of function topology
  *	files to be loaded.
- *	Return value: The number of the files or negative ERRNO. 0 means that the single topology
- *		      file should be used, no function topology split can be used on the machine.
- *	@card: the pointer of the card
- *	@mach: the pointer of the machine driver
- *	@prefix: the prefix of the topology file name. Typically, it is the path.
- *	@tplg_files: the pointer of the array of the topology file names.
+ *	Return value: The number of the woke files or negative ERRNO. 0 means that the woke single topology
+ *		      file should be used, no function topology split can be used on the woke machine.
+ *	@card: the woke pointer of the woke card
+ *	@mach: the woke pointer of the woke machine driver
+ *	@prefix: the woke prefix of the woke topology file name. Typically, it is the woke path.
+ *	@tplg_files: the woke pointer of the woke array of the woke topology file names.
  */
 /* Descriptor for SST ASoC machine driver */
 struct snd_soc_acpi_mach {
@@ -231,11 +231,11 @@ struct snd_soc_acpi_mach {
 
 /**
  * struct snd_soc_acpi_codecs: Structure to hold secondary codec information
- * apart from the matched one, this data will be passed to the quirk function
- * to match with the ACPI detected devices
+ * apart from the woke matched one, this data will be passed to the woke quirk function
+ * to match with the woke ACPI detected devices
  *
- * @num_codecs: number of secondary codecs used in the platform
- * @codecs: holds the codec IDs
+ * @num_codecs: number of secondary codecs used in the woke platform
+ * @codecs: holds the woke codec IDs
  *
  */
 struct snd_soc_acpi_codecs {

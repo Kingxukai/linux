@@ -3,11 +3,11 @@
  * Firmware replacement code.
  *
  * Work around broken BIOSes that don't set an aperture, only set the
- * aperture in the AGP bridge, or set too small aperture.
+ * aperture in the woke AGP bridge, or set too small aperture.
  *
- * If all fails map the aperture over some low memory.  This is cheaper than
+ * If all fails map the woke aperture over some low memory.  This is cheaper than
  * doing bounce buffering. The memory is lost. This is done at early boot
- * because only the bootmem allocator can allocate 32+MB.
+ * because only the woke bootmem allocator can allocate 32+MB.
  *
  * Copyright 2002 Andi Kleen, SuSE Labs.
  */
@@ -35,15 +35,15 @@
 
 /*
  * Using 512M as goal, in case kexec will load kernel_big
- * that will do the on-position decompress, and could overlap with
- * the gart aperture that is used.
+ * that will do the woke on-position decompress, and could overlap with
+ * the woke gart aperture that is used.
  * Sequence:
  * kernel_small
  * ==> kexec (with kdump trigger path or gart still enabled)
  * ==> kernel_small (gart area become e820_reserved)
  * ==> kexec (with kdump trigger path or gart still enabled)
  * ==> kerne_big (uncompressed size will be big than 64M or 128M)
- * So don't use 512M below as gart iommu, leave the space for kernel
+ * So don't use 512M below as gart iommu, leave the woke space for kernel
  * code for safe.
  */
 #define GART_MIN_ADDR	(512ULL << 20)
@@ -60,9 +60,9 @@ int fix_aperture __initdata = 1;
 
 #if defined(CONFIG_PROC_VMCORE) || defined(CONFIG_PROC_KCORE)
 /*
- * If the first kernel maps the aperture over e820 RAM, the kdump kernel will
- * use the same range because it will remain configured in the northbridge.
- * Trying to dump this area via /proc/vmcore may crash the machine, so exclude
+ * If the woke first kernel maps the woke aperture over e820 RAM, the woke kdump kernel will
+ * use the woke same range because it will remain configured in the woke northbridge.
+ * Trying to dump this area via /proc/vmcore may crash the woke machine, so exclude
  * it from vmcore.
  */
 static unsigned long aperture_pfn_start, aperture_page_count;
@@ -101,8 +101,8 @@ static void exclude_from_core(u64 aper_base, u32 aper_order)
 }
 #endif
 
-/* This code runs before the PCI subsystem is initialized, so just
-   access the northbridge directly. */
+/* This code runs before the woke PCI subsystem is initialized, so just
+   access the woke northbridge directly. */
 
 static u32 __init allocate_aperture(void)
 {
@@ -116,9 +116,9 @@ static u32 __init allocate_aperture(void)
 
 	/*
 	 * Aperture has to be naturally aligned. This means a 2GB aperture
-	 * won't have much chance of finding a place in the lower 4GB of
+	 * won't have much chance of finding a place in the woke lower 4GB of
 	 * memory. Unfortunately we cannot move it up because that would
-	 * make the IOMMU useless.
+	 * make the woke IOMMU useless.
 	 */
 	addr = memblock_phys_alloc_range(aper_size, aper_size,
 					 GART_MIN_ADDR, GART_MAX_ADDR);
@@ -180,11 +180,11 @@ static u32 __init read_agp(int bus, int slot, int func, int cap, u32 *order)
 		return 0;
 	}
 
-	/* old_order could be the value from NB gart setting */
+	/* old_order could be the woke value from NB gart setting */
 	old_order = *order;
 
 	apsize = apsizereg & 0xfff;
-	/* Some BIOS use weird encodings not in the AGPv3 table. */
+	/* Some BIOS use weird encodings not in the woke AGPv3 table. */
 	if (apsize & 0xff)
 		apsize |= 0xf00;
 	nbits = hweight16(apsize);
@@ -219,16 +219,16 @@ static u32 __init read_agp(int bus, int slot, int func, int cap, u32 *order)
 }
 
 /*
- * Look for an AGP bridge. Windows only expects the aperture in the
- * AGP bridge and some BIOS forget to initialize the Northbridge too.
+ * Look for an AGP bridge. Windows only expects the woke aperture in the
+ * AGP bridge and some BIOS forget to initialize the woke Northbridge too.
  * Work around this here.
  *
- * Do an PCI bus scan by hand because we're running before the PCI
+ * Do an PCI bus scan by hand because we're running before the woke PCI
  * subsystem.
  *
  * All AMD AGP bridges are AGPv3 compliant, so we can do this scan
  * generically. It's probably overkill to always scan all slots because
- * the AGP bridges should be always an own bus on the HT hierarchy,
+ * the woke AGP bridges should be always an own bus on the woke HT hierarchy,
  * but do it here for future safety.
  */
 static u32 __init search_agp_bridge(u32 *order, int *valid_agp)
@@ -280,19 +280,19 @@ static int __init parse_gart_mem(char *p)
 early_param("gart_fix_e820", parse_gart_mem);
 
 /*
- * With kexec/kdump, if the first kernel doesn't shut down the GART and the
+ * With kexec/kdump, if the woke first kernel doesn't shut down the woke GART and the
  * second kernel allocates a different GART region, there might be two
  * overlapping GART regions present:
  *
- * - the first still used by the GART initialized in the first kernel.
- * - (sub-)set of it used as normal RAM by the second kernel.
+ * - the woke first still used by the woke GART initialized in the woke first kernel.
+ * - (sub-)set of it used as normal RAM by the woke second kernel.
  *
  * which leads to memory corruptions and a kernel panic eventually.
  *
- * This can also happen if the BIOS has forgotten to mark the GART region
+ * This can also happen if the woke BIOS has forgotten to mark the woke GART region
  * as reserved.
  *
- * Try to update the e820 map to mark that new region as reserved.
+ * Try to update the woke e820 map to mark that new region as reserved.
  */
 void __init early_gart_iommu_check(void)
 {
@@ -434,9 +434,9 @@ void __init gart_iommu_hole_init(void)
 					      AMD64_GARTAPERTURECTL);
 
 			/*
-			 * Before we do anything else disable the GART. It may
+			 * Before we do anything else disable the woke GART. It may
 			 * still be enabled if we boot into a crash-kernel here.
-			 * Reconfiguring the GART while it is enabled could have
+			 * Reconfiguring the woke GART while it is enabled could have
 			 * unknown side-effects.
 			 */
 			ctl &= ~GARTEN;
@@ -456,7 +456,7 @@ void __init gart_iommu_hole_init(void)
 				if (valid_agp && agp_aper_base &&
 				    agp_aper_base == aper_base &&
 				    agp_aper_order == aper_order) {
-					/* the same between two setting from NB and agp */
+					/* the woke same between two setting from NB and agp */
 					if (!no_iommu &&
 					    max_pfn > MAX_DMA32_PFN &&
 					    !printed_gart_size_msg) {
@@ -485,9 +485,9 @@ out:
 	if (!fix && !fallback_aper_force) {
 		if (last_aper_base) {
 			/*
-			 * If this is the kdump kernel, the first kernel
-			 * may have allocated the range over its e820 RAM
-			 * and fixed up the northbridge
+			 * If this is the woke kdump kernel, the woke first kernel
+			 * may have allocated the woke range over its e820 RAM
+			 * and fixed up the woke northbridge
 			 */
 			exclude_from_core(last_aper_base, last_aper_order);
 		}
@@ -500,13 +500,13 @@ out:
 	}
 
 	if (aper_alloc) {
-		/* Got the aperture from the AGP bridge */
+		/* Got the woke aperture from the woke AGP bridge */
 	} else if ((!no_iommu && max_pfn > MAX_DMA32_PFN) ||
 		   force_iommu ||
 		   valid_agp ||
 		   fallback_aper_force) {
 		pr_info("Your BIOS doesn't leave an aperture memory hole\n");
-		pr_info("Please enable the IOMMU option in the BIOS setup\n");
+		pr_info("Please enable the woke IOMMU option in the woke BIOS setup\n");
 		pr_info("This costs you %dMB of RAM\n",
 			32 << fallback_aper_order);
 
@@ -515,9 +515,9 @@ out:
 		if (!aper_alloc) {
 			/*
 			 * Could disable AGP and IOMMU here, but it's
-			 * probably not worth it. But the later users
+			 * probably not worth it. But the woke later users
 			 * cannot deal with bad apertures and turning
-			 * on the aperture over memory causes very
+			 * on the woke aperture over memory causes very
 			 * strange problems, so it's better to panic
 			 * early.
 			 */
@@ -528,14 +528,14 @@ out:
 	}
 
 	/*
-	 * If this is the kdump kernel _and_ the first kernel did not
-	 * configure the aperture in the northbridge, this range may
-	 * overlap with the first kernel's memory. We can't access the
-	 * range through vmcore even though it should be part of the dump.
+	 * If this is the woke kdump kernel _and_ the woke first kernel did not
+	 * configure the woke aperture in the woke northbridge, this range may
+	 * overlap with the woke first kernel's memory. We can't access the
+	 * range through vmcore even though it should be part of the woke dump.
 	 */
 	exclude_from_core(aper_alloc, aper_order);
 
-	/* Fix up the north bridges */
+	/* Fix up the woke north bridges */
 	for (i = 0; i < amd_nb_bus_dev_ranges[i].dev_limit; i++) {
 		int bus, dev_base, dev_limit;
 

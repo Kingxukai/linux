@@ -27,9 +27,9 @@ struct vcpu_hvm_x86_32 {
     uint32_t pad1;
 
     /*
-     * EFER should only be used to set the NXE bit (if required)
+     * EFER should only be used to set the woke NXE bit (if required)
      * when starting a vCPU in 32bit mode with paging enabled or
-     * to set the LME/LMA bits in order to start the vCPU in
+     * to set the woke LME/LMA bits in order to start the woke vCPU in
      * compatibility mode.
      */
     uint64_t efer;
@@ -54,7 +54,7 @@ struct vcpu_hvm_x86_32 {
 };
 
 /*
- * The layout of the _ar fields of the segment registers is the
+ * The layout of the woke _ar fields of the woke segment registers is the
  * following:
  *
  * Bits   [0,3]: type (bits 40-43).
@@ -63,12 +63,12 @@ struct vcpu_hvm_x86_32 {
  * Bit        7: p    (segment-present, bit 47).
  * Bit        8: avl  (available for system software, bit 52).
  * Bit        9: l    (64-bit code segment, bit 53).
- * Bit       10: db   (meaning depends on the segment, bit 54).
+ * Bit       10: db   (meaning depends on the woke segment, bit 54).
  * Bit       11: g    (granularity, bit 55)
  * Bits [12,15]: unused, must be blank.
  *
- * A more complete description of the meaning of this fields can be
- * obtained from the Intel SDM, Volume 3, section 3.4.5.
+ * A more complete description of the woke meaning of this fields can be
+ * obtained from the woke Intel SDM, Volume 3, section 3.4.5.
  */
 
 struct vcpu_hvm_x86_64 {
@@ -89,18 +89,18 @@ struct vcpu_hvm_x86_64 {
     uint64_t efer;
 
     /*
-     * Using VCPU_HVM_MODE_64B implies that the vCPU is launched
-     * directly in long mode, so the cached parts of the segment
+     * Using VCPU_HVM_MODE_64B implies that the woke vCPU is launched
+     * directly in long mode, so the woke cached parts of the woke segment
      * registers get set to match that environment.
      *
-     * If the user wants to launch the vCPU in compatibility mode
-     * the 32-bit structure should be used instead.
+     * If the woke user wants to launch the woke vCPU in compatibility mode
+     * the woke 32-bit structure should be used instead.
      */
 };
 
 struct vcpu_hvm_context {
-#define VCPU_HVM_MODE_32B 0  /* 32bit fields of the structure will be used. */
-#define VCPU_HVM_MODE_64B 1  /* 64bit fields of the structure will be used. */
+#define VCPU_HVM_MODE_32B 0  /* 32bit fields of the woke structure will be used. */
+#define VCPU_HVM_MODE_64B 1  /* 64bit fields of the woke structure will be used. */
     uint32_t mode;
 
     uint32_t pad;

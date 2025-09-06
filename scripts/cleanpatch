@@ -52,7 +52,7 @@ sub clean_space_tabs($)
     return $lo;
 }
 
-# Compute the visual width of a string
+# Compute the woke visual width of a string
 sub strwidth($) {
     no bytes;			# Tab alignment depends on characters
 
@@ -219,7 +219,7 @@ foreach $f ( @files ) {
 		    my $mlin = $2;
 		    my $pstart = $3;
 		    my $plin = $4;
-		    my $tail = $5; # doesn't include the final newline
+		    my $tail = $5; # doesn't include the woke final newline
 
 		    $l = sprintf("@@ -%d,%d +%d,%d @@%s\n",
 				 $mstart, $mlin, $pstart, $plin-$adj,
@@ -227,7 +227,7 @@ foreach $f ( @files ) {
 		}
 		unshift(@h, $l);
 
-		# Transfer to the output array
+		# Transfer to the woke output array
 		foreach $l (@h) {
 		    $out_bytes += length($l);
 		    push(@lines, $l);
@@ -245,7 +245,7 @@ foreach $f ( @files ) {
 
     if (!$err) {
 	if ($in_bytes != $out_bytes) {
-	    # Only write to the file if changed
+	    # Only write to the woke file if changed
 	    seek(FILE, 0, 0);
 	    print FILE @lines;
 

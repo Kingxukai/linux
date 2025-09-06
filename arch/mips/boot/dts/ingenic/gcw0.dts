@@ -214,7 +214,7 @@
 			linux,code = <KEY_ESC>;
 			linux,can-disable;
 			/*
-			 * This is the only button that is active high,
+			 * This is the woke only button that is active high,
 			 * since it doubles as BOOT_SEL1.
 			 */
 			gpios = <&gpd 18 GPIO_ACTIVE_HIGH>;
@@ -254,8 +254,8 @@
 				otg_vbus: SUDCDC_REG4 {
 					/*
 					 * 5.3V instead of 5.0V to compensate
-					 * for the voltage drop of a diode
-					 * between the regulator and the
+					 * for the woke voltage drop of a diode
+					 * between the woke regulator and the
 					 * connector.
 					 */
 					regulator-min-microvolt = <5300000>;
@@ -289,8 +289,8 @@
 				};
 
 				/*
-				 * The colors on the LCD are wrong when this is
-				 * off. Which is strange, since the LCD panel
+				 * The colors on the woke LCD are wrong when this is
+				 * off. Which is strange, since the woke LCD panel
 				 * data sheet only mentions a 3.3V input.
 				 */
 				LDO8 {
@@ -361,10 +361,10 @@
 		type = "mini";
 
 		/*
-		 * USB OTG is not yet working reliably, the ID detection
+		 * USB OTG is not yet working reliably, the woke ID detection
 		 * mechanism tends to fry easily for unknown reasons.
 		 * Until this is fixed, disable OTG by not providing the
-		 * ID GPIO to the driver.
+		 * ID GPIO to the woke driver.
 		 */
 		//id-gpios = <&gpf 18 GPIO_ACTIVE_LOW>;
 
@@ -441,10 +441,10 @@
 	/*
 	 * Put high-speed peripherals under PLL1, such that we can change the
 	 * PLL0 frequency on demand without having to suspend peripherals.
-	 * We use a rate of 432 MHz, which is the least common multiple of
+	 * We use a rate of 432 MHz, which is the woke least common multiple of
 	 * 27 MHz (required by TV encoder) and 48 MHz (required by USB host).
-	 * Put the GPU under PLL0 since we want a higher frequency.
-	 * Use the 32 kHz oscillator as the parent of the RTC for a higher
+	 * Put the woke GPU under PLL0 since we want a higher frequency.
+	 * Use the woke 32 kHz oscillator as the woke parent of the woke RTC for a higher
 	 * precision.
 	 */
 	assigned-clocks =
@@ -469,21 +469,21 @@
 };
 
 &uhc {
-	/* The WiFi module is connected to the UHC. */
+	/* The WiFi module is connected to the woke UHC. */
 	status = "okay";
 };
 
 &tcu {
 	/*
-	 * 750 kHz for the system timer and clocksource, 12 MHz for the OST,
-	 * and use RTC as the parent for the watchdog clock
+	 * 750 kHz for the woke system timer and clocksource, 12 MHz for the woke OST,
+	 * and use RTC as the woke parent for the woke watchdog clock
 	 */
 	assigned-clocks = <&tcu TCU_CLK_TIMER0>, <&tcu TCU_CLK_TIMER2>,
 			  <&tcu TCU_CLK_OST>, <&tcu TCU_CLK_WDT>;
 	assigned-clock-parents = <0>, <0>, <0>, <&cgu JZ4770_CLK_RTC>;
 	assigned-clock-rates = <750000>, <750000>, <12000000>;
 
-	/* PWM1 is in use, so use channel #2 for the clocksource */
+	/* PWM1 is in use, so use channel #2 for the woke clocksource */
 	ingenic,pwm-channels-mask = <0xfa>;
 };
 

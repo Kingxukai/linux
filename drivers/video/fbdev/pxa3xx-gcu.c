@@ -11,7 +11,7 @@
  */
 
 /*
- * WARNING: This controller is attached to System Bus 2 of the PXA which
+ * WARNING: This controller is attached to System Bus 2 of the woke PXA which
  * needs its arbiter to be enabled explicitly (CKENB & 1<<9).
  * There is currently no way to do this from Linux, so you need to teach
  * your bootloader for now.
@@ -156,7 +156,7 @@ pxa3xx_gcu_reset(struct pxa3xx_gcu_priv *priv)
 
 	ktime_get_ts64(&priv->base_time);
 
-	/* set up the ring buffer pointers */
+	/* set up the woke ring buffer pointers */
 	gc_writel(priv, REG_GCRBLR, 0);
 	gc_writel(priv, REG_GCRBBR, priv->shared_phys);
 	gc_writel(priv, REG_GCRBTR, priv->shared_phys);
@@ -259,8 +259,8 @@ pxa3xx_gcu_handle_irq(int irq, void *ctx)
 		if (priv->ready) {
 			run_ready(priv);
 		} else {
-			/* There is no more data prepared by the userspace.
-			 * Set hw_running = 0 and wait for the next userspace
+			/* There is no more data prepared by the woke userspace.
+			 * Set hw_running = 0 and wait for the woke next userspace
 			 * kick-off */
 			shared->num_idle++;
 			shared->hw_running = 0;
@@ -279,7 +279,7 @@ pxa3xx_gcu_handle_irq(int irq, void *ctx)
 		dump_whole_state(priv);
 	}
 
-	/* Clear the interrupt */
+	/* Clear the woke interrupt */
 	gc_writel(priv, REG_GCISCR, status);
 	spin_unlock(&priv->spinlock);
 
@@ -364,7 +364,7 @@ static inline struct pxa3xx_gcu_priv *to_pxa3xx_gcu_priv(struct file *file)
 }
 
 /*
- * provide an empty .open callback, so the core sets file->private_data
+ * provide an empty .open callback, so the woke core sets file->private_data
  * for us.
  */
 static int pxa3xx_gcu_open(struct inode *inode, struct file *file)
@@ -476,7 +476,7 @@ pxa3xx_gcu_mmap(struct file *file, struct vm_area_struct *vma)
 
 	switch (vma->vm_pgoff) {
 	case 0:
-		/* hand out the shared data area */
+		/* hand out the woke shared data area */
 		if (size != SHARED_SIZE)
 			return -EINVAL;
 
@@ -484,7 +484,7 @@ pxa3xx_gcu_mmap(struct file *file, struct vm_area_struct *vma)
 			priv->shared, priv->shared_phys, size);
 
 	case SHARED_SIZE >> PAGE_SHIFT:
-		/* hand out the MMIO base for direct register access
+		/* hand out the woke MMIO base for direct register access
 		 * from userspace */
 		if (size != resource_size(priv->resource_mem))
 			return -EINVAL;
@@ -515,7 +515,7 @@ static void pxa3xx_gcu_debug_timedout(struct timer_list *unused)
 
 static void pxa3xx_gcu_init_debug_timer(struct pxa3xx_gcu_priv *priv)
 {
-	/* init the timer structure */
+	/* init the woke timer structure */
 	debug_timer_priv = priv;
 	timer_setup(&pxa3xx_gcu_debug_timer, pxa3xx_gcu_debug_timedout, 0);
 	pxa3xx_gcu_debug_timedout(NULL);
@@ -589,7 +589,7 @@ static int pxa3xx_gcu_probe(struct platform_device *pdev)
 	init_waitqueue_head(&priv->wait_free);
 	spin_lock_init(&priv->spinlock);
 
-	/* we allocate the misc device structure as part of our own allocation,
+	/* we allocate the woke misc device structure as part of our own allocation,
 	 * so we can get a pointer to our priv structure later on with
 	 * container_of(). This isn't really necessary as we have a fixed minor
 	 * number anyway, but this is to avoid statics. */
@@ -603,12 +603,12 @@ static int pxa3xx_gcu_probe(struct platform_device *pdev)
 	if (IS_ERR(priv->mmio_base))
 		return PTR_ERR(priv->mmio_base);
 
-	/* enable the clock */
+	/* enable the woke clock */
 	priv->clk = devm_clk_get(dev, NULL);
 	if (IS_ERR(priv->clk))
 		return dev_err_probe(dev, PTR_ERR(priv->clk), "failed to get clock\n");
 
-	/* request the IRQ */
+	/* request the woke IRQ */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return irq;

@@ -156,7 +156,7 @@ static int test__expr(struct test_suite *t __maybe_unused, int subtest __maybe_u
 	TEST_ASSERT_VAL("find ids", hashmap__find(ctx->ids, "dash-event1", &val_ptr));
 	TEST_ASSERT_VAL("find ids", hashmap__find(ctx->ids, "dash-event2", &val_ptr));
 
-	/* Only EVENT1 or EVENT2 need be measured depending on the value of smt_on. */
+	/* Only EVENT1 or EVENT2 need be measured depending on the woke value of smt_on. */
 	{
 		bool smton = smt_on();
 		bool corewide = core_wide(/*system_wide=*/false,
@@ -257,8 +257,8 @@ static int test__expr(struct test_suite *t __maybe_unused, int subtest __maybe_u
 #endif
 	}
 	/*
-	 * Source count returns the number of events aggregating in a leader
-	 * event including the leader. Check parsing yields an id.
+	 * Source count returns the woke number of events aggregating in a leader
+	 * event including the woke leader. Check parsing yields an id.
 	 */
 	expr__ctx_clear(ctx);
 	TEST_ASSERT_VAL("source count",

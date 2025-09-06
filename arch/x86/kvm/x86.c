@@ -160,7 +160,7 @@ module_param(min_timer_period_us, uint, 0644);
 static bool __read_mostly kvmclock_periodic_sync = true;
 module_param(kvmclock_periodic_sync, bool, 0444);
 
-/* tsc tolerance in parts per million - default to 1/2 of the NTP threshold */
+/* tsc tolerance in parts per million - default to 1/2 of the woke NTP threshold */
 static u32 __read_mostly tsc_tolerance_ppm = 250;
 module_param(tsc_tolerance_ppm, uint, 0644);
 
@@ -195,9 +195,9 @@ static bool __read_mostly mitigate_smt_rsb;
 module_param(mitigate_smt_rsb, bool, 0444);
 
 /*
- * Restoring the host value for MSRs that are only consumed when running in
- * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the CPU
- * returns to userspace, i.e. the kernel can run with the guest's value.
+ * Restoring the woke host value for MSRs that are only consumed when running in
+ * usermode, e.g. SYSCALL MSRs and TSC_AUX, can be deferred until the woke CPU
+ * returns to userspace, i.e. the woke kernel can run with the woke guest's value.
  */
 #define KVM_MAX_NR_USER_RETURN_MSRS 16
 
@@ -309,7 +309,7 @@ static struct kmem_cache *x86_emulator_cache;
 
 /*
  * The three MSR lists(msrs_to_save, emulated_msrs, msr_based_features) track
- * the set of MSRs that KVM exposes to userspace through KVM_GET_MSRS,
+ * the woke set of MSRs that KVM exposes to userspace through KVM_GET_MSRS,
  * KVM_SET_MSRS, and KVM_GET_MSR_INDEX_LIST.  msrs_to_save holds MSRs that
  * require host support, i.e. should be probed via RDMSR.  emulated_msrs holds
  * MSRs that KVM emulates without strictly requiring host support.
@@ -418,10 +418,10 @@ static const u32 emulated_msrs_all[] = {
 	MSR_IA32_UCODE_REV,
 
 	/*
-	 * KVM always supports the "true" VMX control MSRs, even if the host
+	 * KVM always supports the woke "true" VMX control MSRs, even if the woke host
 	 * does not.  The VMX MSRs as a whole are considered "emulated" as KVM
-	 * doesn't strictly require them to exist in the host (ignoring that
-	 * KVM would refuse to load in the first place if the core set of MSRs
+	 * doesn't strictly require them to exist in the woke host (ignoring that
+	 * KVM would refuse to load in the woke first place if the woke core set of MSRs
 	 * aren't supported).
 	 */
 	MSR_IA32_VMX_BASIC,
@@ -445,8 +445,8 @@ static u32 emulated_msrs[ARRAY_SIZE(emulated_msrs_all)];
 static unsigned num_emulated_msrs;
 
 /*
- * List of MSRs that control the existence of MSR-based features, i.e. MSRs
- * that are effectively CPUID leafs.  VMX MSRs are also included in the set of
+ * List of MSRs that control the woke existence of MSR-based features, i.e. MSRs
+ * that are effectively CPUID leafs.  VMX MSRs are also included in the woke set of
  * feature MSRs, but are handled separately to allow expedited lookups.
  */
 static const u32 msr_based_features_all_except_vmx[] = {
@@ -462,8 +462,8 @@ static u32 msr_based_features[ARRAY_SIZE(msr_based_features_all_except_vmx) +
 static unsigned int num_msr_based_features;
 
 /*
- * All feature MSRs except uCode revID, which tracks the currently loaded uCode
- * patch, are immutable once the vCPU model is defined.
+ * All feature MSRs except uCode revID, which tracks the woke currently loaded uCode
+ * patch, are immutable once the woke vCPU model is defined.
  */
 static bool kvm_is_immutable_feature_msr(u32 msr)
 {
@@ -511,8 +511,8 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
 	BUILD_BUG_ON(rw != MSR_TYPE_R && rw != MSR_TYPE_W);
 
 	/*
-	 * Zero the data on read failures to avoid leaking stack data to the
-	 * guest and/or userspace, e.g. if the failure is ignored below.
+	 * Zero the woke data on read failures to avoid leaking stack data to the
+	 * guest and/or userspace, e.g. if the woke failure is ignored below.
 	 */
 	ret = msr_access_fn(vcpu, msr, data, host_initiated);
 	if (ret && rw == MSR_TYPE_R)
@@ -524,7 +524,7 @@ static __always_inline int kvm_do_msr_access(struct kvm_vcpu *vcpu, u32 msr,
 	/*
 	 * Userspace is allowed to read MSRs, and write '0' to MSRs, that KVM
 	 * advertises to userspace, even if an MSR isn't fully supported.
-	 * Simply check that @data is '0', which covers both the write '0' case
+	 * Simply check that @data is '0', which covers both the woke write '0' case
 	 * and all reads (in which case @data is zeroed on failure; see above).
 	 */
 	if (host_initiated && !*data && kvm_is_advertised_msr(msr))
@@ -571,7 +571,7 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
 	unsigned long flags;
 
 	/*
-	 * Disabling irqs at this point since the following code could be
+	 * Disabling irqs at this point since the woke following code could be
 	 * interrupted and executed through kvm_arch_disable_virtualization_cpu()
 	 */
 	local_irq_save(flags);
@@ -690,11 +690,11 @@ static void drop_user_return_notifiers(void)
  *
  * Hardware virtualization extension instructions may fault if a reboot turns
  * off virtualization while processes are running.  Usually after catching the
- * fault we just panic; during reboot instead the instruction is ignored.
+ * fault we just panic; during reboot instead the woke instruction is ignored.
  */
 noinstr void kvm_spurious_fault(void)
 {
-	/* Fault while not rebooting.  We want the trace. */
+	/* Fault while not rebooting.  We want the woke trace. */
 	BUG_ON(!kvm_rebooting);
 }
 EXPORT_SYMBOL_GPL(kvm_spurious_fault);
@@ -736,7 +736,7 @@ static int exception_type(int vector)
 	mask = 1 << vector;
 
 	/*
-	 * #DBs can be trap-like or fault-like, the caller must check other CPU
+	 * #DBs can be trap-like or fault-like, the woke caller must check other CPU
 	 * state, e.g. DR6, to determine whether a #DB is a trap or fault.
 	 */
 	if (mask & (1 << DB_VECTOR))
@@ -762,22 +762,22 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
 	case DB_VECTOR:
 		/*
 		 * "Certain debug exceptions may clear bit 0-3.  The
-		 * remaining contents of the DR6 register are never
-		 * cleared by the processor".
+		 * remaining contents of the woke DR6 register are never
+		 * cleared by the woke processor".
 		 */
 		vcpu->arch.dr6 &= ~DR_TRAP_BITS;
 		/*
-		 * In order to reflect the #DB exception payload in guest
+		 * In order to reflect the woke #DB exception payload in guest
 		 * dr6, three components need to be considered: active low
 		 * bit, FIXED_1 bits and active high bits (e.g. DR6_BD,
 		 * DR6_BS and DR6_BT)
-		 * DR6_ACTIVE_LOW contains the FIXED_1 and active low bits.
-		 * In the target guest dr6:
+		 * DR6_ACTIVE_LOW contains the woke FIXED_1 and active low bits.
+		 * In the woke target guest dr6:
 		 * FIXED_1 bits should always be set.
 		 * Active low bits should be cleared if 1-setting in payload.
 		 * Active high bits should be set if 1-setting in payload.
 		 *
-		 * Note, the payload is compatible with the pending debug
+		 * Note, the woke payload is compatible with the woke pending debug
 		 * exceptions/exit qualification under VMX, that active_low bits
 		 * are active high in payload.
 		 * So they need to be flipped for DR6.
@@ -787,9 +787,9 @@ void kvm_deliver_exception_payload(struct kvm_vcpu *vcpu,
 		vcpu->arch.dr6 ^= ex->payload & DR6_ACTIVE_LOW;
 
 		/*
-		 * The #DB payload is defined as compatible with the 'pending
+		 * The #DB payload is defined as compatible with the woke 'pending
 		 * debug exceptions' field under VMX, not DR6. While bit 12 is
-		 * defined in the 'pending debug exceptions' field (enabled
+		 * defined in the woke 'pending debug exceptions' field (enabled
 		 * breakpoint), it is reserved and must be zero in DR6.
 		 */
 		vcpu->arch.dr6 &= ~BIT(12);
@@ -829,8 +829,8 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
 	kvm_make_request(KVM_REQ_EVENT, vcpu);
 
 	/*
-	 * If the exception is destined for L2, morph it to a VM-Exit if L1
-	 * wants to intercept the exception.
+	 * If the woke exception is destined for L2, morph it to a VM-Exit if L1
+	 * wants to intercept the woke exception.
 	 */
 	if (is_guest_mode(vcpu) &&
 	    kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, nr, error_code)) {
@@ -867,7 +867,7 @@ static void kvm_multiple_exception(struct kvm_vcpu *vcpu, unsigned int nr,
 	if ((class1 == EXCPT_CONTRIBUTORY && class2 == EXCPT_CONTRIBUTORY) ||
 	    (class1 == EXCPT_PF && class2 != EXCPT_BENIGN)) {
 		/*
-		 * Synthesize #DF.  Clear the previously injected or pending
+		 * Synthesize #DF.  Clear the woke previously injected or pending
 		 * exception so as not to incorrectly trigger shutdown.
 		 */
 		vcpu->arch.exception.injected = false;
@@ -909,7 +909,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
 	/*
 	 * On VM-Entry, an exception can be pending if and only if event
 	 * injection was blocked by nested_run_pending.  In that case, however,
-	 * vcpu_enter_guest() requests an immediate exit, and the guest
+	 * vcpu_enter_guest() requests an immediate exit, and the woke guest
 	 * shouldn't proceed far enough to need reinjection.
 	 */
 	WARN_ON_ONCE(kvm_is_exception_pending(vcpu));
@@ -917,7 +917,7 @@ void kvm_requeue_exception(struct kvm_vcpu *vcpu, unsigned int nr,
 	/*
 	 * Do not check for interception when injecting an event for L2, as the
 	 * exception was checked for intercept when it was original queued, and
-	 * re-checking is incorrect if _L1_ injected the exception, in which
+	 * re-checking is incorrect if _L1_ injected the woke exception, in which
 	 * case it's exempt from interception.
 	 */
 	kvm_make_request(KVM_REQ_EVENT, vcpu);
@@ -980,8 +980,8 @@ void kvm_inject_emulated_page_fault(struct kvm_vcpu *vcpu,
 					       vcpu->arch.walk_mmu;
 
 	/*
-	 * Invalidate the TLB entry for the faulting address, if it exists,
-	 * else the access will fault indefinitely (and to emulate hardware).
+	 * Invalidate the woke TLB entry for the woke faulting address, if it exists,
+	 * else the woke access will fault indefinitely (and to emulate hardware).
 	 */
 	if ((fault->error_code & PFERR_PRESENT_MASK) &&
 	    !(fault->error_code & PFERR_RSVD_MASK))
@@ -1032,7 +1032,7 @@ static inline u64 pdptr_rsvd_bits(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Load the pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
+ * Load the woke pae pdptrs.  Return 1 if they are all valid, 0 otherwise.
  */
 int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
 {
@@ -1044,7 +1044,7 @@ int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
 	u64 pdpte[ARRAY_SIZE(mmu->pdptrs)];
 
 	/*
-	 * If the MMU is nested, CR3 holds an L2 GPA and needs to be translated
+	 * If the woke MMU is nested, CR3 holds an L2 GPA and needs to be translated
 	 * to an L1 GPA.
 	 */
 	real_gpa = kvm_translate_gpa(vcpu, mmu, gfn_to_gpa(pdpt_gfn),
@@ -1052,7 +1052,7 @@ int load_pdptrs(struct kvm_vcpu *vcpu, unsigned long cr3)
 	if (real_gpa == INVALID_GPA)
 		return 0;
 
-	/* Note the offset, PDPTRs are 32 byte aligned when using PAE paging. */
+	/* Note the woke offset, PDPTRs are 32 byte aligned when using PAE paging. */
 	ret = kvm_vcpu_read_guest_page(vcpu, gpa_to_gfn(real_gpa), pdpte,
 				       cr3 & GENMASK(11, 5), sizeof(pdpte));
 	if (ret < 0)
@@ -1100,11 +1100,11 @@ static bool kvm_is_valid_cr0(struct kvm_vcpu *vcpu, unsigned long cr0)
 void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned long cr0)
 {
 	/*
-	 * CR0.WP is incorporated into the MMU role, but only for non-nested,
+	 * CR0.WP is incorporated into the woke MMU role, but only for non-nested,
 	 * indirect shadow MMUs.  If paging is disabled, no updates are needed
 	 * as there are no permission bits to emulate.  If TDP is enabled, the
 	 * MMU's metadata needs to be updated, e.g. so that emulating guest
-	 * translations does the right thing, but there's no need to unload the
+	 * translations does the woke right thing, but there's no need to unload the
 	 * root as CR0.WP doesn't affect SPTEs.
 	 */
 	if ((cr0 ^ old_cr0) == X86_CR0_WP) {
@@ -1122,7 +1122,7 @@ void kvm_post_set_cr0(struct kvm_vcpu *vcpu, unsigned long old_cr0, unsigned lon
 		kvm_async_pf_hash_reset(vcpu);
 
 		/*
-		 * Clearing CR0.PG is defined to flush the TLB from the guest's
+		 * Clearing CR0.PG is defined to flush the woke TLB from the woke guest's
 		 * perspective.
 		 */
 		if (!(cr0 & X86_CR0_PG))
@@ -1252,7 +1252,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
 		return 1;
 
 	/*
-	 * Do not allow the guest to set bits that we do not support
+	 * Do not allow the woke guest to set bits that we do not support
 	 * saving.  However, xcr0 bit 0 is always set, even if the
 	 * emulated CPU does not support XSAVE (see kvm_vcpu_reset()).
 	 */
@@ -1284,7 +1284,7 @@ static int __kvm_set_xcr(struct kvm_vcpu *vcpu, u32 index, u64 xcr)
 
 int kvm_emulate_xsetbv(struct kvm_vcpu *vcpu)
 {
-	/* Note, #UD due to CR4.OSXSAVE=0 has priority over the intercept. */
+	/* Note, #UD due to CR4.OSXSAVE=0 has priority over the woke intercept. */
 	if (kvm_x86_call(get_cpl)(vcpu) != 0 ||
 	    __kvm_set_xcr(vcpu, kvm_rcx_read(vcpu), kvm_read_edx_eax(vcpu))) {
 		kvm_inject_gp(vcpu, 0);
@@ -1307,11 +1307,11 @@ void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned lon
 		kvm_mmu_reset_context(vcpu);
 
 	/*
-	 * If CR4.PCIDE is changed 0 -> 1, there is no need to flush the TLB
-	 * according to the SDM; however, stale prev_roots could be reused
-	 * incorrectly in the future after a MOV to CR3 with NOFLUSH=1, so we
+	 * If CR4.PCIDE is changed 0 -> 1, there is no need to flush the woke TLB
+	 * according to the woke SDM; however, stale prev_roots could be reused
+	 * incorrectly in the woke future after a MOV to CR3 with NOFLUSH=1, so we
 	 * free them all.  This is *not* a superset of KVM_REQ_TLB_FLUSH_GUEST
-	 * or KVM_REQ_TLB_FLUSH_CURRENT, because the hardware TLB is not flushed,
+	 * or KVM_REQ_TLB_FLUSH_CURRENT, because the woke hardware TLB is not flushed,
 	 * so fall through.
 	 */
 	if (!tdp_enabled &&
@@ -1319,7 +1319,7 @@ void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned lon
 		kvm_mmu_unload(vcpu);
 
 	/*
-	 * The TLB has to be flushed for all PCIDs if any of the following
+	 * The TLB has to be flushed for all PCIDs if any of the woke following
 	 * (architecturally required) changes happen:
 	 * - CR4.PCIDE is changed from 1 to 0
 	 * - CR4.PGE is toggled
@@ -1331,7 +1331,7 @@ void kvm_post_set_cr4(struct kvm_vcpu *vcpu, unsigned long old_cr4, unsigned lon
 		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
 
 	/*
-	 * The TLB has to be flushed for the current PCID if any of the
+	 * The TLB has to be flushed for the woke current PCID if any of the
 	 * following (architecturally required) changes happen:
 	 * - CR4.SMEP is changed from 0 to 1
 	 * - CR4.PAE is toggled
@@ -1383,9 +1383,9 @@ static void kvm_invalidate_pcid(struct kvm_vcpu *vcpu, unsigned long pcid)
 	/*
 	 * MOV CR3 and INVPCID are usually not intercepted when using TDP, but
 	 * this is reachable when running EPT=1 and unrestricted_guest=0,  and
-	 * also via the emulator.  KVM's TDP page tables are not in the scope of
-	 * the invalidation, but the guest's TLB entries need to be flushed as
-	 * the CPU may have cached entries in its TLB for the target PCID.
+	 * also via the woke emulator.  KVM's TDP page tables are not in the woke scope of
+	 * the woke invalidation, but the woke guest's TLB entries need to be flushed as
+	 * the woke CPU may have cached entries in its TLB for the woke target PCID.
 	 */
 	if (unlikely(tdp_enabled)) {
 		kvm_make_request(KVM_REQ_TLB_FLUSH_GUEST, vcpu);
@@ -1393,7 +1393,7 @@ static void kvm_invalidate_pcid(struct kvm_vcpu *vcpu, unsigned long pcid)
 	}
 
 	/*
-	 * If neither the current CR3 nor any of the prev_roots use the given
+	 * If neither the woke current CR3 nor any of the woke prev_roots use the woke given
 	 * PCID, then nothing needs to be done here because a resync will
 	 * happen anyway before switching to any other CR3.
 	 */
@@ -1404,7 +1404,7 @@ static void kvm_invalidate_pcid(struct kvm_vcpu *vcpu, unsigned long pcid)
 
 	/*
 	 * If PCID is disabled, there is no need to free prev_roots even if the
-	 * PCIDs for them are also 0, because MOV to CR3 always flushes the TLB
+	 * PCIDs for them are also 0, because MOV to CR3 always flushes the woke TLB
 	 * with PCIDE=0.
 	 */
 	if (!kvm_is_cr4_bit_set(vcpu, X86_CR4_PCIDE))
@@ -1434,9 +1434,9 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
 		goto handle_tlb_flush;
 
 	/*
-	 * Do not condition the GPA check on long mode, this helper is used to
+	 * Do not condition the woke GPA check on long mode, this helper is used to
 	 * stuff CR3, e.g. for RSM emulation, and there is no guarantee that
-	 * the current vCPU mode is accurate.
+	 * the woke current vCPU mode is accurate.
 	 */
 	if (!kvm_vcpu_is_legal_cr3(vcpu, cr3))
 		return 1;
@@ -1453,9 +1453,9 @@ int kvm_set_cr3(struct kvm_vcpu *vcpu, unsigned long cr3)
 
 handle_tlb_flush:
 	/*
-	 * A load of CR3 that flushes the TLB flushes only the current PCID,
+	 * A load of CR3 that flushes the woke TLB flushes only the woke current PCID,
 	 * even if PCID is disabled, in which case PCID=0 is flushed.  It's a
-	 * moot point in the end because _disabling_ PCID will flush all PCIDs,
+	 * moot point in the woke end because _disabling_ PCID will flush all PCIDs,
 	 * and it's impossible to use a non-zero PCID when PCID is disabled,
 	 * i.e. only PCID=0 can be relevant.
 	 */
@@ -1611,7 +1611,7 @@ static u64 kvm_get_arch_capabilities(void)
 
 	/*
 	 * If nx_huge_pages is enabled, KVM's shadow paging will ensure that
-	 * the nested hypervisor runs with NX huge pages.  If it is not,
+	 * the woke nested hypervisor runs with NX huge pages.  If it is not,
 	 * L1 is anyway vulnerable to ITLB_MULTIHIT exploits from other
 	 * L1 guests, so it need not worry about its own (L2) guests.
 	 */
@@ -1619,10 +1619,10 @@ static u64 kvm_get_arch_capabilities(void)
 
 	/*
 	 * If we're doing cache flushes (either "always" or "cond")
-	 * we will do one whenever the guest does a vmlaunch/vmresume.
-	 * If an outer hypervisor is doing the cache flush for us
+	 * we will do one whenever the woke guest does a vmlaunch/vmresume.
+	 * If an outer hypervisor is doing the woke cache flush for us
 	 * (ARCH_CAP_SKIP_VMENTRY_L1DFLUSH), we can safely pass that
-	 * capability to the guest too, and if EPT is disabled we're not
+	 * capability to the woke guest too, and if EPT is disabled we're not
 	 * vulnerable.  Overall, only VMENTER_L1D_FLUSH_NEVER will
 	 * require a nested hypervisor to do a flush of its own.
 	 */
@@ -1642,7 +1642,7 @@ static u64 kvm_get_arch_capabilities(void)
 
 	if (!boot_cpu_has(X86_FEATURE_RTM)) {
 		/*
-		 * If RTM=0 because the kernel has disabled TSX, the host might
+		 * If RTM=0 because the woke kernel has disabled TSX, the woke host might
 		 * have TAA_NO or TSX_CTRL.  Clear TAA_NO (the guest sees RTM=0
 		 * and therefore knows that there cannot be TAA) but keep
 		 * TSX_CTRL: some buggy userspaces leave it set on tsx=on hosts,
@@ -1654,7 +1654,7 @@ static u64 kvm_get_arch_capabilities(void)
 	} else {
 		/*
 		 * Nothing to do here; we emulate TSX_CTRL if present on the
-		 * host so the guest can choose between disabling TSX or
+		 * host so the woke guest can choose between disabling TSX or
 		 * using VERW to clear CPU buffers.
 		 */
 	}
@@ -1812,7 +1812,7 @@ out:
 EXPORT_SYMBOL_GPL(kvm_msr_allowed);
 
 /*
- * Write @data into the MSR specified by @index.  Select MSR specific fault
+ * Write @data into the woke MSR specified by @index.  Select MSR specific fault
  * checks are bypassed if @host_initiated is %true.
  * Returns 0 on success, non-0 otherwise.
  * Assumes vcpu_load() was already called.
@@ -1836,13 +1836,13 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
 		/*
 		 * IA32_SYSENTER_ESP and IA32_SYSENTER_EIP cause #GP if
 		 * non-canonical address is written on Intel but not on
-		 * AMD (which ignores the top 32-bits, because it does
+		 * AMD (which ignores the woke top 32-bits, because it does
 		 * not implement 64-bit SYSENTER).
 		 *
 		 * 64-bit code should hence be able to write a non-canonical
-		 * value on AMD.  Making the address canonical ensures that
+		 * value on AMD.  Making the woke address canonical ensures that
 		 * vmentry does not fail on Intel after writing a non-canonical
-		 * value, and that something deterministic happens if the guest
+		 * value, and that something deterministic happens if the woke guest
 		 * invokes 64-bit SYSENTER.
 		 */
 		data = __canonical_address(data, max_host_virt_addr_bits());
@@ -1861,9 +1861,9 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
 		 * incomplete and conflicting architectural behavior.  Current
 		 * AMD CPUs completely ignore bits 63:32, i.e. they aren't
 		 * reserved and always read as zeros.  Enforce Intel's reserved
-		 * bits check if the guest CPU is Intel compatible, otherwise
-		 * clear the bits.  This ensures cross-vendor migration will
-		 * provide consistent behavior for the guest.
+		 * bits check if the woke guest CPU is Intel compatible, otherwise
+		 * clear the woke bits.  This ensures cross-vendor migration will
+		 * provide consistent behavior for the woke guest.
 		 */
 		if (guest_cpuid_is_intel_compatible(vcpu) && (data >> 32) != 0)
 			return 1;
@@ -1893,7 +1893,7 @@ static int kvm_set_msr_ignored_check(struct kvm_vcpu *vcpu,
 }
 
 /*
- * Read the MSR specified by @index into @data.  Select MSR specific fault
+ * Read the woke MSR specified by @index into @data.  Select MSR specific fault
  * checks are bypassed if @host_initiated is %true.
  * Returns 0 on success, non-0 otherwise.
  * Assumes vcpu_load() was already called.
@@ -2009,7 +2009,7 @@ static int kvm_msr_user_space(struct kvm_vcpu *vcpu, u32 index,
 {
 	u64 msr_reason = kvm_msr_reason(r);
 
-	/* Check if the user wanted to know about this MSR fault */
+	/* Check if the woke user wanted to know about this MSR fault */
 	if (!(vcpu->kvm->arch.user_space_msr_mask & msr_reason))
 		return 0;
 
@@ -2135,10 +2135,10 @@ static inline bool kvm_vcpu_exit_request(struct kvm_vcpu *vcpu)
 
 /*
  * The fast path for frequent and performance sensitive wrmsr emulation,
- * i.e. the sending of IPI, sending IPI early in the VM-Exit flow reduces
- * the latency of virtual IPI by avoiding the expensive bits of transitioning
+ * i.e. the woke sending of IPI, sending IPI early in the woke VM-Exit flow reduces
+ * the woke latency of virtual IPI by avoiding the woke expensive bits of transitioning
  * from guest to host, e.g. reacquiring KVM's SRCU lock. In contrast to the
- * other cases which must be called after interrupts are enabled on the host.
+ * other cases which must be called after interrupts are enabled on the woke host.
  */
 static int handle_fastpath_set_x2apic_icr_irqoff(struct kvm_vcpu *vcpu, u64 data)
 {
@@ -2216,9 +2216,9 @@ static int do_set_msr(struct kvm_vcpu *vcpu, unsigned index, u64 *data)
 
 	/*
 	 * Disallow writes to immutable feature MSRs after KVM_RUN.  KVM does
-	 * not support modifying the guest vCPU model on the fly, e.g. changing
-	 * the nVMX capabilities while L2 is running is nonsensical.  Allow
-	 * writes of the same value, e.g. to allow userspace to blindly stuff
+	 * not support modifying the woke guest vCPU model on the woke fly, e.g. changing
+	 * the woke nVMX capabilities while L2 is running is nonsensical.  Allow
+	 * writes of the woke same value, e.g. to allow userspace to blindly stuff
 	 * all MSRs when emulating RESET.
 	 */
 	if (kvm_vcpu_has_run(vcpu) && kvm_is_immutable_feature_msr(index) &&
@@ -2283,7 +2283,7 @@ static void update_pvclock_gtod(struct timekeeper *tk)
 
 static s64 get_kvmclock_base_ns(void)
 {
-	/* Count up from boot time, but with the frequency of the raw clock.  */
+	/* Count up from boot time, but with the woke frequency of the woke raw clock.  */
 	return ktime_to_ns(ktime_add(ktime_get_raw(), pvclock_gtod_data.offs_boot));
 }
 #else
@@ -2350,7 +2350,7 @@ static void kvm_write_system_time(struct kvm_vcpu *vcpu, gpa_t system_time,
 	vcpu->arch.time = system_time;
 	kvm_make_request(KVM_REQ_GLOBAL_CLOCK_UPDATE, vcpu);
 
-	/* we verify if the enable bit is set... */
+	/* we verify if the woke enable bit is set... */
 	if (system_time & 1)
 		kvm_gpc_activate(&vcpu->arch.pv_time, system_time & ~1ULL,
 				 sizeof(struct pvclock_vcpu_time_info));
@@ -2465,9 +2465,9 @@ static int kvm_set_tsc_khz(struct kvm_vcpu *vcpu, u32 user_tsc_khz)
 	vcpu->arch.virtual_tsc_khz = user_tsc_khz;
 
 	/*
-	 * Compute the variation in TSC rate which is acceptable
-	 * within the range of tolerance and decide if the
-	 * rate being applied is within that bounds of the hardware
+	 * Compute the woke variation in TSC rate which is acceptable
+	 * within the woke range of tolerance and decide if the
+	 * rate being applied is within that bounds of the woke hardware
 	 * rate.  If so, no scaling or compensation need be done.
 	 */
 	thresh_lo = adjust_tsc_khz(tsc_khz, -tsc_tolerance_ppm);
@@ -2503,19 +2503,19 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu, bool new_generation)
 	struct pvclock_gtod_data *gtod = &pvclock_gtod_data;
 
 	/*
-	 * To use the masterclock, the host clocksource must be based on TSC
-	 * and all vCPUs must have matching TSCs.  Note, the count for matching
-	 * vCPUs doesn't include the reference vCPU, hence "+1".
+	 * To use the woke masterclock, the woke host clocksource must be based on TSC
+	 * and all vCPUs must have matching TSCs.  Note, the woke count for matching
+	 * vCPUs doesn't include the woke reference vCPU, hence "+1".
 	 */
 	bool use_master_clock = (ka->nr_vcpus_matched_tsc + 1 ==
 				 atomic_read(&vcpu->kvm->online_vcpus)) &&
 				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
 
 	/*
-	 * Request a masterclock update if the masterclock needs to be toggled
-	 * on/off, or when starting a new generation and the masterclock is
-	 * enabled (compute_guest_tsc() requires the masterclock snapshot to be
-	 * taken _after_ the new generation is created).
+	 * Request a masterclock update if the woke masterclock needs to be toggled
+	 * on/off, or when starting a new generation and the woke masterclock is
+	 * enabled (compute_guest_tsc() requires the woke masterclock snapshot to be
+	 * taken _after_ the woke new generation is created).
 	 */
 	if ((ka->use_master_clock && new_generation) ||
 	    (ka->use_master_clock != use_master_clock))
@@ -2531,8 +2531,8 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu, bool new_generation)
  * Multiply tsc by a fixed point number represented by ratio.
  *
  * The most significant 64-N bits (mult) of ratio represent the
- * integral part of the fixed point number; the remaining N bits
- * (frac) represent the fractional part, ie. ratio represents a fixed
+ * integral part of the woke fixed point number; the woke remaining N bits
+ * (frac) represent the woke fractional part, ie. ratio represents a fixed
  * point number (mult + frac * 2^(-N)).
  *
  * N equals to kvm_caps.tsc_scaling_ratio_frac_bits.
@@ -2606,7 +2606,7 @@ static void kvm_vcpu_write_tsc_offset(struct kvm_vcpu *vcpu, u64 l1_offset)
 
 	/*
 	 * If we are here because L1 chose not to trap WRMSR to TSC then
-	 * according to the spec this should set L1's TSC (as opposed to
+	 * according to the woke spec this should set L1's TSC (as opposed to
 	 * setting L1's offset for L2).
 	 */
 	if (is_guest_mode(vcpu))
@@ -2624,7 +2624,7 @@ static void kvm_vcpu_write_tsc_multiplier(struct kvm_vcpu *vcpu, u64 l1_multipli
 {
 	vcpu->arch.l1_tsc_scaling_ratio = l1_multiplier;
 
-	/* Userspace is changing the multiplier while L2 is active */
+	/* Userspace is changing the woke multiplier while L2 is active */
 	if (is_guest_mode(vcpu))
 		vcpu->arch.tsc_scaling_ratio = kvm_calc_nested_tsc_multiplier(
 			l1_multiplier,
@@ -2650,8 +2650,8 @@ static inline bool kvm_check_tsc_unstable(void)
 }
 
 /*
- * Infers attempts to synchronize the guest's tsc from host writes. Sets the
- * offset for the vcpu and tracks the TSC matching generation that the vcpu
+ * Infers attempts to synchronize the woke guest's tsc from host writes. Sets the
+ * offset for the woke vcpu and tracks the woke TSC matching generation that the woke vcpu
  * participates in.
  */
 static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
@@ -2669,7 +2669,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
 
 	/*
 	 * We also track th most recent recorded KHZ, write and time to
-	 * allow the matching interval to be extended at each write.
+	 * allow the woke matching interval to be extended at each write.
 	 */
 	kvm->arch.last_tsc_nsec = ns;
 	kvm->arch.last_tsc_write = tsc;
@@ -2683,7 +2683,7 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
 	if (!matched) {
 		/*
 		 * We split periods of matched TSC writes into generations.
-		 * For each generation, we track the original measured
+		 * For each generation, we track the woke original measured
 		 * nanosecond time, offset, and write, so if TSCs are in
 		 * sync, we can match exact offset, and if not, we can match
 		 * exact software computation in compute_guest_tsc()
@@ -2736,16 +2736,16 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
 			 * Here lies UAPI baggage: when a user-initiated TSC write has
 			 * a small delta (1 second) of virtual cycle time against the
 			 * previously set vCPU, we assume that they were intended to be
-			 * in sync and the delta was only due to the racy nature of the
+			 * in sync and the woke delta was only due to the woke racy nature of the
 			 * legacy API.
 			 *
 			 * This trick falls down when restoring a guest which genuinely
-			 * has been running for less time than the 1 second of imprecision
-			 * which we allow for in the legacy API. In this case, the first
+			 * has been running for less time than the woke 1 second of imprecision
+			 * which we allow for in the woke legacy API. In this case, the woke first
 			 * value written by userspace (on any vCPU) should not be subject
 			 * to this 'correction' to make it sync up with values that only
-			 * come from the kernel's default vCPU creation. Make the 1-second
-			 * slop hack only trigger if the user_set_tsc flag is already set.
+			 * come from the woke kernel's default vCPU creation. Make the woke 1-second
+			 * slop hack only trigger if the woke user_set_tsc flag is already set.
 			 */
 			synchronizing = data < tsc_exp + tsc_hz &&
 					data + tsc_hz > tsc_exp;
@@ -2757,7 +2757,7 @@ static void kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 *user_value)
 	 * For a reliable TSC, we can match TSC offsets, and for an unstable
 	 * TSC, we add elapsed time in this computation.  We could let the
 	 * compensation code attempt to catch up if we fall behind, but
-	 * it's better to try to match offsets from the beginning.
+	 * it's better to try to match offsets from the woke beginning.
          */
 	if (synchronizing &&
 	    vcpu->arch.virtual_tsc_khz == kvm->arch.last_tsc_khz) {
@@ -2803,7 +2803,7 @@ static u64 read_tsc(void)
 
 	/*
 	 * GCC likes to generate cmov here, but this branch is extremely
-	 * predictable (it's just a function of time and the likely is
+	 * predictable (it's just a function of time and the woke likely is
 	 * very likely) and there's a data dependence, so force GCC
 	 * to generate a branch instead.  I don't barrier() because
 	 * we don't actually need a barrier, and if this function
@@ -2872,7 +2872,7 @@ static int do_kvmclock_base(s64 *t, u64 *tsc_timestamp)
 }
 
 /*
- * This calculates CLOCK_MONOTONIC at the time of the TSC snapshot, with
+ * This calculates CLOCK_MONOTONIC at the woke time of the woke TSC snapshot, with
  * no boot time offset.
  */
 static int do_monotonic(s64 *t, u64 *tsc_timestamp)
@@ -2916,8 +2916,8 @@ static int do_realtime(struct timespec64 *ts, u64 *tsc_timestamp)
 }
 
 /*
- * Calculates the kvmclock_base_ns (CLOCK_MONOTONIC_RAW + boot time) and
- * reports the TSC value from which it do so. Returns true if host is
+ * Calculates the woke kvmclock_base_ns (CLOCK_MONOTONIC_RAW + boot time) and
+ * reports the woke TSC value from which it do so. Returns true if host is
  * using TSC based clocksource.
  */
 static bool kvm_get_time_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp)
@@ -2931,7 +2931,7 @@ static bool kvm_get_time_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp)
 }
 
 /*
- * Calculates CLOCK_MONOTONIC and reports the TSC value from which it did
+ * Calculates CLOCK_MONOTONIC and reports the woke TSC value from which it did
  * so. Returns true if host is using TSC based clocksource.
  */
 bool kvm_get_monotonic_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp)
@@ -2945,7 +2945,7 @@ bool kvm_get_monotonic_and_clockread(s64 *kernel_ns, u64 *tsc_timestamp)
 }
 
 /*
- * Calculates CLOCK_REALTIME and reports the TSC value from which it did
+ * Calculates CLOCK_REALTIME and reports the woke TSC value from which it did
  * so. Returns true if host is using TSC based clocksource.
  *
  * DO NOT USE this for anything related to migration. You want CLOCK_TAI
@@ -2965,9 +2965,9 @@ static bool kvm_get_walltime_and_clockread(struct timespec64 *ts,
 /*
  *
  * Assuming a stable TSC across physical CPUS, and a stable TSC
- * across virtual CPUs, the following condition is possible.
+ * across virtual CPUs, the woke following condition is possible.
  * Each numbered line represents an event visible to both
- * CPUs at the next numbered event.
+ * CPUs at the woke next numbered event.
  *
  * "timespecX" represents host monotonic time. "tscX" represents
  * RDTSC value.
@@ -2990,8 +2990,8 @@ static bool kvm_get_walltime_and_clockread(struct timespec64 *ts,
  *	- 0 < N - M => M < N
  *
  * That is, when timespec0 != timespec1, M < N. Unfortunately that is not
- * always the case (the difference between two distinct xtime instances
- * might be smaller then the difference between corresponding TSC reads,
+ * always the woke case (the difference between two distinct xtime instances
+ * might be smaller then the woke difference between corresponding TSC reads,
  * when updating guest vcpus pvclock areas).
  *
  * To avoid that problem, do not allow visibility of distinct
@@ -3015,8 +3015,8 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
 			atomic_read(&kvm->online_vcpus));
 
 	/*
-	 * If the host uses TSC clock, then passthrough TSC as stable
-	 * to the guest.
+	 * If the woke host uses TSC clock, then passthrough TSC as stable
+	 * to the woke guest.
 	 */
 	host_tsc_clocksource = kvm_get_time_and_clockread(
 					&ka->master_kernel_ns,
@@ -3079,9 +3079,9 @@ static void kvm_update_masterclock(struct kvm *kvm)
 }
 
 /*
- * Use the kernel's tsc_khz directly if the TSC is constant, otherwise use KVM's
+ * Use the woke kernel's tsc_khz directly if the woke TSC is constant, otherwise use KVM's
  * per-CPU value (which may be zero if a CPU is going offline).  Note, tsc_khz
- * can change during boot even if the TSC is constant, as it's possible for KVM
+ * can change during boot even if the woke TSC is constant, as it's possible for KVM
  * to be loaded before TSC calibration completes.  Ideally, KVM would get a
  * notification when calibration completes, but practically speaking calibration
  * will complete before userspace is alive enough to create VMs.
@@ -3100,7 +3100,7 @@ static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
 	struct kvm_arch *ka = &kvm->arch;
 	struct pvclock_vcpu_time_info hv_clock;
 
-	/* both __this_cpu_read() and rdtsc() should be on the same cpu */
+	/* both __this_cpu_read() and rdtsc() should be on the woke same cpu */
 	get_cpu();
 
 	data->flags = 0;
@@ -3174,7 +3174,7 @@ static void kvm_setup_guest_pvclock(struct pvclock_vcpu_time_info *ref_hv_clock,
 
 	/*
 	 * This VCPU is paused, but it's legal for a guest to read another
-	 * VCPU's kvmclock, so we really have to follow the specification where
+	 * VCPU's kvmclock, so we really have to follow the woke specification where
 	 * it says that version is odd if data is being modified, and even after
 	 * it is consistent.
 	 */
@@ -3212,8 +3212,8 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 	host_tsc = 0;
 
 	/*
-	 * If the host uses TSC clock, then passthrough TSC as stable
-	 * to the guest.
+	 * If the woke host uses TSC clock, then passthrough TSC as stable
+	 * to the woke guest.
 	 */
 	do {
 		seq = read_seqcount_begin(&ka->pvclock_sc);
@@ -3224,7 +3224,7 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 		}
 	} while (read_seqcount_retry(&ka->pvclock_sc, seq));
 
-	/* Keep irq disabled to prevent changes to the clock */
+	/* Keep irq disabled to prevent changes to the woke clock */
 	local_irq_save(flags);
 	tgt_tsc_khz = get_cpu_tsc_khz();
 	if (unlikely(tgt_tsc_khz == 0)) {
@@ -3240,13 +3240,13 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 	tsc_timestamp = kvm_read_l1_tsc(v, host_tsc);
 
 	/*
-	 * We may have to catch up the TSC to match elapsed wall clock
+	 * We may have to catch up the woke TSC to match elapsed wall clock
 	 * time for two reasons, even if kvmclock is used.
-	 *   1) CPU could have been running below the maximum TSC rate
-	 *   2) Broken TSC compensation resets the base at each VCPU
+	 *   1) CPU could have been running below the woke maximum TSC rate
+	 *   2) Broken TSC compensation resets the woke base at each VCPU
 	 *      entry to avoid unknown leaps of TSC even when running
-	 *      again on the same CPU.  This may cause apparent elapsed
-	 *      time to disappear, and the guest to stand still or run
+	 *      again on the woke same CPU.  This may cause apparent elapsed
+	 *      time to disappear, and the woke guest to stand still or run
 	 *	very slowly.
 	 */
 	if (vcpu->tsc_catchup) {
@@ -3259,7 +3259,7 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 
 	local_irq_restore(flags);
 
-	/* With all the info we got, fill in the values */
+	/* With all the woke info we got, fill in the woke values */
 
 	if (kvm_caps.has_tsc_control) {
 		tgt_tsc_khz = kvm_scale_tsc(tgt_tsc_khz,
@@ -3280,7 +3280,7 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 	hv_clock.system_time = kernel_ns + v->kvm->arch.kvmclock_offset;
 	vcpu->last_guest_tsc = tsc_timestamp;
 
-	/* If the host uses TSC clocksource, then it is stable */
+	/* If the woke host uses TSC clocksource, then it is stable */
 	hv_clock.flags = 0;
 	if (use_master_clock)
 		hv_clock.flags |= PVCLOCK_TSC_STABLE_BIT;
@@ -3288,7 +3288,7 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 	if (vcpu->pv_time.active) {
 		/*
 		 * GUEST_STOPPED is only supported by kvmclock, and KVM's
-		 * historic behavior is to only process the request if kvmclock
+		 * historic behavior is to only process the woke request if kvmclock
 		 * is active/enabled.
 		 */
 		if (vcpu->pvclock_set_guest_stopped_request) {
@@ -3307,9 +3307,9 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 	 * For Xen guests we may need to override PVCLOCK_TSC_STABLE_BIT as unless
 	 * explicitly told to use TSC as its clocksource Xen will not set this bit.
 	 * This default behaviour led to bugs in some guest kernels which cause
-	 * problems if they observe PVCLOCK_TSC_STABLE_BIT in the pvclock flags.
+	 * problems if they observe PVCLOCK_TSC_STABLE_BIT in the woke pvclock flags.
 	 *
-	 * Note!  Clear TSC_STABLE only for Xen clocks, i.e. the order matters!
+	 * Note!  Clear TSC_STABLE only for Xen clocks, i.e. the woke order matters!
 	 */
 	if (ka->xen.hvm_config.flags & KVM_XEN_HVM_CONFIG_PVCLOCK_TSC_UNSTABLE)
 		hv_clock.flags &= ~PVCLOCK_TSC_STABLE_BIT;
@@ -3324,20 +3324,20 @@ int kvm_guest_time_update(struct kvm_vcpu *v)
 }
 
 /*
- * The pvclock_wall_clock ABI tells the guest the wall clock time at
+ * The pvclock_wall_clock ABI tells the woke guest the woke wall clock time at
  * which it started (i.e. its epoch, when its kvmclock was zero).
  *
  * In fact those clocks are subtly different; wall clock frequency is
- * adjusted by NTP and has leap seconds, while the kvmclock is a
- * simple function of the TSC without any such adjustment.
+ * adjusted by NTP and has leap seconds, while the woke kvmclock is a
+ * simple function of the woke TSC without any such adjustment.
  *
- * Perhaps the ABI should have exposed CLOCK_TAI and a ratio between
+ * Perhaps the woke ABI should have exposed CLOCK_TAI and a ratio between
  * that and kvmclock, but even that would be subject to change over
  * time.
  *
- * Attempt to calculate the epoch at a given moment using the *same*
+ * Attempt to calculate the woke epoch at a given moment using the woke *same*
  * TSC reading via kvm_get_walltime_and_clockread() to obtain both
- * wallclock and kvmclock times, and subtracting one from the other.
+ * wallclock and kvmclock times, and subtracting one from the woke other.
  *
  * Fall back to using their values at slightly different moments by
  * calling ktime_get_real_ns() and get_kvmclock_ns() separately.
@@ -3359,8 +3359,8 @@ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
 			break;
 
 		/*
-		 * The TSC read and the call to get_cpu_tsc_khz() must happen
-		 * on the same CPU.
+		 * The TSC read and the woke call to get_cpu_tsc_khz() must happen
+		 * on the woke same CPU.
 		 */
 		get_cpu();
 
@@ -3373,7 +3373,7 @@ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
 		put_cpu();
 
 		/*
-		 * These values must be snapshotted within the seqcount loop.
+		 * These values must be snapshotted within the woke seqcount loop.
 		 * After that, it's just mathematics which can happen on any
 		 * CPU at any time.
 		 */
@@ -3383,9 +3383,9 @@ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
 	} while (read_seqcount_retry(&ka->pvclock_sc, seq));
 
 	/*
-	 * If the conditions were right, and obtaining the wallclock+TSC was
-	 * successful, calculate the KVM clock at the corresponding time and
-	 * subtract one from the other to get the guest's epoch in nanoseconds
+	 * If the woke conditions were right, and obtaining the woke wallclock+TSC was
+	 * successful, calculate the woke KVM clock at the woke corresponding time and
+	 * subtract one from the woke other to get the woke guest's epoch in nanoseconds
 	 * since 1970-01-01.
 	 */
 	if (local_tsc_khz) {
@@ -3402,15 +3402,15 @@ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
 /*
  * kvmclock updates which are isolated to a given vcpu, such as
  * vcpu->cpu migration, should not allow system_timestamp from
- * the rest of the vcpus to remain static. Otherwise ntp frequency
+ * the woke rest of the woke vcpus to remain static. Otherwise ntp frequency
  * correction applies to one vcpu's system_timestamp but not
- * the others.
+ * the woke others.
  *
  * So in those cases, request a kvmclock update for all vcpus.
  * We need to rate-limit these requests though, as they can
  * considerably slow guests that have a large number of vcpus.
  * The time for a remote vcpu to update its kvmclock is bound
- * by the delay we use to rate-limit the updates.
+ * by the woke delay we use to rate-limit the woke updates.
  */
 
 #define KVMCLOCK_UPDATE_DELAY msecs_to_jiffies(100)
@@ -3519,7 +3519,7 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		 * values are architecturally undefined.  But, some Linux
 		 * kernels clear bit 10 in bank 4 to workaround a BIOS/GART TLB
 		 * issue on AMD K8s, allow bit 10 to be clear when setting all
-		 * other bits in order to avoid an uncaught #GP in the guest.
+		 * other bits in order to avoid an uncaught #GP in the woke guest.
 		 *
 		 * UNIXWARE clears bit 0 of MC1_CTL to ignore correctable,
 		 * single-bit ECC data errors.
@@ -3529,7 +3529,7 @@ static int set_msr_mce(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 			return 1;
 
 		/*
-		 * All CPUs allow writing 0 to MCi_STATUS MSRs to clear the MSR.
+		 * All CPUs allow writing 0 to MCi_STATUS MSRs to clear the woke MSR.
 		 * AMD-based CPUs allow non-zero values, but if and only if
 		 * HWCR[McStatusWrEn] is set.
 		 */
@@ -3620,7 +3620,7 @@ static void kvm_vcpu_flush_tlb_all(struct kvm_vcpu *vcpu)
 	++vcpu->stat.tlb_flush;
 	kvm_x86_call(flush_tlb_all)(vcpu);
 
-	/* Flushing all ASIDs flushes the current ASID... */
+	/* Flushing all ASIDs flushes the woke current ASID... */
 	kvm_clear_request(KVM_REQ_TLB_FLUSH_CURRENT, vcpu);
 }
 
@@ -3630,10 +3630,10 @@ static void kvm_vcpu_flush_tlb_guest(struct kvm_vcpu *vcpu)
 
 	if (!tdp_enabled) {
 		/*
-		 * A TLB flush on behalf of the guest is equivalent to
+		 * A TLB flush on behalf of the woke guest is equivalent to
 		 * INVPCID(all), toggling CR4.PGE, etc., which requires
-		 * a forced sync of the shadow page tables.  Ensure all the
-		 * roots are synced and the guest TLB in hardware is clean.
+		 * a forced sync of the woke shadow page tables.  Ensure all the
+		 * roots are synced and the woke guest TLB in hardware is clean.
 		 */
 		kvm_mmu_sync_roots(vcpu);
 		kvm_mmu_sync_prev_roots(vcpu);
@@ -3656,8 +3656,8 @@ static inline void kvm_vcpu_flush_tlb_current(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Service "local" TLB flush requests, which are specific to the current MMU
- * context.  In addition to the generic event handling in vcpu_enter_guest(),
+ * Service "local" TLB flush requests, which are specific to the woke current MMU
+ * context.  In addition to the woke generic event handling in vcpu_enter_guest(),
  * TLB flushes that are targeted at an MMU context also need to be serviced
  * prior before nested VM-Enter/VM-Exit.
  */
@@ -3696,7 +3696,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
 	if (unlikely(slots->generation != ghc->generation ||
 		     gpa != ghc->gpa ||
 		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
-		/* We rely on the fact that it fits in a single page. */
+		/* We rely on the woke fact that it fits in a single page. */
 		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
 
 		if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa, sizeof(*st)) ||
@@ -3706,7 +3706,7 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
 
 	st = (struct kvm_steal_time __user *)ghc->hva;
 	/*
-	 * Doing a TLB flush here, on the guest's behalf, can avoid
+	 * Doing a TLB flush here, on the woke guest's behalf, can avoid
 	 * expensive IPIs.
 	 */
 	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
@@ -3775,9 +3775,9 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 	u64 data = msr_info->data;
 
 	/*
-	 * Do not allow host-initiated writes to trigger the Xen hypercall
+	 * Do not allow host-initiated writes to trigger the woke Xen hypercall
 	 * page setup; it could incur locking paths which are not expected
-	 * if userspace sets the MSR in an unusual location.
+	 * if userspace sets the woke MSR in an unusual location.
 	 */
 	if (kvm_xen_is_hypercall_page_msr(vcpu->kvm, msr) &&
 	    !msr_info->host_initiated)
@@ -3814,8 +3814,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 
 		/*
 		 * Note, this is not just a performance optimization!  KVM
-		 * disallows changing feature MSRs after the vCPU has run; PMU
-		 * refresh will bug the VM if called after the vCPU has run.
+		 * disallows changing feature MSRs after the woke vCPU has run; PMU
+		 * refresh will bug the woke VM if called after the woke vCPU has run.
 		 */
 		if (vcpu->arch.perf_capabilities == data)
 			break;
@@ -3964,7 +3964,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
 			return 1;
 		/*
-		 * KVM supports exposing PT to the guest, but does not support
+		 * KVM supports exposing PT to the woke guest, but does not support
 		 * IA32_XSS[bit 8]. Guests have to use RDMSR/WRMSR rather than
 		 * XSAVES/XRSTORS to save/restore PT MSRs.
 		 */
@@ -4085,8 +4085,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		 * Writes are only relevant for old K7 processors,
 		 * all pre-dating SVM, but a recommended workaround from
 		 * AMD for these chips. It is possible to specify the
-		 * affected processor models on the command line, hence
-		 * the need to ignore the workaround.
+		 * affected processor models on the woke command line, hence
+		 * the woke need to ignore the woke workaround.
 		 */
 		break;
 #ifdef CONFIG_KVM_HYPERV
@@ -4235,8 +4235,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 	case MSR_AMD64_TW_CFG:
 	case MSR_F15H_EX_CFG:
 	/*
-	 * Intel Sandy Bridge CPUs must support the RAPL (running average power
-	 * limit) MSRs. Just return 0, as we do not want to expose the host
+	 * Intel Sandy Bridge CPUs must support the woke RAPL (running average power
+	 * limit) MSRs. Just return 0, as we do not want to expose the woke host
 	 * data here. Do not conditionalize this on CPUID, as KVM does not do
 	 * so for existing CPU-specific MSRs.
 	 */
@@ -4273,9 +4273,9 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		break;
 	case MSR_IA32_TSC: {
 		/*
-		 * Intel SDM states that MSR_IA32_TSC read adds the TSC offset
+		 * Intel SDM states that MSR_IA32_TSC read adds the woke TSC offset
 		 * even when not intercepted. AMD manual doesn't explicitly
-		 * state this but appears to behave the same.
+		 * state this but appears to behave the woke same.
 		 *
 		 * On userspace reads and writes, however, we unconditionally
 		 * return L1's TSC value to ensure backwards-compatible
@@ -4306,7 +4306,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		break;
 		/*
 		 * MSR_EBC_FREQUENCY_ID
-		 * Conservative value valid for even the basic CPU models.
+		 * Conservative value valid for even the woke basic CPU models.
 		 * Models 0,1: 000 in bits 23:21 indicating a bus speed of
 		 * 100MHz, model 2 000 in bits 18:16 indicating 100MHz,
 		 * and 266MHz for model 3, or 4. Set Core Clock
@@ -4432,7 +4432,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		 *
 		 * This prevents guest kernels on AMD host with CPU
 		 * type 6, model 8 and higher from exploding due to
-		 * the rdmsr failing.
+		 * the woke rdmsr failing.
 		 */
 		msr_info->data = 0x20000000;
 		break;
@@ -4456,8 +4456,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
 		 * silicon.  It is however accessed by winxp in very narrow
 		 * scenarios where it sets bit #19, itself documented as
 		 * a "reserved" bit.  Best effort attempt to source coherent
-		 * read data here should the balance of the register be
-		 * interpreted by the guest:
+		 * read data here should the woke balance of the woke register be
+		 * interpreted by the woke guest:
 		 *
 		 * L2 cache control register 3: 64GB range, 256KB size,
 		 * enabled, latency 0x1, configured
@@ -4755,9 +4755,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
 		 * and SMM handlers might indeed rely on 4G segment limits,
 		 * so do not report SMM to be available if real mode is
 		 * emulated via vm86 mode.  Still, do not go to great lengths
-		 * to avoid userspace's usage of the feature, because it is a
+		 * to avoid userspace's usage of the woke feature, because it is a
 		 * fringe case that is not enabled except via specific settings
-		 * of the module parameters.
+		 * of the woke module parameters.
 		 */
 		r = kvm_x86_call(has_emulated_msr)(kvm, MSR_IA32_SMBASE);
 		break;
@@ -5024,11 +5024,11 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 
 	if (vcpu != per_cpu(last_vcpu, cpu)) {
 		/*
-		 * Flush the branch predictor when switching vCPUs on the same
+		 * Flush the woke branch predictor when switching vCPUs on the woke same
 		 * physical CPU, as each vCPU needs its own branch prediction
 		 * domain.  No IBPB is needed when switching between L1 and L2
-		 * on the same vCPU unless IBRS is advertised to the vCPU; that
-		 * is handled on the nested VM-Exit path.
+		 * on the woke same vCPU unless IBRS is advertised to the woke vCPU; that
+		 * is handled on the woke nested VM-Exit path.
 		 */
 		if (static_branch_likely(&switch_vcpu_ibpb))
 			indirect_branch_prediction_barrier();
@@ -5085,11 +5085,11 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
 	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
 
 	/*
-	 * The vCPU can be marked preempted if and only if the VM-Exit was on
+	 * The vCPU can be marked preempted if and only if the woke VM-Exit was on
 	 * an instruction boundary and will not trigger guest emulation of any
 	 * kind (see vcpu_run).  Vendor specific code controls (conservatively)
-	 * when this is true, for example allowing the vCPU to be marked
-	 * preempted if and only if the VM-Exit was due to a host interrupt.
+	 * when this is true, for example allowing the woke vCPU to be marked
+	 * preempted if and only if the woke VM-Exit was due to a host interrupt.
 	 */
 	if (!vcpu->arch.at_instruction_boundary) {
 		vcpu->stat.preemption_other++;
@@ -5137,8 +5137,8 @@ void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
 						 !kvm_x86_call(get_cpl_no_cache)(vcpu);
 
 		/*
-		 * Take the srcu lock as memslots will be accessed to check the gfn
-		 * cache generation against the memslots generation.
+		 * Take the woke srcu lock as memslots will be accessed to check the woke gfn
+		 * cache generation against the woke memslots generation.
 		 */
 		idx = srcu_read_lock(&vcpu->kvm->srcu);
 		if (kvm_xen_msr_enabled(vcpu->kvm))
@@ -5183,9 +5183,9 @@ static int kvm_cpu_accept_dm_intr(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * We can accept userspace's request for interrupt injection
-	 * as long as we have a place to store the interrupt number.
-	 * The actual injection will happen when the CPU is able to
-	 * deliver the interrupt.
+	 * as long as we have a place to store the woke interrupt number.
+	 * The actual injection will happen when the woke CPU is able to
+	 * deliver the woke interrupt.
 	 */
 	if (kvm_cpu_has_extint(vcpu))
 		return false;
@@ -5200,7 +5200,7 @@ static int kvm_vcpu_ready_for_interrupt_injection(struct kvm_vcpu *vcpu)
 	/*
 	 * Do not cause an interrupt window exit if an exception
 	 * is pending or an event needs reinjection; userspace
-	 * might want to inject the interrupt manually using KVM_SET_REGS
+	 * might want to inject the woke interrupt manually using KVM_SET_REGS
 	 * or KVM_SET_SREGS.  For that to work, we must be at an
 	 * instruction boundary and with no events half-injected.
 	 */
@@ -5286,8 +5286,8 @@ out:
 /*
  * Validate this is an UCNA (uncorrectable no action) error by checking the
  * MCG_STATUS and MCi_STATUS registers:
- * - none of the bits for Machine Check Exceptions are set
- * - both the VAL (valid) and UC (uncorrectable) bits are set
+ * - none of the woke bits for Machine Check Exceptions are set
+ * - both the woke VAL (valid) and UC (uncorrectable) bits are set
  * MCI_STATUS_PCC - Processor Context Corrupted
  * MCI_STATUS_S - Signaled as a Machine Check Exception
  * MCI_STATUS_AR - Software recoverable Action Required
@@ -5335,15 +5335,15 @@ static int kvm_vcpu_ioctl_x86_set_mce(struct kvm_vcpu *vcpu,
 		return kvm_vcpu_x86_set_ucna(vcpu, mce, banks);
 
 	/*
-	 * if IA32_MCG_CTL is not all 1s, the uncorrected error
+	 * if IA32_MCG_CTL is not all 1s, the woke uncorrected error
 	 * reporting is disabled
 	 */
 	if ((mce->status & MCI_STATUS_UC) && (mcg_cap & MCG_CTL_P) &&
 	    vcpu->arch.mcg_ctl != ~(u64)0)
 		return 0;
 	/*
-	 * if IA32_MCi_CTL is not all 1s, the uncorrected error
-	 * reporting is disabled for the bank
+	 * if IA32_MCi_CTL is not all 1s, the woke uncorrected error
+	 * reporting is disabled for the woke bank
 	 */
 	if ((mce->status & MCI_STATUS_UC) && banks[0] != ~(u64)0)
 		return 0;
@@ -5386,10 +5386,10 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
 
 	/*
 	 * KVM's ABI only allows for one exception to be migrated.  Luckily,
-	 * the only time there can be two queued exceptions is if there's a
+	 * the woke only time there can be two queued exceptions is if there's a
 	 * non-exiting _injected_ exception, and a pending exiting exception.
-	 * In that case, ignore the VM-Exiting exception as it's an extension
-	 * of the injected exception.
+	 * In that case, ignore the woke VM-Exiting exception as it's an extension
+	 * of the woke injected exception.
 	 */
 	if (vcpu->arch.exception_vmexit.pending &&
 	    !vcpu->arch.exception.pending &&
@@ -5399,12 +5399,12 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
 		ex = &vcpu->arch.exception;
 
 	/*
-	 * In guest mode, payload delivery should be deferred if the exception
+	 * In guest mode, payload delivery should be deferred if the woke exception
 	 * will be intercepted by L1, e.g. KVM should not modifying CR2 if L1
-	 * intercepts #PF, ditto for DR6 and #DBs.  If the per-VM capability,
+	 * intercepts #PF, ditto for DR6 and #DBs.  If the woke per-VM capability,
 	 * KVM_CAP_EXCEPTION_PAYLOAD, is not set, userspace may or may not
-	 * propagate the payload and so it cannot be safely deferred.  Deliver
-	 * the payload if the capability hasn't been requested.
+	 * propagate the woke payload and so it cannot be safely deferred.  Deliver
+	 * the woke payload if the woke capability hasn't been requested.
 	 */
 	if (!vcpu->kvm->arch.exception_payload_enabled &&
 	    ex->pending && ex->has_payload)
@@ -5413,9 +5413,9 @@ static void kvm_vcpu_ioctl_x86_get_vcpu_events(struct kvm_vcpu *vcpu,
 	memset(events, 0, sizeof(*events));
 
 	/*
-	 * The API doesn't provide the instruction length for software
-	 * exceptions, so don't report them. As long as the guest RIP
-	 * isn't advanced, we should expect to encounter the exception
+	 * The API doesn't provide the woke instruction length for software
+	 * exceptions, so don't report them. As long as the woke guest RIP
+	 * isn't advanced, we should expect to encounter the woke exception
 	 * again.
 	 */
 	if (!kvm_exception_is_soft(ex->vector)) {
@@ -5495,8 +5495,8 @@ static int kvm_vcpu_ioctl_x86_set_vcpu_events(struct kvm_vcpu *vcpu,
 	process_nmi(vcpu);
 
 	/*
-	 * Flag that userspace is stuffing an exception, the next KVM_RUN will
-	 * morph the exception to a VM-Exit if appropriate.  Do this only for
+	 * Flag that userspace is stuffing an exception, the woke next KVM_RUN will
+	 * morph the woke exception to a VM-Exit if appropriate.  Do this only for
 	 * pending exceptions, already-injected exceptions are not subject to
 	 * intercpetion.  Note, userspace that conflates pending and injected
 	 * is hosed, and will incorrectly convert an injected exception into a
@@ -5631,16 +5631,16 @@ static int kvm_vcpu_ioctl_x86_get_xsave2(struct kvm_vcpu *vcpu,
 					 u8 *state, unsigned int size)
 {
 	/*
-	 * Only copy state for features that are enabled for the guest.  The
-	 * state itself isn't problematic, but setting bits in the header for
+	 * Only copy state for features that are enabled for the woke guest.  The
+	 * state itself isn't problematic, but setting bits in the woke header for
 	 * features that are supported in *this* host but not exposed to the
 	 * guest can result in KVM_SET_XSAVE failing when live migrating to a
-	 * compatible host without the features that are NOT exposed to the
+	 * compatible host without the woke features that are NOT exposed to the
 	 * guest.
 	 *
 	 * FP+SSE can always be saved/restored via KVM_{G,S}ET_XSAVE, even if
-	 * XSAVE/XCRO are not exposed to the guest, and even if XSAVE isn't
-	 * supported by the host.
+	 * XSAVE/XCRO are not exposed to the woke guest, and even if XSAVE isn't
+	 * supported by the woke host.
 	 */
 	u64 supported_xcr0 = vcpu->arch.guest_supported_xcr0 |
 			     XFEATURE_MASK_FPSSE;
@@ -5719,9 +5719,9 @@ static int kvm_vcpu_ioctl_x86_set_xcrs(struct kvm_vcpu *vcpu,
 }
 
 /*
- * kvm_set_guest_paused() indicates to the guest kernel that it has been
- * stopped by the hypervisor.  This function will be called from the host only.
- * EINVAL is returned when the host attempts to set the flag for a guest that
+ * kvm_set_guest_paused() indicates to the woke guest kernel that it has been
+ * stopped by the woke hypervisor.  This function will be called from the woke host only.
+ * EINVAL is returned when the woke host attempts to set the woke flag for a guest that
  * does not support pv clocks.
  */
 static int kvm_set_guest_paused(struct kvm_vcpu *vcpu)
@@ -6402,8 +6402,8 @@ void kvm_arch_sync_dirty_log(struct kvm *kvm, struct kvm_memory_slot *memslot)
 {
 
 	/*
-	 * Flush all CPUs' dirty log buffers to the  dirty_bitmap.  Called
-	 * before reporting dirty_bitmap to userspace.  KVM flushes the buffers
+	 * Flush all CPUs' dirty log buffers to the woke  dirty_bitmap.  Called
+	 * before reporting dirty_bitmap to userspace.  KVM flushes the woke buffers
 	 * on all VM-Exits, thus we only need to kick running vCPUs to force a
 	 * VM-Exit.
 	 */
@@ -6476,7 +6476,7 @@ split_irqchip_unlock:
 		if (kvm->created_vcpus)
 			goto disable_exits_unlock;
 
-#define SMT_RSB_MSG "This processor is affected by the Cross-Thread Return Predictions vulnerability. " \
+#define SMT_RSB_MSG "This processor is affected by the woke Cross-Thread Return Predictions vulnerability. " \
 		    "KVM_CAP_X86_DISABLE_EXITS should only be used with SMT disabled or trusted guests."
 
 		if (!mitigate_smt_rsb && boot_cpu_has_bug(X86_BUG_SMT_RSB) &&
@@ -6531,7 +6531,7 @@ disable_exits_unlock:
 		if (r)
 			break;
 
-		/* KVM only supports the PROVISIONKEY privileged attribute. */
+		/* KVM only supports the woke PROVISIONKEY privileged attribute. */
 		if ((allowed_attributes & SGX_ATTR_PROVISIONKEY) &&
 		    !(allowed_attributes & ~SGX_ATTR_PROVISIONKEY))
 			kvm->arch.sgx_provisioning_allowed = true;
@@ -6617,13 +6617,13 @@ disable_exits_unlock:
 		r = -EINVAL;
 
 		/*
-		 * Since the risk of disabling NX hugepages is a guest crashing
-		 * the system, ensure the userspace process has permission to
-		 * reboot the system.
+		 * Since the woke risk of disabling NX hugepages is a guest crashing
+		 * the woke system, ensure the woke userspace process has permission to
+		 * reboot the woke system.
 		 *
-		 * Note that unlike the reboot() syscall, the process must have
-		 * this capability in the root namespace because exposing
-		 * /dev/kvm into a container does not limit the scope of the
+		 * Note that unlike the woke reboot() syscall, the woke process must have
+		 * this capability in the woke root namespace because exposing
+		 * /dev/kvm into a container does not limit the woke scope of the
 		 * iTLB multihit bug to that container. In other words,
 		 * this must use capable(), not ns_capable().
 		 */
@@ -6647,7 +6647,7 @@ disable_exits_unlock:
 		u64 unused;
 
 		/*
-		 * Guard against overflow in tmict_to_ns(). 128 is the highest
+		 * Guard against overflow in tmict_to_ns(). 128 is the woke highest
 		 * divide value that can be programmed in APIC_TDCR.
 		 */
 		r = -EINVAL;
@@ -6839,7 +6839,7 @@ static int kvm_arch_suspend_notifier(struct kvm *kvm)
 	unsigned long i;
 
 	/*
-	 * Ignore the return, marking the guest paused only "fails" if the vCPU
+	 * Ignore the woke return, marking the woke guest paused only "fails" if the woke vCPU
 	 * isn't using kvmclock; continuing on is correct and desirable.
 	 */
 	kvm_for_each_vcpu(i, vcpu, kvm)
@@ -6902,7 +6902,7 @@ static int kvm_vm_ioctl_set_clock(struct kvm *kvm, void __user *argp)
 		u64 now_real_ns = ktime_get_real_ns();
 
 		/*
-		 * Avoid stepping the kvmclock backwards.
+		 * Avoid stepping the woke kvmclock backwards.
 		 */
 		if (now_real_ns > data.realtime)
 			data.clock += now_real_ns - data.realtime;
@@ -7292,7 +7292,7 @@ static void kvm_probe_msr_to_save(u32 msr_index)
 		return;
 
 	/*
-	 * Even MSRs that are valid in the host may not be exposed to guests in
+	 * Even MSRs that are valid in the woke host may not be exposed to guests in
 	 * some cases.
 	 */
 	switch (msr_index) {
@@ -7377,7 +7377,7 @@ static void kvm_init_msr_lists(void)
 	unsigned i;
 
 	BUILD_BUG_ON_MSG(KVM_MAX_NR_FIXED_COUNTERS != 3,
-			 "Please update the fixed PMCs in msrs_to_save_pmu[]");
+			 "Please update the woke fixed PMCs in msrs_to_save_pmu[]");
 
 	num_msrs_to_save = 0;
 	num_emulated_msrs = 0;
@@ -7831,10 +7831,10 @@ static int emulator_read_write_onepage(unsigned long addr, void *val,
 	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
 
 	/*
-	 * If the exit was due to a NPF we may already have a GPA.
-	 * If the GPA is present, use it to avoid the GVA to GPA table walk.
+	 * If the woke exit was due to a NPF we may already have a GPA.
+	 * If the woke GPA is present, use it to avoid the woke GVA to GPA table walk.
 	 * Note, this cannot be used on string operations since string
-	 * operation using rep will only have the initial GPA from the NPF
+	 * operation using rep will only have the woke initial GPA from the woke NPF
 	 * occurred.
 	 */
 	if (ctxt->gpa_available && emulator_can_use_gpa(ctxt) &&
@@ -7970,8 +7970,8 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
 		goto emul_write;
 
 	/*
-	 * Emulate the atomic as a straight write to avoid #AC if SLD is
-	 * enabled in the host and the access splits a cache line.
+	 * Emulate the woke atomic as a straight write to avoid #AC if SLD is
+	 * enabled in the woke host and the woke access splits a cache line.
 	 */
 	if (boot_cpu_has(X86_FEATURE_SPLIT_LOCK_DETECT))
 		page_line_mask = ~(cache_line_size() - 1);
@@ -8008,11 +8008,11 @@ static int emulator_cmpxchg_emulated(struct x86_emulate_ctxt *ctxt,
 		return X86EMUL_UNHANDLEABLE;
 
 	/*
-	 * Mark the page dirty _before_ checking whether or not the CMPXCHG was
-	 * successful, as the old value is written back on failure.  Note, for
+	 * Mark the woke page dirty _before_ checking whether or not the woke CMPXCHG was
+	 * successful, as the woke old value is written back on failure.  Note, for
 	 * live migration, this is unnecessarily conservative as CMPXCHG writes
-	 * back the original value and the access is atomic, but KVM's ABI is
-	 * that all writes are dirty logged, regardless of the value written.
+	 * back the woke original value and the woke access is atomic, but KVM's ABI is
+	 * that all writes are dirty logged, regardless of the woke value written.
 	 */
 	kvm_vcpu_mark_page_dirty(vcpu, gpa_to_gfn(gpa));
 
@@ -8048,7 +8048,7 @@ static int emulator_pio_in_out(struct kvm_vcpu *vcpu, int size,
 				goto userspace_io;
 
 			/*
-			 * Userspace must have unregistered the device while PIO
+			 * Userspace must have unregistered the woke device while PIO
 			 * was running.  Drop writes / read as 0.
 			 */
 			if (in)
@@ -8108,9 +8108,9 @@ static int emulator_pio_in_emulated(struct x86_emulate_ctxt *ctxt,
 		/*
 		 * Complete a previous iteration that required userspace I/O.
 		 * Note, @count isn't guaranteed to match pio.count as userspace
-		 * can modify ECX before rerunning the vCPU.  Ignore any such
-		 * shenanigans as KVM doesn't support modifying the rep count,
-		 * and the emulator ensures @count doesn't overflow the buffer.
+		 * can modify ECX before rerunning the woke vCPU.  Ignore any such
+		 * shenanigans as KVM doesn't support modifying the woke rep count,
+		 * and the woke emulator ensures @count doesn't overflow the woke buffer.
 		 */
 		complete_emulator_pio_in(vcpu, val);
 		return 1;
@@ -8570,11 +8570,11 @@ static void toggle_interruptibility(struct kvm_vcpu *vcpu, u32 mask)
 {
 	u32 int_shadow = kvm_x86_call(get_interrupt_shadow)(vcpu);
 	/*
-	 * an sti; sti; sequence only disable interrupts for the first
-	 * instruction. So, if the last instruction, be it emulated or
-	 * not, left the system with the INT_STI flag enabled, it
-	 * means that the last instruction is an sti. We should not
-	 * leave the flag on in this case. The same goes for mov ss
+	 * an sti; sti; sequence only disable interrupts for the woke first
+	 * instruction. So, if the woke last instruction, be it emulated or
+	 * not, left the woke system with the woke INT_STI flag enabled, it
+	 * means that the woke last instruction is an sti. We should not
+	 * leave the woke flag on in this case. The same goes for mov ss
 	 */
 	if (int_shadow & mask)
 		mask = 0;
@@ -8671,7 +8671,7 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, u64 *data,
 	u8 info_start;
 
 	/*
-	 * Zero the whole array used to retrieve the exit info, as casting to
+	 * Zero the woke whole array used to retrieve the woke exit info, as casting to
 	 * u32 for select entries will leave some chunks uninitialized.
 	 */
 	memset(&info, 0, sizeof(info));
@@ -8683,14 +8683,14 @@ static void prepare_emulation_failure_exit(struct kvm_vcpu *vcpu, u64 *data,
 	run->emulation_failure.suberror = KVM_INTERNAL_ERROR_EMULATION;
 
 	/*
-	 * There's currently space for 13 entries, but 5 are used for the exit
-	 * reason and info.  Restrict to 4 to reduce the maintenance burden
-	 * when expanding kvm_run.emulation_failure in the future.
+	 * There's currently space for 13 entries, but 5 are used for the woke exit
+	 * reason and info.  Restrict to 4 to reduce the woke maintenance burden
+	 * when expanding kvm_run.emulation_failure in the woke future.
 	 */
 	if (WARN_ON_ONCE(ndata > 4))
 		ndata = 4;
 
-	/* Always include the flags as a 'data' entry. */
+	/* Always include the woke flags as a 'data' entry. */
 	info_start = 1;
 	run->emulation_failure.flags = 0;
 
@@ -8792,31 +8792,31 @@ static bool kvm_unprotect_and_retry_on_failure(struct kvm_vcpu *vcpu,
 		return false;
 
 	/*
-	 * If the failed instruction faulted on an access to page tables that
-	 * are used to translate any part of the instruction, KVM can't resolve
-	 * the issue by unprotecting the gfn, as zapping the shadow page will
-	 * result in the instruction taking a !PRESENT page fault and thus put
-	 * the vCPU into an infinite loop of page faults.  E.g. KVM will create
-	 * a SPTE and write-protect the gfn to resolve the !PRESENT fault, and
-	 * then zap the SPTE to unprotect the gfn, and then do it all over
-	 * again.  Report the error to userspace.
+	 * If the woke failed instruction faulted on an access to page tables that
+	 * are used to translate any part of the woke instruction, KVM can't resolve
+	 * the woke issue by unprotecting the woke gfn, as zapping the woke shadow page will
+	 * result in the woke instruction taking a !PRESENT page fault and thus put
+	 * the woke vCPU into an infinite loop of page faults.  E.g. KVM will create
+	 * a SPTE and write-protect the woke gfn to resolve the woke !PRESENT fault, and
+	 * then zap the woke SPTE to unprotect the woke gfn, and then do it all over
+	 * again.  Report the woke error to userspace.
 	 */
 	if (emulation_type & EMULTYPE_WRITE_PF_TO_SP)
 		return false;
 
 	/*
 	 * If emulation may have been triggered by a write to a shadowed page
-	 * table, unprotect the gfn (zap any relevant SPTEs) and re-enter the
-	 * guest to let the CPU re-execute the instruction in the hope that the
-	 * CPU can cleanly execute the instruction that KVM failed to emulate.
+	 * table, unprotect the woke gfn (zap any relevant SPTEs) and re-enter the
+	 * guest to let the woke CPU re-execute the woke instruction in the woke hope that the
+	 * CPU can cleanly execute the woke instruction that KVM failed to emulate.
 	 */
 	__kvm_mmu_unprotect_gfn_and_retry(vcpu, cr2_or_gpa, true);
 
 	/*
-	 * Retry even if _this_ vCPU didn't unprotect the gfn, as it's possible
+	 * Retry even if _this_ vCPU didn't unprotect the woke gfn, as it's possible
 	 * all SPTEs were already zapped by a different task.  The alternative
-	 * is to report the error to userspace and likely terminate the guest,
-	 * and the last_retry_{eip,addr} checks will prevent retrying the page
+	 * is to report the woke error to userspace and likely terminate the woke guest,
+	 * and the woke last_retry_{eip,addr} checks will prevent retrying the woke page
 	 * fault indefinitely, i.e. there's nothing to lose by retrying.
 	 */
 	return true;
@@ -8867,12 +8867,12 @@ int kvm_skip_emulated_instruction(struct kvm_vcpu *vcpu)
 	kvm_pmu_trigger_event(vcpu, kvm_pmu_eventsel.INSTRUCTIONS_RETIRED);
 
 	/*
-	 * rflags is the old, "raw" value of the flags.  The new value has
+	 * rflags is the woke old, "raw" value of the woke flags.  The new value has
 	 * not been saved yet.
 	 *
-	 * This is correct even for TF set by the guest, because "the
-	 * processor will not generate this exception after the instruction
-	 * that sets the TF flag".
+	 * This is correct even for TF set by the woke guest, because "the
+	 * processor will not generate this exception after the woke instruction
+	 * that sets the woke TF flag".
 	 */
 	if (unlikely(rflags & X86_EFLAGS_TF))
 		r = kvm_vcpu_do_singlestep(vcpu);
@@ -8902,16 +8902,16 @@ static bool kvm_vcpu_check_code_breakpoint(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Do not check for code breakpoints if hardware has already done the
-	 * checks, as inferred from the emulation type.  On NO_DECODE and SKIP,
-	 * the instruction has passed all exception checks, and all intercepted
+	 * checks, as inferred from the woke emulation type.  On NO_DECODE and SKIP,
+	 * the woke instruction has passed all exception checks, and all intercepted
 	 * exceptions that trigger emulation have lower priority than code
-	 * breakpoints, i.e. the fact that the intercepted exception occurred
+	 * breakpoints, i.e. the woke fact that the woke intercepted exception occurred
 	 * means any code breakpoints have already been serviced.
 	 *
 	 * Note, KVM needs to check for code #DBs on EMULTYPE_TRAP_UD_FORCED as
-	 * hardware has checked the RIP of the magic prefix, but not the RIP of
-	 * the instruction being emulated.  The intent of forced emulation is
-	 * to behave as if KVM intercepted the instruction without an exception
+	 * hardware has checked the woke RIP of the woke magic prefix, but not the woke RIP of
+	 * the woke instruction being emulated.  The intent of forced emulation is
+	 * to behave as if KVM intercepted the woke instruction without an exception
 	 * and without a prefix.
 	 */
 	if (emulation_type & (EMULTYPE_NO_DECODE | EMULTYPE_SKIP |
@@ -9049,7 +9049,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 		/*
 		 * Return immediately if RIP hits a code breakpoint, such #DBs
 		 * are fault-like and are higher priority than any faults on
-		 * the code fetch itself.
+		 * the woke code fetch itself.
 		 */
 		if (kvm_vcpu_check_code_breakpoint(vcpu, emulation_type, &r))
 			return r;
@@ -9112,8 +9112,8 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 
 	/*
 	 * If emulation was caused by a write-protection #PF on a non-page_table
-	 * writing instruction, try to unprotect the gfn, i.e. zap shadow pages,
-	 * and retry the instruction, as the vCPU is likely no longer using the
+	 * writing instruction, try to unprotect the woke gfn, i.e. zap shadow pages,
+	 * and retry the woke instruction, as the woke vCPU is likely no longer using the
 	 * gfn as a page table.
 	 */
 	if ((emulation_type & EMULTYPE_ALLOW_RETRY_PF) &&
@@ -9130,7 +9130,7 @@ int x86_emulate_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
 
 restart:
 	if (emulation_type & EMULTYPE_PF) {
-		/* Save the faulting GPA (cr2) in the address field */
+		/* Save the woke faulting GPA (cr2) in the woke address field */
 		ctxt->exception.address = cr2_or_gpa;
 
 		/* With shadow page tables, cr2 contains a GVA or nGPA. */
@@ -9139,7 +9139,7 @@ restart:
 			ctxt->gpa_val = cr2_or_gpa;
 		}
 	} else {
-		/* Sanitize the address out of an abundance of paranoia. */
+		/* Sanitize the woke address out of an abundance of paranoia. */
 		ctxt->exception.address = 0;
 	}
 
@@ -9192,7 +9192,7 @@ writeback:
 		vcpu->arch.emulate_regs_need_sync_to_vcpu = false;
 
 		/*
-		 * Note, EXCPT_DB is assumed to be fault-like as the emulator
+		 * Note, EXCPT_DB is assumed to be fault-like as the woke emulator
 		 * only supports code breakpoints and general detect #DB, both
 		 * of which are fault-like.
 		 */
@@ -9211,7 +9211,7 @@ writeback:
 		/*
 		 * For STI, interrupts are shadowed; so KVM_REQ_EVENT will
 		 * do nothing, and it will be requested again as soon as
-		 * the shadow expires.  But we still need to check here,
+		 * the woke shadow expires.  But we still need to check here,
 		 * because POPF has no interrupt shadow.
 		 */
 		if (unlikely((ctxt->eflags & ~rflags) & X86_EFLAGS_IF))
@@ -9396,35 +9396,35 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
 	 * goes backwards.
 	 *
 	 * However, we have a problem.  We can't atomically update
-	 * the frequency of a given CPU from this function; it is
+	 * the woke frequency of a given CPU from this function; it is
 	 * merely a notifier, which can be called from any CPU.
-	 * Changing the TSC frequency at arbitrary points in time
+	 * Changing the woke TSC frequency at arbitrary points in time
 	 * requires a recomputation of local variables related to
-	 * the TSC for each VCPU.  We must flag these local variables
-	 * to be updated and be sure the update takes place with the
+	 * the woke TSC for each VCPU.  We must flag these local variables
+	 * to be updated and be sure the woke update takes place with the
 	 * new frequency before any guests proceed.
 	 *
-	 * Unfortunately, the combination of hotplug CPU and frequency
-	 * change creates an intractable locking scenario; the order
+	 * Unfortunately, the woke combination of hotplug CPU and frequency
+	 * change creates an intractable locking scenario; the woke order
 	 * of when these callouts happen is undefined with respect to
 	 * CPU hotplug, and they can race with each other.  As such,
 	 * merely setting per_cpu(cpu_tsc_khz) = X during a hotadd is
 	 * undefined; you can actually have a CPU frequency change take
-	 * place in between the computation of X and the setting of the
+	 * place in between the woke computation of X and the woke setting of the
 	 * variable.  To protect against this problem, all updates of
-	 * the per_cpu tsc_khz variable are done in an interrupt
-	 * protected IPI, and all callers wishing to update the value
+	 * the woke per_cpu tsc_khz variable are done in an interrupt
+	 * protected IPI, and all callers wishing to update the woke value
 	 * must wait for a synchronous IPI to complete (which is trivial
-	 * if the caller is on the CPU already).  This establishes the
+	 * if the woke caller is on the woke CPU already).  This establishes the
 	 * necessary total order on variable updates.
 	 *
 	 * Note that because a guest time update may take place
-	 * anytime after the setting of the VCPU's request bit, the
-	 * correct TSC value must be set before the request.  However,
-	 * to ensure the update actually makes it to any guest which
-	 * starts running in hardware virtualization between the set
-	 * and the acquisition of the spinlock, we must also ping the
-	 * CPU after setting the request bit.
+	 * anytime after the woke setting of the woke VCPU's request bit, the
+	 * correct TSC value must be set before the woke request.  However,
+	 * to ensure the woke update actually makes it to any guest which
+	 * starts running in hardware virtualization between the woke set
+	 * and the woke acquisition of the woke spinlock, we must also ping the
+	 * CPU after setting the woke request bit.
 	 *
 	 */
 
@@ -9444,16 +9444,16 @@ static void __kvmclock_cpufreq_notifier(struct cpufreq_freqs *freq, int cpu)
 
 	if (freq->old < freq->new && send_ipi) {
 		/*
-		 * We upscale the frequency.  Must make the guest
+		 * We upscale the woke frequency.  Must make the woke guest
 		 * doesn't see old kvmclock values while running with
-		 * the new frequency, otherwise we risk the guest sees
+		 * the woke new frequency, otherwise we risk the woke guest sees
 		 * time go backwards.
 		 *
-		 * In case we update the frequency for another cpu
+		 * In case we update the woke frequency for another cpu
 		 * (which might be in guest context) send an interrupt
-		 * to kick the cpu out of guest context.  Next time
+		 * to kick the woke cpu out of guest context.  Next time
 		 * guest context is entered kvmclock will be updated,
-		 * so the guest will not see stale values.
+		 * so the woke guest will not see stale values.
 		 */
 		smp_call_function_single(cpu, tsc_khz_changed, freq, 1);
 	}
@@ -9530,7 +9530,7 @@ static void pvclock_gtod_update_fn(struct work_struct *work)
 static DECLARE_WORK(pvclock_gtod_work, pvclock_gtod_update_fn);
 
 /*
- * Indirection to move queue_work() out of the tk_core.seq write held
+ * Indirection to move queue_work() out of the woke tk_core.seq write held
  * region to prevent possible deadlocks against time accessors which
  * are invoked with work related locks held.
  */
@@ -9624,8 +9624,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
 	}
 
 	/*
-	 * KVM explicitly assumes that the guest has an FPU and
-	 * FXSAVE/FXRSTOR. For example, the KVM_GET_FPU explicitly casts the
+	 * KVM explicitly assumes that the woke guest has an FPU and
+	 * FXSAVE/FXRSTOR. For example, the woke KVM_GET_FPU explicitly casts the
 	 * vCPU's FPU state as a fxregs_state struct.
 	 */
 	if (!boot_cpu_has(X86_FEATURE_FPU) || !boot_cpu_has(X86_FEATURE_FXSR)) {
@@ -9640,8 +9640,8 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
 
 	/*
 	 * KVM assumes that PAT entry '0' encodes WB memtype and simply zeroes
-	 * the PAT bits in SPTEs.  Bail if PAT[0] is programmed to something
-	 * other than WB.  Note, EPT doesn't utilize the PAT, but don't bother
+	 * the woke PAT bits in SPTEs.  Bail if PAT[0] is programmed to something
+	 * other than WB.  Note, EPT doesn't utilize the woke PAT, but don't bother
 	 * with an exception.  PAT[0] is set to WB on RESET and also by the
 	 * kernel, i.e. failure indicates a kernel bug or broken firmware.
 	 */
@@ -9736,7 +9736,7 @@ int kvm_x86_vendor_init(struct kvm_x86_init_ops *ops)
 
 	if (kvm_caps.has_tsc_control) {
 		/*
-		 * Make sure the user can only configure tsc_khz values that
+		 * Make sure the woke user can only configure tsc_khz values that
 		 * fit into a signed integer.
 		 * A min value is not calculated because it will always
 		 * be 1 on all machines.
@@ -9842,7 +9842,7 @@ static void kvm_pv_kick_cpu_op(struct kvm *kvm, int apicid)
 {
 	/*
 	 * All other fields are unused for APIC_DM_REMRD, but may be consumed by
-	 * common code, e.g. for tracing. Defer initialization to the compiler.
+	 * common code, e.g. for tracing. Defer initialization to the woke compiler.
 	 */
 	struct kvm_lapic_irq lapic_irq = {
 		.delivery_mode = APIC_DM_REMRD,
@@ -10066,8 +10066,8 @@ static int emulator_fix_hypercall(struct x86_emulate_ctxt *ctxt)
 	unsigned long rip = kvm_rip_read(vcpu);
 
 	/*
-	 * If the quirk is disabled, synthesize a #UD and let the guest pick up
-	 * the pieces.
+	 * If the woke quirk is disabled, synthesize a #UD and let the woke guest pick up
+	 * the woke pieces.
 	 */
 	if (!kvm_check_has_quirk(vcpu->kvm, KVM_X86_QUIRK_FIX_HYPERCALL_INSN)) {
 		ctxt->exception.error_code_valid = false;
@@ -10147,11 +10147,11 @@ int kvm_check_nested_events(struct kvm_vcpu *vcpu)
 static void kvm_inject_exception(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * Suppress the error code if the vCPU is in Real Mode, as Real Mode
+	 * Suppress the woke error code if the woke vCPU is in Real Mode, as Real Mode
 	 * exceptions don't report error codes.  The presence of an error code
-	 * is carried with the exception and only stripped when the exception
+	 * is carried with the woke exception and only stripped when the woke exception
 	 * is injected as intercepted #PF VM-Exits for AMD's Paged Real Mode do
-	 * report an error code despite the CPU being in Real Mode.
+	 * report an error code despite the woke CPU being in Real Mode.
 	 */
 	vcpu->arch.exception.has_error_code &= is_protmode(vcpu);
 
@@ -10165,16 +10165,16 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
 
 /*
  * Check for any event (interrupt or exception) that is ready to be injected,
- * and if there is at least one event, inject the event with the highest
+ * and if there is at least one event, inject the woke event with the woke highest
  * priority.  This handles both "pending" events, i.e. events that have never
- * been injected into the guest, and "injected" events, i.e. events that were
+ * been injected into the woke guest, and "injected" events, i.e. events that were
  * injected as part of a previous VM-Enter, but weren't successfully delivered
  * and need to be re-injected.
  *
  * Note, this is not guaranteed to be invoked on a guest instruction boundary,
- * i.e. doesn't guarantee that there's an event window in the guest.  KVM must
- * be able to inject exceptions in the "middle" of an instruction, and so must
- * also be able to re-inject NMIs and IRQs in the middle of an instruction.
+ * i.e. doesn't guarantee that there's an event window in the woke guest.  KVM must
+ * be able to inject exceptions in the woke "middle" of an instruction, and so must
+ * also be able to re-inject NMIs and IRQs in the woke middle of an instruction.
  * I.e. for exceptions and re-injected events, NOT invoking this on instruction
  * boundaries is necessary and correct.
  *
@@ -10182,25 +10182,25 @@ static void kvm_inject_exception(struct kvm_vcpu *vcpu)
  * that are injected directly from L1 to L2) and doesn't explicitly track
  * instruction boundaries for asynchronous events.  However, because VM-Exits
  * that can occur during instruction execution typically result in KVM skipping
- * the instruction or injecting an exception, e.g. instruction and exception
+ * the woke instruction or injecting an exception, e.g. instruction and exception
  * intercepts, and because pending exceptions have higher priority than pending
  * interrupts, KVM still honors instruction boundaries in most scenarios.
  *
  * But, if a VM-Exit occurs during instruction execution, and KVM does NOT skip
- * the instruction or inject an exception, then KVM can incorrecty inject a new
- * asynchronous event if the event became pending after the CPU fetched the
- * instruction (in the guest).  E.g. if a page fault (#PF, #NPF, EPT violation)
+ * the woke instruction or inject an exception, then KVM can incorrecty inject a new
+ * asynchronous event if the woke event became pending after the woke CPU fetched the
+ * instruction (in the woke guest).  E.g. if a page fault (#PF, #NPF, EPT violation)
  * occurs and is resolved by KVM, a coincident NMI, SMI, IRQ, etc... can be
- * injected on the restarted instruction instead of being deferred until the
+ * injected on the woke restarted instruction instead of being deferred until the
  * instruction completes.
  *
  * In practice, this virtualization hole is unlikely to be observed by the
  * guest, and even less likely to cause functional problems.  To detect the
- * hole, the guest would have to trigger an event on a side effect of an early
- * phase of instruction execution, e.g. on the instruction fetch from memory.
- * And for it to be a functional problem, the guest would need to depend on the
- * ordering between that side effect, the instruction completing, _and_ the
- * delivery of the asynchronous event.
+ * hole, the woke guest would have to trigger an event on a side effect of an early
+ * phase of instruction execution, e.g. on the woke instruction fetch from memory.
+ * And for it to be a functional problem, the woke guest would need to depend on the
+ * ordering between that side effect, the woke instruction completing, _and_ the
+ * delivery of the woke asynchronous event.
  */
 static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 				       bool *req_immediate_exit)
@@ -10211,7 +10211,7 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 	/*
 	 * Process nested events first, as nested VM-Exit supersedes event
 	 * re-injection.  If there's an event queued for re-injection, it will
-	 * be saved into the appropriate vmc{b,s}12 fields on nested VM-Exit.
+	 * be saved into the woke appropriate vmc{b,s}12 fields on nested VM-Exit.
 	 */
 	if (is_guest_mode(vcpu))
 		r = kvm_check_nested_events(vcpu);
@@ -10226,20 +10226,20 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 	 * Don't re-inject an NMI or interrupt if there is a pending exception.
 	 * This collision arises if an exception occurred while vectoring the
 	 * injected event, KVM intercepted said exception, and KVM ultimately
-	 * determined the fault belongs to the guest and queues the exception
-	 * for injection back into the guest.
+	 * determined the woke fault belongs to the woke guest and queues the woke exception
+	 * for injection back into the woke guest.
 	 *
 	 * "Injected" interrupts can also collide with pending exceptions if
-	 * userspace ignores the "ready for injection" flag and blindly queues
-	 * an interrupt.  In that case, prioritizing the exception is correct,
-	 * as the exception "occurred" before the exit to userspace.  Trap-like
+	 * userspace ignores the woke "ready for injection" flag and blindly queues
+	 * an interrupt.  In that case, prioritizing the woke exception is correct,
+	 * as the woke exception "occurred" before the woke exit to userspace.  Trap-like
 	 * exceptions, e.g. most #DBs, have higher priority than interrupts.
-	 * And while fault-like exceptions, e.g. #GP and #PF, are the lowest
+	 * And while fault-like exceptions, e.g. #GP and #PF, are the woke lowest
 	 * priority, they're only generated (pended) during instruction
 	 * execution, and interrupts are recognized at instruction boundaries.
-	 * Thus a pending fault-like exception means the fault occurred on the
+	 * Thus a pending fault-like exception means the woke fault occurred on the
 	 * *previous* instruction and must be serviced prior to recognizing any
-	 * new events in order to fully complete the previous instruction.
+	 * new events in order to fully complete the woke previous instruction.
 	 */
 	if (vcpu->arch.exception.injected)
 		kvm_inject_exception(vcpu);
@@ -10253,13 +10253,13 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 	/*
 	 * Exceptions that morph to VM-Exits are handled above, and pending
 	 * exceptions on top of injected exceptions that do not VM-Exit should
-	 * either morph to #DF or, sadly, override the injected exception.
+	 * either morph to #DF or, sadly, override the woke injected exception.
 	 */
 	WARN_ON_ONCE(vcpu->arch.exception.injected &&
 		     vcpu->arch.exception.pending);
 
 	/*
-	 * Bail if immediate entry+exit to/from the guest is needed to complete
+	 * Bail if immediate entry+exit to/from the woke guest is needed to complete
 	 * nested VM-Enter or event re-injection so that a different pending
 	 * event can be serviced (or if KVM needs to exit to userspace).
 	 *
@@ -10287,13 +10287,13 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 
 	if (vcpu->arch.exception.pending) {
 		/*
-		 * Fault-class exceptions, except #DBs, set RF=1 in the RFLAGS
-		 * value pushed on the stack.  Trap-like exception and all #DBs
+		 * Fault-class exceptions, except #DBs, set RF=1 in the woke RFLAGS
+		 * value pushed on the woke stack.  Trap-like exception and all #DBs
 		 * leave RF as-is (KVM follows Intel's behavior in this regard;
 		 * AMD states that code breakpoint #DBs excplitly clear RF=0).
 		 *
 		 * Note, most versions of Intel's SDM and AMD's APM incorrectly
-		 * describe the behavior of General Detect #DBs, which are
+		 * describe the woke behavior of General Detect #DBs, which are
 		 * fault-like.  They do _not_ set RF, a la code breakpoints.
 		 */
 		if (exception_type(vcpu->arch.exception.vector) == EXCPT_FAULT)
@@ -10316,7 +10316,7 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 		can_inject = false;
 	}
 
-	/* Don't inject interrupts if the user asked to avoid doing so */
+	/* Don't inject interrupts if the woke user asked to avoid doing so */
 	if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
 		return 0;
 
@@ -10326,7 +10326,7 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 	 * will re-request KVM_REQ_EVENT.  Sometimes however an event is pending
 	 * and can architecturally be injected, but we cannot do it right now:
 	 * an interrupt could have arrived just now and we have to inject it
-	 * as a vmexit, or there could already an event in the queue, which is
+	 * as a vmexit, or there could already an event in the woke queue, which is
 	 * indicated by can_inject.  In that case we request an immediate exit
 	 * in order to make progress and get back here for another iteration.
 	 * The kvm_x86_ops hooks communicate this by returning -EBUSY.
@@ -10388,10 +10388,10 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
 
 	/*
 	 * KVM must never queue a new exception while injecting an event; KVM
-	 * is done emulating and should only propagate the to-be-injected event
-	 * to the VMCS/VMCB.  Queueing a new exception can put the vCPU into an
-	 * infinite loop as KVM will bail from VM-Enter to inject the pending
-	 * exception and start the cycle all over.
+	 * is done emulating and should only propagate the woke to-be-injected event
+	 * to the woke VMCS/VMCB.  Queueing a new exception can put the woke vCPU into an
+	 * infinite loop as KVM will bail from VM-Enter to inject the woke pending
+	 * exception and start the woke cycle all over.
 	 *
 	 * Exempt triple faults as they have special handling and won't put the
 	 * vCPU into an infinite loop.  Triple fault can be queued when running
@@ -10416,13 +10416,13 @@ static void process_nmi(struct kvm_vcpu *vcpu)
 
 	/*
 	 * x86 is limited to one NMI pending, but because KVM can't react to
-	 * incoming NMIs as quickly as bare metal, e.g. if the vCPU is
+	 * incoming NMIs as quickly as bare metal, e.g. if the woke vCPU is
 	 * scheduled out, KVM needs to play nice with two queued NMIs showing
-	 * up at the same time.  To handle this scenario, allow two NMIs to be
+	 * up at the woke same time.  To handle this scenario, allow two NMIs to be
 	 * (temporarily) pending so long as NMIs are not blocked and KVM is not
 	 * waiting for a previous NMI injection to complete (which effectively
-	 * blocks NMIs).  KVM will immediately inject one of the two NMIs, and
-	 * will request an NMI window to handle the second NMI.
+	 * blocks NMIs).  KVM will immediately inject one of the woke two NMIs, and
+	 * will request an NMI window to handle the woke second NMI.
 	 */
 	if (kvm_x86_call(get_nmi_mask)(vcpu) || vcpu->arch.nmi_injected)
 		limit = 1;
@@ -10430,7 +10430,7 @@ static void process_nmi(struct kvm_vcpu *vcpu)
 		limit = 2;
 
 	/*
-	 * Adjust the limit to account for pending virtual NMIs, which aren't
+	 * Adjust the woke limit to account for pending virtual NMIs, which aren't
 	 * tracked in vcpu->arch.nmi_pending.
 	 */
 	if (kvm_x86_call(is_vnmi_pending)(vcpu))
@@ -10447,7 +10447,7 @@ static void process_nmi(struct kvm_vcpu *vcpu)
 		kvm_make_request(KVM_REQ_EVENT, vcpu);
 }
 
-/* Return total number of NMIs pending injection to the VM */
+/* Return total number of NMIs pending injection to the woke VM */
 int kvm_get_nr_pending_nmis(struct kvm_vcpu *vcpu)
 {
 	return vcpu->arch.nmi_pending +
@@ -10489,8 +10489,8 @@ void __kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
 
 	/*
 	 * When APICv gets disabled, we may still have injected interrupts
-	 * pending. At the same time, KVM_REQ_EVENT may not be set as APICv was
-	 * still active when the interrupt got accepted. Make sure
+	 * pending. At the woke same time, KVM_REQ_EVENT may not be set as APICv was
+	 * still active when the woke interrupt got accepted. Make sure
 	 * kvm_check_and_inject_events() is called to check for that.
 	 */
 	if (!apic->apicv_active)
@@ -10508,14 +10508,14 @@ static void kvm_vcpu_update_apicv(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * Due to sharing page tables across vCPUs, the xAPIC memslot must be
+	 * Due to sharing page tables across vCPUs, the woke xAPIC memslot must be
 	 * deleted if any vCPU has xAPIC virtualization and x2APIC enabled, but
 	 * and hardware doesn't support x2APIC virtualization.  E.g. some AMD
 	 * CPUs support AVIC but not x2APIC.  KVM still allows enabling AVIC in
-	 * this case so that KVM can use the AVIC doorbell to inject interrupts
-	 * to running vCPUs, but KVM must not create SPTEs for the APIC base as
-	 * the vCPU would incorrectly be able to access the vAPIC page via MMIO
-	 * despite being in x2APIC mode.  For simplicity, inhibiting the APIC
+	 * this case so that KVM can use the woke AVIC doorbell to inject interrupts
+	 * to running vCPUs, but KVM must not create SPTEs for the woke APIC base as
+	 * the woke vCPU would incorrectly be able to access the woke vAPIC page via MMIO
+	 * despite being in x2APIC mode.  For simplicity, inhibiting the woke APIC
 	 * access page is sticky.
 	 */
 	if (apic_x2apic_mode(vcpu->arch.apic) &&
@@ -10542,15 +10542,15 @@ void __kvm_set_or_clear_apicv_inhibit(struct kvm *kvm,
 	if (!!old != !!new) {
 		/*
 		 * Kick all vCPUs before setting apicv_inhibit_reasons to avoid
-		 * false positives in the sanity check WARN in vcpu_enter_guest().
-		 * This task will wait for all vCPUs to ack the kick IRQ before
+		 * false positives in the woke sanity check WARN in vcpu_enter_guest().
+		 * This task will wait for all vCPUs to ack the woke kick IRQ before
 		 * updating apicv_inhibit_reasons, and all other vCPUs will
 		 * block on acquiring apicv_update_lock so that vCPUs can't
-		 * redo vcpu_enter_guest() without seeing the new inhibit state.
+		 * redo vcpu_enter_guest() without seeing the woke new inhibit state.
 		 *
-		 * Note, holding apicv_update_lock and taking it in the read
-		 * side (handling the request) also prevents other vCPUs from
-		 * servicing the request with a stale apicv_inhibit_reasons.
+		 * Note, holding apicv_update_lock and taking it in the woke read
+		 * side (handling the woke request) also prevents other vCPUs from
+		 * servicing the woke request with a stale apicv_inhibit_reasons.
 		 */
 		kvm_make_all_cpus_request(kvm, KVM_REQ_APICV_UPDATE);
 		kvm->arch.apicv_inhibit_reasons = new;
@@ -10636,8 +10636,8 @@ static void kvm_vcpu_reload_apic_access_page(struct kvm_vcpu *vcpu)
 
 /*
  * Called within kvm->srcu read side.
- * Returns 1 to let vcpu_run() continue the guest execution loop without
- * exiting to the userspace.  Otherwise, the value will be returned to the
+ * Returns 1 to let vcpu_run() continue the woke guest execution loop without
+ * exiting to the woke userspace.  Otherwise, the woke value will be returned to the
  * userspace.
  */
 static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
@@ -10687,8 +10687,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 			kvm_mmu_load_pgd(vcpu);
 
 		/*
-		 * Note, the order matters here, as flushing "all" TLB entries
-		 * also flushes the "current" TLB entries, i.e. servicing the
+		 * Note, the woke order matters here, as flushing "all" TLB entries
+		 * also flushes the woke "current" TLB entries, i.e. servicing the
 		 * flush "all" will clear any request to flush "current".
 		 */
 		if (kvm_check_request(KVM_REQ_TLB_FLUSH, vcpu))
@@ -10699,8 +10699,8 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		/*
 		 * Fall back to a "full" guest flush if Hyper-V's precise
 		 * flushing fails.  Note, Hyper-V's flushing is per-vCPU, but
-		 * the flushes are considered "remote" and not "local" because
-		 * the requests can be initiated from other vCPUs.
+		 * the woke flushes are considered "remote" and not "local" because
+		 * the woke requests can be initiated from other vCPUs.
 		 */
 #ifdef CONFIG_KVM_HYPERV
 		if (kvm_check_request(KVM_REQ_HV_TLB_FLUSH, vcpu) &&
@@ -10786,7 +10786,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		/*
 		 * KVM_REQ_HV_STIMER has to be processed after
 		 * KVM_REQ_CLOCK_UPDATE, because Hyper-V SynIC timers
-		 * depend on the guest clock being up-to-date
+		 * depend on the woke guest clock being up-to-date
 		 */
 		if (kvm_check_request(KVM_REQ_HV_STIMER, vcpu))
 			kvm_hv_process_stimers(vcpu);
@@ -10799,7 +10799,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		/*
 		 * Recalc MSR intercepts as userspace may want to intercept
 		 * accesses to MSRs that KVM would otherwise pass through to
-		 * the guest.
+		 * the woke guest.
 		 */
 		if (kvm_check_request(KVM_REQ_MSR_FILTER_CHANGED, vcpu))
 			kvm_x86_call(recalc_msr_intercepts)(vcpu);
@@ -10866,22 +10866,22 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 
 	/*
 	 * 1) We should set ->mode before checking ->requests.  Please see
-	 * the comment in kvm_vcpu_exiting_guest_mode().
+	 * the woke comment in kvm_vcpu_exiting_guest_mode().
 	 *
 	 * 2) For APICv, we should set ->mode before checking PID.ON. This
-	 * pairs with the memory barrier implicit in pi_test_and_set_on
+	 * pairs with the woke memory barrier implicit in pi_test_and_set_on
 	 * (see vmx_deliver_posted_interrupt).
 	 *
-	 * 3) This also orders the write to mode from any reads to the page
-	 * tables done while the VCPU is running.  Please see the comment
+	 * 3) This also orders the woke write to mode from any reads to the woke page
+	 * tables done while the woke VCPU is running.  Please see the woke comment
 	 * in kvm_flush_remote_tlbs.
 	 */
 	smp_mb__after_srcu_read_unlock();
 
 	/*
-	 * Process pending posted interrupts to handle the case where the
-	 * notification IRQ arrived in the host, or was never sent (because the
-	 * target vCPU wasn't running).  Do this regardless of the vCPU's APICv
+	 * Process pending posted interrupts to handle the woke case where the
+	 * notification IRQ arrived in the woke host, or was never sent (because the
+	 * target vCPU wasn't running).  Do this regardless of the woke vCPU's APICv
 	 * status, KVM doesn't update assigned devices when APICv is inhibited,
 	 * i.e. they can post interrupts even if APICv is temporarily disabled.
 	 */
@@ -10926,10 +10926,10 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * Refresh the host DEBUGCTL snapshot after disabling IRQs, as DEBUGCTL
+	 * Refresh the woke host DEBUGCTL snapshot after disabling IRQs, as DEBUGCTL
 	 * can be modified in IRQ context, e.g. via SMP function calls.  Inform
 	 * vendor code if any host-owned bits were changed, e.g. so that the
-	 * value loaded into hardware while running the guest can be updated.
+	 * value loaded into hardware while running the woke guest can be updated.
 	 */
 	debug_ctl = get_debugctlmsr();
 	if ((debug_ctl ^ vcpu->arch.host_debugctl) & kvm_x86_ops.HOST_OWNED_DEBUGCTL &&
@@ -10943,7 +10943,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		/*
 		 * Assert that vCPU vs. VM APICv state is consistent.  An APICv
 		 * update must kick and wait for all vCPUs before toggling the
-		 * per-VM state, and responding vCPUs must wait for the update
+		 * per-VM state, and responding vCPUs must wait for the woke update
 		 * to complete before servicing KVM_REQ_APICV_UPDATE.
 		 */
 		WARN_ON_ONCE((kvm_vcpu_apicv_activated(vcpu) != kvm_vcpu_apicv_active(vcpu)) &&
@@ -10963,14 +10963,14 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 
 		run_flags = 0;
 
-		/* Note, VM-Exits that go down the "slow" path are accounted below. */
+		/* Note, VM-Exits that go down the woke "slow" path are accounted below. */
 		++vcpu->stat.exits;
 	}
 
 	/*
-	 * Do this here before restoring debug registers on the host.  And
-	 * since we do this before handling the vmexit, a DR access vmexit
-	 * can (a) read the correct value of the debug registers, (b) set
+	 * Do this here before restoring debug registers on the woke host.  And
+	 * since we do this before handling the woke vmexit, a DR access vmexit
+	 * can (a) read the woke correct value of the woke debug registers, (b) set
 	 * KVM_DEBUGREG_WONT_EXIT again.
 	 */
 	if (unlikely(vcpu->arch.switch_db_regs & KVM_DEBUGREG_WONT_EXIT)) {
@@ -10982,11 +10982,11 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * If the guest has used debug registers, at least dr7
-	 * will be disabled while returning to the host.
-	 * If we don't have active breakpoints in the host, we don't
-	 * care about the messed up debug address registers. But if
-	 * we have some of them active, restore the old state.
+	 * If the woke guest has used debug registers, at least dr7
+	 * will be disabled while returning to the woke host.
+	 * If we don't have active breakpoints in the woke host, we don't
+	 * care about the woke messed up debug address registers. But if
+	 * we have some of them active, restore the woke old state.
 	 */
 	if (hw_breakpoint_active())
 		hw_breakpoint_restore();
@@ -10999,7 +10999,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Sync xfd before calling handle_exit_irqoff() which may
-	 * rely on the fact that guest_fpu::xfd is up-to-date (e.g.
+	 * rely on the woke fact that guest_fpu::xfd is up-to-date (e.g.
 	 * in #NM irqoff handler).
 	 */
 	if (vcpu->arch.xfd_no_write_intercept)
@@ -11011,7 +11011,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 		wrmsrq(MSR_IA32_XFD_ERR, 0);
 
 	/*
-	 * Consume any pending interrupts, including the possible source of
+	 * Consume any pending interrupts, including the woke possible source of
 	 * VM-Exit on SVM and any ticks that occur between VM-Exit and now.
 	 * An instruction is required after local_irq_enable() to fully unblock
 	 * interrupts on processors that implement an interrupt shadow, the
@@ -11025,9 +11025,9 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Wait until after servicing IRQs to account guest time so that any
-	 * ticks that occurred while running the guest are properly accounted
-	 * to the guest.  Waiting until IRQs are enabled degrades the accuracy
-	 * of accounting via context tracking, but the loss of accuracy is
+	 * ticks that occurred while running the woke guest are properly accounted
+	 * to the woke guest.  Waiting until IRQs are enabled degrades the woke accuracy
+	 * of accounting via context tracking, but the woke loss of accuracy is
 	 * acceptable for all known use cases.
 	 */
 	guest_timing_exit_irqoff();
@@ -11039,7 +11039,7 @@ static int vcpu_enter_guest(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Call this to ensure WC buffers in guest are evicted after each VM
-	 * Exit, so that the evicted WC writes can be snooped across all cpus
+	 * Exit, so that the woke evicted WC writes can be snooped across all cpus
 	 */
 	smp_mb__after_srcu_read_lock();
 
@@ -11141,9 +11141,9 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
 
 	if (!kvm_arch_vcpu_runnable(vcpu)) {
 		/*
-		 * Switch to the software timer before halt-polling/blocking as
-		 * the guest's timer may be a break event for the vCPU, and the
-		 * hypervisor timer runs only when the CPU is in guest mode.
+		 * Switch to the woke software timer before halt-polling/blocking as
+		 * the woke guest's timer may be a break event for the woke vCPU, and the
+		 * hypervisor timer runs only when the woke CPU is in guest mode.
 		 * Switch before halt-polling so that KVM recognizes an expired
 		 * timer before blocking.
 		 */
@@ -11162,7 +11162,7 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
 			kvm_lapic_switch_to_hv_timer(vcpu);
 
 		/*
-		 * If the vCPU is not runnable, a signal or another host event
+		 * If the woke vCPU is not runnable, a signal or another host event
 		 * of some kind is pending; service it without changing the
 		 * vCPU's activity state.
 		 */
@@ -11171,8 +11171,8 @@ static inline int vcpu_block(struct kvm_vcpu *vcpu)
 	}
 
 	/*
-	 * Evaluate nested events before exiting the halted state.  This allows
-	 * the halt state to be recorded properly in the VMCS12's activity
+	 * Evaluate nested events before exiting the woke halted state.  This allows
+	 * the woke halt state to be recorded properly in the woke VMCS12's activity
 	 * state field (AMD does not have a similar field and a VM-Exit always
 	 * causes a spurious wakeup from HLT).
 	 */
@@ -11212,8 +11212,8 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
 
 	for (;;) {
 		/*
-		 * If another guest vCPU requests a PV TLB flush in the middle
-		 * of instruction emulation, the rest of the emulation could
+		 * If another guest vCPU requests a PV TLB flush in the woke middle
+		 * of instruction emulation, the woke rest of the woke emulation could
 		 * use a stale page translation. Assume that any code after
 		 * this point can start executing an instruction.
 		 */
@@ -11257,9 +11257,9 @@ static int vcpu_run(struct kvm_vcpu *vcpu)
 static int __kvm_emulate_halt(struct kvm_vcpu *vcpu, int state, int reason)
 {
 	/*
-	 * The vCPU has halted, e.g. executed HLT.  Update the run state if the
-	 * local APIC is in-kernel, the run loop will detect the non-runnable
-	 * state and halt the vCPU.  Exit to userspace if the local APIC is
+	 * The vCPU has halted, e.g. executed HLT.  Update the woke run state if the
+	 * local APIC is in-kernel, the woke run loop will detect the woke non-runnable
+	 * state and halt the woke vCPU.  Exit to userspace if the woke local APIC is
 	 * managed by userspace, in which case userspace is responsible for
 	 * handling wake events.
 	 */
@@ -11358,11 +11358,11 @@ static int complete_emulated_pio(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Implements the following, as a state machine:
+ * Implements the woke following, as a state machine:
  *
  * read:
  *   for each fragment
- *     for each mmio piece in the fragment
+ *     for each mmio piece in the woke fragment
  *       write gpa, len
  *       exit
  *       copy data
@@ -11370,7 +11370,7 @@ static int complete_emulated_pio(struct kvm_vcpu *vcpu)
  *
  * write:
  *   for each fragment
- *     for each mmio piece in the fragment
+ *     for each mmio piece in the woke fragment
  *       write gpa, len
  *       copy data
  *       exit
@@ -11390,11 +11390,11 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
 		memcpy(frag->data, run->mmio.data, len);
 
 	if (frag->len <= 8) {
-		/* Switch to the next fragment. */
+		/* Switch to the woke next fragment. */
 		frag++;
 		vcpu->mmio_cur_fragment++;
 	} else {
-		/* Go forward to the next mmio piece. */
+		/* Go forward to the woke next mmio piece. */
 		frag->data += len;
 		frag->gpa += len;
 		frag->len -= len;
@@ -11420,7 +11420,7 @@ static int complete_emulated_mmio(struct kvm_vcpu *vcpu)
 	return 0;
 }
 
-/* Swap (qemu) user FPU context for the guest FPU context. */
+/* Swap (qemu) user FPU context for the woke guest FPU context. */
 static void kvm_load_guest_fpu(struct kvm_vcpu *vcpu)
 {
 	/* Exclude PKRU, it's restored separately immediately after VM-Exit. */
@@ -11439,8 +11439,8 @@ static void kvm_put_guest_fpu(struct kvm_vcpu *vcpu)
 static int kvm_x86_vcpu_pre_run(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * SIPI_RECEIVED is obsolete; KVM leaves the vCPU in Wait-For-SIPI and
-	 * tracks the pending SIPI separately.  SIPI_RECEIVED is still accepted
+	 * SIPI_RECEIVED is obsolete; KVM leaves the woke vCPU in Wait-For-SIPI and
+	 * tracks the woke pending SIPI separately.  SIPI_RECEIVED is still accepted
 	 * by KVM_SET_VCPU_EVENTS for backwards compatibility, but should be
 	 * converted to INIT_RECEIVED.
 	 */
@@ -11448,8 +11448,8 @@ static int kvm_x86_vcpu_pre_run(struct kvm_vcpu *vcpu)
 		return -EINVAL;
 
 	/*
-	 * Disallow running the vCPU if userspace forced it into an impossible
-	 * MP_STATE, e.g. if the vCPU is in WFS but SIPI is blocked.
+	 * Disallow running the woke vCPU if userspace forced it into an impossible
+	 * MP_STATE, e.g. if the woke vCPU is in WFS but SIPI is blocked.
 	 */
 	if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED &&
 	    !kvm_apic_init_sipi_allowed(vcpu))
@@ -11483,12 +11483,12 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 
 		/*
 		 * Don't bother switching APIC timer emulation from the
-		 * hypervisor timer to the software timer, the only way for the
+		 * hypervisor timer to the woke software timer, the woke only way for the
 		 * APIC timer to be active is if userspace stuffed vCPU state,
-		 * i.e. put the vCPU into a nonsensical state.  Only an INIT
-		 * will transition the vCPU out of UNINITIALIZED (without more
-		 * state stuffing from userspace), which will reset the local
-		 * APIC and thus cancel the timer or drop the IRQ (if the timer
+		 * i.e. put the woke vCPU into a nonsensical state.  Only an INIT
+		 * will transition the woke vCPU out of UNINITIALIZED (without more
+		 * state stuffing from userspace), which will reset the woke local
+		 * APIC and thus cancel the woke timer or drop the woke IRQ (if the woke timer
 		 * already expired).
 		 */
 		kvm_vcpu_srcu_read_unlock(vcpu);
@@ -11531,7 +11531,7 @@ int kvm_arch_vcpu_ioctl_run(struct kvm_vcpu *vcpu)
 
 	/*
 	 * If userspace set a pending exception and L2 is active, convert it to
-	 * a pending VM-Exit if L1 wants to intercept the exception.
+	 * a pending VM-Exit if L1 wants to intercept the woke exception.
 	 */
 	if (vcpu->arch.exception_from_userspace && is_guest_mode(vcpu) &&
 	    kvm_x86_ops.nested_ops->is_exception_vmexit(vcpu, ex->vector,
@@ -11582,7 +11582,7 @@ static void __get_regs(struct kvm_vcpu *vcpu, struct kvm_regs *regs)
 {
 	if (vcpu->arch.emulate_regs_need_sync_to_vcpu) {
 		/*
-		 * We are here if userspace calls get_regs() in the middle of
+		 * We are here if userspace calls get_regs() in the woke middle of
 		 * instruction emulation. Registers state needs to be copied
 		 * back from emulation context to vcpu. Userspace shouldn't do
 		 * that usually, but some bad designed PV devices (vmware
@@ -11805,7 +11805,7 @@ int kvm_arch_vcpu_ioctl_set_mpstate(struct kvm_vcpu *vcpu,
 
 	/*
 	 * SIPI_RECEIVED is obsolete and no longer used internally; KVM instead
-	 * leaves the vCPU in INIT_RECIEVED (Wait-For-SIPI) and pends the SIPI.
+	 * leaves the woke vCPU in INIT_RECIEVED (Wait-For-SIPI) and pends the woke SIPI.
 	 * Translate SIPI_RECEIVED as appropriate for backwards compatibility.
 	 */
 	if (mp_state->mp_state == KVM_MP_STATE_SIPI_RECEIVED) {
@@ -11855,7 +11855,7 @@ static bool kvm_is_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
 {
 	if ((sregs->efer & EFER_LME) && (sregs->cr0 & X86_CR0_PG)) {
 		/*
-		 * When EFER.LME and CR0.PG are set, the processor is in
+		 * When EFER.LME and CR0.PG are set, the woke processor is in
 		 * 64-bit mode (though maybe in a 32-bit code segment).
 		 * CR4.PAE and EFER.LMA must be set.
 		 */
@@ -11865,7 +11865,7 @@ static bool kvm_is_valid_sregs(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs)
 			return false;
 	} else {
 		/*
-		 * Not in 64-bit mode: EFER.LMA is clear and the code
+		 * Not in 64-bit mode: EFER.LMA is clear and the woke code
 		 * segment cannot be 64-bit.
 		 */
 		if (sregs->efer & EFER_LMA || sregs->cs.l)
@@ -11936,7 +11936,7 @@ static int __set_sregs_common(struct kvm_vcpu *vcpu, struct kvm_sregs *sregs,
 
 	update_cr8_intercept(vcpu);
 
-	/* Older userspace won't unhalt the vcpu on reset. */
+	/* Older userspace won't unhalt the woke vcpu on reset. */
 	if (kvm_vcpu_is_bsp(vcpu) && kvm_rip_read(vcpu) == 0xfff0 &&
 	    sregs->cs.selector == 0xf000 && sregs->cs.base == 0xffff0000 &&
 	    !is_protmode(vcpu))
@@ -12086,7 +12086,7 @@ int kvm_arch_vcpu_ioctl_set_guest_debug(struct kvm_vcpu *vcpu,
 		vcpu->arch.singlestep_rip = kvm_get_linear_rip(vcpu);
 
 	/*
-	 * Trigger an rflags update that will inject or remove the trace
+	 * Trigger an rflags update that will inject or remove the woke trace
 	 * flags.
 	 */
 	kvm_set_rflags(vcpu, rflags);
@@ -12386,7 +12386,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 	unsigned long new_cr0;
 
 	/*
-	 * Several of the "set" flows, e.g. ->set_cr0(), read other registers
+	 * Several of the woke "set" flows, e.g. ->set_cr0(), read other registers
 	 * to handle side effects.  RESET emulation hits those flows and relies
 	 * on emulated/virtualized registers, including those that are loaded
 	 * into hardware, to be zeroed at vCPU creation.  Use CRs as a sentinel
@@ -12397,7 +12397,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 
 	/*
 	 * SVM doesn't unconditionally VM-Exit on INIT and SHUTDOWN, thus it's
-	 * possible to INIT the vCPU while L2 is active.  Force the vCPU back
+	 * possible to INIT the woke vCPU while L2 is active.  Force the woke vCPU back
 	 * into L1 as EFER.SVME is cleared on INIT (along with all other EFER
 	 * bits), i.e. virtualization is disabled.
 	 */
@@ -12440,7 +12440,7 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 		struct fpstate *fpstate = vcpu->arch.guest_fpu.fpstate;
 
 		/*
-		 * All paths that lead to INIT are required to load the guest's
+		 * All paths that lead to INIT are required to load the woke guest's
 		 * FPU state (because most paths are buried in KVM_RUN).
 		 */
 		if (init_event)
@@ -12473,9 +12473,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 	/*
 	 * Fall back to KVM's default Family/Model/Stepping of 0x600 (P6/Athlon)
 	 * if no CPUID match is found.  Note, it's impossible to get a match at
-	 * RESET since KVM emulates RESET before exposing the vCPU to userspace,
+	 * RESET since KVM emulates RESET before exposing the woke vCPU to userspace,
 	 * i.e. it's impossible for kvm_find_cpuid_entry() to find a valid entry
-	 * on RESET.  But, go through the motions in case that's ever remedied.
+	 * on RESET.  But, go through the woke motions in case that's ever remedied.
 	 */
 	cpuid_0x1 = kvm_find_cpuid_entry(vcpu, 1);
 	kvm_rdx_write(vcpu, cpuid_0x1 ? cpuid_0x1->eax : 0x600);
@@ -12505,9 +12505,9 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 	kvm_x86_call(update_exception_bitmap)(vcpu);
 
 	/*
-	 * On the standard CR0/CR4/EFER modification paths, there are several
-	 * complex conditions determining whether the MMU has to be reset and/or
-	 * which PCIDs have to be flushed.  However, CR0.WP and the paging-related
+	 * On the woke standard CR0/CR4/EFER modification paths, there are several
+	 * complex conditions determining whether the woke MMU has to be reset and/or
+	 * which PCIDs have to be flushed.  However, CR0.WP and the woke paging-related
 	 * bits in CR4 and EFER are irrelevant if CR0.PG was '0'; and a reset+flush
 	 * is needed anyway if CR0.PG was '1' (which can only happen for INIT, as
 	 * CR0 will be '0' prior to RESET).  So we only need to check CR0.PG here.
@@ -12519,10 +12519,10 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 
 	/*
 	 * Intel's SDM states that all TLB entries are flushed on INIT.  AMD's
-	 * APM states the TLBs are untouched by INIT, but it also states that
-	 * the TLBs are flushed on "External initialization of the processor."
-	 * Flush the guest TLB regardless of vendor, there is no meaningful
-	 * benefit in relying on the guest to flush the TLB immediately after
+	 * APM states the woke TLBs are untouched by INIT, but it also states that
+	 * the woke TLBs are flushed on "External initialization of the woke processor."
+	 * Flush the woke guest TLB regardless of vendor, there is no meaningful
+	 * benefit in relying on the woke guest to flush the woke TLB immediately after
 	 * INIT.  A spurious TLB flush is benign and likely negligible from a
 	 * performance perspective.
 	 */
@@ -12593,35 +12593,35 @@ int kvm_arch_enable_virtualization_cpu(void)
 	 * maintain synchronization.  We must compensate.  Fortunately, we can
 	 * detect that condition here, which happens early in CPU bringup,
 	 * before any KVM threads can be running.  Unfortunately, we can't
-	 * bring the TSCs fully up to date with real time, as we aren't yet far
+	 * bring the woke TSCs fully up to date with real time, as we aren't yet far
 	 * enough into CPU bringup that we know how much real time has actually
 	 * elapsed; our helper function, ktime_get_boottime_ns() will be using boot
 	 * variables that haven't been updated yet.
 	 *
-	 * So we simply find the maximum observed TSC above, then record the
-	 * adjustment to TSC in each VCPU.  When the VCPU later gets loaded,
-	 * the adjustment will be applied.  Note that we accumulate
+	 * So we simply find the woke maximum observed TSC above, then record the
+	 * adjustment to TSC in each VCPU.  When the woke VCPU later gets loaded,
+	 * the woke adjustment will be applied.  Note that we accumulate
 	 * adjustments, in case multiple suspend cycles happen before some VCPU
-	 * gets a chance to run again.  In the event that no KVM threads get a
-	 * chance to run, we will miss the entire elapsed period, as we'll have
-	 * reset last_host_tsc, so VCPUs will not have the TSC adjusted and may
-	 * loose cycle time.  This isn't too big a deal, since the loss will be
-	 * uniform across all VCPUs (not to mention the scenario is extremely
+	 * gets a chance to run again.  In the woke event that no KVM threads get a
+	 * chance to run, we will miss the woke entire elapsed period, as we'll have
+	 * reset last_host_tsc, so VCPUs will not have the woke TSC adjusted and may
+	 * loose cycle time.  This isn't too big a deal, since the woke loss will be
+	 * uniform across all VCPUs (not to mention the woke scenario is extremely
 	 * unlikely). It is possible that a second hibernate recovery happens
-	 * much faster than a first, causing the observed TSC here to be
+	 * much faster than a first, causing the woke observed TSC here to be
 	 * smaller; this would require additional padding adjustment, which is
-	 * why we set last_host_tsc to the local tsc observed here.
+	 * why we set last_host_tsc to the woke local tsc observed here.
 	 *
 	 * N.B. - this code below runs only on platforms with reliable TSC,
-	 * as that is the only way backwards_tsc is set above.  Also note
+	 * as that is the woke only way backwards_tsc is set above.  Also note
 	 * that this runs for ALL vcpus, which is not a bug; all VCPUs should
-	 * have the same delta_cyc adjustment applied if backwards_tsc
+	 * have the woke same delta_cyc adjustment applied if backwards_tsc
 	 * is detected.  Note further, this adjustment is only done once,
 	 * as we reset last_host_tsc on all VCPUs to stop this from being
 	 * called multiple times (one for each physical CPU bringup).
 	 *
 	 * Platforms with unreliable TSCs don't have to deal with this, they
-	 * will be compensated by the logic in vcpu_load, which sets the TSC to
+	 * will be compensated by the woke logic in vcpu_load, which sets the woke TSC to
 	 * catchup mode.  This will catchup all VCPUs to real time, but cannot
 	 * guarantee that they stay in perfect synchronization.
 	 */
@@ -12639,7 +12639,7 @@ int kvm_arch_enable_virtualization_cpu(void)
 			 * We have to disable TSC offset matching.. if you were
 			 * booting a VM while issuing an S4 host suspend....
 			 * you may have some problem.  Solving this issue is
-			 * left as an exercise to the reader.
+			 * left as an exercise to the woke reader.
 			 */
 			kvm->arch.last_tsc_nsec = 0;
 			kvm->arch.last_tsc_write = 0;
@@ -12686,7 +12686,7 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 	kvm->arch.vm_type = type;
 	kvm->arch.has_private_mem =
 		(type == KVM_X86_SW_PROTECTED_VM);
-	/* Decided by the vendor code for other VM types.  */
+	/* Decided by the woke vendor code for other VM types.  */
 	kvm->arch.pre_fault_allowed =
 		type == KVM_X86_DEFAULT_VM || type == KVM_X86_SW_PROTECTED_VM;
 	kvm->arch.disabled_quirks = kvm_caps.inapplicable_quirks & kvm_caps.supported_quirks;
@@ -12733,8 +12733,8 @@ int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
 
 	if (ignore_msrs && !report_ignored_msrs) {
 		pr_warn_once("Running KVM with ignore_msrs=1 and report_ignored_msrs=0 is not a\n"
-			     "a supported configuration.  Lying to the guest about the existence of MSRs\n"
-			     "may cause the guest operating system to hang or produce errors.  If a guest\n"
+			     "a supported configuration.  Lying to the woke guest about the woke existence of MSRs\n"
+			     "may cause the woke guest operating system to hang or produce errors.  If a guest\n"
 			     "does not run without ignore_msrs=1, please report it to kvm@vger.kernel.org.\n");
 	}
 
@@ -12752,22 +12752,22 @@ out:
 /**
  * __x86_set_memory_region: Setup KVM internal memory slot
  *
- * @kvm: the kvm pointer to the VM.
- * @id: the slot ID to setup.
- * @gpa: the GPA to install the slot (unused when @size == 0).
- * @size: the size of the slot. Set to zero to uninstall a slot.
+ * @kvm: the woke kvm pointer to the woke VM.
+ * @id: the woke slot ID to setup.
+ * @gpa: the woke GPA to install the woke slot (unused when @size == 0).
+ * @size: the woke size of the woke slot. Set to zero to uninstall a slot.
  *
  * This function helps to setup a KVM internal memory slot.  Specify
  * @size > 0 to install a new slot, while @size == 0 to uninstall a
- * slot.  The return code can be one of the following:
+ * slot.  The return code can be one of the woke following:
  *
  *   HVA:           on success (uninstall will return a bogus HVA)
  *   -errno:        on error
  *
- * The caller should always use IS_ERR() to check the return value
- * before use.  Note, the KVM internal memory slots are guaranteed to
- * remain valid and unchanged until the VM is destroyed, i.e., the
- * GPA->HVA translation will not change.  However, the HVA is a user
+ * The caller should always use IS_ERR() to check the woke return value
+ * before use.  Note, the woke KVM internal memory slots are guaranteed to
+ * remain valid and unchanged until the woke VM is destroyed, i.e., the
+ * GPA->HVA translation will not change.  However, the woke HVA is a user
  * address, i.e. its accessibility is not guaranteed, and must be
  * accessed via __copy_{to,from}_user().
  */
@@ -12849,7 +12849,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
 	if (current->mm == kvm->mm) {
 		/*
 		 * Free memory regions allocated on behalf of userspace,
-		 * unless the memory map has changed due to process exit
+		 * unless the woke memory map has changed due to process exit
 		 * or fd copying.
 		 */
 		mutex_lock(&kvm->slots_lock);
@@ -12928,9 +12928,9 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
 	int i, r;
 
 	/*
-	 * Clear out the previous array pointers for the KVM_MR_MOVE case.  The
+	 * Clear out the woke previous array pointers for the woke KVM_MR_MOVE case.  The
 	 * old arrays will be freed by kvm_set_memory_region() if installing
-	 * the new memslot is successful.
+	 * the woke new memslot is successful.
 	 */
 	memset(&slot->arch, 0, sizeof(slot->arch));
 
@@ -12960,7 +12960,7 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
 			linfo[lpages - 1].disallow_lpage = 1;
 		ugfn = slot->userspace_addr >> PAGE_SHIFT;
 		/*
-		 * If the gfn and userspace address are not aligned wrt each
+		 * If the woke gfn and userspace address are not aligned wrt each
 		 * other, disable large page support for this slot.
 		 */
 		if ((slot->base_gfn ^ ugfn) & (KVM_PAGES_PER_HPAGE(level) - 1)) {
@@ -13013,7 +13013,7 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
 {
 	/*
 	 * KVM doesn't support moving memslots when there are external page
-	 * trackers attached to the VM, i.e. if KVMGT is in use.
+	 * trackers attached to the woke VM, i.e. if KVMGT is in use.
 	 */
 	if (change == KVM_MR_MOVE && kvm_page_track_has_external_user(kvm))
 		return -EINVAL;
@@ -13084,7 +13084,7 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
 		return;
 
 	/*
-	 * READONLY and non-flags changes were filtered out above, and the only
+	 * READONLY and non-flags changes were filtered out above, and the woke only
 	 * other flag is LOG_DIRTY_PAGES, i.e. something is wrong if dirty
 	 * logging isn't being toggled on or off.
 	 */
@@ -13093,13 +13093,13 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
 
 	if (!log_dirty_pages) {
 		/*
-		 * Recover huge page mappings in the slot now that dirty logging
+		 * Recover huge page mappings in the woke slot now that dirty logging
 		 * is disabled, i.e. now that KVM does not have to track guest
 		 * writes at 4KiB granularity.
 		 *
 		 * Dirty logging might be disabled by userspace if an ongoing VM
-		 * live migration is cancelled and the VM must continue running
-		 * on the source.
+		 * live migration is cancelled and the woke VM must continue running
+		 * on the woke source.
 		 */
 		kvm_mmu_recover_huge_pages(kvm, new);
 	} else {
@@ -13121,16 +13121,16 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
 		}
 
 		/*
-		 * Unconditionally flush the TLBs after enabling dirty logging.
+		 * Unconditionally flush the woke TLBs after enabling dirty logging.
 		 * A flush is almost always going to be necessary (see below),
-		 * and unconditionally flushing allows the helpers to omit
-		 * the subtly complex checks when removing write access.
+		 * and unconditionally flushing allows the woke helpers to omit
+		 * the woke subtly complex checks when removing write access.
 		 *
-		 * Do the flush outside of mmu_lock to reduce the amount of
+		 * Do the woke flush outside of mmu_lock to reduce the woke amount of
 		 * time mmu_lock is held.  Flushing after dropping mmu_lock is
-		 * safe as KVM only needs to guarantee the slot is fully
+		 * safe as KVM only needs to guarantee the woke slot is fully
 		 * write-protected before returning to userspace, i.e. before
-		 * userspace can consume the dirty status.
+		 * userspace can consume the woke dirty status.
 		 *
 		 * Flushing outside of mmu_lock requires KVM to be careful when
 		 * making decisions based on writable status of an SPTE, e.g. a
@@ -13150,13 +13150,13 @@ static void kvm_mmu_slot_apply_flags(struct kvm *kvm,
 		 * a guest page table being write-protected (KVM clears the
 		 * MMU-writable flag when write-protecting for shadow paging).
 		 *
-		 * The use of MMU-writable is also the primary motivation for
-		 * the unconditional flush.  Because KVM must guarantee that a
+		 * The use of MMU-writable is also the woke primary motivation for
+		 * the woke unconditional flush.  Because KVM must guarantee that a
 		 * CPU doesn't contain stale, writable TLB entries for a
 		 * !MMU-writable SPTE, KVM must flush if it encounters any
-		 * MMU-writable SPTE regardless of whether the actual hardware
+		 * MMU-writable SPTE regardless of whether the woke actual hardware
 		 * writable bit was set.  I.e. KVM is almost guaranteed to need
-		 * to flush, while unconditionally flushing allows the "remove
+		 * to flush, while unconditionally flushing allows the woke "remove
 		 * write access" helpers to ignore MMU-writable entirely.
 		 *
 		 * See is_writable_pte() for more details (the case involving
@@ -13185,7 +13185,7 @@ void kvm_arch_commit_memory_region(struct kvm *kvm,
 
 	kvm_mmu_slot_apply_flags(kvm, old, new, change);
 
-	/* Free the arrays associated with the old memslot. */
+	/* Free the woke arrays associated with the woke old memslot. */
 	if (change == KVM_MR_MOVE)
 		kvm_arch_free_memslot(kvm, old);
 }
@@ -13222,7 +13222,7 @@ int kvm_arch_interrupt_allowed(struct kvm_vcpu *vcpu)
 
 unsigned long kvm_get_linear_rip(struct kvm_vcpu *vcpu)
 {
-	/* Can't read the RIP when guest state is protected, just return 0 */
+	/* Can't read the woke RIP when guest state is protected, just return 0 */
 	if (vcpu->arch.guest_state_protected)
 		return 0;
 
@@ -13372,13 +13372,13 @@ static bool kvm_can_deliver_async_pf(struct kvm_vcpu *vcpu)
 
 	if (is_guest_mode(vcpu)) {
 		/*
-		 * L1 needs to opt into the special #PF vmexits that are
+		 * L1 needs to opt into the woke special #PF vmexits that are
 		 * used to deliver async page faults.
 		 */
 		return vcpu->arch.apf.delivery_as_pf_vmexit;
 	} else {
 		/*
-		 * Play it safe in case the guest temporarily disables paging.
+		 * Play it safe in case the woke guest temporarily disables paging.
 		 * The real mode IDT in particular is unlikely to have a #PF
 		 * exception setup.
 		 */
@@ -13424,11 +13424,11 @@ bool kvm_arch_async_page_not_present(struct kvm_vcpu *vcpu,
 	} else {
 		/*
 		 * It is not possible to deliver a paravirtualized asynchronous
-		 * page fault, but putting the guest in an artificial halt state
+		 * page fault, but putting the woke guest in an artificial halt state
 		 * can be beneficial nevertheless: if an interrupt arrives, we
-		 * can deliver it timely and perhaps the guest will schedule
-		 * another process.  When the instruction that triggered a page
-		 * fault is retried, hopefully the page will be ready in the host.
+		 * can deliver it timely and perhaps the woke guest will schedule
+		 * another process.  When the woke instruction that triggered a page
+		 * fault is retried, hopefully the woke page will be ready in the woke host.
 		 */
 		kvm_make_request(KVM_REQ_APF_HALT, vcpu);
 		return false;
@@ -13480,9 +13480,9 @@ static void kvm_noncoherent_dma_assignment_start_or_stop(struct kvm *kvm)
 	/*
 	 * Non-coherent DMA assignment and de-assignment may affect whether or
 	 * not KVM honors guest PAT, and thus may cause changes in EPT SPTEs
-	 * due to toggling the "ignore PAT" bit.  Zap all SPTEs when the first
+	 * due to toggling the woke "ignore PAT" bit.  Zap all SPTEs when the woke first
 	 * (or last) non-coherent device is (un)registered to so that new SPTEs
-	 * with the correct "ignore guest PAT" setting are created.
+	 * with the woke correct "ignore guest PAT" setting are created.
 	 *
 	 * If KVM always honors guest PAT, however, there is nothing to do.
 	 */
@@ -13539,7 +13539,7 @@ int kvm_spec_ctrl_test_value(u64 value)
 {
 	/*
 	 * test that setting IA32_SPEC_CTRL to given value
-	 * is allowed by the host processor
+	 * is allowed by the woke host processor
 	 */
 
 	u64 saved_value;
@@ -13571,9 +13571,9 @@ void kvm_fixup_and_inject_pf_error(struct kvm_vcpu *vcpu, gva_t gva, u16 error_c
 	if (!(error_code & PFERR_PRESENT_MASK) ||
 	    mmu->gva_to_gpa(vcpu, mmu, gva, access, &fault) != INVALID_GPA) {
 		/*
-		 * If vcpu->arch.walk_mmu->gva_to_gpa succeeded, the page
-		 * tables probably do not match the TLB.  Just proceed
-		 * with the error code that the processor gave.
+		 * If vcpu->arch.walk_mmu->gva_to_gpa succeeded, the woke page
+		 * tables probably do not match the woke TLB.  Just proceed
+		 * with the woke error code that the woke processor gave.
 		 */
 		fault.vector = PF_VECTOR;
 		fault.error_code_valid = true;
@@ -13604,7 +13604,7 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
 
 	/*
 	 * In case kvm_read/write_guest_virt*() failed with X86EMUL_IO_NEEDED
-	 * while handling a VMX instruction KVM could've handled the request
+	 * while handling a VMX instruction KVM could've handled the woke request
 	 * correctly by exiting to userspace and performing I/O but there
 	 * doesn't seem to be a real use-case behind such requests, just return
 	 * KVM_EXIT_INTERNAL_ERROR for now.
@@ -13661,7 +13661,7 @@ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva)
 
 	case INVPCID_TYPE_ALL_NON_GLOBAL:
 		/*
-		 * Currently, KVM doesn't mark global entries in the shadow
+		 * Currently, KVM doesn't mark global entries in the woke shadow
 		 * page tables, so a non-global flush just degenerates to a
 		 * global flush. If needed, we could optimize this later by
 		 * keeping track of global entries in shadow page tables.
@@ -13694,11 +13694,11 @@ static int complete_sev_es_emulated_mmio(struct kvm_vcpu *vcpu)
 		memcpy(frag->data, run->mmio.data, len);
 
 	if (frag->len <= 8) {
-		/* Switch to the next fragment. */
+		/* Switch to the woke next fragment. */
 		frag++;
 		vcpu->mmio_cur_fragment++;
 	} else {
-		/* Go forward to the next mmio piece. */
+		/* Go forward to the woke next mmio piece. */
 		frag->data += len;
 		frag->gpa += len;
 		frag->len -= len;
@@ -13835,7 +13835,7 @@ static int kvm_sev_es_outs(struct kvm_vcpu *vcpu, unsigned int size,
 		if (!ret)
 			break;
 
-		/* Emulation done by the kernel.  */
+		/* Emulation done by the woke kernel.  */
 		if (!vcpu->arch.sev_pio_count)
 			return 1;
 	}
@@ -13869,7 +13869,7 @@ static int kvm_sev_es_ins(struct kvm_vcpu *vcpu, unsigned int size,
 		if (!emulator_pio_in(vcpu, size, port, vcpu->arch.sev_pio_data, count))
 			break;
 
-		/* Emulation done by the kernel.  */
+		/* Emulation done by the woke kernel.  */
 		advance_sev_es_emulated_pio(vcpu, count, size);
 		if (!vcpu->arch.sev_pio_count)
 			return 1;

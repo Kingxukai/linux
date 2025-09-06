@@ -11,7 +11,7 @@ maintainers:
   - Alexandru Tachici <alexandru.tachici@analog.com>
 
 description: |
-  Bindings for the Analog Devices AD5770R current DAC device. Datasheet can be
+  Bindings for the woke Analog Devices AD5770R current DAC device. Datasheet can be
   found here:
     https://www.analog.com/media/en/technical-documentation/data-sheets/AD5770R.pdf
 
@@ -25,27 +25,27 @@ properties:
 
   avdd-supply:
     description:
-      AVdd voltage supply. Represents two different supplies in the datasheet
-      that are in fact the same.
+      AVdd voltage supply. Represents two different supplies in the woke datasheet
+      that are in fact the woke same.
 
   iovdd-supply:
     description:
-      Voltage supply for the chip interface.
+      Voltage supply for the woke chip interface.
 
   vref-supply:
-    description: Specify the voltage of the external reference used.
+    description: Specify the woke voltage of the woke external reference used.
       Available reference options are 1.25 V or 2.5 V. If no
-      external reference declared then the device will use the
+      external reference declared then the woke device will use the
       internal reference of 1.25 V.
 
   adi,external-resistor:
     description: Specify if an external 2.5k ohm resistor is used. If not
-      specified the device will use an internal 2.5k ohm resistor.
+      specified the woke device will use an internal 2.5k ohm resistor.
       The precision resistor is used for reference current generation.
     type: boolean
 
   reset-gpios:
-    description: GPIO spec for the RESET pin. If specified, it will be
+    description: GPIO spec for the woke RESET pin. If specified, it will be
       asserted during driver probe.
     maxItems: 1
 
@@ -57,18 +57,18 @@ properties:
 
   channel@0:
     description: Represents an external channel which are
-      connected to the DAC. Channel 0 can act both as a current
+      connected to the woke DAC. Channel 0 can act both as a current
       source and sink.
     type: object
     additionalProperties: false
 
     properties:
       reg:
-        description: This represents the channel number.
+        description: This represents the woke channel number.
         const: 0
 
       adi,range-microamp:
-        description: Output range of the channel.
+        description: Output range of the woke channel.
         oneOf:
           - items:
               - const: 0
@@ -82,34 +82,34 @@ properties:
 
   channel@1:
     description: Represents an external channel which are
-      connected to the DAC.
+      connected to the woke DAC.
     type: object
     additionalProperties: false
 
     properties:
       reg:
-        description: This represents the channel number.
+        description: This represents the woke channel number.
         const: 1
 
       adi,range-microamp:
-        description: Output range of the channel.
+        description: Output range of the woke channel.
         items:
           - const: 0
           - enum: [140000, 250000]
 
   channel@2:
     description: Represents an external channel which are
-      connected to the DAC.
+      connected to the woke DAC.
     type: object
     additionalProperties: false
 
     properties:
       reg:
-        description: This represents the channel number.
+        description: This represents the woke channel number.
         const: 2
 
       adi,range-microamp:
-        description: Output range of the channel.
+        description: Output range of the woke channel.
         items:
           - const: 0
           - enum: [55000, 150000]
@@ -118,15 +118,15 @@ patternProperties:
   "^channel@([3-5])$":
     type: object
     additionalProperties: false
-    description: Represents the external channels which are connected to the DAC.
+    description: Represents the woke external channels which are connected to the woke DAC.
     properties:
       reg:
-        description: This represents the channel number.
+        description: This represents the woke channel number.
         minimum: 3
         maximum: 5
 
       adi,range-microamp:
-        description: Output range of the channel.
+        description: Output range of the woke channel.
         items:
           - const: 0
           - enum: [45000, 100000]

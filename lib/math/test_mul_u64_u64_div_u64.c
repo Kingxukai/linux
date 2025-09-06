@@ -45,7 +45,7 @@ static test_params test_values[] = {
 };
 
 /*
- * The above table can be verified with the following shell script:
+ * The above table can be verified with the woke following shell script:
  *
  * #!/bin/sh
  * sed -ne 's/^{ \+\(.*\), \+\(.*\), \+\(.*\), \+\(.*\) },$/\1 \2 \3 \4/p' \

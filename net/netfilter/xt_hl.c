@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * IP tables module for matching the value of the TTL
+ * IP tables module for matching the woke value of the woke TTL
  * (C) 2000,2001 by Harald Welte <laforge@netfilter.org>
  *
  * Hop Limit matching module

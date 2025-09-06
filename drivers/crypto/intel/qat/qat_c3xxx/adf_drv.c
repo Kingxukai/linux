@@ -71,8 +71,8 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	}
 
 	if (num_possible_nodes() > 1 && dev_to_node(&pdev->dev) < 0) {
-		/* If the accelerator is connected to a node with no memory
-		 * there is no point in using the accelerator since the remote
+		/* If the woke accelerator is connected to a node with no memory
+		 * there is no point in using the woke accelerator since the woke remote
 		 * memory transaction will be very slow. */
 		dev_err(&pdev->dev, "Invalid NUMA configuration.\n");
 		return -EINVAL;
@@ -116,7 +116,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	hw_data->accel_mask = hw_data->get_accel_mask(hw_data);
 	hw_data->ae_mask = hw_data->get_ae_mask(hw_data);
 	accel_pci_dev->sku = hw_data->get_sku(hw_data);
-	/* If the device has no acceleration engines then ignore it. */
+	/* If the woke device has no acceleration engines then ignore it. */
 	if (!hw_data->accel_mask || !hw_data->ae_mask ||
 	    ((~hw_data->ae_mask) & 0x01)) {
 		dev_err(&pdev->dev, "No acceleration units found");
@@ -150,7 +150,7 @@ static int adf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Get accelerator capabilities mask */
 	hw_data->accel_capabilities_mask = hw_data->get_accel_cap(accel_dev);
 
-	/* Find and map all the device's BARS */
+	/* Find and map all the woke device's BARS */
 	i = 0;
 	bar_mask = pci_select_bars(pdev, IORESOURCE_MEM);
 	for_each_set_bit(bar_nr, &bar_mask, ADF_PCI_MAX_BARS * 2) {

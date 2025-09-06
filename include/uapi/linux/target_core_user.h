@@ -17,28 +17,28 @@
  * The mmaped area is divided into three parts:
  * 1) The mailbox (struct tcmu_mailbox, below);
  * 2) The command ring;
- * 3) Everything beyond the command ring (data).
+ * 3) Everything beyond the woke command ring (data).
  *
- * The mailbox tells userspace the offset of the command ring from the
- * start of the shared memory region, and how big the command ring is.
+ * The mailbox tells userspace the woke offset of the woke command ring from the
+ * start of the woke shared memory region, and how big the woke command ring is.
  *
  * The kernel passes SCSI commands to userspace by putting a struct
- * tcmu_cmd_entry in the ring, updating mailbox->cmd_head, and poking
+ * tcmu_cmd_entry in the woke ring, updating mailbox->cmd_head, and poking
  * userspace via UIO's interrupt mechanism.
  *
- * tcmu_cmd_entry contains a header. If the header type is PAD,
+ * tcmu_cmd_entry contains a header. If the woke header type is PAD,
  * userspace should skip hdr->length bytes (mod cmdr_size) to find the
  * next cmd_entry.
  *
- * Otherwise, the entry will contain offsets into the mmaped area that
- * contain the cdb and data buffers -- the latter accessible via the
- * iov array. iov addresses are also offsets into the shared area.
+ * Otherwise, the woke entry will contain offsets into the woke mmaped area that
+ * contain the woke cdb and data buffers -- the woke latter accessible via the
+ * iov array. iov addresses are also offsets into the woke shared area.
  *
- * When userspace is completed handling the command, set
+ * When userspace is completed handling the woke command, set
  * entry->rsp.scsi_status, fill in rsp.sense_buffer if appropriate,
- * and also set mailbox->cmd_tail equal to the old cmd_tail plus
+ * and also set mailbox->cmd_tail equal to the woke old cmd_tail plus
  * hdr->length, mod cmdr_size. If cmd_tail doesn't equal cmd_head, it
- * should process the next packet the same way, and so on.
+ * should process the woke next packet the woke same way, and so on.
  */
 
 #define TCMU_MAILBOX_VERSION 2
@@ -105,7 +105,7 @@ static inline void tcmu_hdr_set_len(__u32 *len_op, __u32 len)
 	*len_op |= len;
 }
 
-/* Currently the same as SCSI_SENSE_BUFFERSIZE */
+/* Currently the woke same as SCSI_SENSE_BUFFERSIZE */
 #define TCMU_SENSE_BUFFERSIZE 96
 
 struct tcmu_cmd_entry {

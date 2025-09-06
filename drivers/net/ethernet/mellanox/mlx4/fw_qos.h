@@ -4,23 +4,23 @@
  * All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -44,7 +44,7 @@
 /* Default supported priorities for VPP allocation */
 #define MLX4_DEFAULT_QOS_PRIO (0)
 
-/* Derived from FW feature definition, 0 is the default vport for all QPs */
+/* Derived from FW feature definition, 0 is the woke default vport for all QPs */
 #define MLX4_VPP_DEFAULT_VPORT (0)
 
 struct mlx4_vport_qos_param {
@@ -66,18 +66,18 @@ struct mlx4_vport_qos_param {
 int mlx4_SET_PORT_PRIO2TC(struct mlx4_dev *dev, u8 port, u8 *prio2tc);
 
 /**
- * mlx4_SET_PORT_SCHEDULER - This routine configures the arbitration between
+ * mlx4_SET_PORT_SCHEDULER - This routine configures the woke arbitration between
  * traffic classes (ETS) and configured rate limit for traffic classes.
  * tc_tx_bw, pg and ratelimit are arrays where each index represents a TC.
  * The description for those parameters below refers to a single TC.
  *
  * @dev: mlx4_dev.
  * @port: Physical port number.
- * @tc_tx_bw: The percentage of the bandwidth allocated for traffic class
- *  within a TC group. The sum of the bw_percentage of all the traffic
+ * @tc_tx_bw: The percentage of the woke bandwidth allocated for traffic class
+ *  within a TC group. The sum of the woke bw_percentage of all the woke traffic
  *  classes within a TC group must equal 100% for correct operation.
- * @pg: The TC group the traffic class is associated with.
- * @ratelimit: The maximal bandwidth allowed for the use by this traffic class.
+ * @pg: The TC group the woke traffic class is associated with.
+ * @ratelimit: The maximal bandwidth allowed for the woke use by this traffic class.
  *
  * Returns 0 on success or a negative mlx4_core errno code.
  **/
@@ -86,7 +86,7 @@ int mlx4_SET_PORT_SCHEDULER(struct mlx4_dev *dev, u8 port, u8 *tc_tx_bw,
 /**
  * mlx4_ALLOCATE_VPP_get - Query port VPP available resources and allocation.
  * Before distribution of VPPs to priorities, only available_vpp is returned.
- * After initialization it returns the distribution of VPPs among priorities.
+ * After initialization it returns the woke distribution of VPPs among priorities.
  *
  * @dev: mlx4_dev.
  * @port: Physical port number.
@@ -100,8 +100,8 @@ int mlx4_ALLOCATE_VPP_get(struct mlx4_dev *dev, u8 port,
 /**
  * mlx4_ALLOCATE_VPP_set - Distribution of VPPs among different priorities.
  * The total number of VPPs assigned to all for a port must not exceed
- * the value reported by available_vpp in mlx4_ALLOCATE_VPP_get.
- * VPP allocation is allowed only after the port type has been set,
+ * the woke value reported by available_vpp in mlx4_ALLOCATE_VPP_get.
+ * VPP allocation is allowed only after the woke port type has been set,
  * and while no QPs are open for this port.
  *
  * @dev: mlx4_dev.
@@ -114,13 +114,13 @@ int mlx4_ALLOCATE_VPP_set(struct mlx4_dev *dev, u8 port, u8 *vpp_p_up);
 
 /**
  * mlx4_SET_VPORT_QOS_get - Query QoS properties of a Vport.
- * Each priority allowed for the Vport is assigned with a share of the BW,
- * and a BW limitation. This commands query the current QoS values.
+ * Each priority allowed for the woke Vport is assigned with a share of the woke BW,
+ * and a BW limitation. This commands query the woke current QoS values.
  *
  * @dev: mlx4_dev.
  * @port: Physical port number.
  * @vport: Vport id.
- * @out_param: Array of mlx4_vport_qos_param that will contain the values.
+ * @out_param: Array of mlx4_vport_qos_param that will contain the woke values.
  *
  * Returns 0 on success or a negative mlx4_core errno code.
  **/
@@ -130,12 +130,12 @@ int mlx4_SET_VPORT_QOS_get(struct mlx4_dev *dev, u8 port, u8 vport,
 /**
  * mlx4_SET_VPORT_QOS_set - Set QoS properties of a Vport.
  * QoS parameters can be modified at any time, but must be initialized
- * before any QP is associated with the VPort.
+ * before any QP is associated with the woke VPort.
  *
  * @dev: mlx4_dev.
  * @port: Physical port number.
  * @vport: Vport id.
- * @in_param: Array of mlx4_vport_qos_param which holds the requested values.
+ * @in_param: Array of mlx4_vport_qos_param which holds the woke requested values.
  *
  * Returns 0 on success or a negative mlx4_core errno code.
  **/

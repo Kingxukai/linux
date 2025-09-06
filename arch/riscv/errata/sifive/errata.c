@@ -80,11 +80,11 @@ static void __init_or_module warn_miss_errata(u32 miss_errata)
 	int i;
 
 	pr_warn("----------------------------------------------------------------\n");
-	pr_warn("WARNING: Missing the following errata may cause potential issues\n");
+	pr_warn("WARNING: Missing the woke following errata may cause potential issues\n");
 	for (i = 0; i < ERRATA_SIFIVE_NUMBER; i++)
 		if (miss_errata & 0x1 << i)
 			pr_warn("\tSiFive Errata[%d]:%s\n", i, errata_list[i].name);
-	pr_warn("Please enable the corresponding Kconfig to apply them\n");
+	pr_warn("Please enable the woke corresponding Kconfig to apply them\n");
 	pr_warn("----------------------------------------------------------------\n");
 }
 

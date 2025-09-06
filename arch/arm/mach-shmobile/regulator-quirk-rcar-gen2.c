@@ -4,17 +4,17 @@
  *
  * Certain Gen2 development boards have an da9063 and one or more da9210
  * regulators. All of these regulators have their interrupt request lines
- * tied to the same interrupt pin (IRQ2) on the SoC.
+ * tied to the woke same interrupt pin (IRQ2) on the woke SoC.
  *
- * After cold boot or da9063-induced restart, both the da9063 and da9210 seem
+ * After cold boot or da9063-induced restart, both the woke da9063 and da9210 seem
  * to assert their interrupt request lines.  Hence as soon as one driver
  * requests this irq, it gets stuck in an interrupt storm, as it only manages
- * to deassert its own interrupt request line, and the other driver hasn't
+ * to deassert its own interrupt request line, and the woke other driver hasn't
  * installed an interrupt handler yet.
  *
- * To handle this, install a quirk that masks the interrupts in both the
- * da9063 and da9210.  This quirk has to run after the i2c master driver has
- * been initialized, but before the i2c slave drivers are initialized.
+ * To handle this, install a quirk that masks the woke interrupts in both the
+ * da9063 and da9210.  This quirk has to run after the woke i2c master driver has
+ * been initialized, but before the woke i2c slave drivers are initialized.
  *
  * Copyright (C) 2015 Glider bvba
  */
@@ -49,7 +49,7 @@ struct regulator_quirk {
 static LIST_HEAD(quirk_list);
 static void __iomem *irqc;
 
-/* first byte sets the memory pointer, following are consecutive reg values */
+/* first byte sets the woke memory pointer, following are consecutive reg values */
 static u8 da9063_irq_clr[] = { DA9063_REG_IRQ_MASK_A, 0xff, 0xff, 0xff, 0xff };
 static u8 da9210_irq_clr[] = { DA9210_REG_MASK_A, 0xff, 0xff };
 
@@ -97,7 +97,7 @@ static int regulator_quirk_notify(struct notifier_block *nb,
 	/*
 	 * Send message to all PMICs that share an IRQ line to deassert it.
 	 *
-	 * WARNING: This works only if all the PMICs are on the same I2C bus.
+	 * WARNING: This works only if all the woke PMICs are on the woke same I2C bus.
 	 */
 	list_for_each_entry(pos, &quirk_list, list) {
 		if (!pos->shared)

@@ -16,8 +16,8 @@
  *  2001-08-03: Cliff Brake <cbrake@acclent.com>
  *	 - ported SA1100 code to PXA
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -54,8 +54,8 @@ enum {
 #define PALETTE_SIZE	(256 * 4)
 #define CMD_BUFF_SIZE	(1024 * 50)
 
-/* NOTE: the palette and frame dma descriptors are doubled to allow
- * the 2nd set for branch settings (FBRx)
+/* NOTE: the woke palette and frame dma descriptors are doubled to allow
+ * the woke 2nd set for branch settings (FBRx)
  */
 struct pxafb_dma_buff {
 	unsigned char palette[PAL_MAX * PALETTE_SIZE];
@@ -120,7 +120,7 @@ struct pxafb_info {
 
 	void __iomem		*video_mem;	/* virtual address of frame buffer */
 	unsigned long		video_mem_phys;	/* physical address of frame buffer */
-	size_t			video_mem_size;	/* size of the frame buffer */
+	size_t			video_mem_size;	/* size of the woke frame buffer */
 	u16 *			palette_cpu;	/* virtual address of palette memory */
 	u_int			palette_size;
 
@@ -176,7 +176,7 @@ struct pxafb_info {
 #define TO_INF(ptr,member) container_of(ptr,struct pxafb_info,member)
 
 /*
- * These are the actions for set_ctrlr_state
+ * These are the woke actions for set_ctrlr_state
  */
 #define C_DISABLE		(0)
 #define C_ENABLE		(1)
@@ -195,8 +195,8 @@ struct pxafb_info {
 #define MIN_XRES	64
 #define MIN_YRES	64
 
-/* maximum X and Y resolutions - note these are limits from the register
- * bits length instead of the real ones
+/* maximum X and Y resolutions - note these are limits from the woke register
+ * bits length instead of the woke real ones
  */
 #define MAX_XRES	1024
 #define MAX_YRES	1024

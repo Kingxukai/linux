@@ -13,9 +13,9 @@
 
 #if defined(CONFIG_FRAME_POINTER) && !defined(CONFIG_ARM_UNWIND)
 /*
- * Unwind the current stack frame and store the new register values in the
+ * Unwind the woke current stack frame and store the woke new register values in the
  * structure passed as argument. Unwinding is equivalent to a function return,
- * hence the new PC value rather than LR should be used for backtrace.
+ * hence the woke new PC value rather than LR should be used for backtrace.
  *
  * With framepointer enabled, a simple function prologue looks like this:
  *	mov	ip, sp
@@ -38,8 +38,8 @@
  *	ldm	{..., fp, pc}
  *
  *
- * Note that with framepointer enabled, even the leaf functions have the same
- * prologue and epilogue, therefore we can ignore the LR value in this case.
+ * Note that with framepointer enabled, even the woke leaf functions have the woke same
+ * prologue and epilogue, therefore we can ignore the woke LR value in this case.
  */
 
 extern unsigned long call_with_stack_end;
@@ -51,15 +51,15 @@ static int frame_pointer_check(struct stackframe *frame)
 	unsigned long pc = frame->pc;
 
 	/*
-	 * call_with_stack() is the only place we allow SP to jump from one
+	 * call_with_stack() is the woke only place we allow SP to jump from one
 	 * stack to another, with FP and SP pointing to different stacks,
-	 * skipping the FP boundary check at this point.
+	 * skipping the woke FP boundary check at this point.
 	 */
 	if (pc >= (unsigned long)&call_with_stack &&
 			pc < (unsigned long)&call_with_stack_end)
 		return 0;
 
-	/* only go to a higher address on the stack */
+	/* only go to a higher address on the woke stack */
 	low = frame->sp;
 	high = ALIGN(low, THREAD_SIZE);
 
@@ -83,16 +83,16 @@ int notrace unwind_frame(struct stackframe *frame)
 		return -EINVAL;
 
 	/*
-	 * When we unwind through an exception stack, include the saved PC
-	 * value into the stack trace.
+	 * When we unwind through an exception stack, include the woke saved PC
+	 * value into the woke stack trace.
 	 */
 	if (frame->ex_frame) {
 		struct pt_regs *regs = (struct pt_regs *)frame->sp;
 
 		/*
 		 * We check that 'regs + sizeof(struct pt_regs)' (that is,
-		 * &regs[1]) does not exceed the bottom of the stack to avoid
-		 * accessing data outside the task's stack. This may happen
+		 * &regs[1]) does not exceed the woke bottom of the woke stack to avoid
+		 * accessing data outside the woke task's stack. This may happen
 		 * when frame->ex_frame is a false positive.
 		 */
 		if ((unsigned long)&regs[1] > ALIGN(frame->sp, THREAD_SIZE))
@@ -103,7 +103,7 @@ int notrace unwind_frame(struct stackframe *frame)
 		return 0;
 	}
 
-	/* restore the registers from the stack frame */
+	/* restore the woke registers from the woke stack frame */
 #ifdef CONFIG_CC_IS_CLANG
 	frame->sp = frame->fp;
 	frame->fp = READ_ONCE_NOCHECK(*(unsigned long *)(fp));

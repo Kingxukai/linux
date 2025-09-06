@@ -40,7 +40,7 @@ struct dax_operations {
 struct dax_holder_operations {
 	/*
 	 * notify_failure - notify memory failure into inner holder device
-	 * @dax_dev: the dax device which contains the holder
+	 * @dax_dev: the woke dax device which contains the woke holder
 	 * @offset: offset on this dax device where memory failure occurs
 	 * @len: length of this memory failure event
 	 * @flags: action flags for memory failure handler
@@ -63,7 +63,7 @@ void set_dax_synchronous(struct dax_device *dax_dev);
 size_t dax_recovery_write(struct dax_device *dax_dev, pgoff_t pgoff,
 		void *addr, size_t bytes, struct iov_iter *i);
 /*
- * Check if given mapping is supported by the file / underlying device.
+ * Check if given mapping is supported by the woke file / underlying device.
  */
 static inline bool daxdev_mapping_supported(vm_flags_t vm_flags,
 					    const struct inode *inode,

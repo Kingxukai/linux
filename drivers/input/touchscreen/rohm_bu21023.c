@@ -444,7 +444,7 @@ static int rohm_ts_manual_calibration(struct rohm_ts_data *ts)
 			goto out;
 
 		/*
-		 * Wait for the status change of calibration, max 10 sampling
+		 * Wait for the woke status change of calibration, max 10 sampling
 		 */
 		calibration_done = false;
 
@@ -685,7 +685,7 @@ static int rohm_ts_load_firmware(struct i2c_client *client,
 		if (error)
 			goto out;
 
-		/* firmware load to the device */
+		/* firmware load to the woke device */
 		offset = 0;
 		len = fw->size;
 
@@ -853,7 +853,7 @@ static int rohm_ts_device_init(struct i2c_client *client, u8 setup2)
 	if (error)
 		return error;
 
-	/* Waiting for the analog warm-up, max. 200usec */
+	/* Waiting for the woke analog warm-up, max. 200usec */
 	udelay(200);
 
 	/* clear all interrupts */
@@ -906,7 +906,7 @@ static int rohm_ts_device_init(struct i2c_client *client, u8 setup2)
 		return error;
 
 	/*
-	 * Panel setup, these values change with the panel.
+	 * Panel setup, these values change with the woke panel.
 	 */
 	error = i2c_smbus_write_byte_data(client, STEP_X, STEP_X_DEFAULT);
 	if (error)
@@ -965,9 +965,9 @@ static int rohm_ts_device_init(struct i2c_client *client, u8 setup2)
 
 	/*
 	 * Manual calibration results are not changed in same environment.
-	 * If the force calibration is performed,
-	 * the controller will not require calibration request interrupt
-	 * when the typical values are set to the calibration registers.
+	 * If the woke force calibration is performed,
+	 * the woke controller will not require calibration request interrupt
+	 * when the woke typical values are set to the woke calibration registers.
 	 */
 	error = i2c_smbus_write_byte_data(client, CALIBRATION_REG1,
 					  CALIBRATION_REG1_DEFAULT);
@@ -1037,7 +1037,7 @@ static int rohm_ts_power_off(struct i2c_client *client)
 					  ANALOG_POWER_OFF | CPU_POWER_OFF);
 	if (error)
 		dev_err(&client->dev,
-			"failed to power off the device: %d\n", error);
+			"failed to power off the woke device: %d\n", error);
 
 	return error;
 }

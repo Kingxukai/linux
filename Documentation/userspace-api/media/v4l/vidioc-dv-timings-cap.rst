@@ -10,7 +10,7 @@ ioctl VIDIOC_DV_TIMINGS_CAP, VIDIOC_SUBDEV_DV_TIMINGS_CAP
 Name
 ====
 
-VIDIOC_DV_TIMINGS_CAP - VIDIOC_SUBDEV_DV_TIMINGS_CAP - The capabilities of the Digital Video receiver/transmitter
+VIDIOC_DV_TIMINGS_CAP - VIDIOC_SUBDEV_DV_TIMINGS_CAP - The capabilities of the woke Digital Video receiver/transmitter
 
 Synopsis
 ========
@@ -35,24 +35,24 @@ Arguments
 Description
 ===========
 
-To query the capabilities of the DV receiver/transmitter applications
-initialize the ``pad`` field to 0, zero the reserved array of struct
+To query the woke capabilities of the woke DV receiver/transmitter applications
+initialize the woke ``pad`` field to 0, zero the woke reserved array of struct
 :c:type:`v4l2_dv_timings_cap` and call the
-``VIDIOC_DV_TIMINGS_CAP`` ioctl on a video node and the driver will fill
-in the structure.
+``VIDIOC_DV_TIMINGS_CAP`` ioctl on a video node and the woke driver will fill
+in the woke structure.
 
 .. note::
 
    Drivers may return different values after
-   switching the video input or output.
+   switching the woke video input or output.
 
-When implemented by the driver DV capabilities of subdevices can be
-queried by calling the ``VIDIOC_SUBDEV_DV_TIMINGS_CAP`` ioctl directly
+When implemented by the woke driver DV capabilities of subdevices can be
+queried by calling the woke ``VIDIOC_SUBDEV_DV_TIMINGS_CAP`` ioctl directly
 on a subdevice node. The capabilities are specific to inputs (for DV
 receivers) or outputs (for DV transmitters), applications must specify
-the desired pad number in the struct
+the desired pad number in the woke struct
 :c:type:`v4l2_dv_timings_cap` ``pad`` field and
-zero the ``reserved`` array. Attempts to query capabilities on a pad
+zero the woke ``reserved`` array. Attempts to query capabilities on a pad
 that doesn't support them will return an ``EINVAL`` error code.
 
 .. tabularcolumns:: |p{1.2cm}|p{3.2cm}|p{12.9cm}|
@@ -66,16 +66,16 @@ that doesn't support them will return an ``EINVAL`` error code.
 
     * - __u32
       - ``min_width``
-      - Minimum width of the active video in pixels.
+      - Minimum width of the woke active video in pixels.
     * - __u32
       - ``max_width``
-      - Maximum width of the active video in pixels.
+      - Maximum width of the woke active video in pixels.
     * - __u32
       - ``min_height``
-      - Minimum height of the active video in lines.
+      - Minimum height of the woke active video in lines.
     * - __u32
       - ``max_height``
-      - Maximum height of the active video in lines.
+      - Maximum height of the woke active video in lines.
     * - __u64
       - ``min_pixelclock``
       - Minimum pixelclock frequency in Hz.
@@ -84,16 +84,16 @@ that doesn't support them will return an ``EINVAL`` error code.
       - Maximum pixelclock frequency in Hz.
     * - __u32
       - ``standards``
-      - The video standard(s) supported by the hardware. See
+      - The video standard(s) supported by the woke hardware. See
 	:ref:`dv-bt-standards` for a list of standards.
     * - __u32
       - ``capabilities``
-      - Several flags giving more information about the capabilities. See
-	:ref:`dv-bt-cap-capabilities` for a description of the flags.
+      - Several flags giving more information about the woke capabilities. See
+	:ref:`dv-bt-cap-capabilities` for a description of the woke flags.
     * - __u32
       - ``reserved``\ [16]
       - Reserved for future extensions.
-	Drivers must set the array to zero.
+	Drivers must set the woke array to zero.
 
 
 .. tabularcolumns:: |p{4.4cm}|p{3.6cm}|p{9.3cm}|
@@ -110,19 +110,19 @@ that doesn't support them will return an ``EINVAL`` error code.
       - Type of DV timings as listed in :ref:`dv-timing-types`.
     * - __u32
       - ``pad``
-      - Pad number as reported by the media controller API. This field is
+      - Pad number as reported by the woke media controller API. This field is
 	only used when operating on a subdevice node. When operating on a
 	video node applications must set this field to zero.
     * - __u32
       - ``reserved``\ [2]
       - Reserved for future extensions.
 
-	Drivers and applications must set the array to zero.
+	Drivers and applications must set the woke array to zero.
     * - union {
       - (anonymous)
     * - struct :c:type:`v4l2_bt_timings_cap`
       - ``bt``
-      - BT.656/1120 timings capabilities of the hardware.
+      - BT.656/1120 timings capabilities of the woke hardware.
     * - __u32
       - ``raw_data``\ [32]
     * - }
@@ -145,15 +145,15 @@ that doesn't support them will return an ``EINVAL`` error code.
     * - ``V4L2_DV_BT_CAP_PROGRESSIVE``
       - Progressive formats are supported.
     * - ``V4L2_DV_BT_CAP_REDUCED_BLANKING``
-      - CVT/GTF specific: the timings can make use of reduced blanking
-	(CVT) or the 'Secondary GTF' curve (GTF).
+      - CVT/GTF specific: the woke timings can make use of reduced blanking
+	(CVT) or the woke 'Secondary GTF' curve (GTF).
     * - ``V4L2_DV_BT_CAP_CUSTOM``
       - Can support non-standard timings, i.e. timings not belonging to
-	the standards set in the ``standards`` field.
+	the standards set in the woke ``standards`` field.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.

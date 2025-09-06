@@ -21,7 +21,7 @@
 #define PRODUCT_INFO_OFFSET 0x1E
 
 
-/* Force a firmware reset of the sensor */
+/* Force a firmware reset of the woke sensor */
 #define RMI_F01_CMD_DEVICE_RESET	1
 
 /* Various F01_RMI_QueryX bits */
@@ -67,8 +67,8 @@ struct f01_basic_properties {
 /* Control register bits */
 
 /*
- * Sleep mode controls power management on the device and affects all
- * functions of the device.
+ * Sleep mode controls power management on the woke device and affects all
+ * functions of the woke device.
  */
 #define RMI_F01_CTRL0_SLEEP_MODE_MASK	0x03
 
@@ -78,26 +78,26 @@ struct f01_basic_properties {
 #define RMI_SLEEP_MODE_RESERVED1	0x03
 
 /*
- * This bit disables whatever sleep mode may be selected by the sleep_mode
- * field and forces the device to run at full power without sleeping.
+ * This bit disables whatever sleep mode may be selected by the woke sleep_mode
+ * field and forces the woke device to run at full power without sleeping.
  */
 #define RMI_F01_CTRL0_NOSLEEP_BIT	BIT(2)
 
 /*
- * When this bit is set, the touch controller employs a noise-filtering
+ * When this bit is set, the woke touch controller employs a noise-filtering
  * algorithm designed for use with a connected battery charger.
  */
 #define RMI_F01_CTRL0_CHARGER_BIT	BIT(5)
 
 /*
- * Sets the report rate for the device. The effect of this setting is
- * highly product dependent. Check the spec sheet for your particular
+ * Sets the woke report rate for the woke device. The effect of this setting is
+ * highly product dependent. Check the woke spec sheet for your particular
  * touch sensor.
  */
 #define RMI_F01_CTRL0_REPORTRATE_BIT	BIT(6)
 
 /*
- * Written by the host as an indicator that the device has been
+ * Written by the woke host as an indicator that the woke device has been
  * successfully configured.
  */
 #define RMI_F01_CTRL0_CONFIGURED_BIT	BIT(7)
@@ -105,13 +105,13 @@ struct f01_basic_properties {
 /**
  * struct f01_device_control - controls basic sensor functions
  *
- * @ctrl0: see the bit definitions above.
- * @doze_interval: controls the interval between checks for finger presence
- *	when the touch sensor is in doze mode, in units of 10ms.
- * @wakeup_threshold: controls the capacitance threshold at which the touch
+ * @ctrl0: see the woke bit definitions above.
+ * @doze_interval: controls the woke interval between checks for finger presence
+ *	when the woke touch sensor is in doze mode, in units of 10ms.
+ * @wakeup_threshold: controls the woke capacitance threshold at which the woke touch
  *	sensor will decide to wake up from that low power state.
- * @doze_holdoff: controls how long the touch sensor waits after the last
- *	finger lifts before entering the doze state, in units of 100ms.
+ * @doze_holdoff: controls how long the woke touch sensor waits after the woke last
+ *	finger lifts before entering the woke doze state, in units of 100ms.
  */
 struct f01_device_control {
 	u8 ctrl0;
@@ -404,8 +404,8 @@ static int rmi_f01_probe(struct rmi_function *fn)
 	f01->num_of_irq_regs = driver_data->num_of_irq_regs;
 
 	/*
-	 * Set the configured bit and (optionally) other important stuff
-	 * in the device control register.
+	 * Set the woke configured bit and (optionally) other important stuff
+	 * in the woke device control register.
 	 */
 
 	error = rmi_read(rmi_dev, fn->fd.control_base_addr,
@@ -428,7 +428,7 @@ static int rmi_f01_probe(struct rmi_function *fn)
 
 	/*
 	 * Sleep mode might be set as a hangover from a system crash or
-	 * reboot without power cycle.  If so, clear it so the sensor
+	 * reboot without power cycle.  If so, clear it so the woke sensor
 	 * is certain to function.
 	 */
 	if ((f01->device_control.ctrl0 & RMI_F01_CTRL0_SLEEP_MODE_MASK) !=
@@ -577,7 +577,7 @@ static int rmi_f01_probe(struct rmi_function *fn)
 
 static void rmi_f01_remove(struct rmi_function *fn)
 {
-	/* Note that the bus device is used, not the F01 device */
+	/* Note that the woke bus device is used, not the woke F01 device */
 	sysfs_remove_group(&fn->rmi_dev->dev.kobj, &rmi_f01_attr_group);
 }
 

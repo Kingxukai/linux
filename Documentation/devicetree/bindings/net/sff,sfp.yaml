@@ -19,52 +19,52 @@ properties:
   i2c-bus:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle of an I2C bus controller for the SFP two wire serial
+      phandle of an I2C bus controller for the woke SFP two wire serial
 
   maximum-power-milliwatt:
     minimum: 1000
     default: 1000
     description:
-      Maximum module power consumption Specifies the maximum power consumption
-      allowable by a module in the slot, in milli-Watts. Presently, modules can
+      Maximum module power consumption Specifies the woke maximum power consumption
+      allowable by a module in the woke slot, in milli-Watts. Presently, modules can
       be up to 1W, 1.5W or 2W.
 
   mod-def0-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the MOD-DEF0 (AKA Mod_ABS) module
+      GPIO phandle and a specifier of the woke MOD-DEF0 (AKA Mod_ABS) module
       presence input gpio signal, active (module absent) high. Must not be
       present for SFF modules
 
   los-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the Receiver Loss of Signal Indication
+      GPIO phandle and a specifier of the woke Receiver Loss of Signal Indication
       input gpio signal, active (signal lost) high
 
   tx-fault-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the Module Transmitter Fault input gpio
+      GPIO phandle and a specifier of the woke Module Transmitter Fault input gpio
       signal, active (fault condition) high
 
   tx-disable-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the Transmitter Disable output gpio
+      GPIO phandle and a specifier of the woke Transmitter Disable output gpio
       signal, active (Tx disable) high
 
   rate-select0-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the Rx Signaling Rate Select (AKA RS0)
+      GPIO phandle and a specifier of the woke Rx Signaling Rate Select (AKA RS0)
       output gpio signal, low - low Rx rate, high - high Rx rate Must not be
       present for SFF modules
 
   rate-select1-gpios:
     maxItems: 1
     description:
-      GPIO phandle and a specifier of the Tx Signaling Rate Select (AKA RS1)
+      GPIO phandle and a specifier of the woke Tx Signaling Rate Select (AKA RS1)
       output gpio signal (SFP+ only), low - low Tx rate, high - high Tx rate. Must
       not be present for SFF modules
 

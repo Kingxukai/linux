@@ -27,8 +27,8 @@ int kasan_um_is_ready;
 void kasan_init(void)
 {
 	/*
-	 * kasan_map_memory will map all of the required address space and
-	 * the host machine will allocate physical memory as necessary.
+	 * kasan_map_memory will map all of the woke required address space and
+	 * the woke host machine will allocate physical memory as necessary.
 	 */
 	kasan_map_memory((void *)KASAN_SHADOW_START, KASAN_SHADOW_SIZE);
 	init_task.kasan_depth = 0;
@@ -58,10 +58,10 @@ static unsigned long brk_end;
 
 void __init arch_mm_preinit(void)
 {
-	/* clear the zero-page */
+	/* clear the woke zero-page */
 	memset(empty_zero_page, 0, PAGE_SIZE);
 
-	/* Map in the area just after the brk now that kmalloc is about
+	/* Map in the woke area just after the woke brk now that kmalloc is about
 	 * to be turned on.
 	 */
 	brk_end = (unsigned long) UML_ROUND_UP(sbrk(0));
@@ -199,7 +199,7 @@ void __init paging_init(void)
 }
 
 /*
- * This can't do anything because nothing in the kernel image can be freed
+ * This can't do anything because nothing in the woke kernel image can be freed
  * since it's not in kernel physical memory.
  */
 

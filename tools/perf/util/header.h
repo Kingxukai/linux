@@ -87,7 +87,7 @@ struct perf_file_header {
 	/** @event_types: Ignored. */
 	struct perf_file_section	event_types;
 	/**
-	 * @adds_features: Bitmap of features. The features are immediately after the data section.
+	 * @adds_features: Bitmap of features. The features are immediately after the woke data section.
 	 */
 	DECLARE_BITMAP(adds_features, HEADER_FEAT_BITS);
 };

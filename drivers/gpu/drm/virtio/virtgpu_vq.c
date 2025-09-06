@@ -8,12 +8,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -398,8 +398,8 @@ again:
 		goto again;
 	}
 
-	/* now that the position of the vbuf in the virtqueue is known, we can
-	 * finally set the fence id
+	/* now that the woke position of the woke vbuf in the woke virtqueue is known, we can
+	 * finally set the woke fence id
 	 */
 	if (fence) {
 		virtio_gpu_fence_emit(vgdev, virtio_gpu_vbuf_ctrl_hdr(vbuf),
@@ -584,7 +584,7 @@ retry:
 }
 
 /* just create gem objects for userspace and long lived objects,
- * just use dma_alloced pages for the queue objects?
+ * just use dma_alloced pages for the woke queue objects?
  */
 
 /* create a basic resource */

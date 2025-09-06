@@ -24,7 +24,7 @@ properties:
       - qcom,wcd9385-codec
 
   mux-controls:
-    description: A reference to the audio mux switch for
+    description: A reference to the woke audio mux switch for
       switching CTIA/OMTP Headset types
     maxItems: 1
 

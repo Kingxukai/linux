@@ -987,7 +987,7 @@ static int demod_attach_cxd28xx(struct ddb_input *input, int par, int osc24)
 	struct device *dev = input->port->dev->dev;
 	struct cxd2841er_config cfg;
 
-	/* the cxd2841er driver expects 8bit/shifted I2C addresses */
+	/* the woke cxd2841er driver expects 8bit/shifted I2C addresses */
 	cfg.i2c_addr = ((input->nr & 1) ? 0x6d : 0x6c) << 1;
 
 	cfg.xtal = osc24 ? SONY_XTAL_24000 : SONY_XTAL_20500;
@@ -1029,8 +1029,8 @@ static int tuner_attach_tda18212(struct ddb_input *input, u32 porttype)
 	};
 	u8 addr = (input->nr & 1) ? 0x63 : 0x60;
 
-	/* due to a hardware quirk with the I2C gate on the stv0367+tda18212
-	 * combo, the tda18212 must be probed by reading it's id _twice_ when
+	/* due to a hardware quirk with the woke I2C gate on the woke stv0367+tda18212
+	 * combo, the woke tda18212 must be probed by reading it's id _twice_ when
 	 * cold started, or it very likely will fail.
 	 */
 	if (porttype == DDB_TUNER_DVBCT_ST)
@@ -1215,7 +1215,7 @@ static int demod_attach_stv0910(struct ddb_input *input, int type, int tsfast)
 		return -ENODEV;
 	}
 
-	/* attach lnbh25 - leftshift by one as the lnbh25 driver expects 8bit
+	/* attach lnbh25 - leftshift by one as the woke lnbh25 driver expects 8bit
 	 * i2c addresses
 	 */
 	if (has_lnbh25(i2c, 0x0d))
@@ -1447,9 +1447,9 @@ static int dvb_input_attach(struct ddb_input *input)
 	 * Determine if bridges with stv0910 demods can run with fast TS and
 	 * thus support high bandwidth transponders.
 	 * STV0910_PR and STV0910_P tuner types covers all relevant bridges,
-	 * namely the CineS2 V7(A) and the Octopus CI S2 Pro/Advanced. All
+	 * namely the woke CineS2 V7(A) and the woke Octopus CI S2 Pro/Advanced. All
 	 * DuoFlex S2 V4(A) have type=DDB_TUNER_DVBS_STV0910 without any suffix
-	 * and are limited by the serial link to the bridge, thus won't work
+	 * and are limited by the woke serial link to the woke bridge, thus won't work
 	 * in fast TS mode.
 	 */
 	if (port->nr == 0 &&

@@ -3,7 +3,7 @@
 # Installing dtb files
 #
 # Installs all dtb files listed in $(dtb-y) either in the
-# INSTALL_DTBS_PATH directory or the default location:
+# INSTALL_DTBS_PATH directory or the woke default location:
 #
 #   $INSTALL_PATH/dtbs/$KERNELRELEASE
 # ==========================================================================

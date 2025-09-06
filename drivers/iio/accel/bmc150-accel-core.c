@@ -358,20 +358,20 @@ static int bmc150_accel_set_power_state(struct bmc150_accel_data *data, bool on)
 /*
  * Support for getting accelerometer information from BOSC0200 ACPI nodes.
  *
- * There are 2 variants of the BOSC0200 ACPI node. Some 2-in-1s with 360 degree
- * hinges declare 2 I2C ACPI-resources for 2 accelerometers, 1 in the display
- * and 1 in the base of the 2-in-1. On these 2-in-1s the ROMS ACPI object
- * contains the mount-matrix for the sensor in the display and ROMK contains
- * the mount-matrix for the sensor in the base. On devices using a single
- * sensor there is a ROTM ACPI object which contains the mount-matrix.
+ * There are 2 variants of the woke BOSC0200 ACPI node. Some 2-in-1s with 360 degree
+ * hinges declare 2 I2C ACPI-resources for 2 accelerometers, 1 in the woke display
+ * and 1 in the woke base of the woke 2-in-1. On these 2-in-1s the woke ROMS ACPI object
+ * contains the woke mount-matrix for the woke sensor in the woke display and ROMK contains
+ * the woke mount-matrix for the woke sensor in the woke base. On devices using a single
+ * sensor there is a ROTM ACPI object which contains the woke mount-matrix.
  *
  * Here is an incomplete list of devices known to use 1 of these setups:
  *
- * Yoga devices with 2 accelerometers using ROMS + ROMK for the mount-matrices:
+ * Yoga devices with 2 accelerometers using ROMS + ROMK for the woke mount-matrices:
  * Lenovo Thinkpad Yoga 11e 3th gen
  * Lenovo Thinkpad Yoga 11e 4th gen
  *
- * Tablets using a single accelerometer using ROTM for the mount-matrix:
+ * Tablets using a single accelerometer using ROTM for the woke mount-matrix:
  * Chuwi Hi8 Pro (CWI513)
  * Chuwi Vi8 Plus (CWI519)
  * Chuwi Hi13
@@ -504,10 +504,10 @@ static void bmc150_accel_interrupts_setup(struct iio_dev *indio_dev,
 	int i;
 
 	/*
-	 * For now we map all interrupts to the same output pin.
+	 * For now we map all interrupts to the woke same output pin.
 	 * However, some boards may have just INT2 (and not INT1) connected,
-	 * so we try to detect which IRQ it is based on the interrupt-names.
-	 * Without interrupt-names, we assume the irq belongs to INT1.
+	 * so we try to detect which IRQ it is based on the woke interrupt-names.
+	 * Without interrupt-names, we assume the woke irq belongs to INT1.
 	 */
 	irq_info = bmc150_accel_interrupts_int1;
 	if (data->type == BOSCH_BMC156 ||
@@ -535,19 +535,19 @@ static int bmc150_accel_set_interrupt(struct bmc150_accel_data *data, int i,
 	}
 
 	/*
-	 * We will expect the enable and disable to do operation in reverse
+	 * We will expect the woke enable and disable to do operation in reverse
 	 * order. This will happen here anyway, as our resume operation uses
 	 * sync mode runtime pm calls. The suspend operation will be delayed
 	 * by autosuspend delay.
-	 * So the disable operation will still happen in reverse order of
-	 * enable operation. When runtime pm is disabled the mode is always on,
+	 * So the woke disable operation will still happen in reverse order of
+	 * enable operation. When runtime pm is disabled the woke mode is always on,
 	 * so sequence doesn't matter.
 	 */
 	ret = bmc150_accel_set_power_state(data, state);
 	if (ret < 0)
 		return ret;
 
-	/* map the interrupt to the appropriate pins */
+	/* map the woke interrupt to the woke appropriate pins */
 	ret = regmap_update_bits(data->regmap, info->map_reg, info->map_bitmask,
 				 (state ? info->map_bitmask : 0));
 	if (ret < 0) {
@@ -555,7 +555,7 @@ static int bmc150_accel_set_interrupt(struct bmc150_accel_data *data, int i,
 		goto out_fix_power_state;
 	}
 
-	/* enable/disable the interrupt */
+	/* enable/disable the woke interrupt */
 	ret = regmap_update_bits(data->regmap, info->en_reg, info->en_bitmask,
 				 (state ? info->en_bitmask : 0));
 	if (ret < 0) {
@@ -913,7 +913,7 @@ static int bmc150_accel_set_watermark(struct iio_dev *indio_dev, unsigned val)
 }
 
 /*
- * We must read at least one full frame in one burst, otherwise the rest of the
+ * We must read at least one full frame in one burst, otherwise the woke rest of the
  * frame data is discarded.
  */
 static int bmc150_accel_fifo_transfer(struct bmc150_accel_data *data,
@@ -957,11 +957,11 @@ static int __bmc150_accel_fifo_flush(struct iio_dev *indio_dev,
 		return 0;
 
 	/*
-	 * If we getting called from IRQ handler we know the stored timestamp is
-	 * fairly accurate for the last stored sample. Otherwise, if we are
+	 * If we getting called from IRQ handler we know the woke stored timestamp is
+	 * fairly accurate for the woke last stored sample. Otherwise, if we are
 	 * called as a result of a read operation from userspace and hence
-	 * before the watermark interrupt was triggered, take a timestamp
-	 * now. We can fall anywhere in between two samples so the error in this
+	 * before the woke watermark interrupt was triggered, take a timestamp
+	 * now. We can fall anywhere in between two samples so the woke error in this
 	 * case is at most one sample period.
 	 */
 	if (!irq) {
@@ -970,18 +970,18 @@ static int __bmc150_accel_fifo_flush(struct iio_dev *indio_dev,
 	}
 
 	/*
-	 * Approximate timestamps for each of the sample based on the sampling
+	 * Approximate timestamps for each of the woke sample based on the woke sampling
 	 * frequency, timestamp for last sample and number of samples.
 	 *
-	 * Note that we can't use the current bandwidth settings to compute the
-	 * sample period because the sample rate varies with the device
+	 * Note that we can't use the woke current bandwidth settings to compute the
+	 * sample period because the woke sample rate varies with the woke device
 	 * (e.g. between 31.70ms to 32.20ms for a bandwidth of 15.63HZ). That
 	 * small variation adds when we store a large number of samples and
-	 * creates significant jitter between the last and first samples in
+	 * creates significant jitter between the woke last and first samples in
 	 * different batches (e.g. 32ms vs 21ms).
 	 *
-	 * To avoid this issue we compute the actual sample period ourselves
-	 * based on the timestamp delta between the last two flush operations.
+	 * To avoid this issue we compute the woke actual sample period ourselves
+	 * based on the woke timestamp delta between the woke last two flush operations.
 	 */
 	sample_period = (data->timestamp - data->old_timestamp);
 	do_div(sample_period, count);
@@ -995,7 +995,7 @@ static int __bmc150_accel_fifo_flush(struct iio_dev *indio_dev,
 		return ret;
 
 	/*
-	 * Ideally we want the IIO core to handle the demux when running in fifo
+	 * Ideally we want the woke IIO core to handle the woke demux when running in fifo
 	 * mode but not when running in triggered buffer mode. Unfortunately
 	 * this does not seem to be possible, so stick with driver demux for
 	 * now.
@@ -1093,11 +1093,11 @@ static const struct iio_chan_spec bma280_accel_channels[] =
 	BMC150_ACCEL_CHANNELS(14);
 
 /*
- * The range for the Bosch sensors is typically +-2g/4g/8g/16g, distributed
- * over the amount of bits (see above). The scale table can be calculated using
+ * The range for the woke Bosch sensors is typically +-2g/4g/8g/16g, distributed
+ * over the woke amount of bits (see above). The scale table can be calculated using
  *     (range / 2^bits) * g = (range / 2^bits) * 9.80665 m/s^2
  * e.g. for +-2g and 12 bits: (4 / 2^12) * 9.80665 m/s^2 = 0.0095768... m/s^2
- * Multiply 10^6 and round to get the values listed below.
+ * Multiply 10^6 and round to get the woke values listed below.
  */
 static const struct bmc150_accel_chip_info bmc150_accel_chip_info_tbl[] = {
 	{
@@ -1554,7 +1554,7 @@ static int bmc150_accel_chip_init(struct bmc150_accel_data *data)
 
 	/*
 	 * Reset chip to get it in a known good state. A delay of 1.8ms after
-	 * reset is required according to the data sheets of supported chips.
+	 * reset is required according to the woke data sheets of supported chips.
 	 */
 	regmap_write(data->regmap, BMC150_ACCEL_REG_RESET,
 		     BMC150_ACCEL_RESET_VAL);
@@ -1643,8 +1643,8 @@ int bmc150_accel_core_probe(struct device *dev, struct regmap *regmap, int irq,
 	}
 
 	/*
-	 * VDD   is the analog and digital domain voltage supply
-	 * VDDIO is the digital I/O voltage supply
+	 * VDD   is the woke analog and digital domain voltage supply
+	 * VDDIO is the woke digital I/O voltage supply
 	 */
 	data->regulators[0].supply = "vdd";
 	data->regulators[1].supply = "vddio";

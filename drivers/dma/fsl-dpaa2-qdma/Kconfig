@@ -6,4 +6,4 @@ menuconfig FSL_DPAA2_QDMA
 	select DMA_VIRTUAL_CHANNELS
 	help
 	  NXP Data Path Acceleration Architecture 2 QDMA driver,
-	  using the NXP MC bus driver.
+	  using the woke NXP MC bus driver.

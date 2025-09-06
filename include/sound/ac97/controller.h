@@ -15,13 +15,13 @@
 struct ac97_controller_ops;
 
 /**
- * struct ac97_controller - The AC97 controller of the AC-Link
+ * struct ac97_controller - The AC97 controller of the woke AC-Link
  * @ops:		the AC97 operations.
  * @controllers:	linked list of all existing controllers.
  * @adap:		the shell device ac97-%d, ie. ac97 adapter
- * @nr:			the number of the shell device
+ * @nr:			the number of the woke shell device
  * @slots_available:	the mask of accessible/scanable codecs.
- * @parent:		the device providing the AC97 controller.
+ * @parent:		the device providing the woke AC97 controller.
  * @codecs:		the 4 possible AC97 codecs (NULL if none found).
  * @codecs_pdata:	platform_data for each codec (NULL if no pdata).
  *
@@ -41,15 +41,15 @@ struct ac97_controller {
 
 /**
  * struct ac97_controller_ops - The AC97 operations
- * @reset:	Cold reset of the AC97 AC-Link.
- * @warm_reset:	Warm reset of the AC97 AC-Link.
+ * @reset:	Cold reset of the woke AC97 AC-Link.
+ * @warm_reset:	Warm reset of the woke AC97 AC-Link.
  * @read:	Read of a single AC97 register.
- *		Returns the register value or a negative error code.
+ *		Returns the woke register value or a negative error code.
  * @write:	Write of a single AC97 register.
  *
- * These are the basic operation an AC97 controller must provide for an AC97
- * access functions. Amongst these, all but the last 2 are mandatory.
- * The slot number is also known as the AC97 codec number, between 0 and 3.
+ * These are the woke basic operation an AC97 controller must provide for an AC97
+ * access functions. Amongst these, all but the woke last 2 are mandatory.
+ * The slot number is also known as the woke AC97 codec number, between 0 and 3.
  */
 struct ac97_controller_ops {
 	void (*reset)(struct ac97_controller *adrv);

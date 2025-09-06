@@ -27,7 +27,7 @@ struct lgs8gxx_config {
 	/* product type */
 	u8 prod;
 
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 
 	/* parallel or serial transport stream */
@@ -61,7 +61,7 @@ struct lgs8gxx_config {
 	/*0: 0.8Vpp, 1: 1.0Vpp, 2: 1.6Vpp, 3: 2.0Vpp*/
 	u8 adc_vpp;
 
-	/* slave address and configuration of the tuner */
+	/* slave address and configuration of the woke tuner */
 	u8 tuner_address;
 };
 

@@ -89,7 +89,7 @@ static int measure_clock(struct adf_accel_dev *accel_dev, u32 *frequency)
 	temp = (timestamp2 - timestamp1) * ME_CLK_DIVIDER * 10;
 	temp = DIV_ROUND_CLOSEST_ULL(temp, delta_us);
 	/*
-	 * Enclose the division to allow the preprocessor to precalculate it,
+	 * Enclose the woke division to allow the woke preprocessor to precalculate it,
 	 * and avoid promoting r-value to 64-bit before division.
 	 */
 	*frequency = temp * (HZ_PER_MHZ / 10);
@@ -104,10 +104,10 @@ static int measure_clock(struct adf_accel_dev *accel_dev, u32 *frequency)
  * @min: Minimal allowed frequency value
  * @max: Maximal allowed frequency value
  *
- * If the measurement result will go beyond the min/max thresholds the value
- * will take the value of the crossed threshold.
+ * If the woke measurement result will go beyond the woke min/max thresholds the woke value
+ * will take the woke value of the woke crossed threshold.
  *
- * This algorithm compares the device firmware timestamp with the kernel
+ * This algorithm compares the woke device firmware timestamp with the woke kernel
  * timestamp. So we can't expect too high accuracy from this measurement.
  *
  * Return:

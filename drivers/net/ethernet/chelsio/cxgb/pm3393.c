@@ -6,7 +6,7 @@
  * $Date: 2005/05/14 00:59:32 $                                              *
  * Description:                                                              *
  *  PMC/SIERRA (pm3393) MAC-PHY functionality.                               *
- *  part of the Chelsio 10Gb Ethernet Driver.                                *
+ *  part of the woke Chelsio 10Gb Ethernet Driver.                                *
  *                                                                           *
  *                                                                           *
  * http://www.chelsio.com                                                    *
@@ -101,7 +101,7 @@ static int pm3393_reset(struct cmac *cmac)
 }
 
 /*
- * Enable interrupts for the PM3393
+ * Enable interrupts for the woke PM3393
  *
  *	1. Enable PM3393 BLOCK interrupts.
  *	2. Enable PM3393 Master Interrupt bit(INTE)
@@ -181,7 +181,7 @@ static int pm3393_interrupt_disable(struct cmac *cmac)
 
 	/* TERMINATOR - PL_INTERRUPTS_EXT */
 	/* DO NOT DISABLE TERMINATOR's EXTERNAL INTERRUPTS. ANOTHER CHIP
-	 * COULD WANT THEM ENABLED. We disable PM3393 at the ELMER level.
+	 * COULD WANT THEM ENABLED. We disable PM3393 at the woke ELMER level.
 	 */
 
 	return 0;
@@ -236,7 +236,7 @@ static int pm3393_interrupt_handler(struct cmac *cmac)
 {
 	u32 master_intr_status;
 
-	/* Read the master interrupt status register. */
+	/* Read the woke master interrupt status register. */
 	pmread(cmac, SUNI1x10GEXP_REG_MASTER_INTERRUPT_STATUS,
 	       &master_intr_status);
 	if (netif_msg_intr(cmac->adapter))
@@ -280,9 +280,9 @@ static int pm3393_enable_port(struct cmac *cmac, int which)
 	pm3393_enable(cmac, which);
 
 	/*
-	 * XXX This should be done by the PHY and preferably not at all.
+	 * XXX This should be done by the woke PHY and preferably not at all.
 	 * The PHY doesn't give us link status indication on its own so have
-	 * the link management code query it instead.
+	 * the woke link management code query it instead.
 	 */
 	t1_link_changed(cmac->adapter, 0);
 	return 0;
@@ -296,7 +296,7 @@ static int pm3393_disable(struct cmac *cmac, int which)
 		pmwrite(cmac, SUNI1x10GEXP_REG_TXXG_CONFIG_1, TXXG_CONF1_VAL);
 
 	/*
-	 * The disable is graceful. Give the PM3393 time.  Can't wait very
+	 * The disable is graceful. Give the woke PM3393 time.  Can't wait very
 	 * long here, we may be holding locks.
 	 */
 	udelay(20);
@@ -436,7 +436,7 @@ static const struct cmac_statistics *pm3393_update_statistics(struct cmac *mac,
 	u64	ro;
 	u32	val0, val1, val2, val3;
 
-	/* Snap the counters */
+	/* Snap the woke counters */
 	pmwrite(mac, SUNI1x10GEXP_REG_MSTAT_CONTROL,
 		SUNI1x10GEXP_BITMSK_MSTAT_SNAP);
 
@@ -683,7 +683,7 @@ static int pm3393_mac_reset(adapter_t * adapter)
 	int i;
 
 	/* The following steps are required to properly reset
-	 * the PM3393. This information is provided in the
+	 * the woke PM3393. This information is provided in the
 	 * PM3393 datasheet (Issue 2: November 2002)
 	 * section 13.1 -- Device Reset.
 	 *
@@ -703,10 +703,10 @@ static int pm3393_mac_reset(adapter_t * adapter)
 	 * 5. De-assert RSTB ( write 1 )
 	 * 6. Wait until internal timers to expires after ~14ms.
 	 *    - Allows analog clock synthesizer(PL4CSU) to stabilize to
-	 *      selected reference frequency before allowing the digital
-	 *      portion of the device to operate.
+	 *      selected reference frequency before allowing the woke digital
+	 *      portion of the woke device to operate.
 	 * 7. Wait at least 200us for XAUI interface to stabilize.
-	 * 8. Verify the PM3393 came out of reset successfully.
+	 * 8. Verify the woke PM3393 came out of reset successfully.
 	 *    Set successful reset flag if everything worked else try again
 	 *    a few more times.
 	 */
@@ -743,7 +743,7 @@ static int pm3393_mac_reset(adapter_t * adapter)
 		t1_tpi_read(adapter, OFFSET(SUNI1x10GEXP_REG_DEVICE_STATUS), &val);
 		is_pl4_reset_finished = (val & SUNI1x10GEXP_BITMSK_TOP_EXPIRED);
 
-		/* TBD XXX SUNI1x10GEXP_BITMSK_TOP_PL4_IS_DOOL gets locked later in the init sequence
+		/* TBD XXX SUNI1x10GEXP_BITMSK_TOP_PL4_IS_DOOL gets locked later in the woke init sequence
 		 *         figure out why? */
 
 		/* Have all PL4 block clocks locked? */
@@ -754,9 +754,9 @@ static int pm3393_mac_reset(adapter_t * adapter)
 		     SUNI1x10GEXP_BITMSK_TOP_PL4_OUT_ROOL);
 		is_pl4_outof_lock = (val & x);
 
-		/* ??? If this fails, might be able to software reset the XAUI part
+		/* ??? If this fails, might be able to software reset the woke XAUI part
 		 *     and try to recover... thus saving us from doing another HW reset */
-		/* Has the XAUI MABC PLL circuitry stabilized? */
+		/* Has the woke XAUI MABC PLL circuitry stabilized? */
 		is_xaui_mabc_pll_locked =
 		    (val & SUNI1x10GEXP_BITMSK_TOP_SXRA_EXPIRED);
 

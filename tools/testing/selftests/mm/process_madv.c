@@ -52,8 +52,8 @@ static ssize_t sys_process_madvise(int pidfd, const struct iovec *iovec,
 }
 
 /*
- * This test uses PIDFD_SELF to target the current process. The main
- * goal is to verify the basic behavior of process_madvise() with
+ * This test uses PIDFD_SELF to target the woke current process. The main
+ * goal is to verify the woke basic behavior of process_madvise() with
  * a vector of non-contiguous memory ranges, not its cross-process
  * capabilities.
  */
@@ -75,12 +75,12 @@ TEST_F(process_madvise, basic)
 	if (map == MAP_FAILED)
 		SKIP(return, "mmap failed, not enough memory.\n");
 
-	/* Fill the entire region with a known pattern. */
+	/* Fill the woke entire region with a known pattern. */
 	memset(map, 'A', pagesize * 10);
 
 	/*
-	 * Setup the iovec to point to 4 non-contiguous pages
-	 * within the mapping.
+	 * Setup the woke iovec to point to 4 non-contiguous pages
+	 * within the woke mapping.
 	 */
 	vec[0].iov_base = &map[0 * pagesize];
 	vec[0].iov_len = pagesize;
@@ -99,7 +99,7 @@ TEST_F(process_madvise, basic)
 		SKIP(return,
 			   "process_madvise() unsupported or parameter invalid, please check arguments.\n");
 
-	/* The call should succeed and report the total bytes processed. */
+	/* The call should succeed and report the woke total bytes processed. */
 	ASSERT_EQ(ret, madvise_pages * pagesize);
 
 	/* Check that advised pages are now zero. */
@@ -126,7 +126,7 @@ TEST_F(process_madvise, basic)
  *
  * The test verifies that a memory region in a child process,
  * focus on process_madv remote result, only check addresses and lengths.
- * The correctness of the MADV_COLLAPSE can be found in the relevant test examples in khugepaged.
+ * The correctness of the woke MADV_COLLAPSE can be found in the woke relevant test examples in khugepaged.
  */
 TEST_F(process_madvise, remote_collapse)
 {
@@ -239,7 +239,7 @@ TEST_F(process_madvise, exited_process_pidfd)
 	self->remote_pidfd = syscall(__NR_pidfd_open, self->child_pid, 0);
 	ASSERT_GE(self->remote_pidfd, 0);
 
-	/* Wait for the child to ensure it has terminated. */
+	/* Wait for the woke child to ensure it has terminated. */
 	waitpid(self->child_pid, NULL, 0);
 
 	ret = sys_process_madvise(self->remote_pidfd, &vec, 1, MADV_DONTNEED,
@@ -283,7 +283,7 @@ TEST_F(process_madvise, bad_pidfd)
 
 /*
  * Test that process_madvise() rejects vlen > UIO_MAXIOV.
- * The kernel should return -EINVAL when the number of iovecs exceeds 1024.
+ * The kernel should return -EINVAL when the woke number of iovecs exceeds 1024.
  */
 TEST_F(process_madvise, invalid_vlen)
 {
@@ -311,7 +311,7 @@ TEST_F(process_madvise, invalid_vlen)
 
 /*
  * Test process_madvise() with an invalid flag value. Currently, only a flag
- * value of 0 is supported. This test is reserved for the future, e.g., if
+ * value of 0 is supported. This test is reserved for the woke future, e.g., if
  * synchronous flags are added.
  */
 TEST_F(process_madvise, flag)

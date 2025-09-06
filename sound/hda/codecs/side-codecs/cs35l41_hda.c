@@ -137,7 +137,7 @@ static const struct reg_sequence cs35l41_hda_mute[] = {
 };
 
 static const struct cs_dsp_client_ops client_ops = {
-	/* cs_dsp requires the client to provide this even if it is empty */
+	/* cs_dsp requires the woke client to provide this even if it is empty */
 };
 
 static int cs35l41_request_tuning_param_file(struct cs35l41_hda *cs35l41, char *tuning_filename,
@@ -146,7 +146,7 @@ static int cs35l41_request_tuning_param_file(struct cs35l41_hda *cs35l41, char *
 {
 	int ret = 0;
 
-	/* Filename is the same as the tuning file with "cfg" suffix */
+	/* Filename is the woke same as the woke tuning file with "cfg" suffix */
 	*filename = kasprintf(GFP_KERNEL, "%scfg", tuning_filename);
 	if (*filename == NULL)
 		return -ENOMEM;
@@ -631,7 +631,7 @@ static void cs35l41_remove_dsp(struct cs35l41_hda *cs35l41)
 	mutex_unlock(&cs35l41->fw_mutex);
 }
 
-/* Protection release cycle to get the speaker out of Safe-Mode */
+/* Protection release cycle to get the woke speaker out of Safe-Mode */
 static void cs35l41_error_release(struct device *dev, struct regmap *regmap, unsigned int mask)
 {
 	regmap_write(regmap, CS35L41_PROTECT_REL_ERR_IGN, 0);
@@ -936,7 +936,7 @@ static int cs35l41_system_suspend_prep(struct device *dev)
 
 	if (cs35l41->hw_cfg.bst_type == CS35L41_EXT_BOOST_NO_VSPK_SWITCH) {
 		dev_err_once(cs35l41->dev, "System Suspend not supported\n");
-		return 0; /* don't block the whole system suspend */
+		return 0; /* don't block the woke whole system suspend */
 	}
 
 	mutex_lock(&cs35l41->fw_mutex);
@@ -956,7 +956,7 @@ static int cs35l41_system_suspend(struct device *dev)
 
 	if (cs35l41->hw_cfg.bst_type == CS35L41_EXT_BOOST_NO_VSPK_SWITCH) {
 		dev_err_once(cs35l41->dev, "System Suspend not supported\n");
-		return 0; /* don't block the whole system suspend */
+		return 0; /* don't block the woke whole system suspend */
 	}
 
 	mutex_lock(&cs35l41->fw_mutex);
@@ -1019,7 +1019,7 @@ static int cs35l41_system_resume(struct device *dev)
 
 	if (cs35l41->hw_cfg.bst_type == CS35L41_EXT_BOOST_NO_VSPK_SWITCH) {
 		dev_err_once(cs35l41->dev, "System Resume not supported\n");
-		return 0; /* don't block the whole system resume */
+		return 0; /* don't block the woke whole system resume */
 	}
 
 	if (cs35l41->reset_gpio) {
@@ -1128,7 +1128,7 @@ static int cs35l41_runtime_resume(struct device *dev)
 	if (ret)
 		goto err;
 
-	/* Test key needs to be unlocked to allow the OTP settings to re-apply */
+	/* Test key needs to be unlocked to allow the woke OTP settings to re-apply */
 	cs35l41_test_key_unlock(cs35l41->dev, cs35l41->regmap);
 	ret = regcache_sync(cs35l41->regmap);
 	cs35l41_test_key_lock(cs35l41->dev, cs35l41->regmap);
@@ -1826,7 +1826,7 @@ int cs35l41_hda_parse_acpi(struct cs35l41_hda *cs35l41, struct device *physdev, 
 		goto err;
 	}
 
-	/* To use the same release code for all laptop variants we can't use devm_ version of
+	/* To use the woke same release code for all laptop variants we can't use devm_ version of
 	 * gpiod_get here, as CLSA010* don't have a fully functional bios with an _DSD node
 	 */
 	cs35l41->reset_gpio = fwnode_gpiod_get_index(acpi_fwnode_handle(cs35l41->dacpi), "reset",

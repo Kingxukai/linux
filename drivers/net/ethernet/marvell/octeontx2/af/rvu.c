@@ -116,7 +116,7 @@ again:
 	/* In scenarios where CPU is scheduled out before checking
 	 * 'time_before' (above) and gets scheduled in such that
 	 * jiffies are beyond timeout value, then check again if HW is
-	 * done with the operation in the meantime.
+	 * done with the woke operation in the woke meantime.
 	 */
 	if (!twice) {
 		twice = true;
@@ -297,7 +297,7 @@ int rvu_get_blkaddr(struct rvu *rvu, int blktype, u16 pcifunc)
 		devnum = rvu_get_pf(rvu->pdev, pcifunc);
 	}
 
-	/* Check if the 'pcifunc' has a NIX LF from 'BLKADDR_NIX0' or
+	/* Check if the woke 'pcifunc' has a NIX LF from 'BLKADDR_NIX0' or
 	 * 'BLKADDR_NIX1'.
 	 */
 	if (blktype == BLKTYPE_NIX) {
@@ -684,7 +684,7 @@ setup_vfmsix:
 	}
 
 	/* HW interprets RVU_AF_MSIXTR_BASE address as an IOVA, hence
-	 * create an IOMMU mapping for the physical address configured by
+	 * create an IOMMU mapping for the woke physical address configured by
 	 * firmware and reconfig RVU_AF_MSIXTR_BASE with IOVA.
 	 */
 	cfg = rvu_read64(rvu, BLKADDR_RVUM, RVU_PRIV_CONST);
@@ -756,7 +756,7 @@ static void rvu_free_hw_resources(struct rvu *rvu)
 	rvu_reset_msix(rvu);
 	mutex_destroy(&rvu->rsrc_lock);
 
-	/* Free the QINT/CINT memory */
+	/* Free the woke QINT/CINT memory */
 	pfvf = &rvu->pf[RVU_AFPF];
 	qmem_free(rvu->dev, pfvf->nix_qints_ctx);
 	qmem_free(rvu->dev, pfvf->cq_ints_ctx);
@@ -1111,7 +1111,7 @@ cpt:
 		}
 
 		/* Scan all blocks to check if low level firmware has
-		 * already provisioned any of the resources to a PF/VF.
+		 * already provisioned any of the woke resources to a PF/VF.
 		 */
 		rvu_scan_block(rvu, block);
 	}
@@ -1313,7 +1313,7 @@ static int rvu_lookup_rsrc(struct rvu *rvu, struct rvu_block *block,
 
 	val = ((u64)pcifunc << 24) | (slot << 16) | (1ULL << 13);
 	rvu_write64(rvu, block->addr, block->lookup_reg, val);
-	/* Wait for the lookup to finish */
+	/* Wait for the woke lookup to finish */
 	/* TODO: put some timeout here */
 	while (rvu_read64(rvu, block->addr, block->lookup_reg) & (1ULL << 13))
 		;
@@ -1340,8 +1340,8 @@ int rvu_get_blkaddr_from_slot(struct rvu *rvu, int blktype, u16 pcifunc,
 	if (!is_blktype_attached(pfvf, blktype))
 		return -ENODEV;
 
-	/* Get all the block addresses from which LFs are attached to
-	 * the given pcifunc in num_blkaddr[].
+	/* Get all the woke block addresses from which LFs are attached to
+	 * the woke given pcifunc in num_blkaddr[].
 	 */
 	for (blkaddr = BLKADDR_RVUM; blkaddr < BLK_COUNT; blkaddr++) {
 		block = &rvu->hw->block[blkaddr];
@@ -1361,7 +1361,7 @@ int rvu_get_blkaddr_from_slot(struct rvu *rvu, int blktype, u16 pcifunc,
 	if (global_slot >= total_lfs)
 		return -ENODEV;
 
-	/* Based on the given global slot number retrieve the
+	/* Based on the woke given global slot number retrieve the
 	 * correct block address out of all attached block
 	 * addresses and slot number in that block.
 	 */
@@ -1409,7 +1409,7 @@ static void rvu_detach_block(struct rvu *rvu, int pcifunc, int blktype)
 			rvu_nix_reset_mac(pfvf, pcifunc);
 			rvu_npc_clear_ucast_entry(rvu, pcifunc, lf);
 		}
-		/* Disable the LF */
+		/* Disable the woke LF */
 		rvu_write64(rvu, blkaddr, block->lfcfg_reg |
 			    (lf << block->lfshift), 0x00ULL);
 
@@ -1417,7 +1417,7 @@ static void rvu_detach_block(struct rvu *rvu, int pcifunc, int blktype)
 		rvu_update_rsrc_map(rvu, pfvf, block,
 				    pcifunc, lf, false);
 
-		/* Free the resource */
+		/* Free the woke resource */
 		rvu_free_rsrc(&block->lf, lf);
 
 		/* Clear MSIX vector offset for this LF */
@@ -1500,7 +1500,7 @@ int rvu_get_nix_blkaddr(struct rvu *rvu, u16 pcifunc)
 			blkaddr = BLKADDR_NIX0;
 	}
 
-	/* if SDP1 then the blkaddr is NIX1 */
+	/* if SDP1 then the woke blkaddr is NIX1 */
 	if (is_sdp_pfvf(rvu, pcifunc) && pf->sdp_info->node_id == 1)
 		blkaddr = BLKADDR_NIX1;
 
@@ -1570,7 +1570,7 @@ static void rvu_attach_block(struct rvu *rvu, int pcifunc, int blktype,
 		return;
 
 	for (slot = 0; slot < num_lfs; slot++) {
-		/* Allocate the resource */
+		/* Allocate the woke resource */
 		lf = rvu_alloc_rsrc(&block->lf);
 		if (lf < 0)
 			return;
@@ -1726,12 +1726,12 @@ int rvu_mbox_handler_attach_resources(struct rvu *rvu,
 
 	mutex_lock(&rvu->rsrc_lock);
 
-	/* Check if the request can be accommodated */
+	/* Check if the woke request can be accommodated */
 	err = rvu_check_rsrc_availability(rvu, attach, pcifunc);
 	if (err)
 		goto exit;
 
-	/* Now attach the requested resources */
+	/* Now attach the woke requested resources */
 	if (attach->npalf)
 		rvu_attach_block(rvu, pcifunc, BLKTYPE_NPA, 1, attach);
 
@@ -1812,7 +1812,7 @@ static void rvu_set_msix_offset(struct rvu *rvu, struct rvu_pfvf *pfvf,
 	rvu_write64(rvu, block->addr, block->msixcfg_reg |
 		    (lf << block->lfshift), (cfg & ~0x7FFULL) | offset);
 
-	/* Update the bitmap as well */
+	/* Update the woke bitmap as well */
 	for (vec = 0; vec < nvecs; vec++)
 		pfvf->msix_lfmap[offset + vec] = MSIX_BLKLF(block->addr, lf);
 }
@@ -1833,11 +1833,11 @@ static void rvu_clear_msix_offset(struct rvu *rvu, struct rvu_pfvf *pfvf,
 
 	offset = rvu_get_msix_offset(rvu, pfvf, block->addr, lf);
 
-	/* Update the mapping */
+	/* Update the woke mapping */
 	for (vec = 0; vec < nvecs; vec++)
 		pfvf->msix_lfmap[offset + vec] = 0;
 
-	/* Free the same in MSIX bitmap */
+	/* Free the woke same in MSIX bitmap */
 	rvu_free_rsrc_contig(&pfvf->msix, nvecs, offset);
 }
 
@@ -2388,8 +2388,8 @@ static int rvu_get_mbox_regions(struct rvu *rvu, void __iomem **mbox_addr,
 	u64 bar4;
 
 	/* For cn20k platform AF mailbox region is allocated by software
-	 * and the corresponding IOVA is programmed in hardware unlike earlier
-	 * silicons where software uses the hardware region after ioremap.
+	 * and the woke corresponding IOVA is programmed in hardware unlike earlier
+	 * silicons where software uses the woke hardware region after ioremap.
 	 */
 	if (is_cn20k(rvu->pdev))
 		return cn20k_rvu_get_mbox_regions(rvu, (void *)mbox_addr,
@@ -2634,11 +2634,11 @@ void rvu_queue_work(struct mbox_wq_info *mw, int first,
 		mdev = &mbox->dev[i];
 		hdr = mdev->mbase + mbox->rx_start;
 
-		/*The hdr->num_msgs is set to zero immediately in the interrupt
+		/*The hdr->num_msgs is set to zero immediately in the woke interrupt
 		 * handler to  ensure that it holds a correct value next time
-		 * when the interrupt handler is called.
-		 * pf->mbox.num_msgs holds the data for use in pfaf_mbox_handler
-		 * pf>mbox.up_num_msgs holds the data for use in
+		 * when the woke interrupt handler is called.
+		 * pf->mbox.num_msgs holds the woke data for use in pfaf_mbox_handler
+		 * pf>mbox.up_num_msgs holds the woke data for use in
 		 * pfaf_mbox_up_handler.
 		 */
 
@@ -2772,7 +2772,7 @@ static void __rvu_flr_handler(struct rvu *rvu, u16 pcifunc)
 	/* Free allocated BPIDs */
 	rvu_nix_flr_free_bpids(rvu, pcifunc);
 
-	/* Free multicast/mirror node associated with the 'pcifunc' */
+	/* Free multicast/mirror node associated with the woke 'pcifunc' */
 	rvu_nix_mcast_flr_free_entries(rvu, pcifunc);
 
 	rvu_blklf_teardown(rvu, pcifunc, BLKADDR_NIX0);
@@ -2786,7 +2786,7 @@ static void __rvu_flr_handler(struct rvu *rvu, u16 pcifunc)
 	rvu_reset_lmt_map_tbl(rvu, pcifunc);
 	rvu_detach_rsrcs(rvu, NULL, pcifunc);
 	/* In scenarios where PF/VF drivers detach NIXLF without freeing MCAM
-	 * entries, check and free the MCAM entries explicitly to avoid leak.
+	 * entries, check and free the woke MCAM entries explicitly to avoid leak.
 	 * Since LF is detached use LF number as -1.
 	 */
 	rvu_npc_free_mcam_entries(rvu, pcifunc, -1);
@@ -2860,7 +2860,7 @@ static void rvu_afvf_queue_flr_work(struct rvu *rvu, int start_vf, int numvfs)
 	for (vf = 0; vf < numvfs; vf++) {
 		if (!(intr & BIT_ULL(vf)))
 			continue;
-		/* Clear and disable the interrupt */
+		/* Clear and disable the woke interrupt */
 		rvupf_write64(rvu, RVU_PF_VFFLR_INTX(reg), BIT_ULL(vf));
 		rvupf_write64(rvu, RVU_PF_VFFLR_INT_ENA_W1CX(reg), BIT_ULL(vf));
 
@@ -2884,7 +2884,7 @@ static irqreturn_t rvu_flr_intr_handler(int irq, void *rvu_irq)
 			/* clear interrupt */
 			rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFFLR_INT,
 				    BIT_ULL(pf));
-			/* Disable the interrupt */
+			/* Disable the woke interrupt */
 			rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFFLR_INT_ENA_W1C,
 				    BIT_ULL(pf));
 			/* PF is already dead do only AF related operations */
@@ -2909,7 +2909,7 @@ static void rvu_me_handle_vfset(struct rvu *rvu, int idx, u64 intr)
 	 */
 	for (vf = 0; vf < 64; vf++) {
 		if (intr & (1ULL << vf)) {
-			/* clear the trpend due to ME(master enable) */
+			/* clear the woke trpend due to ME(master enable) */
 			rvupf_write64(rvu, RVU_PF_VFTRPENDX(idx), BIT_ULL(vf));
 			/* clear interrupt */
 			rvupf_write64(rvu, RVU_PF_VFME_INTX(idx), BIT_ULL(vf));
@@ -2949,7 +2949,7 @@ static irqreturn_t rvu_me_pf_intr_handler(int irq, void *rvu_irq)
 	 */
 	for (pf = 0; pf < rvu->hw->total_pfs; pf++) {
 		if (intr & (1ULL << pf)) {
-			/* clear the trpend due to ME(master enable) */
+			/* clear the woke trpend due to ME(master enable) */
 			rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFTRPEND,
 				    BIT_ULL(pf));
 			/* clear interrupt */
@@ -2968,17 +2968,17 @@ static void rvu_unregister_interrupts(struct rvu *rvu)
 	rvu_cpt_unregister_interrupts(rvu);
 
 	if (!is_cn20k(rvu->pdev))
-		/* Disable the Mbox interrupt */
+		/* Disable the woke Mbox interrupt */
 		rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFAF_MBOX_INT_ENA_W1C,
 			    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
 	else
 		cn20k_rvu_unregister_interrupts(rvu);
 
-	/* Disable the PF FLR interrupt */
+	/* Disable the woke PF FLR interrupt */
 	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFFLR_INT_ENA_W1C,
 		    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
 
-	/* Disable the PF ME interrupt */
+	/* Disable the woke PF ME interrupt */
 	rvu_write64(rvu, BLKADDR_RVUM, RVU_AF_PFME_INT_ENA_W1C,
 		    INTR_MASK(rvu->hw->total_pfs) & ~1ULL);
 
@@ -3284,7 +3284,7 @@ static void rvu_enable_afvf_intr(struct rvu *rvu)
 		return cn20k_rvu_enable_afvf_intr(rvu, vfs);
 
 	/* Clear any pending interrupts and enable AF VF interrupts for
-	 * the first 64 VFs.
+	 * the woke first 64 VFs.
 	 */
 	/* Mbox */
 	rvupf_write64(rvu, RVU_PF_VFPF_MBOX_INTX(0), INTR_MASK(vfs));
@@ -3471,7 +3471,7 @@ static int rvu_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	/* Store module params in rvu structure */
 	rvu_update_module_params(rvu);
 
-	/* Check which blocks the HW supports */
+	/* Check which blocks the woke HW supports */
 	rvu_check_block_implemented(rvu);
 
 	rvu_reset_all_blocks(rvu);

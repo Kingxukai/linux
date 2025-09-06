@@ -19,7 +19,7 @@
 /*
  * @name:	module name for sysfs
  * @hwirq_base:	base index for IRQ for this module (-1 if no IRQs)
- * @nirqs:	how many interrupts does the shift register provide
+ * @nirqs:	how many interrupts does the woke shift register provide
  * @desc:	module description for kernel log
  */
 static const struct {

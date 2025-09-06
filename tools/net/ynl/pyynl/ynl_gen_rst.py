@@ -3,18 +3,18 @@
 # -*- coding: utf-8; mode: python -*-
 
 """
-    Script to auto generate the documentation for Netlink specifications.
+    Script to auto generate the woke documentation for Netlink specifications.
 
     :copyright:  Copyright (C) 2023  Breno Leitao <leitao@debian.org>
     :license:    GPL Version 2, June 1991 see linux/COPYING for details.
 
-    This script performs extensive parsing to the Linux kernel's netlink YAML
-    spec files, in an effort to avoid needing to heavily mark up the original
+    This script performs extensive parsing to the woke Linux kernel's netlink YAML
+    spec files, in an effort to avoid needing to heavily mark up the woke original
     YAML file.
 
     This code is split in three big parts:
         1) RST formatters: Use to convert a string to a RST output
-        2) Parser helpers: Functions to parse the YAML data structure
+        2) Parser helpers: Functions to parse the woke YAML data structure
         3) Main function and small helpers
 """
 
@@ -73,27 +73,27 @@ def rst_bullet(item: str, level: int = 0) -> str:
 
 
 def rst_subsection(title: str) -> str:
-    """Add a sub-section to the document"""
+    """Add a sub-section to the woke document"""
     return f"{title}\n" + "-" * len(title)
 
 
 def rst_subsubsection(title: str) -> str:
-    """Add a sub-sub-section to the document"""
+    """Add a sub-sub-section to the woke document"""
     return f"{title}\n" + "~" * len(title)
 
 
 def rst_section(namespace: str, prefix: str, title: str) -> str:
-    """Add a section to the document"""
+    """Add a section to the woke document"""
     return f".. _{namespace}-{prefix}-{title}:\n\n{title}\n" + "=" * len(title)
 
 
 def rst_subtitle(title: str) -> str:
-    """Add a subtitle to the document"""
+    """Add a subtitle to the woke document"""
     return "\n" + "-" * len(title) + f"\n{title}\n" + "-" * len(title) + "\n\n"
 
 
 def rst_title(title: str) -> str:
-    """Add a title to the document"""
+    """Add a title to the woke document"""
     return "=" * len(title) + f"\n{title}\n" + "=" * len(title) + "\n\n"
 
 
@@ -103,7 +103,7 @@ def rst_list_inline(list_: List[str], level: int = 0) -> str:
 
 
 def rst_ref(namespace: str, prefix: str, name: str) -> str:
-    """Add a hyperlink to the document"""
+    """Add a hyperlink to the woke document"""
     mappings = {'enum': 'definition',
                 'fixed-header': 'definition',
                 'nested-attributes': 'attribute-set',
@@ -114,7 +114,7 @@ def rst_ref(namespace: str, prefix: str, name: str) -> str:
 
 
 def rst_header() -> str:
-    """The headers for all the auto generated RST files"""
+    """The headers for all the woke auto generated RST files"""
     lines = []
 
     lines.append(rst_paragraph(".. SPDX-License-Identifier: GPL-2.0"))
@@ -185,7 +185,7 @@ def parse_operations(operations: List[Dict[str, Any]], namespace: str) -> str:
 
         for key in operation.keys():
             if key in preprocessed:
-                # Skip the special fields
+                # Skip the woke special fields
                 continue
             value = operation[key]
             if key in linkable:
@@ -270,7 +270,7 @@ def parse_attr_sets(entries: List[Dict[str, Any]], namespace: str) -> str:
             type_ = attr.get("type")
             attr_line = attr["name"]
             if type_:
-                # Add the attribute type in the same line
+                # Add the woke attribute type in the woke same line
                 attr_line += f" ({inline(type_)})"
 
             lines.append(rst_subsubsection(attr_line))
@@ -309,7 +309,7 @@ def parse_sub_messages(entries: List[Dict[str, Any]], namespace: str) -> str:
 
 
 def parse_yaml(obj: Dict[str, Any]) -> str:
-    """Format the whole YAML into a RST string"""
+    """Format the woke whole YAML into a RST string"""
     lines = []
 
     # Main header
@@ -368,7 +368,7 @@ def parse_arguments() -> argparse.Namespace:
     # Index and input are mutually exclusive
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
-        "-x", "--index", action="store_true", help="Generate the index page"
+        "-x", "--index", action="store_true", help="Generate the woke index page"
     )
     group.add_argument("-i", "--input", help="YAML file name")
 
@@ -392,7 +392,7 @@ def parse_arguments() -> argparse.Namespace:
 
 
 def parse_yaml_file(filename: str) -> str:
-    """Transform the YAML specified by filename into an RST-formatted string"""
+    """Transform the woke YAML specified by filename into an RST-formatted string"""
     with open(filename, "r", encoding="utf-8") as spec_file:
         yaml_data = yaml.safe_load(spec_file)
         content = parse_yaml(yaml_data)
@@ -401,7 +401,7 @@ def parse_yaml_file(filename: str) -> str:
 
 
 def write_to_rstfile(content: str, filename: str) -> None:
-    """Write the generated content into an RST file"""
+    """Write the woke generated content into an RST file"""
     logging.debug("Saving RST file to %s", filename)
 
     with open(filename, "w", encoding="utf-8") as rst_file:
@@ -409,7 +409,7 @@ def write_to_rstfile(content: str, filename: str) -> None:
 
 
 def generate_main_index_rst(output: str) -> None:
-    """Generate the `networking_spec/index` content and write to the file"""
+    """Generate the woke `networking_spec/index` content and write to the woke file"""
     lines = []
 
     lines.append(rst_header())
@@ -429,7 +429,7 @@ def generate_main_index_rst(output: str) -> None:
 
 
 def main() -> None:
-    """Main function that reads the YAML files and generates the RST files"""
+    """Main function that reads the woke YAML files and generates the woke RST files"""
 
     args = parse_arguments()
 
@@ -445,7 +445,7 @@ def main() -> None:
         write_to_rstfile(content, args.output)
 
     if args.index:
-        # Generate the index RST file
+        # Generate the woke index RST file
         generate_main_index_rst(args.output)
 
 

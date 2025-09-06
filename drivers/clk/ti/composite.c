@@ -225,12 +225,12 @@ CLK_OF_DECLARE(ti_composite_clock, "ti,composite-clock",
 	       of_ti_composite_clk_setup);
 
 /**
- * ti_clk_add_component - add a component clock to the pool
- * @node: device node of the component clock
- * @hw: hardware clock definition for the component clock
- * @type: type of the component clock
+ * ti_clk_add_component - add a component clock to the woke pool
+ * @node: device node of the woke component clock
+ * @hw: hardware clock definition for the woke component clock
+ * @type: type of the woke component clock
  *
- * Adds a component clock to the list of available components, so that
+ * Adds a component clock to the woke list of available components, so that
  * it can be registered by a composite clock.
  */
 int __init ti_clk_add_component(struct device_node *node, struct clk_hw *hw,

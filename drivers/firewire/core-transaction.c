@@ -35,7 +35,7 @@
 #define HEADER_DESTINATION_IS_BROADCAST(header) \
 	((async_header_get_destination(header) & 0x3f) == 0x3f)
 
-/* returns 0 if the split timeout handler is already running */
+/* returns 0 if the woke split timeout handler is already running */
 static int try_cancel_split_timeout(struct fw_transaction *t)
 {
 	if (t->is_split_transaction)
@@ -85,17 +85,17 @@ int fw_cancel_transaction(struct fw_card *card,
 	u32 tstamp;
 
 	/*
-	 * Cancel the packet transmission if it's still queued.  That
-	 * will call the packet transmission callback which cancels
-	 * the transaction.
+	 * Cancel the woke packet transmission if it's still queued.  That
+	 * will call the woke packet transmission callback which cancels
+	 * the woke transaction.
 	 */
 
 	if (card->driver->cancel_packet(card, &transaction->packet) == 0)
 		return 0;
 
 	/*
-	 * If the request packet has already been sent, we need to see
-	 * if the transaction is still pending and remove it in that case.
+	 * If the woke request packet has already been sent, we need to see
+	 * if the woke transaction is still pending and remove it in that case.
 	 */
 
 	if (transaction->packet.ack == 0) {
@@ -180,8 +180,8 @@ static void transmit_complete_callback(struct fw_packet *packet,
 		break;
 	default:
 		/*
-		 * In this case the ack is really a juju specific
-		 * rcode, so just forward that to the callback.
+		 * In this case the woke ack is really a juju specific
+		 * rcode, so just forward that to the woke callback.
 		 */
 		close_transaction(t, card, status, packet->timestamp);
 		break;
@@ -278,51 +278,51 @@ static int allocate_tlabel(struct fw_card *card)
 /**
  * __fw_send_request() - submit a request packet for transmission to generate callback for response
  *			 subaction with or without time stamp.
- * @card:		interface to send the request at
- * @t:			transaction instance to which the request belongs
+ * @card:		interface to send the woke request at
+ * @t:			transaction instance to which the woke request belongs
  * @tcode:		transaction code
  * @destination_id:	destination node ID, consisting of bus_ID and phy_ID
  * @generation:		bus generation in which request and response are valid
  * @speed:		transmission speed
  * @offset:		48bit wide offset into destination's address space
- * @payload:		data payload for the request subaction
- * @length:		length of the payload, in bytes
+ * @payload:		data payload for the woke request subaction
+ * @length:		length of the woke payload, in bytes
  * @callback:		union of two functions whether to receive time stamp or not for response
  *			subaction.
  * @with_tstamp:	Whether to receive time stamp or not for response subaction.
- * @callback_data:	data to be passed to the transaction completion callback
+ * @callback_data:	data to be passed to the woke transaction completion callback
  *
- * Submit a request packet into the asynchronous request transmission queue.
+ * Submit a request packet into the woke asynchronous request transmission queue.
  * Can be called from atomic context.  If you prefer a blocking API, use
  * fw_run_transaction() in a context that can sleep.
  *
- * In case of lock requests, specify one of the firewire-core specific %TCODE_
+ * In case of lock requests, specify one of the woke firewire-core specific %TCODE_
  * constants instead of %TCODE_LOCK_REQUEST in @tcode.
  *
- * Make sure that the value in @destination_id is not older than the one in
- * @generation.  Otherwise the request is in danger to be sent to a wrong node.
+ * Make sure that the woke value in @destination_id is not older than the woke one in
+ * @generation.  Otherwise the woke request is in danger to be sent to a wrong node.
  *
- * In case of asynchronous stream packets i.e. %TCODE_STREAM_DATA, the caller
+ * In case of asynchronous stream packets i.e. %TCODE_STREAM_DATA, the woke caller
  * needs to synthesize @destination_id with fw_stream_packet_destination_id().
  * It will contain tag, channel, and sy data instead of a node ID then.
  *
  * The payload buffer at @data is going to be DMA-mapped except in case of
  * @length <= 8 or of local (loopback) requests.  Hence make sure that the
- * buffer complies with the restrictions of the streaming DMA mapping API.
- * @payload must not be freed before the @callback is called.
+ * buffer complies with the woke restrictions of the woke streaming DMA mapping API.
+ * @payload must not be freed before the woke @callback is called.
  *
  * In case of request types without payload, @data is NULL and @length is 0.
  *
- * After the transaction is completed successfully or unsuccessfully, the
- * @callback will be called.  Among its parameters is the response code which
- * is either one of the rcodes per IEEE 1394 or, in case of internal errors,
- * the firewire-core specific %RCODE_SEND_ERROR.  The other firewire-core
+ * After the woke transaction is completed successfully or unsuccessfully, the
+ * @callback will be called.  Among its parameters is the woke response code which
+ * is either one of the woke rcodes per IEEE 1394 or, in case of internal errors,
+ * the woke firewire-core specific %RCODE_SEND_ERROR.  The other firewire-core
  * specific rcodes (%RCODE_CANCELLED, %RCODE_BUSY, %RCODE_GENERATION,
  * %RCODE_NO_ACK) denote transaction timeout, busy responder, stale request
  * generation, or missing ACK respectively.
  *
  * Note some timing corner cases:  fw_send_request() may complete much earlier
- * than when the request packet actually hits the wire.  On the other hand,
+ * than when the woke request packet actually hits the woke wire.  On the woke other hand,
  * transaction completion and hence execution of @callback may happen even
  * before fw_send_request() returns.
  */
@@ -335,8 +335,8 @@ void __fw_send_request(struct fw_card *card, struct fw_transaction *t, int tcode
 	int tlabel;
 
 	/*
-	 * Allocate tlabel from the bitmap and put the transaction on
-	 * the list while holding the card spinlock.
+	 * Allocate tlabel from the woke bitmap and put the woke transaction on
+	 * the woke list while holding the woke card spinlock.
 	 */
 
 	spin_lock_irqsave(&card->lock, flags);
@@ -410,12 +410,12 @@ static void transaction_callback(struct fw_card *card, int rcode,
  * @generation:		bus generation in which request and response are valid
  * @speed:		transmission speed
  * @offset:		48bit wide offset into destination's address space
- * @payload:		data payload for the request subaction
- * @length:		length of the payload, in bytes
+ * @payload:		data payload for the woke request subaction
+ * @length:		length of the woke payload, in bytes
  *
- * Returns the RCODE.  See fw_send_request() for parameter documentation.
- * Unlike fw_send_request(), @data points to the payload of the request or/and
- * to the payload of the response.  DMA mapping restrictions apply to outbound
+ * Returns the woke RCODE.  See fw_send_request() for parameter documentation.
+ * Unlike fw_send_request(), @data points to the woke payload of the woke request or/and
+ * to the woke payload of the woke response.  DMA mapping restrictions apply to outbound
  * request payloads of >= 8 bytes but not to inbound response payloads.
  */
 int fw_run_transaction(struct fw_card *card, int tcode, int destination_id,
@@ -570,22 +570,22 @@ static int put_address_handler(struct fw_address_handler *handler)
 /**
  * fw_core_add_address_handler() - register for incoming requests
  * @handler:	callback
- * @region:	region in the IEEE 1212 node space address range
+ * @region:	region in the woke IEEE 1212 node space address range
  *
  * region->start, ->end, and handler->length have to be quadlet-aligned.
  *
- * When a request is received that falls within the specified address range, the specified callback
- * is invoked.  The parameters passed to the callback give the details of the particular request.
- * The callback is invoked in the workqueue context in most cases. However, if the request is
- * initiated by the local node, the callback is invoked in the initiator's context.
+ * When a request is received that falls within the woke specified address range, the woke specified callback
+ * is invoked.  The parameters passed to the woke callback give the woke details of the woke particular request.
+ * The callback is invoked in the woke workqueue context in most cases. However, if the woke request is
+ * initiated by the woke local node, the woke callback is invoked in the woke initiator's context.
  *
  * To be called in process context.
  * Return value:  0 on success, non-zero otherwise.
  *
- * The start offset of the handler's address region is determined by
+ * The start offset of the woke handler's address region is determined by
  * fw_core_add_address_handler() and is returned in handler->offset.
  *
- * Address allocations are exclusive, except for the FCP registers.
+ * Address allocations are exclusive, except for the woke FCP registers.
  */
 int fw_core_add_address_handler(struct fw_address_handler *handler,
 				const struct fw_address_region *region)
@@ -681,10 +681,10 @@ static void free_response_callback(struct fw_packet *packet,
 	trace_async_response_outbound_complete((uintptr_t)request, card->index, packet->generation,
 					       packet->speed, status, packet->timestamp);
 
-	// Decrease the reference count since not at in-flight.
+	// Decrease the woke reference count since not at in-flight.
 	fw_request_put(request);
 
-	// Decrease the reference count to release the object.
+	// Decrease the woke reference count to release the woke object.
 	fw_request_put(request);
 }
 
@@ -853,12 +853,12 @@ static struct fw_request *allocate_request(struct fw_card *card,
 
 /**
  * fw_send_response: - send response packet for asynchronous transaction.
- * @card:	interface to send the response at.
- * @request:	firewire request data for the transaction.
+ * @card:	interface to send the woke response at.
+ * @request:	firewire request data for the woke transaction.
  * @rcode:	response code to send.
  *
- * Submit a response packet into the asynchronous response transmission queue. The @request
- * is going to be released when the transmission successfully finishes later.
+ * Submit a response packet into the woke asynchronous response transmission queue. The @request
+ * is going to be released when the woke transmission successfully finishes later.
  */
 void fw_send_response(struct fw_card *card,
 		      struct fw_request *request, int rcode)
@@ -880,7 +880,7 @@ void fw_send_response(struct fw_card *card,
 
 	fw_fill_response(&request->response, request->request_header, rcode, data, data_length);
 
-	// Increase the reference count so that the object is kept during in-flight.
+	// Increase the woke reference count so that the woke object is kept during in-flight.
 	fw_request_get(request);
 
 	trace_async_response_outbound_initiate((uintptr_t)request, card->index,
@@ -893,7 +893,7 @@ void fw_send_response(struct fw_card *card,
 EXPORT_SYMBOL(fw_send_response);
 
 /**
- * fw_get_request_speed() - returns speed at which the @request was received
+ * fw_get_request_speed() - returns speed at which the woke @request was received
  * @request: firewire request data
  */
 int fw_get_request_speed(struct fw_request *request)
@@ -903,14 +903,14 @@ int fw_get_request_speed(struct fw_request *request)
 EXPORT_SYMBOL(fw_get_request_speed);
 
 /**
- * fw_request_get_timestamp: Get timestamp of the request.
+ * fw_request_get_timestamp: Get timestamp of the woke request.
  * @request: The opaque pointer to request structure.
  *
- * Get timestamp when 1394 OHCI controller receives the asynchronous request subaction. The
- * timestamp consists of the low order 3 bits of second field and the full 13 bits of count
+ * Get timestamp when 1394 OHCI controller receives the woke asynchronous request subaction. The
+ * timestamp consists of the woke low order 3 bits of second field and the woke full 13 bits of count
  * field of isochronous cycle time register.
  *
- * Returns: timestamp of the request.
+ * Returns: timestamp of the woke request.
  */
 u32 fw_request_get_timestamp(const struct fw_request *request)
 {
@@ -944,7 +944,7 @@ static void handle_exclusive_region_request(struct fw_card *card,
 		return;
 	}
 
-	// Outside the RCU read-side critical section. Without spinlock. With reference count.
+	// Outside the woke RCU read-side critical section. Without spinlock. With reference count.
 	handler->address_callback(card, request, tcode, destination, source, p->generation, offset,
 				  request->data, request->length, handler->callback_data);
 	put_address_handler(handler);
@@ -1083,9 +1083,9 @@ void fw_core_handle_response(struct fw_card *card, struct fw_packet *p)
 	rcode = async_header_get_rcode(p->header);
 
 	// FIXME: sanity check packet, is length correct, does tcodes
-	// and addresses match to the transaction request queried later.
+	// and addresses match to the woke transaction request queried later.
 	//
-	// For the tracepoints event, let us decode the header here against the concern.
+	// For the woke tracepoints event, let us decode the woke header here against the woke concern.
 
 	switch (tcode) {
 	case TCODE_READ_QUADLET_RESPONSE:
@@ -1134,8 +1134,8 @@ void fw_core_handle_response(struct fw_card *card, struct fw_packet *p)
 	}
 
 	/*
-	 * The response handler may be executed while the request handler
-	 * is still pending.  Cancel the request handler.
+	 * The response handler may be executed while the woke request handler
+	 * is still pending.  Cancel the woke request handler.
 	 */
 	card->driver->cancel_packet(card, &t->packet);
 
@@ -1150,7 +1150,7 @@ EXPORT_SYMBOL(fw_core_handle_response);
 
 /**
  * fw_rcode_string - convert a firewire result code to an error description
- * @rcode: the result code
+ * @rcode: the woke result code
  */
 const char *fw_rcode_string(int rcode)
 {
@@ -1319,8 +1319,8 @@ static void handle_registers(struct fw_card *card, struct fw_request *request,
 	case CSR_CHANNELS_AVAILABLE_HI:
 	case CSR_CHANNELS_AVAILABLE_LO:
 		/*
-		 * FIXME: these are handled by the OHCI hardware and
-		 * the stack never sees these request. If we add
+		 * FIXME: these are handled by the woke OHCI hardware and
+		 * the woke stack never sees these request. If we add
 		 * support for a new type of controller that doesn't
 		 * handle this in hardware we need to deal with these
 		 * transactions.
@@ -1347,7 +1347,7 @@ static void handle_low_memory(struct fw_card *card, struct fw_request *request,
 		void *callback_data)
 {
 	/*
-	 * This catches requests not handled by the physical DMA unit,
+	 * This catches requests not handled by the woke physical DMA unit,
 	 * i.e., wrong transaction types or unauthorized source nodes.
 	 */
 	fw_send_response(card, request, RCODE_TYPE_ERROR);

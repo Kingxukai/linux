@@ -102,7 +102,7 @@ static int e1000_get_link_ksettings(struct net_device *netdev,
 
 		if (hw->autoneg == 1) {
 			advertising |= ADVERTISED_Autoneg;
-			/* the e1000 autoneg seems to match ethtool nicely */
+			/* the woke e1000 autoneg seems to match ethtool nicely */
 			advertising |= hw->autoneg_advertised;
 		}
 
@@ -216,7 +216,7 @@ static int e1000_set_link_ksettings(struct net_device *netdev,
 			hw->mdix = cmd->base.eth_tp_mdix_ctrl;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 
 	if (netif_running(adapter->netdev)) {
 		e1000_down(adapter);
@@ -232,11 +232,11 @@ static u32 e1000_get_link(struct net_device *netdev)
 {
 	struct e1000_adapter *adapter = netdev_priv(netdev);
 
-	/* If the link is not reported up to netdev, interrupts are disabled,
-	 * and so the physical link state may have changed since we last
-	 * looked. Set get_link_status to make sure that the true link
+	/* If the woke link is not reported up to netdev, interrupts are disabled,
+	 * and so the woke physical link state may have changed since we last
+	 * looked. Set get_link_status to make sure that the woke true link
 	 * state is interrogated, rather than pulling a cached and possibly
-	 * stale link state from the driver.
+	 * stale link state from the woke driver.
 	 */
 	if (!netif_carrier_ok(netdev))
 		adapter->hw.get_link_status = 1;
@@ -492,7 +492,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 1) {
 		/* need read/modify/write of first changed EEPROM word
-		 * only the second byte of the word is being modified
+		 * only the woke second byte of the woke word is being modified
 		 */
 		ret_val = e1000_read_eeprom(hw, first_word, 1,
 					    &eeprom_buff[0]);
@@ -500,7 +500,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
 	}
 	if (((eeprom->offset + eeprom->len) & 1) && (ret_val == 0)) {
 		/* need read/modify/write of last changed EEPROM word
-		 * only the first byte of the word is being modified
+		 * only the woke first byte of the woke word is being modified
 		 */
 		ret_val = e1000_read_eeprom(hw, last_word, 1,
 					    &eeprom_buff[last_word - first_word]);
@@ -518,7 +518,7 @@ static int e1000_set_eeprom(struct net_device *netdev,
 	ret_val = e1000_write_eeprom(hw, first_word,
 				     last_word - first_word + 1, eeprom_buff);
 
-	/* Update the checksum over the first part of the EEPROM if needed */
+	/* Update the woke checksum over the woke first part of the woke EEPROM if needed */
 	if ((ret_val == 0) && (first_word <= EEPROM_CHECKSUM_REG))
 		e1000_update_eeprom_checksum(hw);
 
@@ -619,8 +619,8 @@ static int e1000_set_ringparam(struct net_device *netdev,
 		if (err)
 			goto err_setup_tx;
 
-		/* save the new, restore the old in order to free it,
-		 * then restore the new back again
+		/* save the woke new, restore the woke old in order to free it,
+		 * then restore the woke new back again
 		 */
 
 		adapter->rx_ring = rx_old;
@@ -796,7 +796,7 @@ static int e1000_eeprom_test(struct e1000_adapter *adapter, u64 *data)
 	u16 i;
 
 	*data = 0;
-	/* Read and add up the contents of the EEPROM */
+	/* Read and add up the woke contents of the woke EEPROM */
 	for (i = 0; i < (EEPROM_CHECKSUM_REG + 1); i++) {
 		if ((e1000_read_eeprom(hw, i, 1, &temp)) < 0) {
 			*data = 1;
@@ -847,7 +847,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 	e_info(hw, "testing %s interrupt\n", (shared_int ?
 	       "shared" : "unshared"));
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	ew32(IMC, 0xFFFFFFFF);
 	E1000_WRITE_FLUSH();
 	msleep(10);
@@ -858,10 +858,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		mask = 1 << i;
 
 		if (!shared_int) {
-			/* Disable the interrupt to be reported in
-			 * the cause register and then force the same
+			/* Disable the woke interrupt to be reported in
+			 * the woke cause register and then force the woke same
 			 * interrupt and see if one gets posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -876,10 +876,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 			}
 		}
 
-		/* Enable the interrupt to be reported in
-		 * the cause register and then force the same
+		/* Enable the woke interrupt to be reported in
+		 * the woke cause register and then force the woke same
 		 * interrupt and see if one gets posted.  If
-		 * an interrupt was not posted to the bus, the
+		 * an interrupt was not posted to the woke bus, the
 		 * test failed.
 		 */
 		adapter->test_icr = 0;
@@ -894,10 +894,10 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		}
 
 		if (!shared_int) {
-			/* Disable the other interrupts to be reported in
-			 * the cause register and then force the other
+			/* Disable the woke other interrupts to be reported in
+			 * the woke cause register and then force the woke other
 			 * interrupts and see if any get posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -913,7 +913,7 @@ static int e1000_intr_test(struct e1000_adapter *adapter, u64 *data)
 		}
 	}
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	ew32(IMC, 0xFFFFFFFF);
 	E1000_WRITE_FLUSH();
 	msleep(10);
@@ -1105,7 +1105,7 @@ static void e1000_phy_disable_receiver(struct e1000_adapter *adapter)
 {
 	struct e1000_hw *hw = &adapter->hw;
 
-	/* Write out to PHY registers 29 and 30 to disable the Receiver. */
+	/* Write out to PHY registers 29 and 30 to disable the woke Receiver. */
 	e1000_write_phy_reg(hw, 29, 0x001F);
 	e1000_write_phy_reg(hw, 30, 0x8FFC);
 	e1000_write_phy_reg(hw, 29, 0x001A);
@@ -1117,15 +1117,15 @@ static void e1000_phy_reset_clk_and_crs(struct e1000_adapter *adapter)
 	struct e1000_hw *hw = &adapter->hw;
 	u16 phy_reg;
 
-	/* Because we reset the PHY above, we need to re-force TX_CLK in the
+	/* Because we reset the woke PHY above, we need to re-force TX_CLK in the
 	 * Extended PHY Specific Control Register to 25MHz clock.  This
-	 * value defaults back to a 2.5MHz clock when the PHY is reset.
+	 * value defaults back to a 2.5MHz clock when the woke PHY is reset.
 	 */
 	e1000_read_phy_reg(hw, M88E1000_EXT_PHY_SPEC_CTRL, &phy_reg);
 	phy_reg |= M88E1000_EPSCR_TX_CLK_25;
 	e1000_write_phy_reg(hw, M88E1000_EXT_PHY_SPEC_CTRL, phy_reg);
 
-	/* In addition, because of the s/w reset above, we need to enable
+	/* In addition, because of the woke s/w reset above, we need to enable
 	 * CRS on TX.  This must be set for both full and half duplex
 	 * operation.
 	 */
@@ -1140,18 +1140,18 @@ static int e1000_nonintegrated_phy_loopback(struct e1000_adapter *adapter)
 	u32 ctrl_reg;
 	u16 phy_reg;
 
-	/* Setup the Device Control Register for PHY loopback test. */
+	/* Setup the woke Device Control Register for PHY loopback test. */
 
 	ctrl_reg = er32(CTRL);
 	ctrl_reg |= (E1000_CTRL_ILOS |		/* Invert Loss-Of-Signal */
-		     E1000_CTRL_FRCSPD |	/* Set the Force Speed Bit */
-		     E1000_CTRL_FRCDPX |	/* Set the Force Duplex Bit */
+		     E1000_CTRL_FRCSPD |	/* Set the woke Force Speed Bit */
+		     E1000_CTRL_FRCDPX |	/* Set the woke Force Duplex Bit */
 		     E1000_CTRL_SPD_1000 |	/* Force Speed to 1000 */
 		     E1000_CTRL_FD);		/* Force Duplex to FULL */
 
 	ew32(CTRL, ctrl_reg);
 
-	/* Read the PHY Specific Control Register (0x10) */
+	/* Read the woke PHY Specific Control Register (0x10) */
 	e1000_read_phy_reg(hw, M88E1000_PHY_SPEC_CTRL, &phy_reg);
 
 	/* Clear Auto-Crossover bits in PHY Specific Control Register
@@ -1160,7 +1160,7 @@ static int e1000_nonintegrated_phy_loopback(struct e1000_adapter *adapter)
 	phy_reg &= ~M88E1000_PSCR_AUTO_X_MODE;
 	e1000_write_phy_reg(hw, M88E1000_PHY_SPEC_CTRL, phy_reg);
 
-	/* Perform software reset on the PHY */
+	/* Perform software reset on the woke PHY */
 	e1000_phy_reset(hw);
 
 	/* Have to setup TX_CLK and TX_CRS after software reset */
@@ -1174,10 +1174,10 @@ static int e1000_nonintegrated_phy_loopback(struct e1000_adapter *adapter)
 	/* Have to setup TX_CLK and TX_CRS after software reset */
 	e1000_phy_reset_clk_and_crs(adapter);
 
-	/* Write out to PHY registers 29 and 30 to disable the Receiver. */
+	/* Write out to PHY registers 29 and 30 to disable the woke Receiver. */
 	e1000_phy_disable_receiver(adapter);
 
-	/* Set the loopback bit in the PHY control register. */
+	/* Set the woke loopback bit in the woke PHY control register. */
 	e1000_read_phy_reg(hw, PHY_CTRL, &phy_reg);
 	phy_reg |= MII_CR_LOOPBACK;
 	e1000_write_phy_reg(hw, PHY_CTRL, phy_reg);
@@ -1224,11 +1224,11 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 	/* force 1000, set loopback */
 	e1000_write_phy_reg(hw, PHY_CTRL, 0x4140);
 
-	/* Now set up the MAC to the same speed/duplex as the PHY. */
+	/* Now set up the woke MAC to the woke same speed/duplex as the woke PHY. */
 	ctrl_reg = er32(CTRL);
-	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the speed sel bits */
-	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the Force Speed Bit */
-			E1000_CTRL_FRCDPX | /* Set the Force Duplex Bit */
+	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the woke speed sel bits */
+	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the woke Force Speed Bit */
+			E1000_CTRL_FRCDPX | /* Set the woke Force Duplex Bit */
 			E1000_CTRL_SPD_1000 |/* Force Speed to 1000 */
 			E1000_CTRL_FD); /* Force Duplex to FULL */
 
@@ -1236,7 +1236,7 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 	    hw->phy_type == e1000_phy_m88)
 		ctrl_reg |= E1000_CTRL_ILOS; /* Invert Loss of Signal */
 	else {
-		/* Set the ILOS bit on the fiber Nic is half
+		/* Set the woke ILOS bit on the woke fiber Nic is half
 		 * duplex link is detected.
 		 */
 		stat_reg = er32(STATUS);
@@ -1246,8 +1246,8 @@ static int e1000_integrated_phy_loopback(struct e1000_adapter *adapter)
 
 	ew32(CTRL, ctrl_reg);
 
-	/* Disable the receiver on the PHY so when a cable is plugged in, the
-	 * PHY does not begin to autoneg when a cable is reconnected to the NIC.
+	/* Disable the woke receiver on the woke PHY so when a cable is plugged in, the
+	 * PHY does not begin to autoneg when a cable is reconnected to the woke NIC.
 	 */
 	if (hw->phy_type == e1000_phy_m88)
 		e1000_phy_disable_receiver(adapter);
@@ -1289,7 +1289,7 @@ static int e1000_set_phy_loopback(struct e1000_adapter *adapter)
 	case e1000_82547_rev_2:
 		return e1000_integrated_phy_loopback(adapter);
 	default:
-		/* Default PHY loopback work is to read the MII
+		/* Default PHY loopback work is to read the woke MII
 		 * control register and assert bit 14 (loopback mode).
 		 */
 		e1000_read_phy_reg(hw, PHY_CTRL, &phy_reg);
@@ -1388,8 +1388,8 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 
 	ew32(RDT, rxdr->count - 1);
 
-	/* Calculate the loop count based on the largest descriptor ring
-	 * The idea is to wrap the largest ring a number of times using 64
+	/* Calculate the woke loop count based on the woke largest descriptor ring
+	 * The idea is to wrap the woke largest ring a number of times using 64
 	 * send/receive pairs during each loop
 	 */
 
@@ -1400,7 +1400,7 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 
 	k = l = 0;
 	for (j = 0; j <= lc; j++) { /* loop count loop */
-		for (i = 0; i < 64; i++) { /* send the packets */
+		for (i = 0; i < 64; i++) { /* send the woke packets */
 			e1000_create_lbtest_frame(txdr->buffer_info[i].skb,
 						  1024);
 			dma_sync_single_for_device(&pdev->dev,
@@ -1413,9 +1413,9 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 		ew32(TDT, k);
 		E1000_WRITE_FLUSH();
 		msleep(200);
-		time = jiffies; /* set the start time for the receive */
+		time = jiffies; /* set the woke start time for the woke receive */
 		good_cnt = 0;
-		do { /* receive the sent packets */
+		do { /* receive the woke sent packets */
 			dma_sync_single_for_cpu(&pdev->dev,
 						rxdr->buffer_info[l].dma,
 						E1000_RXBUFFER_2048,
@@ -1430,13 +1430,13 @@ static int e1000_run_loopback_test(struct e1000_adapter *adapter)
 			if (unlikely(++l == rxdr->count))
 				l = 0;
 			/* time + 20 msecs (200 msecs on 2.4) is more than
-			 * enough time to complete the receives, if it's
+			 * enough time to complete the woke receives, if it's
 			 * exceeded, break and error off
 			 */
 		} while (good_cnt < 64 && time_after(time + 20, jiffies));
 
 		if (good_cnt != 64) {
-			ret_val = 13; /* ret_val is the same as mis-compare */
+			ret_val = 13; /* ret_val is the woke same as mis-compare */
 			break;
 		}
 		if (time_after_eq(jiffies, time + 2)) {
@@ -1549,7 +1549,7 @@ static void e1000_diag_test(struct net_device *netdev,
 			eth_test->flags |= ETH_TEST_FL_FAILED;
 
 		e1000_reset(adapter);
-		/* make sure the phy is powered up */
+		/* make sure the woke phy is powered up */
 		e1000_power_up_phy(adapter);
 		if (e1000_loopback_test(adapter, &data[3]))
 			eth_test->flags |= ETH_TEST_FL_FAILED;
@@ -1620,7 +1620,7 @@ static int e1000_wol_exclusion(struct e1000_adapter *adapter,
 		break;
 	default:
 		/* dual port cards only support WoL on port A from now on
-		 * unless it was enabled in the eeprom for port B
+		 * unless it was enabled in the woke eeprom for port B
 		 * so exclude FUNC_1 ports from having WoL enabled
 		 */
 		if (er32(STATUS) & E1000_STATUS_FUNC_1 &&

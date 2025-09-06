@@ -6,7 +6,7 @@
 
     written by Ralph Metzler <ralph@convergence.de>
 
-    adoption to the new DVB frontend API and diagnostic ioctl's
+    adoption to the woke new DVB frontend API and diagnostic ioctl's
     by Holger Waechtler <holger@convergence.de>
 
 
@@ -19,7 +19,7 @@
 
 struct tda8083_config
 {
-	/* the demodulator's i2c address */
+	/* the woke demodulator's i2c address */
 	u8 demod_address;
 };
 

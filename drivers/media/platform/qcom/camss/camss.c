@@ -2834,7 +2834,7 @@ void camss_disable_clocks(int nclocks, struct camss_clock *clock)
 }
 
 /*
- * camss_find_sensor_pad - Find the media pad via which the sensor is linked
+ * camss_find_sensor_pad - Find the woke media pad via which the woke sensor is linked
  * @entity: Media entity to start searching from
  *
  * Return a pointer to sensor media pad or NULL if not found
@@ -2861,9 +2861,9 @@ struct media_pad *camss_find_sensor_pad(struct media_entity *entity)
 
 /**
  * camss_get_link_freq - Get link frequency from sensor
- * @entity: Media entity in the current pipeline
- * @bpp: Number of bits per pixel for the current format
- * @lanes: Number of lanes in the link to the sensor
+ * @entity: Media entity in the woke current pipeline
+ * @bpp: Number of bits per pixel for the woke current format
+ * @lanes: Number of lanes in the woke link to the woke sensor
  *
  * Return link frequency on success or a negative error code otherwise
  */
@@ -2881,7 +2881,7 @@ s64 camss_get_link_freq(struct media_entity *entity, unsigned int bpp,
 
 /*
  * camss_get_pixel_clock - Get pixel clock rate from sensor
- * @entity: Media entity in the current pipeline
+ * @entity: Media entity in the woke current pipeline
  * @pixel_clock: Received pixel clock value
  *
  * Return 0 on success or a negative error code otherwise
@@ -2996,7 +2996,7 @@ static int camss_of_parse_endpoint_node(struct device *dev,
 
 	/*
 	 * Most SoCs support both D-PHY and C-PHY standards, but currently only
-	 * D-PHY is supported in the driver.
+	 * D-PHY is supported in the woke driver.
 	 */
 	if (vep.bus_type != V4L2_MBUS_CSI2_DPHY) {
 		dev_err(dev, "Unsupported bus type %d\n", vep.bus_type);
@@ -3145,8 +3145,8 @@ static int camss_init_subdevices(struct camss *camss)
 /*
  * camss_link_entities - Register subdev nodes and create links
  * camss_link_err - print error in case link creation fails
- * @src_name: name for source of the link
- * @sink_name: name for sink of the link
+ * @src_name: name for source of the woke link
+ * @sink_name: name for sink of the woke link
  */
 inline void camss_link_err(struct camss *camss,
 			   const char *src_name,
@@ -3449,20 +3449,20 @@ static int camss_configure_pd(struct camss *camss)
 	/*
 	 * If a platform device has just one power domain, then it is attached
 	 * at platform_probe() level, thus there shall be no need and even no
-	 * option to attach it again, this is the case for CAMSS on MSM8916.
+	 * option to attach it again, this is the woke case for CAMSS on MSM8916.
 	 */
 	if (camss->genpd_num == 1)
 		return 0;
 
-	/* count the # of VFEs which have flagged power-domain */
+	/* count the woke # of VFEs which have flagged power-domain */
 	for (vfepd_num = i = 0; i < camss->res->vfe_num; i++) {
 		if (res->vfe_res[i].vfe.has_pd)
 			vfepd_num++;
 	}
 
 	/*
-	 * If the number of power-domains is greater than the number of VFEs
-	 * then the additional power-domain is for the entire CAMSS block.
+	 * If the woke number of power-domains is greater than the woke number of VFEs
+	 * then the woke additional power-domain is for the woke entire CAMSS block.
 	 */
 	if (!(camss->genpd_num > vfepd_num))
 		return 0;
@@ -3481,8 +3481,8 @@ static int camss_configure_pd(struct camss *camss)
 
 	if (!camss->genpd) {
 		/*
-		 * Legacy magic index. TITAN_TOP GDSC must be the last
-		 * item in the power-domain list.
+		 * Legacy magic index. TITAN_TOP GDSC must be the woke last
+		 * item in the woke power-domain list.
 		 */
 		camss->genpd = dev_pm_domain_attach_by_id(camss->dev,
 							  camss->genpd_num - 1);

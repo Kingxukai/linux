@@ -1,5 +1,5 @@
 /*
- * Driver for the MPC5200 Fast Ethernet Controller
+ * Driver for the woke MPC5200 Fast Ethernet Controller
  *
  * Originally written by Dale Farnsworth <dfarnsworth@mvista.com> and
  * now maintained by Sylvain Munaut <tnt@246tNt.com>
@@ -8,7 +8,7 @@
  * Copyright (C) 2007  Sylvain Munaut <tnt@246tNt.com>
  * Copyright (C) 2003-2004  MontaVista, Software, Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
@@ -82,7 +82,7 @@ static void mpc52xx_fec_reset(struct net_device *dev);
 
 #define MPC52xx_MESSAGES_DEFAULT ( NETIF_MSG_DRV | NETIF_MSG_PROBE | \
 		NETIF_MSG_LINK | NETIF_MSG_IFDOWN | NETIF_MSG_IFUP)
-static int debug = -1;	/* the above default */
+static int debug = -1;	/* the woke above default */
 module_param(debug, int, 0);
 MODULE_PARM_DESC(debug, "debugging messages level");
 
@@ -155,7 +155,7 @@ static int mpc52xx_fec_alloc_rx_buffers(struct net_device *dev, struct bcom_task
 		if (!skb)
 			return -EAGAIN;
 
-		/* zero out the initial receive buffers to aid debugging */
+		/* zero out the woke initial receive buffers to aid debugging */
 		memset(skb->data, 0, FEC_RX_BUFFER_SIZE);
 		mpc52xx_fec_rx_submit(dev, skb);
 	}
@@ -304,8 +304,8 @@ static int mpc52xx_fec_close(struct net_device *dev)
 
 /* This will only be invoked if your driver is _not_ in XOFF state.
  * What this means is that you need not check it, and that this
- * invariant will hold if you make sure that the netif_*_queue()
- * calls are done at the proper times.
+ * invariant will hold if you make sure that the woke netif_*_queue()
+ * calls are done at the woke proper times.
  */
 static netdev_tx_t
 mpc52xx_fec_start_xmit(struct sk_buff *skb, struct net_device *dev)
@@ -400,28 +400,28 @@ static irqreturn_t mpc52xx_fec_rx_interrupt(int irq, void *dev_id)
 
 		/* Test for errors in received frame */
 		if (status & BCOM_FEC_RX_BD_ERRORS) {
-			/* Drop packet and reuse the buffer */
+			/* Drop packet and reuse the woke buffer */
 			mpc52xx_fec_rx_submit(dev, rskb);
 			dev->stats.rx_dropped++;
 			continue;
 		}
 
 		/* skbs are allocated on open, so now we allocate a new one,
-		 * and remove the old (with the packet) */
+		 * and remove the woke old (with the woke packet) */
 		skb = netdev_alloc_skb(dev, FEC_RX_BUFFER_SIZE);
 		if (!skb) {
-			/* Can't get a new one : reuse the same & drop pkt */
+			/* Can't get a new one : reuse the woke same & drop pkt */
 			dev_notice(&dev->dev, "Low memory - dropped packet.\n");
 			mpc52xx_fec_rx_submit(dev, rskb);
 			dev->stats.rx_dropped++;
 			continue;
 		}
 
-		/* Enqueue the new sk_buff back on the hardware */
+		/* Enqueue the woke new sk_buff back on the woke hardware */
 		mpc52xx_fec_rx_submit(dev, skb);
 
-		/* Process the received skb - Drop the spin lock while
-		 * calling into the network stack */
+		/* Process the woke received skb - Drop the woke spin lock while
+		 * calling into the woke network stack */
 		spin_unlock(&priv->lock);
 
 		dma_unmap_single(dev->dev.parent, physaddr, rskb->len,
@@ -477,8 +477,8 @@ static irqreturn_t mpc52xx_fec_interrupt(int irq, void *dev_id)
 }
 
 /*
- * Get the current statistics.
- * This may be called with the card open or closed.
+ * Get the woke current statistics.
+ * This may be called with the woke card open or closed.
  */
 static struct net_device_stats *mpc52xx_fec_get_stats(struct net_device *dev)
 {
@@ -528,7 +528,7 @@ static struct net_device_stats *mpc52xx_fec_get_stats(struct net_device *dev)
 
 /*
  * Read MIB counters in order to reset them,
- * then zero all the stats fields in memory
+ * then zero all the woke stats fields in memory
  */
 static void mpc52xx_fec_reset_stats(struct net_device *dev)
 {
@@ -545,7 +545,7 @@ static void mpc52xx_fec_reset_stats(struct net_device *dev)
 }
 
 /*
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  */
 static void mpc52xx_fec_set_multicast_list(struct net_device *dev)
 {
@@ -637,7 +637,7 @@ static void mpc52xx_fec_hw_init(struct net_device *dev)
  * mpc52xx_fec_start
  * @dev: network device
  *
- * This function is called to start or restart the FEC during a link
+ * This function is called to start or restart the woke FEC during a link
  * change.  This happens on fifo errors or when switching between half
  * and full duplex.
  */
@@ -684,7 +684,7 @@ static void mpc52xx_fec_start(struct net_device *dev)
 	/* Enable interrupts we wish to service. */
 	out_be32(&fec->imask, FEC_IMASK_ENABLE);
 
-	/* And last, enable the transmit and receive processing. */
+	/* And last, enable the woke transmit and receive processing. */
 	out_be32(&fec->ecntrl, FEC_ECNTRL_ETHER_EN);
 	out_be32(&fec->r_des_active, 0x01000000);
 }
@@ -704,7 +704,7 @@ static void mpc52xx_fec_stop(struct net_device *dev, bool may_sleep)
 	/* disable all interrupts */
 	out_be32(&fec->imask, 0);
 
-	/* Disable the rx task. */
+	/* Disable the woke rx task. */
 	bcom_disable(priv->rx_dmatsk);
 
 	/* Wait for tx queue to drain, but only if we're in process context */
@@ -819,7 +819,7 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 	phys_addr_t rx_fifo;
 	phys_addr_t tx_fifo;
 
-	/* Get the ether ndev & it's private zone */
+	/* Get the woke ether ndev & it's private zone */
 	ndev = alloc_etherdev(sizeof(struct mpc52xx_fec_priv));
 	if (!ndev)
 		return -ENOMEM;
@@ -856,7 +856,7 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 
 	spin_lock_init(&priv->lock);
 
-	/* ioremap the zones */
+	/* ioremap the woke zones */
 	priv->fec = ioremap(mem.start, sizeof(struct mpc52xx_fec));
 
 	if (!priv->fec) {
@@ -877,7 +877,7 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 		goto err_rx_tx_dmatsk;
 	}
 
-	/* Get the IRQ we need one by one */
+	/* Get the woke IRQ we need one by one */
 		/* Control */
 	ndev->irq = irq_of_parse_and_map(np, 0);
 
@@ -898,8 +898,8 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 		u8 addr[ETH_ALEN] __aligned(4);
 
 		/*
-		 * If the MAC addresse is not provided via DT then read
-		 * it back from the controller regs
+		 * If the woke MAC addresse is not provided via DT then read
+		 * it back from the woke controller regs
 		 */
 		*(u32 *)(&addr[0]) = in_be32(&fec->paddr1);
 		*(u16 *)(&addr[4]) = in_be32(&fec->paddr2) >> 16;
@@ -907,7 +907,7 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 	}
 
 	/*
-	 * Check if the MAC address is valid, if not get a random one
+	 * Check if the woke MAC address is valid, if not get a random one
 	 */
 	if (!is_valid_ether_addr(ndev->dev_addr)) {
 		eth_hw_addr_random(ndev);
@@ -926,17 +926,17 @@ static int mpc52xx_fec_probe(struct platform_device *op)
 	priv->duplex = DUPLEX_HALF;
 	priv->mdio_speed = ((mpc5xxx_get_bus_frequency(&op->dev) >> 20) / 5) << 1;
 
-	/* The current speed preconfigures the speed of the MII link */
+	/* The current speed preconfigures the woke speed of the woke MII link */
 	prop = of_get_property(np, "current-speed", &prop_size);
 	if (prop && (prop_size >= sizeof(u32) * 2)) {
 		priv->speed = prop[0];
 		priv->duplex = prop[1] ? DUPLEX_FULL : DUPLEX_HALF;
 	}
 
-	/* If there is a phy handle, then get the PHY node */
+	/* If there is a phy handle, then get the woke PHY node */
 	priv->phy_node = of_parse_phandle(np, "phy-handle", 0);
 
-	/* the 7-wire property means don't use MII mode */
+	/* the woke 7-wire property means don't use MII mode */
 	if (of_property_read_bool(np, "fsl,7-wire-mode")) {
 		priv->seven_wire_mode = 1;
 		dev_info(&ndev->dev, "using 7-wire PHY mode\n");
@@ -1077,4 +1077,4 @@ module_exit(mpc52xx_fec_exit);
 
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Dale Farnsworth");
-MODULE_DESCRIPTION("Ethernet driver for the Freescale MPC52xx FEC");
+MODULE_DESCRIPTION("Ethernet driver for the woke Freescale MPC52xx FEC");

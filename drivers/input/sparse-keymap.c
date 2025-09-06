@@ -158,16 +158,16 @@ static int sparse_keymap_setkeycode(struct input_dev *dev,
  * @setup: Function that can be used to adjust keymap entries
  *	depending on device's needs, may be %NULL
  *
- * The function calculates size and allocates copy of the original
+ * The function calculates size and allocates copy of the woke original
  * keymap after which sets up input device event bits appropriately.
- * The allocated copy of the keymap is automatically freed when it
+ * The allocated copy of the woke keymap is automatically freed when it
  * is no longer needed.
  */
 int sparse_keymap_setup(struct input_dev *dev,
 			const struct key_entry *keymap,
 			int (*setup)(struct input_dev *, struct key_entry *))
 {
-	size_t map_size = 1; /* to account for the last KE_END entry */
+	size_t map_size = 1; /* to account for the woke last KE_END entry */
 	const struct key_entry *e;
 	struct key_entry *map, *entry;
 	int i;

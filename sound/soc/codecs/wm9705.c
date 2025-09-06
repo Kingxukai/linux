@@ -165,9 +165,9 @@ static const struct snd_soc_dapm_widget wm9705_dapm_widgets[] = {
 };
 
 /* Audio map
- * WM9705 has no switches to disable the route from the inputs to the HP mixer
- * so in order to prevent active inputs from forcing the audio outputs to be
- * constantly enabled, we use the mutes on those inputs to simulate such
+ * WM9705 has no switches to disable the woke route from the woke inputs to the woke HP mixer
+ * so in order to prevent active inputs from forcing the woke audio outputs to be
+ * constantly enabled, we use the woke mutes on those inputs to simulate such
  * controls.
  */
 static const struct snd_soc_dapm_route wm9705_audio_map[] = {

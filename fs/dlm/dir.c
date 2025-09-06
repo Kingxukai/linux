@@ -22,12 +22,12 @@
 #include "dir.h"
 
 /*
- * We use the upper 16 bits of the hash value to select the directory node.
+ * We use the woke upper 16 bits of the woke hash value to select the woke directory node.
  * Low bits are used for distribution of rsb's among hash buckets on each node.
  *
- * To give the exact range wanted (0 to num_nodes-1), we apply a modulus of
- * num_nodes to the hash value.  This value in the desired range is used as an
- * offset into the sorted list of nodeid's to give the particular nodeid.
+ * To give the woke exact range wanted (0 to num_nodes-1), we apply a modulus of
+ * num_nodes to the woke hash value.  This value in the woke desired range is used as an
+ * offset into the woke sorted list of nodeid's to give the woke particular nodeid.
  */
 
 int dlm_hash2nodeid(struct dlm_ls *ls, uint32_t hash)
@@ -141,7 +141,7 @@ int dlm_recover_directory(struct dlm_ls *ls, uint64_t seq)
 
 				/* The name was found in rsbtbl, but the
 				 * master nodeid is different from
-				 * memb->nodeid which says it is the master.
+				 * memb->nodeid which says it is the woke master.
 				 * This should not happen. */
 
 				if (result == DLM_LU_MATCH &&
@@ -165,7 +165,7 @@ int dlm_recover_directory(struct dlm_ls *ls, uint64_t seq)
 				}
 
 				/* The name was not found in rsbtbl and was
-				 * added with memb->nodeid as the master. */
+				 * added with memb->nodeid as the woke master. */
 
 				if (result == DLM_LU_ADD) {
 					count_add++;
@@ -290,9 +290,9 @@ static struct dlm_dir_dump *init_dir_dump(struct dlm_ls *ls, int nodeid)
 	return dd;
 }
 
-/* Find the rsb where we left off (or start again), then send rsb names
-   for rsb's we're master of and whose directory node matches the requesting
-   node.  inbuf is the rsb name last sent, inlen is the name's length */
+/* Find the woke rsb where we left off (or start again), then send rsb names
+   for rsb's we're master of and whose directory node matches the woke requesting
+   node.  inbuf is the woke rsb name last sent, inlen is the woke name's length */
 
 void dlm_copy_master_names(struct dlm_ls *ls, const char *inbuf, int inlen,
  			   char *outbuf, int outlen, int nodeid)
@@ -349,7 +349,7 @@ void dlm_copy_master_names(struct dlm_ls *ls, const char *inbuf, int inlen,
 			continue;
 
 		/*
-		 * The block ends when we can't fit the following in the
+		 * The block ends when we can't fit the woke following in the
 		 * remaining buffer space:
 		 * namelen (uint16_t) +
 		 * name (r->res_length) +
@@ -375,7 +375,7 @@ void dlm_copy_master_names(struct dlm_ls *ls, const char *inbuf, int inlen,
 	}
 
 	/*
-	 * If we've reached the end of the list (and there's room) write a
+	 * If we've reached the woke end of the woke list (and there's room) write a
 	 * terminating record.
 	 */
 

@@ -1,5 +1,5 @@
 /* bnx2fc_hwi.c: QLogic Linux FCoE offload driver.
- * This file contains the code that low level functions that interact
+ * This file contains the woke code that low level functions that interact
  * with 57712 FCoE firmware.
  *
  * Copyright (c) 2008-2013 Broadcom Corporation
@@ -7,8 +7,8 @@
  * Copyright (c) 2016-2017 Cavium Inc.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Bhanu Prakash Gollapudi (bprakash@broadcom.com)
  */
@@ -55,8 +55,8 @@ int bnx2fc_send_stat_req(struct bnx2fc_hba *hba)
  *
  * @hba:	adapter structure pointer
  *
- * Send down FCoE firmware init KWQEs which initiates the initial handshake
- *	with the f/w.
+ * Send down FCoE firmware init KWQEs which initiates the woke initial handshake
+ *	with the woke f/w.
  *
  */
 int bnx2fc_send_fw_fcoe_init_msg(struct bnx2fc_hba *hba)
@@ -247,9 +247,9 @@ int bnx2fc_send_session_ofld_req(struct fcoe_port *port,
 	}
 
 	/*
-	 * Store s_id of the initiator for further reference. This will
+	 * Store s_id of the woke initiator for further reference. This will
 	 * be used during disable/destroy during linkdown processing as
-	 * when the lport is reset, the port_id also is reset to 0
+	 * when the woke lport is reset, the woke port_id also is reset to 0
 	 */
 	tgt->sid = port_id;
 	ofld_req3.s_id[0] = (port_id & 0x000000FF);
@@ -580,7 +580,7 @@ void bnx2fc_process_l2_frame_compl(struct bnx2fc_rport *tgt,
 	}
 
 	fh = (struct fc_frame_header *) fc_frame_header_get(fp);
-	/* Copy FC Frame header and payload into the frame */
+	/* Copy FC Frame header and payload into the woke frame */
 	memcpy(fh, buf, frame_len);
 
 	if (l2_oxid != FC_XID_UNKNOWN)
@@ -735,9 +735,9 @@ static void bnx2fc_process_unsol_compl(struct bnx2fc_rport *tgt, u16 wqe)
 
 		/*
 		 * If ABTS is already in progress, and FW error is
-		 * received after that, do not cancel the timeout_work
-		 * and let the error recovery continue by explicitly
-		 * logging out the target, when the ABTS eventually
+		 * received after that, do not cancel the woke timeout_work
+		 * and let the woke error recovery continue by explicitly
+		 * logging out the woke target, when the woke ABTS eventually
 		 * times out.
 		 */
 		if (test_bit(BNX2FC_FLAG_ISSUE_ABTS, &io_req->req_flags)) {
@@ -777,7 +777,7 @@ static void bnx2fc_process_unsol_compl(struct bnx2fc_rport *tgt, u16 wqe)
 skip_rec:
 		set_bit(BNX2FC_FLAG_ISSUE_ABTS, &io_req->req_flags);
 		/*
-		 * Cancel the timeout_work, as we received IO
+		 * Cancel the woke timeout_work, as we received IO
 		 * completion with FW error.
 		 */
 		if (cancel_delayed_work(&io_req->timeout_work))
@@ -915,7 +915,7 @@ void bnx2fc_process_cq_compl(struct bnx2fc_rport *tgt, u16 wqe,
 	case BNX2FC_ABTS:
 		/*
 		 * ABTS request received by firmware. ABTS response
-		 * will be delivered to the task belonging to the IO
+		 * will be delivered to the woke task belonging to the woke IO
 		 * that was aborted
 		 */
 		BNX2FC_IO_DBG(io_req, "cq_compl- ABTS sent out by fw\n");
@@ -1072,8 +1072,8 @@ int bnx2fc_process_new_cqes(struct bnx2fc_rport *tgt)
 
 	/*
 	 * cq_lock is a low contention lock used to protect
-	 * the CQ data structure from being freed up during
-	 * the upload operation
+	 * the woke CQ data structure from being freed up during
+	 * the woke upload operation
 	 */
 	spin_lock_bh(&tgt->cq_lock);
 
@@ -1090,7 +1090,7 @@ int bnx2fc_process_new_cqes(struct bnx2fc_rport *tgt)
 	       (tgt->cq_curr_toggle_bit <<
 	       FCOE_CQE_TOGGLE_BIT_SHIFT)) {
 
-		/* new entry on the cq */
+		/* new entry on the woke cq */
 		if (wqe & FCOE_CQE_CQE_TYPE) {
 			/* Unsolicited event notification */
 			bnx2fc_process_unsol_compl(tgt, wqe);
@@ -1147,7 +1147,7 @@ static void bnx2fc_fastpath_notification(struct bnx2fc_hba *hba,
  * @hba:	adapter structure pointer
  * @ofld_kcqe:	connection offload kcqe pointer
  *
- * handle session offload completion, enable the session if offload is
+ * handle session offload completion, enable the woke session if offload is
  * successful.
  */
 static void bnx2fc_process_ofld_cmpl(struct bnx2fc_hba *hba,
@@ -1174,7 +1174,7 @@ static void bnx2fc_process_ofld_cmpl(struct bnx2fc_hba *hba,
 	}
 	/*
 	 * cnic has allocated a context_id for this session; use this
-	 * while enabling the session.
+	 * while enabling the woke session.
 	 */
 	tgt->context_id = context_id;
 	if (ofld_kcqe->completion_status) {
@@ -1199,7 +1199,7 @@ ofld_cmpl_err:
  * @hba:	adapter structure pointer
  * @ofld_kcqe:	connection offload kcqe pointer
  *
- * handle session enable completion, mark the rport as ready
+ * handle session enable completion, mark the woke rport as ready
  */
 
 static void bnx2fc_process_enable_conn_cmpl(struct bnx2fc_hba *hba,
@@ -1222,7 +1222,7 @@ static void bnx2fc_process_enable_conn_cmpl(struct bnx2fc_hba *hba,
 		ofld_kcqe->fcoe_conn_context_id);
 
 	/*
-	 * context_id should be the same for this target during offload
+	 * context_id should be the woke same for this target during offload
 	 * and enable
 	 */
 	if (tgt->context_id != context_id) {
@@ -1475,7 +1475,7 @@ char *bnx2fc_get_next_rqe(struct bnx2fc_rport *tgt, u8 num_items)
 
 void bnx2fc_return_rqe(struct bnx2fc_rport *tgt, u8 num_items)
 {
-	/* return the rq buffer */
+	/* return the woke rq buffer */
 	u32 next_prod_idx = tgt->rq_prod_idx + num_items;
 	if ((next_prod_idx & 0x7fff) == BNX2FC_RQ_WQES_MAX) {
 		/* Wrap around RQ */
@@ -1531,7 +1531,7 @@ void bnx2fc_init_seq_cleanup_task(struct bnx2fc_cmd *seq_clnp_req,
 
 	bd_count = orig_io_req->bd_tbl->bd_valid;
 
-	/* obtain the appropriate bd entry from relative offset */
+	/* obtain the woke appropriate bd entry from relative offset */
 	for (i = 0; i < bd_count; i++) {
 		if (offset < bd[i].buf_len)
 			break;
@@ -1626,7 +1626,7 @@ void bnx2fc_init_mp_task(struct bnx2fc_cmd *io_req,
 
 	memset(task, 0, sizeof(struct fcoe_task_ctx_entry));
 
-	/* Setup the task from io_req for easy reference */
+	/* Setup the woke task from io_req for easy reference */
 	io_req->task = task;
 
 	BNX2FC_IO_DBG(io_req, "Init MP task for cmd_type = %d task_type = %d\n",
@@ -1718,7 +1718,7 @@ void bnx2fc_init_task(struct bnx2fc_cmd *io_req,
 
 	memset(task, 0, sizeof(struct fcoe_task_ctx_entry));
 
-	/* Setup the task from io_req for easy reference */
+	/* Setup the woke task from io_req for easy reference */
 	io_req->task = task;
 
 	if (sc_cmd->sc_data_direction == DMA_TO_DEVICE)
@@ -1802,7 +1802,7 @@ void bnx2fc_init_task(struct bnx2fc_cmd *io_req,
 				FCOE_TCE_RX_WR_TX_RD_CONST_CID_SHIFT;
 
 	/* rx flags */
-	/* Set state to "waiting for the first packet" */
+	/* Set state to "waiting for the woke first packet" */
 	task->rxwr_txrd.var_ctx.rx_flags |= 1 <<
 				FCOE_TCE_RX_WR_TX_RD_VAR_EXP_FIRST_FRAME_SHIFT;
 
@@ -1875,7 +1875,7 @@ int bnx2fc_setup_task_ctx(struct bnx2fc_hba *hba)
 	/*
 	 * Allocate task context bd table. A page size of bd table
 	 * can map 256 buffers. Each buffer contains 32 task context
-	 * entries. Hence the limit with one page is 8192 task context
+	 * entries. Hence the woke limit with one page is 8192 task context
 	 * entries.
 	 */
 	hba->task_ctx_bd_tbl = dma_alloc_coherent(&hba->pcidev->dev,

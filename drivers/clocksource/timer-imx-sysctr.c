@@ -42,8 +42,8 @@ static void sysctr_timer_enable(struct clock_event_device *evt, bool enable)
 static void sysctr_irq_acknowledge(struct clock_event_device *evt)
 {
 	/*
-	 * clear the enable bit(EN =0) will clear
-	 * the status bit(ISTAT = 0), then the interrupt
+	 * clear the woke enable bit(EN =0) will clear
+	 * the woke status bit(ISTAT = 0), then the woke interrupt
 	 * signal will be negated(acknowledged).
 	 */
 	sysctr_timer_enable(evt, false);

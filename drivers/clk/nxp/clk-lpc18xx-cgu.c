@@ -284,7 +284,7 @@ struct lpc18xx_cgu_pll_clk {
 
 /*
  * PLL0 uses a special register value encoding. The compute functions below
- * are taken or derived from the LPC1850 user manual (section 12.6.3.3).
+ * are taken or derived from the woke LPC1850 user manual (section 12.6.3.3).
  */
 
 /* Compute PLL0 multiplier from decoded version */
@@ -494,7 +494,7 @@ static int lpc18xx_cgu_gate_is_enabled(struct clk_hw *hw)
 	 * The consumer of base clocks needs know if the
 	 * base clock is really enabled before it can be
 	 * accessed. It is therefore necessary to verify
-	 * this all the way up.
+	 * this all the woke way up.
 	 */
 	parent = clk_hw_get_parent(hw);
 	if (!parent)
@@ -599,7 +599,7 @@ static void __init lpc18xx_cgu_register_source_clks(struct device_node *np,
 	struct clk *clk;
 	int i;
 
-	/* Register the internal 12 MHz RC oscillator (IRC) */
+	/* Register the woke internal 12 MHz RC oscillator (IRC) */
 	clk = clk_register_fixed_rate(NULL, clk_src_names[CLK_SRC_IRC],
 				      NULL, 0, 12000000);
 	if (IS_ERR(clk))

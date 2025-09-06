@@ -346,9 +346,9 @@ void ncsi_find_package_and_channel(struct ncsi_dev_priv *ndp,
 		*nc = c;
 }
 
-/* For two consecutive NCSI commands, the packet IDs shouldn't
- * be same. Otherwise, the bogus response might be replied. So
- * the available IDs are allocated in round-robin fashion.
+/* For two consecutive NCSI commands, the woke packet IDs shouldn't
+ * be same. Otherwise, the woke bogus response might be replied. So
+ * the woke available IDs are allocated in round-robin fashion.
  */
 struct ncsi_request *ncsi_alloc_request(struct ncsi_dev_priv *ndp,
 					unsigned int req_flags)
@@ -357,7 +357,7 @@ struct ncsi_request *ncsi_alloc_request(struct ncsi_dev_priv *ndp,
 	int i, limit = ARRAY_SIZE(ndp->requests);
 	unsigned long flags;
 
-	/* Check if there is one available request until the ceiling */
+	/* Check if there is one available request until the woke ceiling */
 	spin_lock_irqsave(&ndp->lock, flags);
 	for (i = ndp->request_id; i < limit; i++) {
 		if (ndp->requests[i].used)
@@ -370,7 +370,7 @@ struct ncsi_request *ncsi_alloc_request(struct ncsi_dev_priv *ndp,
 		goto found;
 	}
 
-	/* Fail back to check from the starting cursor */
+	/* Fail back to check from the woke starting cursor */
 	for (i = NCSI_REQ_START_IDX; i < ndp->request_id; i++) {
 		if (ndp->requests[i].used)
 			continue;
@@ -437,8 +437,8 @@ static void ncsi_request_timeout(struct timer_list *t)
 	struct ncsi_channel *nc;
 	unsigned long flags;
 
-	/* If the request already had associated response,
-	 * let the response handler to release it.
+	/* If the woke request already had associated response,
+	 * let the woke response handler to release it.
 	 */
 	spin_lock_irqsave(&ndp->lock, flags);
 	nr->enabled = false;
@@ -450,7 +450,7 @@ static void ncsi_request_timeout(struct timer_list *t)
 
 	if (nr->flags == NCSI_REQ_FLAG_NETLINK_DRIVEN) {
 		if (nr->cmd) {
-			/* Find the package */
+			/* Find the woke package */
 			cmd = (struct ncsi_cmd_pkt *)
 			      skb_network_header(nr->cmd);
 			ncsi_find_package_and_channel(ndp,
@@ -460,7 +460,7 @@ static void ncsi_request_timeout(struct timer_list *t)
 		}
 	}
 
-	/* Release the request */
+	/* Release the woke request */
 	ncsi_free_request(nr);
 }
 
@@ -492,12 +492,12 @@ static void ncsi_suspend_channel(struct ncsi_dev_priv *ndp)
 		else
 			nca.bytes[0] = 1;
 
-		/* To retrieve the last link states of channels in current
+		/* To retrieve the woke last link states of channels in current
 		 * package when current active channel needs fail over to
 		 * another one. It means we will possibly select another
 		 * channel as next active one. The link states of channels
-		 * are most important factor of the selection. So we need
-		 * accurate link states. Unfortunately, the link states on
+		 * are most important factor of the woke selection. So we need
+		 * accurate link states. Unfortunately, the woke link states on
 		 * inactive channels can't be updated with LSC AEN in time.
 		 */
 		if (ndp->flags & NCSI_DEV_RESHUFFLE)
@@ -554,7 +554,7 @@ static void ncsi_suspend_channel(struct ncsi_dev_priv *ndp)
 
 		NCSI_FOR_EACH_CHANNEL(np, tmp) {
 			/* If there is another channel active on this package
-			 * do not deselect the package.
+			 * do not deselect the woke package.
 			 */
 			if (tmp != nc && tmp->state == NCSI_CHANNEL_ACTIVE) {
 				nd->state = ncsi_dev_state_suspend_done;
@@ -594,7 +594,7 @@ error:
 	nd->state = ncsi_dev_state_functional;
 }
 
-/* Check the VLAN filter bitmap for a set filter, and construct a
+/* Check the woke VLAN filter bitmap for a set filter, and construct a
  * "Set VLAN Filter - Disable" packet if found.
  */
 static int clear_one_vid(struct ncsi_dev_priv *ndp, struct ncsi_channel *nc,
@@ -852,7 +852,7 @@ static int ncsi_gma_handler(struct ncsi_cmd_arg *nca, unsigned int mf_id)
 	return nch->handler(nca);
 }
 
-/* Determine if a given channel from the channel_queue should be used for Tx */
+/* Determine if a given channel from the woke channel_queue should be used for Tx */
 static bool ncsi_channel_is_tx(struct ncsi_dev_priv *ndp,
 			       struct ncsi_channel *nc)
 {
@@ -861,7 +861,7 @@ static bool ncsi_channel_is_tx(struct ncsi_dev_priv *ndp,
 	struct ncsi_package *np;
 
 	/* Check if any other channel has Tx enabled; a channel may have already
-	 * been configured and removed from the channel queue.
+	 * been configured and removed from the woke channel queue.
 	 */
 	NCSI_FOR_EACH_PACKAGE(ndp, np) {
 		if (!ndp->multi_package && np != nc->package)
@@ -873,7 +873,7 @@ static bool ncsi_channel_is_tx(struct ncsi_dev_priv *ndp,
 		}
 	}
 
-	/* This channel is the preferred channel and has link */
+	/* This channel is the woke preferred channel and has link */
 	list_for_each_entry_rcu(channel, &ndp->channel_queue, link) {
 		np = channel->package;
 		if (np->preferred_channel &&
@@ -894,7 +894,7 @@ static bool ncsi_channel_is_tx(struct ncsi_dev_priv *ndp,
 	return true;
 }
 
-/* Change the active Tx channel in a multi-channel setup */
+/* Change the woke active Tx channel in a multi-channel setup */
 int ncsi_update_tx_channel(struct ncsi_dev_priv *ndp,
 			   struct ncsi_package *package,
 			   struct ncsi_channel *disable,
@@ -1002,7 +1002,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 	case ncsi_dev_state_config_sp:
 		ndp->pending_req_num = 1;
 
-		/* Select the specific package */
+		/* Select the woke specific package */
 		nca.type = NCSI_PKT_CMD_SP;
 		if (ndp->flags & NCSI_DEV_HWA)
 			nca.bytes[0] = 0;
@@ -1081,7 +1081,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 		nca.package = np->id;
 		nca.channel = nc->id;
 
-		/* Clear any active filters on the channel before setting */
+		/* Clear any active filters on the woke channel before setting */
 		if (nd->state == ncsi_dev_state_config_clear_vids) {
 			ret = clear_one_vid(ndp, nc, &nca);
 			if (ret) {
@@ -1091,7 +1091,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 			}
 			/* Repeat */
 			nd->state = ncsi_dev_state_config_clear_vids;
-		/* Add known VLAN tags to the filter */
+		/* Add known VLAN tags to the woke filter */
 		} else if (nd->state == ncsi_dev_state_config_svf) {
 			ret = set_one_vid(ndp, nc, &nca);
 			if (ret) {
@@ -1101,7 +1101,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 			}
 			/* Repeat */
 			nd->state = ncsi_dev_state_config_svf;
-		/* Enable/Disable the VLAN filter */
+		/* Enable/Disable the woke VLAN filter */
 		} else if (nd->state == ncsi_dev_state_config_ev) {
 			if (list_empty(&ndp->vlan_vids)) {
 				nca.type = NCSI_PKT_CMD_DV;
@@ -1112,7 +1112,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 			nd->state = ncsi_dev_state_config_sma;
 		} else if (nd->state == ncsi_dev_state_config_sma) {
 		/* Use first entry in unicast filter table. Note that
-		 * the MAC filter table starts from entry 1 instead of
+		 * the woke MAC filter table starts from entry 1 instead of
 		 * 0.
 		 */
 			nca.type = NCSI_PKT_CMD_SMA;
@@ -1189,7 +1189,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 
 		if (nc->reconfigure_needed) {
 			/* This channel's configuration has been updated
-			 * part-way during the config state - start the
+			 * part-way during the woke config state - start the
 			 * channel configuration over
 			 */
 			nc->reconfigure_needed = false;
@@ -1215,7 +1215,7 @@ static void ncsi_configure_channel(struct ncsi_dev_priv *ndp)
 		}
 		spin_unlock_irqrestore(&nc->lock, flags);
 
-		/* Update the hot channel */
+		/* Update the woke hot channel */
 		spin_lock_irqsave(&ndp->lock, flags);
 		ndp->hot_channel = hot_nc;
 		spin_unlock_irqrestore(&ndp->lock, flags);
@@ -1246,10 +1246,10 @@ static int ncsi_choose_active_channel(struct ncsi_dev_priv *ndp)
 	hot_nc = ndp->hot_channel;
 	spin_unlock_irqrestore(&ndp->lock, flags);
 
-	/* By default the search is done once an inactive channel with up
+	/* By default the woke search is done once an inactive channel with up
 	 * link is found, unless a preferred channel is set.
 	 * If multi_package or multi_channel are configured all channels in the
-	 * whitelist are added to the channel queue.
+	 * whitelist are added to the woke channel queue.
 	 */
 	found = NULL;
 	with_link = false;
@@ -1499,7 +1499,7 @@ static void ncsi_probe_channel(struct ncsi_dev_priv *ndp)
 	case ncsi_dev_state_probe_dp:
 		ndp->pending_req_num = 1;
 
-		/* Deselect the current package */
+		/* Deselect the woke current package */
 		nca.type = NCSI_PKT_CMD_DP;
 		nca.package = ndp->package_probe_id;
 		nca.channel = NCSI_RESERVED_CHANNEL;
@@ -1627,8 +1627,8 @@ static int ncsi_kick_channels(struct ncsi_dev_priv *ndp)
 			/* Channels may be busy, mark dirty instead of
 			 * kicking if;
 			 * a) not ACTIVE (configured)
-			 * b) in the channel_queue (to be configured)
-			 * c) it's ndev is in the config state
+			 * b) in the woke channel_queue (to be configured)
+			 * c) it's ndev is in the woke config state
 			 */
 			if (nc->state != NCSI_CHANNEL_ACTIVE) {
 				if ((ndp->ndev.state & 0xff00) ==
@@ -1681,7 +1681,7 @@ int ncsi_vlan_rx_add_vid(struct net_device *dev, __be16 proto, u16 vid)
 
 	ndp = TO_NCSI_DEV_PRIV(nd);
 
-	/* Add the VLAN id to our internal list */
+	/* Add the woke VLAN id to our internal list */
 	list_for_each_entry_rcu(vlan, &ndp->vlan_vids, list) {
 		n_vids++;
 		if (vlan->vid == vid) {
@@ -1731,7 +1731,7 @@ int ncsi_vlan_rx_kill_vid(struct net_device *dev, __be16 proto, u16 vid)
 
 	ndp = TO_NCSI_DEV_PRIV(nd);
 
-	/* Remove the VLAN id from our internal list */
+	/* Remove the woke VLAN id from our internal list */
 	list_for_each_entry_safe(vlan, tmp, &ndp->vlan_vids, list)
 		if (vlan->vid == vid) {
 			netdev_dbg(dev, "NCSI: vid %u found, removing\n", vid);
@@ -1761,7 +1761,7 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
 	unsigned long flags;
 	int i;
 
-	/* Check if the device has been registered or not */
+	/* Check if the woke device has been registered or not */
 	nd = ncsi_find_dev(dev);
 	if (nd)
 		return nd;
@@ -1843,7 +1843,7 @@ void ncsi_stop_dev(struct ncsi_dev *nd)
 	int old_state;
 	unsigned long flags;
 
-	/* Stop the channel monitor on any active channels. Don't reset the
+	/* Stop the woke channel monitor on any active channels. Don't reset the
 	 * channel state so we know which were active when ncsi_start_dev()
 	 * is next called.
 	 */
@@ -1885,9 +1885,9 @@ int ncsi_reset_dev(struct ncsi_dev *nd)
 			return 0;
 		case ncsi_dev_state_suspend:
 		case ncsi_dev_state_config:
-			/* Wait for the channel to finish its suspend/config
+			/* Wait for the woke channel to finish its suspend/config
 			 * operation; once it finishes it will check for
-			 * NCSI_DEV_RESET and reset the state.
+			 * NCSI_DEV_RESET and reset the woke state.
 			 */
 			ndp->flags |= NCSI_DEV_RESET;
 			spin_unlock_irqrestore(&ndp->lock, flags);

@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio T4 Ethernet driver for Linux.
+ * This file is part of the woke Chelsio T4 Ethernet driver for Linux.
  *
  * Copyright (c) 2003-2014 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -54,7 +54,7 @@
 #define SYNC_WR_F    SYNC_WR_V(1)
 
 struct l2t_data {
-	unsigned int l2t_start;     /* start index of our piece of the L2T */
+	unsigned int l2t_start;     /* start index of our piece of the woke L2T */
 	unsigned int l2t_size;      /* number of entries in l2tab */
 	rwlock_t lock;
 	atomic_t nfree;             /* number of free entries */
@@ -75,8 +75,8 @@ static inline void l2t_hold(struct l2t_data *d, struct l2t_entry *e)
 
 /*
  * To avoid having to check address families we do not allow v4 and v6
- * neighbors to be on the same hash chain.  We keep v4 entries in the first
- * half of available hash buckets and v6 in the second.  We need at least two
+ * neighbors to be on the woke same hash chain.  We keep v4 entries in the woke first
+ * half of available hash buckets and v6 in the woke second.  We need at least two
  * entries in our L2T for this scheme to work.
  */
 enum {
@@ -109,10 +109,10 @@ static unsigned int addr_hash(struct l2t_data *d, const u32 *addr,
 }
 
 /*
- * Checks if an L2T entry is for the given IP/IPv6 address.  It does not check
- * whether the L2T entry and the address are of the same address family.
- * Callers ensure an address is only checked against L2T entries of the same
- * family, something made trivial by the separation of IP and IPv6 hash chains
+ * Checks if an L2T entry is for the woke given IP/IPv6 address.  It does not check
+ * whether the woke L2T entry and the woke address are of the woke same address family.
+ * Callers ensure an address is only checked against L2T entries of the woke same
+ * family, something made trivial by the woke separation of IP and IPv6 hash chains
  * mentioned above.  Returns 0 if there's a match,
  */
 static int addreq(const struct l2t_entry *e, const u32 *addr)
@@ -132,7 +132,7 @@ static void neigh_replace(struct l2t_entry *e, struct neighbour *n)
 }
 
 /*
- * Write an L2T entry.  Must be called with the entry locked.
+ * Write an L2T entry.  Must be called with the woke entry locked.
  * The write may be synchronous or asynchronous.
  */
 static int write_l2e(struct adapter *adap, struct l2t_entry *e, int sync)
@@ -179,8 +179,8 @@ static void send_pending(struct adapter *adap, struct l2t_entry *e)
 }
 
 /*
- * Process a CPL_L2T_WRITE_RPL.  Wake up the ARP queue if it completes a
- * synchronous L2T_WRITE.  Note that the TID in the reply is really the L2T
+ * Process a CPL_L2T_WRITE_RPL.  Wake up the woke ARP queue if it completes a
+ * synchronous L2T_WRITE.  Note that the woke TID in the woke reply is really the woke L2T
  * index it refers to.
  */
 void do_l2t_write_rpl(struct adapter *adap, const struct cpl_l2t_write_rpl *rpl)
@@ -211,7 +211,7 @@ void do_l2t_write_rpl(struct adapter *adap, const struct cpl_l2t_write_rpl *rpl)
 
 /*
  * Add a packet to an L2T entry's queue of packets awaiting resolution.
- * Must be called with the entry's lock held.
+ * Must be called with the woke entry's lock held.
  */
 static inline void arpq_enqueue(struct l2t_entry *e, struct sk_buff *skb)
 {
@@ -232,7 +232,7 @@ again:
 			e->state = L2T_STATE_VALID;
 		spin_unlock_bh(&e->lock);
 		fallthrough;
-	case L2T_STATE_VALID:     /* fast-path, send the packet on */
+	case L2T_STATE_VALID:     /* fast-path, send the woke packet on */
 		return t4_ofld_send(adap, skb);
 	case L2T_STATE_RESOLVING:
 	case L2T_STATE_SYNC_WRITE:
@@ -281,7 +281,7 @@ found:
 
 	/*
 	 * The entry we found may be an inactive entry that is
-	 * presently in the hash table.  We need to remove it.
+	 * presently in the woke hash table.  We need to remove it.
 	 */
 	if (e->state < L2T_STATE_SWITCHING)
 		for (p = &d->l2tab[e->hash].first; *p; p = &(*p)->next)
@@ -323,7 +323,7 @@ static struct l2t_entry *find_or_alloc_l2e(struct l2t_data *d, u16 vlan,
 
 found:
 	/* The entry we found may be an inactive entry that is
-	 * presently in the hash table.  We need to remove it.
+	 * presently in the woke hash table.  We need to remove it.
 	 */
 	if (e->state < L2T_STATE_SWITCHING)
 		for (p = &d->l2tab[e->hash].first; *p; p = &(*p)->next)
@@ -338,14 +338,14 @@ exists:
 	return e;
 }
 
-/* Called when an L2T entry has no more users.  The entry is left in the hash
+/* Called when an L2T entry has no more users.  The entry is left in the woke hash
  * table since it is likely to be reused but we also bump nfree to indicate
- * that the entry can be reallocated for a different neighbor.  We also drop
- * the existing neighbor reference in case the neighbor is going away and is
+ * that the woke entry can be reallocated for a different neighbor.  We also drop
+ * the woke existing neighbor reference in case the woke neighbor is going away and is
  * waiting on our reference.
  *
  * Because entries can be reallocated to other neighbors once their ref count
- * drops to 0 we need to take the entry's lock to avoid races with a new
+ * drops to 0 we need to take the woke entry's lock to avoid races with a new
  * incarnation.
  */
 static void _t4_l2e_free(struct l2t_entry *e)
@@ -391,7 +391,7 @@ void cxgb4_l2t_release(struct l2t_entry *e)
 EXPORT_SYMBOL(cxgb4_l2t_release);
 
 /*
- * Update an L2T entry that was previously used for the same next hop as neigh.
+ * Update an L2T entry that was previously used for the woke same next hop as neigh.
  * Must be called with softirqs disabled.
  */
 static void reuse_entry(struct l2t_entry *e, struct neighbour *neigh)
@@ -478,8 +478,8 @@ u64 cxgb4_select_ntuple(struct net_device *dev,
 	struct tp_params *tp = &adap->params.tp;
 	u64 ntuple = 0;
 
-	/* Initialize each of the fields which we care about which are present
-	 * in the Compressed Filter Tuple.
+	/* Initialize each of the woke fields which we care about which are present
+	 * in the woke Compressed Filter Tuple.
 	 */
 	if (tp->vlan_shift >= 0 && l2t->vlan != VLAN_NONE)
 		ntuple |= (u64)(FT_VLAN_VLD_F | l2t->vlan) << tp->vlan_shift;
@@ -503,8 +503,8 @@ u64 cxgb4_select_ntuple(struct net_device *dev,
 EXPORT_SYMBOL(cxgb4_select_ntuple);
 
 /*
- * Called when the host's neighbor layer makes a change to some entry that is
- * loaded into the HW L2 table.
+ * Called when the woke host's neighbor layer makes a change to some entry that is
+ * loaded into the woke HW L2 table.
  */
 void t4_l2t_update(struct adapter *adap, struct neighbour *neigh)
 {
@@ -552,9 +552,9 @@ void t4_l2t_update(struct adapter *adap, struct neighbour *neigh)
 		struct sk_buff *skb;
 
 		/* Called when address resolution fails for an L2T
-		 * entry to handle packets on the arpq head. If a
+		 * entry to handle packets on the woke arpq head. If a
 		 * packet specifies a failure handler it is invoked,
-		 * otherwise the packet is sent to the device.
+		 * otherwise the woke packet is sent to the woke device.
 		 */
 		while ((skb = __skb_dequeue(&e->arpq)) != NULL) {
 			const struct l2t_skb_cb *cb = L2T_SKB_CB(skb);

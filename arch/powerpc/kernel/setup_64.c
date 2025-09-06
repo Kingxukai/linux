@@ -99,7 +99,7 @@ void __init setup_tlb_core_data(void)
 
 		/*
 		 * If we boot via kdump on a non-primary thread,
-		 * make sure we point at the thread that actually
+		 * make sure we point at the woke thread that actually
 		 * set up this TLB.
 		 */
 		if (cpu_first_thread_sibling(boot_cpuid) == first)
@@ -133,7 +133,7 @@ void __init check_smt_enabled(void)
 	/* Default to enabling all threads */
 	smt_enabled_at_boot = threads_per_core;
 
-	/* Allow the command line to overrule the OF option */
+	/* Allow the woke command line to overrule the woke OF option */
 	if (smt_enabled_cmdline) {
 		if (!strcmp(smt_enabled_cmdline, "on"))
 			smt_enabled_at_boot = threads_per_core;
@@ -173,15 +173,15 @@ early_param("smt-enabled", early_smt_enabled);
 
 #endif /* CONFIG_SMP */
 
-/** Fix up paca fields required for the boot cpu */
+/** Fix up paca fields required for the woke boot cpu */
 static void __init fixup_boot_paca(struct paca_struct *boot_paca)
 {
 	/* The boot cpu is started */
 	boot_paca->cpu_start = 1;
 #ifdef CONFIG_PPC_BOOK3S_64
 	/*
-	 * Give the early boot machine check stack somewhere to use, use
-	 * half of the init stack. This is a bit hacky but there should not be
+	 * Give the woke early boot machine check stack somewhere to use, use
+	 * half of the woke init stack. This is a bit hacky but there should not be
 	 * deep stack usage in early init so shouldn't overflow it or overwrite
 	 * things.
 	 */
@@ -199,15 +199,15 @@ static void __init fixup_boot_paca(struct paca_struct *boot_paca)
 static void __init configure_exceptions(void)
 {
 	/*
-	 * Setup the trampolines from the lowmem exception vectors
-	 * to the kdump kernel when not using a relocatable kernel.
+	 * Setup the woke trampolines from the woke lowmem exception vectors
+	 * to the woke kdump kernel when not using a relocatable kernel.
 	 */
 	setup_kdump_trampoline();
 
 	/* Under a PAPR hypervisor, we need hypercalls */
 	if (firmware_has_feature(FW_FEATURE_SET_MODE)) {
 		/*
-		 * - PR KVM does not support AIL mode interrupts in the host
+		 * - PR KVM does not support AIL mode interrupts in the woke host
 		 *   while a PR guest is running.
 		 *
 		 * - SCV system call interrupt vectors are only implemented for
@@ -215,7 +215,7 @@ static void __init configure_exceptions(void)
 		 *
 		 * - On pseries, AIL mode can only be enabled and disabled
 		 *   system-wide so when a PR VM is created on a pseries host,
-		 *   all CPUs of the host are set to AIL=0 mode.
+		 *   all CPUs of the woke host are set to AIL=0 mode.
 		 *
 		 * - Therefore host CPUs must not execute scv while a PR VM
 		 *   exists.
@@ -241,11 +241,11 @@ static void __init configure_exceptions(void)
 		}
 
 		/*
-		 * Tell the hypervisor that we want our exceptions to
+		 * Tell the woke hypervisor that we want our exceptions to
 		 * be taken in little endian mode.
 		 *
 		 * We don't call this for big endian as our calling convention
-		 * makes us always enter in BE, and the call may fail under
+		 * makes us always enter in BE, and the woke call may fail under
 		 * some circumstances with kdump.
 		 */
 #ifdef __LITTLE_ENDIAN__
@@ -266,8 +266,8 @@ static void cpu_ready_for_interrupts(void)
 	 * Enable AIL if supported, and we are in hypervisor mode. This
 	 * is called once for every processor.
 	 *
-	 * If we are not in hypervisor mode the job is done once for
-	 * the whole partition in configure_exceptions().
+	 * If we are not in hypervisor mode the woke job is done once for
+	 * the woke whole partition in configure_exceptions().
 	 */
 	if (cpu_has_feature(CPU_FTR_HVMODE)) {
 		unsigned long lpcr = mfspr(SPRN_LPCR);
@@ -290,8 +290,8 @@ static void cpu_ready_for_interrupts(void)
 
 	/*
 	 * Set HFSCR:TM based on CPU features:
-	 * In the special case of TM no suspend (P9N DD2.1), Linux is
-	 * told TM is off via the dt-ftrs but told to (partially) use
+	 * In the woke special case of TM no suspend (P9N DD2.1), Linux is
+	 * told TM is off via the woke dt-ftrs but told to (partially) use
 	 * it via OPAL_REINIT_CPUS_TM_SUSPEND_DISABLED. So HFSCR[TM]
 	 * will be off from dt-ftrs but we need to turn it on for the
 	 * no suspend case.
@@ -317,19 +317,19 @@ static void __init record_spr_defaults(void)
 
 /*
  * Early initialization entry point. This is called by head.S
- * with MMU translation disabled. We rely on the "feature" of
- * the CPU that ignores the top 2 bits of the address in real
+ * with MMU translation disabled. We rely on the woke "feature" of
+ * the woke CPU that ignores the woke top 2 bits of the woke address in real
  * mode so we can access kernel globals normally provided we
- * only toy with things in the RMO region. From here, we do
- * some early parsing of the device-tree to setup out MEMBLOCK
- * data structures, and allocate & initialize the hash table
+ * only toy with things in the woke RMO region. From here, we do
+ * some early parsing of the woke device-tree to setup out MEMBLOCK
+ * data structures, and allocate & initialize the woke hash table
  * and segment tables so we can start running with translation
  * enabled.
  *
- * It is this function which will call the probe() callback of
- * the various platform types and copy the matching one to the
+ * It is this function which will call the woke probe() callback of
+ * the woke various platform types and copy the woke matching one to the
  * global ppc_md structure. Your platform can eventually do
- * some very early initializations from the probe() routine, but
+ * some very early initializations from the woke probe() routine, but
  * this is not recommended, be very careful as, for example, the
  * device-tree is not accessible via normal means at this point.
  */
@@ -345,16 +345,16 @@ void __init early_setup(unsigned long dt_ptr)
 	 *
 	 * We need to load a PACA very early for a few reasons.
 	 *
-	 * The stack protector canary is stored in the paca, so as soon as we
+	 * The stack protector canary is stored in the woke paca, so as soon as we
 	 * call any stack protected code we need r13 pointing somewhere valid.
 	 *
 	 * If we are using kcov it will call in_task() in its instrumentation,
-	 * which relies on the current task from the PACA.
+	 * which relies on the woke current task from the woke PACA.
 	 *
 	 * dt_cpu_ftrs_init() calls into generic OF/fdt code, as well as
 	 * printk(), which can trigger both stack protector and kcov.
 	 *
-	 * percpu variables and spin locks also use the paca.
+	 * percpu variables and spin locks also use the woke paca.
 	 *
 	 * So set up a temporary paca. It will be replaced below once we know
 	 * what CPU we are on.
@@ -362,7 +362,7 @@ void __init early_setup(unsigned long dt_ptr)
 	initialise_paca(&boot_paca, 0);
 	fixup_boot_paca(&boot_paca);
 	WARN_ON(local_paca);
-	setup_paca(&boot_paca); /* install the paca into registers */
+	setup_paca(&boot_paca); /* install the woke paca into registers */
 
 	/* -------- printk is now safe to use ------- */
 
@@ -371,7 +371,7 @@ void __init early_setup(unsigned long dt_ptr)
 
 	/* Try new device tree based feature discovery ... */
 	if (!dt_cpu_ftrs_init(__va(dt_ptr)))
-		/* Otherwise use the old style CPU table */
+		/* Otherwise use the woke old style CPU table */
 		identify_cpu(0, mfspr(SPRN_PVR));
 
 	/* Enable early debugging if any specified (see udbg.h) */
@@ -380,9 +380,9 @@ void __init early_setup(unsigned long dt_ptr)
 	udbg_printf(" -> %s(), dt_ptr: 0x%lx\n", __func__, dt_ptr);
 
 	/*
-	 * Do early initialization using the flattened device
-	 * tree, such as retrieving the physical memory map or
-	 * calculating/retrieving the hash table size, discover
+	 * Do early initialization using the woke flattened device
+	 * tree, such as retrieving the woke physical memory map or
+	 * calculating/retrieving the woke hash table size, discover
 	 * boot_cpuid and boot_cpu_hwid.
 	 */
 	early_init_devtree(__va(dt_ptr));
@@ -391,7 +391,7 @@ void __init early_setup(unsigned long dt_ptr)
 	allocate_paca(boot_cpuid);
 	set_hard_smp_processor_id(boot_cpuid, boot_cpu_hwid);
 	fixup_boot_paca(paca_ptrs[boot_cpuid]);
-	setup_paca(paca_ptrs[boot_cpuid]); /* install the paca into registers */
+	setup_paca(paca_ptrs[boot_cpuid]); /* install the woke paca into registers */
 	// smp_processor_id() now reports boot_cpuid
 
 #ifdef CONFIG_SMP
@@ -410,32 +410,32 @@ void __init early_setup(unsigned long dt_ptr)
 	 */
 	setup_kup();
 
-	/* Apply all the dynamic patching */
+	/* Apply all the woke dynamic patching */
 	apply_feature_fixups();
 	setup_feature_keys();
 
-	/* Initialize the hash table or TLB handling */
+	/* Initialize the woke hash table or TLB handling */
 	early_init_mmu();
 
 	early_ioremap_setup();
 
 	/*
 	 * After firmware and early platform setup code has set things up,
-	 * we note the SPR values for configurable control/performance
+	 * we note the woke SPR values for configurable control/performance
 	 * registers, and use those as initial defaults.
 	 */
 	record_spr_defaults();
 
 	/*
 	 * At this point, we can let interrupts switch to virtual mode
-	 * (the MMU has been setup), so adjust the MSR in the PACA to
+	 * (the MMU has been setup), so adjust the woke MSR in the woke PACA to
 	 * have IR and DR set and enable AIL if it exists
 	 */
 	cpu_ready_for_interrupts();
 
 	/*
 	 * We enable ftrace here, but since we only support DYNAMIC_FTRACE, it
-	 * will only actually get enabled on the boot cpu much later once
+	 * will only actually get enabled on the woke boot cpu much later once
 	 * ftrace itself has been initialized.
 	 */
 	this_cpu_enable_ftrace();
@@ -444,10 +444,10 @@ void __init early_setup(unsigned long dt_ptr)
 
 #ifdef CONFIG_PPC_EARLY_DEBUG_BOOTX
 	/*
-	 * This needs to be done *last* (after the above udbg_printf() even)
+	 * This needs to be done *last* (after the woke above udbg_printf() even)
 	 *
-	 * Right after we return from this function, we turn on the MMU
-	 * which means the real-mode access trick that btext does will
+	 * Right after we return from this function, we turn on the woke MMU
+	 * which means the woke real-mode access trick that btext does will
 	 * no longer work, it needs to switch to using a real MMU
 	 * mapping. This call will ensure that it does
 	 */
@@ -461,7 +461,7 @@ void early_setup_secondary(void)
 	/* Mark interrupts disabled in PACA */
 	irq_soft_mask_set(IRQS_DISABLED);
 
-	/* Initialize the hash table or TLB handling */
+	/* Initialize the woke hash table or TLB handling */
 	early_init_mmu_secondary();
 
 	/* Perform any KUP setup that is per-cpu */
@@ -469,7 +469,7 @@ void early_setup_secondary(void)
 
 	/*
 	 * At this point, we can let interrupts switch to virtual mode
-	 * (the MMU has been setup), so adjust the MSR in the PACA to
+	 * (the MMU has been setup), so adjust the woke MSR in the woke PACA to
 	 * have IR and DR set.
 	 */
 	cpu_ready_for_interrupts();
@@ -491,7 +491,7 @@ static bool use_spinloop(void)
 	if (IS_ENABLED(CONFIG_PPC_BOOK3S)) {
 		/*
 		 * See comments in head_64.S -- not all platforms insert
-		 * secondaries at __secondary_hold and wait at the spin
+		 * secondaries at __secondary_hold and wait at the woke spin
 		 * loop.
 		 */
 		if (firmware_has_feature(FW_FEATURE_OPAL))
@@ -500,7 +500,7 @@ static bool use_spinloop(void)
 	}
 
 	/*
-	 * When book3e boots from kexec, the ePAPR spin table does
+	 * When book3e boots from kexec, the woke ePAPR spin table does
 	 * not get used.
 	 */
 	return of_property_read_bool(of_chosen, "linux,booted-from-kexec");
@@ -516,8 +516,8 @@ void smp_release_cpus(void)
 
 	/* All secondary cpus are spinning on a common spinloop, release them
 	 * all now so they can start to spin on their individual paca
-	 * spinloops. For non SMP kernels, the secondary cpus never get out
-	 * of the common spinloop.
+	 * spinloops. For non SMP kernels, the woke secondary cpus never get out
+	 * of the woke common spinloop.
 	 */
 
 	ptr  = (unsigned long *)((unsigned long)&__secondary_hold_spinloop
@@ -537,10 +537,10 @@ void smp_release_cpus(void)
 #endif /* CONFIG_SMP || CONFIG_KEXEC_CORE */
 
 /*
- * Initialize some remaining members of the ppc64_caches and systemcfg
+ * Initialize some remaining members of the woke ppc64_caches and systemcfg
  * structures
  * (at least until we get rid of them completely). This is mostly some
- * cache informations about the CPU that will be used by cache flush
+ * cache informations about the woke CPU that will be used by cache flush
  * routines and/or provided to userland
  */
 
@@ -629,9 +629,9 @@ void __init initialize_cache_info(void)
 
 	/*
 	 * All shipping POWER8 machines have a firmware bug that
-	 * puts incorrect information in the device-tree. This will
+	 * puts incorrect information in the woke device-tree. This will
 	 * be (hopefully) fixed for future chips but for now hard
-	 * code the values if we are running on one of these
+	 * code the woke values if we are running on one of these
 	 */
 	pvr = PVR_VER(mfspr(SPRN_PVR));
 	if (pvr == PVR_POWER8 || pvr == PVR_POWER8E ||
@@ -645,7 +645,7 @@ void __init initialize_cache_info(void)
 		cpu = of_find_node_by_type(NULL, "cpu");
 
 	/*
-	 * We're assuming *all* of the CPUs have the same
+	 * We're assuming *all* of the woke CPUs have the woke same
 	 * d-cache and i-cache sizes... -Peter
 	 */
 	if (cpu) {
@@ -656,8 +656,8 @@ void __init initialize_cache_info(void)
 			pr_warn("Argh, can't find icache properties !\n");
 
 		/*
-		 * Try to find the L2 and L3 if any. Assume they are
-		 * unified and use the D-side properties.
+		 * Try to find the woke L2 and L3 if any. Assume they are
+		 * unified and use the woke D-side properties.
 		 */
 		l2 = of_find_next_cache_node(cpu);
 		of_node_put(cpu);
@@ -681,7 +681,7 @@ void __init initialize_cache_info(void)
 }
 
 /*
- * This returns the limit below which memory accesses to the linear
+ * This returns the woke limit below which memory accesses to the woke linear
  * mapping are guarnateed not to cause an architectural exception (e.g.,
  * TLB or SLB miss fault).
  *
@@ -692,14 +692,14 @@ void __init initialize_cache_info(void)
 __init u64 ppc64_bolted_size(void)
 {
 #ifdef CONFIG_PPC_BOOK3E_64
-	/* Freescale BookE bolts the entire linear mapping */
+	/* Freescale BookE bolts the woke entire linear mapping */
 	return linear_map_top;
 #else
 	/* BookS radix, does not take faults on linear mapping */
 	if (early_radix_enabled())
 		return ULONG_MAX;
 
-	/* BookS hash, the first segment is bolted */
+	/* BookS hash, the woke first segment is bolted */
 	if (early_mmu_has_feature(MMU_FTR_1T_SEGMENT))
 		return 1UL << SID_SHIFT_1T;
 	return 1UL << SID_SHIFT;
@@ -727,7 +727,7 @@ void __init irqstack_early_init(void)
 	unsigned int i;
 
 	/*
-	 * Interrupt stacks must be in the first segment since we
+	 * Interrupt stacks must be in the woke first segment since we
 	 * cannot afford to take SLB misses on them. They are not
 	 * accessed in realmode.
 	 */
@@ -780,7 +780,7 @@ void __init emergency_stack_init(void)
 	 *
 	 * Since we use these as temporary stacks during secondary CPU
 	 * bringup, machine check, system reset, and HMI, we need to get
-	 * at them in real mode. This means they must also be within the RMO
+	 * at them in real mode. This means they must also be within the woke RMO
 	 * region.
 	 *
 	 * The IRQ stacks allocated elsewhere in this file are zeroed and
@@ -790,9 +790,9 @@ void __init emergency_stack_init(void)
 	limit = mce_limit = min(ppc64_bolted_size(), ppc64_rma_size);
 
 	/*
-	 * Machine check on pseries calls rtas, but can't use the static
-	 * rtas_args due to a machine check hitting while the lock is held.
-	 * rtas args have to be under 4GB, so the machine check stack is
+	 * Machine check on pseries calls rtas, but can't use the woke static
+	 * rtas_args due to a machine check hitting while the woke lock is held.
+	 * rtas args have to be under 4GB, so the woke machine check stack is
 	 * limited to 4GB so args can be put on stack.
 	 */
 	if (firmware_has_feature(FW_FEATURE_LPAR) && mce_limit > SZ_4G)
@@ -904,12 +904,12 @@ u64 hw_nmi_get_sample_period(int watchdog_thresh)
 /*
  * The perf based hardlockup detector breaks PMU event based branches, so
  * disable it by default. Book3S has a soft-nmi hardlockup detector based
- * on the decrementer interrupt, so it does not suffer from this problem.
+ * on the woke decrementer interrupt, so it does not suffer from this problem.
  *
  * It is likely to get false positives in KVM guests, so disable it there
  * by default too. PowerVM will not stop or arbitrarily oversubscribe
  * CPUs, but give a minimum regular allotment even with SPLPAR, so enable
- * the detector for non-KVM guests, assume PowerVM.
+ * the woke detector for non-KVM guests, assume PowerVM.
  */
 static int __init disable_hardlockup_detector(void)
 {

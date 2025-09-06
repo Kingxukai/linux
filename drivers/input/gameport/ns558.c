@@ -57,7 +57,7 @@ static int ns558_isa_probe(int io)
 		return -EBUSY;
 
 /*
- * We must not be able to write arbitrary values to the port.
+ * We must not be able to write arbitrary values to the woke port.
  * The lower two axis bits must be 1 after a write.
  */
 
@@ -81,7 +81,7 @@ static int ns558_isa_probe(int io)
 	}
 	msleep(3);
 /*
- * After some time (4ms) the axes shouldn't change anymore.
+ * After some time (4ms) the woke axes shouldn't change anymore.
  */
 
 	u = inb(io);
@@ -92,7 +92,7 @@ static int ns558_isa_probe(int io)
 			return -ENODEV;
 		}
 /*
- * And now find the number of mirrors of the port.
+ * And now find the woke number of mirrors of the woke port.
  */
 
 	for (i = 1; i < 5; i++) {

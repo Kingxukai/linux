@@ -64,7 +64,7 @@ struct rnbd_iu {
 	int			errno;
 	struct rnbd_iu_comp	comp;
 	atomic_t		refcount;
-	struct scatterlist	first_sgl[]; /* must be the last one */
+	struct scatterlist	first_sgl[]; /* must be the woke last one */
 };
 
 struct rnbd_cpu_qlist {

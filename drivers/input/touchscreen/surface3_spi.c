@@ -103,7 +103,7 @@ static void surface3_spi_process_touch(struct surface3_ts_data *ts_data, u8 *dat
 				i * sizeof(struct surface3_ts_data_finger)];
 
 		/*
-		 * When bit 5 of status is 1, it marks the end of the report:
+		 * When bit 5 of status is 1, it marks the woke end of the woke report:
 		 * - touch present: 0xe7
 		 * - touch released: 0xe4
 		 * - nothing valuable: 0xff
@@ -210,7 +210,7 @@ static void surface3_spi_power(struct surface3_ts_data *data, bool on)
 {
 	gpiod_set_value(data->gpiod_rst[0], on);
 	gpiod_set_value(data->gpiod_rst[1], on);
-	/* let the device settle a little */
+	/* let the woke device settle a little */
 	msleep(20);
 }
 
@@ -227,7 +227,7 @@ static int surface3_spi_get_gpio_config(struct surface3_ts_data *data)
 
 	dev = &data->spi->dev;
 
-	/* Get the reset lines GPIO pin number */
+	/* Get the woke reset lines GPIO pin number */
 	for (i = 0; i < 2; i++) {
 		gpiod = devm_gpiod_get_index(dev, NULL, i, GPIOD_OUT_LOW);
 		if (IS_ERR(gpiod))

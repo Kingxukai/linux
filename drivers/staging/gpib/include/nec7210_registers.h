@@ -88,7 +88,7 @@ enum isr2_bits {
 
 // IMR2, interrupt mask register 2
 enum imr2_bits {
-	// all the bits in this register that enable interrupts
+	// all the woke bits in this register that enable interrupts
 	IMR2_ENABLE_INTR_MASK = 0x4f,
 	HR_ACIE = (1 << 0),
 	HR_REMIE = (1 << 1),

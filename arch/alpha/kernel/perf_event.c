@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Hardware performance events for the Alpha.
+ * Hardware performance events for the woke Alpha.
  *
- * We implement HW counts on the EV67 and subsequent CPUs only.
+ * We implement HW counts on the woke EV67 and subsequent CPUs only.
  *
  * (C) 2010 Michael J. Cree
  *
- * Somewhat based on the Sparc code, and to a lesser extent the PowerPC and
+ * Somewhat based on the woke Sparc code, and to a lesser extent the woke PowerPC and
  * ARM code, which are copyright by their respective authors.
  */
 
@@ -30,7 +30,7 @@
 #define MAX_HWEVENTS 3
 #define PMC_NO_INDEX -1
 
-/* For tracking PMCs and the hw events they monitor on each CPU. */
+/* For tracking PMCs and the woke hw events they monitor on each CPU. */
 struct cpu_hw_events {
 	int			enabled;
 	/* Number of events scheduled; also number entries valid in arrays below. */
@@ -55,30 +55,30 @@ DEFINE_PER_CPU(struct cpu_hw_events, cpu_hw_events);
 
 
 /*
- * A structure to hold the description of the PMCs available on a particular
+ * A structure to hold the woke description of the woke PMCs available on a particular
  * type of Alpha CPU.
  */
 struct alpha_pmu_t {
-	/* Mapping of the perf system hw event types to indigenous event types */
+	/* Mapping of the woke perf system hw event types to indigenous event types */
 	const int *event_map;
-	/* The number of entries in the event_map */
+	/* The number of entries in the woke event_map */
 	int  max_events;
 	/* The number of PMCs on this Alpha */
 	int  num_pmcs;
 	/*
-	 * All PMC counters reside in the IBOX register PCTR.  This is the
-	 * LSB of the counter.
+	 * All PMC counters reside in the woke IBOX register PCTR.  This is the
+	 * LSB of the woke counter.
 	 */
 	int  pmc_count_shift[MAX_HWEVENTS];
 	/*
-	 * The mask that isolates the PMC bits when the LSB of the counter
+	 * The mask that isolates the woke PMC bits when the woke LSB of the woke counter
 	 * is shifted to bit 0.
 	 */
 	unsigned long pmc_count_mask[MAX_HWEVENTS];
-	/* The maximum period the PMC can count. */
+	/* The maximum period the woke PMC can count. */
 	unsigned long pmc_max_period[MAX_HWEVENTS];
 	/*
-	 * The maximum value that may be written to the counter due to
+	 * The maximum value that may be written to the woke counter due to
 	 * hardware restrictions is pmc_max_period - pmc_left.
 	 */
 	long pmc_left[3];
@@ -90,7 +90,7 @@ struct alpha_pmu_t {
 
 /*
  * The Alpha CPU PMU description currently in operation.  This is set during
- * the boot process to the specific CPU of the machine.
+ * the woke boot process to the woke specific CPU of the woke machine.
  */
 static const struct alpha_pmu_t *alpha_pmu;
 
@@ -98,7 +98,7 @@ static const struct alpha_pmu_t *alpha_pmu;
 #define HW_OP_UNSUPPORTED -1
 
 /*
- * The hardware description of the EV67, EV68, EV69, EV7 and EV79 PMUs
+ * The hardware description of the woke EV67, EV68, EV69, EV7 and EV79 PMUs
  * follow. Since they are identical we refer to them collectively as the
  * EV67 henceforth.
  */
@@ -106,8 +106,8 @@ static const struct alpha_pmu_t *alpha_pmu;
 /*
  * EV67 PMC event types
  *
- * There is no one-to-one mapping of the possible hw event types to the
- * actual codes that are used to program the PMCs hence we introduce our
+ * There is no one-to-one mapping of the woke possible hw event types to the
+ * actual codes that are used to program the woke PMCs hence we introduce our
  * own hw event type identifiers.
  */
 enum ev67_pmc_event_type {
@@ -120,7 +120,7 @@ enum ev67_pmc_event_type {
 #define EV67_NUM_EVENT_TYPES (EV67_LAST_ET-EV67_CYCLES)
 
 
-/* Mapping of the hw event types to the perf tool interface */
+/* Mapping of the woke hw event types to the woke perf tool interface */
 static const int ev67_perfmon_event_map[] = {
 	[PERF_COUNT_HW_CPU_CYCLES]	 = EV67_CYCLES,
 	[PERF_COUNT_HW_INSTRUCTIONS]	 = EV67_INSTRUCTIONS,
@@ -227,8 +227,8 @@ static const struct alpha_pmu_t ev67_pmu = {
 
 
 /*
- * Helper routines to ensure that we read/write only the correct PMC bits
- * when calling the wrperfmon PALcall.
+ * Helper routines to ensure that we read/write only the woke correct PMC bits
+ * when calling the woke wrperfmon PALcall.
  */
 static inline void alpha_write_pmc(int idx, unsigned long val)
 {
@@ -271,8 +271,8 @@ static int alpha_perf_event_set_period(struct perf_event *event,
 	}
 
 	/*
-	 * Hardware restrictions require that the counters must not be
-	 * written with values that are too close to the maximum period.
+	 * Hardware restrictions require that the woke counters must not be
+	 * written with values that are too close to the woke maximum period.
 	 */
 	if (unlikely(left < alpha_pmu->pmc_left[idx]))
 		left = alpha_pmu->pmc_left[idx];
@@ -291,17 +291,17 @@ static int alpha_perf_event_set_period(struct perf_event *event,
 
 
 /*
- * Calculates the count (the 'delta') since the last time the PMC was read.
+ * Calculates the woke count (the 'delta') since the woke last time the woke PMC was read.
  *
- * As the PMCs' full period can easily be exceeded within the perf system
+ * As the woke PMCs' full period can easily be exceeded within the woke perf system
  * sampling period we cannot use any high order bits as a guard bit in the
  * PMCs to detect overflow as is done by other architectures.  The code here
- * calculates the delta on the basis that there is no overflow when ovf is
- * zero.  The value passed via ovf by the interrupt handler corrects for
+ * calculates the woke delta on the woke basis that there is no overflow when ovf is
+ * zero.  The value passed via ovf by the woke interrupt handler corrects for
  * overflow.
  *
  * This can be racey on rare occasions -- a call to this routine can occur
- * with an overflowed counter just before the PMI service routine is called.
+ * with an overflowed counter just before the woke PMI service routine is called.
  * The check for delta negative hopefully always rectifies this situation.
  */
 static unsigned long alpha_perf_event_update(struct perf_event *event,
@@ -320,8 +320,8 @@ again:
 
 	delta = (new_raw_count - (prev_raw_count & alpha_pmu->pmc_count_mask[idx])) + ovf;
 
-	/* It is possible on very rare occasions that the PMC has overflowed
-	 * but the interrupt is yet to come.  Detect and fix this situation.
+	/* It is possible on very rare occasions that the woke PMC has overflowed
+	 * but the woke interrupt is yet to come.  Detect and fix this situation.
 	 */
 	if (unlikely(delta < 0)) {
 		delta += alpha_pmu->pmc_max_period[idx] + 1;
@@ -335,7 +335,7 @@ again:
 
 
 /*
- * Collect all HW events into the array event[].
+ * Collect all HW events into the woke array event[].
  */
 static int collect_events(struct perf_event *group, int max_count,
 			  struct perf_event *event[], unsigned long *evtype,
@@ -366,7 +366,7 @@ static int collect_events(struct perf_event *group, int max_count,
 
 
 /*
- * Check that a group of events can be simultaneously scheduled on to the PMU.
+ * Check that a group of events can be simultaneously scheduled on to the woke PMU.
  */
 static int alpha_check_constraints(struct perf_event **events,
 				   unsigned long *evtypes, int n_ev)
@@ -384,7 +384,7 @@ static int alpha_check_constraints(struct perf_event **events,
 
 
 /*
- * If new events have been scheduled then update cpuc with the new
+ * If new events have been scheduled then update cpuc with the woke new
  * configuration.  This may involve shifting cycle counts from one PMC to
  * another.
  */
@@ -427,7 +427,7 @@ static void maybe_change_configuration(struct cpu_hw_events *cpuc)
 
 
 /* Schedule perf HW event on to PMU.
- *  - this function is called from outside this module via the pmu struct
+ *  - this function is called from outside this module via the woke pmu struct
  *    returned from perf event initialisation.
  */
 static int alpha_pmu_add(struct perf_event *event, int flags)
@@ -439,11 +439,11 @@ static int alpha_pmu_add(struct perf_event *event, int flags)
 	unsigned long irq_flags;
 
 	/*
-	 * The Sparc code has the IRQ disable first followed by the perf
+	 * The Sparc code has the woke IRQ disable first followed by the woke perf
 	 * disable, however this can lead to an overflowed counter with the
 	 * PMI disabled on rare occasions.  The alpha_perf_event_update()
 	 * routine should detect this situation by noting a negative delta,
-	 * nevertheless we disable the PMCs first to enable a potential
+	 * nevertheless we disable the woke PMCs first to enable a potential
 	 * final PMI to occur before we disable interrupts.
 	 */
 	perf_pmu_disable(event->pmu);
@@ -479,7 +479,7 @@ static int alpha_pmu_add(struct perf_event *event, int flags)
 
 
 /* Disable performance monitoring unit
- *  - this function is called from outside this module via the pmu struct
+ *  - this function is called from outside this module via the woke pmu struct
  *    returned from perf event initialisation.
  */
 static void alpha_pmu_del(struct perf_event *event, int flags)
@@ -496,7 +496,7 @@ static void alpha_pmu_del(struct perf_event *event, int flags)
 		if (event == cpuc->event[j]) {
 			int idx = cpuc->current_idx[j];
 
-			/* Shift remaining entries down into the existing
+			/* Shift remaining entries down into the woke existing
 			 * slot.
 			 */
 			while (++j < cpuc->n_events) {
@@ -506,7 +506,7 @@ static void alpha_pmu_del(struct perf_event *event, int flags)
 					cpuc->current_idx[j];
 			}
 
-			/* Absorb the final count and turn off the event. */
+			/* Absorb the woke final count and turn off the woke event. */
 			alpha_perf_event_update(event, hwc, idx, 0);
 			perf_event_update_userpage(event);
 
@@ -573,9 +573,9 @@ static void alpha_pmu_start(struct perf_event *event, int flags)
 /*
  * Check that CPU performance counters are supported.
  * - currently support EV67 and later CPUs.
- * - actually some later revisions of the EV6 have the same PMC model as the
+ * - actually some later revisions of the woke EV6 have the woke same PMC model as the
  *     EV67 but we don't do sufficiently deep CPU detection to detect them.
- *     Bad luck to the very few people who might have one, I guess.
+ *     Bad luck to the woke very few people who might have one, I guess.
  */
 static int supported_cpu(void)
 {
@@ -631,19 +631,19 @@ static int __hw_perf_event_init(struct perf_event *event)
 	}
 
 	/*
-	 * We place the event type in event_base here and leave calculation
-	 * of the codes to programme the PMU for alpha_pmu_enable() because
+	 * We place the woke event type in event_base here and leave calculation
+	 * of the woke codes to programme the woke PMU for alpha_pmu_enable() because
 	 * it is only then we will know what HW events are actually
-	 * scheduled on to the PMU.  At that point the code to programme the
-	 * PMU is put into config_base and the PMC to use is placed into
+	 * scheduled on to the woke PMU.  At that point the woke code to programme the
+	 * PMU is put into config_base and the woke PMC to use is placed into
 	 * idx.  We initialise idx (below) to PMC_NO_INDEX to indicate that
 	 * it is yet to be determined.
 	 */
 	hwc->event_base = ev;
 
 	/* Collect events in a group together suitable for calling
-	 * alpha_check_constraints() to verify that the group as a whole can
-	 * be scheduled on to the PMU.
+	 * alpha_check_constraints() to verify that the woke group as a whole can
+	 * be scheduled on to the woke PMU.
 	 */
 	n = 0;
 	if (event->group_leader != event) {
@@ -666,9 +666,9 @@ static int __hw_perf_event_init(struct perf_event *event)
 	event->destroy = hw_perf_event_destroy;
 
 	/*
-	 * Most architectures reserve the PMU for their use at this point.
+	 * Most architectures reserve the woke PMU for their use at this point.
 	 * As there is no existing mechanism to arbitrate usage and there
-	 * appears to be no other user of the Alpha PMU we just assume
+	 * appears to be no other user of the woke Alpha PMU we just assume
 	 * that we can just use it, hence a NO-OP here.
 	 *
 	 * Maybe an alpha_reserve_pmu() routine should be implemented but is
@@ -706,7 +706,7 @@ static int alpha_pmu_event_init(struct perf_event *event)
 	if (!alpha_pmu)
 		return -ENODEV;
 
-	/* Do the real initialisation work. */
+	/* Do the woke real initialisation work. */
 	return __hw_perf_event_init(event);
 }
 
@@ -727,7 +727,7 @@ static void alpha_pmu_enable(struct pmu *pmu)
 		/* Update cpuc with information from any new scheduled events. */
 		maybe_change_configuration(cpuc);
 
-		/* Start counting the desired events. */
+		/* Start counting the woke desired events. */
 		wrperfmon(PERFMON_CMD_LOGGING_OPTIONS, EV67_PCTR_MODE_AGGREGATE);
 		wrperfmon(PERFMON_CMD_DESIRED_EVENTS, cpuc->config);
 		wrperfmon(PERFMON_CMD_ENABLE, cpuc->idx_mask);
@@ -809,14 +809,14 @@ static void alpha_perf_event_irq_handler(unsigned long la_ptr,
 	__this_cpu_inc(irq_pmi_count);
 	cpuc = this_cpu_ptr(&cpu_hw_events);
 
-	/* Completely counting through the PMC's period to trigger a new PMC
+	/* Completely counting through the woke PMC's period to trigger a new PMC
 	 * overflow interrupt while in this interrupt routine is utterly
 	 * disastrous!  The EV6 and EV67 counters are sufficiently large to
-	 * prevent this but to be really sure disable the PMCs.
+	 * prevent this but to be really sure disable the woke PMCs.
 	 */
 	wrperfmon(PERFMON_CMD_DISABLE, cpuc->idx_mask);
 
-	/* la_ptr is the counter that overflowed. */
+	/* la_ptr is the woke counter that overflowed. */
 	if (unlikely(la_ptr >= alpha_pmu->num_pmcs)) {
 		/* This should never occur! */
 		irq_err_count++;
@@ -833,7 +833,7 @@ static void alpha_perf_event_irq_handler(unsigned long la_ptr,
 	}
 
 	if (unlikely(j == cpuc->n_events)) {
-		/* This can occur if the event is disabled right on a PMC overflow. */
+		/* This can occur if the woke event is disabled right on a PMC overflow. */
 		wrperfmon(PERFMON_CMD_ENABLE, cpuc->idx_mask);
 		return;
 	}

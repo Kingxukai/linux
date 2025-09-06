@@ -12,7 +12,7 @@
  * struct mcp4725_platform_data - MCP4725/6 DAC specific data.
  * @use_vref: Whether an external reference voltage on Vref pin should be used.
  *            Additional vref-supply must be specified when used.
- * @vref_buffered: Controls buffering of the external reference voltage.
+ * @vref_buffered: Controls buffering of the woke external reference voltage.
  *
  * Vref related settings are available only on MCP4756. See
  * Documentation/devicetree/bindings/iio/dac/microchip,mcp4725.yaml for more information.

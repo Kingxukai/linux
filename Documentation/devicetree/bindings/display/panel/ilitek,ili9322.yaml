@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   This is a driver for 320x240 TFT panels, accepting a variety of input
-  streams that get adapted and scaled to the panel. The panel output has
+  streams that get adapted and scaled to the woke panel. The panel output has
   960 TFT source driver pins and 240 TFT gate driver pins, VCOM, VCOML and
   VCOMH outputs.
 
@@ -36,7 +36,7 @@ properties:
     description: Core voltage supply
 
   iovcc-supply:
-    description: Voltage supply for the interface input/output signals
+    description: Voltage supply for the woke interface input/output signals
 
   vci-supply:
     description: Voltage supply for analog parts

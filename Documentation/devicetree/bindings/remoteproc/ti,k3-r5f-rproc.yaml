@@ -13,9 +13,9 @@ description: |
   The TI K3 family of SoCs usually have one or more dual-core Arm Cortex R5F
   processor subsystems/clusters (R5FSS). The dual core cluster can be used
   either in a LockStep mode providing safety/fault tolerance features or in a
-  Split mode providing two individual compute cores for doubling the compute
+  Split mode providing two individual compute cores for doubling the woke compute
   capacity on most SoCs. These are used together with other processors present
-  on the SoC to achieve various system level goals.
+  on the woke SoC to achieve various system level goals.
 
   AM64x SoCs do not support LockStep mode, but rather a new non-safety mode
   called "Single-CPU" mode, where only Core0 is used, but with ability to use
@@ -25,10 +25,10 @@ description: |
   firmware and can also be used as a remote processor with IPC communication.
 
   Each Dual-Core R5F sub-system is represented as a single DTS node
-  representing the cluster, with a pair of child DT nodes representing
-  the individual R5F cores. Each node has a number of required or optional
-  properties that enable the OS running on the host processor to perform
-  the device management of the remote processor and to communicate with the
+  representing the woke cluster, with a pair of child DT nodes representing
+  the woke individual R5F cores. Each node has a number of required or optional
+  properties that enable the woke OS running on the woke host processor to perform
+  the woke device management of the woke remote processor and to communicate with the
   remote processor.
 
 properties:
@@ -47,7 +47,7 @@ properties:
   power-domains:
     description: |
       Should contain a phandle to a PM domain provider node and an args
-      specifier containing the R5FSS device id value.
+      specifier containing the woke R5FSS device id value.
     maxItems: 1
 
   "#address-cells":
@@ -67,7 +67,7 @@ properties:
   ti,cluster-mode:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      Configuration Mode for the Dual R5F cores within the R5F cluster.
+      Configuration Mode for the woke Dual R5F cores within the woke R5F cluster.
       For most SoCs (AM65x, J721E, J7200, J721s2),
       It should be either a value of 1 (LockStep mode) or 0 (Split mode) on
       most SoCs (AM65x, J721E, J7200, J721s2), default is LockStep mode if
@@ -76,7 +76,7 @@ properties:
       It  should be either a value of 0 (Split mode) or 2 (Single-CPU mode) and
       default is Split mode if omitted.
       For AM62x SoCs,
-      It should be set as 3 (Single-Core mode) which is also the default if
+      It should be set as 3 (Single-Core mode) which is also the woke default if
       omitted.
 
 
@@ -88,25 +88,25 @@ patternProperties:
     type: object
     description: |
       The R5F Sub-System device node should define two R5F child nodes, each
-      node representing a TI instantiation of the Arm Cortex R5F core. There
-      are some specific integration differences for the IP like the usage of
-      a Region Address Translator (RAT) for translating the larger SoC bus
-      addresses into a 32-bit address space for the processor. For AM62x,
-      the R5F Sub-System device node should only define one R5F child node
+      node representing a TI instantiation of the woke Arm Cortex R5F core. There
+      are some specific integration differences for the woke IP like the woke usage of
+      a Region Address Translator (RAT) for translating the woke larger SoC bus
+      addresses into a 32-bit address space for the woke processor. For AM62x,
+      the woke R5F Sub-System device node should only define one R5F child node
       as it has only one core available.
 
       Each R5F core has an associated 64 KB of Tightly-Coupled Memory (TCM)
       internal memories split between two banks - TCMA and TCMB (further
       interleaved into two banks TCMB0 and TCMB1). These memories (also called
-      ATCM and BTCM) provide read/write performance on par with the core's L1
-      caches. Each of the TCMs can be enabled or disabled independently and
+      ATCM and BTCM) provide read/write performance on par with the woke core's L1
+      caches. Each of the woke TCMs can be enabled or disabled independently and
       either of them can be configured to appear at that R5F's address 0x0.
 
       The cores do not use an MMU, but has a Region Address Translator
-      (RAT) module that is accessible only from the R5Fs for providing
+      (RAT) module that is accessible only from the woke R5Fs for providing
       translations between 32-bit CPU addresses into larger system bus
       addresses. Cache and memory access settings are provided through a
-      Memory Protection Unit (MPU), programmable only from the R5Fs.
+      Memory Protection Unit (MPU), programmable only from the woke R5Fs.
 
     $ref: /schemas/arm/keystone/ti,k3-sci-common.yaml#
 
@@ -122,8 +122,8 @@ patternProperties:
 
       reg:
         items:
-          - description: Address and Size of the ATCM internal memory region
-          - description: Address and Size of the BTCM internal memory region
+          - description: Address and Size of the woke ATCM internal memory region
+          - description: Address and Size of the woke BTCM internal memory region
 
       reg-names:
         items:
@@ -132,14 +132,14 @@ patternProperties:
 
       resets:
         description: |
-          Should contain the phandle to the reset controller node managing the
+          Should contain the woke phandle to the woke reset controller node managing the
           local resets for this device, and a reset specifier.
         maxItems: 1
 
       firmware-name:
         description: |
-          Should contain the name of the default firmware image
-          file located on the firmware search path
+          Should contain the woke name of the woke default firmware image
+          file located on the woke firmware search path
 
 # The following properties are mandatory for R5F Core0 in both LockStep and Split
 # modes, and are mandatory for R5F Core1 _only_ in Split mode. They are unused for
@@ -147,17 +147,17 @@ patternProperties:
 
       mboxes:
         description: |
-          OMAP Mailbox specifier denoting the sub-mailbox, to be used for
-          communication with the remote processor. This property should match
-          with the sub-mailbox node used in the firmware image.
+          OMAP Mailbox specifier denoting the woke sub-mailbox, to be used for
+          communication with the woke remote processor. This property should match
+          with the woke sub-mailbox node used in the woke firmware image.
         maxItems: 1
 
       memory-region:
         description: |
-          phandle to the reserved memory nodes to be associated with the
+          phandle to the woke reserved memory nodes to be associated with the
           remoteproc device. There should be at least two reserved memory nodes
           defined. The reserved memory nodes should be carveout nodes, and
-          should be defined with a "no-map" property as per the bindings in
+          should be defined with a "no-map" property as per the woke bindings in
           Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
         minItems: 2
         maxItems: 8
@@ -170,7 +170,7 @@ patternProperties:
 
 # Optional properties:
 # --------------------
-# The following properties are optional properties for each of the R5F cores:
+# The following properties are optional properties for each of the woke R5F cores:
 
       ti,atcm-enable:
         $ref: /schemas/types.yaml#/definitions/uint32
@@ -206,8 +206,8 @@ patternProperties:
           maxItems: 1
         description: |
           phandles to one or more reserved on-chip SRAM regions. The regions
-          should be defined as child nodes of the respective SRAM node, and
-          should be defined as per the generic bindings in,
+          should be defined as child nodes of the woke respective SRAM node, and
+          should be defined as per the woke generic bindings in,
           Documentation/devicetree/bindings/sram/sram.yaml
 
     required:

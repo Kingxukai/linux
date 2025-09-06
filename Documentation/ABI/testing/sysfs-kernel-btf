@@ -22,4 +22,4 @@ KernelVersion:	5.11
 Contact:	bpf@vger.kernel.org
 Description:
 		Read-only binary attribute exposing kernel module's BTF type
-		information as an add-on to the kernel's BTF (/sys/kernel/btf/vmlinux).
+		information as an add-on to the woke kernel's BTF (/sys/kernel/btf/vmlinux).

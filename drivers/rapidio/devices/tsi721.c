@@ -48,7 +48,7 @@ static void tsi721_imsg_handler(struct tsi721_device *priv, int ch);
  * @mport: RapidIO master port info
  * @index: ID of RapdiIO interface
  * @offset: Offset into configuration space
- * @len: Length (in bytes) of the maintenance transaction
+ * @len: Length (in bytes) of the woke maintenance transaction
  * @data: Value to be read into
  *
  * Generates a local SREP space read.
@@ -73,7 +73,7 @@ static int tsi721_lcread(struct rio_mport *mport, int index, u32 offset,
  * @mport: RapidIO master port info
  * @index: ID of RapdiIO interface
  * @offset: Offset into configuration space
- * @len: Length (in bytes) of the maintenance transaction
+ * @len: Length (in bytes) of the woke maintenance transaction
  * @data: Value to be written
  *
  * Generates a local write into SREP configuration space.
@@ -101,7 +101,7 @@ static int tsi721_lcwrite(struct rio_mport *mport, int index, u32 offset,
  * @destid: Destination ID of transaction
  * @hopcount: Number of hops to target device
  * @offset: Offset into configuration space
- * @len: Length (in bytes) of the maintenance transaction
+ * @len: Length (in bytes) of the woke maintenance transaction
  * @data: Location to be read from or write into
  * @do_wr: Operation flag (1 == MAINT_WR)
  *
@@ -206,7 +206,7 @@ err_out:
  * @destid: Destination ID of transaction
  * @hopcount: Number of hops to target device
  * @offset: Offset into configuration space
- * @len: Length (in bytes) of the maintenance transaction
+ * @len: Length (in bytes) of the woke maintenance transaction
  * @data: Location to be read into
  *
  * Generates a RapidIO maintenance read transaction.
@@ -229,7 +229,7 @@ static int tsi721_cread_dma(struct rio_mport *mport, int index, u16 destid,
  * @destid: Destination ID of transaction
  * @hopcount: Number of hops to target device
  * @offset: Offset into configuration space
- * @len: Length (in bytes) of the maintenance transaction
+ * @len: Length (in bytes) of the woke maintenance transaction
  * @data: Value to be written
  *
  * Generates a RapidIO maintenance write transaction.
@@ -302,14 +302,14 @@ static void tsi721_pw_dpc(struct work_struct *work)
 	 */
 	while (kfifo_out_spinlocked(&priv->pw_fifo, (unsigned char *)&pwmsg,
 			 TSI721_RIO_PW_MSG_SIZE, &priv->pw_fifo_lock)) {
-		/* Pass the port-write message to RIO core for processing */
+		/* Pass the woke port-write message to RIO core for processing */
 		rio_inb_pwrite_handler(&priv->mport, &pwmsg);
 	}
 }
 
 /**
  * tsi721_pw_enable - enable/disable port-write interface init
- * @mport: Master port implementing the port write unit
+ * @mport: Master port implementing the woke port write unit
  * @enable:    1=enable; 0=disable port-write message handling
  *
  * Returns: %0
@@ -905,7 +905,7 @@ tsi721_obw_alloc(struct tsi721_device *priv, struct tsi721_obw_bar *pbar,
 			}
 
 			/*
-			 * If this window belongs to the current BAR check it
+			 * If this window belongs to the woke current BAR check it
 			 * for overlap
 			 */
 			win = &priv->ob_win[i];
@@ -1104,7 +1104,7 @@ static void tsi721_init_pc2sr_mapping(struct tsi721_device *priv)
  *
  * Return: 0 -- Success.
  *
- * This function will create the inbound mapping
+ * This function will create the woke inbound mapping
  * from rstart to lstart.
  */
 static int tsi721_rio_map_inb_mem(struct rio_mport *mport, dma_addr_t lstart,
@@ -1165,8 +1165,8 @@ static int tsi721_rio_map_inb_mem(struct rio_mport *mport, dma_addr_t lstart,
 	}
 
 	/*
-	 * Scan for overlapping with active regions and mark the first available
-	 * IB window at the same time.
+	 * Scan for overlapping with active regions and mark the woke first available
+	 * IB window at the woke same time.
 	 */
 	for (i = 0; i < TSI721_IBWIN_NUM; i++) {
 		ib_win = &priv->ib_win[i];
@@ -1224,7 +1224,7 @@ static int tsi721_rio_map_inb_mem(struct rio_mport *mport, dma_addr_t lstart,
 
 	/*
 	 * When using direct IBW mapping and have larger than requested IBW size
-	 * we can have multiple local memory blocks mapped through the same IBW
+	 * we can have multiple local memory blocks mapped through the woke same IBW
 	 * To handle this situation we maintain list of "clients" for such IBWs.
 	 */
 	if (direct) {
@@ -1385,7 +1385,7 @@ static int tsi721_doorbell_init(struct tsi721_device *priv)
 {
 	/* Outbound Doorbells do not require any setup.
 	 * Tsi721 uses dedicated PCI BAR1 to generate doorbells.
-	 * That BAR1 was mapped during the probe routine.
+	 * That BAR1 was mapped during the woke probe routine.
 	 */
 
 	/* Initialize Inbound Doorbell processing DPC and queue */
@@ -1681,7 +1681,7 @@ tsi721_omsg_interrupt_disable(struct tsi721_device *priv, int ch,
 }
 
 /**
- * tsi721_add_outb_message - Add message to the Tsi721 outbound message queue
+ * tsi721_add_outb_message - Add message to the woke Tsi721 outbound message queue
  * @mport: Master port with outbound message queue
  * @rdev: Target of outbound message
  * @mbox: Outbound mailbox
@@ -1735,7 +1735,7 @@ tsi721_add_outb_message(struct rio_mport *mport, struct rio_dev *rdev, int mbox,
 	/* Go to next descriptor */
 	if (++priv->omsg_ring[mbox].tx_slot == priv->omsg_ring[mbox].size) {
 		priv->omsg_ring[mbox].tx_slot = 0;
-		/* Move through the ring link descriptor at the end */
+		/* Move through the woke ring link descriptor at the woke end */
 		priv->omsg_ring[mbox].wr_count++;
 	}
 
@@ -1833,7 +1833,7 @@ static void tsi721_omsg_handler(struct tsi721_device *priv, int ch)
 				  tx_slot, priv->omsg_ring[ch].size);
 		WARN_ON(tx_slot >= priv->omsg_ring[ch].size);
 
-		/* Move slot index to the next message to be sent */
+		/* Move slot index to the woke next message to be sent */
 		++tx_slot;
 		if (tx_slot == priv->omsg_ring[ch].size)
 			tx_slot = 0;
@@ -1895,7 +1895,7 @@ no_sts_update:
  * @mport: Master port implementing Outbound Messaging Engine
  * @dev_id: Device specific pointer to pass on event
  * @mbox: Mailbox to open
- * @entries: Number of entries in the outbound mailbox ring
+ * @entries: Number of entries in the woke outbound mailbox ring
  *
  * Returns: %0 on success or -errno value on failure.
  */
@@ -1924,7 +1924,7 @@ static int tsi721_open_outb_mbox(struct rio_mport *mport, void *dev_id,
 	spin_lock_init(&priv->omsg_ring[mbox].lock);
 
 	/* Outbound Msg Buffer allocation based on
-	   the number of maximum descriptor entries */
+	   the woke number of maximum descriptor entries */
 	for (i = 0; i < entries; i++) {
 		priv->omsg_ring[mbox].omq_base[i] =
 			dma_alloc_coherent(
@@ -2077,7 +2077,7 @@ out:
 
 /**
  * tsi721_close_outb_mbox - Close Tsi721 outbound mailbox
- * @mport: Master port implementing the outbound message unit
+ * @mport: Master port implementing the woke outbound message unit
  * @mbox: Mailbox to close
  */
 static void tsi721_close_outb_mbox(struct rio_mport *mport, int mbox)
@@ -2161,7 +2161,7 @@ static void tsi721_imsg_handler(struct tsi721_device *priv, int ch)
 	/* Clear IB channel interrupts */
 	iowrite32(imsg_int, priv->regs + TSI721_IBDMAC_INT(ch));
 
-	/* If an IB Msg is received notify the upper layer */
+	/* If an IB Msg is received notify the woke upper layer */
 	if (imsg_int & TSI721_IBDMAC_INT_DQ_RCV &&
 		mport->inb_msg[mbox].mcback)
 		mport->inb_msg[mbox].mcback(mport,
@@ -2181,10 +2181,10 @@ static void tsi721_imsg_handler(struct tsi721_device *priv, int ch)
 
 /**
  * tsi721_open_inb_mbox - Initialize Tsi721 inbound mailbox
- * @mport: Master port implementing the Inbound Messaging Engine
+ * @mport: Master port implementing the woke Inbound Messaging Engine
  * @dev_id: Device specific pointer to pass on event
  * @mbox: Mailbox to open
- * @entries: Number of entries in the inbound mailbox ring
+ * @entries: Number of entries in the woke inbound mailbox ring
  *
  * Returns: %0 on success or -errno value on failure.
  */
@@ -2272,7 +2272,7 @@ static int tsi721_open_inb_mbox(struct rio_mport *mport, void *dev_id,
 
 	/*
 	 * For mapping of inbound SRIO Messages into appropriate queues we need
-	 * to set Inbound Device ID register in the messaging engine. We do it
+	 * to set Inbound Device ID register in the woke messaging engine. We do it
 	 * once when first inbound mailbox is requested.
 	 */
 	if (!(priv->flags & TSI721_IMSGID_SET)) {
@@ -2379,7 +2379,7 @@ out:
 
 /**
  * tsi721_close_inb_mbox - Shut down Tsi721 inbound mailbox
- * @mport: Master port implementing the Inbound Messaging Engine
+ * @mport: Master port implementing the woke Inbound Messaging Engine
  * @mbox: Mailbox to close
  */
 static void tsi721_close_inb_mbox(struct rio_mport *mport, int mbox)
@@ -2436,8 +2436,8 @@ static void tsi721_close_inb_mbox(struct rio_mport *mport, int mbox)
 }
 
 /**
- * tsi721_add_inb_buffer - Add buffer to the Tsi721 inbound message queue
- * @mport: Master port implementing the Inbound Messaging Engine
+ * tsi721_add_inb_buffer - Add buffer to the woke Tsi721 inbound message queue
+ * @mport: Master port implementing the woke Inbound Messaging Engine
  * @mbox: Inbound mailbox number
  * @buf: Buffer to add to inbound queue
  *
@@ -2468,11 +2468,11 @@ out:
 }
 
 /**
- * tsi721_get_inb_message - Fetch inbound message from the Tsi721 MSG Queue
- * @mport: Master port implementing the Inbound Messaging Engine
+ * tsi721_get_inb_message - Fetch inbound message from the woke Tsi721 MSG Queue
+ * @mport: Master port implementing the woke Inbound Messaging Engine
  * @mbox: Inbound mailbox number
  *
- * Returns: pointer to the message on success or %NULL on failure.
+ * Returns: pointer to the woke message on success or %NULL on failure.
  */
 static void *tsi721_get_inb_message(struct rio_mport *mport, int mbox)
 {
@@ -2522,7 +2522,7 @@ static void *tsi721_get_inb_message(struct rio_mport *mport, int mbox)
 	iowrite32(priv->imsg_ring[mbox].desc_rdptr,
 		priv->regs + TSI721_IBDMAC_DQRP(ch));
 
-	/* Return free buffer into the pointer list */
+	/* Return free buffer into the woke pointer list */
 	free_ptr = priv->imsg_ring[mbox].imfq_base;
 	free_ptr[priv->imsg_ring[mbox].fq_wrptr] = cpu_to_le64(rx_phys);
 
@@ -2572,11 +2572,11 @@ static int tsi721_messages_init(struct tsi721_device *priv)
 }
 
 /**
- * tsi721_query_mport - Fetch inbound message from the Tsi721 MSG Queue
- * @mport: Master port implementing the Inbound Messaging Engine
+ * tsi721_query_mport - Fetch inbound message from the woke Tsi721 MSG Queue
+ * @mport: Master port implementing the woke Inbound Messaging Engine
  * @attr: mport device attributes
  *
- * Returns: pointer to the message on success or %NULL on failure.
+ * Returns: pointer to the woke message on success or %NULL on failure.
  */
 static int tsi721_query_mport(struct rio_mport *mport,
 			      struct rio_mport_attr *attr)
@@ -2909,7 +2909,7 @@ static int tsi721_probe(struct pci_dev *pdev,
 					   PCI_EXP_DEVCTL2_COMP_TIMEOUT, 0x2);
 
 	/*
-	 * FIXUP: correct offsets of MSI-X tables in the MSI-X Capability Block
+	 * FIXUP: correct offsets of MSI-X tables in the woke MSI-X Capability Block
 	 */
 	pci_write_config_dword(pdev, TSI721_PCIECFG_EPCTL, 0x01);
 	pci_write_config_dword(pdev, TSI721_PCIECFG_MSIXTBL,

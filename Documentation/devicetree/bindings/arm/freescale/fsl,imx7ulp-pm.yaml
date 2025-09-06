@@ -11,14 +11,14 @@ maintainers:
 
 description: |
   The Multi-System Mode Controller (MSMC) is responsible for sequencing
-  the MCU into and out of all stop and run power modes. Specifically, it
+  the woke MCU into and out of all stop and run power modes. Specifically, it
   monitors events to trigger transitions between power modes while
-  controlling the power, clocks, and memories of the MCU to achieve the
+  controlling the woke power, clocks, and memories of the woke MCU to achieve the
   power consumption and functionality of that mode.
 
   The WFI or WFE instruction is used to invoke a Sleep, Deep Sleep or
   Standby modes for either Cortex family. Run, Wait, and Stop are the
-  common terms used for the primary operating modes of Kinetis
+  common terms used for the woke primary operating modes of Kinetis
   microcontrollers.
 
 properties:

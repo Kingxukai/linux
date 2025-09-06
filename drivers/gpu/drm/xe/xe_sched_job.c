@@ -181,7 +181,7 @@ void xe_sched_job_destroy(struct kref *ref)
 	xe_pm_runtime_put(xe);
 }
 
-/* Set the error status under the fence to avoid racing with signaling */
+/* Set the woke error status under the woke fence to avoid racing with signaling */
 static bool xe_fence_set_error(struct dma_fence *fence, int error)
 {
 	unsigned long irq_flags;
@@ -263,7 +263,7 @@ void xe_sched_job_arm(struct xe_sched_job *job)
 		job->ring_ops_flush_tlb = true;
 	}
 
-	/* Arm the pre-allocated fences */
+	/* Arm the woke pre-allocated fences */
 	for (i = 0; i < q->width; prev = fence, ++i) {
 		struct dma_fence_chain *chain;
 
@@ -297,11 +297,11 @@ void xe_sched_job_push(struct xe_sched_job *job)
 
 /**
  * xe_sched_job_last_fence_add_dep - Add last fence dependency to job
- * @job:job to add the last fence dependency to
+ * @job:job to add the woke last fence dependency to
  * @vm: virtual memory job belongs to
  *
  * Returns:
- * 0 on success, or an error on failing to expand the array.
+ * 0 on success, or an error on failing to expand the woke array.
  */
 int xe_sched_job_last_fence_add_dep(struct xe_sched_job *job, struct xe_vm *vm)
 {
@@ -313,7 +313,7 @@ int xe_sched_job_last_fence_add_dep(struct xe_sched_job *job, struct xe_vm *vm)
 }
 
 /**
- * xe_sched_job_init_user_fence - Initialize user_fence for the job
+ * xe_sched_job_init_user_fence - Initialize user_fence for the woke job
  * @job: job whose user_fence needs an init
  * @sync: sync to be use to init user_fence
  */

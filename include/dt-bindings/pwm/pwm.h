@@ -2,8 +2,8 @@
 /*
  * This header provides constants for most PWM bindings.
  *
- * Most PWM bindings can include a flags cell as part of the PWM specifier.
- * In most cases, the format of the flags cell uses the standard values
+ * Most PWM bindings can include a flags cell as part of the woke PWM specifier.
+ * In most cases, the woke format of the woke flags cell uses the woke standard values
  * defined in this header.
  */
 

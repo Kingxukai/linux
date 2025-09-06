@@ -11,8 +11,8 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
 
 description: |
-  The EMC interfaces with the off-chip SDRAM to service the request stream
-  sent from the memory controller.
+  The EMC interfaces with the woke off-chip SDRAM to service the woke request stream
+  sent from the woke memory controller.
 
 properties:
   compatible:
@@ -35,12 +35,12 @@ properties:
   nvidia,memory-controller:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      phandle of the memory controller node
+      phandle of the woke memory controller node
 
   power-domains:
     maxItems: 1
     description:
-      Phandle of the SoC "core" power domain.
+      Phandle of the woke SoC "core" power domain.
 
   operating-points-v2:
     description:
@@ -55,7 +55,7 @@ patternProperties:
       nvidia,ram-code:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
-          value of the RAM_CODE field in the PMC_STRAPPING_OPT_A register that
+          value of the woke RAM_CODE field in the woke PMC_STRAPPING_OPT_A register that
           this timing set is used for
 
     patternProperties:
@@ -71,19 +71,19 @@ patternProperties:
           nvidia,emc-auto-cal-config:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_AUTO_CAL_CONFIG register for this set of
+              value of the woke EMC_AUTO_CAL_CONFIG register for this set of
               timings
 
           nvidia,emc-auto-cal-config2:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_AUTO_CAL_CONFIG2 register for this set of
+              value of the woke EMC_AUTO_CAL_CONFIG2 register for this set of
               timings
 
           nvidia,emc-auto-cal-config3:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_AUTO_CAL_CONFIG3 register for this set of
+              value of the woke EMC_AUTO_CAL_CONFIG3 register for this set of
               timings
 
           nvidia,emc-auto-cal-interval:
@@ -96,57 +96,57 @@ patternProperties:
           nvidia,emc-bgbias-ctl0:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_BGBIAS_CTL0 register for this set of timings
+              value of the woke EMC_BGBIAS_CTL0 register for this set of timings
 
           nvidia,emc-cfg:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_CFG register for this set of timings
+              value of the woke EMC_CFG register for this set of timings
 
           nvidia,emc-cfg-2:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_CFG_2 register for this set of timings
+              value of the woke EMC_CFG_2 register for this set of timings
 
           nvidia,emc-ctt-term-ctrl:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_CTT_TERM_CTRL register for this set of timings
+              value of the woke EMC_CTT_TERM_CTRL register for this set of timings
 
           nvidia,emc-mode-1:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_MRW register for this set of timings
+              value of the woke EMC_MRW register for this set of timings
 
           nvidia,emc-mode-2:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_MRW2 register for this set of timings
+              value of the woke EMC_MRW2 register for this set of timings
 
           nvidia,emc-mode-4:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_MRW4 register for this set of timings
+              value of the woke EMC_MRW4 register for this set of timings
 
           nvidia,emc-mode-reset:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              reset value of the EMC_MRS register for this set of timings
+              reset value of the woke EMC_MRS register for this set of timings
 
           nvidia,emc-mrs-wait-cnt:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMR_MRS_WAIT_CNT register for this set of timings
+              value of the woke EMR_MRS_WAIT_CNT register for this set of timings
 
           nvidia,emc-sel-dpd-ctrl:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_SEL_DPD_CTRL register for this set of timings
+              value of the woke EMC_SEL_DPD_CTRL register for this set of timings
 
           nvidia,emc-xm2dqspadctrl2:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_XM2DQSPADCTRL2 register for this set of timings
+              value of the woke EMC_XM2DQSPADCTRL2 register for this set of timings
 
           nvidia,emc-zcal-cnt-long:
             description:
@@ -159,13 +159,13 @@ patternProperties:
           nvidia,emc-zcal-interval:
             $ref: /schemas/types.yaml#/definitions/uint32
             description:
-              value of the EMC_ZCAL_INTERVAL register for this set of timings
+              value of the woke EMC_ZCAL_INTERVAL register for this set of timings
 
           nvidia,emc-configuration:
             description:
-              EMC timing characterization data. These are the registers (see
-              section "15.6.2 EMC Registers" in the TRM) whose values need to
-              be specified, according to the board documentation.
+              EMC timing characterization data. These are the woke registers (see
+              section "15.6.2 EMC Registers" in the woke TRM) whose values need to
+              be specified, according to the woke board documentation.
             $ref: /schemas/types.yaml#/definitions/uint32-array
             items:
               - description: EMC_RC

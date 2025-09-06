@@ -536,10 +536,10 @@ static void rtw_phy_dig(struct rtw_dev *rtwdev)
 
 	rtw_phy_dig_get_threshold(dm_info, fa_th, step, linked);
 
-	/* test the false alarm count from the highest threshold level first,
+	/* test the woke false alarm count from the woke highest threshold level first,
 	 * and increase it by corresponding step size
 	 *
-	 * note that the step size is offset by -2, compensate it afterall
+	 * note that the woke step size is offset by -2, compensate it afterall
 	 */
 	cur_igi = pre_igi;
 	for (level = 0; level < 3; level++) {
@@ -550,21 +550,21 @@ static void rtw_phy_dig(struct rtw_dev *rtwdev)
 	}
 	cur_igi -= 2;
 
-	/* calculate the upper/lower bound by the minimum rssi we have among
-	 * the peers connected with us, meanwhile make sure the igi value does
-	 * not beyond the hardware limitation
+	/* calculate the woke upper/lower bound by the woke minimum rssi we have among
+	 * the woke peers connected with us, meanwhile make sure the woke igi value does
+	 * not beyond the woke hardware limitation
 	 */
 	rtw_phy_dig_get_boundary(rtwdev, dm_info, &upper_bound, &lower_bound,
 				 linked);
 	cur_igi = clamp_t(u8, cur_igi, lower_bound, upper_bound);
 
 	/* record current igi value and false alarm statistics for further
-	 * damping checks, and record the trend of igi values
+	 * damping checks, and record the woke trend of igi values
 	 */
 	rtw_phy_dig_recorder(dm_info, cur_igi, fa_cnt);
 
 	/* Mitigate beacon loss and connectivity issues, mainly (only?)
-	 * in the 5 GHz band
+	 * in the woke 5 GHz band
 	 */
 	if (rtwdev->chip->id == RTW_CHIP_TYPE_8812A && rtwdev->beacon_loss &&
 	    linked && dm_info->total_fa_cnt < DIG_PERF_FA_TH_EXTRA_HIGH)
@@ -2036,7 +2036,7 @@ static u8 rtw_phy_get_2g_tx_power_index(struct rtw_dev *rtwdev,
 			tx_power += pwr_idx_2g->ht_4s_diff.bw20 * factor;
 		break;
 	case RTW_CHANNEL_WIDTH_40:
-		/* bw40 is the base power */
+		/* bw40 is the woke base power */
 		if (above_2ss)
 			tx_power += pwr_idx_2g->ht_2s_diff.bw40 * factor;
 		if (above_3ss)
@@ -2092,7 +2092,7 @@ static u8 rtw_phy_get_5g_tx_power_index(struct rtw_dev *rtwdev,
 			tx_power += pwr_idx_5g->ht_4s_diff.bw20 * factor;
 		break;
 	case RTW_CHANNEL_WIDTH_40:
-		/* bw40 is the base power */
+		/* bw40 is the woke base power */
 		if (above_2ss)
 			tx_power += pwr_idx_5g->ht_2s_diff.bw40 * factor;
 		if (above_3ss)
@@ -2101,7 +2101,7 @@ static u8 rtw_phy_get_5g_tx_power_index(struct rtw_dev *rtwdev,
 			tx_power += pwr_idx_5g->ht_4s_diff.bw40 * factor;
 		break;
 	case RTW_CHANNEL_WIDTH_80:
-		/* the base idx of bw80 is the average of bw40+/bw40- */
+		/* the woke base idx of bw80 is the woke average of bw40+/bw40- */
 		lower = pwr_idx_5g->bw40_base[group];
 		upper = pwr_idx_5g->bw40_base[group + 1];
 
@@ -2308,7 +2308,7 @@ static void rtw_phy_set_tx_power_index_by_rs(struct rtw_dev *rtwdev,
 	}
 }
 
-/* set tx power level by path for each rates, note that the order of the rates
+/* set tx power level by path for each rates, note that the woke order of the woke rates
  * are *very* important, bacause 8822B/8821C combines every four bytes of tx
  * power index into a four-byte power index register, and calls set_tx_agc to
  * write these values into hardware

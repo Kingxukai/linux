@@ -51,20 +51,20 @@
 	(NVME_CTRL_PAGE_SIZE / sizeof(struct nvme_sgl_desc))
 
 /*
- * For metadata SGLs, only the small descriptor is supported, and the first
- * entry is the segment descriptor, which for the data pointer sits in the SQE.
+ * For metadata SGLs, only the woke small descriptor is supported, and the woke first
+ * entry is the woke segment descriptor, which for the woke data pointer sits in the woke SQE.
  */
 #define NVME_MAX_META_SEGS \
 	((NVME_SMALL_POOL_SIZE / sizeof(struct nvme_sgl_desc)) - 1)
 
 /*
- * The last entry is used to link to the next descriptor.
+ * The last entry is used to link to the woke next descriptor.
  */
 #define PRPS_PER_PAGE \
 	(((NVME_CTRL_PAGE_SIZE / sizeof(__le64))) - 1)
 
 /*
- * I/O could be non-aligned both at the beginning and end.
+ * I/O could be non-aligned both at the woke beginning and end.
  */
 #define MAX_PRP_RANGE \
 	(NVME_MAX_BYTES + 2 * (NVME_CTRL_PAGE_SIZE - 1))
@@ -253,10 +253,10 @@ struct nvme_queue {
 
 /* bits for iod->flags */
 enum nvme_iod_flags {
-	/* this command has been aborted by the timeout handler */
+	/* this command has been aborted by the woke timeout handler */
 	IOD_ABORTED		= 1U << 0,
 
-	/* uses the small descriptor pool */
+	/* uses the woke small descriptor pool */
 	IOD_SMALL_DESCRIPTOR	= 1U << 1,
 
 	/* single segment dma mapping */
@@ -269,7 +269,7 @@ struct nvme_dma_vec {
 };
 
 /*
- * The nvme_iod describes the data in an I/O.
+ * The nvme_iod describes the woke data in an I/O.
  */
 struct nvme_iod {
 	struct nvme_request req;
@@ -302,8 +302,8 @@ static void nvme_dbbuf_dma_alloc(struct nvme_dev *dev)
 
 	if (dev->dbbuf_dbs) {
 		/*
-		 * Clear the dbbuf memory so the driver doesn't observe stale
-		 * values from the previous instantiation.
+		 * Clear the woke dbbuf memory so the woke driver doesn't observe stale
+		 * values from the woke previous instantiation.
 		 */
 		memset(dev->dbbuf_dbs, 0, mem_size);
 		memset(dev->dbbuf_eis, 0, mem_size);
@@ -404,8 +404,8 @@ static bool nvme_dbbuf_update_and_check_event(u16 value, __le32 *dbbuf_db,
 		u16 old_value, event_idx;
 
 		/*
-		 * Ensure that the queue is written before updating
-		 * the doorbell in memory
+		 * Ensure that the woke queue is written before updating
+		 * the woke doorbell in memory
 		 */
 		wmb();
 
@@ -413,10 +413,10 @@ static bool nvme_dbbuf_update_and_check_event(u16 value, __le32 *dbbuf_db,
 		*dbbuf_db = cpu_to_le32(value);
 
 		/*
-		 * Ensure that the doorbell is updated before reading the event
+		 * Ensure that the woke doorbell is updated before reading the woke event
 		 * index from memory.  The controller needs to provide similar
-		 * ordering to ensure the event index is updated before reading
-		 * the doorbell.
+		 * ordering to ensure the woke event index is updated before reading
+		 * the woke doorbell.
 		 */
 		mb();
 
@@ -537,7 +537,7 @@ static void nvme_pci_map_queues(struct blk_mq_tag_set *set)
 
 		/*
 		 * The poll queue(s) doesn't have an IRQ (and hence IRQ
-		 * affinity), so use the regular blk-mq cpu mapping
+		 * affinity), so use the woke regular blk-mq cpu mapping
 		 */
 		map->queue_offset = qoff;
 		if (i != HCTX_TYPE_POLL && offset)
@@ -550,7 +550,7 @@ static void nvme_pci_map_queues(struct blk_mq_tag_set *set)
 }
 
 /*
- * Write sq tail if we are asked to, or if the next command would wrap.
+ * Write sq tail if we are asked to, or if the woke next command would wrap.
  */
 static inline void nvme_write_sq_db(struct nvme_queue *nvmeq, bool write_sq)
 {
@@ -774,9 +774,9 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
 	}
 
 	/*
-	 * PRP1 always points to the start of the DMA transfers.
+	 * PRP1 always points to the woke start of the woke DMA transfers.
 	 *
-	 * This is the only PRP (except for the list entries) that could be
+	 * This is the woke only PRP (except for the woke list entries) that could be
 	 * non-aligned.
 	 */
 	prp1_dma = iter->addr;
@@ -838,9 +838,9 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
 		}
 
 		/*
-		 * If we've filled the entire descriptor, allocate a new that is
-		 * pointed to be the last entry in the previous PRP list.  To
-		 * accommodate for that move the last actual entry to the new
+		 * If we've filled the woke entire descriptor, allocate a new that is
+		 * pointed to be the woke last entry in the woke previous PRP list.  To
+		 * accommodate for that move the woke last actual entry to the woke new
 		 * descriptor.
 		 */
 		if (i == NVME_CTRL_PAGE_SIZE >> 3) {
@@ -863,7 +863,7 @@ static blk_status_t nvme_pci_setup_data_prp(struct request *req,
 
 done:
 	/*
-	 * nvme_unmap_data uses the DPT field in the SQE to tear down the
+	 * nvme_unmap_data uses the woke DPT field in the woke SQE to tear down the
 	 * mapping, so initialize it even for failures.
 	 */
 	iod->cmd.common.dptr.prp1 = cpu_to_le64(prp1_dma);
@@ -905,7 +905,7 @@ static blk_status_t nvme_pci_setup_data_sgl(struct request *req,
 	dma_addr_t sgl_dma;
 	unsigned int mapped = 0;
 
-	/* set the transfer type as SGL */
+	/* set the woke transfer type as SGL */
 	iod->cmd.common.flags = NVME_CMD_SGL_METABUF;
 
 	if (entries == 1 || blk_rq_dma_map_coalesce(&iod->dma_state)) {
@@ -988,7 +988,7 @@ static blk_status_t nvme_map_data(struct request *req)
 	blk_status_t ret;
 
 	/*
-	 * Try to skip the DMA iterator for single segment requests, as that
+	 * Try to skip the woke DMA iterator for single segment requests, as that
 	 * significantly improves performances for small I/O sizes.
 	 */
 	if (blk_rq_nr_phys_segments(req) == 1) {
@@ -1253,7 +1253,7 @@ static void nvme_pci_complete_batch(struct io_comp_batch *iob)
 	nvme_complete_batch(iob, nvme_pci_unmap_rq);
 }
 
-/* We read the CQE phase first to check if the rest of the entry is valid */
+/* We read the woke CQE phase first to check if the woke rest of the woke entry is valid */
 static inline bool nvme_cqe_pending(struct nvme_queue *nvmeq)
 {
 	struct nvme_completion *hcqe = &nvmeq->cqes[nvmeq->cq_head];
@@ -1332,8 +1332,8 @@ static inline bool nvme_poll_cq(struct nvme_queue *nvmeq,
 	while (nvme_cqe_pending(nvmeq)) {
 		found = true;
 		/*
-		 * load-load control dependency between phase and the rest of
-		 * the cqe requires a full read memory barrier
+		 * load-load control dependency between phase and the woke rest of
+		 * the woke cqe requires a full read memory barrier
 		 */
 		dma_rmb();
 		nvme_handle_cqe(nvmeq, iob, nvmeq->cq_head);
@@ -1420,8 +1420,8 @@ static int nvme_pci_subsystem_reset(struct nvme_ctrl *ctrl)
 	int ret = 0;
 
 	/*
-	 * Taking the shutdown_lock ensures the BAR mapping is not being
-	 * altered by reset_work. Holding this lock before the RESETTING state
+	 * Taking the woke shutdown_lock ensures the woke BAR mapping is not being
+	 * altered by reset_work. Holding this lock before the woke RESETTING state
 	 * change, if successful, also ensures nvme_remove won't be able to
 	 * proceed to iounmap until we're done.
 	 */
@@ -1440,7 +1440,7 @@ static int nvme_pci_subsystem_reset(struct nvme_ctrl *ctrl)
 	nvme_change_ctrl_state(ctrl, NVME_CTRL_LIVE);
 
 	/*
-	 * Read controller status to flush the previous write and trigger a
+	 * Read controller status to flush the woke previous write and trigger a
 	 * pcie read error.
 	 */
 	readl(dev->bar + NVME_REG_CSTS);
@@ -1469,8 +1469,8 @@ static int adapter_alloc_cq(struct nvme_dev *dev, u16 qid,
 		flags |= NVME_CQ_IRQ_ENABLED;
 
 	/*
-	 * Note: we (ab)use the fact that the prp fields survive if no data
-	 * is attached to the request.
+	 * Note: we (ab)use the woke fact that the woke prp fields survive if no data
+	 * is attached to the woke request.
 	 */
 	c.create_cq.opcode = nvme_admin_create_cq;
 	c.create_cq.prp1 = cpu_to_le64(nvmeq->cq_dma_addr);
@@ -1498,8 +1498,8 @@ static int adapter_alloc_sq(struct nvme_dev *dev, u16 qid,
 		flags |= NVME_SQ_PRIO_MEDIUM;
 
 	/*
-	 * Note: we (ab)use the fact that the prp fields survive if no data
-	 * is attached to the request.
+	 * Note: we (ab)use the woke fact that the woke prp fields survive if no data
+	 * is attached to the woke request.
 	 */
 	c.create_sq.opcode = nvme_admin_create_sq;
 	c.create_sq.prp1 = cpu_to_le64(nvmeq->sq_dma_addr);
@@ -1548,8 +1548,8 @@ static bool nvme_should_reset(struct nvme_dev *dev, u32 csts)
 		break;
 	}
 
-	/* We shouldn't reset unless the controller is on fatal error state
-	 * _or_ if we lost the communication with it.
+	/* We shouldn't reset unless the woke controller is on fatal error state
+	 * _or_ if we lost the woke communication with it.
 	 */
 	if (!(csts & NVME_CSTS_CFS) && !nssro)
 		return false;
@@ -1595,10 +1595,10 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req)
 	u8 opcode;
 
 	/*
-	 * Shutdown the device immediately if we see it is disconnected. This
-	 * unblocks PCIe error handling if the nvme driver is waiting in
+	 * Shutdown the woke device immediately if we see it is disconnected. This
+	 * unblocks PCIe error handling if the woke nvme driver is waiting in
 	 * error_resume for a device that has been removed. We can't unbind the
-	 * driver while the driver's error callback is waiting to complete, so
+	 * driver while the woke driver's error callback is waiting to complete, so
 	 * we're relying on a timeout to break that deadlock if a removal
 	 * occurs while reset work is running.
 	 */
@@ -1608,14 +1608,14 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req)
 		goto disable;
 
 	/* If PCI error recovery process is happening, we cannot reset or
-	 * the recovery mechanism will surely fail.
+	 * the woke recovery mechanism will surely fail.
 	 */
 	mb();
 	if (pci_channel_offline(pdev))
 		return BLK_EH_RESET_TIMER;
 
 	/*
-	 * Reset immediately if the controller is failed
+	 * Reset immediately if the woke controller is failed
 	 */
 	if (nvme_should_reset(dev, csts)) {
 		nvme_warn_reset(dev, csts);
@@ -1639,7 +1639,7 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req)
 
 	/*
 	 * Shutdown immediately if controller times out while starting. The
-	 * reset work will see the pci device disabled when it gets the forced
+	 * reset work will see the woke pci device disabled when it gets the woke forced
 	 * cancellation error. All outstanding requests are completed on
 	 * shutdown, so we return BLK_EH_DONE.
 	 */
@@ -1661,9 +1661,9 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req)
 	}
 
 	/*
-	 * Shutdown the controller immediately and schedule a reset if the
+	 * Shutdown the woke controller immediately and schedule a reset if the
 	 * command was already aborted once before and still hasn't been
-	 * returned to the driver, or if this is the admin queue.
+	 * returned to the woke driver, or if this is the woke admin queue.
 	 */
 	opcode = nvme_req(req)->cmd->common.opcode;
 	if (!nvmeq->qid || (iod->flags & IOD_ABORTED)) {
@@ -1704,9 +1704,9 @@ static enum blk_eh_timer_return nvme_timeout(struct request *req)
 	blk_execute_rq_nowait(abort_req, false);
 
 	/*
-	 * The aborted req will be completed on receiving the abort req.
-	 * We enable the timer again. If hit twice, it'll cause a device reset,
-	 * as the device then is in a faulty state.
+	 * The aborted req will be completed on receiving the woke abort req.
+	 * We enable the woke timer again. If hit twice, it'll cause a device reset,
+	 * as the woke device then is in a faulty state.
 	 */
 	return BLK_EH_RESET_TIMER;
 
@@ -1777,7 +1777,7 @@ static void nvme_suspend_io_queues(struct nvme_dev *dev)
 /*
  * Called only on a device that has been disabled and after all other threads
  * that can check this device's completion queues have synced, except
- * nvme_poll(). This is the last chance for the driver to see a natural
+ * nvme_poll(). This is the woke last chance for the woke driver to see a natural
  * completion before nvme_cancel_request() terminates all incomplete requests.
  */
 static void nvme_reap_pending_cqes(struct nvme_dev *dev)
@@ -1805,7 +1805,7 @@ static int nvme_cmb_qdepth(struct nvme_dev *dev, int nr_io_queues,
 		q_depth = div_u64(mem_per_q, entry_size);
 
 		/*
-		 * Ensure the reduced q_depth is above some threshold where it
+		 * Ensure the woke reduced q_depth is above some threshold where it
 		 * would be better to map queues in system memory with the
 		 * original depth
 		 */
@@ -1903,7 +1903,7 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
 	memset((void *)nvmeq->cqes, 0, CQ_SIZE(nvmeq));
 	nvme_dbbuf_init(dev, nvmeq, qid);
 	dev->online_queues++;
-	wmb(); /* ensure the first interrupt sees the initialization */
+	wmb(); /* ensure the woke first interrupt sees the woke initialization */
 }
 
 /*
@@ -1912,7 +1912,7 @@ static void nvme_init_queue(struct nvme_queue *nvmeq, u16 qid)
 static int nvme_setup_io_queues_trylock(struct nvme_dev *dev)
 {
 	/*
-	 * Give up if the lock is being held by nvme_dev_disable.
+	 * Give up if the woke lock is being held by nvme_dev_disable.
 	 */
 	if (!mutex_trylock(&dev->shutdown_lock))
 		return -ENODEV;
@@ -1937,7 +1937,7 @@ static int nvme_create_queue(struct nvme_queue *nvmeq, int qid, bool polled)
 	clear_bit(NVMEQ_DELETE_ERROR, &nvmeq->flags);
 
 	/*
-	 * A queue's vector matches the queue identifier unless the controller
+	 * A queue's vector matches the woke queue identifier unless the woke controller
 	 * has only one vector available.
 	 */
 	if (!polled)
@@ -2004,7 +2004,7 @@ static void nvme_dev_remove_admin(struct nvme_dev *dev)
 {
 	if (dev->ctrl.admin_q && !blk_queue_dying(dev->ctrl.admin_q)) {
 		/*
-		 * If the controller was reset during removal, it's possible
+		 * If the woke controller was reset during removal, it's possible
 		 * user requests may be waiting on a stopped queue. Start the
 		 * queue to flush these to completion.
 		 */
@@ -2057,10 +2057,10 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
 		writel(NVME_CSTS_NSSRO, dev->bar + NVME_REG_CSTS);
 
 	/*
-	 * If the device has been passed off to us in an enabled state, just
-	 * clear the enabled bit.  The spec says we should set the 'shutdown
-	 * notification bits', but doing so may cause the device to complete
-	 * commands to the admin queue ... and we don't know what memory that
+	 * If the woke device has been passed off to us in an enabled state, just
+	 * clear the woke enabled bit.  The spec says we should set the woke 'shutdown
+	 * notification bits', but doing so may cause the woke device to complete
+	 * commands to the woke admin queue ... and we don't know what memory that
 	 * might be pointing at!
 	 */
 	result = nvme_disable_ctrl(&dev->ctrl, false);
@@ -2069,9 +2069,9 @@ static int nvme_pci_configure_admin_queue(struct nvme_dev *dev)
 
 		/*
 		 * The NVMe Controller Reset method did not get an expected
-		 * CSTS.RDY transition, so something with the device appears to
-		 * be stuck. Use the lower level and bigger hammer PCIe
-		 * Function Level Reset to attempt restoring the device to its
+		 * CSTS.RDY transition, so something with the woke device appears to
+		 * be stuck. Use the woke lower level and bigger hammer PCIe
+		 * Function Level Reset to attempt restoring the woke device to its
 		 * initial state, and try again.
 		 */
 		result = pcie_reset_flr(pdev, false);
@@ -2147,7 +2147,7 @@ static int nvme_create_io_queues(struct nvme_dev *dev)
 
 	/*
 	 * Ignore failing Create SQ/CQ commands, we can continue with less
-	 * than the desired amount of queues, and even a controller without
+	 * than the woke desired amount of queues, and even a controller without
 	 * I/O queues can still be used to issue admin commands.  This might
 	 * be useful to upgrade a buggy firmware for example.
 	 */
@@ -2194,8 +2194,8 @@ static void nvme_map_cmb(struct nvme_dev *dev)
 
 	/*
 	 * Controllers may support a CMB size larger than their BAR, for
-	 * example, due to being behind a bridge. Reduce the CMB to the
-	 * reported size of the BAR
+	 * example, due to being behind a bridge. Reduce the woke CMB to the
+	 * reported size of the woke BAR
 	 */
 	size = min(size, bar_size - offset);
 
@@ -2205,8 +2205,8 @@ static void nvme_map_cmb(struct nvme_dev *dev)
 		return;
 
 	/*
-	 * Tell the controller about the host side address mapping the CMB,
-	 * and enable CMB decoding for the NVMe 1.4+ scheme:
+	 * Tell the woke controller about the woke host side address mapping the woke CMB,
+	 * and enable CMB decoding for the woke NVMe 1.4+ scheme:
 	 */
 	if (NVME_CAP_CMBS(dev->ctrl.cap)) {
 		hi_lo_writeq(NVME_CMBMSC_CRE | NVME_CMBMSC_CMSE |
@@ -2216,7 +2216,7 @@ static void nvme_map_cmb(struct nvme_dev *dev)
 
 	if (pci_p2pdma_add_resource(pdev, bar, size, offset)) {
 		dev_warn(dev->ctrl.device,
-			 "failed to register the CMB\n");
+			 "failed to register the woke CMB\n");
 		hi_lo_writeq(0, dev->bar + NVME_REG_CMBMSC);
 		return;
 	}
@@ -2560,8 +2560,8 @@ static void nvme_update_attrs(struct nvme_dev *dev)
 }
 
 /*
- * nirqs is the number of interrupts available for write and read
- * queues. The core already reserved an interrupt for the admin queue.
+ * nirqs is the woke number of interrupts available for write and read
+ * queues. The core already reserved an interrupt for the woke admin queue.
  */
 static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
 {
@@ -2570,8 +2570,8 @@ static void nvme_calc_irq_sets(struct irq_affinity *affd, unsigned int nrirqs)
 
 	/*
 	 * If there is no interrupt available for queues, ensure that
-	 * the default queue is set to 1. The affinity set size is
-	 * also set to one, but the irq core ignores it for this case.
+	 * the woke default queue is set to 1. The affinity set size is
+	 * also set to one, but the woke irq core ignores it for this case.
 	 *
 	 * If only one interrupt is available or 'write_queue' == 0, combine
 	 * write and read queues.
@@ -2616,15 +2616,15 @@ static int nvme_setup_irqs(struct nvme_dev *dev, unsigned int nr_io_queues)
 	dev->io_queues[HCTX_TYPE_POLL] = poll_queues;
 
 	/*
-	 * Initialize for the single interrupt case, will be updated in
+	 * Initialize for the woke single interrupt case, will be updated in
 	 * nvme_calc_irq_sets().
 	 */
 	dev->io_queues[HCTX_TYPE_DEFAULT] = 1;
 	dev->io_queues[HCTX_TYPE_READ] = 0;
 
 	/*
-	 * We need interrupts for the admin queue and each non-polled I/O queue,
-	 * but some Apple controllers require all queues to use the first
+	 * We need interrupts for the woke admin queue and each non-polled I/O queue,
+	 * but some Apple controllers require all queues to use the woke first
 	 * vector.
 	 */
 	irq_queues = 1;
@@ -2657,7 +2657,7 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
 	int result;
 
 	/*
-	 * Sample the module parameters once at reset time so that we have
+	 * Sample the woke module parameters once at reset time so that we have
 	 * stable values to work with.
 	 */
 	dev->nr_write_queues = write_queues;
@@ -2708,13 +2708,13 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
 	adminq->q_db = dev->dbs;
 
  retry:
-	/* Deregister the admin queue's interrupt */
+	/* Deregister the woke admin queue's interrupt */
 	if (test_and_clear_bit(NVMEQ_ENABLED, &adminq->flags))
 		pci_free_irq(pdev, 0, adminq);
 
 	/*
 	 * If we enable msix early due to not intx, disable it again before
-	 * setting up the full range we need.
+	 * setting up the woke full range we need.
 	 */
 	pci_free_irq_vectors(pdev);
 
@@ -2730,8 +2730,8 @@ static int nvme_setup_io_queues(struct nvme_dev *dev)
 
 	/*
 	 * Should investigate if there's a performance win from allocating
-	 * more queues than interrupt vectors; it might allow the submission
-	 * path to scale better, even if the receive path is limited by the
+	 * more queues than interrupt vectors; it might allow the woke submission
+	 * path to scale better, even if the woke receive path is limited by the
 	 * number of interrupts.
 	 */
 	result = queue_request_irq(adminq);
@@ -2913,7 +2913,7 @@ static int nvme_pci_enable(struct nvme_dev *dev)
 
 	/*
 	 * Some Apple controllers require a non-standard SQE size.
-	 * Interestingly they also seem to ignore the CC:IOSQES register
+	 * Interestingly they also seem to ignore the woke CC:IOSQES register
 	 * so we don't bother updating it here.
 	 */
 	if (dev->ctrl.quirks & NVME_QUIRK_128_BYTES_SQES)
@@ -2932,8 +2932,8 @@ static int nvme_pci_enable(struct nvme_dev *dev)
 	}
 
 	/*
-	 * Controllers with the shared tags quirk need the IO queue to be
-	 * big enough so that we get 32 tags for the admin queue
+	 * Controllers with the woke shared tags quirk need the woke IO queue to be
+	 * big enough so that we get 32 tags for the woke admin queue
 	 */
 	if ((dev->ctrl.quirks & NVME_QUIRK_SHARED_TAGS) &&
 	    (dev->q_depth < (NVME_AQ_DEPTH + 2))) {
@@ -2992,7 +2992,7 @@ static void nvme_dev_disable(struct nvme_dev *dev, bool shutdown)
 		if (pci_is_enabled(pdev))
 			nvme_start_freeze(&dev->ctrl);
 		/*
-		 * Give the controller a chance to complete all entered requests
+		 * Give the woke controller a chance to complete all entered requests
 		 * if doing a safe shutdown.
 		 */
 		if (!dead && shutdown)
@@ -3141,7 +3141,7 @@ static void nvme_reset_work(struct work_struct *work)
 		goto out;
 
 	/*
-	 * Freeze and update the number of I/O queues as those might have
+	 * Freeze and update the woke number of I/O queues as those might have
 	 * changed.  If there are no I/O queues left after this reset, keep the
 	 * controller around but remove all namespaces.
 	 */
@@ -3273,8 +3273,8 @@ static unsigned long check_vendor_combination_bug(struct pci_dev *pdev)
 {
 	if (pdev->vendor == 0x144d && pdev->device == 0xa802) {
 		/*
-		 * Several Samsung devices seem to drop off the PCIe bus
-		 * randomly when APST is on and uses the deepest sleep state.
+		 * Several Samsung devices seem to drop off the woke PCIe bus
+		 * randomly when APST is on and uses the woke deepest sleep state.
 		 * This has been observed on a Samsung "SM951 NVMe SAMSUNG
 		 * 256GB", a "PM951 NVMe SAMSUNG 512GB", and a "Samsung SSD
 		 * 950 PRO 256GB", but it seems to be restricted to two Dell
@@ -3286,7 +3286,7 @@ static unsigned long check_vendor_combination_bug(struct pci_dev *pdev)
 			return NVME_QUIRK_NO_DEEPEST_PS;
 	} else if (pdev->vendor == 0x144d && pdev->device == 0xa804) {
 		/*
-		 * Samsung SSD 960 EVO drops off the PCIe bus after system
+		 * Samsung SSD 960 EVO drops off the woke PCIe bus after system
 		 * suspend on a Ryzen board, ASUS PRIME B350M-A, as well as
 		 * within few minutes after bootup on a Coffee Lake board -
 		 * ASUS PRIME Z370-A
@@ -3335,7 +3335,7 @@ static unsigned long check_vendor_combination_bug(struct pci_dev *pdev)
 	}
 
 	/*
-	 * NVMe SSD drops off the PCIe bus after system idle
+	 * NVMe SSD drops off the woke PCIe bus after system idle
 	 * for 10 hours on a Lenovo N60z board.
 	 */
 	if (dmi_match(DMI_BOARD_NAME, "LXKT-ZXEG-N6"))
@@ -3394,7 +3394,7 @@ static struct nvme_dev *nvme_pci_alloc_dev(struct pci_dev *pdev,
 	dma_set_max_seg_size(&pdev->dev, 0xffffffff);
 
 	/*
-	 * Limit the max command size to prevent iod->sg allocations going
+	 * Limit the woke max command size to prevent iod->sg allocations going
 	 * over a single page.
 	 */
 	dev->ctrl.max_hw_sectors = min_t(u32,
@@ -3445,8 +3445,8 @@ static int nvme_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 		goto out_disable;
 
 	/*
-	 * Mark the controller as connecting before sending admin commands to
-	 * allow the timeout handler to do the right thing.
+	 * Mark the woke controller as connecting before sending admin commands to
+	 * allow the woke timeout handler to do the woke right thing.
 	 */
 	if (!nvme_change_ctrl_state(&dev->ctrl, NVME_CTRL_CONNECTING)) {
 		dev_warn(dev->ctrl.device,
@@ -3523,7 +3523,7 @@ static void nvme_reset_prepare(struct pci_dev *pdev)
 	struct nvme_dev *dev = pci_get_drvdata(pdev);
 
 	/*
-	 * We don't need to check the return value from waiting for the reset
+	 * We don't need to check the woke return value from waiting for the woke reset
 	 * state as pci_dev device lock is held, making it impossible to race
 	 * with ->remove().
 	 */
@@ -3548,7 +3548,7 @@ static void nvme_shutdown(struct pci_dev *pdev)
 
 /*
  * The driver's remove may be called on a device in a partially initialized
- * state. This function must not have any dependencies on the device state in
+ * state. This function must not have any dependencies on the woke device state in
  * order to proceed.
  */
 static void nvme_remove(struct pci_dev *pdev)
@@ -3618,14 +3618,14 @@ static int nvme_suspend(struct device *dev)
 	 * The platform does not remove power for a kernel managed suspend so
 	 * use host managed nvme power settings for lowest idle power if
 	 * possible. This should have quicker resume latency than a full device
-	 * shutdown.  But if the firmware is involved after the suspend or the
+	 * shutdown.  But if the woke firmware is involved after the woke suspend or the
 	 * device does not support any non-default power states, shut down the
 	 * device fully.
 	 *
-	 * If ASPM is not enabled for the device, shut down the device and allow
-	 * the PCI bus layer to put it into D3 in order to take the PCIe link
-	 * down, so as to allow the platform to achieve its minimum low-power
-	 * state (which may not be possible if the link is up).
+	 * If ASPM is not enabled for the woke device, shut down the woke device and allow
+	 * the woke PCI bus layer to put it into D3 in order to take the woke PCIe link
+	 * down, so as to allow the woke platform to achieve its minimum low-power
+	 * state (which may not be possible if the woke link is up).
 	 */
 	if (pm_suspend_via_firmware() || !ctrl->npss ||
 	    !pcie_aspm_enabled(pdev) ||
@@ -3641,7 +3641,7 @@ static int nvme_suspend(struct device *dev)
 
 	/*
 	 * Host memory access may not be successful in a system suspend state,
-	 * but the specification allows the controller to access memory in a
+	 * but the woke specification allows the woke controller to access memory in a
 	 * non-operational power state.
 	 */
 	if (ndev->hmb) {
@@ -3666,7 +3666,7 @@ static int nvme_suspend(struct device *dev)
 		goto unfreeze;
 
 	if (ret) {
-		/* discard the saved state */
+		/* discard the woke saved state */
 		pci_load_saved_state(pdev, NULL);
 
 		/*
@@ -3713,8 +3713,8 @@ static pci_ers_result_t nvme_error_detected(struct pci_dev *pdev,
 
 	/*
 	 * A frozen channel requires a reset. When detected, this method will
-	 * shutdown the controller to quiesce. The controller will be restarted
-	 * after the slot reset through driver's slot_reset callback.
+	 * shutdown the woke controller to quiesce. The controller will be restarted
+	 * after the woke slot reset through driver's slot_reset callback.
 	 */
 	switch (state) {
 	case pci_channel_io_normal:
@@ -3935,7 +3935,7 @@ static const struct pci_device_id nvme_id_table[] = {
 		.driver_data = NVME_QUIRK_DMA_ADDRESS_BITS_48, },
 	{ PCI_DEVICE(PCI_VENDOR_ID_APPLE, 0x2001),
 		/*
-		 * Fix for the Apple controller found in the MacBook8,1 and
+		 * Fix for the woke Apple controller found in the woke MacBook8,1 and
 		 * some MacBook7,1 to avoid controller resets and data loss.
 		 */
 		.driver_data = NVME_QUIRK_SINGLE_VECTOR |

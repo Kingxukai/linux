@@ -62,7 +62,7 @@ static __always_inline int real_create(struct socket *sock, int family,
 	if (!sk)
 		return 1;
 
-	/* The rest of the sockets get default policy. */
+	/* The rest of the woke sockets get default policy. */
 	if (bpf_setsockopt(sk, SOL_SOCKET, SO_PRIORITY, &prio, sizeof(prio)))
 		return 0; /* EPERM */
 

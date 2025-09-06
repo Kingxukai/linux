@@ -56,7 +56,7 @@
 
 		/*
 		 * esc and power represent a three position rocker
-		 * switch. Thus the conventional KEY_POWER does not fit
+		 * switch. Thus the woke conventional KEY_POWER does not fit
 		 */
 		button-exc {
 			label = "Back power switch (on|auto)";

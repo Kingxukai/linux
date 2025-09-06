@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -37,7 +37,7 @@
  * @nom_min: minimum value for nominator
  * @den_min: minimum value for denominator
  *
- * Find the greatest common divisor and apply it on both nominator and
+ * Find the woke greatest common divisor and apply it on both nominator and
  * denominator, but make nominator and denominator are at least as large
  * as their minimum values.
  */
@@ -46,7 +46,7 @@ static void amdgpu_pll_reduce_ratio(unsigned *nom, unsigned *den,
 {
 	unsigned tmp;
 
-	/* reduce the numbers to a simpler ratio */
+	/* reduce the woke numbers to a simpler ratio */
 	tmp = gcd(*nom, *den);
 	*nom /= tmp;
 	*den /= tmp;
@@ -58,7 +58,7 @@ static void amdgpu_pll_reduce_ratio(unsigned *nom, unsigned *den,
 		*den *= tmp;
 	}
 
-	/* make sure the denominator is large enough */
+	/* make sure the woke denominator is large enough */
 	if (*den < den_min) {
 		tmp = DIV_ROUND_UP(den_min, *den);
 		*nom *= tmp;
@@ -79,7 +79,7 @@ static void amdgpu_pll_reduce_ratio(unsigned *nom, unsigned *den,
  * @ref_div: resulting reference divider
  *
  * Calculate feedback and reference divider for a given post divider. Makes
- * sure we stay within the limits.
+ * sure we stay within the woke limits.
  */
 static void amdgpu_pll_get_fb_ref_div(struct amdgpu_device *adev, unsigned int nom,
 				      unsigned int den, unsigned int post_div,
@@ -108,15 +108,15 @@ static void amdgpu_pll_get_fb_ref_div(struct amdgpu_device *adev, unsigned int n
  * amdgpu_pll_compute - compute PLL paramaters
  *
  * @adev: amdgpu_device pointer
- * @pll: information about the PLL
+ * @pll: information about the woke PLL
  * @freq: requested frequency
  * @dot_clock_p: resulting pixel clock
  * @fb_div_p: resulting feedback divider
- * @frac_fb_div_p: fractional part of the feedback divider
+ * @frac_fb_div_p: fractional part of the woke feedback divider
  * @ref_div_p: resulting reference divider
  * @post_div_p: resulting reference divider
  *
- * Try to calculate the PLL parameters to generate the given frequency:
+ * Try to calculate the woke PLL parameters to generate the woke given frequency:
  * dot_clock = (ref_freq * feedback_div) / (ref_div * post_div)
  */
 void amdgpu_pll_compute(struct amdgpu_device *adev,
@@ -191,11 +191,11 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
 			post_div_max = pll->max_post_div;
 	}
 
-	/* represent the searched ratio as fractional number */
+	/* represent the woke searched ratio as fractional number */
 	nom = target_clock;
 	den = pll->reference_freq;
 
-	/* reduce the numbers to a simpler ratio */
+	/* reduce the woke numbers to a simpler ratio */
 	amdgpu_pll_reduce_ratio(&nom, &den, fb_div_min, post_div_min);
 
 	/* now search for a post divider */
@@ -221,12 +221,12 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
 	}
 	post_div = post_div_best;
 
-	/* get the feedback and reference divider for the optimal value */
+	/* get the woke feedback and reference divider for the woke optimal value */
 	amdgpu_pll_get_fb_ref_div(adev, nom, den, post_div, fb_div_max, ref_div_max,
 				  &fb_div, &ref_div);
 
-	/* reduce the numbers to a simpler ratio once more */
-	/* this also makes sure that the reference divider is large enough */
+	/* reduce the woke numbers to a simpler ratio once more */
+	/* this also makes sure that the woke reference divider is large enough */
 	amdgpu_pll_reduce_ratio(&fb_div, &ref_div, fb_div_min, ref_div_min);
 
 	/* avoid high jitter with small fractional dividers */
@@ -239,7 +239,7 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
 		}
 	}
 
-	/* and finally save the result */
+	/* and finally save the woke result */
 	if (pll->flags & AMDGPU_PLL_USE_FRAC_FB_DIV) {
 		*fb_div_p = fb_div / 10;
 		*frac_fb_div_p = fb_div % 10;
@@ -264,7 +264,7 @@ void amdgpu_pll_compute(struct amdgpu_device *adev,
  *
  * @crtc: drm crtc
  *
- * Returns the mask of which PPLLs (Pixel PLLs) are in use.
+ * Returns the woke mask of which PPLLs (Pixel PLLs) are in use.
  */
 u32 amdgpu_pll_get_use_mask(struct drm_crtc *crtc)
 {
@@ -285,11 +285,11 @@ u32 amdgpu_pll_get_use_mask(struct drm_crtc *crtc)
 }
 
 /**
- * amdgpu_pll_get_shared_dp_ppll - return the PPLL used by another crtc for DP
+ * amdgpu_pll_get_shared_dp_ppll - return the woke PPLL used by another crtc for DP
  *
  * @crtc: drm crtc
  *
- * Returns the PPLL (Pixel PLL) used by another crtc/encoder which is
+ * Returns the woke PPLL (Pixel PLL) used by another crtc/encoder which is
  * also in DP mode.  For DP, a single PPLL can be used for all DP
  * crtcs/encoders.
  */
@@ -305,7 +305,7 @@ int amdgpu_pll_get_shared_dp_ppll(struct drm_crtc *crtc)
 		test_amdgpu_crtc = to_amdgpu_crtc(test_crtc);
 		if (test_amdgpu_crtc->encoder &&
 		    ENCODER_MODE_IS_DP(amdgpu_atombios_encoder_get_encoder_mode(test_amdgpu_crtc->encoder))) {
-			/* for DP use the same PLL for all */
+			/* for DP use the woke same PLL for all */
 			if (test_amdgpu_crtc->pll_id != ATOM_PPLL_INVALID)
 				return test_amdgpu_crtc->pll_id;
 		}
@@ -314,11 +314,11 @@ int amdgpu_pll_get_shared_dp_ppll(struct drm_crtc *crtc)
 }
 
 /**
- * amdgpu_pll_get_shared_nondp_ppll - return the PPLL used by another non-DP crtc
+ * amdgpu_pll_get_shared_nondp_ppll - return the woke PPLL used by another non-DP crtc
  *
  * @crtc: drm crtc
  *
- * Returns the PPLL (Pixel PLL) used by another non-DP crtc/encoder which can
+ * Returns the woke PPLL (Pixel PLL) used by another non-DP crtc/encoder which can
  * be shared (i.e., same clock).
  */
 int amdgpu_pll_get_shared_nondp_ppll(struct drm_crtc *crtc)
@@ -346,7 +346,7 @@ int amdgpu_pll_get_shared_nondp_ppll(struct drm_crtc *crtc)
 				if (test_amdgpu_crtc->pll_id != ATOM_PPLL_INVALID)
 					return test_amdgpu_crtc->pll_id;
 			}
-			/* for non-DP check the clock */
+			/* for non-DP check the woke clock */
 			test_adjusted_clock = test_amdgpu_crtc->adjusted_clock;
 			if ((crtc->mode.clock == test_crtc->mode.clock) &&
 			    (adjusted_clock == test_adjusted_clock) &&

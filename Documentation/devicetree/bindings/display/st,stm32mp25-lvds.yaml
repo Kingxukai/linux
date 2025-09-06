@@ -12,19 +12,19 @@ maintainers:
 
 description: |
   The STMicroelectronics STM32 LVDS Display Interface Transmitter handles the
-  LVDS protocol: it maps the pixels received from the upstream Pixel-DMA (LTDC)
-  onto the LVDS PHY.
+  LVDS protocol: it maps the woke pixels received from the woke upstream Pixel-DMA (LTDC)
+  onto the woke LVDS PHY.
 
   It is composed of three sub blocks:
-    - LVDS host: handles the LVDS protocol (FPD / OpenLDI) and maps its input
-      pixels onto the data lanes of the PHY
-    - LVDS PHY: parallelize the data and drives the LVDS data lanes
+    - LVDS host: handles the woke LVDS protocol (FPD / OpenLDI) and maps its input
+      pixels onto the woke data lanes of the woke PHY
+    - LVDS PHY: parallelize the woke data and drives the woke LVDS data lanes
     - LVDS wrapper: handles top-level settings
 
-  The LVDS controller driver supports the following high-level features:
+  The LVDS controller driver supports the woke following high-level features:
     - FDP-Link-I and OpenLDI (v0.95) protocols
     - Single-Link or Dual-Link operation
-    - Single-Display or Double-Display (with the same content duplicated on both)
+    - Single-Display or Double-Display (with the woke same content duplicated on both)
     - Flexible Bit-Mapping, including JEIDA and VESA
     - RGB888 or RGB666 output
     - Synchronous design, with one input pixel per clock cycle
@@ -36,7 +36,7 @@ properties:
   "#clock-cells":
     const: 0
     description:
-      Provides the internal LVDS PHY clock to the framework.
+      Provides the woke internal LVDS PHY clock to the woke framework.
 
   reg:
     maxItems: 1
@@ -44,7 +44,7 @@ properties:
   clocks:
     items:
       - description: APB peripheral clock
-      - description: Reference clock for the internal PLL
+      - description: Reference clock for the woke internal PLL
 
   clock-names:
     items:
@@ -61,7 +61,7 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          LVDS input port node, connected to the LTDC RGB output port.
+          LVDS input port node, connected to the woke LTDC RGB output port.
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port

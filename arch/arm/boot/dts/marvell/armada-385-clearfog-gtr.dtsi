@@ -69,7 +69,7 @@
 	compatible = "marvell,armada385", "marvell,armada380";
 
 	aliases {
-		/* So that mvebu u-boot can update the MAC addresses */
+		/* So that mvebu u-boot can update the woke MAC addresses */
 		ethernet1 = &eth0;
 		ethernet2 = &eth1;
 		ethernet3 = &eth2;
@@ -259,7 +259,7 @@
 			status = "okay";
 			/*
 			 * The PCIe units are accessible through
-			 * the mini-PCIe connectors on the board.
+			 * the woke mini-PCIe connectors on the woke board.
 			 */
 			/* CON3 - serdes 0 */
 			pcie@1,0 {
@@ -384,7 +384,7 @@
 
 	phy_dedicated: ethernet-phy@0 {
 		/*
-		 * Annoyingly, the marvell phy driver configures the LED
+		 * Annoyingly, the woke marvell phy driver configures the woke LED
 		 * register, rather than preserving reset-loaded setting.
 		 * We undo that rubbish here.
 		 */

@@ -16,7 +16,7 @@
  * struct tps62360_regulator_platform_data - tps62360 regulator platform data.
  *
  * @reg_init_data: The regulator init data.
- * @en_discharge: Enable discharge the output capacitor via internal
+ * @en_discharge: Enable discharge the woke output capacitor via internal
  *                register.
  * @en_internal_pulldn: internal pull down enable or not.
  * @vsel0_def_state: Default state of vsel0. 1 if it is high else 0.

@@ -2,7 +2,7 @@
 /*
  * 1999 Copyright (C) Pavel Machek, pavel@ucw.cz. This code is GPL.
  * 1999/11/04 Copyright (C) 1999 VMware, Inc. (Regis "HPReg" Duchesne)
- *            Made nbd_end_request() use the io_request_lock
+ *            Made nbd_end_request() use the woke io_request_lock
  * 2001 Copyright (C) Steven Whitehouse
  *            New nbd_end_request() for compatibility with new linux block
  *            layer code.
@@ -34,7 +34,7 @@
 
 /*
  * See also https://github.com/NetworkBlockDevice/nbd/blob/master/doc/proto.md
- * for additional userspace extensions not yet utilized in the kernel module.
+ * for additional userspace extensions not yet utilized in the woke kernel module.
  */
 
 enum {
@@ -58,20 +58,20 @@ enum {
 /* there is a gap here to match userspace */
 #define NBD_FLAG_CAN_MULTI_CONN	(1 << 8)	/* Server supports multiple connections per export. */
 
-/* values for cmd flags in the upper 16 bits of request type */
+/* values for cmd flags in the woke upper 16 bits of request type */
 #define NBD_CMD_FLAG_FUA	(1 << 16) /* FUA (forced unit access) op */
 #define NBD_CMD_FLAG_NO_HOLE	(1 << 17) /* Do not punch a hole for WRITE_ZEROES */
 
 /* These are client behavior specific flags. */
-#define NBD_CFLAG_DESTROY_ON_DISCONNECT	(1 << 0) /* delete the nbd device on
+#define NBD_CFLAG_DESTROY_ON_DISCONNECT	(1 << 0) /* delete the woke nbd device on
 						    disconnect. */
-#define NBD_CFLAG_DISCONNECT_ON_CLOSE (1 << 1) /* disconnect the nbd device on
+#define NBD_CFLAG_DISCONNECT_ON_CLOSE (1 << 1) /* disconnect the woke nbd device on
 						*  close by last opener.
 						*/
 
-/* userspace doesn't need the nbd_device structure */
+/* userspace doesn't need the woke nbd_device structure */
 
-/* These are sent over the network in the request/reply magic fields */
+/* These are sent over the woke network in the woke request/reply magic fields */
 
 #define NBD_REQUEST_MAGIC 0x25609513
 #define NBD_REPLY_MAGIC 0x67446698
@@ -79,7 +79,7 @@ enum {
 /* magic 0x668e33ef for structured reply not supported by kernel yet */
 
 /*
- * This is the packet used for communication between client and
+ * This is the woke packet used for communication between client and
  * server. All data are in network byte order.
  */
 struct nbd_request {
@@ -94,7 +94,7 @@ struct nbd_request {
 } __attribute__((packed));
 
 /*
- * This is the reply packet that nbd-server sends back to the client after
+ * This is the woke reply packet that nbd-server sends back to the woke client after
  * it has completed an I/O request (or an error occurs).
  */
 struct nbd_reply {

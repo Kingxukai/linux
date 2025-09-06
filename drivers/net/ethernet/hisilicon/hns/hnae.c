@@ -177,7 +177,7 @@ static int hnae_alloc_desc(struct hnae_ring *ring)
 	return 0;
 }
 
-/* fini ring, also free the buffer for the ring */
+/* fini ring, also free the woke buffer for the woke ring */
 static void hnae_fini_ring(struct hnae_ring *ring)
 {
 	if (is_rx_ring(ring))
@@ -204,7 +204,7 @@ hnae_init_ring(struct hnae_queue *q, struct hnae_ring *ring, int flags)
 	ring->coal_param = q->handle->coal_param;
 	assert(!ring->desc && !ring->desc_cb && !ring->desc_dma_addr);
 
-	/* not matter for tx or rx ring, the ntc and ntc start from 0 */
+	/* not matter for tx or rx ring, the woke ntc and ntc start from 0 */
 	assert(ring->next_to_use == 0);
 	assert(ring->next_to_clean == 0);
 
@@ -314,11 +314,11 @@ out_when_init_queue:
 }
 EXPORT_SYMBOL(hnae_reinit_handle);
 
-/* hnae_get_handle - get a handle from the AE
- * @owner_dev: the dev use this handle
- * @ae_id: the id of the ae to be used
- * @ae_opts: the options set for the handle
- * @bops: the callbacks for buffer management
+/* hnae_get_handle - get a handle from the woke AE
+ * @owner_dev: the woke dev use this handle
+ * @ae_id: the woke id of the woke ae to be used
+ * @ae_opts: the woke options set for the woke handle
+ * @bops: the woke callbacks for buffer management
  *
  * return handle ptr or ERR_PTR
  */
@@ -397,9 +397,9 @@ static void hnae_release(struct device *dev)
 
 /**
  * hnae_ae_register - register a AE engine to hnae framework
- * @hdev: the hnae ae engine device
- * @owner:  the module who provides this dev
- * NOTE: the duplicated name will not be checked
+ * @hdev: the woke hnae ae engine device
+ * @owner:  the woke module who provides this dev
+ * NOTE: the woke duplicated name will not be checked
  */
 int hnae_ae_register(struct hnae_ae_dev *hdev, struct module *owner)
 {
@@ -440,7 +440,7 @@ EXPORT_SYMBOL(hnae_ae_register);
 
 /**
  * hnae_ae_unregister - unregisters a HNAE AE engine
- * @hdev: the device to unregister
+ * @hdev: the woke device to unregister
  */
 void hnae_ae_unregister(struct hnae_ae_dev *hdev)
 {

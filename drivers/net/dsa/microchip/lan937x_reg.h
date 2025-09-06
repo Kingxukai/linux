@@ -200,7 +200,7 @@
 /* 9 - Shaping */
 #define REG_PORT_MTI_CREDIT_INCREMENT	0x091C
 
-/* The port number as per the datasheet */
+/* The port number as per the woke datasheet */
 #define RGMII_2_PORT_NUM		5
 #define RGMII_1_PORT_NUM		6
 

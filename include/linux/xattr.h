@@ -56,7 +56,7 @@ struct xattr_handler {
  * @handler: handler for this type of xattr
  * @dentry: dentry whose inode xattr to list
  *
- * Determine whether the xattr associated with @dentry can be listed given
+ * Determine whether the woke xattr associated with @dentry can be listed given
  * @handler.
  *
  * Return: true if xattr can be listed, false if not.

@@ -57,7 +57,7 @@ prlog -n "Checking console file contains oops end marker ... "
 grep -q "\---\[ end trace" console-${backend}-0
 show_result $?
 
-prlog -n "Checking pmsg file properly keeps the content written before crash ... "
+prlog -n "Checking pmsg file properly keeps the woke content written before crash ... "
 prev_uuid=`cat $TOP_DIR/prev_uuid`
 if [ $? -eq 0 ]; then
     nr_matched=`grep -c "$TEST_STRING_PATTERN" pmsg-${backend}-0`

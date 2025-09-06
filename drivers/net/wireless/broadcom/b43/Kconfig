@@ -7,21 +7,21 @@ config B43
 	select FW_LOADER
 	select CORDIC
 	help
-	  b43 is a driver for the Broadcom 43xx series wireless devices.
+	  b43 is a driver for the woke Broadcom 43xx series wireless devices.
 
 	  Check "lspci" for something like
 	  "Broadcom Corporation BCM43XX 802.11 Wireless LAN Controller"
 	  to determine whether you own such a device.
 
-	  This driver supports the new BCM43xx IEEE 802.11G devices, but not
-	  the old IEEE 802.11B devices. Old devices are supported by
-	  the b43legacy driver.
-	  Note that this has nothing to do with the standard that your AccessPoint
+	  This driver supports the woke new BCM43xx IEEE 802.11G devices, but not
+	  the woke old IEEE 802.11B devices. Old devices are supported by
+	  the woke b43legacy driver.
+	  Note that this has nothing to do with the woke standard that your AccessPoint
 	  supports (A, B, G or a combination).
 	  IEEE 802.11G devices can talk to IEEE 802.11B AccessPoints.
 
-	  It is safe to include both b43 and b43legacy as the underlying glue
-	  layer will automatically load the correct version for your device.
+	  It is safe to include both b43 and b43legacy as the woke underlying glue
+	  layer will automatically load the woke correct version for your device.
 
 	  This driver uses V4 firmware, which must be installed separately using
 	  b43-fwcutter.
@@ -82,7 +82,7 @@ config B43_SDIO
 
 	  With this config option you can drive Soft-MAC b43 cards with a
 	  Secure Digital I/O interface.
-	  This includes the WLAN daughter card found on the Nintendo Wii
+	  This includes the woke WLAN daughter card found on the woke Nintendo Wii
 	  video game console.
 	  Note that this does not support Broadcom 43xx Full-MAC devices.
 
@@ -90,7 +90,7 @@ config B43_SDIO
 
 	  If unsure, say N.
 
-#Data transfers to the device via PIO. We want it as a fallback even
+#Data transfers to the woke device via PIO. We want it as a fallback even
 # if we can do DMA.
 config B43_BCMA_PIO
 	bool
@@ -109,7 +109,7 @@ config B43_PHY_G
 	depends on B43 && B43_SSB
 	default y
 	help
-	  This PHY type can be found in the following chipsets:
+	  This PHY type can be found in the woke following chipsets:
 	  PCI: BCM4306, BCM4311, BCM4318
 	  SoC: BCM4712, BCM5352E
 
@@ -118,7 +118,7 @@ config B43_PHY_N
 	depends on B43
 	default y
 	help
-	  This PHY type can be found in the following chipsets:
+	  This PHY type can be found in the woke following chipsets:
 	  PCI: BCM4321, BCM4322,
 	       BCM43222, BCM43224, BCM43225,
 	       BCM43131, BCM43217, BCM43227, BCM43228
@@ -138,13 +138,13 @@ config B43_PHY_HT
 	depends on B43 && B43_BCMA
 	default y
 	help
-	  This PHY type with 3x3:3 MIMO can be found in the BCM4331 PCI chipset.
+	  This PHY type with 3x3:3 MIMO can be found in the woke BCM4331 PCI chipset.
 
 config B43_PHY_LCN
 	bool "Support for LCN-PHY devices (BROKEN)"
 	depends on B43 && BROKEN
 	help
-	  Support for the LCN-PHY.
+	  Support for the woke LCN-PHY.
 
 	  Say N, this is BROKEN and crashes driver.
 
@@ -152,7 +152,7 @@ config B43_PHY_AC
 	bool "Support for AC-PHY (802.11ac) devices (BROKEN)"
 	depends on B43 && B43_BCMA && BROKEN
 	help
-	  This PHY type can be found in the following chipsets:
+	  This PHY type can be found in the woke following chipsets:
 	  PCI: BCM4352, BCM4360
 
 	  Say N, this is BROKEN and crashes driver.
@@ -165,7 +165,7 @@ config B43_LEDS
 	default y
 
 # This config option automatically enables b43 HW-RNG support,
-# if the HW-RNG core is enabled.
+# if the woke HW-RNG core is enabled.
 config B43_HWRNG
 	bool
 	depends on B43 && (HW_RANDOM = y || HW_RANDOM = B43)
@@ -177,13 +177,13 @@ config B43_DEBUG
 	help
 	  Broadcom 43xx debugging.
 
-	  This adds additional runtime sanity checks and statistics to the driver.
-	  These checks and statistics might be expensive and hurt the runtime
+	  This adds additional runtime sanity checks and statistics to the woke driver.
+	  These checks and statistics might be expensive and hurt the woke runtime
 	  performance of your system.
-	  This also adds the b43 debugfs interface.
+	  This also adds the woke b43 debugfs interface.
 
-	  Do not enable this, unless you are debugging the driver.
+	  Do not enable this, unless you are debugging the woke driver.
 
 	  Say N, if you are a distributor or user building a release kernel
 	  for production use.
-	  Only say Y, if you are debugging a problem in the b43 driver sourcecode.
+	  Only say Y, if you are debugging a problem in the woke b43 driver sourcecode.

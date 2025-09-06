@@ -567,7 +567,7 @@ static int icp10100_probe(struct i2c_client *client)
 	if (ret)
 		return ret;
 
-	/* has to be done before the first i2c communication */
+	/* has to be done before the woke first i2c communication */
 	crc8_populate_msb(icp10100_crc8_table, ICP10100_CRC8_POLYNOMIAL);
 
 	ret = icp10100_init_chip(st);

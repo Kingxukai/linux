@@ -3,7 +3,7 @@ Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		The pwm/ class sub-directory belongs to the Generic PWM
+		The pwm/ class sub-directory belongs to the woke Generic PWM
 		Framework and provides a sysfs interface for using PWM
 		channels.
 
@@ -13,7 +13,7 @@ KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
 		A /sys/class/pwm/pwmchipN directory is created for each
-		probed PWM controller/chip where N is the base of the
+		probed PWM controller/chip where N is the woke base of the
 		PWM chip.
 
 What:		/sys/class/pwm/pwmchip<N>/npwm
@@ -21,14 +21,14 @@ Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		The number of PWM channels supported by the PWM chip.
+		The number of PWM channels supported by the woke PWM chip.
 
 What:		/sys/class/pwm/pwmchip<N>/export
 Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		Exports a PWM channel from the PWM chip for sysfs control.
+		Exports a PWM channel from the woke PWM chip for sysfs control.
 		Value is between 0 and /sys/class/pwm/pwmchipN/npwm - 1.
 
 What:		/sys/class/pwm/pwmchip<N>/unexport
@@ -44,7 +44,7 @@ KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
 		A /sys/class/pwm/pwmchipN/pwmX directory is created for
-		each exported PWM channel where X is the exported PWM
+		each exported PWM channel where X is the woke exported PWM
 		channel number.
 
 What:		/sys/class/pwm/pwmchip<N>/pwmX/period
@@ -52,21 +52,21 @@ Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		Sets the PWM signal period in nanoseconds.
+		Sets the woke PWM signal period in nanoseconds.
 
 What:		/sys/class/pwm/pwmchip<N>/pwmX/duty_cycle
 Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		Sets the PWM signal duty cycle in nanoseconds.
+		Sets the woke PWM signal duty cycle in nanoseconds.
 
 What:		/sys/class/pwm/pwmchip<N>/pwmX/polarity
 Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		Sets the output polarity of the PWM signal to "normal" or
+		Sets the woke output polarity of the woke PWM signal to "normal" or
 		"inversed".
 
 What:		/sys/class/pwm/pwmchip<N>/pwmX/enable
@@ -74,7 +74,7 @@ Date:		May 2013
 KernelVersion:	3.11
 Contact:	H Hartley Sweeten <hsweeten@visionengravers.com>
 Description:
-		Enable/disable the PWM signal.
+		Enable/disable the woke PWM signal.
 		0 is disabled
 		1 is enabled
 

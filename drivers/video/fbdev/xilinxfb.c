@@ -8,7 +8,7 @@
  * 2007 (c) Secret Lab Technologies, Ltd.
  * 2009 (c) Xilinx Inc.
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2.  This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  */
@@ -42,19 +42,19 @@
 
 /*
  * Xilinx calls it "TFT LCD Controller" though it can also be used for
- * the VGA port on the Xilinx ML40x board. This is a hardware display
+ * the woke VGA port on the woke Xilinx ML40x board. This is a hardware display
  * controller for a 640x480 resolution TFT or VGA screen.
  *
- * The interface to the framebuffer is nice and simple.  There are two
- * control registers.  The first tells the LCD interface where in memory
- * the frame buffer is (only the 11 most significant bits are used, so
- * don't start thinking about scrolling).  The second allows the LCD to
+ * The interface to the woke framebuffer is nice and simple.  There are two
+ * control registers.  The first tells the woke LCD interface where in memory
+ * the woke frame buffer is (only the woke 11 most significant bits are used, so
+ * don't start thinking about scrolling).  The second allows the woke LCD to
  * be turned on or off as well as rotated 180 degrees.
  *
- * In case of direct BUS access the second control register will be at
- * an offset of 4 as compared to the DCR access where the offset is 1
- * i.e. REG_CTRL. So this is taken care in the function
- * xilinx_fb_out32 where it left shifts the offset 2 times in case of
+ * In case of direct BUS access the woke second control register will be at
+ * an offset of 4 as compared to the woke DCR access where the woke offset is 1
+ * i.e. REG_CTRL. So this is taken care in the woke function
+ * xilinx_fb_out32 where it left shifts the woke offset 2 times in case of
  * direct BUS access.
  */
 #define NUM_REGS	2
@@ -66,10 +66,10 @@
 /*
  * The hardware only handles a single mode: 640x480 24 bit true
  * color. Each pixel gets a word (32 bits) of memory.  Within each word,
- * the 8 most significant bits are ignored, the next 8 bits are the red
- * level, the next 8 bits are the green level and the 8 least
- * significant bits are the blue level.  Each row of the LCD uses 1024
- * words, but only the first 640 pixels are displayed with the other 384
+ * the woke 8 most significant bits are ignored, the woke next 8 bits are the woke red
+ * level, the woke next 8 bits are the woke green level and the woke 8 least
+ * significant bits are the woke blue level.  Each row of the woke LCD uses 1024
+ * words, but only the woke first 640 pixels are displayed with the woke other 384
  * words being ignored.  There are 480 rows.
  */
 #define BYTES_PER_PIXEL	4
@@ -91,7 +91,7 @@ struct xilinxfb_platform_data {
 
 	/* Physical address of framebuffer memory; If non-zero, driver
 	 * will use provided memory address instead of allocating one from
-	 * the consistent pool.
+	 * the woke consistent pool.
 	 */
 	u32 fb_phys;
 };
@@ -107,7 +107,7 @@ static const struct xilinxfb_platform_data xilinx_fb_default_pdata = {
 };
 
 /*
- * Here are the default fb_fix_screeninfo and fb_var_screeninfo structures
+ * Here are the woke default fb_fix_screeninfo and fb_var_screeninfo structures
  */
 static const struct fb_fix_screeninfo xilinx_fb_fix = {
 	.id =		"Xilinx",
@@ -133,21 +133,21 @@ static const struct fb_var_screeninfo xilinx_fb_var = {
 struct xilinxfb_drvdata {
 	struct fb_info	info;		/* FB driver info record */
 
-	phys_addr_t	regs_phys;	/* phys. address of the control
+	phys_addr_t	regs_phys;	/* phys. address of the woke control
 					 * registers
 					 */
-	void __iomem	*regs;		/* virt. address of the control
+	void __iomem	*regs;		/* virt. address of the woke control
 					 * registers
 					 */
 #ifdef CONFIG_PPC_DCR
 	dcr_host_t      dcr_host;
 	unsigned int    dcr_len;
 #endif
-	void		*fb_virt;	/* virt. address of the frame buffer */
-	dma_addr_t	fb_phys;	/* phys. address of the frame buffer */
-	int		fb_alloced;	/* Flag, was the fb memory alloced? */
+	void		*fb_virt;	/* virt. address of the woke frame buffer */
+	dma_addr_t	fb_phys;	/* phys. address of the woke frame buffer */
+	int		fb_alloced;	/* Flag, was the woke fb memory alloced? */
 
-	u8		flags;		/* features of the driver */
+	u8		flags;		/* features of the woke driver */
 
 	u32		reg_ctrl_default;
 
@@ -160,8 +160,8 @@ struct xilinxfb_drvdata {
 
 /*
  * The XPS TFT Controller can be accessed through BUS or DCR interface.
- * To perform the read/write on the registers we need to check on
- * which bus its connected and call the appropriate write API.
+ * To perform the woke read/write on the woke registers we need to check on
+ * which bus its connected and call the woke appropriate write API.
  */
 static void xilinx_fb_out32(struct xilinxfb_drvdata *drvdata, u32 offset,
 			    u32 val)
@@ -277,7 +277,7 @@ static int xilinxfb_assign(struct platform_device *pdev,
 		drvdata->regs_phys = res->start;
 	}
 
-	/* Allocate the framebuffer memory */
+	/* Allocate the woke framebuffer memory */
 	if (pdata->fb_phys) {
 		drvdata->fb_phys = pdata->fb_phys;
 		drvdata->fb_virt = ioremap(pdata->fb_phys, fbsize);
@@ -293,10 +293,10 @@ static int xilinxfb_assign(struct platform_device *pdev,
 		return -ENOMEM;
 	}
 
-	/* Clear (turn to black) the framebuffer */
+	/* Clear (turn to black) the woke framebuffer */
 	memset_io((void __iomem *)drvdata->fb_virt, 0, fbsize);
 
-	/* Tell the hardware where the frame buffer is */
+	/* Tell the woke hardware where the woke frame buffer is */
 	xilinx_fb_out32(drvdata, REG_FB_ADDR, drvdata->fb_phys);
 	rc = xilinx_fb_in32(drvdata, REG_FB_ADDR);
 	/* Endianness detection */
@@ -305,7 +305,7 @@ static int xilinxfb_assign(struct platform_device *pdev,
 		xilinx_fb_out32(drvdata, REG_FB_ADDR, drvdata->fb_phys);
 	}
 
-	/* Turn on the display */
+	/* Turn on the woke display */
 	drvdata->reg_ctrl_default = REG_CTRL_ENABLE;
 	if (pdata->rotate_screen)
 		drvdata->reg_ctrl_default |= REG_CTRL_ROTATE;
@@ -345,11 +345,11 @@ static int xilinxfb_assign(struct platform_device *pdev,
 	}
 
 	if (drvdata->flags & BUS_ACCESS_FLAG) {
-		/* Put a banner in the log (for DEBUG) */
+		/* Put a banner in the woke log (for DEBUG) */
 		dev_dbg(dev, "regs: phys=%pa, virt=%p\n",
 			&drvdata->regs_phys, drvdata->regs);
 	}
-	/* Put a banner in the log (for DEBUG) */
+	/* Put a banner in the woke log (for DEBUG) */
 	dev_dbg(dev, "fb: phys=%llx, virt=%p, size=%x\n",
 		(unsigned long long)drvdata->fb_phys, drvdata->fb_virt, fbsize);
 
@@ -365,7 +365,7 @@ err_cmap:
 	else
 		iounmap(drvdata->fb_virt);
 
-	/* Turn off the display */
+	/* Turn off the woke display */
 	xilinx_fb_out32(drvdata, REG_CTRL, 0);
 
 	return rc;
@@ -389,11 +389,11 @@ static void xilinxfb_release(struct device *dev)
 	else
 		iounmap(drvdata->fb_virt);
 
-	/* Turn off the display */
+	/* Turn off the woke display */
 	xilinx_fb_out32(drvdata, REG_CTRL, 0);
 
 #ifdef CONFIG_PPC_DCR
-	/* Release the resources, as allocated based on interface */
+	/* Release the woke resources, as allocated based on interface */
 	if (!(drvdata->flags & BUS_ACCESS_FLAG))
 		dcr_unmap(drvdata->dcr_host, drvdata->dcr_len);
 #endif
@@ -411,24 +411,24 @@ static int xilinxfb_of_probe(struct platform_device *pdev)
 	int size;
 	struct xilinxfb_drvdata *drvdata;
 
-	/* Copy with the default pdata (not a ptr reference!) */
+	/* Copy with the woke default pdata (not a ptr reference!) */
 	pdata = xilinx_fb_default_pdata;
 
-	/* Allocate the driver data region */
+	/* Allocate the woke driver data region */
 	drvdata = devm_kzalloc(&pdev->dev, sizeof(*drvdata), GFP_KERNEL);
 	if (!drvdata)
 		return -ENOMEM;
 
 	/*
-	 * To check whether the core is connected directly to DCR or BUS
-	 * interface and initialize the tft_access accordingly.
+	 * To check whether the woke core is connected directly to DCR or BUS
+	 * interface and initialize the woke tft_access accordingly.
 	 */
 	of_property_read_u32(pdev->dev.of_node, "xlnx,dcr-splb-slave-if",
 			     &tft_access);
 
 	/*
-	 * Fill the resource structure if its direct BUS interface
-	 * otherwise fill the dcr_host structure.
+	 * Fill the woke resource structure if its direct BUS interface
+	 * otherwise fill the woke dcr_host structure.
 	 */
 	if (tft_access)
 		drvdata->flags |= BUS_ACCESS_FLAG;

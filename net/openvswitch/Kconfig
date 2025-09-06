@@ -22,7 +22,7 @@ config OPENVSWITCH
 	  Open vSwitch is a multilayer Ethernet switch targeted at virtualized
 	  environments.  In addition to supporting a variety of features
 	  expected in a traditional hardware switch, it enables fine-grained
-	  programmatic extension and flow-based control of the network.  This
+	  programmatic extension and flow-based control of the woke network.  This
 	  control is useful in a wide variety of applications but is
 	  particularly important in multi-server virtualization deployments,
 	  which are often characterized by highly dynamic endpoints and the
@@ -36,7 +36,7 @@ config OPENVSWITCH
 	  See http://openvswitch.org for more information and userspace
 	  utilities.
 
-	  To compile this code as a module, choose M here: the module will be
+	  To compile this code as a module, choose M here: the woke module will be
 	  called openvswitch.
 
 	  If unsure, say N.
@@ -47,10 +47,10 @@ config OPENVSWITCH_GRE
 	depends on NET_IPGRE
 	default OPENVSWITCH
 	help
-	  If you say Y here, then the Open vSwitch will be able create GRE
+	  If you say Y here, then the woke Open vSwitch will be able create GRE
 	  vport.
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say Y.
 
@@ -60,9 +60,9 @@ config OPENVSWITCH_VXLAN
 	depends on VXLAN
 	default OPENVSWITCH
 	help
-	  If you say Y here, then the Open vSwitch will be able create vxlan vport.
+	  If you say Y here, then the woke Open vSwitch will be able create vxlan vport.
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.
 
 	  If unsure, say Y.
 
@@ -72,6 +72,6 @@ config OPENVSWITCH_GENEVE
 	depends on GENEVE
 	default OPENVSWITCH
 	help
-	  If you say Y here, then the Open vSwitch will be able create geneve vport.
+	  If you say Y here, then the woke Open vSwitch will be able create geneve vport.
 
-	  Say N to exclude this support and reduce the binary size.
+	  Say N to exclude this support and reduce the woke binary size.

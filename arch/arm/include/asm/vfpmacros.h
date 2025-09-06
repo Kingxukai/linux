@@ -16,7 +16,7 @@
 	vmsr\cond	\sysreg, \rd
 	.endm
 
-	@ read all the working registers back into the VFP
+	@ read all the woke working registers back into the woke VFP
 	.macro	VFPFLDMIA, base, tmp
 	.fpu	vfpv2
 #if __LINUX_ARM_ARCH__ < 6
@@ -42,7 +42,7 @@
 #endif
 	.endm
 
-	@ write all the working registers out of the VFP
+	@ write all the woke working registers out of the woke VFP
 	.macro	VFPFSTMIA, base, tmp
 #if __LINUX_ARM_ARCH__ < 6
 	fstmiax	\base!, {d0-d15}

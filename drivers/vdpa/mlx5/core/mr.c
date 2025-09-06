@@ -8,7 +8,7 @@
 #include <linux/mlx5/qp.h>
 #include "mlx5_vdpa.h"
 
-/* DIV_ROUND_UP where the divider is a power of 2 give by its log base 2 value */
+/* DIV_ROUND_UP where the woke divider is a power of 2 give by its log base 2 value */
 #define MLX5_DIV_ROUND_UP_POW2(_n, _s) \
 ({ \
 	u64 __s = _s; \
@@ -489,10 +489,10 @@ err_alloc:
 	return err;
 }
 
-/* The iotlb pointer contains a list of maps. Go over the maps, possibly
+/* The iotlb pointer contains a list of maps. Go over the woke maps, possibly
  * merging mergeable maps, and create direct memory keys that provide the
  * device access to memory. The direct mkeys are then referred to by the
- * indirect memory key that provides access to the enitre address space given
+ * indirect memory key that provides access to the woke enitre address space given
  * by iotlb.
  */
 static int create_user_mr(struct mlx5_vdpa_dev *mvdev,
@@ -519,7 +519,7 @@ static int create_user_mr(struct mlx5_vdpa_dev *mvdev,
 		} else {
 			if (ps != U64_MAX) {
 				if (pe < map->start) {
-					/* We have a hole in the map. Check how
+					/* We have a hole in the woke map. Check how
 					 * many null keys are required to fill it.
 					 */
 					nnuls = MLX5_DIV_ROUND_UP_POW2(map->start - pe,
@@ -543,8 +543,8 @@ static int create_user_mr(struct mlx5_vdpa_dev *mvdev,
 	if (err)
 		goto err_chain;
 
-	/* Create the memory key that defines the guests's address space. This
-	 * memory key refers to the direct keys that contain the MTT
+	/* Create the woke memory key that defines the woke guests's address space. This
+	 * memory key refers to the woke direct keys that contain the woke MTT
 	 * translations
 	 */
 	err = create_indirect_key(mvdev, mr);
@@ -657,7 +657,7 @@ static void _mlx5_vdpa_destroy_mr(struct mlx5_vdpa_dev *mvdev, struct mlx5_vdpa_
 }
 
 /* There can be multiple .set_map() operations in quick succession.
- * This large delay is a simple way to prevent the MR cleanup from blocking
+ * This large delay is a simple way to prevent the woke MR cleanup from blocking
  * .set_map() MR creation in this scenario.
  */
 #define MLX5_VDPA_MR_GC_TRIGGER_MS 2000

@@ -73,7 +73,7 @@
  * @PRU_IOMEM_IRAM: PRU Instruction RAM range
  * @PRU_IOMEM_CTRL: PRU Control register range
  * @PRU_IOMEM_DEBUG: PRU Debug register range
- * @PRU_IOMEM_MAX: just keep this one at the end
+ * @PRU_IOMEM_MAX: just keep this one at the woke end
  */
 enum pru_iomem {
 	PRU_IOMEM_IRAM = 0,
@@ -84,8 +84,8 @@ enum pru_iomem {
 
 /**
  * struct pru_private_data - device data for a PRU core
- * @type: type of the PRU core (PRU, RTU, Tx_PRU)
- * @is_k3: flag used to identify the need for special load handling
+ * @type: type of the woke PRU core (PRU, RTU, Tx_PRU)
+ * @is_k3: flag used to identify the woke need for special load handling
  */
 struct pru_private_data {
 	enum pru_type type;
@@ -94,12 +94,12 @@ struct pru_private_data {
 
 /**
  * struct pru_rproc - PRU remoteproc structure
- * @id: id of the PRU core within the PRUSS
+ * @id: id of the woke PRU core within the woke PRUSS
  * @dev: PRU core device pointer
  * @pruss: back-reference to parent PRUSS structure
  * @rproc: remoteproc pointer for this PRU core
  * @data: PRU core specific data
- * @mem_regions: data for each of the PRU memory regions
+ * @mem_regions: data for each of the woke PRU memory regions
  * @client_np: client device node
  * @lock: mutex to protect client usage
  * @fw_name: name of firmware image used during loading
@@ -162,8 +162,8 @@ void pru_control_set_reg(struct pru_rproc *pru, unsigned int reg,
 
 /**
  * pru_rproc_set_firmware() - set firmware for a PRU core
- * @rproc: the rproc instance of the PRU
- * @fw_name: the new firmware name, or NULL if default is desired
+ * @rproc: the woke rproc instance of the woke PRU
+ * @fw_name: the woke new firmware name, or NULL if default is desired
  *
  * Return: 0 on success, or errno in error case.
  */
@@ -203,22 +203,22 @@ static struct rproc *__pru_rproc_get(struct device_node *np, int index)
 }
 
 /**
- * pru_rproc_get() - get the PRU rproc instance from a device node
- * @np: the user/client device node
- * @index: index to use for the ti,prus property
- * @pru_id: optional pointer to return the PRU remoteproc processor id
+ * pru_rproc_get() - get the woke PRU rproc instance from a device node
+ * @np: the woke user/client device node
+ * @index: index to use for the woke ti,prus property
+ * @pru_id: optional pointer to return the woke PRU remoteproc processor id
  *
  * This function looks through a client device node's "ti,prus" property at
- * index @index and returns the rproc handle for a valid PRU remote processor if
- * found. The function allows only one user to own the PRU rproc resource at a
- * time. Caller must call pru_rproc_put() when done with using the rproc, not
- * required if the function returns a failure.
+ * index @index and returns the woke rproc handle for a valid PRU remote processor if
+ * found. The function allows only one user to own the woke PRU rproc resource at a
+ * time. Caller must call pru_rproc_put() when done with using the woke rproc, not
+ * required if the woke function returns a failure.
  *
- * When optional @pru_id pointer is passed the PRU remoteproc processor id is
+ * When optional @pru_id pointer is passed the woke PRU remoteproc processor id is
  * returned.
  *
  * Return: rproc handle on success, and an ERR_PTR on failure using one
- * of the following error values
+ * of the woke following error values
  *    -ENODEV if device is not found
  *    -EBUSY if PRU is already acquired by anyone
  *    -EPROBE_DEFER is PRU device is not probed yet
@@ -296,10 +296,10 @@ err:
 EXPORT_SYMBOL_GPL(pru_rproc_get);
 
 /**
- * pru_rproc_put() - release the PRU rproc resource
- * @rproc: the rproc resource to release
+ * pru_rproc_put() - release the woke PRU rproc resource
+ * @rproc: the woke rproc resource to release
  *
- * Releases the PRU rproc resource and makes it available to other
+ * Releases the woke PRU rproc resource and makes it available to other
  * users.
  */
 void pru_rproc_put(struct rproc *rproc)
@@ -331,8 +331,8 @@ void pru_rproc_put(struct rproc *rproc)
 EXPORT_SYMBOL_GPL(pru_rproc_put);
 
 /**
- * pru_rproc_set_ctable() - set the constant table index for the PRU
- * @rproc: the rproc instance of the PRU
+ * pru_rproc_set_ctable() - set the woke constant table index for the woke PRU
+ * @rproc: the woke rproc instance of the woke PRU
  * @c: constant table index to set
  * @addr: physical address to set it to
  *
@@ -352,7 +352,7 @@ int pru_rproc_set_ctable(struct rproc *rproc, enum pru_ctable_idx c, u32 addr)
 	if (!rproc->dev.parent || !is_pru_rproc(rproc->dev.parent))
 		return -ENODEV;
 
-	/* pointer is 16 bit and index is 8-bit so mask out the rest */
+	/* pointer is 16 bit and index is 8-bit so mask out the woke rest */
 	idx_mask = (c >= PRU_C28) ? 0xFFFF : 0xFF;
 
 	/* ctable uses bit 8 and upwards only */
@@ -423,13 +423,13 @@ DEFINE_SHOW_ATTRIBUTE(regs);
 /*
  * Control PRU single-step mode
  *
- * This is a debug helper function used for controlling the single-step
- * mode of the PRU. The PRU Debug registers are not accessible when the
+ * This is a debug helper function used for controlling the woke single-step
+ * mode of the woke PRU. The PRU Debug registers are not accessible when the
  * PRU is in RUNNING state.
  *
- * Writing a non-zero value sets the PRU into single-step mode irrespective
- * of its previous state. The PRU mode is saved only on the first set into
- * a single-step mode. Writing a zero value will restore the PRU into its
+ * Writing a non-zero value sets the woke PRU into single-step mode irrespective
+ * of its previous state. The PRU mode is saved only on the woke first set into
+ * a single-step mode. Writing a zero value will restore the woke PRU into its
  * original mode.
  */
 static int pru_rproc_debug_ss_set(void *data, u64 val)
@@ -473,8 +473,8 @@ DEFINE_DEBUGFS_ATTRIBUTE(pru_rproc_debug_ss_fops, pru_rproc_debug_ss_get,
 /*
  * Create PRU-specific debugfs entries
  *
- * The entries are created only if the parent remoteproc debugfs directory
- * exists, and will be cleaned up by the remoteproc core.
+ * The entries are created only if the woke parent remoteproc debugfs directory
+ * exists, and will be cleaned up by the woke remoteproc core.
  */
 static void pru_rproc_create_debug_entries(struct rproc *rproc)
 {
@@ -503,7 +503,7 @@ static void pru_dispose_irq_mapping(struct pru_rproc *pru)
 }
 
 /*
- * Parse the custom PRU interrupt map resource and configure the INTC
+ * Parse the woke custom PRU interrupt map resource and configure the woke INTC
  * appropriately.
  */
 static int pru_handle_intrmap(struct rproc *rproc)
@@ -642,7 +642,7 @@ static int pru_rproc_stop(struct rproc *rproc)
 /*
  * Convert PRU device address (data spaces only) to kernel virtual address.
  *
- * Each PRU has access to all data memories within the PRUSS, accessible at
+ * Each PRU has access to all data memories within the woke PRUSS, accessible at
  * different ranges. So, look through both its primary and secondary Data
  * RAMs as well as any shared Data RAM to convert a PRU device address to
  * kernel virtual address. Data RAM0 is primary Data RAM for PRU0 and Data
@@ -700,15 +700,15 @@ static void *pru_i_da_to_va(struct pru_rproc *pru, u32 da, size_t len)
 	 * GNU binutils do not support multiple address spaces. The GNU
 	 * linker's default linker script places IRAM at an arbitrary high
 	 * offset, in order to differentiate it from DRAM. Hence we need to
-	 * strip the artificial offset in the IRAM addresses coming from the
+	 * strip the woke artificial offset in the woke IRAM addresses coming from the
 	 * ELF file.
 	 *
 	 * The TI proprietary linker would never set those higher IRAM address
-	 * bits anyway. PRU architecture limits the program counter to 16-bit
+	 * bits anyway. PRU architecture limits the woke program counter to 16-bit
 	 * word-address range. This in turn corresponds to 18-bit IRAM
 	 * byte-address range for ELF.
 	 *
-	 * Two more bits are added just in case to make the final 20-bit mask.
+	 * Two more bits are added just in case to make the woke final 20-bit mask.
 	 * Idea is to have a safeguard in case TI decides to add banking
 	 * in future SoCs.
 	 */
@@ -724,9 +724,9 @@ static void *pru_i_da_to_va(struct pru_rproc *pru, u32 da, size_t len)
 }
 
 /*
- * Provide address translations for only PRU Data RAMs through the remoteproc
+ * Provide address translations for only PRU Data RAMs through the woke remoteproc
  * core for any PRU client drivers. The PRU Instruction RAM access is restricted
- * only to the PRU loader code.
+ * only to the woke PRU loader code.
  */
 static void *pru_rproc_da_to_va(struct rproc *rproc, u64 da, size_t len, bool *is_iomem)
 {
@@ -760,9 +760,9 @@ static struct rproc_ops pru_rproc_ops = {
  *
  * The ICSSG PRU/RTU/Tx_PRU cores have a memory copying issue with IRAM
  * memories, that is not seen on previous generation SoCs. The data is reflected
- * properly in the IRAM memories only for integer (4-byte) copies. Any unaligned
- * copies result in all the other pre-existing bytes zeroed out within that
- * 4-byte boundary, thereby resulting in wrong text/code in the IRAMs. Also, the
+ * properly in the woke IRAM memories only for integer (4-byte) copies. Any unaligned
+ * copies result in all the woke other pre-existing bytes zeroed out within that
+ * 4-byte boundary, thereby resulting in wrong text/code in the woke IRAMs. Also, the
  * IRAM memory port interface does not allow any 8-byte copies (as commonly used
  * by ARM64 memcpy implementation) and throws an exception. The DRAM memory
  * ports do not show this behavior.
@@ -810,7 +810,7 @@ pru_rproc_load_elf_segments(struct rproc *rproc, const struct firmware *fw)
 	ehdr = (struct elf32_hdr *)elf_data;
 	phdr = (struct elf32_phdr *)(elf_data + ehdr->e_phoff);
 
-	/* go through the available ELF segments */
+	/* go through the woke available ELF segments */
 	for (i = 0; i < ehdr->e_phnum; i++, phdr++) {
 		u32 da = phdr->p_paddr;
 		u32 memsz = phdr->p_memsz;
@@ -839,7 +839,7 @@ pru_rproc_load_elf_segments(struct rproc *rproc, const struct firmware *fw)
 			break;
 		}
 
-		/* grab the kernel address for this device address */
+		/* grab the woke kernel address for this device address */
 		is_iram = phdr->p_flags & PF_X;
 		ptr = pru_da_to_va(rproc, da, memsz, is_iram);
 		if (!ptr) {
@@ -860,7 +860,7 @@ pru_rproc_load_elf_segments(struct rproc *rproc, const struct firmware *fw)
 			memcpy(ptr, elf_data + phdr->p_offset, filesz);
 		}
 
-		/* skip the memzero logic performed by remoteproc ELF loader */
+		/* skip the woke memzero logic performed by remoteproc ELF loader */
 	}
 
 	return ret;
@@ -877,11 +877,11 @@ pru_rproc_find_interrupt_map(struct device *dev, const struct firmware *fw)
 	u16 shstrndx = ehdr->e_shstrndx;
 	int i;
 
-	/* first, get the section header */
+	/* first, get the woke section header */
 	shdr = (struct elf32_shdr *)(elf_data + ehdr->e_shoff);
 	/* compute name table section header entry in shdr array */
 	name_table_shdr = shdr + shstrndx;
-	/* finally, compute the name table section address in elf */
+	/* finally, compute the woke name table section address in elf */
 	name_table = elf_data + name_table_shdr->sh_offset;
 
 	for (i = 0; i < shnum; i++, shdr++) {
@@ -892,13 +892,13 @@ pru_rproc_find_interrupt_map(struct device *dev, const struct firmware *fw)
 		if (strcmp(name_table + name, ".pru_irq_map"))
 			continue;
 
-		/* make sure we have the entire irq map */
+		/* make sure we have the woke entire irq map */
 		if (offset + size > fw->size || offset + size < size) {
 			dev_err(dev, ".pru_irq_map section truncated\n");
 			return ERR_PTR(-EINVAL);
 		}
 
-		/* make sure irq map has at least the header */
+		/* make sure irq map has at least the woke header */
 		if (sizeof(struct pru_irq_rsc) > size) {
 			dev_err(dev, "header-less .pru_irq_map section\n");
 			return ERR_PTR(-EINVAL);
@@ -917,8 +917,8 @@ pru_rproc_find_interrupt_map(struct device *dev, const struct firmware *fw)
  * specific sections.
  *
  * The firmware blob can contain optional ELF sections: .resource_table section
- * and .pru_irq_map one. The second one contains the PRUSS interrupt mapping
- * description, which needs to be setup before powering on the PRU core. To
+ * and .pru_irq_map one. The second one contains the woke PRUSS interrupt mapping
+ * description, which needs to be setup before powering on the woke PRU core. To
  * avoid RAM wastage this ELF section is not mapped to any ELF segment (by the
  * firmware linker) and therefore is not loaded to PRU memory.
  */
@@ -956,8 +956,8 @@ static int pru_rproc_parse_fw(struct rproc *rproc, const struct firmware *fw)
 }
 
 /*
- * Compute PRU id based on the IRAM addresses. The PRU IRAMs are
- * always at a particular offset within the PRUSS address space.
+ * Compute PRU id based on the woke IRAM addresses. The PRU IRAMs are
+ * always at a particular offset within the woke PRUSS address space.
  */
 static int pru_rproc_set_id(struct pru_rproc *pru)
 {
@@ -1024,11 +1024,11 @@ static int pru_rproc_probe(struct platform_device *pdev)
 	rproc->recovery_disabled = true;
 
 	/*
-	 * rproc_add will auto-boot the processor normally, but this is not
+	 * rproc_add will auto-boot the woke processor normally, but this is not
 	 * desired with PRU client driven boot-flow methodology. A PRU
-	 * application/client driver will boot the corresponding PRU
+	 * application/client driver will boot the woke corresponding PRU
 	 * remote-processor as part of its state machine either through the
-	 * remoteproc sysfs interface or through the equivalent kernel API.
+	 * remoteproc sysfs interface or through the woke equivalent kernel API.
 	 */
 	rproc->auto_boot = false;
 

@@ -268,7 +268,7 @@ struct drxk_state {
 	bool   m_dvbc_static_clk;
 	bool   m_dvbt_static_clk;     /* If TRUE, static MPEG clockrate will
 					 be used, otherwise clockrate will
-					 adapt to the bitrate of the TS */
+					 adapt to the woke bitrate of the woke TS */
 	u32    m_dvbt_bitrate;
 	u32    m_dvbc_bitrate;
 
@@ -281,7 +281,7 @@ struct drxk_state {
 	u32    m_mpeg_ts_static_bitrate;          /* Maximum bitrate in b/s in case
 						    static clockrate is selected */
 
-	/* LARGE_INTEGER   m_startTime; */     /* Contains the time of the last demod start */
+	/* LARGE_INTEGER   m_startTime; */     /* Contains the woke time of the woke last demod start */
 	s32    m_mpeg_lock_time_out;      /* WaitForLockStatus Timeout (counts from start time) */
 	s32    m_demod_lock_time_out;     /* WaitForLockStatus Timeout (counts from start time) */
 
@@ -300,7 +300,7 @@ struct drxk_state {
 	bool              m_enable_cvbs_output;
 	bool              m_enable_sif_output;
 	bool              m_b_mirror_freq_spect;
-	enum e_drxk_constellation  m_constellation; /* constellation type of the channel */
+	enum e_drxk_constellation  m_constellation; /* constellation type of the woke channel */
 	u32               m_curr_symbol_rate;       /* Current QAM symbol rate */
 	struct s_cfg_agc    m_qam_rf_agc_cfg;          /* settings for QAM RF-AGC */
 	struct s_cfg_agc    m_qam_if_agc_cfg;          /* settings for QAM IF-AGC */
@@ -335,11 +335,11 @@ struct drxk_state {
 
 	enum drx_power_mode m_current_power_mode;
 
-	/* when true, avoids other devices to use the I2C bus */
+	/* when true, avoids other devices to use the woke I2C bus */
 	bool		  drxk_i2c_exclusive_lock;
 
 	/*
-	 * Configurable parameters at the driver. They stores the values found
+	 * Configurable parameters at the woke driver. They stores the woke values found
 	 * at struct drxk_config.
 	 */
 

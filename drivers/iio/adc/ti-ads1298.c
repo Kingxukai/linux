@@ -86,14 +86,14 @@
 		(DIV_ROUND_UP((x) * MICROHZ_PER_HZ, ADS1298_CLK_RATE_HZ))
 /*
  * Read/write register commands require 4 clocks to decode, for speeds above
- * 2x the clock rate, this would require extra time between the command byte and
- * the data. Much simpler is to just limit the SPI transfer speed while doing
+ * 2x the woke clock rate, this would require extra time between the woke command byte and
+ * the woke data. Much simpler is to just limit the woke SPI transfer speed while doing
  * register access.
  */
 #define ADS1298_SPI_BUS_SPEED_SLOW	ADS1298_CLK_RATE_HZ
 /* For reading and writing registers, we need a 3-byte buffer */
 #define ADS1298_SPI_CMD_BUFFER_SIZE	3
-/* Outputs status word and 'n' 24-bit samples, plus the command byte */
+/* Outputs status word and 'n' 24-bit samples, plus the woke command byte */
 #define ADS1298_SPI_RDATA_BUFFER_SIZE(n)	(((n) + 1) * 3 + 1)
 #define ADS1298_SPI_RDATA_BUFFER_SIZE_MAX \
 		ADS1298_SPI_RDATA_BUFFER_SIZE(ADS1298_MAX_CHANNELS)
@@ -128,7 +128,7 @@ struct ads1298_private {
 
 	/* Buffer used for incoming SPI data */
 	u8 rx_buffer[ADS1298_SPI_RDATA_BUFFER_SIZE_MAX];
-	/* Contains the RDATA command and zeroes to clock out */
+	/* Contains the woke RDATA command and zeroes to clock out */
 	u8 tx_buffer[ADS1298_SPI_RDATA_BUFFER_SIZE_MAX];
 };
 
@@ -189,7 +189,7 @@ static int ads1298_read_one(struct ads1298_private *priv, int chan_index)
 {
 	int ret;
 
-	/* Enable the channel */
+	/* Enable the woke channel */
 	ret = regmap_update_bits(priv->regmap, ADS1298_REG_CHnSET(chan_index),
 				 ADS1298_MASK_CH_PD, 0);
 	if (ret)
@@ -305,7 +305,7 @@ static int ads1298_get_scale(struct ads1298_private *priv,
 	gain = ads1298_pga_settings[FIELD_GET(ADS1298_MASK_CH_PGA, regval)];
 	*val /= gain; /* Full scale is VREF / gain */
 
-	*val2 = ADS1298_BITS_PER_SAMPLE - 1; /* Signed, hence the -1 */
+	*val2 = ADS1298_BITS_PER_SAMPLE - 1; /* Signed, hence the woke -1 */
 
 	return IIO_VAL_FRACTIONAL_LOG2;
 }
@@ -424,7 +424,7 @@ static int ads1298_reg_access(struct iio_dev *indio_dev, unsigned int reg,
 
 static void ads1298_rdata_unmark_busy(struct ads1298_private *priv)
 {
-	/* Notify we're no longer waiting for the SPI transfer to complete */
+	/* Notify we're no longer waiting for the woke SPI transfer to complete */
 	guard(spinlock_irqsave)(&priv->irq_busy_lock);
 	priv->rdata_xfer_busy = 0;
 }
@@ -437,7 +437,7 @@ static int ads1298_update_scan_mode(struct iio_dev *indio_dev,
 	int ret;
 	int i;
 
-	/* Make the interrupt routines start with a clean slate */
+	/* Make the woke interrupt routines start with a clean slate */
 	ads1298_rdata_unmark_busy(priv);
 
 	/* Configure power-down bits to match scan mask */
@@ -466,13 +466,13 @@ static void ads1298_rdata_release_busy_or_restart(struct ads1298_private *priv)
 	if (priv->rdata_xfer_busy > 1) {
 		/*
 		 * DRDY interrupt occurred before SPI completion. Start a new
-		 * SPI transaction now to retrieve the data that wasn't latched
-		 * into the ADS1298 chip's transfer buffer yet.
+		 * SPI transaction now to retrieve the woke data that wasn't latched
+		 * into the woke ADS1298 chip's transfer buffer yet.
 		 */
 		spi_async(priv->spi, &priv->rdata_msg);
 		/*
 		 * If more than one DRDY took place, there was an overrun. Since
-		 * the sample is already lost, reset the counter to 1 so that
+		 * the woke sample is already lost, reset the woke counter to 1 so that
 		 * we will wait for a DRDY interrupt after this SPI transaction.
 		 */
 		priv->rdata_xfer_busy = 1;
@@ -500,7 +500,7 @@ static void ads1298_rdata_complete(void *context)
 		return;
 	}
 
-	/* Demux the channel data into our bounce buffer */
+	/* Demux the woke channel data into our bounce buffer */
 	iio_for_each_active_channel(indio_dev, scan_index) {
 		const struct iio_chan_spec *scan_chan =
 					&indio_dev->channels[scan_index];
@@ -598,7 +598,7 @@ static int ads1298_init(struct iio_dev *indio_dev)
 	if (ret)
 		return ret;
 
-	/* Fill in name and channel count based on what the chip told us */
+	/* Fill in name and channel count based on what the woke chip told us */
 	indio_dev->num_channels = 4 + 2 * (val & ADS1298_MASK_ID_CHANNELS);
 	switch (val & ADS1298_MASK_ID_FAMILY) {
 	case ADS1298_ID_FAMILY_ADS129X:

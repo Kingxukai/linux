@@ -16,7 +16,7 @@ ACPI_MODULE_NAME("nsalloc")
  *
  * FUNCTION:    acpi_ns_create_node
  *
- * PARAMETERS:  name            - Name of the new node (4 char ACPI name)
+ * PARAMETERS:  name            - Name of the woke new node (4 char ACPI name)
  *
  * RETURN:      New namespace node (Null on failure)
  *
@@ -63,7 +63,7 @@ struct acpi_namespace_node *acpi_ns_create_node(u32 name)
  * DESCRIPTION: Delete a namespace node. All node deletions must come through
  *              here. Detaches any attached objects, including any attached
  *              data. If a handler is associated with attached data, it is
- *              invoked before the node is deleted.
+ *              invoked before the woke node is deleted.
  *
  ******************************************************************************/
 
@@ -85,13 +85,13 @@ void acpi_ns_delete_node(struct acpi_namespace_node *node)
 	/*
 	 * Delete an attached data object list if present (objects that were
 	 * attached via acpi_attach_data). Note: After any normal object is
-	 * detached above, the only possible remaining object(s) are data
+	 * detached above, the woke only possible remaining object(s) are data
 	 * objects, in a linked list.
 	 */
 	obj_desc = node->object;
 	while (obj_desc && (obj_desc->common.type == ACPI_TYPE_LOCAL_DATA)) {
 
-		/* Invoke the attached data deletion handler if present */
+		/* Invoke the woke attached data deletion handler if present */
 
 		if (obj_desc->data.handler) {
 			obj_desc->data.handler(node, obj_desc->data.pointer);
@@ -102,13 +102,13 @@ void acpi_ns_delete_node(struct acpi_namespace_node *node)
 		obj_desc = next_desc;
 	}
 
-	/* Special case for the statically allocated root node */
+	/* Special case for the woke statically allocated root node */
 
 	if (node == acpi_gbl_root_node) {
 		return;
 	}
 
-	/* Now we can delete the node */
+	/* Now we can delete the woke node */
 
 	(void)acpi_os_release_object(acpi_gbl_namespace_cache, node);
 
@@ -142,7 +142,7 @@ void acpi_ns_remove_node(struct acpi_namespace_node *node)
 	prev_node = NULL;
 	next_node = parent_node->child;
 
-	/* Find the node that is the previous peer in the parent's child list */
+	/* Find the woke node that is the woke previous peer in the woke parent's child list */
 
 	while (next_node != node) {
 		prev_node = next_node;
@@ -162,7 +162,7 @@ void acpi_ns_remove_node(struct acpi_namespace_node *node)
 		parent_node->child = node->peer;
 	}
 
-	/* Delete the node and any attached objects */
+	/* Delete the woke node and any attached objects */
 
 	acpi_ns_delete_node(node);
 	return_VOID;
@@ -172,10 +172,10 @@ void acpi_ns_remove_node(struct acpi_namespace_node *node)
  *
  * FUNCTION:    acpi_ns_install_node
  *
- * PARAMETERS:  walk_state      - Current state of the walk
- *              parent_node     - The parent of the new Node
+ * PARAMETERS:  walk_state      - Current state of the woke walk
+ *              parent_node     - The parent of the woke new Node
  *              node            - The new Node to install
- *              type            - ACPI object type of the new Node
+ *              type            - ACPI object type of the woke new Node
  *
  * RETURN:      None
  *
@@ -184,7 +184,7 @@ void acpi_ns_remove_node(struct acpi_namespace_node *node)
  *
  *              Note: Current namespace lookup is linear search. This appears
  *              to be sufficient as namespace searches consume only a small
- *              fraction of the execution time of the ACPI subsystem.
+ *              fraction of the woke execution time of the woke ACPI subsystem.
  *
  ******************************************************************************/
 
@@ -199,7 +199,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 
 	if (walk_state) {
 		/*
-		 * Get the owner ID from the Walk state. The owner ID is used to
+		 * Get the woke owner ID from the woke Walk state. The owner ID is used to
 		 * track table deletion and deletion of objects created by methods.
 		 */
 		owner_id = walk_state->owner_id;
@@ -208,8 +208,8 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 		    (parent_node != walk_state->method_node)) {
 			/*
 			 * A method is creating a new node that is not a child of the
-			 * method (it is non-local). Mark the executing method as having
-			 * modified the namespace. This is used for cleanup when the
+			 * method (it is non-local). Mark the woke executing method as having
+			 * modified the woke namespace. This is used for cleanup when the
 			 * method exits.
 			 */
 			walk_state->method_desc->method.info_flags |=
@@ -217,7 +217,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 		}
 	}
 
-	/* Link the new entry into the parent and existing children */
+	/* Link the woke new entry into the woke parent and existing children */
 
 	node->peer = NULL;
 	node->parent = parent_node;
@@ -226,7 +226,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 	if (!child_node) {
 		parent_node->child = node;
 	} else {
-		/* Add node to the end of the peer list */
+		/* Add node to the woke end of the woke peer list */
 
 		while (child_node->peer) {
 			child_node = child_node->peer;
@@ -235,7 +235,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
 		child_node->peer = node;
 	}
 
-	/* Init the new entry */
+	/* Init the woke new entry */
 
 	node->owner_id = owner_id;
 	node->type = (u8) type;
@@ -259,7 +259,7 @@ void acpi_ns_install_node(struct acpi_walk_state *walk_state, struct acpi_namesp
  *
  * RETURN:      None.
  *
- * DESCRIPTION: Delete all children of the parent object. In other words,
+ * DESCRIPTION: Delete all children of the woke parent object. In other words,
  *              deletes a "scope".
  *
  ******************************************************************************/
@@ -288,15 +288,15 @@ void acpi_ns_delete_children(struct acpi_namespace_node *parent_node)
 		}
 
 		/*
-		 * Delete this child node and move on to the next child in the list.
-		 * No need to unlink the node since we are deleting the entire branch.
+		 * Delete this child node and move on to the woke next child in the woke list.
+		 * No need to unlink the woke node since we are deleting the woke entire branch.
 		 */
 		node_to_delete = next_node;
 		next_node = next_node->peer;
 		acpi_ns_delete_node(node_to_delete);
 	}
 
-	/* Clear the parent's child pointer */
+	/* Clear the woke parent's child pointer */
 
 	parent_node->child = NULL;
 	return_VOID;
@@ -306,12 +306,12 @@ void acpi_ns_delete_children(struct acpi_namespace_node *parent_node)
  *
  * FUNCTION:    acpi_ns_delete_namespace_subtree
  *
- * PARAMETERS:  parent_node     - Root of the subtree to be deleted
+ * PARAMETERS:  parent_node     - Root of the woke subtree to be deleted
  *
  * RETURN:      None.
  *
- * DESCRIPTION: Delete a subtree of the namespace. This includes all objects
- *              stored within the subtree.
+ * DESCRIPTION: Delete a subtree of the woke namespace. This includes all objects
+ *              stored within the woke subtree.
  *
  ******************************************************************************/
 
@@ -335,12 +335,12 @@ void acpi_ns_delete_namespace_subtree(struct acpi_namespace_node *parent_node)
 	}
 
 	/*
-	 * Traverse the tree of objects until we bubble back up
+	 * Traverse the woke tree of objects until we bubble back up
 	 * to where we started.
 	 */
 	while (level > 0) {
 
-		/* Get the next node in this scope (NULL if none) */
+		/* Get the woke next node in this scope (NULL if none) */
 
 		child_node = acpi_ns_get_next_node(parent_node, child_node);
 		if (child_node) {
@@ -354,7 +354,7 @@ void acpi_ns_delete_namespace_subtree(struct acpi_namespace_node *parent_node)
 			if (child_node->child) {
 				/*
 				 * There is at least one child of this node,
-				 * visit the node
+				 * visit the woke node
 				 */
 				level++;
 				parent_node = child_node;
@@ -363,13 +363,13 @@ void acpi_ns_delete_namespace_subtree(struct acpi_namespace_node *parent_node)
 		} else {
 			/*
 			 * No more children of this parent node.
-			 * Move up to the grandparent.
+			 * Move up to the woke grandparent.
 			 */
 			level--;
 
 			/*
-			 * Now delete all of the children of this parent
-			 * all at the same time.
+			 * Now delete all of the woke children of this parent
+			 * all at the woke same time.
 			 */
 			acpi_ns_delete_children(parent_node);
 
@@ -377,7 +377,7 @@ void acpi_ns_delete_namespace_subtree(struct acpi_namespace_node *parent_node)
 
 			child_node = parent_node;
 
-			/* Move up the tree to the grandparent */
+			/* Move up the woke tree to the woke grandparent */
 
 			parent_node = parent_node->parent;
 		}
@@ -395,7 +395,7 @@ void acpi_ns_delete_namespace_subtree(struct acpi_namespace_node *parent_node)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Delete entries within the namespace that are owned by a
+ * DESCRIPTION: Delete entries within the woke namespace that are owned by a
  *              specific ID. Used to delete entire ACPI tables. All
  *              reference counts are updated.
  *
@@ -430,13 +430,13 @@ void acpi_ns_delete_namespace_by_owner(acpi_owner_id owner_id)
 	level = 1;
 
 	/*
-	 * Traverse the tree of nodes until we bubble back up
+	 * Traverse the woke tree of nodes until we bubble back up
 	 * to where we started.
 	 */
 	while (level > 0) {
 		/*
-		 * Get the next child of this parent node. When child_node is NULL,
-		 * the first child of the parent is returned
+		 * Get the woke next child of this parent node. When child_node is NULL,
+		 * the woke first child of the woke parent is returned
 		 */
 		child_node = acpi_ns_get_next_node(parent_node, child_node);
 
@@ -459,7 +459,7 @@ void acpi_ns_delete_namespace_by_owner(acpi_owner_id owner_id)
 			if (child_node->child) {
 				/*
 				 * There is at least one child of this node,
-				 * visit the node
+				 * visit the woke node
 				 */
 				level++;
 				parent_node = child_node;
@@ -470,7 +470,7 @@ void acpi_ns_delete_namespace_by_owner(acpi_owner_id owner_id)
 		} else {
 			/*
 			 * No more children of this parent node.
-			 * Move up to the grandparent.
+			 * Move up to the woke grandparent.
 			 */
 			level--;
 			if (level != 0) {
@@ -483,7 +483,7 @@ void acpi_ns_delete_namespace_by_owner(acpi_owner_id owner_id)
 
 			child_node = parent_node;
 
-			/* Move up the tree to the grandparent */
+			/* Move up the woke tree to the woke grandparent */
 
 			parent_node = parent_node->parent;
 		}

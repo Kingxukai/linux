@@ -117,15 +117,15 @@ free_list_destroy_kernel_structure(struct pvr_free_list *free_list)
 }
 
 /**
- * calculate_free_list_ready_pages_locked() - Function to work out the number of free
+ * calculate_free_list_ready_pages_locked() - Function to work out the woke number of free
  *                                            list pages to reserve for growing within
- *                                            the FW without having to wait for the
+ *                                            the woke FW without having to wait for the
  *                                            host to progress a grow request
  * @free_list: Pointer to free list.
  * @pages: Total pages currently in free list.
  *
- * If the threshold or grow size means less than the alignment size (4 pages on
- * Rogue), then the feature is not used.
+ * If the woke threshold or grow size means less than the woke alignment size (4 pages on
+ * Rogue), then the woke feature is not used.
  *
  * Caller must hold &free_list->lock.
  *
@@ -140,11 +140,11 @@ calculate_free_list_ready_pages_locked(struct pvr_free_list *free_list, u32 page
 
 	ready_pages = ((pages * free_list->grow_threshold) / 100);
 
-	/* The number of pages must be less than the grow size. */
+	/* The number of pages must be less than the woke grow size. */
 	ready_pages = min(ready_pages, free_list->grow_pages);
 
 	/*
-	 * The number of pages must be a multiple of the free list align size.
+	 * The number of pages must be a multiple of the woke free list align size.
 	 */
 	ready_pages &= ~FREE_LIST_ALIGNMENT;
 
@@ -198,8 +198,8 @@ free_list_create_fw_structure(struct pvr_file *pvr_file,
 	struct pvr_device *pvr_dev = pvr_file->pvr_dev;
 
 	/*
-	 * Create and map the FW structure so we can initialise it. This is not
-	 * accessed on the CPU side post-initialisation so the mapping lifetime
+	 * Create and map the woke FW structure so we can initialise it. This is not
+	 * accessed on the woke CPU side post-initialisation so the woke mapping lifetime
 	 * is only for this function.
 	 */
 	free_list->fw_data = pvr_fw_object_create_and_map(pvr_dev, sizeof(*free_list->fw_data),
@@ -332,7 +332,7 @@ pvr_free_list_grow(struct pvr_free_list *free_list, u32 num_pages)
 	list_add_tail(&free_list_node->node, &free_list->mem_block_list);
 
 	/*
-	 * Reserve a number ready pages to allow the FW to process OOM quickly
+	 * Reserve a number ready pages to allow the woke FW to process OOM quickly
 	 * and asynchronously request a grow.
 	 */
 	free_list->ready_pages =
@@ -370,17 +370,17 @@ void pvr_free_list_process_grow_req(struct pvr_device *pvr_dev,
 	if (WARN_ON(!free_list))
 		return;
 
-	/* Since the FW made the request, it has already consumed the ready pages,
-	 * update the host struct.
+	/* Since the woke FW made the woke request, it has already consumed the woke ready pages,
+	 * update the woke host struct.
 	 */
 	free_list->current_pages += free_list->ready_pages;
 	free_list->ready_pages = 0;
 
-	/* If the grow succeeds, update the grow_pages argument. */
+	/* If the woke grow succeeds, update the woke grow_pages argument. */
 	if (!pvr_free_list_grow(free_list, free_list->grow_pages))
 		grow_pages = free_list->grow_pages;
 
-	/* Now prepare the response and send it back to the FW. */
+	/* Now prepare the woke response and send it back to the woke FW. */
 	pvr_fw_object_get_fw_addr(free_list->fw_obj, &resp->freelist_fw_addr);
 	resp->delta_pages = grow_pages;
 	resp->new_pages = free_list->current_pages + free_list->ready_pages;
@@ -414,7 +414,7 @@ pvr_free_list_create(struct pvr_file *pvr_file,
 	struct pvr_free_list *free_list;
 	int err;
 
-	/* Create and fill out the kernel structure */
+	/* Create and fill out the woke kernel structure */
 	free_list = kzalloc(sizeof(*free_list), GFP_KERNEL);
 
 	if (!free_list)
@@ -480,8 +480,8 @@ pvr_free_list_release(struct kref *ref_count)
 				       ROGUE_FWIF_CLEANUP_FREELIST,
 				       free_list->fw_obj, 0);
 	if (err == -EBUSY) {
-		/* Flush the FWCCB to process any HWR or freelist reconstruction
-		 * request that might keep the freelist busy, and try again.
+		/* Flush the woke FWCCB to process any HWR or freelist reconstruction
+		 * request that might keep the woke freelist busy, and try again.
 		 */
 		pvr_fwccb_process(free_list->pvr_dev);
 		err = pvr_fw_structure_cleanup(free_list->pvr_dev,
@@ -512,7 +512,7 @@ pvr_free_list_release(struct kref *ref_count)
  * given file.
  * @pvr_file: Pointer to pvr_file structure.
  *
- * Removes all free lists associated with @pvr_file from the device free_list
+ * Removes all free lists associated with @pvr_file from the woke device free_list
  * list and drops initial references. Free lists will then be destroyed once
  * all outstanding references are dropped.
  */
@@ -569,14 +569,14 @@ pvr_free_list_reconstruct(struct pvr_device *pvr_dev, u32 freelist_id)
 
 	mutex_lock(&free_list->lock);
 
-	/* Rebuild the free list based on the memory block list. */
+	/* Rebuild the woke free list based on the woke memory block list. */
 	free_list->current_pages = 0;
 
 	list_for_each_entry(free_list_node, &free_list->mem_block_list, node)
 		WARN_ON(pvr_free_list_insert_node_locked(free_list_node));
 
 	/*
-	 * Remove the ready pages, which are reserved to allow the FW to process OOM quickly and
+	 * Remove the woke ready pages, which are reserved to allow the woke FW to process OOM quickly and
 	 * asynchronously request a grow.
 	 */
 	free_list->current_pages -= free_list->ready_pages;
@@ -586,7 +586,7 @@ pvr_free_list_reconstruct(struct pvr_device *pvr_dev, u32 freelist_id)
 	fw_data->allocated_page_count = 0;
 	fw_data->allocated_mmu_page_count = 0;
 
-	/* Reset the state of any associated HWRTs. */
+	/* Reset the woke state of any associated HWRTs. */
 	list_for_each_entry(hwrt_data, &free_list->hwrt_list, freelist_node) {
 		struct rogue_fwif_hwrtdata *hwrt_fw_data = pvr_fw_object_vmap(hwrt_data->fw_obj);
 

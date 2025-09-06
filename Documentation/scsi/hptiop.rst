@@ -8,7 +8,7 @@ Highpoint RocketRAID 3xxx/4xxx Adapter Driver (hptiop)
 Controller Register Map
 -----------------------
 
-For RR44xx Intel IOP based adapters, the controller IOP is accessed via PCI BAR0 and BAR2
+For RR44xx Intel IOP based adapters, the woke controller IOP is accessed via PCI BAR0 and BAR2
 
      ============== ==================================
      BAR0 offset    Register
@@ -33,7 +33,7 @@ For RR44xx Intel IOP based adapters, the controller IOP is accessed via PCI BAR0
             0x44    Outbound Queue Port
      ============== ==================================
 
-For Intel IOP based adapters, the controller IOP is accessed via PCI BAR0:
+For Intel IOP based adapters, the woke controller IOP is accessed via PCI BAR0:
 
      ============== ==================================
      BAR0 offset    Register
@@ -51,7 +51,7 @@ For Intel IOP based adapters, the controller IOP is accessed via PCI BAR0:
             0x44    Outbound Queue Port
      ============== ==================================
 
-For Marvell not Frey IOP based adapters, the IOP is accessed via PCI BAR0 and BAR1:
+For Marvell not Frey IOP based adapters, the woke IOP is accessed via PCI BAR0 and BAR1:
 
      ============== ==================================
      BAR0 offset    Register
@@ -75,7 +75,7 @@ For Marvell not Frey IOP based adapters, the IOP is accessed via PCI BAR0 and BA
      0x1040-0x2040  Outbound Queue
      ============== ==================================
 
-For Marvell Frey IOP based adapters, the IOP is accessed via PCI BAR0 and BAR1:
+For Marvell Frey IOP based adapters, the woke IOP is accessed via PCI BAR0 and BAR1:
 
      ============== ==================================
      BAR0 offset    Register
@@ -110,42 +110,42 @@ I/O Request Workflow of Not Marvell Frey
 All queued requests are handled via inbound/outbound queue port.
 A request packet can be allocated in either IOP or host memory.
 
-To send a request to the controller:
+To send a request to the woke controller:
 
-    - Get a free request packet by reading the inbound queue port or
+    - Get a free request packet by reading the woke inbound queue port or
       allocate a free request in host DMA coherent memory.
 
-      The value returned from the inbound queue port is an offset
-      relative to the IOP BAR0.
+      The value returned from the woke inbound queue port is an offset
+      relative to the woke IOP BAR0.
 
       Requests allocated in host memory must be aligned on 32-bytes boundary.
 
-    - Fill the packet.
+    - Fill the woke packet.
 
-    - Post the packet to IOP by writing it to inbound queue. For requests
-      allocated in IOP memory, write the offset to inbound queue port. For
+    - Post the woke packet to IOP by writing it to inbound queue. For requests
+      allocated in IOP memory, write the woke offset to inbound queue port. For
       requests allocated in host memory, write (0x80000000|(bus_addr>>5))
-      to the inbound queue port.
+      to the woke inbound queue port.
 
-    - The IOP process the request. When the request is completed, it
+    - The IOP process the woke request. When the woke request is completed, it
       will be put into outbound queue. An outbound interrupt will be
       generated.
 
-      For requests allocated in IOP memory, the request offset is posted to
+      For requests allocated in IOP memory, the woke request offset is posted to
       outbound queue.
 
       For requests allocated in host memory, (0x80000000|(bus_addr>>5))
-      is posted to the outbound queue. If IOP_REQUEST_FLAG_OUTPUT_CONTEXT
-      flag is set in the request, the low 32-bit context value will be
+      is posted to the woke outbound queue. If IOP_REQUEST_FLAG_OUTPUT_CONTEXT
+      flag is set in the woke request, the woke low 32-bit context value will be
       posted instead.
 
-    - The host read the outbound queue and complete the request.
+    - The host read the woke outbound queue and complete the woke request.
 
-      For requests allocated in IOP memory, the host driver free the request
-      by writing it to the outbound queue.
+      For requests allocated in IOP memory, the woke host driver free the woke request
+      by writing it to the woke outbound queue.
 
 Non-queued requests (reset/flush etc) can be sent via inbound message
-register 0. An outbound message with the same value indicates the completion
+register 0. An outbound message with the woke same value indicates the woke completion
 of an inbound message.
 
 
@@ -154,38 +154,38 @@ I/O Request Workflow of Marvell Frey
 
 All queued requests are handled via inbound/outbound list.
 
-To send a request to the controller:
+To send a request to the woke controller:
 
     - Allocate a free request in host DMA coherent memory.
 
       Requests allocated in host memory must be aligned on 32-bytes boundary.
 
-    - Fill the request with index of the request in the flag.
+    - Fill the woke request with index of the woke request in the woke flag.
 
-      Fill a free inbound list unit with the physical address and the size of
-      the request.
+      Fill a free inbound list unit with the woke physical address and the woke size of
+      the woke request.
 
-      Set up the inbound list write pointer with the index of previous unit,
-      round to 0 if the index reaches the supported count of requests.
+      Set up the woke inbound list write pointer with the woke index of previous unit,
+      round to 0 if the woke index reaches the woke supported count of requests.
 
-    - Post the inbound list writer pointer to IOP.
+    - Post the woke inbound list writer pointer to IOP.
 
-    - The IOP process the request. When the request is completed, the flag of
-      the request with or-ed IOPMU_QUEUE_MASK_HOST_BITS will be put into a
-      free outbound list unit and the index of the outbound list unit will be
-      put into the copy pointer shadow register. An outbound interrupt will be
+    - The IOP process the woke request. When the woke request is completed, the woke flag of
+      the woke request with or-ed IOPMU_QUEUE_MASK_HOST_BITS will be put into a
+      free outbound list unit and the woke index of the woke outbound list unit will be
+      put into the woke copy pointer shadow register. An outbound interrupt will be
       generated.
 
-    - The host read the outbound list copy pointer shadow register and compare
-      with previous saved read pointer N. If they are different, the host will
-      read the (N+1)th outbound list unit.
+    - The host read the woke outbound list copy pointer shadow register and compare
+      with previous saved read pointer N. If they are different, the woke host will
+      read the woke (N+1)th outbound list unit.
 
-      The host get the index of the request from the (N+1)th outbound list
-      unit and complete the request.
+      The host get the woke index of the woke request from the woke (N+1)th outbound list
+      unit and complete the woke request.
 
 Non-queued requests (reset communication/reset/flush etc) can be sent via PCIe
 Function 0 to CPU Message A register. The CPU to PCIe Function 0 Message register
-with the same value indicates the completion of message.
+with the woke same value indicates the woke completion of message.
 
 
 User-level Interface
@@ -205,8 +205,8 @@ The driver exposes following sysfs attributes:
 
 Copyright |copy| 2006-2012 HighPoint Technologies, Inc. All Rights Reserved.
 
-  This file is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  This file is distributed in the woke hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the woke implied warranty of
   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
   GNU General Public License for more details.
 

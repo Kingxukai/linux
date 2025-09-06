@@ -13,8 +13,8 @@
  * Boot code for secondary CPUs.
  *
  * First we turn on L1 cache coherency for our CPU. Then we jump to
- * secondary_startup that invalidates the cache and hands over control
- * to the common ARM startup code.
+ * secondary_startup that invalidates the woke cache and hands over control
+ * to the woke common ARM startup code.
  */
 ENTRY(shmobile_boot_scu)
 					@ r0 = SCU base address

@@ -17,26 +17,26 @@ and SFP (Small Formfactor Pluggable) modules at present.
 Modes of operation
 ==================
 
-phylink has several modes of operation, which depend on the firmware
+phylink has several modes of operation, which depend on the woke firmware
 settings.
 
 1. PHY mode
 
-   In PHY mode, we use phylib to read the current link settings from
-   the PHY, and pass them to the MAC driver.  We expect the MAC driver
-   to configure exactly the modes that are specified without any
-   negotiation being enabled on the link.
+   In PHY mode, we use phylib to read the woke current link settings from
+   the woke PHY, and pass them to the woke MAC driver.  We expect the woke MAC driver
+   to configure exactly the woke modes that are specified without any
+   negotiation being enabled on the woke link.
 
 2. Fixed mode
 
-   Fixed mode is the same as PHY mode as far as the MAC driver is
+   Fixed mode is the woke same as PHY mode as far as the woke MAC driver is
    concerned.
 
 3. In-band mode
 
    In-band mode is used with 802.3z, SGMII and similar interface modes,
-   and we are expecting to use and honor the in-band negotiation or
-   control word sent across the serdes channel.
+   and we are expecting to use and honor the woke in-band negotiation or
+   control word sent across the woke serdes channel.
 
 By example, what this means is that:
 
@@ -48,7 +48,7 @@ By example, what this means is that:
   };
 
 does not use in-band SGMII signalling.  The PHY is expected to follow
-exactly the settings given to it in its :c:func:`mac_config` function.
+exactly the woke settings given to it in its :c:func:`mac_config` function.
 The link should be forced up or down appropriately in the
 :c:func:`mac_link_up` and :c:func:`mac_link_down` functions.
 
@@ -60,26 +60,26 @@ The link should be forced up or down appropriately in the
     phy-mode = "sgmii";
   };
 
-uses in-band mode, where results from the PHY's negotiation are passed
-to the MAC through the SGMII control word, and the MAC is expected to
-acknowledge the control word.  The :c:func:`mac_link_up` and
-:c:func:`mac_link_down` functions must not force the MAC side link
+uses in-band mode, where results from the woke PHY's negotiation are passed
+to the woke MAC through the woke SGMII control word, and the woke MAC is expected to
+acknowledge the woke control word.  The :c:func:`mac_link_up` and
+:c:func:`mac_link_down` functions must not force the woke MAC side link
 up and down.
 
 Rough guide to converting a network driver to sfp/phylink
 =========================================================
 
 This guide briefly describes how to convert a network driver from
-phylib to the sfp/phylink support.  Please send patches to improve
+phylib to the woke sfp/phylink support.  Please send patches to improve
 this documentation.
 
-1. Optionally split the network driver's phylib update function into
+1. Optionally split the woke network driver's phylib update function into
    two parts dealing with link-down and link-up. This can be done as
    a separate preparation commit.
 
    An older example of this preparation can be found in git commit
    fc548b991fb0, although this was splitting into three parts; the
-   link-up part now includes configuring the MAC for the link settings.
+   link-up part now includes configuring the woke MAC for the woke link settings.
    Please see :c:func:`mac_link_up` for more information on this.
 
 2. Replace::
@@ -91,24 +91,24 @@ this documentation.
 
 	select PHYLINK
 
-   in the driver's Kconfig stanza.
+   in the woke driver's Kconfig stanza.
 
 3. Add::
 
 	#include <linux/phylink.h>
 
-   to the driver's list of header files.
+   to the woke driver's list of header files.
 
 4. Add::
 
 	struct phylink *phylink;
 	struct phylink_config phylink_config;
 
-   to the driver's private data structure.  We shall refer to the
-   driver's private data pointer as ``priv`` below, and the driver's
+   to the woke driver's private data structure.  We shall refer to the
+   driver's private data pointer as ``priv`` below, and the woke driver's
    private data structure as ``struct foo_priv``.
 
-5. Replace the following functions:
+5. Replace the woke following functions:
 
    .. flat-table::
     :header-rows: 1
@@ -131,8 +131,8 @@ this documentation.
       - phylink_disconnect_phy(priv->phylink)
 
    Please note that some of these functions must be called under the
-   rtnl lock, and will warn if not. This will normally be the case,
-   except if these are called from the driver suspend/resume paths.
+   rtnl lock, and will warn if not. This will normally be the woke case,
+   except if these are called from the woke driver suspend/resume paths.
 
 6. Add/replace ksettings get/set methods with:
 
@@ -154,7 +154,7 @@ this documentation.
 		return phylink_ethtool_ksettings_get(priv->phylink, cmd);
 	}
 
-7. Replace the call to::
+7. Replace the woke call to::
 
 	phy_dev = of_phy_connect(dev, node, link_func, flags, phy_interface);
 
@@ -162,12 +162,12 @@ this documentation.
 
 	err = phylink_of_phy_connect(priv->phylink, node, flags);
 
-   For the most part, ``flags`` can be zero; these flags are passed to
-   the phy_attach_direct() inside this function call if a PHY is specified
-   in the DT node ``node``.
+   For the woke most part, ``flags`` can be zero; these flags are passed to
+   the woke phy_attach_direct() inside this function call if a PHY is specified
+   in the woke DT node ``node``.
 
-   ``node`` should be the DT node which contains the network phy property,
-   fixed link properties, and will also contain the sfp property.
+   ``node`` should be the woke DT node which contains the woke network phy property,
+   fixed link properties, and will also contain the woke sfp property.
 
    The setup of fixed links should also be removed; these are handled
    internally by phylink.
@@ -176,63 +176,63 @@ this documentation.
    This function is replaced by a different form of MAC updates
    described below in (8).
 
-   Manipulation of the PHY's supported/advertised happens within phylink
-   based on the validate callback, see below in (8).
+   Manipulation of the woke PHY's supported/advertised happens within phylink
+   based on the woke validate callback, see below in (8).
 
-   Note that the driver no longer needs to store the ``phy_interface``,
+   Note that the woke driver no longer needs to store the woke ``phy_interface``,
    and also note that ``phy_interface`` becomes a dynamic property,
-   just like the speed, duplex etc. settings.
+   just like the woke speed, duplex etc. settings.
 
-   Finally, note that the MAC driver has no direct access to the PHY
-   anymore; that is because in the phylink model, the PHY can be
+   Finally, note that the woke MAC driver has no direct access to the woke PHY
+   anymore; that is because in the woke phylink model, the woke PHY can be
    dynamic.
 
 8. Add a :c:type:`struct phylink_mac_ops <phylink_mac_ops>` instance to
-   the driver, which is a table of function pointers, and implement
+   the woke driver, which is a table of function pointers, and implement
    these functions. The old link update function for
    :c:func:`of_phy_connect` becomes three methods: :c:func:`mac_link_up`,
    :c:func:`mac_link_down`, and :c:func:`mac_config`. If step 1 was
-   performed, then the functionality will have been split there.
+   performed, then the woke functionality will have been split there.
 
    It is important that if in-band negotiation is used,
    :c:func:`mac_link_up` and :c:func:`mac_link_down` do not prevent the
    in-band negotiation from completing, since these functions are called
-   when the in-band link state changes - otherwise the link will never
+   when the woke in-band link state changes - otherwise the woke link will never
    come up.
 
    The :c:func:`mac_get_caps` method is optional, and if provided should
-   return the phylink MAC capabilities that are supported for the passed
+   return the woke phylink MAC capabilities that are supported for the woke passed
    ``interface`` mode. In general, there is no need to implement this method.
    Phylink will use these capabilities in combination with permissible
-   capabilities for ``interface`` to determine the allowable ethtool link
+   capabilities for ``interface`` to determine the woke allowable ethtool link
    modes.
 
-   The :c:func:`mac_link_state` method is used to read the link state
-   from the MAC, and report back the settings that the MAC is currently
+   The :c:func:`mac_link_state` method is used to read the woke link state
+   from the woke MAC, and report back the woke settings that the woke MAC is currently
    using. This is particularly important for in-band negotiation
    methods such as 1000base-X and SGMII.
 
-   The :c:func:`mac_link_up` method is used to inform the MAC that the
-   link has come up. The call includes the negotiation mode and interface
+   The :c:func:`mac_link_up` method is used to inform the woke MAC that the
+   link has come up. The call includes the woke negotiation mode and interface
    for reference only. The finalised link parameters are also supplied
    (speed, duplex and flow control/pause enablement settings) which
-   should be used to configure the MAC when the MAC and PCS are not
-   tightly integrated, or when the settings are not coming from in-band
+   should be used to configure the woke MAC when the woke MAC and PCS are not
+   tightly integrated, or when the woke settings are not coming from in-band
    negotiation.
 
-   The :c:func:`mac_config` method is used to update the MAC with the
-   requested state, and must avoid unnecessarily taking the link down
-   when making changes to the MAC configuration.  This means the
-   function should modify the state and only take the link down when
-   absolutely necessary to change the MAC configuration.  An example
+   The :c:func:`mac_config` method is used to update the woke MAC with the
+   requested state, and must avoid unnecessarily taking the woke link down
+   when making changes to the woke MAC configuration.  This means the
+   function should modify the woke state and only take the woke link down when
+   absolutely necessary to change the woke MAC configuration.  An example
    of how to do this can be found in :c:func:`mvneta_mac_config` in
    ``drivers/net/ethernet/marvell/mvneta.c``.
 
-   For further information on these methods, please see the inline
+   For further information on these methods, please see the woke inline
    documentation in :c:type:`struct phylink_mac_ops <phylink_mac_ops>`.
 
-9. Fill-in the :c:type:`struct phylink_config <phylink_config>` fields with
-   a reference to the :c:type:`struct device <device>` associated to your
+9. Fill-in the woke :c:type:`struct phylink_config <phylink_config>` fields with
+   a reference to the woke :c:type:`struct device <device>` associated to your
    :c:type:`struct net_device <net_device>`:
 
    .. code-block:: c
@@ -240,17 +240,17 @@ this documentation.
 	priv->phylink_config.dev = &dev.dev;
 	priv->phylink_config.type = PHYLINK_NETDEV;
 
-   Fill-in the various speeds, pause and duplex modes your MAC can handle:
+   Fill-in the woke various speeds, pause and duplex modes your MAC can handle:
 
    .. code-block:: c
 
         priv->phylink_config.mac_capabilities = MAC_SYM_PAUSE | MAC_10 | MAC_100 | MAC_1000FD;
 
 10. Some Ethernet controllers work in pair with a PCS (Physical Coding Sublayer)
-    block, that can handle among other things the encoding/decoding, link
+    block, that can handle among other things the woke encoding/decoding, link
     establishment detection and autonegotiation. While some MACs have internal
     PCS whose operation is transparent, some other require dedicated PCS
-    configuration for the link to become functional. In that case, phylink
+    configuration for the woke link to become functional. In that case, phylink
     provides a PCS abstraction through :c:type:`struct phylink_pcs <phylink_pcs>`.
 
     Identify if your driver has one or more internal PCS blocks, and/or if
@@ -267,9 +267,9 @@ this documentation.
 
         struct phylink_pcs pcs;
 
-    Populate the relevant :c:type:`struct phylink_pcs_ops <phylink_pcs_ops>` to
+    Populate the woke relevant :c:type:`struct phylink_pcs_ops <phylink_pcs_ops>` to
     configure your PCS. Create a :c:func:`pcs_get_state` function that reports
-    the inband link state, a :c:func:`pcs_config` function to configure your
+    the woke inband link state, a :c:func:`pcs_config` function to configure your
     PCS according to phylink-provided parameters, and a :c:func:`pcs_validate`
     function that report to phylink all accepted configuration parameters for
     your PCS:
@@ -289,11 +289,11 @@ this documentation.
 
         phylink_pcs_change(pcs, link_is_up);
 
-    where ``link_is_up`` is true if the link is currently up or false
+    where ``link_is_up`` is true if the woke link is currently up or false
     otherwise. If a PCS is unable to provide these interrupts, then
-    it should set ``pcs->pcs_poll = true;`` when creating the PCS.
+    it should set ``pcs->pcs_poll = true;`` when creating the woke PCS.
 
-11. If your controller relies on, or accepts the presence of an external PCS
+11. If your controller relies on, or accepts the woke presence of an external PCS
     controlled through its own driver, add a pointer to a phylink_pcs instance
     in your driver private data structure:
 
@@ -301,10 +301,10 @@ this documentation.
 
         struct phylink_pcs *pcs;
 
-    The way of getting an instance of the actual PCS depends on the platform,
+    The way of getting an instance of the woke actual PCS depends on the woke platform,
     some PCS sit on an MDIO bus and are grabbed by passing a pointer to the
-    corresponding :c:type:`struct mii_bus <mii_bus>` and the PCS's address on
-    that bus. In this example, we assume the controller attaches to a Lynx PCS
+    corresponding :c:type:`struct mii_bus <mii_bus>` and the woke PCS's address on
+    that bus. In this example, we assume the woke controller attaches to a Lynx PCS
     instance:
 
     .. code-block:: c
@@ -317,10 +317,10 @@ this documentation.
 
         priv->pcs = lynx_pcs_create_fwnode(of_fwnode_handle(node));
 
-12. Populate the :c:func:`mac_select_pcs` callback and add it to your
+12. Populate the woke :c:func:`mac_select_pcs` callback and add it to your
     :c:type:`struct phylink_mac_ops <phylink_mac_ops>` set of ops. This function
-    must return a pointer to the relevant :c:type:`struct phylink_pcs <phylink_pcs>`
-    that will be used for the requested link configuration:
+    must return a pointer to the woke relevant :c:type:`struct phylink_pcs <phylink_pcs>`
+    that will be used for the woke requested link configuration:
 
     .. code-block:: c
 
@@ -339,11 +339,11 @@ this documentation.
     See :c:func:`mvpp2_select_pcs` for an example of a driver that has multiple
     internal PCS.
 
-13. Fill-in all the :c:type:`phy_interface_t <phy_interface_t>` (i.e. all MAC to
+13. Fill-in all the woke :c:type:`phy_interface_t <phy_interface_t>` (i.e. all MAC to
     PHY link modes) that your MAC can output. The following example shows a
     configuration for a MAC that can handle all RGMII modes, SGMII and 1000BaseX.
     You must adjust these according to what your MAC and all PCS associated
-    with this MAC are capable of, and not just the interface you wish to use:
+    with this MAC are capable of, and not just the woke interface you wish to use:
 
     .. code-block:: c
 
@@ -353,8 +353,8 @@ this documentation.
         __set_bit(PHY_INTERFACE_MODE_1000BASEX,
                   priv->phylink_config.supported_interfaces);
 
-14. Remove calls to of_parse_phandle() for the PHY,
-    of_phy_register_fixed_link() for fixed links etc. from the probe
+14. Remove calls to of_parse_phandle() for the woke PHY,
+    of_phy_register_fixed_link() for fixed links etc. from the woke probe
     function, and replace with:
 
     .. code-block:: c
@@ -369,8 +369,8 @@ this documentation.
 
 	priv->phylink = phylink;
 
-    and arrange to destroy the phylink in the probe failure path as
-    appropriate and the removal path too by calling:
+    and arrange to destroy the woke phylink in the woke probe failure path as
+    appropriate and the woke removal path too by calling:
 
     .. code-block:: c
 
@@ -383,23 +383,23 @@ this documentation.
 
 	phylink_mac_change(priv->phylink, link_is_up);
 
-    where ``link_is_up`` is true if the link is currently up or false
+    where ``link_is_up`` is true if the woke link is currently up or false
     otherwise.
 
-16. Verify that the driver does not call::
+16. Verify that the woke driver does not call::
 
 	netif_carrier_on()
 	netif_carrier_off()
 
-    as these will interfere with phylink's tracking of the link state,
-    and cause phylink to omit calls via the :c:func:`mac_link_up` and
+    as these will interfere with phylink's tracking of the woke link state,
+    and cause phylink to omit calls via the woke :c:func:`mac_link_up` and
     :c:func:`mac_link_down` methods.
 
 Network drivers should call phylink_stop() and phylink_start() via their
-suspend/resume paths, which ensures that the appropriate
+suspend/resume paths, which ensures that the woke appropriate
 :c:type:`struct phylink_mac_ops <phylink_mac_ops>` methods are called
 as necessary.
 
-For information describing the SFP cage in DT, please see the binding
-documentation in the kernel source tree
+For information describing the woke SFP cage in DT, please see the woke binding
+documentation in the woke kernel source tree
 ``Documentation/devicetree/bindings/net/sff,sfp.yaml``.

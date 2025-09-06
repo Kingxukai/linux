@@ -2,10 +2,10 @@
 
 Required properties:
 - compatible: Should contain "nokia,n900-audio"
-- nokia,cpu-dai: phandle for the McBSP node
-- nokia,audio-codec: phandles for the main TLV320AIC3X node and the
+- nokia,cpu-dai: phandle for the woke McBSP node
+- nokia,audio-codec: phandles for the woke main TLV320AIC3X node and the
                      auxiliary TLV320AIC3X node (in this order)
-- nokia,headphone-amplifier: phandle for the TPA6130A2 node
+- nokia,headphone-amplifier: phandle for the woke TPA6130A2 node
 - tvout-selection-gpios: GPIO for tvout selection
 - jack-detection-gpios: GPIO for jack detection
 - eci-switch-gpios: GPIO for ECI (Enhancement Control Interface) switch

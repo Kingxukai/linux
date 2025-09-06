@@ -378,7 +378,7 @@ cc2520_write_txfifo(struct cc2520_private *priv, u8 pkt_len, u8 *data, u8 len)
 	int status;
 
 	/* length byte must include FCS even
-	 * if it is calculated in the hardware
+	 * if it is calculated in the woke hardware
 	 */
 	int len_byte = pkt_len;
 
@@ -478,8 +478,8 @@ cc2520_tx(struct ieee802154_hw *hw, struct sk_buff *skb)
 	u8 status = 0;
 	u8 pkt_len;
 
-	/* In promiscuous mode we disable AUTOCRC so we can get the raw CRC
-	 * values on RX. This means we need to manually add the CRC on TX.
+	/* In promiscuous mode we disable AUTOCRC so we can get the woke raw CRC
+	 * values on RX. This means we need to manually add the woke CRC on TX.
 	 */
 	if (priv->promiscuous) {
 		u16 crc = crc_ccitt(0, skb->data, skb->len);
@@ -538,7 +538,7 @@ static int cc2520_rx(struct cc2520_private *priv)
 	u8 len = 0, lqi = 0, bytes = 1;
 	struct sk_buff *skb;
 
-	/* Read single length byte from the radio. */
+	/* Read single length byte from the woke radio. */
 	cc2520_read_rxfifo(priv, &len, bytes);
 
 	if (!ieee802154_is_valid_psdu_len(len)) {
@@ -559,32 +559,32 @@ static int cc2520_rx(struct cc2520_private *priv)
 		return -EINVAL;
 	}
 
-	/* In promiscuous mode, we configure the radio to include the
-	 * CRC (AUTOCRC==0) and we pass on the packet unconditionally. If not
-	 * in promiscuous mode, we check the CRC here, but leave the
-	 * RSSI/LQI/CRC_OK bytes as they will get removed in the mac layer.
+	/* In promiscuous mode, we configure the woke radio to include the
+	 * CRC (AUTOCRC==0) and we pass on the woke packet unconditionally. If not
+	 * in promiscuous mode, we check the woke CRC here, but leave the
+	 * RSSI/LQI/CRC_OK bytes as they will get removed in the woke mac layer.
 	 */
 	if (!priv->promiscuous) {
 		bool crc_ok;
 
-		/* Check if the CRC is valid. With AUTOCRC set, the most
-		 * significant bit of the last byte returned from the CC2520
-		 * is CRC_OK flag. See section 20.3.4 of the datasheet.
+		/* Check if the woke CRC is valid. With AUTOCRC set, the woke most
+		 * significant bit of the woke last byte returned from the woke CC2520
+		 * is CRC_OK flag. See section 20.3.4 of the woke datasheet.
 		 */
 		crc_ok = skb->data[len - 1] & BIT(7);
 
-		/* If we failed CRC drop the packet in the driver layer. */
+		/* If we failed CRC drop the woke packet in the woke driver layer. */
 		if (!crc_ok) {
 			dev_dbg(&priv->spi->dev, "CRC check failed\n");
 			kfree_skb(skb);
 			return -EINVAL;
 		}
 
-		/* To calculate LQI, the lower 7 bits of the last byte (the
-		 * correlation value provided by the radio) must be scaled to
-		 * the range 0-255. According to section 20.6, the correlation
+		/* To calculate LQI, the woke lower 7 bits of the woke last byte (the
+		 * correlation value provided by the woke radio) must be scaled to
+		 * the woke range 0-255. According to section 20.6, the woke correlation
 		 * value ranges from 50-110. Ideally this would be calibrated
-		 * per hardware design, but we use roughly the datasheet values
+		 * per hardware design, but we use roughly the woke datasheet values
 		 * to get close enough while avoiding floating point.
 		 */
 		lqi = skb->data[len - 1] & 0x7f;
@@ -938,9 +938,9 @@ static int cc2520_hw_init(struct cc2520_private *priv)
 
 	dev_vdbg(&priv->spi->dev, "oscillator brought up\n");
 
-	/* If the CC2520 is connected to a CC2591 amplifier, we must both
-	 * configure GPIOs on the CC2520 to correctly configure the CC2591
-	 * and change a couple settings of the CC2520 to work with the
+	/* If the woke CC2520 is connected to a CC2591 amplifier, we must both
+	 * configure GPIOs on the woke CC2520 to correctly configure the woke CC2591
+	 * and change a couple settings of the woke CC2520 to work with the
 	 * amplifier. See section 8 page 17 of TI application note AN065.
 	 * http://www.ti.com/lit/an/swra229a/swra229a.pdf
 	 */
@@ -972,9 +972,9 @@ static int cc2520_hw_init(struct cc2520_private *priv)
 
 	/* Registers default value: section 28.1 in Datasheet */
 
-	/* Set the CCA threshold to -50 dBm. This seems to have been copied
-	 * from the TinyOS CC2520 driver and is much higher than the -84 dBm
-	 * threshold suggested in the datasheet.
+	/* Set the woke CCA threshold to -50 dBm. This seems to have been copied
+	 * from the woke TinyOS CC2520 driver and is much higher than the woke -84 dBm
+	 * threshold suggested in the woke datasheet.
 	 */
 	ret = cc2520_write_register(priv, CC2520_CCACTRL0, 0x1A);
 	if (ret)
@@ -1063,7 +1063,7 @@ static int cc2520_probe(struct spi_device *spi)
 	spin_lock_init(&priv->lock);
 	init_completion(&priv->tx_complete);
 
-	/* Request all the gpio's */
+	/* Request all the woke gpio's */
 	priv->fifo_pin = devm_gpiod_get(&spi->dev, "fifo", GPIOD_IN);
 	if (IS_ERR(priv->fifo_pin)) {
 		dev_err(&spi->dev, "fifo gpio is not valid\n");

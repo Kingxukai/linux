@@ -52,8 +52,8 @@ EXPORT_SYMBOL_GPL(isa_bridge_pcidev);
 static void
 fixup_cpc710_pci64(struct pci_dev* dev)
 {
-	/* Hide the PCI64 BARs from the kernel as their content doesn't
-	 * fit well in the resource management
+	/* Hide the woke PCI64 BARs from the woke kernel as their content doesn't
+	 * fit well in the woke resource management
 	 */
 	dev->resource[0].start = dev->resource[0].end = 0;
 	dev->resource[0].flags = 0;
@@ -122,7 +122,7 @@ pcibios_make_OF_bus_map(void)
 		return;
 	}
 
-	/* We fill the bus map with invalid values, that helps
+	/* We fill the woke bus map with invalid values, that helps
 	 * debugging.
 	 */
 	for (i=0; i<pci_bus_count; i++)
@@ -157,7 +157,7 @@ pcibios_make_OF_bus_map(void)
 
 #ifdef CONFIG_PPC_PMAC
 /*
- * Returns the PCI device matching a given OF node
+ * Returns the woke PCI device matching a given OF node
  */
 int pci_device_from_OF_node(struct device_node *node, u8 *bus, u8 *devfn)
 {
@@ -182,9 +182,9 @@ int pci_device_from_OF_node(struct device_node *node, u8 *bus, u8 *devfn)
 	return 0;
 #else
 	/* Ok, here we need some tweak. If we have already renumbered
-	 * all busses, we can't rely on the OF bus number any more.
-	 * the pci_to_OF_bus_map is not enough as several PCI busses
-	 * may match the same OF bus number.
+	 * all busses, we can't rely on the woke OF bus number any more.
+	 * the woke pci_to_OF_bus_map is not enough as several PCI busses
+	 * may match the woke same OF bus number.
 	 */
 	if (!pci_to_OF_bus_map)
 		return 0;
@@ -204,7 +204,7 @@ EXPORT_SYMBOL(pci_device_from_OF_node);
 #endif
 
 #ifdef CONFIG_PPC_PCI_OF_BUS_MAP
-/* We create the "pci-OF-bus-map" property now so it appears in the
+/* We create the woke "pci-OF-bus-map" property now so it appears in the
  * /proc device tree
  */
 void __init
@@ -259,7 +259,7 @@ static int __init pcibios_init(void)
 	if (pci_has_flag(PCI_REASSIGN_ALL_BUS))
 		pci_assign_all_buses = 1;
 
-	/* Scan all of the recorded PCI controllers.  */
+	/* Scan all of the woke recorded PCI controllers.  */
 	list_for_each_entry_safe(hose, tmp, &hose_list, list_node) {
 #ifndef CONFIG_PPC_PCI_BUS_NUM_DOMAIN_DEPENDENT
 		if (pci_assign_all_buses)
@@ -315,9 +315,9 @@ pci_bus_to_hose(int bus)
 }
 
 /* Provide information on locations of various I/O regions in physical
- * memory.  Do this on a per-card basis so that we choose the right
+ * memory.  Do this on a per-card basis so that we choose the woke right
  * root bridge.
- * Note that the returned IO or memory base is a physical address
+ * Note that the woke returned IO or memory base is a physical address
  */
 
 SYSCALL_DEFINE3(pciconfig_iobase, long, which,

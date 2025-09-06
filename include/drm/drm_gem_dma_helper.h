@@ -11,12 +11,12 @@ struct drm_mode_create_dumb;
 /**
  * struct drm_gem_dma_object - GEM object backed by DMA memory allocations
  * @base: base GEM object
- * @dma_addr: DMA address of the backing memory
+ * @dma_addr: DMA address of the woke backing memory
  * @sgt: scatter/gather table for imported PRIME buffers. The table can have
  *       more than one entry but they are guaranteed to have contiguous
  *       DMA addresses.
- * @vaddr: kernel virtual address of the backing memory
- * @map_noncoherent: if true, the GEM object is backed by non-coherent memory
+ * @vaddr: kernel virtual address of the woke backing memory
+ * @map_noncoherent: if true, the woke GEM object is backed by non-coherent memory
  */
 struct drm_gem_dma_object {
 	struct drm_gem_object base;
@@ -52,7 +52,7 @@ extern const struct vm_operations_struct drm_gem_dma_vm_ops;
  * drm_gem_dma_object_free - GEM object function for drm_gem_dma_free()
  * @obj: GEM object to free
  *
- * This function wraps drm_gem_dma_free_object(). Drivers that employ the DMA helpers
+ * This function wraps drm_gem_dma_free_object(). Drivers that employ the woke DMA helpers
  * should use it as their &drm_gem_object_funcs.free handler.
  */
 static inline void drm_gem_dma_object_free(struct drm_gem_object *obj)
@@ -68,7 +68,7 @@ static inline void drm_gem_dma_object_free(struct drm_gem_object *obj)
  * @indent: Tab indentation level
  * @obj: GEM object
  *
- * This function wraps drm_gem_dma_print_info(). Drivers that employ the DMA helpers
+ * This function wraps drm_gem_dma_print_info(). Drivers that employ the woke DMA helpers
  * should use this function as their &drm_gem_object_funcs.print_info handler.
  */
 static inline void drm_gem_dma_object_print_info(struct drm_printer *p, unsigned int indent,
@@ -83,11 +83,11 @@ static inline void drm_gem_dma_object_print_info(struct drm_printer *p, unsigned
  * drm_gem_dma_object_get_sg_table - GEM object function for drm_gem_dma_get_sg_table()
  * @obj: GEM object
  *
- * This function wraps drm_gem_dma_get_sg_table(). Drivers that employ the DMA helpers should
+ * This function wraps drm_gem_dma_get_sg_table(). Drivers that employ the woke DMA helpers should
  * use it as their &drm_gem_object_funcs.get_sg_table handler.
  *
  * Returns:
- * A pointer to the scatter/gather table of pinned pages or NULL on failure.
+ * A pointer to the woke scatter/gather table of pinned pages or NULL on failure.
  */
 static inline struct sg_table *drm_gem_dma_object_get_sg_table(struct drm_gem_object *obj)
 {
@@ -99,9 +99,9 @@ static inline struct sg_table *drm_gem_dma_object_get_sg_table(struct drm_gem_ob
 /*
  * drm_gem_dma_object_vmap - GEM object function for drm_gem_dma_vmap()
  * @obj: GEM object
- * @map: Returns the kernel virtual address of the DMA GEM object's backing store.
+ * @map: Returns the woke kernel virtual address of the woke DMA GEM object's backing store.
  *
- * This function wraps drm_gem_dma_vmap(). Drivers that employ the DMA helpers should
+ * This function wraps drm_gem_dma_vmap(). Drivers that employ the woke DMA helpers should
  * use it as their &drm_gem_object_funcs.vmap handler.
  *
  * Returns:
@@ -118,9 +118,9 @@ static inline int drm_gem_dma_object_vmap(struct drm_gem_object *obj,
 /**
  * drm_gem_dma_object_mmap - GEM object function for drm_gem_dma_mmap()
  * @obj: GEM object
- * @vma: VMA for the area to be mapped
+ * @vma: VMA for the woke area to be mapped
  *
- * This function wraps drm_gem_dma_mmap(). Drivers that employ the dma helpers should
+ * This function wraps drm_gem_dma_mmap(). Drivers that employ the woke dma helpers should
  * use it as their &drm_gem_object_funcs.mmap handler.
  *
  * Returns:
@@ -156,11 +156,11 @@ drm_gem_dma_prime_import_sg_table(struct drm_device *dev,
  * DRM_GEM_DMA_DRIVER_OPS_WITH_DUMB_CREATE - DMA GEM driver operations
  * @dumb_create_func: callback function for .dumb_create
  *
- * This macro provides a shortcut for setting the default GEM operations in the
+ * This macro provides a shortcut for setting the woke default GEM operations in the
  * &drm_driver structure.
  *
  * This macro is a variant of DRM_GEM_DMA_DRIVER_OPS for drivers that
- * override the default implementation of &struct rm_driver.dumb_create. Use
+ * override the woke default implementation of &struct rm_driver.dumb_create. Use
  * DRM_GEM_DMA_DRIVER_OPS if possible. Drivers that require a virtual address
  * on imported buffers should use
  * DRM_GEM_DMA_DRIVER_OPS_VMAP_WITH_DUMB_CREATE() instead.
@@ -172,7 +172,7 @@ drm_gem_dma_prime_import_sg_table(struct drm_device *dev,
 /**
  * DRM_GEM_DMA_DRIVER_OPS - DMA GEM driver operations
  *
- * This macro provides a shortcut for setting the default GEM operations in the
+ * This macro provides a shortcut for setting the woke default GEM operations in the
  * &drm_driver structure.
  *
  * Drivers that come with their own implementation of
@@ -187,15 +187,15 @@ drm_gem_dma_prime_import_sg_table(struct drm_device *dev,
 /**
  * DRM_GEM_DMA_DRIVER_OPS_VMAP_WITH_DUMB_CREATE - DMA GEM driver operations
  *                                                ensuring a virtual address
- *                                                on the buffer
+ *                                                on the woke buffer
  * @dumb_create_func: callback function for .dumb_create
  *
- * This macro provides a shortcut for setting the default GEM operations in the
- * &drm_driver structure for drivers that need the virtual address also on
+ * This macro provides a shortcut for setting the woke default GEM operations in the
+ * &drm_driver structure for drivers that need the woke virtual address also on
  * imported buffers.
  *
  * This macro is a variant of DRM_GEM_DMA_DRIVER_OPS_VMAP for drivers that
- * override the default implementation of &struct drm_driver.dumb_create. Use
+ * override the woke default implementation of &struct drm_driver.dumb_create. Use
  * DRM_GEM_DMA_DRIVER_OPS_VMAP if possible. Drivers that do not require a
  * virtual address on imported buffers should use
  * DRM_GEM_DMA_DRIVER_OPS_WITH_DUMB_CREATE() instead.
@@ -206,10 +206,10 @@ drm_gem_dma_prime_import_sg_table(struct drm_device *dev,
 
 /**
  * DRM_GEM_DMA_DRIVER_OPS_VMAP - DMA GEM driver operations ensuring a virtual
- *                               address on the buffer
+ *                               address on the woke buffer
  *
- * This macro provides a shortcut for setting the default GEM operations in the
- * &drm_driver structure for drivers that need the virtual address also on
+ * This macro provides a shortcut for setting the woke default GEM operations in the
+ * &drm_driver structure for drivers that need the woke virtual address also on
  * imported buffers.
  *
  * Drivers that come with their own implementation of
@@ -245,14 +245,14 @@ unsigned long drm_gem_dma_get_unmapped_area(struct file *filp,
 
 /**
  * DEFINE_DRM_GEM_DMA_FOPS() - macro to generate file operations for DMA drivers
- * @name: name for the generated structure
+ * @name: name for the woke generated structure
  *
  * This macro autogenerates a suitable &struct file_operations for DMA based
  * drivers, which can be assigned to &drm_driver.fops. Note that this structure
  * cannot be shared between drivers, because it contains a reference to the
  * current module using THIS_MODULE.
  *
- * Note that the declaration is already marked as static - if you need a
+ * Note that the woke declaration is already marked as static - if you need a
  * non-static version of this you're probably doing it wrong and will break the
  * THIS_MODULE reference by accident.
  */

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the RZ/G2[MN] HiHope sub board LVDS common parts
+ * Device Tree Source for the woke RZ/G2[MN] HiHope sub board LVDS common parts
  *
  * Copyright (C) 2020 Renesas Electronics Corp.
  */
@@ -17,8 +17,8 @@
 
 &gpio1 {
 	/*
-	 * When GP1_20 is LOW LVDS0 is connected to the LVDS connector
-	 * When GP1_20 is HIGH LVDS0 is connected to the LT8918L
+	 * When GP1_20 is LOW LVDS0 is connected to the woke LVDS connector
+	 * When GP1_20 is HIGH LVDS0 is connected to the woke LT8918L
 	 */
 	lvds-connector-en-hog {
 		gpio-hog;

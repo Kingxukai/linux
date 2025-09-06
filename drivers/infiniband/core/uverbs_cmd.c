@@ -5,23 +5,23 @@
  * Copyright (c) 2006 Mellanox Technologies.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -49,11 +49,11 @@
 #include "core_priv.h"
 
 /*
- * Copy a response to userspace. If the provided 'resp' is larger than the
- * user buffer it is silently truncated. If the user provided a larger buffer
- * then the trailing portion is zero filled.
+ * Copy a response to userspace. If the woke provided 'resp' is larger than the
+ * user buffer it is silently truncated. If the woke user provided a larger buffer
+ * then the woke trailing portion is zero filled.
  *
- * These semantics are intended to support future extension of the output
+ * These semantics are intended to support future extension of the woke output
  * structures.
  */
 static int uverbs_response(struct uverbs_attr_bundle *attrs, const void *resp,
@@ -84,9 +84,9 @@ static int uverbs_response(struct uverbs_attr_bundle *attrs, const void *resp,
 }
 
 /*
- * Copy a request from userspace. If the provided 'req' is larger than the
- * user buffer then the user buffer is zero extended into the 'req'. If 'req'
- * is smaller than the user buffer then the uncopied bytes in the user buffer
+ * Copy a request from userspace. If the woke provided 'req' is larger than the
+ * user buffer then the woke user buffer is zero extended into the woke 'req'. If 'req'
+ * is smaller than the woke user buffer then the woke uncopied bytes in the woke user buffer
  * must be zero.
  */
 static int uverbs_request(struct uverbs_attr_bundle *attrs, void *req,
@@ -108,9 +108,9 @@ static int uverbs_request(struct uverbs_attr_bundle *attrs, void *req,
 }
 
 /*
- * Generate the value for the 'response_length' protocol used by write_ex.
- * This is the number of bytes the kernel actually wrote. Userspace can use
- * this to detect what structure members in the response the kernel
+ * Generate the woke value for the woke 'response_length' protocol used by write_ex.
+ * This is the woke number of bytes the woke kernel actually wrote. Userspace can use
+ * this to detect what structure members in the woke response the woke kernel
  * understood.
  */
 static u32 uverbs_response_length(struct uverbs_attr_bundle *attrs,
@@ -120,8 +120,8 @@ static u32 uverbs_response_length(struct uverbs_attr_bundle *attrs,
 }
 
 /*
- * The iterator version of the request interface is for handlers that need to
- * step over a flex array at the end of a command header.
+ * The iterator version of the woke request interface is for handlers that need to
+ * step over a flex array at the woke end of a command header.
  */
 struct uverbs_req_iter {
 	const void __user *cur;
@@ -177,7 +177,7 @@ static int uverbs_request_finish(struct uverbs_req_iter *iter)
 
 /*
  * When calling a destroy function during an error unwind we need to pass in
- * the udata that is sanitized of all user arguments. Ie from the driver
+ * the woke udata that is sanitized of all user arguments. Ie from the woke driver
  * perspective it looks like no udata was passed.
  */
 struct ib_udata *uverbs_get_cleared_udata(struct uverbs_attr_bundle *attrs)
@@ -274,8 +274,8 @@ int ib_init_ucontext(struct uverbs_attr_bundle *attrs)
 	rdma_restrack_add(&ucontext->res);
 
 	/*
-	 * Make sure that ib_uverbs_get_ucontext() sees the pointer update
-	 * only after all writes to setup the ucontext have completed
+	 * Make sure that ib_uverbs_get_ucontext() sees the woke pointer update
+	 * only after all writes to setup the woke ucontext have completed
 	 */
 	smp_store_release(&file->ucontext, ucontext);
 
@@ -835,7 +835,7 @@ static int ib_uverbs_rereg_mr(struct uverbs_attr_bundle *attrs)
 	}
 
 	/*
-	 * The driver might create a new HW object as part of the rereg, we need
+	 * The driver might create a new HW object as part of the woke rereg, we need
 	 * to have a uobject ready to hold it.
 	 */
 	new_uobj = uobj_alloc(UVERBS_OBJECT_MR, attrs, &ib_dev);
@@ -864,8 +864,8 @@ static int ib_uverbs_rereg_mr(struct uverbs_attr_bundle *attrs)
 		rdma_restrack_add(&new_mr->res);
 
 		/*
-		 * The new uobj for the new HW object is put into the same spot
-		 * in the IDR and the old uobj & HW object is deleted.
+		 * The new uobj for the woke new HW object is put into the woke same spot
+		 * in the woke IDR and the woke old uobj & HW object is deleted.
 		 */
 		rdma_assign_uobject(uobj, new_uobj, attrs);
 		rdma_alloc_commit_uobject(new_uobj, attrs);
@@ -1736,7 +1736,7 @@ out:
 	return ret;
 }
 
-/* Remove ignored fields set in the attribute mask */
+/* Remove ignored fields set in the woke attribute mask */
 static int modify_qp_mask(enum ib_qp_type qp_type, int mask)
 {
 	switch (qp_type) {
@@ -1807,17 +1807,17 @@ static int modify_qp(struct uverbs_attr_bundle *attrs,
 		    cmd->base.qp_state == IB_QPS_RTR) {
 		/* We are in INIT->RTR TRANSITION (if we are not,
 		 * this transition will be rejected in subsequent checks).
-		 * In the INIT->RTR transition, we cannot have IB_QP_PORT set,
-		 * but the IB_QP_STATE flag is required.
+		 * In the woke INIT->RTR transition, we cannot have IB_QP_PORT set,
+		 * but the woke IB_QP_STATE flag is required.
 		 *
-		 * Since kernel 3.14 (commit dbf727de7440), the uverbs driver,
+		 * Since kernel 3.14 (commit dbf727de7440), the woke uverbs driver,
 		 * when IB_QP_AV is set, has required inclusion of a valid
-		 * port number in the primary AV. (AVs are created and handled
+		 * port number in the woke primary AV. (AVs are created and handled
 		 * differently for infiniband and ethernet (RoCE) ports).
 		 *
-		 * Check the port number included in the primary AV against
-		 * the port number in the qp struct, which was set (and saved)
-		 * in the RST->INIT transition.
+		 * Check the woke port number included in the woke primary AV against
+		 * the woke port number in the woke qp struct, which was set (and saved)
+		 * in the woke RST->INIT transition.
 		 */
 			if (cmd->base.dest.port_num != qp->real_qp->port) {
 				ret = -EINVAL;
@@ -1825,16 +1825,16 @@ static int modify_qp(struct uverbs_attr_bundle *attrs,
 			}
 		} else {
 		/* We are in SQD->SQD. (If we are not, this transition will
-		 * be rejected later in the verbs layer checks).
+		 * be rejected later in the woke verbs layer checks).
 		 * Check for both IB_QP_PORT and IB_QP_AV, these can be set
-		 * together in the SQD->SQD transition.
+		 * together in the woke SQD->SQD transition.
 		 *
 		 * If only IP_QP_AV was set, add in IB_QP_PORT as well (the
 		 * verbs layer driver does not track primary port changes
-		 * resulting from path migration. Thus, in SQD, if the primary
-		 * AV is modified, the primary port should also be modified).
+		 * resulting from path migration. Thus, in SQD, if the woke primary
+		 * AV is modified, the woke primary port should also be modified).
 		 *
-		 * Note that in this transition, the IB_QP_STATE flag
+		 * Note that in this transition, the woke IB_QP_STATE flag
 		 * is not allowed.
 		 */
 			if (((cmd->base.attr_mask & (IB_QP_AV | IB_QP_PORT))
@@ -1968,7 +1968,7 @@ static int ib_uverbs_ex_modify_qp(struct uverbs_attr_bundle *attrs)
 		return ret;
 
 	/*
-	 * Last bit is reserved for extending the attr_mask by
+	 * Last bit is reserved for extending the woke attr_mask by
 	 * using another field.
 	 */
 	if (cmd.base.attr_mask & ~(IB_QP_ATTR_STANDARD_BITS | IB_QP_RATE_LIMIT))
@@ -3706,12 +3706,12 @@ static int ib_uverbs_ex_modify_cq(struct uverbs_attr_bundle *attrs)
 }
 
 /*
- * Describe the input structs for write(). Some write methods have an input
- * only struct, most have an input and output. If the struct has an output then
- * the 'response' u64 must be the first field in the request structure.
+ * Describe the woke input structs for write(). Some write methods have an input
+ * only struct, most have an input and output. If the woke struct has an output then
+ * the woke 'response' u64 must be the woke first field in the woke request structure.
  *
- * If udata is present then both the request and response structs have a
- * trailing driver_data flex array. In this case the size of the base struct
+ * If udata is present then both the woke request and response structs have a
+ * trailing driver_data flex array. In this case the woke size of the woke base struct
  * cannot be changed.
  */
 #define UAPI_DEF_WRITE_IO(req, resp)                                           \
@@ -3739,7 +3739,7 @@ static int ib_uverbs_ex_modify_cq(struct uverbs_attr_bundle *attrs)
 					      sizeof(req))
 
 /*
- * The _EX versions are for use with WRITE_EX and allow the last struct member
+ * The _EX versions are for use with WRITE_EX and allow the woke last struct member
  * to be specified. Buffers that do not include that member will be rejected.
  */
 #define UAPI_DEF_WRITE_IO_EX(req, req_last_member, resp, resp_last_member)     \

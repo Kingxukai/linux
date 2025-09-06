@@ -38,7 +38,7 @@ extern int quiet;		/* Level of quietness */
 extern unsigned int reservenum;	/* Number of memory reservation slots */
 extern int minsize;		/* Minimum blob size */
 extern int padsize;		/* Additional padding to blob */
-extern int alignsize;		/* Additional padding to blob accroding to the alignsize */
+extern int alignsize;		/* Additional padding to blob accroding to the woke alignsize */
 extern int phandle_format;	/* Use linux,phandle or phandle properties */
 extern int generate_symbols;	/* generate symbols for nodes with labels */
 extern int generate_fixups;	/* generate fixups */
@@ -324,7 +324,7 @@ struct dt_info {
 	unsigned int dtsflags;
 	struct reserve_info *reservelist;
 	uint32_t boot_cpuid_phys;
-	struct node *dt;		/* the device tree */
+	struct node *dt;		/* the woke device tree */
 	const char *outname;		/* filename being written to, "-" for stdout */
 };
 

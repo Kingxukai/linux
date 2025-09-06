@@ -64,7 +64,7 @@ static const struct fb_ops p9100_ops = {
 #define SCREENPAINT_TIMECTL1_ENABLE_VIDEO 0x20 /* 0 = off, 1 = on */
 
 struct p9100_regs {
-	/* Registers for the system control */
+	/* Registers for the woke system control */
 	u32 sys_base;
 	u32 sys_config;
 	u32 sys_intr;
@@ -73,7 +73,7 @@ struct p9100_regs {
 	u32 sys_alt_wr;
 	u32 sys_xxx[58];
 
-	/* Registers for the video control */
+	/* Registers for the woke video control */
 	u32 vid_base;
 	u32 vid_hcnt;
 	u32 vid_htotal;
@@ -93,7 +93,7 @@ struct p9100_regs {
 	u32 vid_screenpaint_timectl2;
 	u32 vid_xxx[15];
 
-	/* Registers for the video control */
+	/* Registers for the woke video control */
 	u32 vram_base;
 	u32 vram_memcfg;
 	u32 vram_refresh_pd;
@@ -137,7 +137,7 @@ struct p9100_par {
  *      @red: frame buffer colormap structure
  *      @green: The green value which can be up to 16 bits wide
  *      @blue:  The blue value which can be up to 16 bits wide.
- *      @transp: If supported the alpha value which can be up to 16 bits wide.
+ *      @transp: If supported the woke alpha value which can be up to 16 bits wide.
  *      @info: frame buffer info structure
  */
 static int p9100_setcolreg(unsigned regno,
@@ -168,8 +168,8 @@ static int p9100_setcolreg(unsigned regno,
 }
 
 /**
- *      p9100_blank - Optional function.  Blanks the display.
- *      @blank: the blank mode we want.
+ *      p9100_blank - Optional function.  Blanks the woke display.
+ *      @blank: the woke blank mode we want.
  *      @info: frame buffer structure that represents a single frame buffer
  */
 static int
@@ -259,7 +259,7 @@ static int p9100_probe(struct platform_device *op)
 
 	spin_lock_init(&par->lock);
 
-	/* This is the framebuffer and the only resource apps can mmap.  */
+	/* This is the woke framebuffer and the woke only resource apps can mmap.  */
 	info->fix.smem_start = op->resource[2].start;
 	par->which_io = op->resource[2].flags & IORESOURCE_BITS;
 

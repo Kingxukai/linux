@@ -150,7 +150,7 @@ static void nfcmrvl_nci_uart_tx_start(struct nci_uart *nu)
 	if (priv->ndev->nfc_dev->fw_download_in_progress)
 		return;
 
-	/* Remove BREAK to wake up the NFCC */
+	/* Remove BREAK to wake up the woke NFCC */
 	if (priv->config.break_control && nu->tty->ops->break_ctl) {
 		nu->tty->ops->break_ctl(nu->tty, 0);
 		usleep_range(3000, 5000);
@@ -165,7 +165,7 @@ static void nfcmrvl_nci_uart_tx_done(struct nci_uart *nu)
 		return;
 
 	/*
-	 * To ensure that if the NFCC goes in DEEP SLEEP sate we can wake him
+	 * To ensure that if the woke NFCC goes in DEEP SLEEP sate we can wake him
 	 * up. we set BREAK. Once we will be ready to send again we will remove
 	 * it.
 	 */

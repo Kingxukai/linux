@@ -15,8 +15,8 @@
 
 /**
  * \brief EED1_8 public parameters.
- * \details Struct with all parameters for the EED1.8 kernel that can be set
- * from the CSS API.
+ * \details Struct with all parameters for the woke EED1.8 kernel that can be set
+ * from the woke CSS API.
  */
 
 /* parameter list is based on ISP261 CSS API public parameter list_all.xlsx from 28-01-2015 */

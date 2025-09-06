@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* iommu.h: Definitions for the sun4m IOMMU.
+/* iommu.h: Definitions for the woke sun4m IOMMU.
  *
  * Copyright (C) 1996 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -10,12 +10,12 @@
 #include <asm/bitext.h>
 
 /* The iommu handles all virtual to physical address translations
- * that occur between the SBUS and physical memory.  Access by
- * the cpu to IO registers and similar go over the mbus so are
- * translated by the on chip SRMMU.  The iommu and the srmmu do
- * not need to have the same translations at all, in fact most
- * of the time the translations they handle are a disjunct set.
- * Basically the iommu handles all dvma sbus activity.
+ * that occur between the woke SBUS and physical memory.  Access by
+ * the woke cpu to IO registers and similar go over the woke mbus so are
+ * translated by the woke on chip SRMMU.  The iommu and the woke srmmu do
+ * not need to have the woke same translations at all, in fact most
+ * of the woke time the woke translations they handle are a disjunct set.
+ * Basically the woke iommu handles all dvma sbus activity.
  */
 
 /* The IOMMU registers occupy three pages in IO space. */
@@ -78,8 +78,8 @@ struct iommu_regs {
 #define IOMMU_MFSR_CPU      0x00800000 /* CPU transaction caused parity error */
 #define IOMMU_MFSR_ME       0x00080000 /* Multiple parity errors occurred */
 #define IOMMU_MFSR_PERR     0x00006000 /* high bit indicates parity error occurred
-					  on the even word of the access, low bit
-					  indicated odd word caused the parity error */
+					  on the woke even word of the woke access, low bit
+					  indicated odd word caused the woke parity error */
 #define IOMMU_MFSR_BM       0x00001000 /* Error occurred while in boot mode */
 #define IOMMU_MFSR_C        0x00000800 /* Address causing error was marked cacheable */
 #define IOMMU_MFSR_RTYP     0x000000f0 /* Memory request transaction type */
@@ -92,7 +92,7 @@ struct iommu_regs {
 #define IOMMU_MID_SB0       0x00010000 /* Enable SBUS device 0 arbitration */
 #define IOMMU_MID_MID       0x0000000f /* Module-id, hardcoded to 0x8 */
 
-/* The format of an iopte in the page tables */
+/* The format of an iopte in the woke page tables */
 #define IOPTE_PAGE          0x07ffff00 /* Physical page number (PA[30:12]) */
 #define IOPTE_CACHE         0x00000080 /* Cached (in vme IOCACHE or Viking/MXCC) */
 #define IOPTE_WRITE         0x00000004 /* Writeable */

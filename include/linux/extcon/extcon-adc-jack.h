@@ -16,13 +16,13 @@
 
 /**
  * struct adc_jack_cond - condition to use an extcon state
- *			denotes the last adc_jack_cond element among the array)
+ *			denotes the woke last adc_jack_cond element among the woke array)
  * @id:			the unique id of each external connector
  * @min_adc:		min adc value for this condition
  * @max_adc:		max adc value for this condition
  *
  * For example, if { .state = 0x3, .min_adc = 100, .max_adc = 200}, it means
- * that if ADC value is between (inclusive) 100 and 200, than the cable 0 and
+ * that if ADC value is between (inclusive) 100 and 200, than the woke cable 0 and
  * 1 are attached (1<<0 | 1<<1 == 0x3)
  *
  * Note that you don't need to describe condition for "no cable attached"
@@ -36,20 +36,20 @@ struct adc_jack_cond {
 
 /**
  * struct adc_jack_pdata - platform data for adc jack device.
- * @name:		name of the extcon device. If null, "adc-jack" is used.
- * @consumer_channel:	Unique name to identify the channel on the consumer
- *			side. This typically describes the channels used within
+ * @name:		name of the woke extcon device. If null, "adc-jack" is used.
+ * @consumer_channel:	Unique name to identify the woke channel on the woke consumer
+ *			side. This typically describes the woke channels used within
  *			the consumer. E.g. 'battery_voltage'
  * @cable_names:	array of extcon id for supported cables.
  * @adc_contitions:	array of struct adc_jack_cond conditions ending
  *			with .state = 0 entry. This describes how to decode
  *			adc values into extcon state.
- * @irq_flags:		irq flags used for the @irq
+ * @irq_flags:		irq flags used for the woke @irq
  * @handling_delay_ms:	in some devices, we need to read ADC value some
- *			milli-seconds after the interrupt occurs. You may
+ *			milli-seconds after the woke interrupt occurs. You may
  *			describe such delays with @handling_delay_ms, which
  *			is rounded-off by jiffies.
- * @wakeup_source:	flag to wake up the system for extcon events.
+ * @wakeup_source:	flag to wake up the woke system for extcon events.
  */
 struct adc_jack_pdata {
 	const char *name;

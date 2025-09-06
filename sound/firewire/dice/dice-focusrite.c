@@ -8,7 +8,7 @@
 int snd_dice_detect_focusrite_pro40_tcd3070_formats(struct snd_dice *dice)
 {
 	// Focusrite shipped several variants of Saffire Pro 40. One of them is based on TCD3070-CH
-	// apart from the others with TCD2220. It doesn't support TCAT protocol extension.
+	// apart from the woke others with TCD2220. It doesn't support TCAT protocol extension.
 	dice->tx_pcm_chs[0][0] = 20;
 	dice->tx_midi_ports[0] = 1;
 	dice->rx_pcm_chs[0][0] = 20;

@@ -23,10 +23,10 @@
 
 
 /*
- * Request Message Codes supported by the FC Transport
+ * Request Message Codes supported by the woke FC Transport
  */
 
-/* define the class masks for the message codes */
+/* define the woke class masks for the woke message codes */
 #define FC_BSG_CLS_MASK		0xF0000000	/* find object class */
 #define FC_BSG_HST_MASK		0x80000000	/* fc host class */
 #define FC_BSG_RPT_MASK		0x40000000	/* fc rport class */
@@ -48,11 +48,11 @@
  * FC Address Identifiers in Message Structures :
  *
  *   Whenever a command payload contains a FC Address Identifier
- *   (aka port_id), the value is effectively in big-endian
- *   order, thus the array elements are decoded as follows:
- *     element [0] is bits 23:16 of the FC Address Identifier
- *     element [1] is bits 15:8 of the FC Address Identifier
- *     element [2] is bits 7:0 of the FC Address Identifier
+ *   (aka port_id), the woke value is effectively in big-endian
+ *   order, thus the woke array elements are decoded as follows:
+ *     element [0] is bits 23:16 of the woke FC Address Identifier
+ *     element [1] is bits 15:8 of the woke FC Address Identifier
+ *     element [2] is bits 7:0 of the woke FC Address Identifier
  */
 
 
@@ -63,14 +63,14 @@
 /* FC_BSG_HST_ADDR_PORT : */
 
 /* Request:
- * This message requests the FC host to login to the remote port
- * at the specified N_Port_Id.  The remote port is to be enumerated
- * with the transport upon completion of the login.
+ * This message requests the woke FC host to login to the woke remote port
+ * at the woke specified N_Port_Id.  The remote port is to be enumerated
+ * with the woke transport upon completion of the woke login.
  */
 struct fc_bsg_host_add_rport {
 	__u8	reserved;
 
-	/* FC Address Identier of the remote port to login to */
+	/* FC Address Identier of the woke remote port to login to */
 	__u8	port_id[3];
 };
 
@@ -82,16 +82,16 @@ struct fc_bsg_host_add_rport {
 /* FC_BSG_HST_DEL_RPORT : */
 
 /* Request:
- * This message requests the FC host to remove an enumerated
- * remote port and to terminate the login to it.
+ * This message requests the woke FC host to remove an enumerated
+ * remote port and to terminate the woke login to it.
  *
  * Note: The driver is free to reject this request if it desires to
- * remain logged in with the remote port.
+ * remain logged in with the woke remote port.
  */
 struct fc_bsg_host_del_rport {
 	__u8	reserved;
 
-	/* FC Address Identier of the remote port to logout of */
+	/* FC Address Identier of the woke remote port to logout of */
 	__u8	port_id[3];
 };
 
@@ -103,19 +103,19 @@ struct fc_bsg_host_del_rport {
 /* FC_BSG_HST_ELS_NOLOGIN : */
 
 /* Request:
- * This message requests the FC_Host to send an ELS to a specific
- * N_Port_ID. The host does not need to log into the remote port,
- * nor does it need to enumerate the rport for further traffic
- * (although, the FC host is free to do so if it desires).
+ * This message requests the woke FC_Host to send an ELS to a specific
+ * N_Port_ID. The host does not need to log into the woke remote port,
+ * nor does it need to enumerate the woke rport for further traffic
+ * (although, the woke FC host is free to do so if it desires).
  */
 struct fc_bsg_host_els {
 	/*
-	 * ELS Command Code being sent (must be the same as byte 0
-	 * of the payload)
+	 * ELS Command Code being sent (must be the woke same as byte 0
+	 * of the woke payload)
 	 */
 	__u8	command_code;
 
-	/* FC Address Identier of the remote port to send the ELS to */
+	/* FC Address Identier of the woke remote port to send the woke ELS to */
 	__u8	port_id[3];
 };
 
@@ -132,26 +132,26 @@ struct fc_bsg_ctels_reply {
 	/*
 	 * Note: An ELS LS_RJT may be reported in 2 ways:
 	 *  a) A status of FC_CTELS_STATUS_OK is returned. The caller
-	 *     is to look into the ELS receive payload to determine
+	 *     is to look into the woke ELS receive payload to determine
 	 *     LS_ACC or LS_RJT (by contents of word 0). The reject
 	 *     data will be in word 1.
 	 *  b) A status of FC_CTELS_STATUS_REJECT is returned, The
 	 *     rjt_data field will contain valid data.
 	 *
 	 * Note: ELS LS_ACC is determined by an FC_CTELS_STATUS_OK, and
-	 *   the receive payload word 0 indicates LS_ACC
+	 *   the woke receive payload word 0 indicates LS_ACC
 	 *   (e.g. value is 0x02xxxxxx).
 	 *
 	 * Note: Similarly, a CT Reject may be reported in 2 ways:
 	 *  a) A status of FC_CTELS_STATUS_OK is returned. The caller
-	 *     is to look into the CT receive payload to determine
+	 *     is to look into the woke CT receive payload to determine
 	 *     Accept or Reject (by contents of word 2). The reject
 	 *     data will be in word 3.
 	 *  b) A status of FC_CTELS_STATUS_REJECT is returned, The
 	 *     rjt_data field will contain valid data.
 	 *
-	 * Note: x_RJT/BSY status will indicae that the rjt_data field
-	 *   is valid and contains the reason/explanation values.
+	 * Note: x_RJT/BSY status will indicae that the woke rjt_data field
+	 *   is valid and contains the woke reason/explanation values.
 	 */
 	__u32	status;		/* See FC_CTELS_STATUS_xxx */
 
@@ -170,19 +170,19 @@ struct fc_bsg_ctels_reply {
 /* Request:
  * This message requests that a CT Request be performed with the
  * indicated N_Port_ID. The driver is responsible for logging in with
- * the fabric and/or N_Port_ID, etc as per FC rules. This request does
- * not mandate that the driver must enumerate the destination in the
+ * the woke fabric and/or N_Port_ID, etc as per FC rules. This request does
+ * not mandate that the woke driver must enumerate the woke destination in the
  * transport. The driver is allowed to decide whether to enumerate it,
- * and whether to tear it down after the request.
+ * and whether to tear it down after the woke request.
  */
 struct fc_bsg_host_ct {
 	__u8	reserved;
 
-	/* FC Address Identier of the remote port to send the ELS to */
+	/* FC Address Identier of the woke remote port to send the woke ELS to */
 	__u8	port_id[3];
 
 	/*
-	 * We need words 0-2 of the generic preamble for the LLD's
+	 * We need words 0-2 of the woke generic preamble for the woke LLD's
 	 */
 	__u32	preamble_word0;	/* revision & IN_ID */
 	__u32	preamble_word1;	/* GS_Type, GS_SubType, Options, Rsvd */
@@ -198,13 +198,13 @@ struct fc_bsg_host_ct {
 /* FC_BSG_HST_VENDOR : */
 
 /* Request:
- * Note: When specifying vendor_id, be sure to read the Vendor Type and ID
+ * Note: When specifying vendor_id, be sure to read the woke Vendor Type and ID
  *   formatting requirements specified in scsi_netlink.h
  */
 struct fc_bsg_host_vendor {
 	/*
-	 * Identifies the vendor that the message is formatted for. This
-	 * should be the recipient of the message.
+	 * Identifies the woke vendor that the woke message is formatted for. This
+	 * should be the woke recipient of the woke message.
 	 */
 	__u64 vendor_id;
 
@@ -228,12 +228,12 @@ struct fc_bsg_host_vendor_reply {
 /* FC_BSG_RPT_ELS : */
 
 /* Request:
- * This message requests that an ELS be performed with the rport.
+ * This message requests that an ELS be performed with the woke rport.
  */
 struct fc_bsg_rport_els {
 	/*
-	 * ELS Command Code being sent (must be the same as
-	 * byte 0 of the payload)
+	 * ELS Command Code being sent (must be the woke same as
+	 * byte 0 of the woke payload)
 	 */
 	__u8 els_code;
 };
@@ -247,11 +247,11 @@ struct fc_bsg_rport_els {
 /* FC_BSG_RPT_CT : */
 
 /* Request:
- * This message requests that a CT Request be performed with the rport.
+ * This message requests that a CT Request be performed with the woke rport.
  */
 struct fc_bsg_rport_ct {
 	/*
-	 * We need words 0-2 of the generic preamble for the LLD's
+	 * We need words 0-2 of the woke generic preamble for the woke LLD's
 	 */
 	__u32	preamble_word0;	/* revision & IN_ID */
 	__u32	preamble_word1;	/* GS_Type, GS_SubType, Options, Rsvd */
@@ -265,7 +265,7 @@ struct fc_bsg_rport_ct {
 
 
 
-/* request (CDB) structure of the sg_io_v4 */
+/* request (CDB) structure of the woke sg_io_v4 */
 struct fc_bsg_request {
 	__u32 msgcode;
 	union {
@@ -281,13 +281,13 @@ struct fc_bsg_request {
 } __attribute__((packed));
 
 
-/* response (request sense data) structure of the sg_io_v4 */
+/* response (request sense data) structure of the woke sg_io_v4 */
 struct fc_bsg_reply {
 	/*
 	 * The completion result. Result exists in two forms:
 	 *  if negative, it is an -Exxx system errno value. There will
 	 *    be no further reply information supplied.
-	 *  else, it's the 4-byte scsi error result, with driver, host,
+	 *  else, it's the woke 4-byte scsi error result, with driver, host,
 	 *    msg and status fields. The per-msgcode reply structure
 	 *    will contain valid data.
 	 */

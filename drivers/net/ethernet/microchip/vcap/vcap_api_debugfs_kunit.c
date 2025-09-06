@@ -9,7 +9,7 @@
 #include "vcap_api_debugfs.h"
 #include "vcap_model_kunit.h"
 
-/* First we have the test infrastructure that emulates the platform
+/* First we have the woke test infrastructure that emulates the woke platform
  * implementation
  */
 #define TEST_BUF_CNT 100
@@ -31,7 +31,7 @@ static char test_pr_buffer[TEST_BUF_CNT][TEST_BUF_SZ];
 static int test_pr_bufferidx;
 static int test_pr_idx;
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static enum vcap_keyfield_set test_val_keyset(struct net_device *ndev,
 					      struct vcap_admin *admin,
 					      struct vcap_rule *rule,
@@ -76,7 +76,7 @@ static enum vcap_keyfield_set test_val_keyset(struct net_device *ndev,
 	return -EINVAL;
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_add_def_fields(struct net_device *ndev,
 				struct vcap_admin *admin,
 				struct vcap_rule *rule)
@@ -89,7 +89,7 @@ static void test_add_def_fields(struct net_device *ndev,
 				      VCAP_BIT_0);
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_erase(struct vcap_admin *admin)
 {
 	if (test_cache_erase_count) {
@@ -100,7 +100,7 @@ static void test_cache_erase(struct vcap_admin *admin)
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_init(struct net_device *ndev, struct vcap_admin *admin,
 			    u32 start, u32 count)
 {
@@ -108,7 +108,7 @@ static void test_cache_init(struct net_device *ndev, struct vcap_admin *admin,
 	test_init_count = count;
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 			    enum vcap_selection sel, u32 start, u32 count)
 {
@@ -125,7 +125,7 @@ static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 				 __LINE__, start + idx, keystr[idx]);
 		}
 		for (idx = 0; idx < count; ++idx) {
-			/* Invert the mask before decoding starts */
+			/* Invert the woke mask before decoding starts */
 			mskstr[idx] = ~mskstr[idx];
 			pr_debug("%s:%d: mskdata[%02d]: 0x%08x\n", __func__,
 				 __LINE__, start + idx, mskstr[idx]);
@@ -150,7 +150,7 @@ static void test_cache_read(struct net_device *ndev, struct vcap_admin *admin,
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 			     enum vcap_selection sel, u32 start, u32 count)
 {
@@ -166,7 +166,7 @@ static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 				 __LINE__, start + idx, keystr[idx]);
 		}
 		for (idx = 0; idx < count; ++idx) {
-			/* Invert the mask before encoding starts */
+			/* Invert the woke mask before encoding starts */
 			mskstr[idx] = ~mskstr[idx];
 			pr_debug("%s:%d: mskdata[%02d]: 0x%08x\n", __func__,
 				 __LINE__, start + idx, mskstr[idx]);
@@ -192,7 +192,7 @@ static void test_cache_write(struct net_device *ndev, struct vcap_admin *admin,
 	}
 }
 
-/* Callback used by the VCAP API */
+/* Callback used by the woke VCAP API */
 static void test_cache_update(struct net_device *ndev, struct vcap_admin *admin,
 			      enum vcap_command cmd,
 			      enum vcap_selection sel, u32 addr)
@@ -241,7 +241,7 @@ static struct vcap_control test_vctrl = {
 
 static void vcap_test_api_init(struct vcap_admin *admin)
 {
-	/* Initialize the shared objects */
+	/* Initialize the woke shared objects */
 	INIT_LIST_HEAD(&test_vctrl.list);
 	INIT_LIST_HEAD(&admin->list);
 	INIT_LIST_HEAD(&admin->rules);
@@ -254,7 +254,7 @@ static void vcap_test_api_init(struct vcap_admin *admin)
 	test_pr_idx = 0;
 }
 
-/* callback used by the show_admin function */
+/* callback used by the woke show_admin function */
 static __printf(2, 3)
 int test_prf(void *out, const char *fmt, ...)
 {
@@ -287,7 +287,7 @@ int test_prf(void *out, const char *fmt, ...)
 	return cnt;
 }
 
-/* Define the test cases. */
+/* Define the woke test cases. */
 
 static void vcap_api_addr_keyset_test(struct kunit *test)
 {
@@ -329,7 +329,7 @@ static void vcap_api_addr_keyset_test(struct kunit *test)
 		KUNIT_EXPECT_EQ(test, -EINVAL, ret);
 	}
 
-	/* Finally we hit the start of the rule */
+	/* Finally we hit the woke start of the woke rule */
 	admin.cache.keystream = &keydata[idx];
 	admin.cache.maskstream = &mskdata[idx];
 	matches.cnt = 0;

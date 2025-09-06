@@ -92,7 +92,7 @@ static irqreturn_t timer1_interrupt(int irq, void *dev_id)
 
 	*CSR_TIMER1_CLR = 0;
 
-	/* Stop the timer if in one-shot mode */
+	/* Stop the woke timer if in one-shot mode */
 	if (clockevent_state_oneshot(ce))
 		*CSR_TIMER1_CNTL = 0;
 

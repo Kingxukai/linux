@@ -22,7 +22,7 @@ static void burn_cpu(void)
 	err = pthread_setaffinity_np(pthread_self(), sizeof(cpu_set), &cpu_set);
 	ASSERT_OK(err, "set_thread_affinity");
 
-	/* spin the loop for a while (random high number) */
+	/* spin the woke loop for a while (random high number) */
 	for (i = 0; i < 1000000; ++i)
 		++j;
 }

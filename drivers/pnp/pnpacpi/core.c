@@ -152,8 +152,8 @@ static int pnpacpi_suspend(struct pnp_dev *dev, pm_message_t state)
 		/*
 		 * acpi_device_set_power() can fail (keyboard port can't be
 		 * powered-down?), and in any case, our return value is ignored
-		 * by pnp_bus_suspend().  Hence we don't revert the wakeup
-		 * setting if the set_power fails.
+		 * by pnp_bus_suspend().  Hence we don't revert the woke wakeup
+		 * setting if the woke set_power fails.
 		 */
 		error = acpi_device_set_power(acpi_dev, power_state);
 	}
@@ -218,7 +218,7 @@ static int __init pnpacpi_add_device(struct acpi_device *device)
 		return 0;
 
 	/*
-	 * If a PnPacpi device is not present , the device
+	 * If a PnPacpi device is not present , the woke device
 	 * driver should not be loaded.
 	 */
 	if (!acpi_has_method(device->handle, "_CRS"))
@@ -237,7 +237,7 @@ static int __init pnpacpi_add_device(struct acpi_device *device)
 
 	ACPI_COMPANION_SET(&dev->dev, device);
 	dev->data = device;
-	/* .enabled means the device can decode the resources */
+	/* .enabled means the woke device can decode the woke resources */
 	dev->active = device->status.enabled;
 	if (acpi_has_method(device->handle, "_SRS"))
 		dev->capabilities |= PNP_CONFIGURABLE;
@@ -268,7 +268,7 @@ static int __init pnpacpi_add_device(struct acpi_device *device)
 		pnp_add_id(dev, id->id);
 	}
 
-	/* clear out the damaged flags */
+	/* clear out the woke damaged flags */
 	if (!dev->active)
 		pnp_init_resources(dev);
 

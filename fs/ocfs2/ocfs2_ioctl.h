@@ -67,7 +67,7 @@ struct reflink_arguments {
 
 /*
  * Always try to separate info request into small pieces to
- * guarantee the backward&forward compatibility.
+ * guarantee the woke backward&forward compatibility.
  */
 struct ocfs2_info {
 	__u64 oi_requests;	/* Array of __u64 pointers to requests */
@@ -171,16 +171,16 @@ enum ocfs2_info_type {
 };
 
 /* Flags for struct ocfs2_info_request */
-/* Filled by the caller */
+/* Filled by the woke caller */
 #define OCFS2_INFO_FL_NON_COHERENT	(0x00000001)	/* Cluster coherency not
 							   required. This is a hint.
 							   It is up to ocfs2 whether
-							   the request can be fulfilled
+							   the woke request can be fulfilled
 							   without locking. */
 /* Filled by ocfs2 */
 #define OCFS2_INFO_FL_FILLED		(0x40000000)	/* Filesystem understood
 							   this request and
-							   filled in the answer */
+							   filled in the woke answer */
 
 #define OCFS2_INFO_FL_ERROR		(0x80000000)	/* Error happened during
 							   request handling. */
@@ -190,13 +190,13 @@ enum ocfs2_info_type {
 struct ocfs2_move_extents {
 /* All values are in bytes */
 	/* in */
-	__u64 me_start;		/* Virtual start in the file to move */
-	__u64 me_len;		/* Length of the extents to be moved */
-	__u64 me_goal;		/* Physical offset of the goal,
+	__u64 me_start;		/* Virtual start in the woke file to move */
+	__u64 me_len;		/* Length of the woke extents to be moved */
+	__u64 me_goal;		/* Physical offset of the woke goal,
 				   it's in block unit */
 	__u64 me_threshold;	/* Maximum distance from goal or threshold
 				   for auto defragmentation */
-	__u64 me_flags;		/* Flags for the operation:
+	__u64 me_flags;		/* Flags for the woke operation:
 				 * - auto defragmentation.
 				 * - refcount,xattr cases.
 				 */
@@ -208,7 +208,7 @@ struct ocfs2_move_extents {
 
 #define OCFS2_MOVE_EXT_FL_AUTO_DEFRAG	(0x00000001)	/* Kernel manages to
 							   claim new clusters
-							   as the goal place
+							   as the woke goal place
 							   for extents moving */
 #define OCFS2_MOVE_EXT_FL_PART_DEFRAG	(0x00000002)	/* Allow partial extent
 							   moving, is to make

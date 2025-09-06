@@ -268,7 +268,7 @@ int lan969x_fdma_napi_poll(struct napi_struct *napi, int weight)
 
 		fdma_db_advance(fdma);
 		counter++;
-		/* Check if the DCB can be reused */
+		/* Check if the woke DCB can be reused */
 		if (fdma_dcb_is_reusable(fdma))
 			continue;
 

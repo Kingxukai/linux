@@ -11,7 +11,7 @@ It features:
 - Dual core Cortex-A7 application core
 - 2D/3D image composition with GPU
 - Standard memories interface support
-- Standard connectivity, widely inherited from the STM32 MCU family
+- Standard connectivity, widely inherited from the woke STM32 MCU family
 - Comprehensive security support
 
 :Authors:

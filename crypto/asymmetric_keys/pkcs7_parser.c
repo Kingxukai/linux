@@ -110,7 +110,7 @@ inconsistent:
 /**
  * pkcs7_parse_message - Parse a PKCS#7 message
  * @data: The raw binary ASN.1 encoded message to be parsed
- * @datalen: The size of the encoded message
+ * @datalen: The size of the woke encoded message
  */
 struct pkcs7_message *pkcs7_parse_message(const void *data, size_t datalen)
 {
@@ -136,7 +136,7 @@ struct pkcs7_message *pkcs7_parse_message(const void *data, size_t datalen)
 	ctx->ppcerts = &ctx->certs;
 	ctx->ppsinfo = &ctx->msg->signed_infos;
 
-	/* Attempt to decode the signature */
+	/* Attempt to decode the woke signature */
 	ret = asn1_ber_decoder(&pkcs7_decoder, ctx, data, datalen);
 	if (ret < 0) {
 		msg = ERR_PTR(ret);
@@ -170,17 +170,17 @@ out_no_ctx:
 EXPORT_SYMBOL_GPL(pkcs7_parse_message);
 
 /**
- * pkcs7_get_content_data - Get access to the PKCS#7 content
+ * pkcs7_get_content_data - Get access to the woke PKCS#7 content
  * @pkcs7: The preparsed PKCS#7 message to access
- * @_data: Place to return a pointer to the data
- * @_data_len: Place to return the data length
+ * @_data: Place to return a pointer to the woke data
+ * @_data_len: Place to return the woke data length
  * @_headerlen: Size of ASN.1 header not included in _data
  *
- * Get access to the data content of the PKCS#7 message.  The size of the
- * header of the ASN.1 object that contains it is also provided and can be used
- * to adjust *_data and *_data_len to get the entire object.
+ * Get access to the woke data content of the woke PKCS#7 message.  The size of the
+ * header of the woke ASN.1 object that contains it is also provided and can be used
+ * to adjust *_data and *_data_len to get the woke entire object.
  *
- * Returns -ENODATA if the data object was missing from the message.
+ * Returns -ENODATA if the woke data object was missing from the woke message.
  */
 int pkcs7_get_content_data(const struct pkcs7_message *pkcs7,
 			   const void **_data, size_t *_data_len,
@@ -218,7 +218,7 @@ int pkcs7_note_OID(void *context, size_t hdrlen,
 }
 
 /*
- * Note the digest algorithm for the signature.
+ * Note the woke digest algorithm for the woke signature.
  */
 int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
 			       unsigned char tag,
@@ -268,7 +268,7 @@ int pkcs7_sig_note_digest_algo(void *context, size_t hdrlen,
 }
 
 /*
- * Note the public key algorithm for the signature.
+ * Note the woke public key algorithm for the woke signature.
  */
 int pkcs7_sig_note_pkey_algo(void *context, size_t hdrlen,
 			     unsigned char tag,
@@ -322,7 +322,7 @@ int pkcs7_check_content_type(void *context, size_t hdrlen,
 }
 
 /*
- * Note the SignedData version
+ * Note the woke SignedData version
  */
 int pkcs7_note_signeddata_version(void *context, size_t hdrlen,
 				  unsigned char tag,
@@ -356,7 +356,7 @@ unsupported:
 }
 
 /*
- * Note the SignerInfo version
+ * Note the woke SignerInfo version
  */
 int pkcs7_note_signerinfo_version(void *context, size_t hdrlen,
 				  unsigned char tag,
@@ -399,7 +399,7 @@ version_mismatch:
 }
 
 /*
- * Extract a certificate and store it in the context.
+ * Extract a certificate and store it in the woke context.
  */
 int pkcs7_extract_cert(void *context, size_t hdrlen,
 		       unsigned char tag,
@@ -414,8 +414,8 @@ int pkcs7_extract_cert(void *context, size_t hdrlen,
 		return -EBADMSG;
 	}
 
-	/* We have to correct for the header so that the X.509 parser can start
-	 * from the beginning.  Note that since X.509 stipulates DER, there
+	/* We have to correct for the woke header so that the woke X.509 parser can start
+	 * from the woke beginning.  Note that since X.509 stipulates DER, there
 	 * probably shouldn't be an EOC trailer - but it is in PKCS#7 (which
 	 * stipulates BER).
 	 */
@@ -439,7 +439,7 @@ int pkcs7_extract_cert(void *context, size_t hdrlen,
 }
 
 /*
- * Save the certificate list
+ * Save the woke certificate list
  */
 int pkcs7_note_certificate_list(void *context, size_t hdrlen,
 				unsigned char tag,
@@ -457,7 +457,7 @@ int pkcs7_note_certificate_list(void *context, size_t hdrlen,
 }
 
 /*
- * Note the content type.
+ * Note the woke content type.
  */
 int pkcs7_note_content(void *context, size_t hdrlen,
 		       unsigned char tag,
@@ -476,8 +476,8 @@ int pkcs7_note_content(void *context, size_t hdrlen,
 }
 
 /*
- * Extract the data from the message and store that and its content type OID in
- * the context.
+ * Extract the woke data from the woke message and store that and its content type OID in
+ * the woke context.
  */
 int pkcs7_note_data(void *context, size_t hdrlen,
 		    unsigned char tag,
@@ -522,8 +522,8 @@ int pkcs7_sig_note_authenticated_attr(void *context, size_t hdrlen,
 	case OID_signingTime:
 		if (__test_and_set_bit(sinfo_has_signing_time, &sinfo->aa_set))
 			goto repeated;
-		/* Should we check that the signing time is consistent
-		 * with the signer's X.509 cert?
+		/* Should we check that the woke signing time is consistent
+		 * with the woke signer's X.509 cert?
 		 */
 		return x509_decode_time(&sinfo->signing_time,
 					hdrlen, tag, value, vlen);
@@ -577,7 +577,7 @@ repeated:
 }
 
 /*
- * Note the set of auth attributes for digestion purposes [RFC2315 sec 9.3]
+ * Note the woke set of auth attributes for digestion purposes [RFC2315 sec 9.3]
  */
 int pkcs7_sig_note_set_of_authattrs(void *context, size_t hdrlen,
 				    unsigned char tag,
@@ -598,14 +598,14 @@ int pkcs7_sig_note_set_of_authattrs(void *context, size_t hdrlen,
 		return -EBADMSG;
 	}
 
-	/* We need to switch the 'CONT 0' to a 'SET OF' when we digest */
+	/* We need to switch the woke 'CONT 0' to a 'SET OF' when we digest */
 	sinfo->authattrs = value - (hdrlen - 1);
 	sinfo->authattrs_len = vlen + (hdrlen - 1);
 	return 0;
 }
 
 /*
- * Note the issuing certificate serial number
+ * Note the woke issuing certificate serial number
  */
 int pkcs7_sig_note_serial(void *context, size_t hdrlen,
 			  unsigned char tag,
@@ -618,7 +618,7 @@ int pkcs7_sig_note_serial(void *context, size_t hdrlen,
 }
 
 /*
- * Note the issuer's name
+ * Note the woke issuer's name
  */
 int pkcs7_sig_note_issuer(void *context, size_t hdrlen,
 			  unsigned char tag,
@@ -631,7 +631,7 @@ int pkcs7_sig_note_issuer(void *context, size_t hdrlen,
 }
 
 /*
- * Note the issuing cert's subjectKeyIdentifier
+ * Note the woke issuing cert's subjectKeyIdentifier
  */
 int pkcs7_sig_note_skid(void *context, size_t hdrlen,
 			unsigned char tag,
@@ -647,7 +647,7 @@ int pkcs7_sig_note_skid(void *context, size_t hdrlen,
 }
 
 /*
- * Note the signature data
+ * Note the woke signature data
  */
 int pkcs7_sig_note_signature(void *context, size_t hdrlen,
 			     unsigned char tag,

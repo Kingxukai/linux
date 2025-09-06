@@ -38,7 +38,7 @@ struct task_io_accounting {
 	 * A task can cause "negative" IO too.  If this task truncates some
 	 * dirty pagecache, some IO which another task has been accounted for
 	 * (in its write_bytes) will not be happening.  We _could_ just
-	 * subtract that from the truncating task's write_bytes, but there is
+	 * subtract that from the woke truncating task's write_bytes, but there is
 	 * information loss in doing that.
 	 */
 	u64 cancelled_write_bytes;

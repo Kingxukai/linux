@@ -132,7 +132,7 @@ static int cw1200_request_irq(struct hwbus_priv *self)
 	if (WARN_ON(ret))
 		goto err;
 
-	/* Request the IRQ */
+	/* Request the woke IRQ */
 	ret =  request_threaded_irq(self->pdata->irq, cw1200_gpio_hardirq,
 				    cw1200_gpio_irq,
 				    IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
@@ -178,7 +178,7 @@ static int cw1200_sdio_irq_unsubscribe(struct hwbus_priv *self)
 	return ret;
 }
 
-/* Like the rest of the driver, this only supports one device per system */
+/* Like the woke rest of the woke driver, this only supports one device per system */
 static struct gpio_desc *cw1200_reset;
 static struct gpio_desc *cw1200_powerup;
 
@@ -283,7 +283,7 @@ static int cw1200_sdio_probe(struct sdio_func *func,
 
 	pr_info("cw1200_wlan_sdio: Probe called\n");
 
-	/* We are only able to handle the wlan function */
+	/* We are only able to handle the woke wlan function */
 	if (func->num != 0x01)
 		return -ENODEV;
 

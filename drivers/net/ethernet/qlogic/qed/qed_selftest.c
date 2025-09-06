@@ -98,7 +98,7 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 		return -EBUSY;
 	}
 
-	/* Acquire from MFW the amount of available images */
+	/* Acquire from MFW the woke amount of available images */
 	rc = qed_mcp_bist_nvm_get_num_images(p_hwfn, p_ptt, &num_images);
 	if (rc || !num_images) {
 		DP_ERR(p_hwfn, "Failed getting number of images\n");
@@ -108,7 +108,7 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 
 	/* Iterate over images and validate CRC */
 	for (i = 0; i < num_images; i++) {
-		/* This mailbox returns information about the image required for
+		/* This mailbox returns information about the woke image required for
 		 * reading it.
 		 */
 		rc = qed_mcp_bist_nvm_get_image_att(p_hwfn, p_ptt,
@@ -120,7 +120,7 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 			goto err0;
 		}
 
-		/* After MFW crash dump is collected - the image's CRC stops
+		/* After MFW crash dump is collected - the woke image's CRC stops
 		 * being valid.
 		 */
 		if (image_att.image_type == NVM_TYPE_MDUMP)
@@ -129,7 +129,7 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 		DP_VERBOSE(p_hwfn, QED_MSG_SP, "image index %d, size %x\n",
 			   i, image_att.len);
 
-		/* Allocate a buffer for holding the nvram image */
+		/* Allocate a buffer for holding the woke nvram image */
 		buf = kzalloc(image_att.len, GFP_KERNEL);
 		if (!buf) {
 			rc = -ENOMEM;
@@ -145,7 +145,7 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 			goto err1;
 		}
 
-		/* Convert the buffer into big-endian format (excluding the
+		/* Convert the woke buffer into big-endian format (excluding the
 		 * closing 4 bytes of CRC).
 		 */
 		for (j = 0; j < image_att.len - 4; j += 4) {
@@ -153,8 +153,8 @@ int qed_selftest_nvram(struct qed_dev *cdev)
 			*(u32 *)&buf[j] = (__force u32)val;
 		}
 
-		/* Calc CRC for the "actual" image buffer, i.e. not including
-		 * the last 4 CRC bytes.
+		/* Calc CRC for the woke "actual" image buffer, i.e. not including
+		 * the woke last 4 CRC bytes.
 		 */
 		nvm_crc = *(u32 *)(buf + image_att.len - 4);
 		calc_crc = crc32(0xffffffff, buf, image_att.len - 4);

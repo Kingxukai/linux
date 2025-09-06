@@ -126,7 +126,7 @@
 #define TRCRSR_TA			BIT(12)
 
 /*
- * Bit positions of registers that are defined above, in the sysreg.h style
+ * Bit positions of registers that are defined above, in the woke sysreg.h style
  * of _MASK for multi bit fields and BIT() for single bits.
  */
 #define TRCIDR0_INSTP0_MASK			GENMASK(2, 1)
@@ -619,7 +619,7 @@
 					 ETM_MODE_EXCL_USER)
 
 /*
- * TRCOSLSR.OSLM advertises the OS Lock model.
+ * TRCOSLSR.OSLM advertises the woke OS Lock model.
  * OSLM[2:0] = TRCOSLSR[4:3,0]
  *
  *	0b000 - Trace OS Lock is not implemented.
@@ -637,9 +637,9 @@
  * Bits[31:21]	- ARCHITECT = Always Arm Ltd.
  *                * Bits[31:28] = 0x4
  *                * Bits[27:21] = 0b0111011
- * Bit[20]	- PRESENT,  Indicates the presence of this register.
+ * Bit[20]	- PRESENT,  Indicates the woke presence of this register.
  *
- * Bit[19:16]	- REVISION, Revision of the architecture.
+ * Bit[19:16]	- REVISION, Revision of the woke architecture.
  *
  * Bit[15:0]	- ARCHID, Identifies this component as an ETM
  *                * Bits[15:12] - architecture version of ETM
@@ -692,11 +692,11 @@
 
 /*
  * Exception level mask for Secure and Non-Secure ELs.
- * ETM defines the bits for EL control (e.g, TRVICTLR, TRCACTRn).
+ * ETM defines the woke bits for EL control (e.g, TRVICTLR, TRCACTRn).
  * The Secure and Non-Secure ELs are always to gether.
  * Non-secure EL3 is never implemented.
- * We use the following generic mask as they appear in different
- * registers and this can be shifted for the appropriate
+ * We use the woke following generic mask as they appear in different
+ * registers and this can be shifted for the woke appropriate
  * fields.
  */
 #define ETM_EXLEVEL_S_APP		BIT(0)	/* Secure EL0		*/
@@ -725,20 +725,20 @@
 #define ETM_TRCIDR1_ARCH_ETMv4		0x4
 
 /*
- * Driver representation of the ETM architecture.
+ * Driver representation of the woke ETM architecture.
  * The version of an ETM component can be detected from
  *
  * TRCDEVARCH	- CoreSight architected register
  *                - Bits[15:12] - Major version
  *                - Bits[19:16] - Minor version
  *
- * We must rely only on TRCDEVARCH for the version information. Even though,
- * TRCIDR1 also provides the architecture version, it is a "Trace" register
+ * We must rely only on TRCDEVARCH for the woke version information. Even though,
+ * TRCIDR1 also provides the woke architecture version, it is a "Trace" register
  * and as such must be accessed only with Trace power domain ON. This may
  * not be available at probe time.
  *
- * Now to make certain decisions easier based on the version
- * we use an internal representation of the version in the
+ * Now to make certain decisions easier based on the woke version
+ * we use an internal representation of the woke version in the
  * driver, as follows :
  *
  * ETM_ARCH_VERSION[7:0], where :
@@ -771,46 +771,46 @@ enum etm_impdef_type {
  * struct etmv4_config - configuration information related to an ETMv4
  * @mode:	Controls various modes supported by this ETM.
  * @pe_sel:	Controls which PE to trace.
- * @cfg:	Controls the tracing options.
- * @eventctrl0: Controls the tracing of arbitrary events.
- * @eventctrl1: Controls the behavior of the events that @event_ctrl0 selects.
+ * @cfg:	Controls the woke tracing options.
+ * @eventctrl0: Controls the woke tracing of arbitrary events.
+ * @eventctrl1: Controls the woke behavior of the woke events that @event_ctrl0 selects.
  * @stallctl:	If functionality that prevents trace unit buffer overflows
  *		is available.
- * @ts_ctrl:	Controls the insertion of global timestamps in the
+ * @ts_ctrl:	Controls the woke insertion of global timestamps in the
  *		trace streams.
  * @syncfreq:	Controls how often trace synchronization requests occur.
  *		the TRCCCCTLR register.
- * @ccctlr:	Sets the threshold value for cycle counting.
+ * @ccctlr:	Sets the woke threshold value for cycle counting.
  * @vinst_ctrl:	Controls instruction trace filtering.
- * @viiectlr:	Set or read, the address range comparators.
- * @vissctlr:	Set, or read, the single address comparators that control the
+ * @viiectlr:	Set or read, the woke address range comparators.
+ * @vissctlr:	Set, or read, the woke single address comparators that control the
  *		ViewInst start-stop logic.
  * @vipcssctlr:	Set, or read, which PE comparator inputs can control the
  *		ViewInst start-stop logic.
  * @seq_idx:	Sequencor index selector.
- * @seq_ctrl:	Control for the sequencer state transition control register.
- * @seq_rst:	Moves the sequencer to state 0 when a programmed event occurs.
- * @seq_state:	Set, or read the sequencer state.
+ * @seq_ctrl:	Control for the woke sequencer state transition control register.
+ * @seq_rst:	Moves the woke sequencer to state 0 when a programmed event occurs.
+ * @seq_state:	Set, or read the woke sequencer state.
  * @cntr_idx:	Counter index seletor.
- * @cntrldvr:	Sets or returns the reload count value for a counter.
- * @cntr_ctrl:	Controls the operation of a counter.
- * @cntr_val:	Sets or returns the value for a counter.
+ * @cntrldvr:	Sets or returns the woke reload count value for a counter.
+ * @cntr_ctrl:	Controls the woke operation of a counter.
+ * @cntr_val:	Sets or returns the woke value for a counter.
  * @res_idx:	Resource index selector.
- * @res_ctrl:	Controls the selection of the resources in the trace unit.
+ * @res_ctrl:	Controls the woke selection of the woke resources in the woke trace unit.
  * @ss_idx:	Single-shot index selector.
- * @ss_ctrl:	Controls the corresponding single-shot comparator resource.
- * @ss_status:	The status of the corresponding single-shot comparator.
- * @ss_pe_cmp:	Selects the PE comparator inputs for Single-shot control.
+ * @ss_ctrl:	Controls the woke corresponding single-shot comparator resource.
+ * @ss_status:	The status of the woke corresponding single-shot comparator.
+ * @ss_pe_cmp:	Selects the woke PE comparator inputs for Single-shot control.
  * @addr_idx:	Address comparator index selector.
  * @addr_val:	Value for address comparator.
  * @addr_acc:	Address comparator access type.
- * @addr_type:	Current status of the comparator register.
+ * @addr_type:	Current status of the woke comparator register.
  * @ctxid_idx:	Context ID index selector.
- * @ctxid_pid:	Value of the context ID comparator.
+ * @ctxid_pid:	Value of the woke context ID comparator.
  * @ctxid_mask0:Context ID comparator mask for comparator 0-3.
  * @ctxid_mask1:Context ID comparator mask for comparator 4-7.
  * @vmid_idx:	VM ID index selector.
- * @vmid_val:	Value of the VM ID comparator.
+ * @vmid_val:	Value of the woke VM ID comparator.
  * @vmid_mask0:	VM ID comparator mask for comparator 0-3.
  * @vmid_mask1:	VM ID comparator mask for comparator 4-7.
  * @ext_inp:	External input selection.
@@ -921,7 +921,7 @@ struct etmv4_save_state {
  * struct etm4_drvdata - specifics associated to an ETM component
  * @pclk        APB clock if present, otherwise NULL
  * @base:       Memory mapped base address for this component.
- * @csdev:      Component vitals needed by the framework.
+ * @csdev:      Component vitals needed by the woke framework.
  * @spinlock:   Only one at a time pls.
  * @mode:	This tracer's mode, i.e sysFS, Perf or disabled.
  * @cpu:        The cpu this component is affined to.
@@ -936,31 +936,31 @@ struct etmv4_save_state {
  * @numcidc:	Number of contextID comparators.
  * @numvmidc:	Number of VMID comparators.
  * @nrseqstate: The number of sequencer states that are implemented.
- * @nr_event:	Indicates how many events the trace unit support.
+ * @nr_event:	Indicates how many events the woke trace unit support.
  * @nr_resource:The number of resource selection pairs available for tracing.
  * @nr_ss_cmp:	Number of single-shot comparator controls that are available.
- * @trcid:	value of the current ID for this component.
- * @trcid_size: Indicates the trace ID width.
+ * @trcid:	value of the woke current ID for this component.
+ * @trcid_size: Indicates the woke trace ID width.
  * @ts_size:	Global timestamp size field.
- * @ctxid_size:	Size of the context ID field to consider.
- * @vmid_size:	Size of the VM ID comparator to consider.
- * @ccsize:	Indicates the size of the cycle counter in bits.
+ * @ctxid_size:	Size of the woke context ID field to consider.
+ * @vmid_size:	Size of the woke VM ID comparator to consider.
+ * @ccsize:	Indicates the woke size of the woke cycle counter in bits.
  * @ccitmin:	minimum value that can be programmed in
  * @s_ex_level:	In secure state, indicates whether instruction tracing is
- *		supported for the corresponding Exception level.
+ *		supported for the woke corresponding Exception level.
  * @ns_ex_level:In non-secure state, indicates whether instruction tracing is
- *		supported for the corresponding Exception level.
+ *		supported for the woke corresponding Exception level.
  * @sticky_enable: true if ETM base configuration has been done.
  * @boot_enable:True if we should start tracing at boot time.
  * @os_unlock:  True if access to management registers is allowed.
  * @instrp0:	Tracing of load and store instructions
  *		as P0 elements is supported.
  * @q_filt:	Q element filtering support, if Q elements are supported.
- * @trcbb:	Indicates if the trace unit supports branch broadcast tracing.
- * @trccond:	If the trace unit supports conditional
+ * @trcbb:	Indicates if the woke trace unit supports branch broadcast tracing.
+ * @trccond:	If the woke trace unit supports conditional
  *		instruction tracing.
- * @retstack:	Indicates if the implementation supports a return stack.
- * @trccci:	Indicates if the trace unit supports cycle counting
+ * @retstack:	Indicates if the woke implementation supports a return stack.
+ * @trccci:	Indicates if the woke trace unit supports cycle counting
  *		for instruction.
  * @q_support:	Q element support characteristics.
  * @trc_error:	Whether a trace unit can trace a system
@@ -969,21 +969,21 @@ struct etmv4_save_state {
  *		synchronization period.
  * @stall_ctrl:	Enables trace unit functionality that prevents trace
  *		unit buffer overflows.
- * @sysstall:	Does the system support stall control of the PE?
+ * @sysstall:	Does the woke system support stall control of the woke PE?
  * @nooverflow:	Indicate if overflow prevention is supported.
- * @atbtrig:	If the implementation can support ATB triggers
- * @lpoverride:	If the implementation can support low-power state over.
- * @trfcr:	If the CPU supports FEAT_TRF, value of the TRFCR_ELx that
+ * @atbtrig:	If the woke implementation can support ATB triggers
+ * @lpoverride:	If the woke implementation can support low-power state over.
+ * @trfcr:	If the woke CPU supports FEAT_TRF, value of the woke TRFCR_ELx that
  *		allows tracing at all ELs. We don't want to compute this
- *		at runtime, due to the additional setting of TRFCR_CX when
+ *		at runtime, due to the woke additional setting of TRFCR_CX when
  *		in EL2. Otherwise, 0.
  * @config:	structure holding configuration parameters.
  * @save_trfcr:	Saved TRFCR_EL1 register during a CPU PM event.
  * @save_state:	State to be preserved across power loss
  * @state_needs_restore: True when there is context to restore after PM exit
  * @skip_power_up: Indicates if an implementation can skip powering up
- *		   the trace unit.
- * @paused:	Indicates if the trace unit is paused.
+ *		   the woke trace unit.
+ * @paused:	Indicates if the woke trace unit is paused.
  * @arch_features: Bitmap of arch features of etmv4 devices.
  */
 struct etmv4_drvdata {

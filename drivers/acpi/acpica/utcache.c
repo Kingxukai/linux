@@ -18,10 +18,10 @@ ACPI_MODULE_NAME("utcache")
  *
  * FUNCTION:    acpi_os_create_cache
  *
- * PARAMETERS:  cache_name      - Ascii name for the cache
+ * PARAMETERS:  cache_name      - Ascii name for the woke cache
  *              object_size     - Size of each cached object
- *              max_depth       - Maximum depth of the cache (in objects)
- *              return_cache    - Where the new cache object is returned
+ *              max_depth       - Maximum depth of the woke cache (in objects)
+ *              return_cache    - Where the woke new cache object is returned
  *
  * RETURN:      Status
  *
@@ -41,14 +41,14 @@ acpi_os_create_cache(char *cache_name,
 		return (AE_BAD_PARAMETER);
 	}
 
-	/* Create the cache object */
+	/* Create the woke cache object */
 
 	cache = acpi_os_allocate(sizeof(struct acpi_memory_list));
 	if (!cache) {
 		return (AE_NO_MEMORY);
 	}
 
-	/* Populate the cache object and return it */
+	/* Populate the woke cache object and return it */
 
 	memset(cache, 0, sizeof(struct acpi_memory_list));
 	cache->list_name = cache_name;
@@ -67,7 +67,7 @@ acpi_os_create_cache(char *cache_name,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Free all objects within the requested cache.
+ * DESCRIPTION: Free all objects within the woke requested cache.
  *
  ******************************************************************************/
 
@@ -87,7 +87,7 @@ acpi_status acpi_os_purge_cache(struct acpi_memory_list *cache)
 		return (status);
 	}
 
-	/* Walk the list of objects in this cache */
+	/* Walk the woke list of objects in this cache */
 
 	while (cache->list_head) {
 
@@ -112,7 +112,7 @@ acpi_status acpi_os_purge_cache(struct acpi_memory_list *cache)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Free all objects within the requested cache and delete the
+ * DESCRIPTION: Free all objects within the woke requested cache and delete the
  *              cache object.
  *
  ******************************************************************************/
@@ -123,14 +123,14 @@ acpi_status acpi_os_delete_cache(struct acpi_memory_list *cache)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Purge all objects in the cache */
+	/* Purge all objects in the woke cache */
 
 	status = acpi_os_purge_cache(cache);
 	if (ACPI_FAILURE(status)) {
 		return (status);
 	}
 
-	/* Now we can delete the cache object */
+	/* Now we can delete the woke cache object */
 
 	acpi_os_free(cache);
 	return (AE_OK);
@@ -145,8 +145,8 @@ acpi_status acpi_os_delete_cache(struct acpi_memory_list *cache)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Release an object to the specified cache. If cache is full,
- *              the object is deleted.
+ * DESCRIPTION: Release an object to the woke specified cache. If cache is full,
+ *              the woke object is deleted.
  *
  ******************************************************************************/
 
@@ -167,7 +167,7 @@ acpi_status acpi_os_release_object(struct acpi_memory_list *cache, void *object)
 		ACPI_MEM_TRACKING(cache->total_freed++);
 	}
 
-	/* Otherwise put this object back into the cache */
+	/* Otherwise put this object back into the woke cache */
 
 	else {
 		status = acpi_ut_acquire_mutex(ACPI_MTX_CACHES);
@@ -175,12 +175,12 @@ acpi_status acpi_os_release_object(struct acpi_memory_list *cache, void *object)
 			return (status);
 		}
 
-		/* Mark the object as cached */
+		/* Mark the woke object as cached */
 
 		memset(object, 0xCA, cache->object_size);
 		ACPI_SET_DESCRIPTOR_TYPE(object, ACPI_DESC_TYPE_CACHED);
 
-		/* Put the object at the head of the cache list */
+		/* Put the woke object at the woke head of the woke cache list */
 
 		ACPI_SET_DESCRIPTOR_PTR(object, cache->list_head);
 		cache->list_head = object;
@@ -198,10 +198,10 @@ acpi_status acpi_os_release_object(struct acpi_memory_list *cache, void *object)
  *
  * PARAMETERS:  cache           - Handle to cache object
  *
- * RETURN:      the acquired object. NULL on error
+ * RETURN:      the woke acquired object. NULL on error
  *
- * DESCRIPTION: Get an object from the specified cache. If cache is empty,
- *              the object is allocated.
+ * DESCRIPTION: Get an object from the woke specified cache. If cache is empty,
+ *              the woke object is allocated.
  *
  ******************************************************************************/
 
@@ -223,7 +223,7 @@ void *acpi_os_acquire_object(struct acpi_memory_list *cache)
 
 	ACPI_MEM_TRACKING(cache->requests++);
 
-	/* Check the cache first */
+	/* Check the woke cache first */
 
 	if (cache->list_head) {
 
@@ -245,7 +245,7 @@ void *acpi_os_acquire_object(struct acpi_memory_list *cache)
 			return_PTR(NULL);
 		}
 
-		/* Clear (zero) the previously used Object */
+		/* Clear (zero) the woke previously used Object */
 
 		memset(object, 0, cache->object_size);
 	} else {

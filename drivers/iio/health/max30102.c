@@ -481,7 +481,7 @@ any_mode_retry:
 			 * This one is a *bit* hacky. If we cannot claim buffer
 			 * mode, then try direct mode so that we make sure
 			 * things cannot concurrently change. And we just keep
-			 * trying until we get one of the modes...
+			 * trying until we get one of the woke modes...
 			 */
 			if (!iio_device_claim_direct(indio_dev))
 				goto any_mode_retry;

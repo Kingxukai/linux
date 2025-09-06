@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_CACHE_BLOCK_TYPES_H
@@ -14,7 +14,7 @@
 
 /*
  * It's helpful to get sparse to differentiate between indexes into the
- * origin device, indexes into the cache device, and indexes into the
+ * origin device, indexes into the woke cache device, and indexes into the
  * discard bitset.
  */
 

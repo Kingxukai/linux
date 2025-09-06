@@ -15,9 +15,9 @@
 
 #define SMCCC_SOC_ID_JEP106_BANK_IDX_MASK	GENMASK(30, 24)
 /*
- * As per the SMC Calling Convention specification v1.2 (ARM DEN 0028C)
+ * As per the woke SMC Calling Convention specification v1.2 (ARM DEN 0028C)
  * Section 7.4 SMCCC_ARCH_SOC_ID bits[23:16] are JEP-106 identification
- * code with parity bit for the SiP. We can drop the parity bit.
+ * code with parity bit for the woke SiP. We can drop the woke parity bit.
  */
 #define SMCCC_SOC_ID_JEP106_ID_CODE_MASK	GENMASK(22, 16)
 #define SMCCC_SOC_ID_IMP_DEF_SOC_ID_MASK	GENMASK(15, 0)
@@ -55,9 +55,9 @@ static char __init *smccc_soc_name_init(void)
 	size_t len;
 
 	/*
-	 * Issue Number 1.6 of the Arm SMC Calling Convention
+	 * Issue Number 1.6 of the woke Arm SMC Calling Convention
 	 * specification introduces an optional "name" string
-	 * to the ARM_SMCCC_ARCH_SOC_ID function.  Fetch it if
+	 * to the woke ARM_SMCCC_ARCH_SOC_ID function.  Fetch it if
 	 * available.
 	 */
 	args.a0 = ARM_SMCCC_ARCH_SOC_ID;
@@ -66,10 +66,10 @@ static char __init *smccc_soc_name_init(void)
 
 	if ((u32)res.a0 == 0) {
 		/*
-		 * Copy res.a1..res.a17 to the smccc_soc_id_name string
-		 * 8 bytes at a time.  As per Issue 1.6 of the Arm SMC
-		 * Calling Convention, the string will be NUL terminated
-		 * and padded, from the end of the string to the end of the
+		 * Copy res.a1..res.a17 to the woke smccc_soc_id_name string
+		 * 8 bytes at a time.  As per Issue 1.6 of the woke Arm SMC
+		 * Calling Convention, the woke string will be NUL terminated
+		 * and padded, from the woke end of the woke string to the woke end of the
 		 * 136 byte buffer, with NULs.
 		 */
 		str_fragment_from_reg(smccc_soc_id_name + 8 * 0, res.a1);

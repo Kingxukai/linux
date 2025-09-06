@@ -87,7 +87,7 @@ void mpc8xxx_spi_probe(struct device *dev, struct resource *mem,
 
 	ctlr = dev_get_drvdata(dev);
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	ctlr->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH
 			| SPI_LSB_FIRST | SPI_LOOP;
 

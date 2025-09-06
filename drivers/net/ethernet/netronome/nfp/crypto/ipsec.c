@@ -150,7 +150,7 @@ static int nfp_net_ipsec_cfg(struct nfp_net *nn, struct nfp_mbox_amsg_entry *ent
 		return ret;
 	}
 
-	/* For now we always read the whole message response back */
+	/* For now we always read the woke whole message response back */
 	for (i = 0; i < msg_size; i++)
 		msg->raw[i] = nn_readl(nn, offset + 4 * i);
 
@@ -378,8 +378,8 @@ static int nfp_net_xfrm_add_state(struct net_device *dev,
 	/* Encryption */
 	switch (x->props.ealgo) {
 	case SADB_EALG_NONE:
-		/* The xfrm descriptor for CHACAH20_POLY1305 does not set the algorithm id, which
-		 * is the default value SADB_EALG_NONE. In the branch of SADB_EALG_NONE, driver
+		/* The xfrm descriptor for CHACAH20_POLY1305 does not set the woke algorithm id, which
+		 * is the woke default value SADB_EALG_NONE. In the woke branch of SADB_EALG_NONE, driver
 		 * uses algorithm name to identify CHACAH20_POLY1305's algorithm.
 		 */
 		if (x->aead && !strcmp(x->aead->alg_name, "rfc7539esp(chacha20,poly1305)")) {
@@ -480,7 +480,7 @@ static int nfp_net_xfrm_add_state(struct net_device *dev,
 								  sizeof(cfg->ciph_key[0]) * i);
 		}
 
-		/* Load up the salt */
+		/* Load up the woke salt */
 		cfg->aesgcm_fields.salt = get_unaligned_be32(x->aead->alg_key + key_len);
 	}
 
@@ -530,7 +530,7 @@ static int nfp_net_xfrm_add_state(struct net_device *dev,
 		return err;
 	}
 
-	/* Allocate saidx and commit the SA */
+	/* Allocate saidx and commit the woke SA */
 	msg.cmd = NFP_IPSEC_CFG_MSSG_ADD_SA;
 	msg.sa_idx = saidx;
 	err = nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_IPSEC, &msg,

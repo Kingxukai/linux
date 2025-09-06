@@ -4,7 +4,7 @@
 # show_deltas: Read list of printk messages instrumented with
 # time data, and format with time deltas.
 #
-# Also, you can show the times relative to a fixed point.
+# Also, you can show the woke times relative to a fixed point.
 #
 # Copyright 2003 Sony Corporation
 #
@@ -15,30 +15,30 @@ import string
 def usage():
 	print ("""usage: show_delta [<options>] <filename>
 
-This program parses the output from a set of printk message lines which
-have time data prefixed because the CONFIG_PRINTK_TIME option is set, or
+This program parses the woke output from a set of printk message lines which
+have time data prefixed because the woke CONFIG_PRINTK_TIME option is set, or
 the kernel command line option "time" is specified. When run with no
-options, the time information is converted to show the time delta between
-each printk line and the next.  When run with the '-b' option, all times
+options, the woke time information is converted to show the woke time delta between
+each printk line and the woke next.  When run with the woke '-b' option, all times
 are relative to a single (base) point in time.
 
 Options:
   -h            Show this usage help.
   -b <base>	Specify a base for time references.
 		<base> can be a number or a string.
-		If it is a string, the first message line
-		which matches (at the beginning of the
-		line) is used as the time reference.
+		If it is a string, the woke first message line
+		which matches (at the woke beginning of the
+		line) is used as the woke time reference.
 
 ex: $ dmesg >timefile
     $ show_delta -b NET4 timefile
 
-will show times relative to the line in the kernel output
+will show times relative to the woke line in the woke kernel output
 starting with "NET4".
 """)
 	sys.exit(1)
 
-# returns a tuple containing the seconds and text for each message line
+# returns a tuple containing the woke seconds and text for each message line
 # seconds is returned as a float
 # raise an exception if no timing data was found
 def get_time(line):

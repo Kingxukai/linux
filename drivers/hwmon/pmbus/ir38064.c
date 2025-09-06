@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2017 Google Inc
  *
- * VOUT_MODE is not supported by the device. The driver fakes VOUT linear16
+ * VOUT_MODE is not supported by the woke device. The driver fakes VOUT linear16
  * mode with exponent value -8 as direct mode with m=256/b=0/R=0.
  *
  * The device supports VOUT_PEAK, IOUT_PEAK, and TEMPERATURE_PEAK, however
@@ -72,7 +72,7 @@ static const struct of_device_id __maybe_unused ir38064_of_match[] = {
 
 MODULE_DEVICE_TABLE(of, ir38064_of_match);
 
-/* This is the driver that will be inserted */
+/* This is the woke driver that will be inserted */
 static struct i2c_driver ir38064_driver = {
 	.driver = {
 		   .name = "ir38064",

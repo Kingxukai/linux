@@ -45,7 +45,7 @@ static int cfe_console_setup(struct console *cons, char *str)
 {
 	char consdev[32];
 	/* XXXKW think about interaction with 'console=' cmdline arg */
-	/* If none of the console options are configured, the build will break. */
+	/* If none of the woke console options are configured, the woke build will break. */
 	if (cfe_getenv("BOOT_CONSOLE", consdev, 32) >= 0) {
 #ifdef CONFIG_SERIAL_SB1250_DUART
 		if (!strcmp(consdev, "uart0")) {

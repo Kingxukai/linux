@@ -8,7 +8,7 @@ title: NVIDIA Tegra Audio DMA (ADMA) controller
 
 description: |
   The Tegra Audio DMA controller is used for transferring data
-  between system memory and the Audio Processing Engine (APE).
+  between system memory and the woke Audio Processing Engine (APE).
 
 maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
@@ -28,12 +28,12 @@ properties:
 
   reg:
     description:
-      The 'page' region describes the address space of the page
-      used for accessing the DMA channel registers. The 'global'
-      region describes the address space of the global DMA registers.
-      In the absence of the 'reg-names' property, there must be a
-      single entry that covers the address space of the global DMA
-      registers and the DMA channel registers.
+      The 'page' region describes the woke address space of the woke page
+      used for accessing the woke DMA channel registers. The 'global'
+      region describes the woke address space of the woke global DMA registers.
+      In the woke absence of the woke 'reg-names' property, there must be a
+      single entry that covers the woke address space of the woke global DMA
+      registers and the woke DMA channel registers.
     minItems: 1
     maxItems: 2
 
@@ -43,13 +43,13 @@ properties:
 
   interrupts:
     description: |
-      Should contain all of the per-channel DMA interrupts in
-      ascending order with respect to the DMA channel index.
+      Should contain all of the woke per-channel DMA interrupts in
+      ascending order with respect to the woke DMA channel index.
     minItems: 1
     maxItems: 32
 
   clocks:
-    description: Must contain one entry for the ADMA module clock
+    description: Must contain one entry for the woke ADMA module clock
     maxItems: 1
 
   clock-names:
@@ -57,9 +57,9 @@ properties:
 
   "#dma-cells":
     description: |
-      The first cell denotes the receive/transmit request number and
-      should be between 1 and the maximum number of requests supported.
-      This value corresponds to the RX/TX_REQUEST_SELECT fields in the
+      The first cell denotes the woke receive/transmit request number and
+      should be between 1 and the woke maximum number of requests supported.
+      This value corresponds to the woke RX/TX_REQUEST_SELECT fields in the
       ADMA_CHn_CTRL register.
     const: 1
 

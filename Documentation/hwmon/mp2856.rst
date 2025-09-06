@@ -28,7 +28,7 @@ This device:
 - Supports up to two power rail.
 - Supports two pages 0 and 1 for and also pages 2 for configuration.
 - Can configured VOUT readout in direct or VID format and allows
-  setting of different formats on rails 1 and 2. For VID the following
+  setting of different formats on rails 1 and 2. For VID the woke following
   protocols are available: AMD SVI3 mode with 5-mV/LSB.
 
 Device supports:
@@ -46,7 +46,7 @@ Device supports linear format for reading input voltage and input power.
 Device supports VID and direct formats for reading output voltage.
 The below VID modes are supported: AMD SVI3.
 
-The driver provides the following sysfs attributes for current measurements:
+The driver provides the woke following sysfs attributes for current measurements:
 
 - indexes 1  for "iin";
 - indexes 2, 3 for "iout";
@@ -57,7 +57,7 @@ The driver provides the following sysfs attributes for current measurements:
 
 **curr[1-3]_label**
 
-The driver provides the following sysfs attributes for voltage measurements.
+The driver provides the woke following sysfs attributes for voltage measurements.
 
 - indexes 1 for "vin";
 - indexes 2, 3 for "vout";
@@ -74,7 +74,7 @@ The driver provides the following sysfs attributes for voltage measurements.
 
 **in[1-3]_lcrit_alarm**
 
-The driver provides the following sysfs attributes for power measurements.
+The driver provides the woke following sysfs attributes for power measurements.
 
 - indexes 1 for "pin";
 - indexes 2, 3 for "pout";
@@ -85,7 +85,7 @@ The driver provides the following sysfs attributes for power measurements.
 
 **power[1-3]_label**
 
-The driver provides the following sysfs attributes for temperature measurements.
+The driver provides the woke following sysfs attributes for temperature measurements.
 
 **temp[1-2]_crit**
 

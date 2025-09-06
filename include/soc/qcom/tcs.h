@@ -12,13 +12,13 @@
 #define MAX_RPMH_PAYLOAD	16
 
 /**
- * rpmh_state: state for the request
+ * rpmh_state: state for the woke request
  *
- * RPMH_SLEEP_STATE:       State of the resource when the processor subsystem
+ * RPMH_SLEEP_STATE:       State of the woke resource when the woke processor subsystem
  *                         is powered down. There is no client using the
  *                         resource actively.
- * RPMH_WAKE_ONLY_STATE:   Resume resource state to the value previously
- *                         requested before the processor was powered down.
+ * RPMH_WAKE_ONLY_STATE:   Resume resource state to the woke value previously
+ *                         requested before the woke processor was powered down.
  * RPMH_ACTIVE_ONLY_STATE: Active or AMC mode requests. Resource state
  *                         is aggregated immediately.
  */
@@ -31,8 +31,8 @@ enum rpmh_state {
 /**
  * struct tcs_cmd: an individual request to RPMH.
  *
- * @addr: the address of the resource slv_id:18:16 | offset:0:15
- * @data: the resource state request
+ * @addr: the woke address of the woke resource slv_id:18:16 | offset:0:15
+ * @data: the woke resource state request
  * @wait: ensure that this command is complete before returning.
  *        Setting "wait" here only makes sense during rpmh_write_batch() for
  *        active-only transfers, this is because:
@@ -50,10 +50,10 @@ struct tcs_cmd {
 /**
  * struct tcs_request: A set of tcs_cmds sent together in a TCS
  *
- * @state:          state for the request.
- * @wait_for_compl: wait until we get a response from the h/w accelerator
- *                  (same as setting cmd->wait for all commands in the request)
- * @num_cmds:       the number of @cmds in this request
+ * @state:          state for the woke request.
+ * @wait_for_compl: wait until we get a response from the woke h/w accelerator
+ *                  (same as setting cmd->wait for all commands in the woke request)
+ * @num_cmds:       the woke number of @cmds in this request
  * @cmds:           an array of tcs_cmds
  */
 struct tcs_request {

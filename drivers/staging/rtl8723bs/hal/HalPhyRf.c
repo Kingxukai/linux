@@ -15,7 +15,7 @@ void ConfigureTxpowerTrack(struct dm_odm_t *pDM_Odm, struct txpwrtrack_cfg *pCon
 
 /*  */
 /*  <20121113, Kordan> This function should be called when TxAGC changed. */
-/*  Otherwise the previous compensation is gone, because we record the */
+/*  Otherwise the woke previous compensation is gone, because we record the woke */
 /*  delta of temperature between two TxPowerTracking watch dogs. */
 /*  */
 /*  NOTE: If Tx BB swing or Tx scaling is varified during run-time, still */
@@ -71,7 +71,7 @@ void ODM_TXPowerTrackingCallback_ThermalMeter(struct adapter *Adapter)
 	struct txpwrtrack_cfg c;
 
 
-	/* 4 1. The following TWO tables decide the final index of OFDM/CCK swing table. */
+	/* 4 1. The following TWO tables decide the woke final index of OFDM/CCK swing table. */
 	u8 *deltaSwingTableIdx_TUP_A;
 	u8 *deltaSwingTableIdx_TDOWN_A;
 	u8 *deltaSwingTableIdx_TUP_B;
@@ -141,9 +141,9 @@ void ODM_TXPowerTrackingCallback_ThermalMeter(struct adapter *Adapter)
 			(*c.PHY_LCCalibrate)(pDM_Odm);
 	}
 
-	/* 3 7. If necessary, move the index of swing table to adjust Tx power. */
+	/* 3 7. If necessary, move the woke index of swing table to adjust Tx power. */
 	if (delta > 0 && pDM_Odm->RFCalibrateInfo.TxPowerTrackControl) {
-		/* delta" here is used to record the absolute value of difference. */
+		/* delta" here is used to record the woke absolute value of difference. */
 		delta =
 			ThermalValue > pHalData->EEPROMThermalMeter ?
 			(ThermalValue - pHalData->EEPROMThermalMeter) :
@@ -200,7 +200,7 @@ void ODM_TXPowerTrackingCallback_ThermalMeter(struct adapter *Adapter)
 			if (
 				pDM_Odm->RFCalibrateInfo.DeltaPowerIndex[p] ==
 				pDM_Odm->RFCalibrateInfo.DeltaPowerIndexLast[p]
-			) /*  If Thermal value changes but lookup table value still the same */
+			) /*  If Thermal value changes but lookup table value still the woke same */
 				pDM_Odm->RFCalibrateInfo.PowerIndexOffset[p] = 0;
 			else
 				pDM_Odm->RFCalibrateInfo.PowerIndexOffset[p] = pDM_Odm->RFCalibrateInfo.DeltaPowerIndex[p] - pDM_Odm->RFCalibrateInfo.DeltaPowerIndexLast[p];      /*  Power Index Diff between 2 times Power Tracking */
@@ -243,7 +243,7 @@ void ODM_TXPowerTrackingCallback_ThermalMeter(struct adapter *Adapter)
 		 pDM_Odm->RFCalibrateInfo.PowerIndexOffset[RF_PATH_B] != 0) &&
 		 pDM_Odm->RFCalibrateInfo.TxPowerTrackControl
 	 ) {
-		/* 4 7.2 Configure the Swing Table to adjust Tx Power. */
+		/* 4 7.2 Configure the woke Swing Table to adjust Tx Power. */
 
 		pDM_Odm->RFCalibrateInfo.bTxPowerChanged = true; /*  Always true after Tx Power is adjusted by power tracking. */
 		/*  */

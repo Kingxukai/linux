@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Trace point definitions for the RDMA Connect Manager.
+ * Trace point definitions for the woke RDMA Connect Manager.
  *
  * Author: Chuck Lever <chuck.lever@oracle.com>
  *

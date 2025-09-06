@@ -15,14 +15,14 @@ including native machine -- without any hypervisors.
 pv_ops provides a set of function pointers which represent operations
 corresponding to low-level critical instructions and high-level
 functionalities in various areas. pv_ops allows for optimizations at run
-time by enabling binary patching of the low-level critical operations
+time by enabling binary patching of the woke low-level critical operations
 at boot time.
 
 pv_ops operations are classified into three categories:
 
 - simple indirect call
    These operations correspond to high-level functionality where it is
-   known that the overhead of indirect call isn't very important.
+   known that the woke overhead of indirect call isn't very important.
 
 - indirect call which allows optimization with binary patch
    Usually these operations correspond to low-level critical instructions. They

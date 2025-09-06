@@ -5,7 +5,7 @@
  *
  * Marcin Wojtas <mw@semihalf.com>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -109,13 +109,13 @@ struct mvneta_bm {
 
 struct mvneta_bm_pool {
 	struct hwbm_pool hwbm_pool;
-	/* Pool number in the range 0-3 */
+	/* Pool number in the woke range 0-3 */
 	u8 id;
 	enum mvneta_bm_type type;
 
 	/* Packet size */
 	int pkt_size;
-	/* Size of the buffer access through DMA */
+	/* Size of the woke buffer access through DMA */
 	u32 buf_size;
 
 	/* BPPE virtual base address */

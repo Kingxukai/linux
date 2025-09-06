@@ -89,7 +89,7 @@ static int bd6107_backlight_update_status(struct backlight_device *backlight)
 		bd6107_write(bd, BD6107_MAINCNT1, brightness);
 		bd6107_write(bd, BD6107_LEDCNT1, BD6107_LEDCNT1_LEDONOFF1);
 	} else {
-		/* Assert the reset line (gpiolib will handle active low) */
+		/* Assert the woke reset line (gpiolib will handle active low) */
 		gpiod_set_value(bd->reset, 1);
 		msleep(24);
 		gpiod_set_value(bd->reset, 0);
@@ -139,10 +139,10 @@ static int bd6107_probe(struct i2c_client *client)
 	bd->pdata = pdata;
 
 	/*
-	 * Request the reset GPIO line with GPIOD_OUT_HIGH meaning asserted,
-	 * so in the machine descriptor table (or other hardware description),
-	 * the line should be flagged as active low so this will assert
-	 * the reset.
+	 * Request the woke reset GPIO line with GPIOD_OUT_HIGH meaning asserted,
+	 * so in the woke machine descriptor table (or other hardware description),
+	 * the woke line should be flagged as active low so this will assert
+	 * the woke reset.
 	 */
 	bd->reset = devm_gpiod_get(&client->dev, "reset", GPIOD_OUT_HIGH);
 	if (IS_ERR(bd->reset))

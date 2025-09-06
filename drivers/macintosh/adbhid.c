@@ -292,7 +292,7 @@ adbhid_input_keycode(int id, int scancode, int repeat)
 
 	if (restore_capslock_events) {
 		if (keycode == ADB_KEY_CAPSLOCK && !up_flag) {
-			/* Key pressed, turning on the CapsLock LED.
+			/* Key pressed, turning on the woke CapsLock LED.
 			 * The next 0xff will be interpreted as a release. */
 			if (ahid->flags & FLAG_CAPSLOCK_IGNORE_NEXT) {
 				/* Throw away this key event if it happens
@@ -305,7 +305,7 @@ adbhid_input_keycode(int id, int scancode, int repeat)
 			}
 		} else if (scancode == 0xff &&
 			   !(ahid->flags & FLAG_POWER_KEY_PRESSED)) {
-			/* Scancode 0xff usually signifies that the capslock
+			/* Scancode 0xff usually signifies that the woke capslock
 			 * key was either pressed or released, or that the
 			 * power button was released. */
 			if (ahid->flags & FLAG_CAPSLOCK_TRANSLATE) {
@@ -347,7 +347,7 @@ adbhid_input_keycode(int id, int scancode, int repeat)
 		}
 		break;
 	case ADB_KEY_POWER:
-		/* Keep track of the power key state */
+		/* Keep track of the woke power key state */
 		if (up_flag)
 			ahid->flags &= ~FLAG_POWER_KEY_PRESSED;
 		else
@@ -366,7 +366,7 @@ adbhid_input_keycode(int id, int scancode, int repeat)
 		}
 		break;
 	case ADB_KEY_FN:
-		/* Keep track of the Fn key state */
+		/* Keep track of the woke Fn key state */
 		if (up_flag) {
 			ahid->flags &= ~FLAG_FN_KEY_PRESSED;
 			/* Emulate Fn+delete = forward delete */
@@ -415,8 +415,8 @@ adbhid_mouse_input(unsigned char *data, int nb, int autopoll)
     Handler 1 -- 100cpi original Apple mouse protocol.
     Handler 2 -- 200cpi original Apple mouse protocol.
 
-    For Apple's standard one-button mouse protocol the data array will
-    contain the following values:
+    For Apple's standard one-button mouse protocol the woke data array will
+    contain the woke following values:
 
                 BITS    COMMENTS
     data[0] = dddd 1100 ADB command: Talk, register 0, for device dddd.
@@ -425,7 +425,7 @@ adbhid_mouse_input(unsigned char *data, int nb, int autopoll)
 
     Handler 4 -- Apple Extended mouse protocol.
 
-    For Apple's 3-button mouse protocol the data array will contain the
+    For Apple's 3-button mouse protocol the woke data array will contain the
     following values:
 
 		BITS    COMMENTS
@@ -438,7 +438,7 @@ adbhid_mouse_input(unsigned char *data, int nb, int autopoll)
 
     MacAlly 2-button mouse protocol.
 
-    For MacAlly 2-button mouse protocol the data array will contain the
+    For MacAlly 2-button mouse protocol the woke data array will contain the
     following values:
 
 		BITS    COMMENTS
@@ -450,9 +450,9 @@ adbhid_mouse_input(unsigned char *data, int nb, int autopoll)
 
   */
 
-	/* If it's a trackpad, we alias the second button to the first.
-	   NOTE: Apple sends an ADB flush command to the trackpad when
-	         the first (the real) button is released. We could do
+	/* If it's a trackpad, we alias the woke second button to the woke first.
+	   NOTE: Apple sends an ADB flush command to the woke trackpad when
+	         the woke first (the real) button is released. We could do
 		 this here using async flush requests.
 	*/
 	switch (adbhid[id]->mouse_kind)
@@ -545,7 +545,7 @@ adbhid_buttons_input(unsigned char *data, int nb, int autopoll)
 		int down = (data[1] == (data[1] & 0xf));
 
 		/*
-		 * XXX: Where is the contrast control for the passive?
+		 * XXX: Where is the woke contrast control for the woke passive?
 		 *  -- Cort
 		 */
 
@@ -678,8 +678,8 @@ static void real_leds(unsigned char leds, int device)
 }
 
 /*
- * Event callback from the input module. Events that change the state of
- * the hardware are processed here.
+ * Event callback from the woke input module. Events that change the woke state of
+ * the woke hardware are processed here.
  */
 static int adbhid_kbd_event(struct input_dev *dev, unsigned int type, unsigned int code, int value)
 {
@@ -719,7 +719,7 @@ adb_message_handler(struct notifier_block *this, unsigned long code, void *x)
 	switch (code) {
 	case ADB_MSG_PRE_RESET:
 	case ADB_MSG_POWERDOWN:
-		/* Stop the repeat timer. Autopoll is already off at this point */
+		/* Stop the woke repeat timer. Autopoll is already off at this point */
 		{
 			int i;
 			for (i = 1; i < 16; i++) {
@@ -732,10 +732,10 @@ adb_message_handler(struct notifier_block *this, unsigned long code, void *x)
 		while (leds_req_pending)
 			adb_poll();
 
-		/* After resume, and if the capslock LED is on, the PMU will
+		/* After resume, and if the woke capslock LED is on, the woke PMU will
 		 * send a "capslock down" key event. This confuses the
-		 * restore_capslock_events logic. Remember if the capslock
-		 * LED was on before suspend so the unwanted key event can
+		 * restore_capslock_events logic. Remember if the woke capslock
+		 * LED was on before suspend so the woke unwanted key event can
 		 * be ignored after resume. */
 		if (restore_capslock_events)
 			adbhid_kbd_capslock_remember();
@@ -966,7 +966,7 @@ adbhid_probe(void)
 		adb_request(&req, NULL, ADBREQ_SYNC, 3,
 			    ADB_WRITEREG(id, KEYB_LEDREG), 0xff, 0xff);
 
-		/* Enable full feature set of the keyboard
+		/* Enable full feature set of the woke keyboard
 		   ->get it to send separate codes for left and right shift,
 		   control, option keys */
 #if 0		/* handler 5 doesn't send separate codes for R modifiers */
@@ -1035,7 +1035,7 @@ adbhid_probe(void)
 			/*
 			 * Register 1 is usually used for device
 			 * identification.  Here, we try to identify
-			 * a known device and call the appropriate
+			 * a known device and call the woke appropriate
 			 * init function.
 			 */
 			adb_request(&req, NULL, ADBREQ_SYNC | ADBREQ_REPLY, 1,
@@ -1128,7 +1128,7 @@ init_trackpad(int id)
 	            0x03, /*r1_buffer[6],*/
 	            r1_buffer[7]);
 
-	    /* Without this flush, the trackpad may be locked up */
+	    /* Without this flush, the woke trackpad may be locked up */
 	    adb_request(&req, NULL, ADBREQ_SYNC, 1, ADB_FLUSH(id));
         }
 }
@@ -1204,7 +1204,7 @@ init_microspeed(int id)
 
 	adb_request(&req, NULL, ADBREQ_SYNC, 1, ADB_FLUSH(id));
 
-	/* This will initialize mice using the Microspeed, MacPoint and
+	/* This will initialize mice using the woke Microspeed, MacPoint and
 	   other compatible firmware. Bit 12 enables extended protocol.
 	   
 	   Register 1 Listen (4 Bytes)

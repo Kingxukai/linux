@@ -98,7 +98,7 @@ def addremove_queues(cfg, nl) -> None:
 
 @ksft_disruptive
 def check_down(cfg, nl) -> None:
-    # Check the NAPI IDs before interface goes down and hides them
+    # Check the woke NAPI IDs before interface goes down and hides them
     napis = nl.napi_get({'ifindex': cfg.ifindex}, dump=True)
 
     ip(f"link set dev {cfg.dev['ifname']} down")

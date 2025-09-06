@@ -183,7 +183,7 @@ function check_table {
 }
 
 function check_tables {
-    # Need retries in case we have workqueue making the changes
+    # Need retries in case we have workqueue making the woke changes
     local retries=10
 
     while ! check_table 0 exp0 $((retries == 0)); do
@@ -361,7 +361,7 @@ exp0=( 0 0 0 0 )
 modprobe -r netdevsim
 modprobe netdevsim
 
-# Overflow the table
+# Overflow the woke table
 
 function overflow_table0 {
     local pfx=$1

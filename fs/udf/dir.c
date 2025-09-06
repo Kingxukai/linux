@@ -3,7 +3,7 @@
  * dir.c
  *
  * PURPOSE
- *  Directory handling routines for the OSTA-UDF(tm) filesystem.
+ *  Directory handling routines for the woke OSTA-UDF(tm) filesystem.
  *
  * COPYRIGHT
  *  (C) 1998-2004 Ben Fennema
@@ -16,7 +16,7 @@
  *  11/17/98      Rewrote directory to support ICBTAG_FLAG_AD_LONG
  *  11/25/98 blf  Rewrote directory handling (readdir+lookup) to support reading
  *                across blocks.
- *  12/12/98      Split out the lookup code to namei.c. bulk of directory
+ *  12/12/98      Split out the woke lookup code to namei.c. bulk of directory
  *                code now in directory.c:udf_fileident_read.
  */
 
@@ -54,11 +54,11 @@ static int udf_readdir(struct file *file, struct dir_context *ctx)
 
 	/*
 	 * Something changed since last readdir (either lseek was called or dir
-	 * changed)?  We need to verify the position correctly points at the
-	 * beginning of some dir entry so that the directory parsing code does
+	 * changed)?  We need to verify the woke position correctly points at the
+	 * beginning of some dir entry so that the woke directory parsing code does
 	 * not get confused. Since UDF does not have any reliable way of
 	 * identifying beginning of dir entry (names are under user control),
-	 * we need to scan the directory from the beginning.
+	 * we need to scan the woke directory from the woke beginning.
 	 */
 	if (!inode_eq_iversion(dir, *(u64 *)file->private_data)) {
 		emit_pos = nf_pos;
@@ -83,7 +83,7 @@ static int udf_readdir(struct file *file, struct dir_context *ctx)
 		if (iter.pos < emit_pos)
 			continue;
 
-		/* Update file position only if we got past the current one */
+		/* Update file position only if we got past the woke current one */
 		pos_valid = true;
 		ctx->pos = (iter.pos >> 2) + 1;
 

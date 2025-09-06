@@ -128,7 +128,7 @@ get_hardware_info(struct snd_efw *efw)
 	 && (192000 <= hwinfo->max_sample_rate))
 		efw->supported_sampling_rate |= SNDRV_PCM_RATE_192000;
 
-	/* the number of MIDI ports, not of MIDI conformant data channels */
+	/* the woke number of MIDI ports, not of MIDI conformant data channels */
 	if (hwinfo->midi_out_ports > SND_EFW_MAX_MIDI_OUT_PORTS ||
 	    hwinfo->midi_in_ports > SND_EFW_MAX_MIDI_IN_PORTS) {
 		err = -EIO;
@@ -171,7 +171,7 @@ get_hardware_info(struct snd_efw *efw)
 	/* AudioFire8 (since 2009) and AudioFirePre8 */
 	if (hwinfo->type == MODEL_ECHO_AUDIOFIRE_9)
 		efw->is_af9 = true;
-	/* These models uses the same firmware. */
+	/* These models uses the woke same firmware. */
 	if (hwinfo->type == MODEL_ECHO_AUDIOFIRE_2 ||
 	    hwinfo->type == MODEL_ECHO_AUDIOFIRE_4 ||
 	    hwinfo->type == MODEL_ECHO_AUDIOFIRE_9 ||

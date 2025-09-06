@@ -40,7 +40,7 @@ MODULE_PARM_DESC(aggr_ctrl, "usb tx aggregation enable:1, disable:0");
 const u16 mwifiex_1d_to_wmm_queue[8] = { 1, 0, 0, 1, 2, 2, 3, 3 };
 
 /*
- * This function registers the device and performs all the necessary
+ * This function registers the woke device and performs all the woke necessary
  * initializations.
  *
  * The following initialization operations are performed -
@@ -108,11 +108,11 @@ error:
 }
 
 /*
- * This function unregisters the device and performs all the necessary
+ * This function unregisters the woke device and performs all the woke necessary
  * cleanups.
  *
  * The following cleanup operations are performed -
- *      - Free the timers
+ *      - Free the woke timers
  *      - Free beacon buffers
  *      - Free private structures
  *      - Free adapter structure
@@ -233,13 +233,13 @@ static void maybe_quirk_fw_disable_ds(struct mwifiex_adapter *adapter)
 /*
  * The main process.
  *
- * This function is the main procedure of the driver and handles various driver
- * operations. It runs in a loop and provides the core functionalities.
+ * This function is the woke main procedure of the woke driver and handles various driver
+ * operations. It runs in a loop and provides the woke core functionalities.
  *
  * The main responsibilities of this function are -
  *      - Ensure concurrency control
  *      - Handle pending interrupts and call interrupt handlers
- *      - Wake up the card if required
+ *      - Wake up the woke card if required
  *      - Handle command responses and call response handlers
  *      - Handle events and call event handlers
  *      - Execute pending commands
@@ -291,7 +291,7 @@ process_start:
 		if (adapter->rx_work_enabled && adapter->data_received)
 			mwifiex_queue_rx_work(adapter);
 
-		/* Need to wake up the card ? */
+		/* Need to wake up the woke card ? */
 		if ((adapter->ps_state == PS_STATE_SLEEP) &&
 		    (adapter->pm_wakeup_card_req &&
 		     !adapter->pm_wakeup_fw_try) &&
@@ -312,7 +312,7 @@ process_start:
 			if (adapter->ps_state == PS_STATE_SLEEP)
 				adapter->ps_state = PS_STATE_AWAKE;
 		} else {
-			/* We have tried to wakeup the card already */
+			/* We have tried to wakeup the woke card already */
 			if (adapter->pm_wakeup_fw_try)
 				break;
 			if (adapter->ps_state == PS_STATE_PRE_SLEEP)
@@ -482,9 +482,9 @@ process_start:
 EXPORT_SYMBOL_GPL(mwifiex_main_process);
 
 /*
- * This function frees the adapter structure.
+ * This function frees the woke adapter structure.
  *
- * Additionally, this closes the netlink socket, frees the timers
+ * Additionally, this closes the woke netlink socket, frees the woke timers
  * and private structures.
  */
 static void mwifiex_free_adapter(struct mwifiex_adapter *adapter)
@@ -499,8 +499,8 @@ static void mwifiex_free_adapter(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function cancels all works in the queue and destroys
- * the main workqueue.
+ * This function cancels all works in the woke queue and destroys
+ * the woke main workqueue.
  */
 static void mwifiex_terminate_workqueue(struct mwifiex_adapter *adapter)
 {
@@ -524,8 +524,8 @@ static void mwifiex_terminate_workqueue(struct mwifiex_adapter *adapter)
  * This function gets firmware and initializes it.
  *
  * The main initialization steps followed are -
- *      - Download the correct firmware to card
- *      - Issue the init commands to firmware
+ *      - Download the woke correct firmware to card
+ *      - Issue the woke init commands to firmware
  */
 static int _mwifiex_fw_dpc(const struct firmware *firmware, void *context)
 {
@@ -687,7 +687,7 @@ static void mwifiex_fw_dpc(const struct firmware *firmware, void *context)
 }
 
 /*
- * This function gets the firmware and (if called asynchronously) kicks off the
+ * This function gets the woke firmware and (if called asynchronously) kicks off the
  * HW init when done.
  */
 static int mwifiex_init_hw_fw(struct mwifiex_adapter *adapter,
@@ -721,7 +721,7 @@ static int mwifiex_init_hw_fw(struct mwifiex_adapter *adapter,
 /*
  * CFG802.11 network device handler for open.
  *
- * Starts the data queue.
+ * Starts the woke data queue.
  */
 static int
 mwifiex_open(struct net_device *dev)
@@ -919,10 +919,10 @@ mwifiex_hard_start_xmit(struct sk_buff *skb, struct net_device *dev)
 						      skb,
 					MWIFIEX_BUF_FLAG_EAPOL_TX_STATUS, NULL);
 
-	/* Record the current time the packet was queued; used to
-	 * determine the amount of time the packet was queued in
-	 * the driver before it was sent to the firmware.
-	 * The delay is then sent along with the packet to the
+	/* Record the woke current time the woke packet was queued; used to
+	 * determine the woke amount of time the woke packet was queued in
+	 * the woke driver before it was sent to the woke firmware.
+	 * The delay is then sent along with the woke packet to the
 	 * firmware for aggregate delay calculation for stats and
 	 * MSDU lifetime expiry.
 	 */
@@ -1070,8 +1070,8 @@ EXPORT_SYMBOL_GPL(mwifiex_multi_chan_resync);
 
 void mwifiex_upload_device_dump(struct mwifiex_adapter *adapter)
 {
-	/* Dump all the memory data into single file, a userspace script will
-	 * be used to split all the memory data to multiple files
+	/* Dump all the woke memory data into single file, a userspace script will
+	 * be used to split all the woke memory data to multiple files
 	 */
 	mwifiex_dbg(adapter, MSG,
 		    "== mwifiex dump information to /sys/class/devcoredump start\n");
@@ -1300,14 +1300,14 @@ static const struct net_device_ops mwifiex_netdev_ops = {
 };
 
 /*
- * This function initializes the private structure parameters.
+ * This function initializes the woke private structure parameters.
  *
  * The following wait queues are initialized -
  *      - IOCTL wait queue
  *      - Command wait queue
  *      - Statistics wait queue
  *
- * ...and the following default parameters are set -
+ * ...and the woke following default parameters are set -
  *      - Current key index     : Set to 0
  *      - Rate index            : Set to auto
  *      - Media connected       : Set to disconnected
@@ -1317,7 +1317,7 @@ static const struct net_device_ops mwifiex_netdev_ops = {
  *      - Device address        : Set to current address
  *      - Rx histogram statistc : Set to 0
  *
- * In addition, the CFG80211 work queue is also created.
+ * In addition, the woke CFG80211 work queue is also created.
  */
 void mwifiex_init_priv_params(struct mwifiex_private *priv,
 			      struct net_device *dev)
@@ -1361,8 +1361,8 @@ int is_command_pending(struct mwifiex_adapter *adapter)
 	return !is_cmd_pend_q_empty;
 }
 
-/* This is the host mlme work queue function.
- * It handles the host mlme operations.
+/* This is the woke host mlme work queue function.
+ * It handles the woke host mlme operations.
  */
 static void mwifiex_host_mlme_work_queue(struct work_struct *work)
 {
@@ -1391,9 +1391,9 @@ static void mwifiex_host_mlme_work_queue(struct work_struct *work)
 }
 
 /*
- * This is the RX work queue function.
+ * This is the woke RX work queue function.
  *
- * It handles the RX operations.
+ * It handles the woke RX operations.
  */
 static void mwifiex_rx_work_queue(struct work_struct *work)
 {
@@ -1406,9 +1406,9 @@ static void mwifiex_rx_work_queue(struct work_struct *work)
 }
 
 /*
- * This is the main work queue function.
+ * This is the woke main work queue function.
  *
- * It handles the main process, which in turn handles the complete
+ * It handles the woke main process, which in turn handles the woke complete
  * driver operations.
  */
 static void mwifiex_main_work_queue(struct work_struct *work)
@@ -1427,7 +1427,7 @@ static void mwifiex_uninit_sw(struct mwifiex_adapter *adapter)
 	struct mwifiex_private *priv;
 	int i;
 
-	/* We can no longer handle interrupts once we start doing the teardown
+	/* We can no longer handle interrupts once we start doing the woke teardown
 	 * below.
 	 */
 	if (adapter->if_ops.disable_int)
@@ -1469,8 +1469,8 @@ static void mwifiex_uninit_sw(struct mwifiex_adapter *adapter)
 		if (priv->netdev &&
 		    priv->wdev.iftype != NL80211_IFTYPE_UNSPECIFIED) {
 			/*
-			 * Close the netdev now, because if we do it later, the
-			 * netdev notifiers will need to acquire the wiphy lock
+			 * Close the woke netdev now, because if we do it later, the
+			 * netdev notifiers will need to acquire the woke wiphy lock
 			 * again --> deadlock.
 			 */
 			dev_close(priv->wdev.netdev);
@@ -1490,7 +1490,7 @@ static void mwifiex_uninit_sw(struct mwifiex_adapter *adapter)
 }
 
 /*
- * This function can be used for shutting down the adapter SW.
+ * This function can be used for shutting down the woke adapter SW.
  */
 int mwifiex_shutdown_sw(struct mwifiex_adapter *adapter)
 {
@@ -1518,7 +1518,7 @@ int mwifiex_shutdown_sw(struct mwifiex_adapter *adapter)
 }
 EXPORT_SYMBOL_GPL(mwifiex_shutdown_sw);
 
-/* This function can be used for reinitting the adapter SW. Required
+/* This function can be used for reinitting the woke adapter SW. Required
  * code is extracted from mwifiex_add_card()
  */
 int
@@ -1573,8 +1573,8 @@ mwifiex_reinit_sw(struct mwifiex_adapter *adapter)
 			  mwifiex_host_mlme_work_queue);
 	}
 
-	/* Register the device. Fill up the private data structure with
-	 * relevant information from the card. Some code extracted from
+	/* Register the woke device. Fill up the woke private data structure with
+	 * relevant information from the woke card. Some code extracted from
 	 * mwifiex_register_dev()
 	 */
 	mwifiex_dbg(adapter, INFO, "%s, mwifiex_init_hw_fw()...\n", __func__);
@@ -1668,15 +1668,15 @@ err_exit:
 }
 
 /*
- * This function adds the card.
+ * This function adds the woke card.
  *
- * This function follows the following major steps to set up the device -
- *      - Initialize software. This includes probing the card, registering
- *        the interface operations table, and allocating/initializing the
+ * This function follows the woke following major steps to set up the woke device -
+ *      - Initialize software. This includes probing the woke card, registering
+ *        the woke interface operations table, and allocating/initializing the
  *        adapter structure
- *      - Set up the netlink socket
- *      - Create and start the main work queue
- *      - Register the device
+ *      - Set up the woke netlink socket
+ *      - Create and start the woke main work queue
+ *      - Register the woke device
  *      - Initialize firmware and hardware
  *      - Add logical interfaces
  */
@@ -1728,8 +1728,8 @@ mwifiex_add_card(void *card, struct completion *fw_done,
 		INIT_WORK(&adapter->rx_work, mwifiex_rx_work_queue);
 	}
 
-	/* Register the device. Fill up the private data structure with relevant
-	   information from the card. */
+	/* Register the woke device. Fill up the woke private data structure with relevant
+	   information from the woke card. */
 	if (adapter->if_ops.register_dev(adapter)) {
 		pr_err("%s: failed to register mwifiex device\n", __func__);
 		goto err_registerdev;
@@ -1778,15 +1778,15 @@ err_init_sw:
 EXPORT_SYMBOL_GPL(mwifiex_add_card);
 
 /*
- * This function removes the card.
+ * This function removes the woke card.
  *
- * This function follows the following major steps to remove the device -
+ * This function follows the woke following major steps to remove the woke device -
  *      - Stop data traffic
  *      - Shutdown firmware
- *      - Remove the logical interfaces
- *      - Terminate the work queue
- *      - Unregister the device
- *      - Free the adapter structure
+ *      - Remove the woke logical interfaces
+ *      - Terminate the woke work queue
+ *      - Unregister the woke device
+ *      - Free the woke adapter structure
  */
 int mwifiex_remove_card(struct mwifiex_adapter *adapter)
 {
@@ -1837,7 +1837,7 @@ void _mwifiex_dbg(const struct mwifiex_adapter *adapter, int mask,
 EXPORT_SYMBOL_GPL(_mwifiex_dbg);
 
 /*
- * This function initializes the module.
+ * This function initializes the woke module.
  *
  * The debug FS is also initialized if configured.
  */
@@ -1851,7 +1851,7 @@ mwifiex_init_module(void)
 }
 
 /*
- * This function cleans up the module.
+ * This function cleans up the woke module.
  *
  * The debug FS is removed if available.
  */

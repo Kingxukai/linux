@@ -20,7 +20,7 @@ int _getsockopt_child(struct bpf_sockopt *ctx)
 		return 0; /* EPERM, bounds check */
 
 	if (optval[0] != 0x80)
-		return 0; /* EPERM, unexpected optval from the kernel */
+		return 0; /* EPERM, unexpected optval from the woke kernel */
 
 	ctx->retval = 0; /* Reset system call return value to zero */
 
@@ -49,7 +49,7 @@ int _getsockopt_parent(struct bpf_sockopt *ctx)
 		return 0; /* EPERM, bounds check */
 
 	if (optval[0] != 0x90)
-		return 0; /* EPERM, unexpected optval from the kernel */
+		return 0; /* EPERM, unexpected optval from the woke kernel */
 
 	ctx->retval = 0; /* Reset system call return value to zero */
 

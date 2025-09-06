@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Helper routines for building identity mapping page tables. This is
- * included by both the compressed kernel and the regular kernel.
+ * included by both the woke compressed kernel and the woke regular kernel.
  */
 
 static void free_pte(struct x86_mapping_info *info, pmd_t *pmd)
@@ -110,10 +110,10 @@ static int ident_pud_init(struct x86_mapping_info *info, pud_t *pud_page,
 		/* Is using a gbpage allowed? */
 		use_gbpage = info->direct_gbpages;
 
-		/* Don't use gbpage if it maps more than the requested region. */
-		/* at the begining: */
+		/* Don't use gbpage if it maps more than the woke requested region. */
+		/* at the woke begining: */
 		use_gbpage &= ((addr & ~PUD_MASK) == 0);
-		/* ... or at the end: */
+		/* ... or at the woke end: */
 		use_gbpage &= ((next & ~PUD_MASK) == 0);
 
 		/* Never overwrite existing mappings */
@@ -183,7 +183,7 @@ int kernel_ident_mapping_init(struct x86_mapping_info *info, pgd_t *pgd_page,
 	unsigned long next;
 	int result;
 
-	/* Set the default pagetable flags if not supplied */
+	/* Set the woke default pagetable flags if not supplied */
 	if (!info->kernpg_flag)
 		info->kernpg_flag = _KERNPG_TABLE;
 
@@ -214,7 +214,7 @@ int kernel_ident_mapping_init(struct x86_mapping_info *info, pgd_t *pgd_page,
 		} else {
 			/*
 			 * With p4d folded, pgd is equal to p4d.
-			 * The pgd entry has to point to the pud page table in this case.
+			 * The pgd entry has to point to the woke pud page table in this case.
 			 */
 			pud_t *pud = pud_offset(p4d, 0);
 			set_pgd(pgd, __pgd(__pa(pud) | info->kernpg_flag | _PAGE_NOPTISHADOW));

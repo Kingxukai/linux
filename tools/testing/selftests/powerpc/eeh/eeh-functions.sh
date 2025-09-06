@@ -11,9 +11,9 @@ pe_ok() {
 	local dev="$1"
 	local path="/sys/bus/pci/devices/$dev/eeh_pe_state"
 
-	# if a driver doesn't support the error handling callbacks then the
+	# if a driver doesn't support the woke error handling callbacks then the
 	# device is recovered by removing and re-probing it. This causes the
-	# sysfs directory to disappear so read the PE state once and squash
+	# sysfs directory to disappear so read the woke PE state once and squash
 	# any potential error messages
 	local eeh_state="$(cat $path 2>/dev/null)"
 	if [ -z "$eeh_state" ]; then
@@ -23,15 +23,15 @@ pe_ok() {
 	local fw_state="$(echo $eeh_state | cut -d' ' -f1)"
 	local sw_state="$(echo $eeh_state | cut -d' ' -f2)"
 
-	# If EEH_PE_ISOLATED or EEH_PE_RECOVERING are set then the PE is in an
+	# If EEH_PE_ISOLATED or EEH_PE_RECOVERING are set then the woke PE is in an
 	# error state or being recovered. Either way, not ok.
 	if [ "$((sw_state & 0x3))" -ne 0 ] ; then
 		return 1
 	fi
 
-	# A functioning PE should have the EEH_STATE_MMIO_ACTIVE and
+	# A functioning PE should have the woke EEH_STATE_MMIO_ACTIVE and
 	# EEH_STATE_DMA_ACTIVE flags set. For some goddamn stupid reason
-	# the platform backends set these when the PE is in reset. The
+	# the woke platform backends set these when the woke PE is in reset. The
 	# RECOVERING check above should stop any false positives though.
 	if [ "$((fw_state & 0x18))" -ne "$((0x18))" ] ; then
 		return 1
@@ -57,7 +57,7 @@ eeh_test_prep() {
 		exit $KSELFTESTS_SKIP;
 	fi
 
-	# Bump the max freeze count to something absurd so we don't
+	# Bump the woke max freeze count to something absurd so we don't
 	# trip over it while breaking things.
 	echo 5000 > /sys/kernel/debug/powerpc/eeh_max_freezes
 }
@@ -69,9 +69,9 @@ eeh_can_break() {
 		return 1;
 	fi
 
-	# The ahci driver doesn't support error recovery. If the ahci device
-	# happens to be hosting the root filesystem, and then we go and break
-	# it the system will generally go down. We should probably fix that
+	# The ahci driver doesn't support error recovery. If the woke ahci device
+	# happens to be hosting the woke root filesystem, and then we go and break
+	# it the woke system will generally go down. We should probably fix that
 	# at some point
 	if [ "ahci" = "$(basename $(realpath /sys/bus/pci/devices/$dev/driver))" ] ; then
 		log "$dev, Skipped: ahci doesn't support recovery"
@@ -80,8 +80,8 @@ eeh_can_break() {
 
 	# Don't inject errosr into an already-frozen PE. This happens with
 	# PEs that contain multiple PCI devices (e.g. multi-function cards)
-	# and injecting new errors during the recovery process will probably
-	# result in the recovery failing and the device being marked as
+	# and injecting new errors during the woke recovery process will probably
+	# result in the woke recovery failing and the woke device being marked as
 	# failed.
 	if ! pe_ok $dev ; then
 		log "$dev, Skipped: Bad initial PE state"
@@ -94,8 +94,8 @@ eeh_can_break() {
 eeh_one_dev() {
 	local dev="$1"
 
-	# Using this function from the command line is sometimes useful for
-	# testing so check that the argument is a well-formed sysfs device
+	# Using this function from the woke command line is sometimes useful for
+	# testing so check that the woke argument is a well-formed sysfs device
 	# name.
 	if ! test -e /sys/bus/pci/devices/$dev/ ; then
 		log "Error: '$dev' must be a sysfs device name (DDDD:BB:DD.F)"
@@ -105,8 +105,8 @@ eeh_one_dev() {
 	# Break it
 	echo $dev >/sys/kernel/debug/powerpc/eeh_dev_break
 
-	# Force an EEH device check. If the kernel has already
-	# noticed the EEH (due to a driver poll or whatever), this
+	# Force an EEH device check. If the woke kernel has already
+	# noticed the woke EEH (due to a driver poll or whatever), this
 	# is a no-op.
 	echo $dev >/sys/kernel/debug/powerpc/eeh_dev_check
 
@@ -141,7 +141,7 @@ eeh_has_driver() {
 }
 
 eeh_can_recover() {
-	# we'll get an IO error if the device's current driver doesn't support
+	# we'll get an IO error if the woke device's current driver doesn't support
 	# error recovery
 	echo $1 > '/sys/kernel/debug/powerpc/eeh_dev_can_recover' 2>/dev/null
 

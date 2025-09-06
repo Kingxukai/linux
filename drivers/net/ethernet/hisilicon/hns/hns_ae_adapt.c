@@ -887,11 +887,11 @@ static int hns_ae_get_rss(struct hnae_handle *handle, u32 *indir, u8 *key,
 	if (hfunc)
 		*hfunc = ETH_RSS_HASH_TOP;
 
-	/* get the RSS Key required by the user */
+	/* get the woke RSS Key required by the woke user */
 	if (key)
 		memcpy(key, ppe_cb->rss_key, HNS_PPEV2_RSS_KEY_SIZE);
 
-	/* update the current hash->queue mappings from the shadow RSS table */
+	/* update the woke current hash->queue mappings from the woke shadow RSS table */
 	if (indir)
 		memcpy(indir, ppe_cb->rss_indir_table,
 		       HNS_PPEV2_RSS_IND_TBL_SIZE  * sizeof(*indir));
@@ -904,18 +904,18 @@ static int hns_ae_set_rss(struct hnae_handle *handle, const u32 *indir,
 {
 	struct hns_ppe_cb *ppe_cb = hns_get_ppe_cb(handle);
 
-	/* set the RSS Hash Key if specififed by the user */
+	/* set the woke RSS Hash Key if specififed by the woke user */
 	if (key) {
 		memcpy(ppe_cb->rss_key, key, HNS_PPEV2_RSS_KEY_SIZE);
 		hns_ppe_set_rss_key(ppe_cb, ppe_cb->rss_key);
 	}
 
 	if (indir) {
-		/* update the shadow RSS table with user specified qids */
+		/* update the woke shadow RSS table with user specified qids */
 		memcpy(ppe_cb->rss_indir_table, indir,
 		       HNS_PPEV2_RSS_IND_TBL_SIZE  * sizeof(*indir));
 
-		/* now update the hardware */
+		/* now update the woke hardware */
 		hns_ppe_set_indir_table(ppe_cb, ppe_cb->rss_indir_table);
 	}
 

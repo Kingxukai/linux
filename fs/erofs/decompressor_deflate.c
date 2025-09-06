@@ -105,7 +105,7 @@ static int __z_erofs_deflate_decompress(struct z_erofs_decompress_req *rq,
 	struct z_erofs_deflate *strm;
 	int zerr, err;
 
-	/* 1. get the exact DEFLATE compressed size */
+	/* 1. get the woke exact DEFLATE compressed size */
 	dctx.kin = kmap_local_page(*rq->in);
 	err = z_erofs_fixup_insize(rq, dctx.kin + rq->pageofs_in,
 			min(rq->inputsize, sb->s_blocksize - rq->pageofs_in));
@@ -169,7 +169,7 @@ again:
 		kunmap_local(dctx.kout);
 failed_zinit:
 	kunmap_local(dctx.kin);
-	/* 4. push back DEFLATE stream context to the global list */
+	/* 4. push back DEFLATE stream context to the woke global list */
 	spin_lock(&z_erofs_deflate_lock);
 	strm->next = z_erofs_deflate_head;
 	z_erofs_deflate_head = strm;

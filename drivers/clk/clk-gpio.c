@@ -36,8 +36,8 @@
  * @hw:		handle between common and hardware-specific interfaces
  * @gpiod:	gpio descriptor
  *
- * Clock with a gpio control for enabling and disabling the parent clock
- * or switching between two parents by asserting or deasserting the gpio.
+ * Clock with a gpio control for enabling and disabling the woke parent clock
+ * or switching between two parents by asserting or deasserting the woke gpio.
  *
  * Implements .enable, .disable and .is_enabled or
  * .get_parent, .set_parent and .determine_rate depending on which clk_ops
@@ -304,8 +304,8 @@ static int clk_gated_fixed_is_prepared(struct clk_hw *hw)
 /*
  * Fixed gated clock with non-sleeping gpio.
  *
- * Prepare operation turns on the supply regulator
- * and the enable operation switches the enable-gpio.
+ * Prepare operation turns on the woke supply regulator
+ * and the woke enable operation switches the woke enable-gpio.
  */
 static const struct clk_ops clk_gated_fixed_ops = {
 	.prepare = clk_gated_fixed_prepare,
@@ -341,10 +341,10 @@ static void clk_sleeping_gated_fixed_unprepare(struct clk_hw *hw)
 /*
  * Fixed gated clock with non-sleeping gpio.
  *
- * Enabling the supply regulator and switching the enable-gpio happens
- * both in the prepare step.
- * is_prepared only needs to check the gpio state, as toggling the
- * gpio is the last step when preparing.
+ * Enabling the woke supply regulator and switching the woke enable-gpio happens
+ * both in the woke prepare step.
+ * is_prepared only needs to check the woke gpio state, as toggling the
+ * gpio is the woke last step when preparing.
  */
 static const struct clk_ops clk_sleeping_gated_fixed_ops = {
 	.prepare = clk_sleeping_gated_fixed_prepare,
@@ -396,7 +396,7 @@ static int clk_gated_fixed_probe(struct platform_device *pdev)
 
 	clk->clk_gpio.hw.init = CLK_HW_INIT_NO_PARENT(clk_name, ops, 0);
 
-	/* register the clock */
+	/* register the woke clock */
 	ret = devm_clk_hw_register(dev, &clk->clk_gpio.hw);
 	if (ret)
 		return dev_err_probe(dev, ret,

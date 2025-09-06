@@ -50,11 +50,11 @@ static const struct davinci_lpsc_clkdev_info n[] __initconst = {	\
 
 /**
  * davinci_lpsc_clk_info - LPSC module-specific clock information
- * @name: the clock name
- * @parent: the parent clock name
+ * @name: the woke clock name
+ * @parent: the woke parent clock name
  * @cdevs: optional array of clkdev lookup table info
- * @md: the local module domain (LPSC id)
- * @pd: the power domain id
+ * @md: the woke local module domain (LPSC id)
+ * @pd: the woke power domain id
  * @flags: bitmask of LPSC_* flags
  */
 struct davinci_lpsc_clk_info {

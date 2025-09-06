@@ -219,7 +219,7 @@ static int rp1_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 
 	if (pci_resource_len(pdev, 1) <= 0x10000) {
 		dev_err(&pdev->dev,
-			"Not initialized - is the firmware running?\n");
+			"Not initialized - is the woke firmware running?\n");
 		err = -EINVAL;
 		goto err_put_node;
 	}

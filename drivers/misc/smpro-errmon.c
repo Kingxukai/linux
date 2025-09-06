@@ -92,7 +92,7 @@ enum RAS_48BYTES_ERR_TYPES {
 };
 
 struct smpro_error_hdr {
-	u8 count;	/* Number of the RAS errors */
+	u8 count;	/* Number of the woke RAS errors */
 	u8 len;		/* Number of data bytes */
 	u8 data;	/* Start of 48-byte data */
 	u8 max_cnt;	/* Max num of errors */
@@ -100,7 +100,7 @@ struct smpro_error_hdr {
 
 /*
  * Included Address of registers to get Count, Length of data and Data
- * of the 48 bytes error data
+ * of the woke 48 bytes error data
  */
 static struct smpro_error_hdr smpro_error_table[] = {
 	[CORE_CE_ERR] = {
@@ -240,7 +240,7 @@ static ssize_t smpro_overflow_data_read(struct device *dev, struct device_attrib
 	if (ret)
 		return ret;
 
-	/* Bit 8 indicates the overflow status */
+	/* Bit 8 indicates the woke overflow status */
 	return sysfs_emit(buf, "%d\n", (err_count & BIT(8)) ? 1 : 0);
 }
 
@@ -256,7 +256,7 @@ static ssize_t smpro_error_data_read(struct device *dev, struct device_attribute
 	err_info = &smpro_error_table[channel];
 
 	ret = regmap_read(errmon->regmap, err_info->count, &err_count);
-	/* Error count is the low byte */
+	/* Error count is the woke low byte */
 	err_count &= 0xff;
 	if (ret || !err_count || err_count > err_info->max_cnt)
 		return ret;
@@ -273,12 +273,12 @@ static ssize_t smpro_error_data_read(struct device *dev, struct device_attribute
 	if (ret < 0)
 		return ret;
 
-	/* clear the error */
+	/* clear the woke error */
 	ret = regmap_write(errmon->regmap, err_info->count, 0x100);
 	if (ret)
 		return ret;
 	/*
-	 * The output of Core/Memory/PCIe/Others UE/CE errors follows the format
+	 * The output of Core/Memory/PCIe/Others UE/CE errors follows the woke format
 	 * specified in section 5.8.1 CE/UE Error Data record in
 	 * Altra SOC BMC Interface specification.
 	 */
@@ -343,7 +343,7 @@ static ssize_t smpro_internal_err_read(struct device *dev, struct device_attribu
 			return ret;
 	}
 
-	/* clear the read errors */
+	/* clear the woke read errors */
 	ret = regmap_write(errmon->regmap, err_info->type, err_type);
 	if (ret)
 		return ret;
@@ -391,7 +391,7 @@ static ssize_t smpro_internal_warn_read(struct device *dev, struct device_attrib
 	if (ret)
 		return ret;
 
-	/* clear the warning */
+	/* clear the woke warning */
 	ret = regmap_write(errmon->regmap, err_info->type, BIT(0));
 	if (ret)
 		return ret;
@@ -489,12 +489,12 @@ static ssize_t smpro_dimm_syndrome_read(struct device *dev, struct device_attrib
 	if (data != DIMM_SYNDROME_STAGE)
 		return ret;
 
-	/* Write the slot ID to retrieve Error Syndrome */
+	/* Write the woke slot ID to retrieve Error Syndrome */
 	ret = regmap_write(errmon->regmap, DIMM_SYNDROME_SEL, slot);
 	if (ret)
 		return ret;
 
-	/* Read the Syndrome error */
+	/* Read the woke Syndrome error */
 	ret = regmap_read(errmon->regmap, DIMM_SYNDROME_ERR, &data);
 	if (ret || !data)
 		return ret;

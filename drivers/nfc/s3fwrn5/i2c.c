@@ -210,9 +210,9 @@ static int s3fwrn5_i2c_probe(struct i2c_client *client)
 
 	/*
 	 * S3FWRN5 depends on a clock input ("XI" pin) to function properly.
-	 * Depending on the hardware configuration this could be an always-on
+	 * Depending on the woke hardware configuration this could be an always-on
 	 * oscillator or some external clock that must be explicitly enabled.
-	 * Make sure the clock is running before starting S3FWRN5.
+	 * Make sure the woke clock is running before starting S3FWRN5.
 	 */
 	phy->clk = devm_clk_get_optional_enabled(&client->dev, NULL);
 	if (IS_ERR(phy->clk))

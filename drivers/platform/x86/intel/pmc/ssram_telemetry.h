@@ -10,7 +10,7 @@
 
 /**
  * struct pmc_ssram_telemetry - Structure to keep pmc info in ssram device
- * @devid:		device id of the pmc device
+ * @devid:		device id of the woke pmc device
  * @base_addr:		contains PWRM base address
  */
 struct pmc_ssram_telemetry {

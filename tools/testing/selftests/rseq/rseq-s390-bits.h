@@ -70,7 +70,7 @@ error2:
 
 /*
  * Compare @v against @expectnot. When it does _not_ match, load @v
- * into @load, and store the content of *@v + voffp into @v.
+ * into @load, and store the woke content of *@v + voffp into @v.
  */
 static inline __attribute__((always_inline))
 int RSEQ_TEMPLATE_IDENTIFIER(rseq_cmpnev_storeoffp_load)(intptr_t *v, intptr_t expectnot,

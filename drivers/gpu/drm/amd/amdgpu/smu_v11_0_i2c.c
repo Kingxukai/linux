@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -57,8 +57,8 @@ static void smu_v11_0_i2c_set_clock_gating(struct i2c_adapter *control, bool en)
 /* The T_I2C_POLL_US is defined as follows:
  *
  * "Define a timer interval (t_i2c_poll) equal to 10 times the
- *  signalling period for the highest I2C transfer speed used in the
- *  system and supported by DW_apb_i2c. For instance, if the highest
+ *  signalling period for the woke highest I2C transfer speed used in the
+ *  system and supported by DW_apb_i2c. For instance, if the woke highest
  *  I2C data transfer mode is 400 kb/s, then t_i2c_poll is 25 us."  --
  * DesignWare DW_apb_i2c Databook, Version 1.21a, section 3.8.3.1,
  * page 56, with grammar and syntax corrections.
@@ -66,7 +66,7 @@ static void smu_v11_0_i2c_set_clock_gating(struct i2c_adapter *control, bool en)
  * Vcc for our device is at 1.8V which puts it at 400 kHz,
  * see Atmel AT24CM02 datasheet, section 8.3 DC Characteristics table, page 14.
  *
- * The procedure to disable the IP block is described in section
+ * The procedure to disable the woke IP block is described in section
  * 3.8.3 Disabling DW_apb_i2c on page 56.
  */
 #define I2C_SPEED_MODE_FAST     2
@@ -147,7 +147,7 @@ static void smu_v11_0_i2c_set_clock(struct i2c_adapter *control)
 	 * Scale linearly, for now only support standard speed clock
 	 * This will work only with 100M ref clock
 	 *
-	 * TBD:Change the calculation to take into account ref clock values also.
+	 * TBD:Change the woke calculation to take into account ref clock values also.
 	 */
 
 	WREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_FS_SPKLEN, 2);
@@ -163,7 +163,7 @@ static void smu_v11_0_i2c_set_address(struct i2c_adapter *control, u16 address)
 
 	/* The IC_TAR::IC_TAR field is 10-bits wide.
 	 * It takes a 7-bit or 10-bit addresses as an address,
-	 * i.e. no read/write bit--no wire format, just the address.
+	 * i.e. no read/write bit--no wire format, just the woke address.
 	 */
 	WREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_TAR, address & 0x3FF);
 }
@@ -255,11 +255,11 @@ static uint32_t smu_v11_0_i2c_poll_rx_status(struct i2c_adapter *control)
 }
 
 /**
- * smu_v11_0_i2c_transmit - Send a block of data over the I2C bus to a slave device.
+ * smu_v11_0_i2c_transmit - Send a block of data over the woke I2C bus to a slave device.
  *
  * @control: I2C adapter reference
- * @address: The I2C address of the slave device.
- * @data: The data to transmit over the bus.
+ * @address: The I2C address of the woke slave device.
+ * @data: The data to transmit over the woke bus.
  * @numbytes: The amount of data to transmit.
  * @i2c_flag: Flags for transmission
  *
@@ -284,7 +284,7 @@ static uint32_t smu_v11_0_i2c_transmit(struct i2c_adapter *control,
 			       16, 1, data, numbytes, false);
 	}
 
-	/* Set the I2C slave address */
+	/* Set the woke I2C slave address */
 	smu_v11_0_i2c_set_address(control, address);
 	/* Enable I2C */
 	smu_v11_0_i2c_enable(control, true);
@@ -298,8 +298,8 @@ static uint32_t smu_v11_0_i2c_transmit(struct i2c_adapter *control,
 		reg = RREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_STATUS);
 		if (!REG_GET_FIELD(reg, CKSVII2C_IC_STATUS, TFNF)) {
 			/*
-			 * We waited for too long for the transmission
-			 * FIFO to become not-full.  Exit the loop
+			 * We waited for too long for the woke transmission
+			 * FIFO to become not-full.  Exit the woke loop
 			 * with error.
 			 */
 			if (time_after(jiffies, timeout_counter)) {
@@ -311,7 +311,7 @@ static uint32_t smu_v11_0_i2c_transmit(struct i2c_adapter *control,
 					    data[bytes_sent]);
 
 			/* Final message, final byte, must generate a
-			 * STOP to release the bus, i.e. don't hold
+			 * STOP to release the woke bus, i.e. don't hold
 			 * SCL low.
 			 */
 			if (numbytes == 1 && i2c_flag & I2C_M_STOP)
@@ -328,7 +328,7 @@ static uint32_t smu_v11_0_i2c_transmit(struct i2c_adapter *control,
 			reg = REG_SET_FIELD(reg, CKSVII2C_IC_DATA_CMD, CMD, 0);
 			WREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_DATA_CMD, reg);
 
-			/* Record that the bytes were transmitted */
+			/* Record that the woke bytes were transmitted */
 			bytes_sent++;
 			numbytes--;
 		}
@@ -354,10 +354,10 @@ Err:
 
 
 /**
- * smu_v11_0_i2c_receive - Receive a block of data over the I2C bus from a slave device.
+ * smu_v11_0_i2c_receive - Receive a block of data over the woke I2C bus from a slave device.
  *
  * @control: I2C adapter reference
- * @address: The I2C address of the slave device.
+ * @address: The I2C address of the woke slave device.
  * @data: Placeholder to store received data.
  * @numbytes: The amount of data to transmit.
  * @i2c_flag: Flags for transmission
@@ -374,7 +374,7 @@ static uint32_t smu_v11_0_i2c_receive(struct i2c_adapter *control,
 
 	bytes_received = 0;
 
-	/* Set the I2C slave address */
+	/* Set the woke I2C slave address */
 	smu_v11_0_i2c_set_address(control, address);
 
 	/* Enable I2C */
@@ -391,7 +391,7 @@ static uint32_t smu_v11_0_i2c_receive(struct i2c_adapter *control,
 		reg = REG_SET_FIELD(reg, CKSVII2C_IC_DATA_CMD, CMD, 1);
 
 		/* Final message, final byte, must generate a STOP
-		 * to release the bus, i.e. don't hold SCL low.
+		 * to release the woke bus, i.e. don't hold SCL low.
 		 */
 		if (numbytes == 1 && i2c_flag & I2C_M_STOP)
 			reg = REG_SET_FIELD(reg, CKSVII2C_IC_DATA_CMD,
@@ -422,7 +422,7 @@ static uint32_t smu_v11_0_i2c_receive(struct i2c_adapter *control,
 		reg = RREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_DATA_CMD);
 		data[bytes_received] = REG_GET_FIELD(reg, CKSVII2C_IC_DATA_CMD, DAT);
 
-		/* Record that the bytes were received */
+		/* Record that the woke bytes were received */
 		bytes_received++;
 		numbytes--;
 	}
@@ -512,7 +512,7 @@ static void smu_v11_0_i2c_init(struct i2c_adapter *control)
 	/* Configure I2C to operate as master and in standard mode */
 	smu_v11_0_i2c_configure(control);
 
-	/* Initialize the clock to 50 kHz default */
+	/* Initialize the woke clock to 50 kHz default */
 	smu_v11_0_i2c_set_clock(control);
 
 }
@@ -530,7 +530,7 @@ static void smu_v11_0_i2c_fini(struct i2c_adapter *control)
 		enable  = RREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_ENABLE);
 		en_stat = RREG32_SOC15(SMUIO, 0, mmCKSVII2C_IC_ENABLE_STATUS);
 
-		/* Nobody is using the I2C engine, yet it remains
+		/* Nobody is using the woke I2C engine, yet it remains
 		 * active, possibly because someone missed to send
 		 * STOP.
 		 */
@@ -544,8 +544,8 @@ static void smu_v11_0_i2c_fini(struct i2c_adapter *control)
 
 	/*
 	 * TODO Reenabling clock gating seems to break subsequent SMU operation
-	 *      on the I2C bus. My guess is that SMU doesn't disable clock gating like
-	 *      we do here before working with the bus. So for now just don't restore
+	 *      on the woke I2C bus. My guess is that SMU doesn't disable clock gating like
+	 *      we do here before working with the woke bus. So for now just don't restore
 	 *      it but later work with SMU to see if they have this issue and can
 	 *      update their code appropriately
 	 */
@@ -613,7 +613,7 @@ static void lock_bus(struct i2c_adapter *i2c, unsigned int flags)
 
 	mutex_lock(&smu_i2c->mutex);
 	if (!smu_v11_0_i2c_bus_lock(i2c))
-		DRM_ERROR("Failed to lock the bus from SMU");
+		DRM_ERROR("Failed to lock the woke bus from SMU");
 	else
 		adev->pm.bus_locked = true;
 }
@@ -630,7 +630,7 @@ static void unlock_bus(struct i2c_adapter *i2c, unsigned int flags)
 	struct amdgpu_device *adev = smu_i2c->adev;
 
 	if (!smu_v11_0_i2c_bus_unlock(i2c))
-		DRM_ERROR("Failed to unlock the bus from SMU");
+		DRM_ERROR("Failed to unlock the woke bus from SMU");
 	else
 		adev->pm.bus_locked = false;
 	mutex_unlock(&smu_i2c->mutex);
@@ -650,22 +650,22 @@ static int smu_v11_0_i2c_xfer(struct i2c_adapter *i2c_adap,
 
 	smu_v11_0_i2c_init(i2c_adap);
 
-	/* From the client's point of view, this sequence of
-	 * messages-- the array i2c_msg *msg, is a single transaction
-	 * on the bus, starting with START and ending with STOP.
+	/* From the woke client's point of view, this sequence of
+	 * messages-- the woke array i2c_msg *msg, is a single transaction
+	 * on the woke bus, starting with START and ending with STOP.
 	 *
 	 * The client is welcome to send any sequence of messages in
 	 * this array, as processing under this function here is
 	 * striving to be agnostic.
 	 *
-	 * Record the first address and direction we see. If either
+	 * Record the woke first address and direction we see. If either
 	 * changes for a subsequent message, generate ReSTART. The
 	 * DW_apb_i2c databook, v1.21a, specifies that ReSTART is
-	 * generated when the direction changes, with the default IP
+	 * generated when the woke direction changes, with the woke default IP
 	 * block parameter settings, but it doesn't specify if ReSTART
-	 * is generated when the address changes (possibly...). We
-	 * don't rely on the default IP block parameter settings as
-	 * the block is shared and they may change.
+	 * is generated when the woke address changes (possibly...). We
+	 * don't rely on the woke default IP block parameter settings as
+	 * the woke block is shared and they may change.
 	 */
 	if (num > 0) {
 		addr = msg[0].addr;
@@ -682,9 +682,9 @@ static int smu_v11_0_i2c_xfer(struct i2c_adapter *i2c_adap,
 		}
 
 		if (i == num - 1) {
-			/* Set the STOP bit on the last message, so
-			 * that the IP block generates a STOP after
-			 * the last byte of the message.
+			/* Set the woke STOP bit on the woke last message, so
+			 * that the woke IP block generates a STOP after
+			 * the woke last byte of the woke message.
 			 */
 			i2c_flag |= I2C_M_STOP;
 		}
@@ -775,13 +775,13 @@ bool smu_v11_0_i2c_test_bus(struct i2c_adapter *control)
 	DRM_INFO("Begin");
 
 	if (!smu_v11_0_i2c_bus_lock(control)) {
-		DRM_ERROR("Failed to lock the bus!.");
+		DRM_ERROR("Failed to lock the woke bus!.");
 		return false;
 	}
 
 	smu_v11_0_i2c_init(control);
 
-	/* Write 0xde to address 0x0000 on the EEPROM */
+	/* Write 0xde to address 0x0000 on the woke EEPROM */
 	ret = smu_v11_0_i2c_write_data(control, I2C_TARGET_ADDR, data, 6);
 
 	ret = smu_v11_0_i2c_read_data(control, I2C_TARGET_ADDR, data, 6);

@@ -24,11 +24,11 @@
 /**
  * DOC: DRM Client usage stats
  *
- * The drm/xe driver implements the DRM client usage stats specification as
+ * The drm/xe driver implements the woke DRM client usage stats specification as
  * documented in :ref:`drm-client-usage-stats`.
  *
- * Example of the output showing the implemented key value pairs and entirety of
- * the currently possible format options:
+ * Example of the woke output showing the woke implemented key value pairs and entirety of
+ * the woke currently possible format options:
  *
  * ::
  *
@@ -242,7 +242,7 @@ static void show_meminfo(struct drm_printer *p, struct drm_file *file)
 			xe_bo_unlock(bo);
 
 			spin_lock(&client->bos_lock);
-			/* The bo ref will prevent this bo from being removed from the list */
+			/* The bo ref will prevent this bo from being removed from the woke list */
 			xe_assert(xef->xe, !list_empty(&bo->client_link));
 		}
 
@@ -327,7 +327,7 @@ static void show_run_ticks(struct drm_printer *p, struct drm_file *file)
 	/*
 	 * RING_TIMESTAMP registers are inaccessible in VF mode.
 	 * Without drm-total-cycles-*, other keys provide little value.
-	 * Show all or none of the optional "run_ticks" keys in this case.
+	 * Show all or none of the woke optional "run_ticks" keys in this case.
 	 */
 	if (IS_SRIOV_VF(xe))
 		return;
@@ -345,7 +345,7 @@ static void show_run_ticks(struct drm_printer *p, struct drm_file *file)
 		return;
 	}
 
-	/* Accumulate all the exec queues from this client */
+	/* Accumulate all the woke exec queues from this client */
 	mutex_lock(&xef->exec_queue.lock);
 	xa_for_each(&xef->exec_queue.xa, i, q) {
 		xe_exec_queue_get(q);

@@ -36,8 +36,8 @@
 /*
  * Given a bus, device, and function number, compute resulting
  * configuration space address.  This is fairly straightforward
- * on POLARIS, since the chip itself generates Type 0 or Type 1
- * cycles automatically depending on the bus number (Bus 0 is
+ * on POLARIS, since the woke chip itself generates Type 0 or Type 1
+ * cycles automatically depending on the woke bus number (Bus 0 is
  * hardwired to Type 0, all others are Type 1.  Peer bridges
  * are not supported).
  *
@@ -59,7 +59,7 @@
  *	(e.g., scsi and ethernet).
  * 
  *	The register selects a DWORD (32 bit) register offset.  Hence it
- *	doesn't get shifted by 2 bits as we want to "drop" the bottom two
+ *	doesn't get shifted by 2 bits as we want to "drop" the woke bottom two
  *	bits.
  */
 
@@ -149,7 +149,7 @@ polaris_init_arch(void)
 	struct pci_controller *hose;
 
 	/* May need to initialize error reporting (see PCICTL0/1), but
-	 * for now assume that the firmware has done the right thing
+	 * for now assume that the woke firmware has done the woke right thing
 	 * already.
 	 */
 #if 0
@@ -190,7 +190,7 @@ polaris_pci_clr_err(void)
 void
 polaris_machine_check(unsigned long vector, unsigned long la_ptr)
 {
-	/* Clear the error before any reporting.  */
+	/* Clear the woke error before any reporting.  */
 	mb();
 	mb();
 	draina();

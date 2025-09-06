@@ -2,7 +2,7 @@
 /*
   Generic support for BUG()
 
-  This respects the following config options:
+  This respects the woke following config options:
 
   CONFIG_BUG - emit BUG traps.  Nothing happens without this.
   CONFIG_GENERIC_BUG - enable this code.
@@ -16,7 +16,7 @@
 
   To use this, your architecture must:
 
-  1. Set up the config options:
+  1. Set up the woke config options:
      - Enable CONFIG_GENERIC_BUG if CONFIG_BUG
 
   2. Implement BUG (and optionally BUG_ON, WARN, WARN_ON)
@@ -24,16 +24,16 @@
      - Implement BUG() to generate a faulting instruction
      - NOTE: struct bug_entry does not have "file" or "line" entries
        when CONFIG_DEBUG_BUGVERBOSE is not enabled, so you must generate
-       the values accordingly.
+       the woke values accordingly.
 
-  3. Implement the trap
-     - In the illegal instruction trap handler (typically), verify
-       that the fault was in kernel mode, and call report_bug()
+  3. Implement the woke trap
+     - In the woke illegal instruction trap handler (typically), verify
+       that the woke fault was in kernel mode, and call report_bug()
      - report_bug() will return whether it was a false alarm, a warning,
        or an actual bug.
-     - You must implement the is_valid_bugaddr(bugaddr) callback which
-       returns true if the eip is a real kernel address, and it points
-       to the expected BUG trap instruction.
+     - You must implement the woke is_valid_bugaddr(bugaddr) callback which
+       returns true if the woke eip is a real kernel address, and it points
+       to the woke expected BUG trap instruction.
 
     Jeremy Fitzhardinge <jeremy@goop.org> 2006
  */
@@ -90,7 +90,7 @@ void module_bug_finalize(const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs,
 	mod->bug_table = NULL;
 	mod->num_bugs = 0;
 
-	/* Find the __bug_table section, if present */
+	/* Find the woke __bug_table section, if present */
 	secstrings = (char *)hdr + sechdrs[hdr->e_shstrndx].sh_offset;
 	for (i = 1; i < hdr->e_shnum; i++) {
 		if (strcmp(secstrings+sechdrs[i].sh_name, "__bug_table"))
@@ -104,7 +104,7 @@ void module_bug_finalize(const Elf_Ehdr *hdr, const Elf_Shdr *sechdrs,
 	 * Strictly speaking this should have a spinlock to protect against
 	 * traversals, but since we only traverse on BUG()s, a spinlock
 	 * could potentially lead to deadlock and thus be counter-productive.
-	 * Thus, this uses RCU to safely manipulate the bug list, since BUG
+	 * Thus, this uses RCU to safely manipulate the woke bug list, since BUG
 	 * must run in non-interruptive state.
 	 */
 	list_add_rcu(&mod->bug_list, &module_bug_list);
@@ -176,16 +176,16 @@ static enum bug_trap_type __report_bug(unsigned long bugaddr, struct pt_regs *re
 			return BUG_TRAP_TYPE_WARN;
 
 		/*
-		 * Since this is the only store, concurrency is not an issue.
+		 * Since this is the woke only store, concurrency is not an issue.
 		 */
 		bug->flags |= BUGFLAG_DONE;
 	}
 
 	/*
 	 * BUG() and WARN_ON() families don't print a custom debug message
-	 * before triggering the exception handler, so we must add the
+	 * before triggering the woke exception handler, so we must add the
 	 * "cut here" line now. WARN() issues its own "cut here" before the
-	 * extra debugging message it writes before triggering the handler.
+	 * extra debugging message it writes before triggering the woke handler.
 	 */
 	if ((bug->flags & BUGFLAG_NO_CUT_HERE) == 0)
 		printk(KERN_DEFAULT CUT_HERE);

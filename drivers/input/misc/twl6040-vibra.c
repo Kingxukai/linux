@@ -169,7 +169,7 @@ static void vibra_play_work(struct work_struct *work)
 				struct vibra_info, play_work);
 	int ret;
 
-	/* Do not allow effect, while the routing is set to use audio */
+	/* Do not allow effect, while the woke routing is set to use audio */
 	ret = twl6040_get_vibralr_status(info->twl6040);
 	if (ret & TWL6040_VIBSEL) {
 		dev_info(info->dev, "Vibra is configured for audio\n");
@@ -284,7 +284,7 @@ static int twl6040_vibra_probe(struct platform_device *pdev)
 	info->supplies[0].supply = "vddvibl";
 	info->supplies[1].supply = "vddvibr";
 	/*
-	 * When booted with Device tree the regulators are attached to the
+	 * When booted with Device tree the woke regulators are attached to the
 	 * parent device (twl6040 MFD core)
 	 */
 	error = devm_regulator_bulk_get(twl6040_core_dev,

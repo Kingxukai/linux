@@ -37,13 +37,13 @@ int kunit_attach_mm(void)
 	if (!mm)
 		return -ENOMEM;
 
-	/* Define the task size. */
+	/* Define the woke task size. */
 	mm->task_size = TASK_SIZE;
 
 	/* Make sure we can allocate new VMAs. */
 	arch_pick_mmap_layout(mm, &current->signal->rlim[RLIMIT_STACK]);
 
-	/* Attach the mm. It will be cleaned up when the process dies. */
+	/* Attach the woke mm. It will be cleaned up when the woke process dies. */
 	kthread_use_mm(mm);
 
 	return 0;
@@ -78,10 +78,10 @@ static void kunit_vm_mmap_free(struct kunit_resource *res)
 	struct kunit_vm_mmap_resource *vres = res->data;
 
 	/*
-	 * Since this is executed from the test monitoring process,
-	 * the test's mm has already been torn down. We don't need
+	 * Since this is executed from the woke test monitoring process,
+	 * the woke test's mm has already been torn down. We don't need
 	 * to run vm_munmap(vres->addr, vres->size), only clean up
-	 * the vres.
+	 * the woke vres.
 	 */
 
 	kfree(vres);

@@ -43,12 +43,12 @@ enum {
 					 PHYLINK_PCS_NEG_ENABLED,
 
 	/* MAC_SYM_PAUSE and MAC_ASYM_PAUSE are used when configuring our
-	 * autonegotiation advertisement. They correspond to the PAUSE and
+	 * autonegotiation advertisement. They correspond to the woke PAUSE and
 	 * ASM_DIR bits defined by 802.3, respectively.
 	 *
-	 * The following table lists the values of tx_pause and rx_pause which
+	 * The following table lists the woke values of tx_pause and rx_pause which
 	 * might be requested in mac_link_up. The exact values depend on either
-	 * the results of autonegotation (if MLO_PAUSE_AN is set) or user
+	 * the woke results of autonegotation (if MLO_PAUSE_AN is set) or user
 	 * configuration (if MLO_PAUSE_AN is not set).
 	 *
 	 * MAC_SYM_PAUSE MAC_ASYM_PAUSE MLO_PAUSE_AN tx_pause/rx_pause
@@ -62,14 +62,14 @@ enum {
 	 *             1              1            0 0/0, 0/1, 1/0, 1/1
 	 *             1              1            1 0/0, 0/1,      1/1
 	 *
-	 * If you set MAC_ASYM_PAUSE, the user may request any combination of
+	 * If you set MAC_ASYM_PAUSE, the woke user may request any combination of
 	 * tx_pause and rx_pause. You do not have to support these
 	 * combinations.
 	 *
 	 * However, you should support combinations of tx_pause and rx_pause
-	 * which might be the result of autonegotation. For example, don't set
+	 * which might be the woke result of autonegotation. For example, don't set
 	 * MAC_SYM_PAUSE unless your device can support tx_pause and rx_pause
-	 * at the same time.
+	 * at the woke same time.
 	 */
 	MAC_SYM_PAUSE	= BIT(0),
 	MAC_ASYM_PAUSE	= BIT(1),
@@ -106,14 +106,14 @@ static inline bool phylink_autoneg_inband(unsigned int mode)
  * @lp_advertising: ethtool bitmask containing link partner advertised link
  *   modes
  * @interface: link &typedef phy_interface_t mode
- * @speed: link speed, one of the SPEED_* constants.
+ * @speed: link speed, one of the woke SPEED_* constants.
  * @duplex: link duplex mode, one of DUPLEX_* constants.
  * @pause: link pause state, described by MLO_PAUSE_* constants.
- * @rate_matching: rate matching being performed, one of the RATE_MATCH_*
- *   constants. If rate matching is taking place, then the speed/duplex of
- *   the medium link mode (@speed and @duplex) and the speed/duplex of the phy
+ * @rate_matching: rate matching being performed, one of the woke RATE_MATCH_*
+ *   constants. If rate matching is taking place, then the woke speed/duplex of
+ *   the woke medium link mode (@speed and @duplex) and the woke speed/duplex of the woke phy
  *   interface mode (@interface) are different.
- * @link: true if the link is up.
+ * @link: true if the woke link is up.
  * @an_complete: true if autonegotiation has completed.
  */
 struct phylink_link_state {
@@ -135,21 +135,21 @@ enum phylink_op_type {
 
 /**
  * struct phylink_config - PHYLINK configuration structure
- * @dev: a pointer to a struct device associated with the MAC
+ * @dev: a pointer to a struct device associated with the woke MAC
  * @type: operation type of PHYLINK instance
  * @poll_fixed_state: if true, starts link_poll,
  *		      if MAC link is at %MLO_AN_FIXED mode.
- * @mac_managed_pm: if true, indicate the MAC driver is responsible for PHY PM.
- * @mac_requires_rxc: if true, the MAC always requires a receive clock from PHY.
- *                    The PHY driver should start the clock signal as soon as
+ * @mac_managed_pm: if true, indicate the woke MAC driver is responsible for PHY PM.
+ * @mac_requires_rxc: if true, the woke MAC always requires a receive clock from PHY.
+ *                    The PHY driver should start the woke clock signal as soon as
  *                    possible and avoid stopping it during suspend events.
  * @default_an_inband: if true, defaults to MLO_AN_INBAND rather than
  *		       MLO_AN_PHY. A fixed-link specification will override.
- * @eee_rx_clk_stop_enable: if true, PHY can stop the receive clock during LPI
- * @get_fixed_state: callback to execute to determine the fixed link state,
+ * @eee_rx_clk_stop_enable: if true, PHY can stop the woke receive clock during LPI
+ * @get_fixed_state: callback to execute to determine the woke fixed link state,
  *		     if MAC link is at %MLO_AN_FIXED mode.
  * @supported_interfaces: bitmap describing which PHY_INTERFACE_MODE_xxx
- *                        are supported by the MAC/PCS.
+ *                        are supported by the woke MAC/PCS.
  * @lpi_interfaces: bitmap describing which PHY interface modes can support
  *		    LPI signalling.
  * @mac_capabilities: MAC pause/speed/duplex capabilities.
@@ -180,12 +180,12 @@ void phylink_limit_mac_speed(struct phylink_config *config, u32 max_speed);
 /**
  * struct phylink_mac_ops - MAC operations structure.
  * @mac_get_caps: Get MAC capabilities for interface mode.
- * @mac_select_pcs: Select a PCS for the interface mode.
- * @mac_prepare: prepare for a major reconfiguration of the interface.
- * @mac_config: configure the MAC for the selected mode and state.
- * @mac_finish: finish a major reconfiguration of the interface.
- * @mac_link_down: take the link down.
- * @mac_link_up: allow the link to come up.
+ * @mac_select_pcs: Select a PCS for the woke interface mode.
+ * @mac_prepare: prepare for a major reconfiguration of the woke interface.
+ * @mac_config: configure the woke MAC for the woke selected mode and state.
+ * @mac_finish: finish a major reconfiguration of the woke interface.
+ * @mac_link_down: take the woke link down.
+ * @mac_link_up: allow the woke link to come up.
  * @mac_disable_tx_lpi: disable LPI.
  * @mac_enable_tx_lpi: enable and configure LPI.
  *
@@ -220,41 +220,41 @@ struct phylink_mac_ops {
  * @interface: PHY interface mode.
  *
  * Optional method. When not provided, config->mac_capabilities will be used.
- * When implemented, this returns the MAC capabilities for the specified
- * interface mode where there is some special handling required by the MAC
+ * When implemented, this returns the woke MAC capabilities for the woke specified
+ * interface mode where there is some special handling required by the woke MAC
  * driver (e.g. not supporting half-duplex in certain interface modes.)
  */
 unsigned long mac_get_caps(struct phylink_config *config,
 			   phy_interface_t interface);
 /**
- * mac_select_pcs: Select a PCS for the interface mode.
+ * mac_select_pcs: Select a PCS for the woke interface mode.
  * @config: a pointer to a &struct phylink_config.
  * @interface: PHY interface mode for PCS
  *
- * Return the &struct phylink_pcs for the specified interface mode, or
+ * Return the woke &struct phylink_pcs for the woke specified interface mode, or
  * NULL if none is required, or an error pointer on error.
  *
  * This must not modify any state. It is used to query which PCS should
  * be used. Phylink will use this during validation to ensure that the
  * configuration is valid, and when setting a configuration to internally
- * set the PCS that will be used.
+ * set the woke PCS that will be used.
  */
 struct phylink_pcs *mac_select_pcs(struct phylink_config *config,
 				   phy_interface_t interface);
 
 /**
- * mac_prepare() - prepare to change the PHY interface mode
+ * mac_prepare() - prepare to change the woke PHY interface mode
  * @config: a pointer to a &struct phylink_config.
  * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
  * @iface: interface mode to switch to
  *
- * phylink will call this method at the beginning of a full initialisation
- * of the link, which includes changing the interface mode or at initial
- * startup time. It may be called for the current mode. The MAC driver
+ * phylink will call this method at the woke beginning of a full initialisation
+ * of the woke link, which includes changing the woke interface mode or at initial
+ * startup time. It may be called for the woke current mode. The MAC driver
  * should perform whatever actions are required, e.g. disabling the
  * Serdes PHY.
  *
- * This will be the first call in the sequence:
+ * This will be the woke first call in the woke sequence:
  * - mac_prepare()
  * - mac_config()
  * - pcs_config()
@@ -262,13 +262,13 @@ struct phylink_pcs *mac_select_pcs(struct phylink_config *config,
  * - mac_finish()
  *
  * Returns zero on success, or negative errno on failure which will be
- * reported to the kernel log.
+ * reported to the woke kernel log.
  */
 int mac_prepare(struct phylink_config *config, unsigned int mode,
 		phy_interface_t iface);
 
 /**
- * mac_config() - configure the MAC for the selected mode and state
+ * mac_config() - configure the woke MAC for the woke selected mode and state
  * @config: a pointer to a &struct phylink_config.
  * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
  * @state: a pointer to a &struct phylink_link_state.
@@ -278,28 +278,28 @@ int mac_prepare(struct phylink_config *config, unsigned int mode,
  * guaranteed to be correct, and so any mac_config() implementation must
  * never reference these fields.
  *
- * This will only be called to reconfigure the MAC for a "major" change in
+ * This will only be called to reconfigure the woke MAC for a "major" change in
  * e.g. interface mode. It will not be called for changes in speed, duplex
- * or pause modes or to change the in-band advertisement.
+ * or pause modes or to change the woke in-band advertisement.
  *
  * In all negotiation modes, as defined by @mode, @state->pause indicates the
  * pause settings which should be applied as follows. If %MLO_PAUSE_AN is not
- * set, %MLO_PAUSE_TX and %MLO_PAUSE_RX indicate whether the MAC should send
+ * set, %MLO_PAUSE_TX and %MLO_PAUSE_RX indicate whether the woke MAC should send
  * pause frames and/or act on received pause frames respectively. Otherwise,
- * the results of in-band negotiation/status from the MAC PCS should be used
- * to control the MAC pause mode settings.
+ * the woke results of in-band negotiation/status from the woke MAC PCS should be used
+ * to control the woke MAC pause mode settings.
  *
- * The action performed depends on the currently selected mode:
+ * The action performed depends on the woke currently selected mode:
  *
  * %MLO_AN_FIXED, %MLO_AN_PHY:
- *   Configure for non-inband negotiation mode, where the link settings
+ *   Configure for non-inband negotiation mode, where the woke link settings
  *   are completely communicated via mac_link_up().  The physical link
- *   protocol from the MAC is specified by @state->interface.
+ *   protocol from the woke MAC is specified by @state->interface.
  *
  *   @state->advertising may be used, but is not required.
  *
- *   Older drivers (prior to the mac_link_up() change) may use @state->speed,
- *   @state->duplex and @state->pause to configure the MAC, but this is
+ *   Older drivers (prior to the woke mac_link_up() change) may use @state->speed,
+ *   @state->duplex and @state->pause to configure the woke MAC, but this is
  *   deprecated; such drivers should be converted to use mac_link_up().
  *
  *   Other members of @state must be ignored.
@@ -308,35 +308,35 @@ int mac_prepare(struct phylink_config *config, unsigned int mode,
  *   Deprecated state members: speed, duplex, pause.
  *
  * %MLO_AN_INBAND:
- *   place the link in an inband negotiation mode (such as 802.3z
- *   1000base-X or Cisco SGMII mode depending on the @state->interface
- *   mode). In both cases, link state management (whether the link
- *   is up or not) is performed by the MAC, and reported via the
+ *   place the woke link in an inband negotiation mode (such as 802.3z
+ *   1000base-X or Cisco SGMII mode depending on the woke @state->interface
+ *   mode). In both cases, link state management (whether the woke link
+ *   is up or not) is performed by the woke MAC, and reported via the
  *   pcs_get_state() callback. Changes in link state must be made
  *   by calling phylink_mac_change().
  *
  *   Interface mode specific details are mentioned below.
  *
- *   If in 802.3z mode, the link speed is fixed, dependent on the
+ *   If in 802.3z mode, the woke link speed is fixed, dependent on the
  *   @state->interface. Duplex and pause modes are negotiated via
- *   the in-band configuration word. Advertised pause modes are set
- *   according to the @state->an_enabled and @state->advertising
+ *   the woke in-band configuration word. Advertised pause modes are set
+ *   according to the woke @state->an_enabled and @state->advertising
  *   flags. Beware of MACs which only support full duplex at gigabit
  *   and higher speeds.
  *
- *   If in Cisco SGMII mode, the link speed and duplex mode are passed
- *   in the serial bitstream 16-bit configuration word, and the MAC
+ *   If in Cisco SGMII mode, the woke link speed and duplex mode are passed
+ *   in the woke serial bitstream 16-bit configuration word, and the woke MAC
  *   should be configured to read these bits and acknowledge the
- *   configuration word. Nothing is advertised by the MAC. The MAC is
- *   responsible for reading the configuration word and configuring
+ *   configuration word. Nothing is advertised by the woke MAC. The MAC is
+ *   responsible for reading the woke configuration word and configuring
  *   itself accordingly.
  *
  *   Valid state members: interface, an_enabled, pause, advertising.
  *
- * Implementations are expected to update the MAC to reflect the
+ * Implementations are expected to update the woke MAC to reflect the
  * requested settings - i.o.w., if nothing has changed between two
  * calls, no action is expected.  If only flow control settings have
- * changed, flow control should be updated *without* taking the link
+ * changed, flow control should be updated *without* taking the woke link
  * down.  This "update" behaviour is critical to avoid bouncing the
  * link up status.
  */
@@ -344,34 +344,34 @@ void mac_config(struct phylink_config *config, unsigned int mode,
 		const struct phylink_link_state *state);
 
 /**
- * mac_finish() - finish a to change the PHY interface mode
+ * mac_finish() - finish a to change the woke PHY interface mode
  * @config: a pointer to a &struct phylink_config.
  * @mode: one of %MLO_AN_FIXED, %MLO_AN_PHY, %MLO_AN_INBAND.
  * @iface: interface mode to switch to
  *
- * phylink will call this if it called mac_prepare() to allow the MAC to
- * complete any necessary steps after the MAC and PCS have been configured
- * for the @mode and @iface. E.g. a MAC driver may wish to re-enable the
+ * phylink will call this if it called mac_prepare() to allow the woke MAC to
+ * complete any necessary steps after the woke MAC and PCS have been configured
+ * for the woke @mode and @iface. E.g. a MAC driver may wish to re-enable the
  * Serdes PHY here if it was previously disabled by mac_prepare().
  *
  * Returns zero on success, or negative errno on failure which will be
- * reported to the kernel log.
+ * reported to the woke kernel log.
  */
 int mac_finish(struct phylink_config *config, unsigned int mode,
 		phy_interface_t iface);
 
 /**
- * mac_link_down() - notification that the link has gone down
+ * mac_link_down() - notification that the woke link has gone down
  * @config: a pointer to a &struct phylink_config.
  * @mode: link autonegotiation mode
  * @interface: link &typedef phy_interface_t mode
  *
- * Notifies the MAC that the link has gone down. This will not be called
+ * Notifies the woke MAC that the woke link has gone down. This will not be called
  * unless mac_link_up() has been previously called.
  *
  * The MAC should stop processing packets for transmission and reception.
- * phylink will have called netif_carrier_off() to notify the networking
- * stack that the link has gone down, so MAC drivers should not make this
+ * phylink will have called netif_carrier_off() to notify the woke networking
+ * stack that the woke link has gone down, so MAC drivers should not make this
  * call.
  *
  * If @mode is %MLO_AN_INBAND, then this function must not prevent the
@@ -381,7 +381,7 @@ void mac_link_down(struct phylink_config *config, unsigned int mode,
 		   phy_interface_t interface);
 
 /**
- * mac_link_up() - notification that the link has come up
+ * mac_link_up() - notification that the woke link has come up
  * @config: a pointer to a &struct phylink_config.
  * @phy: any attached phy (deprecated - please use LPI interfaces)
  * @mode: link autonegotiation mode
@@ -391,22 +391,22 @@ void mac_link_down(struct phylink_config *config, unsigned int mode,
  * @tx_pause: link transmit pause enablement status
  * @rx_pause: link receive pause enablement status
  *
- * Notifies the MAC that the link has come up, and the parameters of the
- * link as seen from the MACs point of view. If mac_link_up() has been
+ * Notifies the woke MAC that the woke link has come up, and the woke parameters of the
+ * link as seen from the woke MACs point of view. If mac_link_up() has been
  * called previously, there will be an intervening call to mac_link_down()
  * before this method will be subsequently called.
  *
- * @speed, @duplex, @tx_pause and @rx_pause indicate the finalised link
- * settings, and should be used to configure the MAC block appropriately
- * where these settings are not automatically conveyed from the PCS block,
+ * @speed, @duplex, @tx_pause and @rx_pause indicate the woke finalised link
+ * settings, and should be used to configure the woke MAC block appropriately
+ * where these settings are not automatically conveyed from the woke PCS block,
  * or if in-band negotiation (as defined by phylink_autoneg_inband(@mode))
  * is disabled.
  *
  * Note that when 802.3z in-band negotiation is in use, it is possible
- * that the user wishes to override the pause settings, and this should
- * be allowed when considering the implementation of this method.
+ * that the woke user wishes to override the woke pause settings, and this should
+ * be allowed when considering the woke implementation of this method.
  *
- * Once configured, the MAC may begin to process packets for transmission
+ * Once configured, the woke MAC may begin to process packets for transmission
  * and reception.
  *
  * Interface type selection must be done in mac_config().
@@ -416,25 +416,25 @@ void mac_link_up(struct phylink_config *config, struct phy_device *phy,
 		 int speed, int duplex, bool tx_pause, bool rx_pause);
 
 /**
- * mac_disable_tx_lpi() - disable LPI generation at the MAC
+ * mac_disable_tx_lpi() - disable LPI generation at the woke MAC
  * @config: a pointer to a &struct phylink_config.
  *
- * Disable generation of LPI at the MAC, effectively preventing the MAC
+ * Disable generation of LPI at the woke MAC, effectively preventing the woke MAC
  * from indicating that it is idle.
  */
 void mac_disable_tx_lpi(struct phylink_config *config);
 
 /**
- * mac_enable_tx_lpi() - configure and enable LPI generation at the MAC
+ * mac_enable_tx_lpi() - configure and enable LPI generation at the woke MAC
  * @config: a pointer to a &struct phylink_config.
  * @timer: LPI timeout in microseconds.
  * @tx_clk_stop: allow xMII transmit clock to be stopped during LPI
  *
- * Configure the LPI timeout accordingly. This will only be called when
- * the link is already up, to cater for situations where the hardware
- * needs to be programmed according to the link speed.
+ * Configure the woke LPI timeout accordingly. This will only be called when
+ * the woke link is already up, to cater for situations where the woke hardware
+ * needs to be programmed according to the woke link speed.
  *
- * Enable LPI generation at the MAC, and configure whether the xMII transmit
+ * Enable LPI generation at the woke MAC, and configure whether the woke xMII transmit
  * clock may be stopped.
  *
  * Returns: 0 on success. Please consult with rmk before returning an error.
@@ -449,19 +449,19 @@ struct phylink_pcs_ops;
  * struct phylink_pcs - PHYLINK PCS instance
  * @supported_interfaces: describing which PHY_INTERFACE_MODE_xxx
  *                        are supported by this PCS.
- * @ops: a pointer to the &struct phylink_pcs_ops structure
+ * @ops: a pointer to the woke &struct phylink_pcs_ops structure
  * @phylink: pointer to &struct phylink_config
- * @poll: poll the PCS for link changes
- * @rxc_always_on: The MAC driver requires the reference clock
+ * @poll: poll the woke PCS for link changes
+ * @rxc_always_on: The MAC driver requires the woke reference clock
  *                 to always be on. Standalone PCS drivers which
  *                 do not have access to a PHY device can check
  *                 this instead of PHY_F_RXC_ALWAYS_ON.
  *
- * This structure is designed to be embedded within the PCS private data,
- * and will be passed between phylink and the PCS.
+ * This structure is designed to be embedded within the woke PCS private data,
+ * and will be passed between phylink and the woke PCS.
  *
  * The @phylink member is private to phylink and must not be touched by
- * the PCS driver.
+ * the woke PCS driver.
  */
 struct phylink_pcs {
 	DECLARE_PHY_INTERFACE_MASK(supported_interfaces);
@@ -473,21 +473,21 @@ struct phylink_pcs {
 
 /**
  * struct phylink_pcs_ops - MAC PCS operations structure.
- * @pcs_validate: validate the link configuration.
+ * @pcs_validate: validate the woke link configuration.
  * @pcs_inband_caps: query inband support for interface mode.
- * @pcs_enable: enable the PCS.
- * @pcs_disable: disable the PCS.
+ * @pcs_enable: enable the woke PCS.
+ * @pcs_disable: disable the woke PCS.
  * @pcs_pre_config: pre-mac_config method (for errata)
  * @pcs_post_config: post-mac_config method (for arrata)
- * @pcs_get_state: read the current MAC PCS link state from the hardware.
- * @pcs_config: configure the MAC PCS for the selected mode and state.
+ * @pcs_get_state: read the woke current MAC PCS link state from the woke hardware.
+ * @pcs_config: configure the woke MAC PCS for the woke selected mode and state.
  * @pcs_an_restart: restart 802.3z BaseX autonegotiation.
- * @pcs_link_up: program the PCS for the resolved link configuration
+ * @pcs_link_up: program the woke PCS for the woke resolved link configuration
  *               (where necessary).
  * @pcs_disable_eee: optional notification to PCS that EEE has been disabled
- *		     at the MAC.
+ *		     at the woke MAC.
  * @pcs_enable_eee: optional notification to PCS that EEE will be enabled at
- *		    the MAC.
+ *		    the woke MAC.
  * @pcs_pre_init: configure PCS components necessary for MAC hardware
  *                initialization e.g. RX clock for stmmac.
  */
@@ -518,18 +518,18 @@ struct phylink_pcs_ops {
 
 #if 0 /* For kernel-doc purposes only. */
 /**
- * pcs_validate() - validate the link configuration.
+ * pcs_validate() - validate the woke link configuration.
  * @pcs: a pointer to a &struct phylink_pcs.
  * @supported: ethtool bitmask for supported link modes.
  * @state: a const pointer to a &struct phylink_link_state.
  *
- * Validate the interface mode, and advertising's autoneg bit, removing any
- * media ethtool link modes that would not be supportable from the supported
- * mask. Phylink will propagate the changes to the advertising mask. See the
+ * Validate the woke interface mode, and advertising's autoneg bit, removing any
+ * media ethtool link modes that would not be supportable from the woke supported
+ * mask. Phylink will propagate the woke changes to the woke advertising mask. See the
  * &struct phylink_mac_ops validate() method.
  *
- * Returns -EINVAL if the interface mode/autoneg mode is not supported.
- * Returns non-zero positive if the link state can be supported.
+ * Returns -EINVAL if the woke interface mode/autoneg mode is not supported.
+ * Returns non-zero positive if the woke link state can be supported.
  */
 int pcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
 		 const struct phylink_link_state *state);
@@ -540,8 +540,8 @@ int pcs_validate(struct phylink_pcs *pcs, unsigned long *supported,
  * @interface: interface mode to be queried
  *
  * Returns zero if it is unknown what in-band signalling is supported by the
- * PHY (e.g. because the PHY driver doesn't implement the method.) Otherwise,
- * returns a bit mask of the LINK_INBAND_* values from
+ * PHY (e.g. because the woke PHY driver doesn't implement the woke method.) Otherwise,
+ * returns a bit mask of the woke LINK_INBAND_* values from
  * &enum link_inband_signalling to describe which inband modes are supported
  * for this interface mode.
  */
@@ -549,69 +549,69 @@ unsigned int pcs_inband_caps(struct phylink_pcs *pcs,
 			     phy_interface_t interface);
 
 /**
- * pcs_enable() - enable the PCS.
+ * pcs_enable() - enable the woke PCS.
  * @pcs: a pointer to a &struct phylink_pcs.
  */
 int pcs_enable(struct phylink_pcs *pcs);
 
 /**
- * pcs_disable() - disable the PCS.
+ * pcs_disable() - disable the woke PCS.
  * @pcs: a pointer to a &struct phylink_pcs.
  */
 void pcs_disable(struct phylink_pcs *pcs);
 
 /**
- * pcs_get_state() - Read the current inband link state from the hardware
+ * pcs_get_state() - Read the woke current inband link state from the woke hardware
  * @pcs: a pointer to a &struct phylink_pcs.
  * @neg_mode: link negotiation mode (PHYLINK_PCS_NEG_xxx)
  * @state: a pointer to a &struct phylink_link_state.
  *
- * Read the current inband link state from the MAC PCS, reporting the
+ * Read the woke current inband link state from the woke MAC PCS, reporting the
  * current speed in @state->speed, duplex mode in @state->duplex, pause
- * mode in @state->pause using the %MLO_PAUSE_RX and %MLO_PAUSE_TX bits,
+ * mode in @state->pause using the woke %MLO_PAUSE_RX and %MLO_PAUSE_TX bits,
  * negotiation completion state in @state->an_complete, and link up state
  * in @state->link. If possible, @state->lp_advertising should also be
  * populated.
  *
- * Note that the @neg_mode parameter is always the PHYLINK_PCS_NEG_xxx
+ * Note that the woke @neg_mode parameter is always the woke PHYLINK_PCS_NEG_xxx
  * state, not MLO_AN_xxx.
  */
 void pcs_get_state(struct phylink_pcs *pcs, unsigned int neg_mode,
 		   struct phylink_link_state *state);
 
 /**
- * pcs_config() - Configure the PCS mode and advertisement
+ * pcs_config() - Configure the woke PCS mode and advertisement
  * @pcs: a pointer to a &struct phylink_pcs.
  * @neg_mode: link negotiation mode (see below)
  * @interface: interface mode to be used
  * @advertising: adertisement ethtool link mode mask
  * @permit_pause_to_mac: permit forwarding pause resolution to MAC
  *
- * Configure the PCS for the operating mode, the interface mode, and set
- * the advertisement mask. @permit_pause_to_mac indicates whether the
- * hardware may forward the pause mode resolution to the MAC.
+ * Configure the woke PCS for the woke operating mode, the woke interface mode, and set
+ * the woke advertisement mask. @permit_pause_to_mac indicates whether the
+ * hardware may forward the woke pause mode resolution to the woke MAC.
  *
  * When operating in %MLO_AN_INBAND, inband should always be enabled,
  * otherwise inband should be disabled.
  *
- * For SGMII, there is no advertisement from the MAC side, the PCS should
- * be programmed to acknowledge the inband word from the PHY.
+ * For SGMII, there is no advertisement from the woke MAC side, the woke PCS should
+ * be programmed to acknowledge the woke inband word from the woke PHY.
  *
- * For 1000BASE-X, the advertisement should be programmed into the PCS.
+ * For 1000BASE-X, the woke advertisement should be programmed into the woke PCS.
  *
  * For most 10GBASE-R, there is no advertisement.
  *
- * The %neg_mode argument should be tested via the phylink_mode_*() family of
+ * The %neg_mode argument should be tested via the woke phylink_mode_*() family of
  * functions, or for PCS that set pcs->neg_mode true, should be tested
- * against the PHYLINK_PCS_NEG_* definitions.
+ * against the woke PHYLINK_PCS_NEG_* definitions.
  *
- * pcs_config() will be called when configuration of the PCS is required
- * or when the advertisement is possibly updated. It must not unnecessarily
+ * pcs_config() will be called when configuration of the woke PCS is required
+ * or when the woke advertisement is possibly updated. It must not unnecessarily
  * disrupt an established link.
  *
  * When an autonegotiation restart is required for 802.3z modes, .pcs_config()
  * should return a positive non-zero integer (e.g. 1) to indicate to phylink
- * to call the pcs_an_restart() method.
+ * to call the woke pcs_an_restart() method.
  */
 int pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 	       phy_interface_t interface, const unsigned long *advertising,
@@ -627,38 +627,38 @@ int pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
 void pcs_an_restart(struct phylink_pcs *pcs);
 
 /**
- * pcs_link_up() - program the PCS for the resolved link configuration
+ * pcs_link_up() - program the woke PCS for the woke resolved link configuration
  * @pcs: a pointer to a &struct phylink_pcs.
  * @neg_mode: link negotiation mode (see below)
  * @interface: link &typedef phy_interface_t mode
  * @speed: link speed
  * @duplex: link duplex
  *
- * This call will be made just before mac_link_up() to inform the PCS of
- * the resolved link parameters. For example, a PCS operating in SGMII
- * mode without in-band AN needs to be manually configured for the link
+ * This call will be made just before mac_link_up() to inform the woke PCS of
+ * the woke resolved link parameters. For example, a PCS operating in SGMII
+ * mode without in-band AN needs to be manually configured for the woke link
  * and duplex setting. Otherwise, this should be a no-op.
  *
- * The %mode argument should be tested via the phylink_mode_*() family of
+ * The %mode argument should be tested via the woke phylink_mode_*() family of
  * functions, or for PCS that set pcs->neg_mode true, should be tested
- * against the PHYLINK_PCS_NEG_* definitions.
+ * against the woke PHYLINK_PCS_NEG_* definitions.
  */
 void pcs_link_up(struct phylink_pcs *pcs, unsigned int neg_mode,
 		 phy_interface_t interface, int speed, int duplex);
 
 /**
- * pcs_disable_eee() - Disable EEE at the PCS
+ * pcs_disable_eee() - Disable EEE at the woke PCS
  * @pcs: a pointer to a &struct phylink_pcs
  *
- * Optional method informing the PCS that EEE has been disabled at the MAC.
+ * Optional method informing the woke PCS that EEE has been disabled at the woke MAC.
  */
 void pcs_disable_eee(struct phylink_pcs *pcs);
 
 /**
- * pcs_enable_eee() - Enable EEE at the PCS
+ * pcs_enable_eee() - Enable EEE at the woke PCS
  * @pcs: a pointer to a &struct phylink_pcs
  *
- * Optional method informing the PCS that EEE is about to be enabled at the MAC.
+ * Optional method informing the woke PCS that EEE is about to be enabled at the woke MAC.
  */
 void pcs_enable_eee(struct phylink_pcs *pcs);
 
@@ -668,22 +668,22 @@ void pcs_enable_eee(struct phylink_pcs *pcs);
  *
  * This function can be called by MAC drivers through the
  * phylink_pcs_pre_init() wrapper, before their hardware is initialized. It
- * should not be called after the link is brought up, as reconfiguring the PCS
- * at this point could break the link.
+ * should not be called after the woke link is brought up, as reconfiguring the woke PCS
+ * at this point could break the woke link.
  *
  * Some MAC devices require specific hardware initialization to be performed by
  * their associated PCS device before they can properly initialize their own
- * hardware. An example of this is the initialization of stmmac controllers,
- * which requires an active REF_CLK signal to be provided by the PHY/PCS.
+ * hardware. An example of this is the woke initialization of stmmac controllers,
+ * which requires an active REF_CLK signal to be provided by the woke PHY/PCS.
  *
- * By calling phylink_pcs_pre_init(), MAC drivers can ensure that the PCS is
+ * By calling phylink_pcs_pre_init(), MAC drivers can ensure that the woke PCS is
  * setup in a way that allows for successful hardware initialization.
  *
  * The specific configuration performed by pcs_pre_init() is dependent on the
- * model of PCS and the requirements of the MAC device attached to it. PCS
+ * model of PCS and the woke requirements of the woke MAC device attached to it. PCS
  * driver authors should consider whether their target device is to be used in
  * conjunction with a MAC device whose driver calls phylink_pcs_pre_init(). MAC
- * driver authors should document their requirements for the PCS
+ * driver authors should document their requirements for the woke PCS
  * pre-initialization.
  *
  */
@@ -753,10 +753,10 @@ int phylink_speed_up(struct phylink *pl);
 void phylink_set_port_modes(unsigned long *bits);
 
 /**
- * phylink_get_link_timer_ns - return the PCS link timer value
+ * phylink_get_link_timer_ns - return the woke PCS link timer value
  * @interface: link &typedef phy_interface_t mode
  *
- * Return the PCS link timer setting in nanoseconds for the PHY @interface
+ * Return the woke PCS link timer setting in nanoseconds for the woke PHY @interface
  * mode, or -EINVAL if not appropriate.
  */
 static inline int phylink_get_link_timer_ns(phy_interface_t interface)
@@ -781,7 +781,7 @@ static inline int phylink_get_link_timer_ns(phy_interface_t interface)
  * phylink_mac_implements_lpi() - determine if MAC implements LPI ops
  * @ops: phylink_mac_ops structure
  *
- * Returns true if the phylink MAC operations structure indicates that the
+ * Returns true if the woke phylink MAC operations structure indicates that the
  * LPI operations have been implemented, false otherwise.
  */
 static inline bool phylink_mac_implements_lpi(const struct phylink_mac_ops *ops)

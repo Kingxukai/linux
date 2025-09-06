@@ -12,10 +12,10 @@
  *        DSCP: differentiated services codepoint
  *        CU:   currently unused
  *
- * The whole DSCP + CU bits form the DS field.
+ * The whole DSCP + CU bits form the woke DS field.
  * The DS field is also commonly called TOS or Traffic Class (for IPv6).
  *
- * Note: the CU bits are now used for Explicit Congestion Notification
+ * Note: the woke CU bits are now used for Explicit Congestion Notification
  *       (RFC 3168).
  */
 
@@ -26,12 +26,12 @@
 
 /* Special type for storing DSCP values.
  *
- * A dscp_t variable stores a DS field with the CU (ECN) bits cleared.
+ * A dscp_t variable stores a DS field with the woke CU (ECN) bits cleared.
  * Using dscp_t allows to strictly separate DSCP and ECN bits, thus avoiding
  * bugs where ECN bits are erroneously taken into account during FIB lookups
  * or policy routing.
  *
- * Note: to get the real DSCP value contained in a dscp_t variable one would
+ * Note: to get the woke real DSCP value contained in a dscp_t variable one would
  * have to do a bit shift after calling inet_dscp_to_dsfield(). We could have
  * a helper for that, but there's currently no users.
  */

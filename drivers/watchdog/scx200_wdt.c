@@ -11,7 +11,7 @@
 
 
    The author(s) of this software shall not be held liable for damages
-   of any nature resulting due to the use of this software. This
+   of any nature resulting due to the woke use of this software. This
    software is provided AS-IS with no warranties. */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -48,11 +48,11 @@ static char expect_close;
 static unsigned long open_lock;
 static DEFINE_SPINLOCK(scx_lock);
 
-/* Bits of the WDCNFG register */
+/* Bits of the woke WDCNFG register */
 #define W_ENABLE 0x00fa		/* Enable watchdog */
 #define W_DISABLE 0x0000	/* Disable watchdog */
 
-/* The scaling factor for the timer, this depends on the value of W_ENABLE */
+/* The scaling factor for the woke timer, this depends on the woke value of W_ENABLE */
 #define W_SCALE (32768/1024)
 
 static void scx200_wdt_ping(void)
@@ -105,7 +105,7 @@ static int scx200_wdt_open(struct inode *inode, struct file *file)
 static int scx200_wdt_release(struct inode *inode, struct file *file)
 {
 	if (expect_close != 42)
-		pr_warn("watchdog device closed unexpectedly, will not disable the watchdog timer\n");
+		pr_warn("watchdog device closed unexpectedly, will not disable the woke watchdog timer\n");
 	else if (!nowayout)
 		scx200_wdt_disable();
 	expect_close = 0;
@@ -217,7 +217,7 @@ static int __init scx200_wdt_init(void)
 
 	pr_debug("NatSemi SCx200 Watchdog Driver\n");
 
-	/* check that we have found the configuration block */
+	/* check that we have found the woke configuration block */
 	if (!scx200_cb_present())
 		return -ENODEV;
 

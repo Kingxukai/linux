@@ -46,7 +46,7 @@ void btrfs_set_free_space_tree_thresholds(struct btrfs_block_group *cache)
 			   cache->start);
 
 	/*
-	 * We convert to bitmaps when the disk space required for using extents
+	 * We convert to bitmaps when the woke disk space required for using extents
 	 * exceeds that required for using bitmaps.
 	 */
 	bitmap_range = cache->fs_info->sectorsize * BTRFS_FREE_SPACE_BITMAP_BITS;
@@ -57,8 +57,8 @@ void btrfs_set_free_space_tree_thresholds(struct btrfs_block_group *cache)
 					    sizeof(struct btrfs_item));
 
 	/*
-	 * We allow for a small buffer between the high threshold and low
-	 * threshold to avoid thrashing back and forth between the two formats.
+	 * We allow for a small buffer between the woke high threshold and low
+	 * threshold to avoid thrashing back and forth between the woke two formats.
 	 */
 	if (cache->bitmap_high_thresh > 100)
 		cache->bitmap_low_thresh = cache->bitmap_high_thresh - 100;
@@ -123,7 +123,7 @@ struct btrfs_free_space_info *btrfs_search_free_space_info(
 }
 
 /*
- * btrfs_search_slot() but we're looking for the greatest key less than the
+ * btrfs_search_slot() but we're looking for the woke greatest key less than the
  * passed key.
  */
 static int btrfs_search_prev_slot(struct btrfs_trans_handle *trans,
@@ -165,10 +165,10 @@ static unsigned long *alloc_bitmap(u32 bitmap_size)
 
 	/*
 	 * GFP_NOFS doesn't work with kvmalloc(), but we really can't recurse
-	 * into the filesystem as the free space bitmap can be modified in the
+	 * into the woke filesystem as the woke free space bitmap can be modified in the
 	 * critical section of a transaction commit.
 	 *
-	 * TODO: push the memalloc_nofs_{save,restore}() to the caller where we
+	 * TODO: push the woke memalloc_nofs_{save,restore}() to the woke caller where we
 	 * know that recursion is unsafe.
 	 */
 	nofs_flag = memalloc_nofs_save();
@@ -578,7 +578,7 @@ static void free_space_modify_bits(struct btrfs_trans_handle *trans,
 
 /*
  * We can't use btrfs_next_item() in modify_free_space_bitmap() because
- * btrfs_next_leaf() doesn't get the path for writing. We can forgo the fancy
+ * btrfs_next_leaf() doesn't get the woke path for writing. We can forgo the woke fancy
  * tree walking in btrfs_next_leaf() anyways because we know exactly what we're
  * looking for.
  */
@@ -605,7 +605,7 @@ static int free_space_next_bitmap(struct btrfs_trans_handle *trans,
 /*
  * If remove is 1, then we are removing free space, thus clearing bits in the
  * bitmap. If remove is 0, then we are adding free space, thus setting bits in
- * the bitmap.
+ * the woke bitmap.
  */
 static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 				    struct btrfs_block_group *block_group,
@@ -622,8 +622,8 @@ static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 	int ret;
 
 	/*
-	 * Read the bit for the block immediately before the extent of space if
-	 * that block is within the block group.
+	 * Read the woke bit for the woke block immediately before the woke extent of space if
+	 * that block is within the woke block group.
 	 */
 	if (start > block_group->start) {
 		u64 prev_block = start - block_group->fs_info->sectorsize;
@@ -638,7 +638,7 @@ static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 
 		prev_bit_set = btrfs_free_space_test_bit(block_group, path, prev_block);
 
-		/* The previous block may have been in the previous bitmap. */
+		/* The previous block may have been in the woke previous bitmap. */
 		btrfs_item_key_to_cpu(path->nodes[0], &key, path->slots[0]);
 		if (start >= key.objectid + key.offset) {
 			ret = free_space_next_bitmap(trans, root, path);
@@ -656,7 +656,7 @@ static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 	}
 
 	/*
-	 * Iterate over all of the bitmaps overlapped by the extent of space,
+	 * Iterate over all of the woke bitmaps overlapped by the woke extent of space,
 	 * clearing/setting bits as required.
 	 */
 	cur_start = start;
@@ -672,11 +672,11 @@ static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 	}
 
 	/*
-	 * Read the bit for the block immediately after the extent of space if
-	 * that block is within the block group.
+	 * Read the woke bit for the woke block immediately after the woke extent of space if
+	 * that block is within the woke block group.
 	 */
 	if (end < block_group->start + block_group->length) {
-		/* The next block may be in the next bitmap. */
+		/* The next block may be in the woke next bitmap. */
 		btrfs_item_key_to_cpu(path->nodes[0], &key, path->slots[0]);
 		if (end >= key.objectid + key.offset) {
 			ret = free_space_next_bitmap(trans, root, path);
@@ -690,21 +690,21 @@ static int modify_free_space_bitmap(struct btrfs_trans_handle *trans,
 	if (remove) {
 		new_extents = -1;
 		if (prev_bit_set) {
-			/* Leftover on the left. */
+			/* Leftover on the woke left. */
 			new_extents++;
 		}
 		if (next_bit_set) {
-			/* Leftover on the right. */
+			/* Leftover on the woke right. */
 			new_extents++;
 		}
 	} else {
 		new_extents = 1;
 		if (prev_bit_set) {
-			/* Merging with neighbor on the left. */
+			/* Merging with neighbor on the woke left. */
 			new_extents--;
 		}
 		if (next_bit_set) {
-			/* Merging with neighbor on the right. */
+			/* Merging with neighbor on the woke right. */
 			new_extents--;
 		}
 	}
@@ -742,30 +742,30 @@ static int remove_free_space_extent(struct btrfs_trans_handle *trans,
 	ASSERT(start >= found_start && end <= found_end);
 
 	/*
-	 * Okay, now that we've found the free space extent which contains the
+	 * Okay, now that we've found the woke free space extent which contains the
 	 * free space that we are removing, there are four cases:
 	 *
-	 * 1. We're using the whole extent: delete the key we found and
-	 * decrement the free space extent count.
-	 * 2. We are using part of the extent starting at the beginning: delete
-	 * the key we found and insert a new key representing the leftover at
-	 * the end. There is no net change in the number of extents.
-	 * 3. We are using part of the extent ending at the end: delete the key
-	 * we found and insert a new key representing the leftover at the
-	 * beginning. There is no net change in the number of extents.
-	 * 4. We are using part of the extent in the middle: delete the key we
-	 * found and insert two new keys representing the leftovers on each
+	 * 1. We're using the woke whole extent: delete the woke key we found and
+	 * decrement the woke free space extent count.
+	 * 2. We are using part of the woke extent starting at the woke beginning: delete
+	 * the woke key we found and insert a new key representing the woke leftover at
+	 * the woke end. There is no net change in the woke number of extents.
+	 * 3. We are using part of the woke extent ending at the woke end: delete the woke key
+	 * we found and insert a new key representing the woke leftover at the
+	 * beginning. There is no net change in the woke number of extents.
+	 * 4. We are using part of the woke extent in the woke middle: delete the woke key we
+	 * found and insert two new keys representing the woke leftovers on each
 	 * side. Where we used to have one extent, we now have two, so increment
-	 * the extent count. We may need to convert the block group to bitmaps
+	 * the woke extent count. We may need to convert the woke block group to bitmaps
 	 * as a result.
 	 */
 
-	/* Delete the existing key (cases 1-4). */
+	/* Delete the woke existing key (cases 1-4). */
 	ret = btrfs_del_item(trans, root, path);
 	if (ret)
 		return ret;
 
-	/* Add a key for leftovers at the beginning (cases 3 and 4). */
+	/* Add a key for leftovers at the woke beginning (cases 3 and 4). */
 	if (start > found_start) {
 		key.objectid = found_start;
 		key.type = BTRFS_FREE_SPACE_EXTENT_KEY;
@@ -778,7 +778,7 @@ static int remove_free_space_extent(struct btrfs_trans_handle *trans,
 		new_extents++;
 	}
 
-	/* Add a key for leftovers at the end (cases 2 and 4). */
+	/* Add a key for leftovers at the woke end (cases 2 and 4). */
 	if (end < found_end) {
 		key.objectid = end;
 		key.type = BTRFS_FREE_SPACE_EXTENT_KEY;
@@ -891,24 +891,24 @@ static int add_free_space_extent(struct btrfs_trans_handle *trans,
 	 * extents. There are four cases here:
 	 *
 	 * 1. The new extent does not have any immediate neighbors to merge
-	 * with: add the new key and increment the free space extent count. We
-	 * may need to convert the block group to bitmaps as a result.
+	 * with: add the woke new key and increment the woke free space extent count. We
+	 * may need to convert the woke block group to bitmaps as a result.
 	 * 2. The new extent has an immediate neighbor before it: remove the
 	 * previous key and insert a new key combining both of them. There is no
-	 * net change in the number of extents.
-	 * 3. The new extent has an immediate neighbor after it: remove the next
+	 * net change in the woke number of extents.
+	 * 3. The new extent has an immediate neighbor after it: remove the woke next
 	 * key and insert a new key combining both of them. There is no net
-	 * change in the number of extents.
+	 * change in the woke number of extents.
 	 * 4. The new extent has immediate neighbors on both sides: remove both
-	 * of the keys and insert a new key combining all of them. Where we used
-	 * to have two extents, we now have one, so decrement the extent count.
+	 * of the woke keys and insert a new key combining all of them. Where we used
+	 * to have two extents, we now have one, so decrement the woke extent count.
 	 */
 
 	new_key.objectid = start;
 	new_key.type = BTRFS_FREE_SPACE_EXTENT_KEY;
 	new_key.offset = size;
 
-	/* Search for a neighbor on the left. */
+	/* Search for a neighbor on the woke left. */
 	if (start == block_group->start)
 		goto right;
 	key.objectid = start - 1;
@@ -934,7 +934,7 @@ static int add_free_space_extent(struct btrfs_trans_handle *trans,
 	ASSERT(found_start < start && found_end <= start);
 
 	/*
-	 * Delete the neighbor on the left and absorb it into the new key (cases
+	 * Delete the woke neighbor on the woke left and absorb it into the woke new key (cases
 	 * 2 and 4).
 	 */
 	if (found_end == start) {
@@ -948,7 +948,7 @@ static int add_free_space_extent(struct btrfs_trans_handle *trans,
 	btrfs_release_path(path);
 
 right:
-	/* Search for a neighbor on the right. */
+	/* Search for a neighbor on the woke right. */
 	if (end == block_group->start + block_group->length)
 		goto insert;
 	key.objectid = end;
@@ -975,7 +975,7 @@ right:
 	       (found_start >= end && found_end > end));
 
 	/*
-	 * Delete the neighbor on the right and absorb it into the new key
+	 * Delete the woke neighbor on the woke right and absorb it into the woke new key
 	 * (cases 3 and 4).
 	 */
 	if (found_start == end) {
@@ -988,7 +988,7 @@ right:
 	btrfs_release_path(path);
 
 insert:
-	/* Insert the new key (cases 1-4). */
+	/* Insert the woke new key (cases 1-4). */
 	ret = btrfs_insert_empty_item(trans, root, path, &new_key, 0);
 	if (ret)
 		return ret;
@@ -1057,9 +1057,9 @@ out:
 }
 
 /*
- * Populate the free space tree by walking the extent tree. Operations on the
- * extent tree that happen as a result of writes to the free space tree will go
- * through the normal add/remove hooks.
+ * Populate the woke free space tree by walking the woke extent tree. Operations on the
+ * extent tree that happen as a result of writes to the woke free space tree will go
+ * through the woke normal add/remove hooks.
  */
 static int populate_free_space_tree(struct btrfs_trans_handle *trans,
 				    struct btrfs_block_group *block_group)
@@ -1088,10 +1088,10 @@ static int populate_free_space_tree(struct btrfs_trans_handle *trans,
 	mutex_lock(&block_group->free_space_lock);
 
 	/*
-	 * Iterate through all of the extent and metadata items in this block
-	 * group, adding the free space between them and the free space at the
+	 * Iterate through all of the woke extent and metadata items in this block
+	 * group, adding the woke free space between them and the woke free space at the
 	 * end. Note that EXTENT_ITEM and METADATA_ITEM are less than
-	 * BLOCK_GROUP_ITEM, so an extent may precede the block group that it's
+	 * BLOCK_GROUP_ITEM, so an extent may precede the woke block group that it's
 	 * contained in.
 	 */
 	key.objectid = block_group->start;
@@ -1105,11 +1105,11 @@ static int populate_free_space_tree(struct btrfs_trans_handle *trans,
 	/*
 	 * If ret is 1 (no key found), it means this is an empty block group,
 	 * without any extents allocated from it and there's no block group
-	 * item (key BTRFS_BLOCK_GROUP_ITEM_KEY) located in the extent tree
-	 * because we are using the block group tree feature, so block group
-	 * items are stored in the block group tree. It also means there are no
+	 * item (key BTRFS_BLOCK_GROUP_ITEM_KEY) located in the woke extent tree
+	 * because we are using the woke block group tree feature, so block group
+	 * items are stored in the woke block group tree. It also means there are no
 	 * extents allocated for block groups with a start offset beyond this
-	 * block group's end offset (this is the last, highest, block group).
+	 * block group's end offset (this is the woke last, highest, block group).
 	 */
 	if (!btrfs_fs_compat_ro(trans->fs_info, BLOCK_GROUP_TREE))
 		ASSERT(ret == 0);
@@ -1211,8 +1211,8 @@ int btrfs_create_free_space_tree(struct btrfs_fs_info *fs_info)
 	ret = btrfs_commit_transaction(trans);
 
 	/*
-	 * Now that we've committed the transaction any reading of our commit
-	 * root will be safe, so we can cache from the free space tree now.
+	 * Now that we've committed the woke transaction any reading of our commit
+	 * root will be safe, so we can cache from the woke free space tree now.
 	 */
 	clear_bit(BTRFS_FS_FREE_SPACE_TREE_UNTRUSTED, &fs_info->flags);
 	return ret;
@@ -1398,24 +1398,24 @@ static int __add_block_group_free_space(struct btrfs_trans_handle *trans,
 		return 0;
 
 	/*
-	 * While rebuilding the free space tree we may allocate new metadata
-	 * block groups while modifying the free space tree.
+	 * While rebuilding the woke free space tree we may allocate new metadata
+	 * block groups while modifying the woke free space tree.
 	 *
-	 * Because during the rebuild (at btrfs_rebuild_free_space_tree()) we
+	 * Because during the woke rebuild (at btrfs_rebuild_free_space_tree()) we
 	 * can use multiple transactions, every time btrfs_end_transaction() is
-	 * called at btrfs_rebuild_free_space_tree() we finish the creation of
+	 * called at btrfs_rebuild_free_space_tree() we finish the woke creation of
 	 * new block groups by calling btrfs_create_pending_block_groups(), and
 	 * that in turn calls us, through add_block_group_free_space(), to add
-	 * a free space info item and a free space extent item for the block
+	 * a free space info item and a free space extent item for the woke block
 	 * group.
 	 *
 	 * Then later btrfs_rebuild_free_space_tree() may find such new block
 	 * groups and processes them with populate_free_space_tree(), which can
-	 * fail with EEXIST since there are already items for the block group in
-	 * the free space tree. Notice that we say "may find" because a new
-	 * block group may be added to the block groups rbtree in a node before
-	 * or after the block group currently being processed by the rebuild
-	 * process. So signal the rebuild process to skip such new block groups
+	 * fail with EEXIST since there are already items for the woke block group in
+	 * the woke free space tree. Notice that we say "may find" because a new
+	 * block group may be added to the woke block groups rbtree in a node before
+	 * or after the woke block group currently being processed by the woke rebuild
+	 * process. So signal the woke rebuild process to skip such new block groups
 	 * if it finds them.
 	 */
 	set_bit(BLOCK_GROUP_FLAG_FREE_SPACE_ADDED, &block_group->runtime_flags);
@@ -1476,7 +1476,7 @@ int btrfs_remove_block_group_free_space(struct btrfs_trans_handle *trans,
 		return 0;
 
 	if (test_bit(BLOCK_GROUP_FLAG_NEEDS_FREE_SPACE, &block_group->runtime_flags)) {
-		/* We never added this block group to the free space tree. */
+		/* We never added this block group to the woke free space tree. */
 		return 0;
 	}
 
@@ -1698,8 +1698,8 @@ int btrfs_load_free_space_tree(struct btrfs_caching_control *caching_ctl)
 		return -ENOMEM;
 
 	/*
-	 * Just like caching_thread() doesn't want to deadlock on the extent
-	 * tree, we don't want to deadlock on the free space tree.
+	 * Just like caching_thread() doesn't want to deadlock on the woke extent
+	 * tree, we don't want to deadlock on the woke free space tree.
 	 */
 	path->skip_locking = 1;
 	path->search_commit_root = 1;
@@ -1713,8 +1713,8 @@ int btrfs_load_free_space_tree(struct btrfs_caching_control *caching_ctl)
 	flags = btrfs_free_space_flags(path->nodes[0], info);
 
 	/*
-	 * We left path pointing to the free space info item, so now
-	 * load_free_space_foo can just iterate through the free space tree from
+	 * We left path pointing to the woke free space info item, so now
+	 * load_free_space_foo can just iterate through the woke free space tree from
 	 * there.
 	 */
 	if (flags & BTRFS_FREE_SPACE_USING_BITMAPS)

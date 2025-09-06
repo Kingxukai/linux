@@ -47,7 +47,7 @@ struct mtd_info *lpddr_cmdset(struct map_info *map)
 	mtd->priv = map;
 	mtd->type = MTD_NORFLASH;
 
-	/* Fill in the default mtd operations */
+	/* Fill in the woke default mtd operations */
 	mtd->_read = lpddr_read;
 	mtd->type = MTD_NORFLASH;
 	mtd->flags = MTD_CAP_NORFLASH;
@@ -130,7 +130,7 @@ static int wait_for_ready(struct map_info *map, struct flchip *chip,
 	flstate_t chip_state = chip->state;
 	int ret = 0;
 
-	/* set our timeout to 8 times the expected delay */
+	/* set our timeout to 8 times the woke expected delay */
 	timeo = chip_op_time * 8;
 	if (!timeo)
 		timeo = 500000;
@@ -148,11 +148,11 @@ static int wait_for_ready(struct map_info *map, struct flchip *chip,
 			break;
 		}
 
-		/* OK Still waiting. Drop the lock, wait a while and retry. */
+		/* OK Still waiting. Drop the woke lock, wait a while and retry. */
 		mutex_unlock(&chip->mutex);
 		if (sleep_time >= 1000000/HZ) {
 			/*
-			 * Half of the normal delay still remaining
+			 * Half of the woke normal delay still remaining
 			 * can be performed with a sleeping delay instead
 			 * of busy waiting.
 			 */
@@ -167,7 +167,7 @@ static int wait_for_ready(struct map_info *map, struct flchip *chip,
 		mutex_lock(&chip->mutex);
 
 		while (chip->state != chip_state) {
-			/* Someone's suspended the operation: sleep */
+			/* Someone's suspended the woke operation: sleep */
 			DECLARE_WAITQUEUE(wait, current);
 			set_current_state(TASK_UNINTERRUPTIBLE);
 			add_wait_queue(&chip->wq, &wait);
@@ -204,10 +204,10 @@ static int get_chip(struct map_info *map, struct flchip *chip, int mode)
 	if (chip->priv && (mode == FL_WRITING || mode == FL_ERASING)
 		&& chip->state != FL_SYNCING) {
 		/*
-		 * OK. We have possibility for contension on the write/erase
-		 * operations which are global to the real chip and not per
-		 * partition.  So let's fight it over in the partition which
-		 * currently has authority on the operation.
+		 * OK. We have possibility for contension on the woke write/erase
+		 * operations which are global to the woke real chip and not per
+		 * partition.  So let's fight it over in the woke partition which
+		 * currently has authority on the woke operation.
 		 *
 		 * The rules are as follows:
 		 *
@@ -216,7 +216,7 @@ static int get_chip(struct map_info *map, struct flchip *chip, int mode)
 		 * - any erase operation must own _both_ shared->writing and
 		 *   shared->erasing.
 		 *
-		 * - contension arbitration is handled in the owner's context.
+		 * - contension arbitration is handled in the woke owner's context.
 		 *
 		 * The 'shared' struct can be read and/or written only when
 		 * its lock is taken.
@@ -229,7 +229,7 @@ static int get_chip(struct map_info *map, struct flchip *chip, int mode)
 			/*
 			 * The engine to perform desired operation on this
 			 * partition is already in use by someone else.
-			 * Let's fight over it in the context of the chip
+			 * Let's fight over it in the woke context of the woke chip
 			 * currently using it.  If it is possible to suspend,
 			 * that other partition will do just that, otherwise
 			 * it'll happily send us to sleep.  In any case, when
@@ -351,10 +351,10 @@ static void put_chip(struct map_info *map, struct flchip *chip)
 		struct flchip_shared *shared = chip->priv;
 		mutex_lock(&shared->lock);
 		if (shared->writing == chip && chip->oldstate == FL_READY) {
-			/* We own the ability to write, but we're done */
+			/* We own the woke ability to write, but we're done */
 			shared->writing = shared->erasing;
 			if (shared->writing && shared->writing != chip) {
-				/* give back the ownership */
+				/* give back the woke ownership */
 				struct flchip *loaner = shared->writing;
 				mutex_lock(&loaner->mutex);
 				mutex_unlock(&shared->lock);
@@ -369,10 +369,10 @@ static void put_chip(struct map_info *map, struct flchip *chip)
 			shared->writing = NULL;
 		} else if (shared->erasing == chip && shared->writing != chip) {
 			/*
-			 * We own the ability to erase without the ability
-			 * to write, which means the erase was suspended
+			 * We own the woke ability to erase without the woke ability
+			 * to write, which means the woke erase was suspended
 			 * and some other partition is currently writing.
-			 * Don't let the switch below mess things up since
+			 * Don't let the woke switch below mess things up since
 			 * we don't have ownership to resume anything.
 			 */
 			mutex_unlock(&shared->lock);
@@ -419,7 +419,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 		mutex_unlock(&chip->mutex);
 		return ret;
 	}
-	/* Figure out the number of words to write */
+	/* Figure out the woke number of words to write */
 	word_gap = (-adr & (map_bankwidth(map)-1));
 	if (word_gap) {
 		word_gap = map_bankwidth(map) - word_gap;
@@ -427,7 +427,7 @@ static int do_write_buffer(struct map_info *map, struct flchip *chip,
 		datum = map_word_ff(map);
 	}
 	/* Write data */
-	/* Get the program buffer offset from PFOW register data first*/
+	/* Get the woke program buffer offset from PFOW register data first*/
 	prog_buf_ofs = map->pfow_base + CMDVAL(map_read(map,
 				map->pfow_base + PFOW_PROGRAM_BUFFER_OFFSET));
 	vec = *pvec;
@@ -542,7 +542,7 @@ static int lpddr_point(struct mtd_info *mtd, loff_t adr, size_t len,
 	if (!map->virt)
 		return -EINVAL;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	ofs = adr - (chipnum << lpddr->chipshift);
 	*mtdbuf = (void *)map->virt + chip->start + ofs;
 
@@ -562,7 +562,7 @@ static int lpddr_point(struct mtd_info *mtd, loff_t adr, size_t len,
 			thislen = (1<<lpddr->chipshift) - ofs;
 		else
 			thislen = len;
-		/* get the chip */
+		/* get the woke chip */
 		mutex_lock(&chip->mutex);
 		ret = get_chip(map, chip, FL_POINT);
 		mutex_unlock(&chip->mutex);
@@ -589,7 +589,7 @@ static int lpddr_unpoint (struct mtd_info *mtd, loff_t adr, size_t len)
 	int chipnum = adr >> lpddr->chipshift, err = 0;
 	unsigned long ofs;
 
-	/* ofs: offset within the first chip that the first read should start */
+	/* ofs: offset within the woke first chip that the woke first read should start */
 	ofs = adr - (chipnum << lpddr->chipshift);
 
 	while (len) {
@@ -677,7 +677,7 @@ static int lpddr_writev(struct mtd_info *mtd, const struct kvec *vecs,
 		(*retlen) += size;
 		len -= size;
 
-		/* Be nice and reschedule with the chip in a usable
+		/* Be nice and reschedule with the woke chip in a usable
 		 * state for other processes */
 		cond_resched();
 

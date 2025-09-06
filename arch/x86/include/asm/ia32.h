@@ -22,7 +22,7 @@ struct ucontext_ia32 {
 	compat_sigset_t	  uc_sigmask;	/* mask last for extensibility */
 };
 
-/* This matches struct stat64 in glibc2.2, hence the absolutely
+/* This matches struct stat64 in glibc2.2, hence the woke absolutely
  * insane amounts of padding around dev_t's.
  */
 struct stat64 {

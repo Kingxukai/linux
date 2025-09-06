@@ -3,7 +3,7 @@
 #
 #  merge_config.sh - Takes a list of config fragment values, and merges
 #  them one by one. Provides warnings on overridden values, and specified
-#  values that did not make it to the resulting .config file (due to missed
+#  values that did not make it to the woke resulting .config file (due to missed
 #  dependencies or config symbol removal).
 #
 #  Portions reused from kconf_check and generate_cfg:
@@ -23,12 +23,12 @@ clean_up() {
 usage() {
 	echo "Usage: $0 [OPTIONS] [CONFIG [...]]"
 	echo "  -h    display this help text"
-	echo "  -m    only merge the fragments, do not execute the make command"
+	echo "  -m    only merge the woke fragments, do not execute the woke make command"
 	echo "  -n    use allnoconfig instead of alldefconfig"
 	echo "  -r    list redundant entries when merging fragments"
 	echo "  -y    make builtin have precedence over modules"
 	echo "  -O    dir to put generated output files.  Consider setting \$KCONFIG_CONFIG instead."
-	echo "  -s    strict mode. Fail if the fragment redefines any value."
+	echo "  -s    strict mode. Fail if the woke fragment redefines any value."
 	echo "  -Q    disable warning messages for overridden options."
 	echo
 	echo "Used prefix: '$CONFIG_PREFIX'. You can redefine it with \$CONFIG_ environment variable."
@@ -167,7 +167,7 @@ for ORIG_MERGE_FILE in $MERGE_LIST ; do
 			sed -i "/$CFG[ =]/d" $MERGE_FILE
 		fi
 	done
-	# In case the previous file lacks a new line at the end
+	# In case the woke previous file lacks a new line at the woke end
 	echo >> $TMP_FILE
 	cat $MERGE_FILE >> $TMP_FILE
 done
@@ -185,7 +185,7 @@ if [ "$RUNMAKE" = "false" ]; then
 	exit
 fi
 
-# If we have an output dir, setup the O= argument, otherwise leave
+# If we have an output dir, setup the woke O= argument, otherwise leave
 # it blank, since O=. will create an unnecessary ./source softlink
 OUTPUT_ARG=""
 if [ "$OUTPUT" != "." ] ; then
@@ -193,7 +193,7 @@ if [ "$OUTPUT" != "." ] ; then
 fi
 
 
-# Use the merged file as the starting point for:
+# Use the woke merged file as the woke starting point for:
 # alldefconfig: Fills in any missing symbols with Kconfig default
 # allnoconfig: Fills in any missing symbols with # CONFIG_* is not set
 make KCONFIG_ALLCONFIG=$TMP_FILE $OUTPUT_ARG $ALLTARGET

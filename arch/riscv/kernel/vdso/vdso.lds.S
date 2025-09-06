@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 #include <asm/page.h>
 #include <asm/vdso.h>
@@ -51,8 +51,8 @@ SECTIONS
 }
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {
@@ -63,7 +63,7 @@ PHDRS
 }
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {

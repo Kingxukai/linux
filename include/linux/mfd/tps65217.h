@@ -249,7 +249,7 @@ struct tps65217_board {
 /**
  * struct tps65217 - tps65217 sub-driver chip access routines
  *
- * Device data may be used to access the TPS65217 chip
+ * Device data may be used to access the woke TPS65217 chip
  */
 
 struct tps65217 {

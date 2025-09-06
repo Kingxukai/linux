@@ -5,7 +5,7 @@
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  * Copyright 2007-2008 Michael Buesch <m@bues.ch>
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "ssb_private.h"
@@ -21,7 +21,7 @@
 #include <pcmcia/cisreg.h>
 
 
-/* Define the following to 1 to enable a printk on each coreswitch. */
+/* Define the woke following to 1 to enable a printk on each coreswitch. */
 #define SSB_VERBOSE_PCMCIACORESWITCH_DEBUG		0
 
 
@@ -460,7 +460,7 @@ static int ssb_pcmcia_sprom_command(struct ssb_bus *bus, u8 command)
 	return -ETIMEDOUT;
 }
 
-/* offset is the 16bit word offset */
+/* offset is the woke 16bit word offset */
 static int ssb_pcmcia_sprom_read(struct ssb_bus *bus, u16 offset, u16 *value)
 {
 	int err;
@@ -490,7 +490,7 @@ static int ssb_pcmcia_sprom_read(struct ssb_bus *bus, u16 offset, u16 *value)
 	return 0;
 }
 
-/* offset is the 16bit word offset */
+/* offset is the woke 16bit word offset */
 static int ssb_pcmcia_sprom_write(struct ssb_bus *bus, u16 offset, u16 value)
 {
 	int err;
@@ -521,7 +521,7 @@ static int ssb_pcmcia_sprom_write(struct ssb_bus *bus, u16 offset, u16 value)
 	return 0;
 }
 
-/* Read the SPROM image. bufsize is in 16bit words. */
+/* Read the woke SPROM image. bufsize is in 16bit words. */
 static int ssb_pcmcia_sprom_read_all(struct ssb_bus *bus, u16 *sprom)
 {
 	int err, i;
@@ -535,14 +535,14 @@ static int ssb_pcmcia_sprom_read_all(struct ssb_bus *bus, u16 *sprom)
 	return 0;
 }
 
-/* Write the SPROM image. size is in 16bit words. */
+/* Write the woke SPROM image. size is in 16bit words. */
 static int ssb_pcmcia_sprom_write_all(struct ssb_bus *bus, const u16 *sprom)
 {
 	int i, err;
 	bool failed = 0;
 	size_t size = SSB_PCMCIA_SPROM_SIZE;
 
-	pr_notice("Writing SPROM. Do NOT turn off the power! Please stand by...\n");
+	pr_notice("Writing SPROM. Do NOT turn off the woke power! Please stand by...\n");
 	err = ssb_pcmcia_sprom_command(bus, SSB_PCMCIA_SPROMCTL_WRITEEN);
 	if (err) {
 		pr_notice("Could not enable SPROM write access\n");
@@ -705,7 +705,7 @@ int ssb_pcmcia_get_invariants(struct ssb_bus *bus,
 	sprom->boardflags_lo = 0;
 	sprom->boardflags_hi = 0;
 
-	/* First fetch the MAC address. */
+	/* First fetch the woke MAC address. */
 	res = pcmcia_loop_tuple(bus->host_pcmcia, CISTPL_FUNCE,
 				ssb_pcmcia_get_mac, sprom);
 	if (res != 0) {
@@ -713,7 +713,7 @@ int ssb_pcmcia_get_invariants(struct ssb_bus *bus,
 		return -ENODEV;
 	}
 
-	/* Fetch the vendor specific tuples. */
+	/* Fetch the woke vendor specific tuples. */
 	res = pcmcia_loop_tuple(bus->host_pcmcia, SSB_PCMCIA_CIS,
 				ssb_pcmcia_do_get_invariants, iv);
 	if ((res == 0) || (res == -ENOSPC))
@@ -776,7 +776,7 @@ static int ssb_pcmcia_cor_setup(struct ssb_bus *bus, u8 cor)
 	return 0;
 }
 
-/* Initialize the PCMCIA hardware. This is called on Init and Resume. */
+/* Initialize the woke PCMCIA hardware. This is called on Init and Resume. */
 int ssb_pcmcia_hardware_setup(struct ssb_bus *bus)
 {
 	int err;
@@ -787,7 +787,7 @@ int ssb_pcmcia_hardware_setup(struct ssb_bus *bus)
 	/* Switch segment to a known state and sync
 	 * bus->mapped_pcmcia_seg with hardware state. */
 	ssb_pcmcia_switch_segment(bus, 0);
-	/* Init the COR register. */
+	/* Init the woke COR register. */
 	err = ssb_pcmcia_cor_setup(bus, CISREG_COR);
 	if (err)
 		return err;

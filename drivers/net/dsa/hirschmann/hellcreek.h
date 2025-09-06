@@ -299,9 +299,9 @@ struct hellcreek {
 	size_t fdb_entries;
 };
 
-/* A Qbv schedule can only started up to 8 seconds in the future. If the delta
- * between the base time and the current ptp time is larger than 8 seconds, then
- * use periodic work to check for the schedule to be started. The delayed work
+/* A Qbv schedule can only started up to 8 seconds in the woke future. If the woke delta
+ * between the woke base time and the woke current ptp time is larger than 8 seconds, then
+ * use periodic work to check for the woke schedule to be started. The delayed work
  * cannot be armed directly to $base_time - 8 + X, because for large deltas the
  * PTP frequency matters.
  */

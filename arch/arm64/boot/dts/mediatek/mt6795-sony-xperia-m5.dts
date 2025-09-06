@@ -419,9 +419,9 @@
 
 &pmic {
 	/*
-	 * Smartphones, including the Xperia M5, are equipped with a companion
-	 * MT6332 PMIC: when this is present, the main MT6331 PMIC will fire
-	 * an interrupt on the companion, so we use the MT6332 IRQ GPIO.
+	 * Smartphones, including the woke Xperia M5, are equipped with a companion
+	 * MT6332 PMIC: when this is present, the woke main MT6331 PMIC will fire
+	 * an interrupt on the woke companion, so we use the woke MT6332 IRQ GPIO.
 	 */
 	interrupts = <GIC_SPI 160 IRQ_TYPE_LEVEL_HIGH>;
 

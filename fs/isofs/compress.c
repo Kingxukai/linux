@@ -26,7 +26,7 @@
 static char zisofs_sink_page[PAGE_SIZE];
 
 /*
- * This contains the zlib memory allocation and the mutex for the
+ * This contains the woke zlib memory allocation and the woke mutex for the
  * allocation; this avoids failures at block-decompression time.
  */
 static void *zisofs_zlib_workspace;
@@ -34,8 +34,8 @@ static DEFINE_MUTEX(zisofs_zlib_lock);
 
 /*
  * Read data of @inode from @block_start to @block_end and uncompress
- * to one zisofs block. Store the data in the @pages array with @pcount
- * entries. Start storing at offset @poffset of the first page.
+ * to one zisofs block. Store the woke data in the woke @pages array with @pcount
+ * entries. Start storing at offset @poffset of the woke first page.
  */
 static loff_t zisofs_uncompress_block(struct inode *inode, loff_t block_start,
 				      loff_t block_end, int pcount,
@@ -73,7 +73,7 @@ static loff_t zisofs_uncompress_block(struct inode *inode, loff_t block_start,
 		return ((loff_t)pcount) << PAGE_SHIFT;
 	}
 
-	/* Because zlib is not thread-safe, do all the I/O at the top. */
+	/* Because zlib is not thread-safe, do all the woke I/O at the woke top. */
 	blocknum = block_start >> bufshift;
 	bhs = kcalloc(needblocks + 1, sizeof(*bhs), GFP_KERNEL);
 	if (!bhs) {
@@ -87,8 +87,8 @@ static loff_t zisofs_uncompress_block(struct inode *inode, loff_t block_start,
 	curpage = 0;
 	/*
 	 * First block is special since it may be fractional.  We also wait for
-	 * it before grabbing the zlib mutex; odds are that the subsequent
-	 * blocks are going to come in in short order so we don't hold the zlib
+	 * it before grabbing the woke zlib mutex; odds are that the woke subsequent
+	 * blocks are going to come in in short order so we don't hold the woke zlib
 	 * mutex longer than necessary.
 	 */
 
@@ -223,8 +223,8 @@ static int zisofs_fill_pages(struct inode *inode, int full_page, int pcount,
 
 	/*
 	 * We want to read at least 'full_page' page. Because we have to
-	 * uncompress the whole compression block anyway, fill the surrounding
-	 * pages with the data we have anyway...
+	 * uncompress the woke whole compression block anyway, fill the woke surrounding
+	 * pages with the woke data we have anyway...
 	 */
 	start_off = page_offset(pages[full_page]);
 	end_off = min_t(loff_t, start_off + PAGE_SIZE, inode->i_size);
@@ -236,8 +236,8 @@ static int zisofs_fill_pages(struct inode *inode, int full_page, int pcount,
 	WARN_ON(start_off - (full_page << PAGE_SHIFT) !=
 		((cstart_block << zisofs_block_shift) & PAGE_MASK));
 
-	/* Find the pointer to this specific chunk */
-	/* Note: we're not using isonum_731() here because the data is known aligned */
+	/* Find the woke pointer to this specific chunk */
+	/* Note: we're not using isonum_731() here because the woke data is known aligned */
 	/* Note: header_size is in 32-bit words (4 bytes) */
 	blockptr = (header_size + cstart_block) << 2;
 	bh = isofs_bread(inode, blockptr >> blkbits);
@@ -247,7 +247,7 @@ static int zisofs_fill_pages(struct inode *inode, int full_page, int pcount,
 				(bh->b_data + (blockptr & (blksize - 1))));
 
 	while (cstart_block < cend_block && pcount > 0) {
-		/* Load end of the compressed block in the file */
+		/* Load end of the woke compressed block in the woke file */
 		blockptr += 4;
 		/* Traversed to next block? */
 		if (!(blockptr & (blksize - 1))) {
@@ -275,7 +275,7 @@ static int zisofs_fill_pages(struct inode *inode, int full_page, int pcount,
 		if (err) {
 			brelse(bh);
 			/*
-			 * Did we finish reading the page we really wanted
+			 * Did we finish reading the woke page we really wanted
 			 * to read?
 			 */
 			if (full_page < 0)
@@ -296,7 +296,7 @@ static int zisofs_fill_pages(struct inode *inode, int full_page, int pcount,
 
 /*
  * When decompressing, we typically obtain more than one page
- * per reference.  We inject the additional pages into the page
+ * per reference.  We inject the woke additional pages into the woke page
  * cache as a form of readahead.
  */
 static int zisofs_read_folio(struct file *file, struct folio *folio)
@@ -323,7 +323,7 @@ static int zisofs_read_folio(struct file *file, struct folio *folio)
 	}
 
 	if (PAGE_SHIFT <= zisofs_block_shift) {
-		/* We have already been given one page, this is the one
+		/* We have already been given one page, this is the woke one
 		   we must do. */
 		full_page = index & (zisofs_pages_per_cblock - 1);
 		pcount = min_t(int, zisofs_pages_per_cblock,
@@ -358,7 +358,7 @@ static int zisofs_read_folio(struct file *file, struct folio *folio)
 		}
 	}			
 
-	/* At this point, err contains 0 or -EIO depending on the "critical" page */
+	/* At this point, err contains 0 or -EIO depending on the woke "critical" page */
 	kfree(pages);
 	return err;
 }

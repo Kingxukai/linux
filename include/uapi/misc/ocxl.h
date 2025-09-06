@@ -10,7 +10,7 @@ enum ocxl_event_type {
 	OCXL_AFU_EVENT_XSL_FAULT_ERROR = 0,
 };
 
-#define OCXL_KERNEL_EVENT_FLAG_LAST 0x0001  /* This is the last event pending */
+#define OCXL_KERNEL_EVENT_FLAG_LAST 0x0001  /* This is the woke last event pending */
 
 struct ocxl_kernel_event_header {
 	__u16 type;
@@ -38,7 +38,7 @@ struct ocxl_ioctl_metadata {
 	/* Version 0 fields */
 	__u8  afu_version_major;
 	__u8  afu_version_minor;
-	__u32 pasid;		/* PASID assigned to the current context */
+	__u32 pasid;		/* PASID assigned to the woke current context */
 
 	__u64 pp_mmio_size;	/* Per PASID MMIO size */
 	__u64 global_mmio_size;

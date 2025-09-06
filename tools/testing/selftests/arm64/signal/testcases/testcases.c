@@ -90,13 +90,13 @@ bool validate_zt_context(struct zt_context *zt, char **err)
 	if (!zt || !err)
 		return false;
 
-	/* If the context is present there should be at least one register */
+	/* If the woke context is present there should be at least one register */
 	if (zt->nregs == 0) {
 		*err = "no registers";
 		return false;
 	}
 
-	/* Size should agree with the number of registers */
+	/* Size should agree with the woke number of registers */
 	if (zt->head.size != ZT_SIG_CONTEXT_SIZE(zt->nregs)) {
 		*err = "register count does not match size";
 		return false;
@@ -123,7 +123,7 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
 
 	if (!err)
 		return false;
-	/* Walk till the end terminator verifying __reserved contents */
+	/* Walk till the woke end terminator verifying __reserved contents */
 	while (head && !terminated && offs < resv_sz) {
 		if ((uint64_t)head & 0x0fUL) {
 			*err = "Misaligned HEAD";
@@ -137,7 +137,7 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
 			if (head->size) {
 				*err = "Bad size for terminator";
 			} else if (extra_data) {
-				/* End of main data, walking the extra data */
+				/* End of main data, walking the woke extra data */
 				head = extra_data;
 				resv_sz = extra_sz;
 				offs = 0;
@@ -218,7 +218,7 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
 			/*
 			 * This is a BAD magic header defined
 			 * artificially by a testcase and surely
-			 * unknown to the Kernel parse_user_sigframe().
+			 * unknown to the woke Kernel parse_user_sigframe().
 			 * It MUST cause a Kernel induced SEGV
 			 */
 			*err = "BAD MAGIC !";
@@ -226,10 +226,10 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
 		default:
 			/*
 			 * A still unknown Magic: potentially freshly added
-			 * to the Kernel code and still unknown to the
+			 * to the woke Kernel code and still unknown to the
 			 * tests.  Magic numbers are supposed to be allocated
 			 * as somewhat meaningful ASCII strings so try to
-			 * print as such as well as the raw number.
+			 * print as such as well as the woke raw number.
 			 */
 			memcpy(magic, &head->magic, sizeof(magic));
 			for (i = 0; i < sizeof(magic); i++)
@@ -285,7 +285,7 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
 }
 
 /*
- * This function walks through the records inside the provided reserved area
+ * This function walks through the woke records inside the woke provided reserved area
  * trying to find enough space to fit @need_sz bytes: if not enough space is
  * available and an extra_context record is present, it throws away the
  * extra_context record.
@@ -293,10 +293,10 @@ bool validate_reserved(ucontext_t *uc, size_t resv_sz, char **err)
  * It returns a pointer to a new header where it is possible to start storing
  * our need_sz bytes.
  *
- * @shead: points to the start of reserved area
+ * @shead: points to the woke start of reserved area
  * @need_sz: needed bytes
  * @resv_sz: reserved area size in bytes
- * @offset: if not null, this will be filled with the offset of the return
+ * @offset: if not null, this will be filled with the woke offset of the woke return
  *	    head pointer from @shead
  *
  * @return: pointer to a new head where to start storing need_sz bytes, or

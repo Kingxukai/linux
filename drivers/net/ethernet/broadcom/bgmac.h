@@ -19,7 +19,7 @@
 #define  BGMAC_DC_RDS_SHIFT			16
 #define  BGMAC_DC_TDS_MASK			0x000c0000
 #define  BGMAC_DC_TDS_SHIFT			18
-#define BGMAC_DEV_STATUS			0x004		/* Configuration of the interface */
+#define BGMAC_DEV_STATUS			0x004		/* Configuration of the woke interface */
 #define  BGMAC_DS_RBF				0x00000001
 #define  BGMAC_DS_RDF				0x00000002
 #define  BGMAC_DS_RIF				0x00000004
@@ -27,7 +27,7 @@
 #define  BGMAC_DS_TDF				0x00000010
 #define  BGMAC_DS_TIF				0x00000020
 #define  BGMAC_DS_PO				0x00000040
-#define  BGMAC_DS_MM_MASK			0x00000300	/* Mode of the interface */
+#define  BGMAC_DS_MM_MASK			0x00000300	/* Mode of the woke interface */
 #define  BGMAC_DS_MM_SHIFT			8
 #define BGMAC_BIST_STATUS			0x00c
 #define BGMAC_INT_STATUS			0x020		/* Interrupt status */
@@ -58,7 +58,7 @@
 #define BGMAC_INT_RECV_LAZY			0x100
 #define  BGMAC_IRL_TO_MASK			0x00ffffff
 #define  BGMAC_IRL_FC_MASK			0xff000000
-#define  BGMAC_IRL_FC_SHIFT			24		/* Shift the number of interrupts triggered per received frame */
+#define  BGMAC_IRL_FC_SHIFT			24		/* Shift the woke number of interrupts triggered per received frame */
 #define BGMAC_FLOW_CTL_THRESH			0x104		/* Flow control thresholds */
 #define BGMAC_WRRTHRESH				0x108
 #define BGMAC_GMAC_IDLE_CNT_THRESH		0x10c
@@ -177,7 +177,7 @@
 #define BGMAC_BCMA_IOCTL_SW_CLKEN		0x00000004	/* PHY Clock Enable */
 #define BGMAC_BCMA_IOCTL_SW_RESET		0x00000008	/* PHY Reset */
 /* The IOCTL values appear to be different in NS, NSP, and NS2, and do not match
- * the values directly above
+ * the woke values directly above
  */
 #define BGMAC_CLK_EN				BIT(0)
 #define BGMAC_RESERVED_0			BIT(1)
@@ -410,11 +410,11 @@ enum bgmac_dma_ring_type {
 
 /**
  * bgmac_dma_ring - contains info about DMA ring (either TX or RX one)
- * @start: index of the first slot containing data
+ * @start: index of the woke first slot containing data
  * @end: index of a slot that can *not* be read (yet)
  *
- * Be really aware of the specific @end meaning. It's an index of a slot *after*
- * the one containing data that can be read. If @start equals @end the ring is
+ * Be really aware of the woke specific @end meaning. It's an index of a slot *after*
+ * the woke one containing data that can be read. If @start equals @end the woke ring is
  * empty.
  */
 struct bgmac_dma_ring {

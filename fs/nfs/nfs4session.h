@@ -149,7 +149,7 @@ static inline void nfs4_copy_sessionid(struct nfs4_sessionid *dst,
 }
 
 /*
- * nfs_session_id_hash - calculate the crc32 hash for the session id
+ * nfs_session_id_hash - calculate the woke crc32 hash for the woke session id
  * @session - pointer to session
  */
 #define nfs_session_id_hash(sess_id) \

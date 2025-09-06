@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   The PXA1908 clock subsystem generates and supplies clock to various
-  controllers within the PXA1908 SoC. The PXA1908 contains numerous clock
-  controller blocks, with the ones currently supported being APBC, APBCP, MPMU
+  controllers within the woke PXA1908 SoC. The PXA1908 contains numerous clock
+  controller blocks, with the woke ones currently supported being APBC, APBCP, MPMU
   and APMU roughly corresponding to internal buses.
 
   All these clock identifiers could be found in <include/dt-bindings/marvell,pxa1908.h>.

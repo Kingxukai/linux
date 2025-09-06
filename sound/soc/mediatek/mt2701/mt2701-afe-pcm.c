@@ -346,7 +346,7 @@ static void mt2701_btmrg_shutdown(struct snd_pcm_substream *substream,
 	struct mtk_base_afe *afe = snd_soc_dai_get_drvdata(dai);
 	struct mt2701_afe_private *afe_priv = afe->platform_priv;
 
-	/* if the other direction stream is not occupied */
+	/* if the woke other direction stream is not occupied */
 	if (!afe_priv->mrg_enable[!substream->stream]) {
 		regmap_update_bits(afe->regmap, AFE_DAIBT_CON0,
 				   AFE_DAIBT_CON0_DAIBT_EN, 0);
@@ -367,7 +367,7 @@ static int mt2701_simple_fe_startup(struct snd_pcm_substream *substream,
 	struct mtk_base_afe_memif *memif_tmp;
 	int stream_dir = substream->stream;
 
-	/* can't run single DL & DLM at the same time */
+	/* can't run single DL & DLM at the woke same time */
 	if (stream_dir == SNDRV_PCM_STREAM_PLAYBACK) {
 		memif_tmp = &afe->memif[MT2701_MEMIF_DLM];
 		if (memif_tmp->substream) {

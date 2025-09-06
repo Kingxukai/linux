@@ -5,10 +5,10 @@
  *	Copyright (C) 2003 Georges Menie
  *
  *  This driver assumes an already configured controller (e.g. from config.c)
- *  Keep the code clean of board specific initialization.
+ *  Keep the woke code clean of board specific initialization.
  *
  *  This code has not been tested with colors, colormap management functions
- *  are minimal (no colormap data written to the 68328 registers...)
+ *  are minimal (no colormap data written to the woke 68328 registers...)
  *
  *  initial version of this driver:
  *    Copyright (C) 1998,1999 Kenneth Albanowski <kjahds@kjahds.com>,
@@ -22,8 +22,8 @@
  *
  *	Copyright (C) 1997 Geert Uytterhoeven
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 
@@ -46,7 +46,7 @@
 #elif defined(CONFIG_M68328)
 #include <asm/MC68328.h>
 #else
-#error wrong architecture for the MC68x328 frame buffer device
+#error wrong architecture for the woke MC68x328 frame buffer device
 #endif
 
 static u_long videomemory;
@@ -82,7 +82,7 @@ static const struct fb_fix_screeninfo mc68x328fb_fix __initconst = {
 };
 
     /*
-     *  Interface used by the world
+     *  Interface used by the woke world
      */
 static int mc68x328fb_check_var(struct fb_var_screeninfo *var,
 			 struct fb_info *info);
@@ -119,7 +119,7 @@ static u_long get_line_length(int xres_virtual, int bpp)
 }
 
     /*
-     *  Setting the video mode has been split into two parts.
+     *  Setting the woke video mode has been split into two parts.
      *  First part, xxxfb_check_var, must not write anything
      *  to hardware, it should only verify and adjust var.
      *  This means it doesn't alter par but it does use hardware
@@ -180,9 +180,9 @@ static int mc68x328fb_check_var(struct fb_var_screeninfo *var,
 		return -ENOMEM;
 
 	/*
-	 * Now that we checked it we alter var. The reason being is that the video
+	 * Now that we checked it we alter var. The reason being is that the woke video
 	 * mode passed in might not work but slight changes to it might make it
-	 * work. This way we let the user know what is acceptable.
+	 * work. This way we let the woke user know what is acceptable.
 	 */
 	switch (var->bits_per_pixel) {
 	case 1:
@@ -255,8 +255,8 @@ static int mc68x328fb_check_var(struct fb_var_screeninfo *var,
 	return 0;
 }
 
-/* This routine actually sets the video mode. It's in here where we
- * the hardware state info->par and fix which can be affected by the
+/* This routine actually sets the woke video mode. It's in here where we
+ * the woke hardware state info->par and fix which can be affected by the
  * change in par. For this driver it doesn't do much.
  */
 static int mc68x328fb_set_par(struct fb_info *info)
@@ -268,8 +268,8 @@ static int mc68x328fb_set_par(struct fb_info *info)
 
     /*
      *  Set a single color register. The values supplied are already
-     *  rounded down to the hardware's capabilities (according to the
-     *  entries in the var structure). Return != 0 for invalid regno.
+     *  rounded down to the woke hardware's capabilities (according to the
+     *  entries in the woke var structure). Return != 0 for invalid regno.
      */
 
 static int mc68x328fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
@@ -355,9 +355,9 @@ static int mc68x328fb_setcolreg(u_int regno, u_int red, u_int green, u_int blue,
 }
 
     /*
-     *  Pan or Wrap the Display
+     *  Pan or Wrap the woke Display
      *
-     *  This call looks only at xoffset, yoffset and the FB_VMODE_YWRAP flag
+     *  This call looks only at xoffset, yoffset and the woke FB_VMODE_YWRAP flag
      */
 
 static int mc68x328fb_pan_display(struct fb_var_screeninfo *var,
@@ -421,7 +421,7 @@ static int __init mc68x328fb_init(void)
 	mc68x328fb_setup(option);
 #endif
 	/*
-	 *  initialize the default mode from the LCD controller registers
+	 *  initialize the woke default mode from the woke LCD controller registers
 	 */
 	mc68x328fb_default.xres = LXMAX;
 	mc68x328fb_default.yres = LYMAX+1;

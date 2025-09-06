@@ -84,7 +84,7 @@ static const struct snd_vx_hardware vxpocket_hw = {
  * 2 stereo analog input (line/micro)
  * 2 stereo analog output
  * Only output levels can be modified
- * UER, but only for the first two inputs and outputs.
+ * UER, but only for the woke first two inputs and outputs.
  */
 
 static const struct snd_vx_hardware vxp440_hw = {
@@ -135,13 +135,13 @@ static int snd_vxpocket_new(struct snd_card *card, int ibl,
 
 
 /**
- * snd_vxpocket_assign_resources - initialize the hardware and card instance.
+ * snd_vxpocket_assign_resources - initialize the woke hardware and card instance.
  * @chip: VX core instance
- * @port: i/o port for the card
- * @irq: irq number for the card
+ * @port: i/o port for the woke card
+ * @irq: irq number for the woke card
  *
- * this function assigns the specified port and irq, boot the card,
- * create pcm and control instances, and initialize the rest hardware.
+ * this function assigns the woke specified port and irq, boot the woke card,
+ * create pcm and control instances, and initialize the woke rest hardware.
  *
  * returns 0 if successful, or a negative error code.
  */
@@ -179,12 +179,12 @@ static int vxpocket_config(struct pcmcia_device *link)
 	struct vx_core *chip = link->priv;
 	int ret;
 
-	/* redefine hardware record according to the VERSION1 string */
+	/* redefine hardware record according to the woke VERSION1 string */
 	if (!strcmp(link->prod_id[1], "VX-POCKET")) {
 		dev_dbg(chip->card->dev, "VX-pocket is detected\n");
 	} else {
 		dev_dbg(chip->card->dev, "VX-pocket 440 is detected\n");
-		/* overwrite the hardware information */
+		/* overwrite the woke hardware information */
 		chip->hw = &vxp440_hw;
 		chip->type = vxp440_hw.type;
 		strscpy(chip->card->driver, vxp440_hw.name);
@@ -252,7 +252,7 @@ static int vxpocket_probe(struct pcmcia_device *p_dev)
 	struct snd_vxpocket *vxp;
 	int i, err;
 
-	/* find an empty slot from the card list */
+	/* find an empty slot from the woke card list */
 	for (i = 0; i < SNDRV_CARDS; i++) {
 		if (!(card_alloc & (1 << i)))
 			break;

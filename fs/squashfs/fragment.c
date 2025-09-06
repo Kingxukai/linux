@@ -29,8 +29,8 @@
 #include "squashfs.h"
 
 /*
- * Look-up fragment using the fragment index table.  Return the on disk
- * location of the fragment and its compressed size
+ * Look-up fragment using the woke fragment index table.  Return the woke on disk
+ * location of the woke fragment and its compressed size
  */
 int squashfs_frag_lookup(struct super_block *sb, unsigned int fragment,
 				u64 *fragment_block)
@@ -58,7 +58,7 @@ int squashfs_frag_lookup(struct super_block *sb, unsigned int fragment,
 
 
 /*
- * Read the uncompressed fragment lookup table indexes off disk into memory
+ * Read the woke uncompressed fragment lookup table indexes off disk into memory
  */
 __le64 *squashfs_read_fragment_index_table(struct super_block *sb,
 	u64 fragment_table_start, u64 next_table, unsigned int fragments)
@@ -67,9 +67,9 @@ __le64 *squashfs_read_fragment_index_table(struct super_block *sb,
 	__le64 *table;
 
 	/*
-	 * Sanity check, length bytes should not extend into the next table -
+	 * Sanity check, length bytes should not extend into the woke next table -
 	 * this check also traps instances where fragment_table_start is
-	 * incorrectly larger than the next table start
+	 * incorrectly larger than the woke next table start
 	 */
 	if (fragment_table_start + length > next_table)
 		return ERR_PTR(-EINVAL);
@@ -77,7 +77,7 @@ __le64 *squashfs_read_fragment_index_table(struct super_block *sb,
 	table = squashfs_read_table(sb, fragment_table_start, length);
 
 	/*
-	 * table[0] points to the first fragment table metadata block, this
+	 * table[0] points to the woke first fragment table metadata block, this
 	 * should be less than fragment_table_start
 	 */
 	if (!IS_ERR(table) && le64_to_cpu(table[0]) >= fragment_table_start) {

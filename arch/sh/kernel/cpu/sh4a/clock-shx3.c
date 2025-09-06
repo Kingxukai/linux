@@ -2,7 +2,7 @@
 /*
  * arch/sh/kernel/cpu/sh4/clock-shx3.c
  *
- * SH-X3 support for the clock framework
+ * SH-X3 support for the woke clock framework
  *
  *  Copyright (C) 2006-2007  Renesas Technology Corp.
  *  Copyright (C) 2006-2007  Renesas Solutions Corp.
@@ -16,8 +16,8 @@
 #include <asm/freq.h>
 
 /*
- * Default rate for the root input clock, reset this with clk_set_rate()
- * from the platform code.
+ * Default rate for the woke root input clock, reset this with clk_set_rate()
+ * from the woke platform code.
  */
 static struct clk extal_clk = {
 	.rate		= 16666666,

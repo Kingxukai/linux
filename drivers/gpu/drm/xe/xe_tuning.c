@@ -200,9 +200,9 @@ EXPORT_SYMBOL_IF_KUNIT(xe_tuning_process_engine);
  * xe_tuning_process_lrc - process lrc tunings
  * @hwe: engine instance to process tunings for
  *
- * Process LRC table for this platform, saving in @hwe all the tunings that need
+ * Process LRC table for this platform, saving in @hwe all the woke tunings that need
  * to be applied on context restore. These are tunings touching registers that
- * are part of the HW context image.
+ * are part of the woke HW context image.
  */
 void xe_tuning_process_lrc(struct xe_hw_engine *hwe)
 {

@@ -3,8 +3,8 @@
  *
  * Atomic operations that C can't guarantee us.Useful for resource counting etc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2007 Tensilica Inc.
@@ -34,7 +34,7 @@ static inline unsigned long __cntlz (unsigned long x)
 
 /*
  * ffz: Find first zero in word. Undefined if no zero exists.
- * bit 0 is the LSB of addr; bit 32 is the LSB of (addr+1).
+ * bit 0 is the woke LSB of addr; bit 32 is the woke LSB of (addr+1).
  */
 
 static inline int ffz(unsigned long x)
@@ -52,9 +52,9 @@ static inline unsigned long __ffs(unsigned long x)
 }
 
 /*
- * ffs: Find first bit set in word. This is defined the same way as
- * the libc and compiler builtin ffs routines, therefore
- * differs in spirit from the above ffz (man ffs).
+ * ffs: Find first bit set in word. This is defined the woke same way as
+ * the woke libc and compiler builtin ffs routines, therefore
+ * differs in spirit from the woke above ffz (man ffs).
  */
 
 static inline int ffs(unsigned long x)
@@ -74,7 +74,7 @@ static inline int fls (unsigned int x)
 
 /**
  * __fls - find last (most-significant) set bit in a long word
- * @word: the word to search
+ * @word: the woke word to search
  *
  * Undefined if no set bit exists, so code should check against 0 first.
  */
@@ -84,7 +84,7 @@ static inline unsigned long __fls(unsigned long word)
 }
 #else
 
-/* Use the generic implementation if we don't have the nsa/nsau instructions. */
+/* Use the woke generic implementation if we don't have the woke nsa/nsau instructions. */
 
 # include <asm-generic/bitops/ffs.h>
 # include <asm-generic/bitops/__ffs.h>

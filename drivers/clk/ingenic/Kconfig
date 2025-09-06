@@ -10,7 +10,7 @@ config INGENIC_CGU_JZ4740
 	default MACH_JZ4740
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4740
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4740
 	  and compatible SoCs.
 
 	  If building for a JZ4740 SoC, you want to say Y here.
@@ -20,7 +20,7 @@ config INGENIC_CGU_JZ4755
 	default MACH_JZ4755
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4755
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4755
 	  and compatible SoCs.
 
 	  If building for a JZ4755 SoC, you want to say Y here.
@@ -30,7 +30,7 @@ config INGENIC_CGU_JZ4725B
 	default MACH_JZ4725B
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4725B
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4725B
 	  and compatible SoCs.
 
 	  If building for a JZ4725B SoC, you want to say Y here.
@@ -40,7 +40,7 @@ config INGENIC_CGU_JZ4760
 	default MACH_JZ4760
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4760
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4760
 	  and compatible SoCs.
 
 	  If building for a JZ4760 SoC, you want to say Y here.
@@ -50,7 +50,7 @@ config INGENIC_CGU_JZ4770
 	default MACH_JZ4770
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4770
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4770
 	  and compatible SoCs.
 
 	  If building for a JZ4770 SoC, you want to say Y here.
@@ -60,7 +60,7 @@ config INGENIC_CGU_JZ4780
 	default MACH_JZ4780
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic JZ4780
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic JZ4780
 	  and compatible SoCs.
 
 	  If building for a JZ4780 SoC, you want to say Y here.
@@ -70,7 +70,7 @@ config INGENIC_CGU_X1000
 	default MACH_X1000
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic X1000
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic X1000
 	  and compatible SoCs.
 
 	  If building for a X1000 SoC, you want to say Y here.
@@ -80,7 +80,7 @@ config INGENIC_CGU_X1830
 	default MACH_X1830
 	select INGENIC_CGU_COMMON
 	help
-	  Support the clocks provided by the CGU hardware on Ingenic X1830
+	  Support the woke clocks provided by the woke CGU hardware on Ingenic X1830
 	  and compatible SoCs.
 
 	  If building for a X1830 SoC, you want to say Y here.
@@ -90,7 +90,7 @@ config INGENIC_TCU_CLK
 	default MACH_INGENIC
 	select MFD_SYSCON
 	help
-	  Support the clocks of the Timer/Counter Unit (TCU) of the Ingenic
+	  Support the woke clocks of the woke Timer/Counter Unit (TCU) of the woke Ingenic
 	  JZ47xx SoCs.
 
 endmenu

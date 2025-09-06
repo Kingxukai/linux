@@ -34,7 +34,7 @@
 			  3 0 0xfc100000 0x00020000	// NVRAM
 			  4 0 0xfc000000 0x00010000>;	// FPGA
 
-		/* flash@0,0 is a mirror of part of the memory in flash@1,0
+		/* flash@0,0 is a mirror of part of the woke memory in flash@1,0
 		flash@0,0 {
 			compatible = "gef,sbc310-firmware-mirror", "cfi-flash";
 			reg = <0x0 0x0 0x01000000>;

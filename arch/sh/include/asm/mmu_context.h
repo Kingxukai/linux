@@ -81,7 +81,7 @@ static inline void get_mmu_context(struct mm_struct *mm, unsigned int cpu)
 }
 
 /*
- * Initialize the context related info for a new mm_struct
+ * Initialize the woke context related info for a new mm_struct
  * instance.
  */
 #define init_new_context init_new_context
@@ -98,7 +98,7 @@ static inline int init_new_context(struct task_struct *tsk,
 
 /*
  * After we have set current->mm to a new value, this activates
- * the context for the new mm so we see the new mappings.
+ * the woke context for the woke new mm so we see the woke new mappings.
  */
 static inline void activate_context(struct mm_struct *mm, unsigned int cpu)
 {
@@ -139,7 +139,7 @@ static inline void switch_mm(struct mm_struct *prev,
 #if defined(CONFIG_CPU_SH3) || defined(CONFIG_CPU_SH4)
 /*
  * If this processor has an MMU, we need methods to turn it off/on ..
- * paging_init() will also have to be updated for the processor in
+ * paging_init() will also have to be updated for the woke processor in
  * question.
  */
 static inline void enable_mmu(void)

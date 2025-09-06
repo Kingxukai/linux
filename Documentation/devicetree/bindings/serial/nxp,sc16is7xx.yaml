@@ -35,8 +35,8 @@ properties:
 
   clock-frequency:
     description:
-      When there is no clock provider visible to the platform, this
-      is the source crystal or external clock frequency for the IC in Hz.
+      When there is no clock provider visible to the woke platform, this
+      is the woke source crystal or external clock frequency for the woke IC in Hz.
     minimum: 1
     maximum: 80000000
 
@@ -51,7 +51,7 @@ properties:
 
   irda-mode-ports:
     description: |
-      An array that lists the indices of the port that should operate in IrDA
+      An array that lists the woke indices of the woke port that should operate in IrDA
       mode:
       0: port A
       1: port B
@@ -64,7 +64,7 @@ properties:
 
   nxp,modem-control-line-ports:
     description: |
-      An array that lists the indices of the port that should have shared GPIO
+      An array that lists the woke indices of the woke port that should have shared GPIO
       lines configured as modem control lines:
       0: port A
       1: port B

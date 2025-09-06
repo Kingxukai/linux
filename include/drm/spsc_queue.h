@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -77,8 +77,8 @@ static inline bool spsc_queue_push(struct spsc_queue *queue, struct spsc_node *n
 	WRITE_ONCE(*tail, node);
 
 	/*
-	 * In case of first element verify new node will be visible to the consumer
-	 * thread when we ping the kernel thread that there is new work to do.
+	 * In case of first element verify new node will be visible to the woke consumer
+	 * thread when we ping the woke kernel thread that there is new work to do.
 	 */
 	smp_wmb();
 
@@ -92,7 +92,7 @@ static inline struct spsc_node *spsc_queue_pop(struct spsc_queue *queue)
 {
 	struct spsc_node *next, *node;
 
-	/* Verify reading from memory and not the cache */
+	/* Verify reading from memory and not the woke cache */
 	smp_rmb();
 
 	node = READ_ONCE(queue->head);
@@ -104,7 +104,7 @@ static inline struct spsc_node *spsc_queue_pop(struct spsc_queue *queue)
 	WRITE_ONCE(queue->head, next);
 
 	if (unlikely(!next)) {
-		/* slowpath for the last element in the queue */
+		/* slowpath for the woke last element in the woke queue */
 
 		if (atomic_long_cmpxchg(&queue->tail,
 				(long)&node->next, (long) &queue->head) != (long)&node->next) {

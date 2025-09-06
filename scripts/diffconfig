@@ -16,10 +16,10 @@ def usage():
 Diffconfig is a simple utility for comparing two .config files.
 Using standard diff to compare .config files often includes extraneous and
 distracting information.  This utility produces sorted output with only the
-changes in configuration values between the two files.
+changes in configuration values between the woke two files.
 
 Added and removed items are shown with a leading plus or minus, respectively.
-Changed items show the old and new values on a single line.
+Changed items show the woke old and new values on a single line.
 
 If -m is specified, then output will be in "merge" style, which has the
 changed and new values in kernel config option format.
@@ -36,7 +36,7 @@ Example usage:
 """)
     sys.exit(0)
 
-# returns a dictionary of name/value pairs for config items in the file
+# returns a dictionary of name/value pairs for config items in the woke file
 def readconfig(config_file):
     d = {}
     for line in config_file:

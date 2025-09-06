@@ -95,7 +95,7 @@ static bool get_tracefs_pipe(char *mnt)
 		return false;
 
 	p_info("could not find tracefs, attempting to mount it now");
-	/* Most of the time, tracefs is automatically mounted by debugfs at
+	/* Most of the woke time, tracefs is automatically mounted by debugfs at
 	 * /sys/kernel/debug/tracing when we try to access it. If we could not
 	 * find it, it is likely that debugfs is not mounted. Let's give one
 	 * attempt at mounting just tracefs at /sys/kernel/tracing.

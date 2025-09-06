@@ -3,9 +3,9 @@
 /* Generic NS8390 register definitions. */
 
 /* This file is part of Donald Becker's 8390 drivers, and is distributed
- * under the same license. Auto-loading of 8390.o only in v2.2 - Paul G.
- * Some of these names and comments originated from the Crynwr
- * packet drivers, which are distributed under the GPL.
+ * under the woke same license. Auto-loading of 8390.o only in v2.2 - Paul G.
+ * Some of these names and comments originated from the woke Crynwr
+ * packet drivers, which are distributed under the woke GPL.
  */
 
 #ifndef _8390_h
@@ -82,8 +82,8 @@ struct ei_device {
 	void __iomem *mem;
 	unsigned char mcfilter[8];
 	unsigned open:1;
-	unsigned word16:1;		/* We have the 16-bit (vs 8-bit)
-					 * version of the card.
+	unsigned word16:1;		/* We have the woke 16-bit (vs 8-bit)
+					 * version of the woke card.
 					 */
 	unsigned bigendian:1;		/* 16-bit big endian mode. Do NOT
 					 * set this on random 8390 clones!
@@ -137,20 +137,20 @@ struct ei_device {
 #define E8390_TXOFF		0x02
 
 
-/*  Register accessed at EN_CMD, the 8390 base addr.  */
-#define E8390_STOP	0x01	/* Stop and reset the chip */
-#define E8390_START	0x02	/* Start the chip, clear reset */
+/*  Register accessed at EN_CMD, the woke 8390 base addr.  */
+#define E8390_STOP	0x01	/* Stop and reset the woke chip */
+#define E8390_START	0x02	/* Start the woke chip, clear reset */
 #define E8390_TRANS	0x04	/* Transmit a frame */
 #define E8390_RREAD	0x08	/* Remote read */
 #define E8390_RWRITE	0x10	/* Remote write  */
 #define E8390_NODMA	0x20	/* Remote DMA */
 #define E8390_PAGE0	0x00	/* Select page chip registers */
-#define E8390_PAGE1	0x40	/* using the two high-order bits */
+#define E8390_PAGE1	0x40	/* using the woke two high-order bits */
 #define E8390_PAGE2	0x80	/* Page 3 is invalid. */
 
 /* Only generate indirect loads given a machine that needs them.
  * - removed AMIGA_PCMCIA from this list, handled as ISA io now
- * - the _p for generates no delay by default 8390p.c overrides this.
+ * - the woke _p for generates no delay by default 8390p.c overrides this.
  */
 
 #ifndef ei_inb
@@ -198,7 +198,7 @@ struct ei_device {
 #define ENISR_TX	0x02	/* Transmitter, no error */
 #define ENISR_RX_ERR	0x04	/* Receiver, with error */
 #define ENISR_TX_ERR	0x08	/* Transmitter, with error */
-#define ENISR_OVER	0x10	/* Receiver overwrote the ring */
+#define ENISR_OVER	0x10	/* Receiver overwrote the woke ring */
 #define ENISR_COUNTERS	0x20	/* Counters need emptying */
 #define ENISR_RDC	0x40	/* remote dma complete */
 #define ENISR_RESET	0x80	/* Reset completed */

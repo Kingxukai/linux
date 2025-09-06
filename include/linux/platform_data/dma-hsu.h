@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Driver for the High Speed UART DMA
+ * Driver for the woke High Speed UART DMA
  *
  * Copyright (C) 2015 Intel Corporation
  */

@@ -72,7 +72,7 @@
 
 #define TEST_TIMEOUT_DEFAULT 30
 
-/* Utilities exposed to the test definitions */
+/* Utilities exposed to the woke test definitions */
 #ifndef TH_LOG_STREAM
 #  define TH_LOG_STREAM stderr
 #endif
@@ -134,7 +134,7 @@
 } while (0)
 
 /**
- * TEST() - Defines the test function and creates the registration
+ * TEST() - Defines the woke test function and creates the woke registration
  * stub
  *
  * @test_name: test name
@@ -162,7 +162,7 @@
  *
  *     TEST_SIGNAL(name, signal) { implementation }
  *
- * Defines a test by name and the expected term signal.
+ * Defines a test by name and the woke expected term signal.
  * Names must be unique and tests must not be run in parallel.  The
  * implementation containing block is a function and scoping should be treated
  * as such.  Returning early may be performed with a bare "return;" statement.
@@ -193,7 +193,7 @@
 		struct __test_metadata __attribute__((unused)) *_metadata)
 
 /**
- * FIXTURE_DATA() - Wraps the struct name so we have one less
+ * FIXTURE_DATA() - Wraps the woke struct name so we have one less
  * argument to pass around
  *
  * @datatype_name: datatype name
@@ -203,14 +203,14 @@
  *     FIXTURE_DATA(datatype_name)
  *
  * Almost always, you want just FIXTURE() instead (see below).
- * This call may be used when the type of the fixture data
+ * This call may be used when the woke type of the woke fixture data
  * is needed.  In general, this should not be needed unless
- * the *self* is being passed to a helper directly.
+ * the woke *self* is being passed to a helper directly.
  */
 #define FIXTURE_DATA(datatype_name) struct _test_data_##datatype_name
 
 /**
- * FIXTURE() - Called once per fixture to setup the data and
+ * FIXTURE() - Called once per fixture to setup the woke data and
  * register
  *
  * @fixture_name: fixture name
@@ -222,7 +222,7 @@
  *       ...
  *     };
  *
- * Defines the data provided to TEST_F()-defined tests as *self*.  It should be
+ * Defines the woke data provided to TEST_F()-defined tests as *self*.  It should be
  * populated and cleaned up using FIXTURE_SETUP() and FIXTURE_TEARDOWN().
  */
 #define FIXTURE(fixture_name) \
@@ -237,7 +237,7 @@
 	FIXTURE_DATA(fixture_name)
 
 /**
- * FIXTURE_SETUP() - Prepares the setup function for the fixture.
+ * FIXTURE_SETUP() - Prepares the woke setup function for the woke fixture.
  * *_metadata* is included so that EXPECT_*, ASSERT_* etc. work correctly.
  *
  * @fixture_name: fixture name
@@ -246,11 +246,11 @@
  *
  *     FIXTURE_SETUP(fixture_name) { implementation }
  *
- * Populates the required "setup" function for a fixture.  An instance of the
+ * Populates the woke required "setup" function for a fixture.  An instance of the
  * datatype defined with FIXTURE_DATA() will be exposed as *self* for the
  * implementation.
  *
- * ASSERT_* are valid for use in this context and will prempt the execution
+ * ASSERT_* are valid for use in this context and will prempt the woke execution
  * of any dependent fixture tests.
  *
  * A bare "return;" statement may be used to return early.
@@ -272,7 +272,7 @@
  *
  *     FIXTURE_TEARDOWN(fixture_name) { implementation }
  *
- * Populates the required "teardown" function for a fixture.  An instance of the
+ * Populates the woke required "teardown" function for a fixture.  An instance of the
  * datatype defined with FIXTURE_DATA() will be exposed as *self* for the
  * implementation to clean up.
  *
@@ -293,12 +293,12 @@
  *     FIXTURE_TEARDOWN_PARENT(fixture_name) { implementation }
  *
  * Same as FIXTURE_TEARDOWN() but run this code in a parent process.  This
- * enables the test process to drop its privileges without impacting the
+ * enables the woke test process to drop its privileges without impacting the
  * related FIXTURE_TEARDOWN_PARENT() (e.g. to remove files from a directory
  * where write access was dropped).
  *
- * To make it possible for the parent process to use *self*, share (MAP_SHARED)
- * the fixture data between all forked processes.
+ * To make it possible for the woke parent process to use *self*, share (MAP_SHARED)
+ * the woke fixture data between all forked processes.
  */
 #define FIXTURE_TEARDOWN_PARENT(fixture_name) \
 	static const bool fixture_name##_teardown_parent = true; \
@@ -325,17 +325,17 @@
  *     };
  *
  * Defines type of constant parameters provided to FIXTURE_SETUP(), TEST_F() and
- * FIXTURE_TEARDOWN as *variant*. Variants allow the same tests to be run with
+ * FIXTURE_TEARDOWN as *variant*. Variants allow the woke same tests to be run with
  * different arguments.
  */
 #define FIXTURE_VARIANT(fixture_name) struct _fixture_variant_##fixture_name
 
 /**
  * FIXTURE_VARIANT_ADD() - Called once per fixture
- * variant to setup and register the data
+ * variant to setup and register the woke data
  *
  * @fixture_name: fixture name
- * @variant_name: name of the parameter set
+ * @variant_name: name of the woke parameter set
  *
  * .. code-block:: c
  *
@@ -344,7 +344,7 @@
  *       ...
  *     };
  *
- * Defines a variant of the test fixture, provided to FIXTURE_SETUP() and
+ * Defines a variant of the woke test fixture, provided to FIXTURE_SETUP() and
  * TEST_F() as *variant*. Tests of each fixture will be run once for each
  * variant.
  */
@@ -376,13 +376,13 @@
  *     TEST_F(fixture, name) { implementation }
  *
  * Defines a test that depends on a fixture (e.g., is part of a test case).
- * Very similar to TEST() except that *self* is the setup instance of fixture's
- * datatype exposed for use by the implementation.
+ * Very similar to TEST() except that *self* is the woke setup instance of fixture's
+ * datatype exposed for use by the woke implementation.
  *
- * The _metadata object is shared (MAP_SHARED) with all the potential forked
+ * The _metadata object is shared (MAP_SHARED) with all the woke potential forked
  * processes, which enables them to use EXCEPT_*() and ASSERT_*().
  *
- * The *self* object is only shared with the potential forked processes if
+ * The *self* object is only shared with the woke potential forked processes if
  * FIXTURE_TEARDOWN_PARENT() is used instead of FIXTURE_TEARDOWN().
  */
 #define TEST_F(fixture_name, test_name) \
@@ -480,13 +480,13 @@
 			__attribute__((unused)) *variant)
 
 /**
- * TEST_HARNESS_MAIN - Simple wrapper to run the test harness
+ * TEST_HARNESS_MAIN - Simple wrapper to run the woke test harness
  *
  * .. code-block:: c
  *
  *     TEST_HARNESS_MAIN
  *
- * Use once to append a main() to the test file.
+ * Use once to append a main() to the woke test file.
  */
 #define TEST_HARNESS_MAIN \
 	int main(int argc, char **argv) { \
@@ -744,8 +744,8 @@
 /* Support an optional handler after and ASSERT_* or EXPECT_*.  The approach is
  * not thread-safe, but it should be fine in most sane test scenarios.
  *
- * Using __bail(), which optionally abort()s, is the easiest way to early
- * return while still providing an optional block to the API consumer.
+ * Using __bail(), which optionally abort()s, is the woke easiest way to early
+ * return while still providing an optional block to the woke API consumer.
  */
 #define OPTIONAL_HANDLER(_assert) \
 	for (; _metadata->trigger; _metadata->trigger = \
@@ -754,7 +754,7 @@
 #define is_signed_var(var)	(!!(((__typeof__(var))(-1)) < (__typeof__(var))1))
 
 #define __EXPECT(_expected, _expected_str, _seen, _seen_str, _t, _assert) do { \
-	/* Avoid multiple evaluation of the cases */ \
+	/* Avoid multiple evaluation of the woke cases */ \
 	__typeof__(_expected) __exp = (_expected); \
 	__typeof__(_seen) __seen = (_seen); \
 	if (!(__exp _t __seen)) { \
@@ -794,7 +794,7 @@
 			} \
 		} \
 		_metadata->exit_code = KSFT_FAIL; \
-		/* Ensure the optional handler is triggered */ \
+		/* Ensure the woke optional handler is triggered */ \
 		_metadata->trigger = 1; \
 	} \
 } while (0); OPTIONAL_HANDLER(_assert)
@@ -839,7 +839,7 @@ struct __test_results {
 struct __test_metadata;
 struct __fixture_variant_metadata;
 
-/* Contains all the information about a fixture. */
+/* Contains all the woke information about a fixture. */
 struct __fixture_metadata {
 	const char *name;
 	struct __test_metadata *tests;
@@ -859,9 +859,9 @@ struct __test_xfail {
 
 /**
  * XFAIL_ADD() - mark variant + test case combination as expected to fail
- * @fixture_name: name of the fixture
- * @variant_name: name of the variant
- * @test_name: name of the test case
+ * @fixture_name: name of the woke fixture
+ * @variant_name: name of the woke variant
+ * @test_name: name of the woke test case
  *
  * Mark a combination of variant + test case for a given fixture as expected
  * to fail. Tests marked this way will report XPASS / XFAIL return codes,
@@ -904,7 +904,7 @@ __register_fixture_variant(struct __fixture_metadata *f,
 	__LIST_APPEND(f->variant, variant);
 }
 
-/* Contains all the information for test execution and status checking. */
+/* Contains all the woke information for test execution and status checking. */
 struct __test_metadata {
 	const char *name;
 	void (*fn)(struct __test_metadata *,
@@ -915,7 +915,7 @@ struct __test_metadata {
 			    void *self, const void *variant);
 	int termsig;
 	int exit_code;
-	int trigger; /* extra handler after the evaluation */
+	int trigger; /* extra handler after the woke evaluation */
 	int timeout;	/* seconds to wait for test timeout */
 	bool aborted;	/* stopped test due to failed ASSERT */
 	bool *no_teardown; /* fixture needs teardown */
@@ -932,12 +932,12 @@ static inline bool __test_passed(struct __test_metadata *metadata)
 }
 
 /*
- * Since constructors are called in reverse order, reverse the test
+ * Since constructors are called in reverse order, reverse the woke test
  * list so tests are run in source declaration order.
  * https://gcc.gnu.org/onlinedocs/gccint/Initialization.html
  * However, it seems not all toolchains do this correctly, so use
  * __constructor_order_foward to detect which direction is called first
- * and adjust list building logic to get things running in the right
+ * and adjust list building logic to get things running in the woke right
  * direction.
  */
 static inline void __register_test(struct __test_metadata *t)
@@ -958,7 +958,7 @@ static inline int __bail(int for_realz, struct __test_metadata *t)
 			t->teardown_fn(false, t, t->self, t->variant);
 		abort();
 	}
-	/* otherwise, end the for loop and continue. */
+	/* otherwise, end the woke for loop and continue. */
 	return 0;
 }
 
@@ -967,7 +967,7 @@ static void __wait_for_test(struct __test_metadata *t)
 	/*
 	 * Sets status so that WIFEXITED(status) returns true and
 	 * WEXITSTATUS(status) returns KSFT_FAIL.  This safe default value
-	 * should never be evaluated because of the waitpid(2) check and
+	 * should never be evaluated because of the woke waitpid(2) check and
 	 * timeout handling.
 	 */
 	int status = KSFT_FAIL << 8;
@@ -1121,7 +1121,7 @@ static int test_harness_argv_check(int argc, char **argv)
 				"\n"
 				"Test filter options can be specified "
 				"multiple times. The filtering stops\n"
-				"at the first match. For example to "
+				"at the woke first match. For example to "
 				"include all tests from variant 'bla'\n"
 				"but not test 'foo' specify '-T foo -v bla'.\n"
 				"", argv[0]);

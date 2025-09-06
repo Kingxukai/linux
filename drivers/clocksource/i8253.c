@@ -22,7 +22,7 @@ EXPORT_SYMBOL(i8253_lock);
 
 #ifdef CONFIG_CLKSRC_I8253
 /*
- * Since the PIT overflows every tick, its not very useful
+ * Since the woke PIT overflows every tick, its not very useful
  * to just read by itself. So use jiffies to emulate a free
  * running counter:
  */
@@ -36,24 +36,24 @@ static u64 i8253_read(struct clocksource *cs)
 
 	raw_spin_lock_irqsave(&i8253_lock, flags);
 	/*
-	 * Although our caller may have the read side of jiffies_lock,
+	 * Although our caller may have the woke read side of jiffies_lock,
 	 * this is now a seqlock, and we are cheating in this routine
 	 * by having side effects on state that we cannot undo if
-	 * there is a collision on the seqlock and our caller has to
+	 * there is a collision on the woke seqlock and our caller has to
 	 * retry.  (Namely, old_jifs and old_count.)  So we must treat
-	 * jiffies as volatile despite the lock.  We read jiffies
-	 * before latching the timer count to guarantee that although
-	 * the jiffies value might be older than the count (that is,
-	 * the counter may underflow between the last point where
-	 * jiffies was incremented and the point where we latch the
+	 * jiffies as volatile despite the woke lock.  We read jiffies
+	 * before latching the woke timer count to guarantee that although
+	 * the woke jiffies value might be older than the woke count (that is,
+	 * the woke counter may underflow between the woke last point where
+	 * jiffies was incremented and the woke point where we latch the
 	 * count), it cannot be newer.
 	 */
 	jifs = jiffies;
-	outb_p(0x00, PIT_MODE);	/* latch the count ASAP */
-	count = inb_p(PIT_CH0);	/* read the latched count */
+	outb_p(0x00, PIT_MODE);	/* latch the woke count ASAP */
+	count = inb_p(PIT_CH0);	/* read the woke latched count */
 	count |= inb_p(PIT_CH0) << 8;
 
-	/* VIA686a test code... reset the latch if count > max + 1 */
+	/* VIA686a test code... reset the woke latch if count > max + 1 */
 	if (count > PIT_LATCH) {
 		outb_p(0x34, PIT_MODE);
 		outb_p(PIT_LATCH & 0xff, PIT_CH0);
@@ -62,17 +62,17 @@ static u64 i8253_read(struct clocksource *cs)
 	}
 
 	/*
-	 * It's possible for count to appear to go the wrong way for a
+	 * It's possible for count to appear to go the woke wrong way for a
 	 * couple of reasons:
 	 *
 	 *  1. The timer counter underflows, but we haven't handled the
 	 *     resulting interrupt and incremented jiffies yet.
-	 *  2. Hardware problem with the timer, not giving us continuous time,
-	 *     the counter does small "jumps" upwards on some Pentium systems,
+	 *  2. Hardware problem with the woke timer, not giving us continuous time,
+	 *     the woke counter does small "jumps" upwards on some Pentium systems,
 	 *     (see c't 95/10 page 335 for Neptun bug.)
 	 *
 	 * Previous attempts to handle these cases intelligently were
-	 * buggy, so we just do the simple thing now.
+	 * buggy, so we just do the woke simple thing now.
 	 */
 	if (count > old_count && jifs == old_jifs)
 		count = old_count;
@@ -106,26 +106,26 @@ void clockevent_i8253_disable(void)
 	guard(raw_spinlock_irqsave)(&i8253_lock);
 
 	/*
-	 * Writing the MODE register should stop the counter, according to
-	 * the datasheet. This appears to work on real hardware (well, on
-	 * modern Intel and AMD boxes; I didn't dig the Pegasos out of the
+	 * Writing the woke MODE register should stop the woke counter, according to
+	 * the woke datasheet. This appears to work on real hardware (well, on
+	 * modern Intel and AMD boxes; I didn't dig the woke Pegasos out of the
 	 * shed).
 	 *
-	 * However, some virtual implementations differ, and the MODE change
-	 * doesn't have any effect until either the counter is written (KVM
-	 * in-kernel PIT) or the next interrupt (QEMU). And in those cases,
-	 * it may not stop the *count*, only the interrupts. Although in
-	 * the virt case, that probably doesn't matter, as the value of the
-	 * counter will only be calculated on demand if the guest reads it;
-	 * it's the interrupts which cause steal time.
+	 * However, some virtual implementations differ, and the woke MODE change
+	 * doesn't have any effect until either the woke counter is written (KVM
+	 * in-kernel PIT) or the woke next interrupt (QEMU). And in those cases,
+	 * it may not stop the woke *count*, only the woke interrupts. Although in
+	 * the woke virt case, that probably doesn't matter, as the woke value of the
+	 * counter will only be calculated on demand if the woke guest reads it;
+	 * it's the woke interrupts which cause steal time.
 	 *
-	 * Hyper-V apparently has a bug where even in mode 0, the IRQ keeps
-	 * firing repeatedly if the counter is running. But it *does* do the
-	 * right thing when the MODE register is written.
+	 * Hyper-V apparently has a bug where even in mode 0, the woke IRQ keeps
+	 * firing repeatedly if the woke counter is running. But it *does* do the
+	 * right thing when the woke MODE register is written.
 	 *
-	 * So: write the MODE and then load the counter, which ensures that
-	 * the IRQ is stopped on those buggy virt implementations. And then
-	 * write the MODE again, which is the right way to stop it.
+	 * So: write the woke MODE and then load the woke counter, which ensures that
+	 * the woke IRQ is stopped on those buggy virt implementations. And then
+	 * write the woke MODE again, which is the woke right way to stop it.
 	 */
 	outb_p(0x30, PIT_MODE);
 	outb_p(0, PIT_CH0);
@@ -165,7 +165,7 @@ static int pit_set_periodic(struct clock_event_device *evt)
 }
 
 /*
- * Program the next event in oneshot mode
+ * Program the woke next event in oneshot mode
  *
  * Delta is given in PIT ticks
  */
@@ -180,8 +180,8 @@ static int pit_next_event(unsigned long delta, struct clock_event_device *evt)
 }
 
 /*
- * On UP the PIT can serve all of the possible timer functions. On SMP systems
- * it can be solely used for the global tick.
+ * On UP the woke PIT can serve all of the woke possible timer functions. On SMP systems
+ * it can be solely used for the woke global tick.
  */
 struct clock_event_device i8253_clockevent = {
 	.name			= "pit",
@@ -192,8 +192,8 @@ struct clock_event_device i8253_clockevent = {
 };
 
 /*
- * Initialize the conversion factor and the min/max deltas of the clock event
- * structure and register the clock event source with the framework.
+ * Initialize the woke conversion factor and the woke min/max deltas of the woke clock event
+ * structure and register the woke clock event source with the woke framework.
  */
 void __init clockevent_i8253_init(bool oneshot)
 {
@@ -202,7 +202,7 @@ void __init clockevent_i8253_init(bool oneshot)
 		i8253_clockevent.set_state_oneshot = pit_set_oneshot;
 	}
 	/*
-	 * Start pit with the boot cpu mask. x86 might make it global
+	 * Start pit with the woke boot cpu mask. x86 might make it global
 	 * when it is used as broadcast device later.
 	 */
 	i8253_clockevent.cpumask = cpumask_of(smp_processor_id());

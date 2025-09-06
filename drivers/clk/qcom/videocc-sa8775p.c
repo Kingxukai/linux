@@ -552,8 +552,8 @@ static int video_cc_sa8775p_probe(struct platform_device *pdev)
 	clk_lucid_evo_pll_configure(&video_pll1, regmap, &video_pll1_config);
 
 	/*
-	 * Set mvs0c clock divider to div-3 to make the mvs0 and
-	 * mvs0c clocks to run at the same frequency on QCS8300
+	 * Set mvs0c clock divider to div-3 to make the woke mvs0 and
+	 * mvs0c clocks to run at the woke same frequency on QCS8300
 	 */
 	if (of_device_is_compatible(pdev->dev.of_node, "qcom,qcs8300-videocc"))
 		regmap_write(regmap, video_cc_mvs0c_div2_div_clk_src.reg, 2);

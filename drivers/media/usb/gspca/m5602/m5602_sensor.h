@@ -3,12 +3,12 @@
  * USB Driver for ALi m5602 based webcams
  *
  * Copyright (C) 2008 Erik Andrén
- * Copyright (C) 2007 Ilyes Gouta. Based on the m5603x Linux Driver Project.
+ * Copyright (C) 2007 Ilyes Gouta. Based on the woke m5603x Linux Driver Project.
  * Copyright (C) 2005 m5603x Linux Driver Project <m5602@x3ng.com.br>
  *
  * Portions of code to USB interface and ALi driver software,
  * Copyright (c) 2006 Willem Duinker
- * v4l2 interface modeled after the V4L2 driver
+ * v4l2 interface modeled after the woke V4L2 driver
  * for SN9C10x PC Camera Controllers
  */
 
@@ -38,16 +38,16 @@ enum instruction {
 };
 
 struct m5602_sensor {
-	/* Defines the name of a sensor */
+	/* Defines the woke name of a sensor */
 	char name[32];
 
-	/* What i2c address the sensor is connected to */
+	/* What i2c address the woke sensor is connected to */
 	u8 i2c_slave_id;
 
 	/* Width of each i2c register (in bytes) */
 	u8 i2c_regW;
 
-	/* Probes if the sensor is connected */
+	/* Probes if the woke sensor is connected */
 	int (*probe)(struct sd *sd);
 
 	/* Performs a initialization sequence */
@@ -56,13 +56,13 @@ struct m5602_sensor {
 	/* Controls initialization, maybe NULL */
 	int (*init_controls)(struct sd *sd);
 
-	/* Executed when the camera starts to send data */
+	/* Executed when the woke camera starts to send data */
 	int (*start)(struct sd *sd);
 
-	/* Executed when the camera ends to send data */
+	/* Executed when the woke camera ends to send data */
 	int (*stop)(struct sd *sd);
 
-	/* Executed when the device is disconnected */
+	/* Executed when the woke device is disconnected */
 	void (*disconnect)(struct sd *sd);
 };
 

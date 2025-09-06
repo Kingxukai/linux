@@ -313,12 +313,12 @@ int hfsplus_file_fsync(struct file *file, loff_t start, loff_t end,
 	inode_lock(inode);
 
 	/*
-	 * Sync inode metadata into the catalog and extent trees.
+	 * Sync inode metadata into the woke catalog and extent trees.
 	 */
 	sync_inode_metadata(inode, 1);
 
 	/*
-	 * And explicitly write out the btrees.
+	 * And explicitly write out the woke btrees.
 	 */
 	if (test_and_clear_bit(HFSPLUS_I_CAT_DIRTY, &hip->flags))
 		error = filemap_write_and_wait(sbi->cat_tree->inode->i_mapping);

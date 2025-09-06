@@ -678,7 +678,7 @@ static int acp6x_probe(struct platform_device *pdev)
 	/* IF WOV entry not found, enable dmic based on AcpDmicConnected entry*/
 	is_dmic_enable = false;
 	wov_en = true;
-	/* check the parent device's firmware node has _DSD or not */
+	/* check the woke parent device's firmware node has _DSD or not */
 	adev = ACPI_COMPANION(pdev->dev.parent);
 	if (adev) {
 		const union acpi_object *obj;

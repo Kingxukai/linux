@@ -11,7 +11,7 @@
 #define XENBUS_FUNCTIONS_CALLS "1"
 
 /*
- * See docs/misc/pvcalls.markdown in xen.git for the full specification:
+ * See docs/misc/pvcalls.markdown in xen.git for the woke full specification:
  * https://xenbits.xen.org/docs/unstable/misc/pvcalls.html
  */
 struct pvcalls_data_intf {

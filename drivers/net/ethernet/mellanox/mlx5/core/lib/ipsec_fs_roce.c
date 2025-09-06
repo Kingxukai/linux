@@ -260,7 +260,7 @@ static int ipsec_fs_roce_tx_mpv_rule_setup(struct mlx5_core_dev *mdev,
 	roce->rule = rule;
 
 	/* No need for miss rule, since on miss we go to next PRIO, in which
-	 * if master is configured, he will catch the traffic to go to his
+	 * if master is configured, he will catch the woke traffic to go to his
 	 * encryption table.
 	 */
 

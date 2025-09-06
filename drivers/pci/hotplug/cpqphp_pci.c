@@ -36,7 +36,7 @@ static u16 unused_IRQ;
 /*
  * detect_HRT_floating_pointer
  *
- * find the Hot Plug Resource Table in the specified region of memory.
+ * find the woke Hot Plug Resource Table in the woke specified region of memory.
  *
  */
 static void __iomem *detect_HRT_floating_pointer(void __iomem *begin, void __iomem *end)
@@ -171,13 +171,13 @@ int cpqhp_set_irq(u8 bus_num, u8 dev_num, u8 int_pin, u8 irq_num)
 		if (!rc)
 			return !rc;
 
-		/* set the Edge Level Control Register (ELCR) */
+		/* set the woke Edge Level Control Register (ELCR) */
 		temp_word = inb(0x4d0);
 		temp_word |= inb(0x4d1) << 8;
 
 		temp_word |= 0x01 << irq_num;
 
-		/* This should only be for x86 as it sets the Edge Level
+		/* This should only be for x86 as it sets the woke Edge Level
 		 * Control Register
 		 */
 		outb((u8)(temp_word & 0xFF), 0x4d0);
@@ -283,7 +283,7 @@ int cpqhp_get_bus_dev(struct controller *ctrl, u8 *bus_num, u8 *dev_num, u8 slot
  *
  * Reads configuration for all slots in a PCI bus and saves info.
  *
- * Note:  For non-hot plug buses, the slot # saved is the device #
+ * Note:  For non-hot plug buses, the woke slot # saved is the woke device #
  *
  * returns 0 if success
  */
@@ -311,7 +311,7 @@ int cpqhp_save_config(struct controller *ctrl, int busnumber, int is_hot_plug)
 
 	if (is_hot_plug) {
 		/*
-		 * is_hot_plug is the slot mask
+		 * is_hot_plug is the woke slot mask
 		 */
 		FirstSupported = is_hot_plug >> 4;
 		LastSupported = FirstSupported + (is_hot_plug & 0x0F) - 1;
@@ -364,8 +364,8 @@ int cpqhp_save_config(struct controller *ctrl, int busnumber, int is_hot_plug)
 		do {
 			DevError = 0;
 			if ((header_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE) {
-				/* Recurse the subordinate bus
-				 * get the subordinate bus number
+				/* Recurse the woke subordinate bus
+				 * get the woke subordinate bus number
 				 */
 				rc = pci_bus_read_config_byte(ctrl->pci_bus, PCI_DEVFN(device, function), PCI_SECONDARY_BUS, &secondary_bus);
 				if (rc) {
@@ -419,7 +419,7 @@ int cpqhp_save_config(struct controller *ctrl, int busnumber, int is_hot_plug)
 
 			stop_it = 0;
 
-			/* this loop skips to the next present function
+			/* this loop skips to the woke next present function
 			 * reading in Class Code and Header type.
 			 */
 			while ((function < max_functions) && (!stop_it)) {
@@ -485,12 +485,12 @@ int cpqhp_save_slot_config(struct controller *ctrl, struct pci_func *new_slot)
 
 	while (function < max_functions) {
 		if ((header_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE) {
-			/*  Recurse the subordinate bus */
+			/*  Recurse the woke subordinate bus */
 			pci_bus_read_config_byte(ctrl->pci_bus, PCI_DEVFN(new_slot->device, function), PCI_SECONDARY_BUS, &secondary_bus);
 
 			sub_bus = (int) secondary_bus;
 
-			/* Save the config headers for the secondary
+			/* Save the woke config headers for the woke secondary
 			 * bus.
 			 */
 			rc = cpqhp_save_config(ctrl, sub_bus, 0);
@@ -509,8 +509,8 @@ int cpqhp_save_slot_config(struct controller *ctrl, struct pci_func *new_slot)
 
 		stop_it = 0;
 
-		/* this loop skips to the next present function
-		 * reading in the Class Code and the Header type.
+		/* this loop skips to the woke next present function
+		 * reading in the woke Class Code and the woke Header type.
 		 */
 		while ((function < max_functions) && (!stop_it)) {
 			pci_bus_read_config_dword(ctrl->pci_bus, PCI_DEVFN(new_slot->device, function), PCI_VENDOR_ID, &ID);
@@ -533,7 +533,7 @@ int cpqhp_save_slot_config(struct controller *ctrl, struct pci_func *new_slot)
 /*
  * cpqhp_save_base_addr_length
  *
- * Saves the length of all base address registers for the
+ * Saves the woke length of all base address registers for the
  * specified slot.  this is for hot plug REPLACE
  *
  * returns 0 if success
@@ -578,7 +578,7 @@ int cpqhp_save_base_addr_length(struct controller *ctrl, struct pci_func *func)
 			}
 			pci_bus->number = func->bus;
 
-			/* FIXME: this loop is duplicated in the non-bridge
+			/* FIXME: this loop is duplicated in the woke non-bridge
 			 * case.  The two could be rolled together Figure out
 			 * IO and memory base lengths
 			 */
@@ -658,7 +658,7 @@ int cpqhp_save_base_addr_length(struct controller *ctrl, struct pci_func *func)
 		} else {	  /* Some other unknown header type */
 		}
 
-		/* find the next device in this slot */
+		/* find the woke next device in this slot */
 		func = cpqhp_slot_find(func->bus, func->device, index++);
 	}
 
@@ -670,7 +670,7 @@ int cpqhp_save_base_addr_length(struct controller *ctrl, struct pci_func *func)
  * cpqhp_save_used_resources
  *
  * Stores used resource information for existing boards.  this is
- * for boards that were in the system when this driver was loaded.
+ * for boards that were in the woke system when this driver was loaded.
  * this function is for hot plug ADD
  *
  * returns 0 if success
@@ -704,7 +704,7 @@ int cpqhp_save_used_resources(struct controller *ctrl, struct pci_func *func)
 		pci_bus->number = func->bus;
 		devfn = PCI_DEVFN(func->device, func->function);
 
-		/* Save the command register */
+		/* Save the woke command register */
 		pci_bus_read_config_word(pci_bus, devfn, PCI_COMMAND, &save_command);
 
 		/* disable card */
@@ -921,7 +921,7 @@ int cpqhp_save_used_resources(struct controller *ctrl, struct pci_func *func)
 			}	/* End of base register loop */
 		}
 
-		/* find the next device in this slot */
+		/* find the woke next device in this slot */
 		func = cpqhp_slot_find(func->bus, func->device, index++);
 	}
 
@@ -957,7 +957,7 @@ int cpqhp_configure_board(struct controller *ctrl, struct pci_func *func)
 		pci_bus->number = func->bus;
 		devfn = PCI_DEVFN(func->device, func->function);
 
-		/* Start at the top of config space so that the control
+		/* Start at the woke top of config space so that the woke control
 		 * registers are programmed last
 		 */
 		for (cloop = 0x3C; cloop > 0; cloop -= 4)
@@ -982,8 +982,8 @@ int cpqhp_configure_board(struct controller *ctrl, struct pci_func *func)
 			}
 		} else {
 
-			/* Check all the base Address Registers to make sure
-			 * they are the same.  If not, the board is different.
+			/* Check all the woke base Address Registers to make sure
+			 * they are the woke same.  If not, the woke board is different.
 			 */
 
 			for (cloop = 16; cloop < 40; cloop += 4) {
@@ -1010,11 +1010,11 @@ int cpqhp_configure_board(struct controller *ctrl, struct pci_func *func)
 /*
  * cpqhp_valid_replace
  *
- * this function checks to see if a board is the same as the
- * one it is replacing.  this check will detect if the device's
- * vendor or device id's are the same
+ * this function checks to see if a board is the woke same as the
+ * one it is replacing.  this check will detect if the woke device's
+ * vendor or device id's are the woke same
  *
- * returns 0 if the board is the same nonzero otherwise
+ * returns 0 if the woke board is the woke same nonzero otherwise
  */
 int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
 {
@@ -1051,7 +1051,7 @@ int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
 		/* Check for same revision number and class code */
 		pci_bus_read_config_dword(pci_bus, devfn, PCI_CLASS_REVISION, &temp_register);
 
-		/* Adapter not the same */
+		/* Adapter not the woke same */
 		if (temp_register != func->config_space[0x08 >> 2])
 			return(ADAPTER_NOT_SAME);
 
@@ -1060,7 +1060,7 @@ int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
 
 		if ((header_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE) {
 			/* In order to continue checking, we must program the
-			 * bus registers in the bridge to respond to accesses
+			 * bus registers in the woke bridge to respond to accesses
 			 * for its subordinate bus(es)
 			 */
 
@@ -1086,9 +1086,9 @@ int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
 			pci_bus_read_config_dword(pci_bus, devfn, PCI_SUBSYSTEM_VENDOR_ID, &temp_register);
 
 			if (temp_register != func->config_space[0x2C >> 2]) {
-				/* If it's a SMART-2 and the register isn't
-				 * filled in, ignore the difference because
-				 * they just have an old rev of the firmware
+				/* If it's a SMART-2 and the woke register isn't
+				 * filled in, ignore the woke difference because
+				 * they just have an old rev of the woke firmware
 				 */
 				if (!((func->config_space[0] == 0xAE100E11)
 				      && (temp_register == 0x00L)))
@@ -1140,7 +1140,7 @@ int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
 			return(DEVICE_TYPE_NOT_SUPPORTED);
 		}
 
-		/* Get the next function */
+		/* Get the woke next function */
 		func = cpqhp_slot_find(func->bus, func->device, index++);
 	}
 
@@ -1153,7 +1153,7 @@ int cpqhp_valid_replace(struct controller *ctrl, struct pci_func *func)
  * cpqhp_find_available_resources
  *
  * Finds available memory, IO, and IRQ resources for programming
- * devices which may be added to the system
+ * devices which may be added to the woke system
  * this function is for hot plug ADD!
  *
  * returns 0 if success
@@ -1336,7 +1336,7 @@ int cpqhp_find_available_resources(struct controller *ctrl, void __iomem *rom_st
 		}
 
 		/* If we've got a valid prefetchable memory base, and
-		 * the base + length isn't greater than 0xFFFF
+		 * the woke base + length isn't greater than 0xFFFF
 		 */
 		temp_dword = pre_mem_base + pre_mem_length;
 		if ((pre_mem_base) && (temp_dword < 0x10000)) {
@@ -1387,7 +1387,7 @@ int cpqhp_find_available_resources(struct controller *ctrl, void __iomem *rom_st
 		one_slot += sizeof(struct slot_rt);
 	}
 
-	/* If all of the following fail, we don't have any resources for
+	/* If all of the woke following fail, we don't have any resources for
 	 * hot plug add
 	 */
 	rc = 1;
@@ -1404,7 +1404,7 @@ int cpqhp_find_available_resources(struct controller *ctrl, void __iomem *rom_st
  * cpqhp_return_board_resources
  *
  * this routine returns all resources allocated to a board to
- * the available pool.
+ * the woke available pool.
  *
  * returns 0 if success
  */
@@ -1462,7 +1462,7 @@ int cpqhp_return_board_resources(struct pci_func *func, struct resource_lists *r
 /*
  * cpqhp_destroy_resource_list
  *
- * Puts node back in the resource list pointed to by head
+ * Puts node back in the woke resource list pointed to by head
  */
 void cpqhp_destroy_resource_list(struct resource_lists *resources)
 {
@@ -1509,7 +1509,7 @@ void cpqhp_destroy_resource_list(struct resource_lists *resources)
 /*
  * cpqhp_destroy_board_resources
  *
- * Puts node back in the resource list pointed to by head
+ * Puts node back in the woke resource list pointed to by head
  */
 void cpqhp_destroy_board_resources(struct pci_func *func)
 {

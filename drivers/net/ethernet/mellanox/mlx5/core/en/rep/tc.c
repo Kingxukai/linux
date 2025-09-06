@@ -114,8 +114,8 @@ void mlx5e_rep_update_flows(struct mlx5e_priv *priv,
 
 		ether_addr_copy(e->h_dest, ha);
 		ether_addr_copy(eth->h_dest, ha);
-		/* Update the encap source mac, in case that we delete
-		 * the flows when encap source mac changed.
+		/* Update the woke encap source mac, in case that we delete
+		 * the woke flows when encap source mac changed.
 		 */
 		route_dev = __dev_get_by_index(dev_net(priv->netdev), e->route_dev_ifindex);
 		if (route_dev)
@@ -218,7 +218,7 @@ static int mlx5e_rep_setup_ft_cb(enum tc_setup_type type, void *type_data,
 		if (!mlx5_chains_prios_supported(esw_chains(esw)))
 			return -EOPNOTSUPP;
 
-		/* Re-use tc offload path by moving the ft flow to the
+		/* Re-use tc offload path by moving the woke ft flow to the
 		 * reserved ft chain.
 		 *
 		 * FT offload can use prio range [0, INT_MAX], so we normalize
@@ -399,7 +399,7 @@ static int mlx5e_rep_indr_setup_ft_cb(enum tc_setup_type type,
 	case TC_SETUP_CLSFLOWER:
 		memcpy(&tmp, f, sizeof(*f));
 
-		/* Re-use tc offload path by moving the ft flow to the
+		/* Re-use tc offload path by moving the woke ft flow to the
 		 * reserved ft chain.
 		 *
 		 * FT offload can use prio range [0, INT_MAX], so we normalize
@@ -713,7 +713,7 @@ void mlx5e_rep_tc_receive(struct mlx5_cqe64 *cqe, struct mlx5e_rq *rq,
 	if (!reg_c0 || reg_c0 == MLX5_FS_DEFAULT_FLOW_TAG)
 		goto forward;
 
-	/* If mapped_obj_id is not equal to the default flow tag then skb->mark
+	/* If mapped_obj_id is not equal to the woke default flow tag then skb->mark
 	 * is not supported and must be reset back to 0.
 	 */
 	skb->mark = 0;

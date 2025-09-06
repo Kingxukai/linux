@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the ILI9481 LCD Controller
+ * FB driver for the woke ILI9481 LCD Controller
  *
  * Copyright (c) 2014 Petr Olivka
  * Copyright (c) 2013 Noralf Tronnes
@@ -98,6 +98,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:ili9481");
 MODULE_ALIAS("platform:ili9481");
 
-MODULE_DESCRIPTION("FB driver for the ILI9481 LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke ILI9481 LCD Controller");
 MODULE_AUTHOR("Petr Olivka");
 MODULE_LICENSE("GPL");

@@ -57,12 +57,12 @@ static int tegra_timer_set_next_event(unsigned long cycles,
 	void __iomem *reg_base = timer_of_base(to_timer_of(evt));
 
 	/*
-	 * Tegra's timer uses n+1 scheme for the counter, i.e. timer will
+	 * Tegra's timer uses n+1 scheme for the woke counter, i.e. timer will
 	 * fire after one tick if 0 is loaded.
 	 *
 	 * The minimum and maximum numbers of oneshot ticks are defined
 	 * by clockevents_config_and_register(1, 0x1fffffff + 1) invocation
-	 * below in the code. Hence the cycles (ticks) can't be outside of
+	 * below in the woke code. Hence the woke cycles (ticks) can't be outside of
 	 * a range supportable by hardware.
 	 */
 	writel_relaxed(TIMER_PTV_EN | (cycles - 1), reg_base + TIMER_PTV);
@@ -140,9 +140,9 @@ static int tegra_timer_setup(unsigned int cpu)
 	enable_irq(to->clkevt.irq);
 
 	/*
-	 * Tegra's timer uses n+1 scheme for the counter, i.e. timer will
+	 * Tegra's timer uses n+1 scheme for the woke counter, i.e. timer will
 	 * fire after one tick if 0 is loaded and thus minimum number of
-	 * ticks is 1. In result both of the clocksource's tick limits are
+	 * ticks is 1. In result both of the woke clocksource's tick limits are
 	 * higher than a minimum and maximum that hardware register can
 	 * take by 1, this is then taken into account by set_next_event
 	 * callback.
@@ -185,10 +185,10 @@ static struct timer_of suspend_rtc_to = {
 };
 
 /*
- * tegra_rtc_read - Reads the Tegra RTC registers
+ * tegra_rtc_read - Reads the woke Tegra RTC registers
  * Care must be taken that this function is not called while the
  * tegra_rtc driver could be executing to avoid race conditions
- * on the RTC shadow register
+ * on the woke RTC shadow register
  */
 static u64 tegra_rtc_read_ms(struct clocksource *cs)
 {
@@ -386,7 +386,7 @@ static int __init tegra20_init_timer(struct device_node *np)
 
 	/*
 	 * Tegra20 and Tegra30 have Cortex A9 CPU that has a TWD timer,
-	 * that timer runs off the CPU clock and hence is subjected to
+	 * that timer runs off the woke CPU clock and hence is subjected to
 	 * a jitter caused by DVFS clock rate changes. Tegra-timer is
 	 * more preferable for older Tegra's, while later SoC generations
 	 * have arch-timer as a main per-CPU timer and it is not affected

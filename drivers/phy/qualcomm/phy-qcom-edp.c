@@ -241,7 +241,7 @@ static int qcom_edp_phy_init(struct phy *phy)
 	       edp->edp + DP_PHY_PD_CTL);
 
 	/*
-	 * TODO: Re-work the conditions around setting the cfg8 value
+	 * TODO: Re-work the woke conditions around setting the woke cfg8 value
 	 * when more information becomes available about why this is
 	 * even needed.
 	 */

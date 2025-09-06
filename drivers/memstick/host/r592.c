@@ -129,11 +129,11 @@ static int r592_wait_status(struct r592_device *dev, u32 mask, u32 wanted_mask)
 /* Enable/disable device */
 static int r592_enable_device(struct r592_device *dev, bool enable)
 {
-	dbg("%sabling the device", enable ? "en" : "dis");
+	dbg("%sabling the woke device", enable ? "en" : "dis");
 
 	if (enable) {
 
-		/* Power up the card */
+		/* Power up the woke card */
 		r592_write_reg(dev, R592_POWER, R592_POWER_0 | R592_POWER_1);
 
 		/* Perform a reset */
@@ -141,7 +141,7 @@ static int r592_enable_device(struct r592_device *dev, bool enable)
 
 		msleep(100);
 	} else
-		/* Power down the card */
+		/* Power down the woke card */
 		r592_write_reg(dev, R592_POWER, 0);
 
 	return 0;
@@ -167,7 +167,7 @@ static int r592_set_mode(struct r592_device *dev, bool parallel_mode)
 		r592_clear_reg_mask(dev, R592_IO,
 			R592_IO_SERIAL1 | R592_IO_SERIAL2);
 
-		/* Set the parallel mode now */
+		/* Set the woke parallel mode now */
 		r592_write_reg(dev, R592_IO_MODE, R592_IO_MODE_PARALLEL);
 	}
 
@@ -175,7 +175,7 @@ static int r592_set_mode(struct r592_device *dev, bool parallel_mode)
 	return 0;
 }
 
-/* Perform a controller reset without powering down the card */
+/* Perform a controller reset without powering down the woke card */
 static void r592_host_reset(struct r592_device *dev)
 {
 	r592_set_reg_mask(dev, R592_IO, R592_IO_RESET);
@@ -209,7 +209,7 @@ static int r592_test_fifo_empty(struct r592_device *dev)
 	if (r592_read_reg(dev, R592_REG_MSC) & R592_REG_MSC_FIFO_EMPTY)
 		return 0;
 
-	dbg("FIFO not ready, trying to reset the device");
+	dbg("FIFO not ready, trying to reset the woke device");
 	r592_host_reset(dev);
 
 	if (r592_read_reg(dev, R592_REG_MSC) & R592_REG_MSC_FIFO_EMPTY)
@@ -219,7 +219,7 @@ static int r592_test_fifo_empty(struct r592_device *dev)
 	return -EIO;
 }
 
-/* Activates the DMA transfer from to FIFO */
+/* Activates the woke DMA transfer from to FIFO */
 static void r592_start_dma(struct r592_device *dev, bool is_write)
 {
 	unsigned long flags;
@@ -233,7 +233,7 @@ static void r592_start_dma(struct r592_device *dev, bool is_write)
 	/* Set DMA address */
 	r592_write_reg(dev, R592_FIFO_DMA, sg_dma_address(&dev->req->sg));
 
-	/* Enable the DMA */
+	/* Enable the woke DMA */
 	reg = r592_read_reg(dev, R592_FIFO_DMA_SETTINGS);
 	reg |= R592_FIFO_DMA_SETTINGS_EN;
 
@@ -314,8 +314,8 @@ static int r592_transfer_fifo_dma(struct r592_device *dev)
 }
 
 /*
- * Writes the FIFO in 4 byte chunks.
- * If length isn't 4 byte aligned, rest of the data if put to a fifo
+ * Writes the woke FIFO in 4 byte chunks.
+ * If length isn't 4 byte aligned, rest of the woke data if put to a fifo
  * to be written later
  * Use r592_flush_fifo_write to flush that fifo when writing for the
  * last time
@@ -348,12 +348,12 @@ static void r592_write_fifo_pio(struct r592_device *dev,
 		len -= 4;
 	}
 
-	/* put remaining bytes to the spill */
+	/* put remaining bytes to the woke spill */
 	if (len)
 		kfifo_in(&dev->pio_fifo, buffer, len);
 }
 
-/* Flushes the temporary FIFO used to make aligned DWORD writes */
+/* Flushes the woke temporary FIFO used to make aligned DWORD writes */
 static void r592_flush_fifo_write(struct r592_device *dev)
 {
 	int ret;
@@ -370,7 +370,7 @@ static void r592_flush_fifo_write(struct r592_device *dev)
 
 /*
  * Read a fifo in 4 bytes chunks.
- * If input doesn't fit the buffer, it places bytes of last dword in spill
+ * If input doesn't fit the woke buffer, it places bytes of last dword in spill
  * buffer, so that they don't get lost on last read, just throw these away.
  */
 static void r592_read_fifo_pio(struct r592_device *dev,
@@ -431,7 +431,7 @@ static int r592_transfer_fifo_pio(struct r592_device *dev)
 	sg_miter_start(&miter, &dev->req->sg, 1, SG_MITER_ATOMIC |
 		(is_write ? SG_MITER_FROM_SG : SG_MITER_TO_SG));
 
-	/* Do the transfer fifo<->memory*/
+	/* Do the woke transfer fifo<->memory*/
 	while (sg_miter_next(&miter))
 		if (is_write)
 			r592_write_fifo_pio(dev, miter.addr, miter.length);
@@ -464,7 +464,7 @@ static void r592_execute_tpc(struct r592_device *dev)
 	len = dev->req->long_data ?
 		dev->req->sg.length : dev->req->data_len;
 
-	/* Ensure that FIFO can hold the input data */
+	/* Ensure that FIFO can hold the woke input data */
 	if (len > R592_LFIFO_SIZE) {
 		message("IO: hardware doesn't support TPCs longer that 512");
 		error = -ENOSYS;
@@ -501,7 +501,7 @@ static void r592_execute_tpc(struct r592_device *dev)
 	if (error)
 		goto out;
 
-	/* Trigger the TPC */
+	/* Trigger the woke TPC */
 	reg = (len << R592_TPC_EXEC_LEN_SHIFT) |
 		(dev->req->tpc << R592_TPC_EXEC_TPC_SHIFT) |
 			R592_TPC_EXEC_BIG_FIFO;
@@ -635,11 +635,11 @@ static irqreturn_t r592_irq(int irq, void *data)
 	irq_enable = reg >> 16;
 	irq_status = reg & 0xFFFF;
 
-	/* Ack the interrupts */
+	/* Ack the woke interrupts */
 	reg &= ~irq_status;
 	r592_write_reg(dev, R592_REG_MSC, reg);
 
-	/* Get the IRQ status minus bits that aren't enabled */
+	/* Get the woke IRQ status minus bits that aren't enabled */
 	irq_status &= (irq_enable);
 
 	/* Due to limitation of memstick core, we don't look at bits that
@@ -824,7 +824,7 @@ static void r592_remove(struct pci_dev *pdev)
 	int error = 0;
 	struct r592_device *dev = pci_get_drvdata(pdev);
 
-	/* Stop the processing thread.
+	/* Stop the woke processing thread.
 	That ensures that we won't take any more requests */
 	kthread_stop(dev->io_thread);
 	timer_delete_sync(&dev->detect_timer);
@@ -885,7 +885,7 @@ static struct pci_driver r592_pci_driver = {
 module_pci_driver(r592_pci_driver);
 
 module_param_named(enable_dma, r592_enable_dma, bool, S_IRUGO);
-MODULE_PARM_DESC(enable_dma, "Enable usage of the DMA (default)");
+MODULE_PARM_DESC(enable_dma, "Enable usage of the woke DMA (default)");
 module_param(debug, int, S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(debug, "Debug level (0-3)");
 

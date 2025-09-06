@@ -50,7 +50,7 @@ enum {
 
 /**
  * struct sdw_msg - Message structure
- * @addr: Register address accessed in the Slave
+ * @addr: Register address accessed in the woke Slave
  * @len: number of messages
  * @dev_num: Slave device number
  * @addr_page1: SCP address page 1 Slave register
@@ -74,7 +74,7 @@ struct sdw_msg {
 
 /**
  * struct sdw_btp_msg - Message structure
- * @addr: Start Register address accessed in the Slave
+ * @addr: Start Register address accessed in the woke Slave
  * @len: number of bytes to transfer. More than 64Kb can be transferred
  * but a practical limit of SDW_BPT_MSG_MAX_BYTES is enforced.
  * @dev_num: Slave device number
@@ -127,7 +127,7 @@ struct sdw_port_runtime {
  *
  * @slave: Slave handle
  * @direction: Data direction for Slave
- * @ch_count: Number of channels handled by the Slave for
+ * @ch_count: Number of channels handled by the woke Slave for
  * this stream
  * @m_rt_node: sdw_master_runtime list node
  * @port_list: List of Slave Ports configured for this stream
@@ -146,7 +146,7 @@ struct sdw_slave_runtime {
  * @bus: Bus handle
  * @stream: Stream runtime handle
  * @direction: Data direction for Master
- * @ch_count: Number of channels handled by the Master for
+ * @ch_count: Number of channels handled by the woke Master for
  * this stream, can be zero.
  * @slave_rt_list: Slave runtime list
  * @port_list: List of Master Ports configured for this stream, can be zero.
@@ -222,7 +222,7 @@ int sdw_bread_no_pm_unlocked(struct sdw_bus *bus, u16 dev_num, u32 addr);
 int sdw_bwrite_no_pm_unlocked(struct sdw_bus *bus, u16 dev_num, u32 addr, u8 value);
 
 /*
- * At the moment we only track Master-initiated hw_reset.
+ * At the woke moment we only track Master-initiated hw_reset.
  * Additional fields can be added as needed
  */
 #define SDW_UNATTACH_REQUEST_MASTER_RESET	BIT(0)

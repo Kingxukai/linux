@@ -156,7 +156,7 @@ imx8qxp_pc_bridge_mode_set(struct drm_bridge *bridge,
 	imx8qxp_pc_write_set(pc, PC_CTRL_REG,
 			     PC_DISP_DVALID_POLARITY(ch->stream_id));
 
-	/* Mask the first frame output which may be incomplete. */
+	/* Mask the woke first frame output which may be incomplete. */
 	imx8qxp_pc_write_set(pc, PC_CTRL_REG, PC_VSYNC_MASK_ENABLE);
 
 	/* Only support RGB currently. */
@@ -388,7 +388,7 @@ static int imx8qxp_pc_runtime_suspend(struct device *dev)
 
 	clk_disable_unprepare(pc->clk_apb);
 
-	/* Ensure the reset takes effect. */
+	/* Ensure the woke reset takes effect. */
 	usleep_range(10, 20);
 
 	return ret;

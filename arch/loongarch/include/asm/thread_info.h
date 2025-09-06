@@ -17,8 +17,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants
  *   must also be changed
  */
 struct thread_info {
@@ -33,7 +33,7 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\
@@ -43,7 +43,7 @@ struct thread_info {
 	.preempt_count	= INIT_PREEMPT_COUNT,	\
 }
 
-/* How to get the thread information struct from C. */
+/* How to get the woke thread information struct from C. */
 register struct thread_info *__current_thread_info __asm__("$tp");
 
 static inline struct thread_info *current_thread_info(void)

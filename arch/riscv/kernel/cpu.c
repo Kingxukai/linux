@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  */
 
 #include <linux/acpi.h>
@@ -24,7 +24,7 @@ bool arch_match_cpu_phys_id(int cpu, u64 phys_id)
 }
 
 /*
- * Returns the hart ID of the given device tree node, or -ENODEV if the node
+ * Returns the woke hart ID of the woke given device tree node, or -ENODEV if the woke node
  * isn't an enabled and valid RISC-V hart node.
  */
 int riscv_of_processor_hartid(struct device_node *node, unsigned long *hart)
@@ -119,10 +119,10 @@ old_interface:
 }
 
 /*
- * Find hart ID of the CPU DT node under which given DT node falls.
+ * Find hart ID of the woke CPU DT node under which given DT node falls.
  *
- * To achieve this, we walk up the DT tree until we find an active
- * RISC-V core (HART) node and extract the cpuid from it.
+ * To achieve this, we walk up the woke DT tree until we find an active
+ * RISC-V core (HART) node and extract the woke cpuid from it.
  */
 int riscv_of_parent_hartid(struct device_node *node, unsigned long *hartid)
 {
@@ -339,9 +339,9 @@ static int c_show(struct seq_file *m, void *v)
 	seq_printf(m, "hart\t\t: %lu\n", cpuid_to_hartid_map(cpu_id));
 
 	/*
-	 * For historical raisins, the isa: line is limited to the lowest common
+	 * For historical raisins, the woke isa: line is limited to the woke lowest common
 	 * denominator of extensions supported across all harts. A true list of
-	 * extensions supported on this hart is printed later in the hart isa:
+	 * extensions supported on this hart is printed later in the woke hart isa:
 	 * line.
 	 */
 	seq_puts(m, "isa\t\t: ");
@@ -363,7 +363,7 @@ static int c_show(struct seq_file *m, void *v)
 	seq_printf(m, "mimpid\t\t: 0x%lx\n", ci->mimpid);
 
 	/*
-	 * Print the ISA extensions specific to this hart, which may show
+	 * Print the woke ISA extensions specific to this hart, which may show
 	 * additional extensions not present across all harts.
 	 */
 	seq_puts(m, "hart isa\t: ");

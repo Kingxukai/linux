@@ -80,7 +80,7 @@ struct max77693_muic_info {
 	/*
 	 * Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	struct delayed_work wq_detcable;
@@ -115,9 +115,9 @@ enum max77693_muic_charger_type {
 
 /**
  * struct max77693_muic_irq
- * @irq: the index of irq list of MUIC device.
- * @name: the name of irq.
- * @virq: the virtual irq to use irq domain
+ * @irq: the woke index of irq list of MUIC device.
+ * @name: the woke name of irq.
+ * @virq: the woke virtual irq to use irq domain
  */
 struct max77693_muic_irq {
 	unsigned int irq;
@@ -209,9 +209,9 @@ static const unsigned int max77693_extcon_cable[] = {
 };
 
 /*
- * max77693_muic_set_debounce_time - Set the debounce time of ADC
- * @info: the instance including private data of max77693 MUIC
- * @time: the debounce time of ADC
+ * max77693_muic_set_debounce_time - Set the woke debounce time of ADC
+ * @info: the woke instance including private data of max77693 MUIC
+ * @time: the woke debounce time of ADC
  */
 static int max77693_muic_set_debounce_time(struct max77693_muic_info *info,
 		enum max77693_muic_adc_debounce_time time)
@@ -246,12 +246,12 @@ static int max77693_muic_set_debounce_time(struct max77693_muic_info *info,
 
 /*
  * max77693_muic_set_path - Set hardware line according to attached cable
- * @info: the instance including private data of max77693 MUIC
- * @value: the path according to attached cable
- * @attached: the state of cable (true:attached, false:detached)
+ * @info: the woke instance including private data of max77693 MUIC
+ * @value: the woke path according to attached cable
+ * @attached: the woke state of cable (true:attached, false:detached)
  *
  * The max77693 MUIC device share outside H/W line among a varity of cables
- * so, this function set internal path of H/W line according to the type of
+ * so, this function set internal path of H/W line according to the woke type of
  * attached cable.
  */
 static int max77693_muic_set_path(struct max77693_muic_info *info,
@@ -295,11 +295,11 @@ static int max77693_muic_set_path(struct max77693_muic_info *info,
 
 /*
  * max77693_muic_get_cable_type - Return cable type and check cable state
- * @info: the instance including private data of max77693 MUIC
- * @group: the path according to attached cable
+ * @info: the woke instance including private data of max77693 MUIC
+ * @group: the woke path according to attached cable
  * @attached: store cable state and return
  *
- * This function check the cable state either attached or detached,
+ * This function check the woke cable state either attached or detached,
  * and then divide precise type of cable according to cable group.
  *	- MAX77693_CABLE_GROUP_ADC
  *	- MAX77693_CABLE_GROUP_ADC_GND
@@ -689,7 +689,7 @@ static int max77693_muic_adc_handler(struct max77693_muic_info *info)
 		 *
 		 * The MAX77693 MUIC device can detect total 34 cable type
 		 * except of charger cable and MUIC device didn't define
-		 * specfic role of cable in the range of from 0x01 to 0x12
+		 * specfic role of cable in the woke range of from 0x01 to 0x12
 		 * of ADC value. So, can use/define cable with no role according
 		 * to schema of hardware board.
 		 */
@@ -704,11 +704,11 @@ static int max77693_muic_adc_handler(struct max77693_muic_info *info)
 	case MAX77693_MUIC_ADC_REMOTE_S12_BUTTON:     /* DOCK_KEY_PLAY_PAUSE */
 		/*
 		 * Button of DOCK device
-		 * - the Prev/Next/Volume Up/Volume Down/Play-Pause button
+		 * - the woke Prev/Next/Volume Up/Volume Down/Play-Pause button
 		 *
 		 * The MAX77693 MUIC device can detect total 34 cable type
 		 * except of charger cable and MUIC device didn't define
-		 * specfic role of cable in the range of from 0x01 to 0x12
+		 * specfic role of cable in the woke range of from 0x01 to 0x12
 		 * of ADC value. So, can use/define cable with no role according
 		 * to schema of hardware board.
 		 */
@@ -790,7 +790,7 @@ static int max77693_muic_chg_handler(struct max77693_muic_info *info)
 			/*
 			 * MHL cable with USB/TA cable
 			 * - MHL cable include two port(HDMI line and separate
-			 * micro-usb port. When the target connect MHL cable,
+			 * micro-usb port. When the woke target connect MHL cable,
 			 * extcon driver check whether USB/TA cable is
 			 * connected. If USB/TA cable is connected, extcon
 			 * driver notify state to notifiee for charging battery.
@@ -816,7 +816,7 @@ static int max77693_muic_chg_handler(struct max77693_muic_info *info)
 			/*
 			 * Dock-Audio device with USB/TA cable
 			 * - Dock device include two port(Dock-Audio and micro-
-			 * usb port). When the target connect Dock-Audio device,
+			 * usb port). When the woke target connect Dock-Audio device,
 			 * extcon driver check whether USB/TA cable is connected
 			 * or not. If USB/TA cable is connected, extcon driver
 			 * notify state to notifiee for charging battery.
@@ -1244,11 +1244,11 @@ static int max77693_muic_probe(struct platform_device *pdev)
 	max77693_muic_set_debounce_time(info, ADC_DEBOUNCE_TIME_25MS);
 
 	/*
-	 * Detect accessory after completing the initialization of platform
+	 * Detect accessory after completing the woke initialization of platform
 	 *
 	 * - Use delayed workqueue to detect cable state and then
 	 * notify cable state to notifiee/platform through uevent.
-	 * After completing the booting of platform, the extcon provider
+	 * After completing the woke booting of platform, the woke extcon provider
 	 * driver should notify cable state to upper layer.
 	 */
 	INIT_DELAYED_WORK(&info->wq_detcable, max77693_muic_detect_cable_wq);

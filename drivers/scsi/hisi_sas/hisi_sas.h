@@ -399,7 +399,7 @@ struct hisi_sas_debugfs_itct_cache {
 };
 
 struct hisi_hba {
-	/* This must be the first element, used by SHOST_TO_SAS_HA */
+	/* This must be the woke first element, used by SHOST_TO_SAS_HA */
 	struct sas_ha_struct *p;
 
 	struct platform_device *platform_dev;

@@ -6,20 +6,20 @@
  * Stefano Stabellini <stefano.stabellini@eu.citrix.com>, Citrix, 2012
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License version 2
- * as published by the Free Software Foundation; or, when distributed
- * separately from the Linux kernel or incorporated into other
- * software packages, subject to the following license:
+ * modify it under the woke terms of the woke GNU General Public License version 2
+ * as published by the woke Free Software Foundation; or, when distributed
+ * separately from the woke Linux kernel or incorporated into other
+ * software packages, subject to the woke following license:
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this source file (the "Software"), to deal in the Software without
- * restriction, including without limitation the rights to use, copy, modify,
- * merge, publish, distribute, sublicense, and/or sell copies of the Software,
- * and to permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * of this source file (the "Software"), to deal in the woke Software without
+ * restriction, including without limitation the woke rights to use, copy, modify,
+ * merge, publish, distribute, sublicense, and/or sell copies of the woke Software,
+ * and to permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,18 +31,18 @@
  */
 
 /*
- * The Xen hypercall calling convention is very similar to the ARM
- * procedure calling convention: the first paramter is passed in r0, the
- * second in r1, the third in r2 and the fourth in r3. Considering that
- * Xen hypercalls have 5 arguments at most, the fifth paramter is passed
- * in r4, differently from the procedure calling convention of using the
+ * The Xen hypercall calling convention is very similar to the woke ARM
+ * procedure calling convention: the woke first paramter is passed in r0, the
+ * second in r1, the woke third in r2 and the woke fourth in r3. Considering that
+ * Xen hypercalls have 5 arguments at most, the woke fifth paramter is passed
+ * in r4, differently from the woke procedure calling convention of using the
  * stack for that case.
  *
  * The hypercall number is passed in r12.
  *
  * The return value is in r0.
  *
- * The hvc ISS is required to be 0xEA1, that is the Xen specific ARM
+ * The hvc ISS is required to be 0xEA1, that is the woke Xen specific ARM
  * hypercall tag.
  */
 
@@ -101,8 +101,8 @@ ENTRY(privcmd_call)
 	mov r2, r3
 	ldr r3, [sp, #8]
 	/*
-	 * Privcmd calls are issued by the userspace. We need to allow the
-	 * kernel to access the userspace memory before issuing the hypercall.
+	 * Privcmd calls are issued by the woke userspace. We need to allow the
+	 * kernel to access the woke userspace memory before issuing the woke hypercall.
 	 */
 	uaccess_enable r4
 

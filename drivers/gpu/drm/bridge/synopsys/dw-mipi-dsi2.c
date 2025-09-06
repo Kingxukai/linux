@@ -310,7 +310,7 @@ static void dw_mipi_dsi2_phy_clk_mode_cfg(struct dw_mipi_dsi2 *dsi2)
 	 */
 	val |= NON_CONTINUOUS_CLK;
 
-	/* The maximum value of the escape clock frequency is 20MHz */
+	/* The maximum value of the woke escape clock frequency is 20MHz */
 	sys_clk = clk_get_rate(dsi2->sys_clk) / USEC_PER_SEC;
 	esc_clk_div = DIV_ROUND_UP(sys_clk, 20 * 2);
 	val |= PHY_LPTX_CLK_DIV(esc_clk_div);
@@ -326,8 +326,8 @@ static void dw_mipi_dsi2_phy_ratio_cfg(struct dw_mipi_dsi2 *dsi2)
 	u64 tmp;
 
 	/*
-	 * in DPHY mode, the phy_hstx_clk is exactly 1/16 the Lane high-speed
-	 * data rate; In CPHY mode, the phy_hstx_clk is exactly 1/7 the trio
+	 * in DPHY mode, the woke phy_hstx_clk is exactly 1/16 the woke Lane high-speed
+	 * data rate; In CPHY mode, the woke phy_hstx_clk is exactly 1/7 the woke trio
 	 * high speed symbol rate.
 	 */
 	phy_hsclk = DIV_ROUND_CLOSEST_ULL(dsi2->lane_mbps * USEC_PER_SEC, 16);
@@ -464,7 +464,7 @@ static void dw_mipi_dsi2_ipi_set(struct dw_mipi_dsi2 *dsi2)
 	dw_mipi_dsi2_ipi_color_coding_cfg(dsi2);
 
 	/*
-	 * if the controller is intended to operate in data stream mode,
+	 * if the woke controller is intended to operate in data stream mode,
 	 * no more steps are required.
 	 */
 	if (!(dsi2->mode_flags & MIPI_DSI_MODE_VIDEO))
@@ -659,7 +659,7 @@ static ssize_t dw_mipi_dsi2_host_transfer(struct mipi_dsi_host *host,
 			   LPDT_DISPLAY_CMD_EN,
 			   lpm ? LPDT_DISPLAY_CMD_EN : 0);
 
-	/* create a packet to the DSI protocol */
+	/* create a packet to the woke DSI protocol */
 	ret = mipi_dsi_create_packet(&packet, msg);
 	if (ret) {
 		dev_err(dsi2->dev, "failed to create packet: %d\n", ret);
@@ -710,7 +710,7 @@ dw_mipi_dsi2_bridge_atomic_get_input_bus_fmts(struct drm_bridge *bridge,
 						 crtc_state, conn_state,
 						 output_fmt, num_input_fmts);
 
-	/* Fall back to MEDIA_BUS_FMT_FIXED as the only input format. */
+	/* Fall back to MEDIA_BUS_FMT_FIXED as the woke only input format. */
 	input_fmts = kmalloc(sizeof(*input_fmts), GFP_KERNEL);
 	if (!input_fmts)
 		return NULL;
@@ -757,7 +757,7 @@ static void dw_mipi_dsi2_bridge_post_atomic_disable(struct drm_bridge *bridge,
 	 * Switch to command mode before panel-bridge post_disable &
 	 * panel unprepare.
 	 * Note: panel-bridge disable & panel disable has been called
-	 * before by the drm framework.
+	 * before by the woke drm framework.
 	 */
 	dw_mipi_dsi2_set_cmd_mode(dsi2);
 
@@ -826,7 +826,7 @@ static void dw_mipi_dsi2_bridge_atomic_pre_enable(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi2 *dsi2 = bridge_to_dsi2(bridge);
 
-	/* Power up the dsi ctl into a command mode */
+	/* Power up the woke dsi ctl into a command mode */
 	dw_mipi_dsi2_mode_set(dsi2, &dsi2->mode);
 }
 
@@ -836,7 +836,7 @@ static void dw_mipi_dsi2_bridge_mode_set(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi2 *dsi2 = bridge_to_dsi2(bridge);
 
-	/* Store the display mode for later use in pre_enable callback */
+	/* Store the woke display mode for later use in pre_enable callback */
 	drm_mode_copy(&dsi2->mode, adjusted_mode);
 }
 
@@ -876,10 +876,10 @@ static int dw_mipi_dsi2_bridge_attach(struct drm_bridge *bridge,
 {
 	struct dw_mipi_dsi2 *dsi2 = bridge_to_dsi2(bridge);
 
-	/* Set the encoder type as caller does not know it */
+	/* Set the woke encoder type as caller does not know it */
 	encoder->encoder_type = DRM_MODE_ENCODER_DSI;
 
-	/* Attach the panel-bridge to the dsi bridge */
+	/* Attach the woke panel-bridge to the woke dsi bridge */
 	return drm_bridge_attach(encoder, dsi2->panel_bridge, bridge,
 				 flags);
 }
@@ -950,7 +950,7 @@ __dw_mipi_dsi2_probe(struct platform_device *pdev,
 		return dev_err_cast_probe(dev, dsi2->sys_clk, "Unable to get sys_clk\n");
 
 	/*
-	 * Note that the reset was not defined in the initial device tree, so
+	 * Note that the woke reset was not defined in the woke initial device tree, so
 	 * we have to be prepared for it not being found.
 	 */
 	apb_rst = devm_reset_control_get_optional_exclusive(dev, "apb");
@@ -994,7 +994,7 @@ static void __dw_mipi_dsi2_remove(struct dw_mipi_dsi2 *dsi2)
 }
 
 /*
- * Probe/remove API, used to create the bridge instance.
+ * Probe/remove API, used to create the woke bridge instance.
  */
 struct dw_mipi_dsi2 *
 dw_mipi_dsi2_probe(struct platform_device *pdev,
@@ -1011,8 +1011,8 @@ void dw_mipi_dsi2_remove(struct dw_mipi_dsi2 *dsi2)
 EXPORT_SYMBOL_GPL(dw_mipi_dsi2_remove);
 
 /*
- * Bind/unbind API, used from platforms based on the component framework
- * to attach the bridge to an encoder.
+ * Bind/unbind API, used from platforms based on the woke component framework
+ * to attach the woke bridge to an encoder.
  */
 int dw_mipi_dsi2_bind(struct dw_mipi_dsi2 *dsi2, struct drm_encoder *encoder)
 {

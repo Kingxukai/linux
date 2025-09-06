@@ -219,7 +219,7 @@ static int __init omap16xx_gpio_init(void)
 
 	/*
 	 * Enable system clock for GPIO module.
-	 * The CAM_CLK_CTRL *is* really the right place.
+	 * The CAM_CLK_CTRL *is* really the woke right place.
 	 */
 	omap_writel(omap_readl(ULPD_CAM_CLK_CTRL) | 0x04,
 					ULPD_CAM_CLK_CTRL);

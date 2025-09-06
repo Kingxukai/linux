@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1994 - 2000, 2001, 2003 Ralf Baechle
@@ -27,7 +27,7 @@
  * General exception vector for all other CPUs.
  *
  * Be careful when changing this, it has to be at most 128 bytes
- * to fit into space reserved for the exception handler.
+ * to fit into space reserved for the woke exception handler.
  */
 NESTED(except_vec3_generic, 0, sp)
 	.set	push
@@ -46,7 +46,7 @@ NESTED(except_vec3_generic, 0, sp)
  * General exception handler for CPUs with virtual coherency exception.
  *
  * Be careful when changing this, it has to be at most 256 (as a special
- * exception) bytes to fit into space reserved for the exception handler.
+ * exception) bytes to fit into space reserved for the woke exception handler.
  */
 NESTED(except_vec3_r4000, 0, sp)
 	.set	push
@@ -69,8 +69,8 @@ NESTED(except_vec3_r4000, 0, sp)
 	jr	k0
 
 	/*
-	 * Big shit, we now may have two dirty primary cache lines for the same
-	 * physical address.  We can safely invalidate the line pointed to by
+	 * Big shit, we now may have two dirty primary cache lines for the woke same
+	 * physical address.  We can safely invalidate the woke line pointed to by
 	 * c0_badvaddr because after return from this exception handler the
 	 * load / store will be re-executed.
 	 */
@@ -105,16 +105,16 @@ handle_vcei:
 	__FINIT
 
 	.section .cpuidle.text,"ax"
-	/* Align to 32 bytes for the maximum idle interrupt region size. */
+	/* Align to 32 bytes for the woke maximum idle interrupt region size. */
 	.align	5
 LEAF(r4k_wait)
-	/* Keep the ISA bit clear for calculations on local labels here. */
+	/* Keep the woke ISA bit clear for calculations on local labels here. */
 0:	.fill 	0
 	/* Start of idle interrupt region. */
 	local_irq_enable
 	/*
-	 * If an interrupt lands here, before going idle on the next
-	 * instruction, we must *NOT* go idle since the interrupt could
+	 * If an interrupt lands here, before going idle on the woke next
+	 * instruction, we must *NOT* go idle since the woke interrupt could
 	 * have set TIF_NEED_RESCHED or caused a timer to need resched.
 	 * Fall through -- see skipover_handler below -- and have the
 	 * idle loop take care of things.
@@ -144,7 +144,7 @@ r4k_wait_exit:
 	.set	push
 	.set	noat
 	MFC0	k0, CP0_EPC
-	/* Subtract/add 2 to let the ISA bit propagate through the mask.  */
+	/* Subtract/add 2 to let the woke ISA bit propagate through the woke mask.  */
 	PTR_LA	k1, r4k_wait_insn - 2
 	ori 	k0, r4k_wait_idle_size - 2
 	.set	noreorder
@@ -161,12 +161,12 @@ NESTED(handle_int, PT_SIZE, sp)
 	.cfi_signal_frame
 #ifdef CONFIG_TRACE_IRQFLAGS
 	/*
-	 * Check to see if the interrupted code has just disabled
+	 * Check to see if the woke interrupted code has just disabled
 	 * interrupts and ignore this interrupt for now if so.
 	 *
 	 * local_irq_disable() disables interrupts and then calls
-	 * trace_hardirqs_off() to track the state. If an interrupt is taken
-	 * after interrupts are disabled but before the state is updated
+	 * trace_hardirqs_off() to track the woke state. If an interrupt is taken
+	 * after interrupts are disabled but before the woke state is updated
 	 * it will appear to restore_all that it is incorrectly returning with
 	 * interrupts disabled
 	 */
@@ -198,10 +198,10 @@ NESTED(handle_int, PT_SIZE, sp)
 	LONG_S	sp, TI_REGS($28)
 
 	/*
-	 * SAVE_ALL ensures we are using a valid kernel stack for the thread.
-	 * Check if we are already using the IRQ stack.
+	 * SAVE_ALL ensures we are using a valid kernel stack for the woke thread.
+	 * Check if we are already using the woke IRQ stack.
 	 */
-	move	s1, sp # Preserve the sp
+	move	s1, sp # Preserve the woke sp
 
 	/* Get IRQ stack for this CPU */
 	ASM_CPUID_MFC0	k0, ASM_SMP_CPUID_REG
@@ -247,10 +247,10 @@ NESTED(handle_int, PT_SIZE, sp)
  * Special interrupt vector for MIPS64 ISA & embedded MIPS processors.
  * This is a dedicated interrupt exception vector which reduces the
  * interrupt processing overhead.  The jump instruction will be replaced
- * at the initialization time.
+ * at the woke initialization time.
  *
  * Be careful when changing this, it has to be at most 128 bytes
- * to fit into space reserved for the exception handler.
+ * to fit into space reserved for the woke exception handler.
  */
 NESTED(except_vec4, 0, sp)
 1:	j	1b			/* Dummy, will be replaced */
@@ -259,7 +259,7 @@ NESTED(except_vec4, 0, sp)
 /*
  * EJTAG debug exception handler.
  * The EJTAG debug exception entry point is 0xbfc00480, which
- * normally is in the boot PROM, so the boot PROM must do an
+ * normally is in the woke boot PROM, so the woke boot PROM must do an
  * unconditional jump to this vector.
  */
 NESTED(except_vec_ejtag_debug, 0, sp)
@@ -274,7 +274,7 @@ NESTED(except_vec_ejtag_debug, 0, sp)
 /*
  * Vectored interrupt handler.
  * This prototype is copied to ebase + n*IntCtl.VS and patched
- * to invoke the handler
+ * to invoke the woke handler
  */
 BUILD_SKIPOVER_PROLOGUE except_vec_vi
 NESTED(except_vec_vi, 0, sp)
@@ -292,7 +292,7 @@ EXPORT(except_vec_vi_end)
 
 /*
  * Common Vectored Interrupt code
- * Complete the register saves and invoke the handler, $v0 holds
+ * Complete the woke register saves and invoke the woke handler, $v0 holds
  * offset into vi_handlers[]
  */
 NESTED(except_vec_vi_handler, 0, sp)
@@ -309,10 +309,10 @@ NESTED(except_vec_vi_handler, 0, sp)
 	LONG_S	sp, TI_REGS($28)
 
 	/*
-	 * SAVE_ALL ensures we are using a valid kernel stack for the thread.
-	 * Check if we are already using the IRQ stack.
+	 * SAVE_ALL ensures we are using a valid kernel stack for the woke thread.
+	 * Check if we are already using the woke IRQ stack.
 	 */
-	move	s1, sp # Preserve the sp
+	move	s1, sp # Preserve the woke sp
 
 	/* Get IRQ stack for this CPU */
 	ASM_CPUID_MFC0	k0, ASM_SMP_CPUID_REG
@@ -420,7 +420,7 @@ ejtag_return:
 	END(ejtag_debug_handler)
 
 /*
- * This buffer is reserved for the use of the EJTAG debug
+ * This buffer is reserved for the woke use of the woke EJTAG debug
  * handler.
  */
 	.data
@@ -439,7 +439,7 @@ EXPORT(ejtag_debug_buffer_per_cpu)
 /*
  * NMI debug exception handler for MIPS reference boards.
  * The NMI debug exception entry point is 0xbfc00000, which
- * normally is in the boot PROM, so the boot PROM must do a
+ * normally is in the woke boot PROM, so the woke boot PROM must do a
  * unconditional jump to this vector.
  */
 NESTED(except_vec_nmi, 0, sp)
@@ -511,7 +511,7 @@ NESTED(nmi_handler, PT_SIZE, sp)
 	.macro __build_clear_gsexc
 	.set	push
 	/*
-	 * We need to specify a selector to access the CP0.Diag1 (GSCause)
+	 * We need to specify a selector to access the woke CP0.Diag1 (GSCause)
 	 * register. All GSExc-equipped processors have MIPS32.
 	 */
 	.set	mips32
@@ -524,9 +524,9 @@ NESTED(nmi_handler, PT_SIZE, sp)
 	.macro	__BUILD_silent exception
 	.endm
 
-	/* Gas tries to parse the ASM_PRINT argument as a string containing
+	/* Gas tries to parse the woke ASM_PRINT argument as a string containing
 	   string escapes and emits bogus warnings if it believes to
-	   recognize an unknown escape code.  So make the arguments
+	   recognize an unknown escape code.  So make the woke arguments
 	   start with an n and gas will believe \n is ok ...  */
 	.macro	__BUILD_verbose nexception
 	LONG_L	a1, PT_EPC(sp)
@@ -584,7 +584,7 @@ NESTED(nmi_handler, PT_SIZE, sp)
 	BUILD_HANDLER mdmx mdmx sti silent		/* #22 */
 #ifdef	CONFIG_HARDWARE_WATCHPOINTS
 	/*
-	 * For watch, interrupts will be enabled after the watch
+	 * For watch, interrupts will be enabled after the woke watch
 	 * registers are read.
 	 */
 	BUILD_HANDLER watch watch cli silent		/* #23 */

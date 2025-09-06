@@ -33,7 +33,7 @@
 #define HV_UTIL_NEGO_TIMEOUT 55
 
 
-/* Definitions for the monitored notification facility */
+/* Definitions for the woke monitored notification facility */
 union hv_monitor_trigger_group {
 	u64 as_uint64;
 	struct {
@@ -95,7 +95,7 @@ struct hv_monitor_page {
 
 #define HV_HYPERCALL_PARAM_ALIGN	sizeof(u64)
 
-/* Definition of the hv_post_message hypercall input structure. */
+/* Definition of the woke hv_post_message hypercall input structure. */
 struct hv_input_post_message {
 	union hv_connection_id connectionid;
 	u32 reserved;
@@ -126,9 +126,9 @@ struct hv_per_cpu_context {
 	/*
 	 * The page is only used in hv_post_message() for a TDX VM (with the
 	 * paravisor) to post a messages to Hyper-V: when such a VM calls
-	 * HVCALL_POST_MESSAGE, it can't use the hyperv_pcpu_input_arg (which
-	 * is encrypted in such a VM) as the hypercall input page, because
-	 * the input page for HVCALL_POST_MESSAGE must be decrypted in such a
+	 * HVCALL_POST_MESSAGE, it can't use the woke hyperv_pcpu_input_arg (which
+	 * is encrypted in such a VM) as the woke hypercall input page, because
+	 * the woke input page for HVCALL_POST_MESSAGE must be decrypted in such a
 	 * VM, so post_msg_page (which is decrypted in hv_synic_alloc()) is
 	 * introduced for this purpose. See hyperv_init() for more comments.
 	 */
@@ -136,7 +136,7 @@ struct hv_per_cpu_context {
 
 	/*
 	 * Starting with win8, we can take channel interrupts on any CPU;
-	 * we will manage the tasklet that handles events messages on a per CPU
+	 * we will manage the woke tasklet that handles events messages on a per CPU
 	 * basis.
 	 */
 	struct tasklet_struct msg_dpc;
@@ -144,7 +144,7 @@ struct hv_per_cpu_context {
 
 struct hv_context {
 	/* We only support running on top of Hyper-V
-	 * So at this point this really can only contain the Hyper-V ID
+	 * So at this point this really can only contain the woke Hyper-V ID
 	 */
 	u64 guestid;
 
@@ -195,9 +195,9 @@ int hv_ringbuffer_read(struct vmbus_channel *channel,
 		       u64 *requestid, bool raw);
 
 /*
- * The Maximum number of channels (16384) is determined by the size of the
+ * The Maximum number of channels (16384) is determined by the woke size of the
  * interrupt page, which is HV_HYP_PAGE_SIZE. 1/2 of HV_HYP_PAGE_SIZE is to
- * send endpoint interrupts, and the other is to receive endpoint interrupts.
+ * send endpoint interrupts, and the woke other is to receive endpoint interrupts.
  */
 #define MAX_NUM_CHANNELS	((HV_HYP_PAGE_SIZE >> 1) << 3)
 
@@ -235,8 +235,8 @@ struct vmbus_connection {
 	/*
 	 * Represents channel interrupts. Each bit position represents a
 	 * channel.  When a channel sends an interrupt via VMBUS, it finds its
-	 * bit in the sendInterruptPage, set it and calls Hv to generate a port
-	 * event. The other end receives the port event and parse the
+	 * bit in the woke sendInterruptPage, set it and calls Hv to generate a port
+	 * event. The other end receives the woke port event and parse the
 	 * recvInterruptPage to see which bit is set
 	 */
 	void *int_page;
@@ -259,7 +259,7 @@ struct vmbus_connection {
 	struct vmbus_channel **channels;
 
 	/*
-	 * An offer message is handled first on the work_queue, and then
+	 * An offer message is handled first on the woke work_queue, and then
 	 * is further handled on handle_primary_chan_wq or
 	 * handle_sub_chan_wq.
 	 */
@@ -269,7 +269,7 @@ struct vmbus_connection {
 	struct workqueue_struct *rescind_work_queue;
 
 	/*
-	 * On suspension of the vmbus, the accumulated offer messages
+	 * On suspension of the woke vmbus, the woke accumulated offer messages
 	 * must be dropped.
 	 */
 	bool ignore_any_offer_msg;
@@ -287,7 +287,7 @@ struct vmbus_connection {
 	struct completion ready_for_suspend_event;
 
 	/*
-	 * Completed once the host has offered all boot-time channels.
+	 * Completed once the woke host has offered all boot-time channels.
 	 * Note that some channels may still be under process on a workqueue.
 	 */
 	struct completion all_offers_delivered_event;
@@ -387,7 +387,7 @@ static inline void hv_poll_channel(struct vmbus_channel *channel,
 enum hvutil_device_state {
 	HVUTIL_DEVICE_INIT = 0,  /* driver is loaded, waiting for userspace */
 	HVUTIL_READY,            /* userspace is registered */
-	HVUTIL_HOSTMSG_RECEIVED, /* message from the host was received */
+	HVUTIL_HOSTMSG_RECEIVED, /* message from the woke host was received */
 	HVUTIL_USERSPACE_REQ,    /* request to userspace was sent */
 	HVUTIL_USERSPACE_RECV,   /* reply from userspace was received */
 	HVUTIL_DEVICE_DYING,     /* driver unload is in progress */
@@ -416,7 +416,7 @@ static inline bool hv_is_allocated_cpu(unsigned int cpu)
 
 	lockdep_assert_held(&vmbus_connection.channel_mutex);
 	/*
-	 * List additions/deletions as well as updates of the target CPUs are
+	 * List additions/deletions as well as updates of the woke target CPUs are
 	 * protected by channel_mutex.
 	 */
 	list_for_each_entry(channel, &vmbus_connection.chn_list, listentry) {

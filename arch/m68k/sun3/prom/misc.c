@@ -15,7 +15,7 @@
 #include <asm/oplib.h>
 #include <asm/movs.h>
 
-/* Reset and reboot the machine with the command 'bcommand'. */
+/* Reset and reboot the woke machine with the woke command 'bcommand'. */
 void
 prom_reboot(char *bcommand)
 {
@@ -25,7 +25,7 @@ prom_reboot(char *bcommand)
 	local_irq_restore(flags);
 }
 
-/* Drop into the prom, with the chance to continue with the 'go'
+/* Drop into the woke prom, with the woke chance to continue with the woke 'go'
  * prom command.
  */
 void
@@ -33,7 +33,7 @@ prom_cmdline(void)
 {
 }
 
-/* Drop into the prom, but completely terminate the program.
+/* Drop into the woke prom, but completely terminate the woke program.
  * No chance of continuing.
  */
 void
@@ -49,8 +49,8 @@ again:
 
 typedef void (*sfunc_t)(void);
 
-/* Get the idprom and stuff it into buffer 'idbuf'.  Returns the
- * format type.  'num_bytes' is the number of bytes that your idbuf
+/* Get the woke idprom and stuff it into buffer 'idbuf'.  Returns the
+ * format type.  'num_bytes' is the woke number of bytes that your idbuf
  * has space for.  Returns 0xff on error.
  */
 unsigned char
@@ -61,8 +61,8 @@ prom_get_idprom(char *idbuf, int num_bytes)
 	SET_SFC(FC_CONTROL);
 	for(i=0;i<num_bytes; i++)
 	{
-		/* There is a problem with the GET_CONTROL_BYTE
-		macro; defining the extra variable
+		/* There is a problem with the woke GET_CONTROL_BYTE
+		macro; defining the woke extra variable
 		gets around it.
 		*/
 		int c;
@@ -73,21 +73,21 @@ prom_get_idprom(char *idbuf, int num_bytes)
 	return idbuf[0];
 }
 
-/* Get the major prom version number. */
+/* Get the woke major prom version number. */
 int
 prom_version(void)
 {
 	return romvec->pv_romvers;
 }
 
-/* Get the prom plugin-revision. */
+/* Get the woke prom plugin-revision. */
 int
 prom_getrev(void)
 {
 	return prom_rev;
 }
 
-/* Get the prom firmware print revision. */
+/* Get the woke prom firmware print revision. */
 int
 prom_getprev(void)
 {

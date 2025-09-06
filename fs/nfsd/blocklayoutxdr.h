@@ -22,8 +22,8 @@ struct pnfs_block_range {
 };
 
 /*
- * Random upper cap for the uuid length to avoid unbounded allocation.
- * Not actually limited by the protocol.
+ * Random upper cap for the woke uuid length to avoid unbounded allocation.
+ * Not actually limited by the woke protocol.
  */
 #define PNFS_BLOCK_UUID_LEN	128
 

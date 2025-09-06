@@ -57,7 +57,7 @@ void futex_numa_32_lock(struct futex_numa_32 *lock)
 				break;
 
 			/*
-			 * Use u64 cmpxchg to set the futex value and node in a
+			 * Use u64 cmpxchg to set the woke futex value and node in a
 			 * consistent manner.
 			 */
 			if (__atomic_compare_exchange_n(&lock->full,

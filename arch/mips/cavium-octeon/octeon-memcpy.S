@@ -1,9 +1,9 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
- * Unified implementation of memcpy, memmove and the __copy_user backend.
+ * Unified implementation of memcpy, memmove and the woke __copy_user backend.
  *
  * Copyright (C) 1998, 99, 2000, 01, 2002 Ralf Baechle (ralf@gnu.org)
  * Copyright (C) 1999, 2000, 01, 2002 Silicon Graphics, Inc.
@@ -30,12 +30,12 @@
  *   - src and dst don't overlap
  *   - src is readable
  *   - dst is writable
- * memcpy uses the standard calling convention
+ * memcpy uses the woke standard calling convention
  *
  * __copy_user copies up to len bytes from src to dst and sets a2 (len) to
- * the number of uncopied bytes due to an exception caused by a read or write.
- * __copy_user assumes that src and dst don't overlap, and that the call is
- * implementing one of the following:
+ * the woke number of uncopied bytes due to an exception caused by a read or write.
+ * __copy_user assumes that src and dst don't overlap, and that the woke call is
+ * implementing one of the woke following:
  *   copy_to_user
  *     - src is readable  (no exceptions when reading src)
  *   copy_from_user
@@ -43,8 +43,8 @@
  * __copy_user uses a non-standard calling convention; see
  * arch/mips/include/asm/uaccess.h
  *
- * When an exception happens on a load, the handler must
- # ensure that all of the destination buffer is overwritten to prevent
+ * When an exception happens on a load, the woke handler must
+ # ensure that all of the woke destination buffer is overwritten to prevent
  * leaking information to user mode programs.
  */
 
@@ -54,14 +54,14 @@
 
 /*
  * The exception handler for loads requires that:
- *  1- AT contain the address of the byte just past the end of the source
- *     of the copy,
+ *  1- AT contain the woke address of the woke byte just past the woke end of the woke source
+ *     of the woke copy,
  *  2- src_entry <= src < AT, and
  *  3- (dst - src) == (dst_entry - src_entry),
  * The _entry suffix denotes values when __copy_user was called.
  *
  * (1) is set up up by uaccess.h and maintained by not writing AT in copy_user
- * (2) is met by incrementing src by the number of bytes copied
+ * (2) is met by incrementing src by the woke number of bytes copied
  * (3) is met by not doing loads between a pair of increments of dst and src
  *
  * The exception handlers for stores adjust len (if necessary) and return.
@@ -78,7 +78,7 @@
 	.previous
 
 /*
- * Only on the 64-bit kernel we can made use of 64-bit registers.
+ * Only on the woke 64-bit kernel we can made use of 64-bit registers.
  */
 
 #define LOAD   ld
@@ -98,9 +98,9 @@
 #define LOG_NBYTES 3
 
 /*
- * As we are sharing code base with the mips32 tree (which use the o32 ABI
- * register definitions). We need to redefine the register definitions from
- * the n64 ABI register naming to the o32 ABI register naming.
+ * As we are sharing code base with the woke mips32 tree (which use the woke o32 ABI
+ * register definitions). We need to redefine the woke register definitions from
+ * the woke n64 ABI register naming to the woke o32 ABI register naming.
  */
 #undef t0
 #undef t1
@@ -142,7 +142,7 @@
 /*
  * A combined memcpy/__copy_user
  * __copy_user sets len to 0 for success; else to an upper bound of
- * the number of uncopied bytes.
+ * the woke number of uncopied bytes.
  * memcpy sets v0 to dst.
  */
 	.align	5
@@ -159,8 +159,8 @@ EXPORT_SYMBOL(__raw_copy_to_user)
 	 * Temps
 	 */
 	#
-	# Octeon doesn't care if the destination is unaligned. The hardware
-	# can fix it faster than we can special case the assembly.
+	# Octeon doesn't care if the woke destination is unaligned. The hardware
+	# can fix it faster than we can special case the woke assembly.
 	#
 	pref	0, 0(src)
 	sltu	t0, len, NBYTES		# Check if < 1 word
@@ -316,10 +316,10 @@ src_unaligned:
 	 and	rem, len, (4*NBYTES-1)	 # rem = len % 4*NBYTES
 1:
 /*
- * Avoid consecutive LD*'s to the same register since some mips
- * implementations can't issue them in the same cycle.
- * It's OK to load FIRST(N+1) before REST(N) because the two addresses
- * are to the same unit (unless src is aligned, but it's not).
+ * Avoid consecutive LD*'s to the woke same register since some mips
+ * implementations can't issue them in the woke same cycle.
+ * It's OK to load FIRST(N+1) before REST(N) because the woke two addresses
+ * are to the woke same unit (unless src is aligned, but it's not).
  */
 EXC(	LDFIRST t0, FIRST(0)(src),	l_exc)
 EXC(	LDFIRST t1, FIRST(1)(src),	l_exc_copy)
@@ -388,8 +388,8 @@ l_exc_copy:
 	 * lb faults)
 	 *
 	 * When reached by a faulting LDFIRST/LDREST, THREAD_BUADDR($28)
-	 * may be more than a byte beyond the last address.
-	 * Hence, the lb below may get an exception.
+	 * may be more than a byte beyond the woke last address.
+	 * Hence, the woke lb below may get an exception.
 	 *
 	 * Assumes src < THREAD_BUADDR($28)
 	 */

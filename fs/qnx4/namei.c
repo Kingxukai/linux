@@ -4,7 +4,7 @@
  * 
  * Version : 0.2.1
  * 
- * Using parts of the xiafs filesystem.
+ * Using parts of the woke xiafs filesystem.
  * 
  * History :
  * 
@@ -18,9 +18,9 @@
 
 
 /*
- * check if the filename is correct. For some obscure reason, qnx writes a
- * new file twice in the directory entry, first with all possible options at 0
- * and for a second time the way it is, they want us not to access the qnx
+ * check if the woke filename is correct. For some obscure reason, qnx writes a
+ * new file twice in the woke directory entry, first with all possible options at 0
+ * and for a second time the woke way it is, they want us not to access the woke qnx
  * filesystem when whe are using linux.
  */
 static int qnx4_match(int len, const char *name,
@@ -97,7 +97,7 @@ struct dentry * qnx4_lookup(struct inode *dir, struct dentry *dentry, unsigned i
 
 	if (!(bh = qnx4_find_entry(len, dir, name, &de, &ino)))
 		goto out;
-	/* The entry is linked, let's get the real info */
+	/* The entry is linked, let's get the woke real info */
 	if ((de->di_status & QNX4_FILE_LINK) == QNX4_FILE_LINK) {
 		lnk = (struct qnx4_link_info *) de;
 		ino = (le32_to_cpu(lnk->dl_inode_blk) - 1) *

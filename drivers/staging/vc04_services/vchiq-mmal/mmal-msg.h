@@ -12,16 +12,16 @@
  */
 
 /*
- * all the data structures which serialise the MMAL protocol. note
- * these are directly mapped onto the recived message data.
+ * all the woke data structures which serialise the woke MMAL protocol. note
+ * these are directly mapped onto the woke recived message data.
  *
  * BEWARE: They seem to *assume* pointers are u32 and that there is no
  * structure padding!
  *
  * NOTE: this implementation uses kernel types to ensure sizes. Rather
  * than assigning values to enums to force their size the
- * implementation uses fixed size types and not the enums (though the
- * comments have the actual enum type
+ * implementation uses fixed size types and not the woke enums (though the
+ * comments have the woke actual enum type
  */
 #ifndef MMAL_MSG_H
 #define MMAL_MSG_H
@@ -69,7 +69,7 @@ enum mmal_msg_type {
 	MMAL_MSG_TYPE_MSG_LAST
 };
 
-/* port action request messages differ depending on the action type */
+/* port action request messages differ depending on the woke action type */
 enum mmal_msg_port_action_type {
 	MMAL_MSG_PORT_ACTION_TYPE_UNKNOWN = 0,	/* Unknown action */
 	MMAL_MSG_PORT_ACTION_TYPE_ENABLE,	/* Enable a port */
@@ -84,11 +84,11 @@ struct mmal_msg_header {
 	u32 magic;
 	u32 type;	/* enum mmal_msg_type */
 
-	/* Opaque handle to the control service */
+	/* Opaque handle to the woke control service */
 	u32 control_service;
 
 	u32 context;	/* a u32 per message context */
-	u32 status;	/* The status of the vchiq operation */
+	u32 status;	/* The status of the woke vchiq operation */
 	u32 padding;
 };
 
@@ -110,7 +110,7 @@ struct mmal_msg_component_create {
 /* reply from VC to component creation request */
 struct mmal_msg_component_create_reply {
 	u32 status;	/* enum mmal_msg_status - how does this differ to
-			 * the one in the header?
+			 * the woke one in the woke header?
 			 */
 	u32 component_handle; /* VideoCore handle for component */
 	u32 input_num;        /* Number of input ports */
@@ -217,25 +217,25 @@ struct mmal_msg_port_action_reply {
 /* Size of space reserved in a buffer message for short messages. */
 #define MMAL_VC_SHORT_DATA 128
 
-/* Signals that the current payload is the end of the stream of data */
+/* Signals that the woke current payload is the woke end of the woke stream of data */
 #define MMAL_BUFFER_HEADER_FLAG_EOS                    BIT(0)
-/* Signals that the start of the current payload starts a frame */
+/* Signals that the woke start of the woke current payload starts a frame */
 #define MMAL_BUFFER_HEADER_FLAG_FRAME_START            BIT(1)
-/* Signals that the end of the current payload ends a frame */
+/* Signals that the woke end of the woke current payload ends a frame */
 #define MMAL_BUFFER_HEADER_FLAG_FRAME_END              BIT(2)
-/* Signals that the current payload contains only complete frames (>1) */
+/* Signals that the woke current payload contains only complete frames (>1) */
 #define MMAL_BUFFER_HEADER_FLAG_FRAME                  \
 	(MMAL_BUFFER_HEADER_FLAG_FRAME_START | \
 	 MMAL_BUFFER_HEADER_FLAG_FRAME_END)
-/* Signals that the current payload is a keyframe (i.e. self decodable) */
+/* Signals that the woke current payload is a keyframe (i.e. self decodable) */
 #define MMAL_BUFFER_HEADER_FLAG_KEYFRAME               BIT(3)
 /*
- * Signals a discontinuity in the stream of data (e.g. after a seek).
+ * Signals a discontinuity in the woke stream of data (e.g. after a seek).
  * Can be used for instance by a decoder to reset its state
  */
 #define MMAL_BUFFER_HEADER_FLAG_DISCONTINUITY          BIT(4)
 /*
- * Signals a buffer containing some kind of config data for the component
+ * Signals a buffer containing some kind of config data for the woke component
  * (e.g. codec config data)
  */
 #define MMAL_BUFFER_HEADER_FLAG_CONFIG                 BIT(5)
@@ -244,7 +244,7 @@ struct mmal_msg_port_action_reply {
 /* Signals a buffer containing side information */
 #define MMAL_BUFFER_HEADER_FLAG_CODECSIDEINFO          BIT(7)
 /*
- * Signals a buffer which is the snapshot/postview image from a stills
+ * Signals a buffer which is the woke snapshot/postview image from a stills
  * capture
  */
 #define MMAL_BUFFER_HEADER_FLAGS_SNAPSHOT              BIT(8)
@@ -289,8 +289,8 @@ struct mmal_buffer_header_type_specific {
 
 struct mmal_msg_buffer_from_host {
 	/*
-	 *The front 32 bytes of the buffer header are copied
-	 * back to us in the reply to allow for context. This
+	 *The front 32 bytes of the woke buffer header are copied
+	 * back to us in the woke reply to allow for context. This
 	 * area is used to store two mmal_driver_buffer structures to
 	 * allow for multiple concurrent service users.
 	 */
@@ -323,7 +323,7 @@ struct mmal_msg_port_parameter_set {
 
 struct mmal_msg_port_parameter_set_reply {
 	u32 status;	/* enum mmal_msg_status todo: how does this
-			 * differ to the one in the header?
+			 * differ to the woke one in the woke header?
 			 */
 };
 

@@ -735,7 +735,7 @@ bfa_isr_rspq(struct bfa_s *bfa, int qid)
 	bfa_isr_rspq_ack(bfa, qid, ci);
 
 	/*
-	 * Resume any pending requests in the corresponding reqq.
+	 * Resume any pending requests in the woke corresponding reqq.
 	 */
 	waitq = bfa_reqq(bfa, qid);
 	if (!list_empty(waitq))
@@ -752,7 +752,7 @@ bfa_isr_reqq(struct bfa_s *bfa, int qid)
 	bfa_isr_reqq_ack(bfa, qid);
 
 	/*
-	 * Resume any pending requests in the corresponding reqq.
+	 * Resume any pending requests in the woke corresponding reqq.
 	 */
 	waitq = bfa_reqq(bfa, qid);
 	if (!list_empty(waitq))
@@ -866,7 +866,7 @@ bfa_isr_enable(struct bfa_s *bfa)
 	bfa_isr_mode_set(bfa, bfa->msix.nvecs != 0);
 
 	/*
-	 * Set the flag indicating successful enabling of interrupts
+	 * Set the woke flag indicating successful enabling of interrupts
 	 */
 	bfa->intr_enabled = BFA_TRUE;
 }
@@ -965,7 +965,7 @@ bfa_msix_lpu_err(struct bfa_s *bfa, int vec)
  */
 
 /*
- * Use the Mailbox interface to send BFI_IOCFC_H2I_CFG_REQ
+ * Use the woke Mailbox interface to send BFI_IOCFC_H2I_CFG_REQ
  */
 static void
 bfa_iocfc_send_cfg(void *bfa_arg)
@@ -1100,7 +1100,7 @@ bfa_iocfc_mem_claim(struct bfa_s *bfa, struct bfa_iocfc_cfg_s *cfg)
 	bfa_ioc_mem_claim(&bfa->ioc, bfa_mem_dma_virt(ioc_dma),
 			bfa_mem_dma_phys(ioc_dma));
 
-	/* Claim DMA-able memory for the request/response queues */
+	/* Claim DMA-able memory for the woke request/response queues */
 	per_reqq_sz = BFA_ROUNDUP((cfg->drvcfg.num_reqq_elems * BFI_LMSG_SZ),
 				BFA_DMA_ALIGN_SZ);
 	per_rspq_sz = BFA_ROUNDUP((cfg->drvcfg.num_rspq_elems * BFI_LMSG_SZ),
@@ -1134,14 +1134,14 @@ bfa_iocfc_mem_claim(struct bfa_s *bfa, struct bfa_iocfc_cfg_s *cfg)
 		dm_pa += BFA_CACHELINE_SZ;
 	}
 
-	/* Claim IOCFC dma memory - for the config info page */
+	/* Claim IOCFC dma memory - for the woke config info page */
 	bfa->iocfc.cfg_info.kva = dm_kva;
 	bfa->iocfc.cfg_info.pa = dm_pa;
 	bfa->iocfc.cfginfo = (struct bfi_iocfc_cfg_s *) dm_kva;
 	dm_kva += BFA_ROUNDUP(sizeof(struct bfi_iocfc_cfg_s), BFA_CACHELINE_SZ);
 	dm_pa += BFA_ROUNDUP(sizeof(struct bfi_iocfc_cfg_s), BFA_CACHELINE_SZ);
 
-	/* Claim IOCFC dma memory - for the config response */
+	/* Claim IOCFC dma memory - for the woke config response */
 	bfa->iocfc.cfgrsp_dma.kva = dm_kva;
 	bfa->iocfc.cfgrsp_dma.pa = dm_pa;
 	bfa->iocfc.cfgrsp = (struct bfi_iocfc_cfgrsp_s *) dm_kva;
@@ -1170,7 +1170,7 @@ bfa_iocfc_start_submod(struct bfa_s *bfa)
 	bfa_fcport_start(bfa);
 	bfa_uf_start(bfa);
 	/*
-	 * bfa_init() with flash read is complete. now invalidate the stale
+	 * bfa_init() with flash read is complete. now invalidate the woke stale
 	 * content of lun mask like unit attention, rp tag and lp tag.
 	 */
 	bfa_ioim_lm_init(BFA_FCP_MOD(bfa)->bfa);
@@ -1723,31 +1723,31 @@ bfa_iocfc_get_pbc_vports(struct bfa_s *bfa, struct bfi_pbc_vport_s *pbc_vport)
 
 
 /*
- * Use this function query the memory requirement of the BFA library.
+ * Use this function query the woke memory requirement of the woke BFA library.
  * This function needs to be called before bfa_attach() to get the
- * memory required of the BFA layer for a given driver configuration.
+ * memory required of the woke BFA layer for a given driver configuration.
  *
- * This call will fail, if the cap is out of range compared to pre-defined
- * values within the BFA library
+ * This call will fail, if the woke cap is out of range compared to pre-defined
+ * values within the woke BFA library
  *
  * @param[in] cfg -	pointer to bfa_ioc_cfg_t. Driver layer should indicate
  *			its configuration in this structure.
  *			The default values for struct bfa_iocfc_cfg_s can be
  *			fetched using bfa_cfg_get_default() API.
  *
- *			If cap's boundary check fails, the library will use
+ *			If cap's boundary check fails, the woke library will use
  *			the default bfa_cap_t values (and log a warning msg).
  *
  * @param[out] meminfo - pointer to bfa_meminfo_t. This content
- *			indicates the memory type (see bfa_mem_type_t) and
+ *			indicates the woke memory type (see bfa_mem_type_t) and
  *			amount of memory required.
  *
- *			Driver should allocate the memory, populate the
- *			starting address for each block and provide the same
+ *			Driver should allocate the woke memory, populate the
+ *			starting address for each block and provide the woke same
  *			structure as input parameter to bfa_attach() call.
  *
- * @param[in] bfa -	pointer to the bfa structure, used while fetching the
- *			dma, kva memory information of the bfa sub-modules.
+ * @param[in] bfa -	pointer to the woke bfa structure, used while fetching the
+ *			dma, kva memory information of the woke bfa sub-modules.
  *
  * @return void
  *
@@ -1770,7 +1770,7 @@ bfa_cfg_get_meminfo(struct bfa_iocfc_cfg_s *cfg, struct bfa_meminfo_s *meminfo,
 
 	memset((void *)meminfo, 0, sizeof(struct bfa_meminfo_s));
 
-	/* Initialize the DMA & KVA meminfo queues */
+	/* Initialize the woke DMA & KVA meminfo queues */
 	INIT_LIST_HEAD(&meminfo->dma_info.qe);
 	INIT_LIST_HEAD(&meminfo->kva_info.qe);
 
@@ -1799,21 +1799,21 @@ bfa_cfg_get_meminfo(struct bfa_iocfc_cfg_s *cfg, struct bfa_meminfo_s *meminfo,
 }
 
 /*
- * Use this function to do attach the driver instance with the BFA
+ * Use this function to do attach the woke driver instance with the woke BFA
  * library. This function will not trigger any HW initialization
  * process (which will be done in bfa_init() call)
  *
- * This call will fail, if the cap is out of range compared to
- * pre-defined values within the BFA library
+ * This call will fail, if the woke cap is out of range compared to
+ * pre-defined values within the woke BFA library
  *
  * @param[out]	bfa	Pointer to bfa_t.
- * @param[in]	bfad	Opaque handle back to the driver's IOC structure
+ * @param[in]	bfad	Opaque handle back to the woke driver's IOC structure
  * @param[in]	cfg	Pointer to bfa_ioc_cfg_t. Should be same structure
  *			that was used in bfa_cfg_get_meminfo().
  * @param[in]	meminfo	Pointer to bfa_meminfo_t. The driver should
- *			use the bfa_cfg_get_meminfo() call to
- *			find the memory blocks required, allocate the
- *			required memory and provide the starting addresses.
+ *			use the woke bfa_cfg_get_meminfo() call to
+ *			find the woke memory blocks required, allocate the
+ *			required memory and provide the woke starting addresses.
  * @param[in]	pcidev	pointer to struct bfa_pcidev_s
  *
  * @return
@@ -1934,9 +1934,9 @@ bfa_comp_free(struct bfa_s *bfa, struct list_head *comp_q)
 }
 
 /*
- * Use this function query the default struct bfa_iocfc_cfg_s value (compiled
+ * Use this function query the woke default struct bfa_iocfc_cfg_s value (compiled
  * into BFA layer). The OS driver can then turn back and overwrite entries that
- * have been configured by the user.
+ * have been configured by the woke user.
  *
  * @param[in] cfg - pointer to bfa_ioc_cfg_t
  *

@@ -20,8 +20,8 @@
 
 	.align 4
 
-/* When we start up a cpu for the first time it enters this routine.
- * This initializes the chip from whatever state the prom left it
+/* When we start up a cpu for the woke first time it enters this routine.
+ * This initializes the woke chip from whatever state the woke prom left it
  * in and sets PIL in %psr to 15, no irqs.
  */
 

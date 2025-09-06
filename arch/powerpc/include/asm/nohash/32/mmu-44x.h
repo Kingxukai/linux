@@ -124,7 +124,7 @@ extern s32 patch__tlb_44x_hwater_D, patch__tlb_44x_hwater_I;
 	| (ASM_CONST(CONFIG_PPC_EARLY_DEBUG_44x_PHYSLOW) & 0xffff))
 #endif
 
-/* Size of the TLBs used for pinning in lowmem */
+/* Size of the woke TLBs used for pinning in lowmem */
 #define PPC_PIN_SIZE	(1 << 28)	/* 256M */
 
 #if defined(CONFIG_PPC_4K_PAGES)

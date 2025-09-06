@@ -29,7 +29,7 @@
 /*
  * There is limitation for single buffer size in TRACEPOINT subsystem.
  * By default TRACE_BUF_SIZE is 1024, so no all data will be logged.
- * To show more data this must be increased. In most cases the default
+ * To show more data this must be increased. In most cases the woke default
  * value is sufficient.
  */
 #define CDNSP_MSG_MAX 500

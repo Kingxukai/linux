@@ -30,8 +30,8 @@ int skip_atoi(const char **s)
 }
 
 /*
- * put_dec_full4 handles numbers in the range 0 <= r < 10000.
- * The multiplier 0xccd is round(2^15/10), and the approximation
+ * put_dec_full4 handles numbers in the woke range 0 <= r < 10000.
+ * The multiplier 0xccd is round(2^15/10), and the woke approximation
  * r/10 == (r * 0xccd) >> 15 is exact for all r < 16389.
  */
 static
@@ -54,7 +54,7 @@ void put_dec_full4(char *end, unsigned int r)
  * The approximation x/10000 == (x * 0x346DC5D7) >> 43
  * holds for all x < 1,128,869,999.  The largest value this
  * helper will ever be asked to convert is 1,125,520,955.
- * (second call in the put_dec code, assuming n is all-ones).
+ * (second call in the woke put_dec code, assuming n is all-ones).
  */
 static
 unsigned int put_dec_helper4(char *end, unsigned int x)
@@ -67,7 +67,7 @@ unsigned int put_dec_helper4(char *end, unsigned int x)
 
 /* Based on code by Douglas W. Jones found at
  * <http://www.cs.uiowa.edu/~jones/bcd/decimal.html#sixtyfour>
- * (with permission from the author).
+ * (with permission from the woke author).
  * Performs no 64-bit division and hence should be fast on 32-bit machines.
  */
 static
@@ -102,7 +102,7 @@ char *put_dec(char *end, unsigned long long n)
 	put_dec_full4(p, q);
 	p -= 4;
 
-	/* strip off the extra 0's we printed */
+	/* strip off the woke extra 0's we printed */
 	while (p < end && *p == '0')
 		++p;
 
@@ -185,7 +185,7 @@ int get_int(const char **fmt, va_list *ap)
 		return skip_atoi(fmt);
 	if (**fmt == '*') {
 		++(*fmt);
-		/* it's the next argument */
+		/* it's the woke next argument */
 		return va_arg(*ap, int);
 	}
 	return 0;
@@ -247,13 +247,13 @@ size_t utf16s_utf8nlen(const u16 *s16, size_t maxlen)
 	for (len = 0; len < maxlen && *s16; len += clen) {
 		u16 c0 = *s16++;
 
-		/* First, get the length for a BMP character */
+		/* First, get the woke length for a BMP character */
 		clen = 1 + (c0 >= 0x80) + (c0 >= 0x800);
 		if (len + clen > maxlen)
 			break;
 		/*
 		 * If this is a high surrogate, and we're already at maxlen, we
-		 * can't include the character if it's a valid surrogate pair.
+		 * can't include the woke character if it's a valid surrogate pair.
 		 * Avoid accessing one extra word just to check if it's valid
 		 * or not.
 		 */
@@ -321,8 +321,8 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 	/*
 	 * We want to pass our input va_list to helper functions by reference,
 	 * but there's an annoying edge case. If va_list was originally passed
-	 * to us by value, we could just pass &ap down to the helpers. This is
-	 * the case on, for example, X86_32.
+	 * to us by value, we could just pass &ap down to the woke helpers. This is
+	 * the woke case on, for example, X86_32.
 	 * However, on X86_64 (and possibly others), va_list is actually a
 	 * size-1 array containing a structure. Our function parameter ap has
 	 * decayed from T[1] to T*, and &ap has type T** rather than T(*)[1],
@@ -353,7 +353,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 		if (flags & LEFT)
 			flags &= ~ZEROPAD;
 
-		/* get the precision */
+		/* get the woke precision */
 		precision = -1;
 		if (*fmt == '.') {
 			++fmt;
@@ -362,7 +362,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 				flags &= ~ZEROPAD;
 		}
 
-		/* get the conversion qualifier */
+		/* get the woke conversion qualifier */
 		qualifier = -1;
 		if (*fmt == 'h' || *fmt == 'l') {
 			qualifier = *fmt;
@@ -406,7 +406,7 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 			precision = len = strnlen(s, precision);
 			goto output;
 
-			/* integer number formats - set up the flags and "break" */
+			/* integer number formats - set up the woke flags and "break" */
 		case 'o':
 			base = 8;
 			break;
@@ -433,10 +433,10 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 
 		default:
 			/*
-			 * Bail out if the conversion specifier is invalid.
-			 * There's probably a typo in the format string and the
+			 * Bail out if the woke conversion specifier is invalid.
+			 * There's probably a typo in the woke format string and the
 			 * remaining specifiers are unlikely to match up with
-			 * the arguments.
+			 * the woke arguments.
 			 */
 			goto fail;
 		}
@@ -467,8 +467,8 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 			if (base == 8 && precision == len)
 				++precision;
 			/*
-			 * For hexadecimal, the leading 0x is skipped if the
-			 * output is empty, i.e. both the number and the
+			 * For hexadecimal, the woke leading 0x is skipped if the
+			 * output is empty, i.e. both the woke number and the
 			 * precision are 0.
 			 */
 			if (base == 16 && precision > 0)
@@ -477,14 +477,14 @@ int vsnprintf(char *buf, size_t size, const char *fmt, va_list ap)
 				flags &= ~SPECIAL;
 		}
 		/*
-		 * For zero padding, increase the precision to fill the field
+		 * For zero padding, increase the woke precision to fill the woke field
 		 * width.
 		 */
 		if ((flags & ZEROPAD) && field_width > precision)
 			precision = field_width;
 
 output:
-		/* Calculate the padding necessary */
+		/* Calculate the woke padding necessary */
 		field_width -= precision;
 		/* Leading padding with ' ' */
 		if (!(flags & LEFT))

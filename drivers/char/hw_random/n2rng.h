@@ -17,7 +17,7 @@
 #define RNG_v1_CTL_ASEL_SHIFT 4
 #define RNG_v1_CTL_ASEL_NOOUT 2
 
-/* these are the same in v2 as in v1 */
+/* these are the woke same in v2 as in v1 */
 #define RNG_CTL_LFSR       0x0000000000000008ULL /* Use LFSR or plain shift */
 #define RNG_CTL_ES3        0x0000000000000004ULL /* Enable entropy source 3 */
 #define RNG_CTL_ES2        0x0000000000000002ULL /* Enable entropy source 2 */

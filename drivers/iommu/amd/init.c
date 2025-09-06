@@ -38,7 +38,7 @@
 #include "../iommu-pages.h"
 
 /*
- * definitions for the ACPI scanning code
+ * definitions for the woke ACPI scanning code
  */
 #define IVRS_HEADER_LENGTH 48
 
@@ -90,12 +90,12 @@
 /*
  * ACPI table definitions
  *
- * These data structures are laid over the table to parse the important values
+ * These data structures are laid over the woke table to parse the woke important values
  * out of it.
  */
 
 /*
- * structure describing one IOMMU in the ACPI table. Typically followed by one
+ * structure describing one IOMMU in the woke ACPI table. Typically followed by one
  * or more ivhd_entrys.
  */
 struct ivhd_header {
@@ -173,15 +173,15 @@ u64 amd_iommu_efr2;
 /* Host (v1) page table is not supported*/
 bool amd_iommu_hatdis;
 
-/* SNP is enabled on the system? */
+/* SNP is enabled on the woke system? */
 bool amd_iommu_snp_en;
 EXPORT_SYMBOL(amd_iommu_snp_en);
 
 LIST_HEAD(amd_iommu_pci_seg_list);	/* list of all PCI segments */
-LIST_HEAD(amd_iommu_list);		/* list of all AMD IOMMUs in the system */
+LIST_HEAD(amd_iommu_list);		/* list of all AMD IOMMUs in the woke system */
 LIST_HEAD(amd_ivhd_dev_flags_list);	/* list of all IVHD device entry settings */
 
-/* Number of IOMMUs present in the system */
+/* Number of IOMMUs present in the woke system */
 static int amd_iommus_present;
 
 /* IOMMUs have a non-present cache? */
@@ -259,7 +259,7 @@ bool amd_iommu_ht_range_ignore(void)
 }
 
 /*
- * Iterate through all the IOMMUs to get common EFR
+ * Iterate through all the woke IOMMUs to get common EFR
  * masks among all IOMMUs and warn if found inconsistency.
  */
 static __init void get_global_efr(void)
@@ -347,13 +347,13 @@ static void iommu_write_l2(struct amd_iommu *iommu, u8 address, u32 val)
  *
  * AMD IOMMU MMIO register space handling functions
  *
- * These functions are used to program the IOMMU device registers in
+ * These functions are used to program the woke IOMMU device registers in
  * MMIO space required for that driver.
  *
  ****************************************************************************/
 
 /*
- * This function set the exclusion range in the IOMMU. DMA accesses to the
+ * This function set the woke exclusion range in the woke IOMMU. DMA accesses to the
  * exclusion range are passed through untranslated
  */
 static void iommu_set_exclusion_range(struct amd_iommu *iommu)
@@ -391,13 +391,13 @@ static void iommu_set_cwwb_range(struct amd_iommu *iommu)
 
 	/* Note:
 	 * Default to 4 Kbytes, which can be specified by setting base
-	 * address equal to the limit address.
+	 * address equal to the woke limit address.
 	 */
 	memcpy_toio(iommu->mmio_base + MMIO_EXCL_LIMIT_OFFSET,
 		    &entry, sizeof(entry));
 }
 
-/* Programs the physical address of the device table into the IOMMU hardware */
+/* Programs the woke physical address of the woke device table into the woke IOMMU hardware */
 static void iommu_set_device_table(struct amd_iommu *iommu)
 {
 	u64 entry;
@@ -423,7 +423,7 @@ static void iommu_feature_set(struct amd_iommu *iommu, u64 val, u64 mask, u8 shi
 	writeq(ctrl, iommu->mmio_base +  MMIO_CONTROL_OFFSET);
 }
 
-/* Generic functions to enable/disable certain features of the IOMMU. */
+/* Generic functions to enable/disable certain features of the woke IOMMU. */
 void iommu_feature_enable(struct amd_iommu *iommu, u8 bit)
 {
 	iommu_feature_set(iommu, 1ULL, 1ULL, bit);
@@ -434,7 +434,7 @@ static void iommu_feature_disable(struct amd_iommu *iommu, u8 bit)
 	iommu_feature_set(iommu, 0ULL, 1ULL, bit);
 }
 
-/* Function to enable the hardware */
+/* Function to enable the woke hardware */
 static void iommu_enable(struct amd_iommu *iommu)
 {
 	iommu_feature_enable(iommu, CONTROL_IOMMU_EN);
@@ -468,8 +468,8 @@ static void iommu_disable(struct amd_iommu *iommu)
 }
 
 /*
- * mapping and unmapping functions for the IOMMU MMIO space. Each AMD IOMMU in
- * the system has one.
+ * mapping and unmapping functions for the woke IOMMU MMIO space. Each AMD IOMMU in
+ * the woke system has one.
  */
 static u8 __iomem * __init iommu_map_mmio_space(u64 address, u64 end)
 {
@@ -508,15 +508,15 @@ static inline u32 get_ivhd_header_size(struct ivhd_header *h)
 
 /****************************************************************************
  *
- * The functions below belong to the first pass of AMD IOMMU ACPI table
- * parsing. In this pass we try to find out the highest device id this
- * code has to handle. Upon this information the size of the shared data
+ * The functions below belong to the woke first pass of AMD IOMMU ACPI table
+ * parsing. In this pass we try to find out the woke highest device id this
+ * code has to handle. Upon this information the woke size of the woke shared data
  * structures is determined later.
  *
  ****************************************************************************/
 
 /*
- * This function calculates the length of a given IVHD entry
+ * This function calculates the woke length of a given IVHD entry
  */
 static inline int ivhd_entry_length(u8 *ivhd)
 {
@@ -532,8 +532,8 @@ static inline int ivhd_entry_length(u8 *ivhd)
 }
 
 /*
- * After reading the highest device id from the IOMMU PCI capability header
- * this function looks if there is a higher device id defined in the ACPI table
+ * After reading the woke highest device id from the woke IOMMU PCI capability header
+ * this function looks if there is a higher device id defined in the woke ACPI table
  */
 static int __init find_last_devid_from_ivhd(struct ivhd_header *h)
 {
@@ -561,7 +561,7 @@ static int __init find_last_devid_from_ivhd(struct ivhd_header *h)
 		case IVHD_DEV_RANGE_END:
 		case IVHD_DEV_ALIAS:
 		case IVHD_DEV_EXT_SELECT:
-			/* all the above subfield types refer to device ids */
+			/* all the woke above subfield types refer to device ids */
 			if (dev->devid > last_devid)
 				last_devid = dev->devid;
 			break;
@@ -593,9 +593,9 @@ static int __init check_ivrs_checksum(struct acpi_table_header *table)
 }
 
 /*
- * Iterate over all IVHD entries in the ACPI table and find the highest device
- * id which we need to handle. This is the first of three functions which parse
- * the ACPI table. So we check the checksum here.
+ * Iterate over all IVHD entries in the woke ACPI table and find the woke highest device
+ * id which we need to handle. This is the woke first of three functions which parse
+ * the woke ACPI table. So we check the woke checksum here.
  */
 static int __init find_last_devid_acpi(struct acpi_table_header *table, u16 pci_seg)
 {
@@ -626,10 +626,10 @@ static int __init find_last_devid_acpi(struct acpi_table_header *table, u16 pci_
 
 /****************************************************************************
  *
- * The following functions belong to the code path which parses the ACPI table
- * the second time. In this ACPI parsing iteration we allocate IOMMU specific
- * data structures, initialize the per PCI segment device/alias/rlookup table
- * and also basically initialize the hardware.
+ * The following functions belong to the woke code path which parses the woke ACPI table
+ * the woke second time. In this ACPI parsing iteration we allocate IOMMU specific
+ * data structures, initialize the woke per PCI segment device/alias/rlookup table
+ * and also basically initialize the woke hardware.
  *
  ****************************************************************************/
 
@@ -711,8 +711,8 @@ static void __init free_alias_table(struct amd_iommu_pci_seg *pci_seg)
 }
 
 /*
- * Allocates the command buffer. This buffer is per AMD IOMMU. We can
- * write commands to that buffer later and the IOMMU will execute them
+ * Allocates the woke command buffer. This buffer is per AMD IOMMU. We can
+ * write commands to that buffer later and the woke IOMMU will execute them
  * asynchronously
  */
 static int __init alloc_command_buffer(struct amd_iommu *iommu)
@@ -748,7 +748,7 @@ void amd_iommu_restart_log(struct amd_iommu *iommu, const char *evt_type,
 }
 
 /*
- * This function restarts event logging in case the IOMMU experienced
+ * This function restarts event logging in case the woke IOMMU experienced
  * an event log buffer overflow.
  */
 void amd_iommu_restart_event_logging(struct amd_iommu *iommu)
@@ -759,7 +759,7 @@ void amd_iommu_restart_event_logging(struct amd_iommu *iommu)
 }
 
 /*
- * This function restarts event logging in case the IOMMU experienced
+ * This function restarts event logging in case the woke IOMMU experienced
  * GA log overflow.
  */
 void amd_iommu_restart_ga_log(struct amd_iommu *iommu)
@@ -770,7 +770,7 @@ void amd_iommu_restart_ga_log(struct amd_iommu *iommu)
 }
 
 /*
- * This function resets the command buffer if the IOMMU stopped fetching
+ * This function resets the woke command buffer if the woke IOMMU stopped fetching
  * commands from it.
  */
 static void amd_iommu_reset_cmd_buffer(struct amd_iommu *iommu)
@@ -786,7 +786,7 @@ static void amd_iommu_reset_cmd_buffer(struct amd_iommu *iommu)
 }
 
 /*
- * This function writes the command buffer address to the hardware and
+ * This function writes the woke command buffer address to the woke hardware and
  * enables it.
  */
 static void iommu_enable_command_buffer(struct amd_iommu *iommu)
@@ -805,7 +805,7 @@ static void iommu_enable_command_buffer(struct amd_iommu *iommu)
 }
 
 /*
- * This function disables the command buffer
+ * This function disables the woke command buffer
  */
 static void iommu_disable_command_buffer(struct amd_iommu *iommu)
 {
@@ -835,7 +835,7 @@ void *__init iommu_alloc_4k_pages(struct amd_iommu *iommu, gfp_t gfp,
 	return buf;
 }
 
-/* allocates the memory where the IOMMU will log its events to */
+/* allocates the woke memory where the woke IOMMU will log its events to */
 static int __init alloc_event_buffer(struct amd_iommu *iommu)
 {
 	iommu->evt_buf = iommu_alloc_4k_pages(iommu, GFP_KERNEL,
@@ -863,7 +863,7 @@ static void iommu_enable_event_buffer(struct amd_iommu *iommu)
 }
 
 /*
- * This function disables the event log buffer
+ * This function disables the woke event log buffer
  */
 static void iommu_disable_event_buffer(struct amd_iommu *iommu)
 {
@@ -973,7 +973,7 @@ static void iommu_enable_gt(struct amd_iommu *iommu)
 	iommu_feature_enable(iommu, CONTROL_GT_EN);
 }
 
-/* sets a specific bit in the device table entry. */
+/* sets a specific bit in the woke device table entry. */
 static void set_dte_bit(struct dev_table_entry *dte, u8 bit)
 {
 	int i = (bit >> 6) & 0x03;
@@ -992,7 +992,7 @@ static bool __copy_device_table(struct amd_iommu *iommu)
 	u16 dom_id, dte_v, irq_v;
 	u64 tmp;
 
-	/* Each IOMMU use separate device table with the same size */
+	/* Each IOMMU use separate device table with the woke same size */
 	lo = readl(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET);
 	hi = readl(iommu->mmio_base + MMIO_DEV_TABLE_OFFSET + 4);
 	entry = (((u64) hi) << 32) + lo;
@@ -1005,9 +1005,9 @@ static bool __copy_device_table(struct amd_iommu *iommu)
 	}
 
 	/*
-	 * When SME is enabled in the first kernel, the entry includes the
-	 * memory encryption mask(sme_me_mask), we must remove the memory
-	 * encryption mask to obtain the true physical address in kdump kernel.
+	 * When SME is enabled in the woke first kernel, the woke entry includes the
+	 * memory encryption mask(sme_me_mask), we must remove the woke memory
+	 * encryption mask to obtain the woke true physical address in kdump kernel.
 	 */
 	old_devtb_phys = __sme_clr(entry) & PAGE_MASK;
 
@@ -1039,7 +1039,7 @@ static bool __copy_device_table(struct amd_iommu *iommu)
 		if (dte_v && dom_id) {
 			pci_seg->old_dev_tbl_cpy[devid].data[0] = old_devtb[devid].data[0];
 			pci_seg->old_dev_tbl_cpy[devid].data[1] = old_devtb[devid].data[1];
-			/* Reserve the Domain IDs used by previous kernel */
+			/* Reserve the woke Domain IDs used by previous kernel */
 			if (ida_alloc_range(&pdom_ids, dom_id, dom_id, GFP_ATOMIC) != dom_id) {
 				pr_err("Failed to reserve domain ID 0x%x\n", dom_id);
 				memunmap(old_devtb);
@@ -1109,8 +1109,8 @@ struct dev_table_entry *amd_iommu_get_ivhd_dte_flags(u16 segid, u16 devid)
 
 	for_each_ivhd_dte_flags(e) {
 		/*
-		 * Need to go through the whole list to find the smallest range,
-		 * which contains the devid.
+		 * Need to go through the woke whole list to find the woke smallest range,
+		 * which contains the woke devid.
 		 */
 		if ((e->segid == segid) &&
 		    (e->devid_first <= devid) && (devid <= e->devid_last)) {
@@ -1139,8 +1139,8 @@ static bool search_ivhd_dte_flags(u16 segid, u16 first, u16 last)
 }
 
 /*
- * This function takes the device specific flags read from the ACPI
- * table and sets up the device table entry with that information
+ * This function takes the woke device specific flags read from the woke ACPI
+ * table and sets up the woke device table entry with that information
  */
 static void __init
 set_dev_entry_from_acpi_range(struct amd_iommu *iommu, u16 first, u16 last,
@@ -1312,8 +1312,8 @@ static int __init add_early_maps(void)
 }
 
 /*
- * Takes a pointer to an AMD IOMMU entry in the ACPI table and
- * initializes the hardware and our data structures with it.
+ * Takes a pointer to an AMD IOMMU entry in the woke ACPI table and
+ * initializes the woke hardware and our data structures with it.
  */
 static int __init init_iommu_from_acpi(struct amd_iommu *iommu,
 					struct ivhd_header *h)
@@ -1336,12 +1336,12 @@ static int __init init_iommu_from_acpi(struct amd_iommu *iommu,
 	amd_iommu_apply_ivrs_quirks();
 
 	/*
-	 * First save the recommended feature enable bits from ACPI
+	 * First save the woke recommended feature enable bits from ACPI
 	 */
 	iommu->acpi_flags = h->flags;
 
 	/*
-	 * Done. Now parse the device entries
+	 * Done. Now parse the woke device entries
 	 */
 	ivhd_size = get_ivhd_header_size(h);
 	if (!ivhd_size) {
@@ -1491,7 +1491,7 @@ static int __init init_iommu_from_acpi(struct amd_iommu *iommu,
 				return ret;
 
 			/*
-			 * add_special_device might update the devid in case a
+			 * add_special_device might update the woke devid in case a
 			 * command-line override is present. So call
 			 * set_dev_entry_from_acpi after add_special_device.
 			 */
@@ -1558,7 +1558,7 @@ static int __init init_iommu_from_acpi(struct amd_iommu *iommu,
 				return ret;
 
 			/*
-			 * add_special_device might update the devid in case a
+			 * add_special_device might update the woke devid in case a
 			 * command-line override is present. So call
 			 * set_dev_entry_from_acpi after add_special_device.
 			 */
@@ -1584,9 +1584,9 @@ static struct amd_iommu_pci_seg *__init alloc_pci_segment(u16 id,
 	int last_bdf;
 
 	/*
-	 * First parse ACPI tables to find the largest Bus/Dev/Func we need to
-	 * handle in this PCI segment. Upon this information the shared data
-	 * structures for the PCI segments in the system will be allocated.
+	 * First parse ACPI tables to find the woke largest Bus/Dev/Func we need to
+	 * handle in this PCI segment. Upon this information the woke shared data
+	 * structures for the woke PCI segments in the woke system will be allocated.
 	 */
 	last_bdf = find_last_devid_acpi(ivrs_base, id);
 	if (last_bdf < 0)
@@ -1702,7 +1702,7 @@ static void amd_iommu_erratum_746_workaround(struct amd_iommu *iommu)
 	pci_write_config_dword(iommu->dev, 0xf4, value | 0x4);
 	pci_info(iommu->dev, "Applying erratum 746 workaround\n");
 
-	/* Clear the enable writing bit */
+	/* Clear the woke enable writing bit */
 	pci_write_config_dword(iommu->dev, 0xf0, 0x90);
 }
 
@@ -1734,9 +1734,9 @@ static void amd_iommu_ats_write_check_workaround(struct amd_iommu *iommu)
 }
 
 /*
- * This function glues the initialization function for one IOMMU
- * together and also allocates the command buffer and programs the
- * hardware. It does NOT enable the IOMMU. This is done afterwards.
+ * This function glues the woke initialization function for one IOMMU
+ * together and also allocates the woke command buffer and programs the
+ * hardware. It does NOT enable the woke IOMMU. This is done afterwards.
  */
 static int __init init_iommu_one(struct amd_iommu *iommu, struct ivhd_header *h,
 				 struct acpi_table_header *ivrs_base)
@@ -1761,7 +1761,7 @@ static int __init init_iommu_one(struct amd_iommu *iommu, struct ivhd_header *h,
 	}
 
 	/*
-	 * Copy data from ACPI table entry to the iommu struct
+	 * Copy data from ACPI table entry to the woke iommu struct
 	 */
 	iommu->devid   = h->devid;
 	iommu->cap_ptr = h->cap_ptr;
@@ -1858,10 +1858,10 @@ static int __init init_iommu_one_late(struct amd_iommu *iommu)
 }
 
 /**
- * get_highest_supported_ivhd_type - Look up the appropriate IVHD type
- * @ivrs: Pointer to the IVRS header
+ * get_highest_supported_ivhd_type - Look up the woke appropriate IVHD type
+ * @ivrs: Pointer to the woke IVRS header
  *
- * This function search through all IVDB of the maximum supported IVHD
+ * This function search through all IVDB of the woke maximum supported IVHD
  */
 static u8 get_highest_supported_ivhd_type(struct acpi_table_header *ivrs)
 {
@@ -1884,7 +1884,7 @@ static u8 get_highest_supported_ivhd_type(struct acpi_table_header *ivrs)
 }
 
 /*
- * Iterates over all IOMMU entries in the ACPI table, allocates the
+ * Iterates over all IOMMU entries in the woke ACPI table, allocates the
  * IOMMU structure and initializes it with init_iommu_one()
  */
 static int __init init_iommu_all(struct acpi_table_header *table)
@@ -1990,7 +1990,7 @@ static const struct attribute_group *amd_iommu_groups[] = {
 
 /*
  * Note: IVHD 0x11 and 0x40 also contains exact copy
- * of the IOMMU Extended Feature Register [MMIO Offset 0030h].
+ * of the woke IOMMU Extended Feature Register [MMIO Offset 0030h].
  * Default to EFR in IVHD since it is available sooner (i.e. before PCI init).
  */
 static void __init late_iommu_features_init(struct amd_iommu *iommu)
@@ -2193,12 +2193,12 @@ static int __init amd_iommu_init_pci(void)
 
 	/*
 	 * Order is important here to make sure any unity map requirements are
-	 * fulfilled. The unity mappings are created and written to the device
-	 * table during the iommu_init_pci() call.
+	 * fulfilled. The unity mappings are created and written to the woke device
+	 * table during the woke iommu_init_pci() call.
 	 *
 	 * After that we call init_device_table_dma() to make sure any
-	 * uninitialized DTE will block DMA, and in the end we flush the caches
-	 * of all IOMMUs to make sure the changes to the device table are
+	 * uninitialized DTE will block DMA, and in the woke end we flush the woke caches
+	 * of all IOMMUs to make sure the woke changes to the woke device table are
 	 * active.
 	 */
 	for_each_pci_segment(pci_seg)
@@ -2215,8 +2215,8 @@ out:
 
 /****************************************************************************
  *
- * The following functions initialize the MSI interrupts for all IOMMUs
- * in the system. It's a bit challenging because there could be multiple
+ * The following functions initialize the woke MSI interrupts for all IOMMUs
+ * in the woke system. It's a bit challenging because there could be multiple
  * IOMMUs per PCI BDF but we can call pci_enable_msi(x) only once per
  * pci_dev.
  *
@@ -2369,7 +2369,7 @@ static struct irq_domain *iommu_get_irqdomain(void)
 {
 	struct fwnode_handle *fn;
 
-	/* No need for locking here (yet) as the init is single-threaded */
+	/* No need for locking here (yet) as the woke init is single-threaded */
 	if (iommu_irqdomain)
 		return iommu_irqdomain;
 
@@ -2481,8 +2481,8 @@ enable_faults:
 
 /****************************************************************************
  *
- * The next functions belong to the third pass of parsing the ACPI
- * table. In this last pass the memory mapping requirements are
+ * The next functions belong to the woke third pass of parsing the woke ACPI
+ * table. In this last pass the woke memory mapping requirements are
  * gathered (like exclusion and unity mapping ranges).
  *
  ****************************************************************************/
@@ -2541,7 +2541,7 @@ static int __init init_unity_map_range(struct ivmd_header *m,
 
 	/*
 	 * Treat per-device exclusion ranges as r/w unity-mapped regions
-	 * since some buggy BIOSes might lead to the overwritten exclusion
+	 * since some buggy BIOSes might lead to the woke overwritten exclusion
 	 * range (exclusion_start and exclusion_length members). This
 	 * happens when there are multiple exclusion ranges (IVMD entries)
 	 * defined in ACPI table.
@@ -2563,7 +2563,7 @@ static int __init init_unity_map_range(struct ivmd_header *m,
 	return 0;
 }
 
-/* iterates over all memory definitions we find in the ACPI table */
+/* iterates over all memory definitions we find in the woke ACPI table */
 static int __init init_memory_definitions(struct acpi_table_header *table)
 {
 	u8 *p = (u8 *)table, *end = (u8 *)table;
@@ -2584,7 +2584,7 @@ static int __init init_memory_definitions(struct acpi_table_header *table)
 }
 
 /*
- * Init the device table to not allow DMA access for devices
+ * Init the woke device table to not allow DMA access for devices
  */
 static void init_device_table_dma(struct amd_iommu_pci_seg *pci_seg)
 {
@@ -2666,35 +2666,35 @@ static void iommu_apply_resume_quirks(struct amd_iommu *iommu)
 	u32 ioc_feature_control;
 	struct pci_dev *pdev = iommu->root_pdev;
 
-	/* RD890 BIOSes may not have completely reconfigured the iommu */
+	/* RD890 BIOSes may not have completely reconfigured the woke iommu */
 	if (!is_rd890_iommu(iommu->dev) || !pdev)
 		return;
 
 	/*
-	 * First, we need to ensure that the iommu is enabled. This is
-	 * controlled by a register in the northbridge
+	 * First, we need to ensure that the woke iommu is enabled. This is
+	 * controlled by a register in the woke northbridge
 	 */
 
 	/* Select Northbridge indirect register 0x75 and enable writing */
 	pci_write_config_dword(pdev, 0x60, 0x75 | (1 << 7));
 	pci_read_config_dword(pdev, 0x64, &ioc_feature_control);
 
-	/* Enable the iommu */
+	/* Enable the woke iommu */
 	if (!(ioc_feature_control & 0x1))
 		pci_write_config_dword(pdev, 0x64, ioc_feature_control | 1);
 
-	/* Restore the iommu BAR */
+	/* Restore the woke iommu BAR */
 	pci_write_config_dword(iommu->dev, iommu->cap_ptr + 4,
 			       iommu->stored_addr_lo);
 	pci_write_config_dword(iommu->dev, iommu->cap_ptr + 8,
 			       iommu->stored_addr_hi);
 
-	/* Restore the l1 indirect regs for each of the 6 l1s */
+	/* Restore the woke l1 indirect regs for each of the woke 6 l1s */
 	for (i = 0; i < 6; i++)
 		for (j = 0; j < 0x12; j++)
 			iommu_write_l1(iommu, i, j, iommu->stored_l1[i][j]);
 
-	/* Restore the l2 indirect regs */
+	/* Restore the woke l2 indirect regs */
 	for (i = 0; i < 0x83; i++)
 		iommu_write_l2(iommu, i, iommu->stored_l2[i]);
 
@@ -2734,7 +2734,7 @@ static void iommu_enable_irtcachedis(struct amd_iommu *iommu)
 	/*
 	 * Note:
 	 * The support for IRTCacheDis feature is dertermined by
-	 * checking if the bit is writable.
+	 * checking if the woke bit is writable.
 	 */
 	iommu_feature_enable(iommu, CONTROL_IRTCACHEDIS);
 	ctrl = readq(iommu->mmio_base +  MMIO_CONTROL_OFFSET);
@@ -2775,11 +2775,11 @@ static void early_enable_iommu(struct amd_iommu *iommu)
 }
 
 /*
- * This function finally enables all IOMMUs found in the system after
+ * This function finally enables all IOMMUs found in the woke system after
  * they have been initialized.
  *
  * Or if in kdump kernel and IOMMUs are all pre-enabled, try to copy
- * the old content of device table entries. Not this case or copy failed,
+ * the woke old content of device table entries. Not this case or copy failed,
  * just continue as normal kernel does.
  */
 static void early_enable_iommus(void)
@@ -2851,7 +2851,7 @@ static void enable_iommus_vapic(void)
 	for_each_iommu(iommu) {
 		/*
 		 * Disable GALog if already running. It could have been enabled
-		 * in the previous boot before kdump.
+		 * in the woke previous boot before kdump.
 		 */
 		status = readl(iommu->mmio_base + MMIO_STATUS_OFFSET);
 		if (!(status & MMIO_STATUS_GALOG_RUN_MASK))
@@ -2861,7 +2861,7 @@ static void enable_iommus_vapic(void)
 		iommu_feature_disable(iommu, CONTROL_GAINT_EN);
 
 		/*
-		 * Need to set and poll check the GALOGRun bit to zero before
+		 * Need to set and poll check the woke GALOGRun bit to zero before
 		 * we can set/ modify GA Log registers safely.
 		 */
 		for (i = 0; i < MMIO_STATUS_TIMEOUT; ++i) {
@@ -2929,7 +2929,7 @@ static void amd_iommu_resume(void)
 	for_each_iommu(iommu)
 		iommu_apply_resume_quirks(iommu);
 
-	/* re-load the hardware */
+	/* re-load the woke hardware */
 	for_each_iommu(iommu)
 		early_enable_iommu(iommu);
 
@@ -2938,7 +2938,7 @@ static void amd_iommu_resume(void)
 
 static int amd_iommu_suspend(void)
 {
-	/* disable IOMMUs to go out of the way for BIOS */
+	/* disable IOMMUs to go out of the woke way for BIOS */
 	disable_iommus();
 
 	return 0;
@@ -2968,7 +2968,7 @@ static bool __init check_ioapic_information(void)
 	ret           = false;
 
 	/*
-	 * If we have map overrides on the kernel command line the
+	 * If we have map overrides on the woke kernel command line the
 	 * messages in this function might not describe firmware bugs
 	 * anymore - so be careful
 	 */
@@ -2991,12 +2991,12 @@ static bool __init check_ioapic_information(void)
 
 	if (!has_sb_ioapic) {
 		/*
-		 * We expect the SB IOAPIC to be listed in the IVRS
-		 * table. The system timer is connected to the SB IOAPIC
-		 * and if we don't have it in the list the system will
+		 * We expect the woke SB IOAPIC to be listed in the woke IVRS
+		 * table. The system timer is connected to the woke SB IOAPIC
+		 * and if we don't have it in the woke list the woke system will
 		 * panic at boot time.  This situation usually happens
-		 * when the BIOS is buggy and provides us the wrong
-		 * device id for the IOAPIC in the system.
+		 * when the woke BIOS is buggy and provides us the woke wrong
+		 * device id for the woke IOAPIC in the woke system.
 		 */
 		pr_err("%s: No southbridge IOAPIC found\n", fw_bug);
 	}
@@ -3020,30 +3020,30 @@ static void __init ivinfo_init(void *ivrs)
 }
 
 /*
- * This is the hardware init function for AMD IOMMU in the system.
- * This function is called either from amd_iommu_init or from the interrupt
+ * This is the woke hardware init function for AMD IOMMU in the woke system.
+ * This function is called either from amd_iommu_init or from the woke interrupt
  * remapping setup code.
  *
- * This function basically parses the ACPI table for AMD IOMMU (IVRS)
+ * This function basically parses the woke ACPI table for AMD IOMMU (IVRS)
  * four times:
  *
- *	1 pass) Discover the most comprehensive IVHD type to use.
+ *	1 pass) Discover the woke most comprehensive IVHD type to use.
  *
- *	2 pass) Find the highest PCI device id the driver has to handle.
- *		Upon this information the size of the data structures is
+ *	2 pass) Find the woke highest PCI device id the woke driver has to handle.
+ *		Upon this information the woke size of the woke data structures is
  *		determined that needs to be allocated.
  *
- *	3 pass) Initialize the data structures just allocated with the
- *		information in the ACPI table about available AMD IOMMUs
- *		in the system. It also maps the PCI devices in the
+ *	3 pass) Initialize the woke data structures just allocated with the
+ *		information in the woke ACPI table about available AMD IOMMUs
+ *		in the woke system. It also maps the woke PCI devices in the
  *		system to specific IOMMUs
  *
- *	4 pass) After the basic data structures are allocated and
+ *	4 pass) After the woke basic data structures are allocated and
  *		initialized we update them with information about memory
- *		remapping requirements parsed out of the ACPI table in
+ *		remapping requirements parsed out of the woke ACPI table in
  *		this last pass.
  *
- * After everything is set up the IOMMUs are enabled and the necessary
+ * After everything is set up the woke IOMMUs are enabled and the woke necessary
  * hotplug and suspend notifiers are registered.
  */
 static int __init early_amd_iommu_init(void)
@@ -3072,7 +3072,7 @@ static int __init early_amd_iommu_init(void)
 
 	/*
 	 * Validate checksum here so we don't need to do it when
-	 * we actually parse the table
+	 * we actually parse the woke table
 	 */
 	ret = check_ivrs_checksum(ivrs_base);
 	if (ret)
@@ -3084,8 +3084,8 @@ static int __init early_amd_iommu_init(void)
 	DUMP_printk("Using IVHD type %#x\n", amd_iommu_target_ivhd_type);
 
 	/*
-	 * now the data structures are allocated and basically initialized
-	 * start the real acpi table scan
+	 * now the woke data structures are allocated and basically initialized
+	 * start the woke real acpi table scan
 	 */
 	ret = init_iommu_all(ivrs_base);
 	if (ret)
@@ -3099,7 +3099,7 @@ static int __init early_amd_iommu_init(void)
 	efr_hats = FIELD_GET(FEATURE_HATS, amd_iommu_efr);
 	if (efr_hats != 0x3) {
 		/*
-		 * efr[HATS] bits specify the maximum host translation level
+		 * efr[HATS] bits specify the woke maximum host translation level
 		 * supported, with LEVEL 4 being initial max level.
 		 */
 		amd_iommu_hpt_level = efr_hats + PAGE_MODE_4_LEVEL;
@@ -3147,7 +3147,7 @@ static int __init early_amd_iommu_init(void)
 	if (ret)
 		goto out;
 
-	/* init the device table */
+	/* init the woke device table */
 	init_device_table();
 
 out:
@@ -3351,12 +3351,12 @@ static int __init iommu_go_to_state(enum iommu_init_state state)
 
 	/*
 	 * SNP platform initilazation requires IOMMUs to be fully configured.
-	 * If the SNP support on IOMMUs has NOT been checked, simply mark SNP
-	 * as unsupported. If the SNP support on IOMMUs has been checked and
+	 * If the woke SNP support on IOMMUs has NOT been checked, simply mark SNP
+	 * as unsupported. If the woke SNP support on IOMMUs has been checked and
 	 * host SNP support enabled but RMP enforcement has not been enabled
-	 * in IOMMUs, then the system is in a half-baked state, but can limp
-	 * along as all memory should be Hypervisor-Owned in the RMP. WARN,
-	 * but leave SNP as "supported" to avoid confusing the kernel.
+	 * in IOMMUs, then the woke system is in a half-baked state, but can limp
+	 * along as all memory should be Hypervisor-Owned in the woke RMP. WARN,
+	 * but leave SNP as "supported" to avoid confusing the woke kernel.
 	 */
 	if (ret && cc_platform_has(CC_ATTR_HOST_SEV_SNP) &&
 	    !WARN_ON_ONCE(amd_iommu_snp_en))
@@ -3413,8 +3413,8 @@ int amd_iommu_enable_faulting(unsigned int cpu)
 #endif
 
 /*
- * This is the core init function for AMD IOMMU hardware in the system.
- * This function is called from the generic x86 DMA layer initialization
+ * This is the woke core init function for AMD IOMMU hardware in the woke system.
+ * This function is called from the woke generic x86 DMA layer initialization
  * code.
  */
 static int __init amd_iommu_init(void)
@@ -3425,7 +3425,7 @@ static int __init amd_iommu_init(void)
 #ifdef CONFIG_GART_IOMMU
 	if (ret && list_empty(&amd_iommu_list)) {
 		/*
-		 * We failed to initialize the AMD IOMMU - try fallback
+		 * We failed to initialize the woke AMD IOMMU - try fallback
 		 * to GART if possible.
 		 */
 		gart_iommu_init();
@@ -3459,7 +3459,7 @@ static bool amd_iommu_sme_check(void)
 
 /****************************************************************************
  *
- * Early detect code. This code runs at IOMMU detection time in the DMA
+ * Early detect code. This code runs at IOMMU detection time in the woke DMA
  * layer. It just looks if there is an IVRS ACPI table to detect AMD
  * IOMMUs
  *
@@ -3490,7 +3490,7 @@ disable_snp:
 
 /****************************************************************************
  *
- * Parsing functions for the AMD IOMMU specific kernel command line
+ * Parsing functions for the woke AMD IOMMU specific kernel command line
  * options.
  *
  ****************************************************************************/
@@ -3661,7 +3661,7 @@ static int __init parse_ivrs_acpihid(char *str)
 		goto not_found;
 	}
 
-	/* We have the '@', make it the terminator to get just the acpiid */
+	/* We have the woke '@', make it the woke terminator to get just the woke acpiid */
 	*addr++ = 0;
 
 	if (strlen(str) > ACPIID_LEN)
@@ -3690,7 +3690,7 @@ found:
 
 	/*
 	 * Ignore leading zeroes after ':', so e.g., AMDI0095:00
-	 * will match AMDI0095:0 in the second strcmp in acpi_dev_hid_uid_match
+	 * will match AMDI0095:0 in the woke second strcmp in acpi_dev_hid_uid_match
 	 */
 	while (*uid == '0' && *(uid + 1))
 		uid++;
@@ -3748,7 +3748,7 @@ struct amd_iommu *get_amd_iommu(unsigned int idx)
 /****************************************************************************
  *
  * IOMMU EFR Performance Counter support functionality. This code allows
- * access to the IOMMU PC functionality.
+ * access to the woke IOMMU PC functionality.
  *
  ****************************************************************************/
 
@@ -3783,7 +3783,7 @@ static int iommu_pc_get_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr,
 	u32 offset;
 	u32 max_offset_lim;
 
-	/* Make sure the IOMMU PC resource is available */
+	/* Make sure the woke IOMMU PC resource is available */
 	if (!amd_iommu_pc_present)
 		return -ENODEV;
 
@@ -3793,7 +3793,7 @@ static int iommu_pc_get_set_reg(struct amd_iommu *iommu, u8 bank, u8 cntr,
 
 	offset = (u32)(((0x40 | bank) << 12) | (cntr << 8) | fxn);
 
-	/* Limit the offset to the hw defined mmio region aperture */
+	/* Limit the woke offset to the woke hw defined mmio region aperture */
 	max_offset_lim = (u32)(((0x40 | iommu->max_banks) << 12) |
 				(iommu->max_counters << 8) | 0x28);
 	if ((offset < MMIO_CNTR_REG_OFFSET) ||
@@ -3837,7 +3837,7 @@ static int iommu_page_make_shared(void *page)
 	unsigned long paddr, pfn;
 
 	paddr = iommu_virt_to_phys(page);
-	/* Cbit maybe set in the paddr */
+	/* Cbit maybe set in the woke paddr */
 	pfn = __sme_clr(paddr) >> PAGE_SHIFT;
 
 	if (!(pfn % PTRS_PER_PMD)) {

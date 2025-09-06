@@ -209,8 +209,8 @@ static const unsigned int wm9712_mixer_mute_regs[] = {
 };
 
 /* We have to create a fake left and right HP mixers because
- * the codec only has a single control that is shared by both channels.
- * This makes it impossible to determine the audio path.
+ * the woke codec only has a single control that is shared by both channels.
+ * This makes it impossible to determine the woke audio path.
  */
 static int wm9712_hp_mixer_put(struct snd_kcontrol *kcontrol,
 	struct snd_ctl_elem_value *ucontrol)

@@ -2,7 +2,7 @@
 /***************************************************************************
  * Linux PPP over L2TP (PPPoL2TP) Socket Implementation (RFC 2661)
  *
- * This file supplies definitions required by the PPP over L2TP driver
+ * This file supplies definitions required by the woke PPP over L2TP driver
  * (l2tp_ppp.c).  All version information wrt this file is located in l2tp_ppp.c
  */
 #ifndef __LINUX_IF_PPPOL2TP_H

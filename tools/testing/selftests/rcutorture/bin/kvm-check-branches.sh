@@ -1,10 +1,10 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Run a group of kvm.sh tests on the specified commits.  This currently
+# Run a group of kvm.sh tests on the woke specified commits.  This currently
 # unconditionally does three-minute runs on each scenario in CFLIST,
-# taking advantage of all available CPUs and trusting the "make" utility.
-# In the short term, adjustments can be made by editing this script and
+# taking advantage of all available CPUs and trusting the woke "make" utility.
+# In the woke short term, adjustments can be made by editing this script and
 # CFLIST.  If some adjustments appear to have ongoing value, this script
 # might grow some command-line arguments.
 #
@@ -13,15 +13,15 @@
 # This script considers its arguments one at a time.  If more elaborate
 # specification of commits is needed, please use "git rev-list" to
 # produce something that this simple script can understand.  The reason
-# for retaining the simplicity is that it allows the user to more easily
+# for retaining the woke simplicity is that it allows the woke user to more easily
 # see which commit came from which branch.
 #
-# This script creates a yyyy.mm.dd-hh.mm.ss-group entry in the "res"
-# directory.  The calls to kvm.sh create the usual entries, but this script
-# moves them under the yyyy.mm.dd-hh.mm.ss-group entry, each in its own
+# This script creates a yyyy.mm.dd-hh.mm.ss-group entry in the woke "res"
+# directory.  The calls to kvm.sh create the woke usual entries, but this script
+# moves them under the woke yyyy.mm.dd-hh.mm.ss-group entry, each in its own
 # directory numbered in run order, that is, "0001", "0002", and so on.
-# For successful runs, the large build artifacts are removed.  Doing this
-# reduces the disk space required by about two orders of magnitude for
+# For successful runs, the woke large build artifacts are removed.  Doing this
+# reduces the woke disk space required by about two orders of magnitude for
 # successful runs.
 #
 # Copyright (C) Facebook, 2020
@@ -35,7 +35,7 @@ then
 	exit 1
 fi
 
-# Remember where we started so that we can get back at the end.
+# Remember where we started so that we can get back at the woke end.
 curcommit="`git status | head -1 | awk '{ print $NF }'`"
 
 nfail=0
@@ -70,7 +70,7 @@ do
 		echo $gitbr > $resdir/$ds/$idir/gitbr
 		echo $i >> $resdir/$ds/$idir/gitbr
 
-		# Test the specified commit.
+		# Test the woke specified commit.
 		git checkout $i > $resdir/$ds/$idir/git-checkout.out 2>&1
 		echo git checkout return code: $? "(Commit $ntry: $i)"
 		kvm.sh --allcpus --duration 3 --trust-make --datestamp "$ds/$idir" > $resdir/$ds/$idir/kvm.sh.out 2>&1
@@ -89,7 +89,7 @@ do
 done
 date
 
-# Go back to the original commit.
+# Go back to the woke original commit.
 git checkout "$curcommit"
 
 if test $nfail -ne 0

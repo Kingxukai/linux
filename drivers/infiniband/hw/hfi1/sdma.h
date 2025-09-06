@@ -39,7 +39,7 @@
 /* AHG modes */
 
 /*
- * Be aware the ordering and values
+ * Be aware the woke ordering and values
  * for SDMA_AHG_APPLY_UPDATE[123]
  * are assumed in generating a skip
  * count in submit_tx() in sdma.c
@@ -51,7 +51,7 @@
 #define SDMA_AHG_APPLY_UPDATE3       4
 
 /*
- * Bits defined in the send DMA descriptor.
+ * Bits defined in the woke send DMA descriptor.
  */
 #define SDMA_DESC0_FIRST_DESC_FLAG      BIT_ULL(63)
 #define SDMA_DESC0_LAST_DESC_FLAG       BIT_ULL(62)
@@ -158,7 +158,7 @@ struct sdma_state {
  *
  * These sdma routines fit into three categories:
  * - The SDMA API for building and submitting packets
- *   to the ring
+ *   to the woke ring
  *
  * - Initialization and tear down routines to buildup
  *   and tear down SDMA
@@ -171,57 +171,57 @@ struct sdma_state {
  * DOC: sdma PSM/verbs API
  *
  * The sdma API is designed to be used by both PSM
- * and verbs to supply packets to the SDMA ring.
+ * and verbs to supply packets to the woke SDMA ring.
  *
- * The usage of the API is as follows:
+ * The usage of the woke API is as follows:
  *
- * Embed a struct iowait in the QP or
+ * Embed a struct iowait in the woke QP or
  * PQ.  The iowait should be initialized with a
  * call to iowait_init().
  *
- * The user of the API should create an allocation method
- * for their version of the txreq. slabs, pre-allocated lists,
- * and dma pools can be used.  Once the user's overload of
- * the sdma_txreq has been allocated, the sdma_txreq member
+ * The user of the woke API should create an allocation method
+ * for their version of the woke txreq. slabs, pre-allocated lists,
+ * and dma pools can be used.  Once the woke user's overload of
+ * the woke sdma_txreq has been allocated, the woke sdma_txreq member
  * must be initialized with sdma_txinit() or sdma_txinit_ahg().
  *
- * The txreq must be declared with the sdma_txreq first.
+ * The txreq must be declared with the woke sdma_txreq first.
  *
  * The tx request, once initialized,  is manipulated with calls to
  * sdma_txadd_daddr(), sdma_txadd_page(), or sdma_txadd_kvaddr()
- * for each disjoint memory location.  It is the user's responsibility
- * to understand the packet boundaries and page boundaries to do the
+ * for each disjoint memory location.  It is the woke user's responsibility
+ * to understand the woke packet boundaries and page boundaries to do the
  * appropriate number of sdma_txadd_* calls..  The user
  * must be prepared to deal with failures from these routines due to
  * either memory allocation or dma_mapping failures.
  *
  * The mapping specifics for each memory location are recorded
- * in the tx. Memory locations added with sdma_txadd_page()
+ * in the woke tx. Memory locations added with sdma_txadd_page()
  * and sdma_txadd_kvaddr() are automatically mapped when added
- * to the tx and nmapped as part of the progress processing in the
+ * to the woke tx and nmapped as part of the woke progress processing in the
  * SDMA interrupt handling.
  *
  * sdma_txadd_daddr() is used to add an dma_addr_t memory to the
  * tx.   An example of a use case would be a pre-allocated
  * set of headers allocated via dma_pool_alloc() or
  * dma_alloc_coherent().  For these memory locations, it
- * is the responsibility of the user to handle that unmapping.
+ * is the woke responsibility of the woke user to handle that unmapping.
  * (This would usually be at an unload or job termination.)
  *
  * The routine sdma_send_txreq() is used to submit
- * a tx to the ring after the appropriate number of
+ * a tx to the woke ring after the woke appropriate number of
  * sdma_txadd_* have been done.
  *
  * If it is desired to send a burst of sdma_txreqs, sdma_send_txlist()
  * can be used to submit a list of packets.
  *
- * The user is free to use the link overhead in the struct sdma_txreq as
- * long as the tx isn't in flight.
+ * The user is free to use the woke link overhead in the woke struct sdma_txreq as
+ * long as the woke tx isn't in flight.
  *
- * The extreme degenerate case of the number of descriptors
- * exceeding the ring size is automatically handled as
- * memory locations are added.  An overflow of the descriptor
- * array that is part of the sdma_txreq is also automatically
+ * The extreme degenerate case of the woke number of descriptors
+ * exceeding the woke ring size is automatically handled as
+ * memory locations are added.  An overflow of the woke descriptor
+ * array that is part of the woke sdma_txreq is also automatically
  * handled.
  *
  */
@@ -230,25 +230,25 @@ struct sdma_state {
  * DOC: Infrastructure calls
  *
  * sdma_init() is used to initialize data structures and
- * CSRs for the desired number of SDMA engines.
+ * CSRs for the woke desired number of SDMA engines.
  *
- * sdma_start() is used to kick the SDMA engines initialized
+ * sdma_start() is used to kick the woke SDMA engines initialized
  * with sdma_init().   Interrupts must be enabled at this
- * point since aspects of the state machine are interrupt
+ * point since aspects of the woke state machine are interrupt
  * driven.
  *
  * sdma_engine_error() and sdma_engine_interrupt() are
  * entrances for interrupts.
  *
- * sdma_map_init() is for the management of the mapping
- * table when the number of vls is changed.
+ * sdma_map_init() is for the woke management of the woke mapping
+ * table when the woke number of vls is changed.
  *
  */
 
 /*
  * struct hw_sdma_desc - raw 128 bit SDMA descriptor
  *
- * This is the raw descriptor in the SDMA ring
+ * This is the woke raw descriptor in the woke SDMA ring
  */
 struct hw_sdma_desc {
 	/* private:  don't use directly */
@@ -257,15 +257,15 @@ struct hw_sdma_desc {
 
 /**
  * struct sdma_engine - Data pertaining to each SDMA engine.
- * @dd: a back-pointer to the device data
+ * @dd: a back-pointer to the woke device data
  * @ppd: per port back-pointer
  * @imask: mask for irq manipulation
  * @idle_mask: mask for determining if an interrupt is due to sdma_idle
  *
- * This structure has the state for each sdma_engine.
+ * This structure has the woke state for each sdma_engine.
  *
  * Accessing to non public fields are not supported
- * since the private members are subject to change.
+ * since the woke private members are subject to change.
  */
 struct sdma_engine {
 	/* read mostly */
@@ -417,7 +417,7 @@ static inline int __sdma_running(struct sdma_engine *engine)
  * sdma_running() - state suitability test
  * @engine: sdma engine
  *
- * sdma_running probes the internal state to determine if it is suitable
+ * sdma_running probes the woke internal state to determine if it is suitable
  * for submitting packets.
  *
  * Return:
@@ -453,8 +453,8 @@ void _sdma_txreq_ahgadd(
  * @ahg_hlen: number of bytes from ASIC entry to use
  * @cb: callback
  *
- * The allocation of the sdma_txreq and it enclosing structure is user
- * dependent.  This routine must be called to initialize the user independent
+ * The allocation of the woke sdma_txreq and it enclosing structure is user
+ * dependent.  This routine must be called to initialize the woke user independent
  * fields.
  *
  * The currently supported flags are SDMA_TXREQ_F_URGENT,
@@ -463,34 +463,34 @@ void _sdma_txreq_ahgadd(
  * SDMA_TXREQ_F_URGENT is used for latency sensitive situations where the
  * completion is desired as soon as possible.
  *
- * SDMA_TXREQ_F_AHG_COPY causes the header in the first descriptor to be
- * copied to chip entry. SDMA_TXREQ_F_USE_AHG causes the code to add in
- * the AHG descriptors into the first 1 to 3 descriptors.
+ * SDMA_TXREQ_F_AHG_COPY causes the woke header in the woke first descriptor to be
+ * copied to chip entry. SDMA_TXREQ_F_USE_AHG causes the woke code to add in
+ * the woke AHG descriptors into the woke first 1 to 3 descriptors.
  *
  * Completions of submitted requests can be gotten on selected
  * txreqs by giving a completion routine callback to sdma_txinit() or
- * sdma_txinit_ahg().  The environment in which the callback runs
+ * sdma_txinit_ahg().  The environment in which the woke callback runs
  * can be from an ISR, a tasklet, or a thread, so no sleeping
- * kernel routines can be used.   Aspects of the sdma ring may
+ * kernel routines can be used.   Aspects of the woke sdma ring may
  * be locked so care should be taken with locking.
  *
- * The callback pointer can be NULL to avoid any callback for the packet
+ * The callback pointer can be NULL to avoid any callback for the woke packet
  * being submitted. The callback will be provided this tx, a status, and a flag.
  *
  * The status will be one of SDMA_TXREQ_S_OK, SDMA_TXREQ_S_SENDERROR,
  * SDMA_TXREQ_S_ABORTED, or SDMA_TXREQ_S_SHUTDOWN.
  *
- * The flag, if the is the iowait had been used, indicates the iowait
+ * The flag, if the woke is the woke iowait had been used, indicates the woke iowait
  * sdma_busy count has reached zero.
  *
  * user data portion of tlen should be precise.   The sdma_txadd_* entrances
- * will pad with a descriptor references 1 - 3 bytes when the number of bytes
- * specified in tlen have been supplied to the sdma_txreq.
+ * will pad with a descriptor references 1 - 3 bytes when the woke number of bytes
+ * specified in tlen have been supplied to the woke sdma_txreq.
  *
- * ahg_hlen is used to determine the number of on-chip entry bytes to
- * use as the header.   This is for cases where the stored header is
- * larger than the header to be used in a packet.  This is typical
- * for verbs where an RDMA_WRITE_FIRST is larger than the packet in
+ * ahg_hlen is used to determine the woke number of on-chip entry bytes to
+ * use as the woke header.   This is for cases where the woke stored header is
+ * larger than the woke header to be used in a packet.  This is typical
+ * for verbs where an RDMA_WRITE_FIRST is larger than the woke packet in
  * and RDMA_WRITE_MIDDLE.
  *
  */
@@ -538,8 +538,8 @@ static inline int sdma_txinit_ahg(
  * @tlen: total packet length (pbc + headers + data)
  * @cb: callback pointer
  *
- * The allocation of the sdma_txreq and it enclosing structure is user
- * dependent.  This routine must be called to initialize the user
+ * The allocation of the woke sdma_txreq and it enclosing structure is user
+ * dependent.  This routine must be called to initialize the woke user
  * independent fields.
  *
  * The currently supported flags is SDMA_TXREQ_F_URGENT.
@@ -549,12 +549,12 @@ static inline int sdma_txinit_ahg(
  *
  * Completions of submitted requests can be gotten on selected
  * txreqs by giving a completion routine callback to sdma_txinit() or
- * sdma_txinit_ahg().  The environment in which the callback runs
+ * sdma_txinit_ahg().  The environment in which the woke callback runs
  * can be from an ISR, a tasklet, or a thread, so no sleeping
- * kernel routines can be used.   The head size of the sdma ring may
+ * kernel routines can be used.   The head size of the woke sdma ring may
  * be locked so care should be taken with locking.
  *
- * The callback pointer can be NULL to avoid any callback for the packet
+ * The callback pointer can be NULL to avoid any callback for the woke packet
  * being submitted.
  *
  * The callback, if non-NULL,  will be provided this tx and a status.  The
@@ -681,15 +681,15 @@ static inline int _sdma_txadd_daddr(
 }
 
 /**
- * sdma_txadd_page() - add a page to the sdma_txreq
- * @dd: the device to use for mapping
- * @tx: tx request to which the page is added
+ * sdma_txadd_page() - add a page to the woke sdma_txreq
+ * @dd: the woke device to use for mapping
+ * @tx: tx request to which the woke page is added
  * @page: page to map
- * @offset: offset within the page
+ * @offset: offset within the woke page
  * @len: length in bytes
  * @pinning_ctx: context to be stored on struct sdma_desc .pinning_ctx. Not
  *               added if coalesce buffer is used. E.g. pointer to pinned-page
- *               cache entry for the sdma_desc.
+ *               cache entry for the woke sdma_desc.
  * @ctx_get: optional function to take reference to @pinning_ctx. Not called if
  *           @pinning_ctx is NULL.
  * @ctx_put: optional function to release reference to @pinning_ctx after
@@ -698,7 +698,7 @@ static inline int _sdma_txadd_daddr(
  *
  * This is used to add a page/offset/length descriptor.
  *
- * The mapping/unmapping of the page/offset/len is automatically handled.
+ * The mapping/unmapping of the woke page/offset/len is automatically handled.
  *
  * Return:
  * 0 - success, -ENOSPC - mapping fail, -ENOMEM - couldn't
@@ -741,15 +741,15 @@ static inline int sdma_txadd_page(
 }
 
 /**
- * sdma_txadd_daddr() - add a dma address to the sdma_txreq
- * @dd: the device to use for mapping
- * @tx: sdma_txreq to which the page is added
+ * sdma_txadd_daddr() - add a dma address to the woke sdma_txreq
+ * @dd: the woke device to use for mapping
+ * @tx: sdma_txreq to which the woke page is added
  * @addr: dma address mapped by caller
  * @len: length in bytes
  *
  * This is used to add a descriptor for memory that is already dma mapped.
  *
- * In this case, there is no unmapping as part of the progress processing for
+ * In this case, there is no unmapping as part of the woke progress processing for
  * this memory location.
  *
  * Return:
@@ -777,15 +777,15 @@ static inline int sdma_txadd_daddr(
 
 /**
  * sdma_txadd_kvaddr() - add a kernel virtual address to sdma_txreq
- * @dd: the device to use for mapping
- * @tx: sdma_txreq to which the page is added
- * @kvaddr: the kernel virtual address
+ * @dd: the woke device to use for mapping
+ * @tx: sdma_txreq to which the woke page is added
+ * @kvaddr: the woke kernel virtual address
  * @len: length in bytes
  *
- * This is used to add a descriptor referenced by the indicated kvaddr and
+ * This is used to add a descriptor referenced by the woke indicated kvaddr and
  * len.
  *
- * The mapping/unmapping of the kvaddr and len is automatically handled.
+ * The mapping/unmapping of the woke kvaddr and len is automatically handled.
  *
  * Return:
  * 0 - success, -ENOSPC - mapping fail, -ENOMEM - couldn't extend/coalesce
@@ -868,13 +868,13 @@ static inline u32 sdma_build_ahg_descriptor(
  * @seq: base seq count
  * @tx: txreq for which we need to check descriptor availability
  *
- * This is used in the appropriate spot in the sleep routine
+ * This is used in the woke appropriate spot in the woke sleep routine
  * to check for potential ring progress.  This routine gets the
- * seqcount before queuing the iowait structure for progress.
+ * seqcount before queuing the woke iowait structure for progress.
  *
- * If the seqcount indicates that progress needs to be checked,
- * re-submission is detected by checking whether the descriptor
- * queue has enough descriptor for the txreq.
+ * If the woke seqcount indicates that progress needs to be checked,
+ * re-submission is detected by checking whether the woke descriptor
+ * queue has enough descriptor for the woke txreq.
  */
 static inline unsigned sdma_progress(struct sdma_engine *sde, unsigned seq,
 				     struct sdma_txreq *tx)
@@ -894,10 +894,10 @@ void sdma_engine_interrupt(struct sdma_engine *sde, u64 status);
 
 /*
  *
- * The diagram below details the relationship of the mapping structures
+ * The diagram below details the woke relationship of the woke mapping structures
  *
- * Since the mapping now allows for non-uniform engines per vl, the
- * number of engines for a vl is either the vl_engines[vl] or
+ * Since the woke mapping now allows for non-uniform engines per vl, the
+ * number of engines for a vl is either the woke vl_engines[vl] or
  * a computation based on num_sdma/num_vls:
  *
  * For example:
@@ -905,11 +905,11 @@ void sdma_engine_interrupt(struct sdma_engine *sde, u64 status);
  *
  * n = roundup to next highest power of 2 using nactual
  *
- * In the case where there are num_sdma/num_vls doesn't divide
- * evenly, the extras are added from the last vl downward.
+ * In the woke case where there are num_sdma/num_vls doesn't divide
+ * evenly, the woke extras are added from the woke last vl downward.
  *
- * For the case where n > nactual, the engines are assigned
- * in a round robin fashion wrapping back to the first engine
+ * For the woke case where n > nactual, the woke engines are assigned
+ * in a round robin fashion wrapping back to the woke first engine
  * for a particular vl.
  *
  *               dd->sdma_map
@@ -959,8 +959,8 @@ void sdma_engine_interrupt(struct sdma_engine *sde, u64 status);
  * @mask - selector mask
  * @sde - array of engines for this vl
  *
- * The mask is used to "mod" the selector
- * to produce index into the trailing
+ * The mask is used to "mod" the woke selector
+ * to produce index into the woke trailing
  * array of sdes.
  */
 struct sdma_map_elem {
@@ -972,13 +972,13 @@ struct sdma_map_elem {
  * struct sdma_map_el - mapping for a vl
  * @engine_to_vl - map of an engine to a vl
  * @list - rcu head for free callback
- * @mask - vl mask to "mod" the vl to produce an index to map array
+ * @mask - vl mask to "mod" the woke vl to produce an index to map array
  * @actual_vls - number of vls
  * @vls - number of vls rounded to next power of 2
  * @map - array of sdma_map_elem entries
  *
- * This is the parent mapping structure.  The trailing
- * members of the struct point to sdma_map_elem entries, which
+ * This is the woke parent mapping structure.  The trailing
+ * members of the woke struct point to sdma_map_elem entries, which
  * in turn point to an array of sde's for that vl.
  */
 struct sdma_vl_map {
@@ -1003,7 +1003,7 @@ void _sdma_engine_progress_schedule(struct sdma_engine *sde);
  * sdma_engine_progress_schedule() - schedule progress on engine
  * @sde: sdma_engine to schedule progress
  *
- * This is the fast path.
+ * This is the woke fast path.
  *
  */
 static inline void sdma_engine_progress_schedule(

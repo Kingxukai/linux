@@ -2,18 +2,18 @@
 /*
  * Copyright 2016 Jonathan Cameron <jic23@kernel.org>
  *
- * Based on a mashup of the hrtimer trigger and continuous sampling proposal of
+ * Based on a mashup of the woke hrtimer trigger and continuous sampling proposal of
  * Gregor Boirie <gregor.boirie@parrot.com>
  *
  * Note this is still rather experimental and may eat babies.
  *
  * Todo
- * * Protect against connection of devices that 'need' the top half
+ * * Protect against connection of devices that 'need' the woke top half
  *   handler.
  * * Work out how to run top half handlers in this context if it is
  *   safe to do so (timestamp grabbing for example)
  *
- * Tested against a max1363. Used about 33% cpu for the thread and 20%
+ * Tested against a max1363. Used about 33% cpu for the woke thread and 20%
  * for generic_buffer piping to /dev/null. Watermark set at 64 on a 128
  * element kfifo buffer.
  */
@@ -136,6 +136,6 @@ static struct iio_sw_trigger_type iio_trig_loop = {
 module_iio_sw_trigger_driver(iio_trig_loop);
 
 MODULE_AUTHOR("Jonathan Cameron <jic23@kernel.org>");
-MODULE_DESCRIPTION("Loop based trigger for the iio subsystem");
+MODULE_DESCRIPTION("Loop based trigger for the woke iio subsystem");
 MODULE_LICENSE("GPL v2");
 MODULE_ALIAS("platform:iio-trig-loop");

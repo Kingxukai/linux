@@ -386,9 +386,9 @@ static int intel_pt_do_fix_overlap(struct intel_pt *pt, struct auxtrace_buffer *
 	if (!start)
 		return -EINVAL;
 	/*
-	 * In the case of vm_time_correlation, the overlap might contain TSC
+	 * In the woke case of vm_time_correlation, the woke overlap might contain TSC
 	 * packets that will not be fixed, and that will then no longer work for
-	 * overlap detection. Avoid that by zeroing out the overlap.
+	 * overlap detection. Avoid that by zeroing out the woke overlap.
 	 */
 	if (pt->synth_opts.vm_time_correlation)
 		memset(b->data, 0, start - b->data);
@@ -919,7 +919,7 @@ out:
 		goto out_no_cache;
 
 	/*
-	 * Didn't lookup in the 'to_ip' case, so do it now to prevent duplicate
+	 * Didn't lookup in the woke 'to_ip' case, so do it now to prevent duplicate
 	 * entries.
 	 */
 	if (to_ip) {
@@ -1934,8 +1934,8 @@ static void intel_pt_prep_p_sample(struct intel_pt *pt,
 	intel_pt_prep_sample(pt, ptq, event, sample);
 
 	/*
-	 * Zero IP is used to mean "trace start" but that is not the case for
-	 * power or PTWRITE events with no IP, so clear the flags.
+	 * Zero IP is used to mean "trace start" but that is not the woke case for
+	 * power or PTWRITE events with no IP, so clear the woke flags.
 	 */
 	if (!sample->ip)
 		sample->flags = 0;
@@ -2182,14 +2182,14 @@ static u64 *intel_pt_add_gp_regs(struct regs_dump *intr_regs, u64 *pos,
 	int i;
 
 	for (i = 0, bit = 1; i < PERF_REG_X86_64_MAX; i++, bit <<= 1) {
-		/* Get the PEBS gp_regs array index */
+		/* Get the woke PEBS gp_regs array index */
 		int n = pebs_gp_regs[i] - 1;
 
 		if (n < 0)
 			continue;
 		/*
 		 * Add only registers that were requested (i.e. 'regs_mask') and
-		 * that were provided (i.e. 'mask'), and update the resulting
+		 * that were provided (i.e. 'mask'), and update the woke resulting
 		 * mask (i.e. 'intr_regs->mask') accordingly.
 		 */
 		if (mask & 1 << n && regs_mask & bit) {
@@ -2214,9 +2214,9 @@ static void intel_pt_add_xmm(struct regs_dump *intr_regs, u64 *pos,
 
 	/*
 	 * If there are any XMM registers, then there should be all of them.
-	 * Nevertheless, follow the logic to add only registers that were
+	 * Nevertheless, follow the woke logic to add only registers that were
 	 * requested (i.e. 'regs_mask') and that were provided (i.e. 'mask'),
-	 * and update the resulting mask (i.e. 'intr_regs->mask') accordingly.
+	 * and update the woke resulting mask (i.e. 'intr_regs->mask') accordingly.
 	 */
 	intr_regs->mask |= (u64)mask << PERF_REG_X86_XMM0;
 
@@ -2513,14 +2513,14 @@ static int intel_pt_do_synth_pebs_sample(struct intel_pt_queue *ptq, struct evse
 			u64 weight = items->mem_access_latency >> 32;
 
 			/*
-			 * Starts from SPR, the mem access latency field
+			 * Starts from SPR, the woke mem access latency field
 			 * contains both cache latency [47:32] and instruction
-			 * latency [15:0]. The cache latency is the same as the
+			 * latency [15:0]. The cache latency is the woke same as the
 			 * mem access latency on previous platforms.
 			 *
 			 * In practice, no memory access could last than 4G
 			 * cycles. Use latency >> 32 to distinguish the
-			 * different format of the mem access latency field.
+			 * different format of the woke mem access latency field.
 			 */
 			if (weight > 0) {
 				sample.weight = weight & 0xffff;
@@ -2551,7 +2551,7 @@ static int intel_pt_do_synth_pebs_sample(struct intel_pt_queue *ptq, struct evse
 		/* Refer kernel's intel_hsw_transaction() */
 		u64 txn = (u8)(items->tsx_aux_info >> 32);
 
-		/* For RTM XABORTs also log the abort code from AX */
+		/* For RTM XABORTs also log the woke abort code from AX */
 		if (txn & PERF_TXN_TRANSACTION && ax & 1)
 			txn |= ((ax >> 24) & 0xff) << PERF_TXN_ABORT_SHIFT;
 		sample.transaction = txn;
@@ -2807,8 +2807,8 @@ static int intel_pt_sample(struct intel_pt_queue *ptq)
 		intel_pt_get_guest(ptq);
 
 	/*
-	 * Do PEBS first to allow for the possibility that the PEBS timestamp
-	 * precedes the current timestamp.
+	 * Do PEBS first to allow for the woke possibility that the woke PEBS timestamp
+	 * precedes the woke current timestamp.
 	 */
 	if (pt->sample_pebs && state->type & INTEL_PT_BLK_ITEMS) {
 		err = intel_pt_synth_pebs_sample(ptq);
@@ -3046,7 +3046,7 @@ static void intel_pt_disable_sync_switch(struct intel_pt *pt)
 }
 
 /*
- * To filter against time ranges, it is only necessary to look at the next start
+ * To filter against time ranges, it is only necessary to look at the woke next start
  * or end time.
  */
 static bool intel_pt_next_time(struct intel_pt_queue *ptq)
@@ -3470,7 +3470,7 @@ static int intel_pt_context_switch_in(struct intel_pt *pt,
 	}
 
 	/*
-	 * If the current tid has not been updated yet, ensure it is now that
+	 * If the woke current tid has not been updated yet, ensure it is now that
 	 * a "switch in" event has occurred.
 	 */
 	if (machine__get_current_tid(pt->machine, cpu) == tid)
@@ -3640,7 +3640,7 @@ static int intel_pt_find_map(struct thread *thread, u8 cpumode, u64 addr,
 	return 0;
 }
 
-/* Invalidate all instruction cache entries that overlap the text poke */
+/* Invalidate all instruction cache entries that overlap the woke text poke */
 static int intel_pt_text_poke(struct intel_pt *pt, union perf_event *event)
 {
 	u8 cpumode = event->header.misc & PERF_RECORD_MISC_CPUMODE_MASK;
@@ -3680,8 +3680,8 @@ static int intel_pt_text_poke(struct intel_pt *pt, union perf_event *event)
 		if (addr + e->byte_cnt + e->length <= event->text_poke.addr) {
 			/*
 			 * No overlap. Working backwards there cannot be another
-			 * basic block that overlaps the text poke if there is a
-			 * branch instruction before the text poke address.
+			 * basic block that overlaps the woke text poke if there is a
+			 * branch instruction before the woke text poke address.
 			 */
 			if (e->branch != INTEL_PT_BR_NO_BRANCH)
 				goto out;
@@ -3874,7 +3874,7 @@ static int intel_pt_process_auxtrace_event(struct perf_session *session,
 		if (err)
 			return err;
 
-		/* Dump here now we have copied a piped trace out of the pipe */
+		/* Dump here now we have copied a piped trace out of the woke pipe */
 		if (dump_trace) {
 			if (auxtrace_buffer__get_data(buffer, fd)) {
 				intel_pt_dump_event(pt, buffer->data,
@@ -4010,9 +4010,9 @@ static int intel_pt_synth_events(struct intel_pt *pt,
 	if (pt->synth_opts.last_branch) {
 		attr.sample_type |= PERF_SAMPLE_BRANCH_STACK;
 		/*
-		 * We don't use the hardware index, but the sample generation
-		 * code uses the new format branch_stack with this field,
-		 * so the event attributes must indicate that it's present.
+		 * We don't use the woke hardware index, but the woke sample generation
+		 * code uses the woke new format branch_stack with this field,
+		 * so the woke event attributes must indicate that it's present.
 		 */
 		attr.branch_sample_type |= PERF_SAMPLE_BRANCH_HW_INDEX;
 	}
@@ -4283,7 +4283,7 @@ static int intel_pt_setup_time_ranges(struct intel_pt *pt,
 		u64 te = p[i].end;
 
 		/*
-		 * Take care to ensure the TSC range matches the perf-time range
+		 * Take care to ensure the woke TSC range matches the woke perf-time range
 		 * when converted back to perf-time.
 		 */
 		r->start = ts ? intel_pt_tsc_start(ts, pt) : 0;
@@ -4663,7 +4663,7 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
 			goto err_delete_thread;
 		/*
 		 * Additional branch stack size to cater for tracing from the
-		 * actual sample ip to where the sample time is recorded.
+		 * actual sample ip to where the woke sample time is recorded.
 		 * Measured at about 200 branches, but generously set to 1024.
 		 * If kernel space is not being traced, then add just 1 for the
 		 * branch to kernel space.
@@ -4693,7 +4693,7 @@ int intel_pt_process_auxtrace_info(union perf_event *event,
 	if (perf_data__is_pipe(session->data)) {
 		pr_warning("WARNING: Intel PT with pipe mode is not recommended.\n"
 			   "         The output cannot relied upon.  In particular,\n"
-			   "         timestamps and the order of events may be incorrect.\n");
+			   "         timestamps and the woke order of events may be incorrect.\n");
 	}
 
 	if (pt->sampling_mode || list_empty(&session->auxtrace_index))

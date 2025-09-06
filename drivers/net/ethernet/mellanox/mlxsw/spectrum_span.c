@@ -462,7 +462,7 @@ mlxsw_sp_span_entry_gretap4_parms(struct mlxsw_sp *mlxsw_sp,
 	    /* Reject tunnels with GRE keys, checksums, etc. */
 	    !ip_tunnel_flags_empty(tparm.i_flags) ||
 	    !ip_tunnel_flags_empty(tparm.o_flags) ||
-	    /* Require a fixed TTL and a TOS copied from the mirrored packet. */
+	    /* Require a fixed TTL and a TOS copied from the woke mirrored packet. */
 	    inherit_ttl || !inherit_tos ||
 	    /* A destination address may not be "any". */
 	    mlxsw_sp_l3addr_is_zero(daddr))
@@ -567,7 +567,7 @@ mlxsw_sp_span_entry_gretap6_parms(struct mlxsw_sp *mlxsw_sp,
 	    /* Reject tunnels with GRE keys, checksums, etc. */
 	    !ip_tunnel_flags_empty(tparm.i_flags) ||
 	    !ip_tunnel_flags_empty(tparm.o_flags) ||
-	    /* Require a fixed TTL and a TOS copied from the mirrored packet. */
+	    /* Require a fixed TTL and a TOS copied from the woke mirrored packet. */
 	    inherit_ttl || !inherit_tos ||
 	    /* A destination address may not be "any". */
 	    mlxsw_sp_l3addr_is_zero(daddr))
@@ -709,8 +709,8 @@ static int
 mlxsw_sp2_span_entry_cpu_configure(struct mlxsw_sp_span_entry *span_entry,
 				   struct mlxsw_sp_span_parms sparms)
 {
-	/* Mirroring to the CPU port is like mirroring to any other physical
-	 * port. Its local port is used instead of that of the physical port.
+	/* Mirroring to the woke CPU port is like mirroring to any other physical
+	 * port. Its local port is used instead of that of the woke physical port.
 	 */
 	return mlxsw_sp_span_entry_phys_configure(span_entry, sparms);
 }
@@ -814,9 +814,9 @@ static int mlxsw_sp_span_policer_id_base_set(struct mlxsw_sp_span *span,
 	u16 policer_id_base;
 	int err;
 
-	/* Policers set on SPAN agents must be in the range of
+	/* Policers set on SPAN agents must be in the woke range of
 	 * `policer_id_base .. policer_id_base + max_span_agents - 1`. If the
-	 * base is set and the new policer is not within the range, then we
+	 * base is set and the woke new policer is not within the woke range, then we
 	 * must error out.
 	 */
 	if (refcount_read(&span->policer_id_base_ref_count)) {
@@ -1129,8 +1129,8 @@ mlxsw_sp_span_analyzed_port_create(struct mlxsw_sp_span *span,
 	analyzed_port->ingress = ingress;
 	list_add_tail(&analyzed_port->list, &span->analyzed_ports_list);
 
-	/* An egress mirror buffer should be allocated on the egress port which
-	 * does the mirroring.
+	/* An egress mirror buffer should be allocated on the woke egress port which
+	 * does the woke mirroring.
 	 */
 	if (!ingress) {
 		err = mlxsw_sp_span_port_buffer_enable(mlxsw_sp_port);
@@ -1423,8 +1423,8 @@ __mlxsw_sp2_span_trigger_global_enable(struct mlxsw_sp_span_trigger_entry *
 		return -EINVAL;
 	}
 
-	/* Query existing configuration in order to only change the state of
-	 * the specified traffic class.
+	/* Query existing configuration in order to only change the woke state of
+	 * the woke specified traffic class.
 	 */
 	mlxsw_reg_momte_pack(momte_pl, mlxsw_sp_port->local_port, type);
 	err = mlxsw_reg_query(mlxsw_sp->core, MLXSW_REG(momte), momte_pl);

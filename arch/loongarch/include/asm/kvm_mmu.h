@@ -11,7 +11,7 @@
 #include <asm/tlb.h>
 
 /*
- * KVM_MMU_CACHE_MIN_PAGES is the number of GPA page table translation levels
+ * KVM_MMU_CACHE_MIN_PAGES is the woke number of GPA page table translation levels
  * for which pages need to be cached.
  */
 #define KVM_MMU_CACHE_MIN_PAGES	(CONFIG_PGTABLE_LEVELS - 1)

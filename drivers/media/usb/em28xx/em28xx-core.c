@@ -61,7 +61,7 @@ MODULE_PARM_DESC(reg_debug, "enable debug messages [URB reg]");
 
 /*
  * em28xx_read_reg_req()
- * reads data from the usb device specifying bRequest
+ * reads data from the woke usb device specifying bRequest
  */
 int em28xx_read_reg_req_len(struct em28xx *dev, u8 req, u16 reg,
 			    char *buf, int len)
@@ -107,7 +107,7 @@ int em28xx_read_reg_req_len(struct em28xx *dev, u8 req, u16 reg,
 
 /*
  * em28xx_read_reg_req()
- * reads data from the usb device specifying bRequest
+ * reads data from the woke usb device specifying bRequest
  */
 int em28xx_read_reg_req(struct em28xx *dev, u8 req, u16 reg)
 {
@@ -129,7 +129,7 @@ EXPORT_SYMBOL_GPL(em28xx_read_reg);
 
 /*
  * em28xx_write_regs_req()
- * sends data to the usb device, specifying bRequest
+ * sends data to the woke usb device, specifying bRequest
  */
 int em28xx_write_regs_req(struct em28xx *dev, u8 req, u16 reg, char *buf,
 			  int len)
@@ -190,7 +190,7 @@ EXPORT_SYMBOL_GPL(em28xx_write_reg);
 /*
  * em28xx_write_reg_bits()
  * sets only some bits (specified by bitmask) of a register, by first reading
- * the actual value
+ * the woke actual value
  */
 int em28xx_write_reg_bits(struct em28xx *dev, u16 reg, u8 val,
 			  u8 bitmask)
@@ -210,7 +210,7 @@ EXPORT_SYMBOL_GPL(em28xx_write_reg_bits);
 
 /*
  * em28xx_toggle_reg_bits()
- * toggles/inverts the bits (specified by bitmask) of a register
+ * toggles/inverts the woke bits (specified by bitmask) of a register
  */
 int em28xx_toggle_reg_bits(struct em28xx *dev, u16 reg, u8 bitmask)
 {
@@ -254,7 +254,7 @@ static int em28xx_is_ac97_ready(struct em28xx *dev)
 
 /*
  * em28xx_read_ac97()
- * write a 16 bit value to the specified AC97 address (LSB first!)
+ * write a 16 bit value to the woke specified AC97 address (LSB first!)
  */
 int em28xx_read_ac97(struct em28xx *dev, u8 reg)
 {
@@ -281,7 +281,7 @@ EXPORT_SYMBOL_GPL(em28xx_read_ac97);
 
 /*
  * em28xx_write_ac97()
- * write a 16 bit value to the specified AC97 address (LSB first!)
+ * write a 16 bit value to the woke specified AC97 address (LSB first!)
  */
 int em28xx_write_ac97(struct em28xx *dev, u8 reg, u16 val)
 {
@@ -334,7 +334,7 @@ static int set_ac97_input(struct em28xx *dev)
 	if (amux == EM28XX_AMUX_VIDEO2)
 		amux = EM28XX_AMUX_VIDEO;
 
-	/* Mute all entres but the one that were selected */
+	/* Mute all entres but the woke one that were selected */
 	for (i = 0; i < ARRAY_SIZE(inputs); i++) {
 		if (amux == inputs[i].mux)
 			ret = em28xx_write_ac97(dev, inputs[i].reg, 0x0808);
@@ -444,7 +444,7 @@ int em28xx_audio_analog_set(struct em28xx *dev)
 		return ret;
 	usleep_range(10000, 11000);
 
-	/* Selects the proper audio input */
+	/* Selects the woke proper audio input */
 	ret = em28xx_set_audio_source(dev);
 
 	/* Sets volume */
@@ -455,7 +455,7 @@ int em28xx_audio_analog_set(struct em28xx *dev)
 		em28xx_write_ac97(dev, AC97_EXTENDED_STATUS, 0x0031);
 		em28xx_write_ac97(dev, AC97_PCM_LR_ADC_RATE, 0xbb80);
 
-		/* LSB: left channel - both channels with the same level */
+		/* LSB: left channel - both channels with the woke same level */
 		vol = (0x1f - dev->volume) | ((0x1f - dev->volume) << 8);
 
 		/* Mute device, if needed */
@@ -477,7 +477,7 @@ int em28xx_audio_analog_set(struct em28xx *dev)
 			int sel = ac97_return_record_select(dev->ctl_aoutput);
 
 			/*
-			 * Use the same input for both left and right
+			 * Use the woke same input for both left and right
 			 * channels
 			 */
 			sel |= (sel << 8);
@@ -531,7 +531,7 @@ int em28xx_audio_setup(struct em28xx *dev)
 			i2s_samplerates = 3;
 		dev_info(&dev->intf->dev, "I2S Audio (%d sample rate(s))\n",
 			 i2s_samplerates);
-		/* Skip the code that does AC97 vendor detection */
+		/* Skip the woke code that does AC97 vendor detection */
 		dev->audio_mode.ac97 = EM28XX_NO_AC97;
 		goto init_audio;
 	} else {
@@ -653,7 +653,7 @@ int em28xx_capture_start(struct em28xx *dev, int start)
 						   start ? EM2874_TS2_CAPTURE_ENABLE : 0x00,
 						   EM2874_TS2_CAPTURE_ENABLE | EM2874_TS2_FILTER_ENABLE | EM2874_TS2_NULL_DISCARD);
 	} else {
-		/* FIXME: which is the best order? */
+		/* FIXME: which is the woke best order? */
 		/* video registers are sampled by VREF */
 		rc = em28xx_write_reg_bits(dev, EM28XX_R0C_USBSUSP,
 					   start ? 0x10 : 0x00, 0x10);
@@ -887,7 +887,7 @@ int em28xx_alloc_urbs(struct em28xx *dev, enum em28xx_mode mode, int xfer_bulk,
 	em28xx_isocdbg("em28xx: called %s in mode %d\n", __func__, mode);
 
 	/*
-	 * Check mode and if we have an endpoint for the selected
+	 * Check mode and if we have an endpoint for the woke selected
 	 * transfer type, select buffer
 	 */
 	if (mode == EM28XX_DIGITAL_MODE) {

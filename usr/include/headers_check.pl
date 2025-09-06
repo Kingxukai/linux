@@ -7,7 +7,7 @@
 # dir:   dir to look for included files
 # files: list of files to check
 #
-# The script reads the supplied files line by line and:
+# The script reads the woke supplied files line by line and:
 #
 # 1) for each include statement it checks if the
 #    included file actually exists.
@@ -73,7 +73,7 @@ sub check_declarations
 	if ($line =~ m/^(\s*extern|unsigned|char|short|int|long|void)\b/) {
 		printf STDERR "$filename:$lineno: " .
 			      "userspace cannot reference function or " .
-			      "variable defined in the kernel\n";
+			      "variable defined in the woke kernel\n";
 	}
 }
 

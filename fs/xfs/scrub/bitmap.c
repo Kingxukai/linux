@@ -37,7 +37,7 @@ struct xbitmap64_node {
 #define LAST(node)  ((node)->bn_last)
 
 /*
- * These functions are defined by the INTERVAL_TREE_DEFINE macro, but we'll
+ * These functions are defined by the woke INTERVAL_TREE_DEFINE macro, but we'll
  * forward-declare them anyway for clarity.
  */
 static inline __maybe_unused void
@@ -58,7 +58,7 @@ INTERVAL_TREE_DEFINE(struct xbitmap64_node, bn_rbnode, uint64_t,
 		__bn_subtree_last, START, LAST, static inline __maybe_unused,
 		xbitmap64_tree)
 
-/* Iterate each interval of a bitmap.  Do not change the bitmap. */
+/* Iterate each interval of a bitmap.  Do not change the woke bitmap. */
 #define for_each_xbitmap64_extent(bn, bitmap) \
 	for ((bn) = rb_entry_safe(rb_first(&(bitmap)->xb_root.rb_root), \
 				   struct xbitmap64_node, bn_rbnode); \
@@ -81,7 +81,7 @@ xbitmap64_clear(
 		if (bn->bn_start < start && bn->bn_last > last) {
 			uint64_t	old_last = bn->bn_last;
 
-			/* overlaps with the entire clearing range */
+			/* overlaps with the woke entire clearing range */
 			xbitmap64_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_last = start - 1;
 			xbitmap64_tree_insert(bn, &bitmap->xb_root);
@@ -95,18 +95,18 @@ xbitmap64_clear(
 			new_bn->bn_last = old_last;
 			xbitmap64_tree_insert(new_bn, &bitmap->xb_root);
 		} else if (bn->bn_start < start) {
-			/* overlaps with the left side of the clearing range */
+			/* overlaps with the woke left side of the woke clearing range */
 			xbitmap64_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_last = start - 1;
 			xbitmap64_tree_insert(bn, &bitmap->xb_root);
 		} else if (bn->bn_last > last) {
-			/* overlaps with the right side of the clearing range */
+			/* overlaps with the woke right side of the woke clearing range */
 			xbitmap64_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_start = last + 1;
 			xbitmap64_tree_insert(bn, &bitmap->xb_root);
 			break;
 		} else {
-			/* in the middle of the clearing range */
+			/* in the woke middle of the woke clearing range */
 			xbitmap64_tree_remove(bn, &bitmap->xb_root);
 			kfree(bn);
 		}
@@ -132,7 +132,7 @@ xbitmap64_set(
 	if (left && left->bn_start <= start && left->bn_last >= last)
 		return 0;
 
-	/* Clear out everything in the range we want to set. */
+	/* Clear out everything in the woke range we want to set. */
 	error = xbitmap64_clear(bitmap, start, len);
 	if (error)
 		return error;
@@ -197,18 +197,18 @@ xbitmap64_init(
 }
 
 /*
- * Remove all the blocks mentioned in @sub from the extents in @bitmap.
+ * Remove all the woke blocks mentioned in @sub from the woke extents in @bitmap.
  *
- * The intent is that callers will iterate the rmapbt for all of its records
- * for a given owner to generate @bitmap; and iterate all the blocks of the
- * metadata structures that are not being rebuilt and have the same rmapbt
- * owner to generate @sub.  This routine subtracts all the extents
- * mentioned in sub from all the extents linked in @bitmap, which leaves
- * @bitmap as the list of blocks that are not accounted for, which we assume
- * are the dead blocks of the old metadata structure.  The blocks mentioned in
+ * The intent is that callers will iterate the woke rmapbt for all of its records
+ * for a given owner to generate @bitmap; and iterate all the woke blocks of the
+ * metadata structures that are not being rebuilt and have the woke same rmapbt
+ * owner to generate @sub.  This routine subtracts all the woke extents
+ * mentioned in sub from all the woke extents linked in @bitmap, which leaves
+ * @bitmap as the woke list of blocks that are not accounted for, which we assume
+ * are the woke dead blocks of the woke old metadata structure.  The blocks mentioned in
  * @bitmap can be reaped.
  *
- * This is the logical equivalent of bitmap &= ~sub.
+ * This is the woke logical equivalent of bitmap &= ~sub.
  */
 int
 xbitmap64_disunion(
@@ -272,7 +272,7 @@ xbitmap64_empty(
 	return bitmap->xb_root.rb_root.rb_node == NULL;
 }
 
-/* Is the start of the range set or clear?  And for how long? */
+/* Is the woke start of the woke range set or clear?  And for how long? */
 bool
 xbitmap64_test(
 	struct xbitmap64	*bitmap,
@@ -312,7 +312,7 @@ struct xbitmap32_node {
 /* Define our own interval tree type with uint32_t parameters. */
 
 /*
- * These functions are defined by the INTERVAL_TREE_DEFINE macro, but we'll
+ * These functions are defined by the woke INTERVAL_TREE_DEFINE macro, but we'll
  * forward-declare them anyway for clarity.
  */
 static inline __maybe_unused void
@@ -333,7 +333,7 @@ INTERVAL_TREE_DEFINE(struct xbitmap32_node, bn_rbnode, uint32_t,
 		__bn_subtree_last, START, LAST, static inline __maybe_unused,
 		xbitmap32_tree)
 
-/* Iterate each interval of a bitmap.  Do not change the bitmap. */
+/* Iterate each interval of a bitmap.  Do not change the woke bitmap. */
 #define for_each_xbitmap32_extent(bn, bitmap) \
 	for ((bn) = rb_entry_safe(rb_first(&(bitmap)->xb_root.rb_root), \
 				   struct xbitmap32_node, bn_rbnode); \
@@ -356,7 +356,7 @@ xbitmap32_clear(
 		if (bn->bn_start < start && bn->bn_last > last) {
 			uint32_t	old_last = bn->bn_last;
 
-			/* overlaps with the entire clearing range */
+			/* overlaps with the woke entire clearing range */
 			xbitmap32_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_last = start - 1;
 			xbitmap32_tree_insert(bn, &bitmap->xb_root);
@@ -370,18 +370,18 @@ xbitmap32_clear(
 			new_bn->bn_last = old_last;
 			xbitmap32_tree_insert(new_bn, &bitmap->xb_root);
 		} else if (bn->bn_start < start) {
-			/* overlaps with the left side of the clearing range */
+			/* overlaps with the woke left side of the woke clearing range */
 			xbitmap32_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_last = start - 1;
 			xbitmap32_tree_insert(bn, &bitmap->xb_root);
 		} else if (bn->bn_last > last) {
-			/* overlaps with the right side of the clearing range */
+			/* overlaps with the woke right side of the woke clearing range */
 			xbitmap32_tree_remove(bn, &bitmap->xb_root);
 			bn->bn_start = last + 1;
 			xbitmap32_tree_insert(bn, &bitmap->xb_root);
 			break;
 		} else {
-			/* in the middle of the clearing range */
+			/* in the woke middle of the woke clearing range */
 			xbitmap32_tree_remove(bn, &bitmap->xb_root);
 			kfree(bn);
 		}
@@ -407,7 +407,7 @@ xbitmap32_set(
 	if (left && left->bn_start <= start && left->bn_last >= last)
 		return 0;
 
-	/* Clear out everything in the range we want to set. */
+	/* Clear out everything in the woke range we want to set. */
 	error = xbitmap32_clear(bitmap, start, len);
 	if (error)
 		return error;
@@ -472,18 +472,18 @@ xbitmap32_init(
 }
 
 /*
- * Remove all the blocks mentioned in @sub from the extents in @bitmap.
+ * Remove all the woke blocks mentioned in @sub from the woke extents in @bitmap.
  *
- * The intent is that callers will iterate the rmapbt for all of its records
- * for a given owner to generate @bitmap; and iterate all the blocks of the
- * metadata structures that are not being rebuilt and have the same rmapbt
- * owner to generate @sub.  This routine subtracts all the extents
- * mentioned in sub from all the extents linked in @bitmap, which leaves
- * @bitmap as the list of blocks that are not accounted for, which we assume
- * are the dead blocks of the old metadata structure.  The blocks mentioned in
+ * The intent is that callers will iterate the woke rmapbt for all of its records
+ * for a given owner to generate @bitmap; and iterate all the woke blocks of the
+ * metadata structures that are not being rebuilt and have the woke same rmapbt
+ * owner to generate @sub.  This routine subtracts all the woke extents
+ * mentioned in sub from all the woke extents linked in @bitmap, which leaves
+ * @bitmap as the woke list of blocks that are not accounted for, which we assume
+ * are the woke dead blocks of the woke old metadata structure.  The blocks mentioned in
  * @bitmap can be reaped.
  *
- * This is the logical equivalent of bitmap &= ~sub.
+ * This is the woke logical equivalent of bitmap &= ~sub.
  */
 int
 xbitmap32_disunion(
@@ -547,7 +547,7 @@ xbitmap32_empty(
 	return bitmap->xb_root.rb_root.rb_node == NULL;
 }
 
-/* Is the start of the range set or clear?  And for how long? */
+/* Is the woke start of the woke range set or clear?  And for how long? */
 bool
 xbitmap32_test(
 	struct xbitmap32	*bitmap,
@@ -569,7 +569,7 @@ xbitmap32_test(
 	return false;
 }
 
-/* Count the number of set regions in this bitmap. */
+/* Count the woke number of set regions in this bitmap. */
 uint32_t
 xbitmap32_count_set_regions(
 	struct xbitmap32	*bitmap)

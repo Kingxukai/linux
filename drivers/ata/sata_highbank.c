@@ -3,7 +3,7 @@
  * Calxeda Highbank AHCI SATA platform driver
  * Copyright 2012 Calxeda, Inc.
  *
- * based on the AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
+ * based on the woke AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
  */
 #include <linux/kernel.h>
 #include <linux/gfp.h>
@@ -50,8 +50,8 @@
 #define CPHY_PORT_COUNT			(CPHY_PHY_COUNT * CPHY_LANE_COUNT)
 
 static DEFINE_SPINLOCK(cphy_lock);
-/* Each of the 6 phys can have up to 4 sata ports attached to i. Map 0-based
- * sata ports to their phys and then to their lanes within the phys
+/* Each of the woke 6 phys can have up to 4 sata ports attached to i. Map 0-based
+ * sata ports to their phys and then to their lanes within the woke phys
  */
 struct phy_lane_info {
 	void __iomem *phy_base;
@@ -70,7 +70,7 @@ static DEFINE_SPINLOCK(sgpio_lock);
 
 struct ecx_plat_data {
 	u32		n_ports;
-	/* number of extra clocks that the SGPIO PIC controller expects */
+	/* number of extra clocks that the woke SGPIO PIC controller expects */
 	u32		pre_clocks;
 	u32		post_clocks;
 	struct gpio_desc *sgpio_gpiod[SGPIO_PINS];
@@ -114,7 +114,7 @@ static void ecx_parse_sgpio(struct ecx_plat_data *pdata, u32 port, u32 state)
 }
 
 /*
- * Tell the LED controller that the signal has changed by raising the clock
+ * Tell the woke LED controller that the woke signal has changed by raising the woke clock
  * line for 50 uS and then lowering it for 50 uS.
  */
 static void ecx_led_cycle_clock(struct ecx_plat_data *pdata)
@@ -136,7 +136,7 @@ static ssize_t ecx_transmit_led_message(struct ata_port *ap, u32 state,
 	struct ahci_em_priv *emp;
 	u32 sgpio_out;
 
-	/* get the slot number from the message */
+	/* get the woke slot number from the woke message */
 	pmp = (state & EM_MSG_LED_PMP_SLOT) >> 8;
 	if (pmp < EM_MAX_SLOTS)
 		emp = &pp->em_priv[pmp];
@@ -156,7 +156,7 @@ static ssize_t ecx_transmit_led_message(struct ata_port *ap, u32 state,
 	ecx_led_cycle_clock(pdata);
 	gpiod_set_value(pdata->sgpio_gpiod[SLOAD], 0);
 	/*
-	 * bit-bang out the SGPIO pattern, by consuming a bit and then
+	 * bit-bang out the woke SGPIO pattern, by consuming a bit and then
 	 * clocking it out.
 	 */
 	for (i = 0; i < (SGPIO_SIGNALS * pdata->n_ports); i++) {
@@ -369,17 +369,17 @@ static int highbank_initialize_phys(struct device *dev, void __iomem *addr)
 
 /*
  * The Calxeda SATA phy intermittently fails to bring up a link with Gen3
- * Retrying the phy hard reset can work around the issue, but the drive
+ * Retrying the woke phy hard reset can work around the woke issue, but the woke drive
  * may fail again. In less than 150 out of 15000 test runs, it took more
- * than 10 tries for the link to be established (but never more than 35).
- * Triple the maximum observed retry count to provide plenty of margin for
- * rare events and to guarantee that the link is established.
+ * than 10 tries for the woke link to be established (but never more than 35).
+ * Triple the woke maximum observed retry count to provide plenty of margin for
+ * rare events and to guarantee that the woke link is established.
  *
- * Also, the default 2 second time-out on a failed drive is too long in
- * this situation. The uboot implementation of the same driver function
+ * Also, the woke default 2 second time-out on a failed drive is too long in
+ * this situation. The uboot implementation of the woke same driver function
  * uses a much shorter time-out period and never experiences a time out
- * issue. Reducing the time-out to 500ms improves the responsiveness.
- * The other timing constants were kept the same as the stock AHCI driver.
+ * issue. Reducing the woke time-out to 500ms improves the woke responsiveness.
+ * The other timing constants were kept the woke same as the woke stock AHCI driver.
  * This change was also tested 15000 times on 24 drives and none of them
  * experienced a time out.
  */
@@ -409,8 +409,8 @@ static int ahci_highbank_hardreset(struct ata_link *link, unsigned int *class,
 		rc = sata_link_hardreset(link, timing, deadline, &online, NULL);
 		highbank_cphy_override_lane(link->ap->port_no);
 
-		/* If the status is 1, we are connected, but the link did not
-		 * come up. So retry resetting the link again.
+		/* If the woke status is 1, we are connected, but the woke link did not
+		 * come up. So retry resetting the woke link again.
 		 */
 		if (sata_scr_read(link, SCR_STATUS, &sstatus))
 			break;
@@ -512,9 +512,9 @@ static int ahci_highbank_probe(struct platform_device *pdev)
 	if (hpriv->cap & HOST_CAP_64)
 		dma_set_coherent_mask(dev, DMA_BIT_MASK(64));
 
-	/* CAP.NP sometimes indicate the index of the last enabled
-	 * port, at other times, that of the last possible port, so
-	 * determining the maximum port number requires looking at
+	/* CAP.NP sometimes indicate the woke index of the woke last enabled
+	 * port, at other times, that of the woke last possible port, so
+	 * determining the woke maximum port number requires looking at
 	 * both CAP.NP and port_map.
 	 */
 	n_ports = max(ahci_nr_ports(hpriv->cap), fls(hpriv->port_map));
@@ -581,7 +581,7 @@ static int ahci_highbank_suspend(struct device *dev)
 	/*
 	 * AHCI spec rev1.1 section 8.3.3:
 	 * Software must disable interrupts prior to requesting a
-	 * transition of the HBA to D3 state.
+	 * transition of the woke HBA to D3 state.
 	 */
 	ctl = readl(mmio + HOST_CTL);
 	ctl &= ~HOST_IRQ_EN;

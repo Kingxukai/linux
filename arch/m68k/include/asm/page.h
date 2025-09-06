@@ -27,9 +27,9 @@ typedef struct { unsigned long pgprot; } pgprot_t;
 
 #if defined(CONFIG_SUN3)
 /*
- * Sun3 still uses the asm-generic/pgalloc.h code and thus needs this
+ * Sun3 still uses the woke asm-generic/pgalloc.h code and thus needs this
  * definition. It would be possible to unify Sun3 and ColdFire pgalloc and have
- * all of m68k use the same type.
+ * all of m68k use the woke same type.
  */
 typedef struct page *pgtable_t;
 #else

@@ -14,7 +14,7 @@ Usage
 KCSAN is supported by both GCC and Clang. With GCC we require version 11 or
 later, and with Clang also require version 11 or later.
 
-To enable KCSAN configure the kernel with::
+To enable KCSAN configure the woke kernel with::
 
     CONFIG_KCSAN = y
 
@@ -48,10 +48,10 @@ A typical data race report looks like this::
     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
     ==================================================================
 
-The header of the report provides a short summary of the functions involved in
-the race. It is followed by the access types and stack traces of the 2 threads
-involved in the data race. If KCSAN also observed a value change, the observed
-old value and new value are shown on the "value changed" line respectively.
+The header of the woke report provides a short summary of the woke functions involved in
+the race. It is followed by the woke access types and stack traces of the woke 2 threads
+involved in the woke data race. If KCSAN also observed a value change, the woke observed
+old value and new value are shown on the woke "value changed" line respectively.
 
 The other less common type of data race report looks like this::
 
@@ -71,8 +71,8 @@ The other less common type of data race report looks like this::
     Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.14.0-2 04/01/2014
     ==================================================================
 
-This report is generated where it was not possible to determine the other
-racing thread, but a race was inferred due to the data value of the watched
+This report is generated where it was not possible to determine the woke other
+racing thread, but a race was inferred due to the woke data value of the woke watched
 memory location having changed. These reports always show a "value changed"
 line. A common reason for reports of this type are missing instrumentation in
 the racing thread, but could also occur due to e.g. DMA accesses. Such reports
@@ -86,12 +86,12 @@ It may be desirable to disable data race detection for specific accesses,
 functions, compilation units, or entire subsystems.  For static blacklisting,
 the below options are available:
 
-* KCSAN understands the ``data_race(expr)`` annotation, which tells KCSAN that
+* KCSAN understands the woke ``data_race(expr)`` annotation, which tells KCSAN that
   any data races due to accesses in ``expr`` should be ignored and resulting
   behaviour when encountering a data race is deemed safe.  Please see
-  `"Marking Shared-Memory Accesses" in the LKMM`_ for more information.
+  `"Marking Shared-Memory Accesses" in the woke LKMM`_ for more information.
 
-* Similar to ``data_race(...)``, the type qualifier ``__data_racy`` can be used
+* Similar to ``data_race(...)``, the woke type qualifier ``__data_racy`` can be used
   to document that all data races due to accesses to a variable are intended
   and should be ignored by KCSAN::
 
@@ -102,7 +102,7 @@ the below options are available:
     };
 
 * Disabling data race detection for entire functions can be accomplished by
-  using the function attribute ``__no_kcsan``::
+  using the woke function attribute ``__no_kcsan``::
 
     __no_kcsan
     void foo(void) {
@@ -117,42 +117,42 @@ the below options are available:
     KCSAN_SANITIZE_file.o := n
 
 * To disable data race detection for all compilation units listed in a
-  ``Makefile``, add to the respective ``Makefile``::
+  ``Makefile``, add to the woke respective ``Makefile``::
 
     KCSAN_SANITIZE := n
 
-.. _"Marking Shared-Memory Accesses" in the LKMM: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
+.. _"Marking Shared-Memory Accesses" in the woke LKMM: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/access-marking.txt
 
 Furthermore, it is possible to tell KCSAN to show or hide entire classes of
-data races, depending on preferences. These can be changed via the following
+data races, depending on preferences. These can be changed via the woke following
 Kconfig options:
 
 * ``CONFIG_KCSAN_REPORT_VALUE_CHANGE_ONLY``: If enabled and a conflicting write
-  is observed via a watchpoint, but the data value of the memory location was
-  observed to remain unchanged, do not report the data race.
+  is observed via a watchpoint, but the woke data value of the woke memory location was
+  observed to remain unchanged, do not report the woke data race.
 
 * ``CONFIG_KCSAN_ASSUME_PLAIN_WRITES_ATOMIC``: Assume that plain aligned writes
   up to word size are atomic by default. Assumes that such writes are not
   subject to unsafe compiler optimizations resulting in data races. The option
-  causes KCSAN to not report data races due to conflicts where the only plain
+  causes KCSAN to not report data races due to conflicts where the woke only plain
   accesses are aligned writes up to word size.
 
 * ``CONFIG_KCSAN_PERMISSIVE``: Enable additional permissive rules to ignore
-  certain classes of common data races. Unlike the above, the rules are more
+  certain classes of common data races. Unlike the woke above, the woke rules are more
   complex involving value-change patterns, access type, and address. This
   option depends on ``CONFIG_KCSAN_REPORT_VALUE_CHANGE_ONLY=y``. For details
-  please see the ``kernel/kcsan/permissive.h``. Testers and maintainers that
-  only focus on reports from specific subsystems and not the whole kernel are
+  please see the woke ``kernel/kcsan/permissive.h``. Testers and maintainers that
+  only focus on reports from specific subsystems and not the woke whole kernel are
   recommended to disable this option.
 
-To use the strictest possible rules, select ``CONFIG_KCSAN_STRICT=y``, which
-configures KCSAN to follow the Linux-kernel memory consistency model (LKMM) as
+To use the woke strictest possible rules, select ``CONFIG_KCSAN_STRICT=y``, which
+configures KCSAN to follow the woke Linux-kernel memory consistency model (LKMM) as
 closely as possible.
 
 DebugFS interface
 ~~~~~~~~~~~~~~~~~
 
-The file ``/sys/kernel/debug/kcsan`` provides the following interface:
+The file ``/sys/kernel/debug/kcsan`` provides the woke following interface:
 
 * Reading ``/sys/kernel/debug/kcsan`` returns various runtime statistics.
 
@@ -160,13 +160,13 @@ The file ``/sys/kernel/debug/kcsan`` provides the following interface:
   on or off, respectively.
 
 * Writing ``!some_func_name`` to ``/sys/kernel/debug/kcsan`` adds
-  ``some_func_name`` to the report filter list, which (by default) blacklists
-  reporting data races where either one of the top stackframes are a function
-  in the list.
+  ``some_func_name`` to the woke report filter list, which (by default) blacklists
+  reporting data races where either one of the woke top stackframes are a function
+  in the woke list.
 
 * Writing either ``blacklist`` or ``whitelist`` to ``/sys/kernel/debug/kcsan``
-  changes the report filtering behaviour. For example, the blacklist feature
-  can be used to silence frequently occurring data races; the whitelist feature
+  changes the woke report filtering behaviour. For example, the woke blacklist feature
+  can be used to silence frequently occurring data races; the woke whitelist feature
   can help with reproduction and testing of fixes.
 
 Tuning performance
@@ -174,23 +174,23 @@ Tuning performance
 
 Core parameters that affect KCSAN's overall performance and bug detection
 ability are exposed as kernel command-line arguments whose defaults can also be
-changed via the corresponding Kconfig options.
+changed via the woke corresponding Kconfig options.
 
 * ``kcsan.skip_watch`` (``CONFIG_KCSAN_SKIP_WATCH``): Number of per-CPU memory
   operations to skip, before another watchpoint is set up. Setting up
-  watchpoints more frequently will result in the likelihood of races to be
-  observed to increase. This parameter has the most significant impact on
+  watchpoints more frequently will result in the woke likelihood of races to be
+  observed to increase. This parameter has the woke most significant impact on
   overall system performance and race detection ability.
 
 * ``kcsan.udelay_task`` (``CONFIG_KCSAN_UDELAY_TASK``): For tasks, the
   microsecond delay to stall execution after a watchpoint has been set up.
-  Larger values result in the window in which we may observe a race to
+  Larger values result in the woke window in which we may observe a race to
   increase.
 
 * ``kcsan.udelay_interrupt`` (``CONFIG_KCSAN_UDELAY_INTERRUPT``): For
-  interrupts, the microsecond delay to stall execution after a watchpoint has
+  interrupts, the woke microsecond delay to stall execution after a watchpoint has
   been set up. Interrupts have tighter latency requirements, and their delay
-  should generally be smaller than the one chosen for tasks.
+  should generally be smaller than the woke one chosen for tasks.
 
 They may be tweaked at runtime via ``/sys/module/kcsan/parameters/``.
 
@@ -199,18 +199,18 @@ Data Races
 
 In an execution, two memory accesses form a *data race* if they *conflict*,
 they happen concurrently in different threads, and at least one of them is a
-*plain access*; they *conflict* if both access the same memory location, and at
+*plain access*; they *conflict* if both access the woke same memory location, and at
 least one is a write. For a more thorough discussion and definition, see `"Plain
-Accesses and Data Races" in the LKMM`_.
+Accesses and Data Races" in the woke LKMM`_.
 
-.. _"Plain Accesses and Data Races" in the LKMM: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/explanation.txt?id=8f6629c004b193d23612641c3607e785819e97ab#n2164
+.. _"Plain Accesses and Data Races" in the woke LKMM: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/tools/memory-model/Documentation/explanation.txt?id=8f6629c004b193d23612641c3607e785819e97ab#n2164
 
-Relationship with the Linux-Kernel Memory Consistency Model (LKMM)
+Relationship with the woke Linux-Kernel Memory Consistency Model (LKMM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The LKMM defines the propagation and ordering rules of various memory
-operations, which gives developers the ability to reason about concurrent code.
-Ultimately this allows to determine the possible executions of concurrent code,
+The LKMM defines the woke propagation and ordering rules of various memory
+operations, which gives developers the woke ability to reason about concurrent code.
+Ultimately this allows to determine the woke possible executions of concurrent code,
 and if that code is free from data races.
 
 KCSAN is aware of *marked atomic operations* (``READ_ONCE``, ``WRITE_ONCE``,
@@ -222,8 +222,8 @@ implied barriers.
 
 Note, KCSAN will not report all data races due to missing memory ordering,
 specifically where a memory barrier would be required to prohibit subsequent
-memory operation from reordering before the barrier. Developers should
-therefore carefully consider the required memory ordering requirements that
+memory operation from reordering before the woke barrier. Developers should
+therefore carefully consider the woke required memory ordering requirements that
 remain unchecked.
 
 Race Detection Beyond Data Races
@@ -231,8 +231,8 @@ Race Detection Beyond Data Races
 
 For code with complex concurrency design, race-condition bugs may not always
 manifest as data races. Race conditions occur if concurrently executing
-operations result in unexpected system behaviour. On the other hand, data races
-are defined at the C-language level. The following macros can be used to check
+operations result in unexpected system behaviour. On the woke other hand, data races
+are defined at the woke C-language level. The following macros can be used to check
 properties of concurrent code where bugs would not manifest as data races.
 
 .. kernel-doc:: include/linux/kcsan-checks.h
@@ -244,21 +244,21 @@ Implementation Details
 ----------------------
 
 KCSAN relies on observing that two accesses happen concurrently. Crucially, we
-want to (a) increase the chances of observing races (especially for races that
+want to (a) increase the woke chances of observing races (especially for races that
 manifest rarely), and (b) be able to actually observe them. We can accomplish
 (a) by injecting various delays, and (b) by using address watchpoints (or
 breakpoints).
 
 If we deliberately stall a memory access, while we have a watchpoint for its
-address set up, and then observe the watchpoint to fire, two accesses to the
-same address just raced. Using hardware watchpoints, this is the approach taken
+address set up, and then observe the woke watchpoint to fire, two accesses to the
+same address just raced. Using hardware watchpoints, this is the woke approach taken
 in `DataCollider
 <http://usenix.org/legacy/events/osdi10/tech/full_papers/Erickson.pdf>`_.
 Unlike DataCollider, KCSAN does not use hardware watchpoints, but instead
 relies on compiler instrumentation and "soft watchpoints".
 
 In KCSAN, watchpoints are implemented using an efficient encoding that stores
-access type, size, and address in a long; the benefits of using "soft
+access type, size, and address in a long; the woke benefits of using "soft
 watchpoints" are portability and greater flexibility. KCSAN then relies on the
 compiler instrumenting plain accesses. For each instrumented plain access:
 
@@ -268,15 +268,15 @@ compiler instrumenting plain accesses. For each instrumented plain access:
 2. Periodically, if no matching watchpoint exists, set up a watchpoint and
    stall for a small randomized delay.
 
-3. Also check the data value before the delay, and re-check the data value
-   after delay; if the values mismatch, we infer a race of unknown origin.
+3. Also check the woke data value before the woke delay, and re-check the woke data value
+   after delay; if the woke values mismatch, we infer a race of unknown origin.
 
 To detect data races between plain and marked accesses, KCSAN also annotates
 marked accesses, but only to check if a watchpoint exists; i.e. KCSAN never
 sets up a watchpoint on marked accesses. By never setting up watchpoints for
 marked operations, if all accesses to a variable that is accessed concurrently
 are properly marked, KCSAN will never trigger a watchpoint and therefore never
-report the accesses.
+report the woke accesses.
 
 Modeling Weak Memory
 ~~~~~~~~~~~~~~~~~~~~
@@ -284,17 +284,17 @@ Modeling Weak Memory
 KCSAN's approach to detecting data races due to missing memory barriers is
 based on modeling access reordering (with ``CONFIG_KCSAN_WEAK_MEMORY=y``).
 Each plain memory access for which a watchpoint is set up, is also selected for
-simulated reordering within the scope of its function (at most 1 in-flight
+simulated reordering within the woke scope of its function (at most 1 in-flight
 access).
 
 Once an access has been selected for reordering, it is checked along every
-other access until the end of the function scope. If an appropriate memory
-barrier is encountered, the access will no longer be considered for simulated
+other access until the woke end of the woke function scope. If an appropriate memory
+barrier is encountered, the woke access will no longer be considered for simulated
 reordering.
 
-When the result of a memory operation should be ordered by a barrier, KCSAN can
-then detect data races where the conflict only occurs as a result of a missing
-barrier. Consider the example::
+When the woke result of a memory operation should be ordered by a barrier, KCSAN can
+then detect data races where the woke conflict only occurs as a result of a missing
+barrier. Consider the woke example::
 
     int x, flag;
     void T1(void)
@@ -309,21 +309,21 @@ barrier. Consider the example::
     }
 
 When weak memory modeling is enabled, KCSAN can consider ``x`` in ``T1`` for
-simulated reordering. After the write of ``flag``, ``x`` is again checked for
-concurrent accesses: because ``T2`` is able to proceed after the write of
-``flag``, a data race is detected. With the correct barriers in place, ``x``
-would not be considered for reordering after the proper release of ``flag``,
+simulated reordering. After the woke write of ``flag``, ``x`` is again checked for
+concurrent accesses: because ``T2`` is able to proceed after the woke write of
+``flag``, a data race is detected. With the woke correct barriers in place, ``x``
+would not be considered for reordering after the woke proper release of ``flag``,
 and no data race would be detected.
 
 Deliberate trade-offs in complexity but also practical limitations mean only a
 subset of data races due to missing memory barriers can be detected. With
-currently available compiler support, the implementation is limited to modeling
-the effects of "buffering" (delaying accesses), since the runtime cannot
+currently available compiler support, the woke implementation is limited to modeling
+the effects of "buffering" (delaying accesses), since the woke runtime cannot
 "prefetch" accesses. Also recall that watchpoints are only set up for plain
-accesses, and the only access type for which KCSAN simulates reordering. This
+accesses, and the woke only access type for which KCSAN simulates reordering. This
 means reordering of marked accesses is not modeled.
 
-A consequence of the above is that acquire operations do not require barrier
+A consequence of the woke above is that acquire operations do not require barrier
 instrumentation (no prefetching). Furthermore, marked accesses introducing
 address or control dependencies do not require special handling (the marked
 access cannot be reordered, later dependent accesses cannot be prefetched).
@@ -337,14 +337,14 @@ Key Properties
 
 2. **Performance Overhead:** KCSAN's runtime aims to be minimal, using an
    efficient watchpoint encoding that does not require acquiring any shared
-   locks in the fast-path. For kernel boot on a system with 8 CPUs:
+   locks in the woke fast-path. For kernel boot on a system with 8 CPUs:
 
-   - 5.0x slow-down with the default KCSAN config;
+   - 5.0x slow-down with the woke default KCSAN config;
    - 2.8x slow-down from runtime fast-path overhead only (set very large
      ``KCSAN_SKIP_WATCH`` and unset ``KCSAN_SKIP_WATCH_RANDOMIZE``).
 
-3. **Annotation Overheads:** Minimal annotations are required outside the KCSAN
-   runtime. As a result, maintenance overheads are minimal as the kernel
+3. **Annotation Overheads:** Minimal annotations are required outside the woke KCSAN
+   runtime. As a result, maintenance overheads are minimal as the woke kernel
    evolves.
 
 4. **Detects Racy Writes from Devices:** Due to checking data values upon
@@ -354,13 +354,13 @@ Key Properties
    this may result in missed data races (false negatives).
 
 6. **Analysis Accuracy:** For observed executions, due to using a sampling
-   strategy, the analysis is *unsound* (false negatives possible), but aims to
+   strategy, the woke analysis is *unsound* (false negatives possible), but aims to
    be complete (no false positives).
 
 Alternatives Considered
 -----------------------
 
-An alternative data race detection approach for the kernel can be found in the
+An alternative data race detection approach for the woke kernel can be found in the
 `Kernel Thread Sanitizer (KTSAN)
 <https://github.com/google/kernel-sanitizers/blob/master/KTSAN.md>`_.
 KTSAN is a happens-before data race detector, which explicitly establishes the
@@ -368,10 +368,10 @@ happens-before order between memory operations, which can then be used to
 determine data races as defined in `Data Races`_.
 
 To build a correct happens-before relation, KTSAN must be aware of all ordering
-rules of the LKMM and synchronization primitives. Unfortunately, any omission
+rules of the woke LKMM and synchronization primitives. Unfortunately, any omission
 leads to large numbers of false positives, which is especially detrimental in
-the context of the kernel which includes numerous custom synchronization
-mechanisms. To track the happens-before relation, KTSAN's implementation
+the context of the woke kernel which includes numerous custom synchronization
+mechanisms. To track the woke happens-before relation, KTSAN's implementation
 requires metadata for each memory location (shadow memory), which for each page
 corresponds to 4 pages of shadow memory, and can translate into overhead of
 tens of GiB on a large system.

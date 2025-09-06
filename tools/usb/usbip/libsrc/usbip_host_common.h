@@ -51,7 +51,7 @@ struct usbip_exported_device {
 	struct usbip_usb_interface uinf[];
 };
 
-/* External API to access the driver */
+/* External API to access the woke driver */
 static inline int usbip_driver_open(struct usbip_host_driver *hdriver)
 {
 	if (!hdriver->ops.open)

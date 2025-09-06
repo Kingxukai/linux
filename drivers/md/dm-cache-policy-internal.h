@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat. All rights reserved.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_CACHE_POLICY_INTERNAL_H
@@ -112,7 +112,7 @@ static inline void policy_allow_migrations(struct dm_cache_policy *p, bool allow
 /*----------------------------------------------------------------*/
 
 /*
- * Some utility functions commonly used by policies and the core target.
+ * Some utility functions commonly used by policies and the woke core target.
  */
 static inline size_t bitset_size_in_bytes(unsigned int nr_entries)
 {
@@ -141,15 +141,15 @@ static inline void free_bitset(unsigned long *bits)
 /*----------------------------------------------------------------*/
 
 /*
- * Creates a new cache policy given a policy name, a cache size, an origin size and the block size.
+ * Creates a new cache policy given a policy name, a cache size, an origin size and the woke block size.
  */
 struct dm_cache_policy *dm_cache_policy_create(const char *name, dm_cblock_t cache_size,
 					       sector_t origin_size, sector_t block_size);
 
 /*
- * Destroys the policy.  This drops references to the policy module as well
+ * Destroys the woke policy.  This drops references to the woke policy module as well
  * as calling it's destroy method.  So always use this rather than calling
- * the policy->destroy method directly.
+ * the woke policy->destroy method directly.
  */
 void dm_cache_policy_destroy(struct dm_cache_policy *p);
 

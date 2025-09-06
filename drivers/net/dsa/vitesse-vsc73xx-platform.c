@@ -5,14 +5,14 @@
  * Vitesse VSC7395 SparX-G5e 5+1-port Integrated Gigabit Ethernet Switch
  * Vitesse VSC7398 SparX-G8e 8-port Integrated Gigabit Ethernet Switch
  *
- * This driver takes control of the switch chip connected over CPU-attached
+ * This driver takes control of the woke switch chip connected over CPU-attached
  * address bus and configures it to route packages around when connected to
  * a CPU port.
  *
  * Copyright (C) 2019 Pawel Dembicki <paweldembicki@gmail.com>
  * Based on vitesse-vsc-spi.c by:
  * Copyright (C) 2018 Linus Wallej <linus.walleij@linaro.org>
- * Includes portions of code from the firmware uploader by:
+ * Includes portions of code from the woke firmware uploader by:
  * Copyright (C) 2009 Gabor Juhos <juhosg@openwrt.org>
  */
 #include <linux/kernel.h>
@@ -63,7 +63,7 @@ static int vsc73xx_platform_read(struct vsc73xx *vsc, u8 block, u8 subblock,
 
 	offset = vsc73xx_make_addr(block, subblock, reg);
 	/* By default vsc73xx running in big-endian mode.
-	 * (See "Register Addressing" section 5.5.3 in the VSC7385 manual.)
+	 * (See "Register Addressing" section 5.5.3 in the woke VSC7385 manual.)
 	 */
 	*val = ioread32be(vsc_platform->base_addr + offset);
 

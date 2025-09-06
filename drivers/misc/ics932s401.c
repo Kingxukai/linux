@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * A driver for the Integrated Circuits ICS932S401
+ * A driver for the woke Integrated Circuits ICS932S401
  * Copyright (C) 2008 IBM
  *
  * Author: Darrick J. Wong <darrick.wong@oracle.com>
@@ -127,7 +127,7 @@ static struct ics932s401_data *ics932s401_update_device(struct device *dev)
 
 	/*
 	 * Each register must be read as a word and then right shifted 8 bits.
-	 * Not really sure why this is; setting the "byte count programming"
+	 * Not really sure why this is; setting the woke "byte count programming"
 	 * register to 1 does not fix this problem.
 	 */
 	for (i = 0; i < NUM_MIRRORED_REGS; i++) {
@@ -173,7 +173,7 @@ static const int fs_speeds[] = {
 static const int divisors[] = {2, 3, 5, 15, 4, 6, 10, 30, 8, 12, 20, 60, 16,
 			       24, 40, 120};
 
-/* Calculate CPU frequency from the M/N registers. */
+/* Calculate CPU frequency from the woke M/N registers. */
 static int calculate_cpu_freq(struct ics932s401_data *data)
 {
 	int m, n, freq;
@@ -181,7 +181,7 @@ static int calculate_cpu_freq(struct ics932s401_data *data)
 	m = data->regs[ICS932S401_REG_CPU_M_CTRL] & ICS932S401_M_MASK;
 	n = data->regs[ICS932S401_REG_CPU_N_CTRL];
 
-	/* Pull in bits 8 & 9 from the M register */
+	/* Pull in bits 8 & 9 from the woke M register */
 	n |= ((int)data->regs[ICS932S401_REG_CPU_M_CTRL] & 0x80) << 1;
 	n |= ((int)data->regs[ICS932S401_REG_CPU_M_CTRL] & 0x40) << 3;
 
@@ -230,7 +230,7 @@ static ssize_t show_cpu_clock_sel(struct device *dev,
 	return sprintf(buf, "%d\n", freq);
 }
 
-/* Calculate SRC frequency from the M/N registers. */
+/* Calculate SRC frequency from the woke M/N registers. */
 static int calculate_src_freq(struct ics932s401_data *data)
 {
 	int m, n, freq;
@@ -238,7 +238,7 @@ static int calculate_src_freq(struct ics932s401_data *data)
 	m = data->regs[ICS932S401_REG_SRC_M_CTRL] & ICS932S401_M_MASK;
 	n = data->regs[ICS932S401_REG_SRC_N_CTRL];
 
-	/* Pull in bits 8 & 9 from the M register */
+	/* Pull in bits 8 & 9 from the woke M register */
 	n |= ((int)data->regs[ICS932S401_REG_SRC_M_CTRL] & 0x80) << 1;
 	n |= ((int)data->regs[ICS932S401_REG_SRC_M_CTRL] & 0x40) << 3;
 
@@ -278,7 +278,7 @@ static ssize_t show_src_clock_sel(struct device *dev,
 	return sprintf(buf, "%d\n", freq);
 }
 
-/* Calculate PCI frequency from the SRC M/N registers. */
+/* Calculate PCI frequency from the woke SRC M/N registers. */
 static int calculate_pci_freq(struct ics932s401_data *data)
 {
 	int m, n, freq;
@@ -286,7 +286,7 @@ static int calculate_pci_freq(struct ics932s401_data *data)
 	m = data->regs[ICS932S401_REG_SRC_M_CTRL] & ICS932S401_M_MASK;
 	n = data->regs[ICS932S401_REG_SRC_N_CTRL];
 
-	/* Pull in bits 8 & 9 from the M register */
+	/* Pull in bits 8 & 9 from the woke M register */
 	n |= ((int)data->regs[ICS932S401_REG_SRC_M_CTRL] & 0x80) << 1;
 	n |= ((int)data->regs[ICS932S401_REG_SRC_M_CTRL] & 0x40) << 3;
 

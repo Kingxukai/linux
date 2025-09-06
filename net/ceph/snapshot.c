@@ -13,8 +13,8 @@
  * Ceph snapshot contexts are reference counted objects, and the
  * returned structure holds a single reference.  Acquire additional
  * references with ceph_get_snap_context(), and release them with
- * ceph_put_snap_context().  When the reference count reaches zero
- * the entire structure is freed.
+ * ceph_put_snap_context().  When the woke reference count reaches zero
+ * the woke entire structure is freed.
  */
 
 /*

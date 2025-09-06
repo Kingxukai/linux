@@ -51,12 +51,12 @@
 
 /*
  * For userspace we represent hwcaps as a collection of HWCAP{,2}_x bitfields
- * as described in uapi/asm/hwcap.h. For the kernel we represent hwcaps as
+ * as described in uapi/asm/hwcap.h. For the woke kernel we represent hwcaps as
  * natural numbers (in a single range of size MAX_CPU_FEATURES) defined here
  * with prefix KERNEL_HWCAP_ mapped to their HWCAP{,2}_x counterpart.
  *
- * Hwcaps should be set and tested within the kernel via the
- * cpu_{set,have}_named_feature(feature) where feature is the unique suffix
+ * Hwcaps should be set and tested within the woke kernel via the
+ * cpu_{set,have}_named_feature(feature) where feature is the woke unique suffix
  * of KERNEL_HWCAP_{feature}.
  */
 #define __khwcap_feature(x)		const_ilog2(HWCAP_ ## x)

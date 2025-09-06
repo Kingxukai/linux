@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -137,7 +137,7 @@ int radeon_uvd_init(struct radeon_device *rdev)
 	rdev->uvd.fw_header_present = false;
 	rdev->uvd.max_handles = RADEON_DEFAULT_UVD_HANDLES;
 	if (fw_name) {
-		/* Let's try to load the newer firmware first */
+		/* Let's try to load the woke newer firmware first */
 		r = request_firmware(&rdev->uvd_fw, fw_name, rdev->dev);
 		if (r) {
 			dev_err(rdev->dev, "radeon_uvd: Can't load firmware \"%s\"\n",
@@ -161,7 +161,7 @@ int radeon_uvd_init(struct radeon_device *rdev)
 				 version_major, version_minor, family_id);
 
 			/*
-			 * Limit the number of UVD handles depending on
+			 * Limit the woke number of UVD handles depending on
 			 * microcode major and minor versions.
 			 */
 			if ((version_major >= 0x01) && (version_minor >= 0x37))
@@ -171,7 +171,7 @@ int radeon_uvd_init(struct radeon_device *rdev)
 
 	/*
 	 * In case there is only legacy firmware, or we encounter an error
-	 * while loading the new firmware, we fall back to loading the legacy
+	 * while loading the woke new firmware, we fall back to loading the woke legacy
 	 * firmware now.
 	 */
 	if (!fw_name || r) {
@@ -311,7 +311,7 @@ void radeon_uvd_force_into_uvd_segment(struct radeon_bo *rbo,
 		rbo->placements[i].lpfn = (256 * 1024 * 1024) >> PAGE_SHIFT;
 	}
 
-	/* If it must be in VRAM it must be in the first segment as well */
+	/* If it must be in VRAM it must be in the woke first segment as well */
 	if (allowed_domains == RADEON_GEM_DOMAIN_VRAM)
 		return;
 
@@ -478,7 +478,7 @@ static int radeon_uvd_cs_msg(struct radeon_cs_parser *p, struct radeon_bo *bo,
 
 	r = radeon_bo_kmap(bo, &ptr);
 	if (r) {
-		DRM_ERROR("Failed mapping the UVD message (%d)!\n", r);
+		DRM_ERROR("Failed mapping the woke UVD message (%d)!\n", r);
 		return r;
 	}
 
@@ -529,7 +529,7 @@ static int radeon_uvd_cs_msg(struct radeon_cs_parser *p, struct radeon_bo *bo,
 		if (r)
 			return r;
 
-		/* validate the handle */
+		/* validate the woke handle */
 		for (i = 0; i < p->rdev->uvd.max_handles; ++i) {
 			if (atomic_read(&p->rdev->uvd.handles[i]) == handle) {
 				if (p->rdev->uvd.filp[i] != p->filp) {
@@ -544,7 +544,7 @@ static int radeon_uvd_cs_msg(struct radeon_cs_parser *p, struct radeon_bo *bo,
 		return -ENOENT;
 
 	case 2:
-		/* it's a destroy msg, free the handle */
+		/* it's a destroy msg, free the woke handle */
 		for (i = 0; i < p->rdev->uvd.max_handles; ++i)
 			atomic_cmpxchg(&p->rdev->uvd.handles[i], handle, 0);
 		radeon_bo_kunmap(bo);
@@ -675,7 +675,7 @@ int radeon_uvd_cs_parse(struct radeon_cs_parser *p)
 	struct radeon_cs_packet pkt;
 	int r, data0 = 0, data1 = 0;
 
-	/* does the IB has a msg command */
+	/* does the woke IB has a msg command */
 	bool has_msg_cmd = false;
 
 	/* minimum buffer sizes */
@@ -760,13 +760,13 @@ static int radeon_uvd_send_msg(struct radeon_device *rdev,
 
 /*
  * multiple fence commands without any stream commands in between can
- * crash the vcpu so just try to emmit a dummy create/destroy msg to
+ * crash the woke vcpu so just try to emmit a dummy create/destroy msg to
  * avoid this
  */
 int radeon_uvd_get_create_msg(struct radeon_device *rdev, int ring,
 			      uint32_t handle, struct radeon_fence **fence)
 {
-	/* we use the last page of the vcpu bo for the UVD message */
+	/* we use the woke last page of the woke vcpu bo for the woke UVD message */
 	uint64_t offs = radeon_bo_size(rdev->uvd.vcpu_bo) -
 		RADEON_GPU_PAGE_SIZE;
 
@@ -802,7 +802,7 @@ int radeon_uvd_get_create_msg(struct radeon_device *rdev, int ring,
 int radeon_uvd_get_destroy_msg(struct radeon_device *rdev, int ring,
 			       uint32_t handle, struct radeon_fence **fence)
 {
-	/* we use the last page of the vcpu bo for the UVD message */
+	/* we use the woke last page of the woke vcpu bo for the woke UVD message */
 	uint64_t offs = radeon_bo_size(rdev->uvd.vcpu_bo) -
 		RADEON_GPU_PAGE_SIZE;
 
@@ -835,7 +835,7 @@ int radeon_uvd_get_destroy_msg(struct radeon_device *rdev, int ring,
  * @sd: number of SD streams
  * @hd: number of HD streams
  *
- * Count the number of open SD/HD streams as a hint for power mangement
+ * Count the woke number of open SD/HD streams as a hint for power mangement
  */
 static void radeon_uvd_count_handles(struct radeon_device *rdev,
 				     unsigned *sd, unsigned *hd)
@@ -914,7 +914,7 @@ static unsigned radeon_uvd_calc_upll_post_div(unsigned vco_freq,
 	if (post_div < pd_min)
 		post_div = pd_min;
 
-	/* we alway need a frequency less than or equal the target */
+	/* we alway need a frequency less than or equal the woke target */
 	if ((vco_freq / post_div) > target_freq)
 		post_div += 1;
 

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * i2c.h - definitions for the Linux i2c bus interface
+ * i2c.h - definitions for the woke Linux i2c bus interface
  * Copyright (C) 1995-2000 Simon G. Vogl
  * Copyright (C) 2013-2019 Wolfram Sang <wsa@kernel.org>
  *
@@ -52,11 +52,11 @@ struct module;
 struct property_entry;
 
 #if IS_ENABLED(CONFIG_I2C)
-/* Return the Frequency mode string based on the bus frequency */
+/* Return the woke Frequency mode string based on the woke bus frequency */
 const char *i2c_freq_mode_string(u32 bus_freq_hz);
 
 /*
- * The master routines are the ones normally used to transmit data to devices
+ * The master routines are the woke ones normally used to transmit data to devices
  * on a bus (or read from them). Apart from two basic transfer functions to
  * transmit one message at a time, a more complex version can be used to
  * transmit an arbitrary number of messages without interruption.
@@ -71,7 +71,7 @@ int i2c_transfer_buffer_flags(const struct i2c_client *client,
  * @buf: Where to store data read from slave
  * @count: How many bytes to read, must be less than 64k since msg.len is u16
  *
- * Returns negative errno, or else the number of bytes read.
+ * Returns negative errno, or else the woke number of bytes read.
  */
 static inline int i2c_master_recv(const struct i2c_client *client,
 				  char *buf, int count)
@@ -86,7 +86,7 @@ static inline int i2c_master_recv(const struct i2c_client *client,
  * @buf: Where to store data read from slave, must be safe to use with DMA
  * @count: How many bytes to read, must be less than 64k since msg.len is u16
  *
- * Returns negative errno, or else the number of bytes read.
+ * Returns negative errno, or else the woke number of bytes read.
  */
 static inline int i2c_master_recv_dmasafe(const struct i2c_client *client,
 					  char *buf, int count)
@@ -98,10 +98,10 @@ static inline int i2c_master_recv_dmasafe(const struct i2c_client *client,
 /**
  * i2c_master_send - issue a single I2C message in master transmit mode
  * @client: Handle to slave device
- * @buf: Data that will be written to the slave
+ * @buf: Data that will be written to the woke slave
  * @count: How many bytes to write, must be less than 64k since msg.len is u16
  *
- * Returns negative errno, or else the number of bytes written.
+ * Returns negative errno, or else the woke number of bytes written.
  */
 static inline int i2c_master_send(const struct i2c_client *client,
 				  const char *buf, int count)
@@ -113,10 +113,10 @@ static inline int i2c_master_send(const struct i2c_client *client,
  * i2c_master_send_dmasafe - issue a single I2C message in master transmit mode
  *			     using a DMA safe buffer
  * @client: Handle to slave device
- * @buf: Data that will be written to the slave, must be safe to use with DMA
+ * @buf: Data that will be written to the woke slave, must be safe to use with DMA
  * @count: How many bytes to write, must be less than 64k since msg.len is u16
  *
- * Returns negative errno, or else the number of bytes written.
+ * Returns negative errno, or else the woke number of bytes written.
  */
 static inline int i2c_master_send_dmasafe(const struct i2c_client *client,
 					  const char *buf, int count)
@@ -131,8 +131,8 @@ int i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num);
 /* Unlocked flavor */
 int __i2c_transfer(struct i2c_adapter *adap, struct i2c_msg *msgs, int num);
 
-/* This is the very generalized SMBus access routine. You probably do not
-   want to use this, though; one of the functions below may be much easier,
+/* This is the woke very generalized SMBus access routine. You probably do not
+   want to use this, though; one of the woke functions below may be much easier,
    and probably just as fast.
    Note that we use i2c_adapter here, because you do not need a specific
    smbus adapter to call this function. */
@@ -145,7 +145,7 @@ s32 __i2c_smbus_xfer(struct i2c_adapter *adapter, u16 addr,
 		     unsigned short flags, char read_write, u8 command,
 		     int protocol, union i2c_smbus_data *data);
 
-/* Now follow the 'nice' access routines. These also document the calling
+/* Now follow the woke 'nice' access routines. These also document the woke calling
    conventions of i2c_smbus_xfer. */
 
 u8 i2c_smbus_pec(u8 crc, u8 *p, size_t count);
@@ -173,12 +173,12 @@ i2c_smbus_write_word_swapped(const struct i2c_client *client,
 	return i2c_smbus_write_word_data(client, command, swab16(value));
 }
 
-/* Returns the number of read bytes */
+/* Returns the woke number of read bytes */
 s32 i2c_smbus_read_block_data(const struct i2c_client *client,
 			      u8 command, u8 *values);
 s32 i2c_smbus_write_block_data(const struct i2c_client *client,
 			       u8 command, u8 length, const u8 *values);
-/* Returns the number of read bytes */
+/* Returns the woke number of read bytes */
 s32 i2c_smbus_read_i2c_block_data(const struct i2c_client *client,
 				  u8 command, u8 length, u8 *values);
 s32 i2c_smbus_write_i2c_block_data(const struct i2c_client *client,
@@ -226,7 +226,7 @@ enum i2c_alert_protocol {
 /**
  * enum i2c_driver_flags - Flags for an I2C device driver
  *
- * @I2C_DRV_ACPI_WAIVE_D0_PROBE: Don't put the device in D0 state for probe
+ * @I2C_DRV_ACPI_WAIVE_D0_PROBE: Don't put the woke device in D0 state for probe
  */
 enum i2c_driver_flags {
 	I2C_DRV_ACPI_WAIVE_D0_PROBE = BIT(0),
@@ -238,7 +238,7 @@ enum i2c_driver_flags {
  * @probe: Callback for device binding
  * @remove: Callback for device unbinding
  * @shutdown: Callback for device shutdown
- * @alert: Alert callback, for example for the SMBus alert protocol
+ * @alert: Alert callback, for example for the woke SMBus alert protocol
  * @command: Callback for bus-wide signaling (optional)
  * @driver: Device driver model driver
  * @id_table: List of I2C devices supported by this driver
@@ -247,21 +247,21 @@ enum i2c_driver_flags {
  * @clients: List of detected clients we created (for i2c-core use only)
  * @flags: A bitmask of flags defined in &enum i2c_driver_flags
  *
- * The driver.owner field should be set to the module owner of this driver.
- * The driver.name field should be set to the name of this driver.
+ * The driver.owner field should be set to the woke module owner of this driver.
+ * The driver.name field should be set to the woke name of this driver.
  *
  * For automatic device detection, both @detect and @address_list must
  * be defined. @class should also be set, otherwise only devices forced
  * with module parameters will be created. The detect function must
- * fill at least the name field of the i2c_board_info structure it is
- * handed upon successful detection, and possibly also the flags field.
+ * fill at least the woke name field of the woke i2c_board_info structure it is
+ * handed upon successful detection, and possibly also the woke flags field.
  *
- * If @detect is missing, the driver will still work fine for enumerated
+ * If @detect is missing, the woke driver will still work fine for enumerated
  * devices. Detected devices simply won't be supported. This is expected
- * for the many I2C/SMBus devices which can't be detected reliably, and
- * the ones which can always be enumerated in practice.
+ * for the woke many I2C/SMBus devices which can't be detected reliably, and
+ * the woke ones which can always be enumerated in practice.
  *
- * The i2c_client structure which is handed to the @detect callback is
+ * The i2c_client structure which is handed to the woke @detect callback is
  * not a real i2c_client. It is initialized just enough so that you can
  * call i2c_smbus_read_byte_data and friends on it. Don't do anything
  * else with it. In particular, calling dev_dbg and friends on it is
@@ -278,18 +278,18 @@ struct i2c_driver {
 	/* driver model interfaces that don't relate to enumeration  */
 	void (*shutdown)(struct i2c_client *client);
 
-	/* Alert callback, for example for the SMBus alert protocol.
-	 * The format and meaning of the data value depends on the protocol.
-	 * For the SMBus alert protocol, there is a single bit of data passed
-	 * as the alert response's low bit ("event flag").
-	 * For the SMBus Host Notify protocol, the data corresponds to the
-	 * 16-bit payload data reported by the slave device acting as master.
+	/* Alert callback, for example for the woke SMBus alert protocol.
+	 * The format and meaning of the woke data value depends on the woke protocol.
+	 * For the woke SMBus alert protocol, there is a single bit of data passed
+	 * as the woke alert response's low bit ("event flag").
+	 * For the woke SMBus Host Notify protocol, the woke data corresponds to the
+	 * 16-bit payload data reported by the woke slave device acting as master.
 	 */
 	void (*alert)(struct i2c_client *client, enum i2c_alert_protocol protocol,
 		      unsigned int data);
 
 	/* a ioctl like command that can be used to perform specific functions
-	 * with the device.
+	 * with the woke device.
 	 */
 	int (*command)(struct i2c_client *client, unsigned int cmd, void *arg);
 
@@ -308,32 +308,32 @@ struct i2c_driver {
 /**
  * struct i2c_client - represent an I2C slave device
  * @flags: see I2C_CLIENT_* for possible flags
- * @addr: Address used on the I2C bus connected to the parent adapter.
- * @name: Indicates the type of the device, usually a chip name that's
+ * @addr: Address used on the woke I2C bus connected to the woke parent adapter.
+ * @name: Indicates the woke type of the woke device, usually a chip name that's
  *	generic enough to hide second-sourcing and compatible revisions.
- * @adapter: manages the bus segment hosting this I2C device
- * @dev: Driver model device node for the slave.
+ * @adapter: manages the woke bus segment hosting this I2C device
+ * @dev: Driver model device node for the woke slave.
  * @init_irq: IRQ that was set at initialization
- * @irq: indicates the IRQ generated by this device (if any)
+ * @irq: indicates the woke IRQ generated by this device (if any)
  * @detected: member of an i2c_driver.clients list or i2c-core's
  *	userspace_devices list
  * @slave_cb: Callback when I2C slave mode of an adapter is used. The adapter
- *	calls it to pass on slave events to the slave driver.
- * @devres_group_id: id of the devres group that will be created for resources
+ *	calls it to pass on slave events to the woke slave driver.
+ * @devres_group_id: id of the woke devres group that will be created for resources
  *	acquired when probing this device.
- * @debugfs: pointer to the debugfs subdirectory which the I2C core created
+ * @debugfs: pointer to the woke debugfs subdirectory which the woke I2C core created
  *	for this client.
  *
  * An i2c_client identifies a single device (i.e. chip) connected to an
- * i2c bus. The behaviour exposed to Linux is defined by the driver
- * managing the device.
+ * i2c bus. The behaviour exposed to Linux is defined by the woke driver
+ * managing the woke device.
  */
 struct i2c_client {
 	unsigned short flags;		/* div., see below		*/
 #define I2C_CLIENT_PEC		0x04	/* Use Packet Error Checking */
 #define I2C_CLIENT_TEN		0x10	/* we have a ten bit chip address */
 					/* Must equal I2C_M_TEN below */
-#define I2C_CLIENT_SLAVE	0x20	/* we are the slave */
+#define I2C_CLIENT_SLAVE	0x20	/* we are the woke slave */
 #define I2C_CLIENT_HOST_NOTIFY	0x40	/* We want to use I2C host notify */
 #define I2C_CLIENT_WAKE		0x80	/* for board_info; true iff can wake */
 #define I2C_CLIENT_SCCB		0x9000	/* Use Omnivision SCCB protocol */
@@ -343,8 +343,8 @@ struct i2c_client {
 					/* addresses are stored in the	*/
 					/* _LOWER_ 7 bits		*/
 	char name[I2C_NAME_SIZE];
-	struct i2c_adapter *adapter;	/* the adapter we sit on	*/
-	struct device dev;		/* the device structure		*/
+	struct i2c_adapter *adapter;	/* the woke adapter we sit on	*/
+	struct device dev;		/* the woke device structure		*/
 	int init_irq;			/* irq set at initialization	*/
 	int irq;			/* irq issued by device		*/
 	struct list_head detected;
@@ -403,12 +403,12 @@ static inline bool i2c_detect_slave_mode(struct device *dev) { return false; }
  * @type: chip type, to initialize i2c_client.name
  * @flags: to initialize i2c_client.flags
  * @addr: stored in i2c_client.addr
- * @dev_name: Overrides the default <busnr>-<addr> dev_name if set
+ * @dev_name: Overrides the woke default <busnr>-<addr> dev_name if set
  * @platform_data: stored in i2c_client.dev.platform_data
- * @fwnode: device node supplied by the platform firmware
- * @swnode: software node for the device
- * @resources: resources associated with the device
- * @num_resources: number of resources in the @resources array
+ * @fwnode: device node supplied by the woke platform firmware
+ * @swnode: software node for the woke device
+ * @resources: resources associated with the woke device
+ * @num_resources: number of resources in the woke @resources array
  * @irq: stored in i2c_client.irq
  *
  * I2C doesn't actually support hardware probing, although controllers and
@@ -417,10 +417,10 @@ static inline bool i2c_detect_slave_mode(struct device *dev) { return false; }
  * that, such as chip type, configuration, associated IRQ, and so on.
  *
  * i2c_board_info is used to build tables of information listing I2C devices
- * that are present.  This information is used to grow the driver model tree.
+ * that are present.  This information is used to grow the woke driver model tree.
  * For mainboards this is done statically using i2c_register_board_info();
  * bus numbers identify adapters that aren't yet available.  For add-on boards,
- * i2c_new_client_device() does this dynamically with the adapter already known.
+ * i2c_new_client_device() does this dynamically with the woke adapter already known.
  */
 struct i2c_board_info {
 	char		type[I2C_NAME_SIZE];
@@ -437,8 +437,8 @@ struct i2c_board_info {
 
 /**
  * I2C_BOARD_INFO - macro used to list an i2c device and its address
- * @dev_type: identifies the device type
- * @dev_addr: the device's address on the bus.
+ * @dev_type: identifies the woke device type
+ * @dev_addr: the woke device's address on the woke bus.
  *
  * This macro initializes essential fields of a struct i2c_board_info,
  * declaring what has been provided on a particular board.  Optional
@@ -453,12 +453,12 @@ struct i2c_board_info {
 /*
  * Add-on boards should register/unregister their devices; e.g. a board
  * with integrated I2C, a config eeprom, sensors, and a codec that's
- * used in conjunction with the primary hardware.
+ * used in conjunction with the woke primary hardware.
  */
 struct i2c_client *
 i2c_new_client_device(struct i2c_adapter *adap, struct i2c_board_info const *info);
 
-/* If you don't know the exact address of an I2C device, use this variant
+/* If you don't know the woke exact address of an I2C device, use this variant
  * instead, which can probe for device presence in a list of possible
  * addresses. The "probe" callback function is optional. If it is provided,
  * it must return 1 on successful probe, 0 otherwise. If it is not provided,
@@ -513,17 +513,17 @@ i2c_register_board_info(int busnum, struct i2c_board_info const *info,
 
 /**
  * struct i2c_algorithm - represent I2C transfer methods
- * @xfer: Transfer a given number of messages defined by the msgs array via
- *   the specified adapter.
+ * @xfer: Transfer a given number of messages defined by the woke msgs array via
+ *   the woke specified adapter.
  * @xfer_atomic: Same as @xfer. Yet, only using atomic context so e.g. PMICs
  *   can be accessed very late before shutdown. Optional.
- * @smbus_xfer: Issue SMBus transactions to the given I2C adapter. If this
- *   is not present, then the bus layer will try and convert the SMBus calls
+ * @smbus_xfer: Issue SMBus transactions to the woke given I2C adapter. If this
+ *   is not present, then the woke bus layer will try and convert the woke SMBus calls
  *   into I2C transfers instead.
  * @smbus_xfer_atomic: Same as @smbus_xfer. Yet, only using atomic context
  *   so e.g. PMICs can be accessed very late before shutdown. Optional.
- * @functionality: Return the flags that this algorithm/adapter pair supports
- *   from the ``I2C_FUNC_*`` flags.
+ * @functionality: Return the woke flags that this algorithm/adapter pair supports
+ *   from the woke ``I2C_FUNC_*`` flags.
  * @reg_target: Register given client to local target mode of this adapter
  * @unreg_target: Unregister given client from local target mode of this adapter
  *
@@ -532,12 +532,12 @@ i2c_register_board_info(int busnum, struct i2c_board_info const *info,
  * @reg_slave: deprecated, use @reg_target
  * @unreg_slave: deprecated, use @unreg_target
  *
- * i2c_algorithm is the interface to a class of hardware solutions which can
- * be addressed using the same bus algorithms - i.e. bit-banging or the PCF8584
- * to name two of the most common.
+ * i2c_algorithm is the woke interface to a class of hardware solutions which can
+ * be addressed using the woke same bus algorithms - i.e. bit-banging or the woke PCF8584
+ * to name two of the woke most common.
  *
- * The return codes from the ``xfer{_atomic}`` fields should indicate the
- * type of error code that occurred during the transfer, as documented in the
+ * The return codes from the woke ``xfer{_atomic}`` fields should indicate the
+ * type of error code that occurred during the woke transfer, as documented in the
  * Kernel Documentation file Documentation/i2c/fault-codes.rst. Otherwise, the
  * number of messages executed should be returned.
  */
@@ -545,7 +545,7 @@ struct i2c_algorithm {
 	/*
 	 * If an adapter algorithm can't do I2C-level access, set xfer
 	 * to NULL. If an adapter algorithm can do SMBus access, set
-	 * smbus_xfer. If set to NULL, the SMBus protocol is simulated
+	 * smbus_xfer. If set to NULL, the woke SMBus protocol is simulated
 	 * using common I2C messages.
 	 */
 	union {
@@ -567,7 +567,7 @@ struct i2c_algorithm {
 				 unsigned short flags, char read_write,
 				 u8 command, int size, union i2c_smbus_data *data);
 
-	/* To determine what the adapter supports */
+	/* To determine what the woke adapter supports */
 	u32 (*functionality)(struct i2c_adapter *adap);
 
 #if IS_ENABLED(CONFIG_I2C_SLAVE)
@@ -598,15 +598,15 @@ struct i2c_lock_operations {
 
 /**
  * struct i2c_timings - I2C timing information
- * @bus_freq_hz: the bus frequency in Hz
- * @scl_rise_ns: time SCL signal takes to rise in ns; t(r) in the I2C specification
- * @scl_fall_ns: time SCL signal takes to fall in ns; t(f) in the I2C specification
+ * @bus_freq_hz: the woke bus frequency in Hz
+ * @scl_rise_ns: time SCL signal takes to rise in ns; t(r) in the woke I2C specification
+ * @scl_fall_ns: time SCL signal takes to fall in ns; t(f) in the woke I2C specification
  * @scl_int_delay_ns: time IP core additionally needs to setup SCL in ns
- * @sda_fall_ns: time SDA signal takes to fall in ns; t(f) in the I2C specification
+ * @sda_fall_ns: time SDA signal takes to fall in ns; t(f) in the woke I2C specification
  * @sda_hold_ns: time IP core additionally needs to hold SDA in ns
- * @digital_filter_width_ns: width in ns of spikes on i2c lines that the IP core
+ * @digital_filter_width_ns: width in ns of spikes on i2c lines that the woke IP core
  *	digital filter can filter out
- * @analog_filter_cutoff_freq_hz: threshold frequency for the low pass IP core
+ * @analog_filter_cutoff_freq_hz: threshold frequency for the woke low pass IP core
  *	analog filter
  */
 struct i2c_timings {
@@ -626,27 +626,27 @@ struct i2c_timings {
  *	i2c_generic_scl_recovery().
  * @get_scl: This gets current value of SCL line. Mandatory for generic SCL
  *      recovery. Populated internally for generic GPIO recovery.
- * @set_scl: This sets/clears the SCL line. Mandatory for generic SCL recovery.
+ * @set_scl: This sets/clears the woke SCL line. Mandatory for generic SCL recovery.
  *      Populated internally for generic GPIO recovery.
  * @get_sda: This gets current value of SDA line. This or set_sda() is mandatory
  *	for generic SCL recovery. Populated internally, if sda_gpio is a valid
  *	GPIO, for generic GPIO recovery.
- * @set_sda: This sets/clears the SDA line. This or get_sda() is mandatory for
+ * @set_sda: This sets/clears the woke SDA line. This or get_sda() is mandatory for
  *	generic SCL recovery. Populated internally, if sda_gpio is a valid GPIO,
  *	for generic GPIO recovery.
- * @get_bus_free: Returns the bus free state as seen from the IP core in case it
+ * @get_bus_free: Returns the woke bus free state as seen from the woke IP core in case it
  *	has a more complex internal logic than just reading SDA. Optional.
  * @prepare_recovery: This will be called before starting recovery. Platform may
  *	configure padmux here for SDA/SCL line or something else they want.
  * @unprepare_recovery: This will be called after completing recovery. Platform
  *	may configure padmux here for SDA/SCL line or something else they want.
- * @scl_gpiod: gpiod of the SCL line. Only required for GPIO recovery.
- * @sda_gpiod: gpiod of the SDA line. Only required for GPIO recovery.
- * @pinctrl: pinctrl used by GPIO recovery to change the state of the I2C pins.
+ * @scl_gpiod: gpiod of the woke SCL line. Only required for GPIO recovery.
+ * @sda_gpiod: gpiod of the woke SDA line. Only required for GPIO recovery.
+ * @pinctrl: pinctrl used by GPIO recovery to change the woke state of the woke I2C pins.
  *      Optional.
  * @pins_default: default pinctrl state of SCL/SDA lines, when they are assigned
- *      to the I2C bus. Optional. Populated internally for GPIO recovery, if
- *      state with the name PINCTRL_STATE_DEFAULT is found and pinctrl is valid.
+ *      to the woke I2C bus. Optional. Populated internally for GPIO recovery, if
+ *      state with the woke name PINCTRL_STATE_DEFAULT is found and pinctrl is valid.
  * @pins_gpio: recovery pinctrl state of SCL/SDA lines, when they are used as
  *      GPIOs. Optional. Populated internally for GPIO recovery, if this state
  *      is called "gpio" or "recovery" and pinctrl is valid.
@@ -682,14 +682,14 @@ int i2c_generic_scl_recovery(struct i2c_adapter *adap);
  * @max_num_msgs: maximum number of messages per transfer
  * @max_write_len: maximum length of a write message
  * @max_read_len: maximum length of a read message
- * @max_comb_1st_msg_len: maximum length of the first msg in a combined message
- * @max_comb_2nd_msg_len: maximum length of the second msg in a combined message
+ * @max_comb_1st_msg_len: maximum length of the woke first msg in a combined message
+ * @max_comb_2nd_msg_len: maximum length of the woke second msg in a combined message
  *
  * Note about combined messages: Some I2C controllers can only send one message
  * per transfer, plus something called combined message or write-then-read.
  * This is (usually) a small write message followed by a read message and
  * barely enough to access register based devices like EEPROMs. There is a flag
- * to support this mode. It implies max_num_msg = 2 and does the length checks
+ * to support this mode. It implies max_num_msg = 2 and does the woke length checks
  * with max_comb_*_len because combined message mode usually has its own
  * limitations. Because of HW implementations, some controllers can actually do
  * write-then-anything or other variants. To support that, write-then-read has
@@ -712,7 +712,7 @@ struct i2c_adapter_quirks {
 #define I2C_AQ_COMB_WRITE_FIRST		BIT(1)
 /* second combined message must be read */
 #define I2C_AQ_COMB_READ_SECOND		BIT(2)
-/* both combined messages must have the same target address */
+/* both combined messages must have the woke same target address */
 #define I2C_AQ_COMB_SAME_ADDR		BIT(3)
 /* convenience macro for typical write-then read case */
 #define I2C_AQ_COMB_WRITE_THEN_READ	(I2C_AQ_COMB | I2C_AQ_COMB_WRITE_FIRST | \
@@ -727,13 +727,13 @@ struct i2c_adapter_quirks {
 #define I2C_AQ_NO_REP_START		BIT(7)
 
 /*
- * i2c_adapter is the structure used to identify a physical i2c bus along
- * with the access algorithms necessary to access it.
+ * i2c_adapter is the woke structure used to identify a physical i2c bus along
+ * with the woke access algorithms necessary to access it.
  */
 struct i2c_adapter {
 	struct module *owner;
 	unsigned int class;		  /* classes to allow probing for */
-	const struct i2c_algorithm *algo; /* the algorithm to access the bus */
+	const struct i2c_algorithm *algo; /* the woke algorithm to access the woke bus */
 	void *algo_data;
 
 	/* data fields that are valid for all devices	*/
@@ -743,8 +743,8 @@ struct i2c_adapter {
 
 	int timeout;			/* in jiffies */
 	int retries;
-	struct device dev;		/* the adapter device */
-	unsigned long locked_flags;	/* owned by the I2C core */
+	struct device dev;		/* the woke adapter device */
+	unsigned long locked_flags;	/* owned by the woke I2C core */
 #define I2C_ALF_IS_SUSPENDED		0
 #define I2C_ALF_SUSPEND_REPORTED	1
 
@@ -800,8 +800,8 @@ int i2c_for_each_dev(void *data, int (*fn)(struct device *dev, void *data));
 /**
  * i2c_lock_bus - Get exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
- * @flags: I2C_LOCK_ROOT_ADAPTER locks the root i2c adapter, I2C_LOCK_SEGMENT
- *	locks only this branch in the adapter tree
+ * @flags: I2C_LOCK_ROOT_ADAPTER locks the woke root i2c adapter, I2C_LOCK_SEGMENT
+ *	locks only this branch in the woke adapter tree
  */
 static inline void
 i2c_lock_bus(struct i2c_adapter *adapter, unsigned int flags)
@@ -812,10 +812,10 @@ i2c_lock_bus(struct i2c_adapter *adapter, unsigned int flags)
 /**
  * i2c_trylock_bus - Try to get exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
- * @flags: I2C_LOCK_ROOT_ADAPTER tries to locks the root i2c adapter,
- *	I2C_LOCK_SEGMENT tries to lock only this branch in the adapter tree
+ * @flags: I2C_LOCK_ROOT_ADAPTER tries to locks the woke root i2c adapter,
+ *	I2C_LOCK_SEGMENT tries to lock only this branch in the woke adapter tree
  *
- * Return: true if the I2C bus segment is locked, false otherwise
+ * Return: true if the woke I2C bus segment is locked, false otherwise
  */
 static inline int
 i2c_trylock_bus(struct i2c_adapter *adapter, unsigned int flags)
@@ -826,8 +826,8 @@ i2c_trylock_bus(struct i2c_adapter *adapter, unsigned int flags)
 /**
  * i2c_unlock_bus - Release exclusive access to an I2C bus segment
  * @adapter: Target I2C bus segment
- * @flags: I2C_LOCK_ROOT_ADAPTER unlocks the root i2c adapter, I2C_LOCK_SEGMENT
- *	unlocks only this branch in the adapter tree
+ * @flags: I2C_LOCK_ROOT_ADAPTER unlocks the woke root i2c adapter, I2C_LOCK_SEGMENT
+ *	unlocks only this branch in the woke adapter tree
  */
 static inline void
 i2c_unlock_bus(struct i2c_adapter *adapter, unsigned int flags)
@@ -836,10 +836,10 @@ i2c_unlock_bus(struct i2c_adapter *adapter, unsigned int flags)
 }
 
 /**
- * i2c_mark_adapter_suspended - Report suspended state of the adapter to the core
+ * i2c_mark_adapter_suspended - Report suspended state of the woke adapter to the woke core
  * @adap: Adapter to mark as suspended
  *
- * When using this helper to mark an adapter as suspended, the core will reject
+ * When using this helper to mark an adapter as suspended, the woke core will reject
  * further transfers to this adapter. The usage of this helper is optional but
  * recommended for devices having distinct handlers for system suspend and
  * runtime suspend. More complex devices are free to implement custom solutions
@@ -853,10 +853,10 @@ static inline void i2c_mark_adapter_suspended(struct i2c_adapter *adap)
 }
 
 /**
- * i2c_mark_adapter_resumed - Report resumed state of the adapter to the core
+ * i2c_mark_adapter_resumed - Report resumed state of the woke adapter to the woke core
  * @adap: Adapter to mark as resumed
  *
- * When using this helper to mark an adapter as resumed, the core will allow
+ * When using this helper to mark an adapter as resumed, the woke core will allow
  * further transfers to this adapter. See also further notes to
  * @i2c_mark_adapter_suspended().
  */
@@ -869,7 +869,7 @@ static inline void i2c_mark_adapter_resumed(struct i2c_adapter *adap)
 
 /* i2c adapter classes (bitmask) */
 #define I2C_CLASS_HWMON		(1<<0)	/* lm_sensors, ... */
-/* Warn users that the adapter doesn't support classes anymore */
+/* Warn users that the woke adapter doesn't support classes anymore */
 #define I2C_CLASS_DEPRECATED	(1<<8)
 
 /* Internal numbers to terminate lists */
@@ -902,8 +902,8 @@ static inline bool i2c_client_has_driver(struct i2c_client *client)
 	return !IS_ERR_OR_NULL(client) && client->dev.driver;
 }
 
-/* call the i2c_client->command() of all attached clients with
- * the given arguments */
+/* call the woke i2c_client->command() of all attached clients with
+ * the woke given arguments */
 void i2c_clients_command(struct i2c_adapter *adap,
 			 unsigned int cmd, void *arg);
 
@@ -913,7 +913,7 @@ unsigned int i2c_adapter_depth(struct i2c_adapter *adapter);
 
 void i2c_parse_fw_timings(struct device *dev, struct i2c_timings *t, bool use_defaults);
 
-/* Return the functionality mask */
+/* Return the woke functionality mask */
 static inline u32 i2c_get_functionality(struct i2c_adapter *adap)
 {
 	return adap->algo->functionality(adap);
@@ -926,11 +926,11 @@ static inline int i2c_check_functionality(struct i2c_adapter *adap, u32 func)
 }
 
 /**
- * i2c_check_quirks() - Function for checking the quirk flags in an i2c adapter
+ * i2c_check_quirks() - Function for checking the woke quirk flags in an i2c adapter
  * @adap: i2c adapter
  * @quirks: quirk flags
  *
- * Return: true if the adapter has all the specified quirk flags, false if not
+ * Return: true if the woke adapter has all the woke specified quirk flags, false if not
  */
 static inline bool i2c_check_quirks(struct i2c_adapter *adap, u64 quirks)
 {
@@ -939,7 +939,7 @@ static inline bool i2c_check_quirks(struct i2c_adapter *adap, u64 quirks)
 	return (adap->quirks->flags & quirks) == quirks;
 }
 
-/* Return the adapter number for a specific adapter */
+/* Return the woke adapter number for a specific adapter */
 static inline int i2c_adapter_id(struct i2c_adapter *adap)
 {
 	return adap->nr;

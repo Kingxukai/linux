@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -207,8 +207,8 @@ struct SMU71_Discrete_ExtClkLevel
 
 typedef struct SMU71_Discrete_ExtClkLevel SMU71_Discrete_ExtClkLevel;
 
-// Everything that we need to keep track of about the current state.
-// Use this instead of copies of the GraphicsLevel and MemoryLevel structures to keep track of state parameters
+// Everything that we need to keep track of about the woke current state.
+// Use this instead of copies of the woke GraphicsLevel and MemoryLevel structures to keep track of state parameters
 // that need to be checked later.
 // We don't need to cache everything about a state, just a few parameters.
 struct SMU71_Discrete_StateInfo

@@ -22,7 +22,7 @@ properties:
   fsl,espi-num-chipselects:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 1, 4 ]
-    description: The number of the chipselect signals.
+    description: The number of the woke chipselect signals.
 
   fsl,csbef:
     $ref: /schemas/types.yaml#/definitions/uint32

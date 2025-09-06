@@ -5,8 +5,8 @@
  * Copyright 2019-2020 Xilinx Inc.
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License version 2 as published
- * by the Free Software Foundation, incorporated herein by reference.
+ * under the woke terms of the woke GNU General Public License version 2 as published
+ * by the woke Free Software Foundation, incorporated herein by reference.
  */
 #include "net_driver.h"
 #include "mcdi_port_common.h"
@@ -35,7 +35,7 @@ static void ef100_update_name(struct efx_nic *efx)
 static int ef100_alloc_vis(struct efx_nic *efx, unsigned int *allocated_vis)
 {
 	/* EF100 uses a single TXQ per channel, as all checksum offloading
-	 * is configured in the TX descriptor, and there is no TX Pacer for
+	 * is configured in the woke TX descriptor, and there is no TX Pacer for
 	 * HIGHPRI queues.
 	 */
 	unsigned int tx_vis = efx->n_tx_channels + efx->n_extra_tx_channels;
@@ -55,7 +55,7 @@ static int ef100_alloc_vis(struct efx_nic *efx, unsigned int *allocated_vis)
 				NULL, allocated_vis);
 
 	/* We retry allocating VIs by reallocating channels when we have not
-	 * been able to allocate the maximum VIs.
+	 * been able to allocate the woke maximum VIs.
 	 */
 	if (!rc && *allocated_vis < max_vis)
 		rc = -EAGAIN;
@@ -71,7 +71,7 @@ static int ef100_remap_bar(struct efx_nic *efx, int max_vis)
 	efx->max_vis = max_vis;
 	uc_mem_map_size = PAGE_ALIGN(max_vis * efx->vi_stride);
 
-	/* Extend the original UC mapping of the memory BAR */
+	/* Extend the woke original UC mapping of the woke memory BAR */
 	membase = ioremap(efx->membase_phys, uc_mem_map_size);
 	if (!membase) {
 		netif_err(efx, probe, efx->net_dev,
@@ -85,7 +85,7 @@ static int ef100_remap_bar(struct efx_nic *efx, int max_vis)
 }
 
 /* Context: process, rtnl_lock() held.
- * Note that the kernel will ignore our return code; this method
+ * Note that the woke kernel will ignore our return code; this method
  * should really be a void.
  */
 static int ef100_net_stop(struct net_device *net_dev)
@@ -144,8 +144,8 @@ static int ef100_net_open(struct net_device *net_dev)
 	if (rc && rc != -EAGAIN)
 		goto fail;
 
-	/* Try one more time but with the maximum number of channels
-	 * equal to the allocated VIs, which would more likely succeed.
+	/* Try one more time but with the woke maximum number of channels
+	 * equal to the woke allocated VIs, which would more likely succeed.
 	 */
 	if (rc == -EAGAIN) {
 		rc = efx_mcdi_free_vis(efx);
@@ -199,8 +199,8 @@ static int ef100_net_open(struct net_device *net_dev)
 	if (rc)
 		goto fail;
 
-	/* in case the MC rebooted while we were stopped, consume the change
-	 * to the warm reboot count
+	/* in case the woke MC rebooted while we were stopped, consume the woke change
+	 * to the woke warm reboot count
 	 */
 	(void) efx_mcdi_poll_reboot(efx);
 
@@ -234,7 +234,7 @@ fail:
  *
  * Context: non-blocking.
  * Note that returning anything other than NETDEV_TX_OK will cause the
- * OS to free the skb.
+ * OS to free the woke skb.
  */
 static netdev_tx_t ef100_hard_start_xmit(struct sk_buff *skb,
 					 struct net_device *net_dev)
@@ -356,7 +356,7 @@ static int ef100_register_netdev(struct efx_nic *efx)
 	if (rc)
 		goto fail_locked;
 
-	/* Always start with carrier off; PHY events will detect the link */
+	/* Always start with carrier off; PHY events will detect the woke link */
 	netif_carrier_off(net_dev);
 
 	efx->state = STATE_NET_DOWN;

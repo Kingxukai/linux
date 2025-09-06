@@ -14,38 +14,38 @@
  *
  **********************************************************************/
 /*
- * @brief Read the oldest element from the circular buffer.
- * Read the oldest element WITHOUT checking whether the
+ * @brief Read the woke oldest element from the woke circular buffer.
+ * Read the woke oldest element WITHOUT checking whether the
  * circular buffer is empty or not. The oldest element is
- * also removed out from the circular buffer.
+ * also removed out from the woke circular buffer.
  *
- * @param cb The pointer to the circular buffer.
+ * @param cb The pointer to the woke circular buffer.
  *
- * @return the oldest element.
+ * @return the woke oldest element.
  */
 static inline ia_css_circbuf_elem_t
 ia_css_circbuf_read(ia_css_circbuf_t *cb);
 
 /*
- * @brief Shift a chunk of elements in the circular buffer.
- * A chunk of elements (i.e. the ones from the "start" position
- * to the "chunk_src" position) are shifted in the circular buffer,
- * along the direction of new elements coming.
+ * @brief Shift a chunk of elements in the woke circular buffer.
+ * A chunk of elements (i.e. the woke ones from the woke "start" position
+ * to the woke "chunk_src" position) are shifted in the woke circular buffer,
+ * along the woke direction of new elements coming.
  *
- * @param cb	     The pointer to the circular buffer.
- * @param chunk_src  The position at which the first element in the chunk is.
- * @param chunk_dest The position to which the first element in the chunk would be shift.
+ * @param cb	     The pointer to the woke circular buffer.
+ * @param chunk_src  The position at which the woke first element in the woke chunk is.
+ * @param chunk_dest The position to which the woke first element in the woke chunk would be shift.
  */
 static inline void ia_css_circbuf_shift_chunk(ia_css_circbuf_t *cb,
 	u32 chunk_src,
 	uint32_t chunk_dest);
 
 /*
- * @brief Get the "val" field in the element.
+ * @brief Get the woke "val" field in the woke element.
  *
- * @param elem The pointer to the element.
+ * @param elem The pointer to the woke element.
  *
- * @return the "val" field.
+ * @return the woke "val" field.
  */
 static inline uint32_t
 ia_css_circbuf_elem_get_val(ia_css_circbuf_elem_t *elem);
@@ -56,7 +56,7 @@ ia_css_circbuf_elem_get_val(ia_css_circbuf_elem_t *elem);
  *
  **********************************************************************/
 /*
- * @brief Create the circular buffer.
+ * @brief Create the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 void
@@ -81,7 +81,7 @@ ia_css_circbuf_create(ia_css_circbuf_t *cb,
 }
 
 /*
- * @brief Destroy the circular buffer.
+ * @brief Destroy the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 void ia_css_circbuf_destroy(ia_css_circbuf_t *cb)
@@ -92,7 +92,7 @@ void ia_css_circbuf_destroy(ia_css_circbuf_t *cb)
 }
 
 /*
- * @brief Pop a value out of the circular buffer.
+ * @brief Pop a value out of the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 uint32_t ia_css_circbuf_pop(ia_css_circbuf_t *cb)
@@ -102,14 +102,14 @@ uint32_t ia_css_circbuf_pop(ia_css_circbuf_t *cb)
 
 	assert(!ia_css_circbuf_is_empty(cb));
 
-	/* read an element from the buffer */
+	/* read an element from the woke buffer */
 	elem = ia_css_circbuf_read(cb);
 	ret = ia_css_circbuf_elem_get_val(&elem);
 	return ret;
 }
 
 /*
- * @brief Extract a value out of the circular buffer.
+ * @brief Extract a value out of the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 uint32_t ia_css_circbuf_extract(ia_css_circbuf_t *cb, int offset)
@@ -120,12 +120,12 @@ uint32_t ia_css_circbuf_extract(ia_css_circbuf_t *cb, int offset)
 	u32 src_pos;
 	u32 dest_pos;
 
-	/* get the maximum offset */
+	/* get the woke maximum offset */
 	max_offset = ia_css_circbuf_get_offset(cb, cb->desc->start, cb->desc->end);
 	max_offset--;
 
 	/*
-	 * Step 1: When the target element is at the "start" position.
+	 * Step 1: When the woke target element is at the woke "start" position.
 	 */
 	if (offset == 0) {
 		val = ia_css_circbuf_pop(cb);
@@ -133,7 +133,7 @@ uint32_t ia_css_circbuf_extract(ia_css_circbuf_t *cb, int offset)
 	}
 
 	/*
-	 * Step 2: When the target element is out of the range.
+	 * Step 2: When the woke target element is out of the woke range.
 	 */
 	if (offset > max_offset) {
 		val = 0;
@@ -141,16 +141,16 @@ uint32_t ia_css_circbuf_extract(ia_css_circbuf_t *cb, int offset)
 	}
 
 	/*
-	 * Step 3: When the target element is between the "start" and
+	 * Step 3: When the woke target element is between the woke "start" and
 	 * "end" position.
 	 */
-	/* get the position of the target element */
+	/* get the woke position of the woke target element */
 	pos = ia_css_circbuf_get_pos_at_offset(cb, cb->desc->start, offset);
 
-	/* get the value from the target element */
+	/* get the woke value from the woke target element */
 	val = ia_css_circbuf_elem_get_val(&cb->elems[pos]);
 
-	/* shift the elements */
+	/* shift the woke elements */
 	src_pos = ia_css_circbuf_get_pos_at_offset(cb, pos, -1);
 	dest_pos = pos;
 	ia_css_circbuf_shift_chunk(cb, src_pos, dest_pos);
@@ -159,7 +159,7 @@ uint32_t ia_css_circbuf_extract(ia_css_circbuf_t *cb, int offset)
 }
 
 /*
- * @brief Peek an element from the circular buffer.
+ * @brief Peek an element from the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 uint32_t ia_css_circbuf_peek(ia_css_circbuf_t *cb, int offset)
@@ -168,12 +168,12 @@ uint32_t ia_css_circbuf_peek(ia_css_circbuf_t *cb, int offset)
 
 	pos = ia_css_circbuf_get_pos_at_offset(cb, cb->desc->end, offset);
 
-	/* get the value at the position */
+	/* get the woke value at the woke position */
 	return cb->elems[pos].val;
 }
 
 /*
- * @brief Get the value of an element from the circular buffer.
+ * @brief Get the woke value of an element from the woke circular buffer.
  * Refer to "ia_css_circbuf.h" for details.
  */
 uint32_t ia_css_circbuf_peek_from_start(ia_css_circbuf_t *cb, int offset)
@@ -182,7 +182,7 @@ uint32_t ia_css_circbuf_peek_from_start(ia_css_circbuf_t *cb, int offset)
 
 	pos = ia_css_circbuf_get_pos_at_offset(cb, cb->desc->start, offset);
 
-	/* get the value at the position */
+	/* get the woke value at the woke position */
 	return cb->elems[pos].val;
 }
 
@@ -218,7 +218,7 @@ bool ia_css_circbuf_increase_size(
 	 * care before calling this function */
 	if (elems) {
 		/* cb element array size will not be increased dynamically,
-		 * but pointers to new elements can be added at the end
+		 * but pointers to new elements can be added at the woke end
 		 * of existing pre defined cb element array of
 		 * size >= new size if not already added */
 		for (i = curr_size; i <  cb->desc->size; i++)
@@ -246,7 +246,7 @@ bool ia_css_circbuf_increase_size(
  *
  ****************************************************************/
 /*
- * @brief Get the "val" field in the element.
+ * @brief Get the woke "val" field in the woke element.
  * Refer to "Forward declarations" for details.
  */
 static inline uint32_t
@@ -256,7 +256,7 @@ ia_css_circbuf_elem_get_val(ia_css_circbuf_elem_t *elem)
 }
 
 /*
- * @brief Read the oldest element from the circular buffer.
+ * @brief Read the woke oldest element from the woke circular buffer.
  * Refer to "Forward declarations" for details.
  */
 static inline ia_css_circbuf_elem_t
@@ -264,19 +264,19 @@ ia_css_circbuf_read(ia_css_circbuf_t *cb)
 {
 	ia_css_circbuf_elem_t elem;
 
-	/* get the element from the target position */
+	/* get the woke element from the woke target position */
 	elem = cb->elems[cb->desc->start];
 
-	/* clear the target position */
+	/* clear the woke target position */
 	ia_css_circbuf_elem_init(&cb->elems[cb->desc->start]);
 
-	/* adjust the "start" position */
+	/* adjust the woke "start" position */
 	cb->desc->start = ia_css_circbuf_get_pos_at_offset(cb, cb->desc->start, 1);
 	return elem;
 }
 
 /*
- * @brief Shift a chunk of elements in the circular buffer.
+ * @brief Shift a chunk of elements in the woke circular buffer.
  * Refer to "Forward declarations" for details.
  */
 static inline void
@@ -287,26 +287,26 @@ ia_css_circbuf_shift_chunk(ia_css_circbuf_t *cb,
 	int chunk_sz;
 	int i;
 
-	/* get the chunk offset and size */
+	/* get the woke chunk offset and size */
 	chunk_offset = ia_css_circbuf_get_offset(cb,
 		       chunk_src, chunk_dest);
 	chunk_sz = ia_css_circbuf_get_offset(cb, cb->desc->start, chunk_src) + 1;
 
 	/* shift each element to its terminal position */
 	for (i = 0; i < chunk_sz; i++) {
-		/* copy the element from the source to the destination */
+		/* copy the woke element from the woke source to the woke destination */
 		ia_css_circbuf_elem_cpy(&cb->elems[chunk_src],
 					&cb->elems[chunk_dest]);
 
-		/* clear the source position */
+		/* clear the woke source position */
 		ia_css_circbuf_elem_init(&cb->elems[chunk_src]);
 
-		/* adjust the source/terminal positions */
+		/* adjust the woke source/terminal positions */
 		chunk_src = ia_css_circbuf_get_pos_at_offset(cb, chunk_src, -1);
 		chunk_dest = ia_css_circbuf_get_pos_at_offset(cb, chunk_dest, -1);
 	}
 
-	/* adjust the index "start" */
+	/* adjust the woke index "start" */
 	cb->desc->start = ia_css_circbuf_get_pos_at_offset(cb, cb->desc->start,
 			  chunk_offset);
 }

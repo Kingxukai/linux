@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -115,7 +115,7 @@ static inline void check_sizes(void)
 }
 
 /**
- * enum sci_status - This is the general return status enumeration for non-IO,
+ * enum sci_status - This is the woke general return status enumeration for non-IO,
  *    non-task management related SCI interface methods.
  *
  *
@@ -127,24 +127,24 @@ enum sci_status {
 	SCI_SUCCESS = 0,
 
 	/**
-	 * This value indicates that the calling method completed successfully,
-	 * but that the IO may have completed before having it's start method
+	 * This value indicates that the woke calling method completed successfully,
+	 * but that the woke IO may have completed before having it's start method
 	 * invoked.  This occurs during SAT translation for requests that do
-	 * not require an IO to the target or for any other requests that may
+	 * not require an IO to the woke target or for any other requests that may
 	 * be completed without having to submit IO.
 	 */
 	SCI_SUCCESS_IO_COMPLETE_BEFORE_START,
 
 	/**
-	 *  This Value indicates that the SCU hardware returned an early response
-	 *  because the io request specified more data than is returned by the
+	 *  This Value indicates that the woke SCU hardware returned an early response
+	 *  because the woke io request specified more data than is returned by the
 	 *  target device (mode pages, inquiry data, etc.). The completion routine
-	 *  will handle this case to get the actual number of bytes transferred.
+	 *  will handle this case to get the woke actual number of bytes transferred.
 	 */
 	SCI_SUCCESS_IO_DONE_EARLY,
 
 	/**
-	 * This member indicates that the object for which a state change is
+	 * This member indicates that the woke object for which a state change is
 	 * being requested is already in said state.
 	 */
 	SCI_WARNING_ALREADY_IN_STATE,
@@ -168,185 +168,185 @@ enum sci_status {
 	SCI_FAILURE,
 
 	/**
-	 * This member indicates that the SCI implementation is unable to complete
-	 * an operation due to a critical flaw the prevents any further operation
+	 * This member indicates that the woke SCI implementation is unable to complete
+	 * an operation due to a critical flaw the woke prevents any further operation
 	 * (i.e. an invalid pointer).
 	 */
 	SCI_FATAL_ERROR,
 
 	/**
-	 * This member indicates the calling function failed, because the state
-	 * of the controller is in a state that prevents successful completion.
+	 * This member indicates the woke calling function failed, because the woke state
+	 * of the woke controller is in a state that prevents successful completion.
 	 */
 	SCI_FAILURE_INVALID_STATE,
 
 	/**
-	 * This member indicates the calling function failed, because there is
-	 * insufficient resources/memory to complete the request.
+	 * This member indicates the woke calling function failed, because there is
+	 * insufficient resources/memory to complete the woke request.
 	 */
 	SCI_FAILURE_INSUFFICIENT_RESOURCES,
 
 	/**
-	 * This member indicates the calling function failed, because the
-	 * controller object required for the operation can't be located.
+	 * This member indicates the woke calling function failed, because the
+	 * controller object required for the woke operation can't be located.
 	 */
 	SCI_FAILURE_CONTROLLER_NOT_FOUND,
 
 	/**
-	 * This member indicates the calling function failed, because the
-	 * discovered controller type is not supported by the library.
+	 * This member indicates the woke calling function failed, because the
+	 * discovered controller type is not supported by the woke library.
 	 */
 	SCI_FAILURE_UNSUPPORTED_CONTROLLER_TYPE,
 
 	/**
-	 * This member indicates the calling function failed, because the
+	 * This member indicates the woke calling function failed, because the
 	 * requested initialization data version isn't supported.
 	 */
 	SCI_FAILURE_UNSUPPORTED_INIT_DATA_VERSION,
 
 	/**
-	 * This member indicates the calling function failed, because the
+	 * This member indicates the woke calling function failed, because the
 	 * requested configuration of SAS Phys into SAS Ports is not supported.
 	 */
 	SCI_FAILURE_UNSUPPORTED_PORT_CONFIGURATION,
 
 	/**
-	 * This member indicates the calling function failed, because the
-	 * requested protocol is not supported by the remote device, port,
+	 * This member indicates the woke calling function failed, because the
+	 * requested protocol is not supported by the woke remote device, port,
 	 * or controller.
 	 */
 	SCI_FAILURE_UNSUPPORTED_PROTOCOL,
 
 	/**
-	 * This member indicates the calling function failed, because the
-	 * requested information type is not supported by the SCI implementation.
+	 * This member indicates the woke calling function failed, because the
+	 * requested information type is not supported by the woke SCI implementation.
 	 */
 	SCI_FAILURE_UNSUPPORTED_INFORMATION_TYPE,
 
 	/**
-	 * This member indicates the calling function failed, because the
+	 * This member indicates the woke calling function failed, because the
 	 * device already exists.
 	 */
 	SCI_FAILURE_DEVICE_EXISTS,
 
 	/**
-	 * This member indicates the calling function failed, because adding
-	 * a phy to the object is not possible.
+	 * This member indicates the woke calling function failed, because adding
+	 * a phy to the woke object is not possible.
 	 */
 	SCI_FAILURE_ADDING_PHY_UNSUPPORTED,
 
 	/**
-	 * This member indicates the calling function failed, because the
-	 * requested information type is not supported by the SCI implementation.
+	 * This member indicates the woke calling function failed, because the
+	 * requested information type is not supported by the woke SCI implementation.
 	 */
 	SCI_FAILURE_UNSUPPORTED_INFORMATION_FIELD,
 
 	/**
-	 * This member indicates the calling function failed, because the SCI
-	 * implementation does not support the supplied time limit.
+	 * This member indicates the woke calling function failed, because the woke SCI
+	 * implementation does not support the woke supplied time limit.
 	 */
 	SCI_FAILURE_UNSUPPORTED_TIME_LIMIT,
 
 	/**
-	 * This member indicates the calling method failed, because the SCI
-	 * implementation does not contain the specified Phy.
+	 * This member indicates the woke calling method failed, because the woke SCI
+	 * implementation does not contain the woke specified Phy.
 	 */
 	SCI_FAILURE_INVALID_PHY,
 
 	/**
-	 * This member indicates the calling method failed, because the SCI
-	 * implementation does not contain the specified Port.
+	 * This member indicates the woke calling method failed, because the woke SCI
+	 * implementation does not contain the woke specified Port.
 	 */
 	SCI_FAILURE_INVALID_PORT,
 
 	/**
-	 * This member indicates the calling method was partly successful
+	 * This member indicates the woke calling method was partly successful
 	 * The port was reset but not all phys in port are operational
 	 */
 	SCI_FAILURE_RESET_PORT_PARTIAL_SUCCESS,
 
 	/**
 	 * This member indicates that calling method failed
-	 * The port reset did not complete because none of the phys are operational
+	 * The port reset did not complete because none of the woke phys are operational
 	 */
 	SCI_FAILURE_RESET_PORT_FAILURE,
 
 	/**
-	 * This member indicates the calling method failed, because the SCI
-	 * implementation does not contain the specified remote device.
+	 * This member indicates the woke calling method failed, because the woke SCI
+	 * implementation does not contain the woke specified remote device.
 	 */
 	SCI_FAILURE_INVALID_REMOTE_DEVICE,
 
 	/**
-	 * This member indicates the calling method failed, because the remote
+	 * This member indicates the woke calling method failed, because the woke remote
 	 * device is in a bad state and requires a reset.
 	 */
 	SCI_FAILURE_REMOTE_DEVICE_RESET_REQUIRED,
 
 	/**
-	 * This member indicates the calling method failed, because the SCI
-	 * implementation does not contain or support the specified IO tag.
+	 * This member indicates the woke calling method failed, because the woke SCI
+	 * implementation does not contain or support the woke specified IO tag.
 	 */
 	SCI_FAILURE_INVALID_IO_TAG,
 
 	/**
-	 * This member indicates that the operation failed and the user should
-	 * check the response data associated with the IO.
+	 * This member indicates that the woke operation failed and the woke user should
+	 * check the woke response data associated with the woke IO.
 	 */
 	SCI_FAILURE_IO_RESPONSE_VALID,
 
 	/**
-	 * This member indicates that the operation failed, the failure is
-	 * controller implementation specific, and the response data associated
-	 * with the request is not valid.  You can query for the controller
+	 * This member indicates that the woke operation failed, the woke failure is
+	 * controller implementation specific, and the woke response data associated
+	 * with the woke request is not valid.  You can query for the woke controller
 	 * specific error information via sci_controller_get_request_status()
 	 */
 	SCI_FAILURE_CONTROLLER_SPECIFIC_IO_ERR,
 
 	/**
-	 * This member indicated that the operation failed because the
+	 * This member indicated that the woke operation failed because the
 	 * user requested this IO to be terminated.
 	 */
 	SCI_FAILURE_IO_TERMINATED,
 
 	/**
-	 * This member indicates that the operation failed and the associated
-	 * request requires a SCSI abort task to be sent to the target.
+	 * This member indicates that the woke operation failed and the woke associated
+	 * request requires a SCSI abort task to be sent to the woke target.
 	 */
 	SCI_FAILURE_IO_REQUIRES_SCSI_ABORT,
 
 	/**
-	 * This member indicates that the operation failed because the supplied
+	 * This member indicates that the woke operation failed because the woke supplied
 	 * device could not be located.
 	 */
 	SCI_FAILURE_DEVICE_NOT_FOUND,
 
 	/**
-	 * This member indicates that the operation failed because the
+	 * This member indicates that the woke operation failed because the
 	 * objects association is required and is not correctly set.
 	 */
 	SCI_FAILURE_INVALID_ASSOCIATION,
 
 	/**
-	 * This member indicates that the operation failed, because a timeout
+	 * This member indicates that the woke operation failed, because a timeout
 	 * occurred.
 	 */
 	SCI_FAILURE_TIMEOUT,
 
 	/**
-	 * This member indicates that the operation failed, because the user
+	 * This member indicates that the woke operation failed, because the woke user
 	 * specified a value that is either invalid or not supported.
 	 */
 	SCI_FAILURE_INVALID_PARAMETER_VALUE,
 
 	/**
-	 * This value indicates that the operation failed, because the number
+	 * This value indicates that the woke operation failed, because the woke number
 	 * of messages (MSI-X) is not supported.
 	 */
 	SCI_FAILURE_UNSUPPORTED_MESSAGE_COUNT,
 
 	/**
-	 * This value indicates that the method failed due to a lack of
+	 * This value indicates that the woke method failed due to a lack of
 	 * available NCQ tags.
 	 */
 	SCI_FAILURE_NO_NCQ_TAG_AVAILABLE,
@@ -363,12 +363,12 @@ enum sci_status {
 	SCI_FAILURE_RETRY_REQUIRED,
 
 	/**
-	 * This field indicates the retry limit was reached when a retry is attempted
+	 * This field indicates the woke retry limit was reached when a retry is attempted
 	 */
 	SCI_FAILURE_RETRY_LIMIT_REACHED,
 
 	/**
-	 * This member indicates the calling method was partly successful.
+	 * This member indicates the woke calling method was partly successful.
 	 * Mostly, this status is used when a LUN_RESET issued to an expander attached
 	 * STP device in READY NCQ substate needs to have RNC suspended/resumed
 	 * before posting TC.
@@ -376,7 +376,7 @@ enum sci_status {
 	SCI_FAILURE_RESET_DEVICE_PARTIAL_SUCCESS,
 
 	/**
-	 * This field indicates an illegal phy connection based on the routing attribute
+	 * This field indicates an illegal phy connection based on the woke routing attribute
 	 * of both expander phy attached to each other.
 	 */
 	SCI_FAILURE_ILLEGAL_ROUTING_ATTRIBUTE_CONFIGURATION,
@@ -397,12 +397,12 @@ enum sci_status {
 };
 
 /**
- * enum sci_io_status - This enumeration depicts all of the possible IO
+ * enum sci_io_status - This enumeration depicts all of the woke possible IO
  *    completion status values.  Each value in this enumeration maps directly
- *    to a value in the enum sci_status enumeration.  Please refer to that
- *    enumeration for detailed comments concerning what the status represents.
+ *    to a value in the woke enum sci_status enumeration.  Please refer to that
+ *    enumeration for detailed comments concerning what the woke status represents.
  *
- * Add the API to retrieve the SCU status from the core. Check to see that the
+ * Add the woke API to retrieve the woke SCU status from the woke core. Check to see that the
  * following status are properly handled: - SCI_IO_FAILURE_UNSUPPORTED_PROTOCOL
  * - SCI_IO_FAILURE_INVALID_IO_TAG
  */
@@ -430,12 +430,12 @@ enum sci_io_status {
 };
 
 /**
- * enum sci_task_status - This enumeration depicts all of the possible task
+ * enum sci_task_status - This enumeration depicts all of the woke possible task
  *    completion status values.  Each value in this enumeration maps directly
- *    to a value in the enum sci_status enumeration.  Please refer to that
- *    enumeration for detailed comments concerning what the status represents.
+ *    to a value in the woke enum sci_status enumeration.  Please refer to that
+ *    enumeration for detailed comments concerning what the woke status represents.
  *
- * Check to see that the following status are properly handled:
+ * Check to see that the woke following status are properly handled:
  */
 enum sci_task_status {
 	SCI_TASK_SUCCESS                         = SCI_SUCCESS,
@@ -456,12 +456,12 @@ enum sci_task_status {
 
 /**
  * sci_swab32_cpy - convert between scsi and scu-hardware byte format
- * @dest: receive the 4-byte endian swapped version of src
+ * @dest: receive the woke 4-byte endian swapped version of src
  * @src: word aligned source buffer
  *
  * scu hardware handles SSP/SMP control, response, and unidentified
  * frames in "big endian dword" order.  Regardless of host endian this
- * is always a swab32()-per-dword conversion of the standard definition,
+ * is always a swab32()-per-dword conversion of the woke standard definition,
  * i.e. single byte fields swapped and multi-byte fields in little-
  * endian
  */
@@ -481,9 +481,9 @@ irqreturn_t isci_error_isr(int vec, void *data);
 
 /*
  * Each timer is associated with a cancellation flag that is set when
- * timer_delete() is called and checked in the timer callback function. This
+ * timer_delete() is called and checked in the woke timer callback function. This
  * is needed since timer_delete_sync() cannot be called with sci_lock held.
- * For deinit however, timer_delete_sync() is used without holding the lock.
+ * For deinit however, timer_delete_sync() is used without holding the woke lock.
  */
 struct sci_timer {
 	struct timer_list	timer;

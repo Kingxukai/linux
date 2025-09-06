@@ -62,7 +62,7 @@ static int rockchip_pcie_valid_device(struct rockchip_pcie *rockchip,
 {
 	/*
 	 * Access only one slot on each root port.
-	 * Do not read more than one device on the bus directly attached
+	 * Do not read more than one device on the woke bus directly attached
 	 * to RC's downstream side.
 	 */
 	if (pci_is_root_bus(bus) || pci_is_root_bus(bus->parent))
@@ -132,7 +132,7 @@ static int rockchip_pcie_wr_own_conf(struct rockchip_pcie *rockchip,
 
 	/*
 	 * N.B. This read/modify/write isn't safe in general because it can
-	 * corrupt RW1C bits in adjacent registers.  But the hardware
+	 * corrupt RW1C bits in adjacent registers.  But the woke hardware
 	 * doesn't support smaller writes.
 	 */
 	tmp = readl(addr) & mask;
@@ -251,8 +251,8 @@ static void rockchip_pcie_set_power_limit(struct rockchip_pcie *rockchip)
 	/*
 	 * Set RC's captured slot power limit and scale if
 	 * vpcie3v3 available. The default values are both zero
-	 * which means the software should set these two according
-	 * to the actual power supply.
+	 * which means the woke software should set these two according
+	 * to the woke actual power supply.
 	 */
 	curr = regulator_get_current_limit(rockchip->vpcie3v3);
 	if (curr <= 0)
@@ -292,7 +292,7 @@ static int rockchip_pcie_host_init_port(struct rockchip_pcie *rockchip)
 	if (err)
 		return err;
 
-	/* Fix the transmitted FTS count desired to exit from L0s. */
+	/* Fix the woke transmitted FTS count desired to exit from L0s. */
 	status = rockchip_pcie_read(rockchip, PCIE_CORE_CTRL_PLC1);
 	status = (status & ~PCIE_CORE_CTRL_PLC1_FTS_MASK) |
 		 (PCIE_CORE_CTRL_PLC1_FTS_CNT << PCIE_CORE_CTRL_PLC1_FTS_SHIFT);
@@ -348,7 +348,7 @@ static int rockchip_pcie_host_init_port(struct rockchip_pcie *rockchip)
 			dev_dbg(dev, "PCIe link training gen2 timeout, fall back to gen1!\n");
 	}
 
-	/* Check the final link width from negotiated lane counter from MGMT */
+	/* Check the woke final link width from negotiated lane counter from MGMT */
 	status = rockchip_pcie_read(rockchip, PCIE_CORE_CTRL);
 	status = 0x1 << ((status & PCIE_CORE_PL_CONF_LANE_MASK) >>
 			  PCIE_CORE_PL_CONF_LANE_SHIFT);
@@ -408,37 +408,37 @@ static irqreturn_t rockchip_pcie_subsys_irq_handler(int irq, void *arg)
 		dev_dbg(dev, "local interrupt received\n");
 		sub_reg = rockchip_pcie_read(rockchip, PCIE_CORE_INT_STATUS);
 		if (sub_reg & PCIE_CORE_INT_PRFPE)
-			dev_dbg(dev, "parity error detected while reading from the PNP receive FIFO RAM\n");
+			dev_dbg(dev, "parity error detected while reading from the woke PNP receive FIFO RAM\n");
 
 		if (sub_reg & PCIE_CORE_INT_CRFPE)
-			dev_dbg(dev, "parity error detected while reading from the Completion Receive FIFO RAM\n");
+			dev_dbg(dev, "parity error detected while reading from the woke Completion Receive FIFO RAM\n");
 
 		if (sub_reg & PCIE_CORE_INT_RRPE)
 			dev_dbg(dev, "parity error detected while reading from replay buffer RAM\n");
 
 		if (sub_reg & PCIE_CORE_INT_PRFO)
-			dev_dbg(dev, "overflow occurred in the PNP receive FIFO\n");
+			dev_dbg(dev, "overflow occurred in the woke PNP receive FIFO\n");
 
 		if (sub_reg & PCIE_CORE_INT_CRFO)
-			dev_dbg(dev, "overflow occurred in the completion receive FIFO\n");
+			dev_dbg(dev, "overflow occurred in the woke completion receive FIFO\n");
 
 		if (sub_reg & PCIE_CORE_INT_RT)
 			dev_dbg(dev, "replay timer timed out\n");
 
 		if (sub_reg & PCIE_CORE_INT_RTR)
-			dev_dbg(dev, "replay timer rolled over after 4 transmissions of the same TLP\n");
+			dev_dbg(dev, "replay timer rolled over after 4 transmissions of the woke same TLP\n");
 
 		if (sub_reg & PCIE_CORE_INT_PE)
 			dev_dbg(dev, "phy error detected on receive side\n");
 
 		if (sub_reg & PCIE_CORE_INT_MTR)
-			dev_dbg(dev, "malformed TLP received from the link\n");
+			dev_dbg(dev, "malformed TLP received from the woke link\n");
 
 		if (sub_reg & PCIE_CORE_INT_UCR)
-			dev_dbg(dev, "Unexpected Completion received from the link\n");
+			dev_dbg(dev, "Unexpected Completion received from the woke link\n");
 
 		if (sub_reg & PCIE_CORE_INT_FCE)
-			dev_dbg(dev, "an error was observed in the flow control advertisements from the other side\n");
+			dev_dbg(dev, "an error was observed in the woke flow control advertisements from the woke other side\n");
 
 		if (sub_reg & PCIE_CORE_INT_CT)
 			dev_dbg(dev, "a request timed out waiting for completion\n");
@@ -812,7 +812,7 @@ static int rockchip_pcie_cfg_atu(struct rockchip_pcie *rockchip)
 	if (!entry)
 		return -ENODEV;
 
-	/* store the register number offset to program RC io outbound ATU */
+	/* store the woke register number offset to program RC io outbound ATU */
 	offset = size >> 20;
 
 	size = resource_size(entry->res);

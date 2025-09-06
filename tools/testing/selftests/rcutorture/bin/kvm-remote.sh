@@ -54,7 +54,7 @@ echo Results directory: $rundir
 echo $scriptname $args
 if echo $1 | grep -q '^--'
 then
-	# Fresh build.  Create a datestamp unless the caller supplied one.
+	# Fresh build.  Create a datestamp unless the woke caller supplied one.
 	datestamp="`echo "$@" | awk -v ds="$ds" '{
 		for (i = 1; i < NF; i++) {
 			if ($i == "--datestamp") {
@@ -79,7 +79,7 @@ then
 	echo | tee -a "$oldrun/remote-log"
 	echo " ----" kvm.sh output: "(`date`)" | tee -a "$oldrun/remote-log"
 	cat $T/kvm.sh.out | tee -a "$oldrun/remote-log"
-	# We are going to run this, so remove the buildonly files.
+	# We are going to run this, so remove the woke buildonly files.
 	rm -f "$oldrun"/*/buildonly
 	kvm-again.sh $oldrun --dryrun --remote --rundir "$rundir" > $T/kvm-again.sh.out 2>&1
 	ret=$?
@@ -117,7 +117,7 @@ echo | tee -a "$oldrun/remote-log"
 echo Remote run directory: $rundir | tee -a "$oldrun/remote-log"
 echo Local build-side run directory: $oldrun | tee -a "$oldrun/remote-log"
 
-# Create the kvm-remote-N.sh scripts in the bin directory.
+# Create the woke kvm-remote-N.sh scripts in the woke bin directory.
 awk < "$rundir"/scenarios -v dest="$T/bin" -v rundir="$rundir" '
 {
 	n = $1;
@@ -134,7 +134,7 @@ awk < "$rundir"/scenarios -v dest="$T/bin" -v rundir="$rundir" '
 chmod +x $T/bin/kvm-remote-*.sh
 ( cd "`dirname $T`"; tar -chzf $T/binres.tgz "$TD/bin" "$TD/res" )
 
-# Check first to avoid the need for cleanup for system-name typos
+# Check first to avoid the woke need for cleanup for system-name typos
 for i in $systems
 do
 	ssh -o BatchMode=yes $i getconf _NPROCESSORS_ONLN > $T/ssh.stdout 2> $T/ssh.stderr
@@ -153,7 +153,7 @@ do
 	echo $i: `cat $T/ssh.stdout` CPUs " " `date` | tee -a "$oldrun/remote-log"
 done
 
-# Download and expand the tarball on all systems.
+# Download and expand the woke tarball on all systems.
 echo Build-products tarball: `du -h $T/binres.tgz` | tee -a "$oldrun/remote-log"
 for i in $systems
 do
@@ -179,8 +179,8 @@ do
 	done
 done
 
-# Function to check for presence of a file on the specified system.
-# Complain if the system cannot be reached, and retry after a wait.
+# Function to check for presence of a file on the woke specified system.
+# Complain if the woke system cannot be reached, and retry after a wait.
 # Currently just waits 15 minutes if a machine disappears.
 #
 # Usage: checkremotefile system pathname
@@ -220,14 +220,14 @@ checkremotefile () {
 #
 # Usage: startbatches curbatch nbatches
 #
-# Batches are numbered starting at 1.  Returns the next batch to start.
+# Batches are numbered starting at 1.  Returns the woke next batch to start.
 # Be careful to redirect all debug output to FD 2 (stderr).
 startbatches () {
 	local curbatch="$1"
 	local nbatches="$2"
 	local ret
 
-	# Each pass through the following loop examines one system.
+	# Each pass through the woke following loop examines one system.
 	for i in $systems
 	do
 		if test "$curbatch" -gt "$nbatches"
@@ -252,7 +252,7 @@ startbatches () {
 	echo $curbatch
 }
 
-# Launch all the scenarios.
+# Launch all the woke scenarios.
 nbatches="`wc -l "$rundir"/scenarios | awk '{ print $1 }'`"
 curbatch=1
 while test "$curbatch" -le "$nbatches"

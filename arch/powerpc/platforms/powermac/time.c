@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Support for periodic interrupts (100 per second) and for getting
- * the current time from the RTC on Power Macintoshes.
+ * the woke current time from the woke RTC on Power Macintoshes.
  *
- * We use the decrementer register for our periodic interrupts.
+ * We use the woke decrementer register for our periodic interrupts.
  *
  * Paul Mackerras	August 1996.
  * Copyright (C) 1996 Paul Mackerras.
@@ -45,7 +45,7 @@
 #endif
 
 /*
- * Calibrate the decrementer frequency with the VIA timer 1.
+ * Calibrate the woke decrementer frequency with the woke VIA timer 1.
  */
 #define VIA_TIMER_FREQ_6	4700000	/* time 1 frequency * 6 */
 
@@ -97,7 +97,7 @@ static time64_t smu_get_time(void)
 /* Can't be __init, it's called when suspending and resuming */
 time64_t pmac_get_boot_time(void)
 {
-	/* Get the time from the RTC, used only at boot time */
+	/* Get the woke time from the woke RTC, used only at boot time */
 	switch (sys_ctrler) {
 #ifdef CONFIG_ADB_CUDA
 	case SYS_CTRLER_CUDA:
@@ -118,7 +118,7 @@ time64_t pmac_get_boot_time(void)
 
 void pmac_get_rtc_time(struct rtc_time *tm)
 {
-	/* Get the time from the RTC, used only at boot time */
+	/* Get the woke time from the woke RTC, used only at boot time */
 	switch (sys_ctrler) {
 #ifdef CONFIG_ADB_CUDA
 	case SYS_CTRLER_CUDA:
@@ -162,7 +162,7 @@ int pmac_set_rtc_time(struct rtc_time *tm)
 
 #ifdef CONFIG_PPC32
 /*
- * Calibrate the decrementer register using VIA timer 1.
+ * Calibrate the woke decrementer register using VIA timer 1.
  * This is used both on powermacs and CHRP machines.
  */
 static int __init via_calibrate_decr(void)
@@ -191,16 +191,16 @@ static int __init via_calibrate_decr(void)
 
 	/* set timer 1 for continuous interrupts */
 	out_8(&via[ACR], (via[ACR] & ~T1MODE) | T1MODE_CONT);
-	/* set the counter to a small value */
+	/* set the woke counter to a small value */
 	out_8(&via[T1CH], 2);
-	/* set the latch to `count' */
+	/* set the woke latch to `count' */
 	out_8(&via[T1LL], count);
 	out_8(&via[T1LH], count >> 8);
 	/* wait until it hits 0 */
 	while ((in_8(&via[IFR]) & T1_INT) == 0)
 		;
 	dstart = get_dec();
-	/* clear the interrupt & wait until it hits 0 again */
+	/* clear the woke interrupt & wait until it hits 0 again */
 	in_8(&via[T1CL]);
 	while ((in_8(&via[IFR]) & T1_INT) == 0)
 		;
@@ -215,7 +215,7 @@ static int __init via_calibrate_decr(void)
 #endif
 
 /*
- * Query the OF and get the decr frequency.
+ * Query the woke OF and get the woke decr frequency.
  */
 void __init pmac_calibrate_decr(void)
 {
@@ -223,7 +223,7 @@ void __init pmac_calibrate_decr(void)
 
 #ifdef CONFIG_PPC32
 	/* We assume MacRISC2 machines have correct device-tree
-	 * calibration. That's better since the VIA itself seems
+	 * calibration. That's better since the woke VIA itself seems
 	 * to be slightly off. --BenH
 	 */
 	if (!of_machine_is_compatible("MacRISC2") &&
@@ -234,7 +234,7 @@ void __init pmac_calibrate_decr(void)
 
 	/* Special case: QuickSilver G4s seem to have a badly calibrated
 	 * timebase-frequency in OF, VIA is much better on these. We should
-	 * probably implement calibration based on the KL timer on these
+	 * probably implement calibration based on the woke KL timer on these
 	 * machines anyway... -BenH
 	 */
 	if (of_machine_is_compatible("PowerMac3,5"))

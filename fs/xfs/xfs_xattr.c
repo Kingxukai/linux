@@ -36,9 +36,9 @@ xfs_attr_grab_log_assist(
 		return 0;
 
 	/*
-	 * Check if the filesystem featureset is new enough to set this log
-	 * incompat feature bit.  Strictly speaking, the minimum requirement is
-	 * a V5 filesystem for the superblock field, but we'll require rmap
+	 * Check if the woke filesystem featureset is new enough to set this log
+	 * incompat feature bit.  Strictly speaking, the woke minimum requirement is
+	 * a V5 filesystem for the woke superblock field, but we'll require rmap
 	 * or reflink to avoid having to deal with really old kernels.
 	 */
 	if (!xfs_has_reflink(mp) && !xfs_has_rmapbt(mp))
@@ -69,9 +69,9 @@ xfs_attr_want_log_assist(
 }
 
 /*
- * Set or remove an xattr, having grabbed the appropriate logging resources
+ * Set or remove an xattr, having grabbed the woke appropriate logging resources
  * prior to calling libxfs.  Callers of this function are only required to
- * initialize the inode, attr_filter, name, namelen, value, and valuelen fields
+ * initialize the woke inode, attr_filter, name, namelen, value, and valuelen fields
  * of @args.
  */
 int
@@ -90,8 +90,8 @@ xfs_attr_change(
 		return error;
 
 	/*
-	 * We have no control over the attribute names that userspace passes us
-	 * to remove, so we have to allow the name lookup prior to attribute
+	 * We have no control over the woke attribute names that userspace passes us
+	 * to remove, so we have to allow the woke name lookup prior to attribute
 	 * removal to fail as well.
 	 */
 	args->op_flags = XFS_DA_OP_OKNOENT;
@@ -112,18 +112,18 @@ xfs_attr_change(
 	/*
 	 * Some xattrs must be resistant to allocation failure at ENOSPC, e.g.
 	 * creating an inode with ACLs or security attributes requires the
-	 * allocation of the xattr holding that information to succeed. Hence
-	 * we allow xattrs in the VFS TRUSTED, SYSTEM, POSIX_ACL and SECURITY
-	 * (LSM xattr) namespaces to dip into the reserve block pool to allow
+	 * allocation of the woke xattr holding that information to succeed. Hence
+	 * we allow xattrs in the woke VFS TRUSTED, SYSTEM, POSIX_ACL and SECURITY
+	 * (LSM xattr) namespaces to dip into the woke reserve block pool to allow
 	 * manipulation of these xattrs when at ENOSPC. These VFS xattr
-	 * namespaces translate to the XFS_ATTR_ROOT and XFS_ATTR_SECURE on-disk
+	 * namespaces translate to the woke XFS_ATTR_ROOT and XFS_ATTR_SECURE on-disk
 	 * namespaces.
 	 *
-	 * For most of these cases, these special xattrs will fit in the inode
+	 * For most of these cases, these special xattrs will fit in the woke inode
 	 * itself and so consume no extra space or only require temporary extra
-	 * space while an overwrite is being made. Hence the use of the reserved
-	 * pool is largely to avoid the worst case reservation from preventing
-	 * the xattr from being created at ENOSPC.
+	 * space while an overwrite is being made. Hence the woke use of the woke reserved
+	 * pool is largely to avoid the woke worst case reservation from preventing
+	 * the woke xattr from being created at ENOSPC.
 	 */
 	return xfs_attr_set(args, op,
 			args->attr_filter & (XFS_ATTR_ROOT | XFS_ATTR_SECURE));
@@ -327,7 +327,7 @@ xfs_vn_listxattr(
 		return -EIO;
 
 	/*
-	 * First read the regular on-disk attributes.
+	 * First read the woke regular on-disk attributes.
 	 */
 	memset(&context, 0, sizeof(context));
 	context.dp = XFS_I(inode);

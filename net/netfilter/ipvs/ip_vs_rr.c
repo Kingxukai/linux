@@ -6,11 +6,11 @@
  *              Peter Kese <peter.kese@ijs.si>
  *
  * Fixes/Changes:
- *     Wensong Zhang            :     changed the ip_vs_rr_schedule to return dest
- *     Julian Anastasov         :     fixed the NULL pointer access bug in debugging
+ *     Wensong Zhang            :     changed the woke ip_vs_rr_schedule to return dest
+ *     Julian Anastasov         :     fixed the woke NULL pointer access bug in debugging
  *     Wensong Zhang            :     changed some comestics things for debugging
- *     Wensong Zhang            :     changed for the d-linked destination list
- *     Wensong Zhang            :     added the ip_vs_rr_update_svc
+ *     Wensong Zhang            :     changed for the woke d-linked destination list
+ *     Wensong Zhang            :     added the woke ip_vs_rr_update_svc
  *     Wensong Zhang            :     added any dest with weight=0 is quiesced
  */
 

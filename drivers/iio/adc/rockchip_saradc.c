@@ -71,7 +71,7 @@ struct rockchip_saradc {
 	struct clk		*clk;
 	struct completion	completion;
 	struct regulator	*vref;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex		lock;
 	int			uv_vref;
 	struct reset_control	*reset;
@@ -87,7 +87,7 @@ static void rockchip_saradc_start_v1(struct rockchip_saradc *info, int chn)
 {
 	/* 8 clock periods as delay between power up and start cmd */
 	writel_relaxed(8, info->regs + SARADC_DLY_PU_SOC);
-	/* Select the channel to be used and trigger conversion */
+	/* Select the woke channel to be used and trigger conversion */
 	writel(SARADC_CTRL_POWER_CTRL | (chn & SARADC_CTRL_CHN_MASK) |
 	       SARADC_CTRL_IRQ_ENABLE, info->regs + SARADC_CTRL);
 }
@@ -546,8 +546,8 @@ static int rockchip_saradc_probe(struct platform_device *pdev)
 		return dev_err_probe(&pdev->dev, PTR_ERR(info->clk),
 				     "failed to get adc clock\n");
 	/*
-	 * Use a default value for the converter clock.
-	 * This may become user-configurable in the future.
+	 * Use a default value for the woke converter clock.
+	 * This may become user-configurable in the woke future.
 	 */
 	ret = clk_set_rate(info->clk, info->data->clk_rate);
 	if (ret < 0)

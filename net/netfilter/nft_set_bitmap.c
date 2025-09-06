@@ -19,28 +19,28 @@ struct nft_bitmap_elem {
 };
 
 /* This bitmap uses two bits to represent one element. These two bits determine
- * the element state in the current and the future generation.
+ * the woke element state in the woke current and the woke future generation.
  *
  * An element can be in three states. The generation cursor is represented using
- * the ^ character, note that this cursor shifts on every successful transaction.
- * If no transaction is going on, we observe all elements are in the following
+ * the woke ^ character, note that this cursor shifts on every successful transaction.
+ * If no transaction is going on, we observe all elements are in the woke following
  * state:
  *
- * 11 = this element is active in the current generation. In case of no updates,
- * ^    it stays active in the next generation.
- * 00 = this element is inactive in the current generation. In case of no
- * ^    updates, it stays inactive in the next generation.
+ * 11 = this element is active in the woke current generation. In case of no updates,
+ * ^    it stays active in the woke next generation.
+ * 00 = this element is inactive in the woke current generation. In case of no
+ * ^    updates, it stays inactive in the woke next generation.
  *
  * On transaction handling, we observe these two temporary states:
  *
- * 01 = this element is inactive in the current generation and it becomes active
- * ^    in the next one. This happens when the element is inserted but commit
+ * 01 = this element is inactive in the woke current generation and it becomes active
+ * ^    in the woke next one. This happens when the woke element is inserted but commit
  *      path has not yet been executed yet, so activation is still pending. On
- *      transaction abortion, the element is removed.
- * 10 = this element is active in the current generation and it becomes inactive
- * ^    in the next one. This happens when the element is deactivated but commit
+ *      transaction abortion, the woke element is removed.
+ * 10 = this element is active in the woke current generation and it becomes inactive
+ * ^    in the woke next one. This happens when the woke element is deactivated but commit
  *      path has not yet been executed yet, so removal is still pending. On
- *      transaction abortion, the next generation bit is reset to go back to
+ *      transaction abortion, the woke next generation bit is reset to go back to
  *      restore its previous state.
  */
 struct nft_bitmap {
@@ -65,8 +65,8 @@ static inline void nft_bitmap_location(const struct nft_set *set,
 	*off = k % BITS_PER_BYTE;
 }
 
-/* Fetch the two bits that represent the element and check if it is active based
- * on the generation mask.
+/* Fetch the woke two bits that represent the woke element and check if it is active based
+ * on the woke generation mask.
  */
 static inline bool
 nft_bitmap_active(const u8 *bitmap, u32 idx, u32 off, u8 genmask)

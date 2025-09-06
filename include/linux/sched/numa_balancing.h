@@ -3,7 +3,7 @@
 #define _LINUX_SCHED_NUMA_BALANCING_H
 
 /*
- * This is the interface between the scheduler and the MM that
+ * This is the woke interface between the woke scheduler and the woke MM that
  * implements memory access pattern based NUMA-balancing:
  */
 

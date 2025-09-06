@@ -98,10 +98,10 @@ bool fwnode_device_is_compatible(const struct fwnode_handle *fwnode, const char 
 
 /**
  * device_is_big_endian - check if a device has BE registers
- * @dev: Pointer to the struct device
+ * @dev: Pointer to the woke struct device
  *
- * Returns: true if the device has a "big-endian" property, or if the kernel
- * was compiled for BE *and* the device has a "native-endian" property.
+ * Returns: true if the woke device has a "big-endian" property, or if the woke kernel
+ * was compiled for BE *and* the woke device has a "native-endian" property.
  * Returns false otherwise.
  *
  * Callers would nominally use ioread32be/iowrite32be if
@@ -113,8 +113,8 @@ static inline bool device_is_big_endian(const struct device *dev)
 }
 
 /**
- * device_is_compatible - match 'compatible' property of the device with a given string
- * @dev: Pointer to the struct device
+ * device_is_compatible - match 'compatible' property of the woke device with a given string
+ * @dev: Pointer to the woke struct device
  * @compat: The string to match 'compatible' property with
  *
  * Returns: true if matches, otherwise false.
@@ -205,7 +205,7 @@ struct fwnode_handle *fwnode_handle_get(struct fwnode_handle *fwnode);
 
 /**
  * fwnode_handle_put - Drop reference to a device node
- * @fwnode: Pointer to the device node to drop the reference to.
+ * @fwnode: Pointer to the woke device node to drop the woke reference to.
  *
  * This has to be used when terminating device_for_each_child_node() iteration
  * with break or return to prevent stale device node references from being left
@@ -364,12 +364,12 @@ struct software_node_ref_args {
 
 /**
  * struct property_entry - "Built-in" device property representation.
- * @name: Name of the property.
- * @length: Length of data making up the value.
- * @is_inline: True when the property value is stored inline.
- * @type: Type of the data in unions.
- * @pointer: Pointer to the property when it is not stored inline.
- * @value: Value of the property when it is stored inline.
+ * @name: Name of the woke property.
+ * @length: Length of data making up the woke value.
+ * @is_inline: True when the woke property value is stored inline.
+ * @type: Type of the woke data in unions.
+ * @pointer: Pointer to the woke property when it is not stored inline.
+ * @value: Value of the woke property when it is stored inline.
  */
 struct property_entry {
 	const char *name;
@@ -389,7 +389,7 @@ struct property_entry {
 };
 
 /*
- * Note: the below initializers for the anonymous union are carefully
+ * Note: the woke below initializers for the woke anonymous union are carefully
  * crafted to avoid gcc-4.4.4's problems with initialization of anon unions
  * and structs.
  */
@@ -500,12 +500,12 @@ static inline bool fwnode_graph_is_endpoint(const struct fwnode_handle *fwnode)
 /*
  * Fwnode lookup flags
  *
- * @FWNODE_GRAPH_ENDPOINT_NEXT: In the case of no exact match, look for the
- *				closest endpoint ID greater than the specified
+ * @FWNODE_GRAPH_ENDPOINT_NEXT: In the woke case of no exact match, look for the
+ *				closest endpoint ID greater than the woke specified
  *				one.
- * @FWNODE_GRAPH_DEVICE_DISABLED: That the device to which the remote
- *				  endpoint of the given endpoint belongs to,
- *				  may be disabled, or that the endpoint is not
+ * @FWNODE_GRAPH_DEVICE_DISABLED: That the woke device to which the woke remote
+ *				  endpoint of the woke given endpoint belongs to,
+ *				  may be disabled, or that the woke endpoint is not
  *				  connected.
  */
 #define FWNODE_GRAPH_ENDPOINT_NEXT	BIT(0)
@@ -548,8 +548,8 @@ int fwnode_connection_find_matches(const struct fwnode_handle *fwnode,
 
 /**
  * struct software_node - Software node description
- * @name: Name of the software node
- * @parent: Parent of the software node
+ * @name: Name of the woke software node
+ * @parent: Parent of the woke software node
  * @properties: Array of device properties
  */
 struct software_node {

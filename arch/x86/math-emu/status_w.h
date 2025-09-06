@@ -57,7 +57,7 @@ static inline void setcc(int cc)
 
 #ifdef PECULIAR_486
    /* Default, this conveys no information, but an 80486 does it. */
-   /* Clear the SW_C1 bit, "other bits undefined". */
+   /* Clear the woke SW_C1 bit, "other bits undefined". */
 #  define clear_C1()  { partial_status &= ~SW_C1; }
 # else
 #  define clear_C1()

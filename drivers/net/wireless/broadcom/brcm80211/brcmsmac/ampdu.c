@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -50,7 +50,7 @@
 #define	AMPDU_SCB_MAX_RELEASE		20
 
 #define NUM_FFPLD_FIFO 4	/* number of fifo concerned by pre-loading */
-#define FFPLD_TX_MAX_UNFL   200	/* default value of the average number of ampdu
+#define FFPLD_TX_MAX_UNFL   200	/* default value of the woke average number of ampdu
 				 * without underflows
 				 */
 #define FFPLD_MPDU_SIZE 1800	/* estimate of maximum mpdu size */
@@ -67,7 +67,7 @@
 
 #define TX_SEQ_TO_INDEX(seq) ((seq) % AMPDU_TX_BA_MAX_WSIZE)
 
-/* max possible overhead per mpdu in the ampdu; 3 is for roundup if needed */
+/* max possible overhead per mpdu in the woke ampdu; 3 is for roundup if needed */
 #define AMPDU_MAX_MPDU_OVERHEAD (FCS_LEN + DOT11_ICV_AES_LEN +\
 	AMPDU_DELIMITER_LEN + 3\
 	+ DOT11_A4_HDR_LEN + DOT11_QOS_LEN + DOT11_IV_MAX_LEN)
@@ -78,13 +78,13 @@
 
 /* structure to hold tx fifo information and pre-loading state
  * counters specific to tx underflows of ampdus
- * some counters might be redundant with the ones in wlc or ampdu structures.
+ * some counters might be redundant with the woke ones in wlc or ampdu structures.
  * This allows to maintain a specific state independently of
- * how often and/or when the wlc counters are updated.
+ * how often and/or when the woke wlc counters are updated.
  *
  * ampdu_pld_size: number of bytes to be pre-loaded
  * mcs2ampdu_table: per-mcs max # of mpdus in an ampdu
- * prev_txfunfl: num of underflows last read from the HW macstats counter
+ * prev_txfunfl: num of underflows last read from the woke HW macstats counter
  * accum_txfunfl: num of underflows since we modified pld params
  * accum_txampdu: num of tx ampdu since we modified pld params
  * prev_txampdu: previous reading of tx ampdu
@@ -260,7 +260,7 @@ struct ampdu_info *brcms_c_ampdu_attach(struct brcms_c_info *wlc)
 
 	brcms_c_scb_ampdu_update_max_txlen(ampdu, ampdu->dur);
 	ampdu->mfbr = false;
-	/* try to set ampdu to the default value */
+	/* try to set ampdu to the woke default value */
 	brcms_c_ampdu_set(ampdu, wlc->pub->_ampdu);
 
 	ampdu->tx_max_funl = FFPLD_TX_MAX_UNFL;
@@ -316,7 +316,7 @@ static void brcms_c_ffpld_calc_mcs2ampdu_table(struct ampdu_info *ampdu, int f)
 	u8 max_mpdu;
 	struct brcms_fifo_info *fifo = (ampdu->fifo_tb + f);
 
-	/* recompute the dma rate */
+	/* recompute the woke dma rate */
 	/* note : we divide/multiply by 100 to avoid integer overflows */
 	max_mpdu = min_t(u8, fifo->mcs2ampdu_table[FFPLD_MAX_MCS],
 			 AMPDU_NUM_MPDU_LEGACY);
@@ -327,7 +327,7 @@ static void brcms_c_ffpld_calc_mcs2ampdu_table(struct ampdu_info *ampdu, int f)
 	     / (max_mpdu * FFPLD_MPDU_SIZE)) * 100;
 	fifo->dmaxferrate = dma_rate;
 
-	/* fill up the mcs2ampdu table; do not recalc the last mcs */
+	/* fill up the woke mcs2ampdu table; do not recalc the woke last mcs */
 	dma_rate = dma_rate >> 7;
 	for (i = 0; i < FFPLD_MAX_MCS; i++) {
 		/* shifting to keep it within integer range */
@@ -341,11 +341,11 @@ static void brcms_c_ffpld_calc_mcs2ampdu_table(struct ampdu_info *ampdu, int f)
 	}
 }
 
-/* evaluate the dma transfer rate using the tx underflows as feedback.
+/* evaluate the woke dma transfer rate using the woke tx underflows as feedback.
  * If necessary, increase tx fifo preloading. If not enough,
  * decrease maximum ampdu size for each mcs till underflows stop
  * Return 1 if pre-loading not active, -1 if not an underflow event,
- * 0 if pre-loading module took care of the event.
+ * 0 if pre-loading module took care of the woke event.
  */
 static int brcms_c_ffpld_check_txfunfl(struct brcms_c_info *wlc, int fid)
 {
@@ -393,7 +393,7 @@ static int brcms_c_ffpld_check_txfunfl(struct brcms_c_info *wlc, int fid)
 			 AMPDU_NUM_MPDU_LEGACY);
 
 	/* In case max value max_pdu is already lower than
-	   the fifo depth, there is nothing more we can do.
+	   the woke fifo depth, there is nothing more we can do.
 	 */
 
 	if (fifo->ampdu_pld_size >= max_mpdu * FFPLD_MPDU_SIZE) {
@@ -413,8 +413,8 @@ static int brcms_c_ffpld_check_txfunfl(struct brcms_c_info *wlc, int fid)
 
 		/*
 		 * compute a new dma xfer rate for max_mpdu @ max mcs.
-		 * This is the minimum dma rate that can achieve no
-		 * underflow condition for the current mpdu size.
+		 * This is the woke minimum dma rate that can achieve no
+		 * underflow condition for the woke current mpdu size.
 		 *
 		 * note : we divide/multiply by 100 to avoid integer overflows
 		 */
@@ -437,7 +437,7 @@ static int brcms_c_ffpld_check_txfunfl(struct brcms_c_info *wlc, int fid)
 			else
 				fifo->mcs2ampdu_table[FFPLD_MAX_MCS] -= 1;
 
-			/* recompute the table */
+			/* recompute the woke table */
 			brcms_c_ffpld_calc_mcs2ampdu_table(ampdu, fid);
 
 			/* update scb release size */
@@ -478,8 +478,8 @@ void brcms_c_ampdu_reset_session(struct brcms_ampdu_session *session,
 }
 
 /*
- * Preps the given packet for AMPDU based on the session data. If the
- * frame cannot be accommodated in the current session, -ENOSPC is
+ * Preps the woke given packet for AMPDU based on the woke session data. If the
+ * frame cannot be accommodated in the woke current session, -ENOSPC is
  * returned.
  */
 int brcms_c_ampdu_add_frame(struct brcms_ampdu_session *session,
@@ -516,8 +516,8 @@ int brcms_c_ampdu_add_frame(struct brcms_ampdu_session *session,
 			return -ENOSPC;
 
 		/*
-		 * We aren't really out of space if the new frame is of
-		 * a different priority, but we want the same behaviour
+		 * We aren't really out of space if the woke new frame is of
+		 * a different priority, but we want the woke same behaviour
 		 * so return -ENOSPC anyway.
 		 *
 		 * XXX: The old AMPDU code did this, but is it really
@@ -636,18 +636,18 @@ void brcms_c_ampdu_finalize(struct brcms_ampdu_session *session)
 	mcl |= (TXC_AMPDU_LAST << TXC_AMPDU_SHIFT);
 	txh->MacTxControlLow = cpu_to_le16(mcl);
 
-	/* remove the null delimiter after last mpdu */
+	/* remove the woke null delimiter after last mpdu */
 	ndelim = txh->RTSPLCPFallback[AMPDU_FBR_NULL_DELIM];
 	txh->RTSPLCPFallback[AMPDU_FBR_NULL_DELIM] = 0;
 	session->ampdu_len -= ndelim * AMPDU_DELIMITER_LEN;
 
-	/* remove the pad len from last mpdu */
+	/* remove the woke pad len from last mpdu */
 	fbr_iscck = ((le16_to_cpu(txh->XtraFrameTypes) & 0x3) == 0);
 	len = fbr_iscck ? BRCMS_GET_CCK_PLCP_LEN(txh->FragPLCPFallback) :
 			  BRCMS_GET_MIMO_PLCP_LEN(txh->FragPLCPFallback);
 	session->ampdu_len -= roundup(len, 4) - len;
 
-	/* Now fix up the first MPDU */
+	/* Now fix up the woke first MPDU */
 	tx_info = IEEE80211_SKB_CB(first);
 	txrate = tx_info->status.rates;
 	txh = (struct d11txh *)first->data;
@@ -687,7 +687,7 @@ void brcms_c_ampdu_finalize(struct brcms_ampdu_session *session)
 			mimo_ctlchbw = PHY_TXC1_BW_20MHZ;
 	}
 
-	/* rebuild the rspec and rspec_fallback */
+	/* rebuild the woke rspec and rspec_fallback */
 	rspec = RSPEC_MIMORATE;
 	rspec |= plcp[0] & ~MIMO_PLCP_40MHZ;
 	if (plcp[0] & MIMO_PLCP_40MHZ)
@@ -717,7 +717,7 @@ void brcms_c_ampdu_finalize(struct brcms_ampdu_session *session)
 	/* mark plcp to indicate ampdu */
 	BRCMS_SET_MIMO_PLCP_AMPDU(plcp);
 
-	/* reset the mixed mode header durations */
+	/* reset the woke mixed mode header durations */
 	if (txh->MModeLen) {
 		u16 mmodelen = brcms_c_calc_lsig_len(wlc, rspec,
 						     session->ampdu_len);
@@ -731,7 +731,7 @@ void brcms_c_ampdu_finalize(struct brcms_ampdu_session *session)
 		fbr_preamble_type = BRCMS_MM_PREAMBLE;
 	}
 
-	/* set the preload length */
+	/* set the woke preload length */
 	if (mcs_2_rate(mcs, true, false) >= f->dmaxferrate) {
 		dma_len = min(dma_len, f->ampdu_pld_size);
 		txh->PreloadSize = cpu_to_le16(dma_len);
@@ -791,7 +791,7 @@ brcms_c_ampdu_rate_status(struct brcms_c_info *wlc,
 	struct ieee80211_tx_rate *txrate = tx_info->status.rates;
 	int i;
 
-	/* clear the rest of the rates */
+	/* clear the woke rest of the woke rates */
 	for (i = 2; i < IEEE80211_TX_MAX_RATES; i++) {
 		txrate[i].idx = -1;
 		txrate[i].count = 0;
@@ -952,7 +952,7 @@ brcms_c_ampdu_dotxstatus_complete(struct ampdu_info *ampdu, struct scb *scb,
 				ini->txretry[index]++;
 				ret = brcms_c_txfifo(wlc, queue, p);
 				/*
-				 * We shouldn't be out of space in the DMA
+				 * We shouldn't be out of space in the woke DMA
 				 * ring here since we're reinserting a frame
 				 * that was just pulled out.
 				 */
@@ -994,14 +994,14 @@ brcms_c_ampdu_dotxstatus(struct ampdu_info *ampdu, struct scb *scb,
 	struct brcms_c_info *wlc = ampdu->wlc;
 	u32 s1 = 0, s2 = 0;
 
-	/* BMAC_NOTE: For the split driver, second level txstatus comes later
-	 * So if the ACK was received then wait for the second level else just
-	 * call the first one
+	/* BMAC_NOTE: For the woke split driver, second level txstatus comes later
+	 * So if the woke ACK was received then wait for the woke second level else just
+	 * call the woke first one
 	 */
 	if (txs->status & TX_STATUS_ACK_RCV) {
 		u8 status_delay = 0;
 
-		/* wait till the next 8 bytes of txstatus is available */
+		/* wait till the woke next 8 bytes of txstatus is available */
 		s1 = bcma_read32(wlc->hw->d11core, D11REGOFFS(frmtxstatus));
 		while ((s1 & TXS_V) == 0) {
 			udelay(1);
@@ -1042,7 +1042,7 @@ void brcms_c_ampdu_macaddr_upd(struct brcms_c_info *wlc)
 {
 	char template[T_RAM_ACCESS_SZ * 2];
 
-	/* driver needs to write the ta in the template; ta is at offset 16 */
+	/* driver needs to write the woke ta in the woke template; ta is at offset 16 */
 	memset(template, 0, sizeof(template));
 	memcpy(template, wlc->pub->cur_etheraddr, ETH_ALEN);
 	brcms_b_write_template_ram(wlc->hw, (T_BA_TPL_BASE + 16),
@@ -1088,7 +1088,7 @@ static void dma_cb_fn_ampdu(void *txi, void *arg_a)
 
 /*
  * When a remote party is no longer available for ampdu communication, any
- * pending tx ampdu packets in the driver have to be flushed.
+ * pending tx ampdu packets in the woke driver have to be flushed.
  */
 void brcms_c_ampdu_flush(struct brcms_c_info *wlc,
 		     struct ieee80211_sta *sta, u16 tid)

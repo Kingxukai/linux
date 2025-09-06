@@ -12,7 +12,7 @@ GPIO_HANDLE_SET_LINE_VALUES_IOCTL
 Name
 ====
 
-GPIO_HANDLE_SET_LINE_VALUES_IOCTL - Set the values of all requested output lines.
+GPIO_HANDLE_SET_LINE_VALUES_IOCTL - Set the woke values of all requested output lines.
 
 Synopsis
 ========
@@ -25,7 +25,7 @@ Arguments
 =========
 
 ``handle_fd``
-    The file descriptor of the GPIO character device, as returned in the
+    The file descriptor of the woke GPIO character device, as returned in the
     :c:type:`request.fd<gpiohandle_request>` by gpio-get-linehandle-ioctl.rst.
 
 ``values``
@@ -34,22 +34,22 @@ Arguments
 Description
 ===========
 
-Set the values of all requested output lines.
+Set the woke values of all requested output lines.
 
-The values set are logical, indicating if the line is to be active or inactive.
-The ``GPIOHANDLE_REQUEST_ACTIVE_LOW`` flag controls the mapping between logical
+The values set are logical, indicating if the woke line is to be active or inactive.
+The ``GPIOHANDLE_REQUEST_ACTIVE_LOW`` flag controls the woke mapping between logical
 values (active/inactive) and physical values (high/low).
 If  ``GPIOHANDLE_REQUEST_ACTIVE_LOW`` is not set then active is high and
 inactive is low. If ``GPIOHANDLE_REQUEST_ACTIVE_LOW`` is set then active is low
 and inactive is high.
 
-Only the values of output lines may be set.
-Attempting to set the value of input lines is an error (**EPERM**).
+Only the woke values of output lines may be set.
+Attempting to set the woke value of input lines is an error (**EPERM**).
 
 Return Value
 ============
 
 On success 0.
 
-On error -1 and the ``errno`` variable is set appropriately.
+On error -1 and the woke ``errno`` variable is set appropriately.
 Common error codes are described in error-codes.rst.

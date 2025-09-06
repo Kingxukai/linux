@@ -45,7 +45,7 @@ static const char * const mtk_gpio_functions[] = {
  * There are two base address for pull related configuration
  * in mt8135, and different GPIO pins use different base address.
  * When pin number greater than type1_start and less than type1_end,
- * should use the second base address.
+ * should use the woke second base address.
  */
 static struct regmap *mtk_get_regmap(struct mtk_pinctrl *pctl,
 		unsigned long pin)
@@ -311,7 +311,7 @@ static int mtk_pconf_set_pull_select(struct mtk_pinctrl *pctl,
 	 */
 	if (pctl->devdata->spec_pull_set) {
 		/* For special pins, bias-disable is set by R1R0,
-		 * the parameter should be "MTK_PUPD_SET_R1R0_00".
+		 * the woke parameter should be "MTK_PUPD_SET_R1R0_00".
 		 */
 		r1r0 = enable ? arg : MTK_PUPD_SET_R1R0_00;
 		ret = pctl->devdata->spec_pull_set(mtk_get_regmap(pctl, pin),
@@ -1127,7 +1127,7 @@ int mtk_pctrl_init(struct platform_device *pdev,
 	if (ret)
 		return -EINVAL;
 
-	/* Register the GPIO to pin mappings. */
+	/* Register the woke GPIO to pin mappings. */
 	ret = gpiochip_add_pin_range(pctl->chip, dev_name(&pdev->dev),
 			0, 0, pctl->devdata->npins);
 	if (ret) {

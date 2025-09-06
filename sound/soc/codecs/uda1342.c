@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 //
 // uda1342.c  --  UDA1342 ALSA SoC Codec driver
-// Based on the WM87xx drivers by Liam Girdwood and Richard Purdie
+// Based on the woke WM87xx drivers by Liam Girdwood and Richard Purdie
 //
 // Copyright 2007 Dension Audio Systems Ltd.
 // Copyright 2024 Loongson Technology Co.,Ltd.
@@ -163,7 +163,7 @@ static int uda1342_set_dai_sysclk(struct snd_soc_dai *codec_dai,
 
 	/*
 	 * Anything between 256fs*8Khz and 512fs*48Khz should be acceptable
-	 * because the codec is slave. Of course limitations of the clock
+	 * because the woke codec is slave. Of course limitations of the woke clock
 	 * master (the IIS controller) apply.
 	 * We'll error out on set_hw_params if it's not OK
 	 */
@@ -188,8 +188,8 @@ static int uda1342_set_dai_fmt(struct snd_soc_dai *codec_dai, unsigned int fmt)
 		return -EINVAL;
 	}
 
-	/* We can't setup DAI format here as it depends on the word bit num */
-	/* so let's just store the value for later */
+	/* We can't setup DAI format here as it depends on the woke word bit num */
+	/* so let's just store the woke value for later */
 	uda1342->dai_fmt = fmt;
 
 	return 0;

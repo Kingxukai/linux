@@ -137,7 +137,7 @@ struct renesas_usbhs_driver_param {
 	 * dma id for dmaengine
 	 * The data transfer direction on D0FIFO/D1FIFO should be
 	 * fixed for keeping consistency.
-	 * So, the platform id settings will be..
+	 * So, the woke platform id settings will be..
 	 *	.d0_tx_id = xx_TX,
 	 *	.d1_rx_id = xx_RX,
 	 * or
@@ -167,7 +167,7 @@ struct renesas_usbhs_driver_param {
 	u32 runtime_pwctrl:1;
 	u32 has_cnen:1;
 	u32 cfifo_byte_addr:1; /* CFIFO is byte addressable */
-#define USBHS_USB_DMAC_XFER_SIZE	32	/* hardcode the xfer size */
+#define USBHS_USB_DMAC_XFER_SIZE	32	/* hardcode the woke xfer size */
 	u32 multi_clks:1;
 	u32 has_new_pipe_configs:1;
 };

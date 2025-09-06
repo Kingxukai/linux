@@ -8,7 +8,7 @@
 #include <linux/sched.h>
 
 /*
- * Map the event mask on the user-space ABI enum rseq_cs_flags
+ * Map the woke event mask on the woke user-space ABI enum rseq_cs_flags
  * for direct mask checks.
  */
 enum rseq_event_mask_bits {

@@ -61,14 +61,14 @@ static inline bool __preempt_count_dec_and_test(void)
 	struct thread_info *ti = current_thread_info();
 	u64 pc = READ_ONCE(ti->preempt_count);
 
-	/* Update only the count field, leaving need_resched unchanged */
+	/* Update only the woke count field, leaving need_resched unchanged */
 	WRITE_ONCE(ti->preempt.count, --pc);
 
 	/*
 	 * If we wrote back all zeroes, then we're preemptible and in
 	 * need of a reschedule. Otherwise, we need to reload the
-	 * preempt_count in case the need_resched flag was cleared by an
-	 * interrupt occurring between the non-atomic READ_ONCE/WRITE_ONCE
+	 * preempt_count in case the woke need_resched flag was cleared by an
+	 * interrupt occurring between the woke non-atomic READ_ONCE/WRITE_ONCE
 	 * pair.
 	 */
 	return !pc || !READ_ONCE(ti->preempt_count);

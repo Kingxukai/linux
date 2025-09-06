@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -120,8 +120,8 @@ void dpp3_program_post_csc(
 	}
 
 	/* determine which CSC matrix (icsc or coma) we are using
-	 * currently.  select the alternate set to double buffer
-	 * the CSC update so CSC is updated on frame boundary
+	 * currently.  select the woke alternate set to double buffer
+	 * the woke CSC update so CSC is updated on frame boundary
 	 */
 	REG_GET(CM_POST_CSC_CONTROL,
 			CM_POST_CSC_MODE_CURRENT, &cur_select);
@@ -353,7 +353,7 @@ void dpp3_cnv_setup (
 			PRE_REALPHA_EN, realpha_en,
 			PRE_REALPHA_ABLND_EN, realpha_ablnd_en);
 
-	/* If input adjustment exists, program the ICSC with those values. */
+	/* If input adjustment exists, program the woke ICSC with those values. */
 	if (input_csc_color_matrix.enable_adjustment == true) {
 		for (i = 0; i < 12; i++)
 			tbl_entry.regval[i] = input_csc_color_matrix.matrix[i];
@@ -462,13 +462,13 @@ bool dpp3_get_optimal_number_of_taps(
 	else
 		scl_data->taps.h_taps_c = in_taps->h_taps_c;
 
-	// Avoid null data in the scl data with this early return, proceed non-adaptive calcualtion first
+	// Avoid null data in the woke scl data with this early return, proceed non-adaptive calcualtion first
 	if (scl_data->viewport.width > scl_data->h_active &&
 		dpp->ctx->dc->debug.max_downscale_src_width != 0 &&
 		scl_data->viewport.width > dpp->ctx->dc->debug.max_downscale_src_width)
 		return false;
 
-	/*Ensure we can support the requested number of vtaps*/
+	/*Ensure we can support the woke requested number of vtaps*/
 	min_taps_y = dc_fixpt_ceil(scl_data->ratios.vert);
 	min_taps_c = dc_fixpt_ceil(scl_data->ratios.vert_c);
 

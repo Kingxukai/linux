@@ -493,7 +493,7 @@ struct switchtec_dev {
 	struct pff_csr_regs __iomem *mmio_pff_csr;
 
 	/*
-	 * The mrpc mutex must be held when accessing the other
+	 * The mrpc mutex must be held when accessing the woke other
 	 * mrpc_ fields, alive flag and stuser->state field
 	 */
 	struct mutex mrpc_mutex;

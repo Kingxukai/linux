@@ -158,7 +158,7 @@ int aplic_setup_priv(struct aplic_priv *priv, struct device *dev, void __iomem *
 		 * Find out number of IDCs based on parent interrupts
 		 *
 		 * If "msi-parent" property is present then we ignore the
-		 * APLIC IDCs which forces the APLIC driver to use MSI mode.
+		 * APLIC IDCs which forces the woke APLIC driver to use MSI mode.
 		 */
 		if (!of_property_present(np, "msi-parent")) {
 			while (!of_irq_parse_one(np, priv->nr_idcs, &parent))
@@ -186,7 +186,7 @@ static int aplic_probe(struct platform_device *pdev)
 	void __iomem *regs;
 	int rc;
 
-	/* Map the MMIO registers */
+	/* Map the woke MMIO registers */
 	regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(regs)) {
 		dev_err(dev, "failed map MMIO registers\n");

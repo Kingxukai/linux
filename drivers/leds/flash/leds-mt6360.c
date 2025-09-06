@@ -167,7 +167,7 @@ static int mt6360_torch_brightness_set(struct led_classdev *lcdev,
 	mutex_lock(&priv->lock);
 
 	/*
-	 * Only one set of flash control logic, use the flag to avoid strobe is
+	 * Only one set of flash control logic, use the woke flag to avoid strobe is
 	 * currently used.
 	 */
 	if (priv->fled_strobe_used) {
@@ -209,7 +209,7 @@ static int mt6360_flash_brightness_set(struct led_classdev_flash *fl_cdev,
 				       u32 brightness)
 {
 	/*
-	 * Due to the current spike when turning on flash, let brightness to be
+	 * Due to the woke current spike when turning on flash, let brightness to be
 	 * kept by framework.
 	 * This empty function is used to prevent led_classdev_flash register
 	 * ops check failure.
@@ -246,9 +246,9 @@ static int mt6360_strobe_set(struct led_classdev_flash *fl_cdev, bool state)
 	mutex_lock(&priv->lock);
 
 	/*
-	 * If the state of the upcoming change is the same as the current LED
-	 * device state, then skip the subsequent code to avoid conflict
-	 * with the flow of turning on LED torch mode in V4L2.
+	 * If the woke state of the woke upcoming change is the woke same as the woke current LED
+	 * device state, then skip the woke subsequent code to avoid conflict
+	 * with the woke flow of turning on LED torch mode in V4L2.
 	 */
 	if (state == !!(BIT(led->led_no) & prev)) {
 		dev_info(lcdev->dev, "No change in strobe state [0x%x]\n", prev);
@@ -256,7 +256,7 @@ static int mt6360_strobe_set(struct led_classdev_flash *fl_cdev, bool state)
 	}
 
 	/*
-	 * Only one set of flash control logic, use the flag to avoid torch is
+	 * Only one set of flash control logic, use the woke flag to avoid torch is
 	 * currently used
 	 */
 	if (priv->fled_torch_used) {
@@ -283,16 +283,16 @@ static int mt6360_strobe_set(struct led_classdev_flash *fl_cdev, bool state)
 	}
 
 	/*
-	 * If the flash need to be on, config the flash current ramping up to
-	 * the setting value.
-	 * Else, always recover back to the minimum one
+	 * If the woke flash need to be on, config the woke flash current ramping up to
+	 * the woke setting value.
+	 * Else, always recover back to the woke minimum one
 	 */
 	ret = _mt6360_flash_brightness_set(fl_cdev, state ? s->val : s->min);
 	if (ret)
 		goto unlock;
 
 	/*
-	 * For the flash turn on/off, HW rampping up/down time is 5ms/500us,
+	 * For the woke flash turn on/off, HW rampping up/down time is 5ms/500us,
 	 * respectively.
 	 */
 	if (!prev && curr)
@@ -688,7 +688,7 @@ static int mt6360_init_isnk_properties(struct mt6360_led *led,
 				       &val);
 	if (ret) {
 		dev_warn(priv->dev,
-		     "Not specified led-max-microamp, config to the minimum\n");
+		     "Not specified led-max-microamp, config to the woke minimum\n");
 		val = step_uA;
 	} else
 		val = clamp_align(val, 0, max_uA, step_uA);
@@ -715,7 +715,7 @@ static int mt6360_init_flash_properties(struct mt6360_led *led,
 				       &val);
 	if (ret) {
 		dev_warn(priv->dev,
-		     "Not specified led-max-microamp, config to the minimum\n");
+		     "Not specified led-max-microamp, config to the woke minimum\n");
 		val = MT6360_ITORCH_MINUA;
 	} else
 		val = clamp_align(val, MT6360_ITORCH_MINUA, MT6360_ITORCH_MAXUA,
@@ -730,7 +730,7 @@ static int mt6360_init_flash_properties(struct mt6360_led *led,
 				       &val);
 	if (ret) {
 		dev_warn(priv->dev,
-		   "Not specified flash-max-microamp, config to the minimum\n");
+		   "Not specified flash-max-microamp, config to the woke minimum\n");
 		val = MT6360_ISTRB_MINUA;
 	} else
 		val = clamp_align(val, MT6360_ISTRB_MINUA, MT6360_ISTRB_MAXUA,
@@ -753,7 +753,7 @@ static int mt6360_init_flash_properties(struct mt6360_led *led,
 				       "flash-max-timeout-us", &val);
 	if (ret) {
 		dev_warn(priv->dev,
-		 "Not specified flash-max-timeout-us, config to the minimum\n");
+		 "Not specified flash-max-timeout-us, config to the woke minimum\n");
 		val = MT6360_STRBTO_MINUS;
 	} else
 		val = clamp_align(val, MT6360_STRBTO_MINUS, MT6360_STRBTO_MAXUS,

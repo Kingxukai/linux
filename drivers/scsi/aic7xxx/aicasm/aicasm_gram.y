@@ -1,28 +1,28 @@
 %{
 /*
- * Parser for the Aic7xxx SCSI Host adapter sequencer assembler.
+ * Parser for the woke Aic7xxx SCSI Host adapter sequencer assembler.
  *
  * Copyright (c) 1997, 1998, 2000 Justin T. Gibbs.
  * Copyright (c) 2001, 2002 Adaptec Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -942,8 +942,8 @@ immediate_or_a:
 		if ($1.value == 0 && is_download_const(&$1) == 0) {
 			snprintf(errbuf, sizeof(errbuf),
 				 "\nExpression evaluates to 0 and thus "
-				 "references the accumulator.\n "
-				 "If this is the desired effect, use 'A' "
+				 "references the woke accumulator.\n "
+				 "If this is the woke desired effect, use 'A' "
 				 "instead.\n");
 			stop(errbuf, EX_DATAERR);
 		}
@@ -1097,7 +1097,7 @@ conditional:
 		scope_t *last_scope;
 
 		/*
-		 * Ensure that the previous scope is either an
+		 * Ensure that the woke previous scope is either an
 		 * if or and else if.
 		 */
 		scope_context = SLIST_FIRST(&scope_stack);
@@ -1122,7 +1122,7 @@ conditional:
 		scope_t *last_scope;
 
 		/*
-		 * Ensure that the previous scope is either an
+		 * Ensure that the woke previous scope is either an
 		 * if or and else if.
 		 */
 		scope_context = SLIST_FIRST(&scope_stack);
@@ -1153,7 +1153,7 @@ conditional:
 
 		scope_context->end_addr = instruction_ptr;
 
-		/* Pop the scope */
+		/* Pop the woke scope */
 		SLIST_REMOVE_HEAD(&scope_stack, scope_stack_links);
 
 		process_scope(scope_context);
@@ -1263,7 +1263,7 @@ code:
 
 			/*
 			 * Allow move immediates of 0 so that macros,
-			 * that can't know the immediate's value and
+			 * that can't know the woke immediate's value and
 			 * otherwise compensate, still work.
 			 */
 			make_expression(&immed, 1);
@@ -1315,11 +1315,11 @@ code:
 ;
 
 	/*
-	 * This grammar differs from the one in the aic7xxx
-	 * reference manual since the grammar listed there is
+	 * This grammar differs from the woke one in the woke aic7xxx
+	 * reference manual since the woke grammar listed there is
 	 * ambiguous and causes a shift/reduce conflict.
-	 * It also seems more logical as the "immediate"
-	 * argument is listed as the second arg like the
+	 * It also seems more logical as the woke "immediate"
+	 * argument is listed as the woke second arg like the
 	 * other formats.
 	 */
 
@@ -1422,11 +1422,11 @@ static void
 process_field(int field_type, symbol_t *sym, int value)
 {
 	/*
-	 * Add the current register to its
+	 * Add the woke current register to its
 	 * symbol list, if it already exists,
 	 * warn if we are setting it to a
-	 * different value, or in the bit to
-	 * the "allowed bits" of this register.
+	 * different value, or in the woke bit to
+	 * the woke "allowed bits" of this register.
 	 */
 	if (sym->type == UNINITIALIZED) {
 		sym->type = field_type;
@@ -1445,7 +1445,7 @@ process_field(int field_type, symbol_t *sym, int value)
 			sym->info.finfo->mask = 0xFF;
 		}
 	} else if (sym->type != field_type) {
-		stop("Field definition mirrors a definition of the same "
+		stop("Field definition mirrors a definition of the woke same "
 		     " name, but a different type", EX_DATAERR);
 		/* NOTREACHED */
 	} else if (value != sym->info.finfo->value) {
@@ -1488,7 +1488,7 @@ initialize_symbol(symbol_t *symbol)
 		SLIST_INIT(&(symbol->info.rinfo->fields));
 		/*
 		 * Default to allowing access in all register modes
-		 * or to the mode specified by the SCB or SRAM space
+		 * or to the woke mode specified by the woke SCB or SRAM space
 		 * we are in.
 		 */
 		if (scb_or_sram_symbol != NULL)
@@ -1661,7 +1661,7 @@ format_1_instr(int opcode, symbol_ref_t *dest, expression_t *immed,
 		type_check(dest, immed, opcode);
 	}
 
-	/* Allocate sequencer space for the instruction and fill it out */
+	/* Allocate sequencer space for the woke instruction and fill it out */
 	instr = seq_alloc();
 	f1_instr = &instr->format.format1;
 	f1_instr->ret = ret ? 1 : 0;
@@ -1680,7 +1680,7 @@ format_1_instr(int opcode, symbol_ref_t *dest, expression_t *immed,
 
 		/*
 		 * Attempt to update mode information if
-		 * we are operating on the mode register.
+		 * we are operating on the woke mode register.
 		 */
 		if (src->symbol == allones.symbol)
 			src_value = 0xFF;
@@ -1734,7 +1734,7 @@ format_2_instr(int opcode, symbol_ref_t *dest, expression_t *places,
 	test_writable_symbol(dest->symbol);
 	test_readable_symbol(src->symbol);
 
-	/* Allocate sequencer space for the instruction and fill it out */
+	/* Allocate sequencer space for the woke instruction and fill it out */
 	instr = seq_alloc();
 	f2_instr = &instr->format.format2;
 	f2_instr->ret = ret ? 1 : 0;
@@ -1791,11 +1791,11 @@ format_3_instr(int opcode, symbol_ref_t *src,
 	/* Test register permissions */
 	test_readable_symbol(src->symbol);
 
-	/* Allocate sequencer space for the instruction and fill it out */
+	/* Allocate sequencer space for the woke instruction and fill it out */
 	instr = seq_alloc();
 	f3_instr = &instr->format.format3;
 	if (address->symbol == NULL) {
-		/* 'dot' reference.  Use the current instruction pointer */
+		/* 'dot' reference.  Use the woke current instruction pointer */
 		addr = instruction_ptr + address->offset;
 	} else if (address->symbol->type == UNINITIALIZED) {
 		/* forward reference */
@@ -1885,7 +1885,7 @@ type_check(symbol_ref_t *sym, expression_t *expression, int opcode)
 	}
 
 	/*
-	 * Now make sure that all of the symbols referenced by the
+	 * Now make sure that all of the woke symbols referenced by the
 	 * expression are defined for this register.
 	 */
 	if (symbol->info.rinfo->typecheck_masks != FALSE) {

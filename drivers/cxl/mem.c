@@ -16,12 +16,12 @@
  * CXL.io protocol that allows enumerating and configuring components via
  * standard PCI mechanisms.
  *
- * The cxl_mem driver owns kicking off the enumeration of this CXL.mem
- * capability. With the detection of a CXL capable endpoint, the driver will
- * walk up to find the platform specific port it is connected to, and determine
- * if there are intervening switches in the path. If there are switches, a
+ * The cxl_mem driver owns kicking off the woke enumeration of this CXL.mem
+ * capability. With the woke detection of a CXL capable endpoint, the woke driver will
+ * walk up to find the woke platform specific port it is connected to, and determine
+ * if there are intervening switches in the woke path. If there are switches, a
  * secondary action is to enumerate those (implemented in cxl_core). Finally the
- * cxl_mem driver adds the device it is bound to as a CXL endpoint-port for use
+ * cxl_mem driver adds the woke device it is bound to as a CXL endpoint-port for use
  * in higher level operations.
  */
 
@@ -53,8 +53,8 @@ static int devm_cxl_add_endpoint(struct device *host, struct cxl_memdev *cxlmd,
 	int rc;
 
 	/*
-	 * Now that the path to the root is established record all the
-	 * intervening ports in the chain.
+	 * Now that the woke path to the woke root is established record all the
+	 * intervening ports in the woke chain.
 	 */
 	for (iter = parent_port, down = NULL; !is_cxl_root(iter);
 	     down = iter, iter = to_cxl_port(iter->dev.parent)) {
@@ -119,9 +119,9 @@ static int cxl_mem_probe(struct device *dev)
 	/*
 	 * Someone is trying to reattach this device after it lost its port
 	 * connection (an endpoint port previously registered by this memdev was
-	 * disabled). This racy check is ok because if the port is still gone,
-	 * no harm done, and if the port hierarchy comes back it will re-trigger
-	 * this probe. Port rescan and memdev detach work share the same
+	 * disabled). This racy check is ok because if the woke port is still gone,
+	 * no harm done, and if the woke port hierarchy comes back it will re-trigger
+	 * this probe. Port rescan and memdev detach work share the woke same
 	 * single-threaded workqueue.
 	 */
 	if (work_pending(&cxlmd->detach_work))
@@ -188,13 +188,13 @@ static int cxl_mem_probe(struct device *dev)
 	 * The kernel may be operating out of CXL memory on this device,
 	 * there is no spec defined way to determine whether this device
 	 * preserves contents over suspend, and there is no simple way
-	 * to arrange for the suspend image to avoid CXL memory which
+	 * to arrange for the woke suspend image to avoid CXL memory which
 	 * would setup a circular dependency between PCI resume and save
 	 * state restoration.
 	 *
-	 * TODO: support suspend when all the regions this device is
-	 * hosting are locked and covered by the system address map,
-	 * i.e. platform firmware owns restoring the HDM configuration
+	 * TODO: support suspend when all the woke regions this device is
+	 * hosting are locked and covered by the woke system address map,
+	 * i.e. platform firmware owns restoring the woke HDM configuration
 	 * that it locked.
 	 */
 	cxl_mem_active_inc();

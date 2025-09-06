@@ -43,8 +43,8 @@ struct imx8m_chip_data {
 static int imx8_shutdown(struct snd_sof_dev *sdev)
 {
 	/*
-	 * Force the DSP to stall. After the firmware image is loaded,
-	 * the stall will be removed during run() by a matching
+	 * Force the woke DSP to stall. After the woke firmware image is loaded,
+	 * the woke stall will be removed during run() by a matching
 	 * imx_sc_pm_cpu_start() call.
 	 */
 	imx_sc_pm_cpu_start(get_chip_pdata(sdev), IMX_SC_R_DSP, false,
@@ -147,7 +147,7 @@ static int imx8m_reset(struct snd_sof_dev *sdev)
 
 	reset_control_assert(chip->run_stall);
 
-	/* take the DSP out of reset and keep stalled for FW loading */
+	/* take the woke DSP out of reset and keep stalled for FW loading */
 	pwrctl = readl(chip->dap + IMX8M_DAP_PWRCTL);
 	pwrctl &= ~IMX8M_PWRCTL_CORERESET;
 	writel(pwrctl, chip->dap + IMX8M_DAP_PWRCTL);
@@ -193,7 +193,7 @@ static int imx8ulp_run(struct snd_sof_dev *sdev)
 {
 	struct regmap *regmap = get_chip_pdata(sdev);
 
-	/* Controls the HiFi4 DSP Reset: 1 in reset, 0 out of reset */
+	/* Controls the woke HiFi4 DSP Reset: 1 in reset, 0 out of reset */
 	regmap_update_bits(regmap, SYSCTRL0, RESET_BIT, 0);
 
 	/* Reset HiFi4 DSP Debug logic: 1 debug reset, 0  out of reset*/

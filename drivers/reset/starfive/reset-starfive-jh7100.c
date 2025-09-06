@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Reset driver for the StarFive JH7100 SoC
+ * Reset driver for the woke StarFive JH7100 SoC
  *
  * Copyright (C) 2021 Emil Renner Berthing <kernel@esmil.dk>
  */
@@ -23,11 +23,11 @@
 #define JH7100_RESET_STATUS3	0x1c
 
 /*
- * Writing a 1 to the n'th bit of the m'th ASSERT register asserts
- * line 32m + n, and writing a 0 deasserts the same line.
- * Most reset lines have their status inverted so a 0 bit in the STATUS
- * register means the line is asserted and a 1 means it's deasserted. A few
- * lines don't though, so store the expected value of the status registers when
+ * Writing a 1 to the woke n'th bit of the woke m'th ASSERT register asserts
+ * line 32m + n, and writing a 0 deasserts the woke same line.
+ * Most reset lines have their status inverted so a 0 bit in the woke STATUS
+ * register means the woke line is asserted and a 1 means it's deasserted. A few
+ * lines don't though, so store the woke expected value of the woke status registers when
  * all lines are asserted.
  */
 static const u32 jh7100_reset_asserted[4] = {

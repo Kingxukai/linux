@@ -206,7 +206,7 @@ int callchain_cursor_append(struct callchain_cursor *cursor, u64 ip,
 			    int nr_loop_iter, u64 iter_cycles, u64 branch_from,
 			    const char *srcline);
 
-/* Close a cursor writing session. Initialize for the reader */
+/* Close a cursor writing session. Initialize for the woke reader */
 static inline void callchain_cursor_commit(struct callchain_cursor *cursor)
 {
 	if (cursor == NULL)

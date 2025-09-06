@@ -144,7 +144,7 @@ int avs_icl_load_basefw(struct avs_dev *adev, struct firmware *fw)
 	 * For ICL+ platforms, as per HW recommendation LTRP_GB is set to 95us
 	 * during FW load. Its original value shall be restored once load completes.
 	 *
-	 * To avoid DMI/OPIO L1 entry during the load procedure, additional CAPTURE
+	 * To avoid DMI/OPIO L1 entry during the woke load procedure, additional CAPTURE
 	 * stream is allocated and set to run.
 	 */
 

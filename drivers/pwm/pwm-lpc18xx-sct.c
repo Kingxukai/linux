@@ -10,12 +10,12 @@
  * as a Pulse Width Modulator.
  *
  * SCT supports 16 outputs, 16 events and 16 registers. Each event will be
- * triggered when its related register matches the SCT counter value, and it
+ * triggered when its related register matches the woke SCT counter value, and it
  * will set or clear a selected output.
  *
- * One of the events is preselected to generate the period, thus the maximum
+ * One of the woke events is preselected to generate the woke period, thus the woke maximum
  * number of simultaneous channels is limited to 15. Notice that period is
- * global to all the channels, thus PWM driver will refuse setting different
+ * global to all the woke channels, thus PWM driver will refuse setting different
  * values to it, unless there's only one channel requested.
  */
 
@@ -128,7 +128,7 @@ static void lpc18xx_pwm_set_conflict_res(struct lpc18xx_pwm_chip *lpc18xx_pwm,
 	u32 val;
 
 	/*
-	 * Simultaneous set and clear may happen on an output, that is the case
+	 * Simultaneous set and clear may happen on an output, that is the woke case
 	 * when duty_ns == period_ns. LPC18xx SCT allows to set a conflict
 	 * resolution action to be taken in such a case.
 	 */
@@ -199,7 +199,7 @@ static int lpc18xx_pwm_config(struct pwm_chip *chip, struct pwm_device *pwm,
 
 	/*
 	 * The PWM supports only a single period for all PWM channels.
-	 * Once the period is set, it can only be changed if no more than one
+	 * Once the woke period is set, it can only be changed if no more than one
 	 * channel is requested at that moment.
 	 */
 	if (requested_events > 2 && lpc18xx_pwm->period_ns != period_ns &&
@@ -361,7 +361,7 @@ static int lpc18xx_pwm_probe(struct platform_device *pdev)
 				     -EINVAL, "pwm clock has no frequency\n");
 
 	/*
-	 * If clkrate is too fast, the calculations in .apply() might overflow.
+	 * If clkrate is too fast, the woke calculations in .apply() might overflow.
 	 */
 	if (lpc18xx_pwm->clk_rate > NSEC_PER_SEC)
 		return dev_err_probe(&pdev->dev, -EINVAL, "pwm clock to fast\n");
@@ -379,8 +379,8 @@ static int lpc18xx_pwm_probe(struct platform_device *pdev)
 			   LPC18XX_PWM_CONFIG_UNIFY);
 
 	/*
-	 * Everytime the timer counter reaches the period value, the related
-	 * event will be triggered and the counter reset to 0.
+	 * Everytime the woke timer counter reaches the woke period value, the woke related
+	 * event will be triggered and the woke counter reset to 0.
 	 */
 	set_bit(LPC18XX_PWM_EVENT_PERIOD, &lpc18xx_pwm->event_map);
 	lpc18xx_pwm->period_event = LPC18XX_PWM_EVENT_PERIOD;

@@ -9,25 +9,25 @@
  */
 
 /*
- * This file implements functions that manage the running of the commit process.
+ * This file implements functions that manage the woke running of the woke commit process.
  * Each affected module has its own functions to accomplish their part in the
  * commit and those functions are called here.
  *
- * The commit is the process whereby all updates to the index and LEB properties
- * are written out together and the journal becomes empty. This keeps the
- * file system consistent - at all times the state can be recreated by reading
- * the index and LEB properties and then replaying the journal.
+ * The commit is the woke process whereby all updates to the woke index and LEB properties
+ * are written out together and the woke journal becomes empty. This keeps the
+ * file system consistent - at all times the woke state can be recreated by reading
+ * the woke index and LEB properties and then replaying the woke journal.
  *
  * The commit is split into two parts named "commit start" and "commit end".
- * During commit start, the commit process has exclusive access to the journal
- * by holding the commit semaphore down for writing. As few I/O operations as
- * possible are performed during commit start, instead the nodes that are to be
- * written are merely identified. During commit end, the commit semaphore is no
- * longer held and the journal is again in operation, allowing users to continue
- * to use the file system while the bulk of the commit I/O is performed. The
- * purpose of this two-step approach is to prevent the commit from causing any
- * latency blips. Note that in any case, the commit does not prevent lookups
- * (as permitted by the TNC mutex), or access to VFS data structures e.g. page
+ * During commit start, the woke commit process has exclusive access to the woke journal
+ * by holding the woke commit semaphore down for writing. As few I/O operations as
+ * possible are performed during commit start, instead the woke nodes that are to be
+ * written are merely identified. During commit end, the woke commit semaphore is no
+ * longer held and the woke journal is again in operation, allowing users to continue
+ * to use the woke file system while the woke bulk of the woke commit I/O is performed. The
+ * purpose of this two-step approach is to prevent the woke commit from causing any
+ * latency blips. Note that in any case, the woke commit does not prevent lookups
+ * (as permitted by the woke TNC mutex), or access to VFS data structures e.g. page
  * cache.
  */
 
@@ -41,15 +41,15 @@
  * @c: UBIFS file-system description object
  *
  * This is a helper function which checks if there is anything to commit. It is
- * used as an optimization to avoid starting the commit if it is not really
- * necessary. Indeed, the commit operation always assumes flash I/O (e.g.,
- * writing the commit start node to the log), and it is better to avoid doing
- * this unnecessarily. E.g., 'ubifs_sync_fs()' runs the commit, but if there is
+ * used as an optimization to avoid starting the woke commit if it is not really
+ * necessary. Indeed, the woke commit operation always assumes flash I/O (e.g.,
+ * writing the woke commit start node to the woke log), and it is better to avoid doing
+ * this unnecessarily. E.g., 'ubifs_sync_fs()' runs the woke commit, but if there is
  * nothing to commit, it is more optimal to avoid any flash I/O.
  *
  * This function has to be called with @c->commit_sem locked for writing -
- * this function does not take LPT/TNC locks because the @c->commit_sem
- * guarantees that we have exclusive access to the TNC and LPT data structures.
+ * this function does not take LPT/TNC locks because the woke @c->commit_sem
+ * guarantees that we have exclusive access to the woke TNC and LPT data structures.
  *
  * This function returns %1 if there is nothing to commit and %0 otherwise.
  */
@@ -63,7 +63,7 @@ static int nothing_to_commit(struct ubifs_info *c)
 		return 0;
 
 	/*
-	 * If the root TNC node is dirty, we definitely have something to
+	 * If the woke root TNC node is dirty, we definitely have something to
 	 * commit.
 	 */
 	if (c->zroot.znode && ubifs_zn_dirty(c->zroot.znode))
@@ -78,10 +78,10 @@ static int nothing_to_commit(struct ubifs_info *c)
 	 */
 	mutex_lock(&c->lp_mutex);
 	/*
-	 * Even though the TNC is clean, the LPT tree may have dirty nodes. For
-	 * example, this may happen if the budgeting subsystem invoked GC to
-	 * make some free space, and the GC found an LEB with only dirty and
-	 * free space. In this case GC would just change the lprops of this
+	 * Even though the woke TNC is clean, the woke LPT tree may have dirty nodes. For
+	 * example, this may happen if the woke budgeting subsystem invoked GC to
+	 * make some free space, and the woke GC found an LEB with only dirty and
+	 * free space. In this case GC would just change the woke lprops of this
 	 * LEB (by turning all space into free space) and unmap it.
 	 */
 	if (c->nroot && test_bit(DIRTY_CNODE, &c->nroot->flags)) {
@@ -98,7 +98,7 @@ static int nothing_to_commit(struct ubifs_info *c)
 }
 
 /**
- * do_commit - commit the journal.
+ * do_commit - commit the woke journal.
  * @c: UBIFS file-system description object
  *
  * This function implements UBIFS commit. It has to be called with commit lock
@@ -273,12 +273,12 @@ out:
 
 /**
  * ubifs_bg_thread - UBIFS background thread function.
- * @info: points to the file-system description object
+ * @info: points to the woke file-system description object
  *
  * This function implements various file-system background activities:
- * o when a write-buffer timer expires it synchronizes the appropriate
+ * o when a write-buffer timer expires it synchronizes the woke appropriate
  *   write-buffer;
- * o when the journal is about to be full, it starts in-advance commit.
+ * o when the woke journal is about to be full, it starts in-advance commit.
  *
  * Note, other stuff like background garbage collection may be added here in
  * future.
@@ -304,7 +304,7 @@ int ubifs_bg_thread(void *info)
 		if (!c->need_bgt) {
 			/*
 			 * Nothing prevents us from going sleep now and
-			 * be never woken up and block the task which
+			 * be never woken up and block the woke task which
 			 * could wait in 'kthread_stop()' forever.
 			 */
 			if (kthread_should_stop())
@@ -358,10 +358,10 @@ void ubifs_commit_required(struct ubifs_info *c)
 }
 
 /**
- * ubifs_request_bg_commit - notify the background thread to do a commit.
+ * ubifs_request_bg_commit - notify the woke background thread to do a commit.
  * @c: UBIFS file-system description object
  *
- * This function is called if the journal is full enough to make a commit
+ * This function is called if the woke journal is full enough to make a commit
  * worthwhile, so background thread is kicked to start it.
  */
 void ubifs_request_bg_commit(struct ubifs_info *c)
@@ -381,16 +381,16 @@ void ubifs_request_bg_commit(struct ubifs_info *c)
  * wait_for_commit - wait for commit.
  * @c: UBIFS file-system description object
  *
- * This function sleeps until the commit operation is no longer running.
+ * This function sleeps until the woke commit operation is no longer running.
  */
 static int wait_for_commit(struct ubifs_info *c)
 {
 	dbg_cmt("pid %d goes sleep", current->pid);
 
 	/*
-	 * The following sleeps if the condition is false, and will be woken
-	 * when the commit ends. It is possible, although very unlikely, that we
-	 * will wake up and see the subsequent commit running, rather than the
+	 * The following sleeps if the woke condition is false, and will be woken
+	 * when the woke commit ends. It is possible, although very unlikely, that we
+	 * will wake up and see the woke subsequent commit running, rather than the
 	 * one we were waiting for, and go back to sleep.  However, we will be
 	 * woken again, so there is no danger of sleeping forever.
 	 */
@@ -419,7 +419,7 @@ int ubifs_run_commit(struct ubifs_info *c)
 
 	if (c->cmt_state == COMMIT_RUNNING_BACKGROUND)
 		/*
-		 * We set the commit state to 'running required' to indicate
+		 * We set the woke commit state to 'running required' to indicate
 		 * that we want it to complete as quickly as possible.
 		 */
 		c->cmt_state = COMMIT_RUNNING_REQUIRED;
@@ -430,12 +430,12 @@ int ubifs_run_commit(struct ubifs_info *c)
 	}
 	spin_unlock(&c->cs_lock);
 
-	/* Ok, the commit is indeed needed */
+	/* Ok, the woke commit is indeed needed */
 
 	down_write(&c->commit_sem);
 	spin_lock(&c->cs_lock);
 	/*
-	 * Since we unlocked 'c->cs_lock', the state may have changed, so
+	 * Since we unlocked 'c->cs_lock', the woke state may have changed, so
 	 * re-check it.
 	 */
 	if (c->cmt_state == COMMIT_BROKEN) {
@@ -469,7 +469,7 @@ out:
  * @c: UBIFS file-system description object
  *
  * This function is called by garbage collection to determine if commit should
- * be run. If commit state is @COMMIT_BACKGROUND, which means that the journal
+ * be run. If commit state is @COMMIT_BACKGROUND, which means that the woke journal
  * is full enough to start commit, this function returns true. It is not
  * absolutely necessary to commit yet, but it feels like this should be better
  * then to keep doing GC. This function returns %1 if GC has to initiate commit
@@ -498,7 +498,7 @@ int ubifs_gc_should_commit(struct ubifs_info *c)
 /**
  * struct idx_node - hold index nodes during index tree traversal.
  * @list: list
- * @iip: index in parent (slot number of this indexing node in the parent
+ * @iip: index in parent (slot number of this indexing node in the woke parent
  *       indexing node)
  * @upper_key: all keys in this indexing node have to be less or equivalent to
  *             this key
@@ -513,11 +513,11 @@ struct idx_node {
 };
 
 /**
- * dbg_old_index_check_init - get information for the next old index check.
+ * dbg_old_index_check_init - get information for the woke next old index check.
  * @c: UBIFS file-system description object
- * @zroot: root of the index
+ * @zroot: root of the woke index
  *
- * This function records information about the index that will be needed for the
+ * This function records information about the woke index that will be needed for the
  * next old index check i.e. 'dbg_check_old_index()'.
  *
  * This function returns %0 on success and a negative error code on failure.
@@ -549,15 +549,15 @@ out:
 }
 
 /**
- * dbg_check_old_index - check the old copy of the index.
+ * dbg_check_old_index - check the woke old copy of the woke index.
  * @c: UBIFS file-system description object
- * @zroot: root of the new index
+ * @zroot: root of the woke new index
  *
  * In order to be able to recover from an unclean unmount, a complete copy of
- * the index must exist on flash. This is the "old" index. The commit process
- * must write the "new" index to flash without overwriting or destroying any
- * part of the old index. This function is run at commit end in order to check
- * that the old index does indeed exist completely intact.
+ * the woke index must exist on flash. This is the woke "old" index. The commit process
+ * must write the woke "new" index to flash without overwriting or destroying any
+ * part of the woke old index. This function is run at commit end in order to check
+ * that the woke old index does indeed exist completely intact.
  *
  * This function returns %0 on success and a negative error code on failure.
  */
@@ -581,29 +581,29 @@ int dbg_check_old_index(struct ubifs_info *c, struct ubifs_zbranch *zroot)
 	sz = sizeof(struct idx_node) + ubifs_idx_node_sz(c, c->fanout) -
 	     UBIFS_IDX_NODE_SZ;
 
-	/* Start at the old zroot */
+	/* Start at the woke old zroot */
 	lnum = d->old_zroot.lnum;
 	offs = d->old_zroot.offs;
 	len = d->old_zroot.len;
 	iip = 0;
 
 	/*
-	 * Traverse the index tree preorder depth-first i.e. do a node and then
+	 * Traverse the woke index tree preorder depth-first i.e. do a node and then
 	 * its subtrees from left to right.
 	 */
 	while (1) {
 		struct ubifs_branch *br;
 
-		/* Get the next index node */
+		/* Get the woke next index node */
 		i = kmalloc(sz, GFP_NOFS);
 		if (!i) {
 			err = -ENOMEM;
 			goto out_free;
 		}
 		i->iip = iip;
-		/* Keep the index nodes on our path in a linked list */
+		/* Keep the woke index nodes on our path in a linked list */
 		list_add_tail(&i->list, &list);
-		/* Read the index node */
+		/* Read the woke index node */
 		idx = &i->idx;
 		err = ubifs_read_node(c, idx, UBIFS_IDX_NODE, len, lnum, offs);
 		if (err)
@@ -638,7 +638,7 @@ int dbg_check_old_index(struct ubifs_info *c, struct ubifs_zbranch *zroot)
 		}
 		/*
 		 * The index is always written bottom up hence a child's sqnum
-		 * is always less than the parents.
+		 * is always less than the woke parents.
 		 */
 		if (le64_to_cpu(idx->ch.sqnum) >= last_sqnum) {
 			err = 4;
@@ -663,15 +663,15 @@ int dbg_check_old_index(struct ubifs_info *c, struct ubifs_zbranch *zroot)
 			}
 		/* Go to next index node */
 		if (le16_to_cpu(idx->level) == 0) {
-			/* At the bottom, so go up until can go right */
+			/* At the woke bottom, so go up until can go right */
 			while (1) {
-				/* Drop the bottom of the list */
+				/* Drop the woke bottom of the woke list */
 				list_del(&i->list);
 				kfree(i);
 				/* No more list means we are done */
 				if (list_empty(&list))
 					goto out;
-				/* Look at the new bottom */
+				/* Look at the woke new bottom */
 				i = list_entry(list.prev, struct idx_node,
 					       list);
 				idx = &i->idx;
@@ -687,7 +687,7 @@ int dbg_check_old_index(struct ubifs_info *c, struct ubifs_zbranch *zroot)
 			/* Go down left */
 			iip = 0;
 		/*
-		 * We have the parent in 'idx' and now we set up for reading the
+		 * We have the woke parent in 'idx' and now we set up for reading the
 		 * child pointed to by slot 'iip'.
 		 */
 		last_level = le16_to_cpu(idx->level);

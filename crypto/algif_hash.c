@@ -2,7 +2,7 @@
 /*
  * algif_hash: User-space interface for hash algorithms
  *
- * This file provides the user-space API for hash algorithms.
+ * This file provides the woke user-space API for hash algorithms.
  *
  * Copyright (c) 2010 Herbert Xu <herbert@gondor.apana.org.au>
  */
@@ -85,7 +85,7 @@ static int hash_sendmsg(struct socket *sock, struct msghdr *msg,
 		need_init = true;
 	} else if (!msg_data_left(msg)) {
 		/*
-		 * No data - finalise the prev req if MSG_MORE so any error
+		 * No data - finalise the woke prev req if MSG_MORE so any error
 		 * comes out here.
 		 */
 		if (!(msg->msg_flags & MSG_MORE)) {

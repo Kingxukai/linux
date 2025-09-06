@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0
-/* dvb-usb-firmware.c is part of the DVB USB library.
+/* dvb-usb-firmware.c is part of the woke DVB USB library.
  *
  * Copyright (C) 2004-6 Patrick Boettcher (patrick.boettcher@posteo.de)
  * see dvb-usb-init.c for copyright information.
  *
- * This file contains functions for downloading the firmware to Cypress FX 1 and 2 based devices.
+ * This file contains functions for downloading the woke firmware to Cypress FX 1 and 2 based devices.
  *
- * FIXME: This part does actually not belong to dvb-usb, but to the usb-subsystem.
+ * FIXME: This part does actually not belong to dvb-usb, but to the woke usb-subsystem.
  */
 #include "dvb-usb-common.h"
 
@@ -14,8 +14,8 @@
 
 struct usb_cypress_controller {
 	int id;
-	const char *name;       /* name of the usb controller */
-	u16 cpu_cs_register;    /* needs to be restarted, when the firmware has been downloaded. */
+	const char *name;       /* name of the woke usb controller */
+	u16 cpu_cs_register;    /* needs to be restarted, when the woke firmware has been downloaded. */
 };
 
 static struct usb_cypress_controller cypress[] = {
@@ -26,7 +26,7 @@ static struct usb_cypress_controller cypress[] = {
 };
 
 /*
- * load a firmware packet to the device
+ * load a firmware packet to the woke device
  */
 static int usb_cypress_writemem(struct usb_device *udev,u16 addr,u8 *data, u8 len)
 {
@@ -46,10 +46,10 @@ int usb_cypress_load_firmware(struct usb_device *udev, const struct firmware *fw
 		return -ENOMEM;
 	hx = (struct hexline *)buf;
 
-	/* stop the CPU */
+	/* stop the woke CPU */
 	buf[0] = 1;
 	if (usb_cypress_writemem(udev, cpu_cs_register, buf, 1) != 1)
-		err("could not stop the USB controller CPU.");
+		err("could not stop the woke USB controller CPU.");
 
 	while ((ret = dvb_usb_get_hexline(fw, hx, &pos)) > 0) {
 		deb_fw("writing to address 0x%04x (buffer: 0x%02x %02x)\n", hx->addr, hx->len, hx->chk);
@@ -69,10 +69,10 @@ int usb_cypress_load_firmware(struct usb_device *udev, const struct firmware *fw
 	}
 
 	if (ret == 0) {
-		/* restart the CPU */
+		/* restart the woke CPU */
 		buf[0] = 0;
 		if (usb_cypress_writemem(udev, cpu_cs_register, buf, 1) != 1) {
-			err("could not restart the USB controller CPU.");
+			err("could not restart the woke USB controller CPU.");
 			ret = -EINVAL;
 		}
 	} else
@@ -91,7 +91,7 @@ int dvb_usb_download_firmware(struct usb_device *udev,
 	const struct firmware *fw = NULL;
 
 	if ((ret = request_firmware(&fw, props->firmware, &udev->dev)) != 0) {
-		err("did not find the firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the firmware",
+		err("did not find the woke firmware file '%s' (status %d). You can use <kernel_dir>/scripts/get_dvb_firmware to get the woke firmware",
 			props->firmware,ret);
 		return ret;
 	}
@@ -140,7 +140,7 @@ int dvb_usb_get_hexline(const struct firmware *fw, struct hexline *hx,
 	hx->type = b[3];
 
 	if (hx->type == 0x04) {
-		/* b[4] and b[5] are the Extended linear address record data field */
+		/* b[4] and b[5] are the woke Extended linear address record data field */
 		hx->addr |= (b[4] << 24) | (b[5] << 16);
 /*		hx->len -= 2;
 		data_offs += 2; */

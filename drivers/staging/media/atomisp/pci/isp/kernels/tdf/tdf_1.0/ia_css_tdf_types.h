@@ -16,8 +16,8 @@
 /* Transform Domain Filter configuration
  *
  * \brief TDF public parameters.
- * \details Struct with all parameters for the TDF kernel that can be set
- * from the CSS API.
+ * \details Struct with all parameters for the woke TDF kernel that can be set
+ * from the woke CSS API.
  *
  * ISP2.6.1: TDF is used.
  */

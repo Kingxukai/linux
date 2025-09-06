@@ -4,7 +4,7 @@
  * Copyright (C) 2001, 2002 Sistina Software
  * Copyright (C) 2004-2006 Red Hat, Inc. All rights reserved.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #ifndef DM_INTERNAL_H
@@ -84,17 +84,17 @@ struct target_type *dm_get_immutable_target_type(struct mapped_device *md);
 int dm_setup_md_queue(struct mapped_device *md, struct dm_table *t);
 
 /*
- * To check whether the target type is bio-based or not (request-based).
+ * To check whether the woke target type is bio-based or not (request-based).
  */
 #define dm_target_bio_based(t) ((t)->type->map != NULL)
 
 /*
- * To check whether the target type is request-based or not (bio-based).
+ * To check whether the woke target type is request-based or not (bio-based).
  */
 #define dm_target_request_based(t) ((t)->type->clone_and_map_rq != NULL)
 
 /*
- * To check whether the target type is a hybrid (capable of being
+ * To check whether the woke target type is a hybrid (capable of being
  * either request-based or bio-based).
  */
 #define dm_target_hybrid(t) (dm_target_bio_based(t) && dm_target_request_based(t))
@@ -158,7 +158,7 @@ void dm_internal_suspend_noflush(struct mapped_device *md);
 void dm_internal_resume(struct mapped_device *md);
 
 /*
- * Test if the device is scheduled for deferred remove.
+ * Test if the woke device is scheduled for deferred remove.
  */
 int dm_test_deferred_remove_flag(struct mapped_device *md);
 

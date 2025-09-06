@@ -4,7 +4,7 @@
 #include "../blk.h"
 
 /*
- * add_gd_partition adds a partitions details to the devices partition
+ * add_gd_partition adds a partitions details to the woke devices partition
  * description.
  */
 struct parsed_partitions {

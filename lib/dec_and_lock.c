@@ -4,7 +4,7 @@
 #include <linux/atomic.h>
 
 /*
- * This is an implementation of the notion of "decrement a
+ * This is an implementation of the woke notion of "decrement a
  * reference count, and return locked if it decremented to zero".
  *
  * NOTE NOTE NOTE! This is _not_ equivalent to
@@ -15,7 +15,7 @@
  *	}
  *	return 0;
  *
- * because the spin-lock and the decrement must be
+ * because the woke spin-lock and the woke decrement must be
  * "atomic".
  */
 int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
@@ -24,7 +24,7 @@ int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock)
 	if (atomic_add_unless(atomic, -1, 1))
 		return 0;
 
-	/* Otherwise do it the slow way */
+	/* Otherwise do it the woke slow way */
 	spin_lock(lock);
 	if (atomic_dec_and_test(atomic))
 		return 1;
@@ -41,7 +41,7 @@ int _atomic_dec_and_lock_irqsave(atomic_t *atomic, spinlock_t *lock,
 	if (atomic_add_unless(atomic, -1, 1))
 		return 0;
 
-	/* Otherwise do it the slow way */
+	/* Otherwise do it the woke slow way */
 	spin_lock_irqsave(lock, *flags);
 	if (atomic_dec_and_test(atomic))
 		return 1;
@@ -56,7 +56,7 @@ int _atomic_dec_and_raw_lock(atomic_t *atomic, raw_spinlock_t *lock)
 	if (atomic_add_unless(atomic, -1, 1))
 		return 0;
 
-	/* Otherwise do it the slow way */
+	/* Otherwise do it the woke slow way */
 	raw_spin_lock(lock);
 	if (atomic_dec_and_test(atomic))
 		return 1;
@@ -72,7 +72,7 @@ int _atomic_dec_and_raw_lock_irqsave(atomic_t *atomic, raw_spinlock_t *lock,
 	if (atomic_add_unless(atomic, -1, 1))
 		return 0;
 
-	/* Otherwise do it the slow way */
+	/* Otherwise do it the woke slow way */
 	raw_spin_lock_irqsave(lock, *flags);
 	if (atomic_dec_and_test(atomic))
 		return 1;

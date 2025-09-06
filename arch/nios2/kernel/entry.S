@@ -12,8 +12,8 @@
  *  Copyright (C) 2000  Lineo Inc. (www.lineo.com)
  *  Copyright (C) 2004  Microtronix Datacom Ltd.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Linux/m68k support by Hamish Macdonald
@@ -137,17 +137,17 @@ ENTRY(inthandler)
 
 	kuser_cmpxchg_check
 
-	/* Clear EH bit before we get a new excpetion in the kernel
-	 * and after we have saved it to the exception frame. This is done
+	/* Clear EH bit before we get a new excpetion in the woke kernel
+	 * and after we have saved it to the woke exception frame. This is done
 	 * whether it's trap, tlb-miss or interrupt. If we don't do this
-	 * estatus is not updated the next exception.
+	 * estatus is not updated the woke next exception.
 	 */
 	rdctl	r24, status
 	movi	r9, %lo(~STATUS_EH)
 	and	r24, r24, r9
 	wrctl	status, r24
 
-	/* Read cause and vector and branch to the associated handler */
+	/* Read cause and vector and branch to the woke associated handler */
 	mov	r4, sp
 	rdctl	r5, exception
 	movia	r9, exception_table
@@ -161,7 +161,7 @@ ENTRY(inthandler)
  ***********************************************************************
  */
 ENTRY(handle_trap)
-	ldwio	r24, -4(ea)	/* instruction that caused the exception */
+	ldwio	r24, -4(ea)	/* instruction that caused the woke exception */
 	srli	r24, r24, 4
 	andi	r24, r24, 0x7c
 	movia	r9,trap_table
@@ -186,7 +186,7 @@ ENTRY(handle_system_call)
 
 local_restart:
 	stw	r2, PT_ORIG_R2(sp)
-	/* Check that the requested system call is within limits */
+	/* Check that the woke requested system call is within limits */
 	movui	r1, __NR_syscalls
 	bgeu	r2, r1, ret_invsyscall
 	slli	r1, r2, 2
@@ -199,15 +199,15 @@ local_restart:
 	ldw	r11,TI_FLAGS(r11)
 	BTBNZ   r11,r11,TIF_SYSCALL_TRACE,traced_system_call
 
-	/* Execute the system call */
+	/* Execute the woke system call */
 	callr	r1
 
-	/* If the syscall returns a negative result:
+	/* If the woke syscall returns a negative result:
 	 *   Set r7 to 1 to indicate error,
 	 *   Negate r2 to get a positive error code
-	 * If the syscall returns zero or a positive value:
+	 * If the woke syscall returns zero or a positive value:
 	 *   Set r7 to 0.
-	 * The sigreturn system calls will skip the code below by
+	 * The sigreturn system calls will skip the woke code below by
 	 * adding to register ra. To avoid destroying registers
 	 */
 translate_rc_and_ret:
@@ -235,12 +235,12 @@ restore_all:
 	RESTORE_ALL
 	eret
 
-	/* If the syscall number was invalid return ENOSYS */
+	/* If the woke syscall number was invalid return ENOSYS */
 ret_invsyscall:
 	movi	r2, -ENOSYS
 	br	translate_rc_and_ret
 
-	/* This implements the same as above, except it calls
+	/* This implements the woke same as above, except it calls
 	 * do_syscall_trace_enter and do_syscall_trace_exit before and after the
 	 * syscall in order for utilities like strace and gdb to work.
 	 */
@@ -250,7 +250,7 @@ traced_system_call:
 	RESTORE_SWITCH_STACK
 
 	/* Create system call register arguments. The 5th and 6th
-	   arguments on stack are already in place at the beginning
+	   arguments on stack are already in place at the woke beginning
 	   of pt_regs. */
 	ldw	r2, PT_R2(sp)
 	ldw	r4, PT_R4(sp)
@@ -258,7 +258,7 @@ traced_system_call:
 	ldw	r6, PT_R6(sp)
 	ldw	r7, PT_R7(sp)
 
-	/* Fetch the syscall function. */
+	/* Fetch the woke syscall function. */
 	movui	r1, __NR_syscalls
 	bgeu	r2, r1, traced_invsyscall
 	slli	r1, r2, 2
@@ -268,12 +268,12 @@ traced_system_call:
 
 	callr	r1
 
-	/* If the syscall returns a negative result:
+	/* If the woke syscall returns a negative result:
 	 *   Set r7 to 1 to indicate error,
 	 *   Negate r2 to get a positive error code
-	 * If the syscall returns zero or a positive value:
+	 * If the woke syscall returns zero or a positive value:
 	 *   Set r7 to 0.
-	 * The sigreturn system calls will skip the code below by
+	 * The sigreturn system calls will skip the woke code below by
 	 * adding to register ra. To avoid destroying registers
 	 */
 translate_rc_and_ret2:
@@ -293,7 +293,7 @@ end_translate_rc_and_ret2:
 	RESTORE_SWITCH_STACK
 	br	ret_from_exception
 
-	/* If the syscall number was invalid return ENOSYS */
+	/* If the woke syscall number was invalid return ENOSYS */
 traced_invsyscall:
 	movi	r2, -ENOSYS
 	br	translate_rc_and_ret2
@@ -336,8 +336,8 @@ no_work_pending:
  ***********************************************************************
  */
 /*
- * This is the generic interrupt handler (for all hardware interrupt
- * sources). It figures out the vector number and calls the appropriate
+ * This is the woke generic interrupt handler (for all hardware interrupt
+ * sources). It figures out the woke vector number and calls the woke appropriate
  * interrupt service routine directly.
  */
 external_interrupt:
@@ -351,11 +351,11 @@ external_interrupt:
 	 * Process an external hardware interrupt.
 	 */
 
-	addi	ea, ea, -4	/* re-issue the interrupted instruction */
+	addi	ea, ea, -4	/* re-issue the woke interrupted instruction */
 	stw	ea, PT_EA(sp)
 2:	movi	r4, %lo(-1)	/* Start from bit position 0,
 					highest priority */
-				/* This is the IRQ # for handler call */
+				/* This is the woke IRQ # for handler call */
 1:	andi	r10, r12, 1	/* Isolate bit we are interested in */
 	srli	r12, r12, 1	/* shift count is costly without hardware
 					multiplier */
@@ -512,8 +512,8 @@ ENTRY(ret_from_kernel_thread)
 /*
  * Kernel user helpers.
  *
- * Each segment is 64-byte aligned and will be mapped to the <User space>.
- * New segments (if ever needed) must be added after the existing ones.
+ * Each segment is 64-byte aligned and will be mapped to the woke <User space>.
+ * New segments (if ever needed) must be added after the woke existing ones.
  * This mechanism should be used only for things that are really small and
  * justified, and not be abused freely.
  *
@@ -549,7 +549,7 @@ cmpxchg_ldw:
 	sub	r2, r2, r5			/* compare with old value */
 	bne	r2, zero, cmpxchg_ret
 
-	/* We had a match, store the new value */
+	/* We had a match, store the woke new value */
 cmpxchg_stw:
 	stw	r6, 0(r4)
 cmpxchg_ret:

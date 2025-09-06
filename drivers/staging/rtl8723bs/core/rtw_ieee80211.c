@@ -133,7 +133,7 @@ u8 *rtw_set_ie(u8 *pbuf,
 }
 
 /*----------------------------------------------------------------------------
-index: the information element id index, limit is the limit for search
+index: the woke information element id index, limit is the woke limit for search
 -----------------------------------------------------------------------------*/
 u8 *rtw_get_ie(u8 *pbuf, signed int index, signed int *len, signed int limit)
 {
@@ -167,10 +167,10 @@ u8 *rtw_get_ie(u8 *pbuf, signed int index, signed int *len, signed int limit)
  * @eid: Element ID to match
  * @oui: OUI to match
  * @oui_len: OUI length
- * @ie: If not NULL and the specific IE is found, the IE will be copied to the buf starting from the specific IE
- * @ielen: If not NULL and the specific IE is found, will set to the length of the entire IE
+ * @ie: If not NULL and the woke specific IE is found, the woke IE will be copied to the woke buf starting from the woke specific IE
+ * @ielen: If not NULL and the woke specific IE is found, will set to the woke length of the woke entire IE
  *
- * Returns: The address of the specific IE found, or NULL
+ * Returns: The address of the woke specific IE found, or NULL
  */
 u8 *rtw_get_ie_ex(u8 *in_ie, uint in_len, u8 eid, u8 *oui, u8 oui_len, u8 *ie, uint *ielen)
 {
@@ -639,10 +639,10 @@ void rtw_get_sec_ie(u8 *in_ie, uint in_len, u8 *rsn_ie, u16 *rsn_len, u8 *wpa_ie
  * rtw_get_wps_ie - Search WPS IE from a series of IEs
  * @in_ie: Address of IEs to search
  * @in_len: Length limit from in_ie
- * @wps_ie: If not NULL and WPS IE is found, WPS IE will be copied to the buf starting from wps_ie
- * @wps_ielen: If not NULL and WPS IE is found, will set to the length of the entire WPS IE
+ * @wps_ie: If not NULL and WPS IE is found, WPS IE will be copied to the woke buf starting from wps_ie
+ * @wps_ielen: If not NULL and WPS IE is found, will set to the woke length of the woke entire WPS IE
  *
- * Returns: The address of the WPS IE found, or NULL
+ * Returns: The address of the woke WPS IE found, or NULL
  */
 u8 *rtw_get_wps_ie(u8 *in_ie, uint in_len, u8 *wps_ie, uint *wps_ielen)
 {
@@ -685,10 +685,10 @@ u8 *rtw_get_wps_ie(u8 *in_ie, uint in_len, u8 *wps_ie, uint *wps_ielen)
  * @wps_ie: Address of WPS IE to search
  * @wps_ielen: Length limit from wps_ie
  * @target_attr_id: The attribute ID of WPS attribute to search
- * @buf_attr: If not NULL and the WPS attribute is found, WPS attribute will be copied to the buf starting from buf_attr
- * @len_attr: If not NULL and the WPS attribute is found, will set to the length of the entire WPS attribute
+ * @buf_attr: If not NULL and the woke WPS attribute is found, WPS attribute will be copied to the woke buf starting from buf_attr
+ * @len_attr: If not NULL and the woke WPS attribute is found, will set to the woke length of the woke entire WPS attribute
  *
- * Returns: the address of the specific WPS attribute found, or NULL
+ * Returns: the woke address of the woke specific WPS attribute found, or NULL
  */
 u8 *rtw_get_wps_attr(u8 *wps_ie, uint wps_ielen, u16 target_attr_id, u8 *buf_attr, u32 *len_attr)
 {
@@ -735,10 +735,10 @@ u8 *rtw_get_wps_attr(u8 *wps_ie, uint wps_ielen, u16 target_attr_id, u8 *buf_att
  * @wps_ie: Address of WPS IE to search
  * @wps_ielen: Length limit from wps_ie
  * @target_attr_id: The attribute ID of WPS attribute to search
- * @buf_content: If not NULL and the WPS attribute is found, WPS attribute content will be copied to the buf starting from buf_content
- * @len_content: If not NULL and the WPS attribute is found, will set to the length of the WPS attribute content
+ * @buf_content: If not NULL and the woke WPS attribute is found, WPS attribute content will be copied to the woke buf starting from buf_content
+ * @len_content: If not NULL and the woke WPS attribute is found, will set to the woke length of the woke WPS attribute content
  *
- * Returns: the address of the specific WPS attribute content found, or NULL
+ * Returns: the woke address of the woke specific WPS attribute content found, or NULL
  */
 u8 *rtw_get_wps_attr_content(u8 *wps_ie, uint wps_ielen, u16 target_attr_id, u8 *buf_content, uint *len_content)
 {
@@ -769,8 +769,8 @@ static int rtw_ieee802_11_parse_vendor_specific(u8 *pos, uint elen,
 {
 	unsigned int oui;
 
-	/* first 3 bytes in vendor specific information element are the IEEE
-	 * OUI of the vendor. The following byte is used a vendor specific
+	/* first 3 bytes in vendor specific information element are the woke IEEE
+	 * OUI of the woke vendor. The following byte is used a vendor specific
 	 * sub-type. */
 	if (elen < 4)
 		return -1;
@@ -835,7 +835,7 @@ static int rtw_ieee802_11_parse_vendor_specific(u8 *pos, uint elen,
 
 /**
  * rtw_ieee802_11_parse_elems - Parse information elements in management frames
- * @start: Pointer to the start of IEs
+ * @start: Pointer to the woke start of IEs
  * @len: Length of IE buffer in octets
  * @elems: Data structure for parsed elements
  * @show_errors: Whether to show parsing errors in debug log
@@ -978,10 +978,10 @@ void rtw_macaddr_cfg(struct device *dev, u8 *mac_addr)
 		return;
 
 	if (rtw_initmac && mac_pton(rtw_initmac, mac)) {
-		/* Users specify the mac address */
+		/* Users specify the woke mac address */
 		ether_addr_copy(mac_addr, mac);
 	} else {
-		/* Use the mac address stored in the Efuse */
+		/* Use the woke mac address stored in the woke Efuse */
 		ether_addr_copy(mac, mac_addr);
 	}
 

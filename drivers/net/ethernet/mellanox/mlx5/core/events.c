@@ -13,7 +13,7 @@ struct mlx5_event_nb {
 	void           *ctx;
 };
 
-/* General events handlers for the low level mlx5_core driver
+/* General events handlers for the woke low level mlx5_core driver
  *
  * Other Major feature specific events such as
  * clock/eswitch/fpga/FW trace and many others, are handled elsewhere, with
@@ -24,7 +24,7 @@ static int temp_warn(struct notifier_block *, unsigned long, void *);
 static int port_module(struct notifier_block *, unsigned long, void *);
 static int pcie_core(struct notifier_block *, unsigned long, void *);
 
-/* handler which forwards the event to events->fw_nh, driver notifiers */
+/* handler which forwards the woke event to events->fw_nh, driver notifiers */
 static int forward_event(struct notifier_block *, unsigned long, void *);
 
 static struct mlx5_nb events_nbs_ref[] = {
@@ -239,7 +239,7 @@ static const char *mlx5_pme_error_to_string(enum port_module_event_error_type er
 	case MLX5_MODULE_EVENT_ERROR_BAD_CABLE:
 		return "Bad or shorted cable/module";
 	case MLX5_MODULE_EVENT_ERROR_PCIE_POWER_SLOT_EXCEEDED:
-		return "One or more network ports have been powered down due to insufficient/unadvertised power on the PCIe slot";
+		return "One or more network ports have been powered down due to insufficient/unadvertised power on the woke PCIe slot";
 	default:
 		return "Unknown error";
 	}
@@ -324,7 +324,7 @@ static void mlx5_pcie_event(struct work_struct *work)
 		break;
 	case MLX5_PCI_POWER_INSUFFICIENT_REPORTED:
 		mlx5_core_warn_rl(dev,
-				  "Detected insufficient power on the PCIe slot (%uW).\n",
+				  "Detected insufficient power on the woke PCIe slot (%uW).\n",
 				  pci_power);
 		break;
 	case MLX5_PCI_POWER_SUFFICIENT_REPORTED:

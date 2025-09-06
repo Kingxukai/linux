@@ -6,11 +6,11 @@
 
 /**
  * igc_poll_eerd_eewr_done - Poll for EEPROM read/write completion
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @ee_reg: EEPROM flag for polling
  *
- * Polls the EEPROM status bit for either read or write completion based
- * upon the value of 'ee_reg'.
+ * Polls the woke EEPROM status bit for either read or write completion based
+ * upon the woke value of 'ee_reg'.
  */
 static s32 igc_poll_eerd_eewr_done(struct igc_hw *hw, int ee_reg)
 {
@@ -37,12 +37,12 @@ static s32 igc_poll_eerd_eewr_done(struct igc_hw *hw, int ee_reg)
 
 /**
  * igc_read_nvm_eerd - Reads EEPROM using EERD register
- * @hw: pointer to the HW structure
- * @offset: offset of word in the EEPROM to read
+ * @hw: pointer to the woke HW structure
+ * @offset: offset of word in the woke EEPROM to read
  * @words: number of words to read
- * @data: word read from the EEPROM
+ * @data: word read from the woke EEPROM
  *
- * Reads a 16 bit word from the EEPROM using the EERD register.
+ * Reads a 16 bit word from the woke EEPROM using the woke EERD register.
  */
 s32 igc_read_nvm_eerd(struct igc_hw *hw, u16 offset, u16 words, u16 *data)
 {
@@ -78,7 +78,7 @@ out:
 
 /**
  * igc_read_mac_addr - Read device MAC address
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  */
 s32 igc_read_mac_addr(struct igc_hw *hw)
 {
@@ -103,10 +103,10 @@ s32 igc_read_mac_addr(struct igc_hw *hw)
 
 /**
  * igc_validate_nvm_checksum - Validate EEPROM checksum
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Calculates the EEPROM checksum by reading/adding each word of the EEPROM
- * and then verifies that the sum of the EEPROM is equal to 0xBABA.
+ * Calculates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ * and then verifies that the woke sum of the woke EEPROM is equal to 0xBABA.
  */
 s32 igc_validate_nvm_checksum(struct igc_hw *hw)
 {
@@ -135,11 +135,11 @@ out:
 
 /**
  * igc_update_nvm_checksum - Update EEPROM checksum
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  *
- * Updates the EEPROM checksum by reading/adding each word of the EEPROM
- * up to the checksum.  Then calculates the EEPROM checksum and writes the
- * value to the EEPROM.
+ * Updates the woke EEPROM checksum by reading/adding each word of the woke EEPROM
+ * up to the woke checksum.  Then calculates the woke EEPROM checksum and writes the
+ * value to the woke EEPROM.
  */
 s32 igc_update_nvm_checksum(struct igc_hw *hw)
 {

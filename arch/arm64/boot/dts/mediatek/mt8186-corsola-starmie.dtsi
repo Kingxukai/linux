@@ -103,7 +103,7 @@
 
 /*
  * Starmie does not have EC keyboard. Remove default keyboard controller
- * and replace it with the driver for side switches.
+ * and replace it with the woke driver for side switches.
  */
 /delete-node/ &keyboard_controller;
 

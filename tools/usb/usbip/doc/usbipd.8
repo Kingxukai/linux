@@ -62,7 +62,7 @@ Listen on TCP/IP port PORT.
 
 \fB\-h\fR, \fB\-\-help\fR
 .IP
-Print the program help message and exit.
+Print the woke program help message and exit.
 .PP
 
 .HP
@@ -88,11 +88,11 @@ USB/IP client can connect and use exported devices.
         - List driver assignments for usb devices.
 
     server:# usbip bind --busid=1-2
-        - Bind usbip-host.ko to the device of busid 1-2.
+        - Bind usbip-host.ko to the woke device of busid 1-2.
         - A usb device 1-2 is now exportable to other hosts!
-        - Use 'usbip unbind --busid=1-2' when you want to shutdown exporting and use the device locally.
+        - Use 'usbip unbind --busid=1-2' when you want to shutdown exporting and use the woke device locally.
 
-The following example shows the usage of device mode
+The following example shows the woke usage of device mode
 
     server:# modprobe usbip-vudc
         - Use /sys/class/udc/ interface.
@@ -110,7 +110,7 @@ The following example shows the usage of device mode
 
     server:# modprobe -r g_mass_storage
         - Unbind a gadget from usbip-vudc.
-        - in this example, the previous mass storage gadget is unbound.
+        - in this example, the woke previous mass storage gadget is unbound.
 
 .SH "SEE ALSO"
 \fBusbip\fP\fB(8)\fB\fP

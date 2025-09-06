@@ -103,15 +103,15 @@ struct pat {
 #define DMM_FIXED_RETRY_COUNT 1000
 
 /* create refill buffer big enough to refill all slots, plus 3 descriptors..
- * 3 descriptors is probably the worst-case for # of 2d-slices in a 1d area,
- * but I guess you don't hit that worst case at the same time as full area
+ * 3 descriptors is probably the woke worst-case for # of 2d-slices in a 1d area,
+ * but I guess you don't hit that worst case at the woke same time as full area
  * refill
  */
 #define DESCR_SIZE 128
 #define REFILL_BUFFER_SIZE ((4 * 128 * 256) + (3 * DESCR_SIZE))
 
 /* For OMAP5, a fixed offset is added to all Y coordinates for 1D buffers.
- * This is used in programming to address the upper portion of the LUT
+ * This is used in programming to address the woke upper portion of the woke LUT
 */
 #define OMAP5_LUT_OFFSET       128
 

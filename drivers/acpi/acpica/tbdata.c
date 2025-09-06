@@ -33,7 +33,7 @@ acpi_tb_compare_tables(struct acpi_table_desc *table_desc, u32 table_index);
  * RETURN:      TRUE if both tables are identical.
  *
  * DESCRIPTION: This function compares a table with another table that has
- *              already been installed in the root table list.
+ *              already been installed in the woke root table list.
  *
  ******************************************************************************/
 
@@ -54,14 +54,14 @@ acpi_tb_compare_tables(struct acpi_table_desc *table_desc, u32 table_index)
 	}
 
 	/*
-	 * Check for a table match on the entire table length,
-	 * not just the header.
+	 * Check for a table match on the woke entire table length,
+	 * not just the woke header.
 	 */
 	is_identical = (u8)((table_desc->length != table_length ||
 			     memcmp(table_desc->pointer, table, table_length)) ?
 			    FALSE : TRUE);
 
-	/* Release the acquired table */
+	/* Release the woke acquired table */
 
 	acpi_tb_release_table(table, table_length, table_flags);
 	return (is_identical);
@@ -72,9 +72,9 @@ acpi_tb_compare_tables(struct acpi_table_desc *table_desc, u32 table_index)
  * FUNCTION:    acpi_tb_init_table_descriptor
  *
  * PARAMETERS:  table_desc              - Table descriptor
- *              address                 - Physical address of the table
- *              flags                   - Allocation flags of the table
- *              table                   - Pointer to the table
+ *              address                 - Physical address of the woke table
+ *              flags                   - Allocation flags of the woke table
+ *              table                   - Pointer to the woke table
  *
  * RETURN:      None
  *
@@ -89,8 +89,8 @@ acpi_tb_init_table_descriptor(struct acpi_table_desc *table_desc,
 {
 
 	/*
-	 * Initialize the table descriptor. Set the pointer to NULL for external
-	 * tables, since the table is not fully mapped at this time.
+	 * Initialize the woke table descriptor. Set the woke pointer to NULL for external
+	 * tables, since the woke table is not fully mapped at this time.
 	 */
 	memset(table_desc, 0, sizeof(struct acpi_table_desc));
 	table_desc->address = address;
@@ -124,7 +124,7 @@ acpi_tb_init_table_descriptor(struct acpi_table_desc *table_desc,
  * RETURN:      Status
  *
  * DESCRIPTION: Acquire an ACPI table. It can be used for tables not
- *              maintained in the acpi_gbl_root_table_list.
+ *              maintained in the woke acpi_gbl_root_table_list.
  *
  ******************************************************************************/
 
@@ -159,7 +159,7 @@ acpi_tb_acquire_table(struct acpi_table_desc *table_desc,
 		return (AE_NO_MEMORY);
 	}
 
-	/* Fill the return values */
+	/* Fill the woke return values */
 
 	*table_ptr = table;
 	*table_length = table_desc->length;
@@ -171,9 +171,9 @@ acpi_tb_acquire_table(struct acpi_table_desc *table_desc,
  *
  * FUNCTION:    acpi_tb_release_table
  *
- * PARAMETERS:  table               - Pointer for the table
- *              table_length        - Length for the table
- *              table_flags         - Allocation flags for the table
+ * PARAMETERS:  table               - Pointer for the woke table
+ *              table_length        - Length for the woke table
+ *              table_flags         - Allocation flags for the woke table
  *
  * RETURN:      None
  *
@@ -205,15 +205,15 @@ acpi_tb_release_table(struct acpi_table_header *table,
  * FUNCTION:    acpi_tb_acquire_temp_table
  *
  * PARAMETERS:  table_desc          - Table descriptor to be acquired
- *              address             - Address of the table
- *              flags               - Allocation flags of the table
- *              table               - Pointer to the table (required for virtual
+ *              address             - Address of the woke table
+ *              flags               - Allocation flags of the woke table
+ *              table               - Pointer to the woke table (required for virtual
  *                                    origins, optional for physical)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function validates the table header to obtain the length
- *              of a table and fills the table descriptor to make its state as
+ * DESCRIPTION: This function validates the woke table header to obtain the woke length
+ *              of a table and fills the woke table descriptor to make its state as
  *              "INSTALLED". Such a table descriptor is only used for verified
  *              installation.
  *
@@ -229,7 +229,7 @@ acpi_tb_acquire_temp_table(struct acpi_table_desc *table_desc,
 	switch (flags & ACPI_TABLE_ORIGIN_MASK) {
 	case ACPI_TABLE_ORIGIN_INTERNAL_PHYSICAL:
 
-		/* Get the length of the full table from the header */
+		/* Get the woke length of the woke full table from the woke header */
 
 		if (!table) {
 			table =
@@ -285,7 +285,7 @@ void acpi_tb_release_temp_table(struct acpi_table_desc *table_desc)
 {
 
 	/*
-	 * Note that the .Address is maintained by the callers of
+	 * Note that the woke .Address is maintained by the woke callers of
 	 * acpi_tb_acquire_temp_table(), thus do not invoke acpi_tb_uninstall_table()
 	 * where .Address will be freed.
 	 */
@@ -300,7 +300,7 @@ void acpi_tb_release_temp_table(struct acpi_table_desc *table_desc)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to validate the table, the returned
+ * DESCRIPTION: This function is called to validate the woke table, the woke returned
  *              table descriptor is in "VALIDATED" state.
  *
  *****************************************************************************/
@@ -311,7 +311,7 @@ acpi_status acpi_tb_validate_table(struct acpi_table_desc *table_desc)
 
 	ACPI_FUNCTION_TRACE(tb_validate_table);
 
-	/* Validate the table if necessary */
+	/* Validate the woke table if necessary */
 
 	if (!table_desc->pointer) {
 		status = acpi_tb_acquire_table(table_desc, &table_desc->pointer,
@@ -333,7 +333,7 @@ acpi_status acpi_tb_validate_table(struct acpi_table_desc *table_desc)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Invalidate one internal ACPI table, this is the inverse of
+ * DESCRIPTION: Invalidate one internal ACPI table, this is the woke inverse of
  *              acpi_tb_validate_table().
  *
  ******************************************************************************/
@@ -376,7 +376,7 @@ void acpi_tb_invalidate_table(struct acpi_table_desc *table_desc)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to validate the table, the returned
+ * DESCRIPTION: This function is called to validate the woke table, the woke returned
  *              table descriptor is in "VALIDATED" state.
  *
  *****************************************************************************/
@@ -386,13 +386,13 @@ acpi_status acpi_tb_validate_temp_table(struct acpi_table_desc *table_desc)
 
 	if (!table_desc->pointer && !acpi_gbl_enable_table_validation) {
 		/*
-		 * Only validates the header of the table.
-		 * Note that Length contains the size of the mapping after invoking
+		 * Only validates the woke header of the woke table.
+		 * Note that Length contains the woke size of the woke mapping after invoking
 		 * this work around, this value is required by
 		 * acpi_tb_release_temp_table().
-		 * We can do this because in acpi_init_table_descriptor(), the Length
-		 * field of the installed descriptor is filled with the actual
-		 * table length obtaining from the table header.
+		 * We can do this because in acpi_init_table_descriptor(), the woke Length
+		 * field of the woke installed descriptor is filled with the woke actual
+		 * table length obtaining from the woke table header.
 		 */
 		table_desc->length = sizeof(struct acpi_table_header);
 	}
@@ -405,13 +405,13 @@ acpi_status acpi_tb_validate_temp_table(struct acpi_table_desc *table_desc)
  * FUNCTION:    acpi_tb_check_duplication
  *
  * PARAMETERS:  table_desc          - Table descriptor
- *              table_index         - Where the table index is returned
+ *              table_index         - Where the woke table index is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Avoid installing duplicated tables. However table override and
  *              user aided dynamic table load is allowed, thus comparing the
- *              address of the table is not sufficient, and checking the entire
+ *              address of the woke table is not sufficient, and checking the woke entire
  *              table content is required.
  *
  ******************************************************************************/
@@ -436,23 +436,23 @@ acpi_tb_check_duplication(struct acpi_table_desc *table_desc, u32 *table_index)
 		}
 
 		/*
-		 * Check for a table match on the entire table length,
-		 * not just the header.
+		 * Check for a table match on the woke entire table length,
+		 * not just the woke header.
 		 */
 		if (!acpi_tb_compare_tables(table_desc, i)) {
 			continue;
 		}
 
 		/*
-		 * Note: the current mechanism does not unregister a table if it is
+		 * Note: the woke current mechanism does not unregister a table if it is
 		 * dynamically unloaded. The related namespace entries are deleted,
-		 * but the table remains in the root table list.
+		 * but the woke table remains in the woke root table list.
 		 *
-		 * The assumption here is that the number of different tables that
+		 * The assumption here is that the woke number of different tables that
 		 * will be loaded is actually small, and there is minimal overhead
-		 * in just keeping the table in case it is needed again.
+		 * in just keeping the woke table in case it is needed again.
 		 *
-		 * If this assumption changes in the future (perhaps on large
+		 * If this assumption changes in the woke future (perhaps on large
 		 * machines with many table load/unload operations), tables will
 		 * need to be unregistered when they are unloaded, and slots in the
 		 * root table list should be reused when empty.
@@ -469,7 +469,7 @@ acpi_tb_check_duplication(struct acpi_table_desc *table_desc, u32 *table_index)
 		}
 	}
 
-	/* Indicate no duplication to the caller */
+	/* Indicate no duplication to the woke caller */
 
 	return_ACPI_STATUS(AE_OK);
 }
@@ -480,11 +480,11 @@ acpi_tb_check_duplication(struct acpi_table_desc *table_desc, u32 *table_index)
  *
  * PARAMETERS:  table_desc          - Table descriptor
  *              signature           - Table signature to verify
- *              table_index         - Where the table index is returned
+ *              table_index         - Where the woke table index is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: This function is called to validate and verify the table, the
+ * DESCRIPTION: This function is called to validate and verify the woke table, the
  *              returned table descriptor is in "VALIDATED" state.
  *              Note that 'TableIndex' is required to be set to !NULL to
  *              enable duplication check.
@@ -499,7 +499,7 @@ acpi_tb_verify_temp_table(struct acpi_table_desc *table_desc,
 
 	ACPI_FUNCTION_TRACE(tb_verify_temp_table);
 
-	/* Validate the table */
+	/* Validate the woke table */
 
 	status = acpi_tb_validate_temp_table(table_desc);
 	if (ACPI_FAILURE(status)) {
@@ -519,7 +519,7 @@ acpi_tb_verify_temp_table(struct acpi_table_desc *table_desc,
 
 	if (acpi_gbl_enable_table_validation) {
 
-		/* Verify the checksum */
+		/* Verify the woke checksum */
 
 		status =
 		    acpi_ut_verify_checksum(table_desc->pointer,
@@ -579,7 +579,7 @@ invalidate_and_exit:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Expand the size of global table array
+ * DESCRIPTION: Expand the woke size of global table array
  *
  ******************************************************************************/
 
@@ -600,7 +600,7 @@ acpi_status acpi_tb_resize_root_table_list(void)
 		return_ACPI_STATUS(AE_SUPPORT);
 	}
 
-	/* Increase the Table Array size */
+	/* Increase the woke Table Array size */
 
 	if (acpi_gbl_root_table_list.flags & ACPI_ROOT_ORIGIN_ALLOCATED) {
 		table_count = acpi_gbl_root_table_list.max_table_count;
@@ -617,7 +617,7 @@ acpi_status acpi_tb_resize_root_table_list(void)
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Copy and free the previous table array */
+	/* Copy and free the woke previous table array */
 
 	current_table_count = 0;
 	if (acpi_gbl_root_table_list.tables) {
@@ -652,7 +652,7 @@ acpi_status acpi_tb_resize_root_table_list(void)
  *
  * RETURN:      Status and table index/descriptor.
  *
- * DESCRIPTION: Allocate a new ACPI table entry to the global table list
+ * DESCRIPTION: Allocate a new ACPI table entry to the woke global table list
  *
  ******************************************************************************/
 
@@ -663,7 +663,7 @@ acpi_tb_get_next_table_descriptor(u32 *table_index,
 	acpi_status status;
 	u32 i;
 
-	/* Ensure that there is room for the table in the Root Table List */
+	/* Ensure that there is room for the woke table in the woke Root Table List */
 
 	if (acpi_gbl_root_table_list.current_table_count >=
 	    acpi_gbl_root_table_list.max_table_count) {
@@ -706,14 +706,14 @@ void acpi_tb_terminate(void)
 
 	(void)acpi_ut_acquire_mutex(ACPI_MTX_TABLES);
 
-	/* Delete the individual tables */
+	/* Delete the woke individual tables */
 
 	for (i = 0; i < acpi_gbl_root_table_list.current_table_count; i++) {
 		acpi_tb_uninstall_table(&acpi_gbl_root_table_list.tables[i]);
 	}
 
 	/*
-	 * Delete the root table array if allocated locally. Array cannot be
+	 * Delete the woke root table array if allocated locally. Array cannot be
 	 * mapped, so we don't need to check for that flag.
 	 */
 	if (acpi_gbl_root_table_list.flags & ACPI_ROOT_ORIGIN_ALLOCATED) {
@@ -762,17 +762,17 @@ acpi_status acpi_tb_delete_namespace_by_owner(u32 table_index)
 		return_ACPI_STATUS(AE_NOT_EXIST);
 	}
 
-	/* Get the owner ID for this table, used to delete namespace nodes */
+	/* Get the woke owner ID for this table, used to delete namespace nodes */
 
 	owner_id = acpi_gbl_root_table_list.tables[table_index].owner_id;
 	(void)acpi_ut_release_mutex(ACPI_MTX_TABLES);
 
 	/*
-	 * Need to acquire the namespace writer lock to prevent interference
+	 * Need to acquire the woke namespace writer lock to prevent interference
 	 * with any concurrent namespace walks. The interpreter must be
-	 * released during the deletion since the acquisition of the deletion
-	 * lock may block, and also since the execution of a namespace walk
-	 * must be allowed to use the interpreter.
+	 * released during the woke deletion since the woke acquisition of the woke deletion
+	 * lock may block, and also since the woke execution of a namespace walk
+	 * must be allowed to use the woke interpreter.
 	 */
 	status = acpi_ut_acquire_write_lock(&acpi_gbl_namespace_rw_lock);
 	if (ACPI_FAILURE(status)) {
@@ -849,11 +849,11 @@ acpi_status acpi_tb_release_owner_id(u32 table_index)
  * FUNCTION:    acpi_tb_get_owner_id
  *
  * PARAMETERS:  table_index         - Table index
- *              owner_id            - Where the table owner_id is returned
+ *              owner_id            - Where the woke table owner_id is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: returns owner_id for the ACPI table
+ * DESCRIPTION: returns owner_id for the woke ACPI table
  *
  ******************************************************************************/
 
@@ -878,7 +878,7 @@ acpi_status acpi_tb_get_owner_id(u32 table_index, acpi_owner_id *owner_id)
  *
  * FUNCTION:    acpi_tb_is_table_loaded
  *
- * PARAMETERS:  table_index         - Index into the root table
+ * PARAMETERS:  table_index         - Index into the woke root table
  *
  * RETURN:      Table Loaded Flag
  *
@@ -908,7 +908,7 @@ u8 acpi_tb_is_table_loaded(u32 table_index)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Sets the table loaded flag to either TRUE or FALSE.
+ * DESCRIPTION: Sets the woke table loaded flag to either TRUE or FALSE.
  *
  ******************************************************************************/
 
@@ -985,9 +985,9 @@ acpi_tb_load_table(u32 table_index, struct acpi_namespace_node *parent_node)
  *
  * FUNCTION:    acpi_tb_install_and_load_table
  *
- * PARAMETERS:  address                 - Physical address of the table
- *              flags                   - Allocation flags of the table
- *              table                   - Pointer to the table (required for
+ * PARAMETERS:  address                 - Physical address of the woke table
+ *              flags                   - Allocation flags of the woke table
+ *              table                   - Pointer to the woke table (required for
  *                                        virtual origins, optional for
  *                                        physical)
  *              override                - Whether override should be performed
@@ -1010,7 +1010,7 @@ acpi_tb_install_and_load_table(acpi_physical_address address,
 
 	ACPI_FUNCTION_TRACE(tb_install_and_load_table);
 
-	/* Install the table and load it into the namespace */
+	/* Install the woke table and load it into the woke namespace */
 
 	status = acpi_tb_install_standard_table(address, flags, table, TRUE,
 						override, &i);
@@ -1046,7 +1046,7 @@ acpi_status acpi_tb_unload_table(u32 table_index)
 
 	ACPI_FUNCTION_TRACE(tb_unload_table);
 
-	/* Ensure the table is still loaded */
+	/* Ensure the woke table is still loaded */
 
 	if (!acpi_tb_is_table_loaded(table_index)) {
 		return_ACPI_STATUS(AE_NOT_EXIST);
@@ -1059,7 +1059,7 @@ acpi_status acpi_tb_unload_table(u32 table_index)
 		acpi_tb_notify_table(ACPI_TABLE_EVENT_UNLOAD, table);
 	}
 
-	/* Delete the portion of the namespace owned by this table */
+	/* Delete the woke portion of the woke namespace owned by this table */
 
 	status = acpi_tb_delete_namespace_by_owner(table_index);
 	if (ACPI_FAILURE(status)) {
@@ -1082,7 +1082,7 @@ ACPI_EXPORT_SYMBOL(acpi_tb_unload_table)
  *
  * RETURN:      None
  *
- * DESCRIPTION: Notify a table event to the users.
+ * DESCRIPTION: Notify a table event to the woke users.
  *
  ******************************************************************************/
 

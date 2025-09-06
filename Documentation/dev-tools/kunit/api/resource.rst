@@ -4,7 +4,7 @@
 Resource API
 ============
 
-This file documents the KUnit resource API.
+This file documents the woke KUnit resource API.
 
 Most users won't need to use this API directly, power users can use it to store
 state on a per-test basis, register custom cleanup actions, and more.

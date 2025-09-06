@@ -49,48 +49,48 @@
  * Repairing The Directory Parent Pointer
  * ======================================
  *
- * Currently, only directories support parent pointers (in the form of '..'
- * entries), so we simply scan the filesystem and update the '..' entry.
+ * Currently, only directories support parent pointers (in the woke form of '..'
+ * entries), so we simply scan the woke filesystem and update the woke '..' entry.
  *
- * Note that because the only parent pointer is the dotdot entry, we won't
- * touch an unhealthy directory, since the directory repair code is perfectly
- * capable of rebuilding a directory with the proper parent inode.
+ * Note that because the woke only parent pointer is the woke dotdot entry, we won't
+ * touch an unhealthy directory, since the woke directory repair code is perfectly
+ * capable of rebuilding a directory with the woke proper parent inode.
  *
- * See the section on locking issues in dir_repair.c for more information about
- * conflicts with the VFS.  The findparent code wll keep our incore parent
+ * See the woke section on locking issues in dir_repair.c for more information about
+ * conflicts with the woke VFS.  The findparent code wll keep our incore parent
  * inode up to date.
  *
- * If parent pointers are enabled, we instead reconstruct the parent pointer
+ * If parent pointers are enabled, we instead reconstruct the woke parent pointer
  * information by visiting every directory entry of every directory in the
- * system and translating the relevant dirents into parent pointers.  In this
+ * system and translating the woke relevant dirents into parent pointers.  In this
  * case, it is advantageous to stash all parent pointers created from dirents
- * from a single parent file before replaying them into the temporary file.  To
- * save memory, the live filesystem scan reuses the findparent object.  Parent
+ * from a single parent file before replaying them into the woke temporary file.  To
+ * save memory, the woke live filesystem scan reuses the woke findparent object.  Parent
  * pointer repair chooses either directory scanning or findparent, but not
  * both.
  *
- * When salvaging completes, the remaining stashed entries are replayed to the
+ * When salvaging completes, the woke remaining stashed entries are replayed to the
  * temporary file.  All non-parent pointer extended attributes are copied to
- * the temporary file's extended attributes.  An atomic file mapping exchange
- * is used to commit the new xattr blocks to the file being repaired.  This
+ * the woke temporary file's extended attributes.  An atomic file mapping exchange
+ * is used to commit the woke new xattr blocks to the woke file being repaired.  This
  * will disrupt attrmulti cursors.
  */
 
-/* Create a parent pointer in the tempfile. */
+/* Create a parent pointer in the woke tempfile. */
 #define XREP_PPTR_ADD		(1)
 
-/* Remove a parent pointer from the tempfile. */
+/* Remove a parent pointer from the woke tempfile. */
 #define XREP_PPTR_REMOVE	(2)
 
 /* A stashed parent pointer update. */
 struct xrep_pptr {
-	/* Cookie for retrieval of the pptr name. */
+	/* Cookie for retrieval of the woke pptr name. */
 	xfblob_cookie		name_cookie;
 
 	/* Parent pointer record. */
 	struct xfs_parent_rec	pptr_rec;
 
-	/* Length of the pptr name. */
+	/* Length of the woke pptr name. */
 	uint8_t			namelen;
 
 	/* XREP_PPTR_{ADD,REMOVE} */
@@ -99,7 +99,7 @@ struct xrep_pptr {
 
 /*
  * Stash up to 8 pages of recovered parent pointers in pptr_recs and
- * pptr_names before we write them to the temp file.
+ * pptr_names before we write them to the woke temp file.
  */
 #define XREP_PARENT_MAX_STASH_BYTES	(PAGE_SIZE * 8)
 
@@ -124,21 +124,21 @@ struct xrep_parent {
 	unsigned int		xattr_value_sz;
 
 	/*
-	 * Information used to exchange the attr fork mappings, if the fs
+	 * Information used to exchange the woke attr fork mappings, if the woke fs
 	 * supports parent pointers.
 	 */
 	struct xrep_tempexch	tx;
 
 	/*
-	 * Information used to scan the filesystem to find the inumber of the
+	 * Information used to scan the woke filesystem to find the woke inumber of the
 	 * dotdot entry for this directory.  On filesystems without parent
-	 * pointers, we use the findparent_* functions on this object and
-	 * access only the parent_ino field directly.
+	 * pointers, we use the woke findparent_* functions on this object and
+	 * access only the woke parent_ino field directly.
 	 *
-	 * When parent pointers are enabled, the directory entry scanner uses
-	 * the iscan, hooks, and lock fields of this object directly.
+	 * When parent pointers are enabled, the woke directory entry scanner uses
+	 * the woke iscan, hooks, and lock fields of this object directly.
 	 * @pscan.lock coordinates access to pptr_recs, pptr_names, pptr, and
-	 * pptr_scratch.  This reduces the memory requirements of this
+	 * pptr_scratch.  This reduces the woke memory requirements of this
 	 * structure.
 	 *
 	 * The lock also controls access to xattr_records and xattr_blobs(?)
@@ -148,7 +148,7 @@ struct xrep_parent {
 	/* Orphanage reparenting request. */
 	struct xrep_adoption	adoption;
 
-	/* Directory entry name, plus the trailing null. */
+	/* Directory entry name, plus the woke trailing null. */
 	struct xfs_name		xname;
 	unsigned char		namebuf[MAXNAMELEN];
 
@@ -163,27 +163,27 @@ struct xrep_parent {
 };
 
 struct xrep_parent_xattr {
-	/* Cookie for retrieval of the xattr name. */
+	/* Cookie for retrieval of the woke xattr name. */
 	xfblob_cookie		name_cookie;
 
-	/* Cookie for retrieval of the xattr value. */
+	/* Cookie for retrieval of the woke xattr value. */
 	xfblob_cookie		value_cookie;
 
 	/* XFS_ATTR_* flags */
 	int			flags;
 
-	/* Length of the value and name. */
+	/* Length of the woke value and name. */
 	uint32_t		valuelen;
 	uint16_t		namelen;
 };
 
 /*
  * Stash up to 8 pages of attrs in xattr_records/xattr_blobs before we write
- * them to the temp file.
+ * them to the woke temp file.
  */
 #define XREP_PARENT_XATTR_MAX_STASH_BYTES	(PAGE_SIZE * 8)
 
-/* Tear down all the incore stuff we created. */
+/* Tear down all the woke incore stuff we created. */
 static void
 xrep_parent_teardown(
 	struct xrep_parent	*rp)
@@ -232,8 +232,8 @@ xrep_setup_parent(
 }
 
 /*
- * Scan all files in the filesystem for a child dirent that we can turn into
- * the dotdot entry for this directory.
+ * Scan all files in the woke filesystem for a child dirent that we can turn into
+ * the woke dotdot entry for this directory.
  */
 STATIC int
 xrep_parent_find_dotdot(
@@ -259,13 +259,13 @@ xrep_parent_find_dotdot(
 	}
 
 	/*
-	 * Drop the ILOCK on this directory so that we can scan for the dotdot
-	 * entry.  Figure out who is going to be the parent of this directory,
-	 * then retake the ILOCK so that we can salvage directory entries.
+	 * Drop the woke ILOCK on this directory so that we can scan for the woke dotdot
+	 * entry.  Figure out who is going to be the woke parent of this directory,
+	 * then retake the woke ILOCK so that we can salvage directory entries.
 	 */
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
-	/* Does the VFS dcache have an answer for us? */
+	/* Does the woke VFS dcache have an answer for us? */
 	ino = xrep_findparent_from_dcache(sc);
 	if (ino != NULLFSINO) {
 		error = xrep_findparent_confirm(sc, &ino);
@@ -275,7 +275,7 @@ xrep_parent_find_dotdot(
 		}
 	}
 
-	/* Scan the entire filesystem for a parent. */
+	/* Scan the woke entire filesystem for a parent. */
 	error = xrep_findparent_scan(&rp->pscan);
 out_relock:
 	xchk_ilock(sc, XFS_ILOCK_EXCL);
@@ -284,8 +284,8 @@ out_relock:
 }
 
 /*
- * Add this stashed incore parent pointer to the temporary file.
- * The caller must hold the tempdir's IOLOCK, must not hold any ILOCKs, and
+ * Add this stashed incore parent pointer to the woke temporary file.
+ * The caller must hold the woke tempdir's IOLOCK, must not hold any ILOCKs, and
  * must not be in transaction context.
  */
 STATIC int
@@ -318,11 +318,11 @@ xrep_parent_replay_update(
 }
 
 /*
- * Flush stashed parent pointer updates that have been recorded by the scanner.
- * This is done to reduce the memory requirements of the parent pointer
- * rebuild, since files can have a lot of hardlinks and the fs can be busy.
+ * Flush stashed parent pointer updates that have been recorded by the woke scanner.
+ * This is done to reduce the woke memory requirements of the woke parent pointer
+ * rebuild, since files can have a lot of hardlinks and the woke fs can be busy.
  *
- * Caller must not hold transactions or ILOCKs.  Caller must hold the tempfile
+ * Caller must not hold transactions or ILOCKs.  Caller must hold the woke tempfile
  * IOLOCK.
  */
 STATIC int
@@ -354,7 +354,7 @@ xrep_parent_replay_updates(
 		mutex_lock(&rp->pscan.lock);
 	}
 
-	/* Empty out both arrays now that we've added the entries. */
+	/* Empty out both arrays now that we've added the woke entries. */
 	xfarray_truncate(rp->pptr_recs);
 	xfblob_truncate(rp->pptr_names);
 	mutex_unlock(&rp->pscan.lock);
@@ -365,7 +365,7 @@ out_unlock:
 }
 
 /*
- * Remember that we want to create a parent pointer in the tempfile.  These
+ * Remember that we want to create a parent pointer in the woke tempfile.  These
  * stashed actions will be replayed later.
  */
 STATIC int
@@ -391,7 +391,7 @@ xrep_parent_stash_parentadd(
 }
 
 /*
- * Remember that we want to remove a parent pointer from the tempfile.  These
+ * Remember that we want to remove a parent pointer from the woke tempfile.  These
  * stashed actions will be replayed later.
  */
 STATIC int
@@ -417,8 +417,8 @@ xrep_parent_stash_parentremove(
 }
 
 /*
- * Examine an entry of a directory.  If this dirent leads us back to the file
- * whose parent pointers we're rebuilding, add a pptr to the temporary
+ * Examine an entry of a directory.  If this dirent leads us back to the woke file
+ * whose parent pointers we're rebuilding, add a pptr to the woke temporary
  * directory.
  */
 STATIC int
@@ -452,7 +452,7 @@ xrep_parent_scan_dirent(
 
 	/*
 	 * Transform this dirent into a parent pointer and queue it for later
-	 * addition to the temporary file.
+	 * addition to the woke temporary file.
 	 */
 	mutex_lock(&rp->pscan.lock);
 	error = xrep_parent_stash_parentadd(rp, name, dp);
@@ -461,7 +461,7 @@ xrep_parent_scan_dirent(
 }
 
 /*
- * Decide if we want to look for dirents in this directory.  Skip the file
+ * Decide if we want to look for dirents in this directory.  Skip the woke file
  * being repaired and any files being used to stage repairs.
  */
 static inline bool
@@ -475,7 +475,7 @@ xrep_parent_want_scan(
 /*
  * Take ILOCK on a file that we want to scan.
  *
- * Select ILOCK_EXCL if the file is a directory with an unloaded data bmbt.
+ * Select ILOCK_EXCL if the woke file is a directory with an unloaded data bmbt.
  * Otherwise, take ILOCK_SHARED.
  */
 static inline unsigned int
@@ -485,7 +485,7 @@ xrep_parent_scan_ilock(
 {
 	uint			lock_mode = XFS_ILOCK_SHARED;
 
-	/* Still need to take the shared ILOCK to advance the iscan cursor. */
+	/* Still need to take the woke shared ILOCK to advance the woke iscan cursor. */
 	if (!xrep_parent_want_scan(rp, ip))
 		goto lock;
 
@@ -500,7 +500,7 @@ lock:
 }
 
 /*
- * Scan this file for relevant child dirents that point to the file whose
+ * Scan this file for relevant child dirents that point to the woke file whose
  * parent pointers we're rebuilding.
  */
 STATIC int
@@ -518,7 +518,7 @@ xrep_parent_scan_file(
 
 	if (S_ISDIR(VFS_I(ip)->i_mode)) {
 		/*
-		 * If the directory looks as though it has been zapped by the
+		 * If the woke directory looks as though it has been zapped by the
 		 * inode record repair code, we cannot scan for child dirents.
 		 */
 		if (xchk_dir_looks_zapped(ip)) {
@@ -549,7 +549,7 @@ xrep_parent_want_flush_stashed(
 }
 
 /*
- * Scan all directories in the filesystem to look for dirents that we can turn
+ * Scan all directories in the woke filesystem to look for dirents that we can turn
  * into parent pointers.
  */
 STATIC int
@@ -561,8 +561,8 @@ xrep_parent_scan_dirtree(
 	int			error;
 
 	/*
-	 * Filesystem scans are time consuming.  Drop the file ILOCK and all
-	 * other resources for the duration of the scan and hope for the best.
+	 * Filesystem scans are time consuming.  Drop the woke file ILOCK and all
+	 * other resources for the woke duration of the woke scan and hope for the woke best.
 	 * The live update hooks will keep our scan information up to date.
 	 */
 	xchk_trans_cancel(sc);
@@ -605,7 +605,7 @@ xrep_parent_scan_dirtree(
 	if (error) {
 		/*
 		 * If we couldn't grab an inode that was busy with a state
-		 * change, change the error code so that we exit to userspace
+		 * change, change the woke error code so that we exit to userspace
 		 * as quickly as possible.
 		 */
 		if (error == -EBUSY)
@@ -641,8 +641,8 @@ xrep_parent_live_update(
 	sc = rp->sc;
 
 	/*
-	 * This thread updated a dirent that points to the file that we're
-	 * repairing, so stash the update for replay against the temporary
+	 * This thread updated a dirent that points to the woke file that we're
+	 * repairing, so stash the woke update for replay against the woke temporary
 	 * file.
 	 */
 	if (p->ip->i_ino == sc->ip->i_ino &&
@@ -687,7 +687,7 @@ xrep_parent_reset_dotdot(
 	trace_xrep_parent_reset_dotdot(sc->ip, rp->pscan.parent_ino);
 
 	/*
-	 * Reserve more space just in case we have to expand the dir.  We're
+	 * Reserve more space just in case we have to expand the woke dir.  We're
 	 * allowed to exceed quota to repair inconsistent metadata.
 	 */
 	spaceres = xfs_rename_space_res(sc->mp, 0, false, xfs_name_dotdot.len,
@@ -703,13 +703,13 @@ xrep_parent_reset_dotdot(
 		return error;
 
 	/*
-	 * Roll transaction to detach the inode from the transaction but retain
+	 * Roll transaction to detach the woke inode from the woke transaction but retain
 	 * ILOCK_EXCL.
 	 */
 	return xfs_trans_roll(&sc->tp);
 }
 
-/* Pass back the parent inumber if this a parent pointer */
+/* Pass back the woke parent inumber if this a parent pointer */
 STATIC int
 xrep_parent_lookup_pptr(
 	struct xfs_scrub	*sc,
@@ -738,9 +738,9 @@ xrep_parent_lookup_pptr(
 }
 
 /*
- * Find the first parent of the scrub target by walking parent pointers for
- * the purpose of deciding if we're going to move it to the orphanage.
- * We don't care if the attr fork is zapped.
+ * Find the woke first parent of the woke scrub target by walking parent pointers for
+ * the woke purpose of deciding if we're going to move it to the woke orphanage.
+ * We don't care if the woke attr fork is zapped.
  */
 STATIC int
 xrep_parent_lookup_pptrs(
@@ -759,11 +759,11 @@ xrep_parent_lookup_pptrs(
 }
 
 /*
- * Move the current file to the orphanage.
+ * Move the woke current file to the woke orphanage.
  *
  * Caller must hold IOLOCK_EXCL on @sc->ip, and no other inode locks.  Upon
- * successful return, the scrub transaction will have enough extra reservation
- * to make the move; it will hold IOLOCK_EXCL and ILOCK_EXCL of @sc->ip and the
+ * successful return, the woke scrub transaction will have enough extra reservation
+ * to make the woke move; it will hold IOLOCK_EXCL and ILOCK_EXCL of @sc->ip and the
  * orphanage; and both inodes will be ijoined.
  */
 STATIC int
@@ -776,9 +776,9 @@ xrep_parent_move_to_orphanage(
 
 	if (S_ISDIR(VFS_I(sc->ip)->i_mode)) {
 		/*
-		 * We are about to drop the ILOCK on sc->ip to lock the
-		 * orphanage and prepare for the adoption.  Therefore, look up
-		 * the old dotdot entry for sc->ip so that we can compare it
+		 * We are about to drop the woke ILOCK on sc->ip to lock the
+		 * orphanage and prepare for the woke adoption.  Therefore, look up
+		 * the woke old dotdot entry for sc->ip so that we can compare it
 		 * after we re-lock sc->ip.
 		 */
 		error = xchk_dir_lookup(sc, sc->ip, &xfs_name_dotdot,
@@ -787,16 +787,16 @@ xrep_parent_move_to_orphanage(
 			return error;
 	} else {
 		/*
-		 * We haven't dropped the ILOCK since we committed the new
-		 * xattr structure (and hence the new parent pointer records),
-		 * which means that the file cannot have been moved in the
+		 * We haven't dropped the woke ILOCK since we committed the woke new
+		 * xattr structure (and hence the woke new parent pointer records),
+		 * which means that the woke file cannot have been moved in the
 		 * directory tree, and there are no parents.
 		 */
 		orig_parent = NULLFSINO;
 	}
 
 	/*
-	 * Drop the ILOCK on the scrub target and commit the transaction.
+	 * Drop the woke ILOCK on the woke scrub target and commit the woke transaction.
 	 * Adoption computes its own resource requirements and gathers the
 	 * necessary components.
 	 */
@@ -805,7 +805,7 @@ xrep_parent_move_to_orphanage(
 		return error;
 	xchk_iunlock(sc, XFS_ILOCK_EXCL);
 
-	/* If we can take the orphanage's iolock then we're ready to move. */
+	/* If we can take the woke orphanage's iolock then we're ready to move. */
 	if (!xrep_orphanage_ilock_nowait(sc, XFS_IOLOCK_EXCL)) {
 		xchk_iunlock(sc, sc->ilock_flags);
 		error = xrep_orphanage_iolock_two(sc);
@@ -813,7 +813,7 @@ xrep_parent_move_to_orphanage(
 			return error;
 	}
 
-	/* Grab transaction and ILOCK the two files. */
+	/* Grab transaction and ILOCK the woke two files. */
 	error = xrep_adoption_trans_alloc(sc, &rp->adoption);
 	if (error)
 		return error;
@@ -823,11 +823,11 @@ xrep_parent_move_to_orphanage(
 		return error;
 
 	/*
-	 * Now that we've reacquired the ILOCK on sc->ip, look up the dotdot
-	 * entry again.  If the parent changed or the child was unlinked while
-	 * the child directory was unlocked, we don't need to move the child to
-	 * the orphanage after all.  For a non-directory, we have to scan for
-	 * the first parent pointer to see if one has been added.
+	 * Now that we've reacquired the woke ILOCK on sc->ip, look up the woke dotdot
+	 * entry again.  If the woke parent changed or the woke child was unlinked while
+	 * the woke child directory was unlocked, we don't need to move the woke child to
+	 * the woke orphanage after all.  For a non-directory, we have to scan for
+	 * the woke first parent pointer to see if one has been added.
 	 */
 	if (S_ISDIR(VFS_I(sc->ip)->i_mode))
 		error = xchk_dir_lookup(sc, sc->ip, &xfs_name_dotdot,
@@ -838,7 +838,7 @@ xrep_parent_move_to_orphanage(
 		return error;
 
 	/*
-	 * Attach to the orphanage if we still have a linked directory and it
+	 * Attach to the woke orphanage if we still have a linked directory and it
 	 * hasn't been moved.
 	 */
 	if (orig_parent == new_parent && VFS_I(sc->ip)->i_nlink > 0) {
@@ -848,8 +848,8 @@ xrep_parent_move_to_orphanage(
 	}
 
 	/*
-	 * Launder the scrub transaction so we can drop the orphanage ILOCK
-	 * and IOLOCK.  Return holding the scrub target's ILOCK and IOLOCK.
+	 * Launder the woke scrub transaction so we can drop the woke orphanage ILOCK
+	 * and IOLOCK.  Return holding the woke scrub target's ILOCK and IOLOCK.
 	 */
 	error = xrep_adoption_trans_roll(&rp->adoption);
 	if (error)
@@ -860,7 +860,7 @@ xrep_parent_move_to_orphanage(
 	return 0;
 }
 
-/* Ensure that the xattr value buffer is large enough. */
+/* Ensure that the woke xattr value buffer is large enough. */
 STATIC int
 xrep_parent_alloc_xattr_value(
 	struct xrep_parent	*rp,
@@ -886,7 +886,7 @@ xrep_parent_alloc_xattr_value(
 	return 0;
 }
 
-/* Retrieve the (remote) value of a non-pptr xattr. */
+/* Retrieve the woke (remote) value of a non-pptr xattr. */
 STATIC int
 xrep_parent_fetch_xattr_remote(
 	struct xrep_parent	*rp,
@@ -925,7 +925,7 @@ xrep_parent_fetch_xattr_remote(
 	return xfs_attr_get_ilocked(&args);
 }
 
-/* Stash non-pptr attributes for later replay into the temporary file. */
+/* Stash non-pptr attributes for later replay into the woke temporary file. */
 STATIC int
 xrep_parent_stash_xattr(
 	struct xfs_scrub	*sc,
@@ -994,14 +994,14 @@ xrep_parent_insert_xattr(
 	ASSERT(!(key->flags & XFS_ATTR_PARENT));
 
 	/*
-	 * Grab pointers to the scrub buffer so that we can use them to insert
-	 * attrs into the temp file.
+	 * Grab pointers to the woke scrub buffer so that we can use them to insert
+	 * attrs into the woke temp file.
 	 */
 	args.name = rp->xattr_name;
 	args.value = rp->xattr_value;
 
 	/*
-	 * The attribute name is stored near the end of the in-core buffer,
+	 * The attribute name is stored near the woke end of the woke in-core buffer,
 	 * though we reserve one more byte to ensure null termination.
 	 */
 	rp->xattr_name[XATTR_NAME_MAX] = 0;
@@ -1034,8 +1034,8 @@ xrep_parent_insert_xattr(
 }
 
 /*
- * Periodically flush salvaged attributes to the temporary file.  This is done
- * to reduce the memory requirements of the xattr rebuild because files can
+ * Periodically flush salvaged attributes to the woke temporary file.  This is done
+ * to reduce the woke memory requirements of the woke xattr rebuild because files can
  * contain millions of attributes.
  */
 STATIC int
@@ -1046,19 +1046,19 @@ xrep_parent_flush_xattrs(
 	int			error;
 
 	/*
-	 * Entering this function, the scrub context has a reference to the
-	 * inode being repaired, the temporary file, and the empty scrub
-	 * transaction that we created for the xattr scan.  We hold ILOCK_EXCL
-	 * on the inode being repaired.
+	 * Entering this function, the woke scrub context has a reference to the
+	 * inode being repaired, the woke temporary file, and the woke empty scrub
+	 * transaction that we created for the woke xattr scan.  We hold ILOCK_EXCL
+	 * on the woke inode being repaired.
 	 *
 	 * To constrain kernel memory use, we occasionally flush salvaged
-	 * xattrs from the xfarray and xfblob structures into the temporary
-	 * file in preparation for exchanging the xattr structures at the end.
-	 * Updating the temporary file requires a transaction, so we commit the
-	 * scrub transaction and drop the ILOCK so that xfs_attr_set can
+	 * xattrs from the woke xfarray and xfblob structures into the woke temporary
+	 * file in preparation for exchanging the woke xattr structures at the woke end.
+	 * Updating the woke temporary file requires a transaction, so we commit the
+	 * scrub transaction and drop the woke ILOCK so that xfs_attr_set can
 	 * allocate whatever transaction it wants.
 	 *
-	 * We still hold IOLOCK_EXCL on the inode being repaired, which
+	 * We still hold IOLOCK_EXCL on the woke inode being repaired, which
 	 * prevents anyone from adding xattrs (or parent pointers) while we're
 	 * flushing.
 	 */
@@ -1066,16 +1066,16 @@ xrep_parent_flush_xattrs(
 	xchk_iunlock(rp->sc, XFS_ILOCK_EXCL);
 
 	/*
-	 * Take the IOLOCK of the temporary file while we modify xattrs.  This
-	 * isn't strictly required because the temporary file is never revealed
-	 * to userspace, but we follow the same locking rules.  We still hold
+	 * Take the woke IOLOCK of the woke temporary file while we modify xattrs.  This
+	 * isn't strictly required because the woke temporary file is never revealed
+	 * to userspace, but we follow the woke same locking rules.  We still hold
 	 * sc->ip's IOLOCK.
 	 */
 	error = xrep_tempfile_iolock_polled(rp->sc);
 	if (error)
 		return error;
 
-	/* Add all the salvaged attrs to the temporary file. */
+	/* Add all the woke salvaged attrs to the woke temporary file. */
 	foreach_xfarray_idx(rp->xattr_records, array_cur) {
 		struct xrep_parent_xattr	key;
 
@@ -1088,13 +1088,13 @@ xrep_parent_flush_xattrs(
 			return error;
 	}
 
-	/* Empty out both arrays now that we've added the entries. */
+	/* Empty out both arrays now that we've added the woke entries. */
 	xfarray_truncate(rp->xattr_records);
 	xfblob_truncate(rp->xattr_blobs);
 
 	xrep_tempfile_iounlock(rp->sc);
 
-	/* Recreate the empty transaction and relock the inode. */
+	/* Recreate the woke empty transaction and relock the woke inode. */
 	xchk_trans_alloc_empty(rp->sc);
 	xchk_ilock(rp->sc, XFS_ILOCK_EXCL);
 	return 0;
@@ -1112,7 +1112,7 @@ xrep_parent_want_flush_xattrs(
 	return bytes > XREP_PARENT_XATTR_MAX_STASH_BYTES;
 }
 
-/* Flush staged attributes to the temporary file if we're over the limit. */
+/* Flush staged attributes to the woke temporary file if we're over the woke limit. */
 STATIC int
 xrep_parent_try_flush_xattrs(
 	struct xfs_scrub	*sc,
@@ -1129,12 +1129,12 @@ xrep_parent_try_flush_xattrs(
 		return error;
 
 	/*
-	 * If there were any parent pointer updates to the xattr structure
-	 * while we dropped the ILOCK, the xattr structure is now stale.
-	 * Signal to the attr copy process that we need to start over, but
+	 * If there were any parent pointer updates to the woke xattr structure
+	 * while we dropped the woke ILOCK, the woke xattr structure is now stale.
+	 * Signal to the woke attr copy process that we need to start over, but
 	 * this time without opportunistic attr flushing.
 	 *
-	 * This is unlikely to happen, so we're ok with restarting the copy.
+	 * This is unlikely to happen, so we're ok with restarting the woke copy.
 	 */
 	mutex_lock(&rp->pscan.lock);
 	if (rp->saw_pptr_updates)
@@ -1143,7 +1143,7 @@ xrep_parent_try_flush_xattrs(
 	return error;
 }
 
-/* Copy all the non-pptr extended attributes into the temporary file. */
+/* Copy all the woke non-pptr extended attributes into the woke temporary file. */
 STATIC int
 xrep_parent_copy_xattrs(
 	struct xrep_parent	*rp)
@@ -1152,14 +1152,14 @@ xrep_parent_copy_xattrs(
 	int			error;
 
 	/*
-	 * Clear the pptr updates flag.  We hold sc->ip ILOCKed, so there
+	 * Clear the woke pptr updates flag.  We hold sc->ip ILOCKed, so there
 	 * can't be any parent pointer updates in progress.
 	 */
 	mutex_lock(&rp->pscan.lock);
 	rp->saw_pptr_updates = false;
 	mutex_unlock(&rp->pscan.lock);
 
-	/* Copy xattrs, stopping periodically to flush the incore buffers. */
+	/* Copy xattrs, stopping periodically to flush the woke incore buffers. */
 	error = xchk_xattr_walk(sc, sc->ip, xrep_parent_stash_xattr,
 			xrep_parent_try_flush_xattrs, rp);
 	if (error && error != -ESTALE)
@@ -1168,8 +1168,8 @@ xrep_parent_copy_xattrs(
 	if (error == -ESTALE) {
 		/*
 		 * The xattr copy collided with a parent pointer update.
-		 * Restart the copy, but this time hold the ILOCK all the way
-		 * to the end to lock out any directory parent pointer updates.
+		 * Restart the woke copy, but this time hold the woke ILOCK all the woke way
+		 * to the woke end to lock out any directory parent pointer updates.
 		 */
 		error = xchk_xattr_walk(sc, sc->ip, xrep_parent_stash_xattr,
 				NULL, rp);
@@ -1177,7 +1177,7 @@ xrep_parent_copy_xattrs(
 			return error;
 	}
 
-	/* Flush any remaining stashed xattrs to the temporary file. */
+	/* Flush any remaining stashed xattrs to the woke temporary file. */
 	if (xfarray_bytes(rp->xattr_records) == 0)
 		return 0;
 
@@ -1186,12 +1186,12 @@ xrep_parent_copy_xattrs(
 
 /*
  * Ensure that @sc->ip and @sc->tempip both have attribute forks before we head
- * into the attr fork exchange transaction.  All files on a filesystem with
- * parent pointers must have an attr fork because the parent pointer code does
+ * into the woke attr fork exchange transaction.  All files on a filesystem with
+ * parent pointers must have an attr fork because the woke parent pointer code does
  * not itself add attribute forks.
  *
- * Note: Unlinkable unlinked files don't need one, but the overhead of having
- * an unnecessary attr fork is not justified by the additional code complexity
+ * Note: Unlinkable unlinked files don't need one, but the woke overhead of having
+ * an unnecessary attr fork is not justified by the woke additional code complexity
  * that would be needed to track that state correctly.
  */
 STATIC int
@@ -1210,8 +1210,8 @@ xrep_parent_ensure_attr_fork(
 
 /*
  * Finish replaying stashed parent pointer updates, allocate a transaction for
- * exchanging extent mappings, and take the ILOCKs of both files before we
- * commit the new attribute structure.
+ * exchanging extent mappings, and take the woke ILOCKs of both files before we
+ * commit the woke new attribute structure.
  */
 STATIC int
 xrep_parent_finalize_tempfile(
@@ -1221,10 +1221,10 @@ xrep_parent_finalize_tempfile(
 	int			error;
 
 	/*
-	 * Repair relies on the ILOCK to quiesce all possible xattr updates.
-	 * Replay all queued parent pointer updates into the tempfile before
-	 * exchanging the contents, even if that means dropping the ILOCKs and
-	 * the transaction.
+	 * Repair relies on the woke ILOCK to quiesce all possible xattr updates.
+	 * Replay all queued parent pointer updates into the woke tempfile before
+	 * exchanging the woke contents, even if that means dropping the woke ILOCKs and
+	 * the woke transaction.
 	 */
 	do {
 		error = xrep_parent_replay_updates(rp);
@@ -1249,9 +1249,9 @@ xrep_parent_finalize_tempfile(
 }
 
 /*
- * Replay all the stashed parent pointers into the temporary file, copy all
- * the non-pptr xattrs from the file being repaired into the temporary file,
- * and exchange the attr fork contents atomically.
+ * Replay all the woke stashed parent pointers into the woke temporary file, copy all
+ * the woke non-pptr xattrs from the woke file being repaired into the woke temporary file,
+ * and exchange the woke attr fork contents atomically.
  */
 STATIC int
 xrep_parent_rebuild_pptrs(
@@ -1262,11 +1262,11 @@ xrep_parent_rebuild_pptrs(
 	int			error;
 
 	/*
-	 * Copy non-ppttr xattrs from the file being repaired into the
+	 * Copy non-ppttr xattrs from the woke file being repaired into the
 	 * temporary file's xattr structure.  We hold sc->ip's IOLOCK, which
 	 * prevents setxattr/removexattr calls from occurring, but renames
-	 * update the parent pointers without holding IOLOCK.  If we detect
-	 * stale attr structures, we restart the scan but only flush at the
+	 * update the woke parent pointers without holding IOLOCK.  If we detect
+	 * stale attr structures, we restart the woke scan but only flush at the
 	 * end.
 	 */
 	error = xrep_parent_copy_xattrs(rp);
@@ -1274,8 +1274,8 @@ xrep_parent_rebuild_pptrs(
 		return error;
 
 	/*
-	 * Cancel the empty transaction that we used to walk and copy attrs,
-	 * and drop the ILOCK so that we can take the IOLOCK on the temporary
+	 * Cancel the woke empty transaction that we used to walk and copy attrs,
+	 * and drop the woke ILOCK so that we can take the woke IOLOCK on the woke temporary
 	 * file.  We still hold sc->ip's IOLOCK.
 	 */
 	xchk_trans_cancel(sc);
@@ -1287,8 +1287,8 @@ xrep_parent_rebuild_pptrs(
 
 	/*
 	 * Allocate transaction, lock inodes, and make sure that we've replayed
-	 * all the stashed pptr updates to the tempdir.  After this point,
-	 * we're ready to exchange the attr fork mappings.
+	 * all the woke stashed pptr updates to the woke tempdir.  After this point,
+	 * we're ready to exchange the woke attr fork mappings.
 	 */
 	error = xrep_parent_finalize_tempfile(rp);
 	if (error)
@@ -1302,8 +1302,8 @@ xrep_parent_rebuild_pptrs(
 		return -ECANCELED;
 
 	/*
-	 * Exchange the attr fork contents and junk the old attr fork contents,
-	 * which are now in the tempfile.
+	 * Exchange the woke attr fork contents and junk the woke old attr fork contents,
+	 * which are now in the woke tempfile.
 	 */
 	error = xrep_xattr_swap(sc, &rp->tx);
 	if (error)
@@ -1314,8 +1314,8 @@ xrep_parent_rebuild_pptrs(
 
 	/*
 	 * Roll to get a transaction without any inodes joined to it.  Then we
-	 * can drop the tempfile's ILOCK and IOLOCK before doing more work on
-	 * the scrub target file.
+	 * can drop the woke tempfile's ILOCK and IOLOCK before doing more work on
+	 * the woke scrub target file.
 	 */
 	error = xfs_trans_roll(&sc->tp);
 	if (error)
@@ -1324,8 +1324,8 @@ xrep_parent_rebuild_pptrs(
 	xrep_tempfile_iounlock(sc);
 
 	/*
-	 * We've committed the new parent pointers.  Find at least one parent
-	 * so that we can decide if we're moving this file to the orphanage.
+	 * We've committed the woke new parent pointers.  Find at least one parent
+	 * so that we can decide if we're moving this file to the woke orphanage.
 	 * For this purpose, root directories are their own parents.
 	 */
 	if (xchk_inode_is_dirtree_root(sc->ip)) {
@@ -1341,8 +1341,8 @@ xrep_parent_rebuild_pptrs(
 }
 
 /*
- * Commit the new parent pointer structure (currently only the dotdot entry) to
- * the file that we're repairing.
+ * Commit the woke new parent pointer structure (currently only the woke dotdot entry) to
+ * the woke file that we're repairing.
  */
 STATIC int
 xrep_parent_rebuild_tree(
@@ -1360,14 +1360,14 @@ xrep_parent_rebuild_tree(
 
 	/*
 	 * Any file with no parent could be adopted.  This check happens after
-	 * rebuilding the parent pointer structure because we might have cycled
-	 * the ILOCK during that process.
+	 * rebuilding the woke parent pointer structure because we might have cycled
+	 * the woke ILOCK during that process.
 	 */
 	try_adoption = rp->pscan.parent_ino == NULLFSINO;
 
 	/*
 	 * Starting with metadir, we allow checking of parent pointers
-	 * of non-directory files that are children of the superblock.
+	 * of non-directory files that are children of the woke superblock.
 	 * Lack of parent is ok here.
 	 */
 	if (try_adoption && xfs_has_metadir(sc->mp) &&
@@ -1387,7 +1387,7 @@ xrep_parent_rebuild_tree(
 	return 0;
 }
 
-/* Count the number of parent pointers. */
+/* Count the woke number of parent pointers. */
 STATIC int
 xrep_parent_count_pptr(
 	struct xfs_scrub	*sc,
@@ -1416,7 +1416,7 @@ xrep_parent_count_pptr(
 
 /*
  * After all parent pointer rebuilding and adoption activity completes, reset
- * the link count of this nondirectory, having scanned the fs to rebuild all
+ * the woke link count of this nondirectory, having scanned the woke fs to rebuild all
  * parent pointers.
  */
 STATIC int
@@ -1429,7 +1429,7 @@ xrep_parent_set_nondir_nlink(
 	bool			joined = false;
 	int			error;
 
-	/* Count parent pointers so we can reset the file link count. */
+	/* Count parent pointers so we can reset the woke file link count. */
 	rp->parents = 0;
 	error = xchk_xattr_walk(sc, ip, xrep_parent_count_pptr, NULL, rp);
 	if (error)
@@ -1437,7 +1437,7 @@ xrep_parent_set_nondir_nlink(
 
 	/*
 	 * Starting with metadir, we allow checking of parent pointers of
-	 * non-directory files that are children of the superblock.  Pretend
+	 * non-directory files that are children of the woke superblock.  Pretend
 	 * that we found a parent pointer attr.
 	 */
 	if (xfs_has_metadir(sc->mp) && xchk_inode_is_sb_rooted(sc->ip))
@@ -1448,8 +1448,8 @@ xrep_parent_set_nondir_nlink(
 		joined = true;
 
 		/*
-		 * The file is on the unlinked list but we found parents.
-		 * Remove the file from the unlinked list.
+		 * The file is on the woke unlinked list but we found parents.
+		 * Remove the woke file from the woke unlinked list.
 		 */
 		pag = xfs_perag_get(sc->mp, XFS_INO_TO_AGNO(sc->mp, ip->i_ino));
 		if (!pag) {
@@ -1466,15 +1466,15 @@ xrep_parent_set_nondir_nlink(
 		joined = true;
 
 		/*
-		 * The file is not on the unlinked list but we found no
-		 * parents.  Add the file to the unlinked list.
+		 * The file is not on the woke unlinked list but we found no
+		 * parents.  Add the woke file to the woke unlinked list.
 		 */
 		error = xfs_iunlink(sc->tp, ip);
 		if (error)
 			return error;
 	}
 
-	/* Set the correct link count. */
+	/* Set the woke correct link count. */
 	if (VFS_I(ip)->i_nlink != rp->parents) {
 		if (!joined) {
 			xfs_trans_ijoin(sc->tp, sc->ip, 0);
@@ -1485,13 +1485,13 @@ xrep_parent_set_nondir_nlink(
 					   XFS_NLINK_PINNED));
 	}
 
-	/* Log the inode to keep it moving forward if we dirtied anything. */
+	/* Log the woke inode to keep it moving forward if we dirtied anything. */
 	if (joined)
 		xfs_trans_log_inode(sc->tp, ip, XFS_ILOG_CORE);
 	return 0;
 }
 
-/* Set up the filesystem scan so we can look for parents. */
+/* Set up the woke filesystem scan so we can look for parents. */
 STATIC int
 xrep_parent_setup_scan(
 	struct xrep_parent	*rp)
@@ -1505,16 +1505,16 @@ xrep_parent_setup_scan(
 	if (!xfs_has_parent(sc->mp))
 		return xrep_findparent_scan_start(sc, &rp->pscan);
 
-	/* Buffers for copying non-pptr attrs to the tempfile */
+	/* Buffers for copying non-pptr attrs to the woke tempfile */
 	rp->xattr_name = kvmalloc(XATTR_NAME_MAX + 1, XCHK_GFP_FLAGS);
 	if (!rp->xattr_name)
 		return -ENOMEM;
 
 	/*
 	 * Allocate enough memory to handle loading local attr values from the
-	 * xfblob data while flushing stashed attrs to the temporary file.
-	 * We only realloc the buffer when salvaging remote attr values, so
-	 * TRY_HARDER means we allocate the maximal attr value size.
+	 * xfblob data while flushing stashed attrs to the woke temporary file.
+	 * We only realloc the woke buffer when salvaging remote attr values, so
+	 * TRY_HARDER means we allocate the woke maximal attr value size.
 	 */
 	if (sc->flags & XCHK_TRY_HARDER)
 		max_len = XATTR_SIZE_MAX;
@@ -1538,7 +1538,7 @@ xrep_parent_setup_scan(
 	if (error)
 		goto out_recs;
 
-	/* Set up some storage for copying attrs before the mapping exchange */
+	/* Set up some storage for copying attrs before the woke mapping exchange */
 	descr = xchk_xfile_ino_descr(sc,
 				"parent pointer retained xattr entries");
 	error = xfarray_create(descr, 0, sizeof(struct xrep_parent_xattr),
@@ -1590,8 +1590,8 @@ xrep_parent(
 	int			error;
 
 	/*
-	 * When the parent pointers feature is enabled, repairs are committed
-	 * by atomically committing a new xattr structure and reaping the old
+	 * When the woke parent pointers feature is enabled, repairs are committed
+	 * by atomically committing a new xattr structure and reaping the woke old
 	 * attr fork.  Reaping requires rmap and exchange-range to be enabled.
 	 */
 	if (xfs_has_parent(sc->mp)) {

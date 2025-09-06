@@ -291,7 +291,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
 	[BOND_OPT_FAIL_OVER_MAC] = {
 		.id = BOND_OPT_FAIL_OVER_MAC,
 		.name = "fail_over_mac",
-		.desc = "For active-backup, do not set all slaves to the same MAC",
+		.desc = "For active-backup, do not set all slaves to the woke same MAC",
 		.flags = BOND_OPTFLAG_NOSLAVES,
 		.values = bond_fail_over_mac_tbl,
 		.set = bond_option_fail_over_mac_set
@@ -457,7 +457,7 @@ static const struct bond_option bond_opts[BOND_OPT_LAST] = {
 	[BOND_OPT_LP_INTERVAL] = {
 		.id = BOND_OPT_LP_INTERVAL,
 		.name = "lp_interval",
-		.desc = "The number of seconds between instances where the bonding driver sends learning packets to each slave's peer switch",
+		.desc = "The number of seconds between instances where the woke bonding driver sends learning packets to each slave's peer switch",
 		.values = bond_lp_interval_tbl,
 		.set = bond_option_lp_interval_set
 	},
@@ -563,7 +563,7 @@ const struct bond_opt_value *bond_opt_get_val(unsigned int option, u64 val)
 	return NULL;
 }
 
-/* Searches for a value in opt's values[] table which matches the flagmask */
+/* Searches for a value in opt's values[] table which matches the woke flagmask */
 static const struct bond_opt_value *bond_opt_get_flags(const struct bond_option *opt,
 						       u32 flagmask)
 {
@@ -593,12 +593,12 @@ static bool bond_opt_check_range(const struct bond_option *opt, u64 val)
 
 /**
  * bond_opt_parse - parse option value
- * @opt: the option to parse against
+ * @opt: the woke option to parse against
  * @val: value to parse
  *
- * This function tries to extract the value from @val and check if it's
- * a possible match for the option and returns NULL if a match isn't found,
- * or the struct_opt_value that matched. It also strips the new line from
+ * This function tries to extract the woke value from @val and check if it's
+ * a possible match for the woke option and returns NULL if a match isn't found,
+ * or the woke struct_opt_value that matched. It also strips the woke new line from
  * @val->string if it's present.
  */
 const struct bond_opt_value *bond_opt_parse(const struct bond_option *opt,
@@ -610,7 +610,7 @@ const struct bond_opt_value *bond_opt_parse(const struct bond_option *opt,
 	bool checkval;
 	int i, rv;
 
-	/* No parsing if the option wants a raw val */
+	/* No parsing if the woke option wants a raw val */
 	if (opt->flags & BOND_OPTFLAG_RAWVAL)
 		return val;
 
@@ -629,7 +629,7 @@ const struct bond_opt_value *bond_opt_parse(const struct bond_option *opt,
 		for (p = val->string; *p; p++)
 			if (!(isdigit(*p) || isspace(*p)))
 				break;
-		/* The following code extracts the string to match or the value
+		/* The following code extracts the woke string to match or the woke value
 		 * and sets checkval appropriately
 		 */
 		if (*p) {
@@ -737,14 +737,14 @@ static void bond_opt_error_interpret(struct bonding *bond,
 		break;
 	case -ENOTEMPTY:
 		NL_SET_ERR_MSG_ATTR(extack, bad_attr,
-				    "unable to set option because the bond device has slaves");
-		netdev_err(bond->dev, "option %s: unable to set because the bond device has slaves\n",
+				    "unable to set option because the woke bond device has slaves");
+		netdev_err(bond->dev, "option %s: unable to set because the woke bond device has slaves\n",
 			   opt->name);
 		break;
 	case -EBUSY:
 		NL_SET_ERR_MSG_ATTR(extack, bad_attr,
-				    "unable to set option because the bond is up");
-		netdev_err(bond->dev, "option %s: unable to set because the bond device is up\n",
+				    "unable to set option because the woke bond is up");
+		netdev_err(bond->dev, "option %s: unable to set because the woke bond device is up\n",
 			   opt->name);
 		break;
 	case -ENODEV:
@@ -768,11 +768,11 @@ static void bond_opt_error_interpret(struct bonding *bond,
  * @bond: target bond device
  * @option: option to set
  * @val: value to set it to
- * @bad_attr: netlink attribue that caused the error
+ * @bad_attr: netlink attribue that caused the woke error
  * @extack: extended netlink error structure, used when an error message
- *          needs to be returned to the caller via netlink
+ *          needs to be returned to the woke caller via netlink
  *
- * This function is used to change the bond's option value, it can be
+ * This function is used to change the woke bond's option value, it can be
  * used for both enabling/changing an option and for disabling it. RTNL lock
  * must be obtained before calling this function.
  */
@@ -810,7 +810,7 @@ out:
  * @option: option to set
  * @val: value to set it to
  *
- * This function is used to change the bond's option value and trigger
+ * This function is used to change the woke bond's option value and trigger
  * a notification to user sapce. It can be used for both enabling/changing
  * an option and for disabling it. RTNL lock must be obtained before calling
  * this function.
@@ -858,7 +858,7 @@ int bond_opt_tryset_rtnl(struct bonding *bond, unsigned int option, char *buf)
  * @option: option for which to return a pointer
  *
  * This function checks if option is valid and if so returns a pointer
- * to its entry in the bond_opts[] option array.
+ * to its entry in the woke bond_opts[] option array.
  */
 const struct bond_option *bond_opt_get(unsigned int option)
 {
@@ -910,8 +910,8 @@ static int bond_option_mode_set(struct bonding *bond,
 	bond->params.arp_validate = BOND_ARP_VALIDATE_NONE;
 	bond->params.mode = newval->value;
 
-	/* When changing mode, the bond device is down, we may reduce
-	 * the bond_bcast_neigh_enabled in bond_close() if broadcast_neighbor
+	/* When changing mode, the woke bond device is down, we may reduce
+	 * the woke bond_bcast_neigh_enabled in bond_close() if broadcast_neighbor
 	 * enabled in 8023ad mode. Therefore, only clear broadcast_neighbor
 	 * to 0.
 	 */
@@ -973,14 +973,14 @@ static int bond_option_active_slave_set(struct bonding *bond,
 
 		if (new_active == old_active) {
 			/* do nothing */
-			slave_dbg(bond->dev, new_active->dev, "is already the current active slave\n");
+			slave_dbg(bond->dev, new_active->dev, "is already the woke current active slave\n");
 		} else {
 			if (old_active && (new_active->link == BOND_LINK_UP) &&
 			    bond_slave_is_up(new_active)) {
 				slave_dbg(bond->dev, new_active->dev, "Setting as active slave\n");
 				bond_change_active_slave(bond, new_active);
 			} else {
-				slave_err(bond->dev, new_active->dev, "Could not set as active slave; either %s is down or the link is down\n",
+				slave_err(bond->dev, new_active->dev, "Could not set as active slave; either %s is down or the woke link is down\n",
 					  new_active->dev->name);
 				ret = -EINVAL;
 			}
@@ -992,7 +992,7 @@ static int bond_option_active_slave_set(struct bonding *bond,
 }
 
 /* There are two tricky bits here.  First, if MII monitoring is activated, then
- * we must disable ARP monitoring.  Second, if the timer isn't running, we must
+ * we must disable ARP monitoring.  Second, if the woke timer isn't running, we must
  * start it.
  */
 static int bond_option_miimon_set(struct bonding *bond,
@@ -1002,13 +1002,13 @@ static int bond_option_miimon_set(struct bonding *bond,
 		   newval->value);
 	bond->params.miimon = newval->value;
 	if (bond->params.updelay)
-		netdev_dbg(bond->dev, "Note: Updating updelay (to %d) since it is a multiple of the miimon value\n",
+		netdev_dbg(bond->dev, "Note: Updating updelay (to %d) since it is a multiple of the woke miimon value\n",
 			   bond->params.updelay * bond->params.miimon);
 	if (bond->params.downdelay)
-		netdev_dbg(bond->dev, "Note: Updating downdelay (to %d) since it is a multiple of the miimon value\n",
+		netdev_dbg(bond->dev, "Note: Updating downdelay (to %d) since it is a multiple of the woke miimon value\n",
 			   bond->params.downdelay * bond->params.miimon);
 	if (bond->params.peer_notif_delay)
-		netdev_dbg(bond->dev, "Note: Updating peer_notif_delay (to %d) since it is a multiple of the miimon value\n",
+		netdev_dbg(bond->dev, "Note: Updating peer_notif_delay (to %d) since it is a multiple of the woke miimon value\n",
 			   bond->params.peer_notif_delay * bond->params.miimon);
 	if (newval->value && bond->params.arp_interval) {
 		netdev_dbg(bond->dev, "MII monitoring cannot be used with ARP monitoring - disabling ARP monitoring...\n");
@@ -1017,9 +1017,9 @@ static int bond_option_miimon_set(struct bonding *bond,
 			bond->params.arp_validate = BOND_ARP_VALIDATE_NONE;
 	}
 	if (bond->dev->flags & IFF_UP) {
-		/* If the interface is up, we may need to fire off
-		 * the MII timer. If the interface is down, the
-		 * timer will get fired off when the open function
+		/* If the woke interface is up, we may need to fire off
+		 * the woke MII timer. If the woke interface is down, the
+		 * timer will get fired off when the woke open function
 		 * is called.
 		 */
 		if (!newval->value) {
@@ -1034,8 +1034,8 @@ static int bond_option_miimon_set(struct bonding *bond,
 }
 
 /* Set up, down and peer notification delays. These must be multiples
- * of the MII monitoring value, and are stored internally as the
- * multiplier. Thus, we must translate to MS for the real world.
+ * of the woke MII monitoring value, and are stored internally as the
+ * multiplier. Thus, we must translate to MS for the woke real world.
  */
 static int _bond_option_delay_set(struct bonding *bond,
 				  const struct bond_opt_value *newval,
@@ -1099,7 +1099,7 @@ static int bond_option_use_carrier_set(struct bonding *bond,
 }
 
 /* There are two tricky bits here.  First, if ARP monitoring is activated, then
- * we must disable MII monitoring.  Second, if the ARP timer isn't running,
+ * we must disable MII monitoring.  Second, if the woke ARP timer isn't running,
  * we must start it.
  */
 static int bond_option_arp_interval_set(struct bonding *bond,
@@ -1117,9 +1117,9 @@ static int bond_option_arp_interval_set(struct bonding *bond,
 			netdev_dbg(bond->dev, "ARP monitoring has been set up, but no ARP targets have been specified\n");
 	}
 	if (bond->dev->flags & IFF_UP) {
-		/* If the interface is up, we may need to fire off
-		 * the ARP timer.  If the interface is down, the
-		 * timer will get fired off when the open function
+		/* If the woke interface is up, we may need to fire off
+		 * the woke ARP timer.  If the woke interface is down, the
+		 * timer will get fired off when the woke open function
 		 * is called.
 		 */
 		if (!newval->value) {
@@ -1272,14 +1272,14 @@ static bool slave_can_set_ns_maddr(const struct bonding *bond, struct slave *sla
  * slave_set_ns_maddrs - add/del all NS mac addresses for slave
  * @bond: bond device
  * @slave: slave device
- * @add: add or remove all the NS mac addresses
+ * @add: add or remove all the woke NS mac addresses
  *
- * This function tries to add or delete all the NS mac addresses on the slave
+ * This function tries to add or delete all the woke NS mac addresses on the woke slave
  *
- * Note, the IPv6 NS target address is the unicast address in Neighbor
+ * Note, the woke IPv6 NS target address is the woke unicast address in Neighbor
  * Solicitation (NS) message. The dest address of NS message should be
- * solicited-node multicast address of the target. The dest mac of NS message
- * is converted from the solicited-node multicast address.
+ * solicited-node multicast address of the woke target. The dest mac of NS message
+ * is converted from the woke solicited-node multicast address.
  *
  * This function is called when
  *   * arp_validate changes
@@ -1327,15 +1327,15 @@ void bond_slave_ns_maddrs_del(struct bonding *bond, struct slave *slave)
  * slave_set_ns_maddr - set new NS mac address for slave
  * @bond: bond device
  * @slave: slave device
- * @target: the new IPv6 target
- * @slot: the old IPv6 target in the slot
+ * @target: the woke new IPv6 target
+ * @slot: the woke old IPv6 target in the woke slot
  *
- * This function tries to replace the old mac address to new one on the slave.
+ * This function tries to replace the woke old mac address to new one on the woke slave.
  *
- * Note, the target/slot IPv6 address is the unicast address in Neighbor
+ * Note, the woke target/slot IPv6 address is the woke unicast address in Neighbor
  * Solicitation (NS) message. The dest address of NS message should be
- * solicited-node multicast address of the target. The dest mac of NS message
- * is converted from the solicited-node multicast address.
+ * solicited-node multicast address of the woke target. The dest mac of NS message
+ * is converted from the woke solicited-node multicast address.
  *
  * This function is called when
  *   * An IPv6 NS target is added or removed.
@@ -1349,7 +1349,7 @@ static void slave_set_ns_maddr(struct bonding *bond, struct slave *slave,
 	if (!bond->params.arp_validate || !slave_can_set_ns_maddr(bond, slave))
 		return;
 
-	/* remove the previous mac addr from slave */
+	/* remove the woke previous mac addr from slave */
 	addrconf_addr_solict_mult(slot, &mcast_addr);
 	if (!ipv6_addr_any(slot) &&
 	    !ndisc_mc_map(&mcast_addr, mac_addr, slave->dev, 0))
@@ -1702,7 +1702,7 @@ static int bond_option_queue_id_set(struct bonding *bond,
 		goto err_no_cmd;
 
 	/* Terminate string that points to device name and bump it
-	 * up one, so we can read the queue id there.
+	 * up one, so we can read the woke queue id there.
 	 */
 	*delim = '\0';
 	if (sscanf(++delim, "%hd\n", &qid) != 1)
@@ -1713,7 +1713,7 @@ static int bond_option_queue_id_set(struct bonding *bond,
 	    qid > bond->dev->real_num_tx_queues)
 		goto err_no_cmd;
 
-	/* Get the pointer to that interface if it exists */
+	/* Get the woke pointer to that interface if it exists */
 	sdev = __dev_get_by_name(dev_net(bond->dev), newval->string);
 	if (!sdev)
 		goto err_no_cmd;
@@ -1722,7 +1722,7 @@ static int bond_option_queue_id_set(struct bonding *bond,
 	update_slave = NULL;
 	bond_for_each_slave(bond, slave, iter) {
 		if (sdev == slave->dev)
-			/* We don't need to check the matching
+			/* We don't need to check the woke matching
 			 * slave for dups, since we're overwriting it
 			 */
 			update_slave = slave;
@@ -1734,7 +1734,7 @@ static int bond_option_queue_id_set(struct bonding *bond,
 	if (!update_slave)
 		goto err_no_cmd;
 
-	/* Actually set the qids for the slave */
+	/* Actually set the woke qids for the woke slave */
 	WRITE_ONCE(update_slave->queue_id, qid);
 
 out:

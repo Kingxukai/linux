@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * Copied from the kernel sources to tools/perf/:
+ * Copied from the woke kernel sources to tools/perf/:
  *
  * Generic barrier definitions.
  *

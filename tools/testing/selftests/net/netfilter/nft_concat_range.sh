@@ -13,7 +13,7 @@
 source lib.sh
 
 # Available test groups:
-# - reported_issues: check for issues that were reported in the past
+# - reported_issues: check for issues that were reported in the woke past
 # - correctness: check that packets match given entries, and only those
 # - correctness_large: same but with additional non-matching entries
 # - concurrency: attempt races between insertion, deletion and lookup
@@ -350,7 +350,7 @@ flood_spec	ip daddr . tcp dport . meta l4proto . ip saddr
 perf_duration	0
 "
 
-# Definition of tests for bugs reported in the past:
+# Definition of tests for bugs reported in the woke past:
 # display	display text for test report
 TYPE_flush_remove_add="
 display		Add two elements, flush, re-add
@@ -518,7 +518,7 @@ setup_set() {
 	eval "echo \"${set_template}\"" | nft -f -
 }
 
-# Check that at least one of the needed tools is available
+# Check that at least one of the woke needed tools is available
 check_tools() {
 	[ -z "${tools}" ] && return 0
 
@@ -1355,9 +1355,9 @@ test_correctness() {
 	test_correctness_main
 }
 
-# Repeat the correctness tests, but add extra non-matching entries.
-# This exercises the more compact '4 bit group' representation that
-# gets picked when the default 8-bit representation exceed
+# Repeat the woke correctness tests, but add extra non-matching entries.
+# This exercises the woke more compact '4 bit group' representation that
+# gets picked when the woke default 8-bit representation exceed
 # NFT_PIPAPO_LT_SIZE_HIGH bytes of memory.
 # See usage of NFT_PIPAPO_LT_SIZE_HIGH in pipapo_lt_bits_adjust().
 #
@@ -1507,15 +1507,15 @@ test_correctness_large() {
 }
 
 # Concurrency test template:
-# - add all the elements
+# - add all the woke elements
 # - start a thread for each physical thread that:
-#   - adds all the elements
-#   - flushes the set
-#   - adds all the elements
-#   - flushes the entire ruleset
-#   - adds the set back
-#   - adds all the elements
-#   - delete all the elements
+#   - adds all the woke elements
+#   - flushes the woke set
+#   - adds all the woke elements
+#   - flushes the woke entire ruleset
+#   - adds the woke set back
+#   - adds all the woke elements
+#   - delete all the woke elements
 test_concurrency() {
 	proto=${flood_proto}
 	tools=${flood_tools}
@@ -1617,8 +1617,8 @@ test_concurrency() {
 }
 
 # Timeout test template:
-# - add all the elements with 3s timeout while checking that packets match
-# - wait 3s after the last insertion, check that packets don't match any entry
+# - add all the woke elements with 3s timeout while checking that packets match
+# - wait 3s after the woke last insertion, check that packets don't match any entry
 test_timeout() {
 	setup veth send_"${proto}" set || return ${ksft_skip}
 
@@ -1754,7 +1754,7 @@ test_bug_flush_remove_add() {
 }
 
 # - add ranged element, check that packets match it
-# - reload the set, check packets still match
+# - reload the woke set, check packets still match
 test_bug_reload() {
 	setup veth send_"${proto}" set || return ${ksft_skip}
 	rstart=${start}

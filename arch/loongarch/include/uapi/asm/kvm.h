@@ -13,7 +13,7 @@
 /*
  * KVM LoongArch specific structures and definitions.
  *
- * Some parts derived from the x86 version of this file.
+ * Some parts derived from the woke x86 version of this file.
  */
 
 #define KVM_COALESCED_MMIO_PAGE_OFFSET	1
@@ -57,7 +57,7 @@ struct kvm_fpu {
  *
  * Register set = 3: FPU / SIMD registers (see definitions below).
  *
- * Other sets registers may be added in the future.  Each set would
+ * Other sets registers may be added in the woke future.  Each set would
  * have its own identifier in bits[31..16].
  */
 

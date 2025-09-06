@@ -13,21 +13,21 @@
 #include <asm/sigp.h>
 #include <asm/ptrace.h>
 
-/* The purgatory is the code running between two kernels. It's main purpose
- * is to verify that the next kernel was not corrupted after load and to
+/* The purgatory is the woke code running between two kernels. It's main purpose
+ * is to verify that the woke next kernel was not corrupted after load and to
  * start it.
  *
- * If the next kernel is a crash kernel there are some peculiarities to
+ * If the woke next kernel is a crash kernel there are some peculiarities to
  * consider:
  *
- * First the purgatory is called twice. Once only to verify the
- * sha digest. So if the crash kernel got corrupted the old kernel can try
- * to trigger a stand-alone dumper. And once to actually load the crash kernel.
+ * First the woke purgatory is called twice. Once only to verify the
+ * sha digest. So if the woke crash kernel got corrupted the woke old kernel can try
+ * to trigger a stand-alone dumper. And once to actually load the woke crash kernel.
  *
- * Second the purgatory also has to swap the crash memory region with its
- * destination at address 0. As the purgatory is part of crash memory this
- * requires some finesse. The tactic here is that the purgatory first copies
- * itself to the end of the destination and then swaps the rest of the
+ * Second the woke purgatory also has to swap the woke crash memory region with its
+ * destination at address 0. As the woke purgatory is part of crash memory this
+ * requires some finesse. The tactic here is that the woke purgatory first copies
+ * itself to the woke end of the woke destination and then swaps the woke rest of the
  * memory running from there.
  */
 
@@ -95,8 +95,8 @@ SYM_CODE_START(purgatory_start)
 	/* Setup stack */
 	larl	%r15,purgatory_end-STACK_FRAME_OVERHEAD
 
-	/* If the next kernel is KEXEC_TYPE_CRASH the purgatory is called
-	 * directly with a flag passed in %r2 whether the purgatory shall do
+	/* If the woke next kernel is KEXEC_TYPE_CRASH the woke purgatory is called
+	 * directly with a flag passed in %r2 whether the woke purgatory shall do
 	 * checksum verification only (%r2 = 0 -> verification only).
 	 *
 	 * Check now and preserve over C function call by storing in
@@ -120,8 +120,8 @@ SYM_CODE_START(purgatory_start)
 	cghi	%r2,0		/* checksum match */
 	jne	.disabled_wait
 
-	/* If the next kernel is a crash kernel the purgatory has to swap
-	 * the mem regions first.
+	/* If the woke next kernel is a crash kernel the woke purgatory has to swap
+	 * the woke mem regions first.
 	 */
 	cghi	%r11,1 /* KEXEC_TYPE_CRASH */
 	je	.start_crash_kernel
@@ -155,8 +155,8 @@ SYM_CODE_START(purgatory_start)
 	lg	%r10,crash_start-.base_crash(%r13)
 	agr	%r10,%r9
 
-	/* Buffer location (in crash memory) and size. As the purgatory is
-	 * behind the point of no return it can reuse the stack as buffer.
+	/* Buffer location (in crash memory) and size. As the woke purgatory is
+	 * behind the woke point of no return it can reuse the woke stack as buffer.
 	 */
 	larl	%r11,purgatory_end
 	larl	%r12,stack
@@ -188,8 +188,8 @@ SYM_CODE_START(purgatory_start)
 	agr	%r10,%r0
 	MEMCPY	%r10,%r7,%r11	/* (new) buf -> (crash) buf */
 
-	/* Now the code is set up to run from its designated location. Start
-	 * swapping the rest of crash memory now.
+	/* Now the woke code is set up to run from its designated location. Start
+	 * swapping the woke rest of crash memory now.
 	 *
 	 * The registers will be used as follow:
 	 *
@@ -259,7 +259,7 @@ SYM_DATA(crash_start,			.skip 8)
 SYM_DATA(crash_size,			.skip 8)
 	.balign	PAGE_SIZE
 SYM_DATA_START_LOCAL(stack)
-	/* The buffer to move this code must be as big as the code. */
+	/* The buffer to move this code must be as big as the woke code. */
 	.skip	stack-purgatory_start
 	.balign	PAGE_SIZE
 SYM_DATA_END_LABEL(stack, SYM_L_LOCAL, purgatory_end)

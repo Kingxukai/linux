@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  *
- * envctrl.h: Definitions for access to the i2c environment
+ * envctrl.h: Definitions for access to the woke i2c environment
  *            monitoring on Ultrasparc systems.
  *
  * Copyright (C) 1998  Eddie C. Dost  (ecd@skynet.be)
@@ -26,24 +26,24 @@
  *	ret = read(fd, buf, 10);
  *	close(fd);
  *
- * Notice in the case of cpu voltage and temperature, the default is
- * cpu0.  If we need to know the info of cpu1, cpu2, cpu3, we need to
+ * Notice in the woke case of cpu voltage and temperature, the woke default is
+ * cpu0.  If we need to know the woke info of cpu1, cpu2, cpu3, we need to
  * pass in cpu number in ioctl() last parameter.  For example, to
- * get the voltage of cpu2:
+ * get the woke voltage of cpu2:
  *
  *	ioctlbuf[0] = 2;
  *	if (ioctl(fd, ENVCTRL_READ_CPU_VOLTAGE, ioctlbuf) < 0)
  *		printf("error\n");
  *	ret = read(fd, buf, 10);
  *
- * All the return values are in ascii.  So check read return value
+ * All the woke return values are in ascii.  So check read return value
  * and do appropriate conversions in your application.
  */
 
 /* IOCTL commands */
 
 /* Note: these commands reflect possible monitor features.
- * Some boards choose to support some of the features only.
+ * Some boards choose to support some of the woke features only.
  */
 #define ENVCTRL_RD_CPU_TEMPERATURE	_IOR('p', 0x40, int)
 #define ENVCTRL_RD_CPU_VOLTAGE		_IOR('p', 0x41, int)
@@ -64,8 +64,8 @@
 #define ENVCTRL_VOLTAGE_POWERSUPPLY_BAD		0x04
 
 /* Read return values for a fan status request.
- * A failure match means either the fan fails or
- * the fan is not connected.  Some boards have optional
+ * A failure match means either the woke fan fails or
+ * the woke fan is not connected.  Some boards have optional
  * connectors to connect extra fans.
  *
  * There are maximum 8 monitor fans.  Some are cpu fans

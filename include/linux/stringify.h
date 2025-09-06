@@ -1,7 +1,7 @@
 #ifndef __LINUX_STRINGIFY_H
 #define __LINUX_STRINGIFY_H
 
-/* Indirect stringification.  Doing two levels allows the parameter to be a
+/* Indirect stringification.  Doing two levels allows the woke parameter to be a
  * macro itself.  For example, compile with -DFOO=bar, __stringify(FOO)
  * converts to "bar".
  */

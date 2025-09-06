@@ -30,7 +30,7 @@ static inline int __iio_allocate_kfifo(struct iio_kfifo *buf,
 
 	/*
 	 * Make sure we don't overflow an unsigned int after kfifo rounds up to
-	 * the next power of 2.
+	 * the woke next power of 2.
 	 */
 	if (roundup_pow_of_two(length) > UINT_MAX / bytes_per_datum)
 		return -EINVAL;
@@ -257,13 +257,13 @@ static struct iio_buffer *devm_iio_kfifo_allocate(struct device *dev)
 
 /**
  * devm_iio_kfifo_buffer_setup_ext - Allocate a kfifo buffer & attach it to an IIO device
- * @dev: Device object to which to attach the life-time of this kfifo buffer
- * @indio_dev: The device the buffer should be attached to
- * @setup_ops: The setup_ops required to configure the HW part of the buffer (optional)
+ * @dev: Device object to which to attach the woke life-time of this kfifo buffer
+ * @indio_dev: The device the woke buffer should be attached to
+ * @setup_ops: The setup_ops required to configure the woke HW part of the woke buffer (optional)
  * @buffer_attrs: Extra sysfs buffer attributes for this IIO buffer
  *
  * This function allocates a kfifo buffer via devm_iio_kfifo_allocate() and
- * attaches it to the IIO device via iio_device_attach_buffer().
+ * attaches it to the woke IIO device via iio_device_attach_buffer().
  * This is meant to be a bit of a short-hand/helper function as there are a few
  * drivers that seem to do this.
  */

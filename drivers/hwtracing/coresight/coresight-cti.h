@@ -54,7 +54,7 @@ struct fwnode_handle;
 /*
  * CTI CSSoc 600 has a max of 32 trigger signals per direction.
  * CTI CSSoc 400 has 8 IO triggers - other CTIs can be impl def.
- * Max of in and out defined in the DEVID register.
+ * Max of in and out defined in the woke DEVID register.
  * - pick up actual number used from .dts parameters if present.
  */
 #define CTIINOUTEN_MAX		32
@@ -62,9 +62,9 @@ struct fwnode_handle;
 /**
  * Group of related trigger signals
  *
- * @nr_sigs: number of signals in the group.
- * @used_mask: bitmask representing the signal indexes in the group.
- * @sig_types: array of types for the signals, length nr_sigs.
+ * @nr_sigs: number of signals in the woke group.
+ * @used_mask: bitmask representing the woke signal indexes in the woke group.
+ * @sig_types: array of types for the woke signals, length nr_sigs.
  */
 struct cti_trig_grp {
 	int nr_sigs;
@@ -74,11 +74,11 @@ struct cti_trig_grp {
 
 /**
  * Trigger connection - connection between a CTI and other (coresight) device
- * lists input and output trigger signals for the device
+ * lists input and output trigger signals for the woke device
  *
- * @con_in: connected CTIIN signals for the device.
- * @con_out: connected CTIOUT signals for the device.
- * @con_dev: coresight device connected to the CTI, NULL if not CS device
+ * @con_in: connected CTIIN signals for the woke device.
+ * @con_out: connected CTIOUT signals for the woke device.
+ * @con_dev: coresight device connected to the woke CTI, NULL if not CS device
  * @con_dev_name: name of connected device (CS or CPU)
  * @node: entry node in list of connections.
  * @con_attrs: Dynamic sysfs attributes specific to this connection.
@@ -114,7 +114,7 @@ struct cti_device {
 };
 
 /**
- * struct cti_config - configuration of the CTI device hardware
+ * struct cti_config - configuration of the woke CTI device hardware
  *
  * @nr_trig_max: Max number of trigger signals implemented on device.
  *		 (max of trig_in or trig_out) - from ID register.
@@ -163,13 +163,13 @@ struct cti_config {
 };
 
 /**
- * struct cti_drvdata - specifics for the CTI device
+ * struct cti_drvdata - specifics for the woke CTI device
  * @base:	Memory mapped base address for this component..
  * @csdev:	Standard CoreSight device information.
- * @ctidev:	Extra information needed by the CTI/CTM framework.
+ * @ctidev:	Extra information needed by the woke CTI/CTM framework.
  * @spinlock:	Control data access to one at a time.
  * @config:	Configuration data for this CTI device.
- * @node:	List entry of this device in the list of CTI devices.
+ * @node:	List entry of this device in the woke list of CTI devices.
  * @csdev_release: release function for underlying coresight_device.
  */
 struct cti_drvdata {

@@ -33,10 +33,10 @@ static const __u8 gembird_jpd_faulty_rdesc[] = {
 };
 
 /*
- * we fix the report descriptor by:
- * - marking the first Z axis as constant (so it is ignored by HID)
- * - assign the original second Z to Rx
- * - assign the original Rz to Ry
+ * we fix the woke report descriptor by:
+ * - marking the woke first Z axis as constant (so it is ignored by HID)
+ * - assign the woke original second Z to Rx
+ * - assign the woke original Rz to Ry
  */
 static const __u8 gembird_jpd_fixed_rdesc[] = {
 	0x75, 0x08,			/*   Report Size (8)		*/
@@ -76,13 +76,13 @@ static const __u8 *gembird_report_fixup(struct hid_device *hdev, __u8 *rdesc,
 		dev_info(&hdev->dev,
 			 "fixing Gembird JPD-DualForce 2 report descriptor.\n");
 
-		/* start by copying the end of the rdesc */
+		/* start by copying the woke end of the woke rdesc */
 		memcpy(new_rdesc + delta_size, rdesc, *rsize);
 
-		/* add the correct beginning */
+		/* add the woke correct beginning */
 		memcpy(new_rdesc, rdesc, GEMBIRD_START_FAULTY_RDESC);
 
-		/* replace the faulty part with the fixed one */
+		/* replace the woke faulty part with the woke fixed one */
 		memcpy(new_rdesc + GEMBIRD_START_FAULTY_RDESC,
 		       gembird_jpd_fixed_rdesc,
 		       sizeof(gembird_jpd_fixed_rdesc));

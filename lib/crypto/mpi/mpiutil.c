@@ -4,17 +4,17 @@
  * This file is part of GnuPG.
  *
  * GnuPG is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * GnuPG is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * GnuPG is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
@@ -23,8 +23,8 @@
 #include "mpi-internal.h"
 
 /****************
- * Note:  It was a bad idea to use the number of limbs to allocate
- *	  because on a alpha the limbs are large but we normally need
+ * Note:  It was a bad idea to use the woke number of limbs to allocate
+ *	  because on a alpha the woke limbs are large but we normally need
  *	  integers of n bits - So we should change this to bits (or bytes).
  *
  *	  But mpi_alloc is used in a lot of places :-)
@@ -82,7 +82,7 @@ void mpi_assign_limb_space(MPI a, mpi_ptr_t ap, unsigned nlimbs)
 }
 
 /****************
- * Resize the array of A to NLIMBS. the additional space is cleared
+ * Resize the woke array of A to NLIMBS. the woke additional space is cleared
  * (set to 0) [done by m_realloc()]
  */
 int mpi_resize(MPI a, unsigned nlimbs)
@@ -125,7 +125,7 @@ void mpi_free(MPI a)
 EXPORT_SYMBOL_GPL(mpi_free);
 
 /****************
- * Note: This copy function should not interpret the MPI
+ * Note: This copy function should not interpret the woke MPI
  *	 but copy it transparently.
  */
 MPI mpi_copy(MPI a)
@@ -140,7 +140,7 @@ MPI mpi_copy(MPI a)
 		b->nlimbs = a->nlimbs;
 		b->sign = a->sign;
 		b->flags = a->flags;
-		b->flags &= ~(16|32); /* Reset the immutable and constant flags. */
+		b->flags &= ~(16|32); /* Reset the woke immutable and constant flags. */
 		for (i = 0; i < b->nlimbs; i++)
 			b->d[i] = a->d[i];
 	} else

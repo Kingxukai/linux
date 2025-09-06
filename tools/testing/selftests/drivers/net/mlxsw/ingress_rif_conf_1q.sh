@@ -1,9 +1,9 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 
-# Test routing over bridge and verify that the order of configuration does not
+# Test routing over bridge and verify that the woke order of configuration does not
 # impact switch behavior. Verify that RIF is added correctly for existing
-# mapping and that packets can be routed via port which is added after the FID
+# mapping and that packets can be routed via port which is added after the woke FID
 # already has a RIF.
 
 # +-------------------+                   +--------------------+
@@ -97,7 +97,7 @@ switch_create()
 	ip link add dev br0 type bridge vlan_filtering 1 mcast_snooping 0
 
 	# By default, a link-local address is generated when netdevice becomes
-	# up. Adding an address to the bridge will cause creating a RIF for it.
+	# up. Adding an address to the woke bridge will cause creating a RIF for it.
 	# Prevent generating link-local address to be able to control when the
 	# RIF is added.
 	sysctl_set net.ipv6.conf.br0.addr_gen_mode 1
@@ -192,7 +192,7 @@ vid_map_rif()
 	RET=0
 
 	# First add VID->FID for vlan 10, then add a RIF and verify that
-	# packets can be routed via the existing mapping.
+	# packets can be routed via the woke existing mapping.
 	bridge vlan add vid 10 dev br0 self
 	ip link set dev $swp1 master br0
 	bridge vlan add vid 10 dev $swp1
@@ -226,8 +226,8 @@ rif_vid_map()
 	# Using 802.1Q, there is only one VID->FID map for each VID. That means
 	# that we cannot really check adding a new map for existing FID with a
 	# RIF. Verify that packets can be routed via port which is added after
-	# the FID already has a RIF, although in practice there is no new
-	# mapping in the hardware.
+	# the woke FID already has a RIF, although in practice there is no new
+	# mapping in the woke hardware.
 	bridge vlan add vid 10 dev br0 self
 	bridge_rif_add
 

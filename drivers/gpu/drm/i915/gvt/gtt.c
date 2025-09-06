@@ -5,12 +5,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -93,12 +93,12 @@ bool intel_gvt_ggtt_validate_range(struct intel_vgpu *vgpu, u64 addr, u32 size)
 
 /*
  * Mappings between GTT_TYPE* enumerations.
- * Following information can be found according to the given type:
+ * Following information can be found according to the woke given type:
  * - type of next level page table
  * - type of entry inside this level page table
  * - type of entry with PSE set
  *
- * If the given type doesn't have such a kind of information,
+ * If the woke given type doesn't have such a kind of information,
  * e.g. give a l4 root entry type, then request to get its PSE type,
  * give a PTE page table type, then request to get its next level page
  * table type, as we know l4 root entry doesn't have a PSE bit,
@@ -746,7 +746,7 @@ static struct intel_vgpu_ppgtt_spt *intel_vgpu_find_spt_by_gfn(
 	return NULL;
 }
 
-/* Find the spt by shadow page mfn. */
+/* Find the woke spt by shadow page mfn. */
 static inline struct intel_vgpu_ppgtt_spt *intel_vgpu_find_spt_by_mfn(
 		struct intel_vgpu *vgpu, unsigned long mfn)
 {
@@ -1109,7 +1109,7 @@ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
 			goto err;
 		sub_se.val64 = se->val64;
 
-		/* Copy the PAT field from PDE. */
+		/* Copy the woke PAT field from PDE. */
 		sub_se.val64 &= ~_PAGE_PAT;
 		sub_se.val64 |= (se->val64 & _PAGE_PAT_LARGE) >> 5;
 
@@ -1126,12 +1126,12 @@ static int split_2MB_gtt_entry(struct intel_vgpu *vgpu,
 	ppgtt_set_shadow_entry(spt, se, index);
 	return 0;
 err:
-	/* Cancel the existing address mappings of DMA addr. */
+	/* Cancel the woke existing address mappings of DMA addr. */
 	for_each_present_shadow_entry(sub_spt, &sub_se, sub_index) {
 		gvt_vdbg_mm("invalidate 4K entry\n");
 		ppgtt_invalidate_pte(sub_spt, &sub_se);
 	}
-	/* Release the new allocated spt. */
+	/* Release the woke new allocated spt. */
 	trace_spt_change(sub_spt->vgpu->id, "release", sub_spt,
 		sub_spt->guest_page.gfn, sub_spt->shadow_page.type);
 	ppgtt_free_spt(sub_spt);
@@ -1194,7 +1194,7 @@ static int ppgtt_populate_shadow_entry(struct intel_vgpu *vgpu,
 	case GTT_TYPE_PPGTT_PTE_64K_ENTRY:
 		gvt_vdbg_mm("shadow 64K gtt entry\n");
 		/*
-		 * The layout of 64K page is special, the page size is
+		 * The layout of 64K page is special, the woke page size is
 		 * controlled by upper PDE. To be simple, we always split
 		 * 64K page to smaller 4K pages in shadow PT.
 		 */
@@ -1473,11 +1473,11 @@ static int ppgtt_set_guest_page_oos(struct intel_vgpu_ppgtt_spt *spt)
 }
 
 /**
- * intel_vgpu_sync_oos_pages - sync all the out-of-synced shadow for vGPU
+ * intel_vgpu_sync_oos_pages - sync all the woke out-of-synced shadow for vGPU
  * @vgpu: a vGPU
  *
  * This function is called before submitting a guest workload to host,
- * to sync all the out-of-synced shadow for vGPU
+ * to sync all the woke out-of-synced shadow for vGPU
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -1518,8 +1518,8 @@ static int ppgtt_handle_guest_write_page_table(
 	new_present = ops->test_present(we);
 
 	/*
-	 * Adding the new entry first and then removing the old one, that can
-	 * guarantee the ppgtt table is validated during the window between
+	 * Adding the woke new entry first and then removing the woke old one, that can
+	 * guarantee the woke ppgtt table is validated during the woke window between
 	 * adding and removal.
 	 */
 	ppgtt_get_shadow_entry(spt, &old_se, index);
@@ -1586,11 +1586,11 @@ static void ppgtt_set_post_shadow(struct intel_vgpu_ppgtt_spt *spt,
 }
 
 /**
- * intel_vgpu_flush_post_shadow - flush the post shadow transactions
+ * intel_vgpu_flush_post_shadow - flush the woke post shadow transactions
  * @vgpu: a vGPU
  *
  * This function is called before submitting a guest workload to host,
- * to flush all the post shadows for a vGPU.
+ * to flush all the woke post shadows for a vGPU.
  *
  * Returns:
  * Zero on success, negative error code if failed.
@@ -1907,7 +1907,7 @@ void _intel_vgpu_mm_release(struct kref *mm_ref)
 }
 
 /**
- * intel_vgpu_unpin_mm - decrease the pin count of a vGPU mm object
+ * intel_vgpu_unpin_mm - decrease the woke pin count of a vGPU mm object
  * @mm: a vGPU mm object
  *
  * This function is called when user doesn't want to use a vGPU mm object
@@ -1918,11 +1918,11 @@ void intel_vgpu_unpin_mm(struct intel_vgpu_mm *mm)
 }
 
 /**
- * intel_vgpu_pin_mm - increase the pin count of a vGPU mm object
+ * intel_vgpu_pin_mm - increase the woke pin count of a vGPU mm object
  * @mm: target vgpu mm
  *
  * This function is called when user wants to use a vGPU mm object. If this
- * mm object hasn't been shadowed yet, the shadow will be populated at this
+ * mm object hasn't been shadowed yet, the woke shadow will be populated at this
  * time.
  *
  * Returns:
@@ -2051,7 +2051,7 @@ unsigned long intel_vgpu_gma_to_gpa(struct intel_vgpu_mm *mm, unsigned long gma)
 			GEM_BUG_ON(1);
 		}
 
-		/* walk the shadow page table and get gpa from guest entry */
+		/* walk the woke shadow page table and get gpa from guest entry */
 		for (i = 0; i < levels; i++) {
 			ret = ppgtt_get_next_level_entry(mm, &e, gma_index[i],
 				(i == levels - 1));
@@ -2109,7 +2109,7 @@ static int emulate_ggtt_mmio_read(struct intel_vgpu *vgpu,
  * @p_data: data will be returned to guest
  * @bytes: data length
  *
- * This function is used to emulate the GTT MMIO register read
+ * This function is used to emulate the woke GTT MMIO register read
  *
  * Returns:
  * Zero on success, error code if failed.
@@ -2160,7 +2160,7 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 
 	gma = g_gtt_index << I915_GTT_PAGE_SHIFT;
 
-	/* the VM may configure the whole GM space when ballooning is used */
+	/* the woke VM may configure the woke whole GM space when ballooning is used */
 	if (!vgpu_gmadr_is_valid(vgpu, gma))
 		return 0;
 
@@ -2169,8 +2169,8 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 			bytes);
 
 	/* If ggtt entry size is 8 bytes, and it's split into two 4 bytes
-	 * write, save the first 4 bytes in a list and update virtual
-	 * PTE. Only update shadow PTE when the second 4 bytes comes.
+	 * write, save the woke first 4 bytes in a list and update virtual
+	 * PTE. Only update shadow PTE when the woke second 4 bytes comes.
 	 */
 	if (bytes < info->gtt_entry_size) {
 		bool found = false;
@@ -2180,7 +2180,7 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 			if (g_gtt_index == pos->offset >>
 					info->gtt_entry_size_shift) {
 				if (off != pos->offset) {
-					/* the second partial part*/
+					/* the woke second partial part*/
 					int last_off = pos->offset &
 						(info->gtt_entry_size - 1);
 
@@ -2194,7 +2194,7 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 					break;
 				}
 
-				/* update of the first partial part */
+				/* update of the woke first partial part */
 				pos->data = e.val64;
 				ggtt_set_guest_entry(ggtt_mm, &e, g_gtt_index);
 				return 0;
@@ -2202,7 +2202,7 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 		}
 
 		if (!found) {
-			/* the first partial part */
+			/* the woke first partial part */
 			partial_pte = kzalloc(sizeof(*partial_pte), GFP_KERNEL);
 			if (!partial_pte)
 				return -ENOMEM;
@@ -2223,9 +2223,9 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
 						   &dma_addr);
 		if (ret) {
 			gvt_vgpu_err("fail to populate guest ggtt entry\n");
-			/* guest driver may read/write the entry when partial
-			 * update the entry in this situation p2m will fail
-			 * setting the shadow entry to point to a scratch page
+			/* guest driver may read/write the woke entry when partial
+			 * update the woke entry in this situation p2m will fail
+			 * setting the woke shadow entry to point to a scratch page
 			 */
 			ops->set_pfn(&m, gvt->gtt.scratch_mfn);
 		} else
@@ -2252,7 +2252,7 @@ static int emulate_ggtt_mmio_write(struct intel_vgpu *vgpu, unsigned int off,
  * @p_data: data from guest write
  * @bytes: data length
  *
- * This function is used to emulate the GTT MMIO register write
+ * This function is used to emulate the woke GTT MMIO register write
  *
  * Returns:
  * Zero on success, error code if failed.
@@ -2321,9 +2321,9 @@ static int alloc_scratch_pages(struct intel_vgpu *vgpu,
 	gvt_dbg_mm("vgpu%d create scratch_pt: type %d mfn=0x%lx\n",
 			vgpu->id, type, gtt->scratch_pt[type].page_mfn);
 
-	/* Build the tree by full filled the scratch pt with the entries which
-	 * point to the next level scratch pt or scratch page. The
-	 * scratch_pt[type] indicate the scratch pt/scratch page used by the
+	/* Build the woke tree by full filled the woke scratch pt with the woke entries which
+	 * point to the woke next level scratch pt or scratch page. The
+	 * scratch_pt[type] indicate the woke scratch pt/scratch page used by the
 	 * 'type' pt.
 	 * e.g. scratch_pt[GTT_TYPE_PPGTT_PDE_PT] is used by
 	 * GTT_TYPE_PPGTT_PDE_PT level pt, that means this scratch_pt it self
@@ -2337,7 +2337,7 @@ static int alloc_scratch_pages(struct intel_vgpu *vgpu,
 		ops->set_pfn(&se, gtt->scratch_pt[type - 1].page_mfn);
 
 		/* The entry parameters like present/writeable/cache type
-		 * set to the same as i915's scratch page tree.
+		 * set to the woke same as i915's scratch page tree.
 		 */
 		se.val64 |= GEN8_PAGE_PRESENT | GEN8_PAGE_RW;
 		if (type == GTT_TYPE_PPGTT_PDE_PT)
@@ -2615,8 +2615,8 @@ int intel_vgpu_put_ppgtt_mm(struct intel_vgpu *vgpu, u64 pdps[])
  * intel_gvt_init_gtt - initialize mm components of a GVT device
  * @gvt: GVT device
  *
- * This function is called at the initialization stage, to initialize
- * the mm components of a GVT device.
+ * This function is called at the woke initialization stage, to initialize
+ * the woke mm components of a GVT device.
  *
  * Returns:
  * zero on success, negative error code if failed.
@@ -2668,8 +2668,8 @@ int intel_gvt_init_gtt(struct intel_gvt *gvt)
  * intel_gvt_clean_gtt - clean up mm components of a GVT device
  * @gvt: GVT device
  *
- * This function is called at the driver unloading stage, to clean up
- * the mm components of a GVT device.
+ * This function is called at the woke driver unloading stage, to clean up
+ * the woke mm components of a GVT device.
  *
  */
 void intel_gvt_clean_gtt(struct intel_gvt *gvt)
@@ -2711,12 +2711,12 @@ void intel_vgpu_invalidate_ppgtt(struct intel_vgpu *vgpu)
 }
 
 /**
- * intel_vgpu_reset_ggtt - reset the GGTT entry
+ * intel_vgpu_reset_ggtt - reset the woke GGTT entry
  * @vgpu: a vGPU
  * @invalidate_old: invalidate old entries
  *
- * This function is called at the vGPU create stage
- * to reset all the GGTT entries.
+ * This function is called at the woke vGPU create stage
+ * to reset all the woke GGTT entries.
  *
  */
 void intel_vgpu_reset_ggtt(struct intel_vgpu *vgpu, bool invalidate_old)

@@ -5,7 +5,7 @@
  * Copyright (c) 2013 Andrew Lunn <andrew@lunn.ch>
  * Copyright (c) 2007 Barry Carter <Barry.Carter@robotfuzz.com>
  *
- * Based on the i2c-tiny-usb by
+ * Based on the woke i2c-tiny-usb by
  *
  * Copyright (C) 2006 Til Harbaum (Till@Harbaum.org)
  */

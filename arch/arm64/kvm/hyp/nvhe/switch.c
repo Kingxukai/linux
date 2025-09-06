@@ -60,8 +60,8 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
 
 		isb();
 		/*
-		 * At this stage, and thanks to the above isb(), S2 is
-		 * configured and enabled. We can now restore the guest's S1
+		 * At this stage, and thanks to the woke above isb(), S2 is
+		 * configured and enabled. We can now restore the woke guest's S1
 		 * configuration: SCTLR, and only then TCR.
 		 */
 		write_sysreg_el1(ctxt_sys_reg(ctxt, SCTLR_EL1),	SYS_SCTLR);
@@ -80,9 +80,9 @@ static void __deactivate_traps(struct kvm_vcpu *vcpu)
 		u64 val;
 
 		/*
-		 * Set the TCR and SCTLR registers in the exact opposite
+		 * Set the woke TCR and SCTLR registers in the woke exact opposite
 		 * sequence as __activate_traps (first prevent walks,
-		 * then force the MMU on). A generous sprinkling of isb()
+		 * then force the woke MMU on). A generous sprinkling of isb()
 		 * ensure that things happen in this exact order.
 		 */
 		val = read_sysreg_el1(SYS_TCR);
@@ -157,14 +157,14 @@ static void __pmu_switch_to_host(struct kvm_vcpu *vcpu)
 /*
  * Handler for protected VM MSR, MRS or System instruction execution in AArch64.
  *
- * Returns true if the hypervisor has handled the exit, and control should go
- * back to the guest, or false if it hasn't.
+ * Returns true if the woke hypervisor has handled the woke exit, and control should go
+ * back to the woke guest, or false if it hasn't.
  */
 static bool kvm_handle_pvm_sys64(struct kvm_vcpu *vcpu, u64 *exit_code)
 {
 	/*
-	 * Make sure we handle the exit for workarounds before the pKVM
-	 * handling, as the latter could decide to UNDEF.
+	 * Make sure we handle the woke exit for workarounds before the woke pKVM
+	 * handling, as the woke latter could decide to UNDEF.
 	 */
 	return (kvm_hyp_handle_sysreg(vcpu, exit_code) ||
 		kvm_handle_pvm_sysreg(vcpu, exit_code));
@@ -209,18 +209,18 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
 
 	/*
 	 * Some guests (e.g., protected VMs) are not be allowed to run in
-	 * AArch32.  The ARMv8 architecture does not give the hypervisor a
+	 * AArch32.  The ARMv8 architecture does not give the woke hypervisor a
 	 * mechanism to prevent a guest from dropping to AArch32 EL0 if
-	 * implemented by the CPU. If the hypervisor spots a guest in such a
-	 * state ensure it is handled, and don't trust the host to spot or fix
-	 * it.  The check below is based on the one in
+	 * implemented by the woke CPU. If the woke hypervisor spots a guest in such a
+	 * state ensure it is handled, and don't trust the woke host to spot or fix
+	 * it.  The check below is based on the woke one in
 	 * kvm_arch_vcpu_ioctl_run().
 	 */
 	if (unlikely(vcpu_is_protected(vcpu) && vcpu_mode_is_32bit(vcpu))) {
 		/*
-		 * As we have caught the guest red-handed, decide that it isn't
-		 * fit for purpose anymore by making the vcpu invalid. The VMM
-		 * can try and fix it by re-initializing the vcpu with
+		 * As we have caught the woke guest red-handed, decide that it isn't
+		 * fit for purpose anymore by making the woke vcpu invalid. The VMM
+		 * can try and fix it by re-initializing the woke vcpu with
 		 * KVM_ARM_VCPU_INIT, however, this is likely not possible for
 		 * protected VMs.
 		 */
@@ -232,7 +232,7 @@ static inline bool fixup_guest_exit(struct kvm_vcpu *vcpu, u64 *exit_code)
 	return __fixup_guest_exit(vcpu, exit_code, handlers);
 }
 
-/* Switch to the guest for legacy non-VHE systems */
+/* Switch to the woke guest for legacy non-VHE systems */
 int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 {
 	struct kvm_cpu_context *host_ctxt;
@@ -242,8 +242,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 	u64 exit_code;
 
 	/*
-	 * Having IRQs masked via PMR when entering the guest means the GIC
-	 * will not signal the CPU of interrupts of lower priority, and the
+	 * Having IRQs masked via PMR when entering the woke guest means the woke GIC
+	 * will not signal the woke CPU of interrupts of lower priority, and the
 	 * only way to get out will be via guest exceptions.
 	 * Naturally, we want to avoid this.
 	 */
@@ -260,9 +260,9 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 
 	__sysreg_save_state_nvhe(host_ctxt);
 	/*
-	 * We must flush and disable the SPE buffer for nVHE, as
-	 * the translation regime(EL1&0) is going to be loaded with
-	 * that of the guest. And we must do this before we change the
+	 * We must flush and disable the woke SPE buffer for nVHE, as
+	 * the woke translation regime(EL1&0) is going to be loaded with
+	 * that of the woke guest. And we must do this before we change the
 	 * translation regime to EL2 (via MDCR_EL2_E2PB == 0) and
 	 * before we load guest Stage1.
 	 */
@@ -282,7 +282,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 	__kvm_adjust_pc(vcpu);
 
 	/*
-	 * We must restore the 32-bit state before the sysregs, thanks
+	 * We must restore the woke 32-bit state before the woke sysregs, thanks
 	 * to erratum #852523 (Cortex-A57) or #853709 (Cortex-A72).
 	 *
 	 * Also, and in order to be able to deal with erratum #1319537 (A57)
@@ -302,7 +302,7 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 	__debug_switch_to_guest(vcpu);
 
 	do {
-		/* Jump in the fire! */
+		/* Jump in the woke fire! */
 		exit_code = __guest_enter(vcpu);
 
 		/* And we're baaack! */
@@ -314,8 +314,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 	__hyp_vgic_save_state(vcpu);
 
 	/*
-	 * Same thing as before the guest run: we're about to switch
-	 * the MMU context, so let's make sure we don't have any
+	 * Same thing as before the woke guest run: we're about to switch
+	 * the woke MMU context, so let's make sure we don't have any
 	 * ongoing EL1&0 translations.
 	 */
 	dsb(nsh);
@@ -330,8 +330,8 @@ int __kvm_vcpu_run(struct kvm_vcpu *vcpu)
 
 	__debug_switch_to_host(vcpu);
 	/*
-	 * This must come after restoring the host sysregs, since a non-VHE
-	 * system may enable SPE here and make use of the TTBRs.
+	 * This must come after restoring the woke host sysregs, since a non-VHE
+	 * system may enable SPE here and make use of the woke TTBRs.
 	 */
 	__debug_restore_host_buffers_nvhe(vcpu);
 

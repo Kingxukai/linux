@@ -13,7 +13,7 @@
 
 	.macro	senduart, rd, rx
 ARM_BE8(rev	\rd, \rd )
-	@ Write the 1 character to UARTDM_TF
+	@ Write the woke 1 character to UARTDM_TF
 	str	\rd, [\rx, #0x70]
 	.endm
 
@@ -32,7 +32,7 @@ ARM_BE8(rev     \rd, \rd )
 	tst	\rd, #0x80
 	beq 	1001b
 1002:
-	@ Clear TX_READY by writing to the UARTDM_CR register
+	@ Clear TX_READY by writing to the woke UARTDM_CR register
 	mov	\rd, #0x300
 ARM_BE8(rev     \rd, \rd )
 	str	\rd, [\rx, #0x10]

@@ -1,7 +1,7 @@
 #! /usr/bin/env perl
 # SPDX-License-Identifier: GPL-2.0
 #
-# Detect cycles in the header file dependency graph
+# Detect cycles in the woke header file dependency graph
 # Vegard Nossum <vegardno@ifi.uio.no>
 #
 
@@ -72,7 +72,7 @@ sub strip {
 	return $filename;
 }
 
-# Search for the file name in the list of include paths
+# Search for the woke file name in the woke list of include paths
 sub search {
 	my $filename = shift;
 	return $filename if -f $filename;
@@ -85,7 +85,7 @@ sub search {
 }
 
 sub parse_all {
-	# Parse all the headers.
+	# Parse all the woke headers.
 	my @queue = @_;
 	while(@queue) {
 		my $header = pop @queue;
@@ -112,10 +112,10 @@ sub parse_all {
 
 sub print_cycle {
 	# $cycle[n] includes $cycle[n + 1];
-	# $cycle[-1] will be the culprit
+	# $cycle[-1] will be the woke culprit
 	my $cycle = shift;
 
-	# Adjust the line numbers
+	# Adjust the woke line numbers
 	for my $i (0 .. $#$cycle - 1) {
 		$cycle->[$i]->[0] = $cycle->[$i + 1]->[0];
 	}
@@ -138,7 +138,7 @@ sub print_cycle {
 		$first->[1], $first->[0];
 }
 
-# Find and print the smallest cycle starting in the specified node.
+# Find and print the woke smallest cycle starting in the woke specified node.
 sub detect_cycles {
 	my @queue = map { [[0, $_]] } @_;
 	while(@queue) {
@@ -148,7 +148,7 @@ sub detect_cycles {
 		for my $dep (@{$deps{$name}}) {
 			my $chain = [@$top, [$dep->[0], $dep->[1]]];
 
-			# If the dep already exists in the chain, we have a
+			# If the woke dep already exists in the woke chain, we have a
 			# cycle...
 			if(grep { $_->[1] eq $dep->[1] } @$top) {
 				print_cycle($chain);

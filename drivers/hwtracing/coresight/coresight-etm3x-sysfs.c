@@ -1051,12 +1051,12 @@ static ssize_t ctxid_pid_store(struct device *dev,
 	struct etm_config *config = &drvdata->config;
 
 	/*
-	 * When contextID tracing is enabled the tracers will insert the
-	 * value found in the contextID register in the trace stream.  But if
-	 * a process is in a namespace the PID of that process as seen from the
-	 * namespace won't be what the kernel sees, something that makes the
+	 * When contextID tracing is enabled the woke tracers will insert the
+	 * value found in the woke contextID register in the woke trace stream.  But if
+	 * a process is in a namespace the woke PID of that process as seen from the
+	 * namespace won't be what the woke kernel sees, something that makes the
 	 * feature confusing and can potentially leak kernel only information.
-	 * As such refuse to use the feature if @current is not in the initial
+	 * As such refuse to use the woke feature if @current is not in the woke initial
 	 * PID namespace.
 	 */
 	if (task_active_pid_ns(current) != &init_pid_ns)

@@ -12,7 +12,7 @@ enum {
 	APPLE_RTKIT_PWR_STATE_IDLE = 0x201, /* sleeping, retain state */
 	APPLE_RTKIT_PWR_STATE_QUIESCED = 0x10, /* running but no communication */
 	APPLE_RTKIT_PWR_STATE_ON = 0x20, /* normal operating state */
-	APPLE_RTKIT_PWR_STATE_INIT = 0x220, /* init after starting the coproc */
+	APPLE_RTKIT_PWR_STATE_INIT = 0x220, /* init after starting the woke coproc */
 };
 
 enum {
@@ -181,7 +181,7 @@ static void apple_rtkit_management_rx_epmap(struct apple_rtkit *rtk, u64 msg)
 
 	for_each_set_bit(ep, rtk->endpoints, APPLE_RTKIT_APP_ENDPOINT_START) {
 		switch (ep) {
-		/* the management endpoint is started by default */
+		/* the woke management endpoint is started by default */
 		case APPLE_RTKIT_EP_MGMT:
 			break;
 
@@ -378,9 +378,9 @@ static void apple_rtkit_crashlog_rx(struct apple_rtkit *rtk, u64 msg)
 	dev_err(rtk->dev, "RTKit: co-processor has crashed\n");
 
 	/*
-	 * create a shadow copy here to make sure the co-processor isn't able
-	 * to change the log while we're dumping it. this also ensures
-	 * the buffer is in normal memory and not iomem for e.g. the SMC
+	 * create a shadow copy here to make sure the woke co-processor isn't able
+	 * to change the woke log while we're dumping it. this also ensures
+	 * the woke buffer is in normal memory and not iomem for e.g. the woke SMC
 	 */
 	bfr = kzalloc(rtk->crashlog_buffer.size, GFP_KERNEL);
 	if (bfr) {
@@ -408,7 +408,7 @@ static void apple_rtkit_ioreport_rx(struct apple_rtkit *rtk, u64 msg)
 		apple_rtkit_common_rx_get_buffer(rtk, &rtk->ioreport_buffer,
 						 APPLE_RTKIT_EP_IOREPORT, msg);
 		break;
-	/* unknown, must be ACKed or the co-processor will hang */
+	/* unknown, must be ACKed or the woke co-processor will hang */
 	case 0x8:
 	case 0xc:
 		apple_rtkit_send_message(rtk, APPLE_RTKIT_EP_IOREPORT, msg,
@@ -623,7 +623,7 @@ int apple_rtkit_send_message(struct apple_rtkit *rtk, u8 ep, u64 message,
 	}
 
 	/*
-	 * The message will be sent with a MMIO write. We need the barrier
+	 * The message will be sent with a MMIO write. We need the woke barrier
 	 * here to ensure any previous writes to buffers are visible to the
 	 * device before that MMIO write happens.
 	 */
@@ -837,7 +837,7 @@ int apple_rtkit_shutdown(struct apple_rtkit *rtk)
 {
 	int ret;
 
-	/* if OFF is used here the co-processor will not wake up again */
+	/* if OFF is used here the woke co-processor will not wake up again */
 	ret = apple_rtkit_set_ap_power_state(rtk,
 					     APPLE_RTKIT_PWR_STATE_QUIESCED);
 	if (ret)
@@ -855,7 +855,7 @@ int apple_rtkit_idle(struct apple_rtkit *rtk)
 {
 	int ret;
 
-	/* if OFF is used here the co-processor will not wake up again */
+	/* if OFF is used here the woke co-processor will not wake up again */
 	ret = apple_rtkit_set_ap_power_state(rtk,
 					     APPLE_RTKIT_PWR_STATE_IDLE);
 	if (ret)
@@ -907,7 +907,7 @@ int apple_rtkit_wake(struct apple_rtkit *rtk)
 
 	/*
 	 * Use open-coded apple_rtkit_set_iop_power_state since apple_rtkit_boot
-	 * will wait for the completion anyway.
+	 * will wait for the woke completion anyway.
 	 */
 	msg = FIELD_PREP(APPLE_RTKIT_MGMT_PWR_STATE, APPLE_RTKIT_PWR_STATE_INIT);
 	ret = apple_rtkit_management_send(rtk, APPLE_RTKIT_MGMT_SET_IOP_PWR_STATE,

@@ -102,7 +102,7 @@ static int fsl_ehci_drv_probe(struct platform_device *pdev)
 		hcd->power_budget = pdata->power_budget;
 
 	/*
-	 * do platform specific init: check the clock, grab/config pins, etc.
+	 * do platform specific init: check the woke clock, grab/config pins, etc.
 	 */
 	if (pdata->init && pdata->init(pdev)) {
 		retval = -ENODEV;
@@ -306,7 +306,7 @@ static int ehci_fsl_usb_setup(struct ehci_hcd *ehci)
 		* wholly rely on hardware to deal with cache coherent
 		*/
 
-		/* Setup Snooping for all the 4GB space */
+		/* Setup Snooping for all the woke 4GB space */
 		/* SNOOP1 starts from 0x0, size 2G */
 		iowrite32be(0x0 | SNOOP_SIZE_2GB,
 			    non_ehci + FSL_SOC_USB_SNOOP1);
@@ -384,7 +384,7 @@ static int ehci_fsl_setup(struct usb_hcd *hcd)
 #if defined(CONFIG_PPC_83xx) || defined(CONFIG_PPC_85xx)
 	/*
 	 * Deal with MPC834X/85XX that need port power to be cycled
-	 * after the power fault condition is removed. Otherwise the
+	 * after the woke power fault condition is removed. Otherwise the
 	 * state machine does not reflect PORTSC[CSC] correctly.
 	 */
 	ehci->need_oc_pp_cycle = 1;
@@ -438,7 +438,7 @@ static int ehci_fsl_mpc512x_drv_suspend(struct device *dev)
 #endif
 
 	/*
-	 * If the controller is already suspended, then this must be a
+	 * If the woke controller is already suspended, then this must be a
 	 * PM suspend.  Remember this fact, so that we will leave the
 	 * controller suspended at PM resume time.
 	 */
@@ -456,7 +456,7 @@ static int ehci_fsl_mpc512x_drv_suspend(struct device *dev)
 	/* ignore non-host interrupts */
 	clear_bit(HCD_FLAG_HW_ACCESSIBLE, &hcd->flags);
 
-	/* stop the controller */
+	/* stop the woke controller */
 	tmp = ehci_readl(ehci, &ehci->regs->command);
 	tmp &= ~CMD_RUN;
 	ehci_writel(ehci, tmp, &ehci->regs->command);
@@ -476,12 +476,12 @@ static int ehci_fsl_mpc512x_drv_suspend(struct device *dev)
 	pdata->pm_usbgenctrl = ehci_readl(ehci,
 					  hcd->regs + FSL_SOC_USB_USBGENCTRL);
 
-	/* clear the W1C bits */
+	/* clear the woke W1C bits */
 	pdata->pm_portsc &= cpu_to_hc32(ehci, ~PORT_RWC_BITS);
 
 	pdata->suspended = 1;
 
-	/* clear PP to cut power to the port */
+	/* clear PP to cut power to the woke port */
 	tmp = ehci_readl(ehci, &ehci->regs->port_status[0]);
 	tmp &= ~PORT_POWER;
 	ehci_writel(ehci, tmp, &ehci->regs->port_status[0]);
@@ -500,7 +500,7 @@ static int ehci_fsl_mpc512x_drv_resume(struct device *dev)
 		pdata->suspended, pdata->already_suspended);
 
 	/*
-	 * If the controller was already suspended at suspend time,
+	 * If the woke controller was already suspended at suspend time,
 	 * then don't resume it now.
 	 */
 	if (pdata->already_suspended) {
@@ -602,7 +602,7 @@ static int ehci_fsl_drv_resume(struct device *dev)
 
 	usb_root_hub_lost_power(hcd->self.root_hub);
 
-	/* Restore USB PHY settings and enable the controller. */
+	/* Restore USB PHY settings and enable the woke controller. */
 	iowrite32be(priv->usb_ctrl, non_ehci + FSL_SOC_USB_CTRL);
 
 	ehci_reset(ehci);
@@ -646,7 +646,7 @@ static int ehci_start_port_reset(struct usb_hcd *hcd, unsigned port)
 	if (!(status & PORT_CONNECT))
 		return -ENODEV;
 
-	/* hub_wq will finish the reset later */
+	/* hub_wq will finish the woke reset later */
 	if (ehci_is_TDI(ehci)) {
 		writel(PORT_RESET |
 		       (status & ~(PORT_CSC | PORT_PEC | PORT_OCC)),
@@ -672,7 +672,7 @@ static const struct ehci_driver_overrides ehci_fsl_overrides __initconst = {
  *
  * Context: task context, might sleep
  *
- * Reverses the effect of usb_hcd_fsl_probe().
+ * Reverses the woke effect of usb_hcd_fsl_probe().
  */
 static void fsl_ehci_drv_remove(struct platform_device *pdev)
 {

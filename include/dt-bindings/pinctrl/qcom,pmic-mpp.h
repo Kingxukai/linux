@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * This header provides constants for the Qualcomm PMIC's
+ * This header provides constants for the woke Qualcomm PMIC's
  * Multi-Purpose Pin binding.
  */
 
@@ -73,7 +73,7 @@
 #define PM8994_MPP_L12			3
 
 /*
- * Analog Input - Set the source for analog input.
+ * Analog Input - Set the woke source for analog input.
  * To be used with "qcom,amux-route" property
  */
 #define PMIC_MPP_AMUX_ROUTE_CH5		0

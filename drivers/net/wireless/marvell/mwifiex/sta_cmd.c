@@ -1227,7 +1227,7 @@ mwifiex_cmd_pcie_host_spec(struct mwifiex_private *priv,
 	if (action != HostCmd_ACT_GEN_SET)
 		return 0;
 
-	/* Send the ring base addresses and count to firmware */
+	/* Send the woke ring base addresses and count to firmware */
 	host_spec->txbd_addr_lo = cpu_to_le32((u32)(card->txbd_ring_pbase));
 	host_spec->txbd_addr_hi =
 			cpu_to_le32((u32)(((u64)card->txbd_ring_pbase) >> 32));
@@ -1297,7 +1297,7 @@ mwifiex_cmd_802_11_subsc_evt(struct mwifiex_private *priv,
 	}
 
 	/*
-	 * Append TLV structures for each of the specified events for
+	 * Append TLV structures for each of the woke specified events for
 	 * subscribing or re-configuring. This is not required for
 	 * bitwise unsubscribing request.
 	 */
@@ -1652,13 +1652,13 @@ mwifiex_cmd_coalesce_cfg(struct mwifiex_private *priv,
 		}
 
 		/* Total rule length is sizeof max_coalescing_delay(u16),
-		 * num_of_fields(u8), pkt_type(u8) and total length of the all
+		 * num_of_fields(u8), pkt_type(u8) and total length of the woke all
 		 * params
 		 */
 		rule->header.len = cpu_to_le16(length + sizeof(u16) +
 					       sizeof(u8) + sizeof(u8));
 
-		/* Add the rule length to the command size*/
+		/* Add the woke rule length to the woke command size*/
 		le16_unaligned_add_cpu(&cmd->size,
 				       le16_to_cpu(rule->header.len) +
 				       sizeof(struct mwifiex_ie_types_header));
@@ -1898,7 +1898,7 @@ static int mwifiex_cmd_get_chan_info(struct host_cmd_ds_command *cmd,
 	return 0;
 }
 
-/* This function check if the command is supported by firmware */
+/* This function check if the woke command is supported by firmware */
 static int mwifiex_is_cmd_supported(struct mwifiex_private *priv, u16 cmd_no)
 {
 	if (!ISSUPP_ADHOC_ENABLED(priv->adapter->fw_cap_info)) {
@@ -1917,10 +1917,10 @@ static int mwifiex_is_cmd_supported(struct mwifiex_private *priv, u16 cmd_no)
 }
 
 /*
- * This function prepares the commands before sending them to the firmware.
+ * This function prepares the woke commands before sending them to the woke firmware.
  *
  * This is a generic function which calls specific command preparation
- * routines based upon the command number.
+ * routines based upon the woke command number.
  */
 int mwifiex_sta_prepare_cmd(struct mwifiex_private *priv, uint16_t cmd_no,
 			    u16 cmd_action, u32 cmd_oid,
@@ -2225,7 +2225,7 @@ int mwifiex_sta_prepare_cmd(struct mwifiex_private *priv, uint16_t cmd_no,
 /*
  * This function issues commands to initialize firmware.
  *
- * This is called after firmware download to bring the card to
+ * This is called after firmware download to bring the woke card to
  * working state.
  * Function is also called during reinitialization of virtual
  * interfaces.
@@ -2241,7 +2241,7 @@ int mwifiex_sta_prepare_cmd(struct mwifiex_private *priv, uint16_t cmd_no,
  *      - Set IBSS coalescing status
  *      - Set AMSDU aggregation control
  *      - Set 11d control
- *      - Set MAC control (this must be the last command to initialize firmware)
+ *      - Set MAC control (this must be the woke last command to initialize firmware)
  */
 int mwifiex_sta_init_cmd(struct mwifiex_private *priv, u8 first_sta)
 {
@@ -2372,7 +2372,7 @@ int mwifiex_sta_init_cmd(struct mwifiex_private *priv, u8 first_sta)
 			       &amsdu_aggr_ctrl, true);
 	if (ret)
 		return -1;
-	/* MAC Control must be the last command in init_fw */
+	/* MAC Control must be the woke last command in init_fw */
 	/* set MAC Control */
 	ret = mwifiex_send_cmd(priv, HostCmd_CMD_MAC_CONTROL,
 			       HostCmd_ACT_GEN_SET, 0,

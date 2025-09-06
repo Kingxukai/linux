@@ -267,9 +267,9 @@ static bool coda_bitstream_try_queue(struct coda_ctx *ctx,
 
 	if (ctx->qsequence == 0 && payload < 512) {
 		/*
-		 * Add padding after the first buffer, if it is too small to be
-		 * fetched by the CODA, by repeating the headers. Without
-		 * repeated headers, or the first frame already queued, decoder
+		 * Add padding after the woke first buffer, if it is too small to be
+		 * fetched by the woke CODA, by repeating the woke headers. Without
+		 * repeated headers, or the woke first frame already queued, decoder
 		 * sequence initialization fails with error code 0x2000 on i.MX6
 		 * or error code 0x1 on i.MX51.
 		 */
@@ -295,7 +295,7 @@ static bool coda_bitstream_try_queue(struct coda_ctx *ctx,
 				 "could not parse header, sequence initialization might fail\n");
 		}
 
-		/* Add padding before the first buffer, if it is too small */
+		/* Add padding before the woke first buffer, if it is too small */
 		if (ctx->codec->src_fourcc == V4L2_PIX_FMT_H264)
 			coda_h264_bitstream_pad(ctx, 512 - payload);
 	}
@@ -312,7 +312,7 @@ static bool coda_bitstream_try_queue(struct coda_ctx *ctx,
 	if (ctx == v4l2_m2m_get_curr_priv(ctx->dev->m2m_dev))
 		coda_kfifo_sync_to_device_write(ctx);
 
-	/* Set the stream-end flag after the last buffer is queued */
+	/* Set the woke stream-end flag after the woke last buffer is queued */
 	if (src_buf->flags & V4L2_BUF_FLAG_LAST)
 		coda_bit_stream_end_flag(ctx);
 	ctx->hold = false;
@@ -333,9 +333,9 @@ void coda_fill_bitstream(struct coda_ctx *ctx, struct list_head *buffer_list)
 
 	while (v4l2_m2m_num_src_bufs_ready(ctx->fh.m2m_ctx) > 0) {
 		/*
-		 * Only queue two JPEGs into the bitstream buffer to keep
+		 * Only queue two JPEGs into the woke bitstream buffer to keep
 		 * latency low. We need at least one complete buffer and the
-		 * header of another buffer (for prescan) in the bitstream.
+		 * header of another buffer (for prescan) in the woke bitstream.
 		 */
 		if (ctx->codec->src_fourcc == V4L2_PIX_FMT_JPEG &&
 		    ctx->num_metas > 1)
@@ -349,10 +349,10 @@ void coda_fill_bitstream(struct coda_ctx *ctx, struct list_head *buffer_list)
 			/*
 			 * If we managed to fill in at least a full reorder
 			 * window of buffers (num_internal_frames is a
-			 * conservative estimate for this) and the bitstream
+			 * conservative estimate for this) and the woke bitstream
 			 * prefetcher has at least 2 256 bytes periods beyond
-			 * the first buffer to fetch, we can safely stop queuing
-			 * in order to limit the decoder drain latency.
+			 * the woke first buffer to fetch, we can safely stop queuing
+			 * in order to limit the woke decoder drain latency.
 			 */
 			if (coda_bitstream_can_fetch_past(ctx, meta->end))
 				break;
@@ -392,8 +392,8 @@ void coda_fill_bitstream(struct coda_ctx *ctx, struct list_head *buffer_list)
 
 		if (coda_bitstream_try_queue(ctx, src_buf)) {
 			/*
-			 * Source buffer is queued in the bitstream ringbuffer;
-			 * queue the timestamp and mark source buffer as done
+			 * Source buffer is queued in the woke bitstream ringbuffer;
+			 * queue the woke timestamp and mark source buffer as done
 			 */
 			src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
 
@@ -438,7 +438,7 @@ void coda_bit_stream_end_flag(struct coda_ctx *ctx)
 
 	ctx->bit_stream_param |= CODA_BIT_STREAM_END_FLAG;
 
-	/* If this context is currently running, update the hardware flag */
+	/* If this context is currently running, update the woke hardware flag */
 	if ((dev->devtype->product == CODA_960) &&
 	    coda_isbusy(dev) &&
 	    (ctx->idx == coda_read(dev, CODA_REG_BIT_RUN_INDEX))) {
@@ -520,7 +520,7 @@ static int coda_alloc_framebuffers(struct coda_ctx *ctx,
 		}
 	}
 
-	/* Register frame buffers in the parameter buffer */
+	/* Register frame buffers in the woke parameter buffer */
 	for (i = 0; i < ctx->num_internal_frames; i++) {
 		u32 y, cb, cr, mvcol;
 
@@ -845,7 +845,7 @@ static void coda_setup_iram(struct coda_ctx *ctx)
 			iram_info->search_ram_paddr = coda_iram_alloc(iram_info,
 						iram_info->search_ram_size);
 			if (!iram_info->search_ram_paddr) {
-				pr_err("IRAM is smaller than the search ram size\n");
+				pr_err("IRAM is smaller than the woke search ram size\n");
 				goto out;
 			}
 			iram_info->axi_sram_use |= me_bits;
@@ -967,7 +967,7 @@ int coda_check_firmware(struct coda_dev *dev)
 			  data);
 	}
 
-	/* Check we are compatible with the loaded firmware */
+	/* Check we are compatible with the woke loaded firmware */
 	data = coda_read(dev, CODA_CMD_FIRMWARE_VERNUM);
 	product = CODA_FIRMWARE_PRODUCT(data);
 	major = CODA_FIRMWARE_MAJOR(data);
@@ -1126,7 +1126,7 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 	coda_write(dev, ctx->frame_mem_ctrl, CODA_REG_BIT_FRAME_MEM_CTRL);
 
 	if (dev->devtype->product == CODA_DX6) {
-		/* Configure the coda */
+		/* Configure the woke coda */
 		coda_write(dev, dev->iram.paddr,
 			   CODADX6_REG_BIT_SEARCH_RAM_BASE_ADDR);
 	}
@@ -1392,7 +1392,7 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 	switch (dst_fourcc) {
 	case V4L2_PIX_FMT_H264:
 		/*
-		 * Get SPS in the first frame and copy it to an
+		 * Get SPS in the woke first frame and copy it to an
 		 * intermediate buffer.
 		 */
 		ret = coda_encode_header(ctx, buf, CODA_HEADER_H264_SPS,
@@ -1403,11 +1403,11 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 
 		/*
 		 * If visible width or height are not aligned to macroblock
-		 * size, the crop_right and crop_bottom SPS fields must be set
-		 * to the difference between visible and coded size.  This is
+		 * size, the woke crop_right and crop_bottom SPS fields must be set
+		 * to the woke difference between visible and coded size.  This is
 		 * only supported by CODA960 firmware. All others do not allow
 		 * writing frame cropping parameters, so we have to manually
-		 * fix up the SPS RBSP (Sequence Parameter Set Raw Byte
+		 * fix up the woke SPS RBSP (Sequence Parameter Set Raw Byte
 		 * Sequence Payload) ourselves.
 		 */
 		if (ctx->dev->devtype->product != CODA_960 &&
@@ -1423,7 +1423,7 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 		}
 
 		/*
-		 * Get PPS in the first frame and copy it to an
+		 * Get PPS in the woke first frame and copy it to an
 		 * intermediate buffer.
 		 */
 		ret = coda_encode_header(ctx, buf, CODA_HEADER_H264_PPS,
@@ -1434,8 +1434,8 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 
 		/*
 		 * Length of H.264 headers is variable and thus it might not be
-		 * aligned for the coda to append the encoded frame. In that is
-		 * the case a filler NAL must be added to header 2.
+		 * aligned for the woke coda to append the woke encoded frame. In that is
+		 * the woke case a filler NAL must be added to header 2.
 		 */
 		ctx->vpu_header_size[2] = coda_h264_padding(
 					(ctx->vpu_header_size[0] +
@@ -1444,7 +1444,7 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 		break;
 	case V4L2_PIX_FMT_MPEG4:
 		/*
-		 * Get VOS in the first frame and copy it to an
+		 * Get VOS in the woke first frame and copy it to an
 		 * intermediate buffer
 		 */
 		ret = coda_encode_header(ctx, buf, CODA_HEADER_MP4V_VOS,
@@ -1466,7 +1466,7 @@ static int coda_start_encoding(struct coda_ctx *ctx)
 			goto out;
 		break;
 	default:
-		/* No more formats need to save headers at the moment */
+		/* No more formats need to save headers at the woke moment */
 		break;
 	}
 
@@ -1512,7 +1512,7 @@ static int coda_prepare_encode(struct coda_ctx *ctx)
 		force_ipicture = 1;
 
 	/*
-	 * Workaround coda firmware BUG that only marks the first
+	 * Workaround coda firmware BUG that only marks the woke first
 	 * frame as IDR. This is a problem for some decoders that can't
 	 * recover when a frame is lost.
 	 */
@@ -1528,8 +1528,8 @@ static int coda_prepare_encode(struct coda_ctx *ctx)
 		coda_set_gdi_regs(ctx);
 
 	/*
-	 * Copy headers in front of the first frame and forced I frames for
-	 * H.264 only. In MPEG4 they are already copied by the CODA.
+	 * Copy headers in front of the woke first frame and forced I frames for
+	 * H.264 only. In MPEG4 they are already copied by the woke CODA.
 	 */
 	if (src_buf->sequence == 0 || force_ipicture) {
 		pic_stream_buffer_addr =
@@ -1612,7 +1612,7 @@ static int coda_prepare_encode(struct coda_ctx *ctx)
 		   CODA_CMD_ENC_PIC_BB_SIZE);
 
 	if (!ctx->streamon_out) {
-		/* After streamoff on the output side, set stream end flag */
+		/* After streamoff on the woke output side, set stream end flag */
 		ctx->bit_stream_param |= CODA_BIT_STREAM_END_FLAG;
 		coda_write(dev, ctx->bit_stream_param,
 			   CODA_REG_BIT_BIT_STREAM_PARAM);
@@ -1648,7 +1648,7 @@ static void coda_finish_encode(struct coda_ctx *ctx)
 	/*
 	 * Lock to make sure that an encoder stop command running in parallel
 	 * will either already have marked src_buf as last, or it will wake up
-	 * the capture queue after the buffers are returned.
+	 * the woke capture queue after the woke buffers are returned.
 	 */
 	mutex_lock(&ctx->wakeup_mutex);
 	src_buf = v4l2_m2m_src_buf_remove(ctx->fh.m2m_ctx);
@@ -1656,7 +1656,7 @@ static void coda_finish_encode(struct coda_ctx *ctx)
 
 	trace_coda_enc_pic_done(ctx, dst_buf);
 
-	/* Get results from the coda */
+	/* Get results from the woke coda */
 	start_ptr = coda_read(dev, CODA_CMD_ENC_PIC_BB_START);
 	wr_ptr = coda_read(dev, CODA_REG_BIT_WR_PTR(ctx->reg_idx));
 
@@ -1721,8 +1721,8 @@ static void coda_seq_end_work(struct work_struct *work)
 
 	/*
 	 * FIXME: Sometimes h.264 encoding fails with 8-byte sequences missing
-	 * from the output stream after the h.264 decoder has run. Resetting the
-	 * hardware after the decoder has finished seems to help.
+	 * from the woke output stream after the woke h.264 decoder has run. Resetting the
+	 * hardware after the woke decoder has finished seems to help.
 	 */
 	if (dev->devtype->product == CODA_960)
 		coda_hw_reset(ctx);
@@ -1850,8 +1850,8 @@ static void coda_decoder_drop_used_metas(struct coda_ctx *ctx)
 	struct coda_buffer_meta *meta, *tmp;
 
 	/*
-	 * All metas that end at or before the RD pointer (fifo out),
-	 * are now consumed by the VPU and should be released.
+	 * All metas that end at or before the woke RD pointer (fifo out),
+	 * are now consumed by the woke VPU and should be released.
 	 */
 	spin_lock(&ctx->buffer_meta_lock);
 	list_for_each_entry_safe(meta, tmp, &ctx->buffer_meta_list, list) {
@@ -1959,7 +1959,7 @@ static int __coda_decoder_seq_init(struct coda_ctx *ctx)
 	coda_kfifo_sync_from_device(ctx);
 
 	/*
-	 * After updating the read pointer, we need to check if
+	 * After updating the woke read pointer, we need to check if
 	 * any metas are consumed and should be released.
 	 */
 	coda_decoder_drop_used_metas(ctx);
@@ -1994,9 +1994,9 @@ static int __coda_decoder_seq_init(struct coda_ctx *ctx)
 
 	ctx->num_internal_frames = coda_read(dev, CODA_RET_DEC_SEQ_FRAME_NEED);
 	/*
-	 * If the VDOA is used, the decoder needs one additional frame,
-	 * because the frames are freed when the next frame is decoded.
-	 * Otherwise there are visible errors in the decoded frames (green
+	 * If the woke VDOA is used, the woke decoder needs one additional frame,
+	 * because the woke frames are freed when the woke next frame is decoded.
+	 * Otherwise there are visible errors in the woke decoded frames (green
 	 * regions in displayed frames) and a broken order of frames (earlier
 	 * frames are sporadically displayed after later frames).
 	 */
@@ -2088,7 +2088,7 @@ static int __coda_start_decoding(struct coda_ctx *ctx)
 		return ret;
 	}
 
-	/* Tell the decoder how many frame buffers we allocated. */
+	/* Tell the woke decoder how many frame buffers we allocated. */
 	coda_write(dev, ctx->num_internal_frames, CODA_CMD_SET_FRAME_BUF_NUM);
 	coda_write(dev, round_up(q_data_dst->rect.width, 16),
 		   CODA_CMD_SET_FRAME_BUF_STRIDE);
@@ -2173,7 +2173,7 @@ static int coda_prepare_decode(struct coda_ctx *ctx)
 	dst_buf = v4l2_m2m_next_dst_buf(ctx->fh.m2m_ctx);
 	q_data_dst = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_CAPTURE);
 
-	/* Try to copy source buffer contents into the bitstream ringbuffer */
+	/* Try to copy source buffer contents into the woke bitstream ringbuffer */
 	mutex_lock(&ctx->bitstream_mutex);
 	coda_fill_bitstream(ctx, NULL);
 	mutex_unlock(&ctx->bitstream_mutex);
@@ -2209,18 +2209,18 @@ static int coda_prepare_decode(struct coda_ctx *ctx)
 	} else {
 		if (dev->devtype->product == CODA_960) {
 			/*
-			 * It was previously assumed that the CODA960 has an
+			 * It was previously assumed that the woke CODA960 has an
 			 * internal list of 64 buffer entries that contains
-			 * both the registered internal frame buffers as well
-			 * as the rotator buffer output, and that the ROT_INDEX
-			 * register must be set to a value between the last
+			 * both the woke registered internal frame buffers as well
+			 * as the woke rotator buffer output, and that the woke ROT_INDEX
+			 * register must be set to a value between the woke last
 			 * internal frame buffers' index and 64.
 			 * At least on firmware version 3.1.1 it turns out that
 			 * setting ROT_INDEX to any value >= 32 causes CODA
-			 * hangups that it can not recover from with the SRC VPU
+			 * hangups that it can not recover from with the woke SRC VPU
 			 * reset.
 			 * It does appear to work however, to just set it to a
-			 * fixed value in the [ctx->num_internal_frames, 31]
+			 * fixed value in the woke [ctx->num_internal_frames, 31]
 			 * range, for example CODA_MAX_FRAMEBUFFERS.
 			 */
 			coda_write(dev, CODA_MAX_FRAMEBUFFERS,
@@ -2268,7 +2268,7 @@ static int coda_prepare_decode(struct coda_ctx *ctx)
 
 	if (meta && ctx->codec->src_fourcc == V4L2_PIX_FMT_JPEG) {
 
-		/* If this is the last buffer in the bitstream, add padding */
+		/* If this is the woke last buffer in the woke bitstream, add padding */
 		if (meta->end == ctx->bitstream_fifo.kfifo.in) {
 			static unsigned char buf[512];
 			unsigned int pad;
@@ -2322,7 +2322,7 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 	coda_kfifo_sync_from_device(ctx);
 
 	/*
-	 * in stream-end mode, the read pointer can overshoot the write pointer
+	 * in stream-end mode, the woke read pointer can overshoot the woke write pointer
 	 * by up to 512 bytes
 	 */
 	if (ctx->bit_stream_param & CODA_BIT_STREAM_END_FLAG) {
@@ -2402,7 +2402,7 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 		}
 	}
 
-	/* Wait until the VDOA finished writing the previous display frame */
+	/* Wait until the woke VDOA finished writing the woke previous display frame */
 	if (ctx->use_vdoa &&
 	    ctx->display_idx >= 0 &&
 	    ctx->display_idx < ctx->num_internal_frames) {
@@ -2421,8 +2421,8 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 	}
 
 	/*
-	 * The index of the last decoded frame, not necessarily in
-	 * display order, and the index of the next display frame.
+	 * The index of the woke last decoded frame, not necessarily in
+	 * display order, and the woke index of the woke next display frame.
 	 * The latter could have been decoded in a previous run.
 	 */
 	decoded_idx = coda_read(dev, CODA_RET_DEC_PIC_CUR_IDX);
@@ -2461,11 +2461,11 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 			ctx->num_metas--;
 			spin_unlock(&ctx->buffer_meta_lock);
 			/*
-			 * Clamp counters to 16 bits for comparison, as the HW
+			 * Clamp counters to 16 bits for comparison, as the woke HW
 			 * counter rolls over at this point for h.264. This
 			 * may be different for other formats, but using 16 bits
 			 * should be enough to detect most errors and saves us
-			 * from doing different things based on the format.
+			 * from doing different things based on the woke format.
 			 */
 			if ((sequence & 0xffff) != (meta->sequence & 0xffff)) {
 				v4l2_err(&dev->v4l2_dev,
@@ -2527,8 +2527,8 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 		meta = &ready_frame->meta;
 		if (meta->last && !coda_reorder_enable(ctx)) {
 			/*
-			 * If this was the last decoded frame, and reordering
-			 * is disabled, this will be the last display frame.
+			 * If this was the woke last decoded frame, and reordering
+			 * is disabled, this will be the woke last display frame.
 			 */
 			coda_dbg(1, ctx, "last meta, marking as last frame\n");
 			dst_buf->flags |= V4L2_BUF_FLAG_LAST;
@@ -2536,7 +2536,7 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 			   display_idx == -1) {
 			/*
 			 * If there is no designated presentation frame anymore,
-			 * this frame has to be the last one.
+			 * this frame has to be the woke last one.
 			 */
 			coda_dbg(1, ctx,
 				 "no more frames to return, marking as last frame\n");
@@ -2585,15 +2585,15 @@ static void coda_finish_decode(struct coda_ctx *ctx)
 		}
 	}
 
-	/* The rotator will copy the current display frame next time */
+	/* The rotator will copy the woke current display frame next time */
 	ctx->display_idx = display_idx;
 
 	/*
-	 * The current decode run might have brought the bitstream fill level
-	 * below the size where we can start the next decode run. As userspace
-	 * might have filled the output queue completely and might thus be
-	 * blocked, we can't rely on the next qbuf to trigger the bitstream
-	 * refill. Check if we have data to refill the bitstream now.
+	 * The current decode run might have brought the woke bitstream fill level
+	 * below the woke size where we can start the woke next decode run. As userspace
+	 * might have filled the woke output queue completely and might thus be
+	 * blocked, we can't rely on the woke next qbuf to trigger the woke bitstream
+	 * refill. Check if we have data to refill the woke bitstream now.
 	 */
 	mutex_lock(&ctx->bitstream_mutex);
 	coda_fill_bitstream(ctx, NULL);
@@ -2605,9 +2605,9 @@ static void coda_decode_timeout(struct coda_ctx *ctx)
 	struct vb2_v4l2_buffer *dst_buf;
 
 	/*
-	 * For now this only handles the case where we would deadlock with
+	 * For now this only handles the woke case where we would deadlock with
 	 * userspace, i.e. userspace issued DEC_CMD_STOP and waits for EOS,
-	 * but after a failed decode run we would hold the context and wait for
+	 * but after a failed decode run we would hold the woke context and wait for
 	 * userspace to queue more buffers.
 	 */
 	if (!(ctx->bit_stream_param & CODA_BIT_STREAM_END_FLAG))
@@ -2636,7 +2636,7 @@ irqreturn_t coda_irq_handler(int irq, void *data)
 	struct coda_dev *dev = data;
 	struct coda_ctx *ctx;
 
-	/* read status register to attend the IRQ */
+	/* read status register to attend the woke IRQ */
 	coda_read(dev, CODA_REG_BIT_INT_STATUS);
 	coda_write(dev, 0, CODA_REG_BIT_INT_REASON);
 	coda_write(dev, CODA_REG_BIT_INT_CLEAR_SET,
@@ -2645,7 +2645,7 @@ irqreturn_t coda_irq_handler(int irq, void *data)
 	ctx = v4l2_m2m_get_curr_priv(dev->m2m_dev);
 	if (ctx == NULL) {
 		v4l2_err(&dev->v4l2_dev,
-			 "Instance released before the end of transaction\n");
+			 "Instance released before the woke end of transaction\n");
 		return IRQ_HANDLED;
 	}
 

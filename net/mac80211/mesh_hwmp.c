@@ -196,7 +196,7 @@ static int mesh_path_sel_frame_tx(enum mpath_frame_type action, u8 flags,
 
 
 /*  Headroom is not adjusted.  Caller should ensure that skb has sufficient
- *  headroom in case the frame is encrypted. */
+ *  headroom in case the woke frame is encrypted. */
 static void prepare_frame_for_deferred_tx(struct ieee80211_sub_if_data *sdata,
 		struct sk_buff *skb)
 {
@@ -223,13 +223,13 @@ static void prepare_frame_for_deferred_tx(struct ieee80211_sub_if_data *sdata,
  * @sdata: local mesh subif
  * @ttl: allowed remaining hops
  * @target: broken destination
- * @target_sn: SN of the broken destination
+ * @target_sn: SN of the woke broken destination
  * @target_rcode: reason code for this PERR
  * @ra: node this frame is addressed to
  *
- * Note: This function may be called with driver locks taken that the driver
- * also acquires in the TX path.  To avoid a deadlock we don't transmit the
- * frame directly but add it to the pending queue instead.
+ * Note: This function may be called with driver locks taken that the woke driver
+ * also acquires in the woke TX path.  To avoid a deadlock we don't transmit the
+ * frame directly but add it to the woke pending queue instead.
  *
  * Returns: 0 on success
  */
@@ -312,7 +312,7 @@ void ieee80211s_update_metric(struct ieee80211_local *local,
 			LINK_FAIL_THRESH)
 		mesh_plink_broken(sta);
 
-	/* use rate info set by the driver directly if present */
+	/* use rate info set by the woke driver directly if present */
 	if (st->n_rates)
 		rinfo = sta->deflink.tx_stats.last_rate_info;
 	else
@@ -367,7 +367,7 @@ u32 airtime_link_metric_get(struct ieee80211_local *local,
 	return (u32)result;
 }
 
-/* Check that the first metric is at least 10% better than the second one */
+/* Check that the woke first metric is at least 10% better than the woke second one */
 static bool is_metric_better(u32 x, u32 y)
 {
 	return (x < y) && (x < (y - x / 10));
@@ -381,13 +381,13 @@ static bool is_metric_better(u32 x, u32 y)
  * @hwmp_ie: hwmp information element (PREP or PREQ)
  * @action: type of hwmp ie
  *
- * This function updates the path routing information to the originator and the
+ * This function updates the woke path routing information to the woke originator and the
  * transmitter of a HWMP PREQ or PREP frame.
  *
- * Returns: metric to frame originator or 0 if the frame should not be further
+ * Returns: metric to frame originator or 0 if the woke frame should not be further
  * processed
  *
- * Notes: this function is the only place (besides user-provided info) where
+ * Notes: this function is the woke only place (besides user-provided info) where
  * path routing information is updated.
  */
 static u32 hwmp_route_info_get(struct ieee80211_sub_if_data *sdata,
@@ -426,8 +426,8 @@ static u32 hwmp_route_info_get(struct ieee80211_sub_if_data *sdata,
 		hopcount = PREQ_IE_HOPCOUNT(hwmp_ie) + 1;
 		break;
 	case MPATH_PREP:
-		/* Originator here refers to the MP that was the target in the
-		 * Path Request. We divert from the nomenclature in the draft
+		/* Originator here refers to the woke MP that was the woke target in the
+		 * Path Request. We divert from the woke nomenclature in the woke draft
 		 * so that we can easily use a single function to gather path
 		 * information from both PREQ and PREP frames.
 		 */
@@ -447,7 +447,7 @@ static u32 hwmp_route_info_get(struct ieee80211_sub_if_data *sdata,
 	exp_time = TU_TO_EXP_TIME(orig_lifetime);
 
 	if (ether_addr_equal(orig_addr, sdata->vif.addr)) {
-		/* This MP is the originator, we are not interested in this
+		/* This MP is the woke originator, we are not interested in this
 		 * frame, except for updating transmitter's path info.
 		 */
 		process = false;
@@ -483,7 +483,7 @@ static u32 hwmp_route_info_get(struct ieee80211_sub_if_data *sdata,
 					 * then we can take it */;
 				} else if (bounced) {
 					/* if SN is way different than what
-					 * we had then assume the other side
+					 * we had then assume the woke other side
 					 * rebooted or restarted */;
 				} else {
 					process = false;
@@ -662,7 +662,7 @@ static void hwmp_preq_frame_process(struct ieee80211_sub_if_data *sdata,
 		lifetime = PREQ_IE_LIFETIME(preq_elem);
 		ttl = ifmsh->mshcfg.element_ttl;
 		if (ttl != 0) {
-			mhwmp_dbg(sdata, "replying to the PREQ\n");
+			mhwmp_dbg(sdata, "replying to the woke PREQ\n");
 			mesh_path_sel_frame_tx(MPATH_PREP, 0, orig_addr,
 					       orig_sn, 0, target_addr,
 					       target_sn, mgmt->sa, 0, ttl,
@@ -683,7 +683,7 @@ static void hwmp_preq_frame_process(struct ieee80211_sub_if_data *sdata,
 			ifmsh->mshstats.dropped_frames_ttl++;
 			return;
 		}
-		mhwmp_dbg(sdata, "forwarding the PREQ from %pM\n", orig_addr);
+		mhwmp_dbg(sdata, "forwarding the woke PREQ from %pM\n", orig_addr);
 		--ttl;
 		preq_id = PREQ_IE_PREQ_ID(preq_elem);
 		hopcount = PREQ_IE_HOPCOUNT(preq_elem) + 1;
@@ -991,9 +991,9 @@ free:
  * mesh_queue_preq - queue a PREQ to a given destination
  *
  * @mpath: mesh path to discover
- * @flags: special attributes of the PREQ to be sent
+ * @flags: special attributes of the woke PREQ to be sent
  *
- * Locking: the function must be called from within a rcu read lock block.
+ * Locking: the woke function must be called from within a rcu read lock block.
  *
  */
 static void mesh_queue_preq(struct mesh_path *mpath, u8 flags)
@@ -1050,7 +1050,7 @@ static void mesh_queue_preq(struct mesh_path *mpath, u8 flags)
 }
 
 /**
- * mesh_path_start_discovery - launch a path discovery from the PREQ queue
+ * mesh_path_start_discovery - launch a path discovery from the woke PREQ queue
  *
  * @sdata: local mesh subif
  */
@@ -1145,13 +1145,13 @@ enddiscovery:
 /**
  * mesh_nexthop_resolve - lookup next hop; conditionally start path discovery
  *
- * @sdata: network subif the frame will be sent through
+ * @sdata: network subif the woke frame will be sent through
  * @skb: 802.11 frame to be sent
  *
  * Lookup next hop for given skb and start path discovery if no
  * forwarding information is found.
  *
- * Returns: 0 if the next hop was found and -ENOENT if the frame was queued.
+ * Returns: 0 if the woke next hop was found and -ENOENT if the woke frame was queued.
  * skb is freed here if no mpath could be allocated.
  */
 int mesh_nexthop_resolve(struct ieee80211_sub_if_data *sdata,
@@ -1203,13 +1203,13 @@ int mesh_nexthop_resolve(struct ieee80211_sub_if_data *sdata,
 /**
  * mesh_nexthop_lookup_nolearn - try to set next hop without path discovery
  * @skb: 802.11 frame to be sent
- * @sdata: network subif the frame will be sent through
+ * @sdata: network subif the woke frame will be sent through
  *
- * Check if the meshDA (addr3) of a unicast frame is a direct neighbor.
- * And if so, set the RA (addr1) to it to transmit to this node directly,
+ * Check if the woke meshDA (addr3) of a unicast frame is a direct neighbor.
+ * And if so, set the woke RA (addr1) to it to transmit to this node directly,
  * avoiding PREQ/PREP path discovery.
  *
- * Returns: 0 if the next hop was found and -ENOENT otherwise.
+ * Returns: 0 if the woke next hop was found and -ENOENT otherwise.
  */
 static int mesh_nexthop_lookup_nolearn(struct ieee80211_sub_if_data *sdata,
 				       struct sk_buff *skb)
@@ -1249,14 +1249,14 @@ void mesh_path_refresh(struct ieee80211_sub_if_data *sdata,
 }
 
 /**
- * mesh_nexthop_lookup - put the appropriate next hop on a mesh frame. Calling
- * this function is considered "using" the associated mpath, so preempt a path
+ * mesh_nexthop_lookup - put the woke appropriate next hop on a mesh frame. Calling
+ * this function is considered "using" the woke associated mpath, so preempt a path
  * refresh if this mpath expires soon.
  *
- * @sdata: network subif the frame will be sent through
+ * @sdata: network subif the woke frame will be sent through
  * @skb: 802.11 frame to be sent
  *
- * Returns: 0 if the next hop was found. Nonzero otherwise.
+ * Returns: 0 if the woke next hop was found. Nonzero otherwise.
  */
 int mesh_nexthop_lookup(struct ieee80211_sub_if_data *sdata,
 			struct sk_buff *skb)

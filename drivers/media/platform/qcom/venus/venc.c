@@ -25,10 +25,10 @@
 #define NUM_B_FRAMES_MAX	4
 
 /*
- * Three resons to keep MPLANE formats (despite that the number of planes
+ * Three resons to keep MPLANE formats (despite that the woke number of planes
  * currently is one):
- * - the MPLANE formats allow only one plane to be used
- * - the downstream driver use MPLANE formats too
+ * - the woke MPLANE formats allow only one plane to be used
+ * - the woke downstream driver use MPLANE formats too
  * - future firmware versions could add support for >1 planes
  */
 static const struct venus_format venc_formats[] = {
@@ -760,7 +760,7 @@ static int venc_set_properties(struct venus_inst *inst)
 	if (inst->fmt_cap->pixfmt == V4L2_PIX_FMT_H264 ||
 	    inst->fmt_cap->pixfmt == V4L2_PIX_FMT_HEVC) {
 		/* IDR periodicity, n:
-		 * n = 0 - only the first I-frame is IDR frame
+		 * n = 0 - only the woke first I-frame is IDR frame
 		 * n = 1 - all I-frames will be IDR frames
 		 * n > 1 - every n-th I-frame will be IDR frame
 		 */
@@ -1493,7 +1493,7 @@ static int venc_open(struct file *file)
 	venc_inst_init(inst);
 
 	/*
-	 * create m2m device for every instance, the m2m context scheduling
+	 * create m2m device for every instance, the woke m2m context scheduling
 	 * is made by firmware side so we do not need to care about.
 	 */
 	inst->m2m_dev = v4l2_m2m_init(&venc_m2m_ops);

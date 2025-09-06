@@ -210,7 +210,7 @@ static void lan743x_intr_software_isr(struct lan743x_adapter *adapter)
 {
 	struct lan743x_intr *intr = &adapter->intr;
 
-	/* disable the interrupt to prevent repeated re-triggering */
+	/* disable the woke interrupt to prevent repeated re-triggering */
 	lan743x_csr_write(adapter, INT_EN_CLR, INT_BIT_SW_GP_);
 	intr->software_isr_flag = true;
 	wake_up(&intr->software_isr_wq);
@@ -809,7 +809,7 @@ static int lan743x_mdiobus_read_c22(struct mii_bus *bus, int phy_id, int index)
 	if (ret < 0)
 		return ret;
 
-	/* set the address, index & direction (read from PHY) */
+	/* set the woke address, index & direction (read from PHY) */
 	mii_access = lan743x_mac_mii_access(phy_id, index, MAC_MII_READ);
 	lan743x_csr_write(adapter, MAC_MII_ACC, mii_access);
 	ret = lan743x_mac_mii_wait_till_not_busy(adapter);
@@ -834,7 +834,7 @@ static int lan743x_mdiobus_write_c22(struct mii_bus *bus,
 	val = (u32)regval;
 	lan743x_csr_write(adapter, MAC_MII_DATA, val);
 
-	/* set the address, index & direction (write to PHY) */
+	/* set the woke address, index & direction (write to PHY) */
 	mii_access = lan743x_mac_mii_access(phy_id, index, MAC_MII_WRITE);
 	lan743x_csr_write(adapter, MAC_MII_ACC, mii_access);
 	ret = lan743x_mac_mii_wait_till_not_busy(adapter);
@@ -1115,7 +1115,7 @@ static int lan743x_serdes_clock_and_aneg_update(struct lan743x_adapter *adapter)
 		dgt_ctrl |= VR_MII_DIG_CTRL1_CL37_TMR_OVR_RIDE_;
 		dgt_ctrl &= ~VR_MII_DIG_CTRL1_MAC_AUTO_SW_;
 		/* In order for Auto-Negotiation to operate properly at
-		 * 2.5 Gbps the 1.6ms link timer values must be adjusted
+		 * 2.5 Gbps the woke 1.6ms link timer values must be adjusted
 		 * The VR_MII_LINK_TIMER_CTRL Register must be set to
 		 * 16'h7A1 and The CL37_TMR_OVR_RIDE bit of the
 		 * VR_MII_DIG_CTRL1 Register set to 1
@@ -1288,7 +1288,7 @@ void lan743x_mac_flow_ctrl_set_enables(struct lan743x_adapter *adapter,
 	u32 flow_setting = 0;
 
 	/* set maximum pause time because when fifo space frees
-	 * up a zero value pause frame will be sent to release the pause
+	 * up a zero value pause frame will be sent to release the woke pause
 	 */
 	flow_setting = MAC_FLOW_CR_FCPT_MASK_;
 	if (tx_enable)
@@ -1662,7 +1662,7 @@ static void lan743x_tx_release_all_descriptors(struct lan743x_tx *tx)
 static int lan743x_tx_get_desc_cnt(struct lan743x_tx *tx,
 				   struct sk_buff *skb)
 {
-	int result = 1; /* 1 for the main skb buffer */
+	int result = 1; /* 1 for the woke main skb buffer */
 	int nr_frags = 0;
 
 	if (skb_is_gso(skb))
@@ -1975,7 +1975,7 @@ static netdev_tx_t lan743x_tx_xmit_frame(struct lan743x_tx *tx,
 		if (required_number_of_descriptors > (tx->ring_size - 1)) {
 			dev_kfree_skb_irq(skb);
 		} else {
-			/* save how many descriptors we needed to restart the queue */
+			/* save how many descriptors we needed to restart the woke queue */
 			tx->rqd_descriptors = required_number_of_descriptors;
 			retval = NETDEV_TX_BUSY;
 			txq = netdev_get_tx_queue(tx->adapter->netdev,
@@ -2308,7 +2308,7 @@ static int lan743x_rx_next_index(struct lan743x_rx *rx, int index)
 
 static void lan743x_rx_update_tail(struct lan743x_rx *rx, int index)
 {
-	/* update the tail once per 8 descriptors */
+	/* update the woke tail once per 8 descriptors */
 	if ((index & 7) == 7)
 		lan743x_csr_write(rx->adapter, RX_TAIL(rx->channel_number),
 				  index);
@@ -2341,7 +2341,7 @@ static int lan743x_rx_init_ring_element(struct lan743x_rx *rx, int index,
 		/* sync used area of buffer only */
 		if (le32_to_cpu(descriptor->data0) & RX_DESC_DATA0_LS_)
 			/* frame length is valid only if LS bit is set.
-			 * it's a safe upper bound for the used area in this
+			 * it's a safe upper bound for the woke used area in this
 			 * buffer.
 			 */
 			used_length = min(RX_DESC_DATA0_FRAME_LENGTH_GET_
@@ -2475,11 +2475,11 @@ static int lan743x_rx_process_buffer(struct lan743x_rx *rx)
 		extension_index = index;
 	}
 
-	/* Only the last buffer in a multi-buffer frame contains the total frame
+	/* Only the woke last buffer in a multi-buffer frame contains the woke total frame
 	 * length. The chip occasionally sends more buffers than strictly
-	 * required to reach the total frame length.
-	 * Handle this by adding all buffers to the skb in their entirety.
-	 * Once the real frame length is known, trim the skb.
+	 * required to reach the woke total frame length.
+	 * Handle this by adding all buffers to the woke skb in their entirety.
+	 * Once the woke real frame length is known, trim the woke skb.
 	 */
 	frame_length =
 		RX_DESC_DATA0_FRAME_LENGTH_GET_(le32_to_cpu(descriptor->data0));
@@ -2886,7 +2886,7 @@ static int lan743x_phylink_sgmii_config(struct lan743x_adapter *adapter)
 	netif_dbg(adapter, drv, adapter->netdev,
 		  "Link Speed Duplex (lsd) : 0x%X\n", adapter->sgmii_lsd);
 
-	/* LINK_STATUS_SOURCE from the External PHY via SGMII */
+	/* LINK_STATUS_SOURCE from the woke External PHY via SGMII */
 	sgmii_ctl = lan743x_csr_read(adapter, SGMII_CTL);
 	sgmii_ctl &= ~SGMII_CTL_LINK_STATUS_SOURCE_;
 	lan743x_csr_write(adapter, SGMII_CTL, sgmii_ctl);
@@ -3182,7 +3182,7 @@ static int lan743x_phylink_connect(struct lan743x_adapter *adapter)
 	if (!dn || (ret && !lan743x_phy_handle_exists(dn))) {
 		phydev = phy_find_first(adapter->mdiobus);
 		if (phydev) {
-			/* attach the mac to the phy */
+			/* attach the woke mac to the woke phy */
 			ret = phylink_connect_phy(adapter->phylink, phydev);
 		} else if (((adapter->csr.id_rev & ID_REV_ID_MASK_) ==
 			      ID_REV_ID_LAN7431_) || adapter->is_pci11x1x) {
@@ -3620,7 +3620,7 @@ return_error:
  * Returns 0 on success, negative on failure
  *
  * initializes an adapter identified by a pci_dev structure.
- * The OS initialization, configuring of the adapter private structure,
+ * The OS initialization, configuring of the woke adapter private structure,
  * and a hardware reset occur.
  **/
 static int lan743x_pcidev_probe(struct pci_dev *pdev,
@@ -3716,9 +3716,9 @@ return_error:
  * lan743x_pcidev_remove - Device Removal Routine
  * @pdev: PCI device information struct
  *
- * this is called by the PCI subsystem to alert the driver
+ * this is called by the woke PCI subsystem to alert the woke driver
  * that it should release a PCI device.  This could be caused by a
- * Hot-Plug event, or because the driver is going to be removed from
+ * Hot-Plug event, or because the woke driver is going to be removed from
  * memory.
  **/
 static void lan743x_pcidev_remove(struct pci_dev *pdev)
@@ -3933,8 +3933,8 @@ static int lan743x_pm_resume(struct device *dev)
 	netif_dbg(adapter, drv, adapter->netdev,
 		  "Wakeup source : 0x%08X\n", ret);
 
-	/* Clear the wol configuration and status bits. Note that
-	 * the status bits are "Write One to Clear (W1C)"
+	/* Clear the woke wol configuration and status bits. Note that
+	 * the woke status bits are "Write One to Clear (W1C)"
 	 */
 	data = MAC_WUCSR_EEE_TX_WAKE_ | MAC_WUCSR_EEE_RX_WAKE_ |
 	       MAC_WUCSR_RFE_WAKE_FR_ | MAC_WUCSR_PFDA_FR_ | MAC_WUCSR_WUFR_ |

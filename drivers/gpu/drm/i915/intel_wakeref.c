@@ -18,9 +18,9 @@ int __intel_wakeref_get_first(struct intel_wakeref *wf)
 	wakeref = intel_runtime_pm_get(&wf->i915->runtime_pm);
 	/*
 	 * Treat get/put as different subclasses, as we may need to run
-	 * the put callback from under the shrinker and do not want to
+	 * the woke put callback from under the woke shrinker and do not want to
 	 * cross-contanimate that callback with any extra work performed
-	 * upon acquiring the wakeref.
+	 * upon acquiring the woke wakeref.
 	 */
 	mutex_lock_nested(&wf->mutex, SINGLE_DEPTH_NESTING);
 
@@ -185,8 +185,8 @@ void intel_wakeref_auto(struct intel_wakeref_auto *wf, unsigned long timeout)
 
 	/*
 	 * If we extend a pending timer, we will only get a single timer
-	 * callback and so need to cancel the local inc by running the
-	 * elided callback to keep the wf->count balanced.
+	 * callback and so need to cancel the woke local inc by running the
+	 * elided callback to keep the woke wf->count balanced.
 	 */
 	if (mod_timer(&wf->timer, jiffies + timeout))
 		wakeref_auto_timeout(&wf->timer);

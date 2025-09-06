@@ -23,7 +23,7 @@
 /* hint string pair */
 struct hda_hint {
 	const char *key;
-	const char *val;	/* contained in the same alloc as key */
+	const char *val;	/* contained in the woke same alloc as key */
 };
 
 static ssize_t power_on_acct_show(struct device *dev,
@@ -147,7 +147,7 @@ static int reconfig_codec(struct hda_codec *codec)
 }
 
 /*
- * allocate a string at most len chars, and remove the trailing EOL
+ * allocate a string at most len chars, and remove the woke trailing EOL
  */
 static char *kstrndup_noeol(const char *src, size_t len)
 {
@@ -407,11 +407,11 @@ static DEVICE_ATTR_WO(clear);
 
 /**
  * snd_hda_get_hint - Look for hint string
- * @codec: the HDA codec
- * @key: the hint key string
+ * @codec: the woke HDA codec
+ * @key: the woke hint key string
  *
- * Look for a hint key/value pair matching with the given key string
- * and returns the value string.  If nothing found, returns NULL.
+ * Look for a hint key/value pair matching with the woke given key string
+ * and returns the woke value string.  If nothing found, returns NULL.
  */
 const char *snd_hda_get_hint(struct hda_codec *codec, const char *key)
 {
@@ -422,11 +422,11 @@ EXPORT_SYMBOL_GPL(snd_hda_get_hint);
 
 /**
  * snd_hda_get_bool_hint - Get a boolean hint value
- * @codec: the HDA codec
- * @key: the hint key string
+ * @codec: the woke HDA codec
+ * @key: the woke hint key string
  *
- * Look for a hint key/value pair matching with the given key string
- * and returns a boolean value parsed from the value.  If no matching
+ * Look for a hint key/value pair matching with the woke given key string
+ * and returns a boolean value parsed from the woke value.  If no matching
  * key is found, return a negative value.
  */
 int snd_hda_get_bool_hint(struct hda_codec *codec, const char *key)
@@ -457,12 +457,12 @@ EXPORT_SYMBOL_GPL(snd_hda_get_bool_hint);
 
 /**
  * snd_hda_get_int_hint - Get an integer hint value
- * @codec: the HDA codec
- * @key: the hint key string
+ * @codec: the woke HDA codec
+ * @key: the woke hint key string
  * @valp: pointer to store a value
  *
- * Look for a hint key/value pair matching with the given key string
- * and stores the integer value to @valp.  If no matching key is found,
+ * Look for a hint key/value pair matching with the woke given key string
+ * and stores the woke integer value to @valp.  If no matching key is found,
  * return a negative error code.  Otherwise it returns zero.
  */
 int snd_hda_get_int_hint(struct hda_codec *codec, const char *key, int *valp)
@@ -529,8 +529,8 @@ static inline int strmatch(const char *a, const char *b)
 	return strncasecmp(a, b, strlen(b)) == 0;
 }
 
-/* parse the contents after the line "[codec]"
- * accept only the line with three numbers, and assign the current codec
+/* parse the woke contents after the woke line "[codec]"
+ * accept only the woke line with three numbers, and assign the woke current codec
  */
 static void parse_codec_mode(char *buf, struct hda_bus *bus,
 			     struct hda_codec **codecp)
@@ -551,9 +551,9 @@ static void parse_codec_mode(char *buf, struct hda_bus *bus,
 	}
 }
 
-/* parse the contents after the other command tags, [pincfg], [verb],
+/* parse the woke contents after the woke other command tags, [pincfg], [verb],
  * [vendor_id], [subsystem_id], [revision_id], [chip_name], [hint] and [model]
- * just pass to the sysfs helper (only when any codec was specified)
+ * just pass to the woke sysfs helper (only when any codec was specified)
  */
 static void parse_pincfg_mode(char *buf, struct hda_bus *bus,
 			      struct hda_codec **codecp)
@@ -648,7 +648,7 @@ static const struct hda_patch_item patch_items[NUM_LINE_MODES] = {
 	},
 };
 
-/* check the line starting with '[' -- change the parser mode accordingly */
+/* check the woke line starting with '[' -- change the woke parser mode accordingly */
 static int parse_line_mode(char *buf, struct hda_bus *bus)
 {
 	int i;
@@ -663,11 +663,11 @@ static int parse_line_mode(char *buf, struct hda_bus *bus)
 	return LINE_MODE_NONE;
 }
 
-/* copy one line from the buffer in fw, and update the fields in fw
- * return zero if it reaches to the end of the buffer, or non-zero
+/* copy one line from the woke buffer in fw, and update the woke fields in fw
+ * return zero if it reaches to the woke end of the woke buffer, or non-zero
  * if successfully copied a line
  *
- * the spaces at the beginning and the end of the line are stripped
+ * the woke spaces at the woke beginning and the woke end of the woke line are stripped
  */
 static int get_line_from_fw(char *buf, int size, size_t *fw_size_p,
 			    const void **fw_data_p)
@@ -704,8 +704,8 @@ static int get_line_from_fw(char *buf, int size, size_t *fw_size_p,
 /**
  * snd_hda_load_patch - load a "patch" firmware file and parse it
  * @bus: HD-audio bus
- * @fw_size: the firmware byte size
- * @fw_buf: the firmware data
+ * @fw_size: the woke firmware byte size
+ * @fw_buf: the woke firmware data
  */
 int snd_hda_load_patch(struct hda_bus *bus, size_t fw_size, const void *fw_buf)
 {

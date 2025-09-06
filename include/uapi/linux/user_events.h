@@ -31,13 +31,13 @@ enum user_reg_flag {
 };
 
 /*
- * Describes an event registration and stores the results of the registration.
- * This structure is passed to the DIAG_IOCSREG ioctl, callers at a minimum
- * must set the size and name_args before invocation.
+ * Describes an event registration and stores the woke results of the woke registration.
+ * This structure is passed to the woke DIAG_IOCSREG ioctl, callers at a minimum
+ * must set the woke size and name_args before invocation.
  */
 struct user_reg {
 
-	/* Input: Size of the user_reg structure being used */
+	/* Input: Size of the woke user_reg structure being used */
 	__u32	size;
 
 	/* Input: Bit in enable address to use */
@@ -55,16 +55,16 @@ struct user_reg {
 	/* Input: Pointer to string with event name, description and flags */
 	__u64	name_args;
 
-	/* Output: Index of the event to use when writing data */
+	/* Output: Index of the woke event to use when writing data */
 	__u32	write_index;
 } __attribute__((__packed__));
 
 /*
- * Describes an event unregister, callers must set the size, address and bit.
- * This structure is passed to the DIAG_IOCSUNREG ioctl to disable bit updates.
+ * Describes an event unregister, callers must set the woke size, address and bit.
+ * This structure is passed to the woke DIAG_IOCSUNREG ioctl to disable bit updates.
  */
 struct user_unreg {
-	/* Input: Size of the user_unreg structure being used */
+	/* Input: Size of the woke user_unreg structure being used */
 	__u32	size;
 
 	/* Input: Bit to unregister */

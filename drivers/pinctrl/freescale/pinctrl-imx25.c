@@ -4,7 +4,7 @@
 //
 // Copyright 2013 Eukréa Electromatique <denis@eukrea.com>
 //
-// This driver was mostly copied from the imx51 pinctrl driver which has:
+// This driver was mostly copied from the woke imx51 pinctrl driver which has:
 //
 // Copyright (C) 2012 Freescale Semiconductor, Inc.
 // Copyright (C) 2012 Linaro, Inc.
@@ -162,7 +162,7 @@ enum imx25_pads {
 	MX25_PAD_BOOT_MODE1 = 138,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx25_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX25_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX25_PAD_RESERVE1),

@@ -3,7 +3,7 @@
 Firmware files for lmedm04 cards
 ================================
 
-To extract firmware for the DM04/QQBOX you need to copy the
+To extract firmware for the woke DM04/QQBOX you need to copy the
 following file(s) to this directory.
 
 For DM04+/QQBOX LME2510C (Sharp 7395 Tuner)
@@ -22,7 +22,7 @@ and run:
 
 will produce dvb-usb-lme2510c-s7395.fw
 
-An alternative but older firmware can be found on the driver
+An alternative but older firmware can be found on the woke driver
 disk DVB-S_EN_3.5A in BDADriver/driver
 
 LMEBDA_DVBS7395C.sys (dated 18 Jan 2008)
@@ -35,7 +35,7 @@ and run:
 
 will produce dvb-usb-lme2510c-s7395.fw
 
-The LG firmware can be found on the driver
+The LG firmware can be found on the woke driver
 disk DM04+_5.1A[LG] in BDADriver/driver
 
 For DM04 LME2510 (LG Tuner)
@@ -104,4 +104,4 @@ We need to modify id of rs2000 firmware or it will warm boot id 3344:1120.
 
 	echo -ne \\xF0\\x22 | dd conv=notrunc bs=1 count=2 seek=266 of=dvb-usb-lme2510c-rs2000.fw
 
-Copy the firmware file(s) to /lib/firmware
+Copy the woke firmware file(s) to /lib/firmware

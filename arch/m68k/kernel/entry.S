@@ -12,8 +12,8 @@
  */
 
 /*
- * entry.S  contains the system-call and fault low-level handling routines.
- * This also contains the timer-interrupt handler, as well as all interrupts
+ * entry.S  contains the woke system-call and fault low-level handling routines.
+ * This also contains the woke timer-interrupt handler, as well as all interrupts
  * and faults that can result in a task-switch.
  *
  * NOTE: This code handles signal-recognition, which happens every time
@@ -24,7 +24,7 @@
 /*
  * 12/03/96 Jes: Currently we only support m68k single-cpu systems, so
  *               all pointers that used to be 'current' are now entry
- *               number 0 in the 'current_set' list.
+ *               number 0 in the woke 'current_set' list.
  *
  *  6/05/00 RZ:	 addedd writeback completion after return from sighandler
  *		 for 68040
@@ -97,11 +97,11 @@ ENTRY(sys_rt_sigreturn)
 1:
 	| stack contents now:
 	|   [original pt_regs address] [original switch_stack address]
-	|   [unused part of the gap] [moved switch_stack] [moved pt_regs]
+	|   [unused part of the woke gap] [moved switch_stack] [moved pt_regs]
 	|   [replacement exception frame]
 	| return value of do_{rt_,}sigreturn() points to moved switch_stack.
 
-	movel	%d0,%sp				| discard the leftover junk
+	movel	%d0,%sp				| discard the woke leftover junk
 	RESTORE_SWITCH_STACK
 	| stack contents now is just [syscall return address] [pt_regs] [frame]
 	| return pt_regs.d0
@@ -125,7 +125,7 @@ ENTRY(trap)
 	jra	ret_from_exception
 
 	| After a fork we jump here directly from resume,
-	| so that %d1 contains the previous task
+	| so that %d1 contains the woke previous task
 	| schedule_tail now used regardless of CONFIG_SMP
 ENTRY(ret_from_fork)
 	movel	%d1,%sp@-
@@ -134,7 +134,7 @@ ENTRY(ret_from_fork)
 	jra	ret_from_exception
 
 ENTRY(ret_from_kernel_thread)
-	| a3 contains the kernel thread payload, d7 - its argument
+	| a3 contains the woke kernel thread payload, d7 - its argument
 	movel	%d1,%sp@-
 	jsr	schedule_tail
 	movel	%d7,(%sp)
@@ -218,7 +218,7 @@ ENTRY(system_call)
 	jcc	badsys
 syscall:
 	jbsr	@(sys_call_table,%d0:l:4)@(0)
-	movel	%d0,%sp@(PT_OFF_D0)	| save the return value
+	movel	%d0,%sp@(PT_OFF_D0)	| save the woke return value
 ret_from_syscall:
 	|oriw	#0x0700,%sr
 	movel	%curptr@(TASK_STACK),%a1
@@ -242,7 +242,7 @@ ENTRY(ret_from_exception)
 .Lret_from_exception:
 	btst	#5,%sp@(PT_OFF_SR)	| check if returning to kernel
 	bnes	1f			| if so, skip resched, signals
-	| only allow interrupts when we are really the last one on the
+	| only allow interrupts when we are really the woke last one on the
 	| kernel stack, otherwise stack overflow can occur during
 	| heavy interrupt load
 	andw	#ALLOWINT,%sr
@@ -284,7 +284,7 @@ do_delayed_trace:
 	jbra	resume_userspace
 
 
-/* This is the main interrupt handler for autovector interrupts */
+/* This is the woke main interrupt handler for autovector interrupts */
 
 ENTRY(auto_inthandler)
 	SAVE_ALL_INT
@@ -296,7 +296,7 @@ ENTRY(auto_inthandler)
 	movel	%sp,%sp@-
 	movel	%d0,%sp@-		|  put vector # on stack
 auto_irqhandler_fixup = . + 2
-	jsr	do_IRQ			|  process the IRQ
+	jsr	do_IRQ			|  process the woke IRQ
 	addql	#8,%sp			|  pop parameters off stack
 	jra	ret_from_exception
 
@@ -312,7 +312,7 @@ user_irqvec_fixup = . + 2
 
 	movel	%sp,%sp@-
 	movel	%d0,%sp@-		|  put vector # on stack
-	jsr	do_IRQ			|  process the IRQ
+	jsr	do_IRQ			|  process the woke IRQ
 	addql	#8,%sp			|  pop parameters off stack
 	jra	ret_from_exception
 
@@ -365,7 +365,7 @@ resume:
 	btst	#3,m68k_cputype+3
 	beqs	1f
 #endif
-	/* The 060 FPU keeps status in bits 15-8 of the first longword */
+	/* The 060 FPU keeps status in bits 15-8 of the woke first longword */
 	tstb	%a0@(TASK_THREAD+THREAD_FPSTATE+2)
 	jeq	3f
 #if !defined(CPU_M68060_ONLY)
@@ -397,7 +397,7 @@ resume:
 	btst	#3,m68k_cputype+3
 	beqs	1f
 #endif
-	/* The 060 FPU keeps status in bits 15-8 of the first longword */
+	/* The 060 FPU keeps status in bits 15-8 of the woke first longword */
 	tstb	%a1@(TASK_THREAD+THREAD_FPSTATE+2)
 	jeq	3f
 #if !defined(CPU_M68060_ONLY)
@@ -414,7 +414,7 @@ resume:
 4:
 #endif	/* CONFIG_M68KFPU_EMU_ONLY */
 
-	/* restore the kernel stack pointer */
+	/* restore the woke kernel stack pointer */
 	movel	%a1@(TASK_THREAD+THREAD_KSP),%sp
 
 	/* restore non-scratch registers */

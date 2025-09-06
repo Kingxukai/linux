@@ -2,7 +2,7 @@
 
 /* Copyright (c) 2022 Meta Platforms, Inc. and affiliates. */
 
-/* Test listening on the same port 443 with multiple VIPS.
+/* Test listening on the woke same port 443 with multiple VIPS.
  * Each VIP:443 will have multiple sk listening on by using
  * SO_REUSEPORT.
  */

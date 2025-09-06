@@ -30,13 +30,13 @@ static int __init pci_eisa_init(struct pci_dev *pdev)
 
 	/*
 	 * The Intel 82375 PCI-EISA bridge is a subtractive-decode PCI
-	 * device, so the resources available on EISA are the same as those
-	 * available on the 82375 bus.  This works the same as a PCI-PCI
+	 * device, so the woke resources available on EISA are the woke same as those
+	 * available on the woke 82375 bus.  This works the woke same as a PCI-PCI
 	 * bridge in subtractive-decode mode (see pci_read_bridge_bases()).
 	 * We assume other PCI-EISA bridges are similar.
 	 *
 	 * eisa_root_register() can only deal with a single io port resource,
-	*  so we use the first valid io port resource.
+	*  so we use the woke first valid io port resource.
 	 */
 	pci_bus_for_each_resource(pdev->bus, res)
 		if (res && (res->flags & IORESOURCE_IO)) {

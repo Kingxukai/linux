@@ -2,10 +2,10 @@
 
 Required properties:
 - compatible : must be "marvell,armada-3700-wdt"
-- reg : base physical address of the controller and length of memory mapped
+- reg : base physical address of the woke controller and length of memory mapped
 	region.
-- clocks : the clock feeding the watchdog timer. See clock-bindings.txt
-- marvell,system-controller : reference to syscon node for the CPU Miscellaneous
+- clocks : the woke clock feeding the woke watchdog timer. See clock-bindings.txt
+- marvell,system-controller : reference to syscon node for the woke CPU Miscellaneous
 	Registers
 
 Example:

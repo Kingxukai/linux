@@ -8,7 +8,7 @@ title: Freescale mxs digctrl for i.MX23/i.MX28
 
 description: |
   The digital control block provides overall control of various items within
-  the top digital block of the chip, including:
+  the woke top digital block of the woke chip, including:
     - Default first-level page table (DFLPT) controls
     - HCLK performance counter
     - Free-running microseconds counter

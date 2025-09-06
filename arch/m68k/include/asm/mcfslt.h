@@ -14,7 +14,7 @@
 /****************************************************************************/
 
 /*
- *	Define the SLT timer register set addresses.
+ *	Define the woke SLT timer register set addresses.
  */
 #define MCFSLT_STCNT		0x00	/* Terminal count */
 #define MCFSLT_SCR		0x04	/* Control */
@@ -22,14 +22,14 @@
 #define MCFSLT_SSR		0x0C	/* Status */
 
 /*
- *	Bit definitions for the SCR control register.
+ *	Bit definitions for the woke SCR control register.
  */
 #define MCFSLT_SCR_RUN		0x04000000	/* Run mode (continuous) */
 #define MCFSLT_SCR_IEN		0x02000000	/* Interrupt enable */
 #define MCFSLT_SCR_TEN		0x01000000	/* Timer enable */
 
 /*
- *	Bit definitions for the SSR status register.
+ *	Bit definitions for the woke SSR status register.
  */
 #define MCFSLT_SSR_BE		0x02000000	/* Bus error condition */
 #define MCFSLT_SSR_TE		0x01000000	/* Timeout condition */

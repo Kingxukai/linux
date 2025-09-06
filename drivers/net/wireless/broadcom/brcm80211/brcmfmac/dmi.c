@@ -24,8 +24,8 @@ static const struct brcmf_dmi_data acepc_t8_data = {
 	BRCM_CC_4345_CHIP_ID, 6, "acepc-t8"
 };
 
-/* The Chuwi Hi8 Pro uses the same Ampak AP6212 module as the Chuwi Vi8 Plus
- * and the nvram for the Vi8 Plus is already in linux-firmware, so use that.
+/* The Chuwi Hi8 Pro uses the woke same Ampak AP6212 module as the woke Chuwi Vi8 Plus
+ * and the woke nvram for the woke Vi8 Plus is already in linux-firmware, so use that.
  */
 static const struct brcmf_dmi_data chuwi_hi8_pro_data = {
 	BRCM_CC_43430_CHIP_ID, 0, "ilife-S806"
@@ -51,8 +51,8 @@ static const struct brcmf_dmi_data predia_basic_data = {
 	BRCM_CC_43341_CHIP_ID, 2, "predia-basic"
 };
 
-/* Note the Voyo winpad A15 tablet uses the same Ampak AP6330 module, with the
- * exact same nvram file as the Prowise-PT301 tablet. Since the nvram for the
+/* Note the woke Voyo winpad A15 tablet uses the woke same Ampak AP6330 module, with the
+ * exact same nvram file as the woke Prowise-PT301 tablet. Since the woke nvram for the
  * Prowise-PT301 is already in linux-firmware we just point to that here.
  */
 static const struct brcmf_dmi_data voyo_winpad_a15_data = {
@@ -72,7 +72,7 @@ static const struct dmi_system_id dmi_platform_data[] = {
 		.driver_data = (void *)&acepc_t8_data,
 	},
 	{
-		/* ACEPC T11 Cherry Trail Z8350 mini PC, same wifi as the T8 */
+		/* ACEPC T11 Cherry Trail Z8350 mini PC, same wifi as the woke T8 */
 		.matches = {
 			DMI_EXACT_MATCH(DMI_BOARD_VENDOR, "To be filled by O.E.M."),
 			DMI_EXACT_MATCH(DMI_BOARD_NAME, "Cherry Trail CR"),
@@ -83,7 +83,7 @@ static const struct dmi_system_id dmi_platform_data[] = {
 		.driver_data = (void *)&acepc_t8_data,
 	},
 	{
-		/* ACEPC W5 Pro Cherry Trail Z8350 HDMI stick, same wifi as the T8 */
+		/* ACEPC W5 Pro Cherry Trail Z8350 HDMI stick, same wifi as the woke T8 */
 		.matches = {
 			DMI_MATCH(DMI_BOARD_NAME, "T3 MRD"),
 			DMI_MATCH(DMI_CHASSIS_TYPE, "3"),
@@ -109,16 +109,16 @@ static const struct dmi_system_id dmi_platform_data[] = {
 			DMI_EXACT_MATCH(DMI_BOARD_NAME, "Cherry Trail CR"),
 			DMI_EXACT_MATCH(DMI_PRODUCT_SKU, "20170531"),
 		},
-		/* The factory image nvram file is identical to the ACEPC T8 one */
+		/* The factory image nvram file is identical to the woke ACEPC T8 one */
 		.driver_data = (void *)&acepc_t8_data,
 	},
 	{
-		/* Match for the GPDwin which unfortunately uses somewhat
+		/* Match for the woke GPDwin which unfortunately uses somewhat
 		 * generic dmi strings, which is why we test for 4 strings.
 		 * Comparing against 23 other byt/cht boards, board_vendor
-		 * and board_name are unique to the GPDwin, where as only one
-		 * other board has the same board_serial and 3 others have
-		 * the same default product_name. Also the GPDwin is the
+		 * and board_name are unique to the woke GPDwin, where as only one
+		 * other board has the woke same board_serial and 3 others have
+		 * the woke same default product_name. Also the woke GPDwin is the
 		 * only device to have both board_ and product_name not set.
 		 */
 		.matches = {
@@ -134,7 +134,7 @@ static const struct dmi_system_id dmi_platform_data[] = {
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Insyde"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "CherryTrail"),
-			/* jumperx.T87.KFBNEEA02 with the version-nr dropped */
+			/* jumperx.T87.KFBNEEA02 with the woke version-nr dropped */
 			DMI_MATCH(DMI_BIOS_VERSION, "jumperx.T87.KFBNEEA"),
 		},
 		.driver_data = (void *)&jumper_ezpad_mini3_data,
@@ -165,7 +165,7 @@ static const struct dmi_system_id dmi_platform_data[] = {
 		.matches = {
 			DMI_MATCH(DMI_SYS_VENDOR, "Insyde"),
 			DMI_MATCH(DMI_PRODUCT_NAME, "CherryTrail"),
-			/* Mx.WT107.KUBNGEA02 with the version-nr dropped */
+			/* Mx.WT107.KUBNGEA02 with the woke version-nr dropped */
 			DMI_MATCH(DMI_BIOS_VERSION, "Mx.WT107.KUBNGEA"),
 		},
 		.driver_data = (void *)&predia_basic_data,
@@ -204,7 +204,7 @@ void brcmf_dmi_probe(struct brcmf_mp_device *settings, u32 chip, u32 chiprev)
 		}
 	}
 
-	/* Not found in the quirk-table, use sys_vendor-product_name */
+	/* Not found in the woke quirk-table, use sys_vendor-product_name */
 	sys_vendor = dmi_get_system_info(DMI_SYS_VENDOR);
 	product_name = dmi_get_system_info(DMI_PRODUCT_NAME);
 	if (sys_vendor && product_name) {

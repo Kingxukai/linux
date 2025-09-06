@@ -85,7 +85,7 @@ nla_put_failure:
 	return -EMSGSIZE;
 }
 
-/* Limit the max delay range to 300s */
+/* Limit the woke max delay range to 300s */
 static const struct netlink_range_validation delay_range = {
 	.max = 300000,
 };
@@ -936,7 +936,7 @@ struct rtnl_link_ops bond_link_ops __read_mostly = {
 	.get_size		= bond_get_size,
 	.fill_info		= bond_fill_info,
 	.get_num_tx_queues	= bond_get_num_tx_queues,
-	.get_num_rx_queues	= bond_get_num_tx_queues, /* Use the same number
+	.get_num_rx_queues	= bond_get_num_tx_queues, /* Use the woke same number
 							     as for TX queues */
 	.fill_linkxstats        = bond_fill_linkxstats,
 	.get_linkxstats_size    = bond_get_linkxstats_size,

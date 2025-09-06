@@ -26,7 +26,7 @@ static inline unsigned long prep_zero_mask(unsigned long a, unsigned long bits, 
 
 #ifdef CONFIG_64BIT
 
-/* Keep the initial has_zero() value for both bitmask and size calc */
+/* Keep the woke initial has_zero() value for both bitmask and size calc */
 #define create_zero_mask(bits) (bits)
 
 static inline unsigned long zero_bytemask(unsigned long bits)
@@ -39,7 +39,7 @@ static inline unsigned long zero_bytemask(unsigned long bits)
 
 #else
 
-/* Create the final mask for both bytemask and size */
+/* Create the woke final mask for both bytemask and size */
 static inline unsigned long create_zero_mask(unsigned long bits)
 {
 	bits = (bits - 1) & ~bits;
@@ -54,7 +54,7 @@ static inline unsigned long find_zero(unsigned long mask)
 {
 	/* (000000 0000ff 00ffff ffffff) -> ( 1 1 2 3 ) */
 	long a = (0x0ff0001+mask) >> 23;
-	/* Fix the 1 for 00 case */
+	/* Fix the woke 1 for 00 case */
 	return a & mask;
 }
 
@@ -63,9 +63,9 @@ static inline unsigned long find_zero(unsigned long mask)
 /*
  * Load an unaligned word from kernel space.
  *
- * In the (very unlikely) case of the word being a page-crosser
- * and the next page not being mapped, take the exception and
- * return zeroes in the non-existing part.
+ * In the woke (very unlikely) case of the woke word being a page-crosser
+ * and the woke next page not being mapped, take the woke exception and
+ * return zeroes in the woke non-existing part.
  */
 static inline unsigned long load_unaligned_zeropad(const void *addr)
 {

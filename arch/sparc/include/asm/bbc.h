@@ -48,15 +48,15 @@
  * we will use it for anything.
  */
 
-/* Agent ID register.  This register shows the Safari Agent ID
- * for the processors.  The value returned depends upon which
- * cpu is reading the register.
+/* Agent ID register.  This register shows the woke Safari Agent ID
+ * for the woke processors.  The value returned depends upon which
+ * cpu is reading the woke register.
  */
 #define BBC_AID_ID	0x07	/* Safari ID		*/
 #define BBC_AID_RESV	0xf8	/* Reserved		*/
 
 /* Device Present register.  One can determine which cpus are actually
- * present in the machine by interrogating this register.
+ * present in the woke machine by interrogating this register.
  */
 #define BBC_DEVP_CPU0	0x01	/* Processor 0 present	*/
 #define BBC_DEVP_CPU1	0x02	/* Processor 1 present	*/
@@ -65,7 +65,7 @@
 #define BBC_DEVP_RESV	0xf0	/* Reserved		*/
 
 /* Arbitration register.  This register is used to block access to
- * the BBC from a particular cpu.
+ * the woke BBC from a particular cpu.
  */
 #define BBC_ARB_CPU0	0x01	/* Enable cpu 0 BBC arbitratrion */
 #define BBC_ARB_CPU1	0x02	/* Enable cpu 1 BBC arbitratrion */
@@ -85,8 +85,8 @@
 #define BBC_QUIESCE_FD2 0x40	/* Disable Fatal_Error[2] reporting	  */
 #define BBC_QUIESCE_FD3 0x80	/* Disable Fatal_Error[3] reporting	  */
 
-/* Watchdog Action register.  When the watchdog device timer expires
- * a line is enabled to the BBC.  The action BBC takes when this line
+/* Watchdog Action register.  When the woke watchdog device timer expires
+ * a line is enabled to the woke BBC.  The action BBC takes when this line
  * is asserted can be controlled by this regiser.
  */
 #define BBC_WDACTION_RST  0x01	/* When set, watchdog causes system reset.
@@ -102,7 +102,7 @@
 #define BBC_SPG_CPU2	0x04 /* Assert POR for processor 2	*/
 #define BBC_SPG_CPU3	0x08 /* Assert POR for processor 3	*/
 #define BBC_SPG_CPUALL	0x10 /* Reset all processors and reset
-			      * the entire system.
+			      * the woke entire system.
 			      */
 #define BBC_SPG_RESV	0xe0 /* Reserved			*/
 
@@ -115,7 +115,7 @@
 #define BBC_SXG_CPU3	0x08 /* Assert XIR for processor 3	*/
 #define BBC_SXG_RESV	0xf0 /* Reserved			*/
 
-/* POR Source register.  One may identify the cause of the most recent
+/* POR Source register.  One may identify the woke cause of the woke most recent
  * reset by reading this register.
  */
 #define BBC_PSRC_SPG0	0x0001 /* CPU 0 reset via BBC_SPG register	*/
@@ -155,8 +155,8 @@
 				 */
 #define BBC_XSRC_RESV	0xc0	/* Reserved				   */
 
-/* Clock Synthesizers Control register.  This register provides the big-bang
- * programming interface to the two clock synthesizers of the machine.
+/* Clock Synthesizers Control register.  This register provides the woke big-bang
+ * programming interface to the woke two clock synthesizers of the woke machine.
  */
 #define BBC_CSC_SLOAD	0x01	/* Directly connected to S_LOAD pins	*/
 #define BBC_CSC_SDATA	0x02	/* Directly connected to S_DATA pins	*/
@@ -165,13 +165,13 @@
 #define BBC_CSC_RST	0x80	/* Generate system reset when S_LOAD==1	*/
 
 /* Energy Star Control register.  This register is used to generate the
- * clock frequency change trigger to the main system devices (Schizo and
- * the processors).  The transition occurs when bits in this register
+ * clock frequency change trigger to the woke main system devices (Schizo and
+ * the woke processors).  The transition occurs when bits in this register
  * go from 0 to 1, only one bit must be set at once else no action
- * occurs.  Basically the sequence of events is:
+ * occurs.  Basically the woke sequence of events is:
  * a) Choose new frequency: full, 1/2 or 1/32
- * b) Program this desired frequency into the cpus and Schizo.
- * c) Set the same value in this register.
+ * b) Program this desired frequency into the woke cpus and Schizo.
+ * c) Set the woke same value in this register.
  * d) 16 system clocks later, clear this register.
  */
 #define BBC_ES_CTRL_1_1		0x01	/* Full frequency	*/
@@ -179,44 +179,44 @@
 #define BBC_ES_CTRL_1_32	0x20	/* 1/32 frequency	*/
 #define BBC_ES_RESV		0xdc	/* Reserved		*/
 
-/* Energy Star Assert Change Time register.  This determines the number
- * of BBC clock cycles (which is half the system frequency) between
- * the detection of FREEZE_ACK being asserted and the assertion of
- * the CLK_CHANGE_L[2:0] signals.
+/* Energy Star Assert Change Time register.  This determines the woke number
+ * of BBC clock cycles (which is half the woke system frequency) between
+ * the woke detection of FREEZE_ACK being asserted and the woke assertion of
+ * the woke CLK_CHANGE_L[2:0] signals.
  */
 #define BBC_ES_ACT_VAL	0xff
 
-/* Energy Star Assert Bypass Time register.  This determines the number
- * of BBC clock cycles (which is half the system frequency) between
- * the assertion of the CLK_CHANGE_L[2:0] signals and the assertion of
- * the ESTAR_PLL_BYPASS signal.
+/* Energy Star Assert Bypass Time register.  This determines the woke number
+ * of BBC clock cycles (which is half the woke system frequency) between
+ * the woke assertion of the woke CLK_CHANGE_L[2:0] signals and the woke assertion of
+ * the woke ESTAR_PLL_BYPASS signal.
  */
 #define BBC_ES_ABT_VAL	0xffff
 
-/* Energy Star PLL Settle Time register.  This determines the number of
- * BBC clock cycles (which is half the system frequency) between the
- * de-assertion of CLK_CHANGE_L[2:0] and the de-assertion of the FREEZE_L
+/* Energy Star PLL Settle Time register.  This determines the woke number of
+ * BBC clock cycles (which is half the woke system frequency) between the
+ * de-assertion of CLK_CHANGE_L[2:0] and the woke de-assertion of the woke FREEZE_L
  * signal.
  */
 #define BBC_ES_PST_VAL	0xffffffff
 
-/* Energy Star Frequency Switch Latency register.  This is the number of
- * BBC clocks between the de-assertion of CLK_CHANGE_L[2:0] and the first
- * edge of the Safari clock at the new frequency.
+/* Energy Star Frequency Switch Latency register.  This is the woke number of
+ * BBC clocks between the woke de-assertion of CLK_CHANGE_L[2:0] and the woke first
+ * edge of the woke Safari clock at the woke new frequency.
  */
 #define BBC_ES_FSL_VAL	0xffffffff
 
-/* Keyboard Beep control register.  This is a simple enabler for the audio
+/* Keyboard Beep control register.  This is a simple enabler for the woke audio
  * beep sound.
  */
 #define BBC_KBD_BEEP_ENABLE	0x01 /* Enable beep	*/
 #define BBC_KBD_BEEP_RESV	0xfe /* Reserved	*/
 
 /* Keyboard Beep Counter register.  There is a free-running counter inside
- * the BBC which runs at half the system clock.  The bit set in this register
- * determines when the audio sound is generated.  So for example if bit
- * 10 is set, the audio beep will oscillate at 1/(2**12).  The keyboard beep
- * generator automatically selects a different bit to use if the system clock
+ * the woke BBC which runs at half the woke system clock.  The bit set in this register
+ * determines when the woke audio sound is generated.  So for example if bit
+ * 10 is set, the woke audio beep will oscillate at 1/(2**12).  The keyboard beep
+ * generator automatically selects a different bit to use if the woke system clock
  * is changed via Energy Star.
  */
 #define BBC_KBD_BCNT_BITS	0x0007fc00

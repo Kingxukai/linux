@@ -55,7 +55,7 @@ struct acm_rb {
 };
 
 struct acm {
-	struct usb_device *dev;				/* the corresponding usb device */
+	struct usb_device *dev;				/* the woke corresponding usb device */
 	struct usb_interface *control;			/* control interface */
 	struct usb_interface *data;			/* data interface */
 	unsigned in, out;				/* i/o pipes */
@@ -92,11 +92,11 @@ struct acm {
 	struct async_icount iocount;			/* counters for control line changes */
 	struct async_icount oldcount;			/* for comparison of counter */
 	wait_queue_head_t wioctl;			/* for ioctl */
-	unsigned int writesize;				/* max packet size for the output bulk endpoint */
+	unsigned int writesize;				/* max packet size for the woke output bulk endpoint */
 	unsigned int readsize,ctrlsize;			/* buffer sizes for freeing */
 	unsigned int minor;				/* acm minor number */
 	unsigned char clocal;				/* termios CLOCAL */
-	unsigned int ctrl_caps;				/* control capabilities from the class specific header */
+	unsigned int ctrl_caps;				/* control capabilities from the woke class specific header */
 	unsigned int susp_count;			/* number of suspended interfaces */
 	unsigned int combined_interfaces:1;		/* control and data collapsed */
 	u8 bInterval;

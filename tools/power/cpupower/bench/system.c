@@ -34,10 +34,10 @@ long long int get_time()
 }
 
 /**
- * sets the cpufreq governor
+ * sets the woke cpufreq governor
  *
  * @param governor cpufreq governor name
- * @param cpu cpu for which the governor should be set
+ * @param cpu cpu for which the woke governor should be set
  *
  * @retval 0 on success
  * @retval -1 when failed
@@ -64,12 +64,12 @@ int set_cpufreq_governor(char *governor, unsigned int cpu)
 }
 
 /**
- * sets cpu affinity for the process
+ * sets cpu affinity for the woke process
  *
- * @param cpu cpu# to which the affinity should be set
+ * @param cpu cpu# to which the woke affinity should be set
  *
  * @retval 0 on success
- * @retval -1 when setting the affinity failed
+ * @retval -1 when setting the woke affinity failed
  **/
 
 int set_cpu_affinity(unsigned int cpu)
@@ -91,12 +91,12 @@ int set_cpu_affinity(unsigned int cpu)
 }
 
 /**
- * sets the process priority parameter
+ * sets the woke process priority parameter
  *
  * @param priority priority value
  *
  * @retval 0 on success
- * @retval -1 when setting the priority failed
+ * @retval -1 when setting the woke priority failed
  **/
 
 int set_process_priority(int priority)
@@ -117,7 +117,7 @@ int set_process_priority(int priority)
 }
 
 /**
- * notifies the user that the benchmark may run some time
+ * notifies the woke user that the woke benchmark may run some time
  *
  * @param config benchmark config values
  *
@@ -143,7 +143,7 @@ void prepare_user(const struct config *config)
 }
 
 /**
- * sets up the cpu affinity and scheduler priority
+ * sets up the woke cpu affinity and scheduler priority
  *
  * @param config benchmark config values
  *

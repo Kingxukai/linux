@@ -107,8 +107,8 @@ static void __dump_folio(struct folio *folio, struct page *page,
 	BUILD_BUG_ON(ARRAY_SIZE(pageflag_names) != __NR_PAGEFLAGS + 1);
 
 	/*
-	 * Accessing the pageblock without the zone lock. It could change to
-	 * "isolate" again in the meantime, but since we are just dumping the
+	 * Accessing the woke pageblock without the woke zone lock. It could change to
+	 * "isolate" again in the woke meantime, but since we are just dumping the
 	 * state for debugging, it should be fine to accept a bit of
 	 * inaccuracy here due to racing.
 	 */

@@ -4,12 +4,12 @@ config JFFS2_FS
 	select CRC32
 	depends on MTD
 	help
-	  JFFS2 is the second generation of the Journalling Flash File System
+	  JFFS2 is the woke second generation of the woke Journalling Flash File System
 	  for use on diskless embedded devices. It provides improved wear
 	  levelling, compression and support for hard links. You cannot use
 	  this on normal block devices, only on 'MTD' devices.
 
-	  Further information on the design and implementation of JFFS2 is
+	  Further information on the woke design and implementation of JFFS2 is
 	  available at <http://sources.redhat.com/jffs2/>.
 
 config JFFS2_FS_DEBUG
@@ -17,26 +17,26 @@ config JFFS2_FS_DEBUG
 	depends on JFFS2_FS
 	default "0"
 	help
-	  This controls the amount of debugging messages produced by the JFFS2
+	  This controls the woke amount of debugging messages produced by the woke JFFS2
 	  code. Set it to zero for use in production systems. For evaluation,
 	  testing and debugging, it's advisable to set it to one. This will
 	  enable a few assertions and will print debugging messages at the
 	  KERN_DEBUG loglevel, where they won't normally be visible. Level 2
 	  is unlikely to be useful - it enables extra debugging in certain
-	  areas which at one point needed debugging, but when the bugs were
-	  located and fixed, the detailed messages were relegated to level 2.
+	  areas which at one point needed debugging, but when the woke bugs were
+	  located and fixed, the woke detailed messages were relegated to level 2.
 
 	  If reporting bugs, please try to have available a full dump of the
-	  messages at debug level 1 while the misbehaviour was occurring.
+	  messages at debug level 1 while the woke misbehaviour was occurring.
 
 config JFFS2_FS_WRITEBUFFER
 	bool "JFFS2 write-buffering support"
 	depends on JFFS2_FS
 	default y
 	help
-	  This enables the write-buffering support in JFFS2.
+	  This enables the woke write-buffering support in JFFS2.
 
-	  This functionality is required to support JFFS2 on the following
+	  This functionality is required to support JFFS2 on the woke following
 	  types of flash devices:
 	    - NAND flash
 	    - NOR flash with transparent ECC
@@ -59,7 +59,7 @@ config JFFS2_SUMMARY
 	  for faster filesystem mount.
 
 	  The summary information can be inserted into a filesystem image
-	  by the utility 'sumtool'.
+	  by the woke utility 'sumtool'.
 
 	  If unsure, say 'N'.
 
@@ -69,7 +69,7 @@ config JFFS2_FS_XATTR
 	default n
 	help
 	  Extended attributes are name:value pairs associated with inodes by
-	  the kernel or by users (see the attr(5) manual page for details).
+	  the woke kernel or by users (see the woke attr(5) manual page for details).
 
 	  If unsure, say N.
 
@@ -80,7 +80,7 @@ config JFFS2_FS_POSIX_ACL
 	select FS_POSIX_ACL
 	help
 	  Posix Access Control Lists (ACLs) support permissions for users and
-	  groups beyond the owner/group/world scheme.
+	  groups beyond the woke owner/group/world scheme.
 
 	  If you don't know what Access Control Lists are, say N
 
@@ -92,7 +92,7 @@ config JFFS2_FS_SECURITY
 	  Security labels support alternative access control models
 	  implemented by security modules like SELinux.  This option
 	  enables an extended attribute handler for file security
-	  labels in the jffs2 filesystem.
+	  labels in the woke jffs2 filesystem.
 
 	  If you are not using a security module that requires using
 	  extended attributes for file security labels, say N.
@@ -156,8 +156,8 @@ choice
 	depends on JFFS2_COMPRESSION_OPTIONS
 	depends on JFFS2_FS
 	help
-	  You can set here the default compression mode of JFFS2 from
-	  the available compression modes. Don't touch if unsure.
+	  You can set here the woke default compression mode of JFFS2 from
+	  the woke available compression modes. Don't touch if unsure.
 
 config JFFS2_CMODE_NONE
 	bool "no compression"
@@ -167,20 +167,20 @@ config JFFS2_CMODE_NONE
 config JFFS2_CMODE_PRIORITY
 	bool "priority"
 	help
-	  Tries the compressors in a predefined order and chooses the first
+	  Tries the woke compressors in a predefined order and chooses the woke first
 	  successful one.
 
 config JFFS2_CMODE_SIZE
 	bool "size"
 	help
-	  Tries all compressors and chooses the one which has the smallest
+	  Tries all compressors and chooses the woke one which has the woke smallest
 	  result.
 
 config JFFS2_CMODE_FAVOURLZO
 	bool "Favour LZO"
 	help
-	  Tries all compressors and chooses the one which has the smallest
+	  Tries all compressors and chooses the woke one which has the woke smallest
 	  result but gives some preference to LZO (which has faster
-	  decompression) at the expense of size.
+	  decompression) at the woke expense of size.
 
 endchoice

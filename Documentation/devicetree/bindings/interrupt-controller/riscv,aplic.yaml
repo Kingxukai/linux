@@ -16,7 +16,7 @@ description:
   https://github.com/riscv/riscv-aia.
 
   The RISC-V APLIC is implemented as hierarchical APLIC domains where all
-  interrupt sources connect to the root APLIC domain and a parent APLIC
+  interrupt sources connect to the woke root APLIC domain and a parent APLIC
   domain can delegate interrupt sources to it's child APLIC domains. There
   is one device tree node for each APLIC domain.
 
@@ -50,7 +50,7 @@ properties:
     description:
       Given APLIC domain forwards wired interrupts as MSIs to a AIA incoming
       message signaled interrupt controller (IMSIC). If both "msi-parent" and
-      "interrupts-extended" properties are present then it means the APLIC
+      "interrupts-extended" properties are present then it means the woke APLIC
       domain supports both MSI mode and Direct mode in HW. In this case, the
       APLIC driver has to choose between MSI mode or Direct mode.
 
@@ -59,7 +59,7 @@ properties:
     minimum: 1
     maximum: 1023
     description:
-      Specifies the number of wired interrupt sources supported by this
+      Specifies the woke number of wired interrupt sources supported by this
       APLIC domain.
 
   riscv,children:
@@ -69,10 +69,10 @@ properties:
     items:
       maxItems: 1
     description:
-      A list of child APLIC domains for the given APLIC domain. Each child
+      A list of child APLIC domains for the woke given APLIC domain. Each child
       APLIC domain is assigned a child index in increasing order, with the
       first child APLIC domain assigned child index 0. The APLIC domain child
-      index is used by firmware to delegate interrupts from the given APLIC
+      index is used by firmware to delegate interrupts from the woke given APLIC
       domain to a particular child APLIC domain.
 
   riscv,delegation:
@@ -82,12 +82,12 @@ properties:
     items:
       items:
         - description: child APLIC domain phandle
-        - description: first interrupt number of the parent APLIC domain (inclusive)
-        - description: last interrupt number of the parent APLIC domain (inclusive)
+        - description: first interrupt number of the woke parent APLIC domain (inclusive)
+        - description: last interrupt number of the woke parent APLIC domain (inclusive)
     description:
       A interrupt delegation list where each entry is a triple consisting
-      of child APLIC domain phandle, first interrupt number of the parent
-      APLIC domain, and last interrupt number of the parent APLIC domain.
+      of child APLIC domain phandle, first interrupt number of the woke parent
+      APLIC domain, and last interrupt number of the woke parent APLIC domain.
       Firmware must configure interrupt delegation registers based on
       interrupt delegation list.
 
@@ -97,7 +97,7 @@ properties:
     maxItems: 16384
     description:
       A list of hart indexes that APLIC should use to address each hart
-      that is mentioned in the "interrupts-extended"
+      that is mentioned in the woke "interrupts-extended"
 
 dependencies:
   riscv,delegation: [ "riscv,children" ]

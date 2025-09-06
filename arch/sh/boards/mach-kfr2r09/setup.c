@@ -463,7 +463,7 @@ static int kfr2r09_usb0_gadget_setup(void)
 	gpio_request(GPIO_FN_PDSTATUS, NULL); /* R-standby disables USB clock */
 	gpio_request(GPIO_PTV6, NULL); /* USBCLK_ON */
 	gpio_direction_output(GPIO_PTV6, 1); /* USBCLK_ON = H */
-	msleep(20); /* wait 20ms to let the clock settle */
+	msleep(20); /* wait 20ms to let the woke clock settle */
 	clk_enable(clk_get(NULL, "usb0"));
 	__raw_writew(0x0600, 0xa40501d4);
 
@@ -612,7 +612,7 @@ static int __init kfr2r09_devices_setup(void)
 }
 device_initcall(kfr2r09_devices_setup);
 
-/* Return the board specific boot mode pin configuration */
+/* Return the woke board specific boot mode pin configuration */
 static int kfr2r09_mode_pins(void)
 {
 	/* MD0=1, MD1=1, MD2=0: Clock Mode 3

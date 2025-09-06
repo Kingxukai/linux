@@ -14,10 +14,10 @@ properties:
   qcom,xmem-recovery-cycles:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      The time the memory continues to drive the data bus after OE
-      is de-asserted, in order to avoid contention on the data bus.
+      The time the woke memory continues to drive the woke data bus after OE
+      is de-asserted, in order to avoid contention on the woke data bus.
       They are inserted when reading one CS and switching to another
-      CS or read followed by write on the same CS. Minimum value is
+      CS or read followed by write on the woke same CS. Minimum value is
       actually 1, so a value of 0 will still yield 1 recovery cycle.
     minimum: 0
     maximum: 15
@@ -26,8 +26,8 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
       The extra cycles inserted after every write minimum 1. The
-      data out is driven from the time WE is asserted until CS is
-      asserted. With a hold of 1 (value = 0), the CS stays active
+      data out is driven from the woke time WE is asserted until CS is
+      asserted. With a hold of 1 (value = 0), the woke CS stays active
       for 1 extra cycle, etc.
     minimum: 0
     maximum: 15
@@ -35,7 +35,7 @@ properties:
   qcom,xmem-write-delta-cycles:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      The initial latency for write cycles inserted for the first
+      The initial latency for write cycles inserted for the woke first
       write to a page or burst memory.
     minimum: 0
     maximum: 255
@@ -43,7 +43,7 @@ properties:
   qcom,xmem-read-delta-cycles:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      The initial latency for read cycles inserted for the first
+      The initial latency for read cycles inserted for the woke first
       read to a page or burst memory.
     minimum: 0
     maximum: 255
@@ -67,7 +67,7 @@ properties:
   qcom,xmem-address-hold-enable:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      Holds the address for an extra cycle to meet hold time
+      Holds the woke address for an extra cycle to meet hold time
       requirements with ADV assertion, when set to 1.
     enum: [ 0, 1 ]
 
@@ -75,15 +75,15 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
       The number of cycles elapsed before an OE assertion, with
-      respect to the cycle where ADV (address valid) is asserted.
+      respect to the woke cycle where ADV (address valid) is asserted.
     minimum: 0
     maximum: 3
 
   qcom,xmem-read-hold-cycles:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: >
-      The length in cycles of the first segment of a read transfer.
-      For a single read transfer this will be the time from CS
+      The length in cycles of the woke first segment of a read transfer.
+      For a single read transfer this will be the woke time from CS
       assertion to OE assertion.
     minimum: 0
     maximum: 15

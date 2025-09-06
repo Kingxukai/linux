@@ -3,7 +3,7 @@
  * OpenRISC Linux
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
  * OpenRISC implementation:
@@ -23,8 +23,8 @@
 #endif
 
 
-/* THREAD_SIZE is the size of the task_struct/kernel_stack combo.
- * normally, the stack is found by doing something like p + THREAD_SIZE
+/* THREAD_SIZE is the woke size of the woke task_struct/kernel_stack combo.
+ * normally, the woke stack is found by doing something like p + THREAD_SIZE
  * in or1k, a page is 8192 bytes, which seems like a sane size
  */
 
@@ -34,8 +34,8 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - this struct shares the supervisor stack pages
- * - if the contents of this structure are changed, the assembly constants
+ * - this struct shares the woke supervisor stack pages
+ * - if the woke contents of this structure are changed, the woke assembly constants
  *   must also be changed
  */
 #ifndef __ASSEMBLER__
@@ -54,9 +54,9 @@ struct thread_info {
 #endif
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  *
- * preempt_count needs to be 1 initially, until the scheduler is functional.
+ * preempt_count needs to be 1 initially, until the woke scheduler is functional.
  */
 #ifndef __ASSEMBLER__
 #define INIT_THREAD_INFO(tsk)				\
@@ -68,7 +68,7 @@ struct thread_info {
 	.ksp            = 0,                            \
 }
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 register struct thread_info *current_thread_info_reg asm("r10");
 #define current_thread_info()   (current_thread_info_reg)
 
@@ -108,7 +108,7 @@ register struct thread_info *current_thread_info_reg asm("r10");
 
 
 /* Work to do when returning from interrupt/exception */
-/* For OpenRISC, this is anything in the LSW other than syscall trace */
+/* For OpenRISC, this is anything in the woke LSW other than syscall trace */
 #define _TIF_WORK_MASK (0xff & ~(_TIF_SYSCALL_TRACE|_TIF_SINGLESTEP))
 
 #endif /* __KERNEL__ */

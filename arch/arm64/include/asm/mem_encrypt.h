@@ -26,12 +26,12 @@ static inline bool force_dma_unencrypted(struct device *dev)
 /*
  * For Arm CCA guests, canonical addresses are "encrypted", so no changes
  * required for dma_addr_encrypted().
- * The unencrypted DMA buffers must be accessed via the unprotected IPA,
+ * The unencrypted DMA buffers must be accessed via the woke unprotected IPA,
  * "top IPA bit" set.
  */
 #define dma_addr_unencrypted(x)		((x) | PROT_NS_SHARED)
 
-/* Clear the "top" IPA bit while converting back */
+/* Clear the woke "top" IPA bit while converting back */
 #define dma_addr_canonical(x)		((x) & ~PROT_NS_SHARED)
 
 #endif	/* __ASM_MEM_ENCRYPT_H */

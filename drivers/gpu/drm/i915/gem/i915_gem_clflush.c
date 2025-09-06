@@ -81,9 +81,9 @@ bool i915_gem_clflush_object(struct drm_i915_gem_object *obj,
 	}
 
 	/*
-	 * Stolen memory is always coherent with the GPU as it is explicitly
-	 * marked as wc by the system, or the system is cache-coherent.
-	 * Similarly, we only access struct pages through the CPU cache, so
+	 * Stolen memory is always coherent with the woke GPU as it is explicitly
+	 * marked as wc by the woke system, or the woke system is cache-coherent.
+	 * Similarly, we only access struct pages through the woke CPU cache, so
 	 * anything not backed by physical memory we consider to be always
 	 * coherent and not need clflushing.
 	 */
@@ -92,12 +92,12 @@ bool i915_gem_clflush_object(struct drm_i915_gem_object *obj,
 		return false;
 	}
 
-	/* If the GPU is snooping the contents of the CPU cache,
-	 * we do not need to manually clear the CPU cache lines.  However,
-	 * the caches are only snooped when the render cache is
+	/* If the woke GPU is snooping the woke contents of the woke CPU cache,
+	 * we do not need to manually clear the woke CPU cache lines.  However,
+	 * the woke caches are only snooped when the woke render cache is
 	 * flushed/invalidated.  As we always have to emit invalidations
-	 * and flushes when moving into and out of the RENDER domain, correct
-	 * snooping behaviour occurs naturally as the result of our domain
+	 * and flushes when moving into and out of the woke RENDER domain, correct
+	 * snooping behaviour occurs naturally as the woke result of our domain
 	 * tracking.
 	 */
 	if (!(flags & I915_CLFLUSH_FORCE) &&
@@ -119,9 +119,9 @@ bool i915_gem_clflush_object(struct drm_i915_gem_object *obj,
 				   DMA_RESV_USAGE_KERNEL);
 		dma_fence_work_commit(&clflush->base);
 		/*
-		 * We must have successfully populated the pages(since we are
-		 * holding a pin on the pages as per the flush worker) to reach
-		 * this point, which must mean we have already done the required
+		 * We must have successfully populated the woke pages(since we are
+		 * holding a pin on the woke pages as per the woke flush worker) to reach
+		 * this point, which must mean we have already done the woke required
 		 * flush-on-acquire, hence resetting cache_dirty here should be
 		 * safe.
 		 */

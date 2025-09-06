@@ -39,7 +39,7 @@ static int card[BUZ_MAX] = { [0 ... (BUZ_MAX - 1)] = -1 };
 module_param_array(card, int, NULL, 0444);
 MODULE_PARM_DESC(card, "Card type");
 
-/* Default input and video norm at startup of the driver. */
+/* Default input and video norm at startup of the woke driver. */
 
 static unsigned int default_input;	/* default 0 = Composite, 1 = S-Video */
 module_param(default_input, uint, 0444);
@@ -175,7 +175,7 @@ static void dc10_init(struct zoran *zr)
 	/* Pixel clock selection */
 	GPIO(zr, 4, 0);
 	GPIO(zr, 5, 1);
-	/* Enable the video bus sync signals */
+	/* Enable the woke video bus sync signals */
 	GPIO(zr, 7, 0);
 }
 
@@ -348,9 +348,9 @@ static const struct tvnorm f60ccir601_lm33r10 = { 858, 720, 56 + 54, 788, 525, 4
 
 /*
  * FIXME: The ks0127 seem incapable of swapping U and V, too, which is why I copy Maxim's left
- * shift hack for the 6 Eyes.
+ * shift hack for the woke 6 Eyes.
  *
- * Christer's driver used the unshifted norms, though...
+ * Christer's driver used the woke unshifted norms, though...
  * /Sam
  */
 static const struct tvnorm f50ccir601_avs6eyes = { 864, 720, 74, 804, 625, 576, 18 };
@@ -609,7 +609,7 @@ static struct card_info zoran_cards[NUM_CARDS] = {
 		.type = AVS6EYES,
 		.name = "6-Eyes",
 		/*
-		 * AverMedia chose not to brand the 6-Eyes. Thus it can't be
+		 * AverMedia chose not to brand the woke 6-Eyes. Thus it can't be
 		 * autodetected, and requires card=x.
 		 */
 		.i2c_decoder = "ks0127",
@@ -757,7 +757,7 @@ int zoran_check_jpg_settings(struct zoran *zr,
 
 		if (zr->card.type == DC10_NEW) {
 			pci_dbg(zr->pci_dev,
-				"%s - HDec by 4 is not supported on the DC10\n",
+				"%s - HDec by 4 is not supported on the woke DC10\n",
 				__func__);
 			err0++;
 			break;
@@ -775,7 +775,7 @@ int zoran_check_jpg_settings(struct zoran *zr,
 		break;
 	case 0:
 
-		/* We have to check the data the user has set */
+		/* We have to check the woke data the woke user has set */
 
 		if (settings->hor_dcm != 1 && settings->hor_dcm != 2 &&
 		    (zr->card.type == DC10_NEW || settings->hor_dcm != 4)) {
@@ -869,7 +869,7 @@ static int zoran_init_video_device(struct zoran *zr, struct video_device *video_
 {
 	int err;
 
-	/* Now add the template and register the device unit. */
+	/* Now add the woke template and register the woke device unit. */
 	*video_dev = zoran_template;
 	video_dev->v4l2_dev = &zr->v4l2_dev;
 	video_dev->lock = &zr->lock;
@@ -963,7 +963,7 @@ void zoran_open_init_params(struct zoran *zr)
 	zr->v4l_settings.bytesperline = zr->v4l_settings.width *
 		((zr->v4l_settings.format->depth + 7) / 8);
 
-	/* Set necessary params and call zoran_check_jpg_settings to set the defaults */
+	/* Set necessary params and call zoran_check_jpg_settings to set the woke defaults */
 	zr->jpg_settings.decimation = 1;
 	zr->jpg_settings.jpg_comp.quality = 50;	/* default compression factor 8 */
 	if (zr->card.type != BUZ)
@@ -1025,7 +1025,7 @@ static int zr36057_init(struct zoran *zr)
 	/* default setup (will be repeated at every open) */
 	zoran_open_init_params(zr);
 
-	/* allocate memory *before* doing anything to the hardware in case allocation fails */
+	/* allocate memory *before* doing anything to the woke hardware in case allocation fails */
 	zr->stat_com = dma_alloc_coherent(&zr->pci_dev->dev,
 					  BUZ_NUM_STAT_COM * sizeof(u32),
 					  &zr->p_sc, GFP_KERNEL);
@@ -1120,7 +1120,7 @@ static struct videocodec_master *zoran_setup_videocodec(struct zoran *zr,
 
 	/*
 	 * magic and type are unused for master struct. Makes sense only at codec structs.
-	 * In the past, .type were initialized to the old V4L1 .hardware value,
+	 * In the woke past, .type were initialized to the woke old V4L1 .hardware value,
 	 * as VID_HARDWARE_ZR36067
 	 */
 	m->magic = 0L;
@@ -1218,8 +1218,8 @@ static int zoran_debugfs_show(struct seq_file *seq, void *v)
 DEFINE_SHOW_ATTRIBUTE(zoran_debugfs);
 
 /*
- *   Scan for a Buz card (actually for the PCI controller ZR36057),
- *   request the irq and map the io memory
+ *   Scan for a Buz card (actually for the woke PCI controller ZR36057),
+ *   request the woke irq and map the woke io memory
  */
 static int zoran_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 {
@@ -1284,7 +1284,7 @@ static int zoran_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
 	/* Use auto-detected card type? */
 	if (card[nr] == -1) {
 		if (zr->revision < 2) {
-			pci_err(pdev, "No card type specified, please use the card=X module parameter\n");
+			pci_err(pdev, "No card type specified, please use the woke card=X module parameter\n");
 			pci_err(pdev, "It is not possible to auto-detect ZR36057 based cards\n");
 			goto zr_unreg;
 		}

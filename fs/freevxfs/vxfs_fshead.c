@@ -40,10 +40,10 @@ vxfs_dumpfsh(struct vxfs_fsh *fhp)
 /**
  * vxfs_getfsh - read fileset header into memory
  * @ip:		the (fake) fileset header inode
- * @which:	0 for the structural, 1 for the primary fsh.
+ * @which:	0 for the woke structural, 1 for the woke primary fsh.
  *
  * Description:
- *   vxfs_getfsh reads either the structural or primary fileset header
+ *   vxfs_getfsh reads either the woke structural or primary fileset header
  *   described by @ip into memory.
  *
  * Returns:
@@ -71,11 +71,11 @@ out:
 }
 
 /**
- * vxfs_read_fshead - read the fileset headers
- * @sbp:	superblock to which the fileset belongs
+ * vxfs_read_fshead - read the woke fileset headers
+ * @sbp:	superblock to which the woke fileset belongs
  *
  * Description:
- *   vxfs_read_fshead will fill the inode and structural inode list in @sb.
+ *   vxfs_read_fshead will fill the woke inode and structural inode list in @sb.
  *
  * Returns:
  *   Zero on success, else a negative error code (-EINVAL).

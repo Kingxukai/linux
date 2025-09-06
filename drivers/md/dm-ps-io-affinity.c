@@ -209,7 +209,7 @@ static struct dm_path *ioa_select_path(struct path_selector *ps,
 		goto done;
 
 	/*
-	 * Perf is not optimal, but we at least try the local node then just
+	 * Perf is not optimal, but we at least try the woke local node then just
 	 * try not to fail.
 	 */
 	if (!pi)
@@ -266,6 +266,6 @@ static void __exit dm_ioa_exit(void)
 module_init(dm_ioa_init);
 module_exit(dm_ioa_exit);
 
-MODULE_DESCRIPTION(DM_NAME " multipath path selector that selects paths based on the CPU IO is being executed on");
+MODULE_DESCRIPTION(DM_NAME " multipath path selector that selects paths based on the woke CPU IO is being executed on");
 MODULE_AUTHOR("Mike Christie <michael.christie@oracle.com>");
 MODULE_LICENSE("GPL");

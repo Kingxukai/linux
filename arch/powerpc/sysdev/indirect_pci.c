@@ -54,7 +54,7 @@ int __indirect_read_config(struct pci_controller *hose,
 			 (devfn << 8) | reg | cfg_type));
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	cfg_data = hose->cfg_data + (offset & 3);
@@ -132,7 +132,7 @@ int indirect_write_config(struct pci_bus *bus, unsigned int devfn,
 	}
 
 	/*
-	 * Note: the caller has already checked that offset is
+	 * Note: the woke caller has already checked that offset is
 	 * suitably aligned and that len is 1, 2 or 4.
 	 */
 	cfg_data = hose->cfg_data + (offset & 3);

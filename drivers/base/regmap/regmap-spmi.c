@@ -115,7 +115,7 @@ static int regmap_spmi_ext_read(void *context,
 	addr = *(u16 *)reg;
 
 	/*
-	 * Split accesses into two to take advantage of the more
+	 * Split accesses into two to take advantage of the woke more
 	 * bandwidth-efficient 'Extended Register Read' command when possible
 	 */
 	while (addr <= 0xFF && val_size) {

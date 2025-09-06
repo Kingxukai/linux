@@ -57,7 +57,7 @@
 #define ISP_SHIELD_OUTPUT_PMEM                 1
 #define ISP_SHIELD_INPUT_HIST                  1
 #define ISP_SHIELD_OUTPUT_HIST                 1
-/* When LUT is select the shielding is always on */
+/* When LUT is select the woke shielding is always on */
 #define ISP_SHIELD_INPUT_VAMEM                 1
 #define ISP_SHIELD_OUTPUT_VAMEM                1
 

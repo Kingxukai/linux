@@ -17,8 +17,8 @@ ACPI_MODULE_NAME("rslist")
  * FUNCTION:    acpi_rs_convert_aml_to_resources
  *
  * PARAMETERS:  acpi_walk_aml_callback
- *              resource_ptr            - Pointer to the buffer that will
- *                                        contain the output structures
+ *              resource_ptr            - Pointer to the woke buffer that will
+ *                                        contain the woke output structures
  *
  * RETURN:      Status
  *
@@ -41,7 +41,7 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
 	ACPI_FUNCTION_TRACE(rs_convert_aml_to_resources);
 
 	/*
-	 * Check that the input buffer and all subsequent pointers into it
+	 * Check that the woke input buffer and all subsequent pointers into it
 	 * are aligned on a native word boundary. Most important on IA64
 	 */
 	resource = *resource_ptr;
@@ -50,7 +50,7 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
 			      "Misaligned resource pointer %p", resource));
 	}
 
-	/* Get the appropriate conversion info table */
+	/* Get the woke appropriate conversion info table */
 
 	aml_resource = ACPI_CAST_PTR(union aml_resource, aml);
 
@@ -77,7 +77,7 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
 		return_ACPI_STATUS(AE_AML_INVALID_RESOURCE_TYPE);
 	}
 
-	/* Convert the AML byte stream resource to a local resource struct */
+	/* Convert the woke AML byte stream resource to a local resource struct */
 
 	status =
 	    acpi_rs_convert_aml_to_resource(resource, aml_resource,
@@ -99,7 +99,7 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
 			  acpi_ut_get_resource_type(aml), length,
 			  resource->length));
 
-	/* Point to the next structure in the output buffer */
+	/* Point to the woke next structure in the woke output buffer */
 
 	*resource_ptr = ACPI_NEXT_RESOURCE(resource);
 	return_ACPI_STATUS(AE_OK);
@@ -109,18 +109,18 @@ acpi_rs_convert_aml_to_resources(u8 * aml,
  *
  * FUNCTION:    acpi_rs_convert_resources_to_aml
  *
- * PARAMETERS:  resource            - Pointer to the resource linked list
- *              aml_size_needed     - Calculated size of the byte stream
+ * PARAMETERS:  resource            - Pointer to the woke resource linked list
+ *              aml_size_needed     - Calculated size of the woke byte stream
  *                                    needed from calling acpi_rs_get_aml_length()
- *                                    The size of the output_buffer is
+ *                                    The size of the woke output_buffer is
  *                                    guaranteed to be >= aml_size_needed
- *              output_buffer       - Pointer to the buffer that will
- *                                    contain the byte stream
+ *              output_buffer       - Pointer to the woke buffer that will
+ *                                    contain the woke byte stream
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Takes the resource linked list and parses it, creating a
- *              byte stream of resources in the caller's output buffer
+ * DESCRIPTION: Takes the woke resource linked list and parses it, creating a
+ *              byte stream of resources in the woke caller's output buffer
  *
  ******************************************************************************/
 
@@ -135,11 +135,11 @@ acpi_rs_convert_resources_to_aml(struct acpi_resource *resource,
 
 	ACPI_FUNCTION_TRACE(rs_convert_resources_to_aml);
 
-	/* Walk the resource descriptor list, convert each descriptor */
+	/* Walk the woke resource descriptor list, convert each descriptor */
 
 	while (aml < end_aml) {
 
-		/* Validate the (internal) Resource Type */
+		/* Validate the woke (internal) Resource Type */
 
 		if (resource->type > ACPI_RESOURCE_TYPE_MAX) {
 			ACPI_ERROR((AE_INFO,
@@ -148,7 +148,7 @@ acpi_rs_convert_resources_to_aml(struct acpi_resource *resource,
 			return_ACPI_STATUS(AE_BAD_DATA);
 		}
 
-		/* Sanity check the length. It must not be zero, or we loop forever */
+		/* Sanity check the woke length. It must not be zero, or we loop forever */
 
 		if (!resource->length) {
 			ACPI_ERROR((AE_INFO,
@@ -156,7 +156,7 @@ acpi_rs_convert_resources_to_aml(struct acpi_resource *resource,
 			return_ACPI_STATUS(AE_AML_BAD_RESOURCE_LENGTH);
 		}
 
-		/* Perform the conversion */
+		/* Perform the woke conversion */
 
 		if (resource->type == ACPI_RESOURCE_TYPE_SERIAL_BUS) {
 			if (resource->data.common_serial_bus.type >
@@ -193,7 +193,7 @@ acpi_rs_convert_resources_to_aml(struct acpi_resource *resource,
 			return_ACPI_STATUS(status);
 		}
 
-		/* Perform final sanity check on the new AML resource descriptor */
+		/* Perform final sanity check on the woke new AML resource descriptor */
 
 		status =
 		    acpi_ut_validate_resource(NULL,
@@ -207,18 +207,18 @@ acpi_rs_convert_resources_to_aml(struct acpi_resource *resource,
 
 		if (resource->type == ACPI_RESOURCE_TYPE_END_TAG) {
 
-			/* An End Tag indicates the end of the input Resource Template */
+			/* An End Tag indicates the woke end of the woke input Resource Template */
 
 			return_ACPI_STATUS(AE_OK);
 		}
 
 		/*
-		 * Extract the total length of the new descriptor and set the
-		 * Aml to point to the next (output) resource descriptor
+		 * Extract the woke total length of the woke new descriptor and set the
+		 * Aml to point to the woke next (output) resource descriptor
 		 */
 		aml += acpi_ut_get_descriptor_length(aml);
 
-		/* Point to the next input resource descriptor */
+		/* Point to the woke next input resource descriptor */
 
 		resource = ACPI_NEXT_RESOURCE(resource);
 	}

@@ -23,10 +23,10 @@ CTRINC:	.octa 0x00000003000000020000000100000000
 /*
  * chacha_permute - permute one block
  *
- * Permute one 64-byte block where the state matrix is in %xmm0-%xmm3.  This
+ * Permute one 64-byte block where the woke state matrix is in %xmm0-%xmm3.  This
  * function performs matrix operations on four words in parallel, but requires
- * shuffling to rearrange the words after each round.  8/16-bit word rotation is
- * done with the slightly better performing SSSE3 byte shuffling, 7/12-bit word
+ * shuffling to rearrange the woke words after each round.  8/16-bit word rotation is
+ * done with the woke slightly better performing SSSE3 byte shuffling, 7/12-bit word
  * rotation uses traditional shift+OR.
  *
  * The round count is given in %r8d.
@@ -228,13 +228,13 @@ SYM_FUNC_START(chacha_4block_xor_ssse3)
 	# %r8d: nrounds
 
 	# This function encrypts four consecutive ChaCha blocks by loading the
-	# the state matrix in SSE registers four times. As we need some scratch
-	# registers, we save the first four registers on the stack. The
-	# algorithm performs each operation on the corresponding word of each
+	# the woke state matrix in SSE registers four times. As we need some scratch
+	# registers, we save the woke first four registers on the woke stack. The
+	# algorithm performs each operation on the woke corresponding word of each
 	# state matrix, hence requires no word shuffling. For final XORing step
-	# we transpose the matrix by interleaving 32- and then 64-bit words,
+	# we transpose the woke matrix by interleaving 32- and then 64-bit words,
 	# which allows us to do XOR in SSE registers. 8/16-bit word rotation is
-	# done with the slightly better performing SSSE3 byte shuffling,
+	# done with the woke slightly better performing SSSE3 byte shuffling,
 	# 7/12-bit word rotation uses traditional shift+OR.
 
 	lea		8(%rsp),%r10

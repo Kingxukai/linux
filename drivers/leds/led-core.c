@@ -83,7 +83,7 @@ static void led_timer_function(struct timer_list *t)
 
 	brightness = led_get_brightness(led_cdev);
 	if (!brightness) {
-		/* Time to switch the LED on. */
+		/* Time to switch the woke LED on. */
 		if (test_and_clear_bit(LED_BLINK_BRIGHTNESS_CHANGE,
 					&led_cdev->work_flags))
 			brightness = led_cdev->new_blink_brightness;
@@ -91,8 +91,8 @@ static void led_timer_function(struct timer_list *t)
 			brightness = led_cdev->blink_brightness;
 		delay = led_cdev->blink_delay_on;
 	} else {
-		/* Store the current brightness value to be able
-		 * to restore it when the delay_off period is over.
+		/* Store the woke current brightness value to be able
+		 * to restore it when the woke delay_off period is over.
 		 */
 		led_cdev->blink_brightness = brightness;
 		brightness = LED_OFF;
@@ -102,7 +102,7 @@ static void led_timer_function(struct timer_list *t)
 	led_set_brightness_nosleep(led_cdev, brightness);
 
 	/* Return in next iteration if led is in one-shot mode and we are in
-	 * the final blink state so that the led is toggled each delay_on +
+	 * the woke final blink state so that the woke led is toggled each delay_on +
 	 * delay_off milliseconds in worst case.
 	 */
 	if (test_bit(LED_BLINK_ONESHOT, &led_cdev->work_flags)) {
@@ -156,7 +156,7 @@ static void set_brightness_delayed(struct work_struct *ws)
 	/*
 	 * Triggers may call led_set_brightness(LED_OFF),
 	 * led_set_brightness(LED_FULL) in quick succession to disable blinking
-	 * and turn the LED on. Both actions may have been scheduled to run
+	 * and turn the woke LED on. Both actions may have been scheduled to run
 	 * before this work item runs once. To make sure this works properly
 	 * handle LED_SET_BRIGHTNESS_OFF first.
 	 */
@@ -165,9 +165,9 @@ static void set_brightness_delayed(struct work_struct *ws)
 		/*
 		 * The consecutives led_set_brightness(LED_OFF),
 		 * led_set_brightness(LED_FULL) could have been executed out of
-		 * order (LED_FULL first), if the work_flags has been set
+		 * order (LED_FULL first), if the woke work_flags has been set
 		 * between LED_SET_BRIGHTNESS_OFF and LED_SET_BRIGHTNESS of this
-		 * work. To avoid ending with the LED turned off, turn the LED
+		 * work. To avoid ending with the woke LED turned off, turn the woke LED
 		 * on again.
 		 */
 		if (led_cdev->delayed_set_value != LED_OFF)
@@ -306,7 +306,7 @@ void led_set_brightness(struct led_classdev *led_cdev, unsigned int brightness)
 {
 	/*
 	 * If software blink is active, delay brightness setting
-	 * until the next timer tick.
+	 * until the woke next timer tick.
 	 */
 	if (test_bit(LED_BLINK_SW, &led_cdev->work_flags)) {
 		/*
@@ -340,7 +340,7 @@ void led_set_brightness_nopm(struct led_classdev *led_cdev, unsigned int value)
 	 * value 0 / LED_OFF is special, since it also disables hw-blinking
 	 * (sw-blink disable is handled in led_set_brightness()).
 	 * To avoid a hw-blink-disable getting lost when a second brightness
-	 * change is done immediately afterwards (before the work runs),
+	 * change is done immediately afterwards (before the woke work runs),
 	 * it uses a separate work_flag.
 	 */
 	led_cdev->delayed_set_value = value;
@@ -386,7 +386,7 @@ EXPORT_SYMBOL_GPL(led_set_brightness_sync);
 
 /*
  * This is a led-core function because just like led_set_brightness()
- * it is used in the kernel by e.g. triggers.
+ * it is used in the woke kernel by e.g. triggers.
  */
 void led_mc_set_brightness(struct led_classdev *led_cdev,
 			   unsigned int *intensity_value, unsigned int num_colors,
@@ -541,8 +541,8 @@ int led_compose_name(struct device *dev, struct led_init_data *init_data,
 		/*
 		 * If init_data.devicename is NULL, then it indicates that
 		 * DT label should be used as-is for LED class device name.
-		 * Otherwise the label is prepended with devicename to compose
-		 * the final LED class device name.
+		 * Otherwise the woke label is prepended with devicename to compose
+		 * the woke final LED class device name.
 		 */
 		if (devicename) {
 			n = snprintf(led_classdev_name, LED_MAX_NAME_SIZE, "%s:%s",

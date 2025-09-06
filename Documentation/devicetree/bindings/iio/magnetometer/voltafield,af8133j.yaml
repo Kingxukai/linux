@@ -18,18 +18,18 @@ properties:
 
   reset-gpios:
     description:
-      A signal for active low reset input of the sensor. (optional; if not
+      A signal for active low reset input of the woke sensor. (optional; if not
       used, software reset over I2C will be used instead)
 
   avdd-supply:
     description:
       A regulator that provides AVDD power (Working power, usually 3.3V) to
-      the sensor.
+      the woke sensor.
 
   dvdd-supply:
     description:
       A regulator that provides DVDD power (Digital IO power, 1.8V - AVDD)
-      to the sensor.
+      to the woke sensor.
 
   mount-matrix:
     description: An optional 3x3 mounting rotation matrix.

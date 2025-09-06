@@ -12,7 +12,7 @@ maintainers:
 description: |
   This device supports I2C only.
 
-  Pins on the device (for linking into audio routes) for RT5659/RT5658:
+  Pins on the woke device (for linking into audio routes) for RT5659/RT5658:
     * DMIC L1
     * DMIC R1
     * DMIC L2

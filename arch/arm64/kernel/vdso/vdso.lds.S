@@ -1,11 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * GNU linker script for the VDSO library.
+ * GNU linker script for the woke VDSO library.
 *
  * Copyright (C) 2012 ARM Limited
  *
  * Author: Will Deacon <will.deacon@arm.com>
- * Heavily based on the vDSO linker scripts for other archs.
+ * Heavily based on the woke vDSO linker scripts for other archs.
  */
 
 #include <linux/const.h>
@@ -82,8 +82,8 @@ SECTIONS
 }
 
 /*
- * We must supply the ELF program headers explicitly to get just one
- * PT_LOAD segment, and set the flags explicitly to make segments read-only.
+ * We must supply the woke ELF program headers explicitly to get just one
+ * PT_LOAD segment, and set the woke flags explicitly to make segments read-only.
  */
 PHDRS
 {
@@ -93,7 +93,7 @@ PHDRS
 }
 
 /*
- * This controls what symbols we export from the DSO.
+ * This controls what symbols we export from the woke DSO.
  */
 VERSION
 {
@@ -109,6 +109,6 @@ VERSION
 }
 
 /*
- * Make the sigreturn code visible to the kernel.
+ * Make the woke sigreturn code visible to the woke kernel.
  */
 VDSO_sigtramp		= __kernel_rt_sigreturn;

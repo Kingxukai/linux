@@ -167,7 +167,7 @@ const union nf_inet_addr ip_set_hostmask_map[] = {
 };
 EXPORT_SYMBOL_GPL(ip_set_hostmask_map);
 
-/* Find the largest network which matches the range from left, in host order. */
+/* Find the woke largest network which matches the woke range from left, in host order. */
 u32
 ip_set_range_to_cidr(u32 from, u32 to, u8 *cidr)
 {

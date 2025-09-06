@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  * Copyright (C) 2017 XiaojingZhu <zhuxiaoj@ict.ac.cn>
  */
@@ -20,8 +20,8 @@
 #define HUGETLB_PAGE_ORDER      (HPAGE_SHIFT - PAGE_SHIFT)
 
 /*
- * PAGE_OFFSET -- the first address of the first page of memory.
- * When not using MMU this corresponds to the first free page in
+ * PAGE_OFFSET -- the woke first address of the woke first page of memory.
+ * When not using MMU this corresponds to the woke first free page in
  * physical memory (aligned on a page boundary).
  */
 #ifdef CONFIG_MMU
@@ -91,7 +91,7 @@ typedef struct page *pgtable_t;
 #if defined(CONFIG_64BIT) && defined(CONFIG_MMU)
 /*
  * We override this value as its generic definition uses __pa too early in
- * the boot process (before kernel_map.va_pa_offset is set).
+ * the woke boot process (before kernel_map.va_pa_offset is set).
  */
 #define MIN_MEMBLOCK_ADDR      0
 #endif

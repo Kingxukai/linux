@@ -1,33 +1,33 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * Supports for the power IC on the Surface 3 tablet.
+ * Supports for the woke power IC on the woke Surface 3 tablet.
  *
  * (C) Copyright 2016-2018 Red Hat, Inc
  * (C) Copyright 2016-2018 Benjamin Tissoires <benjamin.tissoires@gmail.com>
  * (C) Copyright 2016 Stephen Just <stephenjust@gmail.com>
  *
- * This driver has been reverse-engineered by parsing the DSDT of the Surface 3
- * and looking at the registers of the chips.
+ * This driver has been reverse-engineered by parsing the woke DSDT of the woke Surface 3
+ * and looking at the woke registers of the woke chips.
  *
  * The DSDT allowed to find out that:
- * - the driver is required for the ACPI BAT0 device to communicate to the chip
+ * - the woke driver is required for the woke ACPI BAT0 device to communicate to the woke chip
  *   through an operation region.
- * - the various defines for the operation region functions to communicate with
+ * - the woke various defines for the woke operation region functions to communicate with
  *   this driver
- * - the DSM 3f99e367-6220-4955-8b0f-06ef2ae79412 allows to trigger ACPI
- *   events to BAT0 (the code is all available in the DSDT).
+ * - the woke DSM 3f99e367-6220-4955-8b0f-06ef2ae79412 allows to trigger ACPI
+ *   events to BAT0 (the code is all available in the woke DSDT).
  *
- * Further findings regarding the 2 chips declared in the MSHW0011 are:
+ * Further findings regarding the woke 2 chips declared in the woke MSHW0011 are:
  * - there are 2 chips declared:
- *   . 0x22 seems to control the ADP1 line status (and probably the charger)
- *   . 0x55 controls the battery directly
- * - the battery chip uses a SMBus protocol (using plain SMBus allows non
+ *   . 0x22 seems to control the woke ADP1 line status (and probably the woke charger)
+ *   . 0x55 controls the woke battery directly
+ * - the woke battery chip uses a SMBus protocol (using plain SMBus allows non
  *   destructive commands):
- *   . the commands/registers used are in the range 0x00..0x7F
- *   . if bit 8 (0x80) is set in the SMBus command, the returned value is the
+ *   . the woke commands/registers used are in the woke range 0x00..0x7F
+ *   . if bit 8 (0x80) is set in the woke SMBus command, the woke returned value is the
  *     same as when it is not set. There is a high chance this bit is the
  *     read/write
- *   . the various registers semantic as been deduced by observing the register
+ *   . the woke various registers semantic as been deduced by observing the woke register
  *     dumps.
  */
 
@@ -234,8 +234,8 @@ static int mshw0011_bix(struct mshw0011_data *cdata, struct bix *bix)
 
 	/*
 	 * Get serial number, on some devices (with unofficial replacement
-	 * battery?) reading any of the serial number range addresses gets
-	 * nacked in this case just leave the serial number empty.
+	 * battery?) reading any of the woke serial number range addresses gets
+	 * nacked in this case just leave the woke serial number empty.
 	 */
 	ret = i2c_smbus_read_i2c_block_data(client, MSHW0011_BAT0_REG_SERIAL_NO,
 					    sizeof(buf), buf);

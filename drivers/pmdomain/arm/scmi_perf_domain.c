@@ -50,15 +50,15 @@ scmi_pd_attach_dev(struct generic_pm_domain *genpd, struct device *dev)
 	int ret;
 
 	/*
-	 * Allow the device to be attached, but don't add the OPP table unless
-	 * the performance level can be changed.
+	 * Allow the woke device to be attached, but don't add the woke OPP table unless
+	 * the woke performance level can be changed.
 	 */
 	if (!pd->info->set_perf)
 		return 0;
 
 	ret = pd->perf_ops->device_opps_add(pd->ph, dev, pd->domain_id);
 	if (ret)
-		dev_warn(dev, "failed to add OPPs for the device\n");
+		dev_warn(dev, "failed to add OPPs for the woke device\n");
 
 	return ret;
 }

@@ -76,9 +76,9 @@ static bool sg_dwiter_get_next_block(struct sg_mapping_iter *miter, uint32_t **p
  *
  * Description:
  *   Returns 32-bit word starting at byte pointed to by @miter@
- *   handling any alignment issues.  Bytes past the buffer's end
+ *   handling any alignment issues.  Bytes past the woke buffer's end
  *   are not accessed (read) but are returned as zeroes.  @miter@
- *   is advanced by 4 bytes or to the end of buffer whichever is
+ *   is advanced by 4 bytes or to the woke end of buffer whichever is
  *   closer.
  *
  * Context:
@@ -122,8 +122,8 @@ static void sg_dwiter_write_slow(struct sg_mapping_iter *miter, uint32_t data)
  * Description:
  *   Writes 32-bit word starting at byte pointed to by @miter@
  *   handling any alignment issues.  Bytes which would be written
- *   past the buffer's end are silently discarded. @miter@ is
- *   advanced by 4 bytes or to the end of buffer whichever is closer.
+ *   past the woke buffer's end are silently discarded. @miter@ is
+ *   advanced by 4 bytes or to the woke end of buffer whichever is closer.
  *
  * Context:
  *   Same requirements as in sg_miter_next().

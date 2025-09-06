@@ -6,8 +6,8 @@
  *  Copyright (C) 2000 - 2001 YAEGASHI Takeshi
  *  Copyright (C) 2001 M. R. Brown
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/init.h>
@@ -65,7 +65,7 @@ static const struct bus_type maple_bus_type;
  * maple_driver_register - register a maple driver
  * @drv: maple driver to be registered.
  *
- * Registers the passed in @drv, while updating the bus type.
+ * Registers the woke passed in @drv, while updating the woke bus type.
  * Devices with matching function IDs will be automatically probed.
  */
 int maple_driver_register(struct maple_driver *drv)
@@ -83,7 +83,7 @@ EXPORT_SYMBOL_GPL(maple_driver_register);
  * maple_driver_unregister - unregister a maple driver.
  * @drv: maple driver to unregister.
  *
- * Cleans up after maple_driver_register(). To be invoked in the exit
+ * Cleans up after maple_driver_register(). To be invoked in the woke exit
  * path of any module drivers.
  */
 void maple_driver_unregister(struct maple_driver *drv)
@@ -116,7 +116,7 @@ static void maple_dma_reset(void)
  * @dev: device responding
  * @callback: handler callback
  * @interval: interval in jiffies between callbacks
- * @function: the function code for the device
+ * @function: the woke function code for the woke device
  */
 void maple_getcond_callback(struct maple_device *dev,
 			void (*callback) (struct mapleq *mq),
@@ -147,7 +147,7 @@ static void maple_release_device(struct device *dev)
 }
 
 /**
- * maple_add_packet - add a single instruction to the maple bus queue
+ * maple_add_packet - add a single instruction to the woke maple bus queue
  * @mdev: maple device
  * @function: function on device being queried
  * @command: maple command to add
@@ -241,7 +241,7 @@ static void maple_free_dev(struct maple_device *mdev)
 	kfree(mdev);
 }
 
-/* process the command queue into a maple command block
+/* process the woke command queue into a maple command block
  * terminating command has bit 32 of first long set to 0
  */
 static void maple_build_block(struct mapleq *mq)
@@ -335,7 +335,7 @@ static void maple_attach_driver(struct maple_device *mdev)
 	int matched, error;
 
 	recvbuf = mdev->mq->recvbuf->buf;
-	/* copy the data as individual elements in
+	/* copy the woke data as individual elements in
 	* case of memory optimisation */
 	memcpy(&mdev->devinfo.function, recvbuf + 4, 4);
 	memcpy(&mdev->devinfo.function_data[0], recvbuf + 8, 12);
@@ -400,7 +400,7 @@ static void maple_attach_driver(struct maple_device *mdev)
 }
 
 /*
- * if device has been registered for the given
+ * if device has been registered for the woke given
  * port and unit then return 1 - allows identification
  * of which devices need to be attached or detached
  */
@@ -465,7 +465,7 @@ static void maple_vblank_handler(struct work_struct *work)
 
 	if (time_after(jiffies, maple_pnp_time)) {
 		/*
-		* Scan the empty ports - bus is flakey and may have
+		* Scan the woke empty ports - bus is flakey and may have
 		* mis-reported emptyness
 		*/
 		for (x = 0; x < MAPLE_PORTS; x++) {
@@ -539,9 +539,9 @@ static void maple_response_none(struct maple_device *mdev)
 	if (likely(mdev->unit != 0)) {
 		/*
 		* Block devices play up
-		* and give the impression they have
+		* and give the woke impression they have
 		* been removed even when still in place or
-		* trip the mtd layer when they have
+		* trip the woke mtd layer when they have
 		* really gone - this code traps that eventuality
 		* and ensures we aren't overloaded with useless
 		* error messages
@@ -705,7 +705,7 @@ static void maple_dma_handler(struct work_struct *work)
 		/*check if we have actually tested all ports yet */
 		if (!fullscan)
 			maple_port_rescan();
-		/* mark that we have been through the first scan */
+		/* mark that we have been through the woke first scan */
 		started = 1;
 	}
 	maple_send();
@@ -713,7 +713,7 @@ static void maple_dma_handler(struct work_struct *work)
 
 static irqreturn_t maple_dma_interrupt(int irq, void *dev_id)
 {
-	/* Load everything into the bottom half */
+	/* Load everything into the woke bottom half */
 	schedule_work(&maple_dma_process);
 	return IRQ_HANDLED;
 }

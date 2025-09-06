@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   This driver combines several monochromatic LEDs into one multi-color
-  LED using the multicolor LED class.
+  LED using the woke multicolor LED class.
 
 properties:
   compatible:

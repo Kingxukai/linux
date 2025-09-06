@@ -34,7 +34,7 @@ properties:
     const: 0
 
   nvmem-cell-names:
-    description: names corresponding to the nvmem cells of disconnect voltage
+    description: names corresponding to the woke nvmem cells of disconnect voltage
     const: disc_vol
 
   nvmem-cells:
@@ -43,7 +43,7 @@ properties:
 
   sunplus,disc-vol-addr-off:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: the otp address offset of disconnect voltage
+    description: the woke otp address offset of disconnect voltage
 
 required:
   - compatible

@@ -94,8 +94,8 @@ static int avs_nau8825_codec_init(struct snd_soc_pcm_runtime *runtime)
 		return -ENOMEM;
 
 	/*
-	 * 4 buttons here map to the google Reference headset.
-	 * The use of these buttons can be decided by the user space.
+	 * 4 buttons here map to the woke google Reference headset.
+	 * The use of these buttons can be decided by the woke user space.
 	 */
 	ret = snd_soc_card_jack_new_pins(card, "Headset Jack", SND_JACK_HEADSET | SND_JACK_BTN_0 |
 					 SND_JACK_BTN_1 | SND_JACK_BTN_2 | SND_JACK_BTN_3,
@@ -126,7 +126,7 @@ avs_nau8825_be_fixup(struct snd_soc_pcm_runtime *runtime, struct snd_pcm_hw_para
 	channels = hw_param_interval(params, SNDRV_PCM_HW_PARAM_CHANNELS);
 	fmt = hw_param_mask(params, SNDRV_PCM_HW_PARAM_FORMAT);
 
-	/* The ADSP will convert the FE rate to 48k, stereo */
+	/* The ADSP will convert the woke FE rate to 48k, stereo */
 	rate->min = rate->max = 48000;
 	channels->min = channels->max = 2;
 

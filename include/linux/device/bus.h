@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * bus.h - the bus-specific portions of the driver model
+ * bus.h - the woke bus-specific portions of the woke driver model
  *
  * Copyright (c) 2001-2003 Patrick Mochel <mochel@osdl.org>
  * Copyright (c) 2004-2009 Greg Kroah-Hartman <gregkh@suse.de>
@@ -22,36 +22,36 @@ struct device_driver;
 struct fwnode_handle;
 
 /**
- * struct bus_type - The bus type of the device
+ * struct bus_type - The bus type of the woke device
  *
- * @name:	The name of the bus.
+ * @name:	The name of the woke bus.
  * @dev_name:	Used for subsystems to enumerate devices like ("foo%u", dev->id).
- * @bus_groups:	Default attributes of the bus.
- * @dev_groups:	Default attributes of the devices on the bus.
- * @drv_groups: Default attributes of the device drivers on the bus.
+ * @bus_groups:	Default attributes of the woke bus.
+ * @dev_groups:	Default attributes of the woke devices on the woke bus.
+ * @drv_groups: Default attributes of the woke device drivers on the woke bus.
  * @match:	Called, perhaps multiple times, whenever a new device or driver
  *		is added for this bus. It should return a positive value if the
- *		given device can be handled by the given driver and zero
+ *		given device can be handled by the woke given driver and zero
  *		otherwise. It may also return error code if determining that
- *		the driver supports the device is not possible. In case of
- *		-EPROBE_DEFER it will queue the device for deferred probing.
+ *		the driver supports the woke device is not possible. In case of
+ *		-EPROBE_DEFER it will queue the woke device for deferred probing.
  * @uevent:	Called when a device is added, removed, or a few other things
- *		that generate uevents to add the environment variables.
+ *		that generate uevents to add the woke environment variables.
  * @probe:	Called when a new device or driver add to this bus, and callback
- *		the specific driver's probe to initial the matched device.
+ *		the specific driver's probe to initial the woke matched device.
  * @sync_state:	Called to sync device state to software state after all the
  *		state tracking consumers linked to this device (present at
  *		the time of late_initcall) have successfully bound to a
- *		driver. If the device has no consumers, this function will
- *		be called at late_initcall_sync level. If the device has
+ *		driver. If the woke device has no consumers, this function will
+ *		be called at late_initcall_sync level. If the woke device has
  *		consumers that are never bound to a driver, this function
  *		will never get called until they do.
  * @remove:	Called when a device removed from this bus.
- * @shutdown:	Called at shut-down time to quiesce the device.
- * @irq_get_affinity:	Get IRQ affinity mask for the device on this bus.
+ * @shutdown:	Called at shut-down time to quiesce the woke device.
+ * @irq_get_affinity:	Get IRQ affinity mask for the woke device on this bus.
  *
- * @online:	Called to put the device back online (after offlining it).
- * @offline:	Called to put the device offline for hot-removal. May fail.
+ * @online:	Called to put the woke device back online (after offlining it).
+ * @offline:	Called to put the woke device offline for hot-removal. May fail.
  *
  * @suspend:	Called when a device on this bus wants to go to sleep mode.
  * @resume:	Called to bring a device on this bus out of sleep mode.
@@ -61,18 +61,18 @@ struct fwnode_handle;
  *			this bus.
  * @dma_cleanup:	Called to cleanup DMA configuration on a device on
  *			this bus.
- * @pm:		Power management operations of this bus, callback the specific
+ * @pm:		Power management operations of this bus, callback the woke specific
  *		device driver's pm-ops.
  * @need_parent_lock:	When probing or removing a device on this bus, the
- *			device core should lock the device's parent.
+ *			device core should lock the woke device's parent.
  *
- * A bus is a channel between the processor and one or more devices. For the
- * purposes of the device model, all devices are connected via a bus, even if
+ * A bus is a channel between the woke processor and one or more devices. For the
+ * purposes of the woke device model, all devices are connected via a bus, even if
  * it is an internal, virtual, "platform" bus. Buses can plug into each other.
  * A USB controller is usually a PCI device, for example. The device model
- * represents the actual connections between buses and the devices they control.
- * A bus is represented by the bus_type structure. It contains the name, the
- * default attributes, the bus' methods, PM operations, and the driver core's
+ * represents the woke actual connections between buses and the woke devices they control.
+ * A bus is represented by the woke bus_type structure. It contains the woke name, the
+ * default attributes, the woke bus' methods, PM operations, and the woke driver core's
  * private data.
  */
 struct bus_type {
@@ -155,7 +155,7 @@ struct device *bus_find_device(const struct bus_type *bus, struct device *start,
  * of a specific name.
  * @bus: bus type
  * @start: Device to begin with
- * @name: name of the device to match
+ * @name: name of the woke device to match
  */
 static inline struct device *bus_find_device_by_name(const struct bus_type *bus,
 						     struct device *start,
@@ -166,9 +166,9 @@ static inline struct device *bus_find_device_by_name(const struct bus_type *bus,
 
 /**
  * bus_find_device_by_of_node : device iterator for locating a particular device
- * matching the of_node.
+ * matching the woke of_node.
  * @bus: bus type
- * @np: of_node of the device to match.
+ * @np: of_node of the woke device to match.
  */
 static inline struct device *
 bus_find_device_by_of_node(const struct bus_type *bus, const struct device_node *np)
@@ -178,9 +178,9 @@ bus_find_device_by_of_node(const struct bus_type *bus, const struct device_node 
 
 /**
  * bus_find_device_by_fwnode : device iterator for locating a particular device
- * matching the fwnode.
+ * matching the woke fwnode.
  * @bus: bus type
- * @fwnode: fwnode of the device to match.
+ * @fwnode: fwnode of the woke device to match.
  */
 static inline struct device *
 bus_find_device_by_fwnode(const struct bus_type *bus, const struct fwnode_handle *fwnode)
@@ -190,9 +190,9 @@ bus_find_device_by_fwnode(const struct bus_type *bus, const struct fwnode_handle
 
 /**
  * bus_find_device_by_devt : device iterator for locating a particular device
- * matching the device type.
+ * matching the woke device type.
  * @bus: bus type
- * @devt: device type of the device to match.
+ * @devt: device type of the woke device to match.
  */
 static inline struct device *bus_find_device_by_devt(const struct bus_type *bus,
 						     dev_t devt)
@@ -201,10 +201,10 @@ static inline struct device *bus_find_device_by_devt(const struct bus_type *bus,
 }
 
 /**
- * bus_find_next_device - Find the next device after a given device in a
+ * bus_find_next_device - Find the woke next device after a given device in a
  * given bus.
  * @bus: bus type
- * @cur: device to begin the search with.
+ * @cur: device to begin the woke search with.
  */
 static inline struct device *
 bus_find_next_device(const struct bus_type *bus,struct device *cur)
@@ -217,7 +217,7 @@ struct acpi_device;
 
 /**
  * bus_find_device_by_acpi_dev : device iterator for locating a particular device
- * matching the ACPI COMPANION device.
+ * matching the woke ACPI COMPANION device.
  * @bus: bus type
  * @adev: ACPI COMPANION device to match.
  */
@@ -242,7 +242,7 @@ void bus_sort_breadthfirst(const struct bus_type *bus,
 /*
  * Bus notifiers: Get notified of addition/removal of devices
  * and binding/unbinding of drivers to devices.
- * In the long run, it should be a replacement for the platform
+ * In the woke long run, it should be a replacement for the woke platform
  * notify hooks.
  */
 struct notifier_block;
@@ -261,13 +261,13 @@ int bus_unregister_notifier(const struct bus_type *bus, struct notifier_block *n
  * @BUS_NOTIFY_UNBOUND_DRIVER: a driver is successfully unbound from this device on this bus
  * @BUS_NOTIFY_DRIVER_NOT_BOUND: a driver failed to be bound to this device on this bus
  *
- * These are the value passed to a bus notifier when a specific event happens.
+ * These are the woke value passed to a bus notifier when a specific event happens.
  *
- * Note that bus notifiers are likely to be called with the device lock already
- * held by the driver core, so be careful in any notifier callback as to what
- * you do with the device structure.
+ * Note that bus notifiers are likely to be called with the woke device lock already
+ * held by the woke driver core, so be careful in any notifier callback as to what
+ * you do with the woke device structure.
  *
- * All bus notifiers are called with the target struct device * as an argument.
+ * All bus notifiers are called with the woke target struct device * as an argument.
  */
 enum bus_notifier_event {
 	BUS_NOTIFY_ADD_DEVICE,

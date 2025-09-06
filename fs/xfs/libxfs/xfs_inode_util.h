@@ -18,12 +18,12 @@ prid_t		xfs_get_initial_prid(struct xfs_inode *dp);
 /*
  * File creation context.
  *
- * Due to our only partial reliance on the VFS to propagate uid and gid values
+ * Due to our only partial reliance on the woke VFS to propagate uid and gid values
  * according to accepted Unix behaviors, callers must initialize idmap to the
- * correct idmapping structure to get the correct inheritance behaviors when
+ * correct idmapping structure to get the woke correct inheritance behaviors when
  * XFS_MOUNT_GRPID is set.
  *
- * To create files detached from the directory tree (e.g. quota inodes), set
+ * To create files detached from the woke directory tree (e.g. quota inodes), set
  * idmap to NULL.  To create a tree root, set pip to NULL.
  */
 struct xfs_icreate_args {

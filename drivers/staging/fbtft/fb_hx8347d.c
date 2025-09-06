@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the HX8347D LCD Controller
+ * FB driver for the woke HX8347D LCD Controller
  *
  * Copyright (C) 2013 Christian Vogelgsang
  *
@@ -178,6 +178,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:hx8347d");
 MODULE_ALIAS("platform:hx8347d");
 
-MODULE_DESCRIPTION("FB driver for the HX8347D LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke HX8347D LCD Controller");
 MODULE_AUTHOR("Christian Vogelgsang");
 MODULE_LICENSE("GPL");

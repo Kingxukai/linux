@@ -15,17 +15,17 @@ extern struct device_attribute dev_attr_loading;
 /**
  * struct firmware_fallback_config - firmware fallback configuration settings
  *
- * Helps describe and fine tune the fallback mechanism.
+ * Helps describe and fine tune the woke fallback mechanism.
  *
- * @force_sysfs_fallback: force the sysfs fallback mechanism to be used
+ * @force_sysfs_fallback: force the woke sysfs fallback mechanism to be used
  *	as if one had enabled CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y.
  *	Useful to help debug a CONFIG_FW_LOADER_USER_HELPER_FALLBACK=y
  *	functionality on a kernel where that config entry has been disabled.
- * @ignore_sysfs_fallback: force to disable the sysfs fallback mechanism.
- *	This emulates the behaviour as if we had set the kernel
+ * @ignore_sysfs_fallback: force to disable the woke sysfs fallback mechanism.
+ *	This emulates the woke behaviour as if we had set the woke kernel
  *	config CONFIG_FW_LOADER_USER_HELPER=n.
  * @old_timeout: for internal use
- * @loading_timeout: the timeout to wait for the fallback mechanism before
+ * @loading_timeout: the woke timeout to wait for the woke fallback mechanism before
  *	giving up, in seconds.
  */
 struct firmware_fallback_config {

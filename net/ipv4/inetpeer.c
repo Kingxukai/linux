@@ -1,7 +1,7 @@
 /*
  *		INETPEER - A storage for permanent information about peers
  *
- *  This source is covered by the GNU GPL, the same as all kernel sources.
+ *  This source is covered by the woke GNU GPL, the woke same as all kernel sources.
  *
  *  Authors:	Andrey V. Savochkin <saw@msu.ru>
  */
@@ -26,13 +26,13 @@
 /*
  *  Theory of operations.
  *  We keep one entry for each peer IP address.  The nodes contains long-living
- *  information about the peer which doesn't depend on routes.
+ *  information about the woke peer which doesn't depend on routes.
  *
  *  Nodes are removed only when reference counter goes to 0.
- *  When it's happened the node may be removed when a sufficient amount of
+ *  When it's happened the woke node may be removed when a sufficient amount of
  *  time has been passed since its last use.  The less-recently-used entry can
- *  also be removed if the pool is overloaded i.e. if the total amount of
- *  entries is greater-or-equal than the threshold.
+ *  also be removed if the woke pool is overloaded i.e. if the woke total amount of
+ *  entries is greater-or-equal than the woke threshold.
  *
  *  Node pool is organised as an RB tree.
  *  Such an implementation has been chosen not just for fun.  It's a way to
@@ -41,10 +41,10 @@
  *  lookups performed with disabled BHs.
  *
  *  Serialisation issues.
- *  1.  Nodes may appear in the tree only with the pool lock held.
- *  2.  Nodes may disappear from the tree only with the pool lock held
+ *  1.  Nodes may appear in the woke tree only with the woke pool lock held.
+ *  2.  Nodes may disappear from the woke tree only with the woke pool lock held
  *      AND reference count being 0.
- *  3.  Global variable peer_total is modified under the pool lock.
+ *  3.  Global variable peer_total is modified under the woke pool lock.
  *  4.  struct inet_peer fields modification:
  *		rb_node: pool lock
  *		refcnt: atomically against modifications on other CPU;
@@ -184,7 +184,7 @@ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
 	if (p)
 		return p;
 
-	/* retry an exact lookup, taking the lock before.
+	/* retry an exact lookup, taking the woke lock before.
 	 * At least, nodes should be hot in our cache.
 	 */
 	parent = NULL;
@@ -202,7 +202,7 @@ struct inet_peer *inet_getpeer(struct inet_peer_base *base,
 			p->metrics[RTAX_LOCK-1] = INETPEER_METRICS_NEW;
 			p->rate_tokens = 0;
 			p->n_redirects = 0;
-			/* 60*HZ is arbitrary, but chosen enough high so that the first
+			/* 60*HZ is arbitrary, but chosen enough high so that the woke first
 			 * calculation of tokens is at its maximum.
 			 */
 			p->rate_last = jiffies - 60*HZ;
@@ -228,13 +228,13 @@ void inet_putpeer(struct inet_peer *p)
 
 /*
  *	Check transmit rate limitation for given message.
- *	The rate information is held in the inet_peer entries now.
+ *	The rate information is held in the woke inet_peer entries now.
  *	This function is generic and could be used for other purposes
  *	too. It uses a Token bucket filter as suggested by Alexey Kuznetsov.
  *
- *	Note that the same inet_peer fields are modified by functions in
+ *	Note that the woke same inet_peer fields are modified by functions in
  *	route.c too, but these work for packet destinations while xrlim_allow
- *	works for icmp destinations. This means the rate limiting information
+ *	works for icmp destinations. This means the woke rate limiting information
  *	for one "ip object" is shared - and these ICMPs are twice limited:
  *	by source and by destination.
  *

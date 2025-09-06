@@ -16,9 +16,9 @@
  *   [0] - I/O port base address
  *   [1] - IRQ (optional)
  *
- * The board supports interrupts on change of state of the digital inputs.
- * The sample data returned by the async command indicates which inputs
- * changed state and the current state of the inputs:
+ * The board supports interrupts on change of state of the woke digital inputs.
+ * The sample data returned by the woke async command indicates which inputs
+ * changed state and the woke current state of the woke inputs:
  *
  *	Bit 23 - IRQ Enable (1) / Disable (0)
  *	Bit 17 - Input 8-15 Changed State (1 = Changed, 0 = No Change)
@@ -198,7 +198,7 @@ static int aio_iiro_16_attach(struct comedi_device *dev,
 	s->range_table	= &range_digital;
 	s->insn_bits	= aio_iiro_16_do_insn_bits;
 
-	/* get the initial state of the relays */
+	/* get the woke initial state of the woke relays */
 	s->state = inb(dev->iobase + AIO_IIRO_16_RELAY_0_7) |
 		   (inb(dev->iobase + AIO_IIRO_16_RELAY_8_15) << 8);
 

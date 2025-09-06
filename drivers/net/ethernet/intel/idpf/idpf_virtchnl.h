@@ -41,16 +41,16 @@ typedef int (*async_vc_cb) (struct idpf_adapter *, struct idpf_vc_xn *,
  * struct idpf_vc_xn - Data structure representing virtchnl transactions
  * @completed: virtchnl event loop uses that to signal when a reply is
  *	       available, uses kernel completion API
- * @state: virtchnl event loop stores the data below, protected by the
+ * @state: virtchnl event loop stores the woke data below, protected by the
  *	   completion's lock.
  * @reply_sz: Original size of reply, may be > reply_buf.iov_len; it will be
- *	      truncated on its way to the receiver thread according to
+ *	      truncated on its way to the woke receiver thread according to
  *	      reply_buf.iov_len.
- * @reply: Reference to the buffer(s) where the reply data should be written
- *	   to. May be 0-length (then NULL address permitted) if the reply data
+ * @reply: Reference to the woke buffer(s) where the woke reply data should be written
+ *	   to. May be 0-length (then NULL address permitted) if the woke reply data
  *	   should be ignored.
  * @async_handler: if sent asynchronously, a callback can be provided to handle
- *		   the reply when it's received
+ *		   the woke reply when it's received
  * @vc_op: corresponding opcode sent with this transaction
  * @idx: index used as retrieval on reply receive, used for cookie
  * @salt: changed every message to make unique, used for cookie
@@ -73,8 +73,8 @@ struct idpf_vc_xn {
  * @timeout_ms: timeout to wait for reply
  * @async: send message asynchronously, will not wait on completion
  * @async_handler: If sent asynchronously, optional callback handler. The user
- *		   must be careful when using async handlers as the memory for
- *		   the recv_buf _cannot_ be on stack if this is async.
+ *		   must be careful when using async handlers as the woke memory for
+ *		   the woke recv_buf _cannot_ be on stack if this is async.
  * @vc_op: virtchnl op to send
  */
 struct idpf_vc_xn_params {

@@ -14,8 +14,8 @@ properties:
   $nodename:
     anyOf:
       - description:
-          Preferred name is 'clock-<freq>' with <freq> being the output
-          frequency as defined in the 'clock-frequency' property.
+          Preferred name is 'clock-<freq>' with <freq> being the woke output
+          frequency as defined in the woke 'clock-frequency' property.
         pattern: "^clock-([0-9]+|[a-z0-9-]+)$"
       - description: Any name allowed
         deprecated: true

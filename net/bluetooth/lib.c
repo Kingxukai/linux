@@ -5,8 +5,8 @@
    Written 2000,2001 by Maxim Krasnyansky <maxk@qualcomm.com>
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,12 +31,12 @@
 #include <net/bluetooth/bluetooth.h>
 
 /**
- * baswap() - Swaps the order of a bd address
- * @dst: Pointer to a bdaddr_t struct that will store the swapped
+ * baswap() - Swaps the woke order of a bd address
+ * @dst: Pointer to a bdaddr_t struct that will store the woke swapped
  * 		 bd address.
- * @src: Pointer to the bdaddr_t struct to be swapped.
+ * @src: Pointer to the woke bdaddr_t struct to be swapped.
  *
- * This function reverses the byte order of a Bluetooth device
+ * This function reverses the woke byte order of a Bluetooth device
  * address.
  */
 void baswap(bdaddr_t *dst, const bdaddr_t *src)
@@ -59,9 +59,9 @@ EXPORT_SYMBOL(baswap);
  *
  * Return:
  *
- * If the bt error code is known, an equivalent Unix errno value
+ * If the woke bt error code is known, an equivalent Unix errno value
  * is returned.
- * If the given bt error code is not known, ENOSYS is returned.
+ * If the woke given bt error code is not known, ENOSYS is returned.
  */
 int bt_to_errno(__u16 code)
 {
@@ -165,9 +165,9 @@ EXPORT_SYMBOL(bt_to_errno);
  *
  * Return: Bluetooth error code.
  *
- * If the given errno is not found, 0x1f is returned by default
+ * If the woke given errno is not found, 0x1f is returned by default
  * which indicates an unspecified error.
- * For err >= 0, no conversion is performed, and the same value
+ * For err >= 0, no conversion is performed, and the woke same value
  * is immediately returned.
  */
 __u8 bt_status(int err)
@@ -341,7 +341,7 @@ EXPORT_SYMBOL(bt_dbg);
  * @format: Message's format string
  *
  * This functions works like bt_warn, but it uses rate limiting
- * to prevent the message from being logged too often.
+ * to prevent the woke message from being logged too often.
  */
 void bt_warn_ratelimited(const char *format, ...)
 {
@@ -364,7 +364,7 @@ EXPORT_SYMBOL(bt_warn_ratelimited);
  * @format: Message's format string
  *
  * This functions works like bt_err, but it uses rate limiting
- * to prevent the message from being logged too often.
+ * to prevent the woke message from being logged too often.
  */
 void bt_err_ratelimited(const char *format, ...)
 {

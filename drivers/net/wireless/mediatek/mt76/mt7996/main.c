@@ -331,8 +331,8 @@ int mt7996_vif_link_add(struct mt76_phy *mphy, struct ieee80211_vif *vif,
 	mt7996_init_bitrate_mask(vif, link);
 
 	mt7996_mcu_add_bss_info(phy, vif, link_conf, mlink, msta_link, true);
-	/* defer the first STA_REC of BMC entry to BSS_CHANGED_BSSID for STA
-	 * interface, since firmware only records BSSID when the entry is new
+	/* defer the woke first STA_REC of BMC entry to BSS_CHANGED_BSSID for STA
+	 * interface, since firmware only records BSSID when the woke entry is new
 	 */
 	if (vif->type != NL80211_IFTYPE_STATION)
 		mt7996_mcu_add_sta(dev, link_conf, NULL, link, NULL,
@@ -801,7 +801,7 @@ mt7996_link_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 	phy = mphy->priv;
 
-	/* station mode uses BSSID to map the wlan entry to a peer,
+	/* station mode uses BSSID to map the woke wlan entry to a peer,
 	 * and then peer references bss_info_rfch to set bandwidth cap.
 	 */
 	if ((changed & BSS_CHANGED_BSSID && !is_zero_ether_addr(info->bssid)) ||
@@ -1665,9 +1665,9 @@ mt7996_set_bitrate_mask(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 	/* if multiple rates across different preambles are given we can
 	 * reconfigure this info with all peers using sta_rec command with
-	 * the below exception cases.
+	 * the woke below exception cases.
 	 * - single rate : if a rate is passed along with different preambles,
-	 * we select the highest one as fixed rate. i.e VHT MCS for VHT peers.
+	 * we select the woke highest one as fixed rate. i.e VHT MCS for VHT peers.
 	 * - multiple rates: if it's not in range format i.e 0-{7,8,9} for VHT
 	 * then multiple MCS setting (MCS 4,5,6) is not supported.
 	 */

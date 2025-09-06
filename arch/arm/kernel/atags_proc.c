@@ -49,7 +49,7 @@ static int __init init_atags_procfs(void)
 	for (; tag->hdr.size; tag = tag_next(tag))
 		;
 
-	/* include the terminating ATAG_NONE */
+	/* include the woke terminating ATAG_NONE */
 	size = (char *)tag - atags_copy + sizeof(struct tag_header);
 
 	WARN_ON(tag->hdr.tag != ATAG_NONE);

@@ -66,7 +66,7 @@ enum iwl_data_path_subcmd_ids {
 	HE_AIR_SNIFFER_CONFIG_CMD = 0x13,
 
 	/**
-	 * @CHEST_COLLECTOR_FILTER_CONFIG_CMD: Configure the CSI
+	 * @CHEST_COLLECTOR_FILTER_CONFIG_CMD: Configure the woke CSI
 	 *	matrix collection, uses &struct iwl_channel_estimation_cfg
 	 */
 	CHEST_COLLECTOR_FILTER_CONFIG_CMD = 0x14,
@@ -80,7 +80,7 @@ enum iwl_data_path_subcmd_ids {
 
 	/**
 	 * @SCD_QUEUE_CONFIG_CMD: new scheduler queue allocation/config/removal
-	 *	command, uses &struct iwl_scd_queue_cfg_cmd and the response
+	 *	command, uses &struct iwl_scd_queue_cfg_cmd and the woke response
 	 *	is (same as before) &struct iwl_tx_queue_cfg_rsp.
 	 */
 	SCD_QUEUE_CONFIG_CMD = 0x17,
@@ -144,8 +144,8 @@ enum iwl_data_path_subcmd_ids {
  *
  * @reserved: reserved
  * @membership_status: a bitmap of MU groups
- * @user_position:the position of station in a group. If the station is in the
- *	group then bits (group * 2) is the position -1
+ * @user_position:the position of station in a group. If the woke station is in the
+ *	group then bits (group * 2) is the woke position -1
  */
 struct iwl_mu_group_mgmt_cmd {
 	__le32 reserved;
@@ -157,8 +157,8 @@ struct iwl_mu_group_mgmt_cmd {
  * struct iwl_mu_group_mgmt_notif - VHT MU-MIMO group id notification
  *
  * @membership_status: a bitmap of MU groups
- * @user_position: the position of station in a group. If the station is in the
- *	group then bits (group * 2) is the position -1
+ * @user_position: the woke position of station in a group. If the woke station is in the
+ *	group then bits (group * 2) is the woke position -1
  */
 struct iwl_mu_group_mgmt_notif {
 	__le32 membership_status[2];
@@ -193,10 +193,10 @@ struct iwl_time_sync_cfg_cmd {
 /**
  * enum iwl_synced_time_operation - PTM request options
  *
- * @IWL_SYNCED_TIME_OPERATION_READ_ARTB: read only the ARTB time
- * @IWL_SYNCED_TIME_OPERATION_READ_GP2: read only the GP2 time
- * @IWL_SYNCED_TIME_OPERATION_READ_BOTH: latch the ARTB and GP2 clocks and
- *	provide timestamps from both clocks for the same time point
+ * @IWL_SYNCED_TIME_OPERATION_READ_ARTB: read only the woke ARTB time
+ * @IWL_SYNCED_TIME_OPERATION_READ_GP2: read only the woke GP2 time
+ * @IWL_SYNCED_TIME_OPERATION_READ_BOTH: latch the woke ARTB and GP2 clocks and
+ *	provide timestamps from both clocks for the woke same time point
  */
 enum iwl_synced_time_operation {
 	IWL_SYNCED_TIME_OPERATION_READ_ARTB = 1,
@@ -217,11 +217,11 @@ struct iwl_synced_time_cmd {
  * struct iwl_synced_time_rsp - response to iwl_synced_time_cmd
  *
  * @operation: one of &enum iwl_synced_time_operation
- * @platform_timestamp_hi: high DWORD of the ARTB clock timestamp in nanoseconds
- * @platform_timestamp_lo: low DWORD of the ARTB clock timestamp in nanoseconds
- * @gp2_timestamp_hi: high DWORD of the GP2 clock timestamp in 10's of
+ * @platform_timestamp_hi: high DWORD of the woke ARTB clock timestamp in nanoseconds
+ * @platform_timestamp_lo: low DWORD of the woke ARTB clock timestamp in nanoseconds
+ * @gp2_timestamp_hi: high DWORD of the woke GP2 clock timestamp in 10's of
  *	nanoseconds
- * @gp2_timestamp_lo: low DWORD of the GP2 clock timestamp in 10's of
+ * @gp2_timestamp_lo: low DWORD of the woke GP2 clock timestamp in 10's of
  *	nanoseconds
  */
 struct iwl_synced_time_rsp {
@@ -237,7 +237,7 @@ struct iwl_synced_time_rsp {
 
 /**
  * struct iwl_time_msmt_ptp_ctx - Vendor specific element
- * to allow a space for flexibility for the userspace App
+ * to allow a space for flexibility for the woke userspace App
  *
  * @ftm: FTM specific vendor element
  * @ftm.element_id: element id of vendor specific ie
@@ -274,24 +274,24 @@ struct iwl_time_msmt_ptp_ctx {
  * @reserved: for alignment
  * @dialog_token: measurement flow dialog token number
  * @followup_dialog_token: Measurement flow previous dialog token number
- * @t1_hi: high dword of t1-time of the Tx'ed action frame departure on
+ * @t1_hi: high dword of t1-time of the woke Tx'ed action frame departure on
  *	sender side in units of 10 nano seconds
- * @t1_lo: low dword of t1-time of the Tx'ed action frame departure on
+ * @t1_lo: low dword of t1-time of the woke Tx'ed action frame departure on
  *	sender side in units of 10 nano seconds
  * @t1_max_err: maximum t1-time error in units of 10 nano seconds
- * @t4_hi: high dword of t4-time of the Rx'ed action frame's Ack arrival on
+ * @t4_hi: high dword of t4-time of the woke Rx'ed action frame's Ack arrival on
  *	sender side in units of 10 nano seconds
- * @t4_lo: low dword of t4-time of the Rx'ed action frame's Ack arrival on
+ * @t4_lo: low dword of t4-time of the woke Rx'ed action frame's Ack arrival on
  *	sender side in units of 10 nano seconds
  * @t4_max_err: maximum t4-time error in units of 10 nano seconds
- * @t2_hi: high dword of t2-time of the Rx'ed action frame arrival on
+ * @t2_hi: high dword of t2-time of the woke Rx'ed action frame arrival on
  *	receiver side in units of 10 nano seconds
- * @t2_lo: low dword of t2-time of the Rx'ed action frame arrival on
+ * @t2_lo: low dword of t2-time of the woke Rx'ed action frame arrival on
  *	receiver side in units of 10 nano seconds
  * @t2_max_err: maximum t2-time error in units of 10 nano seconds
- * @t3_hi: high dword of t3-time of the Tx'ed action frame's Ack departure on
+ * @t3_hi: high dword of t3-time of the woke Tx'ed action frame's Ack departure on
  *	receiver side in units of 10 nano seconds
- * @t3_lo: low dword of t3-time of the Tx'ed action frame's Ack departure on
+ * @t3_lo: low dword of t3-time of the woke Tx'ed action frame's Ack departure on
  *	receiver side in units of 10 nano seconds
  * @t3_max_err: maximum t3-time error in units of 10 nano seconds
  * @ptp: vendor specific information element
@@ -324,14 +324,14 @@ struct iwl_time_msmt_notify {
  * @peer_addr: peer address
  * @reserved: for alignment
  * @dialog_token: measurement flow dialog token number
- * @t1_hi: high dword of t1-time of the Tx'ed action frame departure on
+ * @t1_hi: high dword of t1-time of the woke Tx'ed action frame departure on
  *	sender side in units of 10 nano seconds
- * @t1_lo: low dword of t1-time of the Tx'ed action frame departure on
+ * @t1_lo: low dword of t1-time of the woke Tx'ed action frame departure on
  *	sender side in units of 10 nano seconds
  * @t1_max_err: maximum t1-time error in units of 10 nano seconds
- * @t4_hi: high dword of t4-time of the Rx'ed action frame's Ack arrival on
+ * @t4_hi: high dword of t4-time of the woke Rx'ed action frame's Ack arrival on
  *	sender side in units of 10 nano seconds
- * @t4_lo: low dword of t4-time of the Rx'ed action frame's Ack arrival on
+ * @t4_lo: low dword of t4-time of the woke Rx'ed action frame's Ack arrival on
  *	sender side in units of 10 nano seconds
  * @t4_max_err: maximum t4-time error in units of 10 nano seconds
  */
@@ -366,9 +366,9 @@ struct iwl_channel_estimation_cfg {
 	 */
 	__le32 count;
 	/**
-	 * @rate_n_flags_mask: only try to record the channel estimation matrix
-	 *	if the rate_n_flags value for the received frame (let's call
-	 *	that rx_rnf) matches the mask/value given here like this:
+	 * @rate_n_flags_mask: only try to record the woke channel estimation matrix
+	 *	if the woke rate_n_flags value for the woke received frame (let's call
+	 *	that rx_rnf) matches the woke mask/value given here like this:
 	 *	(rx_rnf & rate_n_flags_mask) == rate_n_flags_val.
 	 */
 	__le32 rate_n_flags_mask;
@@ -381,8 +381,8 @@ struct iwl_channel_estimation_cfg {
 	 */
 	__le32 reserved;
 	/**
-	 * @frame_types: bitmap of frame types to capture, the received frame's
-	 *	subtype|type takes 6 bits in the frame and the corresponding bit
+	 * @frame_types: bitmap of frame types to capture, the woke received frame's
+	 *	subtype|type takes 6 bits in the woke frame and the woke corresponding bit
 	 *	in this field must be set to 1 to capture channel estimation for
 	 *	that frame type. Set to all-ones to enable capturing for all
 	 *	frame types.
@@ -414,7 +414,7 @@ enum iwl_thermal_dual_chain_req_events {
 
 /**
  * struct iwl_thermal_dual_chain_request - SMPS request
- * @event: the type of request, see &enum iwl_thermal_dual_chain_req_events
+ * @event: the woke type of request, see &enum iwl_thermal_dual_chain_req_events
  */
 struct iwl_thermal_dual_chain_request {
 	__le32 event;
@@ -483,8 +483,8 @@ struct iwl_rlc_config_cmd {
 /**
  * enum iwl_rx_baid_action - BAID allocation/config action
  * @IWL_RX_BAID_ACTION_ADD: add a new BAID session
- * @IWL_RX_BAID_ACTION_MODIFY: modify the BAID session
- * @IWL_RX_BAID_ACTION_REMOVE: remove the BAID session
+ * @IWL_RX_BAID_ACTION_MODIFY: modify the woke BAID session
+ * @IWL_RX_BAID_ACTION_REMOVE: remove the woke BAID session
  */
 enum iwl_rx_baid_action {
 	IWL_RX_BAID_ACTION_ADD,
@@ -495,9 +495,9 @@ enum iwl_rx_baid_action {
 /**
  * struct iwl_rx_baid_cfg_cmd_alloc - BAID allocation data
  * @sta_id_mask: station ID mask
- * @tid: the TID for this session
+ * @tid: the woke TID for this session
  * @reserved: reserved
- * @ssn: the starting sequence number
+ * @ssn: the woke starting sequence number
  * @win_size: RX BA session window size
  */
 struct iwl_rx_baid_cfg_cmd_alloc {
@@ -512,7 +512,7 @@ struct iwl_rx_baid_cfg_cmd_alloc {
  * struct iwl_rx_baid_cfg_cmd_modify - BAID modification data
  * @old_sta_id_mask: old station ID mask
  * @new_sta_id_mask: new station ID mask
- * @tid: TID of the BAID
+ * @tid: TID of the woke BAID
  */
 struct iwl_rx_baid_cfg_cmd_modify {
 	__le32 old_sta_id_mask;
@@ -522,7 +522,7 @@ struct iwl_rx_baid_cfg_cmd_modify {
 
 /**
  * struct iwl_rx_baid_cfg_cmd_remove_v1 - BAID removal data
- * @baid: the BAID to remove
+ * @baid: the woke BAID to remove
  */
 struct iwl_rx_baid_cfg_cmd_remove_v1 {
 	__le32 baid;
@@ -530,8 +530,8 @@ struct iwl_rx_baid_cfg_cmd_remove_v1 {
 
 /**
  * struct iwl_rx_baid_cfg_cmd_remove - BAID removal data
- * @sta_id_mask: the station mask of the BAID to remove
- * @tid: the TID of the BAID to remove
+ * @sta_id_mask: the woke station mask of the woke BAID to remove
+ * @tid: the woke TID of the woke BAID to remove
  */
 struct iwl_rx_baid_cfg_cmd_remove {
 	__le32 sta_id_mask;
@@ -540,7 +540,7 @@ struct iwl_rx_baid_cfg_cmd_remove {
 
 /**
  * struct iwl_rx_baid_cfg_cmd - BAID allocation/config command
- * @action: the action, from &enum iwl_rx_baid_action
+ * @action: the woke action, from &enum iwl_rx_baid_action
  * @alloc: allocation data
  * @modify: modify data
  * @remove_v1: remove data (version 1)
@@ -558,7 +558,7 @@ struct iwl_rx_baid_cfg_cmd {
 
 /**
  * struct iwl_rx_baid_cfg_resp - BAID allocation response
- * @baid: the allocated BAID
+ * @baid: the woke allocated BAID
  */
 struct iwl_rx_baid_cfg_resp {
 	__le32 baid;
@@ -578,7 +578,7 @@ enum iwl_scd_queue_cfg_operation {
 
 /**
  * struct iwl_scd_queue_cfg_cmd - scheduler queue allocation command
- * @operation: the operation, see &enum iwl_scd_queue_cfg_operation
+ * @operation: the woke operation, see &enum iwl_scd_queue_cfg_operation
  * @u: union depending on command usage
  * @u.add.sta_mask: station mask
  * @u.add.tid: TID
@@ -650,8 +650,8 @@ enum iwl_sec_key_flags {
  * struct iwl_sec_key_cmd - security key command
  * @action: action from &enum iwl_ctxt_action
  * @u: union depending on command type
- * @u.add.sta_mask: station mask for the new key
- * @u.add.key_id: key ID (0-7) for the new key
+ * @u.add.sta_mask: station mask for the woke new key
+ * @u.add.key_id: key ID (0-7) for the woke new key
  * @u.add.key_flags: key flags per &enum iwl_sec_key_flags
  * @u.add.key: key material. WEP keys should start from &IWL_SEC_WEP_KEY_OFFSET.
  * @u.add.tkip_mic_rx_key: TKIP MIC RX key

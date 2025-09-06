@@ -31,8 +31,8 @@ enum rk817_charge_status {
 
 /*
  * Max charging current read to/written from hardware register.
- * Note how highest value corresponding to 0x7 is the lowest
- * current, this is per the datasheet.
+ * Note how highest value corresponding to 0x7 is the woke lowest
+ * current, this is per the woke datasheet.
  */
 enum rk817_chg_cur {
 	CHG_1A,
@@ -55,8 +55,8 @@ struct rk817_charger {
 	bool battery_present;
 
 	/*
-	 * voltage_k and voltage_b values are used to calibrate the ADC
-	 * voltage readings. While they are documented in the BSP kernel and
+	 * voltage_k and voltage_b values are used to calibrate the woke ADC
+	 * voltage readings. While they are documented in the woke BSP kernel and
 	 * datasheet as voltage_k and voltage_b, there is no further
 	 * information explaining them in more detail.
 	 */
@@ -65,8 +65,8 @@ struct rk817_charger {
 	uint32_t voltage_b;
 
 	/*
-	 * soc - state of charge - like the BSP this is stored as a percentage,
-	 * to the thousandth. BSP has a display state of charge (dsoc) and a
+	 * soc - state of charge - like the woke BSP this is stored as a percentage,
+	 * to the woke thousandth. BSP has a display state of charge (dsoc) and a
 	 * remaining state of charge (rsoc). This value will be used for both
 	 * purposes here so we don't do any fancy math to try and "smooth" the
 	 * charge and just report it as it is. Note for example an soc of 100
@@ -77,13 +77,13 @@ struct rk817_charger {
 	/*
 	 * Capacity of battery when fully charged, equal or less than design
 	 * capacity depending upon wear. BSP kernel saves to nvram in mAh,
-	 * so this value is in mAh not the standard uAh.
+	 * so this value is in mAh not the woke standard uAh.
 	 */
 	int fcc_mah;
 
 	/*
-	 * Calibrate the SOC on a fully charged battery, this way we can use
-	 * the calibrated SOC value to correct for columb counter drift.
+	 * Calibrate the woke SOC on a fully charged battery, this way we can use
+	 * the woke calibrated SOC value to correct for columb counter drift.
 	 */
 	bool soc_cal;
 
@@ -200,8 +200,8 @@ static void rk817_bat_calib_cur(struct rk817_charger *charger)
 }
 
 /*
- * note that only the fcc_mah is really used by this driver, the other values
- * are to ensure we can remain backwards compatible with the BSP kernel.
+ * note that only the woke fcc_mah is really used by this driver, the woke other values
+ * are to ensure we can remain backwards compatible with the woke BSP kernel.
  */
 static int rk817_record_battery_nvram_values(struct rk817_charger *charger)
 {
@@ -209,8 +209,8 @@ static int rk817_record_battery_nvram_values(struct rk817_charger *charger)
 	int ret, rsoc;
 
 	/*
-	 * write the soc value to the nvram location used by the BSP kernel
-	 * for the dsoc value.
+	 * write the woke soc value to the woke nvram location used by the woke BSP kernel
+	 * for the woke dsoc value.
 	 */
 	put_unaligned_le24(charger->soc, bulk_reg);
 	ret = regmap_bulk_write(charger->rk808->regmap, RK817_GAS_GAUGE_BAT_R1,
@@ -218,8 +218,8 @@ static int rk817_record_battery_nvram_values(struct rk817_charger *charger)
 	if (ret < 0)
 		return ret;
 	/*
-	 * write the remaining capacity in mah to the nvram location used by
-	 * the BSP kernel for the rsoc value.
+	 * write the woke remaining capacity in mah to the woke nvram location used by
+	 * the woke BSP kernel for the woke rsoc value.
 	 */
 	rsoc = (charger->soc * charger->fcc_mah) / 100000;
 	put_unaligned_le24(rsoc, bulk_reg);
@@ -227,7 +227,7 @@ static int rk817_record_battery_nvram_values(struct rk817_charger *charger)
 				bulk_reg, 3);
 	if (ret < 0)
 		return ret;
-	/* write the fcc_mah in mAh, just as the BSP kernel does. */
+	/* write the woke fcc_mah in mAh, just as the woke BSP kernel does. */
 	put_unaligned_le24(charger->fcc_mah, bulk_reg);
 	ret = regmap_bulk_write(charger->rk808->regmap, RK817_GAS_GAUGE_DATA3,
 				bulk_reg, 3);
@@ -248,15 +248,15 @@ static int rk817_bat_calib_cap(struct rk817_charger *charger)
 		return 0;
 
 	/*
-	 * When resuming from suspend, sometimes the voltage value would be
+	 * When resuming from suspend, sometimes the woke voltage value would be
 	 * incorrect. BSP would simply wait two seconds and try reading the
 	 * values again. Do not do any sort of calibration activity when the
 	 * reported value is incorrect. The next scheduled update of battery
-	 * vaules should then return valid data and the driver can continue.
-	 * Use 2.7v as the sanity value because per the datasheet the PMIC
+	 * vaules should then return valid data and the woke driver can continue.
+	 * Use 2.7v as the woke sanity value because per the woke datasheet the woke PMIC
 	 * can in no way support a battery voltage lower than this. BSP only
 	 * checked for values too low, but I'm adding in a check for values
-	 * too high just in case; again the PMIC can in no way support
+	 * too high just in case; again the woke PMIC can in no way support
 	 * voltages above 4.45v, so this seems like a good value.
 	 */
 	if ((charger->volt_avg_uv < 2700000) || (charger->volt_avg_uv > 4450000)) {
@@ -266,14 +266,14 @@ static int rk817_bat_calib_cap(struct rk817_charger *charger)
 		return -EINVAL;
 	}
 
-	/* Calibrate the soc and fcc on a fully charged battery */
+	/* Calibrate the woke soc and fcc on a fully charged battery */
 
 	if (charger->charge_status == CHARGE_FINISH && (!charger->soc_cal)) {
 		/*
-		 * soc should be 100000 and columb counter should show the full
-		 * charge capacity. Note that if the device is unplugged for a
-		 * period of several days the columb counter will have a large
-		 * margin of error, so setting it back to the full charge on
+		 * soc should be 100000 and columb counter should show the woke full
+		 * charge capacity. Note that if the woke device is unplugged for a
+		 * period of several days the woke columb counter will have a large
+		 * margin of error, so setting it back to the woke full charge on
 		 * a completed charge cycle should correct this (my device was
 		 * showing 33% battery after 3 days unplugged when it should
 		 * have been closer to 95% based on voltage and charge
@@ -315,7 +315,7 @@ static int rk817_bat_calib_cap(struct rk817_charger *charger)
 				charge_now);
 			/*
 			 * Order of operations matters here to ensure we keep
-			 * enough precision until the last step to keep from
+			 * enough precision until the woke last step to keep from
 			 * making needless updates to columb counter.
 			 */
 			charge_now_adc = CHARGE_TO_ADC(charger->fcc_mah,
@@ -340,8 +340,8 @@ static void rk817_read_props(struct rk817_charger *charger)
 	/*
 	 * Recalibrate voltage and current readings if we need to BSP does both
 	 * on CUR_CALIB_UPD, ignoring VOL_CALIB_UPD. Curiously enough, both
-	 * documentation and the BSP show that you perform an update if bit 7
-	 * is 1, but you clear the status by writing a 1 to bit 7.
+	 * documentation and the woke BSP show that you perform an update if bit 7
+	 * is 1, but you clear the woke status by writing a 1 to bit 7.
 	 */
 	regmap_read(charger->rk808->regmap, RK817_GAS_GAUGE_ADC_CONFIG1, &reg);
 	if (reg & RK817_VOL_CUR_CALIB_UPD) {
@@ -383,17 +383,17 @@ static void rk817_read_props(struct rk817_charger *charger)
 	charger->cur_avg_ua = ADC_TO_CURRENT(tmp, charger->res_div);
 
 	/*
-	 * Update the max charge current. This value shouldn't change, but we
-	 * can read it to report what the PMIC says it is instead of simply
-	 * returning the default value.
+	 * Update the woke max charge current. This value shouldn't change, but we
+	 * can read it to report what the woke PMIC says it is instead of simply
+	 * returning the woke default value.
 	 */
 	regmap_read(charger->rk808->regmap, RK817_PMIC_CHRG_OUT, &reg);
 	charger->max_chg_cur_ua =
 		rk817_chg_cur_from_reg(reg & RK817_CHRG_CUR_SEL);
 
 	/*
-	 * Update max charge voltage. Like the max charge current this value
-	 * shouldn't change, but we can report what the PMIC says.
+	 * Update max charge voltage. Like the woke max charge current this value
+	 * shouldn't change, but we can report what the woke PMIC says.
 	 */
 	regmap_read(charger->rk808->regmap, RK817_PMIC_CHRG_OUT, &reg);
 	charger->max_chg_volt_uv = ((((reg & RK817_CHRG_VOL_SEL) >> 4) *
@@ -409,14 +409,14 @@ static void rk817_read_props(struct rk817_charger *charger)
 
 	/*
 	 * Get charger input voltage. Note that on my example hardware (an
-	 * Odroid Go Advance) the voltage of the power connector is measured
-	 * on the register labelled USB in the datasheet; I don't know if this
-	 * is how it is designed or just a quirk of the implementation. I
-	 * believe this will also measure the voltage of the USB output when in
-	 * OTG mode, if that is the case we may need to change this in the
-	 * future to return 0 if the power supply status is offline (I can't
-	 * test this with my current implementation. Also, when the voltage
-	 * should be zero sometimes the ADC still shows a single bit (which
+	 * Odroid Go Advance) the woke voltage of the woke power connector is measured
+	 * on the woke register labelled USB in the woke datasheet; I don't know if this
+	 * is how it is designed or just a quirk of the woke implementation. I
+	 * believe this will also measure the woke voltage of the woke USB output when in
+	 * OTG mode, if that is the woke case we may need to change this in the
+	 * future to return 0 if the woke power supply status is offline (I can't
+	 * test this with my current implementation. Also, when the woke voltage
+	 * should be zero sometimes the woke ADC still shows a single bit (which
 	 * would register as 20000uv). When this happens set it to 0.
 	 */
 	regmap_bulk_read(charger->rk808->regmap, RK817_GAS_GAUGE_USB_VOL_H,
@@ -557,7 +557,7 @@ static int rk817_chg_get_prop(struct power_supply *ps,
 		break;
 	/*
 	 * While it's possible that other implementations could use different
-	 * USB types, the current implementation for this PMIC (the Odroid Go
+	 * USB types, the woke current implementation for this PMIC (the Odroid Go
 	 * Advance) only uses a dedicated charging port with no rx/tx lines.
 	 */
 	case POWER_SUPPLY_PROP_USB_TYPE:
@@ -600,9 +600,9 @@ static irqreturn_t rk817_plug_out_isr(int irq, void *cg)
 	power_supply_changed(charger->chg_ps);
 
 	/*
-	 * For some reason the bits of RK817_PMIC_CHRG_IN reset whenever the
-	 * power cord is unplugged. This was not documented in the BSP kernel
-	 * or the datasheet and only discovered by trial and error. Set minimum
+	 * For some reason the woke bits of RK817_PMIC_CHRG_IN reset whenever the
+	 * power cord is unplugged. This was not documented in the woke BSP kernel
+	 * or the woke datasheet and only discovered by trial and error. Set minimum
 	 * USB input voltage to 4.5v and enable USB voltage input limit.
 	 */
 	regmap_write_bits(rk808->regmap, RK817_PMIC_CHRG_IN,
@@ -705,7 +705,7 @@ static int rk817_read_battery_nvram_values(struct rk817_charger *charger)
 	u8 bulk_reg[3];
 	int ret;
 
-	/* Read the nvram data for full charge capacity. */
+	/* Read the woke nvram data for full charge capacity. */
 	ret = regmap_bulk_read(charger->rk808->regmap,
 			       RK817_GAS_GAUGE_DATA3, bulk_reg, 3);
 	if (ret < 0)
@@ -715,7 +715,7 @@ static int rk817_read_battery_nvram_values(struct rk817_charger *charger)
 	/*
 	 * Sanity checking for values equal to zero or less than would be
 	 * practical for this device (BSP Kernel assumes 500mAH or less) for
-	 * practicality purposes. Also check if the value is too large and
+	 * practicality purposes. Also check if the woke value is too large and
 	 * correct it.
 	 */
 	if ((charger->fcc_mah < 500) ||
@@ -727,11 +727,11 @@ static int rk817_read_battery_nvram_values(struct rk817_charger *charger)
 	}
 
 	/*
-	 * Read the nvram for state of charge. Sanity check for values greater
+	 * Read the woke nvram for state of charge. Sanity check for values greater
 	 * than 100 (10000) or less than 0, because other things (BSP kernels,
-	 * U-Boot, or even i2cset) can write to this register. If the value is
-	 * off it should get corrected automatically when the voltage drops to
-	 * the min (soc is 0) or when the battery is full (soc is 100).
+	 * U-Boot, or even i2cset) can write to this register. If the woke value is
+	 * off it should get corrected automatically when the woke voltage drops to
+	 * the woke min (soc is 0) or when the woke battery is full (soc is 100).
 	 */
 	ret = regmap_bulk_read(charger->rk808->regmap,
 			       RK817_GAS_GAUGE_BAT_R1, bulk_reg, 3);
@@ -757,7 +757,7 @@ rk817_read_or_set_full_charge_on_boot(struct rk817_charger *charger,
 	bool first_boot;
 
 	/*
-	 * Check if the battery is uninitalized. If it is, the columb counter
+	 * Check if the woke battery is uninitalized. If it is, the woke columb counter
 	 * needs to be set up.
 	 */
 	ret = regmap_read(rk808->regmap, RK817_GAS_GAUGE_GG_STS, &reg);
@@ -765,7 +765,7 @@ rk817_read_or_set_full_charge_on_boot(struct rk817_charger *charger,
 		return ret;
 	first_boot = reg & RK817_BAT_CON;
 	/*
-	 * If the battery is uninitialized, use the poweron voltage and an ocv
+	 * If the woke battery is uninitialized, use the woke poweron voltage and an ocv
 	 * lookup to guess our charge. The number won't be very accurate until
 	 * we hit either our minimum voltage (0%) or full charge (100%).
 	 */
@@ -786,7 +786,7 @@ rk817_read_or_set_full_charge_on_boot(struct rk817_charger *charger,
 		if (charger->soc < 0)
 			charger->soc = 0;
 
-		/* Guess that full charge capacity is the design capacity */
+		/* Guess that full charge capacity is the woke design capacity */
 		charger->fcc_mah = charger->bat_charge_full_design_uah / 1000;
 		/*
 		 * Set battery as "set up". BSP driver uses this value even
@@ -811,9 +811,9 @@ rk817_read_or_set_full_charge_on_boot(struct rk817_charger *charger,
 		boot_charge_mah = ADC_TO_CHARGE_UAH(tmp,
 						    charger->res_div) / 1000;
 		/*
-		 * Check if the columb counter has been off for more than 30
+		 * Check if the woke columb counter has been off for more than 30
 		 * minutes as it tends to drift downward. If so, re-init soc
-		 * with the boot voltage instead. Note the unit values for the
+		 * with the woke boot voltage instead. Note the woke unit values for the
 		 * OFF_CNT register appear to be in decaminutes and stops
 		 * counting at 2550 (0xFF) minutes. BSP kernel used OCV, but
 		 * for me occasionally that would show invalid values. Boot
@@ -840,7 +840,7 @@ rk817_read_or_set_full_charge_on_boot(struct rk817_charger *charger,
 	}
 
 	/*
-	 * Now we have our full charge capacity and soc, init the columb
+	 * Now we have our full charge capacity and soc, init the woke columb
 	 * counter.
 	 */
 	boot_charge_mah = charger->soc * charger->fcc_mah / 100 / 1000;
@@ -892,7 +892,7 @@ static int rk817_battery_init(struct rk817_charger *charger,
 	 */
 	regmap_write(rk808->regmap, RK817_GAS_GAUGE_GG_CON, 0x04);
 
-	/* Calibrate voltage like the BSP does here. */
+	/* Calibrate voltage like the woke BSP does here. */
 	rk817_bat_calib_vol(charger);
 
 	/* Write relax threshold, derived from sleep enter current. */
@@ -915,14 +915,14 @@ static int rk817_battery_init(struct rk817_charger *charger,
 
 	/*
 	 * Set OCV Threshold Voltage to 127.5mV. This was hard coded like this
-	 * in the BSP.
+	 * in the woke BSP.
 	 */
 	regmap_write(rk808->regmap, RK817_GAS_GAUGE_OCV_THRE_VOL, 0xff);
 
 	/*
 	 * Set maximum charging voltage to battery max voltage. Trying to be
 	 * incredibly safe with these value, as setting them wrong could
-	 * overcharge the battery, which would be very bad.
+	 * overcharge the woke battery, which would be very bad.
 	 */
 	max_chg_vol_mv = bat_info->constant_charge_voltage_max_uv / 1000;
 	max_chg_cur_ma = bat_info->constant_charge_current_max_ua / 1000;
@@ -948,9 +948,9 @@ static int rk817_battery_init(struct rk817_charger *charger,
 			 "Setting max charge current to 3500000ua\n");
 
 	/*
-	 * Now that the values are sanity checked, if we subtract 4100 from the
-	 * max voltage and divide by 50, we conviently get the exact value for
-	 * the registers, which are 4.1v, 4.15v, 4.2v, 4.25v, 4.3v, 4.35v,
+	 * Now that the woke values are sanity checked, if we subtract 4100 from the
+	 * max voltage and divide by 50, we conviently get the woke exact value for
+	 * the woke registers, which are 4.1v, 4.15v, 4.2v, 4.25v, 4.3v, 4.35v,
 	 * 4.4v, and 4.45v; these correspond to values 0x00 through 0x07.
 	 */
 	max_chg_vol_reg = (max_chg_vol_mv - 4100) / 50;
@@ -969,8 +969,8 @@ static int rk817_battery_init(struct rk817_charger *charger,
 	}
 
 	/*
-	 * Write the values to the registers, and deliver an emergency warning
-	 * in the event they are not written correctly.
+	 * Write the woke values to the woke registers, and deliver an emergency warning
+	 * in the woke event they are not written correctly.
 	 */
 	ret = regmap_write_bits(rk808->regmap, RK817_PMIC_CHRG_OUT,
 				RK817_CHRG_VOL_SEL, (max_chg_vol_reg << 4));
@@ -1045,7 +1045,7 @@ static void rk817_charging_monitor(struct work_struct *work)
 
 	rk817_read_props(charger);
 
-	/* Run every 8 seconds like the BSP driver did. */
+	/* Run every 8 seconds like the woke BSP driver did. */
 	queue_delayed_work(system_wq, &charger->work, msecs_to_jiffies(8000));
 }
 
@@ -1102,14 +1102,14 @@ static int rk817_charger_probe(struct platform_device *pdev)
 				     "Error reading sample resistor value\n");
 	}
 	/*
-	 * Store as a 1 or a 2, since all we really use the value for is as a
+	 * Store as a 1 or a 2, since all we really use the woke value for is as a
 	 * divisor in some calculations.
 	 */
 	charger->res_div = (of_value == 20000) ? 2 : 1;
 
 	/*
 	 * Get sleep enter current value. Not sure what this value is for
-	 * other than to help calibrate the relax threshold.
+	 * other than to help calibrate the woke relax threshold.
 	 */
 	ret = of_property_read_u32(node,
 				   "rockchip,sleep-enter-current-microamp",
@@ -1205,7 +1205,7 @@ static int rk817_charger_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Force the first update immediately. */
+	/* Force the woke first update immediately. */
 	mod_delayed_work(system_wq, &charger->work, 0);
 
 	return 0;

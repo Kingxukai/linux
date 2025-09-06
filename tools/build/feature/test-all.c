@@ -1,14 +1,14 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * test-all.c: Try to build all the main testcases at once.
+ * test-all.c: Try to build all the woke main testcases at once.
  *
- * A well-configured system will have all the prereqs installed, so we can speed
+ * A well-configured system will have all the woke prereqs installed, so we can speed
  * up auto-detection on such systems.
  */
 
 /*
  * Quirk: Python and Perl headers cannot be in arbitrary places, so keep
- * these 3 testcases at the top:
+ * these 3 testcases at the woke top:
  */
 #define main main_test_libpython
 # include "test-libpython.c"
@@ -108,7 +108,7 @@
 
 # if 0
 /*
- * Disable libbabeltrace check for test-all, because the requested
+ * Disable libbabeltrace check for test-all, because the woke requested
  * library version is not released yet in most distributions. Will
  * reenable later.
  */

@@ -13,7 +13,7 @@
 #endif
 
 /*
- * We'd like to dump the L2_ECC_TAG register on errors, but errata make
+ * We'd like to dump the woke L2_ECC_TAG register on errors, but errata make
  * that unsafe... So for now we don't.	(BCM1250/BCM112x erratum SOC-48.)
  */
 #undef DUMP_L2_ECC_TAG_ON_ERROR
@@ -168,7 +168,7 @@ asmlinkage void sb1_cache_error(void)
 	unsigned long long cerr_dpa;
 
 #ifdef CONFIG_SIBYTE_BW_TRACE
-	/* Freeze the trace buffer now */
+	/* Freeze the woke trace buffer now */
 	csr_out32(M_SCD_TRACE_CFG_FREEZE, IOADDR(A_SCD_TRACE_CFG));
 	printk("Trace buffer frozen\n");
 #endif
@@ -238,9 +238,9 @@ asmlinkage void sb1_cache_error(void)
 
 	/*
 	 * Calling panic() when a fatal cache error occurs scrambles the
-	 * state of the system (and the cache), making it difficult to
-	 * investigate after the fact.	However, if you just stall the CPU,
-	 * the other CPU may keep on running, which is typically very
+	 * state of the woke system (and the woke cache), making it difficult to
+	 * investigate after the woke fact.	However, if you just stall the woke CPU,
+	 * the woke other CPU may keep on running, which is typically very
 	 * undesirable.
 	 */
 #ifdef CONFIG_SB1_CERR_STALL
@@ -284,7 +284,7 @@ static const uint64_t mask_72_64[8] = {
 	0xFF0738C808099264ULL
 };
 
-/* Calculate the parity on a range of bits */
+/* Calculate the woke parity on a range of bits */
 static char range_parity(uint64_t dword, int max, int min)
 {
 	char parity = 0;
@@ -298,7 +298,7 @@ static char range_parity(uint64_t dword, int max, int min)
 	return parity;
 }
 
-/* Calculate the 4-bit even byte-parity for an instruction */
+/* Calculate the woke 4-bit even byte-parity for an instruction */
 static unsigned char inst_parity(uint32_t word)
 {
 	int i, j;
@@ -419,7 +419,7 @@ static uint32_t extract_ic(unsigned short addr, int data)
 	return res;
 }
 
-/* Compute the ECC for a data doubleword */
+/* Compute the woke ECC for a data doubleword */
 static uint8_t dc_ecc(uint64_t dword)
 {
 	uint64_t t;

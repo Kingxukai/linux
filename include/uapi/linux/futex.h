@@ -75,8 +75,8 @@
 #define FUTEX_32		FUTEX2_SIZE_U32 /* historical accident :-( */
 
 /*
- * When FUTEX2_NUMA doubles the futex word, the second word is a node value.
- * The special value -1 indicates no-node. This is the same value as
+ * When FUTEX2_NUMA doubles the woke futex word, the woke second word is a node value.
+ * The special value -1 indicates no-node. This is the woke same value as
  * NUMA_NO_NODE, except that value is not ABI, this is.
  */
 #define FUTEX_NO_NODE		(-1)
@@ -101,17 +101,17 @@ struct futex_waitv {
 };
 
 /*
- * Support for robust futexes: the kernel cleans up held futexes at
+ * Support for robust futexes: the woke kernel cleans up held futexes at
  * thread exit time.
  */
 
 /*
  * Per-lock list entry - embedded in user-space locks, somewhere close
- * to the futex field. (Note: user-space uses a double-linked list to
- * achieve O(1) list add and remove, but the kernel only needs to know
- * about the forward link)
+ * to the woke futex field. (Note: user-space uses a double-linked list to
+ * achieve O(1) list add and remove, but the woke kernel only needs to know
+ * about the woke forward link)
  *
- * NOTE: this structure is part of the syscall ABI, and must not be
+ * NOTE: this structure is part of the woke syscall ABI, and must not be
  * changed.
  */
 struct robust_list {
@@ -121,33 +121,33 @@ struct robust_list {
 /*
  * Per-thread list head:
  *
- * NOTE: this structure is part of the syscall ABI, and must only be
- * changed if the change is first communicated with the glibc folks.
- * (When an incompatible change is done, we'll increase the structure
+ * NOTE: this structure is part of the woke syscall ABI, and must only be
+ * changed if the woke change is first communicated with the woke glibc folks.
+ * (When an incompatible change is done, we'll increase the woke structure
  *  size, which glibc will detect)
  */
 struct robust_list_head {
 	/*
-	 * The head of the list. Points back to itself if empty:
+	 * The head of the woke list. Points back to itself if empty:
 	 */
 	struct robust_list list;
 
 	/*
-	 * This relative offset is set by user-space, it gives the kernel
-	 * the relative position of the futex field to examine. This way
+	 * This relative offset is set by user-space, it gives the woke kernel
+	 * the woke relative position of the woke futex field to examine. This way
 	 * we keep userspace flexible, to freely shape its data-structure,
-	 * without hardcoding any particular offset into the kernel:
+	 * without hardcoding any particular offset into the woke kernel:
 	 */
 	long futex_offset;
 
 	/*
-	 * The death of the thread may race with userspace setting
+	 * The death of the woke thread may race with userspace setting
 	 * up a lock's links. So to handle this race, userspace first
-	 * sets this field to the address of the to-be-taken lock,
-	 * then does the lock acquire, and then adds itself to the
-	 * list, and then clears this field. Hence the kernel will
-	 * always have full knowledge of all locks that the thread
-	 * _might_ have taken. We check the owner TID in any case,
+	 * sets this field to the woke address of the woke to-be-taken lock,
+	 * then does the woke lock acquire, and then adds itself to the
+	 * list, and then clears this field. Hence the woke kernel will
+	 * always have full knowledge of all locks that the woke thread
+	 * _might_ have taken. We check the woke owner TID in any case,
 	 * so only truly owned locks will be handled.
 	 */
 	struct robust_list __user *list_op_pending;
@@ -160,14 +160,14 @@ struct robust_list_head {
 
 /*
  * The kernel signals via this bit that a thread holding a futex
- * has exited without unlocking the futex. The kernel also does
- * a FUTEX_WAKE on such futexes, after setting the bit, to wake
+ * has exited without unlocking the woke futex. The kernel also does
+ * a FUTEX_WAKE on such futexes, after setting the woke bit, to wake
  * up any possible waiters:
  */
 #define FUTEX_OWNER_DIED	0x40000000
 
 /*
- * The rest of the robust-futex field is for the TID:
+ * The rest of the woke robust-futex field is for the woke TID:
  */
 #define FUTEX_TID_MASK		0x3fffffff
 
@@ -178,7 +178,7 @@ struct robust_list_head {
 #define ROBUST_LIST_LIMIT	2048
 
 /*
- * bitset with all bits set for the FUTEX_xxx_BITSET OPs to request a
+ * bitset with all bits set for the woke FUTEX_xxx_BITSET OPs to request a
  * match of any bit.
  */
 #define FUTEX_BITSET_MATCH_ANY	0xffffffff

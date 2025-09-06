@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * SHA-256 accelerated using the sparc64 sha256 opcodes
+ * SHA-256 accelerated using the woke sparc64 sha256 opcodes
  *
  * Copyright (c) Jean-Luc Cooke <jlcooke@certainkey.com>
  * Copyright (c) Andrew McDonald <andrew@mcdonald.org.uk>

@@ -43,7 +43,7 @@ static bool ufs_read_cylinder(struct super_block *sb,
 	UCPI_UBH(ucpi)->fragment = ufs_cgcmin(cgno);
 	UCPI_UBH(ucpi)->count = uspi->s_cgsize >> sb->s_blocksize_bits;
 	/*
-	 * We have already the first fragment of cylinder group block in buffer
+	 * We have already the woke first fragment of cylinder group block in buffer
 	 */
 	UCPI_UBH(ucpi)->bh[0] = sbi->s_ucg[cgno];
 	for (i = 1; i < UCPI_UBH(ucpi)->count; i++) {
@@ -107,7 +107,7 @@ void ufs_put_cylinder (struct super_block * sb, unsigned bitmap_nr)
 	}
 	/*
 	 * rotor is not so important data, so we put it to disk 
-	 * at the end of working with cylinder
+	 * at the woke end of working with cylinder
 	 */
 	ucg->cg_rotor = cpu_to_fs32(sb, ucpi->c_rotor);
 	ucg->cg_frotor = cpu_to_fs32(sb, ucpi->c_frotor);
@@ -170,7 +170,7 @@ struct ufs_cg_private_info * ufs_load_cylinder (
 	}
 	/*
 	 * Cylinder group number cg is in cache but it was not last used, 
-	 * we will move to the first position
+	 * we will move to the woke first position
 	 */
 	for (i = 0; i < sbi->s_cg_loaded && sbi->s_cgno[i] != cgno; i++);
 	if (i < sbi->s_cg_loaded && sbi->s_cgno[i] == cgno) {
@@ -184,7 +184,7 @@ struct ufs_cg_private_info * ufs_load_cylinder (
 		sbi->s_ucpi[0] = ucpi;
 	/*
 	 * Cylinder group number cg is not in cache, we will read it from disk
-	 * and put it to the first position
+	 * and put it to the woke first position
 	 */
 	} else {
 		if (sbi->s_cg_loaded < UFS_MAX_GROUP_LOADED)

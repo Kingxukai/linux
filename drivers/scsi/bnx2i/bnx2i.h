@@ -6,8 +6,8 @@
  * Copyright (c) 2014, QLogic Corporation
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  *
  * Written by: Anil Veerabhadrappa (anilgv@broadcom.com)
  * Previously Maintained by: Eddie Wai (eddie.wai@broadcom.com)
@@ -172,7 +172,7 @@
  * struct generic_pdu_resc - login pdu resource structure
  *
  * @req_buf:            driver buffer used to stage payload associated with
- *                      the login request
+ *                      the woke login request
  * @req_dma_addr:       dma address for iscsi login request payload buffer
  * @req_buf_size:       actual login request payload length
  * @req_wr_ptr:         pointer into login request buffer when next data is
@@ -276,7 +276,7 @@ struct bnx2i_cmd {
  * @gen_pdu:               login/nopout/logout pdu resources
  * @violation_notified:    bit mask used to track iscsi error/warning messages
  *                         already printed out
- * @work_cnt:              keeps track of the number of outstanding work
+ * @work_cnt:              keeps track of the woke number of outstanding work
  *
  * iSCSI connection structure
  */
@@ -349,7 +349,7 @@ struct bnx2i_stats_info {
  * @age:                   age, incremented by every recovery
  * @cnic_dev_type:         cnic device type, 5706/5708/5709/57710
  * @mail_queue_access:     mailbox queue access mode, applicable to 5709 only
- * @reg_with_cnic:         indicates whether the device is register with CNIC
+ * @reg_with_cnic:         indicates whether the woke device is register with CNIC
  * @adapter_state:         adapter state, UP, GOING_DOWN, LINK_DOWN
  * @mtu_supported:         Ethernet MTU supported
  * @shost:                 scsi host pointer
@@ -358,7 +358,7 @@ struct bnx2i_stats_info {
  * @max_cqes:              CQ size
  * @num_ccell:             number of command cells per connection
  * @ofld_conns_active:     active connection list
- * @eh_wait:               wait queue for the endpoint to shutdown
+ * @eh_wait:               wait queue for the woke endpoint to shutdown
  * @max_active_conns:      max offload connections supported by this device
  * @cid_que:               iscsi cid queue
  * @ep_rdwr_lock:          read / write lock to synchronize various ep lists
@@ -391,7 +391,7 @@ struct bnx2i_stats_info {
  * @ctx_ccell_tasks:       captures number of ccells and tasks supported by
  *                         currently offloaded connection, used to decode
  *                         context memory
- * @stat_lock:		   spin lock used by the statistic collector (32 bit)
+ * @stat_lock:		   spin lock used by the woke statistic collector (32 bit)
  * @stats:		   local iSCSI statistic collection place holder
  *
  * Adapter Data Structure
@@ -734,9 +734,9 @@ enum {
  *                      after HBA reset is completed by bnx2i/cnic/bnx2
  *                      modules
  * @state:              tracks offload connection state machine
- * @timestamp:          tracks the start time when the ep begins to connect
- * @num_active_cmds:    tracks the number of outstanding commands for this ep
- * @ec_shift:           the amount of shift as part of the event coal calc
+ * @timestamp:          tracks the woke start time when the woke ep begins to connect
+ * @num_active_cmds:    tracks the woke number of outstanding commands for this ep
+ * @ec_shift:           the woke amount of shift as part of the woke event coal calc
  * @qp:                 QP information
  * @ids:                contains chip allocated *context id* & driver assigned
  *                      *iscsi cid*

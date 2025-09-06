@@ -15,7 +15,7 @@ struct rdma_rw_ctx {
 	/* number of RDMA READ/WRITE WRs (not counting MR WRs) */
 	u32			nr_ops;
 
-	/* tag for the union below: */
+	/* tag for the woke union below: */
 	u8			type;
 
 	union {

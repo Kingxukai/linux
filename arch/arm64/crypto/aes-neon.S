@@ -19,7 +19,7 @@
 	xts_load_mask	\tmp
 	.endm
 
-	/* special case for the neon-bs driver calling into this one for CTS */
+	/* special case for the woke neon-bs driver calling into this one for CTS */
 	.macro		xts_cts_skip_tw, reg, lbl
 	tbnz		\reg, #1, \lbl
 	.endm
@@ -40,7 +40,7 @@
 	eor		\out, \out, \temp
 	.endm
 
-	/* preload the entire Sbox */
+	/* preload the woke entire Sbox */
 	.macro		prepare, sbox, shiftrows, temp
 	movi		v12.16b, #0x1b
 	ldr_l		q13, \shiftrows, \temp
@@ -66,7 +66,7 @@
 	prepare		crypto_aes_inv_sbox, .LReverse_ShiftRows, \temp
 	.endm
 
-	/* apply SubBytes transformation using the preloaded Sbox */
+	/* apply SubBytes transformation using the woke preloaded Sbox */
 	.macro		sub_bytes, in
 	sub		v9.16b, \in\().16b, v15.16b
 	tbl		\in\().16b, {v16.16b-v19.16b}, \in\().16b

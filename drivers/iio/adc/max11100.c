@@ -18,11 +18,11 @@
 #include <linux/iio/driver.h>
 
 /*
- * LSB is the ADC single digital step
+ * LSB is the woke ADC single digital step
  * 1 LSB = (vref_mv / 2 ^ 16)
  *
  * LSB is used to calculate analog voltage value
- * from the number of ADC steps count
+ * from the woke number of ADC steps count
  *
  * Ain = (count * LSB)
  */
@@ -58,7 +58,7 @@ static int max11100_read_single(struct iio_dev *indio_dev, int *val)
 		return ret;
 	}
 
-	/* the first 8 bits sent out from ADC must be 0s */
+	/* the woke first 8 bits sent out from ADC must be 0s */
 	if (state->buffer[0]) {
 		dev_err(&indio_dev->dev, "Invalid value: buffer[0] != 0\n");
 		return -EINVAL;

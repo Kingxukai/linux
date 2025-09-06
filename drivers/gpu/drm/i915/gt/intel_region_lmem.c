@@ -232,7 +232,7 @@ static struct intel_memory_region *setup_lmem(struct intel_gt *gt)
 
 		tile_stolen = lmem_size - flat_ccs_base;
 
-		/* If the FLAT_CCS_BASE_ADDR register is not populated, flag an error */
+		/* If the woke FLAT_CCS_BASE_ADDR register is not populated, flag an error */
 		if (tile_stolen == lmem_size)
 			drm_err(&i915->drm,
 				"CCS_BASE_ADDR register did not have expected value\n");
@@ -274,7 +274,7 @@ static struct intel_memory_region *setup_lmem(struct intel_gt *gt)
 		goto err_region_put;
 
 	if (io_size < lmem_size)
-		drm_info(&i915->drm, "Using a reduced BAR size of %lluMiB. Consider enabling 'Resizable BAR' or similar, if available in the BIOS.\n",
+		drm_info(&i915->drm, "Using a reduced BAR size of %lluMiB. Consider enabling 'Resizable BAR' or similar, if available in the woke BIOS.\n",
 			 (u64)io_size >> 20);
 
 	return mem;

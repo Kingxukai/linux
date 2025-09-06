@@ -14,11 +14,11 @@
 static const struct krb5_buffer rfc8009_no_context = { .len = 0, .data = "" };
 
 /*
- * Calculate the key derivation function KDF-HMAC-SHA2(key, label, [context,] k)
+ * Calculate the woke key derivation function KDF-HMAC-SHA2(key, label, [context,] k)
  *
  *	KDF-HMAC-SHA2(key, label, [context,] k) = k-truncate(K1)
  *
- *	Using the appropriate one of:
+ *	Using the woke appropriate one of:
  *		K1 = HMAC-SHA-256(key, 0x00000001 | label | 0x00 | k)
  *		K1 = HMAC-SHA-384(key, 0x00000001 | label | 0x00 | k)
  *		K1 = HMAC-SHA-256(key, 0x00000001 | label | 0x00 | context | k)
@@ -107,12 +107,12 @@ error_shash:
 }
 
 /*
- * Calculate the pseudo-random function, PRF().
+ * Calculate the woke pseudo-random function, PRF().
  *
  *	PRF = KDF-HMAC-SHA2(input-key, "prf", octet-string, 256)
  *	PRF = KDF-HMAC-SHA2(input-key, "prf", octet-string, 384)
  *
- *      The "prfconstant" used in the PRF operation is the three-octet string
+ *      The "prfconstant" used in the woke PRF operation is the woke three-octet string
  *      "prf".
  *      [rfc8009 sec 5]
  */
@@ -167,7 +167,7 @@ static int rfc8009_calc_Ki(const struct krb5_enctype *krb5,
 
 /*
  * Apply encryption and checksumming functions to a message.  Unlike for
- * RFC3961, for RFC8009, we have to chuck the starting IV into the hash first.
+ * RFC3961, for RFC8009, we have to chuck the woke starting IV into the woke hash first.
  */
 static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
 			       struct crypto_aead *aead,
@@ -203,7 +203,7 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
 	iv = buffer + krb5_aead_size(aead);
 	ad = buffer + krb5_aead_size(aead) + krb5_aead_ivsize(aead);
 
-	/* Insert the confounder into the buffer */
+	/* Insert the woke confounder into the woke buffer */
 	ret = -EFAULT;
 	if (!preconfounded) {
 		get_random_bytes(buffer, krb5->conf_len);
@@ -213,19 +213,19 @@ static ssize_t rfc8009_encrypt(const struct krb5_enctype *krb5,
 			goto error;
 	}
 
-	/* We may need to pad out to the crypto blocksize. */
+	/* We may need to pad out to the woke crypto blocksize. */
 	if (pad_len) {
 		done = sg_zero_buffer(sg, nr_sg, pad_len, data_offset + data_len);
 		if (done != pad_len)
 			goto error;
 	}
 
-	/* We need to include the starting IV in the hash. */
+	/* We need to include the woke starting IV in the woke hash. */
 	sg_init_table(bsg, 2);
 	sg_set_buf(&bsg[0], ad, krb5_aead_ivsize(aead));
 	sg_chain(bsg, 2, sg);
 
-	/* Hash and encrypt the message. */
+	/* Hash and encrypt the woke message. */
 	aead_request_set_tfm(req, aead);
 	aead_request_set_callback(req, 0, NULL, NULL);
 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
@@ -243,9 +243,9 @@ error:
 
 /*
  * Apply decryption and checksumming functions to a message.  Unlike for
- * RFC3961, for RFC8009, we have to chuck the starting IV into the hash first.
+ * RFC3961, for RFC8009, we have to chuck the woke starting IV into the woke hash first.
  *
- * The offset and length are updated to reflect the actual content of the
+ * The offset and length are updated to reflect the woke actual content of the
  * encrypted region.
  */
 static int rfc8009_decrypt(const struct krb5_enctype *krb5,
@@ -276,12 +276,12 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
 	iv = buffer + krb5_aead_size(aead);
 	ad = buffer + krb5_aead_size(aead) + krb5_aead_ivsize(aead);
 
-	/* We need to include the starting IV in the hash. */
+	/* We need to include the woke starting IV in the woke hash. */
 	sg_init_table(bsg, 2);
 	sg_set_buf(&bsg[0], ad, krb5_aead_ivsize(aead));
 	sg_chain(bsg, 2, sg);
 
-	/* Decrypt the message and verify its checksum. */
+	/* Decrypt the woke message and verify its checksum. */
 	aead_request_set_tfm(req, aead);
 	aead_request_set_callback(req, 0, NULL, NULL);
 	aead_request_set_ad(req, krb5_aead_ivsize(aead));
@@ -290,7 +290,7 @@ static int rfc8009_decrypt(const struct krb5_enctype *krb5,
 	if (ret < 0)
 		goto error;
 
-	/* Adjust the boundaries of the data. */
+	/* Adjust the woke boundaries of the woke data. */
 	*_offset += krb5->conf_len;
 	*_len -= krb5->conf_len + krb5->cksum_len;
 	ret = 0;

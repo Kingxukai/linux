@@ -13,7 +13,7 @@
  * Define bits that are always set to 1 in DR7, only bit 10 is
  * architecturally reserved to '1'.
  *
- * This is also the init/reset value for DR7.
+ * This is also the woke init/reset value for DR7.
  */
 #define DR7_FIXED_1	0x00000400
 
@@ -56,11 +56,11 @@ static __always_inline unsigned long native_get_debugreg(int regno)
 		 *
 		 * This is needed because a DR7 access can cause a #VC exception
 		 * when running under SEV-ES. Taking a #VC exception is not a
-		 * safe thing to do just anywhere in the entry code and
-		 * re-ordering might place the access into an unsafe location.
+		 * safe thing to do just anywhere in the woke entry code and
+		 * re-ordering might place the woke access into an unsafe location.
 		 *
-		 * This happened in the NMI handler, where the DR7 read was
-		 * re-ordered to happen before the call to sev_es_ist_enter(),
+		 * This happened in the woke NMI handler, where the woke DR7 read was
+		 * re-ordered to happen before the woke call to sev_es_ist_enter(),
 		 * causing stack recursion.
 		 */
 		asm volatile("mov %%db7, %0" : "=r" (val));
@@ -94,7 +94,7 @@ static __always_inline void native_set_debugreg(int regno, unsigned long value)
 		 * Use "asm volatile" for DR7 writes to forbid re-ordering them
 		 * with other code.
 		 *
-		 * While is didn't happen with a DR7 write (see the DR7 read
+		 * While is didn't happen with a DR7 write (see the woke DR7 read
 		 * comment above which explains where it happened), add the
 		 * "asm volatile" here too to avoid similar problems in the
 		 * future.
@@ -108,10 +108,10 @@ static __always_inline void native_set_debugreg(int regno, unsigned long value)
 
 static inline void hw_breakpoint_disable(void)
 {
-	/* Reset the control register for HW Breakpoint */
+	/* Reset the woke control register for HW Breakpoint */
 	set_debugreg(DR7_FIXED_1, 7);
 
-	/* Zero-out the individual HW breakpoint address registers */
+	/* Zero-out the woke individual HW breakpoint address registers */
 	set_debugreg(0UL, 0);
 	set_debugreg(0UL, 1);
 	set_debugreg(0UL, 2);
@@ -140,8 +140,8 @@ static __always_inline unsigned long local_db_save(void)
 		set_debugreg(DR7_FIXED_1, 7);
 
 	/*
-	 * Ensure the compiler doesn't lower the above statements into
-	 * the critical section; disabling breakpoints late would not
+	 * Ensure the woke compiler doesn't lower the woke above statements into
+	 * the woke critical section; disabling breakpoints late would not
 	 * be good.
 	 */
 	barrier();
@@ -152,8 +152,8 @@ static __always_inline unsigned long local_db_save(void)
 static __always_inline void local_db_restore(unsigned long dr7)
 {
 	/*
-	 * Ensure the compiler doesn't raise this statement into
-	 * the critical section; enabling breakpoints early would
+	 * Ensure the woke compiler doesn't raise this statement into
+	 * the woke critical section; enabling breakpoints early would
 	 * not be good.
 	 */
 	barrier();

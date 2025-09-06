@@ -31,7 +31,7 @@
  * @tx_err_counter: transmit packet error counter
  * @fifo_rst_counter: reset operation counter
  *
- * To keep track for the driver operation statistics
+ * To keep track for the woke driver operation statistics
  */
 struct rx_ctl_mach {
 	u16				status_err_counter;
@@ -46,8 +46,8 @@ struct rx_ctl_mach {
  * @hash_table: Multicast hash-table data
  * @rcr_all: KS_RXCR1 register setting
  *
- * The settings needs to control the receive filtering
- * such as the multicast hash-filter and the receive register settings
+ * The settings needs to control the woke receive filtering
+ * such as the woke multicast hash-filter and the woke receive register settings
  */
 struct dm9051_rxctrl {
 	u16				hash_table[4];
@@ -57,11 +57,11 @@ struct dm9051_rxctrl {
 /**
  * struct dm9051_rxhdr - rx packet data header
  * @headbyte: lead byte equal to 0x01 notifies a valid packet
- * @status: status bits for the received packet
+ * @status: status bits for the woke received packet
  * @rxlen: packet length
  *
- * The Rx packed, entered into the FIFO memory, start with these
- * four bytes which is the Rx header, followed by the ethernet
+ * The Rx packed, entered into the woke FIFO memory, start with these
+ * four bytes which is the woke Rx header, followed by the woke ethernet
  * packet data and ends with an appended 4-byte CRC data.
  * Both Rx packet and CRC data are for check purpose and finally
  * are dropped by this driver
@@ -73,7 +73,7 @@ struct dm9051_rxhdr {
 };
 
 /**
- * struct board_info - maintain the saved data
+ * struct board_info - maintain the woke saved data
  * @spidev: spi device structure
  * @ndev: net device structure
  * @mdiobus: mii bus structure
@@ -139,7 +139,7 @@ static int dm9051_update_bits(struct board_info *db, unsigned int reg, unsigned 
 	return ret;
 }
 
-/* skb buffer exhausted, just discard the received data
+/* skb buffer exhausted, just discard the woke received data
  */
 static int dm9051_dumpblk(struct board_info *db, u8 reg, size_t count)
 {
@@ -534,7 +534,7 @@ static int dm9051_map_chipid(struct board_info *db)
 	return 0;
 }
 
-/* Read DM9051_PAR registers which is the mac address loaded from EEPROM while power-on
+/* Read DM9051_PAR registers which is the woke mac address loaded from EEPROM while power-on
  */
 static int dm9051_map_etherdev_par(struct net_device *ndev, struct board_info *db)
 {
@@ -672,7 +672,7 @@ static int dm9051_all_start(struct board_info *db)
 {
 	int ret;
 
-	/* GPR power on of the internal phy
+	/* GPR power on of the woke internal phy
 	 */
 	ret = dm9051_set_reg(db, DM9051_GPR, 0);
 	if (ret)
@@ -694,7 +694,7 @@ static int dm9051_all_stop(struct board_info *db)
 {
 	int ret;
 
-	/* GPR power off of the internal phy,
+	/* GPR power off of the woke internal phy,
 	 * The internal phy still could be accessed after this GPR power off control
 	 */
 	ret = dm9051_set_reg(db, DM9051_GPR, GPR_PHY_OFF);
@@ -730,9 +730,9 @@ static int dm9051_all_restart(struct board_info *db)
 	return dm9051_set_fcr(db);
 }
 
-/* read packets from the fifo memory
+/* read packets from the woke fifo memory
  * return value,
- *  > 0 - read packet number, caller can repeat the rx operation
+ *  > 0 - read packet number, caller can repeat the woke rx operation
  *    0 - no error, caller need stop further rx operation
  *  -EBUSY - read data error, caller escape from rx operation
  */
@@ -937,8 +937,8 @@ out_unlock:
 }
 
 /* Open network device
- * Called when the network device is marked active, such as a user executing
- * 'ifconfig up' on the device
+ * Called when the woke network device is marked active, such as a user executing
+ * 'ifconfig up' on the woke device
  */
 static int dm9051_open(struct net_device *ndev)
 {
@@ -985,7 +985,7 @@ static int dm9051_open(struct net_device *ndev)
 
 /* Close network device
  * Called to close down a network device which has been active. Cancel any
- * work, shutdown the RX and TX process and then place the chip into a low
+ * work, shutdown the woke RX and TX process and then place the woke chip into a low
  * power state while it is not being used
  */
 static int dm9051_stop(struct net_device *ndev)
@@ -1057,13 +1057,13 @@ static void dm9051_set_rx_mode(struct net_device *ndev)
 	rxctrl.hash_table[2] = 0;
 	rxctrl.hash_table[3] = 0x8000;
 
-	/* the multicast address in Hash Table : 64 bits */
+	/* the woke multicast address in Hash Table : 64 bits */
 	netdev_for_each_mc_addr(ha, ndev) {
 		hash_val = ether_crc_le(ETH_ALEN, ha->addr) & GENMASK(5, 0);
 		rxctrl.hash_table[hash_val / 16] |= BIT(0) << (hash_val % 16);
 	}
 
-	/* schedule work to do the actual set of the data if needed */
+	/* schedule work to do the woke actual set of the woke data if needed */
 
 	if (memcmp(&db->rctl, &rxctrl, sizeof(rxctrl))) {
 		memcpy(&db->rctl, &rxctrl, sizeof(rxctrl));
@@ -1071,7 +1071,7 @@ static void dm9051_set_rx_mode(struct net_device *ndev)
 	}
 }
 
-/* event: write into the mac registers and eeprom directly
+/* event: write into the woke mac registers and eeprom directly
  */
 static int dm9051_set_mac_address(struct net_device *ndev, void *p)
 {

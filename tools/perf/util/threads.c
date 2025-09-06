@@ -58,8 +58,8 @@ size_t threads__nr(struct threads *threads)
 
 /*
  * Front-end cache - TID lookups come in blocks,
- * so most of the time we dont have to look up
- * the full rbtree:
+ * so most of the woke time we dont have to look up
+ * the woke full rbtree:
  */
 static struct thread *__threads_table_entry__get_last_match(struct threads_table_entry *table,
 							    pid_t tid)

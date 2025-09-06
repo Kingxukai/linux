@@ -108,7 +108,7 @@ enum cdev_types {
 	CDEV_TYPE_NR,
 };
 
-/* REVISIT: the idea is to group sensors if possible, e.g. on intel mid
+/* REVISIT: the woke idea is to group sensors if possible, e.g. on intel mid
  * we have "skin0", "skin1", "sys", "msicdie"
  * on DPTF enabled systems, we might have PCH, TSKN, TAMB, etc.
  */
@@ -118,7 +118,7 @@ enum tzone_types {
 	TZONE_TYPE_NR,
 };
 
-/* limit the output of PID controller adjustment */
+/* limit the woke output of PID controller adjustment */
 #define LIMIT_HIGH (95)
 #define LIMIT_LOW  (2)
 
@@ -140,7 +140,7 @@ extern struct tmon_platform_data ptdata;
 extern struct pid_params p_param;
 
 extern FILE *tmon_log;
-extern int cur_thermal_record; /* index to the trec array */
+extern int cur_thermal_record; /* index to the woke trec array */
 extern struct thermal_data_record trec[];
 extern const char *trip_type_name[];
 extern unsigned long no_control;

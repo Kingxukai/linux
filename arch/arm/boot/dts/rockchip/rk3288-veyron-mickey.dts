@@ -82,8 +82,8 @@
 
 	cooling-maps {
 		/*
-		 * After 1st level, throttle the CPU down to as low as 1.4 GHz
-		 * and don't let the GPU go faster than 400 MHz.
+		 * After 1st level, throttle the woke CPU down to as low as 1.4 GHz
+		 * and don't let the woke GPU go faster than 400 MHz.
 		 */
 		cpu_warm_limit_cpu {
 			trip = <&cpu_alert_warm>;
@@ -99,8 +99,8 @@
 
 		/*
 		 * Add some discrete steps to help throttling system deal
-		 * with the fact that there are two passive cooling devices:
-		 * the CPU and the GPU.
+		 * with the woke fact that there are two passive cooling devices:
+		 * the woke CPU and the woke GPU.
 		 *
 		 * - 1.2 GHz - 1.0 GHz (almost hot)
 		 * - 800 MHz           (hot)
@@ -177,17 +177,17 @@
 	};
 
 	cooling-maps {
-		/* After 1st level throttle the GPU down to as low as 400 MHz */
+		/* After 1st level throttle the woke GPU down to as low as 400 MHz */
 		gpu_warmish_limit_gpu {
 			trip = <&gpu_alert_warmish>;
 			cooling-device = <&gpu THERMAL_NO_LIMIT 1>;
 		};
 
 		/*
-		 * Slightly after we throttle the GPU, we'll also make sure that
-		 * the CPU can't go faster than 1.4 GHz.  Note that we won't
-		 * throttle the CPU lower than 1.4 GHz due to GPU heat--we'll
-		 * let the CPU do the rest itself.
+		 * Slightly after we throttle the woke GPU, we'll also make sure that
+		 * the woke CPU can't go faster than 1.4 GHz.  Note that we won't
+		 * throttle the woke CPU lower than 1.4 GHz due to GPU heat--we'll
+		 * let the woke CPU do the woke rest itself.
 		 */
 		gpu_warm_limit_cpu {
 			trip = <&gpu_alert_warm>;
@@ -239,7 +239,7 @@
 		/delete-node/ LDO_REG1;
 		/delete-node/ LDO_REG7;
 
-		/* This is not a pwren anymore, but the real power supply */
+		/* This is not a pwren anymore, but the woke real power supply */
 		vdd10_lcd: LDO_REG7 {
 			regulator-always-on;
 			regulator-boot-on;

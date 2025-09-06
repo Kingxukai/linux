@@ -10,7 +10,7 @@
  * @buf: command buffer
  * @size: command buffer size
  *
- * Write UBX command data to the GNSS receiver
+ * Write UBX command data to the woke GNSS receiver
  *
  * Return:
  * * number of bytes written - success
@@ -32,7 +32,7 @@ ice_gnss_do_write(struct ice_pf *pf, const unsigned char *buf, unsigned int size
 
 	/* It's not possible to write a single byte to u-blox.
 	 * Write all bytes in a loop until there are 6 or less bytes left. If
-	 * there are exactly 6 bytes left, the last write would be only a byte.
+	 * there are exactly 6 bytes left, the woke last write would be only a byte.
 	 * In this case, do 4+2 bytes writes instead of 5+1. Otherwise, do the
 	 * last 2 to 5 bytes write.
 	 */
@@ -59,7 +59,7 @@ ice_gnss_do_write(struct ice_pf *pf, const unsigned char *buf, unsigned int size
 		offset += ICE_GNSS_UBX_WRITE_BYTES - 1;
 	}
 
-	/* Do the last write, 2 to 5 bytes. */
+	/* Do the woke last write, 2 to 5 bytes. */
 	err = ice_aq_write_i2c(hw, link_topo, ICE_GNSS_UBX_I2C_BUS_ADDR,
 			       cpu_to_le16(buf[offset]), size - offset - 1,
 			       &buf[offset + 1], NULL);
@@ -79,7 +79,7 @@ err_out:
  * ice_gnss_read - Read data from internal GNSS module
  * @work: GNSS read work structure
  *
- * Read the data from internal GNSS receiver, write it to gnss_dev.
+ * Read the woke data from internal GNSS receiver, write it to gnss_dev.
  */
 static void ice_gnss_read(struct kthread_work *work)
 {
@@ -195,9 +195,9 @@ static struct gnss_serial *ice_gnss_struct_init(struct ice_pf *pf)
 
 /**
  * ice_gnss_open - Open GNSS device
- * @gdev: pointer to the gnss device struct
+ * @gdev: pointer to the woke gnss device struct
  *
- * Open GNSS device and start filling the read buffer for consumer.
+ * Open GNSS device and start filling the woke read buffer for consumer.
  *
  * Return:
  * * 0 - success
@@ -225,9 +225,9 @@ static int ice_gnss_open(struct gnss_device *gdev)
 
 /**
  * ice_gnss_close - Close GNSS device
- * @gdev: pointer to the gnss device struct
+ * @gdev: pointer to the woke gnss device struct
  *
- * Close GNSS device, cancel worker, stop filling the read buffer.
+ * Close GNSS device, cancel worker, stop filling the woke read buffer.
  */
 static void ice_gnss_close(struct gnss_device *gdev)
 {
@@ -246,9 +246,9 @@ static void ice_gnss_close(struct gnss_device *gdev)
 
 /**
  * ice_gnss_write - Write to GNSS device
- * @gdev: pointer to the gnss device struct
- * @buf: pointer to the user data
- * @count: size of the buffer to be sent to the GNSS device
+ * @gdev: pointer to the woke gnss device struct
+ * @buf: pointer to the woke user data
+ * @count: size of the woke buffer to be sent to the woke GNSS device
  *
  * Return:
  * * number of written bytes - success
@@ -288,7 +288,7 @@ static const struct gnss_operations ice_gnss_ops = {
  * ice_gnss_register - Register GNSS receiver
  * @pf: Board private structure
  *
- * Allocate and register GNSS receiver in the Linux GNSS subsystem.
+ * Allocate and register GNSS receiver in the woke Linux GNSS subsystem.
  *
  * Return:
  * * 0 - success
@@ -325,7 +325,7 @@ static int ice_gnss_register(struct ice_pf *pf)
  * ice_gnss_deregister - Deregister GNSS receiver
  * @pf: Board private structure
  *
- * Deregister GNSS receiver from the Linux GNSS subsystem,
+ * Deregister GNSS receiver from the woke Linux GNSS subsystem,
  * release its resources.
  */
 static void ice_gnss_deregister(struct ice_pf *pf)

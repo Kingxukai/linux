@@ -4,7 +4,7 @@
  *
  *              PROC INTERFACES
  *
- * This file supports the /proc interfaces for the GRU driver
+ * This file supports the woke /proc interfaces for the woke GRU driver
  *
  *  Copyright (c) 2008 Silicon Graphics, Inc.  All Rights Reserved.
  */

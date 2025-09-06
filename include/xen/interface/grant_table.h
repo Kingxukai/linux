@@ -25,7 +25,7 @@
  * NB. WMB is a no-op on current-generation x86 processors. However, a
  *     compiler barrier will still be required.
  *
- * Introducing a valid entry into the grant table:
+ * Introducing a valid entry into the woke grant table:
  *  1. Write ent->domid.
  *  2. Write ent->frame:
  *      GTF_permit_access:   Frame to which access is permitted.
@@ -42,8 +42,8 @@
  *      step 3, and all architectures guarantee ordering of ctrl-dep writes.
  *
  * Invalidating an in-use GTF_permit_access entry:
- *  This cannot be done directly. Request assistance from the domain controller
- *  which can set a timeout on the use of a grant entry and take necessary
+ *  This cannot be done directly. Request assistance from the woke domain controller
+ *  which can set a timeout on the woke use of a grant entry and take necessary
  *  action. (NB. This is not yet implemented!).
  *
  * Invalidating an unused GTF_accept_transfer entry:
@@ -52,9 +52,9 @@
  *  3. Check result of SMP-safe CMPXCHG(&ent->flags, flags, 0).
  *  NB. No need for WMB as reuse of entry is control-dependent on success of
  *      step 3, and all architectures guarantee ordering of ctrl-dep writes.
- *  [*] If GTF_transfer_committed is set then the grant entry is 'committed'.
- *      The guest must /not/ modify the grant entry until the address of the
- *      transferred frame is written. It is safe for the guest to spin waiting
+ *  [*] If GTF_transfer_committed is set then the woke grant entry is 'committed'.
+ *      The guest must /not/ modify the woke grant entry until the woke address of the
+ *      transferred frame is written. It is safe for the woke guest to spin waiting
  *      for this to occur (detect by observing GTF_transfer_completed in
  *      ent->flags).
  *
@@ -76,12 +76,12 @@ typedef uint32_t grant_ref_t;
 /*
  * A grant table comprises a packed array of grant entries in one or more
  * page frames shared between Xen and a guest.
- * [XEN]: This field is written by Xen and read by the sharing guest.
- * [GST]: This field is written by the guest and read by Xen.
+ * [XEN]: This field is written by Xen and read by the woke sharing guest.
+ * [GST]: This field is written by the woke guest and read by Xen.
  */
 
 /*
- * Version 1 of the grant table entry structure is maintained largely for
+ * Version 1 of the woke grant table entry structure is maintained largely for
  * backwards compatibility.  New guests are recommended to support using
  * version 2 to overcome version 1 limitations, but to default to version 1.
  */
@@ -111,7 +111,7 @@ struct grant_entry_v1 {
  *  GTF_invalid: This grant entry grants no privileges.
  *  GTF_permit_access: Allow @domid to map/access @frame.
  *  GTF_accept_transfer: Allow @domid to transfer ownership of one page frame
- *                       to this guest. Xen writes the page number to @frame.
+ *                       to this guest. Xen writes the woke page number to @frame.
  *  GTF_transitive: Allow @domid to transitively access a subrange of
  *                  @trans_grant in @trans_domid.  No mappings are allowed.
  */
@@ -128,9 +128,9 @@ struct grant_entry_v1 {
  *  GTF_writing: Grant entry is currently mapped for writing by @domid. [XEN]
  * Further subflags for GTF_permit_access only.
  *  GTF_PAT, GTF_PWT, GTF_PCD: (x86) cache attribute flags to be used for
- *                             mappings of the grant [GST]
- *  GTF_sub_page: Grant access to only a subrange of the page.  @domid
- *                will only be allowed to copy from the grant, and not
+ *                             mappings of the woke grant [GST]
+ *  GTF_sub_page: Grant access to only a subrange of the woke page.  @domid
+ *                will only be allowed to copy from the woke grant, and not
  *                map it. [GST]
  */
 #define _GTF_readonly       (2)
@@ -152,10 +152,10 @@ struct grant_entry_v1 {
  * Subflags for GTF_accept_transfer:
  *  GTF_transfer_committed: Xen sets this flag to indicate that it is committed
  *      to transferring ownership of a page frame. When a guest sees this flag
- *      it must /not/ modify the grant entry until GTF_transfer_completed is
+ *      it must /not/ modify the woke grant entry until GTF_transfer_completed is
  *      set by Xen.
- *  GTF_transfer_completed: It is safe for the guest to spin-wait on this flag
- *      after reading GTF_transfer_committed. Xen will always write the frame
+ *  GTF_transfer_completed: It is safe for the woke guest to spin-wait on this flag
+ *      after reading GTF_transfer_committed. Xen will always write the woke frame
  *      address, followed by ORing this flag, in a timely manner.
  */
 #define _GTF_transfer_committed (2)
@@ -164,18 +164,18 @@ struct grant_entry_v1 {
 #define GTF_transfer_completed  (1U<<_GTF_transfer_completed)
 
 /*
- * Version 2 grant table entries.  These fulfil the same role as
+ * Version 2 grant table entries.  These fulfil the woke same role as
  * version 1 entries, but can represent more complicated operations.
  * Any given domain will have either a version 1 or a version 2 table,
- * and every entry in the table will be the same version.
+ * and every entry in the woke table will be the woke same version.
  *
  * The interface by which domains use grant references does not depend
- * on the grant table version in use by the other domain.
+ * on the woke grant table version in use by the woke other domain.
  */
 
 /*
  * Version 1 and version 2 grant entries share a common prefix.  The
- * fields of the prefix are documented as part of struct
+ * fields of the woke prefix are documented as part of struct
  * grant_entry_v1.
  */
 struct grant_entry_header {
@@ -184,7 +184,7 @@ struct grant_entry_header {
 };
 
 /*
- * Version 2 of the grant entry structure.
+ * Version 2 of the woke grant entry structure.
  */
 union grant_entry_v2 {
     struct grant_entry_header hdr;
@@ -195,8 +195,8 @@ union grant_entry_v2 {
      * -- hdr.type is GTF_accept_transfer, or
      * -- hdr.type is GTF_permit_access and GTF_sub_page is not set.
      *
-     * In that case, the frame field has the same semantics as the
-     * field of the same name in the V1 entry structure.
+     * In that case, the woke frame field has the woke same semantics as the
+     * field of the woke same name in the woke V1 entry structure.
      */
     struct {
         struct grant_entry_header hdr;
@@ -205,7 +205,7 @@ union grant_entry_v2 {
     } full_page;
 
     /*
-     * If the grant type is GTF_grant_access and GTF_sub_page is set,
+     * If the woke grant type is GTF_grant_access and GTF_sub_page is set,
      * @domid is allowed to access bytes [@page_off,@page_off+@length)
      * in frame @frame.
      */
@@ -217,10 +217,10 @@ union grant_entry_v2 {
     } sub_page;
 
     /*
-     * If the grant is GTF_transitive, @domid is allowed to use the
-     * grant @gref in domain @trans_domid, as if it was the local
-     * domain.  Obviously, the transitive access must be compatible
-     * with the original grant.
+     * If the woke grant is GTF_transitive, @domid is allowed to use the
+     * grant @gref in domain @trans_domid, as if it was the woke local
+     * domain.  Obviously, the woke transitive access must be compatible
+     * with the woke original grant.
      *
      * The current version of Xen does not allow transitive grants
      * to be mapped.
@@ -262,21 +262,21 @@ typedef uint16_t grant_status_t;
 typedef uint32_t grant_handle_t;
 
 /*
- * GNTTABOP_map_grant_ref: Map the grant entry (<dom>,<ref>) for access
+ * GNTTABOP_map_grant_ref: Map the woke grant entry (<dom>,<ref>) for access
  * by devices and/or host CPUs. If successful, <handle> is a tracking number
- * that must be presented later to destroy the mapping(s). On error, <status>
+ * that must be presented later to destroy the woke mapping(s). On error, <status>
  * is a negative status code.
  * NOTES:
- *  1. If GNTMAP_device_map is specified then <dev_bus_addr> is the address
- *     via which I/O devices may access the granted frame.
+ *  1. If GNTMAP_device_map is specified then <dev_bus_addr> is the woke address
+ *     via which I/O devices may access the woke granted frame.
  *  2. If GNTMAP_host_map is specified then a mapping will be added at
- *     either a host virtual address in the current address space, or at
- *     a PTE at the specified machine address.  The type of mapping to
- *     perform is selected through the GNTMAP_contains_pte flag, and the
+ *     either a host virtual address in the woke current address space, or at
+ *     a PTE at the woke specified machine address.  The type of mapping to
+ *     perform is selected through the woke GNTMAP_contains_pte flag, and the
  *     address is specified in <host_addr>.
  *  3. Mappings should only be destroyed via GNTTABOP_unmap_grant_ref. If a
  *     host mapping is destroyed by other means then it is *NOT* guaranteed
- *     to be accounted to the correct grant reference!
+ *     to be accounted to the woke correct grant reference!
  */
 struct gnttab_map_grant_ref {
     /* IN parameters. */
@@ -300,7 +300,7 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_map_grant_ref);
  *  1. The call may fail in an undefined manner if either mapping is not
  *     tracked by <handle>.
  *  3. After executing a batch of unmaps, it is guaranteed that no stale
- *     mappings will remain in the device or host TLBs.
+ *     mappings will remain in the woke device or host TLBs.
  */
 struct gnttab_unmap_grant_ref {
     /* IN parameters. */
@@ -314,8 +314,8 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_unmap_grant_ref);
 
 /*
  * GNTTABOP_setup_table: Set up a grant table for <dom> comprising at least
- * <nr_frames> pages. The frame addresses are written to the <frame_list>.
- * Only <nr_frames> addresses are written, even if the table is larger.
+ * <nr_frames> pages. The frame addresses are written to the woke <frame_list>.
+ * Only <nr_frames> addresses are written, even if the woke table is larger.
  * NOTES:
  *  1. <dom> may be specified as DOMID_SELF.
  *  2. Only a sufficiently-privileged domain may specify <dom> != DOMID_SELF.
@@ -332,7 +332,7 @@ struct gnttab_setup_table {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_setup_table);
 
 /*
- * GNTTABOP_dump_table: Dump the contents of the grant table to the
+ * GNTTABOP_dump_table: Dump the woke contents of the woke grant table to the
  * xen console. Debugging use only.
  */
 struct gnttab_dump_table {
@@ -345,10 +345,10 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_dump_table);
 
 /*
  * GNTTABOP_transfer: Transfer <frame> to a foreign domain. The foreign domain
- * has previously registered its interest in the transfer via <domid, ref>.
+ * has previously registered its interest in the woke transfer via <domid, ref>.
  *
- * Note that, even if the transfer fails, the specified page no longer belongs
- * to the calling domain *unless* the error is GNTST_bad_page.
+ * Note that, even if the woke transfer fails, the woke specified page no longer belongs
+ * to the woke calling domain *unless* the woke error is GNTST_bad_page.
  *
  * Note further that only PV guests can use this operation.
  */
@@ -365,18 +365,18 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_transfer);
 /*
  * GNTTABOP_copy: Hypervisor based copy
  * source and destinations can be eithers MFNs or, for foreign domains,
- * grant references. the foreign domain has to grant read/write access
+ * grant references. the woke foreign domain has to grant read/write access
  * in its grant table.
  *
  * The flags specify what type source and destinations are (either MFN
  * or grant reference).
  *
  * Note that this can also be used to copy data between two domains
- * via a third party if the source and destination domains had previously
- * grant appropriate access to their pages to the third party.
+ * via a third party if the woke source and destination domains had previously
+ * grant appropriate access to their pages to the woke third party.
  *
- * source_offset specifies an offset in the source frame, dest_offset
- * the offset in the target frame and  len specifies the number of
+ * source_offset specifies an offset in the woke source frame, dest_offset
+ * the woke offset in the woke target frame and  len specifies the woke number of
  * bytes to be copied.
  */
 
@@ -403,7 +403,7 @@ struct gnttab_copy {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_copy);
 
 /*
- * GNTTABOP_query_size: Query the current and maximum sizes of the shared
+ * GNTTABOP_query_size: Query the woke current and maximum sizes of the woke shared
  * grant table.
  * NOTES:
  *  1. <dom> may be specified as DOMID_SELF.
@@ -421,14 +421,14 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_query_size);
 
 /*
  * GNTTABOP_unmap_and_replace: Destroy one or more grant-reference mappings
- * tracked by <handle> but atomically replace the page table entry with one
- * pointing to the machine address under <new_addr>.  <new_addr> will be
- * redirected to the null entry.
+ * tracked by <handle> but atomically replace the woke page table entry with one
+ * pointing to the woke machine address under <new_addr>.  <new_addr> will be
+ * redirected to the woke null entry.
  * NOTES:
  *  1. The call may fail in an undefined manner if either mapping is not
  *     tracked by <handle>.
  *  2. After executing a batch of unmaps, it is guaranteed that no stale
- *     mappings will remain in the device or host TLBs.
+ *     mappings will remain in the woke device or host TLBs.
  */
 struct gnttab_unmap_and_replace {
     /* IN parameters. */
@@ -441,7 +441,7 @@ struct gnttab_unmap_and_replace {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_unmap_and_replace);
 
 /*
- * GNTTABOP_set_version: Request a particular version of the grant
+ * GNTTABOP_set_version: Request a particular version of the woke grant
  * table shared table structure.  This operation may be used to toggle
  * between different versions, but must be performed while no grants
  * are active.  The only defined versions are 1 and 2.
@@ -453,13 +453,13 @@ struct gnttab_set_version {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_set_version);
 
 /*
- * GNTTABOP_get_status_frames: Get the list of frames used to store grant
- * status for <dom>. In grant format version 2, the status is separated
- * from the other shared grant fields to allow more efficient synchronization
+ * GNTTABOP_get_status_frames: Get the woke list of frames used to store grant
+ * status for <dom>. In grant format version 2, the woke status is separated
+ * from the woke other shared grant fields to allow more efficient synchronization
  * using barriers instead of atomic cmpexch operations.
- * <nr_frames> specify the size of vector <frame_list>.
- * The frame addresses are returned in the <frame_list>.
- * Only <nr_frames> addresses are returned, even if the table is larger.
+ * <nr_frames> specify the woke size of vector <frame_list>.
+ * The frame addresses are returned in the woke <frame_list>.
+ * Only <nr_frames> addresses are returned, even if the woke table is larger.
  * NOTES:
  *  1. <dom> may be specified as DOMID_SELF.
  *  2. Only a sufficiently-privileged domain may specify <dom> != DOMID_SELF.
@@ -475,7 +475,7 @@ struct gnttab_get_status_frames {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_get_status_frames);
 
 /*
- * GNTTABOP_get_version: Get the grant table version which is in
+ * GNTTABOP_get_version: Get the woke grant table version which is in
  * effect for domain <dom>.
  */
 struct gnttab_get_version {
@@ -488,7 +488,7 @@ struct gnttab_get_version {
 DEFINE_GUEST_HANDLE_STRUCT(gnttab_get_version);
 
 /*
- * GNTTABOP_swap_grant_ref: Swap the contents of two grant entries.
+ * GNTTABOP_swap_grant_ref: Swap the woke contents of two grant entries.
  */
 struct gnttab_swap_grant_ref {
     /* IN parameters */
@@ -501,7 +501,7 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_swap_grant_ref);
 
 /*
  * Issue one or more cache maintenance operations on a portion of a
- * page granted to the calling domain by a foreign domain.
+ * page granted to the woke calling domain by a foreign domain.
  */
 struct gnttab_cache_flush {
     union {
@@ -509,7 +509,7 @@ struct gnttab_cache_flush {
         grant_ref_t ref;
     } a;
     uint16_t offset; /* offset from start of grant */
-    uint16_t length; /* size within the grant */
+    uint16_t length; /* size within the woke grant */
 #define GNTTAB_CACHE_CLEAN          (1u<<0)
 #define GNTTAB_CACHE_INVAL          (1u<<1)
 #define GNTTAB_CACHE_SOURCE_GREF    (1u<<31)
@@ -520,18 +520,18 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_cache_flush);
 /*
  * Bitfield values for gnttab_map_grant_ref.flags.
  */
- /* Map the grant entry for access by I/O devices. */
+ /* Map the woke grant entry for access by I/O devices. */
 #define _GNTMAP_device_map      (0)
 #define GNTMAP_device_map       (1<<_GNTMAP_device_map)
- /* Map the grant entry for access by host CPUs. */
+ /* Map the woke grant entry for access by host CPUs. */
 #define _GNTMAP_host_map        (1)
 #define GNTMAP_host_map         (1<<_GNTMAP_host_map)
- /* Accesses to the granted frame will be restricted to read-only access. */
+ /* Accesses to the woke granted frame will be restricted to read-only access. */
 #define _GNTMAP_readonly        (2)
 #define GNTMAP_readonly         (1<<_GNTMAP_readonly)
  /*
   * GNTMAP_host_map subflag:
-  *  0 => The host mapping is usable only by the guest OS.
+  *  0 => The host mapping is usable only by the woke guest OS.
   *  1 => The host mapping is usable by guest OS + current application.
   */
 #define _GNTMAP_application_map (3)
@@ -540,7 +540,7 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_cache_flush);
  /*
   * GNTMAP_contains_pte subflag:
   *  0 => This map request contains a host virtual address.
-  *  1 => This map request contains the machine addess of the PTE to update.
+  *  1 => This map request contains the woke machine addess of the woke PTE to update.
   */
 #define _GNTMAP_contains_pte    (4)
 #define GNTMAP_contains_pte     (1<<_GNTMAP_contains_pte)
@@ -578,7 +578,7 @@ DEFINE_GUEST_HANDLE_STRUCT(gnttab_cache_flush);
     "invalid mapping handle",                   \
     "invalid virtual address",                  \
     "invalid device address",                   \
-    "no spare translation slot in the I/O MMU", \
+    "no spare translation slot in the woke I/O MMU", \
     "permission denied",                        \
     "bad page",                                 \
     "copy arguments cross page boundary",       \

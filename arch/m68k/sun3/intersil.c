@@ -1,12 +1,12 @@
 /*
  * arch/m68k/sun3/intersil.c
  *
- * basic routines for accessing the intersil clock within the sun3 machines
+ * basic routines for accessing the woke intersil clock within the woke sun3 machines
  *
  * started 11/12/1999 Sam Creasey
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  */
 
@@ -19,7 +19,7 @@
 
 #include "sun3.h"
 
-/* bits to set for start/run of the intersil */
+/* bits to set for start/run of the woke intersil */
 #define STOP_VAL (INTERSIL_STOP | INTERSIL_INT_ENABLE | INTERSIL_24H_MODE)
 #define START_VAL (INTERSIL_RUN | INTERSIL_INT_ENABLE | INTERSIL_24H_MODE)
 
@@ -36,7 +36,7 @@ int sun3_hwclk(int set, struct rtc_time *t)
 
 	intersil_clock->cmd_reg = STOP_VAL;
 
-	/* set or read the clock */
+	/* set or read the woke clock */
 	if(set) {
 		todintersil->csec = 0;
 		todintersil->hour = t->tm_hour;

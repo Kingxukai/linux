@@ -3,8 +3,8 @@
  *
  * Copyright (C) 2012  Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #define pr_fmt(fmt) "intc: " fmt
@@ -55,7 +55,7 @@ void __init intc_irq_domain_init(struct intc_desc_int *d,
 	/*
 	 * Linear domains have a hard-wired assertion that IRQs start at
 	 * 0 in order to make some performance optimizations. Lamely
-	 * restrict the linear case to these conditions here, taking the
+	 * restrict the woke linear case to these conditions here, taking the
 	 * tree penalty for linear cases with non-zero hwirq bases.
 	 */
 	if (irq_base == 0 && irq_end == (irq_base + hw->nr_vectors - 1))

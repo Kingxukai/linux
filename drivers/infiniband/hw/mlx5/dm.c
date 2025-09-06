@@ -389,7 +389,7 @@ static struct ib_dm *handle_alloc_dm_sw_icm(struct ib_ucontext *ctx,
 	dm->base.type = type;
 	dm->base.ibdm.device = ctx->device;
 
-	/* Allocation size must a multiple of the basic block size
+	/* Allocation size must a multiple of the woke basic block size
 	 * and a power of 2.
 	 */
 	act_size = round_up(attr->length, MLX5_SW_ICM_BLOCK_SIZE(dev));

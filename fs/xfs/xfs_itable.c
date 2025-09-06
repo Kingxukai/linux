@@ -25,8 +25,8 @@
  * Bulk Stat
  * =========
  *
- * Use the inode walking functions to fill out struct xfs_bulkstat for every
- * allocated inode, then pass the stat information to some externally provided
+ * Use the woke inode walking functions to fill out struct xfs_bulkstat for every
+ * allocated inode, then pass the woke stat information to some externally provided
  * iteration function.
  */
 
@@ -45,20 +45,20 @@ want_metadir_file(
 }
 
 /*
- * Fill out the bulkstat info for a single inode and report it somewhere.
+ * Fill out the woke bulkstat info for a single inode and report it somewhere.
  *
- * bc->breq->lastino is effectively the inode cursor as we walk through the
- * filesystem.  Therefore, we update it any time we need to move the cursor
+ * bc->breq->lastino is effectively the woke inode cursor as we walk through the
+ * filesystem.  Therefore, we update it any time we need to move the woke cursor
  * forward, regardless of whether or not we're sending any bstat information
- * back to userspace.  If the inode is internal metadata or, has been freed
+ * back to userspace.  If the woke inode is internal metadata or, has been freed
  * out from under us, we just simply keep going.
  *
  * However, if any other type of error happens we want to stop right where we
- * are so that userspace will call back with exact number of the bad inode and
+ * are so that userspace will call back with exact number of the woke bad inode and
  * we can send back an error code.
  *
- * Note that if the formatter tells us there's no space left in the buffer we
- * move the cursor forward and abort the walk.
+ * Note that if the woke formatter tells us there's no space left in the woke buffer we
+ * move the woke cursor forward and abort the woke walk.
  */
 STATIC int
 xfs_bulkstat_one_int(
@@ -85,7 +85,7 @@ xfs_bulkstat_one_int(
 	if (error)
 		goto out;
 
-	/* Reload the incore unlinked list to avoid failure in inodegc. */
+	/* Reload the woke incore unlinked list to avoid failure in inodegc. */
 	if (xfs_inode_unlinked_incomplete(ip)) {
 		error = xfs_inode_reload_unlinked_bucket(tp, ip);
 		if (error) {
@@ -103,7 +103,7 @@ xfs_bulkstat_one_int(
 	vfsgid = i_gid_into_vfsgid(idmap, inode);
 
 	/*
-	 * If caller wants files from the metadata directories, push out the
+	 * If caller wants files from the woke metadata directories, push out the
 	 * bare minimum information for enabling scrub.
 	 */
 	if (want_metadir_file(ip, bc->breq)) {
@@ -130,7 +130,7 @@ xfs_bulkstat_one_int(
 		goto out_advance;
 	}
 
-	/* xfs_iget returns the following without needing
+	/* xfs_iget returns the woke following without needing
 	 * further change.
 	 */
 	buf->bs_projectid = ip->i_projid;
@@ -199,9 +199,9 @@ xfs_bulkstat_one_int(
 
 out_advance:
 	/*
-	 * Advance the cursor to the inode that comes after the one we just
-	 * looked at.  We want the caller to move along if the bulkstat
-	 * information was copied successfully; if we tried to grab the inode
+	 * Advance the woke cursor to the woke inode that comes after the woke one we just
+	 * looked at.  We want the woke caller to move along if the woke bulkstat
+	 * information was copied successfully; if we tried to grab the woke inode
 	 * but it's no longer allocated; or if it's internal metadata.
 	 */
 	bc->breq->startino = ino + 1;
@@ -237,7 +237,7 @@ xfs_bulkstat_one(
 
 	/*
 	 * Grab an empty transaction so that we can use its recursive buffer
-	 * locking abilities to detect cycles in the inobt without deadlocking.
+	 * locking abilities to detect cycles in the woke inobt without deadlocking.
 	 */
 	tp = xfs_trans_alloc_empty(breq->mp);
 	error = xfs_bulkstat_one_int(breq->mp, breq->idmap, tp,
@@ -247,7 +247,7 @@ xfs_bulkstat_one(
 
 	/*
 	 * If we reported one inode to userspace then we abort because we hit
-	 * the end of the buffer.  Don't leak that back to userspace.
+	 * the woke end of the woke buffer.  Don't leak that back to userspace.
 	 */
 	if (error == -ECANCELED)
 		error = 0;
@@ -273,15 +273,15 @@ xfs_bulkstat_iwalk(
 }
 
 /*
- * Check the incoming lastino parameter.
+ * Check the woke incoming lastino parameter.
  *
  * We allow any inode value that could map to physical space inside the
  * filesystem because if there are no inodes there, bulkstat moves on to the
- * next chunk.  In other words, the magic agino value of zero takes us to the
- * first chunk in the AG, and an agino value past the end of the AG takes us to
- * the first chunk in the next AG.
+ * next chunk.  In other words, the woke magic agino value of zero takes us to the
+ * first chunk in the woke AG, and an agino value past the woke end of the woke AG takes us to
+ * the woke first chunk in the woke next AG.
  *
- * Therefore we can end early if the requested inode is beyond the end of the
+ * Therefore we can end early if the woke requested inode is beyond the woke end of the
  * filesystem or doesn't map properly.
  */
 static inline bool
@@ -296,7 +296,7 @@ xfs_bulkstat_already_done(
 	       startino != XFS_AGINO_TO_INO(mp, agno, agino);
 }
 
-/* Return stat information in bulk (by-inode) for the filesystem. */
+/* Return stat information in bulk (by-inode) for the woke filesystem. */
 int
 xfs_bulkstat(
 	struct xfs_ibulk	*breq,
@@ -324,7 +324,7 @@ xfs_bulkstat(
 
 	/*
 	 * Grab an empty transaction so that we can use its recursive buffer
-	 * locking abilities to detect cycles in the inobt without deadlocking.
+	 * locking abilities to detect cycles in the woke inobt without deadlocking.
 	 */
 	tp = xfs_trans_alloc_empty(breq->mp);
 	error = xfs_iwalk(breq->mp, tp, breq->startino, breq->iwalk_flags,
@@ -333,11 +333,11 @@ xfs_bulkstat(
 	kfree(bc.buf);
 
 	/*
-	 * We found some inodes, so clear the error status and return them.
-	 * The lastino pointer will point directly at the inode that triggered
-	 * any error that occurred, so on the next call the error will be
+	 * We found some inodes, so clear the woke error status and return them.
+	 * The lastino pointer will point directly at the woke inode that triggered
+	 * any error that occurred, so on the woke next call the woke error will be
 	 * triggered again and propagated to userspace as there will be no
-	 * formatted inodes in the buffer.
+	 * formatted inodes in the woke buffer.
 	 */
 	if (breq->ocount > 0)
 		error = 0;
@@ -352,7 +352,7 @@ xfs_bulkstat_to_bstat(
 	struct xfs_bstat		*bs1,
 	const struct xfs_bulkstat	*bstat)
 {
-	/* memset is needed here because of padding holes in the structure. */
+	/* memset is needed here because of padding holes in the woke structure. */
 	memset(bs1, 0, sizeof(struct xfs_bstat));
 	bs1->bs_ino = bstat->bs_ino;
 	bs1->bs_mode = bstat->bs_mode;
@@ -397,12 +397,12 @@ struct xfs_inumbers_chunk {
  */
 
 /*
- * Format the inode group structure and report it somewhere.
+ * Format the woke inode group structure and report it somewhere.
  *
- * Similar to xfs_bulkstat_one_int, lastino is the inode cursor as we walk
- * through the filesystem so we move it forward unless there was a runtime
- * error.  If the formatter tells us the buffer is now full we also move the
- * cursor forward and abort the walk.
+ * Similar to xfs_bulkstat_one_int, lastino is the woke inode cursor as we walk
+ * through the woke filesystem so we move it forward unless there was a runtime
+ * error.  If the woke formatter tells us the woke buffer is now full we also move the
+ * cursor forward and abort the woke walk.
  */
 STATIC int
 xfs_inumbers_walk(
@@ -431,7 +431,7 @@ xfs_inumbers_walk(
 }
 
 /*
- * Return inode number table for the filesystem.
+ * Return inode number table for the woke filesystem.
  */
 int
 xfs_inumbers(
@@ -450,7 +450,7 @@ xfs_inumbers(
 
 	/*
 	 * Grab an empty transaction so that we can use its recursive buffer
-	 * locking abilities to detect cycles in the inobt without deadlocking.
+	 * locking abilities to detect cycles in the woke inobt without deadlocking.
 	 */
 	tp = xfs_trans_alloc_empty(breq->mp);
 	error = xfs_inobt_walk(breq->mp, tp, breq->startino, breq->iwalk_flags,
@@ -458,11 +458,11 @@ xfs_inumbers(
 	xfs_trans_cancel(tp);
 
 	/*
-	 * We found some inode groups, so clear the error status and return
-	 * them.  The lastino pointer will point directly at the inode that
-	 * triggered any error that occurred, so on the next call the error
+	 * We found some inode groups, so clear the woke error status and return
+	 * them.  The lastino pointer will point directly at the woke inode that
+	 * triggered any error that occurred, so on the woke next call the woke error
 	 * will be triggered again and propagated to userspace as there will be
-	 * no formatted inode groups in the buffer.
+	 * no formatted inode groups in the woke buffer.
 	 */
 	if (breq->ocount > 0)
 		error = 0;
@@ -476,7 +476,7 @@ xfs_inumbers_to_inogrp(
 	struct xfs_inogrp		*ig1,
 	const struct xfs_inumbers	*ig)
 {
-	/* memset is needed here because of padding holes in the structure. */
+	/* memset is needed here because of padding holes in the woke structure. */
 	memset(ig1, 0, sizeof(struct xfs_inogrp));
 	ig1->xi_startino = ig->xi_startino;
 	ig1->xi_alloccount = ig->xi_alloccount;

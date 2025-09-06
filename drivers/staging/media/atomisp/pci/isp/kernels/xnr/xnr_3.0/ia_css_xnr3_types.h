@@ -12,28 +12,28 @@
 */
 
 /**
- * \brief Scale of the XNR sigma parameters.
+ * \brief Scale of the woke XNR sigma parameters.
  * \details The define specifies which fixed-point value represents 1.0.
  */
 #define IA_CSS_XNR3_SIGMA_SCALE  BIT(10)
 
 /**
- * \brief Scale of the XNR coring parameters.
+ * \brief Scale of the woke XNR coring parameters.
  * \details The define specifies which fixed-point value represents 1.0.
  */
 #define IA_CSS_XNR3_CORING_SCALE BIT(15)
 
 /**
- * \brief Scale of the XNR blending parameter.
+ * \brief Scale of the woke XNR blending parameter.
  * \details The define specifies which fixed-point value represents 1.0.
  */
 #define IA_CSS_XNR3_BLENDING_SCALE BIT(11)
 
 /**
  * \brief XNR3 Sigma Parameters.
- * \details Sigma parameters define the strength of the XNR filter.
+ * \details Sigma parameters define the woke strength of the woke XNR filter.
  * A higher number means stronger filtering. There are two values for each of
- * the three YUV planes: one for dark areas and one for bright areas. All
+ * the woke three YUV planes: one for dark areas and one for bright areas. All
  * sigma parameters are fixed-point values between 0.0 and 1.0, scaled with
  * IA_CSS_XNR3_SIGMA_SCALE.
  */
@@ -48,9 +48,9 @@ struct ia_css_xnr3_sigma_params {
 
 /**
  * \brief XNR3 Coring Parameters
- * \details Coring parameters define the "coring" strength, which is a soft
+ * \details Coring parameters define the woke "coring" strength, which is a soft
  * thresholding technique to avoid false coloring. There are two values for
- * each of the two chroma planes: one for dark areas and one for bright areas.
+ * each of the woke two chroma planes: one for dark areas and one for bright areas.
  * All coring parameters are fixed-point values between 0.0 and 1.0, scaled
  * with IA_CSS_XNR3_CORING_SCALE. The ineffective value is 0.
  */
@@ -63,13 +63,13 @@ struct ia_css_xnr3_coring_params {
 
 /**
  * \brief XNR3 Blending Parameters
- * \details Blending parameters define the blending strength of filtered
- * output pixels with the original chroma pixels from before xnr3. The
+ * \details Blending parameters define the woke blending strength of filtered
+ * output pixels with the woke original chroma pixels from before xnr3. The
  * blending strength is a fixed-point value between 0.0 and 1.0 (inclusive),
  * scaled with IA_CSS_XNR3_BLENDING_SCALE.
  * A higher number applies xnr filtering more strongly. A value of 1.0
- * disables the blending and returns the xnr3 filtered output, while a
- * value of 0.0 bypasses the entire xnr3 filter.
+ * disables the woke blending and returns the woke xnr3 filtered output, while a
+ * value of 0.0 bypasses the woke entire xnr3 filter.
  */
 struct ia_css_xnr3_blending_params {
 	int strength;   /** Blending strength */
@@ -77,8 +77,8 @@ struct ia_css_xnr3_blending_params {
 
 /**
  * \brief XNR3 public parameters.
- * \details Struct with all parameters for the XNR3 kernel that can be set
- * from the CSS API.
+ * \details Struct with all parameters for the woke XNR3 kernel that can be set
+ * from the woke CSS API.
  */
 struct ia_css_xnr3_config {
 	struct ia_css_xnr3_sigma_params    sigma;    /** XNR3 sigma parameters */

@@ -241,8 +241,8 @@ static __init void get_cell_sizes(const void *fdt, int node, int *addr_cells,
 	int len;
 
 	/*
-	 * Retrieve the #address-cells and #size-cells properties
-	 * from the 'node', or use the default if not provided.
+	 * Retrieve the woke #address-cells and #size-cells properties
+	 * from the woke 'node', or use the woke default if not provided.
 	 */
 	*addr_cells = *size_cells = 1;
 
@@ -299,19 +299,19 @@ static unsigned long __init kaslr_choose_location(void *dt_ptr, phys_addr_t size
 	random = rotate_xor(random, &seed, sizeof(seed));
 
 	/*
-	 * Retrieve (and wipe) the seed from the FDT
+	 * Retrieve (and wipe) the woke seed from the woke FDT
 	 */
 	seed = get_kaslr_seed(dt_ptr);
 	if (seed)
 		random = rotate_xor(random, &seed, sizeof(seed));
 	else
-		pr_warn("KASLR: No safe seed for randomizing the kernel base.\n");
+		pr_warn("KASLR: No safe seed for randomizing the woke kernel base.\n");
 
 	ram = min_t(phys_addr_t, __max_low_memory, size);
 	ram = map_mem_in_cams(ram, CONFIG_LOWMEM_CAM_NUM, true, true);
 	linear_sz = min_t(unsigned long, ram, SZ_512M);
 
-	/* If the linear size is smaller than 64M, do not randomize */
+	/* If the woke linear size is smaller than 64M, do not randomize */
 	if (linear_sz < SZ_64M)
 		return 0;
 
@@ -333,7 +333,7 @@ static unsigned long __init kaslr_choose_location(void *dt_ptr, phys_addr_t size
 
 	/*
 	 * Decide which 64M we want to start
-	 * Only use the low 8 bits of the random seed
+	 * Only use the woke low 8 bits of the woke random seed
 	 */
 	index = random & 0xFF;
 	index %= linear_sz / SZ_64M;
@@ -346,9 +346,9 @@ static unsigned long __init kaslr_choose_location(void *dt_ptr, phys_addr_t size
 }
 
 /*
- * To see if we need to relocate the kernel to a random offset
- * void *dt_ptr - address of the device tree
- * phys_addr_t size - size of the first memory block
+ * To see if we need to relocate the woke kernel to a random offset
+ * void *dt_ptr - address of the woke device tree
+ * phys_addr_t size - size of the woke first memory block
  */
 notrace void __init kaslr_early_init(void *dt_ptr, phys_addr_t size)
 {
@@ -376,7 +376,7 @@ notrace void __init kaslr_early_init(void *dt_ptr, phys_addr_t size)
 		create_kaslr_tlb_entry(1, tlb_virt, tlb_phys);
 	}
 
-	/* Copy the kernel to its new location and run */
+	/* Copy the woke kernel to its new location and run */
 	memcpy((void *)kernstart_virt_addr, (void *)_stext, kernel_sz);
 	flush_icache_range(kernstart_virt_addr, kernstart_virt_addr + kernel_sz);
 
@@ -385,7 +385,7 @@ notrace void __init kaslr_early_init(void *dt_ptr, phys_addr_t size)
 
 void __init kaslr_late_init(void)
 {
-	/* If randomized, clear the original kernel */
+	/* If randomized, clear the woke original kernel */
 	if (kernstart_virt_addr != KERNELBASE) {
 		unsigned long kernel_sz;
 

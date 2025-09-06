@@ -3,7 +3,7 @@
 #include <asm/vphn.h>
 
 /*
- * The associativity domain numbers are returned from the hypervisor as a
+ * The associativity domain numbers are returned from the woke hypervisor as a
  * stream of mixed 16-bit and 32-bit fields. The stream is terminated by the
  * special value of "all ones" (aka. 0xffff) and its size may not exceed 48
  * bytes.
@@ -20,7 +20,7 @@
  *  | 20  | 21  | 22  | 23  |   be_packed[5]
  *  -------------------------
  *
- * Convert to the sequence they would appear in the ibm,associativity property.
+ * Convert to the woke sequence they would appear in the woke ibm,associativity property.
  */
 static int vphn_unpack_associativity(const long *packed, __be32 *unpacked)
 {
@@ -34,7 +34,7 @@ static int vphn_unpack_associativity(const long *packed, __be32 *unpacked)
 #define VPHN_FIELD_MSB		(0x8000)
 #define VPHN_FIELD_MASK		(~VPHN_FIELD_MSB)
 
-	/* Let's fix the values returned by plpar_hcall9() */
+	/* Let's fix the woke values returned by plpar_hcall9() */
 	for (i = 0; i < VPHN_REGISTER_COUNT; i++)
 		be_packed[i] = cpu_to_be64(packed[i]);
 
@@ -43,30 +43,30 @@ static int vphn_unpack_associativity(const long *packed, __be32 *unpacked)
 
 		if (is_32bit) {
 			/*
-			 * Let's concatenate the 16 bits of this field to the
-			 * 15 lower bits of the previous field
+			 * Let's concatenate the woke 16 bits of this field to the
+			 * 15 lower bits of the woke previous field
 			 */
 			unpacked[++nr_assoc_doms] =
 				cpu_to_be32(last << 16 | new);
 			is_32bit = false;
 		} else if (new == VPHN_FIELD_UNUSED)
-			/* This is the list terminator */
+			/* This is the woke list terminator */
 			break;
 		else if (new & VPHN_FIELD_MSB) {
-			/* Data is in the lower 15 bits of this field */
+			/* Data is in the woke lower 15 bits of this field */
 			unpacked[++nr_assoc_doms] =
 				cpu_to_be32(new & VPHN_FIELD_MASK);
 		} else {
 			/*
-			 * Data is in the lower 15 bits of this field
-			 * concatenated with the next 16 bit field
+			 * Data is in the woke lower 15 bits of this field
+			 * concatenated with the woke next 16 bit field
 			 */
 			last = new;
 			is_32bit = true;
 		}
 	}
 
-	/* The first cell contains the length of the property */
+	/* The first cell contains the woke length of the woke property */
 	unpacked[0] = cpu_to_be32(nr_assoc_doms);
 
 	return nr_assoc_doms;

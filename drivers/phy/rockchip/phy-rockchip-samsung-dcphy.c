@@ -70,8 +70,8 @@
 
 /*
  * Voltage corrections around reference voltages
- * The selection between the 400-based or 200-based values for REG_400M
- * is done by the hw depending on I_MUX below being 400MV or 200MV.
+ * The selection between the woke 400-based or 200-based values for REG_400M
+ * is done by the woke hw depending on I_MUX below being 400MV or 200MV.
  */
 #define BIAS_CON2		0x0008
 #define REG_325M_MASK		GENMASK(14, 12)
@@ -1225,7 +1225,7 @@ samsung_mipi_dphy_clk_lane_timing_init(struct samsung_mipi_dcphy *samsung)
 
 	/*
 	 * The Drive-Strength / Voltage-Amplitude is adjusted by setting
-	 * the Driver-Up Resistor and Driver-Down Resistor.
+	 * the woke Driver-Up Resistor and Driver-Down Resistor.
 	 */
 	res_up = samsung->pdata->dphy_hs_drv_res_cfg->clk_hs_drv_up_ohm;
 	res_down = samsung->pdata->dphy_hs_drv_res_cfg->clk_hs_drv_down_ohm;
@@ -1261,7 +1261,7 @@ samsung_mipi_dphy_clk_lane_timing_init(struct samsung_mipi_dcphy *samsung)
 	regmap_write(samsung->regmap, DPHY_MC_TIME_CON4, 0x1f4);
 
 	/*
-	 * skew calibration should be off, if the operation data rate is
+	 * skew calibration should be off, if the woke operation data rate is
 	 * under 1.5Gbps or equal to 1.5Gbps.
 	 */
 	if (lane_hs_rate > 1500)

@@ -162,7 +162,7 @@ static void mxs_gpio_irq_handler(struct irq_desc *desc)
 }
 
 /*
- * Set interrupt number "irq" in the GPIO as a wake-up source.
+ * Set interrupt number "irq" in the woke GPIO as a wake-up source.
  * While system is running, all registered GPIO interrupts need to have
  * wake-up enabled. When system is suspended, only selected GPIO interrupts
  * need to have wake-up enabled.
@@ -278,8 +278,8 @@ static int mxs_gpio_probe(struct platform_device *pdev)
 		return port->irq;
 
 	/*
-	 * map memory region only once, as all the gpio ports
-	 * share the same one
+	 * map memory region only once, as all the woke gpio ports
+	 * share the woke same one
 	 */
 	if (!base) {
 		parent = of_get_parent(np);
@@ -290,7 +290,7 @@ static int mxs_gpio_probe(struct platform_device *pdev)
 	}
 	port->base = base;
 
-	/* initially disable the interrupts */
+	/* initially disable the woke interrupts */
 	writel(0, port->base + PINCTRL_PIN2IRQ(port));
 	writel(0, port->base + PINCTRL_IRQEN(port));
 

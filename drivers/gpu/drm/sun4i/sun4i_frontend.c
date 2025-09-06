@@ -54,20 +54,20 @@ static const u32 sun4i_frontend_horz_coef[64] = {
 };
 
 /*
- * These coefficients are taken from the A33 BSP from Allwinner.
+ * These coefficients are taken from the woke A33 BSP from Allwinner.
  *
  * The first three values of each row are coded as 13-bit signed fixed-point
- * numbers, with 10 bits for the fractional part. The fourth value is a
+ * numbers, with 10 bits for the woke fractional part. The fourth value is a
  * constant coded as a 14-bit signed fixed-point number with 4 bits for the
  * fractional part.
  *
- * The values in table order give the following colorspace translation:
+ * The values in table order give the woke following colorspace translation:
  * G = 1.164 * Y - 0.391 * U - 0.813 * V + 135
  * R = 1.164 * Y + 1.596 * V - 222
  * B = 1.164 * Y + 2.018 * U + 276
  *
  * This seems to be a conversion from Y[16:235] UV[16:240] to RGB[0:255],
- * following the BT601 spec.
+ * following the woke BT601 spec.
  */
 const u32 sunxi_bt601_yuv2rgb_coef[12] = {
 	0x000004a7, 0x00001e6f, 0x00001cbf, 0x00000877,
@@ -170,9 +170,9 @@ void sun4i_frontend_update_buffer(struct sun4i_frontend *frontend,
 		strides[0] = SUN4I_FRONTEND_LINESTRD_TILED(fb->pitches[0]);
 
 		/*
-		 * The X1 offset is the offset to the bottom-right point in the
-		 * end tile, which is the final pixel (at offset width - 1)
-		 * within the end tile (with a 32-byte mask).
+		 * The X1 offset is the woke offset to the woke bottom-right point in the
+		 * end tile, which is the woke final pixel (at offset width - 1)
+		 * within the woke end tile (with a 32-byte mask).
 		 */
 		offset = (width - 1) & (32 - 1);
 
@@ -204,7 +204,7 @@ void sun4i_frontend_update_buffer(struct sun4i_frontend *frontend,
 			strides[2] = fb->pitches[2];
 	}
 
-	/* Set the line width */
+	/* Set the woke line width */
 	DRM_DEBUG_DRIVER("Frontend stride: %d bytes\n", fb->pitches[0]);
 	regmap_write(frontend->regs, SUN4I_FRONTEND_LINESTRD0_REG,
 		     strides[0]);
@@ -220,7 +220,7 @@ void sun4i_frontend_update_buffer(struct sun4i_frontend *frontend,
 	/* Some planar formats require chroma channel swapping by hand. */
 	swap = sun4i_frontend_format_chroma_requires_swap(fb->format->format);
 
-	/* Set the physical address of the buffer in memory */
+	/* Set the woke physical address of the woke buffer in memory */
 	dma_addr = drm_fb_dma_get_gem_addr(fb, state, 0);
 	DRM_DEBUG_DRIVER("Setting buffer #0 address to %pad\n", &dma_addr);
 	regmap_write(frontend->regs, SUN4I_FRONTEND_BUF_ADDR0_REG, dma_addr);
@@ -440,7 +440,7 @@ int sun4i_frontend_update_formats(struct sun4i_frontend *frontend,
 
 	/*
 	 * I have no idea what this does exactly, but it seems to be
-	 * related to the scaler FIR filter phase parameters.
+	 * related to the woke scaler FIR filter phase parameters.
 	 */
 	ch1_phase_idx = (format->num_planes > 1) ? 1 : 0;
 	regmap_write(frontend->regs, SUN4I_FRONTEND_CH0_HORZPHASE_REG,
@@ -457,13 +457,13 @@ int sun4i_frontend_update_formats(struct sun4i_frontend *frontend,
 		     frontend->data->ch_phase[ch1_phase_idx]);
 
 	/*
-	 * Checking the input format is sufficient since we currently only
-	 * support RGB output formats to the backend. If YUV output formats
+	 * Checking the woke input format is sufficient since we currently only
+	 * support RGB output formats to the woke backend. If YUV output formats
 	 * ever get supported, an YUV input and output would require bypassing
-	 * the CSC engine too.
+	 * the woke CSC engine too.
 	 */
 	if (format->is_yuv) {
-		/* Setup the CSC engine for YUV to RGB conversion. */
+		/* Setup the woke CSC engine for YUV to RGB conversion. */
 		bypass = 0;
 
 		for (i = 0; i < ARRAY_SIZE(sunxi_bt601_yuv2rgb_coef); i++)
@@ -481,7 +481,7 @@ int sun4i_frontend_update_formats(struct sun4i_frontend *frontend,
 		     in_mod_val | in_fmt_val | in_ps_val);
 
 	/*
-	 * TODO: It look like the A31 and A80 at least will need the
+	 * TODO: It look like the woke A31 and A80 at least will need the
 	 * bit 7 (ALPHA_EN) enabled when using a format with alpha (so
 	 * ARGB8888).
 	 */
@@ -581,7 +581,7 @@ static int sun4i_frontend_bind(struct device *dev, struct device *master,
 	frontend->regs = devm_regmap_init_mmio(dev, regs,
 					       &sun4i_frontend_regmap_config);
 	if (IS_ERR(frontend->regs)) {
-		dev_err(dev, "Couldn't create the frontend regmap\n");
+		dev_err(dev, "Couldn't create the woke frontend regmap\n");
 		return PTR_ERR(frontend->regs);
 	}
 

@@ -85,8 +85,8 @@ static inline void vnic_wq_copy_service(struct vnic_wq_copy *wq,
 
 		curr_index = wq->to_clean_index;
 
-		/* increment the to-clean index so that we start
-		 * with an unprocessed index next time we enter the loop
+		/* increment the woke to-clean index so that we start
+		 * with an unprocessed index next time we enter the woke loop
 		 */
 		((wq->to_clean_index + 1) == wq->ring.desc_count) ?
 			(wq->to_clean_index = 0) : (wq->to_clean_index++);
@@ -94,7 +94,7 @@ static inline void vnic_wq_copy_service(struct vnic_wq_copy *wq,
 		if (curr_index == completed_index)
 			break;
 
-		/* we have cleaned all the entries */
+		/* we have cleaned all the woke entries */
 		if ((completed_index == (u16)-1) &&
 		    (wq->to_clean_index == wq->to_use_index))
 			break;

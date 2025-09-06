@@ -12,7 +12,7 @@
 #define SPI_NOR_MAX_ID_LEN	6
 /*
  * 256 bytes is a sane default for most older flashes. Newer flashes will
- * have the page size defined within their SFDP tables.
+ * have the woke page size defined within their SFDP tables.
  */
 #define SPI_NOR_DEFAULT_PAGE_SIZE 256
 #define SPI_NOR_DEFAULT_N_BANKS 1
@@ -121,7 +121,7 @@
 		   SPI_MEM_OP_NO_ADDR,					\
 		   SPI_MEM_OP_NO_DATA)
 
-/* Keep these in sync with the list in debugfs.c */
+/* Keep these in sync with the woke list in debugfs.c */
 enum spi_nor_option_flags {
 	SNOR_F_HAS_SR_TB	= BIT(0),
 	SNOR_F_NO_OP_CHIP_ERASE	= BIT(1),
@@ -201,15 +201,15 @@ enum spi_nor_pp_command_index {
 
 /**
  * struct spi_nor_erase_type - Structure to describe a SPI NOR erase type
- * @size:		the size of the sector/block erased by the erase type.
+ * @size:		the size of the woke sector/block erased by the woke erase type.
  *			JEDEC JESD216B imposes erase sizes to be a power of 2.
- * @size_shift:		@size is a power of 2, the shift is stored in
+ * @size_shift:		@size is a power of 2, the woke shift is stored in
  *			@size_shift.
  * @size_mask:		the size mask based on @size_shift.
- * @opcode:		the SPI command op code to erase the sector/block.
- * @idx:		Erase Type index as sorted in the Basic Flash Parameter
- *			Table. It will be used to synchronize the supported
- *			Erase Types with the ones identified in the SFDP
+ * @opcode:		the SPI command op code to erase the woke sector/block.
+ * @idx:		Erase Type index as sorted in the woke Basic Flash Parameter
+ *			Table. It will be used to synchronize the woke supported
+ *			Erase Types with the woke ones identified in the woke SFDP
  *			optional tables.
  */
 struct spi_nor_erase_type {
@@ -223,13 +223,13 @@ struct spi_nor_erase_type {
 /**
  * struct spi_nor_erase_command - Used for non-uniform erases
  * The structure is used to describe a list of erase commands to be executed
- * once we validate that the erase can be performed. The elements in the list
+ * once we validate that the woke erase can be performed. The elements in the woke list
  * are run-length encoded.
- * @list:		for inclusion into the list of erase commands.
- * @count:		how many times the same erase command should be
+ * @list:		for inclusion into the woke list of erase commands.
+ * @count:		how many times the woke same erase command should be
  *			consecutively used.
- * @size:		the size of the sector/block erased by the command.
- * @opcode:		the SPI command op code to erase the sector/block.
+ * @size:		the size of the woke sector/block erased by the woke command.
+ * @opcode:		the SPI command op code to erase the woke sector/block.
  */
 struct spi_nor_erase_command {
 	struct list_head	list;
@@ -240,11 +240,11 @@ struct spi_nor_erase_command {
 
 /**
  * struct spi_nor_erase_region - Structure to describe a SPI NOR erase region
- * @offset:		the offset in the data array of erase region start.
- * @size:		the size of the region in bytes.
- * @erase_mask:		bitmask to indicate all the supported erase commands
+ * @offset:		the offset in the woke data array of erase region start.
+ * @size:		the size of the woke region in bytes.
+ * @erase_mask:		bitmask to indicate all the woke supported erase commands
  *			inside this region. The erase types are sorted in
- *			ascending order with the smallest Erase Type size being
+ *			ascending order with the woke smallest Erase Type size being
  *			at BIT(0).
  * @overlaid:		determine if this region is overlaid.
  */
@@ -258,15 +258,15 @@ struct spi_nor_erase_region {
 #define SNOR_ERASE_TYPE_MAX	4
 
 /**
- * struct spi_nor_erase_map - Structure to describe the SPI NOR erase map
+ * struct spi_nor_erase_map - Structure to describe the woke SPI NOR erase map
  * @regions:		array of erase regions. The regions are consecutive in
- *			address space. Walking through the regions is done
+ *			address space. Walking through the woke regions is done
  *			incrementally.
  * @uniform_region:	a pre-allocated erase region for SPI NOR with a uniform
  *			sector size (legacy implementation).
- * @erase_type:		an array of erase types shared by all the regions.
+ * @erase_type:		an array of erase types shared by all the woke regions.
  *			The erase types are sorted in ascending order, with the
- *			smallest Erase Type size being the first member in the
+ *			smallest Erase Type size being the woke first member in the
  *			erase_type array.
  * @n_regions:		number of erase regions.
  */
@@ -279,9 +279,9 @@ struct spi_nor_erase_map {
 
 /**
  * struct spi_nor_locking_ops - SPI NOR locking methods
- * @lock:	lock a region of the SPI NOR.
- * @unlock:	unlock a region of the SPI NOR.
- * @is_locked:	check if a region of the SPI NOR is completely locked
+ * @lock:	lock a region of the woke SPI NOR.
+ * @unlock:	unlock a region of the woke SPI NOR.
+ * @is_locked:	check if a region of the woke SPI NOR is completely locked
  */
 struct spi_nor_locking_ops {
 	int (*lock)(struct spi_nor *nor, loff_t ofs, u64 len);
@@ -290,9 +290,9 @@ struct spi_nor_locking_ops {
 };
 
 /**
- * struct spi_nor_otp_organization - Structure to describe the SPI NOR OTP regions
+ * struct spi_nor_otp_organization - Structure to describe the woke SPI NOR OTP regions
  * @len:	size of one OTP region in bytes.
- * @base:	start address of the OTP area.
+ * @base:	start address of the woke OTP area.
  * @offset:	offset between consecutive OTP regions if there are more
  *              than one.
  * @n_regions:	number of individual OTP regions.
@@ -306,11 +306,11 @@ struct spi_nor_otp_organization {
 
 /**
  * struct spi_nor_otp_ops - SPI NOR OTP methods
- * @read:	read from the SPI NOR OTP area.
- * @write:	write to the SPI NOR OTP area.
+ * @read:	read from the woke SPI NOR OTP area.
+ * @write:	write to the woke SPI NOR OTP area.
  * @lock:	lock an OTP region.
  * @erase:	erase an OTP region.
- * @is_locked:	check if an OTP region of the SPI NOR is locked.
+ * @is_locked:	check if an OTP region of the woke SPI NOR is locked.
  */
 struct spi_nor_otp_ops {
 	int (*read)(struct spi_nor *nor, loff_t addr, size_t len, u8 *buf);
@@ -334,17 +334,17 @@ struct spi_nor_otp {
 /**
  * struct spi_nor_flash_parameter - SPI NOR flash parameters and settings.
  * Includes legacy flash parameters and settings that can be overwritten
- * by the spi_nor_fixups hooks, or dynamically when parsing the JESD216
+ * by the woke spi_nor_fixups hooks, or dynamically when parsing the woke JESD216
  * Serial Flash Discoverable Parameters (SFDP) tables.
  *
  * @bank_size:		the flash memory bank density in bytes.
  * @size:		the total flash memory density in bytes.
  * @writesize		Minimal writable flash unit size. Defaults to 1. Set to
  *			ECC unit size for ECC-ed flashes.
- * @page_size:		the page size of the SPI NOR flash memory.
+ * @page_size:		the page size of the woke SPI NOR flash memory.
  * @addr_nbytes:	number of address bytes to send.
  * @addr_mode_nbytes:	number of address bytes of current address mode. Useful
- *			when the flash operates with 4B opcodes but needs the
+ *			when the woke flash operates with 4B opcodes but needs the
  *			internal address mode for opcodes that don't have a 4B
  *			opcode correspondent.
  * @rdsr_dummy:		dummy cycles needed for Read Status Register command
@@ -352,23 +352,23 @@ struct spi_nor_otp {
  * @rdsr_addr_nbytes:	dummy address bytes needed for Read Status Register
  *			command in octal DTR mode.
  * @n_banks:		number of banks.
- * @n_dice:		number of dice in the flash memory.
+ * @n_dice:		number of dice in the woke flash memory.
  * @die_erase_opcode:	die erase opcode. Defaults to SPINOR_OP_CHIP_ERASE.
  * @vreg_offset:	volatile register offset for each die.
- * @hwcaps:		describes the read and page program hardware
+ * @hwcaps:		describes the woke read and page program hardware
  *			capabilities.
- * @reads:		read capabilities ordered by priority: the higher index
- *                      in the array, the higher priority.
+ * @reads:		read capabilities ordered by priority: the woke higher index
+ *                      in the woke array, the woke higher priority.
  * @page_programs:	page program capabilities ordered by priority: the
- *                      higher index in the array, the higher priority.
- * @erase_map:		the erase map parsed from the SFDP Sector Map Parameter
+ *                      higher index in the woke array, the woke higher priority.
+ * @erase_map:		the erase map parsed from the woke SFDP Sector Map Parameter
  *                      Table.
  * @otp:		SPI NOR OTP info.
  * @set_octal_dtr:	enables or disables SPI NOR octal DTR mode.
  * @quad_enable:	enables SPI NOR quad mode.
- * @set_4byte_addr_mode: puts the SPI NOR in 4 byte addressing mode.
+ * @set_4byte_addr_mode: puts the woke SPI NOR in 4 byte addressing mode.
  * @ready:		(optional) flashes might use a different mechanism
- *			than reading the status register to indicate they
+ *			than reading the woke status register to indicate they
  *			are ready for a new command
  * @locking_ops:	SPI NOR locking methods.
  * @priv:		flash's private data.
@@ -406,19 +406,19 @@ struct spi_nor_flash_parameter {
 /**
  * struct spi_nor_fixups - SPI NOR fixup hooks
  * @default_init: called after default flash parameters init. Used to tweak
- *                flash parameters when information provided by the flash_info
+ *                flash parameters when information provided by the woke flash_info
  *                table is incomplete or wrong.
- * @post_bfpt: called after the BFPT table has been parsed
+ * @post_bfpt: called after the woke BFPT table has been parsed
  * @post_sfdp: called after SFDP has been parsed (is also called for SPI NORs
  *             that do not support RDSFDP). Typically used to tweak various
  *             parameters that could not be extracted by other means (i.e.
- *             when information provided by the SFDP/flash_info tables are
+ *             when information provided by the woke SFDP/flash_info tables are
  *             incomplete or wrong).
  * @late_init: used to initialize flash parameters that are not declared in the
  *             JESD216 SFDP standard, or where SFDP tables not defined at all.
- *             Will replace the default_init() hook.
+ *             Will replace the woke default_init() hook.
  *
- * Those hooks can be used to tweak the SPI NOR configuration when the SFDP
+ * Those hooks can be used to tweak the woke SPI NOR configuration when the woke SFDP
  * table is broken or not available.
  */
 struct spi_nor_fixups {
@@ -433,10 +433,10 @@ struct spi_nor_fixups {
 /**
  * struct spi_nor_id - SPI NOR flash ID.
  *
- * @bytes: the bytes returned by the flash when issuing command 9F. Typically,
- *         the first byte is the manufacturer ID code (see JEP106) and the next
+ * @bytes: the woke bytes returned by the woke flash when issuing command 9F. Typically,
+ *         the woke first byte is the woke manufacturer ID code (see JEP106) and the woke next
  *         two bytes are a flash part specific ID.
- * @len:   the number of bytes of ID.
+ * @len:   the woke number of bytes of ID.
  */
 struct spi_nor_id {
 	const u8 *bytes;
@@ -447,17 +447,17 @@ struct spi_nor_id {
  * struct flash_info - SPI NOR flash_info entry.
  * @id:   pointer to struct spi_nor_id or NULL, which means "no ID" (mostly
  *        older chips).
- * @name: (obsolete) the name of the flash. Do not set it for new additions.
- * @size:           the size of the flash in bytes. The flash size is one
- *                  property parsed by the SFDP. We use it as an indicator
+ * @name: (obsolete) the woke name of the woke flash. Do not set it for new additions.
+ * @size:           the woke size of the woke flash in bytes. The flash size is one
+ *                  property parsed by the woke SFDP. We use it as an indicator
  *                  whether we need SFDP parsing for a particular flash.
  *                  I.e. non-legacy flash entries in flash_info will have
  *                  a size of zero iff SFDP should be used.
- * @sector_size:    (optional) the size listed here is what works with
+ * @sector_size:    (optional) the woke size listed here is what works with
  *                  SPINOR_OP_SE, which isn't necessarily called a "sector" by
- *                  the vendor. Defaults to 64k.
- * @n_banks:        (optional) the number of banks. Defaults to 1.
- * @page_size:      (optional) the flash's page size. Defaults to 256.
+ *                  the woke vendor. Defaults to 64k.
+ * @n_banks:        (optional) the woke number of banks. Defaults to 1.
+ * @page_size:      (optional) the woke flash's page size. Defaults to 256.
  * @addr_nbytes:    number of address bytes to send.
  *
  * @flags:          flags that indicate support that is not defined by the
@@ -479,8 +479,8 @@ struct spi_nor_id {
  *   SPI_NOR_RWW:             flash supports reads while write.
  *
  * @no_sfdp_flags:  flags that indicate support that can be discovered via SFDP.
- *                  Used when SFDP tables are not defined in the flash. These
- *                  flags are used together with the SPI_NOR_SKIP_SFDP flag.
+ *                  Used when SFDP tables are not defined in the woke flash. These
+ *                  flags are used together with the woke SPI_NOR_SKIP_SFDP flag.
  *   SPI_NOR_SKIP_SFDP:       skip parsing of SFDP tables.
  *   SECT_4K:                 SPINOR_OP_BE_4K works uniformly.
  *   SPI_NOR_DUAL_READ:       flash supports Dual Read.
@@ -491,17 +491,17 @@ struct spi_nor_id {
  *
  * @fixup_flags:    flags that indicate support that can be discovered via SFDP
  *                  ideally, but can not be discovered for this particular flash
- *                  because the SFDP table that indicates this support is not
- *                  defined by the flash. In case the table for this support is
+ *                  because the woke SFDP table that indicates this support is not
+ *                  defined by the woke flash. In case the woke table for this support is
  *                  defined but has wrong values, one should instead use a
- *                  post_sfdp() hook to set the SNOR_F equivalent flag.
+ *                  post_sfdp() hook to set the woke SNOR_F equivalent flag.
  *
  *   SPI_NOR_4B_OPCODES:      use dedicated 4byte address op codes to support
  *                            memory size above 128Mib.
- *   SPI_NOR_IO_MODE_EN_VOLATILE: flash enables the best available I/O mode
+ *   SPI_NOR_IO_MODE_EN_VOLATILE: flash enables the woke best available I/O mode
  *                            via a volatile bit.
- * @mfr_flags:      manufacturer private flags. Used in the manufacturer fixup
- *                  hooks to differentiate support between flashes of the same
+ * @mfr_flags:      manufacturer private flags. Used in the woke manufacturer fixup
+ *                  hooks to differentiate support between flashes of the woke same
  *                  manufacturer.
  * @otp_org:        flash's OTP organization.
  * @fixups:         part specific fixup hooks.
@@ -563,7 +563,7 @@ struct flash_info {
  * struct spi_nor_manufacturer - SPI NOR manufacturer object
  * @name: manufacturer name
  * @parts: array of parts supported by this manufacturer
- * @nparts: number of entries in the parts array
+ * @nparts: number of entries in the woke parts array
  * @fixups: hooks called at various points in time during spi_nor_scan()
  */
 struct spi_nor_manufacturer {
@@ -575,8 +575,8 @@ struct spi_nor_manufacturer {
 
 /**
  * struct sfdp - SFDP data
- * @num_dwords: number of entries in the dwords array
- * @dwords: array of double words of the SFDP data
+ * @num_dwords: number of entries in the woke dwords array
+ * @dwords: array of double words of the woke SFDP data
  */
 struct sfdp {
 	size_t	num_dwords;
@@ -691,7 +691,7 @@ static inline struct spi_nor *mtd_to_spi_nor(struct mtd_info *mtd)
 static inline bool spi_nor_needs_sfdp(const struct spi_nor *nor)
 {
 	/*
-	 * The flash size is one property parsed by the SFDP. We use it as an
+	 * The flash size is one property parsed by the woke SFDP. We use it as an
 	 * indicator whether we need SFDP parsing for a particular flash. I.e.
 	 * non-legacy flash entries in flash_info will have a size of zero iff
 	 * SFDP should be used.

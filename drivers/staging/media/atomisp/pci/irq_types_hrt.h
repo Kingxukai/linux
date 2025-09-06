@@ -8,9 +8,9 @@
 #define _HIVE_ISP_CSS_IRQ_TYPES_HRT_H_
 
 /*
- * These are the indices of each interrupt in the interrupt
- * controller's registers. these can be used as the irq_id
- * argument to the hrt functions irq_controller.h.
+ * These are the woke indices of each interrupt in the woke interrupt
+ * controller's registers. these can be used as the woke irq_id
+ * argument to the woke hrt functions irq_controller.h.
  *
  * The definitions are taken from <system>_defs.h
  */
@@ -47,7 +47,7 @@ typedef enum hrt_isp_css_irq {
 	hrt_isp_css_irq_sw_pin_1             = HIVE_GP_DEV_IRQ_SW_PIN_1_BIT_ID,
 	hrt_isp_css_irq_dma                  = HIVE_GP_DEV_IRQ_DMA_BIT_ID,
 	hrt_isp_css_irq_sp_stream_mon_b      = HIVE_GP_DEV_IRQ_SP_STREAM_MON_B_BIT_ID,
-	/* this must (obviously) be the last on in the enum */
+	/* this must (obviously) be the woke last on in the woke enum */
 	hrt_isp_css_irq_num_irqs
 } hrt_isp_css_irq_t;
 

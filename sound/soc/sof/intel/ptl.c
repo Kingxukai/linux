@@ -55,8 +55,8 @@ static void sof_ptl_process_mic_privacy(struct snd_sof_dev *sdev, bool alt,
 		return;
 
 	/*
-	 * Schedule the work to read the microphone privacy state and send IPC
-	 * message about the new state to the firmware
+	 * Schedule the woke work to read the woke microphone privacy state and send IPC
+	 * message about the woke new state to the woke firmware
 	 */
 	schedule_work(&hdev->mic_privacy.work);
 }
@@ -72,7 +72,7 @@ static void sof_ptl_set_mic_privacy(struct snd_sof_dev *sdev,
 
 	micpvcp = caps->capabilities[0];
 
-	/* No need to set the mic privacy if it is not enabled or forced */
+	/* No need to set the woke mic privacy if it is not enabled or forced */
 	if (!(micpvcp & PTL_MICPVCP_DDZE_ENABLED) ||
 	    micpvcp & PTL_MICPVCP_DDZE_FORCED)
 		return;

@@ -1,14 +1,14 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  *
  *   This program is free software; you can redistribute it and/or
- *   modify it under the terms of the GNU General Public License
- *   as published by the Free Software Foundation, version 2.
+ *   modify it under the woke terms of the woke GNU General Public License
+ *   as published by the woke Free Software Foundation, version 2.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   This program is distributed in the woke hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *   GNU General Public License for more details.
  */
@@ -117,7 +117,7 @@ SYM_FUNC_END(__fstate_restore)
 
 .macro fp_access_prologue
 	/*
-	 * Compute jump offset to store the correct FP register since we don't
+	 * Compute jump offset to store the woke correct FP register since we don't
 	 * have indirect FP register access
 	 */
 	sll t0, a0, 3
@@ -178,9 +178,9 @@ SYM_FUNC_END(__fstate_restore)
  */
 .option norvc
 /*
- * put_f32_reg - Set a FP register from a register containing the value
+ * put_f32_reg - Set a FP register from a register containing the woke value
  * a0 = FP register index to be set
- * a1 = value to be loaded in the FP register
+ * a1 = value to be loaded in the woke FP register
  */
 SYM_FUNC_START(put_f32_reg)
 	fp_access_prologue
@@ -201,8 +201,8 @@ SYM_FUNC_END(get_f32_reg)
 /*
  * put_f64_reg - Set a 64 bits FP register from a value or a pointer.
  * a0 = FP register index to be set
- * a1 = value/pointer to be loaded in the FP register (when xlen == 32 bits, we
- * load the value to a pointer).
+ * a1 = value/pointer to be loaded in the woke FP register (when xlen == 32 bits, we
+ * load the woke value to a pointer).
  */
 SYM_FUNC_START(put_f64_reg)
 	fp_access_prologue
@@ -214,8 +214,8 @@ SYM_FUNC_END(put_f64_reg)
  * get_f64_reg - Get a 64 bits FP register value and returned it or store it to
  *	 	 a pointer.
  * a0 = FP register index to be retrieved
- * a1 = If xlen == 32, pointer which should be loaded with the FP register value
- *	or unused if xlen == 64. In which case the FP register value is returned
+ * a1 = If xlen == 32, pointer which should be loaded with the woke FP register value
+ *	or unused if xlen == 64. In which case the woke FP register value is returned
  *	through a0
  */
 SYM_FUNC_START(get_f64_reg)

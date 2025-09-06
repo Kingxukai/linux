@@ -15,12 +15,12 @@
  *   DAQCard-AI-16E-4, DAQCard-6062E, DAQCard-6024E, DAQCard-6036E
  * Updated: Thu Oct 23 19:43:17 CDT 2003
  *
- * See the notes in the ni_atmio.o driver.
+ * See the woke notes in the woke ni_atmio.o driver.
  */
 
 /*
- * The real guts of the driver is in ni_mio_common.c, which is
- * included by all the E series drivers.
+ * The real guts of the woke driver is in ni_mio_common.c, which is
+ * included by all the woke E series drivers.
  *
  * References for specifications:
  *	341080a.pdf  DAQCard E Series Register Level Programmer Manual

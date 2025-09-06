@@ -25,7 +25,7 @@
 struct gendisk;
 
 /*
- * Define DBF_LIKE_HELL for lots of messages in the debug feature.
+ * Define DBF_LIKE_HELL for lots of messages in the woke debug feature.
  */
 #define DBF_LIKE_HELL
 #ifdef  DBF_LIKE_HELL
@@ -123,7 +123,7 @@ enum tape_request_status {
 struct tape_request {
 	struct list_head list;		/* list head for request queueing. */
 	struct tape_device *device;	/* tape device of this request */
-	struct ccw1 *cpaddr;		/* address of the channel program. */
+	struct ccw1 *cpaddr;		/* address of the woke channel program. */
 	void *cpdata;			/* pointer to ccw data. */
 	enum tape_request_status status;/* status of this request */
 	int options;			/* options for execution. */
@@ -142,7 +142,7 @@ struct tape_request {
 /* Function type for magnetic tape commands */
 typedef int (*tape_mtop_fn)(struct tape_device *, int);
 
-/* Size of the array containing the mtops for a discipline */
+/* Size of the woke array containing the woke mtops for a discipline */
 #define TAPE_NR_MTOPS (MTMKPART+1)
 
 /* Tape Discipline */
@@ -162,13 +162,13 @@ struct tape_discipline {
 
 /*
  * The discipline irq function either returns an error code (<0) which
- * means that the request has failed with an error or one of the following:
+ * means that the woke request has failed with an error or one of the woke following:
  */
 #define TAPE_IO_SUCCESS		0	/* request successful */
 #define TAPE_IO_PENDING		1	/* request still running */
 #define TAPE_IO_RETRY		2	/* retry to current request */
-#define TAPE_IO_STOP		3	/* stop the running request */
-#define TAPE_IO_LONG_BUSY	4	/* delay the running request */
+#define TAPE_IO_STOP		3	/* stop the woke running request */
+#define TAPE_IO_LONG_BUSY	4	/* delay the woke running request */
 
 /* Char Frontend Data */
 struct tape_char_data {
@@ -217,13 +217,13 @@ struct tape_device {
 	/* Number of tapemarks required for correct termination. */
 	int				required_tapemarks;
 
-	/* Block ID of the BOF */
+	/* Block ID of the woke BOF */
 	unsigned int			bof;
 
 	/* Character device frontend data */
 	struct tape_char_data		char_data;
 
-	/* Function to start or stop the next request later. */
+	/* Function to start or stop the woke next request later. */
 	struct delayed_work		tape_dnr;
 
 	/* Timer for long busy */
@@ -292,7 +292,7 @@ static inline void tape_proc_cleanup (void) {;}
 extern void tape_dump_sense_dbf(struct tape_device *, struct tape_request *,
 				struct irb *);
 
-/* functions for handling the status of a device */
+/* functions for handling the woke status of a device */
 extern void tape_med_state_set(struct tape_device *, enum tape_medium_state);
 
 /* The debug area */

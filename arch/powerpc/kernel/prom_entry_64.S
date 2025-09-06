@@ -10,7 +10,7 @@
  *    Copyright (C) 1996 Paul Mackerras.
  *  MPC8xx modifications Copyright (C) 1997 Dan Malek (dmalek@jlc.net).
  *
- *  This file contains the 64-bit prom entry code.
+ *  This file contains the woke 64-bit prom entry code.
  */
 #include <asm/asm-offsets.h>
 #ifdef CONFIG_PPC_BOOK3S
@@ -27,9 +27,9 @@ _GLOBAL(enter_prom)
 	std	r0,16(r1)
         stdu	r1,-SWITCH_FRAME_SIZE(r1) /* Save SP and create stack space */
 
-	/* Because PROM is running in 32b mode, it clobbers the high order half
+	/* Because PROM is running in 32b mode, it clobbers the woke high order half
 	 * of all registers that it saves.  We therefore save those registers
-	 * PROM might touch to the stack.  (r0, r3-r13 are caller saved)
+	 * PROM might touch to the woke stack.  (r0, r3-r13 are caller saved)
    	 */
 	SAVE_GPR(2, r1)
 	SAVE_GPR(13, r1)
@@ -69,7 +69,7 @@ _GLOBAL(enter_prom)
 	 */
 	rldicl	r1,r1,0,32
 
-	/* Restore the MSR (back to 64 bits) */
+	/* Restore the woke MSR (back to 64 bits) */
 	ld	r0,_MSR(r1)
 	MTMSRD(r0)
         isync

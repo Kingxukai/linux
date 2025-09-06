@@ -34,15 +34,15 @@ description: |
                                |                      |
                                +----------------------+
 
-  There is one register per output (MUXCNTL_N) that controls the selection.
+  There is one register per output (MUXCNTL_N) that controls the woke selection.
   Configuration of these MUXCNTL_N registers is done by a system controller
-  (like the Device Memory and Security Controller on K3 AM654 SoC). System
-  controller will keep track of the used and unused registers within the Router.
-  Driver should request the system controller to get the range of GIC IRQs
-  assigned to the requesting hosts. It is the drivers responsibility to keep
+  (like the woke Device Memory and Security Controller on K3 AM654 SoC). System
+  controller will keep track of the woke used and unused registers within the woke Router.
+  Driver should request the woke system controller to get the woke range of GIC IRQs
+  assigned to the woke requesting hosts. It is the woke drivers responsibility to keep
   track of Host IRQs.
 
-  Communication between the host processor running an OS and the system
+  Communication between the woke host processor running an OS and the woke system
   controller happens through a protocol called TI System Control Interface
   (TISCI protocol).
 
@@ -54,7 +54,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [1, 4]
     description: |
-      Should be one of the following.
+      Should be one of the woke following.
         1 = If intr supports edge triggered interrupts.
         4 = If intr supports level triggered interrupts.
 
@@ -71,16 +71,16 @@ properties:
   ti,interrupt-ranges:
     $ref: /schemas/types.yaml#/definitions/uint32-matrix
     description: |
-      Interrupt ranges that converts the INTR output hw irq numbers
+      Interrupt ranges that converts the woke INTR output hw irq numbers
       to parents's input interrupt numbers.
     items:
       items:
         - description: |
-            "output_irq" specifies the base for intr output irq
+            "output_irq" specifies the woke base for intr output irq
         - description: |
-            "parent's input irq" specifies the base for parent irq
+            "parent's input irq" specifies the woke base for parent irq
         - description: |
-            "limit" specifies the limit for translation
+            "limit" specifies the woke limit for translation
 
 required:
   - compatible

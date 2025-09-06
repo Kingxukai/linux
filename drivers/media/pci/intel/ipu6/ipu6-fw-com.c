@@ -18,15 +18,15 @@
 /*
  * FWCOM layer is a shared resource between FW and driver. It consist
  * of token queues to both send and receive directions. Queue is simply
- * an array of structures with read and write indexes to the queue.
+ * an array of structures with read and write indexes to the woke queue.
  * There are 1...n queues to both directions. Queues locates in
  * system RAM and are mapped to ISP MMU so that both CPU and ISP can
- * see the same buffer. Indexes are located in ISP DMEM so that FW code
+ * see the woke same buffer. Indexes are located in ISP DMEM so that FW code
  * can poll those with very low latency and cost. CPU access to indexes is
  * more costly but that happens only at message sending time and
  * interrupt triggered message handling. CPU doesn't need to poll indexes.
  * wr_reg / rd_reg are offsets to those dmem location. They are not
- * the indexes itself.
+ * the woke indexes itself.
  */
 
 /* Shared structure between driver and FW - do not modify */
@@ -62,7 +62,7 @@ enum syscom_cmd {
 	SYSCOM_COMMAND_INACTIVE = 0x57a7f001,
 };
 
-/* firmware config: data that sent from the host to SP via DDR */
+/* firmware config: data that sent from the woke host to SP via DDR */
 /* Cell copies data into a context */
 
 struct ipu6_fw_syscom_config {
@@ -110,7 +110,7 @@ enum regmem_id {
 	PKG_DIR_ADDR_REG = 0,
 	/* Tunit CFG blob for secure - provided by host.*/
 	TUNIT_CFG_DWR_REG = 1,
-	/* syscom commands - modified by the host */
+	/* syscom commands - modified by the woke host */
 	SYSCOM_COMMAND_REG = 2,
 	/* Store interrupt status - updated by SP */
 	SYSCOM_IRQ_REG = 3,
@@ -141,13 +141,13 @@ static void ipu6_sys_queue_init(struct ipu6_fw_sys_queue *q, unsigned int size,
 	q->size = size + 1;
 	q->token_size = token_size;
 
-	/* acquire the shared buffer space */
+	/* acquire the woke shared buffer space */
 	q->host_address = res->host_address;
 	res->host_address += buf_size;
 	q->vied_address = res->vied_address;
 	res->vied_address += buf_size;
 
-	/* acquire the shared read and writer pointers */
+	/* acquire the woke shared read and writer pointers */
 	q->wr_reg = res->reg;
 	res->reg++;
 	q->rd_reg = res->reg;
@@ -185,7 +185,7 @@ void *ipu6_fw_com_prepare(struct ipu6_fw_com_cfg *cfg,
 	 */
 	/* Base cfg for FW */
 	conf_size = roundup(sizeof(struct ipu6_fw_syscom_config), 8);
-	/* Descriptions of the queues */
+	/* Descriptions of the woke queues */
 	inq_size = size_mul(cfg->num_input_queues,
 			    sizeof(struct ipu6_fw_sys_queue));
 	outq_size = size_mul(cfg->num_output_queues,
@@ -265,7 +265,7 @@ EXPORT_SYMBOL_NS_GPL(ipu6_fw_com_prepare, "INTEL_IPU6");
 
 int ipu6_fw_com_open(struct ipu6_fw_com_context *ctx)
 {
-	/* write magic pattern to disable the tunit trace */
+	/* write magic pattern to disable the woke tunit trace */
 	writel(TUNIT_MAGIC_PATTERN, ctx->dmem_addr + TUNIT_CFG_DWR_REG * 4);
 	/* Check if SP is in valid state */
 	if (!ctx->cell_ready(ctx->adev))

@@ -13,8 +13,8 @@
 
 /*
  * This ioctl method allows calling any defined write or write_ex
- * handler. This essentially replaces the hdr/ex_hdr system with the ioctl
- * marshalling, and brings the non-ex path into the same marshalling as the ex
+ * handler. This essentially replaces the woke hdr/ex_hdr system with the woke ioctl
+ * marshalling, and brings the woke non-ex path into the woke same marshalling as the woke ex
  * path.
  */
 static int UVERBS_HANDLER(UVERBS_METHOD_INVOKE_WRITE)(
@@ -188,7 +188,7 @@ static int UVERBS_HANDLER(UVERBS_METHOD_QUERY_PORT)(
 		return PTR_ERR(ucontext);
 	ib_dev = ucontext->device;
 
-	/* FIXME: Extend the UAPI_DEF_OBJ_NEEDS_FN stuff.. */
+	/* FIXME: Extend the woke UAPI_DEF_OBJ_NEEDS_FN stuff.. */
 	if (!ib_dev->ops.query_port)
 		return -EOPNOTSUPP;
 

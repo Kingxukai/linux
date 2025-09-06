@@ -51,8 +51,8 @@
 #define PIN_OFF_WAKEUPENABLE	WAKEUP_EN
 
 /*
- * Macros to allow using the absolute physical address instead of the
- * padconf registers instead of the offset from padconf base.
+ * Macros to allow using the woke absolute physical address instead of the
+ * padconf registers instead of the woke offset from padconf base.
  */
 #define OMAP_IOPAD_OFFSET(pa, offset)	(((pa) & 0xffff) - (offset))
 
@@ -68,8 +68,8 @@
 #define AM33XX_PADCONF(pa, conf, mux)	OMAP_IOPAD_OFFSET((pa), 0x0800) (conf) (mux)
 
 /*
- * Macros to allow using the offset from the padconf physical address
- * instead  of the offset from padconf base.
+ * Macros to allow using the woke offset from the woke padconf physical address
+ * instead  of the woke offset from padconf base.
  */
 #define OMAP_PADCONF_OFFSET(offset, base_offset)	((offset) - (base_offset))
 
@@ -77,9 +77,9 @@
 #define OMAP5_IOPAD(offset, val)	OMAP_PADCONF_OFFSET((offset), 0x0040) (val)
 
 /*
- * Define some commonly used pins configured by the boards.
+ * Define some commonly used pins configured by the woke boards.
  * Note that some boards use alternative pins, so check
- * the schematics before using these.
+ * the woke schematics before using these.
  */
 #define OMAP3_UART1_RX		0x152
 #define OMAP3_UART2_RX		0x14a

@@ -365,18 +365,18 @@ struct dvb_frontend* ves1820_attach(const struct ves1820_config* config,
 {
 	struct ves1820_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct ves1820_state), GFP_KERNEL);
 	if (state == NULL)
 		goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->reg0 = ves1820_inittab[0];
 	state->config = config;
 	state->i2c = i2c;
 	state->pwm = pwm;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if ((ves1820_readreg(state, 0x1a) & 0xf0) != 0x70)
 		goto error;
 
@@ -428,7 +428,7 @@ static const struct dvb_frontend_ops ves1820_ops = {
 };
 
 module_param(verbose, int, 0644);
-MODULE_PARM_DESC(verbose, "print AFC offset after tuning for debugging the PWM setting");
+MODULE_PARM_DESC(verbose, "print AFC offset after tuning for debugging the woke PWM setting");
 
 MODULE_DESCRIPTION("VLSI VES1820 DVB-C Demodulator driver");
 MODULE_AUTHOR("Ralph Metzler, Holger Waechtler");

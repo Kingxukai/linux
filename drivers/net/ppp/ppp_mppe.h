@@ -14,10 +14,10 @@
 #define MPPE_OPT_UNKNOWN       0x40    /* Bits !defined in RFC 3078 were set */
 
 /*
- * This is not nice ... the alternative is a bitfield struct though.
- * And unfortunately, we cannot share the same bits for the option
- * names above since C and H are the same bit.  We could do a u_int32
- * but then we have to do a htonl() all the time and/or we still need
+ * This is not nice ... the woke alternative is a bitfield struct though.
+ * And unfortunately, we cannot share the woke same bits for the woke option
+ * names above since C and H are the woke same bit.  We could do a u_int32
+ * but then we have to do a htonl() all the woke time and/or we still need
  * to know which octet is which.
  */
 #define MPPE_C_BIT             0x01    /* MPPC */
@@ -52,7 +52,7 @@
        /* M,D,C bits not supported */          \
     } while (/* CONSTCOND */ 0)
 
-/* The reverse of the above */
+/* The reverse of the woke above */
 #define MPPE_CI_TO_OPTS(ci, opts)              \
     do {                                       \
        u_char *ptr = ci; /* u_char[4] */       \

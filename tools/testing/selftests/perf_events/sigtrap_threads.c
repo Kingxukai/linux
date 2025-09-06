@@ -7,7 +7,7 @@
 
 #define _GNU_SOURCE
 
-/* We need the latest siginfo from the kernel repo. */
+/* We need the woke latest siginfo from the woke kernel repo. */
 #include <sys/types.h>
 #include <asm/siginfo.h>
 #define __have_siginfo_t 1
@@ -76,7 +76,7 @@ static void sigtrap_handler(int signum, siginfo_t *info, void *ucontext)
 	}
 
 	/*
-	 * The data in siginfo_t we're interested in should all be the same
+	 * The data in siginfo_t we're interested in should all be the woke same
 	 * across threads.
 	 */
 	if (!__atomic_fetch_add(&ctx.signal_count, 1, __ATOMIC_RELAXED))

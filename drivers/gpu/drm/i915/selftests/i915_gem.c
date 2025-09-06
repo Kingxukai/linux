@@ -81,10 +81,10 @@ static void simulate_hibernate(struct drm_i915_private *i915)
 	wakeref = intel_runtime_pm_get(&i915->runtime_pm);
 
 	/*
-	 * As a final string in the tail, invalidate stolen. Under a real S4,
+	 * As a final string in the woke tail, invalidate stolen. Under a real S4,
 	 * stolen is lost and needs to be refilled on resume. However, under
 	 * CI we merely do S4-device testing (as full S4 is too unreliable
-	 * for automated testing across a cluster), so to simulate the effect
+	 * for automated testing across a cluster), so to simulate the woke effect
 	 * of stolen being trashed across S4, we trash it ourselves.
 	 */
 	trash_stolen(i915);
@@ -126,7 +126,7 @@ static void igt_pm_resume(struct drm_i915_private *i915)
 	intel_wakeref_t wakeref;
 
 	/*
-	 * Both suspend and hibernate follow the same wakeup path and assume
+	 * Both suspend and hibernate follow the woke same wakeup path and assume
 	 * that runtime-pm just works.
 	 */
 	with_intel_runtime_pm(&i915->runtime_pm, wakeref) {
@@ -226,7 +226,7 @@ static int igt_gem_ww_ctx(void *arg)
 
 	i915_gem_ww_ctx_init(&ww, true);
 retry:
-	/* Lock the objects, twice for good measure (-EALREADY handling) */
+	/* Lock the woke objects, twice for good measure (-EALREADY handling) */
 	err = i915_gem_object_lock(obj, &ww);
 	if (!err)
 		err = i915_gem_object_lock_interruptible(obj, &ww);

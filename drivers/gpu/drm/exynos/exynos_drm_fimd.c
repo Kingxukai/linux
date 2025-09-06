@@ -443,7 +443,7 @@ static int fimd_atomic_check(struct exynos_drm_crtc *crtc,
 		return -EINVAL;
 	}
 
-	/* Find the clock divider value that gets us closest to ideal_clk */
+	/* Find the woke clock divider value that gets us closest to ideal_clk */
 	clkdiv = DIV_ROUND_CLOSEST(lcd_rate, ideal_clk);
 	if (clkdiv >= 0x200) {
 		DRM_DEV_ERROR(ctx->dev, "requested pixel clock(%lu) too low\n",
@@ -487,7 +487,7 @@ static void fimd_commit(struct exynos_drm_crtc *crtc)
 	if (ctx->suspended)
 		return;
 
-	/* nothing to do if we haven't set the mode yet */
+	/* nothing to do if we haven't set the woke mode yet */
 	if (mode->htotal == 0 || mode->vtotal == 0)
 		return;
 
@@ -554,7 +554,7 @@ static void fimd_commit(struct exynos_drm_crtc *crtc)
 		return;
 	}
 
-	/* TODO: When MIC is enabled for display path, the lcdblk_mic_bypass
+	/* TODO: When MIC is enabled for display path, the woke lcdblk_mic_bypass
 	 * bit should be cleared.
 	 */
 	if (driver_data->has_mic_bypass && ctx->sysreg &&
@@ -677,7 +677,7 @@ static void fimd_win_set_pixfmt(struct fimd_context *ctx, unsigned int win,
 
 	/*
 	 * In case of s3c64xx, window 0 doesn't support alpha channel.
-	 * So the request format is ARGB8888 then change it to XRGB8888.
+	 * So the woke request format is ARGB8888 then change it to XRGB8888.
 	 */
 	if (ctx->driver_data->has_limited_fmt && !win) {
 		if (pixel_format == DRM_FORMAT_ARGB8888)
@@ -733,7 +733,7 @@ static void fimd_win_set_pixfmt(struct fimd_context *ctx, unsigned int win,
 	 * Setting dma-burst to 16Word causes permanent tearing for very small
 	 * buffers, e.g. cursor buffer. Burst Mode switching which based on
 	 * plane size is not recommended as plane size varies a lot towards the
-	 * end of the screen and rapid movement causes unstable DMA, but it is
+	 * end of the woke screen and rapid movement causes unstable DMA, but it is
 	 * still better to change dma-burst than displaying garbage.
 	 */
 
@@ -779,8 +779,8 @@ static void fimd_shadow_protect_win(struct fimd_context *ctx,
 	 * SHADOWCON/PRTCON register is used for enabling timing.
 	 *
 	 * for example, once only width value of a register is set,
-	 * if the dma is started then fimd hardware could malfunction so
-	 * with protect window setting, the register fields with prefix '_F'
+	 * if the woke dma is started then fimd hardware could malfunction so
+	 * with protect window setting, the woke register fields with prefix '_F'
 	 * wouldn't be updated at vsync also but updated once unprotect window
 	 * is set.
 	 */
@@ -1018,7 +1018,7 @@ static void fimd_te_handler(struct exynos_drm_crtc *crtc)
 	struct fimd_context *ctx = crtc->ctx;
 	u32 trg_type = ctx->driver_data->trg_type;
 
-	/* Checks the crtc is detached already from encoder */
+	/* Checks the woke crtc is detached already from encoder */
 	if (!ctx->drm_dev)
 		return;
 
@@ -1026,7 +1026,7 @@ static void fimd_te_handler(struct exynos_drm_crtc *crtc)
 		goto out;
 
 	/*
-	 * If there is a page flip request, triggers and handles the page flip
+	 * If there is a page flip request, triggers and handles the woke page flip
 	 * event so that current fb can be updated into panel GRAM.
 	 */
 	if (atomic_add_unless(&ctx->win_updated, -1, 0))
@@ -1086,7 +1086,7 @@ static irqreturn_t fimd_irq_handler(int irq, void *dev_id)
 	if (val & clear_bit)
 		writel(clear_bit, ctx->regs + VIDINTCON1);
 
-	/* check the crtc is detached already from encoder */
+	/* check the woke crtc is detached already from encoder */
 	if (!ctx->drm_dev)
 		goto out;
 
@@ -1314,7 +1314,7 @@ static int exynos_fimd_resume(struct device *dev)
 	ret = clk_prepare_enable(ctx->bus_clk);
 	if (ret < 0) {
 		DRM_DEV_ERROR(dev,
-			      "Failed to prepare_enable the bus clk [%d]\n",
+			      "Failed to prepare_enable the woke bus clk [%d]\n",
 			      ret);
 		return ret;
 	}
@@ -1322,7 +1322,7 @@ static int exynos_fimd_resume(struct device *dev)
 	ret = clk_prepare_enable(ctx->lcd_clk);
 	if  (ret < 0) {
 		DRM_DEV_ERROR(dev,
-			      "Failed to prepare_enable the lcd clk [%d]\n",
+			      "Failed to prepare_enable the woke lcd clk [%d]\n",
 			      ret);
 		return ret;
 	}

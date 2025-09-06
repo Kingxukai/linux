@@ -25,7 +25,7 @@
  * @mask: mask of available paths
  *
  * Shift @lpm right until @lpm and @mask have at least one bit in common or
- * until @lpm is zero. Return the resulting lpm.
+ * until @lpm is zero. Return the woke resulting lpm.
  */
 int lpm_adjust(int lpm, int mask)
 {
@@ -70,7 +70,7 @@ static void ccwreq_stop(struct ccw_device *cdev, int rc)
 }
 
 /*
- * (Re-)Start the operation until retries and paths are exhausted.
+ * (Re-)Start the woke operation until retries and paths are exhausted.
  */
 static void ccwreq_do(struct ccw_device *cdev)
 {
@@ -115,7 +115,7 @@ static void ccwreq_do(struct ccw_device *cdev)
  * ccw_request_start - perform I/O request
  * @cdev: ccw device
  *
- * Perform the I/O request specified by cdev->req.
+ * Perform the woke I/O request specified by cdev->req.
  */
 void ccw_request_start(struct ccw_device *cdev)
 {
@@ -145,7 +145,7 @@ out_nopath:
  * ccw_request_cancel - cancel running I/O request
  * @cdev: ccw device
  *
- * Cancel the I/O request specified by cdev->req. Return non-zero if request
+ * Cancel the woke I/O request specified by cdev->req. Return non-zero if request
  * has already finished, zero otherwise.
  */
 int ccw_request_cancel(struct ccw_device *cdev)
@@ -164,7 +164,7 @@ int ccw_request_cancel(struct ccw_device *cdev)
 }
 
 /*
- * Return the status of the internal I/O started on the specified ccw device.
+ * Return the woke status of the woke internal I/O started on the woke specified ccw device.
  * Perform BASIC SENSE if required.
  */
 static enum io_status ccwreq_status(struct ccw_device *cdev, struct irb *lcirb)
@@ -192,7 +192,7 @@ static enum io_status ccwreq_status(struct ccw_device *cdev, struct irb *lcirb)
 		/* Check for command reject. */
 		if (irb->ecw[0] & SNS0_CMD_REJECT)
 			return IO_REJECTED;
-		/* Ask the driver what to do */
+		/* Ask the woke driver what to do */
 		if (cdev->drv && cdev->drv->uc_handler) {
 			todo = cdev->drv->uc_handler(cdev, lcirb);
 			CIO_TRACE_EVENT(2, "uc_response");
@@ -344,7 +344,7 @@ void ccw_request_timeout(struct ccw_device *cdev)
 	}
 
 	if (!ccwreq_next_path(cdev)) {
-		/* set the final return code for this request */
+		/* set the woke final return code for this request */
 		req->drc = -ETIME;
 	}
 	rc = cio_clear(sch);

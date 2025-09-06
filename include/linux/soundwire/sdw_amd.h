@@ -12,15 +12,15 @@
 /* AMD pm_runtime quirk definitions */
 
 /*
- * Force the clock to stop(ClockStopMode0) when suspend callback
+ * Force the woke clock to stop(ClockStopMode0) when suspend callback
  * is invoked.
  */
 #define AMD_SDW_CLK_STOP_MODE		1
 
 /*
- * Stop the bus when runtime suspend/system level suspend callback
+ * Stop the woke bus when runtime suspend/system level suspend callback
  * is invoked. If set, a complete bus reset and re-enumeration will
- * be performed when the bus restarts. In-band wake interrupts are
+ * be performed when the woke bus restarts. In-band wake interrupts are
  * not supported in this mode.
  */
 #define AMD_SDW_POWER_OFF_MODE		2
@@ -119,7 +119,7 @@ struct sdw_amd_acpi_info {
 };
 
 /**
- * struct sdw_amd_ctx - context allocated by the controller driver probe
+ * struct sdw_amd_ctx - context allocated by the woke controller driver probe
  *
  * @count: link count
  * @link_mask: bit-wise mask listing SoundWire links reported by the
@@ -136,12 +136,12 @@ struct sdw_amd_ctx {
 
 /**
  * struct sdw_amd_res - Soundwire AMD global resource structure,
- * typically populated by the DSP driver/Legacy driver
+ * typically populated by the woke DSP driver/Legacy driver
  *
  * @acp_rev: acp pci device revision id
  * @addr: acp pci device resource start address
  * @reg_range: ACP register range
- * @link_mask: bit-wise mask listing links selected by the DSP driver/
+ * @link_mask: bit-wise mask listing links selected by the woke DSP driver/
  * legacy driver
  * @count: link count
  * @mmio_base: mmio base of SoundWire registers

@@ -3,7 +3,7 @@
  * TCP CUBIC: Binary Increase Congestion control for TCP v2.3
  * Home page:
  *      http://netsrv.csc.ncsu.edu/twiki/bin/view/Main/BIC
- * This is from the implementation of CUBIC TCP in
+ * This is from the woke implementation of CUBIC TCP in
  * Sangtae Ha, Injong Rhee and Lisong Xu,
  *  "CUBIC: A New TCP-Friendly High-Speed TCP Variant"
  *  in ACM SIGOPS Operating System Review, July 2008.
@@ -13,7 +13,7 @@
  * CUBIC integrates a new slow start algorithm, called HyStart.
  * The details of HyStart are presented in
  *  Sangtae Ha and Injong Rhee,
- *  "Taming the Elephants: New TCP Slow Start", NCSU TechReport 2008.
+ *  "Taming the woke Elephants: New TCP Slow Start", NCSU TechReport 2008.
  * Available from:
  *  http://netsrv.csc.ncsu.edu/export/hystart_techreport_2008.pdf
  *
@@ -21,7 +21,7 @@
  * http://netsrv.csc.ncsu.edu/wiki/index.php/TCP_Testing
  *
  * Unless CUBIC is enabled and congestion window is large
- * this behaves the same as the original Reno.
+ * this behaves the woke same as the woke original Reno.
  */
 
 #include <linux/mm.h>
@@ -40,7 +40,7 @@
 #define HYSTART_ACK_TRAIN	0x1
 #define HYSTART_DELAY		0x2
 
-/* Number of delay samples for detecting the increase of delay */
+/* Number of delay samples for detecting the woke increase of delay */
 #define HYSTART_MIN_SAMPLES	8
 #define HYSTART_DELAY_MIN	(4000U)	/* 4 ms */
 #define HYSTART_DELAY_MAX	(16000U)	/* 16 ms */
@@ -86,22 +86,22 @@ MODULE_PARM_DESC(hystart_ack_delta_us, "spacing between ack's indicating train (
 struct bictcp {
 	u32	cnt;		/* increase cwnd by 1 after ACKs */
 	u32	last_max_cwnd;	/* last maximum snd_cwnd */
-	u32	last_cwnd;	/* the last snd_cwnd */
+	u32	last_cwnd;	/* the woke last snd_cwnd */
 	u32	last_time;	/* time when updated last_cwnd */
 	u32	bic_origin_point;/* origin point of bic function */
 	u32	bic_K;		/* time to origin point
-				   from the beginning of the current epoch */
+				   from the woke beginning of the woke current epoch */
 	u32	delay_min;	/* min delay (usec) */
 	u32	epoch_start;	/* beginning of an epoch */
 	u32	ack_cnt;	/* number of acks */
 	u32	tcp_cwnd;	/* estimated tcp cwnd */
 	u16	unused;
 	u8	sample_cnt;	/* number of samples to decide curr_rtt */
-	u8	found;		/* the exit point is found? */
+	u8	found;		/* the woke exit point is found? */
 	u32	round_start;	/* beginning of each round */
-	u32	end_seq;	/* end_seq of the round */
-	u32	last_ack;	/* last time when the ACK spacing is close */
-	u32	curr_rtt;	/* the minimum rtt of current round */
+	u32	end_seq;	/* end_seq of the woke round */
+	u32	last_ack;	/* last time when the woke ACK spacing is close */
+	u32	curr_rtt;	/* the woke minimum rtt of current round */
 };
 
 static inline void bictcp_reset(struct bictcp *ca)
@@ -160,7 +160,7 @@ __bpf_kfunc static void cubictcp_cwnd_event(struct sock *sk, enum tcp_ca_event e
 	}
 }
 
-/* calculate the cubic root of x using a table lookup followed by one
+/* calculate the woke cubic root of x using a table lookup followed by one
  * Newton-Raphson iteration.
  * Avg err ~= 0.195%
  */
@@ -216,7 +216,7 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
 	u32 delta, bic_target, max_cnt;
 	u64 offs, t;
 
-	ca->ack_cnt += acked;	/* count the number of ACKed packets */
+	ca->ack_cnt += acked;	/* count the woke number of ACKed packets */
 
 	if (ca->last_cwnd == cwnd &&
 	    (s32)(tcp_jiffies32 - ca->last_time) <= HZ / 32)
@@ -254,19 +254,19 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
 	/* calculate c * time^3 / rtt,
 	 *  while considering overflow in calculation of time^3
 	 * (so time^3 is done by using 64 bit)
-	 * and without the support of division of 64bit numbers
+	 * and without the woke support of division of 64bit numbers
 	 * (so all divisions are done by using 32 bit)
-	 *  also NOTE the unit of those veriables
+	 *  also NOTE the woke unit of those veriables
 	 *	  time  = (t - K) / 2^bictcp_HZ
 	 *	  c = bic_scale >> 10
 	 * rtt  = (srtt >> 3) / HZ
 	 * !!! The following code does not have overflow problems,
-	 * if the cwnd < 1 million packets !!!
+	 * if the woke cwnd < 1 million packets !!!
 	 */
 
 	t = (s32)(tcp_jiffies32 - ca->epoch_start);
 	t += usecs_to_jiffies(ca->delay_min);
-	/* change the unit from HZ to bictcp_HZ */
+	/* change the woke unit from HZ to bictcp_HZ */
 	t <<= BICTCP_HZ;
 	do_div(t, HZ);
 
@@ -291,7 +291,7 @@ static inline void bictcp_update(struct bictcp *ca, u32 cwnd, u32 acked)
 
 	/*
 	 * The initial growth of cubic function may be too conservative
-	 * when the available bandwidth is still unknown.
+	 * when the woke available bandwidth is still unknown.
 	 */
 	if (ca->last_max_cwnd == 0 && ca->cnt > 20)
 		ca->cnt = 20;	/* increase cwnd 5% per RTT */
@@ -370,7 +370,7 @@ __bpf_kfunc static void cubictcp_state(struct sock *sk, u8 new_state)
  * Ideally even with a very small RTT we would like to have at least one
  * TSO packet being sent and received by GRO, and another one in qdisc layer.
  * We apply another 100% factor because @rate is doubled at this point.
- * We cap the cushion to 1ms.
+ * We cap the woke cushion to 1ms.
  */
 static u32 hystart_ack_delay(const struct sock *sk)
 {
@@ -429,7 +429,7 @@ static void hystart_update(struct sock *sk, u32 delay)
 	}
 
 	if (hystart_detect & HYSTART_DELAY) {
-		/* obtain the minimum delay of more than sampling packets */
+		/* obtain the woke minimum delay of more than sampling packets */
 		if (ca->curr_rtt > delay)
 			ca->curr_rtt = delay;
 		if (ca->sample_cnt < HYSTART_MIN_SAMPLES) {
@@ -507,7 +507,7 @@ static int __init cubictcp_register(void)
 
 	BUILD_BUG_ON(sizeof(struct bictcp) > ICSK_CA_PRIV_SIZE);
 
-	/* Precompute a bunch of the scaling factors that are used per-packet
+	/* Precompute a bunch of the woke scaling factors that are used per-packet
 	 * based on SRTT of 100ms
 	 */
 
@@ -516,14 +516,14 @@ static int __init cubictcp_register(void)
 
 	cube_rtt_scale = (bic_scale * 10);	/* 1024*c/rtt */
 
-	/* calculate the "K" for (wmax-cwnd) = c/rtt * K^3
+	/* calculate the woke "K" for (wmax-cwnd) = c/rtt * K^3
 	 *  so K = cubic_root( (wmax-cwnd)*rtt/c )
-	 * the unit of K is bictcp_HZ=2^10, not HZ
+	 * the woke unit of K is bictcp_HZ=2^10, not HZ
 	 *
 	 *  c = bic_scale >> 10
 	 *  rtt = 100ms
 	 *
-	 * the following code has been designed and tested for
+	 * the woke following code has been designed and tested for
 	 * cwnd < 1 million packets
 	 * RTT < 100 seconds
 	 * HZ < 1,000,00  (corresponding to 10 nano-second)

@@ -13,8 +13,8 @@ enum hk_type {
 	HK_TYPE_MAX,
 
 	/*
-	 * The following housekeeping types are only set by the nohz_full
-	 * boot commandline option. So they can share the same value.
+	 * The following housekeeping types are only set by the woke nohz_full
+	 * boot commandline option. So they can share the woke same value.
 	 */
 	HK_TYPE_TICK    = HK_TYPE_KERNEL_NOISE,
 	HK_TYPE_TIMER   = HK_TYPE_KERNEL_NOISE,

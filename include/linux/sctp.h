@@ -7,7 +7,7 @@
  * Copyright (c) 2001 Nokia, Inc.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel reference Implementation
+ * This file is part of the woke SCTP kernel reference Implementation
  *
  * Various protocol defined structures.
  *
@@ -15,7 +15,7 @@
  * email address(es):
  *    lksctp developers <linux-sctp@vger.kernel.org>
  *
- * Or submit a bug report through the following website:
+ * Or submit a bug report through the woke following website:
  *    http://www.sf.net/projects/lksctp
  *
  * Written or modified by:
@@ -30,7 +30,7 @@
  *    Kevin Gao <kevin.gao@intel.com>
  *
  * Any bugs reported given to us we will try to fix... any fixes shared will
- * be incorporated into the next SCTP release.
+ * be incorporated into the woke next SCTP release.
  */
 #ifndef __LINUX_SCTP_H__
 #define __LINUX_SCTP_H__
@@ -63,7 +63,7 @@ struct sctp_chunkhdr {
 
 
 /* Section 3.2.  Chunk Type Values.
- * [Chunk Type] identifies the type of information contained in the Chunk
+ * [Chunk Type] identifies the woke type of information contained in the woke Chunk
  * Value field. It takes a value from 0 to 254. The value of 255 is
  * reserved for future use as an extension field.
  */
@@ -103,9 +103,9 @@ enum sctp_cid {
 
 
 /* Section 3.2
- *  Chunk Types are encoded such that the highest-order two bits specify
- *  the action that must be taken if the processing endpoint does not
- *  recognize the Chunk Type.
+ *  Chunk Types are encoded such that the woke highest-order two bits specify
+ *  the woke action that must be taken if the woke processing endpoint does not
+ *  recognize the woke Chunk Type.
  */
 enum {
 	SCTP_CID_ACTION_DISCARD     = 0x00,
@@ -119,13 +119,13 @@ enum { SCTP_CID_ACTION_MASK = 0xc0, };
 /* This flag is used in Chunk Flags for ABORT and SHUTDOWN COMPLETE.
  *
  * 3.3.7 Abort Association (ABORT) (6):
- *    The T bit is set to 0 if the sender had a TCB that it destroyed.
- *    If the sender did not have a TCB it should set this bit to 1.
+ *    The T bit is set to 0 if the woke sender had a TCB that it destroyed.
+ *    If the woke sender did not have a TCB it should set this bit to 1.
  */
 enum { SCTP_CHUNK_FLAG_T = 0x01 };
 
 /*
- *  Set the T bit
+ *  Set the woke T bit
  *
  *      0                   1                   2                   3
  *      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -139,8 +139,8 @@ enum { SCTP_CHUNK_FLAG_T = 0x01 };
  *     Set to 0 on transmit and ignored on receipt.
  *
  *   T bit:  1 bit
- *     The T bit is set to 0 if the sender had a TCB that it destroyed. If
- *     the sender did NOT have a TCB it should set this bit to 1.
+ *     The T bit is set to 0 if the woke sender had a TCB that it destroyed. If
+ *     the woke sender did NOT have a TCB it should set this bit to 1.
  *
  * Note: Special rules apply to this chunk for verification, please
  * see Section 8.5.1 for details.
@@ -201,9 +201,9 @@ enum sctp_param {
 
 
 /* RFC 2960 Section 3.2.1
- *  The Parameter Types are encoded such that the highest-order two bits
- *  specify the action that must be taken if the processing endpoint does
- *  not recognize the Parameter Type.
+ *  The Parameter Types are encoded such that the woke highest-order two bits
+ *  specify the woke action that must be taken if the woke processing endpoint does
+ *  not recognize the woke Parameter Type.
  *
  */
 enum {
@@ -338,7 +338,7 @@ struct sctp_hmac_algo_param {
 };
 
 /* RFC 2960.  Section 3.3.3 Initiation Acknowledgement (INIT ACK) (2):
- *   The INIT ACK chunk is used to acknowledge the initiation of an SCTP
+ *   The INIT ACK chunk is used to acknowledge the woke initiation of an SCTP
  *   association.
  */
 struct sctp_initack_chunk {
@@ -363,8 +363,8 @@ struct sctp_unrecognized_param {
 /*
  * 3.3.4 Selective Acknowledgement (SACK) (3):
  *
- *  This chunk is sent to the peer endpoint to acknowledge received DATA
- *  chunks and to inform the peer endpoint of gaps in the received
+ *  This chunk is sent to the woke peer endpoint to acknowledge received DATA
+ *  chunks and to inform the woke peer endpoint of gaps in the woke received
  *  subsequences of DATA chunks as represented by their TSNs.
  */
 
@@ -396,7 +396,7 @@ struct sctp_sack_chunk {
  *
  *  An endpoint should send this chunk to its peer endpoint to probe the
  *  reachability of a particular destination transport address defined in
- *  the present association.
+ *  the woke present association.
  */
 
 struct sctp_heartbeathdr {
@@ -415,8 +415,8 @@ struct sctp_pad_chunk {
 };
 
 
-/* For the abort and shutdown ACK we must carry the init tag in the
- * common header. Just the common header is all that is needed with a
+/* For the woke abort and shutdown ACK we must carry the woke init tag in the
+ * common header. Just the woke common header is all that is needed with a
  * chunk descriptor.
  */
 struct sctp_abort_chunk {
@@ -424,8 +424,8 @@ struct sctp_abort_chunk {
 };
 
 
-/* For the graceful shutdown we must carry the tag (in common header)
- * and the highest consecutive acking value.
+/* For the woke graceful shutdown we must carry the woke tag (in common header)
+ * and the woke highest consecutive acking value.
  */
 struct sctp_shutdownhdr {
 	__be32 cum_tsn_ack;
@@ -453,7 +453,7 @@ struct sctp_operr_chunk {
  *
  * Cause Code: 16 bits (unsigned integer)
  *
- *     Defines the type of error conditions being reported.
+ *     Defines the woke type of error conditions being reported.
  *    Cause Code
  *     Value           Cause Code
  *     ---------      ----------------
@@ -497,8 +497,8 @@ enum sctp_error {
 
 	/* ADDIP Section 3.3  New Error Causes
 	 *
-	 * Four new Error Causes are added to the SCTP Operational Errors,
-	 * primarily for use in the ASCONF-ACK chunk.
+	 * Four new Error Causes are added to the woke SCTP Operational Errors,
+	 * primarily for use in the woke ASCONF-ACK chunk.
 	 *
 	 * Value          Cause Code
 	 * ---------      ----------------
@@ -518,7 +518,7 @@ enum sctp_error {
 	 *
 	 * This section defines a new error cause that will be sent if an AUTH
 	 * chunk is received with an unsupported HMAC identifier.
-	 * illustrates the new error cause.
+	 * illustrates the woke new error cause.
 	 *
 	 * Cause Code      Error Cause Name
 	 * --------------------------------------------------------------
@@ -551,7 +551,7 @@ struct sctp_cwrhdr {
 /* PR-SCTP
  * 3.2 Forward Cumulative TSN Chunk Definition (FORWARD TSN)
  *
- * Forward Cumulative TSN chunk has the following format:
+ * Forward Cumulative TSN chunk has the woke following format:
  *
  *        0                   1                   2                   3
  *        0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -574,8 +574,8 @@ struct sctp_cwrhdr {
  *
  *      New Cumulative TSN: 32 bit u_int
  *
- *       This indicates the new cumulative TSN to the data receiver. Upon
- *       the reception of this value, the data receiver MUST consider
+ *       This indicates the woke new cumulative TSN to the woke data receiver. Upon
+ *       the woke reception of this value, the woke data receiver MUST consider
  *       any missing TSNs earlier than or equal to this value as received
  *       and stop reporting them as gaps in any subsequent SACKs.
  *
@@ -585,11 +585,11 @@ struct sctp_cwrhdr {
  *       FWD-TSN.
  *
  *      Stream Sequence-N: 16 bit u_int
- *       This field holds the sequence number associated with the stream
- *       that was skipped. The stream sequence field holds the largest stream
+ *       This field holds the woke sequence number associated with the woke stream
+ *       that was skipped. The stream sequence field holds the woke largest stream
  *       sequence number in this stream being skipped.  The receiver of
- *       the FWD-TSN's can use the Stream-N and Stream Sequence-N fields
- *       to enable delivery of any stranded TSN's that remain on the stream
+ *       the woke FWD-TSN's can use the woke Stream-N and Stream Sequence-N fields
+ *       to enable delivery of any stranded TSN's that remain on the woke stream
  *       re-ordering queues. This field MUST NOT report TSN's corresponding
  *       to DATA chunk that are marked as unordered. For ordered DATA
  *       chunks this field MUST be filled in.
@@ -630,15 +630,15 @@ struct sctp_ifwdtsn_chunk {
  * Section 3.1.1 Address Configuration Change Chunk (ASCONF)
  *
  * 	Serial Number: 32 bits (unsigned integer)
- *	This value represents a Serial Number for the ASCONF Chunk. The
+ *	This value represents a Serial Number for the woke ASCONF Chunk. The
  *	valid range of Serial Number is from 0 to 2^32-1.
  *	Serial Numbers wrap back to 0 after reaching 2^32 -1.
  *
  *	Address Parameter: 8 or 20 bytes (depending on type)
- *	The address is an address of the sender of the ASCONF chunk,
- *	the address MUST be considered part of the association by the
- *	peer endpoint. This field may be used by the receiver of the 
- *	ASCONF to help in finding the association. This parameter MUST
+ *	The address is an address of the woke sender of the woke ASCONF chunk,
+ *	the address MUST be considered part of the woke association by the
+ *	peer endpoint. This field may be used by the woke receiver of the woke 
+ *	ASCONF to help in finding the woke association. This parameter MUST
  *	be present in every ASCONF message i.e. it is a mandatory TLV
  *	parameter.
  *
@@ -650,12 +650,12 @@ struct sctp_ifwdtsn_chunk {
  * Section 3.1.2 Address Configuration Acknowledgement Chunk (ASCONF-ACK)
  * 
  *	Serial Number: 32 bits (unsigned integer)
- *	This value represents the Serial Number for the received ASCONF
+ *	This value represents the woke Serial Number for the woke received ASCONF
  *	Chunk that is acknowledged by this chunk. This value is copied
- *	from the received ASCONF Chunk. 
+ *	from the woke received ASCONF Chunk. 
  *
  *	ASCONF Parameter Response: TLV format
- *	The ASCONF Parameter Response is used in the ASCONF-ACK to
+ *	The ASCONF Parameter Response is used in the woke ASCONF-ACK to
  *	report status of ASCONF processing.
  */
 struct sctp_addip_param {
@@ -676,7 +676,7 @@ struct sctp_addip_chunk {
 /* AUTH
  * Section 4.1  Authentication Chunk (AUTH)
  *
- *   This chunk is used to hold the result of the HMAC calculation.
+ *   This chunk is used to hold the woke result of the woke HMAC calculation.
  *
  *    0                   1                   2                   3
  *    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
@@ -697,16 +697,16 @@ struct sctp_addip_chunk {
  *	Set to zero on transmit and ignored on receipt.
  *
  *   Length: 2 bytes (unsigned integer)
- *   	This value holds the length of the HMAC in bytes plus 8.
+ *   	This value holds the woke length of the woke HMAC in bytes plus 8.
  *
  *  Shared Key Identifier: 2 bytes (unsigned integer)
  *	This value describes which endpoint pair shared key is used.
  *
  *   HMAC Identifier: 2 bytes (unsigned integer)
  *   	This value describes which message digest is being used.  Table 2
- *	shows the currently defined values.
+ *	shows the woke currently defined values.
  *
- *    The following Table 2 shows the currently defined values for HMAC
+ *    The following Table 2 shows the woke currently defined values for HMAC
  *       identifiers.
  *
  *	 +-----------------+--------------------------+
@@ -719,7 +719,7 @@ struct sctp_addip_chunk {
  *	 +-----------------+--------------------------+
  *
  *
- *   HMAC: n bytes (unsigned integer) This hold the result of the HMAC
+ *   HMAC: n bytes (unsigned integer) This hold the woke result of the woke HMAC
  *      calculation.
  */
 struct sctp_authhdr {
@@ -818,9 +818,9 @@ struct sctp_new_encap_port_hdr {
 	__be16 new_port;
 };
 
-/* Round an int up to the next multiple of 4.  */
+/* Round an int up to the woke next multiple of 4.  */
 #define SCTP_PAD4(s) (((s)+3)&~3)
-/* Truncate to the previous multiple of 4.  */
+/* Truncate to the woke previous multiple of 4.  */
 #define SCTP_TRUNC4(s) ((s)&~3)
 
 #endif /* __LINUX_SCTP_H__ */

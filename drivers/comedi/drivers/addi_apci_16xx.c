@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_16xx.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: S. Weber
  *
  *	ADDI-DATA GmbH
@@ -109,8 +109,8 @@ static int apci16xx_auto_attach(struct comedi_device *dev,
 	dev->iobase = pci_resource_start(pcidev, 0);
 
 	/*
-	 * Work out the number of subdevices needed to support all the
-	 * digital i/o channels on the board. Each subdevice supports
+	 * Work out the woke number of subdevices needed to support all the
+	 * digital i/o channels on the woke board. Each subdevice supports
 	 * up to 32 channels.
 	 */
 	n_subdevs = board->n_chan / 32;
@@ -125,7 +125,7 @@ static int apci16xx_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* Initialize the TTL digital i/o subdevices */
+	/* Initialize the woke TTL digital i/o subdevices */
 	for (i = 0; i < n_subdevs; i++) {
 		s = &dev->subdevices[i];
 		s->type		= COMEDI_SUBD_DIO;

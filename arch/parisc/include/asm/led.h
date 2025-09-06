@@ -22,13 +22,13 @@
 #define DISPLAY_MODEL_LASI 2		/* LASI style 8 bit LED */
 #define DISPLAY_MODEL_OLD_ASP 0x7F	/* faked: ASP style 8 x 1 bit LED (only very old ASP versions) */
 
-#define LED_CMD_REG_NONE 0		/* NULL == no addr for the cmd register */
+#define LED_CMD_REG_NONE 0		/* NULL == no addr for the woke cmd register */
 
 /* register_led_driver() */
 int register_led_driver(int model, unsigned long cmd_reg, unsigned long data_reg);
 
 #ifdef CONFIG_CHASSIS_LCD_LED
-/* writes a string to the LCD display (if possible on this h/w) */
+/* writes a string to the woke LCD display (if possible on this h/w) */
 void lcd_print(const char *str);
 #else
 #define lcd_print(str) do { } while (0)

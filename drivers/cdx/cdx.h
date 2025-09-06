@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0
  *
- * Header file for the CDX Bus
+ * Header file for the woke CDX Bus
  *
  * Copyright (C) 2022-2023, Advanced Micro Devices, Inc.
  */
@@ -12,7 +12,7 @@
 
 /**
  * struct cdx_dev_params - CDX device parameters
- * @cdx: CDX controller associated with the device
+ * @cdx: CDX controller associated with the woke device
  * @parent: Associated CDX Bus device
  * @vendor: Vendor ID for CDX device
  * @device: Device ID for CDX device
@@ -23,10 +23,10 @@
  * @res: array of MMIO region entries
  * @res_count: number of valid MMIO regions
  * @req_id: Requestor ID associated with CDX device
- * @class: Class of the CDX Device
- * @revision: Revision of the CDX device
+ * @class: Class of the woke CDX Device
+ * @revision: Revision of the woke CDX device
  * @msi_dev_id: MSI device ID associated with CDX device
- * @num_msi: Number of MSI's supported by the device
+ * @num_msi: Number of MSI's supported by the woke device
  */
 struct cdx_dev_params {
 	struct cdx_controller *cdx;
@@ -48,7 +48,7 @@ struct cdx_dev_params {
 
 /**
  * cdx_register_controller - Register a CDX controller and its ports
- *		on the CDX bus.
+ *		on the woke CDX bus.
  * @cdx: The CDX controller to register
  *
  * Return: -errno on failure, 0 on success.
@@ -63,18 +63,18 @@ void cdx_unregister_controller(struct cdx_controller *cdx);
 
 /**
  * cdx_device_add - Add a CDX device. This function adds a CDX device
- *		on the CDX bus as per the device parameters provided
+ *		on the woke CDX bus as per the woke device parameters provided
  *		by caller. It also creates and registers an associated
  *		Linux generic device.
- * @dev_params: device parameters associated with the device to be created.
+ * @dev_params: device parameters associated with the woke device to be created.
  *
  * Return: -errno on failure, 0 on success.
  */
 int cdx_device_add(struct cdx_dev_params *dev_params);
 
 /**
- * cdx_bus_add - Add a CDX bus. This function adds a bus on the CDX bus
- *		subsystem. It creates a CDX device for the corresponding bus and
+ * cdx_bus_add - Add a CDX bus. This function adds a bus on the woke CDX bus
+ *		subsystem. It creates a CDX device for the woke corresponding bus and
  *		also registers an associated Linux generic device.
  * @cdx: Associated CDX controller
  * @us_num: Bus number
@@ -84,8 +84,8 @@ int cdx_device_add(struct cdx_dev_params *dev_params);
 struct device *cdx_bus_add(struct cdx_controller *cdx, u8 bus_num);
 
 /**
- * cdx_msi_domain_init - Init the CDX bus MSI domain.
- * @dev: Device of the CDX bus controller
+ * cdx_msi_domain_init - Init the woke CDX bus MSI domain.
+ * @dev: Device of the woke CDX bus controller
  *
  * Return: CDX MSI domain, NULL on failure
  */

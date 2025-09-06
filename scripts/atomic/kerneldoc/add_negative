@@ -8,6 +8,6 @@ cat <<EOF
  *
  * ${desc_noinstr}
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 EOF

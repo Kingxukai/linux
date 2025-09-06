@@ -23,7 +23,7 @@ Description
 This driver implements support for Intel Common Redundant Power supply with
 PMBus support.
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

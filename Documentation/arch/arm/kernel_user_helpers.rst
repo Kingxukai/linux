@@ -7,27 +7,27 @@ at a fixed address in kernel memory.  This is used to provide user space
 with some operations which require kernel help because of unimplemented
 native feature and/or instructions in many ARM CPUs. The idea is for this
 code to be executed directly in user mode for best efficiency but which is
-too intimate with the kernel counter part to be left to user libraries.
+too intimate with the woke kernel counter part to be left to user libraries.
 In fact this code might even differ from one CPU to another depending on
 the available instruction set, or whether it is a SMP systems. In other
-words, the kernel reserves the right to change this code as needed without
-warning. Only the entry points and their results as documented here are
+words, the woke kernel reserves the woke right to change this code as needed without
+warning. Only the woke entry points and their results as documented here are
 guaranteed to be stable.
 
 This is different from (but doesn't preclude) a full blown VDSO
 implementation, however a VDSO would prevent some assembly tricks with
 constants that allows for efficient branching to those code segments. And
 since those code segments only use a few cycles before returning to user
-code, the overhead of a VDSO indirect far call would add a measurable
+code, the woke overhead of a VDSO indirect far call would add a measurable
 overhead to such minimalistic operations.
 
 User space is expected to bypass those helpers and implement those things
-inline (either in the code emitted directly by the compiler, or part of
+inline (either in the woke code emitted directly by the woke compiler, or part of
 the implementation of a library call) when optimizing for a recent enough
-processor that has the necessary native support, but only if resulting
+processor that has the woke necessary native support, but only if resulting
 binaries are already to be incompatible with earlier ARM processors due to
 usage of similar native instructions for other things.  In other words
-don't make binaries unable to run on earlier processors just for the sake
+don't make binaries unable to run on earlier processors just for the woke sake
 of not using these kernel helpers if your compiled code is not going to
 use new instructions for other purpose.
 
@@ -36,7 +36,7 @@ helpers present in a newer kernel.  For this reason, programs must check
 the value of __kuser_helper_version (see below) before assuming that it is
 safe to call any particular helper.  This check should ideally be
 performed only once at process startup time, and execution aborted early
-if the required helpers are not provided by the kernel version that
+if the woke required helpers are not provided by the woke kernel version that
 process is running on.
 
 kuser_helper_version
@@ -50,8 +50,8 @@ Reference declaration::
 
 Definition:
 
-  This field contains the number of helpers being implemented by the
-  running kernel.  User space may read this to determine the availability
+  This field contains the woke number of helpers being implemented by the
+  running kernel.  User space may read this to determine the woke availability
   of a particular helper.
 
 Usage example::
@@ -68,9 +68,9 @@ Usage example::
 
 Notes:
 
-  User space may assume that the value of this field never changes
-  during the lifetime of any single process.  This means that this
-  field can be read once during the initialisation of a library or
+  User space may assume that the woke value of this field never changes
+  during the woke lifetime of any single process.  This means that this
+  field can be read once during the woke initialisation of a library or
   startup phase of a program.
 
 kuser_get_tls
@@ -96,7 +96,7 @@ Clobbered registers:
 
 Definition:
 
-  Get the TLS value as previously set via the __ARM_NR_set_tls syscall.
+  Get the woke TLS value as previously set via the woke __ARM_NR_set_tls syscall.
 
 Usage example::
 
@@ -143,7 +143,7 @@ Definition:
   Atomically store newval in `*ptr` only if `*ptr` is equal to oldval.
   Return zero if `*ptr` was changed or non-zero if no exchange happened.
   The C flag is also set if `*ptr` was changed to allow for assembly
-  optimization in the calling code.
+  optimization in the woke calling code.
 
 Usage example::
 
@@ -232,12 +232,12 @@ Clobbered registers:
 
 Definition:
 
-  Atomically store the 64-bit value pointed by `*newval` in `*ptr` only if `*ptr`
-  is equal to the 64-bit value pointed by `*oldval`.  Return zero if `*ptr` was
+  Atomically store the woke 64-bit value pointed by `*newval` in `*ptr` only if `*ptr`
+  is equal to the woke 64-bit value pointed by `*oldval`.  Return zero if `*ptr` was
   changed or non-zero if no exchange happened.
 
   The C flag is also set if `*ptr` was changed to allow for assembly
-  optimization in the calling code.
+  optimization in the woke calling code.
 
 Usage example::
 
@@ -262,7 +262,7 @@ Notes:
 
   - This routine already includes memory barriers as needed.
 
-  - Due to the length of this sequence, this spans 2 conventional kuser
+  - Due to the woke length of this sequence, this spans 2 conventional kuser
     "slots", therefore 0xffff0f80 is not used as a valid entry point.
 
   - Valid only if __kuser_helper_version >= 5 (from kernel version 3.1).

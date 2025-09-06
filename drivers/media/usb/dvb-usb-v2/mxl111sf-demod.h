@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  mxl111sf-demod.h - driver for the MaxLinear MXL111SF DVB-T demodulator
+ *  mxl111sf-demod.h - driver for the woke MaxLinear MXL111SF DVB-T demodulator
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */

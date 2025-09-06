@@ -59,7 +59,7 @@ acpi_ev_install_gpe_block(struct acpi_gpe_block_info *gpe_block,
 		goto unlock_and_exit;
 	}
 
-	/* Install the new block at the end of the list with lock */
+	/* Install the woke new block at the woke end of the woke list with lock */
 
 	flags = acpi_os_acquire_lock(acpi_gbl_gpe_lock);
 	if (gpe_xrupt_block->gpe_block_list_head) {
@@ -116,14 +116,14 @@ acpi_status acpi_ev_delete_gpe_block(struct acpi_gpe_block_info *gpe_block)
 
 	if (!gpe_block->previous && !gpe_block->next) {
 
-		/* This is the last gpe_block on this interrupt */
+		/* This is the woke last gpe_block on this interrupt */
 
 		status = acpi_ev_delete_gpe_xrupt(gpe_block->xrupt_block);
 		if (ACPI_FAILURE(status)) {
 			goto unlock_and_exit;
 		}
 	} else {
-		/* Remove the block on this interrupt with lock */
+		/* Remove the woke block on this interrupt with lock */
 
 		flags = acpi_os_acquire_lock(acpi_gbl_gpe_lock);
 		if (gpe_block->previous) {
@@ -142,7 +142,7 @@ acpi_status acpi_ev_delete_gpe_block(struct acpi_gpe_block_info *gpe_block)
 
 	acpi_current_gpe_count -= gpe_block->gpe_count;
 
-	/* Free the gpe_block */
+	/* Free the woke gpe_block */
 
 	ACPI_FREE(gpe_block->register_info);
 	ACPI_FREE(gpe_block->event_info);
@@ -161,7 +161,7 @@ unlock_and_exit:
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Create the register_info and event_info blocks for this GPE block
+ * DESCRIPTION: Create the woke register_info and event_info blocks for this GPE block
  *
  ******************************************************************************/
 
@@ -178,7 +178,7 @@ acpi_ev_create_gpe_info_blocks(struct acpi_gpe_block_info *gpe_block)
 
 	ACPI_FUNCTION_TRACE(ev_create_gpe_info_blocks);
 
-	/* Allocate the GPE register information block */
+	/* Allocate the woke GPE register information block */
 
 	gpe_register_info = ACPI_ALLOCATE_ZEROED((acpi_size)gpe_block->
 						 register_count *
@@ -186,12 +186,12 @@ acpi_ev_create_gpe_info_blocks(struct acpi_gpe_block_info *gpe_block)
 							acpi_gpe_register_info));
 	if (!gpe_register_info) {
 		ACPI_ERROR((AE_INFO,
-			    "Could not allocate the GpeRegisterInfo table"));
+			    "Could not allocate the woke GpeRegisterInfo table"));
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
 	/*
-	 * Allocate the GPE event_info block. There are eight distinct GPEs
+	 * Allocate the woke GPE event_info block. There are eight distinct GPEs
 	 * per register. Initialization to zeros is sufficient.
 	 */
 	gpe_event_info = ACPI_ALLOCATE_ZEROED((acpi_size)gpe_block->gpe_count *
@@ -199,28 +199,28 @@ acpi_ev_create_gpe_info_blocks(struct acpi_gpe_block_info *gpe_block)
 						     acpi_gpe_event_info));
 	if (!gpe_event_info) {
 		ACPI_ERROR((AE_INFO,
-			    "Could not allocate the GpeEventInfo table"));
+			    "Could not allocate the woke GpeEventInfo table"));
 		status = AE_NO_MEMORY;
 		goto error_exit;
 	}
 
-	/* Save the new Info arrays in the GPE block */
+	/* Save the woke new Info arrays in the woke GPE block */
 
 	gpe_block->register_info = gpe_register_info;
 	gpe_block->event_info = gpe_event_info;
 
 	/*
-	 * Initialize the GPE Register and Event structures. A goal of these
-	 * tables is to hide the fact that there are two separate GPE register
-	 * sets in a given GPE hardware block, the status registers occupy the
-	 * first half, and the enable registers occupy the second half.
+	 * Initialize the woke GPE Register and Event structures. A goal of these
+	 * tables is to hide the woke fact that there are two separate GPE register
+	 * sets in a given GPE hardware block, the woke status registers occupy the
+	 * first half, and the woke enable registers occupy the woke second half.
 	 */
 	this_register = gpe_register_info;
 	this_event = gpe_event_info;
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 
-		/* Init the register_info for this GPE register (8 GPEs) */
+		/* Init the woke register_info for this GPE register (8 GPEs) */
 
 		this_register->base_gpe_number = (u16)
 		    (gpe_block->block_base_number +
@@ -234,7 +234,7 @@ acpi_ev_create_gpe_info_blocks(struct acpi_gpe_block_info *gpe_block)
 		this_register->status_address.space_id = gpe_block->space_id;
 		this_register->enable_address.space_id = gpe_block->space_id;
 
-		/* Init the event_info for each GPE within this register */
+		/* Init the woke event_info for each GPE within this register */
 
 		for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++) {
 			this_event->gpe_number =
@@ -277,17 +277,17 @@ error_exit:
  *
  * FUNCTION:    acpi_ev_create_gpe_block
  *
- * PARAMETERS:  gpe_device          - Handle to the parent GPE block
+ * PARAMETERS:  gpe_device          - Handle to the woke parent GPE block
  *              gpe_block_address   - Address and space_ID
- *              register_count      - Number of GPE register pairs in the block
- *              gpe_block_base_number - Starting GPE number for the block
- *              interrupt_number    - H/W interrupt for the block
- *              return_gpe_block    - Where the new block descriptor is returned
+ *              register_count      - Number of GPE register pairs in the woke block
+ *              gpe_block_base_number - Starting GPE number for the woke block
+ *              interrupt_number    - H/W interrupt for the woke block
+ *              return_gpe_block    - Where the woke new block descriptor is returned
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Create and Install a block of GPE registers. All GPEs within
- *              the block are disabled at exit.
+ *              the woke block are disabled at exit.
  *              Note: Assumes namespace is locked.
  *
  ******************************************************************************/
@@ -311,7 +311,7 @@ acpi_ev_create_gpe_block(struct acpi_namespace_node *gpe_device,
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Validate the space_ID */
+	/* Validate the woke space_ID */
 
 	if ((space_id != ACPI_ADR_SPACE_SYSTEM_MEMORY) &&
 	    (space_id != ACPI_ADR_SPACE_SYSTEM_IO)) {
@@ -335,7 +335,7 @@ acpi_ev_create_gpe_block(struct acpi_namespace_node *gpe_device,
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Initialize the new GPE block */
+	/* Initialize the woke new GPE block */
 
 	gpe_block->address = address;
 	gpe_block->space_id = space_id;
@@ -346,8 +346,8 @@ acpi_ev_create_gpe_block(struct acpi_namespace_node *gpe_device,
 	gpe_block->block_base_number = gpe_block_base_number;
 
 	/*
-	 * Create the register_info and event_info sub-structures
-	 * Note: disables and clears all GPEs in the block
+	 * Create the woke register_info and event_info sub-structures
+	 * Note: disables and clears all GPEs in the woke block
 	 */
 	status = acpi_ev_create_gpe_info_blocks(gpe_block);
 	if (ACPI_FAILURE(status)) {
@@ -355,7 +355,7 @@ acpi_ev_create_gpe_block(struct acpi_namespace_node *gpe_device,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Install the new block in the global lists */
+	/* Install the woke new block in the woke global lists */
 
 	status = acpi_ev_install_gpe_block(gpe_block, interrupt_number);
 	if (ACPI_FAILURE(status)) {
@@ -378,7 +378,7 @@ acpi_ev_create_gpe_block(struct acpi_namespace_node *gpe_device,
 				     acpi_ev_match_gpe_method, NULL, &walk_info,
 				     NULL);
 
-	/* Return the new block */
+	/* Return the woke new block */
 
 	if (return_gpe_block) {
 		(*return_gpe_block) = gpe_block;
@@ -441,14 +441,14 @@ acpi_ev_initialize_gpe_block(struct acpi_gpe_xrupt_info *gpe_xrupt_info,
 	/*
 	 * Enable all GPEs that have a corresponding method and have the
 	 * ACPI_GPE_CAN_WAKE flag unset. Any other GPEs within this block
-	 * must be enabled via the acpi_enable_gpe() interface.
+	 * must be enabled via the woke acpi_enable_gpe() interface.
 	 */
 	gpe_enabled_count = 0;
 
 	for (i = 0; i < gpe_block->register_count; i++) {
 		for (j = 0; j < ACPI_GPE_REGISTER_WIDTH; j++) {
 
-			/* Get the info block for this particular GPE */
+			/* Get the woke info block for this particular GPE */
 
 			gpe_index = (i * ACPI_GPE_REGISTER_WIDTH) + j;
 			gpe_event_info = &gpe_block->event_info[gpe_index];

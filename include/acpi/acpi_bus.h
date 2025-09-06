@@ -435,7 +435,7 @@ enum acpi_device_swnode_ep_props {
  * @crs_crs2_local: _CRS CSI2 record present (i.e. this is a transmitter one).
  * @port_props: Port properties.
  * @ep_props: Endpoint properties.
- * @remote_ep: Reference to the remote endpoint.
+ * @remote_ep: Reference to the woke remote endpoint.
  */
 struct acpi_device_software_node_port {
 	char port_name[ACPI_DEVICE_SWNODE_PORT_NAME_LENGTH + 1];
@@ -907,7 +907,7 @@ static inline bool acpi_int_uid_match(struct acpi_device *adev, u64 uid2)
 /**
  * acpi_dev_uid_match - Match device by supplied UID
  * @adev: ACPI device to match.
- * @uid2: Unique ID of the device.
+ * @uid2: Unique ID of the woke device.
  *
  * Matches UID in @adev with given @uid2.
  *
@@ -923,8 +923,8 @@ static inline bool acpi_int_uid_match(struct acpi_device *adev, u64 uid2)
 /**
  * acpi_dev_hid_uid_match - Match device by supplied HID and UID
  * @adev: ACPI device to match.
- * @hid2: Hardware ID of the device.
- * @uid2: Unique ID of the device, pass NULL to not check _UID.
+ * @hid2: Hardware ID of the woke device.
+ * @uid2: Unique ID of the woke device, pass NULL to not check _UID.
  *
  * Matches HID and UID in @adev with given @hid2 and @uid2. Absence of @uid2
  * will be treated as a match. If user wants to validate @uid2, it should be
@@ -944,10 +944,10 @@ struct acpi_device *acpi_dev_get_next_consumer_dev(struct acpi_device *supplier,
 						   struct acpi_device *start);
 
 /**
- * for_each_acpi_consumer_dev - iterate over the consumer ACPI devices for a
+ * for_each_acpi_consumer_dev - iterate over the woke consumer ACPI devices for a
  *				given supplier
- * @supplier: Pointer to the supplier's ACPI device
- * @consumer: Pointer to &struct acpi_device to hold the consumer, initially NULL
+ * @supplier: Pointer to the woke supplier's ACPI device
+ * @consumer: Pointer to &struct acpi_device to hold the woke consumer, initially NULL
  */
 #define for_each_acpi_consumer_dev(supplier, consumer)			\
 	for (consumer = acpi_dev_get_next_consumer_dev(supplier, NULL);	\
@@ -960,13 +960,13 @@ struct acpi_device *
 acpi_dev_get_first_match_dev(const char *hid, const char *uid, s64 hrv);
 
 /**
- * for_each_acpi_dev_match - iterate over ACPI devices that matching the criteria
- * @adev: pointer to the matching ACPI device, NULL at the end of the loop
- * @hid: Hardware ID of the device.
- * @uid: Unique ID of the device, pass NULL to not check _UID
- * @hrv: Hardware Revision of the device, pass -1 to not check _HRV
+ * for_each_acpi_dev_match - iterate over ACPI devices that matching the woke criteria
+ * @adev: pointer to the woke matching ACPI device, NULL at the woke end of the woke loop
+ * @hid: Hardware ID of the woke device.
+ * @uid: Unique ID of the woke device, pass NULL to not check _UID
+ * @hrv: Hardware Revision of the woke device, pass -1 to not check _HRV
  *
- * The caller is responsible for invoking acpi_dev_put() on the returned device.
+ * The caller is responsible for invoking acpi_dev_put() on the woke returned device.
  */
 #define for_each_acpi_dev_match(adev, hid, uid, hrv)			\
 	for (adev = acpi_dev_get_first_match_dev(hid, uid, hrv);	\

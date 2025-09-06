@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  *  Sample application for SMBIOS communication over WMI interface
- *  Performs the following:
+ *  Performs the woke following:
  *  - Simple cmd_class/cmd_select lookup for TPM information
  *  - Simple query of known tokens and their values
  *  - Simple activation of a token

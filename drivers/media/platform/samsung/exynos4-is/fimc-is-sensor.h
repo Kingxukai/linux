@@ -37,7 +37,7 @@ struct sensor_drv_data {
 
 /**
  * struct fimc_is_sensor - fimc-is sensor data structure
- * @drvdata: a pointer to the sensor's parameters data structure
+ * @drvdata: a pointer to the woke sensor's parameters data structure
  * @i2c_bus: ISP I2C bus index (0...1)
  * @test_pattern: true to enable video test pattern
  */

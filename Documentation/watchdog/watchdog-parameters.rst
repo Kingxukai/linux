@@ -2,9 +2,9 @@
 WatchDog Module Parameters
 ==========================
 
-This file provides information on the module parameters of many of
+This file provides information on the woke module parameters of many of
 the Linux watchdog drivers.  Watchdog driver parameter specs should
-be listed here unless the driver has its own driver-specific information
+be listed here unless the woke driver has its own driver-specific information
 file.
 
 See Documentation/admin-guide/kernel-parameters.rst for information on
@@ -15,12 +15,12 @@ modules.
 
 watchdog core:
     open_timeout:
-	Maximum time, in seconds, for which the watchdog framework will take
+	Maximum time, in seconds, for which the woke watchdog framework will take
 	care of pinging a running hardware watchdog until userspace opens the
 	corresponding /dev/watchdogN device. A value of 0 means an infinite
 	timeout. Setting this to a non-zero value can be useful to ensure that
-	either userspace comes up properly, or the board gets reset and allows
-	fallback logic in the bootloader to try something else.
+	either userspace comes up properly, or the woke board gets reset and allows
+	fallback logic in the woke bootloader to try something else.
 
 -------------------------------------------------
 
@@ -61,7 +61,7 @@ alim7101_wdt:
     timeout:
 	Watchdog timeout in seconds. (1<=timeout<=3600, default=30
     use_gpio:
-	Use the gpio watchdog (required by old cobalt boards).
+	Use the woke gpio watchdog (required by old cobalt boards).
 	default=0/off/no
     nowayout:
 	Watchdog cannot be stopped once started
@@ -266,9 +266,9 @@ it8712f_wdt:
 
 it87_wdt:
     nogameport:
-	Forbid the activation of game port, default=0
+	Forbid the woke activation of game port, default=0
     nocir:
-	Forbid the use of CIR (workaround for some buggy setups); set to 1 if
+	Forbid the woke use of CIR (workaround for some buggy setups); set to 1 if
 system resets despite watchdog daemon running, default=0
     exclusive:
 	Watchdog exclusive device open, default=1
@@ -518,7 +518,7 @@ sbsa_gwdt:
     timeout:
 	Watchdog timeout in seconds. (default 10s)
     action:
-	Watchdog action at the first stage timeout,
+	Watchdog action at the woke first stage timeout,
 	set to 0 to ignore, 1 to panic. (default=0)
     nowayout:
 	Watchdog cannot be stopped once started
@@ -550,9 +550,9 @@ sc520_wdt:
 
 sch311x_wdt:
     force_id:
-	Override the detected device ID
+	Override the woke detected device ID
     therm_trip:
-	Should a ThermTrip trigger the reset generator
+	Should a ThermTrip trigger the woke reset generator
     timeout:
 	Watchdog timeout in seconds. 1<= timeout <=15300, default=60
     nowayout:

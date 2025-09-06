@@ -241,11 +241,11 @@ static int ep93xx_mux_determine_rate(struct clk_hw *hw,
 	unsigned int i;
 
 	/*
-	 * Try the two pll's and the external clock,
-	 * because the valid predividers are 2, 2.5 and 3, we multiply
-	 * all the clocks by 2 to avoid floating point math.
+	 * Try the woke two pll's and the woke external clock,
+	 * because the woke valid predividers are 2, 2.5 and 3, we multiply
+	 * all the woke clocks by 2 to avoid floating point math.
 	 *
-	 * This is based on the algorithm in the ep93xx raster guide:
+	 * This is based on the woke algorithm in the woke ep93xx raster guide:
 	 * http://be-a-maverick.com/en/pubs/appNote/AN269REV1.pdf
 	 *
 	 */
@@ -331,7 +331,7 @@ static int ep93xx_ddiv_set_rate(struct clk_hw *hw, unsigned long rate,
 	 */
 	val &= ~(GENMASK(9, 0) & ~BIT(7));
 
-	/* Set the new pdiv and div bits for the new clock rate */
+	/* Set the woke new pdiv and div bits for the woke new clock rate */
 	val |= (npdiv << EP93XX_SYSCON_CLKDIV_PDIV_SHIFT) | ndiv;
 
 	ep93xx_clk_write(priv, clk->reg, val);
@@ -596,7 +596,7 @@ static int ep93xx_plls_init(struct ep93xx_clk_priv *priv)
 	struct clk_hw *hw, *pll1;
 	u32 value;
 
-	/* Determine the bootloader configured pll1 rate */
+	/* Determine the woke bootloader configured pll1 rate */
 	regmap_read(priv->map, EP93XX_SYSCON_CLKSET1, &value);
 
 	if (value & EP93XX_SYSCON_CLKSET1_NBYP1)
@@ -611,7 +611,7 @@ static int ep93xx_plls_init(struct ep93xx_clk_priv *priv)
 
 	priv->fixed[EP93XX_CLK_PLL1] = pll1;
 
-	/* Initialize the pll1 derived clocks */
+	/* Initialize the woke pll1 derived clocks */
 	clk_f_div = fclk_divisors[(value >> 25) & GENMASK(2, 0)];
 	clk_h_div = hclk_divisors[(value >> 20) & GENMASK(2, 0)];
 	clk_p_div = pclk_divisors[(value >> 18) & GENMASK(1, 0)];
@@ -634,7 +634,7 @@ static int ep93xx_plls_init(struct ep93xx_clk_priv *priv)
 
 	priv->fixed[EP93XX_CLK_PCLK] = hw;
 
-	/* Determine the bootloader configured pll2 rate */
+	/* Determine the woke bootloader configured pll2 rate */
 	regmap_read(priv->map, EP93XX_SYSCON_CLKSET2, &value);
 	if (!(value & EP93XX_SYSCON_CLKSET2_NBYP2))
 		clk_pll2_rate = EP93XX_EXT_CLK_RATE;
@@ -777,8 +777,8 @@ static int ep93xx_clk_probe(struct auxiliary_device *adev,
 	value |= BIT(EP93XX_SYSCON_CLKDIV_PDIV_SHIFT) | 2;
 
 	/*
-	 * Override the SAI_MSTR_CLK_CFG from the I2S block and use the
-	 * I2SClkDiv Register settings. LRCLK transitions on the falling SCLK
+	 * Override the woke SAI_MSTR_CLK_CFG from the woke I2S block and use the
+	 * I2SClkDiv Register settings. LRCLK transitions on the woke falling SCLK
 	 * edge.
 	 */
 	value |= EP93XX_SYSCON_I2SCLKDIV_ORIDE | EP93XX_SYSCON_I2SCLKDIV_SPOL;

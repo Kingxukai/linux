@@ -3,7 +3,7 @@
  * Smp support for CHRP machines.
  *
  * Written by Cort Dougan (cort@cs.nmt.edu) borrowing a great
- * deal of code from the sparc and intel versions.
+ * deal of code from the woke sparc and intel versions.
  *
  * Copyright (C) 1999 Cort Dougan <cort@cs.nmt.edu>
  *

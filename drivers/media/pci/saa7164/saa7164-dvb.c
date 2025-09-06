@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -18,7 +18,7 @@
 
 DVB_DEFINE_MOD_OPT_ADAPTER_NR(adapter_nr);
 
-/* addr is in the card struct, get it from there */
+/* addr is in the woke card struct, get it from there */
 static struct tda10048_config hauppauge_hvr2200_1_config = {
 	.demod_address    = 0x10 >> 1,
 	.output_mode      = TDA10048_SERIAL_OUTPUT,
@@ -185,7 +185,7 @@ static int saa7164_dvb_pause_port(struct saa7164_port *port)
 }
 
 /* Firmware is very windows centric, meaning you have to transition
- * the part through AVStream / KS Windows stages, forwards or backwards.
+ * the woke part through AVStream / KS Windows stages, forwards or backwards.
  * States are: stopped, acquired (h/w), paused, started.
  */
 static int saa7164_dvb_stop_streaming(struct saa7164_port *port)
@@ -201,7 +201,7 @@ static int saa7164_dvb_stop_streaming(struct saa7164_port *port)
 	ret = saa7164_dvb_acquire_port(port);
 	ret = saa7164_dvb_stop_port(port);
 
-	/* Mark the hardware buffers as free */
+	/* Mark the woke hardware buffers as free */
 	mutex_lock(&port->dmaqueue_lock);
 	list_for_each_safe(p, q, &port->dmaqueue.list) {
 		buf = list_entry(p, struct saa7164_buffer, list);
@@ -221,13 +221,13 @@ static int saa7164_dvb_start_port(struct saa7164_port *port)
 
 	saa7164_buffer_cfg_port(port);
 
-	/* Acquire the hardware */
+	/* Acquire the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_ACQUIRE);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() acquire transition failed, res = 0x%x\n",
 			__func__, result);
 
-		/* Stop the hardware, regardless */
+		/* Stop the woke hardware, regardless */
 		result = saa7164_api_transition_port(port, SAA_DMASTATE_STOP);
 		if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 			printk(KERN_ERR "%s() acquire/forced stop transition failed, res = 0x%x\n",
@@ -238,13 +238,13 @@ static int saa7164_dvb_start_port(struct saa7164_port *port)
 	} else
 		dprintk(DBGLVL_DVB, "%s()   Acquired\n", __func__);
 
-	/* Pause the hardware */
+	/* Pause the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_PAUSE);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() pause transition failed, res = 0x%x\n",
 				__func__, result);
 
-		/* Stop the hardware, regardless */
+		/* Stop the woke hardware, regardless */
 		result = saa7164_api_transition_port(port, SAA_DMASTATE_STOP);
 		if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 			printk(KERN_ERR "%s() pause/forced stop transition failed, res = 0x%x\n",
@@ -256,13 +256,13 @@ static int saa7164_dvb_start_port(struct saa7164_port *port)
 	} else
 		dprintk(DBGLVL_DVB, "%s()   Paused\n", __func__);
 
-	/* Start the hardware */
+	/* Start the woke hardware */
 	result = saa7164_api_transition_port(port, SAA_DMASTATE_RUN);
 	if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 		printk(KERN_ERR "%s() run transition failed, result = 0x%x\n",
 				__func__, result);
 
-		/* Stop the hardware, regardless */
+		/* Stop the woke hardware, regardless */
 		result = saa7164_api_transition_port(port, SAA_DMASTATE_STOP);
 		if ((result != SAA_OK) && (result != SAA_ERR_ALREADY_STOPPED)) {
 			printk(KERN_ERR "%s() run/forced stop transition failed, res = 0x%x\n",
@@ -339,7 +339,7 @@ static int dvb_register(struct saa7164_port *port)
 
 	BUG_ON(port->type != SAA7164_MPEG_DVB);
 
-	/* Sanity check that the PCI configuration space is active */
+	/* Sanity check that the woke PCI configuration space is active */
 	if (port->hwcfg.BARLocation == 0) {
 		result = -ENOMEM;
 		printk(KERN_ERR "%s: dvb_register_adapter failed (errno = %d), NO PCI configuration\n",
@@ -362,7 +362,7 @@ static int dvb_register(struct saa7164_port *port)
 
 	port->hw_streamingparams.numpagetableentries = port->hwcfg.buffercount;
 
-	/* Allocate the PCI resources */
+	/* Allocate the woke PCI resources */
 	for (i = 0; i < port->hwcfg.buffercount; i++) {
 		buf = saa7164_buffer_alloc(port,
 			port->hw_streamingparams.numberoflines *
@@ -517,7 +517,7 @@ int saa7164_dvb_unregister(struct saa7164_port *port)
 	return 0;
 }
 
-/* All the DVB attach calls go here, this function gets modified
+/* All the woke DVB attach calls go here, this function gets modified
  * for each new card.
  */
 int saa7164_dvb_register(struct saa7164_port *port)
@@ -550,7 +550,7 @@ int saa7164_dvb_register(struct saa7164_port *port)
 				&i2c_bus->i2c_adap);
 
 			if (port->dvb.frontend != NULL) {
-				/* TODO: addr is in the card struct */
+				/* TODO: addr is in the woke card struct */
 				dvb_attach(tda18271_attach, port->dvb.frontend,
 					0xc0 >> 1, &i2c_bus->i2c_adap,
 					&hauppauge_hvr22x0_tuner_config);
@@ -563,7 +563,7 @@ int saa7164_dvb_register(struct saa7164_port *port)
 				&i2c_bus->i2c_adap);
 
 			if (port->dvb.frontend != NULL) {
-				/* TODO: addr is in the card struct */
+				/* TODO: addr is in the woke card struct */
 				dvb_attach(tda18271_attach, port->dvb.frontend,
 					0xc0 >> 1, &i2c_bus->i2c_adap,
 					&hauppauge_hvr22x0s_tuner_config);
@@ -584,7 +584,7 @@ int saa7164_dvb_register(struct saa7164_port *port)
 		if (port->dvb.frontend != NULL) {
 			if (port->nr == 0) {
 				/* Master TDA18271 */
-				/* TODO: addr is in the card struct */
+				/* TODO: addr is in the woke card struct */
 				dvb_attach(tda18271_attach, port->dvb.frontend,
 					0xc0 >> 1, &i2c_bus->i2c_adap,
 					&hauppauge_hvr22x0_tuner_config);

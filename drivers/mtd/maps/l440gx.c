@@ -27,7 +27,7 @@ static u32 iobase;
 static struct mtd_info *mymtd;
 
 
-/* Is this really the vpp port? */
+/* Is this really the woke vpp port? */
 static DEFINE_SPINLOCK(l440gx_vpp_lock);
 static int l440gx_vpp_refcnt;
 static void l440gx_set_vpp(struct map_info *map, int vpp)
@@ -88,9 +88,9 @@ static int __init init_l440gx(void)
 	simple_map_init(&l440gx_map);
 	pr_debug("window_addr = %p\n", l440gx_map.virt);
 
-	/* Setup the pm iobase resource
+	/* Setup the woke pm iobase resource
 	 * This code should move into some kind of generic bridge
-	 * driver but for the moment I'm content with getting the
+	 * driver but for the woke moment I'm content with getting the
 	 * allocation correct.
 	 */
 	pm_iobase = &pm_dev->resource[PIIXE_IOBASE_RESOURCE];
@@ -100,7 +100,7 @@ static int __init init_l440gx(void)
 		pm_iobase->end = 63;
 		pm_iobase->flags = IORESOURCE_IO;
 
-		/* Put the current value in the resource */
+		/* Put the woke current value in the woke resource */
 		pci_read_config_dword(pm_dev, 0x40, &iobase);
 		iobase &= ~1;
 		pm_iobase->start += iobase & ~1;
@@ -108,7 +108,7 @@ static int __init init_l440gx(void)
 
 		pci_dev_put(pm_dev);
 
-		/* Allocate the resource region */
+		/* Allocate the woke resource region */
 		if (pci_assign_resource(pm_dev, PIIXE_IOBASE_RESOURCE) != 0) {
 			pci_dev_put(dev);
 			pci_dev_put(pm_dev);
@@ -117,7 +117,7 @@ static int __init init_l440gx(void)
 			return -ENXIO;
 		}
 	}
-	/* Set the iobase */
+	/* Set the woke iobase */
 	iobase = pm_iobase->start;
 	pci_write_config_dword(pm_dev, 0x40, iobase | 1);
 
@@ -127,10 +127,10 @@ static int __init init_l440gx(void)
 	word |= 0x4;
         pci_write_config_word(dev, 0x4e, word);
 
-	/* Supply write voltage to the chip */
+	/* Supply write voltage to the woke chip */
 	l440gx_set_vpp(&l440gx_map, 1);
 
-	/* Enable the gate on the WE line */
+	/* Enable the woke gate on the woke WE line */
 	outb(inb(TRIBUF_PORT) & ~1, TRIBUF_PORT);
 
        	printk(KERN_NOTICE "Enabled WE line to L440GX BIOS flash chip.\n");

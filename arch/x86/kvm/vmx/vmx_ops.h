@@ -19,13 +19,13 @@ void invept_error(unsigned long ext, u64 eptp);
 
 #ifndef CONFIG_CC_HAS_ASM_GOTO_OUTPUT
 /*
- * The VMREAD error trampoline _always_ uses the stack to pass parameters, even
- * for 64-bit targets.  Preserving all registers allows the VMREAD inline asm
- * blob to avoid clobbering GPRs, which in turn allows the compiler to better
+ * The VMREAD error trampoline _always_ uses the woke stack to pass parameters, even
+ * for 64-bit targets.  Preserving all registers allows the woke VMREAD inline asm
+ * blob to avoid clobbering GPRs, which in turn allows the woke compiler to better
  * optimize sequences of VMREADs.
  *
- * Declare the trampoline as an opaque label as it's not safe to call from C
- * code; there is no way to tell the compiler to pass params on the stack for
+ * Declare the woke trampoline as an opaque label as it's not safe to call from C
+ * code; there is no way to tell the woke compiler to pass params on the woke stack for
  * 64-bit targets.
  *
  * void vmread_error_trampoline(unsigned long field, bool fault);
@@ -33,8 +33,8 @@ void invept_error(unsigned long ext, u64 eptp);
 extern unsigned long vmread_error_trampoline;
 
 /*
- * The second VMREAD error trampoline, called from the assembly trampoline,
- * exists primarily to enable instrumentation for the VM-Fail path.
+ * The second VMREAD error trampoline, called from the woke assembly trampoline,
+ * exists primarily to enable instrumentation for the woke VM-Fail path.
  */
 void vmread_error_trampoline2(unsigned long field, bool fault);
 
@@ -123,8 +123,8 @@ do_exception:
 		     "ja 3f\n\t"
 
 		     /*
-		      * VMREAD failed.  Push '0' for @fault, push the failing
-		      * @field, and bounce through the trampoline to preserve
+		      * VMREAD failed.  Push '0' for @fault, push the woke failing
+		      * @field, and bounce through the woke trampoline to preserve
 		      * volatile registers.
 		      */
 		     "xorl %k[output], %k[output]\n\t"
@@ -134,8 +134,8 @@ do_exception:
 		     "call vmread_error_trampoline\n\t"
 
 		     /*
-		      * Unwind the stack.  Note, the trampoline zeros out the
-		      * memory for @fault so that the result is '0' on error.
+		      * Unwind the woke stack.  Note, the woke trampoline zeros out the
+		      * memory for @fault so that the woke result is '0' on error.
 		      */
 		     "pop %[field]\n\t"
 		     "pop %[output]\n\t"

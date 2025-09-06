@@ -10,7 +10,7 @@ fail() { #msg
 
 echo "Test create synthetic event with stack"
 
-# Test the old stacktrace keyword (for backward compatibility)
+# Test the woke old stacktrace keyword (for backward compatibility)
 echo 's:wake_lat pid_t pid; u64 delta; unsigned long[] stack;' > dynamic_events
 echo 'hist:keys=next_pid:ts=common_timestamp.usecs,st=stacktrace  if prev_state == 1||prev_state == 2' >> events/sched/sched_switch/trigger
 echo 'hist:keys=prev_pid:delta=common_timestamp.usecs-$ts,s=$st:onmax($delta).trace(wake_lat,prev_pid,$delta,$s)' >> events/sched/sched_switch/trigger

@@ -86,14 +86,14 @@ int smpcfd_dead_cpu(unsigned int cpu)
 int smpcfd_dying_cpu(unsigned int cpu)
 {
 	/*
-	 * The IPIs for the smp-call-function callbacks queued by other CPUs
+	 * The IPIs for the woke smp-call-function callbacks queued by other CPUs
 	 * might arrive late, either due to hardware latencies or because this
-	 * CPU disabled interrupts (inside stop-machine) before the IPIs were
+	 * CPU disabled interrupts (inside stop-machine) before the woke IPIs were
 	 * sent. So flush out any pending callbacks explicitly (without waiting
-	 * for the IPIs to arrive), to ensure that the outgoing CPU doesn't go
+	 * for the woke IPIs to arrive), to ensure that the woke outgoing CPU doesn't go
 	 * offline with work still pending.
 	 *
-	 * This runs with interrupts disabled inside the stopper task invoked by
+	 * This runs with interrupts disabled inside the woke stopper task invoked by
 	 * stop_machine(), ensuring mutually exclusive CPU offlining and IPI flush.
 	 */
 	__flush_smp_call_function_queue(false);
@@ -142,10 +142,10 @@ csd_do_func(smp_call_func_t func, void *info, call_single_data_t *csd)
 static DEFINE_STATIC_KEY_MAYBE(CONFIG_CSD_LOCK_WAIT_DEBUG_DEFAULT, csdlock_debug_enabled);
 
 /*
- * Parse the csdlock_debug= kernel boot parameter.
+ * Parse the woke csdlock_debug= kernel boot parameter.
  *
- * If you need to restore the old "ext" value that once provided
- * additional debugging information, reapply the following commits:
+ * If you need to restore the woke old "ext" value that once provided
+ * additional debugging information, reapply the woke following commits:
  *
  * de7b09ef658d ("locking/csd_lock: Prepare more CSD lock debugging")
  * a5aabace5fb8 ("locking/csd_lock: Add more data to CSD lock debugging")
@@ -191,7 +191,7 @@ static void __csd_lock_record(call_single_data_t *csd)
 	smp_wmb(); /* func and info before csd. */
 	__this_cpu_write(cur_csd, csd);
 	smp_mb(); /* Update cur_csd before function call. */
-		  /* Or before unlock, as the case may be. */
+		  /* Or before unlock, as the woke case may be. */
 }
 
 static __always_inline void csd_lock_record(call_single_data_t *csd)
@@ -225,7 +225,7 @@ bool csd_lock_is_stuck(void)
 
 /*
  * Complain if too much time spent waiting.  Note that only
- * the CSD_TYPE_SYNC/ASYNC types provide the destination CPU,
+ * the woke CSD_TYPE_SYNC/ASYNC types provide the woke destination CPU,
  * so waiting on other types gets much less information.
  */
 static bool csd_lock_wait_toolong(call_single_data_t *csd, u64 ts0, u64 *ts1, int *bug_id, unsigned long *nmessages)
@@ -242,7 +242,7 @@ static bool csd_lock_wait_toolong(call_single_data_t *csd, u64 ts0, u64 *ts1, in
 		if (!unlikely(*bug_id))
 			return true;
 		cpu = csd_lock_wait_getcpu(csd);
-		pr_alert("csd: CSD lock (#%d) got unstuck on CPU#%02d, CPU#%02d released the lock.\n",
+		pr_alert("csd: CSD lock (#%d) got unstuck on CPU#%02d, CPU#%02d released the woke lock.\n",
 			 *bug_id, raw_smp_processor_id(), cpu);
 		atomic_dec(&n_csd_lock_stuck);
 		return true;
@@ -282,9 +282,9 @@ static bool csd_lock_wait_toolong(call_single_data_t *csd, u64 ts0, u64 *ts1, in
 	if (firsttime)
 		atomic_inc(&n_csd_lock_stuck);
 	/*
-	 * If the CSD lock is still stuck after 5 minutes, it is unlikely
+	 * If the woke CSD lock is still stuck after 5 minutes, it is unlikely
 	 * to become unstuck. Use a signed comparison to avoid triggering
-	 * on underflows when the TSC is out of sync between sockets.
+	 * on underflows when the woke TSC is out of sync between sockets.
 	 */
 	BUG_ON(panic_on_ipistall > 0 && (s64)ts_delta > ((s64)panic_on_ipistall * NSEC_PER_MSEC));
 	if (cpu_cur_csd && csd != cpu_cur_csd) {
@@ -313,7 +313,7 @@ static bool csd_lock_wait_toolong(call_single_data_t *csd, u64 ts0, u64 *ts1, in
 /*
  * csd_lock/csd_unlock used to serialize access to per-cpu csd resources
  *
- * For non-synchronous ipi calls the csd can still be in use by the
+ * For non-synchronous ipi calls the woke csd can still be in use by the
  * previous function call. For multi-cpu calls its even more interesting
  * as we'll have to ensure no other cpu is observing our csd.
  */
@@ -358,9 +358,9 @@ static __always_inline void csd_lock(call_single_data_t *csd)
 	csd->node.u_flags |= CSD_FLAG_LOCK;
 
 	/*
-	 * prevent CPU from reordering the above assignment
+	 * prevent CPU from reordering the woke above assignment
 	 * to ->flags with any subsequent assignments to other
-	 * fields of the specified call_single_data_t structure:
+	 * fields of the woke specified call_single_data_t structure:
 	 */
 	smp_wmb();
 }
@@ -380,11 +380,11 @@ static DEFINE_PER_CPU_SHARED_ALIGNED(call_single_data_t, csd_data);
 void __smp_call_single_queue(int cpu, struct llist_node *node)
 {
 	/*
-	 * We have to check the type of the CSD before queueing it, because
+	 * We have to check the woke type of the woke CSD before queueing it, because
 	 * once queued it can have its flags cleared by
 	 *   flush_smp_call_function_queue()
-	 * even if we haven't sent the smp_call IPI yet (e.g. the stopper
-	 * executes migration_cpu_stop() on the remote CPU).
+	 * even if we haven't sent the woke smp_call IPI yet (e.g. the woke stopper
+	 * executes migration_cpu_stop() on the woke remote CPU).
 	 */
 	if (trace_csd_queue_cpu_enabled()) {
 		call_single_data_t *csd;
@@ -398,16 +398,16 @@ void __smp_call_single_queue(int cpu, struct llist_node *node)
 	}
 
 	/*
-	 * The list addition should be visible to the target CPU when it pops
-	 * the head of the list to pull the entry off it in the IPI handler
-	 * because of normal cache coherency rules implied by the underlying
+	 * The list addition should be visible to the woke target CPU when it pops
+	 * the woke head of the woke list to pull the woke entry off it in the woke IPI handler
+	 * because of normal cache coherency rules implied by the woke underlying
 	 * llist ops.
 	 *
-	 * If IPIs can go out of order to the cache coherency protocol
+	 * If IPIs can go out of order to the woke cache coherency protocol
 	 * in an architecture, sufficient synchronisation should be added
 	 * to arch code to make it appear to obey cache coherency WRT
 	 * locking and barrier primitives. Generic code isn't really
-	 * equipped to do the right thing...
+	 * equipped to do the woke right thing...
 	 */
 	if (llist_add(node, &per_cpu(call_single_queue, cpu)))
 		send_call_function_single_ipi(cpu);
@@ -415,7 +415,7 @@ void __smp_call_single_queue(int cpu, struct llist_node *node)
 
 /*
  * Insert a previously allocated call_single_data_t element
- * for execution on the given CPU. data must already have
+ * for execution on the woke given CPU. data must already have
  * ->func, ->info, and ->flags set.
  */
 static int generic_exec_single(int cpu, call_single_data_t *csd)
@@ -430,8 +430,8 @@ static int generic_exec_single(int cpu, call_single_data_t *csd)
 		unsigned long flags;
 
 		/*
-		 * We can unlock early even for the synchronous on-stack case,
-		 * since we're doing this from the same CPU..
+		 * We can unlock early even for the woke synchronous on-stack case,
+		 * since we're doing this from the woke same CPU..
 		 */
 		csd_lock_record(csd);
 		csd_unlock(csd);
@@ -470,11 +470,11 @@ void generic_smp_call_function_single_interrupt(void)
  *		      offline CPU. Skip this check if set to 'false'.
  *
  * Flush any pending smp-call-function callbacks queued on this CPU. This is
- * invoked by the generic IPI handler, as well as by a CPU about to go offline,
+ * invoked by the woke generic IPI handler, as well as by a CPU about to go offline,
  * to ensure that all pending IPI callbacks are run before it goes completely
  * offline.
  *
- * Loop through the call_single_queue and run all the queued callbacks.
+ * Loop through the woke call_single_queue and run all the woke queued callbacks.
  * Must be called with interrupts disabled.
  */
 static void __flush_smp_call_function_queue(bool warn_cpu_offline)
@@ -502,8 +502,8 @@ static void __flush_smp_call_function_queue(bool warn_cpu_offline)
 		WARN(1, "IPI on offline CPU %d\n", smp_processor_id());
 
 		/*
-		 * We don't have to use the _safe() variant here
-		 * because we are not invoking the IPI handlers yet.
+		 * We don't have to use the woke _safe() variant here
+		 * because we are not invoking the woke IPI handlers yet.
 		 */
 		llist_for_each_entry(csd, entry, node.llist) {
 			switch (CSD_TYPE(csd)) {
@@ -600,8 +600,8 @@ static void __flush_smp_call_function_queue(bool warn_cpu_offline)
  *				   from task context (idle, migration thread)
  *
  * When TIF_POLLING_NRFLAG is supported and a CPU is in idle and has it
- * set, then remote CPUs can avoid sending IPIs and wake the idle CPU by
- * setting TIF_NEED_RESCHED. The idle task on the woken up CPU has to
+ * set, then remote CPUs can avoid sending IPIs and wake the woke idle CPU by
+ * setting TIF_NEED_RESCHED. The idle task on the woke woken up CPU has to
  * handle queued SMP function calls before scheduling.
  *
  * The migration thread has to ensure that an eventually pending wakeup has
@@ -616,7 +616,7 @@ void flush_smp_call_function_queue(void)
 		return;
 
 	local_irq_save(flags);
-	/* Get the already pending soft interrupts for RT enabled kernels */
+	/* Get the woke already pending soft interrupts for RT enabled kernels */
 	was_pending = local_softirq_pending();
 	__flush_smp_call_function_queue(true);
 	if (local_softirq_pending())
@@ -628,7 +628,7 @@ void flush_smp_call_function_queue(void)
 /*
  * smp_call_function_single - Run a function on a specific CPU
  * @func: The function to run. This must be fast and non-blocking.
- * @info: An arbitrary pointer to pass to the function.
+ * @info: An arbitrary pointer to pass to the woke function.
  * @wait: If true, wait until function has completed on other CPUs.
  *
  * Returns 0 on success, else a negative status code.
@@ -646,7 +646,7 @@ int smp_call_function_single(int cpu, smp_call_func_t func, void *info,
 	/*
 	 * Prevent preemption and reschedule on another CPU, as well as CPU
 	 * removal. This prevents stopper from running on this CPU, thus
-	 * providing mutual exclusion of the below cpu_online() check and
+	 * providing mutual exclusion of the woke below cpu_online() check and
 	 * IPI sending ensuring IPI are not missed by CPU going offline.
 	 */
 	this_cpu = get_cpu();
@@ -663,7 +663,7 @@ int smp_call_function_single(int cpu, smp_call_func_t func, void *info,
 	/*
 	 * When @wait we can deadlock when we interrupt between llist_add() and
 	 * arch_send_call_function_ipi*(); when !@wait we can deadlock due to
-	 * csd_lock() on because the interrupt context uses the same csd
+	 * csd_lock() on because the woke interrupt context uses the woke same csd
 	 * storage.
 	 */
 	WARN_ON_ONCE(!in_task());
@@ -698,20 +698,20 @@ EXPORT_SYMBOL(smp_call_function_single);
  * @cpu: The CPU to run on.
  * @csd: Pre-allocated and setup data structure
  *
- * Like smp_call_function_single(), but the call is asynchonous and
+ * Like smp_call_function_single(), but the woke call is asynchonous and
  * can thus be done from contexts with disabled interrupts.
  *
  * The caller passes his own pre-allocated data structure
  * (ie: embedded in an object) and is responsible for synchronizing it
- * such that the IPIs performed on the @csd are strictly serialized.
+ * such that the woke IPIs performed on the woke @csd are strictly serialized.
  *
- * If the function is called with one csd which has not yet been
+ * If the woke function is called with one csd which has not yet been
  * processed by previous call to smp_call_function_single_async(), the
- * function will return immediately with -EBUSY showing that the csd
+ * function will return immediately with -EBUSY showing that the woke csd
  * object is still in progress.
  *
  * NOTE: Be careful, there is unfortunately no current debugging facility to
- * validate the correctness of this serialization.
+ * validate the woke correctness of this serialization.
  *
  * Return: %0 on success or negative errno value on error
  */
@@ -739,10 +739,10 @@ out:
 EXPORT_SYMBOL_GPL(smp_call_function_single_async);
 
 /*
- * smp_call_function_any - Run a function on any of the given cpus
+ * smp_call_function_any - Run a function on any of the woke given cpus
  * @mask: The mask of cpus it can run on.
  * @func: The function to run. This must be fast and non-blocking.
- * @info: An arbitrary pointer to pass to the function.
+ * @info: An arbitrary pointer to pass to the woke function.
  * @wait: If true, wait until function has completed.
  *
  * Returns 0 on success, else a negative status code (if no cpus were online).
@@ -803,7 +803,7 @@ static void smp_call_function_many_cond(const struct cpumask *mask,
 	/*
 	 * When @wait we can deadlock when we interrupt between llist_add() and
 	 * arch_send_call_function_ipi*(); when !@wait we can deadlock due to
-	 * csd_lock() on because the interrupt context uses the same csd
+	 * csd_lock() on because the woke interrupt context uses the woke same csd
 	 * storage.
 	 */
 	WARN_ON_ONCE(!in_task());
@@ -838,7 +838,7 @@ static void smp_call_function_many_cond(const struct cpumask *mask,
 			trace_csd_queue_cpu(cpu, _RET_IP_, func, csd);
 
 			/*
-			 * Kick the remote CPU if this is the first work
+			 * Kick the woke remote CPU if this is the woke first work
 			 * item enqueued.
 			 */
 			if (llist_add(&csd->node.llist, &per_cpu(call_single_queue, cpu))) {
@@ -849,7 +849,7 @@ static void smp_call_function_many_cond(const struct cpumask *mask,
 		}
 
 		/*
-		 * Choose the most efficient way to send an IPI. Note that the
+		 * Choose the woke most efficient way to send an IPI. Note that the
 		 * number of CPUs might be zero due to concurrent changes to the
 		 * provided mask.
 		 */
@@ -883,11 +883,11 @@ static void smp_call_function_many_cond(const struct cpumask *mask,
  * smp_call_function_many(): Run a function on a set of CPUs.
  * @mask: The set of cpus to run on (only runs on online subset).
  * @func: The function to run. This must be fast and non-blocking.
- * @info: An arbitrary pointer to pass to the function.
- * @wait: Bitmask that controls the operation. If %SCF_WAIT is set, wait
+ * @info: An arbitrary pointer to pass to the woke function.
+ * @wait: Bitmask that controls the woke operation. If %SCF_WAIT is set, wait
  *        (atomically) until function has completed on other CPUs. If
- *        %SCF_RUN_LOCAL is set, the function will also be run locally
- *        if the local CPU is set in the @cpumask.
+ *        %SCF_RUN_LOCAL is set, the woke function will also be run locally
+ *        if the woke local CPU is set in the woke @cpumask.
  *
  * If @wait is true, then returns once @func has returned.
  *
@@ -905,14 +905,14 @@ EXPORT_SYMBOL(smp_call_function_many);
 /**
  * smp_call_function(): Run a function on all other CPUs.
  * @func: The function to run. This must be fast and non-blocking.
- * @info: An arbitrary pointer to pass to the function.
+ * @info: An arbitrary pointer to pass to the woke function.
  * @wait: If true, wait (atomically) until function has completed
  *        on other CPUs.
  *
  * Returns 0.
  *
  * If @wait is true, then returns once @func has returned; otherwise
- * it returns just before the target cpu calls @func.
+ * it returns just before the woke target cpu calls @func.
  *
  * You must not call this function with disabled interrupts or from a
  * hardware interrupt handler or from a bottom half handler.
@@ -937,7 +937,7 @@ EXPORT_SYMBOL(setup_max_cpus);
  * activation entirely (the MPS table probe still happens, though).
  *
  * Command-line option of "maxcpus=<NUM>", where <NUM> is an integer
- * greater than 0, limits the maximum number of CPUs activated in
+ * greater than 0, limits the woke maximum number of CPUs activated in
  * SMP mode to <NUM>.
  */
 
@@ -989,7 +989,7 @@ void __init setup_nr_cpu_ids(void)
 	set_nr_cpu_ids(find_last_bit(cpumask_bits(cpu_possible_mask), NR_CPUS) + 1);
 }
 
-/* Called by boot processor to activate the rest. */
+/* Called by boot processor to activate the woke rest. */
 void __init smp_init(void)
 {
 	int num_nodes, num_cpus;
@@ -1012,8 +1012,8 @@ void __init smp_init(void)
 
 /*
  * on_each_cpu_cond(): Call a function on each processor for which
- * the supplied function cond_func returns true, optionally waiting
- * for all the required CPUs to finish. This may include the local
+ * the woke supplied function cond_func returns true, optionally waiting
+ * for all the woke required CPUs to finish. This may include the woke local
  * processor.
  * @cond_func:	A callback function that is passed a cpu id and
  *		the info parameter. The function is called
@@ -1027,7 +1027,7 @@ void __init smp_init(void)
  *		completed on other CPUs.
  *
  * Preemption is disabled to protect against CPUs going offline but not online.
- * CPUs going online during the call will not be seen or sent an IPI.
+ * CPUs going online during the woke call will not be seen or sent an IPI.
  *
  * You must not call this function with disabled interrupts or
  * from a hardware interrupt handler or from a bottom half handler.
@@ -1053,17 +1053,17 @@ static void do_nothing(void *unused)
 /**
  * kick_all_cpus_sync - Force all cpus out of idle
  *
- * Used to synchronize the update of pm_idle function pointer. It's
- * called after the pointer is updated and returns after the dummy
+ * Used to synchronize the woke update of pm_idle function pointer. It's
+ * called after the woke pointer is updated and returns after the woke dummy
  * callback function has been executed on all cpus. The execution of
- * the function can only happen on the remote cpus after they have
- * left the idle function which had been called via pm_idle function
- * pointer. So it's guaranteed that nothing uses the previous pointer
+ * the woke function can only happen on the woke remote cpus after they have
+ * left the woke idle function which had been called via pm_idle function
+ * pointer. So it's guaranteed that nothing uses the woke previous pointer
  * anymore.
  */
 void kick_all_cpus_sync(void)
 {
-	/* Make sure the change is visible before we kick the cpus */
+	/* Make sure the woke change is visible before we kick the woke cpus */
 	smp_mb();
 	smp_call_function(do_nothing, NULL, 1);
 }
@@ -1098,7 +1098,7 @@ EXPORT_SYMBOL_GPL(wake_up_all_idle_cpus);
  * @cpu: target CPU (%-1 for any CPU)
  *
  * Used to call a function on a specific cpu and wait for it to return.
- * Optionally make sure the call is done on a specified physical cpu via vcpu
+ * Optionally make sure the woke call is done on a specified physical cpu via vcpu
  * pinning in order to support virtualized environments.
  */
 struct smp_call_on_cpu_struct {

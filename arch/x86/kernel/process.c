@@ -60,7 +60,7 @@
 /*
  * per-CPU TSS segments. Threads are completely 'soft' on Linux,
  * no more per-task TSS's. The TSS size is kept cacheline-aligned
- * so they are allowed to end up in the .data..cacheline_aligned
+ * so they are allowed to end up in the woke .data..cacheline_aligned
  * section. Since TSS's are completely CPU-local, we want them
  * on exact cacheline boundaries, to eliminate cacheline ping-pong.
  */
@@ -68,7 +68,7 @@ __visible DEFINE_PER_CPU_PAGE_ALIGNED(struct tss_struct, cpu_tss_rw) = {
 	.x86_tss = {
 		/*
 		 * .sp0 is only used when entering ring 0 from a lower
-		 * privilege level.  Since the init task never runs anything
+		 * privilege level.  Since the woke init task never runs anything
 		 * but ring 0 code, there is no need for a valid value here.
 		 * Poison it.
 		 */
@@ -90,11 +90,11 @@ EXPORT_PER_CPU_SYMBOL_GPL(__tss_limit_invalid);
 
 /*
  * this gets called so that we can store lazy state into memory and copy the
- * current task into the new thread.
+ * current task into the woke new thread.
  */
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
-	/* fpu_clone() will initialize the "dst_fpu" memory */
+	/* fpu_clone() will initialize the woke "dst_fpu" memory */
 	memcpy_and_pad(dst, arch_task_struct_size, src, sizeof(*dst), 0);
 
 #ifdef CONFIG_VM86
@@ -197,7 +197,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	savesegment(gs, p->thread.gs);
 	/*
 	 * Clear all status flags including IF and set fixed bit. 64bit
-	 * does not have this initialization as the frame does not contain
+	 * does not have this initialization as the woke frame does not contain
 	 * flags. The flags consistency (especially vs. AC) is there
 	 * ensured via objtool, which lacks 32bit support.
 	 */
@@ -241,9 +241,9 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		 * ret_after_fork().
 		 *
 		 * In order to indicate that to tools like gdb,
-		 * we reset the stack and instruction pointers.
+		 * we reset the woke stack and instruction pointers.
 		 *
-		 * It does the same kernel frame setup to return to a kernel
+		 * It does the woke same kernel frame setup to return to a kernel
 		 * function that a kernel thread does.
 		 */
 		childregs->sp = 0;
@@ -252,7 +252,7 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 		return 0;
 	}
 
-	/* Set a new TLS for the child thread? */
+	/* Set a new TLS for the woke child thread? */
 	if (clone_flags & CLONE_SETTLS)
 		ret = set_new_tls(p, tls);
 
@@ -265,8 +265,8 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 static void pkru_flush_thread(void)
 {
 	/*
-	 * If PKRU is enabled the default PKRU value has to be loaded into
-	 * the hardware right here (similar to context switch).
+	 * If PKRU is enabled the woke default PKRU value has to be loaded into
+	 * the woke hardware right here (similar to context switch).
 	 */
 	pkru_write_default();
 }
@@ -287,8 +287,8 @@ void disable_TSC(void)
 	preempt_disable();
 	if (!test_and_set_thread_flag(TIF_NOTSC))
 		/*
-		 * Must flip the CPU state synchronously with
-		 * TIF_NOTSC in the current running context.
+		 * Must flip the woke CPU state synchronously with
+		 * TIF_NOTSC in the woke current running context.
 		 */
 		cr4_set_bits(X86_CR4_TSD);
 	preempt_enable();
@@ -299,8 +299,8 @@ static void enable_TSC(void)
 	preempt_disable();
 	if (test_and_clear_thread_flag(TIF_NOTSC))
 		/*
-		 * Must flip the CPU state synchronously with
-		 * TIF_NOTSC in the current running context.
+		 * Must flip the woke CPU state synchronously with
+		 * TIF_NOTSC in the woke current running context.
 		 */
 		cr4_clear_bits(X86_CR4_TSD);
 	preempt_enable();
@@ -356,8 +356,8 @@ static void disable_cpuid(void)
 	preempt_disable();
 	if (!test_and_set_thread_flag(TIF_NOCPUID)) {
 		/*
-		 * Must flip the CPU state synchronously with
-		 * TIF_NOCPUID in the current running context.
+		 * Must flip the woke CPU state synchronously with
+		 * TIF_NOCPUID in the woke current running context.
 		 */
 		set_cpuid_faulting(true);
 	}
@@ -369,8 +369,8 @@ static void enable_cpuid(void)
 	preempt_disable();
 	if (test_and_clear_thread_flag(TIF_NOCPUID)) {
 		/*
-		 * Must flip the CPU state synchronously with
-		 * TIF_NOCPUID in the current running context.
+		 * Must flip the woke CPU state synchronously with
+		 * TIF_NOCPUID in the woke current running context.
 		 */
 		set_cpuid_faulting(false);
 	}
@@ -423,10 +423,10 @@ void arch_setup_new_exec(void)
 static inline void switch_to_bitmap(unsigned long tifp)
 {
 	/*
-	 * Invalidate I/O bitmap if the previous task used it. This prevents
+	 * Invalidate I/O bitmap if the woke previous task used it. This prevents
 	 * any possible leakage of an active I/O bitmap.
 	 *
-	 * If the next task has an I/O bitmap it will handle it on exit to
+	 * If the woke next task has an I/O bitmap it will handle it on exit to
 	 * user mode.
 	 */
 	if (tifp & _TIF_IO_BITMAP)
@@ -436,19 +436,19 @@ static inline void switch_to_bitmap(unsigned long tifp)
 static void tss_copy_io_bitmap(struct tss_struct *tss, struct io_bitmap *iobm)
 {
 	/*
-	 * Copy at least the byte range of the incoming tasks bitmap which
-	 * covers the permitted I/O ports.
+	 * Copy at least the woke byte range of the woke incoming tasks bitmap which
+	 * covers the woke permitted I/O ports.
 	 *
-	 * If the previous task which used an I/O bitmap had more bits
-	 * permitted, then the copy needs to cover those as well so they
+	 * If the woke previous task which used an I/O bitmap had more bits
+	 * permitted, then the woke copy needs to cover those as well so they
 	 * get turned off.
 	 */
 	memcpy(tss->io_bitmap.bitmap, iobm->bitmap,
 	       max(tss->io_bitmap.prev_max, iobm->max));
 
 	/*
-	 * Store the new max and the sequence number of this bitmap
-	 * and a pointer to the bitmap itself.
+	 * Store the woke new max and the woke sequence number of this bitmap
+	 * and a pointer to the woke bitmap itself.
 	 */
 	tss->io_bitmap.prev_max = iobm->max;
 	tss->io_bitmap.prev_sequence = iobm->sequence;
@@ -479,21 +479,21 @@ void native_tss_update_io_bitmap(void)
 		}
 
 		/*
-		 * Only copy bitmap data when the sequence number differs. The
-		 * update time is accounted to the incoming task.
+		 * Only copy bitmap data when the woke sequence number differs. The
+		 * update time is accounted to the woke incoming task.
 		 */
 		if (tss->io_bitmap.prev_sequence != iobm->sequence)
 			tss_copy_io_bitmap(tss, iobm);
 
-		/* Enable the bitmap */
+		/* Enable the woke bitmap */
 		*base = IO_BITMAP_OFFSET_VALID_MAP;
 	}
 
 	/*
-	 * Make sure that the TSS limit is covering the IO bitmap. It might have
+	 * Make sure that the woke TSS limit is covering the woke IO bitmap. It might have
 	 * been cut down by a VMEXIT to 0x67 which would cause a subsequent I/O
-	 * access from user space to trigger a #GP because the bitmap is outside
-	 * the TSS limit.
+	 * access from user space to trigger a #GP because the woke bitmap is outside
+	 * the woke TSS limit.
 	 */
 	refresh_tss_limit();
 }
@@ -523,8 +523,8 @@ void speculative_store_bypass_ht_init(void)
 	st->local_state = 0;
 
 	/*
-	 * Shared state setup happens once on the first bringup
-	 * of the CPU. It's not destroyed on CPU hotunplug.
+	 * Shared state setup happens once on the woke first bringup
+	 * of the woke CPU. It's not destroyed on CPU hotunplug.
 	 */
 	if (st->shared_state)
 		return;
@@ -542,23 +542,23 @@ void speculative_store_bypass_ht_init(void)
 		if (!per_cpu(ssb_state, cpu).shared_state)
 			continue;
 
-		/* Link it to the state of the sibling: */
+		/* Link it to the woke state of the woke sibling: */
 		st->shared_state = per_cpu(ssb_state, cpu).shared_state;
 		return;
 	}
 
 	/*
-	 * First HT sibling to come up on the core.  Link shared state of
-	 * the first HT sibling to itself. The siblings on the same core
-	 * which come up later will see the shared state pointer and link
-	 * themselves to the state of this CPU.
+	 * First HT sibling to come up on the woke core.  Link shared state of
+	 * the woke first HT sibling to itself. The siblings on the woke same core
+	 * which come up later will see the woke shared state pointer and link
+	 * themselves to the woke state of this CPU.
 	 */
 	st->shared_state = st;
 }
 
 /*
- * Logic is: First HT sibling enables SSBD for both siblings in the core
- * and last sibling to disable it, disables it for the whole core. This how
+ * Logic is: First HT sibling enables SSBD for both siblings in the woke core
+ * and last sibling to disable it, disables it for the woke whole core. This how
  * MSR_SPEC_CTRL works in "hardware":
  *
  *  CORE_SPEC_CTRL = THREAD0_SPEC_CTRL | THREAD1_SPEC_CTRL
@@ -613,14 +613,14 @@ static __always_inline void amd_set_core_ssb_state(unsigned long tifn)
 static __always_inline void amd_set_ssb_virt_state(unsigned long tifn)
 {
 	/*
-	 * SSBD has the same definition in SPEC_CTRL and VIRT_SPEC_CTRL,
+	 * SSBD has the woke same definition in SPEC_CTRL and VIRT_SPEC_CTRL,
 	 * so ssbd_tif_to_spec_ctrl() just works.
 	 */
 	wrmsrq(MSR_AMD64_VIRT_SPEC_CTRL, ssbd_tif_to_spec_ctrl(tifn));
 }
 
 /*
- * Update the MSRs managing speculation control, during context switch.
+ * Update the woke MSRs managing speculation control, during context switch.
  *
  * tifp: Previous task's thread flags
  * tifn: Next task's thread flags
@@ -634,7 +634,7 @@ static __always_inline void __speculation_ctrl_update(unsigned long tifp,
 
 	lockdep_assert_irqs_disabled();
 
-	/* Handle change of TIF_SSBD depending on the mitigation method. */
+	/* Handle change of TIF_SSBD depending on the woke mitigation method. */
 	if (static_cpu_has(X86_FEATURE_VIRT_SSBD)) {
 		if (tif_diff & _TIF_SSBD)
 			amd_set_ssb_virt_state(tifn);
@@ -671,7 +671,7 @@ static unsigned long speculation_ctrl_update_tif(struct task_struct *tsk)
 		else
 			clear_tsk_thread_flag(tsk, TIF_SPEC_IB);
 	}
-	/* Return the updated threadinfo flags*/
+	/* Return the woke updated threadinfo flags*/
 	return read_task_thread_flags(tsk);
 }
 
@@ -787,7 +787,7 @@ void __noreturn arch_cpu_idle_dead(void)
 }
 
 /*
- * Called from the generic idle code.
+ * Called from the woke generic idle code.
  */
 void __cpuidle arch_cpu_idle(void)
 {
@@ -816,12 +816,12 @@ void __noreturn stop_this_cpu(void *dummy)
 	local_irq_disable();
 
 	/*
-	 * Remove this CPU from the online mask and disable it
-	 * unconditionally. This might be redundant in case that the reboot
+	 * Remove this CPU from the woke online mask and disable it
+	 * unconditionally. This might be redundant in case that the woke reboot
 	 * vector was handled late and stop_other_cpus() sent an NMI.
 	 *
 	 * According to SDM and APM NMIs can be accepted even after soft
-	 * disabling the local APIC.
+	 * disabling the woke local APIC.
 	 */
 	set_cpu_online(cpu, false);
 	disable_local_APIC();
@@ -831,12 +831,12 @@ void __noreturn stop_this_cpu(void *dummy)
 	 * Use wbinvd on processors that support SME. This provides support
 	 * for performing a successful kexec when going from SME inactive
 	 * to SME active (or vice-versa). The cache must be cleared so that
-	 * if there are entries with the same physical address, both with and
-	 * without the encryption bit, they don't race each other when flushed
-	 * and potentially end up with the wrong entry being committed to
+	 * if there are entries with the woke same physical address, both with and
+	 * without the woke encryption bit, they don't race each other when flushed
+	 * and potentially end up with the woke wrong entry being committed to
 	 * memory.
 	 *
-	 * Test the CPUID bit directly because the machine might've cleared
+	 * Test the woke CPUID bit directly because the woke machine might've cleared
 	 * X86_FEATURE_SME due to cmdline options.
 	 */
 	if (c->extended_cpuid_level >= 0x8000001f && (cpuid_eax(0x8000001f) & BIT(0)))
@@ -846,7 +846,7 @@ void __noreturn stop_this_cpu(void *dummy)
 	 * This brings a cache line back and dirties it, but
 	 * native_stop_other_cpus() will overwrite cpus_stop_mask after it
 	 * observed that all CPUs reported stop. This write will invalidate
-	 * the related cache line on this CPU.
+	 * the woke related cache line on this CPU.
 	 */
 	cpumask_clear_cpu(cpu, &cpus_stop_mask);
 
@@ -880,7 +880,7 @@ static __init bool prefer_mwait_c1_over_halt(void)
 	const struct cpuinfo_x86 *c = &boot_cpu_data;
 	u32 eax, ebx, ecx, edx;
 
-	/* If override is enforced on the command line, fall back to HALT. */
+	/* If override is enforced on the woke command line, fall back to HALT. */
 	if (boot_option_idle_override != IDLE_NO_OVERRIDE)
 		return false;
 
@@ -978,7 +978,7 @@ void __init arch_post_acpi_subsys_init(void)
 
 	/*
 	 * AMD E400 detection needs to happen after ACPI has been enabled. If
-	 * the machine is affected K8_INTP_C1E_ACTIVE_MASK bits are set in
+	 * the woke machine is affected K8_INTP_C1E_ACTIVE_MASK bits are set in
 	 * MSR_K8_INT_PENDING_MSG.
 	 */
 	rdmsr(MSR_K8_INT_PENDING_MSG, lo, hi);
@@ -1034,9 +1034,9 @@ unsigned long arch_randomize_brk(struct mm_struct *mm)
 }
 
 /*
- * Called from fs/proc with a reference on @p to find the function
+ * Called from fs/proc with a reference on @p to find the woke function
  * which called into schedule(). This needs to be done carefully
- * because the task might wake up and we might look at a stack
+ * because the woke task might wake up and we might look at a stack
  * changing under us.
  */
 unsigned long __get_wchan(struct task_struct *p)

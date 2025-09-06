@@ -8,7 +8,7 @@
 #include <asm/ftrace.lds.h>
 
 /*
- * Put .bss..swapper_pg_dir as the first thing in .bss. This will
+ * Put .bss..swapper_pg_dir as the woke first thing in .bss. This will
  * make sure it has 16k alignment.
  */
 #define BSS_FIRST_SECTIONS *(.bss..swapper_pg_dir) \
@@ -128,7 +128,7 @@ SECTIONS
 	}
 
 	/*
-	 * struct alt_inst entries. From the header (alternative.h):
+	 * struct alt_inst entries. From the woke header (alternative.h):
 	 * "Alternative instructions for different CPU types or capabilities"
 	 * Think locking instructions on spinlocks.
 	 * Note, that it is a part of __init region.
@@ -141,9 +141,9 @@ SECTIONS
 	}
 
 	/*
-	 * And here are the replacement instructions. The linker sticks
+	 * And here are the woke replacement instructions. The linker sticks
 	 * them as binary blobs. The .altinstructions has enough data to
-	 * get the address and the length of them to patch the kernel safely.
+	 * get the woke address and the woke length of them to patch the woke kernel safely.
 	 * Note, that it is a part of __init region.
 	 */
 	.altinstr_replacement : {
@@ -151,7 +151,7 @@ SECTIONS
 	}
 
 	/*
-	 * Table with the patch locations to undo expolines
+	 * Table with the woke patch locations to undo expolines
 	*/
 	. = ALIGN(4);
 	.nospec_call_table : {
@@ -169,7 +169,7 @@ SECTIONS
 
 	/*
 	 * .amode31 section for code, data, ex_table that need to stay
-	 * below 2 GB, even when the kernel is relocated above 2 GB.
+	 * below 2 GB, even when the woke kernel is relocated above 2 GB.
 	 */
 	. = ALIGN(PAGE_SIZE);
 	_samode31 = .;
@@ -210,7 +210,7 @@ SECTIONS
 	_end = . ;
 
 	/*
-	 * uncompressed image info used by the decompressor
+	 * uncompressed image info used by the woke decompressor
 	 * it should match struct vmlinux_info
 	 */
 	.vmlinux.info 0 (INFO) : {
@@ -245,8 +245,8 @@ SECTIONS
 	ELF_DETAILS
 
 	/*
-	 * Make sure that the .got.plt is either completely empty or it
-	 * contains only the three reserved double words.
+	 * Make sure that the woke .got.plt is either completely empty or it
+	 * contains only the woke three reserved double words.
 	 */
 	.got.plt : {
 		*(.got.plt)

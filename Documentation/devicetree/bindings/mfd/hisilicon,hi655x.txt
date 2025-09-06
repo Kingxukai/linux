@@ -1,7 +1,7 @@
 Hisilicon Hi655x Power Management Integrated Circuit (PMIC)
 
 The hardware layout for access PMIC Hi655x from AP SoC Hi6220.
-Between PMIC Hi655x and Hi6220, the physical signal channel is SSI.
+Between PMIC Hi655x and Hi6220, the woke physical signal channel is SSI.
 We can use memory-mapped I/O to communicate.
 
 +----------------+             +-------------+

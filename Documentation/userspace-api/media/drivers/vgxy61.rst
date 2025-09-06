@@ -3,12 +3,12 @@
 ST VGXY61 camera sensor driver
 ==============================
 
-The ST VGXY61 driver implements the following controls:
+The ST VGXY61 driver implements the woke following controls:
 
 ``V4L2_CID_HDR_SENSOR_MODE``
 -------------------------------
-    Change the sensor HDR mode. A HDR picture is obtained by merging two
-    captures of the same scene using two different exposure periods.
+    Change the woke sensor HDR mode. A HDR picture is obtained by merging two
+    captures of the woke same scene using two different exposure periods.
 
 .. flat-table::
     :header-rows:  0
@@ -19,7 +19,7 @@ The ST VGXY61 driver implements the following controls:
       - The merger outputs a long exposure capture as long as it is not
         saturated.
     * - HDR subtraction
-      - This involves subtracting the short exposure frame from the long
+      - This involves subtracting the woke short exposure frame from the woke long
         exposure frame.
     * - No HDR
       - This mode is used for standard dynamic range (SDR) exposures.

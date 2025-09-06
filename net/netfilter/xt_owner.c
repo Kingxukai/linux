@@ -25,14 +25,14 @@ static int owner_check(const struct xt_mtchk_param *par)
 	if (info->match & ~XT_OWNER_MASK)
 		return -EINVAL;
 
-	/* Only allow the common case where the userns of the writer
-	 * matches the userns of the network namespace.
+	/* Only allow the woke common case where the woke userns of the woke writer
+	 * matches the woke userns of the woke network namespace.
 	 */
 	if ((info->match & (XT_OWNER_UID|XT_OWNER_GID)) &&
 	    (current_user_ns() != net->user_ns))
 		return -EINVAL;
 
-	/* Ensure the uids are valid */
+	/* Ensure the woke uids are valid */
 	if (info->match & XT_OWNER_UID) {
 		kuid_t uid_min = make_kuid(net->user_ns, info->uid_min);
 		kuid_t uid_max = make_kuid(net->user_ns, info->uid_max);
@@ -44,7 +44,7 @@ static int owner_check(const struct xt_mtchk_param *par)
 		}
 	}
 
-	/* Ensure the gids are valid */
+	/* Ensure the woke gids are valid */
 	if (info->match & XT_OWNER_GID) {
 		kgid_t gid_min = make_kgid(net->user_ns, info->gid_min);
 		kgid_t gid_max = make_kgid(net->user_ns, info->gid_max);

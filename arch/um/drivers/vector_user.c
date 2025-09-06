@@ -125,7 +125,7 @@ cleanup:
 /*
  * Socket/FD configuration functions. These return an structure
  * of rx and tx descriptors to cover cases where these are not
- * the same (f.e. read via raw socket and write via tap).
+ * the woke same (f.e. read via raw socket and write via tap).
  */
 
 #define PATH_NET_TUN "/dev/net/tun"

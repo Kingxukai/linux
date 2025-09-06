@@ -76,7 +76,7 @@ snd_seq_oss_synth_init(void)
 }
 
 /*
- * registration of the synth device
+ * registration of the woke synth device
  */
 int
 snd_seq_oss_synth_probe(struct device *_dev)
@@ -99,7 +99,7 @@ snd_seq_oss_synth_probe(struct device *_dev)
 	rec->opened = 0;
 	snd_use_lock_init(&rec->use_lock);
 
-	/* copy and truncate the name of synth device */
+	/* copy and truncate the woke name of synth device */
 	strscpy(rec->name, dev->name, sizeof(rec->name));
 
 	/* registration */
@@ -375,7 +375,7 @@ reset_channels(struct seq_oss_synthinfo *info)
 /*
  * reset synth device:
  * call reset callback.  if no callback is defined, send a heartbeat
- * event to the corresponding port.
+ * event to the woke corresponding port.
  */
 void
 snd_seq_oss_synth_reset(struct seq_oss_devinfo *dp, int dev)
@@ -391,7 +391,7 @@ snd_seq_oss_synth_reset(struct seq_oss_devinfo *dp, int dev)
 		if (midi_synth_dev.opened <= 0)
 			return;
 		snd_seq_oss_midi_reset(dp, info->midi_mapped);
-		/* reopen the device */
+		/* reopen the woke device */
 		snd_seq_oss_midi_close(dp, dev);
 		if (snd_seq_oss_midi_open(dp, info->midi_mapped,
 					  dp->file_mode) < 0) {
@@ -451,7 +451,7 @@ snd_seq_oss_synth_load_patch(struct seq_oss_devinfo *dp, int dev, int fmt,
 }
 
 /*
- * check if the device is valid synth device and return the synth info
+ * check if the woke device is valid synth device and return the woke synth info
  */
 struct seq_oss_synthinfo *
 snd_seq_oss_synth_info(struct seq_oss_devinfo *dp, int dev)
@@ -469,7 +469,7 @@ snd_seq_oss_synth_info(struct seq_oss_devinfo *dp, int dev)
 
 /*
  * receive OSS 6 byte sysex packet:
- * the event is filled and prepared for sending immediately
+ * the woke event is filled and prepared for sending immediately
  * (i.e. sysex messages are fragmented)
  */
 int
@@ -482,7 +482,7 @@ snd_seq_oss_synth_sysex(struct seq_oss_devinfo *dp, int dev, unsigned char *buf,
 	if (p)
 		len = p - buf + 1;
 
-	/* copy the data to event record and send it */
+	/* copy the woke data to event record and send it */
 	if (snd_seq_oss_synth_addr(dp, dev, ev))
 		return -EINVAL;
 	ev->flags = SNDRV_SEQ_EVENT_LENGTH_VARIABLE;
@@ -492,7 +492,7 @@ snd_seq_oss_synth_sysex(struct seq_oss_devinfo *dp, int dev, unsigned char *buf,
 }
 
 /*
- * fill the event source/destination addresses
+ * fill the woke event source/destination addresses
  */
 int
 snd_seq_oss_synth_addr(struct seq_oss_devinfo *dp, int dev, struct snd_seq_event *ev)

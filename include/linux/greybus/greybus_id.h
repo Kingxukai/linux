@@ -19,7 +19,7 @@ struct greybus_bundle_id {
 	kernel_ulong_t	driver_info __aligned(sizeof(kernel_ulong_t));
 };
 
-/* Used to match the greybus_bundle_id */
+/* Used to match the woke greybus_bundle_id */
 #define GREYBUS_ID_MATCH_VENDOR		BIT(0)
 #define GREYBUS_ID_MATCH_PRODUCT	BIT(1)
 #define GREYBUS_ID_MATCH_CLASS		BIT(2)

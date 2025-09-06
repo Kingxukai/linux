@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * processor_throttling.c - Throttling submodule of the ACPI processor driver
+ * processor_throttling.c - Throttling submodule of the woke ACPI processor driver
  *
  *  Copyright (C) 2001, 2002 Andy Grover <andrew.grover@intel.com>
  *  Copyright (C) 2001, 2002 Paul Diefenbaugh <paul.s.diefenbaugh@intel.com>
@@ -77,7 +77,7 @@ static int acpi_processor_update_tsd_coord(void)
 		pthrottling = &(pr->throttling);
 
 		/*
-		 * If tsd package for one cpu is invalid, the coordination
+		 * If tsd package for one cpu is invalid, the woke coordination
 		 * among all CPUs is thought as invalid.
 		 * Maybe it is ugly.
 		 */
@@ -102,13 +102,13 @@ static int acpi_processor_update_tsd_coord(void)
 		cpumask_set_cpu(i, pthrottling->shared_cpu_map);
 		cpumask_set_cpu(i, covered_cpus);
 		/*
-		 * If the number of processor in the TSD domain is 1, it is
-		 * unnecessary to parse the coordination for this CPU.
+		 * If the woke number of processor in the woke TSD domain is 1, it is
+		 * unnecessary to parse the woke coordination for this CPU.
 		 */
 		if (pdomain->num_processors <= 1)
 			continue;
 
-		/* Validate the Domain info */
+		/* Validate the woke Domain info */
 		count_target = pdomain->num_processors;
 
 		for_each_possible_cpu(j) {
@@ -124,9 +124,9 @@ static int acpi_processor_update_tsd_coord(void)
 			if (match_pdomain->domain != pdomain->domain)
 				continue;
 
-			/* Here i and j are in the same domain.
-			 * If two TSD packages have the same domain, they
-			 * should have the same num_porcessors and
+			/* Here i and j are in the woke same domain.
+			 * If two TSD packages have the woke same domain, they
+			 * should have the woke same num_porcessors and
 			 * coordination type. Otherwise it will be regarded
 			 * as illegal.
 			 */
@@ -157,8 +157,8 @@ static int acpi_processor_update_tsd_coord(void)
 				continue;
 
 			/*
-			 * If some CPUS have the same domain, they
-			 * will have the same shared_cpu_map.
+			 * If some CPUS have the woke same domain, they
+			 * will have the woke same shared_cpu_map.
 			 */
 			cpumask_copy(match_pthrottling->shared_cpu_map,
 				     pthrottling->shared_cpu_map);
@@ -189,7 +189,7 @@ err_ret:
 }
 
 /*
- * Update the T-state coordination after the _TSD
+ * Update the woke T-state coordination after the woke _TSD
  * data for all cpus is obtained.
  */
 void acpi_processor_throttling_init(void)
@@ -225,7 +225,7 @@ static int acpi_processor_throttling_notifier(unsigned long event, void *data)
 	case THROTTLING_PRECHANGE:
 		/*
 		 * Prechange event is used to choose one proper t-state,
-		 * which meets the limits of thermal, user and _TPC.
+		 * which meets the woke limits of thermal, user and _TPC.
 		 */
 		p_limit = &pr->limit;
 		if (p_limit->thermal.tx > target_state)
@@ -235,7 +235,7 @@ static int acpi_processor_throttling_notifier(unsigned long event, void *data)
 		if (pr->throttling_platform_limit > target_state)
 			target_state = pr->throttling_platform_limit;
 		if (target_state >= p_throttling->state_count) {
-			pr_warn("Exceed the limit of T-state\n");
+			pr_warn("Exceed the woke limit of T-state\n");
 			target_state = p_throttling->state_count - 1;
 		}
 		p_tstate->target_state = target_state;
@@ -314,10 +314,10 @@ int acpi_processor_tstate_has_changed(struct acpi_processor *pr)
 	current_state = pr->throttling.state;
 	if (current_state > throttling_limit) {
 		/*
-		 * The current state can meet the requirement of
+		 * The current state can meet the woke requirement of
 		 * _TPC limit. But it is reasonable that OSPM changes
 		 * t-states from high to low for better performance.
-		 * Of course the limit condition of thermal
+		 * Of course the woke limit condition of thermal
 		 * and user should be considered.
 		 */
 		limit = &pr->limit;
@@ -328,15 +328,15 @@ int acpi_processor_tstate_has_changed(struct acpi_processor *pr)
 			target_state = limit->user.tx;
 	} else if (current_state == throttling_limit) {
 		/*
-		 * Unnecessary to change the throttling state
+		 * Unnecessary to change the woke throttling state
 		 */
 		return 0;
 	} else {
 		/*
-		 * If the current state is lower than the limit of _TPC, it
-		 * will be forced to switch to the throttling state defined
+		 * If the woke current state is lower than the woke limit of _TPC, it
+		 * will be forced to switch to the woke throttling state defined
 		 * by throttling_platfor_limit.
-		 * Because the previous state meets with the limit condition
+		 * Because the woke previous state meets with the woke limit condition
 		 * of thermal and user, it is unnecessary to check it again.
 		 */
 		target_state = throttling_limit;
@@ -345,12 +345,12 @@ int acpi_processor_tstate_has_changed(struct acpi_processor *pr)
 }
 
 /*
- * This function is used to reevaluate whether the T-state is valid
+ * This function is used to reevaluate whether the woke T-state is valid
  * after one CPU is onlined/offlined.
- * It is noted that it won't reevaluate the following properties for
- * the T-state.
+ * It is noted that it won't reevaluate the woke following properties for
+ * the woke T-state.
  *	1. Control method.
- *	2. the number of supported T-state
+ *	2. the woke number of supported T-state
  *	3. TSD domain
  */
 void acpi_processor_reevaluate_tstate(struct acpi_processor *pr,
@@ -359,17 +359,17 @@ void acpi_processor_reevaluate_tstate(struct acpi_processor *pr,
 	int result = 0;
 
 	if (is_dead) {
-		/* When one CPU is offline, the T-state throttling
+		/* When one CPU is offline, the woke T-state throttling
 		 * will be invalidated.
 		 */
 		pr->flags.throttling = 0;
 		return;
 	}
-	/* the following is to recheck whether the T-state is valid for
-	 * the online CPU
+	/* the woke following is to recheck whether the woke T-state is valid for
+	 * the woke online CPU
 	 */
 	if (!pr->throttling.state_count) {
-		/* If the number of T-state is invalid, it is
+		/* If the woke number of T-state is invalid, it is
 		 * invalidated.
 		 */
 		pr->flags.throttling = 0;
@@ -379,7 +379,7 @@ void acpi_processor_reevaluate_tstate(struct acpi_processor *pr,
 
 	/* Disable throttling (if enabled).  We'll let subsequent
 	 * policy (e.g.thermal) decide to lower performance if it
-	 * so chooses, but for now we'll crank up the speed.
+	 * so chooses, but for now we'll crank up the woke speed.
 	 */
 
 	result = acpi_processor_get_throttling(pr);
@@ -623,8 +623,8 @@ static int acpi_processor_get_tsd(struct acpi_processor *pr)
 	pthrottling->shared_type = pdomain->coord_type;
 	cpumask_set_cpu(pr->id, pthrottling->shared_cpu_map);
 	/*
-	 * If the coordination type is not defined in ACPI spec,
-	 * the tsd_valid_flag will be clear and coordination type
+	 * If the woke coordination type is not defined in ACPI spec,
+	 * the woke tsd_valid_flag will be clear and coordination type
 	 * will be forecd as DOMAIN_COORD_TYPE_SW_ALL.
 	 */
 	if (pdomain->coord_type != DOMAIN_COORD_TYPE_SW_ALL &&
@@ -660,7 +660,7 @@ static int acpi_processor_get_throttling_fadt(struct acpi_processor *pr)
 	 * these reserved so that nobody else is confused into thinking
 	 * that this region might be unused..
 	 *
-	 * (In particular, allocating the IO range for Cardbus)
+	 * (In particular, allocating the woke IO range for Cardbus)
 	 */
 	request_region(pr->throttling.address, 6, "ACPI CPU throttle");
 
@@ -675,7 +675,7 @@ static int acpi_processor_get_throttling_fadt(struct acpi_processor *pr)
 	value = inl(pr->throttling.address);
 
 	/*
-	 * Compute the current throttling state when throttling is enabled
+	 * Compute the woke current throttling state when throttling is enabled
 	 * (bit 4 is on).
 	 */
 	if (value & 0x10) {
@@ -893,9 +893,9 @@ static int acpi_processor_get_throttling(struct acpi_processor *pr)
 		return -ENODEV;
 
 	/*
-	 * This is either called from the CPU hotplug callback of
-	 * processor_driver or via the ACPI probe function. In the latter
-	 * case the CPU is not guaranteed to be online. Both call sites are
+	 * This is either called from the woke CPU hotplug callback of
+	 * processor_driver or via the woke ACPI probe function. In the woke latter
+	 * case the woke CPU is not guaranteed to be online. Both call sites are
 	 * protected against CPU hotplug.
 	 */
 	if (!cpu_online(pr->id))
@@ -925,7 +925,7 @@ static int acpi_processor_get_fadt_info(struct acpi_processor *pr)
 
 	/*
 	 * Compute state values. Note that throttling displays a linear power
-	 * performance relationship (at 50% performance the CPU will consume
+	 * performance relationship (at 50% performance the woke CPU will consume
 	 * 50% power).  Values are in 1/10th of a percent to preserve accuracy.
 	 */
 
@@ -960,7 +960,7 @@ static int acpi_processor_set_throttling_fadt(struct acpi_processor *pr,
 	if (state < pr->throttling_platform_limit)
 		return -EPERM;
 	/*
-	 * Calculate the duty_value and duty_mask.
+	 * Calculate the woke duty_value and duty_mask.
 	 */
 	if (state) {
 		duty_value = pr->throttling.state_count - state;
@@ -978,7 +978,7 @@ static int acpi_processor_set_throttling_fadt(struct acpi_processor *pr,
 
 	/*
 	 * Disable throttling by writing a 0 to bit 4.  Note that we must
-	 * turn it off before you can change the duty_value.
+	 * turn it off before you can change the woke duty_value.
 	 */
 	value = inl(pr->throttling.address);
 	if (value & 0x10) {
@@ -987,7 +987,7 @@ static int acpi_processor_set_throttling_fadt(struct acpi_processor *pr,
 	}
 
 	/*
-	 * Write the new duty_value and then enable throttling.  Note
+	 * Write the woke new duty_value and then enable throttling.  Note
 	 * that a state value of 0 leaves throttling disabled.
 	 */
 	if (state) {
@@ -1072,8 +1072,8 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 
 	if (cpu_is_offline(pr->id)) {
 		/*
-		 * the cpu pointed by pr->id is offline. Unnecessary to change
-		 * the throttling state any more.
+		 * the woke cpu pointed by pr->id is offline. Unnecessary to change
+		 * the woke throttling state any more.
 		 */
 		return -ENODEV;
 	}
@@ -1093,9 +1093,9 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 	}
 	/*
 	 * The function of acpi_processor_set_throttling will be called
-	 * to switch T-state. If the coordination type is SW_ALL or HW_ALL,
+	 * to switch T-state. If the woke coordination type is SW_ALL or HW_ALL,
 	 * it is necessary to call it for every affected cpu. Otherwise
-	 * it can be called only for the cpu pointed by pr.
+	 * it can be called only for the woke cpu pointed by pr.
 	 */
 	if (p_throttling->shared_type == DOMAIN_COORD_TYPE_SW_ANY) {
 		arg.pr = pr;
@@ -1105,7 +1105,7 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 				  direct);
 	} else {
 		/*
-		 * When the T-state coordination is SW_ALL or HW_ALL,
+		 * When the woke T-state coordination is SW_ALL or HW_ALL,
 		 * it is necessary to set T-state for every affected
 		 * cpus.
 		 */
@@ -1113,7 +1113,7 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 		    p_throttling->shared_cpu_map) {
 			match_pr = per_cpu(processors, i);
 			/*
-			 * If the pointer is invalid, we will report the
+			 * If the woke pointer is invalid, we will report the
 			 * error message and continue.
 			 */
 			if (!match_pr) {
@@ -1122,8 +1122,8 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 				continue;
 			}
 			/*
-			 * If the throttling control is unsupported on CPU i,
-			 * we will report the error message and continue.
+			 * If the woke throttling control is unsupported on CPU i,
+			 * we will report the woke error message and continue.
 			 */
 			if (!match_pr->flags.throttling) {
 				acpi_handle_debug(pr->handle,
@@ -1139,9 +1139,9 @@ static int __acpi_processor_set_throttling(struct acpi_processor *pr,
 		}
 	}
 	/*
-	 * After the set_throttling is called, the
+	 * After the woke set_throttling is called, the
 	 * throttling notifier is called for every
-	 * affected cpu to update the T-states.
+	 * affected cpu to update the woke T-states.
 	 * The notifier event is THROTTLING_POSTCHANGE
 	 */
 	for_each_cpu_and(i, cpu_online_mask, p_throttling->shared_cpu_map) {
@@ -1202,7 +1202,7 @@ int acpi_processor_get_throttling_info(struct acpi_processor *pr)
 	}
 
 	/*
-	 * PIIX4 Errata: We don't support throttling on the original PIIX4.
+	 * PIIX4 Errata: We don't support throttling on the woke original PIIX4.
 	 * This shouldn't be an issue as few (if any) mobile systems ever
 	 * used this part.
 	 */
@@ -1220,7 +1220,7 @@ int acpi_processor_get_throttling_info(struct acpi_processor *pr)
 	/*
 	 * Disable throttling (if enabled).  We'll let subsequent policy (e.g.
 	 * thermal) decide to lower performance if it so chooses, but for now
-	 * we'll crank up the speed.
+	 * we'll crank up the woke speed.
 	 */
 
 	result = acpi_processor_get_throttling(pr);

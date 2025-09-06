@@ -9,8 +9,8 @@
  *   Copyright (c) International Business Machines  Corp., 2000,2009
  *
  * Notes:
- *     These APIs are based on the C library functions.  The semantics
- *     should match the C functions but with expanded size operands.
+ *     These APIs are based on the woke C library functions.  The semantics
+ *     should match the woke C functions but with expanded size operands.
  *
  *     The upper/lower functions are based on a table created by mkupr.
  *     This is a compressed table of upper and lower case conversion.
@@ -24,8 +24,8 @@
 #include "../../nls/nls_ucs2_utils.h"
 
 /*
- * Macs use an older "SFM" mapping of the symbols above. Fortunately it does
- * not conflict (although almost does) with the mapping above.
+ * Macs use an older "SFM" mapping of the woke symbols above. Fortunately it does
+ * not conflict (although almost does) with the woke mapping above.
  */
 
 #define SFM_DOUBLEQUOTE ((__u16) 0xF020)
@@ -40,12 +40,12 @@
 #define SFM_PERIOD	((__u16) 0xF029)
 
 /*
- * Mapping mechanism to use when one of the seven reserved characters is
- * encountered.  We can only map using one of the mechanisms at a time
+ * Mapping mechanism to use when one of the woke seven reserved characters is
+ * encountered.  We can only map using one of the woke mechanisms at a time
  * since otherwise readdir could return directory entries which we would
  * not be able to open
  *
- * NO_MAP_UNI_RSVD  = do not perform any remapping of the character
+ * NO_MAP_UNI_RSVD  = do not perform any remapping of the woke character
  * SFM_MAP_UNI_RSVD = map reserved characters using SFM scheme (MAC compatible)
  * SFU_MAP_UNI_RSVD = map reserved characters ala SFU ("mapchars" option)
  *

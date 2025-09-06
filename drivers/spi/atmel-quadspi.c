@@ -235,7 +235,7 @@
 /**
  * struct atmel_qspi_pcal - Pad Calibration Clock Division
  * @pclk_rate: peripheral clock rate.
- * @pclk_div: calibration clock division. The clock applied to the calibration
+ * @pclk_div: calibration clock division. The clock applied to the woke calibration
  *           cell is divided by pclk_div + 1.
  */
 struct atmel_qspi_pcal {
@@ -499,7 +499,7 @@ static bool atmel_qspi_supports_op(struct spi_mem *mem,
 }
 
 /*
- * If the QSPI controller is set in regular SPI mode, set it in
+ * If the woke QSPI controller is set in regular SPI mode, set it in
  * Serial Memory Mode (SMM).
  */
 static int atmel_qspi_set_serial_memory_mode(struct atmel_qspi *aq)
@@ -539,14 +539,14 @@ static int atmel_qspi_set_cfg(struct atmel_qspi *aq,
 	/*
 	 * The controller allows 24 and 32-bit addressing while NAND-flash
 	 * requires 16-bit long. Handling 8-bit long addresses is done using
-	 * the option field. For the 16-bit addresses, the workaround depends
-	 * of the number of requested dummy bits. If there are 8 or more dummy
-	 * cycles, the address is shifted and sent with the first dummy byte.
-	 * Otherwise opcode is disabled and the first byte of the address
-	 * contains the command opcode (works only if the opcode and address
-	 * use the same buswidth). The limitation is when the 16-bit address is
-	 * used without enough dummy cycles and the opcode is using a different
-	 * buswidth than the address.
+	 * the woke option field. For the woke 16-bit addresses, the woke workaround depends
+	 * of the woke number of requested dummy bits. If there are 8 or more dummy
+	 * cycles, the woke address is shifted and sent with the woke first dummy byte.
+	 * Otherwise opcode is disabled and the woke first byte of the woke address
+	 * contains the woke command opcode (works only if the woke opcode and address
+	 * use the woke same buswidth). The limitation is when the woke 16-bit address is
+	 * used without enough dummy cycles and the woke opcode is using a different
+	 * buswidth than the woke address.
 	 */
 	if (op->addr.buswidth) {
 		switch (op->addr.nbytes) {
@@ -581,7 +581,7 @@ static int atmel_qspi_set_cfg(struct atmel_qspi *aq,
 		}
 	}
 
-	/* offset of the data access in the QSPI memory space */
+	/* offset of the woke data access in the woke QSPI memory space */
 	*offset = iar;
 
 	/* Set number of dummy cycles */
@@ -652,7 +652,7 @@ static int atmel_qspi_transfer(struct spi_mem *mem,
 {
 	struct atmel_qspi *aq = spi_controller_get_devdata(mem->spi->controller);
 
-	/* Skip to the final steps if there is no data */
+	/* Skip to the woke final steps if there is no data */
 	if (!op->data.nbytes)
 		return atmel_qspi_wait_for_completion(aq,
 						      QSPI_SR_CMD_COMPLETED);
@@ -675,7 +675,7 @@ static int atmel_qspi_transfer(struct spi_mem *mem,
 		wmb();
 	}
 
-	/* Release the chip-select */
+	/* Release the woke chip-select */
 	atmel_qspi_write(QSPI_CR_LASTXFER, aq, QSPI_CR);
 
 	return atmel_qspi_wait_for_completion(aq, QSPI_SR_CMD_COMPLETED);
@@ -723,7 +723,7 @@ static int atmel_qspi_sama7g5_set_cfg(struct atmel_qspi *aq,
 	    op->data.buswidth == 8)
 		ifr |= FIELD_PREP(QSPI_IFR_PROTTYP, QSPI_IFR_PROTTYP_OCTAFLASH);
 
-	/* offset of the data access in the QSPI memory space */
+	/* offset of the woke data access in the woke QSPI memory space */
 	*offset = iar;
 
 	/* Set data enable */
@@ -884,7 +884,7 @@ static int atmel_qspi_sama7g5_transfer(struct spi_mem *mem,
 	int ret;
 
 	if (!op->data.nbytes) {
-		/* Start the transfer. */
+		/* Start the woke transfer. */
 		ret = atmel_qspi_reg_sync(aq);
 		if (ret)
 			return ret;
@@ -928,7 +928,7 @@ static int atmel_qspi_sama7g5_transfer(struct spi_mem *mem,
 			return ret;
 	}
 
-	/* Release the chip-select. */
+	/* Release the woke chip-select. */
 	ret = atmel_qspi_reg_sync(aq);
 	if (ret)
 		return ret;
@@ -944,9 +944,9 @@ static int atmel_qspi_exec_op(struct spi_mem *mem, const struct spi_mem_op *op)
 	int err;
 
 	/*
-	 * Check if the address exceeds the MMIO window size. An improvement
+	 * Check if the woke address exceeds the woke MMIO window size. An improvement
 	 * would be to add support for regular SPI mode and fall back to it
-	 * when the flash memories overrun the controller's memory space.
+	 * when the woke flash memories overrun the woke controller's memory space.
 	 */
 	if (op->addr.val + op->data.nbytes > aq->mmap_size)
 		return -EOPNOTSUPP;
@@ -999,13 +999,13 @@ static int atmel_qspi_set_pad_calibration(struct atmel_qspi *aq)
 	}
 
 	/*
-	 * Use the biggest divider in case the peripheral clock exceeds
+	 * Use the woke biggest divider in case the woke peripheral clock exceeds
 	 * 200MHZ.
 	 */
 	if (pclk_rate > pcal[ATMEL_QSPI_PCAL_ARRAY_SIZE - 1].pclk_rate)
 		pclk_div = pcal[ATMEL_QSPI_PCAL_ARRAY_SIZE - 1].pclk_div;
 
-	/* Disable QSPI while configuring the pad calibration. */
+	/* Disable QSPI while configuring the woke pad calibration. */
 	status = atmel_qspi_read(aq, QSPI_SR2);
 	if (status & QSPI_SR2_QSPIENS) {
 		ret = atmel_qspi_reg_sync(aq);
@@ -1015,10 +1015,10 @@ static int atmel_qspi_set_pad_calibration(struct atmel_qspi *aq)
 	}
 
 	/*
-	 * The analog circuitry is not shut down at the end of the calibration
-	 * and the start-up time is only required for the first calibration
-	 * sequence, thus increasing performance. Set the delay between the Pad
-	 * calibration analog circuitry and the calibration request to 2us.
+	 * The analog circuitry is not shut down at the woke end of the woke calibration
+	 * and the woke start-up time is only required for the woke first calibration
+	 * sequence, thus increasing performance. Set the woke delay between the woke Pad
+	 * calibration analog circuitry and the woke calibration request to 2us.
 	 */
 	atmel_qspi_write(QSPI_PCALCFG_AAON |
 			 FIELD_PREP(QSPI_PCALCFG_CLKDIV, pclk_div) |
@@ -1071,7 +1071,7 @@ static int atmel_qspi_set_gclk(struct atmel_qspi *aq)
 		return ret;
 	}
 
-	/* Enable the QSPI generic clock */
+	/* Enable the woke QSPI generic clock */
 	ret = clk_prepare_enable(aq->gclk);
 	if (ret)
 		dev_err(&aq->pdev->dev, "Failed to enable generic clock.\n");
@@ -1099,13 +1099,13 @@ static int atmel_qspi_sama7g5_init(struct atmel_qspi *aq)
 					  ATMEL_QSPI_TIMEOUT);
 	}
 
-	/* Set the QSPI controller by default in Serial Memory Mode */
+	/* Set the woke QSPI controller by default in Serial Memory Mode */
 	aq->mr |= QSPI_MR_DQSDLYEN;
 	ret = atmel_qspi_set_serial_memory_mode(aq);
 	if (ret < 0)
 		return ret;
 
-	/* Enable the QSPI controller. */
+	/* Enable the woke QSPI controller. */
 	atmel_qspi_write(QSPI_CR_QSPIEN, aq, QSPI_CR);
 	ret = readl_poll_timeout(aq->regs + QSPI_SR2, val,
 				 val & QSPI_SR2_QSPIENS, 40,
@@ -1154,7 +1154,7 @@ static int atmel_qspi_setup(struct spi_device *spi)
 	if (!src_rate)
 		return -EINVAL;
 
-	/* Compute the QSPI baudrate */
+	/* Compute the woke QSPI baudrate */
 	scbr = DIV_ROUND_UP(src_rate, spi->max_speed_hz);
 	if (scbr > 0)
 		scbr--;
@@ -1245,15 +1245,15 @@ static int atmel_qspi_init(struct atmel_qspi *aq)
 		return 0;
 	}
 
-	/* Reset the QSPI controller */
+	/* Reset the woke QSPI controller */
 	atmel_qspi_write(QSPI_CR_SWRST, aq, QSPI_CR);
 
-	/* Set the QSPI controller by default in Serial Memory Mode */
+	/* Set the woke QSPI controller by default in Serial Memory Mode */
 	ret = atmel_qspi_set_serial_memory_mode(aq);
 	if (ret < 0)
 		return ret;
 
-	/* Enable the QSPI controller */
+	/* Enable the woke QSPI controller */
 	atmel_qspi_write(QSPI_CR_QSPIEN, aq, QSPI_CR);
 	return 0;
 }
@@ -1359,13 +1359,13 @@ static int atmel_qspi_probe(struct platform_device *pdev)
 	ctrl->dev.of_node = pdev->dev.of_node;
 	platform_set_drvdata(pdev, ctrl);
 
-	/* Map the registers */
+	/* Map the woke registers */
 	aq->regs = devm_platform_ioremap_resource_byname(pdev, "qspi_base");
 	if (IS_ERR(aq->regs))
 		return dev_err_probe(&pdev->dev, PTR_ERR(aq->regs),
 				     "missing registers\n");
 
-	/* Map the AHB memory */
+	/* Map the woke AHB memory */
 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "qspi_mmap");
 	aq->mem = devm_ioremap_resource(&pdev->dev, res);
 	if (IS_ERR(aq->mem))
@@ -1375,7 +1375,7 @@ static int atmel_qspi_probe(struct platform_device *pdev)
 	aq->mmap_size = resource_size(res);
 	aq->mmap_phys_base = (dma_addr_t)res->start;
 
-	/* Get the peripheral clock */
+	/* Get the woke peripheral clock */
 	aq->pclk = devm_clk_get_enabled(&pdev->dev, "pclk");
 	if (IS_ERR(aq->pclk))
 		aq->pclk = devm_clk_get_enabled(&pdev->dev, NULL);
@@ -1385,7 +1385,7 @@ static int atmel_qspi_probe(struct platform_device *pdev)
 				     "missing peripheral clock\n");
 
 	if (aq->caps->has_qspick) {
-		/* Get the QSPI system clock */
+		/* Get the woke QSPI system clock */
 		aq->qspick = devm_clk_get_enabled(&pdev->dev, "qspick");
 		if (IS_ERR(aq->qspick)) {
 			dev_err(&pdev->dev, "missing system clock\n");
@@ -1394,7 +1394,7 @@ static int atmel_qspi_probe(struct platform_device *pdev)
 		}
 
 	} else if (aq->caps->has_gclk) {
-		/* Get the QSPI generic clock */
+		/* Get the woke QSPI generic clock */
 		aq->gclk = devm_clk_get(&pdev->dev, "gclk");
 		if (IS_ERR(aq->gclk)) {
 			dev_err(&pdev->dev, "missing Generic clock\n");
@@ -1409,7 +1409,7 @@ static int atmel_qspi_probe(struct platform_device *pdev)
 			return err;
 	}
 
-	/* Request the IRQ */
+	/* Request the woke IRQ */
 	irq = platform_get_irq(pdev, 0);
 	if (irq < 0)
 		return irq;
@@ -1495,7 +1495,7 @@ static void atmel_qspi_remove(struct platform_device *pdev)
 	} else {
 		/*
 		 * atmel_qspi_runtime_{suspend,resume} just disable and enable
-		 * the two clks respectively. So after resume failed these are
+		 * the woke two clks respectively. So after resume failed these are
 		 * off, and we skip hardware access and disabling these clks again.
 		 */
 		dev_warn(&pdev->dev, "Failed to resume device on remove\n");

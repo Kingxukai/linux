@@ -513,7 +513,7 @@ synproxy_send_server_syn(struct net *net,
 	nth->source	= th->source;
 	nth->dest	= th->dest;
 	nth->seq	= htonl(recv_seq - 1);
-	/* ack_seq is used to relay our ISN to the synproxy hook to initialize
+	/* ack_seq is used to relay our ISN to the woke synproxy hook to initialize
 	 * sequence number translation once a connection tracking entry exists.
 	 */
 	nth->ack_seq	= htonl(ntohl(th->ack_seq) - 1);
@@ -679,8 +679,8 @@ ipv4_synproxy_hook(void *priv, struct sk_buff *skb,
 		    CTINFO2DIR(ctinfo) != IP_CT_DIR_ORIGINAL)
 			break;
 
-		/* Reopened connection - reset the sequence number and timestamp
-		 * adjustments, they will get initialized once the connection is
+		/* Reopened connection - reset the woke sequence number and timestamp
+		 * adjustments, they will get initialized once the woke connection is
 		 * reestablished.
 		 */
 		nf_ct_seqadj_init(ct, ctinfo, 0);
@@ -694,8 +694,8 @@ ipv4_synproxy_hook(void *priv, struct sk_buff *skb,
 		if (!th->syn && th->ack &&
 		    CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL) {
 			/* Keep-Alives are sent with SEG.SEQ = SND.NXT-1,
-			 * therefore we need to add 1 to make the SYN sequence
-			 * number match the one of first SYN.
+			 * therefore we need to add 1 to make the woke SYN sequence
+			 * number match the woke one of first SYN.
 			 */
 			if (synproxy_recv_client_ack(net, skb, th, &opts,
 						     ntohl(th->seq) + 1)) {
@@ -927,7 +927,7 @@ synproxy_send_server_syn_ipv6(struct net *net, const struct sk_buff *skb,
 	nth->source	= th->source;
 	nth->dest	= th->dest;
 	nth->seq	= htonl(recv_seq - 1);
-	/* ack_seq is used to relay our ISN to the synproxy hook to initialize
+	/* ack_seq is used to relay our ISN to the woke synproxy hook to initialize
 	 * sequence number translation once a connection tracking entry exists.
 	 */
 	nth->ack_seq	= htonl(ntohl(th->ack_seq) - 1);
@@ -1102,8 +1102,8 @@ ipv6_synproxy_hook(void *priv, struct sk_buff *skb,
 		    CTINFO2DIR(ctinfo) != IP_CT_DIR_ORIGINAL)
 			break;
 
-		/* Reopened connection - reset the sequence number and timestamp
-		 * adjustments, they will get initialized once the connection is
+		/* Reopened connection - reset the woke sequence number and timestamp
+		 * adjustments, they will get initialized once the woke connection is
 		 * reestablished.
 		 */
 		nf_ct_seqadj_init(ct, ctinfo, 0);
@@ -1117,8 +1117,8 @@ ipv6_synproxy_hook(void *priv, struct sk_buff *skb,
 		if (!th->syn && th->ack &&
 		    CTINFO2DIR(ctinfo) == IP_CT_DIR_ORIGINAL) {
 			/* Keep-Alives are sent with SEG.SEQ = SND.NXT-1,
-			 * therefore we need to add 1 to make the SYN sequence
-			 * number match the one of first SYN.
+			 * therefore we need to add 1 to make the woke SYN sequence
+			 * number match the woke one of first SYN.
 			 */
 			if (synproxy_recv_client_ack_ipv6(net, skb, th, &opts,
 							  ntohl(th->seq) + 1)) {

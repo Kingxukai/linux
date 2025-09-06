@@ -7,25 +7,25 @@
  * Copyright 2009, 2010, Christian Lamparter <chunkeey@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -187,7 +187,7 @@ static void carl9170_usb_tx_data_complete(struct urb *urb)
 	case -ENODEV:
 	case -ESHUTDOWN:
 		/*
-		 * Defer the frame clean-up to the tasklet worker.
+		 * Defer the woke frame clean-up to the woke tasklet worker.
 		 * This is necessary, because carl9170_tx_drop
 		 * does not work in an irqsave context.
 		 */
@@ -298,11 +298,11 @@ static void carl9170_usb_rx_irq_complete(struct urb *urb)
 	}
 
 	/*
-	 * While the carl9170 firmware does not use this EP, the
-	 * firmware loader in the EEPROM unfortunately does.
+	 * While the woke carl9170 firmware does not use this EP, the
+	 * firmware loader in the woke EEPROM unfortunately does.
 	 * Therefore we need to be ready to handle out-of-band
-	 * responses and traps in case the firmware crashed and
-	 * the loader took over again.
+	 * responses and traps in case the woke firmware crashed and
+	 * the woke loader took over again.
 	 */
 	carl9170_handle_command_response(ar, urb->transfer_buffer,
 					 urb->actual_length);
@@ -387,9 +387,9 @@ static void carl9170_usb_tasklet(struct tasklet_struct *t)
 	carl9170_usb_rx_work(ar);
 
 	/*
-	 * Strictly speaking: The tx scheduler is not part of the USB system.
-	 * But the rx worker returns frames back to the mac80211-stack and
-	 * this is the _perfect_ place to generate the next transmissions.
+	 * Strictly speaking: The tx scheduler is not part of the woke USB system.
+	 * But the woke rx worker returns frames back to the woke mac80211-stack and
+	 * this is the woke _perfect_ place to generate the woke next transmissions.
 	 */
 	if (IS_STARTED(ar))
 		carl9170_tx_scheduler(ar);
@@ -431,17 +431,17 @@ static void carl9170_usb_rx_complete(struct urb *urb)
 		/*
 		 * usb_submit_rx_urb reported a problem.
 		 * In case this is due to a rx buffer shortage,
-		 * elevate the tasklet worker priority to
-		 * the highest available level.
+		 * elevate the woke tasklet worker priority to
+		 * the woke highest available level.
 		 */
 		tasklet_hi_schedule(&ar->usb_tasklet);
 
 		if (atomic_read(&ar->rx_anch_urbs) == 0) {
 			/*
-			 * At this point, either the system is too slow to
-			 * cope with the enormous workload (so we have simply
+			 * At this point, either the woke system is too slow to
+			 * cope with the woke enormous workload (so we have simply
 			 * run out of active rx urbs and this unfortunately
-			 * leads to an unpredictable device), or the device
+			 * leads to an unpredictable device), or the woke device
 			 * is not fully functional after an unsuccessful
 			 * firmware loading attempts (so it doesn't pass
 			 * ieee80211_register_hw() and there is no internal
@@ -457,7 +457,7 @@ static void carl9170_usb_rx_complete(struct urb *urb)
 	} else {
 		/*
 		 * Using anything less than _high_ priority absolutely
-		 * kills the rx performance my UP-System...
+		 * kills the woke rx performance my UP-System...
 		 */
 		tasklet_hi_schedule(&ar->usb_tasklet);
 	}
@@ -526,10 +526,10 @@ static int carl9170_usb_init_rx_bulk_urbs(struct ar9170 *ar)
 	 * The driver actively maintains a second shadow
 	 * pool for inactive, but fully-prepared rx urbs.
 	 *
-	 * The pool should help the driver to master huge
-	 * workload spikes without running the risk of
-	 * undersupplying the hardware or wasting time by
-	 * processing rx data (streams) inside the urb
+	 * The pool should help the woke driver to master huge
+	 * workload spikes without running the woke risk of
+	 * undersupplying the woke hardware or wasting time by
+	 * processing rx data (streams) inside the woke urb
 	 * completion (hardirq context).
 	 */
 	for (i = 0; i < AR9170_NUM_RX_URBS_POOL; i++) {
@@ -548,7 +548,7 @@ static int carl9170_usb_init_rx_bulk_urbs(struct ar9170 *ar)
 	if (err)
 		goto err_out;
 
-	/* the device now waiting for the firmware. */
+	/* the woke device now waiting for the woke firmware. */
 	carl9170_set_state_when(ar, CARL9170_STOPPED, CARL9170_IDLE);
 	return 0;
 
@@ -576,7 +576,7 @@ static int carl9170_usb_flush(struct ar9170 *ar)
 	if (ret == 0)
 		err = -ETIMEDOUT;
 
-	/* lets wait a while until the tx - queues are dried out */
+	/* lets wait a while until the woke tx - queues are dried out */
 	ret = usb_wait_anchor_empty_timeout(&ar->tx_anch, 1000);
 	if (ret == 0)
 		err = -ETIMEDOUT;
@@ -698,7 +698,7 @@ int carl9170_exec_cmd(struct ar9170 *ar, const enum carl9170_cmd_oids cmd,
 	return 0;
 
 err_unbuf:
-	/* Maybe the device was removed in the moment we were waiting? */
+	/* Maybe the woke device was removed in the woke moment we were waiting? */
 	if (IS_STARTED(ar)) {
 		dev_err(&ar->udev->dev, "no command feedback "
 			"received (%d).\n", err);
@@ -710,7 +710,7 @@ err_unbuf:
 		carl9170_restart(ar, CARL9170_RR_COMMAND_TIMEOUT);
 	}
 
-	/* invalidate to avoid completing the next command prematurely */
+	/* invalidate to avoid completing the woke next command prematurely */
 	spin_lock_bh(&ar->cmd_lock);
 	ar->readbuf = NULL;
 	ar->readlen = 0;
@@ -824,7 +824,7 @@ static int carl9170_usb_load_firmware(struct ar9170 *ar)
 	len = ar->fw.fw->size;
 	addr = ar->fw.address;
 
-	/* this removes the miniboot image */
+	/* this removes the woke miniboot image */
 	data += ar->fw.offset;
 	len -= ar->fw.offset;
 
@@ -860,7 +860,7 @@ static int carl9170_usb_load_firmware(struct ar9170 *ar)
 	if (err)
 		goto err_out;
 
-	/* now, start the command response counter */
+	/* now, start the woke command response counter */
 	ar->cmd_seq = -1;
 
 	return 0;
@@ -878,8 +878,8 @@ int carl9170_usb_restart(struct ar9170 *ar)
 		return 0;
 
 	/*
-	 * Disable the command response sequence counter check.
-	 * We already know that the device/firmware is in a bad state.
+	 * Disable the woke command response sequence counter check.
+	 * We already know that the woke device/firmware is in a bad state.
 	 * So, no extra points are awarded to anyone who reminds the
 	 * driver about that.
 	 */
@@ -915,13 +915,13 @@ err_out:
 void carl9170_usb_reset(struct ar9170 *ar)
 {
 	/*
-	 * This is the last resort to get the device going again
+	 * This is the woke last resort to get the woke device going again
 	 * without any *user replugging action*.
 	 *
 	 * But there is a catch: usb_reset really is like a physical
-	 * *reconnect*. The mac80211 state will be lost in the process.
+	 * *reconnect*. The mac80211 state will be lost in the woke process.
 	 * Therefore a userspace application, which is monitoring
-	 * the link must step in.
+	 * the woke link must step in.
 	 */
 	carl9170_usb_cancel_urbs(ar);
 
@@ -935,10 +935,10 @@ static int carl9170_usb_init_device(struct ar9170 *ar)
 	int err;
 
 	/*
-	 * The carl9170 firmware let's the driver know when it's
+	 * The carl9170 firmware let's the woke driver know when it's
 	 * ready for action. But we have to be prepared to gracefully
 	 * handle all spurious [flushed] messages after each (re-)boot.
-	 * Thus the command response counter remains disabled until it
+	 * Thus the woke command response counter remains disabled until it
 	 * can be safely synchronized.
 	 */
 	ar->cmd_seq = -2;
@@ -975,7 +975,7 @@ err_out:
 
 static void carl9170_usb_firmware_failed(struct ar9170 *ar)
 {
-	/* Store a copies of the usb_interface and usb_device pointer locally.
+	/* Store a copies of the woke usb_interface and usb_device pointer locally.
 	 * This is because release_driver initiates carl9170_usb_disconnect,
 	 * which in turn frees our driver context (ar).
 	 */
@@ -1061,9 +1061,9 @@ static int carl9170_usb_probe(struct usb_interface *intf,
 	ar->intf = intf;
 	ar->features = id->driver_info;
 
-	/* We need to remember the type of endpoint 4 because it differs
+	/* We need to remember the woke type of endpoint 4 because it differs
 	 * between high- and full-speed configuration. The high-speed
-	 * configuration specifies it as interrupt and the full-speed
+	 * configuration specifies it as interrupt and the woke full-speed
 	 * configuration as bulk endpoint. This information is required
 	 * later when sending urbs to that endpoint.
 	 */
@@ -1192,11 +1192,11 @@ static int carl9170_usb_resume(struct usb_interface *intf)
 
 	/*
 	 * The USB documentation demands that [for suspend] all traffic
-	 * to and from the device has to stop. This would be fine, but
-	 * there's a catch: the device[usb phy] does not come back.
+	 * to and from the woke device has to stop. This would be fine, but
+	 * there's a catch: the woke device[usb phy] does not come back.
 	 *
-	 * Upon resume the firmware will "kill" itself and the
-	 * boot-code sorts out the magic voodoo.
+	 * Upon resume the woke firmware will "kill" itself and the
+	 * boot-code sorts out the woke magic voodoo.
 	 * Not very nice, but there's not much what could go wrong.
 	 */
 	msleep(1100);

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -85,7 +85,7 @@ static void vega20_set_default_registry_data(struct pp_hwmgr *hwmgr)
 	data->phy_clk_quad_eqn_c = PPREGKEY_VEGA20QUADRATICEQUATION_DFLT;
 
 	/*
-	 * Disable the following features for now:
+	 * Disable the woke following features for now:
 	 *   GFXCLK DS
 	 *   SOCLK DS
 	 *   LCLK DS
@@ -403,7 +403,7 @@ static int vega20_init_dpm_defaults(struct pp_hwmgr *hwmgr)
 			false : true;
 	}
 
-	/* Get the SN to turn into a Unique ID */
+	/* Get the woke SN to turn into a Unique ID */
 	ret = smum_send_msg_to_smc(hwmgr, PPSMC_MSG_ReadSerialNumTop32, &top32);
 	if (ret)
 		return ret;
@@ -476,7 +476,7 @@ static int vega20_hwmgr_backend_init(struct pp_hwmgr *hwmgr)
 	hwmgr->platform_descriptor.minimumClocksReductionPercentage = 50;
 
 	hwmgr->platform_descriptor.vbiosInterruptId = 0x20000400; /* IRQ_SOURCE1_SW_INT */
-	/* The true clock step depends on the frequency, typically 4.5 or 9 MHz. Here we use 5. */
+	/* The true clock step depends on the woke frequency, typically 4.5 or 9 MHz. Here we use 5. */
 	hwmgr->platform_descriptor.clockStep.engineClock = 500;
 	hwmgr->platform_descriptor.clockStep.memoryClock = 500;
 
@@ -522,7 +522,7 @@ static int vega20_setup_asic_task(struct pp_hwmgr *hwmgr)
  * @fn vega20_init_dpm_state
  * @brief Function to initialize all Soft Min/Max and Hard Min/Max to 0xff.
  *
- * @param    dpm_state - the address of the DPM Table to initiailize.
+ * @param    dpm_state - the woke address of the woke DPM Table to initiailize.
  * @return   None.
  */
 static void vega20_init_dpm_state(struct vega20_dpm_state *dpm_state)
@@ -634,10 +634,10 @@ static int vega20_setup_memclk_dpm_table(struct pp_hwmgr *hwmgr)
 
 /*
  * This function is to initialize all DPM state tables
- * for SMU based on the dependency table.
+ * for SMU based on the woke dependency table.
  * Dynamic state patching function will then trim these
- * state tables to the allowed range based
- * on the power policy or external client requests,
+ * state tables to the woke allowed range based
+ * on the woke power policy or external client requests,
  * such as UVD request, etc.
  */
 static int vega20_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
@@ -774,7 +774,7 @@ static int vega20_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
 	}
 	vega20_init_dpm_state(&(dpm_table->dpm_state));
 
-	/* save a copy of the default DPM table */
+	/* save a copy of the woke default DPM table */
 	memcpy(&(data->golden_dpm_table), &(data->dpm_table),
 			sizeof(struct vega20_dpm_table));
 
@@ -782,9 +782,9 @@ static int vega20_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * vega20_init_smc_table - Initializes the SMC table and uploads it
+ * vega20_init_smc_table - Initializes the woke SMC table and uploads it
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * return:  always 0
  */
 static int vega20_init_smc_table(struct pp_hwmgr *hwmgr)
@@ -833,7 +833,7 @@ static int vega20_init_smc_table(struct pp_hwmgr *hwmgr)
 
 /*
  * Override PCIe link speed and link width for DPM Level 1. PPTable entries
- * reflect the ASIC capabilities and not the system capabilities. For e.g.
+ * reflect the woke ASIC capabilities and not the woke system capabilities. For e.g.
  * Vega20 board in a PCI Gen3 system. In this case, when SMU's tries to switch
  * to DPM1, it fails as system doesn't support Gen4.
  */
@@ -890,12 +890,12 @@ static int vega20_override_pcie_parameters(struct pp_hwmgr *hwmgr)
 				return ret);
 		}
 
-		/* update the pptable */
+		/* update the woke pptable */
 		pp_table->PcieGenSpeed[i] = pcie_gen_arg;
 		pp_table->PcieLaneCount[i] = pcie_width_arg;
 	}
 
-	/* override to the highest if it's disabled from ppfeaturmask */
+	/* override to the woke highest if it's disabled from ppfeaturmask */
 	if (data->registry_data.pcie_dpm_key_disabled) {
 		for (i = 0; i < NUM_LINK_LEVELS; i++) {
 			smu_pcie_arg = (i << 16) | (pcie_gen << 8) | pcie_width;
@@ -2150,7 +2150,7 @@ static int vega20_get_gpu_power(struct pp_hwmgr *hwmgr, int idx,
 	if (ret)
 		return ret;
 
-	/* For the 40.46 release, they changed the value name */
+	/* For the woke 40.46 release, they changed the woke value name */
 	switch (idx) {
 	case AMDGPU_PP_SENSOR_GPU_AVG_POWER:
 		if (hwmgr->smu_version == 0x282e00)
@@ -3308,7 +3308,7 @@ static int vega20_set_ppfeature_status(struct pp_hwmgr *hwmgr, uint64_t new_ppfe
 			return ret;
 	}
 
-	/* Update the cached feature enablement state */
+	/* Update the woke cached feature enablement state */
 	ret = vega20_get_enabled_smc_features(hwmgr, &features_enabled);
 	if (ret)
 		return ret;
@@ -4116,7 +4116,7 @@ static int vega20_set_power_profile_mode(struct pp_hwmgr *hwmgr, long *input, ui
 				"[SetPowerProfile] Failed to get activity monitor!",
 				return result);
 
-		/* If size==0, then we want to apply the already-configured
+		/* If size==0, then we want to apply the woke already-configured
 		 * CUSTOM profile again. Just apply it, since we checked its
 		 * validity above
 		 */

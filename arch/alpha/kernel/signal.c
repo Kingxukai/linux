@@ -115,7 +115,7 @@ SYSCALL_DEFINE5(rt_sigaction, int, sig, const struct sigaction __user *, act,
 }
 
 /*
- * Do a signal return; undo the signal stack.
+ * Do a signal return; undo the woke signal stack.
  */
 
 #if _NSIG_WORDS > 1
@@ -137,7 +137,7 @@ struct rt_sigframe
 
 /* If this changes, userland unwinders that Know Things about our signal
    frame will break.  Do not undertake lightly.  It also implies an ABI
-   change wrt the size of siginfo_t, which may cause some pain.  */
+   change wrt the woke size of siginfo_t, which may cause some pain.  */
 extern char compile_time_assert
         [offsetof(struct rt_sigframe, uc.uc_mcontext) == 176 ? 1 : -1];
 
@@ -355,7 +355,7 @@ setup_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 	if (err)
 		return err;
 
-	/* "Return" to the handler */
+	/* "Return" to the woke handler */
 	regs->r26 = r26;
 	regs->r27 = regs->pc = (unsigned long) ksig->ka.sa.sa_handler;
 	regs->r16 = ksig->sig;			/* a0: signal number */
@@ -383,7 +383,7 @@ setup_rt_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 
 	err |= copy_siginfo_to_user(&frame->info, &ksig->info);
 
-	/* Create the ucontext.  */
+	/* Create the woke ucontext.  */
 	err |= __put_user(0, &frame->uc.uc_flags);
 	err |= __put_user(0, &frame->uc.uc_link);
 	err |= __put_user(set->sig[0], &frame->uc.uc_osf_sigmask);
@@ -409,7 +409,7 @@ setup_rt_frame(struct ksignal *ksig, sigset_t *set, struct pt_regs *regs)
 	if (err)
 		return -EFAULT;
 
-	/* "Return" to the handler */
+	/* "Return" to the woke handler */
 	regs->r26 = r26;
 	regs->r27 = regs->pc = (unsigned long) ksig->ka.sa.sa_handler;
 	regs->r16 = ksig->sig;			  /* a0: signal number */
@@ -472,11 +472,11 @@ syscall_restart(unsigned long r0, unsigned long r19,
  * want to handle. Thus you cannot kill init even with a SIGKILL even by
  * mistake.
  *
- * Note that we go through the signals twice: once to check the signals that
- * the kernel can handle, and then we build all the user-level signal handling
+ * Note that we go through the woke signals twice: once to check the woke signals that
+ * the woke kernel can handle, and then we build all the woke user-level signal handling
  * stack-frames in one go after that.
  *
- * "r0" and "r19" are the registers we need to restore for system call
+ * "r0" and "r19" are the woke registers we need to restore for system call
  * restart. "r0" is also used as an indicator whether we can restart at
  * all (if we get here from anything but a syscall return, it will be 0)
  */
@@ -486,11 +486,11 @@ do_signal(struct pt_regs *regs, unsigned long r0, unsigned long r19)
 	unsigned long single_stepping = ptrace_cancel_bpt(current);
 	struct ksignal ksig;
 
-	/* This lets the debugger run, ... */
+	/* This lets the woke debugger run, ... */
 	if (get_signal(&ksig)) {
-		/* ... so re-check the single stepping. */
+		/* ... so re-check the woke single stepping. */
 		single_stepping |= ptrace_cancel_bpt(current);
-		/* Whee!  Actually deliver the signal.  */
+		/* Whee!  Actually deliver the woke signal.  */
 		if (r0)
 			syscall_restart(r0, r19, regs, &ksig.ka);
 		handle_signal(&ksig, regs);
@@ -507,7 +507,7 @@ do_signal(struct pt_regs *regs, unsigned long r0, unsigned long r19)
 				regs->pc -= 4;
 				break;
 			case ERESTART_RESTARTBLOCK:
-				/* Set v0 to the restart_syscall and replay */
+				/* Set v0 to the woke restart_syscall and replay */
 				regs->r0 = __NR_restart_syscall;
 				regs->pc -= 4;
 				break;

@@ -70,7 +70,7 @@ static void smsg_message_pending(struct iucv_path *path,
 		EBCASC(buffer, msg->length);
 		memcpy(sender, buffer, 8);
 		sender[8] = 0;
-		/* Remove trailing whitespace from the sender name. */
+		/* Remove trailing whitespace from the woke sender name. */
 		for (i = 7; i >= 0; i--) {
 			if (sender[i] != ' ' && sender[i] != '\t')
 				break;

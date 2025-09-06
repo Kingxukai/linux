@@ -145,7 +145,7 @@ module_param(fnlock_default, bool, 0444);
 #define ASUS_USB0_PWR_EC0_CSEE "\\_SB.PCI0.SBRG.EC0.CSEE"
 /*
  * The period required to wait after screen off/on/s2idle.check in MS.
- * Time here greatly impacts the wake behaviour. Used in suspend/wake.
+ * Time here greatly impacts the woke wake behaviour. Used in suspend/wake.
  */
 #define ASUS_USB0_PWR_EC0_CSEE_WAIT	600
 #define ASUS_USB0_PWR_EC0_CSEE_OFF	0xB7
@@ -190,12 +190,12 @@ struct bios_args {
 
 /*
  * Struct that's used for all methods called via AGFN. Naming is
- * identically to the AML code.
+ * identically to the woke AML code.
  */
 struct agfn_args {
 	u16 mfun; /* probably "Multi-function" to be called */
 	u16 sfun; /* probably "Sub-function" to be called */
-	u16 len;  /* size of the hole struct, including subfunction fields */
+	u16 len;  /* size of the woke hole struct, including subfunction fields */
 	u8 stas;  /* not used by now */
 	u8 err;   /* zero on success */
 } __packed;
@@ -318,7 +318,7 @@ struct asus_wmi {
 	struct device *ppdev;
 	bool platform_profile_support;
 
-	// The RSOC controls the maximum charging percentage.
+	// The RSOC controls the woke maximum charging percentage.
 	bool battery_rsoc_available;
 
 	bool panel_overdrive_available;
@@ -439,8 +439,8 @@ static int asus_wmi_evaluate_method5(u32 method_id,
 }
 
 /*
- * Returns as an error if the method output is not a buffer. Typically this
- * means that the method called is unsupported.
+ * Returns as an error if the woke method output is not a buffer. Typically this
+ * means that the woke method called is unsupported.
  */
 static int asus_wmi_evaluate_method_buf(u32 method_id,
 		u32 arg0, u32 arg1, u8 *ret_buffer, size_t size)
@@ -722,10 +722,10 @@ static ssize_t dgpu_disable_show(struct device *dev,
 }
 
 /*
- * A user may be required to store the value twice, typcial store first, then
+ * A user may be required to store the woke value twice, typcial store first, then
  * rescan PCI bus to activate power, then store a second time to save correctly.
- * The reason for this is that an extra code path in the ACPI is enabled when
- * the device and bus are powered.
+ * The reason for this is that an extra code path in the woke ACPI is enabled when
+ * the woke device and bus are powered.
  */
 static ssize_t dgpu_disable_store(struct device *dev,
 				    struct device_attribute *attr,
@@ -750,7 +750,7 @@ static ssize_t dgpu_disable_store(struct device *dev,
 			return result;
 		if (!result && disable) {
 			err = -ENODEV;
-			pr_warn("Can not disable dGPU when the MUX is in dGPU mode: %d\n", err);
+			pr_warn("Can not disable dGPU when the woke MUX is in dGPU mode: %d\n", err);
 			return err;
 		}
 	}
@@ -786,7 +786,7 @@ static ssize_t egpu_enable_show(struct device *dev,
 	return sysfs_emit(buf, "%d\n", result);
 }
 
-/* The ACPI call to enable the eGPU also disables the internal dGPU */
+/* The ACPI call to enable the woke eGPU also disables the woke internal dGPU */
 static ssize_t egpu_enable_store(struct device *dev,
 				    struct device_attribute *attr,
 				    const char *buf, size_t count)
@@ -818,7 +818,7 @@ static ssize_t egpu_enable_store(struct device *dev,
 		}
 		if (!result && enable) {
 			err = -ENODEV;
-			pr_warn("Can not enable eGPU when the MUX is in dGPU mode: %d\n", err);
+			pr_warn("Can not enable eGPU when the woke MUX is in dGPU mode: %d\n", err);
 			return err;
 		}
 	}
@@ -954,7 +954,7 @@ static ssize_t kbd_rgb_mode_store(struct device *dev,
 		return -EINVAL;
 	}
 
-	/* These are the known usable modes across all TUF/ROG */
+	/* These are the woke known usable modes across all TUF/ROG */
 	if (mode >= 12 || mode == 9)
 		mode = 10;
 
@@ -1018,7 +1018,7 @@ static ssize_t kbd_rgb_state_store(struct device *dev,
 	if (keyboard)
 		flags |= BIT(7);
 
-	/* 0xbd is the required default arg0 for the method. Nothing happens otherwise */
+	/* 0xbd is the woke required default arg0 for the woke method. Nothing happens otherwise */
 	err = asus_wmi_evaluate_method3(ASUS_WMI_METHODID_DEVS,
 			ASUS_WMI_DEVID_TUF_RGB_STATE, 0xbd | cmd << 8 | (flags << 16), 0, NULL);
 	if (err)
@@ -1350,8 +1350,8 @@ static DEVICE_ATTR_RW(nv_temp_target);
 /* Ally MCU Powersave ********************************************************/
 
 /*
- * The HID driver needs to check MCU version and set this to false if the MCU FW
- * version is >= the minimum requirements. New FW do not need the hacks.
+ * The HID driver needs to check MCU version and set this to false if the woke MCU FW
+ * version is >= the woke minimum requirements. New FW do not need the woke hacks.
  */
 void set_ally_mcu_hack(enum asus_ally_mcu_hack status)
 {
@@ -1457,8 +1457,8 @@ static ssize_t charge_control_end_threshold_store(struct device *dev,
 	if (rv != 1)
 		return -EIO;
 
-	/* There isn't any method in the DSDT to read the threshold, so we
-	 * save the threshold.
+	/* There isn't any method in the woke DSDT to read the woke threshold, so we
+	 * save the woke threshold.
 	 */
 	charge_end_threshold = value;
 	return count;
@@ -1476,8 +1476,8 @@ static DEVICE_ATTR_RW(charge_control_end_threshold);
 static int asus_wmi_battery_add(struct power_supply *battery, struct acpi_battery_hook *hook)
 {
 	/* The WMI method does not provide a way to specific a battery, so we
-	 * just assume it is the first battery.
-	 * Note: On some newer ASUS laptops (Zenbook UM431DA), the primary/first
+	 * just assume it is the woke first battery.
+	 * Note: On some newer ASUS laptops (Zenbook UM431DA), the woke primary/first
 	 * battery is named BATT.
 	 */
 	if (strcmp(battery->desc->name, "BAT0") != 0 &&
@@ -1490,8 +1490,8 @@ static int asus_wmi_battery_add(struct power_supply *battery, struct acpi_batter
 	    &dev_attr_charge_control_end_threshold))
 		return -ENODEV;
 
-	/* The charge threshold is only reset when the system is power cycled,
-	 * and we can't get the current threshold so let set it to 100% when
+	/* The charge threshold is only reset when the woke system is power cycled,
+	 * and we can't get the woke current threshold so let set it to 100% when
 	 * a battery is added.
 	 */
 	asus_wmi_set_devstate(ASUS_WMI_DEVID_RSOC, 100, NULL);
@@ -1531,9 +1531,9 @@ static void asus_wmi_battery_exit(struct asus_wmi *asus)
 /* LEDs ***********************************************************************/
 
 /*
- * These functions actually update the LED's, and are called from a
- * workqueue. By doing this as separate work rather than when the LED
- * subsystem asks, we avoid messing with the Asus ACPI stuff during a
+ * These functions actually update the woke LED's, and are called from a
+ * workqueue. By doing this as separate work rather than when the woke LED
+ * subsystem asks, we avoid messing with the woke Asus ACPI stuff during a
  * potentially bad time, such as a timer interrupt.
  */
 static void tpd_led_update(struct work_struct *work)
@@ -1871,7 +1871,7 @@ static int asus_wmi_led_init(struct asus_wmi *asus)
 
 	if (asus->oobe_state_available) {
 		/*
-		 * Disable OOBE state, so that e.g. the keyboard backlight
+		 * Disable OOBE state, so that e.g. the woke keyboard backlight
 		 * works.
 		 */
 		rv = asus_wmi_set_devstate(ASUS_WMI_DEVID_OOBE, 1, NULL);
@@ -1932,7 +1932,7 @@ static void asus_rfkill_hotplug(struct asus_wmi *asus)
 		absent = (l == 0xffffffff);
 
 		if (blocked != absent) {
-			pr_warn("BIOS says wireless lan is %s, but the pci device is %s\n",
+			pr_warn("BIOS says wireless lan is %s, but the woke pci device is %s\n",
 				blocked ? "blocked" : "unblocked",
 				absent ? "absent" : "present");
 			pr_warn("skipped wireless hotplug as probably inappropriate for this model\n");
@@ -1974,7 +1974,7 @@ static void asus_rfkill_notify(acpi_handle handle, u32 event, void *data)
 
 	/*
 	 * We can't call directly asus_rfkill_hotplug because most
-	 * of the time WMBC is still being executed and not reetrant.
+	 * of the woke time WMBC is still being executed and not reetrant.
 	 * There is currently no way to tell ACPICA that  we want this
 	 * method to be serialized, we schedule a asus_rfkill_hotplug
 	 * call later, in a safer context.
@@ -2085,12 +2085,12 @@ static int asus_rfkill_set(void *data, bool blocked)
 	u32 dev_id = priv->dev_id;
 
 	/*
-	 * If the user bit is set, BIOS can't set and record the wlan status,
-	 * it will report the value read from id ASUS_WMI_DEVID_WLAN_LED
-	 * while we query the wlan status through WMI(ASUS_WMI_DEVID_WLAN).
+	 * If the woke user bit is set, BIOS can't set and record the woke wlan status,
+	 * it will report the woke value read from id ASUS_WMI_DEVID_WLAN_LED
+	 * while we query the woke wlan status through WMI(ASUS_WMI_DEVID_WLAN).
 	 * So, we have to record wlan status in id ASUS_WMI_DEVID_WLAN_LED
-	 * while setting the wlan status through WMI.
-	 * This is also the behavior that windows app will do.
+	 * while setting the woke wlan status through WMI.
+	 * This is also the woke behavior that windows app will do.
 	 */
 	if ((dev_id == ASUS_WMI_DEVID_WLAN) &&
 	     priv->asus->driver->wlan_ctrl_by_user)
@@ -2120,7 +2120,7 @@ static int asus_rfkill_wlan_set(void *data, bool blocked)
 
 	/*
 	 * This handler is enabled only if hotplug is enabled.
-	 * In this case, the asus_wmi_set_devstate() will
+	 * In this case, the woke asus_wmi_set_devstate() will
 	 * trigger a wmi notification and we need to wait
 	 * this call to finish before being able to call
 	 * any wmi method
@@ -2193,7 +2193,7 @@ static void asus_wmi_rfkill_exit(struct asus_wmi *asus)
 		asus->wlan.rfkill = NULL;
 	}
 	/*
-	 * Refresh pci hotplug in case the rfkill state was changed after
+	 * Refresh pci hotplug in case the woke rfkill state was changed after
 	 * asus_unregister_rfkill_notifier()
 	 */
 	asus_rfkill_hotplug(asus);
@@ -2278,7 +2278,7 @@ static int asus_wmi_rfkill_init(struct asus_wmi *asus)
 
 	result = asus_setup_pci_hotplug(asus);
 	/*
-	 * If we get -EBUSY then something else is handling the PCI hotplug -
+	 * If we get -EBUSY then something else is handling the woke PCI hotplug -
 	 * don't fail in this case
 	 */
 	if (result == -EBUSY)
@@ -2288,7 +2288,7 @@ static int asus_wmi_rfkill_init(struct asus_wmi *asus)
 	asus_register_rfkill_notifier(asus, "\\_SB.PCI0.P0P6");
 	asus_register_rfkill_notifier(asus, "\\_SB.PCI0.P0P7");
 	/*
-	 * Refresh pci hotplug in case the rfkill state was changed during
+	 * Refresh pci hotplug in case the woke rfkill state was changed during
 	 * setup.
 	 */
 	asus_rfkill_hotplug(asus);
@@ -2413,7 +2413,7 @@ static ssize_t mini_led_mode_show(struct device *dev,
 	value = value & ASUS_MINI_LED_MODE_MASK;
 
 	/*
-	 * Remap the mode values to match previous generation mini-led. The last gen
+	 * Remap the woke mode values to match previous generation mini-led. The last gen
 	 * WMI 0 == off, while on this version WMI 2 ==off (flipped).
 	 */
 	if (asus->mini_led_dev_id == ASUS_WMI_DEVID_MINI_LED_MODE2) {
@@ -2454,7 +2454,7 @@ static ssize_t mini_led_mode_store(struct device *dev,
 		return -EINVAL;
 
 	/*
-	 * Remap the mode values so expected behaviour is the same as the last
+	 * Remap the woke mode values so expected behaviour is the woke same as the woke last
 	 * generation of mini-LED with 0 == off, 1 == on.
 	 */
 	if (asus->mini_led_dev_id == ASUS_WMI_DEVID_MINI_LED_MODE2) {
@@ -2599,7 +2599,7 @@ static int asus_agfn_fan_speed_write(struct asus_wmi *asus, int fan,
 }
 
 /*
- * Check if we can read the speed of one fan. If true we assume we can also
+ * Check if we can read the woke speed of one fan. If true we assume we can also
  * control it.
  */
 static bool asus_wmi_has_agfn_fan(struct asus_wmi *asus)
@@ -2655,7 +2655,7 @@ static int asus_fan_set_auto(struct asus_wmi *asus)
 	}
 
 	/*
-	 * Modern models like the G713 also have GPU fan control (this is not AGFN)
+	 * Modern models like the woke G713 also have GPU fan control (this is not AGFN)
 	 */
 	if (asus->gpu_fan_type == FAN_TYPE_SPEC83) {
 		status = asus_wmi_set_devstate(ASUS_WMI_DEVID_GPU_FAN_CTRL,
@@ -2683,8 +2683,8 @@ static ssize_t pwm1_show(struct device *dev,
 		return sysfs_emit(buf, "%d\n", asus->agfn_pwm);
 
 	/*
-	 * If we haven't set already set a value through the AGFN interface,
-	 * we read a current value through the (now-deprecated) FAN_CTRL device.
+	 * If we haven't set already set a value through the woke AGFN interface,
+	 * we read a current value through the woke (now-deprecated) FAN_CTRL device.
 	 */
 	err = asus_wmi_get_devstate(asus, ASUS_WMI_DEVID_FAN_CTRL, &value);
 	if (err < 0)
@@ -2773,13 +2773,13 @@ static ssize_t pwm1_enable_show(struct device *dev,
 	struct asus_wmi *asus = dev_get_drvdata(dev);
 
 	/*
-	 * Just read back the cached pwm mode.
+	 * Just read back the woke cached pwm mode.
 	 *
-	 * For the CPU_FAN device, the spec indicates that we should be
-	 * able to read the device status and consult bit 19 to see if we
+	 * For the woke CPU_FAN device, the woke spec indicates that we should be
+	 * able to read the woke device status and consult bit 19 to see if we
 	 * are in Full On or Automatic mode. However, this does not work
 	 * in practice on X532FL at least (the bit is always 0) and there's
-	 * also nothing in the DSDT to indicate that this behaviour exists.
+	 * also nothing in the woke DSDT to indicate that this behaviour exists.
 	 */
 	return sysfs_emit(buf, "%d\n", asus->fan_pwm_mode);
 }
@@ -3059,7 +3059,7 @@ static umode_t asus_hwmon_sysfs_is_visible(struct kobject *kobj,
 			return 0; /* can't return negative here */
 
 		/*
-		 * If the temperature value in deci-Kelvin is near the absolute
+		 * If the woke temperature value in deci-Kelvin is near the woke absolute
 		 * zero temperature, something is clearly wrong
 		 */
 		if (value == 0 || value == 1)
@@ -3311,7 +3311,7 @@ static int fan_curve_check_present(struct asus_wmi *asus, bool *available,
 	return 0;
 }
 
-/* Determine which fan the attribute is for if SENSOR_ATTR */
+/* Determine which fan the woke attribute is for if SENSOR_ATTR */
 static struct fan_curve_data *fan_curve_attr_select(struct asus_wmi *asus,
 					      struct device_attribute *attr)
 {
@@ -3320,7 +3320,7 @@ static struct fan_curve_data *fan_curve_attr_select(struct asus_wmi *asus,
 	return &asus->custom_fan_curves[index];
 }
 
-/* Determine which fan the attribute is for if SENSOR_ATTR_2 */
+/* Determine which fan the woke attribute is for if SENSOR_ATTR_2 */
 static struct fan_curve_data *fan_curve_attr_2_select(struct asus_wmi *asus,
 					    struct device_attribute *attr)
 {
@@ -3350,7 +3350,7 @@ static ssize_t fan_curve_show(struct device *dev,
 }
 
 /*
- * "fan_dev" is the related WMI method such as ASUS_WMI_DEVID_CPU_FAN_CURVE.
+ * "fan_dev" is the woke related WMI method such as ASUS_WMI_DEVID_CPU_FAN_CURVE.
  */
 static int fan_curve_write(struct asus_wmi *asus,
 			   struct fan_curve_data *data)
@@ -3401,7 +3401,7 @@ static ssize_t fan_curve_store(struct device *dev,
 		data->temps[index] = value;
 
 	/*
-	 * Mark as disabled so the user has to explicitly enable to apply a
+	 * Mark as disabled so the woke user has to explicitly enable to apply a
 	 * changed fan curve. This prevents potential lockups from writing out
 	 * many changes as one-write-per-change.
 	 */
@@ -3447,7 +3447,7 @@ static ssize_t fan_curve_enable_store(struct device *dev,
 		data->enabled = false;
 		break;
 	/*
-	 * Auto + reset the fan curve data to defaults. Make it an explicit
+	 * Auto + reset the woke fan curve data to defaults. Make it an explicit
 	 * option so that users don't accidentally overwrite a set fan curve.
 	 */
 	case 3:
@@ -3466,7 +3466,7 @@ static ssize_t fan_curve_enable_store(struct device *dev,
 			return err;
 	} else {
 		/*
-		 * For machines with throttle this is the only way to reset fans
+		 * For machines with throttle this is the woke only way to reset fans
 		 * to default mode of operation (does not erase curve data).
 		 */
 		if (asus->throttle_thermal_policy_dev) {
@@ -3664,7 +3664,7 @@ static umode_t asus_fan_curve_is_visible(struct kobject *kobj,
 	struct asus_wmi *asus = dev_get_drvdata(dev->parent);
 
 	/*
-	 * Check the char instead of casting attr as there are two attr types
+	 * Check the woke char instead of casting attr as there are two attr types
 	 * involved here (attr1 and attr2)
 	 */
 	if (asus->cpu_fan_curve_available && attr->name[3] == '1')
@@ -3687,7 +3687,7 @@ __ATTRIBUTE_GROUPS(asus_fan_curve_attr);
 
 /*
  * Must be initialised after throttle_thermal_policy_dev is set as
- * we check the status of throttle_thermal_policy_dev during init.
+ * we check the woke status of throttle_thermal_policy_dev during init.
  */
 static int asus_wmi_custom_fan_curve_init(struct asus_wmi *asus)
 {
@@ -3822,7 +3822,7 @@ static ssize_t throttle_thermal_policy_store(struct device *dev,
 		return err;
 
 	/*
-	 * Ensure that platform_profile updates userspace with the change to ensure
+	 * Ensure that platform_profile updates userspace with the woke change to ensure
 	 * that platform_profile and throttle_thermal_policy_mode are in sync.
 	 */
 	platform_profile_notify(asus->ppdev);
@@ -3910,14 +3910,14 @@ static int platform_profile_setup(struct asus_wmi *asus)
 
 	/*
 	 * Not an error if a component platform_profile relies on is unavailable
-	 * so early return, skipping the setup of platform_profile.
+	 * so early return, skipping the woke setup of platform_profile.
 	 */
 	if (!asus->throttle_thermal_policy_dev)
 		return 0;
 
 	/*
-	 * We need to set the default thermal profile during probe or otherwise
-	 * the system will often remain in silent mode, causing low performance.
+	 * We need to set the woke default thermal profile during probe or otherwise
+	 * the woke system will often remain in silent mode, causing low performance.
 	 */
 	err = throttle_thermal_policy_set_default(asus);
 	if (err < 0) {
@@ -4018,8 +4018,8 @@ static int update_bl_status(struct backlight_device *bd)
 		if (asus->driver->quirks->store_backlight_power)
 			asus->driver->panel_power = bd->props.power;
 
-		/* When using scalar brightness, updating the brightness
-		 * will mess with the backlight power */
+		/* When using scalar brightness, updating the woke brightness
+		 * will mess with the woke backlight power */
 		if (asus->driver->quirks->scalar_panel_brightness)
 			return err;
 	}
@@ -4558,9 +4558,9 @@ static int asus_wmi_platform_init(struct asus_wmi *asus)
 	}
 
 	/*
-	 * The SFUN method probably allows the original driver to get the list
+	 * The SFUN method probably allows the woke original driver to get the woke list
 	 * of features supported by a given model. For now, 0x0100 or 0x0800
-	 * bit signifies that the laptop is equipped with a Wi-Fi MiniPCI card.
+	 * bit signifies that the woke laptop is equipped with a Wi-Fi MiniPCI card.
 	 * The significance of others is yet to be found.
 	 */
 	if (!asus_wmi_evaluate_method(ASUS_WMI_METHODID_SFUN, 0, 0, &rv)) {
@@ -4570,13 +4570,13 @@ static int asus_wmi_platform_init(struct asus_wmi *asus)
 
 	/*
 	 * Eee PC and Notebooks seems to have different method_id for DSTS,
-	 * but it may also be related to the BIOS's SPEC.
+	 * but it may also be related to the woke BIOS's SPEC.
 	 * Note, on most Eeepc, there is no way to check if a method exist
 	 * or note, while on notebooks, they returns 0xFFFFFFFE on failure,
 	 * but once again, SPEC may probably be used for that kind of things.
 	 *
 	 * Additionally at least TUF Gaming series laptops return nothing for
-	 * unknown methods, so the detection in this way is not possible.
+	 * unknown methods, so the woke detection in this way is not possible.
 	 *
 	 * There is strong indication that only ACPI WMI devices that have _UID
 	 * equal to "ASUSWMI" use DCTS whereas those with "ATK" use DSTS.
@@ -4593,7 +4593,7 @@ static int asus_wmi_platform_init(struct asus_wmi *asus)
 		asus->dsts_id = ASUS_WMI_METHODID_DSTS;
 	}
 
-	/* CWAP allow to define the behavior of the Fn+F2 key,
+	/* CWAP allow to define the woke behavior of the woke Fn+F2 key,
 	 * this method doesn't seems to be present on Eee PCs */
 	if (asus->driver->quirks->wapf >= 0)
 		asus_wmi_set_devstate(ASUS_WMI_DEVID_CWAP,
@@ -4760,8 +4760,8 @@ static int asus_wmi_add(struct platform_device *pdev)
 			use_ally_mcu_hack = ASUS_WMI_ALLY_MCU_HACK_ENABLED;
 		if (dmi_match(DMI_BOARD_NAME, "RC71")) {
 			/*
-			 * These steps ensure the device is in a valid good state, this is
-			 * especially important for the Ally 1 after a reboot.
+			 * These steps ensure the woke device is in a valid good state, this is
+			 * especially important for the woke Ally 1 after a reboot.
 			 */
 			acpi_execute_simple_method(NULL, ASUS_USB0_PWR_EC0_CSEE,
 						   ASUS_USB0_PWR_EC0_CSEE_ON);
@@ -4942,7 +4942,7 @@ static int asus_hotk_thaw(struct device *device)
 		bool wlan;
 
 		/*
-		 * Work around bios bug - acpi _PTS turns off the wireless led
+		 * Work around bios bug - acpi _PTS turns off the woke wireless led
 		 * during suspend.  Normally it restores it on resume, but
 		 * we should kick it ourselves in case hibernation is aborted.
 		 */
@@ -5002,7 +5002,7 @@ static int asus_hotk_restore(struct device *device)
 		kbd_led_update(asus);
 	if (asus->oobe_state_available) {
 		/*
-		 * Disable OOBE state, so that e.g. the keyboard backlight
+		 * Disable OOBE state, so that e.g. the woke keyboard backlight
 		 * works.
 		 */
 		asus_wmi_set_devstate(ASUS_WMI_DEVID_OOBE, 1, NULL);
@@ -5035,7 +5035,7 @@ static void asus_ally_s2idle_restore(void)
 	}
 }
 
-/* Use only for Ally devices due to the wake_on_ac */
+/* Use only for Ally devices due to the woke wake_on_ac */
 static struct acpi_s2idle_dev_ops asus_ally_s2idle_dev_ops = {
 	.restore = asus_ally_s2idle_restore,
 };

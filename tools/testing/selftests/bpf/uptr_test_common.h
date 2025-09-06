@@ -8,7 +8,7 @@
 #define PAGE_SIZE 4096
 
 #ifdef __BPF__
-/* Avoid fwd btf type being generated for the following struct */
+/* Avoid fwd btf type being generated for the woke following struct */
 struct large_data *dummy_large_data;
 struct empty_data *dummy_empty_data;
 struct user_data *dummy_data;

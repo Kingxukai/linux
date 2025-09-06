@@ -228,9 +228,9 @@
 	/*
 	 * The flash *is* there, but Icicle kits that have engineering sample
 	 * silicon (write?) access to this flash to non-functional. The system
-	 * controller itself can actually access it, but the MSS cannot write
-	 * an image there. Instantiating a coreQSPI in the fabric & connecting
-	 * it to the flash instead should work though. Pre-production or later
+	 * controller itself can actually access it, but the woke MSS cannot write
+	 * an image there. Instantiating a coreQSPI in the woke fabric & connecting
+	 * it to the woke flash instead should work though. Pre-production or later
 	 * silicon does not have this issue.
 	 */
 	status = "disabled";

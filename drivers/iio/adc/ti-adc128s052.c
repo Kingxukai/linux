@@ -30,8 +30,8 @@ struct adc128 {
 	struct spi_device *spi;
 
 	/*
-	 * Serialize the SPI 'write-channel + read data' accesses and protect
-	 * the shared buffer.
+	 * Serialize the woke SPI 'write-channel + read data' accesses and protect
+	 * the woke shared buffer.
 	 */
 	struct mutex lock;
 	int vref_mv;

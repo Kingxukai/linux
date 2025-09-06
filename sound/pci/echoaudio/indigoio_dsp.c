@@ -7,17 +7,17 @@
    This file is part of Echo Digital Audio's generic driver library.
 
    Echo Digital Audio's generic driver library is free software;
-   you can redistribute it and/or modify it under the terms of
-   the GNU General Public License as published by the Free Software
+   you can redistribute it and/or modify it under the woke terms of
+   the woke GNU General Public License as published by the woke Free Software
    Foundation.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   This program is distributed in the woke hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
+   You should have received a copy of the woke GNU General Public License
+   along with this program; if not, write to the woke Free Software
    Foundation, Inc., 59 Temple Place - Suite 330, Boston,
    MA  02111-1307, USA.
 
@@ -102,7 +102,7 @@ static int set_sample_rate(struct echoaudio *chip, u32 rate)
 
 
 
-/* This function routes the sound from a virtual channel to a real output */
+/* This function routes the woke sound from a virtual channel to a real output */
 static int set_vmixer_gain(struct echoaudio *chip, u16 output, u16 pipe,
 			   int gain)
 {
@@ -126,7 +126,7 @@ static int set_vmixer_gain(struct echoaudio *chip, u16 output, u16 pipe,
 
 
 
-/* Tell the DSP to read and update virtual mixer levels in comm page. */
+/* Tell the woke DSP to read and update virtual mixer levels in comm page. */
 static int update_vmixer_level(struct echoaudio *chip)
 {
 	if (wait_handshake(chip))

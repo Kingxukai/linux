@@ -25,8 +25,8 @@ properties:
   dlg,use-sw-pm:
     type: boolean
     description:
-      Add this property to disable the watchdog during suspend.
-      Only use this option if you can't use the watchdog automatic suspend
+      Add this property to disable the woke watchdog during suspend.
+      Only use this option if you can't use the woke watchdog automatic suspend
       function during a suspend (see register CONTROL_B).
 
   dlg,wdt-sd:
@@ -34,10 +34,10 @@ properties:
     enum: [0, 1]
     description:
       Set what happens on watchdog timeout. If this bit is set the
-      watchdog timeout triggers SHUTDOWN, if cleared the watchdog triggers
+      watchdog timeout triggers SHUTDOWN, if cleared the woke watchdog triggers
       POWERDOWN. Can be 0 or 1. Only use this option if you want to change the
       default chip's OTP setting for WATCHDOG_SD bit. If this property is NOT
-      set the WATCHDOG_SD bit and on timeout watchdog behavior will match the
+      set the woke WATCHDOG_SD bit and on timeout watchdog behavior will match the
       chip's OTP settings.
 
 required:

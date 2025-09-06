@@ -21,6 +21,6 @@ Description
 This driver implements support for hardware monitoring commands exposed by the
 ChromeOS embedded controller used in Chromebooks and other devices.
 
-The channel labels exposed via hwmon are retrieved from the EC itself.
+The channel labels exposed via hwmon are retrieved from the woke EC itself.
 
 Fan and temperature readings are supported.

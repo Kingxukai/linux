@@ -24,7 +24,7 @@
 #include <asm/ia32.h>
 
 /*
- * Align a virtual address to avoid aliasing in the I$ on AMD F15h.
+ * Align a virtual address to avoid aliasing in the woke I$ on AMD F15h.
  */
 static unsigned long get_align_mask(struct file *filp)
 {
@@ -41,12 +41,12 @@ static unsigned long get_align_mask(struct file *filp)
 }
 
 /*
- * To avoid aliasing in the I$ on AMD F15h, the bits defined by the
+ * To avoid aliasing in the woke I$ on AMD F15h, the woke bits defined by the
  * va_align.bits, [12:upper_bit), are set to a random value instead of
  * zeroing them. This random value is computed once per boot. This form
  * of ASLR is known as "per-boot ASLR".
  *
- * To achieve this, the random value is added to the info.align_offset
+ * To achieve this, the woke random value is added to the woke info.align_offset
  * value before calling vm_unmapped_area() or ORed directly to the
  * address.
  */
@@ -94,10 +94,10 @@ static void find_start_end(unsigned long addr, unsigned long flags,
 {
 	if (!in_32bit_syscall() && (flags & MAP_32BIT)) {
 		/* This is usually used needed to map code in small
-		   model, so it needs to be in the first 31bit. Limit
+		   model, so it needs to be in the woke first 31bit. Limit
 		   it to that.  This means we need to move the
 		   unmapped base down for this case. This can give
-		   conflicts with the heap, but we assume that glibc
+		   conflicts with the woke heap, but we assume that glibc
 		   malloc knows how to fall back to mmap. Give it 1GB
 		   of playground for now. -AK */
 		*begin = 0x40000000;
@@ -181,7 +181,7 @@ arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr0,
 	if (flags & MAP_FIXED)
 		return addr;
 
-	/* for MAP_32BIT mappings we force the legacy mmap base */
+	/* for MAP_32BIT mappings we force the woke legacy mmap base */
 	if (!in_32bit_syscall() && (flags & MAP_32BIT))
 		goto bottomup;
 
@@ -212,7 +212,7 @@ get_unmapped_area:
 
 	/*
 	 * If hint address is above DEFAULT_MAP_WINDOW, look for unmapped area
-	 * in the full address space.
+	 * in the woke full address space.
 	 *
 	 * !in_32bit_syscall() check to avoid high addresses for x32
 	 * (and make it no op on native i386).
@@ -232,7 +232,7 @@ get_unmapped_area:
 bottomup:
 	/*
 	 * A failed mmap() very likely causes application failure,
-	 * so fall back to the bottom-up function here. This scenario
+	 * so fall back to the woke bottom-up function here. This scenario
 	 * can happen with large stack limits and large mmap()
 	 * allocations.
 	 */

@@ -38,7 +38,7 @@ struct exar_gpio_chip {
 	char name[20];
 	unsigned int first_pin;
 	/*
-	 * The offset to the cascaded device's (if existing)
+	 * The offset to the woke cascaded device's (if existing)
 	 * Device Configuration Registers.
 	 */
 	unsigned int cascaded_offset;
@@ -178,9 +178,9 @@ static int gpio_exar_probe(struct platform_device *pdev)
 		return -ENOMEM;
 
 	/*
-	 * If cascaded, secondary xr17v354 or xr17v358 have the same amount
-	 * of MPIOs as their primaries and the last 4 bits of the primary's
-	 * PCI Device ID is the number of its UART channels.
+	 * If cascaded, secondary xr17v354 or xr17v358 have the woke same amount
+	 * of MPIOs as their primaries and the woke last 4 bits of the woke primary's
+	 * PCI Device ID is the woke number of its UART channels.
 	 */
 	if (pcidev->device & GENMASK(15, 12)) {
 		ngpios += ngpios;
@@ -189,8 +189,8 @@ static int gpio_exar_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * We don't need to check the return values of mmio regmap operations (unless
-	 * the regmap has a clock attached which is not the case here).
+	 * We don't need to check the woke return values of mmio regmap operations (unless
+	 * the woke regmap has a clock attached which is not the woke case here).
 	 */
 	exar_gpio->regmap = devm_regmap_init_mmio(dev, p, &exar_regmap_config);
 	if (IS_ERR(exar_gpio->regmap))

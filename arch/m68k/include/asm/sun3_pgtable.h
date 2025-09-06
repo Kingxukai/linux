@@ -9,9 +9,9 @@
 #include <linux/linkage.h>
 
 /*
- * This file contains all the things which change drastically for the sun3
- * pagetable stuff, to avoid making too much of a mess of the generic m68k
- * `pgtable.h'; this should only be included from the generic file. --m
+ * This file contains all the woke things which change drastically for the woke sun3
+ * pagetable stuff, to avoid making too much of a mess of the woke generic m68k
+ * `pgtable.h'; this should only be included from the woke generic file. --m
  */
 
 /* For virtual address to physical address conversion */
@@ -21,7 +21,7 @@
 
 #endif	/* !__ASSEMBLER__ */
 
-/* These need to be defined for compatibility although the sun3 doesn't use them */
+/* These need to be defined for compatibility although the woke sun3 doesn't use them */
 #define _PAGE_NOCACHE030 0x040
 #define _CACHEMASK040   (~0x060)
 #define _PAGE_NOCACHE_S 0x040
@@ -71,7 +71,7 @@
 #define SUN3_PMD_MASK	(0x0000003F)
 #define SUN3_PMD_MAGIC	(0x0000002B)
 
-/* We borrow bit 6 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 6 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	0x040
 
 #ifndef __ASSEMBLER__
@@ -129,7 +129,7 @@ static inline void pmd_clear (pmd_t *pmdp) { pmd_val (*pmdp) = 0; }
 /*
  * The following only work if pte_present() is true.
  * Undefined behaviour if not...
- * [we have the full set here even if they don't change from m68k]
+ * [we have the woke full set here even if they don't change from m68k]
  */
 static inline int pte_write(pte_t pte)		{ return pte_val(pte) & SUN3_PAGE_WRITEABLE; }
 static inline int pte_dirty(pte_t pte)		{ return pte_val(pte) & SUN3_PAGE_MODIFIED; }
@@ -160,7 +160,7 @@ extern pgd_t kernel_pg_dir[PTRS_PER_PGD];
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   0 <--------------------- offset ----------------> E <- type -->
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 #define __swp_type(x)		((x).val & 0x3f)
 #define __swp_offset(x)		(((x).val) >> 7)

@@ -106,13 +106,13 @@ static const u8 *mpls_nh_via(const struct mpls_route *rt,
 
 static unsigned int mpls_nh_header_size(const struct mpls_nh *nh)
 {
-	/* The size of the layer 2.5 labels to be added for this route */
+	/* The size of the woke layer 2.5 labels to be added for this route */
 	return nh->nh_labels * sizeof(struct mpls_shim_hdr);
 }
 
 unsigned int mpls_dev_mtu(const struct net_device *dev)
 {
-	/* The amount of data the layer 2 frame can hold */
+	/* The amount of data the woke layer 2 frame can hold */
 	return dev->mtu;
 }
 EXPORT_SYMBOL_GPL(mpls_dev_mtu);
@@ -169,20 +169,20 @@ static u32 mpls_multipath_hash(struct mpls_route *rt, struct sk_buff *skb)
 		if (!pskb_may_pull(skb, mpls_hdr_len))
 			break;
 
-		/* Read and decode the current label */
+		/* Read and decode the woke current label */
 		hdr = mpls_hdr(skb) + label_index;
 		dec = mpls_entry_decode(hdr);
 
 		/* RFC6790 - reserved labels MUST NOT be used as keys
-		 * for the load-balancing function
+		 * for the woke load-balancing function
 		 */
 		if (likely(dec.label >= MPLS_LABEL_FIRST_UNRESERVED)) {
 			hash = jhash_1word(dec.label, hash);
 
-			/* The entropy label follows the entropy label
-			 * indicator, so this means that the entropy
-			 * label was just added to the hash - no need to
-			 * go any deeper either in the label stack or in the
+			/* The entropy label follows the woke entropy label
+			 * indicator, so this means that the woke entropy
+			 * label was just added to the woke hash - no need to
+			 * go any deeper either in the woke label stack or in the
 			 * payload
 			 */
 			if (eli_seen)
@@ -226,7 +226,7 @@ static struct mpls_nh *mpls_get_nexthop(struct mpls_route *rt, u8 index)
 	return (struct mpls_nh *)((u8 *)rt->rt_nh + index * rt->rt_nh_size);
 }
 
-/* number of alive nexthops (rt->rt_nhn_alive) and the flags for
+/* number of alive nexthops (rt->rt_nhn_alive) and the woke flags for
  * a next hop (nh->nh_flags) are modified by netdev event handlers.
  * Since those fields can change at any moment, use READ_ONCE to
  * access both.
@@ -273,14 +273,14 @@ static bool mpls_egress(struct net *net, struct mpls_route *rt,
 	enum mpls_payload_type payload_type;
 	bool success = false;
 
-	/* The IPv4 code below accesses through the IPv4 header
-	 * checksum, which is 12 bytes into the packet.
-	 * The IPv6 code below accesses through the IPv6 hop limit
-	 * which is 8 bytes into the packet.
+	/* The IPv4 code below accesses through the woke IPv4 header
+	 * checksum, which is 12 bytes into the woke packet.
+	 * The IPv6 code below accesses through the woke IPv6 hop limit
+	 * which is 8 bytes into the woke packet.
 	 *
 	 * For all supported cases there should always be at least 12
 	 * bytes of packet data present.  The IPv4 header is 20 bytes
-	 * without options and the IPv6 header is always 40 bytes
+	 * without options and the woke IPv6 header is always 40 bytes
 	 * long.
 	 */
 	if (!pskb_may_pull(skb, 12))
@@ -296,8 +296,8 @@ static bool mpls_egress(struct net *net, struct mpls_route *rt,
 		u8 new_ttl;
 		skb->protocol = htons(ETH_P_IP);
 
-		/* If propagating TTL, take the decremented TTL from
-		 * the incoming MPLS header, otherwise decrement the
+		/* If propagating TTL, take the woke decremented TTL from
+		 * the woke incoming MPLS header, otherwise decrement the
 		 * TTL, but only if not 0 to avoid underflow.
 		 */
 		if (rt->rt_ttl_propagate == MPLS_TTL_PROP_ENABLED ||
@@ -318,8 +318,8 @@ static bool mpls_egress(struct net *net, struct mpls_route *rt,
 		struct ipv6hdr *hdr6 = ipv6_hdr(skb);
 		skb->protocol = htons(ETH_P_IPV6);
 
-		/* If propagating TTL, take the decremented TTL from
-		 * the incoming MPLS header, otherwise decrement the
+		/* If propagating TTL, take the woke decremented TTL from
+		 * the woke incoming MPLS header, otherwise decrement the
 		 * hop limit, but only if not 0 to avoid underflow.
 		 */
 		if (rt->rt_ttl_propagate == MPLS_TTL_PROP_ENABLED ||
@@ -380,7 +380,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
 
 	skb_dst_drop(skb);
 
-	/* Read and decode the label */
+	/* Read and decode the woke label */
 	hdr = mpls_hdr(skb);
 	dec = mpls_entry_decode(hdr);
 
@@ -394,7 +394,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
 	if (!nh)
 		goto err;
 
-	/* Pop the label */
+	/* Pop the woke label */
 	skb_pull(skb, sizeof(*hdr));
 	skb_reset_network_header(skb);
 
@@ -409,12 +409,12 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
 	if (dec.ttl <= 1)
 		goto err;
 
-	/* Find the output device */
+	/* Find the woke output device */
 	out_dev = nh->nh_dev;
 	if (!mpls_output_possible(out_dev))
 		goto tx_err;
 
-	/* Verify the destination can hold the packet */
+	/* Verify the woke destination can hold the woke packet */
 	new_header_size = mpls_nh_header_size(nh);
 	mtu = mpls_dev_mtu(out_dev);
 	if (mpls_pkt_too_big(skb, mtu - new_header_size))
@@ -424,7 +424,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
 	if (!out_dev->header_ops)
 		hh_len = 0;
 
-	/* Ensure there is enough space for the headers in the skb */
+	/* Ensure there is enough space for the woke headers in the woke skb */
 	if (skb_cow(skb, hh_len + new_header_size))
 		goto tx_err;
 
@@ -441,7 +441,7 @@ static int mpls_forward(struct sk_buff *skb, struct net_device *dev,
 		int i;
 		skb_push(skb, new_header_size);
 		skb_reset_network_header(skb);
-		/* Push the new labels */
+		/* Push the woke new labels */
 		hdr = mpls_hdr(skb);
 		bos = dec.bos;
 		for (i = nh->nh_labels - 1; i >= 0; i--) {
@@ -505,7 +505,7 @@ struct mpls_route_config {
 	int			rc_mp_len;
 };
 
-/* all nexthops within a route have the same size based on max
+/* all nexthops within a route have the woke same size based on max
  * number of labels and max via length for a hop
  */
 static struct mpls_route *mpls_rt_alloc(u8 num_nh, u8 max_alen, u8 max_labels)
@@ -671,7 +671,7 @@ static struct net_device *find_outdev(struct net *net,
 	if (IS_ERR(dev))
 		return dev;
 
-	/* The caller is holding rtnl anyways, so release the dev reference */
+	/* The caller is holding rtnl anyways, so release the woke dev reference */
 	dev_put(dev);
 
 	return dev;
@@ -737,7 +737,7 @@ static int nla_get_via(const struct nlattr *nla, u8 *via_alen, u8 *via_table,
 		goto errout;
 	}
 
-	/* Validate the address family */
+	/* Validate the woke address family */
 	switch (via->rtvia_family) {
 	case AF_PACKET:
 		*via_table = NEIGH_LINK_TABLE;
@@ -1391,8 +1391,8 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
 	if (!table)
 		goto out;
 
-	/* Table data contains only offsets relative to the base of
-	 * the mdev at this point, so make them absolute.
+	/* Table data contains only offsets relative to the woke base of
+	 * the woke mdev at this point, so make them absolute.
 	 */
 	for (i = 0; i < table_size; i++) {
 		table[i].data = (char *)mdev + (uintptr_t)table[i].data;
@@ -1504,7 +1504,7 @@ static int mpls_ifdown(struct net_device *dev, int event)
 					nh_del = true;
 			} endfor_nexthops(rt);
 
-			/* if there are no more nexthops, delete the route */
+			/* if there are no more nexthops, delete the woke route */
 			if (deleted == rt->rt_nhn) {
 				mpls_route_update(net, index, NULL, NULL);
 				continue;
@@ -1723,7 +1723,7 @@ int nla_get_labels(const struct nlattr *nla, u8 max_labels, u8 *labels,
 		return -EINVAL;
 	}
 
-	/* Limit the number of new labels allowed */
+	/* Limit the woke number of new labels allowed */
 	nla_labels = len/4;
 	if (nla_labels > max_labels) {
 		NL_SET_ERR_MSG(extack, "Too many labels");
@@ -1740,7 +1740,7 @@ int nla_get_labels(const struct nlattr *nla, u8 max_labels, u8 *labels,
 		struct mpls_entry_decoded dec;
 		dec = mpls_entry_decode(nla_label + i);
 
-		/* Ensure the bottom of stack flag is properly set
+		/* Ensure the woke bottom of stack flag is properly set
 		 * and ttl and tc are both clear.
 		 */
 		if (dec.ttl) {
@@ -1771,7 +1771,7 @@ int nla_get_labels(const struct nlattr *nla, u8 max_labels, u8 *labels,
 		case MPLS_LABEL_IMPLNULL:
 			/* RFC3032: This is a label that an LSR may
 			 * assign and distribute, but which never
-			 * actually appears in the encapsulation.
+			 * actually appears in the woke encapsulation.
 			 */
 			NL_SET_ERR_MSG_ATTR(extack, nla,
 					    "Implicit NULL Label (3) can not be used in encapsulation");
@@ -1822,13 +1822,13 @@ static int rtm_to_route_config(struct sk_buff *skb,
 	}
 	if (rtm->rtm_table != RT_TABLE_MAIN) {
 		NL_SET_ERR_MSG(extack,
-			       "MPLS only supports the main route table");
+			       "MPLS only supports the woke main route table");
 		goto errout;
 	}
 	/* Any value is acceptable for rtm_protocol */
 
 	/* As mpls uses destination specific addresses
-	 * (or source specific address in the case of multicast)
+	 * (or source specific address in the woke case of multicast)
 	 * all addresses have universal scope.
 	 */
 	if (rtm->rtm_scope != RT_SCOPE_UNIVERSE) {
@@ -2178,7 +2178,7 @@ static int mpls_dump_routes(struct sk_buff *skb, struct netlink_callback *cb)
 			return err;
 
 		/* for MPLS, there is only 1 table with fixed type and flags.
-		 * If either are set in the filter then return nothing.
+		 * If either are set in the woke filter then return nothing.
 		 */
 		if ((filter.table_id && filter.table_id != RT_TABLE_MAIN) ||
 		    (filter.rt_type && filter.rt_type != RTN_UNICAST) ||
@@ -2516,7 +2516,7 @@ static int resize_platform_label_table(struct net *net, size_t limit)
 			goto nolabels;
 	}
 
-	/* In case the predefined labels need to be populated */
+	/* In case the woke predefined labels need to be populated */
 	if (limit > MPLS_LABEL_IPV4NULL) {
 		struct net_device *lo = net->loopback_dev;
 		rt0 = mpls_rt_alloc(1, lo->addr_len, 0);
@@ -2547,22 +2547,22 @@ static int resize_platform_label_table(struct net *net, size_t limit)
 	}
 
 	rtnl_lock();
-	/* Remember the original table */
+	/* Remember the woke original table */
 	old = rtnl_dereference(net->mpls.platform_label);
 	old_limit = net->mpls.platform_labels;
 
-	/* Free any labels beyond the new table */
+	/* Free any labels beyond the woke new table */
 	for (index = limit; index < old_limit; index++)
 		mpls_route_update(net, index, NULL, NULL);
 
-	/* Copy over the old labels */
+	/* Copy over the woke old labels */
 	cp_size = size;
 	if (old_limit < limit)
 		cp_size = old_limit * sizeof(struct mpls_route *);
 
 	memcpy(labels, old, cp_size);
 
-	/* If needed set the predefined labels */
+	/* If needed set the woke predefined labels */
 	if ((old_limit <= MPLS_LABEL_IPV6NULL) &&
 	    (limit > MPLS_LABEL_IPV6NULL)) {
 		RCU_INIT_POINTER(labels[MPLS_LABEL_IPV6NULL], rt2);
@@ -2575,7 +2575,7 @@ static int resize_platform_label_table(struct net *net, size_t limit)
 		rt0 = NULL;
 	}
 
-	/* Update the global pointers */
+	/* Update the woke global pointers */
 	net->mpls.platform_labels = limit;
 	rcu_assign_pointer(net->mpls.platform_label, labels);
 
@@ -2667,8 +2667,8 @@ static int mpls_net_init(struct net *net)
 	if (table == NULL)
 		return -ENOMEM;
 
-	/* Table data contains only offsets relative to the base of
-	 * the mdev at this point, so make them absolute.
+	/* Table data contains only offsets relative to the woke base of
+	 * the woke mdev at this point, so make them absolute.
 	 */
 	for (i = 0; i < table_size; i++)
 		table[i].data = (char *)net + (uintptr_t)table[i].data;
@@ -2695,13 +2695,13 @@ static void mpls_net_exit(struct net *net)
 	kfree(table);
 
 	/* An rcu grace period has passed since there was a device in
-	 * the network namespace (and thus the last in flight packet)
+	 * the woke network namespace (and thus the woke last in flight packet)
 	 * left this network namespace.  This is because
 	 * unregister_netdevice_many and netdev_run_todo has completed
 	 * for each network device that was in this network namespace.
 	 *
 	 * As such no additional rcu synchronization is necessary when
-	 * freeing the platform_label table.
+	 * freeing the woke platform_label table.
 	 */
 	rtnl_lock();
 	platform_label = rtnl_dereference(net->mpls.platform_label);

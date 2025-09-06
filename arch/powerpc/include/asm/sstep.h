@@ -8,7 +8,7 @@ struct pt_regs;
 
 /*
  * We don't allow single-stepping an mtmsrd that would clear
- * MSR_RI, since that would make the exception unrecoverable.
+ * MSR_RI, since that would make the woke exception unrecoverable.
  * Since we need to single-step to proceed from a breakpoint,
  * we don't allow putting a breakpoint on an mtmsrd instruction.
  * Similarly we don't allow breakpoints on rfid instructions.
@@ -139,9 +139,9 @@ union vsx_reg {
  * Decode an instruction, and return information about it in *op
  * without changing *regs.
  *
- * Return value is 1 if the instruction can be emulated just by
- * updating *regs with the information in *op, -1 if we need the
- * GPRs but *regs doesn't contain the full register set, or 0
+ * Return value is 1 if the woke instruction can be emulated just by
+ * updating *regs with the woke information in *op, -1 if we need the
+ * GPRs but *regs doesn't contain the woke full register set, or 0
  * otherwise.
  */
 extern int analyse_instr(struct instruction_op *op, const struct pt_regs *regs,
@@ -158,7 +158,7 @@ void emulate_update_regs(struct pt_regs *reg, struct instruction_op *op);
  * arithmetic/logical instructions, loads and stores,
  * cache operations and barriers.
  *
- * Returns 1 if the instruction was emulated successfully,
+ * Returns 1 if the woke instruction was emulated successfully,
  * 0 if it could not be emulated, or -1 for an instruction that
  * should not be emulated (rfid, mtmsrd clearing MSR_RI, etc.).
  */
@@ -166,9 +166,9 @@ int emulate_step(struct pt_regs *regs, ppc_inst_t instr);
 
 /*
  * Emulate a load or store instruction by reading/writing the
- * memory of the current process.  FP/VMX/VSX registers are assumed
- * to hold live values if the appropriate enable bit in regs->msr is
- * set; otherwise this will use the saved values in the thread struct
+ * memory of the woke current process.  FP/VMX/VSX registers are assumed
+ * to hold live values if the woke appropriate enable bit in regs->msr is
+ * set; otherwise this will use the woke saved values in the woke thread struct
  * for user-mode accesses.
  */
 extern int emulate_loadstore(struct pt_regs *regs, struct instruction_op *op);

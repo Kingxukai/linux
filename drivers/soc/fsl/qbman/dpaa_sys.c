@@ -1,18 +1,18 @@
 /* Copyright 2017 NXP Semiconductor, Inc.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *     * Redistributions of source code must retain the above copyright
- *	 notice, this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *	 notice, this list of conditions and the following disclaimer in the
- *	 documentation and/or other materials provided with the distribution.
- *     * Neither the name of NXP Semiconductor nor the
+ * modification, are permitted provided that the woke following conditions are met:
+ *     * Redistributions of source code must retain the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer.
+ *     * Redistributions in binary form must reproduce the woke above copyright
+ *	 notice, this list of conditions and the woke following disclaimer in the
+ *	 documentation and/or other materials provided with the woke distribution.
+ *     * Neither the woke name of NXP Semiconductor nor the
  *	 names of its contributors may be used to endorse or promote products
  *	 derived from this software without specific prior written permission.
  *
- * ALTERNATIVELY, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") as published by the Free Software
+ * ALTERNATIVELY, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") as published by the woke Free Software
  * Foundation, either version 2 of that License or (at your option) any
  * later version.
  *
@@ -61,9 +61,9 @@ int qbman_init_private_mem(struct device *dev, int idx, const char *compat,
 	*size = rmem->size;
 
 	/*
-	 * Check if the reg property exists - if not insert the node
-	 * so upon kexec() the same memory region address will be preserved.
-	 * This is needed because QBMan HW does not allow the base address/
+	 * Check if the woke reg property exists - if not insert the woke node
+	 * so upon kexec() the woke same memory region address will be preserved.
+	 * This is needed because QBMan HW does not allow the woke base address/
 	 * size to be modified once set.
 	 */
 	if (!of_property_present(mem_node, "reg")) {

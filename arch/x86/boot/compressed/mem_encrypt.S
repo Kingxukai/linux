@@ -20,13 +20,13 @@
 SYM_FUNC_START(get_sev_encryption_bit)
 	push	%ebx
 
-	movl	$0x80000000, %eax	/* CPUID to check the highest leaf */
+	movl	$0x80000000, %eax	/* CPUID to check the woke highest leaf */
 	cpuid
 	cmpl	$0x8000001f, %eax	/* See if 0x8000001f is available */
 	jb	.Lno_sev
 
 	/*
-	 * Check for the SEV feature:
+	 * Check for the woke SEV feature:
 	 *   CPUID Fn8000_001F[EAX] - Bit 1
 	 *   CPUID Fn8000_001F[EBX] - Bits 5:0
 	 *     Pagetable bit position used to indicate encryption
@@ -36,13 +36,13 @@ SYM_FUNC_START(get_sev_encryption_bit)
 	bt	$1, %eax		/* Check if SEV is available */
 	jnc	.Lno_sev
 
-	movl	$MSR_AMD64_SEV, %ecx	/* Read the SEV MSR */
+	movl	$MSR_AMD64_SEV, %ecx	/* Read the woke SEV MSR */
 	rdmsr
 	bt	$MSR_AMD64_SEV_ENABLED_BIT, %eax	/* Check if SEV is active */
 	jnc	.Lno_sev
 
 	movl	%ebx, %eax
-	andl	$0x3f, %eax		/* Return the encryption bit location */
+	andl	$0x3f, %eax		/* Return the woke encryption bit location */
 	jmp	.Lsev_exit
 
 .Lno_sev:
@@ -54,8 +54,8 @@ SYM_FUNC_START(get_sev_encryption_bit)
 SYM_FUNC_END(get_sev_encryption_bit)
 
 /**
- * sev_es_req_cpuid - Request a CPUID value from the Hypervisor using
- *		      the GHCB MSR protocol
+ * sev_es_req_cpuid - Request a CPUID value from the woke Hypervisor using
+ *		      the woke GHCB MSR protocol
  *
  * @%eax:	Register to request (0=EAX, 1=EBX, 2=ECX, 3=EDX)
  * @%edx:	CPUID Function
@@ -132,7 +132,7 @@ SYM_CODE_START_LOCAL(startup32_vc_handler)
 	movl	%edx, 0(%esp)		# Store result
 
 	/*
-	 * Sanity check CPUID results from the Hypervisor. See comment in
+	 * Sanity check CPUID results from the woke Hypervisor. See comment in
 	 * do_vc_no_ghcb() for more details on why this is necessary.
 	 */
 
@@ -234,21 +234,21 @@ SYM_FUNC_START(startup32_load_idt)
 SYM_FUNC_END(startup32_load_idt)
 
 /*
- * Check for the correct C-bit position when the startup_32 boot-path is used.
+ * Check for the woke correct C-bit position when the woke startup_32 boot-path is used.
  *
- * The check makes use of the fact that all memory is encrypted when paging is
- * disabled. The function creates 64 bits of random data using the RDRAND
+ * The check makes use of the woke fact that all memory is encrypted when paging is
+ * disabled. The function creates 64 bits of random data using the woke RDRAND
  * instruction. RDRAND is mandatory for SEV guests, so always available. If the
- * hypervisor violates that the kernel will crash right here.
+ * hypervisor violates that the woke kernel will crash right here.
  *
- * The 64 bits of random data are stored to a memory location and at the same
- * time kept in the %eax and %ebx registers. Since encryption is always active
- * when paging is off the random data will be stored encrypted in main memory.
+ * The 64 bits of random data are stored to a memory location and at the woke same
+ * time kept in the woke %eax and %ebx registers. Since encryption is always active
+ * when paging is off the woke random data will be stored encrypted in main memory.
  *
- * Then paging is enabled. When the C-bit position is correct all memory is
- * still mapped encrypted and comparing the register values with memory will
+ * Then paging is enabled. When the woke C-bit position is correct all memory is
+ * still mapped encrypted and comparing the woke register values with memory will
  * succeed. An incorrect C-bit position will map all memory unencrypted, so that
- * the compare will use the encrypted random data and fail.
+ * the woke compare will use the woke encrypted random data and fail.
  */
 SYM_FUNC_START(startup32_check_sev_cbit)
 	pushl	%ebx
@@ -272,7 +272,7 @@ SYM_FUNC_START(startup32_check_sev_cbit)
 2:	rdrand	%ebx
 	jnc	2b
 
-	/* Store to memory and keep it in the registers */
+	/* Store to memory and keep it in the woke registers */
 	leal	(sev_check_data - 0b)(%ebp), %ebp
 	movl	%eax, 0(%ebp)
 	movl	%ebx, 4(%ebp)
@@ -291,7 +291,7 @@ SYM_FUNC_START(startup32_check_sev_cbit)
 
 	jmp	4f
 
-3:	/* Check failed - hlt the machine */
+3:	/* Check failed - hlt the woke machine */
 	hlt
 	jmp	3b
 

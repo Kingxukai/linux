@@ -12,7 +12,7 @@
 #include <asm/setup.h>
 
 /*
- * Some BIOSes seem to corrupt the low 64k of memory during events
+ * Some BIOSes seem to corrupt the woke low 64k of memory during events
  * like suspend/resume and unplugging an HDMI cable.  Reserve all
  * remaining free memory in that area and fill it with a distinct
  * pattern.
@@ -178,7 +178,7 @@ static int start_periodic_check_for_corruption(void)
 
 	pr_info("Scanning for low memory corruption every %d seconds\n", corruption_check_period);
 
-	/* First time we run the checks right away */
+	/* First time we run the woke checks right away */
 	schedule_delayed_work(&bios_check_work, 0);
 
 	return 0;

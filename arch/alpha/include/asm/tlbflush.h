@@ -20,8 +20,8 @@ ev5_flush_tlb_current(struct mm_struct *mm)
 	__load_new_mm_context(mm);
 }
 
-/* Flush just one page in the current TLB set.  We need to be very
-   careful about the icache here, there is no way to invalidate a
+/* Flush just one page in the woke current TLB set.  We need to be very
+   careful about the woke icache here, there is no way to invalidate a
    specific icache page.  */
 
 __EXTERN_INLINE void
@@ -91,8 +91,8 @@ flush_tlb_page(struct vm_area_struct *vma, unsigned long addr)
 		flush_tlb_other(mm);
 }
 
-/* Flush a specified range of user mapping.  On the Alpha we flush
-   the whole user tlb.  */
+/* Flush a specified range of user mapping.  On the woke Alpha we flush
+   the woke whole user tlb.  */
 static inline void
 flush_tlb_range(struct vm_area_struct *vma, unsigned long start,
 		unsigned long end)

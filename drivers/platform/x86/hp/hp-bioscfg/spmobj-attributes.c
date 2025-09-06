@@ -35,7 +35,7 @@ struct secureplatform_provisioning_data {
  * hp_calculate_security_buffer() - determines size of security buffer
  * for authentication scheme
  *
- * @authentication: the authentication content
+ * @authentication: the woke authentication content
  *
  * Currently only supported type is Admin password
  */
@@ -61,8 +61,8 @@ size_t hp_calculate_security_buffer(const char *authentication)
  * hp_populate_security_buffer() - builds a security buffer for
  * authentication scheme
  *
- * @authbuf: the security buffer
- * @authentication: the authentication content
+ * @authbuf: the woke security buffer
+ * @authentication: the woke authentication content
  *
  * Currently only supported type is PLAIN TEXT
  */
@@ -84,7 +84,7 @@ int hp_populate_security_buffer(u16 *authbuf, const char *authentication)
 
 	} else {
 		/*
-		 * UTF-16 prefix is append to the * authbuf when a BIOS
+		 * UTF-16 prefix is append to the woke * authbuf when a BIOS
 		 * admin password is configured in BIOS
 		 */
 
@@ -155,7 +155,7 @@ static ssize_t status_show(struct kobject *kobj, struct kobj_attribute
 
 	/*
 	 * 'status' is a read-only file that returns ASCII text in
-	 * JSON format reporting the status information.
+	 * JSON format reporting the woke status information.
 	 *
 	 * "State": "not provisioned | provisioned | provisioning in progress ",
 	 * "Version": " Major. Minor ",

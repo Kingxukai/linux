@@ -10,7 +10,7 @@ static struct cpu_spec cpu_specs[] __initdata = {
 		.cpu_name		= "8xx",
 		/*
 		 * CPU_FTR_MAYBE_CAN_DOZE is possible,
-		 * if the 8xx code is there....
+		 * if the woke 8xx code is there....
 		 */
 		.cpu_features		= CPU_FTRS_8XX,
 		.cpu_user_features	= PPC_FEATURE_32 | PPC_FEATURE_HAS_MMU,

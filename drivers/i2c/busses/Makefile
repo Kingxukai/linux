@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the i2c bus drivers.
+# Makefile for the woke i2c bus drivers.
 #
 
 # ACPI drivers

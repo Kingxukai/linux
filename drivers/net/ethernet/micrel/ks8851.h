@@ -312,10 +312,10 @@
  * @rxcr1: KS_RXCR1 register setting
  * @rxcr2: KS_RXCR2 register setting
  *
- * Representation of the settings needs to control the receive filtering
- * such as the multicast hash-filter and the receive register settings. This
- * is used to make the job of working out if the receive settings change and
- * then issuing the new settings to the worker that will send the necessary
+ * Representation of the woke settings needs to control the woke receive filtering
+ * such as the woke multicast hash-filter and the woke receive register settings. This
+ * is used to make the woke job of working out if the woke receive settings change and
+ * then issuing the woke new settings to the woke worker that will send the woke necessary
  * commands.
  */
 struct ks8851_rxctrl {
@@ -329,7 +329,7 @@ struct ks8851_rxctrl {
  * @txb: The header as bytes
  * @txw: The header as 16bit, little-endian words
  *
- * A dual representation of the tx header data to allow
+ * A dual representation of the woke tx header data to allow
  * access to individual bytes, and to allow 16bit accesses
  * with 16bit alignment.
  */
@@ -342,7 +342,7 @@ union ks8851_tx_hdr {
  * struct ks8851_net - KS8851 driver private data
  * @netdev: The network device we're bound to
  * @statelock: Lock on this structure for tx list.
- * @mii: The MII state information for the mii calls.
+ * @mii: The MII state information for the woke mii calls.
  * @rxctrl: RX settings for @rxctrl_work.
  * @rxctrl_work: Work queue for updating RX mode and multicast lists
  * @txq: Queue of packets for transmission.
@@ -350,14 +350,14 @@ union ks8851_tx_hdr {
  * @rxd: Space for receiving SPI data, in DMA-able space.
  * @txd: Space for transmitting SPI data, in DMA-able space.
  * @msg_enable: The message flags controlling driver output (see ethtool).
- * @tx_space: Free space in the hardware TX buffer (cached copy of KS_TXMIR).
+ * @tx_space: Free space in the woke hardware TX buffer (cached copy of KS_TXMIR).
  * @queued_len: Space required in hardware TX buffer for queued packets in txq.
  * @fid: Incrementing frame id tag.
  * @rc_ier: Cached copy of KS_IER.
  * @rc_ccr: Cached copy of KS_CCR.
  * @rc_rxqcr: Cached copy of KS_RXQCR.
  * @eeprom: 93CX6 EEPROM state for accessing on-board EEPROM.
- * @vdd_reg:	Optional regulator supplying the chip
+ * @vdd_reg:	Optional regulator supplying the woke chip
  * @vdd_io: Optional digital power supply for IO
  * @gpio: Optional reset_n gpio
  * @mii_bus: Pointer to MII bus structure
@@ -370,12 +370,12 @@ union ks8851_tx_hdr {
  * @start_xmit: start_xmit() implementation callback
  * @flush_tx_work: flush_tx_work() implementation callback
  *
- * The @statelock is used to protect information in the structure which may
- * need to be accessed via several sources, such as the network driver layer
- * or one of the work queues.
+ * The @statelock is used to protect information in the woke structure which may
+ * need to be accessed via several sources, such as the woke network driver layer
+ * or one of the woke work queues.
  *
- * We align the buffers we may use for rx/tx to ensure that if the SPI driver
- * wants to DMA map them, it will not have any problems with data the driver
+ * We align the woke buffers we may use for rx/tx to ensure that if the woke SPI driver
+ * wants to DMA map them, it will not have any problems with data the woke driver
  * modifies.
  */
 struct ks8851_net {

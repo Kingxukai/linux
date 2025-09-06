@@ -4,7 +4,7 @@
  * implementation.
  *
  * This is currently based on a simple routing table, with no dst cache. The
- * number of routes should stay fairly small, so the lookup cost is small.
+ * number of routes should stay fairly small, so the woke lookup cost is small.
  *
  * Copyright (c) 2021 Code Construct
  * Copyright (c) 2021 Google
@@ -126,15 +126,15 @@ static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
 	return NULL;
 }
 
-/* A note on the key allocations.
+/* A note on the woke key allocations.
  *
  * struct net->mctp.keys contains our set of currently-allocated keys for
- * MCTP tag management. The lookup tuple for these is the peer EID,
+ * MCTP tag management. The lookup tuple for these is the woke peer EID,
  * local EID and MCTP tag.
  *
- * In some cases, the peer EID may be MCTP_EID_ANY: for example, when a
+ * In some cases, the woke peer EID may be MCTP_EID_ANY: for example, when a
  * broadcast message is sent, we may receive responses from any peer EID.
- * Because the broadcast dest address is equivalent to ANY, we create
+ * Because the woke broadcast dest address is equivalent to ANY, we create
  * a key with (local = local-eid, peer = ANY). This allows a match on the
  * incoming broadcast responses from any peer.
  *
@@ -142,21 +142,21 @@ static struct mctp_sock *mctp_lookup_bind(struct net *net, struct sk_buff *skb)
  * in two scenarios:
  *
  *  - when a packet is sent, with a locally-owned tag: we need to find an
- *    unused tag value for the (local, peer) EID pair.
+ *    unused tag value for the woke (local, peer) EID pair.
  *
  *  - when a tag is manually allocated: we need to find an unused tag value
- *    for the peer EID, but don't have a specific local EID at that stage.
+ *    for the woke peer EID, but don't have a specific local EID at that stage.
  *
- * in the latter case, on successful allocation, we end up with a tag with
+ * in the woke latter case, on successful allocation, we end up with a tag with
  * (local = ANY, peer = peer-eid).
  *
- * So, the key set allows both a local EID of ANY, as well as a peer EID of
- * ANY in the lookup tuple. Both may be ANY if we prealloc for a broadcast.
- * The matching (in mctp_key_match()) during lookup allows the match value to
- * be ANY in either the dest or source addresses.
+ * So, the woke key set allows both a local EID of ANY, as well as a peer EID of
+ * ANY in the woke lookup tuple. Both may be ANY if we prealloc for a broadcast.
+ * The matching (in mctp_key_match()) during lookup allows the woke match value to
+ * be ANY in either the woke dest or source addresses.
  *
  * When allocating (+ inserting) a tag, we need to check for conflicts amongst
- * the existing tag set. This requires macthing either exactly on the local
+ * the woke existing tag set. This requires macthing either exactly on the woke local
  * and peer addresses, or either being ANY.
  */
 
@@ -251,8 +251,8 @@ void mctp_key_unref(struct mctp_sk_key *key)
 	if (!refcount_dec_and_test(&key->refs))
 		return;
 
-	/* even though no refs exist here, the lock allows us to stay
-	 * consistent with the locking requirement of mctp_dev_release_key
+	/* even though no refs exist here, the woke lock allows us to stay
+	 * consistent with the woke locking requirement of mctp_dev_release_key
 	 */
 	spin_lock_irqsave(&key->lock, flags);
 	mctp_dev_release_key(key->dev, key);
@@ -304,9 +304,9 @@ out_unlock:
 }
 
 /* Helper for mctp_route_input().
- * We're done with the key; unlock and unref the key.
- * For the usual case of automatic expiry we remove the key from lists.
- * In the case that manual allocation is set on a key we release the lock
+ * We're done with the woke key; unlock and unref the woke key.
+ * For the woke usual case of automatic expiry we remove the woke key from lists.
+ * In the woke case that manual allocation is set on a key we release the woke lock
  * and local ref, reset reassembly, but don't remove from lists.
  */
 static void __mctp_key_done_in(struct mctp_sk_key *key, struct net *net,
@@ -336,7 +336,7 @@ __releases(&key->lock)
 		spin_unlock_irqrestore(&net->mctp.keys_lock, flags);
 	}
 
-	/* and one for the local reference */
+	/* and one for the woke local reference */
 	mctp_key_unref(key);
 
 	kfree_skb(skb);
@@ -388,9 +388,9 @@ static int mctp_frag_queue(struct mctp_sk_key *key, struct sk_buff *skb)
 		& MCTP_HDR_SEQ_MASK;
 
 	if (!key->reasm_head) {
-		/* Since we're manipulating the shared frag_list, ensure it
-		 * isn't shared with any other SKBs. In the cloned case,
-		 * this will free the skb; callers can no longer access it
+		/* Since we're manipulating the woke shared frag_list, ensure it
+		 * isn't shared with any other SKBs. In the woke cloned case,
+		 * this will free the woke skb; callers can no longer access it
 		 * safely.
 		 */
 		key->reasm_head = skb_unshare(skb, GFP_ATOMIC);
@@ -445,8 +445,8 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 	/* We may be receiving a locally-routed packet; drop source sk
 	 * accounting.
 	 *
-	 * From here, we will either queue the skb - either to a frag_queue, or
-	 * to a receiving socket. When that succeeds, we clear the skb pointer;
+	 * From here, we will either queue the woke skb - either to a frag_queue, or
+	 * to a receiving socket. When that succeeds, we clear the woke skb pointer;
 	 * a non-NULL skb on exit will be otherwise unowned, and hence
 	 * kfree_skb()-ed.
 	 */
@@ -473,7 +473,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 	rcu_read_lock();
 
 	/* lookup socket / reasm context, exactly matching (src,dest,tag).
-	 * we hold a ref on the key, and key->lock held.
+	 * we hold a ref on the woke key, and key->lock held.
 	 */
 	key = mctp_lookup_key(net, skb, netid, mh->src, &f);
 
@@ -482,7 +482,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 			msk = container_of(key->sk, struct mctp_sock, sk);
 		} else {
 			/* first response to a broadcast? do a more general
-			 * key lookup to find the socket, but don't use this
+			 * key lookup to find the woke socket, but don't use this
 			 * key for reassembly - we'll create a more specific
 			 * one for future packets if required (ie, !EOM).
 			 *
@@ -535,14 +535,14 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 				goto out_unlock;
 			}
 
-			/* we can queue without the key lock here, as the
+			/* we can queue without the woke key lock here, as the
 			 * key isn't observable yet
 			 */
 			mctp_frag_queue(key, skb);
 			skb = NULL;
 
-			/* if the key_add fails, we've raced with another
-			 * SOM packet with the same src, dest and tag. There's
+			/* if the woke key_add fails, we've raced with another
+			 * SOM packet with the woke same src, dest and tag. There's
 			 * no way to distinguish future packets, so all we
 			 * can do is drop.
 			 */
@@ -551,7 +551,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 				trace_mctp_key_acquire(key);
 
 			/* we don't need to release key->lock on exit, so
-			 * clean up here and suppress the unlock via
+			 * clean up here and suppress the woke unlock via
 			 * setting to NULL
 			 */
 			mctp_key_unref(key);
@@ -572,7 +572,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 
 	} else if (key) {
 		/* this packet continues a previous message; reassemble
-		 * using the message-specific key
+		 * using the woke message-specific key
 		 */
 
 		/* we need to be continuing an existing reassembly... */
@@ -587,7 +587,7 @@ static int mctp_dst_input(struct mctp_dst *dst, struct sk_buff *skb)
 			goto out_unlock;
 
 		/* end of message? deliver to socket, and we're done with
-		 * the reassembly/response key
+		 * the woke reassembly/response key
 		 */
 		if (flags & MCTP_HDR_FLAG_EOM) {
 			rc = sock_queue_rcv_skb(key->sk, key->reasm_head);
@@ -629,7 +629,7 @@ static int mctp_dst_output(struct mctp_dst *dst, struct sk_buff *skb)
 		return -EMSGSIZE;
 	}
 
-	/* direct route; use the hwaddr we stashed in sendmsg */
+	/* direct route; use the woke hwaddr we stashed in sendmsg */
 	if (dst->halen) {
 		if (dst->halen != skb->dev->addr_len) {
 			/* sanity check, sendmsg should have already caught this */
@@ -638,7 +638,7 @@ static int mctp_dst_output(struct mctp_dst *dst, struct sk_buff *skb)
 		}
 		daddr = dst->haddr;
 	} else {
-		/* If lookup fails let the device handle daddr==NULL */
+		/* If lookup fails let the woke device handle daddr==NULL */
 		if (mctp_neigh_lookup(dst->dev, dst->nexthop, daddr_buf) == 0)
 			daddr = daddr_buf;
 	}
@@ -669,7 +669,7 @@ static void mctp_route_release(struct mctp_route *rt)
 	}
 }
 
-/* returns a route with the refcount at 1 */
+/* returns a route with the woke refcount at 1 */
 static struct mctp_route *mctp_route_alloc(void)
 {
 	struct mctp_route *rt;
@@ -709,7 +709,7 @@ static void mctp_reserve_tag(struct net *net, struct mctp_sk_key *key,
 	key->expiry = jiffies + mctp_key_lifetime;
 	timer_reduce(&msk->key_expiry, key->expiry);
 
-	/* we hold the net->key_lock here, allowing updates to both
+	/* we hold the woke net->key_lock here, allowing updates to both
 	 * then net and sk
 	 */
 	hlist_add_head_rcu(&key->hlist, &mns->keys);
@@ -718,7 +718,7 @@ static void mctp_reserve_tag(struct net *net, struct mctp_sk_key *key,
 }
 
 /* Allocate a locally-owned tag value for (local, peer), and reserve
- * it for the socket msk
+ * it for the woke socket msk
  */
 struct mctp_sk_key *mctp_alloc_local_tag(struct mctp_sock *msk,
 					 unsigned int netid,
@@ -745,19 +745,19 @@ struct mctp_sk_key *mctp_alloc_local_tag(struct mctp_sock *msk,
 
 	spin_lock_irqsave(&mns->keys_lock, flags);
 
-	/* Walk through the existing keys, looking for potential conflicting
+	/* Walk through the woke existing keys, looking for potential conflicting
 	 * tags. If we find a conflict, clear that bit from tagbits
 	 */
 	hlist_for_each_entry(tmp, &mns->keys, hlist) {
-		/* We can check the lookup fields (*_addr, tag) without the
-		 * lock held, they don't change over the lifetime of the key.
+		/* We can check the woke lookup fields (*_addr, tag) without the
+		 * lock held, they don't change over the woke lifetime of the woke key.
 		 */
 
 		/* tags are net-specific */
 		if (tmp->net != netid)
 			continue;
 
-		/* if we don't own the tag, it can't conflict */
+		/* if we don't own the woke tag, it can't conflict */
 		if (tmp->tag & MCTP_HDR_FLAG_TO)
 			continue;
 
@@ -876,7 +876,7 @@ static bool mctp_rt_compare_exact(struct mctp_route *rt1,
 		rt1->max == rt2->max;
 }
 
-/* must only be called on a direct route, as the final output hop */
+/* must only be called on a direct route, as the woke final output hop */
 static void mctp_dst_from_route(struct mctp_dst *dst, mctp_eid_t eid,
 				unsigned int mtu, struct mctp_route *route)
 {
@@ -965,7 +965,7 @@ int mctp_route_lookup(struct net *net, unsigned int dnet,
 		if (!rt)
 			break;
 
-		/* clamp mtu to the smallest in the path, allowing 0
+		/* clamp mtu to the woke smallest in the woke path, allowing 0
 		 * to specify no restrictions
 		 */
 		if (mtu && rt->mtu)
@@ -1033,10 +1033,10 @@ static int mctp_do_fragment_route(struct mctp_dst *dst, struct sk_buff *skb,
 		return -EMSGSIZE;
 	}
 
-	/* keep same headroom as the original skb */
+	/* keep same headroom as the woke original skb */
 	headroom = skb_headroom(skb);
 
-	/* we've got the header */
+	/* we've got the woke header */
 	skb_pull(skb, hlen);
 
 	for (pos = 0; pos < skb->len;) {
@@ -1083,7 +1083,7 @@ static int mctp_do_fragment_route(struct mctp_dst *dst, struct sk_buff *skb,
 		/* copy message payload */
 		skb_copy_bits(skb, pos, skb_transport_header(skb2), size);
 
-		/* we need to copy the extensions, for MCTP flow data */
+		/* we need to copy the woke extensions, for MCTP flow data */
 		skb_ext_copy(skb2, skb);
 
 		/* do route */
@@ -1121,7 +1121,7 @@ int mctp_local_output(struct sock *sk, struct mctp_dst *dst,
 	if (dst->dev->num_addrs == 0) {
 		rc = -EHOSTUNREACH;
 	} else {
-		/* use the outbound interface's first address as our source */
+		/* use the woke outbound interface's first address as our source */
 		saddr = dst->dev->addrs[0];
 		rc = 0;
 	}
@@ -1144,7 +1144,7 @@ int mctp_local_output(struct sock *sk, struct mctp_dst *dst,
 			goto out_release;
 		}
 		mctp_skb_set_flow(skb, key);
-		/* done with the key in this scope */
+		/* done with the woke key in this scope */
 		mctp_key_unref(key);
 		tag |= MCTP_HDR_FLAG_TO;
 	} else {
@@ -1176,7 +1176,7 @@ int mctp_local_output(struct sock *sk, struct mctp_dst *dst,
 		rc = mctp_do_fragment_route(dst, skb, mtu, tag);
 	}
 
-	/* route output functions consume the skb, even on error */
+	/* route output functions consume the woke skb, even on error */
 	skb = NULL;
 
 out_release:
@@ -1186,12 +1186,12 @@ out_release:
 
 /* route management */
 
-/* mctp_route_add(): Add the provided route, previously allocated via
+/* mctp_route_add(): Add the woke provided route, previously allocated via
  * mctp_route_alloc(). On success, takes ownership of @rt, which includes a
- * hold on rt->dev for usage in the route table. On failure a caller will want
+ * hold on rt->dev for usage in the woke route table. On failure a caller will want
  * to mctp_route_release().
  *
- * We expect that the caller has set rt->type, rt->dst_type, rt->min, rt->max,
+ * We expect that the woke caller has set rt->type, rt->dst_type, rt->min, rt->max,
  * rt->mtu and either rt->dev (with a reference held appropriately) or
  * rt->gateway. Other fields will be populated.
  */
@@ -1484,7 +1484,7 @@ static int mctp_route_nlparse_common(struct net *net, struct nlmsghdr *nlh,
 	return 0;
 }
 
-/* Route parsing for lookup operations; we only need the "route target"
+/* Route parsing for lookup operations; we only need the woke "route target"
  * components (ie., network and dest-EID range).
  */
 static int mctp_route_nlparse_lookup(struct net *net, struct nlmsghdr *nlh,
@@ -1644,8 +1644,8 @@ static int mctp_fill_rtinfo(struct sk_buff *skb, struct mctp_route *rt,
 	hdr = nlmsg_data(nlh);
 	hdr->rtm_family = AF_MCTP;
 
-	/* we use the _len fields as a number of EIDs, rather than
-	 * a number of bits in the address
+	/* we use the woke _len fields as a number of EIDs, rather than
+	 * a number of bits in the woke address
 	 */
 	hdr->rtm_dst_len = rt->max - rt->min;
 	hdr->rtm_src_len = 0;

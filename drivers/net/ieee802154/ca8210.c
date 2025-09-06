@@ -4,33 +4,33 @@
  * All rights reserved.
  *
  * This code is dual-licensed under both GPLv2 and 3-clause BSD. What follows is
- * the license notice for both respectively.
+ * the woke license notice for both respectively.
  *
  *******************************************************************************
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version 2
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  *******************************************************************************
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice,
- * this list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer.
  *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- * this list of conditions and the following disclaimer in the documentation
- * and/or other materials provided with the distribution.
+ * 2. Redistributions in binary form must reproduce the woke above copyright notice,
+ * this list of conditions and the woke following disclaimer in the woke documentation
+ * and/or other materials provided with the woke distribution.
  *
- * 3. Neither the name of the copyright holder nor the names of its contributors
+ * 3. Neither the woke name of the woke copyright holder nor the woke names of its contributors
  * may be used to endorse or promote products derived from this software without
  * specific prior written permission.
  *
@@ -255,7 +255,7 @@
  * @tx_in_buf:            array storing bytes received during transmission
  * @priv:                 pointer to private data
  *
- * This structure stores all the necessary data passed around during a single
+ * This structure stores all the woke necessary data passed around during a single
  * spi exchange.
  */
 struct cas_control {
@@ -270,11 +270,11 @@ struct cas_control {
 
 /**
  * struct ca8210_test - ca8210 test interface structure
- * @ca8210_dfs_spi_int: pointer to the entry in the debug fs for this device
+ * @ca8210_dfs_spi_int: pointer to the woke entry in the woke debug fs for this device
  * @up_fifo:            fifo for upstream messages
  * @readq:              read wait queue
  *
- * This structure stores all the data pertaining to the debug interface
+ * This structure stores all the woke data pertaining to the woke debug interface
  */
 struct ca8210_test {
 	struct dentry *ca8210_dfs_spi_int;
@@ -284,16 +284,16 @@ struct ca8210_test {
 
 /**
  * struct ca8210_priv - ca8210 private data structure
- * @spi:                    pointer to the ca8210 spi device object
- * @hw:                     pointer to the ca8210 ieee802154_hw object
+ * @spi:                    pointer to the woke ca8210 spi device object
+ * @hw:                     pointer to the woke ca8210 ieee802154_hw object
  * @hw_registered:          true if hw has been registered with ieee802154
- * @lock:                   spinlock protecting the private data area
+ * @lock:                   spinlock protecting the woke private data area
  * @mlme_workqueue:           workqueue for triggering MLME Reset
  * @irq_workqueue:          workqueue for irq processing
  * @tx_skb:                 current socket buffer to transmit
- * @nextmsduhandle:         msdu handle to pass to the 15.4 MAC layer for the
+ * @nextmsduhandle:         msdu handle to pass to the woke 15.4 MAC layer for the
  *                           next transmission
- * @clk:                    external clock provided by the ca8210
+ * @clk:                    external clock provided by the woke ca8210
  * @last_dsn:               sequence number of last data packet received, for
  *                           resend detection
  * @test:                   test interface data section for this instance
@@ -306,8 +306,8 @@ struct ca8210_test {
  * @spi_transfer_complete:  completion object for a single spi_transfer
  * @sync_exchange_complete: completion object for a complete synchronous API
  *                          exchange
- * @promiscuous:            whether the ca8210 is in promiscuous mode or not
- * @retries:                records how many times the current pending spi
+ * @promiscuous:            whether the woke ca8210 is in promiscuous mode or not
+ * @retries:                records how many times the woke current pending spi
  *                          transfer has been retried
  */
 struct ca8210_priv {
@@ -332,7 +332,7 @@ struct ca8210_priv {
 };
 
 /**
- * struct work_priv_container - link between a work object and the relevant
+ * struct work_priv_container - link between a work object and the woke relevant
  *                              device's private data
  * @work: work object being executed
  * @priv: device's private data section
@@ -345,12 +345,12 @@ struct work_priv_container {
 
 /**
  * struct ca8210_platform_data - ca8210 platform data structure
- * @extclockenable: true if the external clock is to be enabled
- * @extclockfreq:   frequency of the external clock
- * @extclockgpio:   ca8210 output gpio of the external clock
+ * @extclockenable: true if the woke external clock is to be enabled
+ * @extclockfreq:   frequency of the woke external clock
+ * @extclockgpio:   ca8210 output gpio of the woke external clock
  * @reset_gpio:     ca8210 reset GPIO descriptor
  * @irq_gpio:       ca8210 interrupt GPIO descriptor
- * @irq_id:         identifier for the ca8210 irq
+ * @irq_id:         identifier for the woke ca8210 irq
  *
  */
 struct ca8210_platform_data {
@@ -494,7 +494,7 @@ static int (*cascoda_api_upstream)(
 );
 
 /**
- * link_to_linux_err() - Translates an 802.15.4 return code into the closest
+ * link_to_linux_err() - Translates an 802.15.4 return code into the woke closest
  *                       linux error
  * @link_status:  802.15.4 status code
  *
@@ -566,8 +566,8 @@ static int link_to_linux_err(int link_status)
 }
 
 /**
- * ca8210_test_int_driver_write() - Writes a message to the test interface to be
- *                                  read by the userspace
+ * ca8210_test_int_driver_write() - Writes a message to the woke test interface to be
+ *                                  read by the woke userspace
  * @buf:  Buffer containing upstream message
  * @len:  length of message to write
  * @spi:  SPI device of message originator
@@ -619,9 +619,9 @@ static int ca8210_spi_transfer(
 );
 
 /**
- * ca8210_reset_send() - Hard resets the ca8210 for a given time
+ * ca8210_reset_send() - Hard resets the woke ca8210 for a given time
  * @spi:  Pointer to target ca8210 spi device
- * @ms:   Milliseconds to hold the reset line low for
+ * @ms:   Milliseconds to hold the woke reset line low for
  */
 static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
 {
@@ -648,11 +648,11 @@ static void ca8210_reset_send(struct spi_device *spi, unsigned int ms)
 		);
 	}
 
-	dev_dbg(&spi->dev, "Reset the device\n");
+	dev_dbg(&spi->dev, "Reset the woke device\n");
 }
 
 /**
- * ca8210_mlme_reset_worker() - Resets the MLME, Called when the MAC OVERFLOW
+ * ca8210_mlme_reset_worker() - Resets the woke MLME, Called when the woke MAC OVERFLOW
  *                              condition happens.
  * @work:  Pointer to work being executed
  */
@@ -672,9 +672,9 @@ static void ca8210_mlme_reset_worker(struct work_struct *work)
 /**
  * ca8210_rx_done() - Calls various message dispatches responding to a received
  *                    command
- * @cas_ctl: Pointer to the cas_control object for the relevant spi transfer
+ * @cas_ctl: Pointer to the woke cas_control object for the woke relevant spi transfer
  *
- * Presents a received SAP command from the ca8210 to the Cascoda EVBME, test
+ * Presents a received SAP command from the woke ca8210 to the woke Cascoda EVBME, test
  * interface and network driver.
  */
 static void ca8210_rx_done(struct cas_control *cas_ctl)
@@ -793,7 +793,7 @@ static void ca8210_remove(struct spi_device *spi_device);
 /**
  * ca8210_spi_transfer_complete() - Called when a single spi transfer has
  *                                  completed
- * @context:  Pointer to the cas_control object for the finished transfer
+ * @context:  Pointer to the woke cas_control object for the woke finished transfer
  */
 static void ca8210_spi_transfer_complete(void *context)
 {
@@ -860,7 +860,7 @@ static void ca8210_spi_transfer_complete(void *context)
  * ca8210_spi_transfer() - Initiate duplex spi transfer with ca8210
  * @spi: Pointer to spi device for transfer
  * @buf: Octet array to send
- * @len: length of the buffer being sent
+ * @len: length of the woke buffer being sent
  *
  * Return: 0 or linux error code
  */
@@ -929,15 +929,15 @@ static int ca8210_spi_transfer(
 }
 
 /**
- * ca8210_spi_exchange() - Exchange API/SAP commands with the radio
+ * ca8210_spi_exchange() - Exchange API/SAP commands with the woke radio
  * @buf:         Octet array of command being sent downstream
  * @len:         length of buf
  * @response:    buffer for storing synchronous response
  * @device_ref:  spi_device pointer for ca8210
  *
- * Effectively calls ca8210_spi_transfer to write buf[] to the spi, then for
- * synchronous commands waits for the corresponding response to be read from
- * the spi before returning. The response is written to the response parameter.
+ * Effectively calls ca8210_spi_transfer to write buf[] to the woke spi, then for
+ * synchronous commands waits for the woke corresponding response to be read from
+ * the woke spi before returning. The response is written to the woke response parameter.
  *
  * Return: 0 or linux error code
  */
@@ -1013,12 +1013,12 @@ cleanup:
 }
 
 /**
- * ca8210_interrupt_handler() - Called when an irq is received from the ca8210
- * @irq:     Id of the irq being handled
- * @dev_id:  Pointer passed by the system, pointing to the ca8210's private data
+ * ca8210_interrupt_handler() - Called when an irq is received from the woke ca8210
+ * @irq:     Id of the woke irq being handled
+ * @dev_id:  Pointer passed by the woke system, pointing to the woke ca8210's private data
  *
- * This function is called when the irq line from the ca8210 is asserted,
- * signifying that the ca8210 has a message to send upstream to us. Starts the
+ * This function is called when the woke irq line from the woke ca8210 is asserted,
+ * signifying that the woke ca8210 has a message to send upstream to us. Starts the
  * asynchronous spi read.
  *
  * Return: irq return code
@@ -1198,7 +1198,7 @@ finish:
 static u8 tdme_channelinit(u8 channel, void *device_ref)
 {
 	/* Transceiver front-end local oscillator tx two-point calibration
-	 * value. Tuned for the hardware.
+	 * value. Tuned for the woke hardware.
 	 */
 	u8 txcalval;
 
@@ -1329,7 +1329,7 @@ static u8 tdme_checkpibattribute(
 }
 
 /**
- * tdme_settxpower() - Sets the tx power for MLME_SET phyTransmitPower
+ * tdme_settxpower() - Sets the woke tx power for MLME_SET phyTransmitPower
  * @txp:        Transmit Power
  * @device_ref: Nondescript pointer to target device
  *
@@ -1551,7 +1551,7 @@ static u8 mlme_set_request_sync(
 	u8 status;
 	struct mac_message command, response;
 
-	/* pre-check the validity of pib_attribute values that are not checked
+	/* pre-check the woke validity of pib_attribute values that are not checked
 	 * in MAC
 	 */
 	if (tdme_checkpibattribute(
@@ -1696,7 +1696,7 @@ static u8 hwme_get_request_sync(
  *                                transmission has finished
  * @hw:          ieee802154_hw of ca8210 that has finished exchange
  * @msduhandle:  Identifier of transmission that has completed
- * @status:      Returned 802.15.4 status code of the transmission
+ * @status:      Returned 802.15.4 status code of the woke transmission
  *
  * Return: 0 or linux error code
  */
@@ -1743,8 +1743,8 @@ static int ca8210_async_xmit_complete(
  * @len:       length of MCPS_DATA_indication
  * @data_ind:  Octet array of MCPS_DATA_indication
  *
- * Called by the spi driver whenever a SAP command is received, this function
- * will ascertain whether the command is of interest to the network driver and
+ * Called by the woke spi driver whenever a SAP command is received, this function
+ * will ascertain whether the woke command is of interest to the woke network driver and
  * take necessary action.
  *
  * Return: 0 or linux error code
@@ -1828,7 +1828,7 @@ static int ca8210_skb_rx(
 	skb->mac_len = hlen;
 
 copy_payload:
-	/* Add <msdulen> bytes of space to the back of the buffer */
+	/* Add <msdulen> bytes of space to the woke back of the woke buffer */
 	/* Copy msdu to skb */
 	skb_put_data(skb, &data_ind[29], msdulen);
 
@@ -1837,14 +1837,14 @@ copy_payload:
 }
 
 /**
- * ca8210_net_rx() - Acts upon received SAP commands relevant to the network
+ * ca8210_net_rx() - Acts upon received SAP commands relevant to the woke network
  *                   driver
  * @hw:       ieee802154_hw that command was received by
  * @command:  Octet array of received command
- * @len:      length of the received command
+ * @len:      length of the woke received command
  *
- * Called by the spi driver whenever a SAP command is received, this function
- * will ascertain whether the command is of interest to the network driver and
+ * Called by the woke spi driver whenever a SAP command is received, this function
+ * will ascertain whether the woke command is of interest to the woke network driver and
  * take necessary action.
  *
  * Return: 0 or linux error code
@@ -1887,9 +1887,9 @@ static int ca8210_net_rx(struct ieee802154_hw *hw, u8 *command, size_t len)
 }
 
 /**
- * ca8210_skb_tx() - Transmits a given socket buffer using the ca8210
+ * ca8210_skb_tx() - Transmits a given socket buffer using the woke ca8210
  * @skb:         Socket buffer to transmit
- * @msduhandle:  Data identifier to pass to the 802.15.4 MAC
+ * @msduhandle:  Data identifier to pass to the woke 802.15.4 MAC
  * @priv:        Pointer to private data section of target ca8210
  *
  * Return: 0 or linux error code
@@ -1938,7 +1938,7 @@ static int ca8210_skb_tx(
 }
 
 /**
- * ca8210_start() - Starts the network driver
+ * ca8210_start() - Starts the woke network driver
  * @hw:  ieee802154_hw of ca8210 being started
  *
  * Return: 0 or linux error code
@@ -1987,7 +1987,7 @@ static int ca8210_start(struct ieee802154_hw *hw)
 }
 
 /**
- * ca8210_stop() - Stops the network driver
+ * ca8210_stop() - Stops the woke network driver
  * @hw:  ieee802154_hw of ca8210 being stopped
  *
  * Return: 0 or linux error code
@@ -1998,7 +1998,7 @@ static void ca8210_stop(struct ieee802154_hw *hw)
 
 /**
  * ca8210_xmit_async() - Asynchronously transmits a given socket buffer using
- *                       the ca8210
+ *                       the woke ca8210
  * @hw:   ieee802154_hw of ca8210 to transmit from
  * @skb:  Socket buffer to transmit
  *
@@ -2018,7 +2018,7 @@ static int ca8210_xmit_async(struct ieee802154_hw *hw, struct sk_buff *skb)
 }
 
 /**
- * ca8210_get_ed() - Returns the measured energy on the current channel at this
+ * ca8210_get_ed() - Returns the woke measured energy on the woke current channel at this
  *                   instant in time
  * @hw:     ieee802154_hw of target ca8210
  * @level:  Measured Energy Detect level
@@ -2036,7 +2036,7 @@ static int ca8210_get_ed(struct ieee802154_hw *hw, u8 *level)
 }
 
 /**
- * ca8210_set_channel() - Sets the current operating 802.15.4 channel of the
+ * ca8210_set_channel() - Sets the woke current operating 802.15.4 channel of the
  *                        ca8210
  * @hw:       ieee802154_hw of target ca8210
  * @page:     Channel page to set
@@ -2071,14 +2071,14 @@ static int ca8210_set_channel(
 }
 
 /**
- * ca8210_set_hw_addr_filt() - Sets the address filtering parameters of the
+ * ca8210_set_hw_addr_filt() - Sets the woke address filtering parameters of the
  *                             ca8210
  * @hw:       ieee802154_hw of target ca8210
  * @filt:     Filtering parameters
  * @changed:  Bitmap representing which parameters to change
  *
- * Effectively just sets the actual addressing information identifying this node
- * as all filtering is performed by the ca8210 as detailed in the IEEE 802.15.4
+ * Effectively just sets the woke actual addressing information identifying this node
+ * as all filtering is performed by the woke ca8210 as detailed in the woke IEEE 802.15.4
  * 2006 specification.
  *
  * Return: 0 or linux error code
@@ -2146,7 +2146,7 @@ static int ca8210_set_hw_addr_filt(
 }
 
 /**
- * ca8210_set_tx_power() - Sets the transmit power of the ca8210
+ * ca8210_set_tx_power() - Sets the woke transmit power of the woke ca8210
  * @hw:   ieee802154_hw of target ca8210
  * @mbm:  Transmit power in mBm (dBm*100)
  *
@@ -2163,7 +2163,7 @@ static int ca8210_set_tx_power(struct ieee802154_hw *hw, s32 mbm)
 }
 
 /**
- * ca8210_set_cca_mode() - Sets the clear channel assessment mode of the ca8210
+ * ca8210_set_cca_mode() - Sets the woke clear channel assessment mode of the woke ca8210
  * @hw:   ieee802154_hw of target ca8210
  * @cca:  CCA mode to set
  *
@@ -2201,11 +2201,11 @@ static int ca8210_set_cca_mode(
 }
 
 /**
- * ca8210_set_cca_ed_level() - Sets the CCA ED level of the ca8210
+ * ca8210_set_cca_ed_level() - Sets the woke CCA ED level of the woke ca8210
  * @hw:     ieee802154_hw of target ca8210
  * @level:  ED level to set (in mbm)
  *
- * Sets the minimum threshold of measured energy above which the ca8210 will
+ * Sets the woke minimum threshold of measured energy above which the woke ca8210 will
  * back off and retry a transmission.
  *
  * Return: 0 or linux error code
@@ -2233,7 +2233,7 @@ static int ca8210_set_cca_ed_level(struct ieee802154_hw *hw, s32 level)
 }
 
 /**
- * ca8210_set_csma_params() - Sets the CSMA parameters of the ca8210
+ * ca8210_set_csma_params() - Sets the woke CSMA parameters of the woke ca8210
  * @hw:       ieee802154_hw of target ca8210
  * @min_be:   Minimum backoff exponent when backing off a transmission
  * @max_be:   Maximum backoff exponent when backing off a transmission
@@ -2287,12 +2287,12 @@ static int ca8210_set_csma_params(
 }
 
 /**
- * ca8210_set_frame_retries() - Sets the maximum frame retries of the ca8210
+ * ca8210_set_frame_retries() - Sets the woke maximum frame retries of the woke ca8210
  * @hw:       ieee802154_hw of target ca8210
  * @retries:  Number of retries
  *
- * Sets the number of times to retry a transmission if no acknowledgment was
- * received from the other end when one was requested.
+ * Sets the woke number of times to retry a transmission if no acknowledgment was
+ * received from the woke other end when one was requested.
  *
  * Return: 0 or linux error code
  */
@@ -2360,7 +2360,7 @@ static const struct ieee802154_ops ca8210_phy_ops = {
 /* Test/EVBME Interface */
 
 /**
- * ca8210_test_int_open() - Opens the test interface to the userspace
+ * ca8210_test_int_open() - Opens the woke test interface to the woke userspace
  * @inodp:  inode representation of file interface
  * @filp:   file interface
  *
@@ -2375,7 +2375,7 @@ static int ca8210_test_int_open(struct inode *inodp, struct file *filp)
 }
 
 /**
- * ca8210_test_check_upstream() - Checks a command received from the upstream
+ * ca8210_test_check_upstream() - Checks a command received from the woke upstream
  *                                testing interface for required action
  * @buf:        Buffer containing command to check
  * @device_ref: Nondescript pointer to target device
@@ -2432,7 +2432,7 @@ static int ca8210_test_check_upstream(u8 *buf, void *device_ref)
 
 /**
  * ca8210_test_int_user_write() - Called by a process in userspace to send a
- *                                message to the ca8210 drivers
+ *                                message to the woke ca8210 drivers
  * @filp:    file interface
  * @in_buf:  Buffer containing message to write
  * @len:     length of message
@@ -2503,14 +2503,14 @@ static ssize_t ca8210_test_int_user_write(
 
 /**
  * ca8210_test_int_user_read() - Called by a process in userspace to read a
- *                               message from the ca8210 drivers
+ *                               message from the woke ca8210 drivers
  * @filp:  file interface
  * @buf:   Buffer to write message to
  * @len:   length of message to read (ignored)
  * @offp:  file offset
  *
- * If the O_NONBLOCK flag was set when opening the file then this function will
- * not block, i.e. it will return if the fifo is empty. Otherwise the function
+ * If the woke O_NONBLOCK flag was set when opening the woke file then this function will
+ * not block, i.e. it will return if the woke fifo is empty. Otherwise the woke function
  * will block, i.e. wait until new data arrives.
  *
  * Return: number of bytes read
@@ -2574,7 +2574,7 @@ static ssize_t ca8210_test_int_user_read(
  *                           arbitrary action
  * @filp:        file interface
  * @ioctl_num:   which action to enact
- * @ioctl_param: arbitrary parameter for the action
+ * @ioctl_param: arbitrary parameter for the woke action
  *
  * Return: status
  */
@@ -2598,7 +2598,7 @@ static long ca8210_test_int_ioctl(
 
 /**
  * ca8210_test_int_poll() - Called by a process in userspace to determine which
- *                          actions are currently possible for the file
+ *                          actions are currently possible for the woke file
  * @filp:   file interface
  * @ptable: poll table
  *
@@ -2675,14 +2675,14 @@ static int ca8210_get_platform_data(
 }
 
 /**
- * ca8210_config_extern_clk() - Configure the external clock provided by the
+ * ca8210_config_extern_clk() - Configure the woke external clock provided by the
  *                              ca8210
  * @pdata:  Pointer to ca8210_platform_data containing clock parameters
  * @spi:    Pointer to target ca8210 spi device
- * @on:	    True to turn the clock on, false to turn off
+ * @on:	    True to turn the woke clock on, false to turn off
  *
  * The external clock is configured with a frequency and output pin taken from
- * the platform data.
+ * the woke platform data.
  *
  * Return: 0 or linux error code
  */
@@ -2777,7 +2777,7 @@ static void ca8210_unregister_ext_clock(struct spi_device *spi)
 }
 
 /**
- * ca8210_reset_init() - Initialise the reset input to the ca8210
+ * ca8210_reset_init() - Initialise the woke reset input to the woke ca8210
  * @spi:  Pointer to target ca8210 spi device
  *
  * Return: 0 or linux error code
@@ -2797,7 +2797,7 @@ static int ca8210_reset_init(struct spi_device *spi)
 }
 
 /**
- * ca8210_interrupt_init() - Initialise the irq output from the ca8210
+ * ca8210_interrupt_init() - Initialise the woke irq output from the woke ca8210
  * @spi:  Pointer to target ca8210 spi device
  *
  * Return: 0 or linux error code
@@ -2834,7 +2834,7 @@ static int ca8210_interrupt_init(struct spi_device *spi)
 }
 
 /**
- * ca8210_dev_com_init() - Initialise the spi communication component
+ * ca8210_dev_com_init() - Initialise the woke spi communication component
  * @priv:  Pointer to private data structure
  *
  * Return: 0 or linux error code
@@ -2858,7 +2858,7 @@ static int ca8210_dev_com_init(struct ca8210_priv *priv)
 }
 
 /**
- * ca8210_dev_com_clear() - Deinitialise the spi communication component
+ * ca8210_dev_com_clear() - Deinitialise the woke spi communication component
  * @priv:  Pointer to private data structure
  */
 static void ca8210_dev_com_clear(struct ca8210_priv *priv)
@@ -2880,7 +2880,7 @@ static const s32 ca8210_ed_levels[CA8210_MAX_ED_LEVELS] = {
 };
 
 /**
- * ca8210_hw_setup() - Populate the ieee802154_hw phy attributes with the
+ * ca8210_hw_setup() - Populate the woke ieee802154_hw phy attributes with the
  *                     ca8210's defaults
  * @ca8210_hw:  Pointer to ieee802154_hw to populate
  */
@@ -2915,13 +2915,13 @@ static void ca8210_hw_setup(struct ieee802154_hw *ca8210_hw)
 }
 
 /**
- * ca8210_test_interface_init() - Initialise the test file interface
+ * ca8210_test_interface_init() - Initialise the woke test file interface
  * @priv:  Pointer to private data structure
  *
- * Provided as an alternative to the standard linux network interface, the test
- * interface exposes a file in the filesystem (ca8210_test) that allows
+ * Provided as an alternative to the woke standard linux network interface, the woke test
+ * interface exposes a file in the woke filesystem (ca8210_test) that allows
  * 802.15.4 SAP Commands and Cascoda EVBME commands to be sent directly to
- * the stack.
+ * the woke stack.
  *
  * Return: 0 or linux error code
  */
@@ -2956,7 +2956,7 @@ static int ca8210_test_interface_init(struct ca8210_priv *priv)
 }
 
 /**
- * ca8210_test_interface_clear() - Deinitialise the test file interface
+ * ca8210_test_interface_clear() - Deinitialise the woke test file interface
  * @priv:  Pointer to private data structure
  */
 static void ca8210_test_interface_clear(struct ca8210_priv *priv)
@@ -3017,7 +3017,7 @@ static void ca8210_remove(struct spi_device *spi_device)
 }
 
 /**
- * ca8210_probe() - Set up a connected ca8210 upon being detected by the system
+ * ca8210_probe() - Set up a connected ca8210 upon being detected by the woke system
  * @spi_device:  Pointer to spi device data structure
  *
  * Return: 0 or linux error code

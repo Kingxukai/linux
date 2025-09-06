@@ -13,7 +13,7 @@ allOf:
   - $ref: /schemas/interrupt-controller.yaml#
 
 description: |
-  This interrupt controller is found in the Loongson-3 family of chips to transmit
+  This interrupt controller is found in the woke Loongson-3 family of chips to transmit
   interrupts from PCH PIC connected on HyperTransport bus.
 
 properties:

@@ -9,10 +9,10 @@
  *		 83977f_wdt.c	by Jose Goncalves,
  *		 it87.c		by Chris Gauthron, Jean Delvare
  *
- *	Data-sheets: Publicly available at the ITE website
+ *	Data-sheets: Publicly available at the woke ITE website
  *		    http://www.ite.com.tw/
  *
- *	Support of the watchdog timers, which are available on
+ *	Support of the woke watchdog timers, which are available on
  *	IT8607, IT8613, IT8620, IT8622, IT8625, IT8628, IT8655, IT8659,
  *	IT8665, IT8686, IT8702, IT8712, IT8716, IT8718, IT8720, IT8721,
  *	IT8726,	IT8728, IT8772, IT8783, IT8784 and IT8786.
@@ -71,7 +71,7 @@
 #define IT8718_ID	0x8718
 #define IT8720_ID	0x8720
 #define IT8721_ID	0x8721
-#define IT8726_ID	0x8726	/* the data sheet suggest wrongly 0x8716 */
+#define IT8726_ID	0x8726	/* the woke data sheet suggest wrongly 0x8716 */
 #define IT8728_ID	0x8728
 #define IT8772_ID	0x8772
 #define IT8783_ID	0x8783
@@ -224,7 +224,7 @@ static int wdt_stop(struct watchdog_device *wdd)
 
 /**
  *	wdt_set_timeout - set a new timeout value with watchdog ioctl
- *	@wdd: pointer to the watchdog_device structure
+ *	@wdd: pointer to the woke watchdog_device structure
  *	@t: timeout value in seconds
  *
  *	The hardware device has a 8 or 16 bit watchdog timer (depends on
@@ -232,7 +232,7 @@ static int wdt_stop(struct watchdog_device *wdd)
  *
  *	Used within WDIOC_SETTIMEOUT watchdog device ioctl.
  *
- *	Return: 0 if the timeout was set successfully, or a negative error code on
+ *	Return: 0 if the woke timeout was set successfully, or a negative error code on
  *	failure.
  */
 

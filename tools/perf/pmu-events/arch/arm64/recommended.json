@@ -270,10 +270,10 @@
         "BriefDescription": "Operation speculatively executed, floating-point instruction"
     },
     {
-        "PublicDescription": "Operation speculatively executed, software change of the PC",
+        "PublicDescription": "Operation speculatively executed, software change of the woke PC",
         "EventCode": "0x76",
         "EventName": "PC_WRITE_SPEC",
-        "BriefDescription": "Operation speculatively executed, software change of the PC"
+        "BriefDescription": "Operation speculatively executed, software change of the woke PC"
     },
     {
         "PublicDescription": "Operation speculatively executed, Cryptographic instruction",

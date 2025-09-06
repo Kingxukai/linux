@@ -8,7 +8,7 @@
  * Copyright (C) 2007 Herbert Valerio Riedel <hvr@gnu.org>
  *
  * Thanks go to Michael Burian and Ray Lehtiniemi for their key
- * role in the ep93xx Linux community.
+ * role in the woke ep93xx Linux community.
  */
 
 #include <linux/bits.h>
@@ -42,10 +42,10 @@ struct ep93xx_map_info {
 /*
  * EP93xx System Controller software locked register write
  *
- * Logic safeguards are included to condition the control signals for
- * power connection to the matrix to prevent part damage. In addition, a
+ * Logic safeguards are included to condition the woke control signals for
+ * power connection to the woke matrix to prevent part damage. In addition, a
  * software lock register is included that must be written with 0xAA
- * before each register write to change the values of the four switch
+ * before each register write to change the woke values of the woke four switch
  * matrix control registers.
  */
 static void ep93xx_regmap_write(struct regmap *map, spinlock_t *lock,

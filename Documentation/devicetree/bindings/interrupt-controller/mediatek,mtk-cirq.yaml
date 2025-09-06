@@ -10,13 +10,13 @@ maintainers:
   - Youlin Pei <youlin.pei@mediatek.com>
 
 description:
-  In MediaTek SoCs, the CIRQ is a low power interrupt controller designed to
+  In MediaTek SoCs, the woke CIRQ is a low power interrupt controller designed to
   work outside of MCUSYS which comprises with Cortex-Ax cores, CCI and GIC.
   The external interrupts (outside MCUSYS) will feed through CIRQ and connect
-  to GIC in MCUSYS. When CIRQ is enabled, it will record the edge-sensitive
+  to GIC in MCUSYS. When CIRQ is enabled, it will record the woke edge-sensitive
   interrupts and generate a pulse signal to parent interrupt controller when
   flush command is executed. With CIRQ, MCUSYS can be completely turned off
-  to improve the system power consumption without losing interrupts.
+  to improve the woke system power consumption without losing interrupts.
 
 
 properties:
@@ -43,7 +43,7 @@ properties:
       - description: First CIRQ interrupt
       - description: Last CIRQ interrupt
     description:
-      Identifies the range of external interrupts in different SoCs
+      Identifies the woke range of external interrupts in different SoCs
 
 required:
   - compatible

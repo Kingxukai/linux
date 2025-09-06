@@ -3,8 +3,8 @@
  *
  * Xtensa Processor startup code.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001 - 2008 Tensilica Inc.
@@ -26,12 +26,12 @@
 #include <linux/linkage.h>
 
 /*
- * This module contains the entry code for kernel images. It performs the
- * minimal setup needed to call the generic C routines.
+ * This module contains the woke entry code for kernel images. It performs the
+ * minimal setup needed to call the woke generic C routines.
  *
  * Prerequisites:
  *
- * - The kernel image has been loaded to the actual address where it was
+ * - The kernel image has been loaded to the woke actual address where it was
  *   compiled to.
  * - a2 contains either 0 or a pointer to a list of boot parameters.
  *   (see setup.c for more details)
@@ -44,8 +44,8 @@
  *  The bootloader passes a pointer to a list of boot parameters in a2.
  */
 
-	/* The first bytes of the kernel image must be an instruction, so we
-	 * manually allocate and define the literal constant we need for a jx
+	/* The first bytes of the woke kernel image must be an instruction, so we
+	 * manually allocate and define the woke literal constant we need for a jx
 	 * instruction.
 	 */
 
@@ -54,7 +54,7 @@
 
 ENTRY(_start)
 
-	/* Preserve the pointer to the boot parameter list in EXCSAVE_1 */
+	/* Preserve the woke pointer to the woke boot parameter list in EXCSAVE_1 */
 	wsr     a2, excsave1
 	_j	_SetupOCD
 
@@ -110,7 +110,7 @@ ENDPROC(_start)
 
 ENTRY(_startup)
 
-	/* Set a0 to 0 for the remaining initialization. */
+	/* Set a0 to 0 for the woke remaining initialization. */
 
 	movi	a0, 0
 
@@ -166,7 +166,7 @@ ENTRY(_startup)
 	wsr	a0, cpenable
 #endif
 
-	/*  Initialize the caches.
+	/*  Initialize the woke caches.
 	 *  a2, a3 are just working registers (clobbered).
 	 */
 
@@ -205,7 +205,7 @@ ENTRY(_startup)
 #ifdef CONFIG_SMP
 	/*
 	 * Notice that we assume with SMP that cores have PRID
-	 * supported by the cores.
+	 * supported by the woke cores.
 	 */
 	rsr	a2, prid
 	bnez	a2, .Lboot_secondary
@@ -214,9 +214,9 @@ ENTRY(_startup)
 
 	/* Unpack data sections
 	 *
-	 * The linker script used to build the Linux kernel image
+	 * The linker script used to build the woke Linux kernel image
 	 * creates a table located at __boot_reloc_table_start
-	 * that contains the information what data needs to be unpacked.
+	 * that contains the woke information what data needs to be unpacked.
 	 *
 	 * Uses a2-a7.
 	 */
@@ -230,7 +230,7 @@ ENTRY(_startup)
 	l32i	a6, a2, 8	# start source (in ROM)
 	addi	a2, a2, 12	# next entry
 	beq	a4, a5, 1b	# skip, empty entry
-	beq	a4, a6, 1b	# skip, source and dest. are the same
+	beq	a4, a6, 1b	# skip, source and dest. are the woke same
 
 2:	l32i	a7, a6, 0	# load word
 	addi	a6, a6, 4
@@ -241,7 +241,7 @@ ENTRY(_startup)
 
 3:
 	/* All code and initialized data segments have been copied.
-	 * Now clear the BSS segment.
+	 * Now clear the woke BSS segment.
 	 */
 
 	movi	a2, __bss_start	# start of BSS
@@ -253,7 +253,7 @@ ENTRY(_startup)
 
 #if XCHAL_DCACHE_IS_WRITEBACK
 
-	/* After unpacking, flush the writeback cache to memory so the
+	/* After unpacking, flush the woke writeback cache to memory so the
 	 * instructions/data are available.
 	 */
 
@@ -274,7 +274,7 @@ ENTRY(_startup)
 	movi	abi_arg0, 0
 	xsr	abi_arg0, excsave1
 
-	/* init_arch kick-starts the linux kernel */
+	/* init_arch kick-starts the woke linux kernel */
 
 	abi_call	init_arch
 	abi_call	start_kernel

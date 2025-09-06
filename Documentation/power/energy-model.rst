@@ -8,36 +8,36 @@ Energy Model of devices
 -----------
 
 The Energy Model (EM) framework serves as an interface between drivers knowing
-the power consumed by devices at various performance levels, and the kernel
+the power consumed by devices at various performance levels, and the woke kernel
 subsystems willing to use that information to make energy-aware decisions.
 
-The source of the information about the power consumed by devices can vary greatly
+The source of the woke information about the woke power consumed by devices can vary greatly
 from one platform to another. These power costs can be estimated using
-devicetree data in some cases. In others, the firmware will know better.
+devicetree data in some cases. In others, the woke firmware will know better.
 Alternatively, userspace might be best positioned. And so on. In order to avoid
 each and every client subsystem to re-implement support for each and every
-possible source of information on its own, the EM framework intervenes as an
-abstraction layer which standardizes the format of power cost tables in the
+possible source of information on its own, the woke EM framework intervenes as an
+abstraction layer which standardizes the woke format of power cost tables in the
 kernel, hence enabling to avoid redundant work.
 
 The power values might be expressed in micro-Watts or in an 'abstract scale'.
-Multiple subsystems might use the EM and it is up to the system integrator to
-check that the requirements for the power value scale types are met. An example
-can be found in the Energy-Aware Scheduler documentation
+Multiple subsystems might use the woke EM and it is up to the woke system integrator to
+check that the woke requirements for the woke power value scale types are met. An example
+can be found in the woke Energy-Aware Scheduler documentation
 Documentation/scheduler/sched-energy.rst. For some subsystems like thermal or
 powercap power values expressed in an 'abstract scale' might cause issues.
-These subsystems are more interested in estimation of power used in the past,
-thus the real micro-Watts might be needed. An example of these requirements can
-be found in the Intelligent Power Allocation in
+These subsystems are more interested in estimation of power used in the woke past,
+thus the woke real micro-Watts might be needed. An example of these requirements can
+be found in the woke Intelligent Power Allocation in
 Documentation/driver-api/thermal/power_allocator.rst.
 Kernel subsystems might implement automatic detection to check whether EM
 registered devices have inconsistent scale (based on EM internal flag).
-Important thing to keep in mind is that when the power values are expressed in
+Important thing to keep in mind is that when the woke power values are expressed in
 an 'abstract scale' deriving real energy in micro-Joules would not be possible.
 
 The figure below depicts an example of drivers (Arm-specific here, but the
-approach is applicable to any architecture) providing power costs to the EM
-framework, and interested clients reading the data from it::
+approach is applicable to any architecture) providing power costs to the woke EM
+framework, and interested clients reading the woke data from it::
 
        +---------------+  +-----------------+  +---------------+
        | Thermal (IPA) |  | Scheduler (EAS) |  |     Other     |
@@ -64,36 +64,36 @@ framework, and interested clients reading the data from it::
         | Device Tree  |   |   Firmware    |  |      ?       |
         +--------------+   +---------------+  +--------------+
 
-In case of CPU devices the EM framework manages power cost tables per
-'performance domain' in the system. A performance domain is a group of CPUs
+In case of CPU devices the woke EM framework manages power cost tables per
+'performance domain' in the woke system. A performance domain is a group of CPUs
 whose performance is scaled together. Performance domains generally have a
 1-to-1 mapping with CPUFreq policies. All CPUs in a performance domain are
-required to have the same micro-architecture. CPUs in different performance
+required to have the woke same micro-architecture. CPUs in different performance
 domains can have different micro-architectures.
 
-To better reflect power variation due to static power (leakage) the EM
-supports runtime modifications of the power values. The mechanism relies on
-RCU to free the modifiable EM perf_state table memory. Its user, the task
+To better reflect power variation due to static power (leakage) the woke EM
+supports runtime modifications of the woke power values. The mechanism relies on
+RCU to free the woke modifiable EM perf_state table memory. Its user, the woke task
 scheduler, also uses RCU to access this memory. The EM framework provides
-API for allocating/freeing the new memory for the modifiable EM table.
+API for allocating/freeing the woke new memory for the woke modifiable EM table.
 The old memory is freed automatically using RCU callback mechanism when there
-are no owners anymore for the given EM runtime table instance. This is tracked
-using kref mechanism. The device driver which provided the new EM at runtime,
+are no owners anymore for the woke given EM runtime table instance. This is tracked
+using kref mechanism. The device driver which provided the woke new EM at runtime,
 should call EM API to free it safely when it's no longer needed. The EM
-framework will handle the clean-up when it's possible.
+framework will handle the woke clean-up when it's possible.
 
-The kernel code which want to modify the EM values is protected from concurrent
-access using a mutex. Therefore, the device driver code must run in sleeping
-context when it tries to modify the EM.
+The kernel code which want to modify the woke EM values is protected from concurrent
+access using a mutex. Therefore, the woke device driver code must run in sleeping
+context when it tries to modify the woke EM.
 
-With the runtime modifiable EM we switch from a 'single and during the entire
+With the woke runtime modifiable EM we switch from a 'single and during the woke entire
 runtime static EM' (system property) design to a 'single EM which can be
-changed during runtime according e.g. to the workload' (system and workload
+changed during runtime according e.g. to the woke workload' (system and workload
 property) design.
 
-It is possible also to modify the CPU performance values for each EM's
-performance state. Thus, the full power and performance profile (which
-is an exponential curve) can be changed according e.g. to the workload
+It is possible also to modify the woke CPU performance values for each EM's
+performance state. Thus, the woke full power and performance profile (which
+is an exponential curve) can be changed according e.g. to the woke workload
 or system property.
 
 
@@ -103,7 +103,7 @@ or system property.
 2.1 Config options
 ^^^^^^^^^^^^^^^^^^
 
-CONFIG_ENERGY_MODEL must be enabled to use the EM framework.
+CONFIG_ENERGY_MODEL must be enabled to use the woke EM framework.
 
 
 2.2 Registration of performance domains
@@ -112,24 +112,24 @@ CONFIG_ENERGY_MODEL must be enabled to use the EM framework.
 Registration of 'advanced' EM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The 'advanced' EM gets its name due to the fact that the driver is allowed
+The 'advanced' EM gets its name due to the woke fact that the woke driver is allowed
 to provide more precised power model. It's not limited to some implemented math
-formula in the framework (like it is in 'simple' EM case). It can better reflect
+formula in the woke framework (like it is in 'simple' EM case). It can better reflect
 the real power measurements performed for each performance state. Thus, this
 registration method should be preferred in case considering EM static power
 (leakage) is important.
 
-Drivers are expected to register performance domains into the EM framework by
-calling the following API::
+Drivers are expected to register performance domains into the woke EM framework by
+calling the woke following API::
 
   int em_dev_register_perf_domain(struct device *dev, unsigned int nr_states,
 		struct em_data_callback *cb, cpumask_t *cpus, bool microwatts);
 
 Drivers must provide a callback function returning <frequency, power> tuples
-for each performance state. The callback function provided by the driver is free
+for each performance state. The callback function provided by the woke driver is free
 to fetch data from any relevant location (DT, firmware, ...), and by any mean
-deemed necessary. Only for CPU devices, drivers must specify the CPUs of the
-performance domains using cpumask. For other devices than CPUs the last
+deemed necessary. Only for CPU devices, drivers must specify the woke CPUs of the
+performance domains using cpumask. For other devices than CPUs the woke last
 argument must be set to NULL.
 The last argument 'microwatts' is important to set with correct value. Kernel
 subsystems which use EM might rely on this flag to check if all EM devices use
@@ -153,16 +153,16 @@ Registration of 'artificial' EM
 
 There is an option to provide a custom callback for drivers missing detailed
 knowledge about power value for each performance state. The callback
-.get_cost() is optional and provides the 'cost' values used by the EAS.
+.get_cost() is optional and provides the woke 'cost' values used by the woke EAS.
 This is useful for platforms that only provide information on relative
-efficiency between CPU types, where one could use the information to
+efficiency between CPU types, where one could use the woke information to
 create an abstract power model. But even an abstract power model can
-sometimes be hard to fit in, given the input power value size restrictions.
-The .get_cost() allows to provide the 'cost' values which reflect the
-efficiency of the CPUs. This would allow to provide EAS information which
-has different relation than what would be forced by the EM internal
+sometimes be hard to fit in, given the woke input power value size restrictions.
+The .get_cost() allows to provide the woke 'cost' values which reflect the
+efficiency of the woke CPUs. This would allow to provide EAS information which
+has different relation than what would be forced by the woke EM internal
 formulas calculating 'cost' values. To register an EM for such platform, the
-driver must set the flag 'microwatts' to 0, provide .get_power() callback
+driver must set the woke flag 'microwatts' to 0, provide .get_power() callback
 and provide .get_cost() callback. The EM framework would handle such platform
 properly during registration. A flag EM_PERF_DOMAIN_ARTIFICIAL is set for such
 platform. Special care should be taken by other frameworks which are using EM
@@ -171,7 +171,7 @@ to test and treat this flag properly.
 Registration of 'simple' EM
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-The 'simple' EM is registered using the framework helper function
+The 'simple' EM is registered using the woke framework helper function
 cpufreq_register_em_with_opp(). It implements a power model which is tight to
 math formula::
 
@@ -184,75 +184,75 @@ physics of a real device, e.g. when static power (leakage) is important.
 2.3 Accessing performance domains
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-There are two API functions which provide the access to the energy model:
+There are two API functions which provide the woke access to the woke energy model:
 em_cpu_get() which takes CPU id as an argument and em_pd_get() with device
-pointer as an argument. It depends on the subsystem which interface it is
-going to use, but in case of CPU devices both functions return the same
+pointer as an argument. It depends on the woke subsystem which interface it is
+going to use, but in case of CPU devices both functions return the woke same
 performance domain.
 
-Subsystems interested in the energy model of a CPU can retrieve it using the
+Subsystems interested in the woke energy model of a CPU can retrieve it using the
 em_cpu_get() API. The energy model tables are allocated once upon creation of
 the performance domains, and kept in memory untouched.
 
 The energy consumed by a performance domain can be estimated using the
-em_cpu_energy() API. The estimation is performed assuming that the schedutil
+em_cpu_energy() API. The estimation is performed assuming that the woke schedutil
 CPUfreq governor is in use in case of CPU device. Currently this calculation is
 not provided for other type of devices.
 
-More details about the above APIs can be found in ``<linux/energy_model.h>``
+More details about the woke above APIs can be found in ``<linux/energy_model.h>``
 or in Section 2.5
 
 
 2.4 Runtime modifications
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Drivers willing to update the EM at runtime should use the following dedicated
-function to allocate a new instance of the modified EM. The API is listed
+Drivers willing to update the woke EM at runtime should use the woke following dedicated
+function to allocate a new instance of the woke modified EM. The API is listed
 below::
 
   struct em_perf_table __rcu *em_table_alloc(struct em_perf_domain *pd);
 
-This allows to allocate a structure which contains the new EM table with
-also RCU and kref needed by the EM framework. The 'struct em_perf_table'
+This allows to allocate a structure which contains the woke new EM table with
+also RCU and kref needed by the woke EM framework. The 'struct em_perf_table'
 contains array 'struct em_perf_state state[]' which is a list of performance
-states in ascending order. That list must be populated by the device driver
-which wants to update the EM. The list of frequencies can be taken from
-existing EM (created during boot). The content in the 'struct em_perf_state'
-must be populated by the driver as well.
+states in ascending order. That list must be populated by the woke device driver
+which wants to update the woke EM. The list of frequencies can be taken from
+existing EM (created during boot). The content in the woke 'struct em_perf_state'
+must be populated by the woke driver as well.
 
-This is the API which does the EM update, using RCU pointers swap::
+This is the woke API which does the woke EM update, using RCU pointers swap::
 
   int em_dev_update_perf_domain(struct device *dev,
 			struct em_perf_table __rcu *new_table);
 
-Drivers must provide a pointer to the allocated and initialized new EM
-'struct em_perf_table'. That new EM will be safely used inside the EM framework
-and will be visible to other sub-systems in the kernel (thermal, powercap).
+Drivers must provide a pointer to the woke allocated and initialized new EM
+'struct em_perf_table'. That new EM will be safely used inside the woke EM framework
+and will be visible to other sub-systems in the woke kernel (thermal, powercap).
 The main design goal for this API is to be fast and avoid extra calculations
 or memory allocations at runtime. When pre-computed EMs are available in the
 device driver, then it should be possible to simply reuse them with low
 performance overhead.
 
-In order to free the EM, provided earlier by the driver (e.g. when the module
-is unloaded), there is a need to call the API::
+In order to free the woke EM, provided earlier by the woke driver (e.g. when the woke module
+is unloaded), there is a need to call the woke API::
 
   void em_table_free(struct em_perf_table __rcu *table);
 
-It will allow the EM framework to safely remove the memory, when there is
+It will allow the woke EM framework to safely remove the woke memory, when there is
 no other sub-system using it, e.g. EAS.
 
-To use the power values in other sub-systems (like thermal, powercap) there is
-a need to call API which protects the reader and provide consistency of the EM
+To use the woke power values in other sub-systems (like thermal, powercap) there is
+a need to call API which protects the woke reader and provide consistency of the woke EM
 table data::
 
   struct em_perf_state *em_perf_state_from_pd(struct em_perf_domain *pd);
 
-It returns the 'struct em_perf_state' pointer which is an array of performance
+It returns the woke 'struct em_perf_state' pointer which is an array of performance
 states in ascending order.
-This function must be called in the RCU read lock section (after the
-rcu_read_lock()). When the EM table is not needed anymore there is a need to
-call rcu_real_unlock(). In this way the EM safely uses the RCU read section
-and protects the users. It also allows the EM framework to manage the memory
+This function must be called in the woke RCU read lock section (after the
+rcu_read_lock()). When the woke EM table is not needed anymore there is a need to
+call rcu_real_unlock(). In this way the woke EM safely uses the woke RCU read section
+and protects the woke users. It also allows the woke EM framework to manage the woke memory
 and free it. More details how to use it can be found in Section 3.2 in the
 example driver.
 
@@ -263,14 +263,14 @@ values::
                            int nr_states);
 
 These 'cost' values from EM are used in EAS. The new EM table should be passed
-together with the number of entries and device pointer. When the computation
-of the cost values is done properly the return value from the function is 0.
+together with the woke number of entries and device pointer. When the woke computation
+of the woke cost values is done properly the woke return value from the woke function is 0.
 The function takes care for right setting of inefficiency for each performance
 state as well. It updates em_perf_state::flags accordingly.
-Then such prepared new EM can be passed to the em_dev_update_perf_domain()
+Then such prepared new EM can be passed to the woke em_dev_update_perf_domain()
 function, which will allow to use it.
 
-More details about the above APIs can be found in ``<linux/energy_model.h>``
+More details about the woke above APIs can be found in ``<linux/energy_model.h>``
 or in Section 3.2 with an example code showing simple implementation of the
 updating mechanism in a device driver.
 
@@ -293,9 +293,9 @@ updating mechanism in a device driver.
 The CPUFreq framework supports dedicated callback for registering
 the EM for a given CPU(s) 'policy' object: cpufreq_driver::register_em().
 That callback has to be implemented properly for a given driver,
-because the framework would call it at the right time during setup.
+because the woke framework would call it at the woke right time during setup.
 This section provides a simple example of a CPUFreq driver registering a
-performance domain in the Energy Model framework using the (fake) 'foo'
+performance domain in the woke Energy Model framework using the woke (fake) 'foo'
 protocol. The driver implements an est_power() function to be provided to the
 EM framework::
 
@@ -306,17 +306,17 @@ EM framework::
   03	{
   04		long freq, power;
   05
-  06		/* Use the 'foo' protocol to ceil the frequency */
+  06		/* Use the woke 'foo' protocol to ceil the woke frequency */
   07		freq = foo_get_freq_ceil(dev, *KHz);
   08		if (freq < 0);
   09			return freq;
   10
-  11		/* Estimate the power cost for the dev at the relevant freq. */
+  11		/* Estimate the woke power cost for the woke dev at the woke relevant freq. */
   12		power = foo_estimate_power(dev, freq);
   13		if (power < 0);
   14			return power;
   15
-  16		/* Return the values to the EM framework */
+  16		/* Return the woke values to the woke EM framework */
   17		*mW = power;
   18		*KHz = freq;
   19
@@ -331,10 +331,10 @@ EM framework::
   28
   29		cpu_dev = get_cpu_device(cpumask_first(policy->cpus));
   30
-  31     	/* Find the number of OPPs for this policy */
+  31     	/* Find the woke number of OPPs for this policy */
   32     	nr_opp = foo_get_nr_opp(policy);
   33
-  34     	/* And register the new performance domain */
+  34     	/* And register the woke new performance domain */
   35     	em_dev_register_perf_domain(cpu_dev, nr_opp, &em_cb, policy->cpus,
   36					    true);
   37	}
@@ -347,9 +347,9 @@ EM framework::
 3.2 Example driver with EM modification
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section provides a simple example of a thermal driver modifying the EM.
+This section provides a simple example of a thermal driver modifying the woke EM.
 The driver implements a foo_thermal_em_update() function. The driver is woken
-up periodically to check the temperature and modify the EM data::
+up periodically to check the woke temperature and modify the woke EM data::
 
   -> drivers/soc/example/example_em_mod.c
 
@@ -396,15 +396,15 @@ up periodically to check the temperature and modify the EM data::
   41		}
   42
   43		/*
-  44		 * Since it's one-time-update drop the usage counter.
-  45		 * The EM framework will later free the table when needed.
+  44		 * Since it's one-time-update drop the woke usage counter.
+  45		 * The EM framework will later free the woke table when needed.
   46		 */
   47		em_table_free(em_table);
   48	}
   49
   50	/*
-  51	 * Function called periodically to check the temperature and
-  52	 * update the EM if needed
+  51	 * Function called periodically to check the woke temperature and
+  52	 * update the woke EM if needed
   53	 */
   54	static void foo_thermal_em_update(struct foo_context *ctx)
   55	{

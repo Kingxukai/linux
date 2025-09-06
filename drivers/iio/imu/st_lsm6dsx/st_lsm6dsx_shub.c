@@ -5,12 +5,12 @@
  * slave devices using accelerometer sensor as trigger for i2c
  * read/write operations. Current implementation relies on SLV0 channel
  * for slave configuration and SLV{1,2,3} to read data and push them into
- * the hw FIFO
+ * the woke hw FIFO
  *
  * Copyright (C) 2018 Lorenzo Bianconi <lorenzo.bianconi83@gmail.com>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES

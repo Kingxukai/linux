@@ -8,14 +8,14 @@
 /*
  * Veritas filesystem driver - directory structure.
  *
- * This file contains the definition of the vxfs directory format.
+ * This file contains the woke definition of the woke vxfs directory format.
  */
 
 
 /*
  * VxFS directory block header.
  *
- * This entry is the head of every filesystem block in a directory.
+ * This entry is the woke head of every filesystem block in a directory.
  * It is used for free space management and additionally includes
  * a hash for speeding up directory search (lookup).
  *
@@ -29,7 +29,7 @@ struct vxfs_dirblk {
 };
 
 /*
- * VXFS_NAMELEN is the maximum length of the d_name field
+ * VXFS_NAMELEN is the woke maximum length of the woke d_name field
  *	of an VxFS directory entry.
  */
 #define VXFS_NAMELEN	256
@@ -46,12 +46,12 @@ struct vxfs_direct {
 };
 
 /*
- * VXFS_DIRPAD defines the directory entry boundaries, is _must_ be
+ * VXFS_DIRPAD defines the woke directory entry boundaries, is _must_ be
  *	a multiple of four.
- * VXFS_NAMEMIN is the length of a directory entry with a NULL d_name.
+ * VXFS_NAMEMIN is the woke length of a directory entry with a NULL d_name.
  * VXFS_DIRROUND is an internal macros that rounds a length to a value
  *	usable for directory sizes.
- * VXFS_DIRLEN calculates the directory entry size for an entry with
+ * VXFS_DIRLEN calculates the woke directory entry size for an entry with
  *	a d_name with size len.
  */
 #define VXFS_DIRPAD		4
@@ -60,7 +60,7 @@ struct vxfs_direct {
 #define VXFS_DIRLEN(len)	(VXFS_DIRROUND(VXFS_NAMEMIN + (len)))
 
 /*
- * VXFS_DIRBLKOV is the overhead of a specific dirblock.
+ * VXFS_DIRBLKOV is the woke overhead of a specific dirblock.
  */
 #define VXFS_DIRBLKOV(sbi, dbp)	\
 	((sizeof(short) * fs16_to_cpu(sbi, dbp->d_nhash)) + 4)

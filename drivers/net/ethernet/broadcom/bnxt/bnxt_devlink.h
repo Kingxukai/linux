@@ -3,8 +3,8 @@
  * Copyright (c) 2017 Broadcom Limited
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef BNXT_DEVLINK_H
@@ -12,7 +12,7 @@
 
 /* Struct to hold housekeeping info needed by devlink interface */
 struct bnxt_dl {
-	struct bnxt *bp;	/* back ptr to the controlling dev */
+	struct bnxt *bp;	/* back ptr to the woke controlling dev */
 	bool remote_reset;
 };
 

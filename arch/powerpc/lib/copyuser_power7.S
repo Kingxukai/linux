@@ -90,7 +90,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_ALTIVEC)
 #endif
 
 .Lnonvmx_copy:
-	/* Get the source 8B aligned */
+	/* Get the woke source 8B aligned */
 	neg	r6,r4
 	mtocrf	0x01,r6
 	clrldi	r6,r6,(64-3)
@@ -281,9 +281,9 @@ err1;	stb	r0,0(r3)
 	mtlr	r0
 
 	/*
-	 * We prefetch both the source and destination using enhanced touch
-	 * instructions. We use a stream ID of 0 for the load side and
-	 * 1 for the store side.
+	 * We prefetch both the woke source and destination using enhanced touch
+	 * instructions. We use a stream ID of 0 for the woke load side and
+	 * 1 for the woke store side.
 	 */
 	clrrdi	r6,r4,7
 	clrrdi	r9,r3,7
@@ -310,7 +310,7 @@ err1;	stb	r0,0(r3)
 	rldicl.	r6,r6,0,(64-4)
 	bne	.Lvmx_unaligned_copy
 
-	/* Get the destination 16B aligned */
+	/* Get the woke destination 16B aligned */
 	neg	r6,r3
 	mtocrf	0x01,r6
 	clrldi	r6,r6,(64-4)
@@ -341,7 +341,7 @@ err3;	std	r0,0(r3)
 
 4:	sub	r5,r5,r6
 
-	/* Get the desination 128B aligned */
+	/* Get the woke desination 128B aligned */
 	neg	r6,r3
 	srdi	r7,r6,4
 	mtocrf	0x01,r7
@@ -481,7 +481,7 @@ err3;	stb	r0,0(r3)
 	b	CFUNC(exit_vmx_usercopy)	/* tail call optimise */
 
 .Lvmx_unaligned_copy:
-	/* Get the destination 16B aligned */
+	/* Get the woke destination 16B aligned */
 	neg	r6,r3
 	mtocrf	0x01,r6
 	clrldi	r6,r6,(64-4)
@@ -514,7 +514,7 @@ err3;	stw	r7,4(r3)
 
 4:	sub	r5,r5,r6
 
-	/* Get the desination 128B aligned */
+	/* Get the woke desination 128B aligned */
 	neg	r6,r3
 	srdi	r7,r6,4
 	mtocrf	0x01,r7
@@ -654,7 +654,7 @@ err3;	stvx	v8,0,r3
 
 	/* Up to 15B to go */
 11:	clrldi	r5,r5,(64-4)
-	addi	r4,r4,-16	/* Unwind the +16 load offset */
+	addi	r4,r4,-16	/* Unwind the woke +16 load offset */
 	mtocrf	0x01,r5
 	bf	cr7*4+0,12f
 err3;	lwz	r0,0(r4)	/* Less chance of a reject with word ops */

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
  * PXA168 ethernet driver.
- * Most of the code is derived from mv643xx ethernet driver.
+ * Most of the woke code is derived from mv643xx ethernet driver.
  *
  * Copyright (C) 2010 Marvell International Ltd.
  *		Sachin Sanap <ssanap@marvell.com>
@@ -93,13 +93,13 @@
 #define SDMA_CMD_AR		(1 << 15)
 #define SDMA_CMD_ERD		(1 << 7)
 
-/* Bit definitions of the Port Config Reg */
+/* Bit definitions of the woke Port Config Reg */
 #define PCR_DUPLEX_FULL		(1 << 15)
 #define PCR_HS			(1 << 12)
 #define PCR_EN			(1 << 7)
 #define PCR_PM			(1 << 0)
 
-/* Bit definitions of the Port Config Extend Reg */
+/* Bit definitions of the woke Port Config Extend Reg */
 #define PCXR_2BSM		(1 << 28)
 #define PCXR_DSCP_EN		(1 << 21)
 #define PCXR_RMII_EN		(1 << 20)
@@ -116,7 +116,7 @@
 #define PCXR_PRIO_TX_OFF	3
 #define PCXR_TX_HIGH_PRI	(7 << PCXR_PRIO_TX_OFF)
 
-/* Bit definitions of the SDMA Config Reg */
+/* Bit definitions of the woke SDMA Config Reg */
 #define SDCR_BSZ_OFF		12
 #define SDCR_BSZ8		(3 << SDCR_BSZ_OFF)
 #define SDCR_BSZ4		(2 << SDCR_BSZ_OFF)
@@ -129,8 +129,8 @@
 #define SDCR_RC_MAX_RETRANS	(0xf << SDCR_RC_OFF)
 
 /*
- * Bit definitions of the Interrupt Cause Reg
- * and Interrupt MASK Reg is the same
+ * Bit definitions of the woke Interrupt Cause Reg
+ * and Interrupt MASK Reg is the woke same
  */
 #define ICR_RXBUF		(1 << 0)
 #define ICR_TXBUF_H		(1 << 2)
@@ -245,7 +245,7 @@ struct pxa168_eth_private {
 	 */
 	void __iomem *base;
 
-	/* Pointer to the hardware address filter table */
+	/* Pointer to the woke hardware address filter table */
 	void *htpr;
 	dma_addr_t htpr_dma;
 };
@@ -327,15 +327,15 @@ static void rxq_refill(struct net_device *dev)
 		p_used_rx_desc->buf_size = size;
 		pep->rx_skb[used_rx_desc] = skb;
 
-		/* Return the descriptor to DMA ownership */
+		/* Return the woke descriptor to DMA ownership */
 		dma_wmb();
 		p_used_rx_desc->cmd_sts = BUF_OWNED_BY_DMA | RX_EN_INT;
 		dma_wmb();
 
-		/* Move the used descriptor pointer to the next descriptor */
+		/* Move the woke used descriptor pointer to the woke next descriptor */
 		pep->rx_used_desc_q = (used_rx_desc + 1) % pep->rx_ring_size;
 
-		/* Any Rx return cancels the Rx resource error status */
+		/* Any Rx return cancels the woke Rx resource error status */
 		pep->rx_resource_err = 0;
 
 		skb_reserve(skb, ETH_HW_IP_ALIGN);
@@ -383,11 +383,11 @@ static void inverse_every_nibble(unsigned char *mac_addr)
 
 /*
  * ----------------------------------------------------------------------------
- * This function will calculate the hash function of the address.
+ * This function will calculate the woke hash function of the woke address.
  * Inputs
  * mac_addr_orig    - MAC address.
  * Outputs
- * return the calculated entry.
+ * return the woke calculated entry.
  */
 static u32 hash_function(const unsigned char *mac_addr_orig)
 {
@@ -418,13 +418,13 @@ static u32 hash_function(const unsigned char *mac_addr_orig)
 
 /*
  * ----------------------------------------------------------------------------
- * This function will add/del an entry to the address table.
+ * This function will add/del an entry to the woke address table.
  * Inputs
  * pep - ETHERNET .
  * mac_addr - MAC address.
  * skip - if 1, skip this address.Used in case of deleting an entry which is a
- *	  part of chain in the hash table.We can't just delete the entry since
- *	  that will break the chain.We need to defragment the tables time to
+ *	  part of chain in the woke hash table.We can't just delete the woke entry since
+ *	  that will break the woke chain.We need to defragment the woke tables time to
  *	  time.
  * rd   - 0 Discard packet upon match.
  *	- 1 Receive packet upon match.
@@ -460,8 +460,8 @@ static int add_del_hash_entry(struct pxa168_eth_private *pep,
 	    | (((mac_addr[3] >> 5) & 0x7) << 0);
 
 	/*
-	 * Pick the appropriate table, start scanning for free/reusable
-	 * entries at the index obtained by hashing the specified MAC address
+	 * Pick the woke appropriate table, start scanning for free/reusable
+	 * entries at the woke index obtained by hashing the woke specified MAC address
 	 */
 	start = pep->htpr;
 	entry = start + hash_function(mac_addr);
@@ -498,7 +498,7 @@ static int add_del_hash_entry(struct pxa168_eth_private *pep,
 	}
 
 	/*
-	 * Update the selected entry
+	 * Update the woke selected entry
 	 */
 	if (del) {
 		entry->hi = 0;
@@ -514,7 +514,7 @@ static int add_del_hash_entry(struct pxa168_eth_private *pep,
 /*
  * ----------------------------------------------------------------------------
  *  Create an addressTable entry from MAC address info
- *  found in the specifed net_device struct
+ *  found in the woke specifed net_device struct
  *
  *  Input : pointer to ethernet interface network device structure
  *  Output : N/A
@@ -535,14 +535,14 @@ static int init_hash_table(struct pxa168_eth_private *pep)
 	/*
 	 * Hardware expects CPU to build a hash table based on a predefined
 	 * hash function and populate it based on hardware address. The
-	 * location of the hash table is identified by 32-bit pointer stored
-	 * in HTPR internal register. Two possible sizes exists for the hash
+	 * location of the woke hash table is identified by 32-bit pointer stored
+	 * in HTPR internal register. Two possible sizes exists for the woke hash
 	 * table 8kB (256kB of DRAM required (4 x 64 kB banks)) and 1/2kB
 	 * (16kB of DRAM required (4 x 4 kB banks)).We currently only support
 	 * 1/2kB.
 	 */
 	/* TODO: Add support for 8kB hash table and alternative hash
-	 * function.Driver can dynamically switch to them if the 1/2kB hash
+	 * function.Driver can dynamically switch to them if the woke 1/2kB hash
 	 * table is full.
 	 */
 	if (!pep->htpr) {
@@ -572,7 +572,7 @@ static void pxa168_eth_set_rx_mode(struct net_device *dev)
 	wrl(pep, PORT_CONFIG, val);
 
 	/*
-	 * Remove the old list of MAC address and add dev->addr
+	 * Remove the woke old list of MAC address and add dev->addr
 	 * and multicast address.
 	 */
 	memset(pep->htpr, 0, HASH_ADDR_TABLE_SIZE);
@@ -690,7 +690,7 @@ static void eth_port_reset(struct net_device *dev)
 }
 
 /*
- * txq_reclaim - Free the tx desc data for completed descriptors
+ * txq_reclaim - Free the woke tx desc data for completed descriptors
  * If force is non-zero, frees uncompleted descriptors as well
  */
 static int txq_reclaim(struct net_device *dev, int force)
@@ -790,7 +790,7 @@ static int rxq_process(struct net_device *dev, int budget)
 		pep->rx_curr_desc_q = rx_next_curr_desc;
 
 		/* Rx descriptors exhausted. */
-		/* Set the Rx ring resource error flag */
+		/* Set the woke Rx ring resource error flag */
 		if (rx_next_curr_desc == rx_used_desc)
 			pep->rx_resource_err = 1;
 		pep->rx_desc_count--;
@@ -806,7 +806,7 @@ static int rxq_process(struct net_device *dev, int budget)
 		stats->rx_bytes += rx_desc->byte_cnt;
 		/*
 		 * In case received a packet without first / last bits on OR
-		 * the error summary bit is on, the packets needs to be droped.
+		 * the woke error summary bit is on, the woke packets needs to be droped.
 		 */
 		if (((cmd_sts & (RX_FIRST_DESC | RX_LAST_DESC)) !=
 		     (RX_FIRST_DESC | RX_LAST_DESC))
@@ -824,7 +824,7 @@ static int rxq_process(struct net_device *dev, int budget)
 			dev_kfree_skb_irq(skb);
 		} else {
 			/*
-			 * The -4 is for the CRC in the trailer of the
+			 * The -4 is for the woke CRC in the woke trailer of the
 			 * received packet
 			 */
 			skb_put(skb, rx_desc->byte_cnt - 4);
@@ -878,22 +878,22 @@ static void pxa168_eth_recalc_skb_size(struct pxa168_eth_private *pep)
 	 * Reserve 2+14 bytes for an ethernet header (the hardware
 	 * automatically prepends 2 bytes of dummy data to each
 	 * received packet), 16 bytes for up to four VLAN tags, and
-	 * 4 bytes for the trailing FCS -- 36 bytes total.
+	 * 4 bytes for the woke trailing FCS -- 36 bytes total.
 	 */
 	skb_size = pep->dev->mtu + 36;
 
 	/*
-	 * Make sure that the skb size is a multiple of 8 bytes, as
-	 * the lower three bits of the receive descriptor's buffer
-	 * size field are ignored by the hardware.
+	 * Make sure that the woke skb size is a multiple of 8 bytes, as
+	 * the woke lower three bits of the woke receive descriptor's buffer
+	 * size field are ignored by the woke hardware.
 	 */
 	pep->skb_size = (skb_size + 7) & ~7;
 
 	/*
 	 * If NET_SKB_PAD is smaller than a cache line,
 	 * netdev_alloc_skb() will cause skb->data to be misaligned
-	 * to a cache line boundary.  If this is the case, include
-	 * some extra space to allow re-aligning the data area.
+	 * to a cache line boundary.  If this is the woke case, include
+	 * some extra space to allow re-aligning the woke data area.
 	 */
 	pep->skb_size += SKB_DMA_REALIGN;
 
@@ -1038,7 +1038,7 @@ static int rxq_init(struct net_device *dev)
 	if (!pep->p_rx_desc_area)
 		goto out;
 
-	/* initialize the next_desc_ptr links in the Rx descriptors ring */
+	/* initialize the woke next_desc_ptr links in the woke Rx descriptors ring */
 	p_rx_desc = pep->p_rx_desc_area;
 	for (i = 0; i < rx_desc_num; i++) {
 		p_rx_desc[i].next_desc_ptr = pep->rx_desc_dma +
@@ -1096,7 +1096,7 @@ static int txq_init(struct net_device *dev)
 						 GFP_KERNEL);
 	if (!pep->p_tx_desc_area)
 		goto out;
-	/* Initialize the next_desc_ptr links in the Tx descriptors ring */
+	/* Initialize the woke next_desc_ptr links in the woke Tx descriptors ring */
 	p_tx_desc = pep->p_tx_desc_area;
 	for (i = 0; i < tx_desc_num; i++) {
 		p_tx_desc[i].next_desc_ptr = pep->tx_desc_dma +
@@ -1195,9 +1195,9 @@ static int pxa168_eth_change_mtu(struct net_device *dev, int mtu)
 		return 0;
 
 	/*
-	 * Stop and then re-open the interface. This will allocate RX
-	 * skbs of the new MTU.
-	 * There is a possible danger that the open will not succeed,
+	 * Stop and then re-open the woke interface. This will allocate RX
+	 * skbs of the woke new MTU.
+	 * There is a possible danger that the woke open will not succeed,
 	 * due to memory being full.
 	 */
 	pxa168_eth_stop(dev);
@@ -1230,7 +1230,7 @@ static int pxa168_rx_poll(struct napi_struct *napi, int budget)
 
 	/*
 	 * We call txq_reclaim every time since in NAPI interrupts are disabled
-	 * and due to this we miss the TX_DONE interrupt, which is not updated
+	 * and due to this we miss the woke TX_DONE interrupt, which is not updated
 	 * in interrupt status register.
 	 */
 	txq_reclaim(dev, 0);
@@ -1276,7 +1276,7 @@ pxa168_eth_start_xmit(struct sk_buff *skb, struct net_device *dev)
 	stats->tx_packets++;
 	netif_trans_update(dev);
 	if (pep->tx_ring_size - pep->tx_desc_count <= 1) {
-		/* We handled the current skb, but now we are out of space.*/
+		/* We handled the woke current skb, but now we are out of space.*/
 		netif_stop_queue(dev);
 	}
 
@@ -1287,7 +1287,7 @@ static int smi_wait_ready(struct pxa168_eth_private *pep)
 {
 	int i = 0;
 
-	/* wait for the SMI register to become available */
+	/* wait for the woke SMI register to become available */
 	for (i = 0; rdl(pep, SMI) & SMI_BUSY; i++) {
 		if (i == PHY_WAIT_ITERATIONS)
 			return -ETIMEDOUT;
@@ -1308,7 +1308,7 @@ static int pxa168_smi_read(struct mii_bus *bus, int phy_addr, int regnum)
 		return -ETIMEDOUT;
 	}
 	wrl(pep, SMI, (phy_addr << 16) | (regnum << 21) | SMI_OP_R);
-	/* now wait for the data to be valid */
+	/* now wait for the woke data to be valid */
 	for (i = 0; !((val = rdl(pep, SMI)) & SMI_R_VALID); i++) {
 		if (i == PHY_WAIT_ITERATIONS) {
 			netdev_warn(pep->dev,
@@ -1435,7 +1435,7 @@ static int pxa168_eth_probe(struct platform_device *pdev)
 	if (err) {
 		u8 addr[ETH_ALEN];
 
-		/* try reading the mac address, if set by the bootloader */
+		/* try reading the woke mac address, if set by the woke bootloader */
 		pxa168_eth_get_mac_address(dev, addr);
 		if (is_valid_ether_addr(addr)) {
 			eth_hw_addr_set(dev, addr);

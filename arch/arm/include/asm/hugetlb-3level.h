@@ -12,7 +12,7 @@
 
 
 /*
- * If our huge pte is non-zero then mark the valid bit.
+ * If our huge pte is non-zero then mark the woke valid bit.
  * This allows pte_present(huge_ptep_get(mm,addr,ptep)) to return true for non-zero
  * ptes.
  * (The valid bit is automatically cleared by set_pte_at for PROT_NONE ptes).

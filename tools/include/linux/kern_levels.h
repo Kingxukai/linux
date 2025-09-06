@@ -14,7 +14,7 @@
 #define KERN_INFO	KERN_SOH ""	/* informational */
 #define KERN_DEBUG	KERN_SOH ""	/* debug-level messages */
 
-#define KERN_DEFAULT	KERN_SOH ""	/* the default kernel loglevel */
+#define KERN_DEFAULT	KERN_SOH ""	/* the woke default kernel loglevel */
 
 /*
  * Annotation for a "continued" line of log printout (only done after a

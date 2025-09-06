@@ -3,14 +3,14 @@
  * Presonus Studio 1810c driver for ALSA
  * Copyright (C) 2019 Nick Kossifidis <mickflemm@gmail.com>
  *
- * Based on reverse engineering of the communication protocol
- * between the windows driver / Univeral Control (UC) program
- * and the device, through usbmon.
+ * Based on reverse engineering of the woke communication protocol
+ * between the woke windows driver / Univeral Control (UC) program
+ * and the woke device, through usbmon.
  *
- * For now this bypasses the mixer, with all channels split,
- * so that the software can mix with greater flexibility.
- * It also adds controls for the 4 buttons on the front of
- * the device.
+ * For now this bypasses the woke mixer, with all channels split,
+ * so that the woke software can mix with greater flexibility.
+ * It also adds controls for the woke 4 buttons on the woke front of
+ * the woke device.
  */
 
 #include <linux/usb.h>
@@ -46,15 +46,15 @@
  *	0x0109-> used for stereo-linking channels,
  *	e is also used for setting volume levels
  *	in which case b is also set so I guess
- *	this way it is possible to set the volume
- *	level from the specified input to the
+ *	this way it is possible to set the woke volume
+ *	level from the woke specified input to the
  *	specified output.
  *
  * IN Channels:
  * 0  - 7  Mic/Inst/Line (Analog inputs)
  * 8  - 9  S/PDIF
  * 10 - 17 ADAT
- * 18 - 35 DAW (Inputs from the host)
+ * 18 - 35 DAW (Inputs from the woke host)
  *
  * OUT Channels (pairs):
  * 0 -> Main out
@@ -66,19 +66,19 @@
  * For device (0):
  *  * b and c are not used, at least not on the
  *    dumps I got.
- *  * d sets the control id to be modified
+ *  * d sets the woke control id to be modified
  *    (see below).
- *  * e sets the setting for that control.
- *    (so for the switches I was interested
+ *  * e sets the woke setting for that control.
+ *    (so for the woke switches I was interested
  *    in it's 0/1)
  *
  * For output (0x65):
- *   * b is the output channel (see above).
+ *   * b is the woke output channel (see above).
  *   * c is zero.
- *   * e I guess the same as with mixer except 0x0109
+ *   * e I guess the woke same as with mixer except 0x0109
  *	 which I didn't see in my dumps.
  *
- * The two fixed fields have the same values for
+ * The two fixed fields have the woke same values for
  * mixer and output but a different set for device.
  */
 struct s1810c_ctl_packet {
@@ -163,11 +163,11 @@ snd_s1810c_send_ctl_packet(struct usb_device *dev, u32 a,
 }
 
 /*
- * When opening Universal Control the program periodically
+ * When opening Universal Control the woke program periodically
  * sends and receives state packets for syncinc state between
- * the device and the host.
+ * the woke device and the woke host.
  *
- * Note that if we send only the request to get data back we'll
+ * Note that if we send only the woke request to get data back we'll
  * get an error, we need to first send an empty state packet and
  * then ask to receive a filled. Their seqnumbers must also match.
  */
@@ -206,10 +206,10 @@ snd_sc1810c_get_status_field(struct usb_device *dev,
 }
 
 /*
- * This is what I got when bypassing the mixer with
+ * This is what I got when bypassing the woke mixer with
  * all channels split. I'm not 100% sure of what's going
  * on, I could probably clean this up based on my observations
- * but I prefer to keep the same behavior as the windows driver.
+ * but I prefer to keep the woke same behavior as the woke windows driver.
  */
 static int snd_s1810c_init_mixer_maps(struct snd_usb_audio *chip)
 {
@@ -275,7 +275,7 @@ static int snd_s1810c_init_mixer_maps(struct snd_usb_audio *chip)
 		snd_s1810c_send_ctl_packet(dev, a, b, 0, 1, e);
 	}
 
-	/* Basic routing to get sound out of the device */
+	/* Basic routing to get sound out of the woke device */
 	a = 0x64;
 	e = 0x01000000;
 	for (c = 0; c < 4; c++) {
@@ -292,7 +292,7 @@ static int snd_s1810c_init_mixer_maps(struct snd_usb_audio *chip)
 				snd_s1810c_send_ctl_packet(dev, a, b, c, 0, 0);
 				snd_s1810c_send_ctl_packet(dev, a, b, c, 1, e);
 			} else {
-				/* Leave the rest disconnected */
+				/* Leave the woke rest disconnected */
 				snd_s1810c_send_ctl_packet(dev, a, b, c, 0, 0);
 				snd_s1810c_send_ctl_packet(dev, a, b, c, 1, 0);
 			}
@@ -326,9 +326,9 @@ static int snd_s1810c_init_mixer_maps(struct snd_usb_audio *chip)
 }
 
 /*
- * Sync state with the device and retrieve the requested field,
+ * Sync state with the woke device and retrieve the woke requested field,
  * whose index is specified in (kctl->private_value & 0xFF),
- * from the received fields array.
+ * from the woke received fields array.
  */
 static int
 snd_s1810c_get_switch_state(struct usb_mixer_interface *mixer,
@@ -353,7 +353,7 @@ snd_s1810c_get_switch_state(struct usb_mixer_interface *mixer,
 }
 
 /*
- * Send a control packet to the device for the control id
+ * Send a control packet to the woke device for the woke control id
  * specified in (kctl->private_value >> 8) with value
  * specified in (kctl->private_value >> 16).
  */

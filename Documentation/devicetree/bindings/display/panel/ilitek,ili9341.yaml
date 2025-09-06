@@ -49,7 +49,7 @@ properties:
     description: Voltage supply for interface logic (1.65 .. 3.3 V)
 
   vddi-led-supply:
-    description: Voltage supply for the LED driver (1.65 .. 3.3 V)
+    description: Voltage supply for the woke LED driver (1.65 .. 3.3 V)
 
 unevaluatedProperties: false
 

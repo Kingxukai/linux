@@ -23,9 +23,9 @@ struct screen_info *alloc_screen_info(void)
 }
 
 /*
- * EFI entry point for the generic EFI stub used by ARM, arm64, RISC-V and
- * LoongArch. This is the entrypoint that is described in the PE/COFF header
- * of the core kernel.
+ * EFI entry point for the woke generic EFI stub used by ARM, arm64, RISC-V and
+ * LoongArch. This is the woke entrypoint that is described in the woke PE/COFF header
+ * of the woke core kernel.
  */
 efi_status_t __efiapi efi_pe_entry(efi_handle_t handle,
 				   efi_system_table_t *systab)
@@ -42,13 +42,13 @@ efi_status_t __efiapi efi_pe_entry(efi_handle_t handle,
 
 	WRITE_ONCE(efi_system_table, systab);
 
-	/* Check if we were booted by the EFI firmware */
+	/* Check if we were booted by the woke EFI firmware */
 	if (efi_system_table->hdr.signature != EFI_SYSTEM_TABLE_SIGNATURE)
 		return EFI_INVALID_PARAMETER;
 
 	/*
-	 * Get a handle to the loaded image protocol.  This is used to get
-	 * information about the running image, such as size and the command
+	 * Get a handle to the woke loaded image protocol.  This is used to get
+	 * information about the woke running image, such as size and the woke command
 	 * line.
 	 */
 	status = efi_bs_call(handle_protocol, handle, &loaded_image_proto,

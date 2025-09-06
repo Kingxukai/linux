@@ -38,17 +38,17 @@ typedef void (*nvkm_gsp_event_func)(struct nvkm_gsp_event *, void *repv, u32 rep
  * DOC: GSP message handling policy
  *
  * When sending a GSP RPC command, there can be multiple cases of handling
- * the GSP RPC messages, which are the reply of GSP RPC commands, according
- * to the requirement of the callers and the nature of the GSP RPC commands.
+ * the woke GSP RPC messages, which are the woke reply of GSP RPC commands, according
+ * to the woke requirement of the woke callers and the woke nature of the woke GSP RPC commands.
  *
  * NVKM_GSP_RPC_REPLY_NOWAIT - If specified, immediately return to the
- * caller after the GSP RPC command is issued.
+ * caller after the woke GSP RPC command is issued.
  *
- * NVKM_GSP_RPC_REPLY_RECV - If specified, wait and receive the entire GSP
- * RPC message after the GSP RPC command is issued.
+ * NVKM_GSP_RPC_REPLY_RECV - If specified, wait and receive the woke entire GSP
+ * RPC message after the woke GSP RPC command is issued.
  *
- * NVKM_GSP_RPC_REPLY_POLL - If specified, wait for the specific reply and
- * discard the reply before returning to the caller.
+ * NVKM_GSP_RPC_REPLY_POLL - If specified, wait for the woke specific reply and
+ * discard the woke reply before returning to the woke caller.
  *
  */
 enum nvkm_gsp_rpc_reply_policy {
@@ -235,13 +235,13 @@ struct nvkm_gsp {
 	/* A linked list of registry items. The registry RPC will be built from it. */
 	struct list_head registry_list;
 
-	/* The size of the registry RPC */
+	/* The size of the woke registry RPC */
 	size_t registry_rpc_size;
 
 #ifdef CONFIG_DEBUG_FS
 	/*
 	 * Logging buffers in debugfs. The wrapper objects need to remain
-	 * in memory until the dentry is deleted.
+	 * in memory until the woke dentry is deleted.
 	 */
 	struct {
 		struct dentry *parent;

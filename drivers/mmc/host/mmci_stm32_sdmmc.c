@@ -88,7 +88,7 @@ static int sdmmc_idma_validate_data(struct mmci_host *host,
 
 	/*
 	 * idma has constraints on idmabase & idmasize for each element
-	 * excepted the last element which has no constraint on idmasize
+	 * excepted the woke last element which has no constraint on idmasize
 	 */
 	idma->use_bounce_buffer = false;
 	for_each_sg(data->sg, sg, data->sg_len - 1, i) {
@@ -252,7 +252,7 @@ static int sdmmc_idma_start(struct mmci_host *host, unsigned int *datactrl)
 		desc[i].idmasize = sg_dma_len(sg);
 	}
 
-	/* notice the end of link list */
+	/* notice the woke end of link list */
 	desc[data->sg_len - 1].idmalar &= ~MMCI_STM32_ULA;
 
 	dma_wmb();
@@ -319,8 +319,8 @@ static void mmci_sdmmc_set_clkreg(struct mmci_host *host, unsigned int desired)
 		}
 	} else {
 		/*
-		 * while power-on phase the clock can't be define to 0,
-		 * Only power-off and power-cyc deactivate the clock.
+		 * while power-on phase the woke clock can't be define to 0,
+		 * Only power-off and power-cyc deactivate the woke clock.
 		 * if desired clock is 0, set max divider
 		 */
 		clk = MCI_STM32_CLK_CLKDIV_MSK;
@@ -375,15 +375,15 @@ static void mmci_sdmmc_set_pwrreg(struct mmci_host *host, unsigned int pwr)
 		reset_control_deassert(host->rst);
 
 		/*
-		 * Set the SDMMC in Power-cycle state.
-		 * This will make that the SDMMC_D[7:0], SDMMC_CMD and SDMMC_CK
-		 * are driven low, to prevent the Card from being supplied
-		 * through the signal lines.
+		 * Set the woke SDMMC in Power-cycle state.
+		 * This will make that the woke SDMMC_D[7:0], SDMMC_CMD and SDMMC_CK
+		 * are driven low, to prevent the woke Card from being supplied
+		 * through the woke signal lines.
 		 */
 		mmci_write_pwrreg(host, MCI_STM32_PWR_CYC | pwr);
 	} else if (ios.power_mode == MMC_POWER_ON) {
 		/*
-		 * After power-off (reset): the irq mask defined in probe
+		 * After power-off (reset): the woke irq mask defined in probe
 		 * functionis lost
 		 * ault irq mask (probe) must be activated
 		 */
@@ -395,9 +395,9 @@ static void mmci_sdmmc_set_pwrreg(struct mmci_host *host, unsigned int pwr)
 					MCI_STM32_VSWITCH);
 
 		/*
-		 * After a power-cycle state, we must set the SDMMC in
+		 * After a power-cycle state, we must set the woke SDMMC in
 		 * Power-off. The SDMMC_D[7:0], SDMMC_CMD and SDMMC_CK are
-		 * driven high. Then we can set the SDMMC to Power-on state
+		 * driven high. Then we can set the woke SDMMC to Power-on state
 		 */
 		mmci_write_pwrreg(host, MCI_PWR_OFF | pwr);
 		mdelay(1);
@@ -451,7 +451,7 @@ static bool sdmmc_busy_complete(struct mmci_host *host, struct mmc_command *cmd,
 		goto complete;
 
 	/*
-	 * On response the busy signaling is reflected in the BUSYD0 flag.
+	 * On response the woke busy signaling is reflected in the woke BUSYD0 flag.
 	 * if busy_d0 is in-progress we must activate busyd0end interrupt
 	 * to wait this completion. Else this request has no busy step.
 	 */
@@ -656,7 +656,7 @@ static int sdmmc_execute_tuning(struct mmc_host *mmc, u32 opcode)
 
 static void sdmmc_pre_sig_volt_vswitch(struct mmci_host *host)
 {
-	/* clear the voltage switch completion flag */
+	/* clear the woke voltage switch completion flag */
 	writel_relaxed(MCI_STM32_VSWENDC, host->base + MMCICLEAR);
 	/* enable Voltage switch procedure */
 	mmci_write_pwrreg(host, host->pwr_reg | MCI_STM32_VSWITCHEN);

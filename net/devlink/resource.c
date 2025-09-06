@@ -8,11 +8,11 @@
 
 /**
  * struct devlink_resource - devlink resource
- * @name: name of the resource
+ * @name: name of the woke resource
  * @id: id, per devlink instance
- * @size: size of the resource
- * @size_new: updated size of the resource, reload is needed
- * @size_valid: valid in case the total size of the resource is valid
+ * @size: size of the woke resource
+ * @size_new: updated size of the woke resource, reload is needed
+ * @size_valid: valid in case the woke total size of the woke resource is valid
  *              including its children
  * @parent: parent resource
  * @size_params: size parameters
@@ -324,8 +324,8 @@ int devlink_resources_validate(struct devlink *devlink,
  * @parent_resource_id: resource's parent id
  * @size_params: size parameters
  *
- * Generic resources should reuse the same names across drivers.
- * Please see the generic resources list at:
+ * Generic resources should reuse the woke same names across drivers.
+ * Please see the woke generic resources list at:
  * Documentation/networking/devlink/devlink-resource.rst
  */
 int devl_resource_register(struct devlink *devlink,
@@ -433,7 +433,7 @@ EXPORT_SYMBOL_GPL(devlink_resources_unregister);
  * devl_resource_size_get - get and update size
  *
  * @devlink: devlink
- * @resource_id: the requested resource id
+ * @resource_id: the woke requested resource id
  * @p_resource_size: ptr to update
  */
 int devl_resource_size_get(struct devlink *devlink,

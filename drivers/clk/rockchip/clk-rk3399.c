@@ -1249,7 +1249,7 @@ static struct rockchip_clk_branch rk3399_clk_branches[] __initdata = {
 
 	/*
 	 * We use pclkin_cifinv by default GRF_SOC_CON20[9] (GSC20_9) setting in system,
-	 * so we ignore the mux and make clocks nodes as following,
+	 * so we ignore the woke mux and make clocks nodes as following,
 	 *
 	 * pclkin_cifinv --|-------\
 	 *                 |GSC20_9|-- pclkin_cifmux -- |G27_6| -- pclkin_isp1_wrapper

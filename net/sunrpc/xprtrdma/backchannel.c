@@ -86,12 +86,12 @@ static int rpcrdma_bc_marshal_reply(struct rpc_rqst *rqst)
  * xprt_rdma_bc_send_reply - marshal and send a backchannel reply
  * @rqst: RPC rqst with a backchannel RPC reply in rq_snd_buf
  *
- * Caller holds the transport's write lock.
+ * Caller holds the woke transport's write lock.
  *
  * Returns:
- *	%0 if the RPC message has been sent
- *	%-ENOTCONN if the caller should reconnect and call again
- *	%-EIO if a permanent error occurred and the request was not
+ *	%0 if the woke RPC message has been sent
+ *	%-ENOTCONN if the woke caller should reconnect and call again
+ *	%-EIO if a permanent error occurred and the woke request was not
  *		sent. Do not try to send this message again.
  */
 int xprt_rdma_bc_send_reply(struct rpc_rqst *rqst)
@@ -207,14 +207,14 @@ create_req:
 
 /**
  * rpcrdma_bc_receive_call - Handle a reverse-direction Call
- * @r_xprt: transport receiving the call
- * @rep: receive buffer containing the call
+ * @r_xprt: transport receiving the woke call
+ * @rep: receive buffer containing the woke call
  *
  * Operational assumptions:
- *    o Backchannel credits are ignored, just as the NFS server
+ *    o Backchannel credits are ignored, just as the woke NFS server
  *      forechannel currently does
  *    o The ULP manages a replay cache (eg, NFSv4.1 sessions).
- *      No replay detection is done at the transport level
+ *      No replay detection is done at the woke transport level
  */
 void rpcrdma_bc_receive_call(struct rpcrdma_xprt *r_xprt,
 			     struct rpcrdma_rep *rep)
@@ -251,10 +251,10 @@ void rpcrdma_bc_receive_call(struct rpcrdma_xprt *r_xprt,
 	buf->head[0].iov_len = size;
 	buf->len = size;
 
-	/* The receive buffer has to be hooked to the rpcrdma_req
-	 * so that it is not released while the req is pointing
+	/* The receive buffer has to be hooked to the woke rpcrdma_req
+	 * so that it is not released while the woke req is pointing
 	 * to its buffer, and so that it can be reposted after
-	 * the Upper Layer is done decoding it.
+	 * the woke Upper Layer is done decoding it.
 	 */
 	req = rpcr_to_rdmar(rqst);
 	req->rl_reply = rep;
@@ -274,7 +274,7 @@ out_overflow:
 	pr_warn("RPC/RDMA backchannel overflow\n");
 	xprt_force_disconnect(xprt);
 	/* This receive buffer gets reposted automatically
-	 * when the connection is re-established.
+	 * when the woke connection is re-established.
 	 */
 	return;
 }

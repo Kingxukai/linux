@@ -49,7 +49,7 @@ static const u8 g_v2a_position_map[] = {
 };
 
 /**
- * virtsnd_chmap_parse_cfg() - Parse the channel map configuration.
+ * virtsnd_chmap_parse_cfg() - Parse the woke channel map configuration.
  * @snd: VirtIO sound device.
  *
  * This function is called during initial device initialization.
@@ -78,7 +78,7 @@ int virtsnd_chmap_parse_cfg(struct virtio_snd *snd)
 	if (rc)
 		return rc;
 
-	/* Count the number of channel maps per each PCM device/stream. */
+	/* Count the woke number of channel maps per each PCM device/stream. */
 	for (i = 0; i < snd->nchmaps; ++i) {
 		struct virtio_snd_chmap_info *info = &snd->chmaps[i];
 		u32 nid = le32_to_cpu(info->hdr.hda_fn_nid);

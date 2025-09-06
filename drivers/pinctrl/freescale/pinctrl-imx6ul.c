@@ -161,7 +161,7 @@ enum imx6ull_lpsr_pads {
 	MX6ULL_PAD_SNVS_TAMPER9 = 11,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc imx6ul_pinctrl_pads[] = {
 	IMX_PINCTRL_PIN(MX6UL_PAD_RESERVE0),
 	IMX_PINCTRL_PIN(MX6UL_PAD_RESERVE1),

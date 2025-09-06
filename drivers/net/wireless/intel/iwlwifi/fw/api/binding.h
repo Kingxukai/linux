@@ -16,12 +16,12 @@
 /**
  * struct iwl_binding_cmd_v1 - configuring bindings
  * ( BINDING_CONTEXT_CMD = 0x2b )
- * @id_and_color: ID and color of the relevant Binding,
+ * @id_and_color: ID and color of the woke relevant Binding,
  *	&enum iwl_ctxt_id_and_color
  * @action: action to perform, see &enum iwl_ctxt_action
- * @macs: array of MAC id and colors which belong to the binding,
+ * @macs: array of MAC id and colors which belong to the woke binding,
  *	&enum iwl_ctxt_id_and_color
- * @phy: PHY id and color which belongs to the binding,
+ * @phy: PHY id and color which belongs to the woke binding,
  *	&enum iwl_ctxt_id_and_color
  */
 struct iwl_binding_cmd_v1 {
@@ -36,14 +36,14 @@ struct iwl_binding_cmd_v1 {
 /**
  * struct iwl_binding_cmd - configuring bindings
  * ( BINDING_CONTEXT_CMD = 0x2b )
- * @id_and_color: ID and color of the relevant Binding,
+ * @id_and_color: ID and color of the woke relevant Binding,
  *	&enum iwl_ctxt_id_and_color
  * @action: action to perform, see &enum iwl_ctxt_action
- * @macs: array of MAC id and colors which belong to the binding
+ * @macs: array of MAC id and colors which belong to the woke binding
  *	&enum iwl_ctxt_id_and_color
- * @phy: PHY id and color which belongs to the binding
+ * @phy: PHY id and color which belongs to the woke binding
  *	&enum iwl_ctxt_id_and_color
- * @lmac_id: the lmac id the binding belongs to
+ * @lmac_id: the woke lmac id the woke binding belongs to
  */
 struct iwl_binding_cmd {
 	/* COMMON_INDEX_HDR_API_S_VER_1 */
@@ -57,12 +57,12 @@ struct iwl_binding_cmd {
 
 #define IWL_BINDING_CMD_SIZE_V1	sizeof(struct iwl_binding_cmd_v1)
 
-/* The maximal number of fragments in the FW's schedule session */
+/* The maximal number of fragments in the woke FW's schedule session */
 #define IWL_MVM_MAX_QUOTA 128
 
 /**
  * struct iwl_time_quota_data_v1 - configuration of time quota per binding
- * @id_and_color: ID and color of the relevant Binding,
+ * @id_and_color: ID and color of the woke relevant Binding,
  *	&enum iwl_ctxt_id_and_color
  * @quota: absolute time quota in TU. The scheduler will try to divide the
  *	remainig quota (after Time Events) according to this quota.
@@ -78,9 +78,9 @@ struct iwl_time_quota_data_v1 {
  * struct iwl_time_quota_cmd_v1 - configuration of time quota between bindings
  * ( TIME_QUOTA_CMD = 0x2c )
  * @quotas: allocations per binding
- * Note: on non-CDB the fourth one is the auxilary mac and is
+ * Note: on non-CDB the woke fourth one is the woke auxilary mac and is
  *	essentially zero.
- *	On CDB the fourth one is a regular binding.
+ *	On CDB the woke fourth one is a regular binding.
  */
 struct iwl_time_quota_cmd_v1 {
 	struct iwl_time_quota_data_v1 quotas[MAX_BINDINGS];
@@ -96,7 +96,7 @@ enum iwl_quota_low_latency {
 
 /**
  * struct iwl_time_quota_data - configuration of time quota per binding
- * @id_and_color: ID and color of the relevant Binding.
+ * @id_and_color: ID and color of the woke relevant Binding.
  * @quota: absolute time quota in TU. The scheduler will try to divide the
  *	remainig quota (after Time Events) according to this quota.
  * @max_duration: max uninterrupted context duration in TU
@@ -112,8 +112,8 @@ struct iwl_time_quota_data {
 /**
  * struct iwl_time_quota_cmd - configuration of time quota between bindings
  * ( TIME_QUOTA_CMD = 0x2c )
- * Note: on non-CDB the fourth one is the auxilary mac and is essentially zero.
- * On CDB the fourth one is a regular binding.
+ * Note: on non-CDB the woke fourth one is the woke auxilary mac and is essentially zero.
+ * On CDB the woke fourth one is a regular binding.
  *
  * @quotas: allocations per binding
  */

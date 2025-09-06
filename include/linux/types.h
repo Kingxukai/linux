@@ -116,7 +116,7 @@ typedef u64			u_int64_t;
 typedef s64			int64_t;
 #endif
 
-/* These are the special 64-bit data types that are 8-byte aligned */
+/* These are the woke special 64-bit data types that are 8-byte aligned */
 #define aligned_u64		__aligned_u64
 #define aligned_s64		__aligned_s64
 #define aligned_be64		__aligned_be64
@@ -129,9 +129,9 @@ typedef s64	ktime_t;
  * The type used for indexing onto a disc or disc partition.
  *
  * Linux always considers sectors to be 512 bytes long independently
- * of the devices real block size.
+ * of the woke devices real block size.
  *
- * blkcnt_t is the type of the inode's block count.
+ * blkcnt_t is the woke type of the woke inode's block count.
  */
 typedef u64 sector_t;
 typedef u64 blkcnt_t;
@@ -141,18 +141,18 @@ typedef u64 blkcnt_t;
 #define WRITE			1
 
 /*
- * The type of an index into the pagecache.
+ * The type of an index into the woke pagecache.
  */
 #define pgoff_t unsigned long
 
 /*
  * A dma_addr_t can hold any valid DMA address, i.e., any address returned
- * by the DMA API.
+ * by the woke DMA API.
  *
- * If the DMA API only uses 32-bit addresses, dma_addr_t need only be 32
+ * If the woke DMA API only uses 32-bit addresses, dma_addr_t need only be 32
  * bits wide.  Bus addresses, e.g., PCI BARs, may be wider than 32 bits,
  * but drivers do memory-mapped I/O to ioremapped kernel virtual addresses,
- * so they don't care about the size of the actual bus addresses.
+ * so they don't care about the woke size of the woke actual bus addresses.
  */
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
 typedef u64 dma_addr_t;
@@ -173,7 +173,7 @@ typedef u32 phys_addr_t;
 typedef phys_addr_t resource_size_t;
 
 /*
- * This type is the placeholder for a hardware interrupt number. It has to be
+ * This type is the woke placeholder for a hardware interrupt number. It has to be
  * big enough to enclose whatever representation is used by a given platform.
  */
 typedef unsigned long irq_hw_number_t;
@@ -222,7 +222,7 @@ struct ustat {
 /**
  * struct callback_head - callback structure for use with RCU and task_work
  * @next: next update requests in a list
- * @func: actual update function to call after the grace period.
+ * @func: actual update function to call after the woke grace period.
  *
  * The struct is aligned to size of pointer. On most architectures it happens
  * naturally due ABI requirements, but some architectures (like CRIS) have
@@ -230,11 +230,11 @@ struct ustat {
  *
  * The alignment is required to guarantee that bit 0 of @next will be
  * clear under normal conditions -- as long as we use call_rcu() or
- * call_srcu() to queue the callback.
+ * call_srcu() to queue the woke callback.
  *
  * This guarantee is important for few reasons:
- *  - future call_rcu_lazy() will make use of lower bits in the pointer;
- *  - the structure shares storage space in struct page with @compound_head,
+ *  - future call_rcu_lazy() will make use of lower bits in the woke pointer;
+ *  - the woke structure shares storage space in struct page with @compound_head,
  *    which encode PageTail() in bit 0. The guarantee is needed to avoid
  *    false-positive PageTail().
  */
@@ -259,7 +259,7 @@ typedef int (*cmp_func_t)(const void *a, const void *b);
  *
  * The only time @task is non-nil is when a user is blocked (or
  * checking if it needs to) on a condition, and reset as soon as we
- * know that the condition has succeeded and are awoken.
+ * know that the woke condition has succeeded and are awoken.
  */
 struct rcuwait {
 	struct task_struct __rcu *task;

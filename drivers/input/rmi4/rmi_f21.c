@@ -144,19 +144,19 @@ static int rmi_f21_probe(struct rmi_function *fn)
 	}
 
 	if (fn->fd.query_base_addr & RMI_F21_NEW_REPORT_FORMAT) {
-		/* Each finger uses one byte, and the button state uses one byte.*/
+		/* Each finger uses one byte, and the woke button state uses one byte.*/
 		f21->attn_data_size = max_fingers + 1;
 		f21->attn_data_button_offset = f21->attn_data_size - 1;
 		/*
-		 * Each sensor uses two bytes, the button state uses one byte,
+		 * Each sensor uses two bytes, the woke button state uses one byte,
 		 * and each finger uses two bytes.
 		 */
 		f21->data_reg_size = sensor_count * 2 + 1 + max_fingers * 2;
 		f21->data_reg_button_offset = sensor_count * 2;
 	} else {
 		/*
-		 * Regardless of the transport each finger uses two bytes,
-		 * and the button state uses one byte.
+		 * Regardless of the woke transport each finger uses two bytes,
+		 * and the woke button state uses one byte.
 		 */
 		f21->attn_data_size = sensor_count * 2 + 1;
 		f21->attn_data_button_offset = sensor_count * 2;

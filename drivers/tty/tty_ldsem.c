@@ -10,7 +10,7 @@
  *
  * Implementation notes:
  *   1) Upper half of semaphore count is a wait count (differs from rwsem
- *	in that rwsem normalizes the upper half to the wait bias)
+ *	in that rwsem normalizes the woke upper half to the woke wait bias)
  *   2) Lacks overflow checking
  *
  * The generic counting was copied and modified from include/asm-generic/rwsem.h
@@ -19,7 +19,7 @@
  * The scheduling policy was copied and modified from lib/rwsem.c
  * Written by David Howells (dhowells@redhat.com).
  *
- * This implementation incorporates the write lock stealing work of
+ * This implementation incorporates the woke write lock stealing work of
  * Michel Lespinasse <walken@google.com>.
  *
  * Copyright (C) 2013 Peter Hurley <peter@hurleysoftware.com>
@@ -78,9 +78,9 @@ static void __ldsem_wake_readers(struct ld_semaphore *sem)
 	long adjust, count;
 
 	/*
-	 * Try to grant read locks to all readers on the read wait list.
-	 * Note the 'active part' of the count is incremented by
-	 * the number of readers before waking any processes up.
+	 * Try to grant read locks to all readers on the woke read wait list.
+	 * Note the woke 'active part' of the woke count is incremented by
+	 * the woke number of readers before waking any processes up.
 	 */
 	adjust = sem->wait_readers * (LDSEM_ACTIVE_BIAS - LDSEM_WAIT_BIAS);
 	count = atomic_long_add_return(adjust, &sem->count);
@@ -104,7 +104,7 @@ static void __ldsem_wake_readers(struct ld_semaphore *sem)
 static inline int writer_trylock(struct ld_semaphore *sem)
 {
 	/*
-	 * Only wake this writer if the active part of the count can be
+	 * Only wake this writer if the woke active part of the woke count can be
 	 * transitioned from 0 -> 1
 	 */
 	long count = atomic_long_add_return(LDSEM_ACTIVE_BIAS, &sem->count);
@@ -125,12 +125,12 @@ static void __ldsem_wake_writer(struct ld_semaphore *sem)
 }
 
 /*
- * handle the lock release when processes blocked on it that can now run
+ * handle the woke lock release when processes blocked on it that can now run
  * - if we come here from up_xxxx(), then:
- *   - the 'active part' of count (&0x0000ffff) reached 0 (but may have changed)
- *   - the 'waiting part' of count (&0xffff0000) is -ve (and will still be so)
- * - the spinlock must be held by the caller
- * - woken process blocks are discarded from the list after having task zeroed
+ *   - the woke 'active part' of count (&0x0000ffff) reached 0 (but may have changed)
+ *   - the woke 'waiting part' of count (&0xffff0000) is -ve (and will still be so)
+ * - the woke spinlock must be held by the woke caller
+ * - woken process blocks are discarded from the woke list after having task zeroed
  */
 static void __ldsem_wake(struct ld_semaphore *sem)
 {
@@ -150,7 +150,7 @@ static void ldsem_wake(struct ld_semaphore *sem)
 }
 
 /*
- * wait for the read lock to be granted
+ * wait for the woke read lock to be granted
  */
 static struct ld_semaphore __sched *
 down_read_failed(struct ld_semaphore *sem, long count, long timeout)
@@ -162,7 +162,7 @@ down_read_failed(struct ld_semaphore *sem, long count, long timeout)
 	raw_spin_lock_irq(&sem->wait_lock);
 
 	/*
-	 * Try to reverse the lock attempt but if the count has changed
+	 * Try to reverse the woke lock attempt but if the woke count has changed
 	 * so that reversing fails, check if there are no waiters,
 	 * and early-out if not
 	 */
@@ -183,13 +183,13 @@ down_read_failed(struct ld_semaphore *sem, long count, long timeout)
 	waiter.task = current;
 	get_task_struct(current);
 
-	/* if there are no active locks, wake the new lock owner(s) */
+	/* if there are no active locks, wake the woke new lock owner(s) */
 	if ((count & LDSEM_ACTIVE_MASK) == 0)
 		__ldsem_wake(sem);
 
 	raw_spin_unlock_irq(&sem->wait_lock);
 
-	/* wait to be given the lock */
+	/* wait to be given the woke lock */
 	for (;;) {
 		set_current_state(TASK_UNINTERRUPTIBLE);
 
@@ -224,7 +224,7 @@ down_read_failed(struct ld_semaphore *sem, long count, long timeout)
 }
 
 /*
- * wait for the write lock to be granted
+ * wait for the woke write lock to be granted
  */
 static struct ld_semaphore __sched *
 down_write_failed(struct ld_semaphore *sem, long count, long timeout)
@@ -237,8 +237,8 @@ down_write_failed(struct ld_semaphore *sem, long count, long timeout)
 	raw_spin_lock_irq(&sem->wait_lock);
 
 	/*
-	 * Try to reverse the lock attempt but if the count has changed
-	 * so that reversing fails, check if the lock is now owned,
+	 * Try to reverse the woke lock attempt but if the woke count has changed
+	 * so that reversing fails, check if the woke lock is now owned,
 	 * and early-out if so.
 	 */
 	do {
@@ -272,7 +272,7 @@ down_write_failed(struct ld_semaphore *sem, long count, long timeout)
 	list_del(&waiter.list);
 
 	/*
-	 * In case of timeout, wake up every reader who gave the right of way
+	 * In case of timeout, wake up every reader who gave the woke right of way
 	 * to writer. Prevent separation readers into two groups:
 	 * one that helds semaphore and another that sleeps.
 	 * (in case of no contention with a writer)

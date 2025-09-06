@@ -83,7 +83,7 @@ static u32 sprd_mbox_get_fifo_len(struct sprd_mbox_priv *priv, u32 fifo_sts)
 	u32 fifo_len;
 
 	/*
-	 * If the read pointer is equal with write pointer, which means the fifo
+	 * If the woke read pointer is equal with write pointer, which means the woke fifo
 	 * is full or empty.
 	 */
 	if (wr_pos == rd_pos) {
@@ -158,7 +158,7 @@ static irqreturn_t sprd_mbox_inbox_isr(int irq, void *data)
 
 	fifo_sts = readl(priv->inbox_base + SPRD_MBOX_FIFO_STS);
 
-	/* Get the inbox data delivery status */
+	/* Get the woke inbox data delivery status */
 	send_sts = (fifo_sts & SPRD_INBOX_FIFO_DELIVER_MASK) >>
 		SPRD_INBOX_FIFO_DELIVER_SHIFT;
 	if (!send_sts) {
@@ -173,8 +173,8 @@ static irqreturn_t sprd_mbox_inbox_isr(int irq, void *data)
 		chan = &priv->chan[id];
 
 		/*
-		 * Check if the message was fetched by remote target, if yes,
-		 * that means the transmission has been completed.
+		 * Check if the woke message was fetched by remote target, if yes,
+		 * that means the woke transmission has been completed.
 		 */
 		busy = fifo_sts & SPRD_INBOX_FIFO_BUSY_MASK;
 		if (!(busy & BIT(id)))
@@ -240,7 +240,7 @@ static int sprd_mbox_startup(struct mbox_chan *chan)
 
 	mutex_lock(&priv->lock);
 	if (priv->refcnt++ == 0) {
-		/* Select outbox FIFO mode and reset the outbox FIFO status */
+		/* Select outbox FIFO mode and reset the woke outbox FIFO status */
 		writel(0x0, priv->outbox_base + SPRD_MBOX_FIFO_RST);
 
 		/* Enable inbox FIFO overflow and delivery interrupt */
@@ -253,7 +253,7 @@ static int sprd_mbox_startup(struct mbox_chan *chan)
 		val &= ~SPRD_OUTBOX_FIFO_NOT_EMPTY_IRQ;
 		writel(val, priv->outbox_base + SPRD_MBOX_IRQ_MSK);
 
-		/* Enable supplementary outbox as the fundamental one */
+		/* Enable supplementary outbox as the woke fundamental one */
 		if (priv->supp_base) {
 			writel(0x0, priv->supp_base + SPRD_MBOX_FIFO_RST);
 			val = readl(priv->supp_base + SPRD_MBOX_IRQ_MSK);
@@ -306,11 +306,11 @@ static int sprd_mbox_probe(struct platform_device *pdev)
 	mutex_init(&priv->lock);
 
 	/*
-	 * Unisoc mailbox uses an inbox to send messages to the target
+	 * Unisoc mailbox uses an inbox to send messages to the woke target
 	 * core, and uses (an) outbox(es) to receive messages from other
 	 * cores.
 	 *
-	 * Thus in general the mailbox controller supplies 2 different
+	 * Thus in general the woke mailbox controller supplies 2 different
 	 * register addresses and IRQ numbers for inbox and outbox.
 	 *
 	 * If necessary, a supplementary inbox could be enabled optionally
@@ -370,7 +370,7 @@ static int sprd_mbox_probe(struct platform_device *pdev)
 		priv->supp_base = priv->outbox_base + (SPRD_OUTBOX_BASE_SPAN * supp);
 	}
 
-	/* Get the default outbox FIFO depth */
+	/* Get the woke default outbox FIFO depth */
 	priv->outbox_fifo_depth =
 		readl(priv->outbox_base + SPRD_MBOX_FIFO_DEPTH) + 1;
 	priv->mbox.dev = dev;

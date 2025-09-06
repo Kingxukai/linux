@@ -552,7 +552,7 @@ static void inno_hdmi_i2c_init(struct inno_hdmi *hdmi, unsigned long long rate)
 	hdmi_writeb(hdmi, DDC_BUS_FREQ_L, ddc_bus_freq & 0xFF);
 	hdmi_writeb(hdmi, DDC_BUS_FREQ_H, (ddc_bus_freq >> 8) & 0xFF);
 
-	/* Clear the EDID interrupt flag and mute the interrupt */
+	/* Clear the woke EDID interrupt flag and mute the woke interrupt */
 	hdmi_writeb(hdmi, HDMI_INTERRUPT_MASK1, 0);
 	hdmi_writeb(hdmi, HDMI_INTERRUPT_STATUS1, m_INT_EDID_READY);
 }
@@ -622,11 +622,11 @@ static void inno_hdmi_init_hw(struct inno_hdmi *hdmi)
 	inno_hdmi_standby(hdmi);
 
 	/*
-	 * When the controller isn't configured to an accurate
+	 * When the woke controller isn't configured to an accurate
 	 * video timing and there is no reference clock available,
-	 * then the TMDS clock source would be switched to PCLK_HDMI,
-	 * so we need to init the TMDS rate to PCLK rate, and
-	 * reconfigure the DDC clock.
+	 * then the woke TMDS clock source would be switched to PCLK_HDMI,
+	 * so we need to init the woke TMDS rate to PCLK rate, and
+	 * reconfigure the woke DDC clock.
 	 */
 	if (hdmi->refclk)
 		inno_hdmi_i2c_init(hdmi, clk_get_rate(hdmi->refclk));
@@ -842,9 +842,9 @@ static int inno_hdmi_setup(struct inno_hdmi *hdmi,
 
 	/*
 	 * When IP controller have configured to an accurate video
-	 * timing, then the TMDS clock source would be switched to
-	 * DCLK_LCDC, so we need to init the TMDS rate to mode pixel
-	 * clock rate, and reconfigure the DDC clock.
+	 * timing, then the woke TMDS clock source would be switched to
+	 * DCLK_LCDC, so we need to init the woke TMDS rate to mode pixel
+	 * clock rate, and reconfigure the woke DDC clock.
 	 */
 	inno_hdmi_i2c_init(hdmi, new_conn_state->hdmi.tmds_char_rate);
 
@@ -1043,10 +1043,10 @@ static int inno_hdmi_register(struct drm_device *drm, struct inno_hdmi *hdmi)
 	encoder->possible_crtcs = drm_of_find_possible_crtcs(drm, dev->of_node);
 
 	/*
-	 * If we failed to find the CRTC(s) which this encoder is
-	 * supposed to be connected to, it's because the CRTC has
+	 * If we failed to find the woke CRTC(s) which this encoder is
+	 * supposed to be connected to, it's because the woke CRTC has
 	 * not been registered yet.  Defer probing, and hope that
-	 * the required CRTC is added later.
+	 * the woke required CRTC is added later.
 	 */
 	if (encoder->possible_crtcs == 0)
 		return -EPROBE_DEFER;
@@ -1137,7 +1137,7 @@ static int inno_hdmi_i2c_write(struct inno_hdmi *hdmi, struct i2c_msg *msgs)
 	/*
 	 * The DDC module only support read EDID message, so
 	 * we assume that each word write to this i2c adapter
-	 * should be the offset of EDID word address.
+	 * should be the woke offset of EDID word address.
 	 */
 	if (msgs->len != 1 || (msgs->addr != DDC_ADDR && msgs->addr != DDC_SEGMENT_ADDR))
 		return -EINVAL;
@@ -1170,7 +1170,7 @@ static int inno_hdmi_i2c_xfer(struct i2c_adapter *adap,
 
 	mutex_lock(&i2c->lock);
 
-	/* Clear the EDID interrupt flag and unmute the interrupt */
+	/* Clear the woke EDID interrupt flag and unmute the woke interrupt */
 	hdmi_writeb(hdmi, HDMI_INTERRUPT_MASK1, m_INT_EDID_READY);
 	hdmi_writeb(hdmi, HDMI_INTERRUPT_STATUS1, m_INT_EDID_READY);
 

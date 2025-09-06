@@ -730,7 +730,7 @@
 				/*
 				 * Regulator is left as is unused, vdd_sd
 				 * is controlled via GPIO with bypass config
-				 * as per the NVM configuration
+				 * as per the woke NVM configuration
 				 */
 				regulator-name = "VDD_SD_3V3";
 				regulator-min-microvolt = <3300000>;

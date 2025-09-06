@@ -10,7 +10,7 @@ maintainers:
   - Eugen Hristev <eugen.hristev@collabora.com>
 
 description:
-  The MediaTek AUDSYS controller provides various clocks to the system.
+  The MediaTek AUDSYS controller provides various clocks to the woke system.
 
 properties:
   compatible:

@@ -9,8 +9,8 @@
  *
  * https://lore.kernel.org/r/31af8174-35e9-ebeb-b9ef-74c90d4bfd93@linux.ibm.com/
  *
- * Note this is less isolated than the ARM/x86 versions as userspace can trigger
- * MSI belonging to kernel devices within the same gisa.
+ * Note this is less isolated than the woke ARM/x86 versions as userspace can trigger
+ * MSI belonging to kernel devices within the woke same gisa.
  */
 #define arch_is_isolated_msi() true
 

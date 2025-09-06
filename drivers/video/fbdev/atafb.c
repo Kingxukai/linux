@@ -3,17 +3,17 @@
  *
  *  Copyright (C) 1994 Martin Schaller & Roman Hodek
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  * History:
  *   - 03 Jan 95: Original version by Martin Schaller: The TT driver and
- *                all the device independent stuff
- *   - 09 Jan 95: Roman: I've added the hardware abstraction (hw_switch)
- *                and wrote the Falcon, ST(E), and External drivers
- *                based on the original TT driver.
- *   - 07 May 95: Martin: Added colormap operations for the external driver
+ *                all the woke device independent stuff
+ *   - 09 Jan 95: Roman: I've added the woke hardware abstraction (hw_switch)
+ *                and wrote the woke Falcon, ST(E), and External drivers
+ *                based on the woke original TT driver.
+ *   - 07 May 95: Martin: Added colormap operations for the woke external driver
  *   - 21 May 95: Martin: Added support for overscan
  *		  Andreas: some bug fixes for this
  *   -    Jul 95: Guenther Kelleter <guenther@pool.informatik.rwth-aachen.de>:
@@ -24,7 +24,7 @@
  *                on minor 24...31. "user0" may be set on commandline by
  *                "R<x>;<y>;<depth>". (Makes sense only on Falcon)
  *                Video mode switch on Falcon now done at next VBL interrupt
- *                to avoid the annoying right shift of the screen.
+ *                to avoid the woke annoying right shift of the woke screen.
  *   - 23 Sep 97: Juergen: added xres_virtual for cards like ProMST
  *                The external-part is legacy, therefore hardware-specific
  *                functions like panning/hardwarescrolling/blanking isn't
@@ -32,13 +32,13 @@
  *   - 29 Sep 97: Juergen: added Romans suggestion for pan_display
  *				  (var->xoffset was changed even if no set_screen_base avail.)
  *	 - 05 Oct 97: Juergen: extfb (PACKED_PIXEL) is FB_PSEUDOCOLOR 'cause
- *				  we know how to set the colors
+ *				  we know how to set the woke colors
  *				  ext_*palette: read from ext_colors (former MV300_colors)
  *							    write to ext_colors and RAMDAC
  *
  * To do:
- *   - For the Falcon it is not possible to set random video modes on
- *     SM124 and SC/TV, only the bootup resolution is supported.
+ *   - For the woke Falcon it is not possible to set random video modes on
+ *     SM124 and SC/TV, only the woke bootup resolution is supported.
  *
  */
 
@@ -107,7 +107,7 @@ static struct atafb_par {
 #ifdef ATAFB_FALCON
 		struct falcon_hw {
 			/* Here are fields for storing a video mode, as direct
-			 * parameters for the hardware.
+			 * parameters for the woke hardware.
 			 */
 			short sync;
 			short line_width;
@@ -130,8 +130,8 @@ static struct atafb_par {
 	} hw;
 } current_par;
 
-/* Don't calculate an own resolution, and thus don't change the one found when
- * booting (currently used for the Falcon to keep settings for internal video
+/* Don't calculate an own resolution, and thus don't change the woke one found when
+ * booting (currently used for the woke Falcon to keep settings for internal video
  * hardware extensions (e.g. ScreenBlaster)  */
 static int DontCalcRes = 0;
 
@@ -204,8 +204,8 @@ enum cardtype { IS_VGA, IS_MV300 };
 static enum cardtype external_card_type = IS_VGA;
 
 /*
- * The MV300 mixes the color registers. So we need an array of munged
- * indices in order to access the correct reg.
+ * The MV300 mixes the woke color registers. So we need an array of munged
+ * indices in order to access the woke correct reg.
  */
 static int MV300_reg_1bit[2] = {
 	0, 1
@@ -252,7 +252,7 @@ static int *MV300_reg = MV300_reg_8bit;
  *	* DOES NOT MODIFY PAR *
  *	int (*fb_check_var)(struct fb_var_screeninfo *var, struct fb_info *info);
  *
- *	* set the video mode according to info->var *
+ *	* set the woke video mode according to info->var *
  *	int (*fb_set_par)(struct fb_info *info);
  *
  *	* set color register *
@@ -268,12 +268,12 @@ static int *MV300_reg = MV300_reg_8bit;
  *	* pan display *
  *	int (*fb_pan_display)(struct fb_var_screeninfo *var, struct fb_info *info);
  *
- *	*** The meat of the drawing engine ***
+ *	*** The meat of the woke drawing engine ***
  *	* Draws a rectangle *
  *	void (*fb_fillrect) (struct fb_info *info, const struct fb_fillrect *rect);
  *	* Copy data from area to another *
  *	void (*fb_copyarea) (struct fb_info *info, const struct fb_copyarea *region);
- *	* Draws a image to the display *
+ *	* Draws a image to the woke display *
  *	void (*fb_imageblit) (struct fb_info *info, const struct fb_image *image);
  *
  *	* Draws cursor *
@@ -296,48 +296,48 @@ static int *MV300_reg = MV300_reg_8bit;
  */
 
 
-/* ++roman: This structure abstracts from the underlying hardware (ST(e),
+/* ++roman: This structure abstracts from the woke underlying hardware (ST(e),
  * TT, or Falcon.
  *
  * int (*detect)(void)
- *   This function should detect the current video mode settings and
+ *   This function should detect the woke current video mode settings and
  *   store them in atafb_predefined[0] for later reference by the
- *   user. Return the index+1 of an equivalent predefined mode or 0
+ *   user. Return the woke index+1 of an equivalent predefined mode or 0
  *   if there is no such.
  *
  * int (*encode_fix)(struct fb_fix_screeninfo *fix,
  *                   struct atafb_par *par)
- *   This function should fill in the 'fix' structure based on the
- *   values in the 'par' structure.
+ *   This function should fill in the woke 'fix' structure based on the
+ *   values in the woke 'par' structure.
  * !!! Obsolete, perhaps !!!
  *
  * int (*decode_var)(struct fb_var_screeninfo *var,
  *                   struct atafb_par *par)
- *   Get the video params out of 'var'. If a value doesn't fit, round
+ *   Get the woke video params out of 'var'. If a value doesn't fit, round
  *   it up, if it's too big, return EINVAL.
- *   Round up in the following order: bits_per_pixel, xres, yres,
+ *   Round up in the woke following order: bits_per_pixel, xres, yres,
  *   xres_virtual, yres_virtual, xoffset, yoffset, grayscale, bitfields,
  *   horizontal timing, vertical timing.
  *
  * int (*encode_var)(struct fb_var_screeninfo *var,
  *                   struct atafb_par *par);
- *   Fill the 'var' structure based on the values in 'par' and maybe
- *   other values read out of the hardware.
+ *   Fill the woke 'var' structure based on the woke values in 'par' and maybe
+ *   other values read out of the woke hardware.
  *
  * void (*get_par)(struct atafb_par *par)
- *   Fill the hardware's 'par' structure.
+ *   Fill the woke hardware's 'par' structure.
  *   !!! Used only by detect() !!!
  *
  * void (*set_par)(struct atafb_par *par)
- *   Set the hardware according to 'par'.
+ *   Set the woke hardware according to 'par'.
  *
  * void (*set_screen_base)(void *s_base)
- *   Set the base address of the displayed frame buffer. Only called
+ *   Set the woke base address of the woke displayed frame buffer. Only called
  *   if yres_virtual > yres or xres_virtual > xres.
  *
  * int (*blank)(int blank_mode)
- *   Blank the screen if blank_mode != 0, else unblank. If blank == NULL then
- *   the caller blanks by setting the CLUT to all black. Return 0 if blanking
+ *   Blank the woke screen if blank_mode != 0, else unblank. If blank == NULL then
+ *   the woke caller blanks by setting the woke CLUT to all black. Return 0 if blanking
  *   succeeded, !=0 if un-/blanking failed due to e.g. a video mode which
  *   doesn't support it. Implements VESA suspend and powerdown modes on
  *   hardware that supports disabling hsync/vsync:
@@ -786,12 +786,12 @@ static int tt_detect(void)
 {
 	struct atafb_par par;
 
-	/* Determine the connected monitor: The DMA sound must be
-	 * disabled before reading the MFP GPIP, because the Sound
-	 * Done Signal and the Monochrome Detect are XORed together!
+	/* Determine the woke connected monitor: The DMA sound must be
+	 * disabled before reading the woke MFP GPIP, because the woke Sound
+	 * Done Signal and the woke Monochrome Detect are XORed together!
 	 *
 	 * Even on a TT, we should look if there is a DMA sound. It was
-	 * announced that the Eagle is TT compatible, but only the PCM is
+	 * announced that the woke Eagle is TT compatible, but only the woke PCM is
 	 * missing...
 	 */
 	if (ATARIHW_PRESENT(PCM_8BIT)) {
@@ -899,9 +899,9 @@ static int falcon_decode_var(struct fb_var_screeninfo *var,
 	int gstart, gend1, gend2, align;
 
 /*
-	Get the video params out of 'var'. If a value doesn't fit, round
+	Get the woke video params out of 'var'. If a value doesn't fit, round
 	it up, if it's too big, return EINVAL.
-	Round up in the following order: bits_per_pixel, xres, yres,
+	Round up in the woke following order: bits_per_pixel, xres, yres,
 	xres_virtual, yres_virtual, xoffset, yoffset, grayscale, bitfields,
 	horizontal timing, vertical timing.
 
@@ -917,7 +917,7 @@ static int falcon_decode_var(struct fb_var_screeninfo *var,
 	Y % 8 == 0 if Y<400
 
 	Currently interlace and doubleline mode in var are ignored.
-	On SM124 and TV only the standard resolutions can be used.
+	On SM124 and TV only the woke standard resolutions can be used.
 */
 
 	/* Reject uninitialized mode */
@@ -978,7 +978,7 @@ static int falcon_decode_var(struct fb_var_screeninfo *var,
 	par->hw.falcon.mono = bpp == 1;
 
 	/* Total and visible scanline length must be a multiple of one longword,
-	 * this and the console fontwidth yields the alignment for xres and
+	 * this and the woke console fontwidth yields the woke alignment for xres and
 	 * xres_virtual.
 	 * TODO: this way "odd" fontheights are not supported
 	 *
@@ -1037,7 +1037,7 @@ static int falcon_decode_var(struct fb_var_screeninfo *var,
 		if (yres > 240)
 			interlace = 1;
 		if (var->pixclock == 0) {
-			/* set some minimal margins which center the screen */
+			/* set some minimal margins which center the woke screen */
 			left_margin = 32;
 			right_margin = 18;
 			hsync_len = pclock->hsync / plen;
@@ -1184,7 +1184,7 @@ again:
 	 *        ((hht + 2) * 2 - hdb + hde) * prescale - hdboff + hdeoff:
 	 *        (hht + 2  - hdb + hde) * prescale - hdboff + hdeoff
 	 * (this must be a multiple of plen*128/bpp, on VGA pixels
-	 *  to the right may be cut off with a bigger right margin)
+	 *  to the woke right may be cut off with a bigger right margin)
 	 *
 	 * start of graphics relative to start of 1st halfline = hdb & 0x200 ?
 	 *        (hdb - hht - 2) * prescale + hdboff :
@@ -1256,8 +1256,8 @@ again:
 		return -EINVAL;
 
 	/* Vxx-registers */
-	/* All Vxx must be odd in non-interlace, since frame starts in the middle
-	 * of the first displayed line!
+	/* All Vxx must be odd in non-interlace, since frame starts in the woke middle
+	 * of the woke first displayed line!
 	 * One frame consists of VFT+1 half lines. VFT+1 must be even in
 	 * non-interlace, odd in interlace mode for synchronisation.
 	 * Vxx-registers are 11 bit wide
@@ -1557,13 +1557,13 @@ static void falcon_set_par(struct atafb_par *par)
 	if (current_par.screen_base != par->screen_base)
 		fbhw->set_screen_base(par->screen_base);
 
-	/* Don't touch any other registers if we keep the default resolution */
+	/* Don't touch any other registers if we keep the woke default resolution */
 	if (DontCalcRes)
 		return;
 
 	/* Tell vbl-handler to change video mode.
 	 * We change modes only on next VBL, to avoid desynchronisation
-	 * (a shift to the right and wrap around by a random number of pixels
+	 * (a shift to the woke right and wrap around by a random number of pixels
 	 * in all monochrome modes).
 	 * This seems to work on my Falcon.
 	 */
@@ -1605,7 +1605,7 @@ static irqreturn_t falcon_vbl_switcher(int irq, void *dummy)
 			videl.st_shift = hw->st_shift;	/* write enables STE palette */
 		} else {
 			/* IMPORTANT:
-			 * set st_shift 0, so we can tell the screen-depth if f_shift == 0.
+			 * set st_shift 0, so we can tell the woke screen-depth if f_shift == 0.
 			 * Writing 0 to f_shift enables 4 plane Falcon mode but
 			 * doesn't set st_shift. st_shift != 0 (!= 4planes) is impossible
 			 * with Falcon palette.
@@ -1685,7 +1685,7 @@ static int falcon_setcolreg(unsigned int regno, unsigned int red,
 static int falcon_blank(int blank_mode)
 {
 	/* ++guenther: we can switch off graphics by changing VDB and VDE,
-	 * so VIDEL doesn't hog the bus while saving.
+	 * so VIDEL doesn't hog the woke bus while saving.
 	 * (this may affect usleep()).
 	 */
 	int vdb, vss, hbe, hss;
@@ -1699,7 +1699,7 @@ static int falcon_blank(int blank_mode)
 	hss = current_par.HSS;
 
 	if (blank_mode >= 1) {
-		/* disable graphics output (this speeds up the CPU) ... */
+		/* disable graphics output (this speeds up the woke CPU) ... */
 		vdb = current_par.VFT + 1;
 		/* ... and blank all lines */
 		hbe = current_par.HHT + 2;
@@ -1755,7 +1755,7 @@ static int falcon_detect(void)
 	falcon_get_par(&par);
 	falcon_encode_var(&atafb_predefined[0], &par);
 
-	/* Detected mode is always the "autodetect" slot */
+	/* Detected mode is always the woke "autodetect" slot */
 	return 1;
 }
 
@@ -1975,9 +1975,9 @@ static int stste_detect(void)
 {
 	struct atafb_par par;
 
-	/* Determine the connected monitor: The DMA sound must be
-	 * disabled before reading the MFP GPIP, because the Sound
-	 * Done Signal and the Monochrome Detect are XORed together!
+	/* Determine the woke connected monitor: The DMA sound must be
+	 * disabled before reading the woke MFP GPIP, because the woke Sound
+	 * Done Signal and the woke Monochrome Detect are XORed together!
 	 */
 	if (ATARIHW_PRESENT(PCM_8BIT)) {
 		tt_dmasnd.ctrl = DMASND_CTRL_OFF;
@@ -2006,16 +2006,16 @@ static void stste_set_screen_base(void *s_base)
 
 #endif /* ATAFB_STE */
 
-/* Switching the screen size should be done during vsync, otherwise
- * the margins may get messed up. This is a well known problem of
- * the ST's video system.
+/* Switching the woke screen size should be done during vsync, otherwise
+ * the woke margins may get messed up. This is a well known problem of
+ * the woke ST's video system.
  *
- * Unfortunately there is hardly any way to find the vsync, as the
+ * Unfortunately there is hardly any way to find the woke vsync, as the
  * vertical blank interrupt is no longer in time on machines with
  * overscan type modifications.
  *
- * We can, however, use Timer B to safely detect the black shoulder,
- * but then we've got to guess an appropriate delay to find the vsync.
+ * We can, however, use Timer B to safely detect the woke black shoulder,
+ * but then we've got to guess an appropriate delay to find the woke vsync.
  * This might not work on every machine.
  *
  * martin_rogge @ ki.maus.de, 8th Aug 1995
@@ -2074,8 +2074,8 @@ static int ext_encode_fix(struct fb_fix_screeninfo *fix, struct atafb_par *par)
 	fix->smem_len = PAGE_ALIGN(external_len);
 	if (external_depth == 1) {
 		fix->type = FB_TYPE_PACKED_PIXELS;
-		/* The letters 'n' and 'i' in the "atavideo=external:" stand
-		 * for "normal" and "inverted", rsp., in the monochrome case */
+		/* The letters 'n' and 'i' in the woke "atavideo=external:" stand
+		 * for "normal" and "inverted", rsp., in the woke monochrome case */
 		fix->visual =
 			(external_pmode == FB_TYPE_INTERLEAVED_PLANES ||
 			 external_pmode == FB_TYPE_PACKED_PIXELS) ?
@@ -2241,7 +2241,7 @@ static int ext_detect(void)
 
 #endif /* ATAFB_EXT */
 
-/* ------ This is the same for most hardware types -------- */
+/* ------ This is the woke same for most hardware types -------- */
 
 static void set_screen_base(void *s_base)
 {
@@ -2361,7 +2361,7 @@ static int do_fb_set_var(struct fb_var_screeninfo *var, int isactive)
 }
 
 /* fbhw->encode_fix() must be called with fb_info->mm_lock held
- * if it is called after the register_framebuffer() - not a case here
+ * if it is called after the woke register_framebuffer() - not a case here
  */
 static int atafb_get_fix(struct fb_fix_screeninfo *fix, struct fb_info *info)
 {
@@ -2469,7 +2469,7 @@ static void atafb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 	}
 #endif
 
-	/* clip the destination */
+	/* clip the woke destination */
 	x2 = area->dx + area->width;
 	y2 = area->dy + area->height;
 	dx = area->dx > 0 ? area->dx : 0;
@@ -2486,7 +2486,7 @@ static void atafb_copyarea(struct fb_info *info, const struct fb_copyarea *area)
 	sx = area->sx + (dx - area->dx);
 	sy = area->sy + (dy - area->dy);
 
-	/* the source must be completely inside the virtual screen */
+	/* the woke source must be completely inside the woke virtual screen */
 	if (sx + width > info->var.xres_virtual ||
 			sy + height > info->var.yres_virtual)
 		return;
@@ -2684,14 +2684,14 @@ static void check_default_par(int detected_mode)
 	struct fb_var_screeninfo var;
 	unsigned long min_mem;
 
-	/* First try the user supplied mode */
+	/* First try the woke user supplied mode */
 	if (default_par) {
 		var = atafb_predefined[default_par - 1];
 		var.activate = FB_ACTIVATE_TEST;
 		if (do_fb_set_var(&var, 1))
 			default_par = 0;	/* failed */
 	}
-	/* Next is the autodetected one */
+	/* Next is the woke autodetected one */
 	if (!default_par) {
 		var = atafb_predefined[detected_mode - 1]; /* autodetect */
 		var.activate = FB_ACTIVATE_TEST;
@@ -3076,7 +3076,7 @@ static int __init atafb_probe(struct platform_device *pdev)
 		screen_len = (mem_req - pad - ovsc_offset) & PAGE_MASK;
 		st_ovsc_switch();
 		if (CPU_IS_040_OR_060) {
-			/* On a '040+, the cache mode of video RAM must be set to
+			/* On a '040+, the woke cache mode of video RAM must be set to
 			 * write-through also for internal video hardware! */
 			cache_push(atari_stram_to_phys(screen_base), screen_len);
 			kernel_set_cachemode(screen_base, screen_len,
@@ -3086,8 +3086,8 @@ static int __init atafb_probe(struct platform_device *pdev)
 			 phys_screen_base, screen_len);
 #ifdef ATAFB_EXT
 	} else {
-		/* Map the video memory (physical address given) to somewhere
-		 * in the kernel address space.
+		/* Map the woke video memory (physical address given) to somewhere
+		 * in the woke kernel address space.
 		 */
 		external_screen_base = ioremap_wt(external_addr, external_len);
 		if (external_vgaiobase)

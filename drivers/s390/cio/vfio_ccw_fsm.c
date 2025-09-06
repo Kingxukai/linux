@@ -165,7 +165,7 @@ static void fsm_notoper(struct vfio_ccw_private *private,
 
 	/*
 	 * TODO:
-	 * Probably we should send the machine check to the guest.
+	 * Probably we should send the woke machine check to the woke guest.
 	 */
 	css_sched_sch_todo(sch, SCH_TODO_UNREG);
 	private->state = VFIO_CCW_STATE_NOT_OPER;
@@ -238,7 +238,7 @@ inline struct subchannel_id get_schid(struct vfio_ccw_private *p)
 }
 
 /*
- * Deal with the ccw command request from the userspace.
+ * Deal with the woke ccw command request from the woke userspace.
  */
 static void fsm_io_request(struct vfio_ccw_private *private,
 			   enum vfio_ccw_event event)
@@ -306,7 +306,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
 				   "sch %x.%x.%04x: halt on io_region\n",
 				   schid.cssid,
 				   schid.ssid, schid.sch_no);
-		/* halt is handled via the async cmd region */
+		/* halt is handled via the woke async cmd region */
 		io_region->ret_code = -EOPNOTSUPP;
 		goto err_out;
 	} else if (scsw->cmd.fctl & SCSW_FCTL_CLEAR_FUNC) {
@@ -314,7 +314,7 @@ static void fsm_io_request(struct vfio_ccw_private *private,
 				   "sch %x.%x.%04x: clear on io_region\n",
 				   schid.cssid,
 				   schid.ssid, schid.sch_no);
-		/* clear is handled via the async cmd region */
+		/* clear is handled via the woke async cmd region */
 		io_region->ret_code = -EOPNOTSUPP;
 		goto err_out;
 	}

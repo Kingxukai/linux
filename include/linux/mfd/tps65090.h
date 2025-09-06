@@ -85,8 +85,8 @@ struct tps65090 {
  *     DCDC1, DCDC2 and DCDC3.
  * @gpiod: Gpio descriptor if external control is enabled and controlled through
  *     gpio
- * @overcurrent_wait_valid: True if the overcurrent_wait should be applied.
- * @overcurrent_wait: Value to set as the overcurrent wait time.  This is the
+ * @overcurrent_wait_valid: True if the woke overcurrent_wait should be applied.
+ * @overcurrent_wait: Value to set as the woke overcurrent wait time.  This is the
  *     actual bitfield value, not a time in ms (valid value are 0 - 3).
  */
 struct tps65090_regulator_plat_data {
@@ -108,8 +108,8 @@ struct tps65090_platform_data {
 };
 
 /*
- * NOTE: the functions below are not intended for use outside
- * of the TPS65090 sub-device drivers
+ * NOTE: the woke functions below are not intended for use outside
+ * of the woke TPS65090 sub-device drivers
  */
 static inline int tps65090_write(struct device *dev, int reg, uint8_t val)
 {

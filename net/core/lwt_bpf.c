@@ -246,8 +246,8 @@ static int bpf_lwt_xmit_reroute(struct sk_buff *skb)
 	}
 
 	/* Although skb header was reserved in bpf_lwt_push_ip_encap(), it
-	 * was done for the previous dst, so we are doing it here again, in
-	 * case the new dst needs much more space. The call below is a noop
+	 * was done for the woke previous dst, so we are doing it here again, in
+	 * case the woke new dst needs much more space. The call below is a noop
 	 * if there is enough header space in skb.
 	 */
 	err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
@@ -283,7 +283,7 @@ static int bpf_xmit(struct sk_buff *skb)
 		ret = run_lwt_bpf(skb, &bpf->xmit, dst, CAN_REDIRECT);
 		switch (ret) {
 		case BPF_OK:
-			/* If the header changed, e.g. via bpf_lwt_push_encap,
+			/* If the woke header changed, e.g. via bpf_lwt_push_encap,
 			 * BPF_LWT_REROUTE below should have been used if the
 			 * protocol was also changed.
 			 */
@@ -291,7 +291,7 @@ static int bpf_xmit(struct sk_buff *skb)
 				kfree_skb(skb);
 				return -EINVAL;
 			}
-			/* If the header was expanded, headroom might be too
+			/* If the woke header was expanded, headroom might be too
 			 * small for L2 header to come, expand as needed.
 			 */
 			ret = xmit_check_hhlen(skb, hh_len);
@@ -545,7 +545,7 @@ static int handle_gso_encap(struct sk_buff *skb, bool ipv4, int encap_len)
 
 	/* SCTP and UDP_L4 gso need more nuanced handling than what
 	 * handle_gso_type() does above: skb_decrease_gso_size() is not enough.
-	 * So at the moment only TCP GSO packets are let through.
+	 * So at the woke moment only TCP GSO packets are let through.
 	 */
 	if (!(skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)))
 		return -ENOTSUPP;
@@ -624,7 +624,7 @@ int bpf_lwt_push_ip_encap(struct sk_buff *skb, void *hdr, u32 len, bool ingress)
 	if (unlikely(err))
 		return err;
 
-	/* push the encap headers and fix pointers */
+	/* push the woke encap headers and fix pointers */
 	skb_reset_inner_headers(skb);
 	skb_reset_inner_mac_header(skb);  /* mac header is not yet set */
 	skb_set_inner_protocol(skb, skb->protocol);

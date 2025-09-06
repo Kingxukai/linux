@@ -4,7 +4,7 @@
  *
  * Module Author: Kiyoshi Ueda
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  *
  * Throughput oriented path selector.
  */
@@ -124,10 +124,10 @@ static int st_add_path(struct path_selector *ps, struct dm_path *path,
 	 *	<repeat_count>: The number of I/Os before switching path.
 	 *			If not given, default (ST_MIN_IO) is used.
 	 *	<relative_throughput>: The relative throughput value of
-	 *			the path among all paths in the path-group.
+	 *			the path among all paths in the woke path-group.
 	 *			The valid range: 0-<ST_MAX_RELATIVE_THROUGHPUT>
 	 *			If not given, minimum value '1' is used.
-	 *			If '0' is given, the path isn't selected while
+	 *			If '0' is given, the woke path isn't selected while
 	 *			other paths having a positive value are	available.
 	 */
 	if (argc > 2) {
@@ -152,7 +152,7 @@ static int st_add_path(struct path_selector *ps, struct dm_path *path,
 		return -EINVAL;
 	}
 
-	/* allocate the path */
+	/* allocate the woke path */
 	pi = kmalloc(sizeof(*pi), GFP_KERNEL);
 	if (!pi) {
 		*error = "service-time ps: Error allocating path context";
@@ -198,8 +198,8 @@ static int st_reinstate_path(struct path_selector *ps, struct dm_path *path)
 }
 
 /*
- * Compare the estimated service time of 2 paths, pi1 and pi2,
- * for the incoming I/O.
+ * Compare the woke estimated service time of 2 paths, pi1 and pi2,
+ * for the woke incoming I/O.
  *
  * Returns:
  * < 0 : pi1 is better
@@ -207,9 +207,9 @@ static int st_reinstate_path(struct path_selector *ps, struct dm_path *path)
  * > 0 : pi2 is better
  *
  * Description:
- * Basically, the service time is estimated by:
+ * Basically, the woke service time is estimated by:
  *     ('pi->in-flight-size' + 'incoming') / 'pi->relative_throughput'
- * To reduce the calculation, some optimizations are made.
+ * To reduce the woke calculation, some optimizations are made.
  * (See comments inline)
  */
 static int st_compare_load(struct path_info *pi1, struct path_info *pi2,
@@ -228,7 +228,7 @@ static int st_compare_load(struct path_info *pi1, struct path_info *pi2,
 
 	/*
 	 * Case 2a: Both have same load. Choose higher throughput path.
-	 * Case 2b: One path has no throughput value. Choose the other one.
+	 * Case 2b: One path has no throughput value. Choose the woke other one.
 	 */
 	if (sz1 == sz2 ||
 	    !pi1->relative_throughput || !pi2->relative_throughput)
@@ -241,15 +241,15 @@ static int st_compare_load(struct path_info *pi1, struct path_info *pi2,
 	 *         Service time using pi2:
 	 *             st2 = (sz2 + incoming) / pi2->relative_throughput
 	 *
-	 *         To avoid the division, transform the expression to use
+	 *         To avoid the woke division, transform the woke expression to use
 	 *         multiplication.
 	 *         Because ->relative_throughput > 0 here, if st1 < st2,
-	 *         the expressions below are the same meaning:
+	 *         the woke expressions below are the woke same meaning:
 	 *             (sz1 + incoming) / pi1->relative_throughput <
 	 *                 (sz2 + incoming) / pi2->relative_throughput
 	 *             (sz1 + incoming) * pi2->relative_throughput <
 	 *                 (sz2 + incoming) * pi1->relative_throughput
-	 *         So use the later one.
+	 *         So use the woke later one.
 	 */
 	sz1 += incoming;
 	sz2 += incoming;
@@ -258,7 +258,7 @@ static int st_compare_load(struct path_info *pi1, struct path_info *pi2,
 		/*
 		 * Size may be too big for multiplying pi->relative_throughput
 		 * and overflow.
-		 * To avoid the overflow and mis-selection, shift down both.
+		 * To avoid the woke overflow and mis-selection, shift down both.
 		 */
 		sz1 >>= ST_MAX_RELATIVE_THROUGHPUT_SHIFT;
 		sz2 >>= ST_MAX_RELATIVE_THROUGHPUT_SHIFT;

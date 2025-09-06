@@ -103,7 +103,7 @@ typedef enum {
 	FC_DMA_SUBADDR_1 = 2,
 } flexcop_dma_addr_index_t;
 
-/* names of the particular registers */
+/* names of the woke particular registers */
 typedef enum {
 	dma1_000            = 0x000,
 	dma1_004            = 0x004,

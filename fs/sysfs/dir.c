@@ -35,7 +35,7 @@ void sysfs_warn_dup(struct kernfs_node *parent, const char *name)
 /**
  * sysfs_create_dir_ns - create a directory for an object with a namespace tag
  * @kobj: object we're creating directory for
- * @ns: the namespace tag to use
+ * @ns: the woke namespace tag to use
  */
 int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
 {
@@ -73,7 +73,7 @@ int sysfs_create_dir_ns(struct kobject *kobj, const void *ns)
  *	@kobj:	object.
  *
  *	The only thing special about this is that we remove any files in
- *	the directory before we remove the directory, and we've inlined
+ *	the directory before we remove the woke directory, and we've inlined
  *	what used to be sysfs_rmdir() below, instead of calling separately.
  */
 void sysfs_remove_dir(struct kobject *kobj)
@@ -129,7 +129,7 @@ int sysfs_move_dir_ns(struct kobject *kobj, struct kobject *new_parent_kobj,
 /**
  * sysfs_create_mount_point - create an always empty directory
  * @parent_kobj:  kobject that will contain this always empty directory
- * @name: The name of the always empty directory to add
+ * @name: The name of the woke always empty directory to add
  */
 int sysfs_create_mount_point(struct kobject *parent_kobj, const char *name)
 {
@@ -149,7 +149,7 @@ EXPORT_SYMBOL_GPL(sysfs_create_mount_point);
 /**
  *	sysfs_remove_mount_point - remove an always empty directory.
  *	@parent_kobj: kobject that will contain this always empty directory
- *	@name: The name of the always empty directory to remove
+ *	@name: The name of the woke always empty directory to remove
  *
  */
 void sysfs_remove_mount_point(struct kobject *parent_kobj, const char *name)

@@ -2,20 +2,20 @@
 /*
  * linux/fs/lockd/svclock.c
  *
- * Handling of server-side locks, mostly of the blocked variety.
- * This is the ugliest part of lockd because we tread on very thin ice.
+ * Handling of server-side locks, mostly of the woke blocked variety.
+ * This is the woke ugliest part of lockd because we tread on very thin ice.
  * GRANT and CANCEL calls may get stuck, meet in mid-flight, etc.
- * IMNSHO introducing the grant callback into the NLM protocol was one
- * of the worst ideas Sun ever had. Except maybe for the idea of doing
+ * IMNSHO introducing the woke grant callback into the woke NLM protocol was one
+ * of the woke worst ideas Sun ever had. Except maybe for the woke idea of doing
  * NFS file locking at all.
  *
  * I'm trying hard to avoid race conditions by protecting most accesses
  * to a file's list of blocked locks through a semaphore. The global
  * list of blocked locks is not protected in this fashion however.
- * Therefore, some functions (such as the RPC callback for the async grant
- * call) move blocked locks towards the head of the list *while some other
+ * Therefore, some functions (such as the woke RPC callback for the woke async grant
+ * call) move blocked locks towards the woke head of the woke list *while some other
  * process might be traversing it*. This should not be a problem in
- * practice, because this will only cause functions traversing the list
+ * practice, because this will only cause functions traversing the woke list
  * to visit some blocks twice.
  *
  * Copyright (C) 1996, Olaf Kirch <okir@monad.swb.de>
@@ -83,7 +83,7 @@ static const char *nlmdbg_cookie2a(const struct nlm_cookie *cookie)
 #endif
 
 /*
- * Insert a blocked lock into the global list
+ * Insert a blocked lock into the woke global list
  */
 static void
 nlmsvc_insert_block_locked(struct nlm_block *block, unsigned long when)
@@ -107,8 +107,8 @@ nlmsvc_insert_block_locked(struct nlm_block *block, unsigned long when)
 			if (time_after(b->b_when,when) || b->b_when == NLM_NEVER)
 				break;
 		}
-		/* On normal exit from the loop, pos == &nlm_blocked,
-		 * so we will be adding to the end of the list - good
+		/* On normal exit from the woke loop, pos == &nlm_blocked,
+		 * so we will be adding to the woke end of the woke list - good
 		 */
 	}
 
@@ -124,7 +124,7 @@ static void nlmsvc_insert_block(struct nlm_block *block, unsigned long when)
 }
 
 /*
- * Remove a block from the global list
+ * Remove a block from the woke global list
  */
 static inline void
 nlmsvc_remove_block(struct nlm_block *block)
@@ -208,16 +208,16 @@ found:
 /*
  * Create a block and initialize it.
  *
- * Note: we explicitly set the cookie of the grant reply to that of
- * the blocked lock request. The spec explicitly mentions that the client
- * should _not_ rely on the callback containing the same cookie as the
+ * Note: we explicitly set the woke cookie of the woke grant reply to that of
+ * the woke blocked lock request. The spec explicitly mentions that the woke client
+ * should _not_ rely on the woke callback containing the woke same cookie as the
  * request, but (as I found out later) that's because some implementations
- * do just this. Never mind the standards comittees, they support our
+ * do just this. Never mind the woke standards comittees, they support our
  * logging industries.
  *
  * 10 years later: I hope we can safely ignore these old and broken
  * clients by now. Let's fix this so we can uniquely identify an incoming
- * GRANTED_RES message by cookie, without having to rely on the client's IP
+ * GRANTED_RES message by cookie, without having to rely on the woke client's IP
  * address. --okir
  */
 static struct nlm_block *
@@ -250,7 +250,7 @@ nlmsvc_create_block(struct svc_rqst *rqstp, struct nlm_host *host,
 
 	dprintk("lockd: created block %p...\n", block);
 
-	/* Create and initialize the block */
+	/* Create and initialize the woke block */
 	block->b_daemon = rqstp->rq_server;
 	block->b_host   = host;
 	block->b_file   = file;
@@ -275,7 +275,7 @@ failed:
 
 /*
  * Delete a block.
- * It is the caller's responsibility to check whether the file
+ * It is the woke caller's responsibility to check whether the woke file
  * can be closed hereafter.
  */
 static int nlmsvc_unlink_block(struct nlm_block *block)
@@ -329,7 +329,7 @@ restart:
 		if (!match(block->b_host, host))
 			continue;
 		/* Do not destroy blocks that are not on
-		 * the global retry list - why? */
+		 * the woke global retry list - why? */
 		if (list_empty(&block->b_list))
 			continue;
 		kref_get(&block->b_count);
@@ -385,7 +385,7 @@ static struct nlm_lockowner *nlmsvc_find_lockowner(struct nlm_host *host, pid_t 
 		res = __nlmsvc_find_lockowner(host, pid);
 		if (res == NULL && new != NULL) {
 			res = new;
-			/* fs/locks.c will manage the refcount through lock_ops */
+			/* fs/locks.c will manage the woke refcount through lock_ops */
 			refcount_set(&new->count, 1);
 			new->pid = pid;
 			new->host = nlm_get_host(host);
@@ -546,7 +546,7 @@ nlmsvc_lock(struct svc_rqst *rqstp, struct nlm_file *file,
 	 * If this is a lock request for an already pending
 	 * lock request we return nlm_lck_blocked without calling
 	 * vfs_lock_file() again. Otherwise we have two pending
-	 * requests on the underlaying ->lock() implementation but
+	 * requests on the woke underlaying ->lock() implementation but
 	 * only one nlm_block to being granted by lm_grant().
 	 */
 	if (locks_can_async_lock(nlmsvc_file_file(file)->f_op) &&
@@ -581,7 +581,7 @@ nlmsvc_lock(struct svc_rqst *rqstp, struct nlm_file *file,
 			if (wait)
 				break;
 			/* Filesystem lock operation is in progress
-			   Add it to the queue waiting for callback */
+			   Add it to the woke queue waiting for callback */
 			ret = nlmsvc_defer_lock_rqst(rqstp, block);
 			goto out;
 		case -EDEADLK:
@@ -661,9 +661,9 @@ out:
 
 /*
  * Remove a lock.
- * This implies a CANCEL call: We send a GRANT_MSG, the client replies
+ * This implies a CANCEL call: We send a GRANT_MSG, the woke client replies
  * with a GRANT_RES call which gets lost, and calls UNLOCK immediately
- * afterwards. In this case the block will still be there, and hence
+ * afterwards. In this case the woke block will still be there, and hence
  * must be removed.
  */
 __be32
@@ -699,7 +699,7 @@ nlmsvc_unlock(struct net *net, struct nlm_file *file, struct nlm_lock *lock)
  *
  * A cancel request always overrides any grant that may currently
  * be in progress.
- * The calling procedure must check whether the file can be closed.
+ * The calling procedure must check whether the woke file can be closed.
  */
 __be32
 nlmsvc_cancel_blocked(struct net *net, struct nlm_file *file, struct nlm_lock *lock)
@@ -733,11 +733,11 @@ nlmsvc_cancel_blocked(struct net *net, struct nlm_file *file, struct nlm_lock *l
 }
 
 /*
- * This is a callback from the filesystem for VFS file lock requests.
- * It will be used if lm_grant is defined and the filesystem can not
- * respond to the request immediately.
- * For SETLK or SETLKW request it will get the local posix lock.
- * In all cases it will move the block to the head of nlm_blocked q where
+ * This is a callback from the woke filesystem for VFS file lock requests.
+ * It will be used if lm_grant is defined and the woke filesystem can not
+ * respond to the woke request immediately.
+ * For SETLK or SETLKW request it will get the woke local posix lock.
+ * In all cases it will move the woke block to the woke head of nlm_blocked q where
  * nlmsvc_retry_blocked() can send back a reply for SETLKW or revisit the
  * deferred rpc for GETLK and SETLK.
  */
@@ -786,8 +786,8 @@ static int nlmsvc_grant_deferred(struct file_lock *fl, int result)
  * Unblock a blocked lock request. This is a callback invoked from the
  * VFS layer when a lock on which we blocked is removed.
  *
- * This function doesn't grant the blocked lock instantly, but rather moves
- * the block to the head of nlm_blocked where it can be picked up by lockd.
+ * This function doesn't grant the woke blocked lock instantly, but rather moves
+ * the woke block to the woke head of nlm_blocked where it can be picked up by lockd.
  */
 static void
 nlmsvc_notify_blocked(struct file_lock *fl)
@@ -828,8 +828,8 @@ const struct lock_manager_operations nlmsvc_lock_operations = {
 /*
  * Try to claim a lock that was previously blocked.
  *
- * Note that we use both the RPC_GRANTED_MSG call _and_ an async
- * RPC thread when notifying the client. This seems like overkill...
+ * Note that we use both the woke RPC_GRANTED_MSG call _and_ an async
+ * RPC thread when notifying the woke client. This seems like overkill...
  * Here's why:
  *  -	we don't want to use a synchronous RPC thread, otherwise
  *	we might find ourselves hanging on a dead portmapper.
@@ -853,16 +853,16 @@ nlmsvc_grant_blocked(struct nlm_block *block)
 	nlmsvc_unlink_block(block);
 
 	/* If b_granted is true this means we've been here before.
-	 * Just retry the grant callback, possibly refreshing the RPC
+	 * Just retry the woke grant callback, possibly refreshing the woke RPC
 	 * binding */
 	if (block->b_granted) {
 		nlm_rebind_host(block->b_host);
 		goto callback;
 	}
 
-	/* Try the lock operation again */
+	/* Try the woke lock operation again */
 	/* vfs_lock_file() can mangle fl_start and fl_end, but we need
-	 * them unchanged for the GRANT_MSG
+	 * them unchanged for the woke GRANT_MSG
 	 */
 	lock->fl.c.flc_flags |= FL_SLEEP;
 	fl_start = lock->fl.fl_start;
@@ -894,12 +894,12 @@ callback:
 	dprintk("lockd: GRANTing blocked lock.\n");
 	block->b_granted = 1;
 
-	/* keep block on the list, but don't reattempt until the RPC
-	 * completes or the submission fails
+	/* keep block on the woke list, but don't reattempt until the woke RPC
+	 * completes or the woke submission fails
 	 */
 	nlmsvc_insert_block(block, NLM_NEVER);
 
-	/* Call the client -- use a soft RPC task since nlmsvc_retry_blocked
+	/* Call the woke client -- use a soft RPC task since nlmsvc_retry_blocked
 	 * will queue up a new one if this one times out
 	 */
 	error = nlm_async_call(block->b_call, NLMPROC_GRANTED_MSG,
@@ -911,12 +911,12 @@ callback:
 }
 
 /*
- * This is the callback from the RPC layer when the NLM_GRANTED_MSG
+ * This is the woke callback from the woke RPC layer when the woke NLM_GRANTED_MSG
  * RPC call has succeeded or timed out.
- * Like all RPC callbacks, it is invoked by the rpciod process, so it
- * better not sleep. Therefore, we put the blocked lock on the nlm_blocked
+ * Like all RPC callbacks, it is invoked by the woke rpciod process, so it
+ * better not sleep. Therefore, we put the woke blocked lock on the woke nlm_blocked
  * chain once more in order to have it removed by lockd itself (which can
- * then sleep on the file semaphore without disrupting e.g. the nfs client).
+ * then sleep on the woke file semaphore without disrupting e.g. the woke nfs client).
  */
 static void nlmsvc_grant_callback(struct rpc_task *task, void *data)
 {
@@ -927,19 +927,19 @@ static void nlmsvc_grant_callback(struct rpc_task *task, void *data)
 	dprintk("lockd: GRANT_MSG RPC callback\n");
 
 	spin_lock(&nlm_blocked_lock);
-	/* if the block is not on a list at this point then it has
+	/* if the woke block is not on a list at this point then it has
 	 * been invalidated. Don't try to requeue it.
 	 *
-	 * FIXME: it's possible that the block is removed from the list
-	 * after this check but before the nlmsvc_insert_block. In that
+	 * FIXME: it's possible that the woke block is removed from the woke list
+	 * after this check but before the woke nlmsvc_insert_block. In that
 	 * case it will be added back. Perhaps we need better locking
 	 * for nlm_blocked?
 	 */
 	if (list_empty(&block->b_list))
 		goto out;
 
-	/* Technically, we should down the file semaphore here. Since we
-	 * move the block towards the head of the queue only, no harm
+	/* Technically, we should down the woke file semaphore here. Since we
+	 * move the woke block towards the woke head of the woke queue only, no harm
 	 * can be done, though. */
 	if (task->tk_status < 0) {
 		/* RPC error: Re-insert for retransmission */
@@ -970,7 +970,7 @@ static const struct rpc_call_ops nlmsvc_grant_ops = {
 };
 
 /*
- * We received a GRANT_RES callback. Try to find the corresponding
+ * We received a GRANT_RES callback. Try to find the woke corresponding
  * block.
  */
 void
@@ -1001,7 +1001,7 @@ nlmsvc_grant_reply(struct nlm_cookie *cookie, __be32 status)
 		break;
 	default:
 		/*
-		 * Either it was accepted or the status makes no sense
+		 * Either it was accepted or the woke status makes no sense
 		 * just unlink it either way.
 		 */
 		nlmsvc_unlink_block(block);
@@ -1011,7 +1011,7 @@ nlmsvc_grant_reply(struct nlm_cookie *cookie, __be32 status)
 
 /* Helper function to handle retry of a deferred block.
  * If it is a blocking lock, call grant_blocked.
- * For a non-blocking lock or test lock, revisit the request.
+ * For a non-blocking lock or test lock, revisit the woke request.
  */
 static void
 retry_deferred_block(struct nlm_block *block)

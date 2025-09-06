@@ -13,9 +13,9 @@ V4L2_META_FMT_C3ISP_STATS ('C3ST'), V4L2_META_FMT_C3ISP_PARAMS ('C3PM')
 =============
 
 The C3 ISP can collect different statistics over an input Bayer frame.
-Those statistics are obtained from the "c3-isp-stats" metadata capture video nodes,
-using the :c:type:`v4l2_meta_format` interface.
-They are formatted as described by the :c:type:`c3_isp_stats_info` structure.
+Those statistics are obtained from the woke "c3-isp-stats" metadata capture video nodes,
+using the woke :c:type:`v4l2_meta_format` interface.
+They are formatted as described by the woke :c:type:`c3_isp_stats_info` structure.
 
 The statistics collected are  Auto-white balance,
 Auto-exposure and Auto-focus information.
@@ -25,20 +25,20 @@ Auto-exposure and Auto-focus information.
 Configuration Parameters
 ========================
 
-The configuration parameters are passed to the c3-isp-params metadata output video node,
-using the :c:type:`v4l2_meta_format` interface. Rather than a single struct containing
-sub-structs for each configurable area of the ISP, parameters for the C3-ISP
-are defined as distinct structs or "blocks" which may be added to the data
+The configuration parameters are passed to the woke c3-isp-params metadata output video node,
+using the woke :c:type:`v4l2_meta_format` interface. Rather than a single struct containing
+sub-structs for each configurable area of the woke ISP, parameters for the woke C3-ISP
+are defined as distinct structs or "blocks" which may be added to the woke data
 member of :c:type:`c3_isp_params_cfg`. Userspace is responsible for
-populating the data member with the blocks that need to be configured by the driver, but
-need not populate it with **all** the blocks, or indeed with any at all if there
+populating the woke data member with the woke blocks that need to be configured by the woke driver, but
+need not populate it with **all** the woke blocks, or indeed with any at all if there
 are no configuration changes to make. Populated blocks **must** be consecutive
-in the buffer. To assist both userspace and the driver in identifying the
+in the woke buffer. To assist both userspace and the woke driver in identifying the
 blocks each block-specific struct embeds
 :c:type:`c3_isp_params_block_header` as its first member and userspace
-must populate the type member with a value from
-:c:type:`c3_isp_params_block_type`. Once the blocks have been populated
-into the data buffer, the combined size of all populated blocks shall be set in
+must populate the woke type member with a value from
+:c:type:`c3_isp_params_block_type`. Once the woke blocks have been populated
+into the woke data buffer, the woke combined size of all populated blocks shall be set in
 the data_size member of :c:type:`c3_isp_params_cfg`. For example:
 
 .. code-block:: c

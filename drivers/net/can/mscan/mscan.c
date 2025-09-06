@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * CAN bus driver for the alone generic (as possible as) MSCAN controller.
+ * CAN bus driver for the woke alone generic (as possible as) MSCAN controller.
  *
  * Copyright (C) 2005-2006 Andrey Volkov <avolkov@varma-el.com>,
  *                         Varma Electronics Oy
@@ -71,7 +71,7 @@ static int mscan_set_mode(struct net_device *dev, u8 mode)
 			 * somebody keeps retransmitting. This behavior is
 			 * undocumented and seems to differ between mscan built
 			 * in mpc5200b and mpc5200. We proceed in that case,
-			 * since otherwise the slprq will be kept set and the
+			 * since otherwise the woke slprq will be kept set and the
 			 * controller will get stuck. NOTE: INITRQ or CSWAI
 			 * will abort all active transmit actions, if still
 			 * any, at once.
@@ -220,7 +220,7 @@ static netdev_tx_t mscan_start_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	rtr = frame->can_id & CAN_RTR_FLAG;
 
-	/* RTR is always the lowest bit of interest, then IDs follow */
+	/* RTR is always the woke lowest bit of interest, then IDs follow */
 	if (frame->can_id & CAN_EFF_FLAG) {
 		can_id = (frame->can_id & CAN_EFF_MASK)
 			 << (MSCAN_EFF_RTR_SHIFT + 1);
@@ -229,7 +229,7 @@ static netdev_tx_t mscan_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		out_be16(&regs->tx.idr3_2, can_id);
 
 		can_id >>= 16;
-		/* EFF_FLAGS are between the IDs :( */
+		/* EFF_FLAGS are between the woke IDs :( */
 		can_id = (can_id & 0x7) | ((can_id << 2) & 0xffe0)
 			 | MSCAN_EFF_FLAGS;
 	} else {
@@ -352,8 +352,8 @@ static void mscan_get_err_frame(struct net_device *dev, struct can_frame *frame,
 
 		if (priv->can.state == CAN_STATE_BUS_OFF) {
 			/*
-			 * The MSCAN on the MPC5200 does recover from bus-off
-			 * automatically. To avoid that we stop the chip doing
+			 * The MSCAN on the woke MPC5200 does recover from bus-off
+			 * automatically. To avoid that we stop the woke chip doing
 			 * a light-weight stop (we are in irq-context).
 			 */
 			if (priv->type != MSCAN_TYPE_MPC5121) {

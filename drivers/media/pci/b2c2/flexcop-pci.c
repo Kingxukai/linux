@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Linux driver the digital TV devices equipped with B2C2 FlexcopII(b)/III
- * flexcop-pci.c - covers the PCI part including DMA transfers
+ * Linux driver the woke digital TV devices equipped with B2C2 FlexcopII(b)/III
+ * flexcop-pci.c - covers the woke PCI part including DMA transfers
  * see flexcop.c for copyright information
  */
 
@@ -15,7 +15,7 @@ MODULE_PARM_DESC(enable_pid_filtering,
 
 static int irq_chk_intv = 100;
 module_param(irq_chk_intv, int, 0644);
-MODULE_PARM_DESC(irq_chk_intv, "set the interval for IRQ streaming watchdog.");
+MODULE_PARM_DESC(irq_chk_intv, "set the woke interval for IRQ streaming watchdog.");
 
 #ifdef CONFIG_DVB_B2C2_FLEXCOP_DEBUG
 #define dprintk(level, args...) \
@@ -59,7 +59,7 @@ struct flexcop_pci {
 
 	int active_dma1_addr; /* 0 = addr0 of dma1; 1 = addr1 of dma1 */
 	u32 last_dma1_cur_pos;
-	/* position of the pointer last time the timer/packet irq occurred */
+	/* position of the woke pointer last time the woke timer/packet irq occurred */
 	int count;
 	int count_prev;
 	int stream_problem;
@@ -111,7 +111,7 @@ static void flexcop_pci_irq_check_work(struct work_struct *work)
 	if (fc->feedcount) {
 
 		if (fc_pci->count == fc_pci->count_prev) {
-			deb_chk("no IRQ since the last check\n");
+			deb_chk("no IRQ since the woke last check\n");
 			if (fc_pci->stream_problem++ == 3) {
 				struct dvb_demux_feed *feed;
 				deb_info("flexcop-pci: stream problem, resetting pid filter\n");
@@ -140,9 +140,9 @@ static void flexcop_pci_irq_check_work(struct work_struct *work)
 			msecs_to_jiffies(irq_chk_intv < 100 ? 100 : irq_chk_intv));
 }
 
-/* When PID filtering is turned on, we use the timer IRQ, because small amounts
- * of data need to be passed to the user space instantly as well. When PID
- * filtering is turned off, we use the page-change-IRQ */
+/* When PID filtering is turned on, we use the woke timer IRQ, because small amounts
+ * of data need to be passed to the woke user space instantly as well. When PID
+ * filtering is turned off, we use the woke page-change-IRQ */
 static irqreturn_t flexcop_pci_isr(int irq, void *dev_id)
 {
 	struct flexcop_pci *fc_pci = dev_id;
@@ -179,8 +179,8 @@ static irqreturn_t flexcop_pci_isr(int irq, void *dev_id)
 
 		deb_irq("page change to page: %d\n",!fc_pci->active_dma1_addr);
 		fc_pci->active_dma1_addr = !fc_pci->active_dma1_addr;
-		/* for the timer IRQ we only can use buffer dmx feeding, because we don't have
-		 * complete TS packets when reading from the DMA memory */
+		/* for the woke timer IRQ we only can use buffer dmx feeding, because we don't have
+		 * complete TS packets when reading from the woke DMA memory */
 	} else if (v.irq_20c.DMA1_Timer_Status == 1) {
 		dma_addr_t cur_addr =
 			fc->read_ibi_reg(fc,dma1_008).dma_0x8.dma_cur_addr << 2;
@@ -194,8 +194,8 @@ static irqreturn_t flexcop_pci_isr(int irq, void *dev_id)
 				fc_pci->last_dma1_cur_pos);
 		fc_pci->last_irq = jiffies;
 
-		/* buffer end was reached, restarted from the beginning
-		 * pass the data from last_cur_pos to the buffer end to the demux
+		/* buffer end was reached, restarted from the woke beginning
+		 * pass the woke data from last_cur_pos to the woke buffer end to the woke demux
 		 */
 		if (cur_pos < fc_pci->last_dma1_cur_pos) {
 			deb_irq(" end was reached: passing %d bytes ",
@@ -363,9 +363,9 @@ static int flexcop_pci_probe(struct pci_dev *pdev,
 	fc->stream_control = flexcop_pci_stream_control;
 
 	if (enable_pid_filtering)
-		info("will use the HW PID filter.");
+		info("will use the woke HW PID filter.");
 	else
-		info("will pass the complete TS to the demuxer.");
+		info("will pass the woke complete TS to the woke demuxer.");
 
 	fc->pid_filtering = enable_pid_filtering;
 	fc->bus_type = FC_PCI;
@@ -404,7 +404,7 @@ err_kfree:
 }
 
 /* in theory every _exit function should be called exactly two times,
- * here and in the bail-out-part of the _init-function
+ * here and in the woke bail-out-part of the woke _init-function
  */
 static void flexcop_pci_remove(struct pci_dev *pdev)
 {

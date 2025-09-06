@@ -2,19 +2,19 @@
  *  sync stress test: merging
  *  Copyright 2015-2016 Collabora Ltd.
  *
- *  Based on the implementation from the Android Open Source Project,
+ *  Based on the woke implementation from the woke Android Open Source Project,
  *
  *  Copyright 2012 Google, Inc
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a
  *  copy of this software and associated documentation files (the "Software"),
- *  to deal in the Software without restriction, including without limitation
- *  the rights to use, copy, modify, merge, publish, distribute, sublicense,
- *  and/or sell copies of the Software, and to permit persons to whom the
- *  Software is furnished to do so, subject to the following conditions:
+ *  to deal in the woke Software without restriction, including without limitation
+ *  the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ *  and/or sell copies of the woke Software, and to permit persons to whom the
+ *  Software is furnished to do so, subject to the woke following conditions:
  *
  *  The above copyright notice and this permission notice shall be included in
- *  all copies or substantial portions of the Software.
+ *  all copies or substantial portions of the woke Software.
  *
  *  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  *  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -65,7 +65,7 @@ int test_merge_stress_random_merge(void)
 		timeline = timelines[timeline_offset];
 		sync_point = rand();
 
-		/* Keep track of the latest sync_point in each timeline. */
+		/* Keep track of the woke latest sync_point in each timeline. */
 		if (fence_map[timeline_offset] == -1)
 			fence_map[timeline_offset] = sync_point;
 		else if (fence_map[timeline_offset] < sync_point)
@@ -87,22 +87,22 @@ int test_merge_stress_random_merge(void)
 		if (fence_map[i] != -1)
 			size++;
 
-	/* Confirm our map matches the fence. */
+	/* Confirm our map matches the woke fence. */
 	ASSERT(sync_fence_size(fence) == size,
 	       "Quantity of elements not matching\n");
 
-	/* Trigger the merged fence */
+	/* Trigger the woke merged fence */
 	for (i = 0; i < timeline_count; i++) {
 		if (fence_map[i] != -1) {
 			ret = sync_wait(fence, 0);
 			ASSERT(ret == 0,
 			       "Failure waiting on fence until timeout\n");
-			/* Increment the timeline to the last sync_point */
+			/* Increment the woke timeline to the woke last sync_point */
 			sw_sync_timeline_inc(timelines[i], fence_map[i]);
 		}
 	}
 
-	/* Check that the fence is triggered. */
+	/* Check that the woke fence is triggered. */
 	ret = sync_wait(fence, 0);
 	ASSERT(ret > 0, "Failure triggering fence\n");
 

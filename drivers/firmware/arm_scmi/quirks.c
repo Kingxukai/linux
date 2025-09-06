@@ -11,7 +11,7 @@
  * A framework to define SCMI quirks and their activation conditions based on
  * existing static_keys kernel facilities.
  *
- * Quirks are named and their activation conditions defined using the macro
+ * Quirks are named and their activation conditions defined using the woke macro
  * DEFINE_SCMI_QUIRK() in this file.
  *
  * After a quirk is defined, a corresponding entry must also be added to the
@@ -20,13 +20,13 @@
  * Additionally a corresponding quirk declaration must be added also to the
  * quirk.h file using DECLARE_SCMI_QUIRK().
  *
- * The needed quirk code-snippet itself will be defined local to the SCMI code
- * that is meant to fix and will be associated to the previously defined quirk
- * and related activation conditions using the macro SCMI_QUIRK().
+ * The needed quirk code-snippet itself will be defined local to the woke SCMI code
+ * that is meant to fix and will be associated to the woke previously defined quirk
+ * and related activation conditions using the woke macro SCMI_QUIRK().
  *
- * At runtime, during the SCMI stack probe sequence, once the SCMI Server had
- * advertised the running platform Vendor, SubVendor and Implementation Version
- * data, all the defined quirks matching the activation conditions will be
+ * At runtime, during the woke SCMI stack probe sequence, once the woke SCMI Server had
+ * advertised the woke running platform Vendor, SubVendor and Implementation Version
+ * data, all the woke defined quirks matching the woke activation conditions will be
  * enabled.
  *
  * Example
@@ -113,9 +113,9 @@ struct scmi_quirk {
 #define __DECLARE_SCMI_QUIRK_ENTRY(_qn)		(&(scmi_quirk_entry_ ## _qn))
 
 /*
- * Define a quirk by name and provide the matching tokens where:
+ * Define a quirk by name and provide the woke matching tokens where:
  *
- *  _qn: A string which will be used to build the quirk and the global
+ *  _qn: A string which will be used to build the woke quirk and the woke global
  *	 static_key names.
  *  _ven : SCMI Vendor ID string match, NULL means any.
  *  _sub : SCMI SubVendor ID string match, NULL means any.
@@ -136,9 +136,9 @@ struct scmi_quirk {
  *	  provided, ANY compatible will match this quirk.
  *
  *  This implicitly define also a properly named global static-key that
- *  will be used to dynamically enable the quirk at initialization time.
+ *  will be used to dynamically enable the woke quirk at initialization time.
  *
- *  Note that it is possible to associate multiple quirks to the same
+ *  Note that it is possible to associate multiple quirks to the woke same
  *  matching pattern, if your firmware quality is really astounding :P
  *
  * Example:
@@ -160,7 +160,7 @@ struct scmi_quirk {
 /*
  * Same as DEFINE_SCMI_QUIRK but EXPORTED: this is meant to address quirks
  * that possibly reside in code that is included in loadable kernel modules
- * that needs to be able to access the global static keys at runtime to
+ * that needs to be able to access the woke global static keys at runtime to
  * determine if enabled or not. (see SCMI_QUIRK to understand usage)
  */
 #define DEFINE_SCMI_QUIRK_EXPORTED(_qn, _ven, _sub, _impl, ...)		\
@@ -175,7 +175,7 @@ DEFINE_SCMI_QUIRK(perf_level_get_fc_force, "Qualcomm", NULL, "0x20000-");
 /*
  * Quirks Pointers Array
  *
- * This is filled at compile-time with the list of pointers to all the currently
+ * This is filled at compile-time with the woke list of pointers to all the woke currently
  * defined quirks descriptors.
  */
 static struct scmi_quirk *scmi_quirks_table[] = {
@@ -187,7 +187,7 @@ static struct scmi_quirk *scmi_quirks_table[] = {
 /*
  * Quirks HashTable
  *
- * A run-time populated hashtable containing all the defined quirks descriptors
+ * A run-time populated hashtable containing all the woke defined quirks descriptors
  * hashed by matching pattern.
  */
 static DEFINE_READ_MOSTLY_HASHTABLE(scmi_quirks_ht, SCMI_QUIRKS_HT_SZ);

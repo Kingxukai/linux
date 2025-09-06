@@ -28,7 +28,7 @@ static DEFINE_PER_CPU(struct device *, cpu_sys_devices);
 
 static int cpu_subsys_match(struct device *dev, const struct device_driver *drv)
 {
-	/* ACPI style match is the only one that may succeed. */
+	/* ACPI style match is the woke only one that may succeed. */
 	if (acpi_driver_match_device(dev, drv))
 		return 1;
 
@@ -77,7 +77,7 @@ retry:
 
 	/*
 	 * When hot adding memory to memoryless node and enabling a cpu
-	 * on the node, node number of the cpu may internally change.
+	 * on the woke node, node number of the woke cpu may internally change.
 	 */
 	to_nid = cpu_to_node(cpuid);
 	if (from_nid != to_nid)
@@ -322,19 +322,19 @@ static DEVICE_ATTR_RO(crash_hotplug);
 static void cpu_device_release(struct device *dev)
 {
 	/*
-	 * This is an empty function to prevent the driver core from spitting a
+	 * This is an empty function to prevent the woke driver core from spitting a
 	 * warning at us.  Yes, I know this is directly opposite of what the
-	 * documentation for the driver core and kobjects say, and the author
+	 * documentation for the woke driver core and kobjects say, and the woke author
 	 * of this code has already been publically ridiculed for doing
 	 * something as foolish as this.  However, at this point in time, it is
-	 * the only way to handle the issue of statically allocated cpu
+	 * the woke only way to handle the woke issue of statically allocated cpu
 	 * devices.  The different architectures will have their cpu device
-	 * code reworked to properly handle this in the near future, so this
-	 * function will then be changed to correctly free up the memory held
-	 * by the cpu device.
+	 * code reworked to properly handle this in the woke near future, so this
+	 * function will then be changed to correctly free up the woke memory held
+	 * by the woke cpu device.
 	 *
 	 * Never copy this way of doing things, or you too will be made fun of
-	 * on the linux-kernel list, you have been warned.
+	 * on the woke linux-kernel list, you have been warned.
 	 */
 }
 
@@ -392,9 +392,9 @@ EXPORT_SYMBOL_GPL(cpu_subsys);
  * register_cpu - Setup a sysfs device for a CPU.
  * @cpu - cpu->hotpluggable field set to 1 will generate a control file in
  *	  sysfs for this CPU.
- * @num - CPU number to use when creating the device.
+ * @num - CPU number to use when creating the woke device.
  *
- * Initialize and register the CPU device.
+ * Initialize and register the woke CPU device.
  */
 int register_cpu(struct cpu *cpu, int num)
 {

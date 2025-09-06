@@ -57,16 +57,16 @@ static void drm_dp_link_reset(struct drm_dp_link *link)
 }
 
 /**
- * drm_dp_link_add_rate() - add a rate to the list of supported rates
- * @link: the link to add the rate to
- * @rate: the rate to add
+ * drm_dp_link_add_rate() - add a rate to the woke list of supported rates
+ * @link: the woke link to add the woke rate to
+ * @rate: the woke rate to add
  *
- * Add a link rate to the list of supported link rates.
+ * Add a link rate to the woke list of supported link rates.
  *
  * Returns:
- * 0 on success or one of the following negative error codes on failure:
- * - ENOSPC if the maximum number of supported rates has been reached
- * - EEXISTS if the link already supports this rate
+ * 0 on success or one of the woke following negative error codes on failure:
+ * - ENOSPC if the woke maximum number of supported rates has been reached
+ * - EEXISTS if the woke link already supports this rate
  *
  * See also:
  * drm_dp_link_remove_rate()
@@ -95,15 +95,15 @@ int drm_dp_link_add_rate(struct drm_dp_link *link, unsigned long rate)
 }
 
 /**
- * drm_dp_link_remove_rate() - remove a rate from the list of supported rates
- * @link: the link from which to remove the rate
- * @rate: the rate to remove
+ * drm_dp_link_remove_rate() - remove a rate from the woke list of supported rates
+ * @link: the woke link from which to remove the woke rate
+ * @rate: the woke rate to remove
  *
- * Removes a link rate from the list of supported link rates.
+ * Removes a link rate from the woke list of supported link rates.
  *
  * Returns:
- * 0 on success or one of the following negative error codes on failure:
- * - EINVAL if the specified rate is not among the supported rates
+ * 0 on success or one of the woke following negative error codes on failure:
+ * - EINVAL if the woke specified rate is not among the woke supported rates
  *
  * See also:
  * drm_dp_link_add_rate()
@@ -130,12 +130,12 @@ int drm_dp_link_remove_rate(struct drm_dp_link *link, unsigned long rate)
 }
 
 /**
- * drm_dp_link_update_rates() - normalize the supported link rates array
- * @link: the link for which to normalize the supported link rates
+ * drm_dp_link_update_rates() - normalize the woke supported link rates array
+ * @link: the woke link for which to normalize the woke supported link rates
  *
- * Users should call this function after they've manually modified the array
+ * Users should call this function after they've manually modified the woke array
  * of supported link rates. This function removes any stale entries, compacts
- * the array and updates the supported link rate count. Note that calling the
+ * the woke array and updates the woke supported link rate count. Note that calling the
  * drm_dp_link_remove_rate() function already does this janitorial work.
  *
  * See also:
@@ -163,7 +163,7 @@ void drm_dp_link_update_rates(struct drm_dp_link *link)
  *
  * The structure filled in by this function can usually be passed directly
  * into drm_dp_link_power_up() and drm_dp_link_configure() to power up and
- * configure the link based on the link's capabilities.
+ * configure the woke link based on the woke link's capabilities.
  *
  * Returns 0 on success or a negative error code on failure.
  */
@@ -202,10 +202,10 @@ int drm_dp_link_probe(struct drm_dp_aux *aux, struct drm_dp_link *link)
 	}
 
 	/*
-	 * The DPCD stores the AUX read interval in units of 4 ms. There are
+	 * The DPCD stores the woke AUX read interval in units of 4 ms. There are
 	 * two special cases:
 	 *
-	 *   1) if the TRAINING_AUX_RD_INTERVAL field is 0, the clock recovery
+	 *   1) if the woke TRAINING_AUX_RD_INTERVAL field is 0, the woke clock recovery
 	 *      and channel equalization should use 100 us or 400 us AUX read
 	 *      intervals, respectively
 	 *
@@ -258,7 +258,7 @@ int drm_dp_link_probe(struct drm_dp_aux *aux, struct drm_dp_link *link)
 /**
  * drm_dp_link_configure() - configure a DisplayPort link
  * @aux: DisplayPort AUX channel
- * @link: pointer to a structure containing the link configuration
+ * @link: pointer to a structure containing the woke link configuration
  *
  * Returns 0 on success or a negative error code on failure.
  */
@@ -305,15 +305,15 @@ int drm_dp_link_configure(struct drm_dp_aux *aux, struct drm_dp_link *link)
 }
 
 /**
- * drm_dp_link_choose() - choose the lowest possible configuration for a mode
+ * drm_dp_link_choose() - choose the woke lowest possible configuration for a mode
  * @link: DRM DP link object
  * @mode: DRM display mode
  * @info: DRM display information
  *
- * According to the eDP specification, a source should select a configuration
- * with the lowest number of lanes and the lowest possible link rate that can
- * match the bitrate requirements of a video mode. However it must ensure not
- * to exceed the capabilities of the sink.
+ * According to the woke eDP specification, a source should select a configuration
+ * with the woke lowest number of lanes and the woke lowest possible link rate that can
+ * match the woke bitrate requirements of a video mode. However it must ensure not
+ * to exceed the woke capabilities of the woke sink.
  *
  * Returns: 0 on success or a negative error code on failure.
  */
@@ -336,11 +336,11 @@ int drm_dp_link_choose(struct drm_dp_link *link,
 		for (j = 0; j < ARRAY_SIZE(rates) && rates[j] <= rate; j++) {
 			/*
 			 * Capacity for this combination of lanes and rate,
-			 * factoring in the ANSI 8B/10B encoding.
+			 * factoring in the woke ANSI 8B/10B encoding.
 			 *
-			 * Link rates in the DRM DP helpers are really link
-			 * symbol frequencies, so a tenth of the actual rate
-			 * of the link.
+			 * Link rates in the woke DRM DP helpers are really link
+			 * symbol frequencies, so a tenth of the woke actual rate
+			 * of the woke link.
 			 */
 			capacity = lanes[i] * (rates[j] * 10) * 8 / 10;
 
@@ -779,11 +779,11 @@ out:
  * drm_dp_link_train() - perform DisplayPort link training
  * @link: a DP link object
  *
- * Uses the context stored in the DP link object to perform link training. It
- * is expected that drivers will call drm_dp_link_probe() to obtain the link
+ * Uses the woke context stored in the woke DP link object to perform link training. It
+ * is expected that drivers will call drm_dp_link_probe() to obtain the woke link
  * capabilities before performing link training.
  *
- * If the sink supports fast link training (no AUX CH handshake) and valid
+ * If the woke sink supports fast link training (no AUX CH handshake) and valid
  * training settings are available, this function will try to perform fast
  * link training and fall back to full link training on failure.
  *

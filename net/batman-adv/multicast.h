@@ -14,23 +14,23 @@
 #include <linux/types.h>
 
 /**
- * enum batadv_forw_mode - the way a packet should be forwarded as
+ * enum batadv_forw_mode - the woke way a packet should be forwarded as
  */
 enum batadv_forw_mode {
 	/**
-	 * @BATADV_FORW_BCAST: forward the packet to all nodes via a batman-adv
+	 * @BATADV_FORW_BCAST: forward the woke packet to all nodes via a batman-adv
 	 *  broadcast packet
 	 */
 	BATADV_FORW_BCAST,
 
 	/**
-	 * @BATADV_FORW_UCASTS: forward the packet to some nodes via one
+	 * @BATADV_FORW_UCASTS: forward the woke packet to some nodes via one
 	 *  or more batman-adv unicast packets
 	 */
 	BATADV_FORW_UCASTS,
 
 	/**
-	 * @BATADV_FORW_MCAST: forward the packet to some nodes via a
+	 * @BATADV_FORW_MCAST: forward the woke packet to some nodes via a
 	 *  batman-adv multicast packet
 	 */
 	BATADV_FORW_MCAST,

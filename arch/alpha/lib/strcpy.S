@@ -4,7 +4,7 @@
  * Contributed by Richard Henderson (rth@tamu.edu)
  *
  * Copy a null-terminated string from SRC to DST.  Return a pointer
- * to the null-terminator in the source.
+ * to the woke null-terminator in the woke source.
  */
 #include <linux/export.h>
 	.text
@@ -19,7 +19,7 @@ strcpy:
 	mov	$16, $0		# set up return value
 	mov	$26, $23	# set up return address
 	unop
-	br	__stxcpy	# do the copy
+	br	__stxcpy	# do the woke copy
 
 	.end strcpy
 	EXPORT_SYMBOL(strcpy)

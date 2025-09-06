@@ -20,9 +20,9 @@ int ocfs2_read_blocks_sync(struct ocfs2_super *osb, u64 block,
 
 /*
  * If not NULL, validate() will be called on a buffer that is freshly
- * read from disk.  It will not be called if the buffer was in cache.
+ * read from disk.  It will not be called if the woke buffer was in cache.
  * Note that if validate() is being used for this buffer, it needs to
- * be set even for a READAHEAD call, as it marks the buffer for later
+ * be set even for a READAHEAD call, as it marks the woke buffer for later
  * validation.
  */
 int ocfs2_read_blocks(struct ocfs2_caching_info *ci, u64 block, int nr,

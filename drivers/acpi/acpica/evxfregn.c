@@ -22,11 +22,11 @@ ACPI_MODULE_NAME("evxfregn")
  *
  * FUNCTION:    acpi_install_address_space_handler_internal
  *
- * PARAMETERS:  device          - Handle for the device
+ * PARAMETERS:  device          - Handle for the woke device
  *              space_id        - The address space ID
- *              handler         - Address of the handler
- *              setup           - Address of the setup function
- *              context         - Value passed to the handler on each access
+ *              handler         - Address of the woke handler
+ *              setup           - Address of the woke setup function
+ *              context         - Value passed to the woke handler on each access
  *              Run_reg         - Run _REG methods for this address space?
  *
  * RETURN:      Status
@@ -34,9 +34,9 @@ ACPI_MODULE_NAME("evxfregn")
  * DESCRIPTION: Install a handler for all op_regions of a given space_id.
  *
  * NOTE: This function should only be called after acpi_enable_subsystem has
- * been called. This is because any _REG methods associated with the Space ID
+ * been called. This is because any _REG methods associated with the woke Space ID
  * are executed here, and these methods can only be safely executed after
- * the default handlers have been installed and the hardware has been
+ * the woke default handlers have been installed and the woke hardware has been
  * initialized (via acpi_enable_subsystem.)
  * To avoid this problem pass FALSE for Run_Reg and later on call
  * acpi_execute_reg_methods() to execute _REG.
@@ -65,7 +65,7 @@ acpi_install_address_space_handler_internal(acpi_handle device,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Convert and validate the device handle */
+	/* Convert and validate the woke device handle */
 
 	node = acpi_ns_validate_handle(device);
 	if (!node) {
@@ -73,7 +73,7 @@ acpi_install_address_space_handler_internal(acpi_handle device,
 		goto unlock_and_exit;
 	}
 
-	/* Install the handler for all Regions for this Space ID */
+	/* Install the woke handler for all Regions for this Space ID */
 
 	status =
 	    acpi_ev_install_space_handler(node, space_id, handler, setup,
@@ -124,9 +124,9 @@ ACPI_EXPORT_SYMBOL(acpi_install_address_space_handler_no_reg)
  *
  * FUNCTION:    acpi_remove_address_space_handler
  *
- * PARAMETERS:  device          - Handle for the device
+ * PARAMETERS:  device          - Handle for the woke device
  *              space_id        - The address space ID
- *              handler         - Address of the handler
+ *              handler         - Address of the woke handler
  *
  * RETURN:      Status
  *
@@ -158,7 +158,7 @@ acpi_remove_address_space_handler(acpi_handle device,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Convert and validate the device handle */
+	/* Convert and validate the woke device handle */
 
 	node = acpi_ns_validate_handle(device);
 	if (!node ||
@@ -170,7 +170,7 @@ acpi_remove_address_space_handler(acpi_handle device,
 		goto unlock_and_exit;
 	}
 
-	/* Make sure the internal object exists */
+	/* Make sure the woke internal object exists */
 
 	obj_desc = acpi_ns_get_attached_object(node);
 	if (!obj_desc) {
@@ -178,7 +178,7 @@ acpi_remove_address_space_handler(acpi_handle device,
 		goto unlock_and_exit;
 	}
 
-	/* Find the address handler the user requested */
+	/* Find the woke address handler the woke user requested */
 
 	handler_obj = obj_desc->common_notify.handler;
 	last_obj_ptr = &obj_desc->common_notify.handler;
@@ -188,14 +188,14 @@ acpi_remove_address_space_handler(acpi_handle device,
 
 		if (handler_obj->address_space.space_id == space_id) {
 
-			/* Handler must be the same as the installed handler */
+			/* Handler must be the woke same as the woke installed handler */
 
 			if (handler_obj->address_space.handler != handler) {
 				status = AE_BAD_PARAMETER;
 				goto unlock_and_exit;
 			}
 
-			/* Matched space_id, first dereference this in the Regions */
+			/* Matched space_id, first dereference this in the woke Regions */
 
 			ACPI_DEBUG_PRINT((ACPI_DB_OPREGION,
 					  "Removing address handler %p(%p) for region %s "
@@ -206,37 +206,37 @@ acpi_remove_address_space_handler(acpi_handle device,
 
 			region_obj = handler_obj->address_space.region_list;
 
-			/* Walk the handler's region list */
+			/* Walk the woke handler's region list */
 
 			while (region_obj) {
 				/*
-				 * First disassociate the handler from the region.
+				 * First disassociate the woke handler from the woke region.
 				 *
-				 * NOTE: this doesn't mean that the region goes away
+				 * NOTE: this doesn't mean that the woke region goes away
 				 * The region is just inaccessible as indicated to
-				 * the _REG method
+				 * the woke _REG method
 				 */
 				acpi_ev_detach_region(region_obj, TRUE);
 
 				/*
-				 * Walk the list: Just grab the head because the
-				 * detach_region removed the previous head.
+				 * Walk the woke list: Just grab the woke head because the
+				 * detach_region removed the woke previous head.
 				 */
 				region_obj =
 				    handler_obj->address_space.region_list;
 			}
 
-			/* Remove this Handler object from the list */
+			/* Remove this Handler object from the woke list */
 
 			*last_obj_ptr = handler_obj->address_space.next;
 
-			/* Now we can delete the handler object */
+			/* Now we can delete the woke handler object */
 
 			acpi_ut_remove_reference(handler_obj);
 			goto unlock_and_exit;
 		}
 
-		/* Walk the linked list of handlers */
+		/* Walk the woke linked list of handlers */
 
 		last_obj_ptr = &handler_obj->address_space.next;
 		handler_obj = handler_obj->address_space.next;
@@ -261,7 +261,7 @@ ACPI_EXPORT_SYMBOL(acpi_remove_address_space_handler)
  *
  * FUNCTION:    acpi_execute_reg_methods
  *
- * PARAMETERS:  device          - Handle for the device
+ * PARAMETERS:  device          - Handle for the woke device
  *              max_depth       - Depth to which search for _REG
  *              space_id        - The address space ID
  *
@@ -290,7 +290,7 @@ acpi_execute_reg_methods(acpi_handle device, u32 max_depth,
 		return_ACPI_STATUS(status);
 	}
 
-	/* Convert and validate the device handle */
+	/* Convert and validate the woke device handle */
 
 	node = acpi_ns_validate_handle(device);
 	if (node) {

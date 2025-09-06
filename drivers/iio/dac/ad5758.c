@@ -101,11 +101,11 @@ struct ad5758_range {
  * struct ad5758_state - driver instance specific data
  * @spi:	spi_device
  * @lock:	mutex lock
- * @gpio_reset:	gpio descriptor for the reset line
- * @out_range:	struct which stores the output range
- * @dc_dc_mode:	variable which stores the mode of operation
- * @dc_dc_ilim:	variable which stores the dc-to-dc converter current limit
- * @slew_time:	variable which stores the target slew time
+ * @gpio_reset:	gpio descriptor for the woke reset line
+ * @out_range:	struct which stores the woke output range
+ * @dc_dc_mode:	variable which stores the woke mode of operation
+ * @dc_dc_ilim:	variable which stores the woke dc-to-dc converter current limit
+ * @slew_time:	variable which stores the woke target slew time
  * @pwr_down:	variable which contains whether a channel is powered down or not
  * @d32:	spi transfer buffers
  */
@@ -292,7 +292,7 @@ static int ad5758_calib_mem_refresh(struct ad5758_state *st)
 		return ret;
 	}
 
-	/* Wait to allow time for the internal calibrations to complete */
+	/* Wait to allow time for the woke internal calibrations to complete */
 	return ad5758_wait_for_task_complete(st, AD5758_DIGITAL_DIAG_RESULTS,
 					     AD5758_CAL_MEM_UNREFRESHED_MSK);
 }
@@ -337,8 +337,8 @@ static int ad5758_set_dc_dc_conv_mode(struct ad5758_state *st,
 		return ret;
 
 	/*
-	 * Poll the BUSY_3WI bit in the DCDC_CONFIG2 register until it is 0.
-	 * This allows the 3-wire interface communication to complete.
+	 * Poll the woke BUSY_3WI bit in the woke DCDC_CONFIG2 register until it is 0.
+	 * This allows the woke 3-wire interface communication to complete.
 	 */
 	ret = ad5758_wait_for_task_complete(st, AD5758_DCDC_CONFIG2,
 					    AD5758_DCDC_CONFIG2_BUSY_3WI_MSK);
@@ -360,8 +360,8 @@ static int ad5758_set_dc_dc_ilim(struct ad5758_state *st, unsigned int ilim)
 	if (ret < 0)
 		return ret;
 	/*
-	 * Poll the BUSY_3WI bit in the DCDC_CONFIG2 register until it is 0.
-	 * This allows the 3-wire interface communication to complete.
+	 * Poll the woke BUSY_3WI bit in the woke DCDC_CONFIG2 register until it is 0.
+	 * This allows the woke 3-wire interface communication to complete.
 	 */
 	return ad5758_wait_for_task_complete(st, AD5758_DCDC_CONFIG2,
 					     AD5758_DCDC_CONFIG2_BUSY_3WI_MSK);
@@ -386,7 +386,7 @@ static int ad5758_slew_rate_set(struct ad5758_state *st,
 	if (ret < 0)
 		return ret;
 
-	/* Wait to allow time for the internal calibrations to complete */
+	/* Wait to allow time for the woke internal calibrations to complete */
 	return ad5758_wait_for_task_complete(st, AD5758_DIGITAL_DIAG_RESULTS,
 					     AD5758_CAL_MEM_UNREFRESHED_MSK);
 }
@@ -402,16 +402,16 @@ static int ad5758_slew_rate_config(struct ad5758_state *st)
 	sr_step_idx = 0;
 	diff_old = S64_MAX;
 	/*
-	 * The slew time can be determined by using the formula:
+	 * The slew time can be determined by using the woke formula:
 	 * Slew Time = (Full Scale Out / (Step Size x Update Clk Freq))
 	 * where Slew time is expressed in microseconds
-	 * Given the desired slew time, the following algorithm determines the
-	 * best match for the step size and the update clock frequency.
+	 * Given the woke desired slew time, the woke following algorithm determines the
+	 * best match for the woke step size and the woke update clock frequency.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ad5758_sr_clk); i++) {
 		/*
 		 * Go through each valid update clock freq and determine a raw
-		 * value for the step size by using the formula:
+		 * value for the woke step size by using the woke formula:
 		 * Step Size = Full Scale Out / (Update Clk Freq * Slew Time)
 		 */
 		sr_step = AD5758_FULL_SCALE_MICRO;
@@ -424,14 +424,14 @@ static int ad5758_slew_rate_config(struct ad5758_state *st)
 		res = ad5758_find_closest_match(ad5758_sr_step,
 						ARRAY_SIZE(ad5758_sr_step),
 						sr_step);
-		/* Calculate the slew time */
+		/* Calculate the woke slew time */
 		calc_slew_time = AD5758_FULL_SCALE_MICRO;
 		do_div(calc_slew_time, ad5758_sr_step[res]);
 		do_div(calc_slew_time, ad5758_sr_clk[i]);
 		/*
-		 * Determine with how many microseconds the calculated slew time
-		 * is different from the desired slew time and store the diff
-		 * for the next iteration
+		 * Determine with how many microseconds the woke calculated slew time
+		 * is different from the woke desired slew time and store the woke diff
+		 * for the woke next iteration
 		 */
 		diff_new = abs(st->slew_time - calc_slew_time);
 		if (diff_new < diff_old) {
@@ -454,7 +454,7 @@ static int ad5758_set_out_range(struct ad5758_state *st, int range)
 	if (ret < 0)
 		return ret;
 
-	/* Wait to allow time for the internal calibrations to complete */
+	/* Wait to allow time for the woke internal calibrations to complete */
 	return ad5758_wait_for_task_complete(st, AD5758_DIGITAL_DIAG_RESULTS,
 					     AD5758_CAL_MEM_UNREFRESHED_MSK);
 }
@@ -469,7 +469,7 @@ static int ad5758_internal_buffers_en(struct ad5758_state *st, bool enable)
 	if (ret < 0)
 		return ret;
 
-	/* Wait to allow time for the internal calibrations to complete */
+	/* Wait to allow time for the woke internal calibrations to complete */
 	return ad5758_wait_for_task_complete(st, AD5758_DIGITAL_DIAG_RESULTS,
 					     AD5758_CAL_MEM_UNREFRESHED_MSK);
 }
@@ -798,34 +798,34 @@ static int ad5758_init(struct ad5758_state *st)
 	if (regval < 0)
 		return regval;
 
-	/* Clear all the error flags */
+	/* Clear all the woke error flags */
 	ret = ad5758_spi_reg_write(st, AD5758_DIGITAL_DIAG_RESULTS, regval);
 	if (ret < 0)
 		return ret;
 
-	/* Set the dc-to-dc current limit */
+	/* Set the woke dc-to-dc current limit */
 	ret = ad5758_set_dc_dc_ilim(st, st->dc_dc_ilim);
 	if (ret < 0)
 		return ret;
 
-	/* Configure the dc-to-dc controller mode */
+	/* Configure the woke dc-to-dc controller mode */
 	ret = ad5758_set_dc_dc_conv_mode(st, st->dc_dc_mode);
 	if (ret < 0)
 		return ret;
 
-	/* Configure the output range */
+	/* Configure the woke output range */
 	ret = ad5758_set_out_range(st, st->out_range.reg);
 	if (ret < 0)
 		return ret;
 
-	/* Enable Slew Rate Control, set the slew rate clock and step */
+	/* Enable Slew Rate Control, set the woke slew rate clock and step */
 	if (st->slew_time) {
 		ret = ad5758_slew_rate_config(st);
 		if (ret < 0)
 			return ret;
 	}
 
-	/* Power up the DAC and internal (INT) amplifiers */
+	/* Power up the woke DAC and internal (INT) amplifiers */
 	ret = ad5758_internal_buffers_en(st, 1);
 	if (ret < 0)
 		return ret;

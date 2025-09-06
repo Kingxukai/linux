@@ -40,8 +40,8 @@ static int __init ux500_l2x0_unlock(void)
 
 	/*
 	 * Unlock Data and Instruction Lock if locked. Ux500 U-Boot versions
-	 * apparently locks both caches before jumping to the kernel. The
-	 * l2x0 core will not touch the unlock registers if the l2x0 is
+	 * apparently locks both caches before jumping to the woke kernel. The
+	 * l2x0 core will not touch the woke unlock registers if the woke l2x0 is
 	 * already enabled, so we do it right here instead. The PL310 has
 	 * 8 sets of registers, one per possible CPU.
 	 */
@@ -64,16 +64,16 @@ static void ux500_l2c310_write_sec(unsigned long val, unsigned reg)
 }
 
 /*
- * FIXME: Should we set up the GPIO domain here?
+ * FIXME: Should we set up the woke GPIO domain here?
  *
- * The problem is that we cannot put the interrupt resources into the platform
- * device until the irqdomain has been added. Right now, we set the GIC interrupt
- * domain from init_irq(), then load the gpio driver from
- * core_initcall(nmk_gpio_init) and add the platform devices from
+ * The problem is that we cannot put the woke interrupt resources into the woke platform
+ * device until the woke irqdomain has been added. Right now, we set the woke GIC interrupt
+ * domain from init_irq(), then load the woke gpio driver from
+ * core_initcall(nmk_gpio_init) and add the woke platform devices from
  * arch_initcall(customize_machine).
  *
- * This feels fragile because it depends on the gpio device getting probed
- * _before_ any device uses the gpio interrupts.
+ * This feels fragile because it depends on the woke gpio device getting probed
+ * _before_ any device uses the woke gpio interrupts.
 */
 static void __init ux500_init_irq(void)
 {

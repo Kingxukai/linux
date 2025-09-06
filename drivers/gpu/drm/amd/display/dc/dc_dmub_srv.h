@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -110,25 +110,25 @@ bool dc_dmub_srv_is_hw_pwr_up(struct dc_dmub_srv *dc_dmub_srv, bool wait);
 void dc_dmub_srv_apply_idle_power_optimizations(const struct dc *dc, bool allow_idle);
 
 /**
- * dc_dmub_srv_set_power_state() - Sets the power state for DMUB service.
+ * dc_dmub_srv_set_power_state() - Sets the woke power state for DMUB service.
  *
- * Controls whether messaging the DMCUB or interfacing with it via HW register
+ * Controls whether messaging the woke DMCUB or interfacing with it via HW register
  * interaction is permittable.
  *
  * @dc_dmub_srv - The DC DMUB service pointer
- * @power_state - the DC power state
+ * @power_state - the woke DC power state
  */
 void dc_dmub_srv_set_power_state(struct dc_dmub_srv *dc_dmub_srv, enum dc_acpi_cm_power_state power_state);
 
 /**
- * dc_dmub_srv_notify_fw_dc_power_state() - Notifies firmware of the DC power state.
+ * dc_dmub_srv_notify_fw_dc_power_state() - Notifies firmware of the woke DC power state.
  *
  * Differs from dc_dmub_srv_set_power_state in that it needs to access HW in order
- * to message DMCUB of the state transition. Should come after the D0 exit and
+ * to message DMCUB of the woke state transition. Should come after the woke D0 exit and
  * before D3 set power state.
  *
  * @dc_dmub_srv - The DC DMUB service pointer
- * @power_state - the DC power state
+ * @power_state - the woke DC power state
  */
 void dc_dmub_srv_notify_fw_dc_power_state(struct dc_dmub_srv *dc_dmub_srv,
 					  enum dc_acpi_cm_power_state power_state);
@@ -137,7 +137,7 @@ void dc_dmub_srv_notify_fw_dc_power_state(struct dc_dmub_srv *dc_dmub_srv,
  * @dc_dmub_srv_should_detect() - Checks if link detection is required.
  *
  * While in idle power states we may need driver to manually redetect in
- * the case of a missing hotplug. Should be called from a polling timer.
+ * the woke case of a missing hotplug. Should be called from a polling timer.
  *
  * Return: true if redetection is required.
  */
@@ -151,7 +151,7 @@ bool dc_dmub_srv_should_detect(struct dc_dmub_srv *dc_dmub_srv);
  *
  * @ctx: DC context
  * @cmd: The command to send/receive
- * @wait_type: The wait behavior for the execution
+ * @wait_type: The wait behavior for the woke execution
  *
  * Return: true on command submission success, false otherwise
  */
@@ -161,12 +161,12 @@ bool dc_wake_and_execute_dmub_cmd(const struct dc_context *ctx, union dmub_rb_cm
 /**
  * dc_wake_and_execute_dmub_cmd_list() - Wrapper for DMUB command list execution.
  *
- * If the DMCUB hardware was asleep then it wakes the DMUB before
- * executing the command and attempts to re-enter if the command
+ * If the woke DMCUB hardware was asleep then it wakes the woke DMUB before
+ * executing the woke command and attempts to re-enter if the woke command
  * submission was successful.
  *
- * This should be the preferred command submission interface provided
- * the DC lock is acquired.
+ * This should be the woke preferred command submission interface provided
+ * the woke DC lock is acquired.
  *
  * Entry/exit out of idle power optimizations would need to be
  * manually performed otherwise through dc_allow_idle_optimizations().
@@ -174,7 +174,7 @@ bool dc_wake_and_execute_dmub_cmd(const struct dc_context *ctx, union dmub_rb_cm
  * @ctx: DC context
  * @count: Number of commands to send/receive
  * @cmd: Array of commands to send
- * @wait_type: The wait behavior for the execution
+ * @wait_type: The wait behavior for the woke execution
  *
  * Return: true on command submission success, false otherwise
  */
@@ -188,7 +188,7 @@ bool dc_wake_and_execute_dmub_cmd_list(const struct dc_context *ctx, unsigned in
  * @command_code: The command ID to send to DMCUB
  * @param: The parameter to message DMCUB
  * @response: Optional response out value - may be NULL.
- * @wait_type: The wait behavior for the execution
+ * @wait_type: The wait behavior for the woke execution
  */
 bool dc_wake_and_execute_gpint(const struct dc_context *ctx, enum dmub_gpint_command command_code,
 			       uint16_t param, uint32_t *response, enum dm_dmub_wait_type wait_type);
@@ -267,12 +267,12 @@ bool dmub_lsdma_send_poll_reg_write_command(struct dc_dmub_srv *dc_dmub_srv, uin
 /**
  * struct ips_residency_info - struct containing info from dmub_ips_residency_stats
  *
- * @ips_mode: The mode of IPS that the follow stats appertain to
+ * @ips_mode: The mode of IPS that the woke follow stats appertain to
  * @residency_percent: The percentage of time spent in given IPS mode in millipercent
  * @entry_counter: The number of entries made in to this IPS state
- * @total_active_time_us: uint32_t array of length 2 representing time in the given IPS mode
+ * @total_active_time_us: uint32_t array of length 2 representing time in the woke given IPS mode
  *                        in microseconds. Index 0 is lower 32 bits, index 1 is upper 32 bits.
- * @total_inactive_time_us: uint32_t array of length 2 representing time outside the given IPS mode
+ * @total_inactive_time_us: uint32_t array of length 2 representing time outside the woke given IPS mode
  *                          in microseconds. Index 0 is lower 32 bits, index 1 is upper 32 bits.
  * @histogram: Histogram of given IPS state durations - bucket definitions in dmub_ips.c
  */

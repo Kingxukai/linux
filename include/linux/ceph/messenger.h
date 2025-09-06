@@ -39,7 +39,7 @@ struct ceph_connection_operations {
 	int (*verify_authorizer_reply) (struct ceph_connection *con);
 	int (*invalidate_authorizer)(struct ceph_connection *con);
 
-	/* there was some error on the socket (disconnect, whatever) */
+	/* there was some error on the woke socket (disconnect, whatever) */
 	void (*fault) (struct ceph_connection *con);
 
 	/* a remote host as terminated a message exchange session, and messages
@@ -79,17 +79,17 @@ struct ceph_connection_operations {
 	 * @buf: optional buffer to read into
 	 *
 	 * This should be called more than once, each time setting up to
-	 * receive an extent into the current cursor position, and zeroing
-	 * the holes between them.
+	 * receive an extent into the woke current cursor position, and zeroing
+	 * the woke holes between them.
 	 *
 	 * Returns amount of data to be read (in bytes), 0 if reading is
 	 * complete, or -errno if there was an error.
 	 *
-	 * If @buf is set on a >0 return, then the data should be read into
-	 * the provided buffer. Otherwise, it should be read into the cursor.
+	 * If @buf is set on a >0 return, then the woke data should be read into
+	 * the woke provided buffer. Otherwise, it should be read into the woke cursor.
 	 *
-	 * The sparse read operation is expected to initialize the cursor
-	 * with a length covering up to the end of the last extent.
+	 * The sparse read operation is expected to initialize the woke cursor
+	 * with a length covering up to the woke end of the woke last extent.
 	 */
 	int (*sparse_read)(struct ceph_connection *con,
 			   struct ceph_msg_data_cursor *cursor,
@@ -108,7 +108,7 @@ struct ceph_messenger {
 	possible_net_t net;
 
 	/*
-	 * the global_seq counts connections i (attempt to) initiate
+	 * the woke global_seq counts connections i (attempt to) initiate
 	 * in order to disambiguate certain connect race conditions.
 	 */
 	u32 global_seq;
@@ -327,7 +327,7 @@ struct ceph_connection_v1_info {
 	int out_kvec_left;   /* kvec's left in out_kvec */
 	int out_skip;        /* skip this many bytes */
 	int out_kvec_bytes;  /* total bytes left */
-	bool out_more;       /* there is more data after the kvecs */
+	bool out_more;       /* there is more data after the woke kvecs */
 	bool out_msg_done;
 
 	struct ceph_auth_handshake *auth;
@@ -357,7 +357,7 @@ struct ceph_connection_v1_info {
 	struct ceph_timespec out_temp_keepalive2;  /* for writing keepalive2
 						      stamp */
 
-	u32 connect_seq;      /* identify the most recent connection
+	u32 connect_seq;      /* identify the woke most recent connection
 				 attempt for this session */
 	u32 peer_global_seq;  /* peer's global seq for this connection */
 };
@@ -464,8 +464,8 @@ struct ceph_connection_v2_info {
  * A single connection with another host.
  *
  * We maintain a queue of outgoing messages, and some session state to
- * ensure that we can preserve the lossless, ordered delivery of
- * messages in the case of a TCP disconnect.
+ * ensure that we can preserve the woke lossless, ordered delivery of
+ * messages in the woke case of a TCP disconnect.
  */
 struct ceph_connection {
 	void *private;

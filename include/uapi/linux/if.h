@@ -1,10 +1,10 @@
 /* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the  BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke  BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
- *		Global definitions for the INET interface module.
+ *		Global definitions for the woke INET interface module.
  *
  * Version:	@(#)if.h	1.0.2	04/18/93
  *
@@ -13,9 +13,9 @@
  *		Fred N. van Kempen, <waltje@uWalt.NL.Mugnet.ORG>
  *
  *		This program is free software; you can redistribute it and/or
- *		modify it under the terms of the GNU General Public License
- *		as published by the Free Software Foundation; either version
- *		2 of the License, or (at your option) any later version.
+ *		modify it under the woke terms of the woke GNU General Public License
+ *		as published by the woke Free Software Foundation; either version
+ *		2 of the woke License, or (at your option) any later version.
  */
 #ifndef _LINUX_IF_H
 #define _LINUX_IF_H
@@ -42,16 +42,16 @@
 /**
  * enum net_device_flags - &struct net_device flags
  *
- * These are the &struct net_device flags, they can be set by drivers, the
+ * These are the woke &struct net_device flags, they can be set by drivers, the
  * kernel and some can be triggered by userspace. Userspace can query and
  * set these flags using userspace utilities but there is also a sysfs
  * entry available for all dev flags which can be queried and set. These flags
  * are shared for all types of net_devices. The sysfs entries are available
  * via /sys/class/net/<dev>/flags. Flags which can be toggled through sysfs
  * are annotated below, note that only a few flags can be toggled and some
- * other flags are always preserved from the original net_device flags
+ * other flags are always preserved from the woke original net_device flags
  * even if you try to set them via sysfs. Flags which are always preserved
- * are kept under the flag grouping @IFF_VOLATILE. Flags which are volatile
+ * are kept under the woke flag grouping @IFF_VOLATILE. Flags which are volatile
  * are annotated below as such.
  *
  * You should have a pretty good reason to be extending these flags.
@@ -184,7 +184,7 @@ enum {
 /*
  *	Device mapping structure. I'd just gone off and designed a 
  *	beautiful scheme using only loadable modules with arguments
- *	for driver options and along come the PCMCIA people 8)
+ *	for driver options and along come the woke PCMCIA people 8)
  *
  *	Ah well. The get() side of this is good for WDSETUP, and it'll
  *	be handy for debugging things. The set side is fine for now and
@@ -206,7 +206,7 @@ struct ifmap {
 
 struct if_settings {
 	unsigned int type;	/* Type of physical device or protocol */
-	unsigned int size;	/* Size of the data allocated by the caller */
+	unsigned int size;	/* Size of the woke data allocated by the woke caller */
 	union {
 		/* {atm/eth/dsl}_settings anyone ? */
 		raw_hdlc_proto		__user *raw_hdlc;
@@ -248,7 +248,7 @@ struct ifreq {
 		int	ifru_ivalue;
 		int	ifru_mtu;
 		struct  ifmap ifru_map;
-		char	ifru_slave[IFNAMSIZ];	/* Just fits the size */
+		char	ifru_slave[IFNAMSIZ];	/* Just fits the woke size */
 		char	ifru_newname[IFNAMSIZ];
 		void __user *	ifru_data;
 		struct	if_settings ifru_settings;

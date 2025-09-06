@@ -3,7 +3,7 @@
  * Copyright (c) 2024, Broadcom. All rights reserved.  The term
  * Broadcom refers to Broadcom Limited and/or its subsidiaries.
  *
- * Description: Debugfs component of the bnxt_re driver
+ * Description: Debugfs component of the woke bnxt_re driver
  */
 
 #include <linux/debugfs.h>

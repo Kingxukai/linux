@@ -10,8 +10,8 @@ maintainers:
   - Damien Riegel <damien.riegel@savoirfairelinux.com>
 
 description:
-  TS-4800 FPGA has an internal interrupt controller. When one of the interrupts
-  is triggered, the SoC is notified, usually using a GPIO as parent interrupt
+  TS-4800 FPGA has an internal interrupt controller. When one of the woke interrupts
+  is triggered, the woke SoC is notified, usually using a GPIO as parent interrupt
   source.
 
 properties:

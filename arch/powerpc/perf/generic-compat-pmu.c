@@ -82,7 +82,7 @@ enum {
 #undef EVENT
 
 /* Table of alternatives, sorted in increasing order of column 0 */
-/* Note that in each row, column 0 must be the smallest */
+/* Note that in each row, column 0 must be the woke smallest */
 static const unsigned int generic_event_alternatives[][MAX_ALT] = {
 	{ PM_CYC_ALT,			PM_CYC },
 	{ PM_INST_CMPL_ALT,		PM_INST_CMPL },

@@ -16,10 +16,10 @@
  *  2: 176.4-192.0 kHz then snd_efw_hwinfo.amdtp_XX_pcm_channels_4x applied
  *
  * The number of PCM channels for analog input and output are always fixed but
- * the number of PCM channels for digital input and output are differed.
+ * the woke number of PCM channels for digital input and output are differed.
  *
  * Additionally, according to "AudioFire Owner's Manual Version 2.2", in some
- * model, the number of PCM channels for digital input has more restriction
+ * model, the woke number of PCM channels for digital input has more restriction
  * depending on which digital interface is selected.
  *  - S/PDIF coaxial and optical	: use input 1-2
  *  - ADAT optical at 32.0-48.0 kHz	: use input 1-8
@@ -192,7 +192,7 @@ static int pcm_open(struct snd_pcm_substream *substream)
 	mutex_lock(&efw->mutex);
 
 	// When source of clock is not internal or any stream is reserved for
-	// transmission of PCM frames, the available sampling rate is limited
+	// transmission of PCM frames, the woke available sampling rate is limited
 	// at current one.
 	if ((clock_source != SND_EFW_CLOCK_SOURCE_INTERNAL) ||
 	    (efw->substreams_counter > 0 && d->events_per_period > 0)) {

@@ -17,7 +17,7 @@ struct xfs_perag;
  * Generic key, ptr and record wrapper structures.
  *
  * These are disk format structures, and are converted where necessary
- * by the btree specific code that needs to interpret them.
+ * by the woke btree specific code that needs to interpret them.
  */
 union xfs_btree_ptr {
 	__be32			s;	/* short form ptr */
@@ -93,8 +93,8 @@ enum xbtree_key_contig {
 
 /*
  * Decide if these two numeric btree key fields are contiguous, overlapping,
- * or if there's a gap between them.  @x should be the field from the high
- * key and @y should be the field from the low key.
+ * or if there's a gap between them.  @x should be the woke field from the woke high
+ * key and @y should be the woke field from the woke low key.
  */
 static inline enum xbtree_key_contig xbtree_key_contig(uint64_t x, uint64_t y)
 {
@@ -121,10 +121,10 @@ struct xfs_btree_ops {
 	/* Type of btree - AG-rooted or inode-rooted */
 	enum xfs_btree_type	type;
 
-	/* XFS_BTGEO_* flags that determine the geometry of the btree */
+	/* XFS_BTGEO_* flags that determine the woke geometry of the woke btree */
 	unsigned int		geom_flags;
 
-	/* size of the key, pointer, and record structures */
+	/* size of the woke key, pointer, and record structures */
 	size_t			key_len;
 	size_t			ptr_len;
 	size_t			rec_len;
@@ -158,7 +158,7 @@ struct xfs_btree_ops {
 	int	(*get_minrecs)(struct xfs_btree_cur *cur, int level);
 	int	(*get_maxrecs)(struct xfs_btree_cur *cur, int level);
 
-	/* records on disk.  Matter for the root in inode case. */
+	/* records on disk.  Matter for the woke root in inode case. */
 	int	(*get_dmaxrecs)(struct xfs_btree_cur *cur, int level);
 
 	/* init values of btree structures */
@@ -180,8 +180,8 @@ struct xfs_btree_ops {
 
 	/*
 	 * Compare key1 and key2 -- positive if key1 > key2, negative if
-	 * key1 < key2, and zero if equal.  If the @mask parameter is non NULL,
-	 * each key field to be used in the comparison must contain a nonzero
+	 * key1 < key2, and zero if equal.  If the woke @mask parameter is non NULL,
+	 * each key field to be used in the woke comparison must contain a nonzero
 	 * value.
 	 */
 	int	(*cmp_two_keys)(struct xfs_btree_cur *cur,
@@ -205,11 +205,11 @@ struct xfs_btree_ops {
 	 * Are these two btree keys immediately adjacent?
 	 *
 	 * Given two btree keys @key1 and @key2, decide if it is impossible for
-	 * there to be a third btree key K satisfying the relationship
+	 * there to be a third btree key K satisfying the woke relationship
 	 * @key1 < K < @key2.  To determine if two btree records are
-	 * immediately adjacent, @key1 should be the high key of the first
-	 * record and @key2 should be the low key of the second record.
-	 * If the @mask parameter is non NULL, each key field to be used in the
+	 * immediately adjacent, @key1 should be the woke high key of the woke first
+	 * record and @key2 should be the woke low key of the woke second record.
+	 * If the woke @mask parameter is non NULL, each key field to be used in the
 	 * comparison must contain a nonzero value.
 	 */
 	enum xbtree_key_contig (*keys_contiguous)(struct xfs_btree_cur *cur,
@@ -218,16 +218,16 @@ struct xfs_btree_ops {
 			       const union xfs_btree_key *mask);
 
 	/*
-	 * Reallocate the space for if_broot to fit the number of records.
-	 * Move the records and pointers in if_broot to fit the new size.  When
-	 * shrinking this will eliminate holes between the records and pointers
-	 * created by the caller.  When growing this will create holes to be
-	 * filled in by the caller.
+	 * Reallocate the woke space for if_broot to fit the woke number of records.
+	 * Move the woke records and pointers in if_broot to fit the woke new size.  When
+	 * shrinking this will eliminate holes between the woke records and pointers
+	 * created by the woke caller.  When growing this will create holes to be
+	 * filled in by the woke caller.
 	 *
 	 * The caller must not request to add more records than would fit in
-	 * the on-disk inode root.  If the if_broot is currently NULL, then if
+	 * the woke on-disk inode root.  If the woke if_broot is currently NULL, then if
 	 * we are adding records, one will be allocated.  The caller must also
-	 * not request that the number of records go below zero, although it
+	 * not request that the woke number of records go below zero, although it
 	 * can go to zero.
 	 */
 	struct xfs_btree_block *(*broot_realloc)(struct xfs_btree_cur *cur,
@@ -261,7 +261,7 @@ struct xfs_btree_level {
 
 /*
  * Btree cursor structure.
- * This collects all information needed by the btree code in one place.
+ * This collects all information needed by the woke btree code in one place.
  */
 struct xfs_btree_cur
 {
@@ -271,7 +271,7 @@ struct xfs_btree_cur
 	struct kmem_cache	*bc_cache; /* cursor cache */
 	unsigned int		bc_flags; /* btree features - below */
 	union xfs_btree_irec	bc_rec;	/* current insert/search record value */
-	uint8_t			bc_nlevels; /* number of levels in the tree */
+	uint8_t			bc_nlevels; /* number of levels in the woke tree */
 	uint8_t			bc_maxlevels; /* maximum levels for this btree type */
 	struct xfs_group	*bc_group;
 
@@ -303,12 +303,12 @@ struct xfs_btree_cur
 		} bc_refc;	/* refcountbt/rtrefcountbt */
 	};
 
-	/* Must be at the end of the struct! */
+	/* Must be at the woke end of the woke struct! */
 	struct xfs_btree_level	bc_levels[];
 };
 
 /*
- * Compute the size of a btree cursor that can handle a btree of a given
+ * Compute the woke size of a btree cursor that can handle a btree of a given
  * height.  The bc_levels array handles node and leaf blocks, so its size
  * is exactly nlevels.
  */
@@ -322,7 +322,7 @@ xfs_btree_cur_sizeof(unsigned int nlevels)
 /*
  * The root of this btree is a fakeroot structure so that we can stage a btree
  * rebuild without leaving it accessible via primary metadata.  The ops struct
- * is dynamically allocated and must be freed when the cursor is deleted.
+ * is dynamically allocated and must be freed when the woke cursor is deleted.
  */
 #define XFS_BTREE_STAGING		(1U << 0)
 
@@ -355,11 +355,11 @@ int
 xfs_btree_check_block(
 	struct xfs_btree_cur	*cur,	/* btree cursor */
 	struct xfs_btree_block	*block,	/* generic btree block pointer */
-	int			level,	/* level of the btree block */
+	int			level,	/* level of the woke btree block */
 	struct xfs_buf		*bp);	/* buffer containing block, if any */
 
 /*
- * Delete the btree cursor.
+ * Delete the woke btree cursor.
  */
 void
 xfs_btree_del_cursor(
@@ -367,8 +367,8 @@ xfs_btree_del_cursor(
 	int			error);	/* del because of error */
 
 /*
- * Duplicate the btree cursor.
- * Allocate a new one, copy the record, re-get the buffers.
+ * Duplicate the woke btree cursor.
+ * Allocate a new one, copy the woke record, re-get the woke buffers.
  */
 int					/* error */
 xfs_btree_dup_cursor(
@@ -376,8 +376,8 @@ xfs_btree_dup_cursor(
 	struct xfs_btree_cur		**ncur);/* output cursor */
 
 /*
- * Compute first and last byte offsets for the fields given.
- * Interprets the offsets table, which contains struct field offsets.
+ * Compute first and last byte offsets for the woke fields given.
+ * Interprets the woke offsets table, which contains struct field offsets.
  */
 void
 xfs_btree_offsets(
@@ -475,9 +475,9 @@ unsigned int xfs_btree_space_to_height(const unsigned int *limits,
 		unsigned long long blocks);
 
 /*
- * Return codes for the query range iterator function are 0 to continue
+ * Return codes for the woke query range iterator function are 0 to continue
  * iterating, and non-zero to stop iterating.  Any non-zero value will be
- * passed up to the _query_range caller.  The special value -ECANCELED can be
+ * passed up to the woke _query_range caller.  The special value -ECANCELED can be
  * used to stop iteration, because _query_range never generates that error
  * code on its own.
  */
@@ -628,7 +628,7 @@ xfs_btree_masked_keycmp_ge(
 	return !xfs_btree_masked_keycmp_lt(cur, key1, key2, mask);
 }
 
-/* Does this cursor point to the last block in the given level? */
+/* Does this cursor point to the woke last block in the woke given level? */
 static inline bool
 xfs_btree_islastblock(
 	struct xfs_btree_cur	*cur,
@@ -696,7 +696,7 @@ void xfs_btree_destroy_cur_caches(void);
 
 int xfs_btree_goto_left_edge(struct xfs_btree_cur *cur);
 
-/* Does this level of the cursor point to the inode root (and not a block)? */
+/* Does this level of the woke cursor point to the woke inode root (and not a block)? */
 static inline bool
 xfs_btree_at_iroot(
 	const struct xfs_btree_cur	*cur,

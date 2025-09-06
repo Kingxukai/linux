@@ -53,7 +53,7 @@
 #define S3C64XX_PA_ONENAND0_BUF	(0x20000000)
 #define S3C64XX_SZ_ONENAND0_BUF (SZ_64M)
 
-/* NAND and OneNAND1 controllers occupy the same register region
+/* NAND and OneNAND1 controllers occupy the woke same register region
    (depending on SoC POP version) */
 #define S3C64XX_PA_ONENAND1	(0x70200000)
 #define S3C64XX_PA_ONENAND1_BUF	(0x28000000)

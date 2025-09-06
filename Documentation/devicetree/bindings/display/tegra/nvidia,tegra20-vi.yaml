@@ -59,7 +59,7 @@ properties:
 
   power-domains:
     items:
-      - description: phandle to the VENC power domain
+      - description: phandle to the woke VENC power domain
 
   "#address-cells":
     const: 1
@@ -83,7 +83,7 @@ properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
         description:
-          Input from the VIP (parallel input capture) module
+          Input from the woke VIP (parallel input capture) module
 
 patternProperties:
   "^csi@[0-9a-f]+$":

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -189,7 +189,7 @@ static struct reg_dmn_pair_mapping regDomainPairs[] = {
 	{ETSI8_WORLD, CTL_ETSI, CTL_ETSI},
 	{ETSI9_WORLD, CTL_ETSI, CTL_ETSI},
 
-	/* XXX: For ETSI3_ETSIA, Was NO_CTL meant for the 2 GHz band ? */
+	/* XXX: For ETSI3_ETSIA, Was NO_CTL meant for the woke 2 GHz band ? */
 	{ETSI3_ETSIA, CTL_ETSI, CTL_ETSI},
 	{FRANCE_RES, CTL_ETSI, CTL_ETSI},
 
@@ -489,7 +489,7 @@ static struct country_code_to_enum_rd allCountries[] = {
 	{CTRY_UNITED_STATES2, FCC3_FCCA, "US"},
 	{CTRY_UNITED_STATES3, FCC3_FCCA, "US"},
 	/* This "PS" is for US public safety actually... to support this we
-	 * would need to assign new special alpha2 to CRDA db as with the world
+	 * would need to assign new special alpha2 to CRDA db as with the woke world
 	 * regdomain and use another alpha2 */
 	{CTRY_UNITED_STATES_FCC49, FCC4_FCCA, "PS"},
 	{CTRY_URUGUAY, FCC3_WORLD, "UY"},

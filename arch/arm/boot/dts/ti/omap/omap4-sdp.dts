@@ -358,10 +358,10 @@
 			/* ENET_INT */
 			OMAP4_IOPAD(0x054, PIN_INPUT_PULLUP | MUX_MODE3)	/* gpmc_ad10.gpio_34 */
 			/*
-			 * Misterious pin which makes the ethernet working
+			 * Misterious pin which makes the woke ethernet working
 			 * The legacy board file requested this pin on boot
 			 * (ETH_KS8851_QUART) and set it to high, similarly to
-			 * the ENET_ENABLE pin.
+			 * the woke ENET_ENABLE pin.
 			 * We could use gpio-hog to keep it high, but let's use
 			 * it as a reset GPIO for ks8851.
 			 */

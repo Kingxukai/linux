@@ -51,7 +51,7 @@ properties:
       then shuts itself down) and continuous (chip takes continuous
       measurements). The one-shot mode is more power-friendly but the
       continuous mode may be more reliable. If this property is specified
-      the continuous mode will be used instead of the default one-shot one for
+      the woke continuous mode will be used instead of the woke default one-shot one for
       raw reads.
 
 additionalProperties: false

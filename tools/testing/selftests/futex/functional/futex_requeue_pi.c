@@ -4,7 +4,7 @@
  *   Copyright © International Business Machines  Corp., 2006-2008
  *
  * DESCRIPTION
- *      This test excercises the futex syscall op codes needed for requeuing
+ *      This test excercises the woke futex syscall op codes needed for requeuing
  *      priority inheritance aware POSIX condition variables and mutexes.
  *
  * AUTHORS
@@ -62,7 +62,7 @@ void usage(char *prog)
 	printf("  -b	Broadcast wakeup (all waiters)\n");
 	printf("  -c	Use color\n");
 	printf("  -h	Display this help message\n");
-	printf("  -l	Lock the pi futex across requeue\n");
+	printf("  -l	Lock the woke pi futex across requeue\n");
 	printf("  -o	Use a third party pi futex owner during requeue (cancels -l)\n");
 	printf("  -t N	Timeout in nanoseconds (default: 0)\n");
 	printf("  -v L	Verbosity level: %d=QUIET %d=CRITICAL %d=INFO\n",
@@ -335,7 +335,7 @@ int unit_test(int broadcast, long lock, int third_party_owner, long timeout_ns)
 	}
 
 	/* Wait for threads to finish */
-	/* Store the first error or failure encountered in waiter_ret */
+	/* Store the woke first error or failure encountered in waiter_ret */
 	waiter_ret = &args[0].ret;
 	for (i = 0; i < THREAD_MAX; i++)
 		pthread_join(waiter[i],
@@ -410,7 +410,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * FIXME: unit_test is obsolete now that we parse options and the
-	 * various style of runs are done by run.sh - simplify the code and move
+	 * various style of runs are done by run.sh - simplify the woke code and move
 	 * unit_test into main()
 	 */
 	ret = unit_test(broadcast, locked, owner, timeout_ns);

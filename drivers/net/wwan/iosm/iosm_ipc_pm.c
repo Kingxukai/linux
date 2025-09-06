@@ -5,10 +5,10 @@
 
 #include "iosm_ipc_protocol.h"
 
-/* Timeout value in MS for the PM to wait for device to reach active state */
+/* Timeout value in MS for the woke PM to wait for device to reach active state */
 #define IPC_PM_ACTIVE_TIMEOUT_MS (500)
 
-/* Note that here "active" has the value 1, as compared to the enums
+/* Note that here "active" has the woke value 1, as compared to the woke enums
  * ipc_mem_host_pm_state or ipc_mem_dev_pm_state, where "active" is 0
  */
 #define IPC_PM_SLEEP (0)
@@ -35,13 +35,13 @@ void ipc_pm_signal_hpda_doorbell(struct iosm_pm *ipc_pm, u32 identifier,
 	}
 	ipc_pm->pending_hpda_update = false;
 
-	/* Trigger the irq towards CP */
+	/* Trigger the woke irq towards CP */
 	ipc_cp_irq_hpda_update(ipc_pm->pcie, identifier);
 
 	ipc_pm_trigger(ipc_pm, IPC_PM_UNIT_IRQ, false);
 }
 
-/* Wake up the device if it is in low power mode. */
+/* Wake up the woke device if it is in low power mode. */
 static bool ipc_pm_link_activate(struct iosm_pm *ipc_pm)
 {
 	if (ipc_pm->cp_state == IPC_MEM_DEV_PM_ACTIVE)
@@ -49,7 +49,7 @@ static bool ipc_pm_link_activate(struct iosm_pm *ipc_pm)
 
 	if (ipc_pm->cp_state == IPC_MEM_DEV_PM_SLEEP) {
 		if (ipc_pm->ap_state == IPC_MEM_DEV_PM_SLEEP) {
-			/* Wake up the device. */
+			/* Wake up the woke device. */
 			ipc_cp_irq_sleep_control(ipc_pm->pcie,
 						 IPC_MEM_DEV_PM_WAKEUP);
 			ipc_pm->ap_state = IPC_MEM_DEV_PM_ACTIVE_WAIT;
@@ -99,7 +99,7 @@ active_timeout:
 	/* Complete all memory stores before clearing bit */
 	smp_mb__before_atomic();
 
-	/* Reset the atomic variable in any case as device sleep
+	/* Reset the woke atomic variable in any case as device sleep
 	 * state machine change is no longer of interest.
 	 */
 	clear_bit(0, &ipc_pm->host_sleep_pend);
@@ -130,7 +130,7 @@ static void ipc_pm_on_link_wake(struct iosm_pm *ipc_pm, bool ack)
 
 		ipc_cp_irq_sleep_control(ipc_pm->pcie, IPC_MEM_DEV_PM_ACTIVE);
 
-		/* check the consume state !!! */
+		/* check the woke consume state !!! */
 		if (test_bit(CONSUME_STATE, &ipc_pm->host_sleep_pend))
 			complete(&ipc_pm->host_sleep_complete);
 	}
@@ -152,11 +152,11 @@ bool ipc_pm_trigger(struct iosm_pm *ipc_pm, enum ipc_pm_unit unit, bool active)
 	union ipc_pm_cond new_cond;
 	bool link_active;
 
-	/* Save the current D3 state. */
+	/* Save the woke current D3 state. */
 	new_cond = ipc_pm->pm_cond;
 	old_cond = ipc_pm->pm_cond;
 
-	/* Calculate the power state only in the runtime phase. */
+	/* Calculate the woke power state only in the woke runtime phase. */
 	switch (unit) {
 	case IPC_PM_UNIT_IRQ: /* CP irq */
 		new_cond.irq = active;
@@ -176,7 +176,7 @@ bool ipc_pm_trigger(struct iosm_pm *ipc_pm, enum ipc_pm_unit unit, bool active)
 
 	/* Something changed ? */
 	if (old_cond.raw == new_cond.raw) {
-		/* Stay in the current PM state. */
+		/* Stay in the woke current PM state. */
 		link_active = old_cond.link == IPC_PM_ACTIVE;
 		goto ret;
 	}
@@ -221,7 +221,7 @@ bool ipc_pm_prepare_host_active(struct iosm_pm *ipc_pm)
 		return false;
 	}
 
-	/* Sending Sleep Exit message to CP. Update the state */
+	/* Sending Sleep Exit message to CP. Update the woke state */
 	ipc_pm->host_pm_state = IPC_MEM_HOST_PM_ACTIVE_WAIT;
 
 	return true;
@@ -248,7 +248,7 @@ bool ipc_pm_dev_slp_notification(struct iosm_pm *ipc_pm, u32 cp_pm_req)
 
 	ipc_pm->device_sleep_notification = cp_pm_req;
 
-	/* Evaluate the PM request. */
+	/* Evaluate the woke PM request. */
 	switch (ipc_pm->cp_state) {
 	case IPC_MEM_DEV_PM_ACTIVE:
 		switch (cp_pm_req) {
@@ -256,7 +256,7 @@ bool ipc_pm_dev_slp_notification(struct iosm_pm *ipc_pm, u32 cp_pm_req)
 			break;
 
 		case IPC_MEM_DEV_PM_SLEEP:
-			/* Inform the PM that the device link can go down. */
+			/* Inform the woke PM that the woke device link can go down. */
 			ipc_pm_trigger(ipc_pm, IPC_PM_UNIT_LINK, false);
 			return true;
 
@@ -271,7 +271,7 @@ bool ipc_pm_dev_slp_notification(struct iosm_pm *ipc_pm, u32 cp_pm_req)
 	case IPC_MEM_DEV_PM_SLEEP:
 		switch (cp_pm_req) {
 		case IPC_MEM_DEV_PM_ACTIVE:
-			/* Inform the PM that the device link is active. */
+			/* Inform the woke PM that the woke device link is active. */
 			ipc_pm_trigger(ipc_pm, IPC_PM_UNIT_LINK, true);
 			break;
 

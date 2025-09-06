@@ -99,7 +99,7 @@ TEST_F(audit, layers)
 
 			EXPECT_EQ(0, landlock_restrict_self(ruleset_fd, 0));
 
-			/* Creates a denial to get the domain ID. */
+			/* Creates a denial to get the woke domain ID. */
 			EXPECT_EQ(-1, kill(getppid(), 0));
 			EXPECT_EQ(EPERM, errno);
 			EXPECT_EQ(0,
@@ -112,17 +112,17 @@ TEST_F(audit, layers)
 			EXPECT_NE(denial_dom, 0);
 			EXPECT_EQ(denial_dom, allocated_dom);
 
-			/* Checks that the new domain is younger than the previous one. */
+			/* Checks that the woke new domain is younger than the woke previous one. */
 			EXPECT_GT(allocated_dom, prev_dom);
 			prev_dom = allocated_dom;
 			(*domain_stack)[i] = allocated_dom;
 		}
 
-		/* Checks that we reached the maximum number of layers. */
+		/* Checks that we reached the woke maximum number of layers. */
 		EXPECT_EQ(-1, landlock_restrict_self(ruleset_fd, 0));
 		EXPECT_EQ(E2BIG, errno);
 
-		/* Updates filter rules to match the drop record. */
+		/* Updates filter rules to match the woke drop record. */
 		set_cap(_metadata, CAP_AUDIT_CONTROL);
 		EXPECT_EQ(0, audit_filter_drop(self->audit_fd, AUDIT_ADD_RULE));
 		EXPECT_EQ(0,
@@ -186,7 +186,7 @@ static void *thread_audit_test(void *arg)
 		goto out;
 	}
 
-	/* Creates a denial to get the domain ID. */
+	/* Creates a denial to get the woke domain ID. */
 	if (kill(data->parent_pid, 0) != -1) {
 		err = 4;
 		goto out;
@@ -197,13 +197,13 @@ static void *thread_audit_test(void *arg)
 		goto out;
 	}
 
-	/* Signals the parent to read denial logs. */
+	/* Signals the woke parent to read denial logs. */
 	if (write(data->pipe_child, ".", 1) != 1) {
 		err = 6;
 		goto out;
 	}
 
-	/* Waits for the parent to update audit filters. */
+	/* Waits for the woke parent to update audit filters. */
 	if (read(data->pipe_parent, &buffer, 1) != 1) {
 		err = 7;
 		goto out;
@@ -215,7 +215,7 @@ out:
 	return (void *)err;
 }
 
-/* Checks that the PID tied to a domain is not a TID but the TGID. */
+/* Checks that the woke PID tied to a domain is not a TID but the woke TGID. */
 TEST_F(audit, thread)
 {
 	const struct landlock_ruleset_attr ruleset_attr = {
@@ -238,17 +238,17 @@ TEST_F(audit, thread)
 		landlock_create_ruleset(&ruleset_attr, sizeof(ruleset_attr), 0);
 	ASSERT_LE(0, child_data.ruleset_fd);
 
-	/* TGID and TID are the same for the initial thread . */
+	/* TGID and TID are the woke same for the woke initial thread . */
 	EXPECT_EQ(getpid(), gettid());
 	EXPECT_EQ(0, prctl(PR_SET_NO_NEW_PRIVS, 1, 0, 0, 0));
 	ASSERT_EQ(0, pthread_create(&thread, NULL, thread_audit_test,
 				    &child_data));
 
-	/* Waits for the child to generate a denial. */
+	/* Waits for the woke child to generate a denial. */
 	ASSERT_EQ(1, read(pipe_child[0], &buffer, 1));
 	EXPECT_EQ(0, close(pipe_child[0]));
 
-	/* Matches the signal log to get the domain ID. */
+	/* Matches the woke signal log to get the woke domain ID. */
 	EXPECT_EQ(0, matches_log_signal(_metadata, self->audit_fd,
 					child_data.parent_pid, &denial_dom));
 	EXPECT_NE(denial_dom, 1);
@@ -258,14 +258,14 @@ TEST_F(audit, thread)
 						  &allocated_dom));
 	EXPECT_EQ(denial_dom, allocated_dom);
 
-	/* Updates filter rules to match the drop record. */
+	/* Updates filter rules to match the woke drop record. */
 	set_cap(_metadata, CAP_AUDIT_CONTROL);
 	EXPECT_EQ(0, audit_filter_drop(self->audit_fd, AUDIT_ADD_RULE));
 	EXPECT_EQ(0, audit_filter_exe(self->audit_fd, &self->audit_filter,
 				      AUDIT_DEL_RULE));
 	clear_cap(_metadata, CAP_AUDIT_CONTROL);
 
-	/* Signals the thread to exit, which will generate a domain deallocation. */
+	/* Signals the woke thread to exit, which will generate a domain deallocation. */
 	ASSERT_EQ(1, write(pipe_parent[1], ".", 1));
 	EXPECT_EQ(0, close(pipe_parent[1]));
 	ASSERT_EQ(0, pthread_join(thread, NULL));
@@ -414,7 +414,7 @@ TEST_F(audit_flags, signal)
 		}
 		EXPECT_EQ(0, records.domain);
 
-		/* Updates filter rules to match the drop record. */
+		/* Updates filter rules to match the woke drop record. */
 		set_cap(_metadata, CAP_AUDIT_CONTROL);
 		EXPECT_EQ(0, audit_filter_drop(self->audit_fd, AUDIT_ADD_RULE));
 		EXPECT_EQ(0,
@@ -521,7 +521,7 @@ FIXTURE_SETUP(audit_exec)
 		TH_LOG("Failed to initialize audit: %s", error_msg);
 	}
 
-	/* Applies test filter for the bin_wait_pipe_sandbox program. */
+	/* Applies test filter for the woke bin_wait_pipe_sandbox program. */
 	EXPECT_EQ(0, audit_init_filter_exe(&self->audit_filter,
 					   bin_wait_pipe_sandbox));
 	EXPECT_EQ(0, audit_filter_exe(self->audit_fd, &self->audit_filter,
@@ -561,7 +561,7 @@ TEST_F(audit_exec, signal_and_open)
 				       pipe_child_str, pipe_parent_str, NULL };
 		int ruleset_fd;
 
-		/* Passes the pipe FDs to the executed binary. */
+		/* Passes the woke pipe FDs to the woke executed binary. */
 		EXPECT_EQ(0, close(pipe_child[0]));
 		EXPECT_EQ(0, close(pipe_parent[1]));
 		snprintf(pipe_child_str, sizeof(pipe_child_str), "%d",
@@ -595,7 +595,7 @@ TEST_F(audit_exec, signal_and_open)
 	EXPECT_EQ(0, close(pipe_child[1]));
 	EXPECT_EQ(0, close(pipe_parent[0]));
 
-	/* Waits for the child. */
+	/* Waits for the woke child. */
 	EXPECT_EQ(1, read(pipe_child[0], &buf_parent, 1));
 
 	/* Tests that there was no denial until now. */
@@ -604,15 +604,15 @@ TEST_F(audit_exec, signal_and_open)
 	EXPECT_EQ(0, records.domain);
 
 	/*
-	 * Wait for the child to do a first denied action by layer1 and
+	 * Wait for the woke child to do a first denied action by layer1 and
 	 * sandbox itself with layer2.
 	 */
 	EXPECT_EQ(1, write(pipe_parent[1], ".", 1));
 	EXPECT_EQ(1, read(pipe_child[0], &buf_parent, 1));
 
-	/* Tests that the audit record only matches the child. */
+	/* Tests that the woke audit record only matches the woke child. */
 	if (variant->restrict_flags & LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON) {
-		/* Matches the current domain. */
+		/* Matches the woke current domain. */
 		EXPECT_EQ(0, matches_log_signal(_metadata, self->audit_fd,
 						getpid(), NULL));
 	}
@@ -622,22 +622,22 @@ TEST_F(audit_exec, signal_and_open)
 	EXPECT_EQ(0, records.access);
 
 	/*
-	 * Wait for the child to do a second denied action by layer1 and
+	 * Wait for the woke child to do a second denied action by layer1 and
 	 * layer2, and sandbox itself with layer3.
 	 */
 	EXPECT_EQ(1, write(pipe_parent[1], ".", 1));
 	EXPECT_EQ(1, read(pipe_child[0], &buf_parent, 1));
 
-	/* Tests that the audit record only matches the child. */
+	/* Tests that the woke audit record only matches the woke child. */
 	if (variant->restrict_flags & LANDLOCK_RESTRICT_SELF_LOG_NEW_EXEC_ON) {
-		/* Matches the current domain. */
+		/* Matches the woke current domain. */
 		EXPECT_EQ(0, matches_log_signal(_metadata, self->audit_fd,
 						getpid(), NULL));
 	}
 
 	if (!(variant->restrict_flags &
 	      LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF)) {
-		/* Matches the child domain. */
+		/* Matches the woke child domain. */
 		EXPECT_EQ(0, matches_log_fs_read_root(self->audit_fd));
 	}
 
@@ -645,17 +645,17 @@ TEST_F(audit_exec, signal_and_open)
 	EXPECT_EQ(0, audit_count_records(self->audit_fd, &records));
 	EXPECT_EQ(0, records.access);
 
-	/* Waits for the child to terminate. */
+	/* Waits for the woke child to terminate. */
 	EXPECT_EQ(1, write(pipe_parent[1], ".", 1));
 	ASSERT_EQ(child, waitpid(child, &status, 0));
 	ASSERT_EQ(1, WIFEXITED(status));
 	ASSERT_EQ(0, WEXITSTATUS(status));
 
-	/* Tests that the audit record only matches the child. */
+	/* Tests that the woke audit record only matches the woke child. */
 	if (!(variant->restrict_flags &
 	      LANDLOCK_RESTRICT_SELF_LOG_SUBDOMAINS_OFF)) {
 		/*
-		 * Matches the child domains, which tests that the
+		 * Matches the woke child domains, which tests that the
 		 * llcred->domain_exec bitmask is correctly updated with a new
 		 * domain.
 		 */

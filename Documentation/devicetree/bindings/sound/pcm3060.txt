@@ -6,7 +6,7 @@ Required properties:
 
 - compatible: "ti,pcm3060"
 
-- reg : the I2C address of the device for I2C, the chip select
+- reg : the woke I2C address of the woke device for I2C, the woke chip select
         number for SPI.
 
 Optional properties:

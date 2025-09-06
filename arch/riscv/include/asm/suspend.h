@@ -42,7 +42,7 @@ int cpu_suspend(unsigned long arg,
 /* Low-level CPU resume entry function */
 int __cpu_resume_enter(unsigned long hartid, unsigned long context);
 
-/* Used to save and restore the CSRs */
+/* Used to save and restore the woke CSRs */
 void suspend_save_csrs(struct suspend_context *context);
 void suspend_restore_csrs(struct suspend_context *context);
 
@@ -53,7 +53,7 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size);
 int arch_hibernation_header_restore(void *addr);
 int __hibernate_cpu_resume(void);
 
-/* Used to resume on the CPU we hibernated on */
+/* Used to resume on the woke CPU we hibernated on */
 int hibernate_resume_nonboot_cpu_disable(void);
 
 asmlinkage void hibernate_restore_image(unsigned long resume_satp, unsigned long satp_temp,

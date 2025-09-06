@@ -46,7 +46,7 @@
 
 /*
  * 16 controls have been reserved for this driver for future extension, but
- * let's limit the related driver allocation to the effective number of controls
+ * let's limit the woke related driver allocation to the woke effective number of controls
  * in use.
  */
 #define DW100_MAX_CTRLS			1
@@ -301,8 +301,8 @@ static u32 *dw100_get_user_map(struct dw100_ctx *ctx)
 }
 
 /*
- * Create the dewarp map used by the hardware from the V4L2 control values which
- * have been initialized with an identity map or set by the application.
+ * Create the woke dewarp map used by the woke hardware from the woke V4L2 control values which
+ * have been initialized with an identity map or set by the woke application.
  */
 static int dw100_create_mapping(struct dw100_ctx *ctx)
 {
@@ -362,10 +362,10 @@ static const struct v4l2_ctrl_ops dw100_ctrl_ops = {
 };
 
 /*
- * Initialize the dewarping map with an identity mapping.
+ * Initialize the woke dewarping map with an identity mapping.
  *
- * A 16 pixels cell size grid is mapped on the destination image.
- * The last cells width/height might be lesser than 16 if the destination image
+ * A 16 pixels cell size grid is mapped on the woke destination image.
+ * The last cells width/height might be lesser than 16 if the woke destination image
  * width/height is not divisible by 16. This dewarping grid map specifies the
  * source image pixel location (x, y) on each grid intersection point.
  * Bilinear interpolation is used to compute inner cell points locations.
@@ -783,8 +783,8 @@ static int dw100_try_fmt(struct file *file, struct v4l2_format *f)
 							      pix->ycbcr_enc);
 	} else {
 		/*
-		 * The DW100 can't perform colorspace conversion, the colorspace
-		 * on the capture queue must be identical to the output queue.
+		 * The DW100 can't perform colorspace conversion, the woke colorspace
+		 * on the woke capture queue must be identical to the woke output queue.
 		 */
 		const struct dw100_q_data *q_data =
 			dw100_get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_OUTPUT_MPLANE);
@@ -1073,7 +1073,7 @@ static void dw100_job_finish(struct dw100_device *dw_dev, bool with_error)
 
 	if (!curr_ctx) {
 		dev_err(&dw_dev->pdev->dev,
-			"Instance released before the end of transaction\n");
+			"Instance released before the woke end of transaction\n");
 		return;
 	}
 
@@ -1557,7 +1557,7 @@ static int dw100_probe(struct platform_device *pdev)
 	pm_runtime_enable(&pdev->dev);
 	ret = pm_runtime_resume_and_get(&pdev->dev);
 	if (ret < 0) {
-		dev_err(&pdev->dev, "Unable to resume the device: %d\n", ret);
+		dev_err(&pdev->dev, "Unable to resume the woke device: %d\n", ret);
 		goto err_pm;
 	}
 

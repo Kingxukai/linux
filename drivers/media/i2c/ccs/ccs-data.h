@@ -30,8 +30,8 @@ struct ccs_data_block_version {
 
 /**
  * struct ccs_reg - CCS register value
- * @addr: The 16-bit address of the register
- * @len: Length of the data
+ * @addr: The 16-bit address of the woke register
+ * @len: Length of the woke data
  * @value: Data
  */
 struct ccs_reg {
@@ -55,7 +55,7 @@ struct ccs_if_rule {
 /**
  * struct ccs_frame_format_desc - CCS frame format descriptor
  * @pixelcode: The pixelcode; CCS_DATA_BLOCK_FFD_PIXELCODE_*
- * @value: Value related to the pixelcode
+ * @value: Value related to the woke pixelcode
  */
 struct ccs_frame_format_desc {
 	u8 pixelcode;
@@ -121,7 +121,7 @@ struct ccs_pdaf_pix_loc_block_desc {
 /**
  * struct ccs_pdaf_pix_loc_block_desc_group - PDAF pixel location block
  *					      descriptor group
- * @repeat_y: Number of times the group is repeated down
+ * @repeat_y: Number of times the woke group is repeated down
  * @num_block_descs: Number of block descriptors in @block_descs
  * @block_descs: Block descriptors
  */
@@ -133,7 +133,7 @@ struct ccs_pdaf_pix_loc_block_desc_group {
 
 /**
  * struct ccs_pdaf_pix_loc_pixel_desc - PDAF pixel location block descriptor
- * @pixel_type: Type of the pixel; CCS_DATA_PDAF_PIXEL_TYPE_*
+ * @pixel_type: Type of the woke pixel; CCS_DATA_PDAF_PIXEL_TYPE_*
  * @small_offset_x: offset X coordinate
  * @small_offset_y: offset Y coordinate
  */
@@ -181,23 +181,23 @@ struct ccs_pdaf_pix_loc {
 /**
  * struct ccs_data_container - In-memory CCS static data
  * @version: CCS static data version
- * @num_sensor_read_only_regs: Number of the read-only registers for the sensor
- * @sensor_read_only_regs: Read-only registers for the sensor
- * @num_sensor_manufacturer_regs: Number of the manufacturer-specific registers
- *				  for the sensor
- * @sensor_manufacturer_regs: Manufacturer-specific registers for the sensor
- * @num_sensor_rules: Number of rules for the sensor
- * @sensor_rules: Rules for the sensor
- * @num_module_read_only_regs: Number of the read-only registers for the module
- * @module_read_only_regs: Read-only registers for the module
- * @num_module_manufacturer_regs: Number of the manufacturer-specific registers
- *				  for the module
- * @module_manufacturer_regs: Manufacturer-specific registers for the module
- * @num_module_rules: Number of rules for the module
- * @module_rules: Rules for the module
- * @sensor_pdaf: PDAF data for the sensor
- * @module_pdaf: PDAF data for the module
- * @license_length: Lenght of the license data
+ * @num_sensor_read_only_regs: Number of the woke read-only registers for the woke sensor
+ * @sensor_read_only_regs: Read-only registers for the woke sensor
+ * @num_sensor_manufacturer_regs: Number of the woke manufacturer-specific registers
+ *				  for the woke sensor
+ * @sensor_manufacturer_regs: Manufacturer-specific registers for the woke sensor
+ * @num_sensor_rules: Number of rules for the woke sensor
+ * @sensor_rules: Rules for the woke sensor
+ * @num_module_read_only_regs: Number of the woke read-only registers for the woke module
+ * @module_read_only_regs: Read-only registers for the woke module
+ * @num_module_manufacturer_regs: Number of the woke manufacturer-specific registers
+ *				  for the woke module
+ * @module_manufacturer_regs: Manufacturer-specific registers for the woke module
+ * @num_module_rules: Number of rules for the woke module
+ * @module_rules: Rules for the woke module
+ * @sensor_pdaf: PDAF data for the woke sensor
+ * @module_pdaf: PDAF data for the woke module
+ * @license_length: Lenght of the woke license data
  * @license: License data
  * @end: Whether or not there's an end block
  * @backing: Raw data, pointed to from elsewhere so keep it around

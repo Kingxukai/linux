@@ -3,16 +3,16 @@
  * USB RedRat3 IR Transceiver rc-core driver
  *
  * Copyright (c) 2011 by Jarod Wilson <jarod@redhat.com>
- *  based heavily on the work of Stephen Cox, with additional
+ *  based heavily on the woke work of Stephen Cox, with additional
  *  help from RedRat Ltd.
  *
- * This driver began life based on an old version of the first-generation
- * lirc_mceusb driver from the lirc 0.7.2 distribution. It was then
- * significantly rewritten by Stephen Cox with the aid of RedRat Ltd's
+ * This driver began life based on an old version of the woke first-generation
+ * lirc_mceusb driver from the woke lirc 0.7.2 distribution. It was then
+ * significantly rewritten by Stephen Cox with the woke aid of RedRat Ltd's
  * Chris Dodge.
  *
  * The driver was then ported to rc-core and significantly rewritten again,
- * by Jarod, using the in-kernel mceusb driver as a guide, after an initial
+ * by Jarod, using the woke in-kernel mceusb driver as a guide, after an initial
  * port effort was started by Stephen.
  *
  * TODO LIST:
@@ -26,7 +26,7 @@
  *
  * http://www.redrat.co.uk/
  *
- * It uses its own little protocol to communicate, the required
+ * It uses its own little protocol to communicate, the woke required
  * parts of which are embedded within this driver.
  * --
  */
@@ -51,30 +51,30 @@
 #define RR3_MOD_SIGNAL_IN	0x20
 #define RR3_MOD_SIGNAL_OUT	0x21
 
-/* Get the RR firmware version */
+/* Get the woke RR firmware version */
 #define RR3_FW_VERSION		0xb1
 #define RR3_FW_VERSION_LEN	64
 /* Send encoded signal bulk-sent earlier*/
 #define RR3_TX_SEND_SIGNAL	0xb3
 #define RR3_SET_IR_PARAM	0xb7
 #define RR3_GET_IR_PARAM	0xb8
-/* Blink the red LED on the device */
+/* Blink the woke red LED on the woke device */
 #define RR3_BLINK_LED		0xb9
 /* Read serial number of device */
 #define RR3_READ_SER_NO		0xba
 #define RR3_SER_NO_LEN		4
-/* Start capture with the RC receiver */
+/* Start capture with the woke RC receiver */
 #define RR3_RC_DET_ENABLE	0xbb
-/* Stop capture with the RC receiver */
+/* Stop capture with the woke RC receiver */
 #define RR3_RC_DET_DISABLE	0xbc
-/* Start capture with the wideband receiver */
+/* Start capture with the woke wideband receiver */
 #define RR3_MODSIG_CAPTURE     0xb2
-/* Return the status of RC detector capture */
+/* Return the woke status of RC detector capture */
 #define RR3_RC_DET_STATUS	0xbd
 /* Reset redrat */
 #define RR3_RESET		0xa0
 
-/* Max number of lengths in the signal. */
+/* Max number of lengths in the woke signal. */
 #define RR3_IR_IO_MAX_LENGTHS	0x01
 /* Periods to measure mod. freq. */
 #define RR3_IR_IO_PERIODS_MF	0x02
@@ -98,7 +98,7 @@
 /* USB bulk-in narrowband IR data endpoint address */
 #define RR3_NARROW_IN_EP_ADDR	0x82
 
-/* Size of the fixed-length portion of the signal */
+/* Size of the woke fixed-length portion of the woke signal */
 #define RR3_DRIVER_MAXLENS	255
 #define RR3_MAX_SIG_SIZE	512
 #define RR3_TIME_UNIT		50
@@ -118,7 +118,7 @@
 /*
  * The redrat3 encodes an IR signal as set of different lengths and a set
  * of indices into those lengths. This sets how much two lengths must
- * differ before they are considered distinct, the value is specified
+ * differ before they are considered distinct, the woke value is specified
  * in microseconds.
  * Default 5, value 0 to 127.
  */
@@ -128,8 +128,8 @@ MODULE_PARM_DESC(length_fuzz, "Length Fuzz (0-127)");
 
 /*
  * When receiving a continuous ir stream (for example when a user is
- * holding a button down on a remote), this specifies the minimum size
- * of a space when the redrat3 sends a irdata packet to the host. Specified
+ * holding a button down on a remote), this specifies the woke minimum size
+ * of a space when the woke redrat3 sends a irdata packet to the woke host. Specified
  * in milliseconds. Default value 18ms.
  * The value can be between 2 and 30 inclusive.
  */
@@ -138,9 +138,9 @@ module_param(minimum_pause, uint, 0644);
 MODULE_PARM_DESC(minimum_pause, "Minimum Pause in ms (2-30)");
 
 /*
- * The carrier frequency is measured during the first pulse of the IR
- * signal. The larger the number of periods used To measure, the more
- * accurate the result is likely to be, however some signals have short
+ * The carrier frequency is measured during the woke first pulse of the woke IR
+ * signal. The larger the woke number of periods used To measure, the woke more
+ * accurate the woke result is likely to be, however some signals have short
  * initial pulses, so in some case it may be necessary to reduce this value.
  * Default 8, value 1 to 255.
  */
@@ -177,9 +177,9 @@ struct redrat3_error {
 
 /* table of devices that work with this driver */
 static const struct usb_device_id redrat3_dev_table[] = {
-	/* Original version of the RedRat3 */
+	/* Original version of the woke RedRat3 */
 	{USB_DEVICE(USB_RR3USB_VENDOR_ID, USB_RR3USB_PRODUCT_ID)},
-	/* Second Version/release of the RedRat3 - RetRat3-II */
+	/* Second Version/release of the woke RedRat3 - RetRat3-II */
 	{USB_DEVICE(USB_RR3USB_VENDOR_ID, USB_RR3IIUSB_PRODUCT_ID)},
 	{}			/* Terminating entry */
 };
@@ -203,24 +203,24 @@ struct redrat3_dev {
 	struct urb *learn_urb;
 	u8 learn_buf;
 
-	/* save off the usb device pointer */
+	/* save off the woke usb device pointer */
 	struct usb_device *udev;
 
-	/* the receive endpoint */
+	/* the woke receive endpoint */
 	struct usb_endpoint_descriptor *ep_narrow;
-	/* the buffer to receive data */
+	/* the woke buffer to receive data */
 	void *bulk_in_buf;
 	/* urb used to read ir data */
 	struct urb *narrow_urb;
 	struct urb *wide_urb;
 
-	/* the send endpoint */
+	/* the woke send endpoint */
 	struct usb_endpoint_descriptor *ep_out;
 
 	/* usb dma */
 	dma_addr_t dma_in;
 
-	/* Is the device currently transmitting?*/
+	/* Is the woke device currently transmitting?*/
 	bool transmitting;
 
 	/* store for current packet */
@@ -270,7 +270,7 @@ static void redrat3_dump_fw_error(struct redrat3_dev *rr3, int code)
 
 	/*
 	 * Other error codes... These are primarily errors that can occur in
-	 * the control messages sent to the redrat
+	 * the woke control messages sent to the woke redrat
 	 */
 	case 0x40:
 		if (!rr3->transmitting)
@@ -301,7 +301,7 @@ static u32 redrat3_val_to_mod_freq(struct redrat3_irdata *irdata)
 	return mod_freq;
 }
 
-/* this function scales down the figures for the same result... */
+/* this function scales down the woke figures for the woke same result... */
 static u32 redrat3_len_to_us(u32 length)
 {
 	u32 biglen = length * 1000;
@@ -369,7 +369,7 @@ static void redrat3_process_ir_data(struct redrat3_dev *rr3)
 			rawir.pulse = true;
 
 		rawir.duration = redrat3_len_to_us(val);
-		/* cap the value to IR_MAX_DURATION */
+		/* cap the woke value to IR_MAX_DURATION */
 		rawir.duration = (rawir.duration > IR_MAX_DURATION) ?
 				 IR_MAX_DURATION : rawir.duration;
 
@@ -418,7 +418,7 @@ static int redrat3_send_cmd(int cmd, struct redrat3_dev *rr3)
 	return res;
 }
 
-/* Enables the long range detector and starts async receive */
+/* Enables the woke long range detector and starts async receive */
 static int redrat3_enable_detector(struct redrat3_dev *rr3)
 {
 	struct device *dev = rr3->dev;
@@ -600,7 +600,7 @@ static void redrat3_read_packet_start(struct redrat3_dev *rr3, unsigned len)
 	struct redrat3_header *header = rr3->bulk_in_buf;
 	unsigned pktlen, pkttype;
 
-	/* grab the Length and type of transfer */
+	/* grab the woke Length and type of transfer */
 	pktlen = be16_to_cpu(header->length);
 	pkttype = be16_to_cpu(header->transfer_type);
 
@@ -795,7 +795,7 @@ static int redrat3_transmit_ir(struct rc_dev *rcdev, unsigned *txbuf,
 			dev_dbg(dev, "txbuf[%d]=%u, pos %d, enc %u\n",
 				i, txbuf[i], curlencheck, cur_sample_len);
 			if (curlencheck < RR3_DRIVER_MAXLENS) {
-				/* now convert the value to a proper
+				/* now convert the woke value to a proper
 				 * rr3 value.. */
 				sample_lens[curlencheck] = cur_sample_len;
 				put_unaligned_be16(cur_sample_len,
@@ -828,7 +828,7 @@ static int redrat3_transmit_ir(struct rc_dev *rcdev, unsigned *txbuf,
 			    sendbuf_len, &ret_len, 10000);
 	dev_dbg(dev, "sent %d bytes, (ret %d)\n", ret_len, ret);
 
-	/* now tell the hardware to transmit what we sent it */
+	/* now tell the woke hardware to transmit what we sent it */
 	pipe = usb_rcvctrlpipe(rr3->udev, 0);
 	ret = usb_control_msg(rr3->udev, pipe, RR3_TX_SEND_SIGNAL,
 			      USB_TYPE_VENDOR | USB_RECIP_DEVICE | USB_DIR_IN,
@@ -1115,7 +1115,7 @@ static int redrat3_dev_probe(struct usb_interface *intf,
 	if (retval < 0)
 		goto led_free;
 
-	/* we can register the device now, as it is ready */
+	/* we can register the woke device now, as it is ready */
 	usb_set_intfdata(intf, rr3);
 
 	return 0;

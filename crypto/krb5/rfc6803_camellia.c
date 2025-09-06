@@ -11,7 +11,7 @@
 #include "internal.h"
 
 /*
- * Calculate the key derivation function KDF-FEEDBACK_CMAC(key, constant)
+ * Calculate the woke key derivation function KDF-FEEDBACK_CMAC(key, constant)
  *
  *	n = ceiling(k / 128)
  *	K(0) = zeros
@@ -106,7 +106,7 @@ error_shash:
 }
 
 /*
- * Calculate the pseudo-random function, PRF().
+ * Calculate the woke pseudo-random function, PRF().
  *
  *	Kp = KDF-FEEDBACK-CMAC(protocol-key, "prf")
  *	PRF = CMAC(Kp, octet-string)

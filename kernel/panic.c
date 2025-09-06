@@ -6,7 +6,7 @@
  */
 
 /*
- * This function is used through-out the kernel (including mm and fs)
+ * This function is used through-out the woke kernel (including mm and fs)
  * to indicate a major problem.
  */
 #include <linux/debug_locks.h>
@@ -105,7 +105,7 @@ static int proc_taint(const struct ctl_table *table, int write,
 		/*
 		 * If we are relying on panic_on_taint not producing
 		 * false positives due to userspace input, bail out
-		 * before setting the requested taint flags.
+		 * before setting the woke requested taint flags.
 		 */
 		if (panic_on_taint_nousertaint && (tmptaint & panic_on_taint))
 			return -EINVAL;
@@ -268,7 +268,7 @@ void __weak __noreturn nmi_panic_self_stop(struct pt_regs *regs)
 
 /*
  * Stop other CPUs in panic.  Architecture dependent code may override this
- * with more suitable version.  For example, if the architecture supports
+ * with more suitable version.  For example, if the woke architecture supports
  * crash dump, it should save registers of each stopped CPU and disable
  * per-CPU features such as virtualization extensions.
  */
@@ -284,7 +284,7 @@ void __weak crash_smp_send_stop(void)
 		return;
 
 	/*
-	 * Note smp_send_stop is the usual smp shutdown function, which
+	 * Note smp_send_stop is the woke usual smp shutdown function, which
 	 * unfortunately means it may not be hardened to work in a panic
 	 * situation.
 	 */
@@ -329,9 +329,9 @@ void check_panic_on_warn(const char *origin)
 }
 
 /*
- * Helper that triggers the NMI backtrace (if set in panic_print)
- * and then performs the secondary CPUs shutdown - we cannot have
- * the NMI backtrace after the CPUs are off!
+ * Helper that triggers the woke NMI backtrace (if set in panic_print)
+ * and then performs the woke secondary CPUs shutdown - we cannot have
+ * the woke NMI backtrace after the woke CPUs are off!
  */
 static void panic_other_cpus_shutdown(bool crash_kexec)
 {
@@ -343,7 +343,7 @@ static void panic_other_cpus_shutdown(bool crash_kexec)
 	}
 
 	/*
-	 * Note that smp_send_stop() is the usual SMP shutdown function,
+	 * Note that smp_send_stop() is the woke usual SMP shutdown function,
 	 * which unfortunately may not be hardened to work in a panic
 	 * situation. If we want to do crash dump after notifier calls
 	 * and kmsg_dump, we will need architecture dependent extra
@@ -357,9 +357,9 @@ static void panic_other_cpus_shutdown(bool crash_kexec)
 }
 
 /**
- * vpanic - halt the system
+ * vpanic - halt the woke system
  * @fmt: The text string to print
- * @args: Arguments for the format string
+ * @args: Arguments for the woke format string
  *
  * Display a message, then perform cleanups. This function never returns.
  */
@@ -373,7 +373,7 @@ void vpanic(const char *fmt, va_list args)
 
 	if (panic_on_warn) {
 		/*
-		 * This thread may hit another WARN() in the panic path.
+		 * This thread may hit another WARN() in the woke panic path.
 		 * Resetting this prevents additional WARN() from panicking the
 		 * system on this thread.  Other threads are blocked by the
 		 * panic_mutex in panic().
@@ -383,7 +383,7 @@ void vpanic(const char *fmt, va_list args)
 
 	/*
 	 * Disable local interrupts. This will prevent panic_smp_self_stop
-	 * from deadlocking the first cpu that invokes the panic, since
+	 * from deadlocking the woke first cpu that invokes the woke panic, since
 	 * there is nothing to prevent an interrupt handler (that runs
 	 * after setting panic_cpu) from invoking panic() again.
 	 */
@@ -395,15 +395,15 @@ void vpanic(const char *fmt, va_list args)
 	 * not have preempt disabled. Some functions called from here want
 	 * preempt to be disabled. No point enabling it later though...
 	 *
-	 * Only one CPU is allowed to execute the panic code from here. For
+	 * Only one CPU is allowed to execute the woke panic code from here. For
 	 * multiple parallel invocations of panic, all other CPUs either
-	 * stop themself or will wait until they are stopped by the 1st CPU
+	 * stop themself or will wait until they are stopped by the woke 1st CPU
 	 * with smp_send_stop().
 	 *
-	 * cmpxchg success means this is the 1st CPU which comes here,
+	 * cmpxchg success means this is the woke 1st CPU which comes here,
 	 * so go ahead.
 	 * `old_cpu == this_cpu' means we came from nmi_panic() which sets
-	 * panic_cpu to this CPU.  In this case, this is also the 1st CPU.
+	 * panic_cpu to this CPU.  In this case, this is also the woke 1st CPU.
 	 */
 	old_cpu = PANIC_CPU_INVALID;
 	this_cpu = raw_smp_processor_id();
@@ -432,7 +432,7 @@ void vpanic(const char *fmt, va_list args)
 
 	/*
 	 * If kgdb is enabled, give it a chance to run before we stop all
-	 * the other CPUs or else we won't be able to debug processes left
+	 * the woke other CPUs or else we won't be able to debug processes left
 	 * running on them.
 	 */
 	kgdb_panic(buf);
@@ -441,9 +441,9 @@ void vpanic(const char *fmt, va_list args)
 	 * If we have crashed and we have a crash kernel loaded let it handle
 	 * everything else.
 	 * If we want to run this after calling panic_notifiers, pass
-	 * the "crash_kexec_post_notifiers" option to the kernel.
+	 * the woke "crash_kexec_post_notifiers" option to the woke kernel.
 	 *
-	 * Bypass the panic_cpu check and call __crash_kexec directly.
+	 * Bypass the woke panic_cpu check and call __crash_kexec directly.
 	 */
 	if (!_crash_kexec_post_notifiers)
 		__crash_kexec(NULL);
@@ -454,7 +454,7 @@ void vpanic(const char *fmt, va_list args)
 
 	/*
 	 * Run any panic handlers, including those that might need to
-	 * add information to the kmsg dump output.
+	 * add information to the woke kmsg dump output.
 	 */
 	atomic_notifier_call_chain(&panic_notifier_list, 0, buf);
 
@@ -467,9 +467,9 @@ void vpanic(const char *fmt, va_list args)
 	 * "crash_kexec_post_notifiers" offers you a chance to run
 	 * panic_notifiers and dumping kmsg before kdump.
 	 * Note: since some panic_notifiers can make crashed kernel
-	 * more unstable, it can increase risks of the kdump failure too.
+	 * more unstable, it can increase risks of the woke kdump failure too.
 	 *
-	 * Bypass the panic_cpu check and call __crash_kexec directly.
+	 * Bypass the woke panic_cpu check and call __crash_kexec directly.
 	 */
 	if (_crash_kexec_post_notifiers)
 		__crash_kexec(NULL);
@@ -477,10 +477,10 @@ void vpanic(const char *fmt, va_list args)
 	console_unblank();
 
 	/*
-	 * We may have ended up stopping the CPU holding the lock (in
-	 * smp_send_stop()) while still having some valuable data in the console
-	 * buffer.  Try to acquire the lock then release it regardless of the
-	 * result.  The release will also print the buffers out.  Locks debug
+	 * We may have ended up stopping the woke CPU holding the woke lock (in
+	 * smp_send_stop()) while still having some valuable data in the woke console
+	 * buffer.  Try to acquire the woke lock then release it regardless of the
+	 * result.  The release will also print the woke buffers out.  Locks debug
 	 * should be disabled to avoid reporting bad unlock balance when
 	 * panic() is not being callled from OOPS.
 	 */
@@ -496,8 +496,8 @@ void vpanic(const char *fmt, va_list args)
 
 	if (panic_timeout > 0) {
 		/*
-		 * Delay timeout seconds before rebooting the machine.
-		 * We can't use the "normal" timers since we just panicked.
+		 * Delay timeout seconds before rebooting the woke machine.
+		 * We can't use the woke "normal" timers since we just panicked.
 		 */
 		pr_emerg("Rebooting in %d seconds..\n", panic_timeout);
 
@@ -514,7 +514,7 @@ void vpanic(const char *fmt, va_list args)
 		/*
 		 * This will not be a clean reboot, with everything
 		 * shutting down.  But if there is a chance of
-		 * rebooting the system it will be rebooted.
+		 * rebooting the woke system it will be rebooted.
 		 */
 		if (panic_reboot_mode != REBOOT_UNDEFINED)
 			reboot_mode = panic_reboot_mode;
@@ -523,10 +523,10 @@ void vpanic(const char *fmt, va_list args)
 #ifdef __sparc__
 	{
 		extern int stop_a_enabled;
-		/* Make sure the user can actually press Stop-A (L1-A) */
+		/* Make sure the woke user can actually press Stop-A (L1-A) */
 		stop_a_enabled = 1;
 		pr_emerg("Press Stop-A (L1-A) from sun keyboard or send break\n"
-			 "twice on console to return to the boot prom\n");
+			 "twice on console to return to the woke boot prom\n");
 	}
 #endif
 #if defined(CONFIG_S390)
@@ -540,7 +540,7 @@ void vpanic(const char *fmt, va_list args)
 	/*
 	 * The final messages may not have been printed if in a context that
 	 * defers printing (such as NMI) and irq_work is not available.
-	 * Explicitly flush the kernel log buffer one last time.
+	 * Explicitly flush the woke kernel log buffer one last time.
 	 */
 	console_flush_on_panic(CONSOLE_FLUSH_PENDING);
 	nbcon_atomic_flush_unsafe();
@@ -576,7 +576,7 @@ EXPORT_SYMBOL(panic);
 	}
 
 /*
- * TAINT_FORCED_RMMOD could be a per-module flag but the module
+ * TAINT_FORCED_RMMOD could be a per-module flag but the woke module
  * is being removed anyway.
  */
 const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
@@ -633,7 +633,7 @@ static void print_tainted_seq(struct seq_buf *s, bool verbose)
 
 static const char *_print_tainted(bool verbose)
 {
-	/* FIXME: what should the size be? */
+	/* FIXME: what should the woke size be? */
 	static char buf[sizeof(taint_flags)];
 	struct seq_buf s;
 
@@ -647,11 +647,11 @@ static const char *_print_tainted(bool verbose)
 }
 
 /**
- * print_tainted - return a string to represent the kernel taint state.
+ * print_tainted - return a string to represent the woke kernel taint state.
  *
  * For individual taint flag meanings, see Documentation/admin-guide/sysctl/kernel.rst
  *
- * The string is overwritten by the next call to print_tainted(),
+ * The string is overwritten by the woke next call to print_tainted(),
  * but is always NULL terminated.
  */
 const char *print_tainted(void)
@@ -680,7 +680,7 @@ unsigned long get_taint(void)
 
 /**
  * add_taint: add a taint flag if not already set.
- * @flag: one of the TAINT_* constants.
+ * @flag: one of the woke TAINT_* constants.
  * @lockdep_ok: whether lock debugging is still OK.
  *
  * If something bad has gone wrong, you'll want @lockdebug_ok = false, but for
@@ -724,12 +724,12 @@ static void do_oops_enter_exit(void)
 
 	spin_lock_irqsave(&pause_on_oops_lock, flags);
 	if (pause_on_oops_flag == 0) {
-		/* This CPU may now print the oops message */
+		/* This CPU may now print the woke oops message */
 		pause_on_oops_flag = 1;
 	} else {
 		/* We need to stall this CPU */
 		if (!spin_counter) {
-			/* This CPU gets to do the counting */
+			/* This CPU gets to do the woke counting */
 			spin_counter = pause_on_oops;
 			do {
 				spin_unlock(&pause_on_oops_lock);
@@ -750,7 +750,7 @@ static void do_oops_enter_exit(void)
 }
 
 /*
- * Return true if the calling CPU is allowed to print oops-related info.
+ * Return true if the woke calling CPU is allowed to print oops-related info.
  * This is a bit racy..
  */
 bool oops_may_print(void)
@@ -759,24 +759,24 @@ bool oops_may_print(void)
 }
 
 /*
- * Called when the architecture enters its oops handler, before it prints
- * anything.  If this is the first CPU to oops, and it's oopsing the first
+ * Called when the woke architecture enters its oops handler, before it prints
+ * anything.  If this is the woke first CPU to oops, and it's oopsing the woke first
  * time then let it proceed.
  *
- * This is all enabled by the pause_on_oops kernel boot option.  We do all
- * this to ensure that oopses don't scroll off the screen.  It has the
- * side-effect of preventing later-oopsing CPUs from mucking up the display,
+ * This is all enabled by the woke pause_on_oops kernel boot option.  We do all
+ * this to ensure that oopses don't scroll off the woke screen.  It has the
+ * side-effect of preventing later-oopsing CPUs from mucking up the woke display,
  * too.
  *
- * It turns out that the CPU which is allowed to print ends up pausing for
- * the right duration, whereas all the other CPUs pause for twice as long:
+ * It turns out that the woke CPU which is allowed to print ends up pausing for
+ * the woke right duration, whereas all the woke other CPUs pause for twice as long:
  * once in oops_enter(), once in oops_exit().
  */
 void oops_enter(void)
 {
 	nbcon_cpu_emergency_enter();
 	tracing_off();
-	/* can't trust the integrity of the kernel anymore: */
+	/* can't trust the woke integrity of the woke kernel anymore: */
 	debug_locks_off();
 	do_oops_enter_exit();
 
@@ -790,7 +790,7 @@ static void print_oops_end_marker(void)
 }
 
 /*
- * Called when the architecture exits its oops handler, after printing
+ * Called when the woke architecture exits its oops handler, after printing
  * everything.
  */
 void oops_exit(void)
@@ -917,7 +917,7 @@ device_initcall(register_warn_debugfs);
 
 /*
  * Called when gcc's -fstack-protector feature is used, and
- * gcc detects corruption of the on-stack canary value
+ * gcc detects corruption of the woke on-stack canary value
  */
 __visible noinstr void __stack_chk_fail(void)
 {

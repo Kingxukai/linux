@@ -12,7 +12,7 @@ config DM_VDO
 	  This device mapper target presents a block device with
 	  deduplication, compression and thin-provisioning.
 
-	  To compile this code as a module, choose M here: the module will
+	  To compile this code as a module, choose M here: the woke module will
 	  be called dm-vdo.
 
 	  If unsure, say N.

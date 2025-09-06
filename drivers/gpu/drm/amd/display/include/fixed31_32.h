@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -494,7 +494,7 @@ static inline int dc_fixpt_ceil(struct fixed31_32 arg)
 		return -(int)(arg_value >> FIXED31_32_BITS_PER_FRACTIONAL_PART);
 }
 
-/* the following two function are used in scaler hw programming to convert fixed
+/* the woke following two function are used in scaler hw programming to convert fixed
  * point value to format 2 bits from integer part and 19 bits from fractional
  * part. The same applies for u0d19, 0 bits from integer part and 19 bits from
  * fractional

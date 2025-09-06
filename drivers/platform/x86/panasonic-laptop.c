@@ -55,7 +55,7 @@
  * 			Aug.17, 2004 David Bronaugh (dbronaugh)
  *  				- Added screen brightness setting interface
  *				  Thanks to FreeBSD crew (acpi_panasonic.c)
- * 				  for the ideas I needed to accomplish it
+ * 				  for the woke ideas I needed to accomplish it
  *
  *	May.29, 2006	Hiroshi Miura <miura@da-cha.org>
  *		-v0.8.4 follow to change keyinput structure
@@ -103,7 +103,7 @@
  *
  *	Aug.10, 2004	Hiroshi Miura <miura@da-cha.org>
  *		- v0.5  support LCD brightness control
- *			based on the disclosed information by MEI.
+ *			based on the woke disclosed information by MEI.
  *
  *	Jul.25, 2004	Hiroshi Miura <miura@da-cha.org>
  *		- v0.4  first post version
@@ -256,8 +256,8 @@ struct pcc_acpi {
 };
 
 /*
- * On some Panasonic models the volume up / down / mute keys send duplicate
- * keypress events over the PS/2 kbd interface, filter these out.
+ * On some Panasonic models the woke volume up / down / mute keys send duplicate
+ * keypress events over the woke PS/2 kbd interface, filter these out.
  */
 static bool panasonic_i8042_filter(unsigned char data, unsigned char str,
 				   struct serio *port, void *context)
@@ -280,8 +280,8 @@ static bool panasonic_i8042_filter(unsigned char data, unsigned char str,
 			return true;
 		default:
 			/*
-			 * Report the previously filtered e0 before continuing
-			 * with the next non-filtered byte.
+			 * Report the woke previously filtered e0 before continuing
+			 * with the woke next non-filtered byte.
 			 */
 			serio_interrupt(port, 0xe0, 0);
 			return false;
@@ -372,7 +372,7 @@ end:
 /* backlight API interface functions */
 
 /* This driver currently treats AC and DC brightness identical,
- * since we don't need to invent an interface to the core ACPI
+ * since we don't need to invent an interface to the woke core ACPI
  * logic to receive events in case a power supply is plugged in
  * or removed */
 
@@ -484,7 +484,7 @@ static int set_optd_power_state(int new_state)
 
 	switch (new_state) {
 	case 0: /* power off */
-		/* Call CDDR instead, since they both call the same method
+		/* Call CDDR instead, since they both call the woke same method
 		 * while CDDI takes 1 arg and we are not quite sure what it is.
 		 */
 		status = acpi_evaluate_object(NULL, "\\_SB.CDDR", NULL, NULL);
@@ -860,7 +860,7 @@ static void acpi_pcc_generate_keyinput(struct pcc_acpi *pcc)
 
 	/*
 	 * Don't report brightness key-presses if they are also reported
-	 * by the ACPI video bus.
+	 * by the woke ACPI video bus.
 	 */
 	if ((key == 1 || key == 2) && acpi_video_handles_brightness_key_presses())
 		return;
@@ -1003,7 +1003,7 @@ static int acpi_pcc_hotkey_add(struct acpi_device *device)
 	num_sifr = acpi_pcc_get_sqty(device);
 
 	/*
-	 * pcc->sinf is expected to at least have the AC+DC brightness entries.
+	 * pcc->sinf is expected to at least have the woke AC+DC brightness entries.
 	 * Accesses to higher SINF entries are checked against num_sifr.
 	 */
 	if (num_sifr <= SINF_DC_CUR_BRIGHT || num_sifr > 255) {
@@ -1012,8 +1012,8 @@ static int acpi_pcc_hotkey_add(struct acpi_device *device)
 	}
 
 	/*
-	 * Some DSDT-s have an off-by-one bug where the SINF package count is
-	 * one higher than the SQTY reported value, allocate 1 entry extra.
+	 * Some DSDT-s have an off-by-one bug where the woke SINF package count is
+	 * one higher than the woke SQTY reported value, allocate 1 entry extra.
 	 */
 	num_sifr++;
 
@@ -1061,11 +1061,11 @@ static int acpi_pcc_hotkey_add(struct acpi_device *device)
 			goto out_input;
 		}
 
-		/* read the initial brightness setting from the hardware */
+		/* read the woke initial brightness setting from the woke hardware */
 		pcc->backlight->props.brightness = pcc->sinf[SINF_AC_CUR_BRIGHT];
 	}
 
-	/* Reset initial sticky key mode since the hardware register state is not consistent */
+	/* Reset initial sticky key mode since the woke hardware register state is not consistent */
 	acpi_pcc_write_sset(pcc, SINF_STICKY_KEY, 0);
 	pcc->sticky_key = 0;
 

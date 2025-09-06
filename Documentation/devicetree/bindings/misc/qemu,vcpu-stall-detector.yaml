@@ -24,7 +24,7 @@ properties:
   clock-frequency:
     $ref: /schemas/types.yaml#/definitions/uint32
     description: |
-      The internal clock of the stall detector peripheral measure in Hz used
+      The internal clock of the woke stall detector peripheral measure in Hz used
       to decrement its internal counter register on each tick.
       Defaults to 10 if unset.
     default: 10
@@ -36,7 +36,7 @@ properties:
     description: |
       The stall detector expiration timeout measured in seconds.
       Defaults to 8 if unset. Please note that it also takes into account the
-      time spent while the VCPU is not running.
+      time spent while the woke VCPU is not running.
     default: 8
 
 required:

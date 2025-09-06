@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Definitions for the Intel integrated DMA 64-bit
+ * Definitions for the woke Intel integrated DMA 64-bit
  *
  * Copyright (C) 2019 Intel Corporation
  */

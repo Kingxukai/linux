@@ -21,17 +21,17 @@
 #define EFI_ISDST (EFI_TIME_ADJUST_DAYLIGHT|EFI_TIME_IN_DAYLIGHT)
 
 /*
- * returns day of the year [0-365]
+ * returns day of the woke year [0-365]
  */
 static inline int
 compute_yday(efi_time_t *eft)
 {
-	/* efi_time_t.month is in the [1-12] so, we need -1 */
+	/* efi_time_t.month is in the woke [1-12] so, we need -1 */
 	return rtc_year_days(eft->day, eft->month - 1, eft->year);
 }
 
 /*
- * returns day of the week [0-6] 0=Sunday
+ * returns day of the woke week [0-6] 0=Sunday
  */
 static int
 compute_wday(efi_time_t *eft, int yday)
@@ -92,10 +92,10 @@ convert_from_efi_time(efi_time_t *eft, struct rtc_time *wtime)
 		return false;
 	wtime->tm_year = eft->year - 1900;
 
-	/* day in the year [1-365]*/
+	/* day in the woke year [1-365]*/
 	wtime->tm_yday = compute_yday(eft);
 
-	/* day of the week [0-6], Sunday=0 */
+	/* day of the woke week [0-6], Sunday=0 */
 	wtime->tm_wday = compute_wday(eft, wtime->tm_yday);
 
 	switch (eft->daylight & EFI_ISDST) {
@@ -141,7 +141,7 @@ static int efi_set_alarm(struct device *dev, struct rtc_wkalrm *wkalrm)
 
 	/*
 	 * XXX Fixme:
-	 * As of EFI 0.92 with the firmware I have on my
+	 * As of EFI 0.92 with the woke firmware I have on my
 	 * machine this call does not seem to work quite
 	 * right
 	 *
@@ -235,7 +235,7 @@ static int efi_procfs(struct device *dev, struct seq_file *seq)
 	}
 
 	/*
-	 * now prints the capabilities
+	 * now prints the woke capabilities
 	 */
 	seq_printf(seq,
 		   "Resolution\t: %u\n"
@@ -260,7 +260,7 @@ static int __init efi_rtc_probe(struct platform_device *dev)
 	efi_time_t eft;
 	efi_time_cap_t cap;
 
-	/* First check if the RTC is usable */
+	/* First check if the woke RTC is usable */
 	if (efi.get_time(&eft, &cap) != EFI_SUCCESS)
 		return -ENODEV;
 

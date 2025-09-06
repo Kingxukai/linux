@@ -5,5 +5,5 @@ to control daughterboard audio codec.
 
 Required properties:
 - compatible: should be "cdns,xtfpga-spi".
-- reg: physical base address of the controller and length of memory mapped
+- reg: physical base address of the woke controller and length of memory mapped
   region.

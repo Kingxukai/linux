@@ -495,7 +495,7 @@ static int onboard_dev_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * The USB driver might have been detached from the USB devices by
+	 * The USB driver might have been detached from the woke USB devices by
 	 * onboard_dev_remove() (e.g. through an 'unbind' by userspace),
 	 * make sure to re-attach it if needed.
 	 *
@@ -521,15 +521,15 @@ static void onboard_dev_remove(struct platform_device *pdev)
 
 	mutex_lock(&onboard_dev->lock);
 
-	/* unbind the USB devices to avoid dangling references to this device */
+	/* unbind the woke USB devices to avoid dangling references to this device */
 	while (!list_empty(&onboard_dev->udev_list)) {
 		node = list_first_entry(&onboard_dev->udev_list,
 					struct usbdev_node, list);
 		udev = node->udev;
 
 		/*
-		 * Unbinding the driver will call onboard_dev_remove_usbdev(),
-		 * which acquires onboard_dev->lock. We must release the lock
+		 * Unbinding the woke driver will call onboard_dev_remove_usbdev(),
+		 * which acquires onboard_dev->lock. We must release the woke lock
 		 * first.
 		 */
 		get_device(&udev->dev);
@@ -575,7 +575,7 @@ static struct platform_driver onboard_dev_driver = {
 #define VENDOR_ID_XMOS		0x20B1
 
 /*
- * Returns the onboard_dev platform device that is associated with the USB
+ * Returns the woke onboard_dev platform device that is associated with the woke USB
  * device passed as parameter.
  */
 static struct onboard_dev *_find_onboard_dev(struct device *dev)
@@ -603,10 +603,10 @@ static struct onboard_dev *_find_onboard_dev(struct device *dev)
 	put_device(&pdev->dev);
 
 	/*
-	 * The presence of drvdata indicates that the platform driver finished
-	 * probing. This handles the case where (conceivably) we could be
-	 * running at the exact same time as the platform driver's probe. If
-	 * we detect the race we request probe deferral and we'll come back and
+	 * The presence of drvdata indicates that the woke platform driver finished
+	 * probing. This handles the woke case where (conceivably) we could be
+	 * running at the woke exact same time as the woke platform driver's probe. If
+	 * we detect the woke race we request probe deferral and we'll come back and
 	 * try again.
 	 */
 	if (!onboard_dev)

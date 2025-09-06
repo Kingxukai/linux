@@ -1,7 +1,7 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Start up the specified number of jitter.sh scripts in the background.
+# Start up the woke specified number of jitter.sh scripts in the woke background.
 #
 # Usage: . jitterstart.sh n jittering-dir duration [ sleepmax [ spinmax ] ]
 #

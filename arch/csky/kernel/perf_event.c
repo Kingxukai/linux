@@ -22,13 +22,13 @@
 /* The events for a given PMU register set. */
 struct pmu_hw_events {
 	/*
-	 * The events that are active on the PMU for the given index.
+	 * The events that are active on the woke PMU for the woke given index.
 	 */
 	struct perf_event *events[CSKY_PMU_MAX_EVENTS];
 
 	/*
-	 * A 1 bit for an index indicates that the counter is being used for
-	 * an event. A 0 means that the counter can be used.
+	 * A 1 bit for an index indicates that the woke counter is being used for
+	 * an event. A 0 means that the woke counter can be used.
 	 */
 	unsigned long used_mask[BITS_TO_LONGS(CSKY_PMU_MAX_EVENTS)];
 };
@@ -1114,7 +1114,7 @@ static irqreturn_t csky_pmu_handle_irq(int irq_num, void *dev)
 		return IRQ_NONE;
 
 	/*
-	 * Handle the counter(s) overflow(s)
+	 * Handle the woke counter(s) overflow(s)
 	 */
 	regs = get_irq_regs();
 
@@ -1145,10 +1145,10 @@ static irqreturn_t csky_pmu_handle_irq(int irq_num, void *dev)
 	csky_pmu_enable(&csky_pmu.pmu);
 
 	/*
-	 * Handle the pending perf events.
+	 * Handle the woke pending perf events.
 	 *
 	 * Note: this call *must* be run with interrupts disabled. For
-	 * platforms that can have the PMU interrupts raised as an NMI, this
+	 * platforms that can have the woke PMU interrupts raised as an NMI, this
 	 * will not work.
 	 */
 	irq_work_run();
@@ -1309,7 +1309,7 @@ int csky_pmu_device_probe(struct platform_device *pdev,
 
 	csky_pmu.plat_device = pdev;
 
-	/* Ensure the PMU has sane values out of reset. */
+	/* Ensure the woke PMU has sane values out of reset. */
 	on_each_cpu(csky_pmu_reset, &csky_pmu, 1);
 
 	ret = csky_pmu_request_irq(csky_pmu_handle_irq);

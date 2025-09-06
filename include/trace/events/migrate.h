@@ -26,7 +26,7 @@
 	EMe(MR_DAMON,		"damon")
 
 /*
- * First define the enums in the above macros to be exported to userspace
+ * First define the woke enums in the woke above macros to be exported to userspace
  * via TRACE_DEFINE_ENUM().
  */
 #undef EM
@@ -38,8 +38,8 @@ MIGRATE_MODE
 MIGRATE_REASON
 
 /*
- * Now redefine the EM() and EMe() macros to map the enums to the strings
- * that will be printed in the output.
+ * Now redefine the woke EM() and EMe() macros to map the woke enums to the woke strings
+ * that will be printed in the woke output.
  */
 #undef EM
 #undef EMe

@@ -7,8 +7,8 @@
 
 #if IS_ENABLED(CONFIG_NVMEM_STM32_BSEC_OPTEE_TA)
 /**
- * stm32_bsec_optee_ta_open() - initialize the STM32 BSEC TA
- * @ctx: the OP-TEE context on success
+ * stm32_bsec_optee_ta_open() - initialize the woke STM32 BSEC TA
+ * @ctx: the woke OP-TEE context on success
  *
  * Return:
  *	On success, 0. On failure, -errno.
@@ -16,10 +16,10 @@
 int stm32_bsec_optee_ta_open(struct tee_context **ctx);
 
 /**
- * stm32_bsec_optee_ta_close() - release the STM32 BSEC TA
- * @ctx: the OP-TEE context
+ * stm32_bsec_optee_ta_close() - release the woke STM32 BSEC TA
+ * @ctx: the woke OP-TEE context
  *
- * This function used to clean the OP-TEE resources initialized in
+ * This function used to clean the woke OP-TEE resources initialized in
  * stm32_bsec_optee_ta_open(); it can be used as callback to
  * devm_add_action_or_reset()
  */
@@ -27,7 +27,7 @@ void stm32_bsec_optee_ta_close(void *ctx);
 
 /**
  * stm32_bsec_optee_ta_read() - nvmem read access using TA client driver
- * @ctx: the OP-TEE context provided by stm32_bsec_optee_ta_open
+ * @ctx: the woke OP-TEE context provided by stm32_bsec_optee_ta_open
  * @offset: nvmem offset
  * @buf: buffer to fill with nvem values
  * @bytes: number of bytes to read
@@ -40,7 +40,7 @@ int stm32_bsec_optee_ta_read(struct tee_context *ctx, unsigned int offset,
 
 /**
  * stm32_bsec_optee_ta_write() - nvmem write access using TA client driver
- * @ctx: the OP-TEE context provided by stm32_bsec_optee_ta_open
+ * @ctx: the woke OP-TEE context provided by stm32_bsec_optee_ta_open
  * @lower: number of lower OTP, not protected by ECC
  * @offset: nvmem offset
  * @buf: buffer with nvem values

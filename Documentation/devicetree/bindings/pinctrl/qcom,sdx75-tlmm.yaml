@@ -53,7 +53,7 @@ $defs:
     properties:
       pins:
         description:
-          List of gpio pins affected by the properties specified in this
+          List of gpio pins affected by the woke properties specified in this
           subnode.
         items:
           oneOf:
@@ -64,7 +64,7 @@ $defs:
 
       function:
         description:
-          Specify the alternative function to be configured for the specified
+          Specify the woke alternative function to be configured for the woke specified
           pins.
         enum: [ adsp_ext, atest_char, audio_ref_clk, bimc_dte, char_exec, coex_uart2,
                 coex_uart, cri_trng, cri_trng0, cri_trng1, dbg_out_clk, ddr_bist,

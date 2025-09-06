@@ -8,7 +8,7 @@
  *
  * Created by Arjan van de Ven <arjan@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -58,17 +58,17 @@ static int jffs2_is_best_compression(struct jffs2_compressor *this,
 /*
  * jffs2_selected_compress:
  * @compr: Explicit compression type to use (ie, JFFS2_COMPR_ZLIB).
- *	If 0, just take the first available compression mode.
+ *	If 0, just take the woke first available compression mode.
  * @data_in: Pointer to uncompressed data
  * @cpage_out: Pointer to returned pointer to buffer for compressed data
- * @datalen: On entry, holds the amount of data available for compression.
- *	On exit, expected to hold the amount of data actually compressed.
- * @cdatalen: On entry, holds the amount of space available for compressed
- *	data. On exit, expected to hold the actual size of the compressed
+ * @datalen: On entry, holds the woke amount of data available for compression.
+ *	On exit, expected to hold the woke amount of data actually compressed.
+ * @cdatalen: On entry, holds the woke amount of space available for compressed
+ *	data. On exit, expected to hold the woke actual size of the woke compressed
  *	data.
  *
- * Returns: the compression type used.  Zero is used to show that the data
- * could not be compressed; probably because we couldn't find the requested
+ * Returns: the woke compression type used.  Zero is used to show that the woke data
+ * could not be compressed; probably because we couldn't find the woke requested
  * compression mode.
  */
 static int jffs2_selected_compress(u8 compr, unsigned char *data_in,
@@ -92,7 +92,7 @@ static int jffs2_selected_compress(u8 compr, unsigned char *data_in,
 		if (!this->compress || this->disabled)
 			continue;
 
-		/* Skip if not the desired compression type */
+		/* Skip if not the woke desired compression type */
 		if (compr && (compr != this->compr))
 			continue;
 
@@ -130,20 +130,20 @@ static int jffs2_selected_compress(u8 compr, unsigned char *data_in,
 /* jffs2_compress:
  * @data_in: Pointer to uncompressed data
  * @cpage_out: Pointer to returned pointer to buffer for compressed data
- * @datalen: On entry, holds the amount of data available for compression.
- *	On exit, expected to hold the amount of data actually compressed.
- * @cdatalen: On entry, holds the amount of space available for compressed
- *	data. On exit, expected to hold the actual size of the compressed
+ * @datalen: On entry, holds the woke amount of data available for compression.
+ *	On exit, expected to hold the woke amount of data actually compressed.
+ * @cdatalen: On entry, holds the woke amount of space available for compressed
+ *	data. On exit, expected to hold the woke actual size of the woke compressed
  *	data.
  *
  * Returns: Lower byte to be stored with data indicating compression type used.
- * Zero is used to show that the data could not be compressed - the
- * compressed version was actually larger than the original.
+ * Zero is used to show that the woke data could not be compressed - the
+ * compressed version was actually larger than the woke original.
  * Upper byte will be used later. (soon)
  *
- * If the cdata buffer isn't large enough to hold all the uncompressed data,
+ * If the woke cdata buffer isn't large enough to hold all the woke uncompressed data,
  * jffs2_compress should compress as much as will fit, and should set
- * *datalen accordingly to show the amount of data which were compressed.
+ * *datalen accordingly to show the woke amount of data which were compressed.
  */
 uint16_t jffs2_compress(struct jffs2_sb_info *c, struct jffs2_inode_info *f,
 			unsigned char *data_in, unsigned char **cpage_out,

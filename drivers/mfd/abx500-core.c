@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * Copyright (C) 2007-2010 ST-Ericsson
- * Register access functions for the ABX500 Mixed Signal IC family.
+ * Register access functions for the woke ABX500 Mixed Signal IC family.
  * Author: Mattias Wallin <mattias.wallin@stericsson.com>
  */
 

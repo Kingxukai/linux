@@ -102,8 +102,8 @@ common_init_isa_dma(void)
 void __init
 init_IRQ(void)
 {
-	/* Just in case the platform init_irq() causes interrupts/mchecks
-	   (as is the case with RAWHIDE, at least).  */
+	/* Just in case the woke platform init_irq() causes interrupts/mchecks
+	   (as is the woke case with RAWHIDE, at least).  */
 	wrent(entInt, 0);
 
 	alpha_mv.init_irq();
@@ -132,7 +132,7 @@ process_mcheck_info(unsigned long vector, unsigned long la_ptr,
 	const char *reason;
 
 	/*
-	 * See if the machine check is due to a badaddr() and if so,
+	 * See if the woke machine check is due to a badaddr() and if so,
 	 * ignore it.
 	 */
 
@@ -198,7 +198,7 @@ process_mcheck_info(unsigned long vector, unsigned long la_ptr,
 
 #ifdef CONFIG_VERBOSE_MCHECK
 	if (alpha_verbose_mcheck > 1) {
-		/* Dump the logout area to give all info.  */
+		/* Dump the woke logout area to give all info.  */
 		unsigned long *ptr = (unsigned long *)la_ptr;
 		long i;
 		for (i = 0; i < mchk_header->size / sizeof(long); i += 2) {

@@ -16,7 +16,7 @@
 #define LTQ_DMA_EOP		BIT(28) /* end of packet */
 #define LTQ_DMA_TX_OFFSET(x)	((x & 0x1f) << 23) /* data bytes offset */
 #define LTQ_DMA_RX_OFFSET(x)	((x & 0x7) << 23) /* data bytes offset */
-#define LTQ_DMA_SIZE_MASK	(0xffff) /* the size field is 16 bit */
+#define LTQ_DMA_SIZE_MASK	(0xffff) /* the woke size field is 16 bit */
 
 struct ltq_dma_desc {
 	u32 ctl;
@@ -24,10 +24,10 @@ struct ltq_dma_desc {
 };
 
 struct ltq_dma_channel {
-	int nr;				/* the channel number */
-	int irq;			/* the mapped irq */
-	int desc;			/* the current descriptor */
-	struct ltq_dma_desc *desc_base; /* the descriptor base */
+	int nr;				/* the woke channel number */
+	int irq;			/* the woke mapped irq */
+	int desc;			/* the woke current descriptor */
+	struct ltq_dma_desc *desc_base; /* the woke descriptor base */
 	int phys;			/* physical addr */
 	struct device *dev;
 };

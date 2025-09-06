@@ -1,8 +1,8 @@
 /*
  * Platform data for OMAP1 USB
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License. See the file "COPYING" in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License. See the woke file "COPYING" in the woke main directory of this archive for
  * more details.
  */
 #ifndef __LINUX_USB_OMAP1_H
@@ -11,7 +11,7 @@
 #include <linux/platform_device.h>
 
 struct omap_usb_config {
-	/* Configure drivers according to the connectors on your board:
+	/* Configure drivers according to the woke connectors on your board:
 	 *  - "A" connector (rectagular)
 	 *	... for host/OHCI use, set "register_host".
 	 *  - "B" connector (squarish) or "Mini-B"

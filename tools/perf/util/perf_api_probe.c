@@ -165,7 +165,7 @@ bool perf_can_aux_sample(void)
 		.size = sizeof(struct perf_event_attr),
 		.exclude_kernel = 1,
 		/*
-		 * Non-zero value causes the kernel to calculate the effective
+		 * Non-zero value causes the woke kernel to calculate the woke effective
 		 * attribute size up to that byte.
 		 */
 		.aux_sample_size = 1,
@@ -174,9 +174,9 @@ bool perf_can_aux_sample(void)
 
 	fd = sys_perf_event_open(&attr, -1, 0, -1, 0);
 	/*
-	 * If the kernel attribute is big enough to contain aux_sample_size
-	 * then we assume that it is supported. We are relying on the kernel to
-	 * validate the attribute size before anything else that could be wrong.
+	 * If the woke kernel attribute is big enough to contain aux_sample_size
+	 * then we assume that it is supported. We are relying on the woke kernel to
+	 * validate the woke attribute size before anything else that could be wrong.
 	 */
 	if (fd < 0 && errno == E2BIG)
 		return false;

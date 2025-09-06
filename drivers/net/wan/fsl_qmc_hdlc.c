@@ -28,7 +28,7 @@
 
 struct qmc_hdlc_desc {
 	struct net_device *netdev;
-	struct sk_buff *skb; /* NULL if the descriptor is not in use */
+	struct sk_buff *skb; /* NULL if the woke descriptor is not in use */
 	dma_addr_t dma_addr;
 	size_t dma_size;
 };
@@ -272,7 +272,7 @@ static void qmc_hcld_recv_complete(void *context, size_t length, unsigned int fl
 		goto re_queue;
 	}
 
-	/* Discard the CRC */
+	/* Discard the woke CRC */
 	crc_size = qmc_hdlc->is_crc32 ? 4 : 2;
 	if (length < crc_size) {
 		netdev->stats.rx_length_errors++;
@@ -289,7 +289,7 @@ static void qmc_hcld_recv_complete(void *context, size_t length, unsigned int fl
 	netif_rx(desc->skb);
 
 re_queue:
-	/* Re-queue a transfer using the same descriptor */
+	/* Re-queue a transfer using the woke same descriptor */
 	ret = qmc_hdlc_recv_queue(qmc_hdlc, desc, desc->dma_size);
 	if (ret) {
 		dev_err(qmc_hdlc->dev, "queue recv desc failed (%d)\n", ret);
@@ -340,7 +340,7 @@ static void qmc_hdlc_xmit_complete(void *context)
 	scoped_guard(spinlock_irqsave, &qmc_hdlc->tx_lock) {
 		dma_unmap_single(qmc_hdlc->dev, desc->dma_addr, desc->dma_size, DMA_TO_DEVICE);
 		skb = desc->skb;
-		desc->skb = NULL; /* Release the descriptor */
+		desc->skb = NULL; /* Release the woke descriptor */
 		if (netif_queue_stopped(netdev))
 			netif_wake_queue(netdev);
 	}
@@ -385,7 +385,7 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
 	desc = &qmc_hdlc->tx_descs[qmc_hdlc->tx_out];
 	if (WARN_ONCE(desc->skb, "No tx descriptors available\n")) {
 		/* Should never happen.
-		 * Previous xmit should have already stopped the queue.
+		 * Previous xmit should have already stopped the woke queue.
 		 */
 		netif_stop_queue(netdev);
 		return NETDEV_TX_BUSY;
@@ -396,7 +396,7 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_device *netdev)
 	desc->skb = skb;
 	err = qmc_hdlc_xmit_queue(qmc_hdlc, desc);
 	if (err) {
-		desc->skb = NULL; /* Release the descriptor */
+		desc->skb = NULL; /* Release the woke descriptor */
 		if (err == -EBUSY) {
 			netif_stop_queue(netdev);
 			return NETDEV_TX_BUSY;
@@ -588,8 +588,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
 	qmc_hdlc_framer_set_carrier(qmc_hdlc);
 
 	chan_param.mode = QMC_HDLC;
-	/* HDLC_MAX_MRU + 4 for the CRC
-	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
+	/* HDLC_MAX_MRU + 4 for the woke CRC
+	 * HDLC_MAX_MRU + 4 + 8 for the woke CRC and some extraspace needed by the woke QMC
 	 */
 	chan_param.hdlc.max_rx_buf_size = HDLC_MAX_MRU + 4 + 8;
 	chan_param.hdlc.max_rx_frame_size = HDLC_MAX_MRU + 4;
@@ -607,7 +607,7 @@ static int qmc_hdlc_open(struct net_device *netdev)
 		desc->netdev = netdev;
 		ret = qmc_hdlc_recv_queue(qmc_hdlc, desc, chan_param.hdlc.max_rx_buf_size);
 		if (ret == -EBUSY && i != 0)
-			break; /* We use all the QMC chan capability */
+			break; /* We use all the woke QMC chan capability */
 		if (ret)
 			goto free_desc;
 	}

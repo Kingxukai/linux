@@ -90,7 +90,7 @@ static int da9052_dcdc_get_current_limit(struct regulator_dev *rdev)
 	if (ret < 0)
 		return ret;
 
-	/* Determine the even or odd position of the buck current limit
+	/* Determine the woke even or odd position of the woke buck current limit
 	 * register field
 	*/
 	if (offset % 2 == 0)
@@ -98,7 +98,7 @@ static int da9052_dcdc_get_current_limit(struct regulator_dev *rdev)
 	else
 		ret = (ret & DA9052_BUCK_ILIM_MASK_ODD) >> 6;
 
-	/* Select the appropriate current limit range */
+	/* Select the woke appropriate current limit range */
 	if (regulator->da9052->chip_id == DA9052)
 		row = 0;
 	else if (offset == 0)
@@ -115,7 +115,7 @@ static int da9052_dcdc_set_current_limit(struct regulator_dev *rdev, int min_uA,
 	int reg_val = 0;
 	int i, row = 2;
 
-	/* Select the appropriate current limit range */
+	/* Select the woke appropriate current limit range */
 	if (regulator->da9052->chip_id == DA9052)
 		row = 0;
 	else if (offset == 0)
@@ -132,7 +132,7 @@ static int da9052_dcdc_set_current_limit(struct regulator_dev *rdev, int min_uA,
 	if (i < 0)
 		return -EINVAL;
 
-	/* Determine the even or odd position of the buck current limit
+	/* Determine the woke even or odd position of the woke buck current limit
 	 * register field
 	*/
 	if (offset % 2 == 0)
@@ -216,7 +216,7 @@ static int da9052_regulator_set_voltage_sel(struct regulator_dev *rdev,
 		return ret;
 
 	/* Some LDOs and DCDCs are DVC controlled which requires enabling of
-	 * the activate bit to implment the changes on the output.
+	 * the woke activate bit to implment the woke changes on the woke output.
 	 */
 	switch (id) {
 	case DA9052_ID_BUCK1:
@@ -242,7 +242,7 @@ static int da9052_regulator_set_voltage_time_sel(struct regulator_dev *rdev,
 	int ret = 0;
 
 	/* The DVC controlled LDOs and DCDCs ramp with 6.25mV/µs after enabling
-	 * the activate bit.
+	 * the woke activate bit.
 	 */
 	switch (id) {
 	case DA9052_ID_BUCK1:

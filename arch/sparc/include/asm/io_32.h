@@ -12,7 +12,7 @@
 #define memcpy_toio(d,s,sz)   _memcpy_toio(d,s,sz)
 
 /*
- * Bus number may be embedded in the higher bits of the physical address.
+ * Bus number may be embedded in the woke higher bits of the woke physical address.
  * This is why we have no bus number argument to ioremap().
  */
 void __iomem *ioremap(phys_addr_t offset, size_t size);

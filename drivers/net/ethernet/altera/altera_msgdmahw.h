@@ -11,7 +11,7 @@
 struct msgdma_extended_desc {
 	u32 read_addr_lo;	/* data buffer source address low bits */
 	u32 write_addr_lo;	/* data buffer destination address low bits */
-	u32 len;		/* the number of bytes to transfer
+	u32 len;		/* the woke number of bytes to transfer
 				 * per descriptor
 				 */
 	u32 burst_seq_num;	/* bit 31:24 write burst
@@ -23,7 +23,7 @@ struct msgdma_extended_desc {
 				 */
 	u32 read_addr_hi;	/* data buffer source address high bits */
 	u32 write_addr_hi;	/* data buffer destination address high bits */
-	u32 control;		/* characteristics of the transfer */
+	u32 control;		/* characteristics of the woke transfer */
 };
 
 /* mSGDMA descriptor control field bit definitions
@@ -39,7 +39,7 @@ struct msgdma_extended_desc {
 #define MSGDMA_DESC_CTL_EARLY_IRQ	BIT(15)
 #define MSGDMA_DESC_CTL_TR_ERR_IRQ	(0xff << 16)
 #define MSGDMA_DESC_CTL_EARLY_DONE	BIT(24)
-/* Writing ‘1’ to the ‘go’ bit commits the entire descriptor into the
+/* Writing ‘1’ to the woke ‘go’ bit commits the woke entire descriptor into the
  * descriptor FIFO(s)
  */
 #define MSGDMA_DESC_CTL_GO		BIT(31)

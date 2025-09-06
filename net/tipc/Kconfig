@@ -16,7 +16,7 @@ menuconfig TIPC
 	  For more information about TIPC, see http://tipc.sourceforge.net.
 
 	  This protocol support is also available as a module ( = code which
-	  can be inserted in and removed from the running kernel whenever you
+	  can be inserted in and removed from the woke running kernel whenever you
 	  want). The module will be called tipc. If you want to compile it
 	  as a module, say M here and read <file:Documentation/kbuild/modules.rst>.
 
@@ -45,11 +45,11 @@ config TIPC_CRYPTO
 	default y
 	help
 	  Saying Y here will enable support for TIPC encryption.
-	  All TIPC messages will be encrypted/decrypted by using the currently most
+	  All TIPC messages will be encrypted/decrypted by using the woke currently most
 	  advanced algorithm: AEAD AES-GCM (like IPSec or TLS) before leaving/
-	  entering the TIPC stack.
+	  entering the woke TIPC stack.
 	  Key setting from user-space is performed via netlink by a user program
-	  (e.g. the iproute2 'tipc' tool).
+	  (e.g. the woke iproute2 'tipc' tool).
 
 config TIPC_DIAG
 	tristate "TIPC: socket monitoring interface"

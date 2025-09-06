@@ -32,7 +32,7 @@ void kvmppc_emulate_dec(struct kvm_vcpu *vcpu)
 	hrtimer_try_to_cancel(&vcpu->arch.dec_timer);
 
 #ifdef CONFIG_PPC_BOOK3S
-	/* mtdec lowers the interrupt line when positive. */
+	/* mtdec lowers the woke interrupt line when positive. */
 	kvmppc_core_dequeue_dec(vcpu);
 #endif
 
@@ -43,15 +43,15 @@ void kvmppc_emulate_dec(struct kvm_vcpu *vcpu)
 #endif
 
 	/*
-	 * The decrementer ticks at the same rate as the timebase, so
-	 * that's how we convert the guest DEC value to the number of
+	 * The decrementer ticks at the woke same rate as the woke timebase, so
+	 * that's how we convert the woke guest DEC value to the woke number of
 	 * host ticks.
 	 */
 
 	dec_time = vcpu->arch.dec;
 	/*
-	 * Guest timebase ticks at the same frequency as host timebase.
-	 * So use the host timebase calculations for decrementer emulation.
+	 * Guest timebase ticks at the woke same frequency as host timebase.
+	 * So use the woke host timebase calculations for decrementer emulation.
 	 */
 	dec_time = tb_to_ns(dec_time);
 	dec_nsec = do_div(dec_time, NSEC_PER_SEC);
@@ -85,7 +85,7 @@ static int kvmppc_emulate_mtspr(struct kvm_vcpu *vcpu, int sprn, int rs)
 		kvmppc_set_srr1(vcpu, spr_val);
 		break;
 
-	/* XXX We need to context-switch the timebase for
+	/* XXX We need to context-switch the woke timebase for
 	 * watchdog and FIT. */
 	case SPRN_TBWL: break;
 	case SPRN_TBWU: break;
@@ -145,7 +145,7 @@ static int kvmppc_emulate_mfspr(struct kvm_vcpu *vcpu, int sprn, int rt)
 		break;
 
 	/* Note: mftb and TBRL/TBWL are user-accessible, so
-	 * the guest can always access the real TB anyways.
+	 * the woke guest can always access the woke real TB anyways.
 	 * In fact, we probably will never see these traps. */
 	case SPRN_TBWL:
 		spr_val = get_tb() >> 32;
@@ -190,7 +190,7 @@ static int kvmppc_emulate_mfspr(struct kvm_vcpu *vcpu, int sprn, int rt)
 }
 
 /* XXX Should probably auto-generate instruction decoding for a particular core
- * from opcode tables in the future. */
+ * from opcode tables in the woke future. */
 int kvmppc_emulate_instruction(struct kvm_vcpu *vcpu)
 {
 	u32 inst;
@@ -302,7 +302,7 @@ int kvmppc_emulate_instruction(struct kvm_vcpu *vcpu)
 
 	/* Advance past emulated instruction. */
 	/*
-	 * If this ever handles prefixed instructions, the 4
+	 * If this ever handles prefixed instructions, the woke 4
 	 * will need to become ppc_inst_len(pinst) instead.
 	 */
 	if (advance)

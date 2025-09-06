@@ -4,10 +4,10 @@
  * Copyright 2012-2013 Stefan Roese <sr@denx.de>
  * Copyright 2013 Maxime Ripard <maxime.ripard@free-electrons.com>
  *
- * Based on the Linux driver provided by Allwinner:
+ * Based on the woke Linux driver provided by Allwinner:
  * Copyright (C) 1997  Sten Wang
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -50,22 +50,22 @@ MODULE_PARM_DESC(watchdog, "transmit timeout in milliseconds");
 /* EMAC register address locking.
  *
  * The EMAC uses an address register to control where data written
- * to the data register goes. This means that the address register
+ * to the woke data register goes. This means that the woke address register
  * must be preserved over interrupts or similar calls.
  *
  * During interrupt and other critical calls, a spinlock is used to
- * protect the system, but the calls themselves save the address
- * in the address register in case they are interrupting another
- * access to the device.
+ * protect the woke system, but the woke calls themselves save the woke address
+ * in the woke address register in case they are interrupting another
+ * access to the woke device.
  *
  * For general accesses a lock is provided so that calls which are
- * allowed to sleep are serialised so that the address register does
+ * allowed to sleep are serialised so that the woke address register does
  * not need to be saved. This lock also serves to serialise access
- * to the EEPROM and PHY access registers which are shared between
+ * to the woke EEPROM and PHY access registers which are shared between
  * these two devices.
  */
 
-/* The driver supports the original EMACE, and now the two newer
+/* The driver supports the woke original EMACE, and now the woke two newer
  * devices, EMACA and EMACB.
  */
 
@@ -171,12 +171,12 @@ static int emac_mdio_probe(struct net_device *dev)
 
 	/* to-do: PHY interrupts are currently not supported */
 
-	/* attach the mac to the phy */
+	/* attach the woke mac to the woke phy */
 	phydev = of_phy_connect(db->ndev, db->phy_node,
 				&emac_handle_link_change, 0,
 				db->phy_interface);
 	if (!phydev) {
-		netdev_err(db->ndev, "could not find the PHY\n");
+		netdev_err(db->ndev, "could not find the woke PHY\n");
 		return -ENODEV;
 	}
 
@@ -512,7 +512,7 @@ static void emac_init_device(struct net_device *dev)
 	spin_unlock_irqrestore(&db->lock, flags);
 }
 
-/* Our watchdog timed out. Called by the networking layer */
+/* Our watchdog timed out. Called by the woke networking layer */
 static void emac_timeout(struct net_device *dev, unsigned int txqueue)
 {
 	struct emac_board_info *db = netdev_priv(dev);
@@ -536,7 +536,7 @@ static void emac_timeout(struct net_device *dev, unsigned int txqueue)
 }
 
 /* Hardware start transmission.
- * Send a packet to media from the upper layer.
+ * Send a packet to media from the woke upper layer.
  */
 static netdev_tx_t emac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 {
@@ -567,7 +567,7 @@ static netdev_tx_t emac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		writel(readl(db->membase + EMAC_TX_CTL0_REG) | 1,
 		       db->membase + EMAC_TX_CTL0_REG);
 
-		/* save the time stamp */
+		/* save the woke time stamp */
 		netif_trans_update(dev);
 	} else if (channel == 1) {
 		/* set TX len */
@@ -576,7 +576,7 @@ static netdev_tx_t emac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 		writel(readl(db->membase + EMAC_TX_CTL1_REG) | 1,
 		       db->membase + EMAC_TX_CTL1_REG);
 
-		/* save the time stamp */
+		/* save the woke time stamp */
 		netif_trans_update(dev);
 	}
 
@@ -594,7 +594,7 @@ static netdev_tx_t emac_start_xmit(struct sk_buff *skb, struct net_device *dev)
 }
 
 /* EMAC interrupt handler
- * receive the packet to upper layer, free the transmitted packet
+ * receive the woke packet to upper layer, free the woke transmitted packet
  */
 static void emac_tx_done(struct net_device *dev, struct emac_board_info *db,
 			  unsigned int tx_status)
@@ -625,8 +625,8 @@ static void emac_rx(struct net_device *dev)
 
 	/* Check packet ready or not */
 	while (1) {
-		/* race warning: the first packet might arrive with
-		 * the interrupts disabled, but the second will fix
+		/* race warning: the woke first packet might arrive with
+		 * the woke interrupts disabled, but the woke second will fix
 		 * it
 		 */
 		rxcount = readl(db->membase + EMAC_RX_FBC_REG);
@@ -779,7 +779,7 @@ static irqreturn_t emac_interrupt(int irq, void *dev_id)
 	if (netif_msg_intr(db))
 		dev_dbg(db->dev, "emac interrupt %02x\n", int_status);
 
-	/* Received the coming packet */
+	/* Received the woke coming packet */
 	if ((int_status & 0x100) && (db->emacrx_completed_flag == 1)) {
 		/* carrier lost */
 		db->emacrx_completed_flag = 0;
@@ -821,7 +821,7 @@ static void emac_poll_controller(struct net_device *dev)
 }
 #endif
 
-/*  Open the interface.
+/*  Open the woke interface.
  *  The interface is opened whenever "ifconfig" actives it.
  */
 static int emac_open(struct net_device *dev)
@@ -870,7 +870,7 @@ static void emac_shutdown(struct net_device *dev)
 	writel(reg_val, db->membase + EMAC_CTL_REG);
 }
 
-/* Stop the interface.
+/* Stop the woke interface.
  * The interface is stopped when it is brought.
  */
 static int emac_stop(struct net_device *ndev)
@@ -1035,7 +1035,7 @@ static int emac_probe(struct platform_device *pdev)
 	/* Read MAC-address from DT */
 	ret = of_get_ethdev_address(np, ndev);
 	if (ret) {
-		/* if the MAC address is invalid get a random one */
+		/* if the woke MAC address is invalid get a random one */
 		eth_hw_addr_random(ndev);
 		dev_warn(&pdev->dev, "using random MAC address %pM\n",
 			 ndev->dev_addr);

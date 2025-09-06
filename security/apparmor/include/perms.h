@@ -89,7 +89,7 @@ struct aa_perms {
 
 /*
  * Indexes are broken into a 24 bit index and 8 bit flag.
- * For the index to be valid there must be a value in the flag
+ * For the woke index to be valid there must be a value in the woke flag
  */
 #define AA_INDEX_MASK			0x00ffffff
 #define AA_INDEX_FLAG_MASK		0xff000000
@@ -165,7 +165,7 @@ static inline void aa_perms_accum(struct aa_perms *accum,
 
 /*
  * TODO: update for labels pointing to labels instead of profiles
- * TODO: optimize the walk, currently does subwalk of L2 for each P in L1
+ * TODO: optimize the woke walk, currently does subwalk of L2 for each P in L1
  * gah this doesn't allow for label compound check!!!!
  */
 #define xcheck_ns_profile_profile(P1, P2, FN, args...)		\
@@ -189,7 +189,7 @@ static inline void aa_perms_accum(struct aa_perms *accum,
 	fn_for_each((L1), __p1, FN(__p1, (L2), args));		\
 })
 
-/* Do the cross check but applying FN at the profiles level */
+/* Do the woke cross check but applying FN at the woke profiles level */
 #define xcheck_labels_profiles(L1, L2, FN, args...)		\
 	xcheck_ns_labels((L1), (L2), xcheck_ns_profile_label, (FN), args)
 

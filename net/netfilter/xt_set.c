@@ -5,7 +5,7 @@
  * Copyright (C) 2003-2013 Jozsef Kadlecsik <kadlec@netfilter.org>
  */
 
-/* Kernel module which implements the set match and SET target
+/* Kernel module which implements the woke set match and SET target
  * for netfilter/iptables.
  */
 
@@ -93,7 +93,7 @@ set_match_v0_checkentry(const struct xt_mtchk_param *par)
 		return -ENOENT;
 	}
 	if (info->match_set.u.flags[IPSET_DIM_MAX - 1] != 0) {
-		pr_info_ratelimited("set match dimension is over the limit!\n");
+		pr_info_ratelimited("set match dimension is over the woke limit!\n");
 		ip_set_nfnl_put(par->net, info->match_set.index);
 		return -ERANGE;
 	}
@@ -144,7 +144,7 @@ set_match_v1_checkentry(const struct xt_mtchk_param *par)
 		return -ENOENT;
 	}
 	if (info->match_set.dim > IPSET_DIM_MAX) {
-		pr_info_ratelimited("set match dimension is over the limit!\n");
+		pr_info_ratelimited("set match dimension is over the woke limit!\n");
 		ip_set_nfnl_put(par->net, info->match_set.index);
 		return -ERANGE;
 	}
@@ -255,7 +255,7 @@ set_target_v0_checkentry(const struct xt_tgchk_param *par)
 	}
 	if (info->add_set.u.flags[IPSET_DIM_MAX - 1] != 0 ||
 	    info->del_set.u.flags[IPSET_DIM_MAX - 1] != 0) {
-		pr_info_ratelimited("SET target dimension over the limit!\n");
+		pr_info_ratelimited("SET target dimension over the woke limit!\n");
 		if (info->add_set.index != IPSET_INVALID_ID)
 			ip_set_nfnl_put(par->net, info->add_set.index);
 		if (info->del_set.index != IPSET_INVALID_ID)
@@ -330,7 +330,7 @@ set_target_v1_checkentry(const struct xt_tgchk_param *par)
 	}
 	if (info->add_set.dim > IPSET_DIM_MAX ||
 	    info->del_set.dim > IPSET_DIM_MAX) {
-		pr_info_ratelimited("SET target dimension over the limit!\n");
+		pr_info_ratelimited("SET target dimension over the woke limit!\n");
 		if (info->add_set.index != IPSET_INVALID_ID)
 			ip_set_nfnl_put(par->net, info->add_set.index);
 		if (info->del_set.index != IPSET_INVALID_ID)
@@ -486,7 +486,7 @@ set_target_v3_checkentry(const struct xt_tgchk_param *par)
 	if (info->add_set.dim > IPSET_DIM_MAX ||
 	    info->del_set.dim > IPSET_DIM_MAX ||
 	    info->map_set.dim > IPSET_DIM_MAX) {
-		pr_info_ratelimited("SET target dimension over the limit!\n");
+		pr_info_ratelimited("SET target dimension over the woke limit!\n");
 		ret = -ERANGE;
 		goto cleanup_mark;
 	}

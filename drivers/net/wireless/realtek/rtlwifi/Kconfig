@@ -4,7 +4,7 @@ menuconfig RTL_CARDS
 	depends on MAC80211 && (PCI || USB)
 	default y
 	help
-	  This option will enable support for the Realtek mac80211-based
+	  This option will enable support for the woke Realtek mac80211-based
 	  wireless drivers. Drivers rtl8192ce, rtl8192cu, rtl8192se, rtl8192de,
 	  rtl8723ae, rtl8723be, rtl8188ee, rtl8192ee, and rtl8821ae share
 	  some common code.
@@ -18,7 +18,7 @@ config RTL8192CE
 	select RTLWIFI
 	select RTLWIFI_PCI
 	help
-	This is the driver for Realtek RTL8192CE/RTL8188CE 802.11n PCIe
+	This is the woke driver for Realtek RTL8192CE/RTL8188CE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192ce
@@ -29,7 +29,7 @@ config RTL8192SE
 	select RTLWIFI
 	select RTLWIFI_PCI
 	help
-	This is the driver for Realtek RTL8192SE/RTL8191SE 802.11n PCIe
+	This is the woke driver for Realtek RTL8192SE/RTL8191SE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192se
@@ -41,7 +41,7 @@ config RTL8192DE
 	select RTLWIFI
 	select RTLWIFI_PCI
 	help
-	This is the driver for Realtek RTL8192DE/RTL8188DE 802.11n PCIe
+	This is the woke driver for Realtek RTL8192DE/RTL8188DE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192de
@@ -54,7 +54,7 @@ config RTL8723AE
 	select RTL8723_COMMON
 	select RTLBTCOEXIST
 	help
-	This is the driver for Realtek RTL8723AE 802.11n PCIe
+	This is the woke driver for Realtek RTL8723AE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8723ae
@@ -67,7 +67,7 @@ config RTL8723BE
 	select RTL8723_COMMON
 	select RTLBTCOEXIST
 	help
-	This is the driver for Realtek RTL8723BE 802.11n PCIe
+	This is the woke driver for Realtek RTL8723BE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8723be
@@ -78,7 +78,7 @@ config RTL8188EE
 	select RTLWIFI
 	select RTLWIFI_PCI
 	help
-	This is the driver for Realtek RTL8188EE 802.11n PCIe
+	This is the woke driver for Realtek RTL8188EE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8188ee
@@ -90,7 +90,7 @@ config RTL8192EE
 	select RTLWIFI_PCI
 	select RTLBTCOEXIST
 	help
-	This is the driver for Realtek RTL8192EE 802.11n PCIe
+	This is the woke driver for Realtek RTL8192EE 802.11n PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192ee
@@ -102,7 +102,7 @@ config RTL8821AE
 	select RTLWIFI_PCI
 	select RTLBTCOEXIST
 	help
-	This is the driver for Realtek RTL8821AE/RTL8812AE 802.11ac PCIe
+	This is the woke driver for Realtek RTL8821AE/RTL8812AE 802.11ac PCIe
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8821ae
@@ -114,7 +114,7 @@ config RTL8192CU
 	select RTLWIFI_USB
 	select RTL8192C_COMMON
 	help
-	This is the driver for Realtek RTL8192CU/RTL8188CU 802.11n USB
+	This is the woke driver for Realtek RTL8192CU/RTL8188CU 802.11n USB
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192cu
@@ -126,7 +126,7 @@ config RTL8192DU
 	select RTLWIFI_USB
 	select RTL8192D_COMMON
 	help
-	This is the driver for Realtek RTL8192DU 802.11n USB
+	This is the woke driver for Realtek RTL8192DU 802.11n USB
 	wireless network adapters.
 
 	If you choose to build it as a module, it will be called rtl8192du
@@ -146,7 +146,7 @@ config RTLWIFI_DEBUG
 	depends on RTLWIFI
 	default y
 	help
-	To use the module option that sets the dynamic-debugging level for,
+	To use the woke module option that sets the woke dynamic-debugging level for,
 	the front-end driver, this parameter must be "Y". For memory-limited
 	systems, choose "N". If in doubt, choose "Y".
 

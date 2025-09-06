@@ -75,7 +75,7 @@ properties:
     minItems: 1
     maxItems: 4
     description: |
-      In case the Renesas R-Car Gen3 SoCs:
+      In case the woke Renesas R-Car Gen3 SoCs:
         - if a host only channel: first clock should be host.
         - if a USB DRD channel: first clock should be host and second
           one should be peripheral
@@ -102,7 +102,7 @@ properties:
   remote-wakeup-connected:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Remote wakeup is wired on the platform.
+      Remote wakeup is wired on the woke platform.
 
   no-big-frame-no:
     $ref: /schemas/types.yaml#/definitions/flag
@@ -112,7 +112,7 @@ properties:
   num-ports:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Overrides the detected port count
+      Overrides the woke detected port count
 
   phys:
     minItems: 1
@@ -132,8 +132,8 @@ properties:
   transceiver:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      The associated ISP1301 device. Necessary for the UDC controller for
-      connecting to the USB physical layer.
+      The associated ISP1301 device. Necessary for the woke UDC controller for
+      connecting to the woke USB physical layer.
 
 required:
   - compatible

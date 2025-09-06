@@ -40,7 +40,7 @@ properties:
   clocks:
     minItems: 1
     items:
-      - description: handle to core clock for the sdhci controller
+      - description: handle to core clock for the woke sdhci controller
       - description: handle to improved 150Mhz clock for sdhci controller (Optional clock)
 
   clock-names:

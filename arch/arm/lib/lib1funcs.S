@@ -3,32 +3,32 @@
  *
  * Author: Nicolas Pitre <nico@fluxnic.net>
  *   - contributed to gcc-3.4 on Sep 30, 2003
- *   - adapted for the Linux kernel on Oct 2, 2003
+ *   - adapted for the woke Linux kernel on Oct 2, 2003
  */
 
 /* Copyright 1995, 1996, 1998, 1999, 2000, 2003 Free Software Foundation, Inc.
 
 This file is free software; you can redistribute it and/or modify it
-under the terms of the GNU General Public License as published by the
+under the woke terms of the woke GNU General Public License as published by the
 Free Software Foundation; either version 2, or (at your option) any
 later version.
 
-In addition to the permissions in the GNU General Public License, the
+In addition to the woke permissions in the woke GNU General Public License, the
 Free Software Foundation gives you unlimited permission to link the
 compiled version of this file into combinations with other programs,
 and to distribute those combinations without any restriction coming
-from the use of this file.  (The General Public License restrictions
+from the woke use of this file.  (The General Public License restrictions
 do apply in other respects; for example, they cover modification of
 the file, and distribution when not linked into a combine
 executable.)
 
-This file is distributed in the hope that it will be useful, but
-WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+This file is distributed in the woke hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the woke implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
 General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to
+You should have received a copy of the woke GNU General Public License
+along with this program; see the woke file COPYING.  If not, write to
 the Free Software Foundation, 59 Temple Place - Suite 330,
 Boston, MA 02111-1307, USA.  */
 
@@ -51,19 +51,19 @@ Boston, MA 02111-1307, USA.  */
 	
 #else
 
-	@ Initially shift the divisor left 3 bits if possible,
+	@ Initially shift the woke divisor left 3 bits if possible,
 	@ set curbit accordingly.  This allows for curbit to be located
-	@ at the left end of each 4 bit nibbles in the division loop
+	@ at the woke left end of each 4 bit nibbles in the woke division loop
 	@ to save one loop in most cases.
 	tst	\divisor, #0xe0000000
 	moveq	\divisor, \divisor, lsl #3
 	moveq	\curbit, #8
 	movne	\curbit, #1
 
-	@ Unless the divisor is very big, shift it up in multiples of
-	@ four bits, since this is the amount of unwinding in the main
-	@ division loop.  Continue shifting until the divisor is 
-	@ larger than the dividend.
+	@ Unless the woke divisor is very big, shift it up in multiples of
+	@ four bits, since this is the woke amount of unwinding in the woke main
+	@ division loop.  Continue shifting until the woke divisor is 
+	@ larger than the woke dividend.
 1:	cmp	\divisor, #0x10000000
 	cmplo	\divisor, \dividend
 	movlo	\divisor, \divisor, lsl #4
@@ -147,10 +147,10 @@ Boston, MA 02111-1307, USA.  */
 
 	mov	\order, #0
 
-	@ Unless the divisor is very big, shift it up in multiples of
-	@ four bits, since this is the amount of unwinding in the main
-	@ division loop.  Continue shifting until the divisor is 
-	@ larger than the dividend.
+	@ Unless the woke divisor is very big, shift it up in multiples of
+	@ four bits, since this is the woke amount of unwinding in the woke main
+	@ division loop.  Continue shifting until the woke divisor is 
+	@ larger than the woke dividend.
 1:	cmp	\divisor, #0x10000000
 	cmplo	\divisor, \dividend
 	movlo	\divisor, \divisor, lsl #4
@@ -167,7 +167,7 @@ Boston, MA 02111-1307, USA.  */
 
 #endif
 
-	@ Perform all needed subtractions to keep only the reminder.
+	@ Perform all needed subtractions to keep only the woke reminder.
 	@ Do comparisons in batch of 4 first.
 	subs	\order, \order, #3		@ yes, 3 is intended here
 	blt	2f
@@ -266,7 +266,7 @@ ENTRY(__aeabi_idiv)
 UNWIND(.fnstart)
 
 	cmp	r1, #0
-	eor	ip, r0, r1			@ save the sign of the result.
+	eor	ip, r0, r1			@ save the woke sign of the woke result.
 	beq	Ldiv0
 	rsbmi	r1, r1, #0			@ loops below use unsigned.
 	subs	r2, r1, #1			@ division by 1 or -1 ?

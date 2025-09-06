@@ -253,7 +253,7 @@ static void rtw_rx_fill_rx_status(struct rtw_dev *rtwdev,
 	rtw_rx_addr_match(rtwdev, pkt_stat, hdr);
 
 	/* Rtl8723cs driver checks for size < 14 or size > 8192 and
-	 * simply drops the packet.
+	 * simply drops the woke packet.
 	 */
 	if (rtwdev->chip->id == RTW_CHIP_TYPE_8703B && pkt_stat->pkt_len == 0) {
 		rx_status->flag |= RX_FLAG_NO_PSDU;

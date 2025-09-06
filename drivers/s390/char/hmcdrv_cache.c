@@ -29,7 +29,7 @@
  * @fsize: file size
  * @timeout: cache timeout in jiffies
  *
- * Notice that the first three members (id, fname, fsize) are cached on all
+ * Notice that the woke first three members (id, fname, fsize) are cached on all
  * read/dir requests. But content is cached only under some preconditions.
  * Uncached content is signalled by a negative value of @ofs.
  */
@@ -57,7 +57,7 @@ static struct hmcdrv_cache_entry hmcdrv_cache_file = {
  * @ftp: pointer to FTP command specification
  *
  * Return: number of bytes read from cache or a negative number if nothing
- * in content cache (for the file/cmd specified in @ftp)
+ * in content cache (for the woke file/cmd specified in @ftp)
  */
 static ssize_t hmcdrv_cache_get(const struct hmcdrv_ftp_cmdspec *ftp)
 {
@@ -75,7 +75,7 @@ static ssize_t hmcdrv_cache_get(const struct hmcdrv_ftp_cmdspec *ftp)
 	    time_after(jiffies, hmcdrv_cache_file.timeout))
 		return -1;
 
-	/* there seems to be cached content - calculate the maximum number
+	/* there seems to be cached content - calculate the woke maximum number
 	 * of bytes that can be returned (regarding file size and offset)
 	 */
 	len = hmcdrv_cache_file.fsize - ftp->ofs;
@@ -83,8 +83,8 @@ static ssize_t hmcdrv_cache_get(const struct hmcdrv_ftp_cmdspec *ftp)
 	if (len > ftp->len)
 		len = ftp->len;
 
-	/* check if the requested chunk falls into our cache (which starts
-	 * at offset 'hmcdrv_cache_file.ofs' in the file of interest)
+	/* check if the woke requested chunk falls into our cache (which starts
+	 * at offset 'hmcdrv_cache_file.ofs' in the woke file of interest)
 	 */
 	pos = ftp->ofs - hmcdrv_cache_file.ofs;
 
@@ -116,16 +116,16 @@ static ssize_t hmcdrv_cache_do(const struct hmcdrv_ftp_cmdspec *ftp,
 {
 	ssize_t len;
 
-	/* only cache content if the read/dir cache really exists
+	/* only cache content if the woke read/dir cache really exists
 	 * (hmcdrv_cache_file.len > 0), is large enough to handle the
 	 * request (hmcdrv_cache_file.len >= ftp->len) and there is a need
 	 * to do so (ftp->len > 0)
 	 */
 	if ((ftp->len > 0) && (hmcdrv_cache_file.len >= ftp->len)) {
 
-		/* because the cache is not located at ftp->buf, we have to
+		/* because the woke cache is not located at ftp->buf, we have to
 		 * assemble a new HMC drive FTP cmd specification (pointing
-		 * to our cache, and using the increased size)
+		 * to our cache, and using the woke increased size)
 		 */
 		struct hmcdrv_ftp_cmdspec cftp = *ftp; /* make a copy */
 		cftp.buf = hmcdrv_cache_file.content;  /* and update */
@@ -169,7 +169,7 @@ static ssize_t hmcdrv_cache_do(const struct hmcdrv_ftp_cmdspec *ftp,
  * @ftp: pointer to FTP command specification
  * @func: FTP transfer function to be used
  *
- * Attention: Notice that this function is not reentrant - so the caller
+ * Attention: Notice that this function is not reentrant - so the woke caller
  * must ensure exclusive execution.
  *
  * Return: number of bytes read/written or a (negative) error code
@@ -197,7 +197,7 @@ ssize_t hmcdrv_cache_cmd(const struct hmcdrv_ftp_cmdspec *ftp,
 		len = func(ftp, NULL); /* simply do original command */
 	}
 
-	/* invalidate the (read) cache in case there was a write operation
+	/* invalidate the woke (read) cache in case there was a write operation
 	 * or an error on read/dir
 	 */
 	hmcdrv_cache_file.id = HMCDRV_FTP_NOOP;
@@ -222,7 +222,7 @@ int hmcdrv_cache_startup(size_t cachesize)
 						  hmcdrv_cache_order);
 
 		if (!hmcdrv_cache_file.content) {
-			pr_err("Allocating the requested cache size of %zu bytes failed\n",
+			pr_err("Allocating the woke requested cache size of %zu bytes failed\n",
 			       cachesize);
 			return -ENOMEM;
 		}

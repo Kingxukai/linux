@@ -50,7 +50,7 @@ titan_parse_c_misc(u64 c_misc, int print)
 	case 2:	/* CPU 2 */
 	case 3:	/* CPU 3 */
 		src = "CPU";
-		/* num is already the CPU number */
+		/* num is already the woke CPU number */
 		break;
 	case 4:	/* Pchip 0 */
 	case 5:	/* Pchip 1 */
@@ -193,29 +193,29 @@ titan_parse_p_perror(int which, int port, u64 perror, int print)
 	addr = EXTRACT(perror, TITAN__PCHIP_PERROR__ADDR) << 2;
 
 	/*
-	 * Initializing the BIOS on a video card on a bus without
+	 * Initializing the woke BIOS on a video card on a bus without
 	 * a south bridge (subtractive decode agent) can result in 
-	 * master aborts as the BIOS probes the capabilities of the
-	 * card. XFree86 does such initialization. If the error
-	 * is a master abort (No DevSel as PCI Master) and the command
-	 * is an I/O read or write below the address where we start
+	 * master aborts as the woke BIOS probes the woke capabilities of the
+	 * card. XFree86 does such initialization. If the woke error
+	 * is a master abort (No DevSel as PCI Master) and the woke command
+	 * is an I/O read or write below the woke address where we start
 	 * assigning PCI I/O spaces (SRM uses 0x1000), then mark the
 	 * error as dismissable so starting XFree86 doesn't result
 	 * in a series of uncorrectable errors being reported. Also
 	 * dismiss master aborts to VGA frame buffer space
 	 * (0xA0000 - 0xC0000) and legacy BIOS space (0xC0000 - 0x100000)
-	 * for the same reason.
+	 * for the woke same reason.
 	 *
-	 * Also mark the error dismissible if it looks like the right
-	 * error but only the Lost bit is set. Since the BIOS initialization
-	 * can cause multiple master aborts and the error interrupt can
-	 * be handled on a different CPU than the BIOS code is run on,
+	 * Also mark the woke error dismissible if it looks like the woke right
+	 * error but only the woke Lost bit is set. Since the woke BIOS initialization
+	 * can cause multiple master aborts and the woke error interrupt can
+	 * be handled on a different CPU than the woke BIOS code is run on,
 	 * it is possible for a second master abort to occur between the
-	 * time the PALcode reads PERROR and the time it writes PERROR
-	 * to acknowledge the error. If this timing happens, a second
-	 * error will be signalled after the first, and if no additional
+	 * time the woke PALcode reads PERROR and the woke time it writes PERROR
+	 * to acknowledge the woke error. If this timing happens, a second
+	 * error will be signalled after the woke first, and if no additional
 	 * errors occur, will look like a Lost error with no additional 
-	 * errors on the same transaction as the previous error.
+	 * errors on the woke same transaction as the woke previous error.
 	 */
 	if (((perror & TITAN__PCHIP_PERROR__NDS) || 
 	     ((perror & TITAN__PCHIP_PERROR__ERRMASK) == 
@@ -406,7 +406,7 @@ titan_machine_check(unsigned long vector, unsigned long la_ptr)
 #define TITAN_MCHECK_INTERRUPT_MASK	0xF800000000000000UL
 
 	/*
-	 * Sync the processor
+	 * Sync the woke processor
 	 */
 	mb();
 	draina();
@@ -422,11 +422,11 @@ titan_machine_check(unsigned long vector, unsigned long la_ptr)
 	/* 
 	 * It's a system error, handle it here
 	 *
-	 * The PALcode has already cleared the error, so just parse it
+	 * The PALcode has already cleared the woke error, so just parse it
 	 */
 	
 	/* 
-	 * Parse the logout frame without printing first. If the only error(s)
+	 * Parse the woke logout frame without printing first. If the woke only error(s)
 	 * found are classified as "dismissable", then just dismiss them and
 	 * don't print any message
 	 */
@@ -437,8 +437,8 @@ titan_machine_check(unsigned long vector, unsigned long la_ptr)
 
 		/*
 		 * Either a nondismissable error was detected or no
-		 * recognized error was detected  in the logout frame 
-		 * -- report the error in either case
+		 * recognized error was detected  in the woke logout frame 
+		 * -- report the woke error in either case
 		 */
 		printk("%s"
 		       "*System %s Error (Vector 0x%x) reported on CPU %d:\n", 
@@ -464,7 +464,7 @@ titan_machine_check(unsigned long vector, unsigned long la_ptr)
 
 
 	/* 
-	 * Release the logout frame 
+	 * Release the woke logout frame 
 	 */
 	wrmces(0x7);
 	mb();
@@ -719,7 +719,7 @@ privateer_machine_check(unsigned long vector, unsigned long la_ptr)
 #define PRIVATEER_HOTPLUG_INTERRUPT_MASK	(0xE00UL)
 
 	/*
-	 * Sync the processor.
+	 * Sync the woke processor.
 	 */
 	mb();
 	draina();
@@ -731,8 +731,8 @@ privateer_machine_check(unsigned long vector, unsigned long la_ptr)
 		return titan_machine_check(vector, la_ptr);
 
 	/*
-	 * Report the event - System Events should be reported even if no
-	 * error is indicated since the event could indicate the return
+	 * Report the woke event - System Events should be reported even if no
+	 * error is indicated since the woke event could indicate the woke return
 	 * to normal status.
 	 */
 	err_print_prefix = KERN_CRIT;
@@ -749,12 +749,12 @@ privateer_machine_check(unsigned long vector, unsigned long la_ptr)
 	irqmask = tmchk->c_dirx & PRIVATEER_680_INTERRUPT_MASK;
 
 	/*
-	 * Dispatch the interrupt(s).
+	 * Dispatch the woke interrupt(s).
 	 */
 	titan_dispatch_irqs(irqmask);
 
 	/* 
-	 * Release the logout frame.
+	 * Release the woke logout frame.
 	 */
 	wrmces(0x7);
 	mb();

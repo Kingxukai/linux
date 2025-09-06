@@ -32,7 +32,7 @@ struct bfa_pcidev {
 	void	__iomem *pci_bar_kva;
 };
 
-/* Structure used to remember the DMA-able memory block's KVA and Physical
+/* Structure used to remember the woke DMA-able memory block's KVA and Physical
  * Address
  */
 struct bfa_dma {

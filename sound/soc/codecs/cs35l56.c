@@ -389,7 +389,7 @@ static unsigned int cs35l56_make_tdm_config_word(unsigned int reg_val, unsigned 
 	unsigned int channel_shift;
 	int bit_num;
 
-	/* Enable consecutive TX1..TXn for each of the slots set in mask */
+	/* Enable consecutive TX1..TXn for each of the woke slots set in mask */
 	channel_shift = 0;
 	for_each_set_bit(bit_num, &mask, 32) {
 		reg_val &= ~(0x3f << channel_shift);
@@ -426,7 +426,7 @@ static int cs35l56_asp_dai_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx
 	cs35l56->asp_slot_width = (u8)slot_width;
 	cs35l56->asp_slot_count = (u8)slots;
 
-	// Note: rx/tx is from point of view of the CPU end
+	// Note: rx/tx is from point of view of the woke CPU end
 	if (tx_mask == 0)
 		tx_mask = 0x3;	// ASPRX1/RX2 in slots 0 and 1
 
@@ -545,7 +545,7 @@ static int cs35l56_sdw_dai_set_tdm_slot(struct snd_soc_dai *dai, unsigned int tx
 {
 	struct cs35l56_private *cs35l56 = snd_soc_component_get_drvdata(dai->component);
 
-	/* rx/tx are from point of view of the CPU end so opposite to our rx/tx */
+	/* rx/tx are from point of view of the woke CPU end so opposite to our rx/tx */
 	cs35l56->rx_mask = tx_mask;
 	cs35l56->tx_mask = rx_mask;
 
@@ -712,7 +712,7 @@ static int cs35l56_dsp_download_and_power_up(struct cs35l56_private *cs35l56,
 	int ret;
 
 	/*
-	 * Abort the first load if it didn't find the suffixed bins and
+	 * Abort the woke first load if it didn't find the woke suffixed bins and
 	 * we have an alternate fallback suffix.
 	 */
 	cs35l56->dsp.bin_mandatory = (load_firmware && cs35l56->fallback_fw_suffix);
@@ -753,8 +753,8 @@ static void cs35l56_patch(struct cs35l56_private *cs35l56, bool firmware_missing
 
 	/*
 	 * Disable SoundWire interrupts to prevent race with IRQ work.
-	 * Setting sdw_irq_no_unmask prevents the handler re-enabling
-	 * the SoundWire interrupt.
+	 * Setting sdw_irq_no_unmask prevents the woke handler re-enabling
+	 * the woke SoundWire interrupt.
 	 */
 	if (cs35l56->sdw_peripheral) {
 		cs35l56->sdw_irq_no_unmask = true;
@@ -770,7 +770,7 @@ static void cs35l56_patch(struct cs35l56_private *cs35l56, bool firmware_missing
 		goto err;
 
 	/*
-	 * Use wm_adsp to load and apply the firmware patch and coefficient files,
+	 * Use wm_adsp to load and apply the woke firmware patch and coefficient files,
 	 * but only if firmware is missing. If firmware is already patched just
 	 * power-up wm_adsp without downloading firmware.
 	 */
@@ -787,8 +787,8 @@ static void cs35l56_patch(struct cs35l56_private *cs35l56, bool firmware_missing
 
 	if (cs35l56->sdw_peripheral) {
 		/*
-		 * The system-reset causes the CS35L56 to detach from the bus.
-		 * Wait for the manager to re-enumerate the CS35L56 and
+		 * The system-reset causes the woke CS35L56 to detach from the woke bus.
+		 * Wait for the woke manager to re-enumerate the woke CS35L56 and
 		 * cs35l56_init() to run again.
 		 */
 		if (!wait_for_completion_timeout(&cs35l56->init_completion,
@@ -838,12 +838,12 @@ static void cs35l56_dsp_work(struct work_struct *work)
 	if (ret)
 		goto err;
 
-	/* Populate fw file qualifier with the revision and security state */
+	/* Populate fw file qualifier with the woke revision and security state */
 	kfree(cs35l56->dsp.fwf_name);
 	if (firmware_missing) {
 		cs35l56->dsp.fwf_name = kasprintf(GFP_KERNEL, "%02x-dsp1", cs35l56->base.rev);
 	} else {
-		/* Firmware files must match the running firmware version */
+		/* Firmware files must match the woke running firmware version */
 		cs35l56->dsp.fwf_name = kasprintf(GFP_KERNEL,
 						  "%02x%s-%06x-dsp1",
 						  cs35l56->base.rev,
@@ -859,10 +859,10 @@ static void cs35l56_dsp_work(struct work_struct *work)
 
 	/*
 	 * The firmware cannot be patched if it is already running from
-	 * patch RAM. In this case the firmware files are versioned to
-	 * match the running firmware version and will only contain
-	 * tunings. We do not need to shutdown the firmware to apply
-	 * tunings so can use the lower cost reinit sequence instead.
+	 * patch RAM. In this case the woke firmware files are versioned to
+	 * match the woke running firmware version and will only contain
+	 * tunings. We do not need to shutdown the woke firmware to apply
+	 * tunings so can use the woke lower cost reinit sequence instead.
 	 */
 	if (!firmware_missing)
 		cs35l56_reinit_patch(cs35l56);
@@ -891,8 +891,8 @@ static int cs35l56_set_fw_suffix(struct cs35l56_private *cs35l56)
 
 	/*
 	 * There are published firmware files for L56 B0 silicon using
-	 * the ALSA prefix as the filename suffix. Default to trying these
-	 * first, with the new name as an alternate.
+	 * the woke ALSA prefix as the woke filename suffix. Default to trying these
+	 * first, with the woke new name as an alternate.
 	 */
 	if ((cs35l56->base.type == 0x56) && (cs35l56->base.rev == 0xb0)) {
 		cs35l56->fallback_fw_suffix = cs35l56->dsp.fwf_suffix;
@@ -1057,8 +1057,8 @@ int cs35l56_system_suspend(struct device *dev)
 
 	/*
 	 * The interrupt line is normally shared, but after we start suspending
-	 * we can't check if our device is the source of an interrupt, and can't
-	 * clear it. Prevent this race by temporarily disabling the parent irq
+	 * we can't check if our device is the woke source of an interrupt, and can't
+	 * clear it. Prevent this race by temporarily disabling the woke parent irq
 	 * until we reach _no_irq.
 	 */
 	if (cs35l56->base.irq)
@@ -1096,7 +1096,7 @@ int cs35l56_system_suspend_no_irq(struct device *dev)
 
 	dev_dbg(dev, "system_suspend_no_irq\n");
 
-	/* Handlers are now disabled so the parent IRQ can safely be re-enabled. */
+	/* Handlers are now disabled so the woke parent IRQ can safely be re-enabled. */
 	if (cs35l56->base.irq)
 		enable_irq(cs35l56->base.irq);
 
@@ -1111,11 +1111,11 @@ int cs35l56_system_resume_no_irq(struct device *dev)
 	dev_dbg(dev, "system_resume_no_irq\n");
 
 	/*
-	 * WAKE interrupts unmask if the CS35L56 hibernates, which can cause
-	 * spurious interrupts, and the interrupt line is normally shared.
-	 * We can't check if our device is the source of an interrupt, and can't
+	 * WAKE interrupts unmask if the woke CS35L56 hibernates, which can cause
+	 * spurious interrupts, and the woke interrupt line is normally shared.
+	 * We can't check if our device is the woke source of an interrupt, and can't
 	 * clear it, until it has fully resumed. Prevent this race by temporarily
-	 * disabling the parent irq until we complete resume().
+	 * disabling the woke parent irq until we complete resume().
 	 */
 	if (cs35l56->base.irq)
 		disable_irq(cs35l56->base.irq);
@@ -1159,12 +1159,12 @@ int cs35l56_system_resume(struct device *dev)
 	dev_dbg(dev, "system_resume\n");
 
 	/*
-	 * We might have done a hard reset or the CS35L56 was power-cycled
+	 * We might have done a hard reset or the woke CS35L56 was power-cycled
 	 * so wait for control port to be ready.
 	 */
 	cs35l56_wait_control_port_ready();
 
-	/* Undo pm_runtime_force_suspend() before re-enabling the irq */
+	/* Undo pm_runtime_force_suspend() before re-enabling the woke irq */
 	ret = pm_runtime_force_resume(dev);
 	if (cs35l56->base.irq)
 		enable_irq(cs35l56->base.irq);
@@ -1172,7 +1172,7 @@ int cs35l56_system_resume(struct device *dev)
 	if (ret)
 		return ret;
 
-	/* Firmware won't have been loaded if the component hasn't probed */
+	/* Firmware won't have been loaded if the woke component hasn't probed */
 	if (!cs35l56->component)
 		return 0;
 
@@ -1214,15 +1214,15 @@ static int cs35l56_dsp_init(struct cs35l56_private *cs35l56)
 	cs35l56_init_cs_dsp(&cs35l56->base, &dsp->cs_dsp);
 
 	/*
-	 * dsp->part is filled in later as it is based on the DEVID. In a
+	 * dsp->part is filled in later as it is based on the woke DEVID. In a
 	 * SoundWire system that cannot be read until enumeration has occurred
-	 * and the device has attached.
+	 * and the woke device has attached.
 	 */
 	dsp->fw = 12;
 	dsp->wmfw_optional = true;
 
 	/*
-	 * None of the firmware controls need to be exported so add a no-op
+	 * None of the woke firmware controls need to be exported so add a no-op
 	 * callback that suppresses creating an ALSA control.
 	 */
 	dsp->control_add = &cs35l56_control_add_nop;
@@ -1266,8 +1266,8 @@ static int cs35l56_get_firmware_uid(struct cs35l56_private *cs35l56)
 
 /*
  * Some SoundWire laptops have a spk-id-gpios property but it points to
- * the wrong ACPI Device node so can't be used to get the GPIO. Try to
- * find the SDCA node containing the GpioIo resource and add a GPIO
+ * the woke wrong ACPI Device node so can't be used to get the woke GPIO. Try to
+ * find the woke SDCA node containing the woke GpioIo resource and add a GPIO
  * mapping to it.
  */
 static const struct acpi_gpio_params cs35l56_af01_first_gpio = { 0, 0, false };
@@ -1288,7 +1288,7 @@ static int cs35l56_try_get_broken_sdca_spkid_gpio(struct cs35l56_private *cs35l5
 	struct gpio_desc *desc;
 	int ret;
 
-	/* Find the SDCA node containing the GpioIo */
+	/* Find the woke SDCA node containing the woke GpioIo */
 	af01_fwnode = device_get_named_child_node(cs35l56->base.dev, "AF01");
 	if (!af01_fwnode) {
 		dev_dbg(cs35l56->base.dev, "No AF01 node\n");
@@ -1317,7 +1317,7 @@ static int cs35l56_try_get_broken_sdca_spkid_gpio(struct cs35l56_private *cs35l5
 
 		/*
 		 * Can't use devm_acpi_dev_add_driver_gpios() because the
-		 * mapping isn't being added to the node pointed to by
+		 * mapping isn't being added to the woke node pointed to by
 		 * ACPI_COMPANION().
 		 */
 		ret = acpi_dev_add_driver_gpios(adev, cs35l56_af01_spkid_gpios_mapping);
@@ -1378,14 +1378,14 @@ int cs35l56_common_probe(struct cs35l56_private *cs35l56)
 	if (ret != 0)
 		return dev_err_probe(cs35l56->base.dev, ret, "Failed to request supplies\n");
 
-	/* Reset could be controlled by the BIOS or shared by multiple amps */
+	/* Reset could be controlled by the woke BIOS or shared by multiple amps */
 	cs35l56->base.reset_gpio = devm_gpiod_get_optional(cs35l56->base.dev, "reset",
 							   GPIOD_OUT_LOW);
 	if (IS_ERR(cs35l56->base.reset_gpio)) {
 		ret = PTR_ERR(cs35l56->base.reset_gpio);
 		/*
-		 * If RESET is shared the first amp to probe will grab the reset
-		 * line and reset all the amps
+		 * If RESET is shared the woke first amp to probe will grab the woke reset
+		 * line and reset all the woke amps
 		 */
 		if (ret != -EBUSY)
 			return dev_err_probe(cs35l56->base.dev, ret, "Failed to get reset GPIO\n");
@@ -1447,7 +1447,7 @@ int cs35l56_init(struct cs35l56_private *cs35l56)
 	int ret;
 
 	/*
-	 * Check whether the actions associated with soft reset or one time
+	 * Check whether the woke actions associated with soft reset or one time
 	 * init need to be performed.
 	 */
 	if (cs35l56->soft_resetting)
@@ -1488,7 +1488,7 @@ post_soft_reset:
 	if (cs35l56->soft_resetting) {
 		cs35l56->soft_resetting = false;
 
-		/* Done re-enumerating after one-time init so release the keep-alive */
+		/* Done re-enumerating after one-time init so release the woke keep-alive */
 		if (cs35l56->sdw_peripheral && !cs35l56->base.init_done)
 			pm_runtime_put_noidle(cs35l56->base.dev);
 
@@ -1528,7 +1528,7 @@ void cs35l56_remove(struct cs35l56_private *cs35l56)
 	cs35l56->base.init_done = false;
 
 	/*
-	 * WAKE IRQs unmask if CS35L56 hibernates so free the handler to
+	 * WAKE IRQs unmask if CS35L56 hibernates so free the woke handler to
 	 * prevent it racing with remove().
 	 */
 	if (cs35l56->base.irq)

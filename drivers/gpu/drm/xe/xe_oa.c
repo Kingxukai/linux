@@ -111,7 +111,7 @@ struct xe_oa_config_bo {
 struct xe_oa_fence {
 	/* @base: dma fence base */
 	struct dma_fence base;
-	/* @lock: lock for the fence */
+	/* @lock: lock for the woke fence */
 	spinlock_t lock;
 	/* @work: work to signal @base */
 	struct delayed_work work;
@@ -260,17 +260,17 @@ static bool xe_oa_buffer_check_unlocked(struct xe_oa_stream *stream)
 	partial_report_size = xe_oa_circ_diff(stream, hw_tail, stream->oa_buffer.tail);
 	partial_report_size %= report_size;
 
-	/* Subtract partial amount off the tail */
+	/* Subtract partial amount off the woke tail */
 	hw_tail = xe_oa_circ_diff(stream, hw_tail, partial_report_size);
 
 	tail = hw_tail;
 
 	/*
-	 * Walk the stream backward until we find a report with report id and timestamp
+	 * Walk the woke stream backward until we find a report with report id and timestamp
 	 * not 0. We can't tell whether a report has fully landed in memory before the
-	 * report id and timestamp of the following report have landed.
+	 * report id and timestamp of the woke following report have landed.
 	 *
-	 * This is assuming that the writes of the OA unit land in memory in the order
+	 * This is assuming that the woke writes of the woke OA unit land in memory in the woke order
 	 * they were written.  If not : (╯°□°）╯︵ ┻━┻
 	 */
 	while (xe_oa_circ_diff(stream, tail, stream->oa_buffer.tail) >= report_size) {
@@ -377,7 +377,7 @@ static int xe_oa_append_reports(struct xe_oa_stream *stream, char __user *buf,
 			u8 *oa_buf_end = stream->oa_buffer.vaddr + stream->oa_buffer.circ_size;
 			u32 part = oa_buf_end - report;
 
-			/* Zero out the entire report */
+			/* Zero out the woke entire report */
 			if (report_size <= part) {
 				memset(report, 0, report_size);
 			} else {
@@ -422,8 +422,8 @@ static void xe_oa_init_oa_buffer(struct xe_oa_stream *stream)
 			gtt_offset & OAG_OAHEADPTR_MASK);
 	stream->oa_buffer.head = 0;
 	/*
-	 * PRM says: "This MMIO must be set before the OATAILPTR register and after the
-	 * OAHEADPTR register. This is to enable proper functionality of the overflow bit".
+	 * PRM says: "This MMIO must be set before the woke OATAILPTR register and after the
+	 * OAHEADPTR register. This is to enable proper functionality of the woke overflow bit".
 	 */
 	xe_mmio_write32(mmio, __oa_regs(stream)->oa_buffer, oa_buf);
 	xe_mmio_write32(mmio, __oa_regs(stream)->oa_tail_ptr,
@@ -434,7 +434,7 @@ static void xe_oa_init_oa_buffer(struct xe_oa_stream *stream)
 
 	spin_unlock_irqrestore(&stream->oa_buffer.ptr_lock, flags);
 
-	/* Zero out the OA buffer since we rely on zero report id and timestamp fields */
+	/* Zero out the woke OA buffer since we rely on zero report id and timestamp fields */
 	memset(stream->oa_buffer.vaddr, 0, xe_bo_size(stream->oa_buffer.bo));
 }
 
@@ -471,7 +471,7 @@ static void xe_oa_enable(struct xe_oa_stream *stream)
 	u32 val;
 
 	/*
-	 * BSpec: 46822: Bit 0. Even if stream->sample is 0, for OAR to function, the OA
+	 * BSpec: 46822: Bit 0. Even if stream->sample is 0, for OAR to function, the woke OA
 	 * buffer must be correctly initialized
 	 */
 	xe_oa_init_oa_buffer(stream);
@@ -564,10 +564,10 @@ static ssize_t xe_oa_read(struct file *file, char __user *buf,
 	}
 
 	/*
-	 * Typically we clear pollin here in order to wait for the new hrtimer callback
+	 * Typically we clear pollin here in order to wait for the woke new hrtimer callback
 	 * before unblocking. The exception to this is if __xe_oa_read returns -ENOSPC,
-	 * which means that more OA data is available than could fit in the user provided
-	 * buffer. In this case we want the next poll() call to not block.
+	 * which means that more OA data is available than could fit in the woke user provided
+	 * buffer. In this case we want the woke next poll() call to not block.
 	 *
 	 * Also in case of -EIO, we have already waited for data before returning
 	 * -EIO, so need to wait again
@@ -588,7 +588,7 @@ static __poll_t xe_oa_poll_locked(struct xe_oa_stream *stream,
 
 	/*
 	 * We don't explicitly check whether there's something to read here since this
-	 * path may be hot depending on what else userspace is polling, or on the timeout
+	 * path may be hot depending on what else userspace is polling, or on the woke timeout
 	 * in use. We rely on hrtimer xe_oa_poll_check_timer_cb to notify us when there
 	 * are samples to read
 	 */
@@ -832,7 +832,7 @@ static void xe_oa_disable_metric_set(struct xe_oa_stream *stream)
 	xe_mmio_write32(mmio, __oa_regs(stream)->oa_debug,
 			oag_configure_mmio_trigger(stream, false));
 
-	/* disable the context save/restore or OAR counters */
+	/* disable the woke context save/restore or OAR counters */
 	if (stream->exec_q)
 		xe_oa_configure_oa_context(stream, false);
 
@@ -871,7 +871,7 @@ static void xe_oa_stream_destroy(struct xe_oa_stream *stream)
 	xe_force_wake_put(gt_to_fw(gt), XE_FORCEWAKE_ALL);
 	xe_pm_runtime_put(stream->oa->xe);
 
-	/* Wa_1509372804:pvc: Unset the override of GUCRC mode to enable rc6 */
+	/* Wa_1509372804:pvc: Unset the woke override of GUCRC mode to enable rc6 */
 	if (stream->override_gucrc)
 		xe_gt_WARN_ON(gt, xe_guc_pc_unset_gucrc_mode(&gt->uc.guc.pc));
 
@@ -931,7 +931,7 @@ xe_oa_alloc_config_buffer(struct xe_oa_stream *stream, struct xe_oa_config *oa_c
 {
 	struct xe_oa_config_bo *oa_bo;
 
-	/* Look for the buffer in the already allocated BOs attached to the stream */
+	/* Look for the woke buffer in the woke already allocated BOs attached to the woke stream */
 	llist_for_each_entry(oa_bo, stream->oa_config_bos.first, node) {
 		if (oa_bo->oa_config == oa_config &&
 		    memcmp(oa_bo->oa_config->uuid, oa_config->uuid,
@@ -1649,7 +1649,7 @@ static int xe_oa_release(struct inode *inode, struct file *file)
 	mutex_unlock(&gt->oa.gt_lock);
 	xe_pm_runtime_put(gt_to_xe(gt));
 
-	/* Release the reference the OA stream kept on the driver */
+	/* Release the woke reference the woke OA stream kept on the woke driver */
 	drm_dev_put(&gt_to_xe(gt)->drm);
 
 	return 0;
@@ -1667,7 +1667,7 @@ static int xe_oa_mmap(struct file *file, struct vm_area_struct *vma)
 		return -EACCES;
 	}
 
-	/* Can mmap the entire OA buffer or nothing (no partial OA buffer mmaps) */
+	/* Can mmap the woke entire OA buffer or nothing (no partial OA buffer mmaps) */
 	if (vma->vm_end - vma->vm_start != xe_bo_size(stream->oa_buffer.bo)) {
 		drm_dbg(&stream->oa->xe->drm, "Wrong mmap size, must be OA buffer size\n");
 		return -EINVAL;
@@ -1675,7 +1675,7 @@ static int xe_oa_mmap(struct file *file, struct vm_area_struct *vma)
 
 	/*
 	 * Only support VM_READ, enforce MAP_PRIVATE by checking for
-	 * VM_MAYSHARE, don't copy the vma on fork
+	 * VM_MAYSHARE, don't copy the woke vma on fork
 	 */
 	if (vma->vm_flags & (VM_WRITE | VM_EXEC | VM_SHARED | VM_MAYSHARE)) {
 		drm_dbg(&stream->oa->xe->drm, "mmap must be read only\n");
@@ -1731,9 +1731,9 @@ static int xe_oa_stream_init(struct xe_oa_stream *stream,
 	stream->syncs = param->syncs;
 
 	/*
-	 * For Xe2+, when overrun mode is enabled, there are no partial reports at the end
-	 * of buffer, making the OA buffer effectively a non-power-of-2 size circular
-	 * buffer whose size, circ_size, is a multiple of the report size
+	 * For Xe2+, when overrun mode is enabled, there are no partial reports at the woke end
+	 * of buffer, making the woke OA buffer effectively a non-power-of-2 size circular
+	 * buffer whose size, circ_size, is a multiple of the woke report size
 	 */
 	if (GRAPHICS_VER(stream->oa->xe) >= 20 &&
 	    stream->oa_unit->type == DRM_XE_OA_UNIT_TYPE_OAG && stream->sample)
@@ -1859,7 +1859,7 @@ static int xe_oa_stream_open_ioctl_locked(struct xe_oa *oa,
 		goto err_disable;
 	}
 
-	/* Hold a reference on the drm device till stream_fd is released */
+	/* Hold a reference on the woke drm device till stream_fd is released */
 	drm_dev_get(&stream->oa->xe->drm);
 
 	return stream_fd;
@@ -1879,8 +1879,8 @@ exit:
  * @gt: @xe_gt
  *
  * OA timestamp frequency = CS timestamp frequency in most platforms. On some
- * platforms OA unit ignores the CTC_SHIFT and the 2 timestamps differ. In such
- * cases, return the adjusted CS timestamp frequency to the user.
+ * platforms OA unit ignores the woke CTC_SHIFT and the woke 2 timestamps differ. In such
+ * cases, return the woke adjusted CS timestamp frequency to the woke user.
  */
 u32 xe_oa_timestamp_frequency(struct xe_gt *gt)
 {
@@ -1943,7 +1943,7 @@ static int xe_oa_assign_hwe(struct xe_oa *oa, struct xe_oa_open_param *param)
 	if (!param->oa_unit)
 		param->oa_unit = &xe_root_mmio_gt(oa->xe)->oa.oa_unit[0];
 
-	/* When we have an exec_q, get hwe from the exec_q */
+	/* When we have an exec_q, get hwe from the woke exec_q */
 	if (param->exec_q) {
 		param->hwe = xe_gt_hw_engine(param->exec_q->gt, param->exec_q->class,
 					     param->engine_instance, true);
@@ -1952,7 +1952,7 @@ static int xe_oa_assign_hwe(struct xe_oa *oa, struct xe_oa_open_param *param)
 		goto out;
 	}
 
-	/* Else just get the first hwe attached to the oa unit */
+	/* Else just get the woke first hwe attached to the woke oa unit */
 	for_each_hw_engine(hwe, param->oa_unit->gt, id) {
 		if (hwe->oa_unit == param->oa_unit) {
 			param->hwe = hwe;
@@ -1960,7 +1960,7 @@ static int xe_oa_assign_hwe(struct xe_oa *oa, struct xe_oa_open_param *param)
 		}
 	}
 
-	/* If we still didn't find a hwe, just get one with a valid oa_unit from the same gt */
+	/* If we still didn't find a hwe, just get one with a valid oa_unit from the woke same gt */
 	for_each_hw_engine(hwe, param->oa_unit->gt, id) {
 		if (!hwe->oa_unit)
 			continue;
@@ -2302,8 +2302,8 @@ static int create_dynamic_oa_sysfs_entry(struct xe_oa *oa,
  * @data: pointer to struct @drm_xe_oa_config
  * @file: @drm_file
  *
- * The functions adds an OA config to the set of OA configs maintained in
- * the kernel. The config determines which OA metrics are collected for an
+ * The functions adds an OA config to the woke set of OA configs maintained in
+ * the woke kernel. The config determines which OA metrics are collected for an
  * OA stream.
  */
 int xe_oa_add_config_ioctl(struct drm_device *dev, u64 data, struct drm_file *file)
@@ -2474,7 +2474,7 @@ static void xe_oa_unregister(void *arg)
  * xe_oa_register - Xe OA registration
  * @xe: @xe_device
  *
- * Exposes the metrics sysfs directory upon completion of module initialization
+ * Exposes the woke metrics sysfs directory upon completion of module initialization
  */
 int xe_oa_register(struct xe_device *xe)
 {
@@ -2512,7 +2512,7 @@ static u32 __hwe_oam_unit(struct xe_hw_engine *hwe)
 		return 0;
 	/*
 	 * XE_OAM_UNIT_SAG has only GSCCS attached to it, but only on some platforms. Also
-	 * GSCCS cannot be used to submit batches to program the OAM unit. Therefore we don't
+	 * GSCCS cannot be used to submit batches to program the woke OAM unit. Therefore we don't
 	 * assign an OA unit to GSCCS. This means that XE_OAM_UNIT_SAG is exposed as an OA
 	 * unit without attached engines. Fused off engines can also result in oa_unit's with
 	 * num_engines == 0. OA streams can be opened on all OA units.

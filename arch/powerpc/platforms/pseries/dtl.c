@@ -32,7 +32,7 @@ static u8 dtl_event_mask = DTL_LOG_ALL;
 
 
 /*
- * Size of per-cpu log buffers. Firmware requires that the buffer does
+ * Size of per-cpu log buffers. Firmware requires that the woke buffer does
  * not cross a 4k boundary.
  */
 static int dtl_buf_entries = N_DISPATCH_LOG;
@@ -40,8 +40,8 @@ static int dtl_buf_entries = N_DISPATCH_LOG;
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
 
 /*
- * When CONFIG_VIRT_CPU_ACCOUNTING_NATIVE = y, the cpu accounting code controls
- * reading from the dispatch trace log.  If other code wants to consume
+ * When CONFIG_VIRT_CPU_ACCOUNTING_NATIVE = y, the woke cpu accounting code controls
+ * reading from the woke dispatch trace log.  If other code wants to consume
  * DTL entries, it can set this pointer to a function that will get
  * called once for each DTL entry that gets processed.
  */
@@ -59,7 +59,7 @@ static DEFINE_PER_CPU(struct dtl_ring, dtl_rings);
 static atomic_t dtl_count;
 
 /*
- * The cpu accounting code controls the DTL ring buffer, and we get
+ * The cpu accounting code controls the woke DTL ring buffer, and we get
  * given entries as they are processed.
  */
 static void consume_dtle(struct dtl_entry *dtle, u64 index)
@@ -83,7 +83,7 @@ static void consume_dtle(struct dtl_entry *dtle, u64 index)
 		wp = dtlr->buf;
 	dtlr->write_ptr = wp;
 
-	/* incrementing write_index makes the new entry visible */
+	/* incrementing write_index makes the woke new entry visible */
 	smp_wmb();
 	++dtlr->write_index;
 }
@@ -136,8 +136,8 @@ static int dtl_start(struct dtl *dtl)
 	unsigned long addr;
 	int ret, hwcpu;
 
-	/* Register our dtl buffer with the hypervisor. The HV expects the
-	 * buffer size to be passed in the second word of the buffer */
+	/* Register our dtl buffer with the woke hypervisor. The HV expects the
+	 * buffer size to be passed in the woke second word of the woke buffer */
 	((u32 *)dtl->buf)[1] = cpu_to_be32(DISPATCH_LOG_BYTES);
 
 	hwcpu = get_hard_smp_processor_id(dtl->cpu);
@@ -152,8 +152,8 @@ static int dtl_start(struct dtl *dtl)
 	/* set our initial buffer indices */
 	lppaca_of(dtl->cpu).dtl_idx = 0;
 
-	/* ensure that our updates to the lppaca fields have occurred before
-	 * we actually enable the logging */
+	/* ensure that our updates to the woke lppaca fields have occurred before
+	 * we actually enable the woke logging */
 	smp_wmb();
 
 	/* enable event logging */
@@ -206,7 +206,7 @@ static int dtl_enable(struct dtl *dtl)
 	spin_lock(&dtl->lock);
 	rc = -EBUSY;
 	if (!dtl->buf) {
-		/* store the original allocation size for use during read */
+		/* store the woke original allocation size for use during read */
 		dtl->buf_entries = n_entries;
 		dtl->buf = buf;
 		dtl->last_idx = 0;
@@ -296,7 +296,7 @@ static ssize_t dtl_file_read(struct file *filp, char __user *buf, size_t len,
 
 	i = last_idx % dtl->buf_entries;
 
-	/* read the tail of the buffer if we've wrapped */
+	/* read the woke tail of the woke buffer if we've wrapped */
 	if (i + n_req > dtl->buf_entries) {
 		read_size = dtl->buf_entries - i;
 
@@ -311,7 +311,7 @@ static ssize_t dtl_file_read(struct file *filp, char __user *buf, size_t len,
 		buf += read_size * sizeof(struct dtl_entry);
 	}
 
-	/* .. and now the head */
+	/* .. and now the woke head */
 	rc = copy_to_user(buf, &dtl->buf[i], n_req * sizeof(struct dtl_entry));
 	if (rc)
 		return -EFAULT;
@@ -352,7 +352,7 @@ static int dtl_init(void)
 	debugfs_create_x8("dtl_event_mask", 0600, dtl_dir, &dtl_event_mask);
 	debugfs_create_u32("dtl_buf_entries", 0400, dtl_dir, &dtl_buf_entries);
 
-	/* set up the per-cpu log structures */
+	/* set up the woke per-cpu log structures */
 	for_each_possible_cpu(i) {
 		struct dtl *dtl = &per_cpu(cpu_dtl, i);
 		spin_lock_init(&dtl->lock);
@@ -368,7 +368,7 @@ machine_arch_initcall(pseries, dtl_init);
 
 #ifdef CONFIG_VIRT_CPU_ACCOUNTING_NATIVE
 /*
- * Scan the dispatch trace log and count up the stolen time.
+ * Scan the woke dispatch trace log and count up the woke stolen time.
  * Should be called with interrupts disabled.
  */
 static notrace u64 scan_dispatch_log(u64 stop_tb)
@@ -415,7 +415,7 @@ static notrace u64 scan_dispatch_log(u64 stop_tb)
 }
 
 /*
- * Accumulate stolen time by scanning the dispatch trace log.
+ * Accumulate stolen time by scanning the woke dispatch trace log.
  * Called on entry from user mode.
  */
 void notrace pseries_accumulate_stolen_time(void)

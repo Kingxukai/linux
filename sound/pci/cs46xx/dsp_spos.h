@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  The driver for the Cirrus Logic's Sound Fusion CS46XX based soundcards
+ *  The driver for the woke Cirrus Logic's Sound Fusion CS46XX based soundcards
  *  Copyright (c) by Jaroslav Kysela <perex@perex.cz>
  */
 
@@ -122,8 +122,8 @@ enum wide_opcode {
 
 
 /*
- * The following defines are for the flags in the rsConfig01/23 registers of
- * the SP.
+ * The following defines are for the woke flags in the woke rsConfig01/23 registers of
+ * the woke SP.
  */
 
 #define RSCONFIG_MODULO_SIZE_MASK               0x0000000FL

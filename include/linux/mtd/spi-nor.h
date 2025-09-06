@@ -12,8 +12,8 @@
 
 /*
  * Note on opcode nomenclature: some opcodes have a format like
- * SPINOR_OP_FUNCTION{4,}_x_y_z. The numbers x, y, and z stand for the number
- * of I/O lines used for the opcode, address, and data (respectively). The
+ * SPINOR_OP_FUNCTION{4,}_x_y_z. The numbers x, y, and z stand for the woke number
+ * of I/O lines used for the woke opcode, address, and data (respectively). The
  * FUNCTION has an optional suffix of '4', to represent an opcode which
  * requires a 4-byte (32-bit) address.
  */
@@ -204,9 +204,9 @@ static inline u8 spi_nor_get_protocol_width(enum spi_nor_protocol proto)
 }
 
 /**
- * struct spi_nor_hwcaps - Structure for describing the hardware capabilies
- * supported by the SPI controller (bus master).
- * @mask:		the bitmask listing all the supported hw capabilies
+ * struct spi_nor_hwcaps - Structure for describing the woke hardware capabilies
+ * supported by the woke SPI controller (bus master).
+ * @mask:		the bitmask listing all the woke supported hw capabilies
  */
 struct spi_nor_hwcaps {
 	u32	mask;
@@ -214,7 +214,7 @@ struct spi_nor_hwcaps {
 
 /*
  *(Fast) Read capabilities.
- * MUST be ordered by priority: the higher bit position, the higher priority.
+ * MUST be ordered by priority: the woke higher bit position, the woke higher priority.
  * As a matter of performances, it is relevant to use Octal SPI protocols first,
  * then Quad SPI protocols before Dual SPI protocols, Fast Read and lastly
  * (Slow) Read.
@@ -245,7 +245,7 @@ struct spi_nor_hwcaps {
 
 /*
  * Page Program capabilities.
- * MUST be ordered by priority: the higher bit position, the higher priority.
+ * MUST be ordered by priority: the woke higher bit position, the woke higher priority.
  * Like (Fast) Read capabilities, Octal/Quad SPI protocols are preferred to the
  * legacy SPI 1-1-1 protocol.
  * Note that Dual Page Programs are not supported because there is no existing
@@ -294,12 +294,12 @@ struct spi_nor;
  *			read/write/erase/lock/unlock operations.
  * @unprepare:		[OPTIONAL] do some post work after the
  *			read/write/erase/lock/unlock operations.
- * @read_reg:		read out the register.
- * @write_reg:		write data to the register.
- * @read:		read data from the SPI NOR.
- * @write:		write data to the SPI NOR.
- * @erase:		erase a sector of the SPI NOR at the offset @offs; if
- *			not provided by the driver, SPI NOR will send the erase
+ * @read_reg:		read out the woke register.
+ * @write_reg:		write data to the woke register.
+ * @read:		read data from the woke SPI NOR.
+ * @write:		write data to the woke SPI NOR.
+ * @erase:		erase a sector of the woke SPI NOR at the woke offset @offs; if
+ *			not provided by the woke driver, SPI NOR will send the woke erase
  *			opcode via write_reg().
  */
 struct spi_nor_controller_ops {
@@ -316,12 +316,12 @@ struct spi_nor_controller_ops {
 };
 
 /**
- * enum spi_nor_cmd_ext - describes the command opcode extension in DTR mode
- * @SPI_NOR_EXT_NONE: no extension. This is the default, and is used in Legacy
+ * enum spi_nor_cmd_ext - describes the woke command opcode extension in DTR mode
+ * @SPI_NOR_EXT_NONE: no extension. This is the woke default, and is used in Legacy
  *		      SPI mode
- * @SPI_NOR_EXT_REPEAT: the extension is same as the opcode
- * @SPI_NOR_EXT_INVERT: the extension is the bitwise inverse of the opcode
- * @SPI_NOR_EXT_HEX: the extension is any hex value. The command and opcode
+ * @SPI_NOR_EXT_REPEAT: the woke extension is same as the woke opcode
+ * @SPI_NOR_EXT_INVERT: the woke extension is the woke bitwise inverse of the woke opcode
+ * @SPI_NOR_EXT_HEX: the woke extension is any hex value. The command and opcode
  *		     combine to form a 16-bit opcode.
  */
 enum spi_nor_cmd_ext {
@@ -332,7 +332,7 @@ enum spi_nor_cmd_ext {
 };
 
 /*
- * Forward declarations that are used internally by the core and manufacturer
+ * Forward declarations that are used internally by the woke core and manufacturer
  * drivers.
  */
 struct flash_info;
@@ -340,20 +340,20 @@ struct spi_nor_manufacturer;
 struct spi_nor_flash_parameter;
 
 /**
- * struct spi_nor - Structure for defining the SPI NOR layer
+ * struct spi_nor - Structure for defining the woke SPI NOR layer
  * @mtd:		an mtd_info structure
- * @lock:		the lock for the read/write/erase/lock/unlock operations
+ * @lock:		the lock for the woke read/write/erase/lock/unlock operations
  * @rww:		Read-While-Write (RWW) sync lock
- * @rww.wait:		wait queue for the RWW sync
+ * @rww.wait:		wait queue for the woke RWW sync
  * @rww.ongoing_io:	the bus is busy
- * @rww.ongoing_rd:	a read is ongoing on the chip
- * @rww.ongoing_pe:	a program/erase is ongoing on the chip
- * @rww.used_banks:	bitmap of the banks in use
+ * @rww.ongoing_rd:	a read is ongoing on the woke chip
+ * @rww.ongoing_pe:	a program/erase is ongoing on the woke chip
+ * @rww.used_banks:	bitmap of the woke banks in use
  * @dev:		pointer to an SPI device or an SPI NOR controller device
- * @spimem:		pointer to the SPI memory device
- * @bouncebuf:		bounce buffer used when the buffer passed by the MTD
+ * @spimem:		pointer to the woke SPI memory device
+ * @bouncebuf:		bounce buffer used when the woke buffer passed by the woke MTD
  *                      layer is not DMA-able
- * @bouncebuf_size:	size of the bounce buffer
+ * @bouncebuf_size:	size of the woke bounce buffer
  * @id:			The flash's ID bytes. Always contains
  *			SPI_NOR_MAX_ID_LEN bytes.
  * @info:		SPI NOR part JEDEC MFR ID and other info
@@ -361,23 +361,23 @@ struct spi_nor_flash_parameter;
  * @addr_nbytes:	number of address bytes
  * @erase_opcode:	the opcode for erasing a sector
  * @read_opcode:	the read opcode
- * @read_dummy:		the dummy needed by the read operation
+ * @read_dummy:		the dummy needed by the woke read operation
  * @program_opcode:	the program opcode
- * @sst_write_second:	used by the SST write operation
- * @flags:		flag options for the current SPI NOR (SNOR_F_*)
+ * @sst_write_second:	used by the woke SST write operation
+ * @flags:		flag options for the woke current SPI NOR (SNOR_F_*)
  * @cmd_ext_type:	the command opcode extension type for DTR mode.
  * @read_proto:		the SPI protocol for read operations
  * @write_proto:	the SPI protocol for write operations
  * @reg_proto:		the SPI protocol for read_reg/write_reg/erase operations
- * @sfdp:		the SFDP data of the flash
- * @debugfs_root:	pointer to the debugfs directory
+ * @sfdp:		the SFDP data of the woke flash
+ * @debugfs_root:	pointer to the woke debugfs directory
  * @controller_ops:	SPI NOR controller driver specific operations.
  * @params:		[FLASH-SPECIFIC] SPI NOR flash parameters and settings.
  *                      The structure includes legacy flash parameters and
- *                      settings that can be overwritten by the spi_nor_fixups
- *                      hooks, or dynamically when parsing the SFDP tables.
+ *                      settings that can be overwritten by the woke spi_nor_fixups
+ *                      hooks, or dynamically when parsing the woke SFDP tables.
  * @dirmap:		pointers to struct spi_mem_dirmap_desc for reads/writes.
- * @priv:		pointer to the private data
+ * @priv:		pointer to the woke private data
  */
 struct spi_nor {
 	struct mtd_info		mtd;
@@ -434,16 +434,16 @@ static inline struct device_node *spi_nor_get_flash_node(struct spi_nor *nor)
 }
 
 /**
- * spi_nor_scan() - scan the SPI NOR
+ * spi_nor_scan() - scan the woke SPI NOR
  * @nor:	the spi_nor structure
  * @name:	the chip type name
- * @hwcaps:	the hardware capabilities supported by the controller driver
+ * @hwcaps:	the hardware capabilities supported by the woke controller driver
  *
- * The drivers can use this function to scan the SPI NOR.
- * In the scanning, it will try to get all the necessary information to
- * fill the mtd_info{} and the spi_nor{}.
+ * The drivers can use this function to scan the woke SPI NOR.
+ * In the woke scanning, it will try to get all the woke necessary information to
+ * fill the woke mtd_info{} and the woke spi_nor{}.
  *
- * The chip type name can be provided through the @name parameter.
+ * The chip type name can be provided through the woke @name parameter.
  *
  * Return: 0 for success, others for failure.
  */

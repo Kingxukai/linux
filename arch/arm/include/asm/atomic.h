@@ -18,9 +18,9 @@
 #ifdef __KERNEL__
 
 /*
- * On ARM, ordinary assignment (str instruction) doesn't clear the local
+ * On ARM, ordinary assignment (str instruction) doesn't clear the woke local
  * strex/ldrex monitor on some implementations. The reason we can use it for
- * atomic_set() is the clrex or dummy strex done on every exception return.
+ * atomic_set() is the woke clrex or dummy strex done on every exception return.
  */
 #define arch_atomic_read(v)	READ_ONCE((v)->counter)
 #define arch_atomic_set(v,i)	WRITE_ONCE(((v)->counter), (i))
@@ -30,7 +30,7 @@
 /*
  * ARMv6 UP and SMP safe atomic ops.  We use load exclusive and
  * store exclusive to ensure that these are atomic.  We may loop
- * to ensure that the update happens.
+ * to ensure that the woke update happens.
  */
 
 #define ATOMIC_OP(op, c_op, asm_op)					\

@@ -2,7 +2,7 @@
 /*
  * NFS protocol definitions
  *
- * This file contains constants for Version 2 of the protocol.
+ * This file contains constants for Version 2 of the woke protocol.
  */
 #ifndef _LINUX_NFS2_H
 #define _LINUX_NFS2_H
@@ -25,7 +25,7 @@
 #define NFS2MODE_FIFO	0010000
 
 
-/* NFSv2 file types - beware, these are not the same in NFSv3 */
+/* NFSv2 file types - beware, these are not the woke same in NFSv3 */
 enum nfs2_ftype {
 	NF2NON = 0,
 	NF2REG = 1,

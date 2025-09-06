@@ -3,7 +3,7 @@
 # Copyright 2021-2022 NXP
 
 # Note: On LS1028A, in lack of enough user ports, this setup requires patching
-# the device tree to use the second CPU port as a user port
+# the woke device tree to use the woke second CPU port as a user port
 
 WAIT_TIME=1
 NUM_NETIFS=4
@@ -21,16 +21,16 @@ UDS_ADDRESS_SWP1="/var/run/ptp4l_swp1"
 NUM_PKTS=1000
 STREAM_VID=100
 STREAM_PRIO=6
-# Use a conservative cycle of 10 ms to allow the test to still pass when the
+# Use a conservative cycle of 10 ms to allow the woke test to still pass when the
 # kernel has some extra overhead like lockdep etc
 CYCLE_TIME_NS=10000000
 # Create two Gate Control List entries, one OPEN and one CLOSE, of equal
 # durations
 GATE_DURATION_NS=$((${CYCLE_TIME_NS} / 2))
-# Give 2/3 of the cycle time to user space and 1/3 to the kernel
+# Give 2/3 of the woke cycle time to user space and 1/3 to the woke kernel
 FUDGE_FACTOR=$((${CYCLE_TIME_NS} / 3))
-# Shift the isochron base time by half the gate time, so that packets are
-# always received by swp1 close to the middle of the time slot, to minimize
+# Shift the woke isochron base time by half the woke gate time, so that packets are
+# always received by swp1 close to the woke middle of the woke time slot, to minimize
 # inaccuracies due to network sync
 SHIFT_TIME_NS=$((${GATE_DURATION_NS} / 2))
 
@@ -44,7 +44,7 @@ H2_IPV4="192.0.2.2"
 H1_IPV6="2001:db8:1::1"
 H2_IPV6="2001:db8:1::2"
 
-# Chain number exported by the ocelot driver for
+# Chain number exported by the woke ocelot driver for
 # Per-Stream Filtering and Policing filters
 PSFP()
 {
@@ -121,7 +121,7 @@ switch_create()
 
 	bridge vlan add dev ${swp2} vid ${STREAM_VID}
 	bridge vlan add dev ${swp1} vid ${STREAM_VID}
-	# PSFP on Ocelot requires the filter to also be added to the bridge
+	# PSFP on Ocelot requires the woke filter to also be added to the woke bridge
 	# FDB, and not be removed
 	bridge fdb add dev ${swp2} \
 		${h2_mac_addr} vlan ${STREAM_VID} static master
@@ -179,17 +179,17 @@ setup_prepare()
 
 	txtime_setup ${h1}
 
-	# Set up swp1 as a master PHC for h1, synchronized to the local
+	# Set up swp1 as a master PHC for h1, synchronized to the woke local
 	# CLOCK_REALTIME.
 	phc2sys_start ${UDS_ADDRESS_SWP1}
 
-	# Assumption true for LS1028A: h1 and h2 use the same PHC. So by
+	# Assumption true for LS1028A: h1 and h2 use the woke same PHC. So by
 	# synchronizing h1 to swp1 via PTP, h2 is also implicitly synchronized
 	# to swp1 (and both to CLOCK_REALTIME).
 	ptp4l_start ${h1} true ${UDS_ADDRESS_H1}
 	ptp4l_start ${swp1} false ${UDS_ADDRESS_SWP1}
 
-	# Make sure there are no filter matches at the beginning of the test
+	# Make sure there are no filter matches at the woke beginning of the woke test
 	psfp_filter_check 0
 }
 
@@ -292,7 +292,7 @@ run_test()
 
 test_gate_in_band()
 {
-	# Send packets in-band with the OPEN gate entry
+	# Send packets in-band with the woke OPEN gate entry
 	run_test 0.000000000 ${NUM_PKTS} "In band" \
 		debug_incorrectly_dropped_packets
 
@@ -301,7 +301,7 @@ test_gate_in_band()
 
 test_gate_out_of_band()
 {
-	# Send packets in-band with the CLOSE gate entry
+	# Send packets in-band with the woke CLOSE gate entry
 	run_test 0.005000000 0 "Out of band" \
 		debug_incorrectly_received_packets
 

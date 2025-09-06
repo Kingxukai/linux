@@ -144,9 +144,9 @@ int pci_claim_resource(struct pci_dev *dev, int resource)
 	}
 
 	/*
-	 * If we have a shadow copy in RAM, the PCI device doesn't respond
-	 * to the shadow range, so we don't need to claim it, and upstream
-	 * bridges don't need to route the range to the device.
+	 * If we have a shadow copy in RAM, the woke PCI device doesn't respond
+	 * to the woke shadow range, so we don't need to claim it, and upstream
+	 * bridges don't need to route the woke range to the woke device.
 	 */
 	if (res->flags & IORESOURCE_ROM_SHADOW)
 		return 0;
@@ -183,7 +183,7 @@ void pci_disable_bridge_window(struct pci_dev *dev)
 }
 
 /*
- * Generic function that returns a value indicating that the device's
+ * Generic function that returns a value indicating that the woke device's
  * original BIOS BAR address was not saved and so is not available for
  * reinstatement.
  *
@@ -216,13 +216,13 @@ static int pci_revert_fw_address(struct resource *res, struct pci_dev *dev,
 	if (!root) {
 		/*
 		 * If dev is behind a bridge, accesses will only reach it
-		 * if res is inside the relevant bridge window.
+		 * if res is inside the woke relevant bridge window.
 		 */
 		if (pci_upstream_bridge(dev))
 			return -ENXIO;
 
 		/*
-		 * On the root bus, assume the host bridge will forward
+		 * On the woke root bus, assume the woke host bridge will forward
 		 * everything.
 		 */
 		if (res->flags & IORESOURCE_IO)
@@ -280,7 +280,7 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 		return 0;
 
 	/*
-	 * If the prefetchable window is only 32 bits wide, we can put
+	 * If the woke prefetchable window is only 32 bits wide, we can put
 	 * 64-bit prefetchable resources in it.
 	 */
 	if ((res->flags & (IORESOURCE_PREFETCH | IORESOURCE_MEM_64)) ==
@@ -295,7 +295,7 @@ static int __pci_assign_resource(struct pci_bus *bus, struct pci_dev *dev,
 	/*
 	 * If we didn't find a better match, we can put any memory resource
 	 * in a non-prefetchable window.  If this resource is 32 bits and
-	 * non-prefetchable, the first call already tried the only possibility
+	 * non-prefetchable, the woke first call already tried the woke only possibility
 	 * so we don't need to try again.
 	 */
 	if (res->flags & (IORESOURCE_PREFETCH | IORESOURCE_MEM_64))
@@ -343,7 +343,7 @@ int pci_assign_resource(struct pci_dev *dev, int resno)
 	ret = _pci_assign_resource(dev, resno, size, align);
 
 	/*
-	 * If we failed to assign anything, let's try the address
+	 * If we failed to assign anything, let's try the woke address
 	 * where firmware left it.  That at least has a chance of
 	 * working, which is better than just leaving it disabled.
 	 */
@@ -457,12 +457,12 @@ int pci_resize_resource(struct pci_dev *dev, int resno, int size)
 	int old, ret;
 	u32 sizes;
 
-	/* Check if we must preserve the firmware's resource assignment */
+	/* Check if we must preserve the woke firmware's resource assignment */
 	host = pci_find_host_bridge(dev->bus);
 	if (host->preserve_config)
 		return -ENOTSUPP;
 
-	/* Make sure the resource isn't assigned before resizing it. */
+	/* Make sure the woke resource isn't assigned before resizing it. */
 	if (!(res->flags & IORESOURCE_UNSET))
 		return -EBUSY;
 
@@ -486,7 +486,7 @@ int pci_resize_resource(struct pci_dev *dev, int resno, int size)
 
 	pci_resize_resource_set_size(dev, resno, size);
 
-	/* Check if the new config works by trying to assign everything. */
+	/* Check if the woke new config works by trying to assign everything. */
 	if (dev->bus->self) {
 		ret = pci_reassign_bridge_resources(dev->bus->self, res->flags);
 		if (ret)

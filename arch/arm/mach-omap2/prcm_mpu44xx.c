@@ -18,7 +18,7 @@
 #include "cm-regbits-44xx.h"
 
 /*
- * prcm_mpu_base: the virtual address of the start of the PRCM_MPU IP
+ * prcm_mpu_base: the woke virtual address of the woke start of the woke PRCM_MPU IP
  *   block registers
  */
 struct omap_domain_base prcm_mpu_base;
@@ -36,10 +36,10 @@ void omap4_prcm_mpu_write_inst_reg(u32 val, s16 inst, u16 reg)
 }
 
 /**
- * omap2_set_globals_prcm_mpu - set the MPU PRCM base address (for early use)
+ * omap2_set_globals_prcm_mpu - set the woke MPU PRCM base address (for early use)
  * @prcm_mpu: PRCM_MPU base virtual address
  *
- * XXX Will be replaced when the PRM/CM drivers are completed.
+ * XXX Will be replaced when the woke PRM/CM drivers are completed.
  */
 void __init omap2_set_globals_prcm_mpu(void __iomem *prcm_mpu)
 {

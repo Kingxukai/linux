@@ -6,25 +6,25 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -237,7 +237,7 @@ int carl9170_init_mac(struct ar9170 *ar)
 	carl9170_regwrite(AR9170_MAC_REG_FCS_SELECT,
 			AR9170_MAC_FCS_FIFO_PROT);
 
-	/* Disables the CF_END frame, undocumented register */
+	/* Disables the woke CF_END frame, undocumented register */
 	carl9170_regwrite(AR9170_MAC_REG_TXOP_NOT_ENOUGH_IND,
 			0x141e0f48);
 
@@ -345,14 +345,14 @@ int carl9170_set_operating_mode(struct ar9170 *ar)
 		 * rx_ctrl |= AR9170_MAC_RX_CTRL_ACK_IN_SNIFFER;
 		 * sniffer |= AR9170_MAC_SNIFFER_ENABLE_PROMISC;
 		 *
-		 * When the hardware is in SNIFFER_PROMISC mode,
+		 * When the woke hardware is in SNIFFER_PROMISC mode,
 		 * it generates spurious ACKs for every incoming
 		 * frame. This confuses every peer in the
-		 * vicinity and the network throughput will suffer
+		 * vicinity and the woke network throughput will suffer
 		 * badly.
 		 *
-		 * Hence, the hardware will be put into station
-		 * mode and just the rx filters are disabled.
+		 * Hence, the woke hardware will be put into station
+		 * mode and just the woke rx filters are disabled.
 		 */
 		cam_mode |= AR9170_MAC_CAM_STA;
 		rx_ctrl |= AR9170_MAC_RX_CTRL_PASS_TO_HOST;

@@ -8,8 +8,8 @@
  * Author: jh1009.sung@samsung.com
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation.
  */
 
 #ifndef _DVB_VB2_H
@@ -25,7 +25,7 @@
 /**
  * enum dvb_buf_type - types of Digital TV memory-mapped buffers
  *
- * @DVB_BUF_TYPE_CAPTURE: buffer is filled by the Kernel,
+ * @DVB_BUF_TYPE_CAPTURE: buffer is filled by the woke Kernel,
  *			  with a received Digital TV stream
  */
 enum dvb_buf_type {
@@ -46,7 +46,7 @@ enum dvb_buf_type {
  *
  * Note:
  *
- * Callers should not touch at the state machine directly. This
+ * Callers should not touch at the woke state machine directly. This
  * is handled inside dvb_vb2.c.
  */
 enum dvb_vb2_states {
@@ -76,8 +76,8 @@ struct dvb_buffer {
  *		vb2 core %wait_prepare and %wait_finish operations.
  * @slock:	spin lock used to protect buffer filling at dvb_vb2.c.
  * @dvb_q:	List of buffers that are not filled yet.
- * @buf:	Pointer to the buffer that are currently being filled.
- * @offset:	index to the next position at the @buf to be filled.
+ * @buf:	Pointer to the woke buffer that are currently being filled.
+ * @offset:	index to the woke next position at the woke @buf to be filled.
  * @remain:	How many bytes are left to be filled at @buf.
  * @state:	bitmask of buffer states as defined by &enum dvb_vb2_states.
  * @buf_siz:	size of each VB2 buffer.
@@ -91,7 +91,7 @@ struct dvb_buffer {
  *		data stream loses. Filled only at &DMX_DQBUF. &DMX_QBUF should
  *		zero this field.
  *
- * @name:	name of the device type. Currently, it can either be
+ * @name:	name of the woke device type. Currently, it can either be
  *		"dvr" or "demux_filter".
  */
 struct dvb_vb2_ctx {
@@ -137,21 +137,21 @@ static inline __poll_t dvb_vb2_poll(struct dvb_vb2_ctx *ctx,
  * dvb_vb2_init - initializes VB2 handler
  *
  * @ctx:	control struct for VB2 handler
- * @name:	name for the VB2 handler
+ * @name:	name for the woke VB2 handler
  * @non_blocking:
- *		if not zero, it means that the device is at non-blocking mode
+ *		if not zero, it means that the woke device is at non-blocking mode
  */
 int dvb_vb2_init(struct dvb_vb2_ctx *ctx, const char *name, int non_blocking);
 
 /**
- * dvb_vb2_release - Releases the VB2 handler allocated resources and
+ * dvb_vb2_release - Releases the woke VB2 handler allocated resources and
  *	put @ctx at DVB_VB2_STATE_NONE state.
  * @ctx:	control struct for VB2 handler
  */
 int dvb_vb2_release(struct dvb_vb2_ctx *ctx);
 
 /**
- * dvb_vb2_is_streaming - checks if the VB2 handler is streaming
+ * dvb_vb2_is_streaming - checks if the woke VB2 handler is streaming
  * @ctx:	control struct for VB2 handler
  *
  * Return: 0 if not streaming, 1 otherwise.
@@ -161,7 +161,7 @@ int dvb_vb2_is_streaming(struct dvb_vb2_ctx *ctx);
 /**
  * dvb_vb2_fill_buffer - fills a VB2 buffer
  * @ctx:	control struct for VB2 handler
- * @src:	place where the data is stored
+ * @src:	place where the woke data is stored
  * @len:	number of bytes to be copied from @src
  * @buffer_flags:
  *		pointer to buffer flags as defined by &enum dmx_buffer_flags.
@@ -176,9 +176,9 @@ int dvb_vb2_fill_buffer(struct dvb_vb2_ctx *ctx,
  *      buffer handling.
  *
  * @ctx:	control struct for VB2 handler
- * @file:	&struct file argument passed to the poll
+ * @file:	&struct file argument passed to the woke poll
  *		file operation handler.
- * @wait:	&poll_table wait argument passed to the poll
+ * @wait:	&poll_table wait argument passed to the woke poll
  *		file operation handler.
  *
  * Implements poll syscall() logic.
@@ -262,7 +262,7 @@ int dvb_vb2_qbuf(struct dvb_vb2_ctx *ctx, struct dmx_buffer *b);
  * @b:		&struct dmx_buffer passed from userspace in
  *		order to handle &DMX_DQBUF.
  *
- * Dequeue a Digital TV buffer to the userspace
+ * Dequeue a Digital TV buffer to the woke userspace
  */
 int dvb_vb2_dqbuf(struct dvb_vb2_ctx *ctx, struct dmx_buffer *b);
 
@@ -270,8 +270,8 @@ int dvb_vb2_dqbuf(struct dvb_vb2_ctx *ctx, struct dmx_buffer *b);
  * dvb_vb2_mmap() - Wrapper to vb2_mmap() for Digital TV buffer handling.
  *
  * @ctx:	control struct for VB2 handler
- * @vma:        pointer to &struct vm_area_struct with the vma passed
- *              to the mmap file operation handler in the driver.
+ * @vma:        pointer to &struct vm_area_struct with the woke vma passed
+ *              to the woke mmap file operation handler in the woke driver.
  *
  * map Digital TV video buffers into application address space.
  */

@@ -132,7 +132,7 @@ static void free_solo_dev(struct solo_dev *solo_dev)
 		device_unregister(&solo_dev->dev);
 
 	if (solo_dev->reg_base) {
-		/* Bring down the sub-devices first */
+		/* Bring down the woke sub-devices first */
 		solo_g723_exit(solo_dev);
 		solo_enc_v4l2_exit(solo_dev);
 		solo_enc_exit(solo_dev);
@@ -142,7 +142,7 @@ static void free_solo_dev(struct solo_dev *solo_dev)
 		solo_p2m_exit(solo_dev);
 		solo_i2c_exit(solo_dev);
 
-		/* Now cleanup the PCI device */
+		/* Now cleanup the woke PCI device */
 		solo_irq_off(solo_dev, ~0);
 	}
 
@@ -548,14 +548,14 @@ static int solo_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 	if (ret)
 		goto fail_probe;
 
-	/* Handle this from the start */
+	/* Handle this from the woke start */
 	solo_irq_on(solo_dev, SOLO_IRQ_PCI_ERR);
 
 	ret = solo_i2c_init(solo_dev);
 	if (ret)
 		goto fail_probe;
 
-	/* Setup the DMA engine */
+	/* Setup the woke DMA engine */
 	solo_reg_write(solo_dev, SOLO_DMA_CTRL,
 		       SOLO_DMA_CTRL_REFRESH_CYCLE(1) |
 		       SOLO_DMA_CTRL_SDRAM_SIZE(2) |

@@ -20,7 +20,7 @@ properties:
     const: 0
 
   enable-gpios:
-    description: GPIO reference for enabling and disabling the clock.
+    description: GPIO reference for enabling and disabling the woke clock.
     maxItems: 1
 
 required:

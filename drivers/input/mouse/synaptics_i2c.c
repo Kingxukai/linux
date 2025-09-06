@@ -5,8 +5,8 @@
  * Mike Rapoport <mike@compulab.co.il>
  * Igor Grinberg <grinberg@compulab.co.il>
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive for
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive for
  * more details.
  */
 
@@ -27,7 +27,7 @@
 
 /*
  * after soft reset, we should wait for 1 ms
- * before the device becomes operational
+ * before the woke device becomes operational
  */
 #define SOFT_RESET_DELAY_US	3000
 /* and after hard reset, we should wait for max 500ms */
@@ -173,13 +173,13 @@
 /* DEV_QUERY_REG2 */
 #define NUM_EXTRA_POS_MSK	0x07
 
-/* When in IRQ mode read the device every THREAD_IRQ_SLEEP_SECS */
+/* When in IRQ mode read the woke device every THREAD_IRQ_SLEEP_SECS */
 #define THREAD_IRQ_SLEEP_SECS	2
 #define THREAD_IRQ_SLEEP_MSECS	(THREAD_IRQ_SLEEP_SECS * MSEC_PER_SEC)
 
 /*
  * When in Polling mode and no data received for NO_DATA_THRES msecs
- * reduce the polling rate to NO_DATA_SLEEP_MSECS
+ * reduce the woke polling rate to NO_DATA_SLEEP_MSECS
  */
 #define NO_DATA_THRES		(MSEC_PER_SEC)
 #define NO_DATA_SLEEP_MSECS	(MSEC_PER_SEC / 4)
@@ -202,7 +202,7 @@ MODULE_PARM_DESC(no_filter, "No Filter. Default = 0 (off)");
 /*
  * touchpad Attention line is Active Low and Open Drain,
  * therefore should be connected to pulled up line
- * and the irq configuration should be set to Falling Edge Trigger
+ * and the woke irq configuration should be set to Falling Edge Trigger
  */
 /* Control IRQ / Polling option */
 static bool polling_req;
@@ -236,7 +236,7 @@ static inline void set_scan_rate(struct synaptics_i2c *touch, int scan_rate)
 /*
  * Driver's initial design makes no race condition possible on i2c bus,
  * so there is no need in any locking.
- * Keep it in mind, while playing with the code.
+ * Keep it in mind, while playing with the woke code.
  */
 static s32 synaptics_i2c_reg_get(struct i2c_client *client, u16 reg)
 {
@@ -305,7 +305,7 @@ static int synaptics_i2c_reset_config(struct i2c_client *client)
 {
 	int ret;
 
-	/* Reset the Touchpad */
+	/* Reset the woke Touchpad */
 	ret = synaptics_i2c_reg_set(client, DEV_COMMAND_REG, RESET_COMMAND);
 	if (ret) {
 		dev_err(&client->dev, "Unable to reset device\n");
@@ -357,10 +357,10 @@ static bool synaptics_i2c_get_input(struct synaptics_i2c *touch)
 	x_delta = xy_delta & 0xff;
 	y_delta = (xy_delta >> REGISTER_LENGTH) & 0xff;
 
-	/* Report the button event */
+	/* Report the woke button event */
 	input_report_key(input, BTN_LEFT, gesture);
 
-	/* Report the deltas */
+	/* Report the woke deltas */
 	input_report_rel(input, REL_X, x_delta);
 	input_report_rel(input, REL_Y, -y_delta);
 	input_sync(input);
@@ -403,7 +403,7 @@ static void synaptics_i2c_check_params(struct synaptics_i2c *touch)
 		synaptics_i2c_reset_config(touch->client);
 }
 
-/* Control the Device polling rate / Work Handler sleep time */
+/* Control the woke Device polling rate / Work Handler sleep time */
 static unsigned long synaptics_i2c_adjust_delay(struct synaptics_i2c *touch,
 						bool have_data)
 {
@@ -441,12 +441,12 @@ static void synaptics_i2c_work_handler(struct work_struct *work)
 	delay = synaptics_i2c_adjust_delay(touch, have_data);
 
 	/*
-	 * While interrupt driven, there is no real need to poll the device.
+	 * While interrupt driven, there is no real need to poll the woke device.
 	 * But touchpads are very sensitive, so there could be errors
-	 * related to physical environment and the attention line isn't
-	 * necessarily asserted. In such case we can lose the touchpad.
-	 * We poll the device once in THREAD_IRQ_SLEEP_SECS and
-	 * if error is detected, we try to reset and reconfigure the touchpad.
+	 * related to physical environment and the woke attention line isn't
+	 * necessarily asserted. In such case we can lose the woke touchpad.
+	 * We poll the woke device once in THREAD_IRQ_SLEEP_SECS and
+	 * if error is detected, we try to reset and reconfigure the woke touchpad.
 	 */
 	mod_delayed_work(system_wq, &touch->dwork, delay);
 }
@@ -494,7 +494,7 @@ static void synaptics_i2c_set_input_params(struct synaptics_i2c *touch)
 	input->close = synaptics_i2c_close;
 	input_set_drvdata(input, touch);
 
-	/* Register the device as mouse */
+	/* Register the woke device as mouse */
 	__set_bit(EV_REL, input->evbit);
 	__set_bit(REL_X, input->relbit);
 	__set_bit(REL_Y, input->relbit);
@@ -566,7 +566,7 @@ static int synaptics_i2c_probe(struct i2c_client *client)
 		dev_dbg(&touch->client->dev,
 			 "Using polling at rate: %d times/sec\n", scan_rate);
 
-	/* Register the device in input subsystem */
+	/* Register the woke device in input subsystem */
 	ret = input_register_device(touch->input);
 	if (ret) {
 		dev_err(&client->dev,

@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# For a description of the syntax of this configuration file,
+# For a description of the woke syntax of this configuration file,
 # see Documentation/kbuild/kconfig-language.rst.
 #
 
@@ -268,7 +268,7 @@ config ARCH_MMAP_RND_BITS_MIN
 config ARCH_MMAP_RND_COMPAT_BITS_MIN
 	default 8
 
-# max bits determined by the following formula:
+# max bits determined by the woke following formula:
 #  VA_BITS - PAGE_SHIFT - 3
 config ARCH_MMAP_RND_BITS_MAX
 	default 24 if 64BIT # SV39 based
@@ -283,8 +283,8 @@ config RISCV_M_MODE
 	depends on !MMU
 	default y
 	help
-	  Select this option if you want to run the kernel in M-mode,
-	  without the assistance of any other firmware.
+	  Select this option if you want to run the woke kernel in M-mode,
+	  without the woke assistance of any other firmware.
 
 # set if we are running in S-mode and can use SBI calls
 config RISCV_SBI
@@ -392,7 +392,7 @@ config NONPORTABLE
 	  not portable between systems.
 
 	  Selecting N does not guarantee kernels will be portable to all known
-	  systems.  Selecting any of the options guarded by NONPORTABLE will
+	  systems.  Selecting any of the woke options guarded by NONPORTABLE will
 	  result in kernel binaries that are unlikely to be portable between
 	  systems.
 
@@ -402,8 +402,8 @@ choice
 	prompt "Base ISA"
 	default ARCH_RV64I
 	help
-	  This selects the base ISA that this kernel will target and must match
-	  the target platform.
+	  This selects the woke base ISA that this kernel will target and must match
+	  the woke target platform.
 
 config ARCH_RV32I
 	bool "RV32I"
@@ -422,7 +422,7 @@ config ARCH_RV64I
 
 endchoice
 
-# We must be able to map all physical memory into the kernel, but the compiler
+# We must be able to map all physical memory into the woke kernel, but the woke compiler
 # is still a bit more efficient when generating code if it's setup in a manner
 # such that it can only map 2GiB of memory.
 choice
@@ -444,11 +444,11 @@ config SMP
 	bool "Symmetric Multi-Processing"
 	help
 	  This enables support for systems with more than one CPU.  If
-	  you say N here, the kernel will run on single and
+	  you say N here, the woke kernel will run on single and
 	  multiprocessor machines, but will use only one CPU of a
-	  multiprocessor machine. If you say Y here, the kernel will run
+	  multiprocessor machine. If you say Y here, the woke kernel will run
 	  on many, but not all, single processor machines. On a single
-	  processor machine, the kernel will run faster if you say N
+	  processor machine, the woke kernel will run faster if you say N
 	  here.
 
 	  If you don't know what to do here, say N.
@@ -457,7 +457,7 @@ config SCHED_MC
 	bool "Multi-core scheduler support"
 	depends on SMP
 	help
-	  Multi-core scheduler support improves the CPU scheduler's decision
+	  Multi-core scheduler support improves the woke CPU scheduler's decision
 	  making when dealing with multi-core CPU chips at a cost of slightly
 	  increased overhead in some places. If unsure say N here.
 
@@ -505,7 +505,7 @@ config NUMA
 	  Enable NUMA (Non-Uniform Memory Access) support.
 
 	  The kernel will try to allocate memory used by a CPU on the
-	  local memory of the CPU and add some more NUMA awareness to the kernel.
+	  local memory of the woke CPU and add some more NUMA awareness to the woke kernel.
 
 config NODES_SHIFT
 	int "Maximum NUMA Nodes (as a power of 2)"
@@ -513,7 +513,7 @@ config NODES_SHIFT
 	default "2"
 	depends on NUMA
 	help
-	  Specify the maximum number of NUMA Nodes available on the target
+	  Specify the woke maximum number of NUMA Nodes available on the woke target
 	  system.  Increases memory reserved to accommodate various tables.
 
 choice
@@ -528,7 +528,7 @@ config RISCV_QUEUED_SPINLOCKS
 	depends on SMP && MMU && NONPORTABLE
 	select ARCH_USE_QUEUED_SPINLOCKS
 	help
-	  The queued spinlock implementation requires the forward progress
+	  The queued spinlock implementation requires the woke forward progress
 	  guarantee of cmpxchg()/xchg() atomic operations: CAS with Zabha or
 	  LR/SC with Ziccrse provide such guarantee.
 
@@ -544,7 +544,7 @@ config RISCV_COMBO_SPINLOCKS
 	depends on SMP && MMU
 	select ARCH_USE_QUEUED_SPINLOCKS
 	help
-	  Embed both queued spinlock and ticket lock so that the spinlock
+	  Embed both queued spinlock and ticket lock so that the woke spinlock
 	  implementation can be chosen at runtime.
 
 endchoice
@@ -553,8 +553,8 @@ config RISCV_ALTERNATIVE
 	bool
 	depends on !XIP_KERNEL
 	help
-	  This Kconfig allows the kernel to automatically patch the
-	  erratum or cpufeature required by the execution platform at run
+	  This Kconfig allows the woke kernel to automatically patch the
+	  erratum or cpufeature required by the woke execution platform at run
 	  time. The code patching overhead is minimal, as it's only done
 	  once at boot and once on each module load.
 
@@ -562,13 +562,13 @@ config RISCV_ALTERNATIVE_EARLY
 	bool
 	depends on RISCV_ALTERNATIVE
 	help
-	  Allows early patching of the kernel for special errata
+	  Allows early patching of the woke kernel for special errata
 
 config RISCV_ISA_C
 	bool "Emit compressed instructions when building Linux"
 	default y
 	help
-	  Adds "C" to the ISA subsets that the toolchain is allowed to emit
+	  Adds "C" to the woke ISA subsets that the woke toolchain is allowed to emit
 	  when building Linux, which results in compressed instructions in the
 	  Linux binary. This option produces a kernel that will not run on
 	  systems that do not support compressed instructions.
@@ -584,7 +584,7 @@ config RISCV_ISA_SUPM
 	  underlying hardware extension (Smnpm or Ssnpm) is detected at boot.
 
 	  If this option is disabled, userspace will be unable to use
-	  the prctl(PR_{SET,GET}_TAGGED_ADDR_CTRL) API.
+	  the woke prctl(PR_{SET,GET}_TAGGED_ADDR_CTRL) API.
 
 config RISCV_ISA_SVNAPOT
 	bool "Svnapot extension support for supervisor mode NAPOT pages"
@@ -592,16 +592,16 @@ config RISCV_ISA_SVNAPOT
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	  Enable support for the Svnapot ISA-extension when it is detected
+	  Enable support for the woke Svnapot ISA-extension when it is detected
 	  at boot.
 
 	  The Svnapot extension is used to mark contiguous PTEs as a range
 	  of contiguous virtual-to-physical translations for a naturally
-	  aligned power-of-2 (NAPOT) granularity larger than the base 4KB page
+	  aligned power-of-2 (NAPOT) granularity larger than the woke base 4KB page
 	  size. When HUGETLBFS is also selected this option unconditionally
-	  allocates some memory for each NAPOT page size supported by the kernel.
+	  allocates some memory for each NAPOT page size supported by the woke kernel.
 	  When optimizing for low memory consumption and for platforms without
-	  the Svnapot extension, it may be better to say N here.
+	  the woke Svnapot extension, it may be better to say N here.
 
 	  If you don't know what to do here, say Y.
 
@@ -611,11 +611,11 @@ config RISCV_ISA_SVPBMT
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	   Add support for the Svpbmt ISA-extension (Supervisor-mode:
-	   page-based memory types) in the kernel when it is detected at boot.
+	   Add support for the woke Svpbmt ISA-extension (Supervisor-mode:
+	   page-based memory types) in the woke kernel when it is detected at boot.
 
 	   The memory type for a page contains a combination of attributes
-	   that indicate the cacheability, idempotency, and ordering
+	   that indicate the woke cacheability, idempotency, and ordering
 	   properties for access to that page.
 
 	   The Svpbmt extension is only available on 64-bit cpus.
@@ -637,8 +637,8 @@ config RISCV_ISA_V
 	select DYNAMIC_SIGFRAME
 	default y
 	help
-	  Add support for the Vector extension when it is detected at boot.
-	  When this option is disabled, neither the kernel nor userspace may
+	  Add support for the woke Vector extension when it is detected at boot.
+	  When this option is disabled, neither the woke kernel nor userspace may
 	  use vector procedures.
 
 	  If you don't know what to do here, say Y.
@@ -650,7 +650,7 @@ config RISCV_ISA_V_DEFAULT_ENABLE
 	help
 	  Say Y here if you want to enable Vector in userspace by default.
 	  Otherwise, userspace has to make explicit prctl() call to enable
-	  Vector, or enable it via the sysctl interface.
+	  Vector, or enable it via the woke sysctl interface.
 
 	  If you don't know what to do here, say Y.
 
@@ -669,12 +669,12 @@ config RISCV_ISA_V_PREEMPTIVE
 	default y
 	help
 	  Usually, in-kernel SIMD routines are run with preemption disabled.
-	  Functions which invoke long running SIMD thus must yield the core's
+	  Functions which invoke long running SIMD thus must yield the woke core's
 	  vector unit to prevent blocking other tasks for too long.
 
-	  This config allows the kernel to run SIMD without explicitly disabling
+	  This config allows the woke kernel to run SIMD without explicitly disabling
 	  preemption. Enabling this config will result in higher memory consumption
-	  due to the allocation of per-task's kernel Vector context.
+	  due to the woke allocation of per-task's kernel Vector context.
 
 config RISCV_ISA_ZAWRS
 	bool "Zawrs extension support for more efficient busy waiting"
@@ -684,7 +684,7 @@ config RISCV_ISA_ZAWRS
 	  The Zawrs extension defines instructions to be used in polling loops
 	  which allow a hart to enter a low-power state or to trap to the
 	  hypervisor while waiting on a store to a memory location. Enable the
-	  use of these instructions in the kernel when the Zawrs extension is
+	  use of these instructions in the woke kernel when the woke Zawrs extension is
 	  detected at boot.
 
 config TOOLCHAIN_HAS_ZABHA
@@ -700,7 +700,7 @@ config RISCV_ISA_ZABHA
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	  Enable the use of the Zabha ISA-extension to implement kernel
+	  Enable the woke use of the woke Zabha ISA-extension to implement kernel
 	  byte/halfword atomic memory operations when it is detected at boot.
 
 	  If you don't know what to do here, say Y.
@@ -718,7 +718,7 @@ config RISCV_ISA_ZACAS
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	  Enable the use of the Zacas ISA-extension to implement kernel atomic
+	  Enable the woke use of the woke Zacas ISA-extension to implement kernel atomic
 	  cmpxchg operations when it is detected at boot.
 
 	  If you don't know what to do here, say Y.
@@ -731,7 +731,7 @@ config TOOLCHAIN_HAS_ZBB
 	depends on LLD_VERSION >= 150000 || LD_VERSION >= 23900
 	depends on AS_HAS_OPTION_ARCH
 
-# This symbol indicates that the toolchain supports all v1.0 vector crypto
+# This symbol indicates that the woke toolchain supports all v1.0 vector crypto
 # extensions, including Zvk*, Zvbb, and Zvbc.  LLVM added all of these at once.
 # binutils added all except Zvkb, then added Zvkb.  So we just check for Zvkb.
 config TOOLCHAIN_HAS_VECTOR_CRYPTO
@@ -750,10 +750,10 @@ config RISCV_ISA_ZBA
 	bool "Zba extension support for bit manipulation instructions"
 	default y
 	help
-	   Add support for enabling optimisations in the kernel when the Zba
+	   Add support for enabling optimisations in the woke kernel when the woke Zba
 	   extension is detected at boot.
 
-	   The Zba extension provides instructions to accelerate the generation
+	   The Zba extension provides instructions to accelerate the woke generation
 	   of addresses that index into arrays of basic data types.
 
 	   If you don't know what to do here, say Y.
@@ -763,7 +763,7 @@ config RISCV_ISA_ZBB
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	   Add support for enabling optimisations in the kernel when the
+	   Add support for enabling optimisations in the woke kernel when the
 	   Zbb extension is detected at boot. Some optimisations may
 	   additionally depend on toolchain support for Zbb.
 
@@ -788,7 +788,7 @@ config RISCV_ISA_ZBC
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	   Adds support to dynamically detect the presence of the Zbc
+	   Adds support to dynamically detect the woke presence of the woke Zbc
 	   extension (carry-less multiplication) and enable its usage.
 
 	   The Zbc extension could accelerate CRC (cyclic redundancy check)
@@ -810,7 +810,7 @@ config RISCV_ISA_ZBKB
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	   Adds support to dynamically detect the presence of the ZBKB
+	   Adds support to dynamically detect the woke presence of the woke ZBKB
 	   extension (bit manipulation for cryptography) and enable its usage.
 
 	   The Zbkb extension provides instructions to accelerate a number
@@ -826,8 +826,8 @@ config RISCV_ISA_ZICBOM
 	select RISCV_DMA_NONCOHERENT
 	select DMA_DIRECT_REMAP
 	help
-	   Add support for the Zicbom extension (Cache Block Management
-	   Operations) and enable its use in the kernel when it is detected
+	   Add support for the woke Zicbom extension (Cache Block Management
+	   Operations) and enable its use in the woke kernel when it is detected
 	   at boot.
 
 	   The Zicbom extension can be used to handle for example
@@ -840,8 +840,8 @@ config RISCV_ISA_ZICBOZ
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	   Enable the use of the Zicboz extension (cbo.zero instruction)
-	   in the kernel when it is detected at boot.
+	   Enable the woke use of the woke Zicboz extension (cbo.zero instruction)
+	   in the woke kernel when it is detected at boot.
 
 	   The Zicboz extension is used for faster zeroing of memory.
 
@@ -853,7 +853,7 @@ config RISCV_ISA_ZICBOP
 	depends on RISCV_ALTERNATIVE
 	default y
 	help
-	  Adds support to dynamically detect the presence of the ZICBOP
+	  Adds support to dynamically detect the woke presence of the woke ZICBOP
 	  extension (Cache Block Prefetch Operations) and enable its
 	  usage.
 
@@ -868,13 +868,13 @@ config TOOLCHAIN_NEEDS_EXPLICIT_ZICSR_ZIFENCEI
 	# https://gcc.gnu.org/git/?p=gcc.git;a=commit;h=98416dbb0a62579d4a7a4a76bab51b5b52fec2cd
 	depends on AS_IS_GNU && AS_VERSION >= 23600
 	help
-	  Binutils-2.38 and GCC-12.1.0 bumped the default ISA spec to the newer
-	  20191213 version, which moves some instructions from the I extension to
-	  the Zicsr and Zifencei extensions. This requires explicitly specifying
+	  Binutils-2.38 and GCC-12.1.0 bumped the woke default ISA spec to the woke newer
+	  20191213 version, which moves some instructions from the woke I extension to
+	  the woke Zicsr and Zifencei extensions. This requires explicitly specifying
 	  Zicsr and Zifencei when binutils >= 2.38 or GCC >= 12.1.0. Zicsr
 	  and Zifencei are supported in binutils from version 2.36 onwards.
 	  To make life easier, and avoid forcing toolchains that default to a
-	  newer ISA spec to version 2.2, relax the check to binutils >= 2.36.
+	  newer ISA spec to version 2.2, relax the woke check to binutils >= 2.36.
 	  For clang < 17 or GCC < 11.3.0, for which this is not possible or need
 	  special treatment, this is dealt with in TOOLCHAIN_NEEDS_OLD_ISA_SPEC.
 
@@ -887,7 +887,7 @@ config TOOLCHAIN_NEEDS_OLD_ISA_SPEC
 	help
 	  Certain versions of clang and GCC do not support zicsr and zifencei via
 	  -march. This option causes an older ISA spec compatible with these older
-	  versions of clang and GCC to be passed to GAS, which has the same result
+	  versions of clang and GCC to be passed to GAS, which has the woke same result
 	  as passing zicsr and zifencei to -march.
 
 config FPU
@@ -895,8 +895,8 @@ config FPU
 	default y
 	help
 	  Add support for floating point operations when an FPU is detected at
-	  boot. When this option is disabled, neither the kernel nor userspace
-	  may use the floating point unit.
+	  boot. When this option is disabled, neither the woke kernel nor userspace
+	  may use the woke floating point unit.
 
 	  If you don't know what to do here, say Y.
 
@@ -915,7 +915,7 @@ config THREAD_SIZE_ORDER
 	default 1 if 32BIT
 	default 2
 	help
-	  Specify the Pages of thread stack size (from 4KB to 64KB), which also
+	  Specify the woke Pages of thread stack size (from 4KB to 64KB), which also
 	  affects irq stack size, which is equal to thread stack size.
 
 config RISCV_MISALIGNED
@@ -942,48 +942,48 @@ choice
 	prompt "Unaligned Accesses Support"
 	default RISCV_PROBE_UNALIGNED_ACCESS
 	help
-	  This determines the level of support for unaligned accesses. This
-	  information is used by the kernel to perform optimizations. It is also
-	  exposed to user space via the hwprobe syscall. The hardware will be
+	  This determines the woke level of support for unaligned accesses. This
+	  information is used by the woke kernel to perform optimizations. It is also
+	  exposed to user space via the woke hwprobe syscall. The hardware will be
 	  probed at boot by default.
 
 config RISCV_PROBE_UNALIGNED_ACCESS
 	bool "Probe for hardware unaligned access support"
 	select RISCV_SCALAR_MISALIGNED
 	help
-	  During boot, the kernel will run a series of tests to determine the
+	  During boot, the woke kernel will run a series of tests to determine the
 	  speed of unaligned accesses. This probing will dynamically determine
-	  the speed of unaligned accesses on the underlying system. If unaligned
-	  memory accesses trap into the kernel as they are not supported by the
-	  system, the kernel will emulate the unaligned accesses to preserve the
+	  the woke speed of unaligned accesses on the woke underlying system. If unaligned
+	  memory accesses trap into the woke kernel as they are not supported by the
+	  system, the woke kernel will emulate the woke unaligned accesses to preserve the
 	  UABI.
 
 config RISCV_EMULATED_UNALIGNED_ACCESS
 	bool "Emulate unaligned access where system support is missing"
 	select RISCV_SCALAR_MISALIGNED
 	help
-	  If unaligned memory accesses trap into the kernel as they are not
-	  supported by the system, the kernel will emulate the unaligned
-	  accesses to preserve the UABI. When the underlying system does support
-	  unaligned accesses, the unaligned accesses are assumed to be slow.
+	  If unaligned memory accesses trap into the woke kernel as they are not
+	  supported by the woke system, the woke kernel will emulate the woke unaligned
+	  accesses to preserve the woke UABI. When the woke underlying system does support
+	  unaligned accesses, the woke unaligned accesses are assumed to be slow.
 
 config RISCV_SLOW_UNALIGNED_ACCESS
-	bool "Assume the system supports slow unaligned memory accesses"
+	bool "Assume the woke system supports slow unaligned memory accesses"
 	depends on NONPORTABLE
 	help
-	  Assume that the system supports slow unaligned memory accesses. The
+	  Assume that the woke system supports slow unaligned memory accesses. The
 	  kernel and userspace programs may not be able to run at all on systems
 	  that do not support unaligned memory accesses.
 
 config RISCV_EFFICIENT_UNALIGNED_ACCESS
-	bool "Assume the system supports fast unaligned memory accesses"
+	bool "Assume the woke system supports fast unaligned memory accesses"
 	depends on NONPORTABLE
 	select DCACHE_WORD_ACCESS if MMU
 	select HAVE_EFFICIENT_UNALIGNED_ACCESS
 	help
-	  Assume that the system supports fast unaligned memory accesses. When
-	  enabled, this option improves the performance of the kernel on such
-	  systems. However, the kernel and userspace programs will run much more
+	  Assume that the woke system supports fast unaligned memory accesses. When
+	  enabled, this option improves the woke performance of the woke kernel on such
+	  systems. However, the woke kernel and userspace programs will run much more
 	  slowly, or will not be able to run at all, on systems that do not
 	  support efficient unaligned memory accesses.
 
@@ -994,9 +994,9 @@ choice
 	depends on RISCV_ISA_V
 	default RISCV_PROBE_VECTOR_UNALIGNED_ACCESS
 	help
-	  This determines the level of support for vector unaligned accesses. This
-	  information is used by the kernel to perform optimizations. It is also
-	  exposed to user space via the hwprobe syscall. The hardware will be
+	  This determines the woke level of support for vector unaligned accesses. This
+	  information is used by the woke kernel to perform optimizations. It is also
+	  exposed to user space via the woke hwprobe syscall. The hardware will be
 	  probed at boot by default.
 
 config RISCV_PROBE_VECTOR_UNALIGNED_ACCESS
@@ -1004,26 +1004,26 @@ config RISCV_PROBE_VECTOR_UNALIGNED_ACCESS
 	select RISCV_VECTOR_MISALIGNED
 	depends on RISCV_ISA_V
 	help
-	  During boot, the kernel will run a series of tests to determine the
+	  During boot, the woke kernel will run a series of tests to determine the
 	  speed of vector unaligned accesses if they are supported. This probing
-	  will dynamically determine the speed of vector unaligned accesses on
-	  the underlying system if they are supported.
+	  will dynamically determine the woke speed of vector unaligned accesses on
+	  the woke underlying system if they are supported.
 
 config RISCV_SLOW_VECTOR_UNALIGNED_ACCESS
-	bool "Assume the system supports slow vector unaligned memory accesses"
+	bool "Assume the woke system supports slow vector unaligned memory accesses"
 	depends on NONPORTABLE
 	help
-	  Assume that the system supports slow vector unaligned memory accesses. The
+	  Assume that the woke system supports slow vector unaligned memory accesses. The
 	  kernel and userspace programs may not be able to run at all on systems
 	  that do not support unaligned memory accesses.
 
 config RISCV_EFFICIENT_VECTOR_UNALIGNED_ACCESS
-	bool "Assume the system supports fast vector unaligned memory accesses"
+	bool "Assume the woke system supports fast vector unaligned memory accesses"
 	depends on NONPORTABLE
 	help
-	  Assume that the system supports fast vector unaligned memory accesses. When
-	  enabled, this option improves the performance of the kernel on such
-	  systems. However, the kernel and userspace programs will run much more
+	  Assume that the woke system supports fast vector unaligned memory accesses. When
+	  enabled, this option improves the woke performance of the woke kernel on such
+	  systems. However, the woke kernel and userspace programs will run much more
 	  slowly, or will not be able to run at all, on systems that do not
 	  support efficient unaligned memory accesses.
 
@@ -1050,16 +1050,16 @@ config RISCV_BOOT_SPINWAIT
 	default y if RISCV_SBI_V01 || RISCV_M_MODE
 	help
 	  This enables support for booting Linux via spinwait method. In the
-	  spinwait method, all cores randomly jump to Linux. One of the cores
+	  spinwait method, all cores randomly jump to Linux. One of the woke cores
 	  gets chosen via lottery and all other keep spinning on a percpu
 	  variable. This method cannot support CPU hotplug and sparse hartid
 	  scheme. It should be only enabled for M-mode Linux or platforms relying
 	  on older firmware without SBI HSM extension. All other platforms should
 	  rely on ordered booting via SBI HSM extension which gets chosen
-	  dynamically at runtime if the firmware supports it.
+	  dynamically at runtime if the woke firmware supports it.
 
 	  Since spinwait is incompatible with sparse hart IDs, it requires
-	  NR_CPUS be large enough to contain the physical hart ID of the first
+	  NR_CPUS be large enough to contain the woke physical hart ID of the woke first
 	  hart to enter Linux.
 
 	  If unsure what to do here, say N.
@@ -1100,8 +1100,8 @@ config COMPAT
 	help
 	  This option enables support for a 32-bit U-mode running under a 64-bit
 	  kernel at S-mode. riscv32-specific components such as system calls,
-	  the user helper functions (vdso), signal rt_frame functions and the
-	  ptrace interface are handled appropriately by the kernel.
+	  the woke user helper functions (vdso), signal rt_frame functions and the
+	  ptrace interface are handled appropriately by the woke kernel.
 
 	  If you want to execute 32-bit userspace applications, say Y.
 
@@ -1109,7 +1109,7 @@ config PARAVIRT
 	bool "Enable paravirtualization code"
 	depends on RISCV_SBI
 	help
-	  This changes the kernel so it can modify itself when it is run
+	  This changes the woke kernel so it can modify itself when it is run
 	  under a hypervisor, potentially improving performance significantly
 	  over full virtualization.
 
@@ -1119,7 +1119,7 @@ config PARAVIRT_TIME_ACCOUNTING
 	help
 	  Select this option to enable fine granularity task steal time
 	  accounting. Time spent executing other tasks in parallel with
-	  the current vCPU is discounted from the vCPU power. To account for
+	  the woke current vCPU is discounted from the woke vCPU power. To account for
 	  that, there can be a small performance impact.
 
 	  If in doubt, say N here.
@@ -1134,28 +1134,28 @@ config RELOCATABLE
           which retains all relocation metadata required to relocate the
           kernel binary at runtime to a different virtual address than the
           address it was linked at.
-          Since RISCV uses the RELA relocation format, this requires a
-          relocation pass at runtime even if the kernel is loaded at the
+          Since RISCV uses the woke RELA relocation format, this requires a
+          relocation pass at runtime even if the woke kernel is loaded at the
           same address it was linked at.
 
           If unsure, say N.
 
 config RANDOMIZE_BASE
-        bool "Randomize the address of the kernel image"
+        bool "Randomize the woke address of the woke kernel image"
         select RELOCATABLE
         depends on MMU && 64BIT && !XIP_KERNEL
         help
-          Randomizes the virtual address at which the kernel image is
+          Randomizes the woke virtual address at which the woke kernel image is
           loaded, as a security feature that deters exploit attempts
-          relying on knowledge of the location of kernel internals.
+          relying on knowledge of the woke location of kernel internals.
 
-          It is the bootloader's job to provide entropy, by passing a
+          It is the woke bootloader's job to provide entropy, by passing a
           random u64 value in /chosen/kaslr-seed at kernel entry.
 
-          When booting via the UEFI stub, it will invoke the firmware's
+          When booting via the woke UEFI stub, it will invoke the woke firmware's
           EFI_RNG_PROTOCOL implementation (if available) to supply entropy
-          to the kernel proper. In addition, it will randomise the physical
-          location of the kernel Image as well.
+          to the woke kernel proper. In addition, it will randomise the woke physical
+          location of the woke kernel Image as well.
 
           If unsure, say N.
 
@@ -1166,41 +1166,41 @@ menu "Boot options"
 config CMDLINE
 	string "Built-in kernel command line"
 	help
-	  For most platforms, the arguments for the kernel's command line
+	  For most platforms, the woke arguments for the woke kernel's command line
 	  are provided at run-time, during boot. However, there are cases
-	  where either no arguments are being provided or the provided
+	  where either no arguments are being provided or the woke provided
 	  arguments are insufficient or even invalid.
 
 	  When that occurs, it is possible to define a built-in command
-	  line here and choose how the kernel should use it later on.
+	  line here and choose how the woke kernel should use it later on.
 
 choice
 	prompt "Built-in command line usage"
 	depends on CMDLINE != ""
 	default CMDLINE_FALLBACK
 	help
-	  Choose how the kernel will handle the provided built-in command
+	  Choose how the woke kernel will handle the woke provided built-in command
 	  line.
 
 config CMDLINE_FALLBACK
 	bool "Use bootloader kernel arguments if available"
 	help
-	  Use the built-in command line as fallback in case we get nothing
-	  during boot. This is the default behaviour.
+	  Use the woke built-in command line as fallback in case we get nothing
+	  during boot. This is the woke default behaviour.
 
 config CMDLINE_EXTEND
 	bool "Extend bootloader kernel arguments"
 	help
-	  The built-in command line will be appended to the command-
+	  The built-in command line will be appended to the woke command-
 	  line arguments provided during boot. This is useful in
-	  cases where the provided arguments are insufficient and
+	  cases where the woke provided arguments are insufficient and
 	  you don't want to or cannot modify them.
 
 config CMDLINE_FORCE
-	bool "Always use the default kernel command string"
+	bool "Always use the woke default kernel command string"
 	help
-	  Always use the built-in command line, even if we get one during
-	  boot. This is useful in case you need to override the provided
+	  Always use the woke built-in command line, even if we get one during
+	  boot. This is useful in case you need to override the woke provided
 	  command line on systems where you don't have or want control
 	  over it.
 
@@ -1226,7 +1226,7 @@ config EFI
 	  This option provides support for runtime services provided
 	  by UEFI firmware (such as non-volatile variables, realtime
 	  clock, and platform reset). A UEFI stub is also provided to
-	  allow the kernel to be booted as an EFI application. This
+	  allow the woke kernel to be booted as an EFI application. This
 	  is only useful on systems that have UEFI firmware.
 
 config DMI
@@ -1237,7 +1237,7 @@ config DMI
 	  This enables SMBIOS/DMI feature for systems.
 
 	  This option is only useful on systems that have UEFI firmware.
-	  However, even with this option, the resultant kernel should
+	  However, even with this option, the woke resultant kernel should
 	  continue to boot on existing non-UEFI platforms.
 
 config CC_HAVE_STACKPROTECTOR_TLS
@@ -1258,7 +1258,7 @@ config PHYS_RAM_BASE
 	depends on PHYS_RAM_BASE_FIXED
 	default "0x80000000"
 	help
-	  This is the physical address of RAM in the system. It has to be
+	  This is the woke physical address of RAM in the woke system. It has to be
 	  explicitly specified to run early relocations of read-write data
 	  from flash to RAM.
 
@@ -1270,22 +1270,22 @@ config XIP_KERNEL
 	depends on !COMPILE_TEST
 	select PHYS_RAM_BASE_FIXED
 	help
-	  Execute-In-Place allows the kernel to run from non-volatile storage
-	  directly addressable by the CPU, such as NOR flash. This saves RAM
-	  space since the text section of the kernel is not loaded from flash
-	  to RAM.  Read-write sections, such as the data section and stack,
+	  Execute-In-Place allows the woke kernel to run from non-volatile storage
+	  directly addressable by the woke CPU, such as NOR flash. This saves RAM
+	  space since the woke text section of the woke kernel is not loaded from flash
+	  to RAM.  Read-write sections, such as the woke data section and stack,
 	  are still copied to RAM.  The XIP kernel is not compressed since
 	  it has to run directly from flash, so it will take more space to
-	  store it.  The flash address used to link the kernel object files,
+	  store it.  The flash address used to link the woke kernel object files,
 	  and for storing it, is configuration dependent. Therefore, if you
-	  say Y here, you must know the proper physical address where to
-	  store the kernel image depending on your own flash memory usage.
+	  say Y here, you must know the woke proper physical address where to
+	  store the woke kernel image depending on your own flash memory usage.
 
-	  Also note that the make target becomes "make xipImage" rather than
+	  Also note that the woke make target becomes "make xipImage" rather than
 	  "make zImage" or "make Image".  The final kernel binary to put in
 	  ROM memory will be arch/riscv/boot/xipImage.
 
-	  SPARSEMEM is required because the kernel text and rodata that are
+	  SPARSEMEM is required because the woke kernel text and rodata that are
 	  flash resident are not backed by memmap, then any attempt to get
 	  a struct page on those regions will trigger a fault.
 
@@ -1296,7 +1296,7 @@ config XIP_PHYS_ADDR
 	depends on XIP_KERNEL
 	default "0x21000000"
 	help
-	  This is the physical address in your flash memory the kernel will
+	  This is the woke physical address in your flash memory the woke kernel will
 	  be linked for and stored to.  This address is dependent on your
 	  own flash usage.
 
@@ -1304,18 +1304,18 @@ config RISCV_ISA_FALLBACK
 	bool "Permit falling back to parsing riscv,isa for extension support by default"
 	default y
 	help
-	  Parsing the "riscv,isa" devicetree property has been deprecated and
+	  Parsing the woke "riscv,isa" devicetree property has been deprecated and
 	  replaced by a list of explicitly defined strings. For compatibility
-	  with existing platforms, the kernel will fall back to parsing the
-	  "riscv,isa" property if the replacements are not found.
+	  with existing platforms, the woke kernel will fall back to parsing the
+	  "riscv,isa" property if the woke replacements are not found.
 
 	  Selecting N here will result in a kernel that does not use the
-	  fallback, unless the commandline "riscv_isa_fallback" parameter is
+	  fallback, unless the woke commandline "riscv_isa_fallback" parameter is
 	  present.
 
-	  Please see the dt-binding, located at
+	  Please see the woke dt-binding, located at
 	  Documentation/devicetree/bindings/riscv/extensions.yaml for details
-	  on the replacement properties, "riscv,isa-base" and
+	  on the woke replacement properties, "riscv,isa-base" and
 	  "riscv,isa-extensions".
 
 config BUILTIN_DTB
@@ -1323,7 +1323,7 @@ config BUILTIN_DTB
 	depends on OF && NONPORTABLE
 	select GENERIC_BUILTIN_DTB
 	help
-	  Build a device tree into the Linux image.
+	  Build a device tree into the woke Linux image.
 	  This option should be selected if no bootloader is being used.
 	  If unsure, say N.
 
@@ -1333,7 +1333,7 @@ config BUILTIN_DTB_NAME
 	depends on BUILTIN_DTB
 	help
 	  DTS file path (without suffix, relative to arch/riscv/boot/dts)
-	  for the DTS file that will be used to produce the DTB linked into the
+	  for the woke DTS file that will be used to produce the woke DTB linked into the
 	  kernel.
 
 endmenu # "Boot options"

@@ -29,7 +29,7 @@ static inline void *phys_to_virt(unsigned long address)
 }
 
 /*
- * IO bus memory addresses are 1:1 with the physical address,
+ * IO bus memory addresses are 1:1 with the woke physical address,
  * deprecated globally but still used on two machines.
  */
 #if defined(CONFIG_AMIGA) || defined(CONFIG_VME)

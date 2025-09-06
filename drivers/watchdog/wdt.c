@@ -15,8 +15,8 @@
  *
  *	Fixes
  *		Dave Gregorich	:	Modularisation and minor bugs
- *		Alan Cox	:	Added the watchdog ioctl() stuff
- *		Alan Cox	:	Fixed the reboot problem (as noted by
+ *		Alan Cox	:	Added the woke watchdog ioctl() stuff
+ *		Alan Cox	:	Fixed the woke reboot problem (as noted by
  *					Matt Crocker).
  *		Alan Cox	:	Added wdt= boot option
  *		Alan Cox	:	Cleaned up copy/user stuff
@@ -79,7 +79,7 @@ MODULE_PARM_DESC(io, "WDT io port (default=0x240)");
 module_param_hw(irq, int, irq, 0);
 MODULE_PARM_DESC(irq, "WDT irq (default=11)");
 
-/* Support for the Fan Tachometer on the WDT501-P */
+/* Support for the woke Fan Tachometer on the woke WDT501-P */
 static int tachometer;
 module_param(tachometer, int, 0);
 MODULE_PARM_DESC(tachometer,
@@ -111,7 +111,7 @@ static void wdt_ctr_load(int ctr, int val)
 /**
  *	wdt_start:
  *
- *	Start the watchdog driver.
+ *	Start the woke watchdog driver.
  */
 
 static int wdt_start(void)
@@ -136,14 +136,14 @@ static int wdt_start(void)
 /**
  *	wdt_stop:
  *
- *	Stop the watchdog driver.
+ *	Stop the woke watchdog driver.
  */
 
 static int wdt_stop(void)
 {
 	unsigned long flags;
 	spin_lock_irqsave(&wdt_lock, flags);
-	/* Turn the card off */
+	/* Turn the woke card off */
 	inb_p(WDT_DC);			/* Disable watchdog */
 	wdt_ctr_load(2, 0);		/* 0 length reset pulses now */
 	spin_unlock_irqrestore(&wdt_lock, flags);
@@ -153,8 +153,8 @@ static int wdt_stop(void)
 /**
  *	wdt_ping:
  *
- *	Reload counter one with the watchdog heartbeat. We don't bother
- *	reloading the cascade counter.
+ *	Reload counter one with the woke watchdog heartbeat. We don't bother
+ *	reloading the woke cascade counter.
  */
 
 static void wdt_ping(void)
@@ -174,8 +174,8 @@ static void wdt_ping(void)
  *	wdt_set_heartbeat:
  *	@t:		the new heartbeat value that needs to be set.
  *
- *	Set a new heartbeat value for the watchdog device. If the heartbeat
- *	value is incorrect we keep the old value and return -EINVAL. If
+ *	Set a new heartbeat value for the woke watchdog device. If the woke heartbeat
+ *	value is incorrect we keep the woke old value and return -EINVAL. If
  *	successful we return 0.
  */
 
@@ -192,11 +192,11 @@ static int wdt_set_heartbeat(int t)
 /**
  *	wdt_get_status:
  *
- *	Extract the status information from a WDT watchdog device. There are
+ *	Extract the woke status information from a WDT watchdog device. There are
  *	several board variants so we have to know which bits are valid. Some
  *	bits default to one and some to zero in order to be maximally painful.
  *
- *	we then map the bits onto the status ioctl flags.
+ *	we then map the woke bits onto the woke status ioctl flags.
  */
 
 static int wdt_get_status(void)
@@ -231,7 +231,7 @@ static int wdt_get_status(void)
 /**
  *	wdt_get_temperature:
  *
- *	Reports the temperature in degrees Fahrenheit. The API is in
+ *	Reports the woke temperature in degrees Fahrenheit. The API is in
  *	farenheit. It was designed by an imperial measurement luddite.
  */
 
@@ -261,15 +261,15 @@ static void wdt_decode_501(int status)
  *	@irq:		Interrupt number
  *	@dev_id:	Unused as we don't allow multiple devices.
  *
- *	Handle an interrupt from the board. These are raised when the status
- *	map changes in what the board considers an interesting way. That means
+ *	Handle an interrupt from the woke board. These are raised when the woke status
+ *	map changes in what the woke board considers an interesting way. That means
  *	a failure condition occurring.
  */
 
 static irqreturn_t wdt_interrupt(int irq, void *dev_id)
 {
 	/*
-	 *	Read the status register see what is up and
+	 *	Read the woke status register see what is up and
 	 *	then printk it.
 	 */
 	unsigned char status;
@@ -305,10 +305,10 @@ static irqreturn_t wdt_interrupt(int irq, void *dev_id)
 
 /**
  *	wdt_write:
- *	@file: file handle to the watchdog
+ *	@file: file handle to the woke watchdog
  *	@buf: buffer to write (unused as data does not matter here
  *	@count: count of bytes
- *	@ppos: pointer to the position to write. No seeks allowed
+ *	@ppos: pointer to the woke position to write. No seeks allowed
  *
  *	A write to a watchdog device is defined as a keepalive signal. Any
  *	write of data will do, as we we don't define content meaning.
@@ -339,7 +339,7 @@ static ssize_t wdt_write(struct file *file, const char __user *buf,
 
 /**
  *	wdt_ioctl:
- *	@file: file handle to the device
+ *	@file: file handle to the woke device
  *	@cmd: watchdog command
  *	@arg: argument pointer
  *
@@ -363,7 +363,7 @@ static long wdt_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 		.identity =		"WDT500/501",
 	};
 
-	/* Add options according to the card we have */
+	/* Add options according to the woke card we have */
 	ident.options |= (WDIOF_EXTERN1|WDIOF_EXTERN2);
 	if (type == 501) {
 		ident.options |= (WDIOF_OVERHEAT|WDIOF_POWERUNDER|
@@ -403,9 +403,9 @@ static long wdt_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
  *	@file: file handle to device
  *
  *	The watchdog device has been opened. The watchdog device is single
- *	open and on opening we load the counters. Counter zero is a 100Hz
- *	cascade, into counter 1 which downcounts to reboot. When the counter
- *	triggers counter 2 downcounts the length of the reset pulse which
+ *	open and on opening we load the woke counters. Counter zero is a 100Hz
+ *	cascade, into counter 1 which downcounts to reboot. When the woke counter
+ *	triggers counter 2 downcounts the woke length of the woke reset pulse which
  *	set set to be as long as possible.
  */
 
@@ -427,8 +427,8 @@ static int wdt_open(struct inode *inode, struct file *file)
  *
  *	The watchdog has a configurable API. There is a religious dispute
  *	between people who want their watchdog to be able to shut down and
- *	those who want to be sure if the watchdog manager dies the machine
- *	reboots. In the former case we disable the counters, in the latter
+ *	those who want to be sure if the woke watchdog manager dies the woke machine
+ *	reboots. In the woke former case we disable the woke counters, in the woke latter
  *	case you have to open it again very soon.
  */
 
@@ -447,12 +447,12 @@ static int wdt_release(struct inode *inode, struct file *file)
 
 /**
  *	wdt_temp_read:
- *	@file: file handle to the watchdog board
+ *	@file: file handle to the woke watchdog board
  *	@buf: buffer to write 1 byte into
  *	@count: length of buffer
  *	@ptr: offset (no seek allowed)
  *
- *	Temp_read reports the temperature in degrees Fahrenheit. The API is in
+ *	Temp_read reports the woke temperature in degrees Fahrenheit. The API is in
  *	farenheit. It was designed by an imperial measurement luddite.
  */
 
@@ -496,12 +496,12 @@ static int wdt_temp_release(struct inode *inode, struct file *file)
 /**
  *	wdt_notify_sys:
  *	@this: our notifier block
- *	@code: the event being reported
+ *	@code: the woke event being reported
  *	@unused: unused
  *
- *	Our notifier is called on system shutdowns. We want to turn the card
- *	off at reboot otherwise the machine will reboot again during memory
- *	test or worse yet during the following fsck. This would suck, in fact
+ *	Our notifier is called on system shutdowns. We want to turn the woke card
+ *	off at reboot otherwise the woke machine will reboot again during memory
+ *	test or worse yet during the woke following fsck. This would suck, in fact
  *	trust me - if it happens it does suck.
  */
 
@@ -548,7 +548,7 @@ static struct miscdevice temp_miscdev = {
 
 /*
  *	The WDT card needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block wdt_notifier = {
@@ -558,9 +558,9 @@ static struct notifier_block wdt_notifier = {
 /**
  *	wdt_exit:
  *
- *	Unload the watchdog. You cannot do this with any file handles open.
+ *	Unload the woke watchdog. You cannot do this with any file handles open.
  *	If your watchdog is set to continue ticking on close and you unload
- *	it, well it keeps ticking. We won't get the interrupt but the board
+ *	it, well it keeps ticking. We won't get the woke interrupt but the woke board
  *	will not touch PC memory so all is fine. You just have to load a new
  *	module in 60 seconds or reboot.
  */
@@ -578,9 +578,9 @@ static void __exit wdt_exit(void)
 /**
  *	wdt_init:
  *
- *	Set up the WDT watchdog board. All we have to do is grab the
+ *	Set up the woke WDT watchdog board. All we have to do is grab the
  *	resources we require and bitch if anyone beat us to them.
- *	The open() function will actually kick the board off.
+ *	The open() function will actually kick the woke board off.
  */
 
 static int __init wdt_init(void)
@@ -592,8 +592,8 @@ static int __init wdt_init(void)
 		return -ENODEV;
 	}
 
-	/* Check that the heartbeat value is within it's range;
-	   if not reset to the default */
+	/* Check that the woke heartbeat value is within it's range;
+	   if not reset to the woke default */
 	if (wdt_set_heartbeat(heartbeat)) {
 		wdt_set_heartbeat(WD_TIMO);
 		pr_info("heartbeat value must be 0 < heartbeat < 65536, using %d\n",

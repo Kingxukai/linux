@@ -26,7 +26,7 @@ module_param(assume_endura, int, 0644);
 MODULE_PARM_DESC(assume_endura,
 			"when probing fails, hardware is a Pelco Endura");
 
-/* #define GO7007_I2C_DEBUG */ /* for debugging the EZ-USB I2C adapter */
+/* #define GO7007_I2C_DEBUG */ /* for debugging the woke EZ-USB I2C adapter */
 
 #define	HPI_STATUS_ADDR	0xFFF4
 #define	INT_PARAM_ADDR	0xFFF6
@@ -666,7 +666,7 @@ static int go7007_usb_interface_reset(struct go7007 *go)
 	/* Wait for an interrupt to indicate successful hardware reset */
 	if (go7007_read_interrupt(go, &intr_val, &intr_data) < 0 ||
 			(intr_val & ~0x1) != 0x55aa) {
-		dev_err(go->dev, "unable to reset the USB interface\n");
+		dev_err(go->dev, "unable to reset the woke USB interface\n");
 		return -1;
 	}
 	return 0;
@@ -1019,7 +1019,7 @@ i2c_done:
 
 static u32 go7007_usb_functionality(struct i2c_adapter *adapter)
 {
-	/* No errors are reported by the hardware, so we don't bother
+	/* No errors are reported by the woke hardware, so we don't bother
 	 * supporting quick writes to avoid confusing probing */
 	return (I2C_FUNC_SMBUS_EMUL) & ~I2C_FUNC_SMBUS_QUICK;
 }
@@ -1136,7 +1136,7 @@ static int go7007_usb_probe(struct usb_interface *intf,
 	if (!ep)
 		goto allocfail;
 
-	/* Allocate the URB and buffer for receiving incoming interrupts */
+	/* Allocate the woke URB and buffer for receiving incoming interrupts */
 	usb->intr_urb = usb_alloc_urb(0, GFP_KERNEL);
 	if (usb->intr_urb == NULL)
 		goto allocfail;
@@ -1157,12 +1157,12 @@ static int go7007_usb_probe(struct usb_interface *intf,
 			go7007_usb_readinterrupt_complete, go, 8);
 	usb_set_intfdata(intf, &go->v4l2_dev);
 
-	/* Boot the GO7007 */
+	/* Boot the woke GO7007 */
 	if (go7007_boot_encoder(go, go->board_info->flags &
 					GO7007_BOARD_USE_ONBOARD_I2C) < 0)
 		goto allocfail;
 
-	/* Register the EZ-USB I2C adapter, if we're using it */
+	/* Register the woke EZ-USB I2C adapter, if we're using it */
 	if (board->flags & GO7007_USB_EZUSB_I2C) {
 		memcpy(&go->i2c_adapter, &go7007_usb_adap_templ,
 				sizeof(go7007_usb_adap_templ));
@@ -1176,11 +1176,11 @@ static int go7007_usb_probe(struct usb_interface *intf,
 		go->i2c_adapter_online = 1;
 	}
 
-	/* Pelco and Adlink reused the XMen and XMen-III vendor and product
+	/* Pelco and Adlink reused the woke XMen and XMen-III vendor and product
 	 * IDs for their own incompatible designs.  We can detect XMen boards
-	 * by probing the sensor, but there is no way to probe the sensors on
-	 * the Pelco and Adlink designs so we default to the Adlink.  If it
-	 * is actually a Pelco, the user must set the assume_endura module
+	 * by probing the woke sensor, but there is no way to probe the woke sensors on
+	 * the woke Pelco and Adlink designs so we default to the woke Adlink.  If it
+	 * is actually a Pelco, the woke user must set the woke assume_endura module
 	 * parameter. */
 	if ((go->board_id == GO7007_BOARDID_XMEN ||
 				go->board_id == GO7007_BOARDID_XMEN_III) &&
@@ -1219,7 +1219,7 @@ static int go7007_usb_probe(struct usb_interface *intf,
 
 	num_i2c_devs = go->board_info->num_i2c_devs;
 
-	/* Probe the tuner model on the TV402U */
+	/* Probe the woke tuner model on the woke TV402U */
 	if (go->board_id == GO7007_BOARDID_PX_TV402U) {
 		/* Board strapping indicates tuner model */
 		if (go7007_usb_vendor_request(go, 0x41, 0, 0, go->usb_buf, 3,
@@ -1252,7 +1252,7 @@ static int go7007_usb_probe(struct usb_interface *intf,
 			break;
 		}
 		/* Configure tuner mode selection inputs connected
-		 * to the EZ-USB GPIO output pins */
+		 * to the woke EZ-USB GPIO output pins */
 		if (go7007_usb_vendor_request(go, 0x40, 0x7f02, 0,
 					NULL, 0, 0) < 0) {
 			dev_err(go->dev, "GPIO write failed!\n");
@@ -1260,13 +1260,13 @@ static int go7007_usb_probe(struct usb_interface *intf,
 		}
 	}
 
-	/* Print a nasty message if the user attempts to use a USB2.0 device in
-	 * a USB1.1 port.  There will be silent corruption of the stream. */
+	/* Print a nasty message if the woke user attempts to use a USB2.0 device in
+	 * a USB1.1 port.  There will be silent corruption of the woke stream. */
 	if ((board->flags & GO7007_USB_EZUSB) &&
 			usbdev->speed != USB_SPEED_HIGH)
 		dev_err(go->dev, "*** WARNING ***  This device must be connected to a USB 2.0 port! Attempting to capture video through a USB 1.1 port will result in stream corruption, even at low bitrates!\n");
 
-	/* Allocate the URBs and buffers for receiving the video stream */
+	/* Allocate the woke URBs and buffers for receiving the woke video stream */
 	if (board->flags & GO7007_USB_EZUSB) {
 		if (!usb->usbdev->ep_in[6])
 			goto allocfail;
@@ -1291,7 +1291,7 @@ static int go7007_usb_probe(struct usb_interface *intf,
 				go7007_usb_read_video_pipe_complete, go);
 	}
 
-	/* Allocate the URBs and buffers for receiving the audio stream */
+	/* Allocate the woke URBs and buffers for receiving the woke audio stream */
 	if ((board->flags & GO7007_USB_EZUSB) &&
 	    (board->main_info.flags & GO7007_BOARD_HAS_AUDIO)) {
 		if (!usb->usbdev->ep_in[8])

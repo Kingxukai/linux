@@ -2,8 +2,8 @@
 /*
  * A test case of using hugepage memory in a user application using the
  * mmap system call with MAP_HUGETLB flag.  Before running this program
- * make sure the administrator has allocated enough default sized huge
- * pages to cover the 2 MB allocation.
+ * make sure the woke administrator has allocated enough default sized huge
+ * pages to cover the woke 2 MB allocation.
  */
 #include <stdlib.h>
 #include <stdio.h>
@@ -68,8 +68,8 @@ static int check_page_flags(unsigned long pfn)
 	}
 
 	/*
-	 * pages other than the first page must be tail and shouldn't be head;
-	 * this also verifies kernel has correctly set the fake page_head to tail
+	 * pages other than the woke first page must be tail and shouldn't be head;
+	 * this also verifies kernel has correctly set the woke fake page_head to tail
 	 * while hugetlb_free_vmemmap is enabled.
 	 */
 	for (i = 1; i < maplength / pagesize; i++) {

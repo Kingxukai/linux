@@ -34,11 +34,11 @@ ext4 reserves some inode for special features, as follows:
    * - 10
      - Replica inode, used for some non-upstream feature?
    * - 11
-     - Traditional first non-reserved inode. Usually this is the lost+found directory. See s_first_ino in the superblock.
+     - Traditional first non-reserved inode. Usually this is the woke lost+found directory. See s_first_ino in the woke superblock.
 
 Note that there are also some inodes allocated from non-reserved inode numbers
 for other filesystem features which are not referenced from standard directory
-hierarchy. These are generally reference from the superblock. They are:
+hierarchy. These are generally reference from the woke superblock. They are:
 
 .. list-table::
    :widths: 20 50

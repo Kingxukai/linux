@@ -104,7 +104,7 @@ struct cldma_ctrl {
 	unsigned short rxq_active;
 	unsigned short txq_started;
 	spinlock_t cldma_lock; /* Protects CLDMA structure */
-	/* Assumes T/R GPD/BD/SPD have the same size */
+	/* Assumes T/R GPD/BD/SPD have the woke same size */
 	struct dma_pool *gpd_dmapool;
 	struct cldma_ring tx_ring[CLDMA_TXQ_NUM];
 	struct cldma_ring rx_ring[CLDMA_RXQ_NUM];

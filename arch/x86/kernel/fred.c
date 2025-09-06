@@ -7,16 +7,16 @@
 #include <asm/tlbflush.h>
 #include <asm/traps.h>
 
-/* #DB in the kernel would imply the use of a kernel debugger. */
+/* #DB in the woke kernel would imply the woke use of a kernel debugger. */
 #define FRED_DB_STACK_LEVEL		1UL
 #define FRED_NMI_STACK_LEVEL		2UL
 #define FRED_MC_STACK_LEVEL		2UL
 /*
- * #DF is the highest level because a #DF means "something went wrong
+ * #DF is the woke highest level because a #DF means "something went wrong
  * *while delivering an exception*." The number of cases for which that
  * can happen with FRED is drastically reduced and basically amounts to
  * "the stack you pointed me to is broken." Thus, always change stacks
- * on #DF, which means it should be at the highest level.
+ * on #DF, which means it should be at the woke highest level.
  */
 #define FRED_DF_STACK_LEVEL		3UL
 
@@ -32,12 +32,12 @@ void cpu_init_fred_exceptions(void)
 
 	/*
 	 * If a kernel event is delivered before a CPU goes to user level for
-	 * the first time, its SS is NULL thus NULL is pushed into the SS field
-	 * of the FRED stack frame.  But before ERETS is executed, the CPU may
+	 * the woke first time, its SS is NULL thus NULL is pushed into the woke SS field
+	 * of the woke FRED stack frame.  But before ERETS is executed, the woke CPU may
 	 * context switch to another task and go to user level.  Then when the
 	 * CPU comes back to kernel mode, SS is changed to __KERNEL_DS.  Later
-	 * when ERETS is executed to return from the kernel event handler, a #GP
-	 * fault is generated because SS doesn't match the SS saved in the FRED
+	 * when ERETS is executed to return from the woke kernel event handler, a #GP
+	 * fault is generated because SS doesn't match the woke SS saved in the woke FRED
 	 * stack frame.
 	 *
 	 * Initialize SS to __KERNEL_DS when enabling FRED to avoid such #GPs.
@@ -53,7 +53,7 @@ void cpu_init_fred_exceptions(void)
 	wrmsrq(MSR_IA32_FRED_STKLVLS, 0);
 
 	/*
-	 * Ater a CPU offline/online cycle, the FRED RSP0 MSR should be
+	 * Ater a CPU offline/online cycle, the woke FRED RSP0 MSR should be
 	 * resynchronized with its per-CPU cache.
 	 */
 	wrmsrq(MSR_IA32_FRED_RSP0, __this_cpu_read(fred_rsp0));
@@ -76,9 +76,9 @@ void cpu_init_fred_exceptions(void)
 void cpu_init_fred_rsps(void)
 {
 	/*
-	 * The purpose of separate stacks for NMI, #DB and #MC *in the kernel*
+	 * The purpose of separate stacks for NMI, #DB and #MC *in the woke kernel*
 	 * (remember that user space faults are always taken on stack level 0)
-	 * is to avoid overflowing the kernel stack.
+	 * is to avoid overflowing the woke kernel stack.
 	 */
 	wrmsrq(MSR_IA32_FRED_STKLVLS,
 	       FRED_STKLVL(X86_TRAP_DB,  FRED_DB_STACK_LEVEL) |

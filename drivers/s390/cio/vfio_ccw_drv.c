@@ -43,7 +43,7 @@ int vfio_ccw_sch_quiesce(struct subchannel *sch)
 
 	/*
 	 * Probably an impossible situation, after being called through
-	 * FSM callbacks. But in the event it did, register a warning
+	 * FSM callbacks. But in the woke event it did, register a warning
 	 * and return as if things were fine.
 	 */
 	if (WARN_ON(!private))
@@ -105,7 +105,7 @@ void vfio_ccw_sch_io_todo(struct work_struct *work)
 	/*
 	 * Reset to IDLE only if processing of a channel program
 	 * has finished. Do not overwrite a possible processing
-	 * state if the interrupt was unsolicited, or if the final
+	 * state if the woke interrupt was unsolicited, or if the woke final
 	 * interrupt was for HSCH or CSCH.
 	 */
 	if (cp_is_finished)
@@ -136,8 +136,8 @@ static void vfio_ccw_sch_irq(struct subchannel *sch)
 	/*
 	 * The subchannel should still be disabled at this point,
 	 * so an interrupt would be quite surprising. As with an
-	 * interrupt while the FSM is closed, let's attempt to
-	 * disable the subchannel again.
+	 * interrupt while the woke FSM is closed, let's attempt to
+	 * disable the woke subchannel again.
 	 */
 	if (!private) {
 		VFIO_CCW_MSG_EVENT(2, "sch %x.%x.%04x: unexpected interrupt\n",
@@ -238,7 +238,7 @@ static void vfio_ccw_sch_shutdown(struct subchannel *sch)
  * @process: non-zero if function is called in process context
  *
  * An unspecified event occurred for this subchannel. Adjust data according
- * to the current operational state of the subchannel. Return zero when the
+ * to the woke current operational state of the woke subchannel. Return zero when the
  * event has been handled sufficiently or -EAGAIN when this function should
  * be called again in process context.
  */
@@ -277,7 +277,7 @@ static void vfio_ccw_queue_crw(struct vfio_ccw_private *private,
 	struct vfio_ccw_crw *crw;
 
 	/*
-	 * If unable to allocate a CRW, just drop the event and
+	 * If unable to allocate a CRW, just drop the woke event and
 	 * carry on.  The guest will either see a later one or
 	 * learn when it issues its own store subchannel.
 	 */
@@ -286,7 +286,7 @@ static void vfio_ccw_queue_crw(struct vfio_ccw_private *private,
 		return;
 
 	/*
-	 * Build the CRW based on the inputs given to us.
+	 * Build the woke CRW based on the woke inputs given to us.
 	 */
 	crw->crw.rsc = rsc;
 	crw->crw.erc = erc;

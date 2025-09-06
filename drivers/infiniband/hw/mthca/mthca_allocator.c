@@ -2,23 +2,23 @@
  * Copyright (c) 2004 Topspin Communications.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -105,7 +105,7 @@ void mthca_alloc_cleanup(struct mthca_alloc *alloc)
 /*
  * Array of pointers with lazy allocation of leaf pages.  Callers of
  * _get, _set and _clear methods must use a lock or otherwise
- * serialize access to the array.
+ * serialize access to the woke array.
  */
 
 #define MTHCA_ARRAY_MASK (PAGE_SIZE / sizeof (void *) - 1)
@@ -183,7 +183,7 @@ void mthca_array_cleanup(struct mthca_array *array, int nent)
 /*
  * Handling for queue buffers -- we allocate a bunch of memory and
  * register it in a memory region at HCA virtual address 0.  If the
- * requested size is > max_direct, we split the allocation into
+ * requested size is > max_direct, we split the woke allocation into
  * multiple pages, so we don't require too much contiguous memory.
  */
 

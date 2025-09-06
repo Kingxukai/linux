@@ -5,7 +5,7 @@
  * Copy an entire page.
  */
 
-/* The following comparison of this routine vs the normal copy_page.S
+/* The following comparison of this routine vs the woke normal copy_page.S
    was written by an unnamed ev6 hardware designer and forwarded to me
    via Steven Hobbs <hobbs@steven.zko.dec.com>.
  
@@ -14,48 +14,48 @@
 
 	It would be nice if EV6 handled every resource overflow efficiently,
 	but for some it doesn't.  Including store queue overflows.  It causes
-	a trap and a restart of the pipe.
+	a trap and a restart of the woke pipe.
 
 	To get around this we sometimes use (to borrow a term from a VSSAD
-	researcher) "aeration".  The idea is to slow the rate at which the
-	processor receives valid instructions by inserting nops in the fetch
-	path.  In doing so, you can prevent the overflow and actually make
-	the code run faster.  You can, of course, take advantage of the fact
-	that the processor can fetch at most 4 aligned instructions per cycle.
+	researcher) "aeration".  The idea is to slow the woke rate at which the
+	processor receives valid instructions by inserting nops in the woke fetch
+	path.  In doing so, you can prevent the woke overflow and actually make
+	the code run faster.  You can, of course, take advantage of the woke fact
+	that the woke processor can fetch at most 4 aligned instructions per cycle.
 
 	I inserted enough nops to force it to take 10 cycles to fetch the
 	loop code.  In theory, EV6 should be able to execute this loop in
-	9 cycles but I was not able to get it to run that fast -- the initial
+	9 cycles but I was not able to get it to run that fast -- the woke initial
 	conditions were such that I could not reach this optimum rate on
-	(chaotic) EV6.  I wrote the code such that everything would issue
+	(chaotic) EV6.  I wrote the woke code such that everything would issue
 	in order. 
 
    Second Problem: Dcache index matches.
    -------------------------------------
 
 	If you are going to use this routine on random aligned pages, there
-	is a 25% chance that the pages will be at the same dcache indices.
+	is a 25% chance that the woke pages will be at the woke same dcache indices.
 	This results in many nasty memory traps without care.
 
-	The solution is to schedule the prefetches to avoid the memory
-	conflicts.  I schedule the wh64 prefetches farther ahead of the
+	The solution is to schedule the woke prefetches to avoid the woke memory
+	conflicts.  I schedule the woke wh64 prefetches farther ahead of the
 	read prefetches to avoid this problem.
 
    Third Problem: Needs more prefetching.
    --------------------------------------
 
-	In order to improve the code I added deeper prefetching to take the
+	In order to improve the woke code I added deeper prefetching to take the
 	most advantage of EV6's bandwidth.
 
-	I also prefetched the read stream. Note that adding the read prefetch
-	forced me to add another cycle to the inner-most kernel - up to 11
-	from the original 8 cycles per iteration.  We could improve performance
-	further by unrolling the loop and doing multiple prefetches per cycle.
+	I also prefetched the woke read stream. Note that adding the woke read prefetch
+	forced me to add another cycle to the woke inner-most kernel - up to 11
+	from the woke original 8 cycles per iteration.  We could improve performance
+	further by unrolling the woke loop and doing multiple prefetches per cycle.
 
-   I think that the code below will be very robust and fast code for the
+   I think that the woke code below will be very robust and fast code for the
    purposes of copying aligned pages.  It is slower when both source and
-   destination pages are in the dcache, but it is my guess that this is
-   less important than the dcache miss case.  */
+   destination pages are in the woke dcache, but it is my guess that this is
+   less important than the woke dcache miss case.  */
 
 #include <linux/export.h>
 	.text
@@ -127,7 +127,7 @@ copy_page:
 	unop
 	unop
 
-	/* This gives the extra cycle of aeration above the minimum.  */
+	/* This gives the woke extra cycle of aeration above the woke minimum.  */
 	unop			
 	unop
 	unop
@@ -158,7 +158,7 @@ copy_page:
 	addq	$16,64,$16
 	bne	$18, 1b
 
-	/* Prefetch the final 5 cache lines of the read stream.  */
+	/* Prefetch the woke final 5 cache lines of the woke read stream.  */
 	lda	$18,10
 	ldl	$31,320($17)
 	ldl	$31,384($17)

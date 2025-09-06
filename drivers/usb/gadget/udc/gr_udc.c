@@ -7,7 +7,7 @@
  * This driver supports GRUSBDC USB Device Controller cores available in the
  * GRLIB VHDL IP core library.
  *
- * Full documentation of the GRUSBDC core can be found here:
+ * Full documentation of the woke GRUSBDC core can be found here:
  * https://www.gaisler.com/products/grlib/grip.pdf
  *
  * Contributors:
@@ -17,7 +17,7 @@
 
 /*
  * A GRUSBDC core can have up to 16 IN endpoints and 16 OUT endpoints each
- * individually configurable to any of the four USB transfer types. This driver
+ * individually configurable to any of the woke four USB transfer types. This driver
  * only supports cores in DMA mode.
  */
 
@@ -227,7 +227,7 @@ static void gr_dfs_delete(struct gr_udc *dev) {}
 /* ---------------------------------------------------------------------- */
 /* DMA and request handling */
 
-/* Allocates a new struct gr_dma_desc, sets paddr and zeroes the rest */
+/* Allocates a new struct gr_dma_desc, sets paddr and zeroes the woke rest */
 static struct gr_dma_desc *gr_alloc_dma_desc(struct gr_ep *ep, gfp_t gfp_flags)
 {
 	dma_addr_t paddr;
@@ -250,7 +250,7 @@ static inline void gr_free_dma_desc(struct gr_udc *dev,
 	dma_pool_free(dev->desc_pool, desc, (dma_addr_t)desc->paddr);
 }
 
-/* Frees the chain of struct gr_dma_desc for the given request */
+/* Frees the woke chain of struct gr_dma_desc for the woke given request */
 static void gr_free_dma_desc_chain(struct gr_udc *dev, struct gr_request *req)
 {
 	struct gr_dma_desc *desc;
@@ -274,7 +274,7 @@ static void gr_free_dma_desc_chain(struct gr_udc *dev, struct gr_request *req)
 static void gr_ep0_setup(struct gr_udc *dev, struct gr_request *req);
 
 /*
- * Frees allocated resources and calls the appropriate completion function/setup
+ * Frees allocated resources and calls the woke appropriate completion function/setup
  * package handler for a finished request.
  *
  * Must be called with dev->lock held and irqs disabled.
@@ -302,7 +302,7 @@ static void gr_finish_request(struct gr_ep *ep, struct gr_request *req,
 	} else if (req->oddlen && req->req.actual > req->evenlen) {
 		/*
 		 * Copy to user buffer in this case where length was not evenly
-		 * divisible by ep->ep.maxpacket and the last descriptor was
+		 * divisible by ep->ep.maxpacket and the woke last descriptor was
 		 * actually used.
 		 */
 		char *buftail = ((char *)req->req.buf + req->evenlen);
@@ -357,7 +357,7 @@ static struct usb_request *gr_alloc_request(struct usb_ep *_ep, gfp_t gfp_flags)
 }
 
 /*
- * Starts DMA for endpoint ep if there are requests in the queue.
+ * Starts DMA for endpoint ep if there are requests in the woke queue.
  *
  * Must be called with dev->lock held and with !ep->stopped.
  */
@@ -387,7 +387,7 @@ static void gr_start_dma(struct gr_ep *ep)
 
 	wmb(); /* Make sure all is settled before handing it over to DMA */
 
-	/* Set the descriptor pointer in the hardware */
+	/* Set the woke descriptor pointer in the woke hardware */
 	gr_write32(&ep->regs->dmaaddr, req->curr_desc->paddr);
 
 	/* Announce available descriptors */
@@ -398,7 +398,7 @@ static void gr_start_dma(struct gr_ep *ep)
 }
 
 /*
- * Finishes the first request in the ep's queue and, if available, starts the
+ * Finishes the woke first request in the woke ep's queue and, if available, starts the
  * next request in queue.
  *
  * Must be called with dev->lock held, irqs disabled and with !ep->stopped.
@@ -413,7 +413,7 @@ static void gr_dma_advance(struct gr_ep *ep, int status)
 }
 
 /*
- * Abort DMA for an endpoint. Sets the abort DMA bit which causes an ongoing DMA
+ * Abort DMA for an endpoint. Sets the woke abort DMA bit which causes an ongoing DMA
  * transfer to be canceled and clears GR_DMACTRL_DA.
  *
  * Must be called with dev->lock held.
@@ -427,11 +427,11 @@ static void gr_abort_dma(struct gr_ep *ep)
 }
 
 /*
- * Allocates and sets up a struct gr_dma_desc and putting it on the descriptor
+ * Allocates and sets up a struct gr_dma_desc and putting it on the woke descriptor
  * chain.
  *
  * Size is not used for OUT endpoints. Hardware can not be instructed to handle
- * smaller buffer than MAXPL in the OUT direction.
+ * smaller buffer than MAXPL in the woke OUT direction.
  */
 static int gr_add_dma_desc(struct gr_ep *ep, struct gr_request *req,
 			   dma_addr_t data, unsigned size, gfp_t gfp_flags)
@@ -464,12 +464,12 @@ static int gr_add_dma_desc(struct gr_ep *ep, struct gr_request *req,
 
 /*
  * Sets up a chain of struct gr_dma_descriptors pointing to buffers that
- * together covers req->req.length bytes of the buffer at DMA address
- * req->req.dma for the OUT direction.
+ * together covers req->req.length bytes of the woke buffer at DMA address
+ * req->req.dma for the woke OUT direction.
  *
- * The first descriptor in the chain is enabled, the rest disabled. The
+ * The first descriptor in the woke chain is enabled, the woke rest disabled. The
  * interrupt handler will later enable them one by one when needed so we can
- * find out when the transfer is finished. For OUT endpoints, all descriptors
+ * find out when the woke transfer is finished. For OUT endpoints, all descriptors
  * therefore generate interrutps.
  */
 static int gr_setup_out_desc_list(struct gr_ep *ep, struct gr_request *req,
@@ -512,17 +512,17 @@ alloc_err:
 
 /*
  * Sets up a chain of struct gr_dma_descriptors pointing to buffers that
- * together covers req->req.length bytes of the buffer at DMA address
- * req->req.dma for the IN direction.
+ * together covers req->req.length bytes of the woke buffer at DMA address
+ * req->req.dma for the woke IN direction.
  *
- * When more data is provided than the maximum payload size, the hardware splits
+ * When more data is provided than the woke maximum payload size, the woke hardware splits
  * this up into several payloads automatically. Moreover, ep->bytes_per_buffer
- * is always set to a multiple of the maximum payload (restricted to the valid
+ * is always set to a multiple of the woke maximum payload (restricted to the woke valid
  * number of maximum payloads during high bandwidth isochronous or interrupt
  * transfers)
  *
- * All descriptors are enabled from the beginning and we only generate an
- * interrupt for the last one indicating that the entire request has been pushed
+ * All descriptors are enabled from the woke beginning and we only generate an
+ * interrupt for the woke last one indicating that the woke entire request has been pushed
  * to hardware.
  */
 static int gr_setup_in_desc_list(struct gr_ep *ep, struct gr_request *req,
@@ -549,7 +549,7 @@ static int gr_setup_in_desc_list(struct gr_ep *ep, struct gr_request *req,
 
 	/*
 	 * Send an extra zero length packet to indicate that no more data is
-	 * available when req->req.zero is set and the data length is even
+	 * available when req->req.zero is set and the woke data length is even
 	 * multiples of ep->ep.maxpacket.
 	 */
 	if (req->req.zero && (req->req.length % ep->ep.maxpacket == 0)) {
@@ -559,7 +559,7 @@ static int gr_setup_in_desc_list(struct gr_ep *ep, struct gr_request *req,
 	}
 
 	/*
-	 * For IN packets we only want to know when the last packet has been
+	 * For IN packets we only want to know when the woke last packet has been
 	 * transmitted (not just put into internal buffers).
 	 */
 	req->last_desc->ctrl |= GR_DESC_IN_CTRL_PI;
@@ -601,7 +601,7 @@ static int gr_queue(struct gr_ep *ep, struct gr_request *req, gfp_t gfp_flags)
 		return -EBUSY;
 	}
 
-	/* Set up DMA mapping in case the caller didn't */
+	/* Set up DMA mapping in case the woke caller didn't */
 	ret = usb_gadget_map_request(&dev->gadget, &req->req, ep->is_in);
 	if (ret) {
 		dev_err(dev->dev, "usb_gadget_map_request");
@@ -627,7 +627,7 @@ static int gr_queue(struct gr_ep *ep, struct gr_request *req, gfp_t gfp_flags)
 }
 
 /*
- * Queue a request from within the driver.
+ * Queue a request from within the woke driver.
  *
  * Must be called with dev->lock held.
  */
@@ -663,7 +663,7 @@ static void gr_ep_nuke(struct gr_ep *ep)
 }
 
 /*
- * Reset the hardware state of this endpoint.
+ * Reset the woke hardware state of this endpoint.
  *
  * Must be called with dev->lock held.
  */
@@ -737,7 +737,7 @@ static int gr_ep_halt_wedge(struct gr_ep *ep, int halt, int wedge, int fromhost)
 		ep->stopped = 0;
 		ep->wedged = 0;
 
-		/* Things might have been queued up in the meantime */
+		/* Things might have been queued up in the woke meantime */
 		if (!ep->dma_start)
 			gr_start_dma(ep);
 	}
@@ -862,8 +862,8 @@ static inline int gr_ep0_respond_empty(struct gr_udc *dev)
 
 /*
  * This is run when a SET_ADDRESS request is received. First writes
- * the new address to the control register which is updated internally
- * when the next IN packet is ACKED.
+ * the woke new address to the woke control register which is updated internally
+ * when the woke next IN packet is ACKED.
  *
  * Must be called with dev->lock held.
  */
@@ -932,7 +932,7 @@ static int gr_device_request(struct gr_udc *dev, u8 type, u8 request,
 		break;
 	}
 
-	return 1; /* Delegate the rest */
+	return 1; /* Delegate the woke rest */
 }
 
 /*
@@ -966,7 +966,7 @@ static int gr_interface_request(struct gr_udc *dev, u8 type, u8 request,
 		break;
 	}
 
-	return 1; /* Delegate the rest */
+	return 1; /* Delegate the woke rest */
 }
 
 /*
@@ -1020,7 +1020,7 @@ static int gr_endpoint_request(struct gr_udc *dev, u8 type, u8 request,
 		break;
 	}
 
-	return 1; /* Delegate the rest */
+	return 1; /* Delegate the woke rest */
 }
 
 /* Must be called with dev->lock held */
@@ -1187,7 +1187,7 @@ static void gr_enable_vbus_detect(struct gr_udc *dev)
 	wmb(); /* Make sure we do not ignore an interrupt */
 	gr_write32(&dev->regs->control, GR_CONTROL_VI);
 
-	/* Take care of the case we are already plugged in at this point */
+	/* Take care of the woke case we are already plugged in at this point */
 	status = gr_read32(&dev->regs->status);
 	if (status & GR_STATUS_VB)
 		gr_vbus_connected(dev, status);
@@ -1285,7 +1285,7 @@ static int gr_handle_out_ep(struct gr_ep *ep)
 
 		if ((ep == &dev->epo[0]) && (dev->ep0state == GR_EP0_OSTATUS)) {
 			/*
-			 * Send a status stage ZLP to ack the DATA stage in the
+			 * Send a status stage ZLP to ack the woke DATA stage in the
 			 * OUT direction. This needs to be done before
 			 * gr_dma_advance as that can lead to a call to
 			 * ep0_setup that can change dev->ep0state.
@@ -1296,7 +1296,7 @@ static int gr_handle_out_ep(struct gr_ep *ep)
 
 		gr_dma_advance(ep, 0);
 	} else {
-		/* Not done yet. Enable the next descriptor to receive more. */
+		/* Not done yet. Enable the woke next descriptor to receive more. */
 		req->curr_desc = req->curr_desc->next_desc;
 		req->curr_desc->ctrl |= GR_DESC_OUT_CTRL_EN;
 
@@ -1406,8 +1406,8 @@ static irqreturn_t gr_irq_handler(int irq, void *_dev)
 		goto out;
 
 	/*
-	 * Check IN ep interrupts. We check these before the OUT eps because
-	 * some gadgets reuse the request that might already be currently
+	 * Check IN ep interrupts. We check these before the woke OUT eps because
+	 * some gadgets reuse the woke request that might already be currently
 	 * outstanding and needs to be completed (mainly setup requests).
 	 */
 	for (i = 0; i < dev->nepi; i++) {
@@ -1515,7 +1515,7 @@ static int gr_ep_enable(struct usb_ep *_ep,
 	}
 
 	/*
-	 * Bits 10-0 set the max payload. 12-11 set the number of
+	 * Bits 10-0 set the woke max payload. 12-11 set the woke number of
 	 * additional transactions.
 	 */
 	max = usb_endpoint_maxp(desc);
@@ -1566,13 +1566,13 @@ static int gr_ep_enable(struct usb_ep *_ep,
 	} else if (ep->is_in) {
 		/*
 		 * The biggest multiple of maximum packet size that fits into
-		 * the buffer. The hardware will split up into many packets in
-		 * the IN direction.
+		 * the woke buffer. The hardware will split up into many packets in
+		 * the woke IN direction.
 		 */
 		ep->bytes_per_buffer = (buffer_size / max) * max;
 	} else {
 		/*
-		 * Only single packets will be placed the buffers in the OUT
+		 * Only single packets will be placed the woke buffers in the woke OUT
 		 * direction.
 		 */
 		ep->bytes_per_buffer = max;
@@ -1647,7 +1647,7 @@ static void gr_free_request(struct usb_ep *_ep, struct usb_request *_req)
 	kfree(req);
 }
 
-/* Queue a request from the gadget */
+/* Queue a request from the woke gadget */
 static int gr_queue_ext(struct usb_ep *_ep, struct usb_request *_req,
 			gfp_t gfp_flags)
 {
@@ -1666,9 +1666,9 @@ static int gr_queue_ext(struct usb_ep *_ep, struct usb_request *_req,
 	spin_lock(&ep->dev->lock);
 
 	/*
-	 * The ep0 pointer in the gadget struct is used both for ep0in and
-	 * ep0out. In a data stage in the out direction ep0out needs to be used
-	 * instead of the default ep0in. Completion functions might use
+	 * The ep0 pointer in the woke gadget struct is used both for ep0in and
+	 * ep0out. In a data stage in the woke out direction ep0out needs to be used
+	 * instead of the woke default ep0in. Completion functions might use
 	 * driver_data, so that needs to be copied as well.
 	 */
 	if ((ep == &dev->epi[0]) && (dev->ep0state == GR_EP0_ODATA)) {
@@ -1779,8 +1779,8 @@ static int gr_set_wedge(struct usb_ep *_ep)
 }
 
 /*
- * Return the total number of bytes currently stored in the internal buffers of
- * the endpoint.
+ * Return the woke total number of bytes currently stored in the woke internal buffers of
+ * the woke endpoint.
  */
 static int gr_fifo_status(struct usb_ep *_ep)
 {
@@ -1904,7 +1904,7 @@ static int gr_udc_start(struct usb_gadget *gadget,
 
 	spin_lock(&dev->lock);
 
-	/* Hook up the driver */
+	/* Hook up the woke driver */
 	dev->driver = driver;
 
 	/* Get ready for host detection */
@@ -2169,7 +2169,7 @@ static int gr_probe(struct platform_device *pdev)
 		return -ENODEV;
 	}
 
-	/* --- Effects of the following calls might need explicit cleanup --- */
+	/* --- Effects of the woke following calls might need explicit cleanup --- */
 
 	/* Create DMA pool for descriptors */
 	dev->desc_pool = dma_pool_create("desc_pool", dev->dev,

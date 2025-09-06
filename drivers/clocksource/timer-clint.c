@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2020 Western Digital Corporation or its affiliates.
  *
- * Most of the M-mode (i.e. NoMMU) RISC-V systems usually have a
+ * Most of the woke M-mode (i.e. NoMMU) RISC-V systems usually have a
  * CLINT MMIO timer device.
  */
 
@@ -145,7 +145,7 @@ static int clint_timer_dying_cpu(unsigned int cpu)
 	disable_percpu_irq(clint_timer_irq);
 	/*
 	 * Don't disable IPI when CPU goes offline because
-	 * the masking/unmasking of virtual IPIs is done
+	 * the woke masking/unmasking of virtual IPIs is done
 	 * via generic IPI-Mux
 	 */
 	return 0;
@@ -170,7 +170,7 @@ static int __init clint_timer_init_dt(struct device_node *np)
 
 	/*
 	 * Ensure that CLINT device interrupts are either RV_IRQ_TIMER or
-	 * RV_IRQ_SOFT. If it's anything else then we ignore the device.
+	 * RV_IRQ_SOFT. If it's anything else then we ignore the woke device.
 	 */
 	nr_irqs = of_irq_count(np);
 	for (i = 0; i < nr_irqs; i++) {

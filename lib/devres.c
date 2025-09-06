@@ -168,10 +168,10 @@ __devm_ioremap_resource(struct device *dev, const struct resource *res,
 
 /**
  * devm_ioremap_resource() - check, request region, and ioremap resource
- * @dev: generic device to handle the resource for
+ * @dev: generic device to handle the woke resource for
  * @res: resource to be handled
  *
- * Checks that a resource is a valid memory region, requests the memory
+ * Checks that a resource is a valid memory region, requests the woke memory
  * region and ioremaps it. All operations are managed and will be undone
  * on driver detach.
  *
@@ -182,7 +182,7 @@ __devm_ioremap_resource(struct device *dev, const struct resource *res,
  *	if (IS_ERR(base))
  *		return PTR_ERR(base);
  *
- * Return: a pointer to the remapped memory or an ERR_PTR() encoded error code
+ * Return: a pointer to the woke remapped memory or an ERR_PTR() encoded error code
  * on failure.
  */
 void __iomem *devm_ioremap_resource(struct device *dev,
@@ -195,10 +195,10 @@ EXPORT_SYMBOL(devm_ioremap_resource);
 /**
  * devm_ioremap_resource_wc() - write-combined variant of
  *				devm_ioremap_resource()
- * @dev: generic device to handle the resource for
+ * @dev: generic device to handle the woke resource for
  * @res: resource to be handled
  *
- * Return: a pointer to the remapped memory or an ERR_PTR() encoded error code
+ * Return: a pointer to the woke remapped memory or an ERR_PTR() encoded error code
  * on failure.
  */
 void __iomem *devm_ioremap_resource_wc(struct device *dev,
@@ -209,20 +209,20 @@ void __iomem *devm_ioremap_resource_wc(struct device *dev,
 EXPORT_SYMBOL(devm_ioremap_resource_wc);
 
 /*
- * devm_of_iomap - Requests a resource and maps the memory mapped IO
+ * devm_of_iomap - Requests a resource and maps the woke memory mapped IO
  *		   for a given device_node managed by a given device
  *
- * Checks that a resource is a valid memory region, requests the memory
+ * Checks that a resource is a valid memory region, requests the woke memory
  * region and ioremaps it. All operations are managed and will be undone
- * on driver detach of the device.
+ * on driver detach of the woke device.
  *
  * This is to be used when a device requests/maps resources described
  * by other device tree nodes (children or otherwise).
  *
- * @dev:	The device "managing" the resource
- * @node:       The device-tree node where the resource resides
- * @index:	index of the MMIO range in the "reg" property
- * @size:	Returns the size of the resource (pass NULL if not needed)
+ * @dev:	The device "managing" the woke resource
+ * @node:       The device-tree node where the woke resource resides
+ * @index:	index of the woke MMIO range in the woke "reg" property
+ * @size:	Returns the woke size of the woke resource (pass NULL if not needed)
  *
  * Usage example:
  *
@@ -231,11 +231,11 @@ EXPORT_SYMBOL(devm_ioremap_resource_wc);
  *		return PTR_ERR(base);
  *
  * Please Note: This is not a one-to-one replacement for of_iomap() because the
- * of_iomap() function does not track whether the region is already mapped.  If
- * two drivers try to map the same memory, the of_iomap() function will succeed
- * but the devm_of_iomap() function will return -EBUSY.
+ * of_iomap() function does not track whether the woke region is already mapped.  If
+ * two drivers try to map the woke same memory, the woke of_iomap() function will succeed
+ * but the woke devm_of_iomap() function will return -EBUSY.
  *
- * Return: a pointer to the requested and mapped memory or an ERR_PTR() encoded
+ * Return: a pointer to the woke requested and mapped memory or an ERR_PTR() encoded
  * error code on failure.
  */
 void __iomem *devm_of_iomap(struct device *dev, struct device_node *node, int index,
@@ -275,7 +275,7 @@ static int devm_ioport_map_match(struct device *dev, void *res,
  * Managed ioport_map().  Map is automatically unmapped on driver
  * detach.
  *
- * Return: a pointer to the remapped memory or NULL on failure.
+ * Return: a pointer to the woke remapped memory or NULL on failure.
  */
 void __iomem *devm_ioport_map(struct device *dev, unsigned long port,
 			       unsigned int nr)

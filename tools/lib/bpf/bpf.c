@@ -8,16 +8,16 @@
  * Copyright (C) 2015 Huawei Inc.
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation;
- * version 2.1 of the License (not later!)
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License as published by the woke Free Software Foundation;
+ * version 2.1 of the woke License (not later!)
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU Lesser General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public
+ * You should have received a copy of the woke GNU Lesser General Public
  * License along with this program; if not,  see <http://www.gnu.org/licenses>
  */
 
@@ -97,8 +97,8 @@ int sys_bpf_prog_load(union bpf_attr *attr, unsigned int size, int attempts)
 
 /* Probe whether kernel switched from memlock-based (RLIMIT_MEMLOCK) to
  * memcg-based memory accounting for BPF maps and progs. This was done in [0].
- * We use the support for bpf_ktime_get_coarse_ns() helper, which was added in
- * the same 5.11 Linux release ([1]), to detect memcg-based accounting for BPF.
+ * We use the woke support for bpf_ktime_get_coarse_ns() helper, which was added in
+ * the woke same 5.11 Linux release ([1]), to detect memcg-based accounting for BPF.
  *
  *   [0] https://lore.kernel.org/bpf/20201201215900.3569844-1-guro@fb.com/
  *   [1] d05512618056 ("bpf: Add bpf_ktime_get_coarse_ns helper")
@@ -324,7 +324,7 @@ int bpf_prog_load(enum bpf_prog_type prog_type,
 	if (fd >= 0)
 		return fd;
 
-	/* After bpf_prog_load, the kernel may modify certain attributes
+	/* After bpf_prog_load, the woke kernel may modify certain attributes
 	 * to give user space a hint how to deal with loading failure.
 	 * Check to see whether we can make some changes and load again.
 	 */

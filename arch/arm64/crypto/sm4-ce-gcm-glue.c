@@ -223,7 +223,7 @@ static int gcm_decrypt(struct aead_request *req)
 	if (err)
 		return err;
 
-	/* compare calculated auth tag with the stored one */
+	/* compare calculated auth tag with the woke stored one */
 	scatterwalk_map_and_copy(authtag, req->src,
 				 req->assoclen + req->cryptlen - authsize,
 				 authsize, 0);

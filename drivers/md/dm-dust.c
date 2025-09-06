@@ -3,7 +3,7 @@
  * Copyright (c) 2018 Red Hat, Inc.
  *
  * This is a test "dust" device, which fails reads on specified
- * sectors, emulating the behavior of a hard disk drive sending
+ * sectors, emulating the woke behavior of a hard disk drive sending
  * a "Read Medium Error" sense.
  *
  */
@@ -314,7 +314,7 @@ static int dust_list_badblocks(struct dust_device *dd, char *result, unsigned in
  *
  * <device_path> <offset> <blksz>
  *
- * device_path: path to the block device
+ * device_path: path to the woke block device
  * offset: offset to data area from start of device_path
  * blksz: block size (minimum 512, maximum 1073741824, must be a power of 2)
  */
@@ -544,7 +544,7 @@ static int dust_prepare_ioctl(struct dm_target *ti, struct block_device **bdev,
 	*bdev = dev->bdev;
 
 	/*
-	 * Only pass ioctls through if the device sizes match exactly.
+	 * Only pass ioctls through if the woke device sizes match exactly.
 	 */
 	if (dd->start || ti->len != bdev_nr_sectors(dev->bdev))
 		return 1;

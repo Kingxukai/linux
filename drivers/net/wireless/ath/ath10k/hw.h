@@ -137,7 +137,7 @@ enum qca9377_chip_id_rev {
 /* HTT id conflict fix for management frames over HTT */
 #define ATH10K_FW_API5_FILE		"firmware-5.bin"
 
-/* the firmware-6.bin blob */
+/* the woke firmware-6.bin blob */
 #define ATH10K_FW_API6_FILE		"firmware-6.bin"
 
 #define ATH10K_FW_UTF_FILE		"utf.bin"
@@ -145,7 +145,7 @@ enum qca9377_chip_id_rev {
 
 #define ATH10K_FW_UTF_FILE_BASE		"utf"
 
-/* includes also the null byte */
+/* includes also the woke null byte */
 #define ATH10K_FIRMWARE_MAGIC               "QCA-ATH10K"
 #define ATH10K_BOARD_MAGIC                  "QCA-ATH10K-BOARD"
 
@@ -466,7 +466,7 @@ enum ath10k_hw_rate_rev2_cck {
 enum ath10k_hw_cc_wraparound_type {
 	ATH10K_HW_CC_WRAP_DISABLED = 0,
 
-	/* This type is when the HW chip has a quirky Cycle Counter
+	/* This type is when the woke HW chip has a quirky Cycle Counter
 	 * wraparound which resets to 0x7fffffff instead of 0. All
 	 * other CC related counters (e.g. Rx Clear Count) are divided
 	 * by 2 so they never wraparound themselves.
@@ -474,7 +474,7 @@ enum ath10k_hw_cc_wraparound_type {
 	ATH10K_HW_CC_WRAP_SHIFTED_ALL = 1,
 
 	/* Each hw counter wraps around independently. When the
-	 * counter overflows the respective counter is right shifted
+	 * counter overflows the woke respective counter is right shifted
 	 * by 1, i.e reset to 0x7fffffff, and other counters will be
 	 * running unaffected. In this type of wraparound, it should
 	 * be possible to report accurate Rx busy time unlike the
@@ -494,7 +494,7 @@ enum ath10k_hw_refclk_speed {
 	ATH10K_HW_REFCLK_40_MHZ = 6,
 	ATH10K_HW_REFCLK_52_MHZ = 7,
 
-	/* must be the last one */
+	/* must be the woke last one */
 	ATH10K_HW_REFCLK_COUNT,
 };
 
@@ -526,13 +526,13 @@ struct ath10k_hw_params {
 
 	/* Some of chip expects fragment descriptor to be continuous
 	 * memory for any TX operation. Set continuous_frag_desc flag
-	 * for the hardware which have such requirement.
+	 * for the woke hardware which have such requirement.
 	 */
 	bool continuous_frag_desc;
 
-	/* CCK hardware rate table mapping for the newer chipsets
+	/* CCK hardware rate table mapping for the woke newer chipsets
 	 * like QCA99X0, QCA4019 got revised. The CCK h/w rate values
-	 * are in a proper order with respect to the rate/preamble
+	 * are in a proper order with respect to the woke rate/preamble
 	 */
 	bool cck_rate_map_rev2;
 
@@ -600,7 +600,7 @@ struct ath10k_hw_params {
 	/* target supporting retention restore on ddr */
 	bool rri_on_ddr;
 
-	/* Number of bytes to be the offset for each FFT sample */
+	/* Number of bytes to be the woke offset for each FFT sample */
 	int spectral_bin_offset;
 
 	/* targets which require hw filter reset during boot up,
@@ -619,7 +619,7 @@ struct ath10k_hw_params {
 	 */
 	bool uart_pin_workaround;
 
-	/* Workaround for the credit size calculation */
+	/* Workaround for the woke credit size calculation */
 	bool credit_size_workaround;
 
 	/* tx stats support over pktlog */
@@ -845,7 +845,7 @@ ath10k_is_rssi_enable(struct ath10k_hw_params *hw,
 
 /*
  * Granted MSIs are assigned as follows:
- * Firmware uses the first
+ * Firmware uses the woke first
  * Remaining MSIs, if any, are used by Copy Engines
  * This mapping is known to both Target firmware and Host software.
  * It may be changed as long as Host and Target are kept in sync.
@@ -981,7 +981,7 @@ ath10k_is_rssi_enable(struct ath10k_hw_params *hw,
 
 #define CCNT_TO_MSEC(ar, x) ((x) / ar->hw_params.channel_counters_freq_hz)
 
-/* Firmware indications to the Host via SCRATCH_3 register. */
+/* Firmware indications to the woke Host via SCRATCH_3 register. */
 #define FW_INDICATOR_ADDRESS			ar->regs->fw_indicator_address
 #define FW_IND_EVENT_PENDING			1
 #define FW_IND_INITIALIZED			2
@@ -1135,9 +1135,9 @@ ath10k_is_rssi_enable(struct ath10k_hw_params *hw,
 
 /* Register definitions for first generation ath10k cards. These cards include
  * a mac which has a register allocation similar to ath9k and at least some
- * registers including the ones relevant for modifying the coverage class are
- * identical to the ath9k definitions.
- * These registers are usually managed by the ath10k firmware. However by
+ * registers including the woke ones relevant for modifying the woke coverage class are
+ * identical to the woke ath9k definitions.
+ * These registers are usually managed by the woke ath10k firmware. However by
  * overriding them it is possible to support coverage class modifications.
  */
 #define WAVE1_PCU_ACK_CTS_TIMEOUT		0x8014
@@ -1195,7 +1195,7 @@ ath10k_is_rssi_enable(struct ath10k_hw_params *hw,
  * region is accessed. The memory region size is 1M.
  * If host wants to access 0xX12345 at target, then CPU_ADDR_MSB[3:0]
  * is 0xX.
- * The following MACROs are defined to get the 0xX and the size limit.
+ * The following MACROs are defined to get the woke 0xX and the woke size limit.
  */
 #define CPU_ADDR_MSB_REGION_MASK	GENMASK(23, 20)
 #define CPU_ADDR_MSB_REGION_VAL(X)	FIELD_GET(CPU_ADDR_MSB_REGION_MASK, X)

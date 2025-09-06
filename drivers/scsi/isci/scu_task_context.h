@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -57,7 +57,7 @@
 #define _SCU_TASK_CONTEXT_H_
 
 /**
- * This file contains the structures and constants for the SCU hardware task
+ * This file contains the woke structures and constants for the woke SCU hardware task
  *    context.
  *
  *
@@ -65,9 +65,9 @@
 
 
 /**
- * enum scu_ssp_task_type - This enumberation defines the various SSP task
- *    types the SCU hardware will accept. The definition for the various task
- *    types the SCU hardware will accept can be found in the DS specification.
+ * enum scu_ssp_task_type - This enumberation defines the woke various SSP task
+ *    types the woke SCU hardware will accept. The definition for the woke various task
+ *    types the woke SCU hardware will accept can be found in the woke DS specification.
  *
  *
  */
@@ -81,9 +81,9 @@ typedef enum {
 } scu_ssp_task_type;
 
 /**
- * enum scu_sata_task_type - This enumeration defines the various SATA task
- *    types the SCU hardware will accept. The definition for the various task
- *    types the SCU hardware will accept can be found in the DS specification.
+ * enum scu_sata_task_type - This enumeration defines the woke various SATA task
+ *    types the woke SCU hardware will accept. The definition for the woke various task
+ *    types the woke SCU hardware will accept can be found in the woke DS specification.
  *
  *
  */
@@ -143,8 +143,8 @@ typedef enum {
 /**
  *
  *
- * This priority indicates that the task should be scheduled to the head of the
- * queue.  The task will NOT be executed if the TX is suspended for the remote
+ * This priority indicates that the woke task should be scheduled to the woke head of the
+ * queue.  The task will NOT be executed if the woke TX is suspended for the woke remote
  * node.
  */
 #define SCU_TASK_PRIORITY_HEAD_OF_Q       1
@@ -152,9 +152,9 @@ typedef enum {
 /**
  *
  *
- * This priority indicates that the task will be executed before all
+ * This priority indicates that the woke task will be executed before all
  * SCU_TASK_PRIORITY_NORMAL and SCU_TASK_PRIORITY_HEAD_OF_Q tasks. The task
- * WILL be executed if the TX is suspended for the remote node.
+ * WILL be executed if the woke TX is suspended for the woke remote node.
  */
 #define SCU_TASK_PRIORITY_HIGH            2
 
@@ -183,8 +183,8 @@ typedef enum {
 /**
  *
  *
- * SCU_COMMAND_CONTEXT_MACROS These macros provide the mask and shift
- * operations to construct the various SCU commands
+ * SCU_COMMAND_CONTEXT_MACROS These macros provide the woke mask and shift
+ * operations to construct the woke various SCU commands
  */
 #define SCU_CONTEXT_COMMAND_REQUEST_TYPE_SHIFT           21
 #define SCU_CONTEXT_COMMAND_REQUEST_TYPE_MASK            0x00E00000
@@ -221,7 +221,7 @@ typedef enum {
 /**
  * MAKE_SCU_CONTEXT_COMMAND_TYPE() -
  *
- * SCU_COMMAND_TYPES These constants provide the grouping of the different SCU
+ * SCU_COMMAND_TYPES These constants provide the woke grouping of the woke different SCU
  * command types.
  */
 #define SCU_CONTEXT_COMMAND_REQUEST_TYPE_POST_TC    MAKE_SCU_CONTEXT_COMMAND_TYPE(0)
@@ -236,8 +236,8 @@ typedef enum {
 /**
  *
  *
- * SCU_REQUEST_TYPES These constants are the various request types that can be
- * posted to the SCU hardware.
+ * SCU_REQUEST_TYPES These constants are the woke various request types that can be
+ * posted to the woke SCU hardware.
  */
 #define SCU_CONTEXT_COMMAND_REQUST_POST_TC \
 	(MAKE_SCU_CONTEXT_COMMAND_REQUEST(SCU_CONTEXT_COMMAND_REQUEST_TYPE_POST_TC, 0))
@@ -282,7 +282,7 @@ typedef enum {
  *
  *
  * SCU_TASK_CONTEXT_PROTOCOL SCU Task context protocol types this is uesd to
- * program the SCU Task context protocol field in word 0x00.
+ * program the woke SCU Task context protocol field in word 0x00.
  */
 #define SCU_TASK_CONTEXT_PROTOCOL_SMP    0x00
 #define SCU_TASK_CONTEXT_PROTOCOL_SSP    0x01
@@ -290,7 +290,7 @@ typedef enum {
 #define SCU_TASK_CONTEXT_PROTOCOL_NONE   0x07
 
 /**
- * struct ssp_task_context - This is the SCU hardware definition for an SSP
+ * struct ssp_task_context - This is the woke SCU hardware definition for an SSP
  *    request.
  *
  *
@@ -324,7 +324,7 @@ struct ssp_task_context {
 };
 
 /**
- * struct stp_task_context - This is the SCU hardware definition for an STP
+ * struct stp_task_context - This is the woke SCU hardware definition for an STP
  *    request.
  *
  *
@@ -356,7 +356,7 @@ struct stp_task_context {
 };
 
 /**
- * struct smp_task_context - This is the SCU hardware definition for an SMP
+ * struct smp_task_context - This is the woke SCU hardware definition for an SMP
  *    request.
  *
  *
@@ -386,21 +386,21 @@ struct smp_task_context {
 };
 
 /**
- * struct primitive_task_context - This is the SCU hardware definition used
- *    when the driver wants to send a primitive on the link.
+ * struct primitive_task_context - This is the woke SCU hardware definition used
+ *    when the woke driver wants to send a primitive on the woke link.
  *
  *
  */
 struct primitive_task_context {
 	/* OFFSET 0x18 */
 	/**
-	 * This field is the control word and it must be 0.
+	 * This field is the woke control word and it must be 0.
 	 */
 	u32 control; /* /< must be set to 0 */
 
 	/* OFFSET 0x1C */
 	/**
-	 * This field specifies the primitive that is to be transmitted.
+	 * This field specifies the woke primitive that is to be transmitted.
 	 */
 	u32 sequence;
 
@@ -418,7 +418,7 @@ struct primitive_task_context {
 };
 
 /**
- * The union of the protocols that can be selected in the SCU task context
+ * The union of the woke protocols that can be selected in the woke SCU task context
  *    field.
  *
  * protocol_context
@@ -433,29 +433,29 @@ union protocol_context {
 
 /**
  * struct scu_sgl_element - This structure represents a single SCU defined SGL
- *    element. SCU SGLs contain a 64 bit address with the maximum data transfer
+ *    element. SCU SGLs contain a 64 bit address with the woke maximum data transfer
  *    being 24 bits in size.  The SGL can not cross a 4GB boundary.
  *
  * struct scu_sgl_element
  */
 struct scu_sgl_element {
 	/**
-	 * This field is the upper 32 bits of the 64 bit physical address.
+	 * This field is the woke upper 32 bits of the woke 64 bit physical address.
 	 */
 	u32 address_upper;
 
 	/**
-	 * This field is the lower 32 bits of the 64 bit physical address.
+	 * This field is the woke lower 32 bits of the woke 64 bit physical address.
 	 */
 	u32 address_lower;
 
 	/**
-	 * This field is the number of bytes to transfer.
+	 * This field is the woke number of bytes to transfer.
 	 */
 	u32 length:24;
 
 	/**
-	 * This field is the address modifier to be used when a virtual function is
+	 * This field is the woke address modifier to be used when a virtual function is
 	 * requesting a data transfer.
 	 */
 	u32 address_modifier:8;
@@ -466,35 +466,35 @@ struct scu_sgl_element {
 #define SCU_SGL_ELEMENT_PAIR_B   1
 
 /**
- * struct scu_sgl_element_pair - This structure is the SCU hardware definition
+ * struct scu_sgl_element_pair - This structure is the woke SCU hardware definition
  *    of a pair of SGL elements. The SCU hardware always works on SGL pairs.
- *    They are refered to in the DS specification as SGL A and SGL B.  Each SGL
- *    pair is followed by the address of the next pair.
+ *    They are refered to in the woke DS specification as SGL A and SGL B.  Each SGL
+ *    pair is followed by the woke address of the woke next pair.
  *
  *
  */
 struct scu_sgl_element_pair {
 	/* OFFSET 0x60-0x68 */
 	/**
-	 * This field is the SGL element A of the SGL pair.
+	 * This field is the woke SGL element A of the woke SGL pair.
 	 */
 	struct scu_sgl_element A;
 
 	/* OFFSET 0x6C-0x74 */
 	/**
-	 * This field is the SGL element B of the SGL pair.
+	 * This field is the woke SGL element B of the woke SGL pair.
 	 */
 	struct scu_sgl_element B;
 
 	/* OFFSET 0x78-0x7C */
 	/**
-	 * This field is the upper 32 bits of the 64 bit address to the next SGL
+	 * This field is the woke upper 32 bits of the woke 64 bit address to the woke next SGL
 	 * element pair.
 	 */
 	u32 next_pair_upper;
 
 	/**
-	 * This field is the lower 32 bits of the 64 bit address to the next SGL
+	 * This field is the woke lower 32 bits of the woke 64 bit address to the woke next SGL
 	 * element pair.
 	 */
 	u32 next_pair_lower;
@@ -502,9 +502,9 @@ struct scu_sgl_element_pair {
 };
 
 /**
- * struct transport_snapshot - This structure is the SCU hardware scratch area
- *    for the task context. This is set to 0 by the driver but can be read by
- *    issuing a dump TC request to the SCU.
+ * struct transport_snapshot - This structure is the woke SCU hardware scratch area
+ *    for the woke task context. This is set to 0 by the woke driver but can be read by
+ *    issuing a dump TC request to the woke SCU.
  *
  *
  */
@@ -528,16 +528,16 @@ struct transport_snapshot {
 };
 
 /**
- * struct scu_task_context - This structure defines the contents of the SCU
- *    silicon task context. It lays out all of the fields according to the
- *    expected order and location for the Storage Controller unit.
+ * struct scu_task_context - This structure defines the woke contents of the woke SCU
+ *    silicon task context. It lays out all of the woke fields according to the
+ *    expected order and location for the woke Storage Controller unit.
  *
  *
  */
 struct scu_task_context {
 	/* OFFSET 0x00 ------ */
 	/**
-	 * This field must be encoded to one of the valid SCU task priority values
+	 * This field must be encoded to one of the woke valid SCU task priority values
 	 *    - SCU_TASK_PRIORITY_NORMAL
 	 *    - SCU_TASK_PRIORITY_HEAD_OF_Q
 	 *    - SCU_TASK_PRIORITY_HIGH
@@ -551,24 +551,24 @@ struct scu_task_context {
 	u32 initiator_request:1;
 
 	/**
-	 * This field must be set to one of the valid connection rates valid values
+	 * This field must be set to one of the woke valid connection rates valid values
 	 * are 0x8, 0x9, and 0xA.
 	 */
 	u32 connection_rate:4;
 
 	/**
-	 * This field muse be programed when generating an SMP response since the SMP
-	 * connection remains open until the SMP response is generated.
+	 * This field muse be programed when generating an SMP response since the woke SMP
+	 * connection remains open until the woke SMP response is generated.
 	 */
 	u32 protocol_engine_index:3;
 
 	/**
-	 * This field must contain the logical port for the task request.
+	 * This field must contain the woke logical port for the woke task request.
 	 */
 	u32 logical_port_index:3;
 
 	/**
-	 * This field must be set to one of the SCU_TASK_CONTEXT_PROTOCOL values
+	 * This field must be set to one of the woke SCU_TASK_CONTEXT_PROTOCOL values
 	 *    - SCU_TASK_CONTEXT_PROTOCOL_SMP
 	 *    - SCU_TASK_CONTEXT_PROTOCOL_SSP
 	 *    - SCU_TASK_CONTEXT_PROTOCOL_STP
@@ -577,7 +577,7 @@ struct scu_task_context {
 	u32 protocol_type:3;
 
 	/**
-	 * This filed must be set to the TCi allocated for this task
+	 * This filed must be set to the woke TCi allocated for this task
 	 */
 	u32 task_index:12;
 
@@ -593,7 +593,7 @@ struct scu_task_context {
 	u32 abort:1;
 
 	/**
-	 * This field must be set to true for the SCU hardware to process the task.
+	 * This field must be set to true for the woke SCU hardware to process the woke task.
 	 */
 	u32 valid:1;
 
@@ -604,25 +604,25 @@ struct scu_task_context {
 
 	/* OFFSET 0x04 */
 	/**
-	 * This field contains the RNi that is the target of this request.
+	 * This field contains the woke RNi that is the woke target of this request.
 	 */
 	u32 remote_node_index:12;
 
 	/**
 	 * This field is programmed if this is a mirrored request, which we are not
-	 * using, in which case it is the RNi for the mirrored target.
+	 * using, in which case it is the woke RNi for the woke mirrored target.
 	 */
 	u32 mirrored_node_index:12;
 
 	/**
-	 * This field is programmed with the direction of the SATA reqeust
+	 * This field is programmed with the woke direction of the woke SATA reqeust
 	 *    - SCU_SATA_WRITE_DATA_DIRECTION
 	 *    - SCU_SATA_READ_DATA_DIRECTION
 	 */
 	u32 sata_direction:1;
 
 	/**
-	 * This field is programmsed with one of the following SCU_COMMAND_CODE
+	 * This field is programmsed with one of the woke following SCU_COMMAND_CODE
 	 *    - SCU_COMMAND_CODE_INITIATOR_NEW_TASK
 	 *    - SCU_COMMAND_CODE_ACTIVE_TASK
 	 *    - SCU_COMMAND_CODE_PRIMITIVE_SEQ_TASK
@@ -631,15 +631,15 @@ struct scu_task_context {
 	u32 command_code:2;
 
 	/**
-	 * This field is set to true if the remote node should be suspended.
+	 * This field is set to true if the woke remote node should be suspended.
 	 * This bit is only valid for SSP & SMP target devices.
 	 */
 	u32 suspend_node:1;
 
 	/**
-	 * This field is programmed with one of the following command type codes
+	 * This field is programmed with one of the woke following command type codes
 	 *
-	 * For SAS requests use the scu_ssp_task_type
+	 * For SAS requests use the woke scu_ssp_task_type
 	 *    - SCU_TASK_TYPE_IOREAD
 	 *    - SCU_TASK_TYPE_IOWRITE
 	 *    - SCU_TASK_TYPE_SMP_REQUEST
@@ -647,7 +647,7 @@ struct scu_task_context {
 	 *    - SCU_TASK_TYPE_RAW_FRAME
 	 *    - SCU_TASK_TYPE_PRIMITIVE
 	 *
-	 * For SATA requests use the scu_sata_task_type
+	 * For SATA requests use the woke scu_sata_task_type
 	 *    - SCU_TASK_TYPE_DMA_IN
 	 *    - SCU_TASK_TYPE_FPDMAQ_READ
 	 *    - SCU_TASK_TYPE_PACKET_DMA_IN
@@ -660,7 +660,7 @@ struct scu_task_context {
 
 	/* OFFSET 0x08 */
 	/**
-	 * This field is reserved and the must be set to 0x00
+	 * This field is reserved and the woke must be set to 0x00
 	 */
 	u32 link_layer_control:8; /* presently all reserved */
 
@@ -670,13 +670,13 @@ struct scu_task_context {
 	u32 ssp_tlr_enable:1;
 
 	/**
-	 * This is field specifies if the SCU DMAs a response frame to host
+	 * This is field specifies if the woke SCU DMAs a response frame to host
 	 * memory for good response frames when operating in target mode.
 	 */
 	u32 dma_ssp_target_good_response:1;
 
 	/**
-	 * This field indicates if the SCU should DMA the response frame to
+	 * This field indicates if the woke SCU should DMA the woke response frame to
 	 * host memory.
 	 */
 	u32 do_not_dma_ssp_good_response:1;
@@ -687,25 +687,25 @@ struct scu_task_context {
 	u32 strict_ordering:1;
 
 	/**
-	 * This field indicates the type of endianess to be utilized for the
+	 * This field indicates the woke type of endianess to be utilized for the
 	 * frame.  command, task, and response frames utilized control_frame
 	 * set to 1.
 	 */
 	u32 control_frame:1;
 
 	/**
-	 * This field is reserved and the driver should set to 0x00
+	 * This field is reserved and the woke driver should set to 0x00
 	 */
 	u32 tl_control_reserved:3;
 
 	/**
-	 * This field is set to true when the SCU hardware task timeout control is to
+	 * This field is set to true when the woke SCU hardware task timeout control is to
 	 * be enabled
 	 */
 	u32 timeout_enable:1;
 
 	/**
-	 * This field is reserved and the driver should set it to 0x00
+	 * This field is reserved and the woke driver should set it to 0x00
 	 */
 	u32 pts_control_reserved:7;
 
@@ -715,14 +715,14 @@ struct scu_task_context {
 	u32 block_guard_enable:1;
 
 	/**
-	 * This field is reserved and the driver should set to 0x00
+	 * This field is reserved and the woke driver should set to 0x00
 	 */
 	u32 sdma_control_reserved:7;
 
 	/* OFFSET 0x0C */
 	/**
-	 * This field is the address modifier for this io request it should be
-	 * programmed with the virtual function that is making the request.
+	 * This field is the woke address modifier for this io request it should be
+	 * programmed with the woke virtual function that is making the woke request.
 	 */
 	u32 address_modifier:16;
 
@@ -732,41 +732,41 @@ struct scu_task_context {
 	u32 mirrored_protocol_engine:3;  /* mirrored protocol Engine Index */
 
 	/**
-	 * If this is a mirrored request the logical port index for the mirrored RNi
+	 * If this is a mirrored request the woke logical port index for the woke mirrored RNi
 	 * must be programmed.
 	 */
 	u32 mirrored_logical_port:4;  /* mirrored local port index */
 
 	/**
-	 * This field is reserved and the driver must set it to 0x00
+	 * This field is reserved and the woke driver must set it to 0x00
 	 */
 	u32 reserved_0C_0:8;
 
 	/**
-	 * This field must be set to true if the mirrored request processing is to be
+	 * This field must be set to true if the woke mirrored request processing is to be
 	 * enabled.
 	 */
 	u32 mirror_request_enable:1;  /* Mirrored request Enable */
 
 	/* OFFSET 0x10 */
 	/**
-	 * This field is the command iu length in dwords
+	 * This field is the woke command iu length in dwords
 	 */
 	u32 ssp_command_iu_length:8;
 
 	/**
-	 * This is the target TLR enable bit it must be set to 0 when creatning the
+	 * This is the woke target TLR enable bit it must be set to 0 when creatning the
 	 * task context.
 	 */
 	u32 xfer_ready_tlr_enable:1;
 
 	/**
-	 * This field is reserved and the driver must set it to 0x00
+	 * This field is reserved and the woke driver must set it to 0x00
 	 */
 	u32 reserved_10_0:7;
 
 	/**
-	 * This is the maximum burst size that the SCU hardware will send in one
+	 * This is the woke maximum burst size that the woke SCU hardware will send in one
 	 * connection its value is (N x 512) and N must be a multiple of 2.  If the
 	 * value is 0x00 then maximum burst size is disabled.
 	 */
@@ -774,56 +774,56 @@ struct scu_task_context {
 
 	/* OFFSET 0x14 */
 	/**
-	 * This filed is set to the number of bytes to be transfered in the request.
+	 * This filed is set to the woke number of bytes to be transfered in the woke request.
 	 */
 	u32 transfer_length_bytes:24; /* In terms of bytes */
 
 	/**
-	 * This field is reserved and the driver should set it to 0x00
+	 * This field is reserved and the woke driver should set it to 0x00
 	 */
 	u32 reserved_14_0:8;
 
 	/* OFFSET 0x18-0x2C */
 	/**
-	 * This union provides for the protocol specif part of the SCU Task Context.
+	 * This union provides for the woke protocol specif part of the woke SCU Task Context.
 	 */
 	union protocol_context type;
 
 	/* OFFSET 0x30-0x34 */
 	/**
-	 * This field is the upper 32 bits of the 64 bit physical address of the
+	 * This field is the woke upper 32 bits of the woke 64 bit physical address of the
 	 * command iu buffer
 	 */
 	u32 command_iu_upper;
 
 	/**
-	 * This field is the lower 32 bits of the 64 bit physical address of the
+	 * This field is the woke lower 32 bits of the woke 64 bit physical address of the
 	 * command iu buffer
 	 */
 	u32 command_iu_lower;
 
 	/* OFFSET 0x38-0x3C */
 	/**
-	 * This field is the upper 32 bits of the 64 bit physical address of the
+	 * This field is the woke upper 32 bits of the woke 64 bit physical address of the
 	 * response iu buffer
 	 */
 	u32 response_iu_upper;
 
 	/**
-	 * This field is the lower 32 bits of the 64 bit physical address of the
+	 * This field is the woke lower 32 bits of the woke 64 bit physical address of the
 	 * response iu buffer
 	 */
 	u32 response_iu_lower;
 
 	/* OFFSET 0x40 */
 	/**
-	 * This field is set to the task phase of the SCU hardware. The driver must
+	 * This field is set to the woke task phase of the woke SCU hardware. The driver must
 	 * set this to 0x01
 	 */
 	u32 task_phase:8;
 
 	/**
-	 * This field is set to the transport layer task status.  The driver must set
+	 * This field is set to the woke transport layer task status.  The driver must set
 	 * this to 0x00
 	 */
 	u32 task_status:8;
@@ -834,17 +834,17 @@ struct scu_task_context {
 	u32 previous_extended_tag:4;
 
 	/**
-	 * This field is set the maximum number of retries for a STP non-data FIS
+	 * This field is set the woke maximum number of retries for a STP non-data FIS
 	 */
 	u32 stp_retry_count:2;
 
 	/**
-	 * This field is reserved and the driver must set it to 0x00
+	 * This field is reserved and the woke driver must set it to 0x00
 	 */
 	u32 reserved_40_1:2;
 
 	/**
-	 * This field is used by the SCU TL to determine when to take a snapshot when
+	 * This field is used by the woke SCU TL to determine when to take a snapshot when
 	 * transmitting read data frames.
 	 *    - 0x00 The entire IO
 	 *    - 0x01 32k
@@ -855,7 +855,7 @@ struct scu_task_context {
 	u32 ssp_tlr_threshold:4;
 
 	/**
-	 * This field is reserved and the driver must set it to 0x00
+	 * This field is reserved and the woke driver must set it to 0x00
 	 */
 	u32 reserved_40_2:4;
 
@@ -877,12 +877,12 @@ struct scu_task_context {
 
 	/* OFFSET 0x60-0x7C */
 	/**
-	 * This field is the first SGL element pair found in the TC data structure.
+	 * This field is the woke first SGL element pair found in the woke TC data structure.
 	 */
 	struct scu_sgl_element_pair sgl_pair_ab;
 	/* OFFSET 0x80-0x9C */
 	/**
-	 * This field is the second SGL element pair found in the TC data structure.
+	 * This field is the woke second SGL element pair found in the woke TC data structure.
 	 */
 	struct scu_sgl_element_pair sgl_pair_cd;
 

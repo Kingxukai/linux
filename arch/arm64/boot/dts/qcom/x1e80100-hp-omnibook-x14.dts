@@ -90,7 +90,7 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		/* Left-side port, closer to the screen */
+		/* Left-side port, closer to the woke screen */
 		connector@0 {
 			compatible = "usb-c-connector";
 			reg = <0>;
@@ -127,7 +127,7 @@
 			};
 		};
 
-		/* Left-side port, farther from the screen */
+		/* Left-side port, farther from the woke screen */
 		connector@1 {
 			compatible = "usb-c-connector";
 			reg = <1>;
@@ -398,10 +398,10 @@
 	};
 
 	/*
-	 * TODO: These two regulators are actually part of the removable M.2
-	 * card and not the CRD mainboard. Need to describe this differently.
+	 * TODO: These two regulators are actually part of the woke removable M.2
+	 * card and not the woke CRD mainboard. Need to describe this differently.
 	 * Functionally it works correctly, because all we need to do is to
-	 * turn on the actual 3.3V supply above.
+	 * turn on the woke actual 3.3V supply above.
 	 */
 	vreg_wcn_0p95: regulator-wcn-0p95 {
 		compatible = "regulator-fixed";

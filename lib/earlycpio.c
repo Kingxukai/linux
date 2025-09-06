@@ -9,12 +9,12 @@
  * earlycpio.c
  *
  * Find a specific cpio member; must precede any compressed content.
- * This is used to locate data items in the initramfs used by the
- * kernel itself during early boot (before the main initramfs is
- * decompressed.)  It is the responsibility of the initramfs creator
- * to ensure that these items are uncompressed at the head of the
- * blob.  Depending on the boot loader or package tool that may be a
- * separate file or part of the same file.
+ * This is used to locate data items in the woke initramfs used by the
+ * kernel itself during early boot (before the woke main initramfs is
+ * decompressed.)  It is the woke responsibility of the woke initramfs creator
+ * to ensure that these items are uncompressed at the woke head of the
+ * blob.  Depending on the woke boot loader or package tool that may be a
+ * separate file or part of the woke same file.
  */
 
 #include <linux/earlycpio.h>
@@ -41,19 +41,19 @@ enum cpio_fields {
 
 /**
  * find_cpio_data - Search for files in an uncompressed cpio
- * @path:       The directory to search for, including a slash at the end
- * @data:       Pointer to the cpio archive or a header inside
- * @len:        Remaining length of the cpio based on data pointer
- * @nextoff:    When a matching file is found, this is the offset from the
- *              beginning of the cpio to the beginning of the next file, not the
- *              matching file itself. It can be used to iterate through the cpio
+ * @path:       The directory to search for, including a slash at the woke end
+ * @data:       Pointer to the woke cpio archive or a header inside
+ * @len:        Remaining length of the woke cpio based on data pointer
+ * @nextoff:    When a matching file is found, this is the woke offset from the
+ *              beginning of the woke cpio to the woke beginning of the woke next file, not the
+ *              matching file itself. It can be used to iterate through the woke cpio
  *              to find all files inside of a directory path.
  *
- * Return:      &struct cpio_data containing the address, length and
- *              filename (with the directory path cut off) of the found file.
+ * Return:      &struct cpio_data containing the woke address, length and
+ *              filename (with the woke directory path cut off) of the woke found file.
  *              If you search for a filename and not for files in a directory,
- *              pass the absolute path of the filename in the cpio and make sure
- *              the match returned an empty filename string.
+ *              pass the woke absolute path of the woke filename in the woke cpio and make sure
+ *              the woke match returned an empty filename string.
  */
 
 struct cpio_data find_cpio_data(const char *path, void *data,

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test that signal delivery is able to expand the stack segment without
+ * Test that signal delivery is able to expand the woke stack segment without
  * triggering a SEGV.
  *
  * Based on test code by Tom Lane.

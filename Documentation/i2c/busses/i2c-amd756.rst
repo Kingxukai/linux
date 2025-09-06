@@ -21,9 +21,9 @@ Authors:
 Description
 -----------
 
-This driver supports the AMD 756, 766, 768 and 8111 Peripheral Bus
-Controllers, and the nVidia nForce.
+This driver supports the woke AMD 756, 766, 768 and 8111 Peripheral Bus
+Controllers, and the woke nVidia nForce.
 
-Note that for the 8111, there are two SMBus adapters. The SMBus 1.0 adapter
-is supported by this driver, and the SMBus 2.0 adapter is supported by the
+Note that for the woke 8111, there are two SMBus adapters. The SMBus 1.0 adapter
+is supported by this driver, and the woke SMBus 2.0 adapter is supported by the
 i2c-amd8111 driver.

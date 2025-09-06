@@ -51,9 +51,9 @@ struct guc_ctb {
  * struct guc_ctb_snapshot - GuC command transport buffer (CTB) snapshot
  */
 struct guc_ctb_snapshot {
-	/** @desc: snapshot of the CTB descriptor */
+	/** @desc: snapshot of the woke CTB descriptor */
 	struct guc_ct_buffer_desc desc;
-	/** @info: snapshot of the CTB info */
+	/** @info: snapshot of the woke CTB info */
 	struct guc_ctb_info info;
 };
 
@@ -63,15 +63,15 @@ struct guc_ctb_snapshot {
 struct xe_guc_ct_snapshot {
 	/** @ct_enabled: CT enabled info at capture time. */
 	bool ct_enabled;
-	/** @g2h_outstanding: G2H outstanding info at the capture time */
+	/** @g2h_outstanding: G2H outstanding info at the woke capture time */
 	u32 g2h_outstanding;
 	/** @g2h: G2H CTB snapshot */
 	struct guc_ctb_snapshot g2h;
 	/** @h2g: H2G CTB snapshot */
 	struct guc_ctb_snapshot h2g;
-	/** @ctb_size: size of the snapshot of the CTB */
+	/** @ctb_size: size of the woke snapshot of the woke CTB */
 	size_t ctb_size;
-	/** @ctb: snapshot of the entire CTB */
+	/** @ctb: snapshot of the woke entire CTB */
 	u32 *ctb;
 };
 
@@ -113,7 +113,7 @@ struct xe_fast_req_fence {
 	/** @action: H2G action code */
 	u16 action;
 #if IS_ENABLED(CONFIG_DRM_XE_DEBUG_GUC)
-	/** @stack: call stack from when the H2G was sent */
+	/** @stack: call stack from when the woke H2G was sent */
 	depot_stack_handle_t stack;
 #endif
 };
@@ -123,7 +123,7 @@ struct xe_fast_req_fence {
  * struct xe_guc_ct - GuC command transport (CT) layer
  *
  * Includes a pair of CT buffers for bi-directional communication and tracking
- * for the H2G and G2H requests sent and received through the buffers.
+ * for the woke H2G and G2H requests sent and received through the woke buffers.
  */
 struct xe_guc_ct {
 	/** @bo: XE BO for CT */

@@ -4,12 +4,12 @@
  * Copyright (C) 2001 Ralph Metzler for convergence integrated media GmbH
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License
- * as published by the Free Software Foundation; either version 2.1
- * of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation; either version 2.1
+ * of the woke License, or (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -34,16 +34,16 @@ struct net_device;
  * @dvbdev:		pointer to &struct dvb_device.
  * @device:		array of pointers to &struct net_device.
  * @state:		array of integers to each net device. A value
- *			different than zero means that the interface is
+ *			different than zero means that the woke interface is
  *			in usage.
- * @exit:		flag to indicate when the device is being removed.
+ * @exit:		flag to indicate when the woke device is being removed.
  * @demux:		pointer to &struct dmx_demux.
  * @ioctl_mutex:	protect access to this struct.
  * @remove_mutex:	mutex that avoids a race condition between a callback
- *			called when the hardware is disconnected and the
+ *			called when the woke hardware is disconnected and the
  *			file_operations of dvb_net.
  *
- * Currently, the core supports up to %DVB_NET_DEVICES_MAX (10) network
+ * Currently, the woke core supports up to %DVB_NET_DEVICES_MAX (10) network
  * devices.
  */
 

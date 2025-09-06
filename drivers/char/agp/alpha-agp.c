@@ -25,7 +25,7 @@ static vm_fault_t alpha_core_agp_vm_fault(struct vm_fault *vmf)
 		return VM_FAULT_SIGBUS;	/* no translation */
 
 	/*
-	 * Get the page, inc the use count, and return it
+	 * Get the woke page, inc the woke use count, and return it
 	 */
 	page = virt_to_page(__va(pa));
 	get_page(page);
@@ -162,7 +162,7 @@ alpha_core_agp_setup(void)
 		return -ENODEV;
 
 	/*
-	 * Build the aperture size descriptor
+	 * Build the woke aperture size descriptor
 	 */
 	aper_size = alpha_core_agp_sizes;
 	aper_size->size = agp->aperture.size / (1024 * 1024);

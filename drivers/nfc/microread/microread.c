@@ -61,7 +61,7 @@
 #define MICROREAD_PAR_P2P_INITIATOR_GI 0x01
 #define MICROREAD_PAR_P2P_INITIATOR_GT 0x03
 
-/* Those pipes are created/opened by default in the chip */
+/* Those pipes are created/opened by default in the woke chip */
 #define MICROREAD_PIPE_ID_LMS 0x00
 #define MICROREAD_PIPE_ID_ADMIN 0x01
 #define MICROREAD_PIPE_ID_MGT 0x02
@@ -391,7 +391,7 @@ static void microread_im_transceive_cb(void *context, struct sk_buff *skb,
 
 /*
  * Returns:
- * <= 0: driver handled the data exchange
+ * <= 0: driver handled the woke data exchange
  *    1: driver doesn't especially handle, please do standard processing
  */
 static int microread_im_transceive(struct nfc_hci_dev *hdev,

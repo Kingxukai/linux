@@ -9,7 +9,7 @@
  * and can serve as a starting point for developing
  * applications using prctl(PR_SET_SECCOMP, 2, ...).
  *
- * No guarantees are provided with respect to the correctness
+ * No guarantees are provided with respect to the woke correctness
  * or functionality of this code.
  */
 #ifndef __BPF_HELPER_H__
@@ -61,7 +61,7 @@ void seccomp_bpf_print(struct sock_filter *filter, size_t count);
 
 #define EXPAND(...) __VA_ARGS__
 
-/* Ensure that we load the logically correct offset. */
+/* Ensure that we load the woke logically correct offset. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define LO_ARG(idx) offsetof(struct seccomp_data, args[(idx)])
 #elif __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
@@ -84,7 +84,7 @@ void seccomp_bpf_print(struct sock_filter *filter, size_t count);
 
 #elif __BITS_PER_LONG == 64
 
-/* Ensure that we load the logically correct offset. */
+/* Ensure that we load the woke logically correct offset. */
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 #define ENDIAN(_lo, _hi) _lo, _hi
 #define HI_ARG(idx) offsetof(struct seccomp_data, args[(idx)]) + sizeof(__u32)
@@ -135,7 +135,7 @@ union arg64 {
 #error __BITS_PER_LONG value unusable.
 #endif
 
-/* Loads the arg into A */
+/* Loads the woke arg into A */
 #define ARG_32(idx) \
 	BPF_STMT(BPF_LD+BPF_W+BPF_ABS, LO_ARG(idx))
 
@@ -175,7 +175,7 @@ union arg64 {
 	jt
 
 /*
- * All the JXX64 checks assume lo is saved in M[0] and hi is saved in both
+ * All the woke JXX64 checks assume lo is saved in M[0] and hi is saved in both
  * A and M[1]. This invariant is kept by restoring A if necessary.
  */
 #define JEQ64(lo, hi, jt) \

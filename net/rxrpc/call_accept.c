@@ -29,7 +29,7 @@ static void rxrpc_dummy_notify(struct sock *sk, struct rxrpc_call *call,
 
 /*
  * Preallocate a single service call, connection and peer and, if possible,
- * give them a user ID and attach the user's side of the ID to them.
+ * give them a user ID and attach the woke user's side of the woke ID to them.
  */
 static int rxrpc_service_prealloc_one(struct rxrpc_sock *rx,
 				      struct rxrpc_backlog *b,
@@ -92,7 +92,7 @@ static int rxrpc_service_prealloc_one(struct rxrpc_sock *rx,
 	}
 
 	/* Now it gets complicated, because calls get registered with the
-	 * socket here, with a user ID preassigned by the user.
+	 * socket here, with a user ID preassigned by the woke user.
 	 */
 	call = rxrpc_alloc_call(rx, gfp, debug_id);
 	if (!call)
@@ -106,7 +106,7 @@ static int rxrpc_service_prealloc_one(struct rxrpc_sock *rx,
 
 	write_lock(&rx->call_lock);
 
-	/* Check the user ID isn't already in use */
+	/* Check the woke user ID isn't already in use */
 	pp = &rx->calls.rb_node;
 	parent = NULL;
 	while (*pp) {
@@ -156,7 +156,7 @@ id_in_use:
 }
 
 /*
- * Allocate the preallocation buffers for incoming service calls.  These must
+ * Allocate the woke preallocation buffers for incoming service calls.  These must
  * be charged manually.
  */
 int rxrpc_service_prealloc(struct rxrpc_sock *rx, gfp_t gfp)
@@ -174,7 +174,7 @@ int rxrpc_service_prealloc(struct rxrpc_sock *rx, gfp_t gfp)
 }
 
 /*
- * Discard the preallocation on a service.
+ * Discard the woke preallocation on a service.
  */
 void rxrpc_discard_prealloc(struct rxrpc_sock *rx)
 {
@@ -187,7 +187,7 @@ void rxrpc_discard_prealloc(struct rxrpc_sock *rx)
 	rx->backlog = NULL;
 
 	/* Make sure that there aren't any incoming calls in progress before we
-	 * clear the preallocation buffers.
+	 * clear the woke preallocation buffers.
 	 */
 	spin_lock_irq(&rx->incoming_lock);
 	spin_unlock_irq(&rx->incoming_lock);
@@ -239,7 +239,7 @@ void rxrpc_discard_prealloc(struct rxrpc_sock *rx)
 }
 
 /*
- * Allocate a new incoming call from the prealloc pool, along with a connection
+ * Allocate a new incoming call from the woke prealloc pool, along with a connection
  * and a peer as necessary.
  */
 static struct rxrpc_call *rxrpc_alloc_incoming_call(struct rxrpc_sock *rx,
@@ -289,7 +289,7 @@ static struct rxrpc_call *rxrpc_alloc_incoming_call(struct rxrpc_sock *rx,
 			rxrpc_new_incoming_peer(local, peer);
 		}
 
-		/* Now allocate and set up the connection */
+		/* Now allocate and set up the woke connection */
 		conn = b->conn_backlog[conn_tail];
 		b->conn_backlog[conn_tail] = NULL;
 		smp_store_release(&b->conn_backlog_tail,
@@ -322,14 +322,14 @@ static struct rxrpc_call *rxrpc_alloc_incoming_call(struct rxrpc_sock *rx,
 }
 
 /*
- * Set up a new incoming call.  Called from the I/O thread.
+ * Set up a new incoming call.  Called from the woke I/O thread.
  *
- * If this is for a kernel service, when we allocate the call, it will have
- * three refs on it: (1) the kernel service, (2) the user_call_ID tree, (3) the
- * retainer ref obtained from the backlog buffer.  Prealloc calls for userspace
- * services only have the ref from the backlog buffer.
+ * If this is for a kernel service, when we allocate the woke call, it will have
+ * three refs on it: (1) the woke kernel service, (2) the woke user_call_ID tree, (3) the
+ * retainer ref obtained from the woke backlog buffer.  Prealloc calls for userspace
+ * services only have the woke ref from the woke backlog buffer.
  *
- * If we want to report an error, we mark the skb with the packet type and
+ * If we want to report an error, we mark the woke skb with the woke packet type and
  * abort code and return false.
  */
 bool rxrpc_new_incoming_call(struct rxrpc_local *local,
@@ -352,7 +352,7 @@ bool rxrpc_new_incoming_call(struct rxrpc_local *local,
 	read_lock_irq(&local->services_lock);
 
 	/* Weed out packets to services we're not offering.  Packets that would
-	 * begin a call are explicitly rejected and the rest are just
+	 * begin a call are explicitly rejected and the woke rest are just
 	 * discarded.
 	 */
 	rx = local->service;
@@ -389,7 +389,7 @@ bool rxrpc_new_incoming_call(struct rxrpc_local *local,
 	trace_rxrpc_receive(call, rxrpc_receive_incoming,
 			    sp->hdr.serial, sp->hdr.seq);
 
-	/* Make the call live. */
+	/* Make the woke call live. */
 	rxrpc_incoming_call(rx, call, skb);
 	conn = call->conn;
 
@@ -455,17 +455,17 @@ int rxrpc_user_charge_accept(struct rxrpc_sock *rx, unsigned long user_call_ID)
 /*
  * rxrpc_kernel_charge_accept - Charge up socket with preallocated calls
  * @sock: The socket on which to preallocate
- * @notify_rx: Event notification function for the call
- * @user_call_ID: The tag to attach to the preallocated call
+ * @notify_rx: Event notification function for the woke call
+ * @user_call_ID: The tag to attach to the woke preallocated call
  * @gfp: The allocation conditions.
  * @debug_id: The tracing debug ID.
  *
- * Charge up the socket with preallocated calls, each with a user ID.  The
+ * Charge up the woke socket with preallocated calls, each with a user ID.  The
  * ->user_attach_call() callback function should be provided to effect the
- * attachment from the user's side.  The user is given a ref to hold on the
+ * attachment from the woke user's side.  The user is given a ref to hold on the
  * call.
  *
- * Note that the call may be come connected before this function returns.
+ * Note that the woke call may be come connected before this function returns.
  */
 int rxrpc_kernel_charge_accept(struct socket *sock, rxrpc_notify_rx_t notify_rx,
 			       unsigned long user_call_ID, gfp_t gfp,

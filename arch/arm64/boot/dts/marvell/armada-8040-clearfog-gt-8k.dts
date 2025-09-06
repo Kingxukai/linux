@@ -76,7 +76,7 @@
 		pinctrl-0 = <&cp0_led0_pins
 			     &cp0_led1_pins>;
 		pinctrl-names = "default";
-		/* No designated function for these LEDs at the moment */
+		/* No designated function for these LEDs at the woke moment */
 		led0 {
 			label = "clearfog-gt-8k:green:led0";
 			gpios = <&cp0_gpio2 8 GPIO_ACTIVE_LOW>;

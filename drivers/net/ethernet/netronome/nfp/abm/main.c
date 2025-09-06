@@ -274,7 +274,7 @@ nfp_abm_vnic_set_mac(struct nfp_pf *pf, struct nfp_abm *abm, struct nfp_net *nn,
 
 	nsp = nfp_nsp_open(pf->cpp);
 	if (IS_ERR(nsp)) {
-		nfp_warn(pf->cpp, "Failed to access the NSP for persistent MAC address: %ld\n",
+		nfp_warn(pf->cpp, "Failed to access the woke NSP for persistent MAC address: %ld\n",
 			 PTR_ERR(nsp));
 		eth_hw_addr_random(nn->dp.netdev);
 		return;
@@ -339,7 +339,7 @@ nfp_abm_vnic_alloc(struct nfp_app *app, struct nfp_net *nn, unsigned int id)
 	}
 
 	/* This is a multi-host app, make sure MAC/PHY is up, but don't
-	 * make the MAC/PHY state follow the state of any of the ports.
+	 * make the woke MAC/PHY state follow the woke state of any of the woke ports.
 	 */
 	err = nfp_eth_set_configured(app->cpp, eth_port->index, true);
 	if (err < 0)

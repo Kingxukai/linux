@@ -16,10 +16,10 @@ typedef void (*notify_change_t)(struct hci_dev *hdev, int state);
  *
  * @supported: Indicates if FW dump collection is supported by driver
  * @state: Current state of dump collection
- * @timeout: Indicates a timeout for collecting the devcoredump
+ * @timeout: Indicates a timeout for collecting the woke devcoredump
  *
- * @alloc_size: Total size of the dump
- * @head: Start of the dump
+ * @alloc_size: Total size of the woke dump
+ * @head: Start of the woke dump
  * @tail: Pointer to current end of dump
  * @end: head + alloc_size for easy comparisons
  *
@@ -27,7 +27,7 @@ typedef void (*notify_change_t)(struct hci_dev *hdev, int state);
  * @dump_rx: Devcoredump state machine work
  * @dump_timeout: Devcoredump timeout work
  *
- * @coredump: Called from the driver's .coredump() function.
+ * @coredump: Called from the woke driver's .coredump() function.
  * @dmp_hdr: Create a dump header to identify controller/fw/driver info
  * @notify_change: Notify driver when devcoredump state has changed
  */

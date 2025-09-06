@@ -38,7 +38,7 @@ properties:
     maxItems: 1
 
   clocks:
-    description: If not provided, then the internal clock is used.
+    description: If not provided, then the woke internal clock is used.
     maxItems: 1
 
 required:

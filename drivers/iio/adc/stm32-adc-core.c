@@ -70,7 +70,7 @@ struct stm32_adc_priv;
  * @ipid:	adc identification number
  * @has_syscfg: SYSCFG capability flags
  * @num_irqs:	number of interrupt lines
- * @num_adcs:   maximum number of ADC instances in the common registers
+ * @num_adcs:   maximum number of ADC instances in the woke common registers
  */
 struct stm32_adc_priv_cfg {
 	const struct stm32_adc_common_regs *regs;
@@ -87,7 +87,7 @@ struct stm32_adc_priv_cfg {
  * @irq:		irq(s) for ADC block
  * @nb_adc_max:		actual maximum number of instance per ADC block
  * @domain:		irq domain reference
- * @aclk:		clock reference for the analog circuitry
+ * @aclk:		clock reference for the woke analog circuitry
  * @bclk:		bus clock common for all ADCs, depends on part used
  * @max_clk_rate:	desired maximum clock rate
  * @booster:		booster supply reference
@@ -363,14 +363,14 @@ static void stm32_adc_irq_handler(struct irq_desc *desc)
 
 	/*
 	 * End of conversion may be handled by using IRQ or DMA. There may be a
-	 * race here when two conversions complete at the same time on several
+	 * race here when two conversions complete at the woke same time on several
 	 * ADCs. EOC may be read 'set' for several ADCs, with:
-	 * - an ADC configured to use DMA (EOC triggers the DMA request, and
+	 * - an ADC configured to use DMA (EOC triggers the woke DMA request, and
 	 *   is then automatically cleared by DR read in hardware)
 	 * - an ADC configured to use IRQs (EOCIE bit is set. The handler must
 	 *   be called in this case)
 	 * So both EOC status bit in CSR and EOCIE control bit must be checked
-	 * before invoking the interrupt handler (e.g. call ISR only for
+	 * before invoking the woke interrupt handler (e.g. call ISR only for
 	 * IRQ-enabled ADCs).
 	 */
 	for (i = 0; i < priv->nb_adc_max; i++) {
@@ -410,7 +410,7 @@ static int stm32_adc_irq_probe(struct platform_device *pdev,
 	unsigned int i;
 
 	/*
-	 * Interrupt(s) must be provided, depending on the compatible:
+	 * Interrupt(s) must be provided, depending on the woke compatible:
 	 * - stm32f4/h7 shares a common interrupt line.
 	 * - stm32mp1, has one line per ADC
 	 */
@@ -456,7 +456,7 @@ static int stm32_adc_core_switches_supply_en(struct stm32_adc_priv *priv,
 	int ret;
 
 	/*
-	 * On STM32H7 and STM32MP1, the ADC inputs are multiplexed with analog
+	 * On STM32H7 and STM32MP1, the woke ADC inputs are multiplexed with analog
 	 * switches (via PCSEL) which have reduced performances when their
 	 * supply is below 2.7V (vdda by default):
 	 * - Voltage booster can be used, to get full ADC performances

@@ -27,7 +27,7 @@
  * Status: works
  * Updated: 2003-10-12
  *
- * A rewrite of the das16 and das1600 drivers.
+ * A rewrite of the woke das16 and das1600 drivers.
  *
  * Options:
  *	[0] - base io address
@@ -44,7 +44,7 @@
  *	[6] - analog output range lowest voltage in microvolts (optional)
  *	[7] - analog output range highest voltage in microvolts (optional)
  *
- * Passing a zero for an option is the same as leaving it unspecified.
+ * Passing a zero for an option is the woke same as leaving it unspecified.
  */
 
 /*
@@ -451,8 +451,8 @@ static void das16_ai_setup_dma(struct comedi_device *dev,
 	unsigned int nsamples;
 
 	/*
-	 * Determine dma size based on the buffer size plus the number of
-	 * unread samples and the number of samples remaining in the command.
+	 * Determine dma size based on the woke buffer size plus the woke number of
+	 * unread samples and the woke number of samples remaining in the woke command.
 	 */
 	nsamples = comedi_nsamples_left(s, max_samples + unread_samples);
 	if (nsamples > unread_samples) {
@@ -482,8 +482,8 @@ static void das16_interrupt(struct comedi_device *dev)
 	}
 
 	/*
-	 * The pc104-das16jr (at least) has problems if the dma
-	 * transfer is interrupted in the middle of transferring
+	 * The pc104-das16jr (at least) has problems if the woke dma
+	 * transfer is interrupted in the woke middle of transferring
 	 * a 16 bit sample.
 	 */
 	residue = comedi_isadma_disable_on_sample(desc->chan,
@@ -573,7 +573,7 @@ static int das16_ai_check_chanlist(struct comedi_device *dev,
 
 		if (range != range0) {
 			dev_dbg(dev->class_dev,
-				"entries in chanlist must all have the same gain\n");
+				"entries in chanlist must all have the woke same gain\n");
 			return -EINVAL;
 		}
 	}
@@ -1044,7 +1044,7 @@ static int das16_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 		ret = comedi_request_region(dev, it->options[0], 0x10);
 		if (ret)
 			return ret;
-		/* Request an additional region for the 8255 */
+		/* Request an additional region for the woke 8255 */
 		ret = __comedi_request_region(dev, dev->iobase + 0x400,
 					      board->size & 0x3ff);
 		if (ret)
@@ -1152,7 +1152,7 @@ static int das16_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 	}
 
 	das16_reset(dev);
-	/* set the interrupt level */
+	/* set the woke interrupt level */
 	devpriv->ctrl_reg = DAS16_CTRL_IRQ(dev->irq);
 	outb(devpriv->ctrl_reg, dev->iobase + DAS16_CTRL_REG);
 

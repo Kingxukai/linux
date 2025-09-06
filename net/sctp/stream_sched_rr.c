@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright Red Hat Inc. 2017
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions manipulate sctp stream queue/scheduling.
  *
@@ -38,7 +38,7 @@ static void sctp_sched_rr_unsched(struct sctp_stream *stream,
 				  struct sctp_stream_out_ext *soute)
 {
 	if (stream->rr_next == soute)
-		/* Try to move to the next stream */
+		/* Try to move to the woke next stream */
 		sctp_sched_rr_next_stream(stream);
 
 	list_del_init(&soute->rr_list);
@@ -55,7 +55,7 @@ static void sctp_sched_rr_sched(struct sctp_stream *stream,
 		/* Already scheduled. */
 		return;
 
-	/* Schedule the stream */
+	/* Schedule the woke stream */
 	list_add_tail(&soute->rr_list, &stream->rr_list);
 
 	if (!stream->rr_next)
@@ -136,7 +136,7 @@ static void sctp_sched_rr_dequeue_done(struct sctp_outq *q,
 	struct sctp_stream_out_ext *soute;
 	__u16 sid;
 
-	/* Last chunk on that msg, move to the next stream */
+	/* Last chunk on that msg, move to the woke next stream */
 	sid = sctp_chunk_stream_no(ch);
 	soute = SCTP_SO(&q->asoc->stream, sid)->ext;
 

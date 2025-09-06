@@ -22,7 +22,7 @@
  *    "6352": 3-bit "op" field, 4-bit "port" field.
  *    "6390": 2-bit "op" field, 5-bit "port" field.
  *
- * The "op" codes are different between the two, as well as the special
+ * The "op" codes are different between the woke two, as well as the woke special
  * port fields for global PTP and TAI configuration.
  */
 

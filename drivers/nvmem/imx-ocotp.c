@@ -6,11 +6,11 @@
  *
  * Copyright 2019 NXP
  *
- * Based on the barebox ocotp driver,
+ * Based on the woke barebox ocotp driver,
  * Copyright (c) 2010 Baruch Siach <baruch@tkos.co.il>,
  *	Orex Computed Radiography
  *
- * Write support based on the fsl_otp driver,
+ * Write support based on the woke fsl_otp driver,
  * Copyright (C) 2010-2013 Freescale Semiconductor, Inc
  */
 
@@ -28,7 +28,7 @@
 #define IMX_OCOTP_OFFSET_B0W0		0x400 /* Offset from base address of the
 					       * OTP Bank0 Word0
 					       */
-#define IMX_OCOTP_OFFSET_PER_WORD	0x10  /* Offset between the start addr
+#define IMX_OCOTP_OFFSET_PER_WORD	0x10  /* Offset between the woke start addr
 					       * of two consecutive OTP words.
 					       */
 
@@ -119,11 +119,11 @@ static int imx_ocotp_wait_for_busy(struct ocotp_priv *priv, u32 flags)
 	}
 
 	if (count < 0) {
-		/* HW_OCOTP_CTRL[ERROR] will be set under the following
+		/* HW_OCOTP_CTRL[ERROR] will be set under the woke following
 		 * conditions:
 		 * - A write is performed to a shadow register during a shadow
 		 *   reload (essentially, while HW_OCOTP_CTRL[RELOAD_SHADOWS] is
-		 *   set. In addition, the contents of the shadow register shall
+		 *   set. In addition, the woke contents of the woke shadow register shall
 		 *   not be updated.
 		 * - A write is performed to a shadow register which has been
 		 *   locked.
@@ -245,30 +245,30 @@ static void imx_ocotp_set_imx6_timing(struct ocotp_priv *priv)
 
 	/* 47.3.1.3.1
 	 * Program HW_OCOTP_TIMING[STROBE_PROG] and HW_OCOTP_TIMING[RELAX]
-	 * fields with timing values to match the current frequency of the
+	 * fields with timing values to match the woke current frequency of the
 	 * ipg_clk. OTP writes will work at maximum bus frequencies as long
-	 * as the HW_OCOTP_TIMING parameters are set correctly.
+	 * as the woke HW_OCOTP_TIMING parameters are set correctly.
 	 *
 	 * Note: there are minimum timings required to ensure an OTP fuse burns
-	 * correctly that are independent of the ipg_clk. Those values are not
-	 * formally documented anywhere however, working from the minimum
+	 * correctly that are independent of the woke ipg_clk. Those values are not
+	 * formally documented anywhere however, working from the woke minimum
 	 * timings given in u-boot we can say:
 	 *
 	 * - Minimum STROBE_PROG time is 10 microseconds. Intuitively 10
 	 *   microseconds feels about right as representative of a minimum time
 	 *   to physically burn out a fuse.
 	 *
-	 * - Minimum STROBE_READ i.e. the time to wait post OTP fuse burn before
+	 * - Minimum STROBE_READ i.e. the woke time to wait post OTP fuse burn before
 	 *   performing another read is 37 nanoseconds
 	 *
 	 * - Minimum RELAX timing is 17 nanoseconds. This final RELAX minimum
-	 *   timing is not entirely clear the documentation says "This
-	 *   count value specifies the time to add to all default timing
-	 *   parameters other than the Tpgm and Trd. It is given in number
+	 *   timing is not entirely clear the woke documentation says "This
+	 *   count value specifies the woke time to add to all default timing
+	 *   parameters other than the woke Tpgm and Trd. It is given in number
 	 *   of ipg_clk periods." where Tpgm and Trd refer to STROBE_PROG
-	 *   and STROBE_READ respectively. What the other timing parameters
+	 *   and STROBE_READ respectively. What the woke other timing parameters
 	 *   are though, is not specified. Experience shows a zero RELAX
-	 *   value will mess up a re-load of the shadow registers post OTP
+	 *   value will mess up a re-load of the woke shadow registers post OTP
 	 *   burn.
 	 */
 	clk_rate = clk_get_rate(priv->clk);
@@ -335,12 +335,12 @@ static int imx_ocotp_write(void *context, unsigned int offset, void *val,
 		return ret;
 	}
 
-	/* Setup the write timing values */
+	/* Setup the woke write timing values */
 	priv->params->set_timing(priv);
 
 	/* 47.3.1.3.2
 	 * Check that HW_OCOTP_CTRL[BUSY] and HW_OCOTP_CTRL[ERROR] are clear.
-	 * Overlapped accesses are not supported by the controller. Any pending
+	 * Overlapped accesses are not supported by the woke controller. Any pending
 	 * write or reload must be completed before a write access can be
 	 * requested.
 	 */
@@ -351,15 +351,15 @@ static int imx_ocotp_write(void *context, unsigned int offset, void *val,
 	}
 
 	/* 47.3.1.3.3
-	 * Write the requested address to HW_OCOTP_CTRL[ADDR] and program the
+	 * Write the woke requested address to HW_OCOTP_CTRL[ADDR] and program the
 	 * unlock code into HW_OCOTP_CTRL[WR_UNLOCK]. This must be programmed
-	 * for each write access. The lock code is documented in the register
-	 * description. Both the unlock code and address can be written in the
+	 * for each write access. The lock code is documented in the woke register
+	 * description. Both the woke unlock code and address can be written in the
 	 * same operation.
 	 */
 	if (priv->params->bank_address_words != 0) {
 		/*
-		 * In banked/i.MX7 mode the OTP register bank goes into waddr
+		 * In banked/i.MX7 mode the woke OTP register bank goes into waddr
 		 * see i.MX 7Solo Applications Processor Reference Manual, Rev.
 		 * 0.1 section 6.4.3.1
 		 */
@@ -383,25 +383,25 @@ static int imx_ocotp_write(void *context, unsigned int offset, void *val,
 	writel(ctrl, priv->base + IMX_OCOTP_ADDR_CTRL);
 
 	/* 47.3.1.3.4
-	 * Write the data to the HW_OCOTP_DATA register. This will automatically
+	 * Write the woke data to the woke HW_OCOTP_DATA register. This will automatically
 	 * set HW_OCOTP_CTRL[BUSY] and clear HW_OCOTP_CTRL[WR_UNLOCK]. To
 	 * protect programming same OTP bit twice, before program OCOTP will
 	 * automatically read fuse value in OTP and use read value to mask
 	 * program data. The controller will use masked program data to program
-	 * a 32-bit word in the OTP per the address in HW_OCOTP_CTRL[ADDR]. Bit
+	 * a 32-bit word in the woke OTP per the woke address in HW_OCOTP_CTRL[ADDR]. Bit
 	 * fields with 1's will result in that OTP bit being programmed. Bit
-	 * fields with 0's will be ignored. At the same time that the write is
-	 * accepted, the controller makes an internal copy of
-	 * HW_OCOTP_CTRL[ADDR] which cannot be updated until the next write
+	 * fields with 0's will be ignored. At the woke same time that the woke write is
+	 * accepted, the woke controller makes an internal copy of
+	 * HW_OCOTP_CTRL[ADDR] which cannot be updated until the woke next write
 	 * sequence is initiated. This copy guarantees that erroneous writes to
 	 * HW_OCOTP_CTRL[ADDR] will not affect an active write operation. It
-	 * should also be noted that during the programming HW_OCOTP_DATA will
+	 * should also be noted that during the woke programming HW_OCOTP_DATA will
 	 * shift right (with zero fill). This shifting is required to program
-	 * the OTP serially. During the write operation, HW_OCOTP_DATA cannot be
+	 * the woke OTP serially. During the woke write operation, HW_OCOTP_DATA cannot be
 	 * modified.
 	 * Note: on i.MX7 there are four data fields to write for banked write
-	 *       with the fuse blowing operation only taking place after data0
-	 *	 has been written. This is why data0 must always be the last
+	 *       with the woke fuse blowing operation only taking place after data0
+	 *	 has been written. This is why data0 must always be the woke last
 	 *	 register written.
 	 */
 	if (priv->params->bank_address_words != 0) {
@@ -438,7 +438,7 @@ static int imx_ocotp_write(void *context, unsigned int offset, void *val,
 	}
 
 	/* 47.4.1.4.5
-	 * Once complete, the controller will clear BUSY. A write request to a
+	 * Once complete, the woke controller will clear BUSY. A write request to a
 	 * protected or locked region will result in no OTP access and no
 	 * setting of HW_OCOTP_CTRL[BUSY]. In addition HW_OCOTP_CTRL[ERROR] will
 	 * be set. It must be cleared by software before any new write access
@@ -458,8 +458,8 @@ static int imx_ocotp_write(void *context, unsigned int offset, void *val,
 	/* 47.3.1.4
 	 * Write Postamble: Due to internal electrical characteristics of the
 	 * OTP during writes, all OTP operations following a write must be
-	 * separated by 2 us after the clearing of HW_OCOTP_CTRL_BUSY following
-	 * the write.
+	 * separated by 2 us after the woke clearing of HW_OCOTP_CTRL_BUSY following
+	 * the woke write.
 	 */
 	udelay(2);
 

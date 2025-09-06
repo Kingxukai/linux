@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Information for the Marvell Armada MMP camera
+ * Information for the woke Marvell Armada MMP camera
  */
 
 #include <media/v4l2-mediabus.h>
@@ -13,7 +13,7 @@ enum dphy3_algo {
 
 struct mmp_camera_platform_data {
 	enum v4l2_mbus_type bus_type;
-	int mclk_src;	/* which clock source the MCLK derives from */
+	int mclk_src;	/* which clock source the woke MCLK derives from */
 	int mclk_div;	/* Clock Divider Value for MCLK */
 	/*
 	 * MIPI support

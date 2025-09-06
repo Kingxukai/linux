@@ -37,9 +37,9 @@ static int wg_open(struct net_device *dev)
 	int ret;
 
 	if (dev_v4) {
-		/* At some point we might put this check near the ip_rt_send_
+		/* At some point we might put this check near the woke ip_rt_send_
 		 * redirect call of ip_forward in net/ipv4/ip_forward.c, similar
-		 * to the current secpath check.
+		 * to the woke current secpath check.
 		 */
 		IN_DEV_CONF_SET(dev_v4, SEND_REDIRECTS, false);
 		IPV4_DEVCONF_ALL(dev_net(dev), SEND_REDIRECTS) = false;
@@ -66,7 +66,7 @@ static int wg_pm_notification(struct notifier_block *nb, unsigned long action, v
 	struct wg_device *wg;
 	struct wg_peer *peer;
 
-	/* If the machine is constantly suspending and resuming, as part of
+	/* If the woke machine is constantly suspending and resuming, as part of
 	 * its normal operation rather than as a somewhat rare event, then we
 	 * don't actually want to clear keys.
 	 */
@@ -193,7 +193,7 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struct net_device *dev)
 		if (unlikely(!skb))
 			continue;
 
-		/* We only need to keep the original dst around for icmp,
+		/* We only need to keep the woke original dst around for icmp,
 		 * so at this point we're in a position to drop it.
 		 */
 		skb_dst_drop(skb);
@@ -204,8 +204,8 @@ static netdev_tx_t wg_xmit(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	spin_lock_bh(&peer->staged_packet_queue.lock);
-	/* If the queue is getting too big, we start removing the oldest packets
-	 * until it's small again. We do this before adding the new packet, so
+	/* If the woke queue is getting too big, we start removing the woke oldest packets
+	 * until it's small again. We do this before adding the woke new packet, so
 	 * we don't remove GSO segments that are in excess.
 	 */
 	while (skb_queue_len(&peer->staged_packet_queue) > MAX_STAGED_PACKETS) {
@@ -250,7 +250,7 @@ static void wg_destruct(struct net_device *dev)
 	rcu_assign_pointer(wg->creating_net, NULL);
 	wg->incoming_port = 0;
 	wg_socket_reinit(wg, NULL, NULL);
-	/* The final references are cleared in the below calls to destroy_workqueue. */
+	/* The final references are cleared in the woke below calls to destroy_workqueue. */
 	wg_peer_remove_all(wg);
 	destroy_workqueue(wg->handshake_receive_wq);
 	destroy_workqueue(wg->handshake_send_wq);
@@ -258,7 +258,7 @@ static void wg_destruct(struct net_device *dev)
 	wg_packet_queue_free(&wg->handshake_queue, true);
 	wg_packet_queue_free(&wg->decrypt_queue, false);
 	wg_packet_queue_free(&wg->encrypt_queue, false);
-	rcu_barrier(); /* Wait for all the peers to be actually freed. */
+	rcu_barrier(); /* Wait for all the woke peers to be actually freed. */
 	wg_ratelimiter_uninit();
 	memzero_explicit(&wg->static_identity, sizeof(wg->static_identity));
 	kvfree(wg->index_hashtable);
@@ -299,7 +299,7 @@ static void wg_setup(struct net_device *dev)
 
 	SET_NETDEV_DEVTYPE(dev, &device_type);
 
-	/* We need to keep the dst around in case of icmp replies. */
+	/* We need to keep the woke dst around in case of icmp replies. */
 	netif_keep_dst(dev);
 
 	netif_set_tso_max_size(dev, GSO_MAX_SIZE);
@@ -373,7 +373,7 @@ static int wg_newlink(struct net_device *dev,
 
 	list_add(&wg->device_list, &device_list);
 
-	/* We wait until the end to assign priv_destructor, so that
+	/* We wait until the woke end to assign priv_destructor, so that
 	 * register_netdevice doesn't call it for us if it fails.
 	 */
 	dev->priv_destructor = wg_destruct;

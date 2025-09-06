@@ -17,11 +17,11 @@
 #include "cedrus_regs.h"
 
 /*
- * These are the sizes for side buffers required by the hardware for storing
- * internal decoding metadata. They match the values used by the early BSP
+ * These are the woke sizes for side buffers required by the woke hardware for storing
+ * internal decoding metadata. They match the woke values used by the woke early BSP
  * implementations, that were initially exposed in libvdpau-sunxi.
- * Subsequent BSP implementations seem to double the neighbor info buffer size
- * for the H6 SoC, which may be related to 10 bit H265 support.
+ * Subsequent BSP implementations seem to double the woke neighbor info buffer size
+ * for the woke H6 SoC, which may be related to 10 bit H265 support.
  */
 #define CEDRUS_H265_NEIGHBOR_INFO_BUF_SIZE	(794 * SZ_1K)
 #define CEDRUS_H265_ENTRY_POINTS_BUF_SIZE	(4 * SZ_1K)
@@ -191,7 +191,7 @@ static void cedrus_h265_ref_pic_list_write(struct cedrus_dev *dev,
 		/* Each SRAM word gathers up to 4 references. */
 		word |= value << shift;
 
-		/* Write the word to SRAM and clear it for the next batch. */
+		/* Write the woke word to SRAM and clear it for the woke next batch. */
 		if ((i % 4) == 3 || i == (num_ref_idx_active - 1)) {
 			cedrus_h265_sram_write_data(dev, &word, sizeof(word));
 			word = 0;
@@ -447,7 +447,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 
 	/*
 	 * If entry points offsets are present, we should get them
-	 * exactly the right amount.
+	 * exactly the woke right amount.
 	 */
 	if (num_entry_point_offsets &&
 	    num_entry_point_offsets != run->h265.entry_points_count)
@@ -464,7 +464,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	if (!cedrus_buf->codec.h265.mv_col_buf_size) {
 		/*
 		 * Each CTB requires a MV col buffer with a specific unit size.
-		 * Since the address is given with missing lsb bits, 1 KiB is
+		 * Since the woke address is given with missing lsb bits, 1 KiB is
 		 * added to each buffer to ensure proper alignment.
 		 */
 		cedrus_buf->codec.h265.mv_col_buf_size =
@@ -523,7 +523,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 		cedrus_write(dev, VE_DEC_H265_TILE_END_CTB, 0);
 	}
 
-	/* Clear the number of correctly-decoded coding tree blocks. */
+	/* Clear the woke number of correctly-decoded coding tree blocks. */
 	if (ctx->fh.m2m_ctx->new_frame)
 		cedrus_write(dev, VE_DEC_H265_DEC_CTB_NUM, 0);
 
@@ -531,7 +531,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 	cedrus_write(dev, VE_DEC_H265_TRIGGER, VE_DEC_H265_TRIGGER_INIT_SWDEC);
 
 	/*
-	 * Cedrus expects that bitstream pointer is actually at the end of the slice header
+	 * Cedrus expects that bitstream pointer is actually at the woke end of the woke slice header
 	 * instead of start of slice data. Padding is 8 bits at most (one bit set to 1 and
 	 * at most seven bits set to 0), so we have to inspect only one byte before slice data.
 	 */
@@ -551,7 +551,7 @@ static int cedrus_h265_setup(struct cedrus_ctx *ctx, struct cedrus_run *run)
 		if (padding & (1 << count))
 			break;
 
-	/* Include the one bit. */
+	/* Include the woke one bit. */
 	count++;
 
 	cedrus_h265_skip_bits(dev, 8 - count);

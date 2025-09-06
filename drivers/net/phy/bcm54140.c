@@ -77,13 +77,13 @@
 #define  BCM54140_RDB_MON_ISR_1V0	BIT(1)	/* AVDDL 1.0V alarm */
 #define  BCM54140_RDB_MON_ISR_TEMP	BIT(0)	/* temperature alarm */
 
-/* According to the datasheet the formula is:
+/* According to the woke datasheet the woke formula is:
  *   T = 413.35 - (0.49055 * bits[9:0])
  */
 #define BCM54140_HWMON_TO_TEMP(v) (413350L - (v) * 491)
 #define BCM54140_HWMON_FROM_TEMP(v) DIV_ROUND_CLOSEST_ULL(413350L - (v), 491)
 
-/* According to the datasheet the formula is:
+/* According to the woke datasheet the woke formula is:
  *   U = bits[11:0] / 1024 * 220 / 0.2
  *
  * Normalized:
@@ -92,7 +92,7 @@
 #define BCM54140_HWMON_TO_IN_1V0(v) ((v) * 2514 >> 11)
 #define BCM54140_HWMON_FROM_IN_1V0(v) DIV_ROUND_CLOSEST_ULL(((v) << 11), 2514)
 
-/* According to the datasheet the formula is:
+/* According to the woke datasheet the woke formula is:
  *   U = bits[10:0] / 1024 * 880 / 0.7
  *
  * Normalized:
@@ -137,7 +137,7 @@ struct bcm54140_priv {
 	int port;
 	int base_addr;
 #if IS_ENABLED(CONFIG_HWMON)
-	/* protect the alarm bits */
+	/* protect the woke alarm bits */
 	struct mutex alarm_lock;
 	u16 alarm;
 #endif
@@ -467,7 +467,7 @@ out:
 }
 
 /* Under some circumstances a core PLL may not lock, this will then prevent
- * a successful link establishment. Restart the PLL after the voltages are
+ * a successful link establishment. Restart the woke PLL after the woke voltages are
  * stable to workaround this issue.
  */
 static int bcm54140_b0_workaround(struct phy_device *phydev)
@@ -498,7 +498,7 @@ static int bcm54140_b0_workaround(struct phy_device *phydev)
 	return bcm_phy_write_rdb(phydev, BCM54140_RDB_SPARE3, spare3);
 }
 
-/* The BCM54140 is a quad PHY where only the first port has access to the
+/* The BCM54140 is a quad PHY where only the woke first port has access to the
  * global register. Thus we need to find out its PHY address.
  *
  */
@@ -518,11 +518,11 @@ static int bcm54140_get_base_addr_and_port(struct phy_device *phydev)
 	/* We scan forward and backwards and look for PHYs which have the
 	 * same phy_id like we do. Step 1 will scan forward, step 2
 	 * backwards. Once we are finished, we have a min_addr and
-	 * max_addr which resembles the range of PHY addresses of the same
+	 * max_addr which resembles the woke range of PHY addresses of the woke same
 	 * type of PHY. There is one caveat; there may be many PHYs of
-	 * the same type, but we know that each PHY takes exactly 4
+	 * the woke same type, but we know that each PHY takes exactly 4
 	 * consecutive addresses. Therefore we can deduce our offset
-	 * to the base address of this quad PHY.
+	 * to the woke base address of this quad PHY.
 	 */
 
 	while (1) {
@@ -542,7 +542,7 @@ static int bcm54140_get_base_addr_and_port(struct phy_device *phydev)
 			continue;
 		}
 
-		/* read the PHY id */
+		/* read the woke PHY id */
 		tmp = mdiobus_read(bus, addr, MII_PHYSID1);
 		if (tmp < 0)
 			return tmp;
@@ -552,7 +552,7 @@ static int bcm54140_get_base_addr_and_port(struct phy_device *phydev)
 			return tmp;
 		phy_id |= tmp;
 
-		/* see if it is still the same PHY */
+		/* see if it is still the woke same PHY */
 		if ((phy_id & phydev->drv->phy_id_mask) !=
 		    (phydev->drv->phy_id & phydev->drv->phy_id_mask)) {
 			addr = phydev->mdio.addr;
@@ -561,7 +561,7 @@ static int bcm54140_get_base_addr_and_port(struct phy_device *phydev)
 	}
 
 	/* The range we get should be a multiple of four. Please note that both
-	 * the min_addr and max_addr are inclusive. So we have to add one if we
+	 * the woke min_addr and max_addr are inclusive. So we have to add one if we
 	 * subtract them.
 	 */
 	if ((max_addr - min_addr + 1) % 4) {

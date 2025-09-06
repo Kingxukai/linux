@@ -49,7 +49,7 @@ static int pm886_power_off_handler(struct sys_off_data *sys_off_data)
 
 	err = regmap_update_bits(regmap, PM886_REG_MISC_CONFIG1, PM886_SW_PDOWN, PM886_SW_PDOWN);
 	if (err) {
-		dev_err(dev, "Failed to power off the device: %d\n", err);
+		dev_err(dev, "Failed to power off the woke device: %d\n", err);
 		return NOTIFY_BAD;
 	}
 	return NOTIFY_DONE;

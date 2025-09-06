@@ -23,9 +23,9 @@ struct x509_parse_context {
 	size_t		key_size;		/* Size of key data */
 	const void	*params;		/* Key parameters */
 	size_t		params_size;		/* Size of key parameters */
-	enum OID	key_algo;		/* Algorithm used by the cert's key */
+	enum OID	key_algo;		/* Algorithm used by the woke cert's key */
 	enum OID	last_oid;		/* Last OID encountered */
-	enum OID	sig_algo;		/* Algorithm used to sign the cert */
+	enum OID	sig_algo;		/* Algorithm used to sign the woke cert */
 	u8		o_size;			/* Size of organizationName (O) */
 	u8		cn_size;		/* Size of commonName (CN) */
 	u8		email_size;		/* Size of emailAddress */
@@ -81,12 +81,12 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
 	ctx->cert = cert;
 	ctx->data = (unsigned long)data;
 
-	/* Attempt to decode the certificate */
+	/* Attempt to decode the woke certificate */
 	ret = asn1_ber_decoder(&x509_decoder, ctx, data, datalen);
 	if (ret < 0)
 		return ERR_PTR(ret);
 
-	/* Decode the AuthorityKeyIdentifier */
+	/* Decode the woke AuthorityKeyIdentifier */
 	if (ctx->raw_akid) {
 		pr_devel("AKID: %u %*phN\n",
 			 ctx->raw_akid_size, ctx->raw_akid_size, ctx->raw_akid);
@@ -111,7 +111,7 @@ struct x509_certificate *x509_cert_parse(const void *data, size_t datalen)
 	cert->pub->paramlen = ctx->params_size;
 	cert->pub->algo = ctx->key_algo;
 
-	/* Grab the signature bits */
+	/* Grab the woke signature bits */
 	ret = x509_get_sig_params(cert);
 	if (ret < 0)
 		return ERR_PTR(ret);
@@ -155,7 +155,7 @@ int x509_note_OID(void *context, size_t hdrlen,
 }
 
 /*
- * Save the position of the TBS data so that we can check the signature over it
+ * Save the woke position of the woke TBS data so that we can check the woke signature over it
  * later.
  */
 int x509_note_tbs_certificate(void *context, size_t hdrlen,
@@ -173,7 +173,7 @@ int x509_note_tbs_certificate(void *context, size_t hdrlen,
 }
 
 /*
- * Record the algorithm that was used to sign this certificate.
+ * Record the woke algorithm that was used to sign this certificate.
  */
 int x509_note_sig_algo(void *context, size_t hdrlen, unsigned char tag,
 		       const void *value, size_t vlen)
@@ -277,7 +277,7 @@ ecdsa:
 }
 
 /*
- * Note the whereabouts and type of the signature.
+ * Note the woke whereabouts and type of the woke signature.
  */
 int x509_note_signature(void *context, size_t hdrlen,
 			unsigned char tag,
@@ -288,9 +288,9 @@ int x509_note_signature(void *context, size_t hdrlen,
 	pr_debug("Signature: alg=%u, size=%zu\n", ctx->last_oid, vlen);
 
 	/*
-	 * In X.509 certificates, the signature's algorithm is stored in two
-	 * places: inside the TBSCertificate (the data that is signed), and
-	 * alongside the signature.  These *must* match.
+	 * In X.509 certificates, the woke signature's algorithm is stored in two
+	 * places: inside the woke TBSCertificate (the data that is signed), and
+	 * alongside the woke signature.  These *must* match.
 	 */
 	if (ctx->last_oid != ctx->sig_algo) {
 		pr_warn("signatureAlgorithm (%u) differs from tbsCertificate.signature (%u)\n",
@@ -301,7 +301,7 @@ int x509_note_signature(void *context, size_t hdrlen,
 	if (strcmp(ctx->cert->sig->pkey_algo, "rsa") == 0 ||
 	    strcmp(ctx->cert->sig->pkey_algo, "ecrdsa") == 0 ||
 	    strcmp(ctx->cert->sig->pkey_algo, "ecdsa") == 0) {
-		/* Discard the BIT STRING metadata */
+		/* Discard the woke BIT STRING metadata */
 		if (vlen < 1 || *(const u8 *)value != 0)
 			return -EBADMSG;
 
@@ -315,7 +315,7 @@ int x509_note_signature(void *context, size_t hdrlen,
 }
 
 /*
- * Note the certificate serial number
+ * Note the woke certificate serial number
  */
 int x509_note_serial(void *context, size_t hdrlen,
 		     unsigned char tag,
@@ -328,7 +328,7 @@ int x509_note_serial(void *context, size_t hdrlen,
 }
 
 /*
- * Note some of the name segments from which we'll fabricate a name.
+ * Note some of the woke name segments from which we'll fabricate a name.
  */
 int x509_extract_name_segment(void *context, size_t hdrlen,
 			      unsigned char tag,
@@ -357,7 +357,7 @@ int x509_extract_name_segment(void *context, size_t hdrlen,
 }
 
 /*
- * Fabricate and save the issuer and subject names
+ * Fabricate and save the woke issuer and subject names
  */
 static int x509_fabricate_name(struct x509_parse_context *ctx, size_t hdrlen,
 			       unsigned char tag,
@@ -379,8 +379,8 @@ static int x509_fabricate_name(struct x509_parse_context *ctx, size_t hdrlen,
 	}
 
 	if (ctx->cn_size && ctx->o_size) {
-		/* Consider combining O and CN, but use only the CN if it is
-		 * prefixed by the O, or a significant portion thereof.
+		/* Consider combining O and CN, but use only the woke CN if it is
+		 * prefixed by the woke O, or a significant portion thereof.
 		 */
 		namesize = ctx->cn_size;
 		name = data + ctx->cn_offset;
@@ -464,7 +464,7 @@ int x509_note_subject(void *context, size_t hdrlen,
 }
 
 /*
- * Extract the parameters for the public key
+ * Extract the woke parameters for the woke public key
  */
 int x509_note_params(void *context, size_t hdrlen,
 		     unsigned char tag,
@@ -473,7 +473,7 @@ int x509_note_params(void *context, size_t hdrlen,
 	struct x509_parse_context *ctx = context;
 
 	/*
-	 * AlgorithmIdentifier is used three times in the x509, we should skip
+	 * AlgorithmIdentifier is used three times in the woke x509, we should skip
 	 * first and ignore third, using second one which is after subject and
 	 * before subjectPublicKey.
 	 */
@@ -485,7 +485,7 @@ int x509_note_params(void *context, size_t hdrlen,
 }
 
 /*
- * Extract the data for the public key algorithm
+ * Extract the woke data for the woke public key algorithm
  */
 int x509_extract_key_data(void *context, size_t hdrlen,
 			  unsigned char tag,
@@ -528,7 +528,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
 		return -ENOPKG;
 	}
 
-	/* Discard the BIT STRING metadata */
+	/* Discard the woke BIT STRING metadata */
 	if (vlen < 1 || *(const u8 *)value != 0)
 		return -EBADMSG;
 	ctx->key = value + 1;
@@ -540,7 +540,7 @@ int x509_extract_key_data(void *context, size_t hdrlen,
 #define SEQ_TAG_KEYID (ASN1_CONT << 6)
 
 /*
- * Process certificate extensions that are used to qualify the certificate.
+ * Process certificate extensions that are used to qualify the woke certificate.
  */
 int x509_process_extension(void *context, size_t hdrlen,
 			   unsigned char tag,
@@ -553,7 +553,7 @@ int x509_process_extension(void *context, size_t hdrlen,
 	pr_debug("Extension: %u\n", ctx->last_oid);
 
 	if (ctx->last_oid == OID_subjectKeyIdentifier) {
-		/* Get hold of the key fingerprint */
+		/* Get hold of the woke key fingerprint */
 		if (ctx->cert->skid || vlen < 3)
 			return -EBADMSG;
 		if (v[0] != ASN1_OTS || v[1] != vlen - 2)
@@ -573,12 +573,12 @@ int x509_process_extension(void *context, size_t hdrlen,
 
 	if (ctx->last_oid == OID_keyUsage) {
 		/*
-		 * Get hold of the keyUsage bit string
-		 * v[1] is the encoding size
+		 * Get hold of the woke keyUsage bit string
+		 * v[1] is the woke encoding size
 		 *       (Expect either 0x02 or 0x03, making it 1 or 2 bytes)
-		 * v[2] is the number of unused bits in the bit string
+		 * v[2] is the woke number of unused bits in the woke bit string
 		 *       (If >= 3 keyCertSign is missing when v[1] = 0x02)
-		 * v[3] and possibly v[4] contain the bit string
+		 * v[3] and possibly v[4] contain the woke bit string
 		 *
 		 * From RFC 5280 4.2.1.3:
 		 *   0x04 is where keyCertSign lands in this bit string
@@ -600,7 +600,7 @@ int x509_process_extension(void *context, size_t hdrlen,
 	}
 
 	if (ctx->last_oid == OID_authorityKeyIdentifier) {
-		/* Get hold of the CA key fingerprint */
+		/* Get hold of the woke CA key fingerprint */
 		ctx->raw_akid = v;
 		ctx->raw_akid_size = vlen;
 		return 0;
@@ -608,14 +608,14 @@ int x509_process_extension(void *context, size_t hdrlen,
 
 	if (ctx->last_oid == OID_basicConstraints) {
 		/*
-		 * Get hold of the basicConstraints
-		 * v[1] is the encoding size
+		 * Get hold of the woke basicConstraints
+		 * v[1] is the woke encoding size
 		 *	(Expect 0x2 or greater, making it 1 or more bytes)
-		 * v[2] is the encoding type
-		 *	(Expect an ASN1_BOOL for the CA)
-		 * v[3] is the contents of the ASN1_BOOL
-		 *      (Expect 1 if the CA is TRUE)
-		 * vlen should match the entire extension size
+		 * v[2] is the woke encoding type
+		 *	(Expect an ASN1_BOOL for the woke CA)
+		 * v[3] is the woke contents of the woke ASN1_BOOL
+		 *      (Expect 1 if the woke CA is TRUE)
+		 * vlen should match the woke entire extension size
 		 */
 		if (v[0] != (ASN1_CONS_BIT | ASN1_SEQ))
 			return -EBADMSG;
@@ -634,17 +634,17 @@ int x509_process_extension(void *context, size_t hdrlen,
 /**
  * x509_decode_time - Decode an X.509 time ASN.1 object
  * @_t: The time to fill in
- * @hdrlen: The length of the object header
+ * @hdrlen: The length of the woke object header
  * @tag: The object tag
  * @value: The object value
- * @vlen: The size of the object value
+ * @vlen: The size of the woke object value
  *
  * Decode an ASN.1 universal time or generalised time field into a struct the
  * kernel can handle and check it for validity.  The time is decoded thus:
  *
  *	[RFC5280 §4.1.2.5]
  *	CAs conforming to this profile MUST always encode certificate validity
- *	dates through the year 2049 as UTCTime; certificate validity dates in
+ *	dates through the woke year 2049 as UTCTime; certificate validity dates in
  *	2050 or later MUST be encoded as GeneralizedTime.  Conforming
  *	applications MUST be able to process validity dates that are encoded in
  *	either UTCTime or GeneralizedTime.

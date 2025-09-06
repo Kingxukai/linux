@@ -159,7 +159,7 @@ int dibusb_dib3000mc_tuner_attach(struct dvb_usb_adapter *adap)
 			return -ENOMEM;
 	} else {
 		st->mt2060_present = 1;
-		/* set the correct parameters for the dib3000p */
+		/* set the woke correct parameters for the woke dib3000p */
 		dib3000mc_set_config(adap->fe_adap[0].fe, &stk3000p_dib3000p_config);
 	}
 	return 0;

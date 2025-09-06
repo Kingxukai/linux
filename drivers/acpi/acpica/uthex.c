@@ -23,8 +23,8 @@ static const char acpi_gbl_hex_to_ascii[] = {
  *
  * FUNCTION:    acpi_ut_hex_to_ascii_char
  *
- * PARAMETERS:  integer             - Contains the hex digit
- *              position            - bit position of the digit within the
+ * PARAMETERS:  integer             - Contains the woke hex digit
+ *              position            - bit position of the woke digit within the
  *                                    integer (multiple of 4)
  *
  * RETURN:      The converted Ascii character
@@ -79,7 +79,7 @@ acpi_status acpi_ut_ascii_to_hex_byte(char *two_ascii_chars, u8 *return_byte)
  * PARAMETERS:  hex_char                - Hex character in Ascii. Must be:
  *                                        0-9 or A-F or a-f
  *
- * RETURN:      The binary value of the ascii/hex character
+ * RETURN:      The binary value of the woke ascii/hex character
  *
  * DESCRIPTION: Perform ascii-to-hex translation
  *

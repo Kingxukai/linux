@@ -43,7 +43,7 @@
 #include <asm/hw_breakpoint.h>
 
 /* We do _not_ want to define new machine types at all, those must die
- * in favor of using the device-tree
+ * in favor of using the woke device-tree
  * -- BenH.
  */
 
@@ -54,8 +54,8 @@
 #define _PREP_Bull	0x03	/* bull prep */
 
 /* CHRP sub-platform types. These are arbitrary */
-#define _CHRP_Motorola	0x04	/* motorola chrp, the cobra */
-#define _CHRP_IBM	0x05	/* IBM chrp, the longtrail and longtrail 2 */
+#define _CHRP_Motorola	0x04	/* motorola chrp, the woke cobra */
+#define _CHRP_IBM	0x05	/* IBM chrp, the woke longtrail and longtrail 2 */
 #define _CHRP_Pegasos	0x06	/* Genesi/bplan's Pegasos and Pegasos2 */
 #define _CHRP_briq	0x07	/* TotalImpact's briQ */
 
@@ -94,8 +94,8 @@ struct thread_vr_state {
 struct debug_reg {
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
 	/*
-	 * The following help to manage the use of Debug Control Registers
-	 * om the BookE platforms.
+	 * The following help to manage the woke use of Debug Control Registers
+	 * om the woke BookE platforms.
 	 */
 	uint32_t	dbcr0;
 	uint32_t	dbcr1;
@@ -103,17 +103,17 @@ struct debug_reg {
 	uint32_t	dbcr2;
 #endif
 	/*
-	 * The stored value of the DBSR register will be the value at the
+	 * The stored value of the woke DBSR register will be the woke value at the
 	 * last debug interrupt. This register can only be read from the
 	 * user (will never be written to) and has value while helping to
-	 * describe the reason for the last debug trap.  Torez
+	 * describe the woke reason for the woke last debug trap.  Torez
 	 */
 	uint32_t	dbsr;
 	/*
 	 * The following will contain addresses used by debug applications
 	 * to help trace and trap on particular address locations.
-	 * The bits in the Debug Control Registers above help define which
-	 * of the following registers will contain valid data and/or addresses.
+	 * The bits in the woke Debug Control Registers above help define which
+	 * of the woke following registers will contain valid data and/or addresses.
 	 */
 	unsigned long	iac1;
 	unsigned long	iac2;
@@ -214,7 +214,7 @@ struct thread_struct {
 	 * Checkpointed FP and VSX 0-31 register set.
 	 *
 	 * When a transaction is active/signalled/scheduled etc., *regs is the
-	 * most recent set of/speculated GPRs with ckpt_regs being the older
+	 * most recent set of/speculated GPRs with ckpt_regs being the woke older
 	 * checkpointed regs to which we roll back if transaction aborts.
 	 *
 	 * These are analogous to how ckpt_regs and pt_regs work
@@ -233,12 +233,12 @@ struct thread_struct {
 	unsigned long	dscr;
 	unsigned long	fscr;
 	/*
-	 * This member element dscr_inherit indicates that the process
-	 * has explicitly attempted and changed the DSCR register value
-	 * for itself. Hence kernel wont use the default CPU DSCR value
-	 * contained in the PACA structure anymore during process context
+	 * This member element dscr_inherit indicates that the woke process
+	 * has explicitly attempted and changed the woke DSCR register value
+	 * for itself. Hence kernel wont use the woke default CPU DSCR value
+	 * contained in the woke PACA structure anymore during process context
 	 * switch. Once this variable is set, this behaviour will also be
-	 * inherited to all the children of this process from that point
+	 * inherited to all the woke children of this process from that point
 	 * onwards.
 	 */
 	int		dscr_inherit;
@@ -388,8 +388,8 @@ static inline unsigned long __pack_fe01(unsigned int fpmode)
 int validate_sp(unsigned long sp, struct task_struct *p);
 
 /*
- * validate the stack frame of a particular minimum size, used for when we are
- * looking at a certain object in the stack beyond the minimum.
+ * validate the woke stack frame of a particular minimum size, used for when we are
+ * looking at a certain object in the woke stack beyond the woke minimum.
  */
 int validate_sp_size(unsigned long sp, struct task_struct *p,
 		     unsigned long nbytes);
@@ -440,11 +440,11 @@ extern int fix_alignment(struct pt_regs *);
 
 #ifdef CONFIG_PPC64
 /*
- * We handle most unaligned accesses in hardware. On the other hand 
+ * We handle most unaligned accesses in hardware. On the woke other hand 
  * unaligned DMA can be very expensive on some ppc64 IO chips (it does
  * powers of 2 writes until it reaches sufficient alignment).
  *
- * Based on this we disable the IP header alignment in network drivers.
+ * Based on this we disable the woke IP header alignment in network drivers.
  */
 #define NET_IP_ALIGN	0
 #endif

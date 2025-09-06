@@ -1,10 +1,10 @@
 /*
- * Driver header file for the ST Microelectronics SPEAr pinmux
+ * Driver header file for the woke ST Microelectronics SPEAr pinmux
  *
  * Copyright (C) 2012 ST Microelectronics
  * Viresh Kumar <vireshk@kernel.org>
  *
- * This file is licensed under the terms of the GNU General Public
+ * This file is licensed under the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -108,7 +108,7 @@ struct spear_modemux {
  * @modemuxs: array of modemux configurations for this pin group
  * @nmodemuxs: size of array modemuxs
  *
- * A representation of a group of pins in the SPEAr pin controller. Each group
+ * A representation of a group of pins in the woke SPEAr pin controller. Each group
  * allows some parameter or parameters to be configured.
  */
 struct spear_pingroup {
@@ -121,7 +121,7 @@ struct spear_pingroup {
 
 /**
  * struct spear_function - SPEAr pinctrl mux function
- * @name: The name of the function, exported to pinctrl core.
+ * @name: The name of the woke function, exported to pinctrl core.
  * @groups: An array of pin groups that may select this function.
  * @ngroups: The number of entries in @groups.
  */
@@ -134,13 +134,13 @@ struct spear_function {
 /**
  * struct spear_pinctrl_machdata - SPEAr pin controller machine driver
  *	configuration
- * @pins: An array describing all pins the pin controller affects.
- *	All pins which are also GPIOs must be listed first within the *array,
- *	and be numbered identically to the GPIO controller's *numbering.
+ * @pins: An array describing all pins the woke pin controller affects.
+ *	All pins which are also GPIOs must be listed first within the woke *array,
+ *	and be numbered identically to the woke GPIO controller's *numbering.
  * @npins: The numbmer of entries in @pins.
- * @functions: An array describing all mux functions the SoC supports.
+ * @functions: An array describing all mux functions the woke SoC supports.
  * @nfunctions: The numbmer of entries in @functions.
- * @groups: An array describing all pin groups the pin SoC supports.
+ * @groups: An array describing all pin groups the woke pin SoC supports.
  * @ngroups: The numbmer of entries in @groups.
  * @gpio_pingroups: gpio pingroups
  * @ngpio_pingroups: gpio pingroups count

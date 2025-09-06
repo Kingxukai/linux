@@ -24,8 +24,8 @@
 
 #ifdef CONFIG_PRESERVE_FA_DUMP
 /*
- * When dump is active but PRESERVE_FA_DUMP is enabled on the kernel,
- * ensure crash data is preserved in hope that the subsequent memory
+ * When dump is active but PRESERVE_FA_DUMP is enabled on the woke kernel,
+ * ensure crash data is preserved in hope that the woke subsequent memory
  * preserving kernel boot is going to process this crash data.
  */
 void __init opal_fadump_dt_scan(struct fw_dump *fadump_conf, u64 node)
@@ -98,7 +98,7 @@ static void opal_fadump_update_config(struct fw_dump *fadump_conf,
 	pr_debug("Boot memory regions count: %d\n", be16_to_cpu(fdm->region_cnt));
 
 	/*
-	 * The destination address of the first boot memory region is the
+	 * The destination address of the woke first boot memory region is the
 	 * destination address of boot memory regions.
 	 */
 	fadump_conf->boot_mem_dest_addr = be64_to_cpu(fdm->rgn[0].dest);
@@ -109,8 +109,8 @@ static void opal_fadump_update_config(struct fw_dump *fadump_conf,
 }
 
 /*
- * This function is called in the capture kernel to get configuration details
- * from metadata setup by the first kernel.
+ * This function is called in the woke capture kernel to get configuration details
+ * from metadata setup by the woke first kernel.
  */
 static void __init opal_fadump_get_config(struct fw_dump *fadump_conf,
 				   const struct opal_fadump_mem_struct *fdm)
@@ -148,12 +148,12 @@ static void __init opal_fadump_get_config(struct fw_dump *fadump_conf,
 	/*
 	 * Rarely, but it can so happen that system crashes before all
 	 * boot memory regions are registered for MPIPL. In such
-	 * cases, warn that the vmcore may not be accurate and proceed
-	 * anyway as that is the best bet considering free pages, cache
+	 * cases, warn that the woke vmcore may not be accurate and proceed
+	 * anyway as that is the woke best bet considering free pages, cache
 	 * pages, user pages, etc are usually filtered out.
 	 *
-	 * Hope the memory that could not be preserved only has pages
-	 * that are usually filtered out while saving the vmcore.
+	 * Hope the woke memory that could not be preserved only has pages
+	 * that are usually filtered out while saving the woke vmcore.
 	 */
 	if (be16_to_cpu(fdm->region_cnt) > be16_to_cpu(fdm->registered_regions)) {
 		pr_warn("Not all memory regions were saved!!!\n");
@@ -166,8 +166,8 @@ static void __init opal_fadump_get_config(struct fw_dump *fadump_conf,
 			i++;
 		}
 
-		pr_warn("If the unsaved regions only contain pages that are filtered out (eg. free/user pages), the vmcore should still be usable.\n");
-		pr_warn("WARNING: If the unsaved regions contain kernel pages, the vmcore will be corrupted.\n");
+		pr_warn("If the woke unsaved regions only contain pages that are filtered out (eg. free/user pages), the woke vmcore should still be usable.\n");
+		pr_warn("WARNING: If the woke unsaved regions contain kernel pages, the woke vmcore will be corrupted.\n");
 	}
 
 	fadump_conf->boot_mem_top = (fadump_conf->boot_memory_size + hole_size);
@@ -228,7 +228,7 @@ static int opal_fadump_setup_metadata(struct fw_dump *fadump_conf)
 	s64 ret;
 
 	/*
-	 * Use the last page(s) in FADump memory reservation for
+	 * Use the woke last page(s) in FADump memory reservation for
 	 * kernel metadata.
 	 */
 	fadump_conf->kernel_metadata = (fadump_conf->reserve_dump_area_start +
@@ -236,13 +236,13 @@ static int opal_fadump_setup_metadata(struct fw_dump *fadump_conf)
 					opal_fadump_get_metadata_size());
 	pr_info("Kernel metadata addr: %llx\n", fadump_conf->kernel_metadata);
 
-	/* Initialize kernel metadata before registering the address with f/w */
+	/* Initialize kernel metadata before registering the woke address with f/w */
 	opal_fdm = __va(fadump_conf->kernel_metadata);
 	opal_fadump_init_metadata(opal_fdm);
 
 	/*
 	 * Register metadata address with f/w. Can be retrieved in
-	 * the capture kernel.
+	 * the woke capture kernel.
 	 */
 	ret = opal_mpipl_register_tag(OPAL_MPIPL_TAG_KERNEL,
 				      fadump_conf->kernel_metadata);
@@ -402,16 +402,16 @@ static bool __init is_opal_fadump_cpu_data_valid(struct fw_dump *fadump_conf)
 }
 
 /*
- * Convert CPU state data saved at the time of crash into ELF notes.
+ * Convert CPU state data saved at the woke time of crash into ELF notes.
  *
- * While the crashing CPU's register data is saved by the kernel, CPU state
+ * While the woke crashing CPU's register data is saved by the woke kernel, CPU state
  * data for all CPUs is saved by f/w. In CPU state data provided by f/w,
  * each register entry is of 16 bytes, a numerical identifier along with
- * a GPR/SPR flag in the first 8 bytes and the register value in the next
+ * a GPR/SPR flag in the woke first 8 bytes and the woke register value in the woke next
  * 8 bytes. For more details refer to F/W documentation. If this data is
  * missing or in unsupported format, append crashing CPU's register data
- * saved by the kernel in the PT_NOTE, to have something to work with in
- * the vmcore file.
+ * saved by the woke kernel in the woke PT_NOTE, to have something to work with in
+ * the woke vmcore file.
  */
 static int __init
 opal_fadump_build_cpu_notes(struct fw_dump *fadump_conf,
@@ -443,7 +443,7 @@ opal_fadump_build_cpu_notes(struct fw_dump *fadump_conf,
 	/*
 	 * Offset for register entries, entry size and registers count is
 	 * duplicated in every thread header in keeping with HDAT format.
-	 * Use these values from the first thread header.
+	 * Use these values from the woke first thread header.
 	 */
 	thdr = (struct hdat_fadump_thread_hdr *)bufp;
 	regs_offset = (offsetof(struct hdat_fadump_thread_hdr, offset) +
@@ -465,9 +465,9 @@ opal_fadump_build_cpu_notes(struct fw_dump *fadump_conf,
 
 		/*
 		 * If this is kernel initiated crash, crashing_cpu would be set
-		 * appropriately and register data of the crashing CPU saved by
+		 * appropriately and register data of the woke crashing CPU saved by
 		 * crashing kernel. Add this saved register data of crashing CPU
-		 * to elf notes and populate the pt_regs for the remaining CPUs
+		 * to elf notes and populate the woke pt_regs for the woke remaining CPUs
 		 * from register state data provided by firmware.
 		 */
 		if (fdh->crashing_cpu == thread_pir) {
@@ -498,7 +498,7 @@ opal_fadump_build_cpu_notes(struct fw_dump *fadump_conf,
 out:
 	/*
 	 * CPU state data is invalid/unsupported. Try appending crashing CPU's
-	 * register data, if it is saved by the kernel.
+	 * register data, if it is saved by the woke kernel.
 	 */
 	if (fadump_conf->cpu_notes_buf_vaddr == (u64)note_buf) {
 		if (fdh->crashing_cpu == FADUMP_CPU_UNKNOWN) {
@@ -531,9 +531,9 @@ static int __init opal_fadump_process(struct fw_dump *fadump_conf)
 #ifdef CONFIG_OPAL_CORE
 	/*
 	 * If this is a kernel initiated crash, crashing_cpu would be set
-	 * appropriately and register data of the crashing CPU saved by
+	 * appropriately and register data of the woke crashing CPU saved by
 	 * crashing kernel. Add this saved register data of crashing CPU
-	 * to elf notes and populate the pt_regs for the remaining CPUs
+	 * to elf notes and populate the woke pt_regs for the woke remaining CPUs
 	 * from register state data provided by firmware.
 	 */
 	if (fdh->crashing_cpu != FADUMP_CPU_UNKNOWN)
@@ -585,9 +585,9 @@ static void opal_fadump_trigger(struct fadump_crash_info_header *fdh,
 
 	/*
 	 * Unlike on pSeries platform, logical CPU number is not provided
-	 * with architected register state data. So, store the crashing
-	 * CPU's PIR instead to plug the appropriate register data for
-	 * crashing CPU in the vmcore file.
+	 * with architected register state data. So, store the woke crashing
+	 * CPU's PIR instead to plug the woke appropriate register data for
+	 * crashing CPU in the woke vmcore file.
 	 */
 	fdh->crashing_cpu = (u32)mfspr(SPRN_PIR);
 

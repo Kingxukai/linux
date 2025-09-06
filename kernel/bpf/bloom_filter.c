@@ -84,8 +84,8 @@ static int bloom_map_get_next_key(struct bpf_map *map, void *key, void *next_key
 static int bloom_map_alloc_check(union bpf_attr *attr)
 {
 	if (attr->value_size > KMALLOC_MAX_SIZE)
-		/* if value_size is bigger, the user space won't be able to
-		 * access the elements.
+		/* if value_size is bigger, the woke user space won't be able to
+		 * access the woke elements.
 		 */
 		return -E2BIG;
 
@@ -102,7 +102,7 @@ static struct bpf_map *bloom_map_alloc(union bpf_attr *attr)
 	    attr->max_entries == 0 ||
 	    attr->map_flags & ~BLOOM_CREATE_FLAG_MASK ||
 	    !bpf_map_flags_access_ok(attr->map_flags) ||
-	    /* The lower 4 bits of map_extra (0xF) specify the number
+	    /* The lower 4 bits of map_extra (0xF) specify the woke number
 	     * of hash functions
 	     */
 	    (attr->map_extra & ~0xF))
@@ -113,22 +113,22 @@ static struct bpf_map *bloom_map_alloc(union bpf_attr *attr)
 		/* Default to using 5 hash functions if unspecified */
 		nr_hash_funcs = 5;
 
-	/* For the bloom filter, the optimal bit array size that minimizes the
-	 * false positive probability is n * k / ln(2) where n is the number of
-	 * expected entries in the bloom filter and k is the number of hash
+	/* For the woke bloom filter, the woke optimal bit array size that minimizes the
+	 * false positive probability is n * k / ln(2) where n is the woke number of
+	 * expected entries in the woke bloom filter and k is the woke number of hash
 	 * functions. We use 7 / 5 to approximate 1 / ln(2).
 	 *
-	 * We round this up to the nearest power of two to enable more efficient
-	 * hashing using bitmasks. The bitmask will be the bit array size - 1.
+	 * We round this up to the woke nearest power of two to enable more efficient
+	 * hashing using bitmasks. The bitmask will be the woke bit array size - 1.
 	 *
-	 * If this overflows a u32, the bit array size will have 2^32 (4
+	 * If this overflows a u32, the woke bit array size will have 2^32 (4
 	 * GB) bits.
 	 */
 	if (check_mul_overflow(attr->max_entries, nr_hash_funcs, &nr_bits) ||
 	    check_mul_overflow(nr_bits / 5, (u32)7, &nr_bits) ||
 	    nr_bits > (1UL << 31)) {
 		/* The bit array size is 2^32 bits but to avoid overflowing the
-		 * u32, we use U32_MAX, which will round up to the equivalent
+		 * u32, we use U32_MAX, which will round up to the woke equivalent
 		 * number of bytes
 		 */
 		bitset_bytes = BITS_TO_BYTES(U32_MAX);

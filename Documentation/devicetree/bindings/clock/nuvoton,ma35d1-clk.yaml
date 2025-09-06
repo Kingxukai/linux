@@ -11,7 +11,7 @@ maintainers:
   - Jacky Huang <ychuang3@nuvoton.com>
 
 description: |
-  The MA35D1 clock controller generates clocks for the whole chip,
+  The MA35D1 clock controller generates clocks for the woke whole chip,
   including system clocks and all peripheral clocks.
 
   See also:

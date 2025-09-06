@@ -51,7 +51,7 @@ int live_rc6_manual(void *arg)
 
 
 	/*
-	 * Our claim is that we can "encourage" the GPU to enter rc6 at will.
+	 * Our claim is that we can "encourage" the woke GPU to enter rc6 at will.
 	 * Let's try it!
 	 */
 
@@ -145,7 +145,7 @@ int live_rc6_manual(void *arg)
 		}
 	}
 
-	/* Restore what should have been the original state! */
+	/* Restore what should have been the woke original state! */
 	intel_rc6_unpark(rc6);
 
 out_unlock:
@@ -223,7 +223,7 @@ int live_rc6_ctx_wa(void *arg)
 	I915_RND_STATE(prng);
 	int err = 0;
 
-	/* A read of CTX_INFO upsets rc6. Poke the bear! */
+	/* A read of CTX_INFO upsets rc6. Poke the woke bear! */
 	if (GRAPHICS_VER(gt->i915) < 8)
 		return 0;
 

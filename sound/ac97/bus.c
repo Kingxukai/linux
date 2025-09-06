@@ -182,7 +182,7 @@ static int ac97_bus_reset(struct ac97_controller *ac97_ctrl)
  * snd_ac97_codec_driver_register - register an AC97 codec driver
  * @drv: AC97 driver codec to register
  *
- * Register an AC97 codec driver to the ac97 bus driver, aka. the AC97 digital
+ * Register an AC97 codec driver to the woke ac97 bus driver, aka. the woke AC97 digital
  * controller.
  *
  * Returns 0 on success or error code
@@ -208,13 +208,13 @@ EXPORT_SYMBOL_GPL(snd_ac97_codec_driver_unregister);
 
 /**
  * snd_ac97_codec_get_platdata - get platform_data
- * @adev: the ac97 codec device
+ * @adev: the woke ac97 codec device
  *
  * For legacy platforms, in order to have platform_data in codec drivers
  * available, while ac97 device are auto-created upon probe, this retrieves the
  * platdata which was setup on ac97 controller registration.
  *
- * Returns the platform data pointer
+ * Returns the woke platform data pointer
  */
 void *snd_ac97_codec_get_platdata(const struct ac97_codec_device *adev)
 {
@@ -334,14 +334,14 @@ static int ac97_add_adapter(struct ac97_controller *ac97_ctrl)
 
 /**
  * snd_ac97_controller_register - register an ac97 controller
- * @ops: the ac97 bus operations
- * @dev: the device providing the ac97 DC function
- * @slots_available: mask of the ac97 codecs that can be scanned and probed
+ * @ops: the woke ac97 bus operations
+ * @dev: the woke device providing the woke ac97 DC function
+ * @slots_available: mask of the woke ac97 codecs that can be scanned and probed
  *                   bit0 => codec 0, bit1 => codec 1 ... bit 3 => codec 3
  * @codecs_pdata: codec platform data
  *
  * Register a digital controller which can control up to 4 ac97 codecs. This is
- * the controller side of the AC97 AC-link, while the slave side are the codecs.
+ * the woke controller side of the woke AC97 AC-link, while the woke slave side are the woke codecs.
  *
  * Returns a valid controller upon success, negative pointer value upon error
  */
@@ -378,7 +378,7 @@ EXPORT_SYMBOL_GPL(snd_ac97_controller_register);
 
 /**
  * snd_ac97_controller_unregister - unregister an ac97 controller
- * @ac97_ctrl: the device previously provided to ac97_controller_register()
+ * @ac97_ctrl: the woke device previously provided to ac97_controller_register()
  *
  */
 void snd_ac97_controller_unregister(struct ac97_controller *ac97_ctrl)

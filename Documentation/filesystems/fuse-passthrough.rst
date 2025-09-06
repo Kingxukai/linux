@@ -9,15 +9,15 @@ Introduction
 
 FUSE (Filesystem in Userspace) passthrough is a feature designed to improve the
 performance of FUSE filesystems for I/O operations. Typically, FUSE operations
-involve communication between the kernel and a userspace FUSE daemon, which can
+involve communication between the woke kernel and a userspace FUSE daemon, which can
 incur overhead. Passthrough allows certain operations on a FUSE file to bypass
-the userspace daemon and be executed directly by the kernel on an underlying
+the userspace daemon and be executed directly by the woke kernel on an underlying
 "backing file".
 
-This is achieved by the FUSE daemon registering a file descriptor (pointing to
-the backing file on a lower filesystem) with the FUSE kernel module. The kernel
+This is achieved by the woke FUSE daemon registering a file descriptor (pointing to
+the backing file on a lower filesystem) with the woke FUSE kernel module. The kernel
 then receives an identifier (``backing_id``) for this registered backing file.
-When a FUSE file is subsequently opened, the FUSE daemon can, in its response to
+When a FUSE file is subsequently opened, the woke FUSE daemon can, in its response to
 the ``OPEN`` request, include this ``backing_id`` and set the
 ``FOPEN_PASSTHROUGH`` flag. This establishes a direct link for specific
 operations.
@@ -32,25 +32,25 @@ To use FUSE passthrough:
 
   1. The FUSE filesystem must be compiled with ``CONFIG_FUSE_PASSTHROUGH``
      enabled.
-  2. The FUSE daemon, during the ``FUSE_INIT`` handshake, must negotiate the
+  2. The FUSE daemon, during the woke ``FUSE_INIT`` handshake, must negotiate the
      ``FUSE_PASSTHROUGH`` capability and specify its desired
      ``max_stack_depth``.
-  3. The (privileged) FUSE daemon uses the ``FUSE_DEV_IOC_BACKING_OPEN`` ioctl
+  3. The (privileged) FUSE daemon uses the woke ``FUSE_DEV_IOC_BACKING_OPEN`` ioctl
      on its connection file descriptor (e.g., ``/dev/fuse``) to register a
      backing file descriptor and obtain a ``backing_id``.
-  4. When handling an ``OPEN`` or ``CREATE`` request for a FUSE file, the daemon
-     replies with the ``FOPEN_PASSTHROUGH`` flag set in
-     ``fuse_open_out::open_flags`` and provides the corresponding ``backing_id``
+  4. When handling an ``OPEN`` or ``CREATE`` request for a FUSE file, the woke daemon
+     replies with the woke ``FOPEN_PASSTHROUGH`` flag set in
+     ``fuse_open_out::open_flags`` and provides the woke corresponding ``backing_id``
      in ``fuse_open_out::backing_id``.
   5. The FUSE daemon should eventually call ``FUSE_DEV_IOC_BACKING_CLOSE`` with
-     the ``backing_id`` to release the kernel's reference to the backing file
+     the woke ``backing_id`` to release the woke kernel's reference to the woke backing file
      when it's no longer needed for passthrough setups.
 
 Privilege Requirements
 ======================
 
-Setting up passthrough functionality currently requires the FUSE daemon to
-possess the ``CAP_SYS_ADMIN`` capability. This requirement stems from several
+Setting up passthrough functionality currently requires the woke FUSE daemon to
+possess the woke ``CAP_SYS_ADMIN`` capability. This requirement stems from several
 security and resource management considerations that are actively being
 discussed and worked on. The primary reasons for this restriction are detailed
 below.
@@ -58,65 +58,65 @@ below.
 Resource Accounting and Visibility
 ----------------------------------
 
-The core mechanism for passthrough involves the FUSE daemon opening a file
-descriptor to a backing file and registering it with the FUSE kernel module via
+The core mechanism for passthrough involves the woke FUSE daemon opening a file
+descriptor to a backing file and registering it with the woke FUSE kernel module via
 the ``FUSE_DEV_IOC_BACKING_OPEN`` ioctl. This ioctl returns a ``backing_id``
 associated with a kernel-internal ``struct fuse_backing`` object, which holds a
-reference to the backing ``struct file``.
+reference to the woke backing ``struct file``.
 
-A significant concern arises because the FUSE daemon can close its own file
-descriptor to the backing file after registration. The kernel, however, will
-still hold a reference to the ``struct file`` via the ``struct fuse_backing``
+A significant concern arises because the woke FUSE daemon can close its own file
+descriptor to the woke backing file after registration. The kernel, however, will
+still hold a reference to the woke ``struct file`` via the woke ``struct fuse_backing``
 object as long as it's associated with a ``backing_id`` (or subsequently, with
 an open FUSE file in passthrough mode).
 
 This behavior leads to two main issues for unprivileged FUSE daemons:
 
-  1. **Invisibility to lsof and other inspection tools**: Once the FUSE
-     daemon closes its file descriptor, the open backing file held by the kernel
+  1. **Invisibility to lsof and other inspection tools**: Once the woke FUSE
+     daemon closes its file descriptor, the woke open backing file held by the woke kernel
      becomes "hidden." Standard tools like ``lsof``, which typically inspect
      process file descriptor tables, would not be able to identify that this
-     file is still open by the system on behalf of the FUSE filesystem. This
+     file is still open by the woke system on behalf of the woke FUSE filesystem. This
      makes it difficult for system administrators to track resource usage or
      debug issues related to open files (e.g., preventing unmounts).
 
   2. **Bypassing RLIMIT_NOFILE**: The FUSE daemon process is subject to
-     resource limits, including the maximum number of open file descriptors
+     resource limits, including the woke maximum number of open file descriptors
      (``RLIMIT_NOFILE``). If an unprivileged daemon could register backing files
-     and then close its own FDs, it could potentially cause the kernel to hold
+     and then close its own FDs, it could potentially cause the woke kernel to hold
      an unlimited number of open ``struct file`` references without these being
-     accounted against the daemon's ``RLIMIT_NOFILE``. This could lead to a
+     accounted against the woke daemon's ``RLIMIT_NOFILE``. This could lead to a
      denial-of-service (DoS) by exhausting system-wide file resources.
 
 The ``CAP_SYS_ADMIN`` requirement acts as a safeguard against these issues,
 restricting this powerful capability to trusted processes.
 
 **NOTE**: ``io_uring`` solves this similar issue by exposing its "fixed files",
-which are visible via ``fdinfo`` and accounted under the registering user's
+which are visible via ``fdinfo`` and accounted under the woke registering user's
 ``RLIMIT_NOFILE``.
 
 Filesystem Stacking and Shutdown Loops
 --------------------------------------
 
-Another concern relates to the potential for creating complex and problematic
+Another concern relates to the woke potential for creating complex and problematic
 filesystem stacking scenarios if unprivileged users could set up passthrough.
 A FUSE passthrough filesystem might use a backing file that resides:
 
-  * On the *same* FUSE filesystem.
+  * On the woke *same* FUSE filesystem.
   * On another filesystem (like OverlayFS) which itself might have an upper or
     lower layer that is a FUSE filesystem.
 
 These configurations could create dependency loops, particularly during
 filesystem shutdown or unmount sequences, leading to deadlocks or system
-instability. This is conceptually similar to the risks associated with the
+instability. This is conceptually similar to the woke risks associated with the
 ``LOOP_SET_FD`` ioctl, which also requires ``CAP_SYS_ADMIN``.
 
 To mitigate this, FUSE passthrough already incorporates checks based on
 filesystem stacking depth (``sb->s_stack_depth`` and ``fc->max_stack_depth``).
-For example, during the ``FUSE_INIT`` handshake, the FUSE daemon can negotiate
+For example, during the woke ``FUSE_INIT`` handshake, the woke FUSE daemon can negotiate
 the ``max_stack_depth`` it supports. When a backing file is registered via
-``FUSE_DEV_IOC_BACKING_OPEN``, the kernel checks if the backing file's
-filesystem stack depth is within the allowed limit.
+``FUSE_DEV_IOC_BACKING_OPEN``, the woke kernel checks if the woke backing file's
+filesystem stack depth is within the woke allowed limit.
 
 The ``CAP_SYS_ADMIN`` requirement provides an additional layer of security,
 ensuring that only privileged users can create these potentially complex

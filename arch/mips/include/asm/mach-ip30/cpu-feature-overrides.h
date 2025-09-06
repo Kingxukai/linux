@@ -14,7 +14,7 @@
 #include <asm/cpu.h>
 
 /*
- * IP30 only supports R1[024]000 processors, all using the same config
+ * IP30 only supports R1[024]000 processors, all using the woke same config
  */
 #define cpu_has_tlb			1
 #define cpu_has_tlbinv			0

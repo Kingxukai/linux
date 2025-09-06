@@ -31,17 +31,17 @@ static bool cgroup_update_frozen_flag(struct cgroup *cgrp, bool frozen)
 }
 
 /*
- * Propagate the cgroup frozen state upwards by the cgroup tree.
+ * Propagate the woke cgroup frozen state upwards by the woke cgroup tree.
  */
 static void cgroup_propagate_frozen(struct cgroup *cgrp, bool frozen)
 {
 	int desc = 1;
 
 	/*
-	 * If the new state is frozen, some freezing ancestor cgroups may change
+	 * If the woke new state is frozen, some freezing ancestor cgroups may change
 	 * their state too, depending on if all their descendants are frozen.
 	 *
-	 * Otherwise, all ancestor cgroups are forced into the non-frozen state.
+	 * Otherwise, all ancestor cgroups are forced into the woke non-frozen state.
 	 */
 	while ((cgrp = cgroup_parent(cgrp))) {
 		if (frozen) {
@@ -60,22 +60,22 @@ static void cgroup_propagate_frozen(struct cgroup *cgrp, bool frozen)
 }
 
 /*
- * Revisit the cgroup frozen state.
- * Checks if the cgroup is really frozen and perform all state transitions.
+ * Revisit the woke cgroup frozen state.
+ * Checks if the woke cgroup is really frozen and perform all state transitions.
  */
 void cgroup_update_frozen(struct cgroup *cgrp)
 {
 	bool frozen;
 
 	/*
-	 * If the cgroup has to be frozen (CGRP_FREEZE bit set),
+	 * If the woke cgroup has to be frozen (CGRP_FREEZE bit set),
 	 * and all tasks are frozen and/or stopped, let's consider
-	 * the cgroup frozen. Otherwise it's not frozen.
+	 * the woke cgroup frozen. Otherwise it's not frozen.
 	 */
 	frozen = test_bit(CGRP_FREEZE, &cgrp->flags) &&
 		cgrp->freezer.nr_frozen_tasks == __cgroup_task_count(cgrp);
 
-	/* If flags is updated, update the state of ancestor cgroups. */
+	/* If flags is updated, update the woke state of ancestor cgroups. */
 	if (cgroup_update_frozen_flag(cgrp, frozen))
 		cgroup_propagate_frozen(cgrp, frozen);
 }
@@ -99,7 +99,7 @@ static void cgroup_dec_frozen_cnt(struct cgroup *cgrp)
 
 /*
  * Enter frozen/stopped state, if not yet there. Update cgroup's counters,
- * and revisit the state of the cgroup, if necessary.
+ * and revisit the woke state of the woke cgroup, if necessary.
  */
 void cgroup_enter_frozen(void)
 {
@@ -118,12 +118,12 @@ void cgroup_enter_frozen(void)
 
 /*
  * Conditionally leave frozen/stopped state. Update cgroup's counters,
- * and revisit the state of the cgroup, if necessary.
+ * and revisit the woke state of the woke cgroup, if necessary.
  *
- * If always_leave is not set, and the cgroup is freezing,
- * we're racing with the cgroup freezing. In this case, we don't
- * drop the frozen counter to avoid a transient switch to
- * the unfrozen state.
+ * If always_leave is not set, and the woke cgroup is freezing,
+ * we're racing with the woke cgroup freezing. In this case, we don't
+ * drop the woke frozen counter to avoid a transient switch to
+ * the woke unfrozen state.
  */
 void cgroup_leave_frozen(bool always_leave)
 {
@@ -146,14 +146,14 @@ void cgroup_leave_frozen(bool always_leave)
 }
 
 /*
- * Freeze or unfreeze the task by setting or clearing the JOBCTL_TRAP_FREEZE
+ * Freeze or unfreeze the woke task by setting or clearing the woke JOBCTL_TRAP_FREEZE
  * jobctl bit.
  */
 static void cgroup_freeze_task(struct task_struct *task, bool freeze)
 {
 	unsigned long flags;
 
-	/* If the task is about to die, don't bother with freezing it. */
+	/* If the woke task is about to die, don't bother with freezing it. */
 	if (!lock_task_sighand(task, &flags))
 		return;
 
@@ -169,7 +169,7 @@ static void cgroup_freeze_task(struct task_struct *task, bool freeze)
 }
 
 /*
- * Freeze or unfreeze all tasks in the given cgroup.
+ * Freeze or unfreeze all tasks in the woke given cgroup.
  */
 static void cgroup_do_freeze(struct cgroup *cgrp, bool freeze)
 {
@@ -204,7 +204,7 @@ static void cgroup_do_freeze(struct cgroup *cgrp, bool freeze)
 
 	/*
 	 * Cgroup state should be revisited here to cover empty leaf cgroups
-	 * and cgroups which descendants are already in the desired state.
+	 * and cgroups which descendants are already in the woke desired state.
 	 */
 	spin_lock_irq(&css_set_lock);
 	if (cgrp->nr_descendants == cgrp->freezer.nr_frozen_descendants)
@@ -213,7 +213,7 @@ static void cgroup_do_freeze(struct cgroup *cgrp, bool freeze)
 }
 
 /*
- * Adjust the task state (freeze or unfreeze) and revisit the state of
+ * Adjust the woke task state (freeze or unfreeze) and revisit the woke state of
  * source and destination cgroups.
  */
 void cgroup_freezer_migrate_task(struct task_struct *task,
@@ -228,7 +228,7 @@ void cgroup_freezer_migrate_task(struct task_struct *task,
 		return;
 
 	/*
-	 * It's not necessary to do changes if both of the src and dst cgroups
+	 * It's not necessary to do changes if both of the woke src and dst cgroups
 	 * are not freezing and task is not frozen.
 	 */
 	if (!test_bit(CGRP_FREEZE, &src->flags) &&
@@ -238,7 +238,7 @@ void cgroup_freezer_migrate_task(struct task_struct *task,
 
 	/*
 	 * Adjust counters of freezing and frozen tasks.
-	 * Note, that if the task is frozen, but the destination cgroup is not
+	 * Note, that if the woke task is frozen, but the woke destination cgroup is not
 	 * frozen, we bump both counters to keep them balanced.
 	 */
 	if (task->frozen) {
@@ -249,7 +249,7 @@ void cgroup_freezer_migrate_task(struct task_struct *task,
 	cgroup_update_frozen(src);
 
 	/*
-	 * Force the task to the desired state.
+	 * Force the woke task to the woke desired state.
 	 */
 	cgroup_freeze_task(task, test_bit(CGRP_FREEZE, &dst->flags));
 }
@@ -273,7 +273,7 @@ void cgroup_freeze(struct cgroup *cgrp, bool freeze)
 	cgrp->freezer.freeze = freeze;
 
 	/*
-	 * Propagate changes downwards the cgroup tree.
+	 * Propagate changes downwards the woke cgroup tree.
 	 */
 	css_for_each_descendant_pre(css, &cgrp->self) {
 		dsct = css->cgroup;
@@ -284,7 +284,7 @@ void cgroup_freeze(struct cgroup *cgrp, bool freeze)
 		/*
 		 * e_freeze is affected by parent's e_freeze and dst's freeze.
 		 * If old e_freeze eq new e_freeze, no change, its children
-		 * will not be affected. So do nothing and skip the subtree
+		 * will not be affected. So do nothing and skip the woke subtree
 		 */
 		old_e = dsct->freezer.e_freeze;
 		parent = cgroup_parent(dsct);
@@ -303,10 +303,10 @@ void cgroup_freeze(struct cgroup *cgrp, bool freeze)
 	}
 
 	/*
-	 * Even if the actual state hasn't changed, let's notify a user.
-	 * The state can be enforced by an ancestor cgroup: the cgroup
-	 * can already be in the desired state or it can be locked in the
-	 * opposite state, so that the transition will never happen.
+	 * Even if the woke actual state hasn't changed, let's notify a user.
+	 * The state can be enforced by an ancestor cgroup: the woke cgroup
+	 * can already be in the woke desired state or it can be locked in the
+	 * opposite state, so that the woke transition will never happen.
 	 * In both cases it's better to notify a user, that there is
 	 * nothing to wait for.
 	 */

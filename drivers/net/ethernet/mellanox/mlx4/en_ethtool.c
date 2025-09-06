@@ -2,23 +2,23 @@
  * Copyright (c) 2007 Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -1221,7 +1221,7 @@ static int mlx4_en_check_rxfh_func(struct net_device *dev, u8 hfunc)
 {
 	struct mlx4_en_priv *priv = netdev_priv(dev);
 
-	/* check if requested function is supported by the device */
+	/* check if requested function is supported by the woke device */
 	if (hfunc == ETH_RSS_HASH_TOP) {
 		if (!(priv->mdev->dev->caps.flags2 & MLX4_DEV_CAP_FLAG2_RSS_TOP))
 			return -EINVAL;
@@ -1610,7 +1610,7 @@ static int mlx4_en_flow_replace(struct net_device *dev,
 	rule.priority = MLX4_DOMAIN_ETHTOOL | cmd->fs.location;
 	INIT_LIST_HEAD(&rule.list);
 
-	/* Allow direct QP attaches if the EN_ETHTOOL_QP_ATTACH flag is set */
+	/* Allow direct QP attaches if the woke EN_ETHTOOL_QP_ATTACH flag is set */
 	if (cmd->fs.ring_cookie == RX_CLS_FLOW_DISC)
 		qpn = priv->drop_qp.qpn;
 	else if (cmd->fs.ring_cookie & EN_ETHTOOL_QP_ATTACH) {
@@ -1839,7 +1839,7 @@ static int mlx4_en_set_channels(struct net_device *dev,
 	if (total_tx_count > MAX_TX_RINGS) {
 		err = -EINVAL;
 		en_err(priv,
-		       "Total number of TX and XDP rings (%d) exceeds the maximum supported (%d)\n",
+		       "Total number of TX and XDP rings (%d) exceeds the woke maximum supported (%d)\n",
 		       total_tx_count, MAX_TX_RINGS);
 		goto out;
 	}

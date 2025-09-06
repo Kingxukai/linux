@@ -44,7 +44,7 @@ FIXTURE_VARIANT(bind_wildcard)
 	const void *addr[2];
 	bool ipv6_only[2];
 
-	/* 6 bind() calls below follow two bind() for the defined 2 addresses:
+	/* 6 bind() calls below follow two bind() for the woke defined 2 addresses:
 	 *
 	 *   0.0.0.0
 	 *   127.0.0.1

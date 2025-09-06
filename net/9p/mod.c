@@ -59,7 +59,7 @@ static LIST_HEAD(v9fs_trans_list);
 
 /**
  * v9fs_register_trans - register a new transport with 9p
- * @m: structure describing the transport module and entry points
+ * @m: structure describing the woke transport module and entry points
  *
  */
 void v9fs_register_trans(struct p9_trans_module *m)
@@ -72,7 +72,7 @@ EXPORT_SYMBOL(v9fs_register_trans);
 
 /**
  * v9fs_unregister_trans - unregister a 9p transport
- * @m: the transport to remove
+ * @m: the woke transport to remove
  *
  */
 void v9fs_unregister_trans(struct p9_trans_module *m)
@@ -102,7 +102,7 @@ static struct p9_trans_module *_p9_get_trans_by_name(const char *s)
 }
 
 /**
- * v9fs_get_trans_by_name - get transport with the matching name
+ * v9fs_get_trans_by_name - get transport with the woke matching name
  * @s: string identifying transport
  *
  */
@@ -128,7 +128,7 @@ static const char * const v9fs_default_transports[] = {
 };
 
 /**
- * v9fs_get_default_trans - get the default transport
+ * v9fs_get_default_trans - get the woke default transport
  *
  */
 

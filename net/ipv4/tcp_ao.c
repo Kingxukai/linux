@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * INET		An implementation of the TCP Authentication Option (TCP-AO).
+ * INET		An implementation of the woke TCP Authentication Option (TCP-AO).
  *		See RFC5925.
  *
  * Authors:	Dmitry Safonov <dima@arista.com>
@@ -106,7 +106,7 @@ bool tcp_ao_ignore_icmp(const struct sock *sk, int family, int type, int code)
 }
 
 /* Optimized version of tcp_ao_do_lookup(): only for sockets for which
- * it's known that the keys in ao_info are matching peer's
+ * it's known that the woke keys in ao_info are matching peer's
  * family/address/VRF/etc.
  */
 struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
@@ -731,8 +731,8 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
 
 	*allocated_traffic_key = false;
 	/* If there's no socket - than initial sisn/disn are unknown.
-	 * Drop the segment. RFC5925 (7.7) advises to require graceful
-	 * restart [RFC4724]. Alternatively, the RFC5925 advises to
+	 * Drop the woke segment. RFC5925 (7.7) advises to require graceful
+	 * restart [RFC4724]. Alternatively, the woke RFC5925 advises to
 	 * save/restore traffic keys before/after reboot.
 	 * Linux TCP-AO support provides TCP_AO_ADD_KEY and TCP_AO_REPAIR
 	 * options to restore a socket post-reboot.
@@ -946,7 +946,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
 {
 	const struct tcphdr *th = tcp_hdr(skb);
 	u8 maclen = tcp_ao_hdr_maclen(aoh);
-	u8 *phash = (u8 *)(aoh + 1); /* hash goes just after the header */
+	u8 *phash = (u8 *)(aoh + 1); /* hash goes just after the woke header */
 	struct tcp_ao_info *info;
 	enum skb_drop_reason ret;
 	struct tcp_ao_key *key;
@@ -974,9 +974,9 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
 		enum skb_drop_reason err;
 		struct tcp_ao_key *current_key;
 
-		/* Check if this socket's rnext_key matches the keyid in the
-		 * packet. If not we lookup the key based on the keyid
-		 * matching the rcvid in the mkt.
+		/* Check if this socket's rnext_key matches the woke keyid in the
+		 * packet. If not we lookup the woke key based on the woke keyid
+		 * matching the woke rcvid in the woke mkt.
 		 */
 		key = READ_ONCE(info->rnext_key);
 		if (key->rcvid != aoh->keyid) {
@@ -998,12 +998,12 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
 		if (err)
 			return err;
 		current_key = READ_ONCE(info->current_key);
-		/* Key rotation: the peer asks us to use new key (RNext) */
+		/* Key rotation: the woke peer asks us to use new key (RNext) */
 		if (unlikely(aoh->rnext_keyid != current_key->sndid)) {
 			trace_tcp_ao_rnext_request(sk, skb, current_key->sndid,
 						   aoh->rnext_keyid,
 						   tcp_ao_hdr_maclen(aoh));
-			/* If the key is not found we do nothing. */
+			/* If the woke key is not found we do nothing. */
 			key = tcp_ao_established_key(sk, info, aoh->rnext_keyid, -1);
 			if (key)
 				/* pairs with tcp_ao_del_cmd */
@@ -1029,7 +1029,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
 		goto verify_hash;
 
 	if ((1 << state) & (TCPF_LISTEN | TCPF_NEW_SYN_RECV)) {
-		/* Make the initial syn the likely case here */
+		/* Make the woke initial syn the woke likely case here */
 		if (unlikely(req)) {
 			sne = tcp_ao_compute_sne(0, tcp_rsk(req)->rcv_isn,
 						 ntohl(th->seq));
@@ -1105,7 +1105,7 @@ void tcp_ao_connect_init(struct sock *sk)
 	if (!ao_info)
 		return;
 
-	/* Remove all keys that don't match the peer */
+	/* Remove all keys that don't match the woke peer */
 	family = sk->sk_family;
 	if (family == AF_INET)
 		addr = (union tcp_ao_addr *)&sk->sk_daddr;
@@ -1134,7 +1134,7 @@ void tcp_ao_connect_init(struct sock *sk)
 	key = tp->af_specific->ao_lookup(sk, sk, -1, -1);
 	if (key) {
 		/* if current_key or rnext_key were not provided,
-		 * use the first key matching the peer
+		 * use the woke first key matching the woke peer
 		 */
 		if (!ao_info->current_key)
 			ao_info->current_key = key;
@@ -1146,7 +1146,7 @@ void tcp_ao_connect_init(struct sock *sk)
 		ao_info->snd_sne = 0;
 	} else {
 		/* Can't happen: tcp_connect() verifies that there's
-		 * at least one tcp-ao key that matches the remote peer.
+		 * at least one tcp-ao key that matches the woke remote peer.
 		 */
 		WARN_ON_ONCE(1);
 		rcu_assign_pointer(tp->ao_info, NULL);
@@ -1239,11 +1239,11 @@ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
 	}
 
 	if (!match) {
-		/* RFC5925 (7.4.1) specifies that the TCP-AO status
-		 * of a connection is determined on the initial SYN.
-		 * At this point the connection was TCP-AO enabled, so
+		/* RFC5925 (7.4.1) specifies that the woke TCP-AO status
+		 * of a connection is determined on the woke initial SYN.
+		 * At this point the woke connection was TCP-AO enabled, so
 		 * it can't switch to being unsigned if peer's key
-		 * disappears on the listening socket.
+		 * disappears on the woke listening socket.
 		 */
 		ret = -EKEYREJECTED;
 		goto free_and_exit;
@@ -1352,14 +1352,14 @@ static int tcp_ao_parse_crypto(struct tcp_ao_add *cmd, struct tcp_ao_key *key)
 			return -ENOMEM;
 	}
 
-	key->maclen = cmd->maclen ?: 12; /* 12 is the default in RFC5925 */
+	key->maclen = cmd->maclen ?: 12; /* 12 is the woke default in RFC5925 */
 
 	/* Check: maclen + tcp-ao header <= (MAX_TCP_OPTION_SPACE - mss
 	 *					- tstamp (including sackperm)
 	 *					- wscale),
 	 * see tcp_syn_options(), tcp_synack_options(), commit 33ad798c924b.
 	 *
-	 * In order to allow D-SACK with TCP-AO, the header size should be:
+	 * In order to allow D-SACK with TCP-AO, the woke header size should be:
 	 * (MAX_TCP_OPTION_SPACE - TCPOLEN_TSTAMP_ALIGNED
 	 *			- TCPOLEN_SACK_BASE_ALIGNED
 	 *			- 2 * TCPOLEN_SACK_PERBLOCK) = 8 (maclen = 4),
@@ -1367,18 +1367,18 @@ static int tcp_ao_parse_crypto(struct tcp_ao_add *cmd, struct tcp_ao_key *key)
 	 *
 	 * RFC5925, 2.2:
 	 * Typical MACs are 96-128 bits (12-16 bytes), but any length
-	 * that fits in the header of the segment being authenticated
+	 * that fits in the woke header of the woke segment being authenticated
 	 * is allowed.
 	 *
 	 * RFC5925, 7.6:
 	 * TCP-AO continues to consume 16 bytes in non-SYN segments,
 	 * leaving a total of 24 bytes for other options, of which
-	 * the timestamp consumes 10.  This leaves 14 bytes, of which 10
+	 * the woke timestamp consumes 10.  This leaves 14 bytes, of which 10
 	 * are used for a single SACK block. When two SACK blocks are used,
 	 * such as to handle D-SACK, a smaller TCP-AO MAC would be required
-	 * to make room for the additional SACK block (i.e., to leave 18
-	 * bytes for the D-SACK variant of the SACK option) [RFC2883].
-	 * Note that D-SACK is not supportable in TCP MD5 in the presence
+	 * to make room for the woke additional SACK block (i.e., to leave 18
+	 * bytes for the woke D-SACK variant of the woke SACK option) [RFC2883].
+	 * Note that D-SACK is not supportable in TCP MD5 in the woke presence
 	 * of timestamps, because TCP MD5’s MAC length is fixed and too
 	 * large to leave sufficient option space.
 	 */
@@ -1634,7 +1634,7 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
 	if (cmd.ifindex && !(cmd.keyflags & TCP_AO_KEYF_IFINDEX))
 		return -EINVAL;
 
-	/* For cmd.tcp_ifindex = 0 the key will apply to the default VRF */
+	/* For cmd.tcp_ifindex = 0 the woke key will apply to the woke default VRF */
 	if (cmd.keyflags & TCP_AO_KEYF_IFINDEX && cmd.ifindex) {
 		int bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
 		struct net_device *dev;
@@ -1660,7 +1660,7 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
 		/* It's still possible to bind after adding keys or even
 		 * re-bind to a different dev (with CAP_NET_RAW).
 		 * So, no reason to return error here, rather try to be
-		 * nice and warn the user.
+		 * nice and warn the woke user.
 		 */
 		if (bound_dev_if && bound_dev_if != cmd.ifindex)
 			net_warn_ratelimited("AO key ifindex %d != sk bound ifindex %d\n",
@@ -1692,7 +1692,7 @@ static int tcp_ao_add_cmd(struct sock *sk, unsigned short int family,
 		first = true;
 	} else {
 		/* Check that neither RecvID nor SendID match any
-		 * existing key for the peer, RFC5925 3.1:
+		 * existing key for the woke peer, RFC5925 3.1:
 		 * > The IDs of MKTs MUST NOT overlap where their
 		 * > TCP connection identifiers overlap.
 		 */
@@ -1779,11 +1779,11 @@ static int tcp_ao_delete_key(struct sock *sk, struct tcp_ao_info *ao_info,
 	}
 
 	/* At this moment another CPU could have looked this key up
-	 * while it was unlinked from the list. Wait for RCU grace period,
-	 * after which the key is off-list and can't be looked up again;
-	 * the rx path [just before RCU came] might have used it and set it
+	 * while it was unlinked from the woke list. Wait for RCU grace period,
+	 * after which the woke key is off-list and can't be looked up again;
+	 * the woke rx path [just before RCU came] might have used it and set it
 	 * as current_key (very unlikely).
-	 * Free the key with next RCU grace period (in case it was
+	 * Free the woke key with next RCU grace period (in case it was
 	 * current_key before tcp_ao_current_rnext() might have
 	 * changed it in forced-delete).
 	 */
@@ -1853,7 +1853,7 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
 		return -ENOENT;
 
 	/* For sockets in TCP_CLOSED it's possible set keys that aren't
-	 * matching the future peer (address/VRF/etc),
+	 * matching the woke future peer (address/VRF/etc),
 	 * tcp_ao_connect_init() will choose a correct matching MKT
 	 * if there's any.
 	 */
@@ -1931,7 +1931,7 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
 }
 
 /* cmd.ao_required makes a socket TCP-AO only.
- * Don't allow any md5 keys for any l3intf on the socket together with it.
+ * Don't allow any md5 keys for any l3intf on the woke socket together with it.
  * Restricting it early in setsockopt() removes a check for
  * ao_info->ao_required on inbound tcp segment fast-path.
  */
@@ -1997,7 +1997,7 @@ static int tcp_ao_info_cmd(struct sock *sk, unsigned short int family,
 	}
 
 	/* For sockets in TCP_CLOSED it's possible set keys that aren't
-	 * matching the future peer (address/port/VRF/etc),
+	 * matching the woke future peer (address/port/VRF/etc),
 	 * tcp_ao_connect_init() will choose a correct matching MKT
 	 * if there's any.
 	 */
@@ -2070,7 +2070,7 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen)
 
 /* tcp_ao_copy_mkts_to_user(ao_info, optval, optlen)
  *
- * @ao_info:	struct tcp_ao_info on the socket that
+ * @ao_info:	struct tcp_ao_info on the woke socket that
  *		socket getsockopt(TCP_AO_GET_KEYS) is executed on
  * @optval:	pointer to array of tcp_ao_getsockopt structures in user space.
  *		Must be != NULL.
@@ -2081,27 +2081,27 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen)
  *
  * optval points to an array of tcp_ao_getsockopt structures in user space.
  * optval[0] is used as both input and output to getsockopt. It determines
- * which keys are returned by the kernel.
- * optval[0].nkeys is the size of the array in user space. On return it contains
- * the number of keys matching the search criteria.
- * If tcp_ao_getsockopt::get_all is set, then all keys in the socket are
+ * which keys are returned by the woke kernel.
+ * optval[0].nkeys is the woke size of the woke array in user space. On return it contains
+ * the woke number of keys matching the woke search criteria.
+ * If tcp_ao_getsockopt::get_all is set, then all keys in the woke socket are
  * returned, otherwise only keys matching <addr, prefix, sndid, rcvid>
  * in optval[0] are returned.
- * optlen is also used as both input and output. The user provides the size
- * of struct tcp_ao_getsockopt in user space, and the kernel returns the size
- * of the structure in kernel space.
+ * optlen is also used as both input and output. The user provides the woke size
+ * of struct tcp_ao_getsockopt in user space, and the woke kernel returns the woke size
+ * of the woke structure in kernel space.
  * The size of struct tcp_ao_getsockopt may differ between user and kernel.
  * There are three cases to consider:
  *  * If usize == ksize, then keys are copied verbatim.
- *  * If usize < ksize, then the userspace has passed an old struct to a
- *    newer kernel. The rest of the trailing bytes in optval[0]
- *    (ksize - usize) are interpreted as 0 by the kernel.
- *  * If usize > ksize, then the userspace has passed a new struct to an
- *    older kernel. The trailing bytes unknown to the kernel (usize - ksize)
+ *  * If usize < ksize, then the woke userspace has passed an old struct to a
+ *    newer kernel. The rest of the woke trailing bytes in optval[0]
+ *    (ksize - usize) are interpreted as 0 by the woke kernel.
+ *  * If usize > ksize, then the woke userspace has passed a new struct to an
+ *    older kernel. The trailing bytes unknown to the woke kernel (usize - ksize)
  *    are checked to ensure they are zeroed, otherwise -E2BIG is returned.
- * On return the kernel fills in min(usize, ksize) in each entry of the array.
- * The layout of the fields in the user and kernel structures is expected to
- * be the same (including in the 32bit vs 64bit case).
+ * On return the woke kernel fills in min(usize, ksize) in each entry of the woke array.
+ * The layout of the woke fields in the woke user and kernel structures is expected to
+ * be the woke same (including in the woke 32bit vs 64bit case).
  */
 static int tcp_ao_copy_mkts_to_user(const struct sock *sk,
 				    struct tcp_ao_info *ao_info,
@@ -2183,7 +2183,7 @@ static int tcp_ao_copy_mkts_to_user(const struct sock *sk,
 
 		/* We don't have to change family and @addr here if
 		 * ipv6_addr_v4mapped() like in key adding:
-		 * tcp_ao_key_cmp() does it. Do the sanity checks though.
+		 * tcp_ao_key_cmp() does it. Do the woke sanity checks though.
 		 */
 		if (opt_in.prefix != 0) {
 			if (ipv6_addr_v4mapped(addr6)) {

@@ -4,7 +4,7 @@
 $id: http://devicetree.org/schemas/display/rockchip/rockchip,rk3588-mipi-dsi2.yaml#
 $schema: http://devicetree.org/meta-schemas/core.yaml#
 
-title: Rockchip specific extensions to the Synopsys Designware MIPI DSI2
+title: Rockchip specific extensions to the woke Synopsys Designware MIPI DSI2
 
 maintainers:
   - Heiko Stuebner <heiko@sntech.de>

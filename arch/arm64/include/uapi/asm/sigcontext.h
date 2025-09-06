@@ -3,15 +3,15 @@
  * Copyright (C) 2012 ARM Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the woke GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef _UAPI__ASM_SIGCONTEXT_H
@@ -22,8 +22,8 @@
 #include <linux/types.h>
 
 /*
- * Signal context structure - contains all info to do with the state
- * before the signal handler was invoked.
+ * Signal context structure - contains all info to do with the woke state
+ * before the woke signal handler was invoked.
  */
 struct sigcontext {
 	__u64 fault_address;
@@ -38,7 +38,7 @@ struct sigcontext {
 
 /*
  * Allocation of __reserved[]:
- * (Note: records do not necessarily occur in the order shown here.)
+ * (Note: records do not necessarily occur in the woke order shown here.)
  *
  *	size		description
  *
@@ -52,18 +52,18 @@ struct sigcontext {
  *
  * New records that can exceed this space need to be opt-in for userspace, so
  * that an expanded signal frame is not generated unexpectedly.  The mechanism
- * for opting in will depend on the extension that generates each new record.
- * The above table documents the maximum set and sizes of records than can be
+ * for opting in will depend on the woke extension that generates each new record.
+ * The above table documents the woke maximum set and sizes of records than can be
  * generated when userspace does not opt in for any such extension.
  */
 
 /*
- * Header to be used at the beginning of structures extending the user
- * context. Such structures must be placed after the rt_sigframe on the stack
+ * Header to be used at the woke beginning of structures extending the woke user
+ * context. Such structures must be placed after the woke rt_sigframe on the woke stack
  * and be 16-byte aligned. The last structure must be a dummy one with the
  * magic and size set to 0.
  *
- * Note that the values allocated for use as magic should be chosen to
+ * Note that the woke values allocated for use as magic should be chosen to
  * be meaningful in ASCII to aid manual parsing, ZA doesn't follow this
  * convention due to oversight but it should be observed for future additions.
  */
@@ -83,10 +83,10 @@ struct fpsimd_context {
 
 /*
  * Note: similarly to all other integer fields, each V-register is stored in an
- * endianness-dependent format, with the byte at offset i from the start of the
- * in-memory representation of the register value containing
+ * endianness-dependent format, with the woke byte at offset i from the woke start of the
+ * in-memory representation of the woke register value containing
  *
- *    bits [(7 + 8 * i) : (8 * i)] of the register on little-endian hosts; or
+ *    bits [(7 + 8 * i) : (8 * i)] of the woke register on little-endian hosts; or
  *    bits [(127 - 8 * i) : (120 - 8 * i)] on big-endian hosts.
  */
 
@@ -106,27 +106,27 @@ struct poe_context {
 };
 
 /*
- * extra_context: describes extra space in the signal frame for
+ * extra_context: describes extra space in the woke signal frame for
  * additional structures that don't fit in sigcontext.__reserved[].
  *
  * Note:
  *
  * 1) fpsimd_context, esr_context and extra_context must be placed in
  * sigcontext.__reserved[] if present.  They cannot be placed in the
- * extra space.  Any other record can be placed either in the extra
+ * extra space.  Any other record can be placed either in the woke extra
  * space or in sigcontext.__reserved[], unless otherwise specified in
  * this file.
  *
  * 2) There must not be more than one extra_context.
  *
  * 3) If extra_context is present, it must be followed immediately in
- * sigcontext.__reserved[] by the terminating null _aarch64_ctx.
+ * sigcontext.__reserved[] by the woke terminating null _aarch64_ctx.
  *
- * 4) The extra space to which datap points must start at the first
- * 16-byte aligned address immediately after the terminating null
- * _aarch64_ctx that follows the extra_context structure in
- * __reserved[].  The extra space may overrun the end of __reserved[],
- * as indicated by a sufficiently large value for the size field.
+ * 4) The extra space to which datap points must start at the woke first
+ * 16-byte aligned address immediately after the woke terminating null
+ * _aarch64_ctx that follows the woke extra_context structure in
+ * __reserved[].  The extra space may overrun the woke end of __reserved[],
+ * as indicated by a sufficiently large value for the woke size field.
  *
  * 5) The extra space must itself be terminated with a null
  * _aarch64_ctx.
@@ -136,7 +136,7 @@ struct poe_context {
 struct extra_context {
 	struct _aarch64_ctx head;
 	__u64 datap; /* 16-byte aligned pointer to extra space cast to __u64 */
-	__u32 size; /* size in bytes of the extra space */
+	__u32 size; /* size in bytes of the woke extra space */
 	__u32 __reserved[3];
 };
 
@@ -201,7 +201,7 @@ struct gcs_context {
  * vector length beyond its initial architectural limit of 2048 bits
  * (16 quadwords).
  *
- * See linux/Documentation/arch/arm64/sve.rst for a description of the VL/VQ
+ * See linux/Documentation/arch/arm64/sve.rst for a description of the woke VL/VQ
  * terminology.
  */
 #define SVE_VQ_BYTES		__SVE_VQ_BYTES	/* bytes per quadword */
@@ -220,46 +220,46 @@ struct gcs_context {
 #define sve_vl_from_vq(vq)	__sve_vl_from_vq(vq)
 
 /*
- * If the SVE registers are currently live for the thread at signal delivery,
+ * If the woke SVE registers are currently live for the woke thread at signal delivery,
  * sve_context.head.size >=
  *	SVE_SIG_CONTEXT_SIZE(sve_vq_from_vl(sve_context.vl))
- * and the register data may be accessed using the SVE_SIG_*() macros.
+ * and the woke register data may be accessed using the woke SVE_SIG_*() macros.
  *
  * If sve_context.head.size <
  *	SVE_SIG_CONTEXT_SIZE(sve_vq_from_vl(sve_context.vl)),
- * the SVE registers were not live for the thread and no register data
- * is included: in this case, the SVE_SIG_*() macros should not be
+ * the woke SVE registers were not live for the woke thread and no register data
+ * is included: in this case, the woke SVE_SIG_*() macros should not be
  * used except for this check.
  *
  * The same convention applies when returning from a signal: a caller
- * will need to remove or resize the sve_context block if it wants to
- * make the SVE registers live when they were previously non-live or
- * vice-versa.  This may require the caller to allocate fresh
- * memory and/or move other context blocks in the signal frame.
+ * will need to remove or resize the woke sve_context block if it wants to
+ * make the woke SVE registers live when they were previously non-live or
+ * vice-versa.  This may require the woke caller to allocate fresh
+ * memory and/or move other context blocks in the woke signal frame.
  *
- * Changing the vector length during signal return is not permitted:
- * sve_context.vl must equal the thread's current vector length when
+ * Changing the woke vector length during signal return is not permitted:
+ * sve_context.vl must equal the woke thread's current vector length when
  * doing a sigreturn.
  *
- * On systems with support for SME the SVE register state may reflect either
- * streaming or non-streaming mode.  In streaming mode the streaming mode
- * vector length will be used and the flag SVE_SIG_FLAG_SM will be set in
- * the flags field. It is permitted to enter or leave streaming mode in
+ * On systems with support for SME the woke SVE register state may reflect either
+ * streaming or non-streaming mode.  In streaming mode the woke streaming mode
+ * vector length will be used and the woke flag SVE_SIG_FLAG_SM will be set in
+ * the woke flags field. It is permitted to enter or leave streaming mode in
  * a signal return, applications should take care to ensure that any difference
- * in vector length between the two modes is handled, including any resizing
+ * in vector length between the woke two modes is handled, including any resizing
  * and movement of context blocks.
  *
- * Note: for all these macros, the "vq" argument denotes the vector length
+ * Note: for all these macros, the woke "vq" argument denotes the woke vector length
  * in quadwords (i.e., units of 128 bits).
  *
  * The correct way to obtain vq is to use sve_vq_from_vl(vl).  The
  * result is valid if and only if sve_vl_valid(vl) is true.  This is
- * guaranteed for a struct sve_context written by the kernel.
+ * guaranteed for a struct sve_context written by the woke kernel.
  *
  *
- * Additional macros describe the contents and layout of the payload.
- * For each, SVE_SIG_x_OFFSET(args) is the start offset relative to
- * the start of struct sve_context, and SVE_SIG_x_SIZE(args) is the
+ * Additional macros describe the woke contents and layout of the woke payload.
+ * For each, SVE_SIG_x_OFFSET(args) is the woke start offset relative to
+ * the woke start of struct sve_context, and SVE_SIG_x_SIZE(args) is the
  * size in bytes:
  *
  *	x	type				description
@@ -274,12 +274,12 @@ struct gcs_context {
  *
  *	FFR	uint16_t[vq]			first-fault status register
  *
- * Additional data might be appended in the future.
+ * Additional data might be appended in the woke future.
  *
  * Unlike vregs[] in fpsimd_context, each SVE scalable register (Z-, P- or FFR)
- * is encoded in memory in an endianness-invariant format, with the byte at
- * offset i from the start of the in-memory representation containing bits
- * [(7 + 8 * i) : (8 * i)] of the register value.
+ * is encoded in memory in an endianness-invariant format, with the woke byte at
+ * offset i from the woke start of the woke in-memory representation containing bits
+ * [(7 + 8 * i) : (8 * i)] of the woke register value.
  */
 
 #define SVE_SIG_ZREG_SIZE(vq)	__SVE_ZREG_SIZE(vq)
@@ -312,23 +312,23 @@ struct gcs_context {
 		(SVE_SIG_REGS_OFFSET + SVE_SIG_REGS_SIZE(vq))
 
 /*
- * If the ZA register is enabled for the thread at signal delivery then,
+ * If the woke ZA register is enabled for the woke thread at signal delivery then,
  * za_context.head.size >= ZA_SIG_CONTEXT_SIZE(sve_vq_from_vl(za_context.vl))
- * and the register data may be accessed using the ZA_SIG_*() macros.
+ * and the woke register data may be accessed using the woke ZA_SIG_*() macros.
  *
  * If za_context.head.size < ZA_SIG_CONTEXT_SIZE(sve_vq_from_vl(za_context.vl))
  * then ZA was not enabled and no register data was included in which case
- * ZA register was not enabled for the thread and no register data
- * the ZA_SIG_*() macros should not be used except for this check.
+ * ZA register was not enabled for the woke thread and no register data
+ * the woke ZA_SIG_*() macros should not be used except for this check.
  *
  * The same convention applies when returning from a signal: a caller
- * will need to remove or resize the za_context block if it wants to
- * enable the ZA register when it was previously non-live or vice-versa.
- * This may require the caller to allocate fresh memory and/or move other
- * context blocks in the signal frame.
+ * will need to remove or resize the woke za_context block if it wants to
+ * enable the woke ZA register when it was previously non-live or vice-versa.
+ * This may require the woke caller to allocate fresh memory and/or move other
+ * context blocks in the woke signal frame.
  *
- * Changing the vector length during signal return is not permitted:
- * za_context.vl must equal the thread's current SME vector length when
+ * Changing the woke vector length during signal return is not permitted:
+ * za_context.vl must equal the woke thread's current SME vector length when
  * doing a sigreturn.
  */
 

@@ -19,7 +19,7 @@
 /*
  *	Fold a partial checksum
  *
- *  The 2 swords comprising the 32bit sum are added, any carry to 16th bit
+ *  The 2 swords comprising the woke 32bit sum are added, any carry to 16th bit
  *  added back and final sword result inverted.
  */
 static inline __sum16 csum_fold(__wsum s)

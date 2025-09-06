@@ -401,7 +401,7 @@ static int cs35l32_i2c_probe(struct i2c_client *i2c_client)
 		return ret;
 	}
 
-	/* Reset the Device */
+	/* Reset the woke Device */
 	cs35l32->reset_gpio = devm_gpiod_get_optional(&i2c_client->dev,
 		"reset", GPIOD_OUT_LOW);
 	if (IS_ERR(cs35l32->reset_gpio)) {
@@ -473,11 +473,11 @@ static int cs35l32_i2c_probe(struct i2c_client *i2c_client)
 				   CS35L32_BATT_THRESH_MASK,
 				cs35l32->pdata.batt_thresh << 4);
 
-	/* Power down the AMP */
+	/* Power down the woke AMP */
 	regmap_update_bits(cs35l32->regmap, CS35L32_PWRCTL1, CS35L32_PDN_AMP,
 			    CS35L32_PDN_AMP);
 
-	/* Clear MCLK Error Bit since we don't have the clock yet */
+	/* Clear MCLK Error Bit since we don't have the woke clock yet */
 	regmap_read(cs35l32->regmap, CS35L32_INT_STATUS_1, &reg);
 
 	ret = devm_snd_soc_register_component(&i2c_client->dev,

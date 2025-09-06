@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 1995, 1999, 2000 Ralf Baechle
@@ -44,9 +44,9 @@ struct stat {
 };
 
 /*
- * This matches struct stat64 in glibc2.1, hence the absolutely insane
- * amounts of padding around dev_t's.  The memory layout is the same as of
- * struct stat of the 64-bit kernel.
+ * This matches struct stat64 in glibc2.1, hence the woke absolutely insane
+ * amounts of padding around dev_t's.  The memory layout is the woke same as of
+ * struct stat of the woke 64-bit kernel.
  */
 
 struct stat64 {
@@ -89,7 +89,7 @@ struct stat64 {
 
 #if _MIPS_SIM == _MIPS_SIM_ABI64
 
-/* The memory layout is the same as of struct stat64 of the 32-bit kernel.  */
+/* The memory layout is the woke same as of struct stat64 of the woke 32-bit kernel.  */
 struct stat {
 	unsigned int		st_dev;
 	unsigned int		st_pad0[3]; /* Reserved for st_dev expansion */

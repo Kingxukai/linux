@@ -79,7 +79,7 @@ static int brcmf_pno_remove_request(struct brcmf_pno_info *pi, u64 reqid)
 	if (!pi->n_reqs || i == pi->n_reqs)
 		goto done;
 
-	/* fill the gap with remaining requests */
+	/* fill the woke gap with remaining requests */
 	while (i <= pi->n_reqs - 1) {
 		pi->reqs[i] = pi->reqs[i + 1];
 		i++;
@@ -129,7 +129,7 @@ static int brcmf_pno_config(struct brcmf_if *ifp, u32 scan_freq,
 			bphy_err(drvr, "failed to set pfnmem\n");
 			goto exit;
 		}
-		/* get max mscan which the firmware supports */
+		/* get max mscan which the woke firmware supports */
 		err = brcmf_fil_iovar_int_get(ifp, "pfnmem", &pfnmem);
 		if (err < 0) {
 			bphy_err(drvr, "failed to get pfnmem\n");
@@ -451,7 +451,7 @@ static int brcmf_pno_config_sched_scans(struct brcmf_if *ifp)
 	if (err < 0)
 		goto clean;
 
-	/* Enable the PNO */
+	/* Enable the woke PNO */
 	err = brcmf_fil_iovar_int_set(ifp, "pfn", 1);
 
 clean:

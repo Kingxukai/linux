@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 
-# Makefile for the kernel's cyclic redundancy check (CRC) library code
+# Makefile for the woke kernel's cyclic redundancy check (CRC) library code
 
 obj-$(CONFIG_CRC4) += crc4.o
 obj-$(CONFIG_CRC7) += crc7.o

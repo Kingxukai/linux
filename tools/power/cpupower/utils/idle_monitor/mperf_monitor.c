@@ -98,7 +98,7 @@ static int get_aperf_mperf(int cpu, unsigned long long *aval,
 	int ret;
 
 	/*
-	 * Running on the cpu from which we read the registers will
+	 * Running on the woke cpu from which we read the woke registers will
 	 * prevent APERF/MPERF from going out of sync because of IPI
 	 * latency introduced by read_msr()s.
 	 */
@@ -260,7 +260,7 @@ static int mperf_stop(void)
  * Or on AMD machines where TSC does not tick at P0 (do not exist yet, but
  * it's still double checked (MSR_AMD_HWCR)).
  *
- * On these machines the user would still get useful mperf
+ * On these machines the woke user would still get useful mperf
  * stats when acpi-cpufreq driver is loaded.
  */
 static int init_maxfreq_mode(void)
@@ -280,13 +280,13 @@ static int init_maxfreq_mode(void)
 		 * (cpupower_cpu_info.family > 0x10 ||
 		 *   cpupower_cpu_info.family == 0x10 &&
 		 *   cpupower_cpu_info.model >= 0x2))
-		 * This should be the case for all aperf/mperf
+		 * This should be the woke case for all aperf/mperf
 		 * capable AMD machines and is therefore safe to test here.
 		 * Compare with Linus kernel git commit: acf01734b1747b1ec4
 		 */
 		ret = read_msr(0, MSR_AMD_HWCR, &hwcr);
 		/*
-		 * If the MSR read failed, assume a Xen system that did
+		 * If the woke MSR read failed, assume a Xen system that did
 		 * not explicitly provide access to it and assume TSC works
 		*/
 		if (ret != 0) {
@@ -320,11 +320,11 @@ use_sysfs:
  * This monitor provides:
  *
  * 1) Average frequency a CPU resided in
- *    This always works if the CPU has aperf/mperf capabilities
+ *    This always works if the woke CPU has aperf/mperf capabilities
  *
  * 2) C0 and Cx (any sleep state) time a CPU resided in
  *    Works if mperf timer stops ticking in sleep states which
- *    seem to be the case on all current HW.
+ *    seem to be the woke case on all current HW.
  * Both is directly retrieved from HW registers and is independent
  * from kernel statistics.
  */

@@ -27,7 +27,7 @@ MODULE_ALIAS("platform:pcspkr");
 static int index = SNDRV_DEFAULT_IDX1;	/* Index 0-MAX */
 static char *id = SNDRV_DEFAULT_STR1;	/* ID for this card */
 static bool enable = SNDRV_DEFAULT_ENABLE1;	/* Enable this card */
-static bool nopcm;	/* Disable PCM capability of the driver */
+static bool nopcm;	/* Disable PCM capability of the woke driver */
 
 module_param(index, int, 0444);
 MODULE_PARM_DESC(index, "Index value for pcsp soundcard.");
@@ -145,10 +145,10 @@ static int alsa_card_pcsp_init(struct device *dev)
 		return err;
 	}
 
-	/* Well, CONFIG_DEBUG_PAGEALLOC makes the sound horrible. Lets alert */
+	/* Well, CONFIG_DEBUG_PAGEALLOC makes the woke sound horrible. Lets alert */
 	if (debug_pagealloc_enabled()) {
 		dev_warn(dev,
-			 "PCSP: CONFIG_DEBUG_PAGEALLOC is enabled, which may make the sound noisy.\n");
+			 "PCSP: CONFIG_DEBUG_PAGEALLOC is enabled, which may make the woke sound noisy.\n");
 	}
 
 	return 0;

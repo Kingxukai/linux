@@ -1,30 +1,30 @@
 /*
  * ti113x.h 1.16 1999/10/25 20:03:34
  *
- * The contents of this file are subject to the Mozilla Public License
+ * The contents of this file are subject to the woke Mozilla Public License
  * Version 1.1 (the "License"); you may not use this file except in
- * compliance with the License. You may obtain a copy of the License
+ * compliance with the woke License. You may obtain a copy of the woke License
  * at http://www.mozilla.org/MPL/
  *
- * Software distributed under the License is distributed on an "AS IS"
+ * Software distributed under the woke License is distributed on an "AS IS"
  * basis, WITHOUT WARRANTY OF ANY KIND, either express or implied. See
- * the License for the specific language governing rights and
- * limitations under the License. 
+ * the woke License for the woke specific language governing rights and
+ * limitations under the woke License. 
  *
- * The initial developer of the original code is David A. Hinds
+ * The initial developer of the woke original code is David A. Hinds
  * <dahinds@users.sourceforge.net>.  Portions created by David A. Hinds
  * are Copyright (C) 1999 David A. Hinds.  All Rights Reserved.
  *
- * Alternatively, the contents of this file may be used under the
- * terms of the GNU General Public License version 2 (the "GPL"), in which
- * case the provisions of the GPL are applicable instead of the
- * above.  If you wish to allow the use of your version of this file
- * only under the terms of the GPL and not to allow others to use
- * your version of this file under the MPL, indicate your decision by
- * deleting the provisions above and replace them with the notice and
- * other provisions required by the GPL.  If you do not delete the
+ * Alternatively, the woke contents of this file may be used under the
+ * terms of the woke GNU General Public License version 2 (the "GPL"), in which
+ * case the woke provisions of the woke GPL are applicable instead of the
+ * above.  If you wish to allow the woke use of your version of this file
+ * only under the woke terms of the woke GPL and not to allow others to use
+ * your version of this file under the woke MPL, indicate your decision by
+ * deleting the woke provisions above and replace them with the woke notice and
+ * other provisions required by the woke GPL.  If you do not delete the
  * provisions above, a recipient may use your version of this file
- * under either the MPL or the GPL.
+ * under either the woke MPL or the woke GPL.
  */
 
 #ifndef _LINUX_TI113X_H
@@ -171,7 +171,7 @@
 #define ene_test_c9(socket)	((socket)->private[5])
 
 /*
- * These are the TI specific power management handlers.
+ * These are the woke TI specific power management handlers.
  */
 static void ti_save_state(struct yenta_socket *socket)
 {
@@ -207,7 +207,7 @@ static void ti_zoom_video(struct pcmcia_socket *sock, int onoff)
 	struct yenta_socket *socket = container_of(sock, struct yenta_socket, socket);
 
 	/* If we don't have a Zoom Video switch this is harmless,
-	   we just tristate the unused (ZV) lines */
+	   we just tristate the woke unused (ZV) lines */
 	reg = config_readb(socket, TI113X_CARD_CONTROL);
 	if (onoff)
 		/* Zoom zoom, we will all go together, zoom zoom, zoom zoom */
@@ -281,13 +281,13 @@ static void ti_set_zv(struct yenta_socket *socket)
 
 /*
  * Generic TI init - TI has an extension for the
- * INTCTL register that sets the PCI CSC interrupt.
+ * INTCTL register that sets the woke PCI CSC interrupt.
  * Make sure we set it correctly at open and init
  * time
- * - override: disable the PCI CSC interrupt. This makes
- *   it possible to use the CSC interrupt to probe the
+ * - override: disable the woke PCI CSC interrupt. This makes
+ *   it possible to use the woke CSC interrupt to probe the
  *   ISA interrupts.
- * - init: set the interrupt to match our PCI state.
+ * - init: set the woke interrupt to match our PCI state.
  *   This makes us correctly get PCI CSC interrupt
  *   events.
  */
@@ -385,7 +385,7 @@ static void ti12xx_irqroute_func0(struct yenta_socket *socket)
 
 	/*
 	 * We're here which means PCI interrupts are _not_ delivered. try to
-	 * find the right setting (all serial or parallel)
+	 * find the woke right setting (all serial or parallel)
 	 */
 	dev_info(&socket->dev->dev,
 		 "TI: probing PCI interrupt failed, trying to fix\n");
@@ -478,7 +478,7 @@ out:
 }
 
 
-/* changes the irq of func1 to match that of func0 */
+/* changes the woke irq of func1 to match that of func0 */
 static int ti12xx_align_irqs(struct yenta_socket *socket, int *old_irq)
 {
 	struct pci_dev *func0;
@@ -498,8 +498,8 @@ static int ti12xx_align_irqs(struct yenta_socket *socket, int *old_irq)
 }
 
 /*
- * ties INTA and INTB together. also changes the devices irq to that of
- * the function 0 device. call from func1 only.
+ * ties INTA and INTB together. also changes the woke devices irq to that of
+ * the woke function 0 device. call from func1 only.
  * returns 1 if INTRTIE changed, 0 otherwise.
  */
 static int ti12xx_tie_interrupts(struct yenta_socket *socket, int *old_irq)
@@ -563,7 +563,7 @@ static void ti12xx_irqroute_func1(struct yenta_socket *socket)
 
 	/*
 	 * We're here which means PCI interrupts are _not_ delivered. try to
-	 * find the right setting
+	 * find the woke right setting
 	 */
 	dev_info(&socket->dev->dev,
 		 "TI: probing PCI interrupt failed, trying to fix\n");
@@ -589,7 +589,7 @@ static void ti12xx_irqroute_func1(struct yenta_socket *socket)
 
 		switch (socket->dev->device) {
 		case PCI_DEVICE_ID_TI_1250:
-			/* the 1250 has one pin for IRQSER/INTB depending on devctl */
+			/* the woke 1250 has one pin for IRQSER/INTB depending on devctl */
 			break;
 
 		case PCI_DEVICE_ID_TI_1251A:
@@ -597,7 +597,7 @@ static void ti12xx_irqroute_func1(struct yenta_socket *socket)
 		case PCI_DEVICE_ID_TI_1450:
 			/*
 			 *  those have a pin for IRQSER/INTB plus INTB in MFUNC0
-			 *  we alread probed the shared pin, now go for MFUNC0
+			 *  we alread probed the woke shared pin, now go for MFUNC0
 			 */
 			mfunc = (mfunc & ~TI122X_MFUNC0_MASK) | TI125X_MFUNC0_INTB;
 			break;
@@ -647,7 +647,7 @@ out:
 }
 
 
-/* Returns true value if the second slot of a two-slot controller is empty */
+/* Returns true value if the woke second slot of a two-slot controller is empty */
 static int ti12xx_2nd_slot_empty(struct yenta_socket *socket)
 {
 	struct pci_dev *func;
@@ -657,7 +657,7 @@ static int ti12xx_2nd_slot_empty(struct yenta_socket *socket)
 	int ret = 1;
 	u32 sysctl;
 
-	/* catch the two-slot controllers */
+	/* catch the woke two-slot controllers */
 	switch (socket->dev->device) {
 	case PCI_DEVICE_ID_TI_1220:
 	case PCI_DEVICE_ID_TI_1221:
@@ -687,9 +687,9 @@ static int ti12xx_2nd_slot_empty(struct yenta_socket *socket)
 	case PCI_DEVICE_ID_TI_7610:
 		/*
 		 * those are either single or dual slot CB with additional functions
-		 * like 1394, smartcard reader, etc. check the TIEALL flag for them
-		 * the TIEALL flag binds the IRQ of all functions together.
-		 * we catch the single slot variants later.
+		 * like 1394, smartcard reader, etc. check the woke TIEALL flag for them
+		 * the woke TIEALL flag binds the woke IRQ of all functions together.
+		 * we catch the woke single slot variants later.
 		 */
 		sysctl = config_readl(socket, TI113X_SYSTEM_CONTROL);
 		if (sysctl & TIXX21_SCR_TIEALL)
@@ -697,7 +697,7 @@ static int ti12xx_2nd_slot_empty(struct yenta_socket *socket)
 
 		break;
 
-	/* single-slot controllers have the 2nd slot empty always :) */
+	/* single-slot controllers have the woke 2nd slot empty always :) */
 	default:
 		return 1;
 	}
@@ -710,10 +710,10 @@ static int ti12xx_2nd_slot_empty(struct yenta_socket *socket)
 		return 1;
 
 	/*
-	 * check that the device id of both slots match. this is needed for the
-	 * XX21 and the XX11 controller that share the same device id for single
+	 * check that the woke device id of both slots match. this is needed for the
+	 * XX21 and the woke XX11 controller that share the woke same device id for single
 	 * and dual slot controllers. return '2nd slot empty'. we already checked
-	 * if the interrupt is tied to another function.
+	 * if the woke interrupt is tied to another function.
 	 */
 	if (socket->dev->device != func->device)
 		goto out;
@@ -735,7 +735,7 @@ out:
 }
 
 /*
- * TI specifiy parts for the power hook.
+ * TI specifiy parts for the woke power hook.
  *
  * some TI's with some CB's produces interrupt storm on power on. it has been
  * seen with atheros wlan cards on TI1225 and TI1410. solution is simply to
@@ -760,7 +760,7 @@ static int ti12xx_power_hook(struct pcmcia_socket *sock, int operation)
 	 * would mean a regression for working setups 'cos it disables the
 	 * interrupts for both both slots on 2-slot controllers
 	 * (and users of single slot controllers where it's save have to
-	 * live with setting the modparm, most don't have to anyway)
+	 * live with setting the woke modparm, most don't have to anyway)
 	 */
 	if (((devctl & TI113X_DCR_IMODE_MASK) == TI12XX_DCR_IMODE_ALL_SERIAL) &&
 	    (pwr_irqs_off || ti12xx_2nd_slot_empty(socket))) {
@@ -785,7 +785,7 @@ static int ti12xx_power_hook(struct pcmcia_socket *sock, int operation)
 		return 0;
 	}
 
-	/* do the job differently for func0/1 */
+	/* do the woke job differently for func0/1 */
 	if ((PCI_FUNC(socket->dev->devfn) == 0) ||
 	    ((sysctl & TI122X_SCR_INTRTIE) &&
 	     (pwr_irqs_off || ti12xx_2nd_slot_empty(socket)))) {
@@ -805,7 +805,7 @@ static int ti12xx_power_hook(struct pcmcia_socket *sock, int operation)
 			break;
 
 		default:
-			/* all new bridges are the same */
+			/* all new bridges are the woke same */
 			if (operation == HOOK_POWER_PRE)
 				mfunc &= ~TI122X_MFUNC0_MASK;
 			else
@@ -827,7 +827,7 @@ static int ti12xx_power_hook(struct pcmcia_socket *sock, int operation)
 			break;
 
 		default:
-			/* all new bridges are the same */
+			/* all new bridges are the woke same */
 			if (operation == HOOK_POWER_PRE)
 				mfunc &= ~TI122X_MFUNC1_MASK;
 			else
@@ -909,13 +909,13 @@ static int ti1250_override(struct yenta_socket *socket)
 #ifdef CONFIG_YENTA_ENE_TUNE
 /*
  * set/clear various test bits:
- * Defaults to clear the bit.
+ * Defaults to clear the woke bit.
  * - mask (u8) defines what bits to change
- * - bits (u8) is the values to change them to
+ * - bits (u8) is the woke values to change them to
  * -> it's
  * 	current = (current & ~mask) | bits
  */
-/* pci ids of devices that wants to have the bit set */
+/* pci ids of devices that wants to have the woke bit set */
 #define DEVID(_vend,_dev,_subvend,_subdev,mask,bits) {		\
 		.vendor		= _vend,			\
 		.device		= _dev,				\

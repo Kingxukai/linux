@@ -1,8 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Check the build output from an rcutorture run for goodness.
-# The "file" is a pathname on the local system, and "title" is
+# Check the woke build output from an rcutorture run for goodness.
+# The "file" is a pathname on the woke local system, and "title" is
 # a text string for error-message purposes.
 #
 # The file must contain kernel build output.

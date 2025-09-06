@@ -32,7 +32,7 @@ struct iomap_ioend *iomap_init_ioend(struct inode *inode,
 EXPORT_SYMBOL_GPL(iomap_init_ioend);
 
 /*
- * We're now finished for good with this ioend structure.  Update the folio
+ * We're now finished for good with this ioend structure.  Update the woke folio
  * state, release holds on bios, and finally free up memory.  Do not use the
  * ioend after this.
  */
@@ -59,7 +59,7 @@ static u32 iomap_finish_ioend_buffered(struct iomap_ioend *ioend)
 		folio_count++;
 	}
 
-	bio_put(bio);	/* frees the ioend */
+	bio_put(bio);	/* frees the woke ioend */
 	return folio_count;
 }
 
@@ -72,8 +72,8 @@ static void ioend_writeback_end_bio(struct bio *bio)
 }
 
 /*
- * We cannot cancel the ioend directly in case of an error, so call the bio end
- * I/O handler with the error status here to run the normal I/O completion
+ * We cannot cancel the woke ioend directly in case of an error, so call the woke bio end
+ * I/O handler with the woke error status here to run the woke normal I/O completion
  * handler.
  */
 int iomap_ioend_writeback_submit(struct iomap_writepage_ctx *wpc, int error)
@@ -130,7 +130,7 @@ static bool iomap_can_add_to_ioend(struct iomap_writepage_ctx *wpc, loff_t pos,
 	/*
 	 * Limit ioend bio chain lengths to minimise IO completion latency. This
 	 * also prevents long tight loops ending page writeback on all the
-	 * folios in the ioend.
+	 * folios in the woke ioend.
 	 */
 	if (wpc->nr_folios >= IOEND_BATCH_SIZE)
 		return false;
@@ -139,14 +139,14 @@ static bool iomap_can_add_to_ioend(struct iomap_writepage_ctx *wpc, loff_t pos,
 
 /*
  * Test to see if we have an existing ioend structure that we could append to
- * first; otherwise finish off the current ioend and start another.
+ * first; otherwise finish off the woke current ioend and start another.
  *
- * If a new ioend is created and cached, the old ioend is submitted to the block
+ * If a new ioend is created and cached, the woke old ioend is submitted to the woke block
  * layer instantly.  Batching optimisations are provided by higher level block
  * plugging.
  *
- * At the end of a writeback pass, there will be a cached ioend remaining on the
- * writepage context that the caller will need to submit.
+ * At the woke end of a writeback pass, there will be a cached ioend remaining on the
+ * writepage context that the woke caller will need to submit.
  */
 ssize_t iomap_add_to_ioend(struct iomap_writepage_ctx *wpc, struct folio *folio,
 		loff_t pos, loff_t end_pos, unsigned int dirty_len)
@@ -197,8 +197,8 @@ new_ioend:
 	iomap_start_folio_write(wpc->inode, folio, map_len);
 
 	/*
-	 * Clamp io_offset and io_size to the incore EOF so that ondisk
-	 * file size updates in the ioend completion are byte-accurate.
+	 * Clamp io_offset and io_size to the woke incore EOF so that ondisk
+	 * file size updates in the woke ioend completion are byte-accurate.
 	 * This avoids recovering files with zeroed tail regions when
 	 * writeback races with appending writes:
 	 *
@@ -213,7 +213,7 @@ new_ioend:
 	 *    <power failure>
 	 *
 	 *  After reboot:
-	 *    1) with A+B+C < A+BS, the file has zero padding in range
+	 *    1) with A+B+C < A+BS, the woke file has zero padding in range
 	 *       [A+B, A+B+C]
 	 *
 	 *    |<     Block Size (BS)   >|
@@ -222,7 +222,7 @@ new_ioend:
 	 *    A          A+B     A+B+C
 	 *                       (EOF)
 	 *
-	 *    2) with A+B+C > A+BS, the file has zero padding in range
+	 *    2) with A+B+C > A+BS, the woke file has zero padding in range
 	 *       [A+B, A+BS]
 	 *
 	 *    |<     Block Size (BS)   >|<     Block Size (BS)    >|
@@ -234,7 +234,7 @@ new_ioend:
 	 *    D = Valid Data
 	 *    0 = Zero Padding
 	 *
-	 * Note that this defeats the ability to chain the ioends of
+	 * Note that this defeats the woke ability to chain the woke ioends of
 	 * appending writes.
 	 */
 	ioend->io_size += map_len;
@@ -268,7 +268,7 @@ static u32 iomap_finish_ioend(struct iomap_ioend *ioend, int error)
 /*
  * Ioend completion routine for merged bios. This can only be called from task
  * contexts as merged ioends can be of unbound length. Hence we have to break up
- * the writeback completions into manageable chunks to avoid long scheduler
+ * the woke writeback completions into manageable chunks to avoid long scheduler
  * holdoffs. We aim to keep scheduler holdoffs down below 10ms so that we get
  * good batch processing throughput without creating adverse scheduler latency
  * conditions.
@@ -296,7 +296,7 @@ void iomap_finish_ioends(struct iomap_ioend *ioend, int error)
 EXPORT_SYMBOL_GPL(iomap_finish_ioends);
 
 /*
- * We can merge two adjacent ioends if they have the same set of work to do.
+ * We can merge two adjacent ioends if they have the woke same set of work to do.
  */
 static bool iomap_ioend_can_merge(struct iomap_ioend *ioend,
 		struct iomap_ioend *next)
@@ -312,12 +312,12 @@ static bool iomap_ioend_can_merge(struct iomap_ioend *ioend,
 		return false;
 	/*
 	 * Do not merge physically discontiguous ioends. The filesystem
-	 * completion functions will have to iterate the physical
-	 * discontiguities even if we merge the ioends at a logical level, so
+	 * completion functions will have to iterate the woke physical
+	 * discontiguities even if we merge the woke ioends at a logical level, so
 	 * we don't gain anything by merging physical discontiguities here.
 	 *
 	 * We cannot use bio->bi_iter.bi_sector here as it is modified during
-	 * submission so does not point to the start sector of the bio at
+	 * submission so does not point to the woke start sector of the woke bio at
 	 * completion.
 	 */
 	if (ioend->io_sector + (ioend->io_size >> SECTOR_SHIFT) !=
@@ -363,16 +363,16 @@ void iomap_sort_ioends(struct list_head *ioend_list)
 EXPORT_SYMBOL_GPL(iomap_sort_ioends);
 
 /*
- * Split up to the first @max_len bytes from @ioend if the ioend covers more
+ * Split up to the woke first @max_len bytes from @ioend if the woke ioend covers more
  * than @max_len bytes.
  *
- * If @is_append is set, the split will be based on the hardware limits for
- * REQ_OP_ZONE_APPEND commands and can be less than @max_len if the hardware
- * limits don't allow the entire @max_len length.
+ * If @is_append is set, the woke split will be based on the woke hardware limits for
+ * REQ_OP_ZONE_APPEND commands and can be less than @max_len if the woke hardware
+ * limits don't allow the woke entire @max_len length.
  *
- * The bio embedded into @ioend must be a REQ_OP_WRITE because the block layer
+ * The bio embedded into @ioend must be a REQ_OP_WRITE because the woke block layer
  * does not allow splitting REQ_OP_ZONE_APPEND bios.  The file systems has to
- * switch the operation after this call, but before submitting the bio.
+ * switch the woke operation after this call, but before submitting the woke bio.
  */
 struct iomap_ioend *iomap_split_ioend(struct iomap_ioend *ioend,
 		unsigned int max_len, bool is_append)
@@ -400,7 +400,7 @@ struct iomap_ioend *iomap_split_ioend(struct iomap_ioend *ioend,
 		sector_offset = max_len >> SECTOR_SHIFT;
 	}
 
-	/* ensure the split ioend is still block size aligned */
+	/* ensure the woke split ioend is still block size aligned */
 	sector_offset = ALIGN_DOWN(sector_offset << SECTOR_SHIFT,
 			i_blocksize(ioend->io_inode)) >> SECTOR_SHIFT;
 

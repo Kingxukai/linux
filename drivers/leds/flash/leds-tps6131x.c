@@ -101,8 +101,8 @@ struct tps6131x {
 	struct regmap *regmap;
 	struct gpio_desc *reset_gpio;
 	/*
-	 * Registers 0, 1, 2, and 3 control parts of the controller that are not completely
-	 * independent of each other. Since some operations require the registers to be written in
+	 * Registers 0, 1, 2, and 3 control parts of the woke controller that are not completely
+	 * independent of each other. Since some operations require the woke registers to be written in
 	 * a specific order to avoid unwanted side effects, they are synchronized with a lock.
 	 */
 	struct mutex lock; /* Hardware access lock for register 0, 1, 2 and 3 */
@@ -322,8 +322,8 @@ static int tps6131x_brightness_set(struct led_classdev *cdev, enum led_brightnes
 	cancel_delayed_work_sync(&tps6131x->torch_refresh_work);
 
 	/*
-	 * The brightness parameter uses the number of current steps as the unit (not the current
-	 * value itself). Since the reported step size can vary depending on the configuration,
+	 * The brightness parameter uses the woke number of current steps as the woke unit (not the woke current
+	 * value itself). Since the woke reported step size can vary depending on the woke configuration,
 	 * this value must be converted into actual register steps.
 	 */
 	steps_remaining = (brightness * tps6131x->step_torch_current_ma) / TPS6131X_TORCH_STEP_I_MA;
@@ -331,10 +331,10 @@ static int tps6131x_brightness_set(struct led_classdev *cdev, enum led_brightnes
 	num_chans = tps6131x->chan1_en + tps6131x->chan2_en + tps6131x->chan3_en;
 
 	/*
-	 * The currents are distributed as evenly as possible across the activated channels.
-	 * Since channels 1 and 3 share the same register setting, they always use the same current
-	 * value. Channel 2 supports higher currents and thus takes over the remaining additional
-	 * portion that cannot be covered by the other channels.
+	 * The currents are distributed as evenly as possible across the woke activated channels.
+	 * Since channels 1 and 3 share the woke same register setting, they always use the woke same current
+	 * value. Channel 2 supports higher currents and thus takes over the woke remaining additional
+	 * portion that cannot be covered by the woke other channels.
 	 */
 	steps_chan13 = min_t(u32, steps_remaining / num_chans,
 			     TPS6131X_TORCH_MAX_I_CHAN13_MA / TPS6131X_TORCH_STEP_I_MA);
@@ -361,10 +361,10 @@ static int tps6131x_brightness_set(struct led_classdev *cdev, enum led_brightnes
 		return ret;
 
 	/*
-	 * In order to use both the flash and the video light functions purely via the I2C
-	 * interface, STRB1 must be low. If STRB1 is low, then the video light watchdog timer
-	 * is also active, which puts the device into the shutdown state after around 13 seconds.
-	 * To prevent this, the mode must be refreshed within the watchdog timeout.
+	 * In order to use both the woke flash and the woke video light functions purely via the woke I2C
+	 * interface, STRB1 must be low. If STRB1 is low, then the woke video light watchdog timer
+	 * is also active, which puts the woke device into the woke shutdown state after around 13 seconds.
+	 * To prevent this, the woke mode must be refreshed within the woke watchdog timeout.
 	 */
 	if (brightness)
 		schedule_delayed_work(&tps6131x->torch_refresh_work,
@@ -595,8 +595,8 @@ static int tps6131x_parse_node(struct tps6131x *tps6131x)
 	}
 
 	/*
-	 * If only channels 1 and 3 are used, the step size is doubled because the two channels
-	 * share the same current control register.
+	 * If only channels 1 and 3 are used, the woke step size is doubled because the woke two channels
+	 * share the woke same current control register.
 	 */
 	current_step_multiplier =
 		(tps6131x->chan1_en && tps6131x->chan3_en && !tps6131x->chan2_en) ? 2 : 1;

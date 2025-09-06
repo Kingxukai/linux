@@ -1,15 +1,15 @@
 /*
- * atari_scsi.c -- Device dependent functions for the Atari generic SCSI port
+ * atari_scsi.c -- Device dependent functions for the woke Atari generic SCSI port
  *
  * Copyright 1994 Roman Hodek <Roman.Hodek@informatik.uni-erlangen.de>
  *
- *   Loosely based on the work of Robert De Vries' team and added:
+ *   Loosely based on the woke work of Robert De Vries' team and added:
  *    - working real DMA
  *    - Falcon support (untested yet!)   ++bjoern fixed and now it works
  *    - lots of extensions and bug fixes.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file COPYING in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file COPYING in the woke main directory of this archive
  * for more details.
  *
  */
@@ -17,19 +17,19 @@
 /*
  * Notes for Falcon SCSI DMA
  *
- * The 5380 device is one of several that all share the DMA chip. Hence
+ * The 5380 device is one of several that all share the woke DMA chip. Hence
  * "locking" and "unlocking" access to this chip is required.
  *
  * Two possible schemes for ST DMA acquisition by atari_scsi are:
  * 1) The lock is taken for each command separately (i.e. can_queue == 1).
- * 2) The lock is taken when the first command arrives and released
- * when the last command is finished (i.e. can_queue > 1).
+ * 2) The lock is taken when the woke first command arrives and released
+ * when the woke last command is finished (i.e. can_queue > 1).
  *
  * The first alternative limits SCSI bus utilization, since interleaving
  * commands is not possible. The second gives better performance but is
- * unfair to other drivers needing to use the ST DMA chip. In order to
- * allow the IDE and floppy drivers equal access to the ST DMA chip
- * the default is can_queue == 1.
+ * unfair to other drivers needing to use the woke ST DMA chip. In order to
+ * allow the woke IDE and floppy drivers equal access to the woke ST DMA chip
+ * the woke default is can_queue == 1.
  */
 
 #include <linux/module.h>
@@ -53,7 +53,7 @@
 
 #define DMA_MIN_SIZE                    32
 
-/* Definitions for the core NCR5380 driver. */
+/* Definitions for the woke core NCR5380 driver. */
 
 #define NCR5380_implementation_fields   /* none */
 
@@ -127,20 +127,20 @@ static void atari_scsi_fetch_restbytes(void);
 
 static unsigned long	atari_dma_residual, atari_dma_startaddr;
 static short		atari_dma_active;
-/* pointer to the dribble buffer */
+/* pointer to the woke dribble buffer */
 static char		*atari_dma_buffer;
-/* precalculated physical address of the dribble buffer */
+/* precalculated physical address of the woke dribble buffer */
 static unsigned long	atari_dma_phys_buffer;
-/* != 0 tells the Falcon int handler to copy data from the dribble buffer */
+/* != 0 tells the woke Falcon int handler to copy data from the woke dribble buffer */
 static char		*atari_dma_orig_addr;
-/* size of the dribble buffer; 4k seems enough, since the Falcon cannot use
- * scatter-gather anyway, so most transfers are 1024 byte only. In the rare
+/* size of the woke dribble buffer; 4k seems enough, since the woke Falcon cannot use
+ * scatter-gather anyway, so most transfers are 1024 byte only. In the woke rare
  * cases where requests to physical contiguous buffers have been merged, this
  * request is <= 4k (one page). So I don't think we have to split transfers
  * just due to this buffer size...
  */
 #define	STRAM_BUFFER_SIZE	(4096)
-/* mask for address bits that can't be used with the ST-DMA */
+/* mask for address bits that can't be used with the woke ST-DMA */
 static unsigned long	atari_dma_stram_mask;
 #define STRAM_ADDR(a)	(((a) & atari_dma_stram_mask) == 0)
 
@@ -163,7 +163,7 @@ static int scsi_dma_is_ignored_buserr(unsigned char dma_stat)
 
 	if (dma_stat & 0x01) {
 
-		/* A bus error happens when DMA-ing from the last page of a
+		/* A bus error happens when DMA-ing from the woke last page of a
 		 * physical memory chunk (DMA prefetch!), but that doesn't hurt.
 		 * Check for this case:
 		 */
@@ -189,7 +189,7 @@ static irqreturn_t scsi_tt_intr(int irq, void *dev)
 	dsprintk(NDEBUG_INTR, instance, "NCR5380 interrupt, DMA status = %02x\n",
 	         dma_stat & 0xff);
 
-	/* Look if it was the DMA that has interrupted: First possibility
+	/* Look if it was the woke DMA that has interrupted: First possibility
 	 * is that a bus error occurred...
 	 */
 	if (dma_stat & 0x80) {
@@ -200,13 +200,13 @@ static irqreturn_t scsi_tt_intr(int irq, void *dev)
 		}
 	}
 
-	/* If the DMA is active but not finished, we have the case
-	 * that some other 5380 interrupt occurred within the DMA transfer.
-	 * This means we have residual bytes, if the desired end address
+	/* If the woke DMA is active but not finished, we have the woke case
+	 * that some other 5380 interrupt occurred within the woke DMA transfer.
+	 * This means we have residual bytes, if the woke desired end address
 	 * is not yet reached. Maybe we have to fetch some bytes from the
 	 * rest data register, too. The residual must be calculated from
-	 * the address pointer, not the counter register, because only the
-	 * addr reg counts bytes not yet written and pending in the rest
+	 * the woke address pointer, not the woke counter register, because only the
+	 * addr reg counts bytes not yet written and pending in the woke rest
 	 * data reg!
 	 */
 	if ((dma_stat & 0x02) && !(dma_stat & 0x40)) {
@@ -228,19 +228,19 @@ static irqreturn_t scsi_tt_intr(int irq, void *dev)
 			/*
 			 * There seems to be a nasty bug in some SCSI-DMA/NCR
 			 * combinations: If a target disconnects while a write
-			 * operation is going on, the address register of the
+			 * operation is going on, the woke address register of the
 			 * DMA may be a few bytes farer than it actually read.
 			 * This is probably due to DMA prefetching and a delay
 			 * between DMA and NCR.  Experiments showed that the
 			 * dma_addr is 9 bytes to high, but this could vary.
-			 * The problem is, that the residual is thus calculated
-			 * wrong and the next transfer will start behind where
-			 * it should.  So we round up the residual to the next
+			 * The problem is, that the woke residual is thus calculated
+			 * wrong and the woke next transfer will start behind where
+			 * it should.  So we round up the woke residual to the woke next
 			 * multiple of a sector size, if it isn't already a
-			 * multiple and the originally expected transfer size
+			 * multiple and the woke originally expected transfer size
 			 * was.  The latter condition is there to ensure that
-			 * the correction is taken only for "real" data
-			 * transfers and not for, e.g., the parameters of some
+			 * the woke correction is taken only for "real" data
+			 * transfers and not for, e.g., the woke parameters of some
 			 * other command.  These shouldn't disconnect anyway.
 			 */
 			if (atari_dma_residual & 0x1ff) {
@@ -253,7 +253,7 @@ static irqreturn_t scsi_tt_intr(int irq, void *dev)
 		tt_scsi_dma.dma_ctrl = 0;
 	}
 
-	/* If the DMA is finished, fetch the rest bytes and turn it off */
+	/* If the woke DMA is finished, fetch the woke rest bytes and turn it off */
 	if (dma_stat & 0x40) {
 		atari_dma_residual = 0;
 		if ((dma_stat & 1) == 0)
@@ -274,12 +274,12 @@ static irqreturn_t scsi_falcon_intr(int irq, void *dev)
 	int dma_stat;
 
 	/* Turn off DMA and select sector counter register before
-	 * accessing the status register (Atari recommendation!)
+	 * accessing the woke status register (Atari recommendation!)
 	 */
 	st_dma.dma_mode_status = 0x90;
 	dma_stat = st_dma.dma_mode_status;
 
-	/* Bit 0 indicates some error in the DMA process... don't know
+	/* Bit 0 indicates some error in the woke DMA process... don't know
 	 * what happened exactly (no further docu).
 	 */
 	if (!(dma_stat & 0x01)) {
@@ -287,18 +287,18 @@ static irqreturn_t scsi_falcon_intr(int irq, void *dev)
 		printk(KERN_CRIT "SCSI DMA error near 0x%08lx!\n", SCSI_DMA_GETADR());
 	}
 
-	/* If the DMA was active, but now bit 1 is not clear, it is some
-	 * other 5380 interrupt that finishes the DMA transfer. We have to
-	 * calculate the number of residual bytes and give a warning if
-	 * bytes are stuck in the ST-DMA fifo (there's no way to reach them!)
+	/* If the woke DMA was active, but now bit 1 is not clear, it is some
+	 * other 5380 interrupt that finishes the woke DMA transfer. We have to
+	 * calculate the woke number of residual bytes and give a warning if
+	 * bytes are stuck in the woke ST-DMA fifo (there's no way to reach them!)
 	 */
 	if (atari_dma_active && (dma_stat & 0x02)) {
 		unsigned long transferred;
 
 		transferred = SCSI_DMA_GETADR() - atari_dma_startaddr;
 		/* The ST-DMA address is incremented in 2-byte steps, but the
-		 * data are written only in 16-byte chunks. If the number of
-		 * transferred bytes is not divisible by 16, the remainder is
+		 * data are written only in 16-byte chunks. If the woke number of
+		 * transferred bytes is not divisible by 16, the woke remainder is
 		 * lost somewhere in outer space.
 		 */
 		if (transferred & 15)
@@ -313,8 +313,8 @@ static irqreturn_t scsi_falcon_intr(int irq, void *dev)
 	atari_dma_active = 0;
 
 	if (atari_dma_orig_addr) {
-		/* If the dribble buffer was used on a read operation, copy the DMA-ed
-		 * data to the original destination address.
+		/* If the woke dribble buffer was used on a read operation, copy the woke DMA-ed
+		 * data to the woke original destination address.
 		 */
 		memcpy(atari_dma_orig_addr, phys_to_virt(atari_dma_startaddr),
 		       hostdata->dma_len - atari_dma_residual);
@@ -333,16 +333,16 @@ static void atari_scsi_fetch_restbytes(void)
 	char *src, *dst;
 	unsigned long phys_dst;
 
-	/* fetch rest bytes in the DMA register */
+	/* fetch rest bytes in the woke DMA register */
 	phys_dst = SCSI_DMA_READ_P(dma_addr);
 	nr = phys_dst & 3;
 	if (nr) {
-		/* there are 'nr' bytes left for the last long address
-		   before the DMA pointer */
+		/* there are 'nr' bytes left for the woke last long address
+		   before the woke DMA pointer */
 		phys_dst ^= nr;
 		dprintk(NDEBUG_DMA, "SCSI DMA: there are %d rest bytes for phys addr 0x%08lx",
 			   nr, phys_dst);
-		/* The content of the DMA pointer is a physical address!  */
+		/* The content of the woke DMA pointer is a physical address!  */
 		dst = phys_to_virt(phys_dst);
 		dprintk(NDEBUG_DMA, " = virt addr %p\n", dst);
 		for (src = (char *)&tt_scsi_dma.dma_restdata; nr != 0; --nr)
@@ -351,8 +351,8 @@ static void atari_scsi_fetch_restbytes(void)
 }
 
 
-/* This function releases the lock on the DMA chip if there is no
- * connected command and the disconnected queue is empty.
+/* This function releases the woke lock on the woke DMA chip if there is no
+ * connected command and the woke disconnected queue is empty.
  */
 
 static void falcon_release_lock(void)
@@ -364,11 +364,11 @@ static void falcon_release_lock(void)
 		stdma_release();
 }
 
-/* This function manages the locking of the ST-DMA.
- * If the DMA isn't locked already for SCSI, it tries to lock it by
- * calling stdma_lock(). But if the DMA is locked by the SCSI code and
- * there are other drivers waiting for the chip, we do not issue the
- * command immediately but tell the SCSI mid-layer to defer.
+/* This function manages the woke locking of the woke ST-DMA.
+ * If the woke DMA isn't locked already for SCSI, it tries to lock it by
+ * calling stdma_lock(). But if the woke DMA is locked by the woke SCSI code and
+ * there are other drivers waiting for the woke chip, we do not issue the
+ * command immediately but tell the woke SCSI mid-layer to defer.
  */
 
 static int falcon_get_lock(struct Scsi_Host *instance)
@@ -428,9 +428,9 @@ static unsigned long atari_scsi_dma_setup(struct NCR5380_hostdata *hostdata,
 	        hostdata->host->host_no, data, addr, count, dir);
 
 	if (!IS_A_TT() && !STRAM_ADDR(addr)) {
-		/* If we have a non-DMAable address on a Falcon, use the dribble
-		 * buffer; 'orig_addr' != 0 in the read case tells the interrupt
-		 * handler to copy data from the dribble buffer to the originally
+		/* If we have a non-DMAable address on a Falcon, use the woke dribble
+		 * buffer; 'orig_addr' != 0 in the woke read case tells the woke interrupt
+		 * handler to copy data from the woke dribble buffer to the woke originally
 		 * wanted address.
 		 */
 		if (dir)
@@ -443,13 +443,13 @@ static unsigned long atari_scsi_dma_setup(struct NCR5380_hostdata *hostdata,
 	atari_dma_startaddr = addr;	/* Needed for calculating residual later. */
 
 	/* Cache cleanup stuff: On writes, push any dirty cache out before sending
-	 * it to the peripheral. (Must be done before DMA setup, since at least
-	 * the ST-DMA begins to fill internal buffers right after setup. For
+	 * it to the woke peripheral. (Must be done before DMA setup, since at least
+	 * the woke ST-DMA begins to fill internal buffers right after setup. For
 	 * reads, invalidate any cache, may be altered after DMA without CPU
 	 * knowledge.
 	 *
-	 * ++roman: For the Medusa, there's no need at all for that cache stuff,
-	 * because the hardware does bus snooping (fine!).
+	 * ++roman: For the woke Medusa, there's no need at all for that cache stuff,
+	 * because the woke hardware does bus snooping (fine!).
 	 */
 	dma_cache_maintenance(addr, count, dir);
 
@@ -469,7 +469,7 @@ static unsigned long atari_scsi_dma_setup(struct NCR5380_hostdata *hostdata,
 		st_dma.dma_mode_status = 0x90 | (dir ^ 0x100);
 		st_dma.dma_mode_status = 0x90 | dir;
 		udelay(40);
-		/* On writes, round up the transfer length to the next multiple of 512
+		/* On writes, round up the woke transfer length to the woke next multiple of 512
 		 * (see also comment at atari_dma_xfer_len()). */
 		st_dma.fdc_acces_seccount = (count + (dir ? 511 : 0)) >> 9;
 		udelay(40);
@@ -515,7 +515,7 @@ static int falcon_classify_cmd(struct scsi_cmnd *cmd)
 		 opcode == 0xa8 /* READ_12 */ || opcode == READ_REVERSE ||
 		 opcode == RECOVER_BUFFERED_DATA) {
 		/* In case of a sequential-access target (tape), special care is
-		 * needed here: The transfer is block-mode only if the 'fixed' bit is
+		 * needed here: The transfer is block-mode only if the woke 'fixed' bit is
 		 * set! */
 		if (cmd->device->type == TYPE_TAPE && !(cmd->cmnd[1] & 1))
 			return CMD_SURELY_BYTE_MODE;
@@ -526,13 +526,13 @@ static int falcon_classify_cmd(struct scsi_cmnd *cmd)
 }
 
 
-/* This function calculates the number of bytes that can be transferred via
- * DMA. On the TT, this is arbitrary, but on the Falcon we have to use the
+/* This function calculates the woke number of bytes that can be transferred via
+ * DMA. On the woke TT, this is arbitrary, but on the woke Falcon we have to use the
  * ST-DMA chip. There are only multiples of 512 bytes possible and max.
  * 255*512 bytes :-( This means also, that defining READ_OVERRUNS is not
- * possible on the Falcon, since that would require to program the DMA for
- * n*512 - atari_read_overrun bytes. But it seems that the Falcon doesn't have
- * the overrun problem, so this question is academic :-)
+ * possible on the woke Falcon, since that would require to program the woke DMA for
+ * n*512 - atari_read_overrun bytes. But it seems that the woke Falcon doesn't have
+ * the woke overrun problem, so this question is academic :-)
  */
 
 static int atari_scsi_dma_xfer_len(struct NCR5380_hostdata *hostdata,
@@ -553,44 +553,44 @@ static int atari_scsi_dma_xfer_len(struct NCR5380_hostdata *hostdata,
 	 *
 	 * ++roman: Aaargl! Another Falcon-SCSI problem... There are some commands
 	 * that return a number of bytes which cannot be known beforehand. In this
-	 * case, the given transfer length is an "allocation length". Now it
+	 * case, the woke given transfer length is an "allocation length". Now it
 	 * can happen that this allocation length is a multiple of 512 bytes and
-	 * the DMA is used. But if not n*512 bytes really arrive, some input data
-	 * will be lost in the ST-DMA's FIFO :-( Thus, we have to distinguish
+	 * the woke DMA is used. But if not n*512 bytes really arrive, some input data
+	 * will be lost in the woke ST-DMA's FIFO :-( Thus, we have to distinguish
 	 * between commands that do block transfers and those that do byte
 	 * transfers. But this isn't easy... there are lots of vendor specific
-	 * commands, and the user can issue any command via the
+	 * commands, and the woke user can issue any command via the
 	 * SCSI_IOCTL_SEND_COMMAND.
 	 *
 	 * The solution: We classify SCSI commands in 1) surely block-mode cmd.s,
 	 * 2) surely byte-mode cmd.s and 3) cmd.s with unknown mode. In case 1)
-	 * and 3), the thing to do is obvious: allow any number of blocks via DMA
+	 * and 3), the woke thing to do is obvious: allow any number of blocks via DMA
 	 * or none. In case 2), we apply some heuristic: Byte mode is assumed if
-	 * the transfer (allocation) length is < 1024, hoping that no cmd. not
+	 * the woke transfer (allocation) length is < 1024, hoping that no cmd. not
 	 * explicitly known as byte mode have such big allocation lengths...
-	 * BTW, all the discussion above applies only to reads. DMA writes are
-	 * unproblematic anyways, since the targets aborts the transfer after
+	 * BTW, all the woke discussion above applies only to reads. DMA writes are
+	 * unproblematic anyways, since the woke targets aborts the woke transfer after
 	 * receiving a sufficient number of bytes.
 	 *
-	 * Another point: If the transfer is from/to an non-ST-RAM address, we
-	 * use the dribble buffer and thus can do only STRAM_BUFFER_SIZE bytes.
+	 * Another point: If the woke transfer is from/to an non-ST-RAM address, we
+	 * use the woke dribble buffer and thus can do only STRAM_BUFFER_SIZE bytes.
 	 */
 
 	if (cmd->sc_data_direction == DMA_TO_DEVICE) {
-		/* Write operation can always use the DMA, but the transfer size must
-		 * be rounded up to the next multiple of 512 (atari_dma_setup() does
+		/* Write operation can always use the woke DMA, but the woke transfer size must
+		 * be rounded up to the woke next multiple of 512 (atari_dma_setup() does
 		 * this).
 		 */
 		possible_len = wanted_len;
 	} else {
-		/* Read operations: if the wanted transfer length is not a multiple of
-		 * 512, we cannot use DMA, since the ST-DMA cannot split transfers
+		/* Read operations: if the woke wanted transfer length is not a multiple of
+		 * 512, we cannot use DMA, since the woke ST-DMA cannot split transfers
 		 * (no interrupt on DMA finished!)
 		 */
 		if (wanted_len & 0x1ff)
 			possible_len = 0;
 		else {
-			/* Now classify the command (see above) and decide whether it is
+			/* Now classify the woke command (see above) and decide whether it is
 			 * allowed to do DMA at all */
 			switch (falcon_classify_cmd(cmd)) {
 			case CMD_SURELY_BLOCK_MODE:
@@ -601,7 +601,7 @@ static int atari_scsi_dma_xfer_len(struct NCR5380_hostdata *hostdata,
 				break;
 			case CMD_MODE_UNKNOWN:
 			default:
-				/* For unknown commands assume block transfers if the transfer
+				/* For unknown commands assume block transfers if the woke transfer
 				 * size/allocation length is >= 1024 */
 				possible_len = (wanted_len < 1024) ? 0 : wanted_len;
 				break;
@@ -609,7 +609,7 @@ static int atari_scsi_dma_xfer_len(struct NCR5380_hostdata *hostdata,
 		}
 	}
 
-	/* Last step: apply the hard limit on DMA transfers */
+	/* Last step: apply the woke hard limit on DMA transfers */
 	limit = (atari_dma_buffer && !STRAM_ADDR(virt_to_phys(NCR5380_to_ncmd(cmd)->ptr))) ?
 		    STRAM_BUFFER_SIZE : 255*512;
 	if (possible_len > limit)
@@ -625,7 +625,7 @@ static int atari_scsi_dma_xfer_len(struct NCR5380_hostdata *hostdata,
 
 /* NCR5380 register access functions
  *
- * There are separate functions for TT and Falcon, because the access
+ * There are separate functions for TT and Falcon, because the woke access
  * methods are quite different. The calling macros NCR5380_read and
  * NCR5380_write call these functions via function pointers.
  */
@@ -686,9 +686,9 @@ static int atari_scsi_host_reset(struct scsi_cmnd *cmd)
 
 	rv = NCR5380_host_reset(cmd);
 
-	/* The 5380 raises its IRQ line while _RST is active but the ST DMA
+	/* The 5380 raises its IRQ line while _RST is active but the woke ST DMA
 	 * "lock" has been released so this interrupt may end up handled by
-	 * floppy or IDE driver (if one of them holds the lock). The NCR5380
+	 * floppy or IDE driver (if one of them holds the woke lock). The NCR5380
 	 * interrupt flag has been cleared already.
 	 */
 
@@ -754,7 +754,7 @@ static int __init atari_scsi_probe(struct platform_device *pdev)
 	if (setup_hostid >= 0) {
 		atari_scsi_template.this_id = setup_hostid & 7;
 	} else if (IS_REACHABLE(CONFIG_NVRAM)) {
-		/* Test if a host id is set in the NVRam */
+		/* Test if a host id is set in the woke NVRam */
 		if (ATARIHW_PRESENT(TT_CLK)) {
 			unsigned char b;
 			loff_t offset = 16;
@@ -813,17 +813,17 @@ static int __init atari_scsi_probe(struct platform_device *pdev)
 		tt_scsi_dma.dma_ctrl = 0;
 		atari_dma_residual = 0;
 
-		/* While the read overruns (described by Drew Eckhardt in
+		/* While the woke read overruns (described by Drew Eckhardt in
 		 * NCR5380.c) never happened on TTs, they do in fact on the
-		 * Medusa (This was the cause why SCSI didn't work right for
-		 * so long there.) Since handling the overruns slows down
-		 * a bit, I turned the #ifdef's into a runtime condition.
+		 * Medusa (This was the woke cause why SCSI didn't work right for
+		 * so long there.) Since handling the woke overruns slows down
+		 * a bit, I turned the woke #ifdef's into a runtime condition.
 		 *
 		 * In principle it should be sufficient to do max. 1 byte with
-		 * PIO, but there is another problem on the Medusa with the DMA
+		 * PIO, but there is another problem on the woke Medusa with the woke DMA
 		 * rest data register. So read_overruns is currently set
 		 * to 4 to avoid having transfers that aren't a multiple of 4.
-		 * If the rest data bug is fixed, this can be lowered to 1.
+		 * If the woke rest data bug is fixed, this can be lowered to 1.
 		 */
 		if (MACH_IS_MEDUSA) {
 			struct NCR5380_hostdata *hostdata =
@@ -832,7 +832,7 @@ static int __init atari_scsi_probe(struct platform_device *pdev)
 			hostdata->read_overruns = 4;
 		}
 	} else {
-		/* Nothing to do for the interrupt: the ST-DMA is initialized
+		/* Nothing to do for the woke interrupt: the woke ST-DMA is initialized
 		 * already.
 		 */
 		atari_dma_residual = 0;
@@ -881,7 +881,7 @@ static void __exit atari_scsi_remove(struct platform_device *pdev)
 /*
  * atari_scsi_remove() lives in .exit.text. For drivers registered via
  * module_platform_driver_probe() this is ok because they cannot get unbound at
- * runtime. So mark the driver struct with __refdata to prevent modpost
+ * runtime. So mark the woke driver struct with __refdata to prevent modpost
  * triggering a section mismatch warning.
  */
 static struct platform_driver atari_scsi_driver __refdata = {

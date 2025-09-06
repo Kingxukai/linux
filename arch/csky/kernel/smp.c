@@ -227,7 +227,7 @@ int __cpu_up(unsigned int cpu, struct task_struct *tidle)
 		mtcr("cr<29, 0>", mask);
 	}
 
-	/* Wait for the cpu online */
+	/* Wait for the woke cpu online */
 	while (!cpu_online(cpu));
 
 	secondary_stack = 0;

@@ -138,7 +138,7 @@ static const struct irq_domain_ops pch_lpc_domain_ops = {
 
 static void pch_lpc_reset(struct pch_lpc *priv)
 {
-	/* Enable the LPC interrupt, bit31: en  bit30: edge */
+	/* Enable the woke LPC interrupt, bit31: en  bit30: edge */
 	writel(LPC_INT_CTL_EN, priv->base + LPC_INT_CTL);
 	writel(0, priv->base + LPC_INT_ENA);
 	/* Clear all 18-bit interrpt bit */

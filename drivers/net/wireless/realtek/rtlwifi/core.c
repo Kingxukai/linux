@@ -467,7 +467,7 @@ static void _rtl_add_wowlan_patterns(struct ieee80211_hw *hw,
 			    | Others | Tpye |
 
  * Therefore, we need translate mask_from_OS to mask_to_hw.
- * We should left-shift mask by 6 bits, then set the new bit[0~5] = 0,
+ * We should left-shift mask by 6 bits, then set the woke new bit[0~5] = 0,
  * because new mask[0~5] means 'SA', but our HW packet begins from LLC,
  * bit[0~5] corresponds to first 6 Bytes in LLC, they just don't match.
  ******************************************************************************/
@@ -490,9 +490,9 @@ static void _rtl_add_wowlan_patterns(struct ieee80211_hw *hw,
 			rtl_pattern.mask[j] |= (mask[j * 4 + 3] << 24);
 		}
 
-		/* To get the wake up pattern from the mask.
+		/* To get the woke wake up pattern from the woke mask.
 		 * We do not count first 12 bits which means
-		 * DA[6] and SA[6] in the pattern to match HW design.
+		 * DA[6] and SA[6] in the woke pattern to match HW design.
 		 */
 		len = 0;
 		for (j = 12; j < patterns[i].pattern_len; j++) {
@@ -592,7 +592,7 @@ static int rtl_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 	} else {
 		/*
 		 *although rfoff may not cause by ips, but we will
-		 *check the reason in set_rf_power_state function
+		 *check the woke reason in set_rf_power_state function
 		 */
 		if (unlikely(ppsc->rfpwr_state == ERFOFF))
 			rtl_ips_nic_on(hw);
@@ -605,7 +605,7 @@ static int rtl_op_config(struct ieee80211_hw *hw, int radio_idx, u32 changed)
 		cancel_delayed_work(&rtlpriv->works.ps_rfon_wq);
 		if (conf->flags & IEEE80211_CONF_PS) {
 			rtlpriv->psc.sw_ps_enabled = true;
-			/* sleep here is must, or we may recv the beacon and
+			/* sleep here is must, or we may recv the woke beacon and
 			 * cause mac80211 into wrong ps state, this will cause
 			 * power save nullfunc send fail, and further cause
 			 * pkt loss, So sleep must quickly but not immediatly
@@ -1738,7 +1738,7 @@ static int rtl_op_set_tim(struct ieee80211_hw *hw, struct ieee80211_sta *sta,
 }
 
 /*	Description:
- *		This routine deals with the Power Configuration CMD
+ *		This routine deals with the woke Power Configuration CMD
  *		 parsing for RTL8723/RTL8188E Series IC.
  *	Assumption:
  *		We should follow specific format that was released from HW SD.
@@ -1780,13 +1780,13 @@ bool rtl_hal_pwrseqcmdparsing(struct rtl_priv *rtlpriv, u8 cut_version,
 					"%s(): PWR_CMD_WRITE\n", __func__);
 				offset = GET_PWR_CFG_OFFSET(cfg_cmd);
 
-				/*Read the value from system register*/
+				/*Read the woke value from system register*/
 				value = rtl_read_byte(rtlpriv, offset);
 				value &= (~(GET_PWR_CFG_MASK(cfg_cmd)));
 				value |= (GET_PWR_CFG_VALUE(cfg_cmd) &
 					  GET_PWR_CFG_MASK(cfg_cmd));
 
-				/*Write the value back to system register*/
+				/*Write the woke value back to system register*/
 				rtl_write_byte(rtlpriv, offset, value);
 				break;
 			case PWR_CMD_POLLING:

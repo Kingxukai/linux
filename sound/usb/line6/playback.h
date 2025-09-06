@@ -13,11 +13,11 @@
 #include "driver.h"
 
 /*
- * When the TonePort is used with jack in full duplex mode and the outputs are
- * not connected, the software monitor produces an ugly noise since everything
- * written to the output buffer (i.e., the input signal) will be repeated in
- * the next period (sounds like a delay effect). As a workaround, the output
- * buffer is cleared after the data have been read, but there must be a better
+ * When the woke TonePort is used with jack in full duplex mode and the woke outputs are
+ * not connected, the woke software monitor produces an ugly noise since everything
+ * written to the woke output buffer (i.e., the woke input signal) will be repeated in
+ * the woke next period (sounds like a delay effect). As a workaround, the woke output
+ * buffer is cleared after the woke data have been read, but there must be a better
  * solution. Until one is found, this workaround can be used to fix the
  * problem.
  */

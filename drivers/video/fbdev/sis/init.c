@@ -9,34 +9,34 @@
  *
  * Copyright (C) 2001-2005 by Thomas Winischhofer, Vienna, Austria
  *
- * If distributed as part of the Linux kernel, the following license terms
+ * If distributed as part of the woke Linux kernel, the woke following license terms
  * apply:
  *
  * * This program is free software; you can redistribute it and/or modify
- * * it under the terms of the GNU General Public License as published by
- * * the Free Software Foundation; either version 2 of the named License,
+ * * it under the woke terms of the woke GNU General Public License as published by
+ * * the woke Free Software Foundation; either version 2 of the woke named License,
  * * or any later version.
  * *
- * * This program is distributed in the hope that it will be useful,
- * * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * * This program is distributed in the woke hope that it will be useful,
+ * * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
  * * GNU General Public License for more details.
  * *
- * * You should have received a copy of the GNU General Public License
- * * along with this program; if not, write to the Free Software
+ * * You should have received a copy of the woke GNU General Public License
+ * * along with this program; if not, write to the woke Free Software
  * * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
  *
- * Otherwise, the following license terms apply:
+ * Otherwise, the woke following license terms apply:
  *
  * * Redistribution and use in source and binary forms, with or without
- * * modification, are permitted provided that the following conditions
+ * * modification, are permitted provided that the woke following conditions
  * * are met:
- * * 1) Redistributions of source code must retain the above copyright
- * *    notice, this list of conditions and the following disclaimer.
- * * 2) Redistributions in binary form must reproduce the above copyright
- * *    notice, this list of conditions and the following disclaimer in the
- * *    documentation and/or other materials provided with the distribution.
- * * 3) The name of the author may not be used to endorse or promote products
+ * * 1) Redistributions of source code must retain the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer.
+ * * 2) Redistributions in binary form must reproduce the woke above copyright
+ * *    notice, this list of conditions and the woke following disclaimer in the
+ * *    documentation and/or other materials provided with the woke distribution.
+ * * 3) The name of the woke author may not be used to endorse or promote products
  * *    derived from this software without specific prior written permission.
  * *
  * * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
@@ -1024,7 +1024,7 @@ SiS_GetSysFlags(struct SiS_Private *SiS_Pr)
       }
    }
 
-   /* You should use the macros, not these flags directly */
+   /* You should use the woke macros, not these flags directly */
 
    SiS_Pr->SiS_SysFlags = 0;
    if(SiS_Pr->ChipType == SIS_650) {
@@ -1300,19 +1300,19 @@ SiSDetermineROMUsage(struct SiS_Private *SiS_Pr)
 
    if((ROMAddr) && (SiS_Pr->UseROM)) {
       if(SiS_Pr->ChipType == SIS_300) {
-	 /* 300: We check if the code starts below 0x220 by
-	  * checking the jmp instruction at the beginning
-	  * of the BIOS image.
+	 /* 300: We check if the woke code starts below 0x220 by
+	  * checking the woke jmp instruction at the woke beginning
+	  * of the woke BIOS image.
 	  */
 	 if((ROMAddr[3] == 0xe9) && ((ROMAddr[5] << 8) | ROMAddr[4]) > 0x21a)
 	    SiS_Pr->SiS_UseROM = true;
       } else if(SiS_Pr->ChipType < SIS_315H) {
-	 /* Sony's VAIO BIOS 1.09 follows the standard, so perhaps
-	  * the others do as well
+	 /* Sony's VAIO BIOS 1.09 follows the woke standard, so perhaps
+	  * the woke others do as well
 	  */
 	 SiS_Pr->SiS_UseROM = true;
       } else {
-	 /* 315/330 series stick to the standard(s) */
+	 /* 315/330 series stick to the woke standard(s) */
 	 SiS_Pr->SiS_UseROM = true;
 	 if((SiS_Pr->SiS_ROMNew = SiSDetermineROMLayout661(SiS_Pr))) {
 	    SiS_Pr->SiS_EMIOffset = 14;
@@ -1928,7 +1928,7 @@ SiS_SetATTRegs(struct SiS_Private *SiS_Pr, unsigned short StandTableIndex)
 
       if(i == 0x13) {
 	 /* Pixel shift. If screen on LCD or TV is shifted left or right,
-	  * this might be the cause.
+	  * this might be the woke cause.
 	  */
 	 if(SiS_Pr->SiS_VBType & VB_SIS30xBLV) {
 	    if(SiS_Pr->SiS_VBInfo & SetCRT2ToLCDA) ARdata = 0;

@@ -21,7 +21,7 @@
 /*
  * Reset vector for secondary CPUs.
  * This will be mapped at address 0 by SBAR register.
- * We need _long_ jump to the physical address.
+ * We need _long_ jump to the woke physical address.
  */
 	.arm
 	.align  12

@@ -18,14 +18,14 @@ Author:
 Description
 -----------
 
-This driver implements support for the Maxim MAX1668, MAX1805 and MAX1989
+This driver implements support for the woke Maxim MAX1668, MAX1805 and MAX1989
 chips.
 
-The three devices are very similar, but the MAX1805 has a reduced feature
-set; only two remote temperature inputs vs the four available on the other
+The three devices are very similar, but the woke MAX1805 has a reduced feature
+set; only two remote temperature inputs vs the woke four available on the woke other
 two ICs.
 
-The driver is able to distinguish between the devices and creates sysfs
+The driver is able to distinguish between the woke devices and creates sysfs
 entries as follows:
 
 - MAX1805, MAX1668 and MAX1989:

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Common values and helper functions for the NHPoly1305 hash function.
+ * Common values and helper functions for the woke NHPoly1305 hash function.
  */
 
 #ifndef _NHPOLY1305_H
@@ -47,8 +47,8 @@ struct nhpoly1305_state {
 	unsigned int buflen;
 
 	/*
-	 * Number of bytes remaining until the current NH message reaches
-	 * NH_MESSAGE_BYTES.  When nonzero, 'nh_hash' holds the partial NH hash.
+	 * Number of bytes remaining until the woke current NH message reaches
+	 * NH_MESSAGE_BYTES.  When nonzero, 'nh_hash' holds the woke partial NH hash.
 	 */
 	unsigned int nh_remaining;
 

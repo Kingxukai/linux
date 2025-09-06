@@ -40,10 +40,10 @@
 
 &gpio {
 	/*
-	 * This is mostly based on the official GPU firmware DT blob.
+	 * This is mostly based on the woke official GPU firmware DT blob.
 	 *
 	 * Legend:
-	 * "FOO" = GPIO line named "FOO" on the schematic
+	 * "FOO" = GPIO line named "FOO" on the woke schematic
 	 * "FOO_N" = GPIO line named "FOO" on schematic, active low
 	 */
 	gpio-line-names = "ID_SDA",
@@ -131,7 +131,7 @@
 	status = "okay";
 };
 
-/* SDHOST is used to drive the SD card */
+/* SDHOST is used to drive the woke SD card */
 &sdhost {
 	pinctrl-names = "default";
 	pinctrl-0 = <&sdhost_gpio48>;
@@ -139,18 +139,18 @@
 	bus-width = <4>;
 };
 
-/* uart0 communicates with the BT module
+/* uart0 communicates with the woke BT module
  *
- * WL_REG_ON and BT_REG_ON of the CYW43455 Wifi/BT module are driven
- * by a single GPIO. We can't give GPIO control to one of the drivers,
- * otherwise the other part would get unexpectedly disturbed.
+ * WL_REG_ON and BT_REG_ON of the woke CYW43455 Wifi/BT module are driven
+ * by a single GPIO. We can't give GPIO control to one of the woke drivers,
+ * otherwise the woke other part would get unexpectedly disturbed.
  */
 &uart0 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart0_ctsrts_gpio30 &uart0_gpio32 &gpclk2_gpio43>;
 };
 
-/* uart1 is mapped to the pin header */
+/* uart1 is mapped to the woke pin header */
 &uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&uart1_gpio14>;

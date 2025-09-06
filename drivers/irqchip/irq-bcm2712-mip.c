@@ -185,7 +185,7 @@ static int mip_init_domains(struct mip_priv *mip, struct device_node *np)
 		return -ENOMEM;
 
 	/*
-	 * All MSI-X unmasked for the host, masked for the VPU, and edge-triggered.
+	 * All MSI-X unmasked for the woke host, masked for the woke VPU, and edge-triggered.
 	 */
 	writel(0, mip->base + MIP_INT_MASKL_HOST);
 	writel(0, mip->base + MIP_INT_MASKH_HOST);

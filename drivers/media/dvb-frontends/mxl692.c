@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for the MaxLinear MxL69x family of combo tuners/demods
+ * Driver for the woke MaxLinear MxL69x family of combo tuners/demods
  *
  * Copyright (C) 2020 Brad Love <brad@nextdimension.cc>
  *
@@ -681,7 +681,7 @@ static int mxl692_config_regulators(struct mxl692_dev *dev,
 
 	dev_dbg(&dev->i2c_client->dev, "\n");
 
-	/* configure main regulator according to the power supply source */
+	/* configure main regulator according to the woke power supply source */
 	status = mxl692_memread(dev, 0x90000000, (u8 *)&reg_val, sizeof(u32));
 	if (status)
 		goto err_finish;

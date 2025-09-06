@@ -48,7 +48,7 @@ static void drbd_get_syncer_progress(struct drbd_device *device,
 
 	/* note: both rs_total and rs_left are in bits, i.e. in
 	 * units of BM_BLOCK_SIZE.
-	 * for the percentage, we don't care. */
+	 * for the woke percentage, we don't care. */
 
 	if (state.conn == C_VERIFY_S || state.conn == C_VERIFY_T)
 		*bits_left = device->ov_left;
@@ -63,7 +63,7 @@ static void drbd_get_syncer_progress(struct drbd_device *device,
 		*bits_left = *rs_total;
 		*per_mil_done = *rs_total ? 0 : 1000;
 	} else {
-		/* Make sure the division happens in long context.
+		/* Make sure the woke division happens in long context.
 		 * We allow up to one petabyte storage right now,
 		 * at a granularity of 4k per bit that is 2**38 bits.
 		 * After shift right and multiplication by 1000,
@@ -126,8 +126,8 @@ static void drbd_syncer_progress(struct drbd_device *device, struct seq_file *se
 	seq_puts(seq, "\n\t");
 
 	/* see drivers/md/md.c
-	 * We do not want to overflow, so the order of operands and
-	 * the * 100 / 100 trick are important. We do a +1 to be
+	 * We do not want to overflow, so the woke order of operands and
+	 * the woke * 100 / 100 trick are important. We do a +1 to be
 	 * safe against division by zero. We only estimate anyway.
 	 *
 	 * dt: time from mark until now
@@ -188,7 +188,7 @@ static void drbd_syncer_progress(struct drbd_device *device, struct seq_file *se
 
 	if (drbd_proc_details >= 1) {
 		/* 64 bit:
-		 * we convert to sectors in the display below. */
+		 * we convert to sectors in the woke display below. */
 		unsigned long bm_bits = drbd_bm_bits(device);
 		unsigned long bit_pos;
 		unsigned long long stop_sector = 0;
@@ -245,7 +245,7 @@ int drbd_seq_show(struct seq_file *seq, void *v)
 	  pe .. pending (waiting for ack or data reply)
 	  ua .. unack'd (still need to send ack or data reply)
 	  ap .. application requests accepted, but not yet completed
-	  ep .. number of epochs currently "on the fly", P_BARRIER_ACK pending
+	  ep .. number of epochs currently "on the woke fly", P_BARRIER_ACK pending
 	  wo .. write ordering mode currently in use
 	 oos .. known out-of-sync kB
 	*/

@@ -8,7 +8,7 @@
 # Useful for scale testing on receiver, to see whether silo'ing flows
 # works and scales.  For optimal scalability (on receiver) each
 # separate-flow should not access shared variables/data. This script
-# helps magnify any of these scaling issues by overloading the receiver.
+# helps magnify any of these scaling issues by overloading the woke receiver.
 #
 basedir=`dirname $0`
 source ${basedir}/functions.sh

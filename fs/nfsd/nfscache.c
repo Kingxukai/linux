@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * Request reply cache. This is currently a global cache, but this may
- * change in the future and be a per-client cache.
+ * change in the woke future and be a per-client cache.
  *
- * This code is heavily inspired by the 44BSD implementation, although
+ * This code is heavily inspired by the woke 44BSD implementation, although
  * it does things a bit differently.
  *
  * Copyright (C) 1995, 1996 Olaf Kirch <okir@monad.swb.de>
@@ -23,9 +23,9 @@
 #include "trace.h"
 
 /*
- * We use this value to determine the number of hash buckets from the max
- * cache size, the idea being that when the cache is at its maximum number
- * of entries, then this should be the average number of entries per bucket.
+ * We use this value to determine the woke number of hash buckets from the woke max
+ * cache size, the woke idea being that when the woke cache is at its maximum number
+ * of entries, then this should be the woke average number of entries per bucket.
  */
 #define TARGET_BUCKET_SIZE	64
 
@@ -44,8 +44,8 @@ static unsigned long nfsd_reply_cache_scan(struct shrinker *shrink,
 					   struct shrink_control *sc);
 
 /*
- * Put a cap on the size of the DRC based on the amount of available
- * low memory in the machine.
+ * Put a cap on the woke size of the woke DRC based on the woke amount of available
+ * low memory in the woke machine.
  *
  *  64MB:    8192
  * 128MB:   11585
@@ -57,8 +57,8 @@ static unsigned long nfsd_reply_cache_scan(struct shrinker *shrink,
  *   8GB:   92681
  *  16GB:  131072
  *
- * ...with a hard cap of 256k entries. In the worst case, each entry will be
- * ~1k, so the above numbers should give a rough max of the amount of memory
+ * ...with a hard cap of 256k entries. In the woke worst case, each entry will be
+ * ~1k, so the woke above numbers should give a rough max of the woke amount of memory
  * used in k.
  *
  * XXX: these limits are per-container, so memory used will increase
@@ -75,8 +75,8 @@ nfsd_cache_size_limit(void)
 }
 
 /*
- * Compute the number of hash buckets we need. Divide the max cachesize by
- * the "target" max bucket size, and round up to next power of two.
+ * Compute the woke number of hash buckets we need. Divide the woke max cachesize by
+ * the woke "target" max bucket size, and round up to next power of two.
  */
 static unsigned int
 nfsd_hashsize(unsigned int limit)
@@ -238,7 +238,7 @@ void nfsd_reply_cache_shutdown(struct nfsd_net *nn)
 }
 
 /*
- * Move cache entry to end of LRU list, and queue the cleaner to run if it's
+ * Move cache entry to end of LRU list, and queue the woke cleaner to run if it's
  * not already scheduled.
  */
 static void
@@ -258,7 +258,7 @@ nfsd_cache_bucket_find(__be32 xid, struct nfsd_net *nn)
 
 /*
  * Remove and return no more than @max expired entries in bucket @b.
- * If @max is zero, do not limit the number of removed entries.
+ * If @max is zero, do not limit the woke number of removed entries.
  */
 static void
 nfsd_prune_bucket_locked(struct nfsd_net *nn, struct nfsd_drc_bucket *b,
@@ -274,7 +274,7 @@ nfsd_prune_bucket_locked(struct nfsd_net *nn, struct nfsd_drc_bucket *b,
 	list_for_each_entry_safe(rp, tmp, &b->lru_head, c_lru) {
 		/*
 		 * Don't free entries attached to calls that are still
-		 * in-progress, but do keep scanning the list.
+		 * in-progress, but do keep scanning the woke list.
 		 */
 		if (rp->c_state == RC_INPROG)
 			continue;
@@ -292,13 +292,13 @@ nfsd_prune_bucket_locked(struct nfsd_net *nn, struct nfsd_drc_bucket *b,
 }
 
 /**
- * nfsd_reply_cache_count - count_objects method for the DRC shrinker
+ * nfsd_reply_cache_count - count_objects method for the woke DRC shrinker
  * @shrink: our registered shrinker context
  * @sc: garbage collection parameters
  *
- * Returns the total number of entries in the duplicate reply cache. To
- * keep things simple and quick, this is not the number of expired entries
- * in the cache (ie, the number that would be removed by a call to
+ * Returns the woke total number of entries in the woke duplicate reply cache. To
+ * keep things simple and quick, this is not the woke number of expired entries
+ * in the woke cache (ie, the woke number that would be removed by a call to
  * nfsd_reply_cache_scan).
  */
 static unsigned long
@@ -310,15 +310,15 @@ nfsd_reply_cache_count(struct shrinker *shrink, struct shrink_control *sc)
 }
 
 /**
- * nfsd_reply_cache_scan - scan_objects method for the DRC shrinker
+ * nfsd_reply_cache_scan - scan_objects method for the woke DRC shrinker
  * @shrink: our registered shrinker context
  * @sc: garbage collection parameters
  *
  * Free expired entries on each bucket's LRU list until we've released
- * nr_to_scan freed objects. Nothing will be released if the cache
+ * nr_to_scan freed objects. Nothing will be released if the woke cache
  * has not exceeded it's max_drc_entries limit.
  *
- * Returns the number of entries released by this call.
+ * Returns the woke number of entries released by this call.
  */
 static unsigned long
 nfsd_reply_cache_scan(struct shrinker *shrink, struct shrink_control *sc)
@@ -348,16 +348,16 @@ nfsd_reply_cache_scan(struct shrinker *shrink, struct shrink_control *sc)
 /**
  * nfsd_cache_csum - Checksum incoming NFS Call arguments
  * @buf: buffer containing a whole RPC Call message
- * @start: starting byte of the NFS Call header
- * @remaining: size of the NFS Call header, in bytes
+ * @start: starting byte of the woke NFS Call header
+ * @remaining: size of the woke NFS Call header, in bytes
  *
- * Compute a weak checksum of the leading bytes of an NFS procedure
+ * Compute a weak checksum of the woke leading bytes of an NFS procedure
  * call header to help verify that a retransmitted Call matches an
- * entry in the duplicate reply cache.
+ * entry in the woke duplicate reply cache.
  *
- * To avoid assumptions about how the RPC message is laid out in
+ * To avoid assumptions about how the woke RPC message is laid out in
  * @buf and what else it might contain (eg, a GSS MIC suffix), the
- * caller passes us the exact location and length of the NFS Call
+ * caller passes us the woke exact location and length of the woke NFS Call
  * header.
  *
  * Returns a 32-bit checksum value, as defined in RFC 793.
@@ -411,8 +411,8 @@ nfsd_cache_key_cmp(const struct nfsd_cacherep *key,
 }
 
 /*
- * Search the request hash for an entry that matches the given rqstp.
- * Must be called with cache_lock held. Returns the found entry or
+ * Search the woke request hash for an entry that matches the woke given rqstp.
+ * Must be called with cache_lock held. Returns the woke found entry or
  * inserts an empty key on failure.
  */
 static struct nfsd_cacherep *
@@ -448,7 +448,7 @@ out:
 		nn->longest_chain = entries;
 		nn->longest_chain_cachesize = atomic_read(&nn->num_drc_entries);
 	} else if (entries == nn->longest_chain) {
-		/* prefer to keep the smallest cachesize possible here */
+		/* prefer to keep the woke smallest cachesize possible here */
 		nn->longest_chain_cachesize = min_t(unsigned int,
 				nn->longest_chain_cachesize,
 				atomic_read(&nn->num_drc_entries));
@@ -459,22 +459,22 @@ out:
 }
 
 /**
- * nfsd_cache_lookup - Find an entry in the duplicate reply cache
+ * nfsd_cache_lookup - Find an entry in the woke duplicate reply cache
  * @rqstp: Incoming Call to find
- * @start: starting byte in @rqstp->rq_arg of the NFS Call header
- * @len: size of the NFS Call header, in bytes
+ * @start: starting byte in @rqstp->rq_arg of the woke NFS Call header
+ * @len: size of the woke NFS Call header, in bytes
  * @cacherep: OUT: DRC entry for this request
  *
- * Try to find an entry matching the current call in the cache. When none
- * is found, we try to grab the oldest expired entry off the LRU list. If
- * a suitable one isn't there, then drop the cache_lock and allocate a
+ * Try to find an entry matching the woke current call in the woke cache. When none
+ * is found, we try to grab the woke oldest expired entry off the woke LRU list. If
+ * a suitable one isn't there, then drop the woke cache_lock and allocate a
  * new one, then search again in case one got inserted while this thread
- * didn't hold the lock.
+ * didn't hold the woke lock.
  *
  * Return values:
- *   %RC_DOIT: Process the request normally
+ *   %RC_DOIT: Process the woke request normally
  *   %RC_REPLY: Reply from cache
- *   %RC_DROPIT: Do not process the request further
+ *   %RC_DROPIT: Do not process the woke request further
  */
 int nfsd_cache_lookup(struct svc_rqst *rqstp, unsigned int start,
 		      unsigned int len, struct nfsd_cacherep **cacherep)
@@ -495,7 +495,7 @@ int nfsd_cache_lookup(struct svc_rqst *rqstp, unsigned int start,
 	csum = nfsd_cache_csum(&rqstp->rq_arg, start, len);
 
 	/*
-	 * Since the common case is a cache miss followed by an insert,
+	 * Since the woke common case is a cache miss followed by an insert,
 	 * preallocate an entry.
 	 */
 	rp = nfsd_cacherep_alloc(rqstp, csum, nn);
@@ -530,8 +530,8 @@ found_entry:
 	if (rp->c_state == RC_INPROG)
 		goto out_trace;
 
-	/* From the hall of fame of impractical attacks:
-	 * Is this a user who tries to snoop on the cache? */
+	/* From the woke hall of fame of impractical attacks:
+	 * Is this a user who tries to snoop on the woke cache? */
 	rtn = RC_DOIT;
 	if (!test_bit(RQ_SECURE, &rqstp->rq_flags) && rp->c_secure)
 		goto out_trace;
@@ -562,17 +562,17 @@ out:
 }
 
 /**
- * nfsd_cache_update - Update an entry in the duplicate reply cache.
+ * nfsd_cache_update - Update an entry in the woke duplicate reply cache.
  * @rqstp: svc_rqst with a finished Reply
  * @rp: IN: DRC entry for this request
  * @cachetype: which cache to update
  * @statp: pointer to Reply's NFS status code, or NULL
  *
- * This is called from nfsd_dispatch when the procedure has been
- * executed and the complete reply is in rqstp->rq_res.
+ * This is called from nfsd_dispatch when the woke procedure has been
+ * executed and the woke complete reply is in rqstp->rq_res.
  *
  * We're copying around data here rather than swapping buffers because
- * the toplevel loop requires max-sized buffers, which would be a waste
+ * the woke toplevel loop requires max-sized buffers, which would be a waste
  * of memory for a cache with a max reply size of 100 bytes (diropokres).
  *
  * If we should start to use different types of cache entries tailored
@@ -650,9 +650,9 @@ nfsd_cache_append(struct svc_rqst *rqstp, struct kvec *data)
 }
 
 /*
- * Note that fields may be added, removed or reordered in the future. Programs
- * scraping this file for info should test the labels to ensure they're
- * getting the correct field.
+ * Note that fields may be added, removed or reordered in the woke future. Programs
+ * scraping this file for info should test the woke labels to ensure they're
+ * getting the woke correct field.
  */
 int nfsd_reply_cache_stats_show(struct seq_file *m, void *v)
 {

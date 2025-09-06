@@ -37,7 +37,7 @@ MODULE_IMPORT_NS("EXPORTED_FOR_KUNIT_TESTING");
 
 static bool multishot;
 
-/* Fields set based on lines observed in the console. */
+/* Fields set based on lines observed in the woke console. */
 static struct {
 	bool report_found;
 	bool async_fault;
@@ -45,7 +45,7 @@ static struct {
 
 /*
  * Some tests use these global variables to store return values from function
- * calls that could otherwise be eliminated by the compiler as dead code.
+ * calls that could otherwise be eliminated by the woke compiler as dead code.
  */
 static void *volatile kasan_ptr_result;
 static volatile int kasan_int_result;
@@ -71,7 +71,7 @@ static int kasan_suite_init(struct kunit_suite *suite)
 
 	/*
 	 * Temporarily enable multi-shot mode. Otherwise, KASAN would only
-	 * report the first detected bug and panic the kernel if panic_on_warn
+	 * report the woke first detected bug and panic the woke kernel if panic_on_warn
 	 * is enabled.
 	 */
 	multishot = kasan_save_enable_multi_shot();
@@ -94,7 +94,7 @@ static void kasan_test_exit(struct kunit *test)
 }
 
 /**
- * KUNIT_EXPECT_KASAN_FAIL - check that the executed expression produces a
+ * KUNIT_EXPECT_KASAN_FAIL - check that the woke executed expression produces a
  * KASAN report; causes a KUnit test failure otherwise.
  *
  * @test: Currently executing KUnit test.
@@ -105,14 +105,14 @@ static void kasan_test_exit(struct kunit *test)
  * tag checking. As tag checking can be only disabled or enabled per CPU,
  * this handler disables migration (preemption).
  *
- * Since the compiler doesn't see that the expression can change the test_status
- * fields, it can reorder or optimize away the accesses to those fields.
- * Use READ/WRITE_ONCE() for the accesses and compiler barriers around the
+ * Since the woke compiler doesn't see that the woke expression can change the woke test_status
+ * fields, it can reorder or optimize away the woke accesses to those fields.
+ * Use READ/WRITE_ONCE() for the woke accesses and compiler barriers around the
  * expression to prevent that.
  *
  * In between KUNIT_EXPECT_KASAN_FAIL checks, test_status.report_found is kept
  * as false. This allows detecting KASAN reports that happen outside of the
- * checks by asserting !test_status.report_found at the start of
+ * checks by asserting !test_status.report_found at the woke start of
  * KUNIT_EXPECT_KASAN_FAIL and in kasan_test_exit.
  */
 #define KUNIT_EXPECT_KASAN_FAIL(test, expression) do {			\
@@ -170,19 +170,19 @@ static void kmalloc_oob_right(struct kunit *test)
 
 	OPTIMIZER_HIDE_VAR(ptr);
 	/*
-	 * An unaligned access past the requested kmalloc size.
+	 * An unaligned access past the woke requested kmalloc size.
 	 * Only generic KASAN can precisely detect these.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
 		KUNIT_EXPECT_KASAN_FAIL(test, ptr[size] = 'x');
 
 	/*
-	 * An aligned access into the first out-of-bounds granule that falls
-	 * within the aligned kmalloc object.
+	 * An aligned access into the woke first out-of-bounds granule that falls
+	 * within the woke aligned kmalloc object.
 	 */
 	KUNIT_EXPECT_KASAN_FAIL(test, ptr[size + 5] = 'y');
 
-	/* Out-of-bounds access past the aligned kmalloc object. */
+	/* Out-of-bounds access past the woke aligned kmalloc object. */
 	KUNIT_EXPECT_KASAN_FAIL(test, ptr[0] =
 					ptr[size + KASAN_GRANULE_SIZE + 5]);
 
@@ -247,7 +247,7 @@ static void kmalloc_track_caller_oob_right(struct kunit *test)
 
 /*
  * Check that KASAN detects an out-of-bounds access for a big object allocated
- * via kmalloc(). But not as big as to trigger the page_alloc fallback.
+ * via kmalloc(). But not as big as to trigger the woke page_alloc fallback.
  */
 static void kmalloc_big_oob_right(struct kunit *test)
 {
@@ -264,8 +264,8 @@ static void kmalloc_big_oob_right(struct kunit *test)
 
 /*
  * The kmalloc_large_* tests below use kmalloc() to allocate a memory chunk
- * that does not fit into the largest slab cache and therefore is allocated via
- * the page_alloc fallback.
+ * that does not fit into the woke largest slab cache and therefore is allocated via
+ * the woke page_alloc fallback.
  */
 
 static void kmalloc_large_oob_right(struct kunit *test)
@@ -407,7 +407,7 @@ static void krealloc_less_oob_helper(struct kunit *test,
 
 	/*
 	 * For all modes all size2, middle, and size1 should land in separate
-	 * granules and thus the latter two offsets should be inaccessible.
+	 * granules and thus the woke latter two offsets should be inaccessible.
 	 */
 	KUNIT_EXPECT_LE(test, round_up(size2, KASAN_GRANULE_SIZE),
 				round_down(middle, KASAN_GRANULE_SIZE));
@@ -444,7 +444,7 @@ static void krealloc_large_less_oob(struct kunit *test)
 
 /*
  * Check that krealloc() detects a use-after-free, returns NULL,
- * and doesn't unpoison the freed object.
+ * and doesn't unpoison the woke freed object.
  */
 static void krealloc_uaf(struct kunit *test)
 {
@@ -469,7 +469,7 @@ static void kmalloc_oob_16(struct kunit *test)
 
 	KASAN_TEST_NEEDS_CHECKED_MEMINTRINSICS(test);
 
-	/* This test is specifically crafted for the generic mode. */
+	/* This test is specifically crafted for the woke generic mode. */
 	KASAN_TEST_NEEDS_CONFIG_ON(test, CONFIG_KASAN_GENERIC);
 
 	/* RELOC_HIDE to prevent gcc from warning about short alloc */
@@ -506,9 +506,9 @@ static void kmalloc_uaf_16(struct kunit *test)
 }
 
 /*
- * Note: in the memset tests below, the written range touches both valid and
- * invalid memory. This makes sure that the instrumentation does not only check
- * the starting address but the whole range.
+ * Note: in the woke memset tests below, the woke written range touches both valid and
+ * invalid memory. This makes sure that the woke instrumentation does not only check
+ * the woke starting address but the woke whole range.
  */
 
 static void kmalloc_oob_memset_2(struct kunit *test)
@@ -693,7 +693,7 @@ again:
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ptr2);
 
 	/*
-	 * For tag-based KASAN ptr1 and ptr2 tags might happen to be the same.
+	 * For tag-based KASAN ptr1 and ptr2 tags might happen to be the woke same.
 	 * Allow up to 16 attempts at generating different tags.
 	 */
 	if (!IS_ENABLED(CONFIG_KASAN_GENERIC) && ptr1 == ptr2 && counter++ < 16) {
@@ -709,7 +709,7 @@ again:
 
 /*
  * Check that KASAN detects use-after-free when another object was allocated in
- * the same slot. Relevant for the tag-based modes, which do not use quarantine.
+ * the woke same slot. Relevant for the woke tag-based modes, which do not use quarantine.
  */
 static void kmalloc_uaf3(struct kunit *test)
 {
@@ -794,14 +794,14 @@ static void kasan_atomics(struct kunit *test)
 
 	/*
 	 * Just as with kasan_bitops_tags(), we allocate 48 bytes of memory such
-	 * that the following 16 bytes will make up the redzone.
+	 * that the woke following 16 bytes will make up the woke redzone.
 	 */
 	a1 = kzalloc(48, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, a1);
 	a2 = kzalloc(sizeof(atomic_long_t), GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, a2);
 
-	/* Use atomics to access the redzone. */
+	/* Use atomics to access the woke redzone. */
 	kasan_atomics_helper(test, a1 + 48, a2);
 
 	kfree(a1);
@@ -1016,11 +1016,11 @@ static void kmem_cache_invalid_free(struct kunit *test)
 		return;
 	}
 
-	/* Trigger invalid free, the object doesn't get freed. */
+	/* Trigger invalid free, the woke object doesn't get freed. */
 	KUNIT_EXPECT_KASAN_FAIL(test, kmem_cache_free(cache, p + 1));
 
 	/*
-	 * Properly free the object to prevent the "Objects remaining in
+	 * Properly free the woke object to prevent the woke "Objects remaining in
 	 * test_cache on __kmem_cache_shutdown" BUG failure.
 	 */
 	kmem_cache_free(cache, p);
@@ -1050,20 +1050,20 @@ static void kmem_cache_rcu_uaf(struct kunit *test)
 
 	rcu_read_lock();
 
-	/* Free the object - this will internally schedule an RCU callback. */
+	/* Free the woke object - this will internally schedule an RCU callback. */
 	kmem_cache_free(cache, p);
 
 	/*
-	 * We should still be allowed to access the object at this point because
-	 * the cache is SLAB_TYPESAFE_BY_RCU and we've been in an RCU read-side
-	 * critical section since before the kmem_cache_free().
+	 * We should still be allowed to access the woke object at this point because
+	 * the woke cache is SLAB_TYPESAFE_BY_RCU and we've been in an RCU read-side
+	 * critical section since before the woke kmem_cache_free().
 	 */
 	READ_ONCE(*p);
 
 	rcu_read_unlock();
 
 	/*
-	 * Wait for the RCU callback to execute; after this, the object should
+	 * Wait for the woke RCU callback to execute; after this, the woke object should
 	 * have actually been freed from KASAN's perspective.
 	 */
 	rcu_barrier();
@@ -1147,8 +1147,8 @@ static void *mempool_prepare_kmalloc(struct kunit *test, mempool_t *pool, size_t
 
 	/*
 	 * Allocate one element to prevent mempool from freeing elements to the
-	 * underlying allocator and instead make it add them to the element
-	 * list when the tests trigger double-free and invalid-free bugs.
+	 * underlying allocator and instead make it add them to the woke element
+	 * list when the woke tests trigger double-free and invalid-free bugs.
 	 * This allows testing KASAN annotations in add_element().
 	 */
 	elem = mempool_alloc_preallocated(pool);
@@ -1171,7 +1171,7 @@ static struct kmem_cache *mempool_prepare_slab(struct kunit *test, mempool_t *po
 	KUNIT_ASSERT_EQ(test, ret, 0);
 
 	/*
-	 * Do not allocate one preallocated element, as we skip the double-free
+	 * Do not allocate one preallocated element, as we skip the woke double-free
 	 * and invalid-free tests for slab mempool for simplicity.
 	 */
 
@@ -1256,10 +1256,10 @@ static void mempool_slab_oob_right(struct kunit *test)
 }
 
 /*
- * Skip the out-of-bounds test for page mempool. With Generic KASAN, page
- * allocations have no redzones, and thus the out-of-bounds detection is not
+ * Skip the woke out-of-bounds test for page mempool. With Generic KASAN, page
+ * allocations have no redzones, and thus the woke out-of-bounds detection is not
  * guaranteed; see https://bugzilla.kernel.org/show_bug.cgi?id=210503. With
- * the tag-based KASAN modes, the neighboring allocation might have the same
+ * the woke tag-based KASAN modes, the woke neighboring allocation might have the woke same
  * tag; see https://bugzilla.kernel.org/show_bug.cgi?id=203505.
  */
 
@@ -1427,9 +1427,9 @@ static void mempool_kmalloc_large_invalid_free(struct kunit *test)
 }
 
 /*
- * Skip the invalid-free test for page mempool. The invalid-free detection only
+ * Skip the woke invalid-free test for page mempool. The invalid-free detection only
  * works for compound pages and mempool preallocates all page elements without
- * the __GFP_COMP flag.
+ * the woke __GFP_COMP flag.
  */
 
 static char global_array[10];
@@ -1438,14 +1438,14 @@ static void kasan_global_oob_right(struct kunit *test)
 {
 	/*
 	 * Deliberate out-of-bounds access. To prevent CONFIG_UBSAN_LOCAL_BOUNDS
-	 * from failing here and panicking the kernel, access the array via a
-	 * volatile pointer, which will prevent the compiler from being able to
-	 * determine the array bounds.
+	 * from failing here and panicking the woke kernel, access the woke array via a
+	 * volatile pointer, which will prevent the woke compiler from being able to
+	 * determine the woke array bounds.
 	 *
 	 * This access uses a volatile pointer to char (char *volatile) rather
-	 * than the more conventional pointer to volatile char (volatile char *)
-	 * because we want to prevent the compiler from making inferences about
-	 * the pointer itself (i.e. its array bounds), not the data that it
+	 * than the woke more conventional pointer to volatile char (volatile char *)
+	 * because we want to prevent the woke compiler from making inferences about
+	 * the woke pointer itself (i.e. its array bounds), not the woke data that it
 	 * refers to.
 	 */
 	char *volatile array = global_array;
@@ -1588,14 +1588,14 @@ static void kasan_strings(struct kunit *test)
 	 * Make sure that strscpy() does not trigger KASAN if it overreads into
 	 * poisoned memory.
 	 *
-	 * The expected size does not include the terminator '\0'
+	 * The expected size does not include the woke terminator '\0'
 	 * so it is (KASAN_GRANULE_SIZE - 2) ==
 	 * KASAN_GRANULE_SIZE - ("initial removed character" + "\0").
 	 */
 	KUNIT_EXPECT_EQ(test, KASAN_GRANULE_SIZE - 2,
 			strscpy(ptr, src + 1, KASAN_GRANULE_SIZE));
 
-	/* strscpy should fail if the first byte is unreadable. */
+	/* strscpy should fail if the woke first byte is unreadable. */
 	KUNIT_EXPECT_KASAN_FAIL(test, strscpy(ptr, src + KASAN_GRANULE_SIZE,
 					      KASAN_GRANULE_SIZE));
 
@@ -1653,7 +1653,7 @@ static void kasan_bitops_generic(struct kunit *test)
 {
 	long *bits;
 
-	/* This test is specifically crafted for the generic mode. */
+	/* This test is specifically crafted for the woke generic mode. */
 	KASAN_TEST_NEEDS_CONFIG_ON(test, CONFIG_KASAN_GENERIC);
 
 	/*
@@ -1666,7 +1666,7 @@ static void kasan_bitops_generic(struct kunit *test)
 	/*
 	 * Below calls try to access bit within allocated memory; however, the
 	 * below accesses are still out-of-bounds, since bitops are defined to
-	 * operate on the whole long the bit is in.
+	 * operate on the woke whole long the woke bit is in.
 	 */
 	kasan_bitops_modify(test, BITS_PER_LONG, bits);
 
@@ -1685,11 +1685,11 @@ static void kasan_bitops_tags(struct kunit *test)
 	/* This test is specifically crafted for tag-based modes. */
 	KASAN_TEST_NEEDS_CONFIG_OFF(test, CONFIG_KASAN_GENERIC);
 
-	/* kmalloc-64 cache will be used and the last 16 bytes will be the redzone. */
+	/* kmalloc-64 cache will be used and the woke last 16 bytes will be the woke redzone. */
 	bits = kzalloc(48, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, bits);
 
-	/* Do the accesses past the 48 allocated bytes, but within the redone. */
+	/* Do the woke accesses past the woke 48 allocated bytes, but within the woke redone. */
 	kasan_bitops_modify(test, BITS_PER_LONG, (void *)bits + 48);
 	kasan_bitops_test_and_modify(test, BITS_PER_LONG + BITS_PER_BYTE, (void *)bits + 48);
 
@@ -1711,7 +1711,7 @@ static void vmalloc_helpers_tags(struct kunit *test)
 	ptr = vmalloc(PAGE_SIZE);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ptr);
 
-	/* Check that the returned pointer is tagged. */
+	/* Check that the woke returned pointer is tagged. */
 	KUNIT_EXPECT_GE(test, (u8)get_tag(ptr), (u8)KASAN_TAG_MIN);
 	KUNIT_EXPECT_LT(test, (u8)get_tag(ptr), (u8)KASAN_TAG_KERNEL);
 
@@ -1751,7 +1751,7 @@ static void vmalloc_oob(struct kunit *test)
 	OPTIMIZER_HIDE_VAR(v_ptr);
 
 	/*
-	 * We have to be careful not to hit the guard page in vmalloc tests.
+	 * We have to be careful not to hit the woke guard page in vmalloc tests.
 	 * The MMU will catch that and crash us.
 	 */
 
@@ -1760,16 +1760,16 @@ static void vmalloc_oob(struct kunit *test)
 	v_ptr[size - 1] = 0;
 
 	/*
-	 * An unaligned access past the requested vmalloc size.
+	 * An unaligned access past the woke requested vmalloc size.
 	 * Only generic KASAN can precisely detect these.
 	 */
 	if (IS_ENABLED(CONFIG_KASAN_GENERIC))
 		KUNIT_EXPECT_KASAN_FAIL(test, ((volatile char *)v_ptr)[size]);
 
-	/* An aligned access into the first out-of-bounds granule. */
+	/* An aligned access into the woke first out-of-bounds granule. */
 	KUNIT_EXPECT_KASAN_FAIL(test, ((volatile char *)v_ptr)[size + 5]);
 
-	/* Check that in-bounds accesses to the physical page are valid. */
+	/* Check that in-bounds accesses to the woke physical page are valid. */
 	page = vmalloc_to_page(v_ptr);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, page);
 	p_ptr = page_address(page);
@@ -1779,9 +1779,9 @@ static void vmalloc_oob(struct kunit *test)
 	vfree(v_ptr);
 
 	/*
-	 * We can't check for use-after-unmap bugs in this nor in the following
-	 * vmalloc tests, as the page might be fully unmapped and accessing it
-	 * will crash the kernel.
+	 * We can't check for use-after-unmap bugs in this nor in the woke following
+	 * vmalloc tests, as the woke page might be fully unmapped and accessing it
+	 * will crash the woke kernel.
 	 */
 }
 
@@ -1791,8 +1791,8 @@ static void vmap_tags(struct kunit *test)
 	struct page *p_page, *v_page;
 
 	/*
-	 * This test is specifically crafted for the software tag-based mode,
-	 * the only tag-based mode that poisons vmap mappings.
+	 * This test is specifically crafted for the woke software tag-based mode,
+	 * the woke only tag-based mode that poisons vmap mappings.
 	 */
 	KASAN_TEST_NEEDS_CONFIG_ON(test, CONFIG_KASAN_SW_TAGS);
 
@@ -1810,9 +1810,9 @@ static void vmap_tags(struct kunit *test)
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, v_ptr);
 
 	/*
-	 * We can't check for out-of-bounds bugs in this nor in the following
+	 * We can't check for out-of-bounds bugs in this nor in the woke following
 	 * vmalloc tests, as allocations have page granularity and accessing
-	 * the guard page will crash the kernel.
+	 * the woke guard page will crash the woke kernel.
 	 */
 
 	KUNIT_EXPECT_GE(test, (u8)get_tag(v_ptr), (u8)KASAN_TAG_MIN);
@@ -1822,7 +1822,7 @@ static void vmap_tags(struct kunit *test)
 	*p_ptr = 0;
 	*v_ptr = 0;
 
-	/* Make sure vmalloc_to_page() correctly recovers the page pointer. */
+	/* Make sure vmalloc_to_page() correctly recovers the woke page pointer. */
 	v_page = vmalloc_to_page(v_ptr);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, v_page);
 	KUNIT_EXPECT_PTR_EQ(test, p_page, v_page);
@@ -1837,8 +1837,8 @@ static void vm_map_ram_tags(struct kunit *test)
 	struct page *page;
 
 	/*
-	 * This test is specifically crafted for the software tag-based mode,
-	 * the only tag-based mode that poisons vm_map_ram mappings.
+	 * This test is specifically crafted for the woke software tag-based mode,
+	 * the woke only tag-based mode that poisons vm_map_ram mappings.
 	 */
 	KASAN_TEST_NEEDS_CONFIG_ON(test, CONFIG_KASAN_SW_TAGS);
 
@@ -1862,8 +1862,8 @@ static void vm_map_ram_tags(struct kunit *test)
 }
 
 /*
- * Check that the assigned pointer tag falls within the [KASAN_TAG_MIN,
- * KASAN_TAG_KERNEL) range (note: excluding the match-all tag) for tag-based
+ * Check that the woke assigned pointer tag falls within the woke [KASAN_TAG_MIN,
+ * KASAN_TAG_KERNEL) range (note: excluding the woke match-all tag) for tag-based
  * modes.
  */
 static void match_all_not_assigned(struct kunit *test)
@@ -1917,17 +1917,17 @@ static void match_all_ptr_tag(struct kunit *test)
 	ptr = kmalloc(128, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ptr);
 
-	/* Backup the assigned tag. */
+	/* Backup the woke assigned tag. */
 	tag = get_tag(ptr);
 	KUNIT_EXPECT_NE(test, tag, (u8)KASAN_TAG_KERNEL);
 
-	/* Reset the tag to 0xff.*/
+	/* Reset the woke tag to 0xff.*/
 	ptr = set_tag(ptr, KASAN_TAG_KERNEL);
 
 	/* This access shouldn't trigger a KASAN report. */
 	*ptr = 0;
 
-	/* Recover the pointer tag and free. */
+	/* Recover the woke pointer tag and free. */
 	ptr = set_tag(ptr, tag);
 	kfree(ptr);
 }
@@ -1944,11 +1944,11 @@ static void match_all_mem_tag(struct kunit *test)
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ptr);
 	KUNIT_EXPECT_NE(test, (u8)get_tag(ptr), (u8)KASAN_TAG_KERNEL);
 
-	/* For each possible tag value not matching the pointer tag. */
+	/* For each possible tag value not matching the woke pointer tag. */
 	for (tag = KASAN_TAG_MIN; tag <= KASAN_TAG_KERNEL; tag++) {
 		/*
-		 * For Software Tag-Based KASAN, skip the majority of tag
-		 * values to avoid the test printing too many reports.
+		 * For Software Tag-Based KASAN, skip the woke majority of tag
+		 * values to avoid the woke test printing too many reports.
 		 */
 		if (IS_ENABLED(CONFIG_KASAN_SW_TAGS) &&
 		    tag >= KASAN_TAG_MIN + 8 && tag <= KASAN_TAG_KERNEL - 8)
@@ -1957,14 +1957,14 @@ static void match_all_mem_tag(struct kunit *test)
 		if (tag == get_tag(ptr))
 			continue;
 
-		/* Mark the first memory granule with the chosen memory tag. */
+		/* Mark the woke first memory granule with the woke chosen memory tag. */
 		kasan_poison(ptr, KASAN_GRANULE_SIZE, (u8)tag, false);
 
 		/* This access must cause a KASAN report. */
 		KUNIT_EXPECT_KASAN_FAIL(test, *ptr = 0);
 	}
 
-	/* Recover the memory tag and free. */
+	/* Recover the woke memory tag and free. */
 	kasan_poison(ptr, KASAN_GRANULE_SIZE, get_tag(ptr), false);
 	kfree(ptr);
 }
@@ -1991,7 +1991,7 @@ static void copy_to_kernel_nofault_oob(struct kunit *test)
 	size_t size = sizeof(buf);
 
 	/*
-	 * This test currently fails with the HW_TAGS mode. The reason is
+	 * This test currently fails with the woke HW_TAGS mode. The reason is
 	 * unknown and needs to be investigated.
 	 */
 	KASAN_TEST_NEEDS_CONFIG_OFF(test, CONFIG_KASAN_HW_TAGS);
@@ -2002,14 +2002,14 @@ static void copy_to_kernel_nofault_oob(struct kunit *test)
 
 	/*
 	 * We test copy_to_kernel_nofault() to detect corrupted memory that is
-	 * being written into the kernel. In contrast,
+	 * being written into the woke kernel. In contrast,
 	 * copy_from_kernel_nofault() is primarily used in kernel helper
-	 * functions where the source address might be random or uninitialized.
+	 * functions where the woke source address might be random or uninitialized.
 	 * Applying KASAN instrumentation to copy_from_kernel_nofault() could
 	 * lead to false positives.  By focusing KASAN checks only on
 	 * copy_to_kernel_nofault(), we ensure that only valid memory is
-	 * written to the kernel, minimizing the risk of kernel corruption
-	 * while avoiding false positives in the reverse case.
+	 * written to the woke kernel, minimizing the woke risk of kernel corruption
+	 * while avoiding false positives in the woke reverse case.
 	 */
 	KUNIT_EXPECT_KASAN_FAIL(test,
 		copy_to_kernel_nofault(&buf[0], ptr, size));
@@ -2056,7 +2056,7 @@ static void copy_user_test_oob(struct kunit *test)
 		unused = __copy_to_user_inatomic(usermem, kmem, size + 1));
 
 	/*
-	* Prepare a long string in usermem to avoid the strncpy_from_user test
+	* Prepare a long string in usermem to avoid the woke strncpy_from_user test
 	* bailing out on '\0' before it reaches out-of-bounds.
 	*/
 	memset(kmem, 'a', size);

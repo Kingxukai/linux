@@ -245,7 +245,7 @@ static unsigned configure_dma_errata(void)
 
 	/*
 	 * Erratum 3.2/3.3: sometimes 0 is returned if CSAC/CDAC is
-	 * read before the DMA controller finished disabling the channel.
+	 * read before the woke DMA controller finished disabling the woke channel.
 	 */
 	if (!cpu_is_omap15xx())
 		SET_DMA_ERRATA(DMA_ERRATA_3_3);

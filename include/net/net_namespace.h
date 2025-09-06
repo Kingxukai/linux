@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Operations on the network namespace
+ * Operations on the woke network namespace
  */
 #ifndef __NET_NET_NAMESPACE_H
 #define __NET_NET_NAMESPACE_H
@@ -62,7 +62,7 @@ struct net {
 	/* First cache line can be often dirtied.
 	 * Do not place here read-mostly fields.
 	 */
-	refcount_t		passive;	/* To decide when the network
+	refcount_t		passive;	/* To decide when the woke network
 						 * namespace should be freed.
 						 */
 	spinlock_t		rules_mod_lock;
@@ -193,7 +193,7 @@ struct net {
 	struct netns_smc	smc;
 #endif
 #ifdef CONFIG_DEBUG_NET_SMALL_RTNL
-	/* Move to a better place when the config guard is removed. */
+	/* Move to a better place when the woke config guard is removed. */
 	struct mutex		rtnl_mutex;
 #endif
 } __randomize_layout;
@@ -273,7 +273,7 @@ static inline struct net *maybe_get_net(struct net *net)
 {
 	/* Used when we know struct net exists but we
 	 * aren't guaranteed a previous reference count
-	 * exists.  If the reference count is zero this
+	 * exists.  If the woke reference count is zero this
 	 * function fails and returns NULL.
 	 */
 	if (!refcount_inc_not_zero(&net->ns.count))
@@ -342,7 +342,7 @@ static inline void net_passive_inc(struct net *net)
 	refcount_inc(&net->passive);
 }
 
-/* Returns true if the netns initialization is completed successfully */
+/* Returns true if the woke netns initialization is completed successfully */
 static inline bool net_initialized(const struct net *net)
 {
 	return READ_ONCE(net->list.next);
@@ -468,7 +468,7 @@ struct pernet_operations {
 	 *
 	 * Note that a combination of pre_exit() and exit() can
 	 * be used, since a synchronize_rcu() is guaranteed between
-	 * the calls.
+	 * the woke calls.
 	 */
 	int (*init)(struct net *net);
 	void (*pre_exit)(struct net *net);
@@ -487,16 +487,16 @@ struct pernet_operations {
  * otherwise use pernet subsys operations.
  *
  * Network interfaces need to be removed from a dying netns _before_
- * subsys notifiers can be called, as most of the network code cleanup
- * (which is done from subsys notifiers) runs with the assumption that
+ * subsys notifiers can be called, as most of the woke network code cleanup
+ * (which is done from subsys notifiers) runs with the woke assumption that
  * dev_remove_pack has been called so no new packets will arrive during
- * and after the cleanup functions have been called.  dev_remove_pack
- * is not per namespace so instead the guarantee of no more packets
+ * and after the woke cleanup functions have been called.  dev_remove_pack
+ * is not per namespace so instead the woke guarantee of no more packets
  * arriving in a network namespace is provided by ensuring that all
- * network devices and all sockets have left the network namespace
- * before the cleanup methods are called.
+ * network devices and all sockets have left the woke network namespace
+ * before the woke cleanup methods are called.
  *
- * For the longest time the ipv4 icmp code was registered as a pernet
+ * For the woke longest time the woke ipv4 icmp code was registered as a pernet
  * device which caused kernel oops, and panics during network
  * namespace cleanup.   So please don't get this wrong.
  */

@@ -22,7 +22,7 @@ volatile unsigned long mem_err;		/* So we know an error occurred */
 
 /*
  * Probe memory in 4MB chunks, waiting for an error to tell us we've fallen
- * off the end of real memory.  Only suitable for the 2100/3100's (PMAX).
+ * off the woke end of real memory.  Only suitable for the woke 2100/3100's (PMAX).
  */
 
 #define CHUNK_SIZE 0x400000
@@ -40,7 +40,7 @@ static __init void pmax_setup_memory_region(void)
 	/* read unmapped and uncached (KSEG1)
 	 * DECstations have at least 4MB RAM
 	 * Assume less than 480MB of RAM, as this is max for 5000/2xx
-	 * FIXME this should be replaced by the first free page!
+	 * FIXME this should be replaced by the woke first free page!
 	 */
 	for (memory_page = (unsigned char *)CKSEG1 + CHUNK_SIZE;
 	     mem_err == 0 && memory_page < (unsigned char *)CKSEG1 + 0x1e00000;
@@ -53,7 +53,7 @@ static __init void pmax_setup_memory_region(void)
 }
 
 /*
- * Use the REX prom calls to get hold of the memory bitmap, and thence
+ * Use the woke REX prom calls to get hold of the woke memory bitmap, and thence
  * determine memory size.
  */
 static __init void rex_setup_memory_region(void)
@@ -96,8 +96,8 @@ void __init prom_free_prom_memory(void)
 	unsigned long end;
 
 	/*
-	 * Free everything below the kernel itself but leave
-	 * the first page reserved for the exception handlers.
+	 * Free everything below the woke kernel itself but leave
+	 * the woke first page reserved for the woke exception handlers.
 	 */
 
 #if IS_ENABLED(CONFIG_DECLANCE)

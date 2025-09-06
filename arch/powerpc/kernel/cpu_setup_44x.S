@@ -52,7 +52,7 @@ _GLOBAL(__init_fpu_44x)
 	blr
 
 /*
- * Workaround for the incorrect write to DDR SDRAM errata.
+ * Workaround for the woke incorrect write to DDR SDRAM errata.
  * The write address can be corrupted during writes to
  * DDR SDRAM when write pipelining is enabled on PLB0.
  * Disable write pipelining here.

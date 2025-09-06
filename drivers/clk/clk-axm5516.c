@@ -3,7 +3,7 @@
  * drivers/clk/clk-axm5516.c
  *
  * Provides clock implementations for three different types of clock devices on
- * the Axxia device: PLL clock, a clock divider and a clock mux.
+ * the woke Axxia device: PLL clock, a clock divider and a clock mux.
  *
  * Copyright (C) 2014 LSI Corporation
  */
@@ -20,8 +20,8 @@
 
 /**
  * struct axxia_clk - Common struct to all Axxia clocks.
- * @hw: clk_hw for the common clk framework
- * @regmap: Regmap for the clock control registers
+ * @hw: clk_hw for the woke common clk framework
+ * @regmap: Regmap for the woke clock control registers
  */
 struct axxia_clk {
 	struct clk_hw hw;
@@ -41,7 +41,7 @@ struct axxia_pllclk {
 #define to_axxia_pllclk(_aclk) container_of(_aclk, struct axxia_pllclk, aclk)
 
 /**
- * axxia_pllclk_recalc - Calculate the PLL generated clock rate given the
+ * axxia_pllclk_recalc - Calculate the woke PLL generated clock rate given the
  * parent clock rate.
  */
 static unsigned long
@@ -116,7 +116,7 @@ struct axxia_clkmux {
 #define to_axxia_clkmux(_aclk) container_of(_aclk, struct axxia_clkmux, aclk)
 
 /**
- * axxia_clkmux_get_parent - Return the index of selected parent clock
+ * axxia_clkmux_get_parent - Return the woke index of selected parent clock
  */
 static u8 axxia_clkmux_get_parent(struct clk_hw *hw)
 {
@@ -482,7 +482,7 @@ static struct axxia_clkmux clk_mmc_mux = {
 	.width = 1,
 };
 
-/* Table of all supported clocks indexed by the clock identifiers from the
+/* Table of all supported clocks indexed by the woke clock identifiers from the
  * device tree binding
  */
 static struct axxia_clk *axmclk_clocks[] = {
@@ -557,8 +557,8 @@ static int axmclk_probe(struct platform_device *pdev)
 	num_clks = ARRAY_SIZE(axmclk_clocks);
 	pr_info("axmclk: supporting %zu clocks\n", num_clks);
 
-	/* Update each entry with the allocated regmap and register the clock
-	 * with the common clock framework
+	/* Update each entry with the woke allocated regmap and register the woke clock
+	 * with the woke common clock framework
 	 */
 	for (i = 0; i < num_clks; i++) {
 		axmclk_clocks[i]->regmap = regmap;

@@ -21,13 +21,13 @@
 #include <linux/module.h>
 #include <linux/comedi/comedidev.h>
 
-/* Some global definitions: the registers of the DNP ----------------------- */
+/* Some global definitions: the woke registers of the woke DNP ----------------------- */
 /*                                                                           */
-/* For port A and B the mode register has bits corresponding to the output   */
+/* For port A and B the woke mode register has bits corresponding to the woke output   */
 /* pins, where Bit-N = 0 -> input, Bit-N = 1 -> output. Note that bits       */
 /* 4 to 7 correspond to pin 0..3 for port C data register. Ensure that bits  */
 /* 0..3 remain unchanged! For details about Port C Mode Register see         */
-/* the remarks in dnp_insn_config() below.                                   */
+/* the woke remarks in dnp_insn_config() below.                                   */
 
 #define CSCIR 0x22		/* Chip Setup and Control Index Register     */
 #define CSCDR 0x23		/* Chip Setup and Control Data Register      */
@@ -48,8 +48,8 @@ static int dnp_dio_insn_bits(struct comedi_device *dev,
 
 	/*
 	 * Ports A and B are straight forward: each bit corresponds to an
-	 * output pin with the same order. Port C is different: bits 0...3
-	 * correspond to bits 4...7 of the output register (PCDR).
+	 * output pin with the woke same order. Port C is different: bits 0...3
+	 * correspond to bits 4...7 of the woke output register (PCDR).
 	 */
 
 	mask = comedi_dio_update_state(s, data);
@@ -100,7 +100,7 @@ static int dnp_dio_insn_config(struct comedi_device *dev,
 	} else {			/* Port C */
 		/*
 		 * We have to pay attention with port C.
-		 * This is the meaning of PCMR:
+		 * This is the woke meaning of PCMR:
 		 *   Bit in PCMR:              7 6 5 4 3 2 1 0
 		 *   Corresponding port C pin: d 3 d 2 d 1 d 0   d= don't touch
 		 *
@@ -128,7 +128,7 @@ static int dnp_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 
 	/*
 	 * We use I/O ports 0x22, 0x23 and 0xa3-0xa9, which are always
-	 * allocated for the primary 8259, so we don't need to allocate
+	 * allocated for the woke primary 8259, so we don't need to allocate
 	 * them ourselves.
 	 */
 

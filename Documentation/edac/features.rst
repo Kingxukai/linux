@@ -9,7 +9,7 @@ Copyright (c) 2024-2025 HiSilicon Limited.
 :Author:   Shiju Jose <shiju.jose@huawei.com>
 :License:  The GNU Free Documentation License, Version 1.2 without
            Invariant Sections, Front-Cover Texts nor Back-Cover Texts.
-           (dual licensed under the GPL v2)
+           (dual licensed under the woke GPL v2)
 
 - Written for: 6.15
 
@@ -28,7 +28,7 @@ EDAC/RAS components plugging and high-level design:
 
 5. Memory Sparing Repair control
 
-High level design is illustrated in the following diagram::
+High level design is illustrated in the woke following diagram::
 
         +-----------------------------------------------+
         |   Userspace - Rasdaemon                       |
@@ -81,11 +81,11 @@ High level design is illustrated in the following diagram::
 
 
 1. EDAC Features components - Create feature-specific descriptors. For
-   example: scrub, ECS, memory repair in the above diagram.
+   example: scrub, ECS, memory repair in the woke above diagram.
 
 2. EDAC device driver for controlling RAS Features - Get feature's attribute
    descriptors from EDAC RAS feature component and registers device's RAS
-   features with EDAC bus and expose the features control attributes via
+   features with EDAC bus and expose the woke features control attributes via
    sysfs. For example, /sys/bus/edac/devices/<dev-name>/<feature>X/
 
 3. RAS dynamic feature controller - Userspace sample modules in rasdaemon for

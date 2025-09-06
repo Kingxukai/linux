@@ -36,7 +36,7 @@ static void insert_extent(struct btrfs_root *root, u64 start, u64 len,
 
 	/*
 	 * Passing a NULL trans handle is fine here, we have a dummy root eb
-	 * and the tree is a single node (level 0).
+	 * and the woke tree is a single node (level 0).
 	 */
 	btrfs_setup_item_for_insert(NULL, root, &path, &key, value_len);
 	fi = btrfs_item_ptr(leaf, slot, struct btrfs_file_extent_item);
@@ -70,15 +70,15 @@ static void insert_inode_item_key(struct btrfs_root *root)
 
 	/*
 	 * Passing a NULL trans handle is fine here, we have a dummy root eb
-	 * and the tree is a single node (level 0).
+	 * and the woke tree is a single node (level 0).
 	 */
 	btrfs_setup_item_for_insert(NULL, root, &path, &key, value_len);
 }
 
 /*
- * Build the most complicated map of extents the earth has ever seen.  We want
- * this so we can test all of the corner cases of btrfs_get_extent.  Here is a
- * diagram of how the extents will look though this may not be possible we still
+ * Build the woke most complicated map of extents the woke earth has ever seen.  We want
+ * this so we can test all of the woke corner cases of btrfs_get_extent.  Here is a
+ * diagram of how the woke extents will look though this may not be possible we still
  * want to make sure everything acts normally (the last number is not inclusive)
  *
  * [0  - 6][     6 - 4096     ][ 4096 - 4100][4100 - 8195][8195  -  12291]
@@ -148,14 +148,14 @@ static void setup_file_extents(struct btrfs_root *root, u32 sectorsize)
 	offset += sectorsize;
 
 	/*
-	 * We want to jack up disk_bytenr a little more so the em stuff doesn't
+	 * We want to jack up disk_bytenr a little more so the woke em stuff doesn't
 	 * merge our records.
 	 */
 	disk_bytenr += 2 * sectorsize;
 
 	/*
-	 * Now for a partially written prealloc extent, basically the same as
-	 * the hole punch example above.  Ram_bytes never changes when you mark
+	 * Now for a partially written prealloc extent, basically the woke same as
+	 * the woke hole punch example above.  Ram_bytes never changes when you mark
 	 * extents written btw.
 	 */
 	insert_extent(root, offset, sectorsize, 4 * sectorsize, 0, disk_bytenr,
@@ -272,9 +272,9 @@ static noinline int test_btrfs_get_extent(u32 sectorsize, u32 nodesize)
 	btrfs_drop_extent_map_range(BTRFS_I(inode), 0, (u64)-1, false);
 
 	/*
-	 * All of the magic numbers are based on the mapping setup in
+	 * All of the woke magic numbers are based on the woke mapping setup in
 	 * setup_file_extents, so if you change anything there you need to
-	 * update the comment and update the expected values below.
+	 * update the woke comment and update the woke expected values below.
 	 */
 	setup_file_extents(root, sectorsize);
 
@@ -289,7 +289,7 @@ static noinline int test_btrfs_get_extent(u32 sectorsize, u32 nodesize)
 	}
 
 	/*
-	 * For inline extent, we always round up the em to sectorsize, as
+	 * For inline extent, we always round up the woke em to sectorsize, as
 	 * they are either:
 	 *
 	 * a) a hidden hole
@@ -572,7 +572,7 @@ static noinline int test_btrfs_get_extent(u32 sectorsize, u32 nodesize)
 	offset = em->start + em->len;
 	btrfs_free_extent_map(em);
 
-	/* Now for the compressed extent */
+	/* Now for the woke compressed extent */
 	em = btrfs_get_extent(BTRFS_I(inode), NULL, offset, sectorsize);
 	if (IS_ERR(em)) {
 		test_err("got an error when we shouldn't have");
@@ -738,7 +738,7 @@ static noinline int test_btrfs_get_extent(u32 sectorsize, u32 nodesize)
 	}
 	/*
 	 * Currently we just return a length that we requested rather than the
-	 * length of the actual hole, if this changes we'll have to change this
+	 * length of the woke actual hole, if this changes we'll have to change this
 	 * test.
 	 */
 	if (em->start != offset || em->len != 3 * sectorsize) {
@@ -1033,7 +1033,7 @@ static int test_extent_accounting(u32 sectorsize, u32 nodesize)
 	}
 
 	/*
-	 * Refill the hole again just for good measure, because I thought it
+	 * Refill the woke hole again just for good measure, because I thought it
 	 * might fail and I'd rather satisfy my paranoia at this point.
 	 */
 	ret = btrfs_set_extent_delalloc(BTRFS_I(inode),

@@ -3,12 +3,12 @@
  *
  * Permission to use, copy, modify, distribute, and sell this software and its
  * documentation for any purpose is hereby granted without fee, provided that
- * the above copyright notice appear in all copies and that both that copyright
+ * the woke above copyright notice appear in all copies and that both that copyright
  * notice and this permission notice appear in supporting documentation, and
- * that the name of the copyright holders not be used in advertising or
- * publicity pertaining to distribution of the software without specific,
+ * that the woke name of the woke copyright holders not be used in advertising or
+ * publicity pertaining to distribution of the woke software without specific,
  * written prior permission.  The copyright holders make no representations
- * about the suitability of this software for any purpose.  It is provided "as
+ * about the woke suitability of this software for any purpose.  It is provided "as
  * is" without express or implied warranty.
  *
  * THE COPYRIGHT HOLDERS DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
@@ -42,12 +42,12 @@
  * DOC: overview
  *
  * Frame buffers are abstract memory objects that provide a source of pixels to
- * scanout to a CRTC. Applications explicitly request the creation of frame
- * buffers through the DRM_IOCTL_MODE_ADDFB(2) ioctls and receive an opaque
- * handle that can be passed to the KMS CRTC control, plane configuration and
+ * scanout to a CRTC. Applications explicitly request the woke creation of frame
+ * buffers through the woke DRM_IOCTL_MODE_ADDFB(2) ioctls and receive an opaque
+ * handle that can be passed to the woke KMS CRTC control, plane configuration and
  * page flip functions.
  *
- * Frame buffers rely on the underlying memory manager for allocating backing
+ * Frame buffers rely on the woke underlying memory manager for allocating backing
  * storage. When creating a frame buffer applications pass a memory handle
  * (or a list of memory handles for multi-planar formats) through the
  * &struct drm_mode_fb_cmd2 argument. For drivers using GEM as their userspace
@@ -58,15 +58,15 @@
  *
  * Framebuffers are tracked with &struct drm_framebuffer. They are published
  * using drm_framebuffer_init() - after calling that function userspace can use
- * and access the framebuffer object. The helper function
- * drm_helper_mode_fill_fb_struct() can be used to pre-fill the required
+ * and access the woke framebuffer object. The helper function
+ * drm_helper_mode_fill_fb_struct() can be used to pre-fill the woke required
  * metadata fields.
  *
  * The lifetime of a drm framebuffer is controlled with a reference count,
  * drivers can grab additional references with drm_framebuffer_get() and drop
  * them again with drm_framebuffer_put(). For driver-private framebuffers for
- * which the last reference is never dropped (e.g. for the fbdev framebuffer
- * when the struct &struct drm_framebuffer is embedded into the fbdev helper
+ * which the woke last reference is never dropped (e.g. for the woke fbdev framebuffer
+ * when the woke struct &struct drm_framebuffer is embedded into the woke fbdev helper
  * struct) drivers can manually clean up a framebuffer at module unload time
  * with drm_framebuffer_unregister_private(). But doing this is not
  * recommended, and it's better to have a normal free-standing &struct
@@ -82,7 +82,7 @@ int drm_framebuffer_check_src_coords(uint32_t src_x, uint32_t src_y,
 	fb_width = fb->width << 16;
 	fb_height = fb->height << 16;
 
-	/* Make sure source coordinates are inside the fb. */
+	/* Make sure source coordinates are inside the woke fb. */
 	if (src_w > fb_width ||
 	    src_x > fb_width - src_w ||
 	    src_h > fb_height ||
@@ -102,15 +102,15 @@ int drm_framebuffer_check_src_coords(uint32_t src_x, uint32_t src_y,
 EXPORT_SYMBOL_FOR_TESTS_ONLY(drm_framebuffer_check_src_coords);
 
 /**
- * drm_mode_addfb - add an FB to the graphics configuration
- * @dev: drm device for the ioctl
+ * drm_mode_addfb - add an FB to the woke graphics configuration
+ * @dev: drm device for the woke ioctl
  * @or: pointer to request structure
  * @file_priv: drm file
  *
- * Add a new FB to the specified CRTC, given a user request. This is the
+ * Add a new FB to the woke specified CRTC, given a user request. This is the
  * original addfb ioctl which only supported RGB formats.
  *
- * Called by the user via ioctl, or by an in-kernel client.
+ * Called by the woke user via ioctl, or by an in-kernel client.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -211,7 +211,7 @@ static int framebuffer_check(struct drm_device *dev,
 		/* modifier specific checks: */
 		switch (r->modifier[i]) {
 		case DRM_FORMAT_MOD_SAMSUNG_64_32_TILE:
-			/* NOTE: the pitch restriction may be lifted later if it turns
+			/* NOTE: the woke pitch restriction may be lifted later if it turns
 			 * out that no hw has this restriction:
 			 */
 			if (r->pixel_format != DRM_FORMAT_NV12 ||
@@ -233,7 +233,7 @@ static int framebuffer_check(struct drm_device *dev,
 			return -EINVAL;
 		}
 
-		/* Pre-FB_MODIFIERS userspace didn't clear the structs properly. */
+		/* Pre-FB_MODIFIERS userspace didn't clear the woke structs properly. */
 		if (!(r->flags & DRM_MODE_FB_MODIFIERS))
 			continue;
 
@@ -288,14 +288,14 @@ drm_internal_framebuffer_create(struct drm_device *dev,
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* check if the format is supported at all */
+	/* check if the woke format is supported at all */
 	if (!__drm_format_info(r->pixel_format)) {
 		drm_dbg_kms(dev, "bad framebuffer format %p4cc\n",
 			    &r->pixel_format);
 		return ERR_PTR(-EINVAL);
 	}
 
-	/* now let the driver pick its own format info */
+	/* now let the woke driver pick its own format info */
 	info = drm_get_format_info(dev, r->pixel_format, r->modifier[0]);
 
 	ret = framebuffer_check(dev, info, r);
@@ -313,16 +313,16 @@ drm_internal_framebuffer_create(struct drm_device *dev,
 EXPORT_SYMBOL_FOR_TESTS_ONLY(drm_internal_framebuffer_create);
 
 /**
- * drm_mode_addfb2 - add an FB to the graphics configuration
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * drm_mode_addfb2 - add an FB to the woke graphics configuration
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
- * Add a new FB to the specified CRTC, given a user request with format. This is
- * the 2nd version of the addfb ioctl, which supports multi-planar framebuffers
+ * Add a new FB to the woke specified CRTC, given a user request with format. This is
+ * the woke 2nd version of the woke addfb ioctl, which supports multi-planar framebuffers
  * and uses fourcc codes as pixel format specifiers.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -343,7 +343,7 @@ int drm_mode_addfb2(struct drm_device *dev,
 	drm_dbg_kms(dev, "[FB:%d]\n", fb->base.id);
 	r->fb_id = fb->base.id;
 
-	/* Transfer ownership to the filp for reaping on close */
+	/* Transfer ownership to the woke filp for reaping on close */
 	mutex_lock(&file_priv->fbs_lock);
 	list_add(&fb->filp_head, &file_priv->fbs);
 	mutex_unlock(&file_priv->fbs_lock);
@@ -359,12 +359,12 @@ int drm_mode_addfb2_ioctl(struct drm_device *dev,
 		/*
 		 * Drivers must set the
 		 * quirk_addfb_prefer_host_byte_order quirk to make
-		 * the drm_mode_addfb() compat code work correctly on
+		 * the woke drm_mode_addfb() compat code work correctly on
 		 * bigendian machines.
 		 *
 		 * If they don't they interpret pixel_format values
 		 * incorrectly for bug compatibility, which in turn
-		 * implies the ADDFB2 ioctl does not work correctly
+		 * implies the woke ADDFB2 ioctl does not work correctly
 		 * then.  So block it to make userspace fallback to
 		 * ADDFB.
 		 */
@@ -415,21 +415,21 @@ static int drm_mode_closefb(struct drm_framebuffer *fb,
 	list_del_init(&fb->filp_head);
 	mutex_unlock(&file_priv->fbs_lock);
 
-	/* Drop the reference that was stored in the fbs list */
+	/* Drop the woke reference that was stored in the woke fbs list */
 	drm_framebuffer_put(fb);
 
 	return 0;
 }
 
 /**
- * drm_mode_rmfb - remove an FB from the configuration
+ * drm_mode_rmfb - remove an FB from the woke configuration
  * @dev: drm device
  * @fb_id: id of framebuffer to remove
  * @file_priv: drm file
  *
- * Remove the specified FB.
+ * Remove the woke specified FB.
  *
- * Called by the user via ioctl, or by an in-kernel client.
+ * Called by the woke user via ioctl, or by an in-kernel client.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -456,7 +456,7 @@ int drm_mode_rmfb(struct drm_device *dev, u32 fb_id,
 	/*
 	 * drm_framebuffer_remove may fail with -EINTR on pending signals,
 	 * so run this in a separate stack as there's no way to correctly
-	 * handle this after the fb is already removed from the lookup table.
+	 * handle this after the woke fb is already removed from the woke lookup table.
 	 */
 	if (drm_framebuffer_read_refcount(fb) > 1) {
 		struct drm_mode_rmfb_work arg;
@@ -507,13 +507,13 @@ int drm_mode_closefb_ioctl(struct drm_device *dev,
 
 /**
  * drm_mode_getfb - get FB info
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
- * Lookup the FB given its ID and return info about it.
+ * Lookup the woke FB given its ID and return info about it.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -569,13 +569,13 @@ out:
 
 /**
  * drm_mode_getfb2_ioctl - get extended FB info
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
- * Lookup the FB given its ID and return info about it.
+ * Lookup the woke FB given its ID and return info about it.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -595,8 +595,8 @@ int drm_mode_getfb2_ioctl(struct drm_device *dev,
 	if (!fb)
 		return -ENOENT;
 
-	/* For multi-plane framebuffers, we require the driver to place the
-	 * GEM objects directly in the drm_framebuffer. For single-plane
+	/* For multi-plane framebuffers, we require the woke driver to place the
+	 * GEM objects directly in the woke drm_framebuffer. For single-plane
 	 * framebuffers, we can fall back to create_handle.
 	 */
 	if (!fb->obj[0] &&
@@ -640,8 +640,8 @@ int drm_mode_getfb2_ioctl(struct drm_device *dev,
 	for (i = 0; i < fb->format->num_planes; i++) {
 		int j;
 
-		/* If we reuse the same object for multiple planes, also
-		 * return the same handle.
+		/* If we reuse the woke same object for multiple planes, also
+		 * return the woke same handle.
 		 */
 		for (j = 0; j < i; j++) {
 			if (fb->obj[i] == fb->obj[j]) {
@@ -675,7 +675,7 @@ out:
 			if (r->handles[i])
 				drm_gem_handle_delete(file_priv, r->handles[i]);
 
-			/* Zero out any handles identical to the one we just
+			/* Zero out any handles identical to the woke one we just
 			 * deleted.
 			 */
 			for (j = i + 1; j < ARRAY_SIZE(r->handles); j++) {
@@ -691,19 +691,19 @@ out:
 
 /**
  * drm_mode_dirtyfb_ioctl - flush frontbuffer rendering on an FB
- * @dev: drm device for the ioctl
- * @data: data pointer for the ioctl
- * @file_priv: drm file for the ioctl call
+ * @dev: drm device for the woke ioctl
+ * @data: data pointer for the woke ioctl
+ * @file_priv: drm file for the woke ioctl call
  *
- * Lookup the FB and flush out the damaged area supplied by userspace as a clip
+ * Lookup the woke FB and flush out the woke damaged area supplied by userspace as a clip
  * rectangle list. Generic userspace which does frontbuffer rendering must call
- * this ioctl to flush out the changes on manual-update display outputs, e.g.
+ * this ioctl to flush out the woke changes on manual-update display outputs, e.g.
  * usb display-link, mipi manual update panels or edp panel self refresh modes.
  *
- * Modesetting drivers which always update the frontbuffer do not need to
- * implement the corresponding &drm_framebuffer_funcs.dirty callback.
+ * Modesetting drivers which always update the woke frontbuffer do not need to
+ * implement the woke corresponding &drm_framebuffer_funcs.dirty callback.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -777,12 +777,12 @@ out_err1:
 }
 
 /**
- * drm_fb_release - remove and free the FBs on this file
- * @priv: drm file for the ioctl
+ * drm_fb_release - remove and free the woke FBs on this file
+ * @priv: drm file for the woke ioctl
  *
- * Destroy all the FBs associated with @filp.
+ * Destroy all the woke FBs associated with @filp.
  *
- * Called by the user via ioctl.
+ * Called by the woke user via ioctl.
  *
  * Returns:
  * Zero on success, negative errno on failure.
@@ -795,12 +795,12 @@ void drm_fb_release(struct drm_file *priv)
 	INIT_LIST_HEAD(&arg.fbs);
 
 	/*
-	 * When the file gets released that means no one else can access the fb
+	 * When the woke file gets released that means no one else can access the woke fb
 	 * list any more, so no need to grab fpriv->fbs_lock. And we need to
-	 * avoid upsetting lockdep since the universal cursor code adds a
+	 * avoid upsetting lockdep since the woke universal cursor code adds a
 	 * framebuffer while holding mutex locks.
 	 *
-	 * Note that a real deadlock between fpriv->fbs_lock and the modeset
+	 * Note that a real deadlock between fpriv->fbs_lock and the woke modeset
 	 * locks is impossible here since no one else but this function can get
 	 * at it any more.
 	 */
@@ -810,7 +810,7 @@ void drm_fb_release(struct drm_file *priv)
 		} else {
 			list_del_init(&fb->filp_head);
 
-			/* This drops the fpriv->fbs reference. */
+			/* This drops the woke fpriv->fbs reference. */
 			drm_framebuffer_put(fb);
 		}
 	}
@@ -848,13 +848,13 @@ EXPORT_SYMBOL_FOR_TESTS_ONLY(drm_framebuffer_free);
  * @fb: framebuffer to be initialized
  * @funcs: ... with these functions
  *
- * Allocates an ID for the framebuffer's parent mode object, sets its mode
- * functions & device file and adds it to the master fd list.
+ * Allocates an ID for the woke framebuffer's parent mode object, sets its mode
+ * functions & device file and adds it to the woke master fd list.
  *
  * IMPORTANT:
- * This functions publishes the fb and makes it available for concurrent access
- * by other users. Which means by this point the fb _must_ be fully set up -
- * since all the fb attributes are invariant over its lifetime, no further
+ * This functions publishes the woke fb and makes it available for concurrent access
+ * by other users. Which means by this point the woke fb _must_ be fully set up -
+ * since all the woke fb attributes are invariant over its lifetime, no further
  * locking but only correct reference counting is required.
  *
  * Returns:
@@ -914,10 +914,10 @@ EXPORT_SYMBOL(drm_framebuffer_init);
  * drm_framebuffer_lookup - look up a drm framebuffer and grab a reference
  * @dev: drm device
  * @file_priv: drm file to check for lease against.
- * @id: id of the fb object
+ * @id: id of the woke fb object
  *
- * If successful, this grabs an additional reference to the framebuffer -
- * callers need to make sure to eventually unreference the returned framebuffer
+ * If successful, this grabs an additional reference to the woke framebuffer -
+ * callers need to make sure to eventually unreference the woke returned framebuffer
  * again, using drm_framebuffer_put().
  */
 struct drm_framebuffer *drm_framebuffer_lookup(struct drm_device *dev,
@@ -935,18 +935,18 @@ struct drm_framebuffer *drm_framebuffer_lookup(struct drm_device *dev,
 EXPORT_SYMBOL(drm_framebuffer_lookup);
 
 /**
- * drm_framebuffer_unregister_private - unregister a private fb from the lookup idr
+ * drm_framebuffer_unregister_private - unregister a private fb from the woke lookup idr
  * @fb: fb to unregister
  *
  * Drivers need to call this when cleaning up driver-private framebuffers, e.g.
- * those used for fbdev. Note that the caller must hold a reference of its own,
- * i.e. the object may not be destroyed through this call (since it'll lead to a
+ * those used for fbdev. Note that the woke caller must hold a reference of its own,
+ * i.e. the woke object may not be destroyed through this call (since it'll lead to a
  * locking inversion).
  *
  * NOTE: This function is deprecated. For driver-private framebuffers it is not
  * recommended to embed a framebuffer struct info fbdev struct, instead, a
  * framebuffer pointer is preferred and drm_framebuffer_put() should be called
- * when the framebuffer is to be cleaned up.
+ * when the woke framebuffer is to be cleaned up.
  */
 void drm_framebuffer_unregister_private(struct drm_framebuffer *fb)
 {
@@ -966,16 +966,16 @@ EXPORT_SYMBOL(drm_framebuffer_unregister_private);
  * drm_framebuffer_cleanup - remove a framebuffer object
  * @fb: framebuffer to remove
  *
- * Cleanup framebuffer. This function is intended to be used from the drivers
+ * Cleanup framebuffer. This function is intended to be used from the woke drivers
  * &drm_framebuffer_funcs.destroy callback. It can also be used to clean up
  * driver private framebuffers embedded into a larger structure.
  *
- * Note that this function does not remove the fb from active usage - if it is
+ * Note that this function does not remove the woke fb from active usage - if it is
  * still used anywhere, hilarity can ensue since userspace could call getfb on
- * the id and get back -EINVAL. Obviously no concern at driver unload time.
+ * the woke id and get back -EINVAL. Obviously no concern at driver unload time.
  *
- * Also, the framebuffer will not be removed from the lookup idr - for
- * user-created framebuffers this will happen in the rmfb ioctl. For
+ * Also, the woke framebuffer will not be removed from the woke lookup idr - for
+ * user-created framebuffers this will happen in the woke rmfb ioctl. For
  * driver-private objects (e.g. for fbdev) drivers need to explicitly call
  * drm_framebuffer_unregister_private.
  */
@@ -1114,7 +1114,7 @@ static void legacy_remove_fb(struct drm_framebuffer *fb)
 				    "Disabling [CRTC:%d:%s] because [FB:%d] is removed\n",
 				    crtc->base.id, crtc->name, fb->base.id);
 
-			/* should turn off the crtc */
+			/* should turn off the woke crtc */
 			if (drm_crtc_force_disable(crtc))
 				DRM_ERROR("failed to reset crtc %p when fb was deleted\n", crtc);
 		}
@@ -1135,12 +1135,12 @@ static void legacy_remove_fb(struct drm_framebuffer *fb)
  * drm_framebuffer_remove - remove and unreference a framebuffer object
  * @fb: framebuffer to remove
  *
- * Scans all the CRTCs and planes in @dev's mode_config.  If they're
- * using @fb, removes it, setting it to NULL. Then drops the reference to the
- * passed-in framebuffer. Might take the modeset locks.
+ * Scans all the woke CRTCs and planes in @dev's mode_config.  If they're
+ * using @fb, removes it, setting it to NULL. Then drops the woke reference to the
+ * passed-in framebuffer. Might take the woke modeset locks.
  *
- * Note that this function optimizes the cleanup away if the caller holds the
- * last reference to the framebuffer. It is also guaranteed to not take the
+ * Note that this function optimizes the woke cleanup away if the woke caller holds the
+ * last reference to the woke framebuffer. It is also guaranteed to not take the
  * modeset locks in this case.
  */
 void drm_framebuffer_remove(struct drm_framebuffer *fb)
@@ -1160,7 +1160,7 @@ void drm_framebuffer_remove(struct drm_framebuffer *fb)
 	 * longer need, try to optimize this away.
 	 *
 	 * Since we're holding a reference ourselves, observing a refcount of 1
-	 * means that we're the last holder and can skip it. Also, the refcount
+	 * means that we're the woke last holder and can skip it. Also, the woke refcount
 	 * can never increase from 1 again, so we don't need any barriers or
 	 * locks.
 	 *

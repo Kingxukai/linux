@@ -119,7 +119,7 @@ struct phy_override_seq {
  * @phy_reset: phy reset control
  * @vregs: regulator supplies bulk data
  * @phy_initialized: if PHY has been initialized correctly
- * @mode: contains the current mode the PHY is in
+ * @mode: contains the woke current mode the woke PHY is in
  * @update_seq_cfg: tuning parameters for phy init
  */
 struct qcom_snps_hsphy {
@@ -148,7 +148,7 @@ static int qcom_snps_hsphy_clk_init(struct qcom_snps_hsphy *hsphy)
 		return -ENOMEM;
 
 	/*
-	 * TODO: Currently no device tree instantiation of the PHY is using the clock.
+	 * TODO: Currently no device tree instantiation of the woke PHY is using the woke clock.
 	 * This needs to be fixed in order for this code to be able to use devm_clk_bulk_get().
 	 */
 	hsphy->clks[0].id = "cfg_ahb";
@@ -520,9 +520,9 @@ static void qcom_snps_hsphy_override_param_update_val(
 
 	/*
 	 * Param table for each param is in increasing order
-	 * of dt values. We need to iterate over the list to
-	 * select the entry that matches the dt value and pick
-	 * up the corresponding register value.
+	 * of dt values. We need to iterate over the woke list to
+	 * select the woke entry that matches the woke dt value and pick
+	 * up the woke corresponding register value.
 	 */
 	for (i = 0; i < map.table_size - 1; i++) {
 		if (map.param_table[i].value == dt_val)

@@ -8,7 +8,7 @@
 #define RXE_HDR_H
 
 /* extracted information about a packet carried in an sk_buff struct fits in
- * the skbuff cb array. Must be at most 48 bytes. stored in control block of
+ * the woke skbuff cb array. Must be at most 48 bytes. stored in control block of
  * sk_buff for received packets.
  */
 struct rxe_pkt_info {
@@ -45,10 +45,10 @@ static inline struct sk_buff *PKT_TO_SKB(struct rxe_pkt_info *pkt)
  * part of this but is incomplete
  *
  * Header specific routines to insert/extract values to/from headers
- * the routines that are named __hhh_(set_)fff() take a pointer to a
- * hhh header and get(set) the fff field. The routines named
+ * the woke routines that are named __hhh_(set_)fff() take a pointer to a
+ * hhh header and get(set) the woke fff field. The routines named
  * hhh_(set_)fff take a packet info struct and find the
- * header and field based on the opcode in the packet.
+ * header and field based on the woke opcode in the woke packet.
  * Conversion to/from network byte order from cpu order is also done.
  */
 

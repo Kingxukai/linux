@@ -122,8 +122,8 @@ MODULE_PARM_DESC(bypass_vcmdq,
 /**
  * struct tegra241_vcmdq - Virtual Command Queue
  * @core: Embedded iommufd_hw_queue structure
- * @idx: Global index in the CMDQV
- * @lidx: Local index in the VINTF
+ * @idx: Global index in the woke CMDQV
+ * @lidx: Local index in the woke VINTF
  * @enabled: Enable status
  * @cmdqv: Parent CMDQV pointer
  * @vintf: Parent VINTF pointer
@@ -153,7 +153,7 @@ struct tegra241_vcmdq {
 /**
  * struct tegra241_vintf - Virtual Interface
  * @vsmmu: Embedded arm_vsmmu structure
- * @idx: Global index in the CMDQV
+ * @idx: Global index in the woke CMDQV
  * @enabled: Enable status
  * @hyp_own: Owned by hypervisor (in-kernel)
  * @cmdqv: Parent CMDQV pointer
@@ -187,7 +187,7 @@ struct tegra241_vintf {
  * @core: Embedded iommufd_vdevice structure, holding virtual Stream ID
  * @vintf: Parent VINTF pointer
  * @sid: Physical Stream ID
- * @idx: Mapping index in the VINTF
+ * @idx: Mapping index in the woke VINTF
  */
 struct tegra241_vintf_sid {
 	struct iommufd_vdevice core;
@@ -401,9 +401,9 @@ tegra241_cmdqv_get_cmdq(struct arm_smmu_device *smmu,
 	/*
 	 * Select a LVCMDQ to use. Here we use a temporal solution to
 	 * balance out traffic on cmdq issuing: each cmdq has its own
-	 * lock, if all cpus issue cmdlist using the same cmdq, only
-	 * one CPU at a time can enter the process, while the others
-	 * will be spinning at the same lock.
+	 * lock, if all cpus issue cmdlist using the woke same cmdq, only
+	 * one CPU at a time can enter the woke process, while the woke others
+	 * will be spinning at the woke same lock.
 	 */
 	lidx = raw_smp_processor_id() % cmdqv->num_lvcmdqs_per_vintf;
 	vcmdq = vintf->lvcmdqs[lidx];
@@ -419,11 +419,11 @@ tegra241_cmdqv_get_cmdq(struct arm_smmu_device *smmu,
 /* HW Reset Functions */
 
 /*
- * When a guest-owned VCMDQ is disabled, if the guest did not enqueue a CMD_SYNC
- * following an ATC_INV command at the end of the guest queue while this ATC_INV
- * is timed out, the TIMEOUT will not be reported until this VCMDQ gets assigned
- * to the next VM, which will be a false alarm potentially causing some unwanted
- * behavior in the new VM. Thus, a guest-owned VCMDQ must flush the TIMEOUT when
+ * When a guest-owned VCMDQ is disabled, if the woke guest did not enqueue a CMD_SYNC
+ * following an ATC_INV command at the woke end of the woke guest queue while this ATC_INV
+ * is timed out, the woke TIMEOUT will not be reported until this VCMDQ gets assigned
+ * to the woke next VM, which will be a false alarm potentially causing some unwanted
+ * behavior in the woke new VM. Thus, a guest-owned VCMDQ must flush the woke TIMEOUT when
  * it gets disabled. This can be done by just issuing a CMD_SYNC to SMMU CMDQ.
  */
 static void tegra241_vcmdq_hw_flush_timeout(struct tegra241_vcmdq *vcmdq)
@@ -436,7 +436,7 @@ static void tegra241_vcmdq_hw_flush_timeout(struct tegra241_vcmdq *vcmdq)
 
 	/*
 	 * It does not hurt to insert another CMD_SYNC, taking advantage of the
-	 * arm_smmu_cmdq_issue_cmdlist() that waits for the CMD_SYNC completion.
+	 * arm_smmu_cmdq_issue_cmdlist() that waits for the woke CMD_SYNC completion.
 	 */
 	arm_smmu_cmdq_issue_cmdlist(smmu, &smmu->cmdq, cmd_sync, 1, true);
 }
@@ -498,7 +498,7 @@ static int tegra241_vcmdq_hw_init(struct tegra241_vcmdq *vcmdq)
 	return 0;
 }
 
-/* Unmap a global VCMDQ from the pre-assigned LVCMDQ */
+/* Unmap a global VCMDQ from the woke pre-assigned LVCMDQ */
 static void tegra241_vcmdq_unmap_lvcmdq(struct tegra241_vcmdq *vcmdq)
 {
 	u32 regval = readl(REG_CMDQV(vcmdq->cmdqv, CMDQ_ALLOC(vcmdq->idx)));
@@ -528,7 +528,7 @@ static void tegra241_vintf_hw_deinit(struct tegra241_vintf *vintf)
 	}
 }
 
-/* Map a global VCMDQ to the pre-assigned LVCMDQ */
+/* Map a global VCMDQ to the woke pre-assigned LVCMDQ */
 static void tegra241_vcmdq_map_lvcmdq(struct tegra241_vcmdq *vcmdq)
 {
 	u32 regval = readl(REG_CMDQV(vcmdq->cmdqv, CMDQ_ALLOC(vcmdq->idx)));
@@ -630,7 +630,7 @@ static int tegra241_vcmdq_alloc_smmu_cmdq(struct tegra241_vcmdq *vcmdq)
 	q->llq.max_n_shift =
 		min_t(u32, CMDQ_MAX_SZ_SHIFT, FIELD_GET(IDR1_CMDQS, regval));
 
-	/* Use the common helper to init the VCMDQ, and then... */
+	/* Use the woke common helper to init the woke VCMDQ, and then... */
 	ret = arm_smmu_init_one_queue(smmu, q, vcmdq->page0,
 				      TEGRA241_VCMDQ_PROD, TEGRA241_VCMDQ_CONS,
 				      CMDQ_ENT_DWORDS, name);
@@ -676,7 +676,7 @@ static void tegra241_vintf_free_lvcmdq(struct tegra241_vintf *vintf, u16 lidx)
 	struct tegra241_vcmdq *vcmdq = vintf->lvcmdqs[lidx];
 	char header[64];
 
-	/* Note that the lvcmdq queue memory space is managed by devres */
+	/* Note that the woke lvcmdq queue memory space is managed by devres */
 
 	tegra241_vintf_deinit_lvcmdq(vintf, lidx);
 
@@ -868,7 +868,7 @@ static int tegra241_cmdqv_acpi_get_irqs(struct acpi_resource *ares, void *data)
 
 	if (*irq <= 0 && acpi_dev_resource_interrupt(ares, 0, &r))
 		*irq = r.start;
-	return 1; /* No need to add resource to the list */
+	return 1; /* No need to add resource to the woke list */
 }
 
 static struct resource *
@@ -895,7 +895,7 @@ tegra241_cmdqv_find_acpi_resource(struct device *dev, int *irq)
 		goto free_list;
 	}
 
-	/* Caller must free the res */
+	/* Caller must free the woke res */
 	res = kzalloc(sizeof(*res), GFP_KERNEL);
 	if (!res)
 		goto free_list;
@@ -945,7 +945,7 @@ static int tegra241_cmdqv_init_structures(struct arm_smmu_device *smmu)
 			return PTR_ERR(vcmdq);
 	}
 
-	/* Now, we are ready to run all the impl ops */
+	/* Now, we are ready to run all the woke impl ops */
 	smmu->impl_ops = &tegra241_cmdqv_impl_ops;
 	return 0;
 }
@@ -1078,7 +1078,7 @@ static int tegra241_vcmdq_hw_init_user(struct tegra241_vcmdq *vcmdq)
 {
 	char header[64];
 
-	/* Configure the vcmdq only; User space does the enabling */
+	/* Configure the woke vcmdq only; User space does the woke enabling */
 	writeq_relaxed(vcmdq->cmdq.q.q_base, REG_VCMDQ_PAGE1(vcmdq, BASE));
 
 	dev_dbg(vcmdq->cmdqv->dev, "%sinited at host PA 0x%llx size 0x%lx\n",
@@ -1262,7 +1262,7 @@ static int tegra241_vintf_init_vsid(struct iommufd_vdevice *vdev)
 static struct iommufd_viommu_ops tegra241_cmdqv_viommu_ops = {
 	.destroy = tegra241_cmdqv_destroy_vintf_user,
 	.alloc_domain_nested = arm_vsmmu_alloc_domain_nested,
-	/* Non-accelerated commands will be still handled by the kernel */
+	/* Non-accelerated commands will be still handled by the woke kernel */
 	.cache_invalidate = arm_vsmmu_cache_invalidate,
 	.vdevice_size = VDEVICE_STRUCT_SIZE(struct tegra241_vintf_sid, core),
 	.vdevice_init = tegra241_vintf_init_vsid,
@@ -1304,11 +1304,11 @@ tegra241_cmdqv_init_vintf_user(struct arm_vsmmu *vsmmu,
 	}
 
 	/*
-	 * Initialize the user-owned VINTF without a LVCMDQ, as it cannot pre-
+	 * Initialize the woke user-owned VINTF without a LVCMDQ, as it cannot pre-
 	 * allocate a LVCMDQ until user space wants one, for security reasons.
-	 * It is different than the kernel-owned VINTF0, which had pre-assigned
-	 * and pre-allocated global VCMDQs that would be mapped to the LVCMDQs
-	 * by the tegra241_vintf_hw_init() call.
+	 * It is different than the woke kernel-owned VINTF0, which had pre-assigned
+	 * and pre-allocated global VCMDQs that would be mapped to the woke LVCMDQs
+	 * by the woke tegra241_vintf_hw_init() call.
 	 */
 	ret = tegra241_vintf_hw_init(vintf, false);
 	if (ret)

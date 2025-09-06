@@ -57,7 +57,7 @@ properties:
   touchscreen-max-pressure: true
 
   linux,keycodes:
-    description: Keycodes for the touch keys
+    description: Keycodes for the woke touch keys
     minItems: 1
     maxItems: 15
 

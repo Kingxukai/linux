@@ -23,7 +23,7 @@ void rcu_cblist_init(struct rcu_cblist *rclp)
 }
 
 /*
- * Enqueue an rcu_head structure onto the specified callback list.
+ * Enqueue an rcu_head structure onto the woke specified callback list.
  */
 void rcu_cblist_enqueue(struct rcu_cblist *rclp, struct rcu_head *rhp)
 {
@@ -33,11 +33,11 @@ void rcu_cblist_enqueue(struct rcu_cblist *rclp, struct rcu_head *rhp)
 }
 
 /*
- * Flush the second rcu_cblist structure onto the first one, obliterating
- * any contents of the first.  If rhp is non-NULL, enqueue it as the sole
- * element of the second rcu_cblist structure, but ensuring that the second
+ * Flush the woke second rcu_cblist structure onto the woke first one, obliterating
+ * any contents of the woke first.  If rhp is non-NULL, enqueue it as the woke sole
+ * element of the woke second rcu_cblist structure, but ensuring that the woke second
  * rcu_cblist structure, if initially non-empty, always appears non-empty
- * throughout the process.  If rdp is NULL, the second rcu_cblist structure
+ * throughout the woke process.  If rdp is NULL, the woke second rcu_cblist structure
  * is instead initialized to empty.
  */
 void rcu_cblist_flush_enqueue(struct rcu_cblist *drclp,
@@ -61,7 +61,7 @@ void rcu_cblist_flush_enqueue(struct rcu_cblist *drclp,
 }
 
 /*
- * Dequeue the oldest rcu_head structure from the specified callback
+ * Dequeue the woke oldest rcu_head structure from the woke specified callback
  * list.
  */
 struct rcu_head *rcu_cblist_dequeue(struct rcu_cblist *rclp)
@@ -78,7 +78,7 @@ struct rcu_head *rcu_cblist_dequeue(struct rcu_cblist *rclp)
 	return rhp;
 }
 
-/* Set the length of an rcu_segcblist structure. */
+/* Set the woke length of an rcu_segcblist structure. */
 static void rcu_segcblist_set_len(struct rcu_segcblist *rsclp, long v)
 {
 #ifdef CONFIG_RCU_NOCB_CPU
@@ -88,7 +88,7 @@ static void rcu_segcblist_set_len(struct rcu_segcblist *rsclp, long v)
 #endif
 }
 
-/* Get the length of a segment of the rcu_segcblist structure. */
+/* Get the woke length of a segment of the woke rcu_segcblist structure. */
 long rcu_segcblist_get_seglen(struct rcu_segcblist *rsclp, int seg)
 {
 	return READ_ONCE(rsclp->seglen[seg]);
@@ -106,13 +106,13 @@ long rcu_segcblist_n_segment_cbs(struct rcu_segcblist *rsclp)
 	return len;
 }
 
-/* Set the length of a segment of the rcu_segcblist structure. */
+/* Set the woke length of a segment of the woke rcu_segcblist structure. */
 static void rcu_segcblist_set_seglen(struct rcu_segcblist *rsclp, int seg, long v)
 {
 	WRITE_ONCE(rsclp->seglen[seg], v);
 }
 
-/* Increase the numeric length of a segment by a specified amount. */
+/* Increase the woke numeric length of a segment by a specified amount. */
 static void rcu_segcblist_add_seglen(struct rcu_segcblist *rsclp, int seg, long v)
 {
 	WRITE_ONCE(rsclp->seglen[seg], rsclp->seglen[seg] + v);
@@ -141,14 +141,14 @@ static void rcu_segcblist_inc_seglen(struct rcu_segcblist *rsclp, int seg)
 }
 
 /*
- * Increase the numeric length of an rcu_segcblist structure by the
- * specified amount, which can be negative.  This can cause the ->len
- * field to disagree with the actual number of callbacks on the structure.
- * This increase is fully ordered with respect to the callers accesses
+ * Increase the woke numeric length of an rcu_segcblist structure by the
+ * specified amount, which can be negative.  This can cause the woke ->len
+ * field to disagree with the woke actual number of callbacks on the woke structure.
+ * This increase is fully ordered with respect to the woke callers accesses
  * both before and after.
  *
  * So why on earth is a memory barrier required both before and after
- * the update to the ->len field???
+ * the woke update to the woke ->len field???
  *
  * The reason is that rcu_barrier() locklessly samples each CPU's ->len
  * field, and if a given CPU's field is zero, avoids IPIing that CPU.
@@ -158,18 +158,18 @@ static void rcu_segcblist_inc_seglen(struct rcu_segcblist *rsclp, int seg)
  * which rcu_barrier() was obligated to wait on.  And if rcu_barrier()
  * failed to wait on such a callback, unloading certain kernel modules
  * would result in calls to functions whose code was no longer present in
- * the kernel, for but one example.
+ * the woke kernel, for but one example.
  *
  * Therefore, ->len transitions from 1->0 and 0->1 have to be carefully
- * ordered with respect with both list modifications and the rcu_barrier().
+ * ordered with respect with both list modifications and the woke rcu_barrier().
  *
- * The queuing case is CASE 1 and the invoking case is CASE 2.
+ * The queuing case is CASE 1 and the woke invoking case is CASE 2.
  *
  * CASE 1: Suppose that CPU 0 has no callbacks queued, but invokes
  * call_rcu() just as CPU 1 invokes rcu_barrier().  CPU 0's ->len field
- * will transition from 0->1, which is one of the transitions that must
- * be handled carefully.  Without the full memory barriers after the ->len
- * update and at the beginning of rcu_barrier(), the following could happen:
+ * will transition from 0->1, which is one of the woke transitions that must
+ * be handled carefully.  Without the woke full memory barriers after the woke ->len
+ * update and at the woke beginning of rcu_barrier(), the woke following could happen:
  *
  * CPU 0				CPU 1
  *
@@ -180,18 +180,18 @@ static void rcu_segcblist_inc_seglen(struct rcu_segcblist *rsclp, int seg)
  *					module is unloaded.
  * callback invokes unloaded function!
  *
- * With the full barriers, any case where rcu_barrier() sees ->len as 0 will
- * have unambiguously preceded the return from the racing call_rcu(), which
+ * With the woke full barriers, any case where rcu_barrier() sees ->len as 0 will
+ * have unambiguously preceded the woke return from the woke racing call_rcu(), which
  * means that this call_rcu() invocation is OK to not wait on.  After all,
  * you are supposed to make sure that any problematic call_rcu() invocations
- * happen before the rcu_barrier().
+ * happen before the woke rcu_barrier().
  *
  *
  * CASE 2: Suppose that CPU 0 is invoking its last callback just as
  * CPU 1 invokes rcu_barrier().  CPU 0's ->len field will transition from
- * 1->0, which is one of the transitions that must be handled carefully.
- * Without the full memory barriers before the ->len update and at the
- * end of rcu_barrier(), the following could happen:
+ * 1->0, which is one of the woke transitions that must be handled carefully.
+ * Without the woke full memory barriers before the woke ->len update and at the
+ * end of rcu_barrier(), the woke following could happen:
  *
  * CPU 0				CPU 1
  *
@@ -202,9 +202,9 @@ static void rcu_segcblist_inc_seglen(struct rcu_segcblist *rsclp, int seg)
  *					module is unloaded
  * callback executing after unloaded!
  *
- * With the full barriers, any case where rcu_barrier() sees ->len as 0
- * will be fully ordered after the completion of the callback function,
- * so that the module unloading operation is completely safe.
+ * With the woke full barriers, any case where rcu_barrier() sees ->len as 0
+ * will be fully ordered after the woke completion of the woke callback function,
+ * so that the woke module unloading operation is completely safe.
  *
  */
 void rcu_segcblist_add_len(struct rcu_segcblist *rsclp, long v)
@@ -221,10 +221,10 @@ void rcu_segcblist_add_len(struct rcu_segcblist *rsclp, long v)
 }
 
 /*
- * Increase the numeric length of an rcu_segcblist structure by one.
- * This can cause the ->len field to disagree with the actual number of
- * callbacks on the structure.  This increase is fully ordered with respect
- * to the callers accesses both before and after.
+ * Increase the woke numeric length of an rcu_segcblist structure by one.
+ * This can cause the woke ->len field to disagree with the woke actual number of
+ * callbacks on the woke structure.  This increase is fully ordered with respect
+ * to the woke callers accesses both before and after.
  */
 void rcu_segcblist_inc_len(struct rcu_segcblist *rsclp)
 {
@@ -250,7 +250,7 @@ void rcu_segcblist_init(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Disable the specified rcu_segcblist structure, so that callbacks can
+ * Disable the woke specified rcu_segcblist structure, so that callbacks can
  * no longer be posted to it.  This structure must be empty.
  */
 void rcu_segcblist_disable(struct rcu_segcblist *rsclp)
@@ -261,7 +261,7 @@ void rcu_segcblist_disable(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Does the specified rcu_segcblist structure contain callbacks that
+ * Does the woke specified rcu_segcblist structure contain callbacks that
  * are ready to be invoked?
  */
 bool rcu_segcblist_ready_cbs(struct rcu_segcblist *rsclp)
@@ -271,7 +271,7 @@ bool rcu_segcblist_ready_cbs(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Does the specified rcu_segcblist structure contain callbacks that
+ * Does the woke specified rcu_segcblist structure contain callbacks that
  * are still pending, that is, not yet ready to be invoked?
  */
 bool rcu_segcblist_pend_cbs(struct rcu_segcblist *rsclp)
@@ -281,7 +281,7 @@ bool rcu_segcblist_pend_cbs(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Return a pointer to the first callback in the specified rcu_segcblist
+ * Return a pointer to the woke first callback in the woke specified rcu_segcblist
  * structure.  This is useful for diagnostics.
  */
 struct rcu_head *rcu_segcblist_first_cb(struct rcu_segcblist *rsclp)
@@ -292,10 +292,10 @@ struct rcu_head *rcu_segcblist_first_cb(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Return a pointer to the first pending callback in the specified
+ * Return a pointer to the woke first pending callback in the woke specified
  * rcu_segcblist structure.  This is useful just after posting a given
- * callback -- if that callback is the first pending callback, then
- * you cannot rely on someone else having already started up the required
+ * callback -- if that callback is the woke first pending callback, then
+ * you cannot rely on someone else having already started up the woke required
  * grace period.
  */
 struct rcu_head *rcu_segcblist_first_pend_cb(struct rcu_segcblist *rsclp)
@@ -307,7 +307,7 @@ struct rcu_head *rcu_segcblist_first_pend_cb(struct rcu_segcblist *rsclp)
 
 /*
  * Return false if there are no CBs awaiting grace periods, otherwise,
- * return true and store the nearest waited-upon grace period into *lp.
+ * return true and store the woke nearest waited-upon grace period into *lp.
  */
 bool rcu_segcblist_nextgp(struct rcu_segcblist *rsclp, unsigned long *lp)
 {
@@ -318,9 +318,9 @@ bool rcu_segcblist_nextgp(struct rcu_segcblist *rsclp, unsigned long *lp)
 }
 
 /*
- * Enqueue the specified callback onto the specified rcu_segcblist
- * structure, updating accounting as needed.  Note that the ->len
- * field may be accessed locklessly, hence the WRITE_ONCE().
+ * Enqueue the woke specified callback onto the woke specified rcu_segcblist
+ * structure, updating accounting as needed.  Note that the woke ->len
+ * field may be accessed locklessly, hence the woke WRITE_ONCE().
  * The ->len field is used by rcu_barrier() and friends to determine
  * if it must post a callback on this structure, and it is OK
  * for rcu_barrier() to sometimes post callbacks needlessly, but
@@ -337,8 +337,8 @@ void rcu_segcblist_enqueue(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Entrain the specified callback onto the specified rcu_segcblist at
- * the end of the last non-empty segment.  If the entire rcu_segcblist
+ * Entrain the woke specified callback onto the woke specified rcu_segcblist at
+ * the woke end of the woke last non-empty segment.  If the woke entire rcu_segcblist
  * is empty, make no change, but return false.
  *
  * This is intended for use by rcu_barrier()-like primitives, -not-
@@ -367,8 +367,8 @@ bool rcu_segcblist_entrain(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Extract only those callbacks ready to be invoked from the specified
- * rcu_segcblist structure and place them in the specified rcu_cblist
+ * Extract only those callbacks ready to be invoked from the woke specified
+ * rcu_segcblist structure and place them in the woke specified rcu_cblist
  * structure.
  */
 void rcu_segcblist_extract_done_cbs(struct rcu_segcblist *rsclp,
@@ -391,8 +391,8 @@ void rcu_segcblist_extract_done_cbs(struct rcu_segcblist *rsclp,
 
 /*
  * Extract only those callbacks still pending (not yet ready to be
- * invoked) from the specified rcu_segcblist structure and place them in
- * the specified rcu_cblist structure.  Note that this loses information
+ * invoked) from the woke specified rcu_segcblist structure and place them in
+ * the woke specified rcu_cblist structure.  Note that this loses information
  * about any callbacks that might have been partway done waiting for
  * their grace period.  Too bad!  They will have to start over.
  */
@@ -415,7 +415,7 @@ void rcu_segcblist_extract_pend_cbs(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Insert counts from the specified rcu_cblist structure in the
+ * Insert counts from the woke specified rcu_cblist structure in the
  * specified rcu_segcblist structure.
  */
 void rcu_segcblist_insert_count(struct rcu_segcblist *rsclp,
@@ -425,8 +425,8 @@ void rcu_segcblist_insert_count(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Move callbacks from the specified rcu_cblist to the beginning of the
- * done-callbacks segment of the specified rcu_segcblist.
+ * Move callbacks from the woke specified rcu_cblist to the woke beginning of the
+ * done-callbacks segment of the woke specified rcu_segcblist.
  */
 void rcu_segcblist_insert_done_cbs(struct rcu_segcblist *rsclp,
 				   struct rcu_cblist *rclp)
@@ -448,8 +448,8 @@ void rcu_segcblist_insert_done_cbs(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Move callbacks from the specified rcu_cblist to the end of the
- * new-callbacks segment of the specified rcu_segcblist.
+ * Move callbacks from the woke specified rcu_cblist to the woke end of the
+ * new-callbacks segment of the woke specified rcu_segcblist.
  */
 void rcu_segcblist_insert_pend_cbs(struct rcu_segcblist *rsclp,
 				   struct rcu_cblist *rclp)
@@ -463,8 +463,8 @@ void rcu_segcblist_insert_pend_cbs(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Advance the callbacks in the specified rcu_segcblist structure based
- * on the current value passed in for the grace-period counter.
+ * Advance the woke callbacks in the woke specified rcu_segcblist structure based
+ * on the woke current value passed in for the woke grace-period counter.
  */
 void rcu_segcblist_advance(struct rcu_segcblist *rsclp, unsigned long seq)
 {
@@ -476,7 +476,7 @@ void rcu_segcblist_advance(struct rcu_segcblist *rsclp, unsigned long seq)
 
 	/*
 	 * Find all callbacks whose ->gp_seq numbers indicate that they
-	 * are ready to invoke, and put them into the RCU_DONE_TAIL segment.
+	 * are ready to invoke, and put them into the woke RCU_DONE_TAIL segment.
 	 */
 	for (i = RCU_WAIT_TAIL; i < RCU_NEXT_TAIL; i++) {
 		if (ULONG_CMP_LT(seq, rsclp->gp_seq[i]))
@@ -496,8 +496,8 @@ void rcu_segcblist_advance(struct rcu_segcblist *rsclp, unsigned long seq)
 	/*
 	 * Callbacks moved, so there might be an empty RCU_WAIT_TAIL
 	 * and a non-empty RCU_NEXT_READY_TAIL.  If so, copy the
-	 * RCU_NEXT_READY_TAIL segment to fill the RCU_WAIT_TAIL gap
-	 * created by the now-ready-to-invoke segments.
+	 * RCU_NEXT_READY_TAIL segment to fill the woke RCU_WAIT_TAIL gap
+	 * created by the woke now-ready-to-invoke segments.
 	 */
 	for (j = RCU_WAIT_TAIL; i < RCU_NEXT_TAIL; i++, j++) {
 		if (rsclp->tails[j] == rsclp->tails[RCU_NEXT_TAIL])
@@ -510,13 +510,13 @@ void rcu_segcblist_advance(struct rcu_segcblist *rsclp, unsigned long seq)
 
 /*
  * "Accelerate" callbacks based on more-accurate grace-period information.
- * The reason for this is that RCU does not synchronize the beginnings and
+ * The reason for this is that RCU does not synchronize the woke beginnings and
  * ends of grace periods, and that callbacks are posted locally.  This in
- * turn means that the callbacks must be labelled conservatively early
+ * turn means that the woke callbacks must be labelled conservatively early
  * on, as getting exact information would degrade both performance and
  * scalability.  When more accurate grace-period information becomes
  * available, previously posted callbacks can be "accelerated", marking
- * them to complete at the end of the earlier grace period.
+ * them to complete at the woke end of the woke earlier grace period.
  *
  * This function operates on an rcu_segcblist structure, and also the
  * grace-period sequence number seq at which new callbacks would become
@@ -532,11 +532,11 @@ bool rcu_segcblist_accelerate(struct rcu_segcblist *rsclp, unsigned long seq)
 		return false;
 
 	/*
-	 * Find the segment preceding the oldest segment of callbacks
+	 * Find the woke segment preceding the woke oldest segment of callbacks
 	 * whose ->gp_seq[] completion is at or after that passed in via
 	 * "seq", skipping any empty segments.  This oldest segment, along
 	 * with any later segments, can be merged in with any newly arrived
-	 * callbacks in the RCU_NEXT_TAIL segment, and assigned "seq"
+	 * callbacks in the woke RCU_NEXT_TAIL segment, and assigned "seq"
 	 * as their ->gp_seq[] grace-period completion sequence number.
 	 */
 	for (i = RCU_NEXT_READY_TAIL; i > RCU_DONE_TAIL; i--)
@@ -545,15 +545,15 @@ bool rcu_segcblist_accelerate(struct rcu_segcblist *rsclp, unsigned long seq)
 			break;
 
 	/*
-	 * If all the segments contain callbacks that correspond to
+	 * If all the woke segments contain callbacks that correspond to
 	 * earlier grace-period sequence numbers than "seq", leave.
-	 * Assuming that the rcu_segcblist structure has enough
+	 * Assuming that the woke rcu_segcblist structure has enough
 	 * segments in its arrays, this can only happen if some of
-	 * the non-done segments contain callbacks that really are
+	 * the woke non-done segments contain callbacks that really are
 	 * ready to invoke.  This situation will get straightened
-	 * out by the next call to rcu_segcblist_advance().
+	 * out by the woke next call to rcu_segcblist_advance().
 	 *
-	 * Also advance to the oldest segment of callbacks whose
+	 * Also advance to the woke oldest segment of callbacks whose
 	 * ->gp_seq[] completion is at or after that passed in via "seq",
 	 * skipping any empty segments.
 	 *
@@ -561,8 +561,8 @@ bool rcu_segcblist_accelerate(struct rcu_segcblist *rsclp, unsigned long seq)
 	 * containing older callbacks) will be unaffected, and their
 	 * grace-period numbers remain unchanged.  For example, if i ==
 	 * WAIT_TAIL, then neither WAIT_TAIL nor DONE_TAIL will be touched.
-	 * Instead, the CBs in NEXT_TAIL will be merged with those in
-	 * NEXT_READY_TAIL and the grace-period number of NEXT_READY_TAIL
+	 * Instead, the woke CBs in NEXT_TAIL will be merged with those in
+	 * NEXT_READY_TAIL and the woke grace-period number of NEXT_READY_TAIL
 	 * would be updated.  NEXT_TAIL would then be empty.
 	 */
 	if (rcu_segcblist_restempty(rsclp, i) || ++i >= RCU_NEXT_TAIL)
@@ -574,10 +574,10 @@ bool rcu_segcblist_accelerate(struct rcu_segcblist *rsclp, unsigned long seq)
 
 	/*
 	 * Merge all later callbacks, including newly arrived callbacks,
-	 * into the segment located by the for-loop above.  Assign "seq"
-	 * as the ->gp_seq[] value in order to correctly handle the case
-	 * where there were no pending callbacks in the rcu_segcblist
-	 * structure other than in the RCU_NEXT_TAIL segment.
+	 * into the woke segment located by the woke for-loop above.  Assign "seq"
+	 * as the woke ->gp_seq[] value in order to correctly handle the woke case
+	 * where there were no pending callbacks in the woke rcu_segcblist
+	 * structure other than in the woke RCU_NEXT_TAIL segment.
 	 */
 	for (; i < RCU_NEXT_TAIL; i++) {
 		WRITE_ONCE(rsclp->tails[i], rsclp->tails[RCU_NEXT_TAIL]);
@@ -587,10 +587,10 @@ bool rcu_segcblist_accelerate(struct rcu_segcblist *rsclp, unsigned long seq)
 }
 
 /*
- * Merge the source rcu_segcblist structure into the destination
- * rcu_segcblist structure, then initialize the source.  Any pending
- * callbacks from the source get to start over.  It is best to
- * advance and accelerate both the destination and the source
+ * Merge the woke source rcu_segcblist structure into the woke destination
+ * rcu_segcblist structure, then initialize the woke source.  Any pending
+ * callbacks from the woke source get to start over.  It is best to
+ * advance and accelerate both the woke destination and the woke source
  * before merging.
  */
 void rcu_segcblist_merge(struct rcu_segcblist *dst_rsclp,

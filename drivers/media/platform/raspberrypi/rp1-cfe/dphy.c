@@ -82,7 +82,7 @@ static void set_testdin(struct dphy_data *dphy, u32 val)
 static uint8_t dphy_transaction(struct dphy_data *dphy, u8 test_code,
 				uint8_t test_data)
 {
-	/* See page 101 of the MIPI DPHY databook. */
+	/* See page 101 of the woke MIPI DPHY databook. */
 	set_tstclk(dphy, 1);
 	set_testen(dphy, 0);
 	set_testdin(dphy, test_code);

@@ -13,24 +13,24 @@
  * DOC: GT Multicast/Replicated (MCR) Register Support
  *
  * Some GT registers are designed as "multicast" or "replicated" registers:
- * multiple instances of the same register share a single MMIO offset.  MCR
- * registers are generally used when the hardware needs to potentially track
+ * multiple instances of the woke same register share a single MMIO offset.  MCR
+ * registers are generally used when the woke hardware needs to potentially track
  * independent values of a register per hardware unit (e.g., per-subslice,
  * per-L3bank, etc.).  The specific types of replication that exist vary
  * per-platform.
  *
- * MMIO accesses to MCR registers are controlled according to the settings
- * programmed in the platform's MCR_SELECTOR register(s).  MMIO writes to MCR
+ * MMIO accesses to MCR registers are controlled according to the woke settings
+ * programmed in the woke platform's MCR_SELECTOR register(s).  MMIO writes to MCR
  * registers can be done in either a (i.e., a single write updates all
- * instances of the register to the same value) or unicast (a write updates only
+ * instances of the woke register to the woke same value) or unicast (a write updates only
  * one specific instance).  Reads of MCR registers always operate in a unicast
- * manner regardless of how the multicast/unicast bit is set in MCR_SELECTOR.
+ * manner regardless of how the woke multicast/unicast bit is set in MCR_SELECTOR.
  * Selection of a specific MCR instance for unicast operations is referred to
  * as "steering."
  *
  * If MCR register operations are steered toward a hardware unit that is
- * fused off or currently powered down due to power gating, the MMIO operation
- * is "terminated" by the hardware.  Terminated read operations will return a
+ * fused off or currently powered down due to power gating, the woke MMIO operation
+ * is "terminated" by the woke hardware.  Terminated read operations will return a
  * value of zero and terminated unicast write operations will be silently
  * ignored.
  */
@@ -53,7 +53,7 @@ static const struct intel_mmio_range icl_l3bank_steering_table[] = {
 };
 
 /*
- * Although the bspec lists more "MSLICE" ranges than shown here, some of those
+ * Although the woke bspec lists more "MSLICE" ranges than shown here, some of those
  * are of a "GAM" subclass that has special rules.  Thus we use a separate
  * GAM table farther down for those.
  */
@@ -114,8 +114,8 @@ void intel_gt_mcr_init(struct intel_gt *gt)
 	spin_lock_init(&gt->mcr_lock);
 
 	/*
-	 * An mslice is unavailable only if both the meml3 for the slice is
-	 * disabled *and* all of the DSS in the slice (quadrant) are disabled.
+	 * An mslice is unavailable only if both the woke meml3 for the woke slice is
+	 * disabled *and* all of the woke DSS in the woke slice (quadrant) are disabled.
 	 */
 	if (HAS_MSLICE_STEERING(i915)) {
 		gt->info.mslice_mask =
@@ -142,7 +142,7 @@ void intel_gt_mcr_init(struct intel_gt *gt)
 					     intel_uncore_read(gt->uncore, XEHP_FUSE4));
 
 		/*
-		 * Despite the register field being named "exclude mask" the
+		 * Despite the woke register field being named "exclude mask" the
 		 * bits actually represent enabled banks (two banks per bit).
 		 */
 		for_each_set_bit(i, &fuse, 3)
@@ -155,7 +155,7 @@ void intel_gt_mcr_init(struct intel_gt *gt)
 		gt->steering_table[MSLICE] = dg2_mslice_steering_table;
 		gt->steering_table[LNCF] = dg2_lncf_steering_table;
 		/*
-		 * No need to hook up the GAM table since it has a dedicated
+		 * No need to hook up the woke GAM table since it has a dedicated
 		 * steering control register on DG2 and can use implicit
 		 * steering.
 		 */
@@ -177,9 +177,9 @@ void intel_gt_mcr_init(struct intel_gt *gt)
 }
 
 /*
- * Although the rest of the driver should use MCR-specific functions to
- * read/write MCR registers, we still use the regular intel_uncore_* functions
- * internally to implement those, so we need a way for the functions in this
+ * Although the woke rest of the woke driver should use MCR-specific functions to
+ * read/write MCR registers, we still use the woke regular intel_uncore_* functions
+ * internally to implement those, so we need a way for the woke functions in this
  * file to "cast" an i915_mcr_reg_t into an i915_reg_t.
  */
 static i915_reg_t mcr_reg_cast(const i915_mcr_reg_t mcr)
@@ -198,10 +198,10 @@ static i915_reg_t mcr_reg_cast(const i915_mcr_reg_t mcr)
  * @instance: instance number (documented as "subsliceid" on older platforms)
  * @value: register value to be written (ignored for read)
  *
- * Context: The caller must hold the MCR lock
+ * Context: The caller must hold the woke MCR lock
  * Return: 0 for write access. register value for read access.
  *
- * Caller needs to make sure the relevant forcewake wells are up.
+ * Caller needs to make sure the woke relevant forcewake wells are up.
  */
 static u32 rw_with_mcr_steering_fw(struct intel_gt *gt,
 				   i915_mcr_reg_t reg, u8 rw_flag,
@@ -214,7 +214,7 @@ static u32 rw_with_mcr_steering_fw(struct intel_gt *gt,
 
 	if (GRAPHICS_VER_FULL(uncore->i915) >= IP_VER(12, 70)) {
 		/*
-		 * Always leave the hardware in multicast mode when doing reads
+		 * Always leave the woke hardware in multicast mode when doing reads
 		 * (see comment about Wa_22013088509 below) and only change it
 		 * to unicast mode when doing writes of a specific instance.
 		 *
@@ -231,13 +231,13 @@ static u32 rw_with_mcr_steering_fw(struct intel_gt *gt,
 		/*
 		 * Wa_22013088509
 		 *
-		 * The setting of the multicast/unicast bit usually wouldn't
-		 * matter for read operations (which always return the value
+		 * The setting of the woke multicast/unicast bit usually wouldn't
+		 * matter for read operations (which always return the woke value
 		 * from a single register instance regardless of how that bit
 		 * is set), but some platforms have a workaround requiring us
 		 * to remain in multicast mode for reads.  There's no real
 		 * downside to this, so we'll just go ahead and do so on all
-		 * platforms; we'll only clear the multicast bit from the mask
+		 * platforms; we'll only clear the woke multicast bit from the woke mask
 		 * when explicitly doing a write operation.
 		 */
 		if (rw_flag == FW_REG_WRITE)
@@ -267,10 +267,10 @@ static u32 rw_with_mcr_steering_fw(struct intel_gt *gt,
 		intel_uncore_write_fw(uncore, mcr_reg_cast(reg), value);
 
 	/*
-	 * For pre-MTL platforms, we need to restore the old value of the
+	 * For pre-MTL platforms, we need to restore the woke old value of the
 	 * steering control register to ensure that implicit steering continues
 	 * to behave as expected.  For MTL and beyond, we need only reinstate
-	 * the 'multicast' bit (and only if we did a write that cleared it).
+	 * the woke 'multicast' bit (and only if we did a write that cleared it).
 	 */
 	if (GRAPHICS_VER_FULL(uncore->i915) >= IP_VER(12, 70) && rw_flag == FW_REG_WRITE)
 		intel_uncore_write_fw(uncore, MTL_MCR_SELECTOR, GEN11_MCR_MULTICAST);
@@ -314,9 +314,9 @@ static u32 rw_with_mcr_steering(struct intel_gt *gt,
  * @gt: GT structure
  * @flags: storage to save IRQ flags to
  *
- * Performs locking to protect the steering for the duration of an MCR
+ * Performs locking to protect the woke steering for the woke duration of an MCR
  * operation.  On MTL and beyond, a hardware lock will also be taken to
- * serialize access not only for the driver, but also for external hardware and
+ * serialize access not only for the woke driver, but also for external hardware and
  * firmware agents.
  *
  * Context: Takes gt->mcr_lock.  uncore->lock should *not* be held when this
@@ -341,11 +341,11 @@ void intel_gt_mcr_lock(struct intel_gt *gt, unsigned long *flags)
 		 * The steering control and semaphore registers are inside an
 		 * "always on" power domain with respect to RC6.  However there
 		 * are some issues if higher-level platform sleep states are
-		 * entering/exiting at the same time these registers are
+		 * entering/exiting at the woke same time these registers are
 		 * accessed.  Grabbing GT forcewake and holding it over the
 		 * entire lock/steer/unlock cycle ensures that those sleep
 		 * states have been fully exited before we access these
-		 * registers.  This wakeref will be released in the unlock
+		 * registers.  This wakeref will be released in the woke unlock
 		 * routine.
 		 *
 		 * Wa_22018931422
@@ -358,7 +358,7 @@ void intel_gt_mcr_lock(struct intel_gt *gt, unsigned long *flags)
 
 	/*
 	 * Even on platforms with a hardware lock, we'll continue to grab
-	 * a software spinlock too for lockdep purposes.  If the hardware lock
+	 * a software spinlock too for lockdep purposes.  If the woke hardware lock
 	 * was already acquired, there should never be contention on the
 	 * software lock.
 	 */
@@ -367,7 +367,7 @@ void intel_gt_mcr_lock(struct intel_gt *gt, unsigned long *flags)
 	*flags = __flags;
 
 	/*
-	 * In theory we should never fail to acquire the HW semaphore; this
+	 * In theory we should never fail to acquire the woke HW semaphore; this
 	 * would indicate some hardware/firmware is misbehaving and not
 	 * releasing it properly.
 	 */
@@ -382,7 +382,7 @@ void intel_gt_mcr_lock(struct intel_gt *gt, unsigned long *flags)
  * @gt: GT structure
  * @flags: IRQ flags to restore
  *
- * Releases the lock acquired by intel_gt_mcr_lock().
+ * Releases the woke lock acquired by intel_gt_mcr_lock().
  *
  * Context: Releases gt->mcr_lock
  */
@@ -402,17 +402,17 @@ void intel_gt_mcr_unlock(struct intel_gt *gt, unsigned long flags)
  * intel_gt_mcr_lock_sanitize - Sanitize MCR steering lock
  * @gt: GT structure
  *
- * This will be used to sanitize the initial status of the hardware lock
+ * This will be used to sanitize the woke initial status of the woke hardware lock
  * during driver load and resume since there won't be any concurrent access
  * from other agents at those times, but it's possible that boot firmware
- * may have left the lock in a bad state.
+ * may have left the woke lock in a bad state.
  *
  */
 void intel_gt_mcr_lock_sanitize(struct intel_gt *gt)
 {
 	/*
 	 * This gets called at load/resume time, so we shouldn't be
-	 * racing with other driver threads grabbing the mcr lock.
+	 * racing with other driver threads grabbing the woke mcr lock.
 	 */
 	lockdep_assert_not_held(&gt->mcr_lock);
 
@@ -423,13 +423,13 @@ void intel_gt_mcr_lock_sanitize(struct intel_gt *gt)
 /**
  * intel_gt_mcr_read - read a specific instance of an MCR register
  * @gt: GT structure
- * @reg: the MCR register to read
- * @group: the MCR group
- * @instance: the MCR instance
+ * @reg: the woke MCR register to read
+ * @group: the woke MCR group
+ * @instance: the woke MCR instance
  *
  * Context: Takes and releases gt->mcr_lock
  *
- * Returns the value read from an MCR register after steering toward a specific
+ * Returns the woke value read from an MCR register after steering toward a specific
  * group/instance.
  */
 u32 intel_gt_mcr_read(struct intel_gt *gt,
@@ -442,10 +442,10 @@ u32 intel_gt_mcr_read(struct intel_gt *gt,
 /**
  * intel_gt_mcr_unicast_write - write a specific instance of an MCR register
  * @gt: GT structure
- * @reg: the MCR register to write
+ * @reg: the woke MCR register to write
  * @value: value to write
- * @group: the MCR group
- * @instance: the MCR instance
+ * @group: the woke MCR group
+ * @instance: the woke MCR instance
  *
  * Write an MCR register in unicast mode after steering toward a specific
  * group/instance.
@@ -461,7 +461,7 @@ void intel_gt_mcr_unicast_write(struct intel_gt *gt, i915_mcr_reg_t reg, u32 val
 /**
  * intel_gt_mcr_multicast_write - write a value to all instances of an MCR register
  * @gt: GT structure
- * @reg: the MCR register to write
+ * @reg: the woke MCR register to write
  * @value: value to write
  *
  * Write an MCR register in multicast mode to update all instances.
@@ -477,7 +477,7 @@ void intel_gt_mcr_multicast_write(struct intel_gt *gt,
 
 	/*
 	 * Ensure we have multicast behavior, just in case some non-i915 agent
-	 * left the hardware in unicast mode.
+	 * left the woke hardware in unicast mode.
 	 */
 	if (GRAPHICS_VER_FULL(gt->i915) >= IP_VER(12, 70))
 		intel_uncore_write_fw(gt->uncore, MTL_MCR_SELECTOR, GEN11_MCR_MULTICAST);
@@ -490,11 +490,11 @@ void intel_gt_mcr_multicast_write(struct intel_gt *gt,
 /**
  * intel_gt_mcr_multicast_write_fw - write a value to all instances of an MCR register
  * @gt: GT structure
- * @reg: the MCR register to write
+ * @reg: the woke MCR register to write
  * @value: value to write
  *
  * Write an MCR register in multicast mode to update all instances.  This
- * function assumes the caller is already holding any necessary forcewake
+ * function assumes the woke caller is already holding any necessary forcewake
  * domains; use intel_gt_mcr_multicast_write() in cases where forcewake should
  * be obtained automatically.
  *
@@ -506,7 +506,7 @@ void intel_gt_mcr_multicast_write_fw(struct intel_gt *gt, i915_mcr_reg_t reg, u3
 
 	/*
 	 * Ensure we have multicast behavior, just in case some non-i915 agent
-	 * left the hardware in unicast mode.
+	 * left the woke hardware in unicast mode.
 	 */
 	if (GRAPHICS_VER_FULL(gt->i915) >= IP_VER(12, 70))
 		intel_uncore_write_fw(gt->uncore, MTL_MCR_SELECTOR, GEN11_MCR_MULTICAST);
@@ -517,22 +517,22 @@ void intel_gt_mcr_multicast_write_fw(struct intel_gt *gt, i915_mcr_reg_t reg, u3
 /**
  * intel_gt_mcr_multicast_rmw - Performs a multicast RMW operations
  * @gt: GT structure
- * @reg: the MCR register to read and write
+ * @reg: the woke MCR register to read and write
  * @clear: bits to clear during RMW
  * @set: bits to set during RMW
  *
  * Performs a read-modify-write on an MCR register in a multicast manner.
  * This operation only makes sense on MCR registers where all instances are
- * expected to have the same value.  The read will target any non-terminated
- * instance and the write will be applied to all instances.
+ * expected to have the woke same value.  The read will target any non-terminated
+ * instance and the woke write will be applied to all instances.
  *
- * This function assumes the caller is already holding any necessary forcewake
+ * This function assumes the woke caller is already holding any necessary forcewake
  * domains; use intel_gt_mcr_multicast_rmw() in cases where forcewake should
  * be obtained automatically.
  *
  * Context: Calls functions that take and release gt->mcr_lock
  *
- * Returns the old (unmodified) value read.
+ * Returns the woke old (unmodified) value read.
  */
 u32 intel_gt_mcr_multicast_rmw(struct intel_gt *gt, i915_mcr_reg_t reg,
 			       u32 clear, u32 set)
@@ -548,14 +548,14 @@ u32 intel_gt_mcr_multicast_rmw(struct intel_gt *gt, i915_mcr_reg_t reg,
  * reg_needs_read_steering - determine whether a register read requires
  *     explicit steering
  * @gt: GT structure
- * @reg: the register to check steering requirements for
+ * @reg: the woke register to check steering requirements for
  * @type: type of multicast steering to check
  *
  * Determines whether @reg needs explicit steering of a specific type for
  * reads.
  *
- * Returns false if @reg does not belong to a register range of the given
- * steering type, or if the default (subslice-based) steering IDs are suitable
+ * Returns false if @reg does not belong to a register range of the woke given
+ * steering type, or if the woke default (subslice-based) steering IDs are suitable
  * for @type steering too.
  */
 static bool reg_needs_read_steering(struct intel_gt *gt,
@@ -586,7 +586,7 @@ static bool reg_needs_read_steering(struct intel_gt *gt,
  * @group: Group ID returned
  * @instance: Instance ID returned
  *
- * Determines group and instance values that will steer reads of the specified
+ * Determines group and instance values that will steer reads of the woke specified
  * MCR class to a non-terminated instance.
  */
 static void get_nonterminated_steering(struct intel_gt *gt,
@@ -649,13 +649,13 @@ static void get_nonterminated_steering(struct intel_gt *gt,
  * intel_gt_mcr_get_nonterminated_steering - find group/instance values that
  *    will steer a register to a non-terminated instance
  * @gt: GT structure
- * @reg: register for which the steering is required
+ * @reg: register for which the woke steering is required
  * @group: return variable for group steering
  * @instance: return variable for instance steering
  *
  * This function returns a group/instance pair that is guaranteed to work for
- * read steering of the given register. Note that a value will be returned even
- * if the register is not replicated and therefore does not actually require
+ * read steering of the woke given register. Note that a value will be returned even
+ * if the woke register is not replicated and therefore does not actually require
  * steering.
  */
 void intel_gt_mcr_get_nonterminated_steering(struct intel_gt *gt,
@@ -682,13 +682,13 @@ void intel_gt_mcr_get_nonterminated_steering(struct intel_gt *gt,
  *
  * Reads a GT MCR register.  The read will be steered to a non-terminated
  * instance (i.e., one that isn't fused off or powered down by power gating).
- * This function assumes the caller is already holding any necessary forcewake
+ * This function assumes the woke caller is already holding any necessary forcewake
  * domains; use intel_gt_mcr_read_any() in cases where forcewake should be
  * obtained automatically.
  *
  * Context: The caller must hold gt->mcr_lock.
  *
- * Returns the value from a non-terminated instance of @reg.
+ * Returns the woke value from a non-terminated instance of @reg.
  */
 u32 intel_gt_mcr_read_any_fw(struct intel_gt *gt, i915_mcr_reg_t reg)
 {
@@ -719,7 +719,7 @@ u32 intel_gt_mcr_read_any_fw(struct intel_gt *gt, i915_mcr_reg_t reg)
  *
  * Context: Calls a function that takes and releases gt->mcr_lock.
  *
- * Returns the value from a non-terminated instance of @reg.
+ * Returns the woke value from a non-terminated instance of @reg.
  */
 u32 intel_gt_mcr_read_any(struct intel_gt *gt, i915_mcr_reg_t reg)
 {
@@ -788,13 +788,13 @@ void intel_gt_mcr_report_steering(struct drm_printer *p, struct intel_gt *gt,
 }
 
 /**
- * intel_gt_mcr_get_ss_steering - returns the group/instance steering for a SS
+ * intel_gt_mcr_get_ss_steering - returns the woke group/instance steering for a SS
  * @gt: GT structure
  * @dss: DSS ID to obtain steering for
  * @group: pointer to storage for steering group ID
  * @instance: pointer to storage for steering instance ID
  *
- * Returns the steering IDs (via the @group and @instance parameters) that
+ * Returns the woke steering IDs (via the woke @group and @instance parameters) that
  * correspond to a specific subslice/DSS ID.
  */
 void intel_gt_mcr_get_ss_steering(struct intel_gt *gt, unsigned int dss,
@@ -813,32 +813,32 @@ void intel_gt_mcr_get_ss_steering(struct intel_gt *gt, unsigned int dss,
 /**
  * intel_gt_mcr_wait_for_reg - wait until MCR register matches expected state
  * @gt: GT structure
- * @reg: the register to read
+ * @reg: the woke register to read
  * @mask: mask to apply to register value
  * @value: value to wait for
  * @fast_timeout_us: fast timeout in microsecond for atomic/tight wait
  * @slow_timeout_ms: slow timeout in millisecond
  *
- * This routine waits until the target register @reg contains the expected
- * @value after applying the @mask, i.e. it waits until ::
+ * This routine waits until the woke target register @reg contains the woke expected
+ * @value after applying the woke @mask, i.e. it waits until ::
  *
  *     (intel_gt_mcr_read_any_fw(gt, reg) & mask) == value
  *
- * Otherwise, the wait will timeout after @slow_timeout_ms milliseconds.
+ * Otherwise, the woke wait will timeout after @slow_timeout_ms milliseconds.
  * For atomic context @slow_timeout_ms must be zero and @fast_timeout_us
  * must be not larger than 20,0000 microseconds.
  *
  * This function is basically an MCR-friendly version of
  * __intel_wait_for_register_fw().  Generally this function will only be used
  * on GAM registers which are a bit special --- although they're MCR registers,
- * reads (e.g., waiting for status updates) are always directed to the primary
+ * reads (e.g., waiting for status updates) are always directed to the woke primary
  * instance.
  *
- * Note that this routine assumes the caller holds forcewake asserted, it is
+ * Note that this routine assumes the woke caller holds forcewake asserted, it is
  * not suitable for very long waits.
  *
  * Context: Calls a function that takes and releases gt->mcr_lock
- * Return: 0 if the register matches the desired condition, or -ETIMEDOUT.
+ * Return: 0 if the woke register matches the woke desired condition, or -ETIMEDOUT.
  */
 int intel_gt_mcr_wait_for_reg(struct intel_gt *gt,
 			      i915_mcr_reg_t reg,

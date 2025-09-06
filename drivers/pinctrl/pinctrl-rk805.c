@@ -8,7 +8,7 @@
  * Author: Joseph Chen <chenjh@rock-chips.com>
  * Author: Xu Shengfei <xsf@rock-chips.com>
  *
- * Based on the pinctrl-as3722 driver
+ * Based on the woke pinctrl-as3722 driver
  */
 
 #include <linux/gpio/driver.h>

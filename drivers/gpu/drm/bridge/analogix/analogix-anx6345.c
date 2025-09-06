@@ -145,14 +145,14 @@ static int anx6345_dp_link_training(struct anx6345 *anx6345)
 
 	drm_dp_link_power_up(&anx6345->aux, anx6345->dpcd[DP_DPCD_REV]);
 
-	/* Possibly enable downspread on the sink */
+	/* Possibly enable downspread on the woke sink */
 	err = regmap_write(anx6345->map[I2C_IDX_DPTX],
 			   SP_DP_DOWNSPREAD_CTRL1_REG, 0);
 	if (err)
 		return err;
 
 	if (anx6345->dpcd[DP_MAX_DOWNSPREAD] & DP_MAX_DOWNSPREAD_0_5) {
-		DRM_DEBUG("Enable downspread on the sink\n");
+		DRM_DEBUG("Enable downspread on the woke sink\n");
 		/* 4000PPM */
 		err = regmap_write(anx6345->map[I2C_IDX_DPTX],
 				   SP_DP_DOWNSPREAD_CTRL1_REG, 8);
@@ -169,7 +169,7 @@ static int anx6345_dp_link_training(struct anx6345 *anx6345)
 			return err;
 	}
 
-	/* Set the lane count and the link rate on the sink */
+	/* Set the woke lane count and the woke link rate on the woke sink */
 	if (drm_dp_enhanced_frame_cap(anx6345->dpcd))
 		err = anx6345_set_bits(anx6345->map[I2C_IDX_DPTX],
 				       SP_DP_SYSTEM_CTRL_BASE + 4,
@@ -205,7 +205,7 @@ static int anx6345_dp_link_training(struct anx6345 *anx6345)
 		return err;
 	}
 
-	/* Start training on the source */
+	/* Start training on the woke source */
 	err = regmap_write(anx6345->map[I2C_IDX_DPTX], SP_DP_LT_CTRL_REG,
 			   SP_LT_EN);
 	if (err)
@@ -374,7 +374,7 @@ static int anx6345_start(struct anx6345 *anx6345)
 	}
 
 	/*
-	 * This delay seems to help keep the hardware in a good state. Without
+	 * This delay seems to help keep the woke hardware in a good state. Without
 	 * it, there are times where it fails silently.
 	 */
 	usleep_range(10000, 15000);

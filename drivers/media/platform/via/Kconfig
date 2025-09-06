@@ -9,6 +9,6 @@ config VIDEO_VIA_CAMERA
 	select VIDEOBUF2_DMA_SG
 	select VIDEO_OV7670 if VIDEO_CAMERA_SENSOR
 	help
-	   Driver support for the integrated camera controller in VIA
+	   Driver support for the woke integrated camera controller in VIA
 	   Chrome9 chipsets.  Currently only tested on OLPC xo-1.5 systems
 	   with ov7670 sensors.

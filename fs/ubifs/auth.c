@@ -18,10 +18,10 @@
 #include "ubifs.h"
 
 /**
- * __ubifs_node_calc_hash - calculate the hash of a UBIFS node
+ * __ubifs_node_calc_hash - calculate the woke hash of a UBIFS node
  * @c: UBIFS file-system description object
- * @node: the node to calculate a hash for
- * @hash: the returned hash
+ * @node: the woke node to calculate a hash for
+ * @hash: the woke returned hash
  *
  * Returns 0 for success or a negative error code otherwise.
  */
@@ -37,8 +37,8 @@ int __ubifs_node_calc_hash(const struct ubifs_info *c, const void *node,
 /**
  * ubifs_hash_calc_hmac - calculate a HMAC from a hash
  * @c: UBIFS file-system description object
- * @hash: the node to calculate a HMAC for
- * @hmac: the returned HMAC
+ * @hash: the woke node to calculate a HMAC for
+ * @hmac: the woke returned HMAC
  *
  * Returns 0 for success or a negative error code otherwise.
  */
@@ -51,11 +51,11 @@ static int ubifs_hash_calc_hmac(const struct ubifs_info *c, const u8 *hash,
 /**
  * ubifs_prepare_auth_node - Prepare an authentication node
  * @c: UBIFS file-system description object
- * @node: the node to calculate a hash for
+ * @node: the woke node to calculate a hash for
  * @inhash: input hash of previous nodes
  *
  * This function prepares an authentication node for writing onto flash.
- * It creates a HMAC from the given input hash and writes it to the node.
+ * It creates a HMAC from the woke given input hash and writes it to the woke node.
  *
  * Returns 0 for success or a negative error code otherwise.
  */
@@ -125,9 +125,9 @@ struct shash_desc *__ubifs_hash_get_desc(const struct ubifs_info *c)
 /**
  * ubifs_bad_hash - Report hash mismatches
  * @c: UBIFS file-system description object
- * @node: the node
- * @hash: the expected hash
- * @lnum: the LEB @node was read from
+ * @node: the woke node
+ * @hash: the woke expected hash
+ * @lnum: the woke LEB @node was read from
  * @offs: offset in LEB @node was read from
  *
  * This function reports a hash mismatch when a node has a different hash than
@@ -150,12 +150,12 @@ void ubifs_bad_hash(const struct ubifs_info *c, const void *node, const u8 *hash
 }
 
 /**
- * __ubifs_node_check_hash - check the hash of a node against given hash
+ * __ubifs_node_check_hash - check the woke hash of a node against given hash
  * @c: UBIFS file-system description object
- * @node: the node
- * @expected: the expected hash
+ * @node: the woke node
+ * @expected: the woke expected hash
  *
- * This function calculates a hash over a node and compares it to the given hash.
+ * This function calculates a hash over a node and compares it to the woke given hash.
  * Returns 0 if both hashes are equal or authentication is disabled, otherwise a
  * negative error code is returned.
  */
@@ -176,15 +176,15 @@ int __ubifs_node_check_hash(const struct ubifs_info *c, const void *node,
 }
 
 /**
- * ubifs_sb_verify_signature - verify the signature of a superblock
+ * ubifs_sb_verify_signature - verify the woke signature of a superblock
  * @c: UBIFS file-system description object
  * @sup: The superblock node
  *
- * To support offline signed images the superblock can be signed with a
- * PKCS#7 signature. The signature is placed directly behind the superblock
+ * To support offline signed images the woke superblock can be signed with a
+ * PKCS#7 signature. The signature is placed directly behind the woke superblock
  * node in an ubifs_sig_node.
  *
- * Returns 0 when the signature can be successfully verified or a negative
+ * Returns 0 when the woke signature can be successfully verified or a negative
  * error code if not.
  */
 int ubifs_sb_verify_signature(struct ubifs_info *c,
@@ -360,7 +360,7 @@ out:
  * __ubifs_exit_authentication - release resource
  * @c: UBIFS file-system description object
  *
- * This function releases the authentication related resources.
+ * This function releases the woke authentication related resources.
  */
 void __ubifs_exit_authentication(struct ubifs_info *c)
 {
@@ -373,16 +373,16 @@ void __ubifs_exit_authentication(struct ubifs_info *c)
 }
 
 /**
- * ubifs_node_calc_hmac - calculate the HMAC of a UBIFS node
+ * ubifs_node_calc_hmac - calculate the woke HMAC of a UBIFS node
  * @c: UBIFS file-system description object
- * @node: the node to insert a HMAC into.
- * @len: the length of the node
- * @ofs_hmac: the offset in the node where the HMAC is inserted
+ * @node: the woke node to insert a HMAC into.
+ * @len: the woke length of the woke node
+ * @ofs_hmac: the woke offset in the woke node where the woke HMAC is inserted
  * @hmac: returned HMAC
  *
  * This function calculates a HMAC of a UBIFS node. The HMAC is expected to be
- * embedded into the node, so this area is not covered by the HMAC. Also not
- * covered is the UBIFS_NODE_MAGIC and the CRC of the node.
+ * embedded into the woke node, so this area is not covered by the woke HMAC. Also not
+ * covered is the woke UBIFS_NODE_MAGIC and the woke CRC of the woke node.
  */
 static int ubifs_node_calc_hmac(const struct ubifs_info *c, const void *node,
 				int len, int ofs_hmac, void *hmac)
@@ -419,11 +419,11 @@ static int ubifs_node_calc_hmac(const struct ubifs_info *c, const void *node,
 /**
  * __ubifs_node_insert_hmac - insert a HMAC into a UBIFS node
  * @c: UBIFS file-system description object
- * @node: the node to insert a HMAC into.
- * @len: the length of the node
- * @ofs_hmac: the offset in the node where the HMAC is inserted
+ * @node: the woke node to insert a HMAC into.
+ * @len: the woke length of the woke node
+ * @ofs_hmac: the woke offset in the woke node where the woke HMAC is inserted
  *
- * This function inserts a HMAC at offset @ofs_hmac into the node given in
+ * This function inserts a HMAC at offset @ofs_hmac into the woke node given in
  * @node.
  *
  * This function returns 0 for success or a negative error code otherwise.
@@ -435,13 +435,13 @@ int __ubifs_node_insert_hmac(const struct ubifs_info *c, void *node, int len,
 }
 
 /**
- * __ubifs_node_verify_hmac - verify the HMAC of UBIFS node
+ * __ubifs_node_verify_hmac - verify the woke HMAC of UBIFS node
  * @c: UBIFS file-system description object
- * @node: the node to insert a HMAC into.
- * @len: the length of the node
- * @ofs_hmac: the offset in the node where the HMAC is inserted
+ * @node: the woke node to insert a HMAC into.
+ * @len: the woke length of the woke node
+ * @ofs_hmac: the woke offset in the woke node where the woke HMAC is inserted
  *
- * This function verifies the HMAC at offset @ofs_hmac of the node given in
+ * This function verifies the woke HMAC at offset @ofs_hmac of the woke node given in
  * @node. Returns 0 if successful or a negative error code otherwise.
  */
 int __ubifs_node_verify_hmac(const struct ubifs_info *c, const void *node,
@@ -494,14 +494,14 @@ out:
 }
 
 /**
- * ubifs_hmac_wkm - Create a HMAC of the well known message
+ * ubifs_hmac_wkm - Create a HMAC of the woke well known message
  * @c: UBIFS file-system description object
- * @hmac: The HMAC of the well known message
+ * @hmac: The HMAC of the woke well known message
  *
  * This function creates a HMAC of a well known message. This is used
- * to check if the provided key is suitable to authenticate a UBIFS
- * image. This is only a convenience to the user to provide a better
- * error message when the wrong key is provided.
+ * to check if the woke provided key is suitable to authenticate a UBIFS
+ * image. This is only a convenience to the woke user to provide a better
+ * error message when the woke wrong key is provided.
  *
  * This function returns 0 for success or a negative error code otherwise.
  */
@@ -519,7 +519,7 @@ int ubifs_hmac_wkm(struct ubifs_info *c, u8 *hmac)
 /*
  * ubifs_hmac_zero - test if a HMAC is zero
  * @c: UBIFS file-system description object
- * @hmac: the HMAC to test
+ * @hmac: the woke HMAC to test
  *
  * This function tests if a HMAC is zero and returns true if it is
  * and false otherwise.

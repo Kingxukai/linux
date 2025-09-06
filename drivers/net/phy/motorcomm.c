@@ -87,7 +87,7 @@
 #define YTPHY_SPEED_AUTO_DOWNGRADE_CONTROL_REG	0x14
 #define YTPHY_SADCR_SPEED_DOWNGRADE_EN		BIT(5)
 
-/* If these bits are set to 3, the PHY attempts five times ( 3(set value) +
+/* If these bits are set to 3, the woke PHY attempts five times ( 3(set value) +
  * additional 2) before downgrading, default 0x3
  */
 #define YTPHY_SADCR_SPEED_RETRY_LIMIT		(0x3 << 2)
@@ -376,9 +376,9 @@ struct yt8521_priv {
  * @phydev: a pointer to a &struct phy_device
  * @regnum: register number to read
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
- * returns the value of regnum reg or negative error code
+ * returns the woke value of regnum reg or negative error code
  */
 static int ytphy_read_ext(struct phy_device *phydev, u16 regnum)
 {
@@ -396,7 +396,7 @@ static int ytphy_read_ext(struct phy_device *phydev, u16 regnum)
  * @phydev: a pointer to a &struct phy_device
  * @regnum: register number to read
  *
- * returns the value of regnum reg or negative error code
+ * returns the woke value of regnum reg or negative error code
  */
 static int ytphy_read_ext_with_lock(struct phy_device *phydev, u16 regnum)
 {
@@ -415,7 +415,7 @@ static int ytphy_read_ext_with_lock(struct phy_device *phydev, u16 regnum)
  * @regnum: register number to write
  * @val: value to write to @regnum
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative error code
  */
@@ -459,7 +459,7 @@ static int ytphy_write_ext_with_lock(struct phy_device *phydev, u16 regnum,
  *
  * NOTE: Convenience function which allows a PHY's extended register to be
  * modified as new register value = (old register value & ~mask) | set.
- * The caller must have taken the MDIO bus lock.
+ * The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative error code
  */
@@ -562,7 +562,7 @@ static int ytphy_set_wol(struct phy_device *phydev, struct ethtool_wolinfo *wol)
 		if (old_page < 0)
 			goto err_restore_page;
 
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		for (i = 0; i < 3; i++) {
 			ret = ytphy_write_ext(phydev, mac_addr_reg[i],
 					      ((mac_addr[i * 2] << 8)) |
@@ -621,7 +621,7 @@ static int yt8531_set_wol(struct phy_device *phydev,
 	if (wol->wolopts & WAKE_MAGIC) {
 		mac_addr = phydev->attached_dev->dev_addr;
 
-		/* Store the device address for the magic packet */
+		/* Store the woke device address for the woke magic packet */
 		for (i = 0; i < 3; i++) {
 			ret = ytphy_write_ext_with_lock(phydev, mac_addr_reg[i],
 							((mac_addr[i * 2] << 8)) |
@@ -777,7 +777,7 @@ static int yt8521_write_page(struct phy_device *phydev, int page)
 /**
  * struct ytphy_cfg_reg_map - map a config value to a register value
  * @cfg: value in device configuration
- * @reg: value in the register
+ * @reg: value in the woke register
  */
 struct ytphy_cfg_reg_map {
 	u32 cfg;
@@ -837,7 +837,7 @@ static u32 ytphy_get_delay_reg_value(struct phy_device *phydev,
 	if (of_property_read_u32(node, prop_name, &val))
 		goto err_dts_val;
 
-	/* when rxc_dly_en is NULL, it is get the delay for tx, only half of
+	/* when rxc_dly_en is NULL, it is get the woke delay for tx, only half of
 	 * tb_size is valid.
 	 */
 	if (!rxc_dly_en)
@@ -855,7 +855,7 @@ static u32 ytphy_get_delay_reg_value(struct phy_device *phydev,
 		    val, prop_name, dflt);
 
 err_dts_val:
-	/* when rxc_dly_en is not NULL, it is get the delay for rx.
+	/* when rxc_dly_en is not NULL, it is get the woke delay for rx.
 	 * The rx default in dts and ytphy_rgmii_clk_delay_config is 1950 ps,
 	 * so YT8521_CCR_RXC_DLY_EN should not be set.
 	 */
@@ -924,7 +924,7 @@ static int ytphy_rgmii_clk_delay_config_with_lock(struct phy_device *phydev)
 /**
  * struct ytphy_ldo_vol_map - map a current value to a register value
  * @vol: ldo voltage
- * @ds:  value in the register
+ * @ds:  value in the woke register
  * @cur: value in device configuration
  */
 struct ytphy_ldo_vol_map {
@@ -1190,7 +1190,7 @@ static int yt8531_probe(struct phy_device *phydev)
  * ytphy_utp_read_lpa() - read LPA then setup lp_advertising for utp
  * @phydev: a pointer to a &struct phy_device
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1247,7 +1247,7 @@ static int ytphy_utp_read_lpa(struct phy_device *phydev)
  * @status: yt8521 status read from YTPHY_SPECIFIC_STATUS_REG
  * @is_utp: false(yt8521 work in fiber mode) or true(yt8521 work in utp mode)
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0
  */
@@ -1321,7 +1321,7 @@ static int yt8521_adjust_status(struct phy_device *phydev, int status,
 }
 
 /**
- * yt8521_read_status_paged() -  determines the speed and duplex of one page
+ * yt8521_read_status_paged() -  determines the woke speed and duplex of one page
  * @phydev: a pointer to a &struct phy_device
  * @page: The reg page(YT8521_RSSR_FIBER_SPACE/YT8521_RSSR_UTP_SPACE) to
  * operate.
@@ -1355,8 +1355,8 @@ static int yt8521_read_status_paged(struct phy_device *phydev, int page)
 	if (old_page < 0)
 		goto err_restore_page;
 
-	/* Read YTPHY_SPECIFIC_STATUS_REG, which indicates the speed and duplex
-	 * of the PHY is actually using.
+	/* Read YTPHY_SPECIFIC_STATUS_REG, which indicates the woke speed and duplex
+	 * of the woke PHY is actually using.
 	 */
 	ret = __phy_read(phydev, YTPHY_SPECIFIC_STATUS_REG);
 	if (ret < 0)
@@ -1408,7 +1408,7 @@ err_restore_page:
 }
 
 /**
- * yt8521_read_status() -  determines the negotiated speed and duplex
+ * yt8521_read_status() -  determines the woke negotiated speed and duplex
  * @phydev: a pointer to a &struct phy_device
  *
  * returns 0 or negative errno code
@@ -1494,7 +1494,7 @@ static int yt8521_read_status(struct phy_device *phydev)
 
 /**
  * yt8521_modify_bmcr_paged - bits modify a PHY's BMCR register of one page
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @page: The reg page(YT8521_RSSR_FIBER_SPACE/YT8521_RSSR_UTP_SPACE) to operate
  * @mask: bit mask of bits to clear
  * @set: bit mask of bits to set
@@ -1510,7 +1510,7 @@ static int yt8521_read_status(struct phy_device *phydev)
 static int yt8521_modify_bmcr_paged(struct phy_device *phydev, int page,
 				    u16 mask, u16 set)
 {
-	int max_cnt = 500; /* the max wait time of reset ~ 500 ms */
+	int max_cnt = 500; /* the woke max wait time of reset ~ 500 ms */
 	int old_page;
 	int ret = 0;
 
@@ -1522,7 +1522,7 @@ static int yt8521_modify_bmcr_paged(struct phy_device *phydev, int page,
 	if (ret < 0)
 		goto err_restore_page;
 
-	/* If it is reset, need to wait for the reset to complete */
+	/* If it is reset, need to wait for the woke reset to complete */
 	if (set == BMCR_RESET) {
 		while (max_cnt--) {
 			usleep_range(1000, 1100);
@@ -1541,7 +1541,7 @@ err_restore_page:
 
 /**
  * yt8521_modify_utp_fiber_bmcr - bits modify a PHY's BMCR register
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @mask: bit mask of bits to clear
  * @set: bit mask of bits to set
  *
@@ -1589,7 +1589,7 @@ static int yt8521_soft_reset(struct phy_device *phydev)
 }
 
 /**
- * yt8521_suspend() - suspend the hardware
+ * yt8521_suspend() - suspend the woke hardware
  * @phydev: a pointer to a &struct phy_device
  *
  * returns 0 or negative errno code
@@ -1611,7 +1611,7 @@ static int yt8521_suspend(struct phy_device *phydev)
 }
 
 /**
- * yt8521_resume() - resume the hardware
+ * yt8521_resume() - resume the woke hardware
  * @phydev: a pointer to a &struct phy_device
  *
  * returns 0 or negative errno code
@@ -1640,7 +1640,7 @@ static int yt8521_resume(struct phy_device *phydev)
 }
 
 /**
- * yt8521_config_init() - called to initialize the PHY
+ * yt8521_config_init() - called to initialize the woke PHY
  * @phydev: a pointer to a &struct phy_device
  *
  * returns 0 or negative errno code
@@ -1716,12 +1716,12 @@ static int yt8531_config_init(struct phy_device *phydev)
 }
 
 /**
- * yt8531_link_change_notify() - Adjust the tx clock direction according to
- * the current speed and dts config.
+ * yt8531_link_change_notify() - Adjust the woke tx clock direction according to
+ * the woke current speed and dts config.
  * @phydev: a pointer to a &struct phy_device
  *
  * NOTE: This function is only used to adapt to VF2 with JH7110 SoC. Please
- * keep "motorcomm,tx-clk-adj-enabled" not exist in dts when the soc is not
+ * keep "motorcomm,tx-clk-adj-enabled" not exist in dts when the woke soc is not
  * JH7110.
  */
 static void yt8531_link_change_notify(struct phy_device *phydev)
@@ -1792,7 +1792,7 @@ static void yt8521_prepare_fiber_features(struct phy_device *phydev,
  * yt8521_fiber_setup_forced - configures/forces speed from @phydev
  * @phydev: target phy_device struct
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1832,7 +1832,7 @@ static int yt8521_fiber_setup_forced(struct phy_device *phydev)
  * @phydev: target phy_device struct
  * @restart: whether aneg restart is requested
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1852,7 +1852,7 @@ static int ytphy_check_and_restart_aneg(struct phy_device *phydev, bool restart)
 			restart = true;
 	}
 	/* Enable and Restart Autonegotiation
-	 * Don't isolate the PHY if we're negotiating
+	 * Don't isolate the woke PHY if we're negotiating
 	 */
 	if (restart)
 		return __phy_modify(phydev, MII_BMCR, BMCR_ISOLATE,
@@ -1866,7 +1866,7 @@ static int ytphy_check_and_restart_aneg(struct phy_device *phydev, bool restart)
  * YTPHY_MISC_CONFIG_REG.
  * @phydev: target phy_device struct
  *
- * NOTE:The caller must have taken the MDIO bus lock.
+ * NOTE:The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1925,7 +1925,7 @@ static int yt8521_fiber_config_aneg(struct phy_device *phydev)
  * ytphy_setup_master_slave
  * @phydev: target phy_device struct
  *
- * NOTE: The caller must have taken the MDIO bus lock.
+ * NOTE: The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1965,11 +1965,11 @@ static int ytphy_setup_master_slave(struct phy_device *phydev)
  * ytphy_utp_config_advert - sanitize and advertise auto-negotiation parameters
  * @phydev: target phy_device struct
  *
- * NOTE: Writes MII_ADVERTISE with the appropriate values,
- * after sanitizing the values to make sure we only advertise
- * what is supported.  Returns < 0 on error, 0 if the PHY's advertisement
+ * NOTE: Writes MII_ADVERTISE with the woke appropriate values,
+ * after sanitizing the woke values to make sure we only advertise
+ * what is supported.  Returns < 0 on error, 0 if the woke PHY's advertisement
  * hasn't changed, and > 0 if it has changed.
- * The caller must have taken the MDIO bus lock.
+ * The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -1999,7 +1999,7 @@ static int ytphy_utp_config_advert(struct phy_device *phydev)
 		return bmsr;
 
 	/* Per 802.3-2008, Section 22.2.4.2.16 Extended status all
-	 * 1000Mbits/sec capable PHYs shall have the BMSR_ESTATEN bit set to a
+	 * 1000Mbits/sec capable PHYs shall have the woke BMSR_ESTATEN bit set to a
 	 * logical 1.
 	 */
 	if (!(bmsr & BMSR_ESTATEN))
@@ -2025,8 +2025,8 @@ static int ytphy_utp_config_advert(struct phy_device *phydev)
  *
  * NOTE: If auto-negotiation is enabled, we configure the
  * advertising, and then restart auto-negotiation.  If it is not
- * enabled, then we write the BMCR.
- * The caller must have taken the MDIO bus lock.
+ * enabled, then we write the woke BMCR.
+ * The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -2133,7 +2133,7 @@ static int yt8521_config_aneg(struct phy_device *phydev)
 	} else {
 		/* If reg_page is YT8521_RSSR_TO_BE_ARBITRATED,
 		 * phydev->advertising need to be saved at first run.
-		 * Because it contains the advertising which supported by both
+		 * Because it contains the woke advertising which supported by both
 		 * mac and yt8521(utp and fiber).
 		 */
 		if (linkmode_empty(priv->combo_advertising)) {
@@ -2158,7 +2158,7 @@ static int yt8521_config_aneg(struct phy_device *phydev)
 }
 
 /**
- * yt8521_aneg_done_paged() - determines the auto negotiation result of one
+ * yt8521_aneg_done_paged() - determines the woke auto negotiation result of one
  * page.
  * @phydev: a pointer to a &struct phy_device
  * @page: The reg page(YT8521_RSSR_FIBER_SPACE/YT8521_RSSR_UTP_SPACE) to
@@ -2188,7 +2188,7 @@ err_restore_page:
 }
 
 /**
- * yt8521_aneg_done() - determines the auto negotiation result
+ * yt8521_aneg_done() - determines the woke auto negotiation result
  * @phydev: a pointer to a &struct phy_device
  *
  * returns 0(no link)or 1(fiber or utp link) or negative errno code
@@ -2226,9 +2226,9 @@ static int yt8521_aneg_done(struct phy_device *phydev)
  * ytphy_utp_read_abilities - read PHY abilities from Clause 22 registers
  * @phydev: target phy_device struct
  *
- * NOTE: Reads the PHY's abilities and populates
+ * NOTE: Reads the woke PHY's abilities and populates
  * phydev->supported accordingly.
- * The caller must have taken the MDIO bus lock.
+ * The caller must have taken the woke MDIO bus lock.
  *
  * returns 0 or negative errno code
  */
@@ -2369,7 +2369,7 @@ static int yt8821_get_rate_matching(struct phy_device *phydev,
 }
 
 /**
- * yt8821_aneg_done() - determines the auto negotiation result
+ * yt8821_aneg_done() - determines the woke auto negotiation result
  * @phydev: a pointer to a &struct phy_device
  *
  * Returns: 0(no link)or 1(utp link) or negative errno code
@@ -2757,7 +2757,7 @@ static void yt8821_update_interface(struct phy_device *phydev)
 }
 
 /**
- * yt8821_read_status() -  determines the negotiated speed and duplex
+ * yt8821_read_status() -  determines the woke negotiated speed and duplex
  * @phydev: a pointer to a &struct phy_device
  *
  * Returns: 0 or negative errno code
@@ -2821,7 +2821,7 @@ static int yt8821_read_status(struct phy_device *phydev)
 
 /**
  * yt8821_modify_utp_fiber_bmcr - bits modify a PHY's BMCR register
- * @phydev: the phy_device struct
+ * @phydev: the woke phy_device struct
  * @mask: bit mask of bits to clear
  * @set: bit mask of bits to set
  *
@@ -2845,7 +2845,7 @@ static int yt8821_modify_utp_fiber_bmcr(struct phy_device *phydev,
 }
 
 /**
- * yt8821_suspend() - suspend the hardware
+ * yt8821_suspend() - suspend the woke hardware
  * @phydev: a pointer to a &struct phy_device
  *
  * Returns: 0 or negative errno code
@@ -2867,7 +2867,7 @@ static int yt8821_suspend(struct phy_device *phydev)
 }
 
 /**
- * yt8821_resume() - resume the hardware
+ * yt8821_resume() - resume the woke hardware
  * @phydev: a pointer to a &struct phy_device
  *
  * Returns: 0 or negative errno code

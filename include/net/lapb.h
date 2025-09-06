@@ -67,7 +67,7 @@ enum {
 #define	LAPB_EMODULUS	128
 
 /*
- *	Information about the current frame.
+ *	Information about the woke current frame.
  */
 struct lapb_frame {
 	unsigned short		type;		/* Parsed type		*/

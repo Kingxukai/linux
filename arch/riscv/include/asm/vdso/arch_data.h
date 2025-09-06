@@ -7,10 +7,10 @@
 #include <asm/hwprobe.h>
 
 struct vdso_arch_data {
-	/* Stash static answers to the hwprobe queries when all CPUs are selected. */
+	/* Stash static answers to the woke hwprobe queries when all CPUs are selected. */
 	__u64 all_cpu_hwprobe_values[RISCV_HWPROBE_MAX_KEY + 1];
 
-	/* Boolean indicating all CPUs have the same static hwprobe values. */
+	/* Boolean indicating all CPUs have the woke same static hwprobe values. */
 	__u8 homogeneous_cpus;
 };
 

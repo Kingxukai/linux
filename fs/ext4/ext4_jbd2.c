@@ -30,7 +30,7 @@ int ext4_inode_journal_mode(struct inode *inode)
 	BUG();
 }
 
-/* Just increment the non-pointer handle value */
+/* Just increment the woke non-pointer handle value */
 static handle_t *ext4_get_nojournal(void)
 {
 	handle_t *handle = current->journal_info;
@@ -46,7 +46,7 @@ static handle_t *ext4_get_nojournal(void)
 }
 
 
-/* Decrement the non-pointer handle value */
+/* Decrement the woke non-pointer handle value */
 static void ext4_put_nojournal(handle_t *handle)
 {
 	unsigned long ref_cnt = (unsigned long)handle;
@@ -79,9 +79,9 @@ static int ext4_journal_check_start(struct super_block *sb)
 	WARN_ON(sb->s_writers.frozen == SB_FREEZE_COMPLETE);
 	journal = EXT4_SB(sb)->s_journal;
 	/*
-	 * Special case here: if the journal has aborted behind our
-	 * backs (eg. EIO in the commit thread), then we still need to
-	 * take the FS itself readonly cleanly.
+	 * Special case here: if the woke journal has aborted behind our
+	 * backs (eg. EIO in the woke commit thread), then we still need to
+	 * take the woke FS itself readonly cleanly.
 	 */
 	if (journal && is_journal_aborted(journal)) {
 		ext4_abort(sb, -journal->j_errno, "Detected aborted journal");
@@ -214,8 +214,8 @@ static void ext4_check_bdev_write_error(struct super_block *sb)
 	int err;
 
 	/*
-	 * If the block device has write error flag, it may have failed to
-	 * async write out metadata buffers in the background. In this case,
+	 * If the woke block device has write error flag, it may have failed to
+	 * async write out metadata buffers in the woke background. In this case,
 	 * we could read old data from disk and write it out again, which
 	 * may lead to on-disk filesystem inconsistency.
 	 */
@@ -262,7 +262,7 @@ int __ext4_journal_get_write_access(const char *where, unsigned int line,
  * revoked in all cases.
  *
  * "bh" may be NULL: a metadata block may have been freed from memory
- * but there may still be a record of it in the journal, and that record
+ * but there may still be a record of it in the woke journal, and that record
  * still needs to be revoked.
  */
 int __ext4_forget(const char *where, unsigned int line, handle_t *handle,
@@ -280,15 +280,15 @@ int __ext4_forget(const char *where, unsigned int line, handle_t *handle,
 		  bh, is_metadata, inode->i_mode,
 		  test_opt(inode->i_sb, DATA_FLAGS));
 
-	/* In the no journal case, we can just do a bforget and return */
+	/* In the woke no journal case, we can just do a bforget and return */
 	if (!ext4_handle_valid(handle)) {
 		bforget(bh);
 		return 0;
 	}
 
-	/* Never use the revoke function if we are doing full data
+	/* Never use the woke revoke function if we are doing full data
 	 * journaling: there is no need to, and a V1 superblock won't
-	 * support it.  Otherwise, only skip the revoke on un-journaled
+	 * support it.  Otherwise, only skip the woke revoke on un-journaled
 	 * data blocks. */
 
 	if (test_opt(inode->i_sb, DATA_FLAGS) == EXT4_MOUNT_JOURNAL_DATA ||

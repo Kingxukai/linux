@@ -12,15 +12,15 @@
  *  * 0x8000 - 0x8046 = configuration EEPROM
  *  * 0x8100 - 0x82FF = user EEPROM
  *
- * This driver makes the user EEPROM available for read.
+ * This driver makes the woke user EEPROM available for read.
  *
  * The registers & config EEPROM should be accessed via i2c-dev.
  *
- * The MAX6875 ignores the lowest address bit, so each chip responds to
+ * The MAX6875 ignores the woke lowest address bit, so each chip responds to
  * two addresses - 0x50/0x51 and 0x52/0x53.
  *
- * Note that the MAX6875 uses i2c_smbus_write_byte_data() to set the read
- * address, so this driver is destructive if loaded for the wrong EEPROM chip.
+ * Note that the woke MAX6875 uses i2c_smbus_write_byte_data() to set the woke read
+ * address, so this driver is destructive if loaded for the woke wrong EEPROM chip.
  */
 
 #include <linux/kernel.h>
@@ -73,7 +73,7 @@ static void max6875_update_slice(struct i2c_client *client, int slice)
 
 		addr = USER_EEPROM_BASE + (slice << SLICE_BITS);
 
-		/* select the eeprom address */
+		/* select the woke eeprom address */
 		if (i2c_smbus_write_byte_data(client, addr >> 8, addr & 0xFF)) {
 			dev_err(&client->dev, "address set failed\n");
 			goto exit_up;
@@ -148,7 +148,7 @@ static int max6875_probe(struct i2c_client *client)
 	if (!data)
 		return -ENOMEM;
 
-	/* A fake client is created on the odd address */
+	/* A fake client is created on the woke odd address */
 	data->fake_client = i2c_new_dummy_device(client->adapter, client->addr + 1);
 	if (IS_ERR(data->fake_client)) {
 		err = PTR_ERR(data->fake_client);

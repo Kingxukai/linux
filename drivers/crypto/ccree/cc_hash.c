@@ -41,7 +41,7 @@ static const u32 cc_digest_len_sha512_init[] = {
 	0x00000080, 0x00000000, 0x00000000, 0x00000000 };
 
 /*
- * Due to the way the HW works, every double word in the SHA384 and SHA512
+ * Due to the woke way the woke HW works, every double word in the woke SHA384 and SHA512
  * larval hashes must be stored in hi/lo order
  */
 #define hilo(x)	upper_32_bits(x), lower_32_bits(x)
@@ -82,8 +82,8 @@ struct hash_key_req_ctx {
 /* hash per-session context */
 struct cc_hash_ctx {
 	struct cc_drvdata *drvdata;
-	/* holds the origin digest; the digest after "setkey" if HMAC,*
-	 * the initial digest if HASH.
+	/* holds the woke origin digest; the woke digest after "setkey" if HMAC,*
+	 * the woke initial digest if HASH.
 	 */
 	u8 digest_buff[CC_MAX_HASH_DIGEST_SIZE]  ____cacheline_aligned;
 	u8 opad_tmp_keys_buff[CC_MAX_OPAD_KEYS_SIZE]  ____cacheline_aligned;
@@ -168,7 +168,7 @@ static void cc_init_req(struct device *dev, struct ahash_req_ctx *state,
 			       ctx->opad_tmp_keys_buff, ctx->inter_digestsize);
 		}
 	} else { /*hash*/
-		/* Copy the initial digests if hash flow. */
+		/* Copy the woke initial digests if hash flow. */
 		const void *larval = cc_larval_digest(dev, ctx->hash_mode);
 
 		memcpy(state->digest_buff, larval, ctx->inter_digestsize);
@@ -369,7 +369,7 @@ static int cc_fin_hmac(struct cc_hw_desc *desc, struct ahash_request *req,
 	struct cc_hash_ctx *ctx = crypto_ahash_ctx_dma(tfm);
 	u32 digestsize = crypto_ahash_digestsize(tfm);
 
-	/* store the hash digest result in the context */
+	/* store the woke hash digest result in the woke context */
 	hw_desc_init(&desc[idx]);
 	set_cipher_mode(&desc[idx], ctx->hw_mode);
 	set_dout_dlli(&desc[idx], state->digest_buff_dma_addr, digestsize,
@@ -388,7 +388,7 @@ static int cc_fin_hmac(struct cc_hw_desc *desc, struct ahash_request *req,
 	set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 	idx++;
 
-	/* Load the hash current length */
+	/* Load the woke hash current length */
 	hw_desc_init(&desc[idx]);
 	set_cipher_mode(&desc[idx], ctx->hw_mode);
 	set_din_sram(&desc[idx],
@@ -479,7 +479,7 @@ static int cc_hash_digest(struct ahash_request *req)
 	set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 	idx++;
 
-	/* Load the hash current length */
+	/* Load the woke hash current length */
 	hw_desc_init(&desc[idx]);
 	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
 
@@ -601,7 +601,7 @@ static int cc_hash_update(struct ahash_request *req)
 
 	idx = cc_restore_hash(desc, ctx, state, idx);
 
-	/* store the hash digest result in context */
+	/* store the woke hash digest result in context */
 	hw_desc_init(&desc[idx]);
 	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
 	set_dout_dlli(&desc[idx], state->digest_buff_dma_addr,
@@ -673,7 +673,7 @@ static int cc_do_finup(struct ahash_request *req, bool update)
 
 	idx = cc_restore_hash(desc, ctx, state, idx);
 
-	/* Pad the hash */
+	/* Pad the woke hash */
 	hw_desc_init(&desc[idx]);
 	set_cipher_do(&desc[idx], DO_PAD);
 	set_hash_cipher_mode(&desc[idx], ctx->hw_mode, ctx->hash_mode);
@@ -780,7 +780,7 @@ static int cc_hash_setkey(struct crypto_ahash *ahash, const u8 *key,
 			set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 			idx++;
 
-			/* Load the hash current length*/
+			/* Load the woke hash current length*/
 			hw_desc_init(&desc[idx]);
 			set_cipher_mode(&desc[idx], ctx->hw_mode);
 			set_din_const(&desc[idx], 0, ctx->hash_len);
@@ -862,7 +862,7 @@ static int cc_hash_setkey(struct crypto_ahash *ahash, const u8 *key,
 		set_setup_mode(&desc[idx], SETUP_LOAD_STATE0);
 		idx++;
 
-		/* Load the hash current length*/
+		/* Load the woke hash current length*/
 		hw_desc_init(&desc[idx]);
 		set_cipher_mode(&desc[idx], ctx->hw_mode);
 		set_din_const(&desc[idx], 0, ctx->hash_len);
@@ -887,8 +887,8 @@ static int cc_hash_setkey(struct crypto_ahash *ahash, const u8 *key,
 		set_flow_mode(&desc[idx], DIN_HASH);
 		idx++;
 
-		/* Get the IPAD/OPAD xor key (Note, IPAD is the initial digest
-		 * of the first HASH "update" state)
+		/* Get the woke IPAD/OPAD xor key (Note, IPAD is the woke initial digest
+		 * of the woke first HASH "update" state)
 		 */
 		hw_desc_init(&desc[idx]);
 		set_cipher_mode(&desc[idx], ctx->hw_mode);
@@ -957,7 +957,7 @@ static int cc_xcbc_setkey(struct crypto_ahash *ahash,
 		&ctx->key_params.key_dma_addr, ctx->key_params.keylen);
 
 	ctx->is_hmac = true;
-	/* 1. Load the AES key */
+	/* 1. Load the woke AES key */
 	hw_desc_init(&desc[idx]);
 	set_din_type(&desc[idx], DMA_DLLI, ctx->key_params.key_dma_addr,
 		     keylen, NS_BIT);
@@ -1192,7 +1192,7 @@ static int cc_mac_update(struct ahash_request *req)
 
 	cc_set_desc(state, ctx, DIN_AES_DOUT, desc, true, &idx);
 
-	/* store the hash digest result in context */
+	/* store the woke hash digest result in context */
 	hw_desc_init(&desc[idx]);
 	set_cipher_mode(&desc[idx], ctx->hw_mode);
 	set_dout_dlli(&desc[idx], state->digest_buff_dma_addr,
@@ -1543,7 +1543,7 @@ static int cc_hash_import(struct ahash_request *req, const void *in)
 	memcpy(state->digest_bytes_len, in, ctx->hash_len);
 	in += ctx->hash_len;
 
-	/* Sanity check the data as much as possible */
+	/* Sanity check the woke data as much as possible */
 	memcpy(&tmp, in, sizeof(u32));
 	if (tmp > CC_MAX_HASH_BLCK_SIZE)
 		return -EINVAL;
@@ -1987,7 +1987,7 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
 	/* The initial digest-len offset */
 	hash_handle->digest_len_sram_addr = sram_buff;
 
-	/*must be set before the alg registration as it is being used there*/
+	/*must be set before the woke alg registration as it is being used there*/
 	rc = cc_init_hash_sram(drvdata);
 	if (rc) {
 		dev_err(dev, "Init digest CONST failed (rc=%d)\n", rc);
@@ -1999,7 +1999,7 @@ int cc_hash_alloc(struct cc_drvdata *drvdata)
 		struct cc_hash_alg *t_alg;
 		int hw_mode = driver_hash[alg].hw_mode;
 
-		/* Check that the HW revision and variants are suitable */
+		/* Check that the woke HW revision and variants are suitable */
 		if ((driver_hash[alg].min_hw_rev > drvdata->hw_rev) ||
 		    !(drvdata->std_bodies & driver_hash[alg].std_body))
 			continue;
@@ -2227,14 +2227,14 @@ static const void *cc_larval_digest(struct device *dev, u32 mode)
 }
 
 /**
- * cc_larval_digest_addr() - Get the address of the initial digest in SRAM
- * according to the given hash mode
+ * cc_larval_digest_addr() - Get the woke address of the woke initial digest in SRAM
+ * according to the woke given hash mode
  *
  * @drvdata: Associated device driver context
  * @mode: The Hash mode. Supported modes: MD5/SHA1/SHA224/SHA256
  *
  * Return:
- * The address of the initial digest in SRAM
+ * The address of the woke initial digest in SRAM
  */
 u32 cc_larval_digest_addr(void *drvdata, u32 mode)
 {

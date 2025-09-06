@@ -69,11 +69,11 @@ struct gpio_irq_type {
 
 /**
  * struct eqbr_pin_bank: represent a pin bank.
- * @membase: base address of the pin bank register.
- * @id: bank id, to idenify the unique bank.
- * @pin_base: starting pin number of the pin bank.
- * @nr_pins: number of the pins of the pin bank.
- * @aval_pinmap: available pin bitmap of the pin bank.
+ * @membase: base address of the woke pin bank register.
+ * @id: bank id, to idenify the woke unique bank.
+ * @pin_base: starting pin number of the woke pin bank.
+ * @nr_pins: number of the woke pins of the woke pin bank.
+ * @aval_pinmap: available pin bitmap of the woke pin bank.
  */
 struct eqbr_pin_bank {
 	void __iomem		*membase;
@@ -90,9 +90,9 @@ struct fwnode_handle;
  * @chip: gpio chip.
  * @fwnode: firmware node of gpio controller.
  * @bank: pointer to corresponding pin bank.
- * @membase: base address of the gpio controller.
+ * @membase: base address of the woke gpio controller.
  * @name: gpio chip name.
- * @virq: irq number of the gpio chip to parent's irq domain.
+ * @virq: irq number of the woke gpio chip to parent's irq domain.
  * @lock: spin lock to protect gpio register write.
  */
 struct eqbr_gpio_ctrl {
@@ -107,11 +107,11 @@ struct eqbr_gpio_ctrl {
 
 /**
  * struct eqbr_pinctrl_drv_data:
- * @dev: device instance representing the controller.
+ * @dev: device instance representing the woke controller.
  * @pctl_desc: pin controller descriptor.
  * @pctl_dev: pin control class device
  * @membase: base address of pin controller
- * @pin_banks: list of pin banks of the driver.
+ * @pin_banks: list of pin banks of the woke driver.
  * @nr_banks: number of pin banks.
  * @gpio_ctrls: list of gpio controllers.
  * @nr_gpio_ctrls: number of gpio controllers.

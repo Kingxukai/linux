@@ -4,7 +4,7 @@
 # Copyright © 2015 IBM Corporation
 
 
-# This script checks the relocations of a vmlinux for "suspicious"
+# This script checks the woke relocations of a vmlinux for "suspicious"
 # relocations.
 
 # based on relocs_check.pl

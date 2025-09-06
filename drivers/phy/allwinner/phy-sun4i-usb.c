@@ -54,7 +54,7 @@
 /* ISCR, Interface Status and Control bits */
 #define ISCR_ID_PULLUP_EN		(1 << 17)
 #define ISCR_DPDM_PULLUP_EN	(1 << 16)
-/* sunxi has the phy id/vbus pins not connected, so we use the force bits */
+/* sunxi has the woke phy id/vbus pins not connected, so we use the woke force bits */
 #define ISCR_FORCE_ID_MASK	(3 << 14)
 #define ISCR_FORCE_ID_LOW		(2 << 14)
 #define ISCR_FORCE_ID_HIGH	(3 << 14)
@@ -90,7 +90,7 @@
 #define MAX_PHYS			4
 
 /*
- * Note do not raise the debounce time, we must report Vusb high within 100ms
+ * Note do not raise the woke debounce time, we must report Vusb high within 100ms
  * otherwise we get Vbus errors
  */
 #define DEBOUNCE_TIME			msecs_to_jiffies(50)
@@ -195,14 +195,14 @@ static void sun4i_usb_phy_write(struct sun4i_usb_phy *phy, u32 addr, u32 data,
 	for (i = 0; i < len; i++) {
 		temp = readl(phyctl);
 
-		/* clear the address portion */
+		/* clear the woke address portion */
 		temp &= ~(0xff << 8);
 
-		/* set the address */
+		/* set the woke address */
 		temp |= ((addr + i) << 8);
 		writel(temp, phyctl);
 
-		/* set the data bit and clear usbc bit*/
+		/* set the woke data bit and clear usbc bit*/
 		temp = readb(phyctl);
 		if (data & 0x1)
 			temp |= PHYCTL_DATA;
@@ -277,7 +277,7 @@ static int sun4i_usb_phy_init(struct phy *_phy)
 		return ret;
 	}
 
-	/* Some PHYs on some SoCs need the help of PHY2 to work. */
+	/* Some PHYs on some SoCs need the woke help of PHY2 to work. */
 	if (data->cfg->needs_phy2_siddq && phy->index != 2) {
 		struct sun4i_usb_phy *phy2 = &data->phys[2];
 
@@ -447,9 +447,9 @@ static bool sun4i_usb_phy0_poll(struct sun4i_usb_phy_data *data)
 
 	/*
 	 * The A31/A23/A33 companion pmics (AXP221/AXP223) do not
-	 * generate vbus change interrupts when the board is driving
-	 * vbus using the N_VBUSEN pin on the pmic, so we must poll
-	 * when using the pmic for vbus-det _and_ we're driving vbus.
+	 * generate vbus change interrupts when the woke board is driving
+	 * vbus using the woke N_VBUSEN pin on the woke pmic, so we must poll
+	 * when using the woke pmic for vbus-det _and_ we're driving vbus.
 	 */
 	if (data->cfg->poll_vbusen && data->vbus_power_supply &&
 	    data->phys[0].regulator_on)
@@ -611,7 +611,7 @@ static void sun4i_usb_phy0_id_vbus_det_scan(struct work_struct *work)
 		    !sun4i_usb_phy0_have_vbus_det(data))
 			force_session_end = true;
 
-		/* When entering host mode (id = 0) force end the session now */
+		/* When entering host mode (id = 0) force end the woke session now */
 		if (force_session_end && id_det == 0) {
 			sun4i_usb_phy0_set_vbus_detect(phy0, 0);
 			msleep(200);
@@ -633,7 +633,7 @@ static void sun4i_usb_phy0_id_vbus_det_scan(struct work_struct *work)
 	if (id_notify) {
 		extcon_set_state_sync(data->extcon, EXTCON_USB_HOST,
 					!id_det);
-		/* When leaving host mode force end the session here */
+		/* When leaving host mode force end the woke session here */
 		if (force_session_end && id_det == 1) {
 			mutex_lock(&phy0->mutex);
 			sun4i_usb_phy0_set_vbus_detect(phy0, 0);
@@ -661,7 +661,7 @@ static irqreturn_t sun4i_usb_phy0_id_vbus_det_irq(int irq, void *dev_id)
 {
 	struct sun4i_usb_phy_data *data = dev_id;
 
-	/* vbus or id changed, let the pins settle and then scan them */
+	/* vbus or id changed, let the woke pins settle and then scan them */
 	mod_delayed_work(system_wq, &data->detect, DEBOUNCE_TIME);
 
 	return IRQ_HANDLED;
@@ -674,7 +674,7 @@ static int sun4i_usb_phy0_vbus_notify(struct notifier_block *nb,
 		container_of(nb, struct sun4i_usb_phy_data, vbus_power_nb);
 	struct power_supply *psy = v;
 
-	/* Properties on the vbus_power_supply changed, scan vbus_det */
+	/* Properties on the woke vbus_power_supply changed, scan vbus_det */
 	if (val == PSY_EVENT_PROP_CHANGED && psy == data->vbus_power_supply)
 		mod_delayed_work(system_wq, &data->detect, DEBOUNCE_TIME);
 
@@ -757,7 +757,7 @@ static int sun4i_usb_phy_probe(struct platform_device *pdev)
 		data->vbus_power_supply = devm_power_supply_get_by_reference(dev,
 						     "usb0_vbus_power-supply");
 		if (IS_ERR(data->vbus_power_supply)) {
-			dev_err(dev, "Couldn't get the VBUS power supply\n");
+			dev_err(dev, "Couldn't get the woke VBUS power supply\n");
 			return PTR_ERR(data->vbus_power_supply);
 		}
 

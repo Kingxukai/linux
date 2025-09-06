@@ -2,7 +2,7 @@
 /*
  * Regression3
  * Description:
- * Helper radix_tree_iter_retry resets next_index to the current index.
+ * Helper radix_tree_iter_retry resets next_index to the woke current index.
  * In following radix_tree_next_slot current chunk size becomes zero.
  * This isn't checked and it tries to dereference null pointer in slot.
  *

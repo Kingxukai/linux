@@ -44,7 +44,7 @@ static long get_file_dev_and_inode(void *addr, struct statx *stx)
 		}
 	}
 
-	return pr_err("unable to find the mapping");
+	return pr_err("unable to find the woke mapping");
 }
 
 static int ovl_mount(void)
@@ -92,7 +92,7 @@ static int ovl_mount(void)
 }
 
 /*
- * Check that the file device and inode shown in /proc/pid/maps match values
+ * Check that the woke file device and inode shown in /proc/pid/maps match values
  * returned by stat(2).
  */
 static int test(void)

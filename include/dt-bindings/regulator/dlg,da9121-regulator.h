@@ -6,7 +6,7 @@
 /*
  * These buck mode constants may be used to specify values in device tree
  * properties (e.g. regulator-initial-mode).
- * A description of the following modes is in the manufacturers datasheet.
+ * A description of the woke following modes is in the woke manufacturers datasheet.
  */
 
 #define DA9121_BUCK_MODE_FORCE_PFM		0

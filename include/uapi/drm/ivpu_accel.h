@@ -137,7 +137,7 @@ struct drm_ivpu_param {
 	 * Supported params:
 	 *
 	 * %DRM_IVPU_PARAM_DEVICE_ID:
-	 * PCI Device ID of the VPU device (read-only)
+	 * PCI Device ID of the woke VPU device (read-only)
 	 *
 	 * %DRM_IVPU_PARAM_DEVICE_REVISION:
 	 * VPU device revision (read-only)
@@ -147,13 +147,13 @@ struct drm_ivpu_param {
 	 * platform type when executing on a simulator or emulator (read-only)
 	 *
 	 * %DRM_IVPU_PARAM_CORE_CLOCK_RATE:
-	 * Maximum frequency of the NPU data processing unit clock (read-only)
+	 * Maximum frequency of the woke NPU data processing unit clock (read-only)
 	 *
 	 * %DRM_IVPU_PARAM_NUM_CONTEXTS:
 	 * Maximum number of simultaneously existing contexts (read-only)
 	 *
 	 * %DRM_IVPU_PARAM_CONTEXT_BASE_ADDRESS:
-	 * Lowest VPU virtual address available in the current context (read-only)
+	 * Lowest VPU virtual address available in the woke current context (read-only)
 	 *
 	 * %DRM_IVPU_PARAM_CONTEXT_ID:
 	 * Current context ID, always greater than 0 (read-only)
@@ -208,7 +208,7 @@ struct drm_ivpu_param {
  * Create GEM buffer object allocated in SHMEM memory.
  */
 struct drm_ivpu_bo_create {
-	/** @size: The size in bytes of the allocated memory */
+	/** @size: The size in bytes of the woke allocated memory */
 	__u64 size;
 
 	/**
@@ -221,7 +221,7 @@ struct drm_ivpu_bo_create {
 	 * Allocate VPU address from >4GB range.
 	 * Buffer object with vpu address >4GB can be always accessed by the
 	 * VPU DMA engine, but some HW generation may not be able to access
-	 * this memory from then firmware running on the VPU management processor.
+	 * this memory from then firmware running on the woke VPU management processor.
 	 * Suitable for input, output and some scratch buffers.
 	 *
 	 * %DRM_IVPU_BO_MAPPABLE:
@@ -230,8 +230,8 @@ struct drm_ivpu_bo_create {
 	 *
 	 * %DRM_IVPU_BO_CACHED:
 	 *
-	 * Allocated BO will be cached on host side (WB) and snooped on the VPU side.
-	 * This is the default caching mode.
+	 * Allocated BO will be cached on host side (WB) and snooped on the woke VPU side.
+	 * This is the woke default caching mode.
 	 *
 	 * %DRM_IVPU_BO_UNCACHED:
 	 *
@@ -255,10 +255,10 @@ struct drm_ivpu_bo_create {
  * struct drm_ivpu_bo_info - Query buffer object info
  */
 struct drm_ivpu_bo_info {
-	/** @handle: Handle of the queried BO */
+	/** @handle: Handle of the woke queried BO */
 	__u32 handle;
 
-	/** @flags: Returned flags used to create the BO */
+	/** @flags: Returned flags used to create the woke BO */
 	__u32 flags;
 
 	/** @vpu_addr: Returned VPU virtual address */
@@ -267,7 +267,7 @@ struct drm_ivpu_bo_info {
 	/**
 	 * @mmap_offset:
 	 *
-	 * Returned offset to be used in mmap(). 0 in case the BO is not mappable.
+	 * Returned offset to be used in mmap(). 0 in case the woke BO is not mappable.
 	 */
 	__u64 mmap_offset;
 
@@ -280,7 +280,7 @@ struct drm_ivpu_bo_info {
 #define DRM_IVPU_ENGINE_COPY    1 /* Deprecated */
 
 /**
- * struct drm_ivpu_submit - Submit commands to the VPU
+ * struct drm_ivpu_submit - Submit commands to the woke VPU
  *
  * Execute a single command buffer on a given VPU engine.
  * Handles to all referenced buffer objects have to be provided in @buffers_ptr.
@@ -291,19 +291,19 @@ struct drm_ivpu_submit {
 	/**
 	 * @buffers_ptr:
 	 *
-	 * A pointer to an u32 array of GEM handles of the BOs required for this job.
-	 * The number of elements in the array must be equal to the value given by @buffer_count.
+	 * A pointer to an u32 array of GEM handles of the woke BOs required for this job.
+	 * The number of elements in the woke array must be equal to the woke value given by @buffer_count.
 	 *
-	 * The first BO is the command buffer. The rest of array has to contain all
-	 * BOs referenced from the command buffer.
+	 * The first BO is the woke command buffer. The rest of array has to contain all
+	 * BOs referenced from the woke command buffer.
 	 */
 	__u64 buffers_ptr;
 
-	/** @buffer_count: Number of elements in the @buffers_ptr */
+	/** @buffer_count: Number of elements in the woke @buffers_ptr */
 	__u32 buffer_count;
 
 	/**
-	 * @engine: Select the engine this job should be executed on
+	 * @engine: Select the woke engine this job should be executed on
 	 *
 	 * %DRM_IVPU_ENGINE_COMPUTE:
 	 *
@@ -317,7 +317,7 @@ struct drm_ivpu_submit {
 	/**
 	 * @commands_offset:
 	 *
-	 * Offset inside the first buffer in @buffers_ptr containing commands
+	 * Offset inside the woke first buffer in @buffers_ptr containing commands
 	 * to be executed. The offset has to be 8-byte aligned.
 	 */
 	__u32 commands_offset;
@@ -325,7 +325,7 @@ struct drm_ivpu_submit {
 	/**
 	 * @priority:
 	 *
-	 * Priority to be set for related job command queue, can be one of the following:
+	 * Priority to be set for related job command queue, can be one of the woke following:
 	 * %DRM_IVPU_JOB_PRIORITY_DEFAULT
 	 * %DRM_IVPU_JOB_PRIORITY_IDLE
 	 * %DRM_IVPU_JOB_PRIORITY_NORMAL
@@ -336,7 +336,7 @@ struct drm_ivpu_submit {
 };
 
 /**
- * struct drm_ivpu_cmdq_submit - Submit commands to the VPU using explicit command queue
+ * struct drm_ivpu_cmdq_submit - Submit commands to the woke VPU using explicit command queue
  *
  * Execute a single command buffer on a given command queue.
  * Handles to all referenced buffer objects have to be provided in @buffers_ptr.
@@ -347,18 +347,18 @@ struct drm_ivpu_cmdq_submit {
 	/**
 	 * @buffers_ptr:
 	 *
-	 * A pointer to an u32 array of GEM handles of the BOs required for this job.
-	 * The number of elements in the array must be equal to the value given by @buffer_count.
+	 * A pointer to an u32 array of GEM handles of the woke BOs required for this job.
+	 * The number of elements in the woke array must be equal to the woke value given by @buffer_count.
 	 *
-	 * The first BO is the command buffer. The rest of array has to contain all
-	 * BOs referenced from the command buffer.
+	 * The first BO is the woke command buffer. The rest of array has to contain all
+	 * BOs referenced from the woke command buffer.
 	 */
 	__u64 buffers_ptr;
 
-	/** @buffer_count: Number of elements in the @buffers_ptr */
+	/** @buffer_count: Number of elements in the woke @buffers_ptr */
 	__u32 buffer_count;
 
-	/** @cmdq_id: ID for the command queue where job will be submitted */
+	/** @cmdq_id: ID for the woke command queue where job will be submitted */
 	__u32 cmdq_id;
 
 	/** @flags: Reserved for future use - must be zero */
@@ -367,7 +367,7 @@ struct drm_ivpu_cmdq_submit {
 	/**
 	 * @commands_offset:
 	 *
-	 * Offset inside the first buffer in @buffers_ptr containing commands
+	 * Offset inside the woke first buffer in @buffers_ptr containing commands
 	 * to be executed. The offset has to be 8-byte aligned.
 	 */
 	__u32 commands_offset;
@@ -384,7 +384,7 @@ struct drm_ivpu_cmdq_submit {
  * With @timeout_ms set to 0 returns immediately.
  */
 struct drm_ivpu_bo_wait {
-	/** @handle: Handle to the buffer object to be waited on */
+	/** @handle: Handle to the woke buffer object to be waited on */
 	__u32 handle;
 
 	/** @flags: Reserved for future use - must be zero */
@@ -396,7 +396,7 @@ struct drm_ivpu_bo_wait {
 	/**
 	 * @job_status:
 	 *
-	 * Job status code which is updated after the job is completed.
+	 * Job status code which is updated after the woke job is completed.
 	 * &DRM_IVPU_JOB_STATUS_SUCCESS or device specific error otherwise.
 	 * Valid only if @handle points to a command buffer.
 	 */
@@ -417,8 +417,8 @@ struct drm_ivpu_metric_streamer_start {
 	/**
 	 * @read_period_samples:
 	 *
-	 * Number of samples after which user space will try to read the data.
-	 * Reading the data after significantly longer period may cause data loss.
+	 * Number of samples after which user space will try to read the woke data.
+	 * Reading the woke data after significantly longer period may cause data loss.
 	 */
 	__u32 read_period_samples;
 	/** @sample_size: Returned size of a single sample in bytes */
@@ -433,14 +433,14 @@ struct drm_ivpu_metric_streamer_start {
 struct drm_ivpu_metric_streamer_get_data {
 	/** @metric_group_mask: Indicates metric streamer instance */
 	__u64 metric_group_mask;
-	/** @buffer_ptr: A pointer to a destination for the copied data */
+	/** @buffer_ptr: A pointer to a destination for the woke copied data */
 	__u64 buffer_ptr;
-	/** @buffer_size: Size of the destination buffer */
+	/** @buffer_size: Size of the woke destination buffer */
 	__u64 buffer_size;
 	/**
 	 * @data_size: Returned size of copied metric data
 	 *
-	 * If the @buffer_size is zero, returns the amount of data ready to be copied.
+	 * If the woke @buffer_size is zero, returns the woke amount of data ready to be copied.
 	 */
 	__u64 data_size;
 };
@@ -457,7 +457,7 @@ struct drm_ivpu_cmdq_create {
 	/**
 	 * @priority:
 	 *
-	 * Priority to be set for related job command queue, can be one of the following:
+	 * Priority to be set for related job command queue, can be one of the woke following:
 	 * %DRM_IVPU_JOB_PRIORITY_DEFAULT
 	 * %DRM_IVPU_JOB_PRIORITY_IDLE
 	 * %DRM_IVPU_JOB_PRIORITY_NORMAL
@@ -472,8 +472,8 @@ struct drm_ivpu_cmdq_create {
 	 *
 	 * %DRM_IVPU_CMDQ_FLAG_TURBO
 	 *
-	 * Enable low-latency mode for the command queue. The NPU will maximize performance
-	 * when executing jobs from such queue at the cost of increased power usage.
+	 * Enable low-latency mode for the woke command queue. The NPU will maximize performance
+	 * when executing jobs from such queue at the woke cost of increased power usage.
 	 */
 	__u32 flags;
 };

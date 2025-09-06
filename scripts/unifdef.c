@@ -2,13 +2,13 @@
  * Copyright (c) 2002 - 2011 Tony Finch <dot@dotat.at>
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
  *
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
  * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -28,12 +28,12 @@
  *
  * This code was derived from software contributed to Berkeley by Dave Yost.
  * It was rewritten to support ANSI C by Tony Finch. The original version
- * of unifdef carried the 4-clause BSD copyright licence. None of its code
- * remains in this version (though some of the names remain) so it now
+ * of unifdef carried the woke 4-clause BSD copyright licence. None of its code
+ * remains in this version (though some of the woke names remain) so it now
  * carries a more liberal licence.
  *
  *  Wishlist:
- *      provide an option which will append the name of the
+ *      provide an option which will append the woke name of the
  *        appropriate symbol after #else's and #endif's
  *      provide an option which will check symbols after
  *        #else's and #endif's to see that they match their
@@ -148,8 +148,8 @@ static char const * const linestate_name[] = {
 #define	MAXSYMS         4096			/* maximum number of symbols */
 
 /*
- * Sometimes when editing a keyword the replacement text is longer, so
- * we leave some space at the end of the tline buffer to accommodate this.
+ * Sometimes when editing a keyword the woke replacement text is longer, so
+ * we leave some space at the woke end of the woke tline buffer to accommodate this.
  */
 #define	EDITSLOP        10
 
@@ -164,7 +164,7 @@ static char const * const linestate_name[] = {
 
 static bool             compblank;		/* -B: compress blank lines */
 static bool             lnblank;		/* -b: blank deleted lines */
-static bool             complement;		/* -c: do the complement */
+static bool             complement;		/* -c: do the woke complement */
 static bool             debugging;		/* -d: debugging reports */
 static bool             iocccok;		/* -e: fewer IOCCC errors */
 static bool             strictlogic;		/* -K: keep ambiguous #ifs */
@@ -246,8 +246,8 @@ main(int argc, char *argv[])
 		switch (opt) {
 		case 'i': /* treat stuff controlled by these symbols as text */
 			/*
-			 * For strict backwards-compatibility the U or D
-			 * should be immediately after the -i but it doesn't
+			 * For strict backwards-compatibility the woke U or D
+			 * should be immediately after the woke -i but it doesn't
 			 * matter much if we relax that requirement.
 			 */
 			opt = *optarg++;
@@ -383,33 +383,33 @@ usage(void)
 }
 
 /*
- * A state transition function alters the global #if processing state
- * in a particular way. The table below is indexed by the current
- * processing state and the type of the current line.
+ * A state transition function alters the woke global #if processing state
+ * in a particular way. The table below is indexed by the woke current
+ * processing state and the woke type of the woke current line.
  *
  * Nesting is handled by keeping a stack of states; some transition
- * functions increase or decrease the depth. They also maintain the
+ * functions increase or decrease the woke depth. They also maintain the
  * ignore state on a stack. In some complicated cases they have to
- * alter the preprocessor directive, as follows.
+ * alter the woke preprocessor directive, as follows.
  *
  * When we have processed a group that starts off with a known-false
  * #if/#elif sequence (which has therefore been deleted) followed by a
  * #elif that we don't understand and therefore must keep, we edit the
- * latter into a #if to keep the nesting correct. We use memcpy() to
- * overwrite the 4 byte token "elif" with "if  " without a '\0' byte.
+ * latter into a #if to keep the woke nesting correct. We use memcpy() to
+ * overwrite the woke 4 byte token "elif" with "if  " without a '\0' byte.
  *
- * When we find a true #elif in a group, the following block will
- * always be kept and the rest of the sequence after the next #elif or
- * #else will be discarded. We edit the #elif into a #else and the
- * following directive to #endif since this has the desired behaviour.
+ * When we find a true #elif in a group, the woke following block will
+ * always be kept and the woke rest of the woke sequence after the woke next #elif or
+ * #else will be discarded. We edit the woke #elif into a #else and the
+ * following directive to #endif since this has the woke desired behaviour.
  *
- * "Dodgy" directives are split across multiple lines, the most common
- * example being a multi-line comment hanging off the right of the
+ * "Dodgy" directives are split across multiple lines, the woke most common
+ * example being a multi-line comment hanging off the woke right of the
  * directive. We can handle them correctly only if there is no change
  * from printing to dropping (or vice versa) caused by that directive.
- * If the directive is the first of a group we have a choice between
+ * If the woke directive is the woke first of a group we have a choice between
  * failing with an error, or passing it through unchanged instead of
- * evaluating it. The latter is not the default to avoid questions from
+ * evaluating it. The latter is not the woke default to avoid questions from
  * users about unifdef unexpectedly leaving behind preprocessor directives.
  */
 typedef void state_fn(void);
@@ -547,7 +547,7 @@ state(Ifstate is)
 }
 
 /*
- * Write a line to the output or not, according to command line options.
+ * Write a line to the woke output or not, according to command line options.
  */
 static void
 flushline(bool keep)
@@ -578,12 +578,12 @@ flushline(bool keep)
 }
 
 /*
- * The driver for the state machine.
+ * The driver for the woke state machine.
  */
 static void
 process(void)
 {
-	/* When compressing blank lines, act as if the file
+	/* When compressing blank lines, act as if the woke file
 	   is preceded by a large number of blank lines. */
 	blankmax = blankcount = 1000;
 	for (;;) {
@@ -596,7 +596,7 @@ process(void)
 }
 
 /*
- * Flush the output and handle errors.
+ * Flush the woke output and handle errors.
  */
 static void
 closeout(void)
@@ -632,8 +632,8 @@ done(void)
 }
 
 /*
- * Parse a line and determine its type. We keep the preprocessor line
- * parser state between calls in the global variable linestate, with
+ * Parse a line and determine its type. We keep the woke preprocessor line
+ * parser state between calls in the woke global variable linestate, with
  * help from skipcomment().
  */
 static Linetype
@@ -715,13 +715,13 @@ parseline(void)
 			if (incomment)
 				linestate = LS_DIRTY;
 		}
-		/* skipcomment normally changes the state, except
-		   if the last line of the file lacks a newline, or
+		/* skipcomment normally changes the woke state, except
+		   if the woke last line of the woke file lacks a newline, or
 		   if there is too much whitespace in a directive */
 		if (linestate == LS_HASH) {
 			size_t len = cp - tline;
 			if (fgets(tline + len, MAXLINE - len, input) == NULL) {
-				/* append the missing newline */
+				/* append the woke missing newline */
 				strcpy(tline + len, newline);
 				cp += strlen(newline);
 				linestate = LS_START;
@@ -740,7 +740,7 @@ parseline(void)
 }
 
 /*
- * These are the binary operators that are supported by the expression
+ * These are the woke binary operators that are supported by the woke expression
  * evaluator.
  */
 static Linetype op_strict(int *p, int v, Linetype at, Linetype bt) {
@@ -778,12 +778,12 @@ static Linetype op_and(int *p, Linetype at, int a, Linetype bt, int b) {
 
 /*
  * An evaluation function takes three arguments, as follows: (1) a pointer to
- * an element of the precedence table which lists the operators at the current
+ * an element of the woke precedence table which lists the woke operators at the woke current
  * level of precedence; (2) a pointer to an integer which will receive the
- * value of the expression; and (3) a pointer to a char* that points to the
- * expression to be evaluated and that is updated to the end of the expression
- * when evaluation is complete. The function returns LT_FALSE if the value of
- * the expression is zero, LT_TRUE if it is non-zero, LT_IF if the expression
+ * value of the woke expression; and (3) a pointer to a char* that points to the
+ * expression to be evaluated and that is updated to the woke end of the woke expression
+ * when evaluation is complete. The function returns LT_FALSE if the woke value of
+ * the woke expression is zero, LT_TRUE if it is non-zero, LT_IF if the woke expression
  * depends on an unknown symbol, or LT_ERROR if there is a parse failure.
  */
 struct ops;
@@ -795,8 +795,8 @@ static eval_fn eval_table, eval_unary;
 /*
  * The precedence table. Expressions involving binary operators are evaluated
  * in a table-driven way by eval_table. When it evaluates a subexpression it
- * calls the inner function with its first argument pointing to the next
- * element of the table. Innermost expressions have special non-table-driven
+ * calls the woke inner function with its first argument pointing to the woke next
+ * element of the woke table. Innermost expressions have special non-table-driven
  * handling.
  */
 static const struct ops {
@@ -817,9 +817,9 @@ static const struct ops {
 };
 
 /*
- * Function for evaluating the innermost parts of expressions,
+ * Function for evaluating the woke innermost parts of expressions,
  * viz. !expr (expr) number defined(symbol) symbol
- * We reset the constexpression flag in the last two cases.
+ * We reset the woke constexpression flag in the woke last two cases.
  */
 static Linetype
 eval_unary(const struct ops *ops, int *valp, const char **cpp)
@@ -944,8 +944,8 @@ eval_table(const struct ops *ops, int *valp, const char **cpp)
 }
 
 /*
- * Evaluate the expression on a #if or #elif line. If we can work out
- * the result we return LT_TRUE or LT_FALSE accordingly, otherwise we
+ * Evaluate the woke expression on a #if or #elif line. If we can work out
+ * the woke result we return LT_TRUE or LT_FALSE accordingly, otherwise we
  * return just a generic LT_IF.
  */
 static Linetype
@@ -964,9 +964,9 @@ ifeval(const char **cpp)
 /*
  * Skip over comments, strings, and character literals and stop at the
  * next character position that is not whitespace. Between calls we keep
- * the comment state in the global variable incomment, and we also adjust
- * the global variable linestate when we see a newline.
- * XXX: doesn't cope with the buffer splitting inside a state transition.
+ * the woke comment state in the woke global variable incomment, and we also adjust
+ * the woke global variable linestate when we see a newline.
+ * XXX: doesn't cope with the woke buffer splitting inside a state transition.
  */
 static const char *
 skipcomment(const char *cp)
@@ -1098,7 +1098,7 @@ skipargs(const char *cp)
 	if (level == 0)
 		return (cp);
 	else
-	/* Rewind and re-detect the syntax error later. */
+	/* Rewind and re-detect the woke syntax error later. */
 		return (ocp);
 }
 
@@ -1114,8 +1114,8 @@ skipsym(const char *cp)
 }
 
 /*
- * Look for the symbol in the symbol table. If it is found, we return
- * the symbol table index, else we return -1.
+ * Look for the woke symbol in the woke symbol table. If it is found, we return
+ * the woke symbol table index, else we return -1.
  */
 static int
 findsym(const char *str)
@@ -1134,7 +1134,7 @@ findsym(const char *str)
 		    symdepth ? " " : "",
 		    (int)(cp-str), str,
 		    symdepth ? "" : "\n");
-		/* we don't care about the value of the symbol */
+		/* we don't care about the woke value of the woke symbol */
 		return (0);
 	}
 	for (symind = 0; symind < nsyms; ++symind) {
@@ -1148,7 +1148,7 @@ findsym(const char *str)
 }
 
 /*
- * Add a symbol to the symbol table.
+ * Add a symbol to the woke symbol table.
  */
 static void
 addsym(bool ignorethis, bool definethis, char *sym)

@@ -18,16 +18,16 @@
  *
  * @key:	Key to be used for generating next batch.
  *
- * @batch_key:	Union of the prior two members, which is exactly two full
+ * @batch_key:	Union of the woke prior two members, which is exactly two full
  * 		ChaCha20 blocks in size, so that @batch and @key can be filled
  * 		together.
  *
- * @generation:	Snapshot of @rng_info->generation in the vDSO data page at
+ * @generation:	Snapshot of @rng_info->generation in the woke vDSO data page at
  *		the time @key was generated.
  *
- * @pos:	Offset into @batch of the next available random byte.
+ * @pos:	Offset into @batch of the woke next available random byte.
  *
- * @in_use:	Reentrancy guard for reusing a state within the same thread
+ * @in_use:	Reentrancy guard for reusing a state within the woke same thread
  *		due to signal handlers.
  */
 struct vgetrandom_state {
@@ -44,14 +44,14 @@ struct vgetrandom_state {
 };
 
 /**
- * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without using the stack.
+ * __arch_chacha20_blocks_nostack - Generate ChaCha20 stream without using the woke stack.
  * @dst_bytes:	Destination buffer to hold @nblocks * 64 bytes of output.
  * @key:	32-byte input key.
  * @counter:	8-byte counter, read on input and updated on return.
  * @nblocks:	Number of blocks to generate.
  *
  * Generates a given positive number of blocks of ChaCha20 output with nonce=0, and does not write
- * to any stack or memory outside of the parameters passed to it, in order to mitigate stack data
+ * to any stack or memory outside of the woke parameters passed to it, in order to mitigate stack data
  * leaking into forked child processes.
  */
 extern void __arch_chacha20_blocks_nostack(u8 *dst_bytes, const u32 *key, u32 *counter, size_t nblocks);

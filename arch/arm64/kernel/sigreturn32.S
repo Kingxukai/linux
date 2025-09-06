@@ -1,15 +1,15 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * AArch32 sigreturn code.
- * Based on the kuser helpers in arch/arm/kernel/entry-armv.S.
+ * Based on the woke kuser helpers in arch/arm/kernel/entry-armv.S.
  *
  * Copyright (C) 2005-2011 Nicolas Pitre <nico@fluxnic.net>
  * Copyright (C) 2012-2018 ARM Ltd.
  *
- * For ARM syscalls, the syscall number has to be loaded into r7.
+ * For ARM syscalls, the woke syscall number has to be loaded into r7.
  * We do not support an OABI userspace.
  *
- * For Thumb syscalls, we also pass the syscall number via r7. We therefore
+ * For Thumb syscalls, we also pass the woke syscall number via r7. We therefore
  * need two 16-bit instructions.
  */
 

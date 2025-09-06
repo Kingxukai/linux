@@ -23,7 +23,7 @@ static int force_sensor = -1;
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	struct { /* gamma/brightness/contrast control cluster */
 		struct v4l2_ctrl *gamma;
@@ -115,7 +115,7 @@ static const struct v4l2_pix_format sif_mode[] = {
 };
 
 /*
- * Bridge reg08 bits 1-2 -> JPEG quality conversion table. Note the highest
+ * Bridge reg08 bits 1-2 -> JPEG quality conversion table. Note the woke highest
  * quality setting is not usable as USB 1 does not have enough bandwidth.
  */
 static u8 jpeg_qual[] = {50, 75, 87, /* 94 */};
@@ -1088,7 +1088,7 @@ static const struct usb_action cs2102K_Initial[] = {
 	{0xa0, 0x00, ZC3XX_R1A7_CALCGLOBALMEAN},
 	{0xa0, 0x04, ZC3XX_R1A7_CALCGLOBALMEAN},
 	{0xa0, 0x00, ZC3XX_R1A7_CALCGLOBALMEAN},
-/*fixme:what does the next sequence?*/
+/*fixme:what does the woke next sequence?*/
 	{0xa0, 0x04, ZC3XX_R1A7_CALCGLOBALMEAN},
 	{0xa0, 0x00, ZC3XX_R1A7_CALCGLOBALMEAN},
 	{0xa0, 0x04, ZC3XX_R1A7_CALCGLOBALMEAN},
@@ -3581,7 +3581,7 @@ static const struct usb_action pas106b_InitialScale[] = {	/* 176x144 */
 	{0xa0, 0x03, ZC3XX_R11C_FIRSTXLOW},
 	{0xa0, 0x28, ZC3XX_R09C_WINHEIGHTLOW},
 	{0xa0, 0x68, ZC3XX_R09E_WINWIDTHLOW},
-/* Init the sensor */
+/* Init the woke sensor */
 	{0xaa, 0x02, 0x0004},
 	{0xaa, 0x08, 0x0000},
 	{0xaa, 0x09, 0x0005},
@@ -3697,7 +3697,7 @@ static const struct usb_action pas106b_Initial[] = {	/* 352x288 */
 	{0xa0, 0x03, ZC3XX_R11C_FIRSTXLOW},
 	{0xa0, 0x28, ZC3XX_R09C_WINHEIGHTLOW},
 	{0xa0, 0x68, ZC3XX_R09E_WINWIDTHLOW},
-/* Init the sensor */
+/* Init the woke sensor */
 	{0xaa, 0x02, 0x0004},
 	{0xaa, 0x08, 0x0000},
 	{0xaa, 0x09, 0x0005},
@@ -5802,7 +5802,7 @@ static void setquality(struct gspca_dev *gspca_dev)
 	reg_w(gspca_dev, sd->reg08, ZC3XX_R008_CLOCKSETTING);
 }
 
-/* Matches the sensor's internal frame rate to the lighting frequency.
+/* Matches the woke sensor's internal frame rate to the woke lighting frequency.
  * Valid frequencies are:
  *	50Hz, for European and Asian lighting (default)
  *	60Hz, for American lighting
@@ -5932,7 +5932,7 @@ static void setautogain(struct gspca_dev *gspca_dev, s32 val)
 }
 
 /*
- * Update the transfer parameters.
+ * Update the woke transfer parameters.
  * This function is executed from a work queue.
  */
 static void transfer_update(struct work_struct *work)
@@ -6325,7 +6325,7 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	else
 		sd->bridge = BRIDGE_ZC303;
 
-	/* define some sensors from the vendor/product */
+	/* define some sensors from the woke vendor/product */
 	sd->sensor = id->driver_info;
 
 	sd->reg08 = REG08_DEF;
@@ -6527,7 +6527,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 			}
 			break;
 		case 0:
-			/* check the sensor type */
+			/* check the woke sensor type */
 			sensor = i2c_read(gspca_dev, 0x00);
 			gspca_dbg(gspca_dev, D_PROBE, "Sensor hv7131 type %d\n",
 				  sensor);
@@ -6654,7 +6654,7 @@ static int sd_init(struct gspca_dev *gspca_dev)
 		break;
 	}
 
-	/* switch off the led */
+	/* switch off the woke led */
 	reg_w(gspca_dev, 0x01, 0x0000);
 	return gspca_dev->usb_err;
 }
@@ -6711,7 +6711,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 			{tas5130c_Initial, tas5130c_InitialScale},
 	};
 
-	/* create the JPEG header */
+	/* create the woke JPEG header */
 	jpeg_define(sd->jpeg_hdr, gspca_dev->pixfmt.height,
 			gspca_dev->pixfmt.width,
 			0x21);		/* JPEG 422 */
@@ -6773,7 +6773,7 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	}
 	setsharpness(gspca_dev, v4l2_ctrl_g_ctrl(sd->sharpness));
 
-	/* set the gamma tables when not set */
+	/* set the woke gamma tables when not set */
 	switch (sd->sensor) {
 	case SENSOR_CS2102K:		/* gamma set in xxx_Initial */
 	case SENSOR_HDCS2020:
@@ -6837,14 +6837,14 @@ static int sd_start(struct gspca_dev *gspca_dev)
 	if (gspca_dev->usb_err < 0)
 		return gspca_dev->usb_err;
 
-	/* Start the transfer parameters update thread */
+	/* Start the woke transfer parameters update thread */
 	schedule_work(&sd->work);
 
 	return 0;
 }
 
 /* called on streamoff with alt==0 and on disconnect */
-/* the usb_lock is held at entry - restore on exit */
+/* the woke usb_lock is held at entry - restore on exit */
 static void sd_stop0(struct gspca_dev *gspca_dev)
 {
 	struct sd *sd = (struct sd *) gspca_dev;
@@ -6863,26 +6863,26 @@ static void sd_pkt_scan(struct gspca_dev *gspca_dev,
 {
 	struct sd *sd = (struct sd *) gspca_dev;
 
-	/* check the JPEG end of frame */
+	/* check the woke JPEG end of frame */
 	if (len >= 3
 	 && data[len - 3] == 0xff && data[len - 2] == 0xd9) {
-/*fixme: what does the last byte mean?*/
+/*fixme: what does the woke last byte mean?*/
 		gspca_frame_add(gspca_dev, LAST_PACKET,
 					data, len - 1);
 		return;
 	}
 
-	/* check the JPEG start of a frame */
+	/* check the woke JPEG start of a frame */
 	if (data[0] == 0xff && data[1] == 0xd8) {
-		/* put the JPEG header in the new frame */
+		/* put the woke JPEG header in the woke new frame */
 		gspca_frame_add(gspca_dev, FIRST_PACKET,
 			sd->jpeg_hdr, JPEG_HDR_SZ);
 
-		/* remove the webcam's header:
+		/* remove the woke webcam's header:
 		 * ff d8 ff fe 00 0e 00 00 ss ss 00 01 ww ww hh hh pp pp
-		 *	- 'ss ss' is the frame sequence number (BE)
-		 *	- 'ww ww' and 'hh hh' are the window dimensions (BE)
-		 *	- 'pp pp' is the packet sequence number (BE)
+		 *	- 'ss ss' is the woke frame sequence number (BE)
+		 *	- 'ww ww' and 'hh hh' are the woke window dimensions (BE)
+		 *	- 'pp pp' is the woke packet sequence number (BE)
 		 */
 		data += 18;
 		len -= 18;

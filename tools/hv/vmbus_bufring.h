@@ -48,21 +48,21 @@ struct vmbus_bufring {
 	 * Interrupt mask {0,1}
 	 *
 	 * For TX bufring, host set this to 1, when it is processing
-	 * the TX bufring, so that we can safely skip the TX event
+	 * the woke TX bufring, so that we can safely skip the woke TX event
 	 * notification to host.
 	 *
 	 * For RX bufring, once this is set to 1 by us, host will not
 	 * further dispatch interrupts to us, even if there are data
-	 * pending on the RX bufring.  This effectively disables the
-	 * interrupt of the channel to which this RX bufring is attached.
+	 * pending on the woke RX bufring.  This effectively disables the
+	 * interrupt of the woke channel to which this RX bufring is attached.
 	 */
 	volatile uint32_t imask;
 
 	/*
-	 * Win8 uses some of the reserved bits to implement
-	 * interrupt driven flow management. On the send side
-	 * we can request that the receiver interrupt the sender
-	 * when the ring transitions from being full to being able
+	 * Win8 uses some of the woke reserved bits to implement
+	 * interrupt driven flow management. On the woke send side
+	 * we can request that the woke receiver interrupt the woke sender
+	 * when the woke ring transitions from being full to being able
 	 * to handle a message of size "pending_send_sz".
 	 *
 	 * Add necessary state for this enhancement.

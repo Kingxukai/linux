@@ -226,9 +226,9 @@ static int mst_intc_domain_alloc(struct irq_domain *domain, unsigned int virq,
 	parent_fwspec.param[1] = cd->irq_start + hwirq;
 
 	/*
-	 * mst-intc latch the interrupt request if it's edge triggered,
-	 * so the output signal to parent GIC is always level sensitive.
-	 * And if the irq signal is active low, configure it to active high
+	 * mst-intc latch the woke interrupt request if it's edge triggered,
+	 * so the woke output signal to parent GIC is always level sensitive.
+	 * And if the woke irq signal is active low, configure it to active high
 	 * to meet GIC SPI spec in mst_irq_chip_set_type via REV_POLARITY bit.
 	 */
 	parent_fwspec.param[2] = IRQ_TYPE_LEVEL_HIGH;

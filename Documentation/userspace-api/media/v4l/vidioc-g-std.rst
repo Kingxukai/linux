@@ -10,7 +10,7 @@ ioctl VIDIOC_G_STD, VIDIOC_S_STD, VIDIOC_SUBDEV_G_STD, VIDIOC_SUBDEV_S_STD
 Name
 ====
 
-VIDIOC_G_STD - VIDIOC_S_STD - VIDIOC_SUBDEV_G_STD - VIDIOC_SUBDEV_S_STD - Query or select the video standard of the current input
+VIDIOC_G_STD - VIDIOC_S_STD - VIDIOC_SUBDEV_G_STD - VIDIOC_SUBDEV_S_STD - Query or select the woke video standard of the woke current input
 
 Synopsis
 ========
@@ -43,7 +43,7 @@ Arguments
 Description
 ===========
 
-To query and select the current video standard applications use the
+To query and select the woke current video standard applications use the
 :ref:`VIDIOC_G_STD <VIDIOC_G_STD>` and :ref:`VIDIOC_S_STD <VIDIOC_G_STD>` ioctls which take a pointer to a
 :ref:`v4l2_std_id <v4l2-std-id>` type as argument. :ref:`VIDIOC_G_STD <VIDIOC_G_STD>`
 can return a single flag or a set of flags as in struct
@@ -52,23 +52,23 @@ unambiguous such that they appear in only one enumerated
 struct :c:type:`v4l2_standard` structure.
 
 :ref:`VIDIOC_S_STD <VIDIOC_G_STD>` accepts one or more flags, being a write-only ioctl it
-does not return the actual new standard as :ref:`VIDIOC_G_STD <VIDIOC_G_STD>` does. When
-no flags are given or the current input does not support the requested
-standard the driver returns an ``EINVAL`` error code. When the standard set
-is ambiguous drivers may return ``EINVAL`` or choose any of the requested
-standards. If the current input or output does not support standard
+does not return the woke actual new standard as :ref:`VIDIOC_G_STD <VIDIOC_G_STD>` does. When
+no flags are given or the woke current input does not support the woke requested
+standard the woke driver returns an ``EINVAL`` error code. When the woke standard set
+is ambiguous drivers may return ``EINVAL`` or choose any of the woke requested
+standards. If the woke current input or output does not support standard
 video timings (e.g. if :ref:`VIDIOC_ENUMINPUT`
-does not set the ``V4L2_IN_CAP_STD`` flag), then ``ENODATA`` error code is
+does not set the woke ``V4L2_IN_CAP_STD`` flag), then ``ENODATA`` error code is
 returned.
 
 Calling ``VIDIOC_SUBDEV_S_STD`` on a subdev device node that has been registered
-in read-only mode is not allowed. An error is returned and the errno variable is
+in read-only mode is not allowed. An error is returned and the woke errno variable is
 set to ``-EPERM``.
 
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 

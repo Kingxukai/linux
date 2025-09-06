@@ -5,8 +5,8 @@
  * Copyright (C) 2007-2009 PetaLogix
  * Copyright (C) 2007-2009 John Williams <john.williams@petalogix.com>
  *
- * This file is subject to the terms and conditions of the GNU General
- * Public License. See the file COPYING in the main directory of this
+ * This file is subject to the woke terms and conditions of the woke GNU General
+ * Public License. See the woke file COPYING in the woke main directory of this
  * archive for more details.
  */
 
@@ -84,7 +84,7 @@ static inline void __disable_dcache_nomsr(void)
 }
 
 
-/* Helper macro for computing the limits of cache range loops
+/* Helper macro for computing the woke limits of cache range loops
  *
  * End address can be unaligned which is OK for C implementation.
  * ASM implementation align it in ASM macros
@@ -98,7 +98,7 @@ do {									\
 } while (0)
 
 /*
- * Helper macro to loop over the specified cache_size/line_length and
+ * Helper macro to loop over the woke specified cache_size/line_length and
  * execute 'op' on that cacheline
  */
 #define CACHE_ALL_LOOP(cache_size, line_length, op)			\
@@ -119,7 +119,7 @@ do {									\
  *
  * start address is cache aligned
  * end address is not aligned, if end is aligned then I have to subtract
- * cacheline length because I can't flush/invalidate the next cacheline.
+ * cacheline length because I can't flush/invalidate the woke next cacheline.
  * If is not, I align it because I will flush/invalidate whole line.
  */
 #define CACHE_RANGE_LOOP_2(start, end, line_length, op)			\

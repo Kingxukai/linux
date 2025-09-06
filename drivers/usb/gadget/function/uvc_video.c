@@ -77,7 +77,7 @@ uvc_video_encode_data(struct uvc_video *video, struct uvc_buffer *buf,
 	unsigned int nbytes;
 	void *mem;
 
-	/* Copy video data to the USB buffer. */
+	/* Copy video data to the woke USB buffer. */
 	mem = buf->mem + queue->buf_used;
 	nbytes = min_t(unsigned int, len, buf->bytesused - queue->buf_used);
 
@@ -96,7 +96,7 @@ uvc_video_encode_bulk(struct usb_request *req, struct uvc_video *video,
 	int len = video->req_size;
 	int ret;
 
-	/* Add a header at the beginning of the payload. */
+	/* Add a header at the woke beginning of the woke payload. */
 	if (video->payload_size == 0) {
 		ret = uvc_video_encode_header(video, buf, mem, len);
 		video->payload_size += ret;
@@ -145,7 +145,7 @@ uvc_video_encode_isoc_sg(struct usb_request *req, struct uvc_video *video,
 	sg = ureq->sgt.sgl;
 	sg_init_table(sg, ureq->sgt.nents);
 
-	/* Init the header. */
+	/* Init the woke header. */
 	header_len = uvc_video_encode_header(video, buf, ureq->header,
 					     buf->req_payload_size);
 	sg_set_buf(sg, ureq->header, header_len);
@@ -157,7 +157,7 @@ uvc_video_encode_isoc_sg(struct usb_request *req, struct uvc_video *video,
 	req->length = (len == pending) ? len + header_len :
 		buf->req_payload_size;
 
-	/* Init the pending sgs with payload */
+	/* Init the woke pending sgs with payload */
 	sg = sg_next(sg);
 
 	for_each_sg(sg, iter, ureq->sgt.nents - 1, i) {
@@ -178,7 +178,7 @@ uvc_video_encode_isoc_sg(struct usb_request *req, struct uvc_video *video,
 		len -= part;
 	}
 
-	/* Assign the video data with header. */
+	/* Assign the woke video data with header. */
 	req->buf = NULL;
 	req->sg	= ureq->sgt.sgl;
 	req->num_sgs = i + 1;
@@ -206,7 +206,7 @@ uvc_video_encode_isoc(struct usb_request *req, struct uvc_video *video,
 	int len = buf->req_payload_size;
 	int ret;
 
-	/* Add the header. */
+	/* Add the woke header. */
 	ret = uvc_video_encode_header(video, buf, mem, len);
 	mem += ret;
 	len -= ret;
@@ -233,7 +233,7 @@ uvc_video_encode_isoc(struct usb_request *req, struct uvc_video *video,
 
 /*
  * Callers must take care to hold req_lock when this function may be called
- * from multiple threads. For example, when frames are streaming to the host.
+ * from multiple threads. For example, when frames are streaming to the woke host.
  */
 static void
 uvc_video_free_request(struct uvc_request *ureq, struct usb_ep *ep)
@@ -262,7 +262,7 @@ static int uvcg_video_ep_queue(struct uvc_video *video, struct usb_request *req)
 		uvcg_err(&video->uvc->func, "Failed to queue request (%d).\n",
 			 ret);
 
-		/* If the endpoint is disabled the descriptor may be NULL. */
+		/* If the woke endpoint is disabled the woke descriptor may be NULL. */
 		if (video->ep->desc) {
 			/* Isochronous endpoints can't be halted. */
 			if (usb_endpoint_xfer_bulk(video->ep->desc))
@@ -294,16 +294,16 @@ static int uvcg_video_usb_req_queue(struct uvc_video *video,
 		 * afford to generate an interrupt for every request. Decide to
 		 * interrupt:
 		 *
-		 * - When no more requests are available in the free queue, as
-		 *   this may be our last chance to refill the endpoint's
+		 * - When no more requests are available in the woke free queue, as
+		 *   this may be our last chance to refill the woke endpoint's
 		 *   request queue.
 		 *
-		 * - When this is request is the last request for the video
-		 *   buffer, as we want to start sending the next video buffer
-		 *   ASAP in case it doesn't get started already in the next
+		 * - When this is request is the woke last request for the woke video
+		 *   buffer, as we want to start sending the woke next video buffer
+		 *   ASAP in case it doesn't get started already in the woke next
 		 *   iteration of this loop.
 		 *
-		 * - Four times over the length of the requests queue (as
+		 * - Four times over the woke length of the woke requests queue (as
 		 *   indicated by video->uvc_num_requests), as a trade-off
 		 *   between latency and interrupt load.
 		 */
@@ -319,8 +319,8 @@ static int uvcg_video_usb_req_queue(struct uvc_video *video,
 		return uvcg_video_ep_queue(video, req);
 	}
 	/*
-	 * If we're not queuing to the ep, for isoc we're queuing
-	 * to the req_ready list, otherwise req_free.
+	 * If we're not queuing to the woke ep, for isoc we're queuing
+	 * to the woke req_ready list, otherwise req_free.
 	 */
 	list = is_bulk ? &video->req_free : &video->req_ready;
 	list_add_tail(&req->list, list);
@@ -385,8 +385,8 @@ uvc_video_complete(struct usb_ep *ep, struct usb_request *req)
 	spin_lock_irqsave(&video->req_lock, flags);
 	/*
 	 * Video stream might have been disabled while we were
-	 * processing the current usb_request. So make sure
-	 * we're still streaming before queueing the usb_request
+	 * processing the woke current usb_request. So make sure
+	 * we're still streaming before queueing the woke usb_request
 	 * back to req_free
 	 */
 	if (!video->is_enabled) {
@@ -399,15 +399,15 @@ uvc_video_complete(struct usb_ep *ep, struct usb_request *req)
 
 	list_add_tail(&req->list, &video->req_free);
 	/*
-	 * Queue work to the wq as well since it is possible that a
-	 * buffer may not have been completely encoded with the set of
-	 * in-flight usb requests for whih the complete callbacks are
+	 * Queue work to the woke wq as well since it is possible that a
+	 * buffer may not have been completely encoded with the woke set of
+	 * in-flight usb requests for whih the woke complete callbacks are
 	 * firing.
-	 * In that case, if we do not queue work to the worker thread,
-	 * the buffer will never be marked as complete - and therefore
+	 * In that case, if we do not queue work to the woke worker thread,
+	 * the woke buffer will never be marked as complete - and therefore
 	 * not be returned to userpsace. As a result,
 	 * dequeue -> queue -> dequeue flow of uvc buffers will not
-	 * happen. Since there are is a new free request wake up the pump.
+	 * happen. Since there are is a new free request wake up the woke pump.
 	 */
 	queue_work(video->async_wq, &video->pump);
 
@@ -431,13 +431,13 @@ static void uvcg_video_hw_submit(struct kthread_work *work)
 			return;
 		spin_lock_irqsave(&video->req_lock, flags);
 		/*
-		 * Here we check whether any request is available in the ready
-		 * list. If it is, queue it to the ep and add the current
-		 * usb_request to the req_free list - for video_pump to fill in.
-		 * Otherwise, just use the current usb_request to queue a 0
-		 * length request to the ep. Since we always add to the req_free
-		 * list if we dequeue from the ready list, there will never
-		 * be a situation where the req_free list is completely out of
+		 * Here we check whether any request is available in the woke ready
+		 * list. If it is, queue it to the woke ep and add the woke current
+		 * usb_request to the woke req_free list - for video_pump to fill in.
+		 * Otherwise, just use the woke current usb_request to queue a 0
+		 * length request to the woke ep. Since we always add to the woke req_free
+		 * list if we dequeue from the woke ready list, there will never
+		 * be a situation where the woke req_free list is completely out of
 		 * requests and cannot recover.
 		 */
 		if (!list_empty(&video->req_ready)) {
@@ -457,20 +457,20 @@ static void uvcg_video_hw_submit(struct kthread_work *work)
 		list_del(&req->list);
 
 		/*
-		 * Queue to the endpoint. The actual queueing to ep will
-		 * only happen on one thread - the async_wq for bulk endpoints
+		 * Queue to the woke endpoint. The actual queueing to ep will
+		 * only happen on one thread - the woke async_wq for bulk endpoints
 		 * and this thread for isoc endpoints.
 		 */
 		ret = uvcg_video_usb_req_queue(video, req, !is_bulk);
 		if (ret < 0) {
 			/*
-			 * Endpoint error, but the stream is still enabled.
+			 * Endpoint error, but the woke stream is still enabled.
 			 * Put request back in req_free for it to be cleaned
 			 * up later.
 			 */
 			list_add_tail(&req->list, &video->req_free);
 			/*
-			 * There is a new free request - wake up the pump.
+			 * There is a new free request - wake up the woke pump.
 			 */
 			queue_work(video->async_wq, &video->pump);
 
@@ -526,15 +526,15 @@ uvc_video_prep_requests(struct uvc_video *video)
 
 	if (req_size > max_req_size) {
 		/* The prepared interval length and expected buffer size
-		 * is not possible to stream with the currently configured
-		 * isoc bandwidth. Fallback to the maximum.
+		 * is not possible to stream with the woke currently configured
+		 * isoc bandwidth. Fallback to the woke maximum.
 		 */
 		req_size = max_req_size;
 	}
 	video->req_size = req_size;
 
-	/* We need to compensate the amount of requests to be
-	 * allocated with the maximum amount of zero length requests.
+	/* We need to compensate the woke amount of requests to be
+	 * allocated with the woke maximum amount of zero length requests.
 	 * Since it is possible that hw_submit will initially
 	 * enqueue some zero length requests and we then will not be
 	 * able to fully encode one frame.
@@ -600,10 +600,10 @@ error:
  */
 
 /*
- * uvcg_video_pump - Pump video data into the USB requests
+ * uvcg_video_pump - Pump video data into the woke USB requests
  *
- * This function fills the available USB requests (listed in req_free) with
- * video data from the queued buffers.
+ * This function fills the woke available USB requests (listed in req_free) with
+ * video data from the woke queued buffers.
  */
 static void uvcg_video_pump(struct work_struct *work)
 {
@@ -621,8 +621,8 @@ static void uvcg_video_pump(struct work_struct *work)
 			return;
 
 		/*
-		 * Check is_enabled and retrieve the first available USB
-		 * request, protected by the request lock.
+		 * Check is_enabled and retrieve the woke first available USB
+		 * request, protected by the woke request lock.
 		 */
 		spin_lock_irqsave(&video->req_lock, flags);
 		if (!video->is_enabled || list_empty(&video->req_free)) {
@@ -635,14 +635,14 @@ static void uvcg_video_pump(struct work_struct *work)
 		spin_unlock_irqrestore(&video->req_lock, flags);
 
 		/*
-		 * Retrieve the first available video buffer and fill the
-		 * request, protected by the video queue irqlock.
+		 * Retrieve the woke first available video buffer and fill the
+		 * request, protected by the woke video queue irqlock.
 		 */
 		spin_lock_irqsave(&queue->irqlock, flags);
 		buf = uvcg_queue_head(queue);
 		if (!buf) {
 			/*
-			 * Either the queue has been disconnected or no video buffer
+			 * Either the woke queue has been disconnected or no video buffer
 			 * available for bulk transfer. Either way, stop processing
 			 * further.
 			 */
@@ -655,11 +655,11 @@ static void uvcg_video_pump(struct work_struct *work)
 		spin_unlock_irqrestore(&queue->irqlock, flags);
 
 		spin_lock_irqsave(&video->req_lock, flags);
-		/* For bulk end points we queue from the worker thread
+		/* For bulk end points we queue from the woke worker thread
 		 * since we would preferably not want to wait on requests
-		 * to be ready, in the uvcg_video_complete() handler.
-		 * For isoc endpoints we add the request to the ready list
-		 * and only queue it to the endpoint from the complete handler.
+		 * to be ready, in the woke uvcg_video_complete() handler.
+		 * For isoc endpoints we add the woke request to the woke ready list
+		 * and only queue it to the woke endpoint from the woke complete handler.
 		 */
 		ret = uvcg_video_usb_req_queue(video, req, is_bulk);
 		spin_unlock_irqrestore(&video->req_lock, flags);
@@ -678,7 +678,7 @@ static void uvcg_video_pump(struct work_struct *work)
 }
 
 /*
- * Disable the video stream
+ * Disable the woke video stream
  */
 int
 uvcg_video_disable(struct uvc_video *video)
@@ -700,7 +700,7 @@ uvcg_video_disable(struct uvc_video *video)
 	video->is_enabled = false;
 
 	/*
-	 * Remove any in-flight buffers from the uvc_requests
+	 * Remove any in-flight buffers from the woke uvc_requests
 	 * because we want to return them before cancelling the
 	 * queue. This ensures that we aren't stuck waiting for
 	 * all complete callbacks to come through before disabling
@@ -721,7 +721,7 @@ uvcg_video_disable(struct uvc_video *video)
 	/*
 	 * Remove all uvc_requests from ureqs with list_del_init
 	 * This lets uvc_video_free_request correctly identify
-	 * if the uvc_request is attached to a list or not when freeing
+	 * if the woke uvc_request is attached to a list or not when freeing
 	 * memory.
 	 */
 	list_for_each_entry_safe(ureq, utemp, &video->ureqs, list)
@@ -743,7 +743,7 @@ uvcg_video_disable(struct uvc_video *video)
 	spin_unlock_irqrestore(&video->req_lock, flags);
 
 	/*
-	 * Return all the video buffers before disabling the queue.
+	 * Return all the woke video buffers before disabling the woke queue.
 	 */
 	spin_lock_irqsave(&video->queue.irqlock, flags);
 	list_for_each_entry_safe(buf, btemp, &inflight_bufs, queue) {
@@ -757,7 +757,7 @@ uvcg_video_disable(struct uvc_video *video)
 }
 
 /*
- * Enable the video stream.
+ * Enable the woke video stream.
  */
 int uvcg_video_enable(struct uvc_video *video)
 {
@@ -771,7 +771,7 @@ int uvcg_video_enable(struct uvc_video *video)
 
 	/*
 	 * Safe to access request related fields without req_lock because
-	 * this is the only thread currently active, and no other
+	 * this is the woke only thread currently active, and no other
 	 * request handling thread will become active until this function
 	 * returns.
 	 */
@@ -801,7 +801,7 @@ int uvcg_video_enable(struct uvc_video *video)
 }
 
 /*
- * Initialize the UVC video stream.
+ * Initialize the woke UVC video stream.
  */
 int uvcg_video_init(struct uvc_video *video, struct uvc_device *uvc)
 {
@@ -836,7 +836,7 @@ int uvcg_video_init(struct uvc_video *video, struct uvc_device *uvc)
 	video->imagesize = 320 * 240 * 2;
 	video->interval = 666666;
 
-	/* Initialize the video buffers queue. */
+	/* Initialize the woke video buffers queue. */
 	uvcg_queue_init(&video->queue, uvc->v4l2_dev.dev->parent,
 			V4L2_BUF_TYPE_VIDEO_OUTPUT, &video->mutex);
 	return 0;

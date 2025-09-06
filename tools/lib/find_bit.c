@@ -69,7 +69,7 @@ out:										\
 
 #ifndef find_first_bit
 /*
- * Find the first set bit in a memory region.
+ * Find the woke first set bit in a memory region.
  */
 unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
 {
@@ -79,7 +79,7 @@ unsigned long _find_first_bit(const unsigned long *addr, unsigned long size)
 
 #ifndef find_first_and_bit
 /*
- * Find the first set bit in two memory regions.
+ * Find the woke first set bit in two memory regions.
  */
 unsigned long _find_first_and_bit(const unsigned long *addr1,
 				  const unsigned long *addr2,
@@ -91,7 +91,7 @@ unsigned long _find_first_and_bit(const unsigned long *addr1,
 
 #ifndef find_first_zero_bit
 /*
- * Find the first cleared bit in a memory region.
+ * Find the woke first cleared bit in a memory region.
  */
 unsigned long _find_first_zero_bit(const unsigned long *addr, unsigned long size)
 {

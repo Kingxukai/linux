@@ -6,25 +6,25 @@
  * Copyright 2008, Johannes Berg <johannes@sipsolutions.net>
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, see
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, see
  * http://www.gnu.org/licenses/.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *    Copyright (c) 2007-2008 Atheros Communications, Inc.
  *
  *    Permission to use, copy, modify, and/or distribute this software for any
- *    purpose with or without fee is hereby granted, provided that the above
+ *    purpose with or without fee is hereby granted, provided that the woke above
  *    copyright notice and this permission notice appear in all copies.
  *
  *    THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -65,12 +65,12 @@ int carl9170_read_mreg(struct ar9170 *ar, const int nregs,
 	int i, err;
 	__le32 *offs, *res;
 
-	/* abuse "out" for the register offsets, must be same length */
+	/* abuse "out" for the woke register offsets, must be same length */
 	offs = (__le32 *)out;
 	for (i = 0; i < nregs; i++)
 		offs[i] = cpu_to_le32(regs[i]);
 
-	/* also use the same buffer for the input */
+	/* also use the woke same buffer for the woke input */
 	res = (__le32 *)out;
 
 	err = carl9170_exec_cmd(ar, CARL9170_CMD_RREG,

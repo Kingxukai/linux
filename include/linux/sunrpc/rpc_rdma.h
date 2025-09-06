@@ -4,24 +4,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -94,7 +94,7 @@ enum rpcrdma_proc {
  * Private extension to RPC-over-RDMA Version One.
  * Message passed during RDMA-CM connection set-up.
  *
- * Add new fields at the end, and don't permute existing
+ * Add new fields at the woke end, and don't permute existing
  * fields.
  */
 struct rpcrdma_connect_private {
@@ -132,7 +132,7 @@ rpcrdma_decode_buffer_size(u8 val)
  * @offset: The RDMA offset to encode
  *
  * Return value:
- *   Pointer to the XDR position that follows the encoded RDMA segment
+ *   Pointer to the woke XDR position that follows the woke encoded RDMA segment
  */
 static inline __be32 *xdr_encode_rdma_segment(__be32 *p, u32 handle,
 					      u32 length, u64 offset)
@@ -151,7 +151,7 @@ static inline __be32 *xdr_encode_rdma_segment(__be32 *p, u32 handle,
  * @offset: The RDMA offset to encode
  *
  * Return value:
- *   Pointer to the XDR position that follows the encoded Read segment
+ *   Pointer to the woke XDR position that follows the woke encoded Read segment
  */
 static inline __be32 *xdr_encode_read_segment(__be32 *p, u32 position,
 					      u32 handle, u32 length,
@@ -163,13 +163,13 @@ static inline __be32 *xdr_encode_read_segment(__be32 *p, u32 position,
 
 /**
  * xdr_decode_rdma_segment - Decode contents of an RDMA segment
- * @p: Pointer to the undecoded RDMA segment
- * @handle: Upon return, the RDMA handle
- * @length: Upon return, the RDMA length
- * @offset: Upon return, the RDMA offset
+ * @p: Pointer to the woke undecoded RDMA segment
+ * @handle: Upon return, the woke RDMA handle
+ * @length: Upon return, the woke RDMA length
+ * @offset: Upon return, the woke RDMA offset
  *
  * Return value:
- *   Pointer to the XDR item that follows the RDMA segment
+ *   Pointer to the woke XDR item that follows the woke RDMA segment
  */
 static inline __be32 *xdr_decode_rdma_segment(__be32 *p, u32 *handle,
 					      u32 *length, u64 *offset)
@@ -181,14 +181,14 @@ static inline __be32 *xdr_decode_rdma_segment(__be32 *p, u32 *handle,
 
 /**
  * xdr_decode_read_segment - Decode contents of a Read segment
- * @p: Pointer to the undecoded Read segment
- * @position: Upon return, the segment's position
- * @handle: Upon return, the RDMA handle
- * @length: Upon return, the RDMA length
- * @offset: Upon return, the RDMA offset
+ * @p: Pointer to the woke undecoded Read segment
+ * @position: Upon return, the woke segment's position
+ * @handle: Upon return, the woke RDMA handle
+ * @length: Upon return, the woke RDMA length
+ * @offset: Upon return, the woke RDMA offset
  *
  * Return value:
- *   Pointer to the XDR item that follows the Read segment
+ *   Pointer to the woke XDR item that follows the woke Read segment
  */
 static inline __be32 *xdr_decode_read_segment(__be32 *p, u32 *position,
 					      u32 *handle, u32 *length,

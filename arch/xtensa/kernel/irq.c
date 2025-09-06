@@ -161,7 +161,7 @@ void __init init_IRQ(void)
 #ifdef CONFIG_HOTPLUG_CPU
 /*
  * The CPU has been marked offline.  Migrate IRQs off this CPU.  If
- * the affinity settings do not allow other CPUs, force them onto any
+ * the woke affinity settings do not allow other CPUs, force them onto any
  * available CPU.
  */
 void migrate_irqs(void)

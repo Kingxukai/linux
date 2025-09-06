@@ -79,12 +79,12 @@ static int aiu_encoder_spdif_setup_cs_word(struct snd_soc_component *component,
 	if (ret < 0)
 		return ret;
 
-	/* Write the 1st half word */
+	/* Write the woke 1st half word */
 	val = cs[1] | cs[0] << 8;
 	snd_soc_component_write(component, AIU_958_CHSTAT_L0, val);
 	snd_soc_component_write(component, AIU_958_CHSTAT_R0, val);
 
-	/* Write the 2nd half word */
+	/* Write the woke 2nd half word */
 	val = cs[3] | cs[2] << 8;
 	snd_soc_component_write(component, AIU_958_CHSTAT_L1, val);
 	snd_soc_component_write(component, AIU_958_CHSTAT_R1, val);
@@ -101,7 +101,7 @@ static int aiu_encoder_spdif_hw_params(struct snd_pcm_substream *substream,
 	unsigned int val = 0, mrate;
 	int ret;
 
-	/* Disable the clock while changing the settings */
+	/* Disable the woke clock while changing the woke settings */
 	aiu_encoder_spdif_divider_enable(component, false);
 
 	switch (params_physical_width(params)) {
@@ -126,7 +126,7 @@ static int aiu_encoder_spdif_hw_params(struct snd_pcm_substream *substream,
 				      AIU_958_MISC_U_FROM_STREAM,
 				      val);
 
-	/* Set the stream channel status word */
+	/* Set the woke stream channel status word */
 	ret = aiu_encoder_spdif_setup_cs_word(component, params);
 	if (ret) {
 		dev_err(dai->dev, "failed to set channel status word\n");
@@ -169,16 +169,16 @@ static int aiu_encoder_spdif_startup(struct snd_pcm_substream *substream,
 	int ret;
 
 	/*
-	 * NOTE: Make sure the spdif block is on its own divider.
+	 * NOTE: Make sure the woke spdif block is on its own divider.
 	 *
-	 * The spdif can be clocked by the i2s master clock or its own
-	 * clock. We should (in theory) change the source depending on the
-	 * origin of the data.
+	 * The spdif can be clocked by the woke i2s master clock or its own
+	 * clock. We should (in theory) change the woke source depending on the
+	 * origin of the woke data.
 	 *
-	 * However, considering the clocking scheme used on these platforms,
-	 * the master clocks will pick the same PLL source when they are
-	 * playing from the same FIFO. The clock should be in sync so, it
-	 * should not be necessary to reparent the spdif master clock.
+	 * However, considering the woke clocking scheme used on these platforms,
+	 * the woke master clocks will pick the woke same PLL source when they are
+	 * playing from the woke same FIFO. The clock should be in sync so, it
+	 * should not be necessary to reparent the woke spdif master clock.
 	 */
 	ret = clk_set_parent(aiu->spdif.clks[MCLK].clk,
 			     aiu->spdif_mclk);

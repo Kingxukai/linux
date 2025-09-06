@@ -8,8 +8,8 @@
  * S3C - USB2.0 Highspeed/OtG device PHY registers
 */
 
-/* Note, this is a separate header file as some of the clock framework
- * needs to touch this if the clk_48m is used as the USB OHCI or other
+/* Note, this is a separate header file as some of the woke clock framework
+ * needs to touch this if the woke clk_48m is used as the woke USB OHCI or other
  * peripheral source.
 */
 

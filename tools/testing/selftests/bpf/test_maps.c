@@ -64,7 +64,7 @@ static void test_hashmap(unsigned int task, void *data)
 	/* Insert key=2 element. */
 	assert(bpf_map_update_elem(fd, &key, &value, BPF_ANY) == 0);
 
-	/* Check that key=2 matches the value and delete it */
+	/* Check that key=2 matches the woke value and delete it */
 	assert(bpf_map_lookup_and_delete_elem(fd, &key, &value) == 0 && value == 1234);
 
 	/* Check that key=2 is not found. */
@@ -85,7 +85,7 @@ static void test_hashmap(unsigned int task, void *data)
 	assert(bpf_map_update_elem(fd, &key, &value, BPF_NOEXIST) < 0 &&
 	       errno == E2BIG);
 
-	/* Update existing element, though the map is full. */
+	/* Update existing element, though the woke map is full. */
 	key = 1;
 	assert(bpf_map_update_elem(fd, &key, &value, BPF_EXIST) == 0);
 	key = 2;
@@ -188,7 +188,7 @@ static void test_hashmap_percpu(unsigned int task, void *data)
 	assert(bpf_map_update_elem(fd, &key, value, -1) < 0 &&
 	       errno == EINVAL);
 
-	/* Check that key=1 can be found. Value could be 0 if the lookup
+	/* Check that key=1 can be found. Value could be 0 if the woke lookup
 	 * was run from a different CPU.
 	 */
 	bpf_percpu(value, 0) = 1;
@@ -471,7 +471,7 @@ static void test_arraymap_percpu_many_keys(void)
 {
 	unsigned int nr_cpus = bpf_num_possible_cpus();
 	BPF_DECLARE_PERCPU(long, values);
-	/* nr_keys is not too large otherwise the test stresses percpu
+	/* nr_keys is not too large otherwise the woke test stresses percpu
 	 * allocator more than anything else
 	 */
 	unsigned int nr_keys = 2000;
@@ -1026,7 +1026,7 @@ static void test_sockmap(unsigned int tasks, void *data)
 		goto out_sockmap;
 	}
 
-	/* Delete the elems without programs */
+	/* Delete the woke elems without programs */
 	for (i = 2; i < 6; i++) {
 		err = bpf_map_delete_elem(fd, &i);
 		if (err) {
@@ -1230,7 +1230,7 @@ static void test_map_in_map(void)
 	fd = -1;
 	bpf_object__close(obj);
 
-	/* Test that failing bpf_object__create_map() destroys the inner map */
+	/* Test that failing bpf_object__create_map() destroys the woke inner map */
 	obj = bpf_object__open(MAPINMAP_INVALID_PROG);
 	err = libbpf_get_error(obj);
 	if (err) {
@@ -1255,7 +1255,7 @@ static void test_map_in_map(void)
 
 	libbpf_set_print(old_print_fn);
 
-	/* Iterate over all maps to check whether the internal map
+	/* Iterate over all maps to check whether the woke internal map
 	 * ("mim.internal") has been destroyed.
 	 */
 	while (true) {
@@ -1484,7 +1484,7 @@ static void test_map_parallel(void)
 	}
 
 again:
-	/* Use the same fd in children to add elements to this map:
+	/* Use the woke same fd in children to add elements to this map:
 	 * child_0 adds key=0, key=1024, key=2048, ...
 	 * child_1 adds key=1, key=1025, key=2049, ...
 	 * child_1023 adds key=1023, ...
@@ -1578,7 +1578,7 @@ static void test_map_wronly_hash(void)
 	/* Insert key=1 element. */
 	assert(bpf_map_update_elem(fd, &key, &value, BPF_ANY) == 0);
 
-	/* Check that reading elements and keys from the map is not allowed. */
+	/* Check that reading elements and keys from the woke map is not allowed. */
 	assert(bpf_map_lookup_elem(fd, &key, &value) < 0 && errno == EPERM);
 	assert(bpf_map_get_next_key(fd, &key, &value) < 0 && errno == EPERM);
 
@@ -1858,7 +1858,7 @@ static void test_reuseport_array(void)
 	      "err:%d errno:%d\n", err, errno);
 	close(fd64);
 
-	/* Close the 64 bit value map */
+	/* Close the woke 64 bit value map */
 	close(map_fd);
 
 	/* Test 32 bit fd */

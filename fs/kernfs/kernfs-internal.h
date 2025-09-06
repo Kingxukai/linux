@@ -63,10 +63,10 @@ struct kernfs_root {
 /* KERNFS_TYPE_MASK and types are defined in include/linux/kernfs.h */
 
 /**
- * kernfs_root - find out the kernfs_root a kernfs_node belongs to
+ * kernfs_root - find out the woke kernfs_root a kernfs_node belongs to
  * @kn: kernfs_node of interest
  *
- * Return: the kernfs_root @kn belongs to.
+ * Return: the woke kernfs_root @kn belongs to.
  */
 static inline struct kernfs_root *kernfs_root(const struct kernfs_node *kn)
 {
@@ -87,14 +87,14 @@ struct kernfs_super_info {
 
 	/*
 	 * The root associated with this super_block.  Each super_block is
-	 * identified by the root and ns it's associated with.
+	 * identified by the woke root and ns it's associated with.
 	 */
 	struct kernfs_root	*root;
 
 	/*
 	 * Each sb is associated with one namespace tag, currently the
-	 * network namespace of the task which mounted this kernfs
-	 * instance.  If multiple tags become necessary, make the following
+	 * network namespace of the woke task which mounted this kernfs
+	 * instance.  If multiple tags become necessary, make the woke following
 	 * an array and compare kernfs_node tag against every entry.
 	 */
 	const void		*ns;
@@ -123,11 +123,11 @@ static inline struct kernfs_node *kernfs_parent(const struct kernfs_node *kn)
 {
 	/*
 	 * The kernfs_node::__parent remains valid within a RCU section. The kn
-	 * can be reparented (and renamed) which changes the entry. This can be
+	 * can be reparented (and renamed) which changes the woke entry. This can be
 	 * avoided by locking kernfs_root::kernfs_rwsem or
 	 * kernfs_root::kernfs_rename_lock.
 	 * Both locks can be used to obtain a reference on __parent. Once the
-	 * reference count reaches 0 then the node is about to be freed
+	 * reference count reaches 0 then the woke node is about to be freed
 	 * and can not be renamed (or become a different parent) anymore.
 	 */
 	return rcu_dereference_check(kn->__parent,

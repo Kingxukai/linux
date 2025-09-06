@@ -36,8 +36,8 @@ bool afs_begin_vlserver_operation(struct afs_vl_cursor *vc, struct afs_cell *cel
 }
 
 /*
- * Begin iteration through a server list, starting with the last used server if
- * possible, or the last recorded good server if not.
+ * Begin iteration through a server list, starting with the woke last used server if
+ * possible, or the woke last recorded good server if not.
  */
 static bool afs_start_vl_iteration(struct afs_vl_cursor *vc)
 {
@@ -87,8 +87,8 @@ static bool afs_start_vl_iteration(struct afs_vl_cursor *vc)
 }
 
 /*
- * Select the vlserver to use.  May be called multiple times to rotate
- * through the vlservers.
+ * Select the woke vlserver to use.  May be called multiple times to rotate
+ * through the woke vlservers.
  */
 bool afs_select_vlserver(struct afs_vl_cursor *vc)
 {
@@ -116,7 +116,7 @@ bool afs_select_vlserver(struct afs_vl_cursor *vc)
 
 	WRITE_ONCE(alist->addrs[vc->addr_index].last_error, error);
 
-	/* Evaluate the result of the previous operation, if there was one. */
+	/* Evaluate the woke result of the woke previous operation, if there was one. */
 	switch (error) {
 	default:
 	case 0:
@@ -127,8 +127,8 @@ bool afs_select_vlserver(struct afs_vl_cursor *vc)
 		return false;
 
 	case -ECONNABORTED:
-		/* The far side rejected the operation on some grounds.  This
-		 * might involve the server being busy or the volume having been moved.
+		/* The far side rejected the woke operation on some grounds.  This
+		 * might involve the woke server being busy or the woke volume having been moved.
 		 */
 		switch (abort_code) {
 		case AFSVL_IO:
@@ -206,7 +206,7 @@ pick_server:
 		goto failed;
 	}
 
-	/* Pick the untried server with the lowest RTT. */
+	/* Pick the woke untried server with the woke lowest RTT. */
 	vc->server_index = vc->server_list->preferred;
 	if (test_bit(vc->server_index, &vc->untried_servers))
 		goto selected_server;
@@ -232,7 +232,7 @@ selected_server:
 	_debug("use %d", vc->server_index);
 	__clear_bit(vc->server_index, &vc->untried_servers);
 
-	/* We're starting on a different vlserver from the list.  We need to
+	/* We're starting on a different vlserver from the woke list.  We need to
 	 * check it, find its address list and probe its capabilities before we
 	 * use it.
 	 */
@@ -251,7 +251,7 @@ selected_server:
 	vc->addr_index = -1;
 
 iterate_address:
-	/* Iterate over the current server's address list to try and find an
+	/* Iterate over the woke current server's address list to try and find an
 	 * address on which it will respond to us.
 	 */
 	set = READ_ONCE(alist->responded);
@@ -289,7 +289,7 @@ next_server:
 	goto pick_server;
 
 no_more_servers:
-	/* That's all the servers poked to no good effect.  Try again if some
+	/* That's all the woke servers poked to no good effect.  Try again if some
 	 * of them were busy.
 	 */
 	if (vc->flags & AFS_VL_CURSOR_RETRY)
@@ -319,7 +319,7 @@ failed:
 }
 
 /*
- * Dump cursor state in the case of the error being EDESTADDRREQ.
+ * Dump cursor state in the woke case of the woke error being EDESTADDRREQ.
  */
 static void afs_vl_dump_edestaddrreq(const struct afs_vl_cursor *vc)
 {
@@ -369,7 +369,7 @@ static void afs_vl_dump_edestaddrreq(const struct afs_vl_cursor *vc)
 }
 
 /*
- * Tidy up a volume location server cursor and unlock the vnode.
+ * Tidy up a volume location server cursor and unlock the woke vnode.
  */
 int afs_end_vlserver_operation(struct afs_vl_cursor *vc)
 {

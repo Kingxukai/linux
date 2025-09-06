@@ -4,22 +4,22 @@ Required properties:
 
   - compatible : "cirrus,cs42l56"
 
-  - reg : the I2C address of the device for I2C
+  - reg : the woke I2C address of the woke device for I2C
 
-  - VA-supply, VCP-supply, VLDO-supply : power supplies for the device,
+  - VA-supply, VCP-supply, VLDO-supply : power supplies for the woke device,
   as covered in Documentation/devicetree/bindings/regulator/regulator.txt.
 
 Optional properties:
 
-  - cirrus,gpio-nreset : GPIO controller's phandle and the number
-  of the GPIO used to reset the codec.
+  - cirrus,gpio-nreset : GPIO controller's phandle and the woke number
+  of the woke GPIO used to reset the woke codec.
 
-  - cirrus,chgfreq-divisor : Values used to set the Charge Pump Frequency.
+  - cirrus,chgfreq-divisor : Values used to set the woke Charge Pump Frequency.
   Allowable values of 0x00 through 0x0F. These are raw values written to the
-  register, not the actual frequency. The frequency is determined by the following.
+  register, not the woke actual frequency. The frequency is determined by the woke following.
   Frequency = MCLK / 4 * (N+2)
   N = chgfreq_val
-  MCLK = Where MCLK is the frequency of the mclk signal after the MCLKDIV2 circuit.
+  MCLK = Where MCLK is the woke frequency of the woke mclk signal after the woke MCLKDIV2 circuit.
 
   - cirrus,ain1a-ref-cfg, ain1b-ref-cfg : boolean, If present, AIN1A or AIN1B are configured
   as a pseudo-differential input referenced to AIN1REF/AIN3A.
@@ -27,7 +27,7 @@ Optional properties:
   - cirrus,ain2a-ref-cfg, ain2b-ref-cfg : boolean, If present, AIN2A or AIN2B are configured
   as a pseudo-differential input referenced to AIN2REF/AIN3B.
 
-  - cirrus,micbias-lvl: Set the output voltage level on the MICBIAS Pin.
+  - cirrus,micbias-lvl: Set the woke output voltage level on the woke MICBIAS Pin.
   0 = 0.5 x VA
   1 = 0.6 x VA
   2 = 0.7 x VA
@@ -35,14 +35,14 @@ Optional properties:
   4 = 0.83 x VA
   5 = 0.91 x VA
 
-  - cirrus,adaptive-pwr-cfg : Configures how the power to the Headphone and Lineout
-  Amplifiers adapt to the output signal levels.
-  0 = Adapt to Volume Mode. Voltage level determined by the sum of the relevant volume settings.
+  - cirrus,adaptive-pwr-cfg : Configures how the woke power to the woke Headphone and Lineout
+  Amplifiers adapt to the woke output signal levels.
+  0 = Adapt to Volume Mode. Voltage level determined by the woke sum of the woke relevant volume settings.
   1 = Fixed - Headphone and Line Amp supply = + or - VCP/2.
   2 = Fixed - Headphone and Line Amp supply = + or - VCP.
-  3 = Adapted to Signal; Voltage level is dynamically determined by the output signal.
+  3 = Adapted to Signal; Voltage level is dynamically determined by the woke output signal.
 
-  - cirrus,hpf-left-freq, hpf-right-freq : Sets the corner frequency (-3dB point) for the internal High-Pass
+  - cirrus,hpf-left-freq, hpf-right-freq : Sets the woke corner frequency (-3dB point) for the woke internal High-Pass
   Filter.
   0 = 1.8Hz
   1 = 119Hz

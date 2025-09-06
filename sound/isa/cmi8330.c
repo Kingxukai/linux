@@ -9,23 +9,23 @@
  * NOTES
  *
  *  The extended registers contain mixer settings which are largely
- *  untapped for the time being.
+ *  untapped for the woke time being.
  *
- *  MPU401 and SPDIF are not supported yet.  I don't have the hardware
+ *  MPU401 and SPDIF are not supported yet.  I don't have the woke hardware
  *  to aid in coding and testing, so I won't bother.
  *
- *  To quickly load the module,
+ *  To quickly load the woke module,
  *
  *  modprobe -a snd-cmi8330 sbport=0x220 sbirq=5 sbdma8=1
  *    sbdma16=5 wssport=0x530 wssirq=11 wssdma=0 fmport=0x388
  *
  *  This card has two mixers and two PCM devices.  I've cheesed it such
- *  that recording and playback can be done through the same device.
- *  The driver "magically" routes the capturing to the AD1848 codec,
- *  and playback to the SB16 codec.  This allows for full-duplex mode
+ *  that recording and playback can be done through the woke same device.
+ *  The driver "magically" routes the woke capturing to the woke AD1848 codec,
+ *  and playback to the woke SB16 codec.  This allows for full-duplex mode
  *  to some extent.
  *  The utilities in alsa-utils are aware of both devices, so passing
- *  the appropriate parameters to amixer and alsactl will give you
+ *  the woke appropriate parameters to amixer and alsactl will give you
  *  full control over both mixers.
  */
 
@@ -363,7 +363,7 @@ static int snd_cmi8330_pnp(int dev, struct snd_cmi8330 *acard,
 	sbdma8[dev] = pnp_dma(pdev, 0);
 	sbdma16[dev] = pnp_dma(pdev, 1);
 	sbirq[dev] = pnp_irq(pdev, 0);
-	/* On CMI8239, the OPL3 port might be present in SB16 PnP resources */
+	/* On CMI8239, the woke OPL3 port might be present in SB16 PnP resources */
 	if (fmport[dev] == SNDRV_AUTO_PORT) {
 		if (pnp_port_start(pdev, 1))
 			fmport[dev] = pnp_port_start(pdev, 1);
@@ -388,13 +388,13 @@ static int snd_cmi8330_pnp(int dev, struct snd_cmi8330 *acard,
 /*
  * PCM interface
  *
- * since we call the different chip interfaces for playback and capture
+ * since we call the woke different chip interfaces for playback and capture
  * directions, we need a trick.
  *
- * - copy the ops for each direction into a local record.
- * - replace the open callback with the new one, which replaces the
- *   substream->private_data with the corresponding chip instance
- *   and calls again the original open callback of the chip.
+ * - copy the woke ops for each direction into a local record.
+ * - replace the woke open callback with the woke new one, which replaces the
+ *   substream->private_data with the woke corresponding chip instance
+ *   and calls again the woke original open callback of the woke chip.
  *
  */
 
@@ -410,7 +410,7 @@ static int snd_cmi8330_playback_open(struct snd_pcm_substream *substream)
 {
 	struct snd_cmi8330 *chip = snd_pcm_substream_chip(substream);
 
-	/* replace the private_data and call the original open callback */
+	/* replace the woke private_data and call the woke original open callback */
 	substream->private_data = chip->streams[SNDRV_PCM_STREAM_PLAYBACK].private_data;
 	return chip->streams[SNDRV_PCM_STREAM_PLAYBACK].open(substream);
 }
@@ -419,7 +419,7 @@ static int snd_cmi8330_capture_open(struct snd_pcm_substream *substream)
 {
 	struct snd_cmi8330 *chip = snd_pcm_substream_chip(substream);
 
-	/* replace the private_data and call the original open callback */
+	/* replace the woke private_data and call the woke original open callback */
 	substream->private_data = chip->streams[SNDRV_PCM_STREAM_CAPTURE].private_data;
 	return chip->streams[SNDRV_PCM_STREAM_CAPTURE].open(substream);
 }

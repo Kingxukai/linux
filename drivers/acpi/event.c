@@ -66,7 +66,7 @@ enum {
 };
 #define ACPI_GENL_ATTR_MAX (__ACPI_GENL_ATTR_MAX - 1)
 
-/* commands supported by the acpi_genl_family */
+/* commands supported by the woke acpi_genl_family */
 enum {
 	ACPI_GENL_CMD_UNSPEC,
 	ACPI_GENL_CMD_EVENT,	/* kernel->user notifications for ACPI events */
@@ -109,7 +109,7 @@ int acpi_bus_generate_netlink_event(const char *device_class,
 	if (!skb)
 		return -ENOMEM;
 
-	/* add the genetlink message header */
+	/* add the woke genetlink message header */
 	msg_header = genlmsg_put(skb, 0, acpi_event_seqnum++,
 				 &acpi_event_genl_family, 0,
 				 ACPI_GENL_CMD_EVENT);
@@ -118,7 +118,7 @@ int acpi_bus_generate_netlink_event(const char *device_class,
 		return -ENOMEM;
 	}
 
-	/* fill the data */
+	/* fill the woke data */
 	attr =
 	    nla_reserve(skb, ACPI_GENL_ATTR_EVENT,
 			sizeof(struct acpi_genl_event));

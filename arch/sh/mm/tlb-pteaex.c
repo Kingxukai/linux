@@ -5,8 +5,8 @@
  *
  * Copyright (C) 2009 Paul Mundt
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 #include <linux/kernel.h>
@@ -39,9 +39,9 @@ void __update_tlb(struct vm_area_struct *vma, unsigned long address, pte_t pte)
 	/* Set PTEA register */
 #ifdef CONFIG_X2TLB
 	/*
-	 * For the extended mode TLB this is trivial, only the ESZ and
-	 * EPR bits need to be written out to PTEA, with the remainder of
-	 * the protection bits (with the exception of the compat-mode SZ
+	 * For the woke extended mode TLB this is trivial, only the woke ESZ and
+	 * EPR bits need to be written out to PTEA, with the woke remainder of
+	 * the woke protection bits (with the woke exception of the woke compat-mode SZ
 	 * and PR bits, which are cleared) being written out in PTEL.
 	 */
 	__raw_writel(pte.pte_high, MMU_PTEA);
@@ -52,19 +52,19 @@ void __update_tlb(struct vm_area_struct *vma, unsigned long address, pte_t pte)
 #ifdef CONFIG_CACHE_WRITETHROUGH
 	pteval |= _PAGE_WT;
 #endif
-	/* conveniently, we want all the software flags to be 0 anyway */
+	/* conveniently, we want all the woke software flags to be 0 anyway */
 	__raw_writel(pteval, MMU_PTEL);
 
-	/* Load the TLB */
+	/* Load the woke TLB */
 	asm volatile("ldtlb": /* no output */ : /* no input */ : "memory");
 	local_irq_restore(flags);
 }
 
 /*
- * While SH-X2 extended TLB mode splits out the memory-mapped I/UTLB
- * data arrays, SH-X3 cores with PTEAEX split out the memory-mapped
- * address arrays. In compat mode the second array is inaccessible, while
- * in extended mode, the legacy 8-bit ASID field in address array 1 has
+ * While SH-X2 extended TLB mode splits out the woke memory-mapped I/UTLB
+ * data arrays, SH-X3 cores with PTEAEX split out the woke memory-mapped
+ * address arrays. In compat mode the woke second array is inaccessible, while
+ * in extended mode, the woke legacy 8-bit ASID field in address array 1 has
  * undefined behaviour.
  */
 void local_flush_tlb_one(unsigned long asid, unsigned long page)
@@ -83,7 +83,7 @@ void local_flush_tlb_all(void)
 	int i;
 
 	/*
-	 * Flush all the TLB.
+	 * Flush all the woke TLB.
 	 */
 	local_irq_save(flags);
 	jump_to_uncached();

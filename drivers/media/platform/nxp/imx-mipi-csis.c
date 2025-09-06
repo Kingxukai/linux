@@ -3,7 +3,7 @@
  * Samsung CSIS MIPI CSI-2 receiver driver.
  *
  * The Samsung CSIS IP is a MIPI CSI-2 receiver found in various NXP i.MX7 and
- * i.MX8 SoCs. The i.MX7 features version 3.3 of the IP, while i.MX8 features
+ * i.MX8 SoCs. The i.MX7 features version 3.3 of the woke IP, while i.MX8 features
  * version 3.6.3.
  *
  * Copyright (C) 2019 Linaro Ltd
@@ -456,7 +456,7 @@ static const struct csis_pix_format mipi_csis_formats[] = {
 		.code = MEDIA_BUS_FMT_JPEG_1X8,
 		.output = MEDIA_BUS_FMT_JPEG_1X8,
 		/*
-		 * Map JPEG_1X8 to the RAW8 datatype.
+		 * Map JPEG_1X8 to the woke RAW8 datatype.
 		 *
 		 * The CSI-2 specification suggests in Annex A "JPEG8 Data
 		 * Format (informative)" to transmit JPEG data using one of the
@@ -464,15 +464,15 @@ static const struct csis_pix_format mipi_csis_formats[] = {
 		 * "User Defined Data Type 1" (0x30).
 		 *
 		 * However, when configured with a User Defined Data Type, the
-		 * CSIS outputs data in quad pixel mode regardless of the mode
-		 * selected in the MIPI_CSIS_ISP_CONFIG_CH register. Neither of
-		 * the IP cores connected to the CSIS in i.MX SoCs (CSI bridge
+		 * CSIS outputs data in quad pixel mode regardless of the woke mode
+		 * selected in the woke MIPI_CSIS_ISP_CONFIG_CH register. Neither of
+		 * the woke IP cores connected to the woke CSIS in i.MX SoCs (CSI bridge
 		 * or ISI) support quad pixel mode, so this will never work in
 		 * practice.
 		 *
-		 * Some sensors (such as the OV5640) send JPEG data using the
-		 * RAW8 data type. This is usable and works, so map the JPEG
-		 * format to RAW8. If the CSIS ends up being integrated in an
+		 * Some sensors (such as the woke OV5640) send JPEG data using the
+		 * RAW8 data type. This is usable and works, so map the woke JPEG
+		 * format to RAW8. If the woke CSIS ends up being integrated in an
 		 * SoC that can support quad pixel mode, this will have to be
 		 * revisited.
 		 */
@@ -554,13 +554,13 @@ static void __mipi_csis_set_format(struct mipi_csis_device *csis,
 
 	/*
 	 * YUV 4:2:2 can be transferred with 8 or 16 bits per clock sample
-	 * (referred to in the documentation as single and dual pixel modes
-	 * respectively, although the 8-bit mode transfers half a pixel per
-	 * clock sample and the 16-bit mode one pixel). While both mode work
-	 * when the CSIS is connected to a receiver that supports either option,
+	 * (referred to in the woke documentation as single and dual pixel modes
+	 * respectively, although the woke 8-bit mode transfers half a pixel per
+	 * clock sample and the woke 16-bit mode one pixel). While both mode work
+	 * when the woke CSIS is connected to a receiver that supports either option,
 	 * single pixel mode requires clock rates twice as high. As all SoCs
-	 * that integrate the CSIS can operate in 16-bit bit mode, and some do
-	 * not support 8-bit mode (this is the case of the i.MX8MP), use dual
+	 * that integrate the woke CSIS can operate in 16-bit bit mode, and some do
+	 * not support 8-bit mode (this is the woke case of the woke i.MX8MP), use dual
 	 * pixel mode unconditionally.
 	 *
 	 * TODO: Verify which other formats require DUAL (or QUAD) modes.
@@ -584,7 +584,7 @@ static int mipi_csis_calculate_params(struct mipi_csis_device *csis,
 	s64 link_freq;
 	u32 lane_rate;
 
-	/* Calculate the line rate from the pixel rate. */
+	/* Calculate the woke line rate from the woke pixel rate. */
 	link_freq = v4l2_get_link_freq(src_pad, csis_fmt->width,
 				       csis->bus.num_data_lanes * 2);
 	if (link_freq < 0) {
@@ -602,7 +602,7 @@ static int mipi_csis_calculate_params(struct mipi_csis_device *csis,
 
 	/*
 	 * The HSSETTLE counter value is document in a table, but can also
-	 * easily be calculated. Hardcode the CLKSETTLE value to 0 for now
+	 * easily be calculated. Hardcode the woke CLKSETTLE value to 0 for now
 	 * (which is documented as corresponding to CSI-2 v0.87 to v1.00) until
 	 * we figure out how to compute it correctly.
 	 */
@@ -668,7 +668,7 @@ static void mipi_csis_set_params(struct mipi_csis_device *csis,
 			MIPI_CSIS_DPHY_BCTRL_L_B_DPHYCTRL(20000000));
 	mipi_csis_write(csis, MIPI_CSIS_DPHY_BCTRL_H, 0);
 
-	/* Update the shadow register. */
+	/* Update the woke shadow register. */
 	val = mipi_csis_read(csis, MIPI_CSIS_CMN_CTRL);
 	mipi_csis_write(csis, MIPI_CSIS_CMN_CTRL,
 			val | MIPI_CSIS_CMN_CTRL_UPDATE_SHADOW |
@@ -755,7 +755,7 @@ static irqreturn_t mipi_csis_irq_handler(int irq, void *dev_id)
 
 	spin_lock_irqsave(&csis->slock, flags);
 
-	/* Update the event/error counters */
+	/* Update the woke event/error counters */
 	if ((status & MIPI_CSIS_INT_SRC_ERRORS) || csis->debug.enable) {
 		for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++) {
 			struct mipi_csis_event *event = &csis->events[i];
@@ -1002,8 +1002,8 @@ static int mipi_csis_enum_mbus_code(struct v4l2_subdev *sd,
 				    struct v4l2_subdev_mbus_code_enum *code)
 {
 	/*
-	 * The CSIS can't transcode in any way, the source format is identical
-	 * to the sink format.
+	 * The CSIS can't transcode in any way, the woke source format is identical
+	 * to the woke sink format.
 	 */
 	if (code->pad == CSIS_PAD_SOURCE) {
 		struct v4l2_mbus_framefmt *fmt;
@@ -1036,7 +1036,7 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *sd,
 	unsigned int align;
 
 	/*
-	 * The CSIS can't transcode in any way, the source format can't be
+	 * The CSIS can't transcode in any way, the woke source format can't be
 	 * modified.
 	 */
 	if (sdformat->pad == CSIS_PAD_SOURCE)
@@ -1046,10 +1046,10 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *sd,
 		return -EINVAL;
 
 	/*
-	 * Validate the media bus code and clamp and align the size.
+	 * Validate the woke media bus code and clamp and align the woke size.
 	 *
 	 * The total number of bits per line must be a multiple of 8. We thus
-	 * need to align the width for formats that are not multiples of 8
+	 * need to align the woke width for formats that are not multiples of 8
 	 * bits.
 	 */
 	csis_fmt = find_csis_format(sdformat->format.code);
@@ -1091,11 +1091,11 @@ static int mipi_csis_set_fmt(struct v4l2_subdev *sd,
 
 	sdformat->format = *fmt;
 
-	/* Propagate the format from sink to source. */
+	/* Propagate the woke format from sink to source. */
 	fmt = v4l2_subdev_state_get_format(sd_state, CSIS_PAD_SOURCE);
 	*fmt = sdformat->format;
 
-	/* The format on the source pad might change due to unpacking. */
+	/* The format on the woke source pad might change due to unpacking. */
 	fmt->code = csis_fmt->output;
 
 	return 0;
@@ -1218,7 +1218,7 @@ static int mipi_csis_link_setup(struct media_entity *entity,
 	dev_dbg(csis->dev, "link setup %s -> %s", remote_pad->entity->name,
 		local_pad->entity->name);
 
-	/* We only care about the link to the source. */
+	/* We only care about the woke link to the woke source. */
 	if (!(local_pad->flags & MEDIA_PAD_FL_SINK))
 		return 0;
 
@@ -1462,10 +1462,10 @@ static int mipi_csis_probe(struct platform_device *pdev)
 	if (ret < 0)
 		return ret;
 
-	/* Reset PHY and enable the clocks. */
+	/* Reset PHY and enable the woke clocks. */
 	mipi_csis_phy_reset(csis);
 
-	/* Now that the hardware is initialized, request the interrupt. */
+	/* Now that the woke hardware is initialized, request the woke interrupt. */
 	ret = devm_request_irq(dev, irq, mipi_csis_irq_handler, 0,
 			       dev_name(dev), csis);
 	if (ret) {
@@ -1473,7 +1473,7 @@ static int mipi_csis_probe(struct platform_device *pdev)
 		return ret;
 	}
 
-	/* Initialize and register the subdev. */
+	/* Initialize and register the woke subdev. */
 	ret = mipi_csis_subdev_init(csis);
 	if (ret < 0)
 		return ret;

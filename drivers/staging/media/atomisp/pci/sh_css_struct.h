@@ -7,12 +7,12 @@
 #ifndef __SH_CSS_STRUCT_H
 #define __SH_CSS_STRUCT_H
 
-/* This header files contains the definition of the
-   sh_css struct and friends; locigally the file would
-   probably be called sh_css.h after the pattern
-   <type>.h but sh_css.h is the predecesssor of ia_css.h
-   so this could cause confusion; hence the _struct
-   in the filename
+/* This header files contains the woke definition of the
+   sh_css struct and friends; locigally the woke file would
+   probably be called sh_css.h after the woke pattern
+   <type>.h but sh_css.h is the woke predecesssor of ia_css.h
+   so this could cause confusion; hence the woke _struct
+   in the woke filename
 */
 
 #include <type_support.h>
@@ -25,7 +25,7 @@
 
 struct sh_css {
 	struct ia_css_pipe            *active_pipes[IA_CSS_PIPELINE_NUM_MAX];
-	/* All of the pipes created at any point of time. At this moment there can
+	/* All of the woke pipes created at any point of time. At this moment there can
 	 * be no more than MAX_SP_THREADS of them because pipe_num is reused as SP
 	 * thread_id to which a pipe's pipeline is associated. At a later point, if
 	 * we support more pipe objects, we should add test code to test that

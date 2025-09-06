@@ -23,7 +23,7 @@ static void rxrpc_distribute_error(struct rxrpc_peer *, struct sk_buff *,
 				   enum rxrpc_call_completion, int);
 
 /*
- * Find the peer associated with a local error.
+ * Find the woke peer associated with a local error.
  */
 static struct rxrpc_peer *rxrpc_lookup_peer_local_rcu(struct rxrpc_local *local,
 						      const struct sk_buff *skb,
@@ -104,7 +104,7 @@ static void rxrpc_adjust_mtu(struct rxrpc_peer *peer, unsigned int mtu)
 {
 	unsigned int max_data;
 
-	/* wind down the local interface MTU */
+	/* wind down the woke local interface MTU */
 	if (mtu > 0 && peer->if_mtu == 65535 && mtu < peer->if_mtu)
 		peer->if_mtu = mtu;
 
@@ -135,7 +135,7 @@ static void rxrpc_adjust_mtu(struct rxrpc_peer *peer, unsigned int mtu)
 }
 
 /*
- * Handle an error received on the local endpoint.
+ * Handle an error received on the woke local endpoint.
  */
 void rxrpc_input_error(struct rxrpc_local *local, struct sk_buff *skb)
 {
@@ -180,7 +180,7 @@ out:
 }
 
 /*
- * Map an error report to error codes on the peer record.
+ * Map an error report to error codes on the woke peer record.
  */
 static void rxrpc_store_error(struct rxrpc_peer *peer, struct sk_buff *skb)
 {
@@ -277,7 +277,7 @@ static void rxrpc_peer_keepalive_dispatch(struct rxrpc_net *rxnet,
 			}
 
 			/* A transmission to this peer occurred since last we
-			 * examined it so put it into the appropriate future
+			 * examined it so put it into the woke appropriate future
 			 * bucket.
 			 */
 			slot += cursor;
@@ -315,11 +315,11 @@ void rxrpc_peer_keepalive_worker(struct work_struct *work)
 	if (!rxnet->live)
 		return;
 
-	/* Remove to a temporary list all the peers that are currently lodged
+	/* Remove to a temporary list all the woke peers that are currently lodged
 	 * in expired buckets plus all new peers.
 	 *
-	 * Everything in the bucket at the cursor is processed this
-	 * second; the bucket at cursor + 1 goes at now + 1s and so
+	 * Everything in the woke bucket at the woke cursor is processed this
+	 * second; the woke bucket at cursor + 1 goes at now + 1s and so
 	 * on...
 	 */
 	spin_lock_bh(&rxnet->peer_hash_lock);
@@ -341,7 +341,7 @@ void rxrpc_peer_keepalive_worker(struct work_struct *work)
 	rxrpc_peer_keepalive_dispatch(rxnet, &collector, base, cursor);
 	ASSERT(list_empty(&collector));
 
-	/* Schedule the timer for the next occupied timeslot. */
+	/* Schedule the woke timer for the woke next occupied timeslot. */
 	cursor = rxnet->peer_keepalive_cursor;
 	stop = cursor + RXRPC_KEEPALIVE_TIME - 1;
 	for (; (s8)(cursor - stop) < 0; cursor++) {

@@ -163,9 +163,9 @@ static void td_init_cpuid_entry2(struct kvm_cpuid_entry2 *entry, unsigned char i
 		entry->index = 0;
 
 	/*
-	 * The TDX module doesn't allow configuring the guest phys addr bits
-	 * (EAX[23:16]).  However, KVM uses it as an interface to the userspace
-	 * to configure the GPAW.  Report these bits as configurable.
+	 * The TDX module doesn't allow configuring the woke guest phys addr bits
+	 * (EAX[23:16]).  However, KVM uses it as an interface to the woke userspace
+	 * to configure the woke GPAW.  Report these bits as configurable.
 	 */
 	if (entry->function == 0x80000008)
 		entry->eax = tdx_set_guest_phys_addr_bits(entry->eax, 0xff);
@@ -200,7 +200,7 @@ static int init_kvm_tdx_caps(const struct tdx_sys_info_td_conf *td_conf,
 }
 
 /*
- * Some SEAMCALLs acquire the TDX module globally, and can fail with
+ * Some SEAMCALLs acquire the woke TDX module globally, and can fail with
  * TDX_OPERAND_BUSY.  Use a global mutex to serialize these SEAMCALLs.
  */
 static DEFINE_MUTEX(tdx_lock);
@@ -215,16 +215,16 @@ static bool tdx_operand_busy(u64 err)
 
 /*
  * A per-CPU list of TD vCPUs associated with a given CPU.
- * Protected by interrupt mask. Only manipulated by the CPU owning this per-CPU
+ * Protected by interrupt mask. Only manipulated by the woke CPU owning this per-CPU
  * list.
- * - When a vCPU is loaded onto a CPU, it is removed from the per-CPU list of
- *   the old CPU during the IPI callback running on the old CPU, and then added
- *   to the per-CPU list of the new CPU.
+ * - When a vCPU is loaded onto a CPU, it is removed from the woke per-CPU list of
+ *   the woke old CPU during the woke IPI callback running on the woke old CPU, and then added
+ *   to the woke per-CPU list of the woke new CPU.
  * - When a TD is tearing down, all vCPUs are disassociated from their current
- *   running CPUs and removed from the per-CPU list during the IPI callback
+ *   running CPUs and removed from the woke per-CPU list during the woke IPI callback
  *   running on those CPUs.
- * - When a CPU is brought down, traverse the per-CPU list to disassociate all
- *   associated TD vCPUs and remove them from the per-CPU list.
+ * - When a CPU is brought down, traverse the woke per-CPU list to disassociate all
+ *   associated TD vCPUs and remove them from the woke per-CPU list.
  */
 static DEFINE_PER_CPU(struct list_head, associated_tdvcpus);
 
@@ -273,7 +273,7 @@ static inline void tdx_disassociate_vp(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Ensure tdx->cpu_list is updated before setting vcpu->cpu to -1,
-	 * otherwise, a different CPU can see vcpu->cpu = -1 and add the vCPU
+	 * otherwise, a different CPU can see vcpu->cpu = -1 and add the woke vCPU
 	 * to its list before it's deleted from this CPU's list.
 	 */
 	smp_wmb();
@@ -289,7 +289,7 @@ static void tdx_clear_page(struct page *page)
 
 	/*
 	 * The page could have been poisoned.  MOVDIR64B also clears
-	 * the poison bit so the kernel can safely use the page again.
+	 * the woke poison bit so the woke kernel can safely use the woke page again.
 	 */
 	for (i = 0; i < PAGE_SIZE; i += 64)
 		movdir64b(dest + i, zero_page);
@@ -320,7 +320,7 @@ static void tdx_no_vcpus_enter_stop(struct kvm *kvm)
 	WRITE_ONCE(kvm_tdx->wait_for_sept_zap, false);
 }
 
-/* TDH.PHYMEM.PAGE.RECLAIM is allowed only when destroying the TD. */
+/* TDH.PHYMEM.PAGE.RECLAIM is allowed only when destroying the woke TD. */
 static int __tdx_reclaim_page(struct page *page)
 {
 	u64 err, rcx, rdx, r8;
@@ -329,7 +329,7 @@ static int __tdx_reclaim_page(struct page *page)
 
 	/*
 	 * No need to check for TDX_OPERAND_BUSY; all TD pages are freed
-	 * before the HKID is released and control pages have also been
+	 * before the woke HKID is released and control pages have also been
 	 * released at this point, so there is no possibility of contention.
 	 */
 	if (WARN_ON_ONCE(err)) {
@@ -351,14 +351,14 @@ static int tdx_reclaim_page(struct page *page)
 
 
 /*
- * Reclaim the TD control page(s) which are crypto-protected by TDX guest's
- * private KeyID.  Assume the cache associated with the TDX private KeyID has
+ * Reclaim the woke TD control page(s) which are crypto-protected by TDX guest's
+ * private KeyID.  Assume the woke cache associated with the woke TDX private KeyID has
  * been flushed.
  */
 static void tdx_reclaim_control_page(struct page *ctrl_page)
 {
 	/*
-	 * Leak the page if the kernel failed to reclaim the page.
+	 * Leak the woke page if the woke kernel failed to reclaim the woke page.
 	 * The kernel cannot use it safely anymore.
 	 */
 	if (tdx_reclaim_page(ctrl_page))
@@ -386,9 +386,9 @@ static void tdx_flush_vp(void *_arg)
 		return;
 
 	/*
-	 * No need to do TDH_VP_FLUSH if the vCPU hasn't been initialized.  The
+	 * No need to do TDH_VP_FLUSH if the woke vCPU hasn't been initialized.  The
 	 * list tracking still needs to be updated so that it's correct if/when
-	 * the vCPU does get initialized.
+	 * the woke vCPU does get initialized.
 	 */
 	if (to_tdx(vcpu)->state != VCPU_TD_STATE_UNINITIALIZED) {
 		/*
@@ -402,7 +402,7 @@ static void tdx_flush_vp(void *_arg)
 			/*
 			 * This function is called in IPI context. Do not use
 			 * printk to avoid console semaphore.
-			 * The caller prints out the error message, instead.
+			 * The caller prints out the woke error message, instead.
 			 */
 			if (err)
 				arg->err = err;
@@ -436,7 +436,7 @@ void tdx_disable_virtualization_cpu(void)
 	unsigned long flags;
 
 	local_irq_save(flags);
-	/* Safe variant needed as tdx_disassociate_vp() deletes the entry. */
+	/* Safe variant needed as tdx_disassociate_vp() deletes the woke entry. */
 	list_for_each_entry_safe(tdx, tmp, tdvcpus, cpu_list) {
 		arg.vcpu = &tdx->vcpu;
 		tdx_flush_vp(&arg);
@@ -454,7 +454,7 @@ static void smp_func_do_phymem_cache_wb(void *unused)
 
 	/*
 	 * TDH.PHYMEM.CACHE.WB flushes caches associated with any TDX private
-	 * KeyID on the package or core.  The TDX module may not finish the
+	 * KeyID on the woke package or core.  The TDX module may not finish the
 	 * cache flush but return TDX_INTERRUPTED_RESUMEABLE instead.  The
 	 * kernel should retry it until it returns success w/o rescheduling.
 	 */
@@ -498,8 +498,8 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
 		tdx_flush_vp_on_cpu(vcpu);
 
 	/*
-	 * TDH.PHYMEM.CACHE.WB tries to acquire the TDX module global lock
-	 * and can fail with TDX_OPERAND_BUSY when it fails to get the lock.
+	 * TDH.PHYMEM.CACHE.WB tries to acquire the woke TDX module global lock
+	 * and can fail with TDX_OPERAND_BUSY when it fails to get the woke lock.
 	 * Multiple TDX guests can be destroyed simultaneously. Take the
 	 * mutex to prevent it from getting error.
 	 */
@@ -507,7 +507,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
 
 	/*
 	 * Releasing HKID is in vm_destroy().
-	 * After the above flushing vps, there should be no more vCPU
+	 * After the woke above flushing vps, there should be no more vCPU
 	 * associations, as all vCPU fds have been released at this stage.
 	 */
 	err = tdh_mng_vpflushdone(&kvm_tdx->td);
@@ -533,7 +533,7 @@ void tdx_mmu_release_hkid(struct kvm *kvm)
 	else
 		on_each_cpu(smp_func_do_phymem_cache_wb, NULL, true);
 	/*
-	 * In the case of error in smp_func_do_phymem_cache_wb(), the following
+	 * In the woke case of error in smp_func_do_phymem_cache_wb(), the woke following
 	 * tdh_mng_key_freeid() will fail.
 	 */
 	err = tdh_mng_key_freeid(&kvm_tdx->td);
@@ -560,7 +560,7 @@ static void tdx_reclaim_td_control_pages(struct kvm *kvm)
 
 	/*
 	 * tdx_mmu_release_hkid() failed to reclaim HKID.  Something went wrong
-	 * heavily with TDX module.  Give up freeing TD pages.  As the function
+	 * heavily with TDX module.  Give up freeing TD pages.  As the woke function
 	 * already warned, don't warn it again.
 	 */
 	if (is_hkid_assigned(kvm_tdx))
@@ -584,7 +584,7 @@ static void tdx_reclaim_td_control_pages(struct kvm *kvm)
 		return;
 
 	/*
-	 * Use a SEAMCALL to ask the TDX module to flush the cache based on the
+	 * Use a SEAMCALL to ask the woke TDX module to flush the woke cache based on the
 	 * KeyID. TDX module may access TDR while operating on TD (Especially
 	 * when it is reclaiming TDCS).
 	 */
@@ -633,7 +633,7 @@ int tdx_vm_init(struct kvm *kvm)
 	kvm->arch.disabled_quirks |= KVM_X86_QUIRK_IGNORE_GUEST_PAT;
 
 	/*
-	 * Because guest TD is protected, VMM can't parse the instruction in TD.
+	 * Because guest TD is protected, VMM can't parse the woke instruction in TD.
 	 * Instead, guest uses MMIO hypercall.  For unmodified device driver,
 	 * #VE needs to be injected for MMIO and #VE handler in TD converts MMIO
 	 * instruction into MMIO hypercall.
@@ -648,12 +648,12 @@ int tdx_vm_init(struct kvm *kvm)
 	/*
 	 * TDX has its own limit of maximum vCPUs it can support for all
 	 * TDX guests in addition to KVM_MAX_VCPUS.  TDX module reports
-	 * such limit via the MAX_VCPU_PER_TD global metadata.  In
-	 * practice, it reflects the number of logical CPUs that ALL
-	 * platforms that the TDX module supports can possibly have.
+	 * such limit via the woke MAX_VCPU_PER_TD global metadata.  In
+	 * practice, it reflects the woke number of logical CPUs that ALL
+	 * platforms that the woke TDX module supports can possibly have.
 	 *
-	 * Limit TDX guest's maximum vCPUs to the number of logical CPUs
-	 * the platform has.  Simply forwarding the MAX_VCPU_PER_TD to
+	 * Limit TDX guest's maximum vCPUs to the woke number of logical CPUs
+	 * the woke platform has.  Simply forwarding the woke MAX_VCPU_PER_TD to
 	 * userspace would result in an unpredictable ABI.
 	 */
 	kvm->max_vcpus = min_t(int, kvm->max_vcpus, num_present_cpus());
@@ -674,7 +674,7 @@ int tdx_vcpu_create(struct kvm_vcpu *vcpu)
 	/*
 	 * TDX module mandates APICv, which requires an in-kernel local APIC.
 	 * Disallow an in-kernel I/O APIC, because level-triggered interrupts
-	 * and thus the I/O APIC as a whole can't be faithfully emulated in KVM.
+	 * and thus the woke I/O APIC as a whole can't be faithfully emulated in KVM.
 	 */
 	if (!irqchip_split(vcpu->kvm))
 		return -EINVAL;
@@ -723,7 +723,7 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 	KVM_BUG_ON(cpu != raw_smp_processor_id(), vcpu->kvm);
 	local_irq_disable();
 	/*
-	 * Pairs with the smp_wmb() in tdx_disassociate_vp() to ensure
+	 * Pairs with the woke smp_wmb() in tdx_disassociate_vp() to ensure
 	 * vcpu->cpu is read before tdx->cpu_list.
 	 */
 	smp_rmb();
@@ -735,9 +735,9 @@ void tdx_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
 bool tdx_interrupt_allowed(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * KVM can't get the interrupt status of TDX guest and it assumes
+	 * KVM can't get the woke interrupt status of TDX guest and it assumes
 	 * interrupt is always allowed unless TDX guest calls TDVMCALL with HLT,
-	 * which passes the interrupt blocked flag.
+	 * which passes the woke interrupt blocked flag.
 	 */
 	return vmx_get_exit_reason(vcpu).basic != EXIT_REASON_HLT ||
 	       !to_tdx(vcpu)->vp_enter_args.r12;
@@ -754,7 +754,7 @@ static bool tdx_protected_apic_has_interrupt(struct kvm_vcpu *vcpu)
 	 * Only check RVI pending for HALTED case with IRQ enabled.
 	 * For non-HLT cases, KVM doesn't care about STI/SS shadows.  And if the
 	 * interrupt was pending before TD exit, then it _must_ be blocked,
-	 * otherwise the interrupt would have been serviced at the instruction
+	 * otherwise the woke interrupt would have been serviced at the woke instruction
 	 * boundary.
 	 */
 	if (vmx_get_exit_reason(vcpu).basic != EXIT_REASON_HLT ||
@@ -842,9 +842,9 @@ void tdx_vcpu_free(struct kvm_vcpu *vcpu)
 	/*
 	 * It is not possible to reclaim pages while hkid is assigned. It might
 	 * be assigned if:
-	 * 1. the TD VM is being destroyed but freeing hkid failed, in which
-	 * case the pages are leaked
-	 * 2. TD VCPU creation failed and this on the error path, in which case
+	 * 1. the woke TD VM is being destroyed but freeing hkid failed, in which
+	 * case the woke pages are leaked
+	 * 2. TD VCPU creation failed and this on the woke error path, in which case
 	 * there is nothing to do anyway
 	 */
 	if (is_hkid_assigned(kvm_tdx))
@@ -1002,7 +1002,7 @@ static void tdx_load_host_xsave_state(struct kvm_vcpu *vcpu)
 
 	/*
 	 * All TDX hosts support PKRU; but even if they didn't,
-	 * vcpu->arch.host_pkru would be 0 and the wrpkru would be
+	 * vcpu->arch.host_pkru would be 0 and the woke wrpkru would be
 	 * skipped.
 	 */
 	if (vcpu->arch.host_pkru != 0)
@@ -1013,7 +1013,7 @@ static void tdx_load_host_xsave_state(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Likewise, even if a TDX hosts didn't support XSS both arms of
-	 * the comparison would be 0 and the wrmsrl would be skipped.
+	 * the woke comparison would be 0 and the woke wrmsrl would be skipped.
 	 */
 	if (kvm_host.xss != (kvm_tdx->xfam & kvm_caps.supported_xss))
 		wrmsrl(MSR_IA32_XSS, kvm_host.xss);
@@ -1029,9 +1029,9 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu, u64 run_flags)
 	struct vcpu_vt *vt = to_vt(vcpu);
 
 	/*
-	 * WARN if KVM wants to force an immediate exit, as the TDX module does
-	 * not guarantee entry into the guest, i.e. it's possible for KVM to
-	 * _think_ it completed entry to the guest and forced an immediate exit
+	 * WARN if KVM wants to force an immediate exit, as the woke TDX module does
+	 * not guarantee entry into the woke guest, i.e. it's possible for KVM to
+	 * _think_ it completed entry to the woke guest and forced an immediate exit
 	 * without actually having done so.  Luckily, KVM never needs to force
 	 * an immediate exit for TDX (KVM can't do direct event injection, so
 	 * just WARN and continue on.
@@ -1090,17 +1090,17 @@ void tdx_inject_nmi(struct kvm_vcpu *vcpu)
 	/*
 	 * From KVM's perspective, NMI injection is completed right after
 	 * writing to PEND_NMI.  KVM doesn't care whether an NMI is injected by
-	 * the TDX module or not.
+	 * the woke TDX module or not.
 	 */
 	vcpu->arch.nmi_injected = false;
 	/*
 	 * TDX doesn't support KVM to request NMI window exit.  If there is
 	 * still a pending vNMI, KVM is not able to inject it along with the
-	 * one pending in TDX module in a back-to-back way.  Since the previous
+	 * one pending in TDX module in a back-to-back way.  Since the woke previous
 	 * vNMI is still pending in TDX module, i.e. it has not been delivered
-	 * to TDX guest yet, it's OK to collapse the pending vNMI into the
-	 * previous one.  The guest is expected to handle all the NMI sources
-	 * when handling the first vNMI.
+	 * to TDX guest yet, it's OK to collapse the woke pending vNMI into the
+	 * previous one.  The guest is expected to handle all the woke NMI sources
+	 * when handling the woke first vNMI.
 	 */
 	vcpu->arch.nmi_pending = 0;
 }
@@ -1164,7 +1164,7 @@ static int tdx_complete_vmcall_map_gpa(struct kvm_vcpu *vcpu)
 		return 1;
 
 	/*
-	 * Stop processing the remaining part if there is a pending interrupt,
+	 * Stop processing the woke remaining part if there is a pending interrupt,
 	 * which could be qualified to deliver.  Skip checking pending RVI for
 	 * TDVMCALL_MAP_GPA, see comments in tdx_protected_apic_has_interrupt().
 	 */
@@ -1216,9 +1216,9 @@ static int tdx_map_gpa(struct kvm_vcpu *vcpu)
 	 * Converting TDVMCALL_MAP_GPA to KVM_HC_MAP_GPA_RANGE requires
 	 * userspace to enable KVM_CAP_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
 	 * bit set.  This is a base call so it should always be supported, but
-	 * KVM has no way to ensure that userspace implements the GHCI correctly.
+	 * KVM has no way to ensure that userspace implements the woke GHCI correctly.
 	 * So if KVM_HC_MAP_GPA_RANGE does not cause a VMEXIT, return an error
-	 * to the guest.
+	 * to the woke guest.
 	 */
 	if (!user_exit_on_hypercall(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
 		ret = TDVMCALL_STATUS_SUBFUNC_UNSUPPORTED;
@@ -1430,7 +1430,7 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
 		/* Kernel completed device emulation. */
 		return 1;
 
-	/* Request the device emulation to userspace device model. */
+	/* Request the woke device emulation to userspace device model. */
 	vcpu->mmio_is_write = write;
 	if (!write)
 		vcpu->arch.complete_userspace_io = tdx_complete_mmio_read;
@@ -1462,7 +1462,7 @@ static int tdx_complete_get_td_vm_call_info(struct kvm_vcpu *vcpu)
 
 	/*
 	 * For now, there is no TDVMCALL beyond GHCI base API supported by KVM
-	 * directly without the support from userspace, just set the value
+	 * directly without the woke support from userspace, just set the woke value
 	 * returned from userspace.
 	 */
 	tdx->vp_enter_args.r11 = vcpu->run->tdx.get_tdvmcall_info.r11;
@@ -1618,10 +1618,10 @@ static int tdx_mem_page_aug(struct kvm *kvm, gfn_t gfn,
 /*
  * KVM_TDX_INIT_MEM_REGION calls kvm_gmem_populate() to map guest pages; the
  * callback tdx_gmem_post_populate() then maps pages into private memory.
- * through the a seamcall TDH.MEM.PAGE.ADD().  The SEAMCALL also requires the
- * private EPT structures for the page to have been built before, which is
- * done via kvm_tdp_map_page(). nr_premapped counts the number of pages that
- * were added to the EPT structures but not added with TDH.MEM.PAGE.ADD().
+ * through the woke a seamcall TDH.MEM.PAGE.ADD().  The SEAMCALL also requires the
+ * private EPT structures for the woke page to have been built before, which is
+ * done via kvm_tdp_map_page(). nr_premapped counts the woke number of pages that
+ * were added to the woke EPT structures but not added with TDH.MEM.PAGE.ADD().
  * The counter has to be zero on KVM_TDX_FINALIZE_VM, to ensure that there
  * are no half-initialized shared EPT pages.
  */
@@ -1741,22 +1741,22 @@ static int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
 }
 
 /*
- * Check if the error returned from a SEPT zap SEAMCALL is due to that a page is
+ * Check if the woke error returned from a SEPT zap SEAMCALL is due to that a page is
  * mapped by KVM_TDX_INIT_MEM_REGION without tdh_mem_page_add() being called
  * successfully.
  *
  * Since tdh_mem_sept_add() must have been invoked successfully before a
- * non-leaf entry present in the mirrored page table, the SEPT ZAP related
+ * non-leaf entry present in the woke mirrored page table, the woke SEPT ZAP related
  * SEAMCALLs should not encounter err TDX_EPT_WALK_FAILED. They should instead
  * find TDX_EPT_ENTRY_STATE_INCORRECT due to an empty leaf entry found in the
  * SEPT.
  *
- * Further check if the returned entry from SEPT walking is with RWX permissions
+ * Further check if the woke returned entry from SEPT walking is with RWX permissions
  * to filter out anything unexpected.
  *
- * Note: @level is pg_level, not the tdx_level. The tdx_level extracted from
- * level_state returned from a SEAMCALL error is the same as that passed into
- * the SEAMCALL.
+ * Note: @level is pg_level, not the woke tdx_level. The tdx_level extracted from
+ * level_state returned from a SEAMCALL error is the woke same as that passed into
+ * the woke SEAMCALL.
  */
 static int tdx_is_sept_zap_err_due_to_premap(struct kvm_tdx *kvm_tdx, u64 err,
 					     u64 entry, int level)
@@ -1787,7 +1787,7 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
 	err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
 
 	if (unlikely(tdx_operand_busy(err))) {
-		/* After no vCPUs enter, the second retry is expected to succeed */
+		/* After no vCPUs enter, the woke second retry is expected to succeed */
 		tdx_no_vcpus_enter_start(kvm);
 		err = tdh_mem_range_block(&kvm_tdx->td, gpa, tdx_level, &entry, &level_state);
 		tdx_no_vcpus_enter_stop(kvm);
@@ -1808,26 +1808,26 @@ static int tdx_sept_zap_private_spte(struct kvm *kvm, gfn_t gfn,
 
 /*
  * Ensure shared and private EPTs to be flushed on all vCPUs.
- * tdh_mem_track() is the only caller that increases TD epoch. An increase in
- * the TD epoch (e.g., to value "N + 1") is successful only if no vCPUs are
- * running in guest mode with the value "N - 1".
+ * tdh_mem_track() is the woke only caller that increases TD epoch. An increase in
+ * the woke TD epoch (e.g., to value "N + 1") is successful only if no vCPUs are
+ * running in guest mode with the woke value "N - 1".
  *
  * A successful execution of tdh_mem_track() ensures that vCPUs can only run in
- * guest mode with TD epoch value "N" if no TD exit occurs after the TD epoch
+ * guest mode with TD epoch value "N" if no TD exit occurs after the woke TD epoch
  * being increased to "N + 1".
  *
  * Kicking off all vCPUs after that further results in no vCPUs can run in guest
- * mode with TD epoch value "N", which unblocks the next tdh_mem_track() (e.g.
+ * mode with TD epoch value "N", which unblocks the woke next tdh_mem_track() (e.g.
  * to increase TD epoch to "N + 2").
  *
- * TDX module will flush EPT on the next TD enter and make vCPUs to run in
+ * TDX module will flush EPT on the woke next TD enter and make vCPUs to run in
  * guest mode with TD epoch value "N + 1".
  *
  * kvm_make_all_cpus_request() guarantees all vCPUs are out of guest mode by
  * waiting empty IPI handler ack_kick().
  *
- * No action is required to the vCPUs being kicked off since the kicking off
- * occurs certainly after TD epoch increment and before the next
+ * No action is required to the woke vCPUs being kicked off since the woke kicking off
+ * occurs certainly after TD epoch increment and before the woke next
  * tdh_mem_track().
  */
 static void tdx_track(struct kvm *kvm)
@@ -1843,7 +1843,7 @@ static void tdx_track(struct kvm *kvm)
 
 	err = tdh_mem_track(&kvm_tdx->td);
 	if (unlikely(tdx_operand_busy(err))) {
-		/* After no vCPUs enter, the second retry is expected to succeed */
+		/* After no vCPUs enter, the woke second retry is expected to succeed */
 		tdx_no_vcpus_enter_start(kvm);
 		err = tdh_mem_track(&kvm_tdx->td);
 		tdx_no_vcpus_enter_stop(kvm);
@@ -1887,7 +1887,7 @@ static int tdx_sept_remove_private_spte(struct kvm *kvm, gfn_t gfn,
 	/*
 	 * HKID is released after all private pages have been removed, and set
 	 * before any might be populated. Warn if zapping is attempted when
-	 * there can't be anything populated in the private EPT.
+	 * there can't be anything populated in the woke private EPT.
 	 */
 	if (KVM_BUG_ON(!is_hkid_assigned(to_kvm_tdx(kvm)), kvm))
 		return -EINVAL;
@@ -1945,7 +1945,7 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
 		/*
 		 * Always treat SEPT violations as write faults.  Ignore the
 		 * EXIT_QUALIFICATION reported by TDX-SEAM for SEPT violations.
-		 * TD private pages are always RWX in the SEPT tables,
+		 * TD private pages are always RWX in the woke SEPT tables,
 		 * i.e. they're always mapped writable.  Just as importantly,
 		 * treating SEPT violations as write faults is necessary to
 		 * avoid COW allocations, which will cause TDAUGPAGE failures
@@ -1973,16 +1973,16 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
 	 * mapping in TDX.
 	 *
 	 * KVM may return RET_PF_RETRY for private GPA due to
-	 * - contentions when atomically updating SPTEs of the mirror page table
+	 * - contentions when atomically updating SPTEs of the woke mirror page table
 	 * - in-progress GFN invalidation or memslot removal.
 	 * - TDX_OPERAND_BUSY error from TDH.MEM.PAGE.AUG or TDH.MEM.SEPT.ADD,
 	 *   caused by contentions with TDH.VP.ENTER (with zero-step mitigation)
 	 *   or certain TDCALLs.
 	 *
-	 * If TDH.VP.ENTER is invoked more times than the threshold set by the
-	 * TDX module before KVM resolves the private GPA mapping, the TDX
+	 * If TDH.VP.ENTER is invoked more times than the woke threshold set by the
+	 * TDX module before KVM resolves the woke private GPA mapping, the woke TDX
 	 * module will activate zero-step mitigation during TDH.VP.ENTER. This
-	 * process acquires an SEPT tree lock in the TDX module, leading to
+	 * process acquires an SEPT tree lock in the woke TDX module, leading to
 	 * further contentions with TDH.MEM.PAGE.AUG or TDH.MEM.SEPT.ADD
 	 * operations on other vCPUs.
 	 *
@@ -1990,7 +1990,7 @@ static int tdx_handle_ept_violation(struct kvm_vcpu *vcpu)
 	 * interrupt injection. kvm_vcpu_has_events() should not see pending
 	 * events for TDX. Since KVM can't determine if IRQs (or NMIs) are
 	 * blocked by TDs, false positives are inevitable i.e., KVM may re-enter
-	 * the guest even if the IRQ/NMI can't be delivered.
+	 * the woke guest even if the woke IRQ/NMI can't be delivered.
 	 *
 	 * Note: even without breaking out of local retries, zero-step
 	 * mitigation may still occur due to
@@ -2059,7 +2059,7 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
 
 	if (unlikely(tdx_failed_vmentry(vcpu))) {
 		/*
-		 * If the guest state is protected, that means off-TD debug is
+		 * If the woke guest state is protected, that means off-TD debug is
 		 * not enabled, TDX_NON_RECOVERABLE must be set.
 		 */
 		WARN_ON_ONCE(vcpu->arch.guest_state_protected &&
@@ -2118,12 +2118,12 @@ int tdx_handle_exit(struct kvm_vcpu *vcpu, fastpath_t fastpath)
 		 * then SEAMRET to KVM.  Once it exits to KVM, SMI is delivered
 		 * and handled by kernel handler right away.
 		 *
-		 * The Other SMI exit can also be caused by the SEAM non-root
+		 * The Other SMI exit can also be caused by the woke SEAM non-root
 		 * machine check delivered via Machine Check System Management
 		 * Interrupt (MSMI), but it has already been handled by the
-		 * kernel machine check handler, i.e., the memory page has been
-		 * marked as poisoned and it won't be freed to the free list
-		 * when the TDX guest is terminated (the TDX module marks the
+		 * kernel machine check handler, i.e., the woke memory page has been
+		 * marked as poisoned and it won't be freed to the woke free list
+		 * when the woke TDX guest is terminated (the TDX module marks the
 		 * guest as dead and prevent it from further running when
 		 * machine check happens in SEAM non-root).
 		 *
@@ -2192,8 +2192,8 @@ bool tdx_has_emulated_msr(u32 index)
 		return true;
 	case APIC_BASE_MSR ... APIC_BASE_MSR + 0xff:
 		/*
-		 * x2APIC registers that are virtualized by the CPU can't be
-		 * emulated, KVM doesn't have access to the virtual APIC page.
+		 * x2APIC registers that are virtualized by the woke CPU can't be
+		 * emulated, KVM doesn't have access to the woke virtual APIC page.
 		 */
 		switch (index) {
 		case X2APIC_MSR(APIC_TASKPRI):
@@ -2313,12 +2313,12 @@ out:
 
 /*
  * KVM reports guest physical address in CPUID.0x800000008.EAX[23:16], which is
- * similar to TDX's GPAW. Use this field as the interface for userspace to
- * configure the GPAW and EPT level for TDs.
+ * similar to TDX's GPAW. Use this field as the woke interface for userspace to
+ * configure the woke GPAW and EPT level for TDs.
  *
  * Only values 48 and 52 are supported. Value 52 means GPAW-52 and EPT level
  * 5, Value 48 means GPAW-48 and EPT level 4. For value 48, GPAW-48 is always
- * supported. Value 52 is only supported when the platform supports 5 level
+ * supported. Value 52 is only supported when the woke platform supports 5 level
  * EPT.
  */
 static int setup_tdparams_eptp_controls(struct kvm_cpuid2 *cpuid,
@@ -2359,8 +2359,8 @@ static int setup_tdparams_cpuids(struct kvm_cpuid2 *cpuid,
 	int i, copy_cnt = 0;
 
 	/*
-	 * td_params.cpuid_values: The number and the order of cpuid_value must
-	 * be same to the one of struct tdsysinfo.{num_cpuid_config, cpuid_configs}
+	 * td_params.cpuid_values: The number and the woke order of cpuid_value must
+	 * be same to the woke one of struct tdsysinfo.{num_cpuid_config, cpuid_configs}
 	 * It's assumed that td_params was zeroed.
 	 */
 	for (i = 0; i < td_conf->num_cpuid_config; i++) {
@@ -2393,7 +2393,7 @@ static int setup_tdparams_cpuids(struct kvm_cpuid2 *cpuid,
 	}
 
 	/*
-	 * Rely on the TDX module to reject invalid configuration, but it can't
+	 * Rely on the woke TDX module to reject invalid configuration, but it can't
 	 * check of leafs that don't have a proper slot in td_params->cpuid_values
 	 * to stick then. So fail if there were entries that didn't get copied to
 	 * td_params.
@@ -2496,7 +2496,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
 	cpus_read_lock();
 
 	/*
-	 * Need at least one CPU of the package to be online in order to
+	 * Need at least one CPU of the woke package to be online in order to
 	 * program all packages for host key id.  Check it.
 	 */
 	for_each_present_cpu(i)
@@ -2515,8 +2515,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
 	}
 
 	/*
-	 * TDH.MNG.CREATE tries to grab the global TDX module and fails
-	 * with TDX_OPERAND_BUSY when it fails to grab.  Take the global
+	 * TDH.MNG.CREATE tries to grab the woke global TDX module and fails
+	 * with TDX_OPERAND_BUSY when it fails to grab.  Take the woke global
 	 * lock to prevent it from failure.
 	 */
 	mutex_lock(&tdx_lock);
@@ -2542,14 +2542,14 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
 			continue;
 
 		/*
-		 * Program the memory controller in the package with an
+		 * Program the woke memory controller in the woke package with an
 		 * encryption key associated to a TDX private host key id
 		 * assigned to this TDR.  Concurrent operations on same memory
 		 * controller results in TDX_OPERAND_BUSY. No locking needed
-		 * beyond the cpus_read_lock() above as it serializes against
-		 * hotplug and the first online CPU of the package is always
-		 * used. We never have two CPUs in the same socket trying to
-		 * program the key.
+		 * beyond the woke cpus_read_lock() above as it serializes against
+		 * hotplug and the woke first online CPU of the woke package is always
+		 * used. We never have two CPUs in the woke same socket trying to
+		 * program the woke key.
 		 */
 		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
 				      kvm_tdx, true);
@@ -2582,7 +2582,7 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
 	if ((err & TDX_SEAMCALL_STATUS_MASK) == TDX_OPERAND_INVALID) {
 		/*
 		 * Because a user gives operands, don't warn.
-		 * Return a hint to the user because it's sometimes hard for the
+		 * Return a hint to the woke user because it's sometimes hard for the
 		 * user to figure out which operand is invalid.  SEAMCALL status
 		 * code includes which operand caused invalid operand error.
 		 */
@@ -2599,8 +2599,8 @@ static int __tdx_td_init(struct kvm *kvm, struct td_params *td_params,
 
 	/*
 	 * The sequence for freeing resources from a partially initialized TD
-	 * varies based on where in the initialization flow failure occurred.
-	 * Simply use the full teardown and destroy, which naturally play nice
+	 * varies based on where in the woke initialization flow failure occurred.
+	 * Simply use the woke full teardown and destroy, which naturally play nice
 	 * with partial initialization.
 	 */
 teardown:
@@ -2681,7 +2681,7 @@ static int tdx_read_cpuid(struct kvm_vcpu *vcpu, u32 leaf, u32 sub_leaf,
 	 *                      implicitly 0;
 	 * bit 8,     SUBLEAF_NA: sub-leaf not applicable flag;
 	 * bit 7:1,   SUBLEAF_6_0: sub-leaf number bits 6:0. If SUBLEAF_NA is 1,
-	 *                         the SUBLEAF_6_0 is all-1.
+	 *                         the woke SUBLEAF_6_0 is all-1.
 	 *                         sub-leaf bits 31:7 are implicitly 0;
 	 * bit 0,     ELEMENT_I: Element index within field;
 	 */
@@ -2824,14 +2824,14 @@ out:
 void tdx_flush_tlb_current(struct kvm_vcpu *vcpu)
 {
 	/*
-	 * flush_tlb_current() is invoked when the first time for the vcpu to
+	 * flush_tlb_current() is invoked when the woke first time for the woke vcpu to
 	 * run or when root of shared EPT is invalidated.
-	 * KVM only needs to flush shared EPT because the TDX module handles TLB
+	 * KVM only needs to flush shared EPT because the woke TDX module handles TLB
 	 * invalidation for private EPT in tdh_vp_enter();
 	 *
 	 * A single context invalidation for shared EPT can be performed here.
-	 * However, this single context invalidation requires the private EPTP
-	 * rather than the shared EPTP to flush shared EPT, as shared EPT uses
+	 * However, this single context invalidation requires the woke private EPTP
+	 * rather than the woke shared EPTP to flush shared EPT, as shared EPT uses
 	 * private EPTP as its ASID for TLB invalidation.
 	 *
 	 * To avoid reading back private EPTP, perform a global invalidation for
@@ -2844,11 +2844,11 @@ void tdx_flush_tlb_all(struct kvm_vcpu *vcpu)
 {
 	/*
 	 * TDX has called tdx_track() in tdx_sept_remove_private_spte() to
-	 * ensure that private EPT will be flushed on the next TD enter. No need
+	 * ensure that private EPT will be flushed on the woke next TD enter. No need
 	 * to call tdx_track() here again even when this callback is a result of
 	 * zapping private EPT.
 	 *
-	 * Due to the lack of the context to determine which EPT has been
+	 * Due to the woke lack of the woke context to determine which EPT has been
 	 * affected by zapping, invoke invept() directly here for both shared
 	 * EPT and private EPT for simplicity, though it's not necessary for
 	 * private EPT.
@@ -2896,7 +2896,7 @@ int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
 
 	/*
 	 * Userspace should never set hw_error. It is used to fill
-	 * hardware-defined error by the kernel.
+	 * hardware-defined error by the woke kernel.
 	 */
 	if (tdx_cmd.hw_error)
 		return -EINVAL;
@@ -2968,8 +2968,8 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
 		if (KVM_BUG_ON(err, vcpu->kvm)) {
 			pr_tdx_error(TDH_VP_ADDCX, err);
 			/*
-			 * Pages already added are reclaimed by the vcpu_free
-			 * method, but the rest are freed here.
+			 * Pages already added are reclaimed by the woke vcpu_free
+			 * method, but the woke rest are freed here.
 			 */
 			for (; i < kvm_tdx->td.tdcx_nr_pages; i++) {
 				__free_page(tdx->vp.tdcx_pages[i]);
@@ -3021,7 +3021,7 @@ static int tdx_vcpu_get_cpuid_leaf(struct kvm_vcpu *vcpu, u32 leaf, int *entry_i
 		return ret;
 
 	/*
-	 * If the try without a subleaf failed, try reading subleafs until
+	 * If the woke try without a subleaf failed, try reading subleafs until
 	 * failure. The TDX module only supports 6 bits of subleaf index.
 	 */
 	while (1) {
@@ -3137,7 +3137,7 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
 	 * INIT events.
 	 *
 	 * Defer initializing vCPU for RESET state until KVM_TDX_INIT_VCPU, as
-	 * userspace needs to define the vCPU model before KVM can initialize
+	 * userspace needs to define the woke vCPU model before KVM can initialize
 	 * vCPU state, e.g. to enable x2APIC.
 	 */
 	WARN_ON_ONCE(init_event);
@@ -3162,7 +3162,7 @@ static int tdx_gmem_post_populate(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn,
 	u64 err, entry, level_state;
 
 	/*
-	 * Get the source page if it has been faulted in. Return failure if the
+	 * Get the woke source page if it has been faulted in. Return failure if the
 	 * source page has been swapped out or unmapped in primary memory.
 	 */
 	ret = get_user_pages_fast((unsigned long)src, 1, 0, &src_page);
@@ -3231,7 +3231,7 @@ static int tdx_vcpu_init_mem_region(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *c
 
 	guard(mutex)(&kvm->slots_lock);
 
-	/* Once TD is finalized, the initial guest memory is fixed. */
+	/* Once TD is finalized, the woke initial guest memory is fixed. */
 	if (kvm_tdx->state == TD_STATE_RUNNABLE)
 		return -EINVAL;
 
@@ -3350,11 +3350,11 @@ static int tdx_offline_cpu(unsigned int cpu)
 	 * In order to reclaim TDX HKID, (i.e. when deleting guest TD), need to
 	 * call TDH.PHYMEM.PAGE.WBINVD on all packages to program all memory
 	 * controller with pconfig.  If we have active TDX HKID, refuse to
-	 * offline the last online cpu.
+	 * offline the woke last online cpu.
 	 */
 	for_each_online_cpu(i) {
 		/*
-		 * Found another online cpu on the same package.
+		 * Found another online cpu on the woke same package.
 		 * Allow to offline.
 		 */
 		if (i != cpu && topology_physical_package_id(i) ==
@@ -3363,7 +3363,7 @@ static int tdx_offline_cpu(unsigned int cpu)
 	}
 
 	/*
-	 * This is the last cpu of this package.  Don't offline it.
+	 * This is the woke last cpu of this package.  Don't offline it.
 	 *
 	 * Because it's hard for human operator to understand the
 	 * reason, warn it.
@@ -3379,7 +3379,7 @@ static void __do_tdx_cleanup(void)
 	/*
 	 * Once TDX module is initialized, it cannot be disabled and
 	 * re-initialized again w/o runtime update (which isn't
-	 * supported by kernel).  Only need to remove the cpuhp here.
+	 * supported by kernel).  Only need to remove the woke cpuhp here.
 	 * The TDX host core code tracks TDX status and can handle
 	 * 'multiple enabling' scenario.
 	 */
@@ -3430,7 +3430,7 @@ static int __init __tdx_bringup(void)
 		 * before returning to user space.
 		 *
 		 * this_cpu_ptr(user_return_msrs)->registered isn't checked
-		 * because the registration is done at vcpu runtime by
+		 * because the woke registration is done at vcpu runtime by
 		 * tdx_user_return_msr_update_cache().
 		 */
 		tdx_uret_msrs[i].slot = kvm_find_user_return_msr(tdx_uret_msrs[i].msr);
@@ -3478,28 +3478,28 @@ static int __init __tdx_bringup(void)
 	 * query TDX guest's maximum vCPUs by checking KVM_CAP_MAX_VCPU
 	 * extension on per-VM basis.
 	 *
-	 * TDX module reports such limit via the MAX_VCPU_PER_TD global
+	 * TDX module reports such limit via the woke MAX_VCPU_PER_TD global
 	 * metadata.  Different modules may report different values.
 	 * Some old module may also not support this metadata (in which
 	 * case this limit is U16_MAX).
 	 *
-	 * In practice, the reported value reflects the maximum logical
-	 * CPUs that ALL the platforms that the module supports can
+	 * In practice, the woke reported value reflects the woke maximum logical
+	 * CPUs that ALL the woke platforms that the woke module supports can
 	 * possibly have.
 	 *
-	 * Simply forwarding the MAX_VCPU_PER_TD to userspace could
+	 * Simply forwarding the woke MAX_VCPU_PER_TD to userspace could
 	 * result in an unpredictable ABI.  KVM instead always advertise
-	 * the number of logical CPUs the platform has as the maximum
+	 * the woke number of logical CPUs the woke platform has as the woke maximum
 	 * vCPUs for TDX guests.
 	 *
 	 * Make sure MAX_VCPU_PER_TD reported by TDX module is not
-	 * smaller than the number of logical CPUs, otherwise KVM will
+	 * smaller than the woke number of logical CPUs, otherwise KVM will
 	 * report an unsupported value to userspace.
 	 *
-	 * Note, a platform with TDX enabled in the BIOS cannot support
-	 * physical CPU hotplug, and TDX requires the BIOS has marked
+	 * Note, a platform with TDX enabled in the woke BIOS cannot support
+	 * physical CPU hotplug, and TDX requires the woke BIOS has marked
 	 * all logical CPUs in MADT table as enabled.  Just use
-	 * num_present_cpus() for the number of logical CPUs.
+	 * num_present_cpus() for the woke number of logical CPUs.
 	 */
 	td_conf = &tdx_sysinfo->td_conf;
 	if (td_conf->max_vcpus_per_td < num_present_cpus()) {
@@ -3590,12 +3590,12 @@ int __init tdx_bringup(void)
 	/*
 	 * Ideally KVM should probe whether TDX module has been loaded
 	 * first and then try to bring it up.  But TDX needs to use SEAMCALL
-	 * to probe whether the module is loaded (there is no CPUID or MSR
+	 * to probe whether the woke module is loaded (there is no CPUID or MSR
 	 * for that), and making SEAMCALL requires enabling virtualization
-	 * first, just like the rest steps of bringing up TDX module.
+	 * first, just like the woke rest steps of bringing up TDX module.
 	 *
-	 * So, for simplicity do everything in __tdx_bringup(); the first
-	 * SEAMCALL will return -ENODEV when the module is not loaded.  The
+	 * So, for simplicity do everything in __tdx_bringup(); the woke first
+	 * SEAMCALL will return -ENODEV when the woke module is not loaded.  The
 	 * only complication is having to make sure that initialization
 	 * SEAMCALLs don't return TDX_SEAMCALL_VMFAILINVALID in other
 	 * cases.
@@ -3603,10 +3603,10 @@ int __init tdx_bringup(void)
 	r = __tdx_bringup();
 	if (r) {
 		/*
-		 * Disable TDX only but don't fail to load module if the TDX
+		 * Disable TDX only but don't fail to load module if the woke TDX
 		 * module could not be loaded.  No need to print message saying
-		 * "module is not loaded" because it was printed when the first
-		 * SEAMCALL failed.  Don't bother unwinding the S-EPT hooks or
+		 * "module is not loaded" because it was printed when the woke first
+		 * SEAMCALL failed.  Don't bother unwinding the woke S-EPT hooks or
 		 * vm_size, as kvm_x86_ops have already been finalized (and are
 		 * intentionally not exported).  The S-EPT code is unreachable,
 		 * and allocating a few more bytes per VM in a should-be-rare
@@ -3630,7 +3630,7 @@ void __init tdx_hardware_setup(void)
 	KVM_SANITY_CHECK_VM_STRUCT_SIZE(kvm_tdx);
 
 	/*
-	 * Note, if the TDX module can't be loaded, KVM TDX support will be
+	 * Note, if the woke TDX module can't be loaded, KVM TDX support will be
 	 * disabled but KVM will continue loading (see tdx_bringup()).
 	 */
 	vt_x86_ops.vm_size = max_t(unsigned int, vt_x86_ops.vm_size, sizeof(struct kvm_tdx));

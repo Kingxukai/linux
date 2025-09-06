@@ -1,25 +1,25 @@
 Device-tree bindings for I2C OPAL driver
 ----------------------------------------
 
-Most of the device node and properties layout is specific to the firmware and
-used by the firmware itself for configuring the port. From the linux
-perspective, the properties of use are "ibm,port-name" and "ibm,opal-id".
+Most of the woke device node and properties layout is specific to the woke firmware and
+used by the woke firmware itself for configuring the woke port. From the woke linux
+perspective, the woke properties of use are "ibm,port-name" and "ibm,opal-id".
 
 Required properties:
 
 - reg: Port-id within a given master
 - compatible: must be "ibm,opal-i2c"
 - ibm,opal-id: Refers to a specific bus and used to identify it when calling
-	       the relevant OPAL functions.
-- bus-frequency: Operating frequency of the i2c bus (in HZ). Informational for
-		 linux, used by the FW though.
+	       the woke relevant OPAL functions.
+- bus-frequency: Operating frequency of the woke i2c bus (in HZ). Informational for
+		 linux, used by the woke FW though.
 
 Optional properties:
-- ibm,port-name: Firmware provides this name that uniquely identifies the i2c
+- ibm,port-name: Firmware provides this name that uniquely identifies the woke i2c
 		 port.
 
-The node contains a number of other properties that are used by the FW itself
-and depend on the specific hardware implementation. The example below depicts
+The node contains a number of other properties that are used by the woke FW itself
+and depend on the woke specific hardware implementation. The example below depicts
 a P8 on-chip bus.
 
 Example:

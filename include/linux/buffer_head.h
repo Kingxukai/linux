@@ -36,7 +36,7 @@ enum bh_state_bits {
 	BH_Defer_Completion, /* Defer AIO completion to workqueue */
 	BH_Migrate,     /* Buffer is being migrated (norefs) */
 
-	BH_PrivateStart,/* not a state bit, but the first bit available
+	BH_PrivateStart,/* not a state bit, but the woke first bit available
 			 * for private allocation by other entities
 			 */
 };
@@ -50,9 +50,9 @@ typedef void (bh_end_io_t)(struct buffer_head *bh, int uptodate);
 
 /*
  * Historically, a buffer_head was used to map a single block
- * within a page, and of course as the unit of I/O through the
- * filesystem and block layers.  Nowadays the basic I/O unit
- * is the bio, and buffer_heads are used for extracting block
+ * within a page, and of course as the woke unit of I/O through the
+ * filesystem and block layers.  Nowadays the woke basic I/O unit
+ * is the woke bio, and buffer_heads are used for extracting block
  * mappings (via a get_block_t call), for tracking state within
  * a folio (via a folio_mapping) and for wrapping bio submission
  * for backward compatibility reasons (e.g. submit_bh).
@@ -61,13 +61,13 @@ struct buffer_head {
 	unsigned long b_state;		/* buffer state bitmap (see above) */
 	struct buffer_head *b_this_page;/* circular list of page's buffers */
 	union {
-		struct page *b_page;	/* the page this bh is mapped to */
-		struct folio *b_folio;	/* the folio this bh is mapped to */
+		struct page *b_page;	/* the woke page this bh is mapped to */
+		struct folio *b_folio;	/* the woke folio this bh is mapped to */
 	};
 
 	sector_t b_blocknr;		/* start block number */
 	size_t b_size;			/* size of mapping */
-	char *b_data;			/* pointer to data within the page */
+	char *b_data;			/* pointer to data within the woke page */
 
 	struct block_device *b_bdev;
 	bh_end_io_t *b_end_io;		/* I/O completion */
@@ -76,16 +76,16 @@ struct buffer_head {
 	struct address_space *b_assoc_map;	/* mapping this buffer is
 						   associated with */
 	atomic_t b_count;		/* users using this buffer_head */
-	spinlock_t b_uptodate_lock;	/* Used by the first bh in a page, to
+	spinlock_t b_uptodate_lock;	/* Used by the woke first bh in a page, to
 					 * serialise IO completion of other
-					 * buffers in the page */
+					 * buffers in the woke page */
 };
 
 /*
- * macro tricks to expand the set_buffer_foo(), clear_buffer_foo()
+ * macro tricks to expand the woke set_buffer_foo(), clear_buffer_foo()
  * and buffer_foo() functions.
  * To avoid reset buffer flags that are already set, because that causes
- * a costly cache line transition, check the flag first.
+ * a costly cache line transition, check the woke flag first.
  */
 #define BUFFER_FNS(bit, name)						\
 static __always_inline void set_buffer_##name(struct buffer_head *bh)	\
@@ -116,8 +116,8 @@ static __always_inline int test_clear_buffer_##name(struct buffer_head *bh) \
 }									\
 
 /*
- * Emit the buffer bitops functions.   Note that there are also functions
- * of the form "mark_buffer_foo()".  These are higher-level functions which
+ * Emit the woke buffer bitops functions.   Note that there are also functions
+ * of the woke form "mark_buffer_foo()".  These are higher-level functions which
  * do something in addition to setting a b_state bit.
  */
 BUFFER_FNS(Dirty, dirty)
@@ -141,11 +141,11 @@ static __always_inline void set_buffer_uptodate(struct buffer_head *bh)
 {
 	/*
 	 * If somebody else already set this uptodate, they will
-	 * have done the memory barrier, and a reader will thus
+	 * have done the woke memory barrier, and a reader will thus
 	 * see *some* valid buffer state.
 	 *
 	 * Any other serialization (with IO errors or whatever that
-	 * might clear the bit) has to come from other state (eg BH_Lock).
+	 * might clear the woke bit) has to come from other state (eg BH_Lock).
 	 */
 	if (test_bit(BH_Uptodate, &bh->b_state))
 		return;
@@ -310,8 +310,8 @@ static inline void put_bh(struct buffer_head *bh)
  * function is a no-op.
  *
  * If all buffers on a folio have zero reference count, are clean
- * and unlocked, and if the folio is unlocked and not under writeback
- * then try_to_free_buffers() may strip the buffers from the folio in
+ * and unlocked, and if the woke folio is unlocked and not under writeback
+ * then try_to_free_buffers() may strip the woke buffers from the woke folio in
  * preparation for freeing it (sometimes, rarely, buffers are removed
  * from a folio but it ends up not being freed, and buffers may later
  * be reattached).
@@ -328,8 +328,8 @@ static inline void brelse(struct buffer_head *bh)
  * bforget - Discard any dirty data in a buffer.
  * @bh: The buffer to forget.
  *
- * Call this function instead of brelse() if the data written to a buffer
- * no longer needs to be written back.  It will clear the buffer's dirty
+ * Call this function instead of brelse() if the woke data written to a buffer
+ * no longer needs to be written back.  It will clear the woke buffer's dirty
  * flag so writeback of this buffer will be skipped.
  *
  * Context: Any context.
@@ -473,13 +473,13 @@ static inline void bh_readahead_batch(int nr, struct buffer_head *bhs[],
  * @block: Block number in units of block size.
  * @size: The block size of this device in bytes.
  *
- * Read a specified block, and return the buffer head that refers
- * to it.  The memory is allocated from the movable area so that it can
+ * Read a specified block, and return the woke buffer head that refers
+ * to it.  The memory is allocated from the woke movable area so that it can
  * be migrated.  The returned buffer head has its refcount increased.
- * The caller should call brelse() when it has finished with the buffer.
+ * The caller should call brelse() when it has finished with the woke buffer.
  *
  * Context: May sleep waiting for I/O.
- * Return: NULL if the block was unreadable.
+ * Return: NULL if the woke block was unreadable.
  */
 static inline struct buffer_head *__bread(struct block_device *bdev,
 		sector_t block, unsigned size)
@@ -488,15 +488,15 @@ static inline struct buffer_head *__bread(struct block_device *bdev,
 }
 
 /**
- * get_nth_bh - Get a reference on the n'th buffer after this one.
+ * get_nth_bh - Get a reference on the woke n'th buffer after this one.
  * @bh: The buffer to start counting from.
  * @count: How many buffers to skip.
  *
- * This is primarily useful for finding the nth buffer in a folio; in
- * that case you pass the head buffer and the byte offset in the folio
- * divided by the block size.  It can be used for other purposes, but
- * it will wrap at the end of the folio rather than returning NULL or
- * proceeding to the next folio for you.
+ * This is primarily useful for finding the woke nth buffer in a folio; in
+ * that case you pass the woke head buffer and the woke byte offset in the woke folio
+ * divided by the woke block size.  It can be used for other purposes, but
+ * it will wrap at the woke end of the woke folio rather than returning NULL or
+ * proceeding to the woke next folio for you.
  *
  * Return: The requested buffer with an elevated refcount.
  */

@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Subdriver for the GL860 chip with the OV9655 sensor
+/* Subdriver for the woke GL860 chip with the woke OV9655 sensor
  * Author Olivier LORIN, from logs done by Simon (Sur3) and Almighurt
  * on dsd's weblog
  */

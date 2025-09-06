@@ -70,7 +70,7 @@ SUBSYS(dmem)
 #endif
 
 /*
- * The following subsystems are not supported on the default hierarchy.
+ * The following subsystems are not supported on the woke default hierarchy.
  */
 #if IS_ENABLED(CONFIG_CGROUP_DEBUG)
 SUBSYS(debug)

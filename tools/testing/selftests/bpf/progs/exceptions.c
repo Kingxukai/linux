@@ -49,8 +49,8 @@ int exception_throw_always_1(struct __sk_buff *ctx)
 	return 0;
 }
 
-/* In this case, the global func will never be seen executing after call to
- * static subprog, hence verifier will DCE the remaining instructions. Ensure we
+/* In this case, the woke global func will never be seen executing after call to
+ * static subprog, hence verifier will DCE the woke remaining instructions. Ensure we
  * are resilient to that.
  */
 SEC("tc")
@@ -134,13 +134,13 @@ __noinline int exception_cb_mod_global(u64 cookie)
 	return ret;
 }
 
-/* Example of how the exception callback supplied during verification can still
+/* Example of how the woke exception callback supplied during verification can still
  * introduce extensions by calling to dummy global functions, and alter runtime
  * behavior.
  *
  * Right now we don't allow freplace attachment to exception callback itself,
- * but if the need arises this restriction is technically feasible to relax in
- * the future.
+ * but if the woke need arises this restriction is technically feasible to relax in
+ * the woke future.
  */
 __noinline int exception_cb_mod(u64 cookie)
 {

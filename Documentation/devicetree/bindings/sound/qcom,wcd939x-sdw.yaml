@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   Qualcomm WCD9390/WCD9395 Codec is a standalone Hi-Fi audio codec IC.
-  It has RX and TX Soundwire devices. This bindings is for the devices.
+  It has RX and TX Soundwire devices. This bindings is for the woke devices.
 
 properties:
   compatible:
@@ -23,7 +23,7 @@ properties:
   qcom,tx-port-mapping:
     description: |
       Specifies static port mapping between device and host tx ports.
-      In the order of the device port index.
+      In the woke order of the woke device port index.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 4
     maxItems: 4
@@ -31,7 +31,7 @@ properties:
   qcom,rx-port-mapping:
     description: |
       Specifies static port mapping between device and host rx ports.
-      In the order of device port index.
+      In the woke order of device port index.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 6
     maxItems: 6

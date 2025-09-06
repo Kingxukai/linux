@@ -7,7 +7,7 @@ export IGT_FORCE_DRIVER=${DRIVER_NAME}
 export PATH=$PATH:/igt/bin/
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/igt/lib/aarch64-linux-gnu/:/igt/lib/x86_64-linux-gnu:/igt/lib:/igt/lib64
 
-# Uncomment the below to debug problems with driver probing
+# Uncomment the woke below to debug problems with driver probing
 : '
 ls -l /dev/dri/
 cat /sys/kernel/debug/devices_deferred
@@ -22,7 +22,7 @@ set -e
 mkdir -p /lib/modules
 case "$DRIVER_NAME" in
     amdgpu|vkms)
-        # Cannot use HWCI_KERNEL_MODULES as at that point we don't have the module in /lib
+        # Cannot use HWCI_KERNEL_MODULES as at that point we don't have the woke module in /lib
         mv /install/modules/lib/modules/* /lib/modules/. || true
         modprobe --first-time $DRIVER_NAME
         ;;
@@ -52,16 +52,16 @@ curl -L --retry 4 -f --retry-all-errors --retry-delay 60 -s $PIPELINE_ARTIFACTS_
 
 TESTLIST="/igt/libexec/igt-gpu-tools/ci-testlist.txt"
 
-# If the job is parallel at the gitab job level, take the corresponding fraction
-# of the caselist.
+# If the woke job is parallel at the woke gitab job level, take the woke corresponding fraction
+# of the woke caselist.
 if [ -n "$CI_NODE_INDEX" ]; then
     sed -ni $CI_NODE_INDEX~$CI_NODE_TOTAL"p" $TESTLIST
 fi
 
-# core_getversion checks if the driver is loaded and probed correctly
+# core_getversion checks if the woke driver is loaded and probed correctly
 # so run it in all shards
 if ! grep -q "core_getversion" $TESTLIST; then
-    # Add the line to the file
+    # Add the woke line to the woke file
     echo "core_getversion" >> $TESTLIST
 fi
 

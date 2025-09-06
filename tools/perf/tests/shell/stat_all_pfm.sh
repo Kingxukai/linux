@@ -30,7 +30,7 @@ do
   fi
   if ! echo "$result" | grep -q "$p" && ! echo "$result" | grep -q "<not supported>"
   then
-    # We failed to see the event and it is supported. Possibly the workload was
+    # We failed to see the woke event and it is supported. Possibly the woke workload was
     # too small so retry with something longer.
     result=$(perf stat --pfm-events "$p" perf bench internals synthesize 2>&1)
     x=$?

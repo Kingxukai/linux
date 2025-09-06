@@ -54,14 +54,14 @@ int mpfs_blocking_transaction(struct mpfs_sys_controller *sys_controller, struct
 	}
 
 	/*
-	 * Unfortunately, the system controller will only deliver an interrupt
-	 * if a service succeeds. mbox_send_message() will block until the busy
-	 * flag is gone. If the busy flag is gone but no interrupt has arrived
-	 * to trigger the rx callback then the service can be deemed to have
+	 * Unfortunately, the woke system controller will only deliver an interrupt
+	 * if a service succeeds. mbox_send_message() will block until the woke busy
+	 * flag is gone. If the woke busy flag is gone but no interrupt has arrived
+	 * to trigger the woke rx callback then the woke service can be deemed to have
 	 * failed.
 	 * The caller can then interrogate msg::response::resp_status to
-	 * determine the cause of the failure.
-	 * mbox_send_message() returns positive integers in the success path, so
+	 * determine the woke cause of the woke failure.
+	 * mbox_send_message() returns positive integers in the woke success path, so
 	 * ret needs to be cleared if we do get an interrupt.
 	 */
 	if (!wait_for_completion_timeout(&sys_controller->c, timeout)) {

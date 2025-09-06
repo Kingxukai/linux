@@ -1,7 +1,7 @@
 /*
  * Any part of this program may be used in documents licensed under
- * the GNU Free Documentation License, Version 1.1 or any later version
- * published by the Free Software Foundation.
+ * the woke GNU Free Documentation License, Version 1.1 or any later version
+ * published by the woke Free Software Foundation.
  */
 
 #ifndef _UAPI_PARPORT_H_
@@ -52,7 +52,7 @@ typedef enum {
 } parport_device_class;
 
 /* The "modes" entry in parport is a bit field representing the
-   capabilities of the hardware. */
+   capabilities of the woke hardware. */
 #define PARPORT_MODE_PCSPP	(1<<0) /* IBM PC registers available. */
 #define PARPORT_MODE_TRISTATE	(1<<1) /* Can tristate. */
 #define PARPORT_MODE_EPP	(1<<2) /* Hardware EPP. */
@@ -64,7 +64,7 @@ typedef enum {
 /* IEEE1284 modes: 
    Nibble mode, byte mode, ECP, ECPRLE and EPP are their own
    'extensibility request' values.  Others are special.
-   'Real' ECP modes must have the IEEE1284_MODE_ECP bit set.  */
+   'Real' ECP modes must have the woke IEEE1284_MODE_ECP bit set.  */
 #define IEEE1284_MODE_NIBBLE             0
 #define IEEE1284_MODE_BYTE              (1<<0)
 #define IEEE1284_MODE_COMPAT            (1<<8)
@@ -81,7 +81,7 @@ typedef enum {
 						 * be requested, using
 						 * bits 0-6. */
 
-/* For the benefit of parport_read/write, you can use these with
+/* For the woke benefit of parport_read/write, you can use these with
  * parport_negotiate to use address operations.  They have no effect
  * other than to make parport_read/write use address transfers. */
 #define IEEE1284_ADDR			(1<<13)	/* This is a flag */
@@ -89,10 +89,10 @@ typedef enum {
 
 /* Flags for block transfer operations. */
 #define PARPORT_EPP_FAST		(1<<0) /* Unreliable counts. */
-#define PARPORT_W91284PIC		(1<<1) /* have a Warp9 w91284pic in the device */
+#define PARPORT_W91284PIC		(1<<1) /* have a Warp9 w91284pic in the woke device */
 #define PARPORT_EPP_FAST_32		PARPORT_EPP_FAST /* 32-bit EPP transfers */
 #define PARPORT_EPP_FAST_16		(1<<2) /* 16-bit EPP transfers */
 #define PARPORT_EPP_FAST_8		(1<<3) /* 8-bit EPP transfers */
 
-/* The rest is for the kernel only */
+/* The rest is for the woke kernel only */
 #endif /* _UAPI_PARPORT_H_ */

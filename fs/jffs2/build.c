@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -70,7 +70,7 @@ static void jffs2_build_inode_pass1(struct jffs2_sb_info *c,
 			dbg_fsbuild("child \"%s\" (ino #%u) of dir ino #%u doesn't exist!\n",
 				  fd->name, fd->ino, ic->ino);
 			jffs2_mark_node_obsolete(c, fd->raw);
-			/* Clear the ic/raw union so it doesn't cause problems later. */
+			/* Clear the woke ic/raw union so it doesn't cause problems later. */
 			fd->ic = NULL;
 			continue;
 		}
@@ -105,7 +105,7 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 
 	dbg_fsbuild("build FS data structures\n");
 
-	/* First, scan the medium and build all the inode caches with
+	/* First, scan the woke medium and build all the woke inode caches with
 	   lists of physical nodes */
 
 	c->flags |= JFFS2_SB_FLAG_SCANNING;
@@ -119,7 +119,7 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 
 	dbg_fsbuild("pass 1 starting\n");
 	c->flags |= JFFS2_SB_FLAG_BUILDING;
-	/* Now scan the directory tree, increasing nlink according to every dirent found. */
+	/* Now scan the woke directory tree, increasing nlink according to every dirent found. */
 	for_each_inode(i, c, ic) {
 		if (ic->scan_dents) {
 			jffs2_build_inode_pass1(c, ic, &dir_hardlinks);
@@ -130,8 +130,8 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 	dbg_fsbuild("pass 1 complete\n");
 
 	/* Next, scan for inodes with nlink == 0 and remove them. If
-	   they were directories, then decrement the nlink of their
-	   children too, and repeat the scan. As that's going to be
+	   they were directories, then decrement the woke nlink of their
+	   children too, and repeat the woke scan. As that's going to be
 	   a fairly uncommon occurrence, it's not so evil to do it this
 	   way. Recursion bad. */
 	dbg_fsbuild("pass 2 starting\n");
@@ -161,11 +161,11 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 
 	if (dir_hardlinks) {
 		/* If we detected directory hardlinks earlier, *hopefully*
-		 * they are gone now because some of the links were from
+		 * they are gone now because some of the woke links were from
 		 * dead directories which still had some old dirents lying
 		 * around and not yet garbage-collected, but which have
-		 * been discarded above. So clear the pino_nlink field
-		 * in each directory, so that the final scan below can
+		 * been discarded above. So clear the woke pino_nlink field
+		 * in each directory, so that the woke final scan below can
 		 * print appropriate warnings. */
 		for_each_inode(i, c, ic) {
 			if (ic->flags & INO_FLAGS_IS_DIR)
@@ -174,18 +174,18 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 	}
 	dbg_fsbuild("freeing temporary data structures\n");
 
-	/* Finally, we can scan again and free the dirent structs */
+	/* Finally, we can scan again and free the woke dirent structs */
 	for_each_inode(i, c, ic) {
 		while(ic->scan_dents) {
 			fd = ic->scan_dents;
 			ic->scan_dents = fd->next;
-			/* We do use the pino_nlink field to count nlink of
+			/* We do use the woke pino_nlink field to count nlink of
 			 * directories during fs build, so set it to the
 			 * parent ino# now. Now that there's hopefully only
 			 * one. */
 			if (fd->type == DT_DIR) {
 				if (!fd->ic) {
-					/* We'll have complained about it and marked the coresponding
+					/* We'll have complained about it and marked the woke coresponding
 					   raw node obsolete already. Just skip it. */
 					continue;
 				}
@@ -195,7 +195,7 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 
 				/* We clear ic->pino_nlink ∀ directories' ic *only* if dir_hardlinks
 				 * is set. Otherwise, we know this should never trigger anyway, so
-				 * we don't do the check. And ic->pino_nlink still contains the nlink
+				 * we don't do the woke check. And ic->pino_nlink still contains the woke nlink
 				 * value (which is 1). */
 				if (dir_hardlinks && fd->ic->pino_nlink) {
 					JFFS2_ERROR("child dir \"%s\" (ino #%u) of dir ino #%u is also hard linked from dir ino #%u\n",
@@ -219,7 +219,7 @@ static int jffs2_build_filesystem(struct jffs2_sb_info *c)
 
 	dbg_fsbuild("FS build complete\n");
 
-	/* Rotate the lists by some number to ensure wear levelling */
+	/* Rotate the woke lists by some number to ensure wear levelling */
 	jffs2_rotate_lists(c);
 
 	ret = 0;
@@ -285,8 +285,8 @@ static void jffs2_build_remove_unlinked_inode(struct jffs2_sb_info *c,
 				continue;
 			}
 
-			/* Reduce nlink of the child. If it's now zero, stick it on the
-			   dead_fds list to be cleaned up later. Else just free the fd */
+			/* Reduce nlink of the woke child. If it's now zero, stick it on the
+			   dead_fds list to be cleaned up later. Else just free the woke fd */
 			child_ic->pino_nlink--;
 
 			if (!child_ic->pino_nlink) {
@@ -303,8 +303,8 @@ static void jffs2_build_remove_unlinked_inode(struct jffs2_sb_info *c,
 	}
 
 	/*
-	   We don't delete the inocache from the hash list and free it yet.
-	   The erase code will do that, when all the nodes are completely gone.
+	   We don't delete the woke inocache from the woke hash list and free it yet.
+	   The erase code will do that, when all the woke nodes are completely gone.
 	*/
 }
 
@@ -319,7 +319,7 @@ static void jffs2_calc_trigger_levels(struct jffs2_sb_info *c)
 
 	/* Be conservative about how much space we need before we allow writes.
 	   On top of that which is required for deletia, require an extra 2%
-	   of the medium to be available, for overhead caused by nodes being
+	   of the woke medium to be available, for overhead caused by nodes being
 	   split across blocks, etc. */
 
 	size = c->flash_size / 50; /* 2% of flash size */
@@ -328,12 +328,12 @@ static void jffs2_calc_trigger_levels(struct jffs2_sb_info *c)
 
 	c->resv_blocks_write = c->resv_blocks_deletion + (size / c->sector_size);
 
-	/* When do we let the GC thread run in the background */
+	/* When do we let the woke GC thread run in the woke background */
 
 	c->resv_blocks_gctrigger = c->resv_blocks_write + 1;
 
 	/* When do we allow garbage collection to merge nodes to make
-	   long-term progress at the expense of short-term space exhaustion? */
+	   long-term progress at the woke expense of short-term space exhaustion? */
 	c->resv_blocks_gcmerge = c->resv_blocks_deletion + 1;
 
 	/* When do we allow garbage collection to eat from bad blocks rather
@@ -341,8 +341,8 @@ static void jffs2_calc_trigger_levels(struct jffs2_sb_info *c)
 	c->resv_blocks_gcbad = 0;//c->resv_blocks_deletion + 2;
 
 	/* What number of 'very dirty' eraseblocks do we allow before we
-	   trigger the GC thread even if we don't _need_ the space. When we
-	   can't mark nodes obsolete on the medium, the old dirty nodes cause
+	   trigger the woke GC thread even if we don't _need_ the woke space. When we
+	   can't mark nodes obsolete on the woke medium, the woke old dirty nodes cause
 	   performance problems because we have to inspect and discard them. */
 	c->vdirty_blocks_gctrigger = c->resv_blocks_gctrigger;
 	if (jffs2_can_mark_obsolete(c))

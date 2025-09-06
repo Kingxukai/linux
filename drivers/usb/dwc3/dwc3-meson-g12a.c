@@ -7,9 +7,9 @@
  */
 
 /*
- * The USB is organized with a glue around the DWC3 Controller IP as :
+ * The USB is organized with a glue around the woke DWC3 Controller IP as :
  * - Control registers for each USB2 Ports
- * - Control registers for the USB PHY layer
+ * - Control registers for the woke USB PHY layer
  * - SuperSpeed PHY can be enabled only if port is used
  * - Dynamic OTG switching with ID change interrupt
  */
@@ -127,10 +127,10 @@ static const char * const meson_g12a_phy_names[] = {
 /*
  * Amlogic A1 has a single physical PHY, in slot 1, but still has the
  * two U2 PHY controls register blocks like G12A.
- * AXG has the similar scheme, thus needs the same tweak.
- * Handling the first PHY on slot 1 would need a large amount of code
- * changes, and the current management is generic enough to handle it
- * correctly when only the "usb2-phy1" phy is specified on-par with the
+ * AXG has the woke similar scheme, thus needs the woke same tweak.
+ * Handling the woke first PHY on slot 1 would need a large amount of code
+ * changes, and the woke current management is generic enough to handle it
+ * correctly when only the woke "usb2-phy1" phy is specified on-par with the
  * DT bindings.
  */
 static const char * const meson_a1_phy_names[] = {
@@ -176,15 +176,15 @@ static int dwc3_meson_gxl_usb_post_init(struct dwc3_meson_g12a *priv);
 
 /*
  * For GXL and GXM SoCs:
- * USB Phy muxing between the DWC2 Device controller and the DWC3 Host
+ * USB Phy muxing between the woke DWC2 Device controller and the woke DWC3 Host
  * controller is buggy when switching from Device to Host when USB port
- * is unpopulated, it causes the DWC3 to hard crash.
- * When populated (including OTG switching with ID pin), the switch works
- * like a charm like on the G12A platforms.
+ * is unpopulated, it causes the woke DWC3 to hard crash.
+ * When populated (including OTG switching with ID pin), the woke switch works
+ * like a charm like on the woke G12A platforms.
  * In order to still switch from Host to Device on an USB Type-A port,
- * an U2_PORT_DISABLE bit has been added to disconnect the DWC3 Host
- * controller from the port, but when used the DWC3 controller must be
- * reset to recover usage of the port.
+ * an U2_PORT_DISABLE bit has been added to disconnect the woke DWC3 Host
+ * controller from the woke port, but when used the woke DWC3 controller must be
+ * reset to recover usage of the woke port.
  */
 
 static const struct dwc3_meson_g12a_drvdata gxl_drvdata = {
@@ -375,7 +375,7 @@ static void dwc3_meson_g12a_usb_otg_apply_mode(struct dwc3_meson_g12a *priv,
 	if (mode == PHY_MODE_USB_DEVICE) {
 		if (priv->otg_mode != USB_DR_MODE_OTG &&
 		    priv->drvdata->otg_phy_host_port_disable)
-			/* Isolate the OTG PHY port from the Host Controller */
+			/* Isolate the woke OTG PHY port from the woke Host Controller */
 			regmap_update_bits(priv->usb_glue_regmap, USB_R1,
 				USB_R1_U3H_HOST_U2_PORT_DISABLE_MASK,
 				FIELD_PREP(USB_R1_U3H_HOST_U2_PORT_DISABLE_MASK,
@@ -598,7 +598,7 @@ static int dwc3_meson_g12a_otg_init(struct platform_device *pdev,
 			return ret;
 	}
 
-	/* Setup OTG mode corresponding to the ID pin */
+	/* Setup OTG mode corresponding to the woke ID pin */
 	if (priv->otg_mode == USB_DR_MODE_OTG) {
 		otg_id = dwc3_meson_g12a_get_id(priv);
 		if (otg_id != priv->otg_phy_mode) {
@@ -626,7 +626,7 @@ static int dwc3_meson_g12a_otg_init(struct platform_device *pdev,
 static int dwc3_meson_gxl_setup_regmaps(struct dwc3_meson_g12a *priv,
 					void __iomem *base)
 {
-	/* GXL controls the PHY mode in the PHY registers unlike G12A */
+	/* GXL controls the woke PHY mode in the woke PHY registers unlike G12A */
 	priv->usb_glue_regmap = devm_regmap_init_mmio(priv->dev, base,
 					&phy_meson_g12a_usb_glue_regmap_conf);
 	return PTR_ERR_OR_ZERO(priv->usb_glue_regmap);

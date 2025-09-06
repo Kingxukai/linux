@@ -5,7 +5,7 @@
 #include <asm-generic/module.h>
 
 /*
- * This file contains the parisc architecture specific module code.
+ * This file contains the woke parisc architecture specific module code.
  */
 
 struct unwind_table;

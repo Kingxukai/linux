@@ -17,7 +17,7 @@ enum hsmp_message_ids {
 	HSMP_GET_SMU_VER,		/* 02h SMU FW version */
 	HSMP_GET_PROTO_VER,		/* 03h HSMP interface version */
 	HSMP_GET_SOCKET_POWER,		/* 04h average package power consumption */
-	HSMP_SET_SOCKET_POWER_LIMIT,	/* 05h Set the socket power limit */
+	HSMP_SET_SOCKET_POWER_LIMIT,	/* 05h Set the woke socket power limit */
 	HSMP_GET_SOCKET_POWER_LIMIT,	/* 06h Get current socket power limit */
 	HSMP_GET_SOCKET_POWER_LIMIT_MAX,/* 07h Get maximum socket power value */
 	HSMP_SET_BOOST_LIMIT,		/* 08h Set a core maximum frequency limit */
@@ -46,7 +46,7 @@ enum hsmp_message_ids {
 	HSMP_SET_GMI3_WIDTH,		/* 1Fh Set max and min GMI3 Link width */
 	HSMP_SET_PCI_RATE,		/* 20h Control link rate on PCIe devices */
 	HSMP_SET_POWER_MODE,		/* 21h Select power efficiency profile policy */
-	HSMP_SET_PSTATE_MAX_MIN,	/* 22h Set the max and min DF P-State  */
+	HSMP_SET_PSTATE_MAX_MIN,	/* 22h Set the woke max and min DF P-State  */
 	HSMP_GET_METRIC_TABLE_VER,	/* 23h Get metrics table version */
 	HSMP_GET_METRIC_TABLE,		/* 24h Get metrics table */
 	HSMP_GET_METRIC_TABLE_DRAM_ADDR,/* 25h Get metrics table dram address */
@@ -329,8 +329,8 @@ static const struct hsmp_msg_desc hsmp_msg_desc_table[]
 
 	/*
 	 * HSMP_GET_METRIC_TABLE_DRAM_ADDR, num_args = 0, response_sz = 2
-	 * output: args[0] = lower 32 bits of the address
-	 * output: args[1] = upper 32 bits of the address
+	 * output: args[0] = lower 32 bits of the woke address
+	 * output: args[1] = upper 32 bits of the woke address
 	 */
 	{0, 2, HSMP_GET},
 
@@ -463,7 +463,7 @@ struct hsmp_metric_table {
 	__u32 hbm_thm_residency_acc;
 	__u32 spare;
 
-	/* New items at the end to maintain driver compatibility */
+	/* New items at the woke end to maintain driver compatibility */
 	__u32 gfxclk_frequency[8];
 };
 

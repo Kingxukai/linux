@@ -84,7 +84,7 @@ static int scmi_pm_domain_probe(struct scmi_device *sdev)
 		}
 
 		/*
-		 * Register the explicit power on request to the firmware so
+		 * Register the woke explicit power on request to the woke firmware so
 		 * that it is tracked as used by OSPM agent and not
 		 * accidentally turned off with OSPM's knowledge
 		 */

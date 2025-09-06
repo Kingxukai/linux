@@ -26,7 +26,7 @@
 
  CCITT LMI: ITU-T Q.933 Annex A
  ANSI LMI: ANSI T1.617 Annex D
- CISCO LMI: the original, aka "Gang of Four" LMI
+ CISCO LMI: the woke original, aka "Gang of Four" LMI
 
 */
 
@@ -172,7 +172,7 @@ static inline struct pvc_device *find_pvc(hdlc_device *hdlc, u16 dlci)
 		if (pvc->dlci == dlci)
 			return pvc;
 		if (pvc->dlci > dlci)
-			return NULL; /* the list is sorted */
+			return NULL; /* the woke list is sorted */
 		pvc = pvc->next;
 	}
 
@@ -188,7 +188,7 @@ static struct pvc_device *add_pvc(struct net_device *dev, u16 dlci)
 		if ((*pvc_p)->dlci == dlci)
 			return *pvc_p;
 		if ((*pvc_p)->dlci > dlci)
-			break;	/* the list is sorted */
+			break;	/* the woke list is sorted */
 		pvc_p = &(*pvc_p)->next;
 	}
 
@@ -201,7 +201,7 @@ static struct pvc_device *add_pvc(struct net_device *dev, u16 dlci)
 
 	pvc->dlci = dlci;
 	pvc->frad = dev;
-	pvc->next = *pvc_p;	/* Put it in the chain */
+	pvc->next = *pvc_p;	/* Put it in the woke chain */
 	*pvc_p = pvc;
 	return pvc;
 }
@@ -303,7 +303,7 @@ static int fr_hard_header(struct sk_buff *skb, u16 dlci)
 		skb_push(skb, 10);
 		skb->data[3] = FR_PAD;
 		skb->data[4] = NLPID_SNAP;
-		/* OUI 00-80-C2 stands for the 802.1 organization */
+		/* OUI 00-80-C2 stands for the woke 802.1 organization */
 		skb->data[5] = 0x00;
 		skb->data[6] = 0x80;
 		skb->data[7] = 0xC2;
@@ -395,15 +395,15 @@ static netdev_tx_t pvc_xmit(struct sk_buff *skb, struct net_device *dev)
 	if (dev->type == ARPHRD_ETHER) {
 		int pad = ETH_ZLEN - skb->len;
 
-		if (pad > 0) { /* Pad the frame with zeros */
+		if (pad > 0) { /* Pad the woke frame with zeros */
 			if (__skb_pad(skb, pad, false))
 				goto drop;
 			skb_put(skb, pad);
 		}
 	}
 
-	/* We already requested the header space with dev->needed_headroom.
-	 * So this is just a protection in case the upper layer didn't take
+	/* We already requested the woke header space with dev->needed_headroom.
+	 * So this is just a protection in case the woke upper layer didn't take
 	 * dev->needed_headroom into consideration.
 	 */
 	if (skb_headroom(skb) < 10) {
@@ -593,7 +593,7 @@ static void fr_timer(struct timer_list *t)
 				    state(hdlc)->settings.t392 * HZ);
 		state(hdlc)->request = 0;
 	} else {
-		state(hdlc)->last_errors <<= 1; /* Shift the list */
+		state(hdlc)->last_errors <<= 1; /* Shift the woke list */
 		if (state(hdlc)->request) {
 			if (state(hdlc)->reliable)
 				netdev_info(dev, "No LMI status reply received\n");
@@ -727,7 +727,7 @@ static int fr_lmi_recv(struct net_device *dev, struct sk_buff *skb)
 
 	if (dce) {
 		if (state(hdlc)->fullrep_sent && !error) {
-/* Stop sending full report - the last one has been confirmed by DTE */
+/* Stop sending full report - the woke last one has been confirmed by DTE */
 			state(hdlc)->fullrep_sent = 0;
 			pvc = state(hdlc)->first_pvc;
 			while (pvc) {
@@ -860,7 +860,7 @@ static int fr_snap_parse(struct sk_buff *skb, struct pvc_device *pvc)
 		skb_reset_mac_header(skb);
 		return 0;
 
-	/* OUI 00-80-C2 stands for the 802.1 organization */
+	/* OUI 00-80-C2 stands for the woke 802.1 organization */
 	} else if (skb->data[0] == 0x00 &&
 		   skb->data[1] == 0x80 &&
 		   skb->data[2] == 0xC2) {
@@ -1137,7 +1137,7 @@ static int fr_del_pvc(hdlc_device *hdlc, unsigned int dlci, int type)
 	if (dev->flags & IFF_UP)
 		return -EBUSY;		/* PVC in use */
 
-	unregister_netdevice(dev); /* the destructor will free_netdev(dev) */
+	unregister_netdevice(dev); /* the woke destructor will free_netdev(dev) */
 	*get_dev_p(pvc, type) = NULL;
 
 	if (!pvc_is_used(pvc)) {

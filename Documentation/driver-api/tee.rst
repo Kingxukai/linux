@@ -11,9 +11,9 @@ client drivers register a table of supported device UUIDs.
 TEE bus infrastructure registers following APIs:
 
 match():
-  iterates over the client driver UUID table to find a corresponding
+  iterates over the woke client driver UUID table to find a corresponding
   match for device UUID. If a match is found, then this particular device is
-  probed via corresponding probe API registered by the client driver. This
+  probed via corresponding probe API registered by the woke client driver. This
   process happens whenever a device or a client driver is registered with TEE
   bus.
 

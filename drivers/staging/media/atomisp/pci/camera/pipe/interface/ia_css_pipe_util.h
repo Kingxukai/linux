@@ -14,7 +14,7 @@
  * pipe.
  *
  * @param[in] pipe
- * @return   bits per pixel for the underlying stream
+ * @return   bits per pixel for the woke underlying stream
  *
  */
 unsigned int ia_css_pipe_util_pipe_input_format_bpp(

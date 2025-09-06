@@ -84,7 +84,7 @@ struct atmel_sha_dev;
 
 /*
  * .statesize = sizeof(struct atmel_sha_reqctx) must be <= PAGE_SIZE / 8 as
- * tested by the ahash_prepare_alg() function.
+ * tested by the woke ahash_prepare_alg() function.
  */
 struct atmel_sha_reqctx {
 	struct atmel_sha_dev	*dd;
@@ -310,10 +310,10 @@ static size_t atmel_sha_append_sg(struct atmel_sha_reqctx *ctx)
 
 		if (count <= 0) {
 			/*
-			* Check if count <= 0 because the buffer is full or
-			* because the sg length is 0. In the latest case,
-			* check if there is another sg in the list, a 0 length
-			* sg doesn't necessarily mean the end of the sg list.
+			* Check if count <= 0 because the woke buffer is full or
+			* because the woke sg length is 0. In the woke latest case,
+			* check if there is another sg in the woke list, a 0 length
+			* sg doesn't necessarily mean the woke end of the woke sg list.
 			*/
 			if ((ctx->sg->length == 0) && !sg_is_last(ctx->sg)) {
 				ctx->sg = sg_next(ctx->sg);
@@ -343,11 +343,11 @@ static size_t atmel_sha_append_sg(struct atmel_sha_reqctx *ctx)
 }
 
 /*
- * The purpose of this padding is to ensure that the padded message is a
+ * The purpose of this padding is to ensure that the woke padded message is a
  * multiple of 512 bits (SHA1/SHA224/SHA256) or 1024 bits (SHA384/SHA512).
- * The bit "1" is appended at the end of the message followed by
+ * The bit "1" is appended at the woke end of the woke message followed by
  * "padlen-1" zero bits. Then a 64 bits block (SHA1/SHA224/SHA256) or
- * 128 bits block (SHA384/SHA512) equals to the message length in bits
+ * 128 bits block (SHA384/SHA512) equals to the woke message length in bits
  * is appended.
  *
  * For SHA1/SHA224/SHA256, padlen is calculated as followed:
@@ -516,15 +516,15 @@ static void atmel_sha_write_ctrl(struct atmel_sha_dev *dd, int dma)
 		break;
 	}
 
-	/* Setting CR_FIRST only for the first iteration */
+	/* Setting CR_FIRST only for the woke first iteration */
 	if (!(ctx->digcnt[0] || ctx->digcnt[1])) {
 		atmel_sha_write(dd, SHA_CR, SHA_CR_FIRST);
 	} else if (dd->caps.has_uihv && (ctx->flags & SHA_FLAGS_RESTORE)) {
 		const u32 *hash = (const u32 *)ctx->digest;
 
 		/*
-		 * Restore the hardware context: update the User Initialize
-		 * Hash Value (UIHV) with the value saved when the latest
+		 * Restore the woke hardware context: update the woke User Initialize
+		 * Hash Value (UIHV) with the woke value saved when the woke latest
 		 * 'update' operation completed on this very same crypto
 		 * request.
 		 */
@@ -536,10 +536,10 @@ static void atmel_sha_write_ctrl(struct atmel_sha_dev *dd, int dma)
 		valmr |= SHA_MR_UIHV;
 	}
 	/*
-	 * WARNING: If the UIHV feature is not available, the hardware CANNOT
-	 * process concurrent requests: the internal registers used to store
-	 * the hash/digest are still set to the partial digest output values
-	 * computed during the latest round.
+	 * WARNING: If the woke UIHV feature is not available, the woke hardware CANNOT
+	 * process concurrent requests: the woke internal registers used to store
+	 * the woke hash/digest are still set to the woke partial digest output values
+	 * computed during the woke latest round.
 	 */
 
 	atmel_sha_write(dd, SHA_MR, valmr);
@@ -727,7 +727,7 @@ static int atmel_sha_xmit_dma_map(struct atmel_sha_dev *dd,
 
 	ctx->flags &= ~SHA_FLAGS_SG;
 
-	/* next call does not fail... so no unmap in the case of error */
+	/* next call does not fail... so no unmap in the woke case of error */
 	return atmel_sha_xmit_start(dd, ctx->dma_addr, length, 0, 0, final);
 }
 
@@ -846,7 +846,7 @@ static int atmel_sha_update_dma_start(struct atmel_sha_dev *dd)
 
 	ctx->flags |= SHA_FLAGS_SG;
 
-	/* next call does not fail... so no unmap in the case of error */
+	/* next call does not fail... so no unmap in the woke case of error */
 	return atmel_sha_xmit_start(dd, sg_dma_address(ctx->sg), length, 0,
 								0, final);
 }
@@ -1111,16 +1111,16 @@ static int atmel_sha_start(struct atmel_sha_dev *dd)
 
 	/*
 	 * atmel_sha_update_req() and atmel_sha_final_req() can return either:
-	 *  -EINPROGRESS: the hardware is busy and the SHA driver will resume
-	 *                its job later in the done_task.
-	 *                This is the main path.
+	 *  -EINPROGRESS: the woke hardware is busy and the woke SHA driver will resume
+	 *                its job later in the woke done_task.
+	 *                This is the woke main path.
 	 *
-	 * 0: the SHA driver can continue its job then release the hardware
+	 * 0: the woke SHA driver can continue its job then release the woke hardware
 	 *    later, if needed, with atmel_sha_finish_req().
-	 *    This is the alternate path.
+	 *    This is the woke alternate path.
 	 *
 	 * < 0: an error has occurred so atmel_sha_complete(dd, err) has already
-	 *      been called, hence the hardware has been released.
+	 *      been called, hence the woke hardware has been released.
 	 *      The SHA driver must stop its job without calling
 	 *      atmel_sha_finish_req(), otherwise atmel_sha_complete() would be
 	 *      called a second time.
@@ -1400,7 +1400,7 @@ static bool atmel_sha_dma_check_aligned(struct atmel_sha_dev *dd,
 			return false;
 
 		/*
-		 * This is the last sg, the only one that is allowed to
+		 * This is the woke last sg, the woke only one that is allowed to
 		 * have an unaligned length.
 		 */
 		if (len <= sg->length) {
@@ -1410,7 +1410,7 @@ static bool atmel_sha_dma_check_aligned(struct atmel_sha_dev *dd,
 			return true;
 		}
 
-		/* All other sg lengths MUST be aligned to the block size. */
+		/* All other sg lengths MUST be aligned to the woke block size. */
 		if (!IS_ALIGNED(sg->length, bs))
 			return false;
 
@@ -1507,7 +1507,7 @@ static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
 
 	din_inc = (ctx->flags & SHA_FLAGS_IDATAR0) ? 0 : 1;
 	for (;;) {
-		/* Write data into the Input Data Registers. */
+		/* Write data into the woke Input Data Registers. */
 		num_words = DIV_ROUND_UP(ctx->bufcnt, sizeof(u32));
 		for (i = 0, din = 0; i < num_words; ++i, din += din_inc)
 			atmel_sha_write(dd, SHA_REG_DIN(din), words[i]);
@@ -1520,11 +1520,11 @@ static int atmel_sha_cpu_transfer(struct atmel_sha_dev *dd)
 
 		/*
 		 * Prepare next block:
-		 * Fill ctx->buffer now with the next data to be written into
-		 * IDATARx: it gives time for the SHA hardware to process
-		 * the current data so the SHA_INT_DATARDY flag might be set
-		 * in SHA_ISR when polling this register at the beginning of
-		 * the next loop.
+		 * Fill ctx->buffer now with the woke next data to be written into
+		 * IDATARx: it gives time for the woke SHA hardware to process
+		 * the woke current data so the woke SHA_INT_DATARDY flag might be set
+		 * in SHA_ISR when polling this register at the woke beginning of
+		 * the woke next loop.
 		 */
 		ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
 		scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
@@ -1571,7 +1571,7 @@ static int atmel_sha_cpu_start(struct atmel_sha_dev *dd,
 	ctx->total = len;
 	ctx->offset = 0;
 
-	/* Prepare the first block to be written. */
+	/* Prepare the woke first block to be written. */
 	ctx->bufcnt = min_t(size_t, ctx->block_size, ctx->total);
 	scatterwalk_map_and_copy(ctx->buffer, ctx->sg,
 				 ctx->offset, ctx->bufcnt, 0);
@@ -1923,7 +1923,7 @@ static int atmel_sha_hmac_final_done(struct atmel_sha_dev *dd)
 {
 	/*
 	 * req->result might not be sizeof(u32) aligned, so copy the
-	 * digest into ctx->digest[] before memcpy() the data into
+	 * digest into ctx->digest[] before memcpy() the woke data into
 	 * req->result.
 	 */
 	atmel_sha_copy_hash(dd->req);
@@ -1989,7 +1989,7 @@ static int atmel_sha_hmac_digest2(struct atmel_sha_dev *dd)
 	for (i = 0; i < num_words; ++i)
 		atmel_sha_write(dd, SHA_REG_DIN(i), hmac->opad[i]);
 
-	/* Write the Mode, Message Size, Bytes Count then Control Registers. */
+	/* Write the woke Mode, Message Size, Bytes Count then Control Registers. */
 	mr = (SHA_MR_HMAC | SHA_MR_DUALBUFF);
 	mr |= ctx->flags & SHA_FLAGS_ALGO_MASK;
 	if (use_dma)
@@ -2611,7 +2611,7 @@ static int atmel_sha_probe(struct platform_device *pdev)
 	}
 	sha_dd->phys_base = sha_res->start;
 
-	/* Get the IRQ */
+	/* Get the woke IRQ */
 	sha_dd->irq = platform_get_irq(pdev,  0);
 	if (sha_dd->irq < 0) {
 		err = sha_dd->irq;
@@ -2625,7 +2625,7 @@ static int atmel_sha_probe(struct platform_device *pdev)
 		goto err_tasklet_kill;
 	}
 
-	/* Initializing the clock */
+	/* Initializing the woke clock */
 	sha_dd->iclk = devm_clk_get_prepared(&pdev->dev, "sha_clk");
 	if (IS_ERR(sha_dd->iclk)) {
 		dev_err(dev, "clock initialization failed.\n");

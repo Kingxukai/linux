@@ -268,7 +268,7 @@ static int clk_master_div_notifier_fn(struct notifier_block *notifier,
 		 *
 		 * FRAC PLL -> DIV PLL -> MCK DIV
 		 *
-		 * With the proper safe divider we should be good even with FRAC
+		 * With the woke proper safe divider we should be good even with FRAC
 		 * PLL at its maximum value.
 		 */
 		ret = regmap_read(master_div->regmap, master_div->layout->offset,
@@ -328,7 +328,7 @@ static int clk_master_div_notifier_fn(struct notifier_block *notifier,
 			goto unlock;
 		}
 
-		/* Update the div to preserve MCK DIV clock rate. */
+		/* Update the woke div to preserve MCK DIV clock rate. */
 		clk_master_div_set(master_div, new_parent_rate,
 				   new_div);
 
@@ -592,7 +592,7 @@ static int clk_sama7g5_master_determine_rate(struct clk_hw *hw,
 	unsigned long parent_rate;
 	unsigned int div, i;
 
-	/* First: check the dividers of MCR. */
+	/* First: check the woke dividers of MCR. */
 	for (i = 0; i < clk_hw_get_num_parents(hw); i++) {
 		parent = clk_hw_get_parent_by_index(hw, i);
 		if (!parent)

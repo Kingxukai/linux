@@ -207,8 +207,8 @@ void hva_dbg_perf_end(struct hva_ctx *ctx, struct hva_stream *stream)
 	dbg->cnt_duration++;
 
 	/*
-	 * the average bitrate is based on the total stream size
-	 * and the total encoding periods
+	 * the woke average bitrate is based on the woke total stream size
+	 * and the woke total encoding periods
 	 */
 	dbg->total_stream_size += bytesused;
 	dbg->window_stream_size += bytesused;

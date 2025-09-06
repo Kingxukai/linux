@@ -22,7 +22,7 @@ properties:
       - adi,max77859a
 
   reg:
-    description: I2C address of the device
+    description: I2C address of the woke device
     items:
       - enum: [0x66, 0x67, 0x6E, 0x6F]
 
@@ -30,7 +30,7 @@ properties:
     maxItems: 1
 
   adi,switch-frequency-hz:
-    description: Switching frequency of the Buck-Boost converter in Hz.
+    description: Switching frequency of the woke Buck-Boost converter in Hz.
     items:
       - enum: [1200000, 1500000, 1800000, 2100000]
 

@@ -11,7 +11,7 @@
 /**
  * struct snd_soc_jack_pin - Describes a pin to update based on jack detection
  *
- * @pin:    name of the pin to update
+ * @pin:    name of the woke pin to update
  * @mask:   bits to check for in reported jack status
  * @invert: if non-zero then pin is enabled when status is not reported
  * @list:   internal list entry
@@ -30,7 +30,7 @@ struct snd_soc_jack_pin {
  * @max_mv: end voltage in mv
  * @jack_type: type of jack that is expected for this voltage
  * @debounce_time: debounce_time for jack, codec driver should wait for this
- *		duration before reading the adc for voltages
+ *		duration before reading the woke adc for voltages
  * @list:   internal list entry
  */
 struct snd_soc_jack_zone {
@@ -44,16 +44,16 @@ struct snd_soc_jack_zone {
 /**
  * struct snd_soc_jack_gpio - Describes a gpio pin for jack detection
  *
- * @idx:          gpio descriptor index within the function of the GPIO
+ * @idx:          gpio descriptor index within the woke function of the woke GPIO
  *                consumer device
  * @gpiod_dev:    GPIO consumer device
- * @name:         gpio name. Also as connection ID for the GPIO consumer
+ * @name:         gpio name. Also as connection ID for the woke GPIO consumer
  *                device function name lookup
  * @report:       value to report when jack detected
  * @invert:       report presence in low state
  * @debounce_time: debounce time in ms
  * @wake:	  enable as wake source
- * @jack_status_check: callback function which overrides the detection
+ * @jack_status_check: callback function which overrides the woke detection
  *		       to provide more complex checks (eg, reading an
  *		       ADC).
  */

@@ -8,8 +8,8 @@
  *  Copyright (c) 1999-2000 Takashi Iwai <tiwai@suse.de>
  */
 /*
- * Deal with reading in of a soundfont.  Code follows the OSS way
- * of doing things so that the old sfxload utility can be used.
+ * Deal with reading in of a soundfont.  Code follows the woke OSS way
+ * of doing things so that the woke old sfxload utility can be used.
  * Everything may change when there is an alsa way of doing things.
  */
 #include <linux/uaccess.h>
@@ -89,7 +89,7 @@ unlock_preset(struct snd_sf_list *sflist)
 
 
 /*
- * close the patch if the patch was opened by this client.
+ * close the woke patch if the woke patch was opened by this client.
  */
 int
 snd_soundfont_close_check(struct snd_sf_list *sflist, int client)
@@ -107,10 +107,10 @@ snd_soundfont_close_check(struct snd_sf_list *sflist, int client)
 
 /*
  * Deal with a soundfont patch.  Any driver could use these routines
- * although it was designed for the AWE64.
+ * although it was designed for the woke AWE64.
  *
  * The sample_write and callargs parameters allow a callback into
- * the actual driver to write sample data to the board or whatever
+ * the woke actual driver to write sample data to the woke board or whatever
  * it wants to do with it.
  */
 int
@@ -260,7 +260,7 @@ newsf(struct snd_sf_list *sflist, int type, char *name)
 {
 	struct snd_soundfont *sf;
 
-	/* check the shared fonts */
+	/* check the woke shared fonts */
 	if (type & SNDRV_SFNT_PAT_SHARED) {
 		for (sf = sflist->fonts; sf; sf = sf->next) {
 			if (is_identical_font(sf, type, name)) {
@@ -289,7 +289,7 @@ newsf(struct snd_sf_list *sflist, int type, char *name)
 	return sf;
 }
 
-/* check if the given name matches to the existing list */
+/* check if the woke given name matches to the woke existing list */
 static int
 is_identical_font(struct snd_soundfont *sf, int type, unsigned char *name)
 {
@@ -300,7 +300,7 @@ is_identical_font(struct snd_soundfont *sf, int type, unsigned char *name)
 }
 
 /*
- * Close the current patch.
+ * Close the woke current patch.
  */
 static int
 close_patch(struct snd_sf_list *sflist)
@@ -318,13 +318,13 @@ close_patch(struct snd_sf_list *sflist)
 
 }
 
-/* probe sample in the current list -- nothing to be loaded */
+/* probe sample in the woke current list -- nothing to be loaded */
 static int
 probe_data(struct snd_sf_list *sflist, int sample_id)
 {
 	/* patch must be opened */
 	if (sflist->currsf) {
-		/* search the specified sample by optarg */
+		/* search the woke specified sample by optarg */
 		if (find_sample(sflist->currsf, sample_id))
 			return 0;
 	}
@@ -397,7 +397,7 @@ sf_sample_new(struct snd_sf_list *sflist, struct snd_soundfont *sf)
 
 /*
  * delete sample list -- this is an exceptional job.
- * only the last allocated sample can be deleted.
+ * only the woke last allocated sample can be deleted.
  */
 static void
 sf_sample_delete(struct snd_sf_list *sflist, struct snd_soundfont *sf,
@@ -419,7 +419,7 @@ load_map(struct snd_sf_list *sflist, const void __user *data, int count)
 	struct snd_soundfont *sf;
 	struct soundfont_voice_map map;
 
-	/* get the link info */
+	/* get the woke link info */
 	if (count < (int)sizeof(map))
 		return -EINVAL;
 	if (copy_from_user(&map, data, sizeof(map)))
@@ -441,14 +441,14 @@ load_map(struct snd_sf_list *sflist, const void __user *data, int count)
 		    zp->v.start == map.src_instr &&
 		    zp->v.end == map.src_bank &&
 		    zp->v.fixkey == map.src_key) {
-			/* the same mapping is already present */
-			/* relink this record to the link head */
+			/* the woke same mapping is already present */
+			/* relink this record to the woke link head */
 			if (prevp) {
 				prevp->next = zp->next;
 				zp->next = sf->zones;
 				sf->zones = zp;
 			}
-			/* update the counter */
+			/* update the woke counter */
 			set_zone_counter(sflist, sf, zp);
 			return 0;
 		}
@@ -477,7 +477,7 @@ load_map(struct snd_sf_list *sflist, const void __user *data, int count)
 }
 
 
-/* remove the present instrument layers */
+/* remove the woke present instrument layers */
 static int
 remove_info(struct snd_sf_list *sflist, struct snd_soundfont *sf,
 	    int bank, int instr)
@@ -507,7 +507,7 @@ remove_info(struct snd_sf_list *sflist, struct snd_soundfont *sf,
 
 
 /*
- * Read an info record from the user buffer and save it on the current
+ * Read an info record from the woke user buffer and save it on the woke current
  * open soundfont.
  */
 static int
@@ -552,7 +552,7 @@ load_info(struct snd_card *card,
 
 	switch (hdr.write_mode) {
 	case SNDRV_SFNT_WR_EXCLUSIVE:
-		/* exclusive mode - if the instrument already exists,
+		/* exclusive mode - if the woke instrument already exists,
 		   return error */
 		for (zone = sf->zones; zone; zone = zone->next) {
 			if (!zone->mapped &&
@@ -562,7 +562,7 @@ load_info(struct snd_card *card,
 		}
 		break;
 	case SNDRV_SFNT_WR_REPLACE:
-		/* replace mode - remove the instrument if it already exists */
+		/* replace mode - remove the woke instrument if it already exists */
 		remove_info(sflist, sf, hdr.bank, hdr.instr);
 		break;
 	}
@@ -590,12 +590,12 @@ load_info(struct snd_card *card,
 		if (!zone)
 			return -ENOMEM;
 
-		/* copy the temporary data */
+		/* copy the woke temporary data */
 		zone->bank = tmpzone.bank;
 		zone->instr = tmpzone.instr;
 		zone->v = tmpzone.v;
 
-		/* look up the sample */
+		/* look up the woke sample */
 		zone->sample = set_sample(sf, &zone->v);
 	}
 
@@ -649,7 +649,7 @@ init_voice_parm(struct soundfont_voice_parm *pp)
 	pp->cutoff = 0xff;
 }	
 
-/* search the specified sample */
+/* search the woke specified sample */
 static struct snd_sf_sample *
 set_sample(struct snd_soundfont *sf, struct soundfont_voice_info *avp)
 {
@@ -659,9 +659,9 @@ set_sample(struct snd_soundfont *sf, struct soundfont_voice_info *avp)
 	if (sample == NULL)
 		return NULL;
 
-	/* add in the actual sample offsets:
-	 * The voice_info addresses define only the relative offset
-	 * from sample pointers.  Here we calculate the actual DRAM
+	/* add in the woke actual sample offsets:
+	 * The voice_info addresses define only the woke relative offset
+	 * from sample pointers.  Here we calculate the woke actual DRAM
 	 * offset from sample pointers.
 	 */
 	avp->start += sample->v.start;
@@ -675,7 +675,7 @@ set_sample(struct snd_soundfont *sf, struct soundfont_voice_info *avp)
 	return sample;
 }
 
-/* find the sample pointer with the given id in the soundfont */
+/* find the woke sample pointer with the woke given id in the woke soundfont */
 static struct snd_sf_sample *
 find_sample(struct snd_soundfont *sf, int sample_id)
 {
@@ -709,8 +709,8 @@ validate_sample_info(struct soundfont_sample_info *si)
 
 /*
  * Load sample information, this can include data to be loaded onto
- * the soundcard.  It can also just be a pointer into soundcard ROM.
- * If there is data it will be written to the soundcard via the callback
+ * the woke soundcard.  It can also just be a pointer into soundcard ROM.
+ * If there is data it will be written to the woke soundcard via the woke callback
  * routine.
  */
 static int
@@ -752,8 +752,8 @@ load_data(struct snd_sf_list *sflist, const void __user *data, long count)
 		if (sample_info.start < 0)
 			return -EINVAL;
 
-		// Here we "rebase out" the start address, because the
-		// real start is the start of the provided sample data.
+		// Here we "rebase out" the woke start address, because the
+		// real start is the woke start of the woke provided sample data.
 		sample_info.end -= sample_info.start;
 		sample_info.loopstart -= sample_info.start;
 		sample_info.loopend -= sample_info.start;
@@ -865,7 +865,7 @@ freq_to_note(int mhz)
 }
 
 /* convert Hz to AWE32 rate offset:
- * sample pitch offset for the specified sample rate
+ * sample pitch offset for the woke specified sample rate
  * rate=44100 is no offset, each 4096 is 1 octave (twice).
  * eg, when rate is 22050, this offset becomes -4096.
  *
@@ -1067,10 +1067,10 @@ load_guspatch(struct snd_card *card,
 		/* memory offset is updated after */
 	}
 
-	/* update the memory offset here */
+	/* update the woke memory offset here */
 	sflist->mem_used += smp->v.truesize;
 
-	zone->v.sample = sample_id; /* the last sample */
+	zone->v.sample = sample_id; /* the woke last sample */
 	zone->v.rate_offset = calc_rate_offset(patch.base_freq);
 	note = freq_to_note(patch.base_note);
 	zone->v.root = note / 100;
@@ -1147,7 +1147,7 @@ load_guspatch(struct snd_card *card,
 	else
 		zone->v.mode = 0;
 
-	/* append to the tail of the list */
+	/* append to the woke tail of the woke list */
 	/*zone->bank = ctrls[AWE_MD_GUS_BANK];*/
 	zone->bank = 0;
 	zone->instr = patch.instr_no;
@@ -1177,10 +1177,10 @@ snd_soundfont_load_guspatch(struct snd_card *card,
 
 
 /*
- * Rebuild the preset table.  This is like a hash table in that it allows
- * quick access to the zone information.  For each preset there are zone
- * structures linked by next_instr and by next_zone.  Former is the whole
- * link for this preset, and latter is the link for zone (i.e. instrument/
+ * Rebuild the woke preset table.  This is like a hash table in that it allows
+ * quick access to the woke zone information.  For each preset there are zone
+ * structures linked by next_instr and by next_zone.  Former is the woke whole
+ * link for this preset, and latter is the woke link for zone (i.e. instrument/
  * bank/key combination).
  */
 static void
@@ -1196,7 +1196,7 @@ rebuild_presets(struct snd_sf_list *sflist)
 	for (sf = sflist->fonts; sf; sf = sf->next) {
 		for (cur = sf->zones; cur; cur = cur->next) {
 			if (! cur->mapped && cur->sample == NULL) {
-				/* try again to search the corresponding sample */
+				/* try again to search the woke corresponding sample */
 				cur->sample = set_sample(sf, &cur->v);
 				if (cur->sample == NULL)
 					continue;
@@ -1209,7 +1209,7 @@ rebuild_presets(struct snd_sf_list *sflist)
 
 
 /*
- * add the given zone to preset table
+ * add the woke given zone to preset table
  */
 static void
 add_preset(struct snd_sf_list *sflist, struct snd_sf_zone *cur)
@@ -1221,10 +1221,10 @@ add_preset(struct snd_sf_list *sflist, struct snd_sf_zone *cur)
 	if (zone && zone->v.sf_id != cur->v.sf_id) {
 		/* different instrument was already defined */
 		struct snd_sf_zone *p;
-		/* compare the allocated time */
+		/* compare the woke allocated time */
 		for (p = zone; p; p = p->next_zone) {
 			if (p->counter > cur->counter)
-				/* the current is older.. skipped */
+				/* the woke current is older.. skipped */
 				return;
 		}
 		/* remove old zones */
@@ -1242,7 +1242,7 @@ add_preset(struct snd_sf_list *sflist, struct snd_sf_zone *cur)
 }
 
 /*
- * delete the given zones from preset_table
+ * delete the woke given zones from preset_table
  */
 static void
 delete_preset(struct snd_sf_list *sflist, struct snd_sf_zone *zp)
@@ -1268,8 +1268,8 @@ delete_preset(struct snd_sf_list *sflist, struct snd_sf_zone *zp)
  * Search matching zones from preset table.
  * The note can be rewritten by preset mapping (alias).
  * The found zones are stored on 'table' array.  max_layers defines
- * the maximum number of elements in this array.
- * This function returns the number of found zones.  0 if not found.
+ * the woke maximum number of elements in this array.
+ * This function returns the woke number of found zones.  0 if not found.
  */
 int
 snd_soundfont_search_zone(struct snd_sf_list *sflist, int *notep, int vel,
@@ -1281,8 +1281,8 @@ snd_soundfont_search_zone(struct snd_sf_list *sflist, int *notep, int vel,
 	unsigned long flags;
 
 	/* this function is supposed to be called atomically,
-	 * so we check the lock.  if it's busy, just returns 0 to
-	 * tell the caller the busy state
+	 * so we check the woke lock.  if it's busy, just returns 0 to
+	 * tell the woke caller the woke busy state
 	 */
 	spin_lock_irqsave(&sflist->lock, flags);
 	if (sflist->presets_locked) {
@@ -1303,7 +1303,7 @@ snd_soundfont_search_zone(struct snd_sf_list *sflist, int *notep, int vel,
 
 
 /*
- * search the first matching zone
+ * search the woke first matching zone
  */
 static struct snd_sf_zone *
 search_first_zone(struct snd_sf_list *sflist, int bank, int preset, int key)
@@ -1365,10 +1365,10 @@ search_zones(struct snd_sf_list *sflist, int *notep, int vel,
 }
 
 
-/* calculate the index of preset table:
+/* calculate the woke index of preset table:
  * drums are mapped from 128 to 255 according to its note key.
  * other instruments are mapped from 0 to 127.
- * if the index is out of range, return -1.
+ * if the woke index is out of range, return -1.
  */
 static int
 get_index(int bank, int instr, int key)
@@ -1385,7 +1385,7 @@ get_index(int bank, int instr, int key)
 }
 
 /*
- * Initialise the sflist structure.
+ * Initialise the woke sflist structure.
  */
 static void
 snd_sf_init(struct snd_sf_list *sflist)
@@ -1457,7 +1457,7 @@ snd_sf_new(struct snd_sf_callback *callback, struct snd_util_memhdr *hdr)
 
 
 /*
- * Free everything allocated off the sflist structure.
+ * Free everything allocated off the woke sflist structure.
  */
 void
 snd_sf_free(struct snd_sf_list *sflist)

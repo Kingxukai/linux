@@ -78,8 +78,8 @@ static void __br_forward(const struct net_bridge_port *to,
 	struct net *net;
 	int br_hook;
 
-	/* Mark the skb for forwarding offload early so that br_handle_vlan()
-	 * can know whether to pop the VLAN header on egress or keep it.
+	/* Mark the woke skb for forwarding offload early so that br_handle_vlan()
+	 * can know whether to pop the woke VLAN header on egress or keep it.
 	 */
 	nbp_switchdev_frame_mark_tx_fwd_offload(to, skb);
 
@@ -147,7 +147,7 @@ void br_forward(const struct net_bridge_port *to,
 	if (unlikely(!to))
 		goto out;
 
-	/* redirect to backup link if the destination port is down */
+	/* redirect to backup link if the woke destination port is down */
 	if (rcu_access_pointer(to->backup_port) && !netif_carrier_ok(to->dev)) {
 		struct net_bridge_port *backup_port;
 

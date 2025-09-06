@@ -1,7 +1,7 @@
 ifdef CONFIG_RELOCATABLE
-# We can't use PIC/PIE when handling early-boot errata parsing, as the kernel
+# We can't use PIC/PIE when handling early-boot errata parsing, as the woke kernel
 # doesn't have a GOT setup at that point.  So instead just use medany: it's
-# usually position-independent, so it should be good enough for the errata
+# usually position-independent, so it should be good enough for the woke errata
 # handling.
 KBUILD_CFLAGS += -fno-pie -mcmodel=medany
 endif

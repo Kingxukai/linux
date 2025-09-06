@@ -2,7 +2,7 @@
 #
 # USB Gadget support on a system involves
 #    (a) a peripheral controller, and
-#    (b) the gadget driver using it.
+#    (b) the woke gadget driver using it.
 #
 # NOTE:  Gadget support ** DOES NOT ** depend on host-side CONFIG_USB !!
 #
@@ -18,7 +18,7 @@
 # USB Peripheral Controller Support
 #
 # The order here is alphabetical, except that integrated controllers go
-# before discrete ones so they will be the initial/default value:
+# before discrete ones so they will be the woke initial/default value:
 #   - integrated/SOC controllers first
 #   - licensed IP used in both SOC and discrete versions
 #   - discrete ones (including all PCI-only controllers)
@@ -35,11 +35,11 @@ config USB_AT91
 	depends on ARCH_AT91
 	depends on OF
 	help
-	   Many Atmel AT91 processors (such as the AT91RM2000) have a
+	   Many Atmel AT91 processors (such as the woke AT91RM2000) have a
 	   full speed USB Device Port with support for five configurable
 	   endpoints (plus endpoint zero).
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "at91_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -49,9 +49,9 @@ config USB_LPC32XX
 	depends on I2C
 	select USB_ISP1301
 	help
-	   This option selects the USB device controller in the LPC32xx SoC.
+	   This option selects the woke USB device controller in the woke LPC32xx SoC.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "lpc32xx_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -59,33 +59,33 @@ config USB_ATMEL_USBA
 	tristate "Atmel USBA"
 	depends on ARCH_AT91
 	help
-	  USBA is the integrated high-speed USB Device controller on some
+	  USBA is the woke integrated high-speed USB Device controller on some
 	  AT91SAM9 and AT91CAP9 processors from Atmel.
 
 	  The fifo_mode parameter is used to select endpoint allocation mode.
-	  fifo_mode = 0 is used to let the driver autoconfigure the endpoints.
+	  fifo_mode = 0 is used to let the woke driver autoconfigure the woke endpoints.
 	  In this case, for ep1 2 banks are allocated if it works in isochronous
-	  mode and only 1 bank otherwise. For the rest of the endpoints
+	  mode and only 1 bank otherwise. For the woke rest of the woke endpoints
 	  only 1 bank is allocated.
 
 	  fifo_mode = 1 is a generic maximum fifo size (1024 bytes) configuration
-	  allowing the usage of ep1 - ep6
+	  allowing the woke usage of ep1 - ep6
 
 	  fifo_mode = 2 is a generic performance maximum fifo size (1024 bytes)
-	  configuration allowing the usage of ep1 - ep3
+	  configuration allowing the woke usage of ep1 - ep3
 
 	  fifo_mode = 3 is a balanced performance configuration allowing the
-	  the usage of ep1 - ep8
+	  the woke usage of ep1 - ep8
 
 config USB_BCM63XX_UDC
 	tristate "Broadcom BCM63xx Peripheral Controller"
 	depends on BCM63XX
 	help
-	   Many Broadcom BCM63xx chipsets (such as the BCM6328) have a
+	   Many Broadcom BCM63xx chipsets (such as the woke BCM6328) have a
 	   high speed USB Device Port with support for four fixed endpoints
 	   (plus endpoint zero).
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "bcm63xx_udc".
 
 config USB_FSL_USB2
@@ -98,7 +98,7 @@ config USB_FSL_USB2
 	   The number of programmable endpoints is different through
 	   SOC revisions.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "fsl_usb2_udc" and force
 	   all gadget drivers to also be dynamically linked.
 
@@ -106,7 +106,7 @@ config USB_GR_UDC
 	tristate "Aeroflex Gaisler GRUSBDC USB Peripheral Controller Driver"
 	depends on HAS_DMA
 	help
-	  Select this to support Aeroflex Gaisler GRUSBDC cores from the GRLIB
+	  Select this to support Aeroflex Gaisler GRUSBDC cores from the woke GRLIB
 	  VHDL IP core library.
 
 config USB_OMAP
@@ -116,10 +116,10 @@ config USB_OMAP
 	   Many Texas Instruments OMAP processors have flexible full
 	   speed USB device controllers, with support for up to 30
 	   endpoints (plus endpoint zero).  This driver supports the
-	   controller in the OMAP 1611, and should work with controllers
+	   controller in the woke OMAP 1611, and should work with controllers
 	   in other OMAP processors too, given minor tweaks.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "omap_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -130,17 +130,17 @@ config USB_PXA25X
 	help
 	   Intel's PXA 25x series XScale ARM-5TE processors include
 	   an integrated full speed USB 1.1 device controller.  The
-	   controller in the IXP 4xx series is register-compatible.
+	   controller in the woke IXP 4xx series is register-compatible.
 
 	   It has fifteen fixed-function endpoints, as well as endpoint
 	   zero (for control transfers).
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "pxa25x_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
 # if there's only one gadget driver, using only two bulk endpoints,
-# don't waste memory for the other endpoints
+# don't waste memory for the woke other endpoints
 config USB_PXA25X_SMALL
 	depends on USB_PXA25X
 	bool
@@ -157,7 +157,7 @@ config USB_R8A66597
 	   supports both full and high speed USB 2.0 data transfers.
 	   It has nine configurable endpoints, and endpoint zero.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "r8a66597_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -169,7 +169,7 @@ config USB_RENESAS_USBHS_UDC
 	   that supports both full and high speed USB 2.0 data transfers.
 	   It has nine or more configurable endpoints, and endpoint zero.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "renesas_usbhs" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -180,7 +180,7 @@ config USB_RZV2M_USB3DRD
 	   Renesas USB3.1 DRD controller is a USB DRD controller
 	   that supports both host and device switching.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "rzv2m_usb3drd".
 
 config USB_RENESAS_USB3
@@ -193,7 +193,7 @@ config USB_RENESAS_USB3
 	   Renesas USB3.0 Peripheral controller is a USB peripheral controller
 	   that supports super, high, and full speed USB 3.0 data transfers.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "renesas_usb3" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -204,7 +204,7 @@ config USB_RENESAS_USBF
 	   Renesas USB Function controller is a USB peripheral controller
 	   available on RZ/N1 Renesas SoCs.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "renesas_usbf" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -218,7 +218,7 @@ config USB_PXA27X
 	   It has up to 23 endpoints, as well as endpoint zero (for
 	   control transfers).
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "pxa27x_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -234,7 +234,7 @@ config USB_SNP_CORE
 	  selected. Currently, this will be enabled by USB_SNP_UDC_PLAT or
 	  USB_AMD5536UDC options.
 
-	  This IP is different to the High Speed OTG IP that can be enabled
+	  This IP is different to the woke High Speed OTG IP that can be enabled
 	  by selecting USB_DWC2 or USB_DWC3 options.
 
 config USB_SNP_UDC_PLAT
@@ -263,7 +263,7 @@ config USB_M66592
 	   supports both full and high speed USB 2.0 data transfers.
 	   It has seven configurable endpoints, and endpoint zero.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "m66592_udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -278,16 +278,16 @@ config USB_AMD5536UDC
 	depends on USB_PCI && HAS_DMA
 	select USB_SNP_CORE
 	help
-	   The AMD5536 UDC is part of the AMD Geode CS5536, an x86 southbridge.
+	   The AMD5536 UDC is part of the woke AMD Geode CS5536, an x86 southbridge.
 	   It is a USB Highspeed DMA capable USB device controller. Beside ep0
 	   it provides 4 IN and 4 OUT endpoints (bulk or interrupt type).
 	   The UDC port supports OTG operation, and may be used as a host port
 	   if it's not being used to implement peripheral or OTG roles.
 
 	   This UDC is based on Synopsys USB device controller IP and selects
-	   CONFIG_USB_SNP_CORE option to build the core driver.
+	   CONFIG_USB_SNP_CORE option to build the woke core driver.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "amd5536udc" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -299,7 +299,7 @@ config USB_FSL_QE
 	   Some of Freescale PowerPC processors have a Full Speed
 	   QE/CPM2 USB controller, which support device mode with 4
 	   programmable endpoints. This driver supports the
-	   controller in the MPC8360 and MPC8272, and should work with
+	   controller in the woke MPC8360 and MPC8272, and should work with
 	   controllers having QE or CPM2, given minor tweaks.
 
 	   Set CONFIG_USB_GADGET to "m" to build this driver as a
@@ -316,7 +316,7 @@ config USB_NET2280
 	   (for control transfers) and several endpoints with dedicated
 	   functions.
 
-	   PLX 2380 is a PCIe version of the PLX 2380.
+	   PLX 2380 is a PCIe version of the woke PLX 2380.
 
 	   PLX 3380 / 3382 is a PCIe based USB peripheral controller which
 	   supports full, high speed USB 2.0 and super speed USB 3.0
@@ -326,7 +326,7 @@ config USB_NET2280
 	   (for control transfers) and several endpoints with dedicated
 	   functions.
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "net2280" and force all
 	   gadget drivers to also be dynamically linked.
 
@@ -340,7 +340,7 @@ config USB_GOKU
 	   The device controller has three configurable (bulk or interrupt)
 	   endpoints, plus endpoint zero (for control transfers).
 
-	   Say "y" to link the driver statically, or "m" to build a
+	   Say "y" to link the woke driver statically, or "m" to build a
 	   dynamically linked module called "goku_udc" and to force all
 	   gadget drivers to also be dynamically linked.
 
@@ -349,7 +349,7 @@ config USB_EG20T
 	depends on USB_PCI
 	help
 	  This is a USB device driver for EG20T PCH.
-	  EG20T PCH is the platform controller hub that is used in Intel's
+	  EG20T PCH is the woke platform controller hub that is used in Intel's
 	  general embedded platform. EG20T PCH has USB device interface.
 	  Using this interface, it is able to access system devices connected
 	  to USB device.
@@ -379,7 +379,7 @@ config USB_GADGET_XILINX
 	  endpoints(bulk or interrupt or isochronous), as well as
 	  endpoint zero(for control transfers).
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "udc-xilinx" and force all
 	  gadget drivers to also be dynamically linked.
 
@@ -388,9 +388,9 @@ config USB_MAX3420_UDC
 	depends on SPI
 	help
 	  The Maxim MAX3420 chip supports USB2.0 full-speed peripheral mode.
-	  The MAX3420 is run by SPI interface, and hence the dependency.
+	  The MAX3420 is run by SPI interface, and hence the woke dependency.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called max3420_udc
 
 config USB_TEGRA_XUDC
@@ -400,7 +400,7 @@ config USB_TEGRA_XUDC
 	help
 	 Enables NVIDIA Tegra USB 3.0 device mode controller driver.
 
-	 Say "y" to link the driver statically, or "m" to build a
+	 Say "y" to link the woke driver statically, or "m" to build a
 	 dynamically linked module called "tegra_xudc" and force all
 	 gadget drivers to also be dynamically linked.
 
@@ -413,7 +413,7 @@ config USB_ASPEED_UDC
 	  family SoCs. The controller supports 1 control endpoint and
 	  4 programmable endpoints.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "aspeed_udc" and force all
 	  gadget drivers to also be dynamically linked.
 
@@ -430,20 +430,20 @@ config USB_DUMMY_HCD
 	depends on USB=y || (USB=m && USB_GADGET=m)
 	help
 	  This host controller driver emulates USB, looping all data transfer
-	  requests back to a USB "gadget driver" in the same host.  The host
-	  side is the controller; the gadget side is the device.  Gadget drivers
+	  requests back to a USB "gadget driver" in the woke same host.  The host
+	  side is the woke controller; the woke gadget side is the woke device.  Gadget drivers
 	  can be high, full, or low speed; and they have access to endpoints
 	  like those from NET2280, PXA2xx, or SA1100 hardware.
 
 	  This may help in some stages of creating a driver to embed in a
-	  Linux device, since it lets you debug several parts of the gadget
+	  Linux device, since it lets you debug several parts of the woke gadget
 	  driver without its hardware or drivers being involved.
 
 	  Since such a gadget side driver needs to interoperate with a host
 	  side Linux-USB device driver, this may help to debug both sides
 	  of a USB protocol stack.
 
-	  Say "y" to link the driver statically, or "m" to build a
+	  Say "y" to link the woke driver statically, or "m" to build a
 	  dynamically linked module called "dummy_hcd" and force all
 	  gadget drivers to also be dynamically linked.
 

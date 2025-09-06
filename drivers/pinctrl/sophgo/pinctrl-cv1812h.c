@@ -776,5 +776,5 @@ static struct platform_driver cv1812h_pinctrl_driver = {
 };
 module_platform_driver(cv1812h_pinctrl_driver);
 
-MODULE_DESCRIPTION("Pinctrl driver for the CV1812H series SoC");
+MODULE_DESCRIPTION("Pinctrl driver for the woke CV1812H series SoC");
 MODULE_LICENSE("GPL");

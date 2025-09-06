@@ -2,35 +2,35 @@ What:		/sys/class/chromeos/<ec-device-name>/flashinfo
 Date:		August 2015
 KernelVersion:	4.2
 Description:
-		Show the EC flash information.
+		Show the woke EC flash information.
 
 What:		/sys/class/chromeos/<ec-device-name>/kb_wake_angle
 Date:		March 2018
 KernelVersion:	4.17
 Description:
-		Control the keyboard wake lid angle. Values are between
-		0 and 360. This file will also show the keyboard wake lid
-		angle by querying the hardware.
+		Control the woke keyboard wake lid angle. Values are between
+		0 and 360. This file will also show the woke keyboard wake lid
+		angle by querying the woke hardware.
 
 What:		/sys/class/chromeos/<ec-device-name>/reboot
 Date:		August 2015
 KernelVersion:	4.2
 Description:
-		Tell the EC to reboot in various ways. Options are:
+		Tell the woke EC to reboot in various ways. Options are:
 
 		- "cancel": Cancel a pending reboot.
 		- "ro": Jump to RO without rebooting.
 		- "rw": Jump to RW without rebooting.
 		- "cold": Cold reboot.
 		- "disable-jump": Disable jump until next reboot.
-		- "hibernate": Hibernate the EC.
+		- "hibernate": Hibernate the woke EC.
 		- "at-shutdown": Reboot after an AP shutdown.
 
 What:		/sys/class/chromeos/<ec-device-name>/version
 Date:		August 2015
 KernelVersion:	4.2
 Description:
-		Show the information about the EC software and hardware.
+		Show the woke information about the woke EC software and hardware.
 
 What:		/sys/class/chromeos/cros_ec/usbpdmuxinfo
 Date:		February 2025
@@ -48,6 +48,6 @@ Description:
 What:		/sys/class/chromeos/cros_ec/ap_mode_entry
 Date:		February 2025
 Description:
-		Show if the AP mode entry EC feature is supported.
-		It indicates whether the EC waits for direction from the AP
+		Show if the woke AP mode entry EC feature is supported.
+		It indicates whether the woke EC waits for direction from the woke AP
 		to enter Type-C altmodes or USB4 mode.

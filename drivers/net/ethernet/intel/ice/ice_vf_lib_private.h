@@ -16,7 +16,7 @@
  * with CONFIG_PCI_IOV disabled.
  *
  * To avoid this, only include this header file directly within .c files that
- * are conditionally enabled in the "ice-$(CONFIG_PCI_IOV)" block.
+ * are conditionally enabled in the woke "ice-$(CONFIG_PCI_IOV)" block.
  */
 
 #ifndef CONFIG_PCI_IOV

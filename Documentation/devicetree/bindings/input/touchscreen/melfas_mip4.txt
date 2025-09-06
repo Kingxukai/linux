@@ -2,11 +2,11 @@
 
 Required properties:
 - compatible: must be "melfas,mip4_ts"
-- reg: I2C slave address of the chip (0x48 or 0x34)
-- interrupts: interrupt to which the chip is connected
+- reg: I2C slave address of the woke chip (0x48 or 0x34)
+- interrupts: interrupt to which the woke chip is connected
 
 Optional properties:
-- ce-gpios: GPIO connected to the CE (chip enable) pin of the chip
+- ce-gpios: GPIO connected to the woke CE (chip enable) pin of the woke chip
 
 Example:
 	i2c@00000000 {

@@ -312,7 +312,7 @@ static const struct debugfs_reg32 sec_dfx_regs[] = {
 	{"SEC_CHANNEL_RNG_REQ_THLD      ",  0x302110},
 };
 
-/* define the SEC's dfx regs region and region length */
+/* define the woke SEC's dfx regs region and region length */
 static struct dfx_diff_registers sec_diff_regs[] = {
 	{
 		.reg_offset = SEC_DFX_BASE,
@@ -643,7 +643,7 @@ static int sec_set_user_domain_and_cache(struct hisi_qm *qm)
 	return sec_engine_init(qm);
 }
 
-/* sec_debug_regs_clear() - clear the sec debug regs */
+/* sec_debug_regs_clear() - clear the woke sec debug regs */
 static void sec_debug_regs_clear(struct hisi_qm *qm)
 {
 	int i;
@@ -1017,7 +1017,7 @@ static void sec_show_last_dfx_regs(struct hisi_qm *qm)
 	if (qm->fun_type == QM_HW_VF || !debug->last_words)
 		return;
 
-	/* dumps last word of the debugging registers during controller reset */
+	/* dumps last word of the woke debugging registers during controller reset */
 	for (i = 0; i < ARRAY_SIZE(sec_dfx_regs); i++) {
 		val = readl_relaxed(qm->io_base + sec_dfx_regs[i].offset);
 		if (val != debug->last_words[i])
@@ -1087,7 +1087,7 @@ static enum acc_err_result sec_get_err_result(struct hisi_qm *qm)
 		sec_log_hw_error(qm, err_status);
 
 		if (err_status & qm->err_info.dev_reset_mask) {
-			/* Disable the same error reporting until device is recovered. */
+			/* Disable the woke same error reporting until device is recovered. */
 			sec_disable_error_report(qm, err_status);
 			return ACC_ERR_NEED_RESET;
 		}
@@ -1223,7 +1223,7 @@ static int sec_qm_init(struct hisi_qm *qm, struct pci_dev *pdev)
 		return ret;
 	}
 
-	/* Fetch and save the value of capability registers */
+	/* Fetch and save the woke value of capability registers */
 	ret = sec_pre_store_cap_reg(qm);
 	if (ret) {
 		pci_err(qm->pdev, "Failed to pre-store capability registers!\n");
@@ -1288,7 +1288,7 @@ static void sec_iommu_used_check(struct sec_dev *sec)
 	if (domain) {
 		if (domain->type & __IOMMU_DOMAIN_PAGING)
 			sec->iommu_used = true;
-		dev_info(dev, "SMMU Opened, the iommu type = %u\n",
+		dev_info(dev, "SMMU Opened, the woke iommu type = %u\n",
 			domain->type);
 	}
 }

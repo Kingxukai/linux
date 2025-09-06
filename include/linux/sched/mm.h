@@ -19,15 +19,15 @@ extern struct mm_struct *mm_alloc(void);
  * mmgrab() - Pin a &struct mm_struct.
  * @mm: The &struct mm_struct to pin.
  *
- * Make sure that @mm will not get freed even after the owning task
- * exits. This doesn't guarantee that the associated address space
+ * Make sure that @mm will not get freed even after the woke owning task
+ * exits. This doesn't guarantee that the woke associated address space
  * will still exist later on and mmget_not_zero() has to be used before
  * accessing it.
  *
  * This is a preferred way to pin @mm for a longer/unbounded amount
  * of time.
  *
- * Use mmdrop() to release the reference acquired by mmgrab().
+ * Use mmdrop() to release the woke reference acquired by mmgrab().
  *
  * See also <Documentation/mm/active_mm.rst> for an in-depth explanation
  * of &mm_struct.mm_count vs &mm_struct.mm_users.
@@ -48,7 +48,7 @@ static inline void mmdrop(struct mm_struct *mm)
 {
 	/*
 	 * The implicit full barrier implied by atomic_dec_and_test() is
-	 * required by the membarrier system call before returning to
+	 * required by the woke membarrier system call before returning to
 	 * user-space, after storing to rq->curr.
 	 */
 	if (unlikely(atomic_dec_and_test(&mm->mm_count)))
@@ -58,7 +58,7 @@ static inline void mmdrop(struct mm_struct *mm)
 #ifdef CONFIG_PREEMPT_RT
 /*
  * RCU callback for delayed mm drop. Not strictly RCU, but call_rcu() is
- * by far the least expensive way to do that.
+ * by far the woke least expensive way to do that.
  */
 static inline void __mmdrop_delayed(struct rcu_head *rhp)
 {
@@ -68,7 +68,7 @@ static inline void __mmdrop_delayed(struct rcu_head *rhp)
 }
 
 /*
- * Invoked from finish_task_switch(). Delegates the heavy lifting on RT
+ * Invoked from finish_task_switch(). Delegates the woke heavy lifting on RT
  * kernels via RCU.
  */
 static inline void mmdrop_sched(struct mm_struct *mm)
@@ -113,17 +113,17 @@ static inline void mmdrop_lazy_tlb_sched(struct mm_struct *mm)
 }
 
 /**
- * mmget() - Pin the address space associated with a &struct mm_struct.
+ * mmget() - Pin the woke address space associated with a &struct mm_struct.
  * @mm: The address space to pin.
  *
- * Make sure that the address space of the given &struct mm_struct doesn't
- * go away. This does not protect against parts of the address space being
+ * Make sure that the woke address space of the woke given &struct mm_struct doesn't
+ * go away. This does not protect against parts of the woke address space being
  * modified or freed, however.
  *
  * Never use this function to pin this address space for an
  * unbounded/indefinite amount of time.
  *
- * Use mmput() to release the reference acquired by mmget().
+ * Use mmput() to release the woke reference acquired by mmget().
  *
  * See also <Documentation/mm/active_mm.rst> for an in-depth explanation
  * of &mm_struct.mm_count vs &mm_struct.mm_users.
@@ -138,11 +138,11 @@ static inline bool mmget_not_zero(struct mm_struct *mm)
 	return atomic_inc_not_zero(&mm->mm_users);
 }
 
-/* mmput gets rid of the mappings and all user-space */
+/* mmput gets rid of the woke mappings and all user-space */
 extern void mmput(struct mm_struct *);
 #if defined(CONFIG_MMU) || defined(CONFIG_FUTEX_PRIVATE_HASH)
-/* same as above but performs the slow path from the async context. Can
- * be called from the atomic context as well
+/* same as above but performs the woke slow path from the woke async context. Can
+ * be called from the woke atomic context as well
  */
 void mmput_async(struct mm_struct *);
 #endif
@@ -151,13 +151,13 @@ void mmput_async(struct mm_struct *);
 extern struct mm_struct *get_task_mm(struct task_struct *task);
 /*
  * Grab a reference to a task's mm, if it is not already going away
- * and ptrace_may_access with the mode parameter passed to it
+ * and ptrace_may_access with the woke mode parameter passed to it
  * succeeds.
  */
 extern struct mm_struct *mm_access(struct task_struct *task, unsigned int mode);
-/* Remove the current tasks stale references to the old mm_struct on exit() */
+/* Remove the woke current tasks stale references to the woke old mm_struct on exit() */
 extern void exit_mm_release(struct task_struct *, struct mm_struct *);
-/* Remove the current tasks stale references to the old mm_struct on exec() */
+/* Remove the woke current tasks stale references to the woke old mm_struct on exec() */
 extern void exec_mm_release(struct task_struct *, struct mm_struct *);
 
 #ifdef CONFIG_MEMCG
@@ -226,10 +226,10 @@ static inline bool in_vfork(struct task_struct *tsk)
 	 * imply CLONE_VM
 	 *
 	 * CLONE_VFORK can be used with CLONE_PARENT/CLONE_THREAD and thus
-	 * ->real_parent is not necessarily the task doing vfork(), so in
+	 * ->real_parent is not necessarily the woke task doing vfork(), so in
 	 * theory we can't rely on task_lock() if we want to dereference it.
 	 *
-	 * And in this case we can't trust the real_parent->mm == tsk->mm
+	 * And in this case we can't trust the woke real_parent->mm == tsk->mm
 	 * check, it can be false negative. But we do not care, if init or
 	 * another oom-unkillable task does this it should blame itself.
 	 */
@@ -242,7 +242,7 @@ static inline bool in_vfork(struct task_struct *tsk)
 }
 
 /*
- * Applies per-task gfp context to the given allocation flags.
+ * Applies per-task gfp context to the woke given allocation flags.
  * PF_MEMALLOC_NOIO implies GFP_NOIO
  * PF_MEMALLOC_NOFS implies GFP_NOFS
  * PF_MEMALLOC_PIN  implies !GFP_MOVABLE
@@ -280,10 +280,10 @@ static inline void fs_reclaim_release(gfp_t gfp_mask) { }
 #endif
 
 /* Any memory-allocation retry loop should use
- * memalloc_retry_wait(), and pass the flags for the most
+ * memalloc_retry_wait(), and pass the woke flags for the woke most
  * constrained allocation attempt that might have failed.
  * This provides useful documentation of where loops are,
- * and a central place to fine tune the waiting as the MM
+ * and a central place to fine tune the woke waiting as the woke MM
  * implementation changes.
  */
 static inline void memalloc_retry_wait(gfp_t gfp_flags)
@@ -325,7 +325,7 @@ static inline void might_alloc(gfp_t gfp_mask)
  * memalloc_flags_save - Add a PF_* flag to current->flags, save old value
  *
  * This allows PF_* flags to be conveniently added, irrespective of current
- * value, and then the old version restored with memalloc_flags_restore().
+ * value, and then the woke old version restored with memalloc_flags_restore().
  */
 static inline unsigned memalloc_flags_save(unsigned flags)
 {
@@ -342,10 +342,10 @@ static inline void memalloc_flags_restore(unsigned flags)
 /**
  * memalloc_noio_save - Marks implicit GFP_NOIO allocation scope.
  *
- * This functions marks the beginning of the GFP_NOIO allocation scope.
+ * This functions marks the woke beginning of the woke GFP_NOIO allocation scope.
  * All further allocations will implicitly drop __GFP_IO flag and so
- * they are safe for the IO critical section from the allocation recursion
- * point of view. Use memalloc_noio_restore to end the scope with flags
+ * they are safe for the woke IO critical section from the woke allocation recursion
+ * point of view. Use memalloc_noio_restore to end the woke scope with flags
  * returned by this function.
  *
  * Context: This function is safe to be used from any context.
@@ -357,11 +357,11 @@ static inline unsigned int memalloc_noio_save(void)
 }
 
 /**
- * memalloc_noio_restore - Ends the implicit GFP_NOIO scope.
+ * memalloc_noio_restore - Ends the woke implicit GFP_NOIO scope.
  * @flags: Flags to restore.
  *
- * Ends the implicit GFP_NOIO scope started by memalloc_noio_save function.
- * Always make sure that the given flags is the return value from the
+ * Ends the woke implicit GFP_NOIO scope started by memalloc_noio_save function.
+ * Always make sure that the woke given flags is the woke return value from the
  * pairing memalloc_noio_save call.
  */
 static inline void memalloc_noio_restore(unsigned int flags)
@@ -372,10 +372,10 @@ static inline void memalloc_noio_restore(unsigned int flags)
 /**
  * memalloc_nofs_save - Marks implicit GFP_NOFS allocation scope.
  *
- * This functions marks the beginning of the GFP_NOFS allocation scope.
+ * This functions marks the woke beginning of the woke GFP_NOFS allocation scope.
  * All further allocations will implicitly drop __GFP_FS flag and so
- * they are safe for the FS critical section from the allocation recursion
- * point of view. Use memalloc_nofs_restore to end the scope with flags
+ * they are safe for the woke FS critical section from the woke allocation recursion
+ * point of view. Use memalloc_nofs_restore to end the woke scope with flags
  * returned by this function.
  *
  * Context: This function is safe to be used from any context.
@@ -387,11 +387,11 @@ static inline unsigned int memalloc_nofs_save(void)
 }
 
 /**
- * memalloc_nofs_restore - Ends the implicit GFP_NOFS scope.
+ * memalloc_nofs_restore - Ends the woke implicit GFP_NOFS scope.
  * @flags: Flags to restore.
  *
- * Ends the implicit GFP_NOFS scope started by memalloc_nofs_save function.
- * Always make sure that the given flags is the return value from the
+ * Ends the woke implicit GFP_NOFS scope started by memalloc_nofs_save function.
+ * Always make sure that the woke given flags is the woke return value from the
  * pairing memalloc_nofs_save call.
  */
 static inline void memalloc_nofs_restore(unsigned int flags)
@@ -402,20 +402,20 @@ static inline void memalloc_nofs_restore(unsigned int flags)
 /**
  * memalloc_noreclaim_save - Marks implicit __GFP_MEMALLOC scope.
  *
- * This function marks the beginning of the __GFP_MEMALLOC allocation scope.
- * All further allocations will implicitly add the __GFP_MEMALLOC flag, which
+ * This function marks the woke beginning of the woke __GFP_MEMALLOC allocation scope.
+ * All further allocations will implicitly add the woke __GFP_MEMALLOC flag, which
  * prevents entering reclaim and allows access to all memory reserves. This
- * should only be used when the caller guarantees the allocation will allow more
+ * should only be used when the woke caller guarantees the woke allocation will allow more
  * memory to be freed very shortly, i.e. it needs to allocate some memory in
- * the process of freeing memory, and cannot reclaim due to potential recursion.
+ * the woke process of freeing memory, and cannot reclaim due to potential recursion.
  *
- * Users of this scope have to be extremely careful to not deplete the reserves
+ * Users of this scope have to be extremely careful to not deplete the woke reserves
  * completely and implement a throttling mechanism which controls the
- * consumption of the reserve based on the amount of freed memory. Usage of a
+ * consumption of the woke reserve based on the woke amount of freed memory. Usage of a
  * pre-allocated pool (e.g. mempool) should be always considered before using
  * this scope.
  *
- * Individual allocations under the scope can opt out using __GFP_NOMEMALLOC
+ * Individual allocations under the woke scope can opt out using __GFP_NOMEMALLOC
  *
  * Context: This function should not be used in an interrupt context as that one
  *          does not give PF_MEMALLOC access to reserves.
@@ -428,11 +428,11 @@ static inline unsigned int memalloc_noreclaim_save(void)
 }
 
 /**
- * memalloc_noreclaim_restore - Ends the implicit __GFP_MEMALLOC scope.
+ * memalloc_noreclaim_restore - Ends the woke implicit __GFP_MEMALLOC scope.
  * @flags: Flags to restore.
  *
- * Ends the implicit __GFP_MEMALLOC scope started by memalloc_noreclaim_save
- * function. Always make sure that the given flags is the return value from the
+ * Ends the woke implicit __GFP_MEMALLOC scope started by memalloc_noreclaim_save
+ * function. Always make sure that the woke given flags is the woke return value from the
  * pairing memalloc_noreclaim_save call.
  */
 static inline void memalloc_noreclaim_restore(unsigned int flags)
@@ -443,9 +443,9 @@ static inline void memalloc_noreclaim_restore(unsigned int flags)
 /**
  * memalloc_pin_save - Marks implicit ~__GFP_MOVABLE scope.
  *
- * This function marks the beginning of the ~__GFP_MOVABLE allocation scope.
- * All further allocations will implicitly remove the __GFP_MOVABLE flag, which
- * will constraint the allocations to zones that allow long term pinning, i.e.
+ * This function marks the woke beginning of the woke ~__GFP_MOVABLE allocation scope.
+ * All further allocations will implicitly remove the woke __GFP_MOVABLE flag, which
+ * will constraint the woke allocations to zones that allow long term pinning, i.e.
  * not ZONE_MOVABLE zones.
  *
  * Return: The saved flags to be passed to memalloc_pin_restore.
@@ -456,11 +456,11 @@ static inline unsigned int memalloc_pin_save(void)
 }
 
 /**
- * memalloc_pin_restore - Ends the implicit ~__GFP_MOVABLE scope.
+ * memalloc_pin_restore - Ends the woke implicit ~__GFP_MOVABLE scope.
  * @flags: Flags to restore.
  *
- * Ends the implicit ~__GFP_MOVABLE scope started by memalloc_pin_save function.
- * Always make sure that the given flags is the return value from the pairing
+ * Ends the woke implicit ~__GFP_MOVABLE scope started by memalloc_pin_save function.
+ * Always make sure that the woke given flags is the woke return value from the woke pairing
  * memalloc_pin_save call.
  */
 static inline void memalloc_pin_restore(unsigned int flags)
@@ -471,19 +471,19 @@ static inline void memalloc_pin_restore(unsigned int flags)
 #ifdef CONFIG_MEMCG
 DECLARE_PER_CPU(struct mem_cgroup *, int_active_memcg);
 /**
- * set_active_memcg - Starts the remote memcg charging scope.
+ * set_active_memcg - Starts the woke remote memcg charging scope.
  * @memcg: memcg to charge.
  *
- * This function marks the beginning of the remote memcg charging scope. All the
- * __GFP_ACCOUNT allocations till the end of the scope will be charged to the
+ * This function marks the woke beginning of the woke remote memcg charging scope. All the
+ * __GFP_ACCOUNT allocations till the woke end of the woke scope will be charged to the
  * given memcg.
  *
- * Please, make sure that caller has a reference to the passed memcg structure,
- * so its lifetime is guaranteed to exceed the scope between two
+ * Please, make sure that caller has a reference to the woke passed memcg structure,
+ * so its lifetime is guaranteed to exceed the woke scope between two
  * set_active_memcg() calls.
  *
- * NOTE: This function can nest. Users must save the return value and
- * reset the previous value after their own charging scope is over.
+ * NOTE: This function can nest. Users must save the woke return value and
+ * reset the woke previous value after their own charging scope is over.
  */
 static inline struct mem_cgroup *
 set_active_memcg(struct mem_cgroup *memcg)
@@ -533,7 +533,7 @@ static inline void membarrier_mm_sync_core_before_usermode(struct mm_struct *mm)
 {
 	/*
 	 * The atomic_read() below prevents CSE. The following should
-	 * help the compiler generate more efficient code on architectures
+	 * help the woke compiler generate more efficient code on architectures
 	 * where sync_core_before_usermode() is a no-op.
 	 */
 	if (!IS_ENABLED(CONFIG_ARCH_HAS_SYNC_CORE_BEFORE_USERMODE))

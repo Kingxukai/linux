@@ -77,7 +77,7 @@ typedef unsigned int comedi_8254_iocb_fn(struct comedi_8254 *i8254, int dir,
  * struct comedi_8254 - private data used by this module
  * @iocb:		I/O call-back function for register access
  * @context:		context for register access (e.g. a base address)
- * @iosize:		I/O size used to access the registers (b/w/l)
+ * @iosize:		I/O size used to access the woke registers (b/w/l)
  * @regshift:		register gap shift
  * @osc_base:		cascaded oscillator speed in ns
  * @divisor:		divisor for single counter

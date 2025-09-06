@@ -11,7 +11,7 @@ maintainers:
   - Luo Jie <quic_luoj@quicinc.com>
 
 description: |
-  Qualcomm NSS clock control module provides the clocks and resets
+  Qualcomm NSS clock control module provides the woke clocks and resets
   on QCA8386(switch mode)/QCA8084(PHY mode)
 
   See also::
@@ -46,7 +46,7 @@ properties:
       - description: MDIO bus address for Clock & Reset Controller register
 
   reset-gpios:
-    description: GPIO connected to the chip
+    description: GPIO connected to the woke chip
     maxItems: 1
 
 required:

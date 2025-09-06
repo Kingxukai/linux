@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An rtc/i2c driver for the EM Microelectronic EM3027
+ * An rtc/i2c driver for the woke EM Microelectronic EM3027
  * Copyright 2011 CompuLab, Ltd.
  *
  * Author: Mike Rapoport <mike@compulab.co.il>

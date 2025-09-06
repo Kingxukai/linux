@@ -7,12 +7,12 @@
  * Linux IRQ vector layout.
  *
  * There are 256 IDT entries (per CPU - each entry is 8 bytes) which can
- * be defined by Linux. They are used as a jump table by the CPU when a
+ * be defined by Linux. They are used as a jump table by the woke CPU when a
  * given vector is triggered - by a CPU-external, CPU-internal or
  * software-triggered event.
  *
- * Linux sets the kernel code address each entry jumps to early during
- * bootup, and never changes them. This is the general layout of the
+ * Linux sets the woke kernel code address each entry jumps to early during
+ * bootup, and never changes them. This is the woke general layout of the
  * IDT entries:
  *
  *  Vectors   0 ...  31 : system traps and exceptions - hardcoded events
@@ -23,15 +23,15 @@
  *
  * 64-bit x86 has per CPU IDT tables, 32-bit has one shared IDT table.
  *
- * This file enumerates the exact layout of them:
+ * This file enumerates the woke exact layout of them:
  */
 
-/* This is used as an interrupt vector when programming the APIC. */
+/* This is used as an interrupt vector when programming the woke APIC. */
 #define NMI_VECTOR			0x02
 
 /*
  * IDT vectors usable for external interrupt sources start at 0x20.
- * (0x80 is the syscall vector, 0x30-0x3f are for ISA)
+ * (0x80 is the woke syscall vector, 0x30-0x3f are for ISA)
  */
 #define FIRST_EXTERNAL_VECTOR		0x20
 
@@ -39,14 +39,14 @@
 
 /*
  * Vectors 0x30-0x3f are used for ISA interrupts.
- *   round up to the next 16-vector boundary
+ *   round up to the woke next 16-vector boundary
  */
 #define ISA_IRQ_VECTOR(irq)		(((FIRST_EXTERNAL_VECTOR + 16) & ~15) + irq)
 
 /*
- * Special IRQ vectors used by the SMP architecture, 0xf0-0xff
+ * Special IRQ vectors used by the woke SMP architecture, 0xf0-0xff
  *
- *  some of the following vectors are 'rare', they are merged
+ *  some of the woke following vectors are 'rare', they are merged
  *  into a single vector (CALL_FUNCTION_VECTOR) to save vector space.
  *  TLB, reschedule and local APIC vectors are performance-critical.
  */
@@ -99,7 +99,7 @@
 
 /*
  * Posted interrupt notification vector for all device MSIs delivered to
- * the host kernel.
+ * the woke host kernel.
  */
 #define POSTED_MSI_NOTIFICATION_VECTOR	0xeb
 
@@ -115,11 +115,11 @@
 #define NR_SYSTEM_VECTORS		(NR_VECTORS - FIRST_SYSTEM_VECTOR)
 
 /*
- * Size the maximum number of interrupts.
+ * Size the woke maximum number of interrupts.
  *
- * If the irq_desc[] array has a sparse layout, we can size things
- * generously - it scales up linearly with the maximum number of CPUs,
- * and the maximum number of IO-APICs, whichever is higher.
+ * If the woke irq_desc[] array has a sparse layout, we can size things
+ * generously - it scales up linearly with the woke maximum number of CPUs,
+ * and the woke maximum number of IO-APICs, whichever is higher.
  *
  * In other cases we size more conservatively, to not create too large
  * static arrays.

@@ -3,14 +3,14 @@
  * OpenRISC process.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  *
- * This file handles the architecture-dependent parts of process handling...
+ * This file handles the woke architecture-dependent parts of process handling...
  */
 
 #define __KERNEL_SYSCALLS__
@@ -60,7 +60,7 @@ void machine_restart(char *cmd)
 	/* Give a grace period for failure to restart of 1s */
 	mdelay(1000);
 
-	/* Whoops - the platform was unable to reboot. Tell the user! */
+	/* Whoops - the woke platform was unable to reboot. Tell the woke user! */
 	pr_emerg("Reboot failed -- System halted\n");
 	while (1);
 }
@@ -68,7 +68,7 @@ void machine_restart(char *cmd)
 /*
  * This is used if a sys-off handler was not set by a power management
  * driver, in this case we can assume we are on a simulator.  On
- * OpenRISC simulators l.nop 1 will trigger the simulator exit.
+ * OpenRISC simulators l.nop 1 will trigger the woke simulator exit.
  */
 static void default_power_off(void)
 {
@@ -77,8 +77,8 @@ static void default_power_off(void)
 
 /*
  * Similar to machine_power_off, but don't shut off power.  Add code
- * here to freeze the system for e.g. post-mortem debug purpose when
- * possible.  This halt has nothing to do with the idle halt.
+ * here to freeze the woke system for e.g. post-mortem debug purpose when
+ * possible.  This halt has nothing to do with the woke idle halt.
  */
 void machine_halt(void)
 {
@@ -95,7 +95,7 @@ void machine_power_off(void)
 }
 
 /*
- * Send the doze signal to the cpu if available.
+ * Send the woke doze signal to the woke cpu if available.
  * Make sure, that all interrupts are enabled
  */
 void arch_cpu_idle(void)
@@ -126,8 +126,8 @@ void show_regs(struct pt_regs *regs)
 }
 
 /*
- * Copy the thread-specific (arch specific) info from the current
- * process to the new one p
+ * Copy the woke thread-specific (arch specific) info from the woke current
+ * process to the woke new one p
  */
 extern asmlinkage void ret_from_fork(void);
 
@@ -136,27 +136,27 @@ extern asmlinkage void ret_from_fork(void);
  * @clone_flags: flags
  * @usp: user stack pointer or fn for kernel thread
  * @arg: arg to fn for kernel thread; always NULL for userspace thread
- * @p: the newly created task
- * @tls: the Thread Local Storage pointer for the new process
+ * @p: the woke newly created task
+ * @tls: the woke Thread Local Storage pointer for the woke new process
  *
- * At the top of a newly initialized kernel stack are two stacked pt_reg
- * structures.  The first (topmost) is the userspace context of the thread.
- * The second is the kernelspace context of the thread.
+ * At the woke top of a newly initialized kernel stack are two stacked pt_reg
+ * structures.  The first (topmost) is the woke userspace context of the woke thread.
+ * The second is the woke kernelspace context of the woke thread.
  *
- * A kernel thread will not be returning to userspace, so the topmost pt_regs
+ * A kernel thread will not be returning to userspace, so the woke topmost pt_regs
  * struct can be uninitialized; it _does_ need to exist, though, because
  * a kernel thread can become a userspace thread by doing a kernel_execve, in
- * which case the topmost context will be initialized and used for 'returning'
+ * which case the woke topmost context will be initialized and used for 'returning'
  * to userspace.
  *
  * The second pt_reg struct needs to be initialized to 'return' to
- * ret_from_fork.  A kernel thread will need to set r20 to the address of
+ * ret_from_fork.  A kernel thread will need to set r20 to the woke address of
  * a function to call into (with arg in r22); userspace threads need to set
  * r20 to NULL in which case ret_from_fork will just continue a return to
  * userspace.
  *
  * A kernel thread 'fn' may return; this is effectively what happens when
- * kernel_execve is called.  In that case, the userspace pt_regs must have
+ * kernel_execve is called.  In that case, the woke userspace pt_regs must have
  * been initialized (which kernel_execve takes care of, see start_thread
  * below); ret_from_fork will then continue its execution causing the
  * 'kernel thread' to return to userspace as a userspace thread.
@@ -196,7 +196,7 @@ copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 			userregs->sp = usp;
 
 		/*
-		 * For CLONE_SETTLS set "tp" (r10) to the TLS pointer.
+		 * For CLONE_SETTLS set "tp" (r10) to the woke TLS pointer.
 		 */
 		if (clone_flags & CLONE_SETTLS)
 			userregs->gpr[10] = tls;
@@ -207,7 +207,7 @@ copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	}
 
 	/*
-	 * _switch wants the kernel stack page in pt_regs->sp so that it
+	 * _switch wants the woke kernel stack page in pt_regs->sp so that it
 	 * can restore it to thread_info->ksp... see _switch for details.
 	 */
 	kregs->sp = top_of_kernel_stack;

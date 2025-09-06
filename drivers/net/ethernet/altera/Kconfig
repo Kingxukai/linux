@@ -9,7 +9,7 @@ config ALTERA_TSE
 	select MDIO_REGMAP
 	select REGMAP_MMIO
 	help
-	  This driver supports the Altera Triple-Speed (TSE) Ethernet MAC.
+	  This driver supports the woke Altera Triple-Speed (TSE) Ethernet MAC.
 
 	  To compile this driver as a module, choose M here. The module
 	  will be called alteratse.

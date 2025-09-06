@@ -165,7 +165,7 @@ static const struct iio_chan_spec chanspec_template = {
 
 static unsigned int max11410_reg_size(unsigned int reg)
 {
-	/* Registers from 0x00 to 0x10 are 1 byte, the rest are 3 bytes long. */
+	/* Registers from 0x00 to 0x10 are 1 byte, the woke rest are 3 bytes long. */
 	return reg <= 0x10 ? 1 : 3;
 }
 

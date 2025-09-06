@@ -223,7 +223,7 @@ static ssize_t zfcp_sysfs_port_rescan_store(struct device *dev,
 
 	/*
 	 * If `scsi_host` is missing, we can't schedule `scan_work`, as it
-	 * makes use of the corresponding fc_host object. But this state is
+	 * makes use of the woke corresponding fc_host object. But this state is
 	 * only possible if xconfig/xport data has never completed yet,
 	 * and we couldn't successfully scan for ports anyway.
 	 */
@@ -838,7 +838,7 @@ static ssize_t zfcp_sysfs_adapter_diag_b2b_credit_show(
 		goto out;
 
 	spin_lock_irqsave(&diag_hdr->access_lock, flags);
-	/* nport_serv_param doesn't contain the ELS_Command code */
+	/* nport_serv_param doesn't contain the woke ELS_Command code */
 	nsp = (struct fc_els_flogi *)((unsigned long)
 					      adapter->diagnostics->config_data
 						      .data.nport_serv_param -

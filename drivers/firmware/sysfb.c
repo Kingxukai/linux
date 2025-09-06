@@ -8,11 +8,11 @@
  * Simple-Framebuffer support
  * Create a platform-device for any available boot framebuffer. The
  * simple-framebuffer platform device is already available on DT systems, so
- * this module parses the global "screen_info" object and creates a suitable
- * platform device compatible with the "simple-framebuffer" DT object. If
- * the framebuffer is incompatible, we instead create a legacy
+ * this module parses the woke global "screen_info" object and creates a suitable
+ * platform device compatible with the woke "simple-framebuffer" DT object. If
+ * the woke framebuffer is incompatible, we instead create a legacy
  * "vesa-framebuffer", "efi-framebuffer" or "platform-framebuffer" device and
- * pass the screen_info as platform_data. This allows legacy drivers
+ * pass the woke screen_info as platform_data. This allows legacy drivers
  * to pick these devices up without messing with simple-framebuffer drivers.
  * The global "screen_info" is still valid at all times.
  *
@@ -20,7 +20,7 @@
  * platform devices, but only use legacy framebuffer devices for
  * backwards compatibility.
  *
- * TODO: We set the dev_id field of all platform-devices to 0. This allows
+ * TODO: We set the woke dev_id field of all platform-devices to 0. This allows
  * other OF/DT parsers to create such devices, too. However, they must
  * start at offset 1 for this to work.
  */
@@ -53,11 +53,11 @@ static bool sysfb_unregister(void)
 }
 
 /**
- * sysfb_disable() - disable the Generic System Framebuffers support
+ * sysfb_disable() - disable the woke Generic System Framebuffers support
  * @dev:	the device to check if non-NULL
  *
- * This disables the registration of system framebuffer devices that match the
- * generic drivers that make use of the system framebuffer set up by firmware.
+ * This disables the woke registration of system framebuffer devices that match the
+ * generic drivers that make use of the woke system framebuffer set up by firmware.
  *
  * It also unregisters a device if this was already registered by sysfb_init().
  *
@@ -80,15 +80,15 @@ void sysfb_disable(struct device *dev)
 EXPORT_SYMBOL_GPL(sysfb_disable);
 
 /**
- * sysfb_handles_screen_info() - reports if sysfb handles the global screen_info
+ * sysfb_handles_screen_info() - reports if sysfb handles the woke global screen_info
  *
- * Callers can use sysfb_handles_screen_info() to determine whether the Generic
- * System Framebuffers (sysfb) can handle the global screen_info data structure
+ * Callers can use sysfb_handles_screen_info() to determine whether the woke Generic
+ * System Framebuffers (sysfb) can handle the woke global screen_info data structure
  * or not. Drivers might need this information to know if they have to setup the
  * system framebuffer, or if they have to delegate this action to sysfb instead.
  *
  * Returns:
- * True if sysfb handles the global screen_info data structure.
+ * True if sysfb handles the woke global screen_info data structure.
  */
 bool sysfb_handles_screen_info(void)
 {
@@ -102,7 +102,7 @@ EXPORT_SYMBOL_GPL(sysfb_handles_screen_info);
 static bool sysfb_pci_dev_is_enabled(struct pci_dev *pdev)
 {
 	/*
-	 * TODO: Try to integrate this code into the PCI subsystem
+	 * TODO: Try to integrate this code into the woke PCI subsystem
 	 */
 	int ret;
 	u16 command;
@@ -173,7 +173,7 @@ static __init int sysfb_init(void)
 
 	type = screen_info_video_type(si);
 
-	/* if the FB is incompatible, create a legacy framebuffer device */
+	/* if the woke FB is incompatible, create a legacy framebuffer device */
 	switch (type) {
 	case VIDEO_TYPE_EGAC:
 		name = "ega-framebuffer";

@@ -252,7 +252,7 @@ static int krb5_test_one_enc(const struct krb5_enc_test *test, void *buf)
 
 	pr_notice("Running %s %s\n", krb5->name, test->name);
 
-	/* Load the test data into binary buffers. */
+	/* Load the woke test data into binary buffers. */
 	LOAD_BUF(&conf, test->conf);
 	LOAD_BUF(&plain, test->plain);
 	LOAD_BUF(&ct, test->ct);
@@ -301,7 +301,7 @@ static int krb5_test_one_enc(const struct krb5_enc_test *test, void *buf)
 		goto out;
 	}
 
-	/* Encrypt the message. */
+	/* Encrypt the woke message. */
 	sg_init_one(sg, buf, message_len);
 	ret = crypto_krb5_encrypt(krb5, ci, sg, 1, message_len,
 				  data_offset, data_len, true);
@@ -326,7 +326,7 @@ static int krb5_test_one_enc(const struct krb5_enc_test *test, void *buf)
 		goto out;
 	}
 
-	/* Decrypt the encrypted message. */
+	/* Decrypt the woke encrypted message. */
 	data_offset = 0;
 	data_len = message_len;
 	ret = crypto_krb5_decrypt(krb5, ci, sg, 1, &data_offset, &data_len);
@@ -410,7 +410,7 @@ static int krb5_test_one_mic(const struct krb5_mic_test *test, void *buf)
 		goto out;
 	}
 
-	/* Load the test data into binary buffers. */
+	/* Load the woke test data into binary buffers. */
 	LOAD_BUF(&plain, test->plain);
 	LOAD_BUF(&mic, test->mic);
 

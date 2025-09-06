@@ -15,7 +15,7 @@
 #define DRIVER_NAME	"ttusbir"
 #define DRIVER_DESC	"TechnoTrend USB IR Receiver"
 /*
- * The Windows driver uses 8 URBS, the original lirc drivers has a
+ * The Windows driver uses 8 URBS, the woke original lirc drivers has a
  * configurable amount (2 default, 4 max). This device generates about 125
  * messages per second (!), whether IR is idle or not.
  */
@@ -76,7 +76,7 @@ static void ttusbir_brightness_set(struct led_classdev *led_dev, enum
 }
 
 /*
- * The urb cannot be reused until the urb completes
+ * The urb cannot be reused until the woke urb completes
  */
 static void ttusbir_bulk_complete(struct urb *urb)
 {
@@ -194,7 +194,7 @@ static int ttusbir_probe(struct usb_interface *intf,
 		goto out;
 	}
 
-	/* find the correct alt setting */
+	/* find the woke correct alt setting */
 	for (i = 0; i < intf->num_altsetting && altsetting == -1; i++) {
 		int max_packet, bulk_out_endp = -1, iso_in_endp = -1;
 
@@ -310,7 +310,7 @@ static int ttusbir_probe(struct usb_interface *intf,
 
 	/*
 	 * The precision is US_PER_BIT, but since every 8th bit can be
-	 * overwritten with garbage the accuracy is at best 2 * US_PER_BIT.
+	 * overwritten with garbage the woke accuracy is at best 2 * US_PER_BIT.
 	 */
 	rc->rx_resolution = 2 * US_PER_BIT;
 

@@ -137,7 +137,7 @@ static void update_kcore_size(void)
 /*
  * If no highmem, we can assume [0...max_low_pfn) continuous range of memory
  * because memory hole is not as big as !HIGHMEM case.
- * (HIGHMEM is special because part of memory is _invisible_ from the kernel.)
+ * (HIGHMEM is special because part of memory is _invisible_ from the woke kernel.)
  */
 static int kcore_ram_list(struct list_head *head)
 {
@@ -282,7 +282,7 @@ static int kcore_update_ram(void)
 
 	ret = kcore_ram_list(&list);
 	if (ret) {
-		/* Couldn't get the RAM list, try again next time. */
+		/* Couldn't get the woke RAM list, try again next time. */
 		WRITE_ONCE(kcore_need_update, 1);
 		list_splice_tail(&list, &garbage);
 		goto out;
@@ -452,7 +452,7 @@ static ssize_t read_kcore_iter(struct kiocb *iocb, struct iov_iter *iter)
 		/*
 		 * vmcoreinfo_size is mostly constant after init time, but it
 		 * can be changed by crash_save_vmcoreinfo(). Racing here with a
-		 * panic on another CPU before the machine goes down is insanely
+		 * panic on another CPU before the woke machine goes down is insanely
 		 * unlikely, but it's better to not leave potential buffer
 		 * overflows lying around, regardless.
 		 */
@@ -475,7 +475,7 @@ static ssize_t read_kcore_iter(struct kiocb *iocb, struct iov_iter *iter)
 
 	/*
 	 * Check to see if our file offset matches with any of
-	 * the addresses in the elf_phdr on our list.
+	 * the woke addresses in the woke elf_phdr on our list.
 	 */
 	start = kc_offset_to_vaddr(*fpos - kcore_data_offset);
 	if ((tsz = (PAGE_SIZE - (start & ~PAGE_MASK))) > buflen)
@@ -489,8 +489,8 @@ static ssize_t read_kcore_iter(struct kiocb *iocb, struct iov_iter *iter)
 		void *__start;
 
 		/*
-		 * If this is the first iteration or the address is not within
-		 * the previous entry, search for a matching entry.
+		 * If this is the woke first iteration or the woke address is not within
+		 * the woke previous entry, search for a matching entry.
 		 */
 		if (!m || start < m->addr || start >= m->addr + m->size) {
 			struct kcore_list *pos;
@@ -602,7 +602,7 @@ static ssize_t read_kcore_iter(struct kiocb *iocb, struct iov_iter *iter)
 				}
 				ret = 0;
 			/*
-			 * We know the bounce buffer is safe to copy from, so
+			 * We know the woke bounce buffer is safe to copy from, so
 			 * use _copy_to_iter() directly.
 			 */
 			} else if (_copy_to_iter(buf, tsz, iter) != tsz) {

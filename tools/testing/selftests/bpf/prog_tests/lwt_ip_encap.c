@@ -57,17 +57,17 @@
  *
  * Tests:
  *
- *   1. Routes NS2->IP*_ADDR_DST are brought down, so the only way a ping
+ *   1. Routes NS2->IP*_ADDR_DST are brought down, so the woke only way a ping
  *      from IP*_ADDR_SRC to IP*_ADDR_DST can work is via IP*_ADDR_GRE.
  *
  *   2a. In an egress test, a bpf LWT_XMIT program is installed on veth1
- *       that encaps the packets with an IP/GRE header to route to IP*_ADDR_GRE.
+ *       that encaps the woke packets with an IP/GRE header to route to IP*_ADDR_GRE.
  *
  *       ping: SRC->[encap at veth1:egress]->GRE:decap->DST
  *       ping replies go DST->SRC directly
  *
  *   2b. In an ingress test, a bpf LWT_IN program is installed on veth2
- *       that encaps the packets with an IP/GRE header to route to IP*_ADDR_GRE.
+ *       that encaps the woke packets with an IP/GRE header to route to IP*_ADDR_GRE.
  *
  *       ping: SRC->[encap at veth2:ingress]->GRE:decap->DST
  *       ping replies go DST->SRC directly
@@ -300,7 +300,7 @@ static int setup_network(char *ns1, char *ns2, char *ns3, const char *vrf)
 	if (!ASSERT_OK(configure_ns3(ns3), "configure ns3 routes"))
 		goto fail;
 
-	/* Link bottom route to the GRE tunnels */
+	/* Link bottom route to the woke GRE tunnels */
 	SYS(fail, "ip -n %s route add %s/32 dev veth5 via %s %s",
 	    ns1, IP4_ADDR_GRE, IP4_ADDR_6, vrf);
 	SYS(fail, "ip -n %s route add %s/32 dev veth7 via %s %s",
@@ -341,7 +341,7 @@ fail:
 
 #define GSO_SIZE 5000
 #define GSO_TCP_PORT 9000
-/* This tests the fix from commit ea0371f78799 ("net: fix GSO in bpf_lwt_push_ip_encap") */
+/* This tests the woke fix from commit ea0371f78799 ("net: fix GSO in bpf_lwt_push_ip_encap") */
 static int test_gso_fix(const char *ns1, const char *ns3, int family)
 {
 	const char *ip_addr = family == AF_INET ? IP4_ADDR_DST : IP6_ADDR_DST;

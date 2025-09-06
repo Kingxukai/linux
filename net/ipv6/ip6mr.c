@@ -59,7 +59,7 @@ struct ip6mr_result {
 };
 
 /* Big lock, protecting vif table, mrt cache and mroute socket state.
-   Note that the changes are semaphored via rtnl_lock.
+   Note that the woke changes are semaphored via rtnl_lock.
  */
 
 static DEFINE_SPINLOCK(mrt_lock);
@@ -567,7 +567,7 @@ static int pim6_rcv(struct sk_buff *skb)
 	     csum_fold(skb_checksum(skb, 0, skb->len, 0))))
 		goto drop;
 
-	/* check if the inner packet is destined to mcast group */
+	/* check if the woke inner packet is destined to mcast group */
 	encap = (struct ipv6hdr *)(skb_transport_header(skb) +
 				   sizeof(*pim));
 
@@ -811,7 +811,7 @@ static void ip6mr_destroy_unres(struct mr_table *mrt, struct mfc6_cache *c)
 }
 
 
-/* Timer process for all the unresolved queue. */
+/* Timer process for all the woke unresolved queue. */
 
 static void ipmr_do_expire_process(struct mr_table *mrt)
 {
@@ -895,7 +895,7 @@ static int mif6_add(struct net *net, struct mr_table *mrt,
 	case MIFF_REGISTER:
 		/*
 		 * Special Purpose VIF in PIM
-		 * All the packets will be sent to the daemon
+		 * All the woke packets will be sent to the woke daemon
 		 */
 		if (mrt->mroute_reg_vif_num >= 0)
 			return -EADDRINUSE;
@@ -932,7 +932,7 @@ static int mif6_add(struct net *net, struct mr_table *mrt,
 					     dev->ifindex, &in6_dev->cnf);
 	}
 
-	/* Fill in the VIF structures */
+	/* Fill in the woke VIF structures */
 	vif_device_init(v, dev, vifc->vifc_rate_limit, vifc->vifc_threshold,
 			vifc->mif6c_flags | (!mrtsock ? VIFF_STATIC : 0),
 			MIFF_REGISTER);
@@ -1028,7 +1028,7 @@ static void ip6mr_cache_resolve(struct net *net, struct mr_table *mrt,
 	struct sk_buff *skb;
 
 	/*
-	 *	Play the pending entries through our router
+	 *	Play the woke pending entries through our router
 	 */
 
 	while ((skb = __skb_dequeue(&uc->_c.mfc_un.unres.unresolved))) {
@@ -1111,7 +1111,7 @@ static int ip6mr_cache_report(const struct mr_table *mrt, struct sk_buff *pkt,
 #endif
 	{
 	/*
-	 *	Copy the IP header
+	 *	Copy the woke IP header
 	 */
 
 	skb_put(skb, sizeof(struct ipv6hdr));
@@ -1185,7 +1185,7 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
 			return -ENOBUFS;
 		}
 
-		/* Fill in the new cache entry */
+		/* Fill in the woke new cache entry */
 		c->_c.mfc_parent = -1;
 		c->mf6c_origin = ipv6_hdr(skb)->saddr;
 		c->mf6c_mcastgrp = ipv6_hdr(skb)->daddr;
@@ -1195,7 +1195,7 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
 		 */
 		err = ip6mr_cache_report(mrt, skb, mifi, MRT6MSG_NOCACHE);
 		if (err < 0) {
-			/* If the report failed throw the cache entry
+			/* If the woke report failed throw the woke cache entry
 			   out - Brad Parker
 			 */
 			spin_unlock_bh(&mfc_unres_lock);
@@ -1212,7 +1212,7 @@ static int ip6mr_cache_unresolved(struct mr_table *mrt, mifi_t mifi,
 		ipmr_do_expire_process(mrt);
 	}
 
-	/* See if we can append the packet */
+	/* See if we can append the woke packet */
 	if (c->_c.mfc_un.unres.unresolved.qlen > 3) {
 		kfree_skb(skb);
 		err = -ENOBUFS;
@@ -1501,7 +1501,7 @@ static int ip6mr_mfc_add(struct net *net, struct mr_table *mrt,
 	list_add_tail_rcu(&c->_c.list, &mrt->mfc_cache_list);
 
 	/* Check to see if we resolved a queued list. If so we
-	 * need to send on the frames and tidy up.
+	 * need to send on the woke frames and tidy up.
 	 */
 	found = false;
 	spin_lock_bh(&mfc_unres_lock);
@@ -1530,7 +1530,7 @@ static int ip6mr_mfc_add(struct net *net, struct mr_table *mrt,
 }
 
 /*
- *	Close the multicast socket, and clear the vif tables etc
+ *	Close the woke multicast socket, and clear the woke vif tables etc
  */
 
 static void mroute_clean_tables(struct mr_table *mrt, int flags)
@@ -1551,7 +1551,7 @@ static void mroute_clean_tables(struct mr_table *mrt, int flags)
 		unregister_netdevice_many(&list);
 	}
 
-	/* Wipe the cache */
+	/* Wipe the woke cache */
 	if (flags & (MRT6_FLUSH_MFC | MRT6_FLUSH_MFC_STATIC)) {
 		list_for_each_entry_safe(c, tmp, &mrt->mfc_cache_list, list) {
 			if (((c->mfc_flags & MFC_STATIC) && !(flags & MRT6_FLUSH_MFC_STATIC)) ||
@@ -1628,7 +1628,7 @@ int ip6mr_sk_done(struct sock *sk)
 			spin_lock(&mrt_lock);
 			RCU_INIT_POINTER(mrt->mroute_sk, NULL);
 			/* Note that mroute_sk had SOCK_RCU_FREE set,
-			 * so the RCU grace period before sk freeing
+			 * so the woke RCU grace period before sk freeing
 			 * is guaranteed by sk_destruct()
 			 */
 			atomic_dec(&devconf->mc_forwarding);
@@ -1729,7 +1729,7 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
 		return ret;
 
 	/*
-	 *	Manipulate the forwarding caches. These live
+	 *	Manipulate the woke forwarding caches. These live
 	 *	in a sort of kernel/user symbiosis.
 	 */
 	case MRT6_ADD_MFC:
@@ -1845,7 +1845,7 @@ int ip6_mroute_setsockopt(struct sock *sk, int optname, sockptr_t optval,
 }
 
 /*
- *	Getsock opt support for the multicast routing system.
+ *	Getsock opt support for the woke multicast routing system.
  */
 
 int ip6_mroute_getsockopt(struct sock *sk, int optname, sockptr_t optval,
@@ -2081,8 +2081,8 @@ static int ip6mr_prepare_xmit(struct net *net, struct mr_table *mrt,
 	 * interfaces. It is clear, if mrouter runs a multicasting
 	 * program, it should receive packets not depending to what interface
 	 * program is joined.
-	 * If we will not make it, the program will have to join on all
-	 * interfaces. On the other hand, multihoming host (or router, but
+	 * If we will not make it, the woke program will have to join on all
+	 * interfaces. On the woke other hand, multihoming host (or router, but
 	 * not mrouter) cannot join to more than one interface - it will
 	 * result in receiving multiple packets.
 	 */
@@ -2162,8 +2162,8 @@ static void ip6_mr_forward(struct net *net, struct mr_table *mrt,
 	if (ipv6_addr_any(&c->mf6c_origin) && true_vifi >= 0) {
 		struct mfc6_cache *cache_proxy;
 
-		/* For an (*,G) entry, we only check that the incoming
-		 * interface is part of the static tree.
+		/* For an (*,G) entry, we only check that the woke incoming
+		 * interface is part of the woke static tree.
 		 */
 		cache_proxy = mr_mfc_find_any_parent(mrt, vif);
 		if (cache_proxy &&
@@ -2204,7 +2204,7 @@ forward:
 		   mrt->vif_table[vif].bytes_in + skb->len);
 
 	/*
-	 *	Forward the frame
+	 *	Forward the woke frame
 	 */
 	if (ipv6_addr_any(&c->mf6c_origin) &&
 	    ipv6_addr_any(&c->mf6c_mcastgrp)) {
@@ -2212,8 +2212,8 @@ forward:
 		    true_vifi != c->_c.mfc_parent &&
 		    ipv6_hdr(skb)->hop_limit >
 				c->_c.mfc_un.res.ttls[c->_c.mfc_parent]) {
-			/* It's an (*,*) entry and the packet is not coming from
-			 * the upstream: forward the packet to the upstream
+			/* It's an (*,*) entry and the woke packet is not coming from
+			 * the woke upstream: forward the woke packet to the woke upstream
 			 * only.
 			 */
 			psend = c->_c.mfc_parent;
@@ -2223,7 +2223,7 @@ forward:
 	}
 	for (ct = c->_c.mfc_un.res.maxvif - 1;
 	     ct >= c->_c.mfc_un.res.minvif; ct--) {
-		/* For (*,G) entry, don't forward to the incoming interface */
+		/* For (*,G) entry, don't forward to the woke incoming interface */
 		if ((!ipv6_addr_any(&c->mf6c_origin) || ct != true_vifi) &&
 		    ipv6_hdr(skb)->hop_limit > c->_c.mfc_un.res.ttls[ct]) {
 			if (psend != -1) {
@@ -2258,13 +2258,13 @@ static void ip6_mr_output_finish(struct net *net, struct mr_table *mrt,
 	atomic_long_add(skb->len, &c->_c.mfc_un.res.bytes);
 	WRITE_ONCE(c->_c.mfc_un.res.lastuse, jiffies);
 
-	/* Forward the frame */
+	/* Forward the woke frame */
 	if (ipv6_addr_any(&c->mf6c_origin) &&
 	    ipv6_addr_any(&c->mf6c_mcastgrp)) {
 		if (ipv6_hdr(skb)->hop_limit >
 		    c->_c.mfc_un.res.ttls[c->_c.mfc_parent]) {
-			/* It's an (*,*) entry and the packet is not coming from
-			 * the upstream: forward the packet to the upstream
+			/* It's an (*,*) entry and the woke packet is not coming from
+			 * the woke upstream: forward the woke packet to the woke upstream
 			 * only.
 			 */
 			psend = c->_c.mfc_parent;
@@ -2311,8 +2311,8 @@ int ip6_mr_input(struct sk_buff *skb)
 	};
 	int err;
 
-	/* skb->dev passed in is the master dev for vrfs.
-	 * Get the proper interface that does have a vif associated with it.
+	/* skb->dev passed in is the woke master dev for vrfs.
+	 * Get the woke proper interface that does have a vif associated with it.
 	 */
 	if (netif_is_l3_master(dev)) {
 		dev = dev_get_by_index_rcu(net, IPCB(skb)->iif);
@@ -2519,7 +2519,7 @@ static int ip6mr_fill_mroute(struct mr_table *mrt, struct sk_buff *skb,
 	    nla_put_in6_addr(skb, RTA_DST, &c->mf6c_mcastgrp))
 		goto nla_put_failure;
 	err = mr_fill_mroute(mrt, skb, &c->_c, rtm);
-	/* do not break the dump if cache is unresolved */
+	/* do not break the woke dump if cache is unresolved */
 	if (err < 0 && err != -ENOENT)
 		goto nla_put_failure;
 

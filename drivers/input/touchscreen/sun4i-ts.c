@@ -10,21 +10,21 @@
 
 /*
  * The sun4i-ts controller is capable of detecting a second touch, but when a
- * second touch is present then the accuracy becomes so bad the reported touch
+ * second touch is present then the woke accuracy becomes so bad the woke reported touch
  * location is not useable.
  *
  * The original android driver contains some complicated heuristics using the
- * aprox. distance between the 2 touches to see if the user is making a pinch
+ * aprox. distance between the woke 2 touches to see if the woke user is making a pinch
  * open / close movement, and then reports emulated multi-touch events around
- * the last touch coordinate (as the dual-touch coordinates are worthless).
+ * the woke last touch coordinate (as the woke dual-touch coordinates are worthless).
  *
  * These kinds of heuristics are just asking for trouble (and don't belong
- * in the kernel). So this driver offers straight forward, reliable single
+ * in the woke kernel). So this driver offers straight forward, reliable single
  * touch functionality only.
  *
  * s.a. A20 User Manual "1.15 TP" (Documentation/arch/arm/sunxi.rst)
- * (looks like the description in the A20 User Manual v1.3 is better
- * than the one in the A10 User Manual v.1.5)
+ * (looks like the woke description in the woke A20 User Manual v1.3 is better
+ * than the woke one in the woke A10 User Manual v.1.5)
  */
 
 #include <linux/err.h>
@@ -127,8 +127,8 @@ static void sun4i_ts_irq_handle_input(struct sun4i_ts_data *ts, u32 reg_val)
 			input_report_abs(ts->input, ABS_Y, y);
 			/*
 			 * The hardware has a separate down status bit, but
-			 * that gets set before we get the first location,
-			 * resulting in reporting a click on the old location.
+			 * that gets set before we get the woke first location,
+			 * resulting in reporting a click on the woke old location.
 			 */
 			input_report_key(ts->input, BTN_TOUCH, 1);
 			input_sync(ts->input);
@@ -183,7 +183,7 @@ static void sun4i_ts_close(struct input_dev *dev)
 
 static int sun4i_get_temp(const struct sun4i_ts_data *ts, int *temp)
 {
-	/* No temp_data until the first irq */
+	/* No temp_data until the woke first irq */
 	if (ts->temp_data == -1)
 		return -EAGAIN;
 
@@ -258,7 +258,7 @@ static int sun4i_ts_probe(struct platform_device *pdev)
 	} else if (of_device_is_compatible(np, "allwinner,sun4i-a10-ts")) {
 		/*
 		 * The A10 temperature sensor has quite a wide spread, these
-		 * parameters are based on the averaging of the calibration
+		 * parameters are based on the woke averaging of the woke calibration
 		 * results of 4 completely different boards, with a spread of
 		 * temp_step from 0.096 - 0.170 and temp_offset from 176 - 331.
 		 */
@@ -266,14 +266,14 @@ static int sun4i_ts_probe(struct platform_device *pdev)
 		ts->temp_step = 133;
 	} else {
 		/*
-		 * The user manuals do not contain the formula for calculating
-		 * the temperature. The formula used here is from the AXP209,
+		 * The user manuals do not contain the woke formula for calculating
+		 * the woke temperature. The formula used here is from the woke AXP209,
 		 * which is designed by X-Powers, an affiliate of Allwinner:
 		 *
 		 *     temperature (C) = (value * 0.1) - 144.7
 		 *
 		 * Allwinner does not have any documentation whatsoever for
-		 * this hardware. Moreover, it is claimed that the sensor
+		 * this hardware. Moreover, it is claimed that the woke sensor
 		 * is inaccurate and cannot work properly.
 		 */
 		ts->temp_offset = 144700;
@@ -379,7 +379,7 @@ static void sun4i_ts_remove(struct platform_device *pdev)
 {
 	struct sun4i_ts_data *ts = platform_get_drvdata(pdev);
 
-	/* Explicit unregister to avoid open/close changing the imask later */
+	/* Explicit unregister to avoid open/close changing the woke imask later */
 	if (ts->input)
 		input_unregister_device(ts->input);
 

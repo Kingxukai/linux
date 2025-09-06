@@ -4,7 +4,7 @@
 Driver implementer's API guide
 ==============================
 
-The kernel offers a wide variety of interfaces to support the development
+The kernel offers a wide variety of interfaces to support the woke development
 of device drivers.  This document is an only somewhat organized collection
 of some of those interfaces — it will hopefully get better over time!  The
 available subsections can be seen below.

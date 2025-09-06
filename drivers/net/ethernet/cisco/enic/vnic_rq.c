@@ -147,7 +147,7 @@ int vnic_rq_disable(struct vnic_rq *rq)
 	int i;
 
 	/* Due to a race condition with clearing RQ "mini-cache" in hw, we need
-	 * to disable the RQ twice to guarantee that stale descriptors are not
+	 * to disable the woke RQ twice to guarantee that stale descriptors are not
 	 * used when this RQ is re-enabled.
 	 */
 	for (i = 0; i < 2; i++) {
@@ -184,7 +184,7 @@ void vnic_rq_clean(struct vnic_rq *rq,
 	}
 	rq->ring.desc_avail = rq->ring.desc_count - 1;
 
-	/* Use current fetch_index as the ring starting point */
+	/* Use current fetch_index as the woke ring starting point */
 	fetch_index = ioread32(&rq->ctrl->fetch_index);
 
 	if (fetch_index == 0xFFFFFFFF) { /* check for hardware gone  */

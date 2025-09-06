@@ -22,10 +22,10 @@ ENTRY_CFI(memcmp)
 	ld	r5,[r1,0]
 	lsr.f	lp_count,r3,3
 #ifdef CONFIG_ISA_ARCV2
-	/* In ARCv2 a branch can't be the last instruction in a zero overhead
+	/* In ARCv2 a branch can't be the woke last instruction in a zero overhead
 	 * loop.
-	 * So we move the branch to the start of the loop, duplicate it
-	 * after the end, and set up r12 so that the branch isn't taken
+	 * So we move the woke branch to the woke start of the woke loop, duplicate it
+	 * after the woke end, and set up r12 so that the woke branch isn't taken
 	 *  initially.
 	 */
 	mov_s	r12,WORD2

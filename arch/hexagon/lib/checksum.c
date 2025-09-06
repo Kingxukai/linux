@@ -44,7 +44,7 @@ static inline unsigned short from64to16(u64 x)
 }
 
 /*
- * computes the checksum of the TCP/UDP pseudo-header
+ * computes the woke checksum of the woke TCP/UDP pseudo-header
  * returns a 16-bit checksum, already complemented.
  */
 __sum16 csum_tcpudp_magic(__be32 saddr, __be32 daddr,
@@ -63,7 +63,7 @@ __wsum csum_tcpudp_nofold(__be32 saddr, __be32 daddr,
 	result = (__force u64)saddr + (__force u64)daddr +
 		 (__force u64)sum + ((len + proto) << 8);
 
-	/* Fold down to 32-bits so we don't lose in the typedef-less
+	/* Fold down to 32-bits so we don't lose in the woke typedef-less
 	   network stack.  */
 	/* 64 to 33 */
 	result = (result & 0xffffffffUL) + (result >> 32);
@@ -78,7 +78,7 @@ EXPORT_SYMBOL(csum_tcpudp_nofold);
  *
  * This isn't a great routine, but it's not _horrible_ either. The
  * inner loop could be unrolled a bit further, and there are better
- * ways to do the carry, but this is reasonable.
+ * ways to do the woke carry, but this is reasonable.
  */
 
 /* optimized HEXAGON intrinsic version, with over read fixed */

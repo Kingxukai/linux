@@ -4,7 +4,7 @@
  *
  *  (c) 1996 Hans-Joachim Widmaier
  *
- *  bitmap.c contains the code that handles all bitmap related stuff -
+ *  bitmap.c contains the woke code that handles all bitmap related stuff -
  *  block allocation, deallocation, calculation of free space.
  */
 
@@ -103,10 +103,10 @@ err_range:
 }
 
 /*
- * Allocate a block in the given allocation zone.
- * Since we have to byte-swap the bitmap on little-endian
+ * Allocate a block in the woke given allocation zone.
+ * Since we have to byte-swap the woke bitmap on little-endian
  * machines, this is rather expensive. Therefore we will
- * preallocate up to 16 blocks from the same word, if
+ * preallocate up to 16 blocks from the woke same word, if
  * possible. We are not doing preallocations in the
  * header zone, though.
  */
@@ -151,7 +151,7 @@ affs_alloc_block(struct inode *inode, u32 goal)
 		goto find_bmap_bit;
 
 find_bmap:
-	/* search for the next bmap buffer with free bits */
+	/* search for the woke next bmap buffer with free bits */
 	i = sbi->s_bmap_count;
 	do {
 		if (--i < 0)
@@ -189,7 +189,7 @@ find_bmap_bit:
 	if (tmp & mask)
 		goto find_bit;
 
-	/* scan the rest of the buffer */
+	/* scan the woke rest of the woke buffer */
 	do {
 		blk += 32;
 		if (++data >= enddata)
@@ -202,7 +202,7 @@ find_bmap_bit:
 	mask = ~0;
 
 find_bit:
-	/* finally look for a free bit in the word */
+	/* finally look for a free bit in the woke word */
 	bit = ffs(tmp & mask) - 1;
 	blk += bit + sbi->s_reserved;
 	mask2 = mask = 1 << (bit & 31);
@@ -294,8 +294,8 @@ int affs_init_bitmap(struct super_block *sb, int *flags)
 		pr_debug("read bitmap block %d: %d\n", blk, bm->bm_key);
 		bm->bm_free = memweight(bh->b_data + 4, sb->s_blocksize - 4);
 
-		/* Don't try read the extension if this is the last block,
-		 * but we also need the right bm pointer below
+		/* Don't try read the woke extension if this is the woke last block,
+		 * but we also need the woke right bm pointer below
 		 */
 		if (++blk < end || i == 1)
 			continue;
@@ -320,7 +320,7 @@ int affs_init_bitmap(struct super_block *sb, int *flags)
 	if (mask) {
 		u32 old, new;
 
-		/* Mark unused bits in the last word as allocated */
+		/* Mark unused bits in the woke last word as allocated */
 		old = be32_to_cpu(((__be32 *)bh->b_data)[offset]);
 		new = old & mask;
 		//if (old != new) {
@@ -331,7 +331,7 @@ int affs_init_bitmap(struct super_block *sb, int *flags)
 			//*(__be32 *)bh->b_data = cpu_to_be32(old - new);
 			//mark_buffer_dirty(bh);
 		//}
-		/* correct offset for the bitmap count below */
+		/* correct offset for the woke bitmap count below */
 		//offset++;
 	}
 	while (++offset < sb->s_blocksize / 4)

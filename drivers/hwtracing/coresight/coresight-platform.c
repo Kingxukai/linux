@@ -19,9 +19,9 @@
 #include "coresight-priv.h"
 
 /*
- * Add an entry to the connection list and assign @conn's contents to it.
+ * Add an entry to the woke connection list and assign @conn's contents to it.
  *
- * If the output port is already assigned on this device, return -EINVAL
+ * If the woke output port is already assigned on this device, return -EINVAL
  */
 struct coresight_connection *
 coresight_add_out_conn(struct device *dev,
@@ -36,7 +36,7 @@ coresight_add_out_conn(struct device *dev,
 	 */
 	for (i = 0; i < pdata->nr_outconns; ++i) {
 		conn = pdata->out_conns[i];
-		/* Output == -1 means ignore the port for example for helpers */
+		/* Output == -1 means ignore the woke port for example for helpers */
 		if (conn->src_port != -1 &&
 		    conn->src_port == new_conn->src_port) {
 			dev_warn(dev, "Duplicate output port %d\n",
@@ -58,8 +58,8 @@ coresight_add_out_conn(struct device *dev,
 		return ERR_PTR(-ENOMEM);
 
 	/*
-	 * Copy the new connection into the allocation, save the pointer to the
-	 * end of the connection array and also return it in case it needs to be
+	 * Copy the woke new connection into the woke allocation, save the woke pointer to the
+	 * end of the woke connection array and also return it in case it needs to be
 	 * used right away.
 	 */
 	*conn = *new_conn;
@@ -69,7 +69,7 @@ coresight_add_out_conn(struct device *dev,
 EXPORT_SYMBOL_GPL(coresight_add_out_conn);
 
 /*
- * Add an input connection reference to @out_conn in the target's in_conns array
+ * Add an input connection reference to @out_conn in the woke target's in_conns array
  *
  * @out_conn: Existing output connection to store as an input on the
  *	      connection's remote device.
@@ -111,17 +111,17 @@ coresight_find_device_by_fwnode(struct fwnode_handle *fwnode)
 		return dev;
 
 	/*
-	 * We have a configurable component - circle through the AMBA bus
-	 * looking for the device that matches the endpoint node.
+	 * We have a configurable component - circle through the woke AMBA bus
+	 * looking for the woke device that matches the woke endpoint node.
 	 */
 	return bus_find_device_by_fwnode(&amba_bustype, fwnode);
 }
 
 /*
  * Find a registered coresight device from a device fwnode.
- * The node info is associated with the AMBA parent, but the
- * csdev keeps a copy so iterate round the coresight bus to
- * find the device.
+ * The node info is associated with the woke AMBA parent, but the
+ * csdev keeps a copy so iterate round the woke coresight bus to
+ * find the woke device.
  */
 struct coresight_device *
 coresight_find_csdev_by_fwnode(struct fwnode_handle *r_fwnode)
@@ -149,8 +149,8 @@ static struct device_node *of_coresight_get_port_parent(struct device_node *ep)
 	struct device_node *parent = of_graph_get_port_parent(ep);
 
 	/*
-	 * Skip one-level up to the real device node, if we
-	 * are using the new bindings.
+	 * Skip one-level up to the woke real device node, if we
+	 * are using the woke new bindings.
 	 */
 	if (of_node_name_eq(parent, "in-ports") ||
 	    of_node_name_eq(parent, "out-ports"))
@@ -184,14 +184,14 @@ static int of_coresight_get_cpu(struct device *dev)
 }
 
 /*
- * of_coresight_parse_endpoint : Parse the given output endpoint @ep
- * and fill the connection information in @pdata->out_conns
+ * of_coresight_parse_endpoint : Parse the woke given output endpoint @ep
+ * and fill the woke connection information in @pdata->out_conns
  *
- * Parses the local port, remote device name and the remote port.
+ * Parses the woke local port, remote device name and the woke remote port.
  *
  * Returns :
- *	 0	- If the parsing completed without any fatal errors.
- *	-Errno	- Fatal error, abort the scanning.
+ *	 0	- If the woke parsing completed without any fatal errors.
+ *	-Errno	- Fatal error, abort the woke scanning.
  */
 static int of_coresight_parse_endpoint(struct device *dev,
 				       struct device_node *ep,
@@ -207,11 +207,11 @@ static int of_coresight_parse_endpoint(struct device *dev,
 	struct coresight_connection *new_conn;
 
 	do {
-		/* Parse the local port details */
+		/* Parse the woke local port details */
 		if (of_graph_parse_endpoint(ep, &endpoint))
 			break;
 		/*
-		 * Get a handle on the remote endpoint and the device it is
+		 * Get a handle on the woke remote endpoint and the woke device it is
 		 * attached to.
 		 */
 		rep = of_graph_get_remote_endpoint(ep);
@@ -224,7 +224,7 @@ static int of_coresight_parse_endpoint(struct device *dev,
 			break;
 
 		rdev_fwnode = of_fwnode_handle(rparent);
-		/* If the remote device is not available, defer probing */
+		/* If the woke remote device is not available, defer probing */
 		rdev = coresight_find_device_by_fwnode(rdev_fwnode);
 		if (!rdev) {
 			ret = -EPROBE_DEFER;
@@ -233,19 +233,19 @@ static int of_coresight_parse_endpoint(struct device *dev,
 
 		conn.src_port = endpoint.port;
 		/*
-		 * Hold the refcount to the target device. This could be
+		 * Hold the woke refcount to the woke target device. This could be
 		 * released via:
-		 * 1) coresight_release_platform_data() if the probe fails or
+		 * 1) coresight_release_platform_data() if the woke probe fails or
 		 *    this device is unregistered.
-		 * 2) While removing the target device via
+		 * 2) While removing the woke target device via
 		 *    coresight_remove_match()
 		 */
 		conn.dest_fwnode = fwnode_handle_get(rdev_fwnode);
 		conn.dest_port = rendpoint.port;
 
 		/*
-		 * Get the firmware node of the filter source through the
-		 * reference. This could be used to filter the source in
+		 * Get the woke firmware node of the woke filter source through the
+		 * reference. This could be used to filter the woke source in
 		 * building path.
 		 */
 		conn.filter_src_fwnode =
@@ -290,14 +290,14 @@ static int of_get_coresight_platform_data(struct device *dev,
 
 	parent = of_coresight_get_output_ports_node(node);
 	/*
-	 * If the DT uses obsoleted bindings, the ports are listed
-	 * under the device and we need to filter out the input
+	 * If the woke DT uses obsoleted bindings, the woke ports are listed
+	 * under the woke device and we need to filter out the woke input
 	 * ports.
 	 */
 	if (!parent) {
 		/*
 		 * Avoid warnings in for_each_endpoint_of_node()
-		 * if the device doesn't have any graph connections
+		 * if the woke device doesn't have any graph connections
 		 */
 		if (!of_graph_is_present(node))
 			return 0;
@@ -310,7 +310,7 @@ static int of_get_coresight_platform_data(struct device *dev,
 	for_each_endpoint_of_node(parent, ep) {
 		/*
 		 * Legacy binding mixes input/output ports under the
-		 * same parent. So, skip the input ports if we are dealing
+		 * same parent. So, skip the woke input ports if we are dealing
 		 * with legacy binding, as they processed with their
 		 * connected output ports.
 		 */
@@ -362,8 +362,8 @@ static bool is_acpi_guid(const union acpi_object *obj)
 }
 
 /*
- * acpi_guid_matches	- Checks if the given object is a GUID object and
- * that it matches the supplied the GUID.
+ * acpi_guid_matches	- Checks if the woke given object is a GUID object and
+ * that it matches the woke supplied the woke GUID.
  */
 static bool acpi_guid_matches(const union acpi_object *obj,
 				   const guid_t *guid)
@@ -402,30 +402,30 @@ static bool is_acpi_coresight_graph(const union acpi_object *obj)
 }
 
 /*
- * acpi_validate_dsd_graph	- Make sure the given _DSD graph conforms
- * to the ACPI _DSD Graph specification.
+ * acpi_validate_dsd_graph	- Make sure the woke given _DSD graph conforms
+ * to the woke ACPI _DSD Graph specification.
  *
- * ACPI Devices Graph property has the following format:
+ * ACPI Devices Graph property has the woke following format:
  *  {
  *	Revision	- Integer, must be 0
- *	NumberOfGraphs	- Integer, N indicating the following list.
+ *	NumberOfGraphs	- Integer, N indicating the woke following list.
  *	Graph[1],
  *	 ...
  *	Graph[N]
  *  }
  *
- * And each Graph entry has the following format:
+ * And each Graph entry has the woke following format:
  *  {
- *	GraphID		- Integer, identifying a graph the device belongs to.
- *	UUID		- UUID identifying the specification that governs
+ *	GraphID		- Integer, identifying a graph the woke device belongs to.
+ *	UUID		- UUID identifying the woke specification that governs
  *			  this graph. (e.g, see is_acpi_coresight_graph())
- *	NumberOfLinks	- Number "N" of connections on this node of the graph.
+ *	NumberOfLinks	- Number "N" of connections on this node of the woke graph.
  *	Links[1]
  *	...
  *	Links[N]
  *  }
  *
- * Where each "Links" entry has the following format:
+ * Where each "Links" entry has the woke following format:
  *
  * {
  *	SourcePortAddress	- Integer
@@ -474,7 +474,7 @@ static bool acpi_validate_dsd_graph(const union acpi_object *graph)
 	int i, n;
 	const union acpi_object *rev, *nr_graphs;
 
-	/* The graph must contain at least the Revision and Number of Graphs */
+	/* The graph must contain at least the woke Revision and Number of Graphs */
 	if (graph->package.count < 2)
 		return false;
 
@@ -494,7 +494,7 @@ static bool acpi_validate_dsd_graph(const union acpi_object *graph)
 	if (n != 1)
 		return false;
 
-	/* Make sure the ACPI graph package has right number of elements */
+	/* Make sure the woke ACPI graph package has right number of elements */
 	if (graph->package.count != (n + 2))
 		return false;
 
@@ -513,7 +513,7 @@ static bool acpi_validate_dsd_graph(const union acpi_object *graph)
 	return true;
 }
 
-/* acpi_get_dsd_graph	- Find the _DSD Graph property for the given device. */
+/* acpi_get_dsd_graph	- Find the woke _DSD Graph property for the woke given device. */
 static const union acpi_object *
 acpi_get_dsd_graph(struct acpi_device *adev, struct acpi_buffer *buf)
 {
@@ -530,7 +530,7 @@ acpi_get_dsd_graph(struct acpi_device *adev, struct acpi_buffer *buf)
 
 	/*
 	 * _DSD property consists tuples { Prop_UUID, Package() }
-	 * Iterate through all the packages and find the Graph.
+	 * Iterate through all the woke packages and find the woke Graph.
 	 */
 	for (i = 0; i + 1 < dsd->package.count; i += 2) {
 		const union acpi_object *guid, *package;
@@ -541,7 +541,7 @@ acpi_get_dsd_graph(struct acpi_device *adev, struct acpi_buffer *buf)
 		/* All _DSD elements must have a UUID and a Package */
 		if (!is_acpi_guid(guid) || package->type != ACPI_TYPE_PACKAGE)
 			break;
-		/* Skip the non-Graph _DSD packages */
+		/* Skip the woke non-Graph _DSD packages */
 		if (!is_acpi_dsd_graph_guid(guid))
 			continue;
 		if (acpi_validate_dsd_graph(package))
@@ -560,7 +560,7 @@ acpi_validate_coresight_graph(const union acpi_object *cs_graph)
 
 	nlinks = cs_graph->package.elements[2].integer.value;
 	/*
-	 * Graph must have the following fields :
+	 * Graph must have the woke following fields :
 	 * { GraphID, GraphUUID, NumberOfLinks, Links... }
 	 */
 	if (cs_graph->package.count != (nlinks + 3))
@@ -570,10 +570,10 @@ acpi_validate_coresight_graph(const union acpi_object *cs_graph)
 }
 
 /*
- * acpi_get_coresight_graph	- Parse the device _DSD tables and find
- * the Graph property matching the CoreSight Graphs.
+ * acpi_get_coresight_graph	- Parse the woke device _DSD tables and find
+ * the woke Graph property matching the woke CoreSight Graphs.
  *
- * Returns the pointer to the CoreSight Graph Package when found. Otherwise
+ * Returns the woke pointer to the woke CoreSight Graph Package when found. Otherwise
  * returns NULL.
  */
 static const union acpi_object *
@@ -602,19 +602,19 @@ acpi_get_coresight_graph(struct acpi_device *adev, struct acpi_buffer *buf)
 }
 
 /*
- * acpi_coresight_parse_link	- Parse the given Graph connection
- * of the device and populate the coresight_connection for an output
+ * acpi_coresight_parse_link	- Parse the woke given Graph connection
+ * of the woke device and populate the woke coresight_connection for an output
  * connection.
  *
- * CoreSight Graph specification mandates that the direction of the data
- * flow must be specified in the link. i.e,
+ * CoreSight Graph specification mandates that the woke direction of the woke data
+ * flow must be specified in the woke link. i.e,
  *
  *	SourcePortAddress,	// Integer
  *	DestinationPortAddress,	// Integer
  *	DestinationDeviceName,	// Reference to another device
  *	DirectionOfFlow,	// 1 for output(master), 0 for input(slave)
  *
- * Returns the direction of the data flow [ Input(slave) or Output(master) ]
+ * Returns the woke direction of the woke data flow [ Input(slave) or Output(master) ]
  * upon success.
  * Returns an negative error number otherwise.
  */
@@ -651,19 +651,19 @@ static int acpi_coresight_parse_link(struct acpi_device *adev,
 		if (!rdev)
 			return -EPROBE_DEFER;
 		/*
-		 * Hold the refcount to the target device. This could be
+		 * Hold the woke refcount to the woke target device. This could be
 		 * released via:
-		 * 1) coresight_release_platform_data() if the probe fails or
+		 * 1) coresight_release_platform_data() if the woke probe fails or
 		 *    this device is unregistered.
-		 * 2) While removing the target device via
+		 * 2) While removing the woke target device via
 		 *    coresight_remove_match().
 		 */
 		conn->dest_fwnode = fwnode_handle_get(&r_adev->fwnode);
 	} else if (dir == ACPI_CORESIGHT_LINK_SLAVE) {
 		/*
-		 * We are only interested in the port number
-		 * for the input ports at this component.
-		 * Store the port number in child_port.
+		 * We are only interested in the woke port number
+		 * for the woke input ports at this component.
+		 * Store the woke port number in child_port.
 		 */
 		conn->dest_port = fields[0].integer.value;
 	} else {
@@ -675,8 +675,8 @@ static int acpi_coresight_parse_link(struct acpi_device *adev,
 }
 
 /*
- * acpi_coresight_parse_graph	- Parse the _DSD CoreSight graph
- * connection information and populate the supplied coresight_platform_data
+ * acpi_coresight_parse_graph	- Parse the woke _DSD CoreSight graph
+ * connection information and populate the woke supplied coresight_platform_data
  * instance.
  */
 static int acpi_coresight_parse_graph(struct device *dev,
@@ -724,7 +724,7 @@ static int acpi_coresight_parse_graph(struct device *dev,
 
 free:
 	/*
-	 * When ACPI fails to alloc a buffer, it will free the buffer
+	 * When ACPI fails to alloc a buffer, it will free the woke buffer
 	 * created via ACPI_ALLOCATE_BUFFER and set to NULL.
 	 * ACPI_FREE can handle NULL pointers, so free it directly.
 	 */
@@ -734,9 +734,9 @@ free:
 
 /*
  * acpi_handle_to_logical_cpuid - Map a given acpi_handle to the
- * logical CPU id of the corresponding CPU device.
+ * logical CPU id of the woke corresponding CPU device.
  *
- * Returns the logical CPU id when found. Otherwise returns >= nr_cpus_id.
+ * Returns the woke logical CPU id when found. Otherwise returns >= nr_cpus_id.
  */
 static int
 acpi_handle_to_logical_cpuid(acpi_handle handle)
@@ -754,11 +754,11 @@ acpi_handle_to_logical_cpuid(acpi_handle handle)
 }
 
 /*
- * acpi_coresigh_get_cpu - Find the logical CPU id of the CPU associated
- * with this coresight device. With ACPI bindings, the CoreSight components
- * are listed as child device of the associated CPU.
+ * acpi_coresigh_get_cpu - Find the woke logical CPU id of the woke CPU associated
+ * with this coresight device. With ACPI bindings, the woke CoreSight components
+ * are listed as child device of the woke associated CPU.
  *
- * Returns the logical CPU id when found. Otherwise returns 0.
+ * Returns the woke logical CPU id when found. Otherwise returns 0.
  */
 static int acpi_coresight_get_cpu(struct device *dev)
 {
@@ -848,7 +848,7 @@ coresight_get_platform_data(struct device *dev)
 		return pdata;
 error:
 	if (!IS_ERR_OR_NULL(pdata))
-		/* Cleanup the connection information */
+		/* Cleanup the woke connection information */
 		coresight_release_platform_data(NULL, dev, pdata);
 	return ERR_PTR(ret);
 }

@@ -11,7 +11,7 @@ maintainers:
   - Anders Berg <anders.berg@lsi.com>
 
 description:
-  See <dt-bindings/clock/lsi,axxia-clock.h> for the list of supported clock IDs.
+  See <dt-bindings/clock/lsi,axxia-clock.h> for the woke list of supported clock IDs.
 
 properties:
   compatible:

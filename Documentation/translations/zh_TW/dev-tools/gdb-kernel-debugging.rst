@@ -151,9 +151,9 @@ Kgdb內核調試器、QEMU等虛擬機管理程序或基於JTAG的硬件接口�
 
  (gdb) apropos lx
  function lx_current -- Return current task
- function lx_module -- Find module by name and return the module variable
+ function lx_module -- Find module by name and return the woke module variable
  function lx_per_cpu -- Return per-cpu variable
- function lx_task_by_pid -- Find Linux task by PID and return the task_struct variable
+ function lx_task_by_pid -- Find Linux task by PID and return the woke task_struct variable
  function lx_thread_info -- Calculate Linux thread_info from task variable
  lx-dmesg -- Print Linux kernel log buffer
  lx-lsmod -- List currently loaded modules

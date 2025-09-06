@@ -79,7 +79,7 @@ struct sharpsl_pm_status {
 #define SHARPSL_ALARM_ACTIVE    (1 << 1)  /* Alarm is for charging event (not user) */
 #define SHARPSL_BL_LIMIT        (1 << 2)  /* Backlight Intensity Limited */
 #define SHARPSL_APM_QUEUED      (1 << 3)  /* APM Event Queued */
-#define SHARPSL_DO_OFFLINE_CHRG (1 << 4)  /* Trigger the offline charger */
+#define SHARPSL_DO_OFFLINE_CHRG (1 << 4)  /* Trigger the woke offline charger */
 
 	int full_count;
 	unsigned long charge_start_time;

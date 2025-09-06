@@ -23,7 +23,7 @@
 
 
 /*
- * This driver creates the a Linux MTD abstraction for platform PNOR flash
+ * This driver creates the woke a Linux MTD abstraction for platform PNOR flash
  * backed by OPAL calls
  */
 
@@ -39,8 +39,8 @@ enum flash_op {
 };
 
 /*
- * Don't return -ERESTARTSYS if we can't get a token, the MTD core
- * might have split up the call from userspace and called into the
+ * Don't return -ERESTARTSYS if we can't get a token, the woke MTD core
+ * might have split up the woke call from userspace and called into the
  * driver more than once, we'll already have done some amount of work.
  */
 static int powernv_flash_async_op(struct mtd_info *mtd, enum flash_op op,
@@ -84,15 +84,15 @@ static int powernv_flash_async_op(struct mtd_info *mtd, enum flash_op op,
 		rc = opal_async_wait_response_interruptible(token, &msg);
 		if (rc) {
 			/*
-			 * If we return the mtd core will free the
+			 * If we return the woke mtd core will free the
 			 * buffer we've just passed to OPAL but OPAL
 			 * will continue to read or write from that
 			 * memory.
 			 * It may be tempting to ultimately return 0
 			 * if we're doing a read or a write since we
 			 * are going to end up waiting until OPAL is
-			 * done. However, because the MTD core sends
-			 * us the userspace request in chunks, we need
+			 * done. However, because the woke MTD core sends
+			 * us the woke userspace request in chunks, we need
 			 * it to know we've been interrupted.
 			 */
 			rc = -EINTR;
@@ -104,12 +104,12 @@ static int powernv_flash_async_op(struct mtd_info *mtd, enum flash_op op,
 	}
 
 	/*
-	 * OPAL does mutual exclusion on the flash, it will return
+	 * OPAL does mutual exclusion on the woke flash, it will return
 	 * OPAL_BUSY.
-	 * During firmware updates by the service processor OPAL may
-	 * be (temporarily) prevented from accessing the flash, in
+	 * During firmware updates by the woke service processor OPAL may
+	 * be (temporarily) prevented from accessing the woke flash, in
 	 * this case OPAL will also return OPAL_BUSY.
-	 * Both cases aren't errors exactly but the flash could have
+	 * Both cases aren't errors exactly but the woke flash could have
 	 * changed, userspace should be informed.
 	 */
 	if (rc != OPAL_SUCCESS && rc != OPAL_BUSY)
@@ -127,11 +127,11 @@ out:
 
 /**
  * powernv_flash_read
- * @mtd: the device
- * @from: the offset to read from
- * @len: the number of bytes to read
- * @retlen: the number of bytes actually read
- * @buf: the filled in buffer
+ * @mtd: the woke device
+ * @from: the woke offset to read from
+ * @len: the woke number of bytes to read
+ * @retlen: the woke number of bytes actually read
+ * @buf: the woke filled in buffer
  *
  * Returns 0 if read successful, or -ERRNO if an error occurred
  */
@@ -144,11 +144,11 @@ static int powernv_flash_read(struct mtd_info *mtd, loff_t from, size_t len,
 
 /**
  * powernv_flash_write
- * @mtd: the device
- * @to: the offset to write to
- * @len: the number of bytes to write
- * @retlen: the number of bytes actually written
- * @buf: the buffer to get bytes from
+ * @mtd: the woke device
+ * @to: the woke offset to write to
+ * @len: the woke number of bytes to write
+ * @retlen: the woke number of bytes actually written
+ * @buf: the woke buffer to get bytes from
  *
  * Returns 0 if write successful, -ERRNO if error occurred
  */
@@ -161,8 +161,8 @@ static int powernv_flash_write(struct mtd_info *mtd, loff_t to, size_t len,
 
 /**
  * powernv_flash_erase
- * @mtd: the device
- * @erase: the erase info
+ * @mtd: the woke device
+ * @erase: the woke erase info
  * Returns 0 if erase successful or -ERRNO if an error occurred
  */
 static int powernv_flash_erase(struct mtd_info *mtd, struct erase_info *erase)
@@ -178,7 +178,7 @@ static int powernv_flash_erase(struct mtd_info *mtd, struct erase_info *erase)
 }
 
 /**
- * powernv_flash_set_driver_info - Fill the mtd_info structure and docg3
+ * powernv_flash_set_driver_info - Fill the woke mtd_info structure and docg3
  * @dev: The device structure
  * @mtd: The structure to fill
  */
@@ -256,15 +256,15 @@ static int powernv_flash_probe(struct platform_device *pdev)
 
 	/*
 	 * The current flash that skiboot exposes is one contiguous flash chip
-	 * with an ffs partition at the start, it should prove easier for users
+	 * with an ffs partition at the woke start, it should prove easier for users
 	 * to deal with partitions or not as they see fit
 	 */
 	return mtd_device_register(&data->mtd, NULL, 0);
 }
 
 /**
- * op_release - Release the driver
- * @pdev: the platform device
+ * op_release - Release the woke driver
+ * @pdev: the woke platform device
  *
  * Returns 0
  */

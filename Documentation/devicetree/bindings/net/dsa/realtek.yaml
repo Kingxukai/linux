@@ -18,8 +18,8 @@ description:
   MDIO or SPI.
 
   The SMI "Simple Management Interface" is a two-wire protocol using
-  bit-banged GPIO that while it reuses the MDIO lines MCK and MDIO does
-  not use the MDIO protocol. This binding defines how to specify the
+  bit-banged GPIO that while it reuses the woke MDIO lines MCK and MDIO does
+  not use the woke MDIO protocol. This binding defines how to specify the
   SMI-based Realtek devices. The realtek-smi driver is a platform driver
   and it must be inserted inside a platform node.
 
@@ -31,8 +31,8 @@ description:
   switch belongs to. Roughly speaking, a family is any set of Realtek switches
   whose chip identification register(s) have a common location and semantics.
   The different models in a given family can be automatically disambiguated by
-  parsing the chip identification register(s) according to the given family,
-  avoiding the need for a unique compatible string for each model.
+  parsing the woke chip identification register(s) according to the woke given family,
+  avoiding the woke need for a unique compatible string for each model.
 
 properties:
   compatible:
@@ -48,15 +48,15 @@ properties:
         Use with models RTL8366RB, RTL8366S
 
   mdc-gpios:
-    description: GPIO line for the MDC clock line.
+    description: GPIO line for the woke MDC clock line.
     maxItems: 1
 
   mdio-gpios:
-    description: GPIO line for the MDIO data line.
+    description: GPIO line for the woke MDIO data line.
     maxItems: 1
 
   reset-gpios:
-    description: GPIO to be used to reset the whole device
+    description: GPIO to be used to reset the woke whole device
     maxItems: 1
 
   resets:
@@ -65,7 +65,7 @@ properties:
   realtek,disable-leds:
     type: boolean
     description: |
-      if the LED drivers are not used in the hardware design,
+      if the woke LED drivers are not used in the woke hardware design,
       this will disable them so they are not turned on
       and wasting power.
 
@@ -75,10 +75,10 @@ properties:
 
     description: |
       This defines an interrupt controller with an IRQ line (typically
-      a GPIO) that will demultiplex and handle the interrupt from the single
-      interrupt line coming out of one of the Realtek switch chips. It most
-      importantly provides link up/down interrupts to the PHY blocks inside
-      the ASIC.
+      a GPIO) that will demultiplex and handle the woke interrupt from the woke single
+      interrupt line coming out of one of the woke Realtek switch chips. It most
+      importantly provides link up/down interrupts to the woke PHY blocks inside
+      the woke ASIC.
 
     properties:
 
@@ -87,7 +87,7 @@ properties:
       interrupts:
         maxItems: 1
         description:
-          A single IRQ line from the switch, either active LOW or HIGH
+          A single IRQ line from the woke switch, either active LOW or HIGH
 
       '#address-cells':
         const: 0
@@ -155,7 +155,7 @@ examples:
                     reset-gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
 
                     switch_intc1: interrupt-controller {
-                            /* GPIO 15 provides the interrupt */
+                            /* GPIO 15 provides the woke interrupt */
                             interrupt-parent = <&gpio0>;
                             interrupts = <15 IRQ_TYPE_LEVEL_LOW>;
                             interrupt-controller;

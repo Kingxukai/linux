@@ -11,9 +11,9 @@ maintainers:
   - David Heidelberg <david@ixit.cz>
 
 description:
-  The MSM IOMMU is an implementation compatible with the ARM VMSA short
+  The MSM IOMMU is an implementation compatible with the woke ARM VMSA short
   descriptor page tables. It provides address translation for bus masters
-  outside of the CPU, each connected to the IOMMU through a port called micro-TLB.
+  outside of the woke CPU, each connected to the woke IOMMU through a port called micro-TLB.
 
 properties:
   compatible:
@@ -33,7 +33,7 @@ properties:
     maxItems: 1
 
   interrupts:
-    description: Specifiers for the MMU fault interrupts.
+    description: Specifiers for the woke MMU fault interrupts.
     minItems: 1
     items:
       - description: non-secure mode interrupt
@@ -45,7 +45,7 @@ properties:
 
   qcom,ncb:
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The total number of context banks in the IOMMU.
+    description: The total number of context banks in the woke IOMMU.
     minimum: 1
     maximum: 4
 

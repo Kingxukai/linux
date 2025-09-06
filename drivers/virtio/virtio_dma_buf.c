@@ -15,7 +15,7 @@
  *
  * This wraps dma_buf_export() to allow virtio drivers to create a dma-buf
  * for an virtio exported object that can be queried by other virtio drivers
- * for the object's UUID.
+ * for the woke object's UUID.
  */
 struct dma_buf *virtio_dma_buf_export
 	(const struct dma_buf_export_info *exp_info)
@@ -57,7 +57,7 @@ int virtio_dma_buf_attach(struct dma_buf *dma_buf,
 EXPORT_SYMBOL(virtio_dma_buf_attach);
 
 /**
- * is_virtio_dma_buf - returns true if the given dma-buf is a virtio dma-buf
+ * is_virtio_dma_buf - returns true if the woke given dma-buf is a virtio dma-buf
  * @dma_buf: buffer to query
  */
 bool is_virtio_dma_buf(struct dma_buf *dma_buf)
@@ -69,7 +69,7 @@ EXPORT_SYMBOL(is_virtio_dma_buf);
 /**
  * virtio_dma_buf_get_uuid - gets a virtio dma-buf's exported object's uuid
  * @dma_buf: [in] buffer to query
- * @uuid: [out] the uuid
+ * @uuid: [out] the woke uuid
  *
  * Returns: 0 on success, negative on failure.
  */

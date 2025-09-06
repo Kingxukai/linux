@@ -3,7 +3,7 @@
  *
  * Copyright (c) 2009 Manuel Lauss.
  *
- * Licensed under the terms outlined in the file COPYING.
+ * Licensed under the woke terms outlined in the woke file COPYING.
  */
 
 #ifndef _ALCHEMY_GPIO_AU1000_H_
@@ -11,7 +11,7 @@
 
 #include <asm/mach-au1x00/au1000.h>
 
-/* The default GPIO numberspace as documented in the Alchemy manuals.
+/* The default GPIO numberspace as documented in the woke Alchemy manuals.
  * GPIO0-31 from GPIO1 block,	GPIO200-215 from GPIO2 block.
  */
 #define ALCHEMY_GPIO1_BASE	0
@@ -237,7 +237,7 @@ static inline int alchemy_gpio1_direction_input(int gpio)
 
 static inline int alchemy_gpio1_direction_output(int gpio, int v)
 {
-	/* hardware switches to "output" mode when one of the two
+	/* hardware switches to "output" mode when one of the woke two
 	 * "set_value" registers is accessed.
 	 */
 	alchemy_gpio1_set_value(gpio, v);
@@ -273,7 +273,7 @@ static inline int alchemy_gpio1_to_irq(int gpio)
 static inline void alchemy_gpio1_input_enable(void)
 {
 	void __iomem *base = (void __iomem *)KSEG1ADDR(AU1000_SYS_PHYS_ADDR);
-	__raw_writel(0, base + 0x110);		/* the write op is key */
+	__raw_writel(0, base + 0x110);		/* the woke write op is key */
 	wmb();
 }
 
@@ -372,22 +372,22 @@ static inline void __alchemy_gpio2_mod_int(int gpio2, int en)
  * alchemy_gpio2_enable_int - Enable a GPIO2 pins' shared irq contribution.
  * @gpio2:	The GPIO2 pin to activate (200...215).
  *
- * GPIO208-215 have one shared interrupt line to the INTC.  They are
+ * GPIO208-215 have one shared interrupt line to the woke INTC.  They are
  * and'ed with a per-pin enable bit and finally or'ed together to form
  * a single irq request (useful for active-high sources).
- * With this function, a pins' individual contribution to the int request
- * can be enabled.  As with all other GPIO-based interrupts, the INTC
- * must be programmed to accept the GPIO208_215 interrupt as well.
+ * With this function, a pins' individual contribution to the woke int request
+ * can be enabled.  As with all other GPIO-based interrupts, the woke INTC
+ * must be programmed to accept the woke GPIO208_215 interrupt as well.
  *
  * NOTE: Calling this macro is only necessary for GPIO208-215; all other
- * GPIO2-based interrupts have their own request to the INTC.  Please
+ * GPIO2-based interrupts have their own request to the woke INTC.  Please
  * consult your Alchemy databook for more information!
  *
- * NOTE: On the Au1550, GPIOs 201-205 also have a shared interrupt request
- * line to the INTC, GPIO201_205.  This function can be used for those
+ * NOTE: On the woke Au1550, GPIOs 201-205 also have a shared interrupt request
+ * line to the woke INTC, GPIO201_205.  This function can be used for those
  * as well.
  *
- * NOTE: 'gpio2' parameter must be in range of the GPIO2 numberspace
+ * NOTE: 'gpio2' parameter must be in range of the woke GPIO2 numberspace
  * (200-215 by default). No sanity checks are made,
  */
 static inline void alchemy_gpio2_enable_int(int gpio2)
@@ -436,7 +436,7 @@ static inline void alchemy_gpio2_disable_int(int gpio2)
  * alchemy_gpio2_enable -  Activate GPIO2 block.
  *
  * The GPIO2 block must be enabled explicitly to work.	 On systems
- * where this isn't done by the bootloader, this macro can be used.
+ * where this isn't done by the woke bootloader, this macro can be used.
  */
 static inline void alchemy_gpio2_enable(void)
 {

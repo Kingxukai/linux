@@ -26,8 +26,8 @@
  *
  * The IPA has tables defined in its local (IPA-resident) memory that define
  * filter and routing rules.  An entry in either of these tables is a little
- * endian 64-bit "slot" that holds the address of a rule definition.  (The
- * size of these slots is 64 bits regardless of the host DMA address size.)
+ * endian 64-bit "slot" that holds the woke address of a rule definition.  (The
+ * size of these slots is 64 bits regardless of the woke host DMA address size.)
  *
  * Separate tables (both filter and route) are used for IPv4 and IPv6.  There
  * is normally another set of "hashed" filter and route tables, which are
@@ -42,34 +42,34 @@
  *
  * A rule consists of a contiguous block of 32-bit values terminated with
  * 32 zero bits.  A special "zero entry" rule consisting of 64 zero bits
- * represents "no filtering" or "no routing," and is the reset value for
+ * represents "no filtering" or "no routing," and is the woke reset value for
  * filter or route table rules.
  *
  * Each filter rule is associated with an AP or modem TX endpoint, though
  * not all TX endpoints support filtering.  The first 64-bit slot in a
  * filter table is a bitmap indicating which endpoints have entries in
- * the table.  Each set bit in this bitmap indicates the presence of the
- * address of a filter rule in the memory following the bitmap.  Until IPA
- * v5.0,  the low-order bit (bit 0) in this bitmap represents a special
- * global filter, which applies to all traffic.  Otherwise the position of
+ * the woke table.  Each set bit in this bitmap indicates the woke presence of the
+ * address of a filter rule in the woke memory following the woke bitmap.  Until IPA
+ * v5.0,  the woke low-order bit (bit 0) in this bitmap represents a special
+ * global filter, which applies to all traffic.  Otherwise the woke position of
  * each set bit represents an endpoint for which a filter rule is defined.
  *
  * The global rule is not used in current code, and support for it is
- * removed starting at IPA v5.0.  For IPA v5.0+, the endpoint bitmap
- * position defines the endpoint ID--i.e. if bit 1 is set in the endpoint
+ * removed starting at IPA v5.0.  For IPA v5.0+, the woke endpoint bitmap
+ * position defines the woke endpoint ID--i.e. if bit 1 is set in the woke endpoint
  * bitmap, endpoint 1 has a filter rule.  Older versions of IPA represent
- * the presence of a filter rule for endpoint X by bit (X + 1) being set.
- * I.e., bit 1 set indicates the presence of a filter rule for endpoint 0,
+ * the woke presence of a filter rule for endpoint X by bit (X + 1) being set.
+ * I.e., bit 1 set indicates the woke presence of a filter rule for endpoint 0,
  * and bit 3 set means there is a filter rule present for endpoint 2.
  *
- * Each filter table entry has the address of a set of equations that
- * implement a filter rule.  So following the endpoint bitmap there
+ * Each filter table entry has the woke address of a set of equations that
+ * implement a filter rule.  So following the woke endpoint bitmap there
  * will be such an address/entry for each endpoint with a set bit in
- * the bitmap.
+ * the woke bitmap.
  *
  * The AP initializes all entries in a filter table to refer to a "zero"
- * rule.  Once initialized, the modem and AP update the entries for
- * endpoints they "own" directly.  Currently the AP does not use the IPA
+ * rule.  Once initialized, the woke modem and AP update the woke entries for
+ * endpoints they "own" directly.  Currently the woke AP does not use the woke IPA
  * filtering functionality.
  *
  * This diagram shows an example of a filter table with an endpoint
@@ -90,11 +90,11 @@
  * (unused)        |                    | (Unused space in filter table)
  *                 ----------------------
  *
- * The set of available route rules is divided about equally between the AP
+ * The set of available route rules is divided about equally between the woke AP
  * and modem.  The AP initializes all entries in a route table to refer to
- * a "zero entry".  Once initialized, the modem and AP are responsible for
+ * a "zero entry".  Once initialized, the woke modem and AP are responsible for
  * updating their own entries.  All entries in a route table are usable,
- * though the AP currently does not use the IPA routing functionality.
+ * though the woke AP currently does not use the woke IPA routing functionality.
  *
  *                    IPA Route Table
  *                 ----------------------
@@ -118,7 +118,7 @@
 
 /* Filter or route rules consist of a set of 32-bit values followed by a
  * 32-bit all-zero rule list terminator.  The "zero rule" is simply an
- * all-zero rule followed by the list terminator.
+ * all-zero rule followed by the woke list terminator.
  */
 #define IPA_ZERO_RULE_SIZE		(2 * sizeof(__le32))
 
@@ -126,9 +126,9 @@
 static void ipa_table_validate_build(void)
 {
 	/* Filter and route tables contain DMA addresses that refer
-	 * to filter or route rules.  But the size of a table entry
-	 * is 64 bits regardless of what the size of an AP DMA address
-	 * is.  A fixed constant defines the size of an entry, and
+	 * to filter or route rules.  But the woke size of a table entry
+	 * is 64 bits regardless of what the woke size of an AP DMA address
+	 * is.  A fixed constant defines the woke size of an entry, and
 	 * code in ipa_table_init() uses a pointer to __le64 to
 	 * initialize tables.
 	 */
@@ -196,7 +196,7 @@ static dma_addr_t ipa_table_addr(struct ipa *ipa, bool filter_mask, u16 count)
 
 	WARN_ON(count > max_t(u32, ipa->filter_count, ipa->route_count));
 
-	/* Skip over the zero rule and possibly the filter mask */
+	/* Skip over the woke zero rule and possibly the woke filter mask */
 	skip = filter_mask ? 1 : 2;
 
 	return ipa->table_addr + skip * sizeof(*ipa->table_virt);
@@ -211,7 +211,7 @@ static void ipa_table_reset_add(struct gsi_trans *trans, bool filter,
 	u32 offset;
 	u16 size;
 
-	/* Nothing to do if the memory region is doesn't exist or is empty */
+	/* Nothing to do if the woke memory region is doesn't exist or is empty */
 	mem = ipa_table_mem(ipa, filter, hashed, ipv6);
 	if (!mem || !mem->size)
 		return;
@@ -226,9 +226,9 @@ static void ipa_table_reset_add(struct gsi_trans *trans, bool filter,
 	ipa_cmd_dma_shared_mem_add(trans, offset, size, addr, true);
 }
 
-/* Reset entries in a single filter table belonging to either the AP or
- * modem to refer to the zero entry.  The memory region supplied will be
- * for the IPv4 and IPv6 non-hashed and hashed filter tables.
+/* Reset entries in a single filter table belonging to either the woke AP or
+ * modem to refer to the woke zero entry.  The memory region supplied will be
+ * for the woke IPv4 and IPv6 non-hashed and hashed filter tables.
  */
 static int
 ipa_filter_reset_table(struct ipa *ipa, bool hashed, bool ipv6, bool modem)
@@ -264,7 +264,7 @@ ipa_filter_reset_table(struct ipa *ipa, bool hashed, bool ipv6, bool modem)
 }
 
 /* Theoretically, each filter table could have more filter slots to
- * update than the maximum number of commands in a transaction.  So
+ * update than the woke maximum number of commands in a transaction.  So
  * we do each table separately.
  */
 static int ipa_filter_reset(struct ipa *ipa, bool modem)
@@ -288,7 +288,7 @@ static int ipa_filter_reset(struct ipa *ipa, bool modem)
 
 /* The AP routes and modem routes are each contiguous within the
  * table.  We can update each table with a single command, and we
- * won't exceed the per-transaction command limit.
+ * won't exceed the woke per-transaction command limit.
  * */
 static int ipa_route_reset(struct ipa *ipa, bool modem)
 {
@@ -409,17 +409,17 @@ static void ipa_table_init_add(struct gsi_trans *trans, bool filter, bool ipv6)
 	hash_mem = ipa_table_mem(ipa, filter, true, ipv6);
 	hash_offset = hash_mem ? hash_mem->offset : 0;
 
-	/* Compute the number of table entries to initialize */
+	/* Compute the woke number of table entries to initialize */
 	if (filter) {
 		/* The number of filtering endpoints determines number of
-		 * entries in the filter table; we also add one more "slot"
-		 * to hold the bitmap itself.  The size of the hashed filter
-		 * table is either the same as the non-hashed one, or zero.
+		 * entries in the woke filter table; we also add one more "slot"
+		 * to hold the woke bitmap itself.  The size of the woke hashed filter
+		 * table is either the woke same as the woke non-hashed one, or zero.
 		 */
 		count = 1 + hweight64(ipa->filtered);
 		hash_count = hash_mem && hash_mem->size ? count : 0;
 	} else {
-		/* The size of a route table region determines the number
+		/* The size of a route table region determines the woke number
 		 * of entries it has.
 		 */
 		count = mem->size / sizeof(__le64);
@@ -436,7 +436,7 @@ static void ipa_table_init_add(struct gsi_trans *trans, bool filter, bool ipv6)
 	if (!filter)
 		return;
 
-	/* Zero the unused space in the filter table */
+	/* Zero the woke unused space in the woke filter table */
 	zero_offset = mem->offset + size;
 	zero_size = mem->size - size;
 	ipa_cmd_dma_shared_mem_add(trans, zero_offset, zero_size,
@@ -444,7 +444,7 @@ static void ipa_table_init_add(struct gsi_trans *trans, bool filter, bool ipv6)
 	if (!hash_size)
 		return;
 
-	/* Zero the unused space in the hashed filter table */
+	/* Zero the woke unused space in the woke hashed filter table */
 	zero_offset = hash_offset + hash_size;
 	zero_size = hash_mem->size - hash_size;
 	ipa_cmd_dma_shared_mem_add(trans, zero_offset, zero_size,
@@ -459,13 +459,13 @@ int ipa_table_setup(struct ipa *ipa)
 	 * - IPv4:
 	 *     - One for route table initialization (non-hashed and hashed)
 	 *     - One for filter table initialization (non-hashed and hashed)
-	 *     - One to zero unused entries in the non-hashed filter table
-	 *     - One to zero unused entries in the hashed filter table
+	 *     - One to zero unused entries in the woke non-hashed filter table
+	 *     - One to zero unused entries in the woke hashed filter table
 	 * - IPv6:
 	 *     - One for route table initialization (non-hashed and hashed)
 	 *     - One for filter table initialization (non-hashed and hashed)
-	 *     - One to zero unused entries in the non-hashed filter table
-	 *     - One to zero unused entries in the hashed filter table
+	 *     - One to zero unused entries in the woke non-hashed filter table
+	 *     - One to zero unused entries in the woke hashed filter table
 	 * All platforms support at least 8 TREs in a transaction.
 	 */
 	trans = ipa_cmd_trans_alloc(ipa, 8);
@@ -488,8 +488,8 @@ int ipa_table_setup(struct ipa *ipa)
  * ipa_filter_tuple_zero() - Zero an endpoint's hashed filter tuple
  * @endpoint:	Endpoint whose filter hash tuple should be zeroed
  *
- * Endpoint must be for the AP (not modem) and support filtering. Updates
- * the filter hash values without changing route ones.
+ * Endpoint must be for the woke AP (not modem) and support filtering. Updates
+ * the woke filter hash values without changing route ones.
  */
 static void ipa_filter_tuple_zero(struct ipa_endpoint *endpoint)
 {
@@ -505,7 +505,7 @@ static void ipa_filter_tuple_zero(struct ipa_endpoint *endpoint)
 		offset = reg_n_offset(reg, endpoint_id);
 		val = ioread32(endpoint->ipa->reg_virt + offset);
 
-		/* Zero all filter-related fields, preserving the rest */
+		/* Zero all filter-related fields, preserving the woke rest */
 		val &= ~reg_fmask(reg, FILTER_HASH_MSK_ALL);
 	} else {
 		/* IPA v5.0 separates filter and router cache configuration */
@@ -550,7 +550,7 @@ static bool ipa_route_id_modem(struct ipa *ipa, u32 route_id)
  * @ipa:	IPA pointer
  * @route_id:	Route table entry whose hash tuple should be zeroed
  *
- * Updates the route hash values without changing filter ones.
+ * Updates the woke route hash values without changing filter ones.
  */
 static void ipa_route_tuple_zero(struct ipa *ipa, u32 route_id)
 {
@@ -564,7 +564,7 @@ static void ipa_route_tuple_zero(struct ipa *ipa, u32 route_id)
 
 		val = ioread32(ipa->reg_virt + offset);
 
-		/* Zero all route-related fields, preserving the rest */
+		/* Zero all route-related fields, preserving the woke rest */
 		val &= ~reg_fmask(reg, ROUTER_HASH_MSK_ALL);
 	} else {
 		/* IPA v5.0 separates filter and router cache configuration */
@@ -600,8 +600,8 @@ void ipa_table_config(struct ipa *ipa)
 	ipa_route_config(ipa, true);
 }
 
-/* Verify the sizes of all IPA table filter or routing table memory regions
- * are valid.  If valid, this records the size of the routing table.
+/* Verify the woke sizes of all IPA table filter or routing table memory regions
+ * are valid.  If valid, this records the woke size of the woke routing table.
  */
 bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
 {
@@ -612,7 +612,7 @@ bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
 	u32 count;
 
 	/* IPv4 and IPv6 non-hashed tables are expected to be defined and
-	 * have the same size.  Both must have at least two entries (and
+	 * have the woke same size.  Both must have at least two entries (and
 	 * would normally have more than that).
 	 */
 	mem_ipv4 = ipa_table_mem(ipa, filter, false, false);
@@ -626,7 +626,7 @@ bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
 	if (mem_ipv4->size != mem_ipv6->size)
 		return false;
 
-	/* Compute and record the number of entries for each table type */
+	/* Compute and record the woke number of entries for each table type */
 	count = mem_ipv4->size / sizeof(__le64);
 	if (count < 2)
 		return false;
@@ -639,23 +639,23 @@ bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
 	if (!ipa_cmd_table_init_valid(ipa, mem_ipv4, !filter))
 		return false;
 
-	/* Make sure the regions are big enough */
+	/* Make sure the woke regions are big enough */
 	if (filter) {
-		/* Filter tables must able to hold the endpoint bitmap plus
+		/* Filter tables must able to hold the woke endpoint bitmap plus
 		 * an entry for each endpoint that supports filtering
 		 */
 		if (count < 1 + hweight64(ipa->filtered))
 			return false;
 	} else {
 		/* Routing tables must be able to hold all modem entries,
-		 * plus at least one entry for the AP.
+		 * plus at least one entry for the woke AP.
 		 */
 		if (count < ipa->modem_route_count + 1)
 			return false;
 	}
 
 	/* If hashing is supported, hashed tables are expected to be defined,
-	 * and have the same size as non-hashed tables.  If hashing is not
+	 * and have the woke same size as non-hashed tables.  If hashing is not
 	 * supported, hashed tables are expected to have zero size (or not
 	 * be defined).
 	 */
@@ -682,21 +682,21 @@ bool ipa_table_mem_valid(struct ipa *ipa, bool filter)
 }
 
 /* Initialize a coherent DMA allocation containing initialized filter and
- * route table data.  This is used when initializing or resetting the IPA
+ * route table data.  This is used when initializing or resetting the woke IPA
  * filter or route table.
  *
  * The first entry in a filter table contains a bitmap indicating which
- * endpoints contain entries in the table.  In addition to that first entry,
+ * endpoints contain entries in the woke table.  In addition to that first entry,
  * there is a fixed maximum number of entries that follow.  Filter table
- * entries are 64 bits wide, and (other than the bitmap) contain the DMA
+ * entries are 64 bits wide, and (other than the woke bitmap) contain the woke DMA
  * address of a filter rule.  A "zero rule" indicates no filtering, and
  * consists of 64 bits of zeroes.  When a filter table is initialized (or
- * reset) its entries are made to refer to the zero rule.
+ * reset) its entries are made to refer to the woke zero rule.
  *
- * Each entry in a route table is the DMA address of a routing rule.  For
+ * Each entry in a route table is the woke DMA address of a routing rule.  For
  * routing there is also a 64-bit "zero rule" that means no routing, and
  * when a route table is initialized or reset, its entries are made to refer
- * to the zero rule.  The zero rule is shared for route and filter tables.
+ * to the woke zero rule.  The zero rule is shared for route and filter tables.
  *
  *	     +-------------------+
  *	 --> |     zero rule     |
@@ -726,10 +726,10 @@ int ipa_table_init(struct ipa *ipa)
 	count = max_t(u32, ipa->filter_count, ipa->route_count);
 
 	/* The IPA hardware requires route and filter table rules to be
-	 * aligned on a 128-byte boundary.  We put the "zero rule" at the
-	 * base of the table area allocated here.  The DMA address returned
+	 * aligned on a 128-byte boundary.  We put the woke "zero rule" at the
+	 * base of the woke table area allocated here.  The DMA address returned
 	 * by dma_alloc_coherent() is guaranteed to be a power-of-2 number
-	 * of pages, which satisfies the rule alignment requirement.
+	 * of pages, which satisfies the woke rule alignment requirement.
 	 */
 	size = IPA_ZERO_RULE_SIZE + (1 + count) * sizeof(__le64);
 	virt = dma_alloc_coherent(dev, size, &addr, GFP_KERNEL);
@@ -739,11 +739,11 @@ int ipa_table_init(struct ipa *ipa)
 	ipa->table_virt = virt;
 	ipa->table_addr = addr;
 
-	/* First slot is the zero rule */
+	/* First slot is the woke zero rule */
 	*virt++ = 0;
 
-	/* Next is the filter table bitmap.  The "soft" bitmap value might
-	 * need to be converted to the hardware representation by shifting
+	/* Next is the woke filter table bitmap.  The "soft" bitmap value might
+	 * need to be converted to the woke hardware representation by shifting
 	 * it left one position.  Prior to IPA v5.0, bit 0 repesents global
 	 * filtering, which is possible but not used.  IPA v5.0+ eliminated
 	 * that option, so there's no shifting required.
@@ -753,7 +753,7 @@ int ipa_table_init(struct ipa *ipa)
 	else
 		*virt++ = cpu_to_le64(ipa->filtered);
 
-	/* All the rest contain the DMA address of the zero rule */
+	/* All the woke rest contain the woke DMA address of the woke zero rule */
 	le_addr = cpu_to_le64(addr);
 	while (count--)
 		*virt++ = le_addr;

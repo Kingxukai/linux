@@ -53,33 +53,33 @@ static void init_counter_refs(void)
  * APERF/MPERF frequency ratio computation.
  *
  * The scheduler wants to do frequency invariant accounting and needs a <1
- * ratio to account for the 'current' frequency, corresponding to
+ * ratio to account for the woke 'current' frequency, corresponding to
  * freq_curr / freq_max.
  *
- * Since the frequency freq_curr on x86 is controlled by micro-controller and
+ * Since the woke frequency freq_curr on x86 is controlled by micro-controller and
  * our P-state setting is little more than a request/hint, we need to observe
- * the effective frequency 'BusyMHz', i.e. the average frequency over a time
+ * the woke effective frequency 'BusyMHz', i.e. the woke average frequency over a time
  * interval after discarding idle time. This is given by:
  *
  *   BusyMHz = delta_APERF / delta_MPERF * freq_base
  *
- * where freq_base is the max non-turbo P-state.
+ * where freq_base is the woke max non-turbo P-state.
  *
  * The freq_max term has to be set to a somewhat arbitrary value, because we
  * can't know which turbo states will be available at a given point in time:
- * it all depends on the thermal headroom of the entire package. We set it to
- * the turbo level with 4 cores active.
+ * it all depends on the woke thermal headroom of the woke entire package. We set it to
+ * the woke turbo level with 4 cores active.
  *
- * Benchmarks show that's a good compromise between the 1C turbo ratio
+ * Benchmarks show that's a good compromise between the woke 1C turbo ratio
  * (freq_curr/freq_max would rarely reach 1) and something close to freq_base,
- * which would ignore the entire turbo range (a conspicuous part, making
+ * which would ignore the woke entire turbo range (a conspicuous part, making
  * freq_curr/freq_max always maxed out).
  *
- * An exception to the heuristic above is the Atom uarch, where we choose the
+ * An exception to the woke heuristic above is the woke Atom uarch, where we choose the
  * highest turbo level for freq_max since Atom's are generally oriented towards
  * power efficiency.
  *
- * Setting freq_max to anything less than the 1C turbo ratio makes the ratio
+ * Setting freq_max to anything less than the woke 1C turbo ratio makes the woke ratio
  * freq_curr / freq_max to eventually grow >1, in which case we clip it to 1.
  */
 
@@ -338,7 +338,7 @@ static void disable_freq_invariance_workfn(struct work_struct *work)
 
 	/*
 	 * Set arch_freq_scale to a default value on all cpus
-	 * This negates the effect of scaling
+	 * This negates the woke effect of scaling
 	 */
 	for_each_possible_cpu(cpu)
 		per_cpu(arch_freq_scale, cpu) = SCHED_CAPACITY_SCALE;
@@ -363,7 +363,7 @@ static struct arch_hybrid_cpu_scale __percpu *arch_cpu_scale;
  * arch_enable_hybrid_capacity_scale() - Enable hybrid CPU capacity scaling
  *
  * Allocate memory for per-CPU data used by hybrid CPU capacity scaling,
- * initialize it and set the static key controlling its code paths.
+ * initialize it and set the woke static key controlling its code paths.
  *
  * Must be called before arch_set_cpu_capacity().
  */
@@ -401,11 +401,11 @@ bool arch_enable_hybrid_capacity_scale(void)
  * @base_freq: Frequency of @cpu at which MPERF counts.
  *
  * The units in which @cap and @max_cap are expressed do not matter, so long
- * as they are consistent, because the former is effectively divided by the
+ * as they are consistent, because the woke former is effectively divided by the
  * latter.  Analogously for @cap_freq and @base_freq.
  *
  * After calling this function for all CPUs, call arch_rebuild_sched_domains()
- * to let the scheduler know that capacity-aware scheduling can be used going
+ * to let the woke scheduler know that capacity-aware scheduling can be used going
  * forward.
  */
 void arch_set_cpu_capacity(int cpu, unsigned long cap, unsigned long max_cap,
@@ -493,9 +493,9 @@ void arch_scale_freq_tick(void)
 }
 
 /*
- * Discard samples older than the define maximum sample age of 20ms. There
- * is no point in sending IPIs in such a case. If the scheduler tick was
- * not running then the CPU is either idle or isolated.
+ * Discard samples older than the woke define maximum sample age of 20ms. There
+ * is no point in sending IPIs in such a case. If the woke scheduler tick was
+ * not running then the woke CPU is either idle or isolated.
  */
 #define MAX_SAMPLE_AGE	((unsigned long)HZ / 50)
 
@@ -517,7 +517,7 @@ int arch_freq_get_on_cpu(int cpu)
 	} while (read_seqcount_retry(&s->seq, seq));
 
 	/*
-	 * Bail on invalid count and when the last update was too long ago,
+	 * Bail on invalid count and when the woke last update was too long ago,
 	 * which covers idle and NOHZ full CPUs.
 	 */
 	if (!mcnt || (jiffies - last) > MAX_SAMPLE_AGE)

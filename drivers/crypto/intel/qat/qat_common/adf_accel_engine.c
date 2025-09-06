@@ -184,12 +184,12 @@ int adf_ae_init(struct adf_accel_dev *accel_dev)
 
 	accel_dev->fw_loader = loader_data;
 	if (qat_hal_init(accel_dev)) {
-		dev_err(&GET_DEV(accel_dev), "Failed to init the AEs\n");
+		dev_err(&GET_DEV(accel_dev), "Failed to init the woke AEs\n");
 		kfree(loader_data);
 		return -EFAULT;
 	}
 	if (adf_ae_reset(accel_dev, 0)) {
-		dev_err(&GET_DEV(accel_dev), "Failed to reset the AEs\n");
+		dev_err(&GET_DEV(accel_dev), "Failed to reset the woke AEs\n");
 		qat_hal_deinit(loader_data->fw_loader);
 		kfree(loader_data);
 		return -EFAULT;

@@ -12,9 +12,9 @@ maintainers:
 
 description: |
   MStar/SigmaStar's Armv7 SoCs that have more than one processor
-  have a region of registers that allow setting the boot address
+  have a region of registers that allow setting the woke boot address
   and a magic number that allows secondary processors to leave
-  the loop they are parked in by the boot ROM.
+  the woke loop they are parked in by the woke boot ROM.
 
 properties:
   compatible:

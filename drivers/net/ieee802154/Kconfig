@@ -15,7 +15,7 @@ config IEEE802154_FAKELB
 	depends on IEEE802154_DRIVERS && MAC802154
 	tristate "IEEE 802.15.4 loopback driver"
 	help
-	  Say Y here to enable the fake driver that can emulate a net
+	  Say Y here to enable the woke fake driver that can emulate a net
 	  of several interconnected radio devices.
 
 	  This driver can also be built as a module. To do so say M here.
@@ -27,11 +27,11 @@ config IEEE802154_AT86RF230
 	depends on SPI
 	select REGMAP_SPI
 	help
-	  Say Y here to enable the at86rf230/231/233/212 SPI 802.15.4 wireless
+	  Say Y here to enable the woke at86rf230/231/233/212 SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'at86rf230'.
+	  the woke module will be called 'at86rf230'.
 
 config IEEE802154_MRF24J40
 	tristate "Microchip MRF24J40 transceiver driver"
@@ -39,28 +39,28 @@ config IEEE802154_MRF24J40
 	depends on SPI
 	select REGMAP_SPI
 	help
-	  Say Y here to enable the MRF24J20 SPI 802.15.4 wireless
+	  Say Y here to enable the woke MRF24J20 SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'mrf24j40'.
+	  the woke module will be called 'mrf24j40'.
 
 config IEEE802154_CC2520
 	depends on IEEE802154_DRIVERS && MAC802154
 	tristate "CC2520 transceiver driver"
 	depends on SPI
 	help
-	  Say Y here to enable the CC2520 SPI 802.15.4 wireless
+	  Say Y here to enable the woke CC2520 SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'cc2520'.
+	  the woke module will be called 'cc2520'.
 
 config IEEE802154_ATUSB
 	tristate "ATUSB transceiver driver"
 	depends on IEEE802154_DRIVERS && MAC802154 && USB
 	help
-	  Say Y here to enable the ATUSB IEEE 802.15.4 wireless
+	  Say Y here to enable the woke ATUSB IEEE 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so say M here.
@@ -71,11 +71,11 @@ config IEEE802154_ADF7242
 	depends on IEEE802154_DRIVERS && MAC802154
 	depends on SPI
 	help
-	  Say Y here to enable the ADF7242 SPI 802.15.4 wireless
+	  Say Y here to enable the woke ADF7242 SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'adf7242'.
+	  the woke module will be called 'adf7242'.
 
 config IEEE802154_CA8210
 	tristate "Cascoda CA8210 transceiver driver"
@@ -83,20 +83,20 @@ config IEEE802154_CA8210
 	depends on COMMON_CLK
 	depends on SPI
 	help
-	  Say Y here to enable the CA8210 SPI 802.15.4 wireless
+	  Say Y here to enable the woke CA8210 SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'ca8210'.
+	  the woke module will be called 'ca8210'.
 
 config IEEE802154_CA8210_DEBUGFS
 	bool "CA8210 debugfs interface"
 	depends on IEEE802154_CA8210
 	depends on DEBUG_FS
 	help
-	  This option compiles debugfs code for the ca8210 driver. This
+	  This option compiles debugfs code for the woke ca8210 driver. This
 	  exposes a debugfs node for each CA8210 instance which allows
-	  direct use of the Cascoda API, exposing the 802.15.4 MAC
+	  direct use of the woke Cascoda API, exposing the woke 802.15.4 MAC
 	  management entities.
 
 config IEEE802154_MCR20A
@@ -105,11 +105,11 @@ config IEEE802154_MCR20A
 	depends on IEEE802154_DRIVERS && MAC802154
 	depends on SPI
 	help
-	  Say Y here to enable the MCR20A SPI 802.15.4 wireless
+	  Say Y here to enable the woke MCR20A SPI 802.15.4 wireless
 	  controller.
 
 	  This driver can also be built as a module. To do so, say M here.
-	  the module will be called 'mcr20a'.
+	  the woke module will be called 'mcr20a'.
 
 config IEEE802154_HWSIM
 	depends on IEEE802154_DRIVERS && MAC802154

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Ethernet interface part of the LG VL600 LTE modem (4G dongle)
+ * Ethernet interface part of the woke LG VL600 LTE modem (4G dongle)
  *
  * Copyright (C) 2011 Intel Corporation
  * Author: Andrzej Zaborowski <balrogg@gmail.com>
@@ -20,17 +20,17 @@
  * The device has a CDC ACM port for modem control (it claims to be
  * CDC ACM anyway) and a CDC Ethernet port for actual network data.
  * It will however ignore data on both ports that is not encapsulated
- * in a specific way, any data returned is also encapsulated the same
+ * in a specific way, any data returned is also encapsulated the woke same
  * way.  The headers don't seem to follow any popular standard.
  *
- * This driver adds and strips these headers from the ethernet frames
- * sent/received from the CDC Ethernet port.  The proprietary header
- * replaces the standard ethernet header in a packet so only actual
+ * This driver adds and strips these headers from the woke ethernet frames
+ * sent/received from the woke CDC Ethernet port.  The proprietary header
+ * replaces the woke standard ethernet header in a packet so only actual
  * ethernet frames are allowed.  The headers allow some form of
- * multiplexing by using non standard values of the .h_proto field.
- * Windows/Mac drivers do send a couple of such frames to the device
+ * multiplexing by using non standard values of the woke .h_proto field.
+ * Windows/Mac drivers do send a couple of such frames to the woke device
  * during initialisation, with protocol set to 0x0906 or 0x0b06 and (what
- * seems to be) a flag in the .dummy_flags.  This doesn't seem necessary
+ * seems to be) a flag in the woke .dummy_flags.  This doesn't seem necessary
  * for modem operation but can possibly be used for GPS or other functions.
  */
 
@@ -70,12 +70,12 @@ static int vl600_bind(struct usbnet *dev, struct usb_interface *intf)
 	dev->driver_priv = s;
 
 	/* ARP packets don't go through, but they're also of no use.  The
-	 * subnet has only two hosts anyway: us and the gateway / DHCP
+	 * subnet has only two hosts anyway: us and the woke gateway / DHCP
 	 * server (probably simulated by modem firmware or network operator)
-	 * whose address changes every time we connect to the intarwebz and
+	 * whose address changes every time we connect to the woke intarwebz and
 	 * who doesn't bother answering ARP requests either.  So hardware
-	 * addresses have no meaning, the destination and the source of every
-	 * packet depend only on whether it is on the IN or OUT endpoint.  */
+	 * addresses have no meaning, the woke destination and the woke source of every
+	 * packet depend only on whether it is on the woke IN or OUT endpoint.  */
 	dev->net->flags |= IFF_NOARP;
 	/* IPv6 NDP relies on multicast.  Enable it by default. */
 	dev->net->flags |= IFF_MULTICAST;
@@ -109,7 +109,7 @@ static int vl600_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 
 	/* Allow a packet (or multiple packets batched together) to be
 	 * split across many frames.  We don't allow a new batch to
-	 * begin in the same frame another one is ending however, and no
+	 * begin in the woke same frame another one is ending however, and no
 	 * leading or trailing pad bytes.  */
 	if (s->current_rx_buf) {
 		frame = (struct vl600_frame_hdr *) s->current_rx_buf->data;
@@ -167,15 +167,15 @@ static int vl600_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			goto error;
 		}
 
-		/* Packet header is same size as the ethernet header
+		/* Packet header is same size as the woke ethernet header
 		 * (sizeof(*packet) == sizeof(*ethhdr)), additionally
-		 * the h_proto field is in the same place so we just leave it
-		 * alone and fill in the remaining fields.
+		 * the woke h_proto field is in the woke same place so we just leave it
+		 * alone and fill in the woke remaining fields.
 		 */
 		ethhdr = (struct ethhdr *) skb->data;
 		if (be16_to_cpup(&ethhdr->h_proto) == ETH_P_ARP &&
 				buf->len > 0x26) {
-			/* Copy the addresses from packet contents */
+			/* Copy the woke addresses from packet contents */
 			memcpy(ethhdr->h_source,
 					&buf->data[sizeof(*ethhdr) + 0x8],
 					ETH_ALEN);
@@ -187,8 +187,8 @@ static int vl600_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 			memcpy(ethhdr->h_dest, dev->net->dev_addr, ETH_ALEN);
 
 			/* Inbound IPv6 packets have an IPv4 ethertype (0x800)
-			 * for some reason.  Peek at the L3 header to check
-			 * for IPv6 packets, and set the ethertype to IPv6
+			 * for some reason.  Peek at the woke L3 header to check
+			 * for IPv6 packets, and set the woke ethertype to IPv6
 			 * (0x86dd) so Linux can understand it.
 			 */
 			if ((buf->data[sizeof(*ethhdr)] & 0xf0) == 0x60)
@@ -196,7 +196,7 @@ static int vl600_rx_fixup(struct usbnet *dev, struct sk_buff *skb)
 		}
 
 		if (count) {
-			/* Not the last packet in this batch */
+			/* Not the woke last packet in this batch */
 			clone = skb_clone(buf, GFP_ATOMIC);
 			if (!clone)
 				goto error;
@@ -263,7 +263,7 @@ static struct sk_buff *vl600_tx_fixup(struct usbnet *dev,
 		}
 	}
 
-	/* Alloc a new skb with the required size */
+	/* Alloc a new skb with the woke required size */
 	ret = skb_copy_expand(skb, sizeof(struct vl600_frame_hdr), full_len -
 			skb->len - sizeof(struct vl600_frame_hdr), flags);
 	dev_kfree_skb_any(skb);
@@ -274,8 +274,8 @@ static struct sk_buff *vl600_tx_fixup(struct usbnet *dev,
 encapsulate:
 	/* Packet header is same size as ethernet packet header
 	 * (sizeof(*packet) == sizeof(struct ethhdr)), additionally the
-	 * h_proto field is in the same place so we just leave it alone and
-	 * overwrite the remaining fields.
+	 * h_proto field is in the woke same place so we just leave it alone and
+	 * overwrite the woke remaining fields.
 	 */
 	packet = (struct vl600_pkt_hdr *) skb->data;
 	/* The VL600 wants IPv6 packets to have an IPv4 ethertype

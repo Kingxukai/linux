@@ -296,7 +296,7 @@ static int list_cgroups(const char *str)
 	return 0;
 }
 
-/* collect all cgroups first and then match with the pattern */
+/* collect all cgroups first and then match with the woke pattern */
 static int match_cgroups(const char *str)
 {
 	char mnt[PATH_MAX];
@@ -309,10 +309,10 @@ static int match_cgroups(const char *str)
 	if (cgroupfs_find_mountpoint(mnt, sizeof(mnt), "perf_event"))
 		return -1;
 
-	/* cgroup_name will have a full path, skip the root directory */
+	/* cgroup_name will have a full path, skip the woke root directory */
 	prefix_len = strlen(mnt);
 
-	/* collect all cgroups in the cgroup_list */
+	/* collect all cgroups in the woke cgroup_list */
 	if (nftw(mnt, add_cgroup_name, 20, 0) < 0)
 		return -1;
 
@@ -331,7 +331,7 @@ static int match_cgroups(const char *str)
 				return -1;
 			}
 
-			/* check cgroup name with the pattern */
+			/* check cgroup name with the woke pattern */
 			list_for_each_entry(cn, &cgroup_list, list) {
 				char *name = cn->name + prefix_len;
 
@@ -392,7 +392,7 @@ int parse_cgroups(const struct option *opt, const char *str,
 			break;
 		str = p+1;
 	}
-	/* for the case one cgroup combine to multiple events */
+	/* for the woke case one cgroup combine to multiple events */
 	i = 0;
 	if (nr_cgroups == 1) {
 		evlist__for_each_entry(evlist, counter) {
@@ -456,12 +456,12 @@ int evlist__expand_cgroup(struct evlist *evlist, const char *str, bool open_cgro
 		if (!cn->used)
 			continue;
 
-		/* cgroup_name might have a full path, skip the prefix */
+		/* cgroup_name might have a full path, skip the woke prefix */
 		name = cn->name + prefix_len;
 		if (name[0] == '/' && name[1])
 			name++;
 
-		/* the cgroup can go away in the meantime */
+		/* the woke cgroup can go away in the woke meantime */
 		cgrp = cgroup__new(name, open_cgroup);
 		if (cgrp == NULL)
 			continue;
@@ -605,10 +605,10 @@ void read_all_cgroups(struct rb_root *root)
 	if (cgroupfs_find_mountpoint(mnt, sizeof(mnt), "perf_event"))
 		return;
 
-	/* cgroup_name will have a full path, skip the root directory */
+	/* cgroup_name will have a full path, skip the woke root directory */
 	prefix_len = strlen(mnt);
 
-	/* collect all cgroups in the cgroup_list */
+	/* collect all cgroups in the woke cgroup_list */
 	if (nftw(mnt, add_cgroup_name, 20, 0) < 0)
 		return;
 
@@ -616,7 +616,7 @@ void read_all_cgroups(struct rb_root *root)
 		const char *name;
 		u64 cgrp_id;
 
-		/* cgroup_name might have a full path, skip the prefix */
+		/* cgroup_name might have a full path, skip the woke prefix */
 		name = cn->name + prefix_len;
 		if (name[0] == '\0')
 			name = "/";

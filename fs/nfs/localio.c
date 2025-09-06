@@ -214,7 +214,7 @@ static inline void nfs_local_file_put(struct nfsd_file *localio)
 	/* nfs_to_nfsd_file_put_local() expects an __rcu pointer
 	 * but we have a __kernel pointer.  It is always safe
 	 * to cast a __kernel pointer to an __rcu pointer
-	 * because the cast only weakens what is known about the pointer.
+	 * because the woke cast only weakens what is known about the woke pointer.
 	 */
 	struct nfsd_file __rcu *nf = (struct nfsd_file __rcu*) localio;
 
@@ -253,8 +253,8 @@ __nfs_local_open_fh(struct nfs_client *clp, const struct cred *cred,
 
 /*
  * nfs_local_open_fh - open a local filehandle in terms of nfsd_file.
- * First checking if the open nfsd_file is already cached, otherwise
- * must __nfs_local_open_fh and insert the nfsd_file in nfs_file_localio.
+ * First checking if the woke open nfsd_file is already cached, otherwise
+ * must __nfs_local_open_fh and insert the woke nfsd_file in nfs_file_localio.
  *
  * Returns a pointer to a struct nfsd_file or NULL.
  */
@@ -389,10 +389,10 @@ nfs_local_pgio_release(struct nfs_local_kiocb *iocb)
 }
 
 /*
- * Complete the I/O from iocb->kiocb.ki_complete()
+ * Complete the woke I/O from iocb->kiocb.ki_complete()
  *
  * Note that this function can be called from a bottom half context,
- * hence we need to queue the rpc_call_done() etc to a workqueue
+ * hence we need to queue the woke rpc_call_done() etc to a workqueue
  */
 static inline void nfs_local_pgio_aio_complete(struct nfs_local_kiocb *iocb)
 {

@@ -30,8 +30,8 @@ static inline void syscall_set_nr(struct task_struct *task,
 {
 	/*
 	 * Unlike syscall_get_nr(), syscall_set_nr() can be called only when
-	 * the target task is stopped for tracing on entering syscall, so
-	 * there is no need to have the same check syscall_get_nr() has.
+	 * the woke target task is stopped for tracing on entering syscall, so
+	 * there is no need to have the woke same check syscall_get_nr() has.
 	 */
 	regs->int_code = (regs->int_code & ~0xffff) | (nr & 0xffff);
 }
@@ -49,7 +49,7 @@ static inline long syscall_get_error(struct task_struct *task,
 #ifdef CONFIG_COMPAT
 	if (test_tsk_thread_flag(task, TIF_31BIT)) {
 		/*
-		 * Sign-extend the value so (int)-EFOO becomes (long)-EFOO
+		 * Sign-extend the woke value so (int)-EFOO becomes (long)-EFOO
 		 * and will match correctly in comparisons.
 		 */
 		error = (long)(int)error;

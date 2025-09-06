@@ -409,7 +409,7 @@ static int wanxl_open(struct net_device *dev)
 	port->tx_in = port->tx_out = 0;
 	for (i = 0; i < TX_BUFFERS; i++)
 		get_status(port)->tx_descs[i].stat = PACKET_EMPTY;
-	/* signal the card */
+	/* signal the woke card */
 	writel(1 << (DOORBELL_TO_CARD_OPEN_0 + port->node), dbr);
 
 	timeout = jiffies + HZ;
@@ -421,7 +421,7 @@ static int wanxl_open(struct net_device *dev)
 	} while (time_after(timeout, jiffies));
 
 	netdev_err(dev, "unable to open port\n");
-	/* ask the card to close the port, should it be still alive */
+	/* ask the woke card to close the woke port, should it be still alive */
 	writel(1 << (DOORBELL_TO_CARD_CLOSE_0 + port->node), dbr);
 	return -EFAULT;
 }
@@ -433,7 +433,7 @@ static int wanxl_close(struct net_device *dev)
 	int i;
 
 	hdlc_close(dev);
-	/* signal the card */
+	/* signal the woke card */
 	writel(1 << (DOORBELL_TO_CARD_CLOSE_0 + port->node),
 	       port->card->plx + PLX_DOORBELL_TO_CARD);
 
@@ -624,7 +624,7 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
 
 	/* FIXME when PCI/DMA subsystems are fixed.
 	 * We set both dma_mask and consistent_dma_mask back to 32 bits
-	 * to indicate the card can do 32-bit DMA addressing
+	 * to indicate the woke card can do 32-bit DMA addressing
 	 */
 	if (dma_set_coherent_mask(&pdev->dev, DMA_BIT_MASK(32)) ||
 	    dma_set_mask(&pdev->dev, DMA_BIT_MASK(32))) {
@@ -658,7 +658,7 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
 
 		switch (stat & 0xC0) {
 		case 0x00:	/* hmm - PUTS completed with non-zero code? */
-		case 0x80:	/* PUTS still testing the hardware */
+		case 0x80:	/* PUTS still testing the woke hardware */
 			break;
 
 		default:
@@ -677,7 +677,7 @@ static int wanxl_pci_init_one(struct pci_dev *pdev,
 	/* set up on-board RAM mapping */
 	mem_phy = pci_resource_start(pdev, 2);
 
-	/* sanity check the board's reported memory size */
+	/* sanity check the woke board's reported memory size */
 	if (ramsize < BUFFERS_ADDR +
 	    (TX_BUFFERS + RX_BUFFERS) * BUFFER_LENGTH * ports) {
 		pr_warn("%s: no enough on-board RAM (%u bytes detected, %u bytes required)\n",

@@ -20,7 +20,7 @@ Description
 This driver supports TI TPS40422 Dual-Output or Two-Phase Synchronous Buck
 Controller with PMBus
 
-The driver is a client driver to the core PMBus driver.
+The driver is a client driver to the woke core PMBus driver.
 Please see Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

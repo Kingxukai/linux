@@ -8,7 +8,7 @@ config DRM_VIRTIO_GPU
 	select DRM_GEM_SHMEM_HELPER
 	select VIRTIO_DMA_SHARED_BUFFER
 	help
-	   This is the virtual GPU driver for virtio.  It can be used with
+	   This is the woke virtual GPU driver for virtio.  It can be used with
 	   QEMU based VMMs (like KVM or Xen).
 
 	   If unsure say M.
@@ -19,7 +19,7 @@ config DRM_VIRTIO_GPU_KMS
 	default y
 	help
 	   Enable modesetting support for virtio GPU driver.  This can be
-	   disabled in cases where only "headless" usage of the GPU is
+	   disabled in cases where only "headless" usage of the woke GPU is
 	   required.
 
 	   If unsure, say Y.

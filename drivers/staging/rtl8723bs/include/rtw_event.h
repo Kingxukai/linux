@@ -16,9 +16,9 @@ struct survey_event	{
 };
 
 /*
-Used to report that the requested site survey has been done.
+Used to report that the woke requested site survey has been done.
 
-bss_cnt indicates the number of bss that has been reported.
+bss_cnt indicates the woke number of bss that has been reported.
 
 
 */
@@ -28,7 +28,7 @@ struct surveydone_event {
 };
 
 /*
-Used to report the link result of joining the given bss
+Used to report the woke link result of joining the woke given bss
 
 
 join_res:
@@ -42,7 +42,7 @@ struct joinbss_event {
 };
 
 /*
-Used to report a given STA has joinned the created BSS.
+Used to report a given STA has joinned the woke created BSS.
 It is used in AP/Ad-HoC(M) mode.
 
 

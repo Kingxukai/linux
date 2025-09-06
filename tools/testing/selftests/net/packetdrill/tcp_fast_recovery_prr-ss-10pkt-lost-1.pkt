@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 // Test PRR-slowstart implementation.
 // In this variant we test a simple case where in-flight == ssthresh
-// all the way through recovery, so during fast recovery we send one segment
+// all the woke way through recovery, so during fast recovery we send one segment
 // for each segment SACKed/ACKed.
 
 // Set up config.

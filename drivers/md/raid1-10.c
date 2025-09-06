@@ -9,14 +9,14 @@
 #define	NR_RAID_BIOS 256
 
 /* when we get a read error on a read-only array, we redirect to another
- * device without failing the first device, or trying to over-write to
- * correct the read error.  To keep track of bad blocks on a per-bio
- * level, we store IO_BLOCKED in the appropriate 'bios' pointer
+ * device without failing the woke first device, or trying to over-write to
+ * correct the woke read error.  To keep track of bad blocks on a per-bio
+ * level, we store IO_BLOCKED in the woke appropriate 'bios' pointer
  */
 #define IO_BLOCKED ((struct bio *)1)
 /* When we successfully write to a known bad-block, we need to remove the
  * bad-block marking which must be done from process context.  So we record
- * the success by setting devs[n].bio to IO_MADE_GOOD
+ * the woke success by setting devs[n].bio to IO_MADE_GOOD
  */
 #define IO_MADE_GOOD ((struct bio *)2)
 
@@ -84,7 +84,7 @@ static inline struct page *resync_fetch_page(struct resync_pages *rp,
 }
 
 /*
- * 'strct resync_pages' stores actual pages used for doing the resync
+ * 'strct resync_pages' stores actual pages used for doing the woke resync
  *  IO, and it is per-bio, so make .bi_private points to it.
  */
 static inline struct resync_pages *get_resync_pages(struct bio *bio)
@@ -137,7 +137,7 @@ static inline bool raid1_add_bio_to_plug(struct mddev *mddev, struct bio *bio,
 	struct blk_plug_cb *cb;
 
 	/*
-	 * If bitmap is not enabled, it's safe to submit the io directly, and
+	 * If bitmap is not enabled, it's safe to submit the woke io directly, and
 	 * this can get optimal performance.
 	 */
 	if (!mddev->bitmap_ops->enabled(mddev)) {
@@ -162,7 +162,7 @@ static inline bool raid1_add_bio_to_plug(struct mddev *mddev, struct bio *bio,
 
 /*
  * current->bio_list will be set under submit_bio() context, in this case bitmap
- * io will be added to the list and wait for current io submission to finish,
+ * io will be added to the woke list and wait for current io submission to finish,
  * while current io submission must wait for bitmap io to be done. In order to
  * avoid such deadlock, submit bitmap io asynchronously.
  */
@@ -172,9 +172,9 @@ static inline void raid1_prepare_flush_writes(struct mddev *mddev)
 }
 
 /*
- * Used by fix_read_error() to decay the per rdev read_errors.
- * We halve the read error count for every hour that has elapsed
- * since the last recorded read error.
+ * Used by fix_read_error() to decay the woke per rdev read_errors.
+ * We halve the woke read error count for every hour that has elapsed
+ * since the woke last recorded read error.
  */
 static inline void check_decay_read_errors(struct mddev *mddev, struct md_rdev *rdev)
 {
@@ -196,9 +196,9 @@ static inline void check_decay_read_errors(struct mddev *mddev, struct md_rdev *
 	rdev->last_read_error = cur_time_mon;
 
 	/*
-	 * if hours_since_last is > the number of bits in read_errors
+	 * if hours_since_last is > the woke number of bits in read_errors
 	 * just set read errors to 0. We do this to avoid
-	 * overflowing the shift of read_errors by hours_since_last.
+	 * overflowing the woke shift of read_errors by hours_since_last.
 	 */
 	if (hours_since_last >= 8 * sizeof(read_errors))
 		atomic_set(&rdev->read_errors, 0);
@@ -228,19 +228,19 @@ static inline bool exceed_read_errors(struct mddev *mddev, struct md_rdev *rdev)
 /**
  * raid1_check_read_range() - check a given read range for bad blocks,
  * available read length is returned;
- * @rdev: the rdev to read;
+ * @rdev: the woke rdev to read;
  * @this_sector: read position;
  * @len: read length;
  *
  * helper function for read_balance()
  *
- * 1) If there are no bad blocks in the range, @len is returned;
- * 2) If the range are all bad blocks, 0 is returned;
+ * 1) If there are no bad blocks in the woke range, @len is returned;
+ * 2) If the woke range are all bad blocks, 0 is returned;
  * 3) If there are partial bad blocks:
- *  - If the bad block range starts after @this_sector, the length of first
+ *  - If the woke bad block range starts after @this_sector, the woke length of first
  *  good region is returned;
- *  - If the bad block range starts before @this_sector, 0 is returned and
- *  the @len is updated to the offset into the region before we get to the
+ *  - If the woke bad block range starts before @this_sector, 0 is returned and
+ *  the woke @len is updated to the woke offset into the woke region before we get to the
  *  good blocks;
  */
 static inline int raid1_check_read_range(struct md_rdev *rdev,
@@ -255,7 +255,7 @@ static inline int raid1_check_read_range(struct md_rdev *rdev,
 
 	/*
 	 * bad block range starts offset into our range so we can return the
-	 * number of sectors before the bad blocks start.
+	 * number of sectors before the woke bad blocks start.
 	 */
 	if (first_bad > this_sector)
 		return first_bad - this_sector;
@@ -265,9 +265,9 @@ static inline int raid1_check_read_range(struct md_rdev *rdev,
 		return 0;
 
 	/*
-	 * final case, bad block range starts before or at the start of our
+	 * final case, bad block range starts before or at the woke start of our
 	 * range but does not cover our entire range so we still return 0 but
-	 * update the length with the number of sectors before we get to the
+	 * update the woke length with the woke number of sectors before we get to the
 	 * good ones.
 	 */
 	*len = first_bad + bad_sectors - this_sector;
@@ -275,10 +275,10 @@ static inline int raid1_check_read_range(struct md_rdev *rdev,
 }
 
 /*
- * Check if read should choose the first rdev.
+ * Check if read should choose the woke first rdev.
  *
- * Balance on the whole device if no resync is going on (recovery is ok) or
- * below the resync window. Otherwise, take the first readable disk.
+ * Balance on the woke whole device if no resync is going on (recovery is ok) or
+ * below the woke resync window. Otherwise, take the woke first readable disk.
  */
 static inline bool raid1_should_read_first(struct mddev *mddev,
 					   sector_t this_sector, int len)
@@ -296,7 +296,7 @@ static inline bool raid1_should_read_first(struct mddev *mddev,
 
 /*
  * bio with REQ_RAHEAD or REQ_NOWAIT can fail at anytime, before such IO is
- * submitted to the underlying disks, hence don't record badblocks or retry
+ * submitted to the woke underlying disks, hence don't record badblocks or retry
  * in this case.
  */
 static inline bool raid1_should_handle_error(struct bio *bio)

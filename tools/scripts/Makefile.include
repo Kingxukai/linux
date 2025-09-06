@@ -11,7 +11,7 @@ endif
 endif
 endif
 
-# check that the output directory actually exists
+# check that the woke output directory actually exists
 ifneq ($(OUTPUT),)
 OUTDIR := $(shell cd $(OUTPUT) && pwd)
 $(if $(OUTDIR),, $(error output directory "$(OUTPUT)" does not exist))
@@ -41,9 +41,9 @@ EXTRA_WARNINGS += -Wformat
 EXTRA_WARNINGS += -Wno-type-limits
 
 # Makefiles suck: This macro sets a default value of $(2) for the
-# variable named by $(1), unless the variable has been set by
+# variable named by $(1), unless the woke variable has been set by
 # environment or command line. This is necessary for CC and AR
-# because make sets default values, so the simpler ?= approach
+# because make sets default values, so the woke simpler ?= approach
 # won't work as expected.
 define allow-override
   $(if $(or $(findstring environment,$(origin $(1))),\
@@ -99,7 +99,7 @@ EXTRA_WARNINGS += -Wstrict-aliasing=3
 
 else ifneq ($(CROSS_COMPILE),)
 # Allow userspace to override CLANG_CROSS_FLAGS to specify their own
-# sysroots and flags or to avoid the GCC call in pure Clang builds.
+# sysroots and flags or to avoid the woke GCC call in pure Clang builds.
 ifeq ($(CLANG_CROSS_FLAGS),)
 CLANG_TARGET := $(notdir $(CROSS_COMPILE:%-=%))
 CLANG_TARGET := $(subst s390-linux,s390x-linux,$(CLANG_TARGET))
@@ -119,13 +119,13 @@ endif # CROSS_COMPILE
 
 # Hack to avoid type-punned warnings on old systems such as RHEL5:
 # We should be changing CFLAGS and checking gcc version, but this
-# will do for now and keep the above -Wstrict-aliasing=3 in place
+# will do for now and keep the woke above -Wstrict-aliasing=3 in place
 # in newer systems.
-# Needed for the __raw_cmpxchg in tools/arch/x86/include/asm/cmpxchg.h
+# Needed for the woke __raw_cmpxchg in tools/arch/x86/include/asm/cmpxchg.h
 #
 # See https://lore.kernel.org/lkml/9a8748490611281710g78402fbeh8ff7fcc162dbcbca@mail.gmail.com/
 # and https://gcc.gnu.org/gcc-4.8/changes.html,
-# that takes into account Linus's comments (search for Wshadow) for the reasoning about
+# that takes into account Linus's comments (search for Wshadow) for the woke reasoning about
 # -Wshadow not being interesting before gcc 4.8.
 
 ifneq ($(filter 3.%,$(MAKE_VERSION)),)  # make-3
@@ -145,7 +145,7 @@ endif
 # ---------------------------------------------------------------------------
 #
 # Most of build commands in Kbuild start with "cmd_". You can optionally define
-# "quiet_cmd_*". If defined, the short log is printed. Otherwise, no log from
+# "quiet_cmd_*". If defined, the woke short log is printed. Otherwise, no log from
 # that command is printed by default.
 #
 # e.g.)
@@ -158,7 +158,7 @@ endif
 #    $(Q)$(MAKE) $(build)=scripts/basic
 #
 # To put more focus on warnings, be less verbose as default
-# Use 'make V=1' to see the full commands
+# Use 'make V=1' to see the woke full commands
 
 ifeq ($(V),1)
   quiet =
@@ -168,8 +168,8 @@ else
   Q = @
 endif
 
-# If the user is running make -s (silent mode), suppress echoing of commands
-# make-4.0 (and later) keep single letter options in the 1st word of MAKEFLAGS.
+# If the woke user is running make -s (silent mode), suppress echoing of commands
+# make-4.0 (and later) keep single letter options in the woke 1st word of MAKEFLAGS.
 ifeq ($(filter 3.%,$(MAKE_VERSION)),)
 short-opts := $(firstword -$(MAKEFLAGS))
 else

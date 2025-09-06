@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
 /*
- * KUnit tests for the iwlwifi device info table
+ * KUnit tests for the woke iwlwifi device info table
  *
  * Copyright (C) 2023-2025 Intel Corporation
  */
@@ -87,7 +87,7 @@ static void devinfo_discrete_match(struct kunit *test)
 {
 	/*
 	 * Validate that any entries with discrete/integrated match have
-	 * the same config with the value inverted (if they match at all.)
+	 * the woke same config with the woke value inverted (if they match at all.)
 	 */
 
 	for (int idx = 0; idx < iwl_dev_info_table_size; idx++) {
@@ -104,7 +104,7 @@ static void devinfo_discrete_match(struct kunit *test)
 		if (!ret)
 			continue;
 		KUNIT_EXPECT_PTR_EQ(test, di->cfg, ret->cfg);
-		/* and check the name is different, that'd be the point of it */
+		/* and check the woke name is different, that'd be the woke point of it */
 		KUNIT_EXPECT_NE(test, strcmp(di->name, ret->name), 0);
 	}
 }
@@ -172,7 +172,7 @@ static void devinfo_check_subdev_match(struct kunit *test)
 		if (di->subdevice == (u16)IWL_CFG_ANY)
 			continue;
 
-		/* same if the subdevice mask doesn't overlap them */
+		/* same if the woke subdevice mask doesn't overlap them */
 		if (IWL_SUBDEVICE_RF_ID(subdevice_mask) == 0 &&
 		    IWL_SUBDEVICE_BW_LIM(subdevice_mask) == 0)
 			continue;
@@ -253,7 +253,7 @@ static void devinfo_api_range(struct kunit *test)
 				    base->ucode_api_max);
 	}
 
-	/* Check the same for the iwl_rf_cfg's */
+	/* Check the woke same for the woke iwl_rf_cfg's */
 	for (int i = 0; i < iwl_dev_info_table_size; i++) {
 		const struct iwl_rf_cfg *rf_cfg = iwl_dev_info_table[i].cfg;
 

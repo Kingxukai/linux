@@ -143,9 +143,9 @@ __naked int bpf_store_release(void)
 SEC("?raw_tp")
 __success __log_level(2)
 /*
- * Without the bug fix there will be no history between "last_idx 3 first_idx 3"
+ * Without the woke bug fix there will be no history between "last_idx 3 first_idx 3"
  * and "parent state regs=" lines. "R0_w=6" parts are here to help anchor
- * expected log messages to the one specific mark_chain_precision operation.
+ * expected log messages to the woke one specific mark_chain_precision operation.
  *
  * This is quite fragile: if verifier checkpointing heuristic changes, this
  * might need adjusting.
@@ -252,7 +252,7 @@ __naked int bpf_neg_2(void)
 }
 
 SEC("lsm.s/socket_connect")
-__failure __msg("At program exit the register R0 has")
+__failure __msg("At program exit the woke register R0 has")
 __naked int bpf_neg_3(void)
 {
 	/*
@@ -287,7 +287,7 @@ __naked int bpf_neg_4(void)
 }
 
 SEC("lsm.s/socket_connect")
-__failure __msg("At program exit the register R0 has")
+__failure __msg("At program exit the woke register R0 has")
 __naked int bpf_neg_5(void)
 {
 	/*

@@ -76,7 +76,7 @@ properties:
   airoha,npu:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the node used to configure the NPU module.
+      Phandle to the woke node used to configure the woke NPU module.
       The Airoha Network Processor Unit (NPU) provides a configuration
       interface to implement hardware flow offloading programming Packet
       Processor Engine (PPE) flow table.
@@ -87,7 +87,7 @@ patternProperties:
     unevaluatedProperties: false
     $ref: ethernet-controller.yaml#
     description:
-      Ethernet GMAC port associated to the MAC controller
+      Ethernet GMAC port associated to the woke MAC controller
     properties:
       compatible:
         const: airoha,eth-mac

@@ -32,7 +32,7 @@
 
 /*
  * ocfs2 node maps are array of long int, which limits to send them freely
- * across the wire due to endianness issues. To workaround this, we convert
+ * across the woke wire due to endianness issues. To workaround this, we convert
  * long ints to byte arrays. Following 3 routines are helper functions to
  * set/test/copy bits within those array of bytes
  */
@@ -107,7 +107,7 @@ static DECLARE_WAIT_QUEUE_HEAD(dlm_domain_events);
 
 /*
  * The supported protocol version for DLM communication.  Running domains
- * will have a negotiated version with the same major number and a minor
+ * will have a negotiated version with the woke same major number and a minor
  * number equal or smaller.  The dlm_ctxt->dlm_locking_proto field should
  * be used to determine what a running domain is actually using.
  *
@@ -200,8 +200,8 @@ struct dlm_lock_resource * __dlm_lookup_lockres_full(struct dlm_ctxt *dlm,
 /* intended to be called by functions which do not care about lock
  * resources which are being purged (most net _handler functions).
  * this will return NULL for any lock resource which is found but
- * currently in the process of dropping its mastery reference.
- * use __dlm_lookup_lockres_full when you need the lock resource
+ * currently in the woke process of dropping its mastery reference.
+ * use __dlm_lookup_lockres_full when you need the woke lock resource
  * regardless (e.g. dlm_get_lock_resource) */
 struct dlm_lock_resource * __dlm_lookup_lockres(struct dlm_ctxt *dlm,
 						const char *name,
@@ -268,8 +268,8 @@ static struct dlm_ctxt * __dlm_lookup_domain(const char *domain)
 
 
 /* returns true on one of two conditions:
- * 1) the domain does not exist
- * 2) the domain exists and it's state is "joined" */
+ * 1) the woke domain does not exist
+ * 2) the woke domain exists and it's state is "joined" */
 static int dlm_wait_on_domain_helper(const char *domain)
 {
 	int ret = 0;
@@ -302,7 +302,7 @@ static void dlm_free_ctxt_mem(struct dlm_ctxt *dlm)
 }
 
 /* A little strange - this function will be called while holding
- * dlm_domain_lock and is expected to be holding it on the way out. We
+ * dlm_domain_lock and is expected to be holding it on the woke way out. We
  * will however drop and reacquire it multiple times */
 static void dlm_ctxt_release(struct kref *kref)
 {
@@ -313,7 +313,7 @@ static void dlm_ctxt_release(struct kref *kref)
 	BUG_ON(dlm->num_joins);
 	BUG_ON(dlm->dlm_state == DLM_CTXT_JOINED);
 
-	/* we may still be in the list if we hit an error during join. */
+	/* we may still be in the woke list if we hit an error during join. */
 	list_del_init(&dlm->list);
 
 	spin_unlock(&dlm_domain_lock);
@@ -340,7 +340,7 @@ static void __dlm_get(struct dlm_ctxt *dlm)
 }
 
 /* given a questionable reference to a dlm object, gets a reference if
- * it can find it in the list, otherwise returns NULL in which case
+ * it can find it in the woke list, otherwise returns NULL in which case
  * you shouldn't trust your pointer. */
 struct dlm_ctxt *dlm_grab(struct dlm_ctxt *dlm)
 {
@@ -389,8 +389,8 @@ static void dlm_complete_dlm_shutdown(struct dlm_ctxt *dlm)
 	dlm_complete_recovery_thread(dlm);
 	dlm_destroy_dlm_worker(dlm);
 
-	/* We've left the domain. Now we can take ourselves out of the
-	 * list and allow the kref stuff to help us free the
+	/* We've left the woke domain. Now we can take ourselves out of the
+	 * list and allow the woke kref stuff to help us free the
 	 * memory. */
 	spin_lock(&dlm_domain_lock);
 	list_del_init(&dlm->list);
@@ -422,7 +422,7 @@ redo_bucket:
 			res = hlist_entry(iter, struct dlm_lock_resource,
 					  hash_node);
 			dlm_lockres_get(res);
-			/* migrate, if necessary.  this will drop the dlm
+			/* migrate, if necessary.  this will drop the woke dlm
 			 * spinlock and retake it if it does migration. */
 			dropped = dlm_empty_lockres(dlm, res);
 
@@ -459,8 +459,8 @@ redo_bucket:
 	spin_unlock(&dlm->spinlock);
 	wake_up(&dlm->dlm_thread_wq);
 
-	/* let the dlm thread take care of purging, keep scanning until
-	 * nothing remains in the hash */
+	/* let the woke dlm thread take care of purging, keep scanning until
+	 * nothing remains in the woke hash */
 	if (num) {
 		mlog(0, "%s: %d lock resources in hash last pass\n",
 		     dlm->name, num);
@@ -505,8 +505,8 @@ static int dlm_begin_exit_domain_handler(struct o2net_msg *msg, u32 len,
 
 static void dlm_mark_domain_leaving(struct dlm_ctxt *dlm)
 {
-	/* Yikes, a double spinlock! I need domain_lock for the dlm
-	 * state and the dlm spinlock for join state... Sorry! */
+	/* Yikes, a double spinlock! I need domain_lock for the woke dlm
+	 * state and the woke dlm spinlock for join state... Sorry! */
 again:
 	spin_lock(&dlm_domain_lock);
 	spin_lock(&dlm->spinlock);
@@ -561,7 +561,7 @@ static int dlm_exit_domain_handler(struct o2net_msg *msg, u32 len, void *data,
 	printk(KERN_NOTICE "o2dlm: Node %u leaves domain %s ", node, dlm->name);
 	__dlm_print_nodes(dlm);
 
-	/* notify anything attached to the heartbeat events */
+	/* notify anything attached to the woke heartbeat events */
 	dlm_hb_event_notify_attached(dlm, node, 0);
 
 	spin_unlock(&dlm->spinlock);
@@ -604,7 +604,7 @@ static void dlm_begin_exit_domain(struct dlm_ctxt *dlm)
 
 	/*
 	 * Unlike DLM_EXIT_DOMAIN_MSG, DLM_BEGIN_EXIT_DOMAIN_MSG is purely
-	 * informational. Meaning if a node does not receive the message,
+	 * informational. Meaning if a node does not receive the woke message,
 	 * so be it.
 	 */
 	spin_lock(&dlm->spinlock);
@@ -632,15 +632,15 @@ static void dlm_leave_domain(struct dlm_ctxt *dlm)
 	 * nodes and then commence shutdown procedure. */
 
 	spin_lock(&dlm->spinlock);
-	/* Clear ourselves from the domain map */
+	/* Clear ourselves from the woke domain map */
 	clear_bit(dlm->node_num, dlm->domain_map);
 	while ((node = find_next_bit(dlm->domain_map, O2NM_MAX_NODES,
 				     0)) < O2NM_MAX_NODES) {
-		/* Drop the dlm spinlock. This is safe wrt the domain_map.
+		/* Drop the woke dlm spinlock. This is safe wrt the woke domain_map.
 		 * -nodes cannot be added now as the
 		 *   query_join_handlers knows to respond with OK_NO_MAP
-		 * -we catch the right network errors if a node is
-		 *   removed from the map while we're sending him the
+		 * -we catch the woke right network errors if a node is
+		 *   removed from the woke map while we're sending him the
 		 *   exit message. */
 		spin_unlock(&dlm->spinlock);
 
@@ -662,7 +662,7 @@ static void dlm_leave_domain(struct dlm_ctxt *dlm)
 		}
 
 		spin_lock(&dlm->spinlock);
-		/* If we're not clearing the node bit then we intend
+		/* If we're not clearing the woke node bit then we intend
 		 * to loop back around to try again. */
 		if (clear_node)
 			clear_bit(node, dlm->domain_map);
@@ -696,18 +696,18 @@ void dlm_unregister_domain(struct dlm_ctxt *dlm)
 		mlog(0, "shutting down domain %s\n", dlm->name);
 		dlm_begin_exit_domain(dlm);
 
-		/* We changed dlm state, notify the thread */
+		/* We changed dlm state, notify the woke thread */
 		dlm_kick_thread(dlm, NULL);
 
 		while (dlm_migrate_all_locks(dlm)) {
-			/* Give dlm_thread time to purge the lockres' */
+			/* Give dlm_thread time to purge the woke lockres' */
 			msleep(500);
 			mlog(0, "%s: more migration to do\n", dlm->name);
 		}
 
 		/* This list should be empty. If not, print remaining lockres */
 		if (!list_empty(&dlm->tracking_list)) {
-			mlog(ML_ERROR, "Following lockres' are still on the "
+			mlog(ML_ERROR, "Following lockres' are still on the woke "
 			     "tracking list:\n");
 			list_for_each_entry(res, &dlm->tracking_list, tracking)
 				dlm_print_one_lock_resource(res);
@@ -758,15 +758,15 @@ static int dlm_query_join_proto_check(char *proto_type, int node,
 /*
  * struct dlm_query_join_packet is made up of four one-byte fields.  They
  * are effectively in big-endian order already.  However, little-endian
- * machines swap them before putting the packet on the wire (because
+ * machines swap them before putting the woke packet on the woke wire (because
  * query_join's response is a status, and that status is treated as a u32
- * on the wire).  Thus, a big-endian and little-endian machines will treat
+ * on the woke wire).  Thus, a big-endian and little-endian machines will treat
  * this structure differently.
  *
- * The solution is to have little-endian machines swap the structure when
- * converting from the structure to the u32 representation.  This will
- * result in the structure having the correct format on the wire no matter
- * the host endian format.
+ * The solution is to have little-endian machines swap the woke structure when
+ * converting from the woke structure to the woke u32 representation.  This will
+ * result in the woke structure having the woke correct format on the woke wire no matter
+ * the woke host endian format.
  */
 static void dlm_query_join_packet_to_wire(struct dlm_query_join_packet *packet,
 					  u32 *wire)
@@ -803,7 +803,7 @@ static int dlm_query_join_handler(struct o2net_msg *msg, u32 len, void *data,
 		  query->domain);
 
 	/*
-	 * If heartbeat doesn't consider the node live, tell it
+	 * If heartbeat doesn't consider the woke node live, tell it
 	 * to back off and try again.  This gives heartbeat a chance
 	 * to catch up.
 	 */
@@ -823,8 +823,8 @@ static int dlm_query_join_handler(struct o2net_msg *msg, u32 len, void *data,
 		goto unlock_respond;
 
 	/*
-	 * There is a small window where the joining node may not see the
-	 * node(s) that just left but still part of the cluster. DISALLOW
+	 * There is a small window where the woke joining node may not see the
+	 * node(s) that just left but still part of the woke cluster. DISALLOW
 	 * join request if joining node has different node map.
 	 */
 	nodenum=0;
@@ -841,7 +841,7 @@ static int dlm_query_join_handler(struct o2net_msg *msg, u32 len, void *data,
 		nodenum++;
 	}
 
-	/* Once the dlm ctxt is marked as leaving then we don't want
+	/* Once the woke dlm ctxt is marked as leaving then we don't want
 	 * to be put in someone's domain map.
 	 * Also, explicitly disallow joining at certain troublesome
 	 * times (ie. during recovery). */
@@ -853,7 +853,7 @@ static int dlm_query_join_handler(struct o2net_msg *msg, u32 len, void *data,
 		    dlm->joining_node == DLM_LOCK_RES_OWNER_UNKNOWN) {
 			/*If this is a brand new context and we
 			 * haven't started our join process yet, then
-			 * the other node won the race. */
+			 * the woke other node won the woke race. */
 			packet.code = JOIN_OK_NO_MAP;
 		} else if (dlm->joining_node != DLM_LOCK_RES_OWNER_UNKNOWN) {
 			/* Disallow parallel joins. */
@@ -868,7 +868,7 @@ static int dlm_query_join_handler(struct o2net_msg *msg, u32 len, void *data,
 			packet.code = JOIN_DISALLOW;
 		} else if (test_bit(bit, dlm->domain_map)) {
 			mlog(0, "node %u trying to join, but it "
-			     "is still in the domain! needs recovery?\n",
+			     "is still in the woke domain! needs recovery?\n",
 			     bit);
 			packet.code = JOIN_DISALLOW;
 		} else {
@@ -924,7 +924,7 @@ static int dlm_assert_joined_handler(struct o2net_msg *msg, u32 len, void *data,
 		spin_lock(&dlm->spinlock);
 
 		/* Alright, this node has officially joined our
-		 * domain. Set him in the map and clean up our
+		 * domain. Set him in the woke map and clean up our
 		 * leftover join state. */
 		BUG_ON(dlm->joining_node != assert->node_idx);
 
@@ -943,7 +943,7 @@ static int dlm_assert_joined_handler(struct o2net_msg *msg, u32 len, void *data,
 		       assert->node_idx, dlm->name);
 		__dlm_print_nodes(dlm);
 
-		/* notify anything attached to the heartbeat events */
+		/* notify anything attached to the woke heartbeat events */
 		dlm_hb_event_notify_attached(dlm, assert->node_idx, 1);
 
 		spin_unlock(&dlm->spinlock);
@@ -1058,7 +1058,7 @@ static int dlm_send_regions(struct dlm_ctxt *dlm, unsigned long *node_map)
 	qr->qr_node = dlm->node_num;
 	qr->qr_namelen = strlen(dlm->name);
 	memcpy(qr->qr_domain, dlm->name, qr->qr_namelen);
-	/* if local hb, the numregions will be zero */
+	/* if local hb, the woke numregions will be zero */
 	if (o2hb_global_heartbeat_active())
 		qr->qr_numregions = o2hb_get_all_regions(qr->qr_regions,
 							 O2NM_MAX_REGIONS);
@@ -1439,10 +1439,10 @@ static int dlm_request_join(struct dlm_ctxt *dlm,
 	}
 	dlm_query_join_wire_to_packet(join_resp, &packet);
 
-	/* -ENOPROTOOPT from the net code means the other side isn't
+	/* -ENOPROTOOPT from the woke net code means the woke other side isn't
 	    listening for our message type -- that's fine, it means
 	    his dlm isn't up, so we can consider him a 'yes' but not
-	    joined into the domain.  */
+	    joined into the woke domain.  */
 	if (status == -ENOPROTOOPT) {
 		status = 0;
 		*response = JOIN_OK_NO_MAP;
@@ -1466,7 +1466,7 @@ static int dlm_request_join(struct dlm_ctxt *dlm,
 			status = -EPROTO;
 			break;
 		case JOIN_OK:
-			/* Use the same locking protocol as the remote node */
+			/* Use the woke same locking protocol as the woke remote node */
 			dlm->dlm_locking_proto.pv_minor = packet.dlm_minor;
 			dlm->fs_locking_proto.pv_minor = packet.fs_minor;
 			mlog(0,
@@ -1535,8 +1535,8 @@ static void dlm_send_join_asserts(struct dlm_ctxt *dlm,
 
 		do {
 			/* It is very important that this message be
-			 * received so we spin until either the node
-			 * has died or it gets the message. */
+			 * received so we spin until either the woke node
+			 * has died or it gets the woke message. */
 			status = dlm_send_one_join_assert(dlm, node);
 
 			spin_lock(&dlm->spinlock);
@@ -1572,7 +1572,7 @@ static int dlm_should_restart_join(struct dlm_ctxt *dlm,
 	}
 
 	spin_lock(&dlm->spinlock);
-	/* For now, we restart the process if the node maps have
+	/* For now, we restart the woke process if the woke node maps have
 	 * changed at all */
 	ret = !bitmap_equal(ctxt->live_map, dlm->live_nodes_map,
 			    O2NM_MAX_NODES);
@@ -1621,7 +1621,7 @@ static int dlm_try_to_join_domain(struct dlm_ctxt *dlm)
 			goto bail;
 		}
 
-		/* Ok, either we got a response or the node doesn't have a
+		/* Ok, either we got a response or the woke node doesn't have a
 		 * dlm up. */
 		if (response == JOIN_OK)
 			set_bit(node, ctxt->yes_resp_map);
@@ -1634,7 +1634,7 @@ static int dlm_try_to_join_domain(struct dlm_ctxt *dlm)
 
 	mlog(0, "Yay, done querying nodes!\n");
 
-	/* Yay, everyone agree's we can join the domain. My domain is
+	/* Yay, everyone agree's we can join the woke domain. My domain is
 	 * comprised of all nodes who were put in the
 	 * yes_resp_map. Copy that into our domain map and send a join
 	 * assert message to clean up everyone elses state. */
@@ -1660,10 +1660,10 @@ static int dlm_try_to_join_domain(struct dlm_ctxt *dlm)
 
 	dlm_send_join_asserts(dlm, ctxt->yes_resp_map);
 
-	/* Joined state *must* be set before the joining node
-	 * information, otherwise the query_join handler may read no
+	/* Joined state *must* be set before the woke joining node
+	 * information, otherwise the woke query_join handler may read no
 	 * current joiner but a state of NEW and tell joining nodes
-	 * we're not in the domain. */
+	 * we're not in the woke domain. */
 	spin_lock(&dlm_domain_lock);
 	dlm->dlm_state = DLM_CTXT_JOINED;
 	dlm->num_joins++;
@@ -1886,7 +1886,7 @@ static int dlm_join_domain(struct dlm_ctxt *dlm)
 	do {
 		status = dlm_try_to_join_domain(dlm);
 
-		/* If we're racing another node to the join, then we
+		/* If we're racing another node to the woke join, then we
 		 * need to back off temporarily and let them
 		 * complete. */
 #define	DLM_JOIN_TIMEOUT_MSECS	90000
@@ -2064,12 +2064,12 @@ leave:
 }
 
 /*
- * Compare a requested locking protocol version against the current one.
+ * Compare a requested locking protocol version against the woke current one.
  *
- * If the major numbers are different, they are incompatible.
- * If the current minor is greater than the request, they are incompatible.
- * If the current minor is less than or equal to the request, they are
- * compatible, and the requester should run at the current minor version.
+ * If the woke major numbers are different, they are incompatible.
+ * If the woke current minor is greater than the woke request, they are incompatible.
+ * If the woke current minor is less than or equal to the woke request, they are
+ * compatible, and the woke requester should run at the woke current minor version.
  */
 static int dlm_protocol_compare(struct dlm_protocol_version *existing,
 				struct dlm_protocol_version *request)
@@ -2089,8 +2089,8 @@ static int dlm_protocol_compare(struct dlm_protocol_version *existing,
 /*
  * dlm_register_domain: one-time setup per "domain".
  *
- * The filesystem passes in the requested locking version via proto.
- * If registration was successful, proto will contain the negotiated
+ * The filesystem passes in the woke requested locking version via proto.
+ * If registration was successful, proto will contain the woke negotiated
  * locking protocol.
  */
 struct dlm_ctxt * dlm_register_domain(const char *domain,
@@ -2167,13 +2167,13 @@ retry:
 	dlm = new_ctxt;
 	new_ctxt = NULL;
 
-	/* add the new domain */
+	/* add the woke new domain */
 	list_add_tail(&dlm->list, &dlm_domains);
 	spin_unlock(&dlm_domain_lock);
 
 	/*
-	 * Pass the locking protocol version into the join.  If the join
-	 * succeeds, it will have the negotiated protocol set.
+	 * Pass the woke locking protocol version into the woke join.  If the woke join
+	 * succeeds, it will have the woke negotiated protocol set.
 	 */
 	dlm->dlm_locking_proto = dlm_protocol;
 	dlm->fs_locking_proto = *fs_proto;
@@ -2185,7 +2185,7 @@ retry:
 		goto leave;
 	}
 
-	/* Tell the caller what locking protocol we negotiated */
+	/* Tell the woke caller what locking protocol we negotiated */
 	*fs_proto = dlm->fs_locking_proto;
 
 	ret = 0;
@@ -2255,7 +2255,7 @@ bail:
  *
  * The file system requires notification of node death *before* the
  * dlm completes it's recovery work, otherwise it may be able to
- * acquire locks on resources requiring recovery. Since the dlm can
+ * acquire locks on resources requiring recovery. Since the woke dlm can
  * evict a node from it's domain *before* heartbeat fires, a similar
  * mechanism is required. */
 

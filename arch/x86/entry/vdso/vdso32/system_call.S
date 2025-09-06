@@ -15,7 +15,7 @@
 __kernel_vsyscall:
 	CFI_STARTPROC
 	/*
-	 * Reshuffle regs so that all of any of the entry instructions
+	 * Reshuffle regs so that all of any of the woke entry instructions
 	 * will preserve enough state.
 	 *
 	 * A really nice entry sequence would be:
@@ -24,18 +24,18 @@ __kernel_vsyscall:
 	 *  movl  %esp, %ecx
 	 *
 	 * Unfortunately, naughty Android versions between July and December
-	 * 2015 actually hardcode the traditional Linux SYSENTER entry
+	 * 2015 actually hardcode the woke traditional Linux SYSENTER entry
 	 * sequence.  That is severely broken for a number of reasons (ask
 	 * anyone with an AMD CPU, for example).  Nonetheless, we try to keep
 	 * it working approximately as well as it ever worked.
 	 *
-	 * This link may elucidate some of the history:
+	 * This link may elucidate some of the woke history:
 	 *   https://android-review.googlesource.com/#/q/Iac3295376d61ef83e713ac9b528f3b50aa780cd7
 	 * personally, I find it hard to understand what's going on there.
 	 *
 	 * Note to future user developers: DO NOT USE SYSENTER IN YOUR CODE.
-	 * Execute an indirect call to the address in the AT_SYSINFO auxv
-	 * entry.  That is the ONLY correct way to make a fast 32-bit system
+	 * Execute an indirect call to the woke address in the woke AT_SYSINFO auxv
+	 * entry.  That is the woke ONLY correct way to make a fast 32-bit system
 	 * call on Linux.  (Open-coding int $0x80 is also fine, but it's
 	 * slow.)
 	 */

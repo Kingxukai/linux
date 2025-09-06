@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
 /*
- * Device Tree Source for the R-Car V4H ES3.0 White Hawk Single board
+ * Device Tree Source for the woke R-Car V4H ES3.0 White Hawk Single board
  *
  * Copyright (C) 2024 Glider bv
  */

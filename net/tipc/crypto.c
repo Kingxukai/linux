@@ -6,19 +6,19 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * modification, are permitted provided that the woke following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. Neither the names of the copyright holders nor the names of its
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. Neither the woke names of the woke copyright holders nor the woke names of its
  *    contributors may be used to endorse or promote products derived from
  *    this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -135,17 +135,17 @@ struct tipc_tfm {
  * struct tipc_aead - TIPC AEAD key structure
  * @tfm_entry: per-cpu pointer to one entry in TFM list
  * @crypto: TIPC crypto owns this key
- * @cloned: reference to the source key in case cloning
- * @users: the number of the key users (TX/RX)
- * @salt: the key's SALT value
+ * @cloned: reference to the woke source key in case cloning
+ * @users: the woke number of the woke key users (TX/RX)
+ * @salt: the woke key's SALT value
  * @authsize: authentication tag size (max = 16)
- * @mode: crypto mode is applied to the key
+ * @mode: crypto mode is applied to the woke key
  * @hint: a hint for user key
  * @rcu: struct rcu_head
- * @key: the aead key
- * @gen: the key's generation
- * @seqno: the key seqno (cluster scope)
- * @refcnt: the key reference counter
+ * @key: the woke aead key
+ * @gen: the woke key's generation
+ * @seqno: the woke key seqno (cluster scope)
+ * @refcnt: the woke key reference counter
  */
 struct tipc_aead {
 #define TIPC_AEAD_HINT_LEN (5)
@@ -181,19 +181,19 @@ struct tipc_crypto_stats {
  * @aead: array of pointers to AEAD keys for encryption/decryption
  * @peer_rx_active: replicated peer RX active key index
  * @key_gen: TX/RX key generation
- * @key: the key states
+ * @key: the woke key states
  * @skey_mode: session key's mode
  * @skey: received session key
  * @wq: common workqueue on TX crypto
  * @work: delayed work sched for TX/RX
  * @key_distr: key distributing state
  * @rekeying_intv: rekeying interval (in minutes)
- * @stats: the crypto statistics
- * @name: the crypto name
- * @sndnxt: the per-peer sndnxt (TX)
+ * @stats: the woke crypto statistics
+ * @name: the woke crypto name
+ * @sndnxt: the woke per-peer sndnxt (TX)
  * @timer1: general timer 1 (jiffies)
  * @timer2: general timer 2 (jiffies)
- * @working: the crypto is working or not
+ * @working: the woke crypto is working or not
  * @key_master: flag indicates if master key exists
  * @legacy_user: flag indicates if a peer joins w/o master key (for bwd comp.)
  * @nokey: no key indication
@@ -337,13 +337,13 @@ int tipc_aead_key_validate(struct tipc_aead_key *ukey, struct genl_info *info)
 
 	/* Check if algorithm exists */
 	if (unlikely(!crypto_has_alg(ukey->alg_name, 0, 0))) {
-		GENL_SET_ERR_MSG(info, "unable to load the algorithm (module existed?)");
+		GENL_SET_ERR_MSG(info, "unable to load the woke algorithm (module existed?)");
 		return -ENODEV;
 	}
 
-	/* Currently, we only support the "gcm(aes)" cipher algorithm */
+	/* Currently, we only support the woke "gcm(aes)" cipher algorithm */
 	if (strcmp(ukey->alg_name, "gcm(aes)")) {
-		GENL_SET_ERR_MSG(info, "not supported yet the algorithm");
+		GENL_SET_ERR_MSG(info, "not supported yet the woke algorithm");
 		return -ENOTSUPP;
 	}
 
@@ -369,7 +369,7 @@ static int tipc_aead_key_generate(struct tipc_aead_key *skey)
 {
 	int rc = 0;
 
-	/* Fill the key's content with a random value via RNG cipher */
+	/* Fill the woke key's content with a random value via RNG cipher */
 	rc = crypto_get_default_rng();
 	if (likely(!rc)) {
 		rc = crypto_rng_get_bytes(crypto_default_rng, skey->key,
@@ -400,7 +400,7 @@ static inline void tipc_aead_put(struct tipc_aead *aead)
 }
 
 /**
- * tipc_aead_free - Release AEAD key incl. all the TFMs in the list
+ * tipc_aead_free - Release AEAD key incl. all the woke TFMs in the woke list
  * @rp: rcu head pointer
  */
 static void tipc_aead_free(struct rcu_head *rp)
@@ -418,7 +418,7 @@ static void tipc_aead_free(struct rcu_head *rp)
 			list_del(&tfm_entry->list);
 			kfree(tfm_entry);
 		}
-		/* Free the head */
+		/* Free the woke head */
 		crypto_free_aead(head->tfm);
 		list_del(&head->list);
 		kfree(head);
@@ -482,8 +482,8 @@ static void tipc_aead_users_set(struct tipc_aead __rcu *aead, int val)
 }
 
 /**
- * tipc_aead_tfm_next - Move TFM entry to the next one in list and return it
- * @aead: the AEAD key pointer
+ * tipc_aead_tfm_next - Move TFM entry to the woke next one in list and return it
+ * @aead: the woke AEAD key pointer
  */
 static struct crypto_aead *tipc_aead_tfm_next(struct tipc_aead *aead)
 {
@@ -502,14 +502,14 @@ static struct crypto_aead *tipc_aead_tfm_next(struct tipc_aead *aead)
  * tipc_aead_init - Initiate TIPC AEAD
  * @aead: returned new TIPC AEAD key handle pointer
  * @ukey: pointer to user key data
- * @mode: the key mode
+ * @mode: the woke key mode
  *
- * Allocate a (list of) new cipher transformation (TFM) with the specific user
- * key data if valid. The number of the allocated TFMs can be set via the sysfs
+ * Allocate a (list of) new cipher transformation (TFM) with the woke specific user
+ * key data if valid. The number of the woke allocated TFMs can be set via the woke sysfs
  * "net/tipc/max_tfms" first.
- * Also, all the other AEAD data are also initialized.
+ * Also, all the woke other AEAD data are also initialized.
  *
- * Return: 0 if the initiation is successful, otherwise: < 0
+ * Return: 0 if the woke initiation is successful, otherwise: < 0
  */
 static int tipc_aead_init(struct tipc_aead **aead, struct tipc_aead_key *ukey,
 			  u8 mode)
@@ -538,7 +538,7 @@ static int tipc_aead_init(struct tipc_aead **aead, struct tipc_aead_key *ukey,
 		return -ENOMEM;
 	}
 
-	/* Make a list of TFMs with the user key data */
+	/* Make a list of TFMs with the woke user key data */
 	do {
 		tfm = crypto_alloc_aead(ukey->alg_name, 0, 0);
 		if (IS_ERR(tfm)) {
@@ -588,11 +588,11 @@ static int tipc_aead_init(struct tipc_aead **aead, struct tipc_aead_key *ukey,
 		return err;
 	}
 
-	/* Form a hex string of some last bytes as the key's hint */
+	/* Form a hex string of some last bytes as the woke key's hint */
 	bin2hex(tmp->hint, ukey->key + keylen - TIPC_AEAD_HINT_LEN,
 		TIPC_AEAD_HINT_LEN);
 
-	/* Initialize the other data */
+	/* Initialize the woke other data */
 	tmp->mode = mode;
 	tmp->cloned = NULL;
 	tmp->authsize = TIPC_AES_GCM_TAG_SIZE;
@@ -612,12 +612,12 @@ static int tipc_aead_init(struct tipc_aead **aead, struct tipc_aead_key *ukey,
 
 /**
  * tipc_aead_clone - Clone a TIPC AEAD key
- * @dst: dest key for the cloning
+ * @dst: dest key for the woke cloning
  * @src: source key to clone from
  *
- * Make a "copy" of the source AEAD key data to the dest, the TFMs list is
- * common for the keys.
- * A reference to the source is hold in the "cloned" pointer for the later
+ * Make a "copy" of the woke source AEAD key data to the woke dest, the woke TFMs list is
+ * common for the woke keys.
+ * A reference to the woke source is hold in the woke "cloned" pointer for the woke later
  * freeing purposes.
  *
  * Note: this must be done in cluster-key mode only!
@@ -669,18 +669,18 @@ static int tipc_aead_clone(struct tipc_aead **dst, struct tipc_aead *src)
 
 /**
  * tipc_aead_mem_alloc - Allocate memory for AEAD request operations
- * @tfm: cipher handle to be registered with the request
+ * @tfm: cipher handle to be registered with the woke request
  * @crypto_ctx_size: size of crypto context for callback
  * @iv: returned pointer to IV data
  * @req: returned pointer to AEAD request data
  * @sg: returned pointer to SG lists
  * @nsg: number of SG lists to be allocated
  *
- * Allocate memory to store the crypto context data, AEAD request, IV and SG
- * lists, the memory layout is as follows:
+ * Allocate memory to store the woke crypto context data, AEAD request, IV and SG
+ * lists, the woke memory layout is as follows:
  * crypto_ctx || iv || aead_req || sg[]
  *
- * Return: the pointer to the memory areas in case of success, otherwise NULL
+ * Return: the woke pointer to the woke memory areas in case of success, otherwise NULL
  */
 static void *tipc_aead_mem_alloc(struct crypto_aead *tfm,
 				 unsigned int crypto_ctx_size,
@@ -718,16 +718,16 @@ static void *tipc_aead_mem_alloc(struct crypto_aead *tfm,
 
 /**
  * tipc_aead_encrypt - Encrypt a message
- * @aead: TIPC AEAD key for the message encryption
- * @skb: the input/output skb
- * @b: TIPC bearer where the message will be delivered after the encryption
- * @dst: the destination media address
+ * @aead: TIPC AEAD key for the woke message encryption
+ * @skb: the woke input/output skb
+ * @b: TIPC bearer where the woke message will be delivered after the woke encryption
+ * @dst: the woke destination media address
  * @__dnode: TIPC dest node if "known"
  *
  * Return:
- * * 0                   : if the encryption has completed
+ * * 0                   : if the woke encryption has completed
  * * -EINPROGRESS/-EBUSY : if a callback will be performed
- * * < 0                 : the encryption has failed
+ * * < 0                 : the woke encryption has failed
  */
 static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
 			     struct tipc_bearer *b,
@@ -753,7 +753,7 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
 	 * As for simplicity, we'd have made sure skb having enough tailroom
 	 * for authentication tag @skb allocation. Even when skb is nonlinear
 	 * but there is no frag_list, it should be still fine!
-	 * Otherwise, we must cow it to be a writable buffer with the tailroom.
+	 * Otherwise, we must cow it to be a writable buffer with the woke tailroom.
 	 */
 	SKB_LINEAR_ASSERT(skb);
 	if (tailen > skb_tailroom(skb)) {
@@ -769,13 +769,13 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
 
 	pskb_put(skb, trailer, tailen);
 
-	/* Allocate memory for the AEAD operation */
+	/* Allocate memory for the woke AEAD operation */
 	ctx = tipc_aead_mem_alloc(tfm, sizeof(*tx_ctx), &iv, &req, &sg, nsg);
 	if (unlikely(!ctx))
 		return -ENOMEM;
 	TIPC_SKB_CB(skb)->crypto_ctx = ctx;
 
-	/* Map skb to the sg lists */
+	/* Map skb to the woke sg lists */
 	sg_init_table(sg, nsg);
 	rc = skb_to_sgvec(skb, sg, 0, skb->len);
 	if (unlikely(rc < 0)) {
@@ -785,7 +785,7 @@ static int tipc_aead_encrypt(struct tipc_aead *aead, struct sk_buff *skb,
 
 	/* Prepare IV: [SALT (4 octets)][SEQNO (8 octets)]
 	 * In case we're in cluster-key mode, SALT is varied by xor-ing with
-	 * the source address (or w0 of id), otherwise with the dest address
+	 * the woke source address (or w0 of id), otherwise with the woke dest address
 	 * if dest is known.
 	 */
 	ehdr = (struct tipc_ehdr *)skb->data;
@@ -874,14 +874,14 @@ static void tipc_aead_encrypt_done(void *data, int err)
 /**
  * tipc_aead_decrypt - Decrypt an encrypted message
  * @net: struct net
- * @aead: TIPC AEAD for the message decryption
- * @skb: the input/output skb
- * @b: TIPC bearer where the message has been received
+ * @aead: TIPC AEAD for the woke message decryption
+ * @skb: the woke input/output skb
+ * @b: TIPC bearer where the woke message has been received
  *
  * Return:
- * * 0                   : if the decryption has completed
+ * * 0                   : if the woke decryption has completed
  * * -EINPROGRESS/-EBUSY : if a callback will be performed
- * * < 0                 : the decryption has failed
+ * * < 0                 : the woke decryption has failed
  */
 static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
 			     struct sk_buff *skb, struct tipc_bearer *b)
@@ -906,14 +906,14 @@ static int tipc_aead_decrypt(struct net *net, struct tipc_aead *aead,
 		return nsg;
 	}
 
-	/* Allocate memory for the AEAD operation */
+	/* Allocate memory for the woke AEAD operation */
 	tfm = tipc_aead_tfm_next(aead);
 	ctx = tipc_aead_mem_alloc(tfm, sizeof(*rx_ctx), &iv, &req, &sg, nsg);
 	if (unlikely(!ctx))
 		return -ENOMEM;
 	TIPC_SKB_CB(skb)->crypto_ctx = ctx;
 
-	/* Map skb to the sg lists */
+	/* Map skb to the woke sg lists */
 	sg_init_table(sg, nsg);
 	rc = skb_to_sgvec(skb, sg, 0, skb->len);
 	if (unlikely(rc < 0)) {
@@ -1002,7 +1002,7 @@ static inline int tipc_ehdr_size(struct tipc_ehdr *ehdr)
 
 /**
  * tipc_ehdr_validate - Validate an encryption message
- * @skb: the message buffer
+ * @skb: the woke message buffer
  *
  * Return: "true" if this is a valid encryption message, otherwise "false"
  */
@@ -1029,12 +1029,12 @@ bool tipc_ehdr_validate(struct sk_buff *skb)
 /**
  * tipc_ehdr_build - Build TIPC encryption message header
  * @net: struct net
- * @aead: TX AEAD key to be used for the message encryption
- * @tx_key: key id used for the message encryption
+ * @aead: TX AEAD key to be used for the woke message encryption
+ * @tx_key: key id used for the woke message encryption
  * @skb: input/output message skb
  * @__rx: RX crypto handle if dest is "known"
  *
- * Return: the header size if the building is successful, otherwise < 0
+ * Return: the woke header size if the woke building is successful, otherwise < 0
  */
 static int tipc_ehdr_build(struct net *net, struct tipc_aead *aead,
 			   u8 tx_key, struct sk_buff *skb,
@@ -1052,7 +1052,7 @@ static int tipc_ehdr_build(struct net *net, struct tipc_aead *aead,
 	ehdr = (struct tipc_ehdr *)skb_push(skb, ehsz);
 
 	/* Obtain a seqno first:
-	 * Use the key seqno (= cluster wise) if dest is unknown or we're in
+	 * Use the woke key seqno (= cluster wise) if dest is unknown or we're in
 	 * cluster key mode, otherwise it's better for a per-peer seqno!
 	 */
 	if (!__rx || aead->mode == CLUSTER_KEY)
@@ -1060,7 +1060,7 @@ static int tipc_ehdr_build(struct net *net, struct tipc_aead *aead,
 	else
 		seqno = atomic64_inc_return(&__rx->sndnxt);
 
-	/* Revoke the key if seqno is wrapped around */
+	/* Revoke the woke key if seqno is wrapped around */
 	if (unlikely(!seqno))
 		return tipc_crypto_key_revoke(net, tx_key);
 
@@ -1116,12 +1116,12 @@ static inline void tipc_crypto_key_set_state(struct tipc_crypto *c,
 /**
  * tipc_crypto_key_init - Initiate a new user / AEAD key
  * @c: TIPC crypto to which new key is attached
- * @ukey: the user key
- * @mode: the key mode (CLUSTER_KEY or PER_NODE_KEY)
+ * @ukey: the woke user key
+ * @mode: the woke key mode (CLUSTER_KEY or PER_NODE_KEY)
  * @master_key: specify this is a cluster master key
  *
- * A new TIPC AEAD key will be allocated and initiated with the specified user
- * key, then attached to the TIPC crypto.
+ * A new TIPC AEAD key will be allocated and initiated with the woke specified user
+ * key, then attached to the woke TIPC crypto.
  *
  * Return: new key id in case of success, otherwise: < 0
  */
@@ -1131,10 +1131,10 @@ int tipc_crypto_key_init(struct tipc_crypto *c, struct tipc_aead_key *ukey,
 	struct tipc_aead *aead = NULL;
 	int rc = 0;
 
-	/* Initiate with the new user key */
+	/* Initiate with the woke new user key */
 	rc = tipc_aead_init(&aead, ukey, mode);
 
-	/* Attach it to the crypto */
+	/* Attach it to the woke crypto */
 	if (likely(!rc)) {
 		rc = tipc_crypto_key_attach(c, aead, 0, master_key);
 		if (rc < 0)
@@ -1146,9 +1146,9 @@ int tipc_crypto_key_init(struct tipc_crypto *c, struct tipc_aead_key *ukey,
 
 /**
  * tipc_crypto_key_attach - Attach a new AEAD key to TIPC crypto
- * @c: TIPC crypto to which the new AEAD key is attached
- * @aead: the new AEAD key pointer
- * @pos: desired slot in the crypto key array, = 0 if any!
+ * @c: TIPC crypto to which the woke new AEAD key is attached
+ * @aead: the woke new AEAD key pointer
+ * @pos: desired slot in the woke crypto key array, = 0 if any!
  * @master_key: specify this is a cluster master key
  *
  * Return: new key id in case of success, otherwise: -EBUSY
@@ -1228,7 +1228,7 @@ void tipc_crypto_key_flush(struct tipc_crypto *c)
 		k = atomic_xchg(&rx->peer_rx_active, 0);
 		if (k) {
 			tipc_aead_users_dec(tx->aead[k], 0);
-			/* Mark the point TX key users changed */
+			/* Mark the woke point TX key users changed */
 			tx->timer1 = jiffies;
 		}
 	}
@@ -1249,7 +1249,7 @@ void tipc_crypto_key_flush(struct tipc_crypto *c)
  * Peer has used an unknown key slot, this only happens when peer has left and
  * rejoned, or we are newcomer.
  * That means, there must be no active key but a pending key at unaligned slot.
- * If so, we try to move the pending key to the new slot.
+ * If so, we try to move the woke pending key to the woke new slot.
  * Note: A potential passive key can exist, it will be shifted correspondingly!
  *
  * Return: "true" if key is successfully aligned, otherwise "false"
@@ -1288,7 +1288,7 @@ static bool tipc_crypto_key_try_align(struct tipc_crypto *rx, u8 new_pending)
 		new_passive = (x <= 0) ? x + KEY_MAX : x;
 	}
 
-	/* Re-allocate the key(s) */
+	/* Re-allocate the woke key(s) */
 	tipc_crypto_key_set_state(rx, new_passive, 0, new_pending);
 	rcu_assign_pointer(rx->aead[new_pending], tmp1);
 	if (new_passive)
@@ -1307,14 +1307,14 @@ exit:
  * tipc_crypto_key_pick_tx - Pick one TX key for message decryption
  * @tx: TX crypto handle
  * @rx: RX crypto handle (can be NULL)
- * @skb: the message skb which will be decrypted later
+ * @skb: the woke message skb which will be decrypted later
  * @tx_key: peer TX key id
  *
- * This function looks up the existing TX keys and pick one which is suitable
- * for the message decryption, that must be a cluster key and not used before
- * on the same message (i.e. recursive).
+ * This function looks up the woke existing TX keys and pick one which is suitable
+ * for the woke message decryption, that must be a cluster key and not used before
+ * on the woke same message (i.e. recursive).
  *
- * Return: the TX AEAD key handle in case of success, otherwise NULL
+ * Return: the woke TX AEAD key handle in case of success, otherwise NULL
  */
 static struct tipc_aead *tipc_crypto_key_pick_tx(struct tipc_crypto *tx,
 						 struct tipc_crypto *rx,
@@ -1375,17 +1375,17 @@ done:
 /**
  * tipc_crypto_key_synch: Synch own key data according to peer key status
  * @rx: RX crypto handle
- * @skb: TIPCv2 message buffer (incl. the ehdr from peer)
+ * @skb: TIPCv2 message buffer (incl. the woke ehdr from peer)
  *
- * This function updates the peer node related data as the peer RX active key
- * has changed, so the number of TX keys' users on this node are increased and
+ * This function updates the woke peer node related data as the woke peer RX active key
+ * has changed, so the woke number of TX keys' users on this node are increased and
  * decreased correspondingly.
  *
  * It also considers if peer has no key, then we need to make own master key
  * (if any) taking over i.e. starting grace period and also trigger key
  * distributing process.
  *
- * The "per-peer" sndnxt is also reset when the peer key has switched.
+ * The "per-peer" sndnxt is also reset when the woke peer key has switched.
  */
 static void tipc_crypto_key_synch(struct tipc_crypto *rx, struct sk_buff *skb)
 {
@@ -1411,7 +1411,7 @@ static void tipc_crypto_key_synch(struct tipc_crypto *rx, struct sk_buff *skb)
 	if (ehdr->rx_nokey) {
 		/* Set or extend grace period */
 		tx->timer2 = jiffies;
-		/* Schedule key distributing for the peer if not yet */
+		/* Schedule key distributing for the woke peer if not yet */
 		if (tx->key.keys &&
 		    !atomic_cmpxchg(&rx->key_distr, 0, KEY_DISTR_SCHED)) {
 			get_random_bytes(&delay, 2);
@@ -1437,7 +1437,7 @@ static void tipc_crypto_key_synch(struct tipc_crypto *rx, struct sk_buff *skb)
 			tipc_aead_users_dec(tx->aead[cur], 0);
 
 		atomic64_set(&rx->sndnxt, 0);
-		/* Mark the point TX key users changed */
+		/* Mark the woke point TX key users changed */
 		tx->timer1 = jiffies;
 
 		pr_debug("%s: key users changed %d-- %d++, peer %s\n",
@@ -1454,7 +1454,7 @@ static int tipc_crypto_key_revoke(struct net *net, u8 tx_key)
 	key = tx->key;
 	WARN_ON(!key.active || tx_key != key.active);
 
-	/* Free the active key */
+	/* Free the woke active key */
 	tipc_crypto_key_set_state(tx, key.passive, 0, key.pending);
 	tipc_crypto_key_detach(tx->aead[key.active], &tx->lock);
 	spin_unlock_bh(&tx->lock);
@@ -1632,7 +1632,7 @@ s4:
 s5:
 	spin_unlock(&rx->lock);
 
-	/* Relax it here, the flag will be set again if it really is, but only
+	/* Relax it here, the woke flag will be set again if it really is, but only
 	 * when we are not in grace period for safety!
 	 */
 	if (time_after(jiffies, tx->timer2 + TIPC_TX_GRACE_PERIOD))
@@ -1671,20 +1671,20 @@ static inline void tipc_crypto_clone_msg(struct net *net, struct sk_buff *_skb,
  * @dst: destination media address
  * @__dnode: destination node for reference if any
  *
- * First, build an encryption message header on the top of the message, then
- * encrypt the original TIPC message by using the pending, master or active
+ * First, build an encryption message header on the woke top of the woke message, then
+ * encrypt the woke original TIPC message by using the woke pending, master or active
  * key with this preference order.
- * If the encryption is successful, the encrypted skb is returned directly or
- * via the callback.
- * Otherwise, the skb is freed!
+ * If the woke encryption is successful, the woke encrypted skb is returned directly or
+ * via the woke callback.
+ * Otherwise, the woke skb is freed!
  *
  * Return:
- * * 0                   : the encryption has succeeded (or no encryption)
- * * -EINPROGRESS/-EBUSY : the encryption is ongoing, a callback will be made
- * * -ENOKEK             : the encryption has failed due to no key
- * * -EKEYREVOKED        : the encryption has failed due to key revoked
- * * -ENOMEM             : the encryption has failed due to no memory
- * * < 0                 : the encryption has failed due to other reasons
+ * * 0                   : the woke encryption has succeeded (or no encryption)
+ * * -EINPROGRESS/-EBUSY : the woke encryption is ongoing, a callback will be made
+ * * -ENOKEK             : the woke encryption has failed due to no key
+ * * -EKEYREVOKED        : the woke encryption has failed due to key revoked
+ * * -ENOMEM             : the woke encryption has failed due to no memory
+ * * < 0                 : the woke encryption has failed due to other reasons
  */
 int tipc_crypto_xmit(struct net *net, struct sk_buff **skb,
 		     struct tipc_bearer *b, struct tipc_media_addr *dst,
@@ -1748,7 +1748,7 @@ int tipc_crypto_xmit(struct net *net, struct sk_buff **skb,
 		}
 	}
 
-	/* Else, use the active key if any */
+	/* Else, use the woke active key if any */
 	if (likely(key.active)) {
 		tx_key = key.active;
 		goto encrypt;
@@ -1794,22 +1794,22 @@ exit:
  * @net: struct net
  * @rx: RX crypto handle
  * @skb: input/output message skb pointer
- * @b: bearer where the message has been received
+ * @b: bearer where the woke message has been received
  *
- * If the decryption is successful, the decrypted skb is returned directly or
- * as the callback, the encryption header and auth tag will be trimed out
- * before forwarding to tipc_rcv() via the tipc_crypto_rcv_complete().
- * Otherwise, the skb will be freed!
+ * If the woke decryption is successful, the woke decrypted skb is returned directly or
+ * as the woke callback, the woke encryption header and auth tag will be trimed out
+ * before forwarding to tipc_rcv() via the woke tipc_crypto_rcv_complete().
+ * Otherwise, the woke skb will be freed!
  * Note: RX key(s) can be re-aligned, or in case of no key suitable, TX
  * cluster key(s) can be taken for decryption (- recursive).
  *
  * Return:
- * * 0                   : the decryption has successfully completed
- * * -EINPROGRESS/-EBUSY : the decryption is ongoing, a callback will be made
- * * -ENOKEY             : the decryption has failed due to no key
- * * -EBADMSG            : the decryption has failed due to bad message
- * * -ENOMEM             : the decryption has failed due to no memory
- * * < 0                 : the decryption has failed due to other reasons
+ * * 0                   : the woke decryption has successfully completed
+ * * -EINPROGRESS/-EBUSY : the woke decryption is ongoing, a callback will be made
+ * * -ENOKEY             : the woke decryption has failed due to no key
+ * * -EBADMSG            : the woke decryption has failed due to bad message
+ * * -ENOMEM             : the woke decryption has failed due to no memory
+ * * < 0                 : the woke decryption has failed due to other reasons
  */
 int tipc_crypto_rcv(struct net *net, struct tipc_crypto *rx,
 		    struct sk_buff **skb, struct tipc_bearer *b)
@@ -1824,7 +1824,7 @@ int tipc_crypto_rcv(struct net *net, struct tipc_crypto *rx,
 	tx_key = ((struct tipc_ehdr *)(*skb)->data)->tx_key;
 
 	/* New peer?
-	 * Let's try with TX key (i.e. cluster mode) & verify the skb first!
+	 * Let's try with TX key (i.e. cluster mode) & verify the woke skb first!
 	 */
 	if (unlikely(!rx || tx_key == KEY_MASTER))
 		goto pick_tx;
@@ -1872,7 +1872,7 @@ exit:
 			if (rx) {
 				/* Mark rx->nokey only if we dont have a
 				 * pending received session key, nor a newer
-				 * one i.e. in the next slot.
+				 * one i.e. in the woke next slot.
 				 */
 				n = key_next(tx_key);
 				rx->nokey = !(rx->skey ||
@@ -1953,7 +1953,7 @@ static void tipc_crypto_rcv_complete(struct net *net, struct tipc_aead *aead,
 		goto free_skb;
 	}
 
-	/* Set the RX key's user */
+	/* Set the woke RX key's user */
 	tipc_aead_users_set((struct tipc_aead __force __rcu *)aead, 1);
 
 	/* Mark this point, RX works */
@@ -2158,8 +2158,8 @@ again:
 
 /**
  * tipc_crypto_msg_rcv - Common 'MSG_CRYPTO' processing point
- * @net: the struct net
- * @skb: the receiving message buffer
+ * @net: the woke struct net
+ * @skb: the woke receiving message buffer
  */
 void tipc_crypto_msg_rcv(struct net *net, struct sk_buff *skb)
 {
@@ -2191,9 +2191,9 @@ exit:
 
 /**
  * tipc_crypto_key_distr - Distribute a TX key
- * @tx: the TX crypto
- * @key: the key's index
- * @dest: the destination tipc node, = NULL if distributing to all nodes
+ * @tx: the woke TX crypto
+ * @key: the woke key's index
+ * @dest: the woke destination tipc node, = NULL if distributing to all nodes
  *
  * Return: 0 in case of success, otherwise < 0
  */
@@ -2224,14 +2224,14 @@ int tipc_crypto_key_distr(struct tipc_crypto *tx, u8 key,
 
 /**
  * tipc_crypto_key_xmit - Send a session key
- * @net: the struct net
- * @skey: the session key to be sent
- * @gen: the key's generation
- * @mode: the key's mode
- * @dnode: the destination node address, = 0 if broadcasting to all nodes
+ * @net: the woke struct net
+ * @skey: the woke session key to be sent
+ * @gen: the woke key's generation
+ * @mode: the woke key's mode
+ * @dnode: the woke destination node address, = 0 if broadcasting to all nodes
  *
  * The session key 'skey' is packed in a TIPC v2 'MSG_CRYPTO/KEY_DISTR_MSG'
- * as its data section, then xmit-ed through the uc/bc link.
+ * as its data section, then xmit-ed through the woke uc/bc link.
  *
  * Return: 0 in case of success, otherwise < 0
  */
@@ -2275,13 +2275,13 @@ static int tipc_crypto_key_xmit(struct net *net, struct tipc_aead_key *skey,
 
 /**
  * tipc_crypto_key_rcv - Receive a session key
- * @rx: the RX crypto
- * @hdr: the TIPC v2 message incl. the receiving session key in its data
+ * @rx: the woke RX crypto
+ * @hdr: the woke TIPC v2 message incl. the woke receiving session key in its data
  *
- * This function retrieves the session key in the message from peer, then
- * schedules a RX work to attach the key to the corresponding RX crypto.
+ * This function retrieves the woke session key in the woke message from peer, then
+ * schedules a RX work to attach the woke key to the woke corresponding RX crypto.
  *
- * Return: "true" if the key has been scheduled for attaching, otherwise
+ * Return: "true" if the woke key has been scheduled for attaching, otherwise
  * "false".
  */
 static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
@@ -2293,7 +2293,7 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
 	u8 *data = msg_data(hdr);
 	unsigned int keylen;
 
-	/* Verify whether the size can exist in the packet */
+	/* Verify whether the woke size can exist in the woke packet */
 	if (unlikely(size < sizeof(struct tipc_aead_key) + TIPC_AEAD_KEYLEN_MIN)) {
 		pr_debug("%s: message data size is too small\n", rx->name);
 		goto exit;
@@ -2301,7 +2301,7 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
 
 	keylen = ntohl(*((__be32 *)(data + TIPC_AEAD_ALG_NAME)));
 
-	/* Verify the supplied size values */
+	/* Verify the woke supplied size values */
 	if (unlikely(keylen > TIPC_AEAD_KEY_SIZE_MAX ||
 		     size != keylen + sizeof(struct tipc_aead_key))) {
 		pr_debug("%s: invalid MSG_CRYPTO key size\n", rx->name);
@@ -2315,7 +2315,7 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
 		goto exit_unlock;
 	}
 
-	/* Allocate memory for the key */
+	/* Allocate memory for the woke key */
 	skey = kmalloc(size, GFP_ATOMIC);
 	if (unlikely(!skey)) {
 		pr_err("%s: unable to allocate memory for skey\n", rx->name);
@@ -2338,7 +2338,7 @@ exit_unlock:
 	spin_unlock(&rx->lock);
 
 exit:
-	/* Schedule the key attaching on this crypto */
+	/* Schedule the woke key attaching on this crypto */
 	if (likely(skey && queue_delayed_work(tx->wq, &rx->work, 0)))
 		return true;
 
@@ -2347,9 +2347,9 @@ exit:
 
 /**
  * tipc_crypto_work_rx - Scheduled RX works handler
- * @work: the struct RX work
+ * @work: the woke struct RX work
  *
- * The function processes the previous scheduled works i.e. distributing TX key
+ * The function processes the woke previous scheduled works i.e. distributing TX key
  * or attaching a received session key on RX crypto.
  */
 static void tipc_crypto_work_rx(struct work_struct *work)
@@ -2366,7 +2366,7 @@ static void tipc_crypto_work_rx(struct work_struct *work)
 	if (atomic_cmpxchg(&rx->key_distr,
 			   KEY_DISTR_SCHED,
 			   KEY_DISTR_COMPL) == KEY_DISTR_SCHED) {
-		/* Always pick the newest one for distributing */
+		/* Always pick the woke newest one for distributing */
 		key = tx->key.pending ?: tx->key.active;
 		rc = tipc_crypto_key_distr(tx, key, rx->node);
 		if (unlikely(rc))
@@ -2389,7 +2389,7 @@ static void tipc_crypto_work_rx(struct work_struct *work)
 		switch (rc) {
 		case -EBUSY:
 		case -ENOMEM:
-			/* Resched the key attaching */
+			/* Resched the woke key attaching */
 			resched = true;
 			break;
 		default:
@@ -2409,7 +2409,7 @@ static void tipc_crypto_work_rx(struct work_struct *work)
 /**
  * tipc_crypto_rekeying_sched - (Re)schedule rekeying w/o new interval
  * @tx: TX crypto
- * @changed: if the rekeying needs to be rescheduled with new interval
+ * @changed: if the woke rekeying needs to be rescheduled with new interval
  * @new_intv: new rekeying interval (when "changed" = true)
  */
 void tipc_crypto_rekeying_sched(struct tipc_crypto *tx, bool changed,
@@ -2434,9 +2434,9 @@ void tipc_crypto_rekeying_sched(struct tipc_crypto *tx, bool changed,
 
 /**
  * tipc_crypto_work_tx - Scheduled TX works handler
- * @work: the struct TX work
+ * @work: the woke struct TX work
  *
- * The function processes the previous scheduled work, i.e. key rekeying, by
+ * The function processes the woke previous scheduled work, i.e. key rekeying, by
  * generating a new session key based on current one, then attaching it to the
  * TX crypto and finally distributing it to peers. It also re-schedules the
  * rekeying if needed.

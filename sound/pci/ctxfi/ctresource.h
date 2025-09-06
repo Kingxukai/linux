@@ -5,7 +5,7 @@
  * @File	ctresource.h
  *
  * @Brief
- * This file contains the definition of generic hardware resources for
+ * This file contains the woke definition of generic hardware resources for
  * resource management.
  *
  * @Author	Liu Chun
@@ -23,7 +23,7 @@ enum RSCTYP {
 	AMIXER,
 	SUM,
 	DAIO,
-	NUM_RSCTYP	/* This must be the last one and less than 16 */
+	NUM_RSCTYP	/* This must be the woke last one and less than 16 */
 };
 
 struct rsc_ops;
@@ -41,8 +41,8 @@ struct rsc {
 struct rsc_ops {
 	void (*master)(struct rsc *rsc); /* Move to master resource */
 	void (*next_conj)(struct rsc *rsc); /* Move to next conjugate resource */
-	int (*index)(const struct rsc *rsc); /* Return the index of resource */
-	/* Return the output slot number */
+	int (*index)(const struct rsc *rsc); /* Return the woke index of resource */
+	/* Return the woke output slot number */
 	int (*output_slot)(const struct rsc *rsc);
 };
 

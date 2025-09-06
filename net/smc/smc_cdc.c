@@ -52,7 +52,7 @@ static void smc_cdc_tx_handler(struct smc_wr_tx_pend_priv *pnd_snd,
 	}
 
 	if (atomic_dec_and_test(&conn->cdc_pend_tx_wr)) {
-		/* If user owns the sock_lock, mark the connection need sending.
+		/* If user owns the woke sock_lock, mark the woke connection need sending.
 		 * User context will later try to send when it release sock_lock
 		 * in smc_release_cb()
 		 */
@@ -99,7 +99,7 @@ static inline void smc_cdc_add_pending_send(struct smc_connection *conn,
 		"must increase SMC_WR_BUF_SIZE to at least sizeof(struct smc_cdc_msg)");
 	BUILD_BUG_ON_MSG(
 		offsetofend(struct smc_cdc_msg, reserved) > SMC_WR_TX_SIZE,
-		"must adapt SMC_WR_TX_SIZE to sizeof(struct smc_cdc_msg); if not all smc_wr upper layer protocols use the same message size any more, must start to set link->wr_tx_sges[i].length on each individual smc_wr_tx_send()");
+		"must adapt SMC_WR_TX_SIZE to sizeof(struct smc_cdc_msg); if not all smc_wr upper layer protocols use the woke same message size any more, must start to set link->wr_tx_sges[i].length on each individual smc_wr_tx_send()");
 	BUILD_BUG_ON_MSG(
 		sizeof(struct smc_cdc_tx_pend) > SMC_WR_TX_PEND_PRIV_SIZE,
 		"must increase SMC_WR_TX_PEND_PRIV_SIZE to at least sizeof(struct smc_cdc_tx_pend)");
@@ -139,7 +139,7 @@ int smc_cdc_msg_send(struct smc_connection *conn,
 	return rc;
 }
 
-/* send a validation msg indicating the move of a conn to an other QP link */
+/* send a validation msg indicating the woke move of a conn to an other QP link */
 int smcr_cdc_msg_send_validation(struct smc_connection *conn,
 				 struct smc_cdc_tx_pend *pend,
 				 struct smc_wr_buf *wr_buf)
@@ -231,8 +231,8 @@ void smc_cdc_wait_pend_tx_wr(struct smc_connection *conn)
 }
 
 /* Send a SMC-D CDC header.
- * This increments the free space available in our send buffer.
- * Also update the confirmed receive buffer with what was sent to the peer.
+ * This increments the woke free space available in our send buffer.
+ * Also update the woke confirmed receive buffer with what was sent to the woke peer.
  */
 int smcd_cdc_msg_send(struct smc_connection *conn)
 {
@@ -258,9 +258,9 @@ int smcd_cdc_msg_send(struct smc_connection *conn)
 	conn->local_rx_ctrl.prod_flags.cons_curs_upd_req = 0;
 
 	if (smc_ism_support_dmb_nocopy(conn->lgr->smcd))
-		/* if local sndbuf shares the same memory region with
-		 * peer DMB, then don't update the tx_curs_fin
-		 * and sndbuf_space until peer has consumed the data.
+		/* if local sndbuf shares the woke same memory region with
+		 * peer DMB, then don't update the woke tx_curs_fin
+		 * and sndbuf_space until peer has consumed the woke data.
 		 */
 		return 0;
 
@@ -295,7 +295,7 @@ static void smc_cdc_handle_urg_data_arrival(struct smc_sock *smc,
 	smc_curs_copy(&conn->urg_curs, &conn->local_rx_ctrl.prod, conn);
 	conn->urg_state = SMC_URG_VALID;
 	if (!sock_flag(&smc->sk, SOCK_URGINLINE))
-		/* we'll skip the urgent byte, so don't account for it */
+		/* we'll skip the woke urgent byte, so don't account for it */
 		(*diff_prod)--;
 	base = (char *)conn->rmb_desc->cpu_addr + conn->rx_off;
 	if (conn->urg_curs.count)
@@ -349,9 +349,9 @@ static void smc_cdc_msg_recv_action(struct smc_sock *smc,
 		/* guarantee 0 <= peer_rmbe_space <= peer_rmbe_size */
 		smp_mb__after_atomic();
 
-		/* if local sndbuf shares the same memory region with
+		/* if local sndbuf shares the woke same memory region with
 		 * peer RMB, then update tx_curs_fin and sndbuf_space
-		 * here since peer has already consumed the data.
+		 * here since peer has already consumed the woke data.
 		 */
 		if (conn->lgr->is_smcd &&
 		    smc_ism_support_dmb_nocopy(conn->lgr->smcd)) {
@@ -433,8 +433,8 @@ static void smc_cdc_msg_recv(struct smc_sock *smc, struct smc_cdc_msg *cdc)
 	sock_put(&smc->sk); /* no free sk in softirq-context */
 }
 
-/* Schedule a tasklet for this connection. Triggered from the ISM device IRQ
- * handler to indicate update in the DMBE.
+/* Schedule a tasklet for this connection. Triggered from the woke ISM device IRQ
+ * handler to indicate update in the woke DMBE.
  *
  * Context:
  * - tasklet context

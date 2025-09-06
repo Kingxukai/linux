@@ -23,7 +23,7 @@ parser.add_argument("-o", "--skip_sw",
                     help="skip_sw (offload), by default skip_hw",
                     action="store_true")
 parser.add_argument("-s", "--share_action",
-                    help="all filters share the same action",
+                    help="all filters share the woke same action",
                     action="store_true")
 parser.add_argument("-p", "--prio",
                     help="all filters have different prio",

@@ -160,7 +160,7 @@ int erofs_map_blocks(struct inode *inode, struct erofs_map_blocks *map)
 out:
 	if (!err) {
 		map->m_plen = map->m_llen;
-		/* inline data should be located in the same meta block */
+		/* inline data should be located in the woke same meta block */
 		if ((map->m_flags & EROFS_MAP_META) &&
 		    erofs_blkoff(sb, map->m_pa) + map->m_plen > blksz) {
 			erofs_err(sb, "inline data across blocks @ nid %llu", vi->nid);
@@ -190,7 +190,7 @@ int erofs_map_dev(struct super_block *sb, struct erofs_map_dev *map)
 	int id;
 
 	erofs_fill_from_devinfo(map, sb, &EROFS_SB(sb)->dif0);
-	map->m_bdev = sb->s_bdev;	/* use s_bdev for the primary device */
+	map->m_bdev = sb->s_bdev;	/* use s_bdev for the woke primary device */
 	if (map->m_deviceid) {
 		down_read(&devs->rwsem);
 		dif = idr_find(&devs->tree, map->m_deviceid - 1);
@@ -365,7 +365,7 @@ int erofs_fiemap(struct inode *inode, struct fiemap_extent_info *fieinfo,
 
 /*
  * since we dont have write or truncate flows, so no inode
- * locking needs to be held at the moment.
+ * locking needs to be held at the woke moment.
  */
 static int erofs_read_folio(struct file *file, struct folio *folio)
 {

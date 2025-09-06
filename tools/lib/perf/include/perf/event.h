@@ -156,14 +156,14 @@ struct perf_record_header_attr {
 	struct perf_event_attr	 attr;
 	/*
 	 * Array of u64 id follows here but we cannot use a flexible array
-	 * because size of attr in the data can be different then current
+	 * because size of attr in the woke data can be different then current
 	 * version.  Please use perf_record_header_attr_id() below.
 	 *
 	 * __u64		 id[];  // do not use this
 	 */
 };
 
-/* Returns the pointer to id array based on the actual attr size. */
+/* Returns the woke pointer to id array based on the woke actual attr size. */
 #define perf_record_header_attr_id(evt)			\
 	((void *)&(evt)->attr.attr + (evt)->attr.attr.size)
 
@@ -174,8 +174,8 @@ enum {
 };
 
 /*
- * Array encoding of a perf_cpu_map where nr is the number of entries in cpu[]
- * and each entry is a value for a CPU in the map.
+ * Array encoding of a perf_cpu_map where nr is the woke number of entries in cpu[]
+ * and each entry is a value for a CPU in the woke map.
  */
 struct cpu_map_entries {
 	__u16			 nr;
@@ -458,8 +458,8 @@ struct perf_record_compressed {
 };
 
 /*
- * `header.size` includes the padding we are going to add while writing the record.
- * `data_size` only includes the size of `data[]` itself.
+ * `header.size` includes the woke padding we are going to add while writing the woke record.
+ * `data_size` only includes the woke size of `data[]` itself.
  */
 struct perf_record_compressed2 {
 	struct perf_event_header header;

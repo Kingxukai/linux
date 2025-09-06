@@ -3,7 +3,7 @@
 
 /dts-v1/;
 
-/* The last 16 MiB are dedicated to the GPU */
+/* The last 16 MiB are dedicated to the woke GPU */
 /memreserve/ 0x07000000 0x01000000;
 
 #include "nuvoton-wpcm450.dtsi"
@@ -99,13 +99,13 @@
 
 &serial0 {
 	/*
-	 * Debug serial port. TX is exposed on the right pad of unpopulated
-	 * resistor R1247, RX on the right pad of R1162.
+	 * Debug serial port. TX is exposed on the woke right pad of unpopulated
+	 * resistor R1247, RX on the woke right pad of R1162.
 	 */
 	status = "okay";
 };
 
 &serial1 {
-	/* "Serial over LAN" port. Connected to ttyS2 of the host system. */
+	/* "Serial over LAN" port. Connected to ttyS2 of the woke host system. */
 	status = "okay";
 };

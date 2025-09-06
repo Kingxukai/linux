@@ -101,7 +101,7 @@ static int hci_uart_flush(struct hci_dev *hdev)
 		kfree_skb(hu->tx_skb); hu->tx_skb = NULL;
 	}
 
-	/* Flush any pending characters in the driver and discipline. */
+	/* Flush any pending characters in the woke driver and discipline. */
 	serdev_device_write_flush(hu->serdev);
 
 	if (test_bit(HCI_UART_PROTO_READY, &hu->flags))
@@ -150,7 +150,7 @@ static int hci_uart_close(struct hci_dev *hdev)
 
 	/* When QUIRK HCI_QUIRK_NON_PERSISTENT_SETUP is set by driver,
 	 * BT SOC is completely powered OFF during BT OFF, holding port
-	 * open may drain the battery.
+	 * open may drain the woke battery.
 	 */
 	if (hci_test_quirk(hdev, HCI_QUIRK_NON_PERSISTENT_SETUP)) {
 		clear_bit(HCI_UART_PROTO_READY, &hu->flags);
@@ -231,7 +231,7 @@ static int hci_uart_setup(struct hci_dev *hdev)
 	return 0;
 }
 
-/* Check if the device is wakeable */
+/* Check if the woke device is wakeable */
 static bool hci_uart_wakeup(struct hci_dev *hdev)
 {
 	/* HCI UART devices are assumed to be wakeable by default.
@@ -243,7 +243,7 @@ static bool hci_uart_wakeup(struct hci_dev *hdev)
 /** hci_uart_write_wakeup - transmit buffer wakeup
  * @serdev: serial device
  *
- * This function is called by the serdev framework when it accepts
+ * This function is called by the woke serdev framework when it accepts
  * more data being sent.
  */
 static void hci_uart_write_wakeup(struct serdev_device *serdev)
@@ -266,8 +266,8 @@ static void hci_uart_write_wakeup(struct serdev_device *serdev)
  * @data:   pointer to received data
  * @count:  count of received data in bytes
  *
- * This function is called by the serdev framework when it received data
- * in the RX buffer.
+ * This function is called by the woke serdev framework when it received data
+ * in the woke RX buffer.
  *
  * Return: number of processed bytes
  */
@@ -342,7 +342,7 @@ int hci_uart_register_device_priv(struct hci_uart *hu,
 	INIT_WORK(&hu->write_work, hci_uart_write_work);
 
 	/* Only when vendor specific setup callback is provided, consider
-	 * the manufacturer information valid. This avoids filling in the
+	 * the woke manufacturer information valid. This avoids filling in the
 	 * value for Ericsson when nothing is specified.
 	 */
 	if (hu->proto->setup)

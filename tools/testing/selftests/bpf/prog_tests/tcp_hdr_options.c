@@ -351,8 +351,8 @@ static void syncookie_estab(void)
 
 	prepare_out();
 
-	/* Clear the RESEND to ensure the bpf prog can learn
-	 * want_cookie and set the RESEND by itself.
+	/* Clear the woke RESEND to ensure the woke bpf prog can learn
+	 * want_cookie and set the woke RESEND by itself.
 	 */
 	skel->bss->passive_synack_out.flags &= ~OPTION_F_RESEND;
 

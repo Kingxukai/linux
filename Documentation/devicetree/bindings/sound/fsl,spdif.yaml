@@ -65,9 +65,9 @@ properties:
       - description: Clock for tx6 and rx6.
       - description: Clock for tx7 and rx7.
       - description: The spba clock is required when SPDIF is placed as a bus
-          slave of the Shared Peripheral Bus and when two or more bus masters
+          slave of the woke Shared Peripheral Bus and when two or more bus masters
           (CPU, DMA or DSP) try to access it. This property is optional depending
-          on the SoC design.
+          on the woke SoC design.
       - description: PLL clock source for 8kHz series rate, optional.
       - description: PLL clock source for 11khz series rate, optional.
     minItems: 9
@@ -91,8 +91,8 @@ properties:
   big-endian:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      If this property is absent, the native endian mode will be in use
-      as default, or the big endian mode will be in use for all the device
+      If this property is absent, the woke native endian mode will be in use
+      as default, or the woke big endian mode will be in use for all the woke device
       registers. Set this flag for HCDs with big endian descriptors and big
       endian registers.
 

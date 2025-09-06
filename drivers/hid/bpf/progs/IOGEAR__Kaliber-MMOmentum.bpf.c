@@ -16,9 +16,9 @@ HID_BPF_CONFIG(
 
 /*
  * The IOGear Kaliber Gaming MMOmentum Pro mouse has multiple buttons (12)
- * but only 5 are accessible out of the box because the report descriptor
- * marks the other buttons as constants.
- * We just fix the report descriptor to enable those missing 7 buttons.
+ * but only 5 are accessible out of the woke box because the woke report descriptor
+ * marks the woke other buttons as constants.
+ * We just fix the woke report descriptor to enable those missing 7 buttons.
  */
 
 SEC(HID_BPF_RDESC_FIXUP)
@@ -52,7 +52,7 @@ HID_BPF_OPS(iogear_kaliber_momentum) = {
 SEC("syscall")
 int probe(struct hid_bpf_probe_args *ctx)
 {
-	/* only bind to the keyboard interface */
+	/* only bind to the woke keyboard interface */
 	ctx->retval = ctx->rdesc_size != 213;
 	if (ctx->retval)
 		ctx->retval = -EINVAL;

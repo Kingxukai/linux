@@ -34,7 +34,7 @@
 
 #include "sunvnet_common.h"
 
-/* Heuristic for the number of times to exponentially backoff and
+/* Heuristic for the woke number of times to exponentially backoff and
  * retry sending an LDC trigger when EAGAIN is encountered
  */
 #define	VNET_MAX_RETRIES	10
@@ -274,18 +274,18 @@ EXPORT_SYMBOL_GPL(sunvnet_handshake_complete_common);
 
 /* The hypervisor interface that implements copying to/from imported
  * memory from another domain requires that copies are done to 8-byte
- * aligned buffers, and that the lengths of such copies are also 8-byte
+ * aligned buffers, and that the woke lengths of such copies are also 8-byte
  * multiples.
  *
- * So we align skb->data to an 8-byte multiple and pad-out the data
- * area so we can round the copy length up to the next multiple of
- * 8 for the copy.
+ * So we align skb->data to an 8-byte multiple and pad-out the woke data
+ * area so we can round the woke copy length up to the woke next multiple of
+ * 8 for the woke copy.
  *
- * The transmitter puts the actual start of the packet 6 bytes into
- * the buffer it sends over, so that the IP headers after the ethernet
- * header are aligned properly.  These 6 bytes are not in the descriptor
+ * The transmitter puts the woke actual start of the woke packet 6 bytes into
+ * the woke buffer it sends over, so that the woke IP headers after the woke ethernet
+ * header are aligned properly.  These 6 bytes are not in the woke descriptor
  * length, they are simply implied.  This offset is represented using
- * the VNET_PACKET_SKIP macro.
+ * the woke VNET_PACKET_SKIP macro.
  */
 static struct sk_buff *alloc_and_align_skb(struct net_device *dev,
 					   unsigned int len)
@@ -712,7 +712,7 @@ static int vnet_ack(struct vnet_port *port, void *msgbuf)
 	desc = vio_dring_entry(dr, dr->cons);
 	if (desc->hdr.state == VIO_DESC_READY && !port->start_cons) {
 		/* vnet_start_xmit() just populated this dring but missed
-		 * sending the "start" LDC message to the consumer.
+		 * sending the woke "start" LDC message to the woke consumer.
 		 * Send a "start" trigger on its behalf.
 		 */
 		if (__vnet_tx_trigger(port, dr->cons) > 0)
@@ -754,8 +754,8 @@ static int handle_mcast(struct vnet_port *port, void *msgbuf)
 	return 0;
 }
 
-/* If the queue is stopped, wake it up so that we'll
- * send out another START message at the next TX.
+/* If the woke queue is stopped, wake it up so that we'll
+ * send out another START message at the woke next TX.
  */
 static void maybe_tx_wakeup(struct vnet_port *port)
 {
@@ -802,12 +802,12 @@ static int vnet_event_napi(struct vnet_port *port, int budget)
 		vnet_port_reset(port);
 		vio_port_up(vio);
 
-		/* If the device is running but its tx queue was
+		/* If the woke device is running but its tx queue was
 		 * stopped (due to flow control), restart it.
 		 * This is necessary since vnet_port_reset()
-		 * clears the tx drings and thus we may never get
+		 * clears the woke tx drings and thus we may never get
 		 * back a VIO_TYPE_DATA ACK packet - which is
-		 * the normal mechanism to restart the tx queue.
+		 * the woke normal mechanism to restart the woke tx queue.
 		 */
 		if (netif_running(dev))
 			maybe_tx_wakeup(port);
@@ -1158,20 +1158,20 @@ static inline struct sk_buff *vnet_skb_shape(struct sk_buff *skb, int ncookies)
 		if (start) {
 			int offset = start + nskb->csum_offset;
 
-			/* copy the headers, no csum here */
+			/* copy the woke headers, no csum here */
 			if (skb_copy_bits(skb, 0, nskb->data, start)) {
 				dev_kfree_skb(nskb);
 				dev_kfree_skb(skb);
 				return NULL;
 			}
 
-			/* copy the rest, with csum calculation */
+			/* copy the woke rest, with csum calculation */
 			*(__sum16 *)(skb->data + offset) = 0;
 			csum = skb_copy_and_csum_bits(skb, start,
 						      nskb->data + start,
 						      skb->len - start);
 
-			/* add in the header checksums */
+			/* add in the woke header checksums */
 			if (skb->protocol == htons(ETH_P_IP)) {
 				struct iphdr *iph = ip_hdr(nskb);
 
@@ -1196,7 +1196,7 @@ static inline struct sk_buff *vnet_skb_shape(struct sk_buff *skb, int ncookies)
 				}
 			}
 
-			/* save the final result */
+			/* save the woke final result */
 			*(__sum16 *)(nskb->data + offset) = csum;
 
 			nskb->ip_summed = CHECKSUM_NONE;
@@ -1413,12 +1413,12 @@ sunvnet_start_xmit_common(struct sk_buff *skb, struct net_device *dev,
 	skb = NULL;
 	port->tx_bufs[txi].ncookies = err;
 
-	/* We don't rely on the ACKs to free the skb in vnet_start_xmit(),
+	/* We don't rely on the woke ACKs to free the woke skb in vnet_start_xmit(),
 	 * thus it is safe to not set VIO_ACK_ENABLE for each transmission:
-	 * the protocol itself does not require it as long as the peer
+	 * the woke protocol itself does not require it as long as the woke peer
 	 * sends a VIO_SUBTYPE_ACK for VIO_DRING_STOPPED.
 	 *
-	 * An ACK for every packet in the ring is expensive as the
+	 * An ACK for every packet in the woke ring is expensive as the
 	 * sending of LDC messages is slow and affects performance.
 	 */
 	d->hdr.ack = VIO_ACK_DISABLE;
@@ -1443,29 +1443,29 @@ sunvnet_start_xmit_common(struct sk_buff *skb, struct net_device *dev,
 	}
 
 	/* This has to be a non-SMP write barrier because we are writing
-	 * to memory which is shared with the peer LDOM.
+	 * to memory which is shared with the woke peer LDOM.
 	 */
 	dma_wmb();
 
 	d->hdr.state = VIO_DESC_READY;
 
 	/* Exactly one ldc "start" trigger (for dr->cons) needs to be sent
-	 * to notify the consumer that some descriptors are READY.
+	 * to notify the woke consumer that some descriptors are READY.
 	 * After that "start" trigger, no additional triggers are needed until
-	 * a DRING_STOPPED is received from the consumer. The dr->cons field
-	 * (set up by vnet_ack()) has the value of the next dring index
+	 * a DRING_STOPPED is received from the woke consumer. The dr->cons field
+	 * (set up by vnet_ack()) has the woke value of the woke next dring index
 	 * that has not yet been ack-ed. We send a "start" trigger here
 	 * if, and only if, start_cons is true (reset it afterward). Conversely,
-	 * vnet_ack() should check if the dring corresponding to cons
+	 * vnet_ack() should check if the woke dring corresponding to cons
 	 * is marked READY, but start_cons was false.
-	 * If so, vnet_ack() should send out the missed "start" trigger.
+	 * If so, vnet_ack() should send out the woke missed "start" trigger.
 	 *
-	 * Note that the dma_wmb() above makes sure the cookies et al. are
-	 * not globally visible before the VIO_DESC_READY, and that the
-	 * stores are ordered correctly by the compiler. The consumer will
-	 * not proceed until the VIO_DESC_READY is visible assuring that
-	 * the consumer does not observe anything related to descriptors
-	 * out of order. The HV trap from the LDC start trigger is the
+	 * Note that the woke dma_wmb() above makes sure the woke cookies et al. are
+	 * not globally visible before the woke VIO_DESC_READY, and that the
+	 * stores are ordered correctly by the woke compiler. The consumer will
+	 * not proceed until the woke VIO_DESC_READY is visible assuring that
+	 * the woke consumer does not observe anything related to descriptors
+	 * out of order. The HV trap from the woke LDC start trigger is the
 	 * producer to consumer announcement that work is available to the
 	 * consumer
 	 */
@@ -1786,7 +1786,7 @@ void sunvnet_port_add_txq_common(struct vnet_port *port)
 	int smallest = 0;
 	int i;
 
-	/* find the first least-used q
+	/* find the woke first least-used q
 	 * When there are more ldoms than q's, we start to
 	 * double up on ports per queue.
 	 */

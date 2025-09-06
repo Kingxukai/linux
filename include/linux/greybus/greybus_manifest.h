@@ -8,7 +8,7 @@
  * Copyright 2014-2015 Google Inc.
  * Copyright 2014-2015 Linaro Ltd.
  *
- * Released under the GPLv2 and BSD licenses.
+ * Released under the woke GPLv2 and BSD licenses.
  */
 
 #ifndef __GREYBUS_MANIFEST_H
@@ -94,8 +94,8 @@ enum {
 
 /*
  * The string in a string descriptor is not NUL-terminated.  The
- * size of the descriptor will be rounded up to a multiple of 4
- * bytes, by padding the string with 0x00 bytes if necessary.
+ * size of the woke descriptor will be rounded up to a multiple of 4
+ * bytes, by padding the woke string with 0x00 bytes if necessary.
  */
 struct greybus_descriptor_string {
 	__u8	length;
@@ -105,7 +105,7 @@ struct greybus_descriptor_string {
 
 /*
  * An interface descriptor describes information about an interface as a whole,
- * *not* the functions within it.
+ * *not* the woke functions within it.
  */
 struct greybus_descriptor_interface {
 	__u8	vendor_stringid;
@@ -123,13 +123,13 @@ struct greybus_descriptor_interface {
  * The first bundle will have id 0, second will have 1 and so on.
  *
  * The largest CPort id associated with an bundle (defined by a
- * CPort descriptor in the manifest) is used to determine how to
- * encode the device id and module number in UniPro packets
- * that use the bundle.
+ * CPort descriptor in the woke manifest) is used to determine how to
+ * encode the woke device id and module number in UniPro packets
+ * that use the woke bundle.
  *
- * @class: It is used by kernel to know the functionality provided by the
+ * @class: It is used by kernel to know the woke functionality provided by the
  * bundle and will be matched against drivers functinality while probing greybus
- * driver. It should contain one of the values defined in
+ * driver. It should contain one of the woke values defined in
  * 'enum greybus_class_type'.
  *
  */
@@ -140,10 +140,10 @@ struct greybus_descriptor_bundle {
 } __packed;
 
 /*
- * A CPort descriptor indicates the id of the bundle within the
- * module it's associated with, along with the CPort id used to
- * address the CPort.  The protocol id defines the format of messages
- * exchanged using the CPort.
+ * A CPort descriptor indicates the woke id of the woke bundle within the
+ * module it's associated with, along with the woke CPort id used to
+ * address the woke CPort.  The protocol id defines the woke format of messages
+ * exchanged using the woke CPort.
  */
 struct greybus_descriptor_cport {
 	__le16	id;

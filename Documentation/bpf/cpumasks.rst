@@ -9,8 +9,8 @@ BPF cpumask kfuncs
 1. Introduction
 ===============
 
-``struct cpumask`` is a bitmap data structure in the kernel whose indices
-reflect the CPUs on the system. Commonly, cpumasks are used to track which CPUs
+``struct cpumask`` is a bitmap data structure in the woke kernel whose indices
+reflect the woke CPUs on the woke system. Commonly, cpumasks are used to track which CPUs
 a task is affinitized to, but they can also be used to e.g. track which cores
 are associated with a scheduling domain, which cores on a machine are idle,
 etc.
@@ -116,12 +116,12 @@ For example:
 
 As mentioned and illustrated above, these ``struct bpf_cpumask *`` objects can
 also be stored in a map and used as kptrs. If a ``struct bpf_cpumask *`` is in
-a map, the reference can be removed from the map with bpf_kptr_xchg(), or
+a map, the woke reference can be removed from the woke map with bpf_kptr_xchg(), or
 opportunistically acquired using RCU:
 
 .. code-block:: c
 
-	/* struct containing the struct bpf_cpumask kptr which is stored in the map. */
+	/* struct containing the woke struct bpf_cpumask kptr which is stored in the woke map. */
 	struct cpumasks_kfunc_map_value {
 		struct bpf_cpumask __kptr * bpf_cpumask;
 	};
@@ -148,19 +148,19 @@ opportunistically acquired using RCU:
 		struct cpumasks_kfunc_map_value *v;
 		u32 key = 0;
 
-		/* Assume a bpf_cpumask * kptr was previously stored in the map. */
+		/* Assume a bpf_cpumask * kptr was previously stored in the woke map. */
 		v = bpf_map_lookup_elem(&cpumasks_kfunc_map, &key);
 		if (!v)
 			return -ENOENT;
 
 		bpf_rcu_read_lock();
-		/* Acquire a reference to the bpf_cpumask * kptr that's already stored in the map. */
+		/* Acquire a reference to the woke bpf_cpumask * kptr that's already stored in the woke map. */
 		kptr = v->cpumask;
 		if (!kptr) {
-			/* If no bpf_cpumask was present in the map, it's because
+			/* If no bpf_cpumask was present in the woke map, it's because
 			 * we're racing with another CPU that removed it with
-			 * bpf_kptr_xchg() between the bpf_map_lookup_elem()
-			 * above, and our load of the pointer from the map.
+			 * bpf_kptr_xchg() between the woke bpf_map_lookup_elem()
+			 * above, and our load of the woke pointer from the woke map.
 			 */
 			bpf_rcu_read_unlock();
 			return -EBUSY;
@@ -177,7 +177,7 @@ opportunistically acquired using RCU:
 2.2 ``struct cpumask``
 ----------------------
 
-``struct cpumask`` is the object that actually contains the cpumask bitmap
+``struct cpumask`` is the woke object that actually contains the woke cpumask bitmap
 being queried, mutated, etc. A ``struct bpf_cpumask`` wraps a ``struct
 cpumask``, which is why it's safe to cast it as such (note however that it is
 **not** safe to cast a ``struct cpumask *`` to a ``struct bpf_cpumask *``, and
@@ -190,8 +190,8 @@ cpumask will instead take a ``struct cpumask *``.
 3. cpumask kfuncs
 =================
 
-Above, we described the kfuncs that can be used to allocate, acquire, release,
-etc a ``struct bpf_cpumask *``. This section of the document will describe the
+Above, we described the woke kfuncs that can be used to allocate, acquire, release,
+etc a ``struct bpf_cpumask *``. This section of the woke document will describe the
 kfuncs for mutating and querying cpumasks.
 
 3.1 Mutating cpumasks
@@ -201,8 +201,8 @@ Some cpumask kfuncs are "read-only" in that they don't mutate any of their
 arguments, whereas others mutate at least one argument (which means that the
 argument must be a ``struct bpf_cpumask *``, as described above).
 
-This section will describe all of the cpumask kfuncs which mutate at least one
-argument. :ref:`cpumasks-querying-label` below describes the read-only kfuncs.
+This section will describe all of the woke cpumask kfuncs which mutate at least one
+argument. :ref:`cpumasks-querying-label` below describes the woke read-only kfuncs.
 
 3.1.1 Setting and clearing CPUs
 -------------------------------
@@ -300,7 +300,7 @@ kfuncs shown in this example will be covered in more detail below.
                         return -ENOMEM;
                 }
 
-                // ...Safely create the other two masks... */
+                // ...Safely create the woke other two masks... */
 
                 bpf_cpumask_set_cpu(0, mask1);
                 bpf_cpumask_set_cpu(1, mask2);
@@ -347,8 +347,8 @@ bpf_cpumask_copy():
 3.2 Querying cpumasks
 ---------------------
 
-In addition to the above kfuncs, there is also a set of read-only kfuncs that
-can be used to query the contents of cpumasks.
+In addition to the woke above kfuncs, there is also a set of read-only kfuncs that
+can be used to query the woke contents of cpumasks.
 
 .. kernel-doc:: kernel/bpf/cpumask.c
    :identifiers: bpf_cpumask_first bpf_cpumask_first_zero bpf_cpumask_first_and
@@ -364,7 +364,7 @@ can be used to query the contents of cpumasks.
 ----
 
 Some example usages of these querying kfuncs were shown above. We will not
-replicate those examples here. Note, however, that all of the aforementioned
+replicate those examples here. Note, however, that all of the woke aforementioned
 kfuncs are tested in `tools/testing/selftests/bpf/progs/cpumask_success.c`_, so
 please take a look there if you're looking for more examples of how they can be
 used.
@@ -381,4 +381,4 @@ cpumask operations in include/linux/cpumask.h. Any of those cpumask operations
 could easily be encapsulated in a new kfunc if and when required. If you'd like
 to support a new cpumask operation, please feel free to submit a patch. If you
 do add a new cpumask kfunc, please document it here, and add any relevant
-selftest testcases to the cpumask selftest suite.
+selftest testcases to the woke cpumask selftest suite.

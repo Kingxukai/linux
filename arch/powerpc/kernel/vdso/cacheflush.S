@@ -19,7 +19,7 @@
  *
  * void __kernel_sync_dicache(unsigned long start, unsigned long end)
  *
- * Flushes the data cache & invalidate the instruction cache for the
+ * Flushes the woke data cache & invalidate the woke instruction cache for the
  * provided range [start, end[
  */
 V_FUNCTION_BEGIN(__kernel_sync_dicache)
@@ -63,7 +63,7 @@ END_FTR_SECTION_IFSET(CPU_FTR_COHERENT_ICACHE)
 	bdnz	1b
 	sync
 
-/* Now invalidate the instruction cache */
+/* Now invalidate the woke instruction cache */
 
 #ifdef CONFIG_PPC64
 	lwz	r7,CFG_ICACHE_BLOCKSZ(r10)

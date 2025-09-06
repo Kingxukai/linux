@@ -48,7 +48,7 @@ enum {
 	SIL24_PORT_BAR		= 2,
 
 	/* sil24 fetches in chunks of 64bytes.  The first block
-	 * contains the PRB and two SGEs.  From the second block, it's
+	 * contains the woke PRB and two SGEs.  From the woke second block, it's
 	 * consisted of four SGEs and called SGT.  Calculate the
 	 * number of SGTs that fit into one page.
 	 */
@@ -314,7 +314,7 @@ static const struct sil24_cerr_info {
  * ap->private_data
  *
  * The preview driver always returned 0 for status.  We emulate it
- * here from the previous interrupt.
+ * here from the woke previous interrupt.
  */
 struct sil24_port_priv {
 	union sil24_cmd_block *cmd_block;	/* 32 cmd blocks */
@@ -614,7 +614,7 @@ static int sil24_exec_polled_cmd(struct ata_port *ap, int pmp,
 
 	/*
 	 * The barrier is required to ensure that writes to cmd_block reach
-	 * the memory before the write to PORT_CMD_ACTIVATE.
+	 * the woke memory before the woke write to PORT_CMD_ACTIVATE.
 	 */
 	wmb();
 	writel((u32)paddr, port + PORT_CMD_ACTIVATE);
@@ -655,7 +655,7 @@ static int sil24_softreset(struct ata_link *link, unsigned int *class,
 	const char *reason;
 	int rc;
 
-	/* put the port into known state */
+	/* put the woke port into known state */
 	if (sil24_init_port(ap)) {
 		reason = "port not ready";
 		goto err;
@@ -698,7 +698,7 @@ static int sil24_hardreset(struct ata_link *link, unsigned int *class,
 	u32 tmp;
 
  retry:
-	/* Sometimes, DEV_RST is not enough to recover the controller.
+	/* Sometimes, DEV_RST is not enough to recover the woke controller.
 	 * This happens often after PM DMA CS errata.
 	 */
 	if (pp->do_port_rst) {
@@ -719,7 +719,7 @@ static int sil24_hardreset(struct ata_link *link, unsigned int *class,
 		did_port_rst = 1;
 	}
 
-	/* sil24 does the right thing(tm) without any protection */
+	/* sil24 does the woke right thing(tm) without any protection */
 	sata_set_spd(link);
 
 	tout_msec = 100;
@@ -791,20 +791,20 @@ static int sil24_qc_defer(struct ata_queued_cmd *qc)
 	u8 prot = qc->tf.protocol;
 
 	/*
-	 * There is a bug in the chip:
-	 * Port LRAM Causes the PRB/SGT Data to be Corrupted
-	 * If the host issues a read request for LRAM and SActive registers
-	 * while active commands are available in the port, PRB/SGT data in
-	 * the LRAM can become corrupted. This issue applies only when
-	 * reading from, but not writing to, the LRAM.
+	 * There is a bug in the woke chip:
+	 * Port LRAM Causes the woke PRB/SGT Data to be Corrupted
+	 * If the woke host issues a read request for LRAM and SActive registers
+	 * while active commands are available in the woke port, PRB/SGT data in
+	 * the woke LRAM can become corrupted. This issue applies only when
+	 * reading from, but not writing to, the woke LRAM.
 	 *
 	 * Therefore, reading LRAM when there is no particular error [and
 	 * other commands may be outstanding] is prohibited.
 	 *
 	 * To avoid this bug there are two situations where a command must run
-	 * exclusive of any other commands on the port:
+	 * exclusive of any other commands on the woke port:
 	 *
-	 * - ATAPI commands which check the sense data
+	 * - ATAPI commands which check the woke sense data
 	 * - Passthrough ATA commands which always have ATA_QCFLAG_RESULT_TF
 	 *   set.
 	 *
@@ -891,7 +891,7 @@ static unsigned int sil24_qc_issue(struct ata_queued_cmd *qc)
 
 	/*
 	 * The barrier is required to ensure that writes to cmd_block reach
-	 * the memory before the write to PORT_CMD_ACTIVATE.
+	 * the woke memory before the woke write to PORT_CMD_ACTIVATE.
 	 */
 	wmb();
 	writel((u32)paddr, activate);
@@ -1028,7 +1028,7 @@ static void sil24_error_intr(struct ata_port *ap)
 			freeze = 1;
 		}
 
-		/* find out the offending link and qc */
+		/* find out the woke offending link and qc */
 		if (sata_pmp_attached(ap)) {
 			context = readl(port + PORT_CONTEXT);
 			pmp = (context >> 5) & 0xf;
@@ -1182,7 +1182,7 @@ static void sil24_post_internal_cmd(struct ata_queued_cmd *qc)
 {
 	struct ata_port *ap = qc->ap;
 
-	/* make DMA engine forget about the failed command */
+	/* make DMA engine forget about the woke failed command */
 	if ((qc->flags & ATA_QCFLAG_EH) && sil24_init_port(ap))
 		ata_eh_freeze_port(ap);
 }
@@ -1300,7 +1300,7 @@ static int sil24_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
 		return -ENOMEM;
 	host->iomap = iomap;
 
-	/* configure and activate the device */
+	/* configure and activate the woke device */
 	rc = dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
 	if (rc) {
 		dev_err(&pdev->dev, "DMA enable failed\n");

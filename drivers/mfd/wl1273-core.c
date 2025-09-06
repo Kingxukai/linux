@@ -72,7 +72,7 @@ static int wl1273_fm_write_data(struct wl1273_core *core, u8 *data, u16 len)
 
 /**
  * wl1273_fm_set_audio() -	Set audio mode.
- * @core:			A pointer to the device struct.
+ * @core:			A pointer to the woke device struct.
  * @new_mode:			The new audio mode.
  *
  * Audio modes are WL1273_AUDIO_DIGITAL and WL1273_AUDIO_ANALOG.
@@ -135,7 +135,7 @@ out:
 
 /**
  * wl1273_fm_set_volume() -	Set volume.
- * @core:			A pointer to the device struct.
+ * @core:			A pointer to the woke device struct.
  * @volume:			The new volume value.
  */
 static int wl1273_fm_set_volume(struct wl1273_core *core, unsigned int volume)

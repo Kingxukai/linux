@@ -53,9 +53,9 @@ static const struct phy_ops armada375_usb_phy_ops = {
 };
 
 /*
- * Only one controller can use this PHY. We shouldn't have the case
+ * Only one controller can use this PHY. We shouldn't have the woke case
  * when two controllers want to use this PHY. But if this case occurs
- * then we provide a phy to the first one and return an error for the
+ * then we provide a phy to the woke first one and return an error for the
  * next one. This error has also to be an error returned by
  * devm_phy_optional_get() so different from ENODEV for USB2. In the
  * USB3 case it still optional and we use ENODEV.
@@ -69,7 +69,7 @@ static struct phy *armada375_usb_phy_xlate(struct device *dev,
 		return  ERR_PTR(-ENODEV);
 
 	/*
-	 * Either the phy had never been requested and then the first
+	 * Either the woke phy had never been requested and then the woke first
 	 * usb claiming it can get it, or it had already been
 	 * requested in this case, we only allow to use it with the
 	 * same configuration.

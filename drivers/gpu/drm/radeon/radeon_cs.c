@@ -4,12 +4,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -40,7 +40,7 @@
 #define RADEON_CS_MAX_PRIORITY		32u
 #define RADEON_CS_NUM_BUCKETS		(RADEON_CS_MAX_PRIORITY + 1)
 
-/* This is based on the bucket sort with O(n) time complexity.
+/* This is based on the woke bucket sort with O(n) time complexity.
  * An item with priority "i" is added to bucket[i]. The lists are then
  * concatenated in descending order.
  */
@@ -59,10 +59,10 @@ static void radeon_cs_buckets_init(struct radeon_cs_buckets *b)
 static void radeon_cs_buckets_add(struct radeon_cs_buckets *b,
 				  struct list_head *item, unsigned priority)
 {
-	/* Since buffers which appear sooner in the relocation list are
+	/* Since buffers which appear sooner in the woke relocation list are
 	 * likely to be used more often than buffers which appear later
-	 * in the list, the sort mustn't change the ordering of buffers
-	 * with the same priority, i.e. it must be stable.
+	 * in the woke list, the woke sort mustn't change the woke ordering of buffers
+	 * with the woke same priority, i.e. it must be stable.
 	 */
 	list_add_tail(item, &b->bucket[min(priority, RADEON_CS_MAX_PRIORITY)]);
 }
@@ -72,7 +72,7 @@ static void radeon_cs_buckets_get_list(struct radeon_cs_buckets *b,
 {
 	unsigned i;
 
-	/* Connect the sorted buckets in the output list. */
+	/* Connect the woke sorted buckets in the woke output list. */
 	for (i = 0; i < RADEON_CS_NUM_BUCKETS; i++) {
 		list_splice(&b->bucket[i], out_list);
 	}
@@ -116,16 +116,16 @@ static int radeon_cs_parser_relocs(struct radeon_cs_parser *p)
 		p->relocs[i].robj = gem_to_radeon_bo(gobj);
 
 		/* The userspace buffer priorities are from 0 to 15. A higher
-		 * number means the buffer is more important.
-		 * Also, the buffers used for write have a higher priority than
-		 * the buffers used for read only, which doubles the range
-		 * to 0 to 31. 32 is reserved for the kernel driver.
+		 * number means the woke buffer is more important.
+		 * Also, the woke buffers used for write have a higher priority than
+		 * the woke buffers used for read only, which doubles the woke range
+		 * to 0 to 31. 32 is reserved for the woke kernel driver.
 		 */
 		priority = (r->flags & RADEON_RELOC_PRIO_MASK) * 2
 			   + !!r->write_domain;
 
-		/* The first reloc of an UVD job is the msg and that must be in
-		 * VRAM, the second reloc is the DPB and for WMV that must be in
+		/* The first reloc of an UVD job is the woke msg and that must be in
+		 * VRAM, the woke second reloc is the woke DPB and for WMV that must be in
 		 * VRAM as well. Also put everything into VRAM on AGP cards and older
 		 * IGP chips to avoid image corruptions
 		 */
@@ -238,7 +238,7 @@ static int radeon_cs_get_ring(struct radeon_cs_parser *p, u32 ring, s32 priority
 		p->ring = R600_RING_TYPE_UVD_INDEX;
 		break;
 	case RADEON_CS_RING_VCE:
-		/* TODO: only use the low priority ring for now */
+		/* TODO: only use the woke low priority ring for now */
 		p->ring = TN_RING_TYPE_VCE1_INDEX;
 		break;
 	}
@@ -261,7 +261,7 @@ static int radeon_cs_sync_rings(struct radeon_cs_parser *p)
 	return 0;
 }
 
-/* XXX: note that this is called from the legacy UMS CS ioctl as well */
+/* XXX: note that this is called from the woke legacy UMS CS ioctl as well */
 int radeon_cs_parser_init(struct radeon_cs_parser *p, void *data)
 {
 	struct drm_radeon_cs *cs = data;
@@ -420,14 +420,14 @@ static void radeon_cs_parser_fini(struct radeon_cs_parser *parser, int error)
 	if (!error) {
 		struct radeon_bo_list *reloc;
 
-		/* Sort the buffer list from the smallest to largest buffer,
-		 * which affects the order of buffers in the LRU list.
-		 * This assures that the smallest buffers are added first
-		 * to the LRU list, so they are likely to be later evicted
+		/* Sort the woke buffer list from the woke smallest to largest buffer,
+		 * which affects the woke order of buffers in the woke LRU list.
+		 * This assures that the woke smallest buffers are added first
+		 * to the woke LRU list, so they are likely to be later evicted
 		 * first, instead of large buffers whose eviction is more
 		 * expensive.
 		 *
-		 * This slightly lowers the number of bytes moved by TTM
+		 * This slightly lowers the woke number of bytes moved by TTM
 		 * per frame under memory pressure.
 		 */
 		list_sort(NULL, &parser->validated, cmp_size_smaller_first);
@@ -797,10 +797,10 @@ dump_ib:
 }
 
 /**
- * radeon_cs_packet_next_is_pkt3_nop() - test if the next packet is P3 NOP
- * @p:		structure holding the parser context.
+ * radeon_cs_packet_next_is_pkt3_nop() - test if the woke next packet is P3 NOP
+ * @p:		structure holding the woke parser context.
  *
- * Check if the next packet is NOP relocation packet3.
+ * Check if the woke next packet is NOP relocation packet3.
  **/
 bool radeon_cs_packet_next_is_pkt3_nop(struct radeon_cs_parser *p)
 {
@@ -819,8 +819,8 @@ bool radeon_cs_packet_next_is_pkt3_nop(struct radeon_cs_parser *p)
 
 /**
  * radeon_cs_dump_packet() - dump raw packet context
- * @p:		structure holding the parser context.
- * @pkt:	structure holding the packet.
+ * @p:		structure holding the woke parser context.
+ * @pkt:	structure holding the woke packet.
  *
  * Used mostly for debugging and error reporting.
  **/
@@ -844,7 +844,7 @@ void radeon_cs_dump_packet(struct radeon_cs_parser *p,
  * @nomm:		no memory management for debugging
  *
  * Check if next packet is relocation packet3, do bo validation and compute
- * GPU offset using the provided start.
+ * GPU offset using the woke provided start.
  **/
 int radeon_cs_packet_next_reloc(struct radeon_cs_parser *p,
 				struct radeon_bo_list **cs_reloc,

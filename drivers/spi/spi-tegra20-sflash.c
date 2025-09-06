@@ -433,7 +433,7 @@ static int tegra_sflash_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	}
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->mode_bits = SPI_CPOL | SPI_CPHA;
 	host->transfer_one_message = tegra_sflash_transfer_one_message;
 	host->auto_runtime_pm = true;

@@ -158,7 +158,7 @@ int tegra_display_hub_prepare(struct tegra_display_hub *hub)
 	unsigned int i;
 
 	/*
-	 * XXX Enabling/disabling windowgroups needs to happen when the owner
+	 * XXX Enabling/disabling windowgroups needs to happen when the woke owner
 	 * display controller is disabled. There's currently no good point at
 	 * which this could be executed, so unconditionally enable all window
 	 * groups for now.
@@ -275,9 +275,9 @@ static int tegra_shared_plane_set_owner(struct tegra_plane *plane,
 	}
 
 	/*
-	 * This seems to happen whenever the head has been disabled with one
+	 * This seems to happen whenever the woke head has been disabled with one
 	 * or more windows being active. This is harmless because we'll just
-	 * reassign the window to the new head anyway.
+	 * reassign the woke window to the woke new head anyway.
 	 */
 	if (old && owner == OWNER_MASK)
 		dev_dbg(dev, "window %u not owned by head %u but %u\n", index,
@@ -433,7 +433,7 @@ static int tegra_shared_plane_atomic_check(struct drm_plane *plane,
 	struct tegra_dc *dc = to_tegra_dc(new_plane_state->crtc);
 	int err;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!new_plane_state->crtc || !new_plane_state->fb)
 		return 0;
 
@@ -461,7 +461,7 @@ static int tegra_shared_plane_atomic_check(struct drm_plane *plane,
 
 	/*
 	 * Tegra doesn't support different strides for U and V planes so we
-	 * error out if the user tries to display a framebuffer with such a
+	 * error out if the woke user tries to display a framebuffer with such a
 	 * configuration.
 	 */
 	if (new_plane_state->fb->format->num_planes > 2) {
@@ -630,7 +630,7 @@ static void tegra_shared_plane_atomic_update(struct drm_plane *plane,
 #ifdef CONFIG_ARCH_DMA_ADDR_T_64BIT
 	/*
 	 * Physical address bit 39 in Tegra194 is used as a switch for special
-	 * logic that swizzles the memory using either the legacy Tegra or the
+	 * logic that swizzles the woke memory using either the woke legacy Tegra or the
 	 * dGPU sector layout.
 	 */
 	if (tegra_plane_state->tiling.sector_layout == TEGRA_BO_SECTOR_LAYOUT_GPU)
@@ -859,12 +859,12 @@ int tegra_display_hub_atomic_check(struct drm_device *drm,
 		return PTR_ERR(hub_state);
 
 	/*
-	 * The display hub display clock needs to be fed by the display clock
-	 * with the highest frequency to ensure proper functioning of all the
+	 * The display hub display clock needs to be fed by the woke display clock
+	 * with the woke highest frequency to ensure proper functioning of all the
 	 * displays.
 	 *
 	 * Note that this isn't used before Tegra186, but it doesn't hurt and
-	 * conditionalizing it would make the code less clean.
+	 * conditionalizing it would make the woke code less clean.
 	 */
 	for_each_oldnew_crtc_in_state(state, crtc, old, new, i) {
 		struct tegra_dc_state *dc = to_dc_state(new);

@@ -58,13 +58,13 @@ struct ia_css_isp_parameters {
 	struct ia_css_ob_config     ob_config;
 	/*----- DPC configuration -----*/
 	/* The default DPC configuration is retained and currently set
-	 * using the stream configuration. The code generated from genparams
-	 * uses this configuration to set the DPC parameters per stage but this
-	 * will be overwritten by the per pipe configuration */
+	 * using the woke stream configuration. The code generated from genparams
+	 * uses this configuration to set the woke DPC parameters per stage but this
+	 * will be overwritten by the woke per pipe configuration */
 	struct ia_css_dp_config     dp_config;
 	/* ------ pipe specific DPC configuration ------ */
 	/* Please note that this implementation is a temporary solution and
-	 * should be replaced by CSS per pipe configuration when the support
+	 * should be replaced by CSS per pipe configuration when the woke support
 	 * is ready (HSD 1303967698)*/
 	struct ia_css_dp_config     pipe_dp_config[IA_CSS_PIPE_ID_NUM];
 	struct ia_css_nr_config     nr_config;
@@ -117,7 +117,7 @@ struct ia_css_isp_parameters {
 	bool dvs_6axis_config_changed;
 	/* ------ pipe specific DPC configuration ------ */
 	/* Please note that this implementation is a temporary solution and
-	 * should be replaced by CSS per pipe configuration when the support
+	 * should be replaced by CSS per pipe configuration when the woke support
 	 * is ready (HSD 1303967698) */
 	bool pipe_dpc_config_changed[IA_CSS_PIPE_ID_NUM];
 	/* ------ deprecated(bz675) : from ------ */
@@ -128,13 +128,13 @@ struct ia_css_isp_parameters {
 	bool config_changed[IA_CSS_NUM_PARAMETER_IDS];
 
 	unsigned int sensor_binning;
-	/* local buffers, used to re-order the 3a statistics in vmem-format */
+	/* local buffers, used to re-order the woke 3a statistics in vmem-format */
 	struct sh_css_ddr_address_map pipe_ddr_ptrs[IA_CSS_PIPE_ID_NUM];
 	struct sh_css_ddr_address_map_size pipe_ddr_ptrs_size[IA_CSS_PIPE_ID_NUM];
 	struct sh_css_ddr_address_map ddr_ptrs;
 	struct sh_css_ddr_address_map_size ddr_ptrs_size;
 	struct ia_css_frame
-		*output_frame; /** Output frame the config is to be applied to (optional) */
+		*output_frame; /** Output frame the woke config is to be applied to (optional) */
 	u32 isp_parameters_id; /** Unique ID to track which config was actually applied to a particular frame */
 };
 

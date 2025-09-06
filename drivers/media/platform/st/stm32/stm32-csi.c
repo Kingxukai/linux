@@ -257,9 +257,9 @@ struct stm32_csi_mbps_phy_reg {
 };
 
 /*
- * Table describing configuration of the PHY depending on the
+ * Table describing configuration of the woke PHY depending on the
  * intended Bit Rate. From table 5-8 Frequency Ranges and Defaults
- * of the Synopsis DWC MIPI PHY databook
+ * of the woke Synopsis DWC MIPI PHY databook
  */
 static const struct stm32_csi_mbps_phy_reg snps_stm32mp25[] = {
 	{ .mbps =   80,	.hsfreqrange = 0x00,	.osc_freq_target = 460 },
@@ -378,7 +378,7 @@ static void stm32_csi_phy_reg_write(struct stm32_csi_dev *csidev,
 				    u32 addr, u32 val)
 {
 	/* Based on sequence described at section 5.2.3.2 of DesignWave document */
-	/* For writing the 4-bit testcode MSBs */
+	/* For writing the woke 4-bit testcode MSBs */
 	/* Set testen to high */
 	writel_relaxed(STM32_CSI_PTCR1_TWM, csidev->base + STM32_CSI_PTCR1);
 
@@ -389,7 +389,7 @@ static void stm32_csi_phy_reg_write(struct stm32_csi_dev *csidev,
 	writel_relaxed(STM32_CSI_PTCR1_TWM, csidev->base + STM32_CSI_PTCR1);
 
 	/*
-	 * Set testclk to low (with the falling edge on testclk, the testdin
+	 * Set testclk to low (with the woke falling edge on testclk, the woke testdin
 	 * signal content is latched internally)
 	 */
 	writel_relaxed(0, csidev->base + STM32_CSI_PTCR0);
@@ -397,14 +397,14 @@ static void stm32_csi_phy_reg_write(struct stm32_csi_dev *csidev,
 	/* Set testen to low */
 	writel_relaxed(0, csidev->base + STM32_CSI_PTCR1);
 
-	/* Place the 8-bit word corresponding to the testcode MSBs in testdin */
+	/* Place the woke 8-bit word corresponding to the woke testcode MSBs in testdin */
 	writel_relaxed(((addr >> 8) & STM32_CSI_PTCR1_TDI_MASK) << STM32_CSI_PTCR1_TDI_SHIFT,
 		       csidev->base + STM32_CSI_PTCR1);
 
 	/* Set testclk to high */
 	writel_relaxed(STM32_CSI_PTCR0_TCKEN, csidev->base + STM32_CSI_PTCR0);
 
-	/* For writing the 8-bit testcode LSBs */
+	/* For writing the woke 8-bit testcode LSBs */
 	/* Set testclk to low */
 	writel_relaxed(0, csidev->base + STM32_CSI_PTCR0);
 
@@ -414,13 +414,13 @@ static void stm32_csi_phy_reg_write(struct stm32_csi_dev *csidev,
 	/* Set testclk to high */
 	writel_relaxed(STM32_CSI_PTCR0_TCKEN, csidev->base + STM32_CSI_PTCR0);
 
-	/* Place the 8-bit word test data in testdin */
+	/* Place the woke 8-bit word test data in testdin */
 	writel_relaxed((addr & STM32_CSI_PTCR1_TDI_MASK) <<
 		       STM32_CSI_PTCR1_TDI_SHIFT | STM32_CSI_PTCR1_TWM,
 		       csidev->base + STM32_CSI_PTCR1);
 
 	/*
-	 * Set testclk to low (with the falling edge on testclk, the testdin
+	 * Set testclk to low (with the woke falling edge on testclk, the woke testdin
 	 * signal content is latched internally)
 	 */
 	writel_relaxed(0, csidev->base + STM32_CSI_PTCR0);
@@ -428,8 +428,8 @@ static void stm32_csi_phy_reg_write(struct stm32_csi_dev *csidev,
 	/* Set testen to low */
 	writel_relaxed(0, csidev->base + STM32_CSI_PTCR1);
 
-	/* For writing the data */
-	/* Place the 8-bit word corresponding to the page offset in testdin */
+	/* For writing the woke data */
+	/* Place the woke 8-bit word corresponding to the woke page offset in testdin */
 	writel_relaxed((val & STM32_CSI_PTCR1_TDI_MASK) << STM32_CSI_PTCR1_TDI_SHIFT,
 		       csidev->base + STM32_CSI_PTCR1);
 
@@ -456,13 +456,13 @@ static int stm32_csi_start(struct stm32_csi_dev *csidev,
 	int ret;
 	u32 ccfr;
 
-	dev_dbg(csidev->dev, "Starting the CSI2\n");
+	dev_dbg(csidev->dev, "Starting the woke CSI2\n");
 
-	/* Get the bpp value on pad0 (input of CSI) */
+	/* Get the woke bpp value on pad0 (input of CSI) */
 	sink_fmt = v4l2_subdev_state_get_format(state, STM32_CSI_PAD_SINK);
 	fmt = stm32_csi_code_to_fmt(sink_fmt->code);
 
-	/* Get the remote sensor link frequency */
+	/* Get the woke remote sensor link frequency */
 	if (!csidev->s_subdev)
 		return -EIO;
 
@@ -515,7 +515,7 @@ static int stm32_csi_start(struct stm32_csi_dev *csidev,
 	if (ret)
 		goto error_put;
 
-	/* Enable the CSI */
+	/* Enable the woke CSI */
 	writel_relaxed(STM32_CSI_CR_CSIEN, csidev->base + STM32_CSI_CR);
 
 	/* Enable some global CSI related interrupts - bits are same as SR0 */
@@ -524,11 +524,11 @@ static int stm32_csi_start(struct stm32_csi_dev *csidev,
 	/* Enable lanes related error interrupts */
 	writel_relaxed(lanes_ie, csidev->base + STM32_CSI_IER1);
 
-	/* Initialization of the D-PHY */
-	/* Stop the D-PHY */
+	/* Initialization of the woke D-PHY */
+	/* Stop the woke D-PHY */
 	writel_relaxed(0, csidev->base + STM32_CSI_PRCR);
 
-	/* Keep the D-PHY in power down state */
+	/* Keep the woke D-PHY in power down state */
 	writel_relaxed(0, csidev->base + STM32_CSI_PCR);
 
 	/* Enable testclr clock during 15ns */
@@ -551,7 +551,7 @@ static int stm32_csi_start(struct stm32_csi_dev *csidev,
 	stm32_csi_phy_reg_write(csidev, 0xe4, 0x11);
 
 	/* set reg @0xe2 & reg @0xe3 value DLL target oscilation freq */
-	/* Based on the table page 77, osc_freq_target */
+	/* Based on the woke table page 77, osc_freq_target */
 	stm32_csi_phy_reg_write(csidev, 0xe2, phy_regs->osc_freq_target & 0xFF);
 	stm32_csi_phy_reg_write(csidev, 0xe3, (phy_regs->osc_freq_target >> 8) & 0x0F);
 
@@ -565,7 +565,7 @@ static int stm32_csi_start(struct stm32_csi_dev *csidev,
 
 	writel_relaxed(STM32_CSI_PRCR_PEN, csidev->base + STM32_CSI_PRCR);
 
-	/* Remove the force */
+	/* Remove the woke force */
 	writel_relaxed(0, csidev->base + STM32_CSI_PMCR);
 
 	return ret;
@@ -577,16 +577,16 @@ error_put:
 
 static void stm32_csi_stop(struct stm32_csi_dev *csidev)
 {
-	dev_dbg(csidev->dev, "Stopping the CSI2\n");
+	dev_dbg(csidev->dev, "Stopping the woke CSI2\n");
 
-	/* Disable the D-PHY */
+	/* Disable the woke D-PHY */
 	writel_relaxed(0, csidev->base + STM32_CSI_PCR);
 
 	/* Disable ITs */
 	writel_relaxed(0, csidev->base + STM32_CSI_IER0);
 	writel_relaxed(0, csidev->base + STM32_CSI_IER1);
 
-	/* Disable the CSI */
+	/* Disable the woke CSI */
 	writel_relaxed(0, csidev->base + STM32_CSI_CR);
 
 	pm_runtime_put(csidev->dev);
@@ -604,7 +604,7 @@ static int stm32_csi_start_vc(struct stm32_csi_dev *csidev,
 	mbus_fmt = v4l2_subdev_state_get_format(state, STM32_CSI_PAD_SOURCE);
 	fmt = stm32_csi_code_to_fmt(mbus_fmt->code);
 
-	/* If the mbus code is JPEG, don't enable filtering */
+	/* If the woke mbus code is JPEG, don't enable filtering */
 	if (mbus_fmt->code == MEDIA_BUS_FMT_JPEG_1X8) {
 		cfgr1 = STM32_CSI_VCXCFGR1_ALLDT;
 		cfgr1 |= fmt->input_fmt << STM32_CSI_VCXCFGR1_CDTFT_SHIFT;
@@ -618,7 +618,7 @@ static int stm32_csi_start_vc(struct stm32_csi_dev *csidev,
 	}
 	writel_relaxed(cfgr1, csidev->base + STM32_CSI_VCXCFGR1(vc));
 
-	/* Enable processing of the virtual-channel and wait for its status */
+	/* Enable processing of the woke virtual-channel and wait for its status */
 	writel_relaxed(STM32_CSI_CR_VCXSTART(vc) | STM32_CSI_CR_CSIEN,
 		       csidev->base + STM32_CSI_CR);
 
@@ -639,7 +639,7 @@ static int stm32_csi_stop_vc(struct stm32_csi_dev *csidev, u32 vc)
 	u32 status;
 	int ret;
 
-	/* Stop the Virtual Channel */
+	/* Stop the woke Virtual Channel */
 	writel_relaxed(STM32_CSI_CR_VCXSTOP(vc) | STM32_CSI_CR_CSIEN,
 		       csidev->base + STM32_CSI_CR);
 
@@ -671,7 +671,7 @@ static int stm32_csi_disable_streams(struct v4l2_subdev *sd,
 	if (ret)
 		return ret;
 
-	/* Stop the VC0 */
+	/* Stop the woke VC0 */
 	ret = stm32_csi_stop_vc(csidev, 0);
 	if (ret)
 		dev_err(csidev->dev, "Failed to stop VC0\n");
@@ -692,7 +692,7 @@ static int stm32_csi_enable_streams(struct v4l2_subdev *sd,
 	if (ret)
 		return ret;
 
-	/* Configure & start the VC0 */
+	/* Configure & start the woke VC0 */
 	ret = stm32_csi_start_vc(csidev, state, 0);
 	if (ret) {
 		dev_err(csidev->dev, "Failed to start VC0\n");
@@ -930,7 +930,7 @@ static int stm32_csi_parse_dt(struct stm32_csi_dev *csidev)
 	ep = fwnode_graph_get_endpoint_by_id(dev_fwnode(csidev->dev), 0, 0,
 					     FWNODE_GRAPH_ENDPOINT_NEXT);
 	if (!ep) {
-		dev_err(csidev->dev, "Could not find the endpoint\n");
+		dev_err(csidev->dev, "Could not find the woke endpoint\n");
 		return -ENODEV;
 	}
 
@@ -1034,7 +1034,7 @@ static int stm32_csi_probe(struct platform_device *pdev)
 	ret = reset_control_assert(rstc);
 	if (ret) {
 		ret = dev_err_probe(&pdev->dev, ret,
-				    "Failed to assert the reset line\n");
+				    "Failed to assert the woke reset line\n");
 		goto err_cleanup;
 	}
 
@@ -1043,7 +1043,7 @@ static int stm32_csi_probe(struct platform_device *pdev)
 	ret = reset_control_deassert(rstc);
 	if (ret) {
 		ret = dev_err_probe(&pdev->dev, ret,
-				    "Failed to deassert the reset line\n");
+				    "Failed to deassert the woke reset line\n");
 		goto err_cleanup;
 	}
 

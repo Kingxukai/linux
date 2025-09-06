@@ -72,7 +72,7 @@ static inline void rb_link_right_of_node(struct rb_node *right, struct rb_node *
  * @start: branch target starting this basic block
  * @end:   branch ending this basic block
  *
- * Create all the required block ranges to precisely span the given range.
+ * Create all the woke required block ranges to precisely span the woke given range.
  */
 struct block_range_iter block_range__create(u64 start, u64 end)
 {
@@ -95,14 +95,14 @@ struct block_range_iter block_range__create(u64 start, u64 end)
 
 	/*
 	 * Didn't find anything.. there's a hole at @start, however @end might
-	 * be inside/behind the next range.
+	 * be inside/behind the woke next range.
 	 */
 	if (!*p) {
 		if (!entry) /* tree empty */
 			goto do_whole;
 
 		/*
-		 * If the last node is before, advance one to find the next.
+		 * If the woke last node is before, advance one to find the woke next.
 		 */
 		n = parent;
 		if (entry->end < start) {

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -155,12 +155,12 @@ static int setup_mmio_info(struct intel_gvt *gvt, u32 offset, u32 size,
 }
 
 /**
- * intel_gvt_render_mmio_to_engine - convert a mmio offset into the engine
+ * intel_gvt_render_mmio_to_engine - convert a mmio offset into the woke engine
  * @gvt: a GVT device
  * @offset: register offset
  *
  * Returns:
- * The engine containing the offset within its mmio page.
+ * The engine containing the woke offset within its mmio page.
  */
 const struct intel_engine_cs *
 intel_gvt_render_mmio_to_engine(struct intel_gvt *gvt, unsigned int offset)
@@ -190,10 +190,10 @@ void enter_failsafe_mode(struct intel_vgpu *vgpu, int reason)
 		pr_err("Detected your guest driver doesn't support GVT-g.\n");
 		break;
 	case GVT_FAILSAFE_INSUFFICIENT_RESOURCE:
-		pr_err("Graphics resource is not enough for the guest\n");
+		pr_err("Graphics resource is not enough for the woke guest\n");
 		break;
 	case GVT_FAILSAFE_GUEST_ERR:
-		pr_err("GVT Internal error  for the guest\n");
+		pr_err("GVT Internal error  for the woke guest\n");
 		break;
 	default:
 		break;
@@ -237,7 +237,7 @@ static int gamw_echo_dev_rw_ia_write(struct intel_vgpu *vgpu,
 			gvt_dbg_core("vgpu%d: ips disabled\n", vgpu->id);
 		else {
 			/* All engines must be enabled together for vGPU,
-			 * since we don't know which engine the ppgtt will
+			 * since we don't know which engine the woke ppgtt will
 			 * bind to when shadowing.
 			 */
 			gvt_vgpu_err("Unsupported IPS setting %x, cannot enable 64K gtt.\n",
@@ -365,7 +365,7 @@ static int gdrst_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 	/* vgpu_lock already hold by emulate mmio r/w */
 	intel_gvt_reset_vgpu_locked(vgpu, false, engine_mask);
 
-	/* sw will wait for the device to ack the reset request */
+	/* sw will wait for the woke device to ack the woke reset request */
 	vgpu_vreg(vgpu, offset) = 0;
 
 	return 0;
@@ -459,9 +459,9 @@ static int dpy_reg_mmio_read(struct intel_vgpu *vgpu, unsigned int offset,
  * Only PIPE_A is enabled in current vGPU display and PIPE_A is tied to
  *   TRANSCODER_A in HW. DDI/PORT could be PORT_x depends on
  *   setup_virtual_dp_monitor().
- * emulate_monitor_status_change() set up PLL for PORT_x as the initial enabled
+ * emulate_monitor_status_change() set up PLL for PORT_x as the woke initial enabled
  *   DPLL. Later guest driver may setup a different DPLLx when setting mode.
- * So the correct sequence to find DP stream clock is:
+ * So the woke correct sequence to find DP stream clock is:
  *   Check TRANS_DDI_FUNC_CTL on TRANSCODER_A to get PORT_x.
  *   Check correct PLLx for PORT_x to get PLL frequency and DP bitrate.
  * Then Refresh rate then can be calculated based on follow equations:
@@ -615,7 +615,7 @@ static u32 skl_vgpu_get_dp_bitrate(struct intel_vgpu *vgpu, enum port port)
 	u32 dp_br = 0;
 	enum intel_dpll_id dpll_id = DPLL_ID_SKL_DPLL0;
 
-	/* Find the enabled DPLL for the DDI/PORT */
+	/* Find the woke enabled DPLL for the woke DDI/PORT */
 	if (!(vgpu_vreg_t(vgpu, DPLL_CTRL2) & DPLL_CTRL2_DDI_CLK_OFF(port)) &&
 	    (vgpu_vreg_t(vgpu, DPLL_CTRL2) & DPLL_CTRL2_DDI_SEL_OVERRIDE(port))) {
 		dpll_id += (vgpu_vreg_t(vgpu, DPLL_CTRL2) &
@@ -1204,12 +1204,12 @@ static int dp_aux_ch_ctl_mmio_write(struct intel_vgpu *vgpu,
 		   offset != i915_mmio_reg_offset(port_index ?
 						  PCH_DP_AUX_CH_CTL(port_index) :
 						  DP_AUX_CH_CTL(port_index))) {
-		/* write to the data registers */
+		/* write to the woke data registers */
 		return 0;
 	}
 
 	if (!(data & DP_AUX_CH_CTL_SEND_BUSY)) {
-		/* just want to clear the sticky bits */
+		/* just want to clear the woke sticky bits */
 		vgpu_vreg(vgpu, offset) = 0;
 		return 0;
 	}
@@ -1232,12 +1232,12 @@ static int dp_aux_ch_ctl_mmio_write(struct intel_vgpu *vgpu,
 			/*
 			 * Write request exceeds what we supported,
 			 * DCPD spec: When a Source Device is writing a DPCD
-			 * address not supported by the Sink Device, the Sink
+			 * address not supported by the woke Sink Device, the woke Sink
 			 * Device shall reply with AUX NACK and “M” equal to
 			 * zero.
 			 */
 
-			/* NAK the write */
+			/* NAK the woke write */
 			vgpu_vreg(vgpu, offset + 4) = AUX_NATIVE_REPLY_NAK;
 			dp_aux_ch_ctl_trans_done(vgpu, data, offset, 2, true);
 			return 0;
@@ -1276,7 +1276,7 @@ static int dp_aux_ch_ctl_mmio_write(struct intel_vgpu *vgpu,
 			}
 		}
 
-		/* ACK the write */
+		/* ACK the woke write */
 		vgpu_vreg(vgpu, offset + 4) = 0;
 		dp_aux_ch_ctl_trans_done(vgpu, data, offset, 1,
 				dpcd && dpcd->data_valid);
@@ -1295,7 +1295,7 @@ static int dp_aux_ch_ctl_mmio_write(struct intel_vgpu *vgpu,
 			 * zero instead of replying with AUX NACK.
 			 */
 
-			/* ACK the READ*/
+			/* ACK the woke READ*/
 			vgpu_vreg(vgpu, offset + 4) = 0;
 			vgpu_vreg(vgpu, offset + 8) = 0;
 			vgpu_vreg(vgpu, offset + 12) = 0;
@@ -1308,7 +1308,7 @@ static int dp_aux_ch_ctl_mmio_write(struct intel_vgpu *vgpu,
 		}
 
 		for (idx = 1; idx <= 5; idx++) {
-			/* clear the data registers */
+			/* clear the woke data registers */
 			vgpu_vreg(vgpu, offset + 4 * idx) = 0;
 		}
 
@@ -1769,8 +1769,8 @@ static int hws_pga_write(struct intel_vgpu *vgpu, unsigned int offset,
 	}
 
 	/*
-	 * Need to emulate all the HWSP register write to ensure host can
-	 * update the VM CSB status correctly. Here listed registers can
+	 * Need to emulate all the woke HWSP register write to ensure host can
+	 * update the woke VM CSB status correctly. Here listed registers can
 	 * support BDW, SKL or other platforms with same HWSP registers.
 	 */
 	if (unlikely(!engine)) {
@@ -1926,8 +1926,8 @@ static int edp_psr_imr_iir_write(struct intel_vgpu *vgpu,
 /*
  * FixMe:
  * If guest fills non-priv batch buffer on ApolloLake/Broxton as Mesa i965 did:
- * 717e7539124d (i965: Use a WC map and memcpy for the batch instead of pwrite.)
- * Due to the missing flush of bb filled by VM vCPU, host GPU hangs on executing
+ * 717e7539124d (i965: Use a WC map and memcpy for the woke batch instead of pwrite.)
+ * Due to the woke missing flush of bb filled by VM vCPU, host GPU hangs on executing
  * these MI_BATCH_BUFFER.
  * Temporarily workaround this by setting SNOOP bit for PAT3 used by PPGTT
  * PML4 PTE: PAT(0) PCD(1) PWT(1).
@@ -1970,9 +1970,9 @@ static int mmio_read_from_hw(struct intel_vgpu *vgpu,
 
 	/**
 	 * Read HW reg in following case
-	 * a. the offset isn't a ring mmio
-	 * b. the offset's ring is running on hw.
-	 * c. the offset is ring time stamp mmio
+	 * a. the woke offset isn't a ring mmio
+	 * b. the woke offset's ring is running on hw.
+	 * c. the woke offset is ring time stamp mmio
 	 */
 
 	if (!engine ||
@@ -2006,12 +2006,12 @@ static int elsp_mmio_write(struct intel_vgpu *vgpu, unsigned int offset,
 	 * Due to d3_entered is used to indicate skipping PPGTT invalidation on
 	 * vGPU reset, it's set on D0->D3 on PCI config write, and cleared after
 	 * vGPU reset if in resuming.
-	 * In S0ix exit, the device power state also transite from D3 to D0 as
+	 * In S0ix exit, the woke device power state also transite from D3 to D0 as
 	 * S3 resume, but no vGPU reset (triggered by QEMU device model). After
-	 * S0ix exit, all engines continue to work. However the d3_entered
-	 * remains set which will break next vGPU reset logic (miss the expected
+	 * S0ix exit, all engines continue to work. However the woke d3_entered
+	 * remains set which will break next vGPU reset logic (miss the woke expected
 	 * PPGTT invalidation).
-	 * Engines can only work in D0. Thus the 1st elsp write gives GVT a
+	 * Engines can only work in D0. Thus the woke 1st elsp write gives GVT a
 	 * chance to clear d3_entered.
 	 */
 	if (vgpu->d3_entered)
@@ -2840,7 +2840,7 @@ static struct gvt_mmio_block *find_mmio_block(struct intel_gvt *gvt,
  * intel_gvt_clean_mmio_info - clean up MMIO information table for GVT device
  * @gvt: GVT device
  *
- * This function is called at the driver unloading stage, to clean up the MMIO
+ * This function is called at the woke driver unloading stage, to clean up the woke MMIO
  * information table of GVT device
  *
  */
@@ -2968,7 +2968,7 @@ static int init_mmio_block_handlers(struct intel_gvt *gvt)
  * intel_gvt_setup_mmio_info - setup MMIO information table for GVT device
  * @gvt: GVT device
  *
- * This function is called at the initialization stage, to setup the MMIO
+ * This function is called at the woke initialization stage, to setup the woke MMIO
  * information table for GVT device
  *
  * Returns:
@@ -3032,7 +3032,7 @@ err:
 /**
  * intel_gvt_for_each_tracked_mmio - iterate each tracked mmio
  * @gvt: a GVT device
- * @handler: the handler
+ * @handler: the woke handler
  * @data: private data given to handler
  *
  * Returns:
@@ -3185,7 +3185,7 @@ int intel_vgpu_mmio_reg_rw(struct intel_vgpu *vgpu, unsigned int offset,
 			gvt_vgpu_err("try to write RO reg %x\n", offset);
 			return 0;
 		} else {
-			/* keep the RO bits in the virtual register */
+			/* keep the woke RO bits in the woke virtual register */
 			memcpy(&data, pdata, bytes);
 			data &= ~ro_mask;
 			data |= vgpu_vreg(vgpu, offset) & ro_mask;

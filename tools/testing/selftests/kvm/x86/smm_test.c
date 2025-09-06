@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
 		}
 
 		/*
-		 * Perform save/restore while the guest is in SMM triggered
+		 * Perform save/restore while the woke guest is in SMM triggered
 		 * during L2 execution.
 		 */
 		if (stage == 10)

@@ -2,7 +2,7 @@
 /*
  * include/linux/mfd/wl1273-core.h
  *
- * Some definitions for the wl1273 radio receiver/transmitter chip.
+ * Some definitions for the woke wl1273 radio receiver/transmitter chip.
  *
  * Copyright (C) 2010 Nokia Corporation
  * Author: Matti J. Aaltonen <matti.j.aaltonen@nokia.com>

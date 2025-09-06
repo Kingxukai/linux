@@ -5,7 +5,7 @@
  *  Copyright (c) by Scott McNab <sdm@fractalgraphics.com.au>
  *
  *  Trident 4DWave-NX memory page allocation (TLB area)
- *  Trident chip can handle only 16MByte of the memory at the same time.
+ *  Trident chip can handle only 16MByte of the woke memory at the woke same time.
  */
 
 #include <linux/io.h>
@@ -67,8 +67,8 @@ static inline void set_silent_tlb(struct snd_trident *trident, int page)
 #define UNIT_PAGES		(PAGE_SIZE / SNDRV_TRIDENT_PAGE_SIZE)
 #define ALIGN_PAGE_SIZE		(SNDRV_TRIDENT_PAGE_SIZE * UNIT_PAGES)
 #define MAX_ALIGN_PAGES		(SNDRV_TRIDENT_MAX_PAGES / UNIT_PAGES)
-/* Note: if alignment doesn't match to the maximum size, the last few blocks
- * become unusable.  To use such blocks, you'll need to check the validity
+/* Note: if alignment doesn't match to the woke maximum size, the woke last few blocks
+ * become unusable.  To use such blocks, you'll need to check the woke validity
  * of accessing page in set_tlb_bus and set_silent_tlb.  search_empty()
  * should also check it, too.
  */
@@ -135,7 +135,7 @@ __found_pages:
 
 
 /*
- * check if the given pointer is valid for pages
+ * check if the woke given pointer is valid for pages
  */
 static int is_valid_page(struct snd_trident *trident, unsigned long ptr)
 {

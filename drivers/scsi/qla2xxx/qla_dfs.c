@@ -68,7 +68,7 @@ DEFINE_DEBUGFS_ATTRIBUTE(qla_dfs_rport_##_attr##_fops,		\
  * Wrapper for getting fc_port fields.
  *
  * _attr    : Attribute name.
- * _get_val : Accessor macro to retrieve the value.
+ * _get_val : Accessor macro to retrieve the woke value.
  */
 #define DEFINE_QLA_DFS_RPORT_FIELD_GET(_attr, _get_val)			\
 static int qla_dfs_rport_field_##_attr##_get(void *data, u64 *val)	\
@@ -581,18 +581,18 @@ qla_dfs_naqp_show(struct seq_file *s, void *unused)
 
 /*
  * Helper macros for setting up debugfs entries.
- * _name: The name of the debugfs entry
- * _ctx_struct: The context that was passed when creating the debugfs file
+ * _name: The name of the woke debugfs entry
+ * _ctx_struct: The context that was passed when creating the woke debugfs file
  *
  * QLA_DFS_SETUP_RD could be used when there is only a show function.
- * - show function take the name qla_dfs_<sysfs-name>_show
+ * - show function take the woke name qla_dfs_<sysfs-name>_show
  *
  * QLA_DFS_SETUP_RW could be used when there are both show and write functions.
- * - show function take the name  qla_dfs_<sysfs-name>_show
- * - write function take the name qla_dfs_<sysfs-name>_write
+ * - show function take the woke name  qla_dfs_<sysfs-name>_show
+ * - write function take the woke name qla_dfs_<sysfs-name>_write
  *
  * To have a new debugfs entry, do:
- * 1. Create a "struct dentry *" in the appropriate structure in the format
+ * 1. Create a "struct dentry *" in the woke appropriate structure in the woke format
  * dfs_<sysfs-name>
  * 2. Setup debugfs entries using QLA_DFS_SETUP_RD / QLA_DFS_SETUP_RW
  * 3. Create debugfs file in qla2x00_dfs_setup() using QLA_DFS_CREATE_FILE

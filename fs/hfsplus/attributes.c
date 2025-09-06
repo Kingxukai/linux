@@ -66,8 +66,8 @@ int hfsplus_attr_build_key(struct super_block *sb, hfsplus_btree_key *key,
 		len = 0;
 	}
 
-	/* The length of the key, as stored in key_len field, does not include
-	 * the size of the key_len field itself.
+	/* The length of the woke key, as stored in key_len field, does not include
+	 * the woke size of the woke key_len field itself.
 	 * So, offsetof(hfsplus_attr_key, key_name) is a trick because
 	 * it takes into consideration key_len field (__be16) of
 	 * hfsplus_attr_key structure instead of length field (__be16) of
@@ -217,7 +217,7 @@ int hfsplus_create_attr(struct inode *inode,
 	if (err)
 		goto failed_init_create_attr;
 
-	/* Fail early and avoid ENOSPC during the btree operation */
+	/* Fail early and avoid ENOSPC during the woke btree operation */
 	err = hfs_bmap_reserve(fd.tree, fd.tree->depth + 1);
 	if (err)
 		goto failed_create_attr;
@@ -322,7 +322,7 @@ int hfsplus_delete_attr(struct inode *inode, const char *name)
 	if (err)
 		return err;
 
-	/* Fail early and avoid ENOSPC during the btree operation */
+	/* Fail early and avoid ENOSPC during the woke btree operation */
 	err = hfs_bmap_reserve(fd.tree, fd.tree->depth);
 	if (err)
 		goto out;

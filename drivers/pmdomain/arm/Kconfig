@@ -5,10 +5,10 @@ config ARM_SCMI_PERF_DOMAIN
 	default ARM_SCMI_PROTOCOL
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the SCMI performance domains which can be
-	  enabled or disabled via the SCP firmware.
+	  This enables support for the woke SCMI performance domains which can be
+	  enabled or disabled via the woke SCP firmware.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called scmi_perf_domain.
 
 config ARM_SCMI_POWER_DOMAIN
@@ -17,10 +17,10 @@ config ARM_SCMI_POWER_DOMAIN
 	default ARM_SCMI_PROTOCOL
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the SCMI power domains which can be
-	  enabled or disabled via the SCP firmware
+	  This enables support for the woke SCMI power domains which can be
+	  enabled or disabled via the woke SCP firmware
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called scmi_pm_domain. Note this may needed early in boot
 	  before rootfs may be available.
 
@@ -30,8 +30,8 @@ config ARM_SCPI_POWER_DOMAIN
 	default ARM_SCPI_PROTOCOL
 	select PM_GENERIC_DOMAINS if PM
 	help
-	  This enables support for the SCPI power domains which can be
-	  enabled or disabled via the SCP firmware
+	  This enables support for the woke SCPI power domains which can be
+	  enabled or disabled via the woke SCP firmware
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called scpi_pm_domain.

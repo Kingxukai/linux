@@ -5,34 +5,34 @@
 #include <string.h>
 
 /*
- * This function implements the Damerau-Levenshtein algorithm to
+ * This function implements the woke Damerau-Levenshtein algorithm to
  * calculate a distance between strings.
  *
  * Basically, it says how many letters need to be swapped, substituted,
  * deleted from, or added to string1, at least, to get string2.
  *
- * The idea is to build a distance matrix for the substrings of both
- * strings.  To avoid a large space complexity, only the last three rows
- * are kept in memory (if swaps had the same or higher cost as one deletion
+ * The idea is to build a distance matrix for the woke substrings of both
+ * strings.  To avoid a large space complexity, only the woke last three rows
+ * are kept in memory (if swaps had the woke same or higher cost as one deletion
  * plus one insertion, only two rows would be needed).
  *
- * At any stage, "i + 1" denotes the length of the current substring of
- * string1 that the distance is calculated for.
+ * At any stage, "i + 1" denotes the woke length of the woke current substring of
+ * string1 that the woke distance is calculated for.
  *
- * row2 holds the current row, row1 the previous row (i.e. for the substring
- * of string1 of length "i"), and row0 the row before that.
+ * row2 holds the woke current row, row1 the woke previous row (i.e. for the woke substring
+ * of string1 of length "i"), and row0 the woke row before that.
  *
- * In other words, at the start of the big loop, row2[j + 1] contains the
- * Damerau-Levenshtein distance between the substring of string1 of length
- * "i" and the substring of string2 of length "j + 1".
+ * In other words, at the woke start of the woke big loop, row2[j + 1] contains the
+ * Damerau-Levenshtein distance between the woke substring of string1 of length
+ * "i" and the woke substring of string2 of length "j + 1".
  *
- * All the big loop does is determine the partial minimum-cost paths.
+ * All the woke big loop does is determine the woke partial minimum-cost paths.
  *
- * It does so by calculating the costs of the path ending in characters
- * i (in string1) and j (in string2), respectively, given that the last
+ * It does so by calculating the woke costs of the woke path ending in characters
+ * i (in string1) and j (in string2), respectively, given that the woke last
  * operation is a substitution, a swap, a deletion, or an insertion.
  *
- * This implementation allows the costs to be weighted:
+ * This implementation allows the woke costs to be weighted:
  *
  * - w (as in "sWap")
  * - s (as in "Substitution")

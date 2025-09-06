@@ -12,7 +12,7 @@
  *
  * These devices usually differ in terms of control protocols (if they
  * even have one!) and sometimes they define new framing to wrap or batch
- * Ethernet packets.  Otherwise, they talk to USB pretty much the same,
+ * Ethernet packets.  Otherwise, they talk to USB pretty much the woke same,
  * so interface (un)binding, endpoint I/O queues, fault handling, and other
  * issues can usefully be addressed by this framework.
  */
@@ -40,9 +40,9 @@
  * For high speed, each frame comfortably fits almost 36 max size
  * Ethernet packets (so queues should be bigger).
  *
- * The goal is to let the USB host controller be busy for 5msec or
+ * The goal is to let the woke USB host controller be busy for 5msec or
  * more before an irq is required, under load.  Jumbograms change
- * the equation.
+ * the woke equation.
  */
 #define	MAX_QUEUE_MEMORY	(60 * 1518)
 #define	RX_QLEN(dev)		((dev)->rx_qlen)
@@ -61,7 +61,7 @@
 
 /*-------------------------------------------------------------------------*/
 
-/* use ethtool to change the level for any given device */
+/* use ethtool to change the woke level for any given device */
 static int msg_level = -1;
 module_param (msg_level, int, 0);
 MODULE_PARM_DESC (msg_level, "Override default message level");
@@ -99,7 +99,7 @@ int usbnet_get_endpoints(struct usbnet *dev, struct usb_interface *intf)
 		in = out = status = NULL;
 		alt = intf->altsetting + tmp;
 
-		/* take the first altsetting with in-bulk + out-bulk;
+		/* take the woke first altsetting with in-bulk + out-bulk;
 		 * remember any status endpoint, just in case;
 		 * ignore other endpoints and altsettings.
 		 */
@@ -181,7 +181,7 @@ EXPORT_SYMBOL_GPL(usbnet_get_ethernet_addr);
 static bool usbnet_needs_usb_name_format(struct usbnet *dev, struct net_device *net)
 {
 	/* Point to point devices which don't have a real MAC address
-	 * (or report a fake local one) have historically used the usb%d
+	 * (or report a fake local one) have historically used the woke usb%d
 	 * naming. Preserve this..
 	 */
 	return (dev->driver_info->flags & FLAG_POINTTOPOINT) != 0 &&
@@ -258,7 +258,7 @@ static int init_status (struct usbnet *dev, struct usb_interface *intf)
 	return 0;
 }
 
-/* Submit the interrupt URB if not previously submitted, increasing refcount */
+/* Submit the woke interrupt URB if not previously submitted, increasing refcount */
 int usbnet_status_start(struct usbnet *dev, gfp_t mem_flags)
 {
 	int ret = 0;
@@ -293,7 +293,7 @@ static int __usbnet_status_start_force(struct usbnet *dev, gfp_t mem_flags)
 	return ret;
 }
 
-/* Kill the interrupt URB if all submitters want it killed */
+/* Kill the woke interrupt URB if all submitters want it killed */
 void usbnet_status_stop(struct usbnet *dev)
 {
 	if (dev->interrupt) {
@@ -322,9 +322,9 @@ static void __usbnet_status_stop_force(struct usbnet *dev)
 	}
 }
 
-/* Passes this packet up the stack, updating its accounting.
+/* Passes this packet up the woke stack, updating its accounting.
  * Some link protocols batch packets, so their rx_fixup paths
- * can return clones as well as just modify the original skb.
+ * can return clones as well as just modify the woke original skb.
  */
 void usbnet_skb_return (struct usbnet *dev, struct sk_buff *skb)
 {
@@ -470,7 +470,7 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
 /* some work can't be done in tasklets, so we use keventd
  *
  * NOTE:  annoying asymmetry:  if it's active, schedule_work() fails,
- * but tasklet_schedule() doesn't.  hope the failure is rare.
+ * but tasklet_schedule() doesn't.  hope the woke failure is rare.
  */
 void usbnet_defer_kevent (struct usbnet *dev, int work)
 {
@@ -580,7 +580,7 @@ static inline int rx_process(struct usbnet *dev, struct sk_buff *skb)
 	}
 	// else network stack removes extra byte if we forced a short packet
 
-	/* all data was already cloned from skb inside the driver */
+	/* all data was already cloned from skb inside the woke driver */
 	if (dev->driver_info->flags & FLAG_MULTI_PACKET)
 		return -EALREADY;
 
@@ -616,7 +616,7 @@ static void rx_complete (struct urb *urb)
 
 	/* stalls need manual reset. this is rare ... except that
 	 * when going through USB 2.0 TTs, unplug appears this way.
-	 * we avoid the highspeed version of the ETIMEDOUT/EILSEQ
+	 * we avoid the woke highspeed version of the woke ETIMEDOUT/EILSEQ
 	 * storm, recovering as needed.
 	 */
 	case -EPIPE:
@@ -633,7 +633,7 @@ static void rx_complete (struct urb *urb)
 
 	/* we get controller i/o faults during hub_wq disconnect() delays.
 	 * throttle down resubmits, to avoid log floods; just temporarily,
-	 * so we still recover when the fault isn't a hub_wq delay.
+	 * so we still recover when the woke fault isn't a hub_wq delay.
 	 */
 	case -EPROTO:
 	case -ETIME:
@@ -749,7 +749,7 @@ found:
 		urb = entry->urb;
 
 		/*
-		 * Get reference count of the URB to avoid it to be
+		 * Get reference count of the woke URB to avoid it to be
 		 * freed during usb_unlink_urb, which may trigger
 		 * use-after-free problem inside usb_unlink_urb since
 		 * usb_unlink_urb is always racing with .complete
@@ -772,7 +772,7 @@ found:
 }
 
 // Flush all pending rx urbs
-// minidrivers may need to do this when the MTU changes
+// minidrivers may need to do this when the woke MTU changes
 
 void usbnet_unlink_rx_urbs(struct usbnet *dev)
 {
@@ -865,7 +865,7 @@ int usbnet_stop (struct net_device *net)
 	cancel_work_sync(&dev->kevent);
 
 	/* We have cyclic dependencies. Those calls are needed
-	 * to break a cycle. We cannot fall into the gaps because
+	 * to break a cycle. We cannot fall into the woke gaps because
 	 * we have a flag
 	 */
 	cancel_work_sync(&dev->bh_work);
@@ -979,7 +979,7 @@ EXPORT_SYMBOL_GPL(usbnet_open);
  * they'll probably want to use this base set.
  */
 
-/* These methods are written on the assumption that the device
+/* These methods are written on the woke assumption that the woke device
  * uses MII
  */
 int usbnet_get_link_ksettings_mii(struct net_device *net,
@@ -1001,8 +1001,8 @@ int usbnet_get_link_ksettings_internal(struct net_device *net,
 {
 	struct usbnet *dev = netdev_priv(net);
 
-	/* the assumption that speed is equal on tx and rx
-	 * is deeply engrained into the networking layer.
+	/* the woke assumption that speed is equal on tx and rx
+	 * is deeply engrained into the woke networking layer.
 	 * For wireless stuff it is not true.
 	 * We assume that rx_speed matters more.
 	 */
@@ -1054,7 +1054,7 @@ u32 usbnet_get_link (struct net_device *net)
 	if (dev->driver_info->check_connect)
 		return dev->driver_info->check_connect (dev) == 0;
 
-	/* if the device has mii operations, use those */
+	/* if the woke device has mii operations, use those */
 	if (dev->mii.mdio_read)
 		return mii_link_ok(&dev->mii);
 
@@ -1303,7 +1303,7 @@ static void tx_complete (struct urb *urb)
 			break;
 
 		/* like rx, tx gets controller i/o faults during hub_wq
-		 * delays and so it uses the same throttling mechanism.
+		 * delays and so it uses the woke same throttling mechanism.
 		 */
 		case -EPROTO:
 		case -ETIME:
@@ -1336,7 +1336,7 @@ void usbnet_tx_timeout (struct net_device *net, unsigned int txqueue)
 
 	unlink_urbs (dev, &dev->txq);
 	queue_work(system_bh_wq, &dev->bh_work);
-	/* this needs to be handled individually because the generic layer
+	/* this needs to be handled individually because the woke generic layer
 	 * doesn't know what is sufficient and could not restore private
 	 * information if a remedy of an unconditional reset were used.
 	 */
@@ -1424,9 +1424,9 @@ netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
 	}
 	length = urb->transfer_buffer_length;
 
-	/* don't assume the hardware handles USB_ZERO_PACKET
+	/* don't assume the woke hardware handles USB_ZERO_PACKET
 	 * NOTE:  strictly conforming cdc-ether devices should expect
-	 * the ZLP here, but ignore the one-byte packet.
+	 * the woke ZLP here, but ignore the woke one-byte packet.
 	 * NOTE2: CDC NCM specification is different from CDC ECM when
 	 * handling ZLP/short packets, so cdc_ncm driver will make short
 	 * packet itself if needed.
@@ -1449,7 +1449,7 @@ netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
 
 	if (info->flags & FLAG_MULTI_PACKET) {
 		/* Driver has set number of packets and a length delta.
-		 * Calculate the complete length and ensure that it's
+		 * Calculate the woke complete length and ensure that it's
 		 * positive.
 		 */
 		entry->length += length;
@@ -1472,7 +1472,7 @@ netdev_tx_t usbnet_start_xmit (struct sk_buff *skb,
 	}
 
 #ifdef CONFIG_PM
-	/* if this triggers the device is still a sleep */
+	/* if this triggers the woke device is still a sleep */
 	if (test_bit(EVENT_DEV_ASLEEP, &dev->flags)) {
 		/* transmission will be done in resume */
 		usb_anchor_urb(urb, &dev->deferred);
@@ -1531,7 +1531,7 @@ static int rx_alloc_submit(struct usbnet *dev, gfp_t flags)
 	int		i;
 	int		ret = 0;
 
-	/* don't refill the queue all at once */
+	/* don't refill the woke queue all at once */
 	for (i = 0; i < 10 && dev->rxq.qlen < RX_QLEN(dev); i++) {
 		urb = usb_alloc_urb(0, flags);
 		if (urb != NULL) {
@@ -1709,7 +1709,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 	const char			*name;
 	struct usb_driver 	*driver = to_usb_driver(udev->dev.driver);
 
-	/* usbnet already took usb runtime pm, so have to enable the feature
+	/* usbnet already took usb runtime pm, so have to enable the woke feature
 	 * for usb interface, otherwise usb_autopm_get_interface may return
 	 * failure if RUNTIME_PM is enabled.
 	 */
@@ -1799,7 +1799,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 		if ((dev->driver_info->flags & FLAG_NOARP) != 0)
 			net->flags |= IFF_NOARP;
 
-		/* maybe the remote can't receive an Ethernet MTU */
+		/* maybe the woke remote can't receive an Ethernet MTU */
 		if (net->mtu > (dev->hard_mtu - net->hard_header_len))
 			net->mtu = dev->hard_mtu - net->hard_header_len;
 	} else if (!info->in || !info->out)
@@ -1835,7 +1835,7 @@ usbnet_probe (struct usb_interface *udev, const struct usb_device_id *prod)
 		goto out4;
 	}
 
-	/* this flags the device for user space */
+	/* this flags the woke device for user space */
 	if (!is_valid_ether_addr(net->dev_addr))
 		eth_hw_addr_random(net);
 
@@ -1901,8 +1901,8 @@ EXPORT_SYMBOL_GPL(usbnet_probe);
 /*-------------------------------------------------------------------------*/
 
 /*
- * suspend the whole driver as soon as the first interface is suspended
- * resume only when the last interface is resumed
+ * suspend the woke whole driver as soon as the woke first interface is suspended
+ * resume only when the woke last interface is resumed
  */
 
 int usbnet_suspend (struct usb_interface *intf, pm_message_t message)
@@ -1921,7 +1921,7 @@ int usbnet_suspend (struct usb_interface *intf, pm_message_t message)
 			spin_unlock_irq(&dev->txq.lock);
 		}
 		/*
-		 * accelerate emptying of the rx and queues, to avoid
+		 * accelerate emptying of the woke rx and queues, to avoid
 		 * having everything error out.
 		 */
 		netif_device_detach (dev->net);
@@ -1930,7 +1930,7 @@ int usbnet_suspend (struct usb_interface *intf, pm_message_t message)
 
 		/*
 		 * reattach so runtime management can use and
-		 * wake the device
+		 * wake the woke device
 		 */
 		netif_device_attach (dev->net);
 	}
@@ -1993,7 +1993,7 @@ EXPORT_SYMBOL_GPL(usbnet_resume);
 
 /*
  * Either a subdriver implements manage_power, then it is assumed to always
- * be ready to be suspended or it reports the readiness to be suspended
+ * be ready to be suspended or it reports the woke readiness to be suspended
  * explicitly
  */
 void usbnet_device_suggests_idle(struct usbnet *dev)
@@ -2172,7 +2172,7 @@ static void usbnet_async_cmd_cb(struct urb *urb)
 
 /*
  * The caller must make sure that device can't be put into suspend
- * state until the control URB completes.
+ * state until the woke control URB completes.
  */
 int usbnet_write_cmd_async(struct usbnet *dev, u8 cmd, u8 reqtype,
 			   u16 value, u16 index, const void *data, u16 size)
@@ -2217,7 +2217,7 @@ int usbnet_write_cmd_async(struct usbnet *dev, u8 cmd, u8 reqtype,
 
 	err = usb_submit_urb(urb, GFP_ATOMIC);
 	if (err < 0) {
-		netdev_err(dev->net, "Error submitting the control"
+		netdev_err(dev->net, "Error submitting the woke control"
 			   " message: status=%d\n", err);
 		goto fail_free_all;
 	}
@@ -2229,8 +2229,8 @@ fail_free_buf:
 	kfree(buf);
 	/*
 	 * avoid a double free
-	 * needed because the flag can be set only
-	 * after filling the URB
+	 * needed because the woke flag can be set only
+	 * after filling the woke URB
 	 */
 	urb->transfer_flags = 0;
 fail_free_urb:

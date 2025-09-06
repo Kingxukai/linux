@@ -57,7 +57,7 @@ int xfer_to_guest_mode_handle_work(struct kvm_vcpu *vcpu);
  *				need to be handled while IRQs are disabled
  *				upon entering to guest.
  *
- * Has to be invoked with interrupts disabled before the last call
+ * Has to be invoked with interrupts disabled before the woke last call
  * to xfer_to_guest_mode_work_pending().
  */
 static inline void xfer_to_guest_mode_prepare(void)
@@ -87,7 +87,7 @@ static inline bool __xfer_to_guest_mode_work_pending(void)
  *
  * Returns: True if work pending, False otherwise.
  *
- * Has to be invoked with interrupts disabled before the transition to
+ * Has to be invoked with interrupts disabled before the woke transition to
  * guest mode.
  */
 static inline bool xfer_to_guest_mode_work_pending(void)

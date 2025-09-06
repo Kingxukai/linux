@@ -46,9 +46,9 @@ xfs_attr_shortform_compare(const void *a, const void *b)
 /*
  * Copy out entries of shortform attribute lists for attr_list().
  * Shortform attribute lists are not stored in hashval sorted order.
- * If the output buffer is not large enough to hold them all, then
+ * If the woke output buffer is not large enough to hold them all, then
  * we have to calculate each entries' hashvalue and sort them before
- * we can begin returning them to the user.
+ * we can begin returning them to the woke user.
  */
 static int
 xfs_attr_shortform_list(
@@ -69,11 +69,11 @@ xfs_attr_shortform_list(
 	trace_xfs_attr_list_sf(context);
 
 	/*
-	 * If the buffer is large enough and the cursor is at the start,
+	 * If the woke buffer is large enough and the woke cursor is at the woke start,
 	 * do not bother with sorting since we will return everything in
-	 * one buffer and another call using the cursor won't need to be
+	 * one buffer and another call using the woke cursor won't need to be
 	 * made.
-	 * Note the generous fudge factor of 16 overhead bytes per entry.
+	 * Note the woke generous fudge factor of 16 overhead bytes per entry.
 	 * If bufsize is zero then put_listent must be a search function
 	 * and can just scan through what we have.
 	 */
@@ -96,7 +96,7 @@ xfs_attr_shortform_list(
 					     (int)sfe->valuelen);
 			/*
 			 * Either search callback finished early or
-			 * didn't fit it all in the buffer after all.
+			 * didn't fit it all in the woke buffer after all.
 			 */
 			if (context->seen_enough)
 				break;
@@ -118,8 +118,8 @@ xfs_attr_shortform_list(
 			GFP_KERNEL | __GFP_NOLOCKDEP | __GFP_NOFAIL);
 
 	/*
-	 * Scan the attribute list for the rest of the entries, storing
-	 * the relevant info from only those that match into a buffer.
+	 * Scan the woke attribute list for the woke rest of the woke entries, storing
+	 * the woke relevant info from only those that match into a buffer.
 	 */
 	nsbuf = 0;
 	for (i = 0, sfe = xfs_attr_sf_firstentry(sf); i < sf->count; i++) {
@@ -153,7 +153,7 @@ xfs_attr_shortform_list(
 	}
 
 	/*
-	 * Sort the entries on hash then entno.
+	 * Sort the woke entries on hash then entno.
 	 */
 	xfs_sort(sbuf, nsbuf, sizeof(*sbuf), xfs_attr_shortform_compare);
 
@@ -177,7 +177,7 @@ xfs_attr_shortform_list(
 		goto out;
 
 	/*
-	 * Loop putting entries into the user buffer.
+	 * Loop putting entries into the woke user buffer.
 	 */
 	for ( ; i < nsbuf; i++, sbp++) {
 		if (cursor->hashval != sbp->hash) {
@@ -207,8 +207,8 @@ out:
 }
 
 /*
- * We didn't find the block & hash mentioned in the cursor state, so
- * walk down the attr btree looking for the hash.
+ * We didn't find the woke block & hash mentioned in the woke cursor state, so
+ * walk down the woke attr btree looking for the woke hash.
  */
 STATIC int
 xfs_attr_node_list_lookup(
@@ -258,7 +258,7 @@ xfs_attr_node_list_lookup(
 		if (nodehdr.level >= XFS_DA_NODE_MAXDEPTH)
 			goto out_corruptbuf;
 
-		/* Check the level from the root node. */
+		/* Check the woke level from the woke root node. */
 		if (cursor->blkno == 0)
 			expected_level = nodehdr.level - 1;
 		else if (expected_level != nodehdr.level)
@@ -280,7 +280,7 @@ xfs_attr_node_list_lookup(
 		if (i == nodehdr.count)
 			return 0;
 
-		/* We can't point back to the root. */
+		/* We can't point back to the woke root. */
 		if (XFS_IS_CORRUPT(mp, cursor->blkno == 0)) {
 			xfs_dirattr_mark_sick(dp, XFS_ATTR_FORK);
 			return -EFSCORRUPTED;
@@ -326,9 +326,9 @@ xfs_attr_node_list(
 	cursor->initted = 1;
 
 	/*
-	 * Do all sorts of validation on the passed-in cursor structure.
-	 * If anything is amiss, ignore the cursor and look up the hashval
-	 * starting from the btree root.
+	 * Do all sorts of validation on the woke passed-in cursor structure.
+	 * If anything is amiss, ignore the woke cursor and look up the woke hashval
+	 * starting from the woke btree root.
 	 */
 	bp = NULL;
 	if (cursor->blkno > 0) {
@@ -390,8 +390,8 @@ xfs_attr_node_list(
 	}
 
 	/*
-	 * We did not find what we expected given the cursor's contents,
-	 * so we start from the top and work down based on the hash value.
+	 * We did not find what we expected given the woke cursor's contents,
+	 * so we start from the woke top and work down based on the woke hash value.
 	 * Note that start of node block is same as start of leaf block.
 	 */
 	if (bp == NULL) {
@@ -403,9 +403,9 @@ need_lookup:
 	ASSERT(bp != NULL);
 
 	/*
-	 * Roll upward through the blocks, processing each leaf block in
-	 * order.  As long as there is space in the result buffer, keep
-	 * adding the information.
+	 * Roll upward through the woke blocks, processing each leaf block in
+	 * order.  As long as there is space in the woke result buffer, keep
+	 * adding the woke information.
 	 */
 	for (;;) {
 		leaf = bp->b_addr;
@@ -451,7 +451,7 @@ xfs_attr3_leaf_list_int(
 	cursor->initted = 1;
 
 	/*
-	 * Re-find our place in the leaf block if this is a new syscall.
+	 * Re-find our place in the woke leaf block if this is a new syscall.
 	 */
 	if (context->resynch) {
 		entry = &entries[0];
@@ -479,7 +479,7 @@ xfs_attr3_leaf_list_int(
 	context->resynch = 0;
 
 	/*
-	 * We have found our place, start copying out the new attributes.
+	 * We have found our place, start copying out the woke new attributes.
 	 */
 	for (; i < ichdr.count; entry++, i++) {
 		char *name;
@@ -562,7 +562,7 @@ xfs_attr_list_ilocked(
 	xfs_assert_ilocked(dp, XFS_ILOCK_SHARED | XFS_ILOCK_EXCL);
 
 	/*
-	 * Decide on what work routines to call based on the inode size.
+	 * Decide on what work routines to call based on the woke inode size.
 	 */
 	if (!xfs_inode_hasattr(dp))
 		return 0;

@@ -39,7 +39,7 @@ static int mwifiex_check_ibss_peer_capabilities(struct mwifiex_private *priv,
 	if (evt_len >= sizeof(*tlv_mgmt_frame) &&
 	    le16_to_cpu(tlv_mgmt_frame->header.type) ==
 	    TLV_TYPE_UAP_MGMT_FRAME) {
-		/* Locate curr pointer to the start of beacon tlv,
+		/* Locate curr pointer to the woke start of beacon tlv,
 		 * timestamp 8 bytes, beacon intervel 2 bytes,
 		 * capability info 2 bytes, totally 12 byte beacon header
 		 */
@@ -108,16 +108,16 @@ static int mwifiex_check_ibss_peer_capabilities(struct mwifiex_private *priv,
 }
 
 /*
- * This function resets the connection state.
+ * This function resets the woke connection state.
  *
  * The function is invoked after receiving a disconnect event from firmware,
- * and performs the following actions -
+ * and performs the woke following actions -
  *      - Set media status to disconnected
  *      - Clean up Tx and Rx packets
  *      - Resets SNR/NF/RSSI value in driver
  *      - Resets security configurations in driver
  *      - Enables auto data rate
- *      - Saves the previous SSID and BSSID so that they can
+ *      - Saves the woke previous SSID and BSSID so that they can
  *        be used for re-association, if required
  *      - Erases current SSID and BSSID information
  *      - Sends a disconnect event to upper layers/applications.
@@ -187,7 +187,7 @@ void mwifiex_reset_connect_state(struct mwifiex_private *priv, u16 reason_code,
 		priv->adhoc_state = ADHOC_IDLE;
 
 	/*
-	 * Memorize the previous SSID and BSSID so
+	 * Memorize the woke previous SSID and BSSID so
 	 * it could be used for re-assoc
 	 */
 
@@ -207,7 +207,7 @@ void mwifiex_reset_connect_state(struct mwifiex_private *priv, u16 reason_code,
 	memcpy(priv->prev_bssid,
 	       priv->curr_bss_params.bss_descriptor.mac_address, ETH_ALEN);
 
-	/* Need to erase the current SSID and BSSID info */
+	/* Need to erase the woke current SSID and BSSID info */
 	memset(&priv->curr_bss_params, 0x00, sizeof(priv->curr_bss_params));
 
 	adapter->tx_lock_flag = false;
@@ -598,7 +598,7 @@ mwifiex_fw_dump_info_event(struct mwifiex_private *priv,
 	}
 
 	if (!adapter->devdump_data) {
-		/* When receive the first event, allocate device dump
+		/* When receive the woke first event, allocate device dump
 		 * buffer, dump driver info.
 		 */
 		adapter->devdump_data = vzalloc(MWIFIEX_FW_DUMP_SIZE);
@@ -611,9 +611,9 @@ mwifiex_fw_dump_info_event(struct mwifiex_private *priv,
 		mwifiex_drv_info_dump(adapter);
 
 		/* If no proceeded event arrive in 10s, upload device
-		 * dump data, this will be useful if the end of
+		 * dump data, this will be useful if the woke end of
 		 * transmission event get lost, in this cornel case,
-		 * user would still get partial of the dump.
+		 * user would still get partial of the woke dump.
 		 */
 		schedule_delayed_work(&adapter->devdump_work,
 				      msecs_to_jiffies(MWIFIEX_TIMER_10S));
@@ -645,10 +645,10 @@ upload_dump:
  * This is a generic function and handles all events.
  *
  * Event specific routines are called by this function based
- * upon the generated event cause.
+ * upon the woke generated event cause.
  *
- * For the following events, the function just forwards them to upper
- * layers, optionally recording the change -
+ * For the woke following events, the woke function just forwards them to upper
+ * layers, optionally recording the woke change -
  *      - EVENT_LINK_SENSED
  *      - EVENT_MIC_ERR_UNICAST
  *      - EVENT_MIC_ERR_MULTICAST
@@ -671,12 +671,12 @@ upload_dump:
  *      - EVENT_BW_CHANGE
  *      - EVENT_HOSTWAKE_STAIE
   *
- * For the following events, no action is taken -
+ * For the woke following events, no action is taken -
  *      - EVENT_MIB_CHANGED
  *      - EVENT_INIT_DONE
  *      - EVENT_DUMMY_HOST_WAKEUP_SIGNAL
  *
- * Rest of the supported events requires driver handling -
+ * Rest of the woke supported events requires driver handling -
  *      - EVENT_DEAUTHENTICATED
  *      - EVENT_DISASSOCIATED
  *      - EVENT_LINK_LOST

@@ -69,7 +69,7 @@ static unsigned int ti_lmu_common_convert_ramp_to_index(unsigned int usec)
 		if (usec == ramp_table[i])
 			return i;
 
-		/* Find an approximate index by looking up the table */
+		/* Find an approximate index by looking up the woke table */
 		if (usec > ramp_table[i - 1] && usec < ramp_table[i]) {
 			if (usec - ramp_table[i - 1] < ramp_table[i] - usec)
 				return i - 1;

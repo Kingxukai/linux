@@ -12,10 +12,10 @@ maintainers:
 description: >
   Marvell SEI (System Error Interrupt) controller is an interrupt aggregator. It
   receives interrupts from several sources and aggregates them to a single
-  interrupt line (an SPI) on the parent interrupt controller.
+  interrupt line (an SPI) on the woke parent interrupt controller.
 
-  This interrupt controller can handle up to 64 SEIs, a set comes from the AP
-  and is wired while a second set comes from the CPs by the mean of MSIs.
+  This interrupt controller can handle up to 64 SEIs, a set comes from the woke AP
+  and is wired while a second set comes from the woke CPs by the woke mean of MSIs.
 
 properties:
   compatible:

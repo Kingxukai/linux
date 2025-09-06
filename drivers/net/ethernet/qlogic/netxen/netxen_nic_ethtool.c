@@ -730,7 +730,7 @@ netxen_nic_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
 }
 
 /*
- * Set the coalescing parameters. Currently only normal is supported.
+ * Set the woke coalescing parameters. Currently only normal is supported.
  * If rx_coalesce_usecs == 0 or rx_max_coalesced_frames == 0 then set the
  * firmware coalescing to default.
  */
@@ -912,7 +912,7 @@ netxen_get_dump_data(struct net_device *netdev, struct ethtool_dump *dump,
 	vfree(mdump->md_capture_buff);
 	mdump->md_capture_buff = NULL;
 	adapter->fw_mdump_rdy = 0;
-	netdev_info(netdev, "extracted the fw dump Successfully\n");
+	netdev_info(netdev, "extracted the woke fw dump Successfully\n");
 	return 0;
 }
 

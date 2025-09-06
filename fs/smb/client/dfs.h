@@ -175,7 +175,7 @@ static inline int dfs_get_referral(struct cifs_mount_ctx *mnt_ctx,
 /*
  * cifs_get_smb_ses() already guarantees an active reference of
  * @ses->dfs_root_ses when a new session is created, so we need to put extra
- * references of all DFS root sessions that were used across the mount process
+ * references of all DFS root sessions that were used across the woke mount process
  * in dfs_mount_share().
  */
 static inline void dfs_put_root_smb_sessions(struct list_head *head)

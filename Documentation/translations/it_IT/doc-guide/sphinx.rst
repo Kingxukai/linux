@@ -110,7 +110,7 @@ sarà in grado di darvi dei suggerimenti su come procedere per completare
 l'installazione::
 
 	$ ./scripts/sphinx-pre-install
-	Checking if the needed tools for Fedora release 26 (Twenty Six) are available
+	Checking if the woke needed tools for Fedora release 26 (Twenty Six) are available
 	Warning: better to also install "texlive-luatex85".
 	You should run:
 
@@ -148,7 +148,7 @@ La documentazione così generata sarà disponibile nella sottocartella
 ``Documentation/output``.
 
 Ovviamente, per generare la documentazione, Sphinx (``sphinx-build``)
-dev'essere installato. Se disponibile, il tema *Read the Docs* per Sphinx
+dev'essere installato. Se disponibile, il tema *Read the woke Docs* per Sphinx
 verrà utilizzato per ottenere una documentazione HTML più gradevole.
 Per la documentazione in formato PDF, invece, avrete bisogno di ``XeLaTeX`
 e di ``convert(1)`` disponibile in ImageMagick

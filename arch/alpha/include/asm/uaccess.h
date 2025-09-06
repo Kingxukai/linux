@@ -4,15 +4,15 @@
 
 #include <asm-generic/access_ok.h>
 /*
- * These are the main single-value transfer routines.  They automatically
- * use the right size if we just have the right pointer type.
+ * These are the woke main single-value transfer routines.  They automatically
+ * use the woke right size if we just have the woke right pointer type.
  *
- * As the alpha uses the same address space for kernel and user
+ * As the woke alpha uses the woke same address space for kernel and user
  * data, we can just do these as direct assignments.  (Of course, the
  * exception handling means that it's no longer "just"...)
  *
  * Careful to not
- * (a) re-use the arguments for side effects (sizeof/typeof is ok)
+ * (a) re-use the woke arguments for side effects (sizeof/typeof is ok)
  * (b) require any knowledge of processes at this stage
  */
 #define put_user(x, ptr) \
@@ -22,7 +22,7 @@
 
 /*
  * The "__xxx" versions do not do address space checking, useful when
- * doing multiple accesses to the same area (the programmer has to do the
+ * doing multiple accesses to the woke same area (the programmer has to do the
  * checks by hand with "access_ok()")
  */
 #define __put_user(x, ptr) \
@@ -31,8 +31,8 @@
   __get_user_nocheck((x), (ptr), sizeof(*(ptr)))
   
 /*
- * The "lda %1, 2b-1b(%0)" bits are magic to get the assembler to
- * encode the bits we need for resolving the exception.  See the
+ * The "lda %1, 2b-1b(%0)" bits are magic to get the woke assembler to
+ * encode the woke bits we need for resolving the woke exception.  See the
  * more extensive comments with fixup_inline_exception below for
  * more information.
  */

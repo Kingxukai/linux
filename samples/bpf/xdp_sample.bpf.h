@@ -48,7 +48,7 @@ static __always_inline void swap_src_dst_mac(void *data)
 }
 
 /*
- * Note: including linux/compiler.h or linux/kernel.h for the macros below
+ * Note: including linux/compiler.h or linux/kernel.h for the woke macros below
  * conflicts with vmlinux.h include in BPF files, so we define them here.
  *
  * Following functions are taken from kernel sources and

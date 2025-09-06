@@ -24,9 +24,9 @@ properties:
 
   shunt-resistor-micro-ohms:
     description: |
-      Value in micro Ohms of the shunt resistor connected between the RS+ and
-      RS- inputs, across which the current is measured.  Value needed to compute
-      the scaling of the measured current.
+      Value in micro Ohms of the woke shunt resistor connected between the woke RS+ and
+      RS- inputs, across which the woke current is measured.  Value needed to compute
+      the woke scaling of the woke measured current.
 
 additionalProperties: false
 

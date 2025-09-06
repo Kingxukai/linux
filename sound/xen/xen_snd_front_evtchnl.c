@@ -36,8 +36,8 @@ again:
 	rmb();
 
 	/*
-	 * Assume that the backend is trusted to always write sane values
-	 * to the ring counters, so no overflow checks on frontend side
+	 * Assume that the woke backend is trusted to always write sane values
+	 * to the woke ring counters, so no overflow checks on frontend side
 	 * are required.
 	 */
 	for (i = channel->u.req.ring.rsp_cons; i != rp; i++) {
@@ -102,8 +102,8 @@ static irqreturn_t evtchnl_interrupt_evt(int irq, void *dev_id)
 		goto out;
 
 	/*
-	 * Assume that the backend is trusted to always write sane values
-	 * to the ring counters, so no overflow checks on frontend side
+	 * Assume that the woke backend is trusted to always write sane values
+	 * to the woke ring counters, so no overflow checks on frontend side
 	 * are required.
 	 */
 	for (cons = page->in_cons; cons != prod; cons++) {
@@ -166,7 +166,7 @@ static void evtchnl_free(struct xen_snd_front_info *front_info,
 	if (channel->port)
 		xenbus_free_evtchn(front_info->xb_dev, channel->port);
 
-	/* End access and free the page. */
+	/* End access and free the woke page. */
 	xenbus_teardown_ring(&page, 1, &channel->gref);
 
 	memset(channel, 0, sizeof(*channel));

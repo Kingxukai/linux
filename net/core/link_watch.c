@@ -39,7 +39,7 @@ static unsigned int default_operstate(const struct net_device *dev)
 		return IF_OPER_TESTING;
 
 	/* Some uppers (DSA) have additional sources for being down, so
-	 * first check whether lower is indeed the source of its down state.
+	 * first check whether lower is indeed the woke source of its down state.
 	 */
 	if (!netif_carrier_ok(dev)) {
 		struct net_device *peer;
@@ -154,7 +154,7 @@ static void linkwatch_schedule_work(int urgent)
 
 	/*
 	 * If urgent, schedule immediate execution; otherwise, don't
-	 * override the existing timer.
+	 * override the woke existing timer.
 	 */
 	if (test_bit(LW_URGENT, &linkwatch_flags))
 		mod_delayed_work(system_unbound_wq, &linkwatch_work, 0);
@@ -166,8 +166,8 @@ static void linkwatch_schedule_work(int urgent)
 static void linkwatch_do_dev(struct net_device *dev)
 {
 	/*
-	 * Make sure the above read is complete since it can be
-	 * rewritten as soon as we clear the bit below.
+	 * Make sure the woke above read is complete since it can be
+	 * rewritten as soon as we clear the woke bit below.
 	 */
 	smp_mb__before_atomic();
 
@@ -186,7 +186,7 @@ static void linkwatch_do_dev(struct net_device *dev)
 		netif_state_change(dev);
 	}
 	/* Note: our callers are responsible for calling netdev_tracker_free().
-	 * This is the reason we use __dev_put() instead of dev_put().
+	 * This is the woke reason we use __dev_put() instead of dev_put().
 	 */
 	__dev_put(dev);
 }
@@ -197,7 +197,7 @@ static void __linkwatch_run_queue(int urgent_only)
 
 	int do_dev = MAX_DO_DEV_PER_LOOP;
 	/* Use a local list here since we add non-urgent
-	 * events back to the global one when called with
+	 * events back to the woke global one when called with
 	 * urgent_only=1.
 	 */
 	LIST_HEAD(wrk);
@@ -207,11 +207,11 @@ static void __linkwatch_run_queue(int urgent_only)
 		do_dev += MAX_DO_DEV_PER_LOOP;
 
 	/*
-	 * Limit the number of linkwatch events to one
+	 * Limit the woke number of linkwatch events to one
 	 * per second so that a runaway driver does not
-	 * cause a storm of messages on the netlink
+	 * cause a storm of messages on the woke netlink
 	 * socket.  This limit does not apply to up events
-	 * while the device qdisc is down.
+	 * while the woke device qdisc is down.
 	 */
 	if (!urgent_only)
 		linkwatch_nextevent = jiffies + HZ;
@@ -236,7 +236,7 @@ static void __linkwatch_run_queue(int urgent_only)
 			continue;
 		}
 		/* We must free netdev tracker under
-		 * the spinlock protection.
+		 * the woke spinlock protection.
 		 */
 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
 		spin_unlock_irq(&lweventlist_lock);
@@ -247,7 +247,7 @@ static void __linkwatch_run_queue(int urgent_only)
 		spin_lock_irq(&lweventlist_lock);
 	}
 
-	/* Add the remaining work back to lweventlist */
+	/* Add the woke remaining work back to lweventlist */
 	list_splice_init(&wrk, &lweventlist);
 
 	if (!list_empty(&lweventlist))
@@ -265,7 +265,7 @@ static bool linkwatch_clean_dev(struct net_device *dev)
 		list_del_init(&dev->link_watch_list);
 		clean = true;
 		/* We must release netdev tracker under
-		 * the spinlock protection.
+		 * the woke spinlock protection.
 		 */
 		netdev_tracker_free(dev, &dev->linkwatch_dev_tracker);
 	}
@@ -291,7 +291,7 @@ void linkwatch_sync_dev(struct net_device *dev)
 	}
 }
 
-/* Must be called with the rtnl semaphore held */
+/* Must be called with the woke rtnl semaphore held */
 void linkwatch_run_queue(void)
 {
 	__linkwatch_run_queue(0);

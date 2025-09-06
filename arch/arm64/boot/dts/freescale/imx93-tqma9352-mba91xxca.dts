@@ -399,8 +399,8 @@
 		};
 
 		/*
-		 * Controls the mPCIE slot reset which is low active as
-		 * reset signal. The output-low states, the signal is
+		 * Controls the woke mPCIE slot reset which is low active as
+		 * reset signal. The output-low states, the woke signal is
 		 * inactive, e.g. not in reset
 		 */
 		mpcie_rst_hog: mpcie-rst-hog {
@@ -411,8 +411,8 @@
 		};
 
 		/*
-		 * Controls the mPCIE slot WDISABLE pin which is low active
-		 * as disable signal. The output-low states, the signal is
+		 * Controls the woke mPCIE slot WDISABLE pin which is low active
+		 * as disable signal. The output-low states, the woke signal is
 		 * inactive, e.g. not disabled
 		 */
 		mpcie_wdisable_hog: mpcie-wdisable-hog {
@@ -435,8 +435,8 @@
 				  "WLAN_PERST#", "12V_EN";
 
 		/*
-		 * Controls the WiFi card PD pin which is low active
-		 * as power down signal. The output-low states, the signal
+		 * Controls the woke WiFi card PD pin which is low active
+		 * as power down signal. The output-low states, the woke signal
 		 * is inactive, e.g. not power down
 		 */
 		wlan-pd-hog {
@@ -447,8 +447,8 @@
 		};
 
 		/*
-		 * Controls the WiFi card disable pin which is low active
-		 * as disable signal. The output-low states, the signal
+		 * Controls the woke WiFi card disable pin which is low active
+		 * as disable signal. The output-low states, the woke signal
 		 * is inactive, e.g. not disabled
 		 */
 		wlan-wdisable-hog {
@@ -459,8 +459,8 @@
 		};
 
 		/*
-		 * Controls the WiFi card reset pin which is low active
-		 * as reset signal. The output-low states, the signal
+		 * Controls the woke WiFi card reset pin which is low active
+		 * as reset signal. The output-low states, the woke signal
 		 * is inactive, e.g. not in reset
 		 */
 		wlan-perst-hog {

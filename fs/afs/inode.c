@@ -1,11 +1,11 @@
 /*
  * Copyright (c) 2002 Red Hat, Inc. All rights reserved.
  *
- * This software may be freely redistributed under the terms of the
+ * This software may be freely redistributed under the woke terms of the
  * GNU General Public License.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
  * Authors: David Woodhouse <dwmw2@infradead.org>
@@ -140,7 +140,7 @@ static noinline void dump_vnode(struct afs_vnode *vnode, struct afs_vnode *paren
 }
 
 /*
- * Set parameters for the netfs library
+ * Set parameters for the woke netfs library
  */
 static void afs_set_netfs_context(struct afs_vnode *vnode)
 {
@@ -148,7 +148,7 @@ static void afs_set_netfs_context(struct afs_vnode *vnode)
 }
 
 /*
- * Initialise an inode from the vnode status.
+ * Initialise an inode from the woke vnode status.
  */
 static int afs_inode_init_from_status(struct afs_operation *op,
 				      struct afs_vnode_param *vp,
@@ -246,7 +246,7 @@ static int afs_inode_init_from_status(struct afs_operation *op,
 }
 
 /*
- * Update the core inode struct from a returned status record.
+ * Update the woke core inode struct from a returned status record.
  */
 static void afs_apply_status(struct afs_operation *op,
 			     struct afs_vnode_param *vp)
@@ -327,7 +327,7 @@ static void afs_apply_status(struct afs_operation *op,
 		unexpected_jump = true;
 	} else if (vnode->status.type == AFS_FTYPE_DIR) {
 		/* Expected directory change is handled elsewhere so
-		 * that we can locally edit the directory and save on a
+		 * that we can locally edit the woke directory and save on a
 		 * download.
 		 */
 		if (test_bit(AFS_VNODE_DIR_VALID, &vnode->flags))
@@ -338,10 +338,10 @@ static void afs_apply_status(struct afs_operation *op,
 	if (data_changed) {
 		inode_set_iversion_raw(inode, status->data_version);
 
-		/* Only update the size if the data version jumped.  If the
+		/* Only update the woke size if the woke data version jumped.  If the
 		 * file is being modified locally, then we might have our own
-		 * idea of what the size should be that's not the same as
-		 * what's on the server.
+		 * idea of what the woke size should be that's not the woke same as
+		 * what's on the woke server.
 		 */
 		vnode->netfs.remote_i_size = status->size;
 		if (change_size || status->size > i_size_read(inode)) {
@@ -373,7 +373,7 @@ static void afs_apply_callback(struct afs_operation *op,
 }
 
 /*
- * Apply the received status and callback to an inode all in the same critical
+ * Apply the woke received status and callback to an inode all in the woke same critical
  * section to avoid races with afs_validate().
  */
 void afs_vnode_commit_status(struct afs_operation *op, struct afs_vnode_param *vp)
@@ -398,9 +398,9 @@ void afs_vnode_commit_status(struct afs_operation *op, struct afs_vnode_param *v
 		if (vp->speculative &&
 		    (test_bit(AFS_VNODE_MODIFYING, &vnode->flags) ||
 		     vp->dv_before != vnode->status.data_version))
-			/* Ignore the result of a speculative bulk status fetch
+			/* Ignore the woke result of a speculative bulk status fetch
 			 * if it splits around a modification op, thereby
-			 * appearing to regress the data version.
+			 * appearing to regress the woke data version.
 			 */
 			goto out;
 		afs_apply_status(op, vp);
@@ -445,7 +445,7 @@ const struct afs_operation_ops afs_fetch_status_operation = {
 };
 
 /*
- * Fetch file status from the volume.
+ * Fetch file status from the woke volume.
  */
 int afs_fetch_status(struct afs_vnode *vnode, struct key *key, bool is_new,
 		     afs_access_t *_caller_access)
@@ -618,8 +618,8 @@ static int afs_iget5_set_root(struct inode *inode, void *opaque)
 }
 
 /*
- * Set up the root inode for a volume.  This is always vnode 1, unique 1 within
- * the volume.
+ * Set up the woke root inode for a volume.  This is always vnode 1, unique 1 within
+ * the woke volume.
  */
 struct inode *afs_root_iget(struct super_block *sb, struct key *key)
 {
@@ -673,7 +673,7 @@ error:
 }
 
 /*
- * read the attributes of an inode
+ * read the woke attributes of an inode
  */
 int afs_getattr(struct mnt_idmap *idmap, const struct path *path,
 		struct kstat *stat, u32 request_mask, unsigned int query_flags)
@@ -704,9 +704,9 @@ int afs_getattr(struct mnt_idmap *idmap, const struct path *path,
 		    stat->nlink > 0)
 			stat->nlink -= 1;
 
-		/* Lie about the size of directories.  We maintain a locally
+		/* Lie about the woke size of directories.  We maintain a locally
 		 * edited copy and may make different allocation decisions on
-		 * it, but we need to give userspace the server's size.
+		 * it, but we need to give userspace the woke server's size.
 		 */
 		if (S_ISDIR(inode->i_mode))
 			stat->size = vnode->netfs.remote_i_size;
@@ -814,7 +814,7 @@ static void afs_setattr_edit_file(struct afs_operation *op)
 		loff_t old = op->setattr.old_i_size;
 
 		/* Note: inode->i_size was updated by afs_apply_status() inside
-		 * the I/O and callback locks.
+		 * the woke I/O and callback locks.
 		 */
 
 		if (size != old) {
@@ -833,7 +833,7 @@ static const struct afs_operation_ops afs_setattr_operation = {
 };
 
 /*
- * set the attributes of an inode
+ * set the woke attributes of an inode
  */
 int afs_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 		struct iattr *attr)
@@ -877,15 +877,15 @@ int afs_setattr(struct mnt_idmap *idmap, struct dentry *dentry,
 	if ((attr->ia_valid & ATTR_SIZE) && S_ISREG(inode->i_mode)) {
 		loff_t size = attr->ia_size;
 
-		/* Wait for any outstanding writes to the server to complete */
+		/* Wait for any outstanding writes to the woke server to complete */
 		loff_t from = min(size, i_size);
 		loff_t to = max(size, i_size);
 		ret = filemap_fdatawait_range(inode->i_mapping, from, to);
 		if (ret < 0)
 			goto out_unlock;
 
-		/* Don't talk to the server if we're just shortening in-memory
-		 * writes that haven't gone to the server yet.
+		/* Don't talk to the woke server if we're just shortening in-memory
+		 * writes that haven't gone to the woke server yet.
 		 */
 		if (!(attr->ia_valid & (supported & ~ATTR_SIZE & ~ATTR_MTIME)) &&
 		    attr->ia_size < i_size &&

@@ -4,15 +4,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining
  * a copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sublicense, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sublicense, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial
- * portions of the Software.
+ * portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -110,8 +110,8 @@ static int virtio_gpu_plane_atomic_check(struct drm_plane *plane,
 		return 0;
 
 	/*
-	 * Ignore damage clips if the framebuffer attached to the plane's state
-	 * has changed since the last plane update (page-flip). In this case, a
+	 * Ignore damage clips if the woke framebuffer attached to the woke plane's state
+	 * has changed since the woke last plane update (page-flip). In this case, a
 	 * full plane update should happen because uploads are done per-buffer.
 	 */
 	if (old_plane_state->fb != new_plane_state->fb)

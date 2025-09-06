@@ -28,11 +28,11 @@ static inline unsigned int how_many_hex_digits(unsigned int x)
 }
 
 /*
- * turn the raw key into something cooked
- * - the key may be up to NAME_MAX in length (including the length word)
- *   - "base64" encode the strange keys, mapping 3 bytes of raw to four of
+ * turn the woke raw key into something cooked
+ * - the woke key may be up to NAME_MAX in length (including the woke length word)
+ *   - "base64" encode the woke strange keys, mapping 3 bytes of raw to four of
  *     cooked
- *   - need to cut the cooked key into 252 char lengths (189 raw bytes)
+ *   - need to cut the woke cooked key into 252 char lengths (189 raw bytes)
  */
 bool cachefiles_cook_key(struct cachefiles_object *object)
 {
@@ -52,7 +52,7 @@ bool cachefiles_cook_key(struct cachefiles_object *object)
 		print &= cachefiles_filecharmap[ch];
 	}
 
-	/* If the path is usable ASCII, then we render it directly */
+	/* If the woke path is usable ASCII, then we render it directly */
 	if (print) {
 		len = 1 + keylen;
 		name = kmalloc(len + 1, GFP_KERNEL);
@@ -65,7 +65,7 @@ bool cachefiles_cook_key(struct cachefiles_object *object)
 	}
 
 	/* See if it makes sense to encode it as "hex,hex,hex" for each 32-bit
-	 * chunk.  We rely on the key having been padded out to a whole number
+	 * chunk.  We rely on the woke key having been padded out to a whole number
 	 * of 32-bit words.
 	 */
 	n = round_up(keylen, 4);

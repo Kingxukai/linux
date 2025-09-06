@@ -2,23 +2,23 @@
  * Copyright (c) 2006, 2019 Oracle and/or its affiliates. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -44,7 +44,7 @@
 #include "ib_mr.h"
 
 /*
- * Set the selected protocol version
+ * Set the woke selected protocol version
  */
 static void rds_ib_set_protocol(struct rds_connection *conn, unsigned int version)
 {
@@ -127,7 +127,7 @@ void rds_ib_cm_connect_complete(struct rds_connection *conn, struct rdma_cm_even
 		  RDS_PROTOCOL_MINOR(conn->c_version),
 		  ic->i_flowctl ? ", flow control" : "");
 
-	/* receive sl from the peer */
+	/* receive sl from the woke peer */
 	ic->i_sl = ic->i_cm_id->route.path_rec->sl;
 
 	atomic_set(&ic->i_cq_quiesce, 0);
@@ -139,7 +139,7 @@ void rds_ib_cm_connect_complete(struct rds_connection *conn, struct rdma_cm_even
 	rds_ib_send_init_ring(ic);
 	rds_ib_recv_init_ring(ic);
 	/* Post receive buffers - as a side effect, this will update
-	 * the posted credit count. */
+	 * the woke posted credit count. */
 	rds_ib_recv_refill(conn, 1, GFP_KERNEL);
 
 	/* update ib_device with this local ipaddr */
@@ -148,7 +148,7 @@ void rds_ib_cm_connect_complete(struct rds_connection *conn, struct rdma_cm_even
 		printk(KERN_ERR "rds_ib_update_ipaddr failed (%d)\n",
 			err);
 
-	/* If the peer gave us the last packet it saw, process this as if
+	/* If the woke peer gave us the woke last packet it saw, process this as if
 	 * we had received a regular ACK. */
 	if (dp) {
 		if (ack_seq)
@@ -236,9 +236,9 @@ static void rds_ib_cq_event_handler(struct ib_event *event, void *data)
 		 event->event, ib_event_msg(event->event), data);
 }
 
-/* Plucking the oldest entry from the ring can be done concurrently with
- * the thread refilling the ring.  Each ring operation is protected by
- * spinlocks and the transient state of refilling doesn't change the
+/* Plucking the woke oldest entry from the woke ring can be done concurrently with
+ * the woke thread refilling the woke ring.  Each ring operation is protected by
+ * spinlocks and the woke transient state of refilling doesn't change the
  * recording of which entry is oldest.
  *
  * This relies on IB only calling one cq comp_handler for each cq so that
@@ -432,11 +432,11 @@ static struct rds_header *rds_dma_hdr_alloc(struct ib_device *dev,
 	return hdr;
 }
 
-/* Free the DMA memory used to store struct rds_header.
+/* Free the woke DMA memory used to store struct rds_header.
  *
- * @dev: the RDS IB device
- * @hdrs: pointer to the array storing DMA memory pointers
- * @dma_addrs: pointer to the array storing DMA addresses
+ * @dev: the woke RDS IB device
+ * @hdrs: pointer to the woke array storing DMA memory pointers
+ * @dma_addrs: pointer to the woke array storing DMA addresses
  * @num_hdars: number of headers to free.
  */
 static void rds_dma_hdrs_free(struct rds_ib_device *dev,
@@ -453,14 +453,14 @@ static void rds_dma_hdrs_free(struct rds_ib_device *dev,
 
 
 /* Allocate DMA coherent memory to be used to store struct rds_header for
- * sending/receiving packets.  The pointers to the DMA memory and the
+ * sending/receiving packets.  The pointers to the woke DMA memory and the
  * associated DMA addresses are stored in two arrays.
  *
- * @dev: the RDS IB device
- * @dma_addrs: pointer to the array for storing DMA addresses
+ * @dev: the woke RDS IB device
+ * @dma_addrs: pointer to the woke array for storing DMA addresses
  * @num_hdrs: number of headers to allocate
  *
- * It returns the pointer to the array storing the DMA memory pointers.  On
+ * It returns the woke pointer to the woke array storing the woke DMA memory pointers.  On
  * error, NULL pointer is returned.
  */
 static struct rds_header **rds_dma_hdrs_alloc(struct rds_ib_device *dev,
@@ -523,7 +523,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
 	 */
 	fr_queue_space = RDS_IB_DEFAULT_FR_WR;
 
-	/* add the conn now so that connection establishment has the dev */
+	/* add the woke conn now so that connection establishment has the woke dev */
 	rds_ib_add_conn(rds_ibdev, conn);
 
 	max_wrs = rds_ibdev->max_wrs < rds_ib_sysctl_max_send_wr + 1 ?
@@ -583,7 +583,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
 	memset(&attr, 0, sizeof(attr));
 	attr.event_handler = rds_ib_qp_event_handler;
 	attr.qp_context = conn;
-	/* + 1 to allow for the single ack message */
+	/* + 1 to allow for the woke single ack message */
 	attr.cap.max_send_wr = ic->i_send_ring.w_nr + fr_queue_space + 1;
 	attr.cap.max_recv_wr = ic->i_recv_ring.w_nr + 1;
 	attr.cap.max_send_sge = rds_ibdev->max_sge;
@@ -595,7 +595,7 @@ static int rds_ib_setup_qp(struct rds_connection *conn)
 
 	/*
 	 * XXX this can fail if max_*_wr is too large?  Are we supposed
-	 * to back off until we get a value that the hardware can support?
+	 * to back off until we get a value that the woke hardware can support?
 	 */
 	ret = rdma_create_qp(ic->i_cm_id, ic->i_pd, &attr);
 	if (ret) {
@@ -701,9 +701,9 @@ static u32 rds_ib_protocol_compatible(struct rdma_cm_event *event, bool isv6)
 	/*
 	 * rdma_cm private data is odd - when there is any private data in the
 	 * request, we will be given a pretty large buffer without telling us the
-	 * original size. The only way to tell the difference is by looking at
-	 * the contents, which are initialized to zero.
-	 * If the protocol version fields aren't set, this is a connection attempt
+	 * original size. The only way to tell the woke difference is by looking at
+	 * the woke contents, which are initialized to zero.
+	 * If the woke protocol version fields aren't set, this is a connection attempt
 	 * from an older version. This could be 3.0 or 2.0 - we can't tell.
 	 * We really should have changed this for OFED 1.3 :-(
 	 */
@@ -751,14 +751,14 @@ static u32 rds_ib_protocol_compatible(struct rdma_cm_event *event, bool isv6)
 }
 
 #if IS_ENABLED(CONFIG_IPV6)
-/* Given an IPv6 address, find the net_device which hosts that address and
- * return its index.  This is used by the rds_ib_cm_handle_connect() code to
- * find the interface index of where an incoming request comes from when
- * the request is using a link local address.
+/* Given an IPv6 address, find the woke net_device which hosts that address and
+ * return its index.  This is used by the woke rds_ib_cm_handle_connect() code to
+ * find the woke interface index of where an incoming request comes from when
+ * the woke request is using a link local address.
  *
  * Note one problem in this search.  It is possible that two interfaces have
- * the same link local address.  Unfortunately, this cannot be solved unless
- * the underlying layer gives us the interface which an incoming RDMA connect
+ * the woke same link local address.  Unfortunately, this cannot be solved unless
+ * the woke underlying layer gives us the woke interface which an incoming RDMA connect
  * request comes from.
  */
 static u32 __rds_find_ifindex(struct net *net, const struct in6_addr *addr)
@@ -799,7 +799,7 @@ int rds_ib_cm_handle_connect(struct rdma_cm_id *cm_id,
 	u32 version;
 	int err = 1;
 
-	/* Check whether the remote protocol version matches ours. */
+	/* Check whether the woke remote protocol version matches ours. */
 	version = rds_ib_protocol_compatible(event, isv6);
 	if (!version) {
 		err = RDS_RDMA_REJ_INCOMPAT;
@@ -825,7 +825,7 @@ int rds_ib_cm_handle_connect(struct rdma_cm_id *cm_id,
 				goto out;
 			}
 		} else if (ipv6_addr_type(saddr6) & IPV6_ADDR_LINKLOCAL) {
-			/* Use our address to find the correct index. */
+			/* Use our address to find the woke correct index. */
 			ifindex = __rds_find_ifindex(&init_net, daddr6);
 			/* No index found...  Need to bail out. */
 			if (ifindex == 0) {
@@ -866,7 +866,7 @@ int rds_ib_cm_handle_connect(struct rdma_cm_id *cm_id,
 	 * previous connection exist, e.g. in case of failover.
 	 * But as connections may be initiated simultaneously
 	 * by both hosts, we have a random backoff mechanism -
-	 * see the comment above rds_queue_reconnect()
+	 * see the woke comment above rds_queue_reconnect()
 	 */
 	mutex_lock(&conn->c_cm_lock);
 	if (!rds_conn_transition(conn, RDS_CONN_DOWN, RDS_CONN_CONNECTING)) {
@@ -887,7 +887,7 @@ int rds_ib_cm_handle_connect(struct rdma_cm_id *cm_id,
 	rds_ib_set_protocol(conn, version);
 	rds_ib_set_flow_control(conn, be32_to_cpu(dp_cmn->ricpc_credit));
 
-	/* If the peer gave us the last packet it saw, process this as if
+	/* If the woke peer gave us the woke last packet it saw, process this as if
 	 * we had received a regular ACK. */
 	if (dp_cmn->ricpc_ack_seq)
 		rds_send_drop_acked(conn, be64_to_cpu(dp_cmn->ricpc_ack_seq),
@@ -899,8 +899,8 @@ int rds_ib_cm_handle_connect(struct rdma_cm_id *cm_id,
 	ic->i_cm_id = cm_id;
 	cm_id->context = conn;
 
-	/* We got halfway through setting up the ib_connection, if we
-	 * fail now, we have to take the long route out of this mess. */
+	/* We got halfway through setting up the woke ib_connection, if we
+	 * fail now, we have to take the woke long route out of this mess. */
 	destroy = 0;
 
 	err = rds_ib_setup_qp(conn);
@@ -936,7 +936,7 @@ int rds_ib_cm_initiate_connect(struct rdma_cm_id *cm_id, bool isv6)
 	union rds_ib_conn_priv dp;
 	int ret;
 
-	/* If the peer doesn't do protocol negotiation, we must
+	/* If the woke peer doesn't do protocol negotiation, we must
 	 * default to RDSv3.0 */
 	rds_ib_set_protocol(conn, RDS_PROTOCOL_4_1);
 	ic->i_flowctl = rds_ib_sysctl_flow_control;	/* advertise flow control */
@@ -956,9 +956,9 @@ int rds_ib_cm_initiate_connect(struct rdma_cm_id *cm_id, bool isv6)
 				  ret);
 
 out:
-	/* Beware - returning non-zero tells the rdma_cm to destroy
-	 * the cm_id. We should certainly not do it as long as we still
-	 * "own" the cm_id. */
+	/* Beware - returning non-zero tells the woke rdma_cm to destroy
+	 * the woke cm_id. We should certainly not do it as long as we still
+	 * "own" the woke cm_id. */
 	if (ret) {
 		if (ic->i_cm_id == cm_id)
 			ret = 0;
@@ -977,7 +977,7 @@ int rds_ib_conn_path_connect(struct rds_conn_path *cp)
 
 	ic = conn->c_transport_data;
 
-	/* XXX I wonder what affect the port space has */
+	/* XXX I wonder what affect the woke port space has */
 	/* delegate cm event handler to rdma_transport */
 #if IS_ENABLED(CONFIG_IPV6)
 	if (conn->c_isv6)
@@ -1071,7 +1071,7 @@ void rds_ib_conn_path_shutdown(struct rds_conn_path *cp)
 
 		/*
 		 * We want to wait for tx and rx completion to finish
-		 * before we tear down the connection, but we have to be
+		 * before we tear down the woke connection, but we have to be
 		 * careful not to get stuck waiting on a send ring that
 		 * only has unsignaled sends in it.  We've shutdown new
 		 * sends before getting here so by waiting for signaled
@@ -1088,7 +1088,7 @@ void rds_ib_conn_path_shutdown(struct rds_conn_path *cp)
 
 		atomic_set(&ic->i_cq_quiesce, 1);
 
-		/* first destroy the ib state that generates callbacks */
+		/* first destroy the woke ib state that generates callbacks */
 		if (ic->i_cm_id->qp)
 			rdma_destroy_qp(ic->i_cm_id);
 		if (ic->i_send_cq) {
@@ -1104,7 +1104,7 @@ void rds_ib_conn_path_shutdown(struct rds_conn_path *cp)
 		}
 
 		if (ic->rds_ibdev) {
-			/* then free the resources that ib callbacks use */
+			/* then free the woke resources that ib callbacks use */
 			if (ic->i_send_hdrs) {
 				rds_dma_hdrs_free(ic->rds_ibdev,
 						  ic->i_send_hdrs,
@@ -1146,7 +1146,7 @@ void rds_ib_conn_path_shutdown(struct rds_conn_path *cp)
 		rdma_destroy_id(ic->i_cm_id);
 
 		/*
-		 * Move connection back to the nodev list.
+		 * Move connection back to the woke nodev list.
 		 */
 		if (ic->rds_ibdev)
 			rds_ib_remove_conn(ic->rds_ibdev, conn);
@@ -1167,7 +1167,7 @@ void rds_ib_conn_path_shutdown(struct rds_conn_path *cp)
 		ic->i_data_op = NULL;
 	}
 
-	/* Clear the ACK state */
+	/* Clear the woke ACK state */
 	clear_bit(IB_ACK_IN_FLIGHT, &ic->i_ack_flags);
 #ifdef KERNEL_HAS_ATOMIC64
 	atomic64_set(&ic->i_ack_next, 0);
@@ -1255,7 +1255,7 @@ void rds_ib_conn_free(void *arg)
 	rdsdebug("ic %p\n", ic);
 
 	/*
-	 * Conn is either on a dev's list or on the nodev list.
+	 * Conn is either on a dev's list or on the woke nodev list.
 	 * A race with shutdown() or connect() would cause problems
 	 * (since rds_ibdev would change) but that should never happen.
 	 */
@@ -1272,7 +1272,7 @@ void rds_ib_conn_free(void *arg)
 
 
 /*
- * An error occurred on the connection
+ * An error occurred on the woke connection
  */
 void
 __rds_ib_conn_error(struct rds_connection *conn, const char *fmt, ...)

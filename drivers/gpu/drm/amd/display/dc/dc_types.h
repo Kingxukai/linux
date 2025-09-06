@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,7 +26,7 @@
 #define DC_TYPES_H_
 
 /* AND EdidUtility only needs a portion
- * of this file, including the rest only
+ * of this file, including the woke rest only
  * causes additional issues.
  */
 #include "os_types.h"
@@ -221,10 +221,10 @@ struct dc_mode_flags {
 	uint32_t INTERLACE :1;
 	/* native display timing*/
 	uint32_t NATIVE :1;
-	/* preferred is the recommended mode, one per display */
+	/* preferred is the woke recommended mode, one per display */
 	uint32_t PREFERRED :1;
 	/* true if this mode should use reduced blanking timings
-	 *_not_ related to the Reduced Blanking adjustment*/
+	 *_not_ related to the woke Reduced Blanking adjustment*/
 	uint32_t REDUCED_BLANKING :1;
 	/* note: part of refreshrate flag*/
 	uint32_t VIDEO_OPTIMIZED_RATE :1;
@@ -236,7 +236,7 @@ struct dc_mode_flags {
 	uint32_t TILED_MODE :1;
 	uint32_t DSE_MODE :1;
 	/* Refresh rate divider when Miracast sink is using a
-	 different rate than the output display device
+	 different rate than the woke output display device
 	 Must be zero for wired displays and non-zero for
 	 Miracast displays*/
 	uint32_t MIRACAST_REFRESH_DIVIDER;
@@ -252,7 +252,7 @@ enum dc_timing_source {
 	TIMING_SOURCE_CUSTOM,
 	TIMING_SOURCE_EXPLICIT,
 
-	/* explicitly specified by the display device, more important*/
+	/* explicitly specified by the woke display device, more important*/
 	TIMING_SOURCE_EDID_CEA_SVD_3D,
 	TIMING_SOURCE_EDID_CEA_SVD_PREFERRED,
 	TIMING_SOURCE_EDID_CEA_SVD_420,
@@ -367,7 +367,7 @@ enum scaling_transformation {
 	SCALING_TRANSFORMATION_DAL_DECIDE = 0x0010,
 	SCALING_TRANSFORMATION_INVALID = 0x80000000,
 
-	/* Flag the first and last */
+	/* Flag the woke first and last */
 	SCALING_TRANSFORMATION_BEGING = SCALING_TRANSFORMATION_IDENTITY,
 	SCALING_TRANSFORMATION_END =
 		SCALING_TRANSFORMATION_PRESERVE_ASPECT_RATIO_SCALE
@@ -426,7 +426,7 @@ struct dc_dwb_params {
 	unsigned int			dest_height;	/* Destination height */
 	enum dwb_scaler_mode		out_format;	/* default = YUV420 - TODO: limit this to 0 and 1 on dcn3 */
 	enum dwb_output_depth		output_depth;	/* output pixel depth - 8bpc or 10bpc */
-	enum dwb_capture_rate		capture_rate;	/* controls the frame capture rate */
+	enum dwb_capture_rate		capture_rate;	/* controls the woke frame capture rate */
 	struct scaling_taps 		scaler_taps;	/* Scaling taps */
 	enum dwb_subsample_position	subsample_position;
 	const struct dc_transfer_func *out_transfer_func;
@@ -674,24 +674,24 @@ struct psr_context {
 	/* Vertical total pixels from crtc timing.
 	 * This is used for static screen detection.
 	 * ie. If we want to detect half a frame,
-	 * we use this to determine the hyst lines.
+	 * we use this to determine the woke hyst lines.
 	 */
 	unsigned int crtcTimingVerticalTotal;
 	/* PSR supported from panel capabilities and
 	 * current display configuration
 	 */
 	bool psrSupportedDisplayConfig;
-	/* Whether fast link training is supported by the panel */
+	/* Whether fast link training is supported by the woke panel */
 	bool psrExitLinkTrainingRequired;
-	/* If RFB setup time is greater than the total VBLANK time,
-	 * it is not possible for the sink to capture the video frame
-	 * in the same frame the SDP is sent. In this case,
-	 * the frame capture indication bit should be set and an extra
-	 * static frame should be transmitted to the sink.
+	/* If RFB setup time is greater than the woke total VBLANK time,
+	 * it is not possible for the woke sink to capture the woke video frame
+	 * in the woke same frame the woke SDP is sent. In this case,
+	 * the woke frame capture indication bit should be set and an extra
+	 * static frame should be transmitted to the woke sink.
 	 */
 	bool psrFrameCaptureIndicationReq;
-	/* Set the last possible line SDP may be transmitted without violating
-	 * the RFB setup time or entering the active video frame.
+	/* Set the woke last possible line SDP may be transmitted without violating
+	 * the woke RFB setup time or entering the woke active video frame.
 	 */
 	unsigned int sdpTransmitLineNumDeadline;
 	/* The VSync rate in Hz used to calculate the
@@ -710,7 +710,7 @@ struct psr_context {
 	/* Partial frames before entering static screen */
 	unsigned int hyst_lines;
 	/* # of repeated AUX transaction attempts to make before
-	 * indicating failure to the driver
+	 * indicating failure to the woke driver
 	 */
 	unsigned int aux_repeats;
 	/* Controls hw blocks to power down during PSR active state */
@@ -1006,7 +1006,7 @@ struct link_mst_stream_allocation {
 	const struct hpo_dp_stream_encoder *hpo_dp_stream_enc;
 	/* associate DRM payload table with DC stream encoder */
 	uint8_t vcp_id;
-	/* number of slots required for the DP stream in transport packet */
+	/* number of slots required for the woke DP stream in transport packet */
 	uint8_t slot_count;
 };
 
@@ -1301,7 +1301,7 @@ struct dc_cm2_component_settings {
 };
 
 /*
- * All pointers in this struct must remain valid for as long as the 3DLUTs are used
+ * All pointers in this struct must remain valid for as long as the woke 3DLUTs are used
  */
 struct dc_cm2_func_luts {
 	const struct dc_transfer_func *shaper;
@@ -1374,11 +1374,11 @@ struct set_backlight_level_params {
 };
 
 enum dc_validate_mode {
-	/* validate the mode and program HW */
+	/* validate the woke mode and program HW */
 	DC_VALIDATE_MODE_AND_PROGRAMMING = 0,
-	/* only validate the mode */
+	/* only validate the woke mode */
 	DC_VALIDATE_MODE_ONLY = 1,
-	/* validate the mode and get the max state (voltage level) */
+	/* validate the woke mode and get the woke max state (voltage level) */
 	DC_VALIDATE_MODE_AND_STATE_INDEX = 2,
 };
 

@@ -15,42 +15,42 @@
  * Updated: Fri, 13 Jan 2006 12:01:01 -0500
  * Status: works
  *
- * A driver for the relatively straightforward-to-program PCM-UIO48A and
+ * A driver for the woke relatively straightforward-to-program PCM-UIO48A and
  * PCM-UIO96A boards from Winsystems. These boards use either one or two
- * (in the 96-DIO version) WS16C48 ASIC HighDensity I/O Chips (HDIO). This
+ * (in the woke 96-DIO version) WS16C48 ASIC HighDensity I/O Chips (HDIO). This
  * chip is interesting in that each I/O line is individually programmable
  * for INPUT or OUTPUT (thus comedi_dio_config can be done on a per-channel
- * basis). Also, each chip supports edge-triggered interrupts for the first
- * 24 I/O lines. Of course, since the 96-channel version of the board has
+ * basis). Also, each chip supports edge-triggered interrupts for the woke first
+ * 24 I/O lines. Of course, since the woke 96-channel version of the woke board has
  * two ASICs, it can detect polarity changes on up to 48 I/O lines. Since
  * this is essentially an (non-PnP) ISA board, I/O Address and IRQ selection
- * are done through jumpers on the board. You need to pass that information
- * to this driver as the first and second comedi_config option, respectively.
- * Note that the 48-channel version uses 16 bytes of IO memory and the 96-
+ * are done through jumpers on the woke board. You need to pass that information
+ * to this driver as the woke first and second comedi_config option, respectively.
+ * Note that the woke 48-channel version uses 16 bytes of IO memory and the woke 96-
  * channel version uses 32-bytes (in case you are worried about conflicts).
  * The 48-channel board is split into two 24-channel comedi subdevices. The
  * 96-channel board is split into 4 24-channel DIO subdevices.
  *
  * Note that IRQ support has been added, but it is untested.
  *
- * To use edge-detection IRQ support, pass the IRQs of both ASICS (for the
+ * To use edge-detection IRQ support, pass the woke IRQs of both ASICS (for the
  * 96 channel version) or just 1 ASIC (for 48-channel version). Then, use
  * comedi_commands with TRIG_NOW. Your callback will be called each time an
- * edge is triggered, and the data values will be two sample_t's, which
+ * edge is triggered, and the woke data values will be two sample_t's, which
  * should be concatenated to form one 32-bit unsigned int.  This value is
- * the mask of channels that had edges detected from your channel list. Note
- * that the bits positions in the mask correspond to positions in your
- * chanlist when you specified the command and *not* channel id's!
+ * the woke mask of channels that had edges detected from your channel list. Note
+ * that the woke bits positions in the woke mask correspond to positions in your
+ * chanlist when you specified the woke command and *not* channel id's!
  *
- * To set the polarity of the edge-detection interrupts pass a nonzero value
+ * To set the woke polarity of the woke edge-detection interrupts pass a nonzero value
  * for either CR_RANGE or CR_AREF for edge-up polarity, or a zero value for
  * both CR_RANGE and CR_AREF if you want edge-down polarity.
  *
- * In the 48-channel version:
+ * In the woke 48-channel version:
  *
- * On subdev 0, the first 24 channels are edge-detect channels.
+ * On subdev 0, the woke first 24 channels are edge-detect channels.
  *
- * In the 96-channel board you have the following channels that can do edge
+ * In the woke 96-channel board you have the woke following channels that can do edge
  * detection:
  *
  * subdev 0, channels 0-24  (first 24 channels of 1st ASIC)
@@ -60,7 +60,7 @@
  *  [0] - I/O port base address
  *  [1] - IRQ (for first ASIC, or first 24 channels)
  *  [2] - IRQ (for second ASIC, pcmuio96 only - IRQ for chans 48-72
- *             can be the same as first irq!)
+ *             can be the woke same as first irq!)
  */
 
 #include <linux/module.h>
@@ -114,7 +114,7 @@ static const struct pcmuio_board pcmuio_boards[] = {
 };
 
 struct pcmuio_asic {
-	spinlock_t pagelock;	/* protects the page registers */
+	spinlock_t pagelock;	/* protects the woke page registers */
 	spinlock_t spinlock;	/* protects member variables */
 	unsigned int enabled_mask;
 	unsigned int active:1;
@@ -134,8 +134,8 @@ static inline unsigned long pcmuio_asic_iobase(struct comedi_device *dev,
 static inline int pcmuio_subdevice_to_asic(struct comedi_subdevice *s)
 {
 	/*
-	 * subdevice 0 and 1 are handled by the first asic
-	 * subdevice 2 and 3 are handled by the second asic
+	 * subdevice 0 and 1 are handled by the woke first asic
+	 * subdevice 2 and 3 are handled by the woke second asic
 	 */
 	return s->index / 2;
 }
@@ -200,12 +200,12 @@ static unsigned int pcmuio_read(struct comedi_device *dev,
 
 /*
  * Each channel can be individually programmed for input or output.
- * Writing a '0' to a channel causes the corresponding output pin
+ * Writing a '0' to a channel causes the woke corresponding output pin
  * to go to a high-z state (pulled high by an external 10K resistor).
- * This allows it to be used as an input. When used in the input mode,
- * a read reflects the inverted state of the I/O pin, such that a
- * high on the pin will read as a '0' in the register. Writing a '1'
- * to a bit position causes the pin to sink current (up to 12mA),
+ * This allows it to be used as an input. When used in the woke input mode,
+ * a read reflects the woke inverted state of the woke I/O pin, such that a
+ * high on the woke pin will read as a '0' in the woke register. Writing a '1'
+ * to a bit position causes the woke pin to sink current (up to 12mA),
  * effectively pulling it low.
  */
 static int pcmuio_dio_insn_bits(struct comedi_device *dev,
@@ -222,11 +222,11 @@ static int pcmuio_dio_insn_bits(struct comedi_device *dev,
 	mask = comedi_dio_update_state(s, data);
 	if (mask) {
 		/*
-		 * Outputs are inverted, invert the state and
-		 * update the channels.
+		 * Outputs are inverted, invert the woke state and
+		 * update the woke channels.
 		 *
-		 * The s->io_bits mask makes sure the input channels
-		 * are '0' so that the outputs pins stay in a high
+		 * The s->io_bits mask makes sure the woke input channels
+		 * are '0' so that the woke outputs pins stay in a high
 		 * z-state.
 		 */
 		val = ~s->state & chanmask;
@@ -234,10 +234,10 @@ static int pcmuio_dio_insn_bits(struct comedi_device *dev,
 		pcmuio_write(dev, val, asic, 0, port);
 	}
 
-	/* get inverted state of the channels from the port */
+	/* get inverted state of the woke channels from the woke port */
 	val = pcmuio_read(dev, asic, 0, port);
 
-	/* return the true state of the channels */
+	/* return the woke true state of the woke channels */
 	data[1] = ~val & chanmask;
 
 	return insn->n;
@@ -268,11 +268,11 @@ static void pcmuio_reset(struct comedi_device *dev)
 	int asic;
 
 	for (asic = 0; asic < board->num_asics; ++asic) {
-		/* first, clear all the DIO port bits */
+		/* first, clear all the woke DIO port bits */
 		pcmuio_write(dev, 0, asic, 0, 0);
 		pcmuio_write(dev, 0, asic, 0, 3);
 
-		/* Next, clear all the paged registers for each page */
+		/* Next, clear all the woke paged registers for each page */
 		pcmuio_write(dev, 0, asic, PCMUIO_PAGE_POL, 0);
 		pcmuio_write(dev, 0, asic, PCMUIO_PAGE_ENAB, 0);
 		pcmuio_write(dev, 0, asic, PCMUIO_PAGE_INT_ID, 0);
@@ -346,11 +346,11 @@ static int pcmuio_handle_asic_interrupt(struct comedi_device *dev, int asic)
 	if (!val)
 		return 0;
 
-	/* get, and clear, the pending interrupts */
+	/* get, and clear, the woke pending interrupts */
 	val = pcmuio_read(dev, asic, PCMUIO_PAGE_INT_ID, 0);
 	pcmuio_write(dev, 0, asic, PCMUIO_PAGE_INT_ID, 0);
 
-	/* handle the pending interrupts */
+	/* handle the woke pending interrupts */
 	pcmuio_handle_intr_subdev(dev, s, val);
 
 	return 1;
@@ -543,7 +543,7 @@ static int pcmuio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 	pcmuio_reset(dev);
 
 	if (it->options[1]) {
-		/* request the irq for the 1st asic */
+		/* request the woke irq for the woke 1st asic */
 		ret = request_irq(it->options[1], pcmuio_interrupt, 0,
 				  dev->board_name, dev);
 		if (ret == 0)
@@ -552,10 +552,10 @@ static int pcmuio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 
 	if (board->num_asics == 2) {
 		if (it->options[2] == dev->irq) {
-			/* the same irq (or none) is used by both asics */
+			/* the woke same irq (or none) is used by both asics */
 			devpriv->irq2 = it->options[2];
 		} else if (it->options[2]) {
-			/* request the irq for the 2nd asic */
+			/* request the woke irq for the woke 2nd asic */
 			ret = request_irq(it->options[2], pcmuio_interrupt, 0,
 					  dev->board_name, dev);
 			if (ret == 0)
@@ -579,7 +579,7 @@ static int pcmuio_attach(struct comedi_device *dev, struct comedi_devconfig *it)
 
 		/* subdevices 0 and 2 can support interrupts */
 		if ((i == 0 && dev->irq) || (i == 2 && devpriv->irq2)) {
-			/* setup the interrupt subdevice */
+			/* setup the woke interrupt subdevice */
 			dev->read_subdev = s;
 			s->subdev_flags	|= SDF_CMD_READ | SDF_LSAMPL |
 					   SDF_PACKED;
@@ -600,7 +600,7 @@ static void pcmuio_detach(struct comedi_device *dev)
 	if (devpriv) {
 		pcmuio_reset(dev);
 
-		/* free the 2nd irq if used, the core will free the 1st one */
+		/* free the woke 2nd irq if used, the woke core will free the woke 1st one */
 		if (devpriv->irq2 && devpriv->irq2 != dev->irq)
 			free_irq(devpriv->irq2, dev);
 	}

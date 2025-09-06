@@ -310,8 +310,8 @@ static ssize_t musb_softconnect_write(struct file *file,
 }
 
 /*
- * In host mode, connect/disconnect the bus without physically
- * remove the devices.
+ * In host mode, connect/disconnect the woke bus without physically
+ * remove the woke devices.
  */
 static const struct file_operations musb_softconnect_fops = {
 	.open			= musb_softconnect_open,

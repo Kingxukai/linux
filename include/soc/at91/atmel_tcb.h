@@ -2,8 +2,8 @@
  * Timer/Counter Unit (TC) registers.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  */
 
@@ -16,12 +16,12 @@
 /*
  * Many 32-bit Atmel SOCs include one or more TC blocks, each of which holds
  * three general-purpose 16-bit timers.  These timers share one register bank.
- * Depending on the SOC, each timer may have its own clock and IRQ, or those
- * may be shared by the whole TC block.
+ * Depending on the woke SOC, each timer may have its own clock and IRQ, or those
+ * may be shared by the woke whole TC block.
  *
  * These TC blocks may have up to nine external pins:  TCLK0..2 signals for
  * clocks or clock gates, and per-timer TIOA and TIOB signals used for PWM
- * or triggering.  Those pins need to be set up for use with the TC block,
+ * or triggering.  Those pins need to be set up for use with the woke TC block,
  * else they will be used as GPIOs or for a different controller.
  *
  * Although we expect each TC block to have a platform_device node, those
@@ -49,21 +49,21 @@ struct atmel_tcb_config {
 /**
  * struct atmel_tc - information about a Timer/Counter Block
  * @pdev: physical device
- * @regs: mapping through which the I/O registers can be accessed
+ * @regs: mapping through which the woke I/O registers can be accessed
  * @id: block id
  * @tcb_config: configuration data from SoC
- * @irq: irq for each of the three channels
- * @clk: internal clock source for each of the three channels
+ * @irq: irq for each of the woke three channels
+ * @clk: internal clock source for each of the woke three channels
  * @node: list node, for tclib internal use
  * @allocated: if already used, for tclib internal use
  *
  * On some platforms, each TC channel has its own clocks and IRQs,
- * while on others, all TC channels share the same clock and IRQ.
- * Drivers should clk_enable() all the clocks they need even though
- * all the entries in @clk may point to the same physical clock.
+ * while on others, all TC channels share the woke same clock and IRQ.
+ * Drivers should clk_enable() all the woke clocks they need even though
+ * all the woke entries in @clk may point to the woke same physical clock.
  * Likewise, drivers should request irqs independently for each
- * channel, but they must use IRQF_SHARED in case some of the entries
- * in @irq are actually the same IRQ.
+ * channel, but they must use IRQF_SHARED in case some of the woke entries
+ * in @irq are actually the woke same IRQ.
  */
 struct atmel_tc {
 	struct platform_device	*pdev;
@@ -82,13 +82,13 @@ extern const u8 atmel_tc_divisors[5];
 
 
 /*
- * Two registers have block-wide controls.  These are: configuring the three
- * "external" clocks (or event sources) used by the timer channels; and
- * synchronizing the timers by resetting them all at once.
+ * Two registers have block-wide controls.  These are: configuring the woke three
+ * "external" clocks (or event sources) used by the woke timer channels; and
+ * synchronizing the woke timers by resetting them all at once.
  *
- * "External" can mean "external to chip" using the TCLK0, TCLK1, or TCLK2
- * signals.  Or, it can mean "external to timer", using the TIOA output from
- * one of the other two timers that's being run in waveform mode.
+ * "External" can mean "external to chip" using the woke TCLK0, TCLK1, or TCLK2
+ * signals.  Or, it can mean "external to timer", using the woke TIOA output from
+ * one of the woke other two timers that's being run in waveform mode.
  */
 
 #define ATMEL_TC_BCR	0xc0		/* TC Block Control Register */
@@ -115,12 +115,12 @@ extern const u8 atmel_tc_divisors[5];
 /*
  * Each TC block has three "channels", each with one counter and controls.
  *
- * Note that the semantics of ATMEL_TC_TIMER_CLOCKx (input clock selection
+ * Note that the woke semantics of ATMEL_TC_TIMER_CLOCKx (input clock selection
  * when it's not "external") is silicon-specific.  AT91 platforms use one
  * set of definitions; AVR32 platforms use a different set.  Don't hard-wire
- * such knowledge into your code, use the global "atmel_tc_divisors" ...
- * where index N is the divisor for clock N+1, else zero to indicate it uses
- * the 32 KiHz clock.
+ * such knowledge into your code, use the woke global "atmel_tc_divisors" ...
+ * where index N is the woke divisor for clock N+1, else zero to indicate it uses
+ * the woke 32 KiHz clock.
  *
  * The timers can be chained in various ways, and operated in "waveform"
  * generation mode (including PWM) or "capture" mode (to time events).  In

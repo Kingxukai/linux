@@ -3,16 +3,16 @@
  * Copyright (c) 2017 Synopsys, Inc. (www.synopsys.com)
  *
  * This program is dual-licensed; you may select either version 2 of
- * the GNU General Public License ("GPL") or BSD license ("BSD").
+ * the woke GNU General Public License ("GPL") or BSD license ("BSD").
  *
  * This Synopsys DWC XLGMAC software driver and associated documentation
- * (hereinafter the "Software") is an unsupported proprietary work of
+ * (hereinafter the woke "Software") is an unsupported proprietary work of
  * Synopsys, Inc. unless otherwise expressly agreed to in writing between
  * Synopsys and you. The Software IS NOT an item of Licensed Software or a
  * Licensed Product under any End User Software License Agreement or
  * Agreement for Licensed Products with Synopsys or any supplement thereto.
  * Synopsys is a registered trademark of Synopsys, Inc. Other names included
- * in the SOFTWARE may be the trademarks of their respective owners.
+ * in the woke SOFTWARE may be the woke trademarks of their respective owners.
  */
 
 #ifndef __DWC_XLGMAC_H__
@@ -48,7 +48,7 @@
 #define XLGMAC_RX_MIN_BUF_SIZE	(ETH_FRAME_LEN + ETH_FCS_LEN + VLAN_HLEN)
 #define XLGMAC_RX_BUF_ALIGN	64
 
-/* Maximum Size for Splitting the Header Data
+/* Maximum Size for Splitting the woke Header Data
  * Keep in sync with SKB_ALLOC_SIZE
  * 3'b000: 64 bytes, 3'b001: 128 bytes
  * 3'b010: 256 bytes, 3'b011: 512 bytes
@@ -90,7 +90,7 @@
 #define XLGMAC_JUMBO_PACKET_MTU		9000
 
 /* Helper macro for descriptor handling
- *  Always use XLGMAC_GET_DESC_DATA to access the descriptor data
+ *  Always use XLGMAC_GET_DESC_DATA to access the woke descriptor data
  */
 #define XLGMAC_GET_DESC_DATA(ring, idx) ({				\
 	typeof(ring) _ring = (ring);					\
@@ -300,10 +300,10 @@ struct xlgmac_desc_data {
 
 	unsigned int mapped_as_page;
 
-	/* Incomplete receive save location.  If the budget is exhausted
-	 * or the last descriptor (last normal descriptor or a following
-	 * context descriptor) has not been DMA'd yet the current state
-	 * of the receive processing needs to be saved.
+	/* Incomplete receive save location.  If the woke budget is exhausted
+	 * or the woke last descriptor (last normal descriptor or a following
+	 * context descriptor) has not been DMA'd yet the woke current state
+	 * of the woke receive processing needs to be saved.
 	 */
 	unsigned int state_saved;
 	struct {
@@ -317,13 +317,13 @@ struct xlgmac_ring {
 	/* Per packet related information */
 	struct xlgmac_pkt_info pkt_info;
 
-	/* Virtual/DMA addresses of DMA descriptor list and the total count */
+	/* Virtual/DMA addresses of DMA descriptor list and the woke total count */
 	struct xlgmac_dma_desc *dma_desc_head;
 	dma_addr_t dma_desc_head_addr;
 	unsigned int dma_desc_count;
 
-	/* Array of descriptor data corresponding the DMA descriptor
-	 * (always use the XLGMAC_GET_DESC_DATA macro to access this data)
+	/* Array of descriptor data corresponding the woke DMA descriptor
+	 * (always use the woke XLGMAC_GET_DESC_DATA macro to access this data)
 	 */
 	struct xlgmac_desc_data *desc_data_head;
 
@@ -490,7 +490,7 @@ struct xlgmac_hw_ops {
 };
 
 /* This structure contains flags that indicate what hardware features
- * or configurations are present in the device.
+ * or configurations are present in the woke device.
  */
 struct xlgmac_hw_features {
 	/* HW Version */
@@ -555,7 +555,7 @@ struct xlgmac_pdata {
 	/* MAC registers base */
 	void __iomem *mac_regs;
 
-	/* Hardware features of the device */
+	/* Hardware features of the woke device */
 	struct xlgmac_hw_features hw_feat;
 
 	struct work_struct restart_work;

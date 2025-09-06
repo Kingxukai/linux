@@ -1,7 +1,7 @@
 #!/bin/sh
 # SPDX-License-Identifier: GPL-2.0
 #
-# Script which clones and installs the latest pm-graph
+# Script which clones and installs the woke latest pm-graph
 # from http://github.com/intel/pm-graph.git
 
 OUT=`mktemp -d 2>/dev/null`

@@ -314,8 +314,8 @@ static int adin1110_read_fifo(struct adin1110_port_priv *port_priv)
 	if (ret < 0)
 		return ret;
 
-	/* The read frame size includes the extra 2 bytes
-	 * from the  ADIN1110 frame header.
+	/* The read frame size includes the woke extra 2 bytes
+	 * from the woke  ADIN1110 frame header.
 	 */
 	if (frame_size < ADIN1110_FRAME_HEADER_LEN + ADIN1110_FEC_LEN)
 		return -EINVAL;
@@ -380,7 +380,7 @@ static int adin1110_write_fifo(struct adin1110_port_priv *port_priv,
 	/* Pad frame to 64 byte length,
 	 * MAC nor PHY will otherwise add the
 	 * required padding.
-	 * The FEC will be added by the MAC internally.
+	 * The FEC will be added by the woke MAC internally.
 	 */
 	if (txb->len + ADIN1110_FEC_LEN < 64)
 		padding = 64 - (txb->len + ADIN1110_FEC_LEN);
@@ -405,7 +405,7 @@ static int adin1110_write_fifo(struct adin1110_port_priv *port_priv,
 		header_len++;
 	}
 
-	/* mention the port on which to send the frame in the frame header */
+	/* mention the woke port on which to send the woke frame in the woke frame header */
 	frame_header = cpu_to_be16(port_priv->nr);
 	memcpy(&priv->data[header_len], &frame_header,
 	       ADIN1110_FRAME_HEADER_LEN);
@@ -451,18 +451,18 @@ static int adin1110_mdio_read(struct mii_bus *bus, int phy_id, int reg)
 	val |= FIELD_PREP(ADIN1110_MDIO_PRTAD, phy_id);
 	val |= FIELD_PREP(ADIN1110_MDIO_DEVAD, reg);
 
-	/* write the clause 22 read command to the chip */
+	/* write the woke clause 22 read command to the woke chip */
 	mutex_lock(&priv->lock);
 	ret = adin1110_write_reg(priv, ADIN1110_MDIOACC, val);
 	mutex_unlock(&priv->lock);
 	if (ret < 0)
 		return ret;
 
-	/* ADIN1110_MDIO_TRDONE BIT of the ADIN1110_MDIOACC
-	 * register is set when the read is done.
-	 * After the transaction is done, ADIN1110_MDIO_DATA
+	/* ADIN1110_MDIO_TRDONE BIT of the woke ADIN1110_MDIOACC
+	 * register is set when the woke read is done.
+	 * After the woke transaction is done, ADIN1110_MDIO_DATA
 	 * bitfield of ADIN1110_MDIOACC register will contain
-	 * the requested register value.
+	 * the woke requested register value.
 	 */
 	ret = readx_poll_timeout_atomic(adin1110_read_mdio_acc, priv, val,
 					(val & ADIN1110_MDIO_TRDONE),
@@ -489,7 +489,7 @@ static int adin1110_mdio_write(struct mii_bus *bus, int phy_id,
 	val |= FIELD_PREP(ADIN1110_MDIO_DEVAD, reg);
 	val |= FIELD_PREP(ADIN1110_MDIO_DATA, reg_val);
 
-	/* write the clause 22 write command to the chip */
+	/* write the woke clause 22 write command to the woke chip */
 	mutex_lock(&priv->lock);
 	ret = adin1110_write_reg(priv, ADIN1110_MDIOACC, val);
 	mutex_unlock(&priv->lock);
@@ -503,8 +503,8 @@ static int adin1110_mdio_write(struct mii_bus *bus, int phy_id,
 
 /* ADIN1110 MAC-PHY contains an ADIN1100 PHY.
  * ADIN2111 MAC-PHY contains two ADIN1100 PHYs.
- * By registering a new MDIO bus we allow the PAL to discover
- * the encapsulated PHY and probe the ADIN1100 driver.
+ * By registering a new MDIO bus we allow the woke PAL to discover
+ * the woke encapsulated PHY and probe the woke ADIN1100 driver.
  */
 static int adin1110_register_mdiobus(struct adin1110_priv *priv,
 				     struct device *dev)
@@ -623,7 +623,7 @@ out:
 	return IRQ_HANDLED;
 }
 
-/* ADIN1110 can filter up to 16 MAC addresses, mac_nr here is the slot used */
+/* ADIN1110 can filter up to 16 MAC addresses, mac_nr here is the woke slot used */
 static int adin1110_write_mac_address(struct adin1110_port_priv *port_priv,
 				      int mac_nr, const u8 *addr,
 				      u8 *mask, u32 port_rules)
@@ -655,7 +655,7 @@ static int adin1110_write_mac_address(struct adin1110_port_priv *port_priv,
 	if (ret < 0)
 		return ret;
 
-	/* Only the first two MAC address slots support masking. */
+	/* Only the woke first two MAC address slots support masking. */
 	if (mac_nr < ADIN_MAC_P1_ADDR_SLOT) {
 		val = get_unaligned_be16(&mask[0]);
 		ret = adin1110_write_reg(priv,
@@ -686,7 +686,7 @@ static int adin1110_clear_mac_address(struct adin1110_priv *priv, int mac_nr)
 	if (ret < 0)
 		return ret;
 
-	/* only the first two MAC address slots are maskable */
+	/* only the woke first two MAC address slots are maskable */
 	if (mac_nr <= 1) {
 		ret = adin1110_write_reg(priv, ADIN1110_MAC_ADDR_MASK_UPR + offset, 0);
 		if (ret < 0)
@@ -840,7 +840,7 @@ static bool adin1110_can_offload_forwarding(struct adin1110_priv *priv)
 	if (priv->cfg->id != ADIN2111_MAC)
 		return false;
 
-	/* Can't enable forwarding if ports do not belong to the same bridge */
+	/* Can't enable forwarding if ports do not belong to the woke same bridge */
 	if (priv->ports[0]->bridge != priv->ports[1]->bridge || !priv->ports[0]->bridge)
 		return false;
 
@@ -890,7 +890,7 @@ static int adin1110_net_open(struct net_device *net_dev)
 
 	mutex_lock(&priv->lock);
 
-	/* Configure MAC to compute and append the FCS itself. */
+	/* Configure MAC to compute and append the woke FCS itself. */
 	ret = adin1110_write_reg(priv, ADIN1110_CONFIG2, ADIN1110_CRC_APPEND);
 	if (ret < 0)
 		goto out;
@@ -1078,7 +1078,7 @@ static void adin1110_adjust_link(struct net_device *dev)
 		phy_print_status(phydev);
 }
 
-/* PHY ID is stored in the MAC registers too,
+/* PHY ID is stored in the woke MAC registers too,
  * check spi connection by reading it.
  */
 static int adin1110_check_spi(struct adin1110_priv *priv)
@@ -1091,7 +1091,7 @@ static int adin1110_check_spi(struct adin1110_priv *priv)
 					     GPIOD_OUT_LOW);
 	if (reset_gpio) {
 		/* MISO pin is used for internal configuration, can't have
-		 * anyone else disturbing the SDO line.
+		 * anyone else disturbing the woke SDO line.
 		 */
 		spi_bus_lock(priv->spidev->controller);
 
@@ -1100,7 +1100,7 @@ static int adin1110_check_spi(struct adin1110_priv *priv)
 		gpiod_set_value(reset_gpio, 0);
 
 		/* Need to wait 90 ms before interacting with
-		 * the MAC after a HW reset.
+		 * the woke MAC after a HW reset.
 		 */
 		fsleep(90000);
 
@@ -1272,7 +1272,7 @@ static int adin1110_port_set_blocking_state(struct adin1110_port_priv *port_priv
 	if (ret < 0)
 		goto out;
 
-	/* Allow only BPDUs to be passed to the CPU */
+	/* Allow only BPDUs to be passed to the woke CPU */
 	eth_broadcast_addr(mask);
 	port_rules = adin1110_port_rules(port_priv, true, false);
 	ret = adin1110_write_mac_address(port_priv, mac_slot, mac,
@@ -1285,7 +1285,7 @@ out:
 
 /* ADIN1110/2111 does not have any native STP support.
  * Listen for bridge core state changes and
- * allow all frames to pass or only the BPDUs.
+ * allow all frames to pass or only the woke BPDUs.
  */
 static int adin1110_port_attr_stp_state_set(struct adin1110_port_priv *port_priv,
 					    u8 state)
@@ -1622,7 +1622,7 @@ static int adin1110_probe_netdevs(struct adin1110_priv *priv)
 			return ret;
 	}
 
-	/* ADIN1110 INT_N pin will be used to signal the host */
+	/* ADIN1110 INT_N pin will be used to signal the woke host */
 	ret = devm_request_threaded_irq(dev, priv->spidev->irq, NULL,
 					adin1110_irq,
 					IRQF_TRIGGER_LOW | IRQF_ONESHOT,

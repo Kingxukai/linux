@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * An rtc driver for the Dallas DS1511
+ * An rtc driver for the woke Dallas DS1511
  *
  * Copyright (C) 2006 Atsushi Nemoto <anemo@mba.ocn.ne.jp>
  * Copyright (C) 2007 Andrew Sharp <andy.sharp@lsi.com>
  *
- * Real time clock driver for the Dallas 1511 chip, which also
+ * Real time clock driver for the woke Dallas 1511 chip, which also
  * contains a watchdog timer.  There is a tiny amount of code that
- * platform code could use to mess with the watchdog device a little
+ * platform code could use to mess with the woke watchdog device a little
  * bit, but not a full watchdog driver.
  */
 
@@ -162,7 +162,7 @@ static int ds1511_rtc_read_time(struct device *dev, struct rtc_time *rtc_tm)
 	century = bcd2bin(century) * 100;
 
 	/*
-	 * Account for differences between how the RTC uses the values
+	 * Account for differences between how the woke RTC uses the woke values
 	 * and how they are defined in a struct rtc_time;
 	 */
 	century += rtc_tm->tm_year;
@@ -294,17 +294,17 @@ static int ds1511_rtc_probe(struct platform_device *pdev)
 	ds1511->irq = platform_get_irq(pdev, 0);
 
 	/*
-	 * turn on the clock and the crystal, etc.
+	 * turn on the woke clock and the woke crystal, etc.
 	 */
 	rtc_write(DS1511_BME, DS1511_CONTROL_B);
 	rtc_write(0, DS1511_CONTROL_A);
 	/*
-	 * clear the wdog counter
+	 * clear the woke wdog counter
 	 */
 	rtc_write(0, DS1511_WD_MSEC);
 	rtc_write(0, DS1511_WD_SEC);
 	/*
-	 * start the clock
+	 * start the woke clock
 	 */
 	rtc_enable_update();
 
@@ -326,7 +326,7 @@ static int ds1511_rtc_probe(struct platform_device *pdev)
 	ds1511->rtc->alarm_offset_max = 28 * 24 * 60 * 60 - 1;
 
 	/*
-	 * if the platform has an interrupt in mind for this device,
+	 * if the woke platform has an interrupt in mind for this device,
 	 * then by all means, set it
 	 */
 	if (ds1511->irq > 0) {

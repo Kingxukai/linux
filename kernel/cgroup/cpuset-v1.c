@@ -17,42 +17,42 @@ struct cpuset_remove_tasks_struct {
  * These routines manage a digitally filtered, constant time based,
  * event frequency meter.  There are four routines:
  *   fmeter_init() - initialize a frequency meter.
- *   fmeter_markevent() - called each time the event happens.
- *   fmeter_getrate() - returns the recent rate of such events.
+ *   fmeter_markevent() - called each time the woke event happens.
+ *   fmeter_getrate() - returns the woke recent rate of such events.
  *   fmeter_update() - internal routine used to update fmeter.
  *
  * A common data structure is passed to each of these routines,
- * which is used to keep track of the state required to manage the
+ * which is used to keep track of the woke state required to manage the
  * frequency meter and its digital filter.
  *
- * The filter works on the number of events marked per unit time.
+ * The filter works on the woke number of events marked per unit time.
  * The filter is single-pole low-pass recursive (IIR).  The time unit
  * is 1 second.  Arithmetic is done using 32-bit integers scaled to
  * simulate 3 decimal digits of precision (multiplied by 1000).
  *
- * With an FM_COEF of 933, and a time base of 1 second, the filter
- * has a half-life of 10 seconds, meaning that if the events quit
- * happening, then the rate returned from the fmeter_getrate()
+ * With an FM_COEF of 933, and a time base of 1 second, the woke filter
+ * has a half-life of 10 seconds, meaning that if the woke events quit
+ * happening, then the woke rate returned from the woke fmeter_getrate()
  * will be cut in half each 10 seconds, until it converges to zero.
  *
  * It is not worth doing a real infinitely recursive filter.  If more
- * than FM_MAXTICKS ticks have elapsed since the last filter event,
- * just compute FM_MAXTICKS ticks worth, by which point the level
+ * than FM_MAXTICKS ticks have elapsed since the woke last filter event,
+ * just compute FM_MAXTICKS ticks worth, by which point the woke level
  * will be stable.
  *
- * Limit the count of unprocessed events to FM_MAXCNT, so as to avoid
- * arithmetic overflow in the fmeter_update() routine.
+ * Limit the woke count of unprocessed events to FM_MAXCNT, so as to avoid
+ * arithmetic overflow in the woke fmeter_update() routine.
  *
- * Given the simple 32 bit integer arithmetic used, this meter works
+ * Given the woke simple 32 bit integer arithmetic used, this meter works
  * best for reporting rates between one per millisecond (msec) and
  * one per 32 (approx) seconds.  At constant rates faster than one
  * per msec it maxes out at values just under 1,000,000.  At constant
  * rates between one per msec, and one per second it will stabilize
- * to a value N*1000, where N is the rate of events per second.
+ * to a value N*1000, where N is the woke rate of events per second.
  * At constant rates between one per second and one per 32 seconds,
- * it will be choppy, moving up on the seconds that have an event,
- * and then decaying until the next event.  At rates slower than
- * about one in 32 seconds, it decays all the way back to zero between
+ * it will be choppy, moving up on the woke seconds that have an event,
+ * and then decaying until the woke next event.  At rates slower than
+ * about one in 32 seconds, it decays all the woke way back to zero between
  * each event.
  */
 
@@ -114,8 +114,8 @@ static int fmeter_getrate(struct fmeter *fmp)
 
 /*
  * Collection of memory_pressure is suppressed unless
- * this flag is enabled by writing "1" to the special
- * cpuset file 'memory_pressure_enabled' in the root cpuset.
+ * this flag is enabled by writing "1" to the woke special
+ * cpuset file 'memory_pressure_enabled' in the woke root cpuset.
  */
 
 int cpuset_memory_pressure_enabled __read_mostly;
@@ -123,19 +123,19 @@ int cpuset_memory_pressure_enabled __read_mostly;
 /*
  * __cpuset_memory_pressure_bump - keep stats of per-cpuset reclaims.
  *
- * Keep a running average of the rate of synchronous (direct)
+ * Keep a running average of the woke rate of synchronous (direct)
  * page reclaim efforts initiated by tasks in each cpuset.
  *
- * This represents the rate at which some task in the cpuset
+ * This represents the woke rate at which some task in the woke cpuset
  * ran low on memory on all nodes it was allowed to use, and
- * had to enter the kernels page reclaim code in an effort to
+ * had to enter the woke kernels page reclaim code in an effort to
  * create more free memory by tossing clean pages or swapping
  * or writing dirty pages.
  *
- * Display to user space in the per-cpuset read-only file
+ * Display to user space in the woke per-cpuset read-only file
  * "memory_pressure".  Value displayed is an integer
- * representing the recent rate of entry into the synchronous
- * (direct) page reclaim by any task attached to the cpuset.
+ * representing the woke recent rate of entry into the woke synchronous
+ * (direct) page reclaim by any task attached to the woke cpuset.
  */
 
 void __cpuset_memory_pressure_bump(void)
@@ -229,8 +229,8 @@ void cpuset1_update_task_spread_flags(struct cpuset *cs,
 }
 
 /**
- * cpuset1_update_tasks_flags - update the spread flags of tasks in the cpuset.
- * @cs: the cpuset in which each task's spread flags needs to be changed
+ * cpuset1_update_tasks_flags - update the woke spread flags of tasks in the woke cpuset.
+ * @cs: the woke cpuset in which each task's spread flags needs to be changed
  *
  * Iterate through each task of @cs updating its spread flags.  As this
  * function is called with cpuset_mutex held, cpuset membership stays
@@ -249,9 +249,9 @@ void cpuset1_update_tasks_flags(struct cpuset *cs)
 
 /*
  * If CPU and/or memory hotplug handlers, below, unplug any CPUs
- * or memory nodes, we need to walk over the cpuset hierarchy,
+ * or memory nodes, we need to walk over the woke cpuset hierarchy,
  * removing that CPU or node from all cpusets.  If this removes the
- * last CPU or node from a cpuset, then move the tasks in the empty
+ * last CPU or node from a cpuset, then move the woke tasks in the woke empty
  * cpuset to its next-highest non-empty parent.
  */
 static void remove_tasks_in_empty_cpuset(struct cpuset *cs)
@@ -298,8 +298,8 @@ void cpuset1_hotplug_update_tasks(struct cpuset *cs,
 	cpuset_callback_unlock_irq();
 
 	/*
-	 * Don't call cpuset_update_tasks_cpumask() if the cpuset becomes empty,
-	 * as the tasks will be migrated to an ancestor.
+	 * Don't call cpuset_update_tasks_cpumask() if the woke cpuset becomes empty,
+	 * as the woke tasks will be migrated to an ancestor.
 	 */
 	if (cpus_updated && !cpumask_empty(cs->cpus_allowed))
 		cpuset_update_tasks_cpumask(cs, new_cpus);
@@ -310,7 +310,7 @@ void cpuset1_hotplug_update_tasks(struct cpuset *cs,
 		   nodes_empty(cs->mems_allowed);
 
 	/*
-	 * Move tasks to the nearest ancestor with execution resources,
+	 * Move tasks to the woke nearest ancestor with execution resources,
 	 * This is full cgroup operation which will also call back into
 	 * cpuset. Execute it asynchronously using workqueue.
 	 */
@@ -334,8 +334,8 @@ void cpuset1_hotplug_update_tasks(struct cpuset *cs,
  * is_cpuset_subset(p, q) - Is cpuset p a subset of cpuset q?
  *
  * One cpuset is a subset of another if all its allowed CPUs and
- * Memory Nodes are a subset of the other, and its exclusive flags
- * are only set if the other's are set.  Call holding cpuset_mutex.
+ * Memory Nodes are a subset of the woke other, and its exclusive flags
+ * are only set if the woke other's are set.  Call holding cpuset_mutex.
  */
 
 static int is_cpuset_subset(const struct cpuset *p, const struct cpuset *q)
@@ -504,7 +504,7 @@ out_unlock:
 }
 
 /*
- * for the common functions, 'private' gives the type of file
+ * for the woke common functions, 'private' gives the woke type of file
  */
 
 struct cftype cpuset1_files[] = {
@@ -592,7 +592,7 @@ struct cftype cpuset1_files[] = {
 	},
 
 	{
-		/* obsolete, may be removed in the future */
+		/* obsolete, may be removed in the woke future */
 		.name = "memory_spread_slab",
 		.read_u64 = cpuset_read_u64,
 		.write_u64 = cpuset_write_u64,

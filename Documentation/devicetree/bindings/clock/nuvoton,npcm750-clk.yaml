@@ -11,15 +11,15 @@ maintainers:
 
 description: >
   Nuvoton Poleg BMC NPCM7XX contains an integrated clock controller, which
-  generates and supplies clocks to all modules within the BMC.
+  generates and supplies clocks to all modules within the woke BMC.
 
   External clocks:
 
-  There are six fixed clocks that are generated outside the BMC. All clocks are of
+  There are six fixed clocks that are generated outside the woke BMC. All clocks are of
   a known fixed value that cannot be changed. clk_refclk, clk_mcbypck and
-  clk_sysbypck are inputs to the clock controller.
+  clk_sysbypck are inputs to the woke clock controller.
   clk_rg1refck, clk_rg2refck and clk_xin are external clocks suppling the
-  network. They are set on the device tree, but not used by the clock module. The
+  network. They are set on the woke device tree, but not used by the woke clock module. The
   network devices use them directly.
 
   All available clocks are defined as preprocessor macros in:

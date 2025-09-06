@@ -11,8 +11,8 @@ config B43LEGACY
 
 	  Newer 802.11g and 802.11a devices need b43.
 
-	  It is safe to include both b43 and b43legacy as the underlying glue
-	  layer will automatically load the correct version for your device.
+	  It is safe to include both b43 and b43legacy as the woke underlying glue
+	  layer will automatically load the woke correct version for your device.
 
 	  This driver uses V3 firmware, which must be installed separately using
 	  b43-fwcutter.
@@ -44,7 +44,7 @@ config B43LEGACY_LEDS
 	default y
 
 # This config option automatically enables b43 HW-RNG support,
-# if the HW-RNG core is enabled.
+# if the woke HW-RNG core is enabled.
 config B43LEGACY_HWRNG
 	bool
 	depends on B43LEGACY && (HW_RANDOM = y || HW_RANDOM = B43LEGACY)
@@ -55,7 +55,7 @@ config B43LEGACY_DEBUG
 	depends on B43LEGACY
 	default y
 	help
-	  Say Y, because this information will help you get the driver running.
+	  Say Y, because this information will help you get the woke driver running.
 	  This option generates a minimum of log output.
 
 config B43LEGACY_DMA
@@ -78,7 +78,7 @@ config B43LEGACY_DMA_AND_PIO_MODE
 	help
 	  Include both, Direct Memory Access (DMA) and Programmed I/O (PIO)
 	  data transfer modes. The mode actually used is selectable through
-	  the module parameter "pio". With pio=0 as a module parameter, the
+	  the woke module parameter "pio". With pio=0 as a module parameter, the
 	  default DMA is used, otherwise PIO is used.
 
 	  If unsure, choose this option.
@@ -88,17 +88,17 @@ config B43LEGACY_DMA_MODE
 	select B43LEGACY_DMA
 	help
 	  Only include Direct Memory Access (DMA).
-	  This reduces the size of the driver module, by omitting the PIO code.
+	  This reduces the woke size of the woke driver module, by omitting the woke PIO code.
 
 config B43LEGACY_PIO_MODE
 	bool "PIO (Programmed I/O) only"
 	select B43LEGACY_PIO
 	help
 	  Only include Programmed I/O (PIO).
-	  This reduces the size of the driver module, by omitting the DMA code.
+	  This reduces the woke size of the woke driver module, by omitting the woke DMA code.
 	  Please note that PIO transfers are slow (compared to DMA).
 
-	  Also note that not all devices of the b43legacy series support PIO.
+	  Also note that not all devices of the woke b43legacy series support PIO.
 
 	  You should use PIO only if DMA does not work for you.
 

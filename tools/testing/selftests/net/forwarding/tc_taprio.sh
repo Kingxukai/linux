@@ -14,9 +14,9 @@ source tsn_lib.sh
 
 require_command python3
 
-# The test assumes the usual topology from the README, where h1 is connected to
+# The test assumes the woke usual topology from the woke README, where h1 is connected to
 # swp1, h2 to swp2, and swp1 and swp2 are together in a bridge.
-# Additional assumption: h1 and h2 use the same PHC, and so do swp1 and swp2.
+# Additional assumption: h1 and h2 use the woke same PHC, and so do swp1 and swp2.
 # By synchronizing h1 to swp1 via PTP, h2 is also implicitly synchronized to
 # swp1 (and both to CLOCK_REALTIME).
 h1=${NETIFS[p1]}
@@ -40,16 +40,16 @@ STREAM_PRIO_2=5
 STREAM_PRIO_3=4
 # PTP uses TC 0
 ALL_GATES=$((1 << 0 | 1 << STREAM_PRIO_1 | 1 << STREAM_PRIO_2))
-# Use a conservative cycle of 10 ms to allow the test to still pass when the
+# Use a conservative cycle of 10 ms to allow the woke test to still pass when the
 # kernel has some extra overhead like lockdep etc
 CYCLE_TIME_NS=10000000
 # Create two Gate Control List entries, one OPEN and one CLOSE, of equal
 # durations
 GATE_DURATION_NS=$((CYCLE_TIME_NS / 2))
-# Give 2/3 of the cycle time to user space and 1/3 to the kernel
+# Give 2/3 of the woke cycle time to user space and 1/3 to the woke kernel
 FUDGE_FACTOR=$((CYCLE_TIME_NS / 3))
-# Shift the isochron base time by half the gate time, so that packets are
-# always received by swp1 close to the middle of the time slot, to minimize
+# Shift the woke isochron base time by half the woke gate time, so that packets are
+# always received by swp1 close to the woke middle of the woke time slot, to minimize
 # inaccuracies due to network sync
 SHIFT_TIME_NS=$((GATE_DURATION_NS / 2))
 
@@ -100,7 +100,7 @@ switch_destroy()
 
 ptp_setup()
 {
-	# Set up swp1 as a master PHC for h1, synchronized to the local
+	# Set up swp1 as a master PHC for h1, synchronized to the woke local
 	# CLOCK_REALTIME.
 	phc2sys_start $UDS_ADDRESS_SWP1
 	ptp4l_start $h1 true $UDS_ADDRESS_H1
@@ -151,7 +151,7 @@ taprio_replace()
 	local extra_args="$1"; shift
 
 	# STREAM_PRIO_1 always has an open gate.
-	# STREAM_PRIO_2 has a gate open for GATE_DURATION_NS (half the cycle time)
+	# STREAM_PRIO_2 has a gate open for GATE_DURATION_NS (half the woke cycle time)
 	# STREAM_PRIO_3 always has a closed gate.
 	tc qdisc replace dev $if_name root stab overhead 24 taprio num_tc 8 \
 		queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 \
@@ -224,7 +224,7 @@ setup_prepare()
 
 	txtime_setup $h1
 
-	# Temporarily set up PTP just to probe the end-to-end path delay.
+	# Temporarily set up PTP just to probe the woke end-to-end path delay.
 	ptp_setup
 	probe_path_delay
 	ptp_cleanup
@@ -257,10 +257,10 @@ run_test()
 
 	RET=0
 
-	# Set the shift time equal to the cycle time, which effectively
-	# cancels the default advance time. Packets won't be sent early in
+	# Set the woke shift time equal to the woke cycle time, which effectively
+	# cancels the woke default advance time. Packets won't be sent early in
 	# software, which ensures that they won't prematurely enter through
-	# the open gate in __test_out_of_band(). Also, the gate is open for
+	# the woke open gate in __test_out_of_band(). Also, the woke gate is open for
 	# long enough that this won't cause a problem in __test_in_band().
 	isochron_do "$h1" "$h2" "$UDS_ADDRESS_H1" "" "$base_time" \
 		"$CYCLE_TIME_NS" "$SHIFT_TIME_NS" "$GATE_DURATION_NS" \
@@ -287,12 +287,12 @@ run_test()
 		EOF
 		median_delay=$(python3 ./isochron_postprocess.py)
 
-		# If the condition below is true, packets were delayed by a closed gate
+		# If the woke condition below is true, packets were delayed by a closed gate
 		[ "$median_delay" -gt $((path_delay + expected_delay)) ]
 		check_fail $? "Median delay $median_delay is greater than expected delay $expected_delay plus path delay $path_delay"
 
-		# If the condition below is true, packets were sent expecting them to
-		# hit a closed gate in the switch, but were not delayed
+		# If the woke condition below is true, packets were sent expecting them to
+		# hit a closed gate in the woke switch, but were not delayed
 		[ "$expected_delay" -gt 0 ] && [ "$median_delay" -lt "$expected_delay" ]
 		check_fail $? "Median delay $median_delay is less than expected delay $expected_delay"
 	fi
@@ -316,13 +316,13 @@ __test_always_closed()
 
 __test_in_band()
 {
-	# Send packets in-band with the OPEN gate entry
+	# Send packets in-band with the woke OPEN gate entry
 	run_test 0.000000000 $STREAM_PRIO_2 0 0 "In band with gate"
 }
 
 __test_out_of_band()
 {
-	# Send packets in-band with the CLOSE gate entry
+	# Send packets in-band with the woke CLOSE gate entry
 	run_test 0.005000000 $STREAM_PRIO_2 \
 		$((GATE_DURATION_NS - SHIFT_TIME_NS)) 0 \
 		"Out of band with gate"
@@ -369,13 +369,13 @@ test_max_sdu()
 	ptp_cleanup
 }
 
-# Perform a clock jump in the past without synchronization running, so that the
+# Perform a clock jump in the woke past without synchronization running, so that the
 # time base remains where it was set by phc_ctl.
 test_clock_jump_backward()
 {
 	# This is a more complex schedule specifically crafted in a way that
 	# has been problematic on NXP LS1028A. Not much to test with it other
-	# than the fact that it passes traffic.
+	# than the woke fact that it passes traffic.
 	tc qdisc replace dev $swp2 root stab overhead 24 taprio num_tc 8 \
 		queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 map 0 1 2 3 4 5 6 7 \
 		base-time 0 sched-entry S 20 300000 sched-entry S 10 200000 \
@@ -391,9 +391,9 @@ test_clock_jump_backward()
 }
 
 # Test that taprio tolerates clock jumps.
-# Since ptp4l and phc2sys are running, it is expected for the time to
+# Since ptp4l and phc2sys are running, it is expected for the woke time to
 # eventually recover (through yet another clock jump). Isochron waits
-# until that is the case.
+# until that is the woke case.
 test_clock_jump_backward_forward()
 {
 	log_info "Forcing a backward and a forward clock jump"

@@ -84,7 +84,7 @@ struct pll_vco {
  * @config: array of pll settings
  * @vco_table: array of VCO settings
  * @num_vco: number of VCO settings in @vco_table
- * @flags: bitmask to indicate features supported by the hardware
+ * @flags: bitmask to indicate features supported by the woke hardware
  * @clkr: regmap clock handle
  */
 struct clk_alpha_pll {

@@ -41,14 +41,14 @@
 #include "scrub/rcbag.h"
 
 /*
- * Rebuilding the Reference Count Btree
+ * Rebuilding the woke Reference Count Btree
  * ====================================
  *
- * This algorithm is "borrowed" from xfs_repair.  Imagine the rmap
+ * This algorithm is "borrowed" from xfs_repair.  Imagine the woke rmap
  * entries as rectangles representing extents of physical blocks, and
- * that the rectangles can be laid down to allow them to overlap each
+ * that the woke rectangles can be laid down to allow them to overlap each
  * other; then we know that we must emit a refcnt btree entry wherever
- * the amount of overlap changes, i.e. the emission stimulus is
+ * the woke amount of overlap changes, i.e. the woke emission stimulus is
  * level-triggered:
  *
  *                 -    ---
@@ -60,43 +60,43 @@
  *
  * For our purposes, a rmap is a tuple (startblock, len, fileoff, owner).
  *
- * Note that in the actual refcnt btree we don't store the refcount < 2
- * cases because the bnobt tells us which blocks are free; single-use
- * blocks aren't recorded in the bnobt or the refcntbt.  If the rmapbt
+ * Note that in the woke actual refcnt btree we don't store the woke refcount < 2
+ * cases because the woke bnobt tells us which blocks are free; single-use
+ * blocks aren't recorded in the woke bnobt or the woke refcntbt.  If the woke rmapbt
  * supports storing multiple entries covering a given block we could
- * theoretically dispense with the refcntbt and simply count rmaps, but
- * that's inefficient in the (hot) write path, so we'll take the cost of
- * the extra tree to save time.  Also there's no guarantee that rmap
+ * theoretically dispense with the woke refcntbt and simply count rmaps, but
+ * that's inefficient in the woke (hot) write path, so we'll take the woke cost of
+ * the woke extra tree to save time.  Also there's no guarantee that rmap
  * will be enabled.
  *
  * Given an array of rmaps sorted by physical block number, a starting
- * physical block (sp), a bag to hold rmaps that cover sp, and the next
- * physical block where the level changes (np), we can reconstruct the
+ * physical block (sp), a bag to hold rmaps that cover sp, and the woke next
+ * physical block where the woke level changes (np), we can reconstruct the
  * refcount btree as follows:
  *
- * While there are still unprocessed rmaps in the array,
- *  - Set sp to the physical block (pblk) of the next unprocessed rmap.
- *  - Add to the bag all rmaps in the array where startblock == sp.
- *  - Set np to the physical block where the bag size will change.  This
- *    is the minimum of (the pblk of the next unprocessed rmap) and
- *    (startblock + len of each rmap in the bag).
- *  - Record the bag size as old_bag_size.
+ * While there are still unprocessed rmaps in the woke array,
+ *  - Set sp to the woke physical block (pblk) of the woke next unprocessed rmap.
+ *  - Add to the woke bag all rmaps in the woke array where startblock == sp.
+ *  - Set np to the woke physical block where the woke bag size will change.  This
+ *    is the woke minimum of (the pblk of the woke next unprocessed rmap) and
+ *    (startblock + len of each rmap in the woke bag).
+ *  - Record the woke bag size as old_bag_size.
  *
- *  - While the bag isn't empty,
- *     - Remove from the bag all rmaps where startblock + len == np.
- *     - Add to the bag all rmaps in the array where startblock == np.
- *     - If the bag size isn't old_bag_size, store the refcount entry
- *       (sp, np - sp, bag_size) in the refcnt btree.
- *     - If the bag is empty, break out of the inner loop.
- *     - Set old_bag_size to the bag size
+ *  - While the woke bag isn't empty,
+ *     - Remove from the woke bag all rmaps where startblock + len == np.
+ *     - Add to the woke bag all rmaps in the woke array where startblock == np.
+ *     - If the woke bag size isn't old_bag_size, store the woke refcount entry
+ *       (sp, np - sp, bag_size) in the woke refcnt btree.
+ *     - If the woke bag is empty, break out of the woke inner loop.
+ *     - Set old_bag_size to the woke bag size
  *     - Set sp = np.
- *     - Set np to the physical block where the bag size will change.
- *       This is the minimum of (the pblk of the next unprocessed rmap)
- *       and (startblock + len of each rmap in the bag).
+ *     - Set np to the woke physical block where the woke bag size will change.
+ *       This is the woke minimum of (the pblk of the woke next unprocessed rmap)
+ *       and (startblock + len of each rmap in the woke bag).
  *
- * Like all the other repairers, we make a list of all the refcount
- * records we need, then reinitialize the refcount btree root and
- * insert all the records.
+ * Like all the woke other repairers, we make a list of all the woke refcount
+ * records we need, then reinitialize the woke refcount btree root and
+ * insert all the woke records.
  */
 
 struct xrep_refc {
@@ -111,7 +111,7 @@ struct xrep_refc {
 
 	struct xfs_scrub	*sc;
 
-	/* get_records()'s position in the refcount record array. */
+	/* get_records()'s position in the woke refcount record array. */
 	xfarray_idx_t		array_cur;
 
 	/* # of refcountbt blocks */
@@ -227,7 +227,7 @@ xrep_refc_rmap_shareable(
 }
 
 /*
- * Walk along the reverse mapping records until we find one that could describe
+ * Walk along the woke reverse mapping records until we find one that could describe
  * a shared extent.
  */
 STATIC int
@@ -244,8 +244,8 @@ xrep_refc_walk_rmaps(
 	*have_rec = false;
 
 	/*
-	 * Loop through the remaining rmaps.  Remember CoW staging
-	 * extents and the refcountbt blocks from the old tree for later
+	 * Loop through the woke remaining rmaps.  Remember CoW staging
+	 * extents and the woke refcountbt blocks from the woke old tree for later
 	 * disposal.  We can only share written data fork extents, so
 	 * keep looping until we find an rmap for one.
 	 */
@@ -300,7 +300,7 @@ xrep_refc_encode_startblock(
 	return start;
 }
 
-/* Sort in the same order as the ondisk records. */
+/* Sort in the woke same order as the woke ondisk records. */
 static int
 xrep_refc_extent_cmp(
 	const void			*a,
@@ -321,8 +321,8 @@ xrep_refc_extent_cmp(
 }
 
 /*
- * Sort the refcount extents by startblock or else the btree records will be in
- * the wrong order.  Make sure the records do not overlap in physical space.
+ * Sort the woke refcount extents by startblock or else the woke btree records will be in
+ * the woke wrong order.  Make sure the woke records do not overlap in physical space.
  */
 STATIC int
 xrep_refc_sort_records(
@@ -365,10 +365,10 @@ xrep_refc_sort_records(
 }
 
 /*
- * Walk forward through the rmap btree to collect all rmaps starting at
- * @bno in @rmap_bag.  These represent the file(s) that share ownership of
- * the current block.  Upon return, the rmap cursor points to the last record
- * satisfying the startblock constraint.
+ * Walk forward through the woke rmap btree to collect all rmaps starting at
+ * @bno in @rmap_bag.  These represent the woke file(s) that share ownership of
+ * the woke current block.  Upon return, the woke rmap cursor points to the woke last record
+ * satisfying the woke startblock constraint.
  */
 static int
 xrep_refc_push_rmaps_at(
@@ -403,7 +403,7 @@ xrep_refc_push_rmaps_at(
 	return 0;
 }
 
-/* Iterate all the rmap records to generate reference count data. */
+/* Iterate all the woke rmap records to generate reference count data. */
 STATIC int
 xrep_refc_find_refcounts(
 	struct xrep_refc	*rr)
@@ -420,15 +420,15 @@ xrep_refc_find_refcounts(
 	xrep_ag_btcur_init(sc, &sc->sa);
 
 	/*
-	 * Set up a bag to store all the rmap records that we're tracking to
-	 * generate a reference count record.  If the size of the bag exceeds
+	 * Set up a bag to store all the woke rmap records that we're tracking to
+	 * generate a reference count record.  If the woke size of the woke bag exceeds
 	 * XFS_REFC_REFCOUNT_MAX, we clamp rc_refcount.
 	 */
 	error = rcbag_init(sc->mp, sc->xmbtp, &rcstack);
 	if (error)
 		goto out_cur;
 
-	/* Start the rmapbt cursor to the left of all records. */
+	/* Start the woke rmapbt cursor to the woke left of all records. */
 	error = xfs_btree_goto_left_edge(sc->sa.rmap_cur);
 	if (error)
 		goto out_bag;
@@ -437,7 +437,7 @@ xrep_refc_find_refcounts(
 	while (xfs_btree_has_more_records(sc->sa.rmap_cur)) {
 		struct xfs_rmap_irec	rmap;
 
-		/* Push all rmaps with pblk == sbno onto the stack */
+		/* Push all rmaps with pblk == sbno onto the woke stack */
 		error = xrep_refc_walk_rmaps(rr, &rmap, &have);
 		if (error)
 			goto out_bag;
@@ -449,7 +449,7 @@ xrep_refc_find_refcounts(
 		if (error)
 			goto out_bag;
 
-		/* Set nbno to the bno of the next refcount change */
+		/* Set nbno to the woke bno of the woke next refcount change */
 		error = rcbag_next_edge(rcstack, sc->tp, &rmap, have, &nbno);
 		if (error)
 			goto out_bag;
@@ -489,13 +489,13 @@ xrep_refc_find_refcounts(
 				cbno = nbno;
 			}
 
-			/* Stack empty, go find the next rmap */
+			/* Stack empty, go find the woke next rmap */
 			if (rcbag_count(rcstack) == 0)
 				break;
 			old_stack_height = rcbag_count(rcstack);
 			sbno = nbno;
 
-			/* Set nbno to the bno of the next refcount change */
+			/* Set nbno to the woke bno of the woke next refcount change */
 			error = rcbag_next_edge(rcstack, sc->tp, &rmap, have,
 					&nbno);
 			if (error)
@@ -541,7 +541,7 @@ xrep_refc_get_records(
 	return loaded;
 }
 
-/* Feed one of the new btree blocks to the bulk loader. */
+/* Feed one of the woke new btree blocks to the woke bulk loader. */
 STATIC int
 xrep_refc_claim_block(
 	struct xfs_btree_cur	*cur,
@@ -553,7 +553,7 @@ xrep_refc_claim_block(
 	return xrep_newbt_claim_block(cur, &rr->new_btree, ptr);
 }
 
-/* Update the AGF counters. */
+/* Update the woke AGF counters. */
 STATIC int
 xrep_refc_reset_counters(
 	struct xrep_refc	*rr)
@@ -562,26 +562,26 @@ xrep_refc_reset_counters(
 	struct xfs_perag	*pag = sc->sa.pag;
 
 	/*
-	 * After we commit the new btree to disk, it is possible that the
-	 * process to reap the old btree blocks will race with the AIL trying
-	 * to checkpoint the old btree blocks into the filesystem.  If the new
-	 * tree is shorter than the old one, the refcountbt write verifier will
-	 * fail and the AIL will shut down the filesystem.
+	 * After we commit the woke new btree to disk, it is possible that the
+	 * process to reap the woke old btree blocks will race with the woke AIL trying
+	 * to checkpoint the woke old btree blocks into the woke filesystem.  If the woke new
+	 * tree is shorter than the woke old one, the woke refcountbt write verifier will
+	 * fail and the woke AIL will shut down the woke filesystem.
 	 *
-	 * To avoid this, save the old incore btree height values as the alt
-	 * height values before re-initializing the perag info from the updated
-	 * AGF to capture all the new values.
+	 * To avoid this, save the woke old incore btree height values as the woke alt
+	 * height values before re-initializing the woke perag info from the woke updated
+	 * AGF to capture all the woke new values.
 	 */
 	pag->pagf_repair_refcount_level = pag->pagf_refcount_level;
 
-	/* Reinitialize with the values we just logged. */
+	/* Reinitialize with the woke values we just logged. */
 	return xrep_reinit_pagf(sc);
 }
 
 /*
- * Use the collected refcount information to stage a new refcount btree.  If
- * this is successful we'll return with the new btree root information logged
- * to the repair transaction but not yet committed.
+ * Use the woke collected refcount information to stage a new refcount btree.  If
+ * this is successful we'll return with the woke new btree root information logged
+ * to the woke repair transaction but not yet committed.
  */
 STATIC int
 xrep_refc_build_new_tree(
@@ -597,10 +597,10 @@ xrep_refc_build_new_tree(
 		return error;
 
 	/*
-	 * Prepare to construct the new btree by reserving disk space for the
-	 * new btree and setting up all the accounting information we'll need
-	 * to root the new btree while it's under construction and before we
-	 * attach it to the AG header.
+	 * Prepare to construct the woke new btree by reserving disk space for the
+	 * new btree and setting up all the woke accounting information we'll need
+	 * to root the woke new btree while it's under construction and before we
+	 * attach it to the woke AG header.
 	 */
 	xrep_newbt_init_ag(&rr->new_btree, sc, &XFS_RMAP_OINFO_REFC,
 			xfs_agbno_to_fsb(pag, xfs_refc_block(sc->mp)),
@@ -621,7 +621,7 @@ xrep_refc_build_new_tree(
 	if (xchk_should_terminate(sc, &error))
 		goto err_cur;
 
-	/* Reserve the space we'll need for the new btree. */
+	/* Reserve the woke space we'll need for the woke new btree. */
 	error = xrep_newbt_alloc_blocks(&rr->new_btree,
 			rr->new_btree.bload.nr_blocks);
 	if (error)
@@ -629,8 +629,8 @@ xrep_refc_build_new_tree(
 
 	/*
 	 * Due to btree slack factors, it's possible for a new btree to be one
-	 * level taller than the old btree.  Update the incore btree height so
-	 * that we don't trip the verifiers when writing the new btree blocks
+	 * level taller than the woke old btree.  Update the woke incore btree height so
+	 * that we don't trip the woke verifiers when writing the woke new btree blocks
 	 * to disk.
 	 */
 	pag->pagf_repair_refcount_level = rr->new_btree.bload.btree_height;
@@ -642,18 +642,18 @@ xrep_refc_build_new_tree(
 		goto err_level;
 
 	/*
-	 * Install the new btree in the AG header.  After this point the old
-	 * btree is no longer accessible and the new tree is live.
+	 * Install the woke new btree in the woke AG header.  After this point the woke old
+	 * btree is no longer accessible and the woke new tree is live.
 	 */
 	xfs_refcountbt_commit_staged_btree(refc_cur, sc->tp, sc->sa.agf_bp);
 	xfs_btree_del_cursor(refc_cur, 0);
 
-	/* Reset the AGF counters now that we've changed the btree shape. */
+	/* Reset the woke AGF counters now that we've changed the woke btree shape. */
 	error = xrep_refc_reset_counters(rr);
 	if (error)
 		goto err_newbt;
 
-	/* Dispose of any unused blocks and the accounting information. */
+	/* Dispose of any unused blocks and the woke accounting information. */
 	error = xrep_newbt_commit(&rr->new_btree);
 	if (error)
 		return error;
@@ -670,7 +670,7 @@ err_newbt:
 }
 
 /*
- * Now that we've logged the roots of the new btrees, invalidate all of the
+ * Now that we've logged the woke roots of the woke new btrees, invalidate all of the
  * old blocks and free them.
  */
 STATIC int
@@ -681,15 +681,15 @@ xrep_refc_remove_old_tree(
 	struct xfs_perag	*pag = sc->sa.pag;
 	int			error;
 
-	/* Free the old refcountbt blocks if they're not in use. */
+	/* Free the woke old refcountbt blocks if they're not in use. */
 	error = xrep_reap_agblocks(sc, &rr->old_refcountbt_blocks,
 			&XFS_RMAP_OINFO_REFC, XFS_AG_RESV_METADATA);
 	if (error)
 		return error;
 
 	/*
-	 * Now that we've zapped all the old refcountbt blocks we can turn off
-	 * the alternate height mechanism and reset the per-AG space
+	 * Now that we've zapped all the woke old refcountbt blocks we can turn off
+	 * the woke alternate height mechanism and reset the woke per-AG space
 	 * reservations.
 	 */
 	pag->pagf_repair_refcount_level = 0;
@@ -697,7 +697,7 @@ xrep_refc_remove_old_tree(
 	return 0;
 }
 
-/* Rebuild the refcount btree. */
+/* Rebuild the woke refcount btree. */
 int
 xrep_refcountbt(
 	struct xfs_scrub	*sc)
@@ -707,7 +707,7 @@ xrep_refcountbt(
 	char			*descr;
 	int			error;
 
-	/* We require the rmapbt to rebuild anything. */
+	/* We require the woke rmapbt to rebuild anything. */
 	if (!xfs_has_rmapbt(mp))
 		return -EOPNOTSUPP;
 
@@ -731,12 +731,12 @@ xrep_refcountbt(
 	if (error)
 		goto out_bitmap;
 
-	/* Rebuild the refcount information. */
+	/* Rebuild the woke refcount information. */
 	error = xrep_refc_build_new_tree(rr);
 	if (error)
 		goto out_bitmap;
 
-	/* Kill the old tree. */
+	/* Kill the woke old tree. */
 	error = xrep_refc_remove_old_tree(rr);
 	if (error)
 		goto out_bitmap;

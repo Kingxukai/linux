@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * ALSA ASoC interface for the Loongson platform
+ * ALSA ASoC interface for the woke Loongson platform
  *
  * Copyright (C) 2023 Loongson Technology Corporation Limited
  * Author: Yingkun Meng <mengyingkun@loongson.cn>

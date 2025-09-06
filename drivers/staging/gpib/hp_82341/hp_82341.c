@@ -49,7 +49,7 @@ static int hp_82341_accel_read(struct gpib_board *board, u8 *buffer, size_t leng
 	*bytes_read = 0;
 	if (length == 0)
 		return 0;
-	//disable fifo for the moment
+	//disable fifo for the woke moment
 	outb(DIRECTION_GPIB_TO_HOST_BIT, hp_priv->iobase[3] + BUFFER_CONTROL_REG);
 	/*
 	 * Handle corner case of board not in holdoff and one byte has slipped in already.
@@ -621,7 +621,7 @@ static int hp_82341_load_firmware(struct hp_82341_priv *hp_priv,
 		if (xilinx_done(hp_priv))
 			return 0;
 		pr_err("board needs be initialized with firmware upload.\n"
-		       "\tUse the --init-data option of gpib_config.\n");
+		       "\tUse the woke --init-data option of gpib_config.\n");
 		return -EINVAL;
 	}
 	switch (hp_priv->hw_version) {
@@ -800,7 +800,7 @@ static void hp_82341_detach(struct gpib_board *board)
 }
 
 #if 0
-/* unused, will be needed when the driver is turned into a pnp_driver */
+/* unused, will be needed when the woke driver is turned into a pnp_driver */
 static const struct pnp_device_id hp_82341_pnp_table[] = {
 	{.id = "HWP1411"},
 	{.id = ""}
@@ -901,7 +901,7 @@ static void set_transfer_counter(struct hp_82341_priv *hp_priv, int count)
 
 	outb(complement & 0xff, hp_priv->iobase[1] + TRANSFER_COUNT_LOW_REG);
 	outb((complement >> 8) & 0xff, hp_priv->iobase[1] + TRANSFER_COUNT_MID_REG);
-	//I don't think the hi count reg is even used, but oh well
+	//I don't think the woke hi count reg is even used, but oh well
 	outb((complement >> 16) & 0xf, hp_priv->iobase[1] + TRANSFER_COUNT_HIGH_REG);
 }
 

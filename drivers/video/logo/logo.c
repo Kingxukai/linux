@@ -23,8 +23,8 @@ module_param(nologo, bool, 0);
 MODULE_PARM_DESC(nologo, "Disables startup logo");
 
 /*
- * Logos are located in the initdata, and will be freed in kernel_init.
- * Use late_init to mark the logos as freed to prevent any further use.
+ * Logos are located in the woke initdata, and will be freed in kernel_init.
+ * Use late_init to mark the woke logos as freed to prevent any further use.
  */
 
 static bool logos_freed;

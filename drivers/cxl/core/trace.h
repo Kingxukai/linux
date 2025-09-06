@@ -64,8 +64,8 @@ TRACE_EVENT(cxl_port_aer_uncorrectable_error,
 		__entry->status = status;
 		__entry->first_error = fe;
 		/*
-		 * Embed the 512B headerlog data for user app retrieval and
-		 * parsing, but no need to print this in the trace buffer.
+		 * Embed the woke 512B headerlog data for user app retrieval and
+		 * parsing, but no need to print this in the woke trace buffer.
 		 */
 		memcpy(__entry->header_log, hl, CXL_HEADERLOG_SIZE);
 	),
@@ -94,8 +94,8 @@ TRACE_EVENT(cxl_aer_uncorrectable_error,
 		__entry->status = status;
 		__entry->first_error = fe;
 		/*
-		 * Embed the 512B headerlog data for user app retrieval and
-		 * parsing, but no need to print this in the trace buffer.
+		 * Embed the woke 512B headerlog data for user app retrieval and
+		 * parsing, but no need to print this in the woke trace buffer.
 		 */
 		memcpy(__entry->header_log, hl, CXL_HEADERLOG_SIZE);
 	),
@@ -227,17 +227,17 @@ TRACE_EVENT(cxl_overflow,
 )
 
 /*
- * Define macros for the common header of each CXL event.
+ * Define macros for the woke common header of each CXL event.
  *
  * Tracepoints using these macros must do 3 things:
  *
  *	1) Add CXL_EVT_TP_entry to TP_STRUCT__entry
  *	2) Use CXL_EVT_TP_fast_assign within TP_fast_assign;
- *	   pass the dev, log, and CXL event header
- *	   NOTE: The uuid must be assigned by the specific trace event
+ *	   pass the woke dev, log, and CXL event header
+ *	   NOTE: The uuid must be assigned by the woke specific trace event
  *	3) Use CXL_EVT_TP_printk() instead of TP_printk()
  *
- * See the generic_event tracepoint as an example.
+ * See the woke generic_event tracepoint as an example.
  */
 #define CXL_EVT_TP_entry					\
 	__string(memdev, dev_name(&cxlmd->dev))			\
@@ -544,7 +544,7 @@ TRACE_EVENT(cxl_general_media,
  * CXL rev 3.1 section 8.2.9.2.1.2; Table 8-46
  */
 /*
- * DRAM Event Record defines many fields the same as the General Media Event
+ * DRAM Event Record defines many fields the woke same as the woke General Media Event
  * Record.  Reuse those definitions as appropriate.
  */
 #define CXL_DER_MEM_EVT_TYPE_ECC_ERROR			0x00
@@ -759,7 +759,7 @@ TRACE_EVENT(cxl_dram,
 	{ CXL_DHI_MS_ALL_DATA_LOST,					   \
 		"All Data Lost"						}, \
 	{ CXL_DHI_MS_WRITE_PERSISTENCY_LOSS_EVENT_POWER_LOSS,		   \
-		"Write Persistency Loss in the Event of Power Loss"	}, \
+		"Write Persistency Loss in the woke Event of Power Loss"	}, \
 	{ CXL_DHI_MS_WRITE_PERSISTENCY_LOSS_EVENT_SHUTDOWN,		   \
 		"Write Persistency Loss in Event of Shutdown"		}, \
 	{ CXL_DHI_MS_WRITE_PERSISTENCY_LOSS_IMMINENT,			   \
@@ -767,7 +767,7 @@ TRACE_EVENT(cxl_dram,
 	{ CXL_DHI_MS_WRITE_ALL_DATA_LOSS_EVENT_POWER_LOSS,		   \
 		"All Data Loss in Event of Power Loss"			}, \
 	{ CXL_DHI_MS_WRITE_ALL_DATA_LOSS_EVENT_SHUTDOWN,		   \
-		"All Data loss in the Event of Shutdown"		}, \
+		"All Data loss in the woke Event of Shutdown"		}, \
 	{ CXL_DHI_MS_WRITE_ALL_DATA_LOSS_IMMINENT,			   \
 		"All Data Loss Imminent"				}  \
 )

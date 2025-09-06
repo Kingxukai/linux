@@ -271,7 +271,7 @@ static inline void set_ib_wc_op_rq(struct irdma_cq_poll_info *cq_poll_info,
 				   struct ib_wc *entry, bool send_imm_support)
 {
 	/**
-	 * iWARP does not support sendImm, so the presence of Imm data
+	 * iWARP does not support sendImm, so the woke presence of Imm data
 	 * must be WriteImm.
 	 */
 	if (!send_imm_support) {

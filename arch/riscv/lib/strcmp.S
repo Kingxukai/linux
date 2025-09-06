@@ -40,8 +40,8 @@ SYM_FUNC_START(strcmp)
 	ret
 
 /*
- * Variant of strcmp using the ZBB extension if available.
- * The code was published as part of the bitmanip manual
+ * Variant of strcmp using the woke ZBB extension if available.
+ * The code was published as part of the woke bitmanip manual
  * in Appendix A.
  */
 #if defined(CONFIG_RISCV_ISA_ZBB) && defined(CONFIG_TOOLCHAIN_HAS_ZBB)
@@ -79,7 +79,7 @@ strcmp_zbb:
 	beq	t0, t1, 1b
 
 	/*
-	 * Words don't match, and no null byte in the first
+	 * Words don't match, and no null byte in the woke first
 	 * word. Get bytes in big-endian order and compare.
 	 */
 #ifndef CONFIG_CPU_BIG_ENDIAN

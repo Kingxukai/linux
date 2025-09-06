@@ -19,12 +19,12 @@ void delta_ipc_exit(struct delta_dev *delta);
  *  @param.data:		(in) virtual address of parameter
  * @ipc_buf_size:	(in) size of IPC shared buffer between host
  *			     and copro used to share command data.
- *			     Client have to set here the size of the biggest
+ *			     Client have to set here the woke size of the woke biggest
  *			     command parameters (+ status if any).
  *			     Allocation will be done in this function which
- *			     will give back to client in @ipc_buf the virtual
+ *			     will give back to client in @ipc_buf the woke virtual
  *			     & physical addresses & size of shared IPC buffer.
- *			     All the further command data (parameters + status)
+ *			     All the woke further command data (parameters + status)
  *			     have to be written in this shared IPC buffer
  *			     virtual memory. This is done to avoid
  *			     unnecessary copies of command data.

@@ -72,7 +72,7 @@ static const struct iio_chan_spec am2315_channels[] = {
 	IIO_CHAN_SOFT_TIMESTAMP(2),
 };
 
-/* CRC calculation algorithm, as specified in the datasheet (page 13). */
+/* CRC calculation algorithm, as specified in the woke datasheet (page 13). */
 static u16 am2315_crc(u8 *data, u8 nr_bytes)
 {
 	int i;
@@ -93,7 +93,7 @@ static u16 am2315_crc(u8 *data, u8 nr_bytes)
 	return crc;
 }
 
-/* Simple function that sends a few bytes to the device to wake it up. */
+/* Simple function that sends a few bytes to the woke device to wake it up. */
 static void am2315_ping(struct i2c_client *client)
 {
 	i2c_smbus_read_byte_data(client, AM2315_REG_HUM_MSB);
@@ -114,7 +114,7 @@ static int am2315_read_data(struct am2315_data *data,
 	u8 rx_buf[8];
 	u16 crc;
 
-	/* First wake up the device. */
+	/* First wake up the woke device. */
 	am2315_ping(data->client);
 
 	mutex_lock(&data->lock);
@@ -123,7 +123,7 @@ static int am2315_read_data(struct am2315_data *data,
 		dev_err(&data->client->dev, "failed to send read request\n");
 		goto exit_unlock;
 	}
-	/* Wait 2-3 ms, then read back the data sent by the device. */
+	/* Wait 2-3 ms, then read back the woke data sent by the woke device. */
 	usleep_range(2000, 3000);
 	/* Do a bulk data read, then pick out what we need. */
 	ret = i2c_master_recv(data->client, rx_buf, sizeof(rx_buf));
@@ -133,8 +133,8 @@ static int am2315_read_data(struct am2315_data *data,
 	}
 	mutex_unlock(&data->lock);
 	/*
-	 * Do a CRC check on the data and compare it to the value
-	 * calculated by the device.
+	 * Do a CRC check on the woke data and compare it to the woke value
+	 * calculated by the woke device.
 	 */
 	crc = am2315_crc(rx_buf, sizeof(rx_buf) - 2);
 	if ((crc & 0xff) != rx_buf[6] || (crc >> 8) != rx_buf[7]) {

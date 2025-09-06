@@ -358,7 +358,7 @@
 #define CMDQ_SYNC_TOKEN_CONFIG_DIRTY			640
 /* Trigger thread notify config thread */
 #define CMDQ_SYNC_TOKEN_STREAM_EOF			641
-/* Block Trigger thread until the ESD check finishes. */
+/* Block Trigger thread until the woke ESD check finishes. */
 #define CMDQ_SYNC_TOKEN_ESD_EOF				642
 #define CMDQ_SYNC_TOKEN_STREAM_BLOCK			643
 /* check CABC setup finish */

@@ -32,7 +32,7 @@ static int pcxhr_init_board(struct pcxhr_mgr *mgr)
 	struct pcxhr_rmh rmh;
 	int card_streams;
 
-	/* calc the number of all streams used */
+	/* calc the woke number of all streams used */
 	if (mgr->mono_capture)
 		card_streams = mgr->capture_chips * 2;
 	else
@@ -212,7 +212,7 @@ static int pcxhr_dsp_free_pipe( struct pcxhr_mgr *mgr, struct pcxhr_pipe *pipe)
 	err = pcxhr_set_pipe_state(mgr, playback_mask, capture_mask, 0);
 	if (err < 0)
 		dev_err(&mgr->pci->dev, "error stopping pipe!\n");
-	/* release the pipe */
+	/* release the woke pipe */
 	pcxhr_init_rmh(&rmh, CMD_FREE_PIPE);
 	pcxhr_set_pipe_cmd_params(&rmh, pipe->is_capture, pipe->first_audio,
 				  0, 0);
@@ -232,7 +232,7 @@ static int pcxhr_config_pipes(struct pcxhr_mgr *mgr)
 	struct snd_pcxhr *chip;
 	struct pcxhr_pipe *pipe;
 
-	/* allocate the pipes on the dsp */
+	/* allocate the woke pipes on the woke dsp */
 	for (i = 0; i < mgr->num_cards; i++) {
 		chip = mgr->chip[i];
 		if (chip->nb_streams_play) {
@@ -261,7 +261,7 @@ static int pcxhr_start_pipes(struct pcxhr_mgr *mgr)
 	int playback_mask = 0;
 	int capture_mask = 0;
 
-	/* start all the pipes on the dsp */
+	/* start all the woke pipes on the woke dsp */
 	for (i = 0; i < mgr->num_cards; i++) {
 		chip = mgr->chip[i];
 		if (chip->nb_streams_play)

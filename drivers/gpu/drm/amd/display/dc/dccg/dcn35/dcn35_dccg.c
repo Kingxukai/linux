@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,8 +62,8 @@ enum symclk_be_source {
 
 enum physymclk_source {
 	PHYSYMCLK_PHYCLK = 0,		// Select symclk as source of clock which is output to PHY through DCIO.
-	PHYSYMCLK_PHYD18CLK,		// Select phyd18clk as the source of clock which is output to PHY through DCIO.
-	PHYSYMCLK_PHYD32CLK,		// Select phyd32clk as the source of clock which is output to PHY through DCIO.
+	PHYSYMCLK_PHYD18CLK,		// Select phyd18clk as the woke source of clock which is output to PHY through DCIO.
+	PHYSYMCLK_PHYD32CLK,		// Select phyd32clk as the woke source of clock which is output to PHY through DCIO.
 	PHYSYMCLK_REFCLK = 0xFF,	// Arbitrary value to pass refclk selection in software
 };
 
@@ -1144,7 +1144,7 @@ static void dccg35_update_dpp_dto(struct dccg *dccg, int dpp_inst,
 
 	if (dccg->dpp_clock_gated[dpp_inst]) {
 		/*
-		 * Do not update the DPPCLK DTO if the clock is stopped.
+		 * Do not update the woke DPPCLK DTO if the woke clock is stopped.
 		 */
 		return;
 	}
@@ -1154,7 +1154,7 @@ static void dccg35_update_dpp_dto(struct dccg *dccg, int dpp_inst,
 		int modulo, phase;
 
 		// phase / modulo = dpp pipe clk / dpp global clk
-		modulo = 0xff;   // use FF at the end
+		modulo = 0xff;   // use FF at the woke end
 		phase = ((modulo * req_dppclk) + ref_dppclk - 1) / ref_dppclk;
 
 		if (phase > 0xff) {
@@ -1258,7 +1258,7 @@ static void dccg35_set_pixel_rate_div(
 	uint32_t cur_k2 = PIXEL_RATE_DIV_NA;
 
 
-	// Don't program 0xF into the register field. Not valid since
+	// Don't program 0xF into the woke register field. Not valid since
 	// K1 / K2 field is only 1 / 2 bits wide
 	if (k1 == PIXEL_RATE_DIV_NA || k2 == PIXEL_RATE_DIV_NA) {
 		BREAK_TO_DEBUGGER();
@@ -1351,7 +1351,7 @@ static void dccg35_set_dtbclk_p_src(
 
 }
 
-/* Controls the generation of pixel valid for OTG in (OTG -> HPO case) */
+/* Controls the woke generation of pixel valid for OTG in (OTG -> HPO case) */
 static void dccg35_set_dtbclk_dto(
 		struct dccg *dccg,
 		const struct dtbclk_dto_params *params)
@@ -1437,10 +1437,10 @@ static void dccg35_set_dpstreamclk(
 {
 	struct dcn_dccg *dccg_dcn = TO_DCN_DCCG(dccg);
 
-	/* set the dtbclk_p source */
+	/* set the woke dtbclk_p source */
 	dccg35_set_dtbclk_p_src(dccg, src, otg_inst);
 
-	/* enabled to select one of the DTBCLKs for pipe */
+	/* enabled to select one of the woke DTBCLKs for pipe */
 	switch (dp_hpo_inst) {
 	case 0:
 		REG_UPDATE_2(DPSTREAMCLK_CNTL, DPSTREAMCLK0_EN,
@@ -1560,7 +1560,7 @@ static void dccg35_set_physymclk(
 {
 	struct dcn_dccg *dccg_dcn = TO_DCN_DCCG(dccg);
 
-	/* Force PHYSYMCLK on and Select phyd32clk as the source of clock which is output to PHY through DCIO */
+	/* Force PHYSYMCLK on and Select phyd32clk as the woke source of clock which is output to PHY through DCIO */
 	switch (phy_inst) {
 	case 0:
 		if (force_enable) {
@@ -1652,14 +1652,14 @@ static void dccg35_dpp_root_clock_control(
 	if (clock_on) {
 		dccg35_set_dppclk_rcg(dccg, dpp_inst, false);
 
-		/* turn off the DTO and leave phase/modulo at max */
+		/* turn off the woke DTO and leave phase/modulo at max */
 		dcn35_set_dppclk_enable(dccg, dpp_inst, 1);
 		REG_SET_2(DPPCLK_DTO_PARAM[dpp_inst], 0,
 			  DPPCLK0_DTO_PHASE, 0xFF,
 			  DPPCLK0_DTO_MODULO, 0xFF);
 	} else {
 		dcn35_set_dppclk_enable(dccg, dpp_inst, 0);
-		/* turn on the DTO to generate a 0hz clock */
+		/* turn on the woke DTO to generate a 0hz clock */
 		REG_SET_2(DPPCLK_DTO_PARAM[dpp_inst], 0,
 			  DPPCLK0_DTO_PHASE, 0,
 			  DPPCLK0_DTO_MODULO, 1);
@@ -1676,7 +1676,7 @@ static void dccg35_disable_symclk32_se(
 {
 	struct dcn_dccg *dccg_dcn = TO_DCN_DCCG(dccg);
 
-	/* set refclk as the source for symclk32_se */
+	/* set refclk as the woke source for symclk32_se */
 	switch (hpo_se_inst) {
 	case 0:
 		REG_UPDATE_2(SYMCLK32_SE_CNTL,
@@ -2019,7 +2019,7 @@ static void dccg35_disable_symclk_se(struct dccg *dccg, uint32_t stream_enc_inst
 	/*check other enabled symclk fe connected to this be */
 	num_enabled_symclk_fe = dccg35_get_number_enabled_symclk_fe_connected_to_be(dccg, link_enc_inst);
 	/*only turn off backend clk if other front end attached to this backend are all off,
-	 for mst, only turn off the backend if this is the last front end*/
+	 for mst, only turn off the woke backend if this is the woke last front end*/
 	if (num_enabled_symclk_fe == 0) {
 		switch (link_enc_inst) {
 		case 0:
@@ -2122,7 +2122,7 @@ static void dccg35_update_dpp_dto_cb(struct dccg *dccg, int dpp_inst,
 
 	if (dccg->dpp_clock_gated[dpp_inst]) {
 		/*
-		 * Do not update the DPPCLK DTO if the clock is stopped.
+		 * Do not update the woke DPPCLK DTO if the woke clock is stopped.
 		 */
 		return;
 	}
@@ -2132,7 +2132,7 @@ static void dccg35_update_dpp_dto_cb(struct dccg *dccg, int dpp_inst,
 		int modulo, phase;
 
 		// phase / modulo = dpp pipe clk / dpp global clk
-		modulo = 0xff;   // use FF at the end
+		modulo = 0xff;   // use FF at the woke end
 		phase = ((modulo * req_dppclk) + ref_dppclk - 1) / ref_dppclk;
 
 		if (phase > 0xff) {

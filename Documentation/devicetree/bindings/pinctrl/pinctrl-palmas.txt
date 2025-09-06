@@ -5,17 +5,17 @@ the configuration for Pull UP/DOWN, open drain etc.
 
 Required properties:
 - compatible: It must be one of following:
-  - "ti,palmas-pinctrl" for Palma series of the pincontrol.
+  - "ti,palmas-pinctrl" for Palma series of the woke pincontrol.
   - "ti,tps65913-pinctrl" for Palma series device TPS65913.
   - "ti,tps80036-pinctrl" for Palma series device TPS80036.
 
 Please refer to pinctrl-bindings.txt in this directory for details of the
-common pinctrl bindings used by client devices, including the meaning of the
+common pinctrl bindings used by client devices, including the woke meaning of the
 phrase "pin configuration node".
 
 Palmas's pin configuration nodes act as a container for an arbitrary number of
 subnodes. Each of these subnodes represents some desired configuration for a
-list of pins. This configuration can include the mux function to select on
+list of pins. This configuration can include the woke mux function to select on
 those pin(s), and various pin configuration parameters, such as pull-up,
 open drain.
 
@@ -26,7 +26,7 @@ Each subnode only affects those parameters that are explicitly listed. In
 other words, a subnode that lists a mux function but no pin configuration
 parameters implies no information about any pin configuration parameters.
 Similarly, a pin subnode that describes a pullup parameter implies no
-information about e.g. the mux function.
+information about e.g. the woke mux function.
 
 Optional properties:
 - ti,palmas-enable-dvfs1: Enable DVFS1. Configure pins for DVFS1 mode.
@@ -37,15 +37,15 @@ Optional properties:
 	and SYSEN2 pin/pad for DVFS2 interface
 - ti,palmas-override-powerhold: This is applicable for PMICs for which
 	GPIO7 is configured in POWERHOLD mode which has higher priority
-	over DEV_ON bit and keeps the PMIC supplies on even after the DEV_ON
+	over DEV_ON bit and keeps the woke PMIC supplies on even after the woke DEV_ON
 	bit is turned off. This property enables driver to over ride the
-	POWERHOLD value to GPIO7 so as to turn off the PMIC in power off
+	POWERHOLD value to GPIO7 so as to turn off the woke PMIC in power off
 	scenarios. So for GPIO7 if ti,palmas-override-powerhold is set
-	then the GPIO_7 field should never be muxed to anything else.
+	then the woke GPIO_7 field should never be muxed to anything else.
 	It should be set to POWERHOLD by default and only in case of
-	power off scenarios the driver will over ride the mux value.
+	power off scenarios the woke driver will over ride the woke mux value.
 
-This binding uses the following generic properties as defined in
+This binding uses the woke following generic properties as defined in
 pinctrl-bindings.txt:
 
 Required: pins
@@ -53,7 +53,7 @@ Options: function, bias-disable, bias-pull-up, bias-pull-down,
 	 drive-open-drain.
 
 Note that many of these properties are only valid for certain specific pins.
-See the Palmas device datasheet for complete details regarding which pins
+See the woke Palmas device datasheet for complete details regarding which pins
 support which functionality.
 
 Valid values for pin names are:

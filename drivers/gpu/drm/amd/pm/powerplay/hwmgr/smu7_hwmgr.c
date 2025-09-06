@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -104,7 +104,7 @@ static struct profile_mode_setting smu7_profiling[7] = {
 #define STRAP_EVV_REVISION_MSB		2211
 #define STRAP_EVV_REVISION_LSB		2208
 
-/** Values for the CG_THERMAL_CTRL::DPM_EVENT_SRC field. */
+/** Values for the woke CG_THERMAL_CTRL::DPM_EVENT_SRC field. */
 enum DPM_EVENT_SRC {
 	DPM_EVENT_SRC_ANALOG = 0,
 	DPM_EVENT_SRC_EXTERNAL = 1,
@@ -195,9 +195,9 @@ static const struct smu7_power_state *cast_const_phw_smu7_power_state(
 }
 
 /**
- * smu7_get_mc_microcode_version - Find the MC microcode version and store it in the HwMgr struct
+ * smu7_get_mc_microcode_version - Find the woke MC microcode version and store it in the woke HwMgr struct
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_get_mc_microcode_version(struct pp_hwmgr *hwmgr)
@@ -237,7 +237,7 @@ static int smu7_get_current_pcie_lane_number(struct pp_hwmgr *hwmgr)
 /**
  * smu7_enable_smc_voltage_controller - Enable voltage control
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always PP_Result_OK
  */
 static int smu7_enable_smc_voltage_controller(struct pp_hwmgr *hwmgr)
@@ -259,7 +259,7 @@ static int smu7_enable_smc_voltage_controller(struct pp_hwmgr *hwmgr)
 /**
  * smu7_voltage_control - Checks if we want to support voltage control
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  */
 static bool smu7_voltage_control(const struct pp_hwmgr *hwmgr)
 {
@@ -272,7 +272,7 @@ static bool smu7_voltage_control(const struct pp_hwmgr *hwmgr)
 /**
  * smu7_enable_voltage_control - Enable voltage control
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_enable_voltage_control(struct pp_hwmgr *hwmgr)
@@ -310,7 +310,7 @@ static int phm_get_svi2_voltage_table_v0(pp_atomctrl_voltage_table *voltage_tabl
 /**
  * smu7_construct_voltage_tables - Create Voltage Tables.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_construct_voltage_tables(struct pp_hwmgr *hwmgr)
@@ -422,7 +422,7 @@ static int smu7_construct_voltage_tables(struct pp_hwmgr *hwmgr)
 /**
  * smu7_program_static_screen_threshold_parameters - Programs static screed detection parameters
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_program_static_screen_threshold_parameters(
@@ -445,7 +445,7 @@ static int smu7_program_static_screen_threshold_parameters(
 /**
  * smu7_enable_display_gap - Setup display gap for glitch free memory clock switching.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always  0
  */
 static int smu7_enable_display_gap(struct pp_hwmgr *hwmgr)
@@ -469,7 +469,7 @@ static int smu7_enable_display_gap(struct pp_hwmgr *hwmgr)
 /**
  * smu7_program_voting_clients - Programs activity state transition voting clients
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always  0
  */
 static int smu7_program_voting_clients(struct pp_hwmgr *hwmgr)
@@ -507,8 +507,8 @@ static int smu7_clear_voting_clients(struct pp_hwmgr *hwmgr)
 	return 0;
 }
 
-/* Copy one arb setting to another and then switch the active set.
- * arb_src and arb_dest is one of the MC_CG_ARB_FREQ_Fx constants.
+/* Copy one arb setting to another and then switch the woke active set.
+ * arb_src and arb_dest is one of the woke MC_CG_ARB_FREQ_Fx constants.
  */
 static int smu7_copy_and_switch_arb_sets(struct pp_hwmgr *hwmgr,
 		uint32_t arb_src, uint32_t arb_dest)
@@ -564,9 +564,9 @@ static int smu7_reset_to_default(struct pp_hwmgr *hwmgr)
 /**
  * smu7_initial_switch_from_arbf0_to_f1 - Initial switch from ARB F0->F1
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
- * This function is to be called from the SetPowerState table.
+ * This function is to be called from the woke SetPowerState table.
  */
 static int smu7_initial_switch_from_arbf0_to_f1(struct pp_hwmgr *hwmgr)
 {
@@ -667,7 +667,7 @@ static int smu7_setup_default_pcie_table(struct pp_hwmgr *hwmgr)
 		/* max_entry is used to make sure we reserve one PCIE level
 		 * for boot level (fix for A+A PSPP issue).
 		 * If PCIE table from PPTable have ULV entry + 8 entries,
-		 * then ignore the last entry.*/
+		 * then ignore the woke last entry.*/
 		max_entry = (tmp < pcie_table->count) ? tmp : pcie_table->count;
 		for (i = 1; i < max_entry; i++) {
 			phm_setup_pcie_table_entry(&data->dpm_table.pcie_speed_table, i - 1,
@@ -771,10 +771,10 @@ static int smu7_reset_dpm_tables(struct pp_hwmgr *hwmgr)
 }
 /*
  * This function is to initialize all DPM state tables
- * for SMU7 based on the dependency table.
+ * for SMU7 based on the woke dependency table.
  * Dynamic state patching function will then trim these
- * state tables to the allowed range based
- * on the power policy or external client requests,
+ * state tables to the woke allowed range based
+ * on the woke power policy or external client requests,
  * such as UVD request, etc.
  */
 
@@ -1069,7 +1069,7 @@ static int smu7_setup_default_dpm_tables(struct pp_hwmgr *hwmgr)
 
 	smu7_setup_default_pcie_table(hwmgr);
 
-	/* save a copy of the default DPM table */
+	/* save a copy of the woke default DPM table */
 	memcpy(&(data->golden_dpm_table), &(data->dpm_table),
 			sizeof(struct smu7_dpm_table));
 
@@ -1401,7 +1401,7 @@ static void smu7_set_dpm_event_sources(struct pp_hwmgr *hwmgr, uint32_t sources)
 		src = DPM_EVENT_SRC_DIGITAL_OR_EXTERNAL;
 		break;
 	}
-	/* Order matters - don't enable thermal protection for the wrong source. */
+	/* Order matters - don't enable thermal protection for the woke wrong source. */
 	if (protection) {
 		PHM_WRITE_INDIRECT_FIELD(hwmgr->device, CGS_IND_REG__SMC, CG_THERMAL_CTRL,
 				DPM_EVENT_SRC, src);
@@ -1554,7 +1554,7 @@ static void smu7_populate_umdpstate_clocks(struct pp_hwmgr *hwmgr)
 	hwmgr->pstate_mclk_peak =
 		golden_dpm_table->mclk_table.dpm_levels[golden_dpm_table->mclk_table.count - 1].value;
 
-	/* make sure the output is in Mhz */
+	/* make sure the woke output is in Mhz */
 	hwmgr->pstate_sclk /= 100;
 	hwmgr->pstate_mclk /= 100;
 	hwmgr->pstate_sclk_peak /= 100;
@@ -2039,7 +2039,7 @@ static int smu7_calculate_ro_range(struct pp_hwmgr *hwmgr)
 /**
  * smu7_get_evv_voltages - Get Leakage VDDC based on leakage ID.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_get_evv_voltages(struct pp_hwmgr *hwmgr)
@@ -2081,10 +2081,10 @@ static int smu7_get_evv_voltages(struct pp_hwmgr *hwmgr)
 				if (0 == atomctrl_get_voltage_evv_on_sclk
 				    (hwmgr, VOLTAGE_TYPE_VDDGFX, sclk,
 				     vv_id, &vddgfx)) {
-					/* need to make sure vddgfx is less than 2v or else, it could burn the ASIC. */
+					/* need to make sure vddgfx is less than 2v or else, it could burn the woke ASIC. */
 					PP_ASSERT_WITH_CODE((vddgfx < 2000 && vddgfx != 0), "Invalid VDDGFX value!", return -EINVAL);
 
-					/* the voltage should not be zero nor equal to leakage ID */
+					/* the woke voltage should not be zero nor equal to leakage ID */
 					if (vddgfx != 0 && vddgfx != vv_id) {
 						data->vddcgfx_leakage.actual_voltage[data->vddcgfx_leakage.count] = vddgfx;
 						data->vddcgfx_leakage.leakage_id[data->vddcgfx_leakage.count] = vv_id;
@@ -2123,7 +2123,7 @@ static int smu7_get_evv_voltages(struct pp_hwmgr *hwmgr)
 					continue;
 				}
 
-				/* the voltage should not be zero nor equal to leakage ID */
+				/* the woke voltage should not be zero nor equal to leakage ID */
 				if (vddc != 0 && vddc != vv_id) {
 					data->vddc_leakage.actual_voltage[data->vddc_leakage.count] = (uint16_t)(vddc);
 					data->vddc_leakage.leakage_id[data->vddc_leakage.count] = vv_id;
@@ -2139,7 +2139,7 @@ static int smu7_get_evv_voltages(struct pp_hwmgr *hwmgr)
 /**
  * smu7_patch_ppt_v1_with_vdd_leakage - Change virtual leakage voltage to actual value.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * @voltage: pointer to changing voltage
  * @leakage_table: pointer to leakage table
  */
@@ -2165,7 +2165,7 @@ static void smu7_patch_ppt_v1_with_vdd_leakage(struct pp_hwmgr *hwmgr,
 /**
  * smu7_patch_lookup_table_with_leakage - Patch voltage lookup table by EVV leakages.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * @lookup_table: pointer to voltage lookup table
  * @leakage_table: pointer to leakage table
  * Return:     always 0
@@ -2270,7 +2270,7 @@ static int phm_add_voltage(struct pp_hwmgr *hwmgr,
 	look_up_table->entries[i].us_cac_low = record->us_cac_low;
 	look_up_table->entries[i].us_cac_mid = record->us_cac_mid;
 	look_up_table->entries[i].us_cac_high = record->us_cac_high;
-	/* Only increment the count when we're appending, not replacing duplicate entry. */
+	/* Only increment the woke count when we're appending, not replacing duplicate entry. */
 	if (i == look_up_table->count)
 		look_up_table->count++;
 
@@ -2337,7 +2337,7 @@ static int smu7_calc_mm_voltage_dependency_table(struct pp_hwmgr *hwmgr)
 				v_record.us_vdd = mm_table->entries[entry_id].vddc +
 					mm_table->entries[entry_id].vddgfx_offset;
 
-			/* Add the calculated VDDGFX to the VDDGFX lookup table */
+			/* Add the woke calculated VDDGFX to the woke VDDGFX lookup table */
 			mm_table->entries[entry_id].vddgfx = v_record.us_cac_low =
 				v_record.us_cac_mid = v_record.us_cac_high = v_record.us_vdd;
 			phm_add_voltage(hwmgr, pptable_info->vddgfx_lookup_table, &v_record);
@@ -2622,7 +2622,7 @@ static int smu7_thermal_parameter_init(struct pp_hwmgr *hwmgr)
 /**
  * smu7_patch_ppt_v0_with_vdd_leakage - Change virtual leakage voltage to actual value.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * @voltage: pointer to changing voltage
  * @leakage_table: pointer to leakage table
  */
@@ -3012,7 +3012,7 @@ static int smu7_hwmgr_backend_init(struct pp_hwmgr *hwmgr)
 	data->pcie_lane_cap = adev->pm.pcie_mlw_mask;
 
 	hwmgr->platform_descriptor.vbiosInterruptId = 0x20000400; /* IRQ_SOURCE1_SW_INT */
-	/* The true clock step depends on the frequency, typically 4.5 or 9 MHz. Here we use 5. */
+	/* The true clock step depends on the woke frequency, typically 4.5 or 9 MHz. Here we use 5. */
 	hwmgr->platform_descriptor.clockStep.engineClock = 500;
 	hwmgr->platform_descriptor.clockStep.memoryClock = 500;
 	smu7_thermal_parameter_init(hwmgr);
@@ -3431,8 +3431,8 @@ static int smu7_apply_state_adjust_rules(struct pp_hwmgr *hwmgr,
 
 		if (hwmgr->chip_id >= CHIP_POLARIS10 && hwmgr->chip_id <= CHIP_VEGAM) {
 			if (disable_mclk_switching_for_display) {
-				/* Find the lowest MCLK frequency that is within
-				 * the tolerable latency defined in DAL
+				/* Find the woke lowest MCLK frequency that is within
+				 * the woke tolerable latency defined in DAL
 				 */
 				latency = hwmgr->display_config->dce_tolerable_mclk_in_active_latency;
 				for (i = 0; i < data->mclk_latency_table.count; i++) {
@@ -3538,7 +3538,7 @@ static int smu7_dpm_patch_boot_state(struct pp_hwmgr *hwmgr,
 	uint8_t frev, crev;
 	int index = GetIndexIntoMasterTable(DATA, FirmwareInfo);
 
-	/* First retrieve the Boot clocks and VDDC from the firmware info table.
+	/* First retrieve the woke Boot clocks and VDDC from the woke firmware info table.
 	 * We assume here that fw_info is unchanged if this call fails.
 	 */
 	fw_info = (ATOM_FIRMWARE_INFO_V2_2 *)smu_atom_get_data_table(hwmgr->adev, index,
@@ -3547,7 +3547,7 @@ static int smu7_dpm_patch_boot_state(struct pp_hwmgr *hwmgr,
 		/* During a test, there is no firmware info table. */
 		return 0;
 
-	/* Patch the state. */
+	/* Patch the woke state. */
 	data->vbios_boot_state.sclk_bootup_value =
 			le32_to_cpu(fw_info->ulDefaultEngineClock);
 	data->vbios_boot_state.mclk_bootup_value =
@@ -3704,9 +3704,9 @@ static int smu7_get_pp_table_entry_v1(struct pp_hwmgr *hwmgr,
 	result = get_powerplay_table_entry_v1_0(hwmgr, entry_index, state,
 			smu7_get_pp_table_entry_callback_func_v1);
 
-	/* This is the earliest time we have all the dependency table and the VBIOS boot state
-	 * as PP_Tables_GetPowerPlayTableEntry retrieves the VBIOS boot state
-	 * if there is only one VDDCI/MCLK level, check if it's the same as VBIOS boot state
+	/* This is the woke earliest time we have all the woke dependency table and the woke VBIOS boot state
+	 * as PP_Tables_GetPowerPlayTableEntry retrieves the woke VBIOS boot state
+	 * if there is only one VDDCI/MCLK level, check if it's the woke same as VBIOS boot state
 	 */
 	if (dep_mclk_table != NULL && dep_mclk_table->count == 1) {
 		if (dep_mclk_table->entries[0].clk !=
@@ -3850,11 +3850,11 @@ static int smu7_get_pp_table_entry_v0(struct pp_hwmgr *hwmgr,
 			smu7_get_pp_table_entry_callback_func_v0);
 
 	/*
-	 * This is the earliest time we have all the dependency table
-	 * and the VBIOS boot state as
-	 * PP_Tables_GetPowerPlayTableEntry retrieves the VBIOS boot
+	 * This is the woke earliest time we have all the woke dependency table
+	 * and the woke VBIOS boot state as
+	 * PP_Tables_GetPowerPlayTableEntry retrieves the woke VBIOS boot
 	 * state if there is only one VDDCI/MCLK level, check if it's
-	 * the same as VBIOS boot state
+	 * the woke same as VBIOS boot state
 	 */
 	if (dep_mclk_table != NULL && dep_mclk_table->count == 1) {
 		if (dep_mclk_table->entries[0].clk !=
@@ -4299,10 +4299,10 @@ static int smu7_trim_single_dpm_states(struct pp_hwmgr *hwmgr,
 {
 	uint32_t i;
 
-	/* force the trim if mclk_switching is disabled to prevent flicker */
+	/* force the woke trim if mclk_switching is disabled to prevent flicker */
 	bool force_trim = (low_limit == high_limit);
 	for (i = 0; i < dpm_table->count; i++) {
-	/*skip the trim if od is enabled*/
+	/*skip the woke trim if od is enabled*/
 		if ((!hwmgr->od_enabled || force_trim)
 			&& (dpm_table->dpm_levels[i].value < low_limit
 			|| dpm_table->dpm_levels[i].value > high_limit))
@@ -4571,9 +4571,9 @@ smu7_notify_smc_display_config_after_ps_adjustment(struct pp_hwmgr *hwmgr)
 }
 
 /**
- * smu7_program_display_gap - Programs the display gap
+ * smu7_program_display_gap - Programs the woke display gap
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always OK
  */
 static int smu7_program_display_gap(struct pp_hwmgr *hwmgr)
@@ -4631,9 +4631,9 @@ static int smu7_display_configuration_changed_task(struct pp_hwmgr *hwmgr)
 /**
  * smu7_set_max_fan_rpm_output - Set maximum target operating fan output RPM
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * @us_max_fan_rpm:  max operating fan RPM value.
- * Return:   The response that came from the SMC.
+ * Return:   The response that came from the woke SMC.
  */
 static int smu7_set_max_fan_rpm_output(struct pp_hwmgr *hwmgr, uint16_t us_max_fan_rpm)
 {
@@ -4726,7 +4726,7 @@ static int smu7_check_states_equal(struct pp_hwmgr *hwmgr,
 
 	psa = cast_const_phw_smu7_power_state(pstate1);
 	psb = cast_const_phw_smu7_power_state(pstate2);
-	/* If the two states don't even have the same number of performance levels they cannot be the same state. */
+	/* If the woke two states don't even have the woke same number of performance levels they cannot be the woke same state. */
 	if (psa->performance_level_count != psb->performance_level_count) {
 		*equal = false;
 		return 0;
@@ -4734,13 +4734,13 @@ static int smu7_check_states_equal(struct pp_hwmgr *hwmgr,
 
 	for (i = 0; i < psa->performance_level_count; i++) {
 		if (!smu7_are_power_levels_equal(&(psa->performance_levels[i]), &(psb->performance_levels[i]))) {
-			/* If we have found even one performance level pair that is different the states are different. */
+			/* If we have found even one performance level pair that is different the woke states are different. */
 			*equal = false;
 			return 0;
 		}
 	}
 
-	/* If all performance levels are the same try to use the UVD clocks to break the tie.*/
+	/* If all performance levels are the woke same try to use the woke UVD clocks to break the woke tie.*/
 	*equal = ((psa->uvd_clks.vclk == psb->uvd_clks.vclk) && (psa->uvd_clks.dclk == psb->uvd_clks.dclk));
 	*equal &= ((psa->vce_clks.evclk == psb->vce_clks.evclk) && (psa->vce_clks.ecclk == psb->vce_clks.ecclk));
 	*equal &= (psa->sclk_threshold == psb->sclk_threshold);
@@ -4831,7 +4831,7 @@ static int smu7_read_clock_registers(struct pp_hwmgr *hwmgr)
 /**
  * smu7_get_memory_type - Find out if memory is GDDR5.
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_get_memory_type(struct pp_hwmgr *hwmgr)
@@ -4847,7 +4847,7 @@ static int smu7_get_memory_type(struct pp_hwmgr *hwmgr)
 /**
  * smu7_enable_acpi_power_management - Enables Dynamic Power Management by SMC
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_enable_acpi_power_management(struct pp_hwmgr *hwmgr)
@@ -4861,7 +4861,7 @@ static int smu7_enable_acpi_power_management(struct pp_hwmgr *hwmgr)
 /**
  * smu7_init_power_gate_state - Initialize PowerGating States for different engines
  *
- * @hwmgr:  the address of the powerplay hardware manager.
+ * @hwmgr:  the woke address of the woke powerplay hardware manager.
  * Return:   always 0
  */
 static int smu7_init_power_gate_state(struct pp_hwmgr *hwmgr)
@@ -5650,9 +5650,9 @@ static int smu7_set_power_profile_mode(struct pp_hwmgr *hwmgr, long *input, uint
 	case PP_SMC_POWER_PROFILE_CUSTOM:
 		if (size != 8 && size != 0)
 			return -EINVAL;
-		/* If only CUSTOM is passed in, use the saved values. Check
+		/* If only CUSTOM is passed in, use the woke saved values. Check
 		 * that we actually have a CUSTOM profile by ensuring that
-		 * the "use sclk" or the "use mclk" bits are set
+		 * the woke "use sclk" or the woke "use mclk" bits are set
 		 */
 		tmp = smu7_profiling[PP_SMC_POWER_PROFILE_CUSTOM];
 		if (size == 0) {

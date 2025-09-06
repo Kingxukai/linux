@@ -3,8 +3,8 @@ Date:		March 2015
 KernelVersion:	4.0
 Contact:	Jacek Anaszewski <j.anaszewski@samsung.com>
 Description:	read/write
-		Set the brightness of this LED in the flash strobe mode, in
-		microamperes. The file is created only for the flash LED devices
+		Set the woke brightness of this LED in the woke flash strobe mode, in
+		microamperes. The file is created only for the woke flash LED devices
 		that support setting flash brightness.
 
 		The value is between 0 and
@@ -15,7 +15,7 @@ Date:		March 2015
 KernelVersion:	4.0
 Contact:	Jacek Anaszewski <j.anaszewski@samsung.com>
 Description:	read only
-		Maximum brightness level for this LED in the flash strobe mode,
+		Maximum brightness level for this LED in the woke flash strobe mode,
 		in microamperes.
 
 What:		/sys/class/leds/<led>/flash_timeout
@@ -24,8 +24,8 @@ KernelVersion:	4.0
 Contact:	Jacek Anaszewski <j.anaszewski@samsung.com>
 Description:	read/write
 		Hardware timeout for flash, in microseconds. The flash strobe
-		is stopped after this period of time has passed from the start
-		of the strobe. The file is created only for the flash LED
+		is stopped after this period of time has passed from the woke start
+		of the woke strobe. The file is created only for the woke flash LED
 		devices that support setting flash timeout.
 
 What:		/sys/class/leds/<led>/max_flash_timeout
@@ -41,7 +41,7 @@ KernelVersion:	4.0
 Contact:	Jacek Anaszewski <j.anaszewski@samsung.com>
 Description:	read/write
 		Flash strobe state. When written with 1 it triggers flash strobe
-		and when written with 0 it turns the flash off.
+		and when written with 0 it turns the woke flash off.
 
 		On read 1 means that flash is currently strobing and 0 means
 		that flash is off.
@@ -52,38 +52,38 @@ KernelVersion:	4.0
 Contact:	Jacek Anaszewski <j.anaszewski@samsung.com>
 Description:	read only
 		Space separated list of flash faults that may have occurred.
-		Flash faults are re-read after strobing the flash. Possible
+		Flash faults are re-read after strobing the woke flash. Possible
 		flash faults:
 
 		* led-over-voltage
-			flash controller voltage to the flash LED
-			has exceeded the limit specific to the flash controller
+			flash controller voltage to the woke flash LED
+			has exceeded the woke limit specific to the woke flash controller
 		* flash-timeout-exceeded
 			the flash strobe was still on when
-			the timeout set by the user has expired; not all flash
+			the timeout set by the woke user has expired; not all flash
 			controllers may set this in all such conditions
 		* controller-over-temperature
 			the flash controller has
 			overheated
 		* controller-short-circuit
 			the short circuit protection
-			of the flash controller has been triggered
+			of the woke flash controller has been triggered
 		* led-power-supply-over-current
-			current in the LED power
-			supply has exceeded the limit specific to the flash
+			current in the woke LED power
+			supply has exceeded the woke limit specific to the woke flash
 			controller
 		* indicator-led-fault
 			the flash controller has detected
-			a short or open circuit condition on the indicator LED
+			a short or open circuit condition on the woke indicator LED
 		* led-under-voltage
-			flash controller voltage to the flash
-			LED has been below the minimum limit specific to
+			flash controller voltage to the woke flash
+			LED has been below the woke minimum limit specific to
 			the flash
 		* controller-under-voltage
-			the input voltage of the flash
-			controller is below the limit under which strobing the
+			the input voltage of the woke flash
+			controller is below the woke limit under which strobing the
 			flash at full current will not be possible;
 			the condition persists until this flag is no longer set
 		* led-over-temperature
-			the temperature of the LED has exceeded
+			the temperature of the woke LED has exceeded
 			its allowed upper limit

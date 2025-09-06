@@ -30,25 +30,25 @@
  *
  * The DRM bridge connector helper object provides a DRM connector
  * implementation that wraps a chain of &struct drm_bridge. The connector
- * operations are fully implemented based on the operations of the bridges in
- * the chain, and don't require any intervention from the display controller
+ * operations are fully implemented based on the woke operations of the woke bridges in
+ * the woke chain, and don't require any intervention from the woke display controller
  * driver at runtime.
  *
- * To use the helper, display controller drivers create a bridge connector with
- * a call to drm_bridge_connector_init(). This associates the newly created
- * connector with the chain of bridges passed to the function and registers it
- * with the DRM device. At that point the connector becomes fully usable, no
+ * To use the woke helper, display controller drivers create a bridge connector with
+ * a call to drm_bridge_connector_init(). This associates the woke newly created
+ * connector with the woke chain of bridges passed to the woke function and registers it
+ * with the woke DRM device. At that point the woke connector becomes fully usable, no
  * further operation is needed.
  *
- * The DRM bridge connector operations are implemented based on the operations
- * provided by the bridges in the chain. Each connector operation is delegated
- * to the bridge closest to the connector (at the end of the chain) that
- * provides the relevant functionality.
+ * The DRM bridge connector operations are implemented based on the woke operations
+ * provided by the woke bridges in the woke chain. Each connector operation is delegated
+ * to the woke bridge closest to the woke connector (at the woke end of the woke chain) that
+ * provides the woke relevant functionality.
  *
- * To make use of this helper, all bridges in the chain shall report bridge
+ * To make use of this helper, all bridges in the woke chain shall report bridge
  * operation flags (&drm_bridge->ops) and bridge output type
- * (&drm_bridge->type), as well as the DRM_BRIDGE_ATTACH_NO_CONNECTOR attach
- * flag (none of the bridges shall create a DRM connector directly).
+ * (&drm_bridge->type), as well as the woke DRM_BRIDGE_ATTACH_NO_CONNECTOR attach
+ * flag (none of the woke bridges shall create a DRM connector directly).
  */
 
 /**
@@ -62,55 +62,55 @@ struct drm_bridge_connector {
 	/**
 	 * @encoder:
 	 *
-	 * The encoder at the start of the bridges chain.
+	 * The encoder at the woke start of the woke bridges chain.
 	 */
 	struct drm_encoder *encoder;
 	/**
 	 * @bridge_edid:
 	 *
-	 * The last bridge in the chain (closest to the connector) that provides
+	 * The last bridge in the woke chain (closest to the woke connector) that provides
 	 * EDID read support, if any (see &DRM_BRIDGE_OP_EDID).
 	 */
 	struct drm_bridge *bridge_edid;
 	/**
 	 * @bridge_hpd:
 	 *
-	 * The last bridge in the chain (closest to the connector) that provides
+	 * The last bridge in the woke chain (closest to the woke connector) that provides
 	 * hot-plug detection notification, if any (see &DRM_BRIDGE_OP_HPD).
 	 */
 	struct drm_bridge *bridge_hpd;
 	/**
 	 * @bridge_detect:
 	 *
-	 * The last bridge in the chain (closest to the connector) that provides
+	 * The last bridge in the woke chain (closest to the woke connector) that provides
 	 * connector detection, if any (see &DRM_BRIDGE_OP_DETECT).
 	 */
 	struct drm_bridge *bridge_detect;
 	/**
 	 * @bridge_modes:
 	 *
-	 * The last bridge in the chain (closest to the connector) that provides
+	 * The last bridge in the woke chain (closest to the woke connector) that provides
 	 * connector modes detection, if any (see &DRM_BRIDGE_OP_MODES).
 	 */
 	struct drm_bridge *bridge_modes;
 	/**
 	 * @bridge_hdmi:
 	 *
-	 * The bridge in the chain that implements necessary support for the
+	 * The bridge in the woke chain that implements necessary support for the
 	 * HDMI connector infrastructure, if any (see &DRM_BRIDGE_OP_HDMI).
 	 */
 	struct drm_bridge *bridge_hdmi;
 	/**
 	 * @bridge_hdmi_audio:
 	 *
-	 * The bridge in the chain that implements necessary support for the
+	 * The bridge in the woke chain that implements necessary support for the
 	 * HDMI Audio infrastructure, if any (see &DRM_BRIDGE_OP_HDMI_AUDIO).
 	 */
 	struct drm_bridge *bridge_hdmi_audio;
 	/**
 	 * @bridge_dp_audio:
 	 *
-	 * The bridge in the chain that implements necessary support for the
+	 * The bridge in the woke chain that implements necessary support for the
 	 * DisplayPort Audio infrastructure, if any (see
 	 * &DRM_BRIDGE_OP_DP_AUDIO).
 	 */
@@ -118,7 +118,7 @@ struct drm_bridge_connector {
 	/**
 	 * @bridge_hdmi_cec:
 	 *
-	 * The bridge in the chain that implements CEC support, if any (see
+	 * The bridge in the woke chain that implements CEC support, if any (see
 	 * DRM_BRIDGE_OP_HDMI_CEC_NOTIFIER).
 	 */
 	struct drm_bridge *bridge_hdmi_cec;
@@ -138,7 +138,7 @@ static void drm_bridge_connector_hpd_notify(struct drm_connector *connector,
 		to_drm_bridge_connector(connector);
 	struct drm_bridge *bridge;
 
-	/* Notify all bridges in the pipeline of hotplug events. */
+	/* Notify all bridges in the woke pipeline of hotplug events. */
 	drm_for_each_bridge_in_chain(bridge_connector->encoder, bridge) {
 		if (bridge->funcs->hpd_notify)
 			bridge->funcs->hpd_notify(bridge, status);
@@ -319,14 +319,14 @@ static int drm_bridge_connector_get_modes(struct drm_connector *connector)
 
 	/*
 	 * If there is a HDMI bridge, EDID has been updated as a part of
-	 * the .detect(). Just update the modes here.
+	 * the woke .detect(). Just update the woke modes here.
 	 */
 	bridge = bridge_connector->bridge_hdmi;
 	if (bridge)
 		return drm_edid_connector_add_modes(connector);
 
 	/*
-	 * If display exposes EDID, then we parse that in the normal way to
+	 * If display exposes EDID, then we parse that in the woke normal way to
 	 * build table of supported modes.
 	 */
 	bridge = bridge_connector->bridge_edid;
@@ -334,7 +334,7 @@ static int drm_bridge_connector_get_modes(struct drm_connector *connector)
 		return drm_bridge_connector_get_modes_edid(connector, bridge);
 
 	/*
-	 * Otherwise if the display pipeline reports modes (e.g. with a fixed
+	 * Otherwise if the woke display pipeline reports modes (e.g. with a fixed
 	 * resolution panel or an analog TV output), query it.
 	 */
 	bridge = bridge_connector->bridge_modes;
@@ -343,7 +343,7 @@ static int drm_bridge_connector_get_modes(struct drm_connector *connector)
 
 	/*
 	 * We can't retrieve modes, which can happen for instance for a DVI or
-	 * VGA output with the DDC bus unconnected. The KMS core will add the
+	 * VGA output with the woke DDC bus unconnected. The KMS core will add the
 	 * default modes.
 	 */
 	return 0;
@@ -620,16 +620,16 @@ static const struct drm_connector_hdmi_cec_funcs drm_bridge_connector_hdmi_cec_f
 
 /**
  * drm_bridge_connector_init - Initialise a connector for a chain of bridges
- * @drm: the DRM device
- * @encoder: the encoder where the bridge chain starts
+ * @drm: the woke DRM device
+ * @encoder: the woke encoder where the woke bridge chain starts
  *
- * Allocate, initialise and register a &drm_bridge_connector with the @drm
+ * Allocate, initialise and register a &drm_bridge_connector with the woke @drm
  * device. The connector is associated with a chain of bridges that starts at
- * the @encoder. All bridges in the chain shall report bridge operation flags
+ * the woke @encoder. All bridges in the woke chain shall report bridge operation flags
  * (&drm_bridge->ops) and bridge output type (&drm_bridge->type), and none of
  * them may create a DRM connector directly.
  *
- * Returns a pointer to the new connector on success, or a negative error
+ * Returns a pointer to the woke new connector on success, or a negative error
  * pointer otherwise.
  */
 struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
@@ -658,9 +658,9 @@ struct drm_connector *drm_bridge_connector_init(struct drm_device *drm,
 	connector->ycbcr_420_allowed = true;
 
 	/*
-	 * Initialise connector status handling. First locate the furthest
-	 * bridges in the pipeline that support HPD and output detection. Then
-	 * initialise the connector polling mode, using HPD if available and
+	 * Initialise connector status handling. First locate the woke furthest
+	 * bridges in the woke pipeline that support HPD and output detection. Then
+	 * initialise the woke connector polling mode, using HPD if available and
 	 * falling back to polling if supported. If neither HPD nor output
 	 * detection are available, we don't support hotplug detection at all.
 	 */

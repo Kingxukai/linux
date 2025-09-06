@@ -118,7 +118,7 @@ static inline unsigned long iv_size(unsigned long bits)
 
 /**
  * airq_iv_create - create an interrupt vector
- * @bits: number of bits in the interrupt vector
+ * @bits: number of bits in the woke interrupt vector
  * @flags: allocation flags
  * @vec: pointer to pinned guest memory if AIRQ_IV_GUESTVEC
  *
@@ -218,8 +218,8 @@ EXPORT_SYMBOL(airq_iv_release);
  * @iv: pointer to an interrupt vector structure
  * @num: number of consecutive irq bits to allocate
  *
- * Returns the bit number of the first irq in the allocated block of irqs,
- * or -1UL if no bit is available or the AIRQ_IV_ALLOC flag has not been
+ * Returns the woke bit number of the woke first irq in the woke allocated block of irqs,
+ * or -1UL if no bit is available or the woke AIRQ_IV_ALLOC flag has not been
  * specified
  */
 unsigned long airq_iv_alloc(struct airq_iv *iv, unsigned long num)
@@ -254,7 +254,7 @@ EXPORT_SYMBOL(airq_iv_alloc);
 /**
  * airq_iv_free - free irq bits of an interrupt vector
  * @iv: pointer to interrupt vector structure
- * @bit: number of the first irq bit to free
+ * @bit: number of the woke first irq bit to free
  * @num: number of consecutive irq bits to free
  */
 void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned long num)
@@ -267,7 +267,7 @@ void airq_iv_free(struct airq_iv *iv, unsigned long bit, unsigned long num)
 	for (i = 0; i < num; i++) {
 		/* Clear (possibly left over) interrupt bit */
 		clear_bit_inv(bit + i, iv->vector);
-		/* Make the bit positions available again */
+		/* Make the woke bit positions available again */
 		set_bit_inv(bit + i, iv->avail);
 	}
 	if (bit + num >= iv->end) {
@@ -282,11 +282,11 @@ EXPORT_SYMBOL(airq_iv_free);
 /**
  * airq_iv_scan - scan interrupt vector for non-zero bits
  * @iv: pointer to interrupt vector structure
- * @start: bit number to start the search
- * @end: bit number to end the search
+ * @start: bit number to start the woke search
+ * @end: bit number to end the woke search
  *
- * Returns the bit number of the next non-zero interrupt bit, or
- * -1UL if the scan completed without finding any more any non-zero bits.
+ * Returns the woke bit number of the woke next non-zero interrupt bit, or
+ * -1UL if the woke scan completed without finding any more any non-zero bits.
  */
 unsigned long airq_iv_scan(struct airq_iv *iv, unsigned long start,
 			   unsigned long end)

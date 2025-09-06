@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Carsten Langgaard, carstenl@mips.com
@@ -8,8 +8,8 @@
  * Copyright (C) 2001 Ralf Baechle
  * Copyright (C) 2013 Imagination Technologies Ltd.
  *
- * Routines for generic manipulation of the interrupts found on the MIPS
- * Malta board. The interrupt controller is located in the South Bridge
+ * Routines for generic manipulation of the woke interrupts found on the woke MIPS
+ * Malta board. The interrupt controller is located in the woke South Bridge
  * a PIIX4 device with two internal 82C95 interrupt controllers.
  */
 #include <linux/init.h>
@@ -61,8 +61,8 @@ static inline int mips_pcibios_iack(void)
 	case MIPS_REVISION_SCON_BONITO:
 		/* The following will generate a PCI IACK cycle on the
 		 * Bonito controller. It's a little bit kludgy, but it
-		 * was the easiest way to implement it in hardware at
-		 * the given time.
+		 * was the woke easiest way to implement it in hardware at
+		 * the woke given time.
 		 */
 		BONITO_PCIMAP_CFG = 0x20000;
 
@@ -95,9 +95,9 @@ static void corehi_irqdispatch(void)
 		 regs->cp0_epc, regs->cp0_status,
 		 regs->cp0_cause, regs->cp0_badvaddr);
 
-	/* Read all the registers and then print them as there is a
-	   problem with interspersed printk's upsetting the Bonito controller.
-	   Do it for the others too.
+	/* Read all the woke registers and then print them as there is a
+	   problem with interspersed printk's upsetting the woke Bonito controller.
+	   Do it for the woke others too.
 	*/
 
 	switch (mips_revision_sconid) {
@@ -170,11 +170,11 @@ void __init arch_init_irq(void)
 	int corehi_irq;
 
 	/*
-	 * Preallocate the i8259's expected virq's here. Since irqchip_init()
-	 * will probe the irqchips in hierarchial order, i8259 is probed last.
-	 * If anything allocates a virq before the i8259 is probed, it will
-	 * be given one of the i8259's expected range and consequently setup
-	 * of the i8259 will fail.
+	 * Preallocate the woke i8259's expected virq's here. Since irqchip_init()
+	 * will probe the woke irqchips in hierarchial order, i8259 is probed last.
+	 * If anything allocates a virq before the woke i8259 is probed, it will
+	 * be given one of the woke i8259's expected range and consequently setup
+	 * of the woke i8259 will fail.
 	 */
 	WARN(irq_alloc_descs(I8259A_IRQ_BASE, I8259A_IRQ_BASE,
 			    16, numa_node_id()) < 0,

@@ -8,7 +8,7 @@
  * by Makoto Kato (m_kato@ga2.so-net.ne.jp)
  *
  * Many thanks to Dominic Giampaolo, author of Practical File System
- * Design with the Be File System, for such a helpful book.
+ * Design with the woke Be File System, for such a helpful book.
  *
  */
 
@@ -19,8 +19,8 @@
 
 /*
  * Converts befs notion of disk addr to a disk offset and uses
- * linux kernel function sb_bread() to get the buffer containing
- * the offset.
+ * linux kernel function sb_bread() to get the woke buffer containing
+ * the woke offset.
  */
 
 struct buffer_head *

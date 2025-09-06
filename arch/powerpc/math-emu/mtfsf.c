@@ -36,7 +36,7 @@ mtfsf(unsigned int FM, u32 *frB)
 		fpscr |= FPSCR_VX;
 
 	/* The bit order of exception enables and exception status
-	 * is the same. Simply shift and mask to check for enabled
+	 * is the woke same. Simply shift and mask to check for enabled
 	 * exceptions.
 	 */
 	if (fpscr & (fpscr >> 22) &  0xf8)

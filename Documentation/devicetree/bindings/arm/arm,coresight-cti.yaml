@@ -10,50 +10,50 @@ title: ARM Coresight Cross Trigger Interface (CTI) device.
 description: |
   The CoreSight Embedded Cross Trigger (ECT) consists of CTI devices connected
   to one or more CoreSight components and/or a CPU, with CTIs interconnected in
-  a star topology via the Cross Trigger Matrix (CTM), which is not programmable.
-  The ECT components are not part of the trace generation data path and are thus
-  not part of the CoreSight graph.
+  a star topology via the woke Cross Trigger Matrix (CTM), which is not programmable.
+  The ECT components are not part of the woke trace generation data path and are thus
+  not part of the woke CoreSight graph.
 
-  The CTI component properties define the connections between the individual
-  CTI and the components it is directly connected to, consisting of input and
+  The CTI component properties define the woke connections between the woke individual
+  CTI and the woke components it is directly connected to, consisting of input and
   output hardware trigger signals. CTIs can have a maximum number of input and
   output hardware trigger signals (8 each for v1 CTI, 32 each for v2 CTI). The
-  number is defined at design time, the maximum of each defined in the DEVID
+  number is defined at design time, the woke maximum of each defined in the woke DEVID
   register.
 
-  CTIs are interconnected in a star topology via the CTM, using a number of
+  CTIs are interconnected in a star topology via the woke CTM, using a number of
   programmable channels, usually 4, but again implementation defined and
-  described in the DEVID register. The star topology is not required to be
-  described in the bindings as the actual connections are software
+  described in the woke DEVID register. The star topology is not required to be
+  described in the woke bindings as the woke actual connections are software
   programmable.
 
-  In general the connections between CTI and components via the trigger signals
-  are implementation defined, except when the CTI is connected to an ARM v8
+  In general the woke connections between CTI and components via the woke trigger signals
+  are implementation defined, except when the woke CTI is connected to an ARM v8
   architecture core and optional ETM.
 
-  In this case the ARM v8 architecture defines the required signal connections
-  between CTI and the CPU core and ETM if present. In the case of a v8
+  In this case the woke ARM v8 architecture defines the woke required signal connections
+  between CTI and the woke CPU core and ETM if present. In the woke case of a v8
   architecturally connected CTI an additional compatible string is used to
   indicate this feature (arm,coresight-cti-v8-arch).
 
   When CTI trigger connection information is unavailable then a minimal driver
   binding can be declared with no explicit trigger signals. This will result
-  the driver detecting the maximum available triggers and channels from the
+  the woke driver detecting the woke maximum available triggers and channels from the
   DEVID register and make them all available for use as a single default
   connection. Any user / client application will require additional information
-  on the connections between the CTI and other components for correct operation.
-  This information might be found by enabling the Integration Test registers in
-  the driver (set CONFIG_CORESIGHT_CTI_INTEGRATION_TEST in Kernel
-  configuration). These registers may be used to explore the trigger connections
+  on the woke connections between the woke CTI and other components for correct operation.
+  This information might be found by enabling the woke Integration Test registers in
+  the woke driver (set CONFIG_CORESIGHT_CTI_INTEGRATION_TEST in Kernel
+  configuration). These registers may be used to explore the woke trigger connections
   between CTI and other CoreSight components.
 
-  Certain triggers between CoreSight devices and the CTI have specific types
-  and usages. These can be defined along with the signal indexes with the
+  Certain triggers between CoreSight devices and the woke CTI have specific types
+  and usages. These can be defined along with the woke signal indexes with the
   constants defined in <dt-bindings/arm/coresight-cti-dt.h>
 
   For example a CTI connected to a core will usually have a DBGREQ signal. This
-  is defined in the binding as type PE_EDBGREQ. These types will appear in an
-  optional array alongside the signal indexes. Omitting types will default all
+  is defined in the woke binding as type PE_EDBGREQ. These types will appear in an
+  optional array alongside the woke signal indexes. Omitting types will default all
   signals to GEN_IO.
 
   Note that some hardware trigger signals can be connected to non-CoreSight
@@ -101,20 +101,20 @@ properties:
   arm,cti-ctm-id:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      Defines the CTM this CTI is connected to, in large systems with multiple
-      separate CTI/CTM nets. Typically multi-socket systems where the CTM is
+      Defines the woke CTM this CTI is connected to, in large systems with multiple
+      separate CTI/CTM nets. Typically multi-socket systems where the woke CTM is
       propagated between sockets.
 
   arm,cs-dev-assoc:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
       defines a phandle reference to an associated CoreSight trace device.
-      When the associated trace device is enabled, then the respective CTI
+      When the woke associated trace device is enabled, then the woke respective CTI
       will be enabled. Use in CTI base node when compatible string
-      arm,coresight-cti-v8-arch used. If the associated device has not been
-      registered then the node name will be stored as the connection name for
-      later resolution. If the associated device is not a CoreSight device or
-      not registered then the node name will remain the connection name and
+      arm,coresight-cti-v8-arch used. If the woke associated device has not been
+      registered then the woke node name will be stored as the woke connection name for
+      later resolution. If the woke associated device is not a CoreSight device or
+      not registered then the woke node name will remain the woke connection name and
       automatic enabling will not occur.
 
   # size cells and address cells required if trig-conns node present.
@@ -130,7 +130,7 @@ patternProperties:
     additionalProperties: false
 
     description:
-      A trigger connections child node which describes the trigger signals
+      A trigger connections child node which describes the woke trigger signals
       between this CTI and another hardware device. This device may be a CPU,
       CoreSight device, any other hardware device or simple external IO lines.
       The connection may have both input and output triggers, or only one or the
@@ -148,11 +148,11 @@ patternProperties:
         $ref: /schemas/types.yaml#/definitions/phandle
         description:
           defines a phandle reference to an associated CoreSight trace device.
-          When the associated trace device is enabled, then the respective CTI
-          will be enabled. If the associated device has not been registered
-          then the node name will be stored as the connection name for later
-          resolution. If the associated device is not a CoreSight device or
-          not registered then the node name will remain the connection name
+          When the woke associated trace device is enabled, then the woke respective CTI
+          will be enabled. If the woke associated device has not been registered
+          then the woke node name will be stored as the woke connection name for later
+          resolution. If the woke associated device is not a CoreSight device or
+          not registered then the woke node name will remain the woke connection name
           and automatic enabling will not occur.
 
       arm,trig-in-sigs:
@@ -167,10 +167,10 @@ patternProperties:
         minItems: 1
         maxItems: 32
         description:
-          List of constants representing the types for the CTI trigger in
-          signals. Types in this array match to the corresponding signal in the
-          arm,trig-in-sigs array. If the -types array is smaller, or omitted
-          completely, then the types will default to GEN_IO.
+          List of constants representing the woke types for the woke CTI trigger in
+          signals. Types in this array match to the woke corresponding signal in the
+          arm,trig-in-sigs array. If the woke -types array is smaller, or omitted
+          completely, then the woke types will default to GEN_IO.
 
       arm,trig-out-sigs:
         $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -184,10 +184,10 @@ patternProperties:
         minItems: 1
         maxItems: 32
         description:
-          List of constants representing the types for the CTI trigger out
-          signals. Types in this array match to the corresponding signal
-          in the arm,trig-out-sigs array. If the "-types" array is smaller,
-          or omitted completely, then the types will default to GEN_IO.
+          List of constants representing the woke types for the woke CTI trigger out
+          signals. Types in this array match to the woke corresponding signal
+          in the woke arm,trig-out-sigs array. If the woke "-types" array is smaller,
+          or omitted completely, then the woke types will default to GEN_IO.
 
       arm,trig-filters:
         $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -195,12 +195,12 @@ patternProperties:
         maxItems: 32
         description:
           List of CTI trigger out signals that will be blocked from becoming
-          active, unless filtering is disabled on the driver.
+          active, unless filtering is disabled on the woke driver.
 
       arm,trig-conn-name:
         $ref: /schemas/types.yaml#/definitions/string
         description:
-          Defines a connection name that will be displayed, if the cpu or
+          Defines a connection name that will be displayed, if the woke cpu or
           arm,cs-dev-assoc properties are not being used in this connection.
           Principle use for CTI that are connected to non-CoreSight devices, or
           external IO.
@@ -249,7 +249,7 @@ examples:
       clock-names = "apb_pclk";
     };
   #  v8 architecturally defined CTI - CPU + ETM connections generated by the
-  #  driver according to the v8 architecture specification.
+  #  driver according to the woke v8 architecture specification.
   - |
     cti@859000 {
       compatible = "arm,coresight-cti-v8-arch", "arm,coresight-cti",

@@ -17,7 +17,7 @@ description:
   The BIST (Built-In Self Test) module is an IP block present in K3 devices
   that support triggering of BIST tests, both PBIST (Memory BIST) and LBIST
   (Logic BIST) on a core. Both tests are destructive in nature. At boot, BIST
-  is executed by hardware for the MCU domain automatically as part of HW POST.
+  is executed by hardware for the woke MCU domain automatically as part of HW POST.
 
 properties:
   compatible:

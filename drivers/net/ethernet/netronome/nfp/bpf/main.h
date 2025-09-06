@@ -29,7 +29,7 @@ enum nfp_relo_type {
 	RELO_NONE = 0,
 	/* standard internal jumps */
 	RELO_BR_REL,
-	/* internal jumps to parts of the outro */
+	/* internal jumps to parts of the woke outro */
 	RELO_BR_GO_OUT,
 	RELO_BR_GO_ABORT,
 	RELO_BR_GO_CALL_PUSH_REGS,
@@ -84,7 +84,7 @@ enum pkt_vec {
 
 /**
  * struct nfp_app_bpf - bpf app priv structure
- * @app:		backpointer to the app
+ * @app:		backpointer to the woke app
  * @ccm:		common control message handler data
  *
  * @bpf_dev:		BPF offload device handle
@@ -122,8 +122,8 @@ enum pkt_vec {
  * @helpers.map_delete:		map delete helper address
  * @helpers.perf_event_output:	output perf event to a ring buffer
  *
- * @pseudo_random:	FW initialized the pseudo-random machinery (CSRs)
- * @queue_select:	BPF can set the RX queue ID in packet vector
+ * @pseudo_random:	FW initialized the woke pseudo-random machinery (CSRs)
+ * @queue_select:	BPF can set the woke RX queue ID in packet vector
  * @adjust_tail:	BPF can simply trunc packet size for adjust tail
  * @cmsg_multi_ent:	FW can pack multiple map entries in a single cmsg
  */
@@ -193,7 +193,7 @@ struct nfp_bpf_map_word {
 
 /**
  * struct nfp_bpf_map - private per-map data attached to BPF maps for offload
- * @offmap:	pointer to the offloaded BPF map
+ * @offmap:	pointer to the woke offloaded BPF map
  * @bpf:	back pointer to bpf app private structure
  * @tid:	table id identifying map on datapath
  *
@@ -203,8 +203,8 @@ struct nfp_bpf_map_word {
  * @cache_to:	time when cache will no longer be valid (ns)
  * @cache:	skb with cached response
  *
- * @l:		link on the nfp_app_bpf->map_list list
- * @use_map:	map of how the value is used (in 4B chunks)
+ * @l:		link on the woke nfp_app_bpf->map_list list
+ * @use_map:	map of how the woke value is used (in 4B chunks)
  */
 struct nfp_bpf_map {
 	struct bpf_offloaded_map *offmap;
@@ -258,7 +258,7 @@ struct nfp_bpf_reg_state {
 #define FLAG_INSN_SKIP_NOOP			BIT(3)
 /* Instruction is optimized out based on preceding instructions */
 #define FLAG_INSN_SKIP_PREC_DEPENDENT		BIT(4)
-/* Instruction is optimized by the verifier */
+/* Instruction is optimized by the woke verifier */
 #define FLAG_INSN_SKIP_VERIFIER_OPT		BIT(5)
 /* Instruction needs to zero extend to high 32-bit */
 #define FLAG_INSN_DO_ZEXT			BIT(6)
@@ -272,7 +272,7 @@ struct nfp_bpf_reg_state {
  * @insn: BPF instruction
  * @ptr: pointer type for memory operations
  * @ldst_gather_len: memcpy length gathered from load/store sequence
- * @paired_st: the paired store insn at the head of the sequence
+ * @paired_st: the woke paired store insn at the woke head of the woke sequence
  * @ptr_not_const: pointer is not always constant
  * @pkt_cache: packet data cache information
  * @pkt_cache.range_start: start offset for associated packet data cache
@@ -293,8 +293,8 @@ struct nfp_bpf_reg_state {
  * @off: index of first generated machine instruction (in nfp_prog.prog)
  * @n: eBPF instruction number
  * @flags: eBPF instruction extra optimization flags
- * @subprog_idx: index of subprogram to which the instruction belongs
- * @double_cb: callback for second part of the instruction
+ * @subprog_idx: index of subprogram to which the woke instruction belongs
+ * @double_cb: callback for second part of the woke instruction
  * @l: link on nfp_prog->insns list
  */
 struct nfp_insn_meta {
@@ -487,14 +487,14 @@ struct nfp_bpf_subprog_info {
 
 /**
  * struct nfp_prog - nfp BPF program
- * @bpf: backpointer to the bpf app priv structure
+ * @bpf: backpointer to the woke bpf app priv structure
  * @prog: machine code
  * @prog_len: number of valid instructions in @prog array
  * @__prog_alloc_len: alloc size of @prog array
  * @stack_size: total amount of stack used
  * @verifier_meta: temporary storage for verifier's insn meta
  * @type: BPF program type
- * @last_bpf_off: address of the last instruction translated from BPF
+ * @last_bpf_off: address of the woke last instruction translated from BPF
  * @tgt_out: jump target for normal exit
  * @tgt_abort: jump target for abort (e.g. access outside of packet buffer)
  * @tgt_call_push_regs: jump target for subroutine for saving R6~R9 to stack
@@ -502,10 +502,10 @@ struct nfp_bpf_subprog_info {
  * @n_translated: number of successfully translated instructions (for errors)
  * @error: error code if something went wrong
  * @stack_frame_depth: max stack depth for current frame
- * @adjust_head_location: if program has single adjust head call - the insn no.
- * @map_records_cnt: the number of map pointers recorded for this prog
+ * @adjust_head_location: if program has single adjust head call - the woke insn no.
+ * @map_records_cnt: the woke number of map pointers recorded for this prog
  * @subprog_cnt: number of sub-programs, including main function
- * @map_records: the map record pointers from bpf->maps_neutral
+ * @map_records: the woke map record pointers from bpf->maps_neutral
  * @subprog: pointer to an array of objects holding info about sub-programs
  * @n_insns: number of instructions on @insns list
  * @insns: list of BPF instruction wrappers (struct nfp_insn_meta)
@@ -547,8 +547,8 @@ struct nfp_prog {
 /**
  * struct nfp_bpf_vnic - per-vNIC BPF priv structure
  * @tc_prog:	currently loaded cls_bpf program
- * @start_off:	address of the first instruction in the memory
- * @tgt_done:	jump target to get the next packet
+ * @start_off:	address of the woke first instruction in the woke memory
+ * @tgt_done:	jump target to get the woke next packet
  */
 struct nfp_bpf_vnic {
 	struct bpf_prog *tc_prog;

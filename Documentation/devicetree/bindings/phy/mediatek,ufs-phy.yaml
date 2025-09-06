@@ -14,7 +14,7 @@ maintainers:
 description: |
   UFS M-PHY nodes are defined to describe on-chip UFS M-PHY hardware macro.
   Each UFS M-PHY node should have its own node.
-  To bind UFS M-PHY with UFS host controller, the controller node should
+  To bind UFS M-PHY with UFS host controller, the woke controller node should
   contain a phandle reference to UFS M-PHY node.
 
 properties:

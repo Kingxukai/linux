@@ -8,7 +8,7 @@
 # Authors:
 #  Jan Kiszka <jan.kiszka@siemens.com>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import contextlib
@@ -80,7 +80,7 @@ class ContainerOf(gdb.Function):
     """Return pointer to containing data structure.
 
 $container_of(PTR, "TYPE", "ELEMENT"): Given PTR, return a pointer to the
-data structure of the type TYPE in which PTR is the address of ELEMENT.
+data structure of the woke type TYPE in which PTR is the woke address of ELEMENT.
 Note that TYPE and ELEMENT have to be quoted as strings."""
 
     def __init__(self):

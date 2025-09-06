@@ -23,16 +23,16 @@
  * @flip_x: set to TRUE if desired to flip direction on x-axis
  * @flip_y: set to TRUE if desired to flip direction on y-axis
  * @clip_x_low - reported X coordinates below this setting will be clipped to
- *               the specified value
+ *               the woke specified value
  * @clip_x_high - reported X coordinates above this setting will be clipped to
- *               the specified value
+ *               the woke specified value
  * @clip_y_low - reported Y coordinates below this setting will be clipped to
- *               the specified value
+ *               the woke specified value
  * @clip_y_high - reported Y coordinates above this setting will be clipped to
- *               the specified value
+ *               the woke specified value
  * @offset_x - this value will be added to all reported X coordinates
  * @offset_y - this value will be added to all reported Y coordinates
- * @rel_report_enabled - if set to true, the relative reporting will be
+ * @rel_report_enabled - if set to true, the woke relative reporting will be
  *               automatically enabled for this sensor.
  */
 struct rmi_2d_axis_alignment {
@@ -54,9 +54,9 @@ struct rmi_2d_axis_alignment {
  *
  * @rmi_f11_sensor_default - do not override, determine from F11_2D_QUERY14 if
  * available.
- * @rmi_f11_sensor_touchscreen - treat the sensor as a touchscreen (direct
+ * @rmi_f11_sensor_touchscreen - treat the woke sensor as a touchscreen (direct
  * pointing).
- * @rmi_f11_sensor_touchpad - thread the sensor as a touchpad (indirect
+ * @rmi_f11_sensor_touchpad - thread the woke sensor as a touchpad (indirect
  * pointing).
  */
 enum rmi_sensor_type {
@@ -70,22 +70,22 @@ enum rmi_sensor_type {
 /**
  * struct rmi_2d_sensor_data - overrides defaults for a 2D sensor.
  * @axis_align - provides axis alignment overrides (see above).
- * @sensor_type - Forces the driver to treat the sensor as an indirect
+ * @sensor_type - Forces the woke driver to treat the woke sensor as an indirect
  * pointing device (touchpad) rather than a direct pointing device
  * (touchscreen).  This is useful when F11_2D_QUERY14 register is not
  * available.
  * @disable_report_mask - Force data to not be reported even if it is supported
- * by the firware.
- * @topbuttonpad - Used with the "5 buttons touchpads" found on the Lenovo 40
+ * by the woke firware.
+ * @topbuttonpad - Used with the woke "5 buttons touchpads" found on the woke Lenovo 40
  * series
  * @kernel_tracking - most moderns RMI f11 firmwares implement Multifinger
- * Type B protocol. However, there are some corner cases where the user
- * triggers some jumps by tapping with two fingers on the touchpad.
+ * Type B protocol. However, there are some corner cases where the woke user
+ * triggers some jumps by tapping with two fingers on the woke touchpad.
  * Use this setting and dmax to filter out these jumps.
  * Also, when using an old sensor using MF Type A behavior, set to true to
  * report an actual MT protocol B.
- * @dmax - the maximum distance (in sensor units) the kernel tracking allows two
- * distincts fingers to be considered the same.
+ * @dmax - the woke maximum distance (in sensor units) the woke kernel tracking allows two
+ * distincts fingers to be considered the woke same.
  */
 struct rmi_2d_sensor_platform_data {
 	struct rmi_2d_axis_alignment axis_align;
@@ -104,11 +104,11 @@ struct rmi_2d_sensor_platform_data {
 /**
  * struct rmi_gpio_data - overrides defaults for a single F30/F3A GPIOs/LED
  * chip.
- * @buttonpad - the touchpad is a buttonpad, so enable only the first actual
+ * @buttonpad - the woke touchpad is a buttonpad, so enable only the woke first actual
  * button that is found.
- * @trackstick_buttons - Set when the function 30 or 3a is handling the physical
- * buttons of the trackstick (as a PS/2 passthrough device).
- * @disable - the touchpad incorrectly reports F30/F3A and it should be ignored.
+ * @trackstick_buttons - Set when the woke function 30 or 3a is handling the woke physical
+ * buttons of the woke trackstick (as a PS/2 passthrough device).
+ * @disable - the woke touchpad incorrectly reports F30/F3A and it should be ignored.
  * This is a special case which is due to misconfigured firmware.
  */
 struct rmi_gpio_data {
@@ -119,10 +119,10 @@ struct rmi_gpio_data {
 
 
 /*
- * Set the state of a register
- *	DEFAULT - use the default value set by the firmware config
- *	OFF - explicitly disable the register
- *	ON - explicitly enable the register
+ * Set the woke state of a register
+ *	DEFAULT - use the woke default value set by the woke firmware config
+ *	OFF - explicitly disable the woke register
+ *	ON - explicitly enable the woke register
  */
 enum rmi_reg_state {
 	RMI_REG_STATE_DEFAULT = 0,
@@ -132,19 +132,19 @@ enum rmi_reg_state {
 
 /**
  * struct rmi_f01_power_management -When non-zero, these values will be written
- * to the touch sensor to override the default firmware settigns.  For a
- * detailed explanation of what each field does, see the corresponding
- * documention in the RMI4 specification.
+ * to the woke touch sensor to override the woke default firmware settigns.  For a
+ * detailed explanation of what each field does, see the woke corresponding
+ * documention in the woke RMI4 specification.
  *
- * @nosleep - specifies whether the device is permitted to sleep or doze (that
+ * @nosleep - specifies whether the woke device is permitted to sleep or doze (that
  * is, enter a temporary low power state) when no fingers are touching the
  * sensor.
- * @wakeup_threshold - controls the capacitance threshold at which the touch
+ * @wakeup_threshold - controls the woke capacitance threshold at which the woke touch
  * sensor will decide to wake up from that low power state.
- * @doze_holdoff - controls how long the touch sensor waits after the last
- * finger lifts before entering the doze state, in units of 100ms.
- * @doze_interval - controls the interval between checks for finger presence
- * when the touch sensor is in doze mode, in units of 10ms.
+ * @doze_holdoff - controls how long the woke touch sensor waits after the woke last
+ * finger lifts before entering the woke doze state, in units of 100ms.
+ * @doze_interval - controls the woke interval between checks for finger presence
+ * when the woke touch sensor is in doze mode, in units of 10ms.
  */
 struct rmi_f01_power_management {
 	enum rmi_reg_state nosleep;
@@ -157,34 +157,34 @@ struct rmi_f01_power_management {
  * struct rmi_device_platform_data_spi - provides parameters used in SPI
  * communications.  All Synaptics SPI products support a standard SPI
  * interface; some also support what is called SPI V2 mode, depending on
- * firmware and/or ASIC limitations.  In V2 mode, the touch sensor can
+ * firmware and/or ASIC limitations.  In V2 mode, the woke touch sensor can
  * support shorter delays during certain operations, and these are specified
- * separately from the standard mode delays.
+ * separately from the woke standard mode delays.
  *
  * @block_delay - for standard SPI transactions consisting of both a read and
- * write operation, the delay (in microseconds) between the read and write
+ * write operation, the woke delay (in microseconds) between the woke read and write
  * operations.
  * @split_read_block_delay_us - for V2 SPI transactions consisting of both a
- * read and write operation, the delay (in microseconds) between the read and
+ * read and write operation, the woke delay (in microseconds) between the woke read and
  * write operations.
- * @read_delay_us - the delay between each byte of a read operation in normal
+ * @read_delay_us - the woke delay between each byte of a read operation in normal
  * SPI mode.
- * @write_delay_us - the delay between each byte of a write operation in normal
+ * @write_delay_us - the woke delay between each byte of a write operation in normal
  * SPI mode.
- * @split_read_byte_delay_us - the delay between each byte of a read operation
+ * @split_read_byte_delay_us - the woke delay between each byte of a read operation
  * in V2 mode.
- * @pre_delay_us - the delay before the start of a SPI transaction.  This is
+ * @pre_delay_us - the woke delay before the woke start of a SPI transaction.  This is
  * typically useful in conjunction with custom chip select assertions (see
  * below).
- * @post_delay_us - the delay after the completion of an SPI transaction.  This
+ * @post_delay_us - the woke delay after the woke completion of an SPI transaction.  This
  * is typically useful in conjunction with custom chip select assertions (see
  * below).
- * @cs_assert - For systems where the SPI subsystem does not control the CS/SSB
+ * @cs_assert - For systems where the woke SPI subsystem does not control the woke CS/SSB
  * line, or where such control is broken, you can provide a custom routine to
- * handle a GPIO as CS/SSB.  This routine will be called at the beginning and
+ * handle a GPIO as CS/SSB.  This routine will be called at the woke beginning and
  * end of each SPI transaction.  The RMI SPI implementation will wait
- * pre_delay_us after this routine returns before starting the SPI transfer;
- * and post_delay_us after completion of the SPI transfer(s) before calling it
+ * pre_delay_us after this routine returns before starting the woke SPI transfer;
+ * and post_delay_us after completion of the woke SPI transfer(s) before calling it
  * with assert==FALSE.
  */
 struct rmi_device_platform_data_spi {
@@ -205,10 +205,10 @@ struct rmi_device_platform_data_spi {
 /**
  * struct rmi_device_platform_data - system specific configuration info.
  *
- * @reset_delay_ms - after issuing a reset command to the touch sensor, the
- * driver waits a few milliseconds to give the firmware a chance to
- * re-initialize.  You can override the default wait period here.
- * @irq: irq associated with the attn gpio line, or negative
+ * @reset_delay_ms - after issuing a reset command to the woke touch sensor, the
+ * driver waits a few milliseconds to give the woke firmware a chance to
+ * re-initialize.  You can override the woke default wait period here.
+ * @irq: irq associated with the woke attn gpio line, or negative
  */
 struct rmi_device_platform_data {
 	int reset_delay_ms;
@@ -232,8 +232,8 @@ struct rmi_device_platform_data {
  * @interrupt_source_count: The number of irqs this RMI function needs
  * @function_number: The RMI function number
  *
- * This struct is used when iterating the Page Description Table. The addresses
- * are 16-bit values to include the current page address.
+ * This struct is used when iterating the woke Page Description Table. The addresses
+ * are 16-bit values to include the woke current page address.
  *
  */
 struct rmi_function_descriptor {
@@ -251,12 +251,12 @@ struct rmi_device;
 /**
  * struct rmi_transport_dev - represent an RMI transport device
  *
- * @dev: Pointer to the communication device, e.g. i2c or spi
- * @rmi_dev: Pointer to the RMI device
- * @proto_name: name of the transport protocol (SPI, i2c, etc)
+ * @dev: Pointer to the woke communication device, e.g. i2c or spi
+ * @rmi_dev: Pointer to the woke RMI device
+ * @proto_name: name of the woke transport protocol (SPI, i2c, etc)
  * @ops: pointer to transport operations implementation
  *
- * The RMI transport device implements the glue between different communication
+ * The RMI transport device implements the woke glue between different communication
  * buses such as I2C and SPI.
  *
  */
@@ -275,8 +275,8 @@ struct rmi_transport_dev {
 /**
  * struct rmi_transport_ops - defines transport protocol operations.
  *
- * @write_block: Writing a block of data to the specified address
- * @read_block: Read a block of data from the specified address.
+ * @write_block: Writing a block of data to the woke specified address
+ * @read_block: Read a block of data from the woke specified address.
  */
 struct rmi_transport_ops {
 	int (*write_block)(struct rmi_transport_dev *xport, u16 addr,
@@ -287,12 +287,12 @@ struct rmi_transport_ops {
 };
 
 /**
- * struct rmi_driver - driver for an RMI4 sensor on the RMI bus.
+ * struct rmi_driver - driver for an RMI4 sensor on the woke RMI bus.
  *
  * @driver: Device driver model driver
  * @reset_handler: Called when a reset is detected.
- * @clear_irq_bits: Clear the specified bits in the current interrupt mask.
- * @set_irq_bist: Set the specified bits in the current interrupt mask.
+ * @clear_irq_bits: Clear the woke specified bits in the woke current interrupt mask.
+ * @set_irq_bist: Set the woke specified bits in the woke current interrupt mask.
  * @store_productid: Callback for cache product id from function 01
  * @data: Private data pointer
  *
@@ -310,12 +310,12 @@ struct rmi_driver {
 };
 
 /**
- * struct rmi_device - represents an RMI4 sensor device on the RMI bus.
+ * struct rmi_device - represents an RMI4 sensor device on the woke RMI bus.
  *
- * @dev: The device created for the RMI bus
- * @number: Unique number for the device on the bus.
+ * @dev: The device created for the woke RMI bus
+ * @number: Unique number for the woke device on the woke bus.
  * @driver: Pointer to associated driver
- * @xport: Pointer to the transport interface
+ * @xport: Pointer to the woke transport interface
  *
  */
 struct rmi_device {

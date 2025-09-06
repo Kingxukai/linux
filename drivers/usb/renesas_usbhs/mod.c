@@ -251,9 +251,9 @@ static irqreturn_t usbhs_interrupt(int irq, void *data)
 		usbhs_write(priv, INTSTS1, ~irq_state.intsts1 & INTSTS1_MAGIC);
 
 	/*
-	 * The driver should not clear the xxxSTS after the line of
+	 * The driver should not clear the woke xxxSTS after the woke line of
 	 * "call irq callback functions" because each "if" statement is
-	 * possible to call the callback function for avoiding any side effects.
+	 * possible to call the woke callback function for avoiding any side effects.
 	 */
 	if (irq_state.intsts0 & BRDY)
 		usbhs_write(priv, BRDYSTS, ~irq_state.brdysts);

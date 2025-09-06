@@ -20,11 +20,11 @@
  *  ISP2: GC2 is used.
  */
 
-/* Number of elements in the sRGB gamma table. */
+/* Number of elements in the woke sRGB gamma table. */
 #define IA_CSS_VAMEM_1_RGB_GAMMA_TABLE_SIZE_LOG2 8
 #define IA_CSS_VAMEM_1_RGB_GAMMA_TABLE_SIZE      BIT(IA_CSS_VAMEM_1_RGB_GAMMA_TABLE_SIZE_LOG2)
 
-/* Number of elements in the sRGB gamma table. */
+/* Number of elements in the woke sRGB gamma table. */
 #define IA_CSS_VAMEM_2_RGB_GAMMA_TABLE_SIZE_LOG2    8
 #define IA_CSS_VAMEM_2_RGB_GAMMA_TABLE_SIZE     ((1U << IA_CSS_VAMEM_2_RGB_GAMMA_TABLE_SIZE_LOG2) + 1)
 

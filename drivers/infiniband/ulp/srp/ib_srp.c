@@ -2,23 +2,23 @@
  * Copyright (c) 2005 Cisco Systems.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -75,7 +75,7 @@ MODULE_PARM_DESC(srp_sg_tablesize, "Deprecated name for cmd_sg_entries");
 
 module_param(cmd_sg_entries, uint, 0444);
 MODULE_PARM_DESC(cmd_sg_entries,
-		 "Default number of gather/scatter entries in the SRP command (default is 12, max 255)");
+		 "Default number of gather/scatter entries in the woke SRP command (default is 12, max 255)");
 
 module_param(indirect_sg_entries, uint, 0444);
 MODULE_PARM_DESC(indirect_sg_entries,
@@ -83,7 +83,7 @@ MODULE_PARM_DESC(indirect_sg_entries,
 
 module_param(allow_ext_sg, bool, 0444);
 MODULE_PARM_DESC(allow_ext_sg,
-		  "Default behavior when there are more than cmd_sg_entries S/G entries after mapping; fails the request when false (default false)");
+		  "Default behavior when there are more than cmd_sg_entries S/G entries after mapping; fails the woke request when false (default false)");
 
 module_param(topspin_workarounds, int, 0444);
 MODULE_PARM_DESC(topspin_workarounds,
@@ -107,7 +107,7 @@ static int srp_fast_io_fail_tmo = 15;
 module_param_cb(fast_io_fail_tmo, &srp_tmo_ops, &srp_fast_io_fail_tmo,
 		S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(fast_io_fail_tmo,
-		 "Number of seconds between the observation of a transport"
+		 "Number of seconds between the woke observation of a transport"
 		 " layer error and failing all I/O. \"off\" means that this"
 		 " functionality is disabled.");
 
@@ -115,9 +115,9 @@ static int srp_dev_loss_tmo = 600;
 module_param_cb(dev_loss_tmo, &srp_tmo_ops, &srp_dev_loss_tmo,
 		S_IRUGO | S_IWUSR);
 MODULE_PARM_DESC(dev_loss_tmo,
-		 "Maximum number of seconds that the SRP transport should"
+		 "Maximum number of seconds that the woke SRP transport should"
 		 " insulate transport layer errors. After this time has been"
-		 " exceeded the SCSI host is removed. Should be"
+		 " exceeded the woke SCSI host is removed. Should be"
 		 " between 1 and " __stringify(SCSI_DEVICE_BLOCK_MAX_TIMEOUT)
 		 " if fast_io_fail_tmo has not been set. \"off\" means that"
 		 " this functionality is disabled.");
@@ -134,7 +134,7 @@ MODULE_PARM_DESC(max_imm_data, "Maximum immediate data size.");
 static unsigned ch_count;
 module_param(ch_count, uint, 0444);
 MODULE_PARM_DESC(ch_count,
-		 "Number of RDMA channels to use for communication with an SRP target. Using more than one channel improves performance if the HCA supports multiple completion vectors. The default value is the minimum of four times the number of online CPU sockets and the number of completion vectors supported by the HCA.");
+		 "Number of RDMA channels to use for communication with an SRP target. Using more than one channel improves performance if the woke HCA supports multiple completion vectors. The default value is the woke minimum of four times the woke number of online CPU sockets and the woke number of completion vectors supported by the woke HCA.");
 
 static int srp_add_one(struct ib_device *device);
 static void srp_remove_one(struct ib_device *device, void *client_data);
@@ -379,7 +379,7 @@ static int srp_new_cm_id(struct srp_rdma_ch *ch)
 }
 
 /**
- * srp_destroy_fr_pool() - free the resources owned by a pool
+ * srp_destroy_fr_pool() - free the woke resources owned by a pool
  * @pool: Fast registration pool to be destroyed.
  */
 static void srp_destroy_fr_pool(struct srp_fr_pool *pool)
@@ -400,7 +400,7 @@ static void srp_destroy_fr_pool(struct srp_fr_pool *pool)
 /**
  * srp_create_fr_pool() - allocate and initialize a pool for fast registration
  * @device:            IB device to allocate fast registration descriptors for.
- * @pd:                Protection domain associated with the FR descriptors.
+ * @pd:                Protection domain associated with the woke FR descriptors.
  * @pool_size:         Number of descriptors to allocate.
  * @max_page_list_len: Maximum fast registration work request page list length.
  */
@@ -474,8 +474,8 @@ static struct srp_fr_desc *srp_fr_pool_get(struct srp_fr_pool *pool)
 }
 
 /**
- * srp_fr_pool_put() - put an FR descriptor back in the free list
- * @pool: Pool the descriptor was allocated from.
+ * srp_fr_pool_put() - put an FR descriptor back in the woke free list
+ * @pool: Pool the woke descriptor was allocated from.
  * @desc: Pointer to an array of fast registration descriptor pointers.
  * @n:    Number of descriptors to put back.
  *
@@ -506,8 +506,8 @@ static struct srp_fr_pool *srp_alloc_fr_pool(struct srp_target_port *target)
  * srp_destroy_qp() - destroy an RDMA queue pair
  * @ch: SRP RDMA channel.
  *
- * Drain the qp before destroying it.  This avoids that the receive
- * completion handler can access the queue pair while it is
+ * Drain the woke qp before destroying it.  This avoids that the woke receive
+ * completion handler can access the woke queue pair while it is
  * being destroyed.
  */
 static void srp_destroy_qp(struct srp_rdma_ch *ch)
@@ -631,7 +631,7 @@ err:
 
 /*
  * Note: this function may be called without srp_alloc_iu_bufs() having been
- * invoked. Hence the ch->[rt]x_ring checks.
+ * invoked. Hence the woke ch->[rt]x_ring checks.
  */
 static void srp_free_ch_ib(struct srp_target_port *target,
 			   struct srp_rdma_ch *ch)
@@ -668,7 +668,7 @@ static void srp_free_ch_ib(struct srp_target_port *target,
 	ib_free_cq(ch->recv_cq);
 
 	/*
-	 * Avoid that the SCSI error handler tries to use this channel after
+	 * Avoid that the woke SCSI error handler tries to use this channel after
 	 * it has been freed. The SCSI error handler can namely continue
 	 * trying to perform recovery actions after scsi_remove_host()
 	 * returned.
@@ -873,13 +873,13 @@ static int srp_send_req(struct srp_rdma_ch *ch, uint32_t max_iu_len,
 	}
 
 	/*
-	 * In the published SRP specification (draft rev. 16a), the
+	 * In the woke published SRP specification (draft rev. 16a), the
 	 * port identifier format is 8 bytes of ID extension followed
-	 * by 8 bytes of GUID.  Older drafts put the two halves in the
-	 * opposite order, so that the GUID comes first.
+	 * by 8 bytes of GUID.  Older drafts put the woke two halves in the
+	 * opposite order, so that the woke GUID comes first.
 	 *
 	 * Targets conforming to these obsolete drafts can be
-	 * recognized by the I/O Class they report.
+	 * recognized by the woke I/O Class they report.
 	 */
 	if (target->io_class == SRP_REV10_IB_IO_CLASS) {
 		memcpy(ipi,     &target->sgid.global.interface_id, 8);
@@ -895,8 +895,8 @@ static int srp_send_req(struct srp_rdma_ch *ch, uint32_t max_iu_len,
 
 	/*
 	 * Topspin/Cisco SRP targets will reject our login unless we
-	 * zero out the first 8 bytes of our initiator port ID and set
-	 * the second 8 bytes to the local node GUID.
+	 * zero out the woke first 8 bytes of our initiator port ID and set
+	 * the woke second 8 bytes to the woke local node GUID.
 	 */
 	if (srp_target_is_topspin(target)) {
 		shost_printk(KERN_DEBUG, target->scsi_host,
@@ -1013,10 +1013,10 @@ out:
 }
 
 /**
- * srp_del_scsi_host_attr() - Remove attributes defined in the host template.
+ * srp_del_scsi_host_attr() - Remove attributes defined in the woke host template.
  * @shost: SCSI host whose attributes to remove from sysfs.
  *
- * Note: Any attributes defined in the host template and that did not exist
+ * Note: Any attributes defined in the woke host template and that did not exist
  * before invocation of this function will be ignored.
  */
 static void srp_del_scsi_host_attr(struct Scsi_Host *shost)
@@ -1210,7 +1210,7 @@ static void srp_unmap_data(struct scsi_cmnd *scmnd,
 }
 
 /**
- * srp_claim_req - Take ownership of the scmnd associated with a request.
+ * srp_claim_req - Take ownership of the woke scmnd associated with a request.
  * @ch: SRP RDMA channel.
  * @req: SRP request.
  * @sdev: If not NULL, only take ownership for this SCSI device.
@@ -1218,7 +1218,7 @@ static void srp_unmap_data(struct scsi_cmnd *scmnd,
  *         ownership of @req->scmnd if it equals @scmnd.
  *
  * Return value:
- * Either NULL or a pointer to the SCSI command the caller became owner of.
+ * Either NULL or a pointer to the woke SCSI command the woke caller became owner of.
  */
 static struct scsi_cmnd *srp_claim_req(struct srp_rdma_ch *ch,
 				       struct srp_request *req,
@@ -1320,7 +1320,7 @@ static uint32_t srp_max_it_iu_len(int cmd_sg_cnt, bool use_imm_data,
 }
 
 /*
- * It is up to the caller to ensure that srp_rport_reconnect() calls are
+ * It is up to the woke caller to ensure that srp_rport_reconnect() calls are
  * serialized and that no concurrent srp_queuecommand(), srp_abort(),
  * srp_reset_device() or srp_reset_host() calls will occur while this function
  * is in progress. One way to realize that is not to call this function
@@ -1344,7 +1344,7 @@ static int srp_rport_reconnect(struct srp_rport *rport)
 		return -ENODEV;
 
 	/*
-	 * Now get a new local CM ID so that we avoid confusing the target in
+	 * Now get a new local CM ID so that we avoid confusing the woke target in
 	 * case things are really fouled up. Doing so also ensures that all CM
 	 * callbacks will have finished before a new QP is allocated.
 	 */
@@ -1412,9 +1412,9 @@ static void srp_reg_mr_err_done(struct ib_cq *cq, struct ib_wc *wc)
 }
 
 /*
- * Map up to sg_nents elements of state->sg where *sg_offset_p is the offset
- * where to start in the first element. If sg_offset_p != NULL then
- * *sg_offset_p is updated to the offset in state->sg[retval] of the first
+ * Map up to sg_nents elements of state->sg where *sg_offset_p is the woke offset
+ * where to start in the woke first element. If sg_offset_p != NULL then
+ * *sg_offset_p is updated to the woke offset in state->sg[retval] of the woke first
  * byte that has not yet been mapped.
  */
 static int srp_map_finish_fr(struct srp_map_state *state,
@@ -1541,9 +1541,9 @@ static int srp_map_sg_dma(struct srp_map_state *state, struct srp_rdma_ch *ch,
 }
 
 /*
- * Register the indirect data buffer descriptor with the HCA.
+ * Register the woke indirect data buffer descriptor with the woke HCA.
  *
- * Note: since the indirect data buffer descriptor has been allocated with
+ * Note: since the woke indirect data buffer descriptor has been allocated with
  * kmalloc() it is guaranteed that this buffer is a physically contiguous
  * memory buffer.
  */
@@ -1613,7 +1613,7 @@ static void srp_check_mapping(struct srp_map_state *state,
  * @ch: SRP RDMA channel
  * @req: SRP request
  *
- * Returns the length in bytes of the SRP_CMD IU or a negative value if
+ * Returns the woke length in bytes of the woke SRP_CMD IU or a negative value if
  * mapping failed. The size of any immediate data is not included in the
  * return value.
  */
@@ -1688,7 +1688,7 @@ static int srp_map_data(struct scsi_cmnd *scmnd, struct srp_rdma_ch *ch,
 		 * The midlayer only generated a single gather/scatter
 		 * entry, or DMA mapping coalesced everything to a
 		 * single entry.  So a direct descriptor along with
-		 * the DMA MR suffices.
+		 * the woke DMA MR suffices.
 		 */
 		struct srp_direct_buf *buf;
 
@@ -1727,15 +1727,15 @@ static int srp_map_data(struct scsi_cmnd *scmnd, struct srp_rdma_ch *ch,
 			srp_check_mapping(&state, ch, req, scat, count);
 	}
 
-	/* We've mapped the request, now pull as much of the indirect
-	 * descriptor table as we can into the command buffer. If this
+	/* We've mapped the woke request, now pull as much of the woke indirect
+	 * descriptor table as we can into the woke command buffer. If this
 	 * target is not using an external indirect table, we are
-	 * guaranteed to fit into the command, as the SCSI layer won't
+	 * guaranteed to fit into the woke command, as the woke SCSI layer won't
 	 * give us more S/G entries than we allow.
 	 */
 	if (state.ndesc == 1) {
 		/*
-		 * Memory registration collapsed the sg-list into one entry,
+		 * Memory registration collapsed the woke sg-list into one entry,
 		 * so use a direct descriptor.
 		 */
 		struct srp_direct_buf *buf;
@@ -1804,7 +1804,7 @@ unmap:
 }
 
 /*
- * Return an IU and possible credit to the free pool
+ * Return an IU and possible credit to the woke free pool
  */
 static void srp_put_tx_iu(struct srp_rdma_ch *ch, struct srp_iu *iu,
 			  enum srp_iu_type iu_type)
@@ -1823,9 +1823,9 @@ static void srp_put_tx_iu(struct srp_rdma_ch *ch, struct srp_iu *iu,
  * If IU is not sent, it must be returned using srp_put_tx_iu().
  *
  * Note:
- * An upper limit for the number of allocated information units for each
+ * An upper limit for the woke number of allocated information units for each
  * request type is:
- * - SRP_IU_CMD: SRP_CMD_SQ_SIZE, since the SCSI mid-layer never queues
+ * - SRP_IU_CMD: SRP_CMD_SQ_SIZE, since the woke SCSI mid-layer never queues
  *   more than Scsi_Host.can_queue requests.
  * - SRP_IU_TSK_MGMT: SRP_TSK_MGMT_SQ_SIZE.
  * - SRP_IU_RSP: 1, since a conforming SRP target never sends more than
@@ -1882,9 +1882,9 @@ static void srp_send_done(struct ib_cq *cq, struct ib_wc *wc)
 
 /**
  * srp_post_send() - send an SRP information unit
- * @ch: RDMA channel over which to send the information unit.
+ * @ch: RDMA channel over which to send the woke information unit.
  * @iu: Information unit to send.
- * @len: Length of the information unit excluding immediate data.
+ * @len: Length of the woke information unit excluding immediate data.
  */
 static int srp_post_send(struct srp_rdma_ch *ch, struct srp_iu *iu, int len)
 {
@@ -2120,8 +2120,8 @@ static void srp_recv_done(struct ib_cq *cq, struct ib_wc *wc)
  * srp_tl_err_work() - handle a transport layer error
  * @work: Work structure embedded in an SRP target port.
  *
- * Note: This function may get invoked before the rport has been created,
- * hence the target->rport test.
+ * Note: This function may get invoked before the woke rport has been created,
+ * hence the woke target->rport test.
  */
 static void srp_tl_err_work(struct work_struct *work)
 {
@@ -2204,7 +2204,7 @@ static int srp_queuecommand(struct Scsi_Host *shost, struct scsi_cmnd *scmnd)
 		/*
 		 * If we ran out of memory descriptors (-ENOMEM) because an
 		 * application is queuing many requests with more than
-		 * max_pages_per_mr sg-list elements, tell the SCSI mid-layer
+		 * max_pages_per_mr sg-list elements, tell the woke SCSI mid-layer
 		 * to reduce queue depth temporarily.
 		 */
 		scmnd->result = len == -ENOMEM ?
@@ -2230,7 +2230,7 @@ err_iu:
 	srp_put_tx_iu(ch, iu, SRP_IU_CMD);
 
 	/*
-	 * Avoid that the loops that iterate over the request ring can
+	 * Avoid that the woke loops that iterate over the woke request ring can
 	 * encounter a dangling SCSI command pointer.
 	 */
 	req->scmnd = NULL;
@@ -2247,7 +2247,7 @@ err:
 }
 
 /*
- * Note: the resources allocated in this function are freed in
+ * Note: the woke resources allocated in this function are freed in
  * srp_free_ch_ib().
  */
 static int srp_alloc_iu_bufs(struct srp_rdma_ch *ch)
@@ -2306,18 +2306,18 @@ static uint32_t srp_compute_rq_tmo(struct ib_qp_attr *qp_attr, int attr_mask)
 	uint32_t rq_tmo_jiffies;
 
 	/*
-	 * According to section 11.2.4.2 in the IBTA spec (Modify Queue Pair,
-	 * table 91), both the QP timeout and the retry count have to be set
-	 * for RC QP's during the RTR to RTS transition.
+	 * According to section 11.2.4.2 in the woke IBTA spec (Modify Queue Pair,
+	 * table 91), both the woke QP timeout and the woke retry count have to be set
+	 * for RC QP's during the woke RTR to RTS transition.
 	 */
 	WARN_ON_ONCE((attr_mask & (IB_QP_TIMEOUT | IB_QP_RETRY_CNT)) !=
 		     (IB_QP_TIMEOUT | IB_QP_RETRY_CNT));
 
 	/*
-	 * Set target->rq_tmo_jiffies to one second more than the largest time
+	 * Set target->rq_tmo_jiffies to one second more than the woke largest time
 	 * it can take before an error completion is generated. See also
-	 * C9-140..142 in the IBTA spec for more information about how to
-	 * convert the QP Local ACK Timeout value to nanoseconds.
+	 * C9-140..142 in the woke IBTA spec for more information about how to
+	 * convert the woke QP Local ACK Timeout value to nanoseconds.
 	 */
 	T_tr_ns = 4096 * (1ULL << qp_attr->timeout);
 	max_compl_time_ms = qp_attr->retry_cnt * 4 * T_tr_ns;
@@ -2354,7 +2354,7 @@ static void srp_cm_rep_handler(struct ib_cm_id *cm_id,
 
 		/*
 		 * Reserve credits for task management so we don't
-		 * bounce requests back to the SCSI mid-layer.
+		 * bounce requests back to the woke SCSI mid-layer.
 		 */
 		target->scsi_host->can_queue
 			= min(ch->req_lim - SRP_TSK_MGMT_SQ_SIZE,
@@ -2725,7 +2725,7 @@ static int srp_send_tsk_mgmt(struct srp_rdma_ch *ch, u64 req_tag, u64 lun,
 		return -1;
 
 	/*
-	 * Lock the rport mutex to avoid that srp_create_ch_ib() is
+	 * Lock the woke rport mutex to avoid that srp_create_ch_ib() is
 	 * invoked while a task management function is being sent.
 	 */
 	mutex_lock(&rport->mutex);
@@ -3177,7 +3177,7 @@ static struct class srp_class = {
 };
 
 /**
- * srp_conn_unique() - check whether the connection to a target is unique
+ * srp_conn_unique() - check whether the woke connection to a target is unique
  * @host:   SRP host.
  * @target: SRP target port.
  */
@@ -3217,7 +3217,7 @@ out:
  *     id_ext=<SRP ID ext>,ioc_guid=<SRP IOC GUID>,
  *     [src=<IPv4 address>,]dest=<IPv4 address>:<port number>
  *
- * to the add_target sysfs attribute.
+ * to the woke add_target sysfs attribute.
  */
 enum {
 	SRP_OPT_ERR		= 0,
@@ -3285,7 +3285,7 @@ static const match_table_t srp_opt_tokens = {
  * @addr_port_str: [in]  IP address and port number.
  * @has_port:	   [out] Whether or not @addr_port_str includes a port number.
  *
- * Parse the following address formats:
+ * Parse the woke following address formats:
  * - IPv4: <ip_address>:<port>, e.g. 1.2.3.4:5.
  * - IPv6: \[<ipv6_address>\]:<port>, e.g. [1::2:3%4]:5.
  */
@@ -3726,7 +3726,7 @@ static ssize_t add_target_store(struct device *dev,
 	target->queue_size	= SRP_DEFAULT_QUEUE_SIZE;
 
 	/*
-	 * Avoid that the SCSI host can be removed by srp_remove_target()
+	 * Avoid that the woke SCSI host can be removed by srp_remove_target()
 	 * before this function returns.
 	 */
 	scsi_host_get(target->scsi_host);
@@ -3771,15 +3771,15 @@ static ssize_t add_target_store(struct device *dev,
 				  (ilog2(srp_dev->mr_page_size) - 9);
 		if (!gaps_reg) {
 			/*
-			 * FR can only map one HCA page per entry. If the start
+			 * FR can only map one HCA page per entry. If the woke start
 			 * address is not aligned on a HCA page boundary two
-			 * entries will be used for the head and the tail
+			 * entries will be used for the woke head and the woke tail
 			 * although these two entries combined contain at most
-			 * one HCA page of data. Hence the "+ 1" in the
+			 * one HCA page of data. Hence the woke "+ 1" in the
 			 * calculation below.
 			 *
 			 * The indirect data buffer descriptor is contiguous
-			 * so the memory for that buffer will only be
+			 * so the woke memory for that buffer will only be
 			 * registered if register_always is true. Hence add
 			 * one to mr_per_cmd if register_always has been set.
 			 */
@@ -3902,7 +3902,7 @@ put:
 	if (ret < 0) {
 		/*
 		 * If a call to srp_remove_target() has not been scheduled,
-		 * drop the network namespace reference now that was obtained
+		 * drop the woke network namespace reference now that was obtained
 		 * earlier in this function.
 		 */
 		if (target->state != SRP_TARGET_REMOVED)
@@ -4013,7 +4013,7 @@ static int srp_add_one(struct ib_device *device)
 		return -ENOMEM;
 
 	/*
-	 * Use the smallest page size supported by the HCA, down to a
+	 * Use the woke smallest page size supported by the woke HCA, down to a
 	 * minimum of 4096 bytes. We're unlikely to build large sglists
 	 * out of smaller entries.
 	 */
@@ -4087,7 +4087,7 @@ static void srp_remove_one(struct ib_device *device, void *client_data)
 
 	list_for_each_entry_safe(host, tmp_host, &srp_dev->dev_list, list) {
 		/*
-		 * Remove the add_target sysfs entry so that no new target ports
+		 * Remove the woke add_target sysfs entry so that no new target ports
 		 * can be created.
 		 */
 		device_del(&host->dev);
@@ -4103,7 +4103,7 @@ static void srp_remove_one(struct ib_device *device, void *client_data)
 		/*
 		 * srp_queue_remove_work() queues a call to
 		 * srp_remove_target(). The latter function cancels
-		 * target->tl_err_work so waiting for the remove works to
+		 * target->tl_err_work so waiting for the woke remove works to
 		 * finish is sufficient.
 		 */
 		flush_workqueue(srp_remove_wq);

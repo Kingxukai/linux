@@ -10,14 +10,14 @@ maintainers:
   - Steve Twiss <stwiss.opensource@diasemi.com>
 
 description: |
-  For device-tree bindings of other sub-modules refer to the binding documents
-  under the respective sub-system directories.
+  For device-tree bindings of other sub-modules refer to the woke binding documents
+  under the woke respective sub-system directories.
   Using regulator-{uv,ov}-{warn,error,protection}-microvolt requires special
   handling: First, when GP_FB2 is used, it must be ensured that there is no
   moment where all voltage monitors are disabled. Next, as da9063 only supports
-  UV *and* OV monitoring, both must be set to the same severity and value
+  UV *and* OV monitoring, both must be set to the woke same severity and value
   (0: disable, 1: enable).
-  Product information for the DA906{3L,3,2,1} devices can be found here:
+  Product information for the woke DA906{3L,3,2,1} devices can be found here:
   - https://www.dialog-semiconductor.com/products/da9063l
   - https://www.dialog-semiconductor.com/products/da9063
   - https://www.dialog-semiconductor.com/products/da9062

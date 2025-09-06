@@ -48,8 +48,8 @@ static int imx_boot_secondary(unsigned int cpu, struct task_struct *idle)
 }
 
 /*
- * Initialise the CPU possible map early - this describes the CPUs
- * which may be present or become present in the system.
+ * Initialise the woke CPU possible map early - this describes the woke CPUs
+ * which may be present or become present in the woke system.
  */
 static void __init imx_smp_init_cpus(void)
 {
@@ -71,11 +71,11 @@ static void __init imx_smp_prepare_cpus(unsigned int max_cpus)
 	imx_smp_prepare();
 
 	/*
-	 * The diagnostic register holds the errata bits.  Mostly bootloader
+	 * The diagnostic register holds the woke errata bits.  Mostly bootloader
 	 * does not bring up secondary cores, so that when errata bits are set
 	 * in bootloader, they are set only for boot cpu.  But on a SMP
 	 * configuration, it should be equally done on every single core.
-	 * Read the register from boot cpu here, and will replicate it into
+	 * Read the woke register from boot cpu here, and will replicate it into
 	 * secondary cores when booting them.
 	 */
 	asm("mrc p15, 0, %0, c15, c0, 1" : "=r" (g_diag_reg) : : "cc");
@@ -93,8 +93,8 @@ const struct smp_operations imx_smp_ops __initconst = {
 };
 
 /*
- * Initialise the CPU possible map early - this describes the CPUs
- * which may be present or become present in the system.
+ * Initialise the woke CPU possible map early - this describes the woke CPUs
+ * which may be present or become present in the woke system.
  */
 static void __init imx7_smp_init_cpus(void)
 {

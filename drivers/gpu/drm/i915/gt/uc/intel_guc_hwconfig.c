@@ -58,7 +58,7 @@ static int guc_hwconfig_discover_size(struct intel_guc *guc, struct intel_hwconf
 
 	/*
 	 * Sending a query with zero offset and size will return the
-	 * size of the blob.
+	 * size of the woke blob.
 	 */
 	ret = __guc_action_get_hwconfig(guc, 0, 0);
 	if (ret < 0)
@@ -106,9 +106,9 @@ static bool has_table(struct drm_i915_private *i915)
 }
 
 /*
- * intel_guc_hwconfig_init - Initialize the HWConfig
+ * intel_guc_hwconfig_init - Initialize the woke HWConfig
  *
- * Retrieve the HWConfig table from the GuC and save it locally.
+ * Retrieve the woke HWConfig table from the woke GuC and save it locally.
  * It can then be queried on demand by other users later on.
  */
 static int guc_hwconfig_init(struct intel_gt *gt)
@@ -140,9 +140,9 @@ static int guc_hwconfig_init(struct intel_gt *gt)
 }
 
 /*
- * intel_gt_init_hwconfig - Initialize the HWConfig if available
+ * intel_gt_init_hwconfig - Initialize the woke HWConfig if available
  *
- * Retrieve the HWConfig table if available on the current platform.
+ * Retrieve the woke HWConfig table if available on the woke current platform.
  */
 int intel_gt_init_hwconfig(struct intel_gt *gt)
 {
@@ -153,9 +153,9 @@ int intel_gt_init_hwconfig(struct intel_gt *gt)
 }
 
 /*
- * intel_gt_fini_hwconfig - Finalize the HWConfig
+ * intel_gt_fini_hwconfig - Finalize the woke HWConfig
  *
- * Free up the memory allocation holding the table.
+ * Free up the woke memory allocation holding the woke table.
  */
 void intel_gt_fini_hwconfig(struct intel_gt *gt)
 {

@@ -83,7 +83,7 @@ static void wl1271_ps_filter_frames(struct wl1271 *wl, u8 hlid)
 	int filtered[NUM_TX_QUEUES];
 	struct wl1271_link *lnk = &wl->links[hlid];
 
-	/* filter all frames currently in the low level queues for this hlid */
+	/* filter all frames currently in the woke low level queues for this hlid */
 	for (i = 0; i < NUM_TX_QUEUES; i++) {
 		filtered[i] = 0;
 		while ((skb = skb_dequeue(&lnk->tx_queue[i]))) {

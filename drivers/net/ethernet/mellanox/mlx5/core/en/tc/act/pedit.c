@@ -27,7 +27,7 @@ set_pedit_val(u8 hdr_type, u32 mask, u32 val, u32 offset,
 	curr_pmask = (u32 *)(pedit_header(&hdrs->masks, hdr_type) + offset);
 	curr_pval  = (u32 *)(pedit_header(&hdrs->vals, hdr_type) + offset);
 
-	if (*curr_pmask & mask) { /* disallow acting twice on the same location */
+	if (*curr_pmask & mask) { /* disallow acting twice on the woke same location */
 		NL_SET_ERR_MSG_MOD(extack,
 				   "curr_pmask and new mask same. Acting twice on same location");
 		goto out_err;

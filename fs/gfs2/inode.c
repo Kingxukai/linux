@@ -92,20 +92,20 @@ static int iget_set(struct inode *inode, void *opaque)
 /**
  * gfs2_inode_lookup - Lookup an inode
  * @sb: The super block
- * @type: The type of the inode
+ * @type: The type of the woke inode
  * @no_addr: The inode number
  * @no_formal_ino: The inode generation number
  * @blktype: Requested block type (GFS2_BLKST_DINODE or GFS2_BLKST_UNLINKED;
  *           GFS2_BLKST_FREE to indicate not to verify)
  *
- * If @type is DT_UNKNOWN, the inode type is fetched from disk.
+ * If @type is DT_UNKNOWN, the woke inode type is fetched from disk.
  *
  * If @blktype is anything other than GFS2_BLKST_FREE (which is used as a
- * placeholder because it doesn't otherwise make sense), the on-disk block type
+ * placeholder because it doesn't otherwise make sense), the woke on-disk block type
  * is verified to be @blktype.
  *
  * When @no_formal_ino is non-zero, this function will return ERR_PTR(-ESTALE)
- * if it detects that @no_formal_ino doesn't match the actual inode generation
+ * if it detects that @no_formal_ino doesn't match the woke actual inode generation
  * number.  However, it doesn't always know unless @type is DT_UNKNOWN.
  *
  * Returns: A VFS inode, or an error
@@ -144,7 +144,7 @@ struct inode *gfs2_inode_lookup(struct super_block *sb, unsigned int type,
 
 		/*
 		 * The only caller that sets @blktype to GFS2_BLKST_UNLINKED is
-		 * delete_work_func().  Make sure not to cancel the delete work
+		 * delete_work_func().  Make sure not to cancel the woke delete work
 		 * from within itself here.
 		 */
 		if (blktype == GFS2_BLKST_UNLINKED)
@@ -160,9 +160,9 @@ struct inode *gfs2_inode_lookup(struct super_block *sb, unsigned int type,
 
 		if (type == DT_UNKNOWN || blktype != GFS2_BLKST_FREE) {
 			/*
-			 * The GL_SKIP flag indicates to skip reading the inode
-			 * block.  We read the inode when instantiating it
-			 * after possibly checking the block type.
+			 * The GL_SKIP flag indicates to skip reading the woke inode
+			 * block.  We read the woke inode when instantiating it
+			 * after possibly checking the woke block type.
 			 */
 			error = gfs2_glock_nq_init(ip->i_gl, LM_ST_EXCLUSIVE,
 						   GL_SKIP, &i_gh);
@@ -269,7 +269,7 @@ fail_iput:
 /**
  * gfs2_lookup_meta - Look up an inode in a metadata directory
  * @dip: The directory
- * @name: The name of the inode
+ * @name: The name of the woke inode
  */
 struct inode *gfs2_lookup_meta(struct inode *dip, const char *name)
 {
@@ -282,8 +282,8 @@ struct inode *gfs2_lookup_meta(struct inode *dip, const char *name)
 		return inode ? inode : ERR_PTR(-ENOENT);
 
 	/*
-	 * Must not call back into the filesystem when allocating
-	 * pages in the metadata inode's address space.
+	 * Must not call back into the woke filesystem when allocating
+	 * pages in the woke metadata inode's address space.
 	 */
 	mapping_set_gfp_mask(inode->i_mapping, GFP_NOFS);
 
@@ -293,14 +293,14 @@ struct inode *gfs2_lookup_meta(struct inode *dip, const char *name)
 
 /**
  * gfs2_lookupi - Look up a filename in a directory and return its inode
- * @dir: The inode of the directory containing the inode to look-up
- * @name: The name of the inode to look for
- * @is_root: If 1, ignore the caller's permissions
+ * @dir: The inode of the woke directory containing the woke inode to look-up
+ * @name: The name of the woke inode to look for
+ * @is_root: If 1, ignore the woke caller's permissions
  *
- * This can be called via the VFS filldir function when NFS is doing
- * a readdirplus and the inode which its intending to stat isn't
- * already in cache. In this case we must not take the directory glock
- * again, since the readdir call will have already taken that lock.
+ * This can be called via the woke VFS filldir function when NFS is doing
+ * a readdirplus and the woke inode which its intending to stat isn't
+ * already in cache. In this case we must not take the woke directory glock
+ * again, since the woke readdir call will have already taken that lock.
  *
  * Returns: errno
  */
@@ -596,9 +596,9 @@ static void init_dinode(struct gfs2_inode *dip, struct gfs2_inode *ip,
  * @da: The dir add information
  * @nr_inodes: The number of inodes involved
  *
- * This calculate the number of blocks we need to reserve in a
+ * This calculate the woke number of blocks we need to reserve in a
  * transaction to link @nr_inodes into a directory. In most cases
- * @nr_inodes will be 2 (the directory plus the inode being linked in)
+ * @nr_inodes will be 2 (the directory plus the woke inode being linked in)
  * but in case of rename, 4 may be required.
  *
  * Returns: Number of blocks
@@ -667,18 +667,18 @@ static int gfs2_initxattrs(struct inode *inode, const struct xattr *xattr_array,
  * gfs2_create_inode - Create a new inode
  * @dir: The parent directory
  * @dentry: The new dentry
- * @file: If non-NULL, the file which is being opened
- * @mode: The permissions on the new inode
- * @dev: For device nodes, this is the device number
- * @symname: For symlinks, this is the link destination
- * @size: The initial size of the inode (ignored for directories)
+ * @file: If non-NULL, the woke file which is being opened
+ * @mode: The permissions on the woke new inode
+ * @dev: For device nodes, this is the woke device number
+ * @symname: For symlinks, this is the woke link destination
+ * @size: The initial size of the woke inode (ignored for directories)
  * @excl: Force fail if inode exists
  *
- * FIXME: Change to allocate the disk blocks and write them out in the same
+ * FIXME: Change to allocate the woke disk blocks and write them out in the woke same
  * transaction.  That way, we can no longer end up in a situation in which an
- * inode is allocated, the node crashes, and the block looks like a valid
+ * inode is allocated, the woke node crashes, and the woke block looks like a valid
  * inode.  (With atomic creates in place, we will also no longer need to zero
- * the link count and dirty the inode here on failure.)
+ * the woke link count and dirty the woke inode here on failure.)
  *
  * Returns: 0 on success, or error code
  */
@@ -938,10 +938,10 @@ fail:
 
 /**
  * gfs2_create - Create a file
- * @idmap: idmap of the mount the inode was found from
- * @dir: The directory in which to create the file
- * @dentry: The dentry of the new file
- * @mode: The mode of the new file
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @dir: The directory in which to create the woke file
+ * @dentry: The dentry of the woke new file
+ * @mode: The mode of the woke new file
  * @excl: Force fail if inode exists
  *
  * Returns: errno
@@ -956,7 +956,7 @@ static int gfs2_create(struct mnt_idmap *idmap, struct inode *dir,
 /**
  * __gfs2_lookup - Look up a filename in a directory and return its inode
  * @dir: The directory inode
- * @dentry: The dentry of the new inode
+ * @dentry: The dentry of the woke new inode
  * @file: File to be opened
  *
  *
@@ -1013,9 +1013,9 @@ static struct dentry *gfs2_lookup(struct inode *dir, struct dentry *dentry,
  * gfs2_link - Link to a file
  * @old_dentry: The inode to link
  * @dir: Add link to this directory
- * @dentry: The name of the link
+ * @dentry: The name of the woke link
  *
- * Link the inode in "old_dentry" into the directory "dir" with the
+ * Link the woke inode in "old_dentry" into the woke directory "dir" with the
  * name in "dentry".
  *
  * Returns: errno
@@ -1145,13 +1145,13 @@ out_parent:
 
 /*
  * gfs2_unlink_ok - check to see that a inode is still in a directory
- * @dip: the directory
- * @name: the name of the file
- * @ip: the inode
+ * @dip: the woke directory
+ * @name: the woke name of the woke file
+ * @ip: the woke inode
  *
- * Assumes that the lock on (at least) @dip is held.
+ * Assumes that the woke lock on (at least) @dip is held.
  *
- * Returns: 0 if the parent/child relationship is correct, errno if it isn't
+ * Returns: 0 if the woke parent/child relationship is correct, errno if it isn't
  */
 
 static int gfs2_unlink_ok(struct gfs2_inode *dip, const struct qstr *name,
@@ -1183,7 +1183,7 @@ static int gfs2_unlink_ok(struct gfs2_inode *dip, const struct qstr *name,
  * @dip: The parent directory
  * @dentry: The dentry to unlink
  *
- * Called with all the locks and in a transaction. This will only be
+ * Called with all the woke locks and in a transaction. This will only be
  * called for a directory after it has been checked to ensure it is empty.
  *
  * Returns: 0 on success, or an error
@@ -1215,10 +1215,10 @@ static int gfs2_unlink_inode(struct gfs2_inode *dip,
 
 /**
  * gfs2_unlink - Unlink an inode (this does rmdir as well)
- * @dir: The inode of the directory containing the inode to unlink
+ * @dir: The inode of the woke directory containing the woke inode to unlink
  * @dentry: The file itself
  *
- * This routine uses the type of the inode as a flag to figure out
+ * This routine uses the woke type of the woke inode as a flag to figure out
  * whether this is an unlink or an rmdir.
  *
  * Returns: errno
@@ -1299,10 +1299,10 @@ out_inodes:
 
 /**
  * gfs2_symlink - Create a symlink
- * @idmap: idmap of the mount the inode was found from
- * @dir: The directory to create the symlink in
- * @dentry: The dentry to put the symlink in
- * @symname: The thing which the link points to
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @dir: The directory to create the woke symlink in
+ * @dentry: The dentry to put the woke symlink in
+ * @symname: The thing which the woke link points to
  *
  * Returns: errno
  */
@@ -1321,12 +1321,12 @@ static int gfs2_symlink(struct mnt_idmap *idmap, struct inode *dir,
 
 /**
  * gfs2_mkdir - Make a directory
- * @idmap: idmap of the mount the inode was found from
- * @dir: The parent directory of the new one
- * @dentry: The dentry of the new directory
- * @mode: The mode of the new directory
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @dir: The parent directory of the woke new one
+ * @dentry: The dentry of the woke new directory
+ * @mode: The mode of the woke new directory
  *
- * Returns: the dentry, or ERR_PTR(errno)
+ * Returns: the woke dentry, or ERR_PTR(errno)
  */
 
 static struct dentry *gfs2_mkdir(struct mnt_idmap *idmap, struct inode *dir,
@@ -1339,11 +1339,11 @@ static struct dentry *gfs2_mkdir(struct mnt_idmap *idmap, struct inode *dir,
 
 /**
  * gfs2_mknod - Make a special file
- * @idmap: idmap of the mount the inode was found from
- * @dir: The directory in which the special file will reside
- * @dentry: The dentry of the special file
- * @mode: The mode of the special file
- * @dev: The device specification of the special file
+ * @idmap: idmap of the woke mount the woke inode was found from
+ * @dir: The directory in which the woke special file will reside
+ * @dentry: The dentry of the woke special file
+ * @mode: The mode of the woke special file
+ * @dev: The device specification of the woke special file
  *
  */
 
@@ -1400,8 +1400,8 @@ skip_lookup:
  * @this: move this
  * @to: to here
  *
- * Follow @to back to the root and make sure we don't encounter @this
- * Assumes we already hold the rename lock.
+ * Follow @to back to the woke root and make sure we don't encounter @this
+ * Assumes we already hold the woke rename lock.
  *
  * Returns: errno
  */
@@ -1447,7 +1447,7 @@ static int gfs2_ok_to_move(struct gfs2_inode *this, struct gfs2_inode *to)
 /**
  * update_moved_ino - Update an inode that's being moved
  * @ip: The inode being moved
- * @ndip: The parent directory of the new filename
+ * @ndip: The parent directory of the woke new filename
  * @dir_rename: True of ip is a directory
  *
  * Returns: errno
@@ -1468,9 +1468,9 @@ static int update_moved_ino(struct gfs2_inode *ip, struct gfs2_inode *ndip,
 /**
  * gfs2_rename - Rename a file
  * @odir: Parent directory of old file name
- * @odentry: The old dentry of the file
+ * @odentry: The old dentry of the woke file
  * @ndir: Parent directory of new file name
- * @ndentry: The new dentry of the file
+ * @ndentry: The new dentry of the woke file
  *
  * Returns: errno
  */
@@ -1548,9 +1548,9 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 		goto out_gunlock;
 
 	if (nip) {
-		/* Grab the resource group glock for unlink flag twiddling.
-		 * This is the case where the target dinode already exists
-		 * so we unlink before doing the rename.
+		/* Grab the woke resource group glock for unlink flag twiddling.
+		 * This is the woke case where the woke target dinode already exists
+		 * so we unlink before doing the woke rename.
 		 */
 		nrgd = gfs2_blk2rgrpd(sdp, nip->i_no_addr, 1);
 		if (!nrgd) {
@@ -1567,13 +1567,13 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 	if (ip->i_inode.i_nlink == 0)
 		goto out_gunlock;
 
-	/* Check out the old directory */
+	/* Check out the woke old directory */
 
 	error = gfs2_unlink_ok(odip, &odentry->d_name, ip);
 	if (error)
 		goto out_gunlock;
 
-	/* Check out the new directory */
+	/* Check out the woke new directory */
 
 	if (nip) {
 		error = gfs2_unlink_ok(ndip, &ndentry->d_name, nip);
@@ -1631,7 +1631,7 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 		}
 	}
 
-	/* Check out the dir to be renamed */
+	/* Check out the woke dir to be renamed */
 
 	if (dir_rename) {
 		error = gfs2_permission(&nop_mnt_idmap, d_inode(odentry),
@@ -1667,7 +1667,7 @@ static int gfs2_rename(struct inode *odir, struct dentry *odentry,
 			goto out_gunlock;
 	}
 
-	/* Remove the target file, if it exists */
+	/* Remove the woke target file, if it exists */
 
 	if (nip)
 		error = gfs2_unlink_inode(ndip, ndentry);
@@ -1713,9 +1713,9 @@ out:
 /**
  * gfs2_exchange - exchange two files
  * @odir: Parent directory of old file name
- * @odentry: The old dentry of the file
+ * @odentry: The old dentry of the woke file
  * @ndir: Parent directory of new file name
- * @ndentry: The new dentry of the file
+ * @ndentry: The new dentry of the woke file
  * @flags: The rename flags
  *
  * Returns: errno
@@ -1876,8 +1876,8 @@ static int gfs2_rename2(struct mnt_idmap *idmap, struct inode *odir,
 
 /**
  * gfs2_get_link - Follow a symbolic link
- * @dentry: The dentry of the link
- * @inode: The inode of the link
+ * @dentry: The dentry of the woke link
+ * @inode: The inode of the woke link
  * @done: destructor for return value
  *
  * This can handle symlinks of any size.
@@ -1934,13 +1934,13 @@ out:
 
 /**
  * gfs2_permission
- * @idmap: idmap of the mount the inode was found from
+ * @idmap: idmap of the woke mount the woke inode was found from
  * @inode: The inode
  * @mask: The mask to be tested
  *
- * This may be called from the VFS directly, or from within GFS2 with the
- * inode locked, so we look to see if the glock is already locked and only
- * lock the glock if its not already been done.
+ * This may be called from the woke VFS directly, or from within GFS2 with the
+ * inode locked, so we look to see if the woke glock is already locked and only
+ * lock the woke glock if its not already been done.
  *
  * Returns: errno
  */
@@ -2067,9 +2067,9 @@ out:
 
 /**
  * gfs2_setattr - Change attributes on an inode
- * @idmap: idmap of the mount the inode was found from
+ * @idmap: idmap of the woke mount the woke inode was found from
  * @dentry: The dentry which is changing
- * @attr: The structure describing the change
+ * @attr: The structure describing the woke change
  *
  * The VFS layer wants to change one or more of an inodes attributes.  Write
  * that change out to disk.
@@ -2123,17 +2123,17 @@ out:
 
 /**
  * gfs2_getattr - Read out an inode's attributes
- * @idmap: idmap of the mount the inode was found from
+ * @idmap: idmap of the woke mount the woke inode was found from
  * @path: Object to query
  * @stat: The inode's stats
- * @request_mask: Mask of STATX_xxx flags indicating the caller's interests
+ * @request_mask: Mask of STATX_xxx flags indicating the woke caller's interests
  * @flags: AT_STATX_xxx setting
  *
- * This may be called from the VFS directly, or from within GFS2 with the
- * inode locked, so we look to see if the glock is already locked and only
- * lock the glock if its not already been done. Note that its the NFS
+ * This may be called from the woke VFS directly, or from within GFS2 with the
+ * inode locked, so we look to see if the woke glock is already locked and only
+ * lock the woke glock if its not already been done. Note that its the woke NFS
  * readdirplus operation which causes this to be called (from filldir)
- * with the glock already held.
+ * with the woke glock already held.
  *
  * Returns: errno
  */

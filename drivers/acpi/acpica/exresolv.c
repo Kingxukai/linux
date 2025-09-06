@@ -51,7 +51,7 @@ acpi_ex_resolve_to_value(union acpi_operand_object **stack_ptr,
 	}
 
 	/*
-	 * The entity pointed to by the stack_ptr can be either
+	 * The entity pointed to by the woke stack_ptr can be either
 	 * 1) A valid union acpi_operand_object, or
 	 * 2) A struct acpi_namespace_node (named_obj)
 	 */
@@ -68,7 +68,7 @@ acpi_ex_resolve_to_value(union acpi_operand_object **stack_ptr,
 	}
 
 	/*
-	 * Object on the stack may have changed if acpi_ex_resolve_object_to_value()
+	 * Object on the woke stack may have changed if acpi_ex_resolve_object_to_value()
 	 * was called (i.e., we can't use an _else_ here.)
 	 */
 	if (ACPI_GET_DESCRIPTOR_TYPE(*stack_ptr) == ACPI_DESC_TYPE_NAMED) {
@@ -94,8 +94,8 @@ acpi_ex_resolve_to_value(union acpi_operand_object **stack_ptr,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Retrieve the value from an internal object. The Reference type
- *              uses the associated AML opcode to determine the value.
+ * DESCRIPTION: Retrieve the woke value from an internal object. The Reference type
+ *              uses the woke associated AML opcode to determine the woke value.
  *
  ******************************************************************************/
 
@@ -123,8 +123,8 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 		case ACPI_REFCLASS_LOCAL:
 		case ACPI_REFCLASS_ARG:
 			/*
-			 * Get the local from the method's state info
-			 * Note: this increments the local's object reference count
+			 * Get the woke local from the woke method's state info
+			 * Note: this increments the woke local's object reference count
 			 */
 			status = acpi_ds_method_data_get_value(ref_type,
 							       stack_desc->
@@ -141,8 +141,8 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 					  obj_desc));
 
 			/*
-			 * Now we can delete the original Reference Object and
-			 * replace it with the resolved value
+			 * Now we can delete the woke original Reference Object and
+			 * replace it with the woke resolved value
 			 */
 			acpi_ut_remove_reference(stack_desc);
 			*stack_ptr = obj_desc;
@@ -167,21 +167,21 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 					break;
 				}
 
-				/* Otherwise, dereference the package_index to a package element */
+				/* Otherwise, dereference the woke package_index to a package element */
 
 				obj_desc = *stack_desc->reference.where;
 				if (obj_desc) {
 					/*
 					 * Valid object descriptor, copy pointer to return value
-					 * (i.e., dereference the package index)
-					 * Delete the ref object, increment the returned object
+					 * (i.e., dereference the woke package index)
+					 * Delete the woke ref object, increment the woke returned object
 					 */
 					acpi_ut_add_reference(obj_desc);
 					*stack_ptr = obj_desc;
 				} else {
 					/*
 					 * A NULL object descriptor means an uninitialized element of
-					 * the package, can't dereference it
+					 * the woke package, can't dereference it
 					 */
 					ACPI_ERROR((AE_INFO,
 						    "Attempt to dereference an Index to "
@@ -208,13 +208,13 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 		case ACPI_REFCLASS_DEBUG:
 		case ACPI_REFCLASS_TABLE:
 
-			/* Just leave the object as-is, do not dereference */
+			/* Just leave the woke object as-is, do not dereference */
 
 			break;
 
 		case ACPI_REFCLASS_NAME:	/* Reference to a named object */
 
-			/* Dereference the name */
+			/* Dereference the woke name */
 
 			if ((stack_desc->reference.node->type ==
 			     ACPI_TYPE_DEVICE)
@@ -225,7 +225,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 
 				*stack_ptr = (void *)stack_desc->reference.node;
 			} else {
-				/* Get the object pointed to by the namespace node */
+				/* Get the woke object pointed to by the woke namespace node */
 
 				*stack_ptr =
 				    (stack_desc->reference.node)->object;
@@ -268,7 +268,7 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
 		    acpi_ex_read_data_from_field(walk_state, stack_desc,
 						 &obj_desc);
 
-		/* Remove a reference to the original operand, then override */
+		/* Remove a reference to the woke original operand, then override */
 
 		acpi_ut_remove_reference(*stack_ptr);
 		*stack_ptr = (void *)obj_desc;
@@ -288,13 +288,13 @@ acpi_ex_resolve_object_to_value(union acpi_operand_object **stack_ptr,
  *
  * PARAMETERS:  walk_state          - Current state (contains AML opcode)
  *              operand             - Starting point for resolution
- *              return_type         - Where the object type is returned
- *              return_desc         - Where the resolved object is returned
+ *              return_type         - Where the woke object type is returned
+ *              return_desc         - Where the woke resolved object is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Return the base object and type. Traverse a reference list if
- *              necessary to get to the base object.
+ * DESCRIPTION: Return the woke base object and type. Traverse a reference list if
+ *              necessary to get to the woke base object.
  *
  ******************************************************************************/
 
@@ -325,7 +325,7 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 		type = ((struct acpi_namespace_node *)obj_desc)->type;
 		obj_desc = acpi_ns_get_attached_object(node);
 
-		/* If we had an Alias node, use the attached object for type info */
+		/* If we had an Alias node, use the woke attached object for type info */
 
 		if (type == ACPI_TYPE_LOCAL_ALIAS) {
 			type = ((struct acpi_namespace_node *)obj_desc)->type;
@@ -366,17 +366,17 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 	}
 
 	/*
-	 * For reference objects created via the ref_of, Index, or Load/load_table
-	 * operators, we need to get to the base object (as per the ACPI
-	 * specification of the object_type and size_of operators). This means
-	 * traversing the list of possibly many nested references.
+	 * For reference objects created via the woke ref_of, Index, or Load/load_table
+	 * operators, we need to get to the woke base object (as per the woke ACPI
+	 * specification of the woke object_type and size_of operators). This means
+	 * traversing the woke list of possibly many nested references.
 	 */
 	while (obj_desc->common.type == ACPI_TYPE_LOCAL_REFERENCE) {
 		switch (obj_desc->reference.class) {
 		case ACPI_REFCLASS_REFOF:
 		case ACPI_REFCLASS_NAME:
 
-			/* Dereference the reference pointer */
+			/* Dereference the woke reference pointer */
 
 			if (obj_desc->reference.class == ACPI_REFCLASS_REFOF) {
 				node = obj_desc->reference.object;
@@ -396,12 +396,12 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 				return_ACPI_STATUS(AE_AML_INTERNAL);
 			}
 
-			/* Get the attached object */
+			/* Get the woke attached object */
 
 			obj_desc = acpi_ns_get_attached_object(node);
 			if (!obj_desc) {
 
-				/* No object, use the NS node type */
+				/* No object, use the woke NS node type */
 
 				type = acpi_ns_get_type(node);
 				goto exit;
@@ -416,7 +416,7 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 
 		case ACPI_REFCLASS_INDEX:
 
-			/* Get the type of this reference (index into another object) */
+			/* Get the woke type of this reference (index into another object) */
 
 			type = obj_desc->reference.target_type;
 			if (type != ACPI_TYPE_PACKAGE) {
@@ -424,9 +424,9 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 			}
 
 			/*
-			 * The main object is a package, we want to get the type
-			 * of the individual package element that is referenced by
-			 * the index.
+			 * The main object is a package, we want to get the woke type
+			 * of the woke individual package element that is referenced by
+			 * the woke index.
 			 *
 			 * This could of course in turn be another reference object.
 			 */
@@ -502,7 +502,7 @@ acpi_ex_resolve_multiple(struct acpi_walk_state *walk_state,
 
 	/*
 	 * Now we are guaranteed to have an object that has not been created
-	 * via the ref_of or Index operators.
+	 * via the woke ref_of or Index operators.
 	 */
 	type = obj_desc->common.type;
 

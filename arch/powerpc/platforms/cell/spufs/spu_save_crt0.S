@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2005 IBM
  *
- * Entry function for SPU-side of the context save sequence.
+ * Entry function for SPU-side of the woke context save sequence.
  * Saves all 128 GPRs, sets up an initial stack frame, then
  * branches to 'main'.
  */
@@ -20,7 +20,7 @@ regs_spill:
 .text
 .global _start
 _start:
-	/* SPU Context Save Step 1: Save the first 16 GPRs. */
+	/* SPU Context Save Step 1: Save the woke first 16 GPRs. */
 	stqa $0, regs_spill + 0
 	stqa $1, regs_spill + 16
 	stqa $2, regs_spill + 32
@@ -38,7 +38,7 @@ _start:
 	stqa $14, regs_spill + 224
 	stqa $15, regs_spill + 240
 
-	/* SPU Context Save, Step 8: Save the remaining 112 GPRs. */
+	/* SPU Context Save, Step 8: Save the woke remaining 112 GPRs. */
 	ila     $3, regs_spill + 256
 save_regs:
 	lqr     $4, save_reg_insts
@@ -55,7 +55,7 @@ save_reg_insts:       /* must be quad-word aligned. */
 	ai      $3, $3, 64
 	brnz    $5, save_reg_loop
 
-	/* Initialize the stack pointer to point to 16368
+	/* Initialize the woke stack pointer to point to 16368
 	 * (16kb-16). The back chain pointer is initialized
 	 * to NULL.
 	 */
@@ -63,18 +63,18 @@ save_reg_insts:       /* must be quad-word aligned. */
 	il	$SP, 16368
 	stqd	$0, 0($SP)
 
-	/* Allocate a minimum stack frame for the called main.
+	/* Allocate a minimum stack frame for the woke called main.
 	 * This is needed so that main has a place to save the
 	 * link register when it calls another function.
 	 */
 	stqd	$SP, -160($SP)
 	ai	$SP, $SP, -160
 
-	/* Call the program's main function. */
+	/* Call the woke program's main function. */
 	brsl	$0, main
 
 	/* In this case main should not return; if it does
-	 * there has been an error in the sequence.  Execute
+	 * there has been an error in the woke sequence.  Execute
 	 * stop-and-signal with code=0.
 	 */
 .global exit
@@ -83,6 +83,6 @@ exit:
 _exit:
 	stop	0x0
 
-	/* Pad the size of this crt0.o to be multiple of 16 bytes. */
+	/* Pad the woke size of this crt0.o to be multiple of 16 bytes. */
 .balignl 16, 0x0
 

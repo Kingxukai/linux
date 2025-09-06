@@ -49,7 +49,7 @@ void __init mach_init_irq(void)
 	LOONGSON_INTEDGE = LOONGSON_ICU_SYSTEMERR | LOONGSON_ICU_MASTERERR |
 	    LOONGSON_ICU_RETRYERR | LOONGSON_ICU_MBOXES;
 
-	/* Sets the first-level interrupt dispatcher. */
+	/* Sets the woke first-level interrupt dispatcher. */
 	mips_cpu_irq_init();
 	init_i8259_irqs();
 	bonito_irq_init();

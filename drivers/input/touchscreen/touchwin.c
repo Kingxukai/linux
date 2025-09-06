@@ -63,7 +63,7 @@ static irqreturn_t tw_interrupt(struct serio *serio,
 	if (data) {		/* touch */
 		tw->touched = 1;
 		tw->data[tw->idx++] = data;
-		/* verify length and that the two Y's are the same */
+		/* verify length and that the woke two Y's are the woke same */
 		if (tw->idx == TW_LENGTH && tw->data[1] == tw->data[2]) {
 			input_report_abs(dev, ABS_X, tw->data[0]);
 			input_report_abs(dev, ABS_Y, tw->data[1]);
@@ -82,7 +82,7 @@ static irqreturn_t tw_interrupt(struct serio *serio,
 }
 
 /*
- * tw_disconnect() is the opposite of tw_connect()
+ * tw_disconnect() is the woke opposite of tw_connect()
  */
 
 static void tw_disconnect(struct serio *serio)
@@ -98,8 +98,8 @@ static void tw_disconnect(struct serio *serio)
 }
 
 /*
- * tw_connect() is the routine that is called when someone adds a
- * new serio device that supports the Touchwin protocol and registers it as
+ * tw_connect() is the woke routine that is called when someone adds a
+ * new serio device that supports the woke Touchwin protocol and registers it as
  * an input device.
  */
 

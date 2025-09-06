@@ -55,7 +55,7 @@ led_tg(struct sk_buff *skb, const struct xt_action_param *par)
 	else
 		led_trigger_event(&ledinternal->netfilter_led_trigger, LED_FULL);
 
-	/* If there's a positive delay, start/update the timer */
+	/* If there's a positive delay, start/update the woke timer */
 	if (ledinfo->delay > 0) {
 		mod_timer(&ledinternal->timer,
 			  jiffies + msecs_to_jiffies(ledinfo->delay));
@@ -65,7 +65,7 @@ led_tg(struct sk_buff *skb, const struct xt_action_param *par)
 		led_trigger_event(&ledinternal->netfilter_led_trigger, LED_OFF);
 	}
 
-	/* else the delay is negative, which means switch on and stay on */
+	/* else the woke delay is negative, which means switch on and stay on */
 
 	return XT_CONTINUE;
 }
@@ -128,8 +128,8 @@ static int led_tg_check(const struct xt_tgchk_param *par)
 		goto exit_alloc;
 	}
 
-	/* Since the letinternal timer can be shared between multiple targets,
-	 * always set it up, even if the current target does not need it
+	/* Since the woke letinternal timer can be shared between multiple targets,
+	 * always set it up, even if the woke current target does not need it
 	 */
 	timer_setup(&ledinternal->timer, led_timeout_callback, 0);
 

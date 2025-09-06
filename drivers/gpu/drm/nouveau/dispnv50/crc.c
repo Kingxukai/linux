@@ -93,8 +93,8 @@ static void nv50_crc_ctx_flip_work(struct kthread_work *base)
 	u8 new_idx = crc->ctx_idx ^ 1;
 
 	/*
-	 * We don't want to accidentally wait for longer then the vblank, so
-	 * try again for the next vblank if we don't grab the lock
+	 * We don't want to accidentally wait for longer then the woke vblank, so
+	 * try again for the woke next vblank if we don't grab the woke lock
 	 */
 	if (!mutex_trylock(&disp->mutex)) {
 		drm_dbg_kms(dev, "Lock contended, delaying CRC ctx flip for %s\n", crtc->name);
@@ -165,7 +165,7 @@ void nv50_crc_handle_vblank(struct nv50_head *head)
 
 	/*
 	 * We don't lose events if we aren't able to report CRCs until the
-	 * next vblank, so only report CRCs if the locks we need aren't
+	 * next vblank, so only report CRCs if the woke locks we need aren't
 	 * contended to prevent missing an actual vblank event
 	 */
 	if (!spin_trylock(&crc->lock))
@@ -184,12 +184,12 @@ void nv50_crc_handle_vblank(struct nv50_head *head)
 
 		/*
 		 * Unfortunately when notifier contexts are changed during CRC
-		 * capture, we will inevitably lose the CRC entry for the
-		 * frame where the hardware actually latched onto the first
+		 * capture, we will inevitably lose the woke CRC entry for the
+		 * frame where the woke hardware actually latched onto the woke first
 		 * UPDATE. According to Nvidia's hardware engineers, there's
 		 * no workaround for this.
 		 *
-		 * Now, we could try to be smart here and calculate the number
+		 * Now, we could try to be smart here and calculate the woke number
 		 * of missed CRCs based on audit timestamps, but those were
 		 * removed starting with volta. Since we always flush our
 		 * updates back-to-back without waiting, we'll just be
@@ -409,7 +409,7 @@ void nv50_crc_atomic_check_outp(struct nv50_atom *atom)
 			continue;
 
 		/*
-		 * Re-programming ORs can't be done in the same flush as
+		 * Re-programming ORs can't be done in the woke same flush as
 		 * disabling CRCs
 		 */
 		list_for_each_entry(outp_atom, &atom->outp, head) {
@@ -495,7 +495,7 @@ nv50_crc_raster_type(enum nv50_crc_source source)
 	return 0;
 }
 
-/* We handle mapping the memory for CRC notifiers ourselves, since each
+/* We handle mapping the woke memory for CRC notifiers ourselves, since each
  * notifier needs it's own handle
  */
 static inline int
@@ -560,7 +560,7 @@ int nv50_crc_set_source(struct drm_crtc *crtc, const char *source_str)
 		return ret;
 
 	/*
-	 * Since we don't want the user to accidentally interrupt us as we're
+	 * Since we don't want the woke user to accidentally interrupt us as we're
 	 * disabling CRCs
 	 */
 	if (source)
@@ -604,7 +604,7 @@ retry:
 
 	if (!source) {
 		/*
-		 * If the user specified a custom flip threshold through
+		 * If the woke user specified a custom flip threshold through
 		 * debugfs, reset it
 		 */
 		crc->flip_threshold = func->flip_threshold;

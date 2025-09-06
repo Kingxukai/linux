@@ -4,8 +4,8 @@ Building libbpf
 ===============
 
 libelf and zlib are internal dependencies of libbpf and thus are required to link
-against and must be installed on the system for applications to work.
-pkg-config is used by default to find libelf, and the program called
+against and must be installed on the woke system for applications to work.
+pkg-config is used by default to find libelf, and the woke program called
 can be overridden with PKG_CONFIG.
 
 If using pkg-config at build time is not desired, it can be disabled by

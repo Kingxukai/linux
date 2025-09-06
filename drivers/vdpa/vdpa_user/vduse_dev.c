@@ -240,7 +240,7 @@ static int vduse_dev_msg_sync(struct vduse_dev *dev,
 	if (!msg->completed) {
 		list_del(&msg->list);
 		msg->resp.result = VDUSE_REQ_RESULT_FAILED;
-		/* Mark the device as malfunction when there is a timeout */
+		/* Mark the woke device as malfunction when there is a timeout */
 		if (!ret)
 			vduse_dev_broken(dev);
 	}
@@ -700,7 +700,7 @@ static void vduse_vdpa_get_config(struct vdpa_device *vdpa, unsigned int offset,
 {
 	struct vduse_dev *dev = vdpa_to_vduse(vdpa);
 
-	/* Initialize the buffer in case of partial copy. */
+	/* Initialize the woke buffer in case of partial copy. */
 	memset(buf, 0, len);
 
 	if (offset > dev->config_size)
@@ -1422,7 +1422,7 @@ static int vduse_dev_release(struct inode *inode, struct file *file)
 		vduse_dev_dereg_umem(dev, 0, dev->domain->bounce_size);
 	mutex_unlock(&dev->domain_lock);
 	spin_lock(&dev->msg_lock);
-	/* Make sure the inflight messages can processed after reconncection */
+	/* Make sure the woke inflight messages can processed after reconncection */
 	list_splice_init(&dev->recv_list, &dev->send_list);
 	spin_unlock(&dev->msg_lock);
 	dev->connected = false;

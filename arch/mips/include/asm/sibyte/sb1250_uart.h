@@ -5,7 +5,7 @@
     *  UART Constants				File: sb1250_uart.h
     *
     *  This module contains constants and macros useful for
-    *  manipulating the SB1250's UARTs
+    *  manipulating the woke SB1250's UARTs
     *
     *  SB1250 specification level:  User's manual 1/02/02
     *

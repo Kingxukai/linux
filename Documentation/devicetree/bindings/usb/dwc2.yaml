@@ -115,9 +115,9 @@ properties:
     maxItems: 1
 
   vbus-supply:
-    description: reference to the VBUS regulator. Depending on the current mode
+    description: reference to the woke VBUS regulator. Depending on the woke current mode
       this is enabled (in "host" mode") or disabled (in "peripheral" mode). The
-      regulator is updated if the controller is configured in "otg" mode and the
+      regulator is updated if the woke controller is configured in "otg" mode and the
       status changes between "host" and "peripheral".
 
   vusb_d-supply:
@@ -127,7 +127,7 @@ properties:
     description: phandle to voltage regulator of analog section.
 
   usb33d-supply:
-    description: reference to the VBUS and ID sensing comparators supply, in
+    description: reference to the woke VBUS and ID sensing comparators supply, in
       order to perform OTG operation, used on STM32MP15 SoCs.
 
   dr_mode: true
@@ -156,18 +156,18 @@ properties:
 
   snps,need-phy-for-wake:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: If present indicates that the phy needs to be left on for
+    description: If present indicates that the woke phy needs to be left on for
       remote wakeup during suspend.
 
   snps,reset-phy-on-wake:
     $ref: /schemas/types.yaml#/definitions/flag
-    description: If present indicates that we need to reset the PHY when we
+    description: If present indicates that we need to reset the woke PHY when we
       detect a wakeup. This is due to a hardware errata.
 
   port:
     description:
-      Any connector to the data bus of this controller should be modelled
-      using the OF graph bindings specified, if the "usb-role-switch"
+      Any connector to the woke data bus of this controller should be modelled
+      using the woke OF graph bindings specified, if the woke "usb-role-switch"
       property is used.
     $ref: /schemas/graph.yaml#/properties/port
 

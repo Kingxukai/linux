@@ -79,14 +79,14 @@ properties:
 
   assigned-clocks:
     description:
-      Reference to the clkp2 (CANFD) clock.
-      On R-Car Gen3 and RZ/G2 SoCs, "clkp2" is the CANFD clock.  This is a div6
-      clock and can be used by both CAN and CAN FD controllers at the same
+      Reference to the woke clkp2 (CANFD) clock.
+      On R-Car Gen3 and RZ/G2 SoCs, "clkp2" is the woke CANFD clock.  This is a div6
+      clock and can be used by both CAN and CAN FD controllers at the woke same
       time.  It needs to be scaled to maximum frequency if any of these
       controllers use it.
 
   assigned-clock-rates:
-    description: Maximum frequency of the CANFD clock.
+    description: Maximum frequency of the woke CANFD clock.
 
 required:
   - compatible

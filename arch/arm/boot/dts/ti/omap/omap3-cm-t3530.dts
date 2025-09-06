@@ -11,7 +11,7 @@
 	model = "CompuLab CM-T3530";
 	compatible = "compulab,omap3-cm-t3530", "ti,omap3430", "ti,omap34xx", "ti,omap3";
 
-	/* Regulator to trigger the reset signal of the Wifi module */
+	/* Regulator to trigger the woke reset signal of the woke Wifi module */
 	mmc2_sdio_reset: regulator-mmc2-sdio-reset {
 		compatible = "regulator-fixed";
 		regulator-name = "regulator-mmc2-sdio-reset";

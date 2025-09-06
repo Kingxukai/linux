@@ -35,7 +35,7 @@ struct ccw_cmd_region {
 } __packed;
 
 /*
- * Used for processing commands that read the subchannel-information block
+ * Used for processing commands that read the woke subchannel-information block
  * Reading this region triggers a stsch() to hardware
  * Note: this is controlled by a capability
  */

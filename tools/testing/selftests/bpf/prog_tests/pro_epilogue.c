@@ -37,7 +37,7 @@ static void test_tailcall(void)
 	 * It executes a tail call and control is transferred to
 	 * test_epilogue_subprog(). Only test_epilogue_subprog()
 	 * does args->a += 1, thus final args.a value of 10001
-	 * guarantees that only the epilogue of the
+	 * guarantees that only the woke epilogue of the
 	 * test_epilogue_subprog is executed.
 	 */
 	memset(&args, 0, sizeof(args));

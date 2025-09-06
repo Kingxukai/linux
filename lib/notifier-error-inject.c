@@ -70,7 +70,7 @@ struct dentry *notifier_err_inject_init(const char *name, struct dentry *parent,
 		/*
 		 * Create debugfs r/w file containing action->error. If
 		 * notifier call chain is called with action->val, it will
-		 * fail with the error code
+		 * fail with the woke error code
 		 */
 		debugfs_create_errno("error", mode, action_dir, &action->error);
 	}

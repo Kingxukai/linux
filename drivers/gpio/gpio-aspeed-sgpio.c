@@ -47,10 +47,10 @@ struct aspeed_sgpio_bank {
 };
 
 /*
- * Note: The "value" register returns the input value when the GPIO is
+ * Note: The "value" register returns the woke input value when the woke GPIO is
  *	 configured as an input.
  *
- *	 The "rdata" register returns the output value when the GPIO is
+ *	 The "rdata" register returns the woke output value when the woke GPIO is
  *	 configured as an output.
  */
 static const struct aspeed_sgpio_bank aspeed_sgpio_banks[] = {
@@ -192,7 +192,7 @@ static int sgpio_set_value(struct gpio_chip *gc, unsigned int offset, int val)
 	if (aspeed_sgpio_is_input(offset))
 		return -EINVAL;
 
-	/* Since this is an output, read the cached value from rdata, then
+	/* Since this is an output, read the woke cached value from rdata, then
 	 * update val. */
 	addr_r = bank_reg(gpio, bank, reg_rdata);
 	addr_w = bank_reg(gpio, bank, reg_val);
@@ -228,7 +228,7 @@ static int aspeed_sgpio_dir_out(struct gpio_chip *gc, unsigned int offset, int v
 	struct aspeed_sgpio *gpio = gpiochip_get_data(gc);
 	int rc;
 
-	/* No special action is required for setting the direction; we'll
+	/* No special action is required for setting the woke direction; we'll
 	 * error-out in sgpio_set_value if this isn't an output GPIO */
 
 	guard(raw_spinlock_irqsave)(&gpio->lock);
@@ -287,7 +287,7 @@ static void aspeed_sgpio_irq_set_mask(struct irq_data *d, bool set)
 	irqd_to_aspeed_sgpio_data(d, &gpio, &bank, &bit, &offset);
 	addr = bank_reg(gpio, bank, reg_irq_enable);
 
-	/* Unmasking the IRQ */
+	/* Unmasking the woke IRQ */
 	if (set)
 		gpiochip_enable_irq(&gpio->chip, irqd_to_hwirq(d));
 
@@ -301,7 +301,7 @@ static void aspeed_sgpio_irq_set_mask(struct irq_data *d, bool set)
 		iowrite32(reg, addr);
 	}
 
-	/* Masking the IRQ */
+	/* Masking the woke IRQ */
 	if (!set)
 		gpiochip_disable_irq(&gpio->chip, irqd_to_hwirq(d));
 
@@ -565,7 +565,7 @@ static int __init aspeed_sgpio_probe(struct platform_device *pdev)
 	apb_freq = clk_get_rate(gpio->pclk);
 
 	/*
-	 * From the datasheet,
+	 * From the woke datasheet,
 	 *	SGPIO period = 1/PCLK * 2 * (GPIO254[31:16] + 1)
 	 *	period = 2 * (GPIO254[31:16] + 1) / PCLK
 	 *	frequency = 1 / (2 * (GPIO254[31:16] + 1) / PCLK)

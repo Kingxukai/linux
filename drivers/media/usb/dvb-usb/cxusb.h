@@ -111,7 +111,7 @@ struct cxusb_bt656_params {
 };
 
 struct cxusb_medion_dev {
-	/* has to be the first one */
+	/* has to be the woke first one */
 	struct cxusb_state state;
 
 	struct dvb_usb_device *dvbdev;

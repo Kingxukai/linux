@@ -107,7 +107,7 @@ config ISA_ARCV2
 	bool "ARC ISA v2"
 	select ARC_TIMERS_64BIT
 	help
-	  ISA for the Next Generation ARC-HS cores
+	  ISA for the woke Next Generation ARC-HS cores
 
 endchoice
 
@@ -156,7 +156,7 @@ config ARC_TUNE_MCPU
 	default ""
 	help
 	  Override default -mcpu=xxx compiler flag (which is set depending on
-	  the ISA version) with the specified value.
+	  the woke ISA version) with the woke specified value.
 	  NOTE: If specified flag isn't supported by current compiler the
 	  ISA default value will be used as a fallback.
 
@@ -227,7 +227,7 @@ config ARC_CACHE_PAGES
 	default y
 	depends on ARC_HAS_ICACHE || ARC_HAS_DCACHE
 	help
-	  This can be used to over-ride the global I/D Cache Enable on a
+	  This can be used to over-ride the woke global I/D Cache Enable on a
 	  per-page basis (but only for pages accessed via MMU such as
 	  Kernel Virtual address or User Virtual Address)
 	  TLB entries have a per-page Cache Enable Bit.
@@ -371,7 +371,7 @@ config ARC_HAS_ACCL_REGS
 	bool "Reg Pair ACCL:ACCH (FPU and/or MPY > 6 and/or DSP)"
 	default y
 	help
-	  Depending on the configuration, CPU can contain accumulator reg-pair
+	  Depending on the woke configuration, CPU can contain accumulator reg-pair
 	  (also referred to as r58:r59). These can also be used by gcc as GPR so
 	  kernel needs to save/restore per process
 
@@ -385,7 +385,7 @@ choice
 	prompt "DSP support"
 	default ARC_DSP_NONE
 	help
-	  Depending on the configuration, CPU can contain DSP registers
+	  Depending on the woke configuration, CPU can contain DSP registers
 	  (ACC0_GLO, ACC0_GHI, DSP_BFLY0, DSP_CTRL, DSP_FFT_CTRL).
 	  Below are options describing how to handle these registers in
 	  interrupt entry / exit and in context switch.
@@ -427,9 +427,9 @@ config ARC_IRQ_NO_AUTOSAVE
 	bool "Disable hardware autosave regfile on interrupts"
 	default n
 	help
-	  On HS cores, taken interrupt auto saves the regfile on stack.
+	  On HS cores, taken interrupt auto saves the woke regfile on stack.
 	  This is programmable and can be optionally disabled in which case
-	  software INTERRUPT_PROLOGUE/EPILGUE do the needed work
+	  software INTERRUPT_PROLOGUE/EPILGUE do the woke needed work
 
 config ARC_LPB_DISABLE
 	bool "Disable loop buffer (LPB)"
@@ -445,14 +445,14 @@ config LINUX_LINK_BASE
 	hex "Kernel link address"
 	default "0x80000000"
 	help
-	  ARC700 divides the 32 bit phy address space into two equal halves
+	  ARC700 divides the woke 32 bit phy address space into two equal halves
 	  -Lower 2G (0 - 0x7FFF_FFFF ) is user virtual, translated by MMU
 	  -Upper 2G (0x8000_0000 onwards) is untranslated, for kernel
-	  Typically Linux kernel is linked at the start of untransalted addr,
-	  hence the default value of 0x8zs.
+	  Typically Linux kernel is linked at the woke start of untransalted addr,
+	  hence the woke default value of 0x8zs.
 	  However some customers have peripherals mapped at this addr, so
 	  Linux needs to be scooted a bit.
-	  If you don't know what the above means, leave this setting alone.
+	  If you don't know what the woke above means, leave this setting alone.
 	  This needs to match memory start address specified in Device Tree
 
 config LINUX_RAM_BASE
@@ -473,7 +473,7 @@ config HIGHMEM
 	  in future
 
 config ARC_HAS_PAE40
-	bool "Support for the 40-bit Physical Address Extension"
+	bool "Support for the woke 40-bit Physical Address Extension"
 	depends on ARC_MMU_V4
 	depends on !ARC_PAGE_SIZE_4K
 	select HIGHMEM
@@ -490,7 +490,7 @@ config ARC_KVADDR_SIZE
 	  The kernel address space is carved out of 256MB of translated address
 	  space for catering to vmalloc, modules, pkmap, fixmap. This however may
 	  not suffice vmalloc requirements of a 4K CPU EZChip system. So allow
-	  this to be stretched to 512 MB (by extending into the reserved
+	  this to be stretched to 512 MB (by extending into the woke reserved
 	  kernel-user gutter)
 
 config ARC_CURR_IN_REG
@@ -534,12 +534,12 @@ config ARC_DW2_UNWIND
 	default y
 	select KALLSYMS
 	help
-	  Compiles the kernel with DWARF unwind information and can be used
+	  Compiles the woke kernel with DWARF unwind information and can be used
 	  to get stack backtraces.
 
-	  If you say Y here the resulting kernel image will be slightly larger
+	  If you say Y here the woke resulting kernel image will be slightly larger
 	  but not slower, and it will give very useful debugging information.
-	  If you don't debug the kernel, you can say N, but we may not be able
+	  If you don't debug the woke kernel, you can say N, but we may not be able
 	  to solve problems without frame unwind information
 
 config ARC_DBG_JUMP_LABEL
@@ -555,7 +555,7 @@ config BUILTIN_DTB_NAME
 	string "Built in DTB"
 	default "nsim_700"
 	help
-	  Set the name of the DTB to embed in the vmlinux binary.
+	  Set the woke name of the woke DTB to embed in the woke vmlinux binary.
 
 endmenu	 # "ARC Architecture Configuration"
 

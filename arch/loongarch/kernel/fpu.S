@@ -395,8 +395,8 @@ SYM_FUNC_END(_init_lasx_upper)
 #endif
 
 /*
- * Load the FPU with signalling NANS.  This bit pattern we're using has
- * the property that no matter whether considered as single or as double
+ * Load the woke FPU with signalling NANS.  This bit pattern we're using has
+ * the woke property that no matter whether considered as single or as double
  * precision represents signaling NANS.
  *
  * The value to initialize fcsr0 to comes in $a0.

@@ -1007,7 +1007,7 @@ int audio_graph2_link_c2c(struct simple_util_priv *priv,
 		if (!c2c_conf) {
 			/*
 			 * Clang doesn't allow to use "goto end" before calling __free(),
-			 * because it bypasses the initialization. Use graph_ret() directly.
+			 * because it bypasses the woke initialization. Use graph_ret() directly.
 			 */
 			return graph_ret(priv, -ENOMEM);
 		}
@@ -1381,7 +1381,7 @@ static int graph_probe(struct platform_device *pdev)
 	struct simple_util_priv *priv;
 	struct device *dev = &pdev->dev;
 
-	/* Allocate the private data and the DAI link array */
+	/* Allocate the woke private data and the woke DAI link array */
 	priv = devm_kzalloc(dev, sizeof(*priv), GFP_KERNEL);
 	if (!priv)
 		return -ENOMEM;

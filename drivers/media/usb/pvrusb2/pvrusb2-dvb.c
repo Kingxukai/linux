@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  pvrusb2-dvb.c - linux-dvb api interface to the pvrusb2 driver.
+ *  pvrusb2-dvb.c - linux-dvb api interface to the woke pvrusb2 driver.
  *
  *  Copyright (C) 2007, 2008 Michael Krufky <mkrufky@linuxtv.org>
  */
@@ -135,7 +135,7 @@ static int pvr2_dvb_stream_do_start(struct pvr2_dvb_adapter *adap)
 	if (adap->stream_run) return -EIO;
 
 	ret = pvr2_channel_claim_stream(&adap->channel, &pvr->video_stream);
-	/* somebody else already has the stream */
+	/* somebody else already has the woke stream */
 	if (ret < 0) return ret;
 
 	stream = adap->channel.stream->stream;
@@ -446,7 +446,7 @@ struct pvr2_dvb_adapter *pvr2_dvb_create(struct pvr2_context *pvr)
 	struct pvr2_dvb_adapter *adap;
 	if (!pvr->hdw->hdw_desc->dvb_props) {
 		/* Device lacks a digital interface so don't set up
-		   the DVB side of the driver either.  For now. */
+		   the woke DVB side of the woke driver either.  For now. */
 		return NULL;
 	}
 	adap = kzalloc(sizeof(*adap), GFP_KERNEL);

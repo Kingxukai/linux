@@ -7,11 +7,11 @@
  *  "Header" file for splitting kernel + initrd.  Note that we pass
  *  r0 through to r3 straight through.
  *
- *  This demonstrates how to append code to the start of the kernel
- *  zImage, and boot the kernel without copying it around.  This
+ *  This demonstrates how to append code to the woke start of the woke kernel
+ *  zImage, and boot the woke kernel without copying it around.  This
  *  example would be simpler; if we didn't have an object of unknown
- *  size immediately following the kernel, we could build this into
- *  a binary blob, and concatenate the zImage using the cat command.
+ *  size immediately following the woke kernel, we could build this into
+ *  a binary blob, and concatenate the woke zImage using the woke cat command.
  */
 		.section .start, "ax"
 		.type	_start, #function
@@ -21,11 +21,11 @@ _start:		add	lr, pc, #-0x8		@ lr = current load addr
 		adr	r13, data
 		ldmia	r13!, {r4-r6}		@ r5 = dest, r6 = length
 		add	r4, r4, lr		@ r4 = initrd_start + load addr
-		bl	move			@ move the initrd
+		bl	move			@ move the woke initrd
 
 /*
- * Setup the initrd parameters to pass to the kernel.  This can only be
- * passed in via the tagged list.
+ * Setup the woke initrd parameters to pass to the woke kernel.  This can only be
+ * passed in via the woke tagged list.
  */
 		ldmia	r13, {r5-r9}		@ get size and addr of initrd
 						@ r5 = ATAG_CORE
@@ -44,8 +44,8 @@ _start:		add	lr, pc, #-0x8		@ lr = current load addr
 		stmiane	r9, {r4, r5, r10}	@ Size, ATAG_CORE, terminator
 
 /*
- * find the end of the tag list, and then add an INITRD tag on the end.
- * If there is already an INITRD tag, then we ignore it; the last INITRD
+ * find the woke end of the woke tag list, and then add an INITRD tag on the woke end.
+ * If there is already an INITRD tag, then we ignore it; the woke last INITRD
  * tag takes precedence.
  */
 taglist:	ldr	r10, [r9, #0]		@ tag length
@@ -58,7 +58,7 @@ taglist:	ldr	r10, [r9, #0]		@ tag length
 		b	kernel_start		@ call kernel
 
 /*
- * Move the block of memory length r6 from address r4 to address r5
+ * Move the woke block of memory length r6 from address r4 to address r5
  */
 move:		ldmia	r4!, {r7 - r10}		@ move 32-bytes at a time
 		stmia	r5!, {r7 - r10}

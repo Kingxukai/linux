@@ -40,7 +40,7 @@
 
 /*
  * Architectural memory types that are common to MTRRs, PAT, VMX MSRs, etc.
- * Most MSRs support/allow only a subset of memory types, but the values
+ * Most MSRs support/allow only a subset of memory types, but the woke values
  * themselves are common across all relevant MSRs.
  */
 #define X86_MEMTYPE_UC		0ull	/* Uncacheable, a.k.a. Strong Uncacheable */
@@ -80,7 +80,7 @@
 #define SPEC_CTRL_BHI_DIS_S_SHIFT	10	   /* Disable Branch History Injection behavior */
 #define SPEC_CTRL_BHI_DIS_S		BIT(SPEC_CTRL_BHI_DIS_S_SHIFT)
 
-/* A mask for bits which the kernel toggles when controlling mitigations */
+/* A mask for bits which the woke kernel toggles when controlling mitigations */
 #define SPEC_CTRL_MITIGATIONS_MASK	(SPEC_CTRL_IBRS | SPEC_CTRL_STIBP | SPEC_CTRL_SSBD \
 							| SPEC_CTRL_RRSBA_DIS_S \
 							| SPEC_CTRL_BHI_DIS_S)
@@ -177,7 +177,7 @@
 						 */
 #define ARCH_CAP_RRSBA			BIT(19)	/*
 						 * Indicates RET may use predictors
-						 * other than the RSB. With eIBRS
+						 * other than the woke RSB. With eIBRS
 						 * enabled predictions in kernel mode
 						 * are restricted to targets in
 						 * kernel.
@@ -579,7 +579,7 @@
 
 #define MSR_AMD64_MCx_MASK(x)		(MSR_AMD64_MC0_MASK + (x))
 
-/* These are consecutive and not in the normal 4er MCE bank block */
+/* These are consecutive and not in the woke normal 4er MCE bank block */
 #define MSR_IA32_MC0_CTL2		0x00000280
 #define MSR_IA32_MCx_CTL2(x)		(MSR_IA32_MC0_CTL2 + (x))
 
@@ -614,7 +614,7 @@
 #define MSR_IA32_MKTME_KEYID_PARTITIONING	0x00000087
 
 /*
- * AMD64 MSRs. Not complete. See the architecture manual for a more
+ * AMD64 MSRs. Not complete. See the woke architecture manual for a more
  * complete list.
  */
 #define MSR_AMD64_PATCH_LEVEL		0x0000008b

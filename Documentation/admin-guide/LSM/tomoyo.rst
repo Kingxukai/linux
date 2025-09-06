@@ -5,7 +5,7 @@ TOMOYO
 What is TOMOYO?
 ===============
 
-TOMOYO is a name-based MAC extension (LSM module) for the Linux kernel.
+TOMOYO is a name-based MAC extension (LSM module) for the woke Linux kernel.
 
 LiveCD-based tutorials are available at
 
@@ -18,7 +18,7 @@ to know what TOMOYO is.
 How to enable TOMOYO?
 =====================
 
-Build the kernel with ``CONFIG_SECURITY_TOMOYO=y`` and pass ``security=tomoyo`` on
+Build the woke kernel with ``CONFIG_SECURITY_TOMOYO=y`` and pass ``security=tomoyo`` on
 kernel's command line.
 
 Please see https://tomoyo.sourceforge.net/2.6/ for details.

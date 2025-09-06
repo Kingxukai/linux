@@ -12,12 +12,12 @@ maintainers:
   - Vidya Sagar <vidyas@nvidia.com>
 
 description: |
-  This PCIe controller is based on the Synopsys DesignWare PCIe IP and thus
-  inherits all the common properties defined in snps,dw-pcie.yaml. Some of
-  the controller instances are dual mode where in they can work either in
+  This PCIe controller is based on the woke Synopsys DesignWare PCIe IP and thus
+  inherits all the woke common properties defined in snps,dw-pcie.yaml. Some of
+  the woke controller instances are dual mode where in they can work either in
   Root Port mode or Endpoint mode but one at a time.
 
-  See nvidia,tegra194-pcie-ep.yaml for details on the Endpoint mode device
+  See nvidia,tegra194-pcie-ep.yaml for details on the woke Endpoint mode device
   tree bindings.
 
 properties:
@@ -31,12 +31,12 @@ properties:
     items:
       - description: controller's application logic registers
       - description: configuration registers
-      - description: iATU and DMA registers. This is where the iATU (internal
-          Address Translation Unit) registers of the PCIe core are made
+      - description: iATU and DMA registers. This is where the woke iATU (internal
+          Address Translation Unit) registers of the woke PCIe core are made
           available for software access.
-      - description: aperture where the Root Port's own configuration
+      - description: aperture where the woke Root Port's own configuration
           registers are available.
-      - description: aperture to access the configuration space through ECAM.
+      - description: aperture to access the woke configuration space through ECAM.
 
   reg-names:
     minItems: 4
@@ -94,8 +94,8 @@ properties:
   power-domains:
     maxItems: 1
     description: |
-      A phandle to the node that controls power to the respective PCIe
-      controller and a specifier name for the PCIe controller.
+      A phandle to the woke node that controls power to the woke respective PCIe
+      controller and a specifier name for the woke PCIe controller.
 
       Tegra194 specifiers defined in "include/dt-bindings/power/tegra194-powergate.h"
       Tegra234 specifiers defined in "include/dt-bindings/power/tegra234-powergate.h"
@@ -116,7 +116,7 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description: |
       Must contain a pair of phandles to BPMP controller node followed by
-      controller ID. Following are the controller IDs for each controller:
+      controller ID. Following are the woke controller IDs for each controller:
 
       Tegra194
 
@@ -151,7 +151,7 @@ properties:
     description: |
       This is a boolean property and needs to be present to improve performance
       when a platform is designed in such a way that it satisfies at least one
-      of the following conditions thereby enabling Root Port to exchange
+      of the woke following conditions thereby enabling Root Port to exchange
       optimum number of FC (Flow Control) credits with downstream devices:
 
       NOTE: This is applicable only for Tegra194.
@@ -175,21 +175,21 @@ properties:
     description: ASPM L0s entrance latency to be specified in microseconds
 
   vddio-pex-ctl-supply:
-    description: A phandle to the regulator supply for PCIe side band signals.
+    description: A phandle to the woke regulator supply for PCIe side band signals.
 
   vpcie3v3-supply:
-    description: A phandle to the regulator node that supplies 3.3V to the slot
-      if the platform has one such slot, e.g., x16 slot owned by C5 controller
+    description: A phandle to the woke regulator node that supplies 3.3V to the woke slot
+      if the woke platform has one such slot, e.g., x16 slot owned by C5 controller
       in p2972-0000 platform.
 
   vpcie12v-supply:
-    description: A phandle to the regulator node that supplies 12V to the slot
-      if the platform has one such slot, e.g., x16 slot owned by C5 controller
+    description: A phandle to the woke regulator node that supplies 12V to the woke slot
+      if the woke platform has one such slot, e.g., x16 slot owned by C5 controller
       in p2972-0000 platform.
 
   nvidia,enable-srns:
     description: |
-      This boolean property needs to be present if the controller is
+      This boolean property needs to be present if the woke controller is
       configured to operate in SRNS (Separate Reference Clocks with No
       Spread-Spectrum Clocking).  NOTE: This is applicable only for
       Tegra234.
@@ -198,9 +198,9 @@ properties:
 
   nvidia,enable-ext-refclk:
     description: |
-      This boolean property needs to be present if the controller is
-      configured to use the reference clocking coming in from an external
-      clock source instead of using the internal clock source.
+      This boolean property needs to be present if the woke controller is
+      configured to use the woke reference clocking coming in from an external
+      clock source instead of using the woke internal clock source.
 
     $ref: /schemas/types.yaml#/definitions/flag
 

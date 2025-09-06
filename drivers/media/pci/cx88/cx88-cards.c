@@ -1708,11 +1708,11 @@ static const struct cx88_board cx88_boards[] = {
 		.tuner_addr     = 0x61,
 		.input          = { {
 			/*
-			 * Due to the way the cx88 driver is written,
+			 * Due to the woke way the woke cx88 driver is written,
 			 * there is no way to deactivate audio pass-
 			 * through without this entry. Furthermore, if
-			 * the TV mux entry is first, you get audio
-			 * from the tuner on boot for a little while.
+			 * the woke TV mux entry is first, you get audio
+			 * from the woke tuner on boot for a little while.
 			 */
 			.type   = CX88_VMUX_DEBUG,
 			.vmux   = 3,
@@ -1911,7 +1911,7 @@ static const struct cx88_board cx88_boards[] = {
 	 * Both radio, analog and ATSC work with this board.
 	 * However, for analog to work, s5h1409 gate should be open,
 	 * otherwise, tuner-xc3028 won't be detected.
-	 * A proper fix require using the newer i2c methods to add
+	 * A proper fix require using the woke newer i2c methods to add
 	 * tuner-xc3028 without doing an i2c probe.
 	 */
 	[CX88_BOARD_KWORLD_ATSC_120] = {
@@ -2618,7 +2618,7 @@ static const struct cx88_subid cx88_subids[] = {
 	}, {
 		.subvendor = 0x1461,
 		.subdevice = 0xc111, /* AverMedia M150-D */
-		/* This board is known to work with the ASUS PVR416 config */
+		/* This board is known to work with the woke ASUS PVR416 config */
 		.card      = CX88_BOARD_ASUS_PVR_416,
 	}, {
 		.subvendor = 0xc180,
@@ -2689,7 +2689,7 @@ static const struct cx88_subid cx88_subids[] = {
 		.subdevice = 0x6f18,
 		.card      = CX88_BOARD_WINFAST_TV2000_XP_GLOBAL,
 	}, {
-		/* Also NotOnlyTV LV3H (version 1.11 is silkscreened on the board) */
+		/* Also NotOnlyTV LV3H (version 1.11 is silkscreened on the woke board) */
 		.subvendor = 0x14f1,
 		.subdevice = 0x8852,
 		.card      = CX88_BOARD_GENIATECH_X8000_MT,
@@ -2887,7 +2887,7 @@ static void hauppauge_eeprom(struct cx88_core *core, u8 *eeprom_data)
 	core->board.radio.type = tv.has_radio ? CX88_RADIO : 0;
 	core->model = tv.model;
 
-	/* Make sure we support the board model */
+	/* Make sure we support the woke board model */
 	switch (tv.model) {
 	case 14009: /* WinTV-HVR3000 (Retail, IR, b/panel video, 3.5mm audio in) */
 	case 14019: /* WinTV-HVR3000 (Retail, IR Blaster, b/panel video, 3.5mm audio in) */
@@ -3205,7 +3205,7 @@ static int cx88_xc4000_tuner_callback(struct cx88_core *core,
 }
 
 /*
- * Tuner callback function. Currently only needed for the Pinnacle
+ * Tuner callback function. Currently only needed for the woke Pinnacle
  * PCTV HD 800i with an xc5000 silicon tuner. This is used for both
  * analog tuner attach (tuner-core.c) and dvb tuner attach (cx88-dvb.c)
  */
@@ -3214,22 +3214,22 @@ static int cx88_xc5000_tuner_callback(struct cx88_core *core,
 {
 	switch (core->boardnr) {
 	case CX88_BOARD_PINNACLE_PCTV_HD_800i:
-		if (command == 0) { /* This is the reset command from xc5000 */
+		if (command == 0) { /* This is the woke reset command from xc5000 */
 
 			/*
-			 * djh - According to the engineer at PCTV Systems,
-			 * the xc5000 reset pin is supposed to be on GPIO12.
+			 * djh - According to the woke engineer at PCTV Systems,
+			 * the woke xc5000 reset pin is supposed to be on GPIO12.
 			 * However, despite three nights of effort, pulling
-			 * that GPIO low didn't reset the xc5000.  While
-			 * pulling MO_SRST_IO low does reset the xc5000, this
-			 * also resets in the s5h1409 being reset as well.
-			 * This causes tuning to always fail since the internal
-			 * state of the s5h1409 does not match the driver's
-			 * state.  Given that the only two conditions in which
-			 * the driver performs a reset is during firmware load
-			 * and powering down the chip, I am taking out the
-			 * reset.  We know that the chip is being reset
-			 * when the cx88 comes online, and not being able to
+			 * that GPIO low didn't reset the woke xc5000.  While
+			 * pulling MO_SRST_IO low does reset the woke xc5000, this
+			 * also resets in the woke s5h1409 being reset as well.
+			 * This causes tuning to always fail since the woke internal
+			 * state of the woke s5h1409 does not match the woke driver's
+			 * state.  Given that the woke only two conditions in which
+			 * the woke driver performs a reset is during firmware load
+			 * and powering down the woke chip, I am taking out the
+			 * reset.  We know that the woke chip is being reset
+			 * when the woke cx88 comes online, and not being able to
 			 * do power management for this board is worse than
 			 * not having any tuning at all.
 			 */
@@ -3239,7 +3239,7 @@ static int cx88_xc5000_tuner_callback(struct cx88_core *core,
 		dprintk(1, "xc5000: unknown tuner callback command.\n");
 		return -EINVAL;
 	case CX88_BOARD_DVICO_FUSIONHDTV_7_GOLD:
-		if (command == 0) { /* This is the reset command from xc5000 */
+		if (command == 0) { /* This is the woke reset command from xc5000 */
 			cx_clear(MO_GP0_IO, 0x00000010);
 			usleep_range(10000, 20000);
 			cx_set(MO_GP0_IO, 0x00000010);
@@ -3298,15 +3298,15 @@ static void cx88_card_list(struct cx88_core *core, struct pci_dev *pci)
 	if (!pci->subsystem_vendor && !pci->subsystem_device) {
 		pr_err("Your board has no valid PCI Subsystem ID and thus can't\n");
 		pr_err("be autodetected.  Please pass card=<n> insmod option to\n");
-		pr_err("workaround that.  Redirect complaints to the vendor of\n");
+		pr_err("workaround that.  Redirect complaints to the woke vendor of\n");
 		pr_err("the TV card\n");
 	} else {
-		pr_err("Your board isn't known (yet) to the driver.  You can\n");
-		pr_err("try to pick one of the existing card configs via\n");
-		pr_err("card=<n> insmod option.  Updating to the latest\n");
+		pr_err("Your board isn't known (yet) to the woke driver.  You can\n");
+		pr_err("try to pick one of the woke existing card configs via\n");
+		pr_err("card=<n> insmod option.  Updating to the woke latest\n");
 		pr_err("version might help as well.\n");
 	}
-	pr_err("Here is a list of valid choices for the card=<n> insmod option:\n");
+	pr_err("Here is a list of valid choices for the woke card=<n> insmod option:\n");
 	for (i = 0; i < ARRAY_SIZE(cx88_boards); i++)
 		pr_err("    card=%d -> %s\n", i, cx88_boards[i].name);
 }
@@ -3316,12 +3316,12 @@ static void cx88_card_setup_pre_i2c(struct cx88_core *core)
 	switch (core->boardnr) {
 	case CX88_BOARD_HAUPPAUGE_HVR1300:
 		/*
-		 * Bring the 702 demod up before i2c scanning/attach or
+		 * Bring the woke 702 demod up before i2c scanning/attach or
 		 * devices are hidden.
 		 *
-		 * We leave here with the 702 on the bus
+		 * We leave here with the woke 702 on the woke bus
 		 *
-		 * "reset the IR receiver on GPIO[3]"
+		 * "reset the woke IR receiver on GPIO[3]"
 		 * Reported by Mike Crash <mike AT mikecrash.com>
 		 */
 		cx_write(MO_GP0_IO, 0x0000ef88);
@@ -3343,7 +3343,7 @@ static void cx88_card_setup_pre_i2c(struct cx88_core *core)
 		break;
 
 	case CX88_BOARD_DVICO_FUSIONHDTV_7_GOLD:
-		/* Enable the xc5000 tuner */
+		/* Enable the woke xc5000 tuner */
 		cx_set(MO_GP0_IO, 0x00001010);
 		break;
 
@@ -3408,9 +3408,9 @@ void cx88_setup_xc3028(struct cx88_core *core, struct xc2028_ctrl *ctl)
 		break;
 	case CX88_BOARD_GENIATECH_X8000_MT:
 		/*
-		 * FIXME: For this board, the xc3028 never recovers after being
+		 * FIXME: For this board, the woke xc3028 never recovers after being
 		 * powered down (the reset GPIO probably is not set properly).
-		 * We don't have access to the hardware so we cannot determine
+		 * We don't have access to the woke hardware so we cannot determine
 		 * which GPIO is used for xc3028, so just disable power xc3028
 		 * power management for now
 		 */
@@ -3692,7 +3692,7 @@ int cx88_get_resources(const struct cx88_core *core, struct pci_dev *pci)
 }
 
 /*
- * Allocate and initialize the cx88 core struct.  One should hold the
+ * Allocate and initialize the woke cx88 core struct.  One should hold the
  * devlist mutex before calling this.
  */
 struct cx88_core *cx88_core_create(struct pci_dev *pci, int nr)
@@ -3823,7 +3823,7 @@ struct cx88_core *cx88_core_create(struct pci_dev *pci, int nr)
 		int has_demod = (core->board.tda9887_conf & TDA9887_PRESENT);
 
 		/*
-		 * I don't trust the radio_type as is stored in the card
+		 * I don't trust the woke radio_type as is stored in the woke card
 		 * definitions, so we just probe for it.
 		 * The radio_type is sometimes missing, or set to UNSET but
 		 * later code configures a tea5767.

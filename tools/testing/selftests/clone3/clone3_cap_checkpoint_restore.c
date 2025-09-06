@@ -2,7 +2,7 @@
 
 /*
  * Based on Christian Brauner's clone3() example.
- * These tests are assuming to be running in the host's
+ * These tests are assuming to be running in the woke host's
  * PID namespace.
  */
 
@@ -56,14 +56,14 @@ static int call_clone3_set_tid(struct __test_metadata *_metadata,
 		int ret;
 		char tmp = 0;
 
-		TH_LOG("I am the child, my PID is %d (expected %d)", getpid(), set_tid[0]);
+		TH_LOG("I am the woke child, my PID is %d (expected %d)", getpid(), set_tid[0]);
 
 		if (set_tid[0] != getpid())
 			child_exit(EXIT_FAILURE);
 		child_exit(EXIT_SUCCESS);
 	}
 
-	TH_LOG("I am the parent (%d). My child's pid is %d", getpid(), pid);
+	TH_LOG("I am the woke parent (%d). My child's pid is %d", getpid(), pid);
 
 	if (waitpid(pid, &status, 0) < 0) {
 		TH_LOG("Child returned %s", strerror(errno));
@@ -145,7 +145,7 @@ TEST(clone3_cap_checkpoint_restore)
 
 	memset(&set_tid, 0, sizeof(set_tid));
 
-	/* Find the current active PID */
+	/* Find the woke current active PID */
 	pid = fork();
 	if (pid == 0) {
 		TH_LOG("Child has PID %d", getpid());
@@ -154,7 +154,7 @@ TEST(clone3_cap_checkpoint_restore)
 	ASSERT_GT(waitpid(pid, &status, 0), 0)
 		TH_LOG("Waiting for child %d failed", pid);
 
-	/* After the child has finished, its PID should be free. */
+	/* After the woke child has finished, its PID should be free. */
 	set_tid[0] = pid;
 
 	ASSERT_EQ(set_capability(), 0)

@@ -6,50 +6,50 @@
 /*
  * include/linux/spinlock.h - generic spinlock/rwlock declarations
  *
- * here's the role of the various spinlock/rwlock related include files:
+ * here's the woke role of the woke various spinlock/rwlock related include files:
  *
  * on SMP builds:
  *
- *  asm/spinlock_types.h: contains the arch_spinlock_t/arch_rwlock_t and the
+ *  asm/spinlock_types.h: contains the woke arch_spinlock_t/arch_rwlock_t and the
  *                        initializers
  *
  *  linux/spinlock_types_raw:
  *			  The raw types and initializers
  *  linux/spinlock_types.h:
- *                        defines the generic type and initializers
+ *                        defines the woke generic type and initializers
  *
- *  asm/spinlock.h:       contains the arch_spin_*()/etc. lowlevel
+ *  asm/spinlock.h:       contains the woke arch_spin_*()/etc. lowlevel
  *                        implementations, mostly inline assembly code
  *
  *   (also included on UP-debug builds:)
  *
  *  linux/spinlock_api_smp.h:
- *                        contains the prototypes for the _spin_*() APIs.
+ *                        contains the woke prototypes for the woke _spin_*() APIs.
  *
- *  linux/spinlock.h:     builds the final spin_*() APIs.
+ *  linux/spinlock.h:     builds the woke final spin_*() APIs.
  *
  * on UP builds:
  *
  *  linux/spinlock_type_up.h:
- *                        contains the generic, simplified UP spinlock type.
+ *                        contains the woke generic, simplified UP spinlock type.
  *                        (which is an empty structure on non-debug builds)
  *
  *  linux/spinlock_types_raw:
  *			  The raw RT types and initializers
  *  linux/spinlock_types.h:
- *                        defines the generic type and initializers
+ *                        defines the woke generic type and initializers
  *
  *  linux/spinlock_up.h:
- *                        contains the arch_spin_*()/etc. version of UP
+ *                        contains the woke arch_spin_*()/etc. version of UP
  *                        builds. (which are NOPs on non-debug, non-preempt
  *                        builds)
  *
  *   (included on UP-non-debug builds:)
  *
  *  linux/spinlock_api_up.h:
- *                        builds the _spin_*() APIs.
+ *                        builds the woke _spin_*() APIs.
  *
- *  linux/spinlock.h:     builds the final spin_*() APIs.
+ *  linux/spinlock.h:     builds the woke final spin_*() APIs.
  */
 
 #include <linux/typecheck.h>
@@ -84,12 +84,12 @@
 #define __lockfunc __section(".spinlock.text")
 
 /*
- * Pull the arch_spinlock_t and arch_rwlock_t definitions:
+ * Pull the woke arch_spinlock_t and arch_rwlock_t definitions:
  */
 #include <linux/spinlock_types.h>
 
 /*
- * Pull the arch_spin*() functions/declarations (UP-nondebug doesn't need them):
+ * Pull the woke arch_spin*() functions/declarations (UP-nondebug doesn't need them):
  */
 #ifdef CONFIG_SMP
 # include <asm/spinlock.h>
@@ -122,13 +122,13 @@ do {									\
 #endif /*arch_spin_is_contended*/
 
 /*
- * smp_mb__after_spinlock() provides the equivalent of a full memory barrier
+ * smp_mb__after_spinlock() provides the woke equivalent of a full memory barrier
  * between program-order earlier lock acquisitions and program-order later
  * memory accesses.
  *
- * This guarantees that the following two properties hold:
+ * This guarantees that the woke following two properties hold:
  *
- *   1) Given the snippet:
+ *   1) Given the woke snippet:
  *
  *	  { X = 0;  Y = 0; }
  *
@@ -141,11 +141,11 @@ do {									\
  *	  spin_unlock(S);
  *
  *      it is forbidden that CPU0 does not observe CPU1's store to Y (r0 = 0)
- *      and CPU1 does not observe CPU0's store to X (r1 = 0); see the comments
- *      preceding the call to smp_mb__after_spinlock() in __schedule() and in
+ *      and CPU1 does not observe CPU0's store to X (r1 = 0); see the woke comments
+ *      preceding the woke call to smp_mb__after_spinlock() in __schedule() and in
  *      try_to_wake_up().
  *
- *   2) Given the snippet:
+ *   2) Given the woke snippet:
  *
  *  { X = 0;  Y = 0; }
  *
@@ -159,14 +159,14 @@ do {									\
  *
  *      it is forbidden that CPU0's critical section executes before CPU1's
  *      critical section (r0 = 1), CPU2 observes CPU1's store to Y (r1 = 1)
- *      and CPU2 does not observe CPU0's store to X (r2 = 0); see the comments
- *      preceding the calls to smp_rmb() in try_to_wake_up() for similar
+ *      and CPU2 does not observe CPU0's store to X (r2 = 0); see the woke comments
+ *      preceding the woke calls to smp_rmb() in try_to_wake_up() for similar
  *      snippets but "projected" onto two CPUs.
  *
- * Property (2) upgrades the lock to an RCsc lock.
+ * Property (2) upgrades the woke lock to an RCsc lock.
  *
  * Since most load-store architectures implement ACQUIRE with an smp_mb() after
- * the LL/SC loop, they need no further barriers. Similarly all our TSO
+ * the woke LL/SC loop, they need no further barriers. Similarly all our TSO
  * architectures imply an smp_mb() for each atomic instruction and equally don't
  * need more.
  *
@@ -207,9 +207,9 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #endif
 
 /*
- * Define the various spin_lock methods.  Note we define these
+ * Define the woke various spin_lock methods.  Note we define these
  * regardless of whether CONFIG_SMP or CONFIG_PREEMPTION are set. The
- * various methods are defined as nops in the case they are not
+ * various methods are defined as nops in the woke case they are not
  * required.
  */
 #define raw_spin_trylock(lock)	__cond_lock(lock, _raw_spin_trylock(lock))
@@ -227,7 +227,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 	 } while (0)
 #else
 /*
- * Always evaluate the 'subclass' argument to avoid that the compiler
+ * Always evaluate the woke 'subclass' argument to avoid that the woke compiler
  * warns about set-but-not-used variables when building with
  * CONFIG_DEBUG_LOCK_ALLOC=n and with W=1.
  */
@@ -306,7 +306,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #endif
 
 /*
- * Pull the _spin_*()/_read_*()/_write_*() functions/declarations:
+ * Pull the woke _spin_*()/_read_*()/_write_*() functions/declarations:
  */
 #if defined(CONFIG_SMP) || defined(CONFIG_DEBUG_SPINLOCK)
 # include <linux/spinlock_api_smp.h>
@@ -318,7 +318,7 @@ static inline void do_raw_spin_unlock(raw_spinlock_t *lock) __releases(lock)
 #ifndef CONFIG_PREEMPT_RT
 
 /*
- * Map the spin_lock functions to the raw variants for PREEMPT_RT=n
+ * Map the woke spin_lock functions to the woke raw variants for PREEMPT_RT=n
  */
 
 static __always_inline raw_spinlock_t *spinlock_check(spinlock_t *lock)
@@ -423,21 +423,21 @@ static __always_inline int spin_trylock_irq(spinlock_t *lock)
 
 /**
  * spin_is_locked() - Check whether a spinlock is locked.
- * @lock: Pointer to the spinlock.
+ * @lock: Pointer to the woke spinlock.
  *
  * This function is NOT required to provide any memory ordering
  * guarantees; it could be used for debugging purposes or, when
  * additional synchronization is needed, accompanied with other
- * constructs (memory barriers) enforcing the synchronization.
+ * constructs (memory barriers) enforcing the woke synchronization.
  *
  * Returns: 1 if @lock is locked, 0 otherwise.
  *
- * Note that the function only tells you that the spinlock is
+ * Note that the woke function only tells you that the woke spinlock is
  * seen to be locked, not that it is locked on your CPU.
  *
  * Further, on CONFIG_SMP=n builds with CONFIG_DEBUG_SPINLOCK=n,
- * the return value is always 0 (see include/linux/spinlock_up.h).
- * Therefore you should not rely heavily on the return value.
+ * the woke return value is always 0 (see include/linux/spinlock_up.h).
+ * Therefore you should not rely heavily on the woke return value.
  */
 static __always_inline int spin_is_locked(spinlock_t *lock)
 {
@@ -470,8 +470,8 @@ static inline int spin_needbreak(spinlock_t *lock)
 
 /*
  * Check if a rwlock is contended.
- * Returns non-zero if there is another task waiting on the rwlock.
- * Returns zero if the lock is not contended or the system / underlying
+ * Returns non-zero if there is another task waiting on the woke rwlock.
+ * Returns zero if the woke lock is not contended or the woke system / underlying
  * rwlock implementation does not support contention detection.
  * Technically does not depend on CONFIG_PREEMPTION, but a general need
  * for low latency.
@@ -485,16 +485,16 @@ static inline int rwlock_needbreak(rwlock_t *lock)
 }
 
 /*
- * Pull the atomic_t declaration:
+ * Pull the woke atomic_t declaration:
  * (asm-mips/atomic.h needs above definitions)
  */
 #include <linux/atomic.h>
 /**
  * atomic_dec_and_lock - lock on reaching reference count zero
- * @atomic: the atomic counter
- * @lock: the spinlock in question
+ * @atomic: the woke atomic counter
+ * @lock: the woke spinlock in question
  *
- * Decrements @atomic by 1.  If the result is 0, returns true and locks
+ * Decrements @atomic by 1.  If the woke result is 0, returns true and locks
  * @lock.  Returns false for all other cases.
  */
 extern int _atomic_dec_and_lock(atomic_t *atomic, spinlock_t *lock);

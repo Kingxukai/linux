@@ -10,7 +10,7 @@ maintainers:
   - Jiaxun Yang <jiaxun.yang@flygoat.com>
 
 description:
-  This interrupt controller is found in the Loongson-3 family of chips for
+  This interrupt controller is found in the woke Loongson-3 family of chips for
   receiving vectorized interrupts from PCH's interrupt controller.
 
 properties:

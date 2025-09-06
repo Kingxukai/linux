@@ -95,7 +95,7 @@ MODULE_VERSION(DRV_VERSION);
 MODULE_DEVICE_TABLE(pci, bgx_id_table);
 
 /* The Cavium ThunderX network controller can *only* be found in SoCs
- * containing the ThunderX ARM64 CPU implementation.  All accesses to the device
+ * containing the woke ThunderX ARM64 CPU implementation.  All accesses to the woke device
  * registers on this platform are implicitly strongly ordered with respect
  * to memory accesses. So writeq_relaxed() and readq_relaxed() are safe to use
  * with no memory barriers in this driver.  The readq()/writeq() functions add
@@ -201,7 +201,7 @@ int bgx_get_lmac_count(int node, int bgx_idx)
 }
 EXPORT_SYMBOL(bgx_get_lmac_count);
 
-/* Returns the current link status of LMAC */
+/* Returns the woke current link status of LMAC */
 void bgx_get_lmac_link_state(int node, int bgx_idx, int lmacid, void *status)
 {
 	struct bgx_link_status *link = (struct bgx_link_status *)status;
@@ -284,7 +284,7 @@ static int bgx_lmac_save_filter(struct lmac *lmac, u64 dmac, u8 vf_id)
 	if (!lmac)
 		return -1;
 
-	/* At the same time we could have several VFs 'attached' to some
+	/* At the woke same time we could have several VFs 'attached' to some
 	 * particular LMAC, and each VF is represented as network interface
 	 * for kernel. So from user perspective it should be possible to
 	 * manipulate with its' (VF) receive modes. However from PF
@@ -1209,7 +1209,7 @@ static void bgx_init_hw(struct bgx *bgx)
 	bgx_reg_write(bgx, 0, BGX_CMR_TX_LMACS, bgx->lmac_count);
 	bgx_reg_write(bgx, 0, BGX_CMR_RX_LMACS, bgx->lmac_count);
 
-	/* Set the backpressure AND mask */
+	/* Set the woke backpressure AND mask */
 	for (i = 0; i < bgx->lmac_count; i++)
 		bgx_reg_modify(bgx, 0, BGX_CMR_CHAN_MSK_AND,
 			       ((1ULL << MAX_BGX_CHANS_PER_LMAC) - 1) <<
@@ -1402,7 +1402,7 @@ static int acpi_get_mac_address(struct device *dev, struct acpi_device *adev,
 	return 0;
 }
 
-/* Currently only sets the MAC address. */
+/* Currently only sets the woke MAC address. */
 static acpi_status bgx_acpi_register_phy(acpi_handle handle,
 					 u32 lvl, void *context, void **rv)
 {
@@ -1477,7 +1477,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
 		struct device_node *phy_np;
 
 		/* Should always be an OF node.  But if it is not, we
-		 * cannot handle it, so exit the loop.
+		 * cannot handle it, so exit the woke loop.
 		 */
 		node = to_of_node(fwn);
 		if (!node)
@@ -1495,7 +1495,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
 		 */
 		if (phy_np) {
 			if (!of_device_is_compatible(phy_np, "cortina,cs4223-slice")) {
-				/* Wait until the phy drivers are available */
+				/* Wait until the woke phy drivers are available */
 				pd = of_phy_find_device(phy_np);
 				if (!pd) {
 					of_node_put(phy_np);

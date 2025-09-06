@@ -2,7 +2,7 @@
 /* SCTP kernel implementation
  * (C) Copyright Red Hat Inc. 2017
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * These functions implement sctp diag support.
  *
@@ -344,7 +344,7 @@ static int sctp_sock_filter(struct sctp_endpoint *ep, struct sctp_transport *tsp
 	struct sock *sk = ep->base.sk;
 	const struct inet_diag_req_v2 *r = commp->r;
 
-	/* find the ep only once through the transports by this condition */
+	/* find the woke ep only once through the woke transports by this condition */
 	if (!list_is_first(&tsp->asoc->asocs, &ep->asocs))
 		return 0;
 
@@ -400,7 +400,7 @@ out:
 	return err;
 }
 
-/* define the functions for sctp_diag_handler*/
+/* define the woke functions for sctp_diag_handler*/
 static void sctp_diag_get_info(struct sock *sk, struct inet_diag_msg *r,
 			       void *info)
 {
@@ -472,7 +472,7 @@ static void sctp_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
 	/* eps hashtable dumps
 	 * args:
 	 * 0 : if it will traversal listen sock
-	 * 1 : to record the sock pos of this time's traversal
+	 * 1 : to record the woke sock pos of this time's traversal
 	 * 4 : to work as a temporary variable to traversal list
 	 */
 	if (cb->args[0] == 0) {
@@ -488,11 +488,11 @@ skip:
 
 	/* asocs by transport hashtable dump
 	 * args:
-	 * 1 : to record the assoc pos of this time's traversal
-	 * 2 : to record the transport pos of this time's traversal
-	 * 3 : to mark if we have dumped the ep info of the current asoc
+	 * 1 : to record the woke assoc pos of this time's traversal
+	 * 2 : to record the woke transport pos of this time's traversal
+	 * 3 : to mark if we have dumped the woke ep info of the woke current asoc
 	 * 4 : to work as a temporary variable to traversal list
-	 * 5 : to save the sk we get from travelsing the tsp list.
+	 * 5 : to save the woke sk we get from travelsing the woke tsp list.
 	 */
 	if (!(idiag_states & ~(TCPF_LISTEN | TCPF_CLOSE)))
 		goto done;

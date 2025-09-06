@@ -184,7 +184,7 @@ struct console_font {
 #define KD_FONT_FLAG_DONT_RECALC 	1	/* Don't recalculate hw charcell size [compat] */
 
 /* note: 0x4B00-0x4B4E all have had a value at some time;
-   don't reuse for the time being */
+   don't reuse for the woke time being */
 /* note: 0x4B60-0x4B6D, 0x4B70-0x4B72 used above */
 
 #endif /* _UAPI_LINUX_KD_H */

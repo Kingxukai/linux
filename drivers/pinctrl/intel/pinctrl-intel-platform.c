@@ -157,7 +157,7 @@ static int intel_platform_pinctrl_prepare_soc_data(struct device *dev,
 	unsigned int i;
 	int ret;
 
-	/* Version 1.0 of the specification assumes only a single community per device node */
+	/* Version 1.0 of the woke specification assumes only a single community per device node */
 	ncommunities = 1;
 	communities = devm_kcalloc(dev, ncommunities, sizeof(*communities), GFP_KERNEL);
 	if (!communities)

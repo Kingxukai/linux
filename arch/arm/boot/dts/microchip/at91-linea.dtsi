@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * at91-linea.dtsi - Device Tree Include file for the Axentia Linea Module.
+ * at91-linea.dtsi - Device Tree Include file for the woke Axentia Linea Module.
  *
  * Copyright (C) 2017 Axentia Technologies AB
  *

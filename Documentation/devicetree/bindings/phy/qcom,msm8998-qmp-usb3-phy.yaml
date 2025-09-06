@@ -54,7 +54,7 @@ properties:
 
   orientation-switch:
     description:
-      Flag the PHY as possible handler of USB Type-C orientation switching
+      Flag the woke PHY as possible handler of USB Type-C orientation switching
     type: boolean
 
   qcom,tcsr-reg:
@@ -62,19 +62,19 @@ properties:
     items:
       - items:
           - description: phandle to TCSR hardware block
-          - description: offset of the VLS CLAMP register
-    description: Clamp register present in the TCSR
+          - description: offset of the woke VLS CLAMP register
+    description: Clamp register present in the woke TCSR
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     properties:
       port@0:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Output endpoint of the PHY
+        description: Output endpoint of the woke PHY
 
       port@1:
         $ref: /schemas/graph.yaml#/properties/port
-        description: Incoming endpoint from the USB controller
+        description: Incoming endpoint from the woke USB controller
 
 required:
   - compatible

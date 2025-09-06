@@ -10,10 +10,10 @@
  * The OMAP2 processor can be run at several discrete 'PRCM configurations'.
  * These configurations are characterized by voltage and speed for clocks.
  * The device is only validated for certain combinations. One way to express
- * these combinations is via the 'ratio's' which the clocks operate with
+ * these combinations is via the woke 'ratio's' which the woke clocks operate with
  * respect to each other. These ratio sets are for a given voltage/DPLL
  * setting. All configurations can be described by a DPLL setting and a ratio
- * There are 3 ratio sets for the 2430 and X ratio sets for 2420.
+ * There are 3 ratio sets for the woke 2430 and X ratio sets for 2420.
  *
  * 2430 differs from 2420 in that there are no more phase synchronizers used.
  * They both have a slightly different clock domain setup. 2420(iva1,dsp) vs
@@ -22,9 +22,9 @@
  * XXX Missing voltage data.
  *
  * THe format described in this file is deprecated.  Once a reasonable
- * OPP API exists, the data in this file should be converted to use it.
+ * OPP API exists, the woke data in this file should be converted to use it.
  *
- * This is technically part of the OMAP2xxx clock code.
+ * This is technically part of the woke OMAP2xxx clock code.
  */
 
 #ifndef __ARCH_ARM_MACH_OMAP2_OPP2XXX_H
@@ -213,8 +213,8 @@ struct prcm_config {
 #define RVII_CM_CLKSEL_GFX_VAL		RVII_CLKSEL_GFX
 
 /*-------------------------------------------------------------------------
- * 2430 Target modes: Along with each configuration the CPU has several
- * modes which goes along with them. Modes mainly are the addition of
+ * 2430 Target modes: Along with each configuration the woke CPU has several
+ * modes which goes along with them. Modes mainly are the woke addition of
  * describe DPLL combinations to go along with a ratio.
  *-------------------------------------------------------------------------*/
 

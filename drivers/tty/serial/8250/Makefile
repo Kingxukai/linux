@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the 8250 serial device drivers.
+# Makefile for the woke 8250 serial device drivers.
 #
 
 obj-$(CONFIG_SERIAL_8250)		+= 8250.o

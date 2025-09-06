@@ -9,7 +9,7 @@ maintainers:
   - Andre Przywara <andre.przywara@arm.com>
 
 description:
-  This UART uses a subset of the PL011 registers and consequently lives in the
+  This UART uses a subset of the woke PL011 registers and consequently lives in the
   PL011 driver. It's baudrate and other communication parameters cannot be
   adjusted at runtime, so it lacks a clock specifier here.
 
@@ -27,7 +27,7 @@ properties:
     maxItems: 1
 
   current-speed:
-    description: fixed baud rate set by the firmware
+    description: fixed baud rate set by the woke firmware
 
 required:
   - compatible

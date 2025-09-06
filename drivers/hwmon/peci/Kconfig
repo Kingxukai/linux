@@ -6,12 +6,12 @@ config SENSORS_PECI_CPUTEMP
 	select SENSORS_PECI
 	select PECI_CPU
 	help
-	  If you say yes here you get support for the generic Intel PECI
+	  If you say yes here you get support for the woke generic Intel PECI
 	  cputemp driver which provides Digital Thermal Sensor (DTS) thermal
-	  readings of the CPU package and CPU cores that are accessible via
-	  the processor PECI interface.
+	  readings of the woke CPU package and CPU cores that are accessible via
+	  the woke processor PECI interface.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called peci-cputemp.
 
 config SENSORS_PECI_DIMMTEMP
@@ -20,11 +20,11 @@ config SENSORS_PECI_DIMMTEMP
 	select SENSORS_PECI
 	select PECI_CPU
 	help
-	  If you say yes here you get support for the generic Intel PECI hwmon
+	  If you say yes here you get support for the woke generic Intel PECI hwmon
 	  driver which provides Temperature Sensor on DIMM readings that are
-	  accessible via the processor PECI interface.
+	  accessible via the woke processor PECI interface.
 
-	  This driver can also be built as a module. If so, the module
+	  This driver can also be built as a module. If so, the woke module
 	  will be called peci-dimmtemp.
 
 config SENSORS_PECI

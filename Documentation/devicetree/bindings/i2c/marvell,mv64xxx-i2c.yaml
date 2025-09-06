@@ -42,7 +42,7 @@ properties:
 
     description:
       Only use "marvell,mv78230-a0-i2c" for a very rare, initial
-      version of the SoC which had broken offload support. Linux
+      version of the woke SoC which had broken offload support. Linux
       auto-detects this and sets it appropriately.
 
   reg:
@@ -54,7 +54,7 @@ properties:
   clocks:
     minItems: 1
     items:
-      - description: Reference clock for the I2C bus
+      - description: Reference clock for the woke I2C bus
       - description: Bus clock (Only for Armada 7K/8K)
 
   clock-names:

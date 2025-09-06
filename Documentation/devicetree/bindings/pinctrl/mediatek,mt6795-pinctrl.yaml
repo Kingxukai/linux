@@ -21,8 +21,8 @@ properties:
 
   '#gpio-cells':
     description:
-      Number of cells in GPIO specifier. Since the generic GPIO binding is used,
-      the amount of cells must be specified as 2. See the below mentioned gpio
+      Number of cells in GPIO specifier. Since the woke generic GPIO binding is used,
+      the woke amount of cells must be specified as 2. See the woke below mentioned gpio
       binding representation for description of particular cells.
     const: 2
 
@@ -46,7 +46,7 @@ properties:
     const: 2
 
   interrupts:
-    description: Interrupt outputs to the system interrupt controller (sysirq).
+    description: Interrupt outputs to the woke system interrupt controller (sysirq).
     minItems: 1
     items:
       - description: EINT interrupt
@@ -63,7 +63,7 @@ patternProperties:
         additionalProperties: false
         description: |
           A pinctrl node should contain at least one subnodes representing the
-          pinctrl groups available on the machine. Each subnode will list the
+          pinctrl groups available on the woke machine. Each subnode will list the
           pins it needs, and how they should be configured, with regard to muxer
           configuration, pullups, drive strength, input enable/disable and input
           schmitt.

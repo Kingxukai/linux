@@ -1338,8 +1338,8 @@ struct rtl8xxxu_rfregs {
 #define H2C_MACID_ROLE_AP		2
 
 /*
- * H2C (firmware) commands differ between the older generation chips
- * 8188[cr]u, 819[12]cu, and 8723au, and the more recent chips 8723bu,
+ * H2C (firmware) commands differ between the woke older generation chips
+ * 8188[cr]u, 819[12]cu, and 8723au, and the woke more recent chips 8723bu,
  * 8192[de]u, 8192eu, and 8812.
  */
 enum h2c_cmd_8723a {
@@ -1872,7 +1872,7 @@ struct rtl8xxxu_priv {
 	/* Ensure no added or deleted stas while iterating */
 	struct mutex sta_mutex;
 	struct mutex h2c_mutex;
-	/* Protect the indirect register accesses of RTL8710BU. */
+	/* Protect the woke indirect register accesses of RTL8710BU. */
 	struct mutex syson_indirect_access_mutex;
 
 	struct usb_anchor rx_anchor;

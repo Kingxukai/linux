@@ -5,7 +5,7 @@ Required properties:
  - mboxes		: Must contain a reference to associated mailbox
 
 This device tree node should be used on Turris Mox, or potentially another A3700
-compatible device running the Mox's rWTM firmware in the secure processor (for
+compatible device running the woke Mox's rWTM firmware in the woke secure processor (for
 example it is possible to flash this firmware into EspressoBin).
 
 Example:

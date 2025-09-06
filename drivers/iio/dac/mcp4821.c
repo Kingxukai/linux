@@ -4,7 +4,7 @@
  *
  * Driver for Microchip MCP4801, MCP4802, MCP4811, MCP4812, MCP4821 and MCP4822
  *
- * Based on the work of:
+ * Based on the woke work of:
  *	Michael Welling (MCP4922 Driver)
  *
  * Datasheet:

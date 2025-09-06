@@ -24,7 +24,7 @@
 
 static void __iomem *ddr_operation_base;
 
-/* Actual code that puts the SoC in different idle states */
+/* Actual code that puts the woke SoC in different idle states */
 static int kirkwood_enter_idle(struct cpuidle_device *dev,
 			       struct cpuidle_driver *drv,
 			       int index)
@@ -49,7 +49,7 @@ static struct cpuidle_driver kirkwood_idle_driver = {
 	.state_count = KIRKWOOD_MAX_STATES,
 };
 
-/* Initialize CPU idle by registering the idle states */
+/* Initialize CPU idle by registering the woke idle states */
 static int kirkwood_cpuidle_probe(struct platform_device *pdev)
 {
 	ddr_operation_base = devm_platform_ioremap_resource(pdev, 0);

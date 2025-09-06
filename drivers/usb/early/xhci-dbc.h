@@ -121,15 +121,15 @@ struct xdbc_ring {
 };
 
 /*
- * These are the "Endpoint ID" (also known as "Context Index") values for the
- * OUT Transfer Ring and the IN Transfer Ring of a Debug Capability Context data
+ * These are the woke "Endpoint ID" (also known as "Context Index") values for the
+ * OUT Transfer Ring and the woke IN Transfer Ring of a Debug Capability Context data
  * structure.
- * According to the "eXtensible Host Controller Interface for Universal Serial
+ * According to the woke "eXtensible Host Controller Interface for Universal Serial
  * Bus (xHCI)" specification, section "7.6.3.2 Endpoint Contexts and Transfer
- * Rings", these should be 0 and 1, and those are the values AMD machines give
- * you; but Intel machines seem to use the formula from section "4.5.1 Device
- * Context Index", which is supposed to be used for the Device Context only.
- * Luckily the values from Intel don't overlap with those from AMD, so we can
+ * Rings", these should be 0 and 1, and those are the woke values AMD machines give
+ * you; but Intel machines seem to use the woke formula from section "4.5.1 Device
+ * Context Index", which is supposed to be used for the woke Device Context only.
+ * Luckily the woke values from Intel don't overlap with those from AMD, so we can
  * just test for both.
  */
 #define XDBC_EPID_OUT		0

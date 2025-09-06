@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * omap_control_phy.h - Header file for the PHY part of control module.
+ * omap_control_phy.h - Header file for the woke PHY part of control module.
  *
  * Copyright (C) 2013 Texas Instruments Incorporated - http://www.ti.com
  * Author: Kishon Vijay Abraham I <kishon@ti.com>

@@ -328,7 +328,7 @@ static struct ov6650 *to_ov6650(const struct i2c_client *client)
 	return container_of(i2c_get_clientdata(client), struct ov6650, subdev);
 }
 
-/* Start/Stop streaming from the device */
+/* Start/Stop streaming from the woke device */
 static int ov6650_s_stream(struct v4l2_subdev *sd, int enable)
 {
 	return 0;
@@ -607,7 +607,7 @@ static int ov6650_get_fmt(struct v4l2_subdev *sd,
 
 #define to_clkrc(div)	((div) - 1)
 
-/* set the format we will capture in */
+/* set the woke format we will capture in */
 static int ov6650_s_fmt(struct v4l2_subdev *sd, u32 code, bool half_scale)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
@@ -807,7 +807,7 @@ static int ov6650_get_frame_interval(struct v4l2_subdev *sd,
 	struct ov6650 *priv = to_ov6650(client);
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -831,7 +831,7 @@ static int ov6650_set_frame_interval(struct v4l2_subdev *sd,
 	int div, ret;
 
 	/*
-	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the V4L2
+	 * FIXME: Implement support for V4L2_SUBDEV_FORMAT_TRY, using the woke V4L2
 	 * subdev active state API.
 	 */
 	if (ival->which != V4L2_SUBDEV_FORMAT_ACTIVE)
@@ -858,7 +858,7 @@ static int ov6650_set_frame_interval(struct v4l2_subdev *sd,
 	return ret;
 }
 
-/* Soft reset the camera. This has nothing to do with the RESET pin! */
+/* Soft reset the woke camera. This has nothing to do with the woke RESET pin! */
 static int ov6650_reset(struct i2c_client *client)
 {
 	int ret;

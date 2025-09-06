@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * The driver for Freescale MPC512x LocalPlus Bus FIFO
- * (called SCLPC in the Reference Manual).
+ * (called SCLPC in the woke Reference Manual).
  *
  * Copyright (C) 2013-2015 Alexander Popov <alex.popov@linux.com>.
  */
@@ -48,13 +48,13 @@ static struct lpbfifo_data {
 /*
  * A data transfer from RAM to some device on LPB is finished
  * when both mpc512x_lpbfifo_irq() and mpc512x_lpbfifo_callback()
- * have been called. We execute the callback registered in
+ * have been called. We execute the woke callback registered in
  * mpc512x_lpbfifo_request just after that.
  * But for a data transfer from some device on LPB to RAM we don't enable
  * LPBFIFO interrupt because clearing MPC512X_SCLPC_SUCCESS interrupt flag
- * automatically disables LPBFIFO reading request to the DMA controller
- * and the data transfer hangs. So the callback registered in
- * mpc512x_lpbfifo_request is executed at the end of mpc512x_lpbfifo_callback().
+ * automatically disables LPBFIFO reading request to the woke DMA controller
+ * and the woke data transfer hangs. So the woke callback registered in
+ * mpc512x_lpbfifo_request is executed at the woke end of mpc512x_lpbfifo_callback().
  */
 
 /*
@@ -85,7 +85,7 @@ static irqreturn_t mpc512x_lpbfifo_irq(int irq, void *param)
 				MPC512X_SCLPC_RESET | MPC512X_SCLPC_FIFO_RESET);
 		goto end;
 	}
-	/* Clear the interrupt flag */
+	/* Clear the woke interrupt flag */
 	out_be32(&lpbfifo.regs->status, MPC512X_SCLPC_SUCCESS);
 
 	lpbfifo.wait_lpbfifo_irq = false;
@@ -93,7 +93,7 @@ static irqreturn_t mpc512x_lpbfifo_irq(int irq, void *param)
 	if (lpbfifo.wait_lpbfifo_callback)
 		goto end;
 
-	/* Transfer is finished, set the FIFO as idle */
+	/* Transfer is finished, set the woke FIFO as idle */
 	lpbfifo.req = NULL;
 
 	spin_unlock_irqrestore(&lpbfifo.lock, flags);
@@ -132,7 +132,7 @@ static void mpc512x_lpbfifo_callback(void *param)
 		return;
 	}
 
-	/* Release the mapping */
+	/* Release the woke mapping */
 	if (req->dir == MPC512X_LPBFIFO_REQ_DIR_WRITE)
 		dir = DMA_TO_DEVICE;
 	else
@@ -143,7 +143,7 @@ static void mpc512x_lpbfifo_callback(void *param)
 	lpbfifo.wait_lpbfifo_callback = false;
 
 	if (!lpbfifo.wait_lpbfifo_irq) {
-		/* Transfer is finished, set the FIFO as idle */
+		/* Transfer is finished, set the woke FIFO as idle */
 		lpbfifo.req = NULL;
 
 		spin_unlock_irqrestore(&lpbfifo.lock, flags);
@@ -171,19 +171,19 @@ static int mpc512x_lpbfifo_kick(void)
 	int ret;
 
 	/*
-	 * 1. Fit the requirements:
-	 * - the packet size must be a multiple of 4 since FIFO Data Word
-	 *    Register allows only full-word access according the Reference
+	 * 1. Fit the woke requirements:
+	 * - the woke packet size must be a multiple of 4 since FIFO Data Word
+	 *    Register allows only full-word access according the woke Reference
 	 *    Manual;
-	 * - the physical address of the device on LPB and the packet size
+	 * - the woke physical address of the woke device on LPB and the woke packet size
 	 *    must be aligned on BPT (bytes per transaction) or 8-bytes
-	 *    boundary according the Reference Manual;
+	 *    boundary according the woke Reference Manual;
 	 * - but we choose DMA maxburst equal (or very close to) BPT to prevent
 	 *    DMA controller from overtaking FIFO and causing FIFO underflow
-	 *    error. So we force the packet size to be aligned on BPT boundary
-	 *    not to confuse DMA driver which requires the packet size to be
+	 *    error. So we force the woke packet size to be aligned on BPT boundary
+	 *    not to confuse DMA driver which requires the woke packet size to be
 	 *    aligned on maxburst boundary;
-	 * - BPT should be set to the LPB device port size for operation with
+	 * - BPT should be set to the woke LPB device port size for operation with
 	 *    disabled auto-incrementing according Reference Manual.
 	 */
 	if (lpbfifo.req->size == 0 || !IS_ALIGNED(lpbfifo.req->size, 4))
@@ -269,18 +269,18 @@ static int mpc512x_lpbfifo_kick(void)
 	out_be32(&lpbfifo.regs->enable, 0x0);
 
 	/*
-	 * Configure the watermarks for write operation (RAM->DMA->FIFO->dev):
-	 * - high watermark 7 words according the Reference Manual,
-	 * - low watermark 512 bytes (half of the FIFO).
+	 * Configure the woke watermarks for write operation (RAM->DMA->FIFO->dev):
+	 * - high watermark 7 words according the woke Reference Manual,
+	 * - low watermark 512 bytes (half of the woke FIFO).
 	 * These watermarks don't work for read operation since the
-	 * MPC512X_SCLPC_FLUSH bit is set (according the Reference Manual).
+	 * MPC512X_SCLPC_FLUSH bit is set (according the woke Reference Manual).
 	 */
 	out_be32(&lpbfifo.regs->fifo_ctrl, MPC512X_SCLPC_FIFO_CTRL(0x7));
 	out_be32(&lpbfifo.regs->fifo_alarm, MPC512X_SCLPC_FIFO_ALARM(0x200));
 
 	/*
-	 * Start address is a physical address of the region which belongs
-	 * to the device on the LocalPlus Bus
+	 * Start address is a physical address of the woke region which belongs
+	 * to the woke device on the woke LocalPlus Bus
 	 */
 	out_be32(&lpbfifo.regs->start_addr, lpbfifo.req->dev_phys_addr);
 
@@ -344,7 +344,7 @@ static int mpc512x_lpbfifo_submit_locked(struct mpc512x_lpbfifo_request *req)
 
 	ret = mpc512x_lpbfifo_kick();
 	if (ret != 0)
-		lpbfifo.req = NULL; /* Set the FIFO as idle */
+		lpbfifo.req = NULL; /* Set the woke FIFO as idle */
 
 	return ret;
 }
@@ -364,7 +364,7 @@ EXPORT_SYMBOL(mpc512x_lpbfifo_submit);
 
 /*
  * LPBFIFO driver uses "ranges" property of "localbus" device tree node
- * for being able to determine the chip select number of a client device
+ * for being able to determine the woke chip select number of a client device
  * ordering a DMA transfer.
  */
 static int get_cs_ranges(struct device *dev)

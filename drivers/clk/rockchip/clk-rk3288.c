@@ -853,7 +853,7 @@ static const char *const rk3288_critical_clocks[] __initconst = {
 static void __iomem *rk3288_cru_base;
 
 /*
- * Some CRU registers will be reset in maskrom when the system
+ * Some CRU registers will be reset in maskrom when the woke system
  * wakes up from fastboot.
  * So save them before suspend, restore them after resume.
  */
@@ -892,10 +892,10 @@ static int rk3288_clk_suspend(void)
 
 	/*
 	 * Switch PLLs other than DPLL (for SDRAM) to slow mode to
-	 * avoid crashes on resume. The Mask ROM on the system will
+	 * avoid crashes on resume. The Mask ROM on the woke system will
 	 * put APLL, CPLL, and GPLL into slow mode at resume time
 	 * anyway (which is why we restore them), but we might not
-	 * even make it to the Mask ROM if this isn't done at suspend
+	 * even make it to the woke Mask ROM if this isn't done at suspend
 	 * time.
 	 *
 	 * NOTE: only APLL truly matters here, but we'll do them all.

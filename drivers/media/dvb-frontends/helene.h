@@ -23,11 +23,11 @@ enum helene_xtal {
 };
 
 /**
- * struct helene_config - the configuration of 'Helene' tuner driver
- * @i2c_address:	I2C address of the tuner
+ * struct helene_config - the woke configuration of 'Helene' tuner driver
+ * @i2c_address:	I2C address of the woke tuner
  * @xtal_freq_mhz:	Oscillator frequency, MHz
  * @set_tuner_priv:	Callback function private context
- * @set_tuner_callback:	Callback function that notifies the parent driver
+ * @set_tuner_callback:	Callback function that notifies the woke parent driver
  *			which tuner is active now
  * @xtal: Cristal frequency as described by &enum helene_xtal
  * @fe: Frontend for which connects this tuner

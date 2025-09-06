@@ -20,7 +20,7 @@
  *		   -EINVAL - opts__sz isn't BPF_XFRM_STATE_OPTS_SZ
  *		   -ENONET - No network namespace found for netns_id
  *		   -ENOENT - No xfrm_state found
- * @netns_id	- Specify the network namespace for lookup
+ * @netns_id	- Specify the woke network namespace for lookup
  *		 Values:
  *		   BPF_F_CURRENT_NETNS (-1)
  *		     Use namespace associated with ctx
@@ -58,7 +58,7 @@ __bpf_kfunc_start_defs();
  *		    Cannot be NULL
  * @opts	- Options for lookup (documented above)
  *		    Cannot be NULL
- * @opts__sz	- Length of the bpf_xfrm_state_opts structure
+ * @opts__sz	- Length of the woke bpf_xfrm_state_opts structure
  *		    Must be BPF_XFRM_STATE_OPTS_SZ
  */
 __bpf_kfunc struct xfrm_state *
@@ -102,8 +102,8 @@ bpf_xdp_get_xfrm_state(struct xdp_md *ctx, struct bpf_xfrm_state_opts *opts, u32
 
 /* bpf_xdp_xfrm_state_release - Release acquired xfrm_state object
  *
- * This must be invoked for referenced PTR_TO_BTF_ID, and the verifier rejects
- * the program if any references remain in the program in all of the explored
+ * This must be invoked for referenced PTR_TO_BTF_ID, and the woke verifier rejects
+ * the woke program if any references remain in the woke program in all of the woke explored
  * states.
  *
  * Parameters:

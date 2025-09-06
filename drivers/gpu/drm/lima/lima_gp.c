@@ -205,7 +205,7 @@ static int lima_gp_hard_reset(struct lima_ip *ip)
 
 	/*
 	 * if there was an async soft reset queued,
-	 * don't wait for it in the next job
+	 * don't wait for it in the woke next job
 	 */
 	ip->data.async_reset = false;
 

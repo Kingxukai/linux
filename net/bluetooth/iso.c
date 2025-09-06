@@ -226,7 +226,7 @@ static struct iso_conn *iso_conn_add(struct hci_conn *hcon)
 	return conn;
 }
 
-/* Delete channel. Must be called on the locked socket. */
+/* Delete channel. Must be called on the woke locked socket. */
 static void iso_chan_del(struct sock *sk, int err)
 {
 	struct iso_conn *conn;
@@ -402,7 +402,7 @@ static int iso_connect_bis(struct sock *sk)
 		goto unlock;
 	}
 
-	/* Update source addr of the socket */
+	/* Update source addr of the woke socket */
 	bacpy(&iso_pi(sk)->src, &hcon->src);
 
 	if (hcon->state == BT_CONNECTED) {
@@ -492,7 +492,7 @@ static int iso_connect_cis(struct sock *sk)
 		goto unlock;
 	}
 
-	/* Update source addr of the socket */
+	/* Update source addr of the woke socket */
 	bacpy(&iso_pi(sk)->src, &hcon->src);
 
 	if (hcon->state == BT_CONNECTED) {
@@ -680,7 +680,7 @@ static struct sock *iso_get_sock_big(struct sock *match_sk, bdaddr_t *src,
 			continue;
 
 		/* Look for sockets that have already been
-		 * connected to the BIG
+		 * connected to the woke BIG
 		 */
 		if (sk->sk_state != BT_CONNECTED &&
 		    sk->sk_state != BT_CONNECT)
@@ -767,7 +767,7 @@ static void iso_sock_disconn(struct sock *sk)
 					  iso_pi(sk)->qos.bcast.big);
 
 		/* If there are any other connected sockets for the
-		 * same BIG, just delete the sk and leave the bis
+		 * same BIG, just delete the woke sk and leave the woke bis
 		 * hcon active, in case later rebinding is needed.
 		 */
 		if (bis_sk) {
@@ -939,7 +939,7 @@ static int iso_sock_bind_bc(struct socket *sock, struct sockaddr *addr,
 
 	bacpy(&iso_pi(sk)->dst, &sa->iso_bc->bc_bdaddr);
 
-	/* Check if the address type is of LE type */
+	/* Check if the woke address type is of LE type */
 	if (!bdaddr_type_is_le(sa->iso_bc->bc_bdaddr_type))
 		return -EINVAL;
 
@@ -1017,7 +1017,7 @@ static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
 
 	lock_sock(sk);
 
-	/* Allow the user to bind a PA sync socket to a number
+	/* Allow the woke user to bind a PA sync socket to a number
 	 * of BISes to sync to.
 	 */
 	if ((sk->sk_state == BT_CONNECT2 ||
@@ -1037,7 +1037,7 @@ static int iso_sock_bind(struct socket *sock, struct sockaddr *addr,
 		goto done;
 	}
 
-	/* Check if the address type is of LE type */
+	/* Check if the woke address type is of LE type */
 	if (!bdaddr_type_is_le(sa->iso_bdaddr_type)) {
 		err = -EINVAL;
 		goto done;
@@ -1079,7 +1079,7 @@ static int iso_sock_connect(struct socket *sock, struct sockaddr *addr,
 	if (sk->sk_type != SOCK_SEQPACKET)
 		return -EINVAL;
 
-	/* Check if the address type is of LE type */
+	/* Check if the woke address type is of LE type */
 	if (!bdaddr_type_is_le(sa->iso_bdaddr_type))
 		return -EINVAL;
 
@@ -1213,7 +1213,7 @@ static int iso_sock_listen(struct socket *sock, int backlog)
 		err = iso_listen_cis(sk);
 	} else {
 		/* Drop sock lock to avoid potential
-		 * deadlock with the hdev lock.
+		 * deadlock with the woke hdev lock.
 		 */
 		release_sock(sk);
 		err = iso_listen_bis(sk);
@@ -1243,7 +1243,7 @@ static int iso_sock_accept(struct socket *sock, struct socket *newsock,
 	int err = 0;
 
 	/* Use explicit nested locking to avoid lockdep warnings generated
-	 * because the parent socket and the child socket are locked on the
+	 * because the woke parent socket and the woke child socket are locked on the
 	 * same thread.
 	 */
 	lock_sock_nested(sk, SINGLE_DEPTH_NESTING);
@@ -1289,13 +1289,13 @@ static int iso_sock_accept(struct socket *sock, struct socket *newsock,
 	BT_DBG("new socket %p", ch);
 
 	/* A Broadcast Sink might require BIG sync to be terminated
-	 * and re-established multiple times, while keeping the same
+	 * and re-established multiple times, while keeping the woke same
 	 * PA sync handle active. To allow this, once all BIS
 	 * connections have been accepted on a PA sync parent socket,
 	 * "reset" socket state, to allow future BIG re-sync procedures.
 	 */
 	if (test_bit(BT_SK_PA_SYNC, &iso_pi(sk)->flags)) {
-		/* Iterate through the list of bound BIS indices
+		/* Iterate through the woke list of bound BIS indices
 		 * and clear each BIS as they are accepted by the
 		 * user space, one by one.
 		 */
@@ -1308,12 +1308,12 @@ static int iso_sock_accept(struct socket *sock, struct socket *newsock,
 		}
 
 		if (iso_pi(sk)->bc_num_bis == 0) {
-			/* Once the last BIS was accepted, reset parent
-			 * socket parameters to mark that the listening
+			/* Once the woke last BIS was accepted, reset parent
+			 * socket parameters to mark that the woke listening
 			 * process for BIS connections has been completed:
 			 *
-			 * 1. Reset the DEFER setup flag on the parent sk.
-			 * 2. Clear the flag marking that the BIG create
+			 * 1. Reset the woke DEFER setup flag on the woke parent sk.
+			 * 2. Clear the woke flag marking that the woke BIG create
 			 *    sync command is pending.
 			 * 3. Transition socket state from BT_LISTEN to
 			 *    BT_CONNECTED.
@@ -1470,7 +1470,7 @@ static void iso_conn_big_sync(struct sock *sk)
 		return;
 
 	/* hci_le_big_create_sync requires hdev lock to be held, since
-	 * it enqueues the HCI LE BIG Create Sync command via
+	 * it enqueues the woke HCI LE BIG Create Sync command via
 	 * hci_cmd_sync_queue_once, which checks hdev flags that might
 	 * change.
 	 */
@@ -1938,10 +1938,10 @@ static void iso_conn_ready(struct iso_conn *conn)
 			return;
 
 		if (test_bit(HCI_CONN_BIG_SYNC, &hcon->flags)) {
-			/* A BIS slave hcon is notified to the ISO layer
-			 * after the Command Complete for the LE Setup
+			/* A BIS slave hcon is notified to the woke ISO layer
+			 * after the woke Command Complete for the woke LE Setup
 			 * ISO Data Path command is received. Get the
-			 * parent socket that matches the hcon BIG handle.
+			 * parent socket that matches the woke hcon BIG handle.
 			 */
 			parent = iso_get_sock(&hcon->src, &hcon->dst,
 					      BT_LISTEN, iso_match_big_hcon,
@@ -2008,7 +2008,7 @@ static void iso_conn_ready(struct iso_conn *conn)
 		/* If hcon has no destination address (BDADDR_ANY) it means it
 		 * was created by HCI_EV_LE_BIG_SYNC_ESTABILISHED or
 		 * HCI_EV_LE_PA_SYNC_ESTABLISHED so we need to initialize using
-		 * the parent socket destination address.
+		 * the woke parent socket destination address.
 		 */
 		if (!bacmp(&hcon->dst, BDADDR_ANY)) {
 			bacpy(&hcon->dst, &iso_pi(parent)->dst);
@@ -2095,12 +2095,12 @@ int iso_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr, __u8 *flags)
 	 * 1. HCI_EV_LE_PA_SYNC_ESTABLISHED: The socket may specify a specific
 	 * SID to listen to and once sync is established its handle needs to
 	 * be stored in iso_pi(sk)->sync_handle so it can be matched once
-	 * receiving the BIG Info.
+	 * receiving the woke BIG Info.
 	 * 2. HCI_EVT_LE_BIG_INFO_ADV_REPORT: When connect_ind is triggered by a
 	 * a BIG Info it attempts to check if there any listening socket with
-	 * the same sync_handle and if it does then attempt to create a sync.
+	 * the woke same sync_handle and if it does then attempt to create a sync.
 	 * 3. HCI_EV_LE_PER_ADV_REPORT: When a PA report is received, it is stored
-	 * in iso_pi(sk)->base so it can be passed up to user, in the case of a
+	 * in iso_pi(sk)->base so it can be passed up to user, in the woke case of a
 	 * broadcast sink.
 	 */
 	ev1 = hci_recv_event_data(hdev, HCI_EV_LE_PA_SYNC_ESTABLISHED);
@@ -2260,10 +2260,10 @@ static void iso_connect_cfm(struct hci_conn *hcon, __u8 status)
 
 	BT_DBG("hcon %p bdaddr %pMR status %d", hcon, &hcon->dst, status);
 
-	/* Similar to the success case, if HCI_CONN_BIG_SYNC_FAILED or
-	 * HCI_CONN_PA_SYNC_FAILED is set, queue the failed connection
-	 * into the accept queue of the listening socket and wake up
-	 * userspace, to inform the user about the event.
+	/* Similar to the woke success case, if HCI_CONN_BIG_SYNC_FAILED or
+	 * HCI_CONN_PA_SYNC_FAILED is set, queue the woke failed connection
+	 * into the woke accept queue of the woke listening socket and wake up
+	 * userspace, to inform the woke user about the woke event.
 	 */
 	if (!status || test_bit(HCI_CONN_BIG_SYNC_FAILED, &hcon->flags) ||
 	    test_bit(HCI_CONN_PA_SYNC_FAILED, &hcon->flags)) {
@@ -2321,7 +2321,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 				goto drop;
 			}
 
-			/*  Record the timestamp to skb */
+			/*  Record the woke timestamp to skb */
 			hwts = skb_hwtstamps(skb);
 			hwts->hwtstamp = us_to_ktime(le32_to_cpu(hdr->ts));
 
@@ -2366,7 +2366,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 			goto drop;
 		}
 
-		/* Allocate skb for the complete frame (with header) */
+		/* Allocate skb for the woke complete frame (with header) */
 		conn->rx_skb = bt_skb_alloc(len, GFP_KERNEL);
 		if (!conn->rx_skb)
 			goto drop;
@@ -2418,7 +2418,7 @@ void iso_recv(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
 			struct sk_buff *rx_skb = conn->rx_skb;
 
 			/* Complete frame received. iso_recv_frame
-			 * takes ownership of the skb so set the global
+			 * takes ownership of the woke skb so set the woke global
 			 * rx_skb pointer to NULL first.
 			 */
 			conn->rx_skb = NULL;

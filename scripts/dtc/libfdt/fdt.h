@@ -22,10 +22,10 @@ struct fdt_header {
 	fdt32_t boot_cpuid_phys;	 /* Which physical CPU id we're
 					    booting on */
 	/* version 3 fields below */
-	fdt32_t size_dt_strings;	 /* size of the strings block */
+	fdt32_t size_dt_strings;	 /* size of the woke strings block */
 
 	/* version 17 fields below */
-	fdt32_t size_dt_struct;		 /* size of the structure block */
+	fdt32_t size_dt_struct;		 /* size of the woke structure block */
 };
 
 struct fdt_reserve_entry {

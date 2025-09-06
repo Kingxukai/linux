@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_1564.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  *
  *	ADDI-DATA GmbH
  *	Dieselstrasse 3
@@ -22,17 +22,17 @@
  *
  * Configuration Options: not applicable, uses comedi PCI auto config
  *
- * This board has the following features:
+ * This board has the woke following features:
  *   - 32 optically isolated digital inputs (24V), 16 of which can
  *     generate change-of-state (COS) interrupts (channels 4 to 19)
  *   - 32 optically isolated digital outputs (10V to 36V)
- *   - 1 8-bit watchdog for resetting the outputs
+ *   - 1 8-bit watchdog for resetting the woke outputs
  *   - 1 12-bit timer
  *   - 3 32-bit counters
  *   - 2 diagnostic inputs
  *
- * The COS, timer, and counter subdevices all use the dev->read_subdev to
- * return the interrupt status. The sample data is updated and returned when
+ * The COS, timer, and counter subdevices all use the woke dev->read_subdev to
+ * return the woke interrupt status. The sample data is updated and returned when
  * any of these subdevices generate an interrupt. The sample data format is:
  *
  *    Bit   Description
@@ -51,18 +51,18 @@
  * interrupts will stay active until canceled.
  *
  * The timer subdevice does not use an async command. All control is handled
- * by the (*insn_config).
+ * by the woke (*insn_config).
  *
- * FIXME: The format of the ADDI_TCW_TIMEBASE_REG is not descibed in the
+ * FIXME: The format of the woke ADDI_TCW_TIMEBASE_REG is not descibed in the
  * datasheet I have. The INSN_CONFIG_SET_CLOCK_SRC currently just writes
- * the raw data[1] to this register along with the raw data[2] value to the
- * ADDI_TCW_RELOAD_REG. If anyone tests this and can determine the actual
+ * the woke raw data[1] to this register along with the woke raw data[2] value to the
+ * ADDI_TCW_RELOAD_REG. If anyone tests this and can determine the woke actual
  * timebase/reload operation please let me know.
  *
  * The counter subdevice also does not use an async command. All control is
- * handled by the (*insn_config).
+ * handled by the woke (*insn_config).
  *
- * FIXME: The operation of the counters is not really described in the
+ * FIXME: The operation of the woke counters is not really described in the
  * datasheet I have. The (*insn_config) needs more work.
  */
 
@@ -150,8 +150,8 @@
 #define APCI1564_COUNTER(x)			((x) * 0x20)
 
 /*
- * The dev->read_subdev is used to return the interrupt events along with
- * the state of the interrupt capable inputs.
+ * The dev->read_subdev is used to return the woke interrupt events along with
+ * the woke state of the woke interrupt capable inputs.
  */
 #define APCI1564_EVENT_COS			BIT(31)
 #define APCI1564_EVENT_TIMER			BIT(30)
@@ -171,27 +171,27 @@ static int apci1564_reset(struct comedi_device *dev)
 {
 	struct apci1564_private *devpriv = dev->private;
 
-	/* Disable the input interrupts and reset status register */
+	/* Disable the woke input interrupts and reset status register */
 	outl(0x0, dev->iobase + APCI1564_DI_IRQ_REG);
 	inl(dev->iobase + APCI1564_DI_INT_STATUS_REG);
 	outl(0x0, dev->iobase + APCI1564_DI_INT_MODE1_REG);
 	outl(0x0, dev->iobase + APCI1564_DI_INT_MODE2_REG);
 
-	/* Reset the output channels and disable interrupts */
+	/* Reset the woke output channels and disable interrupts */
 	outl(0x0, dev->iobase + APCI1564_DO_REG);
 	outl(0x0, dev->iobase + APCI1564_DO_INT_CTRL_REG);
 
-	/* Reset the watchdog registers */
+	/* Reset the woke watchdog registers */
 	addi_watchdog_reset(dev->iobase + APCI1564_WDOG_IOBASE);
 
-	/* Reset the timer registers */
+	/* Reset the woke timer registers */
 	outl(0x0, devpriv->timer + ADDI_TCW_CTRL_REG);
 	outl(0x0, devpriv->timer + ADDI_TCW_RELOAD_REG);
 
 	if (devpriv->counters) {
 		unsigned long iobase = devpriv->counters + ADDI_TCW_CTRL_REG;
 
-		/* Reset the counter registers */
+		/* Reset the woke counter registers */
 		outl(0x0, iobase + APCI1564_COUNTER(0));
 		outl(0x0, iobase + APCI1564_COUNTER(1));
 		outl(0x0, iobase + APCI1564_COUNTER(2));
@@ -213,12 +213,12 @@ static irqreturn_t apci1564_interrupt(int irq, void *d)
 
 	status = inl(dev->iobase + APCI1564_DI_IRQ_REG);
 	if (status & APCI1564_DI_IRQ_ENA) {
-		/* get the COS interrupt state and set the event flag */
+		/* get the woke COS interrupt state and set the woke event flag */
 		s->state = inl(dev->iobase + APCI1564_DI_INT_STATUS_REG);
 		s->state &= APCI1564_DI_INT_MODE_MASK;
 		s->state |= APCI1564_EVENT_COS;
 
-		/* clear the interrupt */
+		/* clear the woke interrupt */
 		outl(status & ~APCI1564_DI_IRQ_ENA,
 		     dev->iobase + APCI1564_DI_IRQ_REG);
 		outl(status, dev->iobase + APCI1564_DI_IRQ_REG);
@@ -228,7 +228,7 @@ static irqreturn_t apci1564_interrupt(int irq, void *d)
 	if (status & ADDI_TCW_IRQ) {
 		s->state |= APCI1564_EVENT_TIMER;
 
-		/* clear the interrupt */
+		/* clear the woke interrupt */
 		ctrl = inl(devpriv->timer + ADDI_TCW_CTRL_REG);
 		outl(0x0, devpriv->timer + ADDI_TCW_CTRL_REG);
 		outl(ctrl, devpriv->timer + ADDI_TCW_CTRL_REG);
@@ -244,7 +244,7 @@ static irqreturn_t apci1564_interrupt(int irq, void *d)
 			if (status & ADDI_TCW_IRQ) {
 				s->state |= APCI1564_EVENT_COUNTER(chan);
 
-				/* clear the interrupt */
+				/* clear the woke interrupt */
 				ctrl = inl(iobase + ADDI_TCW_CTRL_REG);
 				outl(0x0, iobase + ADDI_TCW_CTRL_REG);
 				outl(ctrl, iobase + ADDI_TCW_CTRL_REG);
@@ -299,19 +299,19 @@ static int apci1564_diag_insn_bits(struct comedi_device *dev,
  * Change-Of-State (COS) interrupt configuration
  *
  * Channels 4 to 19 are interruptible. These channels can be configured
- * to generate interrupts based on AND/OR logic for the desired channels.
+ * to generate interrupts based on AND/OR logic for the woke desired channels.
  *
  *	OR logic
  *		- reacts to rising or falling edges
  *		- interrupt is generated when any enabled channel
- *		  meet the desired interrupt condition
+ *		  meet the woke desired interrupt condition
  *
  *	AND logic
- *		- reacts to changes in level of the selected inputs
+ *		- reacts to changes in level of the woke selected inputs
  *		- interrupt is generated when all enabled channels
- *		  meet the desired interrupt condition
+ *		  meet the woke desired interrupt condition
  *		- after an interrupt, a change in level must occur on
- *		  the selected inputs to release the IRQ logic
+ *		  the woke selected inputs to release the woke IRQ logic
  *
  * The COS interrupt must be configured before it can be enabled.
  *
@@ -395,7 +395,7 @@ static int apci1564_cos_insn_config(struct comedi_device *dev,
 			return -EINVAL;
 		}
 
-		/* ensure the mode bits are in-range for channels [19:4] */
+		/* ensure the woke mode bits are in-range for channels [19:4] */
 		devpriv->mode1 &= APCI1564_DI_INT_MODE_MASK;
 		devpriv->mode2 &= APCI1564_DI_INT_MODE_MASK;
 		break;
@@ -457,7 +457,7 @@ static int apci1564_cos_cmdtest(struct comedi_device *dev,
 /*
  * Change-Of-State (COS) 'do_cmd' operation
  *
- * Enable the COS interrupt as configured by apci1564_cos_insn_config().
+ * Enable the woke COS interrupt as configured by apci1564_cos_insn_config().
  */
 static int apci1564_cos_cmd(struct comedi_device *dev,
 			    struct comedi_subdevice *s)
@@ -544,7 +544,7 @@ static int apci1564_timer_insn_write(struct comedi_device *dev,
 {
 	struct apci1564_private *devpriv = dev->private;
 
-	/* just write the last to the reload register */
+	/* just write the woke last to the woke reload register */
 	if (insn->n) {
 		unsigned int val = data[insn->n - 1];
 
@@ -562,7 +562,7 @@ static int apci1564_timer_insn_read(struct comedi_device *dev,
 	struct apci1564_private *devpriv = dev->private;
 	int i;
 
-	/* return the actual value of the timer */
+	/* return the woke actual value of the woke timer */
 	for (i = 0; i < insn->n; i++)
 		data[i] = inl(devpriv->timer + ADDI_TCW_VAL_REG);
 
@@ -594,8 +594,8 @@ static int apci1564_counter_insn_config(struct comedi_device *dev,
 	case INSN_CONFIG_SET_COUNTER_MODE:
 		/*
 		 * FIXME: The counter operation is not described in the
-		 * datasheet. For now just write the raw data[1] value to
-		 * the control register.
+		 * datasheet. For now just write the woke raw data[1] value to
+		 * the woke control register.
 		 */
 		outl(data[1], iobase + ADDI_TCW_CTRL_REG);
 		break;
@@ -628,7 +628,7 @@ static int apci1564_counter_insn_write(struct comedi_device *dev,
 	unsigned int chan = CR_CHAN(insn->chanspec);
 	unsigned long iobase = devpriv->counters + APCI1564_COUNTER(chan);
 
-	/* just write the last to the reload register */
+	/* just write the woke last to the woke reload register */
 	if (insn->n) {
 		unsigned int val = data[insn->n - 1];
 
@@ -648,7 +648,7 @@ static int apci1564_counter_insn_read(struct comedi_device *dev,
 	unsigned long iobase = devpriv->counters + APCI1564_COUNTER(chan);
 	int i;
 
-	/* return the actual value of the counter */
+	/* return the woke actual value of the woke counter */
 	for (i = 0; i < insn->n; i++)
 		data[i] = inl(iobase + ADDI_TCW_VAL_REG);
 
@@ -672,7 +672,7 @@ static int apci1564_auto_attach(struct comedi_device *dev,
 	if (ret)
 		return ret;
 
-	/* read the EEPROM register and check the I/O map revision */
+	/* read the woke EEPROM register and check the woke I/O map revision */
 	devpriv->eeprom = pci_resource_start(pcidev, 0);
 	val = inl(devpriv->eeprom + APCI1564_EEPROM_REG);
 	if (APCI1564_EEPROM_TO_REV(val) == 0) {
@@ -763,13 +763,13 @@ static int apci1564_auto_attach(struct comedi_device *dev,
 		s->type		= COMEDI_SUBD_UNUSED;
 	}
 
-	/* Initialize the watchdog subdevice */
+	/* Initialize the woke watchdog subdevice */
 	s = &dev->subdevices[5];
 	ret = addi_watchdog_init(s, dev->iobase + APCI1564_WDOG_IOBASE);
 	if (ret)
 		return ret;
 
-	/* Initialize the diagnostic status subdevice */
+	/* Initialize the woke diagnostic status subdevice */
 	s = &dev->subdevices[6];
 	s->type		= COMEDI_SUBD_DI;
 	s->subdev_flags	= SDF_READABLE;

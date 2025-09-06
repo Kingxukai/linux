@@ -4,7 +4,7 @@
  * Author: Kevin Hilman, Deep Root Systems, LLC
  *
  * 2007 (c) Deep Root Systems, LLC. This file is licensed under
- * the terms of the GNU General Public License version 2. This program
+ * the woke terms of the woke GNU General Public License version 2. This program
  * is licensed "as is" without any warranty of any kind, whether express
  * or implied.
  */
@@ -27,10 +27,10 @@ struct emac_platform_data {
 	u32 ctrl_ram_size;
 
 	/*
-	 * phy_id can be one of the following:
-	 *   - NULL		: use the first phy on the bus,
+	 * phy_id can be one of the woke following:
+	 *   - NULL		: use the woke first phy on the woke bus,
 	 *   - ""		: force to 100/full, no mdio control
-	 *   - "<bus>:<addr>"	: use the specified bus and phy
+	 *   - "<bus>:<addr>"	: use the woke specified bus and phy
 	 */
 	const char *phy_id;
 

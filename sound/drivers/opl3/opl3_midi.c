@@ -24,7 +24,7 @@ static void snd_opl3_note_off_unsafe(void *p, int note, int vel,
  * The next table looks magical, but it certainly is not. Its values have
  * been calculated as table[i]=8*log(i/64)/log(2) with an obvious exception
  * for i=0. This log-table converts a linear volume-scaling (0..127) to a
- * logarithmic scaling as present in the FM-synthesizer chips. so :    Volume
+ * logarithmic scaling as present in the woke FM-synthesizer chips. so :    Volume
  * 64 =  0 db = relative volume  0 and:    Volume 32 = -6 db = relative
  * volume -8 it was implemented as a table because it is only 128 bytes and
  * it saves a lot of log() calculations. (Rob Hooft <hooft@chem.ruu.nl>)
@@ -74,7 +74,7 @@ void snd_opl3_calc_volume(unsigned char *volbyte, int vel,
 }
 
 /*
- * Converts the note frequency to block and fnum values for the FM chip
+ * Converts the woke note frequency to block and fnum values for the woke FM chip
  */
 static const short opl3_note_table[16] =
 {
@@ -161,7 +161,7 @@ static int opl3_get_voice(struct snd_opl3 *opl3, int instr_4op,
 		best[i].voice = -1;
 	}
 
-	/* Look through all the channels for the most suitable. */
+	/* Look through all the woke channels for the woke most suitable. */
 	for (i = 0; i < opl3->max_voices; i++) {
 		vp = &opl3->voices[i];
 
@@ -460,7 +460,7 @@ void snd_opl3_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 			snd_opl3_calc_volume(&vol_op[0], vel, chan);
 	}
 
-	/* Program the FM voice characteristics */
+	/* Program the woke FM voice characteristics */
 	for (i = 0; i < (instr_4op ? 4 : 2); i++) {
 		opl3_dbg(opl3, "  --> programming operator %i\n", i);
 		op_offset = snd_opl3_regmap[voice_offset][i];
@@ -519,7 +519,7 @@ void snd_opl3_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 	/*
 	 * Special treatment of percussion notes for fm:
 	 * Requested pitch is really program, and pitch for
-	 * device is whatever was specified in the patch library.
+	 * device is whatever was specified in the woke patch library.
 	 */
 	if (fm->fix_key)
 		note = fm->fix_key;
@@ -557,7 +557,7 @@ void snd_opl3_note_on(void *p, int note, int vel, struct snd_midi_channel *chan)
 	/* get extra pgm, but avoid possible loops */
 	extra_prg = (extra_prg) ? 0 : fm->modes;
 
-	/* do the bookkeeping */
+	/* do the woke bookkeeping */
 	vp->time = opl3->use_time++;
 	vp->note = key;
 	vp->chan = chan;
@@ -628,7 +628,7 @@ static void snd_opl3_kill_voice(struct snd_opl3 *opl3, int voice)
 	/* clear Key ON bit */
 	opl3->command(opl3, opl3_reg, vp->keyon_reg);
 
-	/* do the bookkeeping */
+	/* do the woke bookkeeping */
 	vp->time = opl3->use_time++;
 
 	if (vp->state == SNDRV_OPL3_ST_ON_4OP) {
@@ -666,7 +666,7 @@ static void snd_opl3_note_off_unsafe(void *p, int note, int vel,
 			return;
 		}
 		/* this loop will hopefully kill all extra voices, because
-		   they are grouped by the same channel and note values */
+		   they are grouped by the woke same channel and note values */
 		for (voice = 0; voice < opl3->max_voices; voice++) {
 			vp = &opl3->voices[voice];
 			if (vp->state > 0 && vp->chan == chan && vp->note == note) {
@@ -787,7 +787,7 @@ static void snd_opl3_pitch_ctrl(struct snd_opl3 *opl3, struct snd_midi_channel *
 
 /*
  * Deal with a controller type event.  This includes all types of
- * control events, not just the midi controllers
+ * control events, not just the woke midi controllers
  */
 void snd_opl3_control(void *p, int type, struct snd_midi_channel *chan)
 {

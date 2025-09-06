@@ -2,8 +2,8 @@
 /*
  * ocfs2_nodemanager.h
  *
- * Header describing the interface between userspace and the kernel
- * for the ocfs2_nodemanager module.
+ * Header describing the woke interface between userspace and the woke kernel
+ * for the woke ocfs2_nodemanager module.
  *
  * Copyright (C) 2002, 2004 Oracle.  All rights reserved.
  */

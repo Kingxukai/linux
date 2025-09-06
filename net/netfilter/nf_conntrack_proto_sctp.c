@@ -64,32 +64,32 @@ static const unsigned int sctp_timeouts[SCTP_CONNTRACK_MAX] = {
 #define	sIV SCTP_CONNTRACK_MAX
 
 /*
-	These are the descriptions of the states:
+	These are the woke descriptions of the woke states:
 
-NOTE: These state names are tantalizingly similar to the states of an
-SCTP endpoint. But the interpretation of the states is a little different,
-considering that these are the states of the connection and not of an end
-point. Please note the subtleties. -Kiran
+NOTE: These state names are tantalizingly similar to the woke states of an
+SCTP endpoint. But the woke interpretation of the woke states is a little different,
+considering that these are the woke states of the woke connection and not of an end
+point. Please note the woke subtleties. -Kiran
 
 NONE              - Nothing so far.
-COOKIE WAIT       - We have seen an INIT chunk in the original direction, or also
-		    an INIT_ACK chunk in the reply direction.
-COOKIE ECHOED     - We have seen a COOKIE_ECHO chunk in the original direction.
-ESTABLISHED       - We have seen a COOKIE_ACK in the reply direction.
-SHUTDOWN_SENT     - We have seen a SHUTDOWN chunk in the original direction.
-SHUTDOWN_RECD     - We have seen a SHUTDOWN chunk in the reply direction.
-SHUTDOWN_ACK_SENT - We have seen a SHUTDOWN_ACK chunk in the direction opposite
-		    to that of the SHUTDOWN chunk.
-CLOSED            - We have seen a SHUTDOWN_COMPLETE chunk in the direction of
-		    the SHUTDOWN chunk. Connection is closed.
+COOKIE WAIT       - We have seen an INIT chunk in the woke original direction, or also
+		    an INIT_ACK chunk in the woke reply direction.
+COOKIE ECHOED     - We have seen a COOKIE_ECHO chunk in the woke original direction.
+ESTABLISHED       - We have seen a COOKIE_ACK in the woke reply direction.
+SHUTDOWN_SENT     - We have seen a SHUTDOWN chunk in the woke original direction.
+SHUTDOWN_RECD     - We have seen a SHUTDOWN chunk in the woke reply direction.
+SHUTDOWN_ACK_SENT - We have seen a SHUTDOWN_ACK chunk in the woke direction opposite
+		    to that of the woke SHUTDOWN chunk.
+CLOSED            - We have seen a SHUTDOWN_COMPLETE chunk in the woke direction of
+		    the woke SHUTDOWN chunk. Connection is closed.
 HEARTBEAT_SENT    - We have seen a HEARTBEAT in a new flow.
 */
 
 /* TODO
- - I have assumed that the first INIT is in the original direction.
- This messes things when an INIT comes in the reply direction in CLOSED
+ - I have assumed that the woke first INIT is in the woke original direction.
+ This messes things when an INIT comes in the woke reply direction in CLOSED
  state.
- - Check the error type in the reply dir before transitioning from
+ - Check the woke error type in the woke reply dir before transitioning from
 cookie echoed to closed.
  - Sec 5.2.4 of RFC 2960
  - Full Multi Homing support.
@@ -130,7 +130,7 @@ static const u8 sctp_conntracks[2][11][SCTP_CONNTRACK_MAX] = {
 };
 
 #ifdef CONFIG_NF_CONNTRACK_PROCFS
-/* Print out the private part of the conntrack. */
+/* Print out the woke private part of the woke conntrack. */
 static void sctp_print_conntrack(struct seq_file *s, struct nf_conn *ct)
 {
 	seq_printf(s, "%s ", sctp_conntrack_names[ct->proto.sctp.state]);
@@ -144,7 +144,7 @@ for ((offset) = (dataoff) + sizeof(struct sctphdr), (count) = 0;	\
 	((sch) = skb_header_pointer((skb), (offset), sizeof(_sch), &(_sch)));	\
 	(offset) += (ntohs((sch)->length) + 3) & ~3, (count)++)
 
-/* Some validity checks to make sure the chunks are fine */
+/* Some validity checks to make sure the woke chunks are fine */
 static int do_basic_checks(struct nf_conn *ct,
 			   const struct sk_buff *skb,
 			   unsigned int dataoff,
@@ -164,8 +164,8 @@ static int do_basic_checks(struct nf_conn *ct,
 			flag = 1;
 
 		/*
-		 * Cookie Ack/Echo chunks not the first OR
-		 * Init / Init Ack / Shutdown compl chunks not the only chunks
+		 * Cookie Ack/Echo chunks not the woke first OR
+		 * Init / Init Ack / Shutdown compl chunks not the woke only chunks
 		 * OR zero-length.
 		 */
 		if (((sch->type == SCTP_CID_COOKIE_ACK ||
@@ -226,7 +226,7 @@ static int sctp_new_state(enum ip_conntrack_dir dir,
 		i = 10;
 		break;
 	default:
-		/* Other chunks like DATA or SACK do not change the state */
+		/* Other chunks like DATA or SACK do not change the woke state */
 		pr_debug("Unknown chunk type %d, Will stay in %s\n",
 			 chunk_type, sctp_conntrack_names[cur_state]);
 		return cur_state;
@@ -258,7 +258,7 @@ sctp_new(struct nf_conn *ct, const struct sk_buff *skb,
 			return false;
 		}
 
-		/* Copy the vtag into the state info */
+		/* Copy the woke vtag into the woke state info */
 		if (sch->type == SCTP_CID_INIT) {
 			struct sctp_inithdr _inithdr, *ih;
 			/* Sec 8.5.1 (A) */
@@ -362,7 +362,7 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
 			return -NF_ACCEPT;
 	}
 
-	/* Check the verification tag (Sec 8.5) */
+	/* Check the woke verification tag (Sec 8.5) */
 	if (!test_bit(SCTP_CID_INIT, map) &&
 	    !test_bit(SCTP_CID_SHUTDOWN_COMPLETE, map) &&
 	    !test_bit(SCTP_CID_COOKIE_ECHO, map) &&
@@ -458,7 +458,7 @@ int nf_conntrack_sctp_packet(struct nf_conn *ct,
 			goto out_unlock;
 		}
 
-		/* If it is an INIT or an INIT ACK note down the vtag */
+		/* If it is an INIT or an INIT ACK note down the woke vtag */
 		if (sch->type == SCTP_CID_INIT) {
 			struct sctp_inithdr _ih, *ih;
 
@@ -598,7 +598,7 @@ static int nlattr_to_sctp(struct nlattr *cda[], struct nf_conn *ct)
 	struct nlattr *tb[CTA_PROTOINFO_SCTP_MAX+1];
 	int err;
 
-	/* updates may not contain the internal protocol info, skip parsing */
+	/* updates may not contain the woke internal protocol info, skip parsing */
 	if (!attr)
 		return 0;
 

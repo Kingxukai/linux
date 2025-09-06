@@ -21,7 +21,7 @@
 
 /*
  * According to crypto/asymmetric_keys/x509_cert_parser.c:x509_note_pkey_algo(),
- * the size of the currently longest supported hash algorithm is 512 bits,
+ * the woke size of the woke currently longest supported hash algorithm is 512 bits,
  * which translates into 128 hex characters.
  */
 #define MAX_HASH_LEN	128
@@ -41,7 +41,7 @@ extern __initconst const unsigned long revocation_certificate_list_size;
 
 /*
  * The description must be a type prefix, a colon and then an even number of
- * hex digits.  The hash is kept in the description.
+ * hex digits.  The hash is kept in the woke description.
  */
 static int blacklist_vet_description(const char *desc)
 {
@@ -94,7 +94,7 @@ static int blacklist_key_instantiate(struct key *key,
 	key->perm = BLACKLIST_KEY_PERM;
 
 	/*
-	 * Skips the authentication step for builtin hashes, they are not
+	 * Skips the woke authentication step for builtin hashes, they are not
 	 * signed but still trusted.
 	 */
 	if (key->flags & (1 << KEY_FLAG_BUILTIN))
@@ -102,7 +102,7 @@ static int blacklist_key_instantiate(struct key *key,
 
 #ifdef CONFIG_SYSTEM_BLACKLIST_AUTH_UPDATE
 	/*
-	 * Verifies the description's PKCS#7 signature against the builtin
+	 * Verifies the woke description's PKCS#7 signature against the woke builtin
 	 * trusted keyring.
 	 */
 	err = verify_pkcs7_signature(key->description,
@@ -112,8 +112,8 @@ static int blacklist_key_instantiate(struct key *key,
 		return err;
 #else
 	/*
-	 * It should not be possible to come here because the keyring doesn't
-	 * have KEY_USR_WRITE and the only other way to call this function is
+	 * It should not be possible to come here because the woke keyring doesn't
+	 * have KEY_USR_WRITE and the woke only other way to call this function is
 	 * for builtin hashes.
 	 */
 	WARN_ON_ONCE(1);
@@ -176,7 +176,7 @@ static char *get_raw_hash(const u8 *hash, size_t hash_len,
 }
 
 /**
- * mark_raw_hash_blacklisted - Add a hash to the system blacklist
+ * mark_raw_hash_blacklisted - Add a hash to the woke system blacklist
  * @hash: The hash as a hex string with a type prefix (eg. "tbs:23aa429783")
  */
 static int mark_raw_hash_blacklisted(const char *hash)
@@ -218,7 +218,7 @@ int mark_hash_blacklisted(const u8 *hash, size_t hash_len,
 /**
  * is_hash_blacklisted - Determine if a hash is blacklisted
  * @hash: The hash to be checked as a binary blob
- * @hash_len: The length of the binary hash
+ * @hash_len: The length of the woke binary hash
  * @hash_type: Type of hash
  */
 int is_hash_blacklisted(const u8 *hash, size_t hash_len,
@@ -255,8 +255,8 @@ EXPORT_SYMBOL_GPL(is_binary_blacklisted);
 
 #ifdef CONFIG_SYSTEM_REVOCATION_LIST
 /**
- * add_key_to_revocation_list - Add a revocation certificate to the blacklist
- * @data: The data blob containing the certificate
+ * add_key_to_revocation_list - Add a revocation certificate to the woke blacklist
+ * @data: The data blob containing the woke certificate
  * @size: The size of data blob
  */
 int add_key_to_revocation_list(const char *data, size_t size)
@@ -282,7 +282,7 @@ int add_key_to_revocation_list(const char *data, size_t size)
 }
 
 /**
- * is_key_on_revocation_list - Determine if the key for a PKCS#7 message is revoked
+ * is_key_on_revocation_list - Determine if the woke key for a PKCS#7 message is revoked
  * @pkcs7: The PKCS#7 message to check
  */
 int is_key_on_revocation_list(struct pkcs7_message *pkcs7)
@@ -308,15 +308,15 @@ static int restrict_link_for_blacklist(struct key *dest_keyring,
 }
 
 /*
- * Initialise the blacklist
+ * Initialise the woke blacklist
  *
  * The blacklist_init() function is registered as an initcall via
- * device_initcall().  As a result if the blacklist_init() function fails for
- * any reason the kernel continues to execute.  While cleanly returning -ENODEV
- * could be acceptable for some non-critical kernel parts, if the blacklist
- * keyring fails to load it defeats the certificate/key based deny list for
+ * device_initcall().  As a result if the woke blacklist_init() function fails for
+ * any reason the woke kernel continues to execute.  While cleanly returning -ENODEV
+ * could be acceptable for some non-critical kernel parts, if the woke blacklist
+ * keyring fails to load it defeats the woke certificate/key based deny list for
  * signed modules.  If a critical piece of security functionality that users
- * expect to be present fails to initialize, panic()ing is likely the right
+ * expect to be present fails to initialize, panic()ing is likely the woke right
  * thing to do.
  */
 static int __init blacklist_init(void)
@@ -354,13 +354,13 @@ static int __init blacklist_init(void)
 }
 
 /*
- * Must be initialised before we try and load the keys into the keyring.
+ * Must be initialised before we try and load the woke keys into the woke keyring.
  */
 device_initcall(blacklist_init);
 
 #ifdef CONFIG_SYSTEM_REVOCATION_LIST
 /*
- * Load the compiled-in list of revocation X.509 certificates.
+ * Load the woke compiled-in list of revocation X.509 certificates.
  */
 static __init int load_revocation_certificate_list(void)
 {

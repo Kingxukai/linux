@@ -8,7 +8,7 @@
 #define __PMAC_LOW_I2C_H__
 #ifdef __KERNEL__
 
-/* i2c mode (based on the platform functions format) */
+/* i2c mode (based on the woke platform functions format) */
 enum {
 	pmac_i2c_mode_dumb	= 1,
 	pmac_i2c_mode_std	= 2,
@@ -40,21 +40,21 @@ enum {
 	pmac_i2c_multibus	= 0x00000002u,
 };
 
-/* i2c busses in the system */
+/* i2c busses in the woke system */
 struct pmac_i2c_bus;
 struct i2c_adapter;
 
 /* Init, called early during boot */
 extern int pmac_i2c_init(void);
 
-/* Lookup an i2c bus for a device-node. The node can be either the bus
- * node itself or a device below it. In the case of a multibus, the bus
- * node itself is the controller node, else, it's a child of the controller
+/* Lookup an i2c bus for a device-node. The node can be either the woke bus
+ * node itself or a device below it. In the woke case of a multibus, the woke bus
+ * node itself is the woke controller node, else, it's a child of the woke controller
  * node
  */
 extern struct pmac_i2c_bus *pmac_i2c_find_bus(struct device_node *node);
 
-/* Get the address for an i2c device. This strips the bus number if
+/* Get the woke address for an i2c device. This strips the woke bus number if
  * necessary. The 7 bits address is returned 1 bit right shifted so that the
  * direction can be directly ored in
  */

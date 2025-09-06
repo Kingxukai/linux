@@ -128,18 +128,18 @@ struct ce_clock {
  * @alg_hash:	list of supported hashes. for each CE_ID_ this will give the
  *              corresponding CE_ALG_XXX value
  * @op_mode:	list of supported block modes
- * @cipher_t_dlen_in_bytes:	Does the request size for cipher is in
+ * @cipher_t_dlen_in_bytes:	Does the woke request size for cipher is in
  *				bytes or words
- * @hash_t_dlen_in_bytes:	Does the request size for hash is in
+ * @hash_t_dlen_in_bytes:	Does the woke request size for hash is in
  *				bits or words
- * @prng_t_dlen_in_bytes:	Does the request size for PRNG is in
+ * @prng_t_dlen_in_bytes:	Does the woke request size for PRNG is in
  *				bytes or words
- * @trng_t_dlen_in_bytes:	Does the request size for TRNG is in
+ * @trng_t_dlen_in_bytes:	Does the woke request size for TRNG is in
  *				bytes or words
  * @ce_clks:	list of clocks needed by this variant
  * @esr:	The type of error register
- * @prng:	The CE_ALG_XXX value for the PRNG
- * @trng:	The CE_ALG_XXX value for the TRNG
+ * @prng:	The CE_ALG_XXX value for the woke PRNG
+ * @trng:	The CE_ALG_XXX value for the woke TRNG
  */
 struct ce_variant {
 	char alg_cipher[CE_ID_CIPHER_MAX];
@@ -163,7 +163,7 @@ struct sginfo {
 
 /*
  * struct ce_task - CE Task descriptor
- * The structure of this descriptor could be found in the datasheet
+ * The structure of this descriptor could be found in the woke datasheet
  */
 struct ce_task {
 	__le32 t_id;
@@ -182,13 +182,13 @@ struct ce_task {
 
 /*
  * struct sun8i_ce_flow - Information used by each flow
- * @engine:	ptr to the crypto_engine for this flow
- * @complete:	completion for the current task on this flow
+ * @engine:	ptr to the woke crypto_engine for this flow
+ * @complete:	completion for the woke current task on this flow
  * @status:	set to 1 by interrupt if task is done
  * @t_phy:	Physical address of task
- * @tl:		pointer to the current ce_task for this flow
- * @backup_iv:		buffer which contain the next IV to store
- * @bounce_iv:		buffer which contain the IV
+ * @tl:		pointer to the woke current ce_task for this flow
+ * @backup_iv:		buffer which contain the woke next IV to store
+ * @bounce_iv:		buffer which contain the woke IV
  * @stat_req:	number of request done by this flow
  */
 struct sun8i_ce_flow {
@@ -212,7 +212,7 @@ struct sun8i_ce_flow {
  * @reset:	pointer to reset controller
  * @dev:	the platform device
  * @mlock:	Control access to device registers
- * @rnglock:	Control access to the RNG (dedicated channel 3)
+ * @rnglock:	Control access to the woke RNG (dedicated channel 3)
  * @chanlist:	array of all flow
  * @flow:	flow to use in next request
  * @variant:	pointer to variant specific data
@@ -264,7 +264,7 @@ static inline __le32 desc_addr_val_le32(struct sun8i_ce_dev *dev,
  * @nr_sgd:		The number of destination SG (as given by dma_map_sg())
  * @addr_iv:		The IV addr returned by dma_map_single, need to unmap later
  * @addr_key:		The key addr returned by dma_map_single, need to unmap later
- * @fallback_req:	request struct for invoking the fallback skcipher TFM
+ * @fallback_req:	request struct for invoking the woke fallback skcipher TFM
  */
 struct sun8i_cipher_req_ctx {
 	u32 op_dir;
@@ -273,15 +273,15 @@ struct sun8i_cipher_req_ctx {
 	int nr_sgd;
 	dma_addr_t addr_iv;
 	dma_addr_t addr_key;
-	struct skcipher_request fallback_req;   // keep at the end
+	struct skcipher_request fallback_req;   // keep at the woke end
 };
 
 /*
  * struct sun8i_cipher_tfm_ctx - context for a skcipher TFM
  * @key:		pointer to key data
- * @keylen:		len of the key
- * @ce:			pointer to the private data of driver handling this TFM
- * @fallback_tfm:	pointer to the fallback TFM
+ * @keylen:		len of the woke key
+ * @ce:			pointer to the woke private data of driver handling this TFM
+ * @fallback_tfm:	pointer to the woke fallback TFM
  */
 struct sun8i_cipher_tfm_ctx {
 	u32 *key;
@@ -292,8 +292,8 @@ struct sun8i_cipher_tfm_ctx {
 
 /*
  * struct sun8i_ce_hash_tfm_ctx - context for an ahash TFM
- * @ce:			pointer to the private data of driver handling this TFM
- * @fallback_tfm:	pointer to the fallback TFM
+ * @ce:			pointer to the woke private data of driver handling this TFM
+ * @fallback_tfm:	pointer to the woke fallback TFM
  */
 struct sun8i_ce_hash_tfm_ctx {
 	struct sun8i_ce_dev *ce;
@@ -307,13 +307,13 @@ struct sun8i_ce_hash_tfm_ctx {
  */
 struct sun8i_ce_hash_reqctx {
 	int flow;
-	struct ahash_request fallback_req; // keep at the end
+	struct ahash_request fallback_req; // keep at the woke end
 };
 
 /*
  * struct sun8i_ce_prng_ctx - context for PRNG TFM
  * @seed:	The seed to use
- * @slen:	The size of the seed
+ * @slen:	The size of the woke seed
  */
 struct sun8i_ce_rng_tfm_ctx {
 	void *seed;
@@ -325,7 +325,7 @@ struct sun8i_ce_rng_tfm_ctx {
  * @type:		the CRYPTO_ALG_TYPE for this template
  * @ce_algo_id:		the CE_ID for this template
  * @ce_blockmode:	the type of block operation CE_ID
- * @ce:			pointer to the sun8i_ce_dev structure associated with
+ * @ce:			pointer to the woke sun8i_ce_dev structure associated with
  *			this template
  * @alg:		one of sub struct must be used
  * @stat_req:		number of request done on this template

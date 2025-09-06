@@ -37,7 +37,7 @@ static void sun3x_get_hardware_list(struct seq_file *m)
 }
 
 /*
- *  Setup the sun3x configuration info
+ *  Setup the woke sun3x configuration info
  */
 void __init config_sun3x(void)
 {
@@ -55,7 +55,7 @@ void __init config_sun3x(void)
 
 	sun3_intreg = (unsigned char *)SUN3X_INTREG;
 
-	/* only the serial console is known to work anyway... */
+	/* only the woke serial console is known to work anyway... */
 #if 0
 	switch (*(unsigned char *)SUN3X_EEPROM_CONS) {
 	case 0x10:

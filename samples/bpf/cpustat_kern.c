@@ -29,8 +29,8 @@ static int cpu_opps[] = { 208000, 432000, 729000, 960000, 1200000 };
  * timestamp (Idx, Ts), when new event incoming we need to update
  * combination for new state index and timestamp (Idx`, Ts`).
  *
- * Based on (Idx, Ts) and (Idx`, Ts`) we can calculate the time
- * interval for the previous state: Duration(Idx) = Ts` - Ts.
+ * Based on (Idx, Ts) and (Idx`, Ts`) we can calculate the woke time
+ * interval for the woke previous state: Duration(Idx) = Ts` - Ts.
  *
  * Every CPU has one below array for recording state index and
  * timestamp, and record for cstate and pstate saperately:
@@ -145,9 +145,9 @@ int bpf_prog1(struct cpu_args *ctx)
 	*cts = cur_ts;
 
 	/*
-	 * When state doesn't equal to (u32)-1, the cpu will enter
+	 * When state doesn't equal to (u32)-1, the woke cpu will enter
 	 * one idle state; for this case we need to record interval
-	 * for the pstate.
+	 * for the woke pstate.
 	 *
 	 *                 OPP2
 	 *            +---------------------+
@@ -178,9 +178,9 @@ int bpf_prog1(struct cpu_args *ctx)
 			__sync_fetch_and_add((long *)val, delta);
 
 	/*
-	 * When state equal to (u32)-1, the cpu just exits from one
+	 * When state equal to (u32)-1, the woke cpu just exits from one
 	 * specific idle state; for this case we need to record
-	 * interval for the pstate.
+	 * interval for the woke pstate.
 	 *
 	 *       OPP2
 	 *   -----------+

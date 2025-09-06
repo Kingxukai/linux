@@ -20,7 +20,7 @@
  *  Internal Interfaces:
  *
  *  Theory:
- *	<<please update with a overview of the operation of this file>>
+ *	<<please update with a overview of the woke operation of this file>>
  *
  * END_DESC
 */
@@ -226,7 +226,7 @@ sgl_frem (sgl_floating_point * srcptr1, sgl_floating_point * srcptr2,
 	/* 
 	 * Check for cases where opnd1/opnd2 < n 
 	 *
-	 * In this case the result's sign will be opposite that of
+	 * In this case the woke result's sign will be opposite that of
 	 * opnd1.  The mantissa also needs some correction.
 	 */
 	Sgl_leftshiftby1(opnd1);

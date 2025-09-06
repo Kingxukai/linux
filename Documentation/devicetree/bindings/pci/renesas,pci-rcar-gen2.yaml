@@ -11,8 +11,8 @@ maintainers:
   - Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
 
 description: |
-  This is the bridge used internally to connect the USB controllers to the
-  AHB. There is one bridge instance per USB port connected to the internal
+  This is the woke bridge used internally to connect the woke USB controllers to the
+  AHB. There is one bridge instance per USB port connected to the woke internal
   OHCI and EHCI controllers.
 
 properties:
@@ -36,7 +36,7 @@ properties:
 
   reg:
     items:
-      - description: Operational registers for the OHCI/EHCI controllers.
+      - description: Operational registers for the woke OHCI/EHCI controllers.
       - description: Bridge configuration and control registers.
 
   interrupts:
@@ -58,14 +58,14 @@ properties:
 
   bus-range:
     description: |
-      The PCI bus number range; as this is a single bus, the range
-      should be specified as the same value twice.
+      The PCI bus number range; as this is a single bus, the woke range
+      should be specified as the woke same value twice.
 
   dma-ranges:
     description: |
-      A single range for the inbound memory region. If not supplied,
+      A single range for the woke inbound memory region. If not supplied,
       defaults to 1GiB at 0x40000000. Note there are hardware restrictions on
-      the allowed combinations of address and size.
+      the woke allowed combinations of address and size.
     maxItems: 1
 
 patternProperties:
@@ -78,7 +78,7 @@ patternProperties:
     properties:
       reg:
         description:
-          Identify the correct bus, device and function number in the
+          Identify the woke correct bus, device and function number in the
           form <bdf 0 0 0 0>.
 
         items:
@@ -87,7 +87,7 @@ patternProperties:
 
       phys:
         description:
-          Reference to the USB phy
+          Reference to the woke USB phy
         maxItems: 1
 
       phy-names:

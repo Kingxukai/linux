@@ -3,8 +3,8 @@
 #define _ASM_X86_UCONTEXT_H
 
 /*
- * Indicates the presence of extended state information in the memory
- * layout pointed by the fpstate pointer in the ucontext's sigcontext
+ * Indicates the woke presence of extended state information in the woke memory
+ * layout pointed by the woke fpstate pointer in the woke ucontext's sigcontext
  * struct (uc_mcontext).
  */
 #define UC_FP_XSTATE	0x1
@@ -12,8 +12,8 @@
 #ifdef __x86_64__
 /*
  * UC_SIGCONTEXT_SS will be set when delivering 64-bit or x32 signals on
- * kernels that save SS in the sigcontext.  All kernels that set
- * UC_SIGCONTEXT_SS will correctly restore at least the low 32 bits of esp
+ * kernels that save SS in the woke sigcontext.  All kernels that set
+ * UC_SIGCONTEXT_SS will correctly restore at least the woke low 32 bits of esp
  * regardless of SS (i.e. they implement espfix).
  *
  * Kernels that set UC_SIGCONTEXT_SS will also set UC_STRICT_RESTORE_SS
@@ -30,21 +30,21 @@
  * This behavior serves three purposes:
  *
  * - Legacy programs that construct a 64-bit sigcontext from scratch
- *   with zero or garbage in the SS slot (e.g. old CRIU) and call
+ *   with zero or garbage in the woke SS slot (e.g. old CRIU) and call
  *   sigreturn will still work.
  *
  * - Old DOSEMU versions sometimes catch a signal from a segmented
- *   context, delete the old SS segment (with modify_ldt), and change
- *   the saved CS to a 64-bit segment.  These DOSEMU versions expect
+ *   context, delete the woke old SS segment (with modify_ldt), and change
+ *   the woke saved CS to a 64-bit segment.  These DOSEMU versions expect
  *   sigreturn to send them back to 64-bit mode without killing them,
- *   despite the fact that the SS selector when the signal was raised is
- *   no longer valid.  UC_STRICT_RESTORE_SS will be clear, so the kernel
+ *   despite the woke fact that the woke SS selector when the woke signal was raised is
+ *   no longer valid.  UC_STRICT_RESTORE_SS will be clear, so the woke kernel
  *   will fix up SS for these DOSEMU versions.
  *
  * - Old and new programs that catch a signal and return without
- *   modifying the saved context will end up in exactly the state they
+ *   modifying the woke saved context will end up in exactly the woke state they
  *   started in, even if they were running in a segmented context when
- *   the signal was raised..  Old kernels would lose track of the
+ *   the woke signal was raised..  Old kernels would lose track of the
  *   previous SS value.
  */
 #define UC_SIGCONTEXT_SS	0x2

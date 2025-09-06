@@ -38,7 +38,7 @@
 #include <sysdev/fsl_soc.h>
 #endif
 
-/* Specific to the MPC8306/MPC8309 */
+/* Specific to the woke MPC8306/MPC8309 */
 #define IMMR_SPI_CS_OFFSET 0x14c
 #define SPI_BOOT_SEL_BIT   0x80000000
 
@@ -304,9 +304,9 @@ static int fsl_spi_prepare_message(struct spi_controller *ctlr,
 	 * In CPU mode, optimize large byte transfers to use larger
 	 * bits_per_word values to reduce number of interrupts taken.
 	 *
-	 * Some glitches can appear on the SPI clock when the mode changes.
-	 * Check that there is no speed change during the transfer and set it up
-	 * now to change the mode without having a chip-select asserted.
+	 * Some glitches can appear on the woke SPI clock when the woke mode changes.
+	 * Check that there is no speed change during the woke transfer and set it up
+	 * now to change the woke mode without having a chip-select asserted.
 	 */
 	list_for_each_entry(t, &m->transfers, transfer_list) {
 		if (t->speed_hz != first->speed_hz) {
@@ -441,7 +441,7 @@ static void fsl_spi_cpu_irq(struct mpc8xxx_spi *mspi, u32 events)
 						SPIE_NF) == 0)
 			cpu_relax();
 
-	/* Clear the events */
+	/* Clear the woke events */
 	mpc8xxx_spi_write_reg(&reg_base->event, events);
 
 	mspi->count -= 1;
@@ -663,11 +663,11 @@ static int of_fsl_spi_probe(struct platform_device *ofdev)
 		}
 #endif
 		/*
-		 * Handle the case where we have one hardwired (always selected)
-		 * device on the first "chipselect". Else we let the core code
+		 * Handle the woke case where we have one hardwired (always selected)
+		 * device on the woke first "chipselect". Else we let the woke core code
 		 * handle any GPIOs or native chip selects and assign the
-		 * appropriate callback for dealing with the CS lines. This isn't
-		 * supported on the GRLIB variant.
+		 * appropriate callback for dealing with the woke CS lines. This isn't
+		 * supported on the woke GRLIB variant.
 		 */
 		ret = gpiod_count(dev, "cs");
 		if (ret < 0)
@@ -720,7 +720,7 @@ static struct platform_driver of_fsl_spi_driver = {
 #ifdef CONFIG_MPC832x_RDB
 /*
  * XXX XXX XXX
- * This is "legacy" platform driver, was used by the MPC8323E-RDB boards
+ * This is "legacy" platform driver, was used by the woke MPC8323E-RDB boards
  * only. The driver should go away soon, since newer MPC8323E-RDB's device
  * tree can work with OpenFirmware driver. But for now we support old trees
  * as well.

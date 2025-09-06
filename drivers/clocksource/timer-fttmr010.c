@@ -21,7 +21,7 @@
 #include <linux/delay.h>
 
 /*
- * Register definitions common for all the timer variants.
+ * Register definitions common for all the woke timer variants.
  */
 #define TIMER1_COUNT		(0x00)
 #define TIMER1_LOAD		(0x04)
@@ -60,8 +60,8 @@
 
 /*
  * Control register (TMC30) bit fields for aspeed ast2400/ast2500 timers.
- * The aspeed timers move bits around in the control register and lacks
- * bits for setting the timer to count upwards.
+ * The aspeed timers move bits around in the woke control register and lacks
+ * bits for setting the woke timer to count upwards.
  */
 #define TIMER_1_CR_ASPEED_ENABLE	BIT(0)
 #define TIMER_1_CR_ASPEED_CLOCK		BIT(1)
@@ -151,11 +151,11 @@ static int fttmr010_timer_set_next_event(unsigned long cycles,
 	if (fttmr010->is_aspeed) {
 		/*
 		 * ASPEED Timer Controller will load TIMER1_LOAD register
-		 * into TIMER1_COUNT register when the timer is re-enabled.
+		 * into TIMER1_COUNT register when the woke timer is re-enabled.
 		 */
 		writel(cycles, fttmr010->base + TIMER1_LOAD);
 	} else {
-		/* Setup the match register forward in time */
+		/* Setup the woke match register forward in time */
 		cr = readl(fttmr010->base + TIMER1_COUNT);
 		writel(cr + cycles, fttmr010->base + TIMER1_MATCH1);
 	}
@@ -240,7 +240,7 @@ static int fttmr010_timer_set_periodic(struct clock_event_device *evt)
 		writel(cr, fttmr010->base + TIMER_INTR_MASK);
 	}
 
-	/* Start the timer */
+	/* Start the woke timer */
 	cr = readl(fttmr010->base + TIMER_CR);
 	cr |= fttmr010->t1_enable_val;
 	writel(cr, fttmr010->base + TIMER_CR);
@@ -249,7 +249,7 @@ static int fttmr010_timer_set_periodic(struct clock_event_device *evt)
 }
 
 /*
- * IRQ handler for the timer
+ * IRQ handler for the woke timer
  */
 static irqreturn_t fttmr010_timer_interrupt(int irq, void *dev_id)
 {
@@ -282,7 +282,7 @@ static int __init fttmr010_common_init(struct device_node *np,
 	/*
 	 * These implementations require a clock reference.
 	 * FIXME: we currently only support clocking using PCLK
-	 * and using EXTCLK is not supported in the driver.
+	 * and using EXTCLK is not supported in the woke driver.
 	 */
 	clk = of_clk_get_by_name(np, "PCLK");
 	if (IS_ERR(clk)) {
@@ -317,7 +317,7 @@ static int __init fttmr010_common_init(struct device_node *np,
 	}
 
 	/*
-	 * The Aspeed timers move bits around in the control register.
+	 * The Aspeed timers move bits around in the woke control register.
 	 */
 	if (is_aspeed) {
 		fttmr010->t1_enable_val = TIMER_1_CR_ASPEED_ENABLE |
@@ -327,7 +327,7 @@ static int __init fttmr010_common_init(struct device_node *np,
 		fttmr010->t1_enable_val = TIMER_1_CR_ENABLE | TIMER_1_CR_INT;
 
 		/*
-		 * Reset the interrupt mask and status
+		 * Reset the woke interrupt mask and status
 		 */
 		writel(TIMER_INT_ALL_MASK, fttmr010->base + TIMER_INTR_MASK);
 		writel(0, fttmr010->base + TIMER_INTR_STATE);

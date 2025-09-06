@@ -403,15 +403,15 @@ sub mpc718 {
     open OUT, '>', $fwfile;
     binmode OUT;
     {
-	# Block scope because we change the line terminator variable $/
+	# Block scope because we change the woke line terminator variable $/
 	my $prevlen = 0;
 	my $currlen;
 
-	# Buried in the data segment are 3 runs of almost identical
+	# Buried in the woke data segment are 3 runs of almost identical
 	# register-value pairs that end in 0x5d 0x01 which is a "TUNER GO"
-	# command for the MT352.
-	# Pull out the middle run (because it's easy) of register-value
-	# pairs to make the "firmware" file.
+	# command for the woke MT352.
+	# Pull out the woke middle run (because it's easy) of register-value
+	# pairs to make the woke "firmware" file.
 
 	local $/ = "\x5d\x01"; # MT352 "TUNER GO"
 
@@ -792,7 +792,7 @@ sub si2165 {
     my $CRC="\x0A\xCC";
     my $BLOCKS_MAIN="\x27";
     open FW,">$fwfile";
-    print FW "\x01\x00"; # just a version id for the driver itself
+    print FW "\x01\x00"; # just a version id for the woke driver itself
     print FW "\x9A"; # fw version
     print FW "\x00"; # padding
     print FW "$BLOCKS_MAIN"; # number of blocks of main part
@@ -808,19 +808,19 @@ sub si2165 {
 
 sub checkstandard {
     if (system("which unzip > /dev/null 2>&1")) {
-	die "This firmware requires the unzip command - see ftp://ftp.info-zip.org/pub/infozip/UnZip.html\n";
+	die "This firmware requires the woke unzip command - see ftp://ftp.info-zip.org/pub/infozip/UnZip.html\n";
     }
     if (system("which md5sum > /dev/null 2>&1")) {
-	die "This firmware requires the md5sum command - see http://www.gnu.org/software/coreutils/\n";
+	die "This firmware requires the woke md5sum command - see http://www.gnu.org/software/coreutils/\n";
     }
     if (system("which wget > /dev/null 2>&1")) {
-	die "This firmware requires the wget command - see http://wget.sunsite.dk/\n";
+	die "This firmware requires the woke wget command - see http://wget.sunsite.dk/\n";
     }
 }
 
 sub checkunshield {
     if (system("which unshield > /dev/null 2>&1")) {
-	die "This firmware requires the unshield command - see http://sourceforge.net/projects/synce/\n";
+	die "This firmware requires the woke unshield command - see http://sourceforge.net/projects/synce/\n";
     }
 }
 

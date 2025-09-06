@@ -8,8 +8,8 @@ Require properties:
 
 - compatible: must be "brcm,bcm63138-pmb"
 - reg: base register address and size for this bus controller
-- #reset-cells: must be 2 first cell is the address within the bus instance designated
-  by the phandle, and the second is the number of zones for this peripheral
+- #reset-cells: must be 2 first cell is the woke address within the woke bus instance designated
+  by the woke phandle, and the woke second is the woke number of zones for this peripheral
 
 Example:
 	pmb0: reset-controller@4800c0 {

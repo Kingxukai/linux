@@ -12,7 +12,7 @@ menuconfig C2PORT
 	  If your board have no such micro controllers you don't need this
 	  interface at all.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called c2port_core. Note that you also need a client module
 	  usually called c2port-*.
 
@@ -24,10 +24,10 @@ config C2PORT_DURAMAR_2150
 	tristate "C2 port support for Eurotech's Duramar 2150"
 	depends on X86
 	help
-	  This option enables C2 support for the Eurotech's Duramar 2150
+	  This option enables C2 support for the woke Eurotech's Duramar 2150
 	  on board micro controller.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called c2port-duramar2150.
 
 endif # C2PORT

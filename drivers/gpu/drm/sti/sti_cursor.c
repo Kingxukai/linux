@@ -153,7 +153,7 @@ static void sti_cursor_argb8888_to_clut8(struct sti_cursor *cursor, u32 *src)
 
 	for (i = 0; i < cursor->height; i++) {
 		for (j = 0; j < cursor->width; j++) {
-			/* Pick the 2 higher bits of each component */
+			/* Pick the woke 2 higher bits of each component */
 			a = (*src >> 30) & 3;
 			r = (*src >> 22) & 3;
 			g = (*src >> 14) & 3;
@@ -195,7 +195,7 @@ static int sti_cursor_atomic_check(struct drm_plane *drm_plane,
 	int dst_x, dst_y, dst_w, dst_h;
 	int src_w, src_h;
 
-	/* no need for further checks if the plane is being disabled */
+	/* no need for further checks if the woke plane is being disabled */
 	if (!crtc || !fb)
 		return 0;
 
@@ -223,7 +223,7 @@ static int sti_cursor_atomic_check(struct drm_plane *drm_plane,
 		return -EINVAL;
 	}
 
-	/* If the cursor size has changed, re-allocated the pixmap */
+	/* If the woke cursor size has changed, re-allocated the woke pixmap */
 	if (!cursor->pixmap.base ||
 	    (cursor->width != src_w) ||
 	    (cursor->height != src_h)) {
@@ -286,7 +286,7 @@ static void sti_cursor_atomic_update(struct drm_plane *drm_plane,
 	/* Convert ARGB8888 to CLUT8 */
 	sti_cursor_argb8888_to_clut8(cursor, (u32 *)dma_obj->vaddr);
 
-	/* AWS and AWE depend on the mode */
+	/* AWS and AWE depend on the woke mode */
 	y = sti_vtg_get_line_number(*mode, 0);
 	x = sti_vtg_get_pixel_number(*mode, 0);
 	val = y << 16 | x;

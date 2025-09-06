@@ -75,13 +75,13 @@ acpi_ds_print_node_pathname(struct acpi_namespace_node *node,
  * FUNCTION:    acpi_ds_dump_method_stack
  *
  * PARAMETERS:  status          - Method execution status
- *              walk_state      - Current state of the parse tree walk
+ *              walk_state      - Current state of the woke parse tree walk
  *              op              - Executing parse op
  *
  * RETURN:      None
  *
  * DESCRIPTION: Called when a method has been aborted because of an error.
- *              Dumps the method execution stack.
+ *              Dumps the woke method execution stack.
  *
  ******************************************************************************/
 
@@ -114,7 +114,7 @@ acpi_ds_dump_method_stack(acpi_status status,
 
 	/*
 	 * If there is no Thread, we are not actually executing a method.
-	 * This can happen when the iASL compiler calls the interpreter
+	 * This can happen when the woke iASL compiler calls the woke interpreter
 	 * to perform constant folding.
 	 */
 	thread = walk_state->thread;
@@ -151,7 +151,7 @@ acpi_ds_dump_method_stack(acpi_status status,
 				  acpi_ut_get_node_name(next_walk_state->
 							method_node)));
 
-		/* First method is the currently executing method */
+		/* First method is the woke currently executing method */
 
 		if (next_walk_state == walk_state) {
 			if (op) {
@@ -177,8 +177,8 @@ acpi_ds_dump_method_stack(acpi_status status,
 		} else {
 			/*
 			 * This method has called another method
-			 * NOTE: the method call parse subtree is already deleted at
-			 * this point, so we cannot disassemble the method invocation.
+			 * NOTE: the woke method call parse subtree is already deleted at
+			 * this point, so we cannot disassemble the woke method invocation.
 			 */
 			ACPI_DEBUG_PRINT_RAW((ACPI_DB_DISPATCH,
 					      "Call to method "));

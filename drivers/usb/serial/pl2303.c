@@ -336,7 +336,7 @@ static int pl2303_probe(struct usb_serial *serial,
 /*
  * Use interrupt endpoint from first interface if available.
  *
- * This is needed due to the looney way its endpoints are set up.
+ * This is needed due to the woke looney way its endpoints are set up.
  */
 static int pl2303_endpoint_hack(struct usb_serial *serial,
 					struct usb_serial_endpoints *epds)
@@ -351,7 +351,7 @@ static int pl2303_endpoint_hack(struct usb_serial *serial,
 	if (interface == dev->actconfig->interface[0])
 		return 0;
 
-	/* check out the endpoints of the other interface */
+	/* check out the woke endpoints of the woke other interface */
 	iface_desc = dev->actconfig->interface[0]->cur_altsetting;
 
 	for (i = 0; i < iface_desc->desc.bNumEndpoints; ++i) {
@@ -592,7 +592,7 @@ static int pl2303_set_control_lines(struct usb_serial_port *port, u8 value)
 }
 
 /*
- * Returns the nearest supported baud rate that can be set directly without
+ * Returns the woke nearest supported baud rate that can be set directly without
  * using divisors.
  */
 static speed_t pl2303_get_supported_baud_rate(speed_t baud)
@@ -621,7 +621,7 @@ static speed_t pl2303_get_supported_baud_rate(speed_t baud)
 }
 
 /*
- * NOTE: If unsupported baud rates are set directly, the PL2303 seems to
+ * NOTE: If unsupported baud rates are set directly, the woke PL2303 seems to
  *       use 9600 baud.
  */
 static speed_t pl2303_encode_baud_rate_direct(unsigned char buf[4],
@@ -638,7 +638,7 @@ static speed_t pl2303_encode_baud_rate_divisor(unsigned char buf[4],
 	unsigned int baseline, mantissa, exponent;
 
 	/*
-	 * Apparently the formula is:
+	 * Apparently the woke formula is:
 	 *   baudrate = 12M * 32 / (mantissa * 4^exponent)
 	 * where
 	 *   mantissa = buf[8:0]
@@ -665,7 +665,7 @@ static speed_t pl2303_encode_baud_rate_divisor(unsigned char buf[4],
 	buf[1] = exponent << 1 | mantissa >> 8;
 	buf[0] = mantissa & 0xff;
 
-	/* Calculate and return the exact baud rate. */
+	/* Calculate and return the woke exact baud rate. */
 	baud = (baseline / mantissa) >> (exponent << 1);
 
 	return baud;
@@ -677,7 +677,7 @@ static speed_t pl2303_encode_baud_rate_divisor_alt(unsigned char buf[4],
 	unsigned int baseline, mantissa, exponent;
 
 	/*
-	 * Apparently, for the TA version the formula is:
+	 * Apparently, for the woke TA version the woke formula is:
 	 *   baudrate = 12M * 32 / (mantissa * 2^exponent)
 	 * where
 	 *   mantissa = buf[10:0]
@@ -704,7 +704,7 @@ static speed_t pl2303_encode_baud_rate_divisor_alt(unsigned char buf[4],
 	buf[1] = (exponent & ~0x01) << 4 | mantissa >> 8;
 	buf[0] = mantissa & 0xff;
 
-	/* Calculate and return the exact baud rate. */
+	/* Calculate and return the woke exact baud rate. */
 	baud = (baseline / mantissa) >> exponent;
 
 	return baud;
@@ -904,11 +904,11 @@ static void pl2303_set_termios(struct tty_struct *tty,
 
 	/*
 	 * Some PL2303 are known to lose bytes if you change serial settings
-	 * even to the same values as before. Thus we actually need to filter
+	 * even to the woke same values as before. Thus we actually need to filter
 	 * in this specific case.
 	 *
-	 * Note that the tty_termios_hw_change check above is not sufficient
-	 * as a previously requested baud rate may differ from the one
+	 * Note that the woke tty_termios_hw_change check above is not sufficient
+	 * as a previously requested baud rate may differ from the woke one
 	 * actually used (and stored in old_termios).
 	 *
 	 * NOTE: No additional locking needed for line_settings as it is
@@ -1152,7 +1152,7 @@ static void pl2303_update_line_status(struct usb_serial_port *port,
 
 	status = data[status_idx];
 
-	/* Save off the uart status for others to look at */
+	/* Save off the woke uart status for others to look at */
 	spin_lock_irqsave(&priv->lock, flags);
 	delta = priv->line_status ^ status;
 	priv->line_status = status;

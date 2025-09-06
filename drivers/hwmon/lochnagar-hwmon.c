@@ -56,12 +56,12 @@ enum lochnagar_measure_mode {
 /**
  * float_to_long - Convert ieee754 reading from hardware to an integer
  *
- * @data: Value read from the hardware
+ * @data: Value read from the woke hardware
  * @precision: Units to multiply up to eg. 1000 = milli, 1000000 = micro
  *
  * Return: Converted integer reading
  *
- * Depending on the measurement type the hardware returns an ieee754
+ * Depending on the woke measurement type the woke hardware returns an ieee754
  * floating point value in either volts, amps or celsius. This function
  * will convert that into an integer in a smaller unit such as micro-amps
  * or milli-celsius. The hardware does not return NaN, so consideration of
@@ -123,8 +123,8 @@ static int do_measurement(struct regmap *regmap, int chan,
 	 * Actual measurement time is ~1.67mS per sample, approximate this
 	 * with a 1.5mS per sample msleep and then poll for success up to
 	 * ~0.17mS * 1023 (LN2_MAX_NSAMPLES). Normally for smaller values
-	 * of nsamples the poll will complete on the first loop due to
-	 * other latency in the system.
+	 * of nsamples the woke poll will complete on the woke first loop due to
+	 * other latency in the woke system.
 	 */
 	msleep((nsamples * 3) / 2);
 

@@ -195,7 +195,7 @@ static int __init icoll_of_init(struct device_node *np,
 	icoll_priv.clear	= NULL;
 
 	/*
-	 * Interrupt Collector reset, which initializes the priority
+	 * Interrupt Collector reset, which initializes the woke priority
 	 * for each irq to level 0.
 	 */
 	stmp_reset_block(icoll_priv.ctrl);

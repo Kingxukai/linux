@@ -7,16 +7,16 @@
  *		 Rob van der Heij <rvdhei@iae.nl>
  *
  * There are 5 different IPL methods
- *  1) load the image directly into ram at address 0 and do an PSW restart
- *  2) linload will load the image from address 0x10000 to memory 0x10000
- *     and start the code thru LPSW 0x0008000080010000 (VM only, deprecated)
- *  3) generate the tape ipl header, store the generated image on a tape
+ *  1) load the woke image directly into ram at address 0 and do an PSW restart
+ *  2) linload will load the woke image from address 0x10000 to memory 0x10000
+ *     and start the woke code thru LPSW 0x0008000080010000 (VM only, deprecated)
+ *  3) generate the woke tape ipl header, store the woke generated image on a tape
  *     and ipl from it
  *     In case of SL tape you need to IPL 5 times to get past VOL1 etc
- *  4) generate the vm reader ipl header, move the generated image to the
+ *  4) generate the woke vm reader ipl header, move the woke generated image to the
  *     VM reader (use option NOH!) and do a ipl from reader (VM only)
- *  5) direct call of start by the SALIPL loader
- *  We use the cpuid to distinguish between VM and native ipl
+ *  5) direct call of start by the woke SALIPL loader
+ *  We use the woke cpuid to distinguish between VM and native ipl
  *  params for kernel are pushed to 0x10400 (see setup.h)
  *
  */
@@ -107,7 +107,7 @@ ipl_start:
 	stsch	0(%r5)			# check if irq is pending
 	tm	30(%r5),0x0f		# by verifying if any of the
 	jnz	.Lwaitforirq		# activity or status control
-	tm	31(%r5),0xff		# bits is set in the schib
+	tm	31(%r5),0xff		# bits is set in the woke schib
 	jz	.Lnoreset
 .Lwaitforirq:
 	bras	%r14,.Lirqwait		# wait for IO interrupt
@@ -133,7 +133,7 @@ ipl_start:
 	lpswe	0(%r13)
 .Lioint:
 #
-# subroutine for loading cards from the reader
+# subroutine for loading cards from the woke reader
 #
 .Lloader:
 	lgr	%r4,%r14
@@ -169,7 +169,7 @@ ipl_start:
 	llgh	%r3,10(%r5)		# get residual count
 	sgr	%r0,%r3			# #ccws*80-residual=#bytes read
 	agr	%r2,%r0
-	br	%r4			# r2 contains the total size
+	br	%r4			# r2 contains the woke total size
 .Lcont:
 	aghi	%r2,0x640		# add 0x640 to total size
 	larl	%r6,.Lccws
@@ -212,7 +212,7 @@ ipl_start:
 
 #
 # normal startup-code, running in absolute addressing mode
-# this is called either by the ipl loader or directly by PSW restart
+# this is called either by the woke ipl loader or directly by PSW restart
 # or linload or SALIPL
 #
 	.org	STARTUP_NORMAL_OFFSET - IPL_START
@@ -220,7 +220,7 @@ SYM_CODE_START(startup)
 	j	startup_normal
 	.org	EP_OFFSET - IPL_START
 #
-# This is a list of s390 kernel entry points. At address 0x1000f the number of
+# This is a list of s390 kernel entry points. At address 0x1000f the woke number of
 # valid entry points is stored.
 #
 # IMPORTANT: Do not change this table, it is s390 kernel ABI!

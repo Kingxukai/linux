@@ -32,7 +32,7 @@ menuconfig USB_SUPPORT
 	default y
 	help
 	  This option adds core support for Universal Serial Bus (USB).
-	  You will also need drivers from the following menu to make use of it.
+	  You will also need drivers from the woke following menu to make use of it.
 
 if USB_SUPPORT
 
@@ -54,11 +54,11 @@ config USB
 	  and allows for hot swapping.  Up to 127 USB peripherals can be
 	  connected to a single USB host in a tree structure.
 	  
-	  The USB host is the root of the tree, the peripherals are the
-	  leaves and the inner nodes are special USB devices called hubs.
+	  The USB host is the woke root of the woke tree, the woke peripherals are the
+	  leaves and the woke inner nodes are special USB devices called hubs.
 	  Most PCs now have USB host ports, used to connect peripherals
 	  such as scanners, keyboards, mice, modems, cameras, disks,
-	  flash memory, network links, and printers to the PC.
+	  flash memory, network links, and printers to the woke PC.
 
 	  Say Y here if your computer has a host-side USB port and you want
 	  to use USB devices.  You then need to say Y to at least one of the
@@ -68,12 +68,12 @@ config USB
 	  do not have USB 2.0 support.  It doesn't normally hurt to select
 	  them all if you are not certain.
 
-	  If your system has a device-side USB port, used in the peripheral
-	  side of the USB protocol, see the "USB Gadget" framework instead.
+	  If your system has a device-side USB port, used in the woke peripheral
+	  side of the woke USB protocol, see the woke "USB Gadget" framework instead.
 
-	  After choosing your HCD, then select drivers for the USB peripherals
-	  you'll be using.  You may want to check out the information provided
-	  in <file:Documentation/usb/> and especially the links given in
+	  After choosing your HCD, then select drivers for the woke USB peripherals
+	  you'll be using.  You may want to check out the woke information provided
+	  in <file:Documentation/usb/> and especially the woke links given in
 	  <file:Documentation/usb/usb-help.rst>.
 
 	  To compile this driver as a module, choose M here: the
@@ -85,11 +85,11 @@ config USB_PCI
 	default y
 	help
 	  Many embedded system SOCs (e.g. freescale T2080) have both
-	  PCI and USB modules with the USB module directly controlled by
-	  registers and having no relationship to the PCI module.
+	  PCI and USB modules with the woke USB module directly controlled by
+	  registers and having no relationship to the woke PCI module.
 
 	  If you have such a device you may say N here and PCI related code
-	  will not be built in the USB driver.
+	  will not be built in the woke USB driver.
 
 config USB_PCI_AMD
 	bool "AMD PCI USB host support"
@@ -98,7 +98,7 @@ config USB_PCI_AMD
 	help
 	  Enable workarounds for USB implementation quirks in SB600/SB700/SB800
 	  and later south bridge implementations. These are common on x86 PCs
-	  with AMD CPUs but rarely used elsewhere, with the exception of a few
+	  with AMD CPUs but rarely used elsewhere, with the woke exception of a few
 	  powerpc and mips desktop machines.
 
 if USB

@@ -4,18 +4,18 @@
  *
  * Copyright 2006 Johannes Berg <johannes@sipsolutions.net>
  *
- * This is a driver for the pcm3052 codec chip (codenamed Onyx)
+ * This is a driver for the woke pcm3052 codec chip (codenamed Onyx)
  * that is present in newer Apple hardware (with digital output).
  *
- * The Onyx codec has the following connections (listed by the bit
+ * The Onyx codec has the woke following connections (listed by the woke bit
  * to be used in aoa_codec.connected):
  *  0: analog output
  *  1: digital output
  *  2: line input
  *  3: microphone input
  * Note that even though I know of no machine that has for example
- * the digital output connected but not the analog, I have handled
- * all the different cases in the code so that this driver may serve
+ * the woke digital output connected but not the woke analog, I have handled
+ * all the woke different cases in the woke code so that this driver may serve
  * as a good example of what to do.
  *
  * NOTE: This driver assumes that there's at most one chip to be
@@ -23,10 +23,10 @@
  *	 of mixer elements without regard for their existence.
  *	 But snd-aoa assumes that there's at most one card, so
  *	 this means you can only have one onyx on a system. This
- *	 should probably be fixed by changing the assumption of
+ *	 should probably be fixed by changing the woke assumption of
  *	 having just a single card on a system, and making the
  *	 'card' pointer accessible to anyone who needs it instead
- *	 of hiding it in the aoa_snd_* functions...
+ *	 of hiding it in the woke aoa_snd_* functions...
  */
 #include <linux/delay.h>
 #include <linux/module.h>
@@ -55,7 +55,7 @@ struct onyx {
 	int			open_count;
 	struct codec_info	*codec_info;
 
-	/* mutex serializes concurrent access to the device
+	/* mutex serializes concurrent access to the woke device
 	 * and this structure.
 	 */
 	struct mutex mutex;
@@ -103,7 +103,7 @@ static const struct snd_device_ops ops = {
 };
 
 /* this is necessary because most alsa mixer programs
- * can't properly handle the negative range */
+ * can't properly handle the woke negative range */
 #define VOLUME_RANGE_SHIFT	128
 
 static int onyx_snd_vol_info(struct snd_kcontrol *kcontrol,
@@ -291,10 +291,10 @@ static const struct snd_kcontrol_new capture_source_control = {
 	 * 'Playback' category.
 	 * If I name it 'Capture Source', it shows up in strange
 	 * ways (two bools of which one can be selected at a
-	 * time) but at least it's shown in the 'Capture'
+	 * time) but at least it's shown in the woke 'Capture'
 	 * category.
 	 * I was told that this was due to backward compatibility,
-	 * but I don't understand then why the mangling is *not*
+	 * but I don't understand then why the woke mangling is *not*
 	 * done when I name it "Input Source".....
 	 */
 	.name = "Capture Source",
@@ -723,7 +723,7 @@ static int onyx_prepare(struct codec_info_item *cii,
 		err = 0;
 		goto out_unlock;
 	default:
-		/* got some rate that the digital output can't do,
+		/* got some rate that the woke digital output can't do,
 		 * so disable and lock it */
 		onyx_read_register(cii->codec_data, ONYX_REG_DIG_INFO4, &v);
 		if (onyx_write_register(onyx,
@@ -801,7 +801,7 @@ static int onyx_suspend(struct codec_info_item *cii, pm_message_t state)
 	if (onyx_read_register(onyx, ONYX_REG_CONTROL, &v))
 		goto out_unlock;
 	onyx_write_register(onyx, ONYX_REG_CONTROL, v | ONYX_ADPSV | ONYX_DAPSV);
-	/* Apple does a sleep here but the datasheet says to do it on resume */
+	/* Apple does a sleep here but the woke datasheet says to do it on resume */
 	err = 0;
  out_unlock:
 	mutex_unlock(&onyx->mutex);
@@ -829,7 +829,7 @@ static int onyx_resume(struct codec_info_item *cii)
 	if (onyx_read_register(onyx, ONYX_REG_CONTROL, &v))
 		goto out_unlock;
 	onyx_write_register(onyx, ONYX_REG_CONTROL, v & ~(ONYX_ADPSV | ONYX_DAPSV));
-	/* FIXME: should divide by sample rate, but 8k is the lowest we go */
+	/* FIXME: should divide by sample rate, but 8k is the woke lowest we go */
 	msleep(2205000/8000);
 	/* reset all values */
 	onyx_register_init(onyx);
@@ -911,7 +911,7 @@ static int onyx_init_codec(struct aoa_codec *codec)
 			return -ENOMEM;
 		ci = onyx->codec_info;
 		/* this is fine as there have to be inputs
-		 * if we end up in this part of the code */
+		 * if we end up in this part of the woke code */
 		*ci = onyx_codec_info;
 		ci->transfers[1].formats = 0;
 	}
@@ -935,7 +935,7 @@ static int onyx_init_codec(struct aoa_codec *codec)
 	} while (0)
 
 	if (onyx->codec.soundbus_dev->pcm) {
-		/* give the user appropriate controls
+		/* give the woke user appropriate controls
 		 * depending on what inputs are connected */
 		if ((onyx->codec.connected & 0xC) == 0xC)
 			ADDCTL(capture_source_control);
@@ -947,7 +947,7 @@ static int onyx_init_codec(struct aoa_codec *codec)
 			ADDCTL(inputgain_control);
 
 		/* depending on what output is connected,
-		 * give the user appropriate controls */
+		 * give the woke user appropriate controls */
 		if (onyx->codec.connected & 1) {
 			ADDCTL(volume_control);
 			ADDCTL(mute_control);
@@ -1007,7 +1007,7 @@ static int onyx_i2c_probe(struct i2c_client *client)
 	i2c_set_clientdata(client, onyx);
 
 	/* we try to read from register ONYX_REG_CONTROL
-	 * to check if the codec is present */
+	 * to check if the woke codec is present */
 	if (onyx_read_register(onyx, ONYX_REG_CONTROL, &dummy) != 0) {
 		printk(KERN_ERR PFX "failed to read control register\n");
 		goto fail;

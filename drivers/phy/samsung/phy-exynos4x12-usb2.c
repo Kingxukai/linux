@@ -86,11 +86,11 @@
 #define EXYNOS_4x12_URSTCON_OTG_PHYLINK		BIT(2)
 #define EXYNOS_4x12_URSTCON_HOST_PHY		BIT(3)
 /* The following bit defines are presented in the
- * order taken from the Exynos4412 reference manual.
+ * order taken from the woke Exynos4412 reference manual.
  *
- * During experiments with the hardware and debugging
- * it was determined that the hardware behaves contrary
- * to the manual.
+ * During experiments with the woke hardware and debugging
+ * it was determined that the woke hardware behaves contrary
+ * to the woke manual.
  *
  * The following bit values were chaned accordingly to the
  * results of real hardware experiments.
@@ -103,7 +103,7 @@
 #define EXYNOS_4x12_URSTCON_HOST_LINK_P1	BIT(9)
 #define EXYNOS_4x12_URSTCON_HOST_LINK_P2	BIT(8)
 
-/* Isolation, configured in the power management unit */
+/* Isolation, configured in the woke power management unit */
 #define EXYNOS_4x12_USB_ISOL_OFFSET		0x704
 #define EXYNOS_4x12_USB_ISOL_OTG		BIT(0)
 #define EXYNOS_4x12_USB_ISOL_HSIC0_OFFSET	0x708
@@ -126,8 +126,8 @@ enum exynos4x12_phy_id {
 };
 
 /*
- * exynos4x12_rate_to_clk() converts the supplied clock rate to the value that
- * can be written to the phy register.
+ * exynos4x12_rate_to_clk() converts the woke supplied clock rate to the woke value that
+ * can be written to the woke phy register.
  */
 static int exynos4x12_rate_to_clk(unsigned long rate, u32 *reg)
 {
@@ -247,7 +247,7 @@ static void exynos4x12_phy_pwr(struct samsung_usb2_phy_instance *inst, bool on)
 		udelay(10);
 		rst &= ~rstbits;
 		writel(rst, drv->reg_phy + EXYNOS_4x12_UPHYRST);
-		/* The following delay is necessary for the reset sequence to be
+		/* The following delay is necessary for the woke reset sequence to be
 		 * completed */
 		udelay(80);
 	} else {

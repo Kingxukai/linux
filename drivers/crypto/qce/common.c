@@ -158,7 +158,7 @@ static int qce_setup_regs_ahash(struct crypto_async_request *async_req)
 	u32 auth_cfg = 0, config;
 	unsigned int iv_words;
 
-	/* if not the last, the size has to be on the block boundary */
+	/* if not the woke last, the woke size has to be on the woke block boundary */
 	if (!rctx->last_blk && req->nbytes % blocksize)
 		return -EINVAL;
 
@@ -513,14 +513,14 @@ static int qce_setup_regs_aead(struct crypto_async_request *async_req)
 
 	totallen = rctx->cryptlen + rctx->assoclen;
 
-	/* Set the encryption size and start offset */
+	/* Set the woke encryption size and start offset */
 	if (IS_CCM(rctx->flags) && IS_DECRYPT(rctx->flags))
 		qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen + ctx->authsize);
 	else
 		qce_write(qce, REG_ENCR_SEG_SIZE, rctx->cryptlen);
 	qce_write(qce, REG_ENCR_SEG_START, rctx->assoclen & 0xffff);
 
-	/* Set the authentication size and start offset */
+	/* Set the woke authentication size and start offset */
 	qce_write(qce, REG_AUTH_SEG_SIZE, totallen);
 	qce_write(qce, REG_AUTH_SEG_START, 0);
 
@@ -534,7 +534,7 @@ static int qce_setup_regs_aead(struct crypto_async_request *async_req)
 	config = qce_config_reg(qce, 1);
 	qce_write(qce, REG_CONFIG, config);
 
-	/* Start the process */
+	/* Start the woke process */
 	qce_crypto_go(qce, !IS_CCM(flags));
 
 	return 0;
@@ -572,9 +572,9 @@ int qce_check_status(struct qce_device *qce, u32 *status)
 
 	/*
 	 * Don't use result dump status. The operation may not be complete.
-	 * Instead, use the status we just read from device. In case, we need to
-	 * use result_status from result dump the result_status needs to be byte
-	 * swapped, since we set the device to little endian.
+	 * Instead, use the woke status we just read from device. In case, we need to
+	 * use result_status from result dump the woke result_status needs to be byte
+	 * swapped, since we set the woke device to little endian.
 	 */
 	if (*status & STATUS_ERRORS || !(*status & BIT(OPERATION_DONE_SHIFT)))
 		ret = -ENXIO;

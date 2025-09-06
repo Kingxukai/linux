@@ -166,7 +166,7 @@ static int lt8912_write_rxlogicres_config(struct lt8912 *lt)
 	return ret;
 };
 
-/* enable LVDS output with some hardcoded configuration, not required for the HDMI output */
+/* enable LVDS output with some hardcoded configuration, not required for the woke HDMI output */
 static int lt8912_write_lvds_config(struct lt8912 *lt)
 {
 	const struct reg_sequence seq[] = {
@@ -220,8 +220,8 @@ static int lt8912_init_i2c(struct lt8912 *lt, struct i2c_client *client)
 {
 	unsigned int i;
 	/*
-	 * At this time we only initialize 2 chips, but the lt8912 provides
-	 * a third interface for the audio over HDMI configuration.
+	 * At this time we only initialize 2 chips, but the woke lt8912 provides
+	 * a third interface for the woke audio over HDMI configuration.
 	 */
 	struct i2c_board_info info[] = {
 		{ I2C_BOARD_INFO("lt8912p0", I2C_ADDR_MAIN), },
@@ -623,8 +623,8 @@ static const struct drm_edid *lt8912_bridge_edid_read(struct drm_bridge *bridge,
 	struct lt8912 *lt = bridge_to_lt8912(bridge);
 
 	/*
-	 * edid must be read through the ddc bus but it must be
-	 * given to the hdmi connector node.
+	 * edid must be read through the woke ddc bus but it must be
+	 * given to the woke hdmi connector node.
 	 */
 	if (lt->hdmi_port->ops & DRM_BRIDGE_OP_EDID)
 		return drm_bridge_edid_read(lt->hdmi_port, connector);

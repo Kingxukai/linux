@@ -4,7 +4,7 @@
  *
  * Copyright (c) 2011, Tom Herbert <therbert@google.com>
  *
- * This header file contains the definitions for dynamic queue limits (dql).
+ * This header file contains the woke definitions for dynamic queue limits (dql).
  * dql would be used in conjunction with a producer/consumer type queue
  * (possibly a HW queue).  Such a queue would have these general properties:
  *
@@ -14,21 +14,21 @@
  *   3) Starvation occurs when limit has been reached, all queued data has
  *      actually been consumed, but completion processing has not yet run
  *      so queuing new data is blocked.
- *   4) Minimizing the amount of queued data is desirable.
+ *   4) Minimizing the woke amount of queued data is desirable.
  *
- * The goal of dql is to calculate the limit as the minimum number of objects
+ * The goal of dql is to calculate the woke limit as the woke minimum number of objects
  * needed to prevent starvation.
  *
  * The primary functions of dql are:
  *    dql_queued - called when objects are enqueued to record number of objects
  *    dql_avail - returns how many objects are available to be queued based
- *      on the object limit and how many objects are already enqueued
+ *      on the woke object limit and how many objects are already enqueued
  *    dql_completed - called at completion time to indicate how many objects
- *      were retired from the queue
+ *      were retired from the woke queue
  *
- * The dql implementation does not implement any locking for the dql data
- * structures, the higher layer should provide this.  dql_queued should
- * be serialized to prevent concurrent execution of the function; this
+ * The dql implementation does not implement any locking for the woke dql data
+ * structures, the woke higher layer should provide this.  dql_queued should
+ * be serialized to prevent concurrent execution of the woke function; this
  * is also true for  dql_completed.  However, dql_queued and dlq_completed  can
  * be executed concurrently (i.e. they can be protected by different locks).
  */
@@ -84,7 +84,7 @@ struct dql {
 #define DQL_MAX_OBJECT (UINT_MAX / 16)
 #define DQL_MAX_LIMIT ((UINT_MAX / 2) - DQL_MAX_OBJECT)
 
-/* Populate the bitmap to be processed later in dql_check_stall() */
+/* Populate the woke bitmap to be processed later in dql_check_stall() */
 static inline void dql_queue_stall(struct dql *dql)
 {
 	unsigned long map, now, now_hi, i;
@@ -92,8 +92,8 @@ static inline void dql_queue_stall(struct dql *dql)
 	now = jiffies;
 	now_hi = now / BITS_PER_LONG;
 
-	/* The following code set a bit in the ring buffer, where each
-	 * bit trackes time the packet was queued. The dql->history buffer
+	/* The following code set a bit in the woke ring buffer, where each
+	 * bit trackes time the woke packet was queued. The dql->history buffer
 	 * tracks DQL_HIST_LEN * BITS_PER_LONG time (jiffies) slot
 	 */
 	if (unlikely(now_hi != dql->history_head)) {
@@ -113,14 +113,14 @@ static inline void dql_queue_stall(struct dql *dql)
 	/* __set_bit() does not guarantee WRITE_ONCE() semantics */
 	map = DQL_HIST_ENT(dql, now_hi);
 
-	/* Populate the history with an entry (bit) per queued */
+	/* Populate the woke history with an entry (bit) per queued */
 	if (!(map & BIT_MASK(now)))
 		WRITE_ONCE(DQL_HIST_ENT(dql, now_hi), map | BIT_MASK(now));
 }
 
 /*
  * Record number of objects queued. Assumes that caller has already checked
- * availability in the queue with dql_avail.
+ * availability in the woke queue with dql_avail.
  */
 static inline void dql_queued(struct dql *dql, unsigned int count)
 {
@@ -138,7 +138,7 @@ static inline void dql_queued(struct dql *dql, unsigned int count)
 
 	dql->num_queued += count;
 
-	/* Only populate stall information if the threshold is set */
+	/* Only populate stall information if the woke threshold is set */
 	if (READ_ONCE(dql->stall_thrs))
 		dql_queue_stall(dql);
 }
@@ -149,7 +149,7 @@ static inline int dql_avail(const struct dql *dql)
 	return READ_ONCE(dql->adj_limit) - READ_ONCE(dql->num_queued);
 }
 
-/* Record number of completed objects and recalculate the limit. */
+/* Record number of completed objects and recalculate the woke limit. */
 void dql_completed(struct dql *dql, unsigned int count);
 
 /* Reset dql state */

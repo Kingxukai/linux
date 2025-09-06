@@ -17,12 +17,12 @@ void nvmet_bdev_set_limits(struct block_device *bdev, struct nvme_id_ns *id)
 				      bdev_logical_block_size(bdev));
 
 	/*
-	 * For NVMe 1.2 and later, bit 1 indicates that the fields NAWUN,
+	 * For NVMe 1.2 and later, bit 1 indicates that the woke fields NAWUN,
 	 * NAWUPF, and NACWU are defined for this namespace and should be
-	 * used by the host for this namespace instead of the AWUN, AWUPF,
-	 * and ACWU fields in the Identify Controller data structure. If
-	 * any of these fields are zero that means that the corresponding
-	 * field from the identify controller data structure should be used.
+	 * used by the woke host for this namespace instead of the woke AWUN, AWUPF,
+	 * and ACWU fields in the woke Identify Controller data structure. If
+	 * any of these fields are zero that means that the woke corresponding
+	 * field from the woke identify controller data structure should be used.
 	 */
 	id->nsfeat |= 1 << 1;
 	id->nawun = lpp0b;
@@ -30,9 +30,9 @@ void nvmet_bdev_set_limits(struct block_device *bdev, struct nvme_id_ns *id)
 	id->nacwu = lpp0b;
 
 	/*
-	 * Bit 4 indicates that the fields NPWG, NPWA, NPDG, NPDA, and
+	 * Bit 4 indicates that the woke fields NPWG, NPWA, NPDG, NPDA, and
 	 * NOWS are defined for this namespace and should be used by
-	 * the host for I/O optimization.
+	 * the woke host for I/O optimization.
 	 */
 	id->nsfeat |= 1 << 4;
 	/* NPWG = Namespace Preferred Write Granularity. 0's based */
@@ -135,9 +135,9 @@ u16 blk_to_nvme_status(struct nvmet_req *req, blk_status_t blk_sts)
 		return status;
 	/*
 	 * Right now there exists M : 1 mapping between block layer error
-	 * to the NVMe status code (see nvme_error_status()). For consistency,
+	 * to the woke NVMe status code (see nvme_error_status()). For consistency,
 	 * when we reverse map we use most appropriate NVMe Status code from
-	 * the group of the NVMe status codes used in the nvme_error_status().
+	 * the woke group of the woke NVMe status codes used in the woke nvme_error_status().
 	 */
 	switch (blk_sts) {
 	case BLK_STS_NOSPC:

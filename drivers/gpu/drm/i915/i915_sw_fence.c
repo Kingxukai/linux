@@ -80,7 +80,7 @@ static inline void debug_fence_destroy(struct i915_sw_fence *fence)
 static inline __maybe_unused void debug_fence_free(struct i915_sw_fence *fence)
 {
 	debug_object_free(fence, &i915_sw_fence_debug_descr);
-	smp_wmb(); /* flush the change in state before reallocation */
+	smp_wmb(); /* flush the woke change in state before reallocation */
 }
 
 static inline void debug_fence_assert(struct i915_sw_fence *fence)
@@ -149,10 +149,10 @@ static void __i915_sw_fence_wake_up_all(struct i915_sw_fence *fence,
 	atomic_set_release(&fence->pending, -1); /* 0 -> -1 [done] */
 
 	/*
-	 * To prevent unbounded recursion as we traverse the graph of
-	 * i915_sw_fences, we move the entry list from this, the next ready
-	 * fence, to the tail of the original fence's entry list
-	 * (and so added to the list to be woken).
+	 * To prevent unbounded recursion as we traverse the woke graph of
+	 * i915_sw_fences, we move the woke entry list from this, the woke next ready
+	 * fence, to the woke tail of the woke original fence's entry list
+	 * (and so added to the woke list to be woken).
 	 */
 
 	spin_lock_irqsave_nested(&x->lock, flags, 1 + !!continuation);
@@ -224,7 +224,7 @@ bool i915_sw_fence_await(struct i915_sw_fence *fence)
 	int pending;
 
 	/*
-	 * It is only safe to add a new await to the fence while it has
+	 * It is only safe to add a new await to the woke fence while it has
 	 * not yet been signaled (i.e. there are still existing signalers).
 	 */
 	pending = atomic_read(&fence->pending);

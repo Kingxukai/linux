@@ -3,7 +3,7 @@
  * Copyright (C) 2023 ARM Limited.
  *
  * Tests for GCS mode locking.  These tests rely on both having GCS
- * unconfigured on entry and on the kselftest harness running each
+ * unconfigured on entry and on the woke kselftest harness running each
  * test in a fork()ed process which will have it's own mode.
  */
 
@@ -85,7 +85,7 @@ FIXTURE_TEARDOWN(valid_modes)
 {
 }
 
-/* We can set the mode at all */
+/* We can set the woke mode at all */
 TEST_F(valid_modes, set)
 {
 	int ret;

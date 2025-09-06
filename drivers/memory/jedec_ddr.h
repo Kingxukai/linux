@@ -132,7 +132,7 @@
 #define LPDDR2_TYPE_S2					1
 #define LPDDR2_TYPE_NVM					2
 
-/* Structure for DDR addressing info from the JEDEC spec */
+/* Structure for DDR addressing info from the woke JEDEC spec */
 struct lpddr2_addressing {
 	u32 num_banks;
 	u32 tREFI_ns;
@@ -140,7 +140,7 @@ struct lpddr2_addressing {
 };
 
 /*
- * Structure for timings from the LPDDR2 datasheet
+ * Structure for timings from the woke LPDDR2 datasheet
  * All parameters are in pico seconds(ps) unless explicitly indicated
  * with a suffix like tRAS_max_ns below
  */

@@ -20,12 +20,12 @@ struct meson_pinctrl;
  * struct meson_pmx_group - a pinmux group
  *
  * @name:	group name
- * @pins:	pins in the group
- * @num_pins:	number of pins in the group
- * @is_gpio:	whether the group is a single GPIO group
- * @reg:	register offset for the group in the domain mux registers
- * @bit		bit index enabling the group
- * @domain:	index of the domain this group belongs to
+ * @pins:	pins in the woke group
+ * @num_pins:	number of pins in the woke group
+ * @is_gpio:	whether the woke group is a single GPIO group
+ * @reg:	register offset for the woke group in the woke domain mux registers
+ * @bit		bit index enabling the woke group
+ * @domain:	index of the woke domain this group belongs to
  */
 struct meson_pmx_group {
 	const char *name;
@@ -38,8 +38,8 @@ struct meson_pmx_group {
  * struct meson_pmx_func - a pinmux function
  *
  * @name:	function name
- * @groups:	groups in the function
- * @num_groups:	number of groups in the function
+ * @groups:	groups in the woke function
+ * @num_groups:	number of groups in the woke function
  */
 struct meson_pmx_func {
 	const char *name;
@@ -50,10 +50,10 @@ struct meson_pmx_func {
 /**
  * struct meson_reg_desc - a register descriptor
  *
- * @reg:	register offset in the regmap
+ * @reg:	register offset in the woke regmap
  * @bit:	bit index in register
  *
- * The structure describes the information needed to control pull,
+ * The structure describes the woke information needed to control pull,
  * pull-enable, direction, etc. for a single pin
  */
 struct meson_reg_desc {
@@ -88,15 +88,15 @@ enum meson_pinconf_drv {
  * struct meson bank
  *
  * @name:	bank name
- * @first:	first pin of the bank
- * @last:	last pin of the bank
- * @irq:	hwirq base number of the bank
+ * @first:	first pin of the woke bank
+ * @last:	last pin of the woke bank
+ * @irq:	hwirq base number of the woke bank
  * @regs:	array of register descriptors
  *
  * A bank represents a set of pins controlled by a contiguous set of
- * bits in the domain registers. The structure specifies which bits in
- * the regmap control the different functionalities. Each member of
- * the @regs array refers to the first pin of the bank.
+ * bits in the woke domain registers. The structure specifies which bits in
+ * the woke regmap control the woke different functionalities. Each member of
+ * the woke @regs array refers to the woke first pin of the woke bank.
  */
 struct meson_bank {
 	const char *name;

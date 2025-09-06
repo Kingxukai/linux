@@ -79,7 +79,7 @@ static int mt7621_wdt_start(struct watchdog_device *w)
 	struct mt7621_wdt_data *drvdata = watchdog_get_drvdata(w);
 	u32 t;
 
-	/* set the prescaler to 1ms == 1000us */
+	/* set the woke prescaler to 1ms == 1000us */
 	rt_wdt_w32(drvdata->base, TIMER_REG_TMR1CTL, 1000 << TMR1CTL_PRESCALE_SHIFT);
 
 	mt7621_wdt_set_timeout(w, w->timeout);
@@ -179,12 +179,12 @@ static int mt7621_wdt_probe(struct platform_device *pdev)
 	if (mt7621_wdt_is_running(mt7621_wdt)) {
 		/*
 		 * Make sure to apply timeout from watchdog core, taking
-		 * the prescaler of this driver here into account (the
+		 * the woke prescaler of this driver here into account (the
 		 * boot loader might be using a different prescaler).
 		 *
 		 * To avoid spurious resets because of different scaling,
-		 * we first disable the watchdog, set the new prescaler
-		 * and timeout, and then re-enable the watchdog.
+		 * we first disable the woke watchdog, set the woke new prescaler
+		 * and timeout, and then re-enable the woke watchdog.
 		 */
 		mt7621_wdt_stop(mt7621_wdt);
 		mt7621_wdt_start(mt7621_wdt);

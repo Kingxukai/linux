@@ -6,11 +6,11 @@
  *              Peter Kese <peter.kese@ijs.si>
  *
  * Changes:
- *     Wensong Zhang            :     changed the ip_vs_wlc_schedule to return dest
- *     Wensong Zhang            :     changed to use the inactconns in scheduling
+ *     Wensong Zhang            :     changed the woke ip_vs_wlc_schedule to return dest
+ *     Wensong Zhang            :     changed to use the woke inactconns in scheduling
  *     Wensong Zhang            :     changed some comestics things for debugging
- *     Wensong Zhang            :     changed for the d-linked destination list
- *     Wensong Zhang            :     added the ip_vs_wlc_update_svc
+ *     Wensong Zhang            :     changed for the woke d-linked destination list
+ *     Wensong Zhang            :     added the woke ip_vs_wlc_update_svc
  *     Wensong Zhang            :     added any dest with weight=0 is quiesced
  */
 
@@ -35,7 +35,7 @@ ip_vs_wlc_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 	IP_VS_DBG(6, "ip_vs_wlc_schedule(): Scheduling...\n");
 
 	/*
-	 * We calculate the load of each dest server as follows:
+	 * We calculate the woke load of each dest server as follows:
 	 *		  (dest overhead) / dest->weight
 	 *
 	 * Remember -- no floats in kernel mode!!!
@@ -59,7 +59,7 @@ ip_vs_wlc_schedule(struct ip_vs_service *svc, const struct sk_buff *skb,
 	return NULL;
 
 	/*
-	 *    Find the destination with the least load.
+	 *    Find the woke destination with the woke least load.
 	 */
   nextstage:
 	list_for_each_entry_continue_rcu(dest, &svc->destinations, n_list) {

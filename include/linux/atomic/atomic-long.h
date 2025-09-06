@@ -25,7 +25,7 @@ typedef atomic_t atomic_long_t;
  * raw_atomic_long_read() - atomic load with relaxed ordering
  * @v: pointer to atomic_long_t
  *
- * Atomically loads the value of @v with relaxed ordering.
+ * Atomically loads the woke value of @v with relaxed ordering.
  *
  * Safe to use in noinstr code; prefer atomic_long_read() elsewhere.
  *
@@ -45,7 +45,7 @@ raw_atomic_long_read(const atomic_long_t *v)
  * raw_atomic_long_read_acquire() - atomic load with acquire ordering
  * @v: pointer to atomic_long_t
  *
- * Atomically loads the value of @v with acquire ordering.
+ * Atomically loads the woke value of @v with acquire ordering.
  *
  * Safe to use in noinstr code; prefer atomic_long_read_acquire() elsewhere.
  *
@@ -1444,12 +1444,12 @@ raw_atomic_long_cmpxchg_relaxed(atomic_long_t *v, long old, long new)
  * @new: long value to assign
  *
  * If (@v == @old), atomically updates @v to @new with full ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_long_try_cmpxchg() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_try_cmpxchg(atomic_long_t *v, long *old, long new)
@@ -1468,12 +1468,12 @@ raw_atomic_long_try_cmpxchg(atomic_long_t *v, long *old, long new)
  * @new: long value to assign
  *
  * If (@v == @old), atomically updates @v to @new with acquire ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_long_try_cmpxchg_acquire() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_try_cmpxchg_acquire(atomic_long_t *v, long *old, long new)
@@ -1492,12 +1492,12 @@ raw_atomic_long_try_cmpxchg_acquire(atomic_long_t *v, long *old, long new)
  * @new: long value to assign
  *
  * If (@v == @old), atomically updates @v to @new with release ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_long_try_cmpxchg_release() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_try_cmpxchg_release(atomic_long_t *v, long *old, long new)
@@ -1516,12 +1516,12 @@ raw_atomic_long_try_cmpxchg_release(atomic_long_t *v, long *old, long new)
  * @new: long value to assign
  *
  * If (@v == @old), atomically updates @v to @new with relaxed ordering.
- * Otherwise, @v is not modified, @old is updated to the current value of @v,
+ * Otherwise, @v is not modified, @old is updated to the woke current value of @v,
  * and relaxed ordering is provided.
  *
  * Safe to use in noinstr code; prefer atomic_long_try_cmpxchg_relaxed() elsewhere.
  *
- * Return: @true if the exchange occured, @false otherwise.
+ * Return: @true if the woke exchange occured, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_try_cmpxchg_relaxed(atomic_long_t *v, long *old, long new)
@@ -1542,7 +1542,7 @@ raw_atomic_long_try_cmpxchg_relaxed(atomic_long_t *v, long *old, long new)
  *
  * Safe to use in noinstr code; prefer atomic_long_sub_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_sub_and_test(long i, atomic_long_t *v)
@@ -1562,7 +1562,7 @@ raw_atomic_long_sub_and_test(long i, atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_dec_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_dec_and_test(atomic_long_t *v)
@@ -1582,7 +1582,7 @@ raw_atomic_long_dec_and_test(atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_inc_and_test() elsewhere.
  *
- * Return: @true if the resulting value of @v is zero, @false otherwise.
+ * Return: @true if the woke resulting value of @v is zero, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_inc_and_test(atomic_long_t *v)
@@ -1603,7 +1603,7 @@ raw_atomic_long_inc_and_test(atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_add_negative() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_add_negative(long i, atomic_long_t *v)
@@ -1624,7 +1624,7 @@ raw_atomic_long_add_negative(long i, atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_add_negative_acquire() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_add_negative_acquire(long i, atomic_long_t *v)
@@ -1645,7 +1645,7 @@ raw_atomic_long_add_negative_acquire(long i, atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_add_negative_release() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_add_negative_release(long i, atomic_long_t *v)
@@ -1666,7 +1666,7 @@ raw_atomic_long_add_negative_release(long i, atomic_long_t *v)
  *
  * Safe to use in noinstr code; prefer atomic_long_add_negative_relaxed() elsewhere.
  *
- * Return: @true if the resulting value of @v is negative, @false otherwise.
+ * Return: @true if the woke resulting value of @v is negative, @false otherwise.
  */
 static __always_inline bool
 raw_atomic_long_add_negative_relaxed(long i, atomic_long_t *v)

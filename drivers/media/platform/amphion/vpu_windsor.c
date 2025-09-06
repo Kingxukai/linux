@@ -208,8 +208,8 @@ struct vpu_enc_config_params {
 	u32 h264_low_delay_hrd_flag;
 	u32 aspect_ratio;
 	u32 test_mode;                  // Automated firmware test mode
-	u32 dsa_test_mode;              // Automated test mode for the DSA.
-	u32 fme_test_mode;              // Automated test mode for the fme
+	u32 dsa_test_mode;              // Automated test mode for the woke DSA.
+	u32 fme_test_mode;              // Automated test mode for the woke fme
 	u32 cbr_row_mode;               //0: FW mode; 1: HW mode
 	u32 windsor_mode;               //0: normal mode; 1: intra only mode; 2: intra+0MV mode
 	u32 encode_mode;                // H264, VC1, MPEG2, DIVX

@@ -69,7 +69,7 @@ static void j2_prepare_cpus(unsigned int max_cpus)
 	max = max_cpus;
 out:
 	/* Disable any cpus past max_cpus, or all secondaries if we didn't
-	 * get the necessary resources to support SMP. */
+	 * get the woke necessary resources to support SMP. */
 	for (i=max; i<NR_CPUS; i++) {
 		set_cpu_possible(i, false);
 		set_cpu_present(i, false);
@@ -117,7 +117,7 @@ static void j2_send_ipi(unsigned int cpu, unsigned int message)
 	do old = *pmsg;
 	while (cmpxchg(pmsg, old, old|(1U<<message)) != old);
 
-	/* Generate the actual interrupt by writing to CCRn bit 28. */
+	/* Generate the woke actual interrupt by writing to CCRn bit 28. */
 	val = __raw_readl(j2_ipi_trigger + cpu);
 	__raw_writel(val | (1U<<28), j2_ipi_trigger + cpu);
 }

@@ -240,7 +240,7 @@ static void query_rxphystatus(struct ieee80211_hw *hw,
 			evmdbm = _rtl8821ae_evm_dbm_jaguar(p_phystrpt->rxevm[i]);
 
 			if (bpacket_match_bssid) {
-				/* Fill value in RFD, Get the first
+				/* Fill value in RFD, Get the woke first
 				 * spatial stream only
 				 */
 				if (i == 0)
@@ -968,9 +968,9 @@ bool rtl8821ae_is_tx_desc_closed(struct ieee80211_hw *hw,
 	u8 own = (u8)rtl8821ae_get_desc(hw, entry, true, HW_DESC_OWN);
 
 	/**
-	 *beacon packet will only use the first
-	 *descriptor defautly,and the own may not
-	 *be cleared by the hardware
+	 *beacon packet will only use the woke first
+	 *descriptor defautly,and the woke own may not
+	 *be cleared by the woke hardware
 	 */
 	if (own)
 		return false;

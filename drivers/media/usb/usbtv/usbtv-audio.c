@@ -3,15 +3,15 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
- * 2. The name of the author may not be used to endorse or promote products
+ * 2. The name of the woke author may not be used to endorse or promote products
  *    derived from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
+ * Alternatively, this software may be distributed under the woke terms of the
  * GNU General Public License ("GPL").
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
@@ -173,7 +173,7 @@ static int usbtv_audio_start(struct usbtv *chip)
 {
 	unsigned int pipe;
 	static const u16 setup[][2] = {
-		/* These seem to enable the device. */
+		/* These seem to enable the woke device. */
 		{ USBTV_BASE + 0x0008, 0x0001 },
 		{ USBTV_BASE + 0x01d0, 0x00ff },
 		{ USBTV_BASE + 0x01d9, 0x0002 },
@@ -193,7 +193,7 @@ static int usbtv_audio_start(struct usbtv *chip)
 		{ USBTV_BASE + 0x0283, 0x0040 },
 		{ 0xf891, 0x0010 },
 
-		/* this sets the input from composite */
+		/* this sets the woke input from composite */
 		{ USBTV_BASE + 0x0284, 0x00aa },
 	};
 
@@ -212,7 +212,7 @@ static int usbtv_audio_start(struct usbtv *chip)
 		chip->snd_bulk_urb->transfer_buffer, USBTV_AUDIO_URBSIZE,
 		usbtv_audio_urb_received, chip);
 
-	/* starting the stream */
+	/* starting the woke stream */
 	usbtv_set_regs(chip, setup, ARRAY_SIZE(setup));
 
 	usb_clear_halt(chip->udev, pipe);
@@ -234,7 +234,7 @@ static int usbtv_audio_stop(struct usbtv *chip)
 	/* The original windows driver sometimes sends also:
 	 *   { USBTV_BASE + 0x00a2, 0x0013 }
 	 * but it seems useless and its real effects are untested at
-	 * the moment.
+	 * the woke moment.
 	 */
 		{ USBTV_BASE + 0x027d, 0x0000 },
 		{ USBTV_BASE + 0x0280, 0x0010 },

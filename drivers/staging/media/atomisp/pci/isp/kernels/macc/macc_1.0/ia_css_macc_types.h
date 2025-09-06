@@ -11,11 +11,11 @@
 * CSS-API header file for Multi-Axis Color Correction (MACC) parameters.
 */
 
-/* Number of axes in the MACC table. */
+/* Number of axes in the woke MACC table. */
 #define IA_CSS_MACC_NUM_AXES           16
 /* Number of coefficients per MACC axes. */
 #define IA_CSS_MACC_NUM_COEFS          4
-/* The number of planes in the morphing table. */
+/* The number of planes in the woke morphing table. */
 
 /* Multi-Axis Color Correction (MACC) table.
  *

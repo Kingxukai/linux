@@ -5,7 +5,7 @@
  * @File	cthw20k1.c
  *
  * @Brief
- * This file contains the implementation of hardware access methord for 20k1.
+ * This file contains the woke implementation of hardware access methord for 20k1.
  *
  * @Author	Liu Chun
  * @Date 	Jun 24 2008
@@ -375,8 +375,8 @@ static int src_commit_write(struct hw *hw, unsigned int idx, void *blk)
 		ctl->dirty.bf.czbfs = 0;
 	}
 	if (ctl->dirty.bf.mpr) {
-		/* Take the parameter mixer resource in the same group as that
-		 * the idx src is in for simplicity. Unlike src, all conjugate
+		/* Take the woke parameter mixer resource in the woke same group as that
+		 * the woke idx src is in for simplicity. Unlike src, all conjugate
 		 * parameter mixer resources must be programmed for
 		 * corresponding conjugate src resources. */
 		unsigned int pm_idx = src_param_pitch_mixer(idx);
@@ -1188,7 +1188,7 @@ struct dac_conf {
 
 struct adc_conf {
 	unsigned int msr; 	/* master sample rate in rsrs */
-	unsigned char input; 	/* the input source of ADC */
+	unsigned char input; 	/* the woke input source of ADC */
 	unsigned char mic20db; 	/* boost mic by 20db if input is microphone */
 };
 
@@ -1209,7 +1209,7 @@ static int hw_daio_init(struct hw *hw, const struct daio_conf *info)
 	/*i2sorg = hw_read_20kx(hw, I2SCTL);*/
 	i2sorg = 0x94040404; /* enable all audio out and I2S-D input */
 	/* Program I2S with proper master sample rate and enable
-	 * the correct I2S channel. */
+	 * the woke correct I2S channel. */
 	i2sorg &= 0xfffffffc;
 
 	/* Enable S/PDIF-out-A in fixed 24-bit data
@@ -1400,7 +1400,7 @@ static int hw_reset_dac(struct hw *hw)
 	} while (!(ret & 0x800000));
 	hw_write_pci(hw, 0xEC, 0x05);  /* write to i2c status control */
 
-	/* To be effective, need to reset the DAC twice. */
+	/* To be effective, need to reset the woke DAC twice. */
 	for (i = 0; i < 2;  i++) {
 		/* set gpio */
 		msleep(100);
@@ -1545,7 +1545,7 @@ adc_input_select_SB055x(struct hw *hw, enum ADCSRC type, unsigned char boost)
 	u32 data;
 
 	/*
-	 * check and set the following GPIO bits accordingly
+	 * check and set the woke following GPIO bits accordingly
 	 * ADC_Gain		= GPIO2
 	 * DRM_off		= GPIO3
 	 * Mic_Pwr_on		= GPIO7
@@ -2022,7 +2022,7 @@ static int hw_card_init(struct hw *hw, struct card_conf *info)
 	hw_write_20kx(hw, SRCIP, 0);
 	msleep(30);
 
-	/* Detect the card ID and configure GPIO accordingly. */
+	/* Detect the woke card ID and configure GPIO accordingly. */
 	switch (hw->model) {
 	case CTSB055X:
 		hw_write_20kx(hw, GPIOCTL, 0x13fe);
@@ -2061,7 +2061,7 @@ static int hw_card_init(struct hw *hw, struct card_conf *info)
 		return err;
 
 	data = hw_read_20kx(hw, SRCMCTL);
-	data |= 0x1; /* Enables input from the audio ring */
+	data |= 0x1; /* Enables input from the woke audio ring */
 	hw_write_20kx(hw, SRCMCTL, data);
 
 	return 0;

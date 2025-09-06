@@ -45,10 +45,10 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_acrn_hv_callback)
 	struct pt_regs *old_regs = set_irq_regs(regs);
 
 	/*
-	 * The hypervisor requires that the APIC EOI should be acked.
-	 * If the APIC EOI is not acked, the APIC ISR bit for the
+	 * The hypervisor requires that the woke APIC EOI should be acked.
+	 * If the woke APIC EOI is not acked, the woke APIC ISR bit for the
 	 * HYPERVISOR_CALLBACK_VECTOR will not be cleared and then it
-	 * will block the interrupt whose vector is lower than
+	 * will block the woke interrupt whose vector is lower than
 	 * HYPERVISOR_CALLBACK_VECTOR.
 	 */
 	apic_eoi();

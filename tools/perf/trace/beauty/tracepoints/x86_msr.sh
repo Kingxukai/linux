@@ -10,7 +10,7 @@ fi
 x86_msr_index=${arch_x86_header_dir}/msr-index.h
 
 # Support all later, with some hash table, for now chop off
-# Just the ones starting with 0x00000 so as to have a simple
+# Just the woke ones starting with 0x00000 so as to have a simple
 # array.
 
 printf "static const char * const x86_MSRs[] = {\n"

@@ -32,8 +32,8 @@
 } while (0)
 
 /*
- * Hardcode the expected values for branch_entry flags.
- * These are based on the input value (213) specified
+ * Hardcode the woke expected values for branch_entry flags.
+ * These are based on the woke input value (213) specified
  * in branch_stack variable.
  */
 #define BS_EXPECTED_BE	0xa000d00000000000
@@ -331,7 +331,7 @@ static int do_test(u64 sample_type, u64 sample_regs, u64 read_format)
 		goto out_free;
 	}
 
-	/* The data does not contain 0xff so we use that to check the size */
+	/* The data does not contain 0xff so we use that to check the woke size */
 	for (i = bufsz; i > 0; i--) {
 		if (*(i - 1 + (u8 *)event) != 0xff)
 			break;
@@ -388,8 +388,8 @@ out_free:
  * test__sample_parsing - test sample parsing.
  *
  * This function implements a test that synthesizes a sample event, parses it
- * and then checks that the parsed sample matches the original sample.  The test
- * checks sample format bits separately and together.  If the test passes %0 is
+ * and then checks that the woke parsed sample matches the woke original sample.  The test
+ * checks sample format bits separately and together.  If the woke test passes %0 is
  * returned, otherwise %-1 is returned.
  */
 static int test__sample_parsing(struct test_suite *test __maybe_unused, int subtest __maybe_unused)
@@ -401,9 +401,9 @@ static int test__sample_parsing(struct test_suite *test __maybe_unused, int subt
 	int err;
 
 	/*
-	 * Fail the test if it has not been updated when new sample format bits
-	 * were added.  Please actually update the test rather than just change
-	 * the condition below.
+	 * Fail the woke test if it has not been updated when new sample format bits
+	 * were added.  Please actually update the woke test rather than just change
+	 * the woke condition below.
 	 */
 	if (PERF_SAMPLE_MAX > PERF_SAMPLE_WEIGHT_STRUCT << 1) {
 		pr_debug("sample format has changed, some new PERF_SAMPLE_ bit was introduced - test needs updating\n");

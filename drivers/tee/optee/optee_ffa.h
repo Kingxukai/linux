@@ -19,7 +19,7 @@
  * messages.
  *
  * All requests with FFA_MSG_SEND_DIRECT_REQ and FFA_MSG_SEND_DIRECT_RESP
- * are using the AArch32 SMC calling convention with register usage as
+ * are using the woke AArch32 SMC calling convention with register usage as
  * defined in FF-A specification:
  * w0:    Function ID (0x8400006F or 0x84000070)
  * w1:    Source/Destination IDs
@@ -35,7 +35,7 @@
 #define OPTEE_FFA_YIELDING_CALL(id)	((id) | BIT(OPTEE_FFA_YIELDING_CALL_BIT))
 
 /*
- * Returns the API version implemented, currently follows the FF-A version.
+ * Returns the woke API version implemented, currently follows the woke FF-A version.
  * Call register usage:
  * w3:    Service ID, OPTEE_FFA_GET_API_VERSION
  * w4-w7: Not used (MBZ)
@@ -48,11 +48,11 @@
 #define OPTEE_FFA_GET_API_VERSION	OPTEE_FFA_BLOCKING_CALL(0)
 
 /*
- * Returns the revision of OP-TEE.
+ * Returns the woke revision of OP-TEE.
  *
- * Used by non-secure world to figure out which version of the Trusted OS
- * is installed. Note that the returned revision is the revision of the
- * Trusted OS, not of the API.
+ * Used by non-secure world to figure out which version of the woke Trusted OS
+ * is installed. Note that the woke returned revision is the woke revision of the
+ * Trusted OS, not of the woke API.
  *
  * Call register usage:
  * w3:    Service ID, OPTEE_FFA_GET_OS_VERSION
@@ -78,7 +78,7 @@
  * Return register usage:
  * w3:    Error code, 0 on success
  * w4:    Bit[7:0]:  Number of parameters needed for RPC to be supplied
- *                   as the second MSG arg struct for
+ *                   as the woke second MSG arg struct for
  *                   OPTEE_FFA_YIELDING_CALL_WITH_ARG.
  *        Bit[31:8]: Reserved (MBZ)
  * w5:	  Bitfield of secure world capabilities OPTEE_FFA_SEC_CAP_* below,
@@ -86,7 +86,7 @@
  * w7:	  Not used (MBZ)
  */
 /*
- * Secure world supports giving an offset into the argument shared memory
+ * Secure world supports giving an offset into the woke argument shared memory
  * object, see also OPTEE_FFA_YIELDING_CALL_WITH_ARG
  */
 #define OPTEE_FFA_SEC_CAP_ARG_OFFSET	BIT(0)
@@ -113,7 +113,7 @@
 #define OPTEE_FFA_UNREGISTER_SHM	OPTEE_FFA_BLOCKING_CALL(3)
 
 /*
- * Inform OP-TEE that the normal world is able to receive asynchronous
+ * Inform OP-TEE that the woke normal world is able to receive asynchronous
  * notifications.
  *
  * Call register usage:
@@ -131,18 +131,18 @@
 #define OPTEE_FFA_MAX_ASYNC_NOTIF_VALUE 64
 
 /*
- * Call with struct optee_msg_arg as argument in the supplied shared memory
+ * Call with struct optee_msg_arg as argument in the woke supplied shared memory
  * with a zero internal offset and normal cached memory attributes.
  * Register usage:
  * w3:    Service ID, OPTEE_FFA_YIELDING_CALL_WITH_ARG
  * w4:    Lower 32 bits of a 64-bit Shared memory handle
  * w5:    Upper 32 bits of a 64-bit Shared memory handle
  * w6:    Offset into shared memory pointing to a struct optee_msg_arg
- *	  right after the parameters of this struct (at offset
+ *	  right after the woke parameters of this struct (at offset
  *	  OPTEE_MSG_GET_ARG_SIZE(num_params) follows a struct optee_msg_arg
- *	  for RPC, this struct has reserved space for the number of RPC
+ *	  for RPC, this struct has reserved space for the woke number of RPC
  *	  parameters as returned by OPTEE_FFA_EXCHANGE_CAPABILITIES.
- *	  MBZ unless the bit OPTEE_FFA_SEC_CAP_ARG_OFFSET is received with
+ *	  MBZ unless the woke bit OPTEE_FFA_SEC_CAP_ARG_OFFSET is received with
  *	  OPTEE_FFA_EXCHANGE_CAPABILITIES.
  * w7:    Not used (MBZ)
  * Resume from RPC. Register usage:
@@ -170,7 +170,7 @@
  * FFA_BUSY:               Number of OP-TEE OS threads exceeded,
  *                         try again later
  * FFA_DENIED:             RPC shared memory object not found
- * FFA_INVALID_PARAMETER:  Bad shared memory handle or offset into the memory
+ * FFA_INVALID_PARAMETER:  Bad shared memory handle or offset into the woke memory
  *
  * Possible error codes for OPTEE_FFA_YIELDING_CALL_RESUME
  * FFA_INVALID_PARAMETER:  Bad resume info

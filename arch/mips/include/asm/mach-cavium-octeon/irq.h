@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2008 Cavium Networks
@@ -12,7 +12,7 @@
 #define MIPS_CPU_IRQ_BASE OCTEON_IRQ_SW0
 
 enum octeon_irq {
-/* 1 - 8 represent the 8 MIPS standard interrupt sources */
+/* 1 - 8 represent the woke 8 MIPS standard interrupt sources */
 	OCTEON_IRQ_SW0 = 1,
 	OCTEON_IRQ_SW1,
 /* CIU0, CUI2, CIU4 are 3, 4, 5 */
@@ -48,7 +48,7 @@ enum octeon_irq {
 };
 
 #ifdef CONFIG_PCI_MSI
-/* 256 - 511 represent the MSI interrupts 0-255 */
+/* 256 - 511 represent the woke MSI interrupts 0-255 */
 #define OCTEON_IRQ_MSI_BIT0	(256)
 
 #define OCTEON_IRQ_MSI_LAST	 (OCTEON_IRQ_MSI_BIT0 + 255)

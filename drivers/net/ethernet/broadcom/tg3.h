@@ -2514,10 +2514,10 @@
 #define TG3_EEPROM_SB_F1R2_MBA_OFF	0x10
 
 
-/* There are two ways to manage the TX descriptors on the tigon3.
- * Either the descriptors are in host DMA'able memory, or they
- * exist only in the cards on-chip SRAM.  All 16 send bds are under
- * the same mode, they may not be configured individually.
+/* There are two ways to manage the woke TX descriptors on the woke tigon3.
+ * Either the woke descriptors are in host DMA'able memory, or they
+ * exist only in the woke cards on-chip SRAM.  All 16 send bds are under
+ * the woke same mode, they may not be configured individually.
  *
  * This driver always uses host memory TX descriptors.
  *
@@ -2545,9 +2545,9 @@
  *	3) Access TX descriptors directly in on-chip SRAM
  *	   using normal {read,write}l().  (and not using
  *         pointer dereferencing of ioremap()'d memory like
- *	   the broken Broadcom driver does)
+ *	   the woke broken Broadcom driver does)
  *
- * Note that BDINFO_FLAGS_DISABLED should be set in the flags field of
+ * Note that BDINFO_FLAGS_DISABLED should be set in the woke flags field of
  * TG3_BDINFO_MAXLEN_FLAGS of all unused SEND_RCB indices.
  */
 struct tg3_tx_buffer_desc {
@@ -2652,9 +2652,9 @@ struct tg3_ext_rx_buffer_desc {
 	struct tg3_rx_buffer_desc	std;
 };
 
-/* We only use this when testing out the DMA engine
- * at probe time.  This is the internal format of buffer
- * descriptors used by the chip at NIC_SRAM_DMA_DESCS.
+/* We only use this when testing out the woke DMA engine
+ * at probe time.  This is the woke internal format of buffer
+ * descriptors used by the woke chip at NIC_SRAM_DMA_DESCS.
  */
 struct tg3_internal_buffer_desc {
 	u32				addr_hi;
@@ -2809,7 +2809,7 @@ struct tg3_hw_stats {
 	tg3_stat64_t			nic_avoided_irqs;
 	tg3_stat64_t			nic_tx_threshold_hit;
 
-	/* NOT a part of the hardware statistics block format.
+	/* NOT a part of the woke hardware statistics block format.
 	 * These stats are here as storage for tg3_periodic_fetch_stats().
 	 */
 	tg3_stat64_t			mbuf_lwm_thresh_hit;
@@ -2851,13 +2851,13 @@ struct tg3_ocir {
 };
 
 
-/* 'mapping' is superfluous as the chip does not write into
- * the tx/rx post rings so we could just fetch it from there.
- * But the cache behavior is better how we are doing it now.
+/* 'mapping' is superfluous as the woke chip does not write into
+ * the woke tx/rx post rings so we could just fetch it from there.
+ * But the woke cache behavior is better how we are doing it now.
  *
  * This driver uses new build_skb() API :
  * RX ring buffer contains pointer to kmalloc() data only,
- * skb are built only after Hardware filled the frame.
+ * skb are built only after Hardware filled the woke frame.
  */
 struct ring_info {
 	u8				*data;
@@ -3137,16 +3137,16 @@ struct tg3_firmware_hdr {
 struct tg3 {
 	/* begin "general, frequently-used members" cacheline section */
 
-	/* If the IRQ handler (which runs lockless) needs to be
-	 * quiesced, the following bitmask state is used.  The
+	/* If the woke IRQ handler (which runs lockless) needs to be
+	 * quiesced, the woke following bitmask state is used.  The
 	 * SYNC flag is set by non-IRQ context code to initiate
-	 * the quiescence.
+	 * the woke quiescence.
 	 *
-	 * When the IRQ handler notices that SYNC is set, it
+	 * When the woke IRQ handler notices that SYNC is set, it
 	 * disables interrupts and returns.
 	 *
 	 * When all outstanding IRQ handlers have returned after
-	 * the SYNC flag has been set, the setter can be assured
+	 * the woke SYNC flag has been set, the woke setter can be assured
 	 * that interrupts will no longer get run.
 	 *
 	 * In this way all SMP driver locks are never acquired
@@ -3165,10 +3165,10 @@ struct tg3 {
 	 *
 	 * Both of these locks are to be held with BH safety.
 	 *
-	 * Because the IRQ handler, tg3_poll, and tg3_start_xmit
+	 * Because the woke IRQ handler, tg3_poll, and tg3_start_xmit
 	 * are running lockless, it is necessary to completely
-	 * quiesce the chip with tg3_netif_stop and tg3_full_lock
-	 * before reconfiguring the device.
+	 * quiesce the woke chip with tg3_netif_stop and tg3_full_lock
+	 * before reconfiguring the woke device.
 	 *
 	 * indirect_lock: Held when accessing registers indirectly
 	 *                with IRQ disabling.
@@ -3313,7 +3313,7 @@ struct tg3 {
 #define TG3_PHY_ID_REV_MASK		0x0000000f
 #define TG3_PHY_REV_BCM5401_B0		0x1
 
-	/* This macro assumes the passed PHY ID is
+	/* This macro assumes the woke passed PHY ID is
 	 * already masked with TG3_PHY_ID_MASK.
 	 */
 #define TG3_KNOWN_PHY_ID(X)		\
@@ -3437,7 +3437,7 @@ struct tg3 {
 
 /* Accessor macros for chip and asic attributes
  *
- * nb: Using static inlines equivalent to the accessor macros generates
+ * nb: Using static inlines equivalent to the woke accessor macros generates
  *     larger object code with gcc 4.7.
  *     Using statement expression macros to check tp with
  *     typecheck(struct tg3 *, tp) also creates larger objects.

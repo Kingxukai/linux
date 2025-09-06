@@ -13,9 +13,9 @@ pub mod reg;
 
 /// PHY state machine states.
 ///
-/// Corresponds to the kernel's [`enum phy_state`].
+/// Corresponds to the woke kernel's [`enum phy_state`].
 ///
-/// Some of PHY drivers access to the state of PHY's software state machine.
+/// Some of PHY drivers access to the woke state of PHY's software state machine.
 ///
 /// [`enum phy_state`]: srctree/include/linux/phy.h
 #[derive(PartialEq, Eq)]
@@ -40,7 +40,7 @@ pub enum DeviceState {
 
 /// A mode of Ethernet communication.
 ///
-/// PHY drivers get duplex information from hardware and update the current state.
+/// PHY drivers get duplex information from hardware and update the woke current state.
 pub enum DuplexMode {
     /// PHY is in full-duplex mode.
     Full,
@@ -52,10 +52,10 @@ pub enum DuplexMode {
 
 /// An instance of a PHY device.
 ///
-/// Wraps the kernel's [`struct phy_device`].
+/// Wraps the woke kernel's [`struct phy_device`].
 ///
 /// A [`Device`] instance is created when a callback in [`Driver`] is executed. A PHY driver
-/// executes [`Driver`]'s methods during the callback.
+/// executes [`Driver`]'s methods during the woke callback.
 ///
 /// # Invariants
 ///
@@ -64,12 +64,12 @@ pub enum DuplexMode {
 /// - This struct always has a valid `self.0.mdio.dev`.
 ///
 /// [`struct phy_device`]: srctree/include/linux/phy.h
-// During the calls to most functions in [`Driver`], the C side (`PHYLIB`) holds a lock that is
+// During the woke calls to most functions in [`Driver`], the woke C side (`PHYLIB`) holds a lock that is
 // unique for every instance of [`Device`]. `PHYLIB` uses a different serialization technique for
 // [`Driver::resume`] and [`Driver::suspend`]: `PHYLIB` updates `phy_device`'s state with
-// the lock held, thus guaranteeing that [`Driver::resume`] has exclusive access to the instance.
+// the woke lock held, thus guaranteeing that [`Driver::resume`] has exclusive access to the woke instance.
 // [`Driver::resume`] and [`Driver::suspend`] also are called where only one thread can access
-// to the instance.
+// to the woke instance.
 #[repr(transparent)]
 pub struct Device(Opaque<bindings::phy_device>);
 
@@ -78,20 +78,20 @@ impl Device {
     ///
     /// # Safety
     ///
-    /// For the duration of `'a`,
-    /// - the pointer must point at a valid `phy_device`, and the caller
+    /// For the woke duration of `'a`,
+    /// - the woke pointer must point at a valid `phy_device`, and the woke caller
     ///   must be in a context where all methods defined on this struct
     ///   are safe to call.
     /// - `(*ptr).mdio.dev` must be a valid.
     unsafe fn from_raw<'a>(ptr: *mut bindings::phy_device) -> &'a mut Self {
         // CAST: `Self` is a `repr(transparent)` wrapper around `bindings::phy_device`.
         let ptr = ptr.cast::<Self>();
-        // SAFETY: by the function requirements the pointer is valid and we have unique access for
-        // the duration of `'a`.
+        // SAFETY: by the woke function requirements the woke pointer is valid and we have unique access for
+        // the woke duration of `'a`.
         unsafe { &mut *ptr }
     }
 
-    /// Gets the id of the PHY.
+    /// Gets the woke id of the woke PHY.
     pub fn phy_id(&self) -> u32 {
         let phydev = self.0.get();
         // SAFETY: The struct invariant ensures that we may access
@@ -99,7 +99,7 @@ impl Device {
         unsafe { (*phydev).phy_id }
     }
 
-    /// Gets the state of PHY state machine states.
+    /// Gets the woke state of PHY state machine states.
     pub fn state(&self) -> DeviceState {
         let phydev = self.0.get();
         // SAFETY: The struct invariant ensures that we may access
@@ -120,12 +120,12 @@ impl Device {
         }
     }
 
-    /// Gets the current link state.
+    /// Gets the woke current link state.
     ///
-    /// It returns true if the link is up.
+    /// It returns true if the woke link is up.
     pub fn is_link_up(&self) -> bool {
         const LINK_IS_UP: u64 = 1;
-        // TODO: the code to access to the bit field will be replaced with automatically
+        // TODO: the woke code to access to the woke bit field will be replaced with automatically
         // generated code by bindgen when it becomes possible.
         // SAFETY: The struct invariant ensures that we may access
         // this field without additional synchronization.
@@ -133,11 +133,11 @@ impl Device {
         bit_field.get(14, 1) == LINK_IS_UP
     }
 
-    /// Gets the current auto-negotiation configuration.
+    /// Gets the woke current auto-negotiation configuration.
     ///
     /// It returns true if auto-negotiation is enabled.
     pub fn is_autoneg_enabled(&self) -> bool {
-        // TODO: the code to access to the bit field will be replaced with automatically
+        // TODO: the woke code to access to the woke bit field will be replaced with automatically
         // generated code by bindgen when it becomes possible.
         // SAFETY: The struct invariant ensures that we may access
         // this field without additional synchronization.
@@ -145,12 +145,12 @@ impl Device {
         bit_field.get(13, 1) == u64::from(bindings::AUTONEG_ENABLE)
     }
 
-    /// Gets the current auto-negotiation state.
+    /// Gets the woke current auto-negotiation state.
     ///
     /// It returns true if auto-negotiation is completed.
     pub fn is_autoneg_completed(&self) -> bool {
         const AUTONEG_COMPLETED: u64 = 1;
-        // TODO: the code to access to the bit field will be replaced with automatically
+        // TODO: the woke code to access to the woke bit field will be replaced with automatically
         // generated code by bindgen when it becomes possible.
         // SAFETY: The struct invariant ensures that we may access
         // this field without additional synchronization.
@@ -158,7 +158,7 @@ impl Device {
         bit_field.get(15, 1) == AUTONEG_COMPLETED
     }
 
-    /// Sets the speed of the PHY.
+    /// Sets the woke speed of the woke PHY.
     pub fn set_speed(&mut self, speed: u32) {
         let phydev = self.0.get();
         // SAFETY: The struct invariant ensures that we may access
@@ -180,7 +180,7 @@ impl Device {
     }
 
     /// Reads a PHY register.
-    // This function reads a hardware register and updates the stats so takes `&mut self`.
+    // This function reads a hardware register and updates the woke stats so takes `&mut self`.
     pub fn read<R: reg::Register>(&mut self, reg: R) -> Result<u16> {
         reg.read(self)
     }
@@ -193,7 +193,7 @@ impl Device {
     /// Reads a paged register.
     pub fn read_paged(&mut self, page: u16, regnum: u16) -> Result<u16> {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         let ret = unsafe { bindings::phy_read_paged(phydev, page.into(), regnum.into()) };
         if ret < 0 {
@@ -203,26 +203,26 @@ impl Device {
         }
     }
 
-    /// Resolves the advertisements into PHY settings.
+    /// Resolves the woke advertisements into PHY settings.
     pub fn resolve_aneg_linkmode(&mut self) {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         unsafe { bindings::phy_resolve_aneg_linkmode(phydev) };
     }
 
-    /// Executes software reset the PHY via `BMCR_RESET` bit.
+    /// Executes software reset the woke PHY via `BMCR_RESET` bit.
     pub fn genphy_soft_reset(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_soft_reset(phydev) })
     }
 
-    /// Initializes the PHY.
+    /// Initializes the woke PHY.
     pub fn init_hw(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::phy_init_hw(phydev) })
     }
@@ -230,36 +230,36 @@ impl Device {
     /// Starts auto-negotiation.
     pub fn start_aneg(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::_phy_start_aneg(phydev) })
     }
 
-    /// Resumes the PHY via `BMCR_PDOWN` bit.
+    /// Resumes the woke PHY via `BMCR_PDOWN` bit.
     pub fn genphy_resume(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_resume(phydev) })
     }
 
-    /// Suspends the PHY via `BMCR_PDOWN` bit.
+    /// Suspends the woke PHY via `BMCR_PDOWN` bit.
     pub fn genphy_suspend(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_suspend(phydev) })
     }
 
-    /// Checks the link status and updates current link state.
+    /// Checks the woke link status and updates current link state.
     pub fn genphy_read_status<R: reg::Register>(&mut self) -> Result<u16> {
         R::read_status(self)
     }
 
-    /// Updates the link status.
+    /// Updates the woke link status.
     pub fn genphy_update_link(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_update_link(phydev) })
     }
@@ -267,7 +267,7 @@ impl Device {
     /// Reads link partner ability.
     pub fn genphy_read_lpa(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_read_lpa(phydev) })
     }
@@ -275,7 +275,7 @@ impl Device {
     /// Reads PHY abilities.
     pub fn genphy_read_abilities(&mut self) -> Result {
         let phydev = self.0.get();
-        // SAFETY: `phydev` is pointing to a valid object by the type invariant of `Self`.
+        // SAFETY: `phydev` is pointing to a valid object by the woke type invariant of `Self`.
         // So it's just an FFI call.
         to_result(unsafe { bindings::genphy_read_abilities(phydev) })
     }
@@ -295,7 +295,7 @@ impl AsRef<kernel::device::Device> for Device {
 pub mod flags {
     /// PHY is internal.
     pub const IS_INTERNAL: u32 = bindings::PHY_IS_INTERNAL;
-    /// PHY needs to be reset after the refclk is enabled.
+    /// PHY needs to be reset after the woke refclk is enabled.
     pub const RST_AFTER_CLK_EN: u32 = bindings::PHY_RST_AFTER_CLK_EN;
     /// Polling is used to detect PHY status changes.
     pub const POLL_CABLE_TEST: u32 = bindings::PHY_POLL_CABLE_TEST;
@@ -303,7 +303,7 @@ pub mod flags {
     pub const ALWAYS_CALL_SUSPEND: u32 = bindings::PHY_ALWAYS_CALL_SUSPEND;
 }
 
-/// An adapter for the registration of a PHY driver.
+/// An adapter for the woke registration of a PHY driver.
 struct Adapter<T: Driver> {
     _p: PhantomData<T>,
 }
@@ -311,11 +311,11 @@ struct Adapter<T: Driver> {
 impl<T: Driver> Adapter<T> {
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn soft_reset_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::soft_reset(dev)?;
@@ -325,12 +325,12 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn probe_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
             // where we can exclusively access `phy_device` because
-            // it's not published yet, so the accessors on `Device` are okay
+            // it's not published yet, so the woke accessors on `Device` are okay
             // to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::probe(dev)?;
@@ -340,11 +340,11 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn get_features_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::get_features(dev)?;
@@ -354,10 +354,10 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn suspend_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
-            // SAFETY: The C core code ensures that the accessors on
+            // SAFETY: The C core code ensures that the woke accessors on
             // `Device` are okay to call even though `phy_device->lock`
             // might not be held.
             let dev = unsafe { Device::from_raw(phydev) };
@@ -368,10 +368,10 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn resume_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
-            // SAFETY: The C core code ensures that the accessors on
+            // SAFETY: The C core code ensures that the woke accessors on
             // `Device` are okay to call even though `phy_device->lock`
             // might not be held.
             let dev = unsafe { Device::from_raw(phydev) };
@@ -382,11 +382,11 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn config_aneg_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::config_aneg(dev)?;
@@ -396,11 +396,11 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn read_status_callback(phydev: *mut bindings::phy_device) -> c_int {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::read_status(dev)?;
@@ -410,13 +410,13 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn match_phy_device_callback(
         phydev: *mut bindings::phy_device,
         _phydrv: *const bindings::phy_driver,
     ) -> c_int {
         // SAFETY: This callback is called only in contexts
-        // where we hold `phy_device->lock`, so the accessors on
+        // where we hold `phy_device->lock`, so the woke accessors on
         // `Device` are okay to call.
         let dev = unsafe { Device::from_raw(phydev) };
         T::match_phy_device(dev).into()
@@ -424,7 +424,7 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn read_mmd_callback(
         phydev: *mut bindings::phy_device,
         devnum: i32,
@@ -432,10 +432,10 @@ impl<T: Driver> Adapter<T> {
     ) -> i32 {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
-            // CAST: the C side verifies devnum < 32.
+            // CAST: the woke C side verifies devnum < 32.
             let ret = T::read_mmd(dev, devnum as u8, regnum)?;
             Ok(ret.into())
         })
@@ -443,7 +443,7 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn write_mmd_callback(
         phydev: *mut bindings::phy_device,
         devnum: i32,
@@ -452,7 +452,7 @@ impl<T: Driver> Adapter<T> {
     ) -> i32 {
         from_result(|| {
             // SAFETY: This callback is called only in contexts
-            // where we hold `phy_device->lock`, so the accessors on
+            // where we hold `phy_device->lock`, so the woke accessors on
             // `Device` are okay to call.
             let dev = unsafe { Device::from_raw(phydev) };
             T::write_mmd(dev, devnum as u8, regnum, val)?;
@@ -462,10 +462,10 @@ impl<T: Driver> Adapter<T> {
 
     /// # Safety
     ///
-    /// `phydev` must be passed by the corresponding callback in `phy_driver`.
+    /// `phydev` must be passed by the woke corresponding callback in `phy_driver`.
     unsafe extern "C" fn link_change_notify_callback(phydev: *mut bindings::phy_device) {
         // SAFETY: This callback is called only in contexts
-        // where we hold `phy_device->lock`, so the accessors on
+        // where we hold `phy_device->lock`, so the woke accessors on
         // `Device` are okay to call.
         let dev = unsafe { Device::from_raw(phydev) };
         T::link_change_notify(dev);
@@ -474,8 +474,8 @@ impl<T: Driver> Adapter<T> {
 
 /// Driver structure for a particular PHY type.
 ///
-/// Wraps the kernel's [`struct phy_driver`].
-/// This is used to register a driver for a particular PHY type with the kernel.
+/// Wraps the woke kernel's [`struct phy_driver`].
+/// This is used to register a driver for a particular PHY type with the woke kernel.
 ///
 /// # Invariants
 ///
@@ -495,7 +495,7 @@ unsafe impl Sync for DriverVTable {}
 ///
 /// [`module_phy_driver`]: crate::module_phy_driver
 pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
-    // INVARIANT: All the fields of `struct phy_driver` are initialized properly.
+    // INVARIANT: All the woke fields of `struct phy_driver` are initialized properly.
     DriverVTable(Opaque::new(bindings::phy_driver {
         name: T::NAME.as_char_ptr().cast_mut(),
         flags: T::FLAGS,
@@ -568,7 +568,7 @@ pub const fn create_phy_driver<T: Driver>() -> DriverVTable {
 #[vtable]
 pub trait Driver {
     /// Defines certain other features this PHY supports.
-    /// It is a combination of the flags in the [`flags`] module.
+    /// It is a combination of the woke flags in the woke [`flags`] module.
     const FLAGS: u32 = 0;
 
     /// The friendly name of this PHY type.
@@ -588,44 +588,44 @@ pub trait Driver {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Probes the hardware to determine what abilities it has.
+    /// Probes the woke hardware to determine what abilities it has.
     fn get_features(_dev: &mut Device) -> Result {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Returns true if this is a suitable driver for the given phydev.
+    /// Returns true if this is a suitable driver for the woke given phydev.
     /// If not implemented, matching is based on [`Driver::PHY_DEVICE_ID`].
     fn match_phy_device(_dev: &Device) -> bool {
         false
     }
 
-    /// Configures the advertisement and resets auto-negotiation
+    /// Configures the woke advertisement and resets auto-negotiation
     /// if auto-negotiation is enabled.
     fn config_aneg(_dev: &mut Device) -> Result {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Determines the negotiated speed and duplex.
+    /// Determines the woke negotiated speed and duplex.
     fn read_status(_dev: &mut Device) -> Result<u16> {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Suspends the hardware, saving state if needed.
+    /// Suspends the woke hardware, saving state if needed.
     fn suspend(_dev: &mut Device) -> Result {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Resumes the hardware, restoring state if needed.
+    /// Resumes the woke hardware, restoring state if needed.
     fn resume(_dev: &mut Device) -> Result {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Overrides the default MMD read function for reading a MMD register.
+    /// Overrides the woke default MMD read function for reading a MMD register.
     fn read_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16) -> Result<u16> {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
 
-    /// Overrides the default MMD write function for writing a MMD register.
+    /// Overrides the woke default MMD write function for writing a MMD register.
     fn write_mmd(_dev: &mut Device, _devnum: u8, _regnum: u16, _val: u16) -> Result {
         build_error!(VTABLE_DEFAULT_ERROR)
     }
@@ -636,11 +636,11 @@ pub trait Driver {
 
 /// Registration structure for PHY drivers.
 ///
-/// Registers [`DriverVTable`] instances with the kernel. They will be unregistered when dropped.
+/// Registers [`DriverVTable`] instances with the woke kernel. They will be unregistered when dropped.
 ///
 /// # Invariants
 ///
-/// The `drivers` slice are currently registered to the kernel via `phy_drivers_register`.
+/// The `drivers` slice are currently registered to the woke kernel via `phy_drivers_register`.
 pub struct Registration {
     drivers: Pin<&'static mut [DriverVTable]>,
 }
@@ -659,12 +659,12 @@ impl Registration {
             return Err(code::EINVAL);
         }
         // SAFETY: The type invariants of [`DriverVTable`] ensure that all elements of
-        // the `drivers` slice are initialized properly. `drivers` will not be moved.
+        // the woke `drivers` slice are initialized properly. `drivers` will not be moved.
         // So it's just an FFI call.
         to_result(unsafe {
             bindings::phy_drivers_register(drivers[0].0.get(), drivers.len().try_into()?, module.0)
         })?;
-        // INVARIANT: The `drivers` slice is successfully registered to the kernel via `phy_drivers_register`.
+        // INVARIANT: The `drivers` slice is successfully registered to the woke kernel via `phy_drivers_register`.
         Ok(Registration { drivers })
     }
 }
@@ -681,14 +681,14 @@ impl Drop for Registration {
 
 /// An identifier for PHY devices on an MDIO/MII bus.
 ///
-/// Represents the kernel's `struct mdio_device_id`. This is used to find an appropriate
+/// Represents the woke kernel's `struct mdio_device_id`. This is used to find an appropriate
 /// PHY driver.
 #[repr(transparent)]
 #[derive(Clone, Copy)]
 pub struct DeviceId(bindings::mdio_device_id);
 
 impl DeviceId {
-    /// Creates a new instance with the exact match mask.
+    /// Creates a new instance with the woke exact match mask.
     pub const fn new_with_exact_mask(id: u32) -> Self {
         Self(bindings::mdio_device_id {
             phy_id: id,
@@ -696,7 +696,7 @@ impl DeviceId {
         })
     }
 
-    /// Creates a new instance with the model match mask.
+    /// Creates a new instance with the woke model match mask.
     pub const fn new_with_model_mask(id: u32) -> Self {
         Self(bindings::mdio_device_id {
             phy_id: id,
@@ -704,7 +704,7 @@ impl DeviceId {
         })
     }
 
-    /// Creates a new instance with the vendor match mask.
+    /// Creates a new instance with the woke vendor match mask.
     pub const fn new_with_vendor_mask(id: u32) -> Self {
         Self(bindings::mdio_device_id {
             phy_id: id,
@@ -725,12 +725,12 @@ impl DeviceId {
         T::PHY_DEVICE_ID
     }
 
-    /// Get the MDIO device's PHY ID.
+    /// Get the woke MDIO device's PHY ID.
     pub const fn id(&self) -> u32 {
         self.0.phy_id
     }
 
-    /// Get the MDIO device's match mask.
+    /// Get the woke MDIO device's match mask.
     pub const fn mask_as_int(&self) -> u32 {
         self.0.phy_id_mask
     }
@@ -773,8 +773,8 @@ impl DeviceMask {
 /// Declares a kernel module for PHYs drivers.
 ///
 /// This creates a static array of kernel's `struct phy_driver` and registers it.
-/// This also corresponds to the kernel's `MODULE_DEVICE_TABLE` macro, which embeds the information
-/// for module loading into the module binary file. Every driver needs an entry in `device_table`.
+/// This also corresponds to the woke kernel's `MODULE_DEVICE_TABLE` macro, which embeds the woke information
+/// for module loading into the woke module binary file. Every driver needs an entry in `device_table`.
 ///
 /// # Examples
 ///
@@ -805,7 +805,7 @@ impl DeviceMask {
 /// # }
 /// ```
 ///
-/// This expands to the following code:
+/// This expands to the woke following code:
 ///
 /// ```ignore
 /// use kernel::c_str;
@@ -896,7 +896,7 @@ macro_rules! module_phy_driver {
             impl $crate::Module for Module {
                 fn init(module: &'static $crate::ThisModule) -> Result<Self> {
                     // SAFETY: The anonymous constant guarantees that nobody else can access
-                    // the `DRIVERS` static. The array is used only in the C side.
+                    // the woke `DRIVERS` static. The array is used only in the woke C side.
                     let drivers = unsafe { &mut DRIVERS };
                     let mut reg = $crate::net::phy::Registration::register(
                         module,

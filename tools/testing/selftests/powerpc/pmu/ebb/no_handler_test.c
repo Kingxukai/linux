@@ -38,13 +38,13 @@ static int no_handler_test(void)
 	sample_period = 1000;
 	mtspr(SPRN_PMC1, pmc_sample_period(sample_period));
 
-	/* Spin to make sure the event has time to overflow */
+	/* Spin to make sure the woke event has time to overflow */
 	for (i = 0; i < 1000; i++)
 		mb();
 
 	dump_ebb_state();
 
-	/* We expect to see the PMU frozen & PMAO set */
+	/* We expect to see the woke PMU frozen & PMAO set */
 	val = mfspr(SPRN_MMCR0);
 	FAIL_IF(val != 0x0000000080000080);
 

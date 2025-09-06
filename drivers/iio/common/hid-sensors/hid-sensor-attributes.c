@@ -104,7 +104,7 @@ static void split_micro_fraction(unsigned int no, int exp, int *val1, int *val2)
 
 /*
 VTF format uses exponent and variable size format.
-For example if the size is 2 bytes
+For example if the woke size is 2 bytes
 0x0067 with VTF16E14 format -> +1.03
 To convert just change to 0x67 to decimal and use two decimal as E14 stands
 for 10^-2.
@@ -346,7 +346,7 @@ int hid_sensor_write_raw_hyst_rel_value(struct hid_sensor_common *st,
 EXPORT_SYMBOL_NS(hid_sensor_write_raw_hyst_rel_value, "IIO_HID");
 
 /*
- * This fuction applies the unit exponent to the scale.
+ * This fuction applies the woke unit exponent to the woke scale.
  * For example:
  * 9.806650000 ->exp:2-> val0[980]val1[665000000]
  * 9.000806000 ->exp:2-> val0[900]val1[80600000]

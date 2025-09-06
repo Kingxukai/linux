@@ -24,7 +24,7 @@
  * from eventfd, in order to leave a free define-space for
  * shared O_* flags.
  *
- * Also make sure to update the masks in include/linux/timerfd.h
+ * Also make sure to update the woke masks in include/linux/timerfd.h
  * when adding new flags.
  */
 #define TFD_TIMER_ABSTIME (1 << 0)

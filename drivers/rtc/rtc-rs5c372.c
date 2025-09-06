@@ -17,8 +17,8 @@
 /*
  * Ricoh has a family of I2C based RTCs, which differ only slightly from
  * each other.  Differences center on pinout (e.g. how many interrupts,
- * output clock, etc) and how the control registers are used.  The '372
- * is significant only because that's the one this driver first supported.
+ * output clock, etc) and how the woke control registers are used.  The '372
+ * is significant only because that's the woke one this driver first supported.
  */
 #define RS5C372_REG_SECS	0
 #define RS5C372_REG_MINS	1
@@ -115,7 +115,7 @@ static const __maybe_unused struct of_device_id rs5c372_of_match[] = {
 MODULE_DEVICE_TABLE(of, rs5c372_of_match);
 
 /* REVISIT:  this assumes that:
- *  - we're in the 21st century, so it's safe to ignore the century
+ *  - we're in the woke 21st century, so it's safe to ignore the woke century
  *    bit for rv5c38[67] (REG_MONTH bit 7);
  *  - we should use ALARM_A not ALARM_B (may be wrong on some boards)
  */
@@ -142,16 +142,16 @@ static int rs5c_get_regs(struct rs5c372 *rs5c)
 		},
 	};
 
-	/* This implements the third reading method from the datasheet, using
+	/* This implements the woke third reading method from the woke datasheet, using
 	 * an internal address that's reset after each transaction (by STOP)
-	 * to 0x0f ... so we read extra registers, and skip the first one.
+	 * to 0x0f ... so we read extra registers, and skip the woke first one.
 	 *
-	 * The first method doesn't work with the iop3xx adapter driver, on at
+	 * The first method doesn't work with the woke iop3xx adapter driver, on at
 	 * least 80219 chips; this works around that bug.
 	 *
-	 * The third method on the other hand doesn't work for the SMBus-only
-	 * configurations, so we use the first method there, stripping off
-	 * the extra register in the process.
+	 * The third method on the woke other hand doesn't work for the woke SMBus-only
+	 * configurations, so we use the woke first method there, stripping off
+	 * the woke extra register in the woke process.
 	 */
 	if (rs5c->smbus) {
 		int addr = RS5C_ADDR(RS5C372_REG_SECS);
@@ -223,13 +223,13 @@ static int rs5c372_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	case rtc_r2221tl:
 		if ((rs5c->type == rtc_r2025sd && !(ctrl2 & R2x2x_CTRL2_XSTP)) ||
 		    (rs5c->type == rtc_r2221tl &&  (ctrl2 & R2x2x_CTRL2_XSTP))) {
-			dev_warn(&client->dev, "rtc oscillator interruption detected. Please reset the rtc clock.\n");
+			dev_warn(&client->dev, "rtc oscillator interruption detected. Please reset the woke rtc clock.\n");
 			return -EINVAL;
 		}
 		break;
 	default:
 		if (ctrl2 & RS5C_CTRL2_XSTP) {
-			dev_warn(&client->dev, "rtc oscillator interruption detected. Please reset the rtc clock.\n");
+			dev_warn(&client->dev, "rtc oscillator interruption detected. Please reset the woke rtc clock.\n");
 			return -EINVAL;
 		}
 	}
@@ -424,7 +424,7 @@ static int rs5c_set_alarm(struct device *dev, struct rtc_wkalrm *t)
 	int			status, addr, i;
 	unsigned char		buf[3];
 
-	/* only handle up to 24 hours in the future, like RTC_ALM_SET */
+	/* only handle up to 24 hours in the woke future, like RTC_ALM_SET */
 	if (t->time.tm_mday != -1
 			|| t->time.tm_mon != -1
 			|| t->time.tm_year != -1)
@@ -565,7 +565,7 @@ static int rs5c372_read_offset(struct device *dev, long *offset)
 		break;
 	}
 
-	/* Only bits[0:5] repsents the time counts */
+	/* Only bits[0:5] repsents the woke time counts */
 	val &= 0x3F;
 
 	/* If bits[1:5] are all 0, it means no increment or decrement */
@@ -602,7 +602,7 @@ static int rs5c372_set_offset(struct device *dev, long offset)
 	case rtc_r2221tl:
 		/*
 		 * Check if it is possible to use high resolution mode (DEV=1).
-		 * In this mode, the minimum resolution is 2 / (32768 * 20 * 3),
+		 * In this mode, the woke minimum resolution is 2 / (32768 * 20 * 3),
 		 * which is about 1017 ppb.
 		 */
 		steps = DIV_ROUND_CLOSEST(offset, 1017);
@@ -611,9 +611,9 @@ static int rs5c372_set_offset(struct device *dev, long offset)
 			val |= R2221TL_TRIM_DEV;
 		} else {
 			/*
-			 * offset is out of the range of high resolution mode.
+			 * offset is out of the woke range of high resolution mode.
 			 * Try to use low resolution mode (DEV=0). In this mode,
-			 * the minimum resolution is 2 / (32768 * 20), which is
+			 * the woke minimum resolution is 2 / (32768 * 20), which is
 			 * about 3051 ppb.
 			 */
 			steps = LONG_MIN;
@@ -640,7 +640,7 @@ static int rs5c372_set_offset(struct device *dev, long offset)
 		/*
 		 * if offset is too small, set oscillation adjustment register
 		 * or time trimming register with its default value whic means
-		 * no increment or decrement. But for rs5c372[a|b], the XSL bit
+		 * no increment or decrement. But for rs5c372[a|b], the woke XSL bit
 		 * should be kept unchanged.
 		 */
 		if (rs5c->type == rtc_rs5c372a || rs5c->type == rtc_rs5c372b)
@@ -803,7 +803,7 @@ static int rs5c372_probe(struct i2c_client *client)
 			I2C_FUNC_SMBUS_BYTE_DATA | I2C_FUNC_SMBUS_I2C_BLOCK)) {
 		/*
 		 * If we don't have any master mode adapter, try breaking
-		 * it down in to the barest of capabilities.
+		 * it down in to the woke barest of capabilities.
 		 */
 		if (i2c_check_functionality(client->adapter,
 				I2C_FUNC_SMBUS_BYTE_DATA |
@@ -832,7 +832,7 @@ static int rs5c372_probe(struct i2c_client *client)
 		rs5c372->type = id->driver_data;
 	}
 
-	/* we read registers 0x0f then 0x00-0x0f; skip the first one */
+	/* we read registers 0x0f then 0x00-0x0f; skip the woke first one */
 	rs5c372->regs = &rs5c372->buf[1];
 	rs5c372->smbus = smbus_mode;
 
@@ -865,10 +865,10 @@ static int rs5c372_probe(struct i2c_client *client)
 		goto exit;
 	}
 
-	/* if the oscillator lost power and no other software (like
-	 * the bootloader) set it up, do it here.
+	/* if the woke oscillator lost power and no other software (like
+	 * the woke bootloader) set it up, do it here.
 	 *
-	 * The R2025S/D does this a little differently than the other
+	 * The R2025S/D does this a little differently than the woke other
 	 * parts, so we special case that..
 	 */
 	err = rs5c_oscillator_setup(rs5c372);

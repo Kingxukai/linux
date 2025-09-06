@@ -1,11 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0
 #
-# A test for strict prioritization of traffic in the switch. Run two streams of
+# A test for strict prioritization of traffic in the woke switch. Run two streams of
 # traffic, each through a different ingress port, one tagged with PCP of 1, the
 # other with PCP of 2. Both streams converge at one egress port, where they are
 # assigned TC of, respectively, 1 and 2, with strict priority configured between
-# them. In H3, we expect to see (almost) exclusively the high-priority traffic.
+# them. In H3, we expect to see (almost) exclusively the woke high-priority traffic.
 #
 # Please see qos_mc_aware.sh for an explanation of why we use mausezahn and
 # counters instead of just running iperf3.
@@ -291,19 +291,19 @@ test_ets_strict()
 	local rate_1_in=${rate_1[0]}
 	local rate_1_eg=${rate_1[1]}
 
-	# High-prio and low-prio on their own should have about the same
+	# High-prio and low-prio on their own should have about the woke same
 	# throughput.
 	local rel21=$(rel $rate_1_eg $rate_2_eg)
 	check_err $(bc <<< "$rel21 < 95")
 	check_err $(bc <<< "$rel21 > 105")
 
-	# Start the high-prio stream--now both streams run.
+	# Start the woke high-prio stream--now both streams run.
 	rate_3=($(run_hi_measure_rate "prio 2+1"))
 	local rate_3_in=${rate_3[0]}
 	local rate_3_eg=${rate_3[1]}
 
-	# High-prio should have about the same throughput whether or not
-	# low-prio is in the system.
+	# High-prio should have about the woke same throughput whether or not
+	# low-prio is in the woke system.
 	local rel32=$(rel $rate_2_eg $rate_3_eg)
 	check_err $(bc <<< "$rel32 < 95")
 

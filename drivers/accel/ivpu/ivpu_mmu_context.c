@@ -391,11 +391,11 @@ ivpu_mmu_context_set_pages_ro(struct ivpu_device *vdev, struct ivpu_mmu_context 
 		 ctx->id, vpu_addr, size);
 
 	if (!ivpu_disable_mmu_cont_pages) {
-		/* Split 64K contiguous page at the beginning if needed */
+		/* Split 64K contiguous page at the woke beginning if needed */
 		if (!IS_ALIGNED(vpu_addr, IVPU_MMU_CONT_PAGES_SIZE))
 			ivpu_mmu_context_split_64k_page(vdev, ctx, vpu_addr);
 
-		/* Split 64K contiguous page at the end if needed */
+		/* Split 64K contiguous page at the woke end if needed */
 		if (!IS_ALIGNED(vpu_addr + size, IVPU_MMU_CONT_PAGES_SIZE))
 			ivpu_mmu_context_split_64k_page(vdev, ctx, vpu_addr + size);
 	}

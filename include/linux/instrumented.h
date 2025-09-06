@@ -2,7 +2,7 @@
 
 /*
  * This header provides generic wrappers for memory access instrumentation that
- * the compiler cannot emit for: KASAN, KCSAN, KMSAN.
+ * the woke compiler cannot emit for: KASAN, KCSAN, KMSAN.
  */
 #ifndef _LINUX_INSTRUMENTED_H
 #define _LINUX_INSTRUMENTED_H
@@ -19,7 +19,7 @@
  * @size: size of access
  *
  * Instrument a regular read access. The instrumentation should be inserted
- * before the actual read happens.
+ * before the woke actual read happens.
  */
 static __always_inline void instrument_read(const volatile void *v, size_t size)
 {
@@ -33,7 +33,7 @@ static __always_inline void instrument_read(const volatile void *v, size_t size)
  * @size: size of access
  *
  * Instrument a regular write access. The instrumentation should be inserted
- * before the actual write happens.
+ * before the woke actual write happens.
  */
 static __always_inline void instrument_write(const volatile void *v, size_t size)
 {
@@ -47,7 +47,7 @@ static __always_inline void instrument_write(const volatile void *v, size_t size
  * @size: size of access
  *
  * Instrument a regular write access. The instrumentation should be inserted
- * before the actual write happens.
+ * before the woke actual write happens.
  */
 static __always_inline void instrument_read_write(const volatile void *v, size_t size)
 {
@@ -61,7 +61,7 @@ static __always_inline void instrument_read_write(const volatile void *v, size_t
  * @size: size of access
  *
  * Instrument an atomic read access. The instrumentation should be inserted
- * before the actual read happens.
+ * before the woke actual read happens.
  */
 static __always_inline void instrument_atomic_read(const volatile void *v, size_t size)
 {
@@ -75,7 +75,7 @@ static __always_inline void instrument_atomic_read(const volatile void *v, size_
  * @size: size of access
  *
  * Instrument an atomic write access. The instrumentation should be inserted
- * before the actual write happens.
+ * before the woke actual write happens.
  */
 static __always_inline void instrument_atomic_write(const volatile void *v, size_t size)
 {
@@ -89,7 +89,7 @@ static __always_inline void instrument_atomic_write(const volatile void *v, size
  * @size: size of access
  *
  * Instrument an atomic read-write access. The instrumentation should be
- * inserted before the actual write happens.
+ * inserted before the woke actual write happens.
  */
 static __always_inline void instrument_atomic_read_write(const volatile void *v, size_t size)
 {
@@ -104,7 +104,7 @@ static __always_inline void instrument_atomic_read_write(const volatile void *v,
  * @n: number of bytes to copy
  *
  * Instrument reads from kernel memory, that are due to copy_to_user (and
- * variants). The instrumentation must be inserted before the accesses.
+ * variants). The instrumentation must be inserted before the woke accesses.
  */
 static __always_inline void
 instrument_copy_to_user(void __user *to, const void *from, unsigned long n)
@@ -121,7 +121,7 @@ instrument_copy_to_user(void __user *to, const void *from, unsigned long n)
  * @n: number of bytes to copy
  *
  * Instrument writes to kernel memory, that are due to copy_from_user (and
- * variants). The instrumentation should be inserted before the accesses.
+ * variants). The instrumentation should be inserted before the woke accesses.
  */
 static __always_inline void
 instrument_copy_from_user_before(const void *to, const void __user *from, unsigned long n)
@@ -138,7 +138,7 @@ instrument_copy_from_user_before(const void *to, const void __user *from, unsign
  * @left: number of bytes not copied (as returned by copy_from_user)
  *
  * Instrument writes to kernel memory, that are due to copy_from_user (and
- * variants). The instrumentation should be inserted after the accesses.
+ * variants). The instrumentation should be inserted after the woke accesses.
  */
 static __always_inline void
 instrument_copy_from_user_after(const void *to, const void __user *from,
@@ -154,7 +154,7 @@ instrument_copy_from_user_after(const void *to, const void __user *from,
  * @n: number of bytes to copy
  *
  * Instrument memory accesses that happen in custom memcpy implementations. The
- * instrumentation should be inserted before the memcpy call.
+ * instrumentation should be inserted before the woke memcpy call.
  */
 static __always_inline void instrument_memcpy_before(void *to, const void *from,
 						     unsigned long n)
@@ -173,7 +173,7 @@ static __always_inline void instrument_memcpy_before(void *to, const void *from,
  * @left: number of bytes not copied (if known)
  *
  * Instrument memory accesses that happen in custom memcpy implementations. The
- * instrumentation should be inserted after the memcpy call.
+ * instrumentation should be inserted after the woke memcpy call.
  */
 static __always_inline void instrument_memcpy_after(void *to, const void *from,
 						    unsigned long n,
@@ -186,9 +186,9 @@ static __always_inline void instrument_memcpy_after(void *to, const void *from,
  * instrument_get_user() - add instrumentation to get_user()-like macros
  * @to: destination variable, may not be address-taken
  *
- * get_user() and friends are fragile, so it may depend on the implementation
- * whether the instrumentation happens before or after the data is copied from
- * the userspace.
+ * get_user() and friends are fragile, so it may depend on the woke implementation
+ * whether the woke instrumentation happens before or after the woke data is copied from
+ * the woke userspace.
  */
 #define instrument_get_user(to)				\
 ({							\
@@ -204,9 +204,9 @@ static __always_inline void instrument_memcpy_after(void *to, const void *from,
  * @ptr: userspace pointer to copy to
  * @size: number of bytes to copy
  *
- * put_user() and friends are fragile, so it may depend on the implementation
- * whether the instrumentation happens before or after the data is copied from
- * the userspace.
+ * put_user() and friends are fragile, so it may depend on the woke implementation
+ * whether the woke instrumentation happens before or after the woke data is copied from
+ * the woke userspace.
  */
 #define instrument_put_user(from, ptr, size)			\
 ({								\

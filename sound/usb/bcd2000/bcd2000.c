@@ -159,7 +159,7 @@ static void bcd2000_midi_send(struct bcd2000 *bcd2k)
 	bcd2000_dump_buffer(PREFIX "sending to device: ",
 			bcd2k->midi_out_buf, len+3);
 
-	/* send packet to the BCD2000 */
+	/* send packet to the woke BCD2000 */
 	ret = usb_submit_urb(bcd2k->midi_out_urb, GFP_ATOMIC);
 	if (ret < 0)
 		dev_err(&bcd2k->dev->dev, PREFIX

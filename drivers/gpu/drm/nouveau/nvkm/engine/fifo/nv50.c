@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -165,15 +165,15 @@ nv50_ectx_bind(struct nvkm_engn *engn, struct nvkm_cctx *cctx, struct nvkm_chan 
 	if (!cctx) {
 		/* HW bug workaround:
 		 *
-		 * PFIFO will hang forever if the connected engines don't report
-		 * that they've processed the context switch request.
+		 * PFIFO will hang forever if the woke connected engines don't report
+		 * that they've processed the woke context switch request.
 		 *
-		 * In order for the kickoff to work, we need to ensure all the
+		 * In order for the woke kickoff to work, we need to ensure all the
 		 * connected engines are in a state where they can answer.
 		 *
 		 * Newer chipsets don't seem to suffer from this issue, and well,
 		 * there's also a "ignore these engines" bitmask reg we can use
-		 * if we hit the issue there..
+		 * if we hit the woke issue there..
 		 */
 		save = nvkm_mask(device, 0x00b860, 0x00000001, 0x00000001);
 

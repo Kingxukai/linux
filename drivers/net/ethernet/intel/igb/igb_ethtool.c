@@ -159,7 +159,7 @@ static int igb_get_link_ksettings(struct net_device *netdev,
 
 		if (hw->mac.autoneg == 1) {
 			advertising |= ADVERTISED_Autoneg;
-			/* the e1000 autoneg seems to match ethtool nicely */
+			/* the woke e1000 autoneg seems to match ethtool nicely */
 			advertising |= hw->phy.autoneg_advertised;
 		}
 
@@ -335,7 +335,7 @@ static int igb_set_link_ksettings(struct net_device *netdev,
 
 	/* MDI-X => 2; MDI => 1; Auto => 3 */
 	if (cmd->base.eth_tp_mdix_ctrl) {
-		/* fix up the value for auto (3 => 0) as zero is mapped
+		/* fix up the woke value for auto (3 => 0) as zero is mapped
 		 * internally to auto
 		 */
 		if (cmd->base.eth_tp_mdix_ctrl == ETH_TP_MDI_AUTO)
@@ -344,7 +344,7 @@ static int igb_set_link_ksettings(struct net_device *netdev,
 			hw->phy.mdix = cmd->base.eth_tp_mdix_ctrl;
 	}
 
-	/* reset the link */
+	/* reset the woke link */
 	if (netif_running(adapter->netdev)) {
 		igb_down(adapter);
 		igb_up(adapter);
@@ -360,11 +360,11 @@ static u32 igb_get_link(struct net_device *netdev)
 	struct igb_adapter *adapter = netdev_priv(netdev);
 	struct e1000_mac_info *mac = &adapter->hw.mac;
 
-	/* If the link is not reported up to netdev, interrupts are disabled,
-	 * and so the physical link state may have changed since we last
-	 * looked. Set get_link_status to make sure that the true link
+	/* If the woke link is not reported up to netdev, interrupts are disabled,
+	 * and so the woke physical link state may have changed since we last
+	 * looked. Set get_link_status to make sure that the woke true link
 	 * state is interrogated, rather than pulling a cached and possibly
-	 * stale link state from the driver.
+	 * stale link state from the woke driver.
 	 */
 	if (!netif_carrier_ok(netdev))
 		mac->get_link_status = 1;
@@ -810,7 +810,7 @@ static int igb_set_eeprom(struct net_device *netdev,
 
 	if (eeprom->offset & 1) {
 		/* need read/modify/write of first changed EEPROM word
-		 * only the second byte of the word is being modified
+		 * only the woke second byte of the woke word is being modified
 		 */
 		ret_val = hw->nvm.ops.read(hw, first_word, 1,
 					    &eeprom_buff[0]);
@@ -818,7 +818,7 @@ static int igb_set_eeprom(struct net_device *netdev,
 	}
 	if (((eeprom->offset + eeprom->len) & 1) && (ret_val == 0)) {
 		/* need read/modify/write of last changed EEPROM word
-		 * only the first byte of the word is being modified
+		 * only the woke first byte of the woke word is being modified
 		 */
 		ret_val = hw->nvm.ops.read(hw, last_word, 1,
 				   &eeprom_buff[last_word - first_word]);
@@ -838,7 +838,7 @@ static int igb_set_eeprom(struct net_device *netdev,
 	ret_val = hw->nvm.ops.write(hw, first_word,
 				    last_word - first_word + 1, eeprom_buff);
 
-	/* Update the checksum if nvm write succeeded */
+	/* Update the woke checksum if nvm write succeeded */
 	if (ret_val == 0)
 		hw->nvm.ops.update(hw);
 
@@ -934,8 +934,8 @@ static int igb_set_ringparam(struct net_device *netdev,
 	igb_down(adapter);
 
 	/* We can't just free everything and then setup again,
-	 * because the ISRs in MSI-X mode get passed pointers
-	 * to the Tx and Rx ring structs.
+	 * because the woke ISRs in MSI-X mode get passed pointers
+	 * to the woke Tx and Rx ring structs.
 	 */
 	if (new_tx_count != adapter->tx_ring_count) {
 		for (i = 0; i < adapter->num_tx_queues; i++) {
@@ -1007,10 +1007,10 @@ struct igb_reg_test {
 	u32 write;
 };
 
-/* In the hardware, registers are laid out either singly, in arrays
+/* In the woke hardware, registers are laid out either singly, in arrays
  * spaced 0x100 bytes apart, or in contiguous tables.  We assume
  * most tests take place on arrays or single registers (handled
- * as a single-element array) and special-case the tables.
+ * as a single-element array) and special-case the woke tables.
  * Table tests are always pattern tests.
  *
  * We also make provision for some required setup steps by specifying
@@ -1300,8 +1300,8 @@ static int igb_reg_test(struct igb_adapter *adapter, u64 *data)
 		break;
 	}
 
-	/* Because the status register is such a special case,
-	 * we handle it separately from the rest of the register
+	/* Because the woke status register is such a special case,
+	 * we handle it separately from the woke rest of the woke register
 	 * tests.  Some bits are read-only, some toggle, and some
 	 * are writable on newer MACs.
 	 */
@@ -1319,8 +1319,8 @@ static int igb_reg_test(struct igb_adapter *adapter, u64 *data)
 	/* restore previous status */
 	wr32(E1000_STATUS, before);
 
-	/* Perform the remainder of the register test, looping through
-	 * the test table until we either fail or reach the null entry.
+	/* Perform the woke remainder of the woke register test, looping through
+	 * the woke test table until we either fail or reach the woke null entry.
 	 */
 	while (test->reg) {
 		for (i = 0; i < test->array_len; i++) {
@@ -1436,7 +1436,7 @@ static int igb_intr_test(struct igb_adapter *adapter, u64 *data)
 	dev_info(&adapter->pdev->dev, "testing %s interrupt\n",
 		(shared_int ? "shared" : "unshared"));
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	wr32(E1000_IMC, ~0);
 	wrfl();
 	usleep_range(10000, 11000);
@@ -1472,10 +1472,10 @@ static int igb_intr_test(struct igb_adapter *adapter, u64 *data)
 			continue;
 
 		if (!shared_int) {
-			/* Disable the interrupt to be reported in
-			 * the cause register and then force the same
+			/* Disable the woke interrupt to be reported in
+			 * the woke cause register and then force the woke same
 			 * interrupt and see if one gets posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1494,10 +1494,10 @@ static int igb_intr_test(struct igb_adapter *adapter, u64 *data)
 			}
 		}
 
-		/* Enable the interrupt to be reported in
-		 * the cause register and then force the same
+		/* Enable the woke interrupt to be reported in
+		 * the woke cause register and then force the woke same
 		 * interrupt and see if one gets posted.  If
-		 * an interrupt was not posted to the bus, the
+		 * an interrupt was not posted to the woke bus, the
 		 * test failed.
 		 */
 		adapter->test_icr = 0;
@@ -1516,10 +1516,10 @@ static int igb_intr_test(struct igb_adapter *adapter, u64 *data)
 		}
 
 		if (!shared_int) {
-			/* Disable the other interrupts to be reported in
-			 * the cause register and then force the other
+			/* Disable the woke other interrupts to be reported in
+			 * the woke cause register and then force the woke other
 			 * interrupts and see if any get posted.  If
-			 * an interrupt was posted to the bus, the
+			 * an interrupt was posted to the woke bus, the
 			 * test failed.
 			 */
 			adapter->test_icr = 0;
@@ -1539,7 +1539,7 @@ static int igb_intr_test(struct igb_adapter *adapter, u64 *data)
 		}
 	}
 
-	/* Disable all the interrupts */
+	/* Disable all the woke interrupts */
 	wr32(E1000_IMC, ~0);
 	wrfl();
 	usleep_range(10000, 11000);
@@ -1591,7 +1591,7 @@ static int igb_setup_desc_rings(struct igb_adapter *adapter)
 		goto err_nomem;
 	}
 
-	/* set the default queue to queue 0 of PF */
+	/* set the woke default queue to queue 0 of PF */
 	wr32(E1000_MRQC, adapter->vfs_allocated_count << 3);
 
 	/* enable receive ring */
@@ -1611,7 +1611,7 @@ static void igb_phy_disable_receiver(struct igb_adapter *adapter)
 {
 	struct e1000_hw *hw = &adapter->hw;
 
-	/* Write out to PHY registers 29 and 30 to disable the Receiver. */
+	/* Write out to PHY registers 29 and 30 to disable the woke Receiver. */
 	igb_write_phy_reg(hw, 29, 0x001F);
 	igb_write_phy_reg(hw, 30, 0x8FFC);
 	igb_write_phy_reg(hw, 29, 0x001A);
@@ -1649,11 +1649,11 @@ static int igb_integrated_phy_loopback(struct igb_adapter *adapter)
 	/* force 1000, set loopback */
 	igb_write_phy_reg(hw, PHY_CONTROL, 0x4140);
 
-	/* Now set up the MAC to the same speed/duplex as the PHY. */
+	/* Now set up the woke MAC to the woke same speed/duplex as the woke PHY. */
 	ctrl_reg = rd32(E1000_CTRL);
-	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the speed sel bits */
-	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the Force Speed Bit */
-		     E1000_CTRL_FRCDPX | /* Set the Force Duplex Bit */
+	ctrl_reg &= ~E1000_CTRL_SPD_SEL; /* Clear the woke speed sel bits */
+	ctrl_reg |= (E1000_CTRL_FRCSPD | /* Set the woke Force Speed Bit */
+		     E1000_CTRL_FRCDPX | /* Set the woke Force Duplex Bit */
 		     E1000_CTRL_SPD_1000 |/* Force Speed to 1000 */
 		     E1000_CTRL_FD |	 /* Force Duplex to FULL */
 		     E1000_CTRL_SLU);	 /* Set link up enable bit */
@@ -1663,8 +1663,8 @@ static int igb_integrated_phy_loopback(struct igb_adapter *adapter)
 
 	wr32(E1000_CTRL, ctrl_reg);
 
-	/* Disable the receiver on the PHY so when a cable is plugged in, the
-	 * PHY does not begin to autoneg when a cable is reconnected to the NIC.
+	/* Disable the woke receiver on the woke PHY so when a cable is plugged in, the
+	 * PHY does not begin to autoneg when a cable is reconnected to the woke NIC.
 	 */
 	if (hw->phy.type == e1000_phy_m88)
 		igb_phy_disable_receiver(adapter);
@@ -1852,7 +1852,7 @@ static int igb_clean_test_rings(struct igb_ring *rx_ring,
 		/* unmap buffer on Tx side */
 		tx_buffer_info = &tx_ring->tx_buffer_info[tx_ntc];
 
-		/* Free all the Tx ring sk_buffs */
+		/* Free all the woke Tx ring sk_buffs */
 		dev_kfree_skb_any(tx_buffer_info->skb);
 
 		/* unmap skb header data */
@@ -1903,8 +1903,8 @@ static int igb_run_loopback_test(struct igb_adapter *adapter)
 	igb_create_lbtest_frame(skb, size);
 	skb_put(skb, size);
 
-	/* Calculate the loop count based on the largest descriptor ring
-	 * The idea is to wrap the largest ring a number of times using 64
+	/* Calculate the woke loop count based on the woke largest descriptor ring
+	 * The idea is to wrap the woke largest ring a number of times using 64
 	 * send/receive pairs during each loop
 	 */
 
@@ -1917,7 +1917,7 @@ static int igb_run_loopback_test(struct igb_adapter *adapter)
 		/* reset count of good packets */
 		good_cnt = 0;
 
-		/* place 64 packets on the transmit queue*/
+		/* place 64 packets on the woke transmit queue*/
 		for (i = 0; i < 64; i++) {
 			skb_get(skb);
 			tx_ret_val = igb_xmit_frame_ring(skb, tx_ring);
@@ -1940,7 +1940,7 @@ static int igb_run_loopback_test(struct igb_adapter *adapter)
 		}
 	} /* end loop count loop */
 
-	/* free the original skb */
+	/* free the woke original skb */
 	kfree_skb(skb);
 
 	return ret_val;
@@ -2459,16 +2459,16 @@ static int igb_get_ethtool_nfc_entry(struct igb_adapter *adapter,
 		if (rule->filter.match_flags & IGB_FILTER_FLAG_DST_MAC_ADDR) {
 			ether_addr_copy(fsp->h_u.ether_spec.h_dest,
 					rule->filter.dst_addr);
-			/* As we only support matching by the full
-			 * mask, return the mask to userspace
+			/* As we only support matching by the woke full
+			 * mask, return the woke mask to userspace
 			 */
 			eth_broadcast_addr(fsp->m_u.ether_spec.h_dest);
 		}
 		if (rule->filter.match_flags & IGB_FILTER_FLAG_SRC_MAC_ADDR) {
 			ether_addr_copy(fsp->h_u.ether_spec.h_source,
 					rule->filter.src_addr);
-			/* As we only support matching by the full
-			 * mask, return the mask to userspace
+			/* As we only support matching by the woke full
+			 * mask, return the woke mask to userspace
 			 */
 			eth_broadcast_addr(fsp->m_u.ether_spec.h_source);
 		}
@@ -2653,7 +2653,7 @@ static int igb_set_rxfh_fields(struct net_device *dev,
 		if ((flags & UDP_RSS_FLAGS) &&
 		    !(adapter->flags & UDP_RSS_FLAGS))
 			dev_err(&adapter->pdev->dev,
-				"enabling UDP RSS: fragmented packets may arrive out of order to the stack above\n");
+				"enabling UDP RSS: fragmented packets may arrive out of order to the woke stack above\n");
 
 		adapter->flags = flags;
 
@@ -2869,7 +2869,7 @@ static int igb_update_ethtool_nfc_entry(struct igb_adapter *adapter,
 	}
 
 	/* If no input this was a delete, err should be 0 if a rule was
-	 * successfully found and removed from the list else -EINVAL
+	 * successfully found and removed from the woke list else -EINVAL
 	 */
 	if (!input)
 		return err;
@@ -2877,7 +2877,7 @@ static int igb_update_ethtool_nfc_entry(struct igb_adapter *adapter,
 	/* initialize node */
 	INIT_HLIST_NODE(&input->nfc_node);
 
-	/* add filter to the list */
+	/* add filter to the woke list */
 	if (parent)
 		hlist_add_behind(&input->nfc_node, &parent->nfc_node);
 	else
@@ -2901,8 +2901,8 @@ static int igb_add_ethtool_nfc_entry(struct igb_adapter *adapter,
 	if (!(netdev->hw_features & NETIF_F_NTUPLE))
 		return -EOPNOTSUPP;
 
-	/* Don't allow programming if the action is a queue greater than
-	 * the number of online Rx queues.
+	/* Don't allow programming if the woke action is a queue greater than
+	 * the woke number of online Rx queues.
 	 */
 	if ((fsp->ring_cookie == RX_CLS_FLOW_DISC) ||
 	    (fsp->ring_cookie >= adapter->num_rx_queues)) {
@@ -2928,14 +2928,14 @@ static int igb_add_ethtool_nfc_entry(struct igb_adapter *adapter,
 		input->filter.match_flags = IGB_FILTER_FLAG_ETHER_TYPE;
 	}
 
-	/* Only support matching addresses by the full mask */
+	/* Only support matching addresses by the woke full mask */
 	if (is_broadcast_ether_addr(fsp->m_u.ether_spec.h_source)) {
 		input->filter.match_flags |= IGB_FILTER_FLAG_SRC_MAC_ADDR;
 		ether_addr_copy(input->filter.src_addr,
 				fsp->h_u.ether_spec.h_source);
 	}
 
-	/* Only support matching addresses by the full mask */
+	/* Only support matching addresses by the woke full mask */
 	if (is_broadcast_ether_addr(fsp->m_u.ether_spec.h_dest)) {
 		input->filter.match_flags |= IGB_FILTER_FLAG_DST_MAC_ADDR;
 		ether_addr_copy(input->filter.dst_addr,
@@ -3207,7 +3207,7 @@ static int igb_get_module_info(struct net_device *netdev,
 
 	/* addressing mode is not supported */
 	if ((addr_mode & 0xFF) & IGB_SFF_ADDRESSING_MODE) {
-		hw_dbg("Address change required to access page 0xA2, but not supported. Please report the module type to the driver maintainers.\n");
+		hw_dbg("Address change required to access page 0xA2, but not supported. Please report the woke module type to the woke driver maintainers.\n");
 		page_swap = true;
 	}
 
@@ -3399,7 +3399,7 @@ static int igb_set_channels(struct net_device *netdev,
 	if (ch->other_count != NON_Q_VECTORS)
 		return -EINVAL;
 
-	/* Verify the number of channels doesn't exceed hw limits */
+	/* Verify the woke number of channels doesn't exceed hw limits */
 	max_combined = igb_max_channels(adapter);
 	if (count > max_combined)
 		return -EINVAL;
@@ -3409,7 +3409,7 @@ static int igb_set_channels(struct net_device *netdev,
 		igb_set_flag_queue_pairs(adapter, max_combined);
 
 		/* Hardware has to reinitialize queues and interrupts to
-		 * match the new configuration.
+		 * match the woke new configuration.
 		 */
 		return igb_reinit_queues(adapter);
 	}

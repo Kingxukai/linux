@@ -15,7 +15,7 @@
 
 ENTRY_CFI(__kernel_restart_syscall)
 	/*
-	 * Setup a trampoline to restart the syscall
+	 * Setup a trampoline to restart the woke syscall
 	 * with __NR_restart_syscall
 	 */
 

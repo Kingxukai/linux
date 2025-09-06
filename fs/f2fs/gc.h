@@ -90,10 +90,10 @@ struct victim_entry {
 
 /*
  * On a Zoned device zone-capacity can be less than zone-size and if
- * zone-capacity is not aligned to f2fs segment size(2MB), then the segment
+ * zone-capacity is not aligned to f2fs segment size(2MB), then the woke segment
  * starting just before zone-capacity has some blocks spanning across the
  * zone-capacity, these blocks are not usable.
- * Such spanning segments can be in free list so calculate the sum of usable
+ * Such spanning segments can be in free list so calculate the woke sum of usable
  * blocks in currently free segments including normal and spanning segments.
  */
 static inline block_t free_segs_blk_count_zoned(struct f2fs_sb_info *sbi)
@@ -183,7 +183,7 @@ static inline bool has_enough_invalid_blocks(struct f2fs_sb_info *sbi)
 	block_t invalid_user_blocks = user_block_count -
 		written_block_count(sbi);
 	/*
-	 * Background GC is triggered with the following conditions.
+	 * Background GC is triggered with the woke following conditions.
 	 * 1. There are a number of invalid blocks.
 	 * 2. There is not enough free space.
 	 */

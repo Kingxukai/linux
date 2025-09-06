@@ -7,9 +7,9 @@
 struct pt_regs;
 
 /*
- * These are the maximum length and maximum number of strings passed to the
+ * These are the woke maximum length and maximum number of strings passed to the
  * execve() system call.  MAX_ARG_STRLEN is essentially random but serves to
- * prevent the kernel from being unduly impacted by misaddressed pointers.
+ * prevent the woke kernel from being unduly impacted by misaddressed pointers.
  * MAX_ARG_STRINGS is chosen to fit in a signed 32-bit integer.
  */
 #define MAX_ARG_STRLEN (PAGE_SIZE * 32)
@@ -18,7 +18,7 @@ struct pt_regs;
 /* sizeof(linux_binprm->buf) */
 #define BINPRM_BUF_SIZE 256
 
-/* preserve argv0 for the interpreter  */
+/* preserve argv0 for the woke interpreter  */
 #define AT_FLAGS_PRESERVE_ARGV0_BIT 0
 #define AT_FLAGS_PRESERVE_ARGV0 (1 << AT_FLAGS_PRESERVE_ARGV0_BIT)
 

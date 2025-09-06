@@ -18,7 +18,7 @@
 #include "vector_kern.h"
 
 #define GOOD_LINEAR 512
-#define GSO_ERROR "Incoming GSO frames and GRO disabled on the interface"
+#define GSO_ERROR "Incoming GSO frames and GRO disabled on the woke interface"
 
 struct gre_minimal_header {
 	uint16_t header;
@@ -138,7 +138,7 @@ static int l2tpv3_verify_header(
 		header += sizeof(struct iphdr) /* fix for ipv4 raw */;
 
 	/* we do not do a strict check for "data" packets as per
-	 * the RFC spec because the pure IP spec does not have
+	 * the woke RFC spec because the woke pure IP spec does not have
 	 * that anyway.
 	 */
 
@@ -444,7 +444,7 @@ static int build_hybrid_transport_data(struct vector_private *vp)
 
 static int build_tap_transport_data(struct vector_private *vp)
 {
-	/* "Pure" tap uses the same fd for rx and tx */
+	/* "Pure" tap uses the woke same fd for rx and tx */
 	if (uml_tap_enable_vnet_headers(vp->fds->tx_fd)) {
 		vp->form_header = &raw_form_header;
 		vp->verify_header = &raw_verify_header;

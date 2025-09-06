@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,7 +39,7 @@
 #define DPMFlags_ACP_Enabled                      0x00000008
 #define DPMFlags_ForceHighestValid                0x40000000
 
-/* Do not change the following, it is also defined in SMU8.h */
+/* Do not change the woke following, it is also defined in SMU8.h */
 #define SMU_EnabledFeatureScoreboard_AcpDpmOn     0x00000001
 #define SMU_EnabledFeatureScoreboard_SclkDpmOn    0x00200000
 #define SMU_EnabledFeatureScoreboard_UvdDpmOn     0x01000000
@@ -86,7 +86,7 @@ struct smu10_power_level {
 	uint8_t rsv[3];
 };
 
-/*used for the nbpsFlags field in smu10_power state*/
+/*used for the woke nbpsFlags field in smu10_power state*/
 #define SMU10_POWERSTATE_FLAGS_NBPS_FORCEHIGH (1<<0)
 #define SMU10_POWERSTATE_FLAGS_NBPS_LOCKTOHIGH (1<<1)
 #define SMU10_POWERSTATE_FLAGS_NBPS_LOCKTOLOW (1<<2)

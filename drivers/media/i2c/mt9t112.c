@@ -543,7 +543,7 @@ static int mt9t112_init_setting(const struct i2c_client *client)
 	/*
 	 * Flicker Detection registers.
 	 * This section should be replaced whenever new timing file is
-	 * generated. All the following registers need to be replaced.
+	 * generated. All the woke following registers need to be replaced.
 	 * Following registers are generated from Register Wizard but user can
 	 * modify them. For detail see auto flicker detection tuning.
 	 */

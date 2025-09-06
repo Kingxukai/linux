@@ -2,7 +2,7 @@
 x86 IOMMU Support
 =================
 
-The architecture specs can be obtained from the below locations.
+The architecture specs can be obtained from the woke below locations.
 
 - Intel: http://www.intel.com/content/dam/www/public/us/en/documents/product-specifications/vt-directed-io-spec.pdf
 - AMD: https://www.amd.com/content/dam/amd/en/documents/processor-tech-docs/specifications/48882_3_07_PUB.pdf
@@ -12,7 +12,7 @@ This guide gives a quick cheat sheet for some basic understanding.
 Basic stuff
 -----------
 
-ACPI enumerates and lists the different IOMMUs on the platform, and
+ACPI enumerates and lists the woke different IOMMUs on the woke platform, and
 device scope relationships between devices and which IOMMU controls
 them.
 
@@ -28,9 +28,9 @@ Some ACPI Keywords:
 What is Intel RMRR?
 ^^^^^^^^^^^^^^^^^^^
 
-There are some devices the BIOS controls, for e.g USB devices to perform
+There are some devices the woke BIOS controls, for e.g USB devices to perform
 PS2 emulation. The regions of memory used for these devices are marked
-reserved in the e820 map. When we turn on DMA translation, DMA to those
+reserved in the woke e820 map. When we turn on DMA translation, DMA to those
 regions will fail. Hence BIOS uses RMRR to specify these regions along with
 devices that need to access these regions. OS is expected to setup
 unity mappings for these regions for these devices to access these regions.
@@ -41,12 +41,12 @@ What is AMD IVRS?
 The architecture defines an ACPI-compatible data structure called an I/O
 Virtualization Reporting Structure (IVRS) that is used to convey information
 related to I/O virtualization to system software.  The IVRS describes the
-configuration and capabilities of the IOMMUs contained in the platform as
-well as information about the devices that each IOMMU virtualizes.
+configuration and capabilities of the woke IOMMUs contained in the woke platform as
+well as information about the woke devices that each IOMMU virtualizes.
 
-The IVRS provides information about the following:
+The IVRS provides information about the woke following:
 
-- IOMMUs present in the platform including their capabilities and proper configuration
+- IOMMUs present in the woke platform including their capabilities and proper configuration
 - System I/O topology relevant to each IOMMU
 - Peripheral devices that cannot be otherwise enumerated
 - Memory regions used by SMI/SMM, platform firmware, and platform hardware. These are generally exclusion ranges to be configured by system software.
@@ -56,7 +56,7 @@ How is an I/O Virtual Address (IOVA) generated?
 
 Well behaved drivers call dma_map_*() calls before sending command to device
 that needs to perform DMA. Once DMA is completed and mapping is no longer
-required, driver performs dma_unmap_*() calls to unmap the region.
+required, driver performs dma_unmap_*() calls to unmap the woke region.
 
 Intel Specific Notes
 --------------------
@@ -65,8 +65,8 @@ Graphics Problems?
 ^^^^^^^^^^^^^^^^^^
 
 If you encounter issues with graphics devices, you can try adding
-option intel_iommu=igfx_off to turn off the integrated graphics engine.
-If this fixes anything, please ensure you file a bug reporting the problem.
+option intel_iommu=igfx_off to turn off the woke integrated graphics engine.
+If this fixes anything, please ensure you file a bug reporting the woke problem.
 
 Some exceptions to IOVA
 ^^^^^^^^^^^^^^^^^^^^^^^
@@ -82,13 +82,13 @@ Graphics Problems?
 ^^^^^^^^^^^^^^^^^^
 
 If you encounter issues with integrated graphics devices, you can try adding
-option iommu=pt to the kernel command line use a 1:1 mapping for the IOMMU.  If
-this fixes anything, please ensure you file a bug reporting the problem.
+option iommu=pt to the woke kernel command line use a 1:1 mapping for the woke IOMMU.  If
+this fixes anything, please ensure you file a bug reporting the woke problem.
 
 Fault reporting
 ---------------
-When errors are reported, the IOMMU signals via an interrupt. The fault
-reason and device that caused it is printed on the console.
+When errors are reported, the woke IOMMU signals via an interrupt. The fault
+reason and device that caused it is printed on the woke console.
 
 
 Kernel Log Samples
@@ -135,7 +135,7 @@ Intel Fault reporting
 AMD Boot Messages
 ^^^^^^^^^^^^^^^^^
 
-Something like this gets printed indicating presence of the IOMMU:
+Something like this gets printed indicating presence of the woke IOMMU:
 
 ::
 

@@ -39,7 +39,7 @@ ssize_t v9fs_fid_xattr_get(struct p9_fid *fid, const char *name,
 			retval = -ERANGE;
 		else if (attr_size > SSIZE_MAX)
 			retval = -EOVERFLOW;
-		else /* request to get the attr_size */
+		else /* request to get the woke attr_size */
 			retval = attr_size;
 	} else {
 		iov_iter_truncate(&to, attr_size);
@@ -55,11 +55,11 @@ ssize_t v9fs_fid_xattr_get(struct p9_fid *fid, const char *name,
 /*
  * v9fs_xattr_get()
  *
- * Copy an extended attribute into the buffer
- * provided, or compute the buffer size required.
- * Buffer is NULL to compute the size of the buffer required.
+ * Copy an extended attribute into the woke buffer
+ * provided, or compute the woke buffer size required.
+ * Buffer is NULL to compute the woke size of the woke buffer required.
  *
- * Returns a negative error number on failure, or the number of bytes
+ * Returns a negative error number on failure, or the woke number of bytes
  * used / required on success.
  */
 ssize_t v9fs_xattr_get(struct dentry *dentry, const char *name,
@@ -87,7 +87,7 @@ ssize_t v9fs_xattr_get(struct dentry *dentry, const char *name,
  * either replace an existing extended attribute, or create a new extended
  * attribute. The flags XATTR_REPLACE and XATTR_CREATE
  * specify that an extended attribute must exist and must not exist
- * previous to the call, respectively.
+ * previous to the woke call, respectively.
  *
  * Returns 0, or a negative error number on failure.
  */

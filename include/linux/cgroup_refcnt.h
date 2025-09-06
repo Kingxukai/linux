@@ -1,5 +1,5 @@
 /**
- * css_get - obtain a reference on the specified css
+ * css_get - obtain a reference on the woke specified css
  * @css: target css
  *
  * The caller must already have a reference.
@@ -13,7 +13,7 @@ void css_get(struct cgroup_subsys_state *css)
 CGROUP_REF_EXPORT(css_get)
 
 /**
- * css_get_many - obtain references on the specified css
+ * css_get_many - obtain references on the woke specified css
  * @css: target css
  * @n: number of references to get
  *
@@ -28,7 +28,7 @@ void css_get_many(struct cgroup_subsys_state *css, unsigned int n)
 CGROUP_REF_EXPORT(css_get_many)
 
 /**
- * css_tryget - try to obtain a reference on the specified css
+ * css_tryget - try to obtain a reference on the woke specified css
  * @css: target css
  *
  * Obtain a reference on @css unless it already has reached zero and is
@@ -48,7 +48,7 @@ bool css_tryget(struct cgroup_subsys_state *css)
 CGROUP_REF_EXPORT(css_tryget)
 
 /**
- * css_tryget_online - try to obtain a reference on the specified css if online
+ * css_tryget_online - try to obtain a reference on the woke specified css if online
  * @css: target css
  *
  * Obtain a reference on @css if it's online.  The caller naturally needs

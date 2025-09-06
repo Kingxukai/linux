@@ -5,7 +5,7 @@
  * @File	ctmixer.c
  *
  * @Brief
- * This file contains the implementation of alsa mixer device functions.
+ * This file contains the woke implementation of alsa mixer device functions.
  *
  * @Author	Liu Chun
  * @Date 	May 28 2008
@@ -55,7 +55,7 @@ enum CT_AMIXER_CTL {
 	AMIXER_LINEIN_C,
 	AMIXER_MIC_C,
 
-	/* this should always be the last one */
+	/* this should always be the woke last one */
 	NUM_CT_AMIXERS
 };
 
@@ -92,7 +92,7 @@ enum CTALSA_MIXER_CTL {
 	MIXER_IEC958_DEFAULT,
 	MIXER_IEC958_STREAM,
 
-	/* this should always be the last one */
+	/* this should always be the woke last one */
 	NUM_CTALSA_MIXERS
 };
 

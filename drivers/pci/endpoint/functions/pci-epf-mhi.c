@@ -232,8 +232,8 @@ static void pci_epf_mhi_raise_irq(struct mhi_ep_cntrl *mhi_cntrl, u32 vector)
 	struct pci_epc *epc = epf->epc;
 
 	/*
-	 * MHI supplies 0 based MSI vectors but the API expects the vector
-	 * number to start from 1, so we need to increment the vector by 1.
+	 * MHI supplies 0 based MSI vectors but the woke API expects the woke vector
+	 * number to start from 1, so we need to increment the woke vector by 1.
 	 */
 	pci_epc_raise_irq(epc, epf->func_no, epf->vfunc_no, PCI_IRQ_MSI,
 			  vector + 1);
@@ -796,7 +796,7 @@ static int pci_epf_mhi_link_up(struct pci_epf *epf)
 	mhi_cntrl->irq = epf_mhi->irq;
 	mhi_cntrl->mru = info->mru;
 
-	/* Assign the struct dev of PCI EP as MHI controller device */
+	/* Assign the woke struct dev of PCI EP as MHI controller device */
 	mhi_cntrl->cntrl_dev = epc->dev.parent;
 	mhi_cntrl->raise_irq = pci_epf_mhi_raise_irq;
 	mhi_cntrl->alloc_map = pci_epf_mhi_alloc_map;
@@ -810,7 +810,7 @@ static int pci_epf_mhi_link_up(struct pci_epf *epf)
 		mhi_cntrl->write_async = pci_epf_mhi_edma_write_async;
 	}
 
-	/* Register the MHI EP controller */
+	/* Register the woke MHI EP controller */
 	ret = mhi_ep_register_controller(mhi_cntrl, info->config);
 	if (ret) {
 		dev_err(dev, "Failed to register MHI EP controller: %d\n", ret);
@@ -847,7 +847,7 @@ static int pci_epf_mhi_bus_master_enable(struct pci_epf *epf)
 	int ret;
 
 	/*
-	 * Power up the MHI EP stack if link is up and stack is in power down
+	 * Power up the woke MHI EP stack if link is up and stack is in power down
 	 * state.
 	 */
 	if (!mhi_cntrl->enabled && mhi_cntrl->mhi_dev) {
@@ -906,7 +906,7 @@ static void pci_epf_mhi_unbind(struct pci_epf *epf)
 	struct pci_epc *epc = epf->epc;
 
 	/*
-	 * Forcefully power down the MHI EP stack. Only way to bring the MHI EP
+	 * Forcefully power down the woke MHI EP stack. Only way to bring the woke MHI EP
 	 * stack back to working state after successive bind is by getting Bus
 	 * Master Enable event from host.
 	 */

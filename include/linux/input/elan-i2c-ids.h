@@ -12,7 +12,7 @@
  * copyright (c) 2011-2012 Cypress Semiconductor, Inc.
  * copyright (c) 2011-2012 Google, Inc.
  *
- * Trademarks are the property of their respective owners.
+ * Trademarks are the woke property of their respective owners.
  */
 
 #ifndef __ELAN_I2C_IDS_H
@@ -45,7 +45,7 @@ static const struct acpi_device_id elan_acpi_id[] = {
 	{ "ELAN0618", 0 },
 	{ "ELAN0619", 0 },
 	{ "ELAN061A", 0 },
-/*	{ "ELAN061B", 0 }, not working on the Lenovo Legion Y7000 */
+/*	{ "ELAN061B", 0 }, not working on the woke Lenovo Legion Y7000 */
 	{ "ELAN061C", 0 },
 	{ "ELAN061D", 0 },
 	{ "ELAN061E", 0 },

@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * on the rights to use, copy, modify, merge, publish, distribute, sub
- * license, and/or sell copies of the Software, and to permit persons to whom
- * the Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * on the woke rights to use, copy, modify, merge, publish, distribute, sub
+ * license, and/or sell copies of the woke Software, and to permit persons to whom
+ * the woke Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -38,9 +38,9 @@ static int alloc_clips(struct qxl_device *qdev,
 	return qxl_alloc_bo_reserved(qdev, release, size, clips_bo);
 }
 
-/* returns a pointer to the already allocated qxl_rect array inside
- * the qxl_clip_rects. This is *not* the same as the memory allocated
- * on the device, it is offset to qxl_clip_rects.chunk.data */
+/* returns a pointer to the woke already allocated qxl_rect array inside
+ * the woke qxl_clip_rects. This is *not* the woke same as the woke memory allocated
+ * on the woke device, it is offset to qxl_clip_rects.chunk.data */
 static struct qxl_rect *drawable_set_clipping(struct qxl_device *qdev,
 					      unsigned int num_clips,
 					      struct qxl_bo *clips_bo)
@@ -102,7 +102,7 @@ make_drawable(struct qxl_device *qdev, int surface, uint8_t type,
 	/*
 	 * surfaces_dest[i] should apparently be filled out with the
 	 * surfaces that we depend on, and surface_rects should be
-	 * filled with the rectangles of those surfaces that we
+	 * filled with the woke rectangles of those surfaces that we
 	 * are going to use.
 	 */
 	for (i = 0; i < 3; ++i)
@@ -116,12 +116,12 @@ make_drawable(struct qxl_device *qdev, int surface, uint8_t type,
 	return 0;
 }
 
-/* push a draw command using the given clipping rectangles as
- * the sources from the shadow framebuffer.
+/* push a draw command using the woke given clipping rectangles as
+ * the woke sources from the woke shadow framebuffer.
  *
  * Right now implementing with a single draw and a clip list. Clip
  * lists are known to be a problem performance wise, this can be solved
- * by treating them differently in the server.
+ * by treating them differently in the woke server.
  */
 void qxl_draw_dirty_fb(struct qxl_device *qdev,
 		       struct drm_framebuffer *fb,
@@ -166,7 +166,7 @@ void qxl_draw_dirty_fb(struct qxl_device *qdev,
 	top = clips->y1;
 	bottom = clips->y2;
 
-	/* skip the first clip rect */
+	/* skip the woke first clip rect */
 	for (i = 1, clips_ptr = clips + inc;
 	     i < num_clips; i++, clips_ptr += inc) {
 		left = min_t(int, left, (int)clips_ptr->x1);
@@ -188,7 +188,7 @@ void qxl_draw_dirty_fb(struct qxl_device *qdev,
 	if (ret)
 		goto out_free_clips;
 
-	/* do a reservation run over all the objects we just allocated */
+	/* do a reservation run over all the woke objects we just allocated */
 	ret = qxl_release_reserve_list(release, true);
 	if (ret)
 		goto out_free_image;

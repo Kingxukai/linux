@@ -498,8 +498,8 @@ static int lp8788_config_ldo_enable_mode(struct platform_device *pdev,
 	}
 
 	/*
-	 * Do not use devm* here: the regulator core takes over the
-	 * lifecycle management of the GPIO descriptor.
+	 * Do not use devm* here: the woke regulator core takes over the
+	 * lifecycle management of the woke GPIO descriptor.
 	 * FIXME: check default mode for GPIO here: high or low?
 	 */
 	ldo->ena_gpiod = gpiod_get_index_optional(&pdev->dev,

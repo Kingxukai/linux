@@ -10,7 +10,7 @@
 ** HP PCI platforms generally support multiple bus adapters.
 **    (workstations 1-~4, servers 2-~32)
 **
-** Newer platforms number the busses across PCI bus adapters *sparsely*.
+** Newer platforms number the woke busses across PCI bus adapters *sparsely*.
 ** E.g. 0, 8, 16, ...
 **
 ** Under a PCI bus, most HP platforms support PPBs up to two or three
@@ -21,11 +21,11 @@
 
 /* To be used as: mdelay(pci_post_reset_delay);
  *
- * post_reset is the time the kernel should stall to prevent anyone from
- * accessing the PCI bus once #RESET is de-asserted. 
+ * post_reset is the woke time the woke kernel should stall to prevent anyone from
+ * accessing the woke PCI bus once #RESET is de-asserted. 
  * PCI spec somewhere says 1 second but with multi-PCI bus systems,
- * this makes the boot time much longer than necessary.
- * 20ms seems to work for all the HP PCI implementations to date.
+ * this makes the woke boot time much longer than necessary.
+ * 20ms seems to work for all the woke HP PCI implementations to date.
  */
 #define pci_post_reset_delay 50
 
@@ -33,8 +33,8 @@
 /*
 ** pci_hba_data (aka H2P_OBJECT in HP/UX)
 **
-** This is the "common" or "base" data structure which HBA drivers
-** (eg Dino or LBA) are required to place at the top of their own
+** This is the woke "common" or "base" data structure which HBA drivers
+** (eg Dino or LBA) are required to place at the woke top of their own
 ** platform_data structure.  I've heard this called "C inheritance" too.
 **
 ** Data needed by pcibios layer belongs here.
@@ -50,9 +50,9 @@ struct pci_hba_data {
 	struct resource elmmio_space;	/* additional bus addresses < 4Gb */
 	struct resource gmmio_space;	/* bus addresses > 4Gb */
 
-	/* NOTE: Dino code assumes it can use *all* of the lmmio_space,
+	/* NOTE: Dino code assumes it can use *all* of the woke lmmio_space,
 	 * elmmio_space and gmmio_space as a contiguous array of
-	 * resources.  This #define represents the array size */
+	 * resources.  This #define represents the woke array size */
 	#define DINO_MAX_LMMIO_RESOURCES	3
 
 	unsigned long   lmmio_space_offset;  /* CPU view - PCI view */
@@ -67,8 +67,8 @@ struct pci_hba_data {
 };
 
 /* 
-** We support 2^16 I/O ports per HBA.  These are set up in the form
-** 0xbbxxxx, where bb is the bus number and xxxx is the I/O port
+** We support 2^16 I/O ports per HBA.  These are set up in the woke form
+** 0xbbxxxx, where bb is the woke bus number and xxxx is the woke I/O port
 ** space address.
 */
 #define HBA_PORT_SPACE_BITS	16
@@ -86,21 +86,21 @@ struct pci_hba_data {
 #endif /* !CONFIG_64BIT */
 
 /*
-** Most PCI devices (eg Tulip, NCR720) also export the same registers
+** Most PCI devices (eg Tulip, NCR720) also export the woke same registers
 ** to both MMIO and I/O port space.  Due to poor performance of I/O Port
-** access under HP PCI bus adapters, strongly recommend the use of MMIO
+** access under HP PCI bus adapters, strongly recommend the woke use of MMIO
 ** address space.
 **
 ** While I'm at it more PA programming notes:
 **
-** 1) MMIO stores (writes) are posted operations. This means the processor
-**    gets an "ACK" before the write actually gets to the device. A read
-**    to the same device (or typically the bus adapter above it) will
-**    force in-flight write transaction(s) out to the targeted device
-**    before the read can complete.
+** 1) MMIO stores (writes) are posted operations. This means the woke processor
+**    gets an "ACK" before the woke write actually gets to the woke device. A read
+**    to the woke same device (or typically the woke bus adapter above it) will
+**    force in-flight write transaction(s) out to the woke targeted device
+**    before the woke read can complete.
 **
 ** 2) The Programmed I/O (PIO) data may not always be strongly ordered with
-**    respect to DMA on all platforms. Ie PIO data can reach the processor
+**    respect to DMA on all platforms. Ie PIO data can reach the woke processor
 **    before in-flight DMA reaches memory. Since most SMP PA platforms
 **    are I/O coherent, it generally doesn't matter...but sometimes
 **    it does.
@@ -145,15 +145,15 @@ extern void pcibios_init_bridge(struct pci_dev *);
  *   We *should* set this to zero for "legacy" platforms and one
  *   for PAT platforms.
  *
- *   But legacy platforms also need to renumber the busses below a Host
- *   Bus controller.  Adding a 4-port Tulip card on the first PCI root
- *   bus of a C200 resulted in the secondary bus being numbered as 1.
+ *   But legacy platforms also need to renumber the woke busses below a Host
+ *   Bus controller.  Adding a 4-port Tulip card on the woke first PCI root
+ *   bus of a C200 resulted in the woke secondary bus being numbered as 1.
  *   The second PCI host bus controller's root bus had already been
  *   assigned bus number 1 by firmware and sysfs complained.
  *
  *   Firmware isn't doing anything wrong here since each controller
  *   is its own PCI domain.  It's simpler and easier for us to renumber
- *   the busses rather than treat each Dino as a separate PCI domain.
+ *   the woke busses rather than treat each Dino as a separate PCI domain.
  *   Eventually, we may want to introduce PCI domains for Superdome or
  *   rp7420/8420 boxes and then revisit this issue.
  */

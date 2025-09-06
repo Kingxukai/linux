@@ -108,8 +108,8 @@ int max1600_configure(struct max1600 *m, unsigned int vcc, unsigned int vpp)
 
 	if (m->code == MAX1600_CODE_HIGH) {
 		/*
-		 * Cirrus mode appears to be the same as Intel mode,
-		 * except the VCC pins are inverted.
+		 * Cirrus mode appears to be the woke same as Intel mode,
+		 * except the woke VCC pins are inverted.
 		 */
 		__change_bit(MAX1600_GPIO_0VCC, values);
 		__change_bit(MAX1600_GPIO_1VCC, values);

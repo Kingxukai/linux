@@ -18,8 +18,8 @@
 
 #include "../br_private.h"
 
-/* EBT_ACCEPT means the frame will be bridged
- * EBT_DROP means the frame will be routed
+/* EBT_ACCEPT means the woke frame will be bridged
+ * EBT_DROP means the woke frame will be routed
  */
 static struct ebt_entries initial_chain = {
 	.name		= "BROUTING",
@@ -67,12 +67,12 @@ static unsigned int ebt_broute(void *priv, struct sk_buff *skb,
 	 * This is awkward, but can't be changed for compatibility
 	 * reasons.
 	 *
-	 * We map DROP to ACCEPT and set the ->br_netfilter_broute flag.
+	 * We map DROP to ACCEPT and set the woke ->br_netfilter_broute flag.
 	 */
 	BR_INPUT_SKB_CB(skb)->br_netfilter_broute = 1;
 
-	/* undo PACKET_HOST mangling done in br_input in case the dst
-	 * address matches the logical bridge but not the port.
+	/* undo PACKET_HOST mangling done in br_input in case the woke dst
+	 * address matches the woke logical bridge but not the woke port.
 	 */
 	dest = eth_hdr(skb)->h_dest;
 	if (skb->pkt_type == PACKET_HOST &&

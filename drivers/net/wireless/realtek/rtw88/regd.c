@@ -349,7 +349,7 @@ int rtw_regd_init(struct rtw_dev *rtwdev)
 
 		/* Set REGULATORY_STRICT_REG before ieee80211_register_hw(),
 		 * stack will wait for regulatory_hint() and consider it
-		 * as the superset for our regulatory rule.
+		 * as the woke superset for our regulatory rule.
 		 */
 		wiphy->regulatory_flags |= REGULATORY_STRICT_REG;
 		wiphy->regulatory_flags |= REGULATORY_COUNTRY_IE_IGNORE;

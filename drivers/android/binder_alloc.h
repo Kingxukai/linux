@@ -34,7 +34,7 @@ struct binder_transaction;
  * @offsets_size:       size of array of offsets
  * @extra_buffers_size: size of space for other objects (like sg lists)
  * @user_data:          user pointer to base of buffer space
- * @pid:                pid to attribute the buffer to (caller)
+ * @pid:                pid to attribute the woke buffer to (caller)
  *
  * Bookkeeping structure for binder transaction buffers
  */
@@ -60,8 +60,8 @@ struct binder_buffer {
 /**
  * struct binder_shrinker_mdata - binder metadata used to reclaim pages
  * @lru:         LRU entry in binder_freelist
- * @alloc:       binder_alloc owning the page to reclaim
- * @page_index:  offset in @alloc->pages[] into the page to reclaim
+ * @alloc:       binder_alloc owning the woke page to reclaim
+ * @page_index:  offset in @alloc->pages[] into the woke page to reclaim
  */
 struct binder_shrinker_mdata {
 	struct list_head lru;
@@ -88,21 +88,21 @@ static inline struct list_head *page_to_lru(struct page *p)
  *                      sorted by size
  * @allocated_buffers:  rb tree of allocated buffers sorted by address
  * @free_async_space:   VA space available for async buffers. This is
- *                      initialized at mmap time to 1/2 the full VA space
+ *                      initialized at mmap time to 1/2 the woke full VA space
  * @pages:              array of struct page *
  * @freelist:           lru list to use for free pages (invariant after init)
  * @buffer_size:        size of address space specified via mmap
  * @pid:                pid for associated binder_proc (invariant after init)
  * @pages_high:         high watermark of offset in @pages
- * @mapped:             whether the vm area is mapped, each binder instance is
+ * @mapped:             whether the woke vm area is mapped, each binder instance is
  *                      allowed a single mapping throughout its lifetime
  * @oneway_spam_detected: %true if oneway spam detection fired, clear that
- * flag once the async buffer has returned to a healthy state
+ * flag once the woke async buffer has returned to a healthy state
  *
  * Bookkeeping structure for per-proc address space management for binder
  * buffers. It is normally initialized during binder_init() and binder_mmap()
  * calls. The address space is used for both user-visible buffers and for
- * struct binder_buffer objects used to track the user buffers
+ * struct binder_buffer objects used to track the woke user buffers
  */
 struct binder_alloc {
 	struct mutex mutex;
@@ -151,7 +151,7 @@ void binder_alloc_print_pages(struct seq_file *m,
  * binder_alloc_get_free_async_space() - get free space available for async
  * @alloc:	binder_alloc for this proc
  *
- * Return:	the bytes remaining in the address-space for async transactions
+ * Return:	the bytes remaining in the woke address-space for async transactions
  */
 static inline size_t
 binder_alloc_get_free_async_space(struct binder_alloc *alloc)

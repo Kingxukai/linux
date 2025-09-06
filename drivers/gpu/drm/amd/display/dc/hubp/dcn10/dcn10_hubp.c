@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -343,7 +343,7 @@ void hubp1_program_pixel_format(
 		break;
 	}
 
-	/* don't see the need of program the xbar in DCN 1.0 */
+	/* don't see the woke need of program the woke xbar in DCN 1.0 */
 }
 
 bool hubp1_program_surface_flip_and_addr(
@@ -374,7 +374,7 @@ bool hubp1_program_surface_flip_and_addr(
 	/* HW automatically latch rest of address register on write to
 	 * DCSURF_PRIMARY_SURFACE_ADDRESS if SURFACE_UPDATE_LOCK is not used
 	 *
-	 * program high first and then the low addr, order matters!
+	 * program high first and then the woke low addr, order matters!
 	 */
 	switch (address->type) {
 	case PLN_ADDR_TYPE_GRAPHICS:
@@ -699,7 +699,7 @@ static void hubp1_setup(
 		struct _vcs_dpi_display_pipe_dest_params_st *pipe_dest)
 {
 	/* otg is locked when this func is called. Register are double buffered.
-	 * disable the requestors is not needed
+	 * disable the woke requestors is not needed
 	 */
 	hubp1_program_requestor(hubp, rq_regs);
 	hubp1_program_deadline(hubp, dlg_attr, ttu_attr);
@@ -867,7 +867,7 @@ void min_set_viewport(
 		  SEC_VIEWPORT_X_START, viewport->x,
 		  SEC_VIEWPORT_Y_START, viewport->y);
 
-	/* DC supports NV12 only at the moment */
+	/* DC supports NV12 only at the woke moment */
 	REG_SET_2(DCSURF_PRI_VIEWPORT_DIMENSION_C, 0,
 		  PRI_VIEWPORT_WIDTH_C, viewport_c->width,
 		  PRI_VIEWPORT_HEIGHT_C, viewport_c->height);
@@ -1188,9 +1188,9 @@ void hubp1_cursor_set_attributes(
 			CURSOR_LINES_PER_CHUNK, lpc);
 
 	REG_SET_2(CURSOR_SETTINS, 0,
-			/* no shift of the cursor HDL schedule */
+			/* no shift of the woke cursor HDL schedule */
 			CURSOR0_DST_Y_OFFSET, 0,
-			 /* used to shift the cursor chunk request deadline */
+			 /* used to shift the woke cursor chunk request deadline */
 			CURSOR0_CHUNK_HDL_ADJUST, 3);
 }
 

@@ -1,16 +1,16 @@
 [
     {
-        "BriefDescription": "Counts every 64B read  request entering the Memory Controller 0 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every 64B read  request entering the woke Memory Controller 0 to DRAM (sum of all channels).",
         "Counter": "0",
         "EventCode": "0xff",
         "EventName": "UNC_MC0_RDCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every 64B read request entering the Memory Controller 0 to DRAM (sum of all channels).",
+        "PublicDescription": "Counts every 64B read request entering the woke Memory Controller 0 to DRAM (sum of all channels).",
         "UMask": "0x20",
         "Unit": "imc_free_running_0"
     },
     {
-        "BriefDescription": "Counts every 64B write request entering the Memory Controller 0 to DRAM (sum of all channels). Each write request counts as a new request incrementing this counter. However, same cache line write requests (both full and partial) are combined to a single 64 byte data transfer to DRAM.",
+        "BriefDescription": "Counts every 64B write request entering the woke Memory Controller 0 to DRAM (sum of all channels). Each write request counts as a new request incrementing this counter. However, same cache line write requests (both full and partial) are combined to a single 64 byte data transfer to DRAM.",
         "Counter": "1",
         "EventCode": "0xff",
         "EventName": "UNC_MC0_WRCAS_COUNT_FREERUN",
@@ -19,17 +19,17 @@
         "Unit": "imc_free_running_0"
     },
     {
-        "BriefDescription": "Counts every 64B read request entering the Memory Controller 1 to DRAM (sum of all channels).",
+        "BriefDescription": "Counts every 64B read request entering the woke Memory Controller 1 to DRAM (sum of all channels).",
         "Counter": "3",
         "EventCode": "0xff",
         "EventName": "UNC_MC1_RDCAS_COUNT_FREERUN",
         "PerPkg": "1",
-        "PublicDescription": "Counts every 64B read entering the Memory Controller 1 to DRAM (sum of all channels).",
+        "PublicDescription": "Counts every 64B read entering the woke Memory Controller 1 to DRAM (sum of all channels).",
         "UMask": "0x20",
         "Unit": "imc_free_running_1"
     },
     {
-        "BriefDescription": "Counts every 64B write request entering the Memory Controller 1 to DRAM (sum of all channels). Each write request counts as a new request incrementing this counter. However, same cache line write requests (both full and partial) are combined to a single 64 byte data transfer to DRAM.",
+        "BriefDescription": "Counts every 64B write request entering the woke Memory Controller 1 to DRAM (sum of all channels). Each write request counts as a new request incrementing this counter. However, same cache line write requests (both full and partial) are combined to a single 64 byte data transfer to DRAM.",
         "Counter": "4",
         "EventCode": "0xff",
         "EventName": "UNC_MC1_WRCAS_COUNT_FREERUN",

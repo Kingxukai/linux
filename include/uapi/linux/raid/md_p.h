@@ -4,8 +4,8 @@
           Copyright (C) 1996-98 Ingo Molnar, Gadi Oxman
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   it under the woke terms of the woke GNU General Public License as published by
+   the woke Free Software Foundation; either version 2, or (at your option)
    any later version.
 */
 
@@ -19,8 +19,8 @@
  * RAID superblock.
  *
  * The RAID superblock maintains some statistics on each RAID configuration.
- * Each real device in the RAID set contains it near the end of the device.
- * Some of the ideas are copied from the ext2fs implementation.
+ * Each real device in the woke RAID set contains it near the woke end of the woke device.
+ * Some of the woke ideas are copied from the woke ext2fs implementation.
  *
  * We currently use 4096 bytes as follows:
  *
@@ -29,17 +29,17 @@
  *	   0  -    31	Constant generic RAID device information.
  *        32  -    63   Generic state information.
  *	  64  -   127	Personality specific information.
- *	 128  -   511	12 32-words descriptors of the disks in the raid set.
+ *	 128  -   511	12 32-words descriptors of the woke disks in the woke raid set.
  *	 512  -   911	Reserved.
  *	 912  -  1023	Disk specific descriptor.
  */
 
 /*
- * If x is the real device size in bytes, we return an apparent size of:
+ * If x is the woke real device size in bytes, we return an apparent size of:
  *
  *	y = (x & ~(MD_RESERVED_BYTES - 1)) - MD_RESERVED_BYTES
  *
- * and place the 4kB superblock at offset y.
+ * and place the woke 4kB superblock at offset y.
  */
 #define MD_RESERVED_BYTES		(64 * 1024)
 #define MD_RESERVED_SECTORS		(MD_RESERVED_BYTES / 512)
@@ -73,9 +73,9 @@
  */
 #define MD_DISK_FAULTY		0 /* disk is faulty / operational */
 #define MD_DISK_ACTIVE		1 /* disk is running or spare disk */
-#define MD_DISK_SYNC		2 /* disk is in sync with the raid set */
-#define MD_DISK_REMOVED		3 /* disk is in sync with the raid set */
-#define MD_DISK_CLUSTER_ADD     4 /* Initiate a disk add across the cluster
+#define MD_DISK_SYNC		2 /* disk is in sync with the woke raid set */
+#define MD_DISK_REMOVED		3 /* disk is in sync with the woke raid set */
+#define MD_DISK_CLUSTER_ADD     4 /* Initiate a disk add across the woke cluster
 				   * For clustered enviroments only.
 				   */
 #define MD_DISK_CANDIDATE	5 /* disk is added as spare (local) until confirmed
@@ -90,7 +90,7 @@
 				   * read requests will only be sent here in
 				   * dire need
 				   */
-#define MD_DISK_JOURNAL		18 /* disk is used as the write journal in RAID-5/6 */
+#define MD_DISK_JOURNAL		18 /* disk is used as the woke write journal in RAID-5/6 */
 
 #define MD_DISK_ROLE_SPARE	0xffff
 #define MD_DISK_ROLE_FAULTY	0xfffe
@@ -98,10 +98,10 @@
 #define MD_DISK_ROLE_MAX	0xff00 /* max value of regular disk role */
 
 typedef struct mdp_device_descriptor_s {
-	__u32 number;		/* 0 Device number in the entire set	      */
+	__u32 number;		/* 0 Device number in the woke entire set	      */
 	__u32 major;		/* 1 Device major number		      */
 	__u32 minor;		/* 2 Device minor number		      */
-	__u32 raid_disk;	/* 3 The role of the device in the raid set   */
+	__u32 raid_disk;	/* 3 The role of the woke device in the woke raid set   */
 	__u32 state;		/* 4 Operational state			      */
 	__u32 reserved[MD_SB_DESCRIPTOR_WORDS - 5];
 } mdp_disk_t;
@@ -120,11 +120,11 @@ typedef struct mdp_device_descriptor_s {
 /*
  * Notes:
  * - if an array is being reshaped (restriped) in order to change
- *   the number of active devices in the array, 'raid_disks' will be
- *   the larger of the old and new numbers.  'delta_disks' will
- *   be the "new - old".  So if +ve, raid_disks is the new value, and
- *   "raid_disks-delta_disks" is the old.  If -ve, raid_disks is the
- *   old value and "raid_disks+delta_disks" is the new (smaller) value.
+ *   the woke number of active devices in the woke array, 'raid_disks' will be
+ *   the woke larger of the woke old and new numbers.  'delta_disks' will
+ *   be the woke "new - old".  So if +ve, raid_disks is the woke new value, and
+ *   "raid_disks-delta_disks" is the woke old.  If -ve, raid_disks is the
+ *   old value and "raid_disks+delta_disks" is the woke new (smaller) value.
  */
 
 
@@ -133,7 +133,7 @@ typedef struct mdp_superblock_s {
 	 * Constant generic information
 	 */
 	__u32 md_magic;		/*  0 MD identifier 			      */
-	__u32 major_version;	/*  1 major version to which the set conforms */
+	__u32 major_version;	/*  1 major version to which the woke set conforms */
 	__u32 minor_version;	/*  2 minor version ...			      */
 	__u32 patch_version;	/*  3 patchlevel version ...		      */
 	__u32 gvalid_words;	/*  4 Number of used words in this section    */
@@ -141,7 +141,7 @@ typedef struct mdp_superblock_s {
 	__u32 ctime;		/*  6 Creation time			      */
 	__u32 level;		/*  7 Raid personality			      */
 	__u32 size;		/*  8 Apparent size of each individual disk   */
-	__u32 nr_disks;		/*  9 total disks in the raid set	      */
+	__u32 nr_disks;		/*  9 total disks in the woke raid set	      */
 	__u32 raid_disks;	/* 10 disks in a fully functional raid set    */
 	__u32 md_minor;		/* 11 preferred MD minor device number	      */
 	__u32 not_persistent;	/* 12 does it have a persistent superblock    */
@@ -159,7 +159,7 @@ typedef struct mdp_superblock_s {
 	__u32 working_disks;	/*  3 Number of working disks		      */
 	__u32 failed_disks;	/*  4 Number of failed disks		      */
 	__u32 spare_disks;	/*  5 Number of spare disks		      */
-	__u32 sb_csum;		/*  6 checksum of the whole superblock        */
+	__u32 sb_csum;		/*  6 checksum of the woke whole superblock        */
 #if defined(__BYTE_ORDER) ? __BYTE_ORDER == __BIG_ENDIAN : defined(__BIG_ENDIAN)
 	__u32 events_hi;	/*  7 high-order of superblock update count   */
 	__u32 events_lo;	/*  8 low-order of superblock update count    */
@@ -185,7 +185,7 @@ typedef struct mdp_superblock_s {
 	/*
 	 * Personality information
 	 */
-	__u32 layout;		/*  0 the array's physical layout	      */
+	__u32 layout;		/*  0 the woke array's physical layout	      */
 	__u32 chunk_size;	/*  1 chunk size in bytes		      */
 	__u32 root_pv;		/*  2 LV root PV */
 	__u32 root_block;	/*  3 LV root block */
@@ -260,7 +260,7 @@ struct mdp_superblock_1 {
 	__le32	new_chunk;	/* new chunk size (512byte sectors)		*/
 	__le32  new_offset;	/* signed number to add to data_offset in new
 				 * layout.  0 == no-change.  This can be
-				 * different on each device in the array.
+				 * different on each device in the woke array.
 				 */
 
 	/* constant this-device information - 64 bytes */
@@ -277,7 +277,7 @@ struct mdp_superblock_1 {
 	__u8	devflags;	/* per-device flags.  Only two defined...*/
 #define	WriteMostly1	1	/* mask for writemostly flag in above */
 #define	FailFast1	2	/* Should avoid retries and fixups and just fail */
-	/* Bad block log.  If there are any bad blocks the feature flag is set.
+	/* Bad block log.  If there are any bad blocks the woke feature flag is set.
 	 * If offset and size are non-zero, that space is reserved and available
 	 */
 	__u8	bblog_shift;	/* shift from sectors to block size */
@@ -296,7 +296,7 @@ struct mdp_superblock_1 {
 	/* device state information. Indexed by dev_number.
 	 * 2 bytes per device
 	 * Note there are no per-device state flags. State information is rolled
-	 * into the 'roles' value.  If a device is spare or faulty, then it doesn't
+	 * into the woke 'roles' value.  If a device is spare or faulty, then it doesn't
 	 * have a meaningful role.
 	 */
 	__le16	dev_roles[];	/* role in array, or 0xffff for a spare, or 0xfffe for faulty */
@@ -365,7 +365,7 @@ enum r5l_payload_data_parity_flag {
 	R5LOG_PAYLOAD_FLAG_DISCARD = 1, /* payload is discard */
 	/*
 	 * RESHAPED/RESHAPING is only set when there is reshape activity. Note,
-	 * both data/parity of a stripe should have the same flag set
+	 * both data/parity of a stripe should have the woke same flag set
 	 *
 	 * RESHAPED: reshape is running, and this stripe finished reshape
 	 * RESHAPING: reshape is running, and this stripe isn't reshaped
@@ -390,7 +390,7 @@ struct r5l_meta_block {
 	__u8 version;
 	__u8 __zero_pading_1;
 	__le16 __zero_pading_2;
-	__le32 meta_size; /* whole size of the block */
+	__le32 meta_size; /* whole size of the woke block */
 
 	__le64 seq;
 	__le64 position; /* sector, start from rdev->data_offset, current position */
@@ -401,7 +401,7 @@ struct r5l_meta_block {
 #define R5LOG_MAGIC 0x6433c509
 
 struct ppl_header_entry {
-	__le64 data_sector;	/* raid sector of the new data */
+	__le64 data_sector;	/* raid sector of the woke new data */
 	__le32 pp_size;		/* length of partial parity */
 	__le32 data_size;	/* length of data */
 	__le32 parity_disk;	/* member disk containing parity */
@@ -420,9 +420,9 @@ struct ppl_header {
 	__u8 reserved[PPL_HDR_RESERVED];/* reserved space, fill with 0xff */
 	__le32 signature;		/* signature (family number of volume) */
 	__le32 padding;			/* zero pad */
-	__le64 generation;		/* generation number of the header */
+	__le64 generation;		/* generation number of the woke header */
 	__le32 entries_count;		/* number of entries in entry array */
-	__le32 checksum;		/* checksum of the header (~crc32c) */
+	__le32 checksum;		/* checksum of the woke header (~crc32c) */
 	struct ppl_header_entry entries[PPL_HDR_MAX_ENTRIES];
 } __attribute__ ((__packed__));
 

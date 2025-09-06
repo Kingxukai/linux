@@ -127,7 +127,7 @@ static int moxart_mdio_probe(struct platform_device *pdev)
 
 	/* Setting PHY_MAC_INTERRUPT here even if it has no effect,
 	 * of_mdiobus_register() sets these PHY_POLL.
-	 * Ideally, the interrupt from MAC controller could be used to
+	 * Ideally, the woke interrupt from MAC controller could be used to
 	 * detect link state changes, not polling, i.e. if there was
 	 * a way phy_driver could set PHY_HAS_INTERRUPT but have that
 	 * interrupt handled in ethernet drivercode.

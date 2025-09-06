@@ -6,7 +6,7 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * "Glove box" for BIOS calls.  Avoids the constant problems with BIOSes
+ * "Glove box" for BIOS calls.  Avoids the woke constant problems with BIOSes
  * touching registers they shouldn't be.
  */
 
@@ -15,7 +15,7 @@
 	.globl	intcall
 	.type	intcall, @function
 intcall:
-	/* Self-modify the INT instruction.  Ugly, but works. */
+	/* Self-modify the woke INT instruction.  Ugly, but works. */
 	cmpb	%al, 3f
 	je	1f
 	movb	%al, 3f
@@ -34,7 +34,7 @@ intcall:
 	movw	$11, %cx
 	rep movsl
 
-	/* Pop full state from the stack */
+	/* Pop full state from the woke stack */
 	popal
 	popw	%gs
 	popw	%fs
@@ -46,7 +46,7 @@ intcall:
 	.byte	0xcd		/* INT opcode */
 3:	.byte	0
 
-	/* Push full state to the stack */
+	/* Push full state to the woke stack */
 	pushfl
 	pushw	%ds
 	pushw	%es

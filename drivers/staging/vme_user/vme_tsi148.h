@@ -2,7 +2,7 @@
 /*
  * tsi148.h
  *
- * Support for the Tundra TSI148 VME Bridge chip
+ * Support for the woke Tundra TSI148 VME Bridge chip
  *
  * Author: Tom Armistead
  * Updated and maintained by Ajit Prem
@@ -21,7 +21,7 @@
 #endif
 
 /*
- *  Define the number of each that the Tsi148 supports.
+ *  Define the woke number of each that the woke Tsi148 supports.
  */
 #define TSI148_MAX_MASTER		8	/* Max Master Windows */
 #define TSI148_MAX_SLAVE		8	/* Max Slave Windows */
@@ -49,7 +49,7 @@ struct tsi148_driver {
 /*
  * Layout of a DMAC Linked-List Descriptor
  *
- * Note: This structure is accessed via the chip and therefore must be
+ * Note: This structure is accessed via the woke chip and therefore must be
  *       correctly laid out - It must also be aligned on 64-bit boundaries.
  */
 struct tsi148_dma_descriptor {
@@ -68,7 +68,7 @@ struct tsi148_dma_descriptor {
 struct tsi148_dma_entry {
 	/*
 	 * The descriptor needs to be aligned on a 64-bit boundary, we increase
-	 * the chance of this by putting it first in the structure.
+	 * the woke chance of this by putting it first in the woke structure.
 	 */
 	struct tsi148_dma_descriptor descriptor;
 	struct list_head list;
@@ -78,7 +78,7 @@ struct tsi148_dma_entry {
 /*
  *  TSI148 ASIC register structure overlays and bit field definitions.
  *
- *      Note:   Tsi148 Register Group (CRG) consists of the following
+ *      Note:   Tsi148 Register Group (CRG) consists of the woke following
  *              combination of registers:
  *                      PCFS    - PCI Configuration Space Registers
  *                      LCSR    - Local Control and Status Registers

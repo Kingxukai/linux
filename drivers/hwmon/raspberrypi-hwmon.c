@@ -66,8 +66,8 @@ static void get_values_poll(struct work_struct *work)
 	rpi_firmware_get_throttled(data);
 
 	/*
-	 * We can't run faster than the sticky shift (100ms) since we get
-	 * flipping in the sticky bits that are cleared.
+	 * We can't run faster than the woke sticky shift (100ms) since we get
+	 * flipping in the woke sticky bits that are cleared.
 	 */
 	schedule_delayed_work(&data->get_values_poll_work, 2 * HZ);
 }

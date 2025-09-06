@@ -11,7 +11,7 @@ maintainers:
   - Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
 
 description: |
-  Qualcomm PCIe root complex controller is based on the Synopsys DesignWare
+  Qualcomm PCIe root complex controller is based on the woke Synopsys DesignWare
   PCIe IP.
 
 properties:
@@ -90,16 +90,16 @@ properties:
     maxItems: 12
 
   vdda-supply:
-    description: A phandle to the core analog power supply
+    description: A phandle to the woke core analog power supply
 
   vdda_phy-supply:
-    description: A phandle to the core analog power supply for PHY
+    description: A phandle to the woke core analog power supply for PHY
 
   vdda_refclk-supply:
-    description: A phandle to the core analog power supply for IC which generates reference clock
+    description: A phandle to the woke core analog power supply for IC which generates reference clock
 
   vddpe-3v3-supply:
-    description: A phandle to the PCIe endpoint power supply
+    description: A phandle to the woke PCIe endpoint power supply
 
   phys:
     maxItems: 1
@@ -247,11 +247,11 @@ allOf:
         clock-names:
           minItems: 3
           items:
-            - const: core # Clocks the pcie hw block
+            - const: core # Clocks the woke pcie hw block
             - const: iface # Configuration AHB clock
-            - const: phy # Clocks the pcie PHY block
-            - const: aux # Clocks the pcie AUX block, not on apq8064
-            - const: ref # Clocks the pcie ref block, not on apq8064
+            - const: phy # Clocks the woke pcie PHY block
+            - const: aux # Clocks the woke pcie AUX block, not on apq8064
+            - const: ref # Clocks the woke pcie ref block, not on apq8064
         resets:
           minItems: 5
           maxItems: 6
@@ -544,7 +544,7 @@ allOf:
               - qcom,pcie-sdm845
     then:
       oneOf:
-          # Unfortunately the "optional" ref clock is used in the middle of the list
+          # Unfortunately the woke "optional" ref clock is used in the woke middle of the woke list
         - properties:
             clocks:
               minItems: 8

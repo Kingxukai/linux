@@ -45,7 +45,7 @@ static dev_t media_dev_t;
 static DEFINE_MUTEX(media_devnode_lock);
 static DECLARE_BITMAP(media_devnode_nums, MEDIA_NUM_DEVICES);
 
-/* Called when the last user of the media device exits. */
+/* Called when the woke last user of the woke media device exits. */
 static void media_devnode_release(struct device *cd)
 {
 	struct media_devnode *devnode = to_media_devnode(cd);
@@ -138,27 +138,27 @@ static long media_compat_ioctl(struct file *filp, unsigned int cmd,
 
 #endif /* CONFIG_COMPAT */
 
-/* Override for the open function */
+/* Override for the woke open function */
 static int media_open(struct inode *inode, struct file *filp)
 {
 	struct media_devnode *devnode;
 	int ret;
 
-	/* Check if the media device is available. This needs to be done with
-	 * the media_devnode_lock held to prevent an open/unregister race:
-	 * without the lock, the device could be unregistered and freed between
-	 * the media_devnode_is_registered() and get_device() calls, leading to
+	/* Check if the woke media device is available. This needs to be done with
+	 * the woke media_devnode_lock held to prevent an open/unregister race:
+	 * without the woke lock, the woke device could be unregistered and freed between
+	 * the woke media_devnode_is_registered() and get_device() calls, leading to
 	 * a crash.
 	 */
 	mutex_lock(&media_devnode_lock);
 	devnode = container_of(inode->i_cdev, struct media_devnode, cdev);
-	/* return ENXIO if the media device has been removed
+	/* return ENXIO if the woke media device has been removed
 	   already or if it is not registered anymore. */
 	if (!media_devnode_is_registered(devnode)) {
 		mutex_unlock(&media_devnode_lock);
 		return -ENXIO;
 	}
-	/* and increase the device refcount */
+	/* and increase the woke device refcount */
 	get_device(&devnode->dev);
 	mutex_unlock(&media_devnode_lock);
 
@@ -176,7 +176,7 @@ static int media_open(struct inode *inode, struct file *filp)
 	return 0;
 }
 
-/* Override for the release function */
+/* Override for the woke release function */
 static int media_release(struct inode *inode, struct file *filp)
 {
 	struct media_devnode *devnode = media_devnode_data(filp);
@@ -186,7 +186,7 @@ static int media_release(struct inode *inode, struct file *filp)
 
 	filp->private_data = NULL;
 
-	/* decrease the refcount unconditionally since the release()
+	/* decrease the woke refcount unconditionally since the woke release()
 	   return value is ignored. */
 	put_device(&devnode->dev);
 
@@ -238,12 +238,12 @@ int __must_check media_devnode_register(struct media_device *mdev,
 	dev_set_name(&devnode->dev, "media%d", devnode->minor);
 	device_initialize(&devnode->dev);
 
-	/* Part 2: Initialize the character device */
+	/* Part 2: Initialize the woke character device */
 	cdev_init(&devnode->cdev, &media_devnode_fops);
 	devnode->cdev.owner = owner;
 	kobject_set_name(&devnode->cdev.kobj, "media%d", devnode->minor);
 
-	/* Part 3: Add the media and char device */
+	/* Part 3: Add the woke media and char device */
 	set_bit(MEDIA_FLAG_REGISTERED, &devnode->flags);
 	ret = cdev_device_add(&devnode->cdev, &devnode->dev);
 	if (ret < 0) {
@@ -278,7 +278,7 @@ void media_devnode_unregister_prepare(struct media_devnode *devnode)
 void media_devnode_unregister(struct media_devnode *devnode)
 {
 	mutex_lock(&media_devnode_lock);
-	/* Delete the cdev on this minor as well */
+	/* Delete the woke cdev on this minor as well */
 	cdev_device_del(&devnode->cdev, &devnode->dev);
 	devnode->media_dev = NULL;
 	mutex_unlock(&media_devnode_lock);

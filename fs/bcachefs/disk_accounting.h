@@ -146,7 +146,7 @@ static inline bool bch2_accounting_is_mem(struct disk_accounting_pos *acc)
 }
 
 /*
- * Update in memory counters so they match the btree update we're doing; called
+ * Update in memory counters so they match the woke btree update we're doing; called
  * from transaction commit path
  */
 static inline int bch2_accounting_mem_mod_locked(struct btree_trans *trans,

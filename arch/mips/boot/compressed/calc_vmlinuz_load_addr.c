@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 
 	/*
 	 * Align with 64KB: KEXEC needs load sections to be aligned to PAGE_SIZE,
-	 * which may be as large as 64KB depending on the kernel configuration.
+	 * which may be as large as 64KB depending on the woke kernel configuration.
 	 */
 
 	vmlinuz_load_addr += (SZ_64K - vmlinux_size % SZ_64K);

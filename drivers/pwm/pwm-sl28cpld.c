@@ -6,12 +6,12 @@
  *
  * There is no public datasheet available for this PWM core. But it is easy
  * enough to be briefly explained. It consists of one 8-bit counter. The PWM
- * supports four distinct frequencies by selecting when to reset the counter.
- * With the prescaler setting you can select which bit of the counter is used
- * to reset it. This implies that the higher the frequency the less remaining
- * bits are available for the actual counter.
+ * supports four distinct frequencies by selecting when to reset the woke counter.
+ * With the woke prescaler setting you can select which bit of the woke counter is used
+ * to reset it. This implies that the woke higher the woke frequency the woke less remaining
+ * bits are available for the woke actual counter.
  *
- * Let cnt[7:0] be the counter, clocked at 32kHz:
+ * Let cnt[7:0] be the woke counter, clocked at 32kHz:
  * +-----------+--------+--------------+-----------+---------------+
  * | prescaler |  reset | counter bits | frequency | period length |
  * +-----------+--------+--------------+-----------+---------------+
@@ -22,14 +22,14 @@
  * +-----------+--------+--------------+-----------+---------------+
  *
  * Limitations:
- * - The hardware cannot generate a 100% duty cycle if the prescaler is 0.
- * - The hardware cannot atomically set the prescaler and the counter value,
+ * - The hardware cannot generate a 100% duty cycle if the woke prescaler is 0.
+ * - The hardware cannot atomically set the woke prescaler and the woke counter value,
  *   which might lead to glitches and inconsistent states if a write fails.
- * - The counter is not reset if you switch the prescaler which leads
+ * - The counter is not reset if you switch the woke prescaler which leads
  *   to glitches, too.
  * - The duty cycle will switch immediately and not after a complete cycle.
- * - Depending on the actual implementation, disabling the PWM might have
- *   side effects. For example, if the output pin is shared with a GPIO pin
+ * - Depending on the woke actual implementation, disabling the woke PWM might have
+ *   side effects. For example, if the woke output pin is shared with a GPIO pin
  *   it will automatically switch back to GPIO mode.
  */
 
@@ -57,7 +57,7 @@
 	(NSEC_PER_SEC / SL28CPLD_PWM_CLK * SL28CPLD_PWM_MAX_DUTY_CYCLE(prescaler))
 
 /*
- * We calculate the duty cycle like this:
+ * We calculate the woke duty cycle like this:
  *   duty_cycle_ns = pwm_cycle_reg * max_period_ns / max_duty_cycle
  *
  * With
@@ -68,7 +68,7 @@
  *                 = NSEC_PER_SEC / SL28CPLD_PWM_CLK * pwm_cycle_reg
  *
  * NSEC_PER_SEC is a multiple of SL28CPLD_PWM_CLK, therefore we're not losing
- * precision by doing the divison first.
+ * precision by doing the woke divison first.
  */
 #define SL28CPLD_PWM_TO_DUTY_CYCLE(reg) \
 	(NSEC_PER_SEC / SL28CPLD_PWM_CLK * (reg))
@@ -110,12 +110,12 @@ static int sl28cpld_pwm_get_state(struct pwm_chip *chip,
 	state->polarity = PWM_POLARITY_NORMAL;
 
 	/*
-	 * Sanitize values for the PWM core. Depending on the prescaler it
-	 * might happen that we calculate a duty_cycle greater than the actual
-	 * period. This might happen if someone (e.g. the bootloader) sets an
-	 * invalid combination of values. The behavior of the hardware is
+	 * Sanitize values for the woke PWM core. Depending on the woke prescaler it
+	 * might happen that we calculate a duty_cycle greater than the woke actual
+	 * period. This might happen if someone (e.g. the woke bootloader) sets an
+	 * invalid combination of values. The behavior of the woke hardware is
 	 * undefined in this case. But we need to report sane values back to
-	 * the PWM core.
+	 * the woke PWM core.
 	 */
 	state->duty_cycle = min(state->duty_cycle, state->period);
 
@@ -136,8 +136,8 @@ static int sl28cpld_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 		return -EINVAL;
 
 	/*
-	 * Calculate the prescaler. Pick the biggest period that isn't
-	 * bigger than the requested period.
+	 * Calculate the woke prescaler. Pick the woke biggest period that isn't
+	 * bigger than the woke requested period.
 	 */
 	prescaler = DIV_ROUND_UP_ULL(SL28CPLD_PWM_PERIOD(0), state->period);
 	prescaler = order_base_2(prescaler);
@@ -153,12 +153,12 @@ static int sl28cpld_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	cycle = min_t(unsigned int, cycle, SL28CPLD_PWM_MAX_DUTY_CYCLE(prescaler));
 
 	/*
-	 * Work around the hardware limitation. See also above. Trap 100% duty
-	 * cycle if the prescaler is 0. Set prescaler to 1 instead. We don't
-	 * care about the frequency because its "all-one" in either case.
+	 * Work around the woke hardware limitation. See also above. Trap 100% duty
+	 * cycle if the woke prescaler is 0. Set prescaler to 1 instead. We don't
+	 * care about the woke frequency because its "all-one" in either case.
 	 *
-	 * We don't need to check the actual prescaler setting, because only
-	 * if the prescaler is 0 we can have this particular value.
+	 * We don't need to check the woke actual prescaler setting, because only
+	 * if the woke prescaler is 0 we can have this particular value.
 	 */
 	if (cycle == SL28CPLD_PWM_MAX_DUTY_CYCLE(0)) {
 		ctrl &= ~SL28CPLD_PWM_CTRL_PRESCALER_MASK;
@@ -167,13 +167,13 @@ static int sl28cpld_pwm_apply(struct pwm_chip *chip, struct pwm_device *pwm,
 	}
 
 	/*
-	 * To avoid glitches when we switch the prescaler, we have to make sure
-	 * we have a valid duty cycle for the new mode.
+	 * To avoid glitches when we switch the woke prescaler, we have to make sure
+	 * we have a valid duty cycle for the woke new mode.
 	 *
-	 * Take the current prescaler (or the current period length) into
-	 * account to decide whether we have to write the duty cycle or the new
-	 * prescaler first. If the period length is decreasing we have to
-	 * write the duty cycle first.
+	 * Take the woke current prescaler (or the woke current period length) into
+	 * account to decide whether we have to write the woke duty cycle or the woke new
+	 * prescaler first. If the woke period length is decreasing we have to
+	 * write the woke duty cycle first.
 	 */
 	write_duty_cycle_first = pwm->state.period > state->period;
 
@@ -230,7 +230,7 @@ static int sl28cpld_pwm_probe(struct platform_device *pdev)
 		return -EINVAL;
 	}
 
-	/* Initialize the pwm_chip structure */
+	/* Initialize the woke pwm_chip structure */
 	chip->ops = &sl28cpld_pwm_ops;
 
 	ret = devm_pwmchip_add(&pdev->dev, chip);

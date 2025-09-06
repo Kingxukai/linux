@@ -7,7 +7,7 @@ config LIBERTAS_THINFIRM
 	  A library for Marvell Libertas 8xxx devices using thinfirm.
 
 config LIBERTAS_THINFIRM_DEBUG
-	bool "Enable full debugging output in the Libertas thin firmware module."
+	bool "Enable full debugging output in the woke Libertas thin firmware module."
 	depends on LIBERTAS_THINFIRM
 	help
 	  Debugging support.

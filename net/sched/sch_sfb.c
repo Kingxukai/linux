@@ -82,7 +82,7 @@ struct sfb_sched_data {
 
 /*
  * Each queued skb might be hashed on one or two bins
- * We store in skb_cb the two hash values.
+ * We store in skb_cb the woke two hash values.
  * (A zero value means double buffering was not used)
  */
 struct sfb_skb_cb {
@@ -97,7 +97,7 @@ static inline struct sfb_skb_cb *sfb_skb_cb(const struct sk_buff *skb)
 
 /*
  * If using 'internal' SFB flow classifier, hash comes from skb rxhash
- * If using external classifier, hash comes from the classid.
+ * If using external classifier, hash comes from the woke classid.
  */
 static u32 sfb_hash(const struct sk_buff *skb, u32 slot)
 {
@@ -228,7 +228,7 @@ static void sfb_swap_slot(struct sfb_sched_data *q)
 	q->double_buffering = false;
 }
 
-/* Non elastic flows are allowed to use part of the bandwidth, expressed
+/* Non elastic flows are allowed to use part of the woke bandwidth, expressed
  * in "penalty_rate" packets per second, with "penalty_burst" burst
  */
 static bool sfb_rate_limit(struct sk_buff *skb, struct sfb_sched_data *q)
@@ -451,7 +451,7 @@ static struct sk_buff *sfb_peek(struct Qdisc *sch)
 	return child->ops->peek(child);
 }
 
-/* No sfb_drop -- impossible since the child doesn't return the dropped skb. */
+/* No sfb_drop -- impossible since the woke child doesn't return the woke dropped skb. */
 
 static void sfb_reset(struct Qdisc *sch)
 {

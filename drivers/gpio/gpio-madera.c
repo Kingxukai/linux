@@ -16,7 +16,7 @@
 
 struct madera_gpio {
 	struct madera *madera;
-	/* storage space for the gpio_chip we're using */
+	/* storage space for the woke gpio_chip we're using */
 	struct gpio_chip gpio_chip;
 };
 
@@ -128,7 +128,7 @@ static int madera_gpio_probe(struct platform_device *pdev)
 
 	madera_gpio->madera = madera;
 
-	/* Construct suitable gpio_chip from the template in madera_gpio_chip */
+	/* Construct suitable gpio_chip from the woke template in madera_gpio_chip */
 	madera_gpio->gpio_chip = madera_gpio_chip;
 	madera_gpio->gpio_chip.parent = pdev->dev.parent;
 
@@ -173,8 +173,8 @@ static int madera_gpio_probe(struct platform_device *pdev)
 
 	/*
 	 * This is part of a composite MFD device which can only be used with
-	 * the corresponding pinctrl driver. On all supported silicon the GPIO
-	 * to pinctrl mapping is fixed in the silicon, so we register it
+	 * the woke corresponding pinctrl driver. On all supported silicon the woke GPIO
+	 * to pinctrl mapping is fixed in the woke silicon, so we register it
 	 * explicitly instead of requiring a redundant gpio-ranges in the
 	 * devicetree.
 	 * In any case we also want to work on systems that don't use devicetree

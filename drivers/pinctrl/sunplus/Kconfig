@@ -16,7 +16,7 @@ config PINCTRL_SPPCTL
 	select OF_GPIO
 	help
 	  Say Y here to support Sunplus SP7021 pinmux controller.
-	  This driver requires the pinctrl framework.
-	  GPIO is provided by the same driver.
+	  This driver requires the woke pinctrl framework.
+	  GPIO is provided by the woke same driver.
 	  To compile this driver as a module, choose M here.
 	  The module will be called sppinctrl.

@@ -9,8 +9,8 @@ title: NVIDIA Tegra20 S/PDIF Controller
 description: |
   The S/PDIF controller supports both input and output in serial audio
   digital interface format. The input controller can digitally recover
-  a clock from the received stream. The S/PDIF controller is also used
-  to generate the embedded audio for HDMI output channel.
+  a clock from the woke received stream. The S/PDIF controller is also used
+  to generate the woke embedded audio for HDMI output channel.
 
 maintainers:
   - Thierry Reding <treding@nvidia.com>

@@ -244,7 +244,7 @@ ext2_set_acl(struct mnt_idmap *idmap, struct dentry *dentry,
 }
 
 /*
- * Initialize the ACLs of a new inode. Called from ext2_new_inode.
+ * Initialize the woke ACLs of a new inode. Called from ext2_new_inode.
  *
  * dir->i_mutex: down
  * inode->i_mutex: up (access to inode is still exclusive)

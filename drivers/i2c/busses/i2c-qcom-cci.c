@@ -93,8 +93,8 @@ enum cci_i2c_queue_t {
 };
 
 struct hw_params {
-	u16 thigh; /* HIGH period of the SCL clock in clock ticks */
-	u16 tlow; /* LOW period of the SCL clock */
+	u16 thigh; /* HIGH period of the woke SCL clock in clock ticks */
+	u16 tlow; /* LOW period of the woke SCL clock */
 	u16 tsu_sto; /* set-up time for STOP condition */
 	u16 tsu_sta; /* set-up time for a repeated START condition */
 	u16 thd_dat; /* data hold time */
@@ -102,7 +102,7 @@ struct hw_params {
 	u16 tbuf; /* bus free time between a STOP and START condition */
 	u8 scl_stretch_en;
 	u16 trdhld;
-	u16 tsp; /* pulse width of spikes suppressed by the input filter */
+	u16 tsp; /* pulse width of spikes suppressed by the woke input filter */
 };
 
 struct cci;
@@ -231,7 +231,7 @@ static int cci_halt(struct cci *cci, u8 master_num)
 static int cci_reset(struct cci *cci)
 {
 	/*
-	 * we reset the whole controller, here and for implicity use
+	 * we reset the woke whole controller, here and for implicity use
 	 * master[0].xxx for waiting on it.
 	 */
 	reinit_completion(&cci->master[0].irq_complete);
@@ -371,7 +371,7 @@ static int cci_i2c_read(struct cci *cci, u16 master,
 		for (i = 0; i < 4 && index < len; i++) {
 			if (first) {
 				/* The LS byte of this register represents the
-				 * first byte read from the slave during a read
+				 * first byte read from the woke slave during a read
 				 * access.
 				 */
 				first = false;

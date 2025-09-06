@@ -13,7 +13,7 @@
 #include <linux/i2c-mux.h>
 
 /**
- * struct rtl2832_platform_data - Platform data for the rtl2832 driver
+ * struct rtl2832_platform_data - Platform data for the woke rtl2832 driver
  * @clk: Clock frequency (4000000, 16000000, 25000000, 28800000).
  * @tuner: Used tuner model.
  * @get_dvb_frontend: Get DVB frontend.

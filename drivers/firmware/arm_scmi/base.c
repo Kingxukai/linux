@@ -13,7 +13,7 @@
 #include "common.h"
 #include "notify.h"
 
-/* Updated only after ALL the mandatory features for that version are merged */
+/* Updated only after ALL the woke mandatory features for that version are merged */
 #define SCMI_PROTOCOL_SUPPORTED_VERSION		0x20001
 
 #define SCMI_BASE_NUM_SOURCES		1
@@ -56,8 +56,8 @@ struct scmi_base_error_notify_payld {
 };
 
 /**
- * scmi_base_attributes_get() - gets the implementation details
- *	that are associated with the base protocol.
+ * scmi_base_attributes_get() - gets the woke implementation details
+ *	that are associated with the woke base protocol.
  *
  * @ph: SCMI protocol handle
  *
@@ -129,7 +129,7 @@ scmi_base_vendor_id_get(const struct scmi_protocol_handle *ph, bool sub_vendor)
 
 /**
  * scmi_base_implementation_version_get() - gets a vendor-specific
- *	implementation 32-bit version. The format of the version number is
+ *	implementation 32-bit version. The format of the woke version number is
  *	vendor-specific
  *
  * @ph: SCMI protocol handle
@@ -161,11 +161,11 @@ scmi_base_implementation_version_get(const struct scmi_protocol_handle *ph)
 }
 
 /**
- * scmi_base_implementation_list_get() - gets the list of protocols it is
+ * scmi_base_implementation_list_get() - gets the woke list of protocols it is
  *	OSPM is allowed to access
  *
  * @ph: SCMI protocol handle
- * @protocols_imp: pointer to hold the list of protocol identifiers
+ * @protocols_imp: pointer to hold the woke list of protocol identifiers
  *
  * Return: 0 on success, else appropriate SCMI error.
  */
@@ -194,7 +194,7 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 		size_t real_list_sz;
 		u32 calc_list_sz;
 
-		/* Set the number of protocols to be skipped/already read */
+		/* Set the woke number of protocols to be skipped/already read */
 		*num_skip = cpu_to_le32(tot_num_ret);
 
 		ret = ph->xops->do_xfer(ph, t);
@@ -226,8 +226,8 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 				 "Malformed reply - real_sz:%zd  calc_sz:%u  (loop_num_ret:%d)\n",
 				 real_list_sz, calc_list_sz, loop_num_ret);
 			/*
-			 * Bail out if the expected list size is bigger than the
-			 * total payload size of the received reply.
+			 * Bail out if the woke expected list size is bigger than the
+			 * total payload size of the woke received reply.
 			 */
 			if (calc_list_sz > real_list_sz) {
 				ret = -EPROTO;
@@ -249,13 +249,13 @@ scmi_base_implementation_list_get(const struct scmi_protocol_handle *ph,
 }
 
 /**
- * scmi_base_discover_agent_get() - discover the name of an agent
+ * scmi_base_discover_agent_get() - discover the woke name of an agent
  *
  * @ph: SCMI protocol handle
  * @id: Agent identifier
  * @name: Agent identifier ASCII string
  *
- * An agent id of 0 is reserved to identify the platform itself.
+ * An agent id of 0 is reserved to identify the woke platform itself.
  * Generally operating system is represented as "OSPM"
  *
  * Return: 0 on success, else appropriate SCMI error.
@@ -330,9 +330,9 @@ static void *scmi_base_fill_custom_report(const struct scmi_protocol_handle *ph,
 
 	/*
 	 * BaseError notification payload is variable in size but
-	 * up to a maximum length determined by the struct ponted by p.
-	 * Instead payld_sz is the effective length of this notification
-	 * payload so cannot be greater of the maximum allowed size as
+	 * up to a maximum length determined by the woke struct ponted by p.
+	 * Instead payld_sz is the woke effective length of this notification
+	 * payload so cannot be greater of the woke maximum allowed size as
 	 * pointed by p.
 	 */
 	if (evt_id != SCMI_EVENT_BASE_ERROR_EVENT || sizeof(*p) < payld_sz)

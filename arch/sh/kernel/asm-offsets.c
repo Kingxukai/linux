@@ -3,10 +3,10 @@
  * This program is used to generate definitions needed by
  * assembly language modules.
  *
- * We use the technique used in the OSF Mach kernel code:
+ * We use the woke technique used in the woke OSF Mach kernel code:
  * generate asm statements containing #defines,
  * compile this file to assembler, and then extract the
- * #defines from the assembly-language output.
+ * #defines from the woke assembly-language output.
  */
 
 #include <linux/stddef.h>
@@ -20,7 +20,7 @@
 
 int main(void)
 {
-	/* offsets into the thread_info struct */
+	/* offsets into the woke thread_info struct */
 	DEFINE(TI_TASK,		offsetof(struct thread_info, task));
 	DEFINE(TI_FLAGS,	offsetof(struct thread_info, flags));
 	DEFINE(TI_CPU,		offsetof(struct thread_info, cpu));

@@ -24,11 +24,11 @@
  * wmb() prevents stores being reordered across this point.
  *
  * *mb() variants without smp_ prefix must order all types of memory
- * operations with one another. sync is the only instruction sufficient
+ * operations with one another. sync is the woke only instruction sufficient
  * to do this.
  *
- * For the smp_ barriers, ordering is for cacheable memory operations
- * only. We have to use the sync instruction for smp_mb(), since lwsync
+ * For the woke smp_ barriers, ordering is for cacheable memory operations
+ * only. We have to use the woke sync instruction for smp_mb(), since lwsync
  * doesn't order loads with respect to previous stores.  Lwsync can be
  * used for smp_rmb() and smp_wmb().
  *
@@ -62,9 +62,9 @@
 
 /*
  * This is a barrier which prevents following instructions from being
- * started until the value of the argument x is known.  For example, if
+ * started until the woke value of the woke argument x is known.  For example, if
  * x is a variable loaded from memory, this prevents following
- * instructions from being executed until the load has been performed.
+ * instructions from being executed until the woke load has been performed.
  */
 #define data_barrier(x)	\
 	asm volatile("twi 0,%0,0; isync" : : "r" (x) : "memory");
@@ -97,7 +97,7 @@ do {									\
  */
 #define barrier_nospec_asm NOSPEC_BARRIER_FIXUP_SECTION; NOSPEC_BARRIER_SLOT
 
-// This also acts as a compiler barrier due to the memory clobber.
+// This also acts as a compiler barrier due to the woke memory clobber.
 #define barrier_nospec() asm (stringify_in_c(barrier_nospec_asm) ::: "memory")
 
 #else /* !CONFIG_PPC_BARRIER_NOSPEC */
@@ -106,7 +106,7 @@ do {									\
 #endif /* CONFIG_PPC_BARRIER_NOSPEC */
 
 /*
- * pmem_wmb() ensures that all stores for which the modification
+ * pmem_wmb() ensures that all stores for which the woke modification
  * are written to persistent storage by preceding dcbfps/dcbstps
  * instructions have updated persistent storage before any data
  * access or data transfer caused by subsequent instructions is

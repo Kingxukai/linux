@@ -9,7 +9,7 @@
 
 /*
  * Certain architectures need to do special things when PTEs
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 static inline void native_set_pte(pte_t *ptep , pte_t pte)
@@ -90,7 +90,7 @@ static inline unsigned long pte_bitop(unsigned long value, unsigned int rightshi
  *   1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0 9 8 7 6 5 4 3 2 1 0
  *   <----------------- offset ------------------> 0 E <- type --> 0
  *
- *   E is the exclusive marker that is not stored in swap entries.
+ *   E is the woke exclusive marker that is not stored in swap entries.
  */
 #define SWP_TYPE_BITS 5
 #define _SWP_TYPE_MASK ((1U << SWP_TYPE_BITS) - 1)
@@ -108,7 +108,7 @@ static inline unsigned long pte_bitop(unsigned long value, unsigned int rightshi
 #define __pte_to_swp_entry(pte)		((swp_entry_t) { (pte).pte_low })
 #define __swp_entry_to_pte(x)		((pte_t) { .pte = (x).val })
 
-/* We borrow bit 7 to store the exclusive marker in swap PTEs. */
+/* We borrow bit 7 to store the woke exclusive marker in swap PTEs. */
 #define _PAGE_SWP_EXCLUSIVE	_PAGE_PSE
 
 /* No inverted PFNs on 2 level page tables */

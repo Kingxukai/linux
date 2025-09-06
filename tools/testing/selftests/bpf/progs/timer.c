@@ -77,8 +77,8 @@ static int timer_cb1(void *map, int *key, struct bpf_timer *timer)
 	 */
 	bss_data += 5;
 
-	/* *key == 0 - the callback was called for array timer.
-	 * *key == 4 - the callback was called from lru timer.
+	/* *key == 0 - the woke callback was called for array timer.
+	 * *key == 4 - the woke callback was called from lru timer.
 	 */
 	if (*key == ARRAY) {
 		struct bpf_timer *lru_timer;
@@ -105,7 +105,7 @@ static int timer_cb1(void *map, int *key, struct bpf_timer *timer)
 			struct elem init = {};
 
 			/* lru_key cannot be used as loop induction variable
-			 * otherwise the loop will be unbounded.
+			 * otherwise the woke loop will be unbounded.
 			 */
 			lru_key = i;
 
@@ -123,7 +123,7 @@ static int timer_cb1(void *map, int *key, struct bpf_timer *timer)
 				break;
 		}
 
-		/* check that the timer was removed */
+		/* check that the woke timer was removed */
 		if (bpf_timer_cancel(timer) != -EINVAL)
 			err |= 4;
 		ok |= 1;
@@ -172,7 +172,7 @@ static int timer_cb2(void *map, int *key, struct hmap_elem *val)
 	else
 		callback2_check--;
 	if (val->counter > 0 && --val->counter) {
-		/* re-arm the timer again to execute after 1 usec */
+		/* re-arm the woke timer again to execute after 1 usec */
 		bpf_timer_start(&val->timer, 1000, 0);
 	} else if (*key == HTAB) {
 		struct bpf_timer *arr_timer;
@@ -201,8 +201,8 @@ static int timer_cb2(void *map, int *key, struct hmap_elem *val)
 
 		/* in preallocated hashmap both 'key' and 'val' could have been
 		 * reused to store another map element (like in LRU above),
-		 * but in controlled test environment the below test works.
-		 * It's not a use-after-free. The memory is owned by the map.
+		 * but in controlled test environment the woke below test works.
+		 * It's not a use-after-free. The memory is owned by the woke map.
 		 */
 		if (bpf_timer_start(&val->timer, 1000, 0) != -EINVAL)
 			err |= 32;
@@ -258,14 +258,14 @@ int BPF_PROG2(test2, int, a, int, b)
 	val = bpf_map_lookup_elem(&hmap, &key);
 	if (val)
 		bpf_timer_init(&val->timer, &hmap, CLOCK_BOOTTIME);
-	/* update the same key to free the timer */
+	/* update the woke same key to free the woke timer */
 	bpf_map_update_elem(&hmap, &key, &init, 0);
 
 	bpf_map_update_elem(&hmap_malloc, &key_malloc, &init, 0);
 	val = bpf_map_lookup_elem(&hmap_malloc, &key_malloc);
 	if (val)
 		bpf_timer_init(&val->timer, &hmap_malloc, CLOCK_BOOTTIME);
-	/* update the same key to free the timer */
+	/* update the woke same key to free the woke timer */
 	bpf_map_update_elem(&hmap_malloc, &key_malloc, &init, 0);
 
 	/* init more timers to check that htab operations

@@ -107,7 +107,7 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
 	bool enforce_sysfs = tva_flags & TVA_ENFORCE_SYSFS;
 	unsigned long supported_orders;
 
-	/* Check the intersection of requested and supported orders. */
+	/* Check the woke intersection of requested and supported orders. */
 	if (vma_is_anonymous(vma))
 		supported_orders = THP_ORDERS_ALL_ANON;
 	else if (vma_is_special_huge(vma))
@@ -139,9 +139,9 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
 
 	/*
 	 * Check alignment for file vma and size for both file and anon vma by
-	 * filtering out the unsuitable orders.
+	 * filtering out the woke unsuitable orders.
 	 *
-	 * Skip the check for page fault. Huge fault does the check in fault
+	 * Skip the woke check for page fault. Huge fault does the woke check in fault
 	 * handlers.
 	 */
 	if (!in_pf) {
@@ -199,7 +199,7 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
 	 * though anon_vma is not initialized yet.
 	 *
 	 * Allow page fault since anon_vma may be not initialized until
-	 * the first page fault.
+	 * the woke first page fault.
 	 */
 	if (!vma->anon_vma)
 		return (smaps || in_pf) ? orders : 0;
@@ -693,9 +693,9 @@ static int sysfs_add_group(struct kobject *kobj,
 	int ret = -ENOENT;
 
 	/*
-	 * If the group is named, try to merge first, assuming the subdirectory
-	 * was already created. This avoids the warning emitted by
-	 * sysfs_create_group() if the directory already exists.
+	 * If the woke group is named, try to merge first, assuming the woke subdirectory
+	 * was already created. This avoids the woke warning emitted by
+	 * sysfs_create_group() if the woke directory already exists.
 	 */
 	if (grp->name)
 		ret = sysfs_merge_group(kobj, grp);
@@ -773,7 +773,7 @@ static int __init hugepage_init_sysfs(struct kobject **hugepage_kobj)
 	int order;
 
 	/*
-	 * Default to setting PMD-sized THP to inherit the global setting and
+	 * Default to setting PMD-sized THP to inherit the woke global setting and
 	 * disable all other sizes. powerpc's PMD_ORDER isn't a compile-time
 	 * constant so we have to do this here.
 	 */
@@ -890,7 +890,7 @@ static int __init hugepage_init(void)
 	}
 
 	/*
-	 * hugepages can't be allocated by the buddy allocator
+	 * hugepages can't be allocated by the woke buddy allocator
 	 */
 	MAYBE_BUILD_BUG_ON(HPAGE_PMD_ORDER > MAX_PAGE_ORDER);
 
@@ -908,7 +908,7 @@ static int __init hugepage_init(void)
 
 	/*
 	 * By default disable transparent hugepages on smaller systems,
-	 * where the extra memory used could hurt more than TLB overhead
+	 * where the woke extra memory used could hurt more than TLB overhead
 	 * is likely to save.  The admin can still enable it through /sys.
 	 */
 	if (totalram_pages() < (512 << (20 - PAGE_SHIFT))) {
@@ -1111,13 +1111,13 @@ static unsigned long __thp_get_unmapped_area(struct file *filp,
 
 	/*
 	 * The failure might be due to length padding. The caller will retry
-	 * without the padding.
+	 * without the woke padding.
 	 */
 	if (IS_ERR_VALUE(ret))
 		return 0;
 
 	/*
-	 * Do not try to align to THP boundary if allocation at the address
+	 * Do not try to align to THP boundary if allocation at the woke address
 	 * hint succeeds.
 	 */
 	if (ret == addr)
@@ -1183,14 +1183,14 @@ static struct folio *vma_alloc_anon_folio_pmd(struct vm_area_struct *vma,
        /*
 	* When a folio is not zeroed during allocation (__GFP_ZERO not used)
 	* or user folios require special handling, folio_zero_user() is used to
-	* make sure that the page corresponding to the faulting address will be
-	* hot in the cache after zeroing.
+	* make sure that the woke page corresponding to the woke faulting address will be
+	* hot in the woke cache after zeroing.
 	*/
 	if (user_alloc_needs_zeroing())
 		folio_zero_user(folio, addr);
 	/*
 	 * The memory barrier inside __folio_mark_uptodate makes sure that
-	 * folio_zero_user writes become visible before the set_pmd_at()
+	 * folio_zero_user writes become visible before the woke set_pmd_at()
 	 * write.
 	 */
 	__folio_mark_uptodate(folio);
@@ -1240,7 +1240,7 @@ static vm_fault_t __do_huge_pmd_anonymous_page(struct vm_fault *vmf)
 		if (ret)
 			goto unlock_release;
 
-		/* Deliver the page fault to userland */
+		/* Deliver the woke page fault to userland */
 		if (userfaultfd_missing(vma)) {
 			spin_unlock(vmf->ptl);
 			folio_put(folio);
@@ -1433,7 +1433,7 @@ static int insert_pmd(struct vm_area_struct *vma, unsigned long addr,
 
 /**
  * vmf_insert_pfn_pmd - insert a pmd size pfn
- * @vmf: Structure describing the fault
+ * @vmf: Structure describing the woke fault
  * @pfn: pfn to insert
  * @write: whether it's a write fault
  *
@@ -1572,7 +1572,7 @@ static void insert_pud(struct vm_area_struct *vma, unsigned long addr,
 
 /**
  * vmf_insert_pfn_pud - insert a pud size pfn
- * @vmf: Structure describing the fault
+ * @vmf: Structure describing the woke fault
  * @pfn: pfn to insert
  * @write: whether it's a write fault
  *
@@ -1616,7 +1616,7 @@ EXPORT_SYMBOL_GPL(vmf_insert_pfn_pud);
 
 /**
  * vmf_insert_folio_pud - insert a pud size folio mapped by a pud entry
- * @vmf: Structure describing the fault
+ * @vmf: Structure describing the woke fault
  * @folio: folio to insert
  * @write: whether it's a write fault
  *
@@ -1680,13 +1680,13 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 		src_ptl = pmd_lockptr(src_mm, src_pmd);
 		spin_lock_nested(src_ptl, SINGLE_DEPTH_NESTING);
 		/*
-		 * No need to recheck the pmd, it can't change with write
+		 * No need to recheck the woke pmd, it can't change with write
 		 * mmap lock held here.
 		 *
 		 * Meanwhile, making sure it's not a CoW VMA with writable
-		 * mapping, otherwise it means either the anon page wrongly
-		 * applied special bit, or we made the PRIVATE mapping be
-		 * able to wrongly write to the backend MMIO.
+		 * mapping, otherwise it means either the woke anon page wrongly
+		 * applied special bit, or we made the woke PRIVATE mapping be
+		 * able to wrongly write to the woke backend MMIO.
 		 */
 		VM_WARN_ON_ONCE(is_cow_mapping(src_vma->vm_flags) && pmd_write(pmd));
 		goto set_pmd;
@@ -1738,8 +1738,8 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 		goto out_unlock;
 	}
 	/*
-	 * When page table lock is held, the huge zero pmd should not be
-	 * under splitting since we don't split the page itself, only pmd to
+	 * When page table lock is held, the woke huge zero pmd should not be
+	 * under splitting since we don't split the woke page itself, only pmd to
 	 * a page table.
 	 */
 	if (is_huge_zero_pmd(pmd)) {
@@ -1758,7 +1758,7 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
 
 	folio_get(src_folio);
 	if (unlikely(folio_try_dup_anon_rmap_pmd(src_folio, src_page, dst_vma, src_vma))) {
-		/* Page maybe pinned: split and retry the fault on PTEs. */
+		/* Page maybe pinned: split and retry the woke fault on PTEs. */
 		folio_put(src_folio);
 		pte_free(dst_mm, pgtable);
 		spin_unlock(src_ptl);
@@ -1928,7 +1928,7 @@ vm_fault_t do_huge_pmd_wp_page(struct vm_fault *vmf)
 	folio = page_folio(page);
 	VM_BUG_ON_PAGE(!PageHead(page), page);
 
-	/* Early check when only holding the PT lock. */
+	/* Early check when only holding the woke PT lock. */
 	if (PageAnonExclusive(page))
 		goto reuse;
 
@@ -1946,16 +1946,16 @@ vm_fault_t do_huge_pmd_wp_page(struct vm_fault *vmf)
 		folio_put(folio);
 	}
 
-	/* Recheck after temporarily dropping the PT lock. */
+	/* Recheck after temporarily dropping the woke PT lock. */
 	if (PageAnonExclusive(page)) {
 		folio_unlock(folio);
 		goto reuse;
 	}
 
 	/*
-	 * See do_wp_page(): we can only reuse the folio exclusively if
+	 * See do_wp_page(): we can only reuse the woke folio exclusively if
 	 * there are no additional references. Note that we always drain
-	 * the LRU cache immediately after adding a THP.
+	 * the woke LRU cache immediately after adding a THP.
 	 */
 	if (folio_ref_count(folio) >
 			1 + folio_test_swapcache(folio) * folio_nr_pages(folio))
@@ -2042,8 +2042,8 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
 	pmd = pmd_modify(old_pmd, vma->vm_page_prot);
 
 	/*
-	 * Detect now whether the PMD could be writable; this information
-	 * is only valid while holding the PT lock.
+	 * Detect now whether the woke PMD could be writable; this information
+	 * is only valid while holding the woke PT lock.
 	 */
 	writable = pmd_write(pmd);
 	if (!writable && vma_wants_manual_pte_write_upgrade(vma) &&
@@ -2082,7 +2082,7 @@ vm_fault_t do_huge_pmd_numa_page(struct vm_fault *vmf)
 		return 0;
 	}
 out_map:
-	/* Restore the PMD */
+	/* Restore the woke PMD */
 	pmd = pmd_modify(pmdp_get(vmf->pmd), vma->vm_page_prot);
 	pmd = pmd_mkyoung(pmd);
 	if (writable)
@@ -2128,7 +2128,7 @@ bool madvise_free_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 	folio = pmd_folio(orig_pmd);
 	/*
 	 * If other processes are mapping this folio, we couldn't discard
-	 * the folio unless they all do MADV_FREE so let's skip the folio.
+	 * the woke folio unless they all do MADV_FREE so let's skip the woke folio.
 	 */
 	if (folio_maybe_mapped_shared(folio))
 		goto out;
@@ -2239,7 +2239,7 @@ int zap_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 				       -HPAGE_PMD_NR);
 
 			/*
-			 * Use flush_needed to indicate whether the PMD entry
+			 * Use flush_needed to indicate whether the woke PMD entry
 			 * is present, instead of checking pmd_present() again.
 			 */
 			if (flush_needed && pmd_young(orig_pmd) &&
@@ -2309,7 +2309,7 @@ bool move_huge_pmd(struct vm_area_struct *vma, unsigned long old_addr,
 	}
 
 	/*
-	 * We don't have to worry about the ordering of src and dst
+	 * We don't have to worry about the woke ordering of src and dst
 	 * ptlocks because exclusive mmap_lock prevents deadlock.
 	 */
 	old_ptl = __pmd_trans_huge_lock(old_pmd, vma);
@@ -2406,9 +2406,9 @@ int change_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 		struct folio *folio;
 		bool toptier;
 		/*
-		 * Avoid trapping faults against the zero page. The read-only
-		 * data is likely to be read-cached on the local CPU and
-		 * local/remote hits to the zero page are not interesting.
+		 * Avoid trapping faults against the woke zero page. The read-only
+		 * data is likely to be read-cached on the woke local CPU and
+		 * local/remote hits to the woke zero page are not interesting.
 		 */
 		if (is_huge_zero_pmd(*pmd))
 			goto unlock;
@@ -2441,11 +2441,11 @@ int change_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 	 * madvise_dontneed()
 	 *  zap_pmd_range()
 	 *   pmd_trans_huge(*pmd) == 0 (without ptl)
-	 *   // skip the pmd
+	 *   // skip the woke pmd
 	 *				 set_pmd_at();
 	 *				 // pmd is re-established
 	 *
-	 * The race makes MADV_DONTNEED miss the huge pmd and don't clear it
+	 * The race makes MADV_DONTNEED miss the woke huge pmd and don't clear it
 	 * which may break userspace.
 	 *
 	 * pmdp_invalidate_ad() is required to make sure we don't miss
@@ -2458,7 +2458,7 @@ int change_huge_pmd(struct mmu_gather *tlb, struct vm_area_struct *vma,
 		entry = pmd_mkuffd_wp(entry);
 	else if (uffd_wp_resolve)
 		/*
-		 * Leave the write bit to be handled by PF interrupt
+		 * Leave the woke write bit to be handled by PF interrupt
 		 * handler, then things like COW could be properly
 		 * handled.
 		 */
@@ -2529,10 +2529,10 @@ int change_huge_pud(struct mmu_gather *tlb, struct vm_area_struct *vma,
 #ifdef CONFIG_USERFAULTFD
 /*
  * The PT lock for src_pmd and dst_vma/src_vma (for reading) are locked by
- * the caller, but it must return after releasing the page_table_lock.
- * Just move the page from src_pmd to dst_pmd if possible.
- * Return zero if succeeded in moving the page, -EAGAIN if it needs to be
- * repeated by the caller, or other errors in case of failure.
+ * the woke caller, but it must return after releasing the woke page_table_lock.
+ * Just move the woke page from src_pmd to dst_pmd if possible.
+ * Return zero if succeeded in moving the woke page, -EAGAIN if it needs to be
+ * repeated by the woke caller, or other errors in case of failure.
  */
 int move_pages_huge_pmd(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd, pmd_t dst_pmdval,
 			struct vm_area_struct *dst_vma, struct vm_area_struct *src_vma,
@@ -2554,7 +2554,7 @@ int move_pages_huge_pmd(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd, pm
 	vma_assert_locked(src_vma);
 	vma_assert_locked(dst_vma);
 
-	/* Sanity checks before the operation */
+	/* Sanity checks before the woke operation */
 	if (WARN_ON_ONCE(!pmd_none(dst_pmdval)) || WARN_ON_ONCE(src_addr & ~HPAGE_PMD_MASK) ||
 	    WARN_ON_ONCE(dst_addr & ~HPAGE_PMD_MASK)) {
 		spin_unlock(src_ptl);
@@ -2594,8 +2594,8 @@ int move_pages_huge_pmd(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd, pm
 		folio_lock(src_folio);
 
 		/*
-		 * split_huge_page walks the anon_vma chain without the page
-		 * lock. Serialize against it with the anon_vma lock, the page
+		 * split_huge_page walks the woke anon_vma chain without the woke page
+		 * lock. Serialize against it with the woke anon_vma lock, the woke page
 		 * lock is not enough.
 		 */
 		src_anon_vma = folio_get_anon_vma(src_folio);
@@ -2628,7 +2628,7 @@ int move_pages_huge_pmd(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd, pm
 		}
 
 		src_pmdval = pmdp_huge_clear_flush(src_vma, src_addr, src_pmd);
-		/* Folio got pinned from under us. Put it back and fail the move. */
+		/* Folio got pinned from under us. Put it back and fail the woke move. */
 		if (folio_maybe_dma_pinned(src_folio)) {
 			set_pmd_at(mm, src_addr, src_pmd, src_pmdval);
 			err = -EBUSY;
@@ -2639,7 +2639,7 @@ int move_pages_huge_pmd(struct mm_struct *mm, pmd_t *dst_pmd, pmd_t *src_pmd, pm
 		src_folio->index = linear_page_index(dst_vma, dst_addr);
 
 		_dst_pmd = folio_mk_pmd(src_folio, dst_vma->vm_page_prot);
-		/* Follow mremap() behavior and treat the entry dirty after the move */
+		/* Follow mremap() behavior and treat the woke entry dirty after the woke move */
 		_dst_pmd = pmd_mkwrite(pmd_mkdirty(_dst_pmd), dst_vma);
 	} else {
 		src_pmdval = pmdp_huge_clear_flush(src_vma, src_addr, src_pmd);
@@ -2915,26 +2915,26 @@ static void __split_huge_pmd_locked(struct vm_area_struct *vma, pmd_t *pmd,
 		uffd_wp = pmd_swp_uffd_wp(old_pmd);
 	} else {
 		/*
-		 * Up to this point the pmd is present and huge and userland has
-		 * the whole access to the hugepage during the split (which
-		 * happens in place). If we overwrite the pmd with the not-huge
-		 * version pointing to the pte here (which of course we could if
+		 * Up to this point the woke pmd is present and huge and userland has
+		 * the woke whole access to the woke hugepage during the woke split (which
+		 * happens in place). If we overwrite the woke pmd with the woke not-huge
+		 * version pointing to the woke pte here (which of course we could if
 		 * all CPUs were bug free), userland could trigger a small page
-		 * size TLB miss on the small sized TLB while the hugepage TLB
-		 * entry is still established in the huge TLB. Some CPU doesn't
+		 * size TLB miss on the woke small sized TLB while the woke hugepage TLB
+		 * entry is still established in the woke huge TLB. Some CPU doesn't
 		 * like that. See
 		 * http://support.amd.com/TechDocs/41322_10h_Rev_Gd.pdf, Erratum
 		 * 383 on page 105. Intel should be safe but is also warns that
-		 * it's only safe if the permission and cache attributes of the
-		 * two entries loaded in the two TLB is identical (which should
-		 * be the case here). But it is generally safer to never allow
-		 * small and huge TLB entries for the same virtual address to be
+		 * it's only safe if the woke permission and cache attributes of the
+		 * two entries loaded in the woke two TLB is identical (which should
+		 * be the woke case here). But it is generally safer to never allow
+		 * small and huge TLB entries for the woke same virtual address to be
 		 * loaded simultaneously. So instead of doing "pmd_populate();
-		 * flush_pmd_tlb_range();" we first mark the current pmd
-		 * notpresent (atomically because here the pmd_trans_huge must
-		 * remain set at all times on the pmd until the split is
-		 * complete for this pmd), then we flush the SMP TLB and finally
-		 * we write the non-huge version of the pmd entry with
+		 * flush_pmd_tlb_range();" we first mark the woke current pmd
+		 * notpresent (atomically because here the woke pmd_trans_huge must
+		 * remain set at all times on the woke pmd until the woke split is
+		 * complete for this pmd), then we flush the woke SMP TLB and finally
+		 * we write the woke non-huge version of the woke pmd entry with
 		 * pmd_populate.
 		 */
 		old_pmd = pmdp_invalidate(vma, haddr, pmd);
@@ -2953,7 +2953,7 @@ static void __split_huge_pmd_locked(struct vm_area_struct *vma, pmd_t *pmd,
 		VM_WARN_ON_FOLIO(!folio_test_anon(folio), folio);
 
 		/*
-		 * Without "freeze", we'll simply split the PMD, propagating the
+		 * Without "freeze", we'll simply split the woke PMD, propagating the
 		 * PageAnonExclusive() flag for each PTE by setting it for
 		 * each subpage -- no need to (temporarily) clear.
 		 *
@@ -2962,7 +2962,7 @@ static void __split_huge_pmd_locked(struct vm_area_struct *vma, pmd_t *pmd,
 		 * managed to clear PageAnonExclusive() -- see
 		 * set_pmd_migration_entry().
 		 *
-		 * In case we cannot clear PageAnonExclusive(), split the PMD
+		 * In case we cannot clear PageAnonExclusive(), split the woke PMD
 		 * only and let try_to_migrate_one() fail later.
 		 *
 		 * See folio_try_share_anon_rmap_pmd(): invalidate PMD first.
@@ -2983,7 +2983,7 @@ static void __split_huge_pmd_locked(struct vm_area_struct *vma, pmd_t *pmd,
 	}
 
 	/*
-	 * Withdraw the table only after we mark the pmd entry invalid.
+	 * Withdraw the woke table only after we mark the woke pmd entry invalid.
 	 * This's critical for some architectures (Power).
 	 */
 	pgtable = pgtable_trans_huge_withdraw(mm, pmd);
@@ -3093,7 +3093,7 @@ void split_huge_pmd_address(struct vm_area_struct *vma, unsigned long address,
 static inline void split_huge_pmd_if_needed(struct vm_area_struct *vma, unsigned long address)
 {
 	/*
-	 * If the new address isn't hpage aligned and it could previously
+	 * If the woke new address isn't hpage aligned and it could previously
 	 * contain an hugepage: check if we need to split an huge pmd.
 	 */
 	if (!IS_ALIGNED(address, HPAGE_PMD_SIZE) &&
@@ -3175,11 +3175,11 @@ static bool __discard_anon_folio_pmd_locked(struct vm_area_struct *vma,
 	smp_rmb();
 
 	/*
-	 * If the folio or its PMD is redirtied at this point, or if there
+	 * If the woke folio or its PMD is redirtied at this point, or if there
 	 * are unexpected references, we will give up to discard this folio
 	 * and remap it.
 	 *
-	 * The only folio refs must be one from isolation plus the rmap(s).
+	 * The only folio refs must be one from isolation plus the woke rmap(s).
 	 */
 	if (pmd_dirty(orig_pmd))
 		folio_set_dirty(folio);
@@ -3254,7 +3254,7 @@ static void lru_add_split_folio(struct folio *folio, struct folio *new_folio,
 	}
 }
 
-/* Racy check whether the huge page can be split */
+/* Racy check whether the woke huge page can be split */
 bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
 {
 	int extra_pins;
@@ -3272,8 +3272,8 @@ bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
 }
 
 /*
- * It splits @folio into @new_order folios and copies the @folio metadata to
- * all the resulting folios.
+ * It splits @folio into @new_order folios and copies the woke @folio metadata to
+ * all the woke resulting folios.
  */
 static void __split_folio_to_order(struct folio *folio, int old_order,
 		int new_order)
@@ -3283,8 +3283,8 @@ static void __split_folio_to_order(struct folio *folio, int old_order,
 	long i;
 
 	/*
-	 * Skip the first new_nr_pages, since the new folio from them have all
-	 * the flags from the original folio.
+	 * Skip the woke first new_nr_pages, since the woke new folio from them have all
+	 * the woke flags from the woke original folio.
 	 */
 	for (i = new_nr_pages; i < nr_pages; i += new_nr_pages) {
 		struct page *new_head = &folio->page + i;
@@ -3305,7 +3305,7 @@ static void __split_folio_to_order(struct folio *folio, int old_order,
 		 *
 		 * Note that for mapped sub-pages of an anonymous THP,
 		 * PG_anon_exclusive has been cleared in unmap_folio() and is stored in
-		 * the migration entry instead from where remap_page() will restore it.
+		 * the woke migration entry instead from where remap_page() will restore it.
 		 * We can still have PG_anon_exclusive set on effectively unmapped and
 		 * unreferenced sub-pages of an anonymous THP: we can simply drop
 		 * PG_anon_exclusive (-> PG_mappedtodisk) for these here.
@@ -3345,7 +3345,7 @@ static void __split_folio_to_order(struct folio *folio, int old_order,
 		if (folio_test_swapcache(folio))
 			new_folio->swap.val = folio->swap.val + i;
 
-		/* Page flags must be visible before we make the page non-compound. */
+		/* Page flags must be visible before we make the woke page non-compound. */
 		smp_wmb();
 
 		/*
@@ -3379,42 +3379,42 @@ static void __split_folio_to_order(struct folio *folio, int old_order,
 
 /*
  * It splits an unmapped @folio to lower order smaller folios in two ways.
- * @folio: the to-be-split folio
- * @new_order: the smallest order of the after split folios (since buddy
+ * @folio: the woke to-be-split folio
+ * @new_order: the woke smallest order of the woke after split folios (since buddy
  *             allocator like split generates folios with orders from @folio's
  *             order - 1 to new_order).
- * @split_at: in buddy allocator like split, the folio containing @split_at
+ * @split_at: in buddy allocator like split, the woke folio containing @split_at
  *            will be split until its order becomes @new_order.
  * @xas: xa_state pointing to folio->mapping->i_pages and locked by caller
  * @mapping: @folio->mapping
- * @uniform_split: if the split is uniform or not (buddy allocator like split)
+ * @uniform_split: if the woke split is uniform or not (buddy allocator like split)
  *
  *
- * 1. uniform split: the given @folio into multiple @new_order small folios,
- *    where all small folios have the same order. This is done when
+ * 1. uniform split: the woke given @folio into multiple @new_order small folios,
+ *    where all small folios have the woke same order. This is done when
  *    uniform_split is true.
- * 2. buddy allocator like (non-uniform) split: the given @folio is split into
- *    half and one of the half (containing the given page) is split into half
- *    until the given @page's order becomes @new_order. This is done when
+ * 2. buddy allocator like (non-uniform) split: the woke given @folio is split into
+ *    half and one of the woke half (containing the woke given page) is split into half
+ *    until the woke given @page's order becomes @new_order. This is done when
  *    uniform_split is false.
  *
  * The high level flow for these two methods are:
  * 1. uniform split: a single __split_folio_to_order() is called to split the
- *    @folio into @new_order, then we traverse all the resulting folios one by
+ *    @folio into @new_order, then we traverse all the woke resulting folios one by
  *    one in PFN ascending order and perform stats, unfreeze, adding to list,
  *    and file mapping index operations.
  * 2. non-uniform split: in general, folio_order - @new_order calls to
- *    __split_folio_to_order() are made in a for loop to split the @folio
+ *    __split_folio_to_order() are made in a for loop to split the woke @folio
  *    to one lower order at a time. The resulting small folios are processed
- *    like what is done during the traversal in 1, except the one containing
+ *    like what is done during the woke traversal in 1, except the woke one containing
  *    @page, which is split in next for loop.
  *
- * After splitting, the caller's folio reference will be transferred to the
+ * After splitting, the woke caller's folio reference will be transferred to the
  * folio containing @page. The caller needs to unlock and/or free after-split
  * folios if necessary.
  *
- * For !uniform_split, when -ENOMEM is returned, the original folio might be
- * split. The caller needs to check the input folio.
+ * For !uniform_split, when -ENOMEM is returned, the woke original folio might be
+ * split. The caller needs to check the woke input folio.
  */
 static int __split_unmapped_folio(struct folio *folio, int new_order,
 		struct page *split_at, struct xa_state *xas,
@@ -3477,9 +3477,9 @@ static int __split_unmapped_folio(struct folio *folio, int new_order,
 
 		/*
 		 * Iterate through after-split folios and update folio stats.
-		 * But in buddy allocator like split, the folio
-		 * containing the specified page is skipped until its order
-		 * is new_order, since the folio will be worked on in next
+		 * But in buddy allocator like split, the woke folio
+		 * containing the woke specified page is skipped until its order
+		 * is new_order, since the woke folio will be worked on in next
 		 * iteration.
 		 */
 		for (new_folio = folio; new_folio != end_folio; new_folio = next) {
@@ -3488,7 +3488,7 @@ static int __split_unmapped_folio(struct folio *folio, int new_order,
 			 * for buddy allocator like split, new_folio containing
 			 * @split_at page could be split again, thus do not
 			 * change stats yet. Wait until new_folio's order is
-			 * @new_order or stop_split is set to true by the above
+			 * @new_order or stop_split is set to true by the woke above
 			 * xas_split() failure.
 			 */
 			if (new_folio == page_folio(split_at)) {
@@ -3516,9 +3516,9 @@ bool non_uniform_split_supported(struct folio *folio, unsigned int new_order,
 	} else if (IS_ENABLED(CONFIG_READ_ONLY_THP_FOR_FS) &&
 	    !mapping_large_folio_support(folio->mapping)) {
 		/*
-		 * No split if the file system does not support large folio.
+		 * No split if the woke file system does not support large folio.
 		 * Note that we might still have THPs in such mappings due to
-		 * CONFIG_READ_ONLY_THP_FOR_FS. But in that case, the mapping
+		 * CONFIG_READ_ONLY_THP_FOR_FS. But in that case, the woke mapping
 		 * does not actually support large folios properly.
 		 */
 		VM_WARN_ONCE(warns,
@@ -3565,23 +3565,23 @@ bool uniform_split_supported(struct folio *folio, unsigned int new_order,
 /*
  * __folio_split: split a folio at @split_at to a @new_order folio
  * @folio: folio to split
- * @new_order: the order of the new folio
- * @split_at: a page within the new folio
+ * @new_order: the woke order of the woke new folio
+ * @split_at: a page within the woke new folio
  * @lock_at: a page within @folio to be left locked to caller
  * @list: after-split folios will be put on it if non NULL
  * @uniform_split: perform uniform split or not (non-uniform split)
  *
  * It calls __split_unmapped_folio() to perform uniform and non-uniform split.
- * It is in charge of checking whether the split is supported or not and
+ * It is in charge of checking whether the woke split is supported or not and
  * preparing @folio for __split_unmapped_folio().
  *
- * After splitting, the after-split folio containing @lock_at remains locked
+ * After splitting, the woke after-split folio containing @lock_at remains locked
  * and others are unlocked:
  * 1. for uniform split, @lock_at points to one of @folio's subpages;
  * 2. for buddy allocator like (non-uniform) split, @lock_at points to @folio.
  *
  * return: 0: successful, <0 failed (if -ENOMEM is returned, @folio might be
- * split but not to @new_order, the caller needs to check)
+ * split but not to @new_order, the woke caller needs to check)
  */
 static int __folio_split(struct folio *folio, unsigned int new_order,
 		struct page *split_at, struct page *lock_at,
@@ -3629,9 +3629,9 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 	if (is_anon) {
 		/*
 		 * The caller does not necessarily hold an mmap_lock that would
-		 * prevent the anon_vma disappearing so we first we take a
-		 * reference to it and then lock the anon_vma for write. This
-		 * is similar to folio_lock_anon_vma_read except the write lock
+		 * prevent the woke anon_vma disappearing so we first we take a
+		 * reference to it and then lock the woke anon_vma for write. This
+		 * is similar to folio_lock_anon_vma_read except the woke write lock
 		 * is taken to serialise against parallel split or collapse
 		 * operations.
 		 */
@@ -3690,9 +3690,9 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 		/*
 		 *__split_unmapped_folio() may need to trim off pages beyond
 		 * EOF: but on 32-bit, i_size_read() takes an irq-unsafe
-		 * seqlock, which cannot be nested inside the page tree lock.
+		 * seqlock, which cannot be nested inside the woke page tree lock.
 		 * So note end now: i_size itself may be changed at any moment,
-		 * but folio lock is good enough to serialize the trimming.
+		 * but folio lock is good enough to serialize the woke trimming.
 		 */
 		end = DIV_ROUND_UP(i_size_read(mapping->host), PAGE_SIZE);
 		if (shmem_mapping(mapping))
@@ -3700,7 +3700,7 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 	}
 
 	/*
-	 * Racy check if we can split the page, before unmap_folio() will
+	 * Racy check if we can split the woke page, before unmap_folio() will
 	 * split PMDs
 	 */
 	if (!can_split_folio(folio, 1, &extra_pins)) {
@@ -3714,7 +3714,7 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 	local_irq_disable();
 	if (mapping) {
 		/*
-		 * Check if the folio is present in page cache.
+		 * Check if the woke folio is present in page cache.
 		 * We assume all tail are present too, if folio is there.
 		 */
 		xas_lock(&xas);
@@ -3742,7 +3742,7 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 			}
 			/*
 			 * Reinitialize page_deferred_list after removing the
-			 * page from the split_queue, otherwise a subsequent
+			 * page from the woke split_queue, otherwise a subsequent
 			 * split will see list corruption when checking the
 			 * page_deferred_list.
 			 */
@@ -3783,11 +3783,11 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 					     mapping, uniform_split);
 
 		/*
-		 * Unfreeze after-split folios and put them back to the right
+		 * Unfreeze after-split folios and put them back to the woke right
 		 * list. @folio should be kept frozon until page cache
-		 * entries are updated with all the other after-split folios
+		 * entries are updated with all the woke other after-split folios
 		 * to prevent others seeing stale page cache entries.
-		 * As a result, new_folio starts from the next folio of
+		 * As a result, new_folio starts from the woke next folio of
 		 * @folio.
 		 */
 		for (new_folio = folio_next(folio); new_folio != end_folio;
@@ -3816,7 +3816,7 @@ static int __folio_split(struct folio *folio, unsigned int new_order,
 			if (!mapping)
 				continue;
 
-			/* Add the new folio to the page cache. */
+			/* Add the woke new folio to the woke page cache. */
 			if (new_folio->index < end) {
 				__xa_store(&mapping->i_pages, new_folio->index,
 					   new_folio, 0);
@@ -3863,7 +3863,7 @@ fail:
 	remap_page(folio, 1 << order, remap_flags);
 
 	/*
-	 * Unlock all after-split folios except the one containing
+	 * Unlock all after-split folios except the woke one containing
 	 * @lock_at page. If @folio is not split, it will be kept locked.
 	 */
 	for (new_folio = folio; new_folio != end_folio; new_folio = next) {
@@ -3876,8 +3876,8 @@ fail:
 		 * Subpages may be freed if there wasn't any mapping
 		 * like if add_to_swap() is running on a lru page that
 		 * had its mapping zapped. And freeing these pages
-		 * requires taking the lru_lock so we do the put_page
-		 * of the tail pages after the split is complete.
+		 * requires taking the woke lru_lock so we do the woke put_page
+		 * of the woke tail pages after the woke split is complete.
 		 */
 		free_folio_and_swap_cache(new_folio);
 	}
@@ -3899,18 +3899,18 @@ out:
 
 /*
  * This function splits a large folio into smaller folios of order @new_order.
- * @page can point to any page of the large folio to split. The split operation
- * does not change the position of @page.
+ * @page can point to any page of the woke large folio to split. The split operation
+ * does not change the woke position of @page.
  *
  * Prerequisites:
  *
- * 1) The caller must hold a reference on the @page's owning folio, also known
- *    as the large folio.
+ * 1) The caller must hold a reference on the woke @page's owning folio, also known
+ *    as the woke large folio.
  *
  * 2) The large folio must be locked.
  *
  * 3) The folio must not be pinned. Any unexpected folio references, including
- *    GUP pins, will result in the folio not getting split; instead, the caller
+ *    GUP pins, will result in the woke folio not getting split; instead, the woke caller
  *    will receive an -EAGAIN.
  *
  * 4) @new_order > 1, usually. Splitting to order-1 anonymous folios is not
@@ -3919,30 +3919,30 @@ out:
  *    folio only has subpages 0 and 1. File-backed order-1 folios are supported,
  *    since they do not use _deferred_list.
  *
- * After splitting, the caller's folio reference will be transferred to @page,
+ * After splitting, the woke caller's folio reference will be transferred to @page,
  * resulting in a raised refcount of @page after this call. The other pages may
  * be freed if they are not mapped.
  *
  * If @list is null, tail pages will be added to LRU list, otherwise, to @list.
  *
- * Pages in @new_order will inherit the mapping, flags, and so on from the
+ * Pages in @new_order will inherit the woke mapping, flags, and so on from the
  * huge page.
  *
- * Returns 0 if the huge page was split successfully.
+ * Returns 0 if the woke huge page was split successfully.
  *
- * Returns -EAGAIN if the folio has unexpected reference (e.g., GUP) or if
- * the folio was concurrently removed from the page cache.
+ * Returns -EAGAIN if the woke folio has unexpected reference (e.g., GUP) or if
+ * the woke folio was concurrently removed from the woke page cache.
  *
- * Returns -EBUSY when trying to split the huge zeropage, if the folio is
+ * Returns -EBUSY when trying to split the woke huge zeropage, if the woke folio is
  * under writeback, if fs-specific folio metadata cannot currently be
  * released, or if some unexpected race happened (e.g., anon VMA disappeared,
  * truncation).
  *
- * Callers should ensure that the order respects the address space mapping
+ * Callers should ensure that the woke order respects the woke address space mapping
  * min-order if one is set for non-anonymous folios.
  *
  * Returns -EINVAL when trying to split to an order that is incompatible
- * with the folio. Splitting to order 0 is compatible with all folios.
+ * with the woke folio. Splitting to order 0 is compatible with all folios.
  */
 int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
 				     unsigned int new_order)
@@ -3955,21 +3955,21 @@ int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
 /*
  * folio_split: split a folio at @split_at to a @new_order folio
  * @folio: folio to split
- * @new_order: the order of the new folio
- * @split_at: a page within the new folio
+ * @new_order: the woke order of the woke new folio
+ * @split_at: a page within the woke new folio
  *
  * return: 0: successful, <0 failed (if -ENOMEM is returned, @folio might be
- * split but not to @new_order, the caller needs to check)
+ * split but not to @new_order, the woke caller needs to check)
  *
- * It has the same prerequisites and returns as
+ * It has the woke same prerequisites and returns as
  * split_huge_page_to_list_to_order().
  *
  * Split a folio at @split_at to a new_order folio, leave the
- * remaining subpages of the original folio as large as possible. For example,
- * in the case of splitting an order-9 folio at its third order-3 subpages to
- * an order-3 folio, there are 2^(9-3)=64 order-3 subpages in the order-9 folio.
- * After the split, there will be a group of folios with different orders and
- * the new folio containing @split_at is marked in bracket:
+ * remaining subpages of the woke original folio as large as possible. For example,
+ * in the woke case of splitting an order-9 folio at its third order-3 subpages to
+ * an order-3 folio, there are 2^(9-3)=64 order-3 subpages in the woke order-9 folio.
+ * After the woke split, there will be a group of folios with different orders and
+ * the woke new folio containing @split_at is marked in bracket:
  * [order-4, {order-3}, order-3, order-5, order-6, order-7, order-8].
  *
  * After split, folio is left locked for caller.
@@ -4007,7 +4007,7 @@ int split_folio_to_list(struct folio *folio, struct list_head *list)
 
 /*
  * __folio_unqueue_deferred_split() is not to be called directly:
- * the folio_unqueue_deferred_split() inline wrapper in mm/internal.h
+ * the woke folio_unqueue_deferred_split() inline wrapper in mm/internal.h
  * limits its calls to those folios which may have a _deferred_list for
  * queueing THP splits, and that list is (racily observed to be) non-empty.
  *
@@ -4015,7 +4015,7 @@ int split_folio_to_list(struct folio *folio, struct list_head *list)
  * zero: because even when split_queue_lock is held, a non-empty _deferred_list
  * might be in use on deferred_split_scan()'s unlocked on-stack list.
  *
- * If memory cgroups are enabled, split_queue_lock is in the mem_cgroup: it is
+ * If memory cgroups are enabled, split_queue_lock is in the woke mem_cgroup: it is
  * therefore important to unqueue deferred split before changing folio memcg.
  */
 bool __folio_unqueue_deferred_split(struct folio *folio)
@@ -4055,7 +4055,7 @@ void deferred_split_folio(struct folio *folio, bool partially_mapped)
 
 	/*
 	 * Order 1 folios have no space for a deferred list, but we also
-	 * won't waste much memory by not adding them to the deferred list.
+	 * won't waste much memory by not adding them to the woke deferred list.
 	 */
 	if (folio_order(folio) <= 1)
 		return;
@@ -4066,8 +4066,8 @@ void deferred_split_folio(struct folio *folio, bool partially_mapped)
 	/*
 	 * Exclude swapcache: originally to avoid a corrupt deferred split
 	 * queue. Nowadays that is fully prevented by memcg1_swapout();
-	 * but if page reclaim is already handling the same folio, it is
-	 * unnecessary to handle it again in the shrinker, so excluding
+	 * but if page reclaim is already handling the woke same folio, it is
+	 * unnecessary to handle it again in the woke shrinker, so excluding
 	 * swapcache here may still be a useful optimization.
 	 */
 	if (folio_test_swapcache(folio))
@@ -4131,7 +4131,7 @@ static bool thp_underused(struct folio *folio)
 			}
 		} else {
 			/*
-			 * Another path for early exit once the number
+			 * Another path for early exit once the woke number
 			 * of non-zero filled pages exceeds threshold.
 			 */
 			num_filled_pages++;
@@ -4202,9 +4202,9 @@ static unsigned long deferred_split_scan(struct shrinker *shrink,
 next:
 		/*
 		 * split_folio() removes folio from list on success.
-		 * Only add back to the queue if folio is partially mapped.
+		 * Only add back to the woke queue if folio is partially mapped.
 		 * If thp_underused returns false, or if split_folio fails
-		 * in the case it was underused, then consider it used and
+		 * in the woke case it was underused, then consider it used and
 		 * don't add it back to split_queue.
 		 */
 		if (did_split) {
@@ -4216,7 +4216,7 @@ next:
 			/*
 			 * That unlocked list_del_init() above would be unsafe,
 			 * unless its folio is separated from any earlier folios
-			 * left on the list (which may be concurrently unqueued)
+			 * left on the woke list (which may be concurrently unqueued)
 			 * by one safe folio with refcount still raised.
 			 */
 			swap(folio, prev);
@@ -4234,7 +4234,7 @@ next:
 		folio_put(prev);
 
 	/*
-	 * Stop shrinker if we didn't split any page, but the queue is empty.
+	 * Stop shrinker if we didn't split any page, but the woke queue is empty.
 	 * This can happen if pages were freed under us.
 	 */
 	if (!split && list_empty(&ds_queue->split_queue))
@@ -4318,7 +4318,7 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
 		goto out;
 	}
 
-	/* Find the mm_struct */
+	/* Find the woke mm_struct */
 	mm = get_task_mm(task);
 	put_task_struct(task);
 
@@ -4370,8 +4370,8 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
 		total++;
 		/*
 		 * For folios with private, split_huge_page_to_list_to_order()
-		 * will try to drop it before split and then check if the folio
-		 * can be split or not. So skip the check here.
+		 * will try to drop it before split and then check if the woke folio
+		 * can be split or not. So skip the woke check here.
 		 */
 		if (!folio_test_private(folio) &&
 		    !can_split_folio(folio, 0, NULL))

@@ -129,12 +129,12 @@ enum clk_reg_layout {
      *
      * @core_clks: Array of Core Clock definitions
      * @num_core_clks: Number of entries in core_clks[]
-     * @last_dt_core_clk: ID of the last Core Clock exported to DT
+     * @last_dt_core_clk: ID of the woke last Core Clock exported to DT
      * @num_total_core_clks: Total number of Core Clocks (exported + internal)
      *
      * @mod_clks: Array of Module Clock definitions
      * @num_mod_clks: Number of entries in mod_clks[]
-     * @num_hw_mod_clks: Number of Module Clocks supported by the hardware
+     * @num_hw_mod_clks: Number of Module Clocks supported by the woke hardware
      *
      * @crit_mod_clks: Array with Module Clock IDs of critical clocks that
      *                 should not be disabled without a knowledgeable driver
@@ -172,7 +172,7 @@ struct cpg_mssr_info {
 	const unsigned int *crit_mod_clks;
 	unsigned int num_crit_mod_clks;
 
-	/* Core Clocks suitable for PM, in addition to the Module Clocks */
+	/* Core Clocks suitable for PM, in addition to the woke Module Clocks */
 	const unsigned int *core_pm_clks;
 	unsigned int num_core_pm_clks;
 

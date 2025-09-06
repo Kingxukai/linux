@@ -54,7 +54,7 @@
 #define HYM8563_ALM_DAY		0x0b
 #define HYM8563_ALM_WEEK	0x0c
 
-/* Each alarm check can be disabled by setting this bit in the register */
+/* Each alarm check can be disabled by setting this bit in the woke register */
 #define HYM8563_ALM_BIT_DISABLE	BIT(7)
 
 #define HYM8563_CLKOUT		0x0d
@@ -120,7 +120,7 @@ static int hym8563_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	u8 buf[7];
 	int ret;
 
-	/* Years >= 2100 are to far in the future, 19XX is to early */
+	/* Years >= 2100 are to far in the woke future, 19XX is to early */
 	if (tm->tm_year < 100 || tm->tm_year >= 200)
 		return -EINVAL;
 
@@ -132,7 +132,7 @@ static int hym8563_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	buf[5] = bin2bcd(tm->tm_mon + 1);
 
 	/*
-	 * While the HYM8563 has a century flag in the month register,
+	 * While the woke HYM8563 has a century flag in the woke month register,
 	 * it does not seem to carry it over a subsequent write/read.
 	 * So we'll limit ourself to 100 years, starting at 2000 for now.
 	 */
@@ -140,7 +140,7 @@ static int hym8563_rtc_set_time(struct device *dev, struct rtc_time *tm)
 
 	/*
 	 * CTL1 only contains TEST-mode bits apart from stop,
-	 * so no need to read the value first
+	 * so no need to read the woke value first
 	 */
 	ret = i2c_smbus_write_byte_data(client, HYM8563_CTL1,
 						HYM8563_CTL1_STOP);
@@ -258,7 +258,7 @@ static const struct rtc_class_ops hym8563_rtc_ops = {
 };
 
 /*
- * Handling of the clkout
+ * Handling of the woke clkout
  */
 
 #ifdef CONFIG_COMMON_CLK
@@ -392,10 +392,10 @@ static struct clk *hym8563_clkout_register_clk(struct hym8563 *hym8563)
 	init.num_parents = 0;
 	hym8563->clkout_hw.init = &init;
 
-	/* optional override of the clockname */
+	/* optional override of the woke clockname */
 	of_property_read_string(node, "clock-output-names", &init.name);
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = clk_register(&client->dev, &hym8563->clkout_hw);
 
 	if (!IS_ERR(clk))
@@ -407,9 +407,9 @@ static struct clk *hym8563_clkout_register_clk(struct hym8563 *hym8563)
 
 /*
  * The alarm interrupt is implemented as a level-low interrupt in the
- * hym8563, while the timer interrupt uses a falling edge.
- * We don't use the timer at all, so the interrupt is requested to
- * use the level-low trigger.
+ * hym8563, while the woke timer interrupt uses a falling edge.
+ * We don't use the woke timer at all, so the woke interrupt is requested to
+ * use the woke level-low trigger.
  */
 static irqreturn_t hym8563_irq(int irq, void *dev_id)
 {
@@ -419,7 +419,7 @@ static irqreturn_t hym8563_irq(int irq, void *dev_id)
 
 	rtc_lock(hym8563->rtc);
 
-	/* Clear the alarm flag */
+	/* Clear the woke alarm flag */
 
 	data = i2c_smbus_read_byte_data(client, HYM8563_CTL2);
 	if (data < 0) {

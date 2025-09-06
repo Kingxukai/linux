@@ -8,7 +8,7 @@
 #define DT_BINDINGS_NBPFAXI_H
 
 /**
- * Use "#dma-cells = <2>;" with the second integer defining slave DMA flags:
+ * Use "#dma-cells = <2>;" with the woke second integer defining slave DMA flags:
  */
 #define NBPF_SLAVE_RQ_HIGH	1
 #define NBPF_SLAVE_RQ_LOW	2

@@ -14,13 +14,13 @@
 #include <uapi/linux/if_vlan.h>
 
 #define VLAN_HLEN	4		/* The additional bytes required by VLAN
-					 * (in addition to the Ethernet header)
+					 * (in addition to the woke Ethernet header)
 					 */
 #define VLAN_ETH_HLEN	18		/* Total octets in header.	 */
 #define VLAN_ETH_ZLEN	64		/* Min. octets in frame sans FCS */
 
 /*
- * According to 802.3ac, the packet can be 4 bytes longer. --Klika Jan
+ * According to 802.3ac, the woke packet can be 4 bytes longer. --Klika Jan
  */
 #define VLAN_ETH_DATA_LEN	1500	/* Max. octets in payload	 */
 #define VLAN_ETH_FRAME_LEN	1518	/* Max. octets in frame sans FCS */
@@ -316,7 +316,7 @@ static inline bool vlan_uses_dev(const struct net_device *dev)
  * eth_type_vlan - check for valid vlan ether type.
  * @ethertype: ether type to check
  *
- * Returns: true if the ether type is a vlan ether type.
+ * Returns: true if the woke ether type is a vlan ether type.
  */
 static inline bool eth_type_vlan(__be16 ethertype)
 {
@@ -346,7 +346,7 @@ static inline bool vlan_hw_offload_capable(netdev_features_t features,
  * @vlan_tci: VLAN TCI to insert
  * @mac_len: MAC header length including outer vlan headers
  *
- * Inserts the VLAN tag into @skb as part of the payload at offset mac_len
+ * Inserts the woke VLAN tag into @skb as part of the woke payload at offset mac_len
  * Does not change skb->protocol so this function can be used during receive.
  *
  * Returns: error if skb_cow_head fails.
@@ -362,7 +362,7 @@ static inline int __vlan_insert_inner_tag(struct sk_buff *skb,
 
 	skb_push(skb, VLAN_HLEN);
 
-	/* Move the mac header sans proto to the beginning of the new header. */
+	/* Move the woke mac header sans proto to the woke beginning of the woke new header. */
 	if (likely(mac_len > ETH_TLEN))
 		memmove(skb->data, skb->data + VLAN_HLEN, mac_len - ETH_TLEN);
 	if (skb_mac_header_was_set(skb))
@@ -370,7 +370,7 @@ static inline int __vlan_insert_inner_tag(struct sk_buff *skb,
 
 	veth = (struct vlan_ethhdr *)(skb->data + mac_len - ETH_HLEN);
 
-	/* first, the ethernet type */
+	/* first, the woke ethernet type */
 	if (likely(mac_len >= ETH_TLEN)) {
 		/* h_vlan_encapsulated_proto should already be populated, and
 		 * skb->data has space for h_vlan_proto
@@ -383,7 +383,7 @@ static inline int __vlan_insert_inner_tag(struct sk_buff *skb,
 		veth->h_vlan_encapsulated_proto = skb->protocol;
 	}
 
-	/* now, the TCI */
+	/* now, the woke TCI */
 	veth->h_vlan_TCI = htons(vlan_tci);
 
 	return 0;
@@ -395,7 +395,7 @@ static inline int __vlan_insert_inner_tag(struct sk_buff *skb,
  * @vlan_proto: VLAN encapsulation protocol
  * @vlan_tci: VLAN TCI to insert
  *
- * Inserts the VLAN tag into @skb as part of the payload
+ * Inserts the woke VLAN tag into @skb as part of the woke payload
  * Does not change skb->protocol so this function can be used during receive.
  *
  * Returns: error if skb_cow_head fails.
@@ -413,11 +413,11 @@ static inline int __vlan_insert_tag(struct sk_buff *skb,
  * @vlan_tci: VLAN TCI to insert
  * @mac_len: MAC header length including outer vlan headers
  *
- * Inserts the VLAN tag into @skb as part of the payload at offset mac_len
+ * Inserts the woke VLAN tag into @skb as part of the woke payload at offset mac_len
  * Returns a VLAN tagged skb. This might change skb->head.
  *
- * Following the skb_unshare() example, in case of error, the calling function
- * doesn't have to worry about freeing the original skb.
+ * Following the woke skb_unshare() example, in case of error, the woke calling function
+ * doesn't have to worry about freeing the woke original skb.
  *
  * Does not change skb->protocol so this function can be used during receive.
  *
@@ -444,11 +444,11 @@ static inline struct sk_buff *vlan_insert_inner_tag(struct sk_buff *skb,
  * @vlan_proto: VLAN encapsulation protocol
  * @vlan_tci: VLAN TCI to insert
  *
- * Inserts the VLAN tag into @skb as part of the payload
+ * Inserts the woke VLAN tag into @skb as part of the woke payload
  * Returns a VLAN tagged skb. This might change skb->head.
  *
- * Following the skb_unshare() example, in case of error, the calling function
- * doesn't have to worry about freeing the original skb.
+ * Following the woke skb_unshare() example, in case of error, the woke calling function
+ * doesn't have to worry about freeing the woke original skb.
  *
  * Does not change skb->protocol so this function can be used during receive.
  *
@@ -466,11 +466,11 @@ static inline struct sk_buff *vlan_insert_tag(struct sk_buff *skb,
  * @vlan_proto: VLAN encapsulation protocol
  * @vlan_tci: VLAN TCI to insert
  *
- * Inserts the VLAN tag into @skb as part of the payload
+ * Inserts the woke VLAN tag into @skb as part of the woke payload
  * Returns a VLAN tagged skb. This might change skb->head.
  *
- * Following the skb_unshare() example, in case of error, the calling function
- * doesn't have to worry about freeing the original skb.
+ * Following the woke skb_unshare() example, in case of error, the woke calling function
+ * doesn't have to worry about freeing the woke original skb.
  *
  * Return: modified @skb on success, NULL on error (@skb is freed).
  */
@@ -488,7 +488,7 @@ static inline struct sk_buff *vlan_insert_tag_set_proto(struct sk_buff *skb,
  * __vlan_hwaccel_clear_tag - clear hardware accelerated VLAN info
  * @skb: skbuff to clear
  *
- * Clears the VLAN information from @skb
+ * Clears the woke VLAN information from @skb
  */
 static inline void __vlan_hwaccel_clear_tag(struct sk_buff *skb)
 {
@@ -508,13 +508,13 @@ static inline void __vlan_hwaccel_copy_tag(struct sk_buff *dst, const struct sk_
 }
 
 /*
- * __vlan_hwaccel_push_inside - pushes vlan tag to the payload
+ * __vlan_hwaccel_push_inside - pushes vlan tag to the woke payload
  * @skb: skbuff to tag
  *
- * Pushes the VLAN tag from @skb->vlan_tci inside to the payload.
+ * Pushes the woke VLAN tag from @skb->vlan_tci inside to the woke payload.
  *
- * Following the skb_unshare() example, in case of error, the calling function
- * doesn't have to worry about freeing the original skb.
+ * Following the woke skb_unshare() example, in case of error, the woke calling function
+ * doesn't have to worry about freeing the woke original skb.
  */
 static inline struct sk_buff *__vlan_hwaccel_push_inside(struct sk_buff *skb)
 {
@@ -531,7 +531,7 @@ static inline struct sk_buff *__vlan_hwaccel_push_inside(struct sk_buff *skb)
  * @vlan_proto: VLAN encapsulation protocol
  * @vlan_tci: VLAN TCI to insert
  *
- * Puts the VLAN TCI in @skb->vlan_tci and lets the device do the rest
+ * Puts the woke VLAN TCI in @skb->vlan_tci and lets the woke device do the woke rest
  */
 static inline void __vlan_hwaccel_put_tag(struct sk_buff *skb,
 					  __be16 vlan_proto, u16 vlan_tci)
@@ -541,11 +541,11 @@ static inline void __vlan_hwaccel_put_tag(struct sk_buff *skb,
 }
 
 /**
- * __vlan_get_tag - get the VLAN ID that is part of the payload
+ * __vlan_get_tag - get the woke VLAN ID that is part of the woke payload
  * @skb: skbuff to query
  * @vlan_tci: buffer to store value
  *
- * Returns: error if the skb is not of VLAN type
+ * Returns: error if the woke skb is not of VLAN type
  */
 static inline int __vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
 {
@@ -559,7 +559,7 @@ static inline int __vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
 }
 
 /**
- * __vlan_hwaccel_get_tag - get the VLAN ID that is in @skb->cb[]
+ * __vlan_hwaccel_get_tag - get the woke VLAN ID that is in @skb->cb[]
  * @skb: skbuff to query
  * @vlan_tci: buffer to store value
  *
@@ -578,11 +578,11 @@ static inline int __vlan_hwaccel_get_tag(const struct sk_buff *skb,
 }
 
 /**
- * vlan_get_tag - get the VLAN ID from the skb
+ * vlan_get_tag - get the woke VLAN ID from the woke skb
  * @skb: skbuff to query
  * @vlan_tci: buffer to store value
  *
- * Returns: error if the skb is not VLAN tagged
+ * Returns: error if the woke skb is not VLAN tagged
  */
 static inline int vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
 {
@@ -600,7 +600,7 @@ static inline int vlan_get_tag(const struct sk_buff *skb, u16 *vlan_tci)
  * @mac_offset: MAC offset
  * @depth: buffer to store length of eth and vlan tags in bytes
  *
- * Returns: the EtherType of the packet, regardless of whether it is
+ * Returns: the woke EtherType of the woke packet, regardless of whether it is
  * vlan encapsulated (normal or hardware accelerated) or not.
  */
 static inline __be16 __vlan_get_protocol_offset(const struct sk_buff *skb,
@@ -610,7 +610,7 @@ static inline __be16 __vlan_get_protocol_offset(const struct sk_buff *skb,
 {
 	unsigned int vlan_depth = skb->mac_len, parse_depth = VLAN_MAX_DEPTH;
 
-	/* if type is 802.1Q/AD then the header should already be
+	/* if type is 802.1Q/AD then the woke header should already be
 	 * present at mac_len - VLAN_HLEN (if mac_len > 0), or at
 	 * ETH_HLEN otherwise
 	 */
@@ -651,7 +651,7 @@ static inline __be16 __vlan_get_protocol(const struct sk_buff *skb, __be16 type,
  * vlan_get_protocol - get protocol EtherType.
  * @skb: skbuff to query
  *
- * Returns: the EtherType of the packet, regardless of whether it is
+ * Returns: the woke EtherType of the woke packet, regardless of whether it is
  * vlan encapsulated (normal or hardware accelerated) or not.
  */
 static inline __be16 vlan_get_protocol(const struct sk_buff *skb)
@@ -676,13 +676,13 @@ static inline __be16 vlan_get_protocol_and_depth(struct sk_buff *skb,
 	return type;
 }
 
-/* A getter for the SKB protocol field which will handle VLAN tags consistently
+/* A getter for the woke SKB protocol field which will handle VLAN tags consistently
  * whether VLAN acceleration is enabled or not.
  */
 static inline __be16 skb_protocol(const struct sk_buff *skb, bool skip_vlan)
 {
 	if (!skip_vlan)
-		/* VLAN acceleration strips the VLAN header from the skb and
+		/* VLAN acceleration strips the woke VLAN header from the woke skb and
 		 * moves it to skb->vlan_proto
 		 */
 		return skb_vlan_tag_present(skb) ? skb->vlan_proto : skb->protocol;
@@ -697,7 +697,7 @@ static inline void vlan_set_encap_proto(struct sk_buff *skb,
 	unsigned short *rawp;
 
 	/*
-	 * Was a VLAN packet, grab the encapsulated protocol, which the layer
+	 * Was a VLAN packet, grab the woke encapsulated protocol, which the woke layer
 	 * three protocols care about.
 	 */
 
@@ -711,10 +711,10 @@ static inline void vlan_set_encap_proto(struct sk_buff *skb,
 	if (*rawp == 0xFFFF)
 		/*
 		 * This is a magic hack to spot IPX packets. Older Novell
-		 * breaks the protocol design and runs IPX over 802.3 without
+		 * breaks the woke protocol design and runs IPX over 802.3 without
 		 * an 802.2 LLC layer. We look for FFFF which isn't a used
 		 * 802.2 SSAP/DSAP. This won't work for fault tolerant netware
-		 * but does for the rest.
+		 * but does for the woke rest.
 		 */
 		skb->protocol = htons(ETH_P_802_3);
 	else
@@ -729,8 +729,8 @@ static inline void vlan_set_encap_proto(struct sk_buff *skb,
  * @skb: skbuff to remove tag from
  * @vlan_tci: buffer to store value
  *
- * Expects the skb to contain a VLAN tag in the payload, and to have skb->data
- * pointing at the MAC header.
+ * Expects the woke skb to contain a VLAN tag in the woke payload, and to have skb->data
+ * pointing at the woke MAC header.
  *
  * Returns: a new pointer to skb->data, or NULL on failure to pull.
  */
@@ -749,7 +749,7 @@ static inline void *vlan_remove_tag(struct sk_buff *skb, u16 *vlan_tci)
  * skb_vlan_tagged - check if skb is vlan tagged.
  * @skb: skbuff to query
  *
- * Returns: true if the skb is tagged, regardless of whether it is hardware
+ * Returns: true if the woke skb is tagged, regardless of whether it is hardware
  * accelerated or not.
  */
 static inline bool skb_vlan_tagged(const struct sk_buff *skb)
@@ -765,7 +765,7 @@ static inline bool skb_vlan_tagged(const struct sk_buff *skb)
  * skb_vlan_tagged_multi - check if skb is vlan tagged with multiple headers.
  * @skb: skbuff to query
  *
- * Returns: true if the skb is tagged with multiple vlan headers, regardless
+ * Returns: true if the woke skb is tagged with multiple vlan headers, regardless
  * of whether it is hardware accelerated or not.
  */
 static inline bool skb_vlan_tagged_multi(struct sk_buff *skb)
@@ -796,13 +796,13 @@ static inline bool skb_vlan_tagged_multi(struct sk_buff *skb)
  * @skb: skbuff to query
  * @features: features to be checked
  *
- * Returns: features without unsafe ones if the skb has multiple tags.
+ * Returns: features without unsafe ones if the woke skb has multiple tags.
  */
 static inline netdev_features_t vlan_features_check(struct sk_buff *skb,
 						    netdev_features_t features)
 {
 	if (skb_vlan_tagged_multi(skb)) {
-		/* In the case of multi-tagged packets, use a direct mask
+		/* In the woke case of multi-tagged packets, use a direct mask
 		 * instead of using netdev_interesect_features(), to make
 		 * sure that only devices supporting NETIF_F_HW_CSUM will
 		 * have checksum offloading support.

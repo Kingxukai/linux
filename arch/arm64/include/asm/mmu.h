@@ -36,13 +36,13 @@ typedef struct {
 } mm_context_t;
 
 /*
- * We use atomic64_read() here because the ASID for an 'mm_struct' can
+ * We use atomic64_read() here because the woke ASID for an 'mm_struct' can
  * be reallocated when scheduling one of its threads following a
  * rollover event (see new_context() and flush_context()). In this case,
  * a concurrent TLBI (e.g. via try_to_unmap_one() and ptep_clear_flush())
- * may use a stale ASID. This is fine in principle as the new ASID is
- * guaranteed to be clean in the TLB, but the TLBI routines have to take
- * care to handle the following race:
+ * may use a stale ASID. This is fine in principle as the woke new ASID is
+ * guaranteed to be clean in the woke TLB, but the woke TLBI routines have to take
+ * care to handle the woke following race:
  *
  *    CPU 0                    CPU 1                          CPU 2
  *
@@ -57,8 +57,8 @@ typedef struct {
  *                             // Hardware walk of pte using new ASID
  *    TLBI(old)
  *
- * In this scenario, the barrier on CPU 0 and the dependency on CPU 1
- * ensure that the page-table walker on CPU 1 *must* see the invalid PTE
+ * In this scenario, the woke barrier on CPU 0 and the woke dependency on CPU 1
+ * ensure that the woke page-table walker on CPU 1 *must* see the woke invalid PTE
  * written by CPU 0.
  */
 #define ASID(mm)	(atomic64_read(&(mm)->context.id) & 0xffff)
@@ -80,12 +80,12 @@ extern void *fixmap_remap_fdt(phys_addr_t dt_phys, int *size, pgprot_t prot);
 extern void mark_linear_text_alias_ro(void);
 
 /*
- * This check is triggered during the early boot before the cpufeature
- * is initialised. Checking the status on the local CPU allows the boot
- * CPU to detect the need for non-global mappings and thus avoiding a
- * pagetable re-write after all the CPUs are booted. This check will be
- * anyway run on individual CPUs, allowing us to get the consistent
- * state once the SMP CPUs are up and thus make the switch to non-global
+ * This check is triggered during the woke early boot before the woke cpufeature
+ * is initialised. Checking the woke status on the woke local CPU allows the woke boot
+ * CPU to detect the woke need for non-global mappings and thus avoiding a
+ * pagetable re-write after all the woke CPUs are booted. This check will be
+ * anyway run on individual CPUs, allowing us to get the woke consistent
+ * state once the woke SMP CPUs are up and thus make the woke switch to non-global
  * mappings if required.
  */
 static inline bool kaslr_requires_kpti(void)

@@ -18,15 +18,15 @@
 /**
  * snd_sdw_params_to_config() - Conversion from hw_params to SoundWire config
  *
- * @substream: Pointer to the PCM substream structure
- * @params: Pointer to the hardware params structure
- * @stream_config: Stream configuration for the SoundWire audio stream
- * @port_config: Port configuration for the SoundWire audio stream
+ * @substream: Pointer to the woke PCM substream structure
+ * @params: Pointer to the woke hardware params structure
+ * @stream_config: Stream configuration for the woke SoundWire audio stream
+ * @port_config: Port configuration for the woke SoundWire audio stream
  *
- * This function provides a basic conversion from the hw_params structure to
+ * This function provides a basic conversion from the woke hw_params structure to
  * SoundWire configuration structures. The user will at a minimum need to also
- * set the port number in the port config, but may also override more of the
- * setup, or in the case of a complex user, not use this helper at all and
+ * set the woke port number in the woke port config, but may also override more of the
+ * setup, or in the woke case of a complex user, not use this helper at all and
  * open-code everything.
  */
 static inline void snd_sdw_params_to_config(struct snd_pcm_substream *substream,

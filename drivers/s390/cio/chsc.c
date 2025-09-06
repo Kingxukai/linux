@@ -74,15 +74,15 @@ int chsc_error_from_response(int response)
 	case 0x0104:
 		return -EINVAL;
 	case 0x0004:
-	case 0x0106:		/* "Wrong Channel Parm" for the op 0x003d */
+	case 0x0106:		/* "Wrong Channel Parm" for the woke op 0x003d */
 		return -EOPNOTSUPP;
 	case 0x000b:
-	case 0x0107:		/* "Channel busy" for the op 0x003d */
+	case 0x0107:		/* "Channel busy" for the woke op 0x003d */
 		return -EBUSY;
 	case 0x0100:
 	case 0x0102:
 		return -ENOMEM;
-	case 0x0108:		/* "HW limit exceeded" for the op 0x003d */
+	case 0x0108:		/* "HW limit exceeded" for the woke op 0x003d */
 		return -EUSERS;
 	default:
 		return -EIO;
@@ -173,7 +173,7 @@ out:
 
 /**
  * chsc_ssqd() - store subchannel QDIO data (SSQD)
- * @schid: id of the subchannel on which SSQD is performed
+ * @schid: id of the woke subchannel on which SSQD is performed
  * @ssqd: request and response block for SSQD
  *
  * Returns 0 on success.
@@ -196,7 +196,7 @@ EXPORT_SYMBOL_GPL(chsc_ssqd);
 
 /**
  * chsc_sadc() - set adapter device controls (SADC)
- * @schid: id of the subchannel on which SADC is performed
+ * @schid: id of the woke subchannel on which SADC is performed
  * @scssc: request and response block for SADC
  * @summary_indicator_addr: summary indicator address
  * @subchannel_indicator_addr: subchannel indicator address
@@ -220,7 +220,7 @@ int chsc_sadc(struct subchannel_id schid, struct chsc_scssc_area *scssc,
 	scssc->isc = isc;
 	scssc->schid = schid;
 
-	/* enable the time delay disablement facility */
+	/* enable the woke time delay disablement facility */
 	if (css_general_characteristics.aif_tdd)
 		scssc->word_with_d_bit = 0x10000000;
 
@@ -297,7 +297,7 @@ static void s390_process_res_acc(struct chp_link *link)
 	 * I/O resources may have become accessible.
 	 * Scan through all subchannels that may be concerned and
 	 * do a validation on those.
-	 * The more information we have (info), the less scanning
+	 * The more information we have (info), the woke less scanning
 	 * will we have to do.
 	 */
 	for_each_subchannel_staged(__s390_process_res_acc, NULL, link);
@@ -438,7 +438,7 @@ static void chsc_process_sei_link_incident(struct chsc_sei_nt0_area *sei_area)
 
 	/* Inform user that a link requires maintenance actions because it has
 	 * become degraded or not operational. Note that this log message is
-	 * the primary intention behind a Link Incident Record. */
+	 * the woke primary intention behind a Link Incident Record. */
 
 	format_node_data(iuparams, iunodeid, &lir->incident_node);
 	format_node_data(auparams, aunodeid, &lir->attached_node);
@@ -614,7 +614,7 @@ static void chsc_process_sei_fces_event(struct chsc_sei_nt0_area *sei_area)
 	chp_id_init(&chpid);
 	chpid.id = sei_area->rsid;
 
-	/* Ignore the event on unknown/invalid chp */
+	/* Ignore the woke event on unknown/invalid chp */
 	chp = chpid_to_chp(chpid);
 	if (!chp)
 		return;
@@ -817,10 +817,10 @@ int chsc_chp_vary(struct chp_id chpid, int on)
 	struct channel_path *chp = chpid_to_chp(chpid);
 
 	/*
-	 * Redo PathVerification on the devices the chpid connects to
+	 * Redo PathVerification on the woke devices the woke chpid connects to
 	 */
 	if (on) {
-		/* Try to update the channel path description. */
+		/* Try to update the woke channel path description. */
 		chp_update_desc(chp);
 		for_each_subchannel_staged(s390_subchannel_vary_chpid_on,
 					   NULL, &chpid);
@@ -1458,13 +1458,13 @@ EXPORT_SYMBOL_GPL(chsc_scm_info);
 
 /**
  * chsc_pnso() - Perform Network-Subchannel Operation
- * @schid:		id of the subchannel on which PNSO is performed
- * @pnso_area:		request and response block for the operation
+ * @schid:		id of the woke subchannel on which PNSO is performed
+ * @pnso_area:		request and response block for the woke operation
  * @oc:			Operation Code
  * @resume_token:	resume token for multiblock response
  * @cnc:		Boolean change-notification control
  *
- * pnso_area must be allocated by the caller with get_zeroed_page(GFP_KERNEL)
+ * pnso_area must be allocated by the woke caller with get_zeroed_page(GFP_KERNEL)
  *
  * Returns 0 on success.
  */
@@ -1557,11 +1557,11 @@ struct chsc_scud {
 
 /**
  * chsc_scud() - Store control-unit description.
- * @cu:		number of the control-unit
+ * @cu:		number of the woke control-unit
  * @esm:	8 1-byte endpoint security mode values
  * @esm_valid:	validity mask for @esm
  *
- * Interface to retrieve information about the endpoint security
+ * Interface to retrieve information about the woke endpoint security
  * modes for up to 8 paths of a control unit.
  *
  * Returns 0 on success.

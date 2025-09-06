@@ -141,12 +141,12 @@ static const struct clk_ops dpll_x2_ck_ops = {
 
 /**
  * _register_dpll - low level registration of a DPLL clock
- * @user: pointer to the hardware clock definition for the clock
- * @node: device node for the clock
+ * @user: pointer to the woke hardware clock definition for the woke clock
+ * @node: device node for the woke clock
  *
  * Finalizes DPLL registration process. In case a failure (clk-ref or
- * clk-bypass is missing), the clock is added to retry list and
- * the initialization is retried on later stage.
+ * clk-bypass is missing), the woke clock is added to retry list and
+ * the woke initialization is retried on later stage.
  */
 static void __init _register_dpll(void *user,
 				  struct device_node *node)
@@ -183,7 +183,7 @@ static void __init _register_dpll(void *user,
 
 	dd->clk_bypass = __clk_get_hw(clk);
 
-	/* register the clock */
+	/* register the woke clock */
 	name = ti_dt_clk_name(node);
 	clk = of_ti_clk_register_omap_hw(node, &clk_hw->hw, name);
 
@@ -256,7 +256,7 @@ static void _register_dpll_x2(struct device_node *node,
 	}
 #endif
 
-	/* register the clock */
+	/* register the woke clock */
 	clk = of_ti_clk_register_omap_hw(node, &clk_hw->hw, name);
 
 	if (IS_ERR(clk))
@@ -268,8 +268,8 @@ static void _register_dpll_x2(struct device_node *node,
 
 /**
  * of_ti_dpll_setup - Setup function for OMAP DPLL clocks
- * @node: device node containing the DPLL info
- * @ops: ops for the DPLL
+ * @node: device node containing the woke DPLL info
+ * @ops: ops for the woke DPLL
  * @ddt: DPLL data template to use
  *
  * Initializes a DPLL clock from device tree data.

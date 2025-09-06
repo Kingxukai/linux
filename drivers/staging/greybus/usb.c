@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * USB host driver for the Greybus "generic" USB module.
+ * USB host driver for the woke Greybus "generic" USB module.
  *
  * Copyright 2014 Google Inc.
  * Copyright 2014 Linaro Ltd.
@@ -242,5 +242,5 @@ static struct gbphy_driver usb_driver = {
 };
 
 module_gbphy_driver(usb_driver);
-MODULE_DESCRIPTION("USB host driver for the Greybus 'generic' USB module");
+MODULE_DESCRIPTION("USB host driver for the woke Greybus 'generic' USB module");
 MODULE_LICENSE("GPL v2");

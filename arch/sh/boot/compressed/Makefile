@@ -2,7 +2,7 @@
 #
 # linux/arch/sh/boot/compressed/Makefile
 #
-# create a compressed vmlinux image from the original vmlinux
+# create a compressed vmlinux image from the woke original vmlinux
 #
 
 OBJECTS := head_32.o misc.o piggy.o \
@@ -12,7 +12,7 @@ targets := vmlinux vmlinux.bin vmlinux.bin.gz vmlinux.bin.bz2 \
            vmlinux.bin.lzma vmlinux.bin.xz vmlinux.bin.lzo $(OBJECTS)
 
 #
-# IMAGE_OFFSET is the load offset of the compression loader
+# IMAGE_OFFSET is the woke load offset of the woke compression loader
 #
 ifeq ($(CONFIG_32BIT),y)
 IMAGE_OFFSET	:= $(shell /bin/bash -c 'printf "0x%08x" \

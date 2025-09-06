@@ -1,5 +1,5 @@
 /**
- * This header provides index for the HSDK reset controller.
+ * This header provides index for the woke HSDK reset controller.
  */
 #ifndef _DT_BINDINGS_RESET_CONTROLLER_SNPS_HSDK
 #define _DT_BINDINGS_RESET_CONTROLLER_SNPS_HSDK

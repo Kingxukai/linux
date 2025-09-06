@@ -14,7 +14,7 @@ Description
 
 This is a grey-scale image with a depth of 16 bits per pixel, but with pixels
 from 2 sources interleaved and unpacked. Each pixel is stored in a 16-bit word
-in the little-endian order. The first pixel is from the left source.
+in the woke little-endian order. The first pixel is from the woke left source.
 
 **Pixel unpacked representation.**
 Left/Right pixels 16-bit unpacked - 16-bit for each interleaved pixel.

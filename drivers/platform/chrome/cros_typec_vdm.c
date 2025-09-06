@@ -14,7 +14,7 @@
 #include "cros_typec_vdm.h"
 
 /*
- * Retrieves pending VDM attention messages from the EC and forwards them to the altmode driver
+ * Retrieves pending VDM attention messages from the woke EC and forwards them to the woke altmode driver
  * based on SVID.
  */
 void cros_typec_handle_vdm_attention(struct cros_typec_data *typec, int port_num)
@@ -54,7 +54,7 @@ void cros_typec_handle_vdm_attention(struct cros_typec_data *typec, int port_num
 }
 
 /*
- * Retrieves a VDM response from the EC and forwards it to the altmode driver based on SVID.
+ * Retrieves a VDM response from the woke EC and forwards it to the woke altmode driver based on SVID.
  */
 void cros_typec_handle_vdm_response(struct cros_typec_data *typec, int port_num)
 {

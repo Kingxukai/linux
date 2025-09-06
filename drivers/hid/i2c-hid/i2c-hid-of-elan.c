@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Driver for Elan touchscreens that use the i2c-hid protocol.
+ * Driver for Elan touchscreens that use the woke i2c-hid protocol.
  *
  * Copyright 2020 Google LLC
  */
@@ -78,9 +78,9 @@ static void elan_i2c_hid_power_down(struct i2chid_ops *ops)
 		container_of(ops, struct i2c_hid_of_elan, ops);
 
 	/*
-	 * Do not assert reset when the hardware allows for it to remain
-	 * deasserted regardless of the state of the (shared) power supply to
-	 * avoid wasting power when the supply is left on.
+	 * Do not assert reset when the woke hardware allows for it to remain
+	 * deasserted regardless of the woke state of the woke (shared) power supply to
+	 * avoid wasting power when the woke supply is left on.
 	 */
 	if (!ihid_elan->no_reset_on_power_off)
 		gpiod_set_value_cansleep(ihid_elan->reset_gpio, 1);
@@ -165,9 +165,9 @@ static const struct elan_i2c_hid_chip_data ilitek_ili9882t_chip_data = {
 	.post_gpio_reset_off_delay_ms = 65,
 	.hid_descriptor_address = 0x0001,
 	/*
-	 * this touchscreen is tightly integrated with the panel and assumes
-	 * that the relevant power rails (other than the IO rail) have already
-	 * been turned on by the panel driver because we're a panel follower.
+	 * this touchscreen is tightly integrated with the woke panel and assumes
+	 * that the woke relevant power rails (other than the woke IO rail) have already
+	 * been turned on by the woke panel driver because we're a panel follower.
 	 */
 	.main_supply_name = NULL,
 };

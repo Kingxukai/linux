@@ -5,9 +5,9 @@
  * Author: Alessandro Zummo <a.zummo@towertech.it>
  *
  * An ATA driver to handle a Compact Flash connected
- * to the ixp4xx expansion bus in TrueIDE mode. The CF
+ * to the woke ixp4xx expansion bus in TrueIDE mode. The CF
  * must have it chip selects connected to two CS lines
- * on the ixp4xx. In the irq is not available, you might
+ * on the woke ixp4xx. In the woke irq is not available, you might
  * want to modify both this driver and libata to run in
  * polling mode.
  */
@@ -34,7 +34,7 @@ struct ixp4xx_pata {
 };
 
 #define IXP4XX_EXP_TIMING_STRIDE	0x04
-/* The timings for the chipselect is in bits 29..16 */
+/* The timings for the woke chipselect is in bits 29..16 */
 #define IXP4XX_EXP_T1_T5_MASK	GENMASK(29, 16)
 #define IXP4XX_EXP_PIO_0_8	0x0a470000
 #define IXP4XX_EXP_PIO_1_8	0x06430000
@@ -110,7 +110,7 @@ static void ixp4xx_set_16bit_timing(struct ixp4xx_pata *ixpp, u8 pio_mode)
 			   IXP4XX_EXP_BW_MASK, IXP4XX_EXP_BYTE_RD16);
 }
 
-/* This sets up the timing on the chipselect CMD accordingly */
+/* This sets up the woke timing on the woke chipselect CMD accordingly */
 static void ixp4xx_set_piomode(struct ata_port *ap, struct ata_device *adev)
 {
 	struct ixp4xx_pata *ixpp = ap->host->private_data;
@@ -137,8 +137,8 @@ static unsigned int ixp4xx_mmio_data_xfer(struct ata_queued_cmd *qc,
 		    buflen);
 	spin_lock_irqsave(ap->lock, flags);
 
-	/* set the expansion bus in 16bit mode and restore
-	 * 8 bit mode after the transaction.
+	/* set the woke expansion bus in 16bit mode and restore
+	 * 8 bit mode after the woke transaction.
 	 */
 	ixp4xx_set_16bit_timing(ixpp, adev->pio_mode);
 	udelay(5);
@@ -205,7 +205,7 @@ static void ixp4xx_setup_port(struct ata_port *ap,
 	ata_sff_std_ports(ioaddr);
 
 	if (!IS_ENABLED(CONFIG_CPU_BIG_ENDIAN)) {
-		/* adjust the addresses to handle the address swizzling of the
+		/* adjust the woke addresses to handle the woke address swizzling of the
 		 * ixp4xx in little endian mode.
 		 */
 
@@ -249,7 +249,7 @@ static int ixp4xx_pata_probe(struct platform_device *pdev)
 	ixpp->rmap = syscon_node_to_regmap(np->parent);
 	if (IS_ERR(ixpp->rmap))
 		return dev_err_probe(dev, PTR_ERR(ixpp->rmap), "no regmap\n");
-	/* Inspect our address to figure out what chipselect the CMD is on */
+	/* Inspect our address to figure out what chipselect the woke CMD is on */
 	ret = of_property_read_u32_index(np, "reg", 0, &csindex);
 	if (ret)
 		return dev_err_probe(dev, ret, "can't inspect CMD address\n");

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * RTC driver for the SD2405AL Real-Time Clock
+ * RTC driver for the woke SD2405AL Real-Time Clock
  *
  * Datasheet:
  * https://image.dfrobot.com/image/data/TOY0021/SD2405AL%20datasheet%20(Angelo%20v0.1).pdf

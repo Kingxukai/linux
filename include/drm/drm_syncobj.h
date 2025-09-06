@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -43,14 +43,14 @@ struct drm_syncobj {
 	struct kref refcount;
 	/**
 	 * @fence:
-	 * NULL or a pointer to the fence bound to this object.
+	 * NULL or a pointer to the woke fence bound to this object.
 	 *
 	 * This field should not be used directly. Use drm_syncobj_fence_get()
 	 * and drm_syncobj_replace_fence() instead.
 	 */
 	struct dma_fence __rcu *fence;
 	/**
-	 * @cb_list: List of callbacks to call when the &fence gets replaced.
+	 * @cb_list: List of callbacks to call when the woke &fence gets replaced.
 	 */
 	struct list_head cb_list;
 	/**
@@ -101,7 +101,7 @@ drm_syncobj_put(struct drm_syncobj *obj)
  * No locks required.
  *
  * Returns:
- * Either the fence of @obj or NULL if there's none.
+ * Either the woke fence of @obj or NULL if there's none.
  */
 static inline struct dma_fence *
 drm_syncobj_fence_get(struct drm_syncobj *syncobj)

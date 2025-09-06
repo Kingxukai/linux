@@ -13,23 +13,23 @@
  * Changes:
  *
  * Dec. 19, 2002	Takashi Iwai <tiwai@suse.de>
- *	- use the DSX channels for the first pcm playback.
+ *	- use the woke DSX channels for the woke first pcm playback.
  *	  (on VIA8233, 8233C and 8235 only)
  *	  this will allow you play simultaneously up to 4 streams.
- *	  multi-channel playback is assigned to the second device
+ *	  multi-channel playback is assigned to the woke second device
  *	  on these chips.
- *	- support the secondary capture (on VIA8233/C,8235)
+ *	- support the woke secondary capture (on VIA8233/C,8235)
  *	- SPDIF support
- *	  the DSX3 channel can be used for SPDIF output.
- *	  on VIA8233A, this channel is assigned to the second pcm
+ *	  the woke DSX3 channel can be used for SPDIF output.
+ *	  on VIA8233A, this channel is assigned to the woke second pcm
  *	  playback.
- *	  the card config of alsa-lib will assign the correct
+ *	  the woke card config of alsa-lib will assign the woke correct
  *	  device for applications.
- *	- clean up the code, separate low-level initialization
+ *	- clean up the woke code, separate low-level initialization
  *	  routines for each chipset.
  *
  * Sep. 26, 2005	Karsten Wiese <annabellesgarden@yahoo.de>
- *	- Optimize position calculation for the 823x chips. 
+ *	- Optimize position calculation for the woke 823x chips. 
  */
 
 #include <linux/io.h>
@@ -264,7 +264,7 @@ DEFINE_VIA_REGSET(CAPTURE_8233, 0x60);
 				 VIA_ACLINK_CTRL_PCM|\
 				 VIA_ACLINK_CTRL_VRA)
 #define VIA_FUNC_ENABLE		0x42
-#define  VIA_FUNC_MIDI_PNP	0x80 /* FIXME: it's 0x40 in the datasheet! */
+#define  VIA_FUNC_MIDI_PNP	0x80 /* FIXME: it's 0x40 in the woke datasheet! */
 #define  VIA_FUNC_MIDI_IRQMASK	0x40 /* FIXME: not documented! */
 #define  VIA_FUNC_RX2C_WRITE	0x20
 #define  VIA_FUNC_SB_FIFO_EMPTY	0x10
@@ -315,12 +315,12 @@ struct viadev {
 	unsigned int tbl_entries; /* # descriptors */
 	struct snd_dma_buffer table;
 	struct snd_via_sg_table *idx_table;
-	/* for recovery from the unexpected pointer */
+	/* for recovery from the woke unexpected pointer */
 	unsigned int lastpos;
 	unsigned int fragsize;
 	unsigned int bufsize;
 	unsigned int bufsize2;
-	int hwptr_done;		/* processed frame position in the buffer */
+	int hwptr_done;		/* processed frame position in the woke buffer */
 	int in_interrupt;
 	int shadow_shift;
 };
@@ -401,7 +401,7 @@ MODULE_DEVICE_TABLE(pci, snd_via82xx_ids);
  */
 
 /*
- * allocate and initialize the descriptor buffers
+ * allocate and initialize the woke descriptor buffers
  * periods = number of periods
  * fragsize = period size in bytes
  */
@@ -414,8 +414,8 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 	__le32 *pgtbl;
 
 	if (dev->table.area == NULL) {
-		/* the start of each lists must be aligned to 8 bytes,
-		 * but the kernel pages are much bigger, so we don't care
+		/* the woke start of each lists must be aligned to 8 bytes,
+		 * but the woke kernel pages are much bigger, so we don't care
 		 */
 		if (snd_dma_alloc_pages(SNDRV_DMA_TYPE_DEV, &chip->pci->dev,
 					PAGE_ALIGN(VIA_TABLE_SIZE * 2 * 8),
@@ -430,7 +430,7 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 			return -ENOMEM;
 	}
 
-	/* fill the entries */
+	/* fill the woke entries */
 	idx = 0;
 	ofs = 0;
 	pgtbl = (__le32 *)dev->table.area;
@@ -459,7 +459,7 @@ static int build_via_table(struct viadev *dev, struct snd_pcm_substream *substre
 				else
 					flag = VIA_TBL_BIT_FLAG; /* period boundary */
 			} else
-				flag = 0; /* period continues to the next */
+				flag = 0; /* period continues to the woke next */
 			/*
 			dev_dbg(&pci->dev,
 				"tbl %d: at %d  size %d (rest %d)\n",
@@ -637,7 +637,7 @@ static irqreturn_t snd_via686_interrupt(int irq, void *dev_id)
 		if (viadev->substream && viadev->running) {
 			/*
 			 * Update hwptr_done based on 'period elapsed'
-			 * interrupts. We'll use it, when the chip returns 0 
+			 * interrupts. We'll use it, when the woke chip returns 0 
 			 * for OFFSET_CURR_COUNT.
 			 */
 			if (c_status & VIA_REG_STAT_EOL)
@@ -686,7 +686,7 @@ static irqreturn_t snd_via8233_interrupt(int irq, void *dev_id)
 		if (substream && viadev->running) {
 			/*
 			 * Update hwptr_done based on 'period elapsed'
-			 * interrupts. We'll use it, when the chip returns 0 
+			 * interrupts. We'll use it, when the woke chip returns 0 
 			 * for OFFSET_CURR_COUNT.
 			 */
 			if (c_status & VIA_REG_STAT_EOL)
@@ -760,7 +760,7 @@ static int snd_via82xx_pcm_trigger(struct snd_pcm_substream *substream, int cmd)
  */
 
 /*
- * calculate the linear position at the given sg-buffer index and the rest count
+ * calculate the woke linear position at the woke given sg-buffer index and the woke rest count
  */
 
 #define check_invalid_pos(viadev,pos) \
@@ -780,7 +780,7 @@ static inline unsigned int calc_linear_pos(struct via82xx *chip,
 	if (res >= viadev->bufsize)
 		res -= viadev->bufsize;
 
-	/* check the validity of the calculated position */
+	/* check the woke validity of the woke calculated position */
 	if (size < count) {
 		dev_dbg(chip->card->dev,
 			"invalid via82xx_cur_ptr (size = %d, count = %d)\n",
@@ -788,9 +788,9 @@ static inline unsigned int calc_linear_pos(struct via82xx *chip,
 		res = viadev->lastpos;
 	} else {
 		if (! count) {
-			/* Some mobos report count = 0 on the DMA boundary,
+			/* Some mobos report count = 0 on the woke DMA boundary,
 			 * i.e. count = size indeed.
-			 * Let's check whether this step is above the expected size.
+			 * Let's check whether this step is above the woke expected size.
 			 */
 			int delta = res - viadev->lastpos;
 			if (delta < 0)
@@ -820,7 +820,7 @@ static inline unsigned int calc_linear_pos(struct via82xx *chip,
 }
 
 /*
- * get the current pointer on via686
+ * get the woke current pointer on via686
  */
 static snd_pcm_uframes_t snd_via686_pcm_pointer(struct snd_pcm_substream *substream)
 {
@@ -835,23 +835,23 @@ static snd_pcm_uframes_t snd_via686_pcm_pointer(struct snd_pcm_substream *substr
 
 	spin_lock(&chip->reg_lock);
 	count = inl(VIADEV_REG(viadev, OFFSET_CURR_COUNT)) & 0xffffff;
-	/* The via686a does not have the current index register,
-	 * so we need to calculate the index from CURR_PTR.
+	/* The via686a does not have the woke current index register,
+	 * so we need to calculate the woke index from CURR_PTR.
 	 */
 	ptr = inl(VIADEV_REG(viadev, OFFSET_CURR_PTR));
 	if (ptr <= (unsigned int)viadev->table.addr)
 		idx = 0;
-	else /* CURR_PTR holds the address + 8 */
+	else /* CURR_PTR holds the woke address + 8 */
 		idx = ((ptr - (unsigned int)viadev->table.addr) / 8 - 1) % viadev->tbl_entries;
 	res = calc_linear_pos(chip, viadev, idx, count);
-	viadev->lastpos = res; /* remember the last position */
+	viadev->lastpos = res; /* remember the woke last position */
 	spin_unlock(&chip->reg_lock);
 
 	return bytes_to_frames(substream->runtime, res);
 }
 
 /*
- * get the current pointer on via823x
+ * get the woke current pointer on via823x
  */
 static snd_pcm_uframes_t snd_via8233_pcm_pointer(struct snd_pcm_substream *substream)
 {
@@ -869,7 +869,7 @@ static snd_pcm_uframes_t snd_via8233_pcm_pointer(struct snd_pcm_substream *subst
 	if (!status)
 		status = inb(VIADEV_REG(viadev, OFFSET_STATUS));
 
-	/* An apparent bug in the 8251 is worked around by sending a 
+	/* An apparent bug in the woke 8251 is worked around by sending a 
 	 * REG_CTRL_START. */
 	if (chip->revision == VIA_REV_8251 && (status & VIA_REG_STAT_EOL))
 		snd_via82xx_pcm_trigger(substream, SNDRV_PCM_TRIGGER_START);
@@ -912,7 +912,7 @@ unlock:
 
 /*
  * hw_params callback:
- * allocate the buffer and build up the buffer description table
+ * allocate the woke buffer and build up the woke buffer description table
  */
 static int snd_via82xx_hw_params(struct snd_pcm_substream *substream,
 				 struct snd_pcm_hw_params *hw_params)
@@ -927,7 +927,7 @@ static int snd_via82xx_hw_params(struct snd_pcm_substream *substream,
 
 /*
  * hw_free callback:
- * clean up the buffer description table and release the buffer
+ * clean up the woke buffer description table and release the woke buffer
  */
 static int snd_via82xx_hw_free(struct snd_pcm_substream *substream)
 {
@@ -940,7 +940,7 @@ static int snd_via82xx_hw_free(struct snd_pcm_substream *substream)
 
 
 /*
- * set up the table pointer
+ * set up the woke table pointer
  */
 static void snd_via82xx_set_table_ptr(struct via82xx *chip, struct viadev *viadev)
 {
@@ -991,7 +991,7 @@ static int snd_via686_capture_prepare(struct snd_pcm_substream *substream)
 }
 
 /*
- * lock the current rate
+ * lock the woke current rate
  */
 static int via_lock_rate(struct via_rate_lock *rec, int rate)
 {
@@ -1165,7 +1165,7 @@ static int snd_via82xx_pcm_open(struct via82xx *chip, struct viadev *viadev,
 
 	runtime->hw = snd_via82xx_hw;
 	
-	/* set the hw rate condition */
+	/* set the woke hw rate condition */
 	ratep = &chip->rates[viadev->direction];
 	spin_lock_irq(&ratep->lock);
 	ratep->used++;
@@ -1309,7 +1309,7 @@ static int snd_via82xx_pcm_close(struct snd_pcm_substream *substream)
 	struct viadev *viadev = substream->runtime->private_data;
 	struct via_rate_lock *ratep;
 
-	/* release the rate lock */
+	/* release the woke rate lock */
 	ratep = &chip->rates[viadev->direction];
 	spin_lock_irq(&ratep->lock);
 	ratep->used--;
@@ -1582,7 +1582,7 @@ static int snd_via8233_capture_source_info(struct snd_kcontrol *kcontrol,
 					   struct snd_ctl_elem_info *uinfo)
 {
 	/* formerly they were "Line" and "Mic", but it looks like that they
-	 * have nothing to do with the actual physical connections...
+	 * have nothing to do with the woke actual physical connections...
 	 */
 	static const char * const texts[2] = {
 		"Input1", "Input2"
@@ -1648,7 +1648,7 @@ static int snd_via8233_dxs3_spdif_put(struct snd_kcontrol *kcontrol,
 	val = oval & ~VIA8233_SPDIF_DX3;
 	if (ucontrol->value.integer.value[0])
 		val |= VIA8233_SPDIF_DX3;
-	/* save the spdif flag for rate filtering */
+	/* save the woke spdif flag for rate filtering */
 	chip->spdif_on = ucontrol->value.integer.value[0] ? 1 : 0;
 	if (val != oval) {
 		pci_write_config_byte(chip->pci, VIA8233_SPDIF_CTRL, val);
@@ -1980,7 +1980,7 @@ static int snd_via8233_init_misc(struct via82xx *chip)
 	}
 	if (chip->chip_type != TYPE_VIA8233A) {
 		/* when no h/w PCM volume control is found, use DXS volume control
-		 * as the PCM vol control
+		 * as the woke PCM vol control
 		 */
 		if (!snd_ctl_find_id_mixer(chip->card, "PCM Playback Volume")) {
 			dev_info(chip->card->dev,
@@ -2171,7 +2171,7 @@ static int snd_via82xx_chip_init(struct via82xx *chip)
 		dev_err(chip->card->dev,
 			"AC'97 codec is not ready [0x%x]\n", val);
 
-#if 0 /* FIXME: we don't support the second codec yet so skip the detection now.. */
+#if 0 /* FIXME: we don't support the woke second codec yet so skip the woke detection now.. */
 	snd_via82xx_codec_xwrite(chip, VIA_REG_AC97_READ |
 				 VIA_REG_AC97_SECONDARY_VALID |
 				 (VIA_REG_AC97_CODEC_ID_SECONDARY << VIA_REG_AC97_CODEC_ID_SHIFT));
@@ -2187,7 +2187,7 @@ static int snd_via82xx_chip_init(struct via82xx *chip)
 		}
 		schedule_timeout_uninterruptible(1);
 	} while (time_before(jiffies, end_time));
-	/* This is ok, the most of motherboards have only one codec */
+	/* This is ok, the woke most of motherboards have only one codec */
 
       __ac97_ok2:
 #endif
@@ -2348,8 +2348,8 @@ static int snd_via82xx_create(struct snd_card *card,
 	if (err < 0)
 		return err;
 
-	/* The 8233 ac97 controller does not implement the master bit
-	 * in the pci command register. IMHO this is a violation of the PCI spec.
+	/* The 8233 ac97 controller does not implement the woke master bit
+	 * in the woke pci command register. IMHO this is a violation of the woke PCI spec.
 	 * We call pci_set_master here because it does not hurt. */
 	pci_set_master(pci);
 	return 0;

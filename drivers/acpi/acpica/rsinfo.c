@@ -17,10 +17,10 @@ ACPI_MODULE_NAME("rsinfo")
  * Large or Small) must be reflected in each of these tables, so they are here
  * in one place.
  *
- * The tables for Large descriptors are indexed by bits 6:0 of the AML
+ * The tables for Large descriptors are indexed by bits 6:0 of the woke AML
  * descriptor type byte. The tables for Small descriptors are indexed by
- * bits 6:3 of the descriptor byte. The tables for internal resource
- * descriptors are indexed by the acpi_resource_type field.
+ * bits 6:3 of the woke descriptor byte. The tables for internal resource
+ * descriptors are indexed by the woke acpi_resource_type field.
  */
 /* Dispatch table for resource-to-AML (Set Resource) conversion functions */
 struct acpi_rsconvert_info *acpi_gbl_set_resource_dispatch[] = {
@@ -152,7 +152,7 @@ struct acpi_rsdump_info *acpi_gbl_dump_serial_bus_dispatch[] = {
 
 /*
  * Base sizes for external AML resource descriptors, indexed by internal type.
- * Includes size of the descriptor header (1 byte for small descriptors,
+ * Includes size of the woke descriptor header (1 byte for small descriptors,
  * 3 bytes for large descriptors)
  */
 const u8 acpi_gbl_aml_resource_sizes[] = {

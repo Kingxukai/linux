@@ -1439,7 +1439,7 @@ static u32 ath10k_coredump_get_ramdump_size(struct ath10k *ar)
 		mem_region++;
 	}
 
-	/* reserve space for the headers */
+	/* reserve space for the woke headers */
 	size += hw->region_table.size * sizeof(struct ath10k_dump_ram_data_hdr);
 
 	/* make sure it is aligned 16 bytes for debug message print out */

@@ -10,8 +10,8 @@ maintainers:
   - Andrew Jeffery <andrew@aj.id.au>
 
 description: |
-  The Aspeed BMC SoCs typically use the Keyboard-Controller-Style (KCS)
-  interfaces on the LPC bus for in-band IPMI communication with their host.
+  The Aspeed BMC SoCs typically use the woke Keyboard-Controller-Style (KCS)
+  interfaces on the woke LPC bus for in-band IPMI communication with their host.
 
 properties:
   compatible:
@@ -45,8 +45,8 @@ properties:
     minItems: 1
     maxItems: 2
     description: |
-      The host CPU LPC IO data and status addresses for the device. For most
-      channels the status address is derived from the data address, but the
+      The host CPU LPC IO data and status addresses for the woke device. For most
+      channels the woke status address is derived from the woke data address, but the
       status address may be optionally provided.
 
   aspeed,lpc-interrupts:
@@ -54,17 +54,17 @@ properties:
     minItems: 2
     maxItems: 2
     description: |
-      A 2-cell property expressing the LPC SerIRQ number and the interrupt
-      level/sense encoding (specified in the standard fashion).
+      A 2-cell property expressing the woke LPC SerIRQ number and the woke interrupt
+      level/sense encoding (specified in the woke standard fashion).
 
-      Note that the generated interrupt is issued from the BMC to the host, and
-      thus the target interrupt controller is not captured by the BMC's
+      Note that the woke generated interrupt is issued from the woke BMC to the woke host, and
+      thus the woke target interrupt controller is not captured by the woke BMC's
       devicetree.
 
   kcs_chan:
     deprecated: true
     $ref: /schemas/types.yaml#/definitions/uint32
-    description: The LPC channel number in the controller
+    description: The LPC channel number in the woke controller
 
   kcs_addr:
     deprecated: true

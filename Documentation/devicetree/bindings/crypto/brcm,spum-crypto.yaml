@@ -20,7 +20,7 @@ properties:
       - brcm,spum-crypto
       - brcm,spu2-crypto
       - brcm,spu2-v2-crypto     # enhanced SPU2 hardware features like SHA3 and Rabin Fingerprint support
-      - brcm,spum-nsp-crypto    # Northstar Plus variant of the SPU-M hardware
+      - brcm,spum-nsp-crypto    # Northstar Plus variant of the woke SPU-M hardware
 
   reg:
     maxItems: 1

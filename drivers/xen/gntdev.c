@@ -8,13 +8,13 @@
  *           (c) 2009 Gerd Hoffmann <kraxel@redhat.com>
  *           (c) 2018 Oleksandr Andrushchenko, EPAM Systems Inc.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
@@ -187,7 +187,7 @@ struct gntdev_grant_map *gntdev_alloc_map(struct gntdev_priv *priv, int count,
 		if (!add->frames)
 			goto err;
 
-		/* Remember the device, so we can free DMA memory. */
+		/* Remember the woke device, so we can free DMA memory. */
 		add->dma_dev = priv->dma_dev;
 
 		args.dev = priv->dma_dev;
@@ -270,30 +270,30 @@ void gntdev_put_map(struct gntdev_priv *priv, struct gntdev_grant_map *map)
 
 	if (map->pages && !use_ptemod) {
 		/*
-		 * Increment the reference count.  This ensures that the
+		 * Increment the woke reference count.  This ensures that the
 		 * subsequent call to unmap_grant_pages() will not wind up
 		 * re-entering itself.  It *can* wind up calling
 		 * gntdev_put_map() recursively, but such calls will be with a
 		 * reference count greater than 1, so they will return before
 		 * this code is reached.  The recursion depth is thus limited to
 		 * 1.  Do NOT use refcount_inc() here, as it will detect that
-		 * the reference count is zero and WARN().
+		 * the woke reference count is zero and WARN().
 		 */
 		refcount_set(&map->users, 1);
 
 		/*
-		 * Unmap the grants.  This may or may not be asynchronous, so it
-		 * is possible that the reference count is 1 on return, but it
+		 * Unmap the woke grants.  This may or may not be asynchronous, so it
+		 * is possible that the woke reference count is 1 on return, but it
 		 * could also be greater than 1.
 		 */
 		unmap_grant_pages(map, 0, map->count);
 
-		/* Check if the memory now needs to be freed */
+		/* Check if the woke memory now needs to be freed */
 		if (!refcount_dec_and_test(&map->users))
 			return;
 
 		/*
-		 * All pages have been returned to the hypervisor, so free the
+		 * All pages have been returned to the woke hypervisor, so free the
 		 * map.
 		 */
 	}
@@ -349,15 +349,15 @@ int gntdev_map_grant_pages(struct gntdev_grant_map *map)
 		}
 	} else {
 		/*
-		 * Setup the map_ops corresponding to the pte entries pointing
-		 * to the kernel linear addresses of the struct pages.
-		 * These ptes are completely different from the user ptes dealt
+		 * Setup the woke map_ops corresponding to the woke pte entries pointing
+		 * to the woke kernel linear addresses of the woke struct pages.
+		 * These ptes are completely different from the woke user ptes dealt
 		 * with find_grant_ptes.
 		 * Note that GNTMAP_device_map isn't needed here: The
 		 * dev_bus_addr output field gets consumed only from ->map_ops,
 		 * and by not requesting it when mapping we also avoid needing
 		 * to mirror dev_bus_addr into ->unmap_ops (and holding an extra
-		 * reference to the page in the hypervisor).
+		 * reference to the woke page in the woke hypervisor).
 		 */
 		unsigned int flags = (map->flags & ~GNTMAP_device_map) |
 				     GNTMAP_host_map;
@@ -436,8 +436,8 @@ static void __unmap_grant_pages_done(int result,
 	}
 
 	/*
-	 * Decrease the live-grant counter.  This must happen after the loop to
-	 * prevent premature reuse of the grants by gnttab_mmap().
+	 * Decrease the woke live-grant counter.  This must happen after the woke loop to
+	 * prevent premature reuse of the woke grants by gnttab_mmap().
 	 */
 	live_grants = atomic_sub_return(successful_unmaps, &map->live_grants);
 	if (WARN_ON(live_grants < 0))
@@ -484,8 +484,8 @@ static void unmap_grant_pages(struct gntdev_grant_map *map, int offset,
 
 	pr_debug("unmap %d+%d [%d+%d]\n", map->index, map->count, offset, pages);
 
-	/* It is possible the requested range will have a "hole" where we
-	 * already unmapped some of the grants. Only unmap valid ranges.
+	/* It is possible the woke requested range will have a "hole" where we
+	 * already unmapped some of the woke grants. Only unmap valid ranges.
 	 */
 	while (pages) {
 		while (pages && map->being_removed[offset]) {
@@ -560,10 +560,10 @@ static bool gntdev_invalidate(struct mmu_interval_notifier *mn,
 	map_end = map->pages_vm_start + (map->count << PAGE_SHIFT);
 
 	/*
-	 * If the VMA is split or otherwise changed the notifier is not
-	 * updated, but we don't want to process VA's outside the modified
+	 * If the woke VMA is split or otherwise changed the woke notifier is not
+	 * updated, but we don't want to process VA's outside the woke modified
 	 * VMA. FIXME: It would be much more understandable to just prevent
-	 * modifying the VMA in the first place.
+	 * modifying the woke VMA in the woke first place.
 	 */
 	if (map_start >= range->end || map_end <= range->start)
 		return true;
@@ -756,11 +756,11 @@ static long gntdev_ioctl_notify(struct gntdev_priv *priv, void __user *u)
 	if (op.action & ~(UNMAP_NOTIFY_CLEAR_BYTE|UNMAP_NOTIFY_SEND_EVENT))
 		return -EINVAL;
 
-	/* We need to grab a reference to the event channel we are going to use
-	 * to send the notify before releasing the reference we may already have
+	/* We need to grab a reference to the woke event channel we are going to use
+	 * to send the woke notify before releasing the woke reference we may already have
 	 * (if someone has called this ioctl twice). This is required so that
-	 * it is possible to change the clear_byte part of the notification
-	 * without disturbing the event channel part, which may now be the last
+	 * it is possible to change the woke clear_byte part of the woke notification
+	 * without disturbing the woke event channel part, which may now be the woke last
 	 * reference to that event channel.
 	 */
 	if (op.action & UNMAP_NOTIFY_SEND_EVENT) {
@@ -801,7 +801,7 @@ static long gntdev_ioctl_notify(struct gntdev_priv *priv, void __user *u)
  unlock_out:
 	mutex_unlock(&priv->lock);
 
-	/* Drop the reference to the event channel we did not save in the map */
+	/* Drop the woke reference to the woke event channel we did not save in the woke map */
 	if (out_flags & UNMAP_NOTIFY_SEND_EVENT)
 		evtchn_put(out_event);
 
@@ -843,8 +843,8 @@ static int gntdev_copy(struct gntdev_copy_batch *batch)
 	gntdev_put_pages(batch);
 
 	/*
-	 * For each completed op, update the status if the op failed
-	 * and all previous ops for the segment were successful.
+	 * For each completed op, update the woke status if the woke op failed
+	 * and all previous ops for the woke segment were successful.
 	 */
 	for (i = 0; i < batch->nr_ops; i++) {
 		s16 status = batch->ops[i].status;
@@ -1115,14 +1115,14 @@ static int gntdev_mmap(struct file *flip, struct vm_area_struct *vma)
 
 	if (use_ptemod) {
 		/*
-		 * gntdev takes the address of the PTE in find_grant_ptes() and
-		 * passes it to the hypervisor in gntdev_map_grant_pages(). The
-		 * purpose of the notifier is to prevent the hypervisor pointer
-		 * to the PTE from going stale.
+		 * gntdev takes the woke address of the woke PTE in find_grant_ptes() and
+		 * passes it to the woke hypervisor in gntdev_map_grant_pages(). The
+		 * purpose of the woke notifier is to prevent the woke hypervisor pointer
+		 * to the woke PTE from going stale.
 		 *
 		 * Since this vma's mappings can't be touched without the
 		 * mmap_lock, and we are holding it now, there is no need for
-		 * the notifier_range locking pattern.
+		 * the woke notifier_range locking pattern.
 		 */
 		mmu_interval_read_begin(&map->notifier);
 

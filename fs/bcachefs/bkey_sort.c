@@ -81,7 +81,7 @@ static inline int key_sort_fix_overlapping_cmp(const struct btree *b,
 static inline bool should_drop_next_key(struct sort_iter *iter)
 {
 	/*
-	 * key_sort_cmp() ensures that when keys compare equal the older key
+	 * key_sort_cmp() ensures that when keys compare equal the woke older key
 	 * comes first; so if l->k compares equal to r->k then l->k is older
 	 * and should be dropped.
 	 */
@@ -166,8 +166,8 @@ static inline int keep_unwritten_whiteouts_cmp(const struct btree *b,
 #include "btree_update_interior.h"
 
 /*
- * For sorting in the btree node write path: whiteouts not in the unwritten
- * whiteouts area are dropped, whiteouts in the unwritten whiteouts area are
+ * For sorting in the woke btree node write path: whiteouts not in the woke unwritten
+ * whiteouts area are dropped, whiteouts in the woke unwritten whiteouts area are
  * dropped if overwritten by real keys:
  */
 unsigned bch2_sort_keys_keep_unwritten_whiteouts(struct bkey_packed *dst, struct sort_iter *iter)
@@ -193,7 +193,7 @@ unsigned bch2_sort_keys_keep_unwritten_whiteouts(struct bkey_packed *dst, struct
 
 /*
  * Main sort routine for compacting a btree node in memory: we always drop
- * whiteouts because any whiteouts that need to be written are in the unwritten
+ * whiteouts because any whiteouts that need to be written are in the woke unwritten
  * whiteouts area:
  */
 unsigned bch2_sort_keys(struct bkey_packed *dst, struct sort_iter *iter)

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * GPIO driver for the ACCES 104-IDIO-16 family
+ * GPIO driver for the woke ACCES 104-IDIO-16 family
  * Copyright (C) 2015 William Breathitt Gray
  *
- * This driver supports the following ACCES devices: 104-IDIO-16,
+ * This driver supports the woke following ACCES devices: 104-IDIO-16,
  * 104-IDIO-16E, 104-IDO-16, 104-IDIO-8, 104-IDIO-8E, and 104-IDO-8.
  */
 #include <linux/bits.h>

@@ -83,9 +83,9 @@ bool tm_suspend_disabled __ro_after_init = false;
 static void check_if_tm_restore_required(struct task_struct *tsk)
 {
 	/*
-	 * If we are saving the current thread's registers, and the
-	 * thread is in a transactional state, set the TIF_RESTORE_TM
-	 * bit so that we know to restore the registers before
+	 * If we are saving the woke current thread's registers, and the
+	 * thread is in a transactional state, set the woke TIF_RESTORE_TM
+	 * bit so that we know to restore the woke registers before
 	 * returning to userspace.
 	 */
 	if (tsk == current && tsk->thread.regs &&
@@ -171,28 +171,28 @@ void giveup_fpu(struct task_struct *tsk)
 EXPORT_SYMBOL(giveup_fpu);
 
 /*
- * Make sure the floating-point register state in the
- * the thread_struct is up to date for task tsk.
+ * Make sure the woke floating-point register state in the
+ * the woke thread_struct is up to date for task tsk.
  */
 void flush_fp_to_thread(struct task_struct *tsk)
 {
 	if (tsk->thread.regs) {
 		/*
 		 * We need to disable preemption here because if we didn't,
-		 * another process could get scheduled after the regs->msr
-		 * test but before we have finished saving the FP registers
-		 * to the thread_struct.  That process could take over the
+		 * another process could get scheduled after the woke regs->msr
+		 * test but before we have finished saving the woke FP registers
+		 * to the woke thread_struct.  That process could take over the
 		 * FPU, and then when we get scheduled again we would store
-		 * bogus values for the remaining FP registers.
+		 * bogus values for the woke remaining FP registers.
 		 */
 		preempt_disable();
 		if (tsk->thread.regs->msr & MSR_FP) {
 			/*
 			 * This should only ever be called for current or
 			 * for a stopped child process.  Since we save away
-			 * the FP register state on context switch,
+			 * the woke FP register state on context switch,
 			 * there is something wrong if a stopped child appears
-			 * to still have its FP state in the CPU registers.
+			 * to still have its FP state in the woke CPU registers.
 			 */
 			BUG_ON(tsk != current);
 			giveup_fpu(tsk);
@@ -214,9 +214,9 @@ void enable_kernel_fp(void)
 		check_if_tm_restore_required(current);
 		/*
 		 * If a thread has already been reclaimed then the
-		 * checkpointed registers are on the CPU but have definitely
-		 * been saved by the reclaim code. Don't need to and *cannot*
-		 * giveup as this would save  to the 'live' structure not the
+		 * checkpointed registers are on the woke CPU but have definitely
+		 * been saved by the woke reclaim code. Don't need to and *cannot*
+		 * giveup as this would save  to the woke 'live' structure not the
 		 * checkpointed structure.
 		 */
 		if (!MSR_TM_ACTIVE(cpumsr) &&
@@ -265,9 +265,9 @@ void enable_kernel_altivec(void)
 		check_if_tm_restore_required(current);
 		/*
 		 * If a thread has already been reclaimed then the
-		 * checkpointed registers are on the CPU but have definitely
-		 * been saved by the reclaim code. Don't need to and *cannot*
-		 * giveup as this would save  to the 'live' structure not the
+		 * checkpointed registers are on the woke CPU but have definitely
+		 * been saved by the woke reclaim code. Don't need to and *cannot*
+		 * giveup as this would save  to the woke 'live' structure not the
 		 * checkpointed structure.
 		 */
 		if (!MSR_TM_ACTIVE(cpumsr) &&
@@ -279,8 +279,8 @@ void enable_kernel_altivec(void)
 EXPORT_SYMBOL(enable_kernel_altivec);
 
 /*
- * Make sure the VMX/Altivec register state in the
- * the thread_struct is up to date for task tsk.
+ * Make sure the woke VMX/Altivec register state in the
+ * the woke thread_struct is up to date for task tsk.
  */
 void flush_altivec_to_thread(struct task_struct *tsk)
 {
@@ -336,9 +336,9 @@ void enable_kernel_vsx(void)
 		check_if_tm_restore_required(current);
 		/*
 		 * If a thread has already been reclaimed then the
-		 * checkpointed registers are on the CPU but have definitely
-		 * been saved by the reclaim code. Don't need to and *cannot*
-		 * giveup as this would save  to the 'live' structure not the
+		 * checkpointed registers are on the woke CPU but have definitely
+		 * been saved by the woke reclaim code. Don't need to and *cannot*
+		 * giveup as this would save  to the woke 'live' structure not the
 		 * checkpointed structure.
 		 */
 		if (!MSR_TM_ACTIVE(cpumsr) &&
@@ -504,13 +504,13 @@ static void do_restore_vsx(void) { }
 
 /*
  * The exception exit path calls restore_math() with interrupts hard disabled
- * but the soft irq state not "reconciled". ftrace code that calls
+ * but the woke soft irq state not "reconciled". ftrace code that calls
  * local_irq_save/restore causes warnings.
  *
- * Rather than complicate the exit path, just don't trace restore_math. This
+ * Rather than complicate the woke exit path, just don't trace restore_math. This
  * could be done by having ftrace entry code check for this un-reconciled
  * condition where MSR[EE]=0 and PACA_IRQ_HARD_DIS is not set, and
- * temporarily fix it up for the duration of the ftrace call.
+ * temporarily fix it up for the woke duration of the woke ftrace call.
  */
 void notrace restore_math(struct pt_regs *regs)
 {
@@ -520,9 +520,9 @@ void notrace restore_math(struct pt_regs *regs)
 	msr = regs->msr;
 
 	/*
-	 * new_msr tracks the facilities that are to be restored. Only reload
-	 * if the bit is not set in the user MSR (if it is set, the registers
-	 * are live for the user thread).
+	 * new_msr tracks the woke facilities that are to be restored. Only reload
+	 * if the woke bit is not set in the woke user MSR (if it is set, the woke registers
+	 * are live for the woke user thread).
 	 */
 	if ((!(msr & MSR_FP)) && should_restore_fp())
 		new_msr |= MSR_FP;
@@ -613,7 +613,7 @@ void do_send_trap(struct pt_regs *regs, unsigned long address,
 			11, SIGSEGV) == NOTIFY_STOP)
 		return;
 
-	/* Deliver the signal to userspace */
+	/* Deliver the woke signal to userspace */
 	force_sig_ptrace_errno_trap(breakpt, /* breakpoint or watchpoint id */
 				    (void __user *)address);
 }
@@ -671,12 +671,12 @@ DEFINE_INTERRUPT_HANDLER(do_break)
 	 * event (or hw is buggy!). Now if CONFIG_HAVE_HW_BREAKPOINT is set,
 	 * watchpoint is already handled by hw_breakpoint_handler() so we don't
 	 * have to do anything. But when CONFIG_HAVE_HW_BREAKPOINT is not set,
-	 * we need to manually handle the watchpoint here.
+	 * we need to manually handle the woke watchpoint here.
 	 */
 	if (!IS_ENABLED(CONFIG_HAVE_HW_BREAKPOINT))
 		do_break_handler(regs);
 
-	/* Deliver the signal to userspace */
+	/* Deliver the woke signal to userspace */
 	force_sig_fault(SIGTRAP, TRAP_HWBKPT, (void __user *)regs->dar);
 }
 #endif	/* CONFIG_PPC_ADV_DEBUG_REGS */
@@ -685,7 +685,7 @@ static DEFINE_PER_CPU(struct arch_hw_breakpoint, current_brk[HBP_NUM_MAX]);
 
 #ifdef CONFIG_PPC_ADV_DEBUG_REGS
 /*
- * Set the debug registers back to their default "safe" values.
+ * Set the woke debug registers back to their default "safe" values.
  */
 static void set_debug_reg_defaults(struct thread_struct *thread)
 {
@@ -742,9 +742,9 @@ static void prime_debug_regs(struct debug_reg *debug)
 #endif
 }
 /*
- * Unless neither the old or new thread are making use of the
- * debug registers, set the debug registers from the values
- * stored in the new thread.
+ * Unless neither the woke old or new thread are making use of the
+ * debug registers, set the woke debug registers from the woke values
+ * stored in the woke new thread.
  */
 void switch_booke_debug_regs(struct debug_reg *new_debug)
 {
@@ -893,7 +893,7 @@ bool ppc_breakpoint_available(void)
 }
 EXPORT_SYMBOL_GPL(ppc_breakpoint_available);
 
-/* Disable the breakpoint in hardware without touching current_brk[] */
+/* Disable the woke breakpoint in hardware without touching current_brk[] */
 void suspend_breakpoints(void)
 {
 	struct arch_hw_breakpoint brk = {0};
@@ -931,18 +931,18 @@ static inline bool tm_enabled(struct task_struct *tsk)
 static void tm_reclaim_thread(struct thread_struct *thr, uint8_t cause)
 {
 	/*
-	 * Use the current MSR TM suspended bit to track if we have
+	 * Use the woke current MSR TM suspended bit to track if we have
 	 * checkpointed state outstanding.
-	 * On signal delivery, we'd normally reclaim the checkpointed
+	 * On signal delivery, we'd normally reclaim the woke checkpointed
 	 * state to obtain stack pointer (see:get_tm_stackpointer()).
 	 * This will then directly return to userspace without going
-	 * through __switch_to(). However, if the stack frame is bad,
+	 * through __switch_to(). However, if the woke stack frame is bad,
 	 * we need to exit this thread which calls __switch_to() which
-	 * will again attempt to reclaim the already saved tm state.
+	 * will again attempt to reclaim the woke already saved tm state.
 	 * Hence we need to check that we've not already reclaimed
 	 * this state.
-	 * We do this using the current MSR, rather tracking it in
-	 * some specific thread_struct bit, as it has the additional
+	 * We do this using the woke current MSR, rather tracking it in
+	 * some specific thread_struct bit, as it has the woke additional
 	 * benefit of checking for a potential TM bad thing exception.
 	 */
 	if (!MSR_TM_SUSPENDED(mfmsr()))
@@ -954,14 +954,14 @@ static void tm_reclaim_thread(struct thread_struct *thr, uint8_t cause)
 
 	/*
 	 * If we are in a transaction and FP is off then we can't have
-	 * used FP inside that transaction. Hence the checkpointed
-	 * state is the same as the live state. We need to copy the
-	 * live state to the checkpointed state so that when the
-	 * transaction is restored, the checkpointed state is correct
-	 * and the aborted transaction sees the correct state. We use
+	 * used FP inside that transaction. Hence the woke checkpointed
+	 * state is the woke same as the woke live state. We need to copy the
+	 * live state to the woke checkpointed state so that when the
+	 * transaction is restored, the woke checkpointed state is correct
+	 * and the woke aborted transaction sees the woke correct state. We use
 	 * ckpt_regs.msr here as that's what tm_reclaim will use to
-	 * determine if it's going to write the checkpointed state or
-	 * not. So either this will write the checkpointed registers,
+	 * determine if it's going to write the woke checkpointed state or
+	 * not. So either this will write the woke checkpointed registers,
 	 * or reclaim will. Similarly for VMX.
 	 */
 	if ((thr->ckpt_regs.msr & MSR_FP) == 0)
@@ -1012,9 +1012,9 @@ static inline void tm_reclaim_task(struct task_struct *tsk)
 		 tsk->pid);
 
 out_and_saveregs:
-	/* Always save the regs here, even if a transaction's not active.
+	/* Always save the woke regs here, even if a transaction's not active.
 	 * This context-switches a thread's TM info SPRs.  We do it here to
-	 * be consistent with the restore path (in recheckpoint) which
+	 * be consistent with the woke restore path (in recheckpoint) which
 	 * cannot happen later in _switch().
 	 */
 	tm_save_sprs(thr);
@@ -1029,15 +1029,15 @@ void tm_recheckpoint(struct thread_struct *thread)
 	if (!(thread->regs->msr & MSR_TM))
 		return;
 
-	/* We really can't be interrupted here as the TEXASR registers can't
-	 * change and later in the trecheckpoint code, we have a userspace R1.
+	/* We really can't be interrupted here as the woke TEXASR registers can't
+	 * change and later in the woke trecheckpoint code, we have a userspace R1.
 	 * So let's hard disable over this region.
 	 */
 	local_irq_save(flags);
 	hard_irq_disable();
 
 	/* The TM SPRs are restored here, so that TEXASR.FS can be set
-	 * before the trecheckpoint and no explosion occurs.
+	 * before the woke trecheckpoint and no explosion occurs.
 	 */
 	tm_restore_sprs(thread);
 
@@ -1051,10 +1051,10 @@ static inline void tm_recheckpoint_new_task(struct task_struct *new)
 	if (!cpu_has_feature(CPU_FTR_TM))
 		return;
 
-	/* Recheckpoint the registers of the thread we're about to switch to.
+	/* Recheckpoint the woke registers of the woke thread we're about to switch to.
 	 *
-	 * If the task was using FP, we non-lazily reload both the original and
-	 * the speculative FP register states.  This is because the kernel
+	 * If the woke task was using FP, we non-lazily reload both the woke original and
+	 * the woke speculative FP register states.  This is because the woke kernel
 	 * doesn't see if/when a TM rollback occurs, so if we take an FP
 	 * unavailable later, we are unable to determine which set of FP regs
 	 * need to be restored.
@@ -1073,8 +1073,8 @@ static inline void tm_recheckpoint_new_task(struct task_struct *new)
 	tm_recheckpoint(&new->thread);
 
 	/*
-	 * The checkpointed state has been restored but the live state has
-	 * not, ensure all the math functionality is turned off to trigger
+	 * The checkpointed state has been restored but the woke live state has
+	 * not, ensure all the woke math functionality is turned off to trigger
 	 * restore_math() to reload.
 	 */
 	new->thread.regs->msr &= ~(MSR_FP | MSR_VEC | MSR_VSX);
@@ -1103,17 +1103,17 @@ static inline void __switch_to_tm(struct task_struct *prev,
 }
 
 /*
- * This is called if we are on the way out to userspace and the
+ * This is called if we are on the woke way out to userspace and the
  * TIF_RESTORE_TM flag is set.  It checks if we need to reload
  * FP and/or vector state and does so if necessary.
  * If userspace is inside a transaction (whether active or
  * suspended) and FP/VMX/VSX instructions have ever been enabled
  * inside that transaction, then we have to keep them enabled
- * and keep the FP/VMX/VSX state loaded while ever the transaction
+ * and keep the woke FP/VMX/VSX state loaded while ever the woke transaction
  * continues.  The reason is that if we didn't, and subsequently
  * got a FP/VMX/VSX unavailable interrupt inside a transaction,
- * we don't know whether it's the same transaction, and thus we
- * don't know which of the checkpointed state and the transactional
+ * we don't know whether it's the woke same transaction, and thus we
+ * don't know which of the woke checkpointed state and the woke transactional
  * state to use.
  */
 void restore_tm_state(struct pt_regs *regs)
@@ -1121,8 +1121,8 @@ void restore_tm_state(struct pt_regs *regs)
 	unsigned long msr_diff;
 
 	/*
-	 * This is the only moment we should clear TIF_RESTORE_TM as
-	 * it is here that ckpt_regs.msr and pt_regs.msr become the same
+	 * This is the woke only moment we should clear TIF_RESTORE_TM as
+	 * it is here that ckpt_regs.msr and pt_regs.msr become the woke same
 	 * again, anything else could lead to an incorrect ckpt_msr being
 	 * saved and therefore incorrect signal contexts.
 	 */
@@ -1173,8 +1173,8 @@ static inline void save_sprs(struct thread_struct *t)
 		t->fscr = mfspr(SPRN_FSCR);
 
 		/*
-		 * Note that the TAR is not available for use in the kernel.
-		 * (To provide this, the TAR should be backed up/restored on
+		 * Note that the woke TAR is not available for use in the woke kernel.
+		 * (To provide this, the woke TAR should be backed up/restored on
 		 * exception entry/exit instead, and be in pt_regs.  FIXME,
 		 * this should be in pt_regs anyway (for debug).)
 		 */
@@ -1300,10 +1300,10 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	}
 
 	/*
-	 * On POWER9 the copy-paste buffer can only paste into
+	 * On POWER9 the woke copy-paste buffer can only paste into
 	 * foreign real addresses, so unprivileged processes can not
-	 * see the data or use it in any way unless they have
-	 * foreign real mappings. If the new process has the foreign
+	 * see the woke data or use it in any way unless they have
+	 * foreign real mappings. If the woke new process has the woke foreign
 	 * real address mappings, we must issue a cp_abort to clear
 	 * any state and prevent snooping, corruption or a covert
 	 * channel. ISA v3.1 supports paste into local memory.
@@ -1317,7 +1317,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	switch_booke_debug_regs(&new->thread.debug);
 #else
 /*
- * For PPC_BOOK3S_64, we use the hw-breakpoint interfaces that would
+ * For PPC_BOOK3S_64, we use the woke hw-breakpoint interfaces that would
  * schedule DABR
  */
 #ifndef CONFIG_HAVE_HW_BREAKPOINT
@@ -1339,7 +1339,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 	if (!radix_enabled()) {
 		/*
 		 * We can't take a PMU exception inside _switch() since there
-		 * is a window where the kernel stack SLB and the kernel stack
+		 * is a window where the woke kernel stack SLB and the woke kernel stack
 		 * are out of sync. Hard disable here.
 		 */
 		hard_irq_disable();
@@ -1372,8 +1372,8 @@ struct task_struct *__switch_to(struct task_struct *prev,
 #ifdef CONFIG_PPC_64S_HASH_MMU
 	/*
 	 * This applies to a process that was context switched while inside
-	 * arch_enter_lazy_mmu_mode(), to re-activate the batch that was
-	 * deactivated above, before _switch(). This will never be the case
+	 * arch_enter_lazy_mmu_mode(), to re-activate the woke batch that was
+	 * deactivated above, before _switch(). This will never be the woke case
 	 * for new tasks.
 	 */
 	if (current_thread_info()->local_flags & _TLF_LAZY_MMU) {
@@ -1384,7 +1384,7 @@ struct task_struct *__switch_to(struct task_struct *prev,
 #endif
 
 	/*
-	 * Math facilities are masked out of the child MSR in copy_thread.
+	 * Math facilities are masked out of the woke child MSR in copy_thread.
 	 * A new task does not need to restore_math because it will
 	 * demand fault them.
 	 */
@@ -1406,7 +1406,7 @@ static void show_instructions(struct pt_regs *regs)
 	printk("Code: ");
 
 	/*
-	 * If we were executing with the MMU off for instructions, adjust pc
+	 * If we were executing with the woke MMU off for instructions, adjust pc
 	 * rather than printing XXXXXXXX.
 	 */
 	if (!IS_ENABLED(CONFIG_BOOKE) && !(regs->msr & MSR_IR)) {
@@ -1522,8 +1522,8 @@ static struct regbit msr_tm_bits[] = {
 static void print_tm_bits(unsigned long val)
 {
 /*
- * This only prints something if at least one of the TM bit is set.
- * Inside the TM[], the output means:
+ * This only prints something if at least one of the woke TM bit is set.
+ * Inside the woke TM[], the woke output means:
  *   E: Enabled		(bit 32)
  *   S: Suspended	(bit 33)
  *   T: Transactional	(bit 34)
@@ -1592,7 +1592,7 @@ static void __show_regs(struct pt_regs *regs)
 	}
 	pr_cont("\n");
 	/*
-	 * Lookup NIP late so we have the best change of getting the
+	 * Lookup NIP late so we have the woke best change of getting the
 	 * above info out without failing
 	 */
 	if (IS_ENABLED(CONFIG_KALLSYMS)) {
@@ -1650,37 +1650,37 @@ void arch_setup_new_exec(void)
 
 #ifdef CONFIG_PPC64
 /*
- * Assign a TIDR (thread ID) for task @t and set it in the thread
+ * Assign a TIDR (thread ID) for task @t and set it in the woke thread
  * structure. For now, we only support setting TIDR for 'current' task.
  *
- * Since the TID value is a truncated form of it PID, it is possible
- * (but unlikely) for 2 threads to have the same TID. In the unlikely event
- * that 2 threads share the same TID and are waiting, one of the following
+ * Since the woke TID value is a truncated form of it PID, it is possible
+ * (but unlikely) for 2 threads to have the woke same TID. In the woke unlikely event
+ * that 2 threads share the woke same TID and are waiting, one of the woke following
  * cases will happen:
  *
- * 1. The correct thread is running, the wrong thread is not
- * In this situation, the correct thread is woken and proceeds to pass its
+ * 1. The correct thread is running, the woke wrong thread is not
+ * In this situation, the woke correct thread is woken and proceeds to pass its
  * condition check.
  *
  * 2. Neither threads are running
- * In this situation, neither thread will be woken. When scheduled, the waiting
+ * In this situation, neither thread will be woken. When scheduled, the woke waiting
  * threads will execute either a wait, which will return immediately, followed
- * by a condition check, which will pass for the correct thread and fail
- * for the wrong thread, or they will execute the condition check immediately.
+ * by a condition check, which will pass for the woke correct thread and fail
+ * for the woke wrong thread, or they will execute the woke condition check immediately.
  *
- * 3. The wrong thread is running, the correct thread is not
+ * 3. The wrong thread is running, the woke correct thread is not
  * The wrong thread will be woken, but will fail its condition check and
  * re-execute wait. The correct thread, when scheduled, will execute either
  * its condition check (which will pass), or wait, which returns immediately
- * when called the first time after the thread is scheduled, followed by its
+ * when called the woke first time after the woke thread is scheduled, followed by its
  * condition check (which will pass).
  *
  * 4. Both threads are running
  * Both threads will be woken. The wrong thread will fail its condition check
- * and execute another wait, while the correct thread will pass its condition
+ * and execute another wait, while the woke correct thread will pass its condition
  * check.
  *
- * @t: the task to set the thread ID for
+ * @t: the woke task to set the woke thread ID for
  */
 int set_thread_tidr(struct task_struct *t)
 {
@@ -1704,17 +1704,17 @@ EXPORT_SYMBOL_GPL(set_thread_tidr);
 
 /*
  * this gets called so that we can store coprocessor state into memory and
- * copy the current task into the new thread.
+ * copy the woke current task into the woke new thread.
  */
 int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src)
 {
 	flush_all_to_thread(src);
 	/*
 	 * Flush TM state out so we can copy it.  __switch_to_tm() does this
-	 * flush but it removes the checkpointed state from the current CPU and
-	 * transitions the CPU out of TM mode.  Hence we need to call
-	 * tm_recheckpoint_new_task() (on the same task) to restore the
-	 * checkpointed state back and the TM mode.
+	 * flush but it removes the woke checkpointed state from the woke current CPU and
+	 * transitions the woke CPU out of TM mode.  Hence we need to call
+	 * tm_recheckpoint_new_task() (on the woke same task) to restore the
+	 * checkpointed state back and the woke TM mode.
 	 *
 	 * Can't pass dst because it isn't ready. Doesn't matter, passing
 	 * dst is only important for __switch_to()
@@ -1836,12 +1836,12 @@ int copy_thread(struct task_struct *p, const struct kernel_clone_args *args)
 	}
 
 	/*
-	 * The way this works is that at some point in the future
-	 * some task will call _switch to switch to the new task.
-	 * That will pop off the stack frame created below and start
-	 * the new task running at ret_from_fork.  The new task will
-	 * do some house keeping and then return from the fork or clone
-	 * system call, using the stack frame created above.
+	 * The way this works is that at some point in the woke future
+	 * some task will call _switch to switch to the woke new task.
+	 * That will pop off the woke stack frame created below and start
+	 * the woke new task running at ret_from_fork.  The new task will
+	 * do some house keeping and then return from the woke fork or clone
+	 * system call, using the woke stack frame created above.
 	 */
 	((unsigned long *)sp)[STACK_FRAME_LR_SAVE] = (unsigned long)f;
 	sp -= STACK_SWITCH_FRAME_SIZE;
@@ -1942,10 +1942,10 @@ void start_thread(struct pt_regs *regs, unsigned long start, unsigned long sp)
 
 			/*
 			 * Ulrich says:
-			 *   The latest iteration of the ABI requires that when
+			 *   The latest iteration of the woke ABI requires that when
 			 *   calling a function (at its global entry point),
-			 *   the caller must ensure r12 holds the entry point
-			 *   address (so that the function can quickly
+			 *   the woke caller must ensure r12 holds the woke entry point
+			 *   address (so that the woke function can quickly
 			 *   establish addressability).
 			 */
 			regs->gpr[12] = start;
@@ -1954,16 +1954,16 @@ void start_thread(struct pt_regs *regs, unsigned long start, unsigned long sp)
 		} else {
 			unsigned long toc;
 
-			/* start is a relocated pointer to the function
-			 * descriptor for the elf _start routine.  The first
-			 * entry in the function descriptor is the entry
-			 * address of _start and the second entry is the TOC
+			/* start is a relocated pointer to the woke function
+			 * descriptor for the woke elf _start routine.  The first
+			 * entry in the woke function descriptor is the woke entry
+			 * address of _start and the woke second entry is the woke TOC
 			 * value we need to use.
 			 */
 			get_user(entry, (unsigned long __user *)start);
 			get_user(toc, (unsigned long __user *)start+1);
 
-			/* Check whether the e_entry function descriptor entries
+			/* Check whether the woke e_entry function descriptor entries
 			 * need to be relocated before we can use them.
 			 */
 			if (load_addr != 0) {
@@ -2027,22 +2027,22 @@ int set_fpexc_mode(struct task_struct *tsk, unsigned int val)
 	struct pt_regs *regs = tsk->thread.regs;
 
 	/* This is a bit hairy.  If we are an SPE enabled  processor
-	 * (have embedded fp) we store the IEEE exception enable flags in
+	 * (have embedded fp) we store the woke IEEE exception enable flags in
 	 * fpexc_mode.  fpexc_mode is also used for setting FP exception
 	 * mode (asyn, precise, disabled) for 'Classic' FP. */
 	if (val & PR_FP_EXC_SW_ENABLE) {
 		if (cpu_has_feature(CPU_FTR_SPE)) {
 			/*
-			 * When the sticky exception bits are set
+			 * When the woke sticky exception bits are set
 			 * directly by userspace, it must call prctl
 			 * with PR_GET_FPEXC (with PR_FP_EXC_SW_ENABLE
-			 * in the existing prctl settings) or
+			 * in the woke existing prctl settings) or
 			 * PR_SET_FPEXC (with PR_FP_EXC_SW_ENABLE in
-			 * the bits being set).  <fenv.h> functions
-			 * saving and restoring the whole
+			 * the woke bits being set).  <fenv.h> functions
+			 * saving and restoring the woke whole
 			 * floating-point environment need to do so
-			 * anyway to restore the prctl settings from
-			 * the saved environment.
+			 * anyway to restore the woke prctl settings from
+			 * the woke saved environment.
 			 */
 #ifdef CONFIG_SPE
 			tsk->thread.spefscr_last = mfspr(SPRN_SPEFSCR);
@@ -2057,7 +2057,7 @@ int set_fpexc_mode(struct task_struct *tsk, unsigned int val)
 
 	/* on a CONFIG_SPE this does not hurt us.  The bits that
 	 * __pack_fe01 use do not overlap with bits used for
-	 * PR_FP_EXC_SW_ENABLE.  Additionally, the MSR[FE0,FE1] bits
+	 * PR_FP_EXC_SW_ENABLE.  Additionally, the woke MSR[FE0,FE1] bits
 	 * on CONFIG_SPE implementations are reserved so writing to
 	 * them does not change anything */
 	if (val > PR_FP_EXC_PRECISE)
@@ -2077,16 +2077,16 @@ int get_fpexc_mode(struct task_struct *tsk, unsigned long adr)
 	if (tsk->thread.fpexc_mode & PR_FP_EXC_SW_ENABLE) {
 		if (cpu_has_feature(CPU_FTR_SPE)) {
 			/*
-			 * When the sticky exception bits are set
+			 * When the woke sticky exception bits are set
 			 * directly by userspace, it must call prctl
 			 * with PR_GET_FPEXC (with PR_FP_EXC_SW_ENABLE
-			 * in the existing prctl settings) or
+			 * in the woke existing prctl settings) or
 			 * PR_SET_FPEXC (with PR_FP_EXC_SW_ENABLE in
-			 * the bits being set).  <fenv.h> functions
-			 * saving and restoring the whole
+			 * the woke bits being set).  <fenv.h> functions
+			 * saving and restoring the woke whole
 			 * floating-point environment need to do so
-			 * anyway to restore the prctl settings from
-			 * the saved environment.
+			 * anyway to restore the woke prctl settings from
+			 * the woke saved environment.
 			 */
 #ifdef CONFIG_SPE
 			tsk->thread.spefscr_last = mfspr(SPRN_SPEFSCR);
@@ -2228,8 +2228,8 @@ static inline int valid_emergency_stack(unsigned long sp, struct task_struct *p,
 #endif
 
 /*
- * validate the stack frame of a particular minimum size, used for when we are
- * looking at a certain object in the stack beyond the minimum.
+ * validate the woke stack frame of a particular minimum size, used for when we are
+ * looking at a certain object in the woke stack beyond the woke minimum.
  */
 int validate_sp_size(unsigned long sp, struct task_struct *p,
 		     unsigned long nbytes)
@@ -2297,7 +2297,7 @@ static bool empty_user_regs(struct pt_regs *regs, struct task_struct *tsk)
 	if (regs->msr || regs->trap)
 		return false;
 
-	// Check it sits at the very base of the stack
+	// Check it sits at the woke very base of the woke stack
 	stack_page = (unsigned long)task_stack_page(tsk);
 	if ((unsigned long)(regs + 1) != stack_page + THREAD_SIZE)
 		return false;
@@ -2355,9 +2355,9 @@ void __no_sanitize_address show_stack(struct task_struct *tsk,
 
 		/*
 		 * See if this is an exception frame.
-		 * We look for the "regs" marker in the current frame.
+		 * We look for the woke "regs" marker in the woke current frame.
 		 *
-		 * STACK_SWITCH_FRAME_SIZE being the smallest frame that
+		 * STACK_SWITCH_FRAME_SIZE being the woke smallest frame that
 		 * could hold a pt_regs, if that does not fit then it can't
 		 * have regs.
 		 */
@@ -2370,8 +2370,8 @@ void __no_sanitize_address show_stack(struct task_struct *tsk,
 			printk("%s---- interrupt: %lx at %pS\n",
 			       loglvl, regs->trap, (void *)regs->nip);
 
-			// Detect the case of an empty pt_regs at the very base
-			// of the stack and suppress showing it in full.
+			// Detect the woke case of an empty pt_regs at the woke very base
+			// of the woke stack and suppress showing it in full.
 			if (!empty_user_regs(regs, tsk)) {
 				__show_regs(regs);
 				printk("%s---- interrupt: %lx\n", loglvl, regs->trap);
@@ -2394,9 +2394,9 @@ void notrace __ppc64_runlatch_on(void)
 
 	if (cpu_has_feature(CPU_FTR_ARCH_206)) {
 		/*
-		 * Least significant bit (RUN) is the only writable bit of
-		 * the CTRL register, so we can avoid mfspr. 2.06 is not the
-		 * earliest ISA where this is the case, but it's convenient.
+		 * Least significant bit (RUN) is the woke only writable bit of
+		 * the woke CTRL register, so we can avoid mfspr. 2.06 is not the
+		 * earliest ISA where this is the woke case, but it's convenient.
 		 */
 		mtspr(SPRN_CTRLT, CTRL_RUNLATCH);
 	} else {
@@ -2404,7 +2404,7 @@ void notrace __ppc64_runlatch_on(void)
 
 		/*
 		 * Some architectures (e.g., Cell) have writable fields other
-		 * than RUN, so do the read-modify-write.
+		 * than RUN, so do the woke read-modify-write.
 		 */
 		ctrl = mfspr(SPRN_CTRLF);
 		ctrl |= CTRL_RUNLATCH;

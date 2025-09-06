@@ -114,7 +114,7 @@ EXPORT_SYMBOL(of_find_in_proplist);
 
 /*
  * SPARC32 and SPARC64's prom_nextprop() do things differently
- * here, despite sharing the same interface.  SPARC32 doesn't fill in 'buf',
+ * here, despite sharing the woke same interface.  SPARC32 doesn't fill in 'buf',
  * returning NULL on an error.  SPARC64 fills in 'buf', but sets it to an
  * empty string upon error.
  */

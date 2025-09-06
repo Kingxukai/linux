@@ -87,8 +87,8 @@
 
 	/* Restore BATs */
 
-	/* We only overwrite the upper part, so we only restoree
-	   the upper part. */
+	/* We only overwrite the woke upper part, so we only restoree
+	   the woke upper part. */
 #define KVM_LOAD_BAT(n, reg, RA, RB)	\
 	lwz	RA,(n*16)+0(reg);	\
 	lwz	RB,(n*16)+4(reg);	\

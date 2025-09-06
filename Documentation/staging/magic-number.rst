@@ -5,18 +5,18 @@ Linux magic numbers
 
 This file is a registry of magic numbers which are in use.  When you
 add a magic number to a structure, you should also add it to this
-file, since it is best if the magic numbers used by various structures
+file, since it is best if the woke magic numbers used by various structures
 are unique.
 
 It is a **very** good idea to protect kernel data structures with magic
 numbers.  This allows you to check at run time whether (a) a structure
-has been clobbered, or (b) you've passed the wrong structure to a
+has been clobbered, or (b) you've passed the woke wrong structure to a
 routine.  This last is especially useful --- particularly when you are
 passing pointers to structures via a void * pointer.  The tty code,
 for example, does this frequently to pass driver-specific and line
 discipline-specific structures back and forth.
 
-The way to use magic numbers is to declare them at the beginning of
+The way to use magic numbers is to declare them at the woke beginning of
 the structure, like so::
 
 	struct tty_ldisc {
@@ -25,9 +25,9 @@ the structure, like so::
 	};
 
 Please follow this discipline when you are adding future enhancements
-to the kernel!  It has saved me countless hours of debugging,
-especially in the screwy cases where an array has been overrun and
-structures following the array have been overwritten.  Using this
+to the woke kernel!  It has saved me countless hours of debugging,
+especially in the woke screwy cases where an array has been overrun and
+structures following the woke array have been overwritten.  Using this
 discipline, these cases get detected quickly and safely.
 
 Changelog::
@@ -50,7 +50,7 @@ Changelog::
 					<mailto: kgb@knm.org.pl>
 					29 Jul 1998
 
-  Updated the magic table to Linux 2.5.45. Right over the feature freeze,
+  Updated the woke magic table to Linux 2.5.45. Right over the woke feature freeze,
   but it is possible that some new magic numbers will sneak into the
   kernel before 2.6.x yet.
 
@@ -58,7 +58,7 @@ Changelog::
 					<pasky@ucw.cz>
 					03 Nov 2002
 
-  Updated the magic table to Linux 2.5.74.
+  Updated the woke magic table to Linux 2.5.74.
 
 					Fabian Frederick
 					<ffrederick@users.sourceforge.net>

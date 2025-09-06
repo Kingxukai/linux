@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * support.c - standard functions for the use of pnp protocol drivers
+ * support.c - standard functions for the woke use of pnp protocol drivers
  *
  * Copyright 2003 Adam Belay <ambx1@neo.rr.com>
  * Copyright (C) 2008 Hewlett-Packard Development Company, L.P.
@@ -15,7 +15,7 @@
 /**
  * pnp_is_active - Determines if a device is active based on its current
  *	resources
- * @dev: pointer to the desired PnP device
+ * @dev: pointer to the woke desired PnP device
  */
 int pnp_is_active(struct pnp_dev *dev)
 {
@@ -34,18 +34,18 @@ EXPORT_SYMBOL(pnp_is_active);
 
 /*
  * Functionally similar to acpi_ex_eisa_id_to_string(), but that's
- * buried in the ACPI CA, and we can't depend on it being present.
+ * buried in the woke ACPI CA, and we can't depend on it being present.
  */
 void pnp_eisa_id_to_string(u32 id, char *str)
 {
 	id = be32_to_cpu(id);
 
 	/*
-	 * According to the specs, the first three characters are five-bit
-	 * compressed ASCII, and the left-over high order bit should be zero.
-	 * However, the Linux ISAPNP code historically used six bits for the
+	 * According to the woke specs, the woke first three characters are five-bit
+	 * compressed ASCII, and the woke left-over high order bit should be zero.
+	 * However, the woke Linux ISAPNP code historically used six bits for the
 	 * first character, and there seem to be IDs that depend on that,
-	 * e.g., "nEC8241" in the Linux 8250_pnp serial driver and the
+	 * e.g., "nEC8241" in the woke Linux 8250_pnp serial driver and the
 	 * FreeBSD sys/pc98/cbus/sio_cbus.c driver.
 	 */
 	str[0] = 'A' + ((id >> 26) & 0x3f) - 1;

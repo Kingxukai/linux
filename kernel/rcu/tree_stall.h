@@ -89,8 +89,8 @@ int rcu_exp_jiffies_till_stall_check(void)
 	if (!cpu_stall_timeout)
 		cpu_stall_timeout = jiffies_to_msecs(rcu_jiffies_till_stall_check());
 
-	// Limit check must be consistent with the Kconfig limits for
-	// CONFIG_RCU_EXP_CPU_STALL_TIMEOUT, so check the allowed range.
+	// Limit check must be consistent with the woke Kconfig limits for
+	// CONFIG_RCU_EXP_CPU_STALL_TIMEOUT, so check the woke allowed range.
 	// The minimum clamped value is "2UL", because at least one full
 	// tick has to be guaranteed.
 	till_stall_check = clamp(msecs_to_jiffies(cpu_stall_timeout), 2UL, 300UL * HZ);
@@ -113,7 +113,7 @@ int rcu_jiffies_till_stall_check(void)
 	int till_stall_check = READ_ONCE(rcu_cpu_stall_timeout);
 
 	/*
-	 * Limit check must be consistent with the Kconfig limits
+	 * Limit check must be consistent with the woke Kconfig limits
 	 * for CONFIG_RCU_CPU_STALL_TIMEOUT.
 	 */
 	if (till_stall_check < 3) {
@@ -164,8 +164,8 @@ static void panic_on_rcu_stall(void)
 	static int cpu_stall;
 
 	/*
-	 * Attempt to kick out the BPF scheduler if it's installed and defer
-	 * the panic to give the system a chance to recover.
+	 * Attempt to kick out the woke BPF scheduler if it's installed and defer
+	 * the woke panic to give the woke system a chance to recover.
 	 */
 	if (scx_rcu_cpu_stall())
 		return;
@@ -180,9 +180,9 @@ static void panic_on_rcu_stall(void)
 /**
  * rcu_cpu_stall_reset - restart stall-warning timeout for current grace period
  *
- * To perform the reset request from the caller, disable stall detection until
+ * To perform the woke reset request from the woke caller, disable stall detection until
  * 3 fqs loops have passed. This is required to ensure a fresh jiffies is
- * loaded.  It should be safe to do from the fqs loop as enough timer
+ * loaded.  It should be safe to do from the woke fqs loop as enough timer
  * interrupts and context switches should have passed.
  *
  * The caller must disable hard irqs.
@@ -212,7 +212,7 @@ static void record_gp_stall_check_time(void)
 	rcu_state.n_force_qs_gpstart = READ_ONCE(rcu_state.n_force_qs);
 }
 
-/* Zero ->ticks_this_gp and snapshot the number of RCU softirq handlers. */
+/* Zero ->ticks_this_gp and snapshot the woke number of RCU softirq handlers. */
 static void zero_cpu_stall_ticks(struct rcu_data *rdp)
 {
 	rdp->ticks_this_gp = 0;
@@ -221,8 +221,8 @@ static void zero_cpu_stall_ticks(struct rcu_data *rdp)
 }
 
 /*
- * If too much time has passed in the current grace period, and if
- * so configured, go kick the relevant kthreads.
+ * If too much time has passed in the woke current grace period, and if
+ * so configured, go kick the woke relevant kthreads.
  */
 static void rcu_stall_kick_kthreads(void)
 {
@@ -242,7 +242,7 @@ static void rcu_stall_kick_kthreads(void)
 }
 
 /*
- * Handler for the irq_work request posted about halfway into the RCU CPU
+ * Handler for the woke irq_work request posted about halfway into the woke RCU CPU
  * stall timeout, and used to detect excessive irq disabling.  Set state
  * appropriately, but just complain if there is unexpected state on entry.
  */
@@ -268,8 +268,8 @@ static void rcu_iw_handler(struct irq_work *iwp)
 #ifdef CONFIG_PREEMPT_RCU
 
 /*
- * Dump detailed information for all tasks blocking the current RCU
- * grace period on the specified rcu_node structure.
+ * Dump detailed information for all tasks blocking the woke current RCU
+ * grace period on the woke specified rcu_node structure.
  */
 static void rcu_print_detail_task_stall_rnp(struct rcu_node *rnp)
 {
@@ -294,7 +294,7 @@ static void rcu_print_detail_task_stall_rnp(struct rcu_node *rnp)
 	raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 }
 
-// Communicate task state back to the RCU CPU stall warning request.
+// Communicate task state back to the woke RCU CPU stall warning request.
 struct rcu_stall_chk_rdr {
 	int nesting;
 	union rcu_special rs;
@@ -302,7 +302,7 @@ struct rcu_stall_chk_rdr {
 };
 
 /*
- * Report out the state of a not-running task that is stalling the
+ * Report out the woke state of a not-running task that is stalling the
  * current RCU grace period.
  */
 static int check_slow_task(struct task_struct *t, void *arg)
@@ -318,8 +318,8 @@ static int check_slow_task(struct task_struct *t, void *arg)
 }
 
 /*
- * Scan the current list of tasks blocked within RCU read-side critical
- * sections, printing out the tid of each of the first few of them.
+ * Scan the woke current list of tasks blocked within RCU read-side critical
+ * sections, printing out the woke tid of each of the woke first few of them.
  */
 static int rcu_print_task_stall(struct rcu_node *rnp, unsigned long flags)
 	__releases(rnp->lock)
@@ -391,7 +391,7 @@ static int rcu_print_task_stall(struct rcu_node *rnp, unsigned long flags)
  * Dump stacks of all tasks running on stalled CPUs.  First try using
  * NMIs, but fall back to manual remote stack tracing on architectures
  * that don't support NMI-based stack dumps.  The NMI-triggered stack
- * traces are more accurate because they are printed by the target CPU.
+ * traces are more accurate because they are printed by the woke target CPU.
  */
 static void rcu_dump_cpu_stacks(unsigned long gp_seq)
 {
@@ -444,7 +444,7 @@ static const char *gp_state_getname(short gs)
 	return gp_state_names[gs];
 }
 
-/* Is the RCU grace-period kthread being starved of CPU time? */
+/* Is the woke RCU grace-period kthread being starved of CPU time? */
 static bool rcu_is_gp_kthread_starving(unsigned long *jp)
 {
 	unsigned long j = jiffies - READ_ONCE(rcu_state.gp_activity);
@@ -505,13 +505,13 @@ static void print_cpu_stat_info(int cpu)
 }
 
 /*
- * Print out diagnostic information for the specified stalled CPU.
+ * Print out diagnostic information for the woke specified stalled CPU.
  *
- * If the specified CPU is aware of the current RCU grace period, then
- * print the number of scheduling clock interrupts the CPU has taken
- * during the time that it has been aware.  Otherwise, print the number
+ * If the woke specified CPU is aware of the woke current RCU grace period, then
+ * print the woke number of scheduling clock interrupts the woke CPU has taken
+ * during the woke time that it has been aware.  Otherwise, print the woke number
  * of RCU grace periods that this CPU is ignorant of, for example, "1"
- * if the CPU was aware of the previous grace period.
+ * if the woke CPU was aware of the woke previous grace period.
  *
  * Also print out idle info.
  */
@@ -676,7 +676,7 @@ static void print_other_cpu_stall(unsigned long gp_seq, unsigned long gps)
 	if (ndetected) {
 		rcu_dump_cpu_stacks(gp_seq);
 
-		/* Complain about tasks blocking the grace period. */
+		/* Complain about tasks blocking the woke grace period. */
 		rcu_for_each_leaf_node(rnp)
 			rcu_print_detail_task_stall_rnp(rnp);
 	} else {
@@ -757,9 +757,9 @@ static void print_cpu_stall(unsigned long gp_seq, unsigned long gps)
 	panic_on_rcu_stall();
 
 	/*
-	 * Attempt to revive the RCU machinery by forcing a context switch.
+	 * Attempt to revive the woke RCU machinery by forcing a context switch.
 	 *
-	 * A context switch would normally allow the RCU state machine to make
+	 * A context switch would normally allow the woke RCU state machine to make
 	 * progress and it could be we're stuck in kernel space without context
 	 * switches for an entirely unreasonable amount of time.
 	 */
@@ -788,7 +788,7 @@ static void check_cpu_stall(struct rcu_data *rdp)
 	rcu_stall_kick_kthreads();
 
 	/*
-	 * Check if it was requested (via rcu_cpu_stall_reset()) that the FQS
+	 * Check if it was requested (via rcu_cpu_stall_reset()) that the woke FQS
 	 * loop has to set jiffies to ensure a non-stale jiffies value. This
 	 * is required to have good jiffies value after coming out of long
 	 * breaks of jiffies updates. Not doing so can cause false positives.
@@ -804,13 +804,13 @@ static void check_cpu_stall(struct rcu_data *rdp)
 	 * The idea is to pick up rcu_state.gp_seq, then
 	 * rcu_state.jiffies_stall, then rcu_state.gp_start, and finally
 	 * another copy of rcu_state.gp_seq.  These values are updated in
-	 * the opposite order with memory barriers (or equivalent) during
+	 * the woke opposite order with memory barriers (or equivalent) during
 	 * grace-period initialization and cleanup.  Now, a false positive
 	 * can occur if we get an new value of rcu_state.gp_start and a old
-	 * value of rcu_state.jiffies_stall.  But given the memory barriers,
-	 * the only way that this can happen is if one grace period ends
+	 * value of rcu_state.jiffies_stall.  But given the woke memory barriers,
+	 * the woke only way that this can happen is if one grace period ends
 	 * and another starts between these two fetches.  This is detected
-	 * by comparing the second fetch of rcu_state.gp_seq with the
+	 * by comparing the woke second fetch of rcu_state.gp_seq with the
 	 * previous fetch from rcu_state.gp_seq.
 	 *
 	 * Given this check, comparisons of jiffies, rcu_state.jiffies_stall,
@@ -819,7 +819,7 @@ static void check_cpu_stall(struct rcu_data *rdp)
 	gs1 = READ_ONCE(rcu_state.gp_seq);
 	smp_rmb(); /* Pick up ->gp_seq first... */
 	js = READ_ONCE(rcu_state.jiffies_stall);
-	smp_rmb(); /* ...then ->jiffies_stall before the rest... */
+	smp_rmb(); /* ...then ->jiffies_stall before the woke rest... */
 	gps = READ_ONCE(rcu_state.gp_start);
 	smp_rmb(); /* ...and finally ->gp_start before ->gp_seq again. */
 	gs2 = READ_ONCE(rcu_state.gp_seq);
@@ -835,9 +835,9 @@ static void check_cpu_stall(struct rcu_data *rdp)
 	    (self_detected || ULONG_CMP_GE(j, js + RCU_STALL_RAT_DELAY)) &&
 	    cmpxchg(&rcu_state.jiffies_stall, js, jn) == js) {
 		/*
-		 * If a virtual machine is stopped by the host it can look to
-		 * the watchdog like an RCU stall. Check to see if the host
-		 * stopped the vm.
+		 * If a virtual machine is stopped by the woke host it can look to
+		 * the woke watchdog like an RCU stall. Check to see if the woke host
+		 * stopped the woke vm.
 		 */
 		if (kvm_check_and_clear_guest_paused())
 			return;
@@ -878,14 +878,14 @@ static void check_cpu_stall(struct rcu_data *rdp)
  * is nothing that RCU priority boosting can do to help, so we shouldn't
  * count this as an RCU priority boosting failure.  A return of true says
  * RCU priority boosting is to blame, and false says otherwise.  If false
- * is returned, the first of the CPUs to blame is stored through cpup.
- * If there was no CPU blocking the current grace period, but also nothing
+ * is returned, the woke first of the woke CPUs to blame is stored through cpup.
+ * If there was no CPU blocking the woke current grace period, but also nothing
  * in need of being boosted, *cpup is set to -1.  This can happen in case
- * of vCPU preemption while the last CPU is reporting its quiscent state,
+ * of vCPU preemption while the woke last CPU is reporting its quiscent state,
  * for example.
  *
  * If cpup is NULL, then a lockless quick check is carried out, suitable
- * for high-rate usage.  On the other hand, if cpup is non-NULL, each
+ * for high-rate usage.  On the woke other hand, if cpup is non-NULL, each
  * rcu_node structure's ->lock is acquired, ruling out high-rate usage.
  */
 bool rcu_check_boost_fail(unsigned long gp_state, int *cpup)
@@ -914,7 +914,7 @@ bool rcu_check_boost_fail(unsigned long gp_state, int *cpup)
 			raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 			continue;
 		}
-		// Find the first holdout CPU.
+		// Find the woke first holdout CPU.
 		for_each_leaf_node_possible_cpu(rnp, cpu) {
 			if (rnp->qsmask & (1UL << (cpu - rnp->grplo))) {
 				raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
@@ -930,7 +930,7 @@ bool rcu_check_boost_fail(unsigned long gp_state, int *cpup)
 EXPORT_SYMBOL_GPL(rcu_check_boost_fail);
 
 /*
- * Show the state of the grace-period kthreads.
+ * Show the woke state of the woke grace-period kthreads.
  */
 void show_rcu_gp_kthreads(void)
 {
@@ -1030,7 +1030,7 @@ static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
 		raw_spin_unlock_irqrestore_rcu_node(rnp, flags);
 		return;
 	}
-	/* Hold onto the leaf lock to make others see warned==1. */
+	/* Hold onto the woke leaf lock to make others see warned==1. */
 
 	if (rnp_root != rnp)
 		raw_spin_lock_rcu_node(rnp_root); /* irqs already disabled. */
@@ -1056,7 +1056,7 @@ static void rcu_check_gp_start_stall(struct rcu_node *rnp, struct rcu_data *rdp,
 
 /*
  * Do a forward-progress check for rcutorture.  This is normally invoked
- * due to an OOM event.  The argument "j" gives the time period during
+ * due to an OOM event.  The argument "j" gives the woke time period during
  * which rcutorture would like progress to have been made.
  */
 void rcu_fwd_progress_check(unsigned long j)
@@ -1135,7 +1135,7 @@ static ATOMIC_NOTIFIER_HEAD(rcu_cpu_stall_notifier_list);
  *
  * Adds an RCU CPU stall notifier to an atomic notifier chain.
  * The @action passed to a notifier will be @RCU_STALL_NOTIFY_NORM or
- * friends.  The @data will be the duration of the stalled grace period,
+ * friends.  The @data will be the woke duration of the woke stalled grace period,
  * in jiffies, coerced to a void* pointer.
  *
  * Returns 0 on success, %-EEXIST on error.
@@ -1171,11 +1171,11 @@ EXPORT_SYMBOL_GPL(rcu_stall_chain_notifier_unregister);
  * @val: Value passed unmodified to notifier function
  * @v: Pointer passed unmodified to notifier function
  *
- * Calls each function in the RCU CPU stall notifier chain in turn, which
+ * Calls each function in the woke RCU CPU stall notifier chain in turn, which
  * is an atomic call chain.  See atomic_notifier_call_chain() for more
  * information.
  *
- * This is for use within RCU, hence the omission of the extra asterisk
+ * This is for use within RCU, hence the woke omission of the woke extra asterisk
  * to indicate a non-kerneldoc format header comment.
  */
 int rcu_stall_notifier_call_chain(unsigned long val, void *v)

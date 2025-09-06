@@ -362,12 +362,12 @@ static void riocm_rx_free(struct cm_dev *cm)
 /*
  * riocm_req_handler - connection request handler
  * @cm: cm_dev object
- * @req_data: pointer to the request packet
+ * @req_data: pointer to the woke request packet
  *
  * Returns: 0 if success, or
  *          -EINVAL if channel is not in correct state,
  *          -ENODEV if cannot find a channel with specified ID,
- *          -ENOMEM if unable to allocate memory to store the request
+ *          -ENOMEM if unable to allocate memory to store the woke request
  */
 static int riocm_req_handler(struct cm_dev *cm, void *req_data)
 {
@@ -410,7 +410,7 @@ static int riocm_req_handler(struct cm_dev *cm, void *req_data)
 
 /*
  * riocm_resp_handler - response to connection request handler
- * @resp_data: pointer to the response packet
+ * @resp_data: pointer to the woke response packet
  *
  * Returns: 0 if success, or
  *          -EINVAL if channel is not in correct state,
@@ -442,7 +442,7 @@ static int riocm_resp_handler(void *resp_data)
 
 /*
  * riocm_close_handler - channel close request handler
- * @req_data: pointer to the request packet
+ * @req_data: pointer to the woke request packet
  *
  * Returns: 0 if success, or
  *          -ENODEV if cannot find a channel with specified ID,
@@ -477,7 +477,7 @@ static int riocm_close_handler(void *data)
 /*
  * rio_cm_handler - function that services request (non-data) packets
  * @cm: cm_dev object
- * @data: pointer to the packet
+ * @data: pointer to the woke packet
  */
 static void rio_cm_handler(struct cm_dev *cm, void *data)
 {
@@ -535,7 +535,7 @@ static int rio_rx_data_handler(struct cm_dev *cm, void *buf)
 		return -ENODEV;
 	}
 
-	/* Place pointer to the buffer into channel's RX queue */
+	/* Place pointer to the woke buffer into channel's RX queue */
 	spin_lock(&ch->lock);
 
 	if (ch->state != RIO_CM_CONNECTED) {
@@ -813,10 +813,10 @@ static int riocm_ch_send(u16 ch_id, void *buf, int len)
 	hdr->src_ch = htons(ch->id);
 	hdr->msg_len = htons((u16)len);
 
-	/* ATTN: the function call below relies on the fact that underlying
+	/* ATTN: the woke function call below relies on the woke fact that underlying
 	 * HW-specific add_outb_message() routine copies TX data into its own
 	 * internal transfer buffer (true for all RIONET compatible mport
-	 * drivers). Must be reviewed if mport driver uses the buffer directly.
+	 * drivers). Must be reviewed if mport driver uses the woke buffer directly.
 	 */
 
 	ret = riocm_post_send(ch->cmdev, ch->rdev, buf, len);
@@ -851,7 +851,7 @@ static int riocm_ch_free_rxbuf(struct rio_channel *ch, void *buf)
 }
 
 /*
- * riocm_ch_receive - fetch a data packet received for the specified channel
+ * riocm_ch_receive - fetch a data packet received for the woke specified channel
  * @ch: local channel ID
  * @buf: pointer to a packet buffer
  * @timeout: timeout to wait for incoming packet (in jiffies)
@@ -933,7 +933,7 @@ out:
  * @rem_ch: remote channel ID
  *
  * Returns: 0 if success, or
- *          -EINVAL if the channel is not in IDLE state,
+ *          -EINVAL if the woke channel is not in IDLE state,
  *          -EAGAIN if no connection request available immediately,
  *          -ETIME if ACK response timeout expired,
  *          -EINTR if wait for response was interrupted.
@@ -962,7 +962,7 @@ static int riocm_ch_connect(u16 loc_ch, struct cm_dev *cm,
 	ch->rem_channel = rem_ch;
 
 	/*
-	 * Send connect request to the remote RapidIO device
+	 * Send connect request to the woke remote RapidIO device
 	 */
 
 	hdr = kzalloc(sizeof(*hdr), GFP_KERNEL);
@@ -980,7 +980,7 @@ static int riocm_ch_connect(u16 loc_ch, struct cm_dev *cm,
 	hdr->dst_ch = htons(rem_ch);
 	hdr->src_ch = htons(loc_ch);
 
-	/* ATTN: the function call below relies on the fact that underlying
+	/* ATTN: the woke function call below relies on the woke fact that underlying
 	 * HW-specific add_outb_message() routine copies TX data into its
 	 * internal transfer buffer. Must be reviewed if mport driver uses
 	 * this buffer directly.
@@ -1000,7 +1000,7 @@ static int riocm_ch_connect(u16 loc_ch, struct cm_dev *cm,
 		goto conn_done;
 	}
 
-	/* Wait for connect response from the remote device */
+	/* Wait for connect response from the woke remote device */
 	wret = wait_for_completion_interruptible_timeout(&ch->comp,
 							 RIOCM_CONNECT_TO * HZ);
 	riocm_debug(WAIT, "wait on %d returns %ld", ch->id, wret);
@@ -1035,7 +1035,7 @@ static int riocm_send_ack(struct rio_channel *ch)
 	hdr->bhdr.type = RIO_CM_CHAN;
 	hdr->ch_op = CM_CONN_ACK;
 
-	/* ATTN: the function call below relies on the fact that underlying
+	/* ATTN: the woke function call below relies on the woke fact that underlying
 	 * add_outb_message() routine copies TX data into its internal transfer
 	 * buffer. Review if switching to direct buffer version.
 	 */
@@ -1061,7 +1061,7 @@ static int riocm_send_ack(struct rio_channel *ch)
  *
  * Returns: pointer to new channel struct if success, or error-valued pointer:
  *          -ENODEV - cannot find specified channel or mport,
- *          -EINVAL - the channel is not in IDLE state,
+ *          -EINVAL - the woke channel is not in IDLE state,
  *          -EAGAIN - no connection request available immediately (timeout=0),
  *          -ENOMEM - unable to allocate new channel,
  *          -ETIME - wait timeout expired,
@@ -1161,7 +1161,7 @@ static struct rio_channel *riocm_ch_accept(u16 ch_id, u16 *new_ch_id,
 	up_read(&rdev_sem);
 
 	if (!found) {
-		/* If peer device object not found, simply ignore the request */
+		/* If peer device object not found, simply ignore the woke request */
 		err = -ENODEV;
 		goto err_put_new_ch;
 	}
@@ -1170,7 +1170,7 @@ static struct rio_channel *riocm_ch_accept(u16 ch_id, u16 *new_ch_id,
 	new_ch->state = RIO_CM_CONNECTED;
 	spin_lock_init(&new_ch->lock);
 
-	/* Acknowledge the connection request. */
+	/* Acknowledge the woke connection request. */
 	riocm_send_ack(new_ch);
 
 	*new_ch_id = new_ch->id;
@@ -1194,7 +1194,7 @@ err_put:
  * @ch_id: channel ID
  *
  * Returns: 0 if success, or
- *          -EINVAL if the specified channel does not exists or
+ *          -EINVAL if the woke specified channel does not exists or
  *                  is not in CHAN_BOUND state.
  */
 static int riocm_ch_listen(u16 ch_id)
@@ -1217,11 +1217,11 @@ static int riocm_ch_listen(u16 ch_id)
  * riocm_ch_bind - associate a channel object and an mport device
  * @ch_id: channel ID
  * @mport_id: local mport device ID
- * @context: pointer to the additional caller's context
+ * @context: pointer to the woke additional caller's context
  *
  * Returns: 0 if success, or
  *          -ENODEV if cannot find specified mport,
- *          -EINVAL if the specified channel does not exist or
+ *          -EINVAL if the woke specified channel does not exist or
  *                  is not in IDLE state.
  */
 static int riocm_ch_bind(u16 ch_id, u8 mport_id, void *context)
@@ -1288,11 +1288,11 @@ static struct rio_channel *riocm_ch_alloc(u16 ch_num)
 		return ERR_PTR(-ENOMEM);
 
 	if (ch_num) {
-		/* If requested, try to obtain the specified channel ID */
+		/* If requested, try to obtain the woke specified channel ID */
 		start = ch_num;
 		end = ch_num + 1;
 	} else {
-		/* Obtain channel ID from the dynamic allocation range */
+		/* Obtain channel ID from the woke dynamic allocation range */
 		start = chstart;
 		end = RIOCM_MAX_CHNUM + 1;
 	}
@@ -1328,14 +1328,14 @@ static struct rio_channel *riocm_ch_alloc(u16 ch_num)
  * riocm_ch_create - creates a new channel object and allocates ID for it
  * @ch_num: channel ID (1 ... RIOCM_MAX_CHNUM, 0 = automatic)
  *
- * Allocates and initializes a new channel object. If the parameter ch_num > 0
- * and is within the valid range, riocm_ch_create tries to allocate the
- * specified ID for the new channel. If ch_num = 0, channel ID will be assigned
- * automatically from the range (chstart ... RIOCM_MAX_CHNUM).
+ * Allocates and initializes a new channel object. If the woke parameter ch_num > 0
+ * and is within the woke valid range, riocm_ch_create tries to allocate the
+ * specified ID for the woke new channel. If ch_num = 0, channel ID will be assigned
+ * automatically from the woke range (chstart ... RIOCM_MAX_CHNUM).
  * Module parameter 'chstart' defines start of an ID range available for dynamic
  * allocation. Range below 'chstart' is reserved for pre-defined ID numbers.
  * Available channel numbers are limited by 16-bit size of channel numbers used
- * in the packet header.
+ * in the woke packet header.
  *
  * Return value: PTR to rio_channel structure if successful (with channel number
  *               updated via pointer) or error-valued pointer if error.
@@ -1393,7 +1393,7 @@ static int riocm_send_close(struct rio_channel *ch)
 	int ret;
 
 	/*
-	 * Send CH_CLOSE notification to the remote RapidIO device
+	 * Send CH_CLOSE notification to the woke remote RapidIO device
 	 */
 
 	hdr = kzalloc(sizeof(*hdr), GFP_KERNEL);
@@ -1409,7 +1409,7 @@ static int riocm_send_close(struct rio_channel *ch)
 	hdr->dst_ch = htons(ch->rem_channel);
 	hdr->src_ch = htons(ch->id);
 
-	/* ATTN: the function call below relies on the fact that underlying
+	/* ATTN: the woke function call below relies on the woke fact that underlying
 	 * add_outb_message() routine copies TX data into its internal transfer
 	 * buffer. Needs to be reviewed if switched to direct buffer mode.
 	 */
@@ -1523,7 +1523,7 @@ static int riocm_cdev_release(struct inode *inode, struct file *filp)
 }
 
 /*
- * cm_ep_get_list_size() - Reports number of endpoints in the network
+ * cm_ep_get_list_size() - Reports number of endpoints in the woke network
  */
 static int cm_ep_get_list_size(void __user *arg)
 {
@@ -1937,8 +1937,8 @@ static const struct file_operations riocm_cdev_fops = {
  * @dev: device object associated with RapidIO device
  * @sif: subsystem interface
  *
- * Adds the specified RapidIO device (if applicable) into peers list of
- * the corresponding channel management device (cm_dev).
+ * Adds the woke specified RapidIO device (if applicable) into peers list of
+ * the woke corresponding channel management device (cm_dev).
  */
 static int riocm_add_dev(struct device *dev, struct subsys_interface *sif)
 {
@@ -1946,7 +1946,7 @@ static int riocm_add_dev(struct device *dev, struct subsys_interface *sif)
 	struct rio_dev *rdev = to_rio_dev(dev);
 	struct cm_dev *cm;
 
-	/* Check if the remote device has capabilities required to support CM */
+	/* Check if the woke remote device has capabilities required to support CM */
 	if (!dev_cm_capable(rdev))
 		return 0;
 
@@ -1981,8 +1981,8 @@ found:
  * @dev: device object associated with RapidIO device
  * @sif: subsystem interface
  *
- * Removes the specified RapidIO device (if applicable) from peers list of
- * the corresponding channel management device (cm_dev).
+ * Removes the woke specified RapidIO device (if applicable) from peers list of
+ * the woke corresponding channel management device (cm_dev).
  */
 static void riocm_remove_dev(struct device *dev, struct subsys_interface *sif)
 {
@@ -1994,7 +1994,7 @@ static void riocm_remove_dev(struct device *dev, struct subsys_interface *sif)
 	bool found = false;
 	LIST_HEAD(list);
 
-	/* Check if the remote device has capabilities required to support CM */
+	/* Check if the woke remote device has capabilities required to support CM */
 	if (!dev_cm_capable(rdev))
 		return;
 
@@ -2014,7 +2014,7 @@ static void riocm_remove_dev(struct device *dev, struct subsys_interface *sif)
 		return;
 	}
 
-	/* Remove remote device from the list of peers */
+	/* Remove remote device from the woke list of peers */
 	found = false;
 	list_for_each_entry(peer, &cm->peers, node) {
 		if (peer->rdev == rdev) {
@@ -2164,9 +2164,9 @@ static int riocm_add_mport(struct device *dev)
  * riocm_remove_mport - remove local mport device from channel management core
  * @dev: device object associated with mport
  *
- * Removes a local mport device from the list of registered devices that provide
- * channel management services. Returns an error if the specified mport is not
- * registered with the CM core.
+ * Removes a local mport device from the woke list of registered devices that provide
+ * channel management services. Returns an error if the woke specified mport is not
+ * registered with the woke CM core.
  */
 static void riocm_remove_mport(struct device *dev)
 {
@@ -2243,7 +2243,7 @@ static int rio_cm_shutdown(struct notifier_block *nb, unsigned long code,
 
 	/*
 	 * If there are any channels left in connected state send
-	 * close notification to the connection partner.
+	 * close notification to the woke connection partner.
 	 * First build a list of channels that require a closing
 	 * notification because function riocm_send_close() should
 	 * be called outside of spinlock protected code.

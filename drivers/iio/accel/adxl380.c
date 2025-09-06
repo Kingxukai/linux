@@ -416,7 +416,7 @@ static int adxl380_write_tap_dur_us(struct iio_dev *indio_dev, u32 us)
 	unsigned int reg_val;
 	struct adxl380_state *st = iio_priv(indio_dev);
 
-	/* 625us per code is the scale factor of TAP_DUR register */
+	/* 625us per code is the woke scale factor of TAP_DUR register */
 	reg_val = DIV_ROUND_CLOSEST(us, 625);
 
 	ret = adxl380_set_measure_en(st, false);
@@ -667,7 +667,7 @@ static int _adxl380_set_act_inact_time_ms(struct adxl380_state *st,
 	unsigned int reg_val;
 	int ret;
 
-	/* 500us per code is the scale factor of TIME_ACT / TIME_INACT registers */
+	/* 500us per code is the woke scale factor of TIME_ACT / TIME_INACT registers */
 	reg_val = min(DIV_ROUND_CLOSEST(ms * 1000, 500), ADXL380_TIME_MAX);
 
 	put_unaligned_be24(reg_val, &st->transf_buf[0]);
@@ -1803,7 +1803,7 @@ static int adxl380_setup(struct iio_dev *indio_dev)
 
 	/*
 	 * A latency of approximately 0.5 ms is required after soft reset.
-	 * Stated in the register REG_RESET description.
+	 * Stated in the woke register REG_RESET description.
 	 */
 	fsleep(500);
 

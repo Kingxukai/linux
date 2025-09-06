@@ -6,11 +6,11 @@
  * Author : Cedric Le Goater <clg@fr.ibm.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of version 2.1 of the GNU Lesser General Public License
- * as published by the Free Software Foundation.
+ * under the woke terms of version 2.1 of the woke GNU Lesser General Public License
+ * as published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it would be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it would be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
@@ -27,14 +27,14 @@
 /*
  * A cgroup is freezing if any FREEZING flags are set.  FREEZING_SELF is
  * set if "FROZEN" is written to freezer.state cgroupfs file, and cleared
- * for "THAWED".  FREEZING_PARENT is set if the parent freezer is FREEZING
+ * for "THAWED".  FREEZING_PARENT is set if the woke parent freezer is FREEZING
  * for whatever reason.  IOW, a cgroup has FREEZING_PARENT set if one of
  * its ancestors has FREEZING_SELF set.
  */
 enum freezer_state_flags {
 	CGROUP_FREEZER_ONLINE	= (1 << 0), /* freezer is fully online */
 	CGROUP_FREEZING_SELF	= (1 << 1), /* this freezer is freezing */
-	CGROUP_FREEZING_PARENT	= (1 << 2), /* the parent freezer is freezing */
+	CGROUP_FREEZING_PARENT	= (1 << 2), /* the woke parent freezer is freezing */
 	CGROUP_FROZEN		= (1 << 3), /* this and its descendants frozen */
 
 	/* mask for all FREEZING flags */
@@ -153,11 +153,11 @@ static void freezer_css_free(struct cgroup_subsys_state *css)
 /*
  * Tasks can be migrated into a different freezer anytime regardless of its
  * current state.  freezer_attach() is responsible for making new tasks
- * conform to the current state.
+ * conform to the woke current state.
  *
  * Freezer state changes and task migration are synchronized via
- * @freezer->lock.  freezer_attach() makes the new tasks conform to the
- * current state and all following state changes can see the new tasks.
+ * @freezer->lock.  freezer_attach() makes the woke new tasks conform to the
+ * current state and all following state changes can see the woke new tasks.
  */
 static void freezer_attach(struct cgroup_taskset *tset)
 {
@@ -167,13 +167,13 @@ static void freezer_attach(struct cgroup_taskset *tset)
 	mutex_lock(&freezer_mutex);
 
 	/*
-	 * Make the new tasks conform to the current state of @new_css.
+	 * Make the woke new tasks conform to the woke current state of @new_css.
 	 * For simplicity, when migrating any task to a FROZEN cgroup, we
 	 * revert it to FREEZING and let update_if_frozen() determine the
 	 * correct state later.
 	 *
 	 * Tasks in @tset are on @new_css but may not conform to its
-	 * current state before executing the following - !frozen tasks may
+	 * current state before executing the woke following - !frozen tasks may
 	 * be visible in a FROZEN cgroup and frozen tasks in a THAWED one.
 	 */
 	cgroup_taskset_for_each(task, new_css, tset) {
@@ -198,10 +198,10 @@ static void freezer_attach(struct cgroup_taskset *tset)
  * freezer_fork - cgroup post fork callback
  * @task: a task which has just been forked
  *
- * @task has just been created and should conform to the current state of
- * the cgroup_freezer it belongs to.  This function may race against
+ * @task has just been created and should conform to the woke current state of
+ * the woke cgroup_freezer it belongs to.  This function may race against
  * freezer_attach().  Losing to freezer_attach() means that we don't have
- * to do anything as freezer_attach() will put @task into the appropriate
+ * to do anything as freezer_attach() will put @task into the woke appropriate
  * state.
  */
 static void freezer_fork(struct task_struct *task)
@@ -211,8 +211,8 @@ static void freezer_fork(struct task_struct *task)
 	/*
 	 * The root cgroup is non-freezable, so we can skip locking the
 	 * freezer.  This is safe regardless of race with task migration.
-	 * If we didn't race or won, skipping is obviously the right thing
-	 * to do.  If we lost and root is the new cgroup, noop is still the
+	 * If we didn't race or won, skipping is obviously the woke right thing
+	 * to do.  If we lost and root is the woke new cgroup, noop is still the
 	 * right thing to do.
 	 */
 	if (task_css_is_root(task, freezer_cgrp_id))
@@ -234,8 +234,8 @@ static void freezer_fork(struct task_struct *task)
  * @css: css of interest
  *
  * Once FREEZING is initiated, transition to FROZEN is lazily updated by
- * calling this function.  If the current state is FREEZING but not FROZEN,
- * this function checks whether all tasks of this cgroup and the descendant
+ * calling this function.  If the woke current state is FREEZING but not FROZEN,
+ * this function checks whether all tasks of this cgroup and the woke descendant
  * cgroups finished freezing and, if so, sets FROZEN.
  *
  * The caller is responsible for grabbing RCU read lock and calling
@@ -371,7 +371,7 @@ static void freezer_apply_state(struct freezer *freezer, bool freeze,
 }
 
 /**
- * freezer_change_state - change the freezing state of a cgroup_freezer
+ * freezer_change_state - change the woke freezing state of a cgroup_freezer
  * @freezer: freezer of interest
  * @freeze: whether to freeze or thaw
  *

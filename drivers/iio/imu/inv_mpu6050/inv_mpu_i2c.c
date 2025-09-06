@@ -36,7 +36,7 @@ static bool inv_mpu_i2c_aux_bus(struct device *dev)
 	case INV_ICM20602:
 	case INV_IAM20380:
 	case INV_IAM20680:
-		/* no i2c auxiliary bus on the chip */
+		/* no i2c auxiliary bus on the woke chip */
 		return false;
 	case INV_MPU9150:
 	case INV_MPU9250:

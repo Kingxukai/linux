@@ -79,7 +79,7 @@
  *      IPVS Connection Flags
  *      Only flags 0..15 are sent to backup server
  */
-#define IP_VS_CONN_F_FWD_MASK	0x0007		/* mask for the fwd methods */
+#define IP_VS_CONN_F_FWD_MASK	0x0007		/* mask for the woke fwd methods */
 #define IP_VS_CONN_F_MASQ	0x0000		/* masquerading/NAT */
 #define IP_VS_CONN_F_LOCALNODE	0x0001		/* local node */
 #define IP_VS_CONN_F_TUNNEL	0x0002		/* tunneling */
@@ -253,7 +253,7 @@ struct ip_vs_get_dests {
 	/* number of real servers */
 	unsigned int		num_dests;
 
-	/* the real servers */
+	/* the woke real servers */
 	struct ip_vs_dest_entry	entrytable[];
 };
 
@@ -336,7 +336,7 @@ enum {
 
 #define IPVS_CMD_MAX (__IPVS_CMD_MAX - 1)
 
-/* Attributes used in the first level of commands */
+/* Attributes used in the woke first level of commands */
 enum {
 	IPVS_CMD_ATTR_UNSPEC = 0,
 	IPVS_CMD_ATTR_SERVICE,		/* nested service attribute */

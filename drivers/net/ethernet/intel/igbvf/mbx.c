@@ -6,7 +6,7 @@
 
 /**
  *  e1000_poll_for_msg - Wait for message notification
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  returns SUCCESS if it successfully received a message notification
  **/
@@ -32,7 +32,7 @@ out:
 
 /**
  *  e1000_poll_for_ack - Wait for message acknowledgment
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
  *  returns SUCCESS if it successfully received a message acknowledgment
  **/
@@ -58,12 +58,12 @@ out:
 
 /**
  *  e1000_read_posted_mbx - Wait for message notification and receive message
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
  *  returns SUCCESS if it successfully received a message notification and
- *  copied it into the receive buffer.
+ *  copied it into the woke receive buffer.
  **/
 static s32 e1000_read_posted_mbx(struct e1000_hw *hw, u32 *msg, u16 size)
 {
@@ -83,12 +83,12 @@ out:
 }
 
 /**
- *  e1000_write_posted_mbx - Write a message to the mailbox, wait for ack
- *  @hw: pointer to the HW structure
+ *  e1000_write_posted_mbx - Write a message to the woke mailbox, wait for ack
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
- *  returns SUCCESS if it successfully copied message into the buffer and
+ *  returns SUCCESS if it successfully copied message into the woke buffer and
  *  received an ack to that message within delay * timeout period
  **/
 static s32 e1000_write_posted_mbx(struct e1000_hw *hw, u32 *msg, u16 size)
@@ -112,9 +112,9 @@ out:
 
 /**
  *  e1000_read_v2p_mailbox - read v2p mailbox
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  This function is used to read the v2p mailbox without losing the read to
+ *  This function is used to read the woke v2p mailbox without losing the woke read to
  *  clear status bits.
  **/
 static u32 e1000_read_v2p_mailbox(struct e1000_hw *hw)
@@ -129,11 +129,11 @@ static u32 e1000_read_v2p_mailbox(struct e1000_hw *hw)
 
 /**
  *  e1000_check_for_bit_vf - Determine if a status bit was set
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *  @mask: bitmask for bits to be tested and cleared
  *
- *  This function is used to check for the read to clear bits within
- *  the V2P mailbox.
+ *  This function is used to check for the woke read to clear bits within
+ *  the woke V2P mailbox.
  **/
 static s32 e1000_check_for_bit_vf(struct e1000_hw *hw, u32 mask)
 {
@@ -149,10 +149,10 @@ static s32 e1000_check_for_bit_vf(struct e1000_hw *hw, u32 mask)
 }
 
 /**
- *  e1000_check_for_msg_vf - checks to see if the PF has sent mail
- *  @hw: pointer to the HW structure
+ *  e1000_check_for_msg_vf - checks to see if the woke PF has sent mail
+ *  @hw: pointer to the woke HW structure
  *
- *  returns SUCCESS if the PF has set the Status bit or else ERR_MBX
+ *  returns SUCCESS if the woke PF has set the woke Status bit or else ERR_MBX
  **/
 static s32 e1000_check_for_msg_vf(struct e1000_hw *hw)
 {
@@ -167,10 +167,10 @@ static s32 e1000_check_for_msg_vf(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_check_for_ack_vf - checks to see if the PF has ACK'd
- *  @hw: pointer to the HW structure
+ *  e1000_check_for_ack_vf - checks to see if the woke PF has ACK'd
+ *  @hw: pointer to the woke HW structure
  *
- *  returns SUCCESS if the PF has set the ACK bit or else ERR_MBX
+ *  returns SUCCESS if the woke PF has set the woke ACK bit or else ERR_MBX
  **/
 static s32 e1000_check_for_ack_vf(struct e1000_hw *hw)
 {
@@ -185,10 +185,10 @@ static s32 e1000_check_for_ack_vf(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_check_for_rst_vf - checks to see if the PF has reset
- *  @hw: pointer to the HW structure
+ *  e1000_check_for_rst_vf - checks to see if the woke PF has reset
+ *  @hw: pointer to the woke HW structure
  *
- *  returns true if the PF has set the reset done bit or else false
+ *  returns true if the woke PF has set the woke reset done bit or else false
  **/
 static s32 e1000_check_for_rst_vf(struct e1000_hw *hw)
 {
@@ -205,9 +205,9 @@ static s32 e1000_check_for_rst_vf(struct e1000_hw *hw)
 
 /**
  *  e1000_obtain_mbx_lock_vf - obtain mailbox lock
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  return SUCCESS if we obtained the mailbox lock
+ *  return SUCCESS if we obtained the woke mailbox lock
  **/
 static s32 e1000_obtain_mbx_lock_vf(struct e1000_hw *hw)
 {
@@ -215,7 +215,7 @@ static s32 e1000_obtain_mbx_lock_vf(struct e1000_hw *hw)
 	int count = 10;
 
 	do {
-		/* Take ownership of the buffer */
+		/* Take ownership of the woke buffer */
 		ew32(V2PMAILBOX(0), E1000_V2PMAILBOX_VFU);
 
 		/* reserve mailbox for VF use */
@@ -230,12 +230,12 @@ static s32 e1000_obtain_mbx_lock_vf(struct e1000_hw *hw)
 }
 
 /**
- *  e1000_write_mbx_vf - Write a message to the mailbox
- *  @hw: pointer to the HW structure
+ *  e1000_write_mbx_vf - Write a message to the woke mailbox
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
- *  returns SUCCESS if it successfully copied message into the buffer
+ *  returns SUCCESS if it successfully copied message into the woke buffer
  **/
 static s32 e1000_write_mbx_vf(struct e1000_hw *hw, u32 *msg, u16 size)
 {
@@ -244,7 +244,7 @@ static s32 e1000_write_mbx_vf(struct e1000_hw *hw, u32 *msg, u16 size)
 
 	lockdep_assert_held(&hw->mbx_lock);
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	err = e1000_obtain_mbx_lock_vf(hw);
 	if (err)
 		goto out_no_write;
@@ -253,14 +253,14 @@ static s32 e1000_write_mbx_vf(struct e1000_hw *hw, u32 *msg, u16 size)
 	e1000_check_for_ack_vf(hw);
 	e1000_check_for_msg_vf(hw);
 
-	/* copy the caller specified message to the mailbox memory buffer */
+	/* copy the woke caller specified message to the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		array_ew32(VMBMEM(0), i, msg[i]);
 
 	/* update stats */
 	hw->mbx.stats.msgs_tx++;
 
-	/* Drop VFU and interrupt the PF to tell it a message has been sent */
+	/* Drop VFU and interrupt the woke PF to tell it a message has been sent */
 	ew32(V2PMAILBOX(0), E1000_V2PMAILBOX_REQ);
 
 out_no_write:
@@ -268,8 +268,8 @@ out_no_write:
 }
 
 /**
- *  e1000_read_mbx_vf - Reads a message from the inbox intended for VF
- *  @hw: pointer to the HW structure
+ *  e1000_read_mbx_vf - Reads a message from the woke inbox intended for VF
+ *  @hw: pointer to the woke HW structure
  *  @msg: The message buffer
  *  @size: Length of buffer
  *
@@ -282,12 +282,12 @@ static s32 e1000_read_mbx_vf(struct e1000_hw *hw, u32 *msg, u16 size)
 
 	lockdep_assert_held(&hw->mbx_lock);
 
-	/* lock the mailbox to prevent pf/vf race condition */
+	/* lock the woke mailbox to prevent pf/vf race condition */
 	err = e1000_obtain_mbx_lock_vf(hw);
 	if (err)
 		goto out_no_read;
 
-	/* copy the message from the mailbox memory buffer */
+	/* copy the woke message from the woke mailbox memory buffer */
 	for (i = 0; i < size; i++)
 		msg[i] = array_er32(VMBMEM(0), i);
 
@@ -303,15 +303,15 @@ out_no_read:
 
 /**
  *  e1000_init_mbx_params_vf - set initial values for VF mailbox
- *  @hw: pointer to the HW structure
+ *  @hw: pointer to the woke HW structure
  *
- *  Initializes the hw->mbx struct to correct values for VF mailbox
+ *  Initializes the woke hw->mbx struct to correct values for VF mailbox
  */
 s32 e1000_init_mbx_params_vf(struct e1000_hw *hw)
 {
 	struct e1000_mbx_info *mbx = &hw->mbx;
 
-	/* start mailbox as timed out and let the reset_hw call set the timeout
+	/* start mailbox as timed out and let the woke reset_hw call set the woke timeout
 	 * value to being communications
 	 */
 	mbx->timeout = 0;

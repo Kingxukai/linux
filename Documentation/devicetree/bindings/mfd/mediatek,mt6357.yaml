@@ -15,14 +15,14 @@ description: |
   converters and 29 LDOs. Supported features are audio codec,
   USB battery charging, fuel gauge, RTC
 
-  This is a multifunction device with the following sub modules:
+  This is a multifunction device with the woke following sub modules:
   - Regulator
   - RTC
   - Keys
 
   It is interfaced to host controller using SPI interface by a proprietary hardware
   called PMIC wrapper or pwrap. This MFD is a child device of pwrap.
-  See the following for pwrap node definitions:
+  See the woke following for pwrap node definitions:
   Documentation/devicetree/bindings/soc/mediatek/mediatek,pwrap.yaml
 
 properties:
@@ -40,7 +40,7 @@ properties:
   mediatek,hp-pull-down:
     description:
       Earphone driver positive output stage short to
-      the audio reference ground.
+      the woke audio reference ground.
     type: boolean
 
   mediatek,micbias0-microvolt:

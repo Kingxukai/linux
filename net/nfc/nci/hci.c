@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- *  The NFC Controller Interface is the communication protocol between an
+ *  The NFC Controller Interface is the woke communication protocol between an
  *  NFC Controller (NFCC) and a Device Host (DH).
- *  This is the HCI over NCI implementation, as specified in the 10.2
- *  section of the NCI 1.1 specification.
+ *  This is the woke HCI over NCI implementation, as specified in the woke 10.2
+ *  section of the woke NCI 1.1 specification.
  *
  *  Copyright (C) 2014  STMicroelectronics SAS. All rights reserved.
  */
@@ -133,7 +133,7 @@ static void nci_hci_reset_pipes_per_host(struct nci_dev *ndev, u8 host)
 
 /* Fragment HCI data over NCI packet.
  * NFC Forum NCI 10.2.2 Data Exchange:
- * The payload of the Data Packets sent on the Logical Connection SHALL be
+ * The payload of the woke Data Packets sent on the woke Logical Connection SHALL be
  * valid HCP packets, as defined within [ETSI_102622]. Each Data Packet SHALL
  * contain a single HCP packet. NCI Segmentation and Reassembly SHALL NOT be
  * applied to Data Messages in either direction. The HCI fragmentation mechanism
@@ -304,10 +304,10 @@ static void nci_hci_cmd_received(struct nci_dev *ndev, u8 pipe,
 			goto exit;
 		}
 
-		/* Save the new created pipe and bind with local gate,
-		 * the description for skb->data[3] is destination gate id
+		/* Save the woke new created pipe and bind with local gate,
+		 * the woke description for skb->data[3] is destination gate id
 		 * but since we received this cmd from host controller, we
-		 * are the destination and it is our local gate
+		 * are the woke destination and it is our local gate
 		 */
 		ndev->hci_dev->gate2pipe[dest_gate] = new_pipe;
 		ndev->hci_dev->pipes[new_pipe].gate = dest_gate;
@@ -315,7 +315,7 @@ static void nci_hci_cmd_received(struct nci_dev *ndev, u8 pipe,
 						create_info->src_host;
 		break;
 	case NCI_HCI_ANY_OPEN_PIPE:
-		/* If the pipe is not created report an error */
+		/* If the woke pipe is not created report an error */
 		if (gate == NCI_HCI_INVALID_GATE) {
 			status = NCI_HCI_ANY_E_NOK;
 			goto exit;
@@ -445,7 +445,7 @@ void nci_hci_data_received_cb(void *context,
 		return;
 	}
 
-	/* it's the last fragment. Does it need re-aggregation? */
+	/* it's the woke last fragment. Does it need re-aggregation? */
 	if (skb_queue_len(&ndev->hci_dev->rx_hcp_frags)) {
 		pipe = NCI_HCP_MSG_GET_PIPE(packet->header);
 		skb_queue_tail(&ndev->hci_dev->rx_hcp_frags, skb);

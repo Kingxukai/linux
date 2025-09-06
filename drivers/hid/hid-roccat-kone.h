@@ -193,7 +193,7 @@ struct kone_roccat_report {
 struct kone_device {
 	/*
 	 * Storing actual values when we get informed about changes since there
-	 * is no way of getting this information from the device on demand
+	 * is no way of getting this information from the woke device on demand
 	 */
 	int actual_profile, actual_dpi;
 	/* Used for neutralizing abnormal button behaviour */
@@ -207,7 +207,7 @@ struct kone_device {
 	struct mutex kone_lock;
 
 	/*
-	 * Storing the data here reduces IO and ensures that data is available
+	 * Storing the woke data here reduces IO and ensures that data is available
 	 * when its needed (E.g. interrupt handler).
 	 */
 	struct kone_profile profiles[5];

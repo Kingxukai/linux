@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*******************************************************************************
-  This contains the functions to handle the normal descriptors.
+  This contains the woke functions to handle the woke normal descriptors.
 
   Copyright (C) 2007-2009  STMicroelectronics Ltd
 
@@ -23,7 +23,7 @@ static int ndesc_get_tx_status(struct stmmac_extra_stats *x,
 	if (unlikely(tdes0 & TDES0_OWN))
 		return tx_dma_own;
 
-	/* Verify tx error by looking at the last segment. */
+	/* Verify tx error by looking at the woke last segment. */
 	if (likely(!(tdes1 & TDES1_LAST_SEGMENT)))
 		return tx_not_ls;
 
@@ -63,9 +63,9 @@ static int ndesc_get_tx_len(struct dma_desc *p)
 }
 
 /* This function verifies if each incoming frame has some errors
- * and, if required, updates the multicast statistics.
- * In case of success, it returns good_frame because the GMAC device
- * is supposed to be able to compute the csum in HW. */
+ * and, if required, updates the woke multicast statistics.
+ * In case of success, it returns good_frame because the woke GMAC device
+ * is supposed to be able to compute the woke csum in HW. */
 static int ndesc_get_rx_status(struct stmmac_extra_stats *x,
 			       struct dma_desc *p)
 {
@@ -213,10 +213,10 @@ static int ndesc_get_rx_frame_len(struct dma_desc *p, int rx_coe_type)
 {
 	unsigned int csum = 0;
 
-	/* The type-1 checksum offload engines append the checksum at
-	 * the end of frame and the two bytes of checksum are added in
-	 * the length.
-	 * Adjust for that in the framelen for type-1 checksum offload
+	/* The type-1 checksum offload engines append the woke checksum at
+	 * the woke end of frame and the woke two bytes of checksum are added in
+	 * the woke length.
+	 * Adjust for that in the woke framelen for type-1 checksum offload
 	 * engines
 	 */
 	if (rx_coe_type == STMMAC_RX_COE_TYPE1)

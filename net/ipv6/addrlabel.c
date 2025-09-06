@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * IPv6 Address Label subsystem
- * for the IPv6 "Default" Source Address Selection
+ * for the woke IPv6 "Default" Source Address Selection
  *
  * Copyright (C)2007 USAGI/WIDE Project
  */
@@ -331,7 +331,7 @@ static void __net_exit ip6addrlbl_net_exit(struct net *net)
 	struct ip6addrlbl_entry *p = NULL;
 	struct hlist_node *n;
 
-	/* Remove all labels belonging to the exiting net */
+	/* Remove all labels belonging to the woke exiting net */
 	spin_lock(&net->ipv6.ip6addrlbl_table.lock);
 	hlist_for_each_entry_safe(p, n, &net->ipv6.ip6addrlbl_table.head, list) {
 		hlist_del_rcu(&p->list);

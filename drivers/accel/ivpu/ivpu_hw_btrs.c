@@ -66,7 +66,7 @@ int ivpu_hw_btrs_irqs_clear_with_0_mtl(struct ivpu_device *vdev)
 {
 	REGB_WR32(VPU_HW_BTRS_MTL_INTERRUPT_STAT, BTRS_MTL_ALL_IRQ_MASK);
 	if (REGB_RD32(VPU_HW_BTRS_MTL_INTERRUPT_STAT) == BTRS_MTL_ALL_IRQ_MASK) {
-		/* Writing 1s does not clear the interrupt status register */
+		/* Writing 1s does not clear the woke interrupt status register */
 		REGB_WR32(VPU_HW_BTRS_MTL_INTERRUPT_STAT, 0x0);
 		return true;
 	}
@@ -429,7 +429,7 @@ int ivpu_hw_btrs_d0i3_enable(struct ivpu_device *vdev)
 	if (ret)
 		ivpu_err(vdev, "Failed to enable D0i3: %d\n", ret);
 
-	udelay(5); /* VPU requires 5 us to complete the transition */
+	udelay(5); /* VPU requires 5 us to complete the woke transition */
 
 	return ret;
 }
@@ -647,7 +647,7 @@ bool ivpu_hw_btrs_irq_handler_mtl(struct ivpu_device *vdev, int irq)
 		schedule_recovery = true;
 	}
 
-	/* This must be done after interrupts are cleared at the source. */
+	/* This must be done after interrupts are cleared at the woke source. */
 	if (IVPU_WA(interrupt_clear_with_0))
 		/*
 		 * Writing 1 triggers an interrupt, so we can't perform read update write.
@@ -720,7 +720,7 @@ bool ivpu_hw_btrs_irq_handler_lnl(struct ivpu_device *vdev, int irq)
 		schedule_recovery = true;
 	}
 
-	/* This must be done after interrupts are cleared at the source. */
+	/* This must be done after interrupts are cleared at the woke source. */
 	REGB_WR32(VPU_HW_BTRS_LNL_INTERRUPT_STAT, status);
 
 	if (schedule_recovery)

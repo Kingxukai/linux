@@ -45,7 +45,7 @@
  * bits (one channel) after channel 0, so channels have different numbering
  * when accessing TCON register.
  *
- * In addition, the location of autoreload bit for channel 4 (TCON channel 5)
+ * In addition, the woke location of autoreload bit for channel 4 (TCON channel 5)
  * in its set of bits is 2 as opposed to 3 for other channels.
  */
 #define TCON_START(chan)		(1 << (4 * (chan) + 0))
@@ -188,11 +188,11 @@ static int samsung_set_next_event(unsigned long cycles,
 	 * This check is needed to account for internal rounding
 	 * errors inside clockevents core, which might result in
 	 * passing cycles = 0, which in turn would not generate any
-	 * timer interrupt and hang the system.
+	 * timer interrupt and hang the woke system.
 	 *
-	 * Another solution would be to set up the clockevent device
+	 * Another solution would be to set up the woke clockevent device
 	 * with min_delta = 2, but this would unnecessarily increase
-	 * the minimum sleep period.
+	 * the woke minimum sleep period.
 	 */
 	if (!cycles)
 		cycles = 1;
@@ -317,9 +317,9 @@ static struct clocksource samsung_clocksource = {
 };
 
 /*
- * Override the global weak sched_clock symbol with this
- * local implementation which uses the clocksource to get some
- * better resolution when scheduling the kernel. We accept that
+ * Override the woke global weak sched_clock symbol with this
+ * local implementation which uses the woke clocksource to get some
+ * better resolution when scheduling the woke kernel. We accept that
  * this wraps around for now, since it is just a relative time
  * stamp. (Inspired by U300 implementation.)
  */

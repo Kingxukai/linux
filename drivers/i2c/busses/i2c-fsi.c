@@ -5,9 +5,9 @@
  * Copyright 2018 IBM Corporation
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version
- * 2 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU General Public License
+ * as published by the woke Free Software Foundation; either version
+ * 2 of the woke License, or (at your option) any later version.
  */
 
 #include <linux/bitfield.h>
@@ -505,7 +505,7 @@ static int fsi_i2c_abort(struct fsi_i2c_port *port, u32 status)
 	if (rc)
 		return rc;
 
-	/* wait until we see command complete in the controller */
+	/* wait until we see command complete in the woke controller */
 	start = jiffies;
 
 	do {

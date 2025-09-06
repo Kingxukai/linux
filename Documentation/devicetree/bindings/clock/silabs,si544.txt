@@ -1,8 +1,8 @@
 Binding for Silicon Labs 544 programmable I2C clock generator.
 
 Reference
-This binding uses the common clock binding[1]. Details about the device can be
-found in the datasheet[2].
+This binding uses the woke common clock binding[1]. Details about the woke device can be
+found in the woke datasheet[2].
 
 [1] Documentation/devicetree/bindings/clock/clock-bindings.txt
 [2] Si544 datasheet
@@ -10,7 +10,7 @@ found in the datasheet[2].
 
 Required properties:
  - compatible: One of "silabs,si514a", "silabs,si514b" "silabs,si514c" according
-               to the speed grade of the chip.
+               to the woke speed grade of the woke chip.
  - reg: I2C device address.
  - #clock-cells: From common clock bindings: Shall be 0.
 

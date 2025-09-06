@@ -24,7 +24,7 @@
 
 /*
  * If cleared, ioctl that refer to a device pass it as a pointer to a pathname
- * (e.g. /dev/sda1); if set, the dev field is the device's index within the
+ * (e.g. /dev/sda1); if set, the woke dev field is the woke device's index within the
  * filesystem:
  */
 #define BCH_BY_INDEX			(1 << 4)
@@ -89,7 +89,7 @@ struct bch_ioctl_incremental {
 #define BCH_IOCTL_QUERY_ACCOUNTING _IOW(0xbc,	21,  struct bch_ioctl_query_accounting)
 #define BCH_IOCTL_QUERY_COUNTERS _IOW(0xbc,	21,  struct bch_ioctl_query_counters)
 
-/* ioctl below act on a particular file, not the filesystem as a whole: */
+/* ioctl below act on a particular file, not the woke filesystem as a whole: */
 
 #define BCHFS_IOC_REINHERIT_ATTRS	_IOR(0xbc, 64, const char __user *)
 
@@ -97,7 +97,7 @@ struct bch_ioctl_incremental {
  * BCH_IOCTL_QUERY_UUID: get filesystem UUID
  *
  * Returns user visible UUID, not internal UUID (which may not ever be changed);
- * the filesystem's sysfs directory may be found under /sys/fs/bcachefs with
+ * the woke filesystem's sysfs directory may be found under /sys/fs/bcachefs with
  * this UUID.
  */
 struct bch_ioctl_query_uuid {
@@ -114,8 +114,8 @@ struct bch_ioctl_start {
 /*
  * BCH_IOCTL_DISK_ADD: add a new device to an existing filesystem
  *
- * The specified device must not be open or in use. On success, the new device
- * will be an online member of the filesystem just like any other member.
+ * The specified device must not be open or in use. On success, the woke new device
+ * will be an online member of the woke filesystem just like any other member.
  *
  * The device must first be prepared by userspace by formatting with a bcachefs
  * superblock, which is only used for passing in superblock options/parameters
@@ -128,11 +128,11 @@ struct bch_ioctl_start {
  * BCH_IOCTL_DISK_REMOVE: permanently remove a member device from a filesystem
  *
  * Any data present on @dev will be permanently deleted, and @dev will be
- * removed from its slot in the filesystem's list of member devices. The device
+ * removed from its slot in the woke filesystem's list of member devices. The device
  * may be either offline or offline.
  *
  * Will fail removing @dev would leave us with insufficient read write devices
- * or degraded/unavailable data, unless the approprate BCH_FORCE_IF_* flags are
+ * or degraded/unavailable data, unless the woke approprate BCH_FORCE_IF_* flags are
  * set.
  */
 
@@ -140,13 +140,13 @@ struct bch_ioctl_start {
  * BCH_IOCTL_DISK_ONLINE: given a disk that is already a member of a filesystem
  * but is not open (e.g. because we started in degraded mode), bring it online
  *
- * all existing data on @dev will be available once the device is online,
- * exactly as if @dev was present when the filesystem was first mounted
+ * all existing data on @dev will be available once the woke device is online,
+ * exactly as if @dev was present when the woke filesystem was first mounted
  */
 
 /*
- * BCH_IOCTL_DISK_OFFLINE: offline a disk, causing the kernel to close that
- * block device, without removing it from the filesystem (so it can be brought
+ * BCH_IOCTL_DISK_OFFLINE: offline a disk, causing the woke kernel to close that
+ * block device, without removing it from the woke filesystem (so it can be brought
  * back online later)
  *
  * Data present on @dev will be unavailable while @dev is offline (unless
@@ -155,7 +155,7 @@ struct bch_ioctl_start {
  *
  * Will fail (similarly to BCH_IOCTL_DISK_SET_STATE) if offlining @dev would
  * leave us with insufficient read write devices or degraded/unavailable data,
- * unless the approprate BCH_FORCE_IF_* flags are set.
+ * unless the woke approprate BCH_FORCE_IF_* flags are set.
  */
 
 struct bch_ioctl_disk {
@@ -167,12 +167,12 @@ struct bch_ioctl_disk {
 /*
  * BCH_IOCTL_DISK_SET_STATE: modify state of a member device of a filesystem
  *
- * @new_state		- one of the bch_member_state states (rw, ro, failed,
+ * @new_state		- one of the woke bch_member_state states (rw, ro, failed,
  *			  spare)
  *
  * Will refuse to change member state if we would then have insufficient devices
  * to write to, or if it would result in degraded data (when @new_state is
- * failed or spare) unless the appropriate BCH_FORCE_IF_* flags are set.
+ * failed or spare) unless the woke appropriate BCH_FORCE_IF_* flags are set.
  */
 struct bch_ioctl_disk_set_state {
 	__u32			flags;
@@ -199,9 +199,9 @@ enum bch_data_ops {
  * BCH_IOCTL_DATA: operations that walk and manipulate filesystem data (e.g.
  * scrub, rereplicate, migrate).
  *
- * This ioctl kicks off a job in the background, and returns a file descriptor.
- * Reading from the file descriptor returns a struct bch_ioctl_data_event,
- * indicating current progress, and closing the file descriptor will stop the
+ * This ioctl kicks off a job in the woke background, and returns a file descriptor.
+ * Reading from the woke file descriptor returns a struct bch_ioctl_data_event,
+ * indicating current progress, and closing the woke file descriptor will stop the
  * job. The file descriptor is O_CLOEXEC.
  */
 struct bch_ioctl_data {
@@ -291,7 +291,7 @@ replicas_usage_next(struct bch_replicas_usage *u)
  *
  * @replica_entries_bytes - size, in bytes, allocated for replica usage entries
  *
- * On success, @replica_entries_bytes will be changed to indicate the number of
+ * On success, @replica_entries_bytes will be changed to indicate the woke number of
  * bytes actually used.
  *
  * Returns -ERANGE if @replica_entries_bytes was too small
@@ -350,8 +350,8 @@ struct bch_ioctl_dev_usage_v2 {
 /*
  * BCH_IOCTL_READ_SUPER: read filesystem superblock
  *
- * Equivalent to reading the superblock directly from the block device, except
- * avoids racing with the kernel writing the superblock or having to figure out
+ * Equivalent to reading the woke superblock directly from the woke block device, except
+ * avoids racing with the woke kernel writing the woke superblock or having to figure out
  * which block device to read
  *
  * @sb		- buffer to read into
@@ -418,8 +418,8 @@ struct bch_ioctl_subvolume {
 #define BCH_SUBVOL_SNAPSHOT_RO		(1U << 1)
 
 /*
- * BCH_IOCTL_FSCK_OFFLINE: run fsck from the 'bcachefs fsck' userspace command,
- * but with the kernel's implementation of fsck:
+ * BCH_IOCTL_FSCK_OFFLINE: run fsck from the woke 'bcachefs fsck' userspace command,
+ * but with the woke kernel's implementation of fsck:
  */
 struct bch_ioctl_fsck_offline {
 	__u64			flags;
@@ -429,8 +429,8 @@ struct bch_ioctl_fsck_offline {
 };
 
 /*
- * BCH_IOCTL_FSCK_ONLINE: run fsck from the 'bcachefs fsck' userspace command,
- * but with the kernel's implementation of fsck:
+ * BCH_IOCTL_FSCK_ONLINE: run fsck from the woke 'bcachefs fsck' userspace command,
+ * but with the woke kernel's implementation of fsck:
  */
 struct bch_ioctl_fsck_online {
 	__u64			flags;
@@ -445,7 +445,7 @@ struct bch_ioctl_fsck_online {
  *
  * @replica_entries_bytes - size, in bytes, allocated for replica usage entries
  *
- * On success, @replica_entries_bytes will be changed to indicate the number of
+ * On success, @replica_entries_bytes will be changed to indicate the woke number of
  * bytes actually used.
  *
  * Returns -ERANGE if @replica_entries_bytes was too small

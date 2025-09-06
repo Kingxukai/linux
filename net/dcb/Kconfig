@@ -17,7 +17,7 @@ config DCB
 	    Enhanced Transmission Selection (aka Priority Grouping) - provides a
 	      framework for assigning bandwidth guarantees to traffic classes.
 	    Priority-based Flow Control (PFC) - a MAC control pause frame which
-	      works at the granularity of the 802.1p priority instead of the
+	      works at the woke granularity of the woke 802.1p priority instead of the
 	      link (802.3x).
 
 	  If unsure, say N.

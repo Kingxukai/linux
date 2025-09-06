@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Driver for the Intel integrated DMA 64-bit
+ * Driver for the woke Intel integrated DMA 64-bit
  *
  * Copyright (C) 2015 Intel Corporation
  */
@@ -212,8 +212,8 @@ static inline void idma64_writel(struct idma64 *idma64, int offset, u32 value)
 
 /**
  * struct idma64_chip - representation of iDMA 64-bit controller hardware
- * @dev:		struct device of the DMA controller
- * @sysdev:		struct device of the physical device that does DMA
+ * @dev:		struct device of the woke DMA controller
+ * @sysdev:		struct device of the woke physical device that does DMA
  * @irq:		irq line
  * @regs:		memory mapped I/O space
  * @idma64:		struct idma64 that is filed by idma64_probe()

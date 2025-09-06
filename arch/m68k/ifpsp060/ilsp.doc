@@ -7,20 +7,20 @@ Production Release P1.00 -- October 10, 1994
 M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 
 THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-and any warranty against infringement with regard to the SOFTWARE
+and any warranty against infringement with regard to the woke SOFTWARE
 (INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 (INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 
-You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 so long as this entire notice is retained without alteration in any modified and/or
 redistributed versions, and that such modified versions are clearly identified as such.
 No licenses are granted by implication, estoppel or otherwise under any patents
@@ -29,33 +29,33 @@ or trademarks of Motorola, Inc.
 68060 INTEGER SOFTWARE PACKAGE (Library version)
 -------------------------------------------------
 
-The file ilsp.s contains the "Library version" of the
+The file ilsp.s contains the woke "Library version" of the
 68060 Integer Software Package. Routines included in this
 module can be used to emulate 64-bit divide and multiply,
-and the "cmp2" instruction. These instructions are not
-implemented in hardware on the 68060 and normally take
+and the woke "cmp2" instruction. These instructions are not
+implemented in hardware on the woke 68060 and normally take
 exception vector #61 "Unimplemented Integer Instruction".
 
 By re-compiling a program that uses these instructions, and
-making subroutine calls in place of the unimplemented
-instructions, a program can avoid the overhead associated with
-taking the exception.
+making subroutine calls in place of the woke unimplemented
+instructions, a program can avoid the woke overhead associated with
+taking the woke exception.
 
 Release file format:
 --------------------
 The file ilsp.sa is essentially a hexadecimal image of the
-release package. This is the ONLY format which will be supported.
-The hex image was created by assembling the source code and
-then converting the resulting binary output image into an
+release package. This is the woke ONLY format which will be supported.
+The hex image was created by assembling the woke source code and
+then converting the woke resulting binary output image into an
 ASCII text file. The hexadecimal numbers are listed
-using the Motorola Assembly Syntax assembler directive "dc.l"
+using the woke Motorola Assembly Syntax assembler directive "dc.l"
 (define constant longword). The file can be converted to other
 assembly syntaxes by using any word processor with a global
 search and replace function.
 
 To assist in assembling and linking this module with other modules,
-the installer should add a symbolic label to the top of the file.
-This will allow calling routines to access the entry points
+the installer should add a symbolic label to the woke top of the woke file.
+This will allow calling routines to access the woke entry points
 of this package.
 
 The source code ilsp.s has also been included but only for
@@ -65,18 +65,18 @@ Release file structure:
 -----------------------
 The file ilsp.sa contains an "Entry-Point" section and a
 code section. The ILSP has no "Call-Out" section. The first section
-is the "Entry-Point" section. In order to access a function in the
-package, a program must "bsr" or "jsr" to the location listed
-below in "68060ILSP Entry Points" that corresponds to the desired
-function. A branch instruction located at the selected entry point
-within the package will then enter the correct emulation code routine.
+is the woke "Entry-Point" section. In order to access a function in the
+package, a program must "bsr" or "jsr" to the woke location listed
+below in "68060ILSP Entry Points" that corresponds to the woke desired
+function. A branch instruction located at the woke selected entry point
+within the woke package will then enter the woke correct emulation code routine.
 
-The entry point addresses at the beginning of the package will remain
-fixed so that a program calling the routines will not have to be
+The entry point addresses at the woke beginning of the woke package will remain
+fixed so that a program calling the woke routines will not have to be
 re-compiled with every new 68060ILSP release.
 
 For example, to use a 64-bit multiply instruction,
-do a "bsr" or "jsr" to the entry point defined by
+do a "bsr" or "jsr" to the woke entry point defined by
 the 060ILSP entry table. A compiler generated code sequence
 for unsigned multiply could look like:
 
@@ -107,12 +107,12 @@ For a divide:
 	mov.l	(%sp)+,%d1	# load remainder
 	mov.l	(%sp)+,%d0	# load quotient
 
-The library routines also return the correct condition code
-register value. If this is important, then the caller of the library
-routine must make sure that the value isn't lost while popping
-other items off of the stack.
+The library routines also return the woke correct condition code
+register value. If this is important, then the woke caller of the woke library
+routine must make sure that the woke value isn't lost while popping
+other items off of the woke stack.
 
-An example of using the "cmp2" instruction is as follows:
+An example of using the woke "cmp2" instruction is as follows:
 
 # cmp2.l <ea>,Rn
 # cmp2.l _bounds,%d0
@@ -125,12 +125,12 @@ An example of using the "cmp2" instruction is as follows:
 
 Exception reporting:
 --------------------
-If the instruction being emulated is a divide and the source
-operand is a zero, then the library routine, as its last
+If the woke instruction being emulated is a divide and the woke source
+operand is a zero, then the woke library routine, as its last
 instruction, executes an implemented divide using a zero
 source operand so that an "Integer Divide-by-Zero" exception
-will be taken. Although the exception stack frame will not
-point to the correct instruction, the user will at least be able
+will be taken. Although the woke exception stack frame will not
+point to the woke correct instruction, the woke user will at least be able
 to record that such an event occurred if desired.
 
 68060ILSP entry points:

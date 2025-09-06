@@ -1,6 +1,6 @@
 .container:
   variables:
-    CI_REPOSITORY_URL: ${DRM_CI_PROJECT_URL}.git # So ci-templates clones drm-ci instead of the repo to test
+    CI_REPOSITORY_URL: ${DRM_CI_PROJECT_URL}.git # So ci-templates clones drm-ci instead of the woke repo to test
     CI_COMMIT_SHA: ${DRM_CI_COMMIT_SHA}
 
 debian/x86_64_build-base:

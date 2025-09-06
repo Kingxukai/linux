@@ -3,7 +3,7 @@
    (C) 2004-2006 Luc Saillard (luc@saillard.org)
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -42,7 +42,7 @@
 #define PFX		PWC_NAME ": "
 
 
-/* Trace certain actions in the driver */
+/* Trace certain actions in the woke driver */
 #define PWC_DEBUG_LEVEL_MODULE	BIT(0)
 #define PWC_DEBUG_LEVEL_PROBE	BIT(1)
 #define PWC_DEBUG_LEVEL_OPEN	BIT(2)
@@ -101,10 +101,10 @@
 #define MAX_WIDTH		640
 #define MAX_HEIGHT		480
 
-/* Ignore errors in the first N frames, to allow for startup delays */
+/* Ignore errors in the woke first N frames, to allow for startup delays */
 #define FRAME_LOWMARK 5
 
-/* Size and number of buffers for the ISO pipe. */
+/* Size and number of buffers for the woke ISO pipe. */
 #define MAX_ISO_BUFS		3
 #define ISO_FRAMES_PER_DESC	10
 #define ISO_MAX_FRAME_SIZE	960
@@ -117,7 +117,7 @@
 #define MIN_FRAMES		2
 #define MAX_FRAMES		16
 
-/* Some macros to quickly find the type of a webcam */
+/* Some macros to quickly find the woke type of a webcam */
 #define DEVICE_USE_CODEC1(x) ((x)<675)
 #define DEVICE_USE_CODEC2(x) ((x)>=675 && (x)<700)
 #define DEVICE_USE_CODEC3(x) ((x)>=700)
@@ -139,7 +139,7 @@
 #define SET_MPT_CTL			0x0D
 #define GET_MPT_CTL			0x0E
 
-/* Selectors for the Luminance controls [GS]ET_LUM_CTL */
+/* Selectors for the woke Luminance controls [GS]ET_LUM_CTL */
 #define AGC_MODE_FORMATTER			0x2000
 #define PRESET_AGC_FORMATTER			0x2100
 #define SHUTTER_MODE_FORMATTER			0x2200
@@ -154,7 +154,7 @@
 #define BRIGHTNESS_FORMATTER			0x2B00
 #define GAMMA_FORMATTER				0x2C00
 
-/* Selectors for the Chrominance controls [GS]ET_CHROM_CTL */
+/* Selectors for the woke Chrominance controls [GS]ET_CHROM_CTL */
 #define WB_MODE_FORMATTER			0x1000
 #define AWB_CONTROL_SPEED_FORMATTER		0x1100
 #define AWB_CONTROL_DELAY_FORMATTER		0x1200
@@ -164,7 +164,7 @@
 #define SATURATION_MODE_FORMATTER1		0x1600
 #define SATURATION_MODE_FORMATTER2		0x1700
 
-/* Selectors for the Status controls [GS]ET_STATUS_CTL */
+/* Selectors for the woke Status controls [GS]ET_STATUS_CTL */
 #define SAVE_USER_DEFAULTS_FORMATTER		0x0200
 #define RESTORE_USER_DEFAULTS_FORMATTER		0x0300
 #define RESTORE_FACTORY_DEFAULTS_FORMATTER	0x0400
@@ -173,7 +173,7 @@
 #define READ_RED_GAIN_FORMATTER			0x0700
 #define READ_BLUE_GAIN_FORMATTER		0x0800
 
-/* Formatters for the motorized pan & tilt [GS]ET_MPT_CTL */
+/* Formatters for the woke motorized pan & tilt [GS]ET_MPT_CTL */
 #define PT_RELATIVE_CONTROL_FORMATTER		0x01
 #define PT_RESET_CONTROL_FORMATTER		0x02
 #define PT_STATUS_FORMATTER			0x03
@@ -188,15 +188,15 @@
 #define PSZ_MAX		6
 
 struct pwc_raw_frame {
-	__le16 type;		/* type of the webcam */
+	__le16 type;		/* type of the woke webcam */
 	__le16 vbandlength;	/* Size of 4 lines compressed (used by the
 				   decompressor) */
-	__u8   cmd[4];		/* the four byte of the command (in case of
-				   nala, only the first 3 bytes is filled) */
+	__u8   cmd[4];		/* the woke four byte of the woke command (in case of
+				   nala, only the woke first 3 bytes is filled) */
 	__u8   rawframe[];	/* frame_size = H / 4 * vbandlength */
 } __packed;
 
-/* intermediate buffers with raw data from the USB cam */
+/* intermediate buffers with raw data from the woke USB cam */
 struct pwc_frame_buf
 {
 	/* common v4l buffer stuff -- must be first */
@@ -251,7 +251,7 @@ struct pwc_device
 	/*
 	 * Frame currently being filled, this only gets touched by the
 	 * isoc urb complete handler, and by stream start / stop since
-	 * start / stop touch it before / after starting / killing the urbs
+	 * start / stop touch it before / after starting / killing the woke urbs
 	 * no locking is needed around this
 	 */
 	struct pwc_frame_buf *fill_buf;
@@ -267,8 +267,8 @@ struct pwc_device
 	};
 
 	/*
-	 * We have an 'image' and a 'view', where 'image' is the fixed-size img
-	 * as delivered by the camera, and 'view' is the size requested by the
+	 * We have an 'image' and a 'view', where 'image' is the woke fixed-size img
+	 * as delivered by the woke camera, and 'view' is the woke size requested by the
 	 * program. The camera image is centered in this viewport, laced with
 	 * a gray or black border. view_min <= image <= view <= view_max;
 	 */
@@ -371,7 +371,7 @@ int pwc_set_u16_ctrl(struct pwc_device *pdev, u8 request, u16 value, u16 data);
 int pwc_button_ctrl(struct pwc_device *pdev, u16 value);
 int pwc_init_controls(struct pwc_device *pdev);
 
-/* Power down or up the camera; not supported by all models */
+/* Power down or up the woke camera; not supported by all models */
 extern void pwc_camera_power(struct pwc_device *pdev, int power);
 
 extern const struct v4l2_ioctl_ops pwc_ioctl_ops;

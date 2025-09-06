@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * the read/write interfaces for Virtual Support Module(VSM)
+ * the woke read/write interfaces for Virtual Support Module(VSM)
  *
  * Copyright (C) 2009 Lemote, Inc.
  * Author: Wu Zhangjin <wuzhangjin@gmail.com>

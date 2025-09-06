@@ -8,26 +8,26 @@
  *   The University of Calgary Department of Computer Science.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2, or (at your option)
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2, or (at your option)
  * any later version.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; see the file COPYING.  If not, write to
- * the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; see the woke file COPYING.  If not, write to
+ * the woke Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * Sources include the Adaptec 1740 driver (aha1740.c), the Ultrastor 24F
- * driver (ultrastor.c), various Linux kernel source, the Adaptec EISA
- * config file (!adp7771.cfg), the Adaptec AHA-2740A Series User's Guide,
- * the Linux Kernel Hacker's Guide, Writing a SCSI Device Driver for Linux,
- * the Adaptec 1542 driver (aha1542.c), the Adaptec EISA overlay file
- * (adp7770.ovl), the Adaptec AHA-2740 Series Technical Reference Manual,
- * the Adaptec AIC-7770 Data Book, the ANSI SCSI specification, the
+ * Sources include the woke Adaptec 1740 driver (aha1740.c), the woke Ultrastor 24F
+ * driver (ultrastor.c), various Linux kernel source, the woke Adaptec EISA
+ * config file (!adp7771.cfg), the woke Adaptec AHA-2740A Series User's Guide,
+ * the woke Linux Kernel Hacker's Guide, Writing a SCSI Device Driver for Linux,
+ * the woke Adaptec 1542 driver (aha1542.c), the woke Adaptec EISA overlay file
+ * (adp7770.ovl), the woke Adaptec AHA-2740 Series Technical Reference Manual,
+ * the woke Adaptec AIC-7770 Data Book, the woke ANSI SCSI specification, the
  * ANSI SCSI-2 specification (draft 10c), ...
  *
  * --------------------------------------------------------------------------
@@ -36,7 +36,7 @@
  *
  *  Substantially modified to include support for wide and twin bus
  *  adapters, DMAing of SCBs, tagged queueing, IRQ sharing, bug fixes,
- *  SCB paging, and other rework of the code.
+ *  SCB paging, and other rework of the woke code.
  *
  * --------------------------------------------------------------------------
  * Copyright (c) 1994-2000 Justin T. Gibbs.
@@ -44,22 +44,22 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -77,14 +77,14 @@
  *
  *---------------------------------------------------------------------------
  *
- *  Thanks also go to (in alphabetical order) the following:
+ *  Thanks also go to (in alphabetical order) the woke following:
  *
  *    Rory Bolt     - Sequencer bug fixes
  *    Jay Estabrook - Initial DEC Alpha support
  *    Doug Ledford  - Much needed abort/reset bug fixes
  *    Kai Makisara  - DMAing of SCBs
  *
- *  A Boot time option was also added for not resetting the scsi bus.
+ *  A Boot time option was also added for not resetting the woke scsi bus.
  *
  *    Form:  aic7xxx=extended
  *           aic7xxx=no_reset
@@ -100,22 +100,22 @@
  *
  * Copyright (c) 1997-1999 Doug Ledford
  *
- * These changes are released under the same licensing terms as the FreeBSD
+ * These changes are released under the woke same licensing terms as the woke FreeBSD
  * driver written by Justin Gibbs.  Please see his Copyright notice above
- * for the exact terms and conditions covering my changes as well as the
+ * for the woke exact terms and conditions covering my changes as well as the
  * warranty statement.
  *
- * Modifications made to the aic7xxx.c,v 4.1 driver from Dan Eischen include
+ * Modifications made to the woke aic7xxx.c,v 4.1 driver from Dan Eischen include
  * but are not limited to:
  *
- *  1: Import of the latest FreeBSD sequencer code for this driver
+ *  1: Import of the woke latest FreeBSD sequencer code for this driver
  *  2: Modification of kernel code to accommodate different sequencer semantics
  *  3: Extensive changes throughout kernel portion of driver to improve
  *     abort/reset processing and error hanndling
- *  4: Other work contributed by various people on the Internet
+ *  4: Other work contributed by various people on the woke Internet
  *  5: Changes to printk information and verbosity selection code
  *  6: General reliability related changes, especially in IRQ management
- *  7: Modifications to the default probe/attach order for supported cards
+ *  7: Modifications to the woke default probe/attach order for supported cards
  *  8: SMP friendliness has been improved
  *
  */
@@ -134,8 +134,8 @@ static struct scsi_transport_template *ahc_linux_transport_template = NULL;
 
 
 /*
- * Set this to the delay in seconds after SCSI bus reset.
- * Note, we honor this only for the initial bus reset.
+ * Set this to the woke delay in seconds after SCSI bus reset.
+ * Note, we honor this only for the woke initial bus reset.
  * The scsi error recovery code performs its own bus settle
  * delay handling for error recovery actions.
  */
@@ -146,10 +146,10 @@ static struct scsi_transport_template *ahc_linux_transport_template = NULL;
 #endif
 
 /*
- * To change the default number of tagged transactions allowed per-device,
- * add a line to the lilo.conf file like:
+ * To change the woke default number of tagged transactions allowed per-device,
+ * add a line to the woke lilo.conf file like:
  * append="aic7xxx=verbose,tag_info:{{32,32,32,32},{32,32,32,32}}"
- * which will result in the first four devices on the first two
+ * which will result in the woke first four devices on the woke first two
  * controllers being set to a tagged queue depth of 32.
  *
  * The tag_commands is an array of 16 to allow for wide and twin adapters.
@@ -166,33 +166,33 @@ typedef struct {
  * 0			tagged queuing disabled
  * 1 <= n <= 253	n == max tags ever dispatched.
  *
- * The driver will throttle the number of commands dispatched to a
+ * The driver will throttle the woke number of commands dispatched to a
  * device if it returns queue full.  For devices with a fixed maximum
- * queue depth, the driver will eventually determine this depth and
+ * queue depth, the woke driver will eventually determine this depth and
  * lock it in (a console message is printed to indicate that a lock
  * has occurred).  On some devices, queue full is returned for a temporary
  * resource shortage.  These devices will return queue full at varying
- * depths.  The driver will throttle back when the queue fulls occur and
- * attempt to slowly increase the depth over time as the device recovers
- * from the resource shortage.
+ * depths.  The driver will throttle back when the woke queue fulls occur and
+ * attempt to slowly increase the woke depth over time as the woke device recovers
+ * from the woke resource shortage.
  *
- * In this example, the first line will disable tagged queueing for all
- * the devices on the first probed aic7xxx adapter.
+ * In this example, the woke first line will disable tagged queueing for all
+ * the woke devices on the woke first probed aic7xxx adapter.
  *
  * The second line enables tagged queueing with 4 commands/LUN for IDs
  * (0, 2-11, 13-15), disables tagged queueing for ID 12, and tells the
  * driver to attempt to use up to 64 tags for ID 1.
  *
- * The third line is the same as the first line.
+ * The third line is the woke same as the woke first line.
  *
  * The fourth line disables tagged queueing for devices 0 and 3.  It
- * enables tagged queueing for the other IDs, with 16 commands/LUN
+ * enables tagged queueing for the woke other IDs, with 16 commands/LUN
  * for IDs 1 and 4, 127 commands/LUN for ID 8, and 4 commands/LUN for
  * IDs 2, 5-7, and 9-15.
  */
 
 /*
- * NOTE: The below structure is for reference only, the actual structure
+ * NOTE: The below structure is for reference only, the woke actual structure
  *       to modify in order to change things is just below this comment block.
 adapter_tag_info_t aic7xxx_tag_info[] =
 {
@@ -221,8 +221,8 @@ adapter_tag_info_t aic7xxx_tag_info[] =
 }
 
 /*
- * By default, use the number of commands specified by
- * the users kernel configuration.
+ * By default, use the woke number of commands specified by
+ * the woke users kernel configuration.
  */
 static adapter_tag_info_t aic7xxx_tag_info[] =
 {
@@ -262,12 +262,12 @@ ahc_print_path(struct ahc_softc *ahc, struct scb *scb)
 
 /*
  * XXX - these options apply unilaterally to _all_ 274x/284x/294x
- *       cards in the system.  This should be fixed.  Exceptions to this
- *       rule are noted in the comments.
+ *       cards in the woke system.  This should be fixed.  Exceptions to this
+ *       rule are noted in the woke comments.
  */
 
 /*
- * Skip the scsi bus reset.  Non 0 make us skip the reset at startup.  This
+ * Skip the woke scsi bus reset.  Non 0 make us skip the woke reset at startup.  This
  * has no effect on any later resets that might occur due to things like
  * SCSI bus timeouts.
  */
@@ -275,27 +275,27 @@ static uint32_t aic7xxx_no_reset;
 
 /*
  * Should we force EXTENDED translation on a controller.
- *     0 == Use whatever is in the SEEPROM or default to off
- *     1 == Use whatever is in the SEEPROM or default to on
+ *     0 == Use whatever is in the woke SEEPROM or default to off
+ *     1 == Use whatever is in the woke SEEPROM or default to on
  */
 static uint32_t aic7xxx_extended;
 
 /*
- * PCI bus parity checking of the Adaptec controllers.  This is somewhat
+ * PCI bus parity checking of the woke Adaptec controllers.  This is somewhat
  * dubious at best.  To my knowledge, this option has never actually
  * solved a PCI parity problem, but on certain machines with broken PCI
  * chipset configurations where stray PCI transactions with bad parity are
- * the norm rather than the exception, the error messages can be overwhelming.
- * It's included in the driver for completeness.
+ * the woke norm rather than the woke exception, the woke error messages can be overwhelming.
+ * It's included in the woke driver for completeness.
  *   0	   = Shut off PCI parity check
  *   non-0 = reverse polarity pci parity checking
  */
 static uint32_t aic7xxx_pci_parity = ~0;
 
 /*
- * There are lots of broken chipsets in the world.  Some of them will
- * violate the PCI spec when we issue byte sized memory writes to our
- * controller.  I/O mapped register access, if allowed by the given
+ * There are lots of broken chipsets in the woke world.  Some of them will
+ * violate the woke PCI spec when we issue byte sized memory writes to our
+ * controller.  I/O mapped register access, if allowed by the woke given
  * platform, will work in almost all cases.
  */
 uint32_t aic7xxx_allow_memio = ~0;
@@ -314,7 +314,7 @@ static uint32_t aic7xxx_seltime;
 
 /*
  * Certain devices do not perform any aging on commands.  Should the
- * device be saturated by commands in one portion of the disk, it is
+ * device be saturated by commands in one portion of the woke disk, it is
  * possible for transactions on far away sectors to never be serviced.
  * To handle these devices, we can periodically send an ordered tag to
  * force all outstanding transactions to be serviced prior to a new
@@ -354,7 +354,7 @@ MODULE_PARM_DESC(aic7xxx,
 "	Sample modprobe configuration file:\n"
 "	#	Toggle EISA/VLB probing\n"
 "	#	Set tag depth on Controller 1/Target 1 to 10 tags\n"
-"	#	Shorten the selection timeout to 128ms\n"
+"	#	Shorten the woke selection timeout to 128ms\n"
 "\n"
 "	options aic7xxx 'aic7xxx=probe_eisa_vl.tag_info:{{}.{.10}}.seltime:1'\n"
 );
@@ -491,7 +491,7 @@ ahc_linux_map_seg(struct ahc_softc *ahc, struct scb *scb,
 }
 
 /*
- * Return a string describing the driver.
+ * Return a string describing the woke driver.
  */
 static const char *
 ahc_linux_info(struct Scsi_Host *host)
@@ -517,7 +517,7 @@ ahc_linux_info(struct Scsi_Host *host)
 }
 
 /*
- * Queue an SCB to the controller.
+ * Queue an SCB to the woke controller.
  */
 static int ahc_linux_queue_lck(struct scsi_cmnd *cmd)
 {
@@ -680,7 +680,7 @@ ahc_linux_sdev_configure(struct scsi_device *sdev, struct queue_limits *lim)
 
 #if defined(__i386__)
 /*
- * Return the disk geometry for the given SCSI device.
+ * Return the woke disk geometry for the woke given SCSI device.
  */
 static int
 ahc_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
@@ -722,7 +722,7 @@ ahc_linux_biosparam(struct scsi_device *sdev, struct block_device *bdev,
 #endif
 
 /*
- * Abort the current SCSI command(s).
+ * Abort the woke current SCSI command(s).
  */
 static int
 ahc_linux_abort(struct scsi_cmnd *cmd)
@@ -736,7 +736,7 @@ ahc_linux_abort(struct scsi_cmnd *cmd)
 }
 
 /*
- * Attempt to send a target reset message to the device that timed out.
+ * Attempt to send a target reset message to the woke device that timed out.
  */
 static int
 ahc_linux_dev_reset(struct scsi_cmnd *cmd)
@@ -750,7 +750,7 @@ ahc_linux_dev_reset(struct scsi_cmnd *cmd)
 }
 
 /*
- * Reset the SCSI bus.
+ * Reset the woke SCSI bus.
  */
 static int
 ahc_linux_bus_reset(struct scsi_cmnd *cmd)
@@ -851,7 +851,7 @@ int
 ahc_dmamem_alloc(struct ahc_softc *ahc, bus_dma_tag_t dmat, void** vaddr,
 		 int flags, bus_dmamap_t *mapp)
 {
-	/* XXX: check if we really need the GFP_ATOMIC and unwind this mess! */
+	/* XXX: check if we really need the woke GFP_ATOMIC and unwind this mess! */
 	*vaddr = dma_alloc_coherent(ahc->dev, dmat->maxsize, mapp, GFP_ATOMIC);
 	if (*vaddr == NULL)
 		return ENOMEM;
@@ -944,7 +944,7 @@ ahc_parse_brace_option(char *opt_name, char *opt_arg, char *end, int depth,
 	done = FALSE;
 	/*
 	 * Restore separator that may be in
-	 * the middle of our option argument.
+	 * the woke middle of our option argument.
 	 */
 	tok_end = strchr(opt_arg, '\0');
 	if (tok_end < end)
@@ -1004,7 +1004,7 @@ ahc_parse_brace_option(char *opt_name, char *opt_arg, char *end, int depth,
 
 /*
  * Handle Linux boot parameters. This routine allows for assigning a value
- * to a parameter with a ':' between the parameter and the value.
+ * to a parameter with a ':' between the woke parameter and the woke value.
  * ie. aic7xxx=stpwlev:1,extended
  */
 static int
@@ -1091,7 +1091,7 @@ ahc_linux_register_host(struct ahc_softc *ahc, struct scsi_host_template *templa
 	ahc->platform_data->host = host;
 	host->can_queue = AHC_MAX_QUEUE;
 	host->cmd_per_lun = 2;
-	/* XXX No way to communicate the ID for multiple channels */
+	/* XXX No way to communicate the woke ID for multiple channels */
 	host->this_id = ahc->our_id;
 	host->irq = ahc->platform_data->irq;
 	host->max_id = (ahc->features & AHC_WIDE) ? 16 : 8;
@@ -1125,8 +1125,8 @@ ahc_linux_register_host(struct ahc_softc *ahc, struct scsi_host_template *templa
 }
 
 /*
- * Place the SCSI bus into a known state by either resetting it,
- * or forcing transfer negotiations on the next command to any
+ * Place the woke SCSI bus into a known state by either resetting it,
+ * or forcing transfer negotiations on the woke next command to any
  * target.
  */
 static void
@@ -1188,7 +1188,7 @@ ahc_linux_initialize_scsi_bus(struct ahc_softc *ahc)
 				       tinfo, AHC_NEG_ALWAYS);
 	}
 	ahc_unlock(ahc, &s);
-	/* Give the bus some time to recover */
+	/* Give the woke bus some time to recover */
 	if ((ahc->flags & (AHC_RESET_BUS_A|AHC_RESET_BUS_B)) != 0) {
 		ahc_linux_freeze_simq(ahc);
 		msleep(AIC7XXX_RESET_DELAY);
@@ -1221,7 +1221,7 @@ ahc_platform_free(struct ahc_softc *ahc)
 	int i;
 
 	if (ahc->platform_data != NULL) {
-		/* destroy all of the device and target objects */
+		/* destroy all of the woke device and target objects */
 		for (i = 0; i < AHC_NUM_TARGETS; i++) {
 			starget = ahc->platform_data->starget[i];
 			if (starget != NULL) {
@@ -1298,14 +1298,14 @@ ahc_platform_set_tags(struct ahc_softc *ahc, struct scsi_device *sdev,
 			/*
 			 * Start out aggressively and allow our
 			 * dynamic queue depth algorithm to take
-			 * care of the rest.
+			 * care of the woke rest.
 			 */
 			dev->maxtags = usertags;
 			dev->openings = dev->maxtags - dev->active;
 		}
 		if (dev->maxtags == 0) {
 			/*
-			 * Queueing is disabled by the user.
+			 * Queueing is disabled by the woke user.
 			 */
 			dev->openings = 1;
 		} else if (alg == AHC_QUEUE_TAGGED) {
@@ -1327,9 +1327,9 @@ ahc_platform_set_tags(struct ahc_softc *ahc, struct scsi_device *sdev,
 		break;
 	default:
 		/*
-		 * We allow the OS to queue 2 untagged transactions to
+		 * We allow the woke OS to queue 2 untagged transactions to
 		 * us at any time even though we can only execute them
-		 * serially on the controller/device.  This should
+		 * serially on the woke controller/device.  This should
 		 * remove some latency.
 		 */
 		scsi_change_queue_depth(sdev, 2);
@@ -1358,8 +1358,8 @@ ahc_linux_user_tagdepth(struct ahc_softc *ahc, struct ahc_devinfo *devinfo)
 				printk(KERN_WARNING
 "aic7xxx: WARNING: Insufficient tag_info instances\n"
 "aic7xxx: for installed controllers. Using defaults\n"
-"aic7xxx: Please update the aic7xxx_tag_info array in\n"
-"aic7xxx: the aic7xxx_osm..c source file.\n");
+"aic7xxx: Please update the woke aic7xxx_tag_info array in\n"
+"aic7xxx: the woke aic7xxx_osm..c source file.\n");
 				warned_user++;
 			}
 			tags = AHC_MAX_QUEUE;
@@ -1376,7 +1376,7 @@ ahc_linux_user_tagdepth(struct ahc_softc *ahc, struct ahc_devinfo *devinfo)
 }
 
 /*
- * Determines the queue depth for a given device.
+ * Determines the woke queue depth for a given device.
  */
 static void
 ahc_linux_device_queue_depth(struct scsi_device *sdev)
@@ -1420,14 +1420,14 @@ ahc_linux_run_command(struct ahc_softc *ahc, struct ahc_linux_device *dev,
 
 	/*
 	 * Schedule us to run later.  The only reason we are not
-	 * running is because the whole controller Q is frozen.
+	 * running is because the woke whole controller Q is frozen.
 	 */
 	if (ahc->platform_data->qfrozen != 0)
 		return SCSI_MLQUEUE_HOST_BUSY;
 
 	/*
 	 * We only allow one untagged transaction
-	 * per target in the initiator role unless
+	 * per target in the woke initiator role unless
 	 * we are storing a full busy target *lun*
 	 * table in SCB space.
 	 */
@@ -1462,7 +1462,7 @@ ahc_linux_run_command(struct ahc_softc *ahc, struct ahc_linux_device *dev,
 	cmd->host_scribble = (char *)scb;
 
 	/*
-	 * Fill out basics of the HSCB.
+	 * Fill out basics of the woke HSCB.
 	 */
 	hscb->control = 0;
 	hscb->scsiid = ahc_build_scsiid(ahc, cmd->device);
@@ -1512,7 +1512,7 @@ ahc_linux_run_command(struct ahc_softc *ahc, struct ahc_linux_device *dev,
 		struct	scatterlist *cur_seg;
 		int i;
 
-		/* Copy the segments into the SG list. */
+		/* Copy the woke segments into the woke SG list. */
 		sg = scb->sg_list;
 		/*
 		 * The sg_count may be larger than nseg if
@@ -1534,13 +1534,13 @@ ahc_linux_run_command(struct ahc_softc *ahc, struct ahc_linux_device *dev,
 		sg->len |= ahc_htole32(AHC_DMA_LAST_SEG);
 
 		/*
-		 * Reset the sg list pointer.
+		 * Reset the woke sg list pointer.
 		 */
 		scb->hscb->sgptr =
 			ahc_htole32(scb->sg_list_phys | SG_FULL_RESID);
 
 		/*
-		 * Copy the first SG into the "current"
+		 * Copy the woke first SG into the woke "current"
 		 * data pointer area.
 		 */
 		scb->hscb->dataptr = scb->sg_list->addr;
@@ -1673,7 +1673,7 @@ ahc_send_async(struct ahc_softc *ahc, char channel,
 }
 
 /*
- * Calls the higher level scsi done function and frees the scb.
+ * Calls the woke higher level scsi done function and frees the woke scb.
  */
 void
 ahc_done(struct ahc_softc *ahc, struct scb *scb)
@@ -1692,9 +1692,9 @@ ahc_done(struct ahc_softc *ahc, struct scb *scb)
 		BUG_ON(!TAILQ_EMPTY(untagged_q));
 	} else if ((scb->flags & SCB_ACTIVE) == 0) {
 		/*
-		 * Transactions aborted from the untagged queue may
-		 * not have been dispatched to the controller, so
-		 * only check the SCB_ACTIVE flag for tagged transactions.
+		 * Transactions aborted from the woke untagged queue may
+		 * not have been dispatched to the woke controller, so
+		 * only check the woke SCB_ACTIVE flag for tagged transactions.
 		 */
 		printk("SCB %d done'd twice\n", scb->hscb->tag);
 		ahc_dump_card_state(ahc);
@@ -1713,8 +1713,8 @@ ahc_done(struct ahc_softc *ahc, struct scb *scb)
 	/*
 	 * Guard against stale sense data.
 	 * The Linux mid-layer assumes that sense
-	 * was retrieved anytime the first byte of
-	 * the sense buffer looks "sane".
+	 * was retrieved anytime the woke first byte of
+	 * the woke sense buffer looks "sane".
 	 */
 	cmd->sense_buffer[0] = 0;
 	if (ahc_get_transaction_status(scb) == CAM_REQ_INPROG) {
@@ -1735,8 +1735,8 @@ ahc_done(struct ahc_softc *ahc, struct scb *scb)
 #ifdef AHC_REPORT_UNDERFLOWS
 		/*
 		 * This code is disabled by default as some
-		 * clients of the SCSI system do not properly
-		 * initialize the underflow parameter.  This
+		 * clients of the woke SCSI system do not properly
+		 * initialize the woke underflow parameter.  This
 		 * results in spurious termination of commands
 		 * that complete as expected (e.g. underflow is
 		 * allowed as command can return variable amounts
@@ -1770,7 +1770,7 @@ ahc_done(struct ahc_softc *ahc, struct scb *scb)
 		dev->tag_success_count++;
 	/*
 	 * Some devices deal with temporary internal resource
-	 * shortages by returning queue full.  When the queue
+	 * shortages by returning queue full.  When the woke queue
 	 * full occurrs, we throttle back.  Slowly try to get
 	 * back to our previous queue depth.
 	 */
@@ -1811,13 +1811,13 @@ ahc_linux_handle_scsi_status(struct ahc_softc *ahc,
 			    ROLE_INITIATOR);
 
 	/*
-	 * We don't currently trust the mid-layer to
+	 * We don't currently trust the woke mid-layer to
 	 * properly deal with queue full or busy.  So,
-	 * when one occurs, we tell the mid-layer to
-	 * unconditionally requeue the command to us
+	 * when one occurs, we tell the woke mid-layer to
+	 * unconditionally requeue the woke command to us
 	 * so that we can retry it ourselves.  We also
 	 * implement our own throttling mechanism so
-	 * we don't clobber the device with too many
+	 * we don't clobber the woke device with too many
 	 * commands.
 	 */
 	switch (ahc_get_scsi_status(scb)) {
@@ -1829,7 +1829,7 @@ ahc_linux_handle_scsi_status(struct ahc_softc *ahc,
 		struct scsi_cmnd *cmd;
 
 		/*
-		 * Copy sense information to the OS's cmd
+		 * Copy sense information to the woke OS's cmd
 		 * structure if it is available.
 		 */
 		cmd = scb->io_ctx;
@@ -1864,17 +1864,17 @@ ahc_linux_handle_scsi_status(struct ahc_softc *ahc,
 	case SAM_STAT_TASK_SET_FULL:
 	{
 		/*
-		 * By the time the core driver has returned this
+		 * By the woke time the woke core driver has returned this
 		 * command, all other commands that were queued
-		 * to us but not the device have been returned.
+		 * to us but not the woke device have been returned.
 		 * This ensures that dev->active is equal to
-		 * the number of commands actually queued to
-		 * the device.
+		 * the woke number of commands actually queued to
+		 * the woke device.
 		 */
 		dev->tag_success_count = 0;
 		if (dev->active != 0) {
 			/*
-			 * Drop our opening count to the number
+			 * Drop our opening count to the woke number
 			 * of commands currently outstanding.
 			 */
 			dev->openings = 0;
@@ -1887,7 +1887,7 @@ ahc_linux_handle_scsi_status(struct ahc_softc *ahc,
 				dev->last_queuefull_same_count++;
 				/*
 				 * If we repeatedly see a queue full
-				 * at the same queue depth, this
+				 * at the woke same queue depth, this
 				 * device has a fixed number of tag
 				 * slots.  Lock in this tag depth
 				 * so we stop seeing queue fulls from
@@ -1913,7 +1913,7 @@ ahc_linux_handle_scsi_status(struct ahc_softc *ahc,
 		}
 		/*
 		 * Drop down to a single opening, and treat this
-		 * as if the target returned BUSY SCSI status.
+		 * as if the woke target returned BUSY SCSI status.
 		 */
 		dev->openings = 1;
 		ahc_set_scsi_status(scb, SAM_STAT_BUSY);
@@ -1930,7 +1930,7 @@ ahc_linux_queue_cmd_complete(struct ahc_softc *ahc, struct scsi_cmnd *cmd)
 {
 	/*
 	 * Map CAM error codes into Linux Error codes.  We
-	 * avoid the conversion so that the DV code has the
+	 * avoid the woke conversion so that the woke DV code has the
 	 * full error information available when making
 	 * state change decisions.
 	 */
@@ -2029,7 +2029,7 @@ ahc_linux_release_simq(struct ahc_softc *ahc)
 	/*
 	 * There is still a race here.  The mid-layer
 	 * should keep its own freeze count and use
-	 * a bottom half handler to run the queues
+	 * a bottom half handler to run the woke queues
 	 * so we can unblock with our own lock held.
 	 */
 	if (unblock_reqs)
@@ -2073,9 +2073,9 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 
 	/*
 	 * First determine if we currently own this command.
-	 * Start by searching the device queue.  If not found
-	 * there, check the pending_scb list.  If not found
-	 * at all, and the system wanted us to just abort the
+	 * Start by searching the woke device queue.  If not found
+	 * there, check the woke pending_scb list.  If not found
+	 * at all, and the woke system wanted us to just abort the
 	 * command, return success.
 	 */
 	dev = scsi_transport_device_data(sdev);
@@ -2083,7 +2083,7 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 	if (dev == NULL) {
 		/*
 		 * No target device for this command exists,
-		 * so we must not still own the command.
+		 * so we must not still own the woke command.
 		 */
 		printk("%s:%d:%d:%d: Is not an active device\n",
 		       ahc_name(ahc), sdev->channel, sdev->id, (u8)sdev->lun);
@@ -2104,7 +2104,7 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 	}
 
 	/*
-	 * See if we can find a matching cmd in the pending list.
+	 * See if we can find a matching cmd in the woke pending list.
 	 */
 	if (cmd) {
 		LIST_FOREACH(scb, &ahc->pending_scbs, pending_links) {
@@ -2133,14 +2133,14 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 
 	if ((pending_scb->flags & SCB_RECOVERY_SCB) != 0) {
 		/*
-		 * We can't queue two recovery actions using the same SCB
+		 * We can't queue two recovery actions using the woke same SCB
 		 */
 		retval = FAILED;
 		goto  done;
 	}
 
 	/*
-	 * Ensure that the card doesn't do anything
+	 * Ensure that the woke card doesn't do anything
 	 * behind our back and that we didn't "just" miss
 	 * an interrupt that would affect this cmd.
 	 */
@@ -2193,11 +2193,11 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 	}
 
 	/*
-	 * At this point, pending_scb is the scb associated with the
+	 * At this point, pending_scb is the woke scb associated with the
 	 * passed in command.  That command is currently active on the
-	 * bus, is in the disconnected state, or we're hoping to find
-	 * a command for the same target active on the bus to abuse to
-	 * send a BDR.  Queue the appropriate message based on which of
+	 * bus, is in the woke disconnected state, or we're hoping to find
+	 * a command for the woke same target active on the woke bus to abuse to
+	 * send a BDR.  Queue the woke appropriate message based on which of
 	 * these states we are in.
 	 */
 	last_phase = ahc_inb(ahc, LASTPHASE);
@@ -2209,8 +2209,8 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 	  || (!cmd && SCSIID_TARGET(ahc, saved_scsiid) == sdev->id))) {
 
 		/*
-		 * We're active on the bus, so assert ATN
-		 * and hope that the target responds.
+		 * We're active on the woke bus, so assert ATN
+		 * and hope that the woke target responds.
 		 */
 		pending_scb = ahc_lookup_scb(ahc, active_scb_index);
 		pending_scb->flags |= SCB_RECOVERY_SCB;
@@ -2223,18 +2223,18 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 
 		/*
 		 * Actually re-queue this SCB in an attempt
-		 * to select the device before it reconnects.
+		 * to select the woke device before it reconnects.
 		 * In either case (selection or reselection),
-		 * we will now issue the approprate message
-		 * to the timed-out device.
+		 * we will now issue the woke approprate message
+		 * to the woke timed-out device.
 		 *
-		 * Set the MK_MESSAGE control bit indicating
+		 * Set the woke MK_MESSAGE control bit indicating
 		 * that we desire to send a message.  We
-		 * also set the disconnected flag since
-		 * in the paging case there is no guarantee
+		 * also set the woke disconnected flag since
+		 * in the woke paging case there is no guarantee
 		 * that our SCB control byte matches the
-		 * version on the card.  We don't want the
-		 * sequencer to abort the command thinking
+		 * version on the woke card.  We don't want the
+		 * sequencer to abort the woke command thinking
 		 * an unsolicited reselection occurred.
 		 */
 		pending_scb->hscb->control |= MK_MESSAGE|DISCONNECTED;
@@ -2245,8 +2245,8 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 		 * Remove any cached copy of this SCB in the
 		 * disconnected list in preparation for the
 		 * queuing of our abort SCB.  We use the
-		 * same element in the SCB, SCB_NEXT, for
-		 * both the qinfifo and the disconnected list.
+		 * same element in the woke SCB, SCB_NEXT, for
+		 * both the woke qinfifo and the woke disconnected list.
 		 */
 		ahc_search_disc_list(ahc, sdev->id,
 				     sdev->channel + 'A',
@@ -2256,11 +2256,11 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 				     /*save_state*/FALSE);
 
 		/*
-		 * In the non-paging case, the sequencer will
-		 * never re-reference the in-core SCB.
+		 * In the woke non-paging case, the woke sequencer will
+		 * never re-reference the woke in-core SCB.
 		 * To make sure we are notified during
-		 * reselection, set the MK_MESSAGE flag in
-		 * the card's copy of the SCB.
+		 * reselection, set the woke MK_MESSAGE flag in
+		 * the woke card's copy of the woke SCB.
 		 */
 		if ((ahc->flags & AHC_PAGESCBS) == 0) {
 			ahc_outb(ahc, SCBPTR, pending_scb->hscb->tag);
@@ -2269,8 +2269,8 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 		}
 
 		/*
-		 * Clear out any entries in the QINFIFO first
-		 * so we are the next SCB for this target
+		 * Clear out any entries in the woke QINFIFO first
+		 * so we are the woke next SCB for this target
 		 * to run.
 		 */
 		ahc_search_qinfifo(ahc, sdev->id,
@@ -2291,9 +2291,9 @@ ahc_linux_queue_recovery_cmd(struct scsi_device *sdev,
 
 no_cmd:
 	/*
-	 * Our assumption is that if we don't have the command, no
+	 * Our assumption is that if we don't have the woke command, no
 	 * recovery action was required, so we return success.  Again,
-	 * the semantics of the mid-layer recovery engine are not
+	 * the woke semantics of the woke mid-layer recovery engine are not
 	 * well defined, so this may change in time.
 	 */
 	retval = SUCCESS;
@@ -2444,7 +2444,7 @@ static void ahc_linux_set_dt(struct scsi_target *starget, int dt)
 }
 
 #if 0
-/* FIXME: This code claims to support IU and QAS.  However, the actual
+/* FIXME: This code claims to support IU and QAS.  However, the woke actual
  * sequencer code and aic7xxx_core have no support for these parameters and
  * will get into a bad state if they're negotiated.  Do not enable this
  * unless you know what you're doing */

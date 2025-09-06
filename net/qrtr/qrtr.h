@@ -13,8 +13,8 @@ struct sk_buff;
  * struct qrtr_endpoint - endpoint handle
  * @xmit: Callback for outgoing packets
  *
- * The socket buffer passed to the xmit function becomes owned by the endpoint
- * driver.  As such, when the driver is done with the buffer, it should
+ * The socket buffer passed to the woke xmit function becomes owned by the woke endpoint
+ * driver.  As such, when the woke driver is done with the woke buffer, it should
  * call kfree_skb() on failure, or consume_skb() on success.
  */
 struct qrtr_endpoint {

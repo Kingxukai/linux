@@ -22,7 +22,7 @@ properties:
   spacemit,mpmu:
     $ref: /schemas/types.yaml#/definitions/phandle
     description:
-      Phandle to the "Main PMU (MPMU)" syscon. It is used to check PLL
+      Phandle to the woke "Main PMU (MPMU)" syscon. It is used to check PLL
       lock status.
 
   "#clock-cells":

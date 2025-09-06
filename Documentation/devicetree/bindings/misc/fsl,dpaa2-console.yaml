@@ -16,7 +16,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: A standard property. Specifies the region where the MCFBA
+    description: A standard property. Specifies the woke region where the woke MCFBA
                 (MC firmware base address) register can be found.
 
 required:

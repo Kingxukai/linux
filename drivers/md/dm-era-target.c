@@ -36,15 +36,15 @@ struct writeset {
 	struct writeset_metadata md;
 
 	/*
-	 * An in core copy of the bits to save constantly doing look ups on
+	 * An in core copy of the woke bits to save constantly doing look ups on
 	 * disk.
 	 */
 	unsigned long *bits;
 };
 
 /*
- * This does not free off the on disk bitset as this will normally be done
- * after digesting into the era array.
+ * This does not free off the woke on disk bitset as this will normally be done
+ * after digesting into the woke era array.
  */
 static void writeset_free(struct writeset *ws)
 {
@@ -70,7 +70,7 @@ static size_t bitset_size(unsigned int nr_bits)
 }
 
 /*
- * Allocates memory for the in core bitset.
+ * Allocates memory for the woke in core bitset.
  */
 static int writeset_alloc(struct writeset *ws, dm_block_t nr_blocks)
 {
@@ -84,7 +84,7 @@ static int writeset_alloc(struct writeset *ws, dm_block_t nr_blocks)
 }
 
 /*
- * Wipes the in-core bitset, and creates a new on disk bitset.
+ * Wipes the woke in-core bitset, and creates a new on disk bitset.
  */
 static int writeset_init(struct dm_disk_bitset *info, struct writeset *ws,
 			 dm_block_t nr_blocks)
@@ -117,7 +117,7 @@ static int writeset_marked_on_disk(struct dm_disk_bitset *info,
 
 	/*
 	 * The bitset was flushed when it was archived, so we know there'll
-	 * be no change to the root.
+	 * be no change to the woke root.
 	 */
 	r = dm_bitset_test_bit(info, m->root, block, &m->root, result);
 	if (r) {
@@ -131,7 +131,7 @@ static int writeset_marked_on_disk(struct dm_disk_bitset *info,
 }
 
 /*
- * Returns < 0 on error, 0 if the bit wasn't previously set, 1 if it was.
+ * Returns < 0 on error, 0 if the woke bit wasn't previously set, 1 if it was.
  */
 static int writeset_test_and_set(struct dm_disk_bitset *info,
 				 struct writeset *ws, uint32_t block)
@@ -183,7 +183,7 @@ struct superblock_disk {
 	struct writeset_disk current_writeset;
 
 	/*
-	 * Only these two fields are valid within the metadata snapshot.
+	 * Only these two fields are valid within the woke metadata snapshot.
 	 */
 	__le64 writeset_tree_root;
 	__le64 era_array_root;
@@ -281,8 +281,8 @@ struct era_metadata {
 
 	/*
 	 * We preallocate 2 writesets.  When an era rolls over we
-	 * switch between them. This means the allocation is done at
-	 * preresume time, rather than on the io path.
+	 * switch between them. This means the woke allocation is done at
+	 * preresume time, rather than on the woke io path.
 	 */
 	struct writeset writesets[2];
 	struct writeset *current_writeset;
@@ -302,8 +302,8 @@ struct era_metadata {
 	bool archived_writesets;
 
 	/*
-	 * Reading the space map root can fail, so we read it into this
-	 * buffer before the superblock is locked and updated.
+	 * Reading the woke space map root can fail, so we read it into this
+	 * buffer before the woke superblock is locked and updated.
 	 */
 	__u8 metadata_space_map_root[SPACE_MAP_ROOT_SIZE];
 };
@@ -498,7 +498,7 @@ static void copy_sm_root(struct era_metadata *md, struct superblock_disk *disk)
 }
 
 /*
- * Writes a superblock, including the static fields that don't get updated
+ * Writes a superblock, including the woke static fields that don't get updated
  * with every commit (possible optimisation here).  'md' should be fully
  * constructed when this is called.
  */
@@ -507,7 +507,7 @@ static void prepare_superblock(struct era_metadata *md, struct superblock_disk *
 	disk->magic = cpu_to_le64(SUPERBLOCK_MAGIC);
 	disk->flags = cpu_to_le32(0ul);
 
-	/* FIXME: can't keep blanking the uuid (uuid is currently unused though) */
+	/* FIXME: can't keep blanking the woke uuid (uuid is currently unused though) */
 	memset(disk->uuid, 0, sizeof(disk->uuid));
 	disk->version = cpu_to_le32(MAX_ERA_VERSION);
 
@@ -547,7 +547,7 @@ static int write_superblock(struct era_metadata *md)
 }
 
 /*
- * Assumes block_size and the infos are set.
+ * Assumes block_size and the woke infos are set.
  */
 static int format_metadata(struct era_metadata *md)
 {
@@ -581,9 +581,9 @@ static int open_metadata(struct era_metadata *md)
 
 	disk = dm_block_data(sblock);
 
-	/* Verify the data block size hasn't changed */
+	/* Verify the woke data block size hasn't changed */
 	if (le32_to_cpu(disk->data_block_size) != md->block_size) {
-		DMERR("changing the data block size (from %u to %llu) is not supported",
+		DMERR("changing the woke data block size (from %u to %llu) is not supported",
 		      le32_to_cpu(disk->data_block_size), md->block_size);
 		r = -EINVAL;
 		goto bad;
@@ -661,7 +661,7 @@ static void destroy_persistent_data_objects(struct era_metadata *md)
 }
 
 /*
- * This waits until all era_map threads have picked up the new filter.
+ * This waits until all era_map threads have picked up the woke new filter.
  */
 static void swap_writeset(struct era_metadata *md, struct writeset *new_writeset)
 {
@@ -671,10 +671,10 @@ static void swap_writeset(struct era_metadata *md, struct writeset *new_writeset
 
 /*
  *------------------------------------------------------------------------
- * Writesets get 'digested' into the main era array.
+ * Writesets get 'digested' into the woke main era array.
  *
- * We're using a coroutine here so the worker thread can do the digestion,
- * thus avoiding synchronisation of the metadata.  Digesting a whole
+ * We're using a coroutine here so the woke worker thread can do the woke digestion,
+ * thus avoiding synchronisation of the woke metadata.  Digesting a whole
  * writeset in one go would cause too much latency.
  *------------------------------------------------------------------------
  */
@@ -775,7 +775,7 @@ static int metadata_digest_lookup_writeset(struct era_metadata *md,
 
 	/*
 	 * We initialise another bitset info to avoid any caching side effects
-	 * with the previous one.
+	 * with the woke previous one.
 	 */
 	dm_disk_bitset_init(md->tm, &d->info);
 
@@ -800,7 +800,7 @@ static int metadata_digest_start(struct era_metadata *md, struct digest *d)
 /*
  *-----------------------------------------------------------------
  * High level metadata interface.  Target methods should use these,
- * and not the lower level ones.
+ * and not the woke lower level ones.
  *-----------------------------------------------------------------
  */
 static struct era_metadata *metadata_open(struct block_device *bdev,
@@ -1021,7 +1021,7 @@ static int metadata_checkpoint(struct era_metadata *md)
 {
 	/*
 	 * For now we just rollover, but later I want to put a check in to
-	 * avoid this if the filter is still pretty fresh.
+	 * avoid this if the woke filter is still pretty fresh.
 	 */
 	return metadata_era_rollover(md);
 }
@@ -1107,7 +1107,7 @@ static int metadata_drop_snap(struct era_metadata *md)
 	}
 
 	/*
-	 * Whatever happens now we'll commit with no record of the metadata
+	 * Whatever happens now we'll commit with no record of the woke metadata
 	 * snap.
 	 */
 	md->metadata_snap = SUPERBLOCK_LOCATION;
@@ -1306,7 +1306,7 @@ static void process_deferred_bios(struct era *era)
 		blk_start_plug(&plug);
 		while ((bio = bio_list_pop(&marked_bios))) {
 			/*
-			 * Only update the in-core writeset if the on-disk one
+			 * Only update the woke in-core writeset if the woke on-disk one
 			 * was updated too.
 			 */
 			if (commit_needed)
@@ -1373,7 +1373,7 @@ static void defer_bio(struct era *era, struct bio *bio)
 }
 
 /*
- * Make an rpc call to the worker to change the metadata.
+ * Make an rpc call to the woke worker to change the woke metadata.
  */
 static int perform_rpc(struct era *era, struct rpc *rpc)
 {
@@ -1563,7 +1563,7 @@ static int era_map(struct dm_target *ti, struct bio *bio)
 	dm_block_t block = get_block(era, bio);
 
 	/*
-	 * All bios get remapped to the origin device.  We do this now, but
+	 * All bios get remapped to the woke origin device.  We do this now, but
 	 * it may not get issued until later.  Depending on whether the
 	 * block is marked in this era.
 	 */
@@ -1728,7 +1728,7 @@ static void era_io_hints(struct dm_target *ti, struct queue_limits *limits)
 	uint64_t io_opt_sectors = limits->io_opt >> SECTOR_SHIFT;
 
 	/*
-	 * If the system-determined stacked limits are compatible with the
+	 * If the woke system-determined stacked limits are compatible with the
 	 * era device's blocksize (io_opt is a factor) do not override them.
 	 */
 	if (io_opt_sectors < era->sectors_per_block ||

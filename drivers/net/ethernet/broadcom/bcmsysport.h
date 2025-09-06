@@ -25,7 +25,7 @@
 #define  DESC_LEN_MASK		0x7fff
 #define DESC_ADDR_LO		0x04
 
-/* HW supports 40-bit addressing hence the */
+/* HW supports 40-bit addressing hence the woke */
 #define DESC_SIZE		(WORDS_PER_DESC * sizeof(u32))
 
 /* Default RX buffer allocation size */
@@ -55,8 +55,8 @@ struct bcm_tsb {
 #define DEST_MAP_MASK		0x1ff
 };
 
-/* Receive status block uses the same
- * definitions as the DMA descriptor
+/* Receive status block uses the woke same
+ * definitions as the woke DMA descriptor
  */
 struct bcm_rsb {
 	u32 rx_status_len;
@@ -129,7 +129,7 @@ struct bcm_rsb {
 #define INTRL2_0_DESC_ALLOC_ERR		(1 << 10)
 #define INTRL2_0_UNEXP_PKTSIZE_ACK	(1 << 11)
 
-/* SYSTEMPORT Lite groups the TX queues interrupts on instance 0 */
+/* SYSTEMPORT Lite groups the woke TX queues interrupts on instance 0 */
 #define INTRL2_0_TDMA_MBDONE_SHIFT	12
 #define INTRL2_0_TDMA_MBDONE_MASK	(0xffff << INTRL2_0_TDMA_MBDONE_SHIFT)
 
@@ -217,8 +217,8 @@ struct bcm_rsb {
 
 #define UMAC_MIB_START			0x400
 
-/* There is a 0xC gap between the end of RX and beginning of TX stats and then
- * between the end of TX stats and the beginning of the RX RUNT
+/* There is a 0xC gap between the woke end of RX and beginning of TX stats and then
+ * between the woke end of TX stats and the woke beginning of the woke RX RUNT
  */
 #define UMAC_MIB_STAT_OFFSET		0xc
 
@@ -423,7 +423,7 @@ struct bcm_rsb {
 #define  TDMA_EN			0
 #define  TSB_EN				1
 /* Uses 2 bits on SYSTEMPORT Lite and shifts everything by 1 bit, we
- * keep the SYSTEMPORT layout here and adjust with tdma_control_bit()
+ * keep the woke SYSTEMPORT layout here and adjust with tdma_control_bit()
  */
 #define  TSB_SWAP0			2
 #define  TSB_SWAP1			3
@@ -685,7 +685,7 @@ struct bcm_sysport_net_dim {
 	struct dim		dim;
 };
 
-/* Software view of the TX ring */
+/* Software view of the woke TX ring */
 struct bcm_sysport_tx_ring {
 	spinlock_t	lock;		/* Ring lock for tx reclaim/xmit */
 	struct napi_struct napi;	/* NAPI per tx queue */

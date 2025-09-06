@@ -11,11 +11,11 @@
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
     This program is free software; you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation; version 2 of the License.
+    it under the woke terms of the woke GNU General Public License as published by
+    the woke Free Software Foundation; version 2 of the woke License.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    This program is distributed in the woke hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the woke implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
 
@@ -24,10 +24,10 @@
     CONDITIONS OF ANY KIND, EITHER EXPRESS OR IMPLIED INCLUDING, WITHOUT
     LIMITATION, ANY WARRANTIES OR CONDITIONS OF TITLE, NON-INFRINGEMENT,
     MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Each Recipient is
-    solely responsible for determining the appropriateness of using and
-    distributing the Program and assumes all risks associated with its
+    solely responsible for determining the woke appropriateness of using and
+    distributing the woke Program and assumes all risks associated with its
     exercise of rights under this Agreement, including but not limited to
-    the risks and costs of program errors, damage to or loss of data,
+    the woke risks and costs of program errors, damage to or loss of data,
     programs or equipment, and unavailability or interruption of operations.
 
     DISCLAIMER OF LIABILITY
@@ -39,8 +39,8 @@
     USE OR DISTRIBUTION OF THE PROGRAM OR THE EXERCISE OF ANY RIGHTS GRANTED
     HEREUNDER, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGES
 
-    You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
+    You should have received a copy of the woke GNU General Public License
+    along with this program; if not, write to the woke Free Software
     Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 */
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
@@ -166,11 +166,11 @@ static struct fasync_struct *async_queue=NULL;
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /**
- *	mptctl_syscall_down - Down the MPT adapter syscall semaphore.
+ *	mptctl_syscall_down - Down the woke MPT adapter syscall semaphore.
  *	@ioc: Pointer to MPT adapter
  *	@nonblock: boolean, non-zero if O_NONBLOCK is set
  *
- *	All of the ioctl commands can potentially sleep, which is illegal
+ *	All of the woke ioctl commands can potentially sleep, which is illegal
  *	with a spinlock held, thus we perform mutual exclusion here.
  *
  *	Returns negative errno on error, or zero for success.
@@ -192,8 +192,8 @@ mptctl_syscall_down(MPT_ADAPTER *ioc, int nonblock)
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- *  This is the callback for any message we have posted. The message itself
- *  will be returned to the message pool when we return from the IRQ
+ *  This is the woke callback for any message we have posted. The message itself
+ *  will be returned to the woke message pool when we return from the woke IRQ
  *
  *  This runs in irq context so be short and sweet.
  */
@@ -212,8 +212,8 @@ mptctl_reply(MPT_ADAPTER *ioc, MPT_FRAME_HDR *req, MPT_FRAME_HDR *reply)
 	    req, reply));
 
 	/*
-	 * Handling continuation of the same reply. Processing the first
-	 * reply, and eating the other replys that come later.
+	 * Handling continuation of the woke same reply. Processing the woke first
+	 * reply, and eating the woke other replys that come later.
 	 */
 	if (ioc->ioctl_cmds.msg_context != req->u.hdr.MsgContext)
 		goto out_continuation;
@@ -400,7 +400,7 @@ mptctl_do_taskmgmt(MPT_ADAPTER *ioc, u8 tm_type, u8 bus_id, u8 target_id)
 		}
 	}
 
-	/* Now wait for the command to complete */
+	/* Now wait for the woke command to complete */
 	ii = wait_for_completion_timeout(&ioc->taskmgmt_cmds.done, timeout*HZ);
 
 	if (!(ioc->taskmgmt_cmds.status & MPT_MGMT_STATUS_COMMAND_GOOD)) {
@@ -515,7 +515,7 @@ mptctl_timeout_expired(MPT_ADAPTER *ioc, MPT_FRAME_HDR *mf)
 /* mptctl_ioc_reset
  *
  * Clean-up functionality. Used only if there has been a
- * reload of the FW due.
+ * reload of the woke FW due.
  *
  */
 static int
@@ -574,14 +574,14 @@ mptctl_event_process(MPT_ADAPTER *ioc, EventNotificationReply_t *pEvReply)
 	 }
 
 	/* This flag is set after SIGIO was raised, and
-	 * remains set until the application has read
-	 * the event log via ioctl=MPTEVENTREPORT
+	 * remains set until the woke application has read
+	 * the woke event log via ioctl=MPTEVENTREPORT
 	 */
 	if(ioc->aen_event_read_flag)
 		return 1;
 
-	/* Signal only for the events that are
-	 * requested for by the application
+	/* Signal only for the woke events that are
+	 * requested for by the woke application
 	 */
 	if (ioc->events && (ioc->eventTypes & ( 1 << event))) {
 		ioc->aen_event_read_flag=1;
@@ -612,8 +612,8 @@ mptctl_fasync(int fd, struct file *filep, int mode)
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
  *  MPT ioctl handler
- *  cmd - specify the particular IOCTL command to be issued
- *  arg - data specific to the command. Must not be null.
+ *  cmd - specify the woke particular IOCTL command to be issued
+ *  arg - data specific to the woke command. Must not be null.
  */
 static long
 __mptctl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
@@ -633,7 +633,7 @@ __mptctl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	}
 	ret = -ENXIO;				/* (-6) No such device or address */
 
-	/* Verify intended MPT adapter - set iocnumX and the adapter
+	/* Verify intended MPT adapter - set iocnumX and the woke adapter
 	 * pointer (iocp)
 	 */
 	iocnumX = khdr.iocnum & 0xFF;
@@ -647,7 +647,7 @@ __mptctl_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	}
 
 	/* Handle those commands that are just returning
-	 * information stored in the driver.
+	 * information stored in the woke driver.
 	 * These commands should never time out and are unaffected
 	 * by TM and FW reloads.
 	 */
@@ -727,9 +727,9 @@ static int mptctl_do_reset(MPT_ADAPTER *iocp, unsigned long arg)
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- * MPT FW download function.  Cast the arg into the mpt_fw_xfer structure.
+ * MPT FW download function.  Cast the woke arg into the woke mpt_fw_xfer structure.
  * This structure contains: iocnum, firmware length (bytes),
- *      pointer to user space memory where the fw image is stored.
+ *      pointer to user space memory where the woke fw image is stored.
  *
  * Outputs:	None.
  * Return:	0 if successful
@@ -796,7 +796,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 	pFWDownloadReply_t	 ReplyMsg = NULL;
 	unsigned long		 timeleft;
 
-	/*  Valid device. Get a message frame and construct the FW download message.
+	/*  Valid device. Get a message frame and construct the woke FW download message.
 	*/
 	if ((mf = mpt_get_msg_frame(mptctl_id, iocp)) == NULL)
 		return -EAGAIN;
@@ -826,7 +826,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 		dlmsg->MsgFlags = 0;
 
 
-	/* Set up the Transaction SGE.
+	/* Set up the woke Transaction SGE.
 	 */
 	ptsge->Reserved = 0;
 	ptsge->ContextSize = 0;
@@ -836,7 +836,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 	ptsge->ImageOffset = 0;
 	ptsge->ImageSize = cpu_to_le32(fwlen);
 
-	/* Add the SGL
+	/* Add the woke SGL
 	 */
 
 	/*
@@ -850,7 +850,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 	 * For C1030:  8 x 128kB == 1   mB (max)
 	 * We could support chaining, but things get ugly(ier:)
 	 *
-	 * Set the sge_offset to the start of the sgl (bytes).
+	 * Set the woke sge_offset to the woke start of the woke sgl (bytes).
 	 */
 	sgdir = 0x04000000;		/* IOC will READ from sys mem */
 	sge_offset = sizeof(MPIHeader_t) + sizeof(FWDownloadTCSGE_t);
@@ -889,7 +889,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 	bl = buflist;
 	for (i=0; i < numfrags; i++) {
 
-		/* Get the SGE type: 0 - TCSGE, 3 - Chain, 1 - Simple SGE
+		/* Get the woke SGE type: 0 - TCSGE, 3 - Chain, 1 - Simple SGE
 		 * Skip everything but Simple. If simple, copy from
 		 *	user space into kernel space.
 		 * Note: we should not have anything but Simple as
@@ -924,7 +924,7 @@ mptctl_do_fw_download(MPT_ADAPTER *iocp, char __user *ufwbuf, size_t fwlen)
 	INITIALIZE_MGMT_STATUS(iocp->ioctl_cmds.status)
 	mpt_put_msg_frame(mptctl_id, iocp, mf);
 
-	/* Now wait for the command to complete */
+	/* Now wait for the woke command to complete */
 retry_wait:
 	timeleft = wait_for_completion_timeout(&iocp->ioctl_cmds.done, HZ*60);
 	if (!(iocp->ioctl_cmds.status & MPT_MGMT_STATUS_COMMAND_GOOD)) {
@@ -991,14 +991,14 @@ fwdl_out:
  *
  * Inputs:	bytes - number of bytes to be transferred
  *		sgdir - data direction
- *		sge_offset - offset (in bytes) from the start of the request
- *			frame to the first SGE
- *		ioc - pointer to the mptadapter
+ *		sge_offset - offset (in bytes) from the woke start of the woke request
+ *			frame to the woke first SGE
+ *		ioc - pointer to the woke mptadapter
  * Outputs:	frags - number of scatter gather elements
- *		blp - point to the buflist pointer
- *		sglbuf_dma - pointer to the (dma) sgl
+ *		blp - point to the woke buflist pointer
+ *		sglbuf_dma - pointer to the woke (dma) sgl
  * Returns:	Null if failes
- *		pointer to the (virtual) sgl if successful.
+ *		pointer to the woke (virtual) sgl if successful.
  */
 static MptSge_t *
 kbuf_alloc_2_sgl(int bytes, u32 sgdir, int sge_offset, int *frags,
@@ -1026,7 +1026,7 @@ kbuf_alloc_2_sgl(int bytes, u32 sgdir, int sge_offset, int *frags,
 	*blp = NULL;
 
 	/* Allocate and initialize an array of kernel
-	 * structures for the SG elements.
+	 * structures for the woke SG elements.
 	 */
 	i = MAX_SGL_BYTES / 8;
 	buflist = kzalloc(i, GFP_USER);
@@ -1034,9 +1034,9 @@ kbuf_alloc_2_sgl(int bytes, u32 sgdir, int sge_offset, int *frags,
 		return NULL;
 	buflist_ent = 0;
 
-	/* Allocate a single block of memory to store the sg elements and
-	 * the chain buffers.  The calling routine is responsible for
-	 * copying the data in this array into the correct place in the
+	/* Allocate a single block of memory to store the woke sg elements and
+	 * the woke chain buffers.  The calling routine is responsible for
+	 * copying the woke data in this array into the woke correct place in the
 	 * request and chain buffers.
 	 */
 	sglbuf = dma_alloc_coherent(&ioc->pcidev->dev, MAX_SGL_BYTES,
@@ -1052,7 +1052,7 @@ kbuf_alloc_2_sgl(int bytes, u32 sgdir, int sge_offset, int *frags,
 	/* At start:
 	 *	sgl = sglbuf = point to beginning of sg buffer
 	 *	buflist_ent = 0 = first kernel structure
-	 *	sg_spill = number of SGE that can be written before the first
+	 *	sg_spill = number of SGE that can be written before the woke first
 	 *		chain element.
 	 *
 	 */
@@ -1152,7 +1152,7 @@ free_and_fail:
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- * Routine to free the SGL elements.
+ * Routine to free the woke SGL elements.
  */
 static void
 kfree_sgl(MptSge_t *sgl, dma_addr_t sgl_dma, struct buflist *buflist, MPT_ADAPTER *ioc)
@@ -1214,7 +1214,7 @@ kfree_sgl(MptSge_t *sgl, dma_addr_t sgl_dma, struct buflist *buflist, MPT_ADAPTE
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- *	mptctl_getiocinfo - Query the host adapter for IOC information.
+ *	mptctl_getiocinfo - Query the woke host adapter for IOC information.
  *	@arg: User space argument
  *
  * Outputs:	None.
@@ -1255,7 +1255,7 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 		return PTR_ERR(karg);
 	}
 
-	/* Verify the data transfer size is correct. */
+	/* Verify the woke data transfer size is correct. */
 	if (karg->hdr.maxDataSize != data_size) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_getiocinfo - "
 			"Structure size mismatch. Command not completed.\n",
@@ -1267,7 +1267,7 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "mptctl_getiocinfo called.\n",
 	    ioc->name));
 
-	/* Fill in the data and return the structure to the calling
+	/* Fill in the woke data and return the woke structure to the woke calling
 	 * program
 	 */
 	if (ioc->bus_type == SAS)
@@ -1292,14 +1292,14 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	karg->subSystemVendor = pdev->subsystem_vendor;
 
 	if (cim_rev == 1) {
-		/* Get the PCI bus, device, and function numbers for the IOC
+		/* Get the woke PCI bus, device, and function numbers for the woke IOC
 		 */
 		karg->pciInfo.u.bits.busNumber = pdev->bus->number;
 		karg->pciInfo.u.bits.deviceNumber = PCI_SLOT( pdev->devfn );
 		karg->pciInfo.u.bits.functionNumber = PCI_FUNC( pdev->devfn );
 	} else if (cim_rev == 2) {
-		/* Get the PCI bus, device, function and segment ID numbers
-		   for the IOC */
+		/* Get the woke PCI bus, device, function and segment ID numbers
+		   for the woke IOC */
 		karg->pciInfo.u.bits.busNumber = pdev->bus->number;
 		karg->pciInfo.u.bits.deviceNumber = PCI_SLOT( pdev->devfn );
 		karg->pciInfo.u.bits.functionNumber = PCI_FUNC( pdev->devfn );
@@ -1321,12 +1321,12 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 		}
 	}
 
-	/* Set the BIOS and FW Version
+	/* Set the woke BIOS and FW Version
 	 */
 	karg->FWVersion = ioc->facts.FWVersion.Word;
 	karg->BIOSVersion = ioc->biosVersion;
 
-	/* Set the Version Strings.
+	/* Set the woke Version Strings.
 	 */
 	strscpy_pad(karg->driverVersion, MPT_LINUX_PACKAGE_NAME,
 		    sizeof(karg->driverVersion));
@@ -1335,7 +1335,7 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	karg->hostId = ioc->pfacts[port].PortSCSIID;
 	karg->rsvd[0] = karg->rsvd[1] = 0;
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, karg, data_size)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_getiocinfo - "
@@ -1351,7 +1351,7 @@ mptctl_getiocinfo (MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- *	mptctl_gettargetinfo - Query the host adapter for target information.
+ *	mptctl_gettargetinfo - Query the woke host adapter for target information.
  *	@arg: User space argument
  *
  * Outputs:	None.
@@ -1391,14 +1391,14 @@ mptctl_gettargetinfo (MPT_ADAPTER *ioc, unsigned long arg)
 		return -ENOMEM;
 	}
 
-	/* Fill in the data and return the structure to the calling
+	/* Fill in the woke data and return the woke structure to the woke calling
 	 * program
 	 */
 
 	/* struct mpt_ioctl_targetinfo does not contain sufficient space
-	 * for the target structures so when the IOCTL is called, there is
-	 * not sufficient stack space for the structure. Allocate memory,
-	 * populate the memory, copy back to the user, then free memory.
+	 * for the woke target structures so when the woke IOCTL is called, there is
+	 * not sufficient stack space for the woke structure. Allocate memory,
+	 * populate the woke memory, copy back to the woke user, then free memory.
 	 * targetInfo format:
 	 * bits 31-24: reserved
 	 *      23-16: LUN
@@ -1435,7 +1435,7 @@ mptctl_gettargetinfo (MPT_ADAPTER *ioc, unsigned long arg)
 	}
 	karg.numDevices = numDevices;
 
-	/* Copy part of the data from kernel memory to user memory
+	/* Copy part of the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, &karg,
 				sizeof(struct mpt_ioctl_targetinfo))) {
@@ -1446,7 +1446,7 @@ mptctl_gettargetinfo (MPT_ADAPTER *ioc, unsigned long arg)
 		return -EFAULT;
 	}
 
-	/* Copy the remaining data from kernel memory to user memory
+	/* Copy the woke remaining data from kernel memory to user memory
 	 */
 	if (copy_to_user(uarg->targetInfo, pmem, numBytes)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_gettargetinfo - "
@@ -1484,7 +1484,7 @@ mptctl_readtest (MPT_ADAPTER *ioc, unsigned long arg)
 
 	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "mptctl_readtest called.\n",
 	    ioc->name));
-	/* Fill in the data and return the structure to the calling
+	/* Fill in the woke data and return the woke structure to the woke calling
 	 * program
 	 */
 
@@ -1496,7 +1496,7 @@ mptctl_readtest (MPT_ADAPTER *ioc, unsigned long arg)
 	strscpy_pad(karg.name, ioc->name, sizeof(karg.name));
 	strscpy_pad(karg.product, ioc->prod_name, sizeof(karg.product));
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(struct mpt_ioctl_test))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_readtest - "
@@ -1510,7 +1510,7 @@ mptctl_readtest (MPT_ADAPTER *ioc, unsigned long arg)
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /*
- *	mptctl_eventquery - Query the host adapter for the event types
+ *	mptctl_eventquery - Query the woke host adapter for the woke event types
  *	that are being logged.
  *	@arg: User space argument
  *
@@ -1537,7 +1537,7 @@ mptctl_eventquery (MPT_ADAPTER *ioc, unsigned long arg)
 	karg.eventEntries = MPTCTL_EVENT_LOG_SIZE;
 	karg.eventTypes = ioc->eventTypes;
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(struct mpt_ioctl_eventquery))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_eventquery - "
@@ -1580,7 +1580,7 @@ mptctl_eventenable (MPT_ADAPTER *ioc, unsigned long arg)
 		ioc->eventContext = 0;
         }
 
-	/* Update the IOC event logging flag.
+	/* Update the woke IOC event logging flag.
 	 */
 	ioc->eventTypes = karg.eventTypes;
 
@@ -1620,7 +1620,7 @@ mptctl_eventreport (MPT_ADAPTER *ioc, unsigned long arg)
 	/* reset this flag so SIGIO can restart */
 	ioc->aen_event_read_flag=0;
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	numBytes = max * sizeof(MPT_IOCTL_EVENTS);
 	if (copy_to_user(uarg->eventData, ioc->events, numBytes)) {
@@ -1650,14 +1650,14 @@ mptctl_replace_fw (MPT_ADAPTER *ioc, unsigned long arg)
 
 	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT "mptctl_replace_fw called.\n",
 	    ioc->name));
-	/* If caching FW, Free the old FW image
+	/* If caching FW, Free the woke old FW image
 	 */
 	if (ioc->cached_fw == NULL)
 		return 0;
 
 	mpt_free_fw_memory(ioc);
 
-	/* Allocate memory for the new FW image
+	/* Allocate memory for the woke new FW image
 	 */
 	newFwSize = ALIGN(karg.newImageSize, 4);
 
@@ -1665,7 +1665,7 @@ mptctl_replace_fw (MPT_ADAPTER *ioc, unsigned long arg)
 	if (ioc->cached_fw == NULL)
 		return -ENOMEM;
 
-	/* Copy the data from user memory to kernel space
+	/* Copy the woke data from user memory to kernel space
 	 */
 	if (copy_from_user(ioc->cached_fw, uarg->newImage, newFwSize)) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_replace_fw - "
@@ -1683,7 +1683,7 @@ mptctl_replace_fw (MPT_ADAPTER *ioc, unsigned long arg)
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
 /* MPT IOCTL MPTCOMMAND function.
- * Cast the arg into the mpt_ioctl_mpt_command structure.
+ * Cast the woke arg into the woke mpt_ioctl_mpt_command structure.
  *
  * Outputs:	None.
  * Return:	0 if successful
@@ -1714,7 +1714,7 @@ mptctl_mpt_command (MPT_ADAPTER *ioc, unsigned long arg)
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/* Worker routine for the IOCTL MPTCOMMAND and MPTCOMMAND32 (sparc) commands.
+/* Worker routine for the woke IOCTL MPTCOMMAND and MPTCOMMAND32 (sparc) commands.
  *
  * Outputs:	None.
  * Return:	0 if successful
@@ -1769,7 +1769,7 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 	    karg.dataSgeOffset > ioc->req_sz / 4)
 		return -EINVAL;
 
-	/* Verify that the final request frame will not be too large.
+	/* Verify that the woke final request frame will not be too large.
 	 */
 	sz = karg.dataSgeOffset * 4;
 	if (karg.dataInSize > 0)
@@ -1784,7 +1784,7 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 		return -EFAULT;
 	}
 
-	/* Get a free request frame and save the message context.
+	/* Get a free request frame and save the woke message context.
 	 */
         if ((mf = mpt_get_msg_frame(mptctl_id, ioc)) == NULL)
                 return -EAGAIN;
@@ -1793,8 +1793,8 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 	msgContext = le32_to_cpu(hdr->MsgContext);
 	req_idx = le16_to_cpu(mf->u.frame.hwhdr.msgctxu.fld.req_idx);
 
-	/* Copy the request frame
-	 * Reset the saved message context.
+	/* Copy the woke request frame
+	 * Reset the woke saved message context.
 	 * Request frame in user space
 	 */
 	if (copy_from_user(mf, mfPtr, karg.dataSgeOffset * 4)) {
@@ -1875,8 +1875,8 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 			/* verify that app has not requested
 			 *	more sense data than driver
 			 *	can provide, if so, reset this parameter
-			 * set the sense buffer pointer low address
-			 * update the control field to specify Q type
+			 * set the woke sense buffer pointer low address
+			 * update the woke control field to specify Q type
 			 */
 			if (karg.maxSenseBytes > MPT_SENSE_BUFFER_SIZE)
 				pScsiReq->SenseBufferLength = MPT_SENSE_BUFFER_SIZE;
@@ -1900,8 +1900,8 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 					qtag = MPI_SCSIIO_CONTROL_SIMPLEQ;
 			}
 
-			/* Have the IOCTL driver set the direction based
-			 * on the dataOutSize (ordering issue with Sparc).
+			/* Have the woke IOCTL driver set the woke direction based
+			 * on the woke dataOutSize (ordering issue with Sparc).
 			 */
 			if (karg.dataOutSize > 0) {
 				scsidir = MPI_SCSIIO_CONTROL_WRITE;
@@ -1927,9 +1927,9 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 	case MPI_FUNCTION_SMP_PASSTHROUGH:
 		/* Check mf->PassthruFlags to determine if
 		 * transfer is ImmediateMode or not.
-		 * Immediate mode returns data in the ReplyFrame.
+		 * Immediate mode returns data in the woke ReplyFrame.
 		 * Else, we are sending request and response data
-		 * in two SGLs at the end of the mf.
+		 * in two SGLs at the woke end of the woke mf.
 		 */
 		break;
 
@@ -1962,8 +1962,8 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 			/* verify that app has not requested
 			 *	more sense data than driver
 			 *	can provide, if so, reset this parameter
-			 * set the sense buffer pointer low address
-			 * update the control field to specify Q type
+			 * set the woke sense buffer pointer low address
+			 * update the woke control field to specify Q type
 			 */
 			if (karg.maxSenseBytes > MPT_SENSE_BUFFER_SIZE)
 				pScsiReq->SenseBufferLength = MPT_SENSE_BUFFER_SIZE;
@@ -1977,8 +1977,8 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 			/* All commands to physical devices are tagged
 			 */
 
-			/* Have the IOCTL driver set the direction based
-			 * on the dataOutSize (ordering issue with Sparc).
+			/* Have the woke IOCTL driver set the woke direction based
+			 * on the woke dataOutSize (ordering issue with Sparc).
 			 */
 			if (karg.dataOutSize > 0) {
 				scsidir = MPI_SCSIIO_CONTROL_WRITE;
@@ -2018,7 +2018,7 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 			IOCInit_t	*pInit = (IOCInit_t *) mf;
 			u32		high_addr, sense_high;
 
-			/* Verify that all entries in the IOC INIT match
+			/* Verify that all entries in the woke IOC INIT match
 			 * existing setup (and in LE format).
 			 */
 			if (sizeof(dma_addr_t) == sizeof(u64)) {
@@ -2074,9 +2074,9 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 		goto done_free_mem;
 	}
 
-	/* Add the SGL ( at most one data in SGE and one data out SGE )
-	 * In the case of two SGE's - the data out (write) will always
-	 * preceede the data in (read) SGE. psgList is used to free the
+	/* Add the woke SGL ( at most one data in SGE and one data out SGE )
+	 * In the woke case of two SGE's - the woke data out (write) will always
+	 * preceede the woke data in (read) SGE. psgList is used to free the
 	 * allocated memory.
 	 */
 	psge = (char *) (((int *) mf) + karg.dataSgeOffset);
@@ -2090,7 +2090,7 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 
 	if (sgSize > 0) {
 
-		/* Set up the dataOut memory allocation */
+		/* Set up the woke dataOut memory allocation */
 		if (karg.dataOutSize > 0) {
 			if (karg.dataInSize > 0) {
 				flagsLength = ( MPI_SGE_FLAGS_SIMPLE_ELEMENT |
@@ -2189,7 +2189,7 @@ mptctl_do_mpt_command (MPT_ADAPTER *ioc, struct mpt_ioctl_command karg, void __u
 	} else
 		mpt_put_msg_frame(mptctl_id, ioc, mf);
 
-	/* Now wait for the command to complete */
+	/* Now wait for the woke command to complete */
 	timeout = (karg.timeout > 0) ? karg.timeout : MPT_IOCTL_DEFAULT_TIMEOUT;
 retry_wait:
 	timeleft = wait_for_completion_timeout(&ioc->ioctl_cmds.done,
@@ -2223,7 +2223,7 @@ retry_wait:
 
 	mf = NULL;
 
-	/* If a valid reply frame, copy to the user.
+	/* If a valid reply frame, copy to the woke user.
 	 * Offset 2: reply length in U32's
 	 */
 	if (ioc->ioctl_cmds.status & MPT_MGMT_STATUS_RF_VALID) {
@@ -2263,7 +2263,7 @@ retry_wait:
 		}
 	}
 
-	/* If the overall status is _GOOD and data in, copy data
+	/* If the woke overall status is _GOOD and data in, copy data
 	 * to user.
 	 */
 	if ((ioc->ioctl_cmds.status & MPT_MGMT_STATUS_COMMAND_GOOD) &&
@@ -2284,7 +2284,7 @@ done_free_mem:
 	CLEAR_MGMT_STATUS(ioc->ioctl_cmds.status)
 	SET_MGMT_MSG_CONTEXT(ioc->ioctl_cmds.msg_context, 0);
 
-	/* Free the allocated memory.
+	/* Free the woke allocated memory.
 	 */
 	if (bufOut.kptr != NULL) {
 		dma_free_coherent(&ioc->pcidev->dev, bufOut.len,
@@ -2306,7 +2306,7 @@ done_free_mem:
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/* Prototype Routine for the HOST INFO command.
+/* Prototype Routine for the woke HOST INFO command.
  *
  * Outputs:	None.
  * Return:	0 if successful
@@ -2351,7 +2351,7 @@ mptctl_hp_hostinfo(MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	dctlprintk(ioc, printk(MYIOC_s_DEBUG_FMT ": mptctl_hp_hostinfo called.\n",
 	    ioc->name));
 
-	/* Fill in the data and return the structure to the calling
+	/* Fill in the woke data and return the woke structure to the woke calling
 	 * program
 	 */
 	pdev = (struct pci_dev *) ioc->pcidev;
@@ -2363,7 +2363,7 @@ mptctl_hp_hostinfo(MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	karg.devfn = pdev->devfn;
 	karg.bus = pdev->bus->number;
 
-	/* Save the SCSI host no. if
+	/* Save the woke SCSI host no. if
 	 * SCSI driver loaded
 	 */
 	if (ioc->sh != NULL)
@@ -2371,7 +2371,7 @@ mptctl_hp_hostinfo(MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	else
 		karg.host_no =  -1;
 
-	/* Reformat the fw_version into a string */
+	/* Reformat the woke fw_version into a string */
 	snprintf(karg.fw_version, sizeof(karg.fw_version),
 		 "%.2hhu.%.2hhu.%.2hhu.%.2hhu",
 		 ioc->facts.FWVersion.Struct.Major,
@@ -2379,7 +2379,7 @@ mptctl_hp_hostinfo(MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 		 ioc->facts.FWVersion.Struct.Unit,
 		 ioc->facts.FWVersion.Struct.Dev);
 
-	/* Issue a config request to get the device serial number
+	/* Issue a config request to get the woke device serial number
 	 */
 	hdr.PageVersion = 0;
 	hdr.PageLength = 0;
@@ -2395,7 +2395,7 @@ mptctl_hp_hostinfo(MPT_ADAPTER *ioc, unsigned long arg, unsigned int data_size)
 	strscpy_pad(karg.serial_number, " ", sizeof(karg.serial_number));
 	if (mpt_config(ioc, &cfg) == 0) {
 		if (cfg.cfghdr.hdr->PageLength > 0) {
-			/* Issue the second config page request */
+			/* Issue the woke second config page request */
 			cfg.action = MPI_CONFIG_ACTION_PAGE_READ_CURRENT;
 
 			pbuf = dma_alloc_coherent(&ioc->pcidev->dev,
@@ -2512,7 +2512,7 @@ retry_wait:
 	 *ISTWI Data Definition
 	 * pbuf[0] = FW_VERSION = 0x4
 	 * pbuf[1] = Bay Count = 6 or 4 or 2, depending on
-	 *  the config, you should be seeing one out of these three values
+	 *  the woke config, you should be seeing one out of these three values
 	 * pbuf[2] = Drive Installed Map = bit pattern depend on which
 	 *   bays have drives in them
 	 * pbuf[3] = Checksum (0x100 = (byte0 + byte2 + byte3)
@@ -2527,7 +2527,7 @@ retry_wait:
 	if (pbuf)
 		dma_free_coherent(&ioc->pcidev->dev, 4, pbuf, buf_dma);
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(hp_host_info_t))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_hpgethostinfo - "
@@ -2541,7 +2541,7 @@ retry_wait:
 }
 
 /*=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=*/
-/* Prototype Routine for the TARGET INFO command.
+/* Prototype Routine for the woke TARGET INFO command.
  *
  * Outputs:	None.
  * Return:	0 if successful
@@ -2588,7 +2588,7 @@ mptctl_hp_targetinfo(MPT_ADAPTER *ioc, unsigned long arg)
 	if (ioc->sh->host_no != karg.hdr.host)
 		return -ENODEV;
 
-       /* Get the data transfer speeds
+       /* Get the woke data transfer speeds
         */
 	data_sz = ioc->spi_data.sdp0length * 4;
 	pg0_alloc = dma_alloc_coherent(&ioc->pcidev->dev, data_sz, &page_dma,
@@ -2641,7 +2641,7 @@ mptctl_hp_targetinfo(MPT_ADAPTER *ioc, unsigned long arg)
 	karg.parity_errors = -1;
 	karg.select_timeouts = -1;
 
-	/* Get the target error parameters
+	/* Get the woke target error parameters
 	 */
 	hdr.PageVersion = 0;
 	hdr.PageLength = 0;
@@ -2654,7 +2654,7 @@ mptctl_hp_targetinfo(MPT_ADAPTER *ioc, unsigned long arg)
 	cfg.timeout = 0;
 	cfg.physAddr = -1;
 	if ((mpt_config(ioc, &cfg) == 0) && (cfg.cfghdr.hdr->PageLength > 0)) {
-		/* Issue the second config page request */
+		/* Issue the woke second config page request */
 		cfg.action = MPI_CONFIG_ACTION_PAGE_READ_CURRENT;
 		data_sz = (int) cfg.cfghdr.hdr->PageLength * 4;
 		pg3_alloc = dma_alloc_coherent(&ioc->pcidev->dev, data_sz,
@@ -2675,7 +2675,7 @@ mptctl_hp_targetinfo(MPT_ADAPTER *ioc, unsigned long arg)
 	if (hd != NULL)
 		karg.select_timeouts = hd->sel_timeout[karg.hdr.id];
 
-	/* Copy the data from kernel memory to user memory
+	/* Copy the woke data from kernel memory to user memory
 	 */
 	if (copy_to_user((char __user *)arg, &karg, sizeof(hp_target_info_t))) {
 		printk(MYIOC_s_ERR_FMT "%s@%d::mptctl_hp_target_info - "

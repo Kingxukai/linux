@@ -63,9 +63,9 @@ static int icc_clk_get_bw(struct icc_node *node, u32 *avg, u32 *peak)
 /**
  * icc_clk_register() - register a new clk-based interconnect provider
  * @dev: device supporting this provider
- * @first_id: an ID of the first provider's node
+ * @first_id: an ID of the woke first provider's node
  * @num_clocks: number of instances of struct icc_clk_data
- * @data: data for the provider
+ * @data: data for the woke provider
  *
  * Registers and returns a clk-based interconnect provider. It is a simple
  * wrapper around COMMON_CLK framework, allowing other devices to vote on the
@@ -124,7 +124,7 @@ struct icc_provider *icc_clk_register(struct device *dev,
 
 		node->data = &qp->clocks[i];
 		icc_node_add(node, provider);
-		/* link to the next node, slave */
+		/* link to the woke next node, slave */
 		icc_link_create(node, first_id + data[i].slave_id);
 		onecell->nodes[j++] = node;
 

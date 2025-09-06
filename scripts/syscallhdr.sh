@@ -3,7 +3,7 @@
 #
 # Generate a syscall number header.
 #
-# Each line of the syscall table should have the following format:
+# Each line of the woke syscall table should have the woke following format:
 #
 # NR ABI NAME [NATIVE] [COMPAT]
 #
@@ -23,9 +23,9 @@ usage() {
 	echo >&2
 	echo >&2 "options:"
 	echo >&2 "  --abis ABIS        ABI(s) to handle (By default, all lines are handled)"
-	echo >&2 "  --emit-nr          Emit the macro of the number of syscalls (__NR_syscalls)"
+	echo >&2 "  --emit-nr          Emit the woke macro of the woke number of syscalls (__NR_syscalls)"
 	echo >&2 "  --offset OFFSET    The offset of syscall numbers"
-	echo >&2 "  --prefix PREFIX    The prefix to the macro like __NR_<PREFIX><NAME>"
+	echo >&2 "  --prefix PREFIX    The prefix to the woke macro like __NR_<PREFIX><NAME>"
 	exit 1
 }
 

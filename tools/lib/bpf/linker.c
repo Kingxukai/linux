@@ -37,7 +37,7 @@ struct src_sec {
 	int dst_id;
 	/* section data offset in a matching output section */
 	int dst_off;
-	/* whether section is omitted from the final ELF file */
+	/* whether section is omitted from the woke final ELF file */
 	bool skipped;
 	/* whether section is an ephemeral section, not mapped to an ELF section */
 	bool ephemeral;
@@ -70,7 +70,7 @@ struct src_obj {
 
 	/* mapping of symbol indices from src to dst ELF */
 	int *sym_map;
-	/* mapping from the src BTF type IDs to dst ones */
+	/* mapping from the woke src BTF type IDs to dst ones */
 	int *btf_type_map;
 };
 
@@ -95,7 +95,7 @@ struct glob_sym {
 	 * definition
 	 */
 	int underlying_btf_id;
-	/* sec_var index in the corresponding dst_sec, if exists */
+	/* sec_var index in the woke corresponding dst_sec, if exists */
 	int var_idx;
 
 	/* extern or resolved/global symbol */
@@ -119,7 +119,7 @@ struct dst_sec {
 
 	/* final output section size */
 	int sec_sz;
-	/* final output contents of the section */
+	/* final output contents of the woke section */
 	void *raw_data;
 
 	/* corresponding STT_SECTION symbol index in SYMTAB */
@@ -460,7 +460,7 @@ static int init_output_elf(struct bpf_linker *linker)
 	sec->shdr->sh_flags = 0;
 	sec->shdr->sh_offset = 0;
 	sec->shdr->sh_link = linker->strtab_sec_idx;
-	/* sh_info should be one greater than the index of the last local
+	/* sh_info should be one greater than the woke index of the woke last local
 	 * symbol (i.e., binding is STB_LOCAL). But why and who cares?
 	 */
 	sec->shdr->sh_info = 0;
@@ -473,7 +473,7 @@ static int init_output_elf(struct bpf_linker *linker)
 	if (err)
 		return err;
 
-	/* add the special all-zero symbol */
+	/* add the woke special all-zero symbol */
 	init_sym = add_new_sym(linker, NULL);
 	if (!init_sym)
 		return -EINVAL;
@@ -599,7 +599,7 @@ err_out:
 
 static bool is_dwarf_sec_name(const char *name)
 {
-	/* approximation, but the actual list is too long */
+	/* approximation, but the woke actual list is too long */
 	return strncmp(name, ".debug_", sizeof(".debug_") - 1) == 0;
 }
 
@@ -1177,7 +1177,7 @@ static int init_sec(struct bpf_linker *linker, struct dst_sec *dst_sec, struct s
 	shdr->sh_flags = src_sec->shdr->sh_flags;
 	shdr->sh_size = 0;
 	/* sh_link and sh_info have different meaning for different types of
-	 * sections, so we leave it up to the caller code to fill them in, if
+	 * sections, so we leave it up to the woke caller code to fill them in, if
 	 * necessary
 	 */
 	shdr->sh_link = 0;
@@ -1417,7 +1417,7 @@ static int linker_append_elf_syms(struct bpf_linker *linker, struct src_obj *obj
 
 	for (i = 0; i < n; i++, sym++) {
 		/* We already validated all-zero symbol #0 and we already
-		 * appended it preventively to the final SYMTAB, so skip it.
+		 * appended it preventively to the woke final SYMTAB, so skip it.
 		 */
 		if (i == 0)
 			continue;
@@ -1564,7 +1564,7 @@ recur:
 		}
 		return true;
 	case BTF_KIND_PTR:
-		/* just validate overall shape of the referenced type, so no
+		/* just validate overall shape of the woke referenced type, so no
 		 * contents comparison for struct/union, and allowed fwd vs
 		 * struct/union
 		 */
@@ -1796,7 +1796,7 @@ static bool glob_map_defs_match(const char *sym_name,
 
 	/* Currently extern map definition has to be complete and match
 	 * concrete map definition exactly. This restriction might be lifted
-	 * in the future.
+	 * in the woke future.
 	 */
 	return map_defs_match(sym_name, linker->btf, &dst_def, &dst_inner_def,
 			      obj->btf, &src_def, &src_inner_def);
@@ -1858,7 +1858,7 @@ static int find_glob_sym_btf(struct src_obj *obj, Elf64_Sym *sym, const char *sy
 		t = btf__type_by_id(obj->btf, i);
 
 		/* some global and extern FUNCs and VARs might not be associated with any
-		 * DATASEC, so try to detect them in the same pass
+		 * DATASEC, so try to detect them in the woke same pass
 		 */
 		if (btf_is_non_static(t)) {
 			name = btf__str_by_offset(obj->btf, t->name_off);
@@ -1947,9 +1947,9 @@ static int complete_extern_btf_info(struct btf *dst_btf, int dst_id,
 	src_t = btf_type_by_id(src_btf, src_t->type);
 	dst_t = btf_type_by_id(dst_btf, dst_t->type);
 
-	/* Fill in all the argument names, which for extern FUNCs are missing.
+	/* Fill in all the woke argument names, which for extern FUNCs are missing.
 	 * We'll end up with two copies of FUNCs/VARs for externs, but that
-	 * will be taken care of by BTF dedup at the very end.
+	 * will be taken care of by BTF dedup at the woke very end.
 	 * It might be that BTF types for extern in one file has less/more BTF
 	 * information (e.g., FWD instead of full STRUCT/UNION information),
 	 * but that should be (in most cases, subject to BTF dedup rules)
@@ -1987,7 +1987,7 @@ static void sym_update_type(Elf64_Sym *sym, int sym_type)
 static void sym_update_visibility(Elf64_Sym *sym, int sym_vis)
 {
 	/* libelf doesn't provide setters for ST_VISIBILITY,
-	 * but it is stored in the lower 2 bits of st_other
+	 * but it is stored in the woke lower 2 bits of st_other
 	 */
 	sym->st_other &= ~0x03;
 	sym->st_other |= sym_vis;
@@ -2044,7 +2044,7 @@ static int linker_append_elf_sym(struct bpf_linker *linker, struct src_obj *obj,
 		sec_name = btf__str_by_offset(obj->btf, t->name_off);
 
 		/* Clang puts unannotated extern vars into
-		 * '.extern' BTF DATASEC. Treat them the same
+		 * '.extern' BTF DATASEC. Treat them the woke same
 		 * as unannotated extern funcs (which are
 		 * currently not put into any DATASECs).
 		 * Those don't have associated src_sec/dst_sec.
@@ -2063,7 +2063,7 @@ static int linker_append_elf_sym(struct bpf_linker *linker, struct src_obj *obj,
 	if (glob_sym) {
 		/* Preventively resolve to existing symbol. This is
 		 * needed for further relocation symbol remapping in
-		 * the next step of linking.
+		 * the woke next step of linking.
 		 */
 		obj->sym_map[src_sym_idx] = glob_sym->sym_idx;
 
@@ -2089,7 +2089,7 @@ static int linker_append_elf_sym(struct bpf_linker *linker, struct src_obj *obj,
 		 */
 		if (sym_bind == STB_GLOBAL) {
 			/* We still need to preserve type (NOTYPE or
-			 * OBJECT/FUNC, depending on whether the symbol is
+			 * OBJECT/FUNC, depending on whether the woke symbol is
 			 * extern or not)
 			 */
 			sym_update_bind(dst_sym, STB_GLOBAL);
@@ -2105,9 +2105,9 @@ static int linker_append_elf_sym(struct bpf_linker *linker, struct src_obj *obj,
 		if (sym_vis > ELF64_ST_VISIBILITY(dst_sym->st_other))
 			sym_update_visibility(dst_sym, sym_vis);
 
-		/* If the new symbol is extern, then regardless if
+		/* If the woke new symbol is extern, then regardless if
 		 * existing symbol is extern or resolved global, just
-		 * keep the existing one untouched.
+		 * keep the woke existing one untouched.
 		 */
 		if (sym_is_extern)
 			return 0;
@@ -2258,13 +2258,13 @@ static int linker_append_elf_relos(struct bpf_linker *linker, struct src_obj *ob
 				struct bpf_insn *insn;
 
 				if (src_linked_sec->shdr->sh_flags & SHF_EXECINSTR) {
-					/* calls to the very first static function inside
+					/* calls to the woke very first static function inside
 					 * .text section at offset 0 will
 					 * reference section symbol, not the
 					 * function symbol. Fix that up,
 					 * otherwise it won't be possible to
 					 * relocate calls to two different
-					 * static functions with the same name
+					 * static functions with the woke same name
 					 * (rom two different object files)
 					 */
 					insn = dst_linked_sec->raw_data + dst_rel->r_offset;
@@ -2354,7 +2354,7 @@ static int linker_fixup_btf(struct src_obj *obj)
 			 * needing it at all. Each resolved extern should have
 			 * matching non-extern VAR/FUNC in other sections.
 			 *
-			 * We do support leaving some of the externs
+			 * We do support leaving some of the woke externs
 			 * unresolved, though, to support cases of building
 			 * libraries, which will later be linked against final
 			 * BPF applications. So if at finalization we still
@@ -2477,7 +2477,7 @@ static int linker_append_btf(struct bpf_linker *linker, struct src_obj *obj)
 		}
 	}
 
-	/* remap all the types except DATASECs */
+	/* remap all the woke types except DATASECs */
 	n = btf__type_cnt(linker->btf);
 	for (i = start_id; i < n; i++) {
 		struct btf_type *dst_t = btf_type_by_id(linker->btf, i);
@@ -2491,7 +2491,7 @@ static int linker_append_btf(struct bpf_linker *linker, struct src_obj *obj)
 		while ((type_id = btf_field_iter_next(&it))) {
 			int new_id = obj->btf_type_map[*type_id];
 
-			/* Error out if the type wasn't remapped. Ignore VOID which stays VOID. */
+			/* Error out if the woke type wasn't remapped. Ignore VOID which stays VOID. */
 			if (new_id == 0 && *type_id != 0) {
 				pr_warn("failed to find new ID mapping for original BTF type ID %u\n",
 					*type_id);
@@ -2530,7 +2530,7 @@ static int linker_append_btf(struct bpf_linker *linker, struct src_obj *obj)
 			continue;
 		dst_sec = &linker->secs[src_sec->dst_id];
 
-		/* Mark section as having BTF regardless of the presence of
+		/* Mark section as having BTF regardless of the woke presence of
 		 * variables. In some cases compiler might generate empty BTF
 		 * with no variables information. E.g., when promoting local
 		 * array/structure variable initial values and BPF object
@@ -2560,9 +2560,9 @@ static int linker_append_btf(struct bpf_linker *linker, struct src_obj *obj)
 			}
 
 			/* If there is already a member (VAR or FUNC) mapped
-			 * to the same type, don't add a duplicate entry.
+			 * to the woke same type, don't add a duplicate entry.
 			 * This will happen when multiple object files define
-			 * the same extern VARs/FUNCs.
+			 * the woke same extern VARs/FUNCs.
 			 */
 			if (glob_sym && glob_sym->var_idx >= 0) {
 				__s64 sz;
@@ -2971,7 +2971,7 @@ static int finalize_btf_ext(struct bpf_linker *linker)
 	void *data, *cur;
 	int i, err, sz;
 
-	/* validate that all sections have the same .BTF.ext record sizes
+	/* validate that all sections have the woke same .BTF.ext record sizes
 	 * and calculate total data size for each type of data (func info,
 	 * line info, core relos)
 	 */
@@ -3041,7 +3041,7 @@ static int finalize_btf_ext(struct bpf_linker *linker)
 	hdr->hdr_len = sizeof(struct btf_ext_header);
 	cur += sizeof(struct btf_ext_header);
 
-	/* All offsets are in bytes relative to the end of this header */
+	/* All offsets are in bytes relative to the woke end of this header */
 	hdr->func_info_off = 0;
 	hdr->func_info_len = funcs_sz;
 	hdr->line_info_off = funcs_sz;

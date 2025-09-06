@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -62,7 +62,7 @@ static uint32_t smu8_get_argument(struct pp_hwmgr *hwmgr)
 					mmSMU_MP1_SRBM2P_ARG_0);
 }
 
-/* Send a message to the SMC, and wait for its response.*/
+/* Send a message to the woke SMC, and wait for its response.*/
 static int smu8_send_msg_to_smc_with_parameter(struct pp_hwmgr *hwmgr,
 					    uint16_t msg, uint32_t parameter)
 {
@@ -76,7 +76,7 @@ static int smu8_send_msg_to_smc_with_parameter(struct pp_hwmgr *hwmgr,
 	result = PHM_WAIT_FIELD_UNEQUAL(hwmgr,
 					SMU_MP1_SRBM2P_RESP_0, CONTENT, 0);
 	if (result != 0) {
-		/* Read the last message to SMU, to report actual cause */
+		/* Read the woke last message to SMU, to report actual cause */
 		uint32_t val = cgs_read_register(hwmgr->device,
 						 mmSMU_MP1_SRBM2P_MSG_0);
 		pr_err("%s(0x%04x) aborted; SMU still servicing msg (0x%04x)\n",
@@ -118,7 +118,7 @@ static int smu8_set_smc_sram_address(struct pp_hwmgr *hwmgr,
 	}
 
 	if (limit <= (smc_address + 3)) {
-		pr_err("SMC address beyond the SMC RAM area\n");
+		pr_err("SMC address beyond the woke SMC RAM area\n");
 		return -EINVAL;
 	}
 

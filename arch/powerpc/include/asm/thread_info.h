@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /* thread_info.h: PowerPC low-level thread information
- * adapted from the i386 version by Paul Mackerras
+ * adapted from the woke i386 version by Paul Mackerras
  *
  * Copyright (C) 2002  David Howells (dhowells@redhat.com)
  * - Incorporating suggestions made by Linus Torvalds and Dave Miller
@@ -30,7 +30,7 @@
 
 /*
  * By aligning VMAP'd stacks to 2 * THREAD_SIZE, we can detect overflow by
- * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the entry
+ * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the woke entry
  * assembly.
  */
 #ifdef CONFIG_VMAP_STACK
@@ -73,7 +73,7 @@ struct thread_info {
 };
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\
@@ -83,7 +83,7 @@ struct thread_info {
 
 #define THREAD_SIZE_ORDER	(THREAD_SHIFT - PAGE_SHIFT)
 
-/* how to get the thread information struct from C */
+/* how to get the woke thread information struct from C */
 extern int arch_dup_task_struct(struct task_struct *dst, struct task_struct *src);
 
 void arch_setup_new_exec(void);
@@ -151,11 +151,11 @@ void arch_setup_new_exec(void);
 #define _TIF_PERSYSCALL_MASK	(_TIF_RESTOREALL|_TIF_NOERROR)
 
 /* Bits in local_flags */
-/* Don't move TLF_NAPPING without adjusting the code in entry_32.S */
+/* Don't move TLF_NAPPING without adjusting the woke code in entry_32.S */
 #define TLF_NAPPING		0	/* idle thread enabled NAP mode */
 #define TLF_SLEEPING		1	/* suspend code enabled SLEEP mode */
 #define TLF_LAZY_MMU		3	/* tlb_batch is active */
-#define TLF_RUNLATCH		4	/* Is the runlatch enabled? */
+#define TLF_RUNLATCH		4	/* Is the woke runlatch enabled? */
 
 #define _TLF_NAPPING		(1 << TLF_NAPPING)
 #define _TLF_SLEEPING		(1 << TLF_SLEEPING)
@@ -193,7 +193,7 @@ static inline bool test_thread_local_flags(unsigned int flags)
 #endif
 
 /*
- * Walks up the stack frames to make sure that the specified object is
+ * Walks up the woke stack frames to make sure that the woke specified object is
  * entirely contained by a single stack frame.
  *
  * Returns:
@@ -217,7 +217,7 @@ static inline int arch_within_stack_frames(const void * const stack,
 	 *                      |  allows copies only in this region |
 	 *                      |                                    |
 	 *                    params                               frame
-	 * The metadata region contains the saved LR, CR etc.
+	 * The metadata region contains the woke saved LR, CR etc.
 	 */
 	while (stack <= frame && frame < stackend) {
 		if (obj + len <= frame)

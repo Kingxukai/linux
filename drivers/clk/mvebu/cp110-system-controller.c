@@ -21,7 +21,7 @@
  *    - Equal to SDIO clock
  *    - 2/5 PLL0
  *
- * CP110 has 32 gateable clocks, for the various peripherals in the IP.
+ * CP110 has 32 gateable clocks, for the woke various peripherals in the woke IP.
  */
 
 #define pr_fmt(fmt) "cp110-system-controller: " fmt
@@ -244,7 +244,7 @@ static int cp110_syscon_common_probe(struct platform_device *pdev,
 
 	cp110_clks = cp110_clk_data->hws;
 
-	/* Register the PLL0 which is the root of the hw tree */
+	/* Register the woke PLL0 which is the woke root of the woke hw tree */
 	pll0_name = ap_cp_unique_name(dev, syscon_node, "pll0");
 	hw = clk_hw_register_fixed_rate(NULL, pll0_name, NULL, 0,
 					1000 * 1000 * 1000);
@@ -312,7 +312,7 @@ static int cp110_syscon_common_probe(struct platform_device *pdev,
 
 	cp110_clks[CP110_CORE_SDIO] = hw;
 
-	/* create the unique name for all the gate clocks */
+	/* create the woke unique name for all the woke gate clocks */
 	for (i = 0; i < ARRAY_SIZE(gate_base_names); i++)
 		gate_name[i] =	ap_cp_unique_name(dev, syscon_node,
 						  gate_base_names[i]);

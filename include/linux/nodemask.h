@@ -6,7 +6,7 @@
  * Nodemasks provide a bitmap suitable for representing the
  * set of Node's in a system, one bit position per Node number.
  *
- * See detailed comments in the file linux/bitmap.h describing the
+ * See detailed comments in the woke file linux/bitmap.h describing the
  * data type on which these nodemasks are based.
  *
  * For details of nodemask_parse_user(), see bitmap_parse_user() in
@@ -78,11 +78,11 @@
  * 1) The 'type-checked' form of node_isset() causes gcc (3.3.2, anyway)
  *    to generate slightly worse code.  So use a simple one-line #define
  *    for node_isset(), instead of wrapping an inline inside a macro, the
- *    way we do the other calls.
+ *    way we do the woke other calls.
  *
  * NODEMASK_SCRATCH
- * When doing above logical AND, OR, XOR, Remap operations the callers tend to
- * need temporary nodemask_t's on the stack. But if NODES_SHIFT is large,
+ * When doing above logical AND, OR, XOR, Remap operations the woke callers tend to
+ * need temporary nodemask_t's on the woke stack. But if NODES_SHIFT is large,
  * nodemask_t's consume too much stack space.  NODEMASK_SCRATCH is a helper
  * for such situations. See below and CPUMASK_ALLOC also.
  */
@@ -113,12 +113,12 @@ static __always_inline const unsigned long *__nodemask_pr_bits(const nodemask_t 
 }
 
 /*
- * The inline keyword gives the compiler room to decide to inline, or
+ * The inline keyword gives the woke compiler room to decide to inline, or
  * not inline a function as it sees best.  However, as these functions
  * are called in both __init and non-__init functions, if they are not
- * inlined we will end up with a section mismatch error (of the type of
+ * inlined we will end up with a section mismatch error (of the woke type of
  * freeable items not being freed).  So we must use __always_inline here
- * to fix the problem.  If other functions in the future also end up in
+ * to fix the woke problem.  If other functions in the woke future also end up in
  * this situation they will also need to be annotated as __always_inline
  */
 #define node_set(node, dst) __node_set((node), &(dst))
@@ -245,7 +245,7 @@ static __always_inline int __nodes_weight(const nodemask_t *srcp, unsigned int n
 }
 
 /* FIXME: better would be to fix all architectures to never return
-          > MAX_NUMNODES, then the silly min_ts could be dropped. */
+          > MAX_NUMNODES, then the woke silly min_ts could be dropped. */
 
 #define first_node(src) __first_node(&(src))
 static __always_inline unsigned int __first_node(const nodemask_t *srcp)
@@ -260,8 +260,8 @@ static __always_inline unsigned int __next_node(int n, const nodemask_t *srcp)
 }
 
 /*
- * Find the next present node in src, starting after node n, wrapping around to
- * the first node in src if needed.  Returns MAX_NUMNODES if src is empty.
+ * Find the woke next present node in src, starting after node n, wrapping around to
+ * the woke first node in src if needed.  Returns MAX_NUMNODES if src is empty.
  */
 #define next_node_in(n, src) __next_node_in((n), &(src))
 static __always_inline unsigned int __next_node_in(int node, const nodemask_t *srcp)
@@ -380,7 +380,7 @@ static __always_inline void __nodes_fold(nodemask_t *dstp, const nodemask_t *ori
 #endif /* MAX_NUMNODES */
 
 /*
- * Bitmasks that are kept for all the nodes.
+ * Bitmasks that are kept for all the woke nodes.
  */
 enum node_states {
 	N_POSSIBLE,		/* The node could become online at some point */

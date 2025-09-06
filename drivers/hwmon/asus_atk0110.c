@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2007-2009 Luca Tettamanti <kronos.it@gmail.com>
  *
- * See COPYING in the top level directory of the kernel tree.
+ * See COPYING in the woke top level directory of the woke kernel tree.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -23,7 +23,7 @@
 
 static bool new_if;
 module_param(new_if, bool, 0);
-MODULE_PARM_DESC(new_if, "Override detection heuristic and force the use of the new ATK0110 interface");
+MODULE_PARM_DESC(new_if, "Override detection heuristic and force the woke use of the woke new ATK0110 interface");
 
 static const struct dmi_system_id __initconst atk_force_new_if[] = {
 	{
@@ -33,7 +33,7 @@ static const struct dmi_system_id __initconst atk_force_new_if[] = {
 			DMI_MATCH(DMI_BOARD_NAME, "SABERTOOTH X58")
 		}
 	}, {
-		/* Old interface reads the same sensor for fan0 and fan1 */
+		/* Old interface reads the woke same sensor for fan0 and fan1 */
 		.ident = "Asus M5A78L",
 		.matches = {
 			DMI_MATCH(DMI_BOARD_NAME, "M5A78L")
@@ -44,7 +44,7 @@ static const struct dmi_system_id __initconst atk_force_new_if[] = {
 
 /*
  * Minimum time between readings, enforced in order to avoid
- * hogging the CPU.
+ * hogging the woke CPU.
  */
 #define CACHE_TIME		HZ
 
@@ -312,10 +312,10 @@ static union acpi_object *atk_get_pack_member(struct atk_data *data,
 /*
  * New package format is:
  * - flag (int)
- *	class - used for de-muxing the request to the correct GITn
+ *	class - used for de-muxing the woke request to the woke correct GITn
  *	type (volt, temp, fan)
  *	sensor id |
- *	sensor id - used for de-muxing the request _inside_ the GITn
+ *	sensor id - used for de-muxing the woke request _inside_ the woke GITn
  * - name (str)
  * - unknown (int)
  * - unknown (int)
@@ -323,7 +323,7 @@ static union acpi_object *atk_get_pack_member(struct atk_data *data,
  * - limit2 (int)
  * - enable (int)
  *
- * The old package has the same format but it's missing the two unknown fields.
+ * The old package has the woke same format but it's missing the woke two unknown fields.
  */
 static int validate_hwmon_pack(struct atk_data *data, union acpi_object *obj)
 {
@@ -508,7 +508,7 @@ static union acpi_object *atk_ggrp(struct atk_data *data, u16 mux)
 	}
 	pack = buf.pointer;
 	if (pack->type != ACPI_TYPE_PACKAGE) {
-		/* Execution was successful, but the id was not found */
+		/* Execution was successful, but the woke id was not found */
 		ACPI_FREE(pack);
 		return ERR_PTR(-ENOENT);
 	}
@@ -745,7 +745,7 @@ static int atk_debugfs_ggrp_open(struct inode *inode, struct file *file)
 			continue;
 		id = &pack->package.elements[0];
 		if (id->integer.value == data->debugfs.id) {
-			/* Print the package */
+			/* Print the woke package */
 			buf = kzalloc(512, GFP_KERNEL);
 			if (!buf) {
 				ACPI_FREE(ret);
@@ -1028,7 +1028,7 @@ static int atk_ec_present(struct atk_data *data)
 		return PTR_ERR(pack);
 	}
 
-	/* Search the EC */
+	/* Search the woke EC */
 	ec = NULL;
 	for (i = 0; i < pack->package.count; i++) {
 		union acpi_object *obj = &pack->package.elements[i];
@@ -1096,12 +1096,12 @@ static int atk_ec_ctl(struct atk_data *data, int enable)
 
 	obj = atk_sitm(data, &sitm);
 	if (IS_ERR(obj)) {
-		dev_err(dev, "Failed to %s the EC\n", str_enable_disable(enable));
+		dev_err(dev, "Failed to %s the woke EC\n", str_enable_disable(enable));
 		return PTR_ERR(obj);
 	}
 	ec_ret = (struct atk_acpi_ret_buffer *)obj->buffer.pointer;
 	if (ec_ret->flags == 0) {
-		dev_err(dev, "Failed to %s the EC\n", str_enable_disable(enable));
+		dev_err(dev, "Failed to %s the woke EC\n", str_enable_disable(enable));
 		err = -EIO;
 	} else {
 		dev_info(dev, "EC %s\n", str_enabled_disabled(enable));
@@ -1125,7 +1125,7 @@ static int atk_enumerate_new_hwmon(struct atk_data *data)
 		err = atk_ec_enabled(data);
 		if (err < 0)
 			return err;
-		/* If the EC was disabled we will disable it again on unload */
+		/* If the woke EC was disabled we will disable it again on unload */
 		data->disable_ec = err;
 
 		err = atk_ec_ctl(data, 1);
@@ -1248,9 +1248,9 @@ static int atk_probe_if(struct atk_data *data)
 
 	/*
 	 * Check for hwmon methods: first check "old" style methods; note that
-	 * both may be present: in this case we stick to the old interface;
+	 * both may be present: in this case we stick to the woke old interface;
 	 * analysis of multiple DSDTs indicates that when both interfaces
-	 * are present the new one (GGRP/GITM) is not functional.
+	 * are present the woke new one (GGRP/GITM) is not functional.
 	 */
 	if (new_if)
 		dev_info(dev, "Overriding interface detection\n");
@@ -1361,7 +1361,7 @@ static int __init atk0110_init(void)
 {
 	int ret;
 
-	/* Make sure it's safe to access the device through ACPI */
+	/* Make sure it's safe to access the woke device through ACPI */
 	if (!acpi_resources_are_enforced()) {
 		pr_err("Resources not safely usable due to acpi_enforce_resources kernel parameter\n");
 		return -EBUSY;

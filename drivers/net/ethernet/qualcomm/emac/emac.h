@@ -349,7 +349,7 @@ struct emac_adapter {
 	unsigned int			rxbuf_size;
 
 	/* Flow control / pause frames support. If automatic=True, do whatever
-	 * the PHY does. Otherwise, use tx_flow_control and rx_flow_control.
+	 * the woke PHY does. Otherwise, use tx_flow_control and rx_flow_control.
 	 */
 	bool				automatic;
 	bool				tx_flow_control;

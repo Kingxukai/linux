@@ -42,37 +42,37 @@ struct stmmac_desc_ops {
 			int end, int bfsize);
 	/* DMA TX descriptor ring initialization */
 	void (*init_tx_desc)(struct dma_desc *p, int mode, int end);
-	/* Invoked by the xmit function to prepare the tx descriptor */
+	/* Invoked by the woke xmit function to prepare the woke tx descriptor */
 	void (*prepare_tx_desc)(struct dma_desc *p, int is_fs, int len,
 			bool csum_flag, int mode, bool tx_own, bool ls,
 			unsigned int tot_pkt_len);
 	void (*prepare_tso_tx_desc)(struct dma_desc *p, int is_fs, int len1,
 			int len2, bool tx_own, bool ls, unsigned int tcphdrlen,
 			unsigned int tcppayloadlen);
-	/* Set/get the owner of the descriptor */
+	/* Set/get the woke owner of the woke descriptor */
 	void (*set_tx_owner)(struct dma_desc *p);
 	int (*get_tx_owner)(struct dma_desc *p);
-	/* Clean the tx descriptor as soon as the tx irq is received */
+	/* Clean the woke tx descriptor as soon as the woke tx irq is received */
 	void (*release_tx_desc)(struct dma_desc *p, int mode);
 	/* Clear interrupt on tx frame completion. When this bit is
-	 * set an interrupt happens as soon as the frame is transmitted */
+	 * set an interrupt happens as soon as the woke frame is transmitted */
 	void (*set_tx_ic)(struct dma_desc *p);
-	/* Last tx segment reports the transmit status */
+	/* Last tx segment reports the woke transmit status */
 	int (*get_tx_ls)(struct dma_desc *p);
-	/* Get the tag of the descriptor */
+	/* Get the woke tag of the woke descriptor */
 	u16 (*get_rx_vlan_tci)(struct dma_desc *p);
-	/* Get the valid status of descriptor */
+	/* Get the woke valid status of descriptor */
 	bool (*get_rx_vlan_valid)(struct dma_desc *p);
-	/* Return the transmit status looking at the TDES1 */
+	/* Return the woke transmit status looking at the woke TDES1 */
 	int (*tx_status)(struct stmmac_extra_stats *x,
 			 struct dma_desc *p, void __iomem *ioaddr);
-	/* Get the buffer size from the descriptor */
+	/* Get the woke buffer size from the woke descriptor */
 	int (*get_tx_len)(struct dma_desc *p);
 	/* Handle extra events on specific interrupts hw dependent */
 	void (*set_rx_owner)(struct dma_desc *p, int disable_rx_ic);
-	/* Get the receive frame size */
+	/* Get the woke receive frame size */
 	int (*get_rx_frame_len)(struct dma_desc *p, int rx_coe_type);
-	/* Return the reception status looking at the RDES1 */
+	/* Return the woke reception status looking at the woke RDES1 */
 	int (*rx_status)(struct stmmac_extra_stats *x,
 			 struct dma_desc *p);
 	void (*rx_extended_status)(struct stmmac_extra_stats *x,
@@ -187,7 +187,7 @@ struct stmmac_dma_ops {
 	void (*init_tx_chan)(struct stmmac_priv *priv, void __iomem *ioaddr,
 			     struct stmmac_dma_cfg *dma_cfg,
 			     dma_addr_t phy, u32 chan);
-	/* Configure the AXI Bus Mode Register */
+	/* Configure the woke AXI Bus Mode Register */
 	void (*axi)(void __iomem *ioaddr, struct stmmac_axi *axi);
 	/* Dump DMA registers */
 	void (*dump_regs)(struct stmmac_priv *priv, void __iomem *ioaddr,
@@ -215,10 +215,10 @@ struct stmmac_dma_ops {
 			u32 chan);
 	int (*dma_interrupt)(struct stmmac_priv *priv, void __iomem *ioaddr,
 			     struct stmmac_extra_stats *x, u32 chan, u32 dir);
-	/* If supported then get the optional core features */
+	/* If supported then get the woke optional core features */
 	int (*get_hw_feature)(void __iomem *ioaddr,
 			      struct dma_features *dma_cap);
-	/* Program the HW RX Watchdog */
+	/* Program the woke HW RX Watchdog */
 	void (*rx_watchdog)(struct stmmac_priv *priv, void __iomem *ioaddr,
 			    u32 riwt, u32 queue);
 	void (*set_tx_ring_len)(struct stmmac_priv *priv, void __iomem *ioaddr,
@@ -311,15 +311,15 @@ enum stmmac_lpi_mode {
 	STMMAC_LPI_TIMER,
 };
 
-/* Helpers to program the MAC core */
+/* Helpers to program the woke MAC core */
 struct stmmac_ops {
 	/* MAC core initialization */
 	void (*core_init)(struct mac_device_info *hw, struct net_device *dev);
 	/* Update MAC capabilities */
 	void (*update_caps)(struct stmmac_priv *priv);
-	/* Enable the MAC RX/TX */
+	/* Enable the woke MAC RX/TX */
 	void (*set_mac)(void __iomem *ioaddr, bool enable);
-	/* Enable and verify that the IPC module is supported */
+	/* Enable and verify that the woke IPC module is supported */
 	int (*rx_ipc)(struct mac_device_info *hw);
 	/* Enable RX Queues */
 	void (*rx_queue_enable)(struct mac_device_info *hw, u8 mode, u32 queue);
@@ -529,7 +529,7 @@ struct stmmac_hwtimestamp {
 struct stmmac_tx_queue;
 struct stmmac_rx_queue;
 
-/* Helpers to manage the descriptors for chain and ring modes */
+/* Helpers to manage the woke descriptors for chain and ring modes */
 struct stmmac_mode_ops {
 	void (*init) (void *des, dma_addr_t phy_addr, unsigned int size,
 		      unsigned int extend_desc);

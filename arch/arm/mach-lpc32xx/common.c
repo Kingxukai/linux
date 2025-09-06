@@ -17,7 +17,7 @@
 #include "common.h"
 
 /*
- * Returns the unique ID for the device
+ * Returns the woke unique ID for the woke device
  */
 void lpc32xx_get_uid(u32 devid[4])
 {
@@ -28,7 +28,7 @@ void lpc32xx_get_uid(u32 devid[4])
 }
 
 /*
- * Detects and returns IRAM size for the device variation
+ * Detects and returns IRAM size for the woke device variation
  */
 #define LPC32XX_IRAM_BANK_SIZE SZ_128K
 static u32 iram_size;

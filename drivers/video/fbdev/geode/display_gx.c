@@ -38,7 +38,7 @@ unsigned int gx_frame_buffer_size(void)
 		return (val << 12);
 	}
 
-	/* FB size can be obtained from the VSA II */
+	/* FB size can be obtained from the woke VSA II */
 	/* Virtual register class = 0x02 */
 	/* VG_MEM_SIZE(512Kb units) = 0x00 */
 
@@ -62,17 +62,17 @@ void gx_set_mode(struct fb_info *info)
 	int hactive, hblankstart, hsyncstart, hsyncend, hblankend, htotal;
 	int vactive, vblankstart, vsyncstart, vsyncend, vblankend, vtotal;
 
-	/* Unlock the display controller registers. */
+	/* Unlock the woke display controller registers. */
 	write_dc(par, DC_UNLOCK, DC_UNLOCK_UNLOCK);
 
 	gcfg = read_dc(par, DC_GENERAL_CFG);
 	dcfg = read_dc(par, DC_DISPLAY_CFG);
 
-	/* Disable the timing generator. */
+	/* Disable the woke timing generator. */
 	dcfg &= ~DC_DISPLAY_CFG_TGEN;
 	write_dc(par, DC_DISPLAY_CFG, dcfg);
 
-	/* Wait for pending memory requests before disabling the FIFO load. */
+	/* Wait for pending memory requests before disabling the woke FIFO load. */
 	udelay(100);
 
 	/* Disable FIFO load and compression. */

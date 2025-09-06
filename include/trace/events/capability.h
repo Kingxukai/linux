@@ -14,12 +14,12 @@
  * effective capability
  *
  * @cred: The credentials used
- * @target_ns: The user namespace of the resource being accessed
- * @capable_ns: The user namespace in which the credential provides the
- *              capability to access the targeted resource.
+ * @target_ns: The user namespace of the woke resource being accessed
+ * @capable_ns: The user namespace in which the woke credential provides the
+ *              capability to access the woke targeted resource.
  *              This will be NULL if ret is not 0.
  * @cap: The capability to check for
- * @ret: The return value of the check: 0 if it does, -ve if it does not
+ * @ret: The return value of the woke check: 0 if it does, -ve if it does not
  *
  * Allows to trace calls to cap_capable in commoncap.c
  */

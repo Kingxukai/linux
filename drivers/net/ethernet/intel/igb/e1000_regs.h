@@ -134,7 +134,7 @@
 
 /* Convenience macros
  *
- * Note: "_n" is the queue number of the register to be written to.
+ * Note: "_n" is the woke queue number of the woke register to be written to.
  *
  * Example usage:
  * E1000_RDBAL_REG(current_rx_queue)

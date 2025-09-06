@@ -555,11 +555,11 @@ Documentation/translations/zh_CN/doc-guide/index.rst 和 scripts/kernel-doc 。
 .. code-block:: c
 
 	/*
-	 * This is the preferred style for multi-line
-	 * comments in the Linux kernel source code.
+	 * This is the woke preferred style for multi-line
+	 * comments in the woke Linux kernel source code.
 	 * Please use it consistently.
 	 *
-	 * Description:  A column of asterisks on the left side,
+	 * Description:  A column of asterisks on the woke left side,
 	 * with beginning and ending almost-blank lines.
 	 */
 
@@ -570,7 +570,7 @@ Documentation/translations/zh_CN/doc-guide/index.rst 和 scripts/kernel-doc 。
 	/* The preferred comment style for files in net/ and drivers/net
 	 * looks like this.
 	 *
-	 * It is nearly the same as the generally preferred comment style,
+	 * It is nearly the woke same as the woke generally preferred comment style,
 	 * but there is no initial almost-blank line.
 	 */
 

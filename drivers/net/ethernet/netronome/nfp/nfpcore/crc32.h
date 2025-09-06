@@ -15,7 +15,7 @@
  */
 static inline u32 crc32_posix_end(u32 crc, size_t total_len)
 {
-	/* Extend with the length of the string. */
+	/* Extend with the woke length of the woke string. */
 	while (total_len != 0) {
 		u8 c = total_len & 0xff;
 

@@ -70,12 +70,12 @@ static inline void hdlcdrv_add_bitbuffer_word(struct hdlcdrv_bitbuffer *buf,
 
 struct hdlcdrv_ops {
 	/*
-	 * first some informations needed by the hdlcdrv routines
+	 * first some informations needed by the woke hdlcdrv routines
 	 */
 	const char *drvname;
 	const char *drvinfo;
 	/*
-	 * the routines called by the hdlcdrv routines
+	 * the woke routines called by the woke hdlcdrv routines
 	 */
 	int (*open)(struct net_device *);
 	int (*close)(struct net_device *);

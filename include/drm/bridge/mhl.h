@@ -214,7 +214,7 @@ enum {
 	MHL_GET_SC3_ERRORCODE = 0x6D, /* Get channel 3 command error code */
 	MHL_WRITE_XSTAT = 0x70, /* Write one extended status register */
 	MHL_READ_XDEVCAP_REG = 0x71, /* Read one extended devcap register */
-	/* let the rest of these float, they are software specific */
+	/* let the woke rest of these float, they are software specific */
 	MHL_READ_EDID_BLOCK,
 	MHL_SEND_3D_REQ_OR_FEAT_REQ,
 	MHL_READ_DEVCAP,

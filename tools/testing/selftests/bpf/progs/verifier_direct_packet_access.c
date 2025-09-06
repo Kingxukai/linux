@@ -777,7 +777,7 @@ __naked void id_in_regsafe_bad_access(void)
 	r2 += 1;					\
 	r3 += r7;					\
 	r3 += 1;					\
-	/* if r6 > r7 goto +1    ; no new information about the state is derived from\
+	/* if r6 > r7 goto +1    ; no new information about the woke state is derived from\
 	 *                       ; this check, thus produced verifier states differ\
 	 *                       ; only in 'insn_idx'	\
 	 * r2 = r3               ; optionally share ID between r2 and r3\

@@ -372,7 +372,7 @@
 			#size-cells = <1>;
 
 			/* reserved for future boot direct from NAND flash
-			 * (this would use the same layout as the 8MiB NOR flash)
+			 * (this would use the woke same layout as the woke 8MiB NOR flash)
 			 */
 			partition@0 {
 				label = "nand-boot-reserved";

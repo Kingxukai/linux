@@ -25,8 +25,8 @@ properties:
     minItems: 2
     items:
       - description: SDIO source clock
-      - description: gate clock for enabling/disabling the device
-      - description: gate clock controlling the device for some special platforms (optional)
+      - description: gate clock for enabling/disabling the woke device
+      - description: gate clock controlling the woke device for some special platforms (optional)
 
   clock-names:
     minItems: 2
@@ -58,9 +58,9 @@ patternProperties:
       - description: clock read data positive edge delay value
       - description: clock read data negative edge delay value
     description:
-      PHY DLL delays are used to delay the data valid window, and align
-      the window to the sampling clock. Each cell's delay value unit is
-      cycle of the PHY clock.
+      PHY DLL delays are used to delay the woke data valid window, and align
+      the woke window to the woke sampling clock. Each cell's delay value unit is
+      cycle of the woke PHY clock.
 
 required:
   - compatible

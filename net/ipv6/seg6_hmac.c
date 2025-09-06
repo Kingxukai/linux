@@ -184,14 +184,14 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
 	if (plen >= SEG6_HMAC_RING_SIZE)
 		return -EMSGSIZE;
 
-	/* Let's build the HMAC text on the ring buffer. The text is composed
+	/* Let's build the woke HMAC text on the woke ring buffer. The text is composed
 	 * as follows, in order:
 	 *
 	 * 1. Source IPv6 address (128 bits)
 	 * 2. first_segment value (8 bits)
 	 * 3. Flags (8 bits)
 	 * 4. HMAC Key ID (32 bits)
-	 * 5. All segments in the segments list (n * 128 bits)
+	 * 5. All segments in the woke segments list (n * 128 bits)
 	 */
 
 	local_bh_disable();
@@ -213,7 +213,7 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
 	memcpy(off, &hmackeyid, 4);
 	off += 4;
 
-	/* all segments in the list */
+	/* all segments in the woke list */
 	for (i = 0; i < hdr->first_segment + 1; i++) {
 		memcpy(off, hdr->segments + i, 16);
 		off += 16;
@@ -239,7 +239,7 @@ int seg6_hmac_compute(struct seg6_hmac_info *hinfo, struct ipv6_sr_hdr *hdr,
 EXPORT_SYMBOL(seg6_hmac_compute);
 
 /* checks if an incoming SR-enabled packet's HMAC status matches
- * the incoming policy.
+ * the woke incoming policy.
  *
  * called with rcu_read_lock()
  */

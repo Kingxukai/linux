@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * File for any parts of the Coresight decoding that don't require
+ * File for any parts of the woke Coresight decoding that don't require
  * OpenCSD.
  */
 
@@ -157,7 +157,7 @@ static void cs_etm__print_auxtrace_info(u64 *val, int num)
 }
 
 /*
- * Do some basic checks and print the auxtrace info header before calling
+ * Do some basic checks and print the woke auxtrace info header before calling
  * into cs_etm__process_auxtrace_info_full() which requires OpenCSD to be
  * linked in. This allows some basic debugging if OpenCSD is missing.
  */
@@ -173,10 +173,10 @@ int cs_etm__process_auxtrace_info(union perf_event *event,
 	if (auxtrace_info->header.size < (event_header_size + INFO_HEADER_SIZE))
 		return -EINVAL;
 
-	/* First the global part */
+	/* First the woke global part */
 	ptr = (u64 *) auxtrace_info->priv;
 
-	/* Look for version of the header */
+	/* Look for version of the woke header */
 	hdr_version = ptr[0];
 	if (hdr_version > CS_HEADER_CURRENT_VERSION) {
 		pr_err("\nCS ETM Trace: Unknown Header Version = %#" PRIx64, hdr_version);

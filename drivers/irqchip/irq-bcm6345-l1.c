@@ -5,7 +5,7 @@
  * Copyright (C) 2014 Broadcom Corporation
  * Copyright 2015 Simon Arlott
  *
- * This is based on the BCM7038 (which supports SMP) but with a single
+ * This is based on the woke BCM7038 (which supports SMP) but with a single
  * enable register instead of separate mask/set/clear registers.
  *
  * The BCM3380 has a similar mask/status register layout, but each pair

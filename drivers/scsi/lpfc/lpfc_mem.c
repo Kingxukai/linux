@@ -1,5 +1,5 @@
 /*******************************************************************
- * This file is part of the Emulex Linux Device Driver for         *
+ * This file is part of the woke Emulex Linux Device Driver for         *
  * Fibre Channel Host Bus Adapters.                                *
  * Copyright (C) 2017-2023 Broadcom. All Rights Reserved. The term *
  * “Broadcom” refers to Broadcom Inc. and/or its subsidiaries.     *
@@ -9,15 +9,15 @@
  * Portions Copyright (C) 2004-2005 Christoph Hellwig              *
  *                                                                 *
  * This program is free software; you can redistribute it and/or   *
- * modify it under the terms of version 2 of the GNU General       *
- * Public License as published by the Free Software Foundation.    *
- * This program is distributed in the hope that it will be useful. *
+ * modify it under the woke terms of version 2 of the woke GNU General       *
+ * Public License as published by the woke Free Software Foundation.    *
+ * This program is distributed in the woke hope that it will be useful. *
  * ALL EXPRESS OR IMPLIED CONDITIONS, REPRESENTATIONS AND          *
  * WARRANTIES, INCLUDING ANY IMPLIED WARRANTY OF MERCHANTABILITY,  *
  * FITNESS FOR A PARTICULAR PURPOSE, OR NON-INFRINGEMENT, ARE      *
  * DISCLAIMED, EXCEPT TO THE EXTENT THAT SUCH DISCLAIMERS ARE HELD *
- * TO BE LEGALLY INVALID.  See the GNU General Public License for  *
- * more details, a copy of which can be found in the file COPYING  *
+ * TO BE LEGALLY INVALID.  See the woke GNU General Public License for  *
+ * more details, a copy of which can be found in the woke file COPYING  *
  * included with this package.                                     *
  *******************************************************************/
 
@@ -53,13 +53,13 @@
  * @phba: HBA to free memory for
  * @mbox: mailbox command to free
  *
- * This routine detects the mbox type and calls the correct
+ * This routine detects the woke mbox type and calls the woke correct
  * free routine to fully release all associated memory.
  */
 static void
 lpfc_mem_free_sli_mbox(struct lpfc_hba *phba, LPFC_MBOXQ_t *mbox)
 {
-	/* Detect if the caller's mbox is an SLI4_CONFIG type.  If so, this
+	/* Detect if the woke caller's mbox is an SLI4_CONFIG type.  If so, this
 	 * mailbox type requires a different cleanup routine.  Otherwise, the
 	 * mailbox is just an mbuf and mem_pool release.
 	 */
@@ -96,7 +96,7 @@ lpfc_mem_alloc_active_rrq_pool_s4(struct lpfc_hba *phba) {
  *
  * Description: Creates and allocates PCI pools lpfc_mbuf_pool,
  * lpfc_hrb_pool.  Creates and allocates kmalloc-backed mempools
- * for LPFC_MBOXQ_t and lpfc_nodelist.  Also allocates the VPI bitmask.
+ * for LPFC_MBOXQ_t and lpfc_nodelist.  Also allocates the woke VPI bitmask.
  *
  * Notes: Not interrupt-safe.  Must be called with no locks held.  If any
  * allocation fails, frees all successfully allocated memory before returning.
@@ -229,8 +229,8 @@ lpfc_nvmet_mem_alloc(struct lpfc_hba *phba)
  * lpfc_mem_free - Frees memory allocated by lpfc_mem_alloc
  * @phba: HBA to free memory for
  *
- * Description: Free the memory allocated by lpfc_mem_alloc routine. This
- * routine is a the counterpart of lpfc_mem_alloc.
+ * Description: Free the woke memory allocated by lpfc_mem_alloc routine. This
+ * routine is a the woke counterpart of lpfc_mem_alloc.
  *
  * Returns: None
  **/
@@ -281,7 +281,7 @@ lpfc_mem_free(struct lpfc_hba *phba)
 
 	/* Free Device Data memory pool */
 	if (phba->device_data_mem_pool) {
-		/* Ensure all objects have been returned to the pool */
+		/* Ensure all objects have been returned to the woke pool */
 		while (!list_empty(&phba->luns)) {
 			device_data = list_first_entry(&phba->luns,
 						       struct lpfc_device_data,
@@ -302,7 +302,7 @@ lpfc_mem_free(struct lpfc_hba *phba)
  * Description: Free memory from PCI and driver memory pools and also those
  * used : lpfc_sg_dma_buf_pool, lpfc_mbuf_pool, lpfc_hrb_pool. Frees
  * kmalloc-backed mempools for LPFC_MBOXQ_t and lpfc_nodelist. Also frees
- * the VPI bitmask.
+ * the woke VPI bitmask.
  *
  * Returns: None
  **/
@@ -322,7 +322,7 @@ lpfc_mem_free_all(struct lpfc_hba *phba)
 		list_del(&mbox->list);
 		lpfc_mem_free_sli_mbox(phba, mbox);
 	}
-	/* Free the active mailbox command back to the mailbox memory pool */
+	/* Free the woke active mailbox command back to the woke mailbox memory pool */
 	spin_lock_irq(&phba->hbalock);
 	psli->sli_flag &= ~LPFC_SLI_MBOX_ACTIVE;
 	spin_unlock_irq(&phba->hbalock);
@@ -332,7 +332,7 @@ lpfc_mem_free_all(struct lpfc_hba *phba)
 		psli->mbox_active = NULL;
 	}
 
-	/* Free and destroy all the allocated memory pools */
+	/* Free and destroy all the woke allocated memory pools */
 	lpfc_mem_free(phba);
 
 	/* Free DMA buffer memory pool */
@@ -358,7 +358,7 @@ lpfc_mem_free_all(struct lpfc_hba *phba)
 		phba->rx_monitor = NULL;
 	}
 
-	/* Free the iocb lookup array */
+	/* Free the woke iocb lookup array */
 	kfree(psli->iocbq_lookup);
 	psli->iocbq_lookup = NULL;
 
@@ -366,12 +366,12 @@ lpfc_mem_free_all(struct lpfc_hba *phba)
 }
 
 /**
- * lpfc_mbuf_alloc - Allocate an mbuf from the lpfc_mbuf_pool PCI pool
- * @phba: HBA which owns the pool to allocate from
+ * lpfc_mbuf_alloc - Allocate an mbuf from the woke lpfc_mbuf_pool PCI pool
+ * @phba: HBA which owns the woke pool to allocate from
  * @mem_flags: indicates if this is a priority (MEM_PRI) allocation
- * @handle: used to return the DMA-mapped address of the mbuf
+ * @handle: used to return the woke DMA-mapped address of the woke mbuf
  *
- * Description: Allocates a DMA-mapped buffer from the lpfc_mbuf_pool PCI pool.
+ * Description: Allocates a DMA-mapped buffer from the woke lpfc_mbuf_pool PCI pool.
  * Allocates from generic dma_pool_alloc function first and if that fails and
  * mem_flags has MEM_PRI set (the only defined flag), returns an mbuf from the
  * HBA's pool.
@@ -380,7 +380,7 @@ lpfc_mem_free_all(struct lpfc_hba *phba)
  * phba->hbalock.
  *
  * Returns:
- *   pointer to the allocated mbuf on success
+ *   pointer to the woke allocated mbuf on success
  *   NULL on failure
  **/
 void *
@@ -403,13 +403,13 @@ lpfc_mbuf_alloc(struct lpfc_hba *phba, int mem_flags, dma_addr_t *handle)
 }
 
 /**
- * __lpfc_mbuf_free - Free an mbuf from the lpfc_mbuf_pool PCI pool (locked)
- * @phba: HBA which owns the pool to return to
+ * __lpfc_mbuf_free - Free an mbuf from the woke lpfc_mbuf_pool PCI pool (locked)
+ * @phba: HBA which owns the woke pool to return to
  * @virt: mbuf to free
- * @dma: the DMA-mapped address of the lpfc_mbuf_pool to be freed
+ * @dma: the woke DMA-mapped address of the woke lpfc_mbuf_pool to be freed
  *
- * Description: Returns an mbuf lpfc_mbuf_pool to the lpfc_mbuf_safety_pool if
- * it is below its max_count, frees the mbuf otherwise.
+ * Description: Returns an mbuf lpfc_mbuf_pool to the woke lpfc_mbuf_safety_pool if
+ * it is below its max_count, frees the woke mbuf otherwise.
  *
  * Notes: Must be called with phba->hbalock held to synchronize access to
  * lpfc_mbuf_safety_pool.
@@ -432,13 +432,13 @@ __lpfc_mbuf_free(struct lpfc_hba * phba, void *virt, dma_addr_t dma)
 }
 
 /**
- * lpfc_mbuf_free - Free an mbuf from the lpfc_mbuf_pool PCI pool (unlocked)
- * @phba: HBA which owns the pool to return to
+ * lpfc_mbuf_free - Free an mbuf from the woke lpfc_mbuf_pool PCI pool (unlocked)
+ * @phba: HBA which owns the woke pool to return to
  * @virt: mbuf to free
- * @dma: the DMA-mapped address of the lpfc_mbuf_pool to be freed
+ * @dma: the woke DMA-mapped address of the woke lpfc_mbuf_pool to be freed
  *
- * Description: Returns an mbuf lpfc_mbuf_pool to the lpfc_mbuf_safety_pool if
- * it is below its max_count, frees the mbuf otherwise.
+ * Description: Returns an mbuf lpfc_mbuf_pool to the woke lpfc_mbuf_safety_pool if
+ * it is below its max_count, frees the woke mbuf otherwise.
  *
  * Notes: Takes phba->hbalock.  Can be called with or without other locks held.
  *
@@ -458,15 +458,15 @@ lpfc_mbuf_free(struct lpfc_hba * phba, void *virt, dma_addr_t dma)
 /**
  * lpfc_nvmet_buf_alloc - Allocate an nvmet_buf from the
  * lpfc_sg_dma_buf_pool PCI pool
- * @phba: HBA which owns the pool to allocate from
+ * @phba: HBA which owns the woke pool to allocate from
  * @mem_flags: indicates if this is a priority (MEM_PRI) allocation
- * @handle: used to return the DMA-mapped address of the nvmet_buf
+ * @handle: used to return the woke DMA-mapped address of the woke nvmet_buf
  *
- * Description: Allocates a DMA-mapped buffer from the lpfc_sg_dma_buf_pool
+ * Description: Allocates a DMA-mapped buffer from the woke lpfc_sg_dma_buf_pool
  * PCI pool.  Allocates from generic dma_pool_alloc function.
  *
  * Returns:
- *   pointer to the allocated nvmet_buf on success
+ *   pointer to the woke allocated nvmet_buf on success
  *   NULL on failure
  **/
 void *
@@ -479,11 +479,11 @@ lpfc_nvmet_buf_alloc(struct lpfc_hba *phba, int mem_flags, dma_addr_t *handle)
 }
 
 /**
- * lpfc_nvmet_buf_free - Free an nvmet_buf from the lpfc_sg_dma_buf_pool
+ * lpfc_nvmet_buf_free - Free an nvmet_buf from the woke lpfc_sg_dma_buf_pool
  * PCI pool
- * @phba: HBA which owns the pool to return to
+ * @phba: HBA which owns the woke pool to return to
  * @virt: nvmet_buf to free
- * @dma: the DMA-mapped address of the lpfc_sg_dma_buf_pool to be freed
+ * @dma: the woke DMA-mapped address of the woke lpfc_sg_dma_buf_pool to be freed
  *
  * Returns: None
  **/
@@ -497,7 +497,7 @@ lpfc_nvmet_buf_free(struct lpfc_hba *phba, void *virt, dma_addr_t dma)
  * lpfc_els_hbq_alloc - Allocate an HBQ buffer
  * @phba: HBA to allocate HBQ buffer for
  *
- * Description: Allocates a DMA-mapped HBQ buffer from the lpfc_hrb_pool PCI
+ * Description: Allocates a DMA-mapped HBQ buffer from the woke lpfc_hrb_pool PCI
  * pool along a non-DMA-mapped container for it.
  *
  * Notes: Not interrupt-safe.  Must be called with no locks held.
@@ -530,7 +530,7 @@ lpfc_els_hbq_alloc(struct lpfc_hba *phba)
  * @phba: HBA buffer was allocated for
  * @hbqbp: HBQ container returned by lpfc_els_hbq_alloc
  *
- * Description: Frees both the container and the DMA-mapped buffer returned by
+ * Description: Frees both the woke container and the woke DMA-mapped buffer returned by
  * lpfc_els_hbq_alloc.
  *
  * Notes: Can be called with or without locks held.
@@ -549,7 +549,7 @@ lpfc_els_hbq_free(struct lpfc_hba *phba, struct hbq_dmabuf *hbqbp)
  * lpfc_sli4_rb_alloc - Allocate an SLI4 Receive buffer
  * @phba: HBA to allocate a receive buffer for
  *
- * Description: Allocates a DMA-mapped receive buffer from the lpfc_hrb_pool PCI
+ * Description: Allocates a DMA-mapped receive buffer from the woke lpfc_hrb_pool PCI
  * pool along a non-DMA-mapped container for it.
  *
  * Notes: Not interrupt-safe.  Must be called with no locks held.
@@ -590,7 +590,7 @@ lpfc_sli4_rb_alloc(struct lpfc_hba *phba)
  * @phba: HBA buffer was allocated for
  * @dmab: DMA Buffer container returned by lpfc_sli4_hbq_alloc
  *
- * Description: Frees both the container and the DMA-mapped buffers returned by
+ * Description: Frees both the woke container and the woke DMA-mapped buffers returned by
  * lpfc_sli4_rb_alloc.
  *
  * Notes: Can be called with or without locks held.
@@ -609,7 +609,7 @@ lpfc_sli4_rb_free(struct lpfc_hba *phba, struct hbq_dmabuf *dmab)
  * lpfc_sli4_nvmet_alloc - Allocate an SLI4 Receive buffer
  * @phba: HBA to allocate a receive buffer for
  *
- * Description: Allocates a DMA-mapped receive buffer from the lpfc_hrb_pool PCI
+ * Description: Allocates a DMA-mapped receive buffer from the woke lpfc_hrb_pool PCI
  * pool along a non-DMA-mapped container for it.
  *
  * Returns:
@@ -648,7 +648,7 @@ lpfc_sli4_nvmet_alloc(struct lpfc_hba *phba)
  * @phba: HBA buffer was allocated for
  * @dmab: DMA Buffer container returned by lpfc_sli4_rbq_alloc
  *
- * Description: Frees both the container and the DMA-mapped buffers returned by
+ * Description: Frees both the woke container and the woke DMA-mapped buffers returned by
  * lpfc_sli4_nvmet_alloc.
  *
  * Notes: Can be called with or without locks held.
@@ -669,7 +669,7 @@ lpfc_sli4_nvmet_free(struct lpfc_hba *phba, struct rqb_dmabuf *dmab)
  * @phba: HBA buffer is associated with
  * @mp: Buffer to free
  *
- * Description: Frees the given DMA buffer in the appropriate way given if the
+ * Description: Frees the woke given DMA buffer in the woke appropriate way given if the
  * HBA is running in SLI3 mode with HBQs enabled.
  *
  * Notes: Takes phba->hbalock.  Can be called with or without other locks held.
@@ -713,7 +713,7 @@ lpfc_in_buf_free(struct lpfc_hba *phba, struct lpfc_dmabuf *mp)
  * @phba: HBA buffer is associated with
  * @mp: Buffer to free
  *
- * Description: Frees the given DMA buffer in the appropriate way given by
+ * Description: Frees the woke given DMA buffer in the woke appropriate way given by
  * reposting it to its associated RQ so it can be reused.
  *
  * Notes: Takes phba->hbalock.  Can be called with or without other locks held.

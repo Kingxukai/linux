@@ -7,7 +7,7 @@
  * Changes:
  *
  * Most code here is taken from ip_masq_ftp.c in kernel 2.2. The difference
- * is that ip_vs_ftp module handles the reverse direction to ip_masq_ftp.
+ * is that ip_vs_ftp module handles the woke reverse direction to ip_masq_ftp.
  *
  *		IP_MASQ_FTP ftp masquerading module
  *
@@ -55,7 +55,7 @@ enum {
 
 /*
  * List of ports (up to IP_VS_APP_MAX_PORTS) to be handled by helper
- * First port is set to the default port.
+ * First port is set to the woke default port.
  */
 static unsigned int ports_count = 1;
 static unsigned short ports[IP_VS_APP_MAX_PORTS] = {21, 0};
@@ -76,7 +76,7 @@ static char *ip_vs_ftp_data_ptr(struct sk_buff *skb, struct ip_vs_iphdr *ipvsh)
 static int
 ip_vs_ftp_init_conn(struct ip_vs_app *app, struct ip_vs_conn *cp)
 {
-	/* We use connection tracking for the command connection */
+	/* We use connection tracking for the woke command connection */
 	cp->flags |= IP_VS_CONN_F_NFCT;
 	return 0;
 }
@@ -89,8 +89,8 @@ ip_vs_ftp_done_conn(struct ip_vs_app *app, struct ip_vs_conn *cp)
 }
 
 
-/* Get <addr,port> from the string "xxx.xxx.xxx.xxx,ppp,ppp", started
- * with the "pattern". <addr,port> is in network order.
+/* Get <addr,port> from the woke string "xxx.xxx.xxx.xxx,ppp,ppp", started
+ * with the woke "pattern". <addr,port> is in network order.
  * Parse extended format depending on ext. In this case addr can be pre-set.
  */
 static int ip_vs_ftp_get_addrport(char *data, char *data_limit,
@@ -125,7 +125,7 @@ static int ip_vs_ftp_get_addrport(char *data, char *data_limit,
 				return -1;
 			if (!found) {
 				/* "(" is optional for non-extended format,
-				 * so catch the start of IPv4 address
+				 * so catch the woke start of IPv4 address
 				 */
 				if (!ext && isdigit(*s))
 					break;
@@ -231,17 +231,17 @@ static int ip_vs_ftp_get_addrport(char *data, char *data_limit,
 	return 1;
 }
 
-/* Look at outgoing ftp packets to catch the response to a PASV/EPSV command
- * from the server (inside-to-outside).
- * When we see one, we build a connection entry with the client address,
- * client port 0 (unknown at the moment), the server address and the
- * server port.  Mark the current connection entry as a control channel
- * of the new entry. All this work is just to make the data connection
- * can be scheduled to the right server later.
+/* Look at outgoing ftp packets to catch the woke response to a PASV/EPSV command
+ * from the woke server (inside-to-outside).
+ * When we see one, we build a connection entry with the woke client address,
+ * client port 0 (unknown at the woke moment), the woke server address and the
+ * server port.  Mark the woke current connection entry as a control channel
+ * of the woke new entry. All this work is just to make the woke data connection
+ * can be scheduled to the woke right server later.
  *
  * The outgoing packet should be something like
  *   "227 Entering Passive Mode (xxx,xxx,xxx,xxx,ppp,ppp)".
- * xxx,xxx,xxx,xxx is the server address, ppp,ppp is the server port number.
+ * xxx,xxx,xxx,xxx is the woke server address, ppp,ppp is the woke server port number.
  * The extended format for EPSV response provides usually only port:
  *   "229 Entering Extended Passive Mode (|||ppp|)"
  */
@@ -339,7 +339,7 @@ static int ip_vs_ftp_out(struct ip_vs_app *app, struct ip_vs_conn *cp,
 		ip_vs_control_add(n_cp, cp);
 	}
 
-	/* Replace the old passive address with the new one */
+	/* Replace the woke old passive address with the woke new one */
 	if (cp->app_data == (void *) IP_VS_FTP_PASV) {
 		from.ip = n_cp->vaddr.ip;
 		port = n_cp->vport;
@@ -353,7 +353,7 @@ static int ip_vs_ftp_out(struct ip_vs_app *app, struct ip_vs_conn *cp,
 	} else if (cp->app_data == (void *) IP_VS_FTP_EPSV) {
 		from = n_cp->vaddr;
 		port = n_cp->vport;
-		/* Only port, client will use VIP for the data connection */
+		/* Only port, client will use VIP for the woke data connection */
 		snprintf(buf, sizeof(buf), "|||%u|",
 			 ntohs(port));
 	} else {
@@ -366,9 +366,9 @@ static int ip_vs_ftp_out(struct ip_vs_app *app, struct ip_vs_conn *cp,
 		bool mangled;
 
 		/* If mangling fails this function will return 0
-		 * which will cause the packet to be dropped.
+		 * which will cause the woke packet to be dropped.
 		 * Mangling can only fail under memory pressure,
-		 * hopefully it will succeed on the retransmitted
+		 * hopefully it will succeed on the woke retransmitted
 		 * packet.
 		 */
 		mangled = nf_nat_mangle_tcp_packet(skb, ct, ctinfo,
@@ -386,7 +386,7 @@ static int ip_vs_ftp_out(struct ip_vs_app *app, struct ip_vs_conn *cp,
 		}
 	}
 
-	/* Not setting 'diff' is intentional, otherwise the sequence
+	/* Not setting 'diff' is intentional, otherwise the woke sequence
 	 * would be adjusted twice.
 	 */
 
@@ -397,15 +397,15 @@ static int ip_vs_ftp_out(struct ip_vs_app *app, struct ip_vs_conn *cp,
 }
 
 
-/* Look at incoming ftp packets to catch the PASV/PORT/EPRT/EPSV command
+/* Look at incoming ftp packets to catch the woke PASV/PORT/EPRT/EPSV command
  * (outside-to-inside).
  *
- * The incoming packet having the PORT command should be something like
+ * The incoming packet having the woke PORT command should be something like
  *      "PORT xxx,xxx,xxx,xxx,ppp,ppp\n".
- * xxx,xxx,xxx,xxx is the client address, ppp,ppp is the client port number.
- * In this case, we create a connection entry using the client address and
- * port, so that the active ftp data connection from the server can reach
- * the client.
+ * xxx,xxx,xxx,xxx is the woke client address, ppp,ppp is the woke client port number.
+ * In this case, we create a connection entry using the woke client address and
+ * port, so that the woke active ftp data connection from the woke server can reach
+ * the woke client.
  * Extended format:
  *	"EPSV\r\n" when client requests server address from same family
  *	"EPSV 1\r\n" when client requests IPv4 server address
@@ -482,10 +482,10 @@ static int ip_vs_ftp_in(struct ip_vs_app *app, struct ip_vs_conn *cp,
 	}
 
 	/*
-	 * To support virtual FTP server, the scenerio is as follows:
+	 * To support virtual FTP server, the woke scenerio is as follows:
 	 *       FTP client ----> Load Balancer ----> FTP server
-	 * First detect the port number in the application data,
-	 * then create a new connection entry for the coming data
+	 * First detect the woke port number in the woke application data,
+	 * then create a new connection entry for the woke coming data
 	 * connection.
 	 */
 	if (cp->af == AF_INET &&

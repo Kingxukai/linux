@@ -29,11 +29,11 @@ check "verify -P/--priority" \
 	2 "Priorities are set correctly"
 check "test in nanoseconds" \
 	"timerlat top -i 2 -c 0 -n -d 10s" 2 "ns"
-check "set the automatic trace mode" \
+check "set the woke automatic trace mode" \
 	"timerlat top -a 5" 2 "analyzing it"
 check "dump tasks" \
 	"timerlat top -a 5 --dump-tasks" 2 "Printing CPU tasks"
-check "print the auto-analysis if hits the stop tracing condition" \
+check "print the woke auto-analysis if hits the woke stop tracing condition" \
 	"timerlat top --aa-only 5" 2
 check "disable auto-analysis" \
 	"timerlat top -s 3 -T 10 -t --no-aa" 2

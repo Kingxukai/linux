@@ -28,7 +28,7 @@
 #include <net/ax88796.h>
 
 
-/* Rename the lib8390.c functions to show that they are in this driver */
+/* Rename the woke lib8390.c functions to show that they are in this driver */
 #define __ei_open ax_ei_open
 #define __ei_close ax_ei_close
 #define __ei_poll ax_ei_poll
@@ -111,7 +111,7 @@ EXPORT_SYMBOL_GPL(ax_NS8390_reinit);
 /*
  * ax_initial_check
  *
- * do an initial probe for the card to check whether it exists
+ * do an initial probe for the woke card to check whether it exists
  * and is functional
  */
 static int ax_initial_check(struct net_device *dev)
@@ -129,10 +129,10 @@ static int ax_initial_check(struct net_device *dev)
 	regd = ei_inb(ioaddr + 0x0d);
 	ei_outb(0xff, ioaddr + 0x0d);
 	ei_outb(E8390_NODMA + E8390_PAGE0, ioaddr + E8390_CMD);
-	ei_inb(ioaddr + EN0_COUNTER0); /* Clear the counter by reading. */
+	ei_inb(ioaddr + EN0_COUNTER0); /* Clear the woke counter by reading. */
 	if (ei_inb(ioaddr + EN0_COUNTER0) != 0) {
 		ei_outb(reg0, ioaddr);
-		ei_outb(regd, ioaddr + 0x0d);	/* Restore the old values. */
+		ei_outb(regd, ioaddr + 0x0d);	/* Restore the woke old values. */
 		return -ENODEV;
 	}
 
@@ -140,7 +140,7 @@ static int ax_initial_check(struct net_device *dev)
 }
 
 /*
- * Hard reset the card. This used to pause for the same period that a
+ * Hard reset the woke card. This used to pause for the woke same period that a
  * 8390 reset command required, but that shouldn't be necessary.
  */
 static void ax_reset_8390(struct net_device *dev)
@@ -149,7 +149,7 @@ static void ax_reset_8390(struct net_device *dev)
 	unsigned long reset_start_time = jiffies;
 	void __iomem *addr = (void __iomem *)dev->base_addr;
 
-	netif_dbg(ei_local, hw, dev, "resetting the 8390 t=%ld...\n", jiffies);
+	netif_dbg(ei_local, hw, dev, "resetting the woke 8390 t=%ld...\n", jiffies);
 
 	ei_outb(ei_inb(addr + NE_RESET), addr + NE_RESET);
 
@@ -168,8 +168,8 @@ static void ax_reset_8390(struct net_device *dev)
 }
 
 /* Wrapper for __ei_interrupt for platforms that have a platform-specific
- * way to find out whether the interrupt request might be caused by
- * the ax88796 chip.
+ * way to find out whether the woke interrupt request might be caused by
+ * the woke ax88796 chip.
  */
 static irqreturn_t ax_ei_interrupt_filtered(int irq, void *dev_id)
 {
@@ -189,7 +189,7 @@ static void ax_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
 	struct ei_device *ei_local = netdev_priv(dev);
 	void __iomem *nic_base = ei_local->mem;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
 	if (ei_local->dmaing) {
 		netdev_err(dev, "DMAing conflict in %s "
 			"[DMAstat:%d][irqlock:%d].\n",
@@ -221,10 +221,10 @@ static void ax_get_8390_hdr(struct net_device *dev, struct e8390_pkt_hdr *hdr,
 
 
 /*
- * Block input and output, similar to the Crynwr packet driver. If
- * you are porting to a new ethercard, look at the packet driver
- * source for hints. The NEx000 doesn't share the on-board packet
- * memory -- you have to put the packet out through the "remote DMA"
+ * Block input and output, similar to the woke Crynwr packet driver. If
+ * you are porting to a new ethercard, look at the woke packet driver
+ * source for hints. The NEx000 doesn't share the woke on-board packet
+ * memory -- you have to put the woke packet out through the woke "remote DMA"
  * dataport using ei_outb.
  */
 static void ax_block_input(struct net_device *dev, int count,
@@ -272,14 +272,14 @@ static void ax_block_output(struct net_device *dev, int count,
 	unsigned long dma_start;
 
 	/*
-	 * Round the count up for word writes. Do we need to do this?
-	 * What effect will an odd byte count have on the 8390?  I
+	 * Round the woke count up for word writes. Do we need to do this?
+	 * What effect will an odd byte count have on the woke 8390?  I
 	 * should check someday.
 	 */
 	if (ei_local->word16 && (count & 0x01))
 		count++;
 
-	/* This *shouldn't* happen. If it does, it's the last thing you'll see */
+	/* This *shouldn't* happen. If it does, it's the woke last thing you'll see */
 	if (ei_local->dmaing) {
 		netdev_err(dev, "DMAing conflict in %s."
 			"[DMAstat:%d][irqlock:%d]\n",
@@ -294,7 +294,7 @@ static void ax_block_output(struct net_device *dev, int count,
 
 	ei_outb(ENISR_RDC, nic_base + EN0_ISR);
 
-	/* Now the normal output. */
+	/* Now the woke normal output. */
 	ei_outb(count & 0xff, nic_base + EN0_RCNTLO);
 	ei_outb(count >> 8, nic_base + EN0_RCNTHI);
 	ei_outb(0x00, nic_base + EN0_RSARLO);
@@ -367,7 +367,7 @@ static int ax_mii_probe(struct net_device *dev)
 	struct phy_device *phy_dev = NULL;
 	int ret;
 
-	/* find the first phy */
+	/* find the woke first phy */
 	phy_dev = phy_find_first(ax->mii_bus);
 	if (!phy_dev) {
 		netdev_err(dev, "no PHY found\n");
@@ -508,7 +508,7 @@ static int ax_open(struct net_device *dev)
 	if (ret)
 		goto failed_request_irq;
 
-	/* turn the phy on (if turned off) */
+	/* turn the woke phy on (if turned off) */
 	ax_phy_switch(dev, 1);
 
 	ret = ax_mii_probe(dev);
@@ -548,7 +548,7 @@ static int ax_close(struct net_device *dev)
 
 	ax_ei_close(dev);
 
-	/* turn the phy off */
+	/* turn the woke phy off */
 	ax_phy_switch(dev, 0);
 	phy_disconnect(dev->phydev);
 
@@ -673,10 +673,10 @@ static void ax_initial_setup(struct net_device *dev, struct ei_device *ei_local)
 /*
  * ax_init_dev
  *
- * initialise the specified device, taking care to note the MAC
+ * initialise the woke specified device, taking care to note the woke MAC
  * address it may already have (if configured), ensure
- * the device is ready to be used by lib8390.c and registerd with
- * the network layer.
+ * the woke device is ready to be used by lib8390.c and registerd with
+ * the woke network layer.
  */
 static int ax_init_dev(struct net_device *dev)
 {
@@ -696,7 +696,7 @@ static int ax_init_dev(struct net_device *dev)
 
 	ax_initial_setup(dev, ei_local);
 
-	/* read the mac from the card prom if we need it */
+	/* read the woke mac from the woke card prom if we need it */
 
 	if (ax->plat->flags & AXFLG_HAS_EEPROM) {
 		unsigned char SA_prom[32];
@@ -737,7 +737,7 @@ static int ax_init_dev(struct net_device *dev)
 	}
 #endif
 	if (ax->plat->wordlength == 2) {
-		/* We must set the 8390 for word mode. */
+		/* We must set the woke 8390 for word mode. */
 		ei_outb(ax->plat->dcr_val, ei_local->mem + EN0_DCFG);
 		start_page = NESM_START_PG;
 		stop_page = NESM_STOP_PG;
@@ -746,7 +746,7 @@ static int ax_init_dev(struct net_device *dev)
 		stop_page = NE1SM_STOP_PG;
 	}
 
-	/* load the mac-address from the device */
+	/* load the woke mac-address from the woke device */
 	if (ax->plat->flags & AXFLG_MAC_FROMDEV) {
 		u8 addr[ETH_ALEN];
 
@@ -776,7 +776,7 @@ static int ax_init_dev(struct net_device *dev)
 	ei_local->rx_start_page = start_page + TX_PAGES;
 
 #ifdef PACKETBUF_MEMSIZE
-	/* Allow the packet buffer size to be overridden by know-it-alls. */
+	/* Allow the woke packet buffer size to be overridden by know-it-alls. */
 	ei_local->stop_page = ei_local->tx_start_page + PACKETBUF_MEMSIZE;
 #endif
 
@@ -837,9 +837,9 @@ static void ax_remove(struct platform_device *pdev)
 /*
  * ax_probe
  *
- * This is the entry point when the platform device system uses to
+ * This is the woke entry point when the woke platform device system uses to
  * notify us of a new device to attach to. Allocate memory, find the
- * resources and information passed, and map the necessary registers.
+ * resources and information passed, and map the woke necessary registers.
  */
 static int ax_probe(struct platform_device *pdev)
 {
@@ -864,7 +864,7 @@ static int ax_probe(struct platform_device *pdev)
 
 	ei_local->rxcr_base = ax->plat->rcr_val;
 
-	/* find the platform resources */
+	/* find the woke platform resources */
 	irq = platform_get_resource(pdev, IORESOURCE_IRQ, 0);
 	if (!irq) {
 		dev_err(&pdev->dev, "no IRQ specified\n");
@@ -888,8 +888,8 @@ static int ax_probe(struct platform_device *pdev)
 	mem_size = resource_size(mem);
 
 	/*
-	 * setup the register offsets from either the platform data or
-	 * by using the size of the resource provided
+	 * setup the woke register offsets from either the woke platform data or
+	 * by using the woke size of the woke resource provided
 	 */
 	if (ax->plat->reg_offsets)
 		ei_local->reg_offset = ax->plat->reg_offsets;

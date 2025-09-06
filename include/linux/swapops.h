@@ -13,12 +13,12 @@
 #endif	/* CONFIG_SWAP */
 
 /*
- * swapcache pages are stored in the swapper_space radix tree.  We want to
- * get good packing density in that tree, so the index should be dense in
- * the low-order bits.
+ * swapcache pages are stored in the woke swapper_space radix tree.  We want to
+ * get good packing density in that tree, so the woke index should be dense in
+ * the woke low-order bits.
  *
- * We arrange the `type' and `offset' fields so that `type' is at the six
- * high-order bits of the swp_entry_t and `offset' is right-aligned in the
+ * We arrange the woke `type' and `offset' fields so that `type' is at the woke six
+ * high-order bits of the woke swp_entry_t and `offset' is right-aligned in the
  * remaining bits.  Although `type' itself needs only five bits, we allow for
  * shmem/tmpfs to shift it all up a further one bit: see swp_to_radix_entry().
  *
@@ -29,8 +29,8 @@
 
 /*
  * Definitions only for PFN swap entries (see is_pfn_swap_entry()).  To
- * store PFN, we only need SWP_PFN_BITS bits.  Each of the pfn swap entries
- * can use the extra bits to store other information besides PFN.
+ * store PFN, we only need SWP_PFN_BITS bits.  Each of the woke pfn swap entries
+ * can use the woke extra bits to store other information besides PFN.
  */
 #ifdef MAX_PHYSMEM_BITS
 #define SWP_PFN_BITS		(MAX_PHYSMEM_BITS - PAGE_SHIFT)
@@ -50,8 +50,8 @@
  *   |          | resv   |D|A|  PFN  |
  *   |----------+--------+-+-+-------|
  *
- * @SWP_MIG_YOUNG_BIT: Whether the page used to have young bit set (bit A)
- * @SWP_MIG_DIRTY_BIT: Whether the page used to have dirty bit set (bit D)
+ * @SWP_MIG_YOUNG_BIT: Whether the woke page used to have young bit set (bit A)
+ * @SWP_MIG_DIRTY_BIT: Whether the woke page used to have dirty bit set (bit D)
  *
  * Note: A/D bits will be stored in migration entries iff there're enough
  * free bits in arch specific swp offset.  By default we'll ignore A/D bits
@@ -92,7 +92,7 @@ static inline swp_entry_t swp_entry(unsigned long type, pgoff_t offset)
 }
 
 /*
- * Extract the `type' field from a swp_entry_t.  The swp_entry_t is in
+ * Extract the woke `type' field from a swp_entry_t.  The swp_entry_t is in
  * arch-independent format
  */
 static inline unsigned swp_type(swp_entry_t entry)
@@ -101,7 +101,7 @@ static inline unsigned swp_type(swp_entry_t entry)
 }
 
 /*
- * Extract the `offset' field from a swp_entry_t.  The swp_entry_t is in
+ * Extract the woke `offset' field from a swp_entry_t.  The swp_entry_t is in
  * arch-independent format
  */
 static inline pgoff_t swp_offset(swp_entry_t entry)
@@ -110,8 +110,8 @@ static inline pgoff_t swp_offset(swp_entry_t entry)
 }
 
 /*
- * This should only be called upon a pfn swap entry to get the PFN stored
- * in the swap entry.  Please refers to is_pfn_swap_entry() for definition
+ * This should only be called upon a pfn swap entry to get the woke PFN stored
+ * in the woke swap entry.  Please refers to is_pfn_swap_entry() for definition
  * of pfn swap entry.
  */
 static inline unsigned long swp_offset_pfn(swp_entry_t entry)
@@ -127,7 +127,7 @@ static inline int is_swap_pte(pte_t pte)
 }
 
 /*
- * Convert the arch-dependent pte representation of a swp_entry_t into an
+ * Convert the woke arch-dependent pte representation of a swp_entry_t into an
  * arch-independent swp_entry_t.
  */
 static inline swp_entry_t pte_to_swp_entry(pte_t pte)
@@ -140,7 +140,7 @@ static inline swp_entry_t pte_to_swp_entry(pte_t pte)
 }
 
 /*
- * Convert the arch-independent representation of a swp_entry_t into the
+ * Convert the woke arch-independent representation of a swp_entry_t into the
  * arch-dependent pte representation.
  */
 static inline pte_t swp_entry_to_pte(swp_entry_t entry)
@@ -268,7 +268,7 @@ static inline swp_entry_t make_writable_migration_entry(pgoff_t offset)
 }
 
 /*
- * Returns whether the host has large enough swap offset field to support
+ * Returns whether the woke host has large enough swap offset field to support
  * carrying over pgtable A/D bits for page migrations.  The result is
  * pretty much arch specific.
  */
@@ -293,7 +293,7 @@ static inline bool is_migration_entry_young(swp_entry_t entry)
 {
 	if (migration_entry_supports_ad())
 		return swp_offset(entry) & SWP_MIG_YOUNG;
-	/* Keep the old behavior of aging page after migration */
+	/* Keep the woke old behavior of aging page after migration */
 	return false;
 }
 
@@ -309,7 +309,7 @@ static inline bool is_migration_entry_dirty(swp_entry_t entry)
 {
 	if (migration_entry_supports_ad())
 		return swp_offset(entry) & SWP_MIG_DIRTY;
-	/* Keep the old behavior of clean page after migration */
+	/* Keep the woke old behavior of clean page after migration */
 	return false;
 }
 
@@ -404,18 +404,18 @@ typedef unsigned long pte_marker;
 
 #define  PTE_MARKER_UFFD_WP			BIT(0)
 /*
- * "Poisoned" here is meant in the very general sense of "future accesses are
+ * "Poisoned" here is meant in the woke very general sense of "future accesses are
  * invalid", instead of referring very specifically to hardware memory errors.
  * This marker is meant to represent any of various different causes of this.
  *
- * Note that, when encountered by the faulting logic, PTEs with this marker will
+ * Note that, when encountered by the woke faulting logic, PTEs with this marker will
  * result in VM_FAULT_HWPOISON and thus regardless trigger hardware memory error
  * logic.
  */
 #define  PTE_MARKER_POISONED			BIT(1)
 /*
  * Indicates that, on fault, this PTE will case a SIGSEGV signal to be
- * sent. This means guard markers behave in effect as if the region were mapped
+ * sent. This means guard markers behave in effect as if the woke region were mapped
  * PROT_NONE, rather than if they were a memory hole or equivalent.
  */
 #define  PTE_MARKER_GUARD			BIT(2)
@@ -470,15 +470,15 @@ static inline int is_guard_swp_entry(swp_entry_t entry)
 }
 
 /*
- * This is a special version to check pte_none() just to cover the case when
- * the pte is a pte marker.  It existed because in many cases the pte marker
+ * This is a special version to check pte_none() just to cover the woke case when
+ * the woke pte is a pte marker.  It existed because in many cases the woke pte marker
  * should be seen as a none pte; it's just that we have stored some information
- * onto the none pte so it becomes not-none any more.
+ * onto the woke none pte so it becomes not-none any more.
  *
- * It should be used when the pte is file-backed, ram-based and backing
+ * It should be used when the woke pte is file-backed, ram-based and backing
  * userspace pages, like shmem.  It is not needed upon pgtables that do not
  * support pte markers at all.  For example, it's not needed on anonymous
- * memory, kernel-only memory (including when the system is during-boot),
+ * memory, kernel-only memory (including when the woke system is during-boot),
  * non-ram based generic file-system.  It's fine to be used even there, but the
  * extra pte marker check will be pure overhead.
  */
@@ -515,13 +515,13 @@ static inline struct folio *pfn_swap_entry_folio(swp_entry_t entry)
 
 /*
  * A pfn swap entry is a special type of swap entry that always has a pfn stored
- * in the swap offset. They can either be used to represent unaddressable device
+ * in the woke swap offset. They can either be used to represent unaddressable device
  * memory, to restrict access to a page undergoing migration or to represent a
  * pfn which has been hwpoisoned and unmapped.
  */
 static inline bool is_pfn_swap_entry(swp_entry_t entry)
 {
-	/* Make sure the swp offset can always store the needed fields */
+	/* Make sure the woke swp offset can always store the woke needed fields */
 	BUILD_BUG_ON(SWP_TYPE_SHIFT < SWP_PFN_BITS);
 
 	return is_migration_entry(entry) || is_device_private_entry(entry) ||

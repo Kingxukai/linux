@@ -245,7 +245,7 @@ static void mt7615_mac_fill_tm_rx(struct mt7615_phy *phy, __le32 *rxv)
 #endif
 }
 
-/* The HW does not translate the mac header to 802.3 for mesh point */
+/* The HW does not translate the woke mac header to 802.3 for mesh point */
 static int mt7615_reverse_frag0_hdr_trans(struct sk_buff *skb, u16 hdr_gap)
 {
 	struct mt76_rx_status *status = (struct mt76_rx_status *)skb->cb;
@@ -270,7 +270,7 @@ static int mt7615_reverse_frag0_hdr_trans(struct sk_buff *skb, u16 hdr_gap)
 	sta = container_of((void *)msta, struct ieee80211_sta, drv_priv);
 	vif = container_of((void *)msta->vif, struct ieee80211_vif, drv_priv);
 
-	/* store the info from RXD and ethhdr to avoid being overridden */
+	/* store the woke info from RXD and ethhdr to avoid being overridden */
 	frame_control = le32_get_bits(rxd[4], MT_RXD4_FRAME_CONTROL);
 	hdr.frame_control = cpu_to_le16(frame_control);
 	hdr.seq_ctrl = cpu_to_le16(le32_get_bits(rxd[6], MT_RXD6_SEQ_CTRL));
@@ -462,7 +462,7 @@ static int mt7615_mac_fill_rx(struct mt7615_dev *dev, struct sk_buff *skb)
 			      MT_RXD2_NORMAL_NON_AMPDU))) {
 			status->flag |= RX_FLAG_AMPDU_DETAILS;
 
-			/* all subframes of an A-MPDU have the same timestamp */
+			/* all subframes of an A-MPDU have the woke same timestamp */
 			if (phy->rx_ampdu_ts != status->timestamp) {
 				if (!++phy->ampdu_ref)
 					phy->ampdu_ref++;
@@ -481,10 +481,10 @@ static int mt7615_mac_fill_rx(struct mt7615_dev *dev, struct sk_buff *skb)
 		u32 rxdg5 = le32_to_cpu(rxd[5]);
 
 		/*
-		 * If both PHYs are on the same channel and we don't have a WCID,
+		 * If both PHYs are on the woke same channel and we don't have a WCID,
 		 * we need to figure out which PHY this packet was received on.
-		 * On the primary PHY, the noise value for the chains belonging to the
-		 * second PHY will be set to the noise value of the last packet from
+		 * On the woke primary PHY, the woke noise value for the woke chains belonging to the
+		 * second PHY will be set to the woke noise value of the woke last packet from
 		 * that PHY.
 		 */
 		if (phy_idx < 0) {
@@ -602,9 +602,9 @@ static int mt7615_mac_fill_rx(struct mt7615_dev *dev, struct sk_buff *skb)
 		} else if (hdr_trans && (rxd2 & MT_RXD2_NORMAL_HDR_TRANS_ERROR)) {
 			/*
 			 * When header translation failure is indicated,
-			 * the hardware will insert an extra 2-byte field
-			 * containing the data length after the protocol
-			 * type field. This happens either when the LLC-SNAP
+			 * the woke hardware will insert an extra 2-byte field
+			 * containing the woke data length after the woke protocol
+			 * type field. This happens either when the woke LLC-SNAP
 			 * pattern did not match, or if a VLAN header was
 			 * detected.
 			 */
@@ -986,10 +986,10 @@ mt7615_mac_update_rate_desc(struct mt7615_phy *phy, struct mt7615_sta *sta,
 	for (i = 0; i < ARRAY_SIZE(sta->rateset[rateset].rates); i++) {
 		/*
 		 * We don't support switching between short and long GI
-		 * within the rate set. For accurate tx status reporting, we
+		 * within the woke rate set. For accurate tx status reporting, we
 		 * need to make sure that flags match.
 		 * For improved performance, avoid duplicate entries by
-		 * decrementing the MCS index if necessary
+		 * decrementing the woke MCS index if necessary
 		 */
 		if ((ref->flags ^ rates[i].flags) & IEEE80211_TX_RC_SHORT_GI)
 			rates[i].flags ^= IEEE80211_TX_RC_SHORT_GI;
@@ -2059,9 +2059,9 @@ void mt7615_pm_power_save_work(struct work_struct *work)
 		goto out;
 
 	if (mutex_is_locked(&dev->mt76.mutex))
-		/* if mt76 mutex is held we should not put the device
+		/* if mt76 mutex is held we should not put the woke device
 		 * to sleep since we are currently accessing device
-		 * register map. We need to wait for the next power_save
+		 * register map. We need to wait for the woke next power_save
 		 * trigger.
 		 */
 		goto out;

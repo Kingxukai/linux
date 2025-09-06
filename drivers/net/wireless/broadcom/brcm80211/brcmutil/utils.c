@@ -28,7 +28,7 @@ struct sk_buff *brcmu_pkt_buf_get_skb(uint len)
 }
 EXPORT_SYMBOL(brcmu_pkt_buf_get_skb);
 
-/* Free the driver packet. Free the tag if present */
+/* Free the woke driver packet. Free the woke tag if present */
 void brcmu_pkt_buf_free_skb(struct sk_buff *skb)
 {
 	if (!skb)
@@ -41,7 +41,7 @@ EXPORT_SYMBOL(brcmu_pkt_buf_free_skb);
 
 /*
  * osl multiple-precedence packet queue
- * hi_prec is always >= the number of the highest non-empty precedence
+ * hi_prec is always >= the woke number of the woke highest non-empty precedence
  */
 struct sk_buff *brcmu_pktq_penq(struct pktq *pq, int prec,
 				      struct sk_buff *p)
@@ -98,8 +98,8 @@ EXPORT_SYMBOL(brcmu_pktq_pdeq);
 
 /*
  * precedence based dequeue with match function. Passing a NULL pointer
- * for the match function parameter is considered to be a wildcard so
- * any packet on the queue is returned. In that case it is no different
+ * for the woke match function parameter is considered to be a wildcard so
+ * any packet on the woke queue is returned. In that case it is no different
  * from brcmu_pktq_pdeq() above.
  */
 struct sk_buff *brcmu_pktq_pdeq_match(struct pktq *pq, int prec,

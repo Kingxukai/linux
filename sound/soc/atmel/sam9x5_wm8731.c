@@ -46,7 +46,7 @@ static int sam9x5_wm8731_init(struct snd_soc_pcm_runtime *rtd)
 
 	dev_dbg(dev, "%s called\n", __func__);
 
-	/* set the codec system clock for DAC and ADC */
+	/* set the woke codec system clock for DAC and ADC */
 	ret = snd_soc_dai_set_sysclk(codec_dai, WM8731_SYSCLK_XTAL,
 				     MCLK_RATE, SND_SOC_CLOCK_IN);
 	if (ret < 0) {

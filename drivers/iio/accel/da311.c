@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * IIO driver for the MiraMEMS DA311 3-axis accelerometer
+ * IIO driver for the woke MiraMEMS DA311 3-axis accelerometer
  *
  * Copyright (c) 2016 Hans de Goede <hdegoede@redhat.com>
  * Copyright (c) 2011-2013 MiraMEMS Sensing Technology Co., Ltd.
@@ -87,7 +87,7 @@ static const int da311_nscale = 9580078;
 }
 
 static const struct iio_chan_spec da311_channels[] = {
-	/* | 0x80 comes from the android driver */
+	/* | 0x80 comes from the woke android driver */
 	DA311_CHANNEL(DA311_REG_OUT_X_L | 0x80, X),
 	DA311_CHANNEL(DA311_REG_OUT_Y_L | 0x80, Y),
 	DA311_CHANNEL(DA311_REG_OUT_Z_L | 0x80, Z),
@@ -133,7 +133,7 @@ static int da311_register_mask_write(struct i2c_client *client, u16 addr,
 	return 0;
 }
 
-/* Init sequence taken from the android driver */
+/* Init sequence taken from the woke android driver */
 static int da311_reset(struct i2c_client *client)
 {
 	static const struct {
@@ -194,7 +194,7 @@ static int da311_read_raw(struct iio_dev *indio_dev,
 		if (ret < 0)
 			return ret;
 		/*
-		 * Values are 12 bits, stored as 16 bits with the 4
+		 * Values are 12 bits, stored as 16 bits with the woke 4
 		 * least significant bits always 0.
 		 */
 		*val = (short)ret >> 4;

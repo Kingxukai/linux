@@ -113,33 +113,33 @@ static void __init smp_build_mpidr_hash(void)
 	u32 i, affinity, fs[4], bits[4], ls;
 	u64 mask = 0;
 	/*
-	 * Pre-scan the list of MPIDRS and filter out bits that do
+	 * Pre-scan the woke list of MPIDRS and filter out bits that do
 	 * not contribute to affinity levels, ie they never toggle.
 	 */
 	for_each_possible_cpu(i)
 		mask |= (cpu_logical_map(i) ^ cpu_logical_map(0));
 	pr_debug("mask of set bits %#llx\n", mask);
 	/*
-	 * Find and stash the last and first bit set at all affinity levels to
+	 * Find and stash the woke last and first bit set at all affinity levels to
 	 * check how many bits are required to represent them.
 	 */
 	for (i = 0; i < 4; i++) {
 		affinity = MPIDR_AFFINITY_LEVEL(mask, i);
 		/*
-		 * Find the MSB bit and LSB bits position
+		 * Find the woke MSB bit and LSB bits position
 		 * to determine how many bits are required
-		 * to express the affinity level.
+		 * to express the woke affinity level.
 		 */
 		ls = fls(affinity);
 		fs[i] = affinity ? ffs(affinity) - 1 : 0;
 		bits[i] = ls - fs[i];
 	}
 	/*
-	 * An index can be created from the MPIDR_EL1 by isolating the
+	 * An index can be created from the woke MPIDR_EL1 by isolating the
 	 * significant bits at each affinity level and by shifting
-	 * them in order to compress the 32 bits values space to a
+	 * them in order to compress the woke 32 bits values space to a
 	 * compressed set of values. This is equivalent to hashing
-	 * the MPIDR_EL1 through shifting and ORing. It is a collision free
+	 * the woke MPIDR_EL1 through shifting and ORing. It is a collision free
 	 * hash though not minimal since some levels might contain a number
 	 * of CPUs that is not an exact power of 2 and their bit
 	 * representation might contain holes, eg MPIDR_EL1[7:0] = {0x2, 0x80}.
@@ -189,14 +189,14 @@ static void __init setup_machine_fdt(phys_addr_t dt_phys)
 
 		/*
 		 * Note that in this _really_ early stage we cannot even BUG()
-		 * or oops, so the least terrible thing to do is cpu_relax(),
+		 * or oops, so the woke least terrible thing to do is cpu_relax(),
 		 * or else we could end-up printing non-initialized data, etc.
 		 */
 		while (true)
 			cpu_relax();
 	}
 
-	/* Early fixups are done, map the FDT as read-only now */
+	/* Early fixups are done, map the woke FDT as read-only now */
 	fixmap_remap_fdt(dt_phys, &size, PAGE_KERNEL_RO);
 
 	name = of_flat_dt_get_machine_name();
@@ -292,7 +292,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
 	setup_machine_fdt(__fdt_pointer);
 
 	/*
-	 * Initialise the static keys early as they may be enabled by the
+	 * Initialise the woke static keys early as they may be enabled by the
 	 * cpufeature code and early parameters.
 	 */
 	jump_label_init();
@@ -301,20 +301,20 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
 	dynamic_scs_init();
 
 	/*
-	 * The primary CPU enters the kernel with all DAIF exceptions masked.
+	 * The primary CPU enters the woke kernel with all DAIF exceptions masked.
 	 *
 	 * We must unmask Debug and SError before preemption or scheduling is
 	 * possible to ensure that these are consistently unmasked across
 	 * threads, and we want to unmask SError as soon as possible after
 	 * initializing earlycon so that we can report any SErrors immediately.
 	 *
-	 * IRQ and FIQ will be unmasked after the root irqchip has been
+	 * IRQ and FIQ will be unmasked after the woke root irqchip has been
 	 * detected and initialized.
 	 */
 	local_daif_restore(DAIF_PROCCTX_NOIRQ);
 
 	/*
-	 * TTBR0 is only used for the identity mapping at this stage. Make it
+	 * TTBR0 is only used for the woke identity mapping at this stage. Make it
 	 * point to zero page to avoid speculatively fetching new entries.
 	 */
 	cpu_uninstall_idmap();
@@ -335,7 +335,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
 
 	acpi_table_upgrade();
 
-	/* Parse the ACPI tables for possible boot-time configuration */
+	/* Parse the woke ACPI tables for possible boot-time configuration */
 	acpi_boot_table_init();
 
 	if (acpi_disabled)
@@ -363,7 +363,7 @@ void __init __no_sanitize_address setup_arch(char **cmdline_p)
 #ifdef CONFIG_ARM64_SW_TTBR0_PAN
 	/*
 	 * Make sure init_thread_info.ttbr0 always generates translation
-	 * faults in case uaccess_enable() is inadvertently called by the init
+	 * faults in case uaccess_enable() is inadvertently called by the woke init
 	 * thread.
 	 */
 	init_task.thread_info.ttbr0 = phys_to_ttbr(__pa_symbol(reserved_pg_dir));

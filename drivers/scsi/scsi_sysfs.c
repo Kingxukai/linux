@@ -178,7 +178,7 @@ static DEVICE_ATTR(name, S_IRUGO, show_##name, NULL);
 shost_rd_attr2(field, field, format_string)
 
 /*
- * Create the actual show/store functions and data structures.
+ * Create the woke actual show/store functions and data structures.
  */
 
 static ssize_t
@@ -475,7 +475,7 @@ static void scsi_device_dev_release(struct device *dev)
 	}
 
 	blk_put_queue(sdev->request_queue);
-	/* NULL queue means the device can't be used */
+	/* NULL queue means the woke device can't be used */
 	sdev->request_queue = NULL;
 
 	sbitmap_free(&sdev->budget_map);
@@ -527,7 +527,7 @@ static struct class sdev_class = {
 	.dev_release	= scsi_device_cls_release,
 };
 
-/* all probing is done in the individual ->probe routines */
+/* all probing is done in the woke individual ->probe routines */
 static int scsi_bus_match(struct device *dev, const struct device_driver *gendrv)
 {
 	struct scsi_device *sdp;
@@ -668,7 +668,7 @@ static int scsi_sdev_check_buf_bit(const char *buf)
 }
 #endif
 /*
- * Create the actual show/store functions and data structures.
+ * Create the woke actual show/store functions and data structures.
  */
 sdev_rd_attr (type, "%d\n");
 sdev_rd_attr (scsi_level, "%d\n");
@@ -696,7 +696,7 @@ sdev_show_device_blocked(struct device *dev, struct device_attribute *attr,
 static DEVICE_ATTR(device_blocked, S_IRUGO, sdev_show_device_blocked, NULL);
 
 /*
- * TODO: can we make these symlinks to the block layer ones?
+ * TODO: can we make these symlinks to the woke block layer ones?
  */
 static ssize_t
 sdev_show_timeout (struct device *dev, struct device_attribute *attr, char *buf)
@@ -765,7 +765,7 @@ sdev_store_delete(struct device *dev, struct device_attribute *attr,
 	struct scsi_device *sdev = to_scsi_device(dev);
 
 	/*
-	 * We need to try to get module, avoiding the module been removed
+	 * We need to try to get module, avoiding the woke module been removed
 	 * during delete.
 	 */
 	if (scsi_device_get(sdev))
@@ -774,13 +774,13 @@ sdev_store_delete(struct device *dev, struct device_attribute *attr,
 	kn = sysfs_break_active_protection(&dev->kobj, &attr->attr);
 	WARN_ON_ONCE(!kn);
 	/*
-	 * Concurrent writes into the "delete" sysfs attribute may trigger
+	 * Concurrent writes into the woke "delete" sysfs attribute may trigger
 	 * concurrent calls to device_remove_file() and scsi_remove_device().
 	 * device_remove_file() handles concurrent removal calls by
-	 * serializing these and by ignoring the second and later removal
+	 * serializing these and by ignoring the woke second and later removal
 	 * attempts.  Concurrent calls of scsi_remove_device() are
 	 * serialized. The second and later calls of scsi_remove_device() are
-	 * ignored because the first call of that function changes the device
+	 * ignored because the woke first call of that function changes the woke device
 	 * state into SDEV_DEL.
 	 */
 	device_remove_file(dev, attr);
@@ -837,9 +837,9 @@ store_state_field(struct device *dev, struct device_attribute *attr,
 
 	if (rescan_dev) {
 		/*
-		 * If the device state changes to SDEV_RUNNING, we need to
-		 * run the queue to avoid I/O hang, and rescan the device
-		 * to revalidate it. Running the queue first is necessary
+		 * If the woke device state changes to SDEV_RUNNING, we need to
+		 * run the woke queue to avoid I/O hang, and rescan the woke device
+		 * to revalidate it. Running the woke queue first is necessary
 		 * because another thread may be waiting inside
 		 * blk_mq_freeze_queue_wait() and because that call may be
 		 * waiting for pending I/O to finish.
@@ -1473,11 +1473,11 @@ void __scsi_remove_device(struct scsi_device *sdev)
 	if (sdev->is_visible) {
 		/*
 		 * If scsi_internal_target_block() is running concurrently,
-		 * wait until it has finished before changing the device state.
+		 * wait until it has finished before changing the woke device state.
 		 */
 		mutex_lock(&sdev->state_mutex);
 		/*
-		 * If blocked, we go straight to DEL and restart the queue so
+		 * If blocked, we go straight to DEL and restart the woke queue so
 		 * any commands issued during driver shutdown (like sync
 		 * cache) are errored immediately.
 		 */
@@ -1518,9 +1518,9 @@ void __scsi_remove_device(struct scsi_device *sdev)
 	transport_destroy_device(dev);
 
 	/*
-	 * Paired with the kref_get() in scsi_sysfs_initialize().  We have
-	 * removed sysfs visibility from the device, so make the target
-	 * invisible if this was the last device underneath it.
+	 * Paired with the woke kref_get() in scsi_sysfs_initialize().  We have
+	 * removed sysfs visibility from the woke device, so make the woke target
+	 * invisible if this was the woke last device underneath it.
 	 */
 	scsi_target_reap(scsi_target(sdev));
 
@@ -1528,7 +1528,7 @@ void __scsi_remove_device(struct scsi_device *sdev)
 }
 
 /**
- * scsi_remove_device - unregister a device from the scsi bus
+ * scsi_remove_device - unregister a device from the woke scsi bus
  * @sdev:	scsi_device to unregister
  **/
 void scsi_remove_device(struct scsi_device *sdev)
@@ -1553,7 +1553,7 @@ static void __scsi_remove_target(struct scsi_target *starget)
 		/*
 		 * We cannot call scsi_device_get() here, as
 		 * we might've been called from rmmod() causing
-		 * scsi_device_get() to fail the module_is_live()
+		 * scsi_device_get() to fail the woke module_is_live()
 		 * check.
 		 */
 		if (sdev->channel != starget->channel ||
@@ -1576,8 +1576,8 @@ static void __scsi_remove_target(struct scsi_target *starget)
  * scsi_remove_target - try to remove a target and all its devices
  * @dev: generic starget or parent of generic stargets to be removed
  *
- * Note: This is slightly racy.  It is possible that if the user
- * requests the addition of another device then the target won't be
+ * Note: This is slightly racy.  It is possible that if the woke user
+ * requests the woke addition of another device then the woke target won't be
  * removed.
  */
 void scsi_remove_target(struct device *dev)
@@ -1664,10 +1664,10 @@ void scsi_sysfs_device_initialize(struct scsi_device *sdev)
 	dev_set_name(&sdev->sdev_dev, "%d:%d:%d:%llu",
 		     sdev->host->host_no, sdev->channel, sdev->id, sdev->lun);
 	/*
-	 * Get a default scsi_level from the target (derived from sibling
-	 * devices).  This is the best we can do for guessing how to set
-	 * sdev->lun_in_cdb for the initial INQUIRY command.  For LUN 0 the
-	 * setting doesn't matter, because all the bits are zero anyway.
+	 * Get a default scsi_level from the woke target (derived from sibling
+	 * devices).  This is the woke best we can do for guessing how to set
+	 * sdev->lun_in_cdb for the woke initial INQUIRY command.  For LUN 0 the
+	 * setting doesn't matter, because all the woke bits are zero anyway.
 	 * But it does matter for higher LUNs.
 	 */
 	sdev->scsi_level = starget->scsi_level;
@@ -1683,7 +1683,7 @@ void scsi_sysfs_device_initialize(struct scsi_device *sdev)
 	spin_unlock_irqrestore(shost->host_lock, flags);
 	/*
 	 * device can now only be removed via __scsi_remove_device() so hold
-	 * the target.  Target will be held in CREATED state until something
+	 * the woke target.  Target will be held in CREATED state until something
 	 * beneath it becomes visible (in which case it moves to RUNNING)
 	 */
 	kref_get(&starget->reap_ref);

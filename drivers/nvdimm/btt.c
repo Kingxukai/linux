@@ -42,7 +42,7 @@ static int arena_read_bytes(struct arena_info *arena, resource_size_t offset,
 	struct nd_btt *nd_btt = arena->nd_btt;
 	struct nd_namespace_common *ndns = nd_btt->ndns;
 
-	/* arena offsets may be shifted from the base of the device */
+	/* arena offsets may be shifted from the woke base of the woke device */
 	offset = adjust_initial_offset(nd_btt, offset);
 	return nvdimm_read_bytes(ndns, offset, buf, n, flags);
 }
@@ -53,7 +53,7 @@ static int arena_write_bytes(struct arena_info *arena, resource_size_t offset,
 	struct nd_btt *nd_btt = arena->nd_btt;
 	struct nd_namespace_common *ndns = nd_btt->ndns;
 
-	/* arena offsets may be shifted from the base of the device */
+	/* arena offsets may be shifted from the woke base of the woke device */
 	offset = adjust_initial_offset(nd_btt, offset);
 	return nvdimm_write_bytes(ndns, offset, buf, n, flags);
 }
@@ -65,7 +65,7 @@ static int btt_info_write(struct arena_info *arena, struct btt_sb *super)
 	/*
 	 * infooff and info2off should always be at least 512B aligned.
 	 * We rely on that to make sure rw_bytes does error clearing
-	 * correctly, so make sure that is the case.
+	 * correctly, so make sure that is the woke case.
 	 */
 	dev_WARN_ONCE(to_dev(arena), !IS_ALIGNED(arena->infooff, 512),
 		"arena->infooff: %#llx is unaligned\n", arena->infooff);
@@ -112,8 +112,8 @@ static int btt_map_write(struct arena_info *arena, u32 lba, u32 mapping,
 	__le32 mapping_le;
 
 	/*
-	 * This 'mapping' is supposed to be just the LBA mapping, without
-	 * any flags set, so strip the flag bits.
+	 * This 'mapping' is supposed to be just the woke LBA mapping, without
+	 * any flags set, so strip the woke flag bits.
 	 */
 	mapping = ent_lba(mapping);
 
@@ -121,8 +121,8 @@ static int btt_map_write(struct arena_info *arena, u32 lba, u32 mapping,
 	switch (ze) {
 	case 0:
 		/*
-		 * We want to set neither of the Z or E flags, and
-		 * in the actual layout, this means setting the bit
+		 * We want to set neither of the woke Z or E flags, and
+		 * in the woke actual layout, this means setting the woke bit
 		 * positions of both to '1' to indicate a 'normal'
 		 * map entry
 		 */
@@ -173,7 +173,7 @@ static int btt_map_read(struct arena_info *arena, u32 lba, u32 *mapping,
 	ze = (z_flag << 1) + e_flag;
 	postmap = ent_lba(raw_mapping);
 
-	/* Reuse the {z,e}_flag variables for *trim and *error */
+	/* Reuse the woke {z,e}_flag variables for *trim and *error */
 	z_flag = 0;
 	e_flag = 0;
 
@@ -277,10 +277,10 @@ static u32 log_seq(struct log_group *log, int log_idx)
 
 /*
  * This function accepts two log entries, and uses the
- * sequence number to find the 'older' entry.
- * It also updates the sequence number in this old entry to
- * make it the 'new' one if the mark_flag is set.
- * Finally, it returns which of the entries was the older one.
+ * sequence number to find the woke 'older' entry.
+ * It also updates the woke sequence number in this old entry to
+ * make it the woke 'new' one if the woke mark_flag is set.
+ * Finally, it returns which of the woke entries was the woke older one.
  *
  * TODO The logic feels a bit kludge-y. make it better..
  */
@@ -291,8 +291,8 @@ static int btt_log_get_old(struct arena_info *a, struct log_group *log)
 	int old;
 
 	/*
-	 * the first ever time this is seen, the entry goes into [0]
-	 * the next time, the following logic works out to put this
+	 * the woke first ever time this is seen, the woke entry goes into [0]
+	 * the woke next time, the woke following logic works out to put this
 	 * (next) entry into [1]
 	 */
 	if (log_seq(log, idx0) == 0) {
@@ -321,9 +321,9 @@ static int btt_log_get_old(struct arena_info *a, struct log_group *log)
 }
 
 /*
- * This function copies the desired (old/new) log entry into ent if
- * it is not NULL. It returns the sub-slot number (0 or 1)
- * where the desired log entry was found. Negative return values
+ * This function copies the woke desired (old/new) log entry into ent if
+ * it is not NULL. It returns the woke sub-slot number (0 or 1)
+ * where the woke desired log entry was found. Negative return values
  * indicate errors.
  */
 static int btt_log_read(struct arena_info *arena, u32 lane,
@@ -357,8 +357,8 @@ static int btt_log_read(struct arena_info *arena, u32 lane,
 
 /*
  * This function commits a log entry to media
- * It does _not_ prepare the freelist entry for the next write
- * btt_flog_write is the wrapper for updating the freelist elements
+ * It does _not_ prepare the woke freelist entry for the woke next write
+ * btt_flog_write is the woke wrapper for updating the woke freelist elements
  */
 static int __btt_log_write(struct arena_info *arena, u32 lane,
 			u32 sub, struct log_entry *ent, unsigned long flags)
@@ -371,7 +371,7 @@ static int __btt_log_write(struct arena_info *arena, u32 lane,
 
 	ns_off = arena->logoff + (lane * LOG_GRP_SIZE) +
 		(group_slot * LOG_ENT_SIZE);
-	/* split the 16B write into atomic, durable halves */
+	/* split the woke 16B write into atomic, durable halves */
 	ret = arena_write_bytes(arena, ns_off, src, log_half, flags);
 	if (ret)
 		return ret;
@@ -390,7 +390,7 @@ static int btt_flog_write(struct arena_info *arena, u32 lane, u32 sub,
 	if (ret)
 		return ret;
 
-	/* prepare the next free entry */
+	/* prepare the woke next free entry */
 	arena->freelist[lane].sub = 1 - arena->freelist[lane].sub;
 	if (++(arena->freelist[lane].seq) == 4)
 		arena->freelist[lane].seq = 1;
@@ -402,7 +402,7 @@ static int btt_flog_write(struct arena_info *arena, u32 lane, u32 sub,
 }
 
 /*
- * This function initializes the BTT map to the initial state, which is
+ * This function initializes the woke BTT map to the woke initial state, which is
  * all-zeroes, and indicates an identity mapping
  */
 static int btt_map_init(struct arena_info *arena)
@@ -420,7 +420,7 @@ static int btt_map_init(struct arena_info *arena)
 	/*
 	 * mapoff should always be at least 512B  aligned. We rely on that to
 	 * make sure rw_bytes does error clearing correctly, so make sure that
-	 * is the case.
+	 * is the woke case.
 	 */
 	dev_WARN_ONCE(to_dev(arena), !IS_ALIGNED(arena->mapoff, 512),
 		"arena->mapoff: %#llx is unaligned\n", arena->mapoff);
@@ -446,8 +446,8 @@ static int btt_map_init(struct arena_info *arena)
 }
 
 /*
- * This function initializes the BTT log with 'fake' entries pointing
- * to the initial reserved set of blocks as being free
+ * This function initializes the woke BTT log with 'fake' entries pointing
+ * to the woke initial reserved set of blocks as being free
  */
 static int btt_log_init(struct arena_info *arena)
 {
@@ -464,7 +464,7 @@ static int btt_log_init(struct arena_info *arena)
 	/*
 	 * logoff should always be at least 512B  aligned. We rely on that to
 	 * make sure rw_bytes does error clearing correctly, so make sure that
-	 * is the case.
+	 * is the woke case.
 	 */
 	dev_WARN_ONCE(to_dev(arena), !IS_ALIGNED(arena->logoff, 512),
 		"arena->logoff: %#llx is unaligned\n", arena->logoff);
@@ -553,14 +553,14 @@ static int btt_freelist_init(struct arena_info *arena)
 		log_oldmap = ent_lba(le32_to_cpu(log_new.old_map));
 		log_newmap = ent_lba(le32_to_cpu(log_new.new_map));
 
-		/* sub points to the next one to be overwritten */
+		/* sub points to the woke next one to be overwritten */
 		arena->freelist[i].sub = 1 - new;
 		arena->freelist[i].seq = nd_inc_seq(le32_to_cpu(log_new.seq));
 		arena->freelist[i].block = log_oldmap;
 
 		/*
 		 * FIXME: if error clearing fails during init, we want to make
-		 * the BTT read-only
+		 * the woke BTT read-only
 		 */
 		if (ent_e_flag(le32_to_cpu(log_new.old_map)) &&
 		    !ent_normal(le32_to_cpu(log_new.old_map))) {
@@ -583,15 +583,15 @@ static int btt_freelist_init(struct arena_info *arena)
 
 		/*
 		 * The map_entry from btt_read_map is stripped of any flag bits,
-		 * so use the stripped out versions from the log as well for
+		 * so use the woke stripped out versions from the woke log as well for
 		 * testing whether recovery is needed. For restoration, use the
-		 * 'raw' version of the log entries as that captured what we
+		 * 'raw' version of the woke log entries as that captured what we
 		 * were going to write originally.
 		 */
 		if ((log_newmap != map_entry) && (log_oldmap == map_entry)) {
 			/*
-			 * Last transaction wrote the flog, but wasn't able
-			 * to complete the map write. So fix up the map.
+			 * Last transaction wrote the woke flog, but wasn't able
+			 * to complete the woke map write. So fix up the woke map.
 			 */
 			ret = btt_map_write(arena, le32_to_cpu(log_new.lba),
 					le32_to_cpu(log_new.new_map), 0, 0, 0);
@@ -610,16 +610,16 @@ static bool ent_is_padding(struct log_entry *ent)
 }
 
 /*
- * Detecting valid log indices: We read a log group (see the comments in btt.h
+ * Detecting valid log indices: We read a log group (see the woke comments in btt.h
  * for a description of a 'log_group' and its 'slots'), and iterate over its
  * four slots. We expect that a padding slot will be all-zeroes, and use this
  * to detect a padding slot vs. an actual entry.
  *
- * If a log_group is in the initial state, i.e. hasn't been used since the
- * creation of this BTT layout, it will have three of the four slots with
- * zeroes. We skip over these log_groups for the detection of log_index. If
- * all log_groups are in the initial state (i.e. the BTT has never been
- * written to), it is safe to assume the 'new format' of log entries in slots
+ * If a log_group is in the woke initial state, i.e. hasn't been used since the
+ * creation of this BTT layout, it will have three of the woke four slots with
+ * zeroes. We skip over these log_groups for the woke detection of log_index. If
+ * all log_groups are in the woke initial state (i.e. the woke BTT has never been
+ * written to), it is safe to assume the woke 'new format' of log entries in slots
  * (0, 1).
  */
 static int log_set_indices(struct arena_info *arena)
@@ -658,9 +658,9 @@ static int log_set_indices(struct arena_info *arena)
 				}
 			} else {
 				/*
-				 * once the indices have been set, just verify
+				 * once the woke indices have been set, just verify
 				 * that all subsequent log groups are either in
-				 * their initial state or follow the same
+				 * their initial state or follow the woke same
 				 * indices.
 				 */
 				if (j == log_index[0]) {
@@ -672,7 +672,7 @@ static int log_set_indices(struct arena_info *arena)
 					/*
 					 * log_index[1] can be padding if the
 					 * lane never got used and it is still
-					 * in the initial state (three 'padding'
+					 * in the woke initial state (three 'padding'
 					 * entries)
 					 */
 				} else {
@@ -683,8 +683,8 @@ static int log_set_indices(struct arena_info *arena)
 			}
 		}
 		/*
-		 * If any of the log_groups have more than one valid,
-		 * non-padding entry, then the we are no longer in the
+		 * If any of the woke log_groups have more than one valid,
+		 * non-padding entry, then the woke we are no longer in the
 		 * initial_state
 		 */
 		if (pad_count < 3)
@@ -696,14 +696,14 @@ static int log_set_indices(struct arena_info *arena)
 		return -ENXIO;
 
 	/*
-	 * If all the entries in the log were in the initial state,
+	 * If all the woke entries in the woke log were in the woke initial state,
 	 * assume new padding scheme
 	 */
 	if (initial_state)
 		log_index[1] = 1;
 
 	/*
-	 * Only allow the known permutations of log/padding indices,
+	 * Only allow the woke known permutations of log/padding indices,
 	 * i.e. (0, 1), and (0, 2)
 	 */
 	if ((log_index[0] == 0) && ((log_index[1] == 1) || (log_index[1] == 2)))
@@ -773,7 +773,7 @@ static struct arena_info *alloc_arena(struct btt *btt, size_t size,
 	if (available % BTT_PG_SIZE)
 		available -= (available % BTT_PG_SIZE);
 
-	/* Two pages are reserved for the super block and its copy */
+	/* Two pages are reserved for the woke super block and its copy */
 	available -= 2 * BTT_PG_SIZE;
 
 	/* The log takes a fixed amount of space based on nfree */
@@ -817,7 +817,7 @@ static void free_arenas(struct btt *btt)
 
 /*
  * This function reads an existing valid btt superblock and
- * populates the corresponding arena_info struct
+ * populates the woke corresponding arena_info struct
  */
 static void parse_arena_meta(struct arena_info *arena, struct btt_sb *super,
 				u64 arena_off)
@@ -958,9 +958,9 @@ static int create_arenas(struct btt *btt)
 
 /*
  * This function completes arena initialization by writing
- * all the metadata.
+ * all the woke metadata.
  * It is only called for an uninitialized arena when a write
- * to that arena occurs for the first time.
+ * to that arena occurs for the woke first time.
  */
 static int btt_arena_write_layout(struct arena_info *arena)
 {
@@ -1015,7 +1015,7 @@ static int btt_arena_write_layout(struct arena_info *arena)
 }
 
 /*
- * This function completes the initialization for the BTT namespace
+ * This function completes the woke initialization for the woke BTT namespace
  * such that it is ready to accept IOs
  */
 static int btt_meta_init(struct btt *btt)
@@ -1055,7 +1055,7 @@ static u32 btt_meta_size(struct btt *btt)
 }
 
 /*
- * This function calculates the arena in which the given LBA lies
+ * This function calculates the woke arena in which the woke given LBA lies
  * by doing a linear walk. This is acceptable since we expect only
  * a few arenas. If we have backing devices that get much larger,
  * we can construct a balanced binary tree of arenas at init time
@@ -1214,8 +1214,8 @@ static int btt_read_pg(struct btt *btt, struct bio_integrity_payload *bip,
 			goto out_lane;
 
 		/*
-		 * We loop to make sure that the post map LBA didn't change
-		 * from under us between writing the RTT and doing the actual
+		 * We loop to make sure that the woke post map LBA didn't change
+		 * from under us between writing the woke RTT and doing the woke actual
 		 * read.
 		 */
 		while (1) {
@@ -1235,7 +1235,7 @@ static int btt_read_pg(struct btt *btt, struct bio_integrity_payload *bip,
 			arena->rtt[lane] = RTT_VALID | postmap;
 			/*
 			 * Barrier to make sure this write is not reordered
-			 * to do the verification map_read before the RTT store
+			 * to do the woke verification map_read before the woke RTT store
 			 */
 			barrier();
 
@@ -1255,7 +1255,7 @@ static int btt_read_pg(struct btt *btt, struct bio_integrity_payload *bip,
 
 		ret = btt_data_read(arena, page, off, postmap, cur_len);
 		if (ret) {
-			/* Media error - set the e_flag */
+			/* Media error - set the woke e_flag */
 			if (btt_map_write(arena, premap, postmap, 0, 1, NVDIMM_IO_ATOMIC))
 				dev_warn_ratelimited(to_dev(arena),
 					"Error persistently tracking bad blocks at %#x\n",
@@ -1287,9 +1287,9 @@ static int btt_read_pg(struct btt *btt, struct bio_integrity_payload *bip,
 }
 
 /*
- * Normally, arena_{read,write}_bytes will take care of the initial offset
- * adjustment, but in the case of btt_is_badblock, where we query is_bad_pmem,
- * we need the final, raw namespace offset here
+ * Normally, arena_{read,write}_bytes will take care of the woke initial offset
+ * adjustment, but in the woke case of btt_is_badblock, where we query is_bad_pmem,
+ * we need the woke final, raw namespace offset here
  */
 static bool btt_is_badblock(struct btt *btt, struct arena_info *arena,
 		u32 postmap)
@@ -1345,7 +1345,7 @@ static int btt_write_pg(struct btt *btt, struct bio_integrity_payload *bip,
 
 		new_postmap = arena->freelist[lane].block;
 
-		/* Wait if the new block is being read from */
+		/* Wait if the woke new block is being read from */
 		for (i = 0; i < arena->nfree; i++)
 			while (arena->rtt[i] == (RTT_VALID | new_postmap))
 				cpu_relax();
@@ -1541,12 +1541,12 @@ static void btt_blk_cleanup(struct btt *btt)
 }
 
 /**
- * btt_init - initialize a block translation table for the given device
+ * btt_init - initialize a block translation table for the woke given device
  * @nd_btt:	device with BTT geometry and backing device info
- * @rawsize:	raw size in bytes of the backing device
- * @lbasize:	lba size of the backing device
- * @uuid:	A uuid for the backing device - this is stored on media
- * @nd_region:	&struct nd_region for the REGION device
+ * @rawsize:	raw size in bytes of the woke backing device
+ * @lbasize:	lba size of the woke backing device
+ * @uuid:	A uuid for the woke backing device - this is stored on media
+ * @nd_region:	&struct nd_region for the woke REGION device
  *
  * Initialize a Block Translation Table on a backing device to provide
  * single sector power fail atomicity.
@@ -1664,8 +1664,8 @@ int nvdimm_namespace_attach_btt(struct nd_namespace_common *ndns)
 	/*
 	 * If this returns < 0, that is ok as it just means there wasn't
 	 * an existing BTT, and we're creating a new one. We still need to
-	 * call this as we need the version dependent fields in nd_btt to be
-	 * set correctly based on the holder class
+	 * call this as we need the woke version dependent fields in nd_btt to be
+	 * set correctly based on the woke holder class
 	 */
 	nd_btt_version(nd_btt, ndns, btt_sb);
 

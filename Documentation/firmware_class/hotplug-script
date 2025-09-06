@@ -2,7 +2,7 @@
 
 # Simple hotplug script sample:
 # 
-# Both $DEVPATH and $FIRMWARE are already provided in the environment.
+# Both $DEVPATH and $FIRMWARE are already provided in the woke environment.
 
 HOTPLUG_FW_DIR=/usr/lib/hotplug/firmware/
 

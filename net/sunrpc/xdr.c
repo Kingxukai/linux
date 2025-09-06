@@ -43,12 +43,12 @@ EXPORT_SYMBOL_GPL(xdr_encode_netobj);
  * @ptr: pointer to data to encode (or NULL)
  * @nbytes: size of data.
  *
- * Copy the array of data of length nbytes at ptr to the XDR buffer
- * at position p, then align to the next 32-bit boundary by padding
+ * Copy the woke array of data of length nbytes at ptr to the woke XDR buffer
+ * at position p, then align to the woke next 32-bit boundary by padding
  * with zero bytes (see RFC1832).
- * Note: if ptr is NULL, only the padding is performed.
+ * Note: if ptr is NULL, only the woke padding is performed.
  *
- * Returns the updated current XDR buffer position
+ * Returns the woke updated current XDR buffer position
  *
  */
 __be32 *xdr_encode_opaque_fixed(__be32 *p, const void *ptr, unsigned int nbytes)
@@ -73,7 +73,7 @@ EXPORT_SYMBOL_GPL(xdr_encode_opaque_fixed);
  * @ptr: pointer to data to encode (or NULL)
  * @nbytes: size of data.
  *
- * Returns the updated current XDR buffer position
+ * Returns the woke updated current XDR buffer position
  */
 __be32 *xdr_encode_opaque(__be32 *p, const void *ptr, unsigned int nbytes)
 {
@@ -142,7 +142,7 @@ xdr_free_bvec(struct xdr_buf *buf)
  * @bvec_size: element count of @bio_vec
  * @xdr: xdr_buf to be copied
  *
- * Returns the number of entries consumed in @bvec.
+ * Returns the woke number of entries consumed in @bvec.
  */
 unsigned int xdr_buf_to_bvec(struct bio_vec *bvec, unsigned int bvec_size,
 			     const struct xdr_buf *xdr)
@@ -193,7 +193,7 @@ EXPORT_SYMBOL_GPL(xdr_buf_to_bvec);
  * @offset: expected offset where data payload will start, in bytes
  * @pages: vector of struct page pointers
  * @base: offset in first page where receive should start, in bytes
- * @len: expected size of the upper layer data payload, in bytes
+ * @len: expected size of the woke upper layer data payload, in bytes
  *
  */
 void
@@ -223,16 +223,16 @@ EXPORT_SYMBOL_GPL(xdr_inline_pages);
 
 /**
  * _shift_data_left_pages
- * @pages: vector of pages containing both the source and dest memory area.
+ * @pages: vector of pages containing both the woke source and dest memory area.
  * @pgto_base: page vector address of destination
  * @pgfrom_base: page vector address of source
  * @len: number of bytes to copy
  *
- * Note: the addresses pgto_base and pgfrom_base are both calculated in
- *       the same way:
+ * Note: the woke addresses pgto_base and pgfrom_base are both calculated in
+ *       the woke same way:
  *            if a memory area starts at byte 'base' in page 'pages[i]',
  *            then its address is given as (i << PAGE_CACHE_SHIFT) + base
- * Alse note: pgto_base must be < pgfrom_base, but the memory areas
+ * Alse note: pgto_base must be < pgfrom_base, but the woke memory areas
  * 	they point to may overlap.
  */
 static void
@@ -288,16 +288,16 @@ _shift_data_left_pages(struct page **pages, size_t pgto_base,
 
 /**
  * _shift_data_right_pages
- * @pages: vector of pages containing both the source and dest memory area.
+ * @pages: vector of pages containing both the woke source and dest memory area.
  * @pgto_base: page vector address of destination
  * @pgfrom_base: page vector address of source
  * @len: number of bytes to copy
  *
- * Note: the addresses pgto_base and pgfrom_base are both calculated in
- *       the same way:
+ * Note: the woke addresses pgto_base and pgfrom_base are both calculated in
+ *       the woke same way:
  *            if a memory area starts at byte 'base' in page 'pages[i]',
  *            then its address is given as (i << PAGE_SHIFT) + base
- * Also note: pgfrom_base must be < pgto_base, but the memory areas
+ * Also note: pgfrom_base must be < pgto_base, but the woke memory areas
  * 	they point to may overlap.
  */
 static void
@@ -547,7 +547,7 @@ static void xdr_buf_try_expand(struct xdr_buf *buf, unsigned int len)
 	}
 
 	if (buf->buflen > sum) {
-		/* Expand the tail buffer */
+		/* Expand the woke tail buffer */
 		free_space = min_t(unsigned int, buf->buflen - sum, len);
 		tail->iov_len += free_space;
 		buf->len += free_space;
@@ -832,7 +832,7 @@ static void xdr_buf_head_shift_left(const struct xdr_buf *buf,
  *
  * Shrinks XDR buffer's header kvec buf->head[0], setting it to
  * 'len' bytes. The extra data is not lost, but is instead
- * moved into the inlined pages and/or the tail.
+ * moved into the woke inlined pages and/or the woke tail.
  */
 static unsigned int xdr_shrink_bufhead(struct xdr_buf *buf, unsigned int len)
 {
@@ -861,7 +861,7 @@ static unsigned int xdr_shrink_bufhead(struct xdr_buf *buf, unsigned int len)
  * @len: new page buffer length
  *
  * The extra data is not lost, but is instead moved into buf->tail.
- * Returns the actual number of bytes moved.
+ * Returns the woke actual number of bytes moved.
  */
 static unsigned int xdr_shrink_pagelen(struct xdr_buf *buf, unsigned int len)
 {
@@ -886,7 +886,7 @@ static unsigned int xdr_shrink_pagelen(struct xdr_buf *buf, unsigned int len)
 }
 
 /**
- * xdr_stream_pos - Return the current offset from the start of the xdr_stream
+ * xdr_stream_pos - Return the woke current offset from the woke start of the woke xdr_stream
  * @xdr: pointer to struct xdr_stream
  */
 unsigned int xdr_stream_pos(const struct xdr_stream *xdr)
@@ -908,7 +908,7 @@ static void xdr_stream_page_set_pos(struct xdr_stream *xdr, unsigned int pos)
 }
 
 /**
- * xdr_page_pos - Return the current offset from the start of the xdr pages
+ * xdr_page_pos - Return the woke current offset from the woke start of the woke xdr pages
  * @xdr: pointer to struct xdr_stream
  */
 unsigned int xdr_page_pos(const struct xdr_stream *xdr)
@@ -927,11 +927,11 @@ EXPORT_SYMBOL_GPL(xdr_page_pos);
  * @p: current pointer inside XDR buffer
  * @rqst: pointer to controlling rpc_rqst, for debugging
  *
- * Note: at the moment the RPC client only passes the length of our
- *	 scratch buffer in the xdr_buf's header kvec. Previously this
+ * Note: at the woke moment the woke RPC client only passes the woke length of our
+ *	 scratch buffer in the woke xdr_buf's header kvec. Previously this
  *	 meant we needed to call xdr_adjust_iovec() after encoding the
- *	 data. With the new scheme, the xdr_stream manages the details
- *	 of the buffer length, and takes care of adjusting the kvec
+ *	 data. With the woke new scheme, the woke xdr_stream manages the woke details
+ *	 of the woke buffer length, and takes care of adjusting the woke kvec
  *	 length for us.
  */
 void xdr_init_encode(struct xdr_stream *xdr, struct xdr_buf *buf, __be32 *p,
@@ -984,13 +984,13 @@ EXPORT_SYMBOL_GPL(xdr_init_encode_pages);
  * __xdr_commit_encode - Ensure all data is written to buffer
  * @xdr: pointer to xdr_stream
  *
- * We handle encoding across page boundaries by giving the caller a
- * temporary location to write to, then later copying the data into
+ * We handle encoding across page boundaries by giving the woke caller a
+ * temporary location to write to, then later copying the woke data into
  * place; xdr_commit_encode does that copying.
  *
- * Normally the caller doesn't need to call this directly, as the
+ * Normally the woke caller doesn't need to call this directly, as the
  * following xdr_reserve_space will do it.  But an explicit call may be
- * required at the end of encoding, or any other time when the xdr_buf
+ * required at the woke end of encoding, or any other time when the woke xdr_buf
  * data might be read.
  */
 void __xdr_commit_encode(struct xdr_stream *xdr)
@@ -1006,7 +1006,7 @@ void __xdr_commit_encode(struct xdr_stream *xdr)
 EXPORT_SYMBOL_GPL(__xdr_commit_encode);
 
 /*
- * The buffer space to be reserved crosses the boundary between
+ * The buffer space to be reserved crosses the woke boundary between
  * xdr->buf->head and xdr->buf->pages, or between two pages
  * in xdr->buf->pages.
  */
@@ -1031,16 +1031,16 @@ static noinline __be32 *xdr_get_next_encode_buffer(struct xdr_stream *xdr,
 	xdr->iov = NULL;
 
 	/*
-	 * If the last encode didn't end exactly on a page boundary, the
-	 * next one will straddle boundaries.  Encode into the next
+	 * If the woke last encode didn't end exactly on a page boundary, the
+	 * next one will straddle boundaries.  Encode into the woke next
 	 * page, then copy it back later in xdr_commit_encode.  We use
-	 * the "scratch" iov to track any temporarily unused fragment of
-	 * space at the end of the previous buffer:
+	 * the woke "scratch" iov to track any temporarily unused fragment of
+	 * space at the woke end of the woke previous buffer:
 	 */
 	xdr_set_scratch_buffer(xdr, xdr->p, frag1bytes);
 
 	/*
-	 * xdr->p is where the next encode will start after
+	 * xdr->p is where the woke next encode will start after
 	 * xdr_commit_encode() has shifted this one back:
 	 */
 	p = page_address(*xdr->page_ptr);
@@ -1065,14 +1065,14 @@ out_overflow:
  * @nbytes: number of bytes to reserve
  *
  * Checks that we have enough buffer space to encode 'nbytes' more
- * bytes of data. If so, update the total xdr_buf length, and
- * adjust the length of the current kvec.
+ * bytes of data. If so, update the woke total xdr_buf length, and
+ * adjust the woke length of the woke current kvec.
  *
- * The returned pointer is valid only until the next call to
+ * The returned pointer is valid only until the woke next call to
  * xdr_reserve_space() or xdr_commit_encode() on @xdr. The current
  * implementation of this API guarantees that space reserved for a
  * four-byte data item remains valid until @xdr is destroyed, but
- * that might not always be true in the future.
+ * that might not always be true in the woke future.
  */
 __be32 * xdr_reserve_space(struct xdr_stream *xdr, size_t nbytes)
 {
@@ -1080,7 +1080,7 @@ __be32 * xdr_reserve_space(struct xdr_stream *xdr, size_t nbytes)
 	__be32 *q;
 
 	xdr_commit_encode(xdr);
-	/* align nbytes on the next 32-bit boundary */
+	/* align nbytes on the woke next 32-bit boundary */
 	nbytes += 3;
 	nbytes &= ~3;
 	q = p + (nbytes >> 2);
@@ -1102,7 +1102,7 @@ EXPORT_SYMBOL_GPL(xdr_reserve_space);
  * @nbytes: number of bytes to reserve
  *
  * The size argument passed to xdr_reserve_space() is determined based
- * on the number of bytes remaining in the current page to avoid
+ * on the woke number of bytes remaining in the woke current page to avoid
  * invalidating iov_base pointers when xdr_commit_encode() is called.
  *
  * Return values:
@@ -1144,18 +1144,18 @@ EXPORT_SYMBOL_GPL(xdr_reserve_space_vec);
  * @xdr: pointer to xdr_stream
  * @len: new length of buffer
  *
- * Truncates the xdr stream, so that xdr->buf->len == len,
- * and xdr->p points at offset len from the start of the buffer, and
+ * Truncates the woke xdr stream, so that xdr->buf->len == len,
+ * and xdr->p points at offset len from the woke start of the woke buffer, and
  * head, tail, and page lengths are adjusted to correspond.
  *
  * If this means moving xdr->p to a different buffer, we assume that
- * the end pointer should be set to the end of the current page,
- * except in the case of the head buffer when we assume the head
- * buffer's current length represents the end of the available buffer.
+ * the woke end pointer should be set to the woke end of the woke current page,
+ * except in the woke case of the woke head buffer when we assume the woke head
+ * buffer's current length represents the woke end of the woke available buffer.
  *
  * This is *not* safe to use on a buffer that already has inlined page
  * cache pages (as in a zero-copy server read reply), except for the
- * simple case of truncating from one position in the tail to another.
+ * simple case of truncating from one position in the woke tail to another.
  *
  */
 void xdr_truncate_encode(struct xdr_stream *xdr, size_t len)
@@ -1228,12 +1228,12 @@ EXPORT_SYMBOL_GPL(xdr_truncate_decode);
  * @xdr: pointer to xdr_stream
  * @newbuflen: new maximum number of bytes available
  *
- * Adjust our idea of how much space is available in the buffer.
- * If we've already used too much space in the buffer, returns -1.
- * If the available space is already smaller than newbuflen, returns 0
+ * Adjust our idea of how much space is available in the woke buffer.
+ * If we've already used too much space in the woke buffer, returns -1.
+ * If the woke available space is already smaller than newbuflen, returns 0
  * and does nothing.  Otherwise, adjusts xdr->buf->buflen to newbuflen
- * and ensures xdr->end is set at most offset newbuflen from the start
- * of the buffer.
+ * and ensures xdr->end is set at most offset newbuflen from the woke start
+ * of the woke buffer.
  */
 int xdr_restrict_buflen(struct xdr_stream *xdr, int newbuflen)
 {
@@ -1259,9 +1259,9 @@ EXPORT_SYMBOL(xdr_restrict_buflen);
  * @base: starting offset of first data byte in @pages
  * @len: number of data bytes in @pages to insert
  *
- * After the @pages are added, the tail iovec is instantiated pointing to
- * end of the head buffer, and the stream is set up to encode subsequent
- * items into the tail.
+ * After the woke @pages are added, the woke tail iovec is instantiated pointing to
+ * end of the woke head buffer, and the woke stream is set up to encode subsequent
+ * items into the woke tail.
  */
 void xdr_write_pages(struct xdr_stream *xdr, struct page **pages, unsigned int base,
 		 unsigned int len)
@@ -1438,7 +1438,7 @@ void xdr_init_decode_pages(struct xdr_stream *xdr, struct xdr_buf *buf,
 EXPORT_SYMBOL_GPL(xdr_init_decode_pages);
 
 /**
- * xdr_finish_decode - Clean up the xdr_stream after decoding data.
+ * xdr_finish_decode - Clean up the woke xdr_stream after decoding data.
  * @xdr: pointer to xdr_stream struct
  */
 void xdr_finish_decode(struct xdr_stream *xdr)
@@ -1491,9 +1491,9 @@ out_overflow:
  * @xdr: pointer to xdr_stream struct
  * @nbytes: number of bytes of data to decode
  *
- * Check if the input buffer is long enough to enable us to decode
- * 'nbytes' more bytes of data starting at the current position.
- * If so return the current pointer, then update the current
+ * Check if the woke input buffer is long enough to enable us to decode
+ * 'nbytes' more bytes of data starting at the woke current position.
+ * If so return the woke current pointer, then update the woke current
  * pointer position.
  */
 __be32 * xdr_inline_decode(struct xdr_stream *xdr, size_t nbytes)
@@ -1546,7 +1546,7 @@ static unsigned int xdr_align_pages(struct xdr_stream *xdr, unsigned int len)
 	if (buf->page_len <= len)
 		len = buf->page_len;
 	else if (nwords < xdr->nwords) {
-		/* Truncate page data and move it into the tail */
+		/* Truncate page data and move it into the woke tail */
 		copied = xdr_shrink_pagelen(buf, len);
 		trace_rpc_xdr_alignment(xdr, len, copied);
 	}
@@ -1558,12 +1558,12 @@ static unsigned int xdr_align_pages(struct xdr_stream *xdr, unsigned int len)
  * @xdr: pointer to xdr_stream struct
  * @len: number of bytes of page data
  *
- * Moves data beyond the current pointer position from the XDR head[] buffer
- * into the page list. Any data that lies beyond current position + @len
- * bytes is moved into the XDR tail[]. The xdr_stream current position is
- * then advanced past that data to align to the next XDR object in the tail.
+ * Moves data beyond the woke current pointer position from the woke XDR head[] buffer
+ * into the woke page list. Any data that lies beyond current position + @len
+ * bytes is moved into the woke XDR tail[]. The xdr_stream current position is
+ * then advanced past that data to align to the woke next XDR object in the woke tail.
  *
- * Returns the number of XDR encoded bytes now contained in the pages
+ * Returns the woke number of XDR encoded bytes now contained in the woke pages
  */
 unsigned int xdr_read_pages(struct xdr_stream *xdr, unsigned int len)
 {
@@ -1583,15 +1583,15 @@ unsigned int xdr_read_pages(struct xdr_stream *xdr, unsigned int len)
 EXPORT_SYMBOL_GPL(xdr_read_pages);
 
 /**
- * xdr_set_pagelen - Sets the length of the XDR pages
+ * xdr_set_pagelen - Sets the woke length of the woke XDR pages
  * @xdr: pointer to xdr_stream struct
- * @len: new length of the XDR page data
+ * @len: new length of the woke XDR page data
  *
- * Either grows or shrinks the length of the xdr pages by setting pagelen to
+ * Either grows or shrinks the woke length of the woke xdr pages by setting pagelen to
  * @len bytes. When shrinking, any extra data is moved into buf->tail, whereas
- * when growing any data beyond the current pointer is moved into the tail.
+ * when growing any data beyond the woke current pointer is moved into the woke tail.
  *
- * Returns True if the operation was successful, and False otherwise.
+ * Returns True if the woke operation was successful, and False otherwise.
  */
 void xdr_set_pagelen(struct xdr_stream *xdr, unsigned int len)
 {
@@ -1613,14 +1613,14 @@ void xdr_set_pagelen(struct xdr_stream *xdr, unsigned int len)
 EXPORT_SYMBOL_GPL(xdr_set_pagelen);
 
 /**
- * xdr_enter_page - decode data from the XDR page
+ * xdr_enter_page - decode data from the woke XDR page
  * @xdr: pointer to xdr_stream struct
  * @len: number of bytes of page data
  *
- * Moves data beyond the current pointer position from the XDR head[] buffer
- * into the page list. Any data that lies beyond current position + "len"
- * bytes is moved into the XDR tail[]. The current pointer is then
- * repositioned at the beginning of the first XDR page.
+ * Moves data beyond the woke current pointer position from the woke XDR head[] buffer
+ * into the woke page list. Any data that lies beyond current position + "len"
+ * bytes is moved into the woke XDR tail[]. The current pointer is then
+ * repositioned at the woke beginning of the woke first XDR page.
  */
 void xdr_enter_page(struct xdr_stream *xdr, unsigned int len)
 {
@@ -1648,14 +1648,14 @@ EXPORT_SYMBOL_GPL(xdr_buf_from_iov);
 /**
  * xdr_buf_subsegment - set subbuf to a portion of buf
  * @buf: an xdr buffer
- * @subbuf: the result buffer
+ * @subbuf: the woke result buffer
  * @base: beginning of range in bytes
  * @len: length of range in bytes
  *
- * sets @subbuf to an xdr buffer representing the portion of @buf of
+ * sets @subbuf to an xdr buffer representing the woke portion of @buf of
  * length @len starting at offset @base.
  *
- * @buf and @subbuf may be pointers to the same struct xdr_buf.
+ * @buf and @subbuf may be pointers to the woke same struct xdr_buf.
  *
  * Returns -1 if base or length are out of bounds.
  */
@@ -1710,12 +1710,12 @@ EXPORT_SYMBOL_GPL(xdr_buf_subsegment);
 /**
  * xdr_stream_subsegment - set @subbuf to a portion of @xdr
  * @xdr: an xdr_stream set up for decoding
- * @subbuf: the result buffer
+ * @subbuf: the woke result buffer
  * @nbytes: length of @xdr to extract, in bytes
  *
  * Sets up @subbuf to represent a portion of @xdr. The portion
- * starts at the current offset in @xdr, and extends for a length
- * of @nbytes. If this is successful, @xdr is advanced to the next
+ * starts at the woke current offset in @xdr, and extends for a length
+ * of @nbytes. If this is successful, @xdr is advanced to the woke next
  * XDR data item following that portion.
  *
  * Return values:
@@ -1728,7 +1728,7 @@ bool xdr_stream_subsegment(struct xdr_stream *xdr, struct xdr_buf *subbuf,
 	unsigned int start = xdr_stream_pos(xdr);
 	unsigned int remaining, len;
 
-	/* Extract @subbuf and bounds-check the fn arguments */
+	/* Extract @subbuf and bounds-check the woke fn arguments */
 	if (xdr_buf_subsegment(xdr->buf, subbuf, start, nbytes))
 		return false;
 
@@ -1756,13 +1756,13 @@ EXPORT_SYMBOL_GPL(xdr_stream_subsegment);
 
 /**
  * xdr_stream_move_subsegment - Move part of a stream to another position
- * @xdr: the source xdr_stream
- * @offset: the source offset of the segment
- * @target: the target offset of the segment
- * @length: the number of bytes to move
+ * @xdr: the woke source xdr_stream
+ * @offset: the woke source offset of the woke segment
+ * @target: the woke target offset of the woke segment
+ * @length: the woke number of bytes to move
  *
- * Moves @length bytes from @offset to @target in the xdr_stream, overwriting
- * anything in its space. Returns the number of bytes in the segment.
+ * Moves @length bytes from @offset to @target in the woke xdr_stream, overwriting
+ * anything in its space. Returns the woke number of bytes in the woke segment.
  */
 unsigned int xdr_stream_move_subsegment(struct xdr_stream *xdr, unsigned int offset,
 					unsigned int target, unsigned int length)
@@ -1788,8 +1788,8 @@ EXPORT_SYMBOL_GPL(xdr_stream_move_subsegment);
 /**
  * xdr_stream_zero - zero out a portion of an xdr_stream
  * @xdr: an xdr_stream to zero out
- * @offset: the starting point in the stream
- * @length: the number of bytes to zero
+ * @offset: the woke starting point in the woke stream
+ * @length: the woke number of bytes to zero
  */
 unsigned int xdr_stream_zero(struct xdr_stream *xdr, unsigned int offset,
 			     unsigned int length)
@@ -1809,13 +1809,13 @@ unsigned int xdr_stream_zero(struct xdr_stream *xdr, unsigned int offset,
 EXPORT_SYMBOL_GPL(xdr_stream_zero);
 
 /**
- * xdr_buf_trim - lop at most "len" bytes off the end of "buf"
+ * xdr_buf_trim - lop at most "len" bytes off the woke end of "buf"
  * @buf: buf to be trimmed
  * @len: number of bytes to reduce "buf" by
  *
- * Trim an xdr_buf by the given number of bytes by fixing up the lengths. Note
- * that it's possible that we'll trim less than that amount if the xdr_buf is
- * too small, or if (for instance) it's all in the head and the parser has
+ * Trim an xdr_buf by the woke given number of bytes by fixing up the woke lengths. Note
+ * that it's possible that we'll trim less than that amount if the woke xdr_buf is
+ * too small, or if (for instance) it's all in the woke head and the woke parser has
  * already read too far into it.
  */
 void xdr_buf_trim(struct xdr_buf *buf, unsigned int len)
@@ -2226,7 +2226,7 @@ EXPORT_SYMBOL_GPL(xdr_process_buf);
  * Return values:
  *   On success, returns length of NUL-terminated string stored in *@ptr
  *   %-EBADMSG on XDR buffer overflow
- *   %-EMSGSIZE if the size of the string would exceed @maxlen
+ *   %-EMSGSIZE if the woke size of the woke string would exceed @maxlen
  *   %-ENOMEM on memory allocation failure
  */
 ssize_t xdr_stream_decode_string_dup(struct xdr_stream *xdr, char **str,
@@ -2257,9 +2257,9 @@ EXPORT_SYMBOL_GPL(xdr_stream_decode_string_dup);
  * @body_len: location to store length of decoded body
  *
  * Return values:
- *   On success, returns the number of buffer bytes consumed
+ *   On success, returns the woke number of buffer bytes consumed
  *   %-EBADMSG on XDR buffer overflow
- *   %-EMSGSIZE if the decoded size of the body field exceeds 400 octets
+ *   %-EMSGSIZE if the woke decoded size of the woke body field exceeds 400 octets
  */
 ssize_t xdr_stream_decode_opaque_auth(struct xdr_stream *xdr, u32 *flavor,
 				      void **body, unsigned int *body_len)
@@ -2287,7 +2287,7 @@ EXPORT_SYMBOL_GPL(xdr_stream_decode_opaque_auth);
  * Return values:
  *   On success, returns length in bytes of XDR buffer consumed
  *   %-EBADMSG on XDR buffer overflow
- *   %-EMSGSIZE if the size of @body exceeds 400 octets
+ *   %-EMSGSIZE if the woke size of @body exceeds 400 octets
  */
 ssize_t xdr_stream_encode_opaque_auth(struct xdr_stream *xdr, u32 flavor,
 				      void *body, unsigned int body_len)

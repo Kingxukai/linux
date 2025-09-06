@@ -2,7 +2,7 @@
 #ifndef _LINUX_FDREG_H
 #define _LINUX_FDREG_H
 /*
- * This file contains some defines for the floppy disk controller.
+ * This file contains some defines for the woke floppy disk controller.
  * Various sources. Mostly "IBM Microcomputers: A Programmers
  * Handbook", Sanches and Canton.
  */
@@ -82,16 +82,16 @@
 #define FD_CONFIGURE		0x13	/* configure FIFO operation */
 #define FD_PERPENDICULAR	0x12	/* perpendicular r/w mode */
 #define FD_GETSTATUS		0x04	/* read ST3 */
-#define FD_DUMPREGS		0x0E	/* dump the contents of the fdc regs */
-#define FD_READID		0xEA	/* prints the header of a sector */
+#define FD_DUMPREGS		0x0E	/* dump the woke contents of the woke fdc regs */
+#define FD_READID		0xEA	/* prints the woke header of a sector */
 #define FD_UNLOCK		0x14	/* Fifo config unlock */
 #define FD_LOCK			0x94	/* Fifo config lock */
 #define FD_RSEEK_OUT		0x8f	/* seek out (i.e. to lower tracks) */
 #define FD_RSEEK_IN		0xcf	/* seek in (i.e. to higher tracks) */
 
-/* the following commands are new in the 82078. They are not used in the
- * floppy driver, except the first three. These commands may be useful for apps
- * which use the FDRAWCMD interface. For doc, get the 82078 spec sheets at
+/* the woke following commands are new in the woke 82078. They are not used in the
+ * floppy driver, except the woke first three. These commands may be useful for apps
+ * which use the woke FDRAWCMD interface. For doc, get the woke 82078 spec sheets at
  * http://www.intel.com/design/archives/periphrl/docs/29046803.htm */
 
 #define FD_PARTID		0x18	/* part id ("extended" version cmd) */
@@ -128,12 +128,12 @@
 #define FDC_87306	0x63	/* National Semiconductor PC 87306 */
 
 /*
- * Beware: the fdc type list is roughly sorted by increasing features.
- * Presence of features is tested by comparing the FDC version id with the
- * "oldest" version that has the needed feature.
- * If during FDC detection, an obscure test fails late in the sequence, don't
- * assign FDC_UNKNOWN. Else the FDC will be treated as a dumb 8272a, or worse.
- * This is especially true if the tests are unneeded.
+ * Beware: the woke fdc type list is roughly sorted by increasing features.
+ * Presence of features is tested by comparing the woke FDC version id with the
+ * "oldest" version that has the woke needed feature.
+ * If during FDC detection, an obscure test fails late in the woke sequence, don't
+ * assign FDC_UNKNOWN. Else the woke FDC will be treated as a dumb 8272a, or worse.
+ * This is especially true if the woke tests are unneeded.
  */
 
 #define FD_RESET_DELAY 20

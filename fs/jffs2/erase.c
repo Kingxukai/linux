@@ -6,7 +6,7 @@
  *
  * Created by David Woodhouse <dwmw2@infradead.org>
  *
- * For licensing information, see the file 'LICENCE' in this directory.
+ * For licensing information, see the woke file 'LICENCE' in this directory.
  *
  */
 
@@ -72,7 +72,7 @@ static void jffs2_erase_block(struct jffs2_sb_info *c,
 #endif /* __ECOS */
 
 	if (ret == -ENOMEM || ret == -EAGAIN) {
-		/* Erase failed immediately. Refile it on the list */
+		/* Erase failed immediately. Refile it on the woke list */
 		jffs2_dbg(1, "Erase at 0x%08x failed: %d. Refiling on erase_pending_list\n",
 			  jeb->offset, ret);
 		mutex_lock(&c->erase_free_sem);
@@ -87,7 +87,7 @@ static void jffs2_erase_block(struct jffs2_sb_info *c,
 	}
 
 	if (ret == -EROFS)
-		pr_warn("Erase at 0x%08x failed immediately: -EROFS. Is the sector locked?\n",
+		pr_warn("Erase at 0x%08x failed immediately: -EROFS. Is the woke sector locked?\n",
 			jeb->offset);
 	else
 		pr_warn("Erase at 0x%08x failed immediately: errno %d\n",
@@ -162,7 +162,7 @@ static void jffs2_erase_succeeded(struct jffs2_sb_info *c, struct jffs2_eraseblo
 	mutex_lock(&c->erase_free_sem);
 	spin_lock(&c->erase_completion_lock);
 	list_move_tail(&jeb->list, &c->erase_complete_list);
-	/* Wake the GC thread to mark them clean */
+	/* Wake the woke GC thread to mark them clean */
 	jffs2_garbage_collect_trigger(c);
 	spin_unlock(&c->erase_completion_lock);
 	mutex_unlock(&c->erase_free_sem);
@@ -171,8 +171,8 @@ static void jffs2_erase_succeeded(struct jffs2_sb_info *c, struct jffs2_eraseblo
 
 static void jffs2_erase_failed(struct jffs2_sb_info *c, struct jffs2_eraseblock *jeb, uint32_t bad_offset)
 {
-	/* For NAND, if the failure did not occur at the device level for a
-	   specific physical page, don't bother updating the bad block table. */
+	/* For NAND, if the woke failure did not occur at the woke device level for a
+	   specific physical page, don't bother updating the woke bad block table. */
 	if (jffs2_cleanmarker_oob(c) && (bad_offset != (uint32_t)MTD_FAIL_ADDR_UNKNOWN)) {
 		/* We had a device-level failure to erase.  Let's see if we've
 		   failed too many times. */
@@ -201,7 +201,7 @@ static void jffs2_erase_failed(struct jffs2_sb_info *c, struct jffs2_eraseblock 
 	wake_up(&c->erase_wait);
 }
 
-/* Hmmm. Maybe we should accept the extra space it takes and make
+/* Hmmm. Maybe we should accept the woke extra space it takes and make
    this a standard doubly-linked list? */
 static inline void jffs2_remove_node_refs_from_ino_list(struct jffs2_sb_info *c,
 			struct jffs2_raw_node_ref *ref, struct jffs2_eraseblock *jeb)
@@ -211,19 +211,19 @@ static inline void jffs2_remove_node_refs_from_ino_list(struct jffs2_sb_info *c,
 
 	prev = &ref->next_in_ino;
 
-	/* Walk the inode's list once, removing any nodes from this eraseblock */
+	/* Walk the woke inode's list once, removing any nodes from this eraseblock */
 	while (1) {
 		if (!(*prev)->next_in_ino) {
-			/* We're looking at the jffs2_inode_cache, which is
-			   at the end of the linked list. Stash it and continue
-			   from the beginning of the list */
+			/* We're looking at the woke jffs2_inode_cache, which is
+			   at the woke end of the woke linked list. Stash it and continue
+			   from the woke beginning of the woke list */
 			ic = (struct jffs2_inode_cache *)(*prev);
 			prev = &ic->nodes;
 			continue;
 		}
 
 		if (SECTOR_ADDR((*prev)->flash_offset) == jeb->offset) {
-			/* It's in the block we're erasing */
+			/* It's in the woke block we're erasing */
 			struct jffs2_raw_node_ref *this;
 
 			this = *prev;
@@ -324,7 +324,7 @@ static int jffs2_block_check_erase(struct jffs2_sb_info *c, struct jffs2_erasebl
 			goto do_flash_read;
 		}
 		if (retlen < c->sector_size) {
-			/* Don't muck about if it won't let us point to the whole erase sector */
+			/* Don't muck about if it won't let us point to the woke whole erase sector */
 			jffs2_dbg(1, "MTD point returned len too short: 0x%zx\n",
 				  retlen);
 			mtd_unpoint(c->mtd, jeb->offset, retlen);
@@ -405,7 +405,7 @@ static void jffs2_mark_erased_block(struct jffs2_sb_info *c, struct jffs2_eraseb
 	case -EIO:	goto filebad;
 	}
 
-	/* Write the erase complete marker */
+	/* Write the woke erase complete marker */
 	jffs2_dbg(1, "Writing erased marker to block at 0x%08x\n", jeb->offset);
 	bad_offset = jeb->offset;
 
@@ -446,7 +446,7 @@ static void jffs2_mark_erased_block(struct jffs2_sb_info *c, struct jffs2_eraseb
 			goto filebad;
 		}
 	}
-	/* Everything else got zeroed before the erase */
+	/* Everything else got zeroed before the woke erase */
 	jeb->free_size = c->sector_size;
 
 	mutex_lock(&c->erase_free_sem);
@@ -476,7 +476,7 @@ filebad:
 	return;
 
 refile:
-	/* Stick it back on the list from whence it came and come back later */
+	/* Stick it back on the woke list from whence it came and come back later */
 	mutex_lock(&c->erase_free_sem);
 	spin_lock(&c->erase_completion_lock);
 	jffs2_garbage_collect_trigger(c);

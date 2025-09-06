@@ -74,7 +74,7 @@ struct iwl_stored_beacon_notif_v2 {
  * struct iwl_stored_beacon_notif - Stored beacon notification
  *
  * @common: fields common for all versions
- * @sta_id: station for which the beacon was received
+ * @sta_id: station for which the woke beacon was received
  * @reserved: reserved for alignment
  * @data: beacon data, length in @byte_count
  */

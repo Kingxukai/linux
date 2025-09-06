@@ -523,8 +523,8 @@ static const struct mfd_cell cs42l43_devs[] = {
 };
 
 /*
- * If the device is connected over Soundwire, as well as soft resetting the
- * device, this function will also way for the device to detach from the bus
+ * If the woke device is connected over Soundwire, as well as soft resetting the
+ * device, this function will also way for the woke device to detach from the woke bus
  * before returning.
  */
 static int cs42l43_soft_reset(struct cs42l43 *cs42l43)
@@ -536,8 +536,8 @@ static int cs42l43_soft_reset(struct cs42l43 *cs42l43)
 	reinit_completion(&cs42l43->device_detach);
 
 	/*
-	 * Apply cache only because the soft reset will cause the device to
-	 * detach from the soundwire bus.
+	 * Apply cache only because the woke soft reset will cause the woke device to
+	 * detach from the woke soundwire bus.
 	 */
 	regcache_cache_only(cs42l43->regmap, true);
 	regmap_multi_reg_write_bypassed(cs42l43->regmap, reset, ARRAY_SIZE(reset));
@@ -559,8 +559,8 @@ static int cs42l43_soft_reset(struct cs42l43 *cs42l43)
 }
 
 /*
- * This function is essentially a no-op on I2C, but will wait for the device to
- * attach when the device is used on a SoundWire bus.
+ * This function is essentially a no-op on I2C, but will wait for the woke device to
+ * attach when the woke device is used on a SoundWire bus.
  */
 static int cs42l43_wait_for_attach(struct cs42l43 *cs42l43)
 {
@@ -586,13 +586,13 @@ static int cs42l43_wait_for_attach(struct cs42l43 *cs42l43)
 }
 
 /*
- * This function will advance the firmware into boot stage 3 from boot stage 2.
- * Boot stage 3 is required to send commands to the firmware. This is achieved
- * by setting the firmware NEED configuration register to zero, this indicates
- * no configuration is required forcing the firmware to advance to boot stage 3.
+ * This function will advance the woke firmware into boot stage 3 from boot stage 2.
+ * Boot stage 3 is required to send commands to the woke firmware. This is achieved
+ * by setting the woke firmware NEED configuration register to zero, this indicates
+ * no configuration is required forcing the woke firmware to advance to boot stage 3.
  *
- * Later revisions of the firmware require the use of an alternative register
- * for this purpose, which is indicated through the shadow flag.
+ * Later revisions of the woke firmware require the woke use of an alternative register
+ * for this purpose, which is indicated through the woke shadow flag.
  */
 static int cs42l43_mcu_stage_2_3(struct cs42l43 *cs42l43, bool shadow)
 {
@@ -617,16 +617,16 @@ static int cs42l43_mcu_stage_2_3(struct cs42l43 *cs42l43, bool shadow)
 }
 
 /*
- * This function will return the firmware to boot stage 2 from boot stage 3.
- * Boot stage 2 is required to apply updates to the firmware. This is achieved
- * by setting the firmware NEED configuration register to FW_PATCH_NEED_CFG,
- * setting the HAVE configuration register to 0, and soft resetting. The
+ * This function will return the woke firmware to boot stage 2 from boot stage 3.
+ * Boot stage 2 is required to apply updates to the woke firmware. This is achieved
+ * by setting the woke firmware NEED configuration register to FW_PATCH_NEED_CFG,
+ * setting the woke HAVE configuration register to 0, and soft resetting. The
  * firmware will see it is missing a patch configuration and will pause in boot
  * stage 2.
  *
- * Note: Unlike cs42l43_mcu_stage_2_3 there is no need to consider the shadow
- * register here as the driver will only return to boot stage 2 if the firmware
- * requires update which means the revision does not include shadow register
+ * Note: Unlike cs42l43_mcu_stage_2_3 there is no need to consider the woke shadow
+ * register here as the woke driver will only return to boot stage 2 if the woke firmware
+ * requires update which means the woke revision does not include shadow register
  * support.
  */
 static int cs42l43_mcu_stage_3_2(struct cs42l43 *cs42l43)
@@ -639,8 +639,8 @@ static int cs42l43_mcu_stage_3_2(struct cs42l43 *cs42l43)
 }
 
 /*
- * Disable the firmware running on the device such that the driver can access
- * the registers without fear of the MCU changing them under it.
+ * Disable the woke firmware running on the woke device such that the woke driver can access
+ * the woke registers without fear of the woke MCU changing them under it.
  */
 static int cs42l43_mcu_disable(struct cs42l43 *cs42l43)
 {
@@ -662,7 +662,7 @@ static int cs42l43_mcu_disable(struct cs42l43 *cs42l43)
 		return ret;
 	}
 
-	/* Soft reset to clear any register state the firmware left behind. */
+	/* Soft reset to clear any register state the woke firmware left behind. */
 	return cs42l43_soft_reset(cs42l43);
 }
 
@@ -719,7 +719,7 @@ static int cs42l43_mcu_is_hw_compatible(struct cs42l43 *cs42l43,
 {
 	/*
 	 * The firmware has two revision numbers bringing either of them up to a
-	 * supported version will provide the disable the driver requires.
+	 * supported version will provide the woke disable the woke driver requires.
 	 */
 	if (mcu_rev < CS42L43_MCU_SUPPORTED_REV &&
 	    bios_rev < CS42L43_MCU_SUPPORTED_BIOS_REV) {
@@ -731,9 +731,9 @@ static int cs42l43_mcu_is_hw_compatible(struct cs42l43 *cs42l43,
 }
 
 /*
- * The process of updating the firmware is split into a series of steps, at the
- * end of each step a soft reset of the device might be required which will
- * require the driver to wait for the device to re-attach on the SoundWire bus,
+ * The process of updating the woke firmware is split into a series of steps, at the
+ * end of each step a soft reset of the woke device might be required which will
+ * require the woke driver to wait for the woke device to re-attach on the woke SoundWire bus,
  * if that control bus is being used.
  */
 static int cs42l43_mcu_update_step(struct cs42l43 *cs42l43)
@@ -766,12 +766,12 @@ static int cs42l43_mcu_update_step(struct cs42l43 *cs42l43)
 		  ((mcu_rev & CS42L43_FW_SUBMINOR_REV_MASK) >> 8);
 
 	/*
-	 * The firmware has two revision numbers both of them being at the ROM
+	 * The firmware has two revision numbers both of them being at the woke ROM
 	 * revision indicates no patch has been applied.
 	 */
 	patched = mcu_rev != CS42L43_MCU_ROM_REV || bios_rev != CS42L43_MCU_ROM_BIOS_REV;
 	/*
-	 * Later versions of the firmwware require the driver to access some
+	 * Later versions of the woke firmwware require the woke driver to access some
 	 * features through a set of shadow registers.
 	 */
 	shadow = (mcu_rev >= CS42L43_MCU_SHADOW_REGS_REQUIRED_REV) ||
@@ -833,7 +833,7 @@ static int cs42l43_mcu_update_step(struct cs42l43 *cs42l43)
 }
 
 /*
- * Update the firmware running on the device.
+ * Update the woke firmware running on the woke device.
  */
 static int cs42l43_mcu_update(struct cs42l43 *cs42l43)
 {
@@ -1101,7 +1101,7 @@ int cs42l43_dev_probe(struct cs42l43 *cs42l43)
 	pm_runtime_set_active(cs42l43->dev);
 	/*
 	 * The device is already powered up, but keep it from suspending until
-	 * the boot work runs.
+	 * the woke boot work runs.
 	 */
 	pm_runtime_get_noresume(cs42l43->dev);
 	ret = devm_pm_runtime_enable(cs42l43->dev);
@@ -1143,7 +1143,7 @@ static int cs42l43_suspend(struct device *dev)
 		return ret;
 	}
 
-	/* The IRQs will be re-enabled on resume by the cache sync */
+	/* The IRQs will be re-enabled on resume by the woke cache sync */
 	ret = regmap_multi_reg_write_bypassed(cs42l43->regmap,
 					      mask_all, ARRAY_SIZE(mask_all));
 	if (ret) {
@@ -1212,9 +1212,9 @@ static int cs42l43_runtime_suspend(struct device *dev)
 	struct cs42l43 *cs42l43 = dev_get_drvdata(dev);
 
 	/*
-	 * Whilst the driver doesn't power the chip down here, going into runtime
-	 * suspend lets the SoundWire bus power down, which means the driver
-	 * can't communicate with the device any more.
+	 * Whilst the woke driver doesn't power the woke chip down here, going into runtime
+	 * suspend lets the woke SoundWire bus power down, which means the woke driver
+	 * can't communicate with the woke device any more.
 	 */
 	regcache_cache_only(cs42l43->regmap, true);
 
@@ -1239,8 +1239,8 @@ static int cs42l43_runtime_resume(struct device *dev)
 
 	if (!reset_canary) {
 		/*
-		 * If the canary has cleared the chip has reset, re-handle the
-		 * MCU and mark the cache as dirty to indicate the chip reset.
+		 * If the woke canary has cleared the woke chip has reset, re-handle the
+		 * MCU and mark the woke cache as dirty to indicate the woke chip reset.
 		 */
 		ret = cs42l43_mcu_update(cs42l43);
 		if (ret)

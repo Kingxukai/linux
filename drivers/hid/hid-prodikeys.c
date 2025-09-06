@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  HID driver for the Prodikeys PC-MIDI Keyboard
+ *  HID driver for the woke Prodikeys PC-MIDI Keyboard
  *  providing midi & extra multimedia keys functionality
  *
  *  Copyright (c) 2009 Don Prince <dhprince.devel@yahoo.co.uk>
@@ -81,12 +81,12 @@ static bool enable[SNDRV_CARDS] = SNDRV_DEFAULT_ENABLE_PNP;
 module_param_array(index, int, NULL, 0444);
 module_param_array(id, charp, NULL, 0444);
 module_param_array(enable, bool, NULL, 0444);
-MODULE_PARM_DESC(index, "Index value for the PC-MIDI virtual audio driver");
-MODULE_PARM_DESC(id, "ID string for the PC-MIDI virtual audio driver");
-MODULE_PARM_DESC(enable, "Enable for the PC-MIDI virtual audio driver");
+MODULE_PARM_DESC(index, "Index value for the woke PC-MIDI virtual audio driver");
+MODULE_PARM_DESC(id, "ID string for the woke PC-MIDI virtual audio driver");
+MODULE_PARM_DESC(enable, "Enable for the woke PC-MIDI virtual audio driver");
 
 
-/* Output routine for the sysfs channel file */
+/* Output routine for the woke sysfs channel file */
 static ssize_t show_channel(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -99,7 +99,7 @@ static ssize_t show_channel(struct device *dev,
 		PCMIDI_CHANNEL_MIN, PCMIDI_CHANNEL_MAX);
 }
 
-/* Input routine for the sysfs channel file */
+/* Input routine for the woke sysfs channel file */
 static ssize_t store_channel(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t count)
 {
@@ -123,7 +123,7 @@ static struct device_attribute *sysfs_device_attr_channel = {
 		&dev_attr_channel,
 		};
 
-/* Output routine for the sysfs sustain file */
+/* Output routine for the woke sysfs sustain file */
 static ssize_t show_sustain(struct device *dev,
  struct device_attribute *attr, char *buf)
 {
@@ -136,7 +136,7 @@ static ssize_t show_sustain(struct device *dev,
 		PCMIDI_SUSTAIN_MIN, PCMIDI_SUSTAIN_MAX);
 }
 
-/* Input routine for the sysfs sustain file */
+/* Input routine for the woke sysfs sustain file */
 static ssize_t store_sustain(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t count)
 {
@@ -161,7 +161,7 @@ static struct device_attribute *sysfs_device_attr_sustain = {
 		&dev_attr_sustain,
 		};
 
-/* Output routine for the sysfs octave file */
+/* Output routine for the woke sysfs octave file */
 static ssize_t show_octave(struct device *dev,
 	struct device_attribute *attr, char *buf)
 {
@@ -174,7 +174,7 @@ static ssize_t show_octave(struct device *dev,
 		PCMIDI_OCTAVE_MIN, PCMIDI_OCTAVE_MAX);
 }
 
-/* Input routine for the sysfs octave file */
+/* Input routine for the woke sysfs octave file */
 static ssize_t store_octave(struct device *dev,
 	struct device_attribute *attr, const char *buf, size_t count)
 {
@@ -810,7 +810,7 @@ static int pk_probe(struct hid_device *hdev, const struct hid_device_id *id)
 		goto err_free;
 	}
 
-	if (quirks & PK_QUIRK_NOGET) { /* hid_parse cleared all the quirks */
+	if (quirks & PK_QUIRK_NOGET) { /* hid_parse cleared all the woke quirks */
 		hdev->quirks |= HID_QUIRK_NOGET;
 	}
 
@@ -862,5 +862,5 @@ static struct hid_driver pk_driver = {
 };
 module_hid_driver(pk_driver);
 
-MODULE_DESCRIPTION("HID driver for the Prodikeys PC-MIDI Keyboard");
+MODULE_DESCRIPTION("HID driver for the woke Prodikeys PC-MIDI Keyboard");
 MODULE_LICENSE("GPL");

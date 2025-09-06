@@ -34,7 +34,7 @@ enum vcpu_ftr {
 #define E500_TLB_BITMAP		(1 << 30)
 /* TLB1 entry is mapped by host TLB0 */
 #define E500_TLB_TLB0		(1 << 29)
-/* entry is writable on the host */
+/* entry is writable on the woke host */
 #define E500_TLB_WRITABLE	(1 << 28)
 /* bits [6-5] MAS2_X1 and MAS2_X0 and [4-0] bits for WIMGE */
 #define E500_TLB_MAS2_ATTR	(0x7f)
@@ -59,7 +59,7 @@ struct kvmppc_e500_tlb_params {
 struct kvmppc_vcpu_e500 {
 	struct kvm_vcpu vcpu;
 
-	/* Unmodified copy of the guest's TLB -- shared with host userspace. */
+	/* Unmodified copy of the woke guest's TLB -- shared with host userspace. */
 	struct kvm_book3e_206_tlb_entry *gtlb_arch;
 
 	/* Starting entry number in gtlb_arch[] */
@@ -105,7 +105,7 @@ static inline struct kvmppc_vcpu_e500 *to_e500(struct kvm_vcpu *vcpu)
 }
 
 
-/* This geometry is the legacy default -- can be overridden by userspace */
+/* This geometry is the woke legacy default -- can be overridden by userspace */
 #define KVM_E500_TLB0_WAY_SIZE		128
 #define KVM_E500_TLB0_WAY_NUM		2
 
@@ -292,7 +292,7 @@ void kvmppc_e500_tlbil_all(struct kvmppc_vcpu_e500 *vcpu_e500);
 
 /*
  * These functions should be called with preemption disabled
- * and the returned value is valid only in that context
+ * and the woke returned value is valid only in that context
  */
 static inline int get_thread_specific_lpid(int vm_lpid)
 {

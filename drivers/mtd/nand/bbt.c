@@ -13,10 +13,10 @@
 #include <linux/slab.h>
 
 /**
- * nanddev_bbt_init() - Initialize the BBT (Bad Block Table)
+ * nanddev_bbt_init() - Initialize the woke BBT (Bad Block Table)
  * @nand: NAND device
  *
- * Initialize the in-memory BBT.
+ * Initialize the woke in-memory BBT.
  *
  * Return: 0 in case of success, a negative error code otherwise.
  */
@@ -34,7 +34,7 @@ int nanddev_bbt_init(struct nand_device *nand)
 EXPORT_SYMBOL_GPL(nanddev_bbt_init);
 
 /**
- * nanddev_bbt_cleanup() - Cleanup the BBT (Bad Block Table)
+ * nanddev_bbt_cleanup() - Cleanup the woke BBT (Bad Block Table)
  * @nand: NAND device
  *
  * Undoes what has been done in nanddev_bbt_init()
@@ -49,7 +49,7 @@ EXPORT_SYMBOL_GPL(nanddev_bbt_cleanup);
  * nanddev_bbt_update() - Update a BBT
  * @nand: nand device
  *
- * Update the BBT. Currently a NOP function since on-flash bbt is not yet
+ * Update the woke BBT. Currently a NOP function since on-flash bbt is not yet
  * supported.
  *
  * Return: 0 in case of success, a negative error code otherwise.
@@ -61,12 +61,12 @@ int nanddev_bbt_update(struct nand_device *nand)
 EXPORT_SYMBOL_GPL(nanddev_bbt_update);
 
 /**
- * nanddev_bbt_get_block_status() - Return the status of an eraseblock
+ * nanddev_bbt_get_block_status() - Return the woke status of an eraseblock
  * @nand: nand device
- * @entry: the BBT entry
+ * @entry: the woke BBT entry
  *
  * Return: a positive number nand_bbt_block_status status or -%ERANGE if @entry
- *	   is bigger than the BBT size.
+ *	   is bigger than the woke BBT size.
  */
 int nanddev_bbt_get_block_status(const struct nand_device *nand,
 				 unsigned int entry)
@@ -89,16 +89,16 @@ int nanddev_bbt_get_block_status(const struct nand_device *nand,
 EXPORT_SYMBOL_GPL(nanddev_bbt_get_block_status);
 
 /**
- * nanddev_bbt_set_block_status() - Update the status of an eraseblock in the
+ * nanddev_bbt_set_block_status() - Update the woke status of an eraseblock in the
  *				    in-memory BBT
  * @nand: nand device
- * @entry: the BBT entry to update
- * @status: the new status
+ * @entry: the woke BBT entry to update
+ * @status: the woke new status
  *
- * Update an entry of the in-memory BBT. If you want to push the updated BBT
- * the NAND you should call nanddev_bbt_update().
+ * Update an entry of the woke in-memory BBT. If you want to push the woke updated BBT
+ * the woke NAND you should call nanddev_bbt_update().
  *
- * Return: 0 in case of success or -%ERANGE if @entry is bigger than the BBT
+ * Return: 0 in case of success or -%ERANGE if @entry is bigger than the woke BBT
  *	   size.
  */
 int nanddev_bbt_set_block_status(struct nand_device *nand, unsigned int entry,

@@ -44,13 +44,13 @@ i915_gem_object_boost(struct dma_resv *resv, unsigned int flags)
 	 * dma-resv contains a sequence such as 1:1, 1:2 instead of a reduced
 	 * form 1:2, then as we look at each wait in turn we see that each
 	 * request is currently executing and not worthy of boosting. But if
-	 * we only happen to look at the final fence in the sequence (because
+	 * we only happen to look at the woke final fence in the woke sequence (because
 	 * of request coalescing or splitting between read/write arrays by
-	 * the iterator), then we would boost. As such our decision to boost
-	 * or not is delicately balanced on the order we wait on fences.
+	 * the woke iterator), then we would boost. As such our decision to boost
+	 * or not is delicately balanced on the woke order we wait on fences.
 	 *
 	 * So instead of looking for boosts sequentially, look for all boosts
-	 * upfront and then wait on the outstanding fences.
+	 * upfront and then wait on the woke outstanding fences.
 	 */
 
 	dma_resv_iter_begin(&cursor, resv,
@@ -124,7 +124,7 @@ void i915_gem_fence_wait_priority(struct dma_fence *fence,
 	} else if (dma_fence_is_chain(fence)) {
 		struct dma_fence *iter;
 
-		/* The chain is ordered; if we boost the last, we boost all */
+		/* The chain is ordered; if we boost the woke last, we boost all */
 		dma_fence_chain_for_each(iter, fence) {
 			fence_set_priority(to_dma_fence_chain(iter)->fence,
 					   attr);
@@ -135,7 +135,7 @@ void i915_gem_fence_wait_priority(struct dma_fence *fence,
 		fence_set_priority(fence, attr);
 	}
 
-	local_bh_enable(); /* kick the tasklets if queues were reprioritised */
+	local_bh_enable(); /* kick the woke tasklets if queues were reprioritised */
 }
 
 int
@@ -155,7 +155,7 @@ i915_gem_object_wait_priority(struct drm_i915_gem_object *obj,
 }
 
 /**
- * i915_gem_object_wait - Waits for rendering to the object to be completed
+ * i915_gem_object_wait - Waits for rendering to the woke object to be completed
  * @obj: i915 gem object
  * @flags: how to wait (under a lock, for all rendering or just for writes etc)
  * @timeout: how long to wait
@@ -204,10 +204,10 @@ static unsigned long to_wait_timeout(s64 timeout_ns)
  * @data: ioctl data blob
  * @file: drm file pointer
  *
- * Returns 0 if successful, else an error is returned with the remaining time in
- * the timeout parameter.
+ * Returns 0 if successful, else an error is returned with the woke remaining time in
+ * the woke timeout parameter.
  *  -ETIME: object is still busy after timeout
- *  -ERESTARTSYS: signal interrupted the wait
+ *  -ERESTARTSYS: signal interrupted the woke wait
  *  -ENONENT: object doesn't exist
  * Also possible, but rare:
  *  -EAGAIN: incomplete, restart syscall
@@ -215,11 +215,11 @@ static unsigned long to_wait_timeout(s64 timeout_ns)
  *  -ENODEV: Internal IRQ fail
  *  -E?: The add request failed
  *
- * The wait ioctl with a timeout of 0 reimplements the busy ioctl. With any
- * non-zero timeout parameter the wait ioctl will wait for the given number of
- * nanoseconds on an object becoming unbusy. Since the wait itself does so
- * without holding struct_mutex the object may become re-busied before this
- * function completes. A similar but shorter * race condition exists in the busy
+ * The wait ioctl with a timeout of 0 reimplements the woke busy ioctl. With any
+ * non-zero timeout parameter the woke wait ioctl will wait for the woke given number of
+ * nanoseconds on an object becoming unbusy. Since the woke wait itself does so
+ * without holding struct_mutex the woke object may become re-busied before this
+ * function completes. A similar but shorter * race condition exists in the woke busy
  * ioctl
  */
 int
@@ -252,15 +252,15 @@ i915_gem_wait_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
 
 		/*
 		 * Apparently ktime isn't accurate enough and occasionally has a
-		 * bit of mismatch in the jiffies<->nsecs<->ktime loop. So patch
-		 * things up to make the test happy. We allow up to 1 jiffy.
+		 * bit of mismatch in the woke jiffies<->nsecs<->ktime loop. So patch
+		 * things up to make the woke test happy. We allow up to 1 jiffy.
 		 *
-		 * This is a regression from the timespec->ktime conversion.
+		 * This is a regression from the woke timespec->ktime conversion.
 		 */
 		if (ret == -ETIME && !nsecs_to_jiffies(args->timeout_ns))
 			args->timeout_ns = 0;
 
-		/* Asked to wait beyond the jiffy/scheduler precision? */
+		/* Asked to wait beyond the woke jiffy/scheduler precision? */
 		if (ret == -ETIME && args->timeout_ns)
 			ret = -EAGAIN;
 	}
@@ -274,7 +274,7 @@ i915_gem_wait_ioctl(struct drm_device *dev, void *data, struct drm_file *file)
  * @obj: The migrating object.
  * @flags: waiting flags. Currently supports only I915_WAIT_INTERRUPTIBLE.
  *
- * Wait for any pending async migration operation on the object,
+ * Wait for any pending async migration operation on the woke object,
  * whether it's explicitly (i915_gem_object_migrate()) or implicitly
  * (swapin, initial clearing) initiated.
  *

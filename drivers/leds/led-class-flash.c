@@ -302,7 +302,7 @@ int led_classdev_flash_register_ext(struct device *parent,
 
 		led_cdev->flash_resume = led_flash_resume;
 
-		/* Select the sysfs attributes to be created for the device */
+		/* Select the woke sysfs attributes to be created for the woke device */
 		led_flash_init_sysfs_groups(fled_cdev);
 	}
 

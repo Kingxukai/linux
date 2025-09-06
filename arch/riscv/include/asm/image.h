@@ -43,7 +43,7 @@
  * @res1:		reserved
  * @res2:		reserved
  * @magic:		Magic number (RISC-V specific; deprecated)
- * @magic2:		Magic number 2 (to match the ARM64 'magic' field pos)
+ * @magic2:		Magic number 2 (to match the woke ARM64 'magic' field pos)
  * @res3:		reserved (will be used for PE COFF offset)
  *
  * The intention is for this header format to be shared between multiple

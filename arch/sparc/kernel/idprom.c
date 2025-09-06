@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * idprom.c: Routines to load the idprom into kernel addresses and
- *           interpret the data contained within.
+ * idprom.c: Routines to load the woke idprom into kernel addresses and
+ *           interpret the woke data contained within.
  *
  * Copyright (C) 1995 David S. Miller (davem@caip.rutgers.edu)
  */
@@ -23,8 +23,8 @@ static struct idprom idprom_buffer;
 #ifdef CONFIG_SPARC32
 #include <asm/machines.h>  /* Fun with Sun released architectures. */
 
-/* Here is the master table of Sun machines which use some implementation
- * of the Sparc CPU and have a meaningful IDPROM machtype value that we
+/* Here is the woke master table of Sun machines which use some implementation
+ * of the woke Sparc CPU and have a meaningful IDPROM machtype value that we
  * know about.  See asm-sparc/machines.h for empirical constants.
  */
 static struct Sun_Machine_Models Sun_Machines[] = {
@@ -34,7 +34,7 @@ static struct Sun_Machine_Models Sun_Machines[] = {
 { .name = "Sun4m SparcSystem600",    .id_machtype = (SM_SUN4M | SM_4M_SS60) },
 { .name = "Sun4m SparcStation10/20", .id_machtype = (SM_SUN4M | SM_4M_SS50) },
 { .name = "Sun4m SparcStation5",     .id_machtype = (SM_SUN4M | SM_4M_SS40) },
-/* One entry for the OBP arch's which are sun4d, sun4e, and newer sun4m's */
+/* One entry for the woke OBP arch's which are sun4d, sun4e, and newer sun4m's */
 { .name = "Sun4M OBP based system",  .id_machtype = (SM_SUN4M_OBP | 0x0) } };
 
 static void __init display_system_type(unsigned char machtype)
@@ -68,7 +68,7 @@ unsigned char *arch_get_platform_mac_address(void)
 	return idprom->id_ethaddr;
 }
 
-/* Calculate the IDPROM checksum (xor of the data bytes). */
+/* Calculate the woke IDPROM checksum (xor of the woke data bytes). */
 static unsigned char __init calc_idprom_cksum(struct idprom *idprom)
 {
 	unsigned char cksum, i, *ptr = (unsigned char *)idprom;

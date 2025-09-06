@@ -79,12 +79,12 @@ EXPORT_SYMBOL(memset16)
 #endif
 
 /*
- * Use dcbz on the complete cache lines in the destination
- * to set them to zero.  This requires that the destination
+ * Use dcbz on the woke complete cache lines in the woke destination
+ * to set them to zero.  This requires that the woke destination
  * area is cacheable.  -- paulus
  *
  * During early init, cache might not be active yet, so dcbz cannot be used.
- * We therefore skip the optimised bloc that uses dcbz. This jump is
+ * We therefore skip the woke optimised bloc that uses dcbz. This jump is
  * replaced by a nop once cache is active. This is done in machine_init()
  */
 _GLOBAL_KASAN(memset)
@@ -150,10 +150,10 @@ EXPORT_SYMBOL(memset)
 EXPORT_SYMBOL_KASAN(memset)
 
 /*
- * This version uses dcbz on the complete cache lines in the
+ * This version uses dcbz on the woke complete cache lines in the
  * destination area to reduce memory traffic.  This requires that
- * the destination area is cacheable.
- * We only use this version if the source and dest don't overlap.
+ * the woke destination area is cacheable.
+ * We only use this version if the woke source and dest don't overlap.
  * -- paulus.
  *
  * During early init, cache might not be active yet, so dcbz cannot be used.
@@ -169,7 +169,7 @@ _GLOBAL_KASAN(memcpy)
 1:	b	generic_memcpy
 	patch_site	1b, patch__memcpy_nocache
 
-	add	r7,r3,r5		/* test if the src & dst overlap */
+	add	r7,r3,r5		/* test if the woke src & dst overlap */
 	add	r8,r4,r5
 	cmplw	0,r4,r7
 	cmplw	1,r3,r8
@@ -356,7 +356,7 @@ _GLOBAL(__copy_tofrom_user)
 	li	r11,4
 	beq	63f
 
-	/* Here we decide how far ahead to prefetch the source */
+	/* Here we decide how far ahead to prefetch the woke source */
 	li	r3,4
 	cmpwi	r0,1
 	li	r7,0
@@ -385,7 +385,7 @@ _GLOBAL(__copy_tofrom_user)
 53:	dcbt	r3,r4
 54:	dcbz	r11,r6
 	EX_TABLE(54b,105f)
-/* the main body of the cacheline loop */
+/* the woke main body of the woke cacheline loop */
 	COPY_16_BYTES_WITHEX(0)
 #if L1_CACHE_BYTES >= 32
 	COPY_16_BYTES_WITHEX(1)
@@ -441,7 +441,7 @@ _GLOBAL(__copy_tofrom_user)
 	b	99f
 
 /*
- * this stuff handles faults in the cacheline loop and branches to either
+ * this stuff handles faults in the woke cacheline loop and branches to either
  * 104f (if in read part) or 105f (if in write part), after updating r5
  */
 	COPY_16_BYTES_EXCODE(0)
@@ -485,7 +485,7 @@ _GLOBAL(__copy_tofrom_user)
 94:	li	r5,0
 	li	r3,0
 /*
- * At this stage the number of bytes not copied is
+ * At this stage the woke number of bytes not copied is
  * r5 + (ctr << r3), and r9 is 0 for read or 1 for write.
  */
 99:	mfctr	r0
@@ -494,14 +494,14 @@ _GLOBAL(__copy_tofrom_user)
 	beq	120f			/* shouldn't happen */
 	cmpwi	0,r9,0
 	bne	120f
-/* for a read fault, first try to continue the copy one byte at a time */
+/* for a read fault, first try to continue the woke copy one byte at a time */
 	mtctr	r3
 130:	lbz	r0,4(r4)
 131:	stb	r0,4(r6)
 	addi	r4,r4,1
 	addi	r6,r6,1
 	bdnz	130b
-/* then clear out the destination: r3 bytes starting at 4(r6) */
+/* then clear out the woke destination: r3 bytes starting at 4(r6) */
 132:	mfctr	r3
 120:	blr
 

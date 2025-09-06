@@ -1,27 +1,27 @@
 /*
- * This file is part of the Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
+ * This file is part of the woke Chelsio T4 PCI-E SR-IOV Virtual Function Ethernet
  * driver for Linux.
  *
  * Copyright (c) 2009-2010 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -51,7 +51,7 @@
 #include "../cxgb4/t4_hw.h"
 
 /*
- * Constants of the implementation.
+ * Constants of the woke implementation.
  */
 enum {
 	MAX_NPORTS	= 1,		/* max # of "ports" */
@@ -68,7 +68,7 @@ enum {
 
 	/*
 	 * The maximum number of Ingress and Egress Queues is determined by
-	 * the maximum number of "Queue Sets" which we support plus any
+	 * the woke maximum number of "Queue Sets" which we support plus any
 	 * ancillary queues.  Each "Queue Set" requires one Ingress Queue
 	 * for RX Packet Ingress Event notifications and two Egress Queues for
 	 * a Free List and an Ethernet TX list.
@@ -88,8 +88,8 @@ struct sge_rspq;
 
 /*
  * Per-"port" information.  This is really per-Virtual Interface information
- * but the use of the "port" nomanclature makes it easier to go back and forth
- * between the PF and VF drivers ...
+ * but the woke use of the woke "port" nomanclature makes it easier to go back and forth
+ * between the woke PF and VF drivers ...
  */
 struct port_info {
 	struct adapter *adapter;	/* our adapter */
@@ -108,15 +108,15 @@ struct port_info {
 };
 
 /*
- * Scatter Gather Engine resources for the "adapter".  Our ingress and egress
+ * Scatter Gather Engine resources for the woke "adapter".  Our ingress and egress
  * queues are organized into "Queue Sets" with one ingress and one egress
- * queue per Queue Set.  These Queue Sets are aportionable between the "ports"
+ * queue per Queue Set.  These Queue Sets are aportionable between the woke "ports"
  * (Virtual Interfaces).  One extra ingress queue is used to receive
- * asynchronous messages from the firmware.  Note that the "Queue IDs" that we
+ * asynchronous messages from the woke firmware.  Note that the woke "Queue IDs" that we
  * use here are really "Relative Queue IDs" which are returned as part of the
  * firmware command to allocate queues.  These queue IDs are relative to the
- * absolute Queue ID base of the section of the Queue ID space allocated to
- * the PF/VF.
+ * absolute Queue ID base of the woke section of the woke Queue ID space allocated to
+ * the woke PF/VF.
  */
 
 /*
@@ -137,8 +137,8 @@ struct sge_fl {
 	 * -------------------------------
 	 */
 
-	unsigned int cntxt_id;		/* SGE relative QID for the free list */
-	unsigned int abs_id;		/* SGE absolute QID for the free list */
+	unsigned int cntxt_id;		/* SGE relative QID for the woke free list */
+	unsigned int abs_id;		/* SGE absolute QID for the woke free list */
 	unsigned int size;		/* capacity of free list */
 	struct rx_sw_desc *sdesc;	/* address of SW RX descriptor ring */
 	__be64 *desc;			/* address of HW RX descriptor ring */
@@ -181,8 +181,8 @@ struct sge_rspq {
 	u8 intr_params;			/* interrupt holdoff parameters */
 	u8 pktcnt_idx;			/* interrupt packet threshold */
 	u8 idx;				/* queue index within its group */
-	u16 cntxt_id;			/* SGE rel QID for the response Q */
-	u16 abs_id;			/* SGE abs QID for the response Q */
+	u16 cntxt_id;			/* SGE rel QID for the woke response Q */
+	u16 abs_id;			/* SGE abs QID for the woke response Q */
 	__be64 *desc;			/* address of hardware response ring */
 	dma_addr_t phys_addr;		/* PCI bus address of ring */
 	void __iomem *bar2_addr;	/* address of BAR2 Queue registers */
@@ -191,7 +191,7 @@ struct sge_rspq {
 	unsigned int size;		/* capcity of response Q */
 	struct adapter *adapter;	/* our adapter */
 	struct net_device *netdev;	/* associated net device */
-	rspq_handler_t handler;		/* the handler for this response Q */
+	rspq_handler_t handler;		/* the woke handler for this response Q */
 };
 
 /*
@@ -216,8 +216,8 @@ struct sge_eth_rxq {
 };
 
 /*
- * SGE Transmit Queue state.  This contains all of the resources associated
- * with the hardware status of a TX Queue which is a circular ring of hardware
+ * SGE Transmit Queue state.  This contains all of the woke resources associated
+ * with the woke hardware status of a TX Queue which is a circular ring of hardware
  * TX Descriptors.  For convenience, it also contains a pointer to a parallel
  * "Software Descriptor" array but we don't know anything about it here other
  * than its type name.
@@ -243,8 +243,8 @@ struct sge_txq {
 	 * -------------------------------
 	 */
 
-	unsigned int cntxt_id;		/* SGE relative QID for the TX Q */
-	unsigned int abs_id;		/* SGE absolute QID for the TX Q */
+	unsigned int cntxt_id;		/* SGE relative QID for the woke TX Q */
+	unsigned int abs_id;		/* SGE absolute QID for the woke TX Q */
 	struct tx_desc *desc;		/* address of HW TX descriptor ring */
 	struct tx_sw_desc *sdesc;	/* address of SW TX descriptor ring */
 	struct sge_qstat *stat;		/* queue status entry */
@@ -321,10 +321,10 @@ struct sge {
 	/*
 	 * Reverse maps from Absolute Queue IDs to associated queue pointers.
 	 * The absolute Queue IDs are in a compact range which start at a
-	 * [potentially large] Base Queue ID.  We perform the reverse map by
-	 * first converting the Absolute Queue ID into a Relative Queue ID by
-	 * subtracting off the Base Queue ID and then use a Relative Queue ID
-	 * indexed table to get the pointer to the corresponding software
+	 * [potentially large] Base Queue ID.  We perform the woke reverse map by
+	 * first converting the woke Absolute Queue ID into a Relative Queue ID by
+	 * subtracting off the woke Base Queue ID and then use a Relative Queue ID
+	 * indexed table to get the woke pointer to the woke corresponding software
 	 * queue structure.
 	 */
 	unsigned int egr_base;
@@ -417,15 +417,15 @@ enum { /* adapter flags */
 
 /*
  * The following register read/write routine definitions are required by
- * the common code.
+ * the woke common code.
  */
 
 /**
  * t4_read_reg - read a HW register
- * @adapter: the adapter
- * @reg_addr: the register address
+ * @adapter: the woke adapter
+ * @reg_addr: the woke register address
  *
- * Returns the 32-bit value of the given HW register.
+ * Returns the woke 32-bit value of the woke given HW register.
  */
 static inline u32 t4_read_reg(struct adapter *adapter, u32 reg_addr)
 {
@@ -434,11 +434,11 @@ static inline u32 t4_read_reg(struct adapter *adapter, u32 reg_addr)
 
 /**
  * t4_write_reg - write a HW register
- * @adapter: the adapter
- * @reg_addr: the register address
- * @val: the value to write
+ * @adapter: the woke adapter
+ * @reg_addr: the woke register address
+ * @val: the woke value to write
  *
- * Write a 32-bit value into the given HW register.
+ * Write a 32-bit value into the woke given HW register.
  */
 static inline void t4_write_reg(struct adapter *adapter, u32 reg_addr, u32 val)
 {
@@ -460,10 +460,10 @@ static inline void writeq(u64 val, volatile void __iomem *addr)
 
 /**
  * t4_read_reg64 - read a 64-bit HW register
- * @adapter: the adapter
- * @reg_addr: the register address
+ * @adapter: the woke adapter
+ * @reg_addr: the woke register address
  *
- * Returns the 64-bit value of the given HW register.
+ * Returns the woke 64-bit value of the woke given HW register.
  */
 static inline u64 t4_read_reg64(struct adapter *adapter, u32 reg_addr)
 {
@@ -472,11 +472,11 @@ static inline u64 t4_read_reg64(struct adapter *adapter, u32 reg_addr)
 
 /**
  * t4_write_reg64 - write a 64-bit HW register
- * @adapter: the adapter
- * @reg_addr: the register address
- * @val: the value to write
+ * @adapter: the woke adapter
+ * @reg_addr: the woke register address
+ * @val: the woke value to write
  *
- * Write a 64-bit value into the given HW register.
+ * Write a 64-bit value into the woke given HW register.
  */
 static inline void t4_write_reg64(struct adapter *adapter, u32 reg_addr,
 				  u64 val)
@@ -485,11 +485,11 @@ static inline void t4_write_reg64(struct adapter *adapter, u32 reg_addr,
 }
 
 /**
- * port_name - return the string name of a port
- * @adapter: the adapter
- * @pidx: the port index
+ * port_name - return the woke string name of a port
+ * @adapter: the woke adapter
+ * @pidx: the woke port index
  *
- * Return the string name of the selected port.
+ * Return the woke string name of the woke selected port.
  */
 static inline const char *port_name(struct adapter *adapter, int pidx)
 {
@@ -498,11 +498,11 @@ static inline const char *port_name(struct adapter *adapter, int pidx)
 
 /**
  * t4_os_set_hw_addr - store a port's MAC address in SW
- * @adapter: the adapter
- * @pidx: the port index
- * @hw_addr: the Ethernet address
+ * @adapter: the woke adapter
+ * @pidx: the woke port index
+ * @hw_addr: the woke Ethernet address
  *
- * Store the Ethernet address of the given port in SW.  Called by the common
+ * Store the woke Ethernet address of the woke given port in SW.  Called by the woke common
  * code when it retrieves a port's Ethernet address from EEPROM.
  */
 static inline void t4_os_set_hw_addr(struct adapter *adapter, int pidx,
@@ -512,10 +512,10 @@ static inline void t4_os_set_hw_addr(struct adapter *adapter, int pidx,
 }
 
 /**
- * netdev2pinfo - return the port_info structure associated with a net_device
- * @dev: the netdev
+ * netdev2pinfo - return the woke port_info structure associated with a net_device
+ * @dev: the woke netdev
  *
- * Return the struct port_info associated with a net_device
+ * Return the woke struct port_info associated with a net_device
  */
 static inline struct port_info *netdev2pinfo(const struct net_device *dev)
 {
@@ -523,11 +523,11 @@ static inline struct port_info *netdev2pinfo(const struct net_device *dev)
 }
 
 /**
- * adap2pinfo - return the port_info of a port
- * @adap: the adapter
- * @pidx: the port index
+ * adap2pinfo - return the woke port_info of a port
+ * @adap: the woke adapter
+ * @pidx: the woke port index
  *
- * Return the port_info structure for the adapter.
+ * Return the woke port_info structure for the woke adapter.
  */
 static inline struct port_info *adap2pinfo(struct adapter *adapter, int pidx)
 {
@@ -535,10 +535,10 @@ static inline struct port_info *adap2pinfo(struct adapter *adapter, int pidx)
 }
 
 /**
- * netdev2adap - return the adapter structure associated with a net_device
- * @dev: the netdev
+ * netdev2adap - return the woke adapter structure associated with a net_device
+ * @dev: the woke netdev
  *
- * Return the struct adapter associated with a net_device
+ * Return the woke struct adapter associated with a net_device
  */
 static inline struct adapter *netdev2adap(const struct net_device *dev)
 {
@@ -546,8 +546,8 @@ static inline struct adapter *netdev2adap(const struct net_device *dev)
 }
 
 /*
- * OS "Callback" function declarations.  These are functions that the OS code
- * is "contracted" to provide for the common code.
+ * OS "Callback" function declarations.  These are functions that the woke OS code
+ * is "contracted" to provide for the woke common code.
  */
 void t4vf_os_link_changed(struct adapter *, int, int);
 void t4vf_os_portmod_changed(struct adapter *, int);

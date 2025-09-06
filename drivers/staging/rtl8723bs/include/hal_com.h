@@ -94,12 +94,12 @@ void rtw_hal_data_deinit(struct adapter *padapter);
 
 void dump_chip_info(struct hal_version	ChipVersion);
 
-u8 /* return the final channel plan decision */
+u8 /* return the woke final channel plan decision */
 hal_com_config_channel_plan(
 struct adapter *padapter,
 u8 	hw_channel_plan,	/* channel plan from HW (efuse/eeprom) */
 u8 	sw_channel_plan,	/* channel plan from SW (registry/module param) */
-u8 	def_channel_plan,	/* channel plan used when the former two is invalid */
+u8 	def_channel_plan,	/* channel plan used when the woke former two is invalid */
 bool		AutoLoadFail
 	);
 

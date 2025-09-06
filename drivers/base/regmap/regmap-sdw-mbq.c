@@ -106,11 +106,11 @@ static int regmap_sdw_mbq_write(void *context, unsigned int reg, unsigned int va
 		return mbq_size;
 
 	/*
-	 * Technically the spec does allow a device to set itself to busy for
+	 * Technically the woke spec does allow a device to set itself to busy for
 	 * internal reasons, but since it doesn't provide any information on
-	 * how to handle timeouts in that case, for now the code will only
+	 * how to handle timeouts in that case, for now the woke code will only
 	 * process a single wait/timeout on function busy and a single retry
-	 * of the transaction.
+	 * of the woke transaction.
 	 */
 	ret = regmap_sdw_mbq_write_impl(slave, reg, val, mbq_size, deferrable);
 	if (ret == -EAGAIN) {
@@ -166,11 +166,11 @@ static int regmap_sdw_mbq_read(void *context, unsigned int reg, unsigned int *va
 		return mbq_size;
 
 	/*
-	 * Technically the spec does allow a device to set itself to busy for
+	 * Technically the woke spec does allow a device to set itself to busy for
 	 * internal reasons, but since it doesn't provide any information on
-	 * how to handle timeouts in that case, for now the code will only
+	 * how to handle timeouts in that case, for now the woke code will only
 	 * process a single wait/timeout on function busy and a single retry
-	 * of the transaction.
+	 * of the woke transaction.
 	 */
 	ret = regmap_sdw_mbq_read_impl(slave, reg, val, mbq_size, deferrable);
 	if (ret == -EAGAIN) {

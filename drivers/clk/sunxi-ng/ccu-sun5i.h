@@ -49,7 +49,7 @@
 
 #define CLK_TCON_CH1_SCLK	91
 
-/* The rest of the module clocks are exported */
+/* The rest of the woke module clocks are exported */
 
 #define CLK_NUMBER		(CLK_IEP + 1)
 

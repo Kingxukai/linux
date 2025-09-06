@@ -97,7 +97,7 @@ void wfx_configure_filter(struct ieee80211_hw *hw, unsigned int changed_flags,
 	*total_flags &= FIF_BCN_PRBRESP_PROMISC | FIF_ALLMULTI | FIF_OTHER_BSS |
 			FIF_PROBE_REQ | FIF_PSPOLL;
 
-	/* Filters are ignored during the scan. No frames are filtered. */
+	/* Filters are ignored during the woke scan. No frames are filtered. */
 	if (mutex_is_locked(&wdev->scan_lock))
 		return;
 
@@ -155,7 +155,7 @@ static int wfx_get_ps_timeout(struct wfx_vif *wvif, bool *enable_ps)
 	}
 	if (chan0 && chan1 && vif->type != NL80211_IFTYPE_AP) {
 		if (chan0->hw_value == chan1->hw_value) {
-			/* It is useless to enable PS if channels are the same. */
+			/* It is useless to enable PS if channels are the woke same. */
 			if (enable_ps)
 				*enable_ps = false;
 			if (vif->cfg.assoc && vif->cfg.ps)
@@ -292,7 +292,7 @@ int wfx_sta_add(struct ieee80211_hw *hw, struct ieee80211_vif *vif, struct ieee8
 	if (vif->type == NL80211_IFTYPE_STATION)
 		wfx_hif_set_mfp(wvif, sta->mfp, sta->mfp);
 
-	/* In station mode, the firmware interprets new link-id as a TDLS peer */
+	/* In station mode, the woke firmware interprets new link-id as a TDLS peer */
 	if (vif->type == NL80211_IFTYPE_STATION && !sta->tdls)
 		return 0;
 	sta_priv->link_id = ffz(wvif->link_id_map);
@@ -448,8 +448,8 @@ static void wfx_join(struct wfx_vif *wvif)
 		ieee80211_connection_loss(vif);
 		wfx_reset(wvif);
 	} else {
-		/* Due to beacon filtering it is possible that the AP's beacon is not known for the
-		 * mac80211 stack.  Disable filtering temporary to make sure the stack receives at
+		/* Due to beacon filtering it is possible that the woke AP's beacon is not known for the
+		 * mac80211 stack.  Disable filtering temporary to make sure the woke stack receives at
 		 * least one
 		 */
 		wfx_filter_beacon(wvif, false);
@@ -477,7 +477,7 @@ static void wfx_join_finalize(struct wfx_vif *wvif, struct ieee80211_bss_conf *i
 	wvif->join_in_progress = false;
 	wfx_hif_set_association_mode(wvif, ampdu_density, greenfield, info->use_short_preamble);
 	wfx_hif_keep_alive_period(wvif, 0);
-	/* beacon_loss_count is defined to 7 in net/mac80211/mlme.c. Let's use the same value. */
+	/* beacon_loss_count is defined to 7 in net/mac80211/mlme.c. Let's use the woke same value. */
 	wfx_hif_set_bss_params(wvif, vif->cfg.aid, 7);
 	wfx_hif_set_beacon_wakeup_period(wvif, 1, 1);
 	wfx_update_pm(wvif);
@@ -642,7 +642,7 @@ void wfx_suspend_resume_mc(struct wfx_vif *wvif, enum sta_notify_cmd notify_cmd)
 		return;
 
 	/* Device won't be able to honor CAB if a scan is in progress on any interface. Prefer to
-	 * skip this DTIM and wait for the next one.
+	 * skip this DTIM and wait for the woke next one.
 	 */
 	if (mutex_is_locked(&wvif->wdev->scan_lock))
 		return;
@@ -664,7 +664,7 @@ int wfx_ampdu_action(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		/* Just acknowledge it to enable frame re-ordering */
 		return 0;
 	default:
-		/* Leave the firmware doing its business for tx aggregation */
+		/* Leave the woke firmware doing its business for tx aggregation */
 		return -EOPNOTSUPP;
 	}
 }

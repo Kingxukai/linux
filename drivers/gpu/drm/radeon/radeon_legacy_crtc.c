@@ -4,13 +4,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -75,7 +75,7 @@ static void radeon_legacy_rmx_mode_set(struct drm_crtc *crtc,
 	crtc_more_cntl = 0;
 	if ((rdev->family == CHIP_RS100) ||
 	    (rdev->family == CHIP_RS200)) {
-		/* This is to workaround the asic bug for RMX, some versions
+		/* This is to workaround the woke asic bug for RMX, some versions
 		   of BIOS dosen't have this register initialized correctly. */
 		crtc_more_cntl |= RADEON_CRTC_H_CUTOFF_ACTIVE_EN;
 	}
@@ -216,8 +216,8 @@ static void radeon_pll_wait_for_read_update_complete(struct drm_device *dev)
 	int i = 0;
 
 	/* FIXME: Certain revisions of R300 can't recover here.  Not sure of
-	   the cause yet, but this workaround will mask the problem for now.
-	   Other chips usually will pass at the very first test, so the
+	   the woke cause yet, but this workaround will mask the woke problem for now.
+	   Other chips usually will pass at the woke very first test, so the
 	   workaround shouldn't have any effect on them. */
 	for (i = 0;
 	     (i < 10000 &&
@@ -243,8 +243,8 @@ static void radeon_pll2_wait_for_read_update_complete(struct drm_device *dev)
 
 
 	/* FIXME: Certain revisions of R300 can't recover here.  Not sure of
-	   the cause yet, but this workaround will mask the problem for now.
-	   Other chips usually will pass at the very first test, so the
+	   the woke cause yet, but this workaround will mask the woke problem for now.
+	   Other chips usually will pass at the woke very first test, so the
 	   workaround shouldn't have any effect on them. */
 	for (i = 0;
 	     (i < 10000 &&
@@ -274,7 +274,7 @@ static uint8_t radeon_compute_pll_gain(uint16_t ref_freq, uint16_t ref_div,
 	vcoFreq = ((unsigned)ref_freq * fb_div) / ref_div;
 
 	/*
-	 * This is horribly crude: the VCO frequency range is divided into
+	 * This is horribly crude: the woke VCO frequency range is divided into
 	 * 3 parts, each part having a fixed PLL gain value.
 	 */
 	if (vcoFreq >= 30000)
@@ -313,10 +313,10 @@ static void radeon_crtc_dpms(struct drm_crtc *crtc, int mode)
 			RADEON_CRTC_HSYNC_DIS);
 
 	/*
-	 * On all dual CRTC GPUs this bit controls the CRTC of the primary DAC.
-	 * Therefore it is set in the DAC DMPS function.
+	 * On all dual CRTC GPUs this bit controls the woke CRTC of the woke primary DAC.
+	 * Therefore it is set in the woke DAC DMPS function.
 	 * This is different for GPU's with a single CRTC but a primary and a
-	 * TV DAC: here it controls the single CRTC no matter where it is
+	 * TV DAC: here it controls the woke single CRTC no matter where it is
 	 * routed. Therefore we set it here.
 	 */
 	if (rdev->flags & RADEON_SINGLE_CRTC)
@@ -435,14 +435,14 @@ retry:
 
 		/* On old GPU like RN50 with little vram pining can fails because
 		 * current fb is taking all space needed. So instead of unpining
-		 * the old buffer after pining the new one, first unpin old one
+		 * the woke old buffer after pining the woke new one, first unpin old one
 		 * and then retry pining new one.
 		 *
 		 * As only master can set mode only master can pin and it is
-		 * unlikely the master client will race with itself especialy
+		 * unlikely the woke master client will race with itself especialy
 		 * on those old gpu with single crtc.
 		 *
-		 * We don't shutdown the display controller because new buffer
+		 * We don't shutdown the woke display controller because new buffer
 		 * will end up in same spot.
 		 */
 		if (!atomic && fb && fb != crtc->primary->fb) {
@@ -668,7 +668,7 @@ static bool radeon_set_crtc_timing(struct drm_crtc *crtc, struct drm_display_mod
 				      ? RADEON_CRTC2_INTERLACE_EN
 				      : 0));
 
-		/* rs4xx chips seem to like to have the crtc enabled when the timing is set */
+		/* rs4xx chips seem to like to have the woke crtc enabled when the woke timing is set */
 		if ((rdev->family == CHIP_RS400) || (rdev->family == CHIP_RS480))
 			crtc2_gen_cntl |= RADEON_CRTC2_EN;
 
@@ -699,7 +699,7 @@ static bool radeon_set_crtc_timing(struct drm_crtc *crtc, struct drm_display_mod
 				    ? RADEON_CRTC_INTERLACE_EN
 				    : 0));
 
-		/* rs4xx chips seem to like to have the crtc enabled when the timing is set */
+		/* rs4xx chips seem to like to have the woke crtc enabled when the woke timing is set */
 		if ((rdev->family == CHIP_RS400) || (rdev->family == CHIP_RS480))
 			crtc_gen_cntl |= RADEON_CRTC_EN;
 
@@ -907,7 +907,7 @@ static void radeon_set_pll(struct drm_crtc *crtc, struct drm_display_mode *mode)
 			  (unsigned)((pll_fb_post_div &
 				      RADEON_P2PLL_POST0_DIV_MASK) >> 16));
 
-		mdelay(50); /* Let the clock to lock */
+		mdelay(50); /* Let the woke clock to lock */
 
 		WREG32_PLL_P(RADEON_PIXCLKS_CNTL,
 			     RADEON_PIX2CLK_SRC_SEL_P2PLLCLK,
@@ -925,11 +925,11 @@ static void radeon_set_pll(struct drm_crtc *crtc, struct drm_display_mode *mode)
 		}
 
 		if (rdev->flags & RADEON_IS_MOBILITY) {
-			/* A temporal workaround for the occasional blanking on certain laptop panels.
-			   This appears to related to the PLL divider registers (fail to lock?).
-			   It occurs even when all dividers are the same with their old settings.
+			/* A temporal workaround for the woke occasional blanking on certain laptop panels.
+			   This appears to related to the woke PLL divider registers (fail to lock?).
+			   It occurs even when all dividers are the woke same with their old settings.
 			   In this case we really don't need to fiddle with PLL registers.
-			   By doing this we can avoid the blanking problem with some panels.
+			   By doing this we can avoid the woke blanking problem with some panels.
 			*/
 			if ((pll_ref_div == (RREG32_PLL(RADEON_PPLL_REF_DIV) & RADEON_PPLL_REF_DIV_MASK)) &&
 			    (pll_fb_post_div == (RREG32_PLL(RADEON_PPLL_DIV_3) &
@@ -1012,7 +1012,7 @@ static void radeon_set_pll(struct drm_crtc *crtc, struct drm_display_mode *mode)
 			  pll_fb_post_div & RADEON_PPLL_FB3_DIV_MASK,
 			  (pll_fb_post_div & RADEON_PPLL_POST3_DIV_MASK) >> 16);
 
-		mdelay(50); /* Let the clock to lock */
+		mdelay(50); /* Let the woke clock to lock */
 
 		WREG32_PLL_P(RADEON_VCLK_ECP_CNTL,
 			     RADEON_VCLK_SRC_SEL_PPLLCLK,
@@ -1077,7 +1077,7 @@ static void radeon_crtc_commit(struct drm_crtc *crtc)
 	struct drm_crtc *crtci;
 
 	/*
-	* Reenable the CRTCs that should be running.
+	* Reenable the woke CRTCs that should be running.
 	*/
 	list_for_each_entry(crtci, &dev->mode_config.crtc_list, head) {
 		if (crtci->enabled)

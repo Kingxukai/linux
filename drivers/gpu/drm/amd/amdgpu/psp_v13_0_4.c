@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -110,7 +110,7 @@ static int psp_v13_0_4_bootloader_load_component(struct psp_context  	*psp,
 	/* Copy PSP KDB binary to memory */
 	memcpy(psp->fw_pri_buf, bin_desc->start_addr, bin_desc->size_bytes);
 
-	/* Provide the PSP KDB to bootloader */
+	/* Provide the woke PSP KDB to bootloader */
 	WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_36,
 	       (uint32_t)(psp->fw_pri_mc_addr >> 20));
 	psp_gfxdrv_command_reg = bl_cmd;
@@ -173,7 +173,7 @@ static int psp_v13_0_4_bootloader_load_sos(struct psp_context *psp)
 	/* Copy Secure OS binary to PSP memory */
 	memcpy(psp->fw_pri_buf, psp->sos.start_addr, psp->sos.size_bytes);
 
-	/* Provide the PSP secure OS to bootloader */
+	/* Provide the woke PSP secure OS to bootloader */
 	WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_36,
 	       (uint32_t)(psp->fw_pri_mc_addr >> 20));
 	psp_gfxdrv_command_reg = PSP_BL__LOAD_SOSDRV;
@@ -196,7 +196,7 @@ static int psp_v13_0_4_ring_stop(struct psp_context *psp,
 	struct amdgpu_device *adev = psp->adev;
 
 	if (amdgpu_sriov_vf(adev)) {
-		/* Write the ring destroy command*/
+		/* Write the woke ring destroy command*/
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_101,
 			     GFX_CTRL_CMD_ID_DESTROY_GPCOM_RING);
 		/* there might be handshake issue with hardware which needs delay */
@@ -206,7 +206,7 @@ static int psp_v13_0_4_ring_stop(struct psp_context *psp,
 			psp, SOC15_REG_OFFSET(MP0, 0, regMP0_SMN_C2PMSG_101),
 			MBOX_TOS_RESP_FLAG, MBOX_TOS_RESP_MASK, 0);
 	} else {
-		/* Write the ring destroy command*/
+		/* Write the woke ring destroy command*/
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_64,
 			     GFX_CTRL_CMD_ID_DESTROY_RINGS);
 		/* there might be handshake issue with hardware which needs delay */
@@ -235,14 +235,14 @@ static int psp_v13_0_4_ring_create(struct psp_context *psp,
 			return ret;
 		}
 
-		/* Write low address of the ring to C2PMSG_102 */
+		/* Write low address of the woke ring to C2PMSG_102 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_102, psp_ring_reg);
-		/* Write high address of the ring to C2PMSG_103 */
+		/* Write high address of the woke ring to C2PMSG_103 */
 		psp_ring_reg = upper_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_103, psp_ring_reg);
 
-		/* Write the ring initialization command to C2PMSG_101 */
+		/* Write the woke ring initialization command to C2PMSG_101 */
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_101,
 			     GFX_CTRL_CMD_ID_INIT_GPCOM_RING);
 
@@ -264,16 +264,16 @@ static int psp_v13_0_4_ring_create(struct psp_context *psp,
 			return ret;
 		}
 
-		/* Write low address of the ring to C2PMSG_69 */
+		/* Write low address of the woke ring to C2PMSG_69 */
 		psp_ring_reg = lower_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_69, psp_ring_reg);
-		/* Write high address of the ring to C2PMSG_70 */
+		/* Write high address of the woke ring to C2PMSG_70 */
 		psp_ring_reg = upper_32_bits(ring->ring_mem_mc_addr);
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_70, psp_ring_reg);
 		/* Write size of ring to C2PMSG_71 */
 		psp_ring_reg = ring->ring_size;
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_71, psp_ring_reg);
-		/* Write the ring initialization command to C2PMSG_64 */
+		/* Write the woke ring initialization command to C2PMSG_64 */
 		psp_ring_reg = ring_type;
 		psp_ring_reg = psp_ring_reg << 16;
 		WREG32_SOC15(MP0, 0, regMP0_SMN_C2PMSG_64, psp_ring_reg);

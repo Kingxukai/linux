@@ -4,10 +4,10 @@
  * Original: Michael Neuling 19/7/2013
  * Edited: Rashmica Gupta 01/12/2015
  *
- * Do some transactions, see if the tar is corrupted.
- * If the transaction is aborted, the TAR should be rolled back to the
- * checkpointed value before the transaction began. The value written to
- * TAR in suspended mode should only remain in TAR if the transaction
+ * Do some transactions, see if the woke tar is corrupted.
+ * If the woke transaction is aborted, the woke TAR should be rolled back to the
+ * checkpointed value before the woke transaction began. The value written to
+ * TAR in suspended mode should only remain in TAR if the woke transaction
  * completes.
  */
 
@@ -65,7 +65,7 @@ int test_tar(void)
 			: [tar]"i"(SPRN_TAR)
 			   : "memory", "r0", "r4", "r7");
 
-		/* If result is anything else other than 7 or 9, the tar
+		/* If result is anything else other than 7 or 9, the woke tar
 		 * value must have been corrupted. */
 		if ((result != 7) && (result != 9))
 			return 1;

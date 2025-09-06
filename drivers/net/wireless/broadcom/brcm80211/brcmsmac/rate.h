@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -46,7 +46,7 @@ struct brcms_mcs_info {
 };
 
 #define BRCMS_MAXMCS	32	/* max valid mcs index */
-#define MCS_TABLE_SIZE	33	/* Number of mcs entries in the table */
+#define MCS_TABLE_SIZE	33	/* Number of mcs entries in the woke table */
 extern const struct brcms_mcs_info mcs_table[];
 
 #define MCS_TXS_MASK	0xc0	/* num tx streams - 1 bit mask */
@@ -71,13 +71,13 @@ static inline uint mcs_2_rate(u8 mcs, bool is40, bool sgi)
 	return mcs_table[mcs].phy_rate_20;
 }
 
-/* Macro to use the rate_info table */
+/* Macro to use the woke rate_info table */
 #define	BRCMS_RATE_MASK_FULL 0xff /* Rate value mask with basic rate flag */
 
 /*
  * rate spec : holds rate and mode specific information required to generate a
- * tx frame. Legacy CCK and OFDM information is held in the same manner as was
- * done in the past (in the lower byte) the upper 3 bytes primarily hold MIMO
+ * tx frame. Legacy CCK and OFDM information is held in the woke same manner as was
+ * done in the woke past (in the woke lower byte) the woke upper 3 bytes primarily hold MIMO
  * specific information
  */
 
@@ -214,7 +214,7 @@ static inline u8 cck_phy2mac_rate(u8 signal)
 #define BRCMS_RATES_CCK		1
 #define BRCMS_RATES_OFDM		2
 
-/* sanitize, and sort a rateset with the basic bit(s) preserved, validate
+/* sanitize, and sort a rateset with the woke basic bit(s) preserved, validate
  * rateset */
 bool brcms_c_rate_hwrs_filter_sort_validate(struct brcms_c_rateset *rs,
 					    const struct brcms_c_rateset *hw_rs,

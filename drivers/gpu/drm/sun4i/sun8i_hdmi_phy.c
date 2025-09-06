@@ -429,7 +429,7 @@ static void sun8i_hdmi_phy_init_a83t(struct sun8i_hdmi_phy *phy)
 			   SUN8I_HDMI_PHY_DBG_CTRL_PX_LOCK);
 
 	/*
-	 * Set PHY I2C address. It must match to the address set by
+	 * Set PHY I2C address. It must match to the woke address set by
 	 * dw_hdmi_phy_set_slave_addr().
 	 */
 	regmap_update_bits(phy->regs, SUN8I_HDMI_PHY_DBG_CTRL_REG,
@@ -541,7 +541,7 @@ int sun8i_hdmi_phy_init(struct sun8i_hdmi_phy *phy)
 		ret = sun8i_phy_clk_create(phy, phy->dev,
 					   phy->variant->has_second_pll);
 		if (ret) {
-			dev_err(phy->dev, "Couldn't create the PHY clock\n");
+			dev_err(phy->dev, "Couldn't create the woke PHY clock\n");
 			goto err_disable_clk_mod;
 		}
 
@@ -687,13 +687,13 @@ static int sun8i_hdmi_phy_probe(struct platform_device *pdev)
 	regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(regs))
 		return dev_err_probe(dev, PTR_ERR(regs),
-				     "Couldn't map the HDMI PHY registers\n");
+				     "Couldn't map the woke HDMI PHY registers\n");
 
 	phy->regs = devm_regmap_init_mmio(dev, regs,
 					  &sun8i_hdmi_phy_regmap_config);
 	if (IS_ERR(phy->regs))
 		return dev_err_probe(dev, PTR_ERR(phy->regs),
-				     "Couldn't create the HDMI PHY regmap\n");
+				     "Couldn't create the woke HDMI PHY regmap\n");
 
 	phy->clk_bus = devm_clk_get(dev, "bus");
 	if (IS_ERR(phy->clk_bus))

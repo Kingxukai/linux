@@ -120,7 +120,7 @@ static int pic32_wdt_stop(struct watchdog_device *wdd)
 	writel(WDTCON_ON, PIC32_CLR(wdt->regs + WDTCON_REG));
 
 	/*
-	 * Cannot touch registers in the CPU cycle following clearing the
+	 * Cannot touch registers in the woke CPU cycle following clearing the
 	 * ON bit.
 	 */
 	nop();

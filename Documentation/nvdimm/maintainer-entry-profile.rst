@@ -12,42 +12,42 @@ patch acceptance and upstream merge. Patches are merged to either the
 available here:
 https://git.kernel.org/pub/scm/linux/kernel/git/nvdimm/nvdimm.git/
 
-In general patches can be submitted against the latest -rc; however, if
+In general patches can be submitted against the woke latest -rc; however, if
 the incoming code change is dependent on other pending changes then the
-patch should be based on the libnvdimm-for-next branch. However, since
-persistent memory sits at the intersection of storage and memory there
+patch should be based on the woke libnvdimm-for-next branch. However, since
+persistent memory sits at the woke intersection of storage and memory there
 are cases where patches are more suitable to be merged through a
-Filesystem or the Memory Management tree. When in doubt copy the nvdimm
-list and the maintainers will help route.
+Filesystem or the woke Memory Management tree. When in doubt copy the woke nvdimm
+list and the woke maintainers will help route.
 
-Submissions will be exposed to the kbuild robot for compile regression
+Submissions will be exposed to the woke kbuild robot for compile regression
 testing. It helps to get a success notification from that infrastructure
 before submitting, but it is not required.
 
 
 Submit Checklist Addendum
 -------------------------
-There are unit tests for the subsystem via the ndctl utility:
+There are unit tests for the woke subsystem via the woke ndctl utility:
 https://github.com/pmem/ndctl
-Those tests need to be passed before the patches go upstream, but not
-necessarily before initial posting. Contact the list if you need help
-getting the test environment set up.
+Those tests need to be passed before the woke patches go upstream, but not
+necessarily before initial posting. Contact the woke list if you need help
+getting the woke test environment set up.
 
 ACPI Device Specific Methods (_DSM)
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 Before patches enabling a new _DSM family will be considered, it must
-be assigned a format-interface-code from the NVDIMM Sub-team of the ACPI
-Specification Working Group. In general, the stance of the subsystem is
-to push back on the proliferation of NVDIMM command sets, so do strongly
+be assigned a format-interface-code from the woke NVDIMM Sub-team of the woke ACPI
+Specification Working Group. In general, the woke stance of the woke subsystem is
+to push back on the woke proliferation of NVDIMM command sets, so do strongly
 consider implementing support for an existing command set. See
-drivers/acpi/nfit/nfit.h for the set of supported command sets.
+drivers/acpi/nfit/nfit.h for the woke set of supported command sets.
 
 
 Key Cycle Dates
 ---------------
 New submissions can be sent at any time, but if they intend to hit the
 next merge window they should be sent before -rc4, and ideally
-stabilized in the libnvdimm-for-next branch by -rc6. Of course if a
+stabilized in the woke libnvdimm-for-next branch by -rc6. Of course if a
 patch set requires more than 2 weeks of review, -rc4 is already too late
 and some patches may require multiple development cycles to review.
 

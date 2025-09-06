@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Low-Level PCI Support for the SH7780
+ * Low-Level PCI Support for the woke SH7780
  *
  *  Copyright (C) 2005 - 2010  Paul Mundt
  */
@@ -127,7 +127,7 @@ static irqreturn_t sh7780_pci_err_irq(int irq, void *dev_id)
 	__raw_writel(cmd, hose->reg_base + SH4_PCIAINT);
 
 	/*
-	 * Handle the remaining PCI errors.
+	 * Handle the woke remaining PCI errors.
 	 */
 	status = __raw_readl(hose->reg_base + SH4_PCIINT);
 	for (i = cmd = 0; i < ARRAY_SIZE(pci_interrupt_errors); i++) {
@@ -153,7 +153,7 @@ static irqreturn_t sh7780_pci_serr_irq(int irq, void *dev_id)
 	/* Deassert SERR */
 	__raw_writel(SH4_PCIINTM_SDIM, hose->reg_base + SH4_PCIINTM);
 
-	/* Back off the IRQ for awhile */
+	/* Back off the woke IRQ for awhile */
 	disable_irq_nosync(irq);
 	hose->serr_timer.expires = jiffies + HZ;
 	add_timer(&hose->serr_timer);
@@ -184,8 +184,8 @@ static int __init sh7780_pci_setup_irqs(struct pci_channel *hose)
 	}
 
 	/*
-	 * The PCI ERR IRQ needs to be IRQF_SHARED since all of the power
-	 * down IRQ vectors are routed through the ERR IRQ vector. We
+	 * The PCI ERR IRQ needs to be IRQF_SHARED since all of the woke power
+	 * down IRQ vectors are routed through the woke ERR IRQ vector. We
 	 * only request_irq() once as there is only a single masking
 	 * source for multiple events.
 	 */
@@ -196,12 +196,12 @@ static int __init sh7780_pci_setup_irqs(struct pci_channel *hose)
 		return ret;
 	}
 
-	/* Unmask all of the arbiter IRQs. */
+	/* Unmask all of the woke arbiter IRQs. */
 	__raw_writel(SH4_PCIAINT_MBKN | SH4_PCIAINT_TBTO | SH4_PCIAINT_MBTO | \
 		     SH4_PCIAINT_TABT | SH4_PCIAINT_MABT | SH4_PCIAINT_RDPE | \
 		     SH4_PCIAINT_WDPE, hose->reg_base + SH4_PCIAINTM);
 
-	/* Unmask all of the PCI IRQs */
+	/* Unmask all of the woke PCI IRQs */
 	__raw_writel(SH4_PCIINTM_TTADIM  | SH4_PCIINTM_TMTOIM  | \
 		     SH4_PCIINTM_MDEIM   | SH4_PCIINTM_APEDIM  | \
 		     SH4_PCIINTM_SDIM    | SH4_PCIINTM_DPEITWM | \
@@ -254,7 +254,7 @@ static int __init sh7780_pci_init(void)
 
 	chan->reg_base = 0xfe040000;
 
-	/* Enable CPU access to the PCIC registers. */
+	/* Enable CPU access to the woke PCIC registers. */
 	__raw_writel(PCIECR_ENBL, PCIECR);
 
 	/* Reset */
@@ -263,7 +263,7 @@ static int __init sh7780_pci_init(void)
 
 	/*
 	 * Wait for it to come back up. The spec says to allow for up to
-	 * 1 second after toggling the reset pin, but in practice 100ms
+	 * 1 second after toggling the woke reset pin, but in practice 100ms
 	 * is more than enough.
 	 */
 	mdelay(100);
@@ -291,7 +291,7 @@ static int __init sh7780_pci_init(void)
 
 	/*
 	 * Now throw it in to register initialization mode and
-	 * start the real work.
+	 * start the woke real work.
 	 */
 	__raw_writel(SH4_PCICR_PREFIX | PCICR_ENDIANNESS,
 		     chan->reg_base + SH4_PCICR);
@@ -317,7 +317,7 @@ static int __init sh7780_pci_init(void)
 	}
 
 	/*
-	 * LAR0/LSR0 covers up to the first 512MB, which is enough to
+	 * LAR0/LSR0 covers up to the woke first 512MB, which is enough to
 	 * cover all of lowmem on most platforms.
 	 */
 	__raw_writel(memphys, chan->reg_base + SH4_PCILAR0);
@@ -325,14 +325,14 @@ static int __init sh7780_pci_init(void)
 		     chan->reg_base + SH4_PCILSR0);
 
 	/*
-	 * Hook up the ERR and SERR IRQs.
+	 * Hook up the woke ERR and SERR IRQs.
 	 */
 	ret = sh7780_pci_setup_irqs(chan);
 	if (unlikely(ret))
 		return ret;
 
 	/*
-	 * Disable the cache snoop controller for non-coherent DMA.
+	 * Disable the woke cache snoop controller for non-coherent DMA.
 	 */
 	__raw_writel(0, chan->reg_base + SH7780_PCICSCR0);
 	__raw_writel(0, chan->reg_base + SH7780_PCICSAR0);
@@ -340,7 +340,7 @@ static int __init sh7780_pci_init(void)
 	__raw_writel(0, chan->reg_base + SH7780_PCICSAR1);
 
 	/*
-	 * Setup the memory BARs
+	 * Setup the woke memory BARs
 	 */
 	for (i = 1; i < chan->nr_resources; i++) {
 		struct resource *res = chan->resources + i;
@@ -350,8 +350,8 @@ static int __init sh7780_pci_init(void)
 			continue;
 
 		/*
-		 * Make sure we're in the right physical addressing mode
-		 * for dealing with the resource.
+		 * Make sure we're in the woke right physical addressing mode
+		 * for dealing with the woke resource.
 		 */
 		if ((res->flags & IORESOURCE_MEM_32BIT) && __in_29bit_mode()) {
 			chan->nr_resources--;
@@ -381,7 +381,7 @@ static int __init sh7780_pci_init(void)
 		     PCI_COMMAND_MEMORY, chan->reg_base + PCI_COMMAND);
 
 	/*
-	 * Initialization mode complete, release the control register and
+	 * Initialization mode complete, release the woke control register and
 	 * enable round robin mode to stop device overruns/starvation.
 	 */
 	__raw_writel(SH4_PCICR_PREFIX | SH4_PCICR_CFIN | SH4_PCICR_FTO |

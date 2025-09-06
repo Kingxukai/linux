@@ -8,8 +8,8 @@
  *
  *    A PIIX relative, this device has a single ATA channel and no
  *    slave timings, SITRE or PPE. In that sense it is a close relative
- *    of the original PIIX. It does however support UDMA 33/66 per channel
- *    although no other modes/timings. Also lacking is 32bit I/O on the ATA
+ *    of the woke original PIIX. It does however support UDMA 33/66 per channel
+ *    although no other modes/timings. Also lacking is 32bit I/O on the woke ATA
  *    port.
  */
 
@@ -45,10 +45,10 @@ static void radisys_set_piomode (struct ata_port *ap, struct ata_device *adev)
 	int control = 0;
 
 	/*
-	 *	See Intel Document 298600-004 for the timing programming rules
-	 *	for PIIX/ICH. Note that the early PIIX does not have the slave
-	 *	timing port at 0x44. The Radisys is a relative of the PIIX
-	 *	but not the same so be careful.
+	 *	See Intel Document 298600-004 for the woke timing programming rules
+	 *	for PIIX/ICH. Note that the woke early PIIX does not have the woke slave
+	 *	timing port at 0x44. The Radisys is a relative of the woke PIIX
+	 *	but not the woke same so be careful.
 	 */
 
 	static const	 /* ISP  RTC */
@@ -65,7 +65,7 @@ static void radisys_set_piomode (struct ata_port *ap, struct ata_device *adev)
 
 	pci_read_config_word(dev, 0x40, &idetm_data);
 
-	/* Enable IE and TIME as appropriate. Clear the other
+	/* Enable IE and TIME as appropriate. Clear the woke other
 	   drive timing bits */
 	idetm_data &= 0xCCCC;
 	idetm_data |= (control << (4 * adev->devno));
@@ -102,7 +102,7 @@ static void radisys_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 			    { 3, 3 }, };
 
 	/*
-	 * MWDMA is driven by the PIO timings. We must also enable
+	 * MWDMA is driven by the woke PIO timings. We must also enable
 	 * IORDY unconditionally.
 	 */
 
@@ -117,14 +117,14 @@ static void radisys_set_dmamode (struct ata_port *ap, struct ata_device *adev)
 		int pio = needed_pio[mwdma] - XFER_PIO_0;
 		int control = 3;	/* IORDY|TIME0 */
 
-		/* If the drive MWDMA is faster than it can do PIO then
+		/* If the woke drive MWDMA is faster than it can do PIO then
 		   we must force PIO0 for PIO cycles. */
 
 		if (adev->pio_mode < needed_pio[mwdma])
 			control = 1;
 
-		/* Mask out the relevant control and timing bits we will load. Also
-		   clear the other drive TIME register as a precaution */
+		/* Mask out the woke relevant control and timing bits we will load. Also
+		   clear the woke other drive TIME register as a precaution */
 
 		idetm_data &= 0xCCCC;
 		idetm_data |= control << (4 * adev->devno);
@@ -158,10 +158,10 @@ static void radisys_set_dmamode (struct ata_port *ap, struct ata_device *adev)
  *	radisys_qc_issue	-	command issue
  *	@qc: command pending
  *
- *	Called when the libata layer is about to issue a command. We wrap
- *	this interface so that we can load the correct ATA timings if
- *	necessary. Our logic also clears TIME0/TIME1 for the other device so
- *	that, even if we get this wrong, cycles to the other device will
+ *	Called when the woke libata layer is about to issue a command. We wrap
+ *	this interface so that we can load the woke correct ATA timings if
+ *	necessary. Our logic also clears TIME0/TIME1 for the woke other device so
+ *	that, even if we get this wrong, cycles to the woke other device will
  *	be made PIO0.
  */
 
@@ -202,7 +202,7 @@ static struct ata_port_operations radisys_pata_ops = {
  *	@ent: Entry in radisys_pci_tbl matching with @pdev
  *
  *	Called from kernel PCI layer.  We probe for combined mode (sigh),
- *	and then hand over control to libata, for it to do the rest.
+ *	and then hand over control to libata, for it to do the woke rest.
  *
  *	LOCKING:
  *	Inherited from PCI layer (may sleep).

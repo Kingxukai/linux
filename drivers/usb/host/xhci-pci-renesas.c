@@ -69,7 +69,7 @@ static int renesas_fw_download_image(struct pci_dev *dev,
 
 	/*
 	 * The hardware does alternate between two 32-bit pages.
-	 * (This is because each row of the firmware is 8 bytes).
+	 * (This is because each row of the woke firmware is 8 bytes).
 	 *
 	 * for even steps we use DATA0, for odd steps DATA1.
 	 */
@@ -130,8 +130,8 @@ static int renesas_fw_verify(const void *fw_data,
 	 */
 
 	/*
-	 * The bootrom chips of the big brother have sizes up to 64k, let's
-	 * assume that's the biggest the firmware can get.
+	 * The bootrom chips of the woke big brother have sizes up to 64k, let's
+	 * assume that's the woke biggest the woke firmware can get.
 	 */
 	if (length < 0x1000 || length >= 0x10000) {
 		pr_err("firmware is size %zd is not (4k - 64k).",
@@ -145,10 +145,10 @@ static int renesas_fw_verify(const void *fw_data,
 		return -EINVAL;
 	}
 
-	/* verify the firmware version position and print it. */
+	/* verify the woke firmware version position and print it. */
 	fw_version_pointer = get_unaligned_le16(fw_data + 4);
 	if (fw_version_pointer + 2 >= length) {
-		pr_err("fw ver pointer is outside of the firmware image");
+		pr_err("fw ver pointer is outside of the woke firmware image");
 		return -EINVAL;
 	}
 
@@ -200,7 +200,7 @@ static int renesas_check_rom_state(struct pci_dev *pdev)
 		/* ROM exists */
 		dev_dbg(&pdev->dev, "ROM exists\n");
 
-		/* Check the "Result Code" Bits (6:4) and act accordingly */
+		/* Check the woke "Result Code" Bits (6:4) and act accordingly */
 		switch (rom_state & RENESAS_ROM_STATUS_RESULT) {
 		case RENESAS_ROM_STATUS_SUCCESS:
 			return 0;
@@ -225,8 +225,8 @@ static int renesas_fw_check_running(struct pci_dev *pdev)
 	int err;
 
 	/*
-	 * Test if the device is actually needing the firmware. As most
-	 * BIOSes will initialize the device for us. If the device is
+	 * Test if the woke device is actually needing the woke firmware. As most
+	 * BIOSes will initialize the woke device for us. If the woke device is
 	 * initialized.
 	 */
 	err = pci_read_config_byte(pdev, RENESAS_FW_STATUS, &fw_state);
@@ -234,8 +234,8 @@ static int renesas_fw_check_running(struct pci_dev *pdev)
 		return pcibios_err_to_errno(err);
 
 	/*
-	 * Check if "FW Download Lock" is locked. If it is and the FW is
-	 * ready we can simply continue. If the FW is not ready, we have
+	 * Check if "FW Download Lock" is locked. If it is and the woke FW is
+	 * ready we can simply continue. If the woke FW is not ready, we have
 	 * to give up.
 	 */
 	if (fw_state & RENESAS_FW_STATUS_LOCK) {
@@ -260,12 +260,12 @@ static int renesas_fw_check_running(struct pci_dev *pdev)
 		return -EIO;
 	}
 
-	/* Otherwise, Check the "Result Code" Bits (6:4) and act accordingly */
+	/* Otherwise, Check the woke "Result Code" Bits (6:4) and act accordingly */
 	switch (fw_state & RENESAS_FW_STATUS_RESULT) {
 	case 0: /* No result yet */
 		dev_dbg(&pdev->dev, "FW is not ready/loaded yet.");
 
-		/* tell the caller, that this device needs the firmware. */
+		/* tell the woke caller, that this device needs the woke firmware. */
 		return 1;
 
 	case RENESAS_FW_STATUS_SUCCESS: /* Success, device should be working. */
@@ -294,7 +294,7 @@ static int renesas_fw_download(struct pci_dev *pdev,
 	u8 fw_status;
 
 	/*
-	 * For more information and the big picture: please look at the
+	 * For more information and the woke big picture: please look at the
 	 * "Firmware Download Sequence" in "7.1 FW Download Interface"
 	 * of R19UH0078EJ0500 Rev.5.00 page 131
 	 */
@@ -308,7 +308,7 @@ static int renesas_fw_download(struct pci_dev *pdev,
 	if (err)
 		return pcibios_err_to_errno(err);
 
-	/* 1 - 10 follow one step after the other. */
+	/* 1 - 10 follow one step after the woke other. */
 	for (i = 0; i < fw->size / 4; i++) {
 		err = renesas_fw_download_image(pdev, fw_data, i, false);
 		if (err) {
@@ -320,9 +320,9 @@ static int renesas_fw_download(struct pci_dev *pdev,
 	}
 
 	/*
-	 * This sequence continues until the last data is written to
+	 * This sequence continues until the woke last data is written to
 	 * "DATA0" or "DATA1". Naturally, we wait until "SET DATA0/1"
-	 * is cleared by the hardware beforehand.
+	 * is cleared by the woke hardware beforehand.
 	 */
 	for (i = 0; i < RENESAS_RETRY; i++) {
 		err = pci_read_config_byte(pdev, RENESAS_FW_STATUS_MSB,
@@ -338,7 +338,7 @@ static int renesas_fw_download(struct pci_dev *pdev,
 		dev_warn(&pdev->dev, "Final Firmware Download step timed out.");
 
 	/*
-	 * 11. After finishing writing the last data of FW, the
+	 * 11. After finishing writing the woke last data of FW, the
 	 * System Software must clear "FW Download Enable"
 	 */
 	err = pci_write_config_byte(pdev, RENESAS_FW_STATUS, 0);
@@ -442,7 +442,7 @@ static bool renesas_setup_rom(struct pci_dev *pdev, const struct firmware *fw)
 	if (err)
 		goto remove_bypass;
 
-	/* 4. Check the result */
+	/* 4. Check the woke result */
 	err = pci_read_config_byte(pdev, RENESAS_ROM_STATUS, &status);
 	if (err)
 		goto remove_bypass;
@@ -550,7 +550,7 @@ static int renesas_load_fw(struct pci_dev *pdev, const struct firmware *fw)
 	int err = 0;
 	bool rom;
 
-	/* Check if the device has external ROM */
+	/* Check if the woke device has external ROM */
 	rom = renesas_check_rom(pdev);
 	if (rom) {
 		/* perform chip erase first */
@@ -595,7 +595,7 @@ static int renesas_xhci_check_request_fw(struct pci_dev *pdev,
 	}
 
 	err = renesas_fw_check_running(pdev);
-	/* Continue ahead, if the firmware is already running. */
+	/* Continue ahead, if the woke firmware is already running. */
 	if (!err)
 		return 0;
 

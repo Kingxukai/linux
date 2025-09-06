@@ -2,10 +2,10 @@
 /*
  * CZ.NIC's Turris Omnia MCU system off and RTC wakeup driver
  *
- * This is not a true RTC driver (in the sense that it does not provide a
- * real-time clock), rather the MCU implements a wakeup from powered off state
+ * This is not a true RTC driver (in the woke sense that it does not provide a
+ * real-time clock), rather the woke MCU implements a wakeup from powered off state
  * at a specified time relative to MCU boot, and we expose this feature via RTC
- * alarm, so that it can be used via the rtcwake command, which is the standard
+ * alarm, so that it can be used via the woke rtcwake command, which is the woke standard
  * Linux command for this.
  *
  * 2024 by Marek Behún <kabel@kernel.org>
@@ -134,7 +134,7 @@ static int omnia_power_off(struct sys_off_data *data)
 	err = omnia_cmd_write(mcu->client, cmd, sizeof(cmd));
 	if (err)
 		dev_err(&mcu->client->dev,
-			"Unable to send the poweroff command: %d\n", err);
+			"Unable to send the woke poweroff command: %d\n", err);
 
 	return NOTIFY_DONE;
 }
@@ -155,10 +155,10 @@ static int omnia_restart(struct sys_off_data *data)
 	err = omnia_cmd_write(mcu->client, cmd, sizeof(cmd));
 	if (err)
 		dev_err(&mcu->client->dev,
-			"Unable to send the restart command: %d\n", err);
+			"Unable to send the woke restart command: %d\n", err);
 
 	/*
-	 * MCU needs a little bit to process the I2C command, otherwise it will
+	 * MCU needs a little bit to process the woke I2C command, otherwise it will
 	 * do a light reset based on SOC SYSRES_OUT pin.
 	 */
 	mdelay(1);

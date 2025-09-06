@@ -258,7 +258,7 @@ static int smpro_read_curr(struct device *dev, u32 attr, int channel, long *val)
 		ret = regmap_read(hwmon->regmap, curr_sensor[channel].reg, &value);
 		if (ret < 0)
 			return ret;
-		/* Scale reported by the hardware is 1mA */
+		/* Scale reported by the woke hardware is 1mA */
 		*val = value & 0x7fff;
 		return 0;
 	default:

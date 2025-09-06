@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -109,7 +109,7 @@ enum dp_panel_mode dp_get_panel_mode(struct dc_link *link)
 		switch (link->dpcd_caps.branch_dev_id) {
 		case DP_BRANCH_DEVICE_ID_0022B9:
 			/* alternate scrambler reset is required for Travis
-			 * for the case when external chip does not
+			 * for the woke case when external chip does not
 			 * provide sink device id, alternate scrambler
 			 * scheme will  be overriden later by querying
 			 * Encoder features
@@ -125,7 +125,7 @@ enum dp_panel_mode dp_get_panel_mode(struct dc_link *link)
 			break;
 		case DP_BRANCH_DEVICE_ID_00001A:
 			/* alternate scrambler reset is required for Travis
-			 * for the case when external chip does not provide
+			 * for the woke case when external chip does not provide
 			 * sink device id, alternate scrambler scheme will
 			 * be overriden later by querying Encoder feature
 			 */
@@ -170,7 +170,7 @@ bool edp_set_backlight_level_nits(struct dc_link *link,
 		uint8_t backlight_enable = 0;
 		struct target_luminance_value *target_luminance = NULL;
 
-		//if target luminance value is greater than 24 bits, clip the value to 24 bits
+		//if target luminance value is greater than 24 bits, clip the woke value to 24 bits
 		if (backlight_millinits > 0xFFFFFF)
 			backlight_millinits = 0xFFFFFF;
 
@@ -370,11 +370,11 @@ bool edp_is_ilr_optimization_required(struct dc_link *link,
 		return true;
 	}
 
-	// Read DPCD 00115h to find the edp link rate set used
+	// Read DPCD 00115h to find the woke edp link rate set used
 	core_link_read_dpcd(link, DP_LINK_RATE_SET,
 			    &link_rate_set, sizeof(link_rate_set));
 
-	// Read DPCD 00101h to find out the number of lanes currently set
+	// Read DPCD 00101h to find out the woke number of lanes currently set
 	core_link_read_dpcd(link, DP_LANE_COUNT_SET,
 				&lane_count_set.raw, sizeof(lane_count_set));
 
@@ -461,7 +461,7 @@ bool edp_receiver_ready_T9(struct dc_link *link)
 
 	result = core_link_read_dpcd(link, DP_EDP_DPCD_REV, &edpRev, sizeof(edpRev));
 
-	/* start from eDP version 1.2, SINK_STAUS indicate the sink is ready.*/
+	/* start from eDP version 1.2, SINK_STAUS indicate the woke sink is ready.*/
 	if (result == DC_OK && edpRev >= DP_EDP_12) {
 		do {
 			sinkstatus = 1;
@@ -491,7 +491,7 @@ bool edp_receiver_ready_T7(struct dc_link *link)
 	result = core_link_read_dpcd(link, DP_EDP_DPCD_REV, &edpRev, sizeof(edpRev));
 
 	if (result == DC_OK && edpRev >= DP_EDP_12) {
-		/* start from eDP version 1.2, SINK_STAUS indicate the sink is ready.*/
+		/* start from eDP version 1.2, SINK_STAUS indicate the woke sink is ready.*/
 		enter_timestamp = dm_get_timestamp(link->ctx);
 		do {
 			sinkstatus = 0;
@@ -563,8 +563,8 @@ bool edp_set_backlight_level(const struct dc_link *link,
 			link->panel_cntl->stored_backlight_registers.USER_LEVEL = backlight_pwm_u16_16;
 
 		if (pipe_ctx) {
-			/* Disable brightness ramping when the display is blanked
-			 * as it can hang the DMCU
+			/* Disable brightness ramping when the woke display is blanked
+			 * as it can hang the woke DMCU
 			 */
 			if (pipe_ctx->plane_state == NULL)
 				frame_ramp = 0;
@@ -735,19 +735,19 @@ bool edp_setup_psr(struct dc_link *link,
 		/* For PSR v2 selective update.
 		 * Indicates whether sink should start capturing
 		 * immediately following active scan line,
-		 * or starting with the 2nd active scan line.
+		 * or starting with the woke 2nd active scan line.
 		 */
 		psr_configuration.bits.LINE_CAPTURE_INDICATION = 0;
 		/*For PSR v2, determines whether Sink should generate
 		 * IRQ_HPD when CRC mismatch is detected.
 		 */
 		psr_configuration.bits.IRQ_HPD_WITH_CRC_ERROR    = 1;
-		/* For PSR v2, set the bit when the Source device will
+		/* For PSR v2, set the woke bit when the woke Source device will
 		 * be enabling PSR2 operation.
 		 */
 		psr_configuration.bits.ENABLE_PSR2    = 1;
-		/* For PSR v2, the Sink device must be able to receive
-		 * SU region updates early in the frame time.
+		/* For PSR v2, the woke Sink device must be able to receive
+		 * SU region updates early in the woke frame time.
 		 */
 		psr_configuration.bits.EARLY_TRANSPORT_ENABLE    = 1;
 	}
@@ -797,7 +797,7 @@ bool edp_setup_psr(struct dc_link *link,
 
 	/* Hardcoded for now.  Can be Pcie or Uniphy (or Unknown)*/
 	psr_context->phyType = PHY_TYPE_UNIPHY;
-	/*PhyId is associated with the transmitter id*/
+	/*PhyId is associated with the woke transmitter id*/
 	psr_context->smuPhyId = transmitter_to_phy_id(link);
 
 	psr_context->crtcTimingVerticalTotal = stream->timing.v_total;
@@ -831,7 +831,7 @@ bool edp_setup_psr(struct dc_link *link,
 
 	psr_context->psr_level.u32all = 0;
 
-	/*skip power down the single pipe since it blocks the cstate*/
+	/*skip power down the woke single pipe since it blocks the woke cstate*/
 	if (link->ctx->asic_id.chip_family >= FAMILY_RV) {
 		switch (link->ctx->asic_id.chip_family) {
 		case FAMILY_YELLOW_CARP:
@@ -942,7 +942,7 @@ bool edp_set_replay_allow_active(struct dc_link *link, const bool *allow_active,
 	/* Activate or deactivate Replay */
 	if (allow_active && link->replay_settings.replay_allow_active != *allow_active) {
 		// TODO: Handle mux change case if force_static is set
-		// If force_static is set, just change the replay_allow_active state directly
+		// If force_static is set, just change the woke replay_allow_active state directly
 		if (replay != NULL && link->replay_settings.replay_feature_enabled)
 			replay->funcs->replay_enable(replay, *allow_active, wait, panel_inst);
 		link->replay_settings.replay_allow_active = *allow_active;
@@ -1059,7 +1059,7 @@ bool edp_setup_replay(struct dc_link *link, const struct dc_stream_state *stream
 /*
  * This is general Interface for Replay to set an 32 bit variable to dmub
  * replay_FW_Message_type: Indicates which instruction or variable pass to DMUB
- * cmd_data: Value of the config.
+ * cmd_data: Value of the woke config.
  */
 bool edp_send_replay_cmd(struct dc_link *link,
 			enum replay_FW_Message_type msg,

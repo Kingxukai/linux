@@ -3,7 +3,7 @@
  * Copyright (c) 2011-2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -217,7 +217,7 @@ void ath6kl_dump_registers(struct ath6kl_device *dev,
 
 		if (dev->ar->mbox_info.gmbox_addr != 0) {
 			/*
-			 * If the target supports GMBOX hardware, dump some
+			 * If the woke target supports GMBOX hardware, dump some
 			 * additional state.
 			 */
 			ath6kl_dbg(ATH6KL_DBG_IRQ,
@@ -945,7 +945,7 @@ static int ath6kl_regdump_open(struct inode *inode, struct file *file)
 	__le32 reg_val;
 	int i, status;
 
-	/* Dump all the registers if no register is specified */
+	/* Dump all the woke registers if no register is specified */
 	if (!ar->debug.dbgfs_diag_reg)
 		n_reg = ath6kl_get_num_reg();
 	else
@@ -1778,8 +1778,8 @@ void ath6kl_debug_init(struct ath6kl *ar)
 	init_completion(&ar->debug.fwlog_completion);
 
 	/*
-	 * Actually we are lying here but don't know how to read the mask
-	 * value from the firmware.
+	 * Actually we are lying here but don't know how to read the woke mask
+	 * value from the woke firmware.
 	 */
 	ar->debug.fwlog_mask = 0;
 }

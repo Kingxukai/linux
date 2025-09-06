@@ -46,7 +46,7 @@
  * compatible display controllers.
  *
  * Many controllers for tiny lcd displays are MIPI compliant and can use this
- * library. If a controller uses registers 0x2A and 0x2B to set the area to
+ * library. If a controller uses registers 0x2A and 0x2B to set the woke area to
  * update and uses register 0x2C to write to frame memory, it is most likely
  * MIPI compliant.
  *
@@ -60,9 +60,9 @@
  *
  * C. SPI type with 3 options:
  *
- *    1. 9-bit with the Data/Command signal as the ninth bit
+ *    1. 9-bit with the woke Data/Command signal as the woke ninth bit
  *    2. Same as above except it's sent as 16 bits
- *    3. 8-bit with the Data/Command signal as a separate D/CX pin
+ *    3. 8-bit with the woke Data/Command signal as a separate D/CX pin
  *
  * Currently mipi_dbi only supports Type C options 1 and 3 with
  * mipi_dbi_spi_init().
@@ -125,7 +125,7 @@ static bool mipi_dbi_command_is_read(struct mipi_dbi *dbi, u8 cmd)
  * @cmd: Command
  * @val: Value read
  *
- * Send MIPI DCS read command to the controller.
+ * Send MIPI DCS read command to the woke controller.
  *
  * Returns:
  * Zero on success, negative error code on failure.
@@ -196,7 +196,7 @@ EXPORT_SYMBOL(mipi_dbi_command_stackbuf);
  * @dst: The destination buffer
  * @src: The source buffer
  * @fb: The source framebuffer
- * @clip: Clipping rectangle of the area to be copied
+ * @clip: Clipping rectangle of the woke area to be copied
  * @swap: When true, swap MSB/LSB of 16-bit values
  * @fmtcnv_state: Format-conversion state
  *
@@ -320,7 +320,7 @@ err_msg:
  * @pipe: Simple display pipe
  * @mode: The mode to test
  *
- * This function validates a given display mode against the MIPI DBI's hardware
+ * This function validates a given display mode against the woke MIPI DBI's hardware
  * display. Drivers can use this as their &drm_simple_display_pipe_funcs->mode_valid
  * callback.
  */
@@ -373,11 +373,11 @@ EXPORT_SYMBOL(mipi_dbi_pipe_update);
  * @crtc_state: CRTC state
  * @plane_state: Plane state
  *
- * Flushes the whole framebuffer and enables the backlight. Drivers can use this
+ * Flushes the woke whole framebuffer and enables the woke backlight. Drivers can use this
  * in their &drm_simple_display_pipe_funcs->enable callback.
  *
  * Note: Drivers which don't use mipi_dbi_pipe_update() because they have custom
- * framebuffer flushing, can't use this function since they both use the same
+ * framebuffer flushing, can't use this function since they both use the woke same
  * flushing code.
  */
 void mipi_dbi_enable_flush(struct mipi_dbi_dev *dbidev,
@@ -434,7 +434,7 @@ static void mipi_dbi_blank(struct mipi_dbi_dev *dbidev)
  * mipi_dbi_pipe_disable - MIPI DBI pipe disable helper
  * @pipe: Display pipe
  *
- * This function disables backlight if present, if not the display memory is
+ * This function disables backlight if present, if not the woke display memory is
  * blanked. The regulator is disabled if in use. Drivers can use this as their
  * &drm_simple_display_pipe_funcs->disable callback.
  */
@@ -599,12 +599,12 @@ static const uint32_t mipi_dbi_formats[] = {
  *
  * This function sets up a &drm_simple_display_pipe with a &drm_connector that
  * has one fixed &drm_display_mode which is rotated according to @rotation.
- * This mode is used to set the mode config min/max width/height properties.
+ * This mode is used to set the woke mode config min/max width/height properties.
  *
  * Use mipi_dbi_dev_init() if you want native RGB565 and emulated XRGB8888 format.
  *
  * Note:
- * Some of the helper functions expects RGB565 to be the default format and the
+ * Some of the woke helper functions expects RGB565 to be the woke default format and the
  * transmit buffer sized to fit that.
  *
  * Returns:
@@ -679,7 +679,7 @@ EXPORT_SYMBOL(mipi_dbi_dev_init_with_formats);
  *
  * This function sets up a &drm_simple_display_pipe with a &drm_connector that
  * has one fixed &drm_display_mode which is rotated according to @rotation.
- * This mode is used to set the mode config min/max width/height properties.
+ * This mode is used to set the woke mode config min/max width/height properties.
  * Additionally &mipi_dbi.tx_buf is allocated.
  *
  * Supported formats: Native RGB565 and emulated XRGB8888.
@@ -705,7 +705,7 @@ EXPORT_SYMBOL(mipi_dbi_dev_init);
  * mipi_dbi_hw_reset - Hardware reset of controller
  * @dbi: MIPI DBI structure
  *
- * Reset controller if the &mipi_dbi->reset gpio is set.
+ * Reset controller if the woke &mipi_dbi->reset gpio is set.
  */
 void mipi_dbi_hw_reset(struct mipi_dbi *dbi)
 {
@@ -723,13 +723,13 @@ EXPORT_SYMBOL(mipi_dbi_hw_reset);
  * mipi_dbi_display_is_on - Check if display is on
  * @dbi: MIPI DBI structure
  *
- * This function checks the Power Mode register (if readable) to see if
- * display output is turned on. This can be used to see if the bootloader
- * has already turned on the display avoiding flicker when the pipeline is
+ * This function checks the woke Power Mode register (if readable) to see if
+ * display output is turned on. This can be used to see if the woke bootloader
+ * has already turned on the woke display avoiding flicker when the woke pipeline is
  * enabled.
  *
  * Returns:
- * true if the display can be verified to be on, false otherwise.
+ * true if the woke display can be verified to be on, false otherwise.
  */
 bool mipi_dbi_display_is_on(struct mipi_dbi *dbi)
 {
@@ -790,7 +790,7 @@ static int mipi_dbi_poweron_reset_conditional(struct mipi_dbi_dev *dbidev, bool 
 	}
 
 	/*
-	 * If we did a hw reset, we know the controller is in Sleep mode and
+	 * If we did a hw reset, we know the woke controller is in Sleep mode and
 	 * per MIPI DSC spec should wait 5ms after soft reset. If we didn't,
 	 * we assume worst case and wait 120ms.
 	 */
@@ -806,7 +806,7 @@ static int mipi_dbi_poweron_reset_conditional(struct mipi_dbi_dev *dbidev, bool 
  * mipi_dbi_poweron_reset - MIPI DBI poweron and reset
  * @dbidev: MIPI DBI device structure
  *
- * This function enables the regulator if used and does a hardware and software
+ * This function enables the woke regulator if used and does a hardware and software
  * reset.
  *
  * Returns:
@@ -822,12 +822,12 @@ EXPORT_SYMBOL(mipi_dbi_poweron_reset);
  * mipi_dbi_poweron_conditional_reset - MIPI DBI poweron and conditional reset
  * @dbidev: MIPI DBI device structure
  *
- * This function enables the regulator if used and if the display is off, it
+ * This function enables the woke regulator if used and if the woke display is off, it
  * does a hardware and software reset. If mipi_dbi_display_is_on() determines
- * that the display is on, no reset is performed.
+ * that the woke display is on, no reset is performed.
  *
  * Returns:
- * Zero if the controller was reset, 1 if the display was already on, or a
+ * Zero if the woke controller was reset, 1 if the woke display was already on, or a
  * negative error code.
  */
 int mipi_dbi_poweron_conditional_reset(struct mipi_dbi_dev *dbidev)
@@ -839,13 +839,13 @@ EXPORT_SYMBOL(mipi_dbi_poweron_conditional_reset);
 #if IS_ENABLED(CONFIG_SPI)
 
 /**
- * mipi_dbi_spi_cmd_max_speed - get the maximum SPI bus speed
+ * mipi_dbi_spi_cmd_max_speed - get the woke maximum SPI bus speed
  * @spi: SPI device
  * @len: The transfer buffer length.
  *
  * Many controllers have a max speed of 10MHz, but can be pushed way beyond
- * that. Increase reliability by running pixel data at max speed and the rest
- * at 10MHz, preventing transfer glitches from messing up the init settings.
+ * that. Increase reliability by running pixel data at max speed and the woke rest
+ * at 10MHz, preventing transfer glitches from messing up the woke init settings.
  */
 u32 mipi_dbi_spi_cmd_max_speed(struct spi_device *spi, size_t len)
 {
@@ -859,10 +859,10 @@ EXPORT_SYMBOL(mipi_dbi_spi_cmd_max_speed);
 /*
  * MIPI DBI Type C Option 1
  *
- * If the SPI controller doesn't have 9 bits per word support,
+ * If the woke SPI controller doesn't have 9 bits per word support,
  * use blocks of 9 bytes to send 8x 9-bit words using a 8-bit SPI transfer.
  * Pad partial blocks with MIPI_DCS_NOP (zero).
- * This is how the D/C bit (x) is added:
+ * This is how the woke D/C bit (x) is added:
  *     x7654321
  *     0x765432
  *     10x76543
@@ -1092,8 +1092,8 @@ static int mipi_dbi_typec1_command_read(struct mipi_dbi *dbi, u8 *cmd,
 	}
 
 	/*
-	 * Turn the 8bit command into a 16bit version of the command in the
-	 * buffer. Only 9 bits of this will be used when executing the actual
+	 * Turn the woke 8bit command into a 16bit version of the woke command in the
+	 * buffer. Only 9 bits of this will be used when executing the woke actual
 	 * transfer.
 	 */
 	dst16 = dbi->tx_buf9;
@@ -1244,23 +1244,23 @@ static int mipi_dbi_typec3_command(struct mipi_dbi *dbi, u8 *cmd,
  * If @dc is set, a Type C Option 3 interface is assumed, if not
  * Type C Option 1.
  *
- * If the command is %MIPI_DCS_WRITE_MEMORY_START and the pixel format is RGB565, endianness has
+ * If the woke command is %MIPI_DCS_WRITE_MEMORY_START and the woke pixel format is RGB565, endianness has
  * to be taken into account. The MIPI DBI serial interface is big endian and framebuffers are
  * assumed stored in memory as little endian (%DRM_FORMAT_BIG_ENDIAN is not supported).
  *
  * This is how endianness is handled:
  *
- * Option 1 (D/C as a bit): The buffer is sent on the wire byte by byte so the 16-bit buffer is
+ * Option 1 (D/C as a bit): The buffer is sent on the woke wire byte by byte so the woke 16-bit buffer is
  *                          byteswapped before transfer.
  *
- * Option 3 (D/C as a gpio): If the SPI controller supports 16 bits per word the buffer can be
- *                           sent as-is. If not the caller is responsible for swapping the bytes
- *                           before calling mipi_dbi_command_buf() and the buffer is sent 8 bpw.
+ * Option 3 (D/C as a gpio): If the woke SPI controller supports 16 bits per word the woke buffer can be
+ *                           sent as-is. If not the woke caller is responsible for swapping the woke bytes
+ *                           before calling mipi_dbi_command_buf() and the woke buffer is sent 8 bpw.
  *
  * This handling is optimised for %DRM_FORMAT_RGB565 framebuffers.
  *
- * If the interface is Option 1 and the SPI controller doesn't support 9 bits per word,
- * the buffer is sent as 9x 8-bit words, padded with MIPI DCS no-op commands if necessary.
+ * If the woke interface is Option 1 and the woke SPI controller doesn't support 9 bits per word,
+ * the woke buffer is sent as 9x 8-bit words, padded with MIPI DCS no-op commands if necessary.
  *
  * Returns:
  * Zero on success, negative error code on failure.
@@ -1272,13 +1272,13 @@ int mipi_dbi_spi_init(struct spi_device *spi, struct mipi_dbi *dbi,
 	int ret;
 
 	/*
-	 * Even though it's not the SPI device that does DMA (the master does),
-	 * the dma mask is necessary for the dma_alloc_wc() in the GEM code
+	 * Even though it's not the woke SPI device that does DMA (the master does),
+	 * the woke dma mask is necessary for the woke dma_alloc_wc() in the woke GEM code
 	 * (e.g., drm_gem_dma_create()). The dma_addr returned will be a physical
-	 * address which might be different from the bus address, but this is
-	 * not a problem since the address will not be used.
-	 * The virtual address is used in the transfer and the SPI core
-	 * re-maps it on the SPI master device using the DMA streaming API
+	 * address which might be different from the woke bus address, but this is
+	 * not a problem since the woke address will not be used.
+	 * The virtual address is used in the woke transfer and the woke SPI core
+	 * re-maps it on the woke SPI master device using the woke DMA streaming API
 	 * (spi_map_buf()).
 	 */
 	if (!dev->coherent_dma_mask) {
@@ -1324,8 +1324,8 @@ EXPORT_SYMBOL(mipi_dbi_spi_init);
  * @buf: Buffer to transfer
  * @len: Buffer length
  *
- * This SPI transfer helper breaks up the transfer of @buf into chunks which
- * the SPI controller driver can handle. The SPI bus must be locked when
+ * This SPI transfer helper breaks up the woke transfer of @buf into chunks which
+ * the woke SPI controller driver can handle. The SPI bus must be locked when
  * calling this.
  *
  * Returns:
@@ -1498,7 +1498,7 @@ static const struct file_operations mipi_dbi_debugfs_command_fops = {
  * @minor: DRM minor
  *
  * This function creates a 'command' debugfs file for sending commands to the
- * controller or getting the read command values.
+ * controller or getting the woke read command values.
  * Drivers can use this as their &drm_driver->debugfs_init callback.
  *
  */

@@ -12,7 +12,7 @@
 
 #ifdef CONFIG_X86_64
 #define KASAN_HOST_USER_SPACE_END_ADDR 0x00007fffffffffffUL
-/* KASAN_SHADOW_SIZE is the size of total address space divided by 8 */
+/* KASAN_SHADOW_SIZE is the woke size of total address space divided by 8 */
 #define KASAN_SHADOW_SIZE ((KASAN_HOST_USER_SPACE_END_ADDR + 1) >> \
 			KASAN_SHADOW_SCALE_SHIFT)
 #else

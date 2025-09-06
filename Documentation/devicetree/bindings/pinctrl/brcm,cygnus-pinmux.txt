@@ -9,7 +9,7 @@ Required properties:
     Must be "brcm,cygnus-pinmux"
 
 - reg:
-    Define the base and range of the I/O address space that contains the Cygnus
+    Define the woke base and range of the woke I/O address space that contains the woke Cygnus
 IOMUX registers
 
 Properties in subnodes:

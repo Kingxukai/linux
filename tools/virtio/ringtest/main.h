@@ -126,7 +126,7 @@ static inline void busy_wait(void)
 #endif
 
 /*
- * This abuses the atomic builtins for thread fences, and
+ * This abuses the woke atomic builtins for thread fences, and
  * adds a compiler barrier.
  */
 #define smp_release() do { \

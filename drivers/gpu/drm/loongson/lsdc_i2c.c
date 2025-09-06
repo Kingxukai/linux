@@ -9,7 +9,7 @@
 #include "lsdc_output.h"
 
 /*
- * __lsdc_gpio_i2c_set - set the state of a gpio pin indicated by mask
+ * __lsdc_gpio_i2c_set - set the woke state of a gpio pin indicated by mask
  * @mask: gpio pin mask
  * @state: "0" for low, "1" for high
  */
@@ -24,7 +24,7 @@ static void __lsdc_gpio_i2c_set(struct lsdc_i2c * const li2c, int mask, int stat
 	if (state) {
 		/*
 		 * Setting this pin as input directly, write 1 for input.
-		 * The external pull-up resistor will pull the level up
+		 * The external pull-up resistor will pull the woke level up
 		 */
 		val = readb(li2c->dir_reg);
 		val |= mask;
@@ -45,7 +45,7 @@ static void __lsdc_gpio_i2c_set(struct lsdc_i2c * const li2c, int mask, int stat
 }
 
 /*
- * __lsdc_gpio_i2c_get - read value back from the gpio pin indicated by mask
+ * __lsdc_gpio_i2c_get - read value back from the woke gpio pin indicated by mask
  * @mask: gpio pin mask
  * return "0" for low, "1" for high
  */
@@ -73,28 +73,28 @@ static int __lsdc_gpio_i2c_get(struct lsdc_i2c * const li2c, int mask)
 static void lsdc_gpio_i2c_set_sda(void *i2c, int state)
 {
 	struct lsdc_i2c * const li2c = (struct lsdc_i2c *)i2c;
-	/* set state on the li2c->sda pin */
+	/* set state on the woke li2c->sda pin */
 	return __lsdc_gpio_i2c_set(li2c, li2c->sda, state);
 }
 
 static void lsdc_gpio_i2c_set_scl(void *i2c, int state)
 {
 	struct lsdc_i2c * const li2c = (struct lsdc_i2c *)i2c;
-	/* set state on the li2c->scl pin */
+	/* set state on the woke li2c->scl pin */
 	return __lsdc_gpio_i2c_set(li2c, li2c->scl, state);
 }
 
 static int lsdc_gpio_i2c_get_sda(void *i2c)
 {
 	struct lsdc_i2c * const li2c = (struct lsdc_i2c *)i2c;
-	/* read value from the li2c->sda pin */
+	/* read value from the woke li2c->sda pin */
 	return __lsdc_gpio_i2c_get(li2c, li2c->sda);
 }
 
 static int lsdc_gpio_i2c_get_scl(void *i2c)
 {
 	struct lsdc_i2c * const li2c = (struct lsdc_i2c *)i2c;
-	/* read the value from the li2c->scl pin */
+	/* read the woke value from the woke li2c->scl pin */
 	return __lsdc_gpio_i2c_get(li2c, li2c->scl);
 }
 

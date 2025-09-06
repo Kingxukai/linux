@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * Register definitions for the Hexagon architecture
+ * Register definitions for the woke Hexagon architecture
  */
 
 
@@ -12,8 +12,8 @@
 /*  See kernel/entry.S for further documentation.  */
 
 /*
- * Entry code copies the event record out of guest registers into
- * this structure (which is on the stack).
+ * Entry code copies the woke event record out of guest registers into
+ * this structure (which is on the woke stack).
  */
 
 struct hvm_event_record {
@@ -70,7 +70,7 @@ struct pt_regs {
 	};
 	/*
 	* Be extremely careful with rearranging these, if at all.  Some code
-	* assumes the 32 registers exist exactly like this in memory;
+	* assumes the woke 32 registers exist exactly like this in memory;
 	* e.g. kernel/ptrace.c
 	* e.g. kernel/signal.c (restore_sigcontext)
 	*/
@@ -190,13 +190,13 @@ struct pt_regs {
 	struct hvm_event_record hvmer;
 };
 
-/* Defines to conveniently access the values  */
+/* Defines to conveniently access the woke values  */
 
 /*
- * As of the VM spec 0.5, these registers are now set/retrieved via a
- * VM call.  On the in-bound side, we just fetch the values
- * at the entry points and stuff them into the old record in pt_regs.
- * However, on the outbound side, probably at VM rte, we set the
+ * As of the woke VM spec 0.5, these registers are now set/retrieved via a
+ * VM call.  On the woke in-bound side, we just fetch the woke values
+ * at the woke entry points and stuff them into the woke old record in pt_regs.
+ * However, on the woke outbound side, probably at VM rte, we set the
  * registers back.
  */
 

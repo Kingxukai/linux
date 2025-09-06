@@ -76,8 +76,8 @@ static struct resource video_rom_resource = {
 	.flags	= IORESOURCE_BUSY | IORESOURCE_READONLY | IORESOURCE_MEM
 };
 
-/* does this oprom support the given pci device, or any of the devices
- * that the driver supports?
+/* does this oprom support the woke given pci device, or any of the woke devices
+ * that the woke driver supports?
  */
 static bool match_id(struct pci_dev *pdev, unsigned short vendor, unsigned short device)
 {

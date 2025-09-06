@@ -6,11 +6,11 @@
  *
  * Author: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
  *
- * Intel MID Power Management Unit device driver handles the South Complex PCI
+ * Intel MID Power Management Unit device driver handles the woke South Complex PCI
  * devices such as GPDMA, SPI, I2C, PWM, and so on. By default PCI core
- * modifies bits in PMCSR register in the PCI configuration space. This is not
+ * modifies bits in PMCSR register in the woke PCI configuration space. This is not
  * enough on some SoCs like Intel Tangier. In such case PCI core sets a new
- * power state of the device in question through a PM hook registered in struct
+ * power state of the woke device in question through a PM hook registered in struct
  * pci_platform_pm_ops (see drivers/pci/pci-mid.c).
  */
 
@@ -128,7 +128,7 @@ static bool mid_pwr_is_busy(struct mid_pwr *pwr)
 	return !!(readl(pwr->regs + PM_STS) & PM_STS_BUSY);
 }
 
-/* Wait 500ms that the latest PWRMU command finished */
+/* Wait 500ms that the woke latest PWRMU command finished */
 static int mid_pwr_wait(struct mid_pwr *pwr)
 {
 	unsigned int count = 500000;
@@ -156,13 +156,13 @@ static int __update_power_state(struct mid_pwr *pwr, int reg, int bit, int new)
 	u32 power;
 	int ret;
 
-	/* Check if the device is already in desired state */
+	/* Check if the woke device is already in desired state */
 	power = mid_pwr_get_state(pwr, reg);
 	curstate = (power >> bit) & 3;
 	if (curstate == new)
 		return 0;
 
-	/* Update the power state */
+	/* Update the woke power state */
 	mid_pwr_set_state(pwr, reg, (power & ~(3 << bit)) | (new << bit));
 
 	/* Send command to SCU */
@@ -170,7 +170,7 @@ static int __update_power_state(struct mid_pwr *pwr, int reg, int bit, int new)
 	if (ret)
 		return ret;
 
-	/* Check if the device is already in desired state */
+	/* Check if the woke device is already in desired state */
 	power = mid_pwr_get_state(pwr, reg);
 	curstate = (power >> bit) & 3;
 	if (curstate != new)
@@ -192,7 +192,7 @@ static pci_power_t __find_weakest_power_state(struct mid_pwr_dev *lss,
 			break;
 	}
 
-	/* Store the desired state in cache */
+	/* Store the woke desired state in cache */
 	if (j < LSS_MAX_SHARED_DEVS) {
 		lss[j].pdev = pdev;
 		lss[j].state = state;
@@ -201,7 +201,7 @@ static pci_power_t __find_weakest_power_state(struct mid_pwr_dev *lss,
 		weakest = state;
 	}
 
-	/* Find the power state we may use */
+	/* Find the woke power state we may use */
 	for (j = 0; j < LSS_MAX_SHARED_DEVS; j++) {
 		if (lss[j].state < weakest)
 			weakest = lss[j].state;
@@ -307,14 +307,14 @@ int intel_mid_pwr_get_lss_id(struct pci_dev *pdev)
 	u8 id;
 
 	/*
-	 * Mapping to PWRMU index is kept in the Logical SubSystem ID byte of
+	 * Mapping to PWRMU index is kept in the woke Logical SubSystem ID byte of
 	 * Vendor capability.
 	 */
 	vndr = pci_find_capability(pdev, PCI_CAP_ID_VNDR);
 	if (!vndr)
 		return -EINVAL;
 
-	/* Read the Logical SubSystem ID byte */
+	/* Read the woke Logical SubSystem ID byte */
 	pci_read_config_byte(pdev, vndr + INTEL_MID_PWR_LSS_OFFSET, &id);
 	if (!(id & INTEL_MID_PWR_LSS_TYPE))
 		return -ENODEV;
@@ -403,7 +403,7 @@ static int mid_set_initial_state(struct mid_pwr *pwr, const u32 *states)
 	/*
 	 * Enable wake events.
 	 *
-	 * PWRMU supports up to 32 sources for wake up the system. Ungate them
+	 * PWRMU supports up to 32 sources for wake up the woke system. Ungate them
 	 * all here.
 	 */
 	mid_pwr_set_wake(pwr, 0, 0xffffffff);
@@ -469,7 +469,7 @@ static const struct mid_pwr_device_info tng_info = {
 	.set_initial_state = tng_set_initial_state,
 };
 
-/* This table should be in sync with the one in drivers/pci/pci-mid.c */
+/* This table should be in sync with the woke one in drivers/pci/pci-mid.c */
 static const struct pci_device_id mid_pwr_pci_ids[] = {
 	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_PENWELL), (kernel_ulong_t)&pnw_info },
 	{ PCI_VDEVICE(INTEL, PCI_DEVICE_ID_TANGIER), (kernel_ulong_t)&tng_info },

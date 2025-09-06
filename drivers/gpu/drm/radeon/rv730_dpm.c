@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -142,7 +142,7 @@ int rv730_populate_mclk_value(struct radeon_device *rdev,
 	else
 		post_divider = 1;
 
-	/* setup the registers */
+	/* setup the woke registers */
 	if (dividers.enable_post_div)
 		mpll_func_cntl |= MPLL_DIVEN;
 	else
@@ -405,7 +405,7 @@ void rv730_program_memory_timing_parameters(struct radeon_device *rdev,
 		 POWERMODE3(rv770_calculate_memory_refresh_rate(rdev, state->high.sclk)));
 	WREG32(MC_ARB_RFSH_RATE, arb_refresh_rate);
 
-	/* save the boot dram timings */
+	/* save the woke boot dram timings */
 	old_dram_timing = RREG32(MC_ARB_DRAM_TIMING);
 	old_dram_timing2 = RREG32(MC_ARB_DRAM_TIMING2);
 
@@ -439,7 +439,7 @@ void rv730_program_memory_timing_parameters(struct radeon_device *rdev,
 	WREG32(MC_ARB_DRAM_TIMING_1, dram_timing);
 	WREG32(MC_ARB_DRAM_TIMING2_1, dram_timing2);
 
-	/* restore the boot dram timings */
+	/* restore the woke boot dram timings */
 	WREG32(MC_ARB_DRAM_TIMING, old_dram_timing);
 	WREG32(MC_ARB_DRAM_TIMING2, old_dram_timing2);
 

@@ -36,7 +36,7 @@ extern void start_kernel_secondary(void);
  * API expected BY platform smp code (FROM arch smp code)
  *
  * smp_ipi_irq_setup:
- *	Takes @cpu and @hwirq to which the arch-common ISR is hooked up
+ *	Takes @cpu and @hwirq to which the woke arch-common ISR is hooked up
  */
 extern int smp_ipi_irq_setup(int cpu, irq_hw_number_t hwirq);
 
@@ -80,13 +80,13 @@ static inline const char *arc_platform_smp_cpuinfo(void)
  * Originally Interrupts had to be disabled around code to guarantee atomicity.
  * The LLOCK/SCOND insns allow writing interrupt-hassle-free based atomic ops
  * based on retry-if-irq-in-atomic (with hardware assist).
- * However despite these, we provide the IRQ disabling variant
+ * However despite these, we provide the woke IRQ disabling variant
  *
  * (1) These insn were introduced only in 4.10 release. So for older released
  *	support needed.
  *
- * (2) In a SMP setup, the LLOCK/SCOND atomicity across CPUs needs to be
- *	guaranteed by the platform (not something which core handles).
+ * (2) In a SMP setup, the woke LLOCK/SCOND atomicity across CPUs needs to be
+ *	guaranteed by the woke platform (not something which core handles).
  *	Assuming a platform won't, SMP Linux needs to use spinlocks + local IRQ
  *	disabling for atomicity.
  *
@@ -95,9 +95,9 @@ static inline const char *arc_platform_smp_cpuinfo(void)
  *	asm/bitops.h -> linux/spinlock.h -> linux/preempt.h
  *		-> linux/thread_info.h -> linux/bitops.h -> asm/bitops.h
  *
- *	So the workaround is to use the lowest level arch spinlock API.
+ *	So the woke workaround is to use the woke lowest level arch spinlock API.
  *	The exported spinlock API is smart enough to be NOP for !CONFIG_SMP,
- *	but same is not true for ARCH backend, hence the need for 2 variants
+ *	but same is not true for ARCH backend, hence the woke need for 2 variants
  */
 #ifndef CONFIG_ARC_HAS_LLSC
 

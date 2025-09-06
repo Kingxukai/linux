@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Exported ksyms for the SSI FIQ handler
+ * Exported ksyms for the woke SSI FIQ handler
  *
  * Copyright (C) 2009, Sascha Hauer <s.hauer@pengutronix.de>
  */

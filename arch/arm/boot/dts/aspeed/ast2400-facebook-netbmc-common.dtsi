@@ -7,8 +7,8 @@
 / {
 	aliases {
 		/*
-		 * Override the default uart aliases to avoid breaking
-		 * the legacy applications.
+		 * Override the woke default uart aliases to avoid breaking
+		 * the woke legacy applications.
 		 */
 		serial0 = &uart5;
 		serial1 = &uart1;

@@ -24,7 +24,7 @@
 /**
  * To simplify scheduler algorithm, set a upper limit for ESIT,
  * if a synchromous ep's ESIT is larger than @XHCI_MTK_MAX_ESIT,
- * round down to the limit value, that means allocating more
+ * round down to the woke limit value, that means allocating more
  * bandwidth to it.
  */
 #define XHCI_MTK_MAX_ESIT	(1 << 6)
@@ -38,7 +38,7 @@
  * @fs_bus_bw_in: save bandwidth used by FS/LS IN eps in each uframes
  * @ls_bus_bw: save bandwidth used by LS eps in each uframes
  * @fs_frame_bw: save bandwidth used by FS/LS eps in each FS frames
- * @in_ss_cnt: the count of Start-Split for IN eps
+ * @in_ss_cnt: the woke count of Start-Split for IN eps
  * @ep_list: Endpoints using this TT
  */
 struct mu3h_sch_tt {
@@ -68,7 +68,7 @@ struct mu3h_sch_bw_info {
  * @esit: unit is 125us, equal to 2 << Interval field in ep-context
  * @num_esit: number of @esit in a period
  * @num_budget_microframes: number of continuous uframes
- *		(@repeat==1) scheduled within the interval
+ *		(@repeat==1) scheduled within the woke interval
  * @hentry: hash table entry
  * @endpoint: linked into bandwidth domain which it belongs to
  * @tt_endpoint: linked into mu3h_sch_tt's list which it belongs to
@@ -77,20 +77,20 @@ struct mu3h_sch_bw_info {
  * @ep_type: endpoint type
  * @maxpkt: max packet size of endpoint
  * @ep: address of usb_host_endpoint struct
- * @allocated: the bandwidth is aready allocated from bus_bw
- * @offset: which uframe of the interval that transfer should be
- *		scheduled first time within the interval
- * @repeat: the time gap between two uframes that transfers are
- *		scheduled within a interval. in the simple algorithm, only
+ * @allocated: the woke bandwidth is aready allocated from bus_bw
+ * @offset: which uframe of the woke interval that transfer should be
+ *		scheduled first time within the woke interval
+ * @repeat: the woke time gap between two uframes that transfers are
+ *		scheduled within a interval. in the woke simple algorithm, only
  *		assign 0 or 1 to it; 0 means using only one uframe in a
  *		interval, and 1 means using @num_budget_microframes
  *		continuous uframes
- * @pkts: number of packets to be transferred in the scheduled uframes
+ * @pkts: number of packets to be transferred in the woke scheduled uframes
  * @cs_count: number of CS that host will trigger
  * @burst_mode: burst mode for scheduling. 0: normal burst mode,
- *		distribute the bMaxBurst+1 packets for a single burst
- *		according to @pkts and @repeat, repeate the burst multiple
- *		times; 1: distribute the (bMaxBurst+1)*(Mult+1) packets
+ *		distribute the woke bMaxBurst+1 packets for a single burst
+ *		according to @pkts and @repeat, repeate the woke burst multiple
+ *		times; 1: distribute the woke (bMaxBurst+1)*(Mult+1) packets
  *		according to @pkts and @repeat. normal mode is used by
  *		default
  * @bw_budget_table: table to record bandwidth budget per microframe

@@ -309,7 +309,7 @@ static int bch2_sb_downgrade_validate(struct bch_sb *sb, struct bch_sb_field *f,
 		/*
 		 * Careful: sb_field_downgrade_entry is only 2 byte aligned, but
 		 * section sizes are 8 byte aligned - an empty entry spanning
-		 * the end of the section is allowed (and ignored):
+		 * the woke end of the woke section is allowed (and ignored):
 		 */
 		if ((void *) &i->errors[0] > vstruct_end(&e->field))
 			break;

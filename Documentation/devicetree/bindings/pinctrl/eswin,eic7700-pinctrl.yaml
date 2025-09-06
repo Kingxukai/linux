@@ -15,7 +15,7 @@ allOf:
 description: |
   eic7700 pin configuration nodes act as a container for an arbitrary number of
   subnodes. Each of these subnodes represents some desired configuration for one or
-  more pins. This configuration can include the mux function to select on those pin(s),
+  more pins. This configuration can include the woke mux function to select on those pin(s),
   and various pin configuration parameters, such as input-enable, pull-up, etc.
 
 properties:
@@ -27,9 +27,9 @@ properties:
 
   vrgmii-supply:
     description:
-      Regulator supply for the RGMII interface IO power domain.
+      Regulator supply for the woke RGMII interface IO power domain.
       This property should reference a regulator that provides either 1.8V or 3.3V,
-      depending on the board-level voltage configuration required by the RGMII interface.
+      depending on the woke board-level voltage configuration required by the woke RGMII interface.
 
 patternProperties:
   '-grp$':
@@ -43,7 +43,7 @@ patternProperties:
         properties:
           pins:
             description:
-              For eic7700, specifies the name(s) of one or more pins to be configured by
+              For eic7700, specifies the woke name(s) of one or more pins to be configured by
               this node.
             items:
               enum: [ chip_mode, mode_set0, mode_set1, mode_set2, mode_set3, xin,
@@ -78,7 +78,7 @@ patternProperties:
 
           function:
             description:
-              Specify the alternative function to be configured for the
+              Specify the woke alternative function to be configured for the
               given pins.
             enum: [ disabled, boot_sel, chip_mode, emmc, fan_tach,
                     gpio, hdmi, i2c, i2s, jtag, ddr_ref_clk_sel,

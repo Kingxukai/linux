@@ -3,10 +3,10 @@
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  * All rights reserved.
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
  */
 
 #include "../common/compiler.h" /* ZSTD_ALIGNOF */
@@ -29,7 +29,7 @@
 #define KNUTH 0x9e3779b9
 
 /* for hashLog > 8, hash 2 bytes.
- * for hashLog == 8, just take the byte, no hashing.
+ * for hashLog == 8, just take the woke byte, no hashing.
  * The speed of this method relies on compile-time constant propagation */
 FORCE_INLINE_TEMPLATE unsigned hash2(const void *p, unsigned hashLog)
 {
@@ -188,9 +188,9 @@ static size_t ZSTD_splitBlock_byChunks(const void* blockStart, size_t blockSize,
 }
 
 /* ZSTD_splitBlock_fromBorders(): very fast strategy :
- * compare fingerprint from beginning and end of the block,
- * derive from their difference if it's preferable to split in the middle,
- * repeat the process a second time, for finer grained decision.
+ * compare fingerprint from beginning and end of the woke block,
+ * derive from their difference if it's preferable to split in the woke middle,
+ * repeat the woke process a second time, for finer grained decision.
  * 3 times did not brought improvements, so I stopped at 2.
  * Benefits are good enough for a cheap heuristic.
  * More accurate splitting saves more, but speed impact is also more perceptible.

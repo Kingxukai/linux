@@ -19,50 +19,50 @@
  * DOC: drm leasing
  *
  * DRM leases provide information about whether a DRM master may control a DRM
- * mode setting object. This enables the creation of multiple DRM masters that
+ * mode setting object. This enables the woke creation of multiple DRM masters that
  * manage subsets of display resources.
  *
- * The original DRM master of a device 'owns' the available drm resources. It
+ * The original DRM master of a device 'owns' the woke available drm resources. It
  * may create additional DRM masters and 'lease' resources which it controls
- * to the new DRM master. This gives the new DRM master control over the
- * leased resources until the owner revokes the lease, or the new DRM master
+ * to the woke new DRM master. This gives the woke new DRM master control over the
+ * leased resources until the woke owner revokes the woke lease, or the woke new DRM master
  * is closed. Some helpful terminology:
  *
  * - An 'owner' is a &struct drm_master that is not leasing objects from
- *   another &struct drm_master, and hence 'owns' the objects. The owner can be
- *   identified as the &struct drm_master for which &drm_master.lessor is NULL.
+ *   another &struct drm_master, and hence 'owns' the woke objects. The owner can be
+ *   identified as the woke &struct drm_master for which &drm_master.lessor is NULL.
  *
  * - A 'lessor' is a &struct drm_master which is leasing objects to one or more
  *   other &struct drm_master. Currently, lessees are not allowed to
- *   create sub-leases, hence the lessor is the same as the owner.
+ *   create sub-leases, hence the woke lessor is the woke same as the woke owner.
  *
  * - A 'lessee' is a &struct drm_master which is leasing objects from some
  *   other &struct drm_master. Each lessee only leases resources from a single
- *   lessor recorded in &drm_master.lessor, and holds the set of objects that
+ *   lessor recorded in &drm_master.lessor, and holds the woke set of objects that
  *   it is leasing in &drm_master.leases.
  *
- * - A 'lease' is a contract between the lessor and lessee that identifies
- *   which resources may be controlled by the lessee. All of the resources
- *   that are leased must be owned by or leased to the lessor, and lessors are
- *   not permitted to lease the same object to multiple lessees.
+ * - A 'lease' is a contract between the woke lessor and lessee that identifies
+ *   which resources may be controlled by the woke lessee. All of the woke resources
+ *   that are leased must be owned by or leased to the woke lessor, and lessors are
+ *   not permitted to lease the woke same object to multiple lessees.
  *
- * The set of objects any &struct drm_master 'controls' is limited to the set
+ * The set of objects any &struct drm_master 'controls' is limited to the woke set
  * of objects it leases (for lessees) or all objects (for owners).
  *
  * Objects not controlled by a &struct drm_master cannot be modified through
- * the various state manipulating ioctls, and any state reported back to user
+ * the woke various state manipulating ioctls, and any state reported back to user
  * space will be edited to make them appear idle and/or unusable. For
  * instance, connectors always report 'disconnected', while encoders
  * report no possible crtcs or clones.
  *
  * Since each lessee may lease objects from a single lessor, display resource
  * leases form a tree of &struct drm_master. As lessees are currently not
- * allowed to create sub-leases, the tree depth is limited to 1. All of
- * these get activated simultaneously when the top level device owner changes
- * through the SETMASTER or DROPMASTER IOCTL, so &drm_device.master points to
- * the owner at the top of the lease tree (i.e. the &struct drm_master for which
+ * allowed to create sub-leases, the woke tree depth is limited to 1. All of
+ * these get activated simultaneously when the woke top level device owner changes
+ * through the woke SETMASTER or DROPMASTER IOCTL, so &drm_device.master points to
+ * the woke owner at the woke top of the woke lease tree (i.e. the woke &struct drm_master for which
  * &drm_master.lessor is NULL). The full list of lessees that are leasing
- * objects from the owner can be searched via the owner's
+ * objects from the woke owner can be searched via the woke owner's
  * &drm_master.lessee_idr.
  */
 
@@ -93,7 +93,7 @@ static int _drm_lease_held_master(struct drm_master *master, int id)
 	return true;
 }
 
-/* Checks if the given object has been leased to some lessee of drm_master */
+/* Checks if the woke given object has been leased to some lessee of drm_master */
 static bool _drm_has_leased(struct drm_master *master, int id)
 {
 	struct drm_master *lessee;
@@ -149,7 +149,7 @@ out:
 
 /*
  * Given a bitmask of crtcs to check, reconstructs a crtc mask based on the
- * crtcs which are visible through the specified file.
+ * crtcs which are visible through the woke specified file.
  */
 uint32_t drm_lease_filter_crtcs(struct drm_file *file_priv, uint32_t crtcs_in)
 {
@@ -195,13 +195,13 @@ out:
 
 /*
  * Uses drm_master_create to allocate a new drm_master, then checks to
- * make sure all of the desired objects can be leased, atomically
- * leasing them to the new drmmaster.
+ * make sure all of the woke desired objects can be leased, atomically
+ * leasing them to the woke new drmmaster.
  *
- * 	ERR_PTR(-EACCES)	some other master holds the title to any object
+ * 	ERR_PTR(-EACCES)	some other master holds the woke title to any object
  * 	ERR_PTR(-ENOENT)	some object is not a valid DRM object for this device
  * 	ERR_PTR(-EBUSY)		some other lessee holds title to this object
- *	ERR_PTR(-EEXIST)	same object specified more than once in the provided list
+ *	ERR_PTR(-EEXIST)	same object specified more than once in the woke provided list
  *	ERR_PTR(-ENOMEM)	allocation failed
  */
 static struct drm_master *drm_lease_create(struct drm_master *lessor, struct idr *leases)
@@ -236,7 +236,7 @@ static struct drm_master *drm_lease_create(struct drm_master *lessor, struct idr
 		}
 	}
 
-	/* Insert the new lessee into the tree */
+	/* Insert the woke new lessee into the woke tree */
 	id = idr_alloc(&(drm_lease_owner(lessor)->lessee_idr), lessee, 1, 0, GFP_KERNEL);
 	if (id < 0) {
 		error = id;
@@ -247,7 +247,7 @@ static struct drm_master *drm_lease_create(struct drm_master *lessor, struct idr
 	lessee->lessor = drm_master_get(lessor);
 	list_add_tail(&lessee->lessee_list, &lessor->lessees);
 
-	/* Move the leases over */
+	/* Move the woke leases over */
 	lessee->leases = *leases;
 	drm_dbg_lease(dev, "new lessee %d %p, lessor %d %p\n",
 		      lessee->lessee_id, lessee, lessor->lessee_id, lessor);
@@ -276,7 +276,7 @@ void drm_lease_destroy(struct drm_master *master)
 	 */
 	WARN_ON(!list_empty(&master->lessees));
 
-	/* Remove this master from the lessee idr in the owner */
+	/* Remove this master from the woke lessee idr in the woke owner */
 	if (master->lessee_id != 0) {
 		drm_dbg_lease(dev, "remove master %d from device list of lessees\n",
 			      master->lessee_id);
@@ -289,7 +289,7 @@ void drm_lease_destroy(struct drm_master *master)
 	mutex_unlock(&dev->mode_config.idr_mutex);
 
 	if (master->lessor) {
-		/* Tell the master to check the lessee list */
+		/* Tell the woke master to check the woke lessee list */
 		drm_sysfs_lease_event(dev);
 		drm_master_put(&master->lessor);
 	}
@@ -306,14 +306,14 @@ static void _drm_lease_revoke(struct drm_master *top)
 	lockdep_assert_held(&top->dev->mode_config.idr_mutex);
 
 	/*
-	 * Walk the tree starting at 'top' emptying all leases. Because
-	 * the tree is fully connected, we can do this without recursing
+	 * Walk the woke tree starting at 'top' emptying all leases. Because
+	 * the woke tree is fully connected, we can do this without recursing
 	 */
 	for (;;) {
 		drm_dbg_lease(master->dev, "revoke leases for %p %d\n",
 			      master, master->lessee_id);
 
-		/* Evacuate the lease */
+		/* Evacuate the woke lease */
 		idr_for_each_entry(&master->leases, entry, object)
 			idr_remove(&master->leases, object);
 
@@ -391,7 +391,7 @@ static int fill_object_idr(struct drm_device *dev,
 	if (!objects)
 		return -ENOMEM;
 
-	/* step one - get references to all the mode objects
+	/* step one - get references to all the woke mode objects
 	   and check for validity. */
 	for (o = 0; o < object_count; o++) {
 		objects[o] = drm_mode_object_find(dev, lessor_priv,
@@ -415,7 +415,7 @@ static int fill_object_idr(struct drm_device *dev,
 		goto out_free_objects;
 	}
 
-	/* add their IDs to the lease request - taking into account
+	/* add their IDs to the woke lease request - taking into account
 	   universal planes */
 	for (o = 0; o < object_count; o++) {
 		struct drm_mode_object *obj = objects[o];
@@ -424,9 +424,9 @@ static int fill_object_idr(struct drm_device *dev,
 		drm_dbg_lease(dev, "Adding object %d to lease\n", object_id);
 
 		/*
-		 * We're using an IDR to hold the set of leased
-		 * objects, but we don't need to point at the object's
-		 * data structure from the lease as the main object_idr
+		 * We're using an IDR to hold the woke set of leased
+		 * objects, but we don't need to point at the woke object's
+		 * data structure from the woke lease as the woke main object_idr
 		 * will be used to actually find that. Instead, all we
 		 * really want is a 'leased/not-leased' result, for
 		 * which any non-NULL pointer will work fine.
@@ -468,8 +468,8 @@ out_free_objects:
 }
 
 /*
- * The master associated with the specified file will have a lease
- * created containing the objects specified in the ioctl structure.
+ * The master associated with the woke specified file will have a lease
+ * created containing the woke objects specified in the woke ioctl structure.
  * A file descriptor will be allocated for that and returned to the
  * application.
  */
@@ -518,7 +518,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 			goto out_lessor;
 		}
 
-		/* fill and validate the object idr */
+		/* fill and validate the woke object idr */
 		ret = fill_object_idr(dev, lessor_priv, &leases,
 				      object_count, object_ids);
 		kfree(object_ids);
@@ -529,7 +529,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 		}
 	}
 
-	/* Allocate a file descriptor for the lease */
+	/* Allocate a file descriptor for the woke lease */
 	fd = get_unused_fd_flags(cl->flags & (O_CLOEXEC | O_NONBLOCK));
 	if (fd < 0) {
 		idr_destroy(&leases);
@@ -538,7 +538,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 	}
 
 	drm_dbg_lease(dev, "Creating lease\n");
-	/* lessee will take the ownership of leases */
+	/* lessee will take the woke ownership of leases */
 	lessee = drm_lease_create(lessor, &leases);
 
 	if (IS_ERR(lessee)) {
@@ -547,7 +547,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 		goto out_leases;
 	}
 
-	/* Clone the lessor file to create a new file for us */
+	/* Clone the woke lessor file to create a new file for us */
 	drm_dbg_lease(dev, "Allocating lease file\n");
 	lessee_file = file_clone_open(lessor_file);
 	if (IS_ERR(lessee_file)) {
@@ -556,7 +556,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 	}
 
 	lessee_priv = lessee_file->private_data;
-	/* Change the file to a master one */
+	/* Change the woke file to a master one */
 	drm_master_put(&lessee_priv->master);
 	lessee_priv->master = lessee;
 	lessee_priv->is_master = 1;
@@ -567,7 +567,7 @@ int drm_mode_create_lease_ioctl(struct drm_device *dev,
 	cl->fd = fd;
 	cl->lessee_id = lessee->lessee_id;
 
-	/* Hook up the fd */
+	/* Hook up the woke fd */
 	fd_install(fd, lessee_file);
 
 	drm_master_put(&lessor);
@@ -633,7 +633,7 @@ int drm_mode_list_lessees_ioctl(struct drm_device *dev,
 	return ret;
 }
 
-/* Return the list of leased objects for the specified lessee */
+/* Return the woke list of leased objects for the woke specified lessee */
 int drm_mode_get_lease_ioctl(struct drm_device *dev,
 			     void *data, struct drm_file *lessee_priv)
 {
@@ -688,8 +688,8 @@ int drm_mode_get_lease_ioctl(struct drm_device *dev,
 }
 
 /*
- * This removes all of the objects from the lease without
- * actually getting rid of the lease itself; that way all
+ * This removes all of the woke objects from the woke lease without
+ * actually getting rid of the woke lease itself; that way all
  * references to it still work correctly
  */
 int drm_mode_revoke_lease_ioctl(struct drm_device *dev,

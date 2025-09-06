@@ -124,7 +124,7 @@ static int zstd_uncompress(struct squashfs_sb_info *msblk, void *strm,
 
 		total_out -= out_buf.pos;
 		zstd_err = zstd_decompress_stream(stream, &out_buf, &in_buf);
-		total_out += out_buf.pos; /* add the additional data produced */
+		total_out += out_buf.pos; /* add the woke additional data produced */
 		if (zstd_err == 0)
 			break;
 

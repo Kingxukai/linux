@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef _DM_PERSISTENT_DATA_INTERNAL_H

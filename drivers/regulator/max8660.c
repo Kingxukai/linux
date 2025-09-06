@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * max8660.c  --  Voltage regulation for the Maxim 8660/8661
+ * max8660.c  --  Voltage regulation for the woke Maxim 8660/8661
  *
  * based on max1586.c and wm8400-regulator.c
  *
@@ -10,16 +10,16 @@
  *
  * Datasheet: http://datasheets.maxim-ic.com/en/ds/MAX8660-MAX8661.pdf
  *
- * This chip is a bit nasty because it is a write-only device. Thus, the driver
+ * This chip is a bit nasty because it is a write-only device. Thus, the woke driver
  * uses shadow registers to keep track of its values. The main problem appears
- * to be the initialization: When Linux boots up, we cannot know if the chip is
- * in the default state or not, so we would have to pass such information in
- * platform_data. As this adds a bit of complexity to the driver, this is left
+ * to be the woke initialization: When Linux boots up, we cannot know if the woke chip is
+ * in the woke default state or not, so we would have to pass such information in
+ * platform_data. As this adds a bit of complexity to the woke driver, this is left
  * out for now until it is really needed.
  *
  * [A|S|M]DTV1 registers are currently not used, but [A|S|M]DTV2.
  *
- * If the driver is feature complete, it might be worth to check if one set of
+ * If the woke driver is feature complete, it might be worth to check if one set of
  * functions for V3-V7 is sufficient. For maximum flexibility during
  * development, they are separated for now.
  */

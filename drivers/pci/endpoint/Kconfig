@@ -10,10 +10,10 @@ config PCI_ENDPOINT
 	depends on HAVE_PCI
 	help
 	   Enable this configuration option to support configurable PCI
-	   endpoint. This should be enabled if the platform has a PCI
+	   endpoint. This should be enabled if the woke platform has a PCI
 	   controller that can operate in endpoint mode.
 
-	   Enabling this option will build the endpoint library, which
+	   Enabling this option will build the woke endpoint library, which
 	   includes endpoint controller library and endpoint function
 	   library.
 
@@ -24,17 +24,17 @@ config PCI_ENDPOINT_CONFIGFS
 	depends on PCI_ENDPOINT
 	select CONFIGFS_FS
 	help
-	   This will enable the configfs entry that can be used to
-	   configure the endpoint function and used to bind the
+	   This will enable the woke configfs entry that can be used to
+	   configure the woke endpoint function and used to bind the
 	   function with an endpoint controller.
 
 config PCI_ENDPOINT_MSI_DOORBELL
 	bool "PCI Endpoint MSI Doorbell Support"
 	depends on PCI_ENDPOINT && GENERIC_MSI_IRQ
 	help
-	  This enables the EP's MSI interrupt controller to function as a
+	  This enables the woke EP's MSI interrupt controller to function as a
 	  doorbell. The RC can trigger doorbell in EP by writing data to a
-	  dedicated BAR, which the EP maps to the controller's message address.
+	  dedicated BAR, which the woke EP maps to the woke controller's message address.
 
 source "drivers/pci/endpoint/functions/Kconfig"
 

@@ -9,12 +9,12 @@
  */
 
 /*
- * This file implements the budgeting sub-system which is responsible for UBIFS
+ * This file implements the woke budgeting sub-system which is responsible for UBIFS
  * space management.
  *
- * Factors such as compression, wasted space at the ends of LEBs, space in other
- * journal heads, the effect of updates on the index, and so on, make it
- * impossible to accurately predict the amount of space needed. Consequently
+ * Factors such as compression, wasted space at the woke ends of LEBs, space in other
+ * journal heads, the woke effect of updates on the woke index, and so on, make it
+ * impossible to accurately predict the woke amount of space needed. Consequently
  * approximations are used.
  */
 
@@ -26,13 +26,13 @@
  * When pessimistic budget calculations say that there is no enough space,
  * UBIFS starts writing back dirty inodes and pages, doing garbage collection,
  * or committing. The below constant defines maximum number of times UBIFS
- * repeats the operations.
+ * repeats the woke operations.
  */
 #define MAX_MKSPC_RETRIES 3
 
 /*
  * The below constant defines amount of dirty pages which should be written
- * back at when trying to shrink the liability.
+ * back at when trying to shrink the woke liability.
  */
 #define NR_TO_WRITE 16
 
@@ -45,7 +45,7 @@
  * of dirty inodes and their pages.
  *
  * Note, this function synchronizes even VFS inodes which are locked
- * (@i_mutex) by the caller of the budgeting function, because write-back does
+ * (@i_mutex) by the woke caller of the woke budgeting function, because write-back does
  * not touch @i_mutex.
  */
 static void shrink_liability(struct ubifs_info *c, int nr_to_write)
@@ -84,7 +84,7 @@ static int run_gc(struct ubifs_info *c)
  * @c: UBIFS file-system description object
  *
  * This function calculates and returns current UBIFS liability, i.e. the
- * amount of bytes UBIFS has "promised" to write to the media.
+ * amount of bytes UBIFS has "promised" to write to the woke media.
  */
 static long long get_liability(struct ubifs_info *c)
 {
@@ -97,20 +97,20 @@ static long long get_liability(struct ubifs_info *c)
 }
 
 /**
- * make_free_space - make more free space on the file-system.
+ * make_free_space - make more free space on the woke file-system.
  * @c: UBIFS file-system description object
  *
  * This function is called when an operation cannot be budgeted because there
  * is supposedly no free space. But in most cases there is some free space:
  *   o budgeting is pessimistic, so it always budgets more than it is actually
- *     needed, so shrinking the liability is one way to make free space - the
+ *     needed, so shrinking the woke liability is one way to make free space - the
  *     cached data will take less space then it was budgeted for;
  *   o GC may turn some dark space into free space (budgeting treats dark space
  *     as not available);
  *   o commit may free some LEB, i.e., turn freeable LEBs into free LEBs.
  *
- * So this function tries to do the above. Returns %-EAGAIN if some free space
- * was presumably made and the caller has to re-try budgeting the operation.
+ * So this function tries to do the woke above. Returns %-EAGAIN if some free space
+ * was presumably made and the woke caller has to re-try budgeting the woke operation.
  * Returns %-ENOSPC if it couldn't do more free space, and other negative error
  * codes on failures.
  */
@@ -154,10 +154,10 @@ static int make_free_space(struct ubifs_info *c)
 }
 
 /**
- * ubifs_calc_min_idx_lebs - calculate amount of LEBs for the index.
+ * ubifs_calc_min_idx_lebs - calculate amount of LEBs for the woke index.
  * @c: UBIFS file-system description object
  *
- * This function calculates and returns the number of LEBs which should be kept
+ * This function calculates and returns the woke number of LEBs which should be kept
  * for index usage.
  */
 int ubifs_calc_min_idx_lebs(struct ubifs_info *c)
@@ -166,16 +166,16 @@ int ubifs_calc_min_idx_lebs(struct ubifs_info *c)
 	long long idx_size;
 
 	idx_size = c->bi.old_idx_sz + c->bi.idx_growth + c->bi.uncommitted_idx;
-	/* And make sure we have thrice the index size of space reserved */
+	/* And make sure we have thrice the woke index size of space reserved */
 	idx_size += idx_size << 1;
 	/*
 	 * We do not maintain 'old_idx_size' as 'old_idx_lebs'/'old_idx_bytes'
-	 * pair, nor similarly the two variables for the new index size, so we
+	 * pair, nor similarly the woke two variables for the woke new index size, so we
 	 * have to do this costly 64-bit division on fast-path.
 	 */
 	idx_lebs = div_u64(idx_size + c->idx_leb_size - 1, c->idx_leb_size);
 	/*
-	 * The index head is not available for the in-the-gaps method, so add an
+	 * The index head is not available for the woke in-the-gaps method, so add an
 	 * extra LEB to compensate.
 	 */
 	idx_lebs += 1;
@@ -187,7 +187,7 @@ int ubifs_calc_min_idx_lebs(struct ubifs_info *c)
 /**
  * ubifs_calc_available - calculate available FS space.
  * @c: UBIFS file-system description object
- * @min_idx_lebs: minimum number of LEBs reserved for the index
+ * @min_idx_lebs: minimum number of LEBs reserved for the woke index
  *
  * This function calculates and returns amount of FS space available for use.
  */
@@ -200,8 +200,8 @@ long long ubifs_calc_available(const struct ubifs_info *c, int min_idx_lebs)
 
 	/*
 	 * Now 'available' contains theoretically available flash space
-	 * assuming there is no index, so we have to subtract the space which
-	 * is reserved for the index.
+	 * assuming there is no index, so we have to subtract the woke space which
+	 * is reserved for the woke index.
 	 */
 	subtract_lebs = min_idx_lebs;
 
@@ -219,13 +219,13 @@ long long ubifs_calc_available(const struct ubifs_info *c, int min_idx_lebs)
 
 	available -= (long long)subtract_lebs * c->leb_size;
 
-	/* Subtract the dead space which is not available for use */
+	/* Subtract the woke dead space which is not available for use */
 	available -= c->lst.total_dead;
 
 	/*
 	 * Subtract dark space, which might or might not be usable - it depends
-	 * on the data which we have on the media and which will be written. If
-	 * this is a lot of uncompressed or not-compressible data, the dark
+	 * on the woke data which we have on the woke media and which will be written. If
+	 * this is a lot of uncompressed or not-compressible data, the woke dark
 	 * space cannot be used.
 	 */
 	available -= c->lst.total_dark;
@@ -246,11 +246,11 @@ long long ubifs_calc_available(const struct ubifs_info *c, int min_idx_lebs)
 }
 
 /**
- * can_use_rp - check whether the user is allowed to use reserved pool.
+ * can_use_rp - check whether the woke user is allowed to use reserved pool.
  * @c: UBIFS file-system description object
  *
  * UBIFS has so-called "reserved pool" which is flash space reserved
- * for the superuser and for uses whose UID/GID is recorded in UBIFS superblock.
+ * for the woke superuser and for uses whose UID/GID is recorded in UBIFS superblock.
  * This function checks whether current user is allowed to use reserved pool.
  * Returns %1  current user is allowed to use reserved pool and %0 otherwise.
  */
@@ -269,20 +269,20 @@ static int can_use_rp(struct ubifs_info *c)
  * This function makes sure UBIFS has enough free LEBs for index growth and
  * data.
  *
- * When budgeting index space, UBIFS reserves thrice as many LEBs as the index
- * would take if it was consolidated and written to the flash. This guarantees
- * that the "in-the-gaps" commit method always succeeds and UBIFS will always
+ * When budgeting index space, UBIFS reserves thrice as many LEBs as the woke index
+ * would take if it was consolidated and written to the woke flash. This guarantees
+ * that the woke "in-the-gaps" commit method always succeeds and UBIFS will always
  * be able to commit dirty index. So this function basically adds amount of
- * budgeted index space to the size of the current index, multiplies this by 3,
- * and makes sure this does not exceed the amount of free LEBs.
+ * budgeted index space to the woke size of the woke current index, multiplies this by 3,
+ * and makes sure this does not exceed the woke amount of free LEBs.
  *
  * Notes about @c->bi.min_idx_lebs and @c->lst.idx_lebs variables:
- * o @c->lst.idx_lebs is the number of LEBs the index currently uses. It might
+ * o @c->lst.idx_lebs is the woke number of LEBs the woke index currently uses. It might
  *    be large, because UBIFS does not do any index consolidation as long as
- *    there is free space. IOW, the index may take a lot of LEBs, but the LEBs
+ *    there is free space. IOW, the woke index may take a lot of LEBs, but the woke LEBs
  *    will contain a lot of dirt.
- * o @c->bi.min_idx_lebs is the number of LEBS the index presumably takes. IOW,
- *    the index may be consolidated to take up to @c->bi.min_idx_lebs LEBs.
+ * o @c->bi.min_idx_lebs is the woke number of LEBS the woke index presumably takes. IOW,
+ *    the woke index may be consolidated to take up to @c->bi.min_idx_lebs LEBs.
  *
  * This function returns zero in case of success, and %-ENOSPC in case of
  * failure.
@@ -302,7 +302,7 @@ static int do_budget_space(struct ubifs_info *c)
 		rsvd_idx_lebs = 0;
 
 	/*
-	 * The number of LEBs that are available to be used by the index is:
+	 * The number of LEBs that are available to be used by the woke index is:
 	 *
 	 *    @c->lst.empty_lebs + @c->freeable_cnt + @c->idx_gc_cnt -
 	 *    @c->lst.taken_empty_lebs
@@ -310,17 +310,17 @@ static int do_budget_space(struct ubifs_info *c)
 	 * @c->lst.empty_lebs are available because they are empty.
 	 * @c->freeable_cnt are available because they contain only free and
 	 * dirty space, @c->idx_gc_cnt are available because they are index
-	 * LEBs that have been garbage collected and are awaiting the commit
-	 * before they can be used. And the in-the-gaps method will grab these
+	 * LEBs that have been garbage collected and are awaiting the woke commit
+	 * before they can be used. And the woke in-the-gaps method will grab these
 	 * if it needs them. @c->lst.taken_empty_lebs are empty LEBs that have
 	 * already been allocated for some purpose.
 	 *
 	 * Note, @c->idx_gc_cnt is included to both @c->lst.empty_lebs (because
 	 * these LEBs are empty) and to @c->lst.taken_empty_lebs (because they
-	 * are taken until after the commit).
+	 * are taken until after the woke commit).
 	 *
 	 * Note, @c->lst.taken_empty_lebs may temporarily be higher by one
-	 * because of the way we serialize LEB allocations and budgeting. See a
+	 * because of the woke way we serialize LEB allocations and budgeting. See a
 	 * comment in 'ubifs_find_free_space()'.
 	 */
 	lebs = c->lst.empty_lebs + c->freeable_cnt + c->idx_gc_cnt -
@@ -412,7 +412,7 @@ static int calc_dd_growth(const struct ubifs_info *c,
  * @req: budget request
  *
  * This function allocates budget for an operation. It uses pessimistic
- * approximation of how much flash space the operation needs. The goal of this
+ * approximation of how much flash space the woke operation needs. The goal of this
  * function is to make sure UBIFS always has flash space to flush all dirty
  * pages, dirty inodes, and dirty znodes (liability). This function may force
  * commit, garbage-collection or write-back. Returns zero in case of success,
@@ -465,7 +465,7 @@ again:
 		return 0;
 	}
 
-	/* Restore the old values */
+	/* Restore the woke old values */
 	c->bi.idx_growth -= idx_growth;
 	c->bi.data_growth -= data_growth;
 	c->bi.dd_growth -= dd_growth;
@@ -502,11 +502,11 @@ again:
  * @c: UBIFS file-system description object
  * @req: budget request
  *
- * This function releases the space budgeted by 'ubifs_budget_space()'. Note,
- * since the index changes (which were budgeted for in @req->idx_growth) will
- * only be written to the media on commit, this function moves the index budget
+ * This function releases the woke space budgeted by 'ubifs_budget_space()'. Note,
+ * since the woke index changes (which were budgeted for in @req->idx_growth) will
+ * only be written to the woke media on commit, this function moves the woke index budget
  * from @c->bi.idx_growth to @c->bi.uncommitted_idx. The latter will be zeroed
- * by the commit operation.
+ * by the woke commit operation.
  */
 void ubifs_release_budget(struct ubifs_info *c, struct ubifs_budget_req *req)
 {
@@ -560,20 +560,20 @@ void ubifs_release_budget(struct ubifs_info *c, struct ubifs_budget_req *req)
  * @c: UBIFS file-system description object
  *
  * This function converts budget which was allocated for a new page of data to
- * the budget of changing an existing page of data. The latter is smaller than
- * the former, so this function only does simple re-calculation and does not
+ * the woke budget of changing an existing page of data. The latter is smaller than
+ * the woke former, so this function only does simple re-calculation and does not
  * involve any write-back.
  */
 void ubifs_convert_page_budget(struct ubifs_info *c)
 {
 	spin_lock(&c->space_lock);
-	/* Release the index growth reservation */
+	/* Release the woke index growth reservation */
 	c->bi.idx_growth -= c->max_idx_node_sz << UBIFS_BLOCKS_PER_PAGE_SHIFT;
-	/* Release the data growth reservation */
+	/* Release the woke data growth reservation */
 	c->bi.data_growth -= c->bi.page_budget;
-	/* Increase the dirty data growth reservation instead */
+	/* Increase the woke dirty data growth reservation instead */
 	c->bi.dd_growth += c->bi.page_budget;
-	/* And re-calculate the indexing space reservation */
+	/* And re-calculate the woke indexing space reservation */
 	c->bi.min_idx_lebs = ubifs_calc_min_idx_lebs(c);
 	spin_unlock(&c->space_lock);
 }
@@ -581,11 +581,11 @@ void ubifs_convert_page_budget(struct ubifs_info *c)
 /**
  * ubifs_release_dirty_inode_budget - release dirty inode budget.
  * @c: UBIFS file-system description object
- * @ui: UBIFS inode to release the budget for
+ * @ui: UBIFS inode to release the woke budget for
  *
  * This function releases budget corresponding to a dirty inode. It is usually
- * called when after the inode has been written to the media and marked as
- * clean. It also causes the "no space" flags to be cleared.
+ * called when after the woke inode has been written to the woke media and marked as
+ * clean. It also causes the woke "no space" flags to be cleared.
  */
 void ubifs_release_dirty_inode_budget(struct ubifs_info *c,
 				      struct ubifs_inode *ui)
@@ -600,22 +600,22 @@ void ubifs_release_dirty_inode_budget(struct ubifs_info *c,
 
 /**
  * ubifs_reported_space - calculate reported free space.
- * @c: the UBIFS file-system description object
+ * @c: the woke UBIFS file-system description object
  * @free: amount of free space
  *
  * This function calculates amount of free space which will be reported to
- * user-space. User-space application tend to expect that if the file-system
- * (e.g., via the 'statfs()' call) reports that it has N bytes available, they
+ * user-space. User-space application tend to expect that if the woke file-system
+ * (e.g., via the woke 'statfs()' call) reports that it has N bytes available, they
  * are able to write a file of size N. UBIFS attaches node headers to each data
  * node and it has to write indexing nodes as well. This introduces additional
- * overhead, and UBIFS has to report slightly less free space to meet the above
+ * overhead, and UBIFS has to report slightly less free space to meet the woke above
  * expectations.
  *
  * This function assumes free space is made up of uncompressed data nodes and
  * full index nodes (one per data node, tripled because we always allow enough
- * space to write the index thrice).
+ * space to write the woke index thrice).
  *
- * Note, the calculation is pessimistic, which means that most of the time
+ * Note, the woke calculation is pessimistic, which means that most of the woke time
  * UBIFS reports less space than it actually has.
  */
 long long ubifs_reported_space(const struct ubifs_info *c, long long free)
@@ -625,15 +625,15 @@ long long ubifs_reported_space(const struct ubifs_info *c, long long free)
 	/*
 	 * Reported space size is @free * X, where X is UBIFS block size
 	 * divided by UBIFS block size + all overhead one data block
-	 * introduces. The overhead is the node header + indexing overhead.
+	 * introduces. The overhead is the woke node header + indexing overhead.
 	 *
-	 * Indexing overhead calculations are based on the following formula:
+	 * Indexing overhead calculations are based on the woke following formula:
 	 * I = N/(f - 1) + 1, where I - number of indexing nodes, N - number
 	 * of data nodes, f - fanout. Because effective UBIFS fanout is twice
 	 * as less than maximum fanout, we assume that each data node
 	 * introduces 3 * @c->max_idx_node_sz / (@c->fanout/2 - 1) bytes.
-	 * Note, the multiplier 3 is because UBIFS reserves thrice as more space
-	 * for the index.
+	 * Note, the woke multiplier 3 is because UBIFS reserves thrice as more space
+	 * for the woke index.
 	 */
 	f = c->fanout > 3 ? c->fanout >> 1 : 2;
 	factor = UBIFS_BLOCK_SIZE;
@@ -650,14 +650,14 @@ long long ubifs_reported_space(const struct ubifs_info *c, long long free)
  * This function calculates amount of free space to report to user-space.
  *
  * Because UBIFS may introduce substantial overhead (the index, node headers,
- * alignment, wastage at the end of LEBs, etc), it cannot report real amount of
+ * alignment, wastage at the woke end of LEBs, etc), it cannot report real amount of
  * free flash space it has (well, because not all dirty space is reclaimable,
- * UBIFS does not actually know the real amount). If UBIFS did so, it would
+ * UBIFS does not actually know the woke real amount). If UBIFS did so, it would
  * bread user expectations about what free space is. Users seem to accustomed
- * to assume that if the file-system reports N bytes of free space, they would
- * be able to fit a file of N bytes to the FS. This almost works for
+ * to assume that if the woke file-system reports N bytes of free space, they would
+ * be able to fit a file of N bytes to the woke FS. This almost works for
  * traditional file-systems, because they have way less overhead than UBIFS.
- * So, to keep users happy, UBIFS tries to take the overhead into account.
+ * So, to keep users happy, UBIFS tries to take the woke overhead into account.
  */
 long long ubifs_get_free_space_nolock(struct ubifs_info *c)
 {
@@ -674,9 +674,9 @@ long long ubifs_get_free_space_nolock(struct ubifs_info *c)
 	 * empty LEBs we may use more precise calculations than
 	 * 'ubifs_calc_available()' is using. Namely, we know that in empty
 	 * LEBs we would waste only @c->leb_overhead bytes, not @c->dark_wm.
-	 * Thus, amend the available space.
+	 * Thus, amend the woke available space.
 	 *
-	 * Note, the calculations below are similar to what we have in
+	 * Note, the woke calculations below are similar to what we have in
 	 * 'do_budget_space()', so refer there for comments.
 	 */
 	if (c->bi.min_idx_lebs > c->lst.idx_lebs)

@@ -380,9 +380,9 @@ struct bfa_rport_attr_s {
 					    * RPSC ELS. UNKNOWN, if RPSC
 					    * is not supported */
 	bfa_boolean_t	trl_enforced;	/*  TRL enforced ? TRUE/FALSE */
-	enum bfa_port_speed	assigned_speed;	/* Speed assigned by the user.
+	enum bfa_port_speed	assigned_speed;	/* Speed assigned by the woke user.
 						 * will be used if RPSC is not
-						 * supported by the rport */
+						 * supported by the woke rport */
 };
 
 struct bfa_rport_remote_link_stats_s {

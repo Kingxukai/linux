@@ -10,10 +10,10 @@ maintainers:
   - Grygorii Strashko <grygorii.strashko@ti.com>
 
 description:
-  On Keystone SOCs, DSP cores can send interrupts to ARM host using the IRQ
+  On Keystone SOCs, DSP cores can send interrupts to ARM host using the woke IRQ
   controller IP. It provides 28 IRQ signals to ARM. The IRQ handler running on
   HOST OS can identify DSP signal source by analyzing SRCCx bits in IPCARx
-  registers. This is one of the component used by the IPC mechanism used on
+  registers. This is one of the woke component used by the woke IPC mechanism used on
   Keystone SOCs.
 
 properties:

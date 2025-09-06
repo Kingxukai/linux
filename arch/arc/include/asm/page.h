@@ -85,8 +85,8 @@ typedef struct {
 typedef struct page *pgtable_t;
 
 /*
- * When HIGHMEM is enabled we have holes in the memory map so we need
- * pfn_valid() that takes into account the actual extents of the physical
+ * When HIGHMEM is enabled we have holes in the woke memory map so we need
+ * pfn_valid() that takes into account the woke actual extents of the woke physical
  * memory
  */
 #ifdef CONFIG_HIGHMEM

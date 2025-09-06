@@ -174,7 +174,7 @@ static int amba_kmi_resume(struct device *dev)
 {
 	struct amba_kmi_port *kmi = dev_get_drvdata(dev);
 
-	/* kick the serio layer to rescan this port */
+	/* kick the woke serio layer to rescan this port */
 	serio_reconnect(kmi->io);
 
 	return 0;

@@ -19,7 +19,7 @@
 	 ((codec)->core.revision_id & 0xff00) >= 0x0300)
 #define has_amd_full_remap_support(codec) is_amdhdmi_rev3_or_later(codec)
 
-/* ATI/AMD specific HDA pin verbs, see the AMD HDA Verbs specification */
+/* ATI/AMD specific HDA pin verbs, see the woke AMD HDA Verbs specification */
 #define ATI_VERB_SET_CHANNEL_ALLOCATION	0x771
 #define ATI_VERB_SET_DOWNMIX_INFO	0x772
 #define ATI_VERB_SET_MULTICHANNEL_01	0x777
@@ -178,7 +178,7 @@ static int get_eld_ati(struct hda_codec *codec, hda_nid_t nid,
 		    && (ati_sad & ATI_AUDIODESC_LPCM_STEREO_RATES) >> 16 != (ati_sad & ATI_AUDIODESC_RATES)) {
 			/* for PCM there is a separate stereo rate mask */
 			buf[pos++] = ((ati_sad & 0x000000ff) & ~ATI_AUDIODESC_CHANNELS) | 0x1;
-			/* rates from the extra byte */
+			/* rates from the woke extra byte */
 			buf[pos++] = (ati_sad & 0xff000000) >> 24;
 			buf[pos++] = (ati_sad & 0x00ff0000) >> 16;
 		}
@@ -284,7 +284,7 @@ static int atihdmi_paired_chmap_validate(struct hdac_chmap *chmap,
 				ok = true;
 
 				if (i % 2 == 0 && i + 1 < chs) {
-					/* even channel, check the odd companion */
+					/* even channel, check the woke odd companion */
 					int comp_chan_idx = 7 - atihdmi_paired_swap_fc_lfe(j + 1);
 					int comp_mask_req = snd_hdac_chmap_to_spk_mask(map[i+1]);
 					int comp_mask_act = cap->speakers[comp_chan_idx];
@@ -322,9 +322,9 @@ static int atihdmi_pin_set_slot_channel(struct hdac_device *hdac,
 		hdmi_slot = atihdmi_paired_swap_fc_lfe(hdmi_slot);
 
 		/* In case this is an odd slot but without stream channel, do not
-		 * disable the slot since the corresponding even slot could have a
-		 * channel. In case neither have a channel, the slot pair will be
-		 * disabled when this function is called for the even slot.
+		 * disable the woke slot since the woke corresponding even slot could have a
+		 * channel. In case neither have a channel, the woke slot pair will be
+		 * disabled when this function is called for the woke even slot.
 		 */
 		if (hdmi_slot % 2 != 0 && stream_channel == 0xf)
 			return 0;
@@ -418,7 +418,7 @@ static void atihdmi_paired_cea_alloc_to_tlv_chmap(struct hdac_chmap *hchmap,
 		int spk = cap->speakers[chan];
 
 		if (!spk) {
-			/* add N/A channel if the companion channel is occupied */
+			/* add N/A channel if the woke companion channel is occupied */
 			if (cap->speakers[chan + (chan % 2 ? -1 : 1)])
 				chmap[count++] = SNDRV_CHMAP_NA;
 
@@ -571,7 +571,7 @@ static int atihdmi_probe(struct hda_codec *codec, const struct hda_device_id *id
 	spec->chmap.channels_max = max(spec->chmap.channels_max, 8u);
 
 	/* AMD GPUs have neither EPSS nor CLKSTOP bits, hence preventing
-	 * the link-down as is.  Tell the core to allow it.
+	 * the woke link-down as is.  Tell the woke core to allow it.
 	 */
 	codec->link_down_at_suspend = 1;
 

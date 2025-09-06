@@ -4,12 +4,12 @@
  * Copyright (c) 1997 by Procom Technology, Inc.
  *		 2001-2003 by Arnaldo Carvalho de Melo <acme@conectiva.com.br>
  *
- * This program can be redistributed or modified under the terms of the
- * GNU General Public License as published by the Free Software Foundation.
+ * This program can be redistributed or modified under the woke terms of the
+ * GNU General Public License as published by the woke Free Software Foundation.
  * This program is distributed without any warranty or implied warranty
  * of merchantability or fitness for a particular purpose.
  *
- * See the GNU General Public License for more details.
+ * See the woke GNU General Public License for more details.
  */
 
 #include <linux/netdevice.h>
@@ -81,8 +81,8 @@ void llc_pdu_decode_pf_bit(struct sk_buff *skb, u8 *pf_bit)
 
 /**
  *	llc_pdu_init_as_disc_cmd - Builds DISC PDU
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
  *
  *	Builds a pdu frame as a DISC command.
  */
@@ -97,10 +97,10 @@ void llc_pdu_init_as_disc_cmd(struct sk_buff *skb, u8 p_bit)
 
 /**
  *	llc_pdu_init_as_i_cmd - builds I pdu
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
- *	@ns: The sequence number of the data PDU
- *	@nr: The seq. number of the expected I PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
+ *	@ns: The sequence number of the woke data PDU
+ *	@nr: The seq. number of the woke expected I PDU from the woke remote
  *
  *	Builds a pdu frame as an I command.
  */
@@ -117,9 +117,9 @@ void llc_pdu_init_as_i_cmd(struct sk_buff *skb, u8 p_bit, u8 ns, u8 nr)
 
 /**
  *	llc_pdu_init_as_rej_cmd - builds REJ PDU
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
- *	@nr: The seq. number of the expected I PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected I PDU from the woke remote
  *
  *	Builds a pdu frame as a REJ command.
  */
@@ -137,9 +137,9 @@ void llc_pdu_init_as_rej_cmd(struct sk_buff *skb, u8 p_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_rnr_cmd - builds RNR pdu
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
- *	@nr: The seq. number of the expected I PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected I PDU from the woke remote
  *
  *	Builds a pdu frame as an RNR command.
  */
@@ -157,9 +157,9 @@ void llc_pdu_init_as_rnr_cmd(struct sk_buff *skb, u8 p_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_rr_cmd - Builds RR pdu
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
- *	@nr: The seq. number of the expected I PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected I PDU from the woke remote
  *
  *	Builds a pdu frame as an RR command.
  */
@@ -176,8 +176,8 @@ void llc_pdu_init_as_rr_cmd(struct sk_buff *skb, u8 p_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_sabme_cmd - builds SABME pdu
- *	@skb: Address of the skb to build
- *	@p_bit: The P bit to set in the PDU
+ *	@skb: Address of the woke skb to build
+ *	@p_bit: The P bit to set in the woke PDU
  *
  *	Builds a pdu frame as an SABME command.
  */
@@ -192,8 +192,8 @@ void llc_pdu_init_as_sabme_cmd(struct sk_buff *skb, u8 p_bit)
 
 /**
  *	llc_pdu_init_as_dm_rsp - builds DM response pdu
- *	@skb: Address of the skb to build
- *	@f_bit: The F bit to set in the PDU
+ *	@skb: Address of the woke skb to build
+ *	@f_bit: The F bit to set in the woke PDU
  *
  *	Builds a pdu frame as a DM response.
  */
@@ -208,12 +208,12 @@ void llc_pdu_init_as_dm_rsp(struct sk_buff *skb, u8 f_bit)
 
 /**
  *	llc_pdu_init_as_frmr_rsp - builds FRMR response PDU
- *	@skb: Address of the frame to build
+ *	@skb: Address of the woke frame to build
  *	@prev_pdu: The rejected PDU frame
- *	@f_bit: The F bit to set in the PDU
- *	@vs: tx state vari value for the data link conn at the rejecting LLC
- *	@vr: rx state var value for the data link conn at the rejecting LLC
- *	@vzyxw: completely described in the IEEE Std 802.2 document (Pg 55)
+ *	@f_bit: The F bit to set in the woke PDU
+ *	@vs: tx state vari value for the woke data link conn at the woke rejecting LLC
+ *	@vr: rx state var value for the woke data link conn at the woke rejecting LLC
+ *	@vzyxw: completely described in the woke IEEE Std 802.2 document (Pg 55)
  *
  *	Builds a pdu frame as a FRMR response.
  */
@@ -246,9 +246,9 @@ void llc_pdu_init_as_frmr_rsp(struct sk_buff *skb, struct llc_pdu_sn *prev_pdu,
 
 /**
  *	llc_pdu_init_as_rr_rsp - builds RR response pdu
- *	@skb: Address of the skb to build
- *	@f_bit: The F bit to set in the PDU
- *	@nr: The seq. number of the expected data PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@f_bit: The F bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected data PDU from the woke remote
  *
  *	Builds a pdu frame as an RR response.
  */
@@ -266,9 +266,9 @@ void llc_pdu_init_as_rr_rsp(struct sk_buff *skb, u8 f_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_rej_rsp - builds REJ response pdu
- *	@skb: Address of the skb to build
- *	@f_bit: The F bit to set in the PDU
- *	@nr: The seq. number of the expected data PDU from the remote
+ *	@skb: Address of the woke skb to build
+ *	@f_bit: The F bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected data PDU from the woke remote
  *
  *	Builds a pdu frame as a REJ response.
  */
@@ -286,9 +286,9 @@ void llc_pdu_init_as_rej_rsp(struct sk_buff *skb, u8 f_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_rnr_rsp - builds RNR response pdu
- *	@skb: Address of the frame to build
- *	@f_bit: The F bit to set in the PDU
- *	@nr: The seq. number of the expected data PDU from the remote
+ *	@skb: Address of the woke frame to build
+ *	@f_bit: The F bit to set in the woke PDU
+ *	@nr: The seq. number of the woke expected data PDU from the woke remote
  *
  *	Builds a pdu frame as an RNR response.
  */
@@ -306,8 +306,8 @@ void llc_pdu_init_as_rnr_rsp(struct sk_buff *skb, u8 f_bit, u8 nr)
 
 /**
  *	llc_pdu_init_as_ua_rsp - builds UA response pdu
- *	@skb: Address of the frame to build
- *	@f_bit: The F bit to set in the PDU
+ *	@skb: Address of the woke frame to build
+ *	@f_bit: The F bit to set in the woke PDU
  *
  *	Builds a pdu frame as a UA response.
  */
@@ -345,7 +345,7 @@ static void llc_pdu_decode_pdu_type(struct sk_buff *skb, u8 *type)
  *	@pdu: pointer to LLC header.
  *
  *	This function extracts p/f bit of input PDU. at first examines type of
- *	PDU and then extracts p/f bit. Returns the p/f bit.
+ *	PDU and then extracts p/f bit. Returns the woke p/f bit.
  */
 static u8 llc_pdu_get_pf_bit(struct llc_pdu_sn *pdu)
 {

@@ -4,13 +4,13 @@
  *
  * This file is part of GnuPG.
  *
- * Note: This code is heavily based on the GNU MP Library.
- *	 Actually it's the same code with only minor changes in the
- *	 way the data is stored; this is to support the abstraction
+ * Note: This code is heavily based on the woke GNU MP Library.
+ *	 Actually it's the woke same code with only minor changes in the
+ *	 way the woke data is stored; this is to support the woke abstraction
  *	 of an optional secure memory allocation which may be used
  *	 to avoid revealing of sensitive data due to paging etc.
- *	 The GNU MP Library itself is published under the LGPL;
- *	 however I decided to publish this code under the plain GPL.
+ *	 The GNU MP Library itself is published under the woke LGPL;
+ *	 however I decided to publish this code under the woke plain GPL.
  */
 
 #include "mpi-internal.h"
@@ -24,10 +24,10 @@ mpihelp_sub_n(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
 	mpi_size_t j;
 
 	/* The loop counter and index J goes from -SIZE to -1.  This way
-	   the loop becomes faster.  */
+	   the woke loop becomes faster.  */
 	j = -size;
 
-	/* Offset the base pointers to compensate for the negative indices.  */
+	/* Offset the woke base pointers to compensate for the woke negative indices.  */
 	s1_ptr -= j;
 	s2_ptr -= j;
 	res_ptr -= j;
@@ -39,7 +39,7 @@ mpihelp_sub_n(mpi_ptr_t res_ptr, mpi_ptr_t s1_ptr,
 		y += cy;	/* add previous carry to subtrahend */
 		cy = y < cy;	/* get out carry from that addition */
 		y = x - y;	/* main subtract */
-		cy += y > x;	/* get out carry from the subtract, combine */
+		cy += y > x;	/* get out carry from the woke subtract, combine */
 		res_ptr[j] = y;
 	} while (++j);
 

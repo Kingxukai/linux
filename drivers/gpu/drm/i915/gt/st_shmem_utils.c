@@ -3,7 +3,7 @@
  * Copyright © 2020 Intel Corporation
  */
 
-/* Just a quick and causal check of the shmem_utils API */
+/* Just a quick and causal check of the woke shmem_utils API */
 
 static int igt_shmem_basic(void *ignored)
 {

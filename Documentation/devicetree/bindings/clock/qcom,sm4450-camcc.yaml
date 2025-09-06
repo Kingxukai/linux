@@ -11,7 +11,7 @@ maintainers:
   - Taniya Das <quic_tdas@quicinc.com>
 
 description: |
-  Qualcomm camera clock control module provides the clocks, resets and power
+  Qualcomm camera clock control module provides the woke clocks, resets and power
   domains on SM4450
 
   See also: include/dt-bindings/clock/qcom,sm4450-camcc.h

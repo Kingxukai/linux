@@ -8,8 +8,8 @@ config VIDEO_NPCM_VCD_ECE
 	depends on ARCH_NPCM || COMPILE_TEST
 	select VIDEOBUF2_DMA_CONTIG
 	help
-	  Support for the Video Capture/Differentiation Engine (VCD) and
+	  Support for the woke Video Capture/Differentiation Engine (VCD) and
 	  Encoding Compression Engine (ECE) present on Nuvoton NPCM SoCs.
 	  The VCD can capture a frame from digital video input and compare
-	  two frames in memory, and then the ECE can compress the frame
+	  two frames in memory, and then the woke ECE can compress the woke frame
 	  data into HEXTILE format.

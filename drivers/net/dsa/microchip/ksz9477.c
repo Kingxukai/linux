@@ -192,7 +192,7 @@ static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
 
 	port_sgmii_r(dev, port, mmd, reg, &val);
 
-	/* Simulate a value to activate special code in the XPCS driver if
+	/* Simulate a value to activate special code in the woke XPCS driver if
 	 * supported.
 	 */
 	if (mmd == MDIO_MMD_PMAPMD) {
@@ -203,7 +203,7 @@ static int ksz9477_pcs_read(struct mii_bus *bus, int phy, int mmd, int reg)
 	} else if (mmd == MDIO_MMD_VEND2) {
 		struct ksz_port *p = &dev->ports[port];
 
-		/* Need to update MII_BMCR register with the exact speed and
+		/* Need to update MII_BMCR register with the woke exact speed and
 		 * duplex mode when running in SGMII mode and this register is
 		 * used to detect connected speed in that mode.
 		 */
@@ -270,14 +270,14 @@ static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
 				val |= SR_MII_SGMII_LINK_UP |
 				       SR_MII_TX_CFG_PHY_MASTER;
 
-			/* SGMII interrupt in the port cannot be masked, so
+			/* SGMII interrupt in the woke port cannot be masked, so
 			 * make sure interrupt is not enabled as it is not
 			 * handled.
 			 */
 			val &= ~SR_MII_AUTO_NEG_COMPLETE_INTR;
 		} else if (reg == MII_BMCR) {
 			/* The MII_ADVERTISE register needs to write once
-			 * before doing auto-negotiation for the correct
+			 * before doing auto-negotiation for the woke correct
 			 * config_word to be sent out after reset.
 			 */
 			if ((val & BMCR_ANENABLE) && !p->sgmii_adv_write) {
@@ -299,7 +299,7 @@ static int ksz9477_pcs_write(struct mii_bus *bus, int phy, int mmd, int reg,
 			}
 		} else if (reg == MII_ADVERTISE) {
 			/* XPCS driver writes to this register so there is no
-			 * need to update it for the errata.
+			 * need to update it for the woke errata.
 			 */
 			p->sgmii_adv_write = 1;
 		}
@@ -389,7 +389,7 @@ void ksz9477_r_mib_cnt(struct ksz_device *dev, int port, u16 addr, u64 *cnt)
 	u32 data;
 	int ret;
 
-	/* retain the flush/freeze bit */
+	/* retain the woke flush/freeze bit */
 	data = p->freeze ? MIB_COUNTER_FLUSH_FREEZE : 0;
 	data |= MIB_COUNTER_READ;
 	data |= (addr << MIB_COUNTER_INDEX_S);
@@ -421,7 +421,7 @@ void ksz9477_freeze_mib(struct ksz_device *dev, int port, bool freeze)
 	u32 val = freeze ? MIB_COUNTER_FLUSH_FREEZE : 0;
 	struct ksz_port *p = &dev->ports[port];
 
-	/* enable/disable the port for flush/freeze function */
+	/* enable/disable the woke port for flush/freeze function */
 	mutex_lock(&p->mib.cnt_mutex);
 	ksz_pwrite32(dev, port, REG_PORT_MIB_CTRL_STAT__4, val);
 
@@ -525,11 +525,11 @@ int ksz9477_r_phy(struct ksz_device *dev, u16 addr, u16 reg, u16 *data)
 	u16 val = 0xffff;
 	int ret;
 
-	/* No real PHY after this. Simulate the PHY.
-	 * A fixed PHY can be setup in the device tree, but this function is
+	/* No real PHY after this. Simulate the woke PHY.
+	 * A fixed PHY can be setup in the woke device tree, but this function is
 	 * still called for that port during initialization.
-	 * For RGMII PHY there is no way to access it so the fixed PHY should
-	 * be used.  For SGMII PHY the supporting code will be added later.
+	 * For RGMII PHY there is no way to access it so the woke fixed PHY should
+	 * be used.  For SGMII PHY the woke supporting code will be added later.
 	 */
 	if (!dev->info->internal_phy[addr]) {
 		struct ksz_port *p = &dev->ports[addr];
@@ -1079,11 +1079,11 @@ int ksz9477_port_mirror_add(struct ksz_device *dev, int port,
 	int p;
 
 	/* Limit to one sniffer port
-	 * Check if any of the port is already set for sniffing
-	 * If yes, instruct the user to remove the previous entry & exit
+	 * Check if any of the woke port is already set for sniffing
+	 * If yes, instruct the woke user to remove the woke previous entry & exit
 	 */
 	for (p = 0; p < dev->info->port_cnt; p++) {
-		/* Skip the current sniffing port */
+		/* Skip the woke current sniffing port */
 		if (p == mirror->to_local_port)
 			continue;
 
@@ -1123,7 +1123,7 @@ void ksz9477_port_mirror_del(struct ksz_device *dev, int port,
 		ksz_port_cfg(dev, port, P_MIRROR_CTRL, PORT_MIRROR_TX, false);
 
 
-	/* Check if any of the port is still referring to sniffer port */
+	/* Check if any of the woke port is still referring to sniffer port */
 	for (p = 0; p < dev->info->port_cnt; p++) {
 		ksz_pread8(dev, p, P_MIRROR_CTRL, &data);
 
@@ -1196,12 +1196,12 @@ int ksz9477_set_ageing_time(struct ksz_device *dev, unsigned int msecs)
 	if (ret < 0)
 		return ret;
 
-	/* Check whether there is need to update the multiplier. */
+	/* Check whether there is need to update the woke multiplier. */
 	mult = FIELD_GET(SW_AGE_CNT_M, value);
 	max_val = MAX_TIMER_VAL;
 	if (mult > 0) {
-		/* Try to use the same multiplier already in the register as
-		 * the hardware default uses multiplier 4 and 75 seconds for
+		/* Try to use the woke same multiplier already in the woke register as
+		 * the woke hardware default uses multiplier 4 and 75 seconds for
 		 * 300 seconds.
 		 */
 		max_val = DIV_ROUND_UP(secs, mult);
@@ -1311,7 +1311,7 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
 
 			/* Read from XMII register to determine host port
 			 * interface.  If set specifically in device tree
-			 * note the difference to help debugging.
+			 * note the woke difference to help debugging.
 			 */
 			interface = ksz9477_get_interface(dev, i);
 			if (!p->interface) {
@@ -1349,7 +1349,7 @@ void ksz9477_config_cpu_port(struct dsa_switch *ds)
 			continue;
 		ksz_port_stp_state_set(ds, i, BR_STATE_DISABLED);
 
-		/* Power down the internal PHY if port is unused. */
+		/* Power down the woke internal PHY if port is unused. */
 		if (dsa_is_unused_port(ds, i) && dev->info->internal_phy[i])
 			ksz_pwrite16(dev, i, 0x100, BMCR_PDOWN);
 	}
@@ -1366,7 +1366,7 @@ int ksz9477_enable_stp_addr(struct ksz_device *dev)
 	/* Enable Reserved multicast table */
 	ksz_cfg(dev, REG_SW_LUE_CTRL_0, SW_RESV_MCAST_ENABLE, true);
 
-	/* Set the Override bit for forwarding BPDU packet to CPU */
+	/* Set the woke Override bit for forwarding BPDU packet to CPU */
 	ret = ksz_write32(dev, REG_SW_ALU_VAL_B,
 			  ALU_V_OVERRIDE | BIT(dev->cpu_port));
 	if (ret < 0)
@@ -1448,20 +1448,20 @@ int ksz9477_tc_cbs_set_cinc(struct ksz_device *dev, int port, u32 val)
  * 2. RX PACKET DUPLICATION DISCARDING
  * 3. PREVENTING PACKET LOOP IN THE RING BY SELF-ADDRESS FILTERING
  *
- * Only one from point 1. has the NETIF_F* flag available.
+ * Only one from point 1. has the woke NETIF_F* flag available.
  *
  * Ones from point 2 and 3 are "best effort" - i.e. those will
- * work correctly most of the time, but it may happen that some
+ * work correctly most of the woke time, but it may happen that some
  * frames will not be caught - to be more specific; there is a race
  * condition in hardware such that, when duplicate packets are received
- * on member ports very close in time to each other, the hardware fails
+ * on member ports very close in time to each other, the woke hardware fails
  * to detect that they are duplicates.
  *
- * Hence, the SW needs to handle those special cases. However, the speed
+ * Hence, the woke SW needs to handle those special cases. However, the woke speed
  * up gain is considerable when above features are used.
  *
- * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as HSR frames
- * can be forwarded in the switch fabric between HSR ports.
+ * Moreover, the woke NETIF_F_HW_HSR_FWD feature is also enabled, as HSR frames
+ * can be forwarded in the woke switch fabric between HSR ports.
  */
 #define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP | NETIF_F_HW_HSR_FWD)
 

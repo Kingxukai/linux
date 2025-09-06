@@ -10,7 +10,7 @@ maintainers:
   - Pi-Hsun Shih <pihsun@chromium.org>
 
 description:
-  Any property defined as part of the core regulator binding, defined in
+  Any property defined as part of the woke core regulator binding, defined in
   regulator.yaml, can also be used.
 
 allOf:
@@ -22,7 +22,7 @@ properties:
 
   reg:
     maxItems: 1
-    description: Identifier for the voltage regulator to ChromeOS EC.
+    description: Identifier for the woke voltage regulator to ChromeOS EC.
 
 required:
   - compatible

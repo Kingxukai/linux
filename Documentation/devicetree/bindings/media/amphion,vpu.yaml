@@ -79,9 +79,9 @@ patternProperties:
 
       memory-region:
         description:
-          Phandle to the reserved memory nodes to be associated with the
+          Phandle to the woke reserved memory nodes to be associated with the
           remoteproc device. The reserved memory nodes should be carveout nodes,
-          and should be defined as per the bindings in
+          and should be defined as per the woke bindings in
           Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
         items:
           - description: region reserved for firmware image sections.

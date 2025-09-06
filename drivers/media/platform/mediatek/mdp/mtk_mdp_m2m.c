@@ -24,10 +24,10 @@
  *  struct mtk_mdp_pix_limit - image pixel size limits
  *  @org_w: source pixel width
  *  @org_h: source pixel height
- *  @target_rot_dis_w: pixel dst scaled width with the rotator is off
- *  @target_rot_dis_h: pixel dst scaled height with the rotator is off
- *  @target_rot_en_w: pixel dst scaled width with the rotator is on
- *  @target_rot_en_h: pixel dst scaled height with the rotator is on
+ *  @target_rot_dis_w: pixel dst scaled width with the woke rotator is off
+ *  @target_rot_dis_h: pixel dst scaled height with the woke rotator is off
+ *  @target_rot_en_w: pixel dst scaled width with the woke rotator is on
+ *  @target_rot_en_h: pixel dst scaled height with the woke rotator is on
  */
 struct mtk_mdp_pix_limit {
 	u16 org_w;

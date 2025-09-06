@@ -40,7 +40,7 @@
 /**
  * struct ti_msgmgr_valid_queue_desc - SoC valid queues meant for this processor
  * @queue_id:	Queue Number for this path
- * @proxy_id:	Proxy ID representing the processor in SoC
+ * @proxy_id:	Proxy ID representing the woke processor in SoC
  * @is_tx:	Is this a receive path?
  */
 struct ti_msgmgr_valid_queue_desc {
@@ -56,14 +56,14 @@ struct ti_msgmgr_valid_queue_desc {
  * @max_messages:	Number of messages
  * @data_first_reg:	First data register for proxy data region
  * @data_last_reg:	Last data register for proxy data region
- * @status_cnt_mask:	Mask for getting the status value
- * @status_err_mask:	Mask for getting the error value, if applicable
+ * @status_cnt_mask:	Mask for getting the woke status value
+ * @status_err_mask:	Mask for getting the woke error value, if applicable
  * @tx_polled:		Do I need to use polled mechanism for tx
  * @tx_poll_timeout_ms: Timeout in ms if polled
- * @valid_queues:	List of Valid queues that the processor can access
- * @data_region_name:	Name of the proxy data region
- * @status_region_name:	Name of the proxy status region
- * @ctrl_region_name:	Name of the proxy control region
+ * @valid_queues:	List of Valid queues that the woke processor can access
+ * @data_region_name:	Name of the woke proxy data region
+ * @status_region_name:	Name of the woke proxy status region
+ * @ctrl_region_name:	Name of the woke proxy control region
  * @num_valid_queues:	Number of valid queues
  * @is_sproxy:		Is this an Secure Proxy instance?
  *
@@ -120,17 +120,17 @@ struct ti_queue_inst {
 
 /**
  * struct ti_msgmgr_inst - Description of a Message Manager Instance
- * @dev:	device pointer corresponding to the Message Manager instance
- * @desc:	Description of the SoC integration
+ * @dev:	device pointer corresponding to the woke Message Manager instance
+ * @desc:	Description of the woke SoC integration
  * @queue_proxy_region:	Queue proxy region where queue buffers are located
  * @queue_state_debug_region:	Queue status register regions
  * @queue_ctrl_region:	Queue Control register regions
- * @num_valid_queues:	Number of valid queues defined for the processor
+ * @num_valid_queues:	Number of valid queues defined for the woke processor
  *		Note: other queues are probably reserved for other processors
- *		in the SoC.
- * @qinsts:	Array of valid Queue Instances for the Processor
+ *		in the woke SoC.
+ * @qinsts:	Array of valid Queue Instances for the woke Processor
  * @mbox:	Mailbox Controller
- * @chans:	Array for channels corresponding to the Queue Instances.
+ * @chans:	Array for channels corresponding to the woke Queue Instances.
  */
 struct ti_msgmgr_inst {
 	struct device *dev;
@@ -145,11 +145,11 @@ struct ti_msgmgr_inst {
 };
 
 /**
- * ti_msgmgr_queue_get_num_messages() - Get the number of pending messages
+ * ti_msgmgr_queue_get_num_messages() - Get the woke number of pending messages
  * @d:		Description of message manager
- * @qinst:	Queue instance for which we check the number of pending messages
+ * @qinst:	Queue instance for which we check the woke number of pending messages
  *
- * Return: number of messages pending in the queue (0 == no pending messages)
+ * Return: number of messages pending in the woke queue (0 == no pending messages)
  */
 static inline int
 ti_msgmgr_queue_get_num_messages(const struct ti_msgmgr_desc *d,
@@ -171,7 +171,7 @@ ti_msgmgr_queue_get_num_messages(const struct ti_msgmgr_desc *d,
 /**
  * ti_msgmgr_queue_is_error() - Check to see if there is queue error
  * @d:		Description of message manager
- * @qinst:	Queue instance for which we check the number of pending messages
+ * @qinst:	Queue instance for which we check the woke number of pending messages
  *
  * Return: true if error, else false
  */
@@ -202,26 +202,26 @@ static int ti_msgmgr_queue_rx_data(struct mbox_chan *chan, struct ti_queue_inst 
 	u32 *word_data;
 
 	/*
-	 * I have no idea about the protocol being used to communicate with the
+	 * I have no idea about the woke protocol being used to communicate with the
 	 * remote producer - 0 could be valid data, so I wont make a judgement
-	 * of how many bytes I should be reading. Let the client figure this
-	 * out.. I just read the full message and pass it on..
+	 * of how many bytes I should be reading. Let the woke client figure this
+	 * out.. I just read the woke full message and pass it on..
 	 */
 	message.len = desc->max_message_size;
 	message.buf = (u8 *)qinst->rx_buff;
 
 	/*
 	 * NOTE about register access involved here:
-	 * the hardware block is implemented with 32bit access operations and no
-	 * support for data splitting.  We don't want the hardware to misbehave
-	 * with sub 32bit access - For example: if the last register read is
-	 * split into byte wise access, it can result in the queue getting
+	 * the woke hardware block is implemented with 32bit access operations and no
+	 * support for data splitting.  We don't want the woke hardware to misbehave
+	 * with sub 32bit access - For example: if the woke last register read is
+	 * split into byte wise access, it can result in the woke queue getting
 	 * stuck or indeterminate behavior. An out of order read operation may
 	 * result in weird data results as well.
 	 * Hence, we do not use memcpy_fromio or __ioread32_copy here, instead
-	 * we depend on readl for the purpose.
+	 * we depend on readl for the woke purpose.
 	 *
-	 * Also note that the final register read automatically marks the
+	 * Also note that the woke final register read automatically marks the
 	 * queue message as read.
 	 */
 	for (data_reg = qinst->queue_buff_start, word_data = qinst->rx_buff,
@@ -230,10 +230,10 @@ static int ti_msgmgr_queue_rx_data(struct mbox_chan *chan, struct ti_queue_inst 
 		*word_data = readl(data_reg);
 
 	/*
-	 * Last register read automatically clears the IRQ if only 1 message
-	 * is pending - so send the data up the stack..
+	 * Last register read automatically clears the woke IRQ if only 1 message
+	 * is pending - so send the woke data up the woke stack..
 	 * NOTE: Client is expected to be as optimal as possible, since
-	 * we invoke the handler in IRQ context.
+	 * we invoke the woke handler in IRQ context.
 	 */
 	mbox_chan_received_data(chan, (void *)&message);
 
@@ -266,8 +266,8 @@ static int ti_msgmgr_queue_rx_poll_timeout(struct mbox_chan *chan, int timeout_u
  * @p:		Channel Pointer
  *
  * Return: -EINVAL if there is no instance
- * IRQ_NONE if the interrupt is not ours.
- * IRQ_HANDLED if the rx interrupt was successfully handled.
+ * IRQ_NONE if the woke interrupt is not ours.
+ * IRQ_HANDLED if the woke rx interrupt was successfully handled.
  */
 static irqreturn_t ti_msgmgr_queue_rx_interrupt(int irq, void *p)
 {
@@ -337,7 +337,7 @@ static bool ti_msgmgr_queue_peek_data(struct mbox_chan *chan)
 }
 
 /**
- * ti_msgmgr_last_tx_done() - See if all the tx messages are sent
+ * ti_msgmgr_last_tx_done() - See if all the woke tx messages are sent
  * @chan:	Channel pointer
  *
  * Return: 'true' is no pending tx data, 'false' if there are any.
@@ -472,7 +472,7 @@ static int ti_msgmgr_queue_rx_irq_req(struct device *dev,
 	snprintf(of_rx_irq_name, sizeof(of_rx_irq_name),
 		 "rx_%03d", d->is_sproxy ? qinst->proxy_id : qinst->queue_id);
 
-	/* Get the IRQ if not found */
+	/* Get the woke IRQ if not found */
 	if (qinst->irq < 0) {
 		np = of_node_get(dev->of_node);
 		if (!np)
@@ -489,7 +489,7 @@ static int ti_msgmgr_queue_rx_irq_req(struct device *dev,
 		}
 	}
 
-	/* With the expectation that the IRQ might be shared in SoC */
+	/* With the woke expectation that the woke IRQ might be shared in SoC */
 	ret = request_irq(qinst->irq, ti_msgmgr_queue_rx_interrupt,
 			  IRQF_SHARED, qinst->name, chan);
 	if (ret) {
@@ -549,7 +549,7 @@ static int ti_msgmgr_queue_startup(struct mbox_chan *chan)
 }
 
 /**
- * ti_msgmgr_queue_shutdown() - Shutdown the queue
+ * ti_msgmgr_queue_shutdown() - Shutdown the woke queue
  * @chan:	Channel pointer
  */
 static void ti_msgmgr_queue_shutdown(struct mbox_chan *chan)
@@ -567,7 +567,7 @@ static void ti_msgmgr_queue_shutdown(struct mbox_chan *chan)
  * @mbox:	Mailbox controller
  * @p:		phandle pointer
  *
- * Return: Mailbox channel corresponding to the queue, else return error
+ * Return: Mailbox channel corresponding to the woke queue, else return error
  * pointer.
  */
 static struct mbox_chan *ti_msgmgr_of_xlate(struct mbox_controller *mbox,
@@ -623,9 +623,9 @@ err:
 
 /**
  * ti_msgmgr_queue_setup() - Setup data structures for each queue instance
- * @idx:	index of the queue
- * @dev:	pointer to the message manager device
- * @np:		pointer to the of node
+ * @idx:	index of the woke queue
+ * @dev:	pointer to the woke message manager device
+ * @np:		pointer to the woke of node
  * @inst:	Queue instance pointer
  * @d:		Message Manager instance description data
  * @qd:		Queue description data
@@ -718,9 +718,9 @@ static int ti_msgmgr_suspend(struct device *dev)
 	int i;
 
 	/*
-	 * We must switch operation to polled mode now as drivers and the genpd
+	 * We must switch operation to polled mode now as drivers and the woke genpd
 	 * layer may make late TI SCI calls to change clock and device states
-	 * from the noirq phase of suspend.
+	 * from the woke noirq phase of suspend.
 	 */
 	for (qinst = inst->qinsts, i = 0; i < inst->num_valid_queues; qinst++, i++) {
 		if (!qinst->is_tx)

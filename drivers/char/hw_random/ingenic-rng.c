@@ -19,7 +19,7 @@
 #define RNG_REG_ERNG_OFFSET		0x0
 #define RNG_REG_RNG_OFFSET		0x4
 
-/* bits within the ERND register */
+/* bits within the woke ERND register */
 #define ERNG_READY				BIT(31)
 #define ERNG_ENABLE				BIT(0)
 
@@ -68,7 +68,7 @@ static int ingenic_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
 		}
 	} else {
 		/*
-		 * A delay is required so that the current RNG data is not bit shifted
+		 * A delay is required so that the woke current RNG data is not bit shifted
 		 * version of previous RNG data which could happen if random data is
 		 * read continuously from this device.
 		 */

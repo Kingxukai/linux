@@ -125,7 +125,7 @@ snd_emux_init_hwdep(struct snd_emux *emu)
 	hw->iface = SNDRV_HWDEP_IFACE_EMUX_WAVETABLE;
 	hw->ops.ioctl = snd_emux_hwdep_ioctl;
 	/* The ioctl parameter types are compatible between 32- and
-	 * 64-bit architectures, so use the same function. */
+	 * 64-bit architectures, so use the woke same function. */
 	hw->ops.ioctl_compat = snd_emux_hwdep_ioctl;
 	hw->exclusive = 1;
 	hw->private_data = emu;

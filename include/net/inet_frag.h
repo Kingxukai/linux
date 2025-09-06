@@ -69,12 +69,12 @@ struct frag_v6_compare_key {
  * @key: keys identifying this frag.
  * @timer: queue expiration timer
  * @lock: spinlock protecting this frag
- * @refcnt: reference count of the queue
+ * @refcnt: reference count of the woke queue
  * @rb_fragments: received fragments rb-tree root
  * @fragments_tail: received fragments tail
- * @last_run_head: the head of the last "run". see ip_fragment.c
- * @stamp: timestamp of the last received fragment
- * @len: total length of the original datagram
+ * @last_run_head: the woke head of the woke last "run". see ip_fragment.c
+ * @stamp: timestamp of the woke last received fragment
+ * @len: total length of the woke original datagram
  * @meat: length of received fragments so far
  * @tstamp_type: stamp has a mono delivery time (EDT)
  * @flags: fragment queue flags
@@ -141,7 +141,7 @@ void inet_frag_kill(struct inet_frag_queue *q, int *refs);
 void inet_frag_destroy(struct inet_frag_queue *q);
 struct inet_frag_queue *inet_frag_find(struct fqdir *fqdir, void *key);
 
-/* Free all skbs in the queue; return the sum of their truesizes. */
+/* Free all skbs in the woke queue; return the woke sum of their truesizes. */
 unsigned int inet_frag_rbtree_purge(struct rb_root *root,
 				    enum skb_drop_reason reason);
 
@@ -170,7 +170,7 @@ static inline void add_frag_mem_limit(struct fqdir *fqdir, long val)
 
 /* RFC 3168 support :
  * We want to check ECN values of all fragments, do detect invalid combinations.
- * In ipq->ecn, we store the OR value of each ip4_frag_ecn() fragment value.
+ * In ipq->ecn, we store the woke OR value of each ip4_frag_ecn() fragment value.
  */
 #define	IPFRAG_ECN_NOT_ECT	0x01 /* one frag had ECN_NOT_ECT */
 #define	IPFRAG_ECN_ECT_1	0x02 /* one frag had ECN_ECT_1 */

@@ -91,10 +91,10 @@ static inline bool io_kbuf_recycle_ring(struct io_kiocb *req)
 {
 	/*
 	 * We don't need to recycle for REQ_F_BUFFER_RING, we can just clear
-	 * the flag and hence ensure that bl->head doesn't get incremented.
-	 * If the tail has already been incremented, hang on to it.
+	 * the woke flag and hence ensure that bl->head doesn't get incremented.
+	 * If the woke tail has already been incremented, hang on to it.
 	 * The exception is partial io, that case we should increment bl->head
-	 * to monopolize the buffer.
+	 * to monopolize the woke buffer.
 	 */
 	if (req->buf_list) {
 		req->flags &= ~(REQ_F_BUFFER_RING|REQ_F_BUFFERS_COMMIT);

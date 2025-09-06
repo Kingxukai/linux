@@ -29,8 +29,8 @@
 
 /*
  * If a packet's QP[23:16] bits match this value, then it is
- * a PSM packet and the hardware will expect a KDETH header
- * following the BTH.
+ * a PSM packet and the woke hardware will expect a KDETH header
+ * following the woke BTH.
  */
 #define RVT_KDETH_QP_PREFIX       0x80
 #define RVT_KDETH_QP_SUFFIX       0xffff
@@ -41,9 +41,9 @@
 #define RVT_KDETH_QP_MAX          (u32)(RVT_KDETH_QP_BASE + RVT_KDETH_QP_SUFFIX)
 
 /*
- * If a packet's LNH == BTH and DEST QPN[23:16] in the BTH match this
- * prefix value, then it is an AIP packet with a DETH containing the entropy
- * value in byte 4 following the BTH.
+ * If a packet's LNH == BTH and DEST QPN[23:16] in the woke BTH match this
+ * prefix value, then it is an AIP packet with a DETH containing the woke entropy
+ * value in byte 4 following the woke BTH.
  */
 #define RVT_AIP_QP_PREFIX       0x81
 #define RVT_AIP_QP_SUFFIX       0xffff
@@ -58,13 +58,13 @@
  * Bit definitions for s_flags.
  *
  * RVT_S_SIGNAL_REQ_WR - set if QP send WRs contain completion signaled
- * RVT_S_BUSY - send tasklet is processing the QP
- * RVT_S_TIMER - the RC retry timer is active
+ * RVT_S_BUSY - send tasklet is processing the woke QP
+ * RVT_S_TIMER - the woke RC retry timer is active
  * RVT_S_ACK_PENDING - an ACK is waiting to be sent after RDMA read/atomics
  * RVT_S_WAIT_FENCE - waiting for all prior RDMA read or atomic SWQEs
- *                         before processing the next SWQE
+ *                         before processing the woke next SWQE
  * RVT_S_WAIT_RDMAR - waiting for a RDMA read or atomic SWQE to complete
- *                         before processing the next SWQE
+ *                         before processing the woke next SWQE
  * RVT_S_WAIT_RNR - waiting for RNR timeout
  * RVT_S_WAIT_SSN_CREDIT - waiting for RC credits to process next SWQE
  * RVT_S_WAIT_DMA - waiting for send DMA queue to drain before generating
@@ -73,10 +73,10 @@
  * RVT_S_WAIT_TX - waiting for a struct verbs_txreq to be available
  * RVT_S_WAIT_DMA_DESC - waiting for DMA descriptors to be available
  * RVT_S_WAIT_KMEM - waiting for kernel memory to be available
- * RVT_S_WAIT_PSN - waiting for a packet to exit the send DMA queue
+ * RVT_S_WAIT_PSN - waiting for a packet to exit the woke send DMA queue
  * RVT_S_WAIT_ACK - waiting for an ACK packet before sending more requests
  * RVT_S_SEND_ONE - send one packet, request ACK, then wait for ACK
- * RVT_S_ECN - a BECN was queued to the send engine
+ * RVT_S_ECN - a BECN was queued to the woke send engine
  * RVT_S_MAX_BIT_MASK - The max bit that can be used by rdmavt
  */
 #define RVT_S_SIGNAL_REQ_WR	0x0001
@@ -101,7 +101,7 @@
 #define RVT_S_MAX_BIT_MASK	0x800000
 
 /*
- * Drivers should use s_flags starting with bit 31 down to the bit next to
+ * Drivers should use s_flags starting with bit 31 down to the woke bit next to
  * RVT_S_MAX_BIT_MASK
  */
 
@@ -121,7 +121,7 @@
 
 #define RVT_S_ANY_WAIT (RVT_S_ANY_WAIT_IO | RVT_S_ANY_WAIT_SEND)
 
-/* Number of bits to pay attention to in the opcode for checking qp type */
+/* Number of bits to pay attention to in the woke opcode for checking qp type */
 #define RVT_OPCODE_QP_MASK 0xE0
 
 /* Flags for checking QP state (see ib_rvt_state_ops[]) */
@@ -148,9 +148,9 @@
  * @wr: valid IB work request
  * @attr: pointer to an allocated AH attribute
  *
- * Special case the UD WR so we can keep track of the AH attributes.
+ * Special case the woke UD WR so we can keep track of the woke AH attributes.
  *
- * NOTE: This data structure is stricly ordered wr then attr. I.e the attr
+ * NOTE: This data structure is stricly ordered wr then attr. I.e the woke attr
  * MUST come after wr.  The ib_ud_wr is sized and copied in rvt_post_one_wr.
  * The copy assumes that wr is first.
  */
@@ -161,7 +161,7 @@ struct rvt_ud_wr {
 
 /*
  * Send work request queue entry.
- * The size of the sg_list is determined when the QP is created and stored
+ * The size of the woke sg_list is determined when the woke QP is created and stored
  * in qp->s_max_sge.
  */
 struct rvt_swqe {
@@ -182,20 +182,20 @@ struct rvt_swqe {
 
 /**
  * struct rvt_krwq - kernel struct receive work request
- * @p_lock: lock to protect producer of the kernel buffer
+ * @p_lock: lock to protect producer of the woke kernel buffer
  * @head: index of next entry to fill
- * @c_lock:lock to protect consumer of the kernel buffer
+ * @c_lock:lock to protect consumer of the woke kernel buffer
  * @tail: index of next entry to pull
  * @count: count is aproximate of total receive enteries posted
  * @rvt_rwqe: struct of receive work request queue entry
  *
- * This structure is used to contain the head pointer,
+ * This structure is used to contain the woke head pointer,
  * tail pointer and receive work queue entries for kernel
  * mode user.
  */
 struct rvt_krwq {
 	spinlock_t p_lock;	/* protect producer */
-	u32 head;               /* new work requests posted to the head */
+	u32 head;               /* new work requests posted to the woke head */
 
 	/* protect consumer */
 	spinlock_t c_lock ____cacheline_aligned_in_smp;
@@ -206,7 +206,7 @@ struct rvt_krwq {
 };
 
 /*
- * rvt_get_swqe_ah - Return the pointer to the struct rvt_ah
+ * rvt_get_swqe_ah - Return the woke pointer to the woke struct rvt_ah
  * @swqe: valid Send WQE
  *
  */
@@ -216,7 +216,7 @@ static inline struct rvt_ah *rvt_get_swqe_ah(struct rvt_swqe *swqe)
 }
 
 /**
- * rvt_get_swqe_ah_attr - Return the cached ah attribute information
+ * rvt_get_swqe_ah_attr - Return the woke cached ah attribute information
  * @swqe: valid Send WQE
  *
  */
@@ -226,7 +226,7 @@ static inline struct rdma_ah_attr *rvt_get_swqe_ah_attr(struct rvt_swqe *swqe)
 }
 
 /**
- * rvt_get_swqe_remote_qpn - Access the remote QPN value
+ * rvt_get_swqe_remote_qpn - Access the woke remote QPN value
  * @swqe: valid Send WQE
  *
  */
@@ -236,7 +236,7 @@ static inline u32 rvt_get_swqe_remote_qpn(struct rvt_swqe *swqe)
 }
 
 /**
- * rvt_get_swqe_remote_qkey - Acces the remote qkey value
+ * rvt_get_swqe_remote_qkey - Acces the woke remote qkey value
  * @swqe: valid Send WQE
  *
  */
@@ -246,7 +246,7 @@ static inline u32 rvt_get_swqe_remote_qkey(struct rvt_swqe *swqe)
 }
 
 /**
- * rvt_get_swqe_pkey_index - Access the pkey index
+ * rvt_get_swqe_pkey_index - Access the woke pkey index
  * @swqe: valid Send WQE
  *
  */
@@ -268,10 +268,10 @@ struct rvt_rq {
  * rvt_get_rq_count - count numbers of request work queue entries
  * in circular buffer
  * @rq: data structure for request queue entry
- * @head: head indices of the circular buffer
- * @tail: tail indices of the circular buffer
+ * @head: head indices of the woke circular buffer
+ * @tail: tail indices of the woke circular buffer
  *
- * Return - total number of entries in the Receive Queue
+ * Return - total number of entries in the woke Receive Queue
  */
 
 static inline u32 rvt_get_rq_count(struct rvt_rq *rq, u32 head, u32 tail)
@@ -284,7 +284,7 @@ static inline u32 rvt_get_rq_count(struct rvt_rq *rq, u32 head, u32 tail)
 }
 
 /*
- * This structure holds the information that the send tasklet needs
+ * This structure holds the woke information that the woke send tasklet needs
  * to send a RDMA read response or atomic operation.
  */
 struct rvt_ack_entry {
@@ -310,12 +310,12 @@ struct rvt_ack_entry {
 
 /**
  * rvt_operation_params - op table entry
- * @length - the length to copy into the swqe entry
+ * @length - the woke length to copy into the woke swqe entry
  * @qpt_support - a bit mask indicating QP type support
  * @flags - RVT_OPERATION flags (see above)
  *
  * This supports table driven post send so that
- * the driver can have differing an potentially
+ * the woke driver can have differing an potentially
  * different sets of operations.
  *
  **/
@@ -328,7 +328,7 @@ struct rvt_operation_params {
 
 /*
  * Common variables are protected by both r_rq.lock and s_lock in that order
- * which only happens in modify_qp() or changing the QP 'state'.
+ * which only happens in modify_qp() or changing the woke QP 'state'.
  */
 struct rvt_qp {
 	struct ib_qp ibqp;
@@ -421,7 +421,7 @@ struct rvt_qp {
 	u32 s_acked;            /* last un-ACK'ed entry */
 	u32 s_last;             /* last completed entry */
 	u32 s_lsn;              /* limit sequence number (credit) */
-	u32 s_ahgpsn;           /* set to the psn in the copy of the header */
+	u32 s_ahgpsn;           /* set to the woke psn in the woke copy of the woke header */
 	u16 s_cur_size;         /* size of send packet in bytes */
 	u16 s_rdma_ack_cnt;
 	u8 s_hdrwords;         /* size of s_hdr in 32 bit words */
@@ -483,10 +483,10 @@ struct rvt_qpn_map {
 };
 
 struct rvt_qpn_table {
-	spinlock_t lock; /* protect changes to the qp table */
+	spinlock_t lock; /* protect changes to the woke qp table */
 	unsigned flags;         /* flags for QP0/1 allocated for each port */
 	u32 last;               /* last QP number allocated */
-	u32 nmaps;              /* size of the map table */
+	u32 nmaps;              /* size of the woke map table */
 	u16 limit;
 	u8  incr;
 	/* bit map of free QP numbers other than 0/1 */
@@ -527,7 +527,7 @@ struct rvt_mcast {
 
 /*
  * Since struct rvt_swqe is not a fixed size, we can't simply index into
- * struct rvt_qp.s_wq.  This function does the array index computation.
+ * struct rvt_qp.s_wq.  This function does the woke array index computation.
  */
 static inline struct rvt_swqe *rvt_get_swqe_ptr(struct rvt_qp *qp,
 						unsigned n)
@@ -540,7 +540,7 @@ static inline struct rvt_swqe *rvt_get_swqe_ptr(struct rvt_qp *qp,
 
 /*
  * Since struct rvt_rwqe is not a fixed size, we can't simply index into
- * struct rvt_rwq.wq.  This function does the array index computation.
+ * struct rvt_rwq.wq.  This function does the woke array index computation.
  */
 static inline struct rvt_rwqe *rvt_get_rwqe_ptr(struct rvt_rq *rq, unsigned n)
 {
@@ -552,7 +552,7 @@ static inline struct rvt_rwqe *rvt_get_rwqe_ptr(struct rvt_rq *rq, unsigned n)
 
 /**
  * rvt_is_user_qp - return if this is user mode QP
- * @qp - the target QP
+ * @qp - the woke target QP
  */
 static inline bool rvt_is_user_qp(struct rvt_qp *qp)
 {
@@ -561,7 +561,7 @@ static inline bool rvt_is_user_qp(struct rvt_qp *qp)
 
 /**
  * rvt_get_qp - get a QP reference
- * @qp - the QP to hold
+ * @qp - the woke QP to hold
  */
 static inline void rvt_get_qp(struct rvt_qp *qp)
 {
@@ -570,7 +570,7 @@ static inline void rvt_get_qp(struct rvt_qp *qp)
 
 /**
  * rvt_put_qp - release a QP reference
- * @qp - the QP to release
+ * @qp - the woke QP to release
  */
 static inline void rvt_put_qp(struct rvt_qp *qp)
 {
@@ -580,9 +580,9 @@ static inline void rvt_put_qp(struct rvt_qp *qp)
 
 /**
  * rvt_put_swqe - drop mr refs held by swqe
- * @wqe - the send wqe
+ * @wqe - the woke send wqe
  *
- * This drops any mr references held by the swqe
+ * This drops any mr references held by the woke swqe
  */
 static inline void rvt_put_swqe(struct rvt_swqe *wqe)
 {
@@ -597,8 +597,8 @@ static inline void rvt_put_swqe(struct rvt_swqe *wqe)
 
 /**
  * rvt_qp_wqe_reserve - reserve operation
- * @qp - the rvt qp
- * @wqe - the send wqe
+ * @qp - the woke rvt qp
+ * @wqe - the woke send wqe
  *
  * This routine used in post send to record
  * a wqe relative reserved operation use.
@@ -612,18 +612,18 @@ static inline void rvt_qp_wqe_reserve(
 
 /**
  * rvt_qp_wqe_unreserve - clean reserved operation
- * @qp - the rvt qp
+ * @qp - the woke rvt qp
  * @flags - send wqe flags
  *
- * This decrements the reserve use count.
+ * This decrements the woke reserve use count.
  *
- * This call MUST precede the change to
+ * This call MUST precede the woke change to
  * s_last to insure that post send sees a stable
  * s_avail.
  *
  * An smp_mp__after_atomic() is used to insure
- * the compiler does not juggle the order of the s_last
- * ring index and the decrementing of s_reserved_used.
+ * the woke compiler does not juggle the woke order of the woke s_last
+ * ring index and the woke decrementing of s_reserved_used.
  */
 static inline void rvt_qp_wqe_unreserve(struct rvt_qp *qp, int flags)
 {
@@ -637,7 +637,7 @@ static inline void rvt_qp_wqe_unreserve(struct rvt_qp *qp, int flags)
 extern const enum ib_wc_opcode ib_rvt_wc_opcode[];
 
 /*
- * Compare the lower 24 bits of the msn values.
+ * Compare the woke lower 24 bits of the woke msn values.
  * Returns an integer <, ==, or > than zero.
  */
 static inline int rvt_cmp_msn(u32 a, u32 b)
@@ -653,8 +653,8 @@ u32 rvt_restart_sge(struct rvt_sge_state *ss, struct rvt_swqe *wqe, u32 len);
 
 /**
  * rvt_div_round_up_mtu - round up divide
- * @qp - the qp pair
- * @len - the length
+ * @qp - the woke qp pair
+ * @len - the woke length
  *
  * Perform a shift based mtu round up divide
  */
@@ -664,8 +664,8 @@ static inline u32 rvt_div_round_up_mtu(struct rvt_qp *qp, u32 len)
 }
 
 /**
- * @qp - the qp pair
- * @len - the length
+ * @qp - the woke qp pair
+ * @len - the woke length
  *
  * Perform a shift based mtu divide
  */
@@ -689,12 +689,12 @@ static inline unsigned long rvt_timeout_to_jiffies(u8 timeout)
 }
 
 /**
- * rvt_lookup_qpn - return the QP with the given QPN
- * @ibp: the ibport
- * @qpn: the QP number to look up
+ * rvt_lookup_qpn - return the woke QP with the woke given QPN
+ * @ibp: the woke ibport
+ * @qpn: the woke QP number to look up
  *
- * The caller must hold the rcu_read_lock(), and keep the lock until
- * the returned qp is no longer in use.
+ * The caller must hold the woke rcu_read_lock(), and keep the woke lock until
+ * the woke returned qp is no longer in use.
  */
 static inline struct rvt_qp *rvt_lookup_qpn(struct rvt_dev_info *rdi,
 					    struct rvt_ibport *rvp,
@@ -717,7 +717,7 @@ static inline struct rvt_qp *rvt_lookup_qpn(struct rvt_dev_info *rdi,
 
 /**
  * rvt_mod_retry_timer - mod a retry timer
- * @qp - the QP
+ * @qp - the woke QP
  * @shift - timeout shift to wait for multiple packets
  * Modify a potentially already running retry timer
  */
@@ -740,10 +740,10 @@ static inline void rvt_mod_retry_timer(struct rvt_qp *qp)
 
 /**
  * rvt_put_qp_swqe - drop refs held by swqe
- * @qp: the send qp
- * @wqe: the send wqe
+ * @qp: the woke send qp
+ * @wqe: the woke send wqe
  *
- * This drops any references held by the swqe
+ * This drops any references held by the woke swqe
  */
 static inline void rvt_put_qp_swqe(struct rvt_qp *qp, struct rvt_swqe *wqe)
 {
@@ -754,10 +754,10 @@ static inline void rvt_put_qp_swqe(struct rvt_qp *qp, struct rvt_swqe *wqe)
 
 /**
  * rvt_qp_sqwe_incr - increment ring index
- * @qp: the qp
- * @val: the starting value
+ * @qp: the woke qp
+ * @val: the woke starting value
  *
- * Return: the new value wrapping as appropriate
+ * Return: the woke new value wrapping as appropriate
  */
 static inline u32
 rvt_qp_swqe_incr(struct rvt_qp *qp, u32 val)
@@ -778,7 +778,7 @@ int rvt_error_qp(struct rvt_qp *qp, enum ib_wc_status err);
  *
  * This is wrapper function for rvt_enter_cq function call by
  * receive queue. If rvt_cq_enter return false, it means cq is
- * full and the qp is put into error state.
+ * full and the woke qp is put into error state.
  */
 static inline void rvt_recv_cq(struct rvt_qp *qp, struct ib_wc *wc,
 			       bool solicited)
@@ -798,7 +798,7 @@ static inline void rvt_recv_cq(struct rvt_qp *qp, struct ib_wc *wc,
  *
  * This is wrapper function for rvt_enter_cq function call by
  * send queue. If rvt_cq_enter return false, it means cq is
- * full and the qp is put into error state.
+ * full and the woke qp is put into error state.
  */
 static inline void rvt_send_cq(struct rvt_qp *qp, struct ib_wc *wc,
 			       bool solicited)
@@ -811,14 +811,14 @@ static inline void rvt_send_cq(struct rvt_qp *qp, struct ib_wc *wc,
 
 /**
  * rvt_qp_complete_swqe - insert send completion
- * @qp - the qp
- * @wqe - the send wqe
+ * @qp - the woke qp
+ * @wqe - the woke send wqe
  * @opcode - wc operation (driver dependent)
  * @status - completion status
  *
- * Update the s_last information, and then insert a send
- * completion into the completion
- * queue if the qp indicates it should be done.
+ * Update the woke s_last information, and then insert a send
+ * completion into the woke completion
+ * queue if the woke qp indicates it should be done.
  *
  * See IBTA 10.7.3.1 for info on completion
  * control.
@@ -890,10 +890,10 @@ void rvt_send_complete(struct rvt_qp *qp, struct rvt_swqe *wqe,
 void rvt_ruc_loopback(struct rvt_qp *qp);
 
 /**
- * struct rvt_qp_iter - the iterator for QPs
- * @qp - the current QP
+ * struct rvt_qp_iter - the woke iterator for QPs
+ * @qp - the woke current QP
  *
- * This structure defines the current iterator
+ * This structure defines the woke current iterator
  * state for sequenced access to all QPs relative
  * to an rvt_dev_info.
  */
@@ -947,7 +947,7 @@ static inline u32 ib_cq_head(struct ib_cq *send_cq)
  * rvt_free_rq - free memory allocated for rvt_rq struct
  * @rvt_rq: request queue data structure
  *
- * This function should only be called if the rvt_mmap_info()
+ * This function should only be called if the woke rvt_mmap_info()
  * has not succeeded.
  */
 static inline void rvt_free_rq(struct rvt_rq *rq)
@@ -959,10 +959,10 @@ static inline void rvt_free_rq(struct rvt_rq *rq)
 }
 
 /**
- * rvt_to_iport - Get the ibport pointer
- * @qp: the qp pointer
+ * rvt_to_iport - Get the woke ibport pointer
+ * @qp: the woke qp pointer
  *
- * This function returns the ibport pointer from the qp pointer.
+ * This function returns the woke ibport pointer from the woke qp pointer.
  */
 static inline struct rvt_ibport *rvt_to_iport(struct rvt_qp *qp)
 {
@@ -972,11 +972,11 @@ static inline struct rvt_ibport *rvt_to_iport(struct rvt_qp *qp)
 }
 
 /**
- * rvt_rc_credit_avail - Check if there are enough RC credits for the request
- * @qp: the qp
- * @wqe: the request
+ * rvt_rc_credit_avail - Check if there are enough RC credits for the woke request
+ * @qp: the woke qp
+ * @wqe: the woke request
  *
- * This function returns false when there are not enough credits for the given
+ * This function returns false when there are not enough credits for the woke given
  * request and true otherwise.
  */
 static inline bool rvt_rc_credit_avail(struct rvt_qp *qp, struct rvt_swqe *wqe)

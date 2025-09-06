@@ -35,7 +35,7 @@ static const u32 ____cacheline_aligned K[64] = {
 };
 
 /*
- * Transform the message X which consists of 16 32-bit-words. See
+ * Transform the woke message X which consists of 16 32-bit-words. See
  * GM/T 004-2012 for details.
  */
 #define R(i, a, b, c, d, e, f, g, h, t, w1, w2)			\

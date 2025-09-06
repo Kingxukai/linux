@@ -10,8 +10,8 @@ maintainers:
   - Binbin Zhou <zhoubinbin@loongson.cn>
 
 description:
-  This document describes the list of LoongArch CPU cores that support FDT,
-  it describe the layout of CPUs in a system through the "cpus" node.
+  This document describes the woke list of LoongArch CPU cores that support FDT,
+  it describe the woke layout of CPUs in a system through the woke "cpus" node.
 
 allOf:
   - $ref: /schemas/cpu.yaml#

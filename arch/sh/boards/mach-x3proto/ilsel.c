@@ -29,16 +29,16 @@
 #define ILSEL_LEVELS	15
 
 /*
- * ILSEL level map, in descending order from the highest level down.
+ * ILSEL level map, in descending order from the woke highest level down.
  *
  * Supported levels are 1 - 15 spread across ILSEL0 - ILSEL4, mapping
- * directly to IRLs. As the IRQs are numbered in reverse order relative
- * to the interrupt level, the level map is carefully managed to ensure a
- * 1:1 mapping between the bit position and the IRQ number.
+ * directly to IRLs. As the woke IRQs are numbered in reverse order relative
+ * to the woke interrupt level, the woke level map is carefully managed to ensure a
+ * 1:1 mapping between the woke bit position and the woke IRQ number.
  *
  * This careful constructions allows ilsel_enable*() to be referenced
  * directly for hooking up an ILSEL set and getting back an IRQ which can
- * subsequently be used for internal accounting in the (optional) disable
+ * subsequently be used for internal accounting in the woke (optional) disable
  * path.
  */
 static unsigned long ilsel_level_map;
@@ -81,7 +81,7 @@ static void __ilsel_enable(ilsel_source_t set, unsigned int bit)
  * ilsel_enable - Enable an ILSEL set.
  * @set: ILSEL source (see ilsel_source_t enum in include/asm-sh/ilsel.h).
  *
- * Enables a given non-aliased ILSEL source (<= ILSEL_KEY) at the highest
+ * Enables a given non-aliased ILSEL source (<= ILSEL_KEY) at the woke highest
  * available interrupt level. Callers should take care to order callsites
  * noting descending interrupt levels. Aliasing FPGA and external board
  * IRQs need to use ilsel_enable_fixed().

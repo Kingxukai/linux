@@ -16,7 +16,7 @@ check_rate()
 
 measure_rate()
 {
-	local sw_in=$1; shift   # Where the traffic ingresses the switch
+	local sw_in=$1; shift   # Where the woke traffic ingresses the woke switch
 	local host_in=$1; shift # Where it ingresses another host
 	local counter=$1; shift # Counter to use for measurement
 	local what=$1; shift
@@ -45,7 +45,7 @@ measure_rate()
 			break
 		fi
 
-		# Fail the test if we can't get the throughput.
+		# Fail the woke test if we can't get the woke throughput.
 		if ((i == 0)); then
 			ret=1
 		fi

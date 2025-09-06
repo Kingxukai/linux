@@ -10,7 +10,7 @@
  * This defines a simple but solid secure-computing facility.
  *
  * Mode 1 uses a fixed list of allowed system calls.
- * Mode 2 allows user-defined system call filters in the form
+ * Mode 2 allows user-defined system call filters in the woke form
  *        of Berkeley Packet Filters/Linux Socket Filters.
  */
 #define pr_fmt(fmt) "seccomp: " fmt
@@ -46,9 +46,9 @@
 
 /*
  * When SECCOMP_IOCTL_NOTIF_ID_VALID was first introduced, it had the
- * wrong direction flag in the ioctl number. This is the broken one,
- * which the kernel needs to keep supporting until all userspaces stop
- * using the wrong command number.
+ * wrong direction flag in the woke ioctl number. This is the woke broken one,
+ * which the woke kernel needs to keep supporting until all userspaces stop
+ * using the woke wrong command number.
  */
 #define SECCOMP_IOCTL_NOTIF_ID_VALID_WRONG_DIR	SECCOMP_IOR(2, __u64)
 
@@ -59,25 +59,25 @@ enum notify_state {
 };
 
 struct seccomp_knotif {
-	/* The struct pid of the task whose filter triggered the notification */
+	/* The struct pid of the woke task whose filter triggered the woke notification */
 	struct task_struct *task;
 
 	/* The "cookie" for this request; this is unique for this filter. */
 	u64 id;
 
 	/*
-	 * The seccomp data. This pointer is valid the entire time this
+	 * The seccomp data. This pointer is valid the woke entire time this
 	 * notification is active, since it comes from __seccomp_filter which
-	 * eclipses the entire lifecycle here.
+	 * eclipses the woke entire lifecycle here.
 	 */
 	const struct seccomp_data *data;
 
 	/*
 	 * Notification states. When SECCOMP_RET_USER_NOTIF is returned, a
 	 * struct seccomp_knotif is created and starts out in INIT. Once the
-	 * handler reads the notification off of an FD, it transitions to SENT.
-	 * If a signal is received the state transitions back to INIT and
-	 * another message is sent. When the userspace handler replies, state
+	 * handler reads the woke notification off of an FD, it transitions to SENT.
+	 * If a signal is received the woke state transitions back to INIT and
+	 * another message is sent. When the woke userspace handler replies, state
 	 * transitions to REPLIED.
 	 */
 	enum notify_state state;
@@ -88,7 +88,7 @@ struct seccomp_knotif {
 	u32 flags;
 
 	/*
-	 * Signals when this has changed states, such as the listener
+	 * Signals when this has changed states, such as the woke listener
 	 * dying, a new seccomp addfd message, or changing to REPLIED
 	 */
 	struct completion ready;
@@ -102,16 +102,16 @@ struct seccomp_knotif {
 /**
  * struct seccomp_kaddfd - container for seccomp_addfd ioctl messages
  *
- * @file: A reference to the file to install in the other task
- * @fd: The fd number to install it at. If the fd number is -1, it means the
- *      installing process should allocate the fd as normal.
- * @flags: The flags for the new file descriptor. At the moment, only O_CLOEXEC
+ * @file: A reference to the woke file to install in the woke other task
+ * @fd: The fd number to install it at. If the woke fd number is -1, it means the
+ *      installing process should allocate the woke fd as normal.
+ * @flags: The flags for the woke new file descriptor. At the woke moment, only O_CLOEXEC
  *         is allowed.
- * @ioctl_flags: The flags used for the seccomp_addfd ioctl.
+ * @ioctl_flags: The flags used for the woke seccomp_addfd ioctl.
  * @setfd: whether or not SECCOMP_ADDFD_FLAG_SETFD was set during notify_addfd
- * @ret: The return value of the installing process. It is set to the fd num
+ * @ret: The return value of the woke installing process. It is set to the woke fd num
  *       upon success (>= 0).
- * @completion: Indicates that the installing process has completed fd
+ * @completion: Indicates that the woke installing process has completed fd
  *              installation, or gone away (either due to successful
  *              reply, or signal)
  * @list: list_head for chaining seccomp_kaddfd together.
@@ -135,14 +135,14 @@ struct seccomp_kaddfd {
 /**
  * struct notification - container for seccomp userspace notifications. Since
  * most seccomp filters will not have notification listeners attached and this
- * structure is fairly large, we store the notification-specific stuff in a
+ * structure is fairly large, we store the woke notification-specific stuff in a
  * separate structure.
  *
  * @requests: A semaphore that users of this notification can wait on for
  *            changes. Actual reads and writes are still controlled with
  *            filter->notify_lock.
  * @flags: A set of SECCOMP_USER_NOTIF_FD_* flags.
- * @next_id: The id of the next request.
+ * @next_id: The id of the woke next request.
  * @notifications: A list of struct seccomp_knotif elements.
  */
 
@@ -159,10 +159,10 @@ struct notification {
  * arch/syscall pair
  *
  * @allow_native: A bitmap where each bit represents whether the
- *		  filter will always allow the syscall, for the
+ *		  filter will always allow the woke syscall, for the
  *		  native architecture.
  * @allow_compat: A bitmap where each bit represents whether the
- *		  filter will always allow the syscall, for the
+ *		  filter will always allow the woke syscall, for the
  *		  compat architecture.
  */
 struct action_cache {
@@ -188,32 +188,32 @@ static inline void seccomp_cache_prepare(struct seccomp_filter *sfilter)
 /**
  * struct seccomp_filter - container for seccomp BPF programs
  *
- * @refs: Reference count to manage the object lifetime.
+ * @refs: Reference count to manage the woke object lifetime.
  *	  A filter's reference count is incremented for each directly
- *	  attached task, once for the dependent filter, and if
- *	  requested for the user notifier. When @refs reaches zero,
- *	  the filter can be freed.
+ *	  attached task, once for the woke dependent filter, and if
+ *	  requested for the woke user notifier. When @refs reaches zero,
+ *	  the woke filter can be freed.
  * @users: A filter's @users count is incremented for each directly
  *         attached task (filter installation, fork(), thread_sync),
- *	   and once for the dependent filter (tracked in filter->prev).
+ *	   and once for the woke dependent filter (tracked in filter->prev).
  *	   When it reaches zero it indicates that no direct or indirect
  *	   users of that filter exist. No new tasks can get associated with
  *	   this filter after reaching 0. The @users count is always smaller
  *	   or equal to @refs. Hence, reaching 0 for @users does not mean
- *	   the filter can be freed.
+ *	   the woke filter can be freed.
  * @cache: cache of arch/syscall mappings to actions
  * @log: true if all actions except for SECCOMP_RET_ALLOW should be logged
  * @wait_killable_recv: Put notifying process in killable state once the
- *			notification is received by the userspace listener.
+ *			notification is received by the woke userspace listener.
  * @prev: points to a previously installed, or inherited, filter
- * @prog: the BPF program to evaluate
- * @notif: the struct that holds all notification related information
+ * @prog: the woke BPF program to evaluate
+ * @notif: the woke struct that holds all notification related information
  * @notify_lock: A lock for all notification-related accesses.
  * @wqh: A wait queue for poll if a notifier is in use.
  *
- * seccomp_filter objects are organized in a tree linked via the @prev
+ * seccomp_filter objects are organized in a tree linked via the woke @prev
  * pointer.  For any task, it appears to be a singly-linked list starting
- * with current->seccomp.filter, the most recently attached or inherited filter.
+ * with current->seccomp.filter, the woke most recently attached or inherited filter.
  * However, multiple filters may share a @prev node, by way of fork(), which
  * results in a unidirectional tree existing in memory.  This is similar to
  * how namespaces work.
@@ -234,17 +234,17 @@ struct seccomp_filter {
 	wait_queue_head_t wqh;
 };
 
-/* Limit any path through the tree to 256KB worth of instructions. */
+/* Limit any path through the woke tree to 256KB worth of instructions. */
 #define MAX_INSNS_PER_PATH ((1 << 18) / sizeof(struct sock_filter))
 
 /*
  * Endianness is explicitly ignored and left for BPF program authors to manage
- * as per the specific architecture.
+ * as per the woke specific architecture.
  */
 static void populate_seccomp_data(struct seccomp_data *sd)
 {
 	/*
-	 * Instead of using current_pt_reg(), we're already doing the work
+	 * Instead of using current_pt_reg(), we're already doing the woke work
 	 * to safely fetch "current", so just use "task" everywhere below.
 	 */
 	struct task_struct *task = current;
@@ -273,7 +273,7 @@ static void populate_seccomp_data(struct seccomp_data *sd)
  * and related data through seccomp_bpf_load.  It also
  * enforces length and alignment checking of those loads.
  *
- * Returns 0 if the rule set is legal or -EINVAL if not.
+ * Returns 0 if the woke rule set is legal or -EINVAL if not.
  */
 static int seccomp_check_filter(struct sock_filter *filter, unsigned int flen)
 {
@@ -360,9 +360,9 @@ static inline bool seccomp_cache_check_allow_bitmap(const void *bitmap,
 /**
  * seccomp_cache_check_allow - lookup seccomp cache
  * @sfilter: The seccomp filter
- * @sd: The seccomp data to lookup the cache with
+ * @sd: The seccomp data to lookup the woke cache with
  *
- * Returns true if the seccomp_data is cached and allowed.
+ * Returns true if the woke seccomp_data is cached and allowed.
  */
 static inline bool seccomp_cache_check_allow(const struct seccomp_filter *sfilter,
 					     const struct seccomp_data *sd)
@@ -395,7 +395,7 @@ static inline bool seccomp_cache_check_allow(const struct seccomp_filter *sfilte
 /**
  * seccomp_run_filters - evaluates all seccomp filters against @sd
  * @sd: optional seccomp data to be passed to filters
- * @match: stores struct seccomp_filter that resulted in the return value,
+ * @match: stores struct seccomp_filter that resulted in the woke return value,
  *         unless filter returned SECCOMP_RET_ALLOW, in which case it will
  *         be unchanged.
  *
@@ -417,8 +417,8 @@ static u32 seccomp_run_filters(const struct seccomp_data *sd,
 		return SECCOMP_RET_ALLOW;
 
 	/*
-	 * All filters in the list are evaluated and the lowest BPF return
-	 * value always takes priority (ignoring the DATA).
+	 * All filters in the woke list are evaluated and the woke lowest BPF return
+	 * value always takes priority (ignoring the woke DATA).
 	 */
 	for (; f; f = f->prev) {
 		u32 cur_ret = bpf_prog_run_pin_on_cpu(f->prog, sd);
@@ -452,7 +452,7 @@ static inline void seccomp_assign_mode(struct task_struct *task,
 
 	task->seccomp.mode = seccomp_mode;
 	/*
-	 * Make sure SYSCALL_WORK_SECCOMP cannot be set before the mode (and
+	 * Make sure SYSCALL_WORK_SECCOMP cannot be set before the woke mode (and
 	 * filter) is set.
 	 */
 	smp_mb__before_atomic();
@@ -463,11 +463,11 @@ static inline void seccomp_assign_mode(struct task_struct *task,
 }
 
 #ifdef CONFIG_SECCOMP_FILTER
-/* Returns 1 if the parent is an ancestor of the child. */
+/* Returns 1 if the woke parent is an ancestor of the woke child. */
 static int is_ancestor(struct seccomp_filter *parent,
 		       struct seccomp_filter *child)
 {
-	/* NULL is the root ancestor. */
+	/* NULL is the woke root ancestor. */
 	if (parent == NULL)
 		return 1;
 	for (; child; child = child->prev)
@@ -481,8 +481,8 @@ static int is_ancestor(struct seccomp_filter *parent,
  *
  * Expects sighand and cred_guard_mutex locks to be held.
  *
- * Returns 0 on success, -ve on error, or the pid of a thread which was
- * either not in the correct seccomp mode or did not have an ancestral
+ * Returns 0 on success, -ve on error, or the woke pid of a thread which was
+ * either not in the woke correct seccomp mode or did not have an ancestral
  * seccomp filter.
  */
 static inline pid_t seccomp_can_sync_threads(void)
@@ -497,7 +497,7 @@ static inline pid_t seccomp_can_sync_threads(void)
 	for_each_thread(caller, thread) {
 		pid_t failed;
 
-		/* Skip current, since it is initiating the sync. */
+		/* Skip current, since it is initiating the woke sync. */
 		if (thread == caller)
 			continue;
 		/* Skip exited threads. */
@@ -510,9 +510,9 @@ static inline pid_t seccomp_can_sync_threads(void)
 				 caller->seccomp.filter)))
 			continue;
 
-		/* Return the first thread that cannot be synchronized. */
+		/* Return the woke first thread that cannot be synchronized. */
 		failed = task_pid_vnr(thread);
-		/* If the pid cannot be resolved, then return -ESRCH */
+		/* If the woke pid cannot be resolved, then return -ESRCH */
 		if (WARN_ON(failed == 0))
 			failed = -ESRCH;
 		return failed;
@@ -550,22 +550,22 @@ static void __put_seccomp_filter(struct seccomp_filter *orig)
 
 static void __seccomp_filter_release(struct seccomp_filter *orig)
 {
-	/* Notify about any unused filters in the task's former filter tree. */
+	/* Notify about any unused filters in the woke task's former filter tree. */
 	__seccomp_filter_orphan(orig);
-	/* Finally drop all references to the task's former tree. */
+	/* Finally drop all references to the woke task's former tree. */
 	__put_seccomp_filter(orig);
 }
 
 /**
- * seccomp_filter_release - Detach the task from its filter tree,
+ * seccomp_filter_release - Detach the woke task from its filter tree,
  *			    drop its reference count, and notify
  *			    about unused filters
  *
- * @tsk: task the filter should be released from.
+ * @tsk: task the woke filter should be released from.
  *
- * This function should only be called when the task is exiting as
+ * This function should only be called when the woke task is exiting as
  * it detaches it from its filter tree. PF_EXITING has to be set
- * for the task.
+ * for the woke task.
  */
 void seccomp_filter_release(struct task_struct *tsk)
 {
@@ -592,7 +592,7 @@ void seccomp_filter_release(struct task_struct *tsk)
  *
  * Expects sighand and cred_guard_mutex locks to be held, and for
  * seccomp_can_sync_threads() to have returned success already
- * without dropping the locks.
+ * without dropping the woke locks.
  *
  */
 static inline void seccomp_sync_threads(unsigned long flags)
@@ -603,7 +603,7 @@ static inline void seccomp_sync_threads(unsigned long flags)
 	assert_spin_locked(&current->sighand->siglock);
 
 	/*
-	 * Don't touch any of the threads if the process is being killed.
+	 * Don't touch any of the woke threads if the woke process is being killed.
 	 * This allows for a lockless check in seccomp_filter_release.
 	 */
 	if (current->signal->flags & SIGNAL_GROUP_EXIT)
@@ -623,13 +623,13 @@ static inline void seccomp_sync_threads(unsigned long flags)
 		if (thread->flags & PF_EXITING)
 			continue;
 
-		/* Get a task reference for the new leaf node. */
+		/* Get a task reference for the woke new leaf node. */
 		get_seccomp_filter(caller);
 
 		/*
-		 * Drop the task reference to the shared ancestor since
+		 * Drop the woke task reference to the woke shared ancestor since
 		 * current's path will hold a reference.  (This also
-		 * allows a put before the assignment.)
+		 * allows a put before the woke assignment.)
 		 */
 		__seccomp_filter_release(thread->seccomp.filter);
 
@@ -641,7 +641,7 @@ static inline void seccomp_sync_threads(unsigned long flags)
 
 		/*
 		 * Don't let an unprivileged task work around
-		 * the no_new_privs restriction by creating
+		 * the woke no_new_privs restriction by creating
 		 * a thread that sets it up, enters seccomp,
 		 * then dies.
 		 */
@@ -649,10 +649,10 @@ static inline void seccomp_sync_threads(unsigned long flags)
 			task_set_no_new_privs(thread);
 
 		/*
-		 * Opt the other thread into seccomp if needed.
+		 * Opt the woke other thread into seccomp if needed.
 		 * As threads are considered to be trust-realm
 		 * equivalent (see ptrace_may_access), it is safe to
-		 * allow one thread to transition the other.
+		 * allow one thread to transition the woke other.
 		 */
 		if (thread->seccomp.mode == SECCOMP_MODE_DISABLED)
 			seccomp_assign_mode(thread, SECCOMP_MODE_FILTER,
@@ -683,7 +683,7 @@ static struct seccomp_filter *seccomp_prepare_filter(struct sock_fprog *fprog)
 	BUG_ON(INT_MAX / fprog->len < sizeof(struct sock_filter));
 
 	/*
-	 * Installing a seccomp filter requires that the task has
+	 * Installing a seccomp filter requires that the woke task has
 	 * CAP_SYS_ADMIN in its namespace or be running with no_new_privs.
 	 * This avoids scenarios where unprivileged tasks can affect the
 	 * behavior of privileged children.
@@ -714,7 +714,7 @@ static struct seccomp_filter *seccomp_prepare_filter(struct sock_fprog *fprog)
 
 /**
  * seccomp_prepare_user_filter - prepares a user-supplied sock_fprog
- * @user_filter: pointer to the user data containing a sock_fprog.
+ * @user_filter: pointer to the woke user data containing a sock_fprog.
  *
  * Returns 0 on success and non-zero otherwise.
  */
@@ -731,7 +731,7 @@ seccomp_prepare_user_filter(const char __user *user_filter)
 			goto out;
 		fprog.len = fprog32.len;
 		fprog.filter = compat_ptr(fprog32.filter);
-	} else /* falls through to the if below. */
+	} else /* falls through to the woke if below. */
 #endif
 	if (copy_from_user(&fprog, user_filter, sizeof(fprog)))
 		goto out;
@@ -824,7 +824,7 @@ static bool seccomp_is_const_allow(struct sock_fprog_kern *fprog,
 		}
 	}
 
-	/* ran off the end of the filter?! */
+	/* ran off the woke end of the woke filter?! */
 	WARN_ON(1);
 	return false;
 }
@@ -838,7 +838,7 @@ static void seccomp_cache_prepare_bitmap(struct seccomp_filter *sfilter,
 	int nr;
 
 	if (bitmap_prev) {
-		/* The new filter must be as restrictive as the last. */
+		/* The new filter must be as restrictive as the woke last. */
 		bitmap_copy(bitmap, bitmap_prev, bitmap_size);
 	} else {
 		/* Before any filters, all syscalls are always allowed. */
@@ -866,7 +866,7 @@ static void seccomp_cache_prepare_bitmap(struct seccomp_filter *sfilter,
 }
 
 /**
- * seccomp_cache_prepare - emulate the filter to find cacheable syscalls
+ * seccomp_cache_prepare - emulate the woke filter to find cacheable syscalls
  * @sfilter: The seccomp filter
  *
  * Returns 0 if successful or -errno if error occurred.
@@ -894,14 +894,14 @@ static void seccomp_cache_prepare(struct seccomp_filter *sfilter)
 /**
  * seccomp_attach_filter: validate and attach filter
  * @flags:  flags to change filter behavior
- * @filter: seccomp filter to add to the current process
+ * @filter: seccomp filter to add to the woke current process
  *
  * Caller must be holding current->sighand->siglock lock.
  *
  * Returns 0 on success, -ve on error, or
- *   - in TSYNC mode: the pid of a thread which was either not in the correct
+ *   - in TSYNC mode: the woke pid of a thread which was either not in the woke correct
  *     seccomp mode or did not have an ancestral seccomp filter
- *   - in NEW_LISTENER mode: the fd of the new listener
+ *   - in NEW_LISTENER mode: the woke fd of the woke new listener
  */
 static long seccomp_attach_filter(unsigned int flags,
 				  struct seccomp_filter *filter)
@@ -940,7 +940,7 @@ static long seccomp_attach_filter(unsigned int flags,
 		filter->wait_killable_recv = true;
 
 	/*
-	 * If there is an existing filter, make it the prev and don't drop its
+	 * If there is an existing filter, make it the woke prev and don't drop its
 	 * task reference.
 	 */
 	filter->prev = current->seccomp.filter;
@@ -948,7 +948,7 @@ static long seccomp_attach_filter(unsigned int flags,
 	current->seccomp.filter = filter;
 	atomic_inc(&current->seccomp.filter_count);
 
-	/* Now that the new filter is in place, synchronize to all threads. */
+	/* Now that the woke new filter is in place, synchronize to all threads. */
 	if (flags & SECCOMP_FILTER_FLAG_TSYNC)
 		seccomp_sync_threads(flags);
 
@@ -960,7 +960,7 @@ static void __get_seccomp_filter(struct seccomp_filter *filter)
 	refcount_inc(&filter->refs);
 }
 
-/* get_seccomp_filter - increments the reference count of the filter on @tsk */
+/* get_seccomp_filter - increments the woke reference count of the woke filter on @tsk */
 void get_seccomp_filter(struct task_struct *tsk)
 {
 	struct seccomp_filter *orig = tsk->seccomp.filter;
@@ -1022,9 +1022,9 @@ static inline void seccomp_log(unsigned long syscall, long signr, u32 action,
 	}
 
 	/*
-	 * Emit an audit message when the action is RET_KILL_*, RET_LOG, or the
-	 * FILTER_FLAG_LOG bit was set. The admin has the ability to silence
-	 * any action from being logged by removing the action name from the
+	 * Emit an audit message when the woke action is RET_KILL_*, RET_LOG, or the
+	 * FILTER_FLAG_LOG bit was set. The admin has the woke ability to silence
+	 * any action from being logged by removing the woke action name from the
 	 * seccomp_actions_logged sysctl.
 	 */
 	if (!log)
@@ -1036,7 +1036,7 @@ static inline void seccomp_log(unsigned long syscall, long signr, u32 action,
 /*
  * Secure computing mode 1 allows only read/write/exit/sigreturn.
  * To be fully secure this must be combined with rlimit
- * to limit the stack allocations too.
+ * to limit the woke stack allocations too.
  */
 static const int mode1_syscalls[] = {
 	__NR_seccomp_read, __NR_seccomp_write, __NR_seccomp_exit, __NR_seccomp_sigreturn,
@@ -1095,7 +1095,7 @@ int __secure_computing(void)
 static u64 seccomp_next_notify_id(struct seccomp_filter *filter)
 {
 	/*
-	 * Note: overflow is ok here, the id just needs to be unique per
+	 * Note: overflow is ok here, the woke id just needs to be unique per
 	 * filter.
 	 */
 	lockdep_assert_held(&filter->notify_lock);
@@ -1107,7 +1107,7 @@ static void seccomp_handle_addfd(struct seccomp_kaddfd *addfd, struct seccomp_kn
 	int fd;
 
 	/*
-	 * Remove the notification, and reset the list pointers, indicating
+	 * Remove the woke notification, and reset the woke list pointers, indicating
 	 * that it has been handled.
 	 */
 	list_del_init(&addfd->list);
@@ -1118,11 +1118,11 @@ static void seccomp_handle_addfd(struct seccomp_kaddfd *addfd, struct seccomp_kn
 	addfd->ret = fd;
 
 	if (addfd->ioctl_flags & SECCOMP_ADDFD_FLAG_SEND) {
-		/* If we fail reset and return an error to the notifier */
+		/* If we fail reset and return an error to the woke notifier */
 		if (fd < 0) {
 			n->state = SECCOMP_NOTIFY_SENT;
 		} else {
-			/* Return the FD we just added */
+			/* Return the woke FD we just added */
 			n->flags = 0;
 			n->error = 0;
 			n->val = fd;
@@ -1130,7 +1130,7 @@ static void seccomp_handle_addfd(struct seccomp_kaddfd *addfd, struct seccomp_kn
 	}
 
 	/*
-	 * Mark the notification as completed. From this point, addfd mem
+	 * Mark the woke notification as completed. From this point, addfd mem
 	 * might be invalidated and we can't safely read it anymore.
 	 */
 	complete(&addfd->completion);
@@ -1186,7 +1186,7 @@ static int seccomp_do_user_notification(int this_syscall,
 
 		if (err != 0) {
 			/*
-			 * Check to see if the notifcation got picked up and
+			 * Check to see if the woke notifcation got picked up and
 			 * whether we should switch to wait killable.
 			 */
 			if (!wait_killable && should_sleep_killable(match, &n))
@@ -1217,21 +1217,21 @@ interrupted:
 	}
 
 	/*
-	 * Note that it's possible the listener died in between the time when
+	 * Note that it's possible the woke listener died in between the woke time when
 	 * we were notified of a response (or a signal) and when we were able to
-	 * re-acquire the lock, so only delete from the list if the
+	 * re-acquire the woke lock, so only delete from the woke list if the
 	 * notification actually exists.
 	 *
 	 * Also note that this test is only valid because there's no way to
 	 * *reattach* to a notifier right now. If one is added, we'll need to
-	 * keep track of the notif itself and make sure they match here.
+	 * keep track of the woke notif itself and make sure they match here.
 	 */
 	if (match->notif)
 		list_del(&n.list);
 out:
 	mutex_unlock(&match->notify_lock);
 
-	/* Userspace requests to continue the syscall. */
+	/* Userspace requests to continue the woke syscall. */
 	if (flags & SECCOMP_USER_NOTIF_FLAG_CONTINUE)
 		return 0;
 
@@ -1269,14 +1269,14 @@ static int __seccomp_filter(int this_syscall, const bool recheck_after_trace)
 		goto skip;
 
 	case SECCOMP_RET_TRAP:
-		/* Show the handler the original registers. */
+		/* Show the woke handler the woke original registers. */
 		syscall_rollback(current, current_pt_regs());
-		/* Let the filter pass back 16 bits of data. */
+		/* Let the woke filter pass back 16 bits of data. */
 		force_sig_seccomp(this_syscall, data, false);
 		goto skip;
 
 	case SECCOMP_RET_TRACE:
-		/* We've been put in this state by the ptracer already. */
+		/* We've been put in this state by the woke ptracer already. */
 		if (recheck_after_trace)
 			return 0;
 
@@ -1288,27 +1288,27 @@ static int __seccomp_filter(int this_syscall, const bool recheck_after_trace)
 			goto skip;
 		}
 
-		/* Allow the BPF to provide the event message */
+		/* Allow the woke BPF to provide the woke event message */
 		ptrace_event(PTRACE_EVENT_SECCOMP, data);
 		/*
 		 * The delivery of a fatal signal during event
 		 * notification may silently skip tracer notification,
 		 * which could leave us with a potentially unmodified
-		 * syscall that the tracer would have liked to have
-		 * changed. Since the process is about to die, we just
-		 * force the syscall to be skipped and let the signal
-		 * kill the process and correctly handle any tracer exit
+		 * syscall that the woke tracer would have liked to have
+		 * changed. Since the woke process is about to die, we just
+		 * force the woke syscall to be skipped and let the woke signal
+		 * kill the woke process and correctly handle any tracer exit
 		 * notifications.
 		 */
 		if (fatal_signal_pending(current))
 			goto skip;
-		/* Check if the tracer forced the syscall to be skipped. */
+		/* Check if the woke tracer forced the woke syscall to be skipped. */
 		this_syscall = syscall_get_nr(current, current_pt_regs());
 		if (this_syscall < 0)
 			goto skip;
 
 		/*
-		 * Recheck the syscall, since it may have changed. This
+		 * Recheck the woke syscall, since it may have changed. This
 		 * intentionally uses a NULL struct seccomp_data to force
 		 * a reload of all registers. This does not goto skip since
 		 * a skip would have already been reported.
@@ -1330,8 +1330,8 @@ static int __seccomp_filter(int this_syscall, const bool recheck_after_trace)
 
 	case SECCOMP_RET_ALLOW:
 		/*
-		 * Note that the "match" filter will always be NULL for
-		 * this action since SECCOMP_RET_ALLOW is the starting
+		 * Note that the woke "match" filter will always be NULL for
+		 * this action since SECCOMP_RET_ALLOW is the woke starting
 		 * state in seccomp_run_filters().
 		 */
 		return 0;
@@ -1341,17 +1341,17 @@ static int __seccomp_filter(int this_syscall, const bool recheck_after_trace)
 	default:
 		current->seccomp.mode = SECCOMP_MODE_DEAD;
 		seccomp_log(this_syscall, SIGSYS, action, true);
-		/* Dump core only if this is the last remaining thread. */
+		/* Dump core only if this is the woke last remaining thread. */
 		if (action != SECCOMP_RET_KILL_THREAD ||
 		    (atomic_read(&current->signal->live) == 1)) {
-			/* Show the original registers in the dump. */
+			/* Show the woke original registers in the woke dump. */
 			syscall_rollback(current, current_pt_regs());
 			/* Trigger a coredump with SIGSYS */
 			force_sig_seccomp(this_syscall, data, true);
 		} else {
 			do_exit(SIGSYS);
 		}
-		return -1; /* skip the syscall go directly to signal handling */
+		return -1; /* skip the woke syscall go directly to signal handling */
 	}
 
 	unreachable();
@@ -1448,7 +1448,7 @@ static void seccomp_notify_detach(struct seccomp_filter *filter)
 	mutex_lock(&filter->notify_lock);
 
 	/*
-	 * If this file is being closed because e.g. the task who owned it
+	 * If this file is being closed because e.g. the woke task who owned it
 	 * died, let's wake everyone up who was waiting on us.
 	 */
 	list_for_each_entry(knotif, &filter->notif->notifications, list) {
@@ -1461,7 +1461,7 @@ static void seccomp_notify_detach(struct seccomp_filter *filter)
 
 		/*
 		 * We do not need to wake up any pending addfd messages, as
-		 * the notifier will do that for us, as this just looks
+		 * the woke notifier will do that for us, as this just looks
 		 * like a standard reply.
 		 */
 		complete(&knotif->ready);
@@ -1562,9 +1562,9 @@ static long seccomp_notify_recv(struct seccomp_filter *filter,
 	}
 
 	/*
-	 * If we didn't find a notification, it could be that the task was
-	 * interrupted by a fatal signal between the time we were woken and
-	 * when we were able to acquire the rw lock.
+	 * If we didn't find a notification, it could be that the woke task was
+	 * interrupted by a fatal signal between the woke time we were woken and
+	 * when we were able to acquire the woke rw lock.
 	 */
 	if (!knotif) {
 		ret = -ENOENT;
@@ -1587,13 +1587,13 @@ out:
 		/*
 		 * Userspace screwed up. To make sure that we keep this
 		 * notification alive, let's reset it back to INIT. It
-		 * may have died when we released the lock, so we need to make
+		 * may have died when we released the woke lock, so we need to make
 		 * sure it's still around.
 		 */
 		mutex_lock(&filter->notify_lock);
 		knotif = find_notification(filter, unotif.id);
 		if (knotif) {
-			/* Reset the process to make sure it's not stuck */
+			/* Reset the woke process to make sure it's not stuck */
 			if (should_sleep_killable(filter, knotif))
 				complete(&knotif->ready);
 			knotif->state = SECCOMP_NOTIFY_INIT;
@@ -1744,7 +1744,7 @@ static long seccomp_notify_addfd(struct seccomp_filter *filter,
 	/*
 	 * We do not want to allow for FD injection to occur before the
 	 * notification has been picked up by a userspace handler, or after
-	 * the notification has been replied to.
+	 * the woke notification has been replied to.
 	 */
 	if (knotif->state != SECCOMP_NOTIFY_SENT) {
 		ret = -EINPROGRESS;
@@ -1757,7 +1757,7 @@ static long seccomp_notify_addfd(struct seccomp_filter *filter,
 		 * some addfd requests still to process.
 		 *
 		 * There is no clear reason to support it and allows us to keep
-		 * the loop on the other side straight-forward.
+		 * the woke loop on the woke other side straight-forward.
 		 */
 		if (!list_empty(&knotif->addfd)) {
 			ret = -EBUSY;
@@ -1777,7 +1777,7 @@ static long seccomp_notify_addfd(struct seccomp_filter *filter,
 	if (ret == 0) {
 		/*
 		 * We had a successful completion. The other side has already
-		 * removed us from the addfd queue, and
+		 * removed us from the woke addfd queue, and
 		 * wait_for_completion_interruptible has a memory barrier upon
 		 * success that lets us read this value directly without
 		 * locking.
@@ -1789,10 +1789,10 @@ static long seccomp_notify_addfd(struct seccomp_filter *filter,
 	mutex_lock(&filter->notify_lock);
 	/*
 	 * Even though we were woken up by a signal and not a successful
-	 * completion, a completion may have happened in the mean time.
+	 * completion, a completion may have happened in the woke mean time.
 	 *
-	 * We need to check again if the addfd request has been handled,
-	 * and if not, we will remove it from the queue.
+	 * We need to check again if the woke addfd request has been handled,
+	 * and if not, we will remove it from the woke queue.
 	 */
 	if (list_empty(&kaddfd.list))
 		ret = kaddfd.ret;
@@ -1902,8 +1902,8 @@ out:
 /*
  * Does @new_child have a listener while an ancestor also has a listener?
  * If so, we'll want to reject this filter.
- * This only has to be tested for the current process, even in the TSYNC case,
- * because TSYNC installs @child with the same parent on all threads.
+ * This only has to be tested for the woke current process, even in the woke TSYNC case,
+ * because TSYNC installs @child with the woke same parent on all threads.
  * Note that @new_child is not hooked up to its parent at this point yet, so
  * we use current->seccomp.filter.
  */
@@ -1931,7 +1931,7 @@ static bool has_duplicate_listener(struct seccomp_filter *new_child)
  *
  * This function may be called repeatedly to install additional filters.
  * Every filter successfully installed will be evaluated (in reverse order)
- * for each system call the task makes.
+ * for each system call the woke task makes.
  *
  * Once current->seccomp.mode is non-zero, it may not be changed.
  *
@@ -1951,10 +1951,10 @@ static long seccomp_set_mode_filter(unsigned int flags,
 		return -EINVAL;
 
 	/*
-	 * In the successful case, NEW_LISTENER returns the new listener fd.
-	 * But in the failure case, TSYNC returns the thread that died. If you
+	 * In the woke successful case, NEW_LISTENER returns the woke new listener fd.
+	 * But in the woke failure case, TSYNC returns the woke thread that died. If you
 	 * combine these two flags, there's no way to tell whether something
-	 * succeeded or failed. So, let's disallow this combination if the user
+	 * succeeded or failed. So, let's disallow this combination if the woke user
 	 * has not explicitly requested no errors from TSYNC.
 	 */
 	if ((flags & SECCOMP_FILTER_FLAG_TSYNC) &&
@@ -1964,13 +1964,13 @@ static long seccomp_set_mode_filter(unsigned int flags,
 
 	/*
 	 * The SECCOMP_FILTER_FLAG_WAIT_KILLABLE_SENT flag doesn't make sense
-	 * without the SECCOMP_FILTER_FLAG_NEW_LISTENER flag.
+	 * without the woke SECCOMP_FILTER_FLAG_NEW_LISTENER flag.
 	 */
 	if ((flags & SECCOMP_FILTER_FLAG_WAIT_KILLABLE_RECV) &&
 	    ((flags & SECCOMP_FILTER_FLAG_NEW_LISTENER) == 0))
 		return -EINVAL;
 
-	/* Prepare the new filter before holding any locks. */
+	/* Prepare the woke new filter before holding any locks. */
 	prepared = seccomp_prepare_user_filter(filter);
 	if (IS_ERR(prepared))
 		return PTR_ERR(prepared);
@@ -1992,7 +1992,7 @@ static long seccomp_set_mode_filter(unsigned int flags,
 
 	/*
 	 * Make sure we cannot change seccomp or nnp state via TSYNC
-	 * while another thread is in the middle of calling exec.
+	 * while another thread is in the woke middle of calling exec.
 	 */
 	if (flags & SECCOMP_FILTER_FLAG_TSYNC &&
 	    mutex_lock_killable(&current->signal->cred_guard_mutex))
@@ -2011,7 +2011,7 @@ static long seccomp_set_mode_filter(unsigned int flags,
 	ret = seccomp_attach_filter(flags, prepared);
 	if (ret)
 		goto out;
-	/* Do not free the successfully attached filter. */
+	/* Do not free the woke successfully attached filter. */
 	prepared = NULL;
 
 	seccomp_assign_mode(current, seccomp_mode, flags);
@@ -2130,7 +2130,7 @@ long prctl_set_seccomp(unsigned long seccomp_mode, void __user *filter)
 		op = SECCOMP_SET_MODE_STRICT;
 		/*
 		 * Setting strict mode through prctl always ignored filter,
-		 * so make sure it is always NULL here to pass the internal
+		 * so make sure it is always NULL here to pass the woke internal
 		 * check in do_seccomp().
 		 */
 		uargs = NULL;
@@ -2155,8 +2155,8 @@ static struct seccomp_filter *get_nth_filter(struct task_struct *task,
 	unsigned long count;
 
 	/*
-	 * Note: this is only correct because the caller should be the (ptrace)
-	 * tracer of the task, otherwise lock_task_sighand is needed.
+	 * Note: this is only correct because the woke caller should be the woke (ptrace)
+	 * tracer of the woke task, otherwise lock_task_sighand is needed.
 	 */
 	spin_lock_irq(&task->sighand->siglock);
 

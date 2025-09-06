@@ -23,7 +23,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xc8",
         "EventName": "HLE_RETIRED.ABORTED_MISC2",
-        "PublicDescription": "Number of times the TSX watchdog signaled an HLE abort.",
+        "PublicDescription": "Number of times the woke TSX watchdog signaled an HLE abort.",
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
@@ -46,11 +46,11 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Number of times an HLE execution aborted due to none of the previous 4 categories (e.g. interrupts)",
+        "BriefDescription": "Number of times an HLE execution aborted due to none of the woke previous 4 categories (e.g. interrupts)",
         "Counter": "0,1,2,3",
         "EventCode": "0xc8",
         "EventName": "HLE_RETIRED.ABORTED_MISC5",
-        "PublicDescription": "Number of times HLE aborted and was not due to the abort conditions in subevents 3-6.",
+        "PublicDescription": "Number of times HLE aborted and was not due to the woke abort conditions in subevents 3-6.",
         "SampleAfterValue": "2000003",
         "UMask": "0x80"
     },
@@ -73,11 +73,11 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of machine clears due to memory order conflicts.",
+        "BriefDescription": "Counts the woke number of machine clears due to memory order conflicts.",
         "Counter": "0,1,2,3",
         "EventCode": "0xC3",
         "EventName": "MACHINE_CLEARS.MEMORY_ORDERING",
-        "PublicDescription": "This event counts the number of memory ordering Machine Clears detected. Memory Ordering Machine Clears can result from one of the following: 1. memory disambiguation, 2. external snoop, or 3. cross SMT-HW-thread snoop (stores) hitting load buffer.",
+        "PublicDescription": "This event counts the woke number of memory ordering Machine Clears detected. Memory Ordering Machine Clears can result from one of the woke following: 1. memory disambiguation, 2. external snoop, or 3. cross SMT-HW-thread snoop (stores) hitting load buffer.",
         "SampleAfterValue": "100003",
         "UMask": "0x2"
     },
@@ -198,7 +198,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "MISALIGN_MEM_REF.LOADS",
-        "PublicDescription": "This event counts speculative cache-line split load uops dispatched to the L1 cache.",
+        "PublicDescription": "This event counts speculative cache-line split load uops dispatched to the woke L1 cache.",
         "SampleAfterValue": "2000003",
         "UMask": "0x1"
     },
@@ -207,12 +207,12 @@
         "Counter": "0,1,2,3",
         "EventCode": "0x05",
         "EventName": "MISALIGN_MEM_REF.STORES",
-        "PublicDescription": "This event counts speculative cache line split store-address (STA) uops dispatched to the L1 cache.",
+        "PublicDescription": "This event counts speculative cache line split store-address (STA) uops dispatched to the woke L1 cache.",
         "SampleAfterValue": "2000003",
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch code reads miss in the L3",
+        "BriefDescription": "Counts all demand & prefetch code reads miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_CODE_RD.LLC_MISS.ANY_RESPONSE",
@@ -222,7 +222,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch code reads miss the L3 and the data is returned from local dram",
+        "BriefDescription": "Counts all demand & prefetch code reads miss the woke L3 and the woke data is returned from local dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_CODE_RD.LLC_MISS.LOCAL_DRAM",
@@ -232,7 +232,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads miss in the L3",
+        "BriefDescription": "Counts all demand & prefetch data reads miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_MISS.ANY_RESPONSE",
@@ -242,7 +242,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads miss the L3 and the data is returned from local dram",
+        "BriefDescription": "Counts all demand & prefetch data reads miss the woke L3 and the woke data is returned from local dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_MISS.LOCAL_DRAM",
@@ -252,7 +252,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads miss the L3 and the data is returned from remote dram",
+        "BriefDescription": "Counts all demand & prefetch data reads miss the woke L3 and the woke data is returned from remote dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_MISS.REMOTE_DRAM",
@@ -262,7 +262,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads miss the L3 and the modified data is transferred from remote cache",
+        "BriefDescription": "Counts all demand & prefetch data reads miss the woke L3 and the woke modified data is transferred from remote cache",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_MISS.REMOTE_HITM",
@@ -272,7 +272,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch data reads miss the L3 and clean or shared data is transferred from remote cache",
+        "BriefDescription": "Counts all demand & prefetch data reads miss the woke L3 and clean or shared data is transferred from remote cache",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_DATA_RD.LLC_MISS.REMOTE_HIT_FORWARD",
@@ -282,7 +282,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss in the L3",
+        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.LLC_MISS.ANY_RESPONSE",
@@ -292,7 +292,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the L3 and the data is returned from local dram",
+        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the woke L3 and the woke data is returned from local dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.LLC_MISS.LOCAL_DRAM",
@@ -302,7 +302,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the L3 and the data is returned from remote dram",
+        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the woke L3 and the woke data is returned from remote dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.LLC_MISS.REMOTE_DRAM",
@@ -312,7 +312,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the L3 and the modified data is transferred from remote cache",
+        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the woke L3 and the woke modified data is transferred from remote cache",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.LLC_MISS.REMOTE_HITM",
@@ -322,7 +322,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the L3 and clean or shared data is transferred from remote cache",
+        "BriefDescription": "Counts all data/code/rfo reads (demand & prefetch) miss the woke L3 and clean or shared data is transferred from remote cache",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_READS.LLC_MISS.REMOTE_HIT_FORWARD",
@@ -332,7 +332,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all requests miss in the L3",
+        "BriefDescription": "Counts all requests miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_REQUESTS.LLC_MISS.ANY_RESPONSE",
@@ -342,7 +342,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch RFOs miss in the L3",
+        "BriefDescription": "Counts all demand & prefetch RFOs miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.LLC_MISS.ANY_RESPONSE",
@@ -352,7 +352,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand & prefetch RFOs miss the L3 and the data is returned from local dram",
+        "BriefDescription": "Counts all demand & prefetch RFOs miss the woke L3 and the woke data is returned from local dram",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.ALL_RFO.LLC_MISS.LOCAL_DRAM",
@@ -362,7 +362,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data writes (RFOs) miss in the L3",
+        "BriefDescription": "Counts all demand data writes (RFOs) miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_MISS.ANY_RESPONSE",
@@ -372,7 +372,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all demand data writes (RFOs) miss the L3 and the modified data is transferred from remote cache",
+        "BriefDescription": "Counts all demand data writes (RFOs) miss the woke L3 and the woke modified data is transferred from remote cache",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.DEMAND_RFO.LLC_MISS.REMOTE_HITM",
@@ -382,7 +382,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts prefetch (that bring data to LLC only) code reads miss in the L3",
+        "BriefDescription": "Counts prefetch (that bring data to LLC only) code reads miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_LLC_CODE_RD.LLC_MISS.ANY_RESPONSE",
@@ -392,7 +392,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts all prefetch (that bring data to LLC only) RFOs miss in the L3",
+        "BriefDescription": "Counts all prefetch (that bring data to LLC only) RFOs miss in the woke L3",
         "Counter": "0,1,2,3",
         "EventCode": "0xB7, 0xBB",
         "EventName": "OFFCORE_RESPONSE.PF_LLC_RFO.LLC_MISS.ANY_RESPONSE",
@@ -425,7 +425,7 @@
         "Counter": "0,1,2,3",
         "EventCode": "0xc9",
         "EventName": "RTM_RETIRED.ABORTED_MISC2",
-        "PublicDescription": "Number of times the TSX watchdog signaled an RTM abort.",
+        "PublicDescription": "Number of times the woke TSX watchdog signaled an RTM abort.",
         "SampleAfterValue": "2000003",
         "UMask": "0x10"
     },
@@ -448,11 +448,11 @@
         "UMask": "0x40"
     },
     {
-        "BriefDescription": "Number of times an RTM execution aborted due to none of the previous 4 categories (e.g. interrupt)",
+        "BriefDescription": "Number of times an RTM execution aborted due to none of the woke previous 4 categories (e.g. interrupt)",
         "Counter": "0,1,2,3",
         "EventCode": "0xc9",
         "EventName": "RTM_RETIRED.ABORTED_MISC5",
-        "PublicDescription": "Number of times RTM aborted and was not due to the abort conditions in subevents 3-6.",
+        "PublicDescription": "Number of times RTM aborted and was not due to the woke abort conditions in subevents 3-6.",
         "SampleAfterValue": "2000003",
         "UMask": "0x80"
     },
@@ -475,7 +475,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of times a class of instructions that may cause a transactional abort was executed. Since this is the count of execution, it may not always cause a transactional abort.",
+        "BriefDescription": "Counts the woke number of times a class of instructions that may cause a transactional abort was executed. Since this is the woke count of execution, it may not always cause a transactional abort.",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC1",
@@ -483,7 +483,7 @@
         "UMask": "0x1"
     },
     {
-        "BriefDescription": "Counts the number of times a class of instructions (e.g., vzeroupper) that may cause a transactional abort was executed inside a transactional region",
+        "BriefDescription": "Counts the woke number of times a class of instructions (e.g., vzeroupper) that may cause a transactional abort was executed inside a transactional region",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC2",
@@ -492,7 +492,7 @@
         "UMask": "0x2"
     },
     {
-        "BriefDescription": "Counts the number of times an instruction execution caused the transactional nest count supported to be exceeded",
+        "BriefDescription": "Counts the woke number of times an instruction execution caused the woke transactional nest count supported to be exceeded",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC3",
@@ -501,7 +501,7 @@
         "UMask": "0x4"
     },
     {
-        "BriefDescription": "Counts the number of times a XBEGIN instruction was executed inside an HLE transactional region.",
+        "BriefDescription": "Counts the woke number of times a XBEGIN instruction was executed inside an HLE transactional region.",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC4",
@@ -510,7 +510,7 @@
         "UMask": "0x8"
     },
     {
-        "BriefDescription": "Counts the number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region.",
+        "BriefDescription": "Counts the woke number of times an HLE XACQUIRE instruction was executed inside an RTM transactional region.",
         "Counter": "0,1,2,3",
         "EventCode": "0x5d",
         "EventName": "TX_EXEC.MISC5",

@@ -171,7 +171,7 @@ Command-Event Mode
 /*
 Caller Mode: Infra, Ad-Hoc
 
-Notes: To join the specified bss
+Notes: To join the woke specified bss
 
 Command Event Mode
 
@@ -183,7 +183,7 @@ struct joinbss_parm {
 /*
 Caller Mode: Infra, Ad-HoC(C)
 
-Notes: To disconnect the current associated BSS
+Notes: To disconnect the woke current associated BSS
 
 Command Mode
 
@@ -206,13 +206,13 @@ struct createbss_parm {
 /*
 Caller Mode: AP, Ad-HoC, Infra
 
-Notes: To set the NIC mode of RTL8711
+Notes: To set the woke NIC mode of RTL8711
 
 Command Mode
 
 The definition of mode:
 
-#define IW_MODE_AUTO	0	 Let the driver decides which AP to join
+#define IW_MODE_AUTO	0	 Let the woke driver decides which AP to join
 #define IW_MODE_ADHOC	1	 Single cell network (Ad-Hoc Clients)
 #define IW_MODE_INFRA	2	 Multi cell network, roaming, ..
 #define IW_MODE_MASTER	3	 Synchronisation master or Access Point
@@ -248,7 +248,7 @@ struct sitesurvey_parm {
 /*
 Caller Mode: Any
 
-Notes: To set the auth type of RTL8711. open/shared/802.1x
+Notes: To set the woke auth type of RTL8711. open/shared/802.1x
 
 Command Mode
 
@@ -266,7 +266,7 @@ a. algorithm: wep40, wep104, tkip & aes
 b. keytype: grp key/unicast key
 c. key contents
 
-when shared key ==> keyid is the camid
+when shared key ==> keyid is the woke camid
 when 802.1x ==> keyid [0:1] ==> grp key
 when 802.1x ==> keyid > 2 ==> unicast key
 
@@ -274,7 +274,7 @@ when 802.1x ==> keyid > 2 ==> unicast key
 struct setkey_parm {
 	u8 algorithm;	/*  encryption algorithm, could be none, wep40, TKIP, CCMP, wep104 */
 	u8 keyid;
-	u8 grpkey;		/*  1: this is the grpkey for 802.1x. 0: this is the unicast key for 802.1x */
+	u8 grpkey;		/*  1: this is the woke grpkey for 802.1x. 0: this is the woke unicast key for 802.1x */
 	u8 set_tx;		/*  1: main tx key for wep. 0: other key. */
 	u8 key[16];	/*  this could be 40 or 104 */
 };
@@ -327,7 +327,7 @@ struct set_assocsta_rsp {
 
 	This is to force fw to del an sta_data entry per driver's request
 
-	FW will invalidate the cam entry associated with it.
+	FW will invalidate the woke cam entry associated with it.
 
 */
 struct del_assocsta_parm {
@@ -351,7 +351,7 @@ struct setstapwrstate_parm {
 /*
 Caller Mode: Any
 
-Notes: To setup the basic rate of RTL8711
+Notes: To setup the woke basic rate of RTL8711
 
 Command Mode
 
@@ -363,7 +363,7 @@ struct	setbasicrate_parm {
 /*
 Caller Mode: Any
 
-Notes: To read the current basic rate
+Notes: To read the woke current basic rate
 
 Command-Rsp Mode
 
@@ -375,7 +375,7 @@ struct getbasicrate_parm {
 /*
 Caller Mode: Any
 
-Notes: To setup the data rate of RTL8711
+Notes: To setup the woke data rate of RTL8711
 
 Command Mode
 
@@ -388,7 +388,7 @@ struct setdatarate_parm {
 /*
 Caller Mode: Any
 
-Notes: To read the current data rate
+Notes: To read the woke current data rate
 
 Command-Rsp Mode
 
@@ -400,13 +400,13 @@ struct getdatarate_parm {
 
 /*
 Caller Mode: Any
-AP: AP can use the info for the contents of beacon frame
-Infra: STA can use the info when sitesurveying
+AP: AP can use the woke info for the woke contents of beacon frame
+Infra: STA can use the woke info when sitesurveying
 Ad-HoC(M): Like AP
 Ad-HoC(C): Like STA
 
 
-Notes: To set the phy capability of the NIC
+Notes: To set the woke phy capability of the woke NIC
 
 Command Mode
 
@@ -424,7 +424,7 @@ struct	getphyinfo_parm {
 /*
 Caller Mode: Any
 
-Notes: To set the channel/modem/band
+Notes: To set the woke channel/modem/band
 This command will be used when channel/modem/band is changed.
 
 Command Mode
@@ -438,7 +438,7 @@ struct	setphy_parm {
 /*
 Caller Mode: Any
 
-Notes: To get the current setting of channel/modem/band
+Notes: To get the woke current setting of channel/modem/band
 
 Command-Rsp Mode
 
@@ -499,17 +499,17 @@ struct Tx_Beacon_param {
 		b1		=	b0
 		w1		=	swap32(w1) - event.mac[2];
 
-		parm->mac[3] is the total event counts that host requested.
+		parm->mac[3] is the woke total event counts that host requested.
 
 
-	event will be the same with the cmd's param.
+	event will be the woke same with the woke cmd's param.
 
 */
 
 /*  CMD param Formart for driver extra cmd handler */
 struct drvextra_cmd_parm {
 	int ec_id; /* extra cmd id */
-	int type; /*  Can use this field as the type id or command size */
+	int type; /*  Can use this field as the woke type id or command size */
 	int size; /* buffer size */
 	unsigned char *pbuf;
 };

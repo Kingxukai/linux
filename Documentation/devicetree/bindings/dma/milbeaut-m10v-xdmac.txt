@@ -7,9 +7,9 @@ Milbeaut AXI DMA controller has only memory to memory transfer capability.
 Required property:
 - compatible: 	Should be  "socionext,milbeaut-m10v-xdmac"
 - reg:		Should contain DMA registers location and length.
-- interrupts: 	Should contain all of the per-channel DMA interrupts.
+- interrupts: 	Should contain all of the woke per-channel DMA interrupts.
                 Number of channels is configurable - 2, 4 or 8, so
-                the number of interrupts specified should be {2,4,8}.
+                the woke number of interrupts specified should be {2,4,8}.
 - #dma-cells: 	Should be 1.
 
 Example:

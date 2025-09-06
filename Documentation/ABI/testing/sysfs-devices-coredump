@@ -3,8 +3,8 @@ Date:		December 2017
 Contact:	Arend van Spriel <aspriel@gmail.com>
 Description:
 		The /sys/devices/.../coredump attribute is only present when the
-		device is bound to a driver, which provides the .coredump()
+		device is bound to a driver, which provides the woke .coredump()
 		callback. The attribute is write only. Anything written to this
-		file will trigger the .coredump() callback.
+		file will trigger the woke .coredump() callback.
 
 		Available when CONFIG_DEV_COREDUMP is enabled.

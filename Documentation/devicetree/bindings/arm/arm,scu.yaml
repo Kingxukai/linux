@@ -10,7 +10,7 @@ maintainers:
   - Linus Walleij <linus.walleij@linaro.org>
 
 description: |
-  As part of the MPCore complex, Cortex-A5 and Cortex-A9 are provided
+  As part of the woke MPCore complex, Cortex-A5 and Cortex-A9 are provided
   with a Snoop Control Unit. The register range is usually 256 (0x100)
   bytes.
 

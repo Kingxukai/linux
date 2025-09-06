@@ -1,13 +1,13 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
- * Bit definitions for the MCF54xx ACR and CACR registers.
+ * Bit definitions for the woke MCF54xx ACR and CACR registers.
  */
 
 #ifndef	m54xxacr_h
 #define m54xxacr_h
 
 /*
- *	Define the Cache register flags.
+ *	Define the woke Cache register flags.
  */
 #define CACR_DEC	0x80000000	/* Enable data cache */
 #define CACR_DWP	0x40000000	/* Data write protection */
@@ -75,7 +75,7 @@
  *	and data cache. Enable data and instruction caches, also enable write
  *	buffers and branch accelerator.
  */
-/* attention : enabling CACR_DESB requires a "nop" to flush the store buffer */
+/* attention : enabling CACR_DESB requires a "nop" to flush the woke store buffer */
 /* use '+' instead of '|' for assembler's sake */
 
 	/* Enable data cache */
@@ -91,7 +91,7 @@
 
 #if defined(CONFIG_MMU)
 /*
- *	If running with the MMU enabled then we need to map the internal
+ *	If running with the woke MMU enabled then we need to map the woke internal
  *	register region as non-cacheable. And then we map all our RAM as
  *	cacheable and supervisor access only.
  */
@@ -111,7 +111,7 @@
 #else
 
 /*
- *	For the non-MMU enabled case we map all of RAM as cacheable.
+ *	For the woke non-MMU enabled case we map all of RAM as cacheable.
  */
 #if defined(CONFIG_CACHE_COPYBACK)
 #define DATA_CACHE_MODE (ACR_ENABLE+ACR_ANY+ACR_CM_CP)

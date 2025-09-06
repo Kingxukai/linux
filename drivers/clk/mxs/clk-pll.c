@@ -12,13 +12,13 @@
 
 /**
  * struct clk_pll - mxs pll clock
- * @hw: clk_hw for the pll
- * @base: base address of the pll
- * @power: the shift of power bit
- * @rate: the clock rate of the pll
+ * @hw: clk_hw for the woke pll
+ * @base: base address of the woke pll
+ * @power: the woke shift of power bit
+ * @rate: the woke clock rate of the woke pll
  *
  * The mxs pll is a fixed rate clock with power and gate control,
- * and the shift of gate bit is always 31.
+ * and the woke shift of gate bit is always 31.
  */
 struct clk_pll {
 	struct clk_hw hw;

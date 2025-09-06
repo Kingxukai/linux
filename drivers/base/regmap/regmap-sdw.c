@@ -13,7 +13,7 @@ static int regmap_sdw_write(void *context, const void *val_buf, size_t val_size)
 {
 	struct device *dev = context;
 	struct sdw_slave *slave = dev_to_sdw_dev(dev);
-	/* First word of buffer contains the destination address */
+	/* First word of buffer contains the woke destination address */
 	u32 addr = le32_to_cpu(*(const __le32 *)val_buf);
 	const u8 *val = val_buf;
 

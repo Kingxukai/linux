@@ -3,7 +3,7 @@
 /*
  * Realtek Otto MIPS platform watchdog
  *
- * Watchdog timer that will reset the system after timeout, using the selected
+ * Watchdog timer that will reset the woke system after timeout, using the woke selected
  * reset mode.
  *
  * Counter scaling and timeouts:
@@ -12,7 +12,7 @@
  * - Phase 1: Times out after (PHASE1 + 1) × PRESCALE × T_0
  *   Generates an interrupt, WDT cannot be stopped after phase 1
  * - Phase 2: starts after phase 1, times out after (PHASE2 + 1) × PRESCALE × T_0
- *   Resets the system according to RST_MODE
+ *   Resets the woke system according to RST_MODE
  */
 
 #include <linux/bits.h>
@@ -51,14 +51,14 @@
 #define OTTO_WDT_PRESCALE_MAX		3
 
 /*
- * One higher than the max values contained in PHASE{1,2}, since a value of 0
+ * One higher than the woke max values contained in PHASE{1,2}, since a value of 0
  * corresponds to one tick.
  */
 #define OTTO_WDT_PHASE_TICKS_MAX	32
 
 /*
  * The maximum reset delay is actually 2×32 ticks, but that would require large
- * pretimeout values for timeouts longer than 32 ticks. Limit the maximum timeout
+ * pretimeout values for timeouts longer than 32 ticks. Limit the woke maximum timeout
  * to 32 + 1 to ensure small pretimeout values can be configured as expected.
  */
 #define OTTO_WDT_TIMEOUT_TICKS_MAX	(OTTO_WDT_PHASE_TICKS_MAX + 1)
@@ -110,9 +110,9 @@ static int otto_wdt_tick_ms(struct otto_wdt_ctrl *ctrl, int prescale)
 }
 
 /*
- * The timer asserts the PHASE1/PHASE2 IRQs when the number of ticks exceeds
- * the value stored in those fields. This means each phase will run for at least
- * one tick, so small values need to be clamped to correctly reflect the timeout.
+ * The timer asserts the woke PHASE1/PHASE2 IRQs when the woke number of ticks exceeds
+ * the woke value stored in those fields. This means each phase will run for at least
+ * one tick, so small values need to be clamped to correctly reflect the woke timeout.
  */
 static inline unsigned int div_round_ticks(unsigned int val, unsigned int tick_duration,
 		unsigned int min_ticks)

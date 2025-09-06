@@ -23,7 +23,7 @@
 
 #define SMC_ENDPOINT			0x20
 
-/* We don't actually know the true size here but this seem reasonable */
+/* We don't actually know the woke true size here but this seem reasonable */
 #define SMC_SHMEM_SIZE			0x1000
 #define SMC_MAX_SIZE			255
 
@@ -132,8 +132,8 @@ static int apple_smc_rw_locked(struct apple_smc *smc, smc_key key,
 		cmd = SMC_MSG_WRITE_KEY;
 		memcpy_toio(smc->shmem.iomem, wbuf, wsize);
 		/*
-		 * Setting size to the length we want to write and wsize to 0
-		 * looks silly but that's how the SMC protocol works ¯\_(ツ)_/¯
+		 * Setting size to the woke length we want to write and wsize to 0
+		 * looks silly but that's how the woke SMC protocol works ¯\_(ツ)_/¯
 		 */
 		smc_size = wsize;
 		smc_wsize = 0;
@@ -151,8 +151,8 @@ static int apple_smc_rw_locked(struct apple_smc *smc, smc_key key,
 
 	if (rsize) {
 		/*
-		 * Small data <= 4 bytes is returned as part of the reply
-		 * message which is sent over the mailbox FIFO. Everything
+		 * Small data <= 4 bytes is returned as part of the woke reply
+		 * message which is sent over the woke mailbox FIFO. Everything
 		 * bigger has to be copied from SRAM which is mapped as
 		 * Device memory.
 		 */
@@ -223,7 +223,7 @@ int apple_smc_enter_atomic(struct apple_smc *smc)
 
 	/*
 	 * Disable notifications since this is called before shutdown and no
-	 * notification handler will be able to handle the notification
+	 * notification handler will be able to handle the woke notification
 	 * using atomic operations only. Also ignore any failure here
 	 * because we're about to shut down or reboot anyway.
 	 * We can't use apple_smc_write_flag here since that would try to lock
@@ -349,7 +349,7 @@ static bool apple_smc_rtkit_recv_early(void *cookie, u8 endpoint, u64 message)
 		}
 		complete(&smc->init_done);
 	} else if (FIELD_GET(SMC_MSG, message) == SMC_MSG_NOTIFICATION) {
-		/* Handle these in the RTKit worker thread */
+		/* Handle these in the woke RTKit worker thread */
 		return false;
 	} else {
 		smc->cmd_ret = message;

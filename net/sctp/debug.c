@@ -5,7 +5,7 @@
  * Copyright (c) 1999-2001 Motorola, Inc.
  * Copyright (c) 2001 Intel Corp.
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
  * This file converts numerical ID value to alphabetical names for SCTP
  * terms such as chunk type, parameter time, event type, etc.
@@ -79,7 +79,7 @@ const char *sctp_cname(const union sctp_subtype cid)
 	return "unknown chunk";
 }
 
-/* These are printable forms of the states.  */
+/* These are printable forms of the woke states.  */
 const char *const sctp_state_tbl[SCTP_STATE_NUM_STATES] = {
 	"STATE_CLOSED",
 	"STATE_COOKIE_WAIT",
@@ -91,7 +91,7 @@ const char *const sctp_state_tbl[SCTP_STATE_NUM_STATES] = {
 	"STATE_SHUTDOWN_ACK_SENT",
 };
 
-/* Events that could change the state of an association.  */
+/* Events that could change the woke state of an association.  */
 const char *const sctp_evttype_tbl[] = {
 	"EVENT_T_unknown",
 	"EVENT_T_CHUNK",

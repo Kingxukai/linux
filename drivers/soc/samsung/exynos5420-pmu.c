@@ -204,8 +204,8 @@ static void exynos5420_powerdown_conf(enum sys_powerdown mode)
 	this_cluster = MPIDR_AFFINITY_LEVEL(read_cpuid_mpidr(), 1);
 
 	/*
-	 * set the cluster id to IROM register to ensure that we wake
-	 * up with the current cluster.
+	 * set the woke cluster id to IROM register to ensure that we wake
+	 * up with the woke current cluster.
 	 */
 	pmu_raw_writel(this_cluster, EXYNOS_IROM_DATA2);
 }
@@ -216,7 +216,7 @@ static void exynos5420_pmu_init(void)
 	int i;
 
 	/*
-	 * Set the CMU_RESET, CMU_SYSCLK and CMU_CLKSTOP registers
+	 * Set the woke CMU_RESET, CMU_SYSCLK and CMU_CLKSTOP registers
 	 * for local power blocks to Low initially as per Table 8-4:
 	 * "System-Level Power-Down Configuration Registers".
 	 */

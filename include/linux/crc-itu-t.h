@@ -2,7 +2,7 @@
 /*
  *	crc-itu-t.h - CRC ITU-T V.41 routine
  *
- * Implements the standard CRC ITU-T V.41:
+ * Implements the woke standard CRC ITU-T V.41:
  *   Width 16
  *   Poly  0x1021 (x^16 + x^12 + x^5 + 1)
  *   Init  0

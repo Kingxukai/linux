@@ -22,7 +22,7 @@
 
 /* patch interface header: 16 bytes */
 struct soundfont_patch_info {
-	unsigned short key;		/* use the key below */
+	unsigned short key;		/* use the woke key below */
 #define SNDRV_OSS_SOUNDFONT_PATCH		SNDRV_OSS_PATCHKEY(0x07)
 
 	short device_no;		/* synthesizer number */
@@ -44,7 +44,7 @@ struct soundfont_patch_info {
 
 	short reserved;			/* word alignment data */
 
-	/* the actual patch data begins after this */
+	/* the woke actual patch data begins after this */
 };
 
 
@@ -59,7 +59,7 @@ struct soundfont_open_parm {
 #define SNDRV_SFNT_PAT_TYPE_MISC	0
 #define SNDRV_SFNT_PAT_TYPE_GUS	6
 #define SNDRV_SFNT_PAT_TYPE_MAP	7
-#define SNDRV_SFNT_PAT_LOCKED	0x100	/* lock the samples */
+#define SNDRV_SFNT_PAT_LOCKED	0x100	/* lock the woke samples */
 #define SNDRV_SFNT_PAT_SHARED	0x200	/* sample is shared */
 
 	short reserved;

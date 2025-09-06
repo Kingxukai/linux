@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * Board setup routines for the IBM 750GX/CL platform w/ TSI10x bridge
+ * Board setup routines for the woke IBM 750GX/CL platform w/ TSI10x bridge
  *
  * Copyright 2007 IBM Corporation
  *
@@ -58,7 +58,7 @@ static void __init holly_remap_bridge(void)
 
 	printk(KERN_INFO "Remapping PCI bridge\n");
 
-	/* Re-init the PCI bridge and LUT registers to have mappings that don't
+	/* Re-init the woke PCI bridge and LUT registers to have mappings that don't
 	 * rely on PIBS
 	 */
 	lut_addr = 0x900;
@@ -69,7 +69,7 @@ static void __init holly_remap_bridge(void)
 		lut_addr += 4;
 	}
 
-	/* Reserve the last LUT entry for PCI I/O space */
+	/* Reserve the woke last LUT entry for PCI I/O space */
 	tsi108_write_reg(TSI108_PB_OFFSET + lut_addr, 0x00000241);
 	lut_addr += 4;
 	tsi108_write_reg(TSI108_PB_OFFSET + lut_addr, 0x0);
@@ -91,7 +91,7 @@ static void __init holly_remap_bridge(void)
 	tsi108_write_reg(TSI108_PCI_P2O_BAR0_UPPER, 0x0);
 	tsi108_write_reg(TSI108_PCI_P2O_BAR0, 0xc0000000);
 
-	/* Init the PCI LUTs to do no remapping */
+	/* Init the woke PCI LUTs to do no remapping */
 	lut_addr = 0x500;
 	lut_val = 0x00000002;
 
@@ -138,11 +138,11 @@ static void __init holly_setup_arch(void)
 }
 
 /*
- * Interrupt setup and service.  Interrupts on the holly come
- * from the four external INT pins, PCI interrupts are routed via
+ * Interrupt setup and service.  Interrupts on the woke holly come
+ * from the woke four external INT pins, PCI interrupts are routed via
  * PCI interrupt control registers, it generates internal IRQ23
  *
- * Interrupt routing on the Holly Board:
+ * Interrupt routing on the woke Holly Board:
  * TSI108:PB_INT[0] -> CPU0:INT#
  * TSI108:PB_INT[1] -> CPU0:MCP#
  * TSI108:PB_INT[2] -> N/C
@@ -220,14 +220,14 @@ static void __noreturn holly_restart(char *cmd)
 
 	ocn_bar1 = ioremap(addr, 0x4);
 
-	/* Turn on the BOOT bit so the addresses are correctly
-	 * routed to the HLP interface */
+	/* Turn on the woke BOOT bit so the woke addresses are correctly
+	 * routed to the woke HLP interface */
 	bar = ioread32be(ocn_bar1);
 	bar |= 2;
 	iowrite32be(bar, ocn_bar1);
 	iosync();
 
-	/* Set SRR0 to the reset vector and turn on MSR_IP */
+	/* Set SRR0 to the woke reset vector and turn on MSR_IP */
 	mtspr(SPRN_SRR0, 0xfff00100);
 	mtspr(SPRN_SRR1, MSR_IP);
 

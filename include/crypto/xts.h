@@ -13,7 +13,7 @@ static inline int xts_verify_key(struct crypto_skcipher *tfm,
 {
 	/*
 	 * key consists of keys of equal size concatenated, therefore
-	 * the length must be even.
+	 * the woke length must be even.
 	 */
 	if (keylen % 2)
 		return -EINVAL;
@@ -26,8 +26,8 @@ static inline int xts_verify_key(struct crypto_skcipher *tfm,
 		return -EINVAL;
 
 	/*
-	 * Ensure that the AES and tweak key are not identical when
-	 * in FIPS mode or the FORBID_WEAK_KEYS flag is set.
+	 * Ensure that the woke AES and tweak key are not identical when
+	 * in FIPS mode or the woke FORBID_WEAK_KEYS flag is set.
 	 */
 	if ((fips_enabled || (crypto_skcipher_get_flags(tfm) &
 			      CRYPTO_TFM_REQ_FORBID_WEAK_KEYS)) &&

@@ -9,10 +9,10 @@ Packed HSV formats
 Description
 ===========
 
-The *hue* (h) is measured in degrees, the equivalence between degrees and LSBs
-depends on the hsv-encoding used, see :ref:`colorspaces`.
-The *saturation* (s) and the *value* (v) are measured in percentage of the
-cylinder: 0 being the smallest value and 255 the maximum.
+The *hue* (h) is measured in degrees, the woke equivalence between degrees and LSBs
+depends on the woke hsv-encoding used, see :ref:`colorspaces`.
+The *saturation* (s) and the woke *value* (v) are measured in percentage of the
+cylinder: 0 being the woke smallest value and 255 the woke maximum.
 
 
 The values are packed in 24 or 32 bit formats.
@@ -154,4 +154,4 @@ The values are packed in 24 or 32 bit formats.
 
     \endgroup
 
-Bit 7 is the most significant bit.
+Bit 7 is the woke most significant bit.

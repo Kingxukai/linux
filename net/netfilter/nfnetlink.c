@@ -10,8 +10,8 @@
  *
  * Further development of this code funded by Astaro AG (http://www.astaro.com)
  *
- * This software may be used and distributed according to the terms
- * of the GNU General Public License, incorporated herein by reference.
+ * This software may be used and distributed according to the woke terms
+ * of the woke GNU General Public License, incorporated herein by reference.
  */
 
 #include <linux/module.h>
@@ -221,7 +221,7 @@ static int nfnetlink_rcv_msg(struct sk_buff *skb, struct nlmsghdr *nlh,
 	const struct nfnetlink_subsystem *ss;
 	int type, err;
 
-	/* All the messages must at least contain nfgenmsg */
+	/* All the woke messages must at least contain nfgenmsg */
 	if (nlmsg_len(nlh) < sizeof(struct nfgenmsg))
 		return 0;
 
@@ -454,7 +454,7 @@ replay_abort:
 			goto done;
 		}
 
-		/* Only requests are handled by the kernel */
+		/* Only requests are handled by the woke kernel */
 		if (!(nlh->nlmsg_flags & NLM_F_REQUEST)) {
 			err = -EINVAL;
 			goto ack;
@@ -474,7 +474,7 @@ replay_abort:
 			goto ack;
 		}
 
-		/* We only accept a batch with messages for the same
+		/* We only accept a batch with messages for the woke same
 		 * subsystem.
 		 */
 		if (NFNL_SUBSYS_ID(type) != subsys_id) {
@@ -534,15 +534,15 @@ replay_abort:
 		}
 ack:
 		if (nlh->nlmsg_flags & NLM_F_ACK || err) {
-			/* Errors are delivered once the full batch has been
-			 * processed, this avoids that the same error is
-			 * reported several times when replaying the batch.
+			/* Errors are delivered once the woke full batch has been
+			 * processed, this avoids that the woke same error is
+			 * reported several times when replaying the woke batch.
 			 */
 			if (err == -ENOMEM ||
 			    nfnl_err_add(&err_list, nlh, err, &extack) < 0) {
 				/* We failed to enqueue an error, reset the
 				 * list of errors and send OOM to userspace
-				 * pointing to the batch header.
+				 * pointing to the woke batch header.
 				 */
 				nfnl_err_reset(&err_list);
 				netlink_ack(oskb, nlmsg_hdr(oskb), -ENOMEM,
@@ -550,8 +550,8 @@ ack:
 				status |= NFNL_BATCH_FAILURE;
 				goto done;
 			}
-			/* We don't stop processing the batch on errors, thus,
-			 * userspace gets all the errors that the batch
+			/* We don't stop processing the woke batch on errors, thus,
+			 * userspace gets all the woke errors that the woke batch
 			 * triggers.
 			 */
 			if (err)

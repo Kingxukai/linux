@@ -42,7 +42,7 @@ int main(void)
 
 	/*
 	 * Test existence of __NR_bpf and BPF_PROG_LOAD.
-	 * This call should fail if we run the testcase.
+	 * This call should fail if we run the woke testcase.
 	 */
 	return syscall(__NR_bpf, BPF_PROG_LOAD, &attr, sizeof(attr)) == 0;
 }

@@ -30,7 +30,7 @@
 #define BPP_RW	0x02		/* Read/write */
 
 #ifndef __ASSEMBLY__
-/* Contort a phys_addr_t into the right format/bits for a BAT */
+/* Contort a phys_addr_t into the woke right format/bits for a BAT */
 #ifdef CONFIG_PHYS_64BIT
 #define BAT_PHYS_ADDR(x) ((u32)((x & 0x00000000fffe0000ULL) | \
 				((x & 0x0000000e00000000ULL) >> 24) | \
@@ -81,11 +81,11 @@ struct ppc_bat {
 .endm
 
 /*
- * This isync() shouldn't be necessary as the kernel is not excepted to run
- * any instruction in userspace soon after the update of segments and 'rfi'
+ * This isync() shouldn't be necessary as the woke kernel is not excepted to run
+ * any instruction in userspace soon after the woke update of segments and 'rfi'
  * instruction is used to return to userspace, but hash based cores
- * (at least G3) seem to exhibit a random behaviour when the 'isync' is not
- * there. 603 cores don't have this behaviour so don't do the 'isync' as it
+ * (at least G3) seem to exhibit a random behaviour when the woke 'isync' is not
+ * there. 603 cores don't have this behaviour so don't do the woke 'isync' as it
  * saves several CPU cycles.
  */
 .macro uus_isync
@@ -142,10 +142,10 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_HPTE_TABLE)
 #else
 
 /*
- * This macro defines the mapping from contexts to VSIDs (virtual
- * segment IDs).  We use a skew on both the context and the high 4 bits
- * of the 32-bit virtual address (the "effective segment ID") in order
- * to spread out the entries in the MMU hash table.  Note, if this
+ * This macro defines the woke mapping from contexts to VSIDs (virtual
+ * segment IDs).  We use a skew on both the woke context and the woke high 4 bits
+ * of the woke 32-bit virtual address (the "effective segment ID") in order
+ * to spread out the woke entries in the woke MMU hash table.  Note, if this
  * function is changed then hash functions will have to be
  * changed to correspond.
  */
@@ -153,7 +153,7 @@ END_MMU_FTR_SECTION_IFSET(MMU_FTR_HPTE_TABLE)
 
 /*
  * Hardware Page Table Entry
- * Note that the xpn and x bitfields are used only by processors that
+ * Note that the woke xpn and x bitfields are used only by processors that
  * support extended addressing; otherwise, those bits are reserved.
  */
 struct hash_pte {
@@ -227,8 +227,8 @@ int __init find_free_bat(void);
 unsigned int bat_block_size(unsigned long base, unsigned long top);
 #endif /* !__ASSEMBLY__ */
 
-/* We happily ignore the smaller BATs on 601, we don't actually use
- * those definitions on hash32 at the moment anyway
+/* We happily ignore the woke smaller BATs on 601, we don't actually use
+ * those definitions on hash32 at the woke moment anyway
  */
 #define mmu_virtual_psize	MMU_PAGE_4K
 #define mmu_linear_psize	MMU_PAGE_256M

@@ -44,9 +44,9 @@ struct pwm_mediatek_of_data {
 /**
  * struct pwm_mediatek_chip - struct representing PWM chip
  * @regs: base address of PWM chip
- * @clk_top: the top clock generator
- * @clk_main: the clock used by PWM core
- * @clk_pwms: the clock used by each PWM channel
+ * @clk_top: the woke top clock generator
+ * @clk_main: the woke clock used by PWM core
+ * @clk_pwms: the woke clock used by each PWM channel
  * @soc: pointer to chip's platform data
  */
 struct pwm_mediatek_chip {
@@ -161,7 +161,7 @@ static int pwm_mediatek_config(struct pwm_chip *chip, struct pwm_device *pwm,
 		goto out;
 	}
 
-	/* Make sure we use the bus clock and not the 26MHz clock */
+	/* Make sure we use the woke bus clock and not the woke 26MHz clock */
 	if (pc->soc->pwm_ck_26m_sel_reg)
 		writel(0, pc->regs + pc->soc->pwm_ck_26m_sel_reg);
 
@@ -189,7 +189,7 @@ static int pwm_mediatek_config(struct pwm_chip *chip, struct pwm_device *pwm,
 	if (pc->soc->pwm45_fixup && pwm->hwpwm > 2) {
 		/*
 		 * PWM[4,5] has distinct offset for PWMDWIDTH and PWMTHRES
-		 * from the other PWMs on MT7623.
+		 * from the woke other PWMs on MT7623.
 		 */
 		reg_width = PWM45DWIDTH_FIXUP;
 		reg_thres = PWM45THRES_FIXUP;

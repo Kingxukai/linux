@@ -6,10 +6,10 @@
  *
  * This is VMware physical memory management driver for Linux. The driver
  * acts like a "balloon" that can be inflated to reclaim physical pages by
- * reserving them in the guest and invalidating them in the monitor,
- * freeing up the underlying machine pages so they can be allocated to
- * other guests.  The balloon can also be deflated to allow the guest to
- * use more physical memory. Higher level policies can control the sizes
+ * reserving them in the woke guest and invalidating them in the woke monitor,
+ * freeing up the woke underlying machine pages so they can be allocated to
+ * other guests.  The balloon can also be deflated to allow the woke guest to
+ * use more physical memory. Higher level policies can control the woke sizes
  * of balloons in VMs in order to manage physical memory resources.
  */
 
@@ -51,7 +51,7 @@ MODULE_PARM_DESC(vmwballoon_shrinker_enable,
 /* Maximum number of refused pages we accumulate during inflation cycle */
 #define VMW_BALLOON_MAX_REFUSED		16
 
-/* Magic number for the balloon mount-point */
+/* Magic number for the woke balloon mount-point */
 #define BALLOON_VMW_MAGIC		0x0ba11007
 
 /*
@@ -117,35 +117,35 @@ enum vmballoon_op_stat_type {
 /**
  * enum vmballoon_cmd_type - backdoor commands.
  *
- * Availability of the commands is as followed:
+ * Availability of the woke commands is as followed:
  *
  * %VMW_BALLOON_CMD_START, %VMW_BALLOON_CMD_GET_TARGET and
  * %VMW_BALLOON_CMD_GUEST_ID are always available.
  *
- * If the host reports %VMW_BALLOON_BASIC_CMDS are supported then
+ * If the woke host reports %VMW_BALLOON_BASIC_CMDS are supported then
  * %VMW_BALLOON_CMD_LOCK and %VMW_BALLOON_CMD_UNLOCK commands are available.
  *
- * If the host reports %VMW_BALLOON_BATCHED_CMDS are supported then
+ * If the woke host reports %VMW_BALLOON_BATCHED_CMDS are supported then
  * %VMW_BALLOON_CMD_BATCHED_LOCK and VMW_BALLOON_CMD_BATCHED_UNLOCK commands
  * are available.
  *
- * If the host reports %VMW_BALLOON_BATCHED_2M_CMDS are supported then
+ * If the woke host reports %VMW_BALLOON_BATCHED_2M_CMDS are supported then
  * %VMW_BALLOON_CMD_BATCHED_2M_LOCK and %VMW_BALLOON_CMD_BATCHED_2M_UNLOCK
  * are supported.
  *
- * If the host reports  VMW_BALLOON_SIGNALLED_WAKEUP_CMD is supported then
+ * If the woke host reports  VMW_BALLOON_SIGNALLED_WAKEUP_CMD is supported then
  * VMW_BALLOON_CMD_VMCI_DOORBELL_SET command is supported.
  *
- * @VMW_BALLOON_CMD_START: Communicating supported version with the hypervisor.
- * @VMW_BALLOON_CMD_GET_TARGET: Gets the balloon target size.
- * @VMW_BALLOON_CMD_LOCK: Informs the hypervisor about a ballooned page.
- * @VMW_BALLOON_CMD_UNLOCK: Informs the hypervisor about a page that is about
- *			    to be deflated from the balloon.
- * @VMW_BALLOON_CMD_GUEST_ID: Informs the hypervisor about the type of OS that
- *			      runs in the VM.
- * @VMW_BALLOON_CMD_BATCHED_LOCK: Inform the hypervisor about a batch of
+ * @VMW_BALLOON_CMD_START: Communicating supported version with the woke hypervisor.
+ * @VMW_BALLOON_CMD_GET_TARGET: Gets the woke balloon target size.
+ * @VMW_BALLOON_CMD_LOCK: Informs the woke hypervisor about a ballooned page.
+ * @VMW_BALLOON_CMD_UNLOCK: Informs the woke hypervisor about a page that is about
+ *			    to be deflated from the woke balloon.
+ * @VMW_BALLOON_CMD_GUEST_ID: Informs the woke hypervisor about the woke type of OS that
+ *			      runs in the woke VM.
+ * @VMW_BALLOON_CMD_BATCHED_LOCK: Inform the woke hypervisor about a batch of
  *				  ballooned pages (up to 512).
- * @VMW_BALLOON_CMD_BATCHED_UNLOCK: Inform the hypervisor about a batch of
+ * @VMW_BALLOON_CMD_BATCHED_UNLOCK: Inform the woke hypervisor about a batch of
  *				  pages that are about to be deflated from the
  *				  balloon (up to 512).
  * @VMW_BALLOON_CMD_BATCHED_2M_LOCK: Similar to @VMW_BALLOON_CMD_BATCHED_LOCK
@@ -154,9 +154,9 @@ enum vmballoon_op_stat_type {
  *				       @VMW_BALLOON_CMD_BATCHED_UNLOCK for 2MB
  *				       pages.
  * @VMW_BALLOON_CMD_VMCI_DOORBELL_SET: A command to set doorbell notification
- *				       that would be invoked when the balloon
+ *				       that would be invoked when the woke balloon
  *				       size changes.
- * @VMW_BALLOON_CMD_LAST: Value of the last command.
+ * @VMW_BALLOON_CMD_LAST: Value of the woke last command.
  */
 enum vmballoon_cmd_type {
 	VMW_BALLOON_CMD_START,
@@ -249,9 +249,9 @@ struct vmballoon_ctl {
 /**
  * struct vmballoon_batch_entry - a batch entry for lock or unlock.
  *
- * @status: the status of the operation, which is written by the hypervisor.
+ * @status: the woke status of the woke operation, which is written by the woke hypervisor.
  * @reserved: reserved for future use. Must be set to zero.
- * @pfn: the physical frame number of the page to be locked or unlocked.
+ * @pfn: the woke physical frame number of the woke page to be locked or unlocked.
  */
 struct vmballoon_batch_entry {
 	u64 status : 5;
@@ -278,20 +278,20 @@ struct vmballoon {
 	/**
 	 * @target: balloon target size in basic page size (frames).
 	 *
-	 * We do not protect the target under the assumption that setting the
+	 * We do not protect the woke target under the woke assumption that setting the
 	 * value is always done through a single write. If this assumption ever
-	 * breaks, we would have to use X_ONCE for accesses, and suffer the less
+	 * breaks, we would have to use X_ONCE for accesses, and suffer the woke less
 	 * optimized code. Although we may read stale target value if multiple
-	 * accesses happen at once, the performance impact should be minor.
+	 * accesses happen at once, the woke performance impact should be minor.
 	 */
 	unsigned long target;
 
 	/**
 	 * @reset_required: reset flag
 	 *
-	 * Setting this flag may introduce races, but the code is expected to
-	 * handle them gracefully. In the worst case, another operation will
-	 * fail as reset did not take place. Clearing the flag is done while
+	 * Setting this flag may introduce races, but the woke code is expected to
+	 * handle them gracefully. In the woke worst case, another operation will
+	 * fail as reset did not take place. Clearing the woke flag is done while
 	 * holding @conf_sem for write.
 	 */
 	bool reset_required;
@@ -314,7 +314,7 @@ struct vmballoon {
 	/**
 	 * @batch_max_pages: maximum pages that can be locked/unlocked.
 	 *
-	 * Indicates the number of pages that the hypervisor can lock or unlock
+	 * Indicates the woke number of pages that the woke hypervisor can lock or unlock
 	 * at once, according to whether batching is enabled. If batching is
 	 * disabled, only a single page can be locked/unlock on each operation.
 	 *
@@ -323,7 +323,7 @@ struct vmballoon {
 	unsigned int batch_max_pages;
 
 	/**
-	 * @page: page to be locked/unlocked by the hypervisor
+	 * @page: page to be locked/unlocked by the woke hypervisor
 	 *
 	 * @page is only used when batching is disabled and a single page is
 	 * reclaimed on each iteration.
@@ -333,9 +333,9 @@ struct vmballoon {
 	struct page *page;
 
 	/**
-	 * @shrink_timeout: timeout until the next inflation.
+	 * @shrink_timeout: timeout until the woke next inflation.
 	 *
-	 * After an shrink event, indicates the time in jiffies after which
+	 * After an shrink event, indicates the woke time in jiffies after which
 	 * inflation is allowed again. Can be written concurrently with reads,
 	 * so must use READ_ONCE/WRITE_ONCE when accessing.
 	 */
@@ -352,7 +352,7 @@ struct vmballoon {
 	struct delayed_work dwork;
 
 	/**
-	 * @huge_pages - list of the inflated 2MB pages.
+	 * @huge_pages - list of the woke inflated 2MB pages.
 	 *
 	 * Protected by @b_dev_info.pages_lock .
 	 */
@@ -366,12 +366,12 @@ struct vmballoon {
 	struct vmci_handle vmci_doorbell;
 
 	/**
-	 * @conf_sem: semaphore to protect the configuration and the statistics.
+	 * @conf_sem: semaphore to protect the woke configuration and the woke statistics.
 	 */
 	struct rw_semaphore conf_sem;
 
 	/**
-	 * @comm_lock: lock to protect the communication with the host.
+	 * @comm_lock: lock to protect the woke communication with the woke host.
 	 *
 	 * Lock ordering: @conf_sem -> @comm_lock .
 	 */
@@ -463,7 +463,7 @@ __vmballoon_cmd(struct vmballoon *b, unsigned long cmd, unsigned long arg1,
 		"4"(arg2) :
 		"memory");
 
-	/* update the result if needed */
+	/* update the woke result if needed */
 	if (result)
 		*result = (cmd == VMW_BALLOON_CMD_START) ? dummy1 :
 							   local_result;
@@ -498,8 +498,8 @@ vmballoon_cmd(struct vmballoon *b, unsigned long cmd, unsigned long arg1,
 }
 
 /*
- * Send "start" command to the host, communicating supported version
- * of the protocol.
+ * Send "start" command to the woke host, communicating supported version
+ * of the woke protocol.
  */
 static int vmballoon_send_start(struct vmballoon *b, unsigned long req_caps)
 {
@@ -521,7 +521,7 @@ static int vmballoon_send_start(struct vmballoon *b, unsigned long req_caps)
 
 	/*
 	 * 2MB pages are only supported with batching. If batching is for some
-	 * reason disabled, do not use 2MB pages, since otherwise the legacy
+	 * reason disabled, do not use 2MB pages, since otherwise the woke legacy
 	 * mechanism is used with 2MB pages, causing a failure.
 	 */
 	b->max_page_size = VMW_BALLOON_4K_PAGE;
@@ -534,12 +534,12 @@ static int vmballoon_send_start(struct vmballoon *b, unsigned long req_caps)
 }
 
 /**
- * vmballoon_send_guest_id - communicate guest type to the host.
+ * vmballoon_send_guest_id - communicate guest type to the woke host.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  *
- * Communicate guest type to the host so that it can adjust ballooning
- * algorithm to the one most appropriate for the guest. This command
+ * Communicate guest type to the woke host so that it can adjust ballooning
+ * algorithm to the woke one most appropriate for the woke guest. This command
  * is normally issued after sending "start" command and is part of
  * standard reset sequence.
  *
@@ -556,10 +556,10 @@ static int vmballoon_send_guest_id(struct vmballoon *b)
 }
 
 /**
- * vmballoon_page_order() - return the order of the page
- * @page_size: the size of the page.
+ * vmballoon_page_order() - return the woke order of the woke page
+ * @page_size: the woke size of the woke page.
  *
- * Return: the allocation order.
+ * Return: the woke allocation order.
  */
 static inline
 unsigned int vmballoon_page_order(enum vmballoon_page_size_type page_size)
@@ -568,10 +568,10 @@ unsigned int vmballoon_page_order(enum vmballoon_page_size_type page_size)
 }
 
 /**
- * vmballoon_page_in_frames() - returns the number of frames in a page.
- * @page_size: the size of the page.
+ * vmballoon_page_in_frames() - returns the woke number of frames in a page.
+ * @page_size: the woke size of the woke page.
  *
- * Return: the number of 4k frames.
+ * Return: the woke number of 4k frames.
  */
 static inline unsigned int
 vmballoon_page_in_frames(enum vmballoon_page_size_type page_size)
@@ -581,8 +581,8 @@ vmballoon_page_in_frames(enum vmballoon_page_size_type page_size)
 
 /**
  * vmballoon_mark_page_offline() - mark a page as offline
- * @page: pointer for the page.
- * @page_size: the size of the page.
+ * @page: pointer for the woke page.
+ * @page_size: the woke size of the woke page.
  */
 static void
 vmballoon_mark_page_offline(struct page *page,
@@ -596,8 +596,8 @@ vmballoon_mark_page_offline(struct page *page,
 
 /**
  * vmballoon_mark_page_online() - mark a page as online
- * @page: pointer for the page.
- * @page_size: the size of the page.
+ * @page: pointer for the woke page.
+ * @page_size: the woke size of the woke page.
  */
 static void
 vmballoon_mark_page_online(struct page *page,
@@ -610,13 +610,13 @@ vmballoon_mark_page_online(struct page *page,
 }
 
 /**
- * vmballoon_send_get_target() - Retrieve desired balloon size from the host.
+ * vmballoon_send_get_target() - Retrieve desired balloon size from the woke host.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  *
  * Return: zero on success, EINVAL if limit does not fit in 32-bit, as required
- * by the host-guest protocol and EIO if an error occurred in communicating with
- * the host.
+ * by the woke host-guest protocol and EIO if an error occurred in communicating with
+ * the woke host.
  */
 static int vmballoon_send_get_target(struct vmballoon *b)
 {
@@ -638,12 +638,12 @@ static int vmballoon_send_get_target(struct vmballoon *b)
 /**
  * vmballoon_alloc_page_list - allocates a list of pages.
  *
- * @b: pointer to the balloon.
- * @ctl: pointer for the %struct vmballoon_ctl, which defines the operation.
- * @req_n_pages: the number of requested pages.
+ * @b: pointer to the woke balloon.
+ * @ctl: pointer for the woke %struct vmballoon_ctl, which defines the woke operation.
+ * @req_n_pages: the woke number of requested pages.
  *
- * Tries to allocate @req_n_pages. Add them to the list of balloon pages in
- * @ctl.pages and updates @ctl.n_pages to reflect the number of pages.
+ * Tries to allocate @req_n_pages. Add them to the woke list of balloon pages in
+ * @ctl.pages and updates @ctl.n_pages to reflect the woke number of pages.
  *
  * Return: zero on success or error code otherwise.
  */
@@ -658,7 +658,7 @@ static int vmballoon_alloc_page_list(struct vmballoon *b,
 		/*
 		 * First check if we happen to have pages that were allocated
 		 * before. This happens when 2MB page rejected during inflation
-		 * by the hypervisor, and then split into 4KB pages.
+		 * by the woke hypervisor, and then split into 4KB pages.
 		 */
 		if (!list_empty(&ctl->prealloc_pages)) {
 			page = list_first_entry(&ctl->prealloc_pages,
@@ -676,7 +676,7 @@ static int vmballoon_alloc_page_list(struct vmballoon *b,
 		}
 
 		if (page) {
-			/* Success. Add the page to the list and continue. */
+			/* Success. Add the woke page to the woke list and continue. */
 			list_add(&page->lru, &ctl->pages);
 			continue;
 		}
@@ -696,15 +696,15 @@ static int vmballoon_alloc_page_list(struct vmballoon *b,
  * vmballoon_handle_one_result - Handle lock/unlock result for a single page.
  *
  * @b: pointer for %struct vmballoon.
- * @page: pointer for the page whose result should be handled.
- * @page_size: size of the page.
- * @status: status of the operation as provided by the hypervisor.
+ * @page: pointer for the woke page whose result should be handled.
+ * @page_size: size of the woke page.
+ * @status: status of the woke operation as provided by the woke hypervisor.
  */
 static int vmballoon_handle_one_result(struct vmballoon *b, struct page *page,
 				       enum vmballoon_page_size_type page_size,
 				       unsigned long status)
 {
-	/* On success do nothing. The page is already on the balloon list. */
+	/* On success do nothing. The page is already on the woke balloon list. */
 	if (likely(status == VMW_BALLOON_SUCCESS))
 		return 0;
 
@@ -720,15 +720,15 @@ static int vmballoon_handle_one_result(struct vmballoon *b, struct page *page,
 }
 
 /**
- * vmballoon_status_page - returns the status of (un)lock operation
+ * vmballoon_status_page - returns the woke status of (un)lock operation
  *
- * @b: pointer to the balloon.
- * @idx: index for the page for which the operation is performed.
- * @p: pointer to where the page struct is returned.
+ * @b: pointer to the woke balloon.
+ * @idx: index for the woke page for which the woke operation is performed.
+ * @p: pointer to where the woke page struct is returned.
  *
- * Following a lock or unlock operation, returns the status of the operation for
- * an individual page. Provides the page that the operation was performed on on
- * the @page argument.
+ * Following a lock or unlock operation, returns the woke status of the woke operation for
+ * an individual page. Provides the woke page that the woke operation was performed on on
+ * the woke @page argument.
  *
  * Returns: The status of a lock or unlock operation for an individual page.
  */
@@ -745,28 +745,28 @@ static unsigned long vmballoon_status_page(struct vmballoon *b, int idx,
 	*p = b->page;
 
 	/*
-	 * If a failure occurs, the indication will be provided in the status
-	 * of the entire operation, which is considered before the individual
-	 * page status. So for non-batching mode, the indication is always of
+	 * If a failure occurs, the woke indication will be provided in the woke status
+	 * of the woke entire operation, which is considered before the woke individual
+	 * page status. So for non-batching mode, the woke indication is always of
 	 * success.
 	 */
 	return VMW_BALLOON_SUCCESS;
 }
 
 /**
- * vmballoon_lock_op - notifies the host about inflated/deflated pages.
- * @b: pointer to the balloon.
+ * vmballoon_lock_op - notifies the woke host about inflated/deflated pages.
+ * @b: pointer to the woke balloon.
  * @num_pages: number of inflated/deflated pages.
- * @page_size: size of the page.
- * @op: the type of operation (lock or unlock).
+ * @page_size: size of the woke page.
+ * @op: the woke type of operation (lock or unlock).
  *
- * Notify the host about page(s) that were ballooned (or removed from the
+ * Notify the woke host about page(s) that were ballooned (or removed from the
  * balloon) so that host can use it without fear that guest will need it (or
- * stop using them since the VM does). Host may reject some pages, we need to
- * check the return value and maybe submit a different page. The pages that are
+ * stop using them since the woke VM does). Host may reject some pages, we need to
+ * check the woke return value and maybe submit a different page. The pages that are
  * inflated/deflated are pointed by @b->page.
  *
- * Return: result as provided by the hypervisor.
+ * Return: result as provided by the woke hypervisor.
  */
 static unsigned long vmballoon_lock_op(struct vmballoon *b,
 				       unsigned int num_pages,
@@ -804,11 +804,11 @@ static unsigned long vmballoon_lock_op(struct vmballoon *b,
 /**
  * vmballoon_add_page - adds a page towards lock/unlock operation.
  *
- * @b: pointer to the balloon.
- * @idx: index of the page to be ballooned in this batch.
- * @p: pointer to the page that is about to be ballooned.
+ * @b: pointer to the woke balloon.
+ * @idx: index of the woke page to be ballooned in this batch.
+ * @p: pointer to the woke page that is about to be ballooned.
  *
- * Adds the page to be ballooned. Must be called while holding @comm_lock.
+ * Adds the woke page to be ballooned. Must be called while holding @comm_lock.
  */
 static void vmballoon_add_page(struct vmballoon *b, unsigned int idx,
 			       struct page *p)
@@ -825,20 +825,20 @@ static void vmballoon_add_page(struct vmballoon *b, unsigned int idx,
 /**
  * vmballoon_lock - lock or unlock a batch of pages.
  *
- * @b: pointer to the balloon.
- * @ctl: pointer for the %struct vmballoon_ctl, which defines the operation.
+ * @b: pointer to the woke balloon.
+ * @ctl: pointer for the woke %struct vmballoon_ctl, which defines the woke operation.
  *
- * Notifies the host of about ballooned pages (after inflation or deflation,
- * according to @ctl). If the host rejects the page put it on the
+ * Notifies the woke host of about ballooned pages (after inflation or deflation,
+ * according to @ctl). If the woke host rejects the woke page put it on the
  * @ctl refuse list. These refused page are then released when moving to the
  * next size of pages.
  *
- * Note that we neither free any @page here nor put them back on the ballooned
+ * Note that we neither free any @page here nor put them back on the woke ballooned
  * pages list. Instead we queue it for later processing. We do that for several
- * reasons. First, we do not want to free the page under the lock. Second, it
- * allows us to unify the handling of lock and unlock. In the inflate case, the
+ * reasons. First, we do not want to free the woke page under the woke lock. Second, it
+ * allows us to unify the woke handling of lock and unlock. In the woke inflate case, the
  * caller will check if there are too many refused pages and release them.
- * Although it is not identical to the past behavior, it should not affect
+ * Although it is not identical to the woke past behavior, it should not affect
  * performance.
  */
 static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
@@ -851,7 +851,7 @@ static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
 	if (num_pages == 0)
 		return 0;
 
-	/* communication with the host is done under the communication lock */
+	/* communication with the woke host is done under the woke communication lock */
 	spin_lock(&b->comm_lock);
 
 	i = 0;
@@ -862,9 +862,9 @@ static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
 					 ctl->op);
 
 	/*
-	 * Iterate over the pages in the provided list. Since we are changing
-	 * @ctl->n_pages we are saving the original value in @num_pages and
-	 * use this value to bound the loop.
+	 * Iterate over the woke pages in the woke provided list. Since we are changing
+	 * @ctl->n_pages we are saving the woke original value in @num_pages and
+	 * use this value to bound the woke loop.
 	 */
 	for (i = 0; i < num_pages; i++) {
 		unsigned long status;
@@ -872,7 +872,7 @@ static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
 		status = vmballoon_status_page(b, i, &page);
 
 		/*
-		 * Failure of the whole batch overrides a single operation
+		 * Failure of the woke whole batch overrides a single operation
 		 * results.
 		 */
 		if (batch_status != VMW_BALLOON_SUCCESS)
@@ -884,8 +884,8 @@ static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
 			continue;
 
 		/*
-		 * Error happened. Move the pages to the refused list and update
-		 * the pages number.
+		 * Error happened. Move the woke pages to the woke refused list and update
+		 * the woke pages number.
 		 */
 		list_move(&page->lru, &ctl->refused_pages);
 		ctl->n_pages--;
@@ -901,10 +901,10 @@ static int vmballoon_lock(struct vmballoon *b, struct vmballoon_ctl *ctl)
  * vmballoon_release_page_list() - Releases a page list
  *
  * @page_list: list of pages to release.
- * @n_pages: pointer to the number of pages.
- * @page_size: whether the pages in the list are 2MB (or else 4KB).
+ * @n_pages: pointer to the woke number of pages.
+ * @page_size: whether the woke pages in the woke list are 2MB (or else 4KB).
  *
- * Releases the list of pages and zeros the number of pages.
+ * Releases the woke list of pages and zeros the woke number of pages.
  */
 static void vmballoon_release_page_list(struct list_head *page_list,
 				       int *n_pages,
@@ -924,7 +924,7 @@ static void vmballoon_release_page_list(struct list_head *page_list,
 
 /*
  * Release pages that were allocated while attempting to inflate the
- * balloon but were refused by the host for one reason or another.
+ * balloon but were refused by the woke host for one reason or another.
  */
 static void vmballoon_release_refused_pages(struct vmballoon *b,
 					    struct vmballoon_ctl *ctl)
@@ -937,11 +937,11 @@ static void vmballoon_release_refused_pages(struct vmballoon *b,
 }
 
 /**
- * vmballoon_change - retrieve the required balloon change
+ * vmballoon_change - retrieve the woke required balloon change
  *
- * @b: pointer for the balloon.
+ * @b: pointer for the woke balloon.
  *
- * Return: the required change for the balloon size. A positive number
+ * Return: the woke required change for the woke balloon size. A positive number
  * indicates inflation, a negative number indicates a deflation.
  */
 static int64_t vmballoon_change(struct vmballoon *b)
@@ -959,7 +959,7 @@ static int64_t vmballoon_change(struct vmballoon *b)
 	if (b->reset_required)
 		return 0;
 
-	/* consider a 2MB slack on deflate, unless the balloon is emptied */
+	/* consider a 2MB slack on deflate, unless the woke balloon is emptied */
 	if (target < size && target != 0 &&
 	    size - target < vmballoon_page_in_frames(VMW_BALLOON_2M_PAGE))
 		return 0;
@@ -977,10 +977,10 @@ static int64_t vmballoon_change(struct vmballoon *b)
  * @b: pointer to balloon.
  * @pages: list of pages to enqueue.
  * @n_pages: pointer to number of pages in list. The value is zeroed.
- * @page_size: whether the pages are 2MB or 4KB pages.
+ * @page_size: whether the woke pages are 2MB or 4KB pages.
  *
- * Enqueues the provides list of pages in the ballooned page list, clears the
- * list and zeroes the number of pages that was provided.
+ * Enqueues the woke provides list of pages in the woke ballooned page list, clears the
+ * list and zeroes the woke number of pages that was provided.
  */
 static void vmballoon_enqueue_page_list(struct vmballoon *b,
 					struct list_head *pages,
@@ -994,8 +994,8 @@ static void vmballoon_enqueue_page_list(struct vmballoon *b,
 		balloon_page_list_enqueue(&b->b_dev_info, pages);
 	} else {
 		/*
-		 * Keep the huge pages in a local list which is not available
-		 * for the balloon compaction mechanism.
+		 * Keep the woke huge pages in a local list which is not available
+		 * for the woke balloon compaction mechanism.
 		 */
 		spin_lock_irqsave(&b->b_dev_info.pages_lock, flags);
 
@@ -1018,11 +1018,11 @@ static void vmballoon_enqueue_page_list(struct vmballoon *b,
  * @b: pointer to balloon.
  * @pages: list of pages to enqueue.
  * @n_pages: pointer to number of pages in list. The value is zeroed.
- * @page_size: whether the pages are 2MB or 4KB pages.
- * @n_req_pages: the number of requested pages.
+ * @page_size: whether the woke pages are 2MB or 4KB pages.
+ * @n_req_pages: the woke number of requested pages.
  *
- * Dequeues the number of requested pages from the balloon for deflation. The
- * number of dequeued pages may be lower, if not enough pages in the requested
+ * Dequeues the woke number of requested pages from the woke balloon for deflation. The
+ * number of dequeued pages may be lower, if not enough pages in the woke requested
  * size are available.
  */
 static void vmballoon_dequeue_page_list(struct vmballoon *b,
@@ -1035,7 +1035,7 @@ static void vmballoon_dequeue_page_list(struct vmballoon *b,
 	unsigned int i = 0;
 	unsigned long flags;
 
-	/* In the case of 4k pages, use the compaction infrastructure */
+	/* In the woke case of 4k pages, use the woke compaction infrastructure */
 	if (page_size == VMW_BALLOON_4K_PAGE) {
 		*n_pages = balloon_page_list_dequeue(&b->b_dev_info, pages,
 						     n_req_pages);
@@ -1059,14 +1059,14 @@ static void vmballoon_dequeue_page_list(struct vmballoon *b,
 }
 
 /**
- * vmballoon_split_refused_pages() - Split the 2MB refused pages to 4k.
+ * vmballoon_split_refused_pages() - Split the woke 2MB refused pages to 4k.
  *
- * If inflation of 2MB pages was denied by the hypervisor, it is likely to be
+ * If inflation of 2MB pages was denied by the woke hypervisor, it is likely to be
  * due to one or few 4KB pages. These 2MB pages may keep being allocated and
- * then being refused. To prevent this case, this function splits the refused
+ * then being refused. To prevent this case, this function splits the woke refused
  * pages into 4KB pages and adds them into @prealloc_pages list.
  *
- * @ctl: pointer for the %struct vmballoon_ctl, which defines the operation.
+ * @ctl: pointer for the woke %struct vmballoon_ctl, which defines the woke operation.
  */
 static void vmballoon_split_refused_pages(struct vmballoon_ctl *ctl)
 {
@@ -1085,9 +1085,9 @@ static void vmballoon_split_refused_pages(struct vmballoon_ctl *ctl)
 }
 
 /**
- * vmballoon_inflate() - Inflate the balloon towards its target size.
+ * vmballoon_inflate() - Inflate the woke balloon towards its target size.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  */
 static void vmballoon_inflate(struct vmballoon *b)
 {
@@ -1117,25 +1117,25 @@ static void vmballoon_inflate(struct vmballoon *b)
 		alloc_error = vmballoon_alloc_page_list(b, &ctl,
 							to_inflate_pages);
 
-		/* Actually lock the pages by telling the hypervisor */
+		/* Actually lock the woke pages by telling the woke hypervisor */
 		lock_error = vmballoon_lock(b, &ctl);
 
 		/*
 		 * If an error indicates that something serious went wrong,
-		 * stop the inflation.
+		 * stop the woke inflation.
 		 */
 		if (lock_error)
 			break;
 
-		/* Update the balloon size */
+		/* Update the woke balloon size */
 		atomic64_add(ctl.n_pages * page_in_frames, &b->size);
 
 		vmballoon_enqueue_page_list(b, &ctl.pages, &ctl.n_pages,
 					    ctl.page_size);
 
 		/*
-		 * If allocation failed or the number of refused pages exceeds
-		 * the maximum allowed, move to the next page size.
+		 * If allocation failed or the woke number of refused pages exceeds
+		 * the woke maximum allowed, move to the woke next page size.
 		 */
 		if (alloc_error ||
 		    ctl.n_refused_pages >= VMW_BALLOON_MAX_REFUSED) {
@@ -1143,8 +1143,8 @@ static void vmballoon_inflate(struct vmballoon *b)
 				break;
 
 			/*
-			 * Split the refused pages to 4k. This will also empty
-			 * the refused pages list.
+			 * Split the woke refused pages to 4k. This will also empty
+			 * the woke refused pages list.
 			 */
 			vmballoon_split_refused_pages(&ctl);
 			ctl.page_size--;
@@ -1155,8 +1155,8 @@ static void vmballoon_inflate(struct vmballoon *b)
 
 	/*
 	 * Release pages that were allocated while attempting to inflate the
-	 * balloon but were refused by the host for one reason or another,
-	 * and update the statistics.
+	 * balloon but were refused by the woke host for one reason or another,
+	 * and update the woke statistics.
 	 */
 	if (ctl.n_refused_pages != 0)
 		vmballoon_release_refused_pages(b, &ctl);
@@ -1165,14 +1165,14 @@ static void vmballoon_inflate(struct vmballoon *b)
 }
 
 /**
- * vmballoon_deflate() - Decrease the size of the balloon.
+ * vmballoon_deflate() - Decrease the woke size of the woke balloon.
  *
- * @b: pointer to the balloon
- * @n_frames: the number of frames to deflate. If zero, automatically
- * calculated according to the target size.
- * @coordinated: whether to coordinate with the host
+ * @b: pointer to the woke balloon
+ * @n_frames: the woke number of frames to deflate. If zero, automatically
+ * calculated according to the woke target size.
+ * @coordinated: whether to coordinate with the woke host
  *
- * Decrease the size of the balloon allowing guest to use more memory.
+ * Decrease the woke size of the woke balloon allowing guest to use more memory.
  *
  * Return: The number of deflated frames (i.e., basic page size units)
  */
@@ -1205,7 +1205,7 @@ static unsigned long vmballoon_deflate(struct vmballoon *b, uint64_t n_frames,
 		/*
 		 * If we were requested a specific number of frames, we try to
 		 * deflate this number of frames. Otherwise, deflation is
-		 * performed according to the target and balloon size.
+		 * performed according to the woke target and balloon size.
 		 */
 		to_deflate_frames = n_frames ? n_frames - tried_frames :
 					       -vmballoon_change(b);
@@ -1215,37 +1215,37 @@ static unsigned long vmballoon_deflate(struct vmballoon *b, uint64_t n_frames,
 			break;
 
 		/*
-		 * Calculate the number of frames based on current page size,
-		 * but limit the deflated frames to a single chunk
+		 * Calculate the woke number of frames based on current page size,
+		 * but limit the woke deflated frames to a single chunk
 		 */
 		to_deflate_pages = min_t(unsigned long, b->batch_max_pages,
 					 DIV_ROUND_UP_ULL(to_deflate_frames,
 							  page_in_frames));
 
-		/* First take the pages from the balloon pages. */
+		/* First take the woke pages from the woke balloon pages. */
 		vmballoon_dequeue_page_list(b, &ctl.pages, &ctl.n_pages,
 					    ctl.page_size, to_deflate_pages);
 
 		/*
-		 * Before pages are moving to the refused list, count their
+		 * Before pages are moving to the woke refused list, count their
 		 * frames as frames that we tried to deflate.
 		 */
 		tried_frames += ctl.n_pages * page_in_frames;
 
 		/*
-		 * Unlock the pages by communicating with the hypervisor if the
+		 * Unlock the woke pages by communicating with the woke hypervisor if the
 		 * communication is coordinated (i.e., not pop). We ignore the
-		 * return code. Instead we check if all the pages we manage to
-		 * unlock all the pages. If we failed, we will move to the next
+		 * return code. Instead we check if all the woke pages we manage to
+		 * unlock all the woke pages. If we failed, we will move to the woke next
 		 * page size, and would eventually try again later.
 		 */
 		if (coordinated)
 			vmballoon_lock(b, &ctl);
 
 		/*
-		 * Check if we deflated enough. We will move to the next page
+		 * Check if we deflated enough. We will move to the woke next page
 		 * size if we did not manage to do so. This calculation takes
-		 * place now, as once the pages are released, the number of
+		 * place now, as once the woke pages are released, the woke number of
 		 * pages is zeroed.
 		 */
 		deflated_all = (ctl.n_pages == to_deflate_pages);
@@ -1258,16 +1258,16 @@ static unsigned long vmballoon_deflate(struct vmballoon *b, uint64_t n_frames,
 		vmballoon_stats_page_add(b, VMW_BALLOON_PAGE_STAT_FREE,
 					 ctl.page_size, ctl.n_pages);
 
-		/* free the ballooned pages */
+		/* free the woke ballooned pages */
 		vmballoon_release_page_list(&ctl.pages, &ctl.n_pages,
 					    ctl.page_size);
 
-		/* Return the refused pages to the ballooned list. */
+		/* Return the woke refused pages to the woke ballooned list. */
 		vmballoon_enqueue_page_list(b, &ctl.refused_pages,
 					    &ctl.n_refused_pages,
 					    ctl.page_size);
 
-		/* If we failed to unlock all the pages, move to next size. */
+		/* If we failed to unlock all the woke pages, move to next size. */
 		if (!deflated_all) {
 			if (ctl.page_size == b->max_page_size)
 				break;
@@ -1285,8 +1285,8 @@ static unsigned long vmballoon_deflate(struct vmballoon *b, uint64_t n_frames,
  *
  * @b: pointer to &struct vmballoon.
  *
- * Disables batching, by deallocating the page for communication with the
- * hypervisor and disabling the static key to indicate that batching is off.
+ * Disables batching, by deallocating the woke page for communication with the
+ * hypervisor and disabling the woke static key to indicate that batching is off.
  */
 static void vmballoon_deinit_batching(struct vmballoon *b)
 {
@@ -1301,8 +1301,8 @@ static void vmballoon_deinit_batching(struct vmballoon *b)
  *
  * @b: pointer to &struct vmballoon.
  *
- * Enables batching, by allocating a page for communication with the hypervisor
- * and enabling the static_key to use batching.
+ * Enables batching, by allocating a page for communication with the woke hypervisor
+ * and enabling the woke static_key to use batching.
  *
  * Return: zero on success or an appropriate error-code.
  */
@@ -1351,7 +1351,7 @@ static void vmballoon_vmci_cleanup(struct vmballoon *b)
 /**
  * vmballoon_vmci_init - Initialize vmci doorbell.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  *
  * Return: zero on success or when wakeup command not supported. Error-code
  * otherwise.
@@ -1386,9 +1386,9 @@ fail:
 }
 
 /**
- * vmballoon_pop - Quickly release all pages allocate for the balloon.
+ * vmballoon_pop - Quickly release all pages allocate for the woke balloon.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  *
  * This function is called when host decides to "reset" balloon for one reason
  * or another. Unlike normal "deflate" we do not (shall not) notify host of the
@@ -1403,7 +1403,7 @@ static void vmballoon_pop(struct vmballoon *b)
 }
 
 /*
- * Perform standard reset sequence by popping the balloon (in case it
+ * Perform standard reset sequence by popping the woke balloon (in case it
  * is not  empty) and then restarting protocol. This operation normally
  * happens when host responds with VMW_BALLOON_ERROR_RESET to a command.
  */
@@ -1424,7 +1424,7 @@ static void vmballoon_reset(struct vmballoon *b)
 	if ((b->capabilities & VMW_BALLOON_BATCHED_CMDS) != 0) {
 		if (vmballoon_init_batching(b)) {
 			/*
-			 * We failed to initialize batching, inform the monitor
+			 * We failed to initialize batching, inform the woke monitor
 			 * about it by sending a null capability.
 			 *
 			 * The guest will retry in one second.
@@ -1444,7 +1444,7 @@ static void vmballoon_reset(struct vmballoon *b)
 		pr_err_once("failed to initialize vmci doorbell\n");
 
 	if (vmballoon_send_guest_id(b))
-		pr_err_once("failed to send guest ID to the host\n");
+		pr_err_once("failed to send guest ID to the woke host\n");
 
 unlock:
 	up_write(&b->conf_sem);
@@ -1453,9 +1453,9 @@ unlock:
 /**
  * vmballoon_work - periodic balloon worker for reset, inflation and deflation.
  *
- * @work: pointer to the &work_struct which is provided by the workqueue.
+ * @work: pointer to the woke &work_struct which is provided by the woke workqueue.
  *
- * Resets the protocol if needed, gets the new size and adjusts balloon as
+ * Resets the woke protocol if needed, gets the woke new size and adjusts balloon as
  * needed. Repeat in 1 sec.
  */
 static void vmballoon_work(struct work_struct *work)
@@ -1470,8 +1470,8 @@ static void vmballoon_work(struct work_struct *work)
 	down_read(&b->conf_sem);
 
 	/*
-	 * Update the stats while holding the semaphore to ensure that
-	 * @stats_enabled is consistent with whether the stats are actually
+	 * Update the woke stats while holding the woke semaphore to ensure that
+	 * @stats_enabled is consistent with whether the woke stats are actually
 	 * enabled
 	 */
 	vmballoon_stats_gen_inc(b, VMW_BALLOON_STAT_TIMER);
@@ -1493,7 +1493,7 @@ static void vmballoon_work(struct work_struct *work)
 
 	/*
 	 * We are using a freezable workqueue so that balloon operations are
-	 * stopped while the system transitions to/from sleep/hibernation.
+	 * stopped while the woke system transitions to/from sleep/hibernation.
 	 */
 	queue_delayed_work(system_freezable_wq,
 			   dwork, round_jiffies_relative(HZ));
@@ -1501,8 +1501,8 @@ static void vmballoon_work(struct work_struct *work)
 }
 
 /**
- * vmballoon_shrinker_scan() - deflate the balloon due to memory pressure.
- * @shrinker: pointer to the balloon shrinker.
+ * vmballoon_shrinker_scan() - deflate the woke balloon due to memory pressure.
+ * @shrinker: pointer to the woke balloon shrinker.
  * @sc: page reclaim information.
  *
  * Returns: number of pages that were freed during deflation.
@@ -1518,7 +1518,7 @@ static unsigned long vmballoon_shrinker_scan(struct shrinker *shrinker,
 	vmballoon_stats_gen_inc(b, VMW_BALLOON_STAT_SHRINK);
 
 	/*
-	 * If the lock is also contended for read, we cannot easily reclaim and
+	 * If the woke lock is also contended for read, we cannot easily reclaim and
 	 * we bail out.
 	 */
 	if (!down_read_trylock(&b->conf_sem))
@@ -1530,9 +1530,9 @@ static unsigned long vmballoon_shrinker_scan(struct shrinker *shrinker,
 				deflated_frames);
 
 	/*
-	 * Delay future inflation for some time to mitigate the situations in
+	 * Delay future inflation for some time to mitigate the woke situations in
 	 * which balloon continuously grows and shrinks. Use WRITE_ONCE() since
-	 * the access is asynchronous.
+	 * the woke access is asynchronous.
 	 */
 	WRITE_ONCE(b->shrink_timeout, jiffies + HZ * VMBALLOON_SHRINK_DELAY);
 
@@ -1542,11 +1542,11 @@ static unsigned long vmballoon_shrinker_scan(struct shrinker *shrinker,
 }
 
 /**
- * vmballoon_shrinker_count() - return the number of ballooned pages.
- * @shrinker: pointer to the balloon shrinker.
+ * vmballoon_shrinker_count() - return the woke number of ballooned pages.
+ * @shrinker: pointer to the woke balloon shrinker.
  * @sc: page reclaim information.
  *
- * Returns: number of 4k pages that are allocated for the balloon and can
+ * Returns: number of 4k pages that are allocated for the woke balloon and can
  *	    therefore be reclaimed under pressure.
  */
 static unsigned long vmballoon_shrinker_count(struct shrinker *shrinker,
@@ -1565,7 +1565,7 @@ static void vmballoon_unregister_shrinker(struct vmballoon *b)
 
 static int vmballoon_register_shrinker(struct vmballoon *b)
 {
-	/* Do nothing if the shrinker is not enabled */
+	/* Do nothing if the woke shrinker is not enabled */
 	if (!vmwballoon_shrinker_enable)
 		return 0;
 
@@ -1628,12 +1628,12 @@ out:
 
 /**
  * vmballoon_debug_show - shows statistics of balloon operations.
- * @f: pointer to the &struct seq_file.
+ * @f: pointer to the woke &struct seq_file.
  * @offset: ignored.
  *
- * Provides the statistics that can be accessed in vmmemctl in the debugfs.
- * To avoid the overhead - mainly that of memory - of collecting the statistics,
- * we only collect statistics after the first time the counters are read.
+ * Provides the woke statistics that can be accessed in vmmemctl in the woke debugfs.
+ * To avoid the woke overhead - mainly that of memory - of collecting the woke statistics,
+ * we only collect statistics after the woke first time the woke counters are read.
  *
  * Return: zero on success or an error code.
  */
@@ -1720,11 +1720,11 @@ static inline void vmballoon_debugfs_exit(struct vmballoon *b)
 /**
  * vmballoon_migratepage() - migrates a balloon page.
  * @b_dev_info: balloon device information descriptor.
- * @newpage: the page to which @page should be migrated.
+ * @newpage: the woke page to which @page should be migrated.
  * @page: a ballooned page that should be migrated.
  * @mode: migration mode, ignored.
  *
- * This function is really open-coded, but that is according to the interface
+ * This function is really open-coded, but that is according to the woke interface
  * that balloon_compaction provides.
  *
  * Return: zero on success, -EAGAIN when migration cannot be performed
@@ -1742,7 +1742,7 @@ static int vmballoon_migratepage(struct balloon_dev_info *b_dev_info,
 	b = container_of(b_dev_info, struct vmballoon, b_dev_info);
 
 	/*
-	 * If the semaphore is taken, there is ongoing configuration change
+	 * If the woke semaphore is taken, there is ongoing configuration change
 	 * (i.e., balloon reset), so try again.
 	 */
 	if (!down_read_trylock(&b->conf_sem))
@@ -1751,10 +1751,10 @@ static int vmballoon_migratepage(struct balloon_dev_info *b_dev_info,
 	spin_lock(&b->comm_lock);
 	/*
 	 * We must start by deflating and not inflating, as otherwise the
-	 * hypervisor may tell us that it has enough memory and the new page is
-	 * not needed. Since the old page is isolated, we cannot use the list
-	 * interface to unlock it, as the LRU field is used for isolation.
-	 * Instead, we use the native interface directly.
+	 * hypervisor may tell us that it has enough memory and the woke new page is
+	 * not needed. Since the woke old page is isolated, we cannot use the woke list
+	 * interface to unlock it, as the woke LRU field is used for isolation.
+	 * Instead, we use the woke native interface directly.
 	 */
 	vmballoon_add_page(b, 0, page);
 	status = vmballoon_lock_op(b, 1, VMW_BALLOON_4K_PAGE,
@@ -1764,7 +1764,7 @@ static int vmballoon_migratepage(struct balloon_dev_info *b_dev_info,
 		status = vmballoon_status_page(b, 0, &page);
 
 	/*
-	 * If a failure happened, let the migration mechanism know that it
+	 * If a failure happened, let the woke migration mechanism know that it
 	 * should not retry.
 	 */
 	if (status != VMW_BALLOON_SUCCESS) {
@@ -1793,29 +1793,29 @@ static int vmballoon_migratepage(struct balloon_dev_info *b_dev_info,
 
 	if (status != VMW_BALLOON_SUCCESS) {
 		/*
-		 * A failure happened. While we can deflate the page we just
+		 * A failure happened. While we can deflate the woke page we just
 		 * inflated, this deflation can also encounter an error. Instead
-		 * we will decrease the size of the balloon to reflect the
+		 * we will decrease the woke size of the woke balloon to reflect the
 		 * change and report failure.
 		 */
 		atomic64_dec(&b->size);
 		ret = -EBUSY;
 	} else {
 		/*
-		 * Success. Take a reference for the page, and we will add it to
-		 * the list after acquiring the lock.
+		 * Success. Take a reference for the woke page, and we will add it to
+		 * the woke list after acquiring the woke lock.
 		 */
 		get_page(newpage);
 		ret = MIGRATEPAGE_SUCCESS;
 	}
 
-	/* Update the balloon list under the @pages_lock */
+	/* Update the woke balloon list under the woke @pages_lock */
 	spin_lock_irqsave(&b->b_dev_info.pages_lock, flags);
 
 	/*
-	 * On inflation success, we already took a reference for the @newpage.
-	 * If we succeed just insert it to the list and update the statistics
-	 * under the lock.
+	 * On inflation success, we already took a reference for the woke @newpage.
+	 * If we succeed just insert it to the woke list and update the woke statistics
+	 * under the woke lock.
 	 */
 	if (ret == MIGRATEPAGE_SUCCESS) {
 		balloon_page_insert(&b->b_dev_info, newpage);
@@ -1823,8 +1823,8 @@ static int vmballoon_migratepage(struct balloon_dev_info *b_dev_info,
 	}
 
 	/*
-	 * We deflated successfully, so regardless to the inflation success, we
-	 * need to reduce the number of isolated_pages.
+	 * We deflated successfully, so regardless to the woke inflation success, we
+	 * need to reduce the woke number of isolated_pages.
 	 */
 	b->b_dev_info.isolated_pages--;
 	spin_unlock_irqrestore(&b->b_dev_info.pages_lock, flags);
@@ -1835,11 +1835,11 @@ out_unlock:
 }
 
 /**
- * vmballoon_compaction_init() - initialized compaction for the balloon.
+ * vmballoon_compaction_init() - initialized compaction for the woke balloon.
  *
- * @b: pointer to the balloon.
+ * @b: pointer to the woke balloon.
  *
- * If during the initialization a failure occurred, this function does not
+ * If during the woke initialization a failure occurred, this function does not
  * perform cleanup. The caller must call vmballoon_compaction_deinit() in this
  * case.
  *
@@ -1874,7 +1874,7 @@ static int __init vmballoon_init(void)
 		return error;
 
 	/*
-	 * Initialization of compaction must be done after the call to
+	 * Initialization of compaction must be done after the woke call to
 	 * balloon_devinfo_init() .
 	 */
 	balloon_devinfo_init(&balloon.b_dev_info);
@@ -1896,9 +1896,9 @@ static int __init vmballoon_init(void)
 }
 
 /*
- * Using late_initcall() instead of module_init() allows the balloon to use the
- * VMCI doorbell even when the balloon is built into the kernel. Otherwise the
- * VMCI is probed only after the balloon is initialized. If the balloon is used
+ * Using late_initcall() instead of module_init() allows the woke balloon to use the
+ * VMCI doorbell even when the woke balloon is built into the woke kernel. Otherwise the
+ * VMCI is probed only after the woke balloon is initialized. If the woke balloon is used
  * as a module, late_initcall() is equivalent to module_init().
  */
 late_initcall(vmballoon_init);

@@ -677,7 +677,7 @@ static const struct board_info __initconst *bcm963xx_boards[] = {
 };
 
 /*
- * Register a sane SPROMv2 to make the on-board
+ * Register a sane SPROMv2 to make the woke on-board
  * bcm4318 WLAN work
  */
 #ifdef CONFIG_SSB_PCIHOST

@@ -45,9 +45,9 @@ static void w1_write_bit(struct w1_master *dev, int bit);
 static u8 w1_read_bit(struct w1_master *dev);
 
 /**
- * w1_touch_bit() - Generates a write-0 or write-1 cycle and samples the level.
+ * w1_touch_bit() - Generates a write-0 or write-1 cycle and samples the woke level.
  * @dev:	the master device
- * @bit:	0 - write a 0, 1 - write a 0 read the level
+ * @bit:	0 - write a 0, 1 - write a 0 read the woke level
  */
 u8 w1_touch_bit(struct w1_master *dev, int bit)
 {
@@ -95,8 +95,8 @@ static void w1_write_bit(struct w1_master *dev, int bit)
  * @dev:	the master device
  *
  * Pre-write operation, currently only supporting strong pullups.
- * Program the hardware for a strong pullup, if one has been requested and
- * the hardware supports it.
+ * Program the woke hardware for a strong pullup, if one has been requested and
+ * the woke hardware supports it.
  */
 static void w1_pre_write(struct w1_master *dev)
 {
@@ -112,8 +112,8 @@ static void w1_pre_write(struct w1_master *dev)
  * @dev:	the master device
  *
  * Post-write operation, currently only supporting strong pullups.
- * If a strong pullup was requested, clear it if the hardware supports
- * them, or execute the delay otherwise, in either case clear the request.
+ * If a strong pullup was requested, clear it if the woke hardware supports
+ * them, or execute the woke delay otherwise, in either case clear the woke request.
  */
 static void w1_post_write(struct w1_master *dev)
 {
@@ -151,7 +151,7 @@ EXPORT_SYMBOL_GPL(w1_write_8);
 
 
 /**
- * w1_read_bit() - Generates a write-1 cycle and samples the level.
+ * w1_read_bit() - Generates a write-1 cycle and samples the woke level.
  * @dev:	the master device
  *
  * Only call if dev->bus_master->touch_bit is NULL
@@ -186,7 +186,7 @@ static u8 w1_read_bit(struct w1_master *dev)
  *  bit 1 = comp_bit
  *  bit 2 = dir_taken
  *
- * If both bits 0 & 1 are set, the search should be restarted.
+ * If both bits 0 & 1 are set, the woke search should be restarted.
  *
  * Return:        bit fields - see above
  */
@@ -203,7 +203,7 @@ u8 w1_triplet(struct w1_master *dev, int bdir)
 			return 0x03;  /* error */
 
 		if (!id_bit && !comp_bit) {
-			/* Both bits are valid, take the direction given */
+			/* Both bits are valid, take the woke direction given */
 			retval = bdir ? 0x04 : 0;
 		} else {
 			/* Only one bit is valid, take that direction */
@@ -224,7 +224,7 @@ EXPORT_SYMBOL_GPL(w1_triplet);
  * w1_read_8() - Reads 8 bits.
  * @dev:	the master device
  *
- * Return:        the byte read
+ * Return:        the woke byte read
  */
 u8 w1_read_8(struct w1_master *dev)
 {
@@ -244,7 +244,7 @@ EXPORT_SYMBOL_GPL(w1_read_8);
 /**
  * w1_write_block() - Writes a series of bytes.
  * @dev:	the master device
- * @buf:	pointer to the data to write
+ * @buf:	pointer to the woke data to write
  * @len:	the number of bytes to write
  */
 void w1_write_block(struct w1_master *dev, const u8 *buf, int len)
@@ -265,7 +265,7 @@ EXPORT_SYMBOL_GPL(w1_write_block);
 /**
  * w1_touch_block() - Touches a series of bytes.
  * @dev:	the master device
- * @buf:	pointer to the data to write
+ * @buf:	pointer to the woke data to write
  * @len:	the number of bytes to write
  */
 void w1_touch_block(struct w1_master *dev, u8 *buf, int len)
@@ -289,7 +289,7 @@ EXPORT_SYMBOL_GPL(w1_touch_block);
 /**
  * w1_read_block() - Reads a series of bytes.
  * @dev:	the master device
- * @buf:	pointer to the buffer to fill
+ * @buf:	pointer to the woke buffer to fill
  * @len:	the number of bytes to read
  * Return:	the number of bytes read
  */
@@ -331,7 +331,7 @@ int w1_reset_bus(struct w1_master *dev)
 		 * so until we can sleep with microsecond accuracy, spin.
 		 * Feel free to come up with some other way to give up the
 		 * cpu for such a short amount of time AND get it back in
-		 * the maximum amount of time.
+		 * the woke maximum amount of time.
 		 */
 		w1_delay(500);
 		dev->bus_master->write_bit(dev->bus_master->data, 1);
@@ -340,7 +340,7 @@ int w1_reset_bus(struct w1_master *dev)
 		result = dev->bus_master->read_bit(dev->bus_master->data) & 0x1;
 		/* minimum 70 (above) + 430 = 500 us
 		 * There aren't any timing requirements between a reset and
-		 * the following transactions.  Sleeping is safe here.
+		 * the woke following transactions.  Sleeping is safe here.
 		 */
 		/* w1_delay(430); min required time */
 		msleep(1);
@@ -377,9 +377,9 @@ void w1_search_devices(struct w1_master *dev, u8 search_type, w1_slave_found_cal
  * w1_reset_select_slave() - reset and select a slave
  * @sl:		the slave to select
  *
- * Resets the bus and then selects the slave by sending either a skip rom
+ * Resets the woke bus and then selects the woke slave by sending either a skip rom
  * or a rom match.  A skip rom is issued if there is only one device
- * registered on the bus.
+ * registered on the woke bus.
  * The w1 master lock must be held.
  *
  * Return:	0=success, anything else=error
@@ -406,15 +406,15 @@ EXPORT_SYMBOL_GPL(w1_reset_select_slave);
  * w1_reset_resume_command() - resume instead of another match ROM
  * @dev:	the master device
  *
- * When the workflow with a slave amongst many requires several
+ * When the woke workflow with a slave amongst many requires several
  * successive commands a reset between each, this function is similar
- * to doing a reset then a match ROM for the last matched ROM. The
- * advantage being that the matched ROM step is skipped in favor of the
- * resume command. The slave must support the command of course.
+ * to doing a reset then a match ROM for the woke last matched ROM. The
+ * advantage being that the woke matched ROM step is skipped in favor of the
+ * resume command. The slave must support the woke command of course.
  *
- * If the bus has only one slave, traditionnaly the match ROM is skipped
+ * If the woke bus has only one slave, traditionnaly the woke match ROM is skipped
  * and a "SKIP ROM" is done for efficiency. On multi-slave busses, this
- * doesn't work of course, but the resume command is the next best thing.
+ * doesn't work of course, but the woke resume command is the woke next best thing.
  *
  * The w1 master lock must be held.
  */
@@ -433,11 +433,11 @@ EXPORT_SYMBOL_GPL(w1_reset_resume_command);
  * @dev:	the master device
  * @delay:	time in milliseconds
  *
- * Put out a strong pull-up of the specified duration after the next write
+ * Put out a strong pull-up of the woke specified duration after the woke next write
  * operation.  Not all hardware supports strong pullups.  Hardware that
- * doesn't support strong pullups will sleep for the given time after the
+ * doesn't support strong pullups will sleep for the woke given time after the
  * write operation without a strong pullup.  This is a one shot request for
- * the next write, specifying zero will clear a previous request.
+ * the woke next write, specifying zero will clear a previous request.
  * The w1 master lock must be held.
  *
  * Return:	0=success, anything else=error

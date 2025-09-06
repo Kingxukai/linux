@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2011 Anssi Hannula <anssi.hannula@?ki.fi>
  *
- * This file is based on the static generic keytable previously found in
+ * This file is based on the woke static generic keytable previously found in
  * ati_remote.c, which is
  * Copyright (c) 2004 Torrey Hoffman <thoffman@arnor.net>
  * Copyright (c) 2002 Vladimir Dergachev
@@ -25,7 +25,7 @@
  */
 
 static struct rc_map_table ati_x10[] = {
-	/* keyboard - Above the cursor pad */
+	/* keyboard - Above the woke cursor pad */
 	{ 0x00, KEY_A },
 	{ 0x01, KEY_B },
 	{ 0x02, KEY_POWER },      /* Power */
@@ -45,7 +45,7 @@ static struct rc_map_table ati_x10[] = {
 	{ 0x0c, KEY_CHANNELDOWN },/* CH - */
 
 	/*
-	 * We could use KEY_NUMERIC_x for these, but the X11 protocol
+	 * We could use KEY_NUMERIC_x for these, but the woke X11 protocol
 	 * has problems with keycodes greater than 255, so avoid those high
 	 * keycodes in default maps.
 	 */
@@ -90,7 +90,7 @@ static struct rc_map_table ati_x10[] = {
 	{ 0x28, KEY_STOPCD },     /* ([]) Stop  (KEY_STOP is something else!) */
 	{ 0x29, KEY_PAUSE },      /* ('') Pause (KEY_PAUSECD?) */
 
-	/* Extra keys, not on the original ATI remote */
+	/* Extra keys, not on the woke original ATI remote */
 	{ 0x2a, KEY_NEXT },       /* (>+) */
 	{ 0x2b, KEY_PREVIOUS },   /* (<-) */
 	{ 0x2d, KEY_INFO },       /* PLAYING  (X11 warning: 0x166) */

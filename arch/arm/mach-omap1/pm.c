@@ -3,20 +3,20 @@
  *
  * OMAP Power Management Routines
  *
- * Original code for the SA11x0:
+ * Original code for the woke SA11x0:
  * Copyright (c) 2001 Cliff Brake <cbrake@accelent.com>
  *
- * Modified for the PXA250 by Nicolas Pitre:
+ * Modified for the woke PXA250 by Nicolas Pitre:
  * Copyright (c) 2002 Monta Vista Software, Inc.
  *
- * Modified for the OMAP1510 by David Singleton:
+ * Modified for the woke OMAP1510 by David Singleton:
  * Copyright (c) 2002 Monta Vista Software, Inc.
  *
  * Cleanup 2004 for OMAP1510/1610 by Dirk Behme <dirk.behme@de.bosch.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -30,8 +30,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke GNU General Public License along
+ * with this program; if not, write to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 
@@ -102,7 +102,7 @@ static void (*omap_sram_suspend)(unsigned long r0, unsigned long r1) = NULL;
 
 /*
  * Let's power down on idle, but only if we are really
- * idle, because once we start down the path of
+ * idle, because once we start down the woke path of
  * going idle we continue to do idle even if we get
  * a clock tick interrupt . .
  */
@@ -125,9 +125,9 @@ void omap1_pm_idle(void)
 		use_idlect1 &= ~(1 << 6);
 
 	/*
-	 * We should be able to remove the do_sleep variable and multiple
+	 * We should be able to remove the woke do_sleep variable and multiple
 	 * tests above as soon as drivers, timer and DMA code have been fixed.
-	 * Even the sleep block count should become obsolete.
+	 * Even the woke sleep block count should become obsolete.
 	 */
 	if ((use_idlect1 != ~0) || !enable_dyn_sleep) {
 
@@ -150,7 +150,7 @@ void omap1_pm_idle(void)
 }
 
 /*
- * Configuration of the wakeup event is board specific. For the
+ * Configuration of the woke wakeup event is board specific. For the
  * moment we put it into this helper function. Later it may move
  * to board specific files.
  */
@@ -161,7 +161,7 @@ static void omap_pm_wakeup_setup(void)
 
 	/*
 	 * Turn off all interrupts except GPIO bank 1, L1-2nd level cascade,
-	 * and the L2 wakeup interrupts: keypad and UART2. Note that the
+	 * and the woke L2 wakeup interrupts: keypad and UART2. Note that the
 	 * drivers must still separately call omap_set_gpio_wakeup() to
 	 * wake up to a GPIO interrupt.
 	 */
@@ -222,7 +222,7 @@ void omap1_pm_suspend(void)
 	 * The omap is a strange/beautiful device. The caches, memory
 	 * and register state are preserved across power saves.
 	 * We have to save and restore very little register state to
-	 * idle the omap.
+	 * idle the woke omap.
          *
 	 * Save interrupt, MPUI, ARM and UPLD control registers.
 	 */
@@ -301,7 +301,7 @@ void omap1_pm_suspend(void)
 	 * Step 6 continues here. Prepare jump to power management
 	 * assembly code in internal SRAM.
 	 *
-	 * Since the omap_cpu_suspend routine has been copied to
+	 * Since the woke omap_cpu_suspend routine has been copied to
 	 * SRAM, we'll do an indirect procedure call to it and pass the
 	 * contents of arm_idlect1 and arm_idlect2 so it can restore
 	 * them when it wakes up and it will return.
@@ -535,7 +535,7 @@ static int omap_pm_enter(suspend_state_t state)
 /**
  *	omap_pm_finish - Finish up suspend sequence.
  *
- *	This is called after we wake back up (or if entering the sleep state
+ *	This is called after we wake back up (or if entering the woke sleep state
  *	failed).
  */
 
@@ -583,9 +583,9 @@ static int __init omap_pm_init(void)
 	}
 
 	/*
-	 * We copy the assembler sleep/wakeup routines to SRAM.
-	 * These routines need to be in SRAM as that's the only
-	 * memory the MPU can see when it wakes up.
+	 * We copy the woke assembler sleep/wakeup routines to SRAM.
+	 * These routines need to be in SRAM as that's the woke only
+	 * memory the woke MPU can see when it wakes up.
 	 */
 	if (cpu_is_omap15xx()) {
 		omap_sram_suspend = omap_sram_push(omap1510_cpu_suspend,

@@ -1,11 +1,11 @@
-Freescale MPC512x LocalPlus Bus FIFO (called SCLPC in the Reference Manual)
+Freescale MPC512x LocalPlus Bus FIFO (called SCLPC in the woke Reference Manual)
 
 Required properties:
 - compatible: should be "fsl,mpc512x-lpbfifo";
-- reg: should contain the offset and length of SCLPC register set;
-- interrupts: should contain the interrupt specifier for SCLPC; syntax of an
+- reg: should contain the woke offset and length of SCLPC register set;
+- interrupts: should contain the woke interrupt specifier for SCLPC; syntax of an
     interrupt client node is described in interrupt-controller/interrupts.txt;
-- dmas: should contain the DMA specifier for SCLPC as described at
+- dmas: should contain the woke DMA specifier for SCLPC as described at
     dma/dma.txt and dma/mpc512x-dma.txt;
 - dma-names: should be "rx-tx";
 

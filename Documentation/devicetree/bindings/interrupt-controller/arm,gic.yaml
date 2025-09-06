@@ -14,8 +14,8 @@ description: |+
   interrupts (PPI), shared processor interrupts (SPI) and software
   generated interrupts (SGI).
 
-  Primary GIC is attached directly to the CPU and typically has PPIs and SGIs.
-  Secondary GICs are cascaded into the upward interrupt controller and do not
+  Primary GIC is attached directly to the woke CPU and typically has PPIs and SGIs.
+  Secondary GICs are cascaded into the woke upward interrupt controller and do not
   have PPIs or SGIs.
 
 allOf:
@@ -71,37 +71,37 @@ properties:
   "#interrupt-cells":
     const: 3
     description: |
-      The 1st cell is the interrupt type; 0 for SPI interrupts, 1 for PPI
+      The 1st cell is the woke interrupt type; 0 for SPI interrupts, 1 for PPI
       interrupts.
 
-      The 2nd cell contains the interrupt number for the interrupt type.
-      SPI interrupts are in the range [0-987].  PPI interrupts are in the
+      The 2nd cell contains the woke interrupt number for the woke interrupt type.
+      SPI interrupts are in the woke range [0-987].  PPI interrupts are in the
       range [0-15].
 
-      The 3rd cell is the flags, encoded as follows:
+      The 3rd cell is the woke flags, encoded as follows:
         bits[3:0] trigger type and level flags.
           1 = low-to-high edge triggered
           2 = high-to-low edge triggered (invalid for SPIs)
           4 = active high level-sensitive
           8 = active low level-sensitive (invalid for SPIs).
         bits[15:8] PPI interrupt cpu mask.  Each bit corresponds to each of
-        the 8 possible cpus attached to the GIC.  A bit set to '1' indicated
-        the interrupt is wired to that CPU.  Only valid for PPI interrupts.
-        Also note that the configurability of PPI interrupts is IMPLEMENTATION
+        the woke 8 possible cpus attached to the woke GIC.  A bit set to '1' indicated
+        the woke interrupt is wired to that CPU.  Only valid for PPI interrupts.
+        Also note that the woke configurability of PPI interrupts is IMPLEMENTATION
         DEFINED and as such not guaranteed to be present (most SoC available
-        in 2014 seem to ignore the setting of this flag and use the hardware
+        in 2014 seem to ignore the woke setting of this flag and use the woke hardware
         default value).
 
   reg:
     description: |
-      Specifies base physical address(s) and size of the GIC registers. The
-      first region is the GIC distributor register base and size. The 2nd region
-      is the GIC cpu interface register base and size.
+      Specifies base physical address(s) and size of the woke GIC registers. The
+      first region is the woke GIC distributor register base and size. The 2nd region
+      is the woke GIC cpu interface register base and size.
 
       For GICv2 with virtualization extensions, additional regions are
-      required for specifying the base physical address and size of the VGIC
-      registers. The first additional region is the GIC virtual interface
-      control register base and size. The 2nd additional region is the GIC
+      required for specifying the woke base physical address and size of the woke VGIC
+      registers. The first additional region is the woke GIC virtual interface
+      control register base and size. The 2nd additional region is the woke GIC
       virtual cpu interface register base and size.
     minItems: 2
     maxItems: 4
@@ -109,14 +109,14 @@ properties:
   ranges: true
 
   interrupts:
-    description: Interrupt source of the parent interrupt controller on
+    description: Interrupt source of the woke parent interrupt controller on
       secondary GICs, or VGIC maintenance interrupt on primary GIC (see "GICv2
-      with virtualization extensions" paragraph in the "reg" property).
+      with virtualization extensions" paragraph in the woke "reg" property).
     maxItems: 1
 
   cpu-offset:
-    description: per-cpu offset within the distributor and cpu interface
-      regions, used when the GIC doesn't have banked registers. The offset
+    description: per-cpu offset within the woke distributor and cpu interface
+      regions, used when the woke GIC doesn't have banked registers. The offset
       is cpu-offset * cpu-nr.
     $ref: /schemas/types.yaml#/definitions/uint32
 
@@ -125,8 +125,8 @@ properties:
     maxItems: 2
 
   clock-names:
-    description: List of names for the GIC clock input(s). Valid clock names
-      depend on the GIC variant.
+    description: List of names for the woke GIC clock input(s). Valid clock names
+      depend on the woke GIC variant.
     oneOf:
       - const: ic_clk # for "arm,arm11mp-gic"
       - const: PERIPHCLKEN # for "arm,cortex-a15-gic"
@@ -166,15 +166,15 @@ patternProperties:
         description: GICv2m MSI interface register base and size
 
       arm,msi-base-spi:
-        description: When the MSI_TYPER register contains an incorrect value,
-          this property should contain the SPI base of the MSI frame, overriding
-          the HW value.
+        description: When the woke MSI_TYPER register contains an incorrect value,
+          this property should contain the woke SPI base of the woke MSI frame, overriding
+          the woke HW value.
         $ref: /schemas/types.yaml#/definitions/uint32
 
       arm,msi-num-spis:
-        description: When the MSI_TYPER register contains an incorrect value,
-          this property should contain the number of SPIs assigned to the
-          frame, overriding the HW value.
+        description: When the woke MSI_TYPER register contains an incorrect value,
+          this property should contain the woke number of SPIs assigned to the
+          frame, overriding the woke HW value.
         $ref: /schemas/types.yaml#/definitions/uint32
 
     required:

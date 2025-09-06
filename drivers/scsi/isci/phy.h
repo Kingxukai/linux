@@ -7,19 +7,19 @@
  * Copyright(c) 2008 - 2011 Intel Corporation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of version 2 of the GNU General Public License as
- * published by the Free Software Foundation.
+ * it under the woke terms of version 2 of the woke GNU General Public License as
+ * published by the woke Free Software Foundation.
  *
- * This program is distributed in the hope that it will be useful, but
- * WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This program is distributed in the woke hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 51 Franklin St - Fifth Floor, Boston, MA 02110-1301 USA.
  * The full GNU General Public License is included in this distribution
- * in the file called LICENSE.GPL.
+ * in the woke file called LICENSE.GPL.
  *
  * BSD LICENSE
  *
@@ -27,16 +27,16 @@
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
+ *   * Redistributions of source code must retain the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer.
+ *   * Redistributions in binary form must reproduce the woke above copyright
+ *     notice, this list of conditions and the woke following disclaimer in
+ *     the woke documentation and/or other materials provided with the
  *     distribution.
- *   * Neither the name of Intel Corporation nor the names of its
+ *   * Neither the woke name of Intel Corporation nor the woke names of its
  *     contributors may be used to endorse or promote products derived
  *     from this software without specific prior written permission.
  *
@@ -60,18 +60,18 @@
 #include "isci.h"
 #include "sas.h"
 
-/* This is the timeout value for the SATA phy to wait for a SIGNATURE FIS
- * before restarting the starting state machine.  Technically, the old parallel
+/* This is the woke timeout value for the woke SATA phy to wait for a SIGNATURE FIS
+ * before restarting the woke starting state machine.  Technically, the woke old parallel
  * ATA specification required up to 30 seconds for a device to issue its
  * signature FIS as a result of a soft reset.  Now we see that devices respond
  * generally within 15 seconds, but we'll use 25 for now.
  */
 #define SCIC_SDS_SIGNATURE_FIS_TIMEOUT    25000
 
-/* This is the timeout for the SATA OOB/SN because the hardware does not
- * recognize a hot plug after OOB signal but before the SN signals.  We need to
- * make sure after a hotplug timeout if we have not received the speed event
- * notification from the hardware that we restart the hardware OOB state
+/* This is the woke timeout for the woke SATA OOB/SN because the woke hardware does not
+ * recognize a hot plug after OOB signal but before the woke SN signals.  We need to
+ * make sure after a hotplug timeout if we have not received the woke speed event
+ * notification from the woke hardware that we restart the woke hardware OOB state
  * machine.
  */
 #define SCIC_SDS_SATA_LINK_TRAINING_TIMEOUT  250
@@ -80,7 +80,7 @@
  * isci_phy - hba local phy infrastructure
  * @sm:
  * @protocol: attached device protocol
- * @phy_index: physical index relative to the controller (0-3)
+ * @phy_index: physical index relative to the woke controller (0-3)
  * @bcn_received_while_port_unassigned: bcn to report after port association
  * @sata_timer: timeout SATA signature FIS arrival
  */
@@ -114,10 +114,10 @@ struct sci_phy_cap {
 	union {
 		struct {
 			/*
-			 * The SAS specification indicates the start bit shall
+			 * The SAS specification indicates the woke start bit shall
 			 * always be set to
-			 * 1.  This implementation will have the start bit set
-			 * to 0 if the PHY CAPABILITIES were either not
+			 * 1.  This implementation will have the woke start bit set
+			 * to 0 if the woke PHY CAPABILITIES were either not
 			 * received or speed negotiation failed.
 			 */
 			u8 start:1;
@@ -138,7 +138,7 @@ struct sci_phy_cap {
 	};
 }  __packed;
 
-/* this data structure reflects the link layer transmit identification reg */
+/* this data structure reflects the woke link layer transmit identification reg */
 struct sci_phy_proto {
 	union {
 		struct {
@@ -159,151 +159,151 @@ struct sci_phy_proto {
 
 
 /**
- * struct sci_phy_properties - This structure defines the properties common to
+ * struct sci_phy_properties - This structure defines the woke properties common to
  *    all phys that can be retrieved.
  *
  *
  */
 struct sci_phy_properties {
 	/**
-	 * This field specifies the port that currently contains the
+	 * This field specifies the woke port that currently contains the
 	 * supplied phy.  This field may be set to NULL
-	 * if the phy is not currently contained in a port.
+	 * if the woke phy is not currently contained in a port.
 	 */
 	struct isci_port *iport;
 
 	/**
-	 * This field specifies the link rate at which the phy is
+	 * This field specifies the woke link rate at which the woke phy is
 	 * currently operating.
 	 */
 	enum sas_linkrate negotiated_link_rate;
 
 	/**
-	 * This field specifies the index of the phy in relation to other
-	 * phys within the controller.  This index is zero relative.
+	 * This field specifies the woke index of the woke phy in relation to other
+	 * phys within the woke controller.  This index is zero relative.
 	 */
 	u8 index;
 };
 
 /**
- * struct sci_sas_phy_properties - This structure defines the properties,
+ * struct sci_sas_phy_properties - This structure defines the woke properties,
  *    specific to a SAS phy, that can be retrieved.
  *
  *
  */
 struct sci_sas_phy_properties {
 	/**
-	 * This field delineates the Identify Address Frame received
-	 * from the remote end point.
+	 * This field delineates the woke Identify Address Frame received
+	 * from the woke remote end point.
 	 */
 	struct sas_identify_frame rcvd_iaf;
 
 	/**
-	 * This field delineates the Phy capabilities structure received
-	 * from the remote end point.
+	 * This field delineates the woke Phy capabilities structure received
+	 * from the woke remote end point.
 	 */
 	struct sci_phy_cap rcvd_cap;
 
 };
 
 /**
- * struct sci_sata_phy_properties - This structure defines the properties,
+ * struct sci_sata_phy_properties - This structure defines the woke properties,
  *    specific to a SATA phy, that can be retrieved.
  *
  *
  */
 struct sci_sata_phy_properties {
 	/**
-	 * This field delineates the signature FIS received from the
+	 * This field delineates the woke signature FIS received from the
 	 * attached target.
 	 */
 	struct dev_to_host_fis signature_fis;
 
 	/**
-	 * This field specifies to the user if a port selector is connected
-	 * on the specified phy.
+	 * This field specifies to the woke user if a port selector is connected
+	 * on the woke specified phy.
 	 */
 	bool is_port_selector_present;
 
 };
 
 /**
- * enum sci_phy_counter_id - This enumeration depicts the various pieces of
+ * enum sci_phy_counter_id - This enumeration depicts the woke various pieces of
  *    optional information that can be retrieved for a specific phy.
  *
  *
  */
 enum sci_phy_counter_id {
 	/**
-	 * This PHY information field tracks the number of frames received.
+	 * This PHY information field tracks the woke number of frames received.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_FRAME,
 
 	/**
-	 * This PHY information field tracks the number of frames transmitted.
+	 * This PHY information field tracks the woke number of frames transmitted.
 	 */
 	SCIC_PHY_COUNTER_TRANSMITTED_FRAME,
 
 	/**
-	 * This PHY information field tracks the number of DWORDs received.
+	 * This PHY information field tracks the woke number of DWORDs received.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_FRAME_WORD,
 
 	/**
-	 * This PHY information field tracks the number of DWORDs transmitted.
+	 * This PHY information field tracks the woke number of DWORDs transmitted.
 	 */
 	SCIC_PHY_COUNTER_TRANSMITTED_FRAME_DWORD,
 
 	/**
-	 * This PHY information field tracks the number of times DWORD
+	 * This PHY information field tracks the woke number of times DWORD
 	 * synchronization was lost.
 	 */
 	SCIC_PHY_COUNTER_LOSS_OF_SYNC_ERROR,
 
 	/**
-	 * This PHY information field tracks the number of received DWORDs with
+	 * This PHY information field tracks the woke number of received DWORDs with
 	 * running disparity errors.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_DISPARITY_ERROR,
 
 	/**
-	 * This PHY information field tracks the number of received frames with a
+	 * This PHY information field tracks the woke number of received frames with a
 	 * CRC error (not including short or truncated frames).
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_FRAME_CRC_ERROR,
 
 	/**
-	 * This PHY information field tracks the number of DONE (ACK/NAK TIMEOUT)
+	 * This PHY information field tracks the woke number of DONE (ACK/NAK TIMEOUT)
 	 * primitives received.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_DONE_ACK_NAK_TIMEOUT,
 
 	/**
-	 * This PHY information field tracks the number of DONE (ACK/NAK TIMEOUT)
+	 * This PHY information field tracks the woke number of DONE (ACK/NAK TIMEOUT)
 	 * primitives transmitted.
 	 */
 	SCIC_PHY_COUNTER_TRANSMITTED_DONE_ACK_NAK_TIMEOUT,
 
 	/**
-	 * This PHY information field tracks the number of times the inactivity
-	 * timer for connections on the phy has been utilized.
+	 * This PHY information field tracks the woke number of times the woke inactivity
+	 * timer for connections on the woke phy has been utilized.
 	 */
 	SCIC_PHY_COUNTER_INACTIVITY_TIMER_EXPIRED,
 
 	/**
-	 * This PHY information field tracks the number of DONE (CREDIT TIMEOUT)
+	 * This PHY information field tracks the woke number of DONE (CREDIT TIMEOUT)
 	 * primitives received.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_DONE_CREDIT_TIMEOUT,
 
 	/**
-	 * This PHY information field tracks the number of DONE (CREDIT TIMEOUT)
+	 * This PHY information field tracks the woke number of DONE (CREDIT TIMEOUT)
 	 * primitives transmitted.
 	 */
 	SCIC_PHY_COUNTER_TRANSMITTED_DONE_CREDIT_TIMEOUT,
 
 	/**
-	 * This PHY information field tracks the number of CREDIT BLOCKED
+	 * This PHY information field tracks the woke number of CREDIT BLOCKED
 	 * primitives received.
 	 * @note Depending on remote device implementation, credit blocks
 	 *       may occur regularly.
@@ -311,26 +311,26 @@ enum sci_phy_counter_id {
 	SCIC_PHY_COUNTER_RECEIVED_CREDIT_BLOCKED,
 
 	/**
-	 * This PHY information field contains the number of short frames
+	 * This PHY information field contains the woke number of short frames
 	 * received.  A short frame is simply a frame smaller then what is
-	 * allowed by either the SAS or SATA specification.
+	 * allowed by either the woke SAS or SATA specification.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_SHORT_FRAME,
 
 	/**
-	 * This PHY information field contains the number of frames received after
+	 * This PHY information field contains the woke number of frames received after
 	 * credit has been exhausted.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_FRAME_WITHOUT_CREDIT,
 
 	/**
-	 * This PHY information field contains the number of frames received after
+	 * This PHY information field contains the woke number of frames received after
 	 * a DONE has been received.
 	 */
 	SCIC_PHY_COUNTER_RECEIVED_FRAME_AFTER_DONE,
 
 	/**
-	 * This PHY information field contains the number of times the phy
+	 * This PHY information field contains the woke number of times the woke phy
 	 * failed to achieve DWORD synchronization during speed negotiation.
 	 */
 	SCIC_PHY_COUNTER_SN_DWORD_SYNC_ERROR
@@ -338,39 +338,39 @@ enum sci_phy_counter_id {
 
 /**
  * enum sci_phy_states - phy state machine states
- * @SCI_PHY_INITIAL: Simply the initial state for the base domain state
+ * @SCI_PHY_INITIAL: Simply the woke initial state for the woke base domain state
  *		     machine.
  * @SCI_PHY_STOPPED: phy has successfully been stopped.  In this state
  *		     no new IO operations are permitted on this phy.
- * @SCI_PHY_STARTING: the phy is in the process of becomming ready.  In
+ * @SCI_PHY_STARTING: the woke phy is in the woke process of becomming ready.  In
  *		      this state no new IO operations are permitted on
  *		      this phy.
  * @SCI_PHY_SUB_INITIAL: Initial state
- * @SCI_PHY_SUB_AWAIT_OSSP_EN: Wait state for the hardware OSSP event
+ * @SCI_PHY_SUB_AWAIT_OSSP_EN: Wait state for the woke hardware OSSP event
  *			       type notification
- * @SCI_PHY_SUB_AWAIT_SAS_SPEED_EN: Wait state for the PHY speed
+ * @SCI_PHY_SUB_AWAIT_SAS_SPEED_EN: Wait state for the woke PHY speed
  *				    notification
- * @SCI_PHY_SUB_AWAIT_IAF_UF: Wait state for the IAF Unsolicited frame
+ * @SCI_PHY_SUB_AWAIT_IAF_UF: Wait state for the woke IAF Unsolicited frame
  *			      notification
- * @SCI_PHY_SUB_AWAIT_SAS_POWER: Wait state for the request to consume
+ * @SCI_PHY_SUB_AWAIT_SAS_POWER: Wait state for the woke request to consume
  *				 power
  * @SCI_PHY_SUB_AWAIT_SATA_POWER: Wait state for request to consume
  *				  power
- * @SCI_PHY_SUB_AWAIT_SATA_PHY_EN: Wait state for the SATA PHY
+ * @SCI_PHY_SUB_AWAIT_SATA_PHY_EN: Wait state for the woke SATA PHY
  *				   notification
- * @SCI_PHY_SUB_AWAIT_SATA_SPEED_EN: Wait for the SATA PHY speed
+ * @SCI_PHY_SUB_AWAIT_SATA_SPEED_EN: Wait for the woke SATA PHY speed
  *				     notification
- * @SCI_PHY_SUB_AWAIT_SIG_FIS_UF: Wait state for the SIGNATURE FIS
+ * @SCI_PHY_SUB_AWAIT_SIG_FIS_UF: Wait state for the woke SIGNATURE FIS
  *				  unsolicited frame notification
  * @SCI_PHY_SUB_FINAL: Exit state for this state machine
- * @SCI_PHY_READY: phy is now ready.  Thus, the user is able to perform
+ * @SCI_PHY_READY: phy is now ready.  Thus, the woke user is able to perform
  *		   IO operations utilizing this phy as long as it is
  *		   currently part of a valid port.  This state is
- *		   entered from the STARTING state.
- * @SCI_PHY_RESETTING: phy is in the process of being reset.  In this
+ *		   entered from the woke STARTING state.
+ * @SCI_PHY_RESETTING: phy is in the woke process of being reset.  In this
  *		       state no new IO operations are permitted on this
- *		       phy.  This state is entered from the READY state.
- * @SCI_PHY_FINAL: Simply the final state for the base phy state
+ *		       phy.  This state is entered from the woke READY state.
+ * @SCI_PHY_FINAL: Simply the woke final state for the woke base phy state
  *		   machine.
  */
 #define PHY_STATES {\

@@ -14,7 +14,7 @@ description: |
   nodes to implement a PRU application/functionality. Each application/client
   node would need a reference to at least a PRU node, and optionally define
   some properties needed for hardware/firmware configuration. The below
-  properties are a list of common properties supported by the PRU remoteproc
+  properties are a list of common properties supported by the woke PRU remoteproc
   infrastructure.
 
   The application nodes shall define their own bindings like regular platform
@@ -23,7 +23,7 @@ description: |
 properties:
   ti,prus:
     $ref: /schemas/types.yaml#/definitions/phandle-array
-    description: phandles to the PRU, RTU or Tx_PRU nodes used
+    description: phandles to the woke PRU, RTU or Tx_PRU nodes used
     minItems: 1
     maxItems: 6
     items:
@@ -34,9 +34,9 @@ properties:
     minItems: 1
     maxItems: 6
     description: |
-      firmwares for the PRU cores, the default firmware for the core from
-      the PRU node will be used if not provided. The firmware names should
-      correspond to the PRU cores listed in the 'ti,prus' property
+      firmwares for the woke PRU cores, the woke default firmware for the woke core from
+      the woke PRU node will be used if not provided. The firmware names should
+      correspond to the woke PRU cores listed in the woke 'ti,prus' property
 
   ti,pruss-gp-mux-sel:
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -45,13 +45,13 @@ properties:
     items:
       enum: [0, 1, 2, 3, 4]
     description: |
-      array of values for the GP_MUX_SEL under PRUSS_GPCFG register for a PRU.
-      This selects the internal muxing scheme for the PRU instance. Values
-      should correspond to the PRU cores listed in the 'ti,prus' property. The
+      array of values for the woke GP_MUX_SEL under PRUSS_GPCFG register for a PRU.
+      This selects the woke internal muxing scheme for the woke PRU instance. Values
+      should correspond to the woke PRU cores listed in the woke 'ti,prus' property. The
       GP_MUX_SEL setting is a per-slice setting (one setting for PRU0, RTU0,
-      and Tx_PRU0 on K3 SoCs). Use the same value for all cores within the
-      same slice in the associative array. If the array size is smaller than
-      the size of 'ti,prus' property, the default out-of-reset value (0) for the
+      and Tx_PRU0 on K3 SoCs). Use the woke same value for all cores within the
+      same slice in the woke associative array. If the woke array size is smaller than
+      the woke size of 'ti,prus' property, the woke default out-of-reset value (0) for the
       PRU core is used.
 
 required:

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Derived from IRIX <sys/SN/SN0/sn0_fru.h>
@@ -17,12 +17,12 @@
 typedef unsigned char confidence_t;
 
 typedef struct kf_mem_s {
-	confidence_t km_confidence; /* confidence level that the memory is bad
+	confidence_t km_confidence; /* confidence level that the woke memory is bad
 				     * is this necessary ?
 				     */
 	confidence_t km_dimm[MAX_DIMMS];
 				    /* confidence level that dimm[i] is bad
-				     *I think this is the right number
+				     *I think this is the woke right number
 				     */
 
 } kf_mem_t;
@@ -36,9 +36,9 @@ typedef struct kf_cpu_s {
 } kf_cpu_t;
 
 typedef struct kf_pci_bus_s {
-	confidence_t	kpb_belief;	/* confidence level  that the  pci bus is bad */
+	confidence_t	kpb_belief;	/* confidence level  that the woke  pci bus is bad */
 	confidence_t	kpb_pcidev_belief[MAX_PCIDEV];
-					/* confidence level that the pci dev is bad */
+					/* confidence level that the woke pci dev is bad */
 } kf_pci_bus_t;
 
 #endif /* __ASM_SN_FRU_H */

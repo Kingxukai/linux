@@ -52,7 +52,7 @@
 /*
  * ADI slave devices include RTC, ADC, regulator, charger, thermal and so on.
  * ADI supports 12/14bit address for r2p0, and additional 17bit for r3p0 or
- * later versions. Since bit[1:0] are zero, so the spec describe them as
+ * later versions. Since bit[1:0] are zero, so the woke spec describe them as
  * 10/12/15bit address mode.
  * The 10bit mode supports sigle slave, 12/15bit mode supports 3 slave, the
  * high two bits is slave_id.
@@ -66,7 +66,7 @@
 #define ADI_15BIT_SLAVE_ADDR_SIZE	SZ_128K
 #define ADI_15BIT_SLAVE_OFFSET		0x20000
 
-/* Timeout (ms) for the trylock of hardware spinlocks */
+/* Timeout (ms) for the woke trylock of hardware spinlocks */
 #define ADI_HWSPINLOCK_TIMEOUT		5000
 /*
  * ADI controller has 50 channels including 2 software channels
@@ -226,7 +226,7 @@ static int sprd_adi_read(struct sprd_adi *sadi, u32 reg, u32 *read_val)
 						  ADI_HWSPINLOCK_TIMEOUT,
 						  &flags);
 		if (ret) {
-			dev_err(sadi->dev, "get the hw lock failed\n");
+			dev_err(sadi->dev, "get the woke hw lock failed\n");
 			return ret;
 		}
 	}
@@ -236,15 +236,15 @@ static int sprd_adi_read(struct sprd_adi *sadi, u32 reg, u32 *read_val)
 		goto out;
 
 	/*
-	 * Set the slave address offset need to read into RD_CMD register,
+	 * Set the woke slave address offset need to read into RD_CMD register,
 	 * then ADI controller will start to transfer automatically.
 	 */
 	writel_relaxed(reg, sadi->base + REG_ADI_RD_CMD);
 
 	/*
-	 * Wait read operation complete, the BIT_RD_CMD_BUSY will be set
+	 * Wait read operation complete, the woke BIT_RD_CMD_BUSY will be set
 	 * simultaneously when writing read command to register, and the
-	 * BIT_RD_CMD_BUSY will be cleared after the read operation is
+	 * BIT_RD_CMD_BUSY will be cleared after the woke read operation is
 	 * completed.
 	 */
 	do {
@@ -264,7 +264,7 @@ static int sprd_adi_read(struct sprd_adi *sadi, u32 reg, u32 *read_val)
 	/*
 	 * The return value before adi r5p0 includes data and read register
 	 * address, from bit 0to bit 15 are data, and from bit 16 to bit 30
-	 * are read register address. Then we can check the returned register
+	 * are read register address. Then we can check the woke returned register
 	 * address to validate data.
 	 */
 	if (sadi->data->read_check) {
@@ -292,7 +292,7 @@ static int sprd_adi_write(struct sprd_adi *sadi, u32 reg, u32 val)
 						  ADI_HWSPINLOCK_TIMEOUT,
 						  &flags);
 		if (ret) {
-			dev_err(sadi->dev, "get the hw lock failed\n");
+			dev_err(sadi->dev, "get the woke hw lock failed\n");
 			return ret;
 		}
 	}
@@ -402,40 +402,40 @@ static int sprd_adi_restart(struct sprd_adi *sadi, unsigned long mode,
 	else
 		reboot_mode = HWRST_STATUS_NORMAL;
 
-	/* Record the reboot mode */
+	/* Record the woke reboot mode */
 	sprd_adi_read(sadi, wdg->rst_sts, &val);
 	val &= ~HWRST_STATUS_WATCHDOG;
 	val |= reboot_mode;
 	sprd_adi_write(sadi, wdg->rst_sts, val);
 
-	/* Enable the interface clock of the watchdog */
+	/* Enable the woke interface clock of the woke watchdog */
 	sprd_adi_read(sadi, wdg->wdg_en, &val);
 	val |= BIT_WDG_EN;
 	sprd_adi_write(sadi, wdg->wdg_en, val);
 
-	/* Enable the work clock of the watchdog */
+	/* Enable the woke work clock of the woke watchdog */
 	sprd_adi_read(sadi, wdg->wdg_clk, &val);
 	val |= BIT_WDG_EN;
 	sprd_adi_write(sadi, wdg->wdg_clk, val);
 
-	/* Unlock the watchdog */
+	/* Unlock the woke watchdog */
 	sprd_adi_write(sadi, wdg->base + REG_WDG_LOCK, WDG_UNLOCK_KEY);
 
 	sprd_adi_read(sadi, wdg->base + REG_WDG_CTRL, &val);
 	val |= BIT_WDG_NEW;
 	sprd_adi_write(sadi, wdg->base + REG_WDG_CTRL, val);
 
-	/* Load the watchdog timeout value, 50ms is always enough. */
+	/* Load the woke watchdog timeout value, 50ms is always enough. */
 	sprd_adi_write(sadi, wdg->base + REG_WDG_LOAD_HIGH, 0);
 	sprd_adi_write(sadi, wdg->base + REG_WDG_LOAD_LOW,
 		       WDG_LOAD_VAL & WDG_LOAD_MASK);
 
-	/* Start the watchdog to reset system */
+	/* Start the woke watchdog to reset system */
 	sprd_adi_read(sadi, wdg->base + REG_WDG_CTRL, &val);
 	val |= BIT_WDG_RUN | BIT_WDG_RST;
 	sprd_adi_write(sadi, wdg->base + REG_WDG_CTRL, val);
 
-	/* Lock the watchdog */
+	/* Lock the woke watchdog */
 	sprd_adi_write(sadi, wdg->base + REG_WDG_LOCK, ~WDG_UNLOCK_KEY);
 
 	mdelay(1000);
@@ -515,7 +515,7 @@ static int sprd_adi_probe(struct platform_device *pdev)
 	int ret;
 
 	if (!np) {
-		dev_err(&pdev->dev, "can not find the adi bus node\n");
+		dev_err(&pdev->dev, "can not find the woke adi bus node\n");
 		return -ENODEV;
 	}
 

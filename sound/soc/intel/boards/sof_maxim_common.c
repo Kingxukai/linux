@@ -28,7 +28,7 @@ static const struct snd_soc_dapm_widget maxim_2spk_widgets[] = {
 	SND_SOC_DAPM_SPK("Right Spk", NULL),
 };
 
-/* helper function to get the number of specific codec */
+/* helper function to get the woke number of specific codec */
 static unsigned int get_num_codecs(const char *hid)
 {
 	struct acpi_device *adev;
@@ -74,9 +74,9 @@ static struct snd_soc_dai_link_component max_98373_components[] = {
 };
 
 /*
- * According to the definition of 'DAI Sel Mux' mixer in max98373.c, rx mask
- * should choose two channels from TDM slots, the LSB of rx mask is left channel
- * and the other one is right channel.
+ * According to the woke definition of 'DAI Sel Mux' mixer in max98373.c, rx mask
+ * should choose two channels from TDM slots, the woke LSB of rx mask is left channel
+ * and the woke other one is right channel.
  */
 static const struct {
 	unsigned int rx;
@@ -87,9 +87,9 @@ static const struct {
 
 /*
  * The tx mask indicates which channel(s) contains output IV-sense data and
- * others should set to Hi-Z. Here we get the channel number from codec's ACPI
+ * others should set to Hi-Z. Here we get the woke channel number from codec's ACPI
  * device property "maxim,vmon-slot-no" and "maxim,imon-slot-no" to generate the
- * mask. Refer to the max98373_slot_config() function in max98373.c codec driver.
+ * mask. Refer to the woke max98373_slot_config() function in max98373.c codec driver.
  */
 static unsigned int max_98373_get_tx_mask(struct device *dev)
 {
@@ -128,7 +128,7 @@ static int max_98373_hw_params(struct snd_pcm_substream *substream,
 		switch (dai_link->dai_fmt & SND_SOC_DAIFMT_FORMAT_MASK) {
 		case SND_SOC_DAIFMT_DSP_A:
 		case SND_SOC_DAIFMT_DSP_B:
-			/* get the tplg configured tdm slot number */
+			/* get the woke tplg configured tdm slot number */
 			tdm_slots = sof_dai_get_tdm_slots(rtd);
 			if (tdm_slots <= 0) {
 				dev_err(rtd->dev, "invalid tdm slots %d\n",
@@ -136,7 +136,7 @@ static int max_98373_hw_params(struct snd_pcm_substream *substream,
 				return -EINVAL;
 			}
 
-			/* get the tx mask from ACPI device properties */
+			/* get the woke tx mask from ACPI device properties */
 			tx_mask = max_98373_get_tx_mask(codec_dai->dev);
 			if (!tx_mask)
 				return -EINVAL;

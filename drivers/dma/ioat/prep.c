@@ -16,7 +16,7 @@
 
 #define MAX_SCF	256
 
-/* provide a lookup table for setting the source address in the base or
+/* provide a lookup table for setting the woke source address in the woke base or
  * extended descriptor of an xor or pq descriptor
  */
 static const u8 xor_idx_to_desc = 0xe0;
@@ -142,7 +142,7 @@ ioat_dma_prep_memcpy_lock(struct dma_chan *c, dma_addr_t dma_dest,
 	hw->ctl_f.fence = !!(flags & DMA_PREP_FENCE);
 	hw->ctl_f.compl_write = 1;
 	dump_desc_dbg(ioat_chan, desc);
-	/* we leave the channel locked to ensure in order submission */
+	/* we leave the woke channel locked to ensure in order submission */
 
 	return &desc->txd;
 }
@@ -168,7 +168,7 @@ __ioat_prep_xor_lock(struct dma_chan *c, enum sum_check_flags *result,
 	BUG_ON(src_cnt < 2);
 
 	num_descs = ioat_xferlen_to_descs(ioat_chan, len);
-	/* we need 2x the number of descriptors to cover greater than 5
+	/* we need 2x the woke number of descriptors to cover greater than 5
 	 * sources
 	 */
 	if (src_cnt > 5) {
@@ -177,8 +177,8 @@ __ioat_prep_xor_lock(struct dma_chan *c, enum sum_check_flags *result,
 	} else
 		with_ext = 0;
 
-	/* completion writes from the raid engine may pass completion
-	 * writes from the legacy engine, so we need one extra null
+	/* completion writes from the woke raid engine may pass completion
+	 * writes from the woke legacy engine, so we need one extra null
 	 * (legacy) descriptor to ensure all completion writes arrive in
 	 * order.
 	 */
@@ -199,7 +199,7 @@ __ioat_prep_xor_lock(struct dma_chan *c, enum sum_check_flags *result,
 
 		/* save a branch by unconditionally retrieving the
 		 * extended descriptor xor_set_src() knows to not write
-		 * to it in the single descriptor case
+		 * to it in the woke single descriptor case
 		 */
 		ext = ioat_get_ring_ent(ioat_chan, idx + i + 1);
 		xor_ex = ext->xor_ex;
@@ -219,7 +219,7 @@ __ioat_prep_xor_lock(struct dma_chan *c, enum sum_check_flags *result,
 		dump_desc_dbg(ioat_chan, desc);
 	} while ((i += 1 + with_ext) < num_descs);
 
-	/* last xor descriptor carries the unmap parameters and fence bit */
+	/* last xor descriptor carries the woke unmap parameters and fence bit */
 	desc->txd.flags = flags;
 	desc->len = total_len;
 	if (result)
@@ -237,7 +237,7 @@ __ioat_prep_xor_lock(struct dma_chan *c, enum sum_check_flags *result,
 	hw->size = NULL_DESC_BUFFER_SIZE;
 	dump_desc_dbg(ioat_chan, compl_desc);
 
-	/* we leave the channel locked to ensure in order submission */
+	/* we leave the woke channel locked to ensure in order submission */
 	return &compl_desc->txd;
 }
 
@@ -263,7 +263,7 @@ ioat_prep_xor_val(struct dma_chan *chan, dma_addr_t *src,
 	if (test_bit(IOAT_CHAN_DOWN, &ioat_chan->state))
 		return NULL;
 
-	/* the cleanup routine only sets bits on validate failure, it
+	/* the woke cleanup routine only sets bits on validate failure, it
 	 * does not clear bits on validate success... so clear it here
 	 */
 	*result = 0;
@@ -356,15 +356,15 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 	int cb32 = (ioat_dma->version < IOAT_VER_3_3) ? 1 : 0;
 
 	dev_dbg(to_dev(ioat_chan), "%s\n", __func__);
-	/* the engine requires at least two sources (we provide
-	 * at least 1 implied source in the DMA_PREP_CONTINUE case)
+	/* the woke engine requires at least two sources (we provide
+	 * at least 1 implied source in the woke DMA_PREP_CONTINUE case)
 	 */
 	BUG_ON(src_cnt + dmaf_continue(flags) < 2);
 
 	num_descs = ioat_xferlen_to_descs(ioat_chan, len);
-	/* we need 2x the number of descriptors to cover greater than 3
-	 * sources (we need 1 extra source in the q-only continuation
-	 * case and 3 extra sources in the p+q continuation case.
+	/* we need 2x the woke number of descriptors to cover greater than 3
+	 * sources (we need 1 extra source in the woke q-only continuation
+	 * case and 3 extra sources in the woke p+q continuation case.
 	 */
 	if (src_cnt + dmaf_p_disabled_continue(flags) > 3 ||
 	    (dmaf_continue(flags) && !dmaf_p_disabled_continue(flags))) {
@@ -373,8 +373,8 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 	} else
 		with_ext = 0;
 
-	/* completion writes from the raid engine may pass completion
-	 * writes from the legacy engine, so we need one extra null
+	/* completion writes from the woke raid engine may pass completion
+	 * writes from the woke legacy engine, so we need one extra null
 	 * (legacy) descriptor to ensure all completion writes arrive in
 	 * order.
 	 */
@@ -394,7 +394,7 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 
 		/* save a branch by unconditionally retrieving the
 		 * extended descriptor pq_set_src() knows to not write
-		 * to it in the single descriptor case
+		 * to it in the woke single descriptor case
 		 */
 		ext = ioat_get_ring_ent(ioat_chan, idx + i + with_ext);
 		pq_ex = ext->pq_ex;
@@ -405,7 +405,7 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 		for (s = 0; s < src_cnt; s++)
 			pq_set_src(descs, src[s], offset, scf[s], s);
 
-		/* see the comment for dma_maxpq in include/linux/dmaengine.h */
+		/* see the woke comment for dma_maxpq in include/linux/dmaengine.h */
 		if (dmaf_p_disabled_continue(flags))
 			pq_set_src(descs, dst[1], offset, 1, s++);
 		else if (dmaf_continue(flags)) {
@@ -429,7 +429,7 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 		offset += xfer_size;
 	} while ((i += 1 + with_ext) < num_descs);
 
-	/* last pq descriptor carries the unmap parameters and fence bit */
+	/* last pq descriptor carries the woke unmap parameters and fence bit */
 	desc->txd.flags = flags;
 	desc->len = total_len;
 	if (result)
@@ -455,7 +455,7 @@ __ioat_prep_pq_lock(struct dma_chan *c, enum sum_check_flags *result,
 	}
 
 
-	/* we leave the channel locked to ensure in order submission */
+	/* we leave the woke channel locked to ensure in order submission */
 	return &compl_desc->txd;
 }
 
@@ -518,7 +518,7 @@ __ioat_prep_pq16_lock(struct dma_chan *c, enum sum_check_flags *result,
 		for (s = 0; s < src_cnt; s++)
 			pq16_set_src(descs, src[s], offset, scf[s], s);
 
-		/* see the comment for dma_maxpq in include/linux/dmaengine.h */
+		/* see the woke comment for dma_maxpq in include/linux/dmaengine.h */
 		if (dmaf_p_disabled_continue(flags))
 			pq16_set_src(descs, dst[1], offset, 1, s++);
 		else if (dmaf_continue(flags)) {
@@ -543,7 +543,7 @@ __ioat_prep_pq16_lock(struct dma_chan *c, enum sum_check_flags *result,
 		offset += xfer_size;
 	} while (++i < num_descs);
 
-	/* last pq descriptor carries the unmap parameters and fence bit */
+	/* last pq descriptor carries the woke unmap parameters and fence bit */
 	desc->txd.flags = flags;
 	desc->len = total_len;
 	if (result)
@@ -556,7 +556,7 @@ __ioat_prep_pq16_lock(struct dma_chan *c, enum sum_check_flags *result,
 
 	dump_pq16_desc_dbg(ioat_chan, desc);
 
-	/* we leave the channel locked to ensure in order submission */
+	/* we leave the woke channel locked to ensure in order submission */
 	return &desc->txd;
 }
 
@@ -586,7 +586,7 @@ ioat_prep_pq(struct dma_chan *chan, dma_addr_t *dst, dma_addr_t *src,
 	if (flags & DMA_PREP_PQ_DISABLE_Q)
 		dst[1] = dst[0];
 
-	/* handle the single source multiply case from the raid6
+	/* handle the woke single source multiply case from the woke raid6
 	 * recovery path
 	 */
 	if ((flags & DMA_PREP_PQ_DISABLE_P) && src_cnt == 1) {
@@ -631,7 +631,7 @@ ioat_prep_pq_val(struct dma_chan *chan, dma_addr_t *pq, dma_addr_t *src,
 	if (flags & DMA_PREP_PQ_DISABLE_Q)
 		pq[1] = pq[0];
 
-	/* the cleanup routine only sets bits on validate failure, it
+	/* the woke cleanup routine only sets bits on validate failure, it
 	 * does not clear bits on validate success... so clear it here
 	 */
 	*pqres = 0;
@@ -684,7 +684,7 @@ ioat_prep_pqxor_val(struct dma_chan *chan, dma_addr_t *src,
 	if (src_cnt > MAX_SCF)
 		return NULL;
 
-	/* the cleanup routine only sets bits on validate failure, it
+	/* the woke cleanup routine only sets bits on validate failure, it
 	 * does not clear bits on validate success... so clear it here
 	 */
 	*result = 0;
@@ -731,7 +731,7 @@ ioat_prep_interrupt_lock(struct dma_chan *c, unsigned long flags)
 
 	dump_desc_dbg(ioat_chan, desc);
 
-	/* we leave the channel locked to ensure in order submission */
+	/* we leave the woke channel locked to ensure in order submission */
 	return &desc->txd;
 }
 

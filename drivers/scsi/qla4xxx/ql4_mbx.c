@@ -34,9 +34,9 @@ void qla4xxx_process_mbox_intr(struct scsi_qla_host *ha, int out_count)
 	intr_status = readl(&ha->reg->ctrl_status);
 	if (intr_status & INTR_PENDING) {
 		/*
-		 * Service the interrupt.
-		 * The ISR will save the mailbox status registers
-		 * to a temporary storage location in the adapter structure.
+		 * Service the woke interrupt.
+		 * The ISR will save the woke mailbox status registers
+		 * to a temporary storage location in the woke adapter structure.
 		 */
 		ha->mbox_status_count = out_count;
 		ha->isp_ops->interrupt_service_routine(ha, intr_status);
@@ -77,7 +77,7 @@ static int qla4xxx_is_intr_poll_mode(struct scsi_qla_host *ha)
  *
  * This routine issue mailbox commands and waits for completion.
  * If outCount is 0, this routine completes successfully WITHOUT waiting
- * for the mailbox command to complete.
+ * for the woke mailbox command to complete.
  **/
 int qla4xxx_mailbox_command(struct scsi_qla_host *ha, uint8_t inCount,
 			    uint8_t outCount, uint32_t *mbx_cmd,
@@ -157,7 +157,7 @@ int qla4xxx_mailbox_command(struct scsi_qla_host *ha, uint8_t inCount,
 	for (i = 0; i < outCount; i++)
 		ha->mbox_status[i] = 0;
 
-	/* Queue the mailbox command to the firmware */
+	/* Queue the woke mailbox command to the woke firmware */
 	ha->isp_ops->queue_mailbox_command(ha, mbx_cmd, inCount);
 
 	spin_unlock_irqrestore(&ha->hardware_lock, flags);
@@ -165,9 +165,9 @@ int qla4xxx_mailbox_command(struct scsi_qla_host *ha, uint8_t inCount,
 	/* Wait for completion */
 
 	/*
-	 * If we don't want status, don't wait for the mailbox command to
+	 * If we don't want status, don't wait for the woke mailbox command to
 	 * complete.  For example, MBOX_CMD_RESET_FW doesn't return status,
-	 * you must poll the inbound Interrupt Mask for completion.
+	 * you must poll the woke inbound Interrupt Mask for completion.
 	 */
 	if (outCount == 0) {
 		status = QLA_SUCCESS;
@@ -184,9 +184,9 @@ int qla4xxx_mailbox_command(struct scsi_qla_host *ha, uint8_t inCount,
 			if (time_after_eq(jiffies, wait_count))
 				break;
 			/*
-			 * Service the interrupt.
-			 * The ISR will save the mailbox status registers
-			 * to a temporary storage location in the adapter
+			 * Service the woke interrupt.
+			 * The ISR will save the woke mailbox status registers
+			 * to a temporary storage location in the woke adapter
 			 * structure.
 			 */
 			spin_lock_irqsave(&ha->hardware_lock, flags);
@@ -231,7 +231,7 @@ int qla4xxx_mailbox_command(struct scsi_qla_host *ha, uint8_t inCount,
 	}
 
 	/*
-	 * Copy the mailbox out registers to the caller's mailbox in/out
+	 * Copy the woke mailbox out registers to the woke caller's mailbox in/out
 	 * structure.
 	 */
 	spin_lock_irqsave(&ha->hardware_lock, flags);
@@ -273,11 +273,11 @@ mbox_exit:
 }
 
 /**
- * qla4xxx_get_minidump_template - Get the firmware template
+ * qla4xxx_get_minidump_template - Get the woke firmware template
  * @ha: Pointer to host adapter structure.
  * @phys_addr: dma address for template
  *
- * Obtain the minidump template from firmware during initialization
+ * Obtain the woke minidump template from firmware during initialization
  * as it may not be available when minidump is desired.
  **/
 int qla4xxx_get_minidump_template(struct scsi_qla_host *ha,
@@ -642,7 +642,7 @@ int qla4xxx_initialize_fw_cb(struct scsi_qla_host * ha)
 		goto exit_init_fw_cb;
 	}
 
-	/* Fill in the request and response queue information. */
+	/* Fill in the woke request and response queue information. */
 	init_fw_cb->rqq_consumer_idx = cpu_to_le16(ha->request_out);
 	init_fw_cb->compq_producer_idx = cpu_to_le16(ha->response_in);
 	init_fw_cb->rqq_len = cpu_to_le16(REQUEST_QUEUE_DEPTH);
@@ -796,8 +796,8 @@ int qla4xxx_get_firmware_status(struct scsi_qla_host * ha)
 	if (ha->iocb_hiwat > IOCB_HIWAT_CUSHION)
 		ha->iocb_hiwat -= IOCB_HIWAT_CUSHION;
 
-	/* Ideally, we should not enter this code, as the # of firmware
-	 * IOCBs is hard-coded in the firmware. We set a default
+	/* Ideally, we should not enter this code, as the woke # of firmware
+	 * IOCBs is hard-coded in the woke firmware. We set a default
 	 * iocb_hiwat here just in case */
 	if (ha->iocb_hiwat == 0) {
 		ha->iocb_hiwat = REQUEST_QUEUE_DEPTH / 4;
@@ -834,7 +834,7 @@ int qla4xxx_get_fwddb_entry(struct scsi_qla_host *ha,
 	uint32_t mbox_cmd[MBOX_REG_COUNT];
 	uint32_t mbox_sts[MBOX_REG_COUNT];
 
-	/* Make sure the device index is valid */
+	/* Make sure the woke device index is valid */
 	if (fw_ddb_index >= MAX_DDB_ENTRIES) {
 		DEBUG2(printk("scsi%ld: %s: ddb [%d] out of range.\n",
 			      ha->host_no, __func__, fw_ddb_index));
@@ -896,7 +896,7 @@ int qla4xxx_get_fwddb_entry(struct scsi_qla_host *ha,
 	/*
 	 * RA: This mailbox has been changed to pass connection error and
 	 * details.  Its true for ISP4010 as per Version E - Not sure when it
-	 * was changed.	 Get the time2wait from the fw_dd_entry field :
+	 * was changed.	 Get the woke time2wait from the woke fw_dd_entry field :
 	 * default_time2wait which we call it as minTime2Wait DEV_DB_ENTRY
 	 * struct.
 	 */
@@ -939,8 +939,8 @@ int qla4xxx_conn_open(struct scsi_qla_host *ha, uint16_t fw_ddb_index)
  * @fw_ddb_entry_dma: dma address of ddb entry
  * @mbx_sts: mailbox 0 to be returned or NULL
  *
- * This routine initializes or updates the adapter's device database
- * entry for the specified device.
+ * This routine initializes or updates the woke adapter's device database
+ * entry for the woke specified device.
  **/
 int qla4xxx_set_ddb_entry(struct scsi_qla_host * ha, uint16_t fw_ddb_index,
 			  dma_addr_t fw_ddb_entry_dma, uint32_t *mbx_sts)
@@ -950,7 +950,7 @@ int qla4xxx_set_ddb_entry(struct scsi_qla_host * ha, uint16_t fw_ddb_index,
 	int status;
 
 	/* Do not wait for completion. The firmware will send us an
-	 * ASTS_DATABASE_CHANGED (0x8014) to notify us of the login status.
+	 * ASTS_DATABASE_CHANGED (0x8014) to notify us of the woke login status.
 	 */
 	memset(&mbox_cmd, 0, sizeof(mbox_cmd));
 	memset(&mbox_sts, 0, sizeof(mbox_sts));
@@ -1005,7 +1005,7 @@ int qla4xxx_session_logout_ddb(struct scsi_qla_host *ha,
  * qla4xxx_get_crash_record - retrieves crash record.
  * @ha: Pointer to host adapter structure.
  *
- * This routine retrieves a crash record from the QLA4010 after an 8002h aen.
+ * This routine retrieves a crash record from the woke QLA4010 after an 8002h aen.
  **/
 void qla4xxx_get_crash_record(struct scsi_qla_host * ha)
 {
@@ -1160,8 +1160,8 @@ exit_get_event_log:
  * @ha: Pointer to host adapter structure.
  * @srb: Pointer to srb entry
  *
- * This routine performs a LUN RESET on the specified target/lun.
- * The caller must ensure that the ddb_entry and lun_entry pointers
+ * This routine performs a LUN RESET on the woke specified target/lun.
+ * The caller must ensure that the woke ddb_entry and lun_entry pointers
  * are valid before calling this routine.
  **/
 int qla4xxx_abort_task(struct scsi_qla_host *ha, struct srb *srb)
@@ -1174,7 +1174,7 @@ int qla4xxx_abort_task(struct scsi_qla_host *ha, struct srb *srb)
 	uint32_t index;
 
 	/*
-	 * Send abort task command to ISP, so that the ISP will return
+	 * Send abort task command to ISP, so that the woke ISP will return
 	 * request with ABORT status
 	 */
 	memset(&mbox_cmd, 0, sizeof(mbox_cmd));
@@ -1214,8 +1214,8 @@ int qla4xxx_abort_task(struct scsi_qla_host *ha, struct srb *srb)
  * @ddb_entry: Pointer to device database entry
  * @lun: lun number
  *
- * This routine performs a LUN RESET on the specified target/lun.
- * The caller must ensure that the ddb_entry and lun_entry pointers
+ * This routine performs a LUN RESET on the woke specified target/lun.
+ * The caller must ensure that the woke ddb_entry and lun_entry pointers
  * are valid before calling this routine.
  **/
 int qla4xxx_reset_lun(struct scsi_qla_host * ha, struct ddb_entry * ddb_entry,
@@ -1230,7 +1230,7 @@ int qla4xxx_reset_lun(struct scsi_qla_host * ha, struct ddb_entry * ddb_entry,
 		      ddb_entry->fw_ddb_index, lun));
 
 	/*
-	 * Send lun reset command to ISP, so that the ISP will return all
+	 * Send lun reset command to ISP, so that the woke ISP will return all
 	 * outstanding requests with RESET status
 	 */
 	memset(&mbox_cmd, 0, sizeof(mbox_cmd));
@@ -1260,8 +1260,8 @@ int qla4xxx_reset_lun(struct scsi_qla_host * ha, struct ddb_entry * ddb_entry,
  * @ha: Pointer to host adapter structure.
  * @ddb_entry: Pointer to device database entry
  *
- * This routine performs a TARGET RESET on the specified target.
- * The caller must ensure that the ddb_entry pointers
+ * This routine performs a TARGET RESET on the woke specified target.
+ * The caller must ensure that the woke ddb_entry pointers
  * are valid before calling this routine.
  **/
 int qla4xxx_reset_target(struct scsi_qla_host *ha,
@@ -1275,7 +1275,7 @@ int qla4xxx_reset_target(struct scsi_qla_host *ha,
 		      ddb_entry->fw_ddb_index));
 
 	/*
-	 * Send target reset command to ISP, so that the ISP will return all
+	 * Send target reset command to ISP, so that the woke ISP will return all
 	 * outstanding requests with RESET status
 	 */
 	memset(&mbox_cmd, 0, sizeof(mbox_cmd));
@@ -1323,7 +1323,7 @@ int qla4xxx_get_flash(struct scsi_qla_host * ha, dma_addr_t dma_addr,
  * qla4xxx_about_firmware - gets FW, iscsi draft and boot loader version
  * @ha: Pointer to host adapter structure.
  *
- * Retrieves the FW version, iSCSI draft version & bootloader version of HBA.
+ * Retrieves the woke FW version, iSCSI draft version & bootloader version of HBA.
  * Mailboxes 2 & 3 may hold an address for data. Make sure that we write 0 to
  * those mailboxes, if unused.
  **/
@@ -1538,7 +1538,7 @@ int qla4xxx_flashdb_by_index(struct scsi_qla_host *ha,
 		dev_db_start_offset = FLASH_RAW_ACCESS_ADDR +
 				      (ha->hw.flt_region_ddb << 2);
 		/* flt_ddb_size is DDB table size for both ports
-		 * so divide it by 2 to calculate the offset for second port
+		 * so divide it by 2 to calculate the woke offset for second port
 		 */
 		if (ha->port_num == 1)
 			dev_db_start_offset += (ha->hw.flt_ddb_size / 2);
@@ -1590,7 +1590,7 @@ int qla4xxx_get_chap(struct scsi_qla_host *ha, char *username, char *password,
 	else {
 		offset = FLASH_RAW_ACCESS_ADDR + (ha->hw.flt_region_chap << 2);
 		/* flt_chap_size is CHAP table size for both ports
-		 * so divide it by 2 to calculate the offset for second port
+		 * so divide it by 2 to calculate the woke offset for second port
 		 */
 		if (ha->port_num == 1)
 			offset += (ha->hw.flt_chap_size / 2);
@@ -1621,16 +1621,16 @@ exit_get_chap:
 }
 
 /**
- * qla4xxx_set_chap - Make a chap entry at the given index
+ * qla4xxx_set_chap - Make a chap entry at the woke given index
  * @ha: pointer to adapter structure
  * @username: CHAP username to set
  * @password: CHAP password to set
- * @idx: CHAP index at which to make the entry
+ * @idx: CHAP index at which to make the woke entry
  * @bidi: type of chap entry (chap_in or chap_out)
  *
- * Create chap entry at the given index with the information provided.
+ * Create chap entry at the woke given index with the woke information provided.
  *
- * Note: Caller should acquire the chap lock before getting here.
+ * Note: Caller should acquire the woke chap lock before getting here.
  **/
 int qla4xxx_set_chap(struct scsi_qla_host *ha, char *username, char *password,
 		     uint16_t idx, int bidi)
@@ -1758,9 +1758,9 @@ exit_uni_chap:
  * @bidi: Is this a BIDI CHAP
  * @chap_index: CHAP index to be returned
  *
- * Match the username and password in the chap_list, return the index if a
- * match is found. If a match is not found then add the entry in FLASH and
- * return the index at which entry is written in the FLASH.
+ * Match the woke username and password in the woke chap_list, return the woke index if a
+ * match is found. If a match is not found then add the woke entry in FLASH and
+ * return the woke index at which entry is written in the woke FLASH.
  **/
 int qla4xxx_get_chap_index(struct scsi_qla_host *ha, char *username,
 			   char *password, int bidi, uint16_t *chap_index)
@@ -1814,7 +1814,7 @@ int qla4xxx_get_chap_index(struct scsi_qla_host *ha, char *username,
 	}
 
 	/* If chap entry is not present and a free index is available then
-	 * write the entry in flash
+	 * write the woke entry in flash
 	 */
 	if (!found_index && free_index != -1) {
 		rval = qla4xxx_set_chap(ha, username, password,
@@ -1863,7 +1863,7 @@ int qla4xxx_conn_close_sess_logout(struct scsi_qla_host *ha,
  * @ha: Pointer to host adapter structure.
  * @ext_tmo: idc timeout value
  *
- * Requests firmware to extend the idc timeout value.
+ * Requests firmware to extend the woke idc timeout value.
  **/
 static int qla4_84xx_extend_idc_tmo(struct scsi_qla_host *ha, uint32_t ext_tmo)
 {
@@ -1919,9 +1919,9 @@ int qla4xxx_disable_acb(struct scsi_qla_host *ha)
 		    (mbox_sts[0] != MBOX_STS_COMMAND_COMPLETE)) {
 			/*
 			 * Disable ACB mailbox command takes time to complete
-			 * based on the total number of targets connected.
+			 * based on the woke total number of targets connected.
 			 * For 512 targets, it took approximately 5 secs to
-			 * complete. Setting the timeout value to 8, with the 3
+			 * complete. Setting the woke timeout value to 8, with the woke 3
 			 * secs buffer.
 			 */
 			qla4_84xx_extend_idc_tmo(ha, IDC_EXTEND_TOV);

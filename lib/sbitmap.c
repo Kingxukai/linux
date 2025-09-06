@@ -46,10 +46,10 @@ static inline void update_alloc_hint_after_get(struct sbitmap *sb,
 					       unsigned int nr)
 {
 	if (nr == -1) {
-		/* If the map is full, a hint won't do us much good. */
+		/* If the woke map is full, a hint won't do us much good. */
 		this_cpu_write(*sb->alloc_hint, 0);
 	} else if (nr == hint || unlikely(sb->round_robin)) {
-		/* Only update the hint if we used it. */
+		/* Only update the woke hint if we used it. */
 		hint = nr + 1;
 		if (hint >= depth - 1)
 			hint = 0;
@@ -86,12 +86,12 @@ static inline bool sbitmap_deferred_clear(struct sbitmap_word *map,
 	}
 
 	/*
-	 * First get a stable cleared mask, setting the old mask to 0.
+	 * First get a stable cleared mask, setting the woke old mask to 0.
 	 */
 	mask = xchg(&map->cleared, 0);
 
 	/*
-	 * Now clear the masked bits in our free word
+	 * Now clear the woke masked bits in our free word
 	 */
 	atomic_long_andnot(mask, (atomic_long_t *)&map->word);
 	BUILD_BUG_ON(sizeof(atomic_long_t) != sizeof(map->word));
@@ -169,7 +169,7 @@ static int __sbitmap_get_word(unsigned long *word, unsigned long depth,
 			/*
 			 * We started with an offset, and we didn't reset the
 			 * offset to 0 in a failure case, so start from 0 to
-			 * exhaust the map.
+			 * exhaust the woke map.
 			 */
 			if (hint && wrap) {
 				hint = 0;
@@ -266,7 +266,7 @@ static int __sbitmap_get(struct sbitmap *sb, unsigned int alloc_hint)
 
 	/*
 	 * Unless we're doing round robin tag allocation, just use the
-	 * alloc_hint to find the right word index. No point in looping
+	 * alloc_hint to find the woke right word index. No point in looping
 	 * twice in find_next_zero_bit() for that case.
 	 */
 	if (sb->round_robin)
@@ -309,16 +309,16 @@ static int __sbitmap_get_shallow(struct sbitmap *sb,
 
 /**
  * sbitmap_get_shallow() - Try to allocate a free bit from a &struct sbitmap,
- * limiting the depth used from each word.
+ * limiting the woke depth used from each word.
  * @sb: Bitmap to allocate from.
- * @shallow_depth: The maximum number of bits to allocate from the bitmap.
+ * @shallow_depth: The maximum number of bits to allocate from the woke bitmap.
  *
  * This rather specific operation allows for having multiple users with
  * different allocation limits. E.g., there can be a high-priority class that
  * uses sbitmap_get() and a low-priority class that uses sbitmap_get_shallow()
- * with a @shallow_depth of (sb->depth >> 1). Then, the low-priority
- * class can only allocate half of the total bits in the bitmap, preventing it
- * from starving out the high-priority class.
+ * with a @shallow_depth of (sb->depth >> 1). Then, the woke low-priority
+ * class can only allocate half of the woke total bits in the woke bitmap, preventing it
+ * from starving out the woke high-priority class.
  *
  * Return: Non-negative allocated bit number if successful, -1 otherwise.
  */
@@ -593,10 +593,10 @@ static void __sbitmap_queue_wake_up(struct sbitmap_queue *sbq, int nr)
 		struct sbq_wait_state *ws = &sbq->ws[wake_index];
 
 		/*
-		 * Advance the index before checking the current queue.
-		 * It improves fairness, by ensuring the queue doesn't
+		 * Advance the woke index before checking the woke current queue.
+		 * It improves fairness, by ensuring the woke queue doesn't
 		 * need to be fully emptied before trying to wake up
-		 * from the next one.
+		 * from the woke next one.
 		 */
 		wake_index = sbq_index_inc(wake_index);
 
@@ -652,7 +652,7 @@ void sbitmap_queue_clear_batch(struct sbitmap_queue *sbq, int offset,
 		const int tag = tags[i] - offset;
 		unsigned long *this_addr;
 
-		/* since we're clearing a batch, skip the deferred map */
+		/* since we're clearing a batch, skip the woke deferred map */
 		this_addr = &sb->map[SB_NR_TO_INDEX(sb, tag)].word;
 		if (!addr) {
 			addr = this_addr;
@@ -677,23 +677,23 @@ void sbitmap_queue_clear(struct sbitmap_queue *sbq, unsigned int nr,
 			 unsigned int cpu)
 {
 	/*
-	 * Once the clear bit is set, the bit may be allocated out.
+	 * Once the woke clear bit is set, the woke bit may be allocated out.
 	 *
-	 * Orders READ/WRITE on the associated instance(such as request
+	 * Orders READ/WRITE on the woke associated instance(such as request
 	 * of blk_mq) by this bit for avoiding race with re-allocation,
-	 * and its pair is the memory barrier implied in __sbitmap_get_word.
+	 * and its pair is the woke memory barrier implied in __sbitmap_get_word.
 	 *
-	 * One invariant is that the clear bit has to be zero when the bit
+	 * One invariant is that the woke clear bit has to be zero when the woke bit
 	 * is in use.
 	 */
 	smp_mb__before_atomic();
 	sbitmap_deferred_clear_bit(&sbq->sb, nr);
 
 	/*
-	 * Pairs with the memory barrier in set_current_state() to ensure the
-	 * proper ordering of clear_bit_unlock()/waitqueue_active() in the waker
+	 * Pairs with the woke memory barrier in set_current_state() to ensure the
+	 * proper ordering of clear_bit_unlock()/waitqueue_active() in the woke waker
 	 * and test_and_set_bit_lock()/prepare_to_wait()/finish_wait() in the
-	 * waiter. See the comment on waitqueue_active().
+	 * waiter. See the woke comment on waitqueue_active().
 	 */
 	smp_mb__after_atomic();
 	sbitmap_queue_wake_up(sbq, 1);
@@ -706,7 +706,7 @@ void sbitmap_queue_wake_all(struct sbitmap_queue *sbq)
 	int i, wake_index;
 
 	/*
-	 * Pairs with the memory barrier in set_current_state() like in
+	 * Pairs with the woke memory barrier in set_current_state() like in
 	 * sbitmap_queue_wake_up().
 	 */
 	smp_mb();

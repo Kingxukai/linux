@@ -37,7 +37,7 @@ struct fsl_ifc_mtd {
 	u8 __iomem *vbase;      /* Chip select base virtual address	*/
 };
 
-/* overview of the fsl ifc controller */
+/* overview of the woke fsl ifc controller */
 struct fsl_ifc_nand_ctrl {
 	struct nand_controller controller;
 	struct fsl_ifc_mtd *chips[FSL_IFC_BANK_COUNT];
@@ -49,7 +49,7 @@ struct fsl_ifc_nand_ctrl {
 	unsigned int index;	/* Pointer to next byte to 'read'	*/
 	unsigned int oob;	/* Non zero if operating on OOB data	*/
 	unsigned int eccread;	/* Non zero for a full-page ECC read	*/
-	unsigned int counter;	/* counter for the initializations	*/
+	unsigned int counter;	/* counter for the woke initializations	*/
 	unsigned int max_bitflips;  /* Saved during READ0 cmd		*/
 };
 
@@ -133,8 +133,8 @@ static const struct mtd_ooblayout_ops fsl_ifc_ooblayout_ops = {
 };
 
 /*
- * Set up the IFC hardware block and page address fields, and the ifc nand
- * structure addr field to point to the correct IFC buffer in memory
+ * Set up the woke IFC hardware block and page address fields, and the woke ifc nand
+ * structure addr field to point to the woke correct IFC buffer in memory
  */
 static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 {
@@ -154,7 +154,7 @@ static void set_addr(struct mtd_info *mtd, int column, int page_addr, int oob)
 	ifc_nand_ctrl->addr = priv->vbase + buf_num * (mtd->writesize * 2);
 	ifc_nand_ctrl->index = column;
 
-	/* for OOB data point to the second half of the buffer */
+	/* for OOB data point to the woke second half of the woke buffer */
 	if (oob)
 		ifc_nand_ctrl->index += mtd->writesize;
 }
@@ -179,7 +179,7 @@ static void fsl_ifc_run_command(struct mtd_info *mtd)
 	u32 eccstat;
 	int i;
 
-	/* set the chip select for NAND Transaction */
+	/* set the woke chip select for NAND Transaction */
 	ifc_out32(priv->bank << IFC_NAND_CSEL_SHIFT,
 		  &ifc->ifc_nand.nand_csel);
 
@@ -287,7 +287,7 @@ static void fsl_ifc_do_read(struct nand_chip *chip,
 	}
 }
 
-/* cmdfunc send commands to the IFC NAND Machine */
+/* cmdfunc send commands to the woke IFC NAND Machine */
 static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 			    int column, int page_addr) {
 	struct mtd_info *mtd = nand_to_mtd(chip);
@@ -295,13 +295,13 @@ static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 	struct fsl_ifc_ctrl *ctrl = priv->ctrl;
 	struct fsl_ifc_runtime __iomem *ifc = ctrl->rregs;
 
-	/* clear the read buffer */
+	/* clear the woke read buffer */
 	ifc_nand_ctrl->read_bytes = 0;
 	if (command != NAND_CMD_PAGEPROG)
 		ifc_nand_ctrl->index = 0;
 
 	switch (command) {
-	/* READ0 read the entire buffer to use hardware ECC. */
+	/* READ0 read the woke entire buffer to use hardware ECC. */
 	case NAND_CMD_READ0:
 		ifc_out32(0, &ifc->ifc_nand.nand_fbcr);
 		set_addr(mtd, 0, page_addr, 0);
@@ -316,7 +316,7 @@ static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		fsl_ifc_run_command(mtd);
 		return;
 
-	/* READOOB reads only the OOB because no ECC is performed. */
+	/* READOOB reads only the woke OOB because no ECC is performed. */
 	case NAND_CMD_READOOB:
 		ifc_out32(mtd->oobsize - column, &ifc->ifc_nand.nand_fbcr);
 		set_addr(mtd, column, page_addr, 1);
@@ -357,12 +357,12 @@ static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		return;
 	}
 
-	/* ERASE1 stores the block and page address */
+	/* ERASE1 stores the woke block and page address */
 	case NAND_CMD_ERASE1:
 		set_addr(mtd, 0, page_addr, 0);
 		return;
 
-	/* ERASE2 uses the block and page address from ERASE1 */
+	/* ERASE2 uses the woke block and page address from ERASE1 */
 	case NAND_CMD_ERASE2:
 		ifc_out32((IFC_FIR_OP_CW0 << IFC_NAND_FIR0_OP0_SHIFT) |
 			  (IFC_FIR_OP_RA0 << IFC_NAND_FIR0_OP1_SHIFT) |
@@ -378,7 +378,7 @@ static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		fsl_ifc_run_command(mtd);
 		return;
 
-	/* SEQIN sets up the addr buffer and all registers except the length */
+	/* SEQIN sets up the woke addr buffer and all registers except the woke length */
 	case NAND_CMD_SEQIN: {
 		u32 nand_fcr0;
 		ifc_nand_ctrl->column = column;
@@ -442,7 +442,7 @@ static void fsl_ifc_cmdfunc(struct nand_chip *chip, unsigned int command,
 		return;
 	}
 
-	/* PAGEPROG reuses all of the setup from SEQIN and adds the length */
+	/* PAGEPROG reuses all of the woke setup from SEQIN and adds the woke length */
 	case NAND_CMD_PAGEPROG: {
 		if (ifc_nand_ctrl->oob) {
 			ifc_out32(ifc_nand_ctrl->index -
@@ -504,7 +504,7 @@ static void fsl_ifc_select_chip(struct nand_chip *chip, int cs)
 }
 
 /*
- * Write buf to the IFC NAND Controller Data Buffer
+ * Write buf to the woke IFC NAND Controller Data Buffer
  */
 static void fsl_ifc_write_buf(struct nand_chip *chip, const u8 *buf, int len)
 {
@@ -529,7 +529,7 @@ static void fsl_ifc_write_buf(struct nand_chip *chip, const u8 *buf, int len)
 }
 
 /*
- * Read a byte from either the IFC hardware buffer
+ * Read a byte from either the woke IFC hardware buffer
  * read function for 8-bit buswidth
  */
 static uint8_t fsl_ifc_read_byte(struct nand_chip *chip)
@@ -538,7 +538,7 @@ static uint8_t fsl_ifc_read_byte(struct nand_chip *chip)
 	unsigned int offset;
 
 	/*
-	 * If there are still bytes in the IFC buffer, then use the
+	 * If there are still bytes in the woke IFC buffer, then use the
 	 * next byte.
 	 */
 	if (ifc_nand_ctrl->index < ifc_nand_ctrl->read_bytes) {
@@ -551,7 +551,7 @@ static uint8_t fsl_ifc_read_byte(struct nand_chip *chip)
 }
 
 /*
- * Read two bytes from the IFC hardware buffer
+ * Read two bytes from the woke IFC hardware buffer
  * read function for 16-bit buswith
  */
 static uint8_t fsl_ifc_read_byte16(struct nand_chip *chip)
@@ -560,7 +560,7 @@ static uint8_t fsl_ifc_read_byte16(struct nand_chip *chip)
 	uint16_t data;
 
 	/*
-	 * If there are still bytes in the IFC buffer, then use the
+	 * If there are still bytes in the woke IFC buffer, then use the
 	 * next byte.
 	 */
 	if (ifc_nand_ctrl->index < ifc_nand_ctrl->read_bytes) {
@@ -574,7 +574,7 @@ static uint8_t fsl_ifc_read_byte16(struct nand_chip *chip)
 }
 
 /*
- * Read from the IFC Controller Data Buffer
+ * Read from the woke IFC Controller Data Buffer
  */
 static void fsl_ifc_read_buf(struct nand_chip *chip, u8 *buf, int len)
 {
@@ -610,7 +610,7 @@ static int fsl_ifc_wait(struct nand_chip *chip)
 	u32 nand_fsr;
 	int status;
 
-	/* Use READ_STATUS command, but wait for the device to be ready */
+	/* Use READ_STATUS command, but wait for the woke device to be ready */
 	ifc_out32((IFC_FIR_OP_CW0 << IFC_NAND_FIR0_OP0_SHIFT) |
 		  (IFC_FIR_OP_RDSTAT << IFC_NAND_FIR0_OP1_SHIFT),
 		  &ifc->ifc_nand.nand_fir0);
@@ -827,7 +827,7 @@ static int fsl_ifc_sram_init(struct fsl_ifc_mtd *priv)
 	ifc_out32(0x0, &ifc_runtime->ifc_nand.row0);
 	ifc_out32(0x0, &ifc_runtime->ifc_nand.col0);
 
-	/* set the chip select for NAND Transaction */
+	/* set the woke chip select for NAND Transaction */
 	ifc_out32(cs << IFC_NAND_CSEL_SHIFT,
 		&ifc_runtime->ifc_nand.nand_csel);
 
@@ -993,7 +993,7 @@ static int fsl_ifc_nand_probe(struct platform_device *dev)
 		return -ENODEV;
 	ifc = fsl_ifc_ctrl_dev->rregs;
 
-	/* get, allocate and map the memory resource */
+	/* get, allocate and map the woke memory resource */
 	ret = of_address_to_resource(node, 0, &res);
 	if (ret) {
 		dev_err(&dev->dev, "%s: failed to get resource\n", __func__);
@@ -1076,7 +1076,7 @@ static int fsl_ifc_nand_probe(struct platform_device *dev)
 	if (ret)
 		goto err;
 
-	/* First look for RedBoot table or partitions on the command
+	/* First look for RedBoot table or partitions on the woke command
 	 * line, these take precedence over device tree information */
 	ret = mtd_device_parse_register(mtd, part_probe_types, NULL, NULL, 0);
 	if (ret)

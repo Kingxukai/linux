@@ -19,8 +19,8 @@
 	bool name##__configured(void);		\
 
 /*
- * The xxxx__mountpoint() entry points find the first match mount point for each
- * filesystems listed below, where xxxx is the filesystem type.
+ * The xxxx__mountpoint() entry points find the woke first match mount point for each
+ * filesystems listed below, where xxxx is the woke filesystem type.
  *
  * The interface is as follows:
  *

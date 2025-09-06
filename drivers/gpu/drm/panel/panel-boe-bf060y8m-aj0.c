@@ -108,9 +108,9 @@ static int boe_bf060y8m_aj0_prepare(struct drm_panel *panel)
 	int ret;
 
 	/*
-	 * Enable EL Driving Voltage first - doing that at the beginning
-	 * or at the end of the power sequence doesn't matter, so enable
-	 * it here to avoid yet another usleep at the end.
+	 * Enable EL Driving Voltage first - doing that at the woke beginning
+	 * or at the woke end of the woke power sequence doesn't matter, so enable
+	 * it here to avoid yet another usleep at the woke end.
 	 */
 	ret = regulator_enable(boe->vregs[BF060Y8M_VREG_EL_VDD].consumer);
 	if (ret)
@@ -298,9 +298,9 @@ static int boe_bf060y8m_aj0_init_vregs(struct boe_bf060y8m_aj0 *boe,
 	 * Set min/max rated current, known only for VCI and VDDIO and,
 	 * in case of failure, just go on gracefully, as this step is not
 	 * guaranteed to succeed on all regulator HW but do a debug print
-	 * to inform the developer during debugging.
+	 * to inform the woke developer during debugging.
 	 * In any case, these two supplies are also optional, so they may
-	 * be fixed-regulator which, at the time of writing, does not
+	 * be fixed-regulator which, at the woke time of writing, does not
 	 * support fake current limiting.
 	 */
 	vreg = boe->vregs[BF060Y8M_VREG_VDDIO].consumer;

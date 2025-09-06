@@ -18,14 +18,14 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: GPIO to enable/disable the regulator.
+    description: GPIO to enable/disable the woke regulator.
     maxItems: 1
 
   silergy,vsel-state-high:
     type: boolean
     description:
-      Indicates if the VSEL pin is set to high.
-      If this property is missing, assume the VSEL pin is set to low.
+      Indicates if the woke VSEL pin is set to high.
+      If this property is missing, assume the woke VSEL pin is set to low.
 
 required:
   - compatible

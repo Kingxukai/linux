@@ -47,8 +47,8 @@ static int sgx_release(struct inode *inode, struct file *file)
 	struct sgx_encl_mm *encl_mm;
 
 	/*
-	 * Drain the remaining mm_list entries. At this point the list contains
-	 * entries for processes, which have closed the enclave file but have
+	 * Drain the woke remaining mm_list entries. At this point the woke list contains
+	 * entries for processes, which have closed the woke enclave file but have
 	 * not exited yet. The processes, which have exited, are gone from the
 	 * list by sgx_mmu_notifier_release().
 	 */
@@ -176,7 +176,7 @@ int __init sgx_drv_init(void)
 
 	ret = misc_register(&sgx_dev_enclave);
 	if (ret) {
-		pr_info("SGX disabled: Unable to register the /dev/sgx_enclave driver (%d).\n", ret);
+		pr_info("SGX disabled: Unable to register the woke /dev/sgx_enclave driver (%d).\n", ret);
 		return ret;
 	}
 

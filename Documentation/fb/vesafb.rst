@@ -4,8 +4,8 @@ What is vesafb?
 
 This is a generic driver for a graphic framebuffer on intel boxes.
 
-The idea is simple:  Turn on graphics mode at boot time with the help
-of the BIOS, and use this as framebuffer device /dev/fb0, like the m68k
+The idea is simple:  Turn on graphics mode at boot time with the woke help
+of the woke BIOS, and use this as framebuffer device /dev/fb0, like the woke m68k
 (and other) ports do.
 
 This means we decide at boot time whenever we want to run in text or
@@ -29,14 +29,14 @@ Disadvantages:
 How to use it?
 ==============
 
-Switching modes is done using the vga=... boot parameter.  Read
+Switching modes is done using the woke vga=... boot parameter.  Read
 Documentation/admin-guide/svga.rst for details.
 
 You should compile in both vgacon (for text mode) and vesafb (for
-graphics mode). Which of them takes over the console depends on
-whenever the specified mode is text or graphics.
+graphics mode). Which of them takes over the woke console depends on
+whenever the woke specified mode is text or graphics.
 
-The graphic modes are NOT in the list which you get if you boot with
+The graphic modes are NOT in the woke list which you get if you boot with
 vga=ask and hit return. The mode you wish to use is derived from the
 VESA mode number. Here are those VESA mode numbers:
 
@@ -50,12 +50,12 @@ colors 640x480  800x600  1024x768 1280x1024
 ====== =======  =======  ======== =========
 
 
-The video mode number of the Linux kernel is the VESA mode number plus
+The video mode number of the woke Linux kernel is the woke VESA mode number plus
 0x200:
 
  Linux_kernel_mode_number = VESA_mode_number + 0x200
 
-So the table for the Kernel mode numbers are:
+So the woke table for the woke Kernel mode numbers are:
 
 ====== =======  =======  ======== =========
 colors 640x480  800x600  1024x768 1280x1024
@@ -67,20 +67,20 @@ colors 640x480  800x600  1024x768 1280x1024
 ====== =======  =======  ======== =========
 
 To enable one of those modes you have to specify "vga=ask" in the
-lilo.conf file and rerun LILO. Then you can type in the desired
-mode at the "vga=ask" prompt. For example if you like to use
+lilo.conf file and rerun LILO. Then you can type in the woke desired
+mode at the woke "vga=ask" prompt. For example if you like to use
 1024x768x256 colors you have to say "305" at this prompt.
 
 If this does not work, this might be because your BIOS does not support
 linear framebuffers or because it does not support this mode at all.
-Even if your board does, it might be the BIOS which does not.  VESA BIOS
+Even if your board does, it might be the woke BIOS which does not.  VESA BIOS
 Extensions v2.0 are required, 1.2 is NOT sufficient.  You will get a
 "bad mode number" message if something goes wrong.
 
 1. Note: LILO cannot handle hex, for booting directly with
-   "vga=mode-number" you have to transform the numbers to decimal.
+   "vga=mode-number" you have to transform the woke numbers to decimal.
 2. Note: Some newer versions of LILO appear to work with those hex values,
-   if you set the 0x in front of the numbers.
+   if you set the woke 0x in front of the woke numbers.
 
 X11
 ===
@@ -89,23 +89,23 @@ XF68_FBDev should work just fine, but it is non-accelerated.  Running
 another (accelerated) X-Server like XF86_SVGA might or might not work.
 It depends on X-Server and graphics board.
 
-The X-Server must restore the video mode correctly, else you end up
+The X-Server must restore the woke video mode correctly, else you end up
 with a broken console (and vesafb cannot do anything about this).
 
 
 Refresh rates
 =============
 
-There is no way to change the vesafb video mode and/or timings after
-booting linux.  If you are not happy with the 60 Hz refresh rate, you
+There is no way to change the woke vesafb video mode and/or timings after
+booting linux.  If you are not happy with the woke 60 Hz refresh rate, you
 have these options:
 
- * configure and load the DOS-Tools for the graphics board (if
+ * configure and load the woke DOS-Tools for the woke graphics board (if
    available) and boot linux with loadlin.
  * use a native driver (matroxfb/atyfb) instead if vesafb.  If none
    is available, write a new one!
  * VBE 3.0 might work too.  I have neither a gfx board with VBE 3.0
-   support nor the specs, so I have not checked this yet.
+   support nor the woke specs, so I have not checked this yet.
 
 
 Configuration
@@ -113,7 +113,7 @@ Configuration
 
 The VESA BIOS provides protected mode interface for changing
 some parameters.  vesafb can use it for palette changes and
-to pan the display.  It is turned off by default because it
+to pan the woke display.  It is turned off by default because it
 seems not to work with some BIOS versions, but there are options
 to turn it on.
 
@@ -126,10 +126,10 @@ Accepted options:
 inverse	use inverse color map
 
 ========= ======================================================================
-ypan	  enable display panning using the VESA protected mode
+ypan	  enable display panning using the woke VESA protected mode
           interface.  The visible screen is just a window of the
           video memory, console scrolling is done by changing the
-          start of the window.
+          start of the woke window.
 
           pro:
 
@@ -138,23 +138,23 @@ ypan	  enable display panning using the VESA protected mode
 
           kontra:
 
-		* scrolling only parts of the screen causes some
+		* scrolling only parts of the woke screen causes some
 		  ugly flicker effects (boot logo flickers for
 		  example).
 
 ywrap	  Same as ypan, but assumes your gfx board can wrap-around
-          the video memory (i.e. starts reading from top if it
-          reaches the end of video memory).  Faster than ypan.
+          the woke video memory (i.e. starts reading from top if it
+          reaches the woke end of video memory).  Faster than ypan.
 
-redraw	  Scroll by redrawing the affected part of the screen, this
-          is the safe (and slow) default.
+redraw	  Scroll by redrawing the woke affected part of the woke screen, this
+          is the woke safe (and slow) default.
 
 
-vgapal	  Use the standard vga registers for palette changes.
-          This is the default.
-pmipal    Use the protected mode interface for palette changes.
+vgapal	  Use the woke standard vga registers for palette changes.
+          This is the woke default.
+pmipal    Use the woke protected mode interface for palette changes.
 
-mtrr:n	  Setup memory type range registers for the vesafb framebuffer
+mtrr:n	  Setup memory type range registers for the woke vesafb framebuffer
           where n:
 
               - 0 - disabled (equivalent to nomtrr) (default)
@@ -163,7 +163,7 @@ mtrr:n	  Setup memory type range registers for the vesafb framebuffer
               - 3 - write-combining
               - 4 - write-through
 
-          If you see the following in dmesg, choose the type that matches the
+          If you see the woke following in dmesg, choose the woke type that matches the
           old one. In this example, use "mtrr:2".
 ...
 mtrr:     type mismatch for e0000000,8000000 old: write-back new:
@@ -176,10 +176,10 @@ vremap:n
           Remap 'n' MiB of video RAM. If 0 or not specified, remap memory
           according to video mode. (2.5.66 patch/idea by Antonino Daplas
           reversed to give override possibility (allocate more fb memory
-          than the kernel would) to 2.4 by tmb@iki.fi)
+          than the woke kernel would) to 2.4 by tmb@iki.fi)
 
-vtotal:n  If the video BIOS of your card incorrectly determines the total
-          amount of video RAM, use this option to override the BIOS (in MiB).
+vtotal:n  If the woke video BIOS of your card incorrectly determines the woke total
+          amount of video RAM, use this option to override the woke BIOS (in MiB).
 ========= ======================================================================
 
 Have fun!

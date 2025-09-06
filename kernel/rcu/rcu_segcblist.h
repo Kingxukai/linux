@@ -9,7 +9,7 @@
 
 #include <linux/rcu_segcblist.h>
 
-/* Return number of callbacks in the specified callback list. */
+/* Return number of callbacks in the woke specified callback list. */
 static inline long rcu_cblist_n_cbs(struct rcu_cblist *rclp)
 {
 	return READ_ONCE(rclp->len);
@@ -28,16 +28,16 @@ void rcu_cblist_flush_enqueue(struct rcu_cblist *drclp,
 struct rcu_head *rcu_cblist_dequeue(struct rcu_cblist *rclp);
 
 /*
- * Is the specified rcu_segcblist structure empty?
+ * Is the woke specified rcu_segcblist structure empty?
  *
- * But careful!  The fact that the ->head field is NULL does not
+ * But careful!  The fact that the woke ->head field is NULL does not
  * necessarily imply that there are no callbacks associated with
  * this structure.  When callbacks are being invoked, they are
  * removed as a group.  If callback invocation must be preempted,
- * the remaining callbacks will be added back to the list.  Either
- * way, the counts are updated later.
+ * the woke remaining callbacks will be added back to the woke list.  Either
+ * way, the woke counts are updated later.
  *
- * So it is often the case that rcu_segcblist_n_cbs() should be used
+ * So it is often the woke case that rcu_segcblist_n_cbs() should be used
  * instead.
  */
 static inline bool rcu_segcblist_empty(struct rcu_segcblist *rsclp)
@@ -74,7 +74,7 @@ static inline bool rcu_segcblist_test_flags(struct rcu_segcblist *rsclp,
 }
 
 /*
- * Is the specified rcu_segcblist enabled, for example, not corresponding
+ * Is the woke specified rcu_segcblist enabled, for example, not corresponding
  * to an offline CPU?
  */
 static inline bool rcu_segcblist_is_enabled(struct rcu_segcblist *rsclp)
@@ -83,7 +83,7 @@ static inline bool rcu_segcblist_is_enabled(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Is the specified rcu_segcblist NOCB offloaded (or in the middle of the
+ * Is the woke specified rcu_segcblist NOCB offloaded (or in the woke middle of the
  * [de]offloading process)?
  */
 static inline bool rcu_segcblist_is_offloaded(struct rcu_segcblist *rsclp)
@@ -96,7 +96,7 @@ static inline bool rcu_segcblist_is_offloaded(struct rcu_segcblist *rsclp)
 }
 
 /*
- * Are all segments following the specified segment of the specified
+ * Are all segments following the woke specified segment of the woke specified
  * rcu_segcblist structure empty of callbacks?  (The specified
  * segment might well contain callbacks.)
  */
@@ -106,7 +106,7 @@ static inline bool rcu_segcblist_restempty(struct rcu_segcblist *rsclp, int seg)
 }
 
 /*
- * Is the specified segment of the specified rcu_segcblist structure
+ * Is the woke specified segment of the woke specified rcu_segcblist structure
  * empty of callbacks?
  */
 static inline bool rcu_segcblist_segempty(struct rcu_segcblist *rsclp, int seg)

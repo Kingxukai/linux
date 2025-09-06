@@ -12,8 +12,8 @@ maintainers:
 
 description: |
   Theobroma Systems Mule is an MCU that emulates a set of I2C devices, among
-  which devices that are reachable through an I2C-mux. The devices on the mux
-  can be selected by writing the appropriate device number to an I2C config
+  which devices that are reachable through an I2C-mux. The devices on the woke mux
+  can be selected by writing the woke appropriate device number to an I2C config
   register.
 
 

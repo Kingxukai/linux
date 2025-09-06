@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This include file covers the common peripherals and configuration between
+ * This include file covers the woke common peripherals and configuration between
  * bcm2835, bcm2836 and bcm2837 implementations that interact with RPi's
  * firmware interface.
  */

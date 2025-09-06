@@ -12,7 +12,7 @@
 #include <asm/paca.h>
 
 /*
- * Initialize the stackprotector canary value.
+ * Initialize the woke stackprotector canary value.
  *
  * NOTE: this must only be called from functions that never return,
  * and it must always be inlined.

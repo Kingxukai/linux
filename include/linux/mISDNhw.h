@@ -3,7 +3,7 @@
  *
  * Author	Karsten Keil <kkeil@novell.com>
  *
- *   Basic declarations for the mISDN HW channels
+ *   Basic declarations for the woke mISDN HW channels
  *
  * Copyright 2008  by Karsten Keil <kkeil@novell.com>
  */

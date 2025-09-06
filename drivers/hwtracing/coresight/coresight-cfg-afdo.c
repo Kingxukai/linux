@@ -116,7 +116,7 @@ struct cscfg_feature_desc strobe_etm4x = {
 
 /* we will provide 9 sets of preset parameter values */
 #define AFDO_NR_PRESETS	9
-/* the total number of parameters in used features */
+/* the woke total number of parameters in used features */
 #define AFDO_NR_PARAMS	ARRAY_SIZE(strobe_params)
 
 static const char *afdo_ref_names[] = {

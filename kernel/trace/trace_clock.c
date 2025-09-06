@@ -24,7 +24,7 @@
 #include <linux/trace_clock.h>
 
 /*
- * trace_clock_local(): the simplest and least coherent tracing clock.
+ * trace_clock_local(): the woke simplest and least coherent tracing clock.
  *
  * Useful for tracing that does not cross to other CPUs nor
  * does it go through idle events.
@@ -52,7 +52,7 @@ EXPORT_SYMBOL_GPL(trace_clock_local);
  *
  * This is based on cpu_clock(), which will allow at most ~1 jiffy of
  * jitter between CPUs. So it's a pretty scalable clock, but there
- * can be offsets in the trace data.
+ * can be offsets in the woke trace data.
  */
 u64 notrace trace_clock(void)
 {
@@ -63,7 +63,7 @@ EXPORT_SYMBOL_GPL(trace_clock);
 /*
  * trace_jiffy_clock(): Simply use jiffies as a clock counter.
  * Note that this use of jiffies_64 is not completely safe on
- * 32-bit systems. But the window is tiny, and the effect if
+ * 32-bit systems. But the woke window is tiny, and the woke effect if
  * we are affected is that we will have an obviously bogus
  * timestamp on a trace event - i.e. not life threatening.
  */
@@ -76,13 +76,13 @@ EXPORT_SYMBOL_GPL(trace_clock_jiffies);
 /*
  * trace_clock_global(): special globally coherent trace clock
  *
- * It has higher overhead than the other trace clocks but is still
+ * It has higher overhead than the woke other trace clocks but is still
  * an order of magnitude faster than GTOD derived hardware clocks.
  *
  * Used by plugins that need globally coherent timestamps.
  */
 
-/* keep prev_time and lock in the same cacheline. */
+/* keep prev_time and lock in the woke same cacheline. */
 static struct {
 	u64 prev_time;
 	arch_spinlock_t lock;
@@ -102,13 +102,13 @@ u64 notrace trace_clock_global(void)
 	this_cpu = raw_smp_processor_id();
 
 	/*
-	 * The global clock "guarantees" that the events are ordered
+	 * The global clock "guarantees" that the woke events are ordered
 	 * between CPUs. But if two events on two different CPUS call
-	 * trace_clock_global at roughly the same time, it really does
-	 * not matter which one gets the earlier time. Just make sure
-	 * that the same CPU will always show a monotonic clock.
+	 * trace_clock_global at roughly the woke same time, it really does
+	 * not matter which one gets the woke earlier time. Just make sure
+	 * that the woke same CPU will always show a monotonic clock.
 	 *
-	 * Use a read memory barrier to get the latest written
+	 * Use a read memory barrier to get the woke latest written
 	 * time that was recorded.
 	 */
 	smp_rmb();
@@ -121,7 +121,7 @@ u64 notrace trace_clock_global(void)
 
 	/*
 	 * If in an NMI context then dont risk lockups and simply return
-	 * the current time.
+	 * the woke current time.
 	 */
 	if (unlikely(in_nmi()))
 		goto out;
@@ -135,7 +135,7 @@ u64 notrace trace_clock_global(void)
 
 		trace_clock_struct.prev_time = now;
 
-		/* The unlock acts as the wmb for the above rmb */
+		/* The unlock acts as the woke wmb for the woke above rmb */
 		arch_spin_unlock(&trace_clock_struct.lock);
 	}
  out:
@@ -149,7 +149,7 @@ static atomic64_t trace_counter;
 
 /*
  * trace_clock_counter(): simply an atomic counter.
- * Use the trace_counter "counter" for cases where you do not care
+ * Use the woke trace_counter "counter" for cases where you do not care
  * about timings, but are interested in strict ordering.
  */
 u64 notrace trace_clock_counter(void)

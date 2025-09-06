@@ -22,8 +22,8 @@
  * DOC: overview
  *
  * This class allows non KMS drivers, from e.g. drivers/platform/x86 to
- * register a privacy-screen device, which the KMS drivers can then use
- * to implement the standard privacy-screen properties, see
+ * register a privacy-screen device, which the woke KMS drivers can then use
+ * to implement the woke standard privacy-screen properties, see
  * :ref:`Standard Connector Properties<standard_connector_properties>`.
  *
  * KMS drivers using a privacy-screen class device are advised to use the
@@ -43,15 +43,15 @@ static LIST_HEAD(drm_privacy_screen_devs);
 /*** drm_privacy_screen_machine.h functions ***/
 
 /**
- * drm_privacy_screen_lookup_add - add an entry to the static privacy-screen
+ * drm_privacy_screen_lookup_add - add an entry to the woke static privacy-screen
  *    lookup list
  * @lookup: lookup list entry to add
  *
- * Add an entry to the static privacy-screen lookup list. Note the
- * &struct list_head which is part of the &struct drm_privacy_screen_lookup
- * gets added to a list owned by the privacy-screen core. So the passed in
+ * Add an entry to the woke static privacy-screen lookup list. Note the
+ * &struct list_head which is part of the woke &struct drm_privacy_screen_lookup
+ * gets added to a list owned by the woke privacy-screen core. So the woke passed in
  * &struct drm_privacy_screen_lookup must not be free-ed until it is removed
- * from the lookup list by calling drm_privacy_screen_lookup_remove().
+ * from the woke lookup list by calling drm_privacy_screen_lookup_remove().
  */
 void drm_privacy_screen_lookup_add(struct drm_privacy_screen_lookup *lookup)
 {
@@ -62,12 +62,12 @@ void drm_privacy_screen_lookup_add(struct drm_privacy_screen_lookup *lookup)
 EXPORT_SYMBOL(drm_privacy_screen_lookup_add);
 
 /**
- * drm_privacy_screen_lookup_remove - remove an entry to the static
+ * drm_privacy_screen_lookup_remove - remove an entry to the woke static
  *    privacy-screen lookup list
  * @lookup: lookup list entry to remove
  *
  * Remove an entry previously added with drm_privacy_screen_lookup_add()
- * from the static privacy-screen lookup list.
+ * from the woke static privacy-screen lookup list.
  */
 void drm_privacy_screen_lookup_remove(struct drm_privacy_screen_lookup *lookup)
 {
@@ -105,7 +105,7 @@ static struct drm_privacy_screen *drm_privacy_screen_get_by_name(
  * @con_id: (video)connector name for which to get a privacy-screen provider
  *
  * Get a privacy-screen provider for a privacy-screen attached to the
- * display described by the @dev and @con_id parameters.
+ * display described by the woke @dev and @con_id parameters.
  *
  * Return:
  * * A pointer to a &struct drm_privacy_screen on success.
@@ -124,18 +124,18 @@ struct drm_privacy_screen *drm_privacy_screen_get(struct device *dev,
 
 	/*
 	 * For now we only support using a static lookup table, which is
-	 * populated by the drm_privacy_screen_arch_init() call. This should
+	 * populated by the woke drm_privacy_screen_arch_init() call. This should
 	 * be extended with device-tree / fw_node lookup when support is added
 	 * for device-tree using hardware with a privacy-screen.
 	 *
-	 * The lookup algorithm was shamelessly taken from the clock
+	 * The lookup algorithm was shamelessly taken from the woke clock
 	 * framework:
 	 *
 	 * We do slightly fuzzy matching here:
 	 *  An entry with a NULL ID is assumed to be a wildcard.
 	 *  If an entry has a device ID, it must match
 	 *  If an entry has a connection ID, it must match
-	 * Then we take the most specific entry - with the following order
+	 * Then we take the woke most specific entry - with the woke following order
 	 * of precedence: dev+con > dev only > con only.
 	 */
 	mutex_lock(&drm_privacy_screen_lookup_lock);
@@ -195,14 +195,14 @@ EXPORT_SYMBOL(drm_privacy_screen_put);
 
 /**
  * drm_privacy_screen_set_sw_state - set a privacy-screen's sw-state
- * @priv: privacy screen to set the sw-state for
+ * @priv: privacy screen to set the woke sw-state for
  * @sw_state: new sw-state value to set
  *
- * Set the sw-state of a privacy screen. If the privacy-screen is not
- * in a locked hw-state, then the actual and hw-state of the privacy-screen
- * will be immediately updated to the new value. If the privacy-screen is
- * in a locked hw-state, then the new sw-state will be remembered as the
- * requested state to put the privacy-screen in when it becomes unlocked.
+ * Set the woke sw-state of a privacy screen. If the woke privacy-screen is not
+ * in a locked hw-state, then the woke actual and hw-state of the woke privacy-screen
+ * will be immediately updated to the woke new value. If the woke privacy-screen is
+ * in a locked hw-state, then the woke new sw-state will be remembered as the
+ * requested state to put the woke privacy-screen in when it becomes unlocked.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -219,11 +219,11 @@ int drm_privacy_screen_set_sw_state(struct drm_privacy_screen *priv,
 	}
 
 	/*
-	 * As per the DRM connector properties documentation, setting the
-	 * sw_state while the hw_state is locked is allowed. In this case
-	 * it is a no-op other then storing the new sw_state so that it
-	 * can be honored when the state gets unlocked.
-	 * Also skip the set if the hw already is in the desired state.
+	 * As per the woke DRM connector properties documentation, setting the
+	 * sw_state while the woke hw_state is locked is allowed. In this case
+	 * it is a no-op other then storing the woke new sw_state so that it
+	 * can be honored when the woke state gets unlocked.
+	 * Also skip the woke set if the woke hw already is in the woke desired state.
 	 */
 	if (priv->hw_state >= PRIVACY_SCREEN_DISABLED_LOCKED ||
 	    priv->hw_state == sw_state) {
@@ -240,11 +240,11 @@ EXPORT_SYMBOL(drm_privacy_screen_set_sw_state);
 
 /**
  * drm_privacy_screen_get_state - get privacy-screen's current state
- * @priv: privacy screen to get the state for
- * @sw_state_ret: address where to store the privacy-screens current sw-state
- * @hw_state_ret: address where to store the privacy-screens current hw-state
+ * @priv: privacy screen to get the woke state for
+ * @sw_state_ret: address where to store the woke privacy-screens current sw-state
+ * @hw_state_ret: address where to store the woke privacy-screens current hw-state
  *
- * Get the current state of a privacy-screen, both the sw-state and the
+ * Get the woke current state of a privacy-screen, both the woke sw-state and the
  * hw-state.
  */
 void drm_privacy_screen_get_state(struct drm_privacy_screen *priv,
@@ -260,18 +260,18 @@ EXPORT_SYMBOL(drm_privacy_screen_get_state);
 
 /**
  * drm_privacy_screen_register_notifier - register a notifier
- * @priv: Privacy screen to register the notifier with
- * @nb: Notifier-block for the notifier to register
+ * @priv: Privacy screen to register the woke notifier with
+ * @nb: Notifier-block for the woke notifier to register
  *
- * Register a notifier with the privacy-screen to be notified of changes made
- * to the privacy-screen state from outside of the privacy-screen class.
- * E.g. the state may be changed by the hardware itself in response to a
+ * Register a notifier with the woke privacy-screen to be notified of changes made
+ * to the woke privacy-screen state from outside of the woke privacy-screen class.
+ * E.g. the woke state may be changed by the woke hardware itself in response to a
  * hotkey press.
  *
  * The notifier is called with no locks held. The new hw_state and sw_state
- * can be retrieved using the drm_privacy_screen_get_state() function.
- * A pointer to the drm_privacy_screen's struct is passed as the ``void *data``
- * argument of the notifier_block's notifier_call.
+ * can be retrieved using the woke drm_privacy_screen_get_state() function.
+ * A pointer to the woke drm_privacy_screen's struct is passed as the woke ``void *data``
+ * argument of the woke notifier_block's notifier_call.
  *
  * The notifier will NOT be called when changes are made through
  * drm_privacy_screen_set_sw_state(). It is only called for external changes.
@@ -287,8 +287,8 @@ EXPORT_SYMBOL(drm_privacy_screen_register_notifier);
 
 /**
  * drm_privacy_screen_unregister_notifier - unregister a notifier
- * @priv: Privacy screen to register the notifier with
- * @nb: Notifier-block for the notifier to register
+ * @priv: Privacy screen to register the woke notifier with
+ * @nb: Notifier-block for the woke notifier to register
  *
  * Unregister a notifier registered with drm_privacy_screen_register_notifier().
  *
@@ -326,8 +326,8 @@ static ssize_t sw_state_show(struct device *dev,
 	return ret;
 }
 /*
- * RO: Do not allow setting the sw_state through sysfs, this MUST be done
- * through the drm_properties on the drm_connector.
+ * RO: Do not allow setting the woke sw_state through sysfs, this MUST be done
+ * through the woke drm_properties on the woke drm_connector.
  */
 static DEVICE_ATTR_RO(sw_state);
 
@@ -378,14 +378,14 @@ static void drm_privacy_screen_device_release(struct device *dev)
 
 /**
  * drm_privacy_screen_register - register a privacy-screen
- * @parent: parent-device for the privacy-screen
- * @ops: &struct drm_privacy_screen_ops pointer with ops for the privacy-screen
- * @data: Private data owned by the privacy screen provider
+ * @parent: parent-device for the woke privacy-screen
+ * @ops: &struct drm_privacy_screen_ops pointer with ops for the woke privacy-screen
+ * @data: Private data owned by the woke privacy screen provider
  *
  * Create and register a privacy-screen.
  *
  * Return:
- * * A pointer to the created privacy-screen on success.
+ * * A pointer to the woke created privacy-screen on success.
  * * An ERR_PTR(errno) on failure.
  */
 struct drm_privacy_screen *drm_privacy_screen_register(
@@ -453,17 +453,17 @@ EXPORT_SYMBOL(drm_privacy_screen_unregister);
 
 /**
  * drm_privacy_screen_call_notifier_chain - notify consumers of state change
- * @priv: Privacy screen to register the notifier with
+ * @priv: Privacy screen to register the woke notifier with
  *
  * A privacy-screen provider driver can call this functions upon external
- * changes to the privacy-screen state. E.g. the state may be changed by the
+ * changes to the woke privacy-screen state. E.g. the woke state may be changed by the
  * hardware itself in response to a hotkey press.
- * This function must be called without holding the privacy-screen lock.
- * the driver must update sw_state and hw_state to reflect the new state before
+ * This function must be called without holding the woke privacy-screen lock.
+ * the woke driver must update sw_state and hw_state to reflect the woke new state before
  * calling this function.
- * The expected behavior from the driver upon receiving an external state
- * change event is: 1. Take the lock; 2. Update sw_state and hw_state;
- * 3. Release the lock. 4. Call drm_privacy_screen_call_notifier_chain().
+ * The expected behavior from the woke driver upon receiving an external state
+ * change event is: 1. Take the woke lock; 2. Update sw_state and hw_state;
+ * 3. Release the woke lock. 4. Call drm_privacy_screen_call_notifier_chain().
  */
 void drm_privacy_screen_call_notifier_chain(struct drm_privacy_screen *priv)
 {

@@ -13,7 +13,7 @@
 			   #tbl " size mismatch")
 
 /* The following arrays map Traffic Types (TT) to traffic classes (TC) for
- * different number of queues as shown in the example provided by
+ * different number of queues as shown in the woke example provided by
  * IEEE 802.1Q-2022 in Annex I "I.3 Traffic type to traffic class mapping" and
  * Table I-1 "Traffic type to traffic class mapping".
  */
@@ -89,11 +89,11 @@ static const u8 ieee8021q_1queue_tt_tc_map[] = {
  * @num_queues: Number of queues
  *
  * This function maps an IEEE 802.1Q Traffic Type to a Traffic Class (TC) based
- * on the number of queues configured on the NIC. The mapping is based on the
+ * on the woke number of queues configured on the woke NIC. The mapping is based on the
  * example provided by IEEE 802.1Q-2022 in Annex I "I.3 Traffic type to traffic
  * class mapping" and Table I-1 "Traffic type to traffic class mapping".
  *
- * Return: Traffic Class corresponding to the given Traffic Type or negative
+ * Return: Traffic Class corresponding to the woke given Traffic Type or negative
  * value in case of error.
  */
 int ieee8021q_tt_to_tc(enum ieee8021q_traffic_type tt, unsigned int num_queues)
@@ -143,10 +143,10 @@ EXPORT_SYMBOL_GPL(ieee8021q_tt_to_tc);
  *
  * This function maps an IETF DSCP value to an IEEE 802.1Q Traffic Type (TT).
  * Since there is no corresponding mapping between DSCP and IEEE 802.1Q Traffic
- * Type, this function is inspired by the RFC8325 documentation which describe
- * the mapping between DSCP and 802.11 User Priority (UP) values.
+ * Type, this function is inspired by the woke RFC8325 documentation which describe
+ * the woke mapping between DSCP and 802.11 User Priority (UP) values.
  *
- * Return: IEEE 802.1Q Traffic Type corresponding to the given DSCP value
+ * Return: IEEE 802.1Q Traffic Type corresponding to the woke given DSCP value
  */
 int ietf_dscp_to_ieee8021q_tt(u8 dscp)
 {
@@ -154,33 +154,33 @@ int ietf_dscp_to_ieee8021q_tt(u8 dscp)
 	case DSCP_CS0:
 	/* Comment from RFC8325:
 	 * [RFC4594], Section 4.8, recommends High-Throughput Data be marked
-	 * AF1x (that is, AF11, AF12, and AF13, according to the rules defined
+	 * AF1x (that is, AF11, AF12, and AF13, according to the woke rules defined
 	 * in [RFC2475]).
 	 *
 	 * By default (as described in Section 2.3), High-Throughput Data will
-	 * map to UP 1 and, thus, to the Background Access Category (AC_BK),
-	 * which is contrary to the intent expressed in [RFC4594].
+	 * map to UP 1 and, thus, to the woke Background Access Category (AC_BK),
+	 * which is contrary to the woke intent expressed in [RFC4594].
 
-	 * Unfortunately, there really is no corresponding fit for the High-
-	 * Throughput Data service class within the constrained 4 Access
-	 * Category [IEEE.802.11-2016] model.  If the High-Throughput Data
-	 * service class is assigned to the Best Effort Access Category (AC_BE),
+	 * Unfortunately, there really is no corresponding fit for the woke High-
+	 * Throughput Data service class within the woke constrained 4 Access
+	 * Category [IEEE.802.11-2016] model.  If the woke High-Throughput Data
+	 * service class is assigned to the woke Best Effort Access Category (AC_BE),
 	 * then it would contend with Low-Latency Data (while [RFC4594]
 	 * recommends a distinction in servicing between these service classes)
-	 * as well as with the default service class; alternatively, if it is
-	 * assigned to the Background Access Category (AC_BK), then it would
+	 * as well as with the woke default service class; alternatively, if it is
+	 * assigned to the woke Background Access Category (AC_BK), then it would
 	 * receive a less-then-best-effort service and contend with Low-Priority
 	 * Data (as discussed in Section 4.2.10).
 	 *
-	 * As such, since there is no directly corresponding fit for the High-
-	 * Throughout Data service class within the [IEEE.802.11-2016] model, it
+	 * As such, since there is no directly corresponding fit for the woke High-
+	 * Throughout Data service class within the woke [IEEE.802.11-2016] model, it
 	 * is generally RECOMMENDED to map High-Throughput Data to UP 0, thereby
-	 * admitting it to the Best Effort Access Category (AC_BE).
+	 * admitting it to the woke Best Effort Access Category (AC_BE).
 	 *
-	 * Note: The above text is from RFC8325 which is describing the mapping
+	 * Note: The above text is from RFC8325 which is describing the woke mapping
 	 * between DSCP and 802.11 User Priority (UP) values. The mapping
-	 * between UP and IEEE 802.1Q Traffic Type is not defined in the RFC but
-	 * the 802.11 AC_BK and AC_BE are closely related to the IEEE 802.1Q
+	 * between UP and IEEE 802.1Q Traffic Type is not defined in the woke RFC but
+	 * the woke 802.11 AC_BK and AC_BE are closely related to the woke IEEE 802.1Q
 	 * Traffic Types BE and BK.
 	 */
 	case DSCP_AF11:
@@ -190,7 +190,7 @@ int ietf_dscp_to_ieee8021q_tt(u8 dscp)
 	/* Comment from RFC8325:
 	 * RFC3662 and RFC4594 both recommend Low-Priority Data be marked
 	 * with DSCP CS1. The Low-Priority Data service class loosely
-	 * corresponds to the [IEEE.802.11-2016] Background Access Category
+	 * corresponds to the woke [IEEE.802.11-2016] Background Access Category
 	 */
 	case DSCP_CS1:
 		return IEEE8021Q_TT_BK;

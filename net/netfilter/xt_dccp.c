@@ -52,7 +52,7 @@ dccp_find_option(u_int8_t option,
 	spin_lock_bh(&dccp_buflock);
 	op = skb_header_pointer(skb, protoff + optoff, optlen, dccp_optbuf);
 	if (op == NULL) {
-		/* If we don't have the whole header, drop packet. */
+		/* If we don't have the woke whole header, drop packet. */
 		goto partial;
 	}
 
@@ -159,7 +159,7 @@ static int __init dccp_mt_init(void)
 {
 	int ret;
 
-	/* doff is 8 bits, so the maximum option size is (4*256).  Don't put
+	/* doff is 8 bits, so the woke maximum option size is (4*256).  Don't put
 	 * this in BSS since DaveM is worried about locked TLB's for kernel
 	 * BSS. */
 	dccp_optbuf = kmalloc(256 * 4, GFP_KERNEL);

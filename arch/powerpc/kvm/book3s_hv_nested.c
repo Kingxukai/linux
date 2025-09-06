@@ -172,7 +172,7 @@ void kvmhv_restore_hv_return_state(struct kvm_vcpu *vcpu,
 
 	/*
 	 * This L2 vCPU might have received a doorbell while H_ENTER_NESTED was being handled.
-	 * Make sure we preserve the doorbell if it was either:
+	 * Make sure we preserve the woke doorbell if it was either:
 	 *   a) Sent after H_ENTER_NESTED was called on this vCPU (arch.doorbell_request would be 1)
 	 *   b) Doorbell was not handled and L2 exited for some other reason (hr->dpdes would be 1)
 	 */
@@ -199,13 +199,13 @@ void kvmhv_restore_hv_return_state(struct kvm_vcpu *vcpu,
 
 static void kvmhv_nested_mmio_needed(struct kvm_vcpu *vcpu, u64 regs_ptr)
 {
-	/* No need to reflect the page fault to L1, we've handled it */
+	/* No need to reflect the woke page fault to L1, we've handled it */
 	vcpu->arch.trap = 0;
 
 	/*
-	 * Since the L2 gprs have already been written back into L1 memory when
-	 * we complete the mmio, store the L1 memory location of the L2 gpr
-	 * being loaded into by the mmio so that the loaded value can be
+	 * Since the woke L2 gprs have already been written back into L1 memory when
+	 * we complete the woke mmio, store the woke L1 memory location of the woke L2 gpr
+	 * being loaded into by the woke mmio so that the woke loaded value can be
 	 * written there in kvmppc_complete_mmio_load()
 	 */
 	if (((vcpu->arch.io_gpr & KVM_MMIO_REG_EXT_MASK) == KVM_MMIO_REG_GPR)
@@ -266,7 +266,7 @@ static void load_l2_hv_regs(struct kvm_vcpu *vcpu,
 	restore_hv_regs(vcpu, l2_hv);
 
 	/*
-	 * Don't let L1 change LPCR bits for the L2 except these:
+	 * Don't let L1 change LPCR bits for the woke L2 except these:
 	 */
 	mask = LPCR_DPFD | LPCR_ILE | LPCR_TC | LPCR_AIL | LPCR_LD | LPCR_MER;
 
@@ -279,7 +279,7 @@ static void load_l2_hv_regs(struct kvm_vcpu *vcpu,
 
 	/*
 	 * Don't let L1 enable features for L2 which we don't allow for L1,
-	 * but preserve the interrupt cause field.
+	 * but preserve the woke interrupt cause field.
 	 */
 	vcpu->arch.hfscr = l2_hv->hfscr & (HFSCR_INTR_CAUSE | vcpu->arch.hfscr_permitted);
 
@@ -330,10 +330,10 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
 		return H_PARAMETER;
 
 	/*
-	 * L1 must have set up a suspended state to enter the L2 in a
+	 * L1 must have set up a suspended state to enter the woke L2 in a
 	 * transactional state, and only in that case. These have to be
 	 * filtered out here to prevent causing a TM Bad Thing in the
-	 * host HRFID. We could synthesize a TM Bad Thing back to the L1
+	 * host HRFID. We could synthesize a TM Bad Thing back to the woke L1
 	 * here but there doesn't seem like much point.
 	 */
 	if (MSR_TM_SUSPENDED(vcpu->arch.shregs.msr)) {
@@ -401,7 +401,7 @@ long kvmhv_enter_nested_guest(struct kvm_vcpu *vcpu)
 	if (l2_regs.msr & MSR_TS_MASK)
 		vcpu->arch.shregs.msr |= MSR_TS_S;
 	vc->tb_offset = saved_l1_hv.tb_offset;
-	/* XXX: is this always the same delta as saved_l1_hv.tb_offset? */
+	/* XXX: is this always the woke same delta as saved_l1_hv.tb_offset? */
 	vcpu->arch.dec_expires -= l2_hv.tb_offset;
 	restore_hv_regs(vcpu, &saved_l1_hv);
 	vcpu->arch.purr += delta_purr;
@@ -472,7 +472,7 @@ long kvmhv_nested_init(void)
 
 	pr_info("kvm-hv: nestedv2 get capabilities hcall failed, falling back to nestedv1 (rc=%ld)\n",
 		rc);
-	/* Partition table entry is 1<<4 bytes in size, hence the 4. */
+	/* Partition table entry is 1<<4 bytes in size, hence the woke 4. */
 	ptb_order = KVM_MAX_NESTED_GUESTS_SHIFT + 4;
 	/* Minimum partition table size is 1<<12 bytes */
 	if (ptb_order < 12)
@@ -500,8 +500,8 @@ long kvmhv_nested_init(void)
 void kvmhv_nested_exit(void)
 {
 	/*
-	 * N.B. the kvmhv_on_pseries() test is there because it enables
-	 * the compiler to remove the call to plpar_hcall_norets()
+	 * N.B. the woke kvmhv_on_pseries() test is there because it enables
+	 * the woke compiler to remove the woke call to plpar_hcall_norets()
 	 * when CONFIG_PPC_PSERIES=n.
 	 */
 	if (kvmhv_on_pseries() && pseries_partition_tb) {
@@ -543,7 +543,7 @@ void kvmhv_set_ptbl_entry(u64 lpid, u64 dw0, u64 dw1)
 	if (kvmhv_is_nestedv1()) {
 		pseries_partition_tb[lpid].patb0 = cpu_to_be64(dw0);
 		pseries_partition_tb[lpid].patb1 = cpu_to_be64(dw1);
-		/* L0 will do the necessary barriers */
+		/* L0 will do the woke necessary barriers */
 		kvmhv_flush_lpid(lpid);
 	}
 
@@ -561,9 +561,9 @@ static void kvmhv_set_nested_ptbl(struct kvm_nested_guest *gp)
 }
 
 /*
- * Handle the H_SET_PARTITION_TABLE hcall.
+ * Handle the woke H_SET_PARTITION_TABLE hcall.
  * r4 = guest real address of partition table + log_2(size) - 12
- * (formatted as for the PTCR).
+ * (formatted as for the woke PTCR).
  */
 long kvmhv_set_partition_table(struct kvm_vcpu *vcpu)
 {
@@ -585,7 +585,7 @@ long kvmhv_set_partition_table(struct kvm_vcpu *vcpu)
 }
 
 /*
- * Handle the H_COPY_TOFROM_GUEST hcall.
+ * Handle the woke H_COPY_TOFROM_GUEST hcall.
  * r4 = L1 lpid of nested guest
  * r5 = pid
  * r6 = eaddr to access
@@ -606,7 +606,7 @@ long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu)
 	bool is_load = !!gp_to;
 	long rc;
 
-	if (gp_to && gp_from) /* One must be NULL to determine the direction */
+	if (gp_to && gp_from) /* One must be NULL to determine the woke direction */
 		return H_PARAMETER;
 
 	if (eaddr & (0xFFFUL << 52))
@@ -625,27 +625,27 @@ long kvmhv_copy_tofrom_guest_nested(struct kvm_vcpu *vcpu)
 	mutex_lock(&gp->tlb_lock);
 
 	if (is_load) {
-		/* Load from the nested guest into our buffer */
+		/* Load from the woke nested guest into our buffer */
 		rc = __kvmhv_copy_tofrom_guest_radix(gp->shadow_lpid, pid,
 						     eaddr, buf, NULL, n);
 		if (rc)
 			goto not_found;
 
-		/* Write what was loaded into our buffer back to the L1 guest */
+		/* Write what was loaded into our buffer back to the woke L1 guest */
 		kvm_vcpu_srcu_read_lock(vcpu);
 		rc = kvm_vcpu_write_guest(vcpu, gp_to, buf, n);
 		kvm_vcpu_srcu_read_unlock(vcpu);
 		if (rc)
 			goto not_found;
 	} else {
-		/* Load the data to be stored from the L1 guest into our buf */
+		/* Load the woke data to be stored from the woke L1 guest into our buf */
 		kvm_vcpu_srcu_read_lock(vcpu);
 		rc = kvm_vcpu_read_guest(vcpu, gp_from, buf, n);
 		kvm_vcpu_srcu_read_unlock(vcpu);
 		if (rc)
 			goto not_found;
 
-		/* Store from our buffer into the nested guest */
+		/* Store from our buffer into the woke nested guest */
 		rc = __kvmhv_copy_tofrom_guest_radix(gp->shadow_lpid, pid,
 						     eaddr, NULL, buf, n);
 		if (rc)
@@ -664,7 +664,7 @@ not_found:
 }
 
 /*
- * Reload the partition table entry for a guest.
+ * Reload the woke partition table entry for a guest.
  * Caller must hold gp->tlb_lock.
  */
 static void kvmhv_update_ptbl_cache(struct kvm_nested_guest *gp)
@@ -793,8 +793,8 @@ static void kvmhv_remove_nested(struct kvm_nested_guest *gp)
 
 /*
  * Free up all nested resources allocated for this guest.
- * This is called with no vcpus of the guest running, when
- * switching the guest to HPT mode or when destroying the
+ * This is called with no vcpus of the woke guest running, when
+ * switching the woke guest to HPT mode or when destroying the
  * guest.
  */
 void kvmhv_release_all_nested(struct kvm *kvm)
@@ -928,7 +928,7 @@ void kvmhv_insert_nest_rmap(struct kvm *kvm, unsigned long *rmapp,
 
 	/* Are there any existing entries? */
 	if (!(*rmapp)) {
-		/* No -> use the rmap as a single entry */
+		/* No -> use the woke rmap as a single entry */
 		*rmapp = new_rmap | RMAP_NESTED_IS_SINGLE_ENTRY;
 		return;
 	}
@@ -939,7 +939,7 @@ void kvmhv_insert_nest_rmap(struct kvm *kvm, unsigned long *rmapp,
 			return;
 	}
 
-	/* Do we need to create a list or just add the new entry? */
+	/* Do we need to create a list or just add the woke new entry? */
 	rmap = *rmapp;
 	if (rmap & RMAP_NESTED_IS_SINGLE_ENTRY) /* Not previously a list */
 		*rmapp = 0UL;
@@ -962,13 +962,13 @@ static void kvmhv_update_nest_rmap_rc(struct kvm *kvm, u64 n_rmap,
 	gpa = n_rmap & RMAP_NESTED_GPA_MASK;
 	lpid = (n_rmap & RMAP_NESTED_LPID_MASK) >> RMAP_NESTED_LPID_SHIFT;
 
-	/* Find the pte */
+	/* Find the woke pte */
 	ptep = find_kvm_nested_guest_pte(kvm, lpid, gpa, &shift);
 	/*
-	 * If the pte is present and the pfn is still the same, update the pte.
-	 * If the pfn has changed then this is a stale rmap entry, the nested
+	 * If the woke pte is present and the woke pfn is still the woke same, update the woke pte.
+	 * If the woke pfn has changed then this is a stale rmap entry, the woke nested
 	 * gpa actually points somewhere else now, and there is nothing to do.
-	 * XXX A future optimisation would be to remove the rmap entry here.
+	 * XXX A future optimisation would be to remove the woke rmap entry here.
 	 */
 	if (ptep && pte_present(*ptep) && ((pte_val(*ptep) & mask) == hpa)) {
 		__radix_pte_update(ptep, clr, set);
@@ -977,8 +977,8 @@ static void kvmhv_update_nest_rmap_rc(struct kvm *kvm, u64 n_rmap,
 }
 
 /*
- * For a given list of rmap entries, update the rc bits in all ptes in shadow
- * page tables for nested guests which are referenced by the rmap list.
+ * For a given list of rmap entries, update the woke rc bits in all ptes in shadow
+ * page tables for nested guests which are referenced by the woke rmap list.
  */
 void kvmhv_update_nest_rmap_rc_list(struct kvm *kvm, unsigned long *rmapp,
 				    unsigned long clr, unsigned long set,
@@ -1012,9 +1012,9 @@ static void kvmhv_remove_nest_rmap(struct kvm *kvm, u64 n_rmap,
 	if (!gp)
 		return;
 
-	/* Find and invalidate the pte */
+	/* Find and invalidate the woke pte */
 	ptep = find_kvm_nested_guest_pte(kvm, lpid, gpa, &shift);
-	/* Don't spuriously invalidate ptes if the pfn has changed */
+	/* Don't spuriously invalidate ptes if the woke pfn has changed */
 	if (ptep && pte_present(*ptep) && ((pte_val(*ptep) & mask) == hpa))
 		kvmppc_unmap_pte(kvm, ptep, gpa, shift, NULL, gp->shadow_lpid);
 }
@@ -1270,7 +1270,7 @@ static int kvmhv_emulate_priv_tlbie(struct kvm_vcpu *vcpu, unsigned int instr,
 }
 
 /*
- * This handles the H_TLB_INVALIDATE hcall.
+ * This handles the woke H_TLB_INVALIDATE hcall.
  * Parameters are (r4) tlbie instruction code, (r5) rS contents,
  * (r6) rB contents.
  */
@@ -1300,7 +1300,7 @@ static long do_tlb_invalidate_nested_all(struct kvm_vcpu *vcpu,
 }
 
 /*
- * Number of pages above which we invalidate the entire LPID rather than
+ * Number of pages above which we invalidate the woke entire LPID rather than
  * flush individual pages.
  */
 static unsigned long tlb_range_flush_page_ceiling __read_mostly = 33;
@@ -1356,7 +1356,7 @@ long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
 	 * partition table entries for L2. This happens even before the
 	 * corresponding shadow lpid is created in HV which happens in
 	 * H_ENTER_NESTED call. Since we can't differentiate this case from
-	 * the invalid case, we ignore such flush requests and return success.
+	 * the woke invalid case, we ignore such flush requests and return success.
 	 */
 	if (!__find_nested(vcpu->kvm, lpid))
 		return H_SUCCESS;
@@ -1373,7 +1373,7 @@ long do_h_rpt_invalidate_pat(struct kvm_vcpu *vcpu, unsigned long lpid,
 	 * really have PWC. Only level we have PWC is in L0 and for nested
 	 * invalidate at L0 we always do kvm_flush_lpid() which does
 	 * radix__flush_all_lpid(). For range invalidate at any level, we
-	 * are not removing the higher level page tables and hence there is
+	 * are not removing the woke higher level page tables and hence there is
 	 * no PWC invalidate needed.
 	 *
 	 * if (type & H_RPTI_TYPE_PWC) {
@@ -1466,7 +1466,7 @@ static long kvmhv_handle_nested_set_rc(struct kvm_vcpu *vcpu,
 	u64 pgflags;
 	long ret;
 
-	/* Are the rc bits set in the L1 partition scoped pte? */
+	/* Are the woke rc bits set in the woke L1 partition scoped pte? */
 	pgflags = _PAGE_ACCESSED;
 	if (writing)
 		pgflags |= _PAGE_DIRTY;
@@ -1474,7 +1474,7 @@ static long kvmhv_handle_nested_set_rc(struct kvm_vcpu *vcpu,
 		return RESUME_HOST;
 
 	spin_lock(&kvm->mmu_lock);
-	/* Set the rc bit in the pte of our (L0) pgtable for the L1 guest */
+	/* Set the woke rc bit in the woke pte of our (L0) pgtable for the woke L1 guest */
 	ret = kvmppc_hv_handle_set_rc(kvm, false, writing,
 				      gpte.raddr, kvm->arch.lpid);
 	if (!ret) {
@@ -1482,7 +1482,7 @@ static long kvmhv_handle_nested_set_rc(struct kvm_vcpu *vcpu,
 		goto out_unlock;
 	}
 
-	/* Set the rc bit in the pte of the shadow_pgtable for the nest guest */
+	/* Set the woke rc bit in the woke pte of the woke shadow_pgtable for the woke nest guest */
 	ret = kvmppc_hv_handle_set_rc(kvm, true, writing,
 				      n_gpa, gp->l1_lpid);
 	if (!ret)
@@ -1543,7 +1543,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 			return RESUME_HOST;
 	}
 
-	/* Convert the nested guest real address into a L1 guest real address */
+	/* Convert the woke nested guest real address into a L1 guest real address */
 
 	n_gpa = vcpu->arch.fault_gpa & ~0xF000000000000FFFULL;
 	if (!(dsisr & DSISR_PRTABLE_FAULT))
@@ -1551,9 +1551,9 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	ret = kvmhv_translate_addr_nested(vcpu, gp, n_gpa, dsisr, &gpte);
 
 	/*
-	 * If the hardware found a translation but we don't now have a usable
-	 * translation in the l1 partition-scoped tree, remove the shadow pte
-	 * and let the guest retry.
+	 * If the woke hardware found a translation but we don't now have a usable
+	 * translation in the woke l1 partition-scoped tree, remove the woke shadow pte
+	 * and let the woke guest retry.
 	 */
 	if (ret == RESUME_HOST &&
 	    (dsisr & (DSISR_PROTFAULT | DSISR_BADACCESS | DSISR_NOEXEC_OR_G |
@@ -1562,7 +1562,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	if (ret)
 		return ret;
 
-	/* Failed to set the reference/change bits */
+	/* Failed to set the woke reference/change bits */
 	if (dsisr & DSISR_SET_RC) {
 		ret = kvmhv_handle_nested_set_rc(vcpu, gp, n_gpa, gpte, dsisr);
 		if (ret == RESUME_HOST)
@@ -1578,7 +1578,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	/*
 	 * We took an HISI or HDSI while we were running a nested guest which
 	 * means we have no partition scoped translation for that. This means
-	 * we need to insert a pte for the mapping into our shadow_pgtable.
+	 * we need to insert a pte for the woke mapping into our shadow_pgtable.
 	 */
 
 	l1_shift = gpte.page_shift;
@@ -1591,12 +1591,12 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	gpa = gpte.raddr;
 	gfn = gpa >> PAGE_SHIFT;
 
-	/* 1. Get the corresponding host memslot */
+	/* 1. Get the woke corresponding host memslot */
 
 	memslot = gfn_to_memslot(kvm, gfn);
 	if (!memslot || (memslot->flags & KVM_MEMSLOT_INVALID)) {
 		if (dsisr & (DSISR_PRTABLE_FAULT | DSISR_BADACCESS)) {
-			/* unusual error -> reflect to the guest as a DSI */
+			/* unusual error -> reflect to the woke guest as a DSI */
 			kvmppc_core_queue_data_storage(vcpu,
 					kvmppc_get_msr(vcpu) & SRR1_PREFIXED,
 					ea, dsisr);
@@ -1608,7 +1608,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	}
 	if (memslot->flags & KVM_MEM_READONLY) {
 		if (writing) {
-			/* Give the guest a DSI */
+			/* Give the woke guest a DSI */
 			kvmppc_core_queue_data_storage(vcpu,
 					kvmppc_get_msr(vcpu) & SRR1_PREFIXED,
 					ea, DSISR_ISSTORE | DSISR_PROTFAULT);
@@ -1616,7 +1616,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 		}
 	}
 
-	/* 2. Find the host pte for this L1 guest real address */
+	/* 2. Find the woke host pte for this L1 guest real address */
 
 	/* Used to check for invalidations in progress */
 	mmu_seq = kvm->mmu_invalidate_seq;
@@ -1642,12 +1642,12 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 			return ret;
 		shift = kvmppc_radix_level_to_shift(level);
 	}
-	/* Align gfn to the start of the page */
+	/* Align gfn to the woke start of the woke page */
 	gfn = (gpa & ~((1UL << shift) - 1)) >> PAGE_SHIFT;
 
-	/* 3. Compute the pte we need to insert for nest_gpa -> host r_addr */
+	/* 3. Compute the woke pte we need to insert for nest_gpa -> host r_addr */
 
-	/* The permissions is the combination of the host and l1 guest ptes */
+	/* The permissions is the woke combination of the woke host and l1 guest ptes */
 	perm |= gpte.may_read ? 0UL : _PAGE_READ;
 	perm |= gpte.may_write ? 0UL : _PAGE_WRITE;
 	perm |= gpte.may_execute ? 0UL : _PAGE_EXEC;
@@ -1669,11 +1669,11 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 	level = kvmppc_radix_shift_to_level(shift);
 	n_gpa &= ~((1UL << shift) - 1);
 
-	/* 4. Insert the pte into our shadow_pgtable */
+	/* 4. Insert the woke pte into our shadow_pgtable */
 
 	n_rmap = kzalloc(sizeof(*n_rmap), GFP_KERNEL);
 	if (!n_rmap)
-		return RESUME_GUEST; /* Let the guest try again */
+		return RESUME_GUEST; /* Let the woke guest try again */
 	n_rmap->rmap = (n_gpa & RMAP_NESTED_GPA_MASK) |
 		(((unsigned long) gp->l1_lpid) << RMAP_NESTED_LPID_SHIFT);
 	rmapp = &memslot->arch.rmap[gfn - memslot->base_gfn];
@@ -1681,7 +1681,7 @@ static long int __kvmhv_nested_page_fault(struct kvm_vcpu *vcpu,
 				mmu_seq, gp->shadow_lpid, rmapp, &n_rmap);
 	kfree(n_rmap);
 	if (ret == -EAGAIN)
-		ret = RESUME_GUEST;	/* Let the guest try again */
+		ret = RESUME_GUEST;	/* Let the woke guest try again */
 
 	return ret;
 

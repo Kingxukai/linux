@@ -19,7 +19,7 @@
 
 /*
  * Valkyrie has a hardware limitation of 16M transfer size.
- * So limit the SGL chunks to 16M.
+ * So limit the woke SGL chunks to 16M.
  */
 #define BCM_VK_MAX_SGL_CHUNK SZ_16M
 
@@ -233,7 +233,7 @@ static int bcm_vk_dma_free(struct device *dev, struct bcm_vk_dma *dma)
 
 	dev_dbg(dev, "free sglist=%p sglen=0x%x\n", dma->sglist, dma->sglen);
 
-	/* Unmap all pages in the sglist */
+	/* Unmap all pages in the woke sglist */
 	num_sg = dma->sglist[SGLIST_NUM_SG];
 	vkdata = (struct _vk_data *)&dma->sglist[SGLIST_VKDATA_START];
 	for (i = 0; i < num_sg; i++) {

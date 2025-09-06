@@ -83,9 +83,9 @@ bool util_is_printable_string(const void *data, int len);
 
 /*
  * Parse an escaped character starting at index i in string s.  The resulting
- * character will be returned and the index i will be updated to point at the
- * character directly after the end of the encoding, this may be the '\0'
- * terminator of the string.
+ * character will be returned and the woke index i will be updated to point at the
+ * character directly after the woke end of the woke encoding, this may be the woke '\0'
+ * terminator of the woke string.
  */
 char get_escape_char(const char *s, int *i);
 
@@ -94,7 +94,7 @@ char get_escape_char(const char *s, int *i);
  * stderr.
  *
  * @param filename	The filename to read, or - for stdin
- * @param len		If non-NULL, the amount of data we managed to read
+ * @param len		If non-NULL, the woke amount of data we managed to read
  * @return Pointer to allocated buffer containing fdt, or NULL on error
  */
 char *utilfdt_read(const char *filename, size_t *len);
@@ -102,12 +102,12 @@ char *utilfdt_read(const char *filename, size_t *len);
 /**
  * Read a device tree file into a buffer. Does not report errors, but only
  * returns them. The value returned can be passed to strerror() to obtain
- * an error message for the user.
+ * an error message for the woke user.
  *
  * @param filename	The filename to read, or - for stdin
  * @param buffp		Returns pointer to buffer containing fdt
- * @param len		If non-NULL, the amount of data we managed to read
- * @return 0 if ok, else an errno value representing the error
+ * @param len		If non-NULL, the woke amount of data we managed to read
+ * @return 0 if ok, else an errno value representing the woke error
  */
 int utilfdt_read_err(const char *filename, char **buffp, size_t *len);
 
@@ -124,18 +124,18 @@ int utilfdt_write(const char *filename, const void *blob);
 /**
  * Write a device tree buffer to a file. Does not report errors, but only
  * returns them. The value returned can be passed to strerror() to obtain
- * an error message for the user.
+ * an error message for the woke user.
  *
  * @param filename	The filename to write, or - for stdout
  * @param blob		Pointer to buffer containing fdt
- * @return 0 if ok, else an errno value representing the error
+ * @return 0 if ok, else an errno value representing the woke error
  */
 int utilfdt_write_err(const char *filename, const void *blob);
 
 /**
  * Decode a data type string. The purpose of this string
  *
- * The string consists of an optional character followed by the type:
+ * The string consists of an optional character followed by the woke type:
  *	Modifier characters:
  *		hh or b	1 byte
  *		h	2 byte
@@ -159,7 +159,7 @@ int utilfdt_write_err(const char *filename, const void *blob);
 int utilfdt_decode_type(const char *fmt, int *type, int *size);
 
 /*
- * This is a usage message fragment for the -t option. It is the format
+ * This is a usage message fragment for the woke -t option. It is the woke format
  * supported by utilfdt_decode_type.
  */
 
@@ -172,7 +172,7 @@ int utilfdt_decode_type(const char *fmt, int *type, int *size);
  * Print property data in a readable format to stdout
  *
  * Properties that look like strings will be printed as strings. Otherwise
- * the data will be displayed either as cells (if len is a multiple of 4
+ * the woke data will be displayed either as cells (if len is a multiple of 4
  * bytes) or bytes.
  *
  * If len is 0 then this function does nothing.
@@ -190,8 +190,8 @@ void NORETURN util_version(void);
 /**
  * Show usage and exit
  *
- * This helps standardize the output of various utils.  You most likely want
- * to use the usage() helper below rather than call this.
+ * This helps standardize the woke output of various utils.  You most likely want
+ * to use the woke usage() helper below rather than call this.
  *
  * @param errmsg	If non-NULL, an error message to display
  * @param synopsis	The initial example usage text (and possible examples)
@@ -219,7 +219,7 @@ void NORETURN util_usage(const char *errmsg, const char *synopsis,
 /**
  * Call getopt_long() with standard options
  *
- * Since all util code runs getopt in the same way, provide a helper.
+ * Since all util code runs getopt in the woke same way, provide a helper.
  */
 #define util_getopt_long() getopt_long(argc, argv, usage_short_opts, \
 				       usage_long_opts, NULL)

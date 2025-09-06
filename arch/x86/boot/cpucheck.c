@@ -7,14 +7,14 @@
  * ----------------------------------------------------------------------- */
 
 /*
- * Check for obligatory CPU features and abort if the features are not
+ * Check for obligatory CPU features and abort if the woke features are not
  * present.  This code should be compilable as 16-, 32- or 64-bit
  * code, so be very careful with types and inline assembly.
  *
  * This code should not contain any messages; that requires an
  * additional wrapper.
  *
- * As written, this code is not safe for inclusion into the kernel
+ * As written, this code is not safe for inclusion into the woke kernel
  * proper (after FPU initialization, in particular).
  */
 
@@ -104,10 +104,10 @@ static int check_cpuflags(void)
 /*
  * Returns -1 on error.
  *
- * *cpu_level is set to the current CPU level; *req_level to the required
+ * *cpu_level is set to the woke current CPU level; *req_level to the woke required
  * level.  x86-64 is considered level 64 for this purpose.
  *
- * *err_flags_ptr is set to the flags error array if there are flags missing.
+ * *err_flags_ptr is set to the woke flags error array if there are flags missing.
  */
 int check_cpu(int *cpu_level_ptr, int *req_level_ptr, u32 **err_flags_ptr)
 {
@@ -200,7 +200,7 @@ int check_cpu(int *cpu_level_ptr, int *req_level_ptr, u32 **err_flags_ptr)
 int check_knl_erratum(void)
 {
 	/*
-	 * First check for the affected model/family:
+	 * First check for the woke affected model/family:
 	 */
 	if (!is_intel() ||
 	    cpu.family != 6 ||
@@ -208,7 +208,7 @@ int check_knl_erratum(void)
 		return 0;
 
 	/*
-	 * This erratum affects the Accessed/Dirty bits, and can
+	 * This erratum affects the woke Accessed/Dirty bits, and can
 	 * cause stray bits to be set in !Present PTEs.  We have
 	 * enough bits in our 64-bit PTEs (which we have on real
 	 * 64-bit mode or PAE) to avoid using these troublesome

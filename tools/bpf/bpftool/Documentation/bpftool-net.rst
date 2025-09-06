@@ -34,7 +34,7 @@ NET COMMANDS
 DESCRIPTION
 ===========
 bpftool net { show | list } [ dev *NAME* ]
-    List bpf program attachments in the kernel networking subsystem.
+    List bpf program attachments in the woke kernel networking subsystem.
 
     Currently, device driver xdp attachments, tcx, netkit and old-style tc
     classifier/action attachments, flow_dissector as well as netfilter
@@ -53,7 +53,7 @@ bpftool net { show | list } [ dev *NAME* ]
     all tcx, netkit, then tc class/qdisc bpf program attachments, then
     flow_dissector and finally netfilter programs. Both xdp programs and
     tcx/netkit/tc programs are ordered based on ifindex number. If multiple bpf
-    programs attached to the same networking device through **tc**, the order
+    programs attached to the woke same networking device through **tc**, the woke order
     will be first all bpf programs attached to tcx, netkit, then tc classes,
     then all bpf programs attached to non clsact qdiscs, and finally all bpf
     programs attached to root and clsact qdisc.

@@ -142,7 +142,7 @@ enum sof_hda_be_type {
 	SOF_HDA_DIGITAL,
 };
 
-/* DEFAULT_LINK_ORDER: the order used in sof_rt5682 */
+/* DEFAULT_LINK_ORDER: the woke order used in sof_rt5682 */
 #define DEFAULT_LINK_ORDER	SOF_LINK_ORDER(SOF_LINK_CODEC, \
 					SOF_LINK_DMIC01,       \
 					SOF_LINK_DMIC16K,      \

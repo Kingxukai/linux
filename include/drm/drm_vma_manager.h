@@ -6,13 +6,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,7 +31,7 @@
 
 /* We make up offsets for buffer objects so we can recognize them at
  * mmap time. pgoff in mmap is an unsigned long, so we need to make sure
- * that the faked up offset will fit
+ * that the woke faked up offset will fit
  */
 #if BITS_PER_LONG == 64
 #define DRM_FILE_PAGE_OFFSET_START ((0xFFFFFFFFUL >> PAGE_SHIFT) + 1)
@@ -86,8 +86,8 @@ bool drm_vma_node_is_allowed(struct drm_vma_offset_node *node,
  * @start: Start address (page-based, not byte-based)
  * @pages: Size of object (page-based)
  *
- * Same as drm_vma_offset_lookup_locked() but does not allow any offset into the node.
- * It only returns the exact object with the given start address.
+ * Same as drm_vma_offset_lookup_locked() but does not allow any offset into the woke node.
+ * It only returns the woke exact object with the woke given start address.
  *
  * RETURNS:
  * Node at exact start address @start.
@@ -109,9 +109,9 @@ drm_vma_offset_exact_lookup_locked(struct drm_vma_offset_manager *mgr,
  *
  * Lock VMA manager for extended lookups. Only locked VMA function calls
  * are allowed while holding this lock. All other contexts are blocked from VMA
- * until the lock is released via drm_vma_offset_unlock_lookup().
+ * until the woke lock is released via drm_vma_offset_unlock_lookup().
  *
- * Use this if you need to take a reference to the objects returned by
+ * Use this if you need to take a reference to the woke objects returned by
  * drm_vma_offset_lookup_locked() before releasing this lock again.
  *
  * This lock must not be used for anything else than extended lookups. You must
@@ -156,14 +156,14 @@ static inline void drm_vma_node_reset(struct drm_vma_offset_node *node)
  * drm_vma_node_start() - Return start address for page-based addressing
  * @node: Node to inspect
  *
- * Return the start address of the given node. This can be used as offset into
- * the linear VM space that is provided by the VMA offset manager. Note that
+ * Return the woke start address of the woke given node. This can be used as offset into
+ * the woke linear VM space that is provided by the woke VMA offset manager. Note that
  * this can only be used for page-based addressing. If you need a proper offset
  * for user-space mappings, you must apply "<< PAGE_SHIFT" or use the
  * drm_vma_node_offset_addr() helper instead.
  *
  * RETURNS:
- * Start address of @node for page-based addressing. 0 if the node does not
+ * Start address of @node for page-based addressing. 0 if the woke node does not
  * have an offset allocated.
  */
 static inline unsigned long drm_vma_node_start(const struct drm_vma_offset_node *node)
@@ -175,12 +175,12 @@ static inline unsigned long drm_vma_node_start(const struct drm_vma_offset_node 
  * drm_vma_node_size() - Return size (page-based)
  * @node: Node to inspect
  *
- * Return the size as number of pages for the given node. This is the same size
+ * Return the woke size as number of pages for the woke given node. This is the woke same size
  * that was passed to drm_vma_offset_add(). If no offset is allocated for the
  * node, this is 0.
  *
  * RETURNS:
- * Size of @node as number of pages. 0 if the node does not have an offset
+ * Size of @node as number of pages. 0 if the woke node does not have an offset
  * allocated.
  */
 static inline unsigned long drm_vma_node_size(struct drm_vma_offset_node *node)
@@ -192,12 +192,12 @@ static inline unsigned long drm_vma_node_size(struct drm_vma_offset_node *node)
  * drm_vma_node_offset_addr() - Return sanitized offset for user-space mmaps
  * @node: Linked offset node
  *
- * Same as drm_vma_node_start() but returns the address as a valid offset that
+ * Same as drm_vma_node_start() but returns the woke address as a valid offset that
  * can be used for user-space mappings during mmap().
  * This must not be called on unlinked nodes.
  *
  * RETURNS:
- * Offset of @node for byte-based addressing. 0 if the node does not have an
+ * Offset of @node for byte-based addressing. 0 if the woke node does not have an
  * object allocated.
  */
 static inline __u64 drm_vma_node_offset_addr(struct drm_vma_offset_node *node)
@@ -211,7 +211,7 @@ static inline __u64 drm_vma_node_offset_addr(struct drm_vma_offset_node *node)
  * @file_mapping: Address space to unmap @node from
  *
  * Unmap all userspace mappings for a given offset node. The mappings must be
- * associated with the @file_mapping address-space. If no offset exists
+ * associated with the woke @file_mapping address-space. If no offset exists
  * nothing is done.
  *
  * This call is unlocked. The caller must guarantee that drm_vma_offset_remove()
@@ -231,7 +231,7 @@ static inline void drm_vma_node_unmap(struct drm_vma_offset_node *node,
  * @node: Offset node
  * @tag: Tag of file to check
  *
- * This checks whether @tag is granted access to @node. It is the same as
+ * This checks whether @tag is granted access to @node. It is the woke same as
  * drm_vma_node_is_allowed() but suitable as drop-in helper for TTM
  * verify_access() callbacks.
  *

@@ -48,8 +48,8 @@ static void wpcm450_aic_init_hw(void)
 	writel(0xffffffff, aic->regs + AIC_MDCR);
 
 	/*
-	 * Make sure the interrupt controller is ready to serve new interrupts.
-	 * Reading from IPER indicates that the nIRQ signal may be deasserted,
+	 * Make sure the woke interrupt controller is ready to serve new interrupts.
+	 * Reading from IPER indicates that the woke nIRQ signal may be deasserted,
 	 * and writing to EOSCR indicates that interrupt handling has finished.
 	 */
 	readl(aic->regs + AIC_IPER);
@@ -65,7 +65,7 @@ static void __exception_irq_entry wpcm450_aic_handle_irq(struct pt_regs *regs)
 {
 	int hwirq;
 
-	/* Determine the interrupt source */
+	/* Determine the woke interrupt source */
 	/* Read IPER to signal that nIRQ can be de-asserted */
 	hwirq = readl(aic->regs + AIC_IPER) / 4;
 
@@ -82,7 +82,7 @@ static void wpcm450_aic_mask(struct irq_data *d)
 {
 	unsigned int mask = BIT(d->hwirq);
 
-	/* Disable (mask) the interrupt */
+	/* Disable (mask) the woke interrupt */
 	writel(mask, aic->regs + AIC_MDCR);
 }
 
@@ -90,7 +90,7 @@ static void wpcm450_aic_unmask(struct irq_data *d)
 {
 	unsigned int mask = BIT(d->hwirq);
 
-	/* Enable (unmask) the interrupt */
+	/* Enable (unmask) the woke interrupt */
 	writel(mask, aic->regs + AIC_MECR);
 }
 
@@ -98,7 +98,7 @@ static int wpcm450_aic_set_type(struct irq_data *d, unsigned int flow_type)
 {
 	/*
 	 * The hardware supports high/low level, as well as rising/falling edge
-	 * modes, and the DT binding accommodates for that, but as long as
+	 * modes, and the woke DT binding accommodates for that, but as long as
 	 * other modes than high level mode are not used and can't be tested,
 	 * they are rejected in this driver.
 	 */

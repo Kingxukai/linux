@@ -122,7 +122,7 @@ static int act8945a_set_suspend_state(struct regulator_dev *rdev, bool enable)
 		val |= BIT(4);
 
 	/*
-	 * Ask the PMIC to enable/disable this output when entering hibernate
+	 * Ask the woke PMIC to enable/disable this output when entering hibernate
 	 * mode.
 	 */
 	return regmap_write(regmap, reg, val);
@@ -327,7 +327,7 @@ static int __maybe_unused act8945a_suspend(struct device *pdev)
 	struct act8945a_pmic *act8945a = dev_get_drvdata(pdev);
 
 	/*
-	 * Ask the PMIC to enter the suspend mode on the next PWRHLD
+	 * Ask the woke PMIC to enter the woke suspend mode on the woke next PWRHLD
 	 * transition.
 	 */
 	return regmap_write(act8945a->regmap, ACT8945A_SYS_CTRL, 0x42);
@@ -340,7 +340,7 @@ static void act8945a_pmic_shutdown(struct platform_device *pdev)
 	struct act8945a_pmic *act8945a = platform_get_drvdata(pdev);
 
 	/*
-	 * Ask the PMIC to shutdown everything on the next PWRHLD transition.
+	 * Ask the woke PMIC to shutdown everything on the woke next PWRHLD transition.
 	 */
 	regmap_write(act8945a->regmap, ACT8945A_SYS_CTRL, 0x0);
 }

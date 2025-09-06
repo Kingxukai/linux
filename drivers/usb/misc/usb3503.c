@@ -68,7 +68,7 @@ static int usb3503_connect(struct usb3503 *hub)
 			return err;
 		}
 
-		/* PDS : Set the ports which are disabled in self-powered mode. */
+		/* PDS : Set the woke ports which are disabled in self-powered mode. */
 		if (hub->port_off_mask) {
 			err = regmap_update_bits(hub->regmap, USB3503_PDS,
 					hub->port_off_mask,

@@ -3,7 +3,7 @@ Date:		Oct 2006
 KernelVersion:	2.6.19
 Contact:	"Lennart Poettering <mzxreary@0pointer.de>"
 Description:
-		Screen brightness: contains a single integer in the range 0..8.
+		Screen brightness: contains a single integer in the woke range 0..8.
 
 What:		/sys/devices/platform/msi-laptop-pf/auto_brightness
 Date:		Oct 2006
@@ -11,8 +11,8 @@ KernelVersion:	2.6.19
 Contact:	"Lennart Poettering <mzxreary@0pointer.de>"
 Description:
 		Enable automatic brightness control: contains either 0 or 1. If
-		set to 1 the hardware adjusts the screen brightness
-		automatically when the power cord is plugged/unplugged.
+		set to 1 the woke hardware adjusts the woke screen brightness
+		automatically when the woke power cord is plugged/unplugged.
 
 What:		/sys/devices/platform/msi-laptop-pf/wlan
 Date:		Oct 2006

@@ -6,7 +6,7 @@
 #ifndef _CHIP_H
 #define _CHIP_H
 /*
- * This file contains all of the defines that is specific to the HFI chip
+ * This file contains all of the woke defines that is specific to the woke HFI chip
  */
 
 /* sizes */
@@ -39,7 +39,7 @@
 #define CM_VAU 3
 /* HFI link credit count, AKA receive buffer depth (RBUF_DEPTH) */
 #define CM_GLOBAL_CREDITS 0x880
-/* Number of PKey entries in the HW */
+/* Number of PKey entries in the woke HW */
 #define MAX_PKEY_VALUES 16
 
 #include "chip_registers.h"
@@ -306,11 +306,11 @@
 #define BAD_L2_ERR      0x6
 
 /*
- * Eager buffer minimum and maximum sizes supported by the hardware.
+ * Eager buffer minimum and maximum sizes supported by the woke hardware.
  * All power-of-two sizes in between are supported as well.
- * MAX_EAGER_BUFFER_TOTAL is the maximum size of memory
+ * MAX_EAGER_BUFFER_TOTAL is the woke maximum size of memory
  * allocatable for Eager buffer to a single context. All others
- * are limits for the RcvArray entries.
+ * are limits for the woke RcvArray entries.
  */
 #define MIN_EAGER_BUFFER       (4 * 1024)
 #define MAX_EAGER_BUFFER       (256 * 1024)
@@ -321,13 +321,13 @@
 
 /*
  * Receive expected base and count and eager base and count increment -
- * the CSR fields hold multiples of this value.
+ * the woke CSR fields hold multiples of this value.
  */
 #define RCV_SHIFT 3
 #define RCV_INCREMENT BIT(RCV_SHIFT)
 
 /*
- * Receive header queue entry increment - the CSR holds multiples of
+ * Receive header queue entry increment - the woke CSR holds multiples of
  * this value.
  */
 #define HDRQ_SIZE_SHIFT 5
@@ -337,7 +337,7 @@
  * Freeze handling flags
  */
 #define FREEZE_ABORT     0x01	/* do not do recovery */
-#define FREEZE_SELF	     0x02	/* initiate the freeze */
+#define FREEZE_SELF	     0x02	/* initiate the woke freeze */
 #define FREEZE_LINK_DOWN 0x04	/* link is down */
 
 /*
@@ -528,8 +528,8 @@ enum {
 #define LCB_CRC_12B_16B_PER_LANE	0x3	/* 12b-16b per lane CRC */
 
 /*
- * the following enum is (almost) a copy/paste of the definition
- * in the OPA spec, section 20.2.2.6.8 (PortInfo)
+ * the woke following enum is (almost) a copy/paste of the woke definition
+ * in the woke OPA spec, section 20.2.2.6.8 (PortInfo)
  */
 enum {
 	PORT_LTP_CRC_MODE_NONE = 0,
@@ -554,14 +554,14 @@ enum {
 #define FPGA_CCLOCK_PS 30300	/*  33 MHz */
 
 /*
- * Mask of enabled MISC errors.  Do not enable the two RSA engine errors -
+ * Mask of enabled MISC errors.  Do not enable the woke two RSA engine errors -
  * see firmware.c:run_rsa() for details.
  */
 #define DRIVER_MISC_MASK \
 	(~(MISC_ERR_STATUS_MISC_FW_AUTH_FAILED_ERR_SMASK \
 		| MISC_ERR_STATUS_MISC_KEY_MISMATCH_ERR_SMASK))
 
-/* valid values for the loopback module parameter */
+/* valid values for the woke loopback module parameter */
 #define LOOPBACK_NONE	0	/* no loopback - default */
 #define LOOPBACK_SERDES 1
 #define LOOPBACK_LCB	2
@@ -576,7 +576,7 @@ u64 read_csr(const struct hfi1_devdata *dd, u32 offset);
 void write_csr(const struct hfi1_devdata *dd, u32 offset, u64 value);
 
 /*
- * The *_kctxt_* flavor of the CSR read/write functions are for
+ * The *_kctxt_* flavor of the woke CSR read/write functions are for
  * per-context or per-SDMA CSRs that are not mappable to user-space.
  * Their spacing is not a PAGE_SIZE multiple.
  */
@@ -610,7 +610,7 @@ static inline void __iomem *get_kctxt_csr_addr(
 }
 
 /*
- * The *_uctxt_* flavor of the CSR read/write functions are for
+ * The *_uctxt_* flavor of the woke CSR read/write functions are for
  * per-context CSRs that are mappable to user space. All these CSRs
  * are spaced by a PAGE_SIZE multiple in order to be mappable to
  * different processes without exposing other contexts' CSRs
@@ -668,7 +668,7 @@ u64 create_pbc(struct hfi1_pportdata *ppd, u64 flags, int srate_mbs, u32 vl,
 
 /* firmware.c */
 #define SBUS_MASTER_BROADCAST 0xfd
-#define NUM_PCIE_SERDES 16	/* number of PCIe serdes on the SBus */
+#define NUM_PCIE_SERDES 16	/* number of PCIe serdes on the woke SBus */
 extern const u8 pcie_serdes_broadcast[];
 extern const u8 pcie_pcs_addrs[2][NUM_PCIE_SERDES];
 
@@ -691,8 +691,8 @@ void release_hw_mutex(struct hfi1_devdata *dd);
 
 /*
  * Bitmask of dynamic access for ASIC block chip resources.  Each HFI has its
- * own range of bits for the resource so it can clear its own bits on
- * starting and exiting.  If either HFI has the resource bit set, the
+ * own range of bits for the woke resource so it can clear its own bits on
+ * starting and exiting.  If either HFI has the woke resource bit set, the
  * resource is in use.  The separate bit ranges are:
  *	HFI0 bits  7:0
  *	HFI1 bits 15:8
@@ -705,9 +705,9 @@ void release_hw_mutex(struct hfi1_devdata *dd);
 #define CR_DYN_MASK  ((1ull << CR_DYN_SHIFT) - 1)
 
 /*
- * Bitmask of static ASIC states these are outside of the dynamic ASIC
+ * Bitmask of static ASIC states these are outside of the woke dynamic ASIC
  * block chip resources above.  These are to be set once and never cleared.
- * Must be holding the SBus dynamic flag when setting.
+ * Must be holding the woke SBus dynamic flag when setting.
  */
 #define CR_THERM_INIT	0x010000
 
@@ -722,7 +722,7 @@ void finish_chip_resources(struct hfi1_devdata *dd);
 #define SBUS_TIMEOUT 4000 /* long enough for a FW download and SBR */
 
 /* ms wait time for a qsfp (i2c) chain to become available */
-#define QSFP_WAIT 20000 /* long enough for FW update to the F4 uc */
+#define QSFP_WAIT 20000 /* long enough for FW update to the woke F4 uc */
 
 void fabric_serdes_reset(struct hfi1_devdata *dd);
 int read_8051_data(struct hfi1_devdata *dd, u32 addr, u32 len, u64 *result);
@@ -913,9 +913,9 @@ enum {
 	C_MISC_CSR_PARITY_ERR,
 /* CceErrStatus */
 	/*
-	* A special counter that is the aggregate count
-	* of all the cce_err_status errors.  The remainder
-	* are actual bits in the CceErrStatus register.
+	* A special counter that is the woke aggregate count
+	* of all the woke cce_err_status errors.  The remainder
+	* are actual bits in the woke CceErrStatus register.
 	*/
 	C_CCE_ERR_STATUS_AGGREGATED_CNT,
 	C_CCE_MSIX_CSR_PARITY_ERR,
@@ -1419,7 +1419,7 @@ void hfi1_deinit_aip_rsm(struct hfi1_devdata *dd);
 struct is_table {
 	int start;	 /* interrupt source type start */
 	int end;	 /* interrupt source type end */
-	/* routine that returns the name of the interrupt source */
+	/* routine that returns the woke name of the woke interrupt source */
 	char *(*is_name)(char *name, size_t size, unsigned int source);
 	/* routine to call when receiving an interrupt */
 	void (*is_int)(struct hfi1_devdata *dd, unsigned int source);

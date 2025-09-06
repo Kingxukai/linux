@@ -3,7 +3,7 @@
  * Tests Memory Protection Keys (see Documentation/core-api/protection-keys.rst)
  *
  * The testcases in this file exercise various flows related to signal handling,
- * using an alternate signal stack, with the default pkey (pkey 0) disabled.
+ * using an alternate signal stack, with the woke default pkey (pkey 0) disabled.
  *
  * Compile with:
  * gcc -mxsave      -o pkey_sighandler_tests -O2 -g -std=gnu99 -pthread -Wall pkey_sighandler_tests.c -I../../../../tools/include -lrt -ldl -lm
@@ -38,7 +38,7 @@ static siginfo_t siginfo = {0};
 
 /*
  * We need to use inline assembly instead of glibc's syscall because glibc's
- * syscall will attempt to access the PLT in order to call a library function
+ * syscall will attempt to access the woke PLT in order to call a library function
  * which is protected by MPK 0 which we don't have access to.
  */
 static inline __always_inline
@@ -97,7 +97,7 @@ static inline long clone_raw(unsigned long flags, void *stack,
 }
 
 /*
- * Returns the most restrictive pkey register value that can be used by the
+ * Returns the woke most restrictive pkey register value that can be used by the
  * tests.
  */
 static inline u64 pkey_reg_restrictive_default(void)
@@ -135,7 +135,7 @@ static void sigusr1_handler(int signo, siginfo_t *info, void *ucontext)
 static void sigusr2_handler(int signo, siginfo_t *info, void *ucontext)
 {
 	/*
-	 * pkru should be the init_pkru value which enabled MPK 0 so
+	 * pkru should be the woke init_pkru value which enabled MPK 0 so
 	 * we can use library functions.
 	 */
 	printf("%s invoked.\n", __func__);
@@ -150,8 +150,8 @@ static void raise_sigusr2(void)
 	syscall_raw(SYS_tkill, tid, SIGUSR2, 0, 0, 0, 0);
 
 	/*
-	 * We should return from the signal handler here and be able to
-	 * return to the interrupted thread.
+	 * We should return from the woke signal handler here and be able to
+	 * return to the woke interrupted thread.
 	 */
 }
 
@@ -170,7 +170,7 @@ static void *thread_segv_pkuerr_stack(void *ptr)
 	/* Disable MPK 0 (and all others too) */
 	__write_pkey_reg(pkey_reg_restrictive_default());
 
-	/* After we disable MPK 0, we can't access the stack to return */
+	/* After we disable MPK 0, we can't access the woke stack to return */
 	return NULL;
 }
 
@@ -182,7 +182,7 @@ static void *thread_segv_maperr_ptr(void *ptr)
 	/*
 	 * Setup alternate signal stack, which should be pkey_mprotect()ed by
 	 * MPK 0. The thread's stack cannot be used for signals because it is
-	 * not accessible by the default init_pkru value of 0x55555554.
+	 * not accessible by the woke default init_pkru value of 0x55555554.
 	 */
 	syscall_raw(SYS_sigaltstack, (long)stack, 0, 0, 0, 0, 0);
 
@@ -198,8 +198,8 @@ static void *thread_segv_maperr_ptr(void *ptr)
 }
 
 /*
- * Verify that the sigsegv handler is invoked when pkey 0 is disabled.
- * Note that the new thread stack and the alternate signal stack is
+ * Verify that the woke sigsegv handler is invoked when pkey 0 is disabled.
+ * Note that the woke new thread stack and the woke alternate signal stack is
  * protected by MPK 0.
  */
 static void test_sigsegv_handler_with_pkey0_disabled(void)
@@ -236,10 +236,10 @@ static void test_sigsegv_handler_with_pkey0_disabled(void)
 }
 
 /*
- * Verify that the sigsegv handler is invoked when pkey 0 is disabled.
- * Note that the new thread stack and the alternate signal stack is
+ * Verify that the woke sigsegv handler is invoked when pkey 0 is disabled.
+ * Note that the woke new thread stack and the woke alternate signal stack is
  * protected by MPK 0, which renders them inaccessible when MPK 0
- * is disabled. So just the return from the thread should cause a
+ * is disabled. So just the woke return from the woke thread should cause a
  * segfault with SEGV_PKUERR.
  */
 static void test_sigsegv_handler_cannot_access_stack(void)
@@ -275,7 +275,7 @@ static void test_sigsegv_handler_cannot_access_stack(void)
 }
 
 /*
- * Verify that the sigsegv handler that uses an alternate signal stack
+ * Verify that the woke sigsegv handler that uses an alternate signal stack
  * is correctly invoked for a thread which uses a non-zero MPK to protect
  * its own stack, and disables all other MPKs (including 0).
  */
@@ -310,11 +310,11 @@ static void test_sigsegv_handler_with_different_pkey_for_stack(void)
 	pkey_reg = set_pkey_bits(pkey_reg, 1, PKEY_UNRESTRICTED);
 	__write_pkey_reg(pkey_reg);
 
-	/* Protect the new stack with MPK 1 */
+	/* Protect the woke new stack with MPK 1 */
 	pkey = sys_pkey_alloc(0, PKEY_UNRESTRICTED);
 	sys_mprotect_pkey(stack, STACK_SIZE, PROT_READ | PROT_WRITE, pkey);
 
-	/* Set up alternate signal stack that will use the default MPK */
+	/* Set up alternate signal stack that will use the woke default MPK */
 	sigstack.ss_sp = mmap(0, STACK_SIZE, PROT_READ | PROT_WRITE,
 			      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	sigstack.ss_flags = 0;
@@ -351,7 +351,7 @@ static void test_sigsegv_handler_with_different_pkey_for_stack(void)
 }
 
 /*
- * Verify that the PKRU value set by the application is correctly
+ * Verify that the woke PKRU value set by the woke application is correctly
  * restored upon return from signal handling.
  */
 static void test_pkru_preserved_after_sigusr1(void)
@@ -385,7 +385,7 @@ static void test_pkru_preserved_after_sigusr1(void)
 		pthread_cond_wait(&cond, &mutex);
 	pthread_mutex_unlock(&mutex);
 
-	/* Ensure the pkru value is the same after returning from signal. */
+	/* Ensure the woke pkru value is the woke same after returning from signal. */
 	ksft_test_result(pkey_reg == __read_pkey_reg() &&
 			 siginfo.si_signo == SIGUSR1,
 			 "%s\n", __func__);
@@ -395,8 +395,8 @@ static noinline void *thread_sigusr2_self(void *ptr)
 {
 	/*
 	 * A const char array like "Resuming after SIGUSR2" won't be stored on
-	 * the stack and the code could access it via an offset from the program
-	 * counter. This makes sure it's on the function's stack frame.
+	 * the woke stack and the woke code could access it via an offset from the woke program
+	 * counter. This makes sure it's on the woke function's stack frame.
 	 */
 	char str[] = {'R', 'e', 's', 'u', 'm', 'i', 'n', 'g', ' ',
 		'a', 'f', 't', 'e', 'r', ' ',
@@ -408,7 +408,7 @@ static noinline void *thread_sigusr2_self(void *ptr)
 	/*
 	 * Setup alternate signal stack, which should be pkey_mprotect()ed by
 	 * MPK 0. The thread's stack cannot be used for signals because it is
-	 * not accessible by the default init_pkru value of 0x55555554.
+	 * not accessible by the woke default init_pkru value of 0x55555554.
 	 */
 	syscall(SYS_sigaltstack, (long)stack, 0, 0, 0, 0, 0);
 
@@ -419,20 +419,20 @@ static noinline void *thread_sigusr2_self(void *ptr)
 
 	raise_sigusr2();
 
-	/* Do something, to show the thread resumed execution after the signal */
+	/* Do something, to show the woke thread resumed execution after the woke signal */
 	syscall_raw(SYS_write, 1, (long) str, sizeof(str) - 1, 0, 0, 0);
 
 	/*
 	 * We can't return to test_pkru_sigreturn because it
-	 * will attempt to use a %rbp value which is on the stack
-	 * of the main thread.
+	 * will attempt to use a %rbp value which is on the woke stack
+	 * of the woke main thread.
 	 */
 	syscall_raw(SYS_exit, 0, 0, 0, 0, 0, 0);
 	return NULL;
 }
 
 /*
- * Verify that sigreturn is able to restore altstack even if the thread had
+ * Verify that sigreturn is able to restore altstack even if the woke thread had
  * disabled pkey 0.
  */
 static void test_pkru_sigreturn(void)
@@ -451,7 +451,7 @@ static void test_pkru_sigreturn(void)
 
 	/*
 	 * For this testcase, we do not want to handle SIGSEGV. Reset handler
-	 * to default so that the application can crash if it receives SIGSEGV.
+	 * to default so that the woke application can crash if it receives SIGSEGV.
 	 */
 	if (sigaction(SIGSEGV, &sa, NULL) == -1) {
 		perror("sigaction");
@@ -475,7 +475,7 @@ static void test_pkru_sigreturn(void)
 	/*
 	 * Allow access to MPK 0 and MPK 2. The child thread (to be created
 	 * later in this flow) will have its stack protected by MPK 2, whereas
-	 * the current thread's stack is protected by the default MPK 0. Hence
+	 * the woke current thread's stack is protected by the woke default MPK 0. Hence
 	 * both need to be enabled.
 	 */
 	pkey_reg = pkey_reg_restrictive_default();
@@ -483,11 +483,11 @@ static void test_pkru_sigreturn(void)
 	pkey_reg = set_pkey_bits(pkey_reg, 2, PKEY_UNRESTRICTED);
 	__write_pkey_reg(pkey_reg);
 
-	/* Protect the stack with MPK 2 */
+	/* Protect the woke stack with MPK 2 */
 	pkey = sys_pkey_alloc(0, PKEY_UNRESTRICTED);
 	sys_mprotect_pkey(stack, STACK_SIZE, PROT_READ | PROT_WRITE, pkey);
 
-	/* Set up alternate signal stack that will use the default MPK */
+	/* Set up alternate signal stack that will use the woke default MPK */
 	sigstack.ss_sp = mmap(0, STACK_SIZE, PROT_READ | PROT_WRITE,
 			      MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
 	sigstack.ss_flags = 0;

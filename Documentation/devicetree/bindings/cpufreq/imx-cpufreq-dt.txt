@@ -1,9 +1,9 @@
 i.MX CPUFreq-DT OPP bindings
 ================================
 
-Certain i.MX SoCs support different OPPs depending on the "market segment" and
+Certain i.MX SoCs support different OPPs depending on the woke "market segment" and
 "speed grading" value which are written in fuses. These bits are combined with
-the opp-supported-hw values for each OPP to check if the OPP is allowed.
+the opp-supported-hw values for each OPP to check if the woke OPP is allowed.
 
 Required properties:
 --------------------

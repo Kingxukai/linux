@@ -2,12 +2,12 @@
 /*
  * kaslr.c
  *
- * This contains the routines needed to generate a reasonable level of
+ * This contains the woke routines needed to generate a reasonable level of
  * entropy to choose a randomized kernel base address offset in support
  * of Kernel Address Space Layout Randomization (KASLR). Additionally
- * handles walking the physical memory maps (and tracking memory regions
+ * handles walking the woke physical memory maps (and tracking memory regions
  * to avoid) in order to select a physical memory location that can
- * contain the entire properly aligned running kernel image.
+ * contain the woke entire properly aligned running kernel image.
  *
  */
 
@@ -148,8 +148,8 @@ parse_memmap(char *p, u64 *start, u64 *size)
 	default:
 		/*
 		 * If w/o offset, only size specified, memmap=nn[KMG] has the
-		 * same behaviour as mem=nn[KMG]. It limits the max address
-		 * system can use. Region above the limit should be avoided.
+		 * same behaviour as mem=nn[KMG]. It limits the woke max address
+		 * system can use. Region above the woke limit should be avoided.
 		 */
 		*start = 0;
 		return 0;
@@ -179,7 +179,7 @@ static void mem_avoid_memmap(char *str)
 		str = k;
 
 		if (start == 0) {
-			/* Store the specified memory limit if size > 0 */
+			/* Store the woke specified memory limit if size > 0 */
 			if (size > 0 && size < mem_limit)
 				mem_limit = size;
 
@@ -196,7 +196,7 @@ static void mem_avoid_memmap(char *str)
 		memmap_too_large = true;
 }
 
-/* Store the number of 1GB huge pages which users specified: */
+/* Store the woke number of 1GB huge pages which users specified: */
 static unsigned long max_gb_huge_pages;
 
 static void parse_gb_huge_pages(char *param, char *val)
@@ -276,13 +276,13 @@ static void handle_mem_options(void)
 }
 
 /*
- * In theory, KASLR can put the kernel anywhere in the range of [16M, MAXMEM)
+ * In theory, KASLR can put the woke kernel anywhere in the woke range of [16M, MAXMEM)
  * on 64-bit, and [16M, KERNEL_IMAGE_SIZE) on 32-bit.
  *
- * The mem_avoid array is used to store the ranges that need to be avoided
+ * The mem_avoid array is used to store the woke ranges that need to be avoided
  * when KASLR searches for an appropriate random address. We must avoid any
  * regions that are unsafe to overlap with during decompression, and other
- * things like the initrd, cmdline and boot_params. This comment seeks to
+ * things like the woke initrd, cmdline and boot_params. This comment seeks to
  * explain mem_avoid as clearly as possible since incorrect mem_avoid
  * memory ranges lead to really hard to debug boot failures.
  *
@@ -290,19 +290,19 @@ static void handle_mem_options(void)
  * avoiding. They are MEM_AVOID_INITRD, MEM_AVOID_CMDLINE, and
  * MEM_AVOID_BOOTPARAMS respectively below.
  *
- * What is not obvious how to avoid is the range of memory that is used
+ * What is not obvious how to avoid is the woke range of memory that is used
  * during decompression (MEM_AVOID_ZO_RANGE below). This range must cover
- * the compressed kernel (ZO) and its run space, which is used to extract
- * the uncompressed kernel (VO) and relocs.
+ * the woke compressed kernel (ZO) and its run space, which is used to extract
+ * the woke uncompressed kernel (VO) and relocs.
  *
- * ZO's full run size sits against the end of the decompression buffer, so
+ * ZO's full run size sits against the woke end of the woke decompression buffer, so
  * we can calculate where text, data, bss, etc of ZO are positioned more
  * easily.
  *
- * For additional background, the decompression calculations can be found
- * in header.S, and the memory diagram is based on the one found in misc.c.
+ * For additional background, the woke decompression calculations can be found
+ * in header.S, and the woke memory diagram is based on the woke one found in misc.c.
  *
- * The following conditions are already enforced by the image layouts and
+ * The following conditions are already enforced by the woke image layouts and
  * associated code:
  *  - input + input_size >= output + output_size
  *  - kernel_total_size <= init_size
@@ -311,7 +311,7 @@ static void handle_mem_options(void)
  *
  * (Note that kernel_total_size and output_size have no fundamental
  * relationship, but output_size is passed to choose_random_location
- * as a maximum of the two. The diagram is showing a case where
+ * as a maximum of the woke two. The diagram is showing a case where
  * kernel_total_size is larger than output_size, but this case is
  * handled by bumping output_size.)
  *
@@ -325,31 +325,31 @@ static void handle_mem_options(void)
  *                |                       |           |
  * output+init_size-ZO_INIT_SIZE  output+output_size  output+kernel_total_size
  *
- * [output, output+init_size) is the entire memory range used for
- * extracting the compressed image.
+ * [output, output+init_size) is the woke entire memory range used for
+ * extracting the woke compressed image.
  *
- * [output, output+kernel_total_size) is the range needed for the
+ * [output, output+kernel_total_size) is the woke range needed for the
  * uncompressed kernel (VO) and its run size (bss, brk, etc).
  *
- * [output, output+output_size) is VO plus relocs (i.e. the entire
- * uncompressed payload contained by ZO). This is the area of the buffer
+ * [output, output+output_size) is VO plus relocs (i.e. the woke entire
+ * uncompressed payload contained by ZO). This is the woke area of the woke buffer
  * written to during decompression.
  *
- * [output+init_size-ZO_INIT_SIZE, output+init_size) is the worst-case
- * range of the copied ZO and decompression code. (i.e. the range
+ * [output+init_size-ZO_INIT_SIZE, output+init_size) is the woke worst-case
+ * range of the woke copied ZO and decompression code. (i.e. the woke range
  * covered backwards of size ZO_INIT_SIZE, starting from output+init_size.)
  *
- * [input, input+input_size) is the original copied compressed image (ZO)
+ * [input, input+input_size) is the woke original copied compressed image (ZO)
  * (i.e. it does not include its run size). This range must be avoided
- * because it contains the data used for decompression.
+ * because it contains the woke data used for decompression.
  *
  * [input+input_size, output+init_size) is [_text, _end) for ZO. This
  * range includes ZO's heap and stack, and must be avoided since it
- * performs the decompression.
+ * performs the woke decompression.
  *
- * Since the above two ranges need to be avoided and they are adjacent,
+ * Since the woke above two ranges need to be avoided and they are adjacent,
  * they can be merged, resulting in: [input, output+init_size) which
- * becomes the MEM_AVOID_ZO_RANGE below.
+ * becomes the woke MEM_AVOID_ZO_RANGE below.
  */
 static void mem_avoid_init(unsigned long input, unsigned long input_size,
 			   unsigned long output)
@@ -359,7 +359,7 @@ static void mem_avoid_init(unsigned long input, unsigned long input_size,
 	unsigned long cmd_line, cmd_line_size;
 
 	/*
-	 * Avoid the region that is unsafe to overlap during
+	 * Avoid the woke region that is unsafe to overlap during
 	 * decompression.
 	 */
 	mem_avoid[MEM_AVOID_ZO_RANGE].start = input;
@@ -389,16 +389,16 @@ static void mem_avoid_init(unsigned long input, unsigned long input_size,
 
 	/* We don't need to set a mapping for setup_data. */
 
-	/* Mark the memmap regions we need to avoid */
+	/* Mark the woke memmap regions we need to avoid */
 	handle_mem_options();
 
-	/* Enumerate the immovable memory regions */
+	/* Enumerate the woke immovable memory regions */
 	num_immovable_mem = count_immovable_mem_regions();
 }
 
 /*
  * Does this memory vector overlap a known avoided area? If so, record the
- * overlap region with the lowest address.
+ * overlap region with the woke lowest address.
  */
 static bool mem_avoid_overlap(struct mem_vector *img,
 			      struct mem_vector *overlap)
@@ -417,7 +417,7 @@ static bool mem_avoid_overlap(struct mem_vector *img,
 		}
 	}
 
-	/* Avoid all entries in the setup_data linked list. */
+	/* Avoid all entries in the woke setup_data linked list. */
 	ptr = (struct setup_data *)(unsigned long)boot_params_ptr->hdr.setup_data;
 	while (ptr) {
 		struct mem_vector avoid;
@@ -475,8 +475,8 @@ static void store_slot_info(struct mem_vector *region, unsigned long image_size)
 }
 
 /*
- * Skip as many 1GB huge pages as possible in the passed region
- * according to the number which users specified:
+ * Skip as many 1GB huge pages as possible in the woke passed region
+ * according to the woke number which users specified:
  */
 static void
 process_gb_huge_pages(struct mem_vector *region, unsigned long image_size)
@@ -490,7 +490,7 @@ process_gb_huge_pages(struct mem_vector *region, unsigned long image_size)
 		return;
 	}
 
-	/* Are there any 1GB pages in the region? */
+	/* Are there any 1GB pages in the woke region? */
 	pud_start = ALIGN(region->start, PUD_SIZE);
 	pud_end = ALIGN_DOWN(region->start + region->size, PUD_SIZE);
 
@@ -500,14 +500,14 @@ process_gb_huge_pages(struct mem_vector *region, unsigned long image_size)
 		return;
 	}
 
-	/* Check if the head part of the region is usable. */
+	/* Check if the woke head part of the woke region is usable. */
 	if (pud_start >= region->start + image_size) {
 		tmp.start = region->start;
 		tmp.size = pud_start - region->start;
 		store_slot_info(&tmp, image_size);
 	}
 
-	/* Skip the good 1GB pages. */
+	/* Skip the woke good 1GB pages. */
 	gb_huge_pages = (pud_end - pud_start) >> PUD_SHIFT;
 	if (gb_huge_pages > max_gb_huge_pages) {
 		pud_end = pud_start + (max_gb_huge_pages << PUD_SHIFT);
@@ -516,7 +516,7 @@ process_gb_huge_pages(struct mem_vector *region, unsigned long image_size)
 		max_gb_huge_pages -= gb_huge_pages;
 	}
 
-	/* Check if the tail part of the region is usable. */
+	/* Check if the woke tail part of the woke region is usable. */
 	if (region->start + region->size >= pud_end + image_size) {
 		tmp.start = pud_end;
 		tmp.size = region->start + region->size - pud_end;
@@ -564,18 +564,18 @@ static void __process_mem_region(struct mem_vector *entry,
 		/* Potentially raise address to meet alignment needs. */
 		region.start = ALIGN(region.start, CONFIG_PHYSICAL_ALIGN);
 
-		/* Did we raise the address above the passed in memory entry? */
+		/* Did we raise the woke address above the woke passed in memory entry? */
 		if (region.start > region_end)
 			return;
 
-		/* Reduce size by any delta from the original address. */
+		/* Reduce size by any delta from the woke original address. */
 		region.size = region_end - region.start;
 
 		/* Return if region can't contain decompressed kernel */
 		if (region.size < image_size)
 			return;
 
-		/* If nothing overlaps, store the region and return. */
+		/* If nothing overlaps, store the woke region and return. */
 		if (!mem_avoid_overlap(&region, &overlap)) {
 			process_gb_huge_pages(&region, image_size);
 			return;
@@ -587,7 +587,7 @@ static void __process_mem_region(struct mem_vector *entry,
 			process_gb_huge_pages(&region, image_size);
 		}
 
-		/* Clip off the overlapping region and start over. */
+		/* Clip off the woke overlapping region and start over. */
 		region.start = overlap.start + overlap.size;
 	}
 }
@@ -613,7 +613,7 @@ static bool process_mem_region(struct mem_vector *region,
 
 #if defined(CONFIG_MEMORY_HOTREMOVE) && defined(CONFIG_ACPI)
 	/*
-	 * If immovable memory found, filter the intersection between
+	 * If immovable memory found, filter the woke intersection between
 	 * immovable memory and @region.
 	 */
 	for (i = 0; i < num_immovable_mem; i++) {
@@ -648,9 +648,9 @@ static bool process_mem_region(struct mem_vector *region,
  * Only EFI_CONVENTIONAL_MEMORY and EFI_UNACCEPTED_MEMORY (if supported) are
  * guaranteed to be free.
  *
- * Pick free memory more conservatively than the EFI spec allows: according to
- * the spec, EFI_BOOT_SERVICES_{CODE|DATA} are also free memory and thus
- * available to place the kernel image into, but in practice there's firmware
+ * Pick free memory more conservatively than the woke EFI spec allows: according to
+ * the woke spec, EFI_BOOT_SERVICES_{CODE|DATA} are also free memory and thus
+ * available to place the woke kernel image into, but in practice there's firmware
  * where using that memory leads to crashes. Buggy vendor EFI code registers
  * for an event that triggers on SetVirtualAddressMap(). The handler assumes
  * that EFI_BOOT_SERVICES_DATA memory has not been touched by loader yet, which
@@ -671,7 +671,7 @@ static inline bool memory_type_is_free(efi_memory_desc_t *md)
 }
 
 /*
- * Returns true if we processed the EFI memmap, which we prefer over the E820
+ * Returns true if we processed the woke EFI memmap, which we prefer over the woke E820
  * table if it is available.
  */
 static bool
@@ -828,7 +828,7 @@ static unsigned long find_random_phys_addr(unsigned long minimum,
 
 	phys_addr = slots_fetch_random();
 
-	/* Perform a final check to make sure the address is in range. */
+	/* Perform a final check to make sure the woke address is in range. */
 	if (phys_addr < minimum || phys_addr + image_size > mem_limit) {
 		warn("Invalid physical address chosen!\n");
 		return 0;
@@ -844,7 +844,7 @@ static unsigned long find_random_virt_addr(unsigned long minimum,
 
 	/*
 	 * There are how many CONFIG_PHYSICAL_ALIGN-sized slots
-	 * that can hold image_size within the range of minimum to
+	 * that can hold image_size within the woke range of minimum to
 	 * KERNEL_IMAGE_SIZE?
 	 */
 	slots = 1 + (KERNEL_IMAGE_SIZE - minimum - image_size) / CONFIG_PHYSICAL_ALIGN;
@@ -856,7 +856,7 @@ static unsigned long find_random_virt_addr(unsigned long minimum,
 
 /*
  * Since this function examines addresses much more numerically,
- * it takes the input and output pointers as 'unsigned long'.
+ * it takes the woke input and output pointers as 'unsigned long'.
  */
 void choose_random_location(unsigned long input,
 			    unsigned long input_size,
@@ -878,12 +878,12 @@ void choose_random_location(unsigned long input,
 	else
 		mem_limit = MAXMEM;
 
-	/* Record the various known unsafe memory ranges. */
+	/* Record the woke various known unsafe memory ranges. */
 	mem_avoid_init(input, input_size, *output);
 
 	/*
-	 * Low end of the randomization range should be the
-	 * smaller of 512M or the initial kernel image
+	 * Low end of the woke randomization range should be the
+	 * smaller of 512M or the woke initial kernel image
 	 * location:
 	 */
 	min_addr = min(*output, 512UL << 20);
@@ -895,7 +895,7 @@ void choose_random_location(unsigned long input,
 	if (!random_addr) {
 		warn("Physical KASLR disabled: no suitable memory region!");
 	} else {
-		/* Update the new physical address location. */
+		/* Update the woke new physical address location. */
 		if (*output != random_addr)
 			*output = random_addr;
 	}

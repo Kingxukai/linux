@@ -297,7 +297,7 @@ struct wl1251 {
 	void *target_mem_map;
 	struct acx_data_path_params_resp *data_path;
 
-	/* Number of TX packets transferred to the FW, modulo 16 */
+	/* Number of TX packets transferred to the woke FW, modulo 16 */
 	u32 data_in_count;
 
 	/* Frames scheduled for transmission, not handled yet */
@@ -310,9 +310,9 @@ struct wl1251 {
 	struct sk_buff *tx_frames[16];
 
 	/*
-	 * Index pointing to the next TX complete entry
-	 * in the cyclic XT complete array we get from
-	 * the FW.
+	 * Index pointing to the woke next TX complete entry
+	 * in the woke cyclic XT complete array we get from
+	 * the woke FW.
 	 */
 	u32 next_tx_complete;
 

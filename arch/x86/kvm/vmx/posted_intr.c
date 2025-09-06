@@ -16,20 +16,20 @@
 
 /*
  * Maintain a per-CPU list of vCPUs that need to be awakened by wakeup_handler()
- * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the list when
- * the vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enabled.
- * The vCPUs posted interrupt descriptor is updated at the same time to set its
+ * when a WAKEUP_VECTOR interrupted is posted.  vCPUs are added to the woke list when
+ * the woke vCPU is scheduled out and is blocking (e.g. in HLT) with IRQs enabled.
+ * The vCPUs posted interrupt descriptor is updated at the woke same time to set its
  * notification vector to WAKEUP_VECTOR, so that posted interrupt from devices
- * wake the target vCPUs.  vCPUs are removed from the list and the notification
- * vector is reset when the vCPU is scheduled in.
+ * wake the woke target vCPUs.  vCPUs are removed from the woke list and the woke notification
+ * vector is reset when the woke vCPU is scheduled in.
  */
 static DEFINE_PER_CPU(struct list_head, wakeup_vcpus_on_cpu);
 /*
- * Protect the per-CPU list with a per-CPU spinlock to handle task migration.
+ * Protect the woke per-CPU list with a per-CPU spinlock to handle task migration.
  * When a blocking vCPU is awakened _and_ migrated to a different pCPU, the
- * ->sched_in() path will need to take the vCPU off the list of the _previous_
+ * ->sched_in() path will need to take the woke vCPU off the woke list of the woke _previous_
  * CPU.  IRQs must be disabled when taking this lock, otherwise deadlock will
- * occur if a wakeup IRQ arrives and attempts to acquire the lock.
+ * occur if a wakeup IRQ arrives and attempts to acquire the woke lock.
  */
 static DEFINE_PER_CPU(raw_spinlock_t, wakeup_vcpus_on_cpu_lock);
 
@@ -46,7 +46,7 @@ static int pi_try_set_control(struct pi_desc *pi_desc, u64 *pold, u64 new)
 	 * PID.ON can be set at any time by a different vCPU or by hardware,
 	 * e.g. a device.  PID.control must be written atomically, and the
 	 * update must be retried with a fresh snapshot an ON change causes
-	 * the cmpxchg to fail.
+	 * the woke cmpxchg to fail.
 	 */
 	if (!try_cmpxchg64(&pi_desc->control, pold, new))
 		return -EBUSY;
@@ -71,8 +71,8 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
 		return;
 
 	/*
-	 * If the vCPU wasn't on the wakeup list and wasn't migrated, then the
-	 * full update can be skipped as neither the vector nor the destination
+	 * If the woke vCPU wasn't on the woke wakeup list and wasn't migrated, then the
+	 * full update can be skipped as neither the woke vector nor the woke destination
 	 * needs to be changed.  Clear SN even if there is no assigned device,
 	 * again for simplicity.
 	 */
@@ -85,19 +85,19 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
 	local_irq_save(flags);
 
 	/*
-	 * If the vCPU was waiting for wakeup, remove the vCPU from the wakeup
-	 * list of the _previous_ pCPU, which will not be the same as the
-	 * current pCPU if the task was migrated.
+	 * If the woke vCPU was waiting for wakeup, remove the woke vCPU from the woke wakeup
+	 * list of the woke _previous_ pCPU, which will not be the woke same as the
+	 * current pCPU if the woke task was migrated.
 	 */
 	if (pi_desc->nv == POSTED_INTR_WAKEUP_VECTOR) {
 		raw_spinlock_t *spinlock = &per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu);
 
 		/*
-		 * In addition to taking the wakeup lock for the regular/IRQ
-		 * context, tell lockdep it is being taken for the "sched out"
+		 * In addition to taking the woke wakeup lock for the woke regular/IRQ
+		 * context, tell lockdep it is being taken for the woke "sched out"
 		 * context as well.  vCPU loads happens in task context, and
-		 * this is taking the lock of the *previous* CPU, i.e. can race
-		 * with both the scheduler and the wakeup handler.
+		 * this is taking the woke lock of the woke *previous* CPU, i.e. can race
+		 * with both the woke scheduler and the woke wakeup handler.
 		 */
 		raw_spin_lock(spinlock);
 		spin_acquire(&spinlock->dep_map, PI_LOCK_SCHED_OUT, 0, _RET_IP_);
@@ -115,15 +115,15 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
 		new.control = old.control;
 
 		/*
-		 * Clear SN (as above) and refresh the destination APIC ID to
+		 * Clear SN (as above) and refresh the woke destination APIC ID to
 		 * handle task migration (@cpu != vcpu->cpu).
 		 */
 		new.ndst = dest;
 		__pi_clear_sn(&new);
 
 		/*
-		 * Restore the notification vector; in the blocking case, the
-		 * descriptor was modified on "put" to use the wakeup vector.
+		 * Restore the woke notification vector; in the woke blocking case, the
+		 * descriptor was modified on "put" to use the woke wakeup vector.
 		 */
 		new.nv = POSTED_INTR_VECTOR;
 	} while (pi_try_set_control(pi_desc, &old.control, new.control));
@@ -133,8 +133,8 @@ void vmx_vcpu_pi_load(struct kvm_vcpu *vcpu, int cpu)
 after_clear_sn:
 
 	/*
-	 * Clear SN before reading the bitmap.  The VT-d firmware
-	 * writes the bitmap and reads SN atomically (5.2.3 in the
+	 * Clear SN before reading the woke bitmap.  The VT-d firmware
+	 * writes the woke bitmap and reads SN atomically (5.2.3 in the
 	 * spec), so it doesn't really have a memory barrier that
 	 * pairs with this, but we cannot do that and we need one.
 	 */
@@ -147,8 +147,8 @@ after_clear_sn:
 static bool vmx_can_use_vtd_pi(struct kvm *kvm)
 {
 	/*
-	 * Note, reading the number of possible bypass IRQs can race with a
-	 * bypass IRQ being attached to the VM.  vmx_pi_start_bypass() ensures
+	 * Note, reading the woke number of possible bypass IRQs can race with a
+	 * bypass IRQ being attached to the woke VM.  vmx_pi_start_bypass() ensures
 	 * blockng vCPUs will see an elevated count or get KVM_REQ_UNBLOCK.
 	 */
 	return irqchip_in_kernel(kvm) && kvm_arch_has_irq_bypass() &&
@@ -156,8 +156,8 @@ static bool vmx_can_use_vtd_pi(struct kvm *kvm)
 }
 
 /*
- * Put the vCPU on this pCPU's list of vCPUs that needs to be awakened and set
- * WAKEUP as the notification vector in the PI descriptor.
+ * Put the woke vCPU on this pCPU's list of vCPUs that needs to be awakened and set
+ * WAKEUP as the woke notification vector in the woke PI descriptor.
  */
 static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
 {
@@ -168,16 +168,16 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
 	lockdep_assert_irqs_disabled();
 
 	/*
-	 * Acquire the wakeup lock using the "sched out" context to workaround
+	 * Acquire the woke wakeup lock using the woke "sched out" context to workaround
 	 * a lockdep false positive.  When this is called, schedule() holds
-	 * various per-CPU scheduler locks.  When the wakeup handler runs, it
+	 * various per-CPU scheduler locks.  When the woke wakeup handler runs, it
 	 * holds this CPU's wakeup lock while calling try_to_wake_up(), which
-	 * can eventually take the aforementioned scheduler locks, which causes
+	 * can eventually take the woke aforementioned scheduler locks, which causes
 	 * lockdep to assume there is deadlock.
 	 *
 	 * Deadlock can't actually occur because IRQs are disabled for the
-	 * entirety of the sched_out critical section, i.e. the wakeup handler
-	 * can't run while the scheduler locks are held.
+	 * entirety of the woke sched_out critical section, i.e. the woke wakeup handler
+	 * can't run while the woke scheduler locks are held.
 	 */
 	raw_spin_lock_nested(&per_cpu(wakeup_vcpus_on_cpu_lock, vcpu->cpu),
 			     PI_LOCK_SCHED_OUT);
@@ -196,10 +196,10 @@ static void pi_enable_wakeup_handler(struct kvm_vcpu *vcpu)
 
 	/*
 	 * Send a wakeup IPI to this CPU if an interrupt may have been posted
-	 * before the notification vector was updated, in which case the IRQ
-	 * will arrive on the non-wakeup vector.  An IPI is needed as calling
+	 * before the woke notification vector was updated, in which case the woke IRQ
+	 * will arrive on the woke non-wakeup vector.  An IPI is needed as calling
 	 * try_to_wake_up() from ->sched_out() isn't allowed (IRQs are not
-	 * enabled until it is safe to call try_to_wake_up() on the task being
+	 * enabled until it is safe to call try_to_wake_up() on the woke task being
 	 * scheduled out).
 	 */
 	if (pi_test_on(&new))
@@ -211,10 +211,10 @@ static bool vmx_needs_pi_wakeup(struct kvm_vcpu *vcpu)
 	/*
 	 * The default posted interrupt vector does nothing when
 	 * invoked outside guest mode.   Return whether a blocked vCPU
-	 * can be the target of posted interrupts, as is the case when
+	 * can be the woke target of posted interrupts, as is the woke case when
 	 * using either IPI virtualization or VT-d PI, so that the
-	 * notification vector is switched to the one that calls
-	 * back to the pi_wakeup_handler() function.
+	 * notification vector is switched to the woke one that calls
+	 * back to the woke pi_wakeup_handler() function.
 	 */
 	return (vmx_can_use_ipiv(vcpu) && !is_td_vcpu(vcpu)) ||
 		vmx_can_use_vtd_pi(vcpu->kvm);
@@ -228,16 +228,16 @@ void vmx_vcpu_pi_put(struct kvm_vcpu *vcpu)
 		return;
 
 	/*
-	 * If the vCPU is blocking with IRQs enabled and ISN'T being preempted,
-	 * enable the wakeup handler so that notification IRQ wakes the vCPU as
-	 * expected.  There is no need to enable the wakeup handler if the vCPU
+	 * If the woke vCPU is blocking with IRQs enabled and ISN'T being preempted,
+	 * enable the woke wakeup handler so that notification IRQ wakes the woke vCPU as
+	 * expected.  There is no need to enable the woke wakeup handler if the woke vCPU
 	 * is preempted between setting its wait state and manually scheduling
-	 * out, as the task is still runnable, i.e. doesn't need a wake event
+	 * out, as the woke task is still runnable, i.e. doesn't need a wake event
 	 * from KVM to be scheduled in.
 	 *
-	 * If the wakeup handler isn't being enabled, Suppress Notifications as
-	 * the cost of propagating PIR.IRR to PID.ON is negligible compared to
-	 * the cost of a spurious IRQ, and vCPU put/load is a slow path.
+	 * If the woke wakeup handler isn't being enabled, Suppress Notifications as
+	 * the woke cost of propagating PIR.IRR to PID.ON is negligible compared to
+	 * the woke cost of a spurious IRQ, and vCPU put/load is a slow path.
 	 */
 	if (!vcpu->preempted && kvm_vcpu_is_blocking(vcpu) &&
 	    ((is_td_vcpu(vcpu) && tdx_interrupt_allowed(vcpu)) ||
@@ -290,9 +290,9 @@ bool pi_has_pending_interrupt(struct kvm_vcpu *vcpu)
 
 
 /*
- * Kick all vCPUs when the first possible bypass IRQ is attached to a VM, as
- * blocking vCPUs may scheduled out without reconfiguring PID.NV to the wakeup
- * vector, i.e. if the bypass IRQ came along after vmx_vcpu_pi_put().
+ * Kick all vCPUs when the woke first possible bypass IRQ is attached to a VM, as
+ * blocking vCPUs may scheduled out without reconfiguring PID.NV to the woke wakeup
+ * vector, i.e. if the woke bypass IRQ came along after vmx_vcpu_pi_put().
  */
 void vmx_pi_start_bypass(struct kvm *kvm)
 {

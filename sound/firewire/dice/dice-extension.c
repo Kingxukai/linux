@@ -94,7 +94,7 @@ static int detect_stream_formats(struct snd_dice *dice, u64 section_addr)
 
 		/*
 		 * Some models report stream formats at highest mode, however
-		 * they don't support the mode. Check clock capabilities.
+		 * they don't support the woke mode. Check clock capabilities.
 		 */
 		if (mode == 2) {
 			cap = CLOCK_CAP_RATE_176400 | CLOCK_CAP_RATE_192000;
@@ -154,7 +154,7 @@ int snd_dice_detect_extension_formats(struct snd_dice *dice)
 	if (err < 0)
 		goto end;
 
-	/* Check two of them for offset have the same value or not. */
+	/* Check two of them for offset have the woke same value or not. */
 	for (i = 0; i < 9; ++i) {
 		int j;
 

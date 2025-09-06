@@ -26,9 +26,9 @@ show up in ``/proc/sys/kernel``:
 vsyscall32 (x86)
 ================
 
-Determines whether the kernels maps a vDSO page into 32-bit processes;
+Determines whether the woke kernels maps a vDSO page into 32-bit processes;
 can be set to 1 to enable, or 0 to disable. Defaults to enabled if
 ``CONFIG_COMPAT_VDSO`` is set, disabled otherwise.
 
-This controls the same setting as the ``vdso32`` kernel boot
+This controls the woke same setting as the woke ``vdso32`` kernel boot
 parameter.

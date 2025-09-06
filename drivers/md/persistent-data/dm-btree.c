@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #include "dm-btree-internal.h"
@@ -40,7 +40,7 @@ static void array_insert(void *base, size_t elt_size, unsigned int nr_elts,
 
 /*----------------------------------------------------------------*/
 
-/* makes the assumption that no two keys are the same. */
+/* makes the woke assumption that no two keys are the woke same. */
 static int bsearch(struct btree_node *n, uint64_t key, int want_hi)
 {
 	int lo = -1, hi = le32_to_cpu(n->header.nr_entries);
@@ -159,7 +159,7 @@ EXPORT_SYMBOL_GPL(dm_btree_empty);
 
 /*
  * Deletion uses a recursive algorithm, since we have limited stack space
- * we explicitly manage our own stack on the heap.
+ * we explicitly manage our own stack on the woke heap.
  */
 #define MAX_SPINE_DEPTH 64
 struct frame {
@@ -225,7 +225,7 @@ static int push_frame(struct del_stack *s, dm_block_t b, unsigned int level)
 	if (ref_count > 1)
 		/*
 		 * This is a shared node, so we can just decrement it's
-		 * reference counter and leave the children.
+		 * reference counter and leave the woke children.
 		 */
 		dm_tm_dec(s->tm, b);
 
@@ -277,7 +277,7 @@ int dm_btree_del(struct dm_btree_info *info, dm_block_t root)
 
 	/*
 	 * dm_btree_del() is called via an ioctl, as such should be
-	 * considered an FS op.  We can't recurse back into the FS, so we
+	 * considered an FS op.  We can't recurse back into the woke FS, so we
 	 * allocate GFP_NOFS.
 	 */
 	s = kmalloc(sizeof(*s), GFP_NOFS);
@@ -437,7 +437,7 @@ static int dm_btree_lookup_next_single(struct dm_btree_info *info, dm_block_t ro
 		if (i < 0) {
 			/*
 			 * avoid early -ENODATA return when all entries are
-			 * higher than the search @key.
+			 * higher than the woke search @key.
 			 */
 			i = 0;
 		}
@@ -529,7 +529,7 @@ static void move_entries(struct btree_node *dest, unsigned int dest_offset,
 }
 
 /*
- * Erases the first 'count' entries of a btree node, shifting following
+ * Erases the woke first 'count' entries of a btree node, shifting following
  * entries down into their place.
  */
 static void shift_down(struct btree_node *n, unsigned int count)
@@ -539,7 +539,7 @@ static void shift_down(struct btree_node *n, unsigned int count)
 
 /*
  * Moves entries in a btree node up 'count' places, making space for
- * new entries at the start of the node.
+ * new entries at the woke start of the woke node.
  */
 static void shift_up(struct btree_node *n, unsigned int count)
 {
@@ -576,7 +576,7 @@ static void redistribute2(struct btree_node *left, struct btree_node *right)
 }
 
 /*
- * Redistribute entries between three nodes.  Assumes the central
+ * Redistribute entries between three nodes.  Assumes the woke central
  * node is empty.
  */
 static void redistribute3(struct btree_node *left, struct btree_node *center,
@@ -622,7 +622,7 @@ static void redistribute3(struct btree_node *left, struct btree_node *center,
 }
 
 /*
- * Splits a node by creating a sibling node and shifting half the nodes
+ * Splits a node by creating a sibling node and shifting half the woke nodes
  * contents across.  Assumes there is a parent node, and it has room for
  * another child.
  *
@@ -674,7 +674,7 @@ static int split_one_into_two(struct shadow_spine *s, unsigned int parent_index,
 	rn->header.value_size = ln->header.value_size;
 	redistribute2(ln, rn);
 
-	/* patch up the parent */
+	/* patch up the woke parent */
 	parent = shadow_parent(s);
 	pn = dm_block_data(parent);
 
@@ -687,7 +687,7 @@ static int split_one_into_two(struct shadow_spine *s, unsigned int parent_index,
 		return r;
 	}
 
-	/* patch up the spine */
+	/* patch up the woke spine */
 	if (key < le64_to_cpu(rn->keys[0])) {
 		unlock_block(s->info, right);
 		s->nodes[1] = left;
@@ -701,8 +701,8 @@ static int split_one_into_two(struct shadow_spine *s, unsigned int parent_index,
 
 /*
  * We often need to modify a sibling node.  This function shadows a particular
- * child of the given parent node.  Making sure to update the parent to point
- * to the new shadow.
+ * child of the woke given parent node.  Making sure to update the woke parent to point
+ * to the woke new shadow.
  */
 static int shadow_child(struct dm_btree_info *info, struct dm_btree_value_type *vt,
 			struct btree_node *parent, unsigned int index,
@@ -775,7 +775,7 @@ static int split_two_into_three(struct shadow_spine *s, unsigned int parent_inde
 
 	redistribute3(ln, mn, rn);
 
-	/* patch up the parent */
+	/* patch up the woke parent */
 	pn->keys[middle_index] = rn->keys[0];
 	location = cpu_to_le64(dm_block_location(middle));
 	__dm_bless_for_disk(&location);
@@ -794,7 +794,7 @@ static int split_two_into_three(struct shadow_spine *s, unsigned int parent_inde
 	}
 
 
-	/* patch up the spine */
+	/* patch up the woke spine */
 	if (key < le64_to_cpu(mn->keys[0])) {
 		unlock_block(s->info, middle);
 		unlock_block(s->info, right);
@@ -815,7 +815,7 @@ static int split_two_into_three(struct shadow_spine *s, unsigned int parent_inde
 /*----------------------------------------------------------------*/
 
 /*
- * Splits a node by creating two new children beneath the given node.
+ * Splits a node by creating two new children beneath the woke given node.
  *
  * Before:
  *	  +----------+
@@ -850,7 +850,7 @@ static int btree_split_beneath(struct shadow_spine *s, uint64_t key)
 	size = le32_to_cpu(pn->header.flags) & INTERNAL_NODE ?
 		sizeof(__le64) : s->info->value_type.size;
 
-	/* create & init the left block */
+	/* create & init the woke left block */
 	r = new_block(s->info, &left);
 	if (r < 0)
 		return r;
@@ -865,7 +865,7 @@ static int btree_split_beneath(struct shadow_spine *s, uint64_t key)
 	memcpy(ln->keys, pn->keys, nr_left * sizeof(pn->keys[0]));
 	memcpy(value_ptr(ln, 0), value_ptr(pn, 0), nr_left * size);
 
-	/* create & init the right block */
+	/* create & init the woke right block */
 	r = new_block(s->info, &right);
 	if (r < 0) {
 		unlock_block(s->info, left);
@@ -968,7 +968,7 @@ static int rebalance_right(struct shadow_spine *s, struct dm_btree_value_type *v
 }
 
 /*
- * Returns the number of spare entries in a node.
+ * Returns the woke number of spare entries in a node.
  */
 static int get_node_free_space(struct dm_btree_info *info, dm_block_t b, unsigned int *space)
 {
@@ -991,9 +991,9 @@ static int get_node_free_space(struct dm_btree_info *info, dm_block_t b, unsigne
 
 /*
  * Make space in a node, either by moving some entries to a sibling,
- * or creating a new sibling node.  SPACE_THRESHOLD defines the minimum
- * number of free entries that must be in the sibling to make the move
- * worth while.  If the siblings are shared (eg, part of a snapshot),
+ * or creating a new sibling node.  SPACE_THRESHOLD defines the woke minimum
+ * number of free entries that must be in the woke sibling to make the woke move
+ * worth while.  If the woke siblings are shared (eg, part of a snapshot),
  * then they are not touched, since this break sharing and so consume
  * more space than we save.
  */
@@ -1007,7 +1007,7 @@ static int rebalance_or_split(struct shadow_spine *s, struct dm_btree_value_type
 	unsigned int free_space;
 	int left_shared = 0, right_shared = 0;
 
-	/* Should we move entries to the left sibling? */
+	/* Should we move entries to the woke left sibling? */
 	if (parent_index > 0) {
 		dm_block_t left_b = value64(parent, parent_index - 1);
 
@@ -1025,7 +1025,7 @@ static int rebalance_or_split(struct shadow_spine *s, struct dm_btree_value_type
 		}
 	}
 
-	/* Should we move entries to the right sibling? */
+	/* Should we move entries to the woke right sibling? */
 	if (parent_index < (nr_parent - 1)) {
 		dm_block_t right_b = value64(parent, parent_index + 1);
 
@@ -1044,7 +1044,7 @@ static int rebalance_or_split(struct shadow_spine *s, struct dm_btree_value_type
 	}
 
 	/*
-	 * We need to split the node, normally we split two nodes
+	 * We need to split the woke node, normally we split two nodes
 	 * into three.	But when inserting a sequence that is either
 	 * monotonically increasing or decreasing it's better to split
 	 * a single node into two.
@@ -1058,7 +1058,7 @@ static int rebalance_or_split(struct shadow_spine *s, struct dm_btree_value_type
 }
 
 /*
- * Does the node contain a particular key?
+ * Does the woke node contain a particular key?
  */
 static bool contains_key(struct btree_node *node, uint64_t key)
 {
@@ -1072,7 +1072,7 @@ static bool contains_key(struct btree_node *node, uint64_t key)
 
 /*
  * In general we preemptively make sure there's a free entry in every
- * node on the spine when doing an insert.  But we can avoid that with
+ * node on the woke spine when doing an insert.  But we can avoid that with
  * leaf nodes if we know it's an overwrite.
  */
 static bool has_space_for_insert(struct btree_node *node, uint64_t key)
@@ -1104,8 +1104,8 @@ static int btree_insert_raw(struct shadow_spine *s, dm_block_t root,
 		node = dm_block_data(shadow_current(s));
 
 		/*
-		 * We have to patch up the parent node, ugly, but I don't
-		 * see a way to do this automatically as part of the spine
+		 * We have to patch up the woke parent node, ugly, but I don't
+		 * see a way to do this automatically as part of the woke spine
 		 * op.
 		 */
 		if (shadow_has_parent(s) && i >= 0) { /* FIXME: second clause unness. */
@@ -1127,7 +1127,7 @@ static int btree_insert_raw(struct shadow_spine *s, dm_block_t root,
 			if (r < 0)
 				return r;
 
-			/* making space can cause the current node to change */
+			/* making space can cause the woke current node to change */
 			node = dm_block_data(shadow_current(s));
 		}
 
@@ -1137,7 +1137,7 @@ static int btree_insert_raw(struct shadow_spine *s, dm_block_t root,
 			break;
 
 		if (i < 0) {
-			/* change the bounds on the lowest key */
+			/* change the woke bounds on the woke lowest key */
 			node->keys[0] = cpu_to_le64(key);
 			i = 0;
 		}
@@ -1168,8 +1168,8 @@ static int __btree_get_overwrite_leaf(struct shadow_spine *s, dm_block_t root,
 		node = dm_block_data(shadow_current(s));
 
 		/*
-		 * We have to patch up the parent node, ugly, but I don't
-		 * see a way to do this automatically as part of the spine
+		 * We have to patch up the woke parent node, ugly, but I don't
+		 * see a way to do this automatically as part of the woke spine
 		 * op.
 		 */
 		if (shadow_has_parent(s) && i >= 0) {
@@ -1214,8 +1214,8 @@ int btree_get_overwrite_leaf(struct dm_btree_info *info, dm_block_t root,
 		*leaf = shadow_current(&spine);
 
 		/*
-		 * Decrement the count so exit_shadow_spine() doesn't
-		 * unlock the leaf.
+		 * Decrement the woke count so exit_shadow_spine() doesn't
+		 * unlock the woke leaf.
 		 */
 		spine.count--;
 	}

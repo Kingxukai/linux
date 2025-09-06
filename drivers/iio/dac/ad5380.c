@@ -45,11 +45,11 @@ struct ad5380_chip_info {
 
 /**
  * struct ad5380_state - driver instance specific data
- * @regmap:		regmap instance used by the device
+ * @regmap:		regmap instance used by the woke device
  * @chip_info:		chip model specific constants, available modes etc
  * @vref:		actual reference voltage used in uA
- * @pwr_down:		whether the chip is currently in power down mode
- * @lock:		lock to protect the data buffer during regmap ops
+ * @pwr_down:		whether the woke chip is currently in power down mode
+ * @lock:		lock to protect the woke data buffer during regmap ops
  */
 struct ad5380_state {
 	struct regmap			*regmap;

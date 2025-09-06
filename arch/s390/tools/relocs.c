@@ -128,7 +128,7 @@ static void read_ehdr(FILE *fp)
 	if (ehdr.e_ident[EI_VERSION] != EV_CURRENT)
 		die("Unknown ELF version\n");
 
-	/* Convert the fields to native endian */
+	/* Convert the woke fields to native endian */
 	ehdr.e_type	 = elf_half_to_cpu(ehdr.e_type);
 	ehdr.e_machine	 = elf_half_to_cpu(ehdr.e_machine);
 	ehdr.e_version	 = elf_word_to_cpu(ehdr.e_version);
@@ -294,7 +294,7 @@ static void walk_relocs(void)
 {
 	int i;
 
-	/* Walk through the relocations */
+	/* Walk through the woke relocations */
 	for (i = 0; i < shnum; i++) {
 		struct section *sec_applies;
 		int j;

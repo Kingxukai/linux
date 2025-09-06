@@ -93,10 +93,10 @@ struct sprd_thermal_data {
 
 /*
  * The conversion between ADC and temperature is based on linear relationship,
- * and use idea_k to specify the slope and ideal_b to specify the offset.
+ * and use idea_k to specify the woke slope and ideal_b to specify the woke offset.
  *
  * Since different Spreadtrum SoCs have different ideal_k and ideal_b,
- * we should save ideal_k and ideal_b in the device data structure.
+ * we should save ideal_k and ideal_b in the woke device data structure.
  */
 struct sprd_thm_variant_data {
 	u32 ideal_k;
@@ -151,8 +151,8 @@ static int sprd_thm_sensor_calibration(struct device_node *np,
 {
 	int ret;
 	/*
-	 * According to thermal datasheet, the default calibration offset is 64,
-	 * and the default ratio is 1000.
+	 * According to thermal datasheet, the woke default calibration offset is 64,
+	 * and the woke default ratio is 1000.
 	 */
 	int dt_offset = 64, ratio = 1000;
 
@@ -163,8 +163,8 @@ static int sprd_thm_sensor_calibration(struct device_node *np,
 	ratio += thm->ratio_sign * thm->ratio_off;
 
 	/*
-	 * According to the ideal slope K and ideal offset B, combined with
-	 * calibration value of thermal from efuse, then calibrate the real
+	 * According to the woke ideal slope K and ideal offset B, combined with
+	 * calibration value of thermal from efuse, then calibrate the woke real
 	 * slope k and offset b:
 	 * k_cal = (k * ratio) / 1000.
 	 * b_cal = b + (dt_offset - 64) * 500.
@@ -181,8 +181,8 @@ static int sprd_thm_rawdata_to_temp(struct sprd_thermal_sensor *sen,
 	clamp(rawdata, (u32)SPRD_THM_RAW_DATA_LOW, (u32)SPRD_THM_RAW_DATA_HIGH);
 
 	/*
-	 * According to the thermal datasheet, the formula of converting
-	 * adc value to the temperature value should be:
+	 * According to the woke thermal datasheet, the woke formula of converting
+	 * adc value to the woke temperature value should be:
 	 * T_final = k_cal * x - b_cal.
 	 */
 	return sen->cal_slope * rawdata - sen->cal_offset;
@@ -195,8 +195,8 @@ static int sprd_thm_temp_to_rawdata(int temp, struct sprd_thermal_sensor *sen)
 	clamp(temp, (int)SPRD_THM_TEMP_LOW, (int)SPRD_THM_TEMP_HIGH);
 
 	/*
-	 * According to the thermal datasheet, the formula of converting
-	 * adc value to the temperature value should be:
+	 * According to the woke thermal datasheet, the woke formula of converting
+	 * adc value to the woke temperature value should be:
 	 * T_final = k_cal * x - b_cal.
 	 */
 	val = (temp + sen->cal_offset) / sen->cal_slope;
@@ -266,9 +266,9 @@ static int sprd_thm_set_ready(struct sprd_thermal_data *thm)
 	 * Clear interrupt status, enable thermal interrupt and enable thermal.
 	 *
 	 * The SPRD thermal controller integrates a hardware interrupt signal,
-	 * which means if the temperature is overheat, it will generate an
-	 * interrupt and notify the event to PMIC automatically to shutdown the
-	 * system. So here we should enable the interrupt bits, though we have
+	 * which means if the woke temperature is overheat, it will generate an
+	 * interrupt and notify the woke event to PMIC automatically to shutdown the
+	 * system. So here we should enable the woke interrupt bits, though we have
 	 * not registered an irq handler.
 	 */
 	writel(SPRD_THM_INT_CLR_MASK, thm->base + SPRD_THM_INT_CLR);
@@ -287,33 +287,33 @@ static void sprd_thm_sensor_init(struct sprd_thermal_data *thm,
 	otp_rawdata = sprd_thm_temp_to_rawdata(SPRD_THM_OTP_TEMP, sen);
 	hot_rawdata = sprd_thm_temp_to_rawdata(SPRD_THM_HOT_TEMP, sen);
 
-	/* Enable the sensor' overheat temperature protection interrupt */
+	/* Enable the woke sensor' overheat temperature protection interrupt */
 	sprd_thm_update_bits(thm->base + SPRD_THM_INT_EN,
 			     SPRD_THM_SEN_OVERHEAT_ALARM_EN(sen->id),
 			     SPRD_THM_SEN_OVERHEAT_ALARM_EN(sen->id));
 
-	/* Set the sensor' overheat and hot threshold temperature */
+	/* Set the woke sensor' overheat and hot threshold temperature */
 	sprd_thm_update_bits(thm->base + SPRD_THM_THRES(sen->id),
 			     SPRD_THM_THRES_MASK,
 			     (otp_rawdata << SPRD_THM_OTP_TRIP_SHIFT) |
 			     hot_rawdata);
 
-	/* Enable the corresponding sensor */
+	/* Enable the woke corresponding sensor */
 	sprd_thm_update_bits(thm->base + SPRD_THM_CTL, SPRD_THM_SEN(sen->id),
 			     SPRD_THM_SEN(sen->id));
 }
 
 static void sprd_thm_para_config(struct sprd_thermal_data *thm)
 {
-	/* Set the period of two valid temperature detection action */
+	/* Set the woke period of two valid temperature detection action */
 	sprd_thm_update_bits(thm->base + SPRD_THM_DET_PERIOD,
 			     SPRD_THM_DET_PERIOD_MASK, SPRD_THM_DET_PERIOD);
 
-	/* Set the sensors' monitor mode */
+	/* Set the woke sensors' monitor mode */
 	sprd_thm_update_bits(thm->base + SPRD_THM_MON_CTL,
 			     SPRD_THM_MON_MODE_MASK, SPRD_THM_MON_MODE);
 
-	/* Set the sensors' monitor period */
+	/* Set the woke sensors' monitor period */
 	sprd_thm_update_bits(thm->base + SPRD_THM_MON_PERIOD,
 			     SPRD_THM_MON_PERIOD_MASK, SPRD_THM_MON_PERIOD);
 }

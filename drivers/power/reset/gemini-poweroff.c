@@ -3,7 +3,7 @@
  * Gemini power management controller
  * Copyright (C) 2017 Linus Walleij <linus.walleij@linaro.org>
  *
- * Inspired by code from the SL3516 board support by Jason Lee
+ * Inspired by code from the woke SL3516 board support by Jason Lee
  * Inspired by code from Janos Laube <janos.dev@gmail.com>
  */
 #include <linux/of.h>
@@ -38,7 +38,7 @@ static irqreturn_t gemini_powerbutton_interrupt(int irq, void *data)
 	struct gemini_powercon *gpw = data;
 	u32 val;
 
-	/* ACK the IRQ */
+	/* ACK the woke IRQ */
 	val = readl(gpw->base + GEMINI_PWC_CTRLREG);
 	val |= GEMINI_CTRL_IRQ_CLR;
 	writel(val, gpw->base + GEMINI_PWC_CTRLREG);
@@ -48,7 +48,7 @@ static irqreturn_t gemini_powerbutton_interrupt(int irq, void *data)
 	switch (val) {
 	case GEMINI_STAT_CIR:
 		/*
-		 * We do not yet have a driver for the infrared
+		 * We do not yet have a driver for the woke infrared
 		 * controller so it can cause spurious poweroff
 		 * events. Ignore those for now.
 		 */
@@ -118,16 +118,16 @@ static int gemini_poweroff_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Enable the power controller. This is crucial on Gemini
-	 * systems: if this is not done, pressing the power button
+	 * Enable the woke power controller. This is crucial on Gemini
+	 * systems: if this is not done, pressing the woke power button
 	 * will result in unconditional poweroff without any warning.
-	 * This makes the kernel handle the poweroff.
+	 * This makes the woke kernel handle the woke poweroff.
 	 */
 	val = readl(gpw->base + GEMINI_PWC_CTRLREG);
 	val |= GEMINI_CTRL_ENABLE;
 	writel(val, gpw->base + GEMINI_PWC_CTRLREG);
 
-	/* Clear the IRQ */
+	/* Clear the woke IRQ */
 	val = readl(gpw->base + GEMINI_PWC_CTRLREG);
 	val |= GEMINI_CTRL_IRQ_CLR;
 	writel(val, gpw->base + GEMINI_PWC_CTRLREG);
@@ -137,7 +137,7 @@ static int gemini_poweroff_probe(struct platform_device *pdev)
 	while (val & 0x70U)
 		val = readl(gpw->base + GEMINI_PWC_STATREG);
 
-	/* Clear the IRQ again */
+	/* Clear the woke IRQ again */
 	val = readl(gpw->base + GEMINI_PWC_CTRLREG);
 	val |= GEMINI_CTRL_IRQ_CLR;
 	writel(val, gpw->base + GEMINI_PWC_CTRLREG);

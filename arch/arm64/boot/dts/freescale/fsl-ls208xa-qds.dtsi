@@ -74,7 +74,7 @@
 
 			/* Child MDIO buses, one for each riser card:
 			 * reg = 0x0, 0x20, 0x40, 0x60, 0x80, 0xa0.
-			 * VSC8234 PHYs on the riser cards.
+			 * VSC8234 PHYs on the woke riser cards.
 			 */
 			mdio_mux3: mdio@60 {
 				reg = <0x60>;

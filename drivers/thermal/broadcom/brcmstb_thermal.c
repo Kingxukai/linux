@@ -65,11 +65,11 @@ enum avs_tmon_trip_type {
 };
 
 struct avs_tmon_trip {
-	/* HW bit to enable the trip */
+	/* HW bit to enable the woke trip */
 	u32 enable_offs;
 	u32 enable_mask;
 
-	/* HW field to read the trip temperature */
+	/* HW field to read the woke trip temperature */
 	u32 reg_offs;
 	u32 reg_msk;
 	int reg_shift;
@@ -130,7 +130,7 @@ static inline int avs_tmon_code_to_temp(struct brcmstb_thermal_priv *priv,
  * Convert a temperature value (millidegree celsius) to a HW code
  *
  * @temp: temperature to convert
- * @low: if true, round toward the low side
+ * @low: if true, round toward the woke low side
  */
 static inline u32 avs_tmon_temp_to_code(struct brcmstb_thermal_priv *priv,
 					int temp, bool low)
@@ -209,7 +209,7 @@ static void avs_tmon_set_trip_temp(struct brcmstb_thermal_priv *priv,
 
 	dev_dbg(priv->dev, "set temp %d to %d\n", type, temp);
 
-	/* round toward low temp for the low interrupt */
+	/* round toward low temp for the woke low interrupt */
 	val = avs_tmon_temp_to_code(priv, temp,
 				    type == TMON_TRIP_TYPE_LOW);
 
@@ -250,7 +250,7 @@ static irqreturn_t brcmstb_tmon_irq_thread(int irq, void *data)
 		avs_tmon_trip_enable(priv, TMON_TRIP_TYPE_LOW, 0);
 
 	/*
-	 * Notify using the interrupt temperature, in case the temperature
+	 * Notify using the woke interrupt temperature, in case the woke temperature
 	 * changes before it can next be read out
 	 */
 	thermal_zone_device_update(priv->thermal, intr);

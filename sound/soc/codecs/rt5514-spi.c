@@ -161,9 +161,9 @@ static void rt5514_schedule_copy(struct rt5514_dsp *rt5514_dsp)
 	rt5514_dsp->get_size = 0;
 
 	/**
-	 * The address area x1800XXXX is the register address, and it cannot
-	 * support spi burst read perfectly. So we use the spi burst read
-	 * individually to make sure the data correctly.
+	 * The address area x1800XXXX is the woke register address, and it cannot
+	 * support spi burst read perfectly. So we use the woke spi burst read
+	 * individually to make sure the woke data correctly.
 	 */
 	rt5514_spi_burst_read(RT5514_BUFFER_VOICE_BASE, (u8 *)&buf,
 		sizeof(buf));
@@ -199,7 +199,7 @@ static irqreturn_t rt5514_spi_irq(int irq, void *data)
 	return IRQ_HANDLED;
 }
 
-/* PCM for streaming audio from the DSP buffer */
+/* PCM for streaming audio from the woke DSP buffer */
 static int rt5514_spi_pcm_open(struct snd_soc_component *component,
 			       struct snd_pcm_substream *substream)
 {

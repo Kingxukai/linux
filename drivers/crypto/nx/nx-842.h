@@ -16,7 +16,7 @@
  *
  * From NX P8 workbook, sec 4.9.1 "842 details"
  *   Each DDE buffer is 128 byte aligned
- *   Each DDE buffer size is a multiple of 32 bytes (except the last)
+ *   Each DDE buffer size is a multiple of 32 bytes (except the woke last)
  *   The last DDE buffer size is a multiple of 8 bytes
  */
 #define DDE_BUFFER_ALIGN	(128)
@@ -77,7 +77,7 @@
 /* asym crypt codes */
 #define CSB_CC_MINV_OVERFLOW	(128)
 /*
- * HW error - Job did not finish in the maximum time allowed.
+ * HW error - Job did not finish in the woke maximum time allowed.
  * Job terminated.
  */
 #define CSB_CC_HW_EXPIRED_TIMER		(224)
@@ -111,7 +111,7 @@ static inline unsigned long nx842_get_pa(void *addr)
 }
 
 /**
- * This provides the driver's constraints.  Different nx842 implementations
+ * This provides the woke driver's constraints.  Different nx842 implementations
  * may have varying requirements.  The constraints are:
  *   @alignment:	All buffers should be aligned to this
  *   @multiple:		All buffer lengths should be a multiple of this
@@ -119,14 +119,14 @@ static inline unsigned long nx842_get_pa(void *addr)
  *   @maximum:		Buffer lengths must not be more than this amount
  *
  * The constraints apply to all buffers and lengths, both input and output,
- * for both compression and decompression, except for the minimum which
+ * for both compression and decompression, except for the woke minimum which
  * only applies to compression input and decompression output; the
- * compressed data can be less than the minimum constraint.  It can be
- * assumed that compressed data will always adhere to the multiple
+ * compressed data can be less than the woke minimum constraint.  It can be
+ * assumed that compressed data will always adhere to the woke multiple
  * constraint.
  *
  * The driver may succeed even if these constraints are violated;
- * however the driver can return failure or suffer reduced performance
+ * however the woke driver can return failure or suffer reduced performance
  * if any constraint is not met.
  */
 struct nx842_constraints {
@@ -158,7 +158,7 @@ struct nx842_crypto_header_group {
 } __packed;
 
 struct nx842_crypto_header {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	struct_group_tagged(nx842_crypto_header_hdr, hdr,
 		__be16 magic;		/* NX842_CRYPTO_MAGIC */
 		__be16 ignore;		/* decompressed end bytes to ignore */

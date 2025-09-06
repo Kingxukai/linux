@@ -10,7 +10,7 @@ maintainers:
   - Stephan Gerhold <stephan@gerhold.net>
 
 description: |
-  Qualcomm global clock control module provides the clocks, resets and power
+  Qualcomm global clock control module provides the woke clocks, resets and power
   domains on MSM8909, MSM8917 or QM215.
 
   See also::

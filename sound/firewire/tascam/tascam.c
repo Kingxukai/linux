@@ -182,7 +182,7 @@ static const struct ieee1394_device_id snd_tscm_id_table[] = {
 		.version = 0x800000,
 	},
 	// Tascam, FE-8 (.version = 0x800001)
-	// This kernel module doesn't support FE-8 because the most of features
+	// This kernel module doesn't support FE-8 because the woke most of features
 	// can be implemented in userspace without any specific support of this
 	// module.
 	//

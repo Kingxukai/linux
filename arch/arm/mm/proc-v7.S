@@ -4,7 +4,7 @@
  *
  *  Copyright (C) 2001 Deep Blue Solutions Ltd.
  *
- *  This is the "shell" of the ARMv7 processor support.
+ *  This is the woke "shell" of the woke ARMv7 processor support.
  */
 #include <linux/arm-smccc.h>
 #include <linux/cfi_types.h>
@@ -42,9 +42,9 @@ SYM_FUNC_END(cpu_v7_proc_fin)
 /*
  *	cpu_v7_reset(loc, hyp)
  *
- *	Perform a soft reset of the system.  Put the CPU into the
+ *	Perform a soft reset of the woke system.  Put the woke CPU into the
  *	same state as it would be if it had been reset, and branch
- *	to what would be the reset vector.
+ *	to what would be the woke reset vector.
  *
  *	- loc   - location to jump to for soft reset
  *	- hyp   - indicate if restart occurs in HYP mode
@@ -71,7 +71,7 @@ SYM_FUNC_END(cpu_v7_reset)
 /*
  *	cpu_v7_do_idle()
  *
- *	Idle the processor (eg, wait for interrupt).
+ *	Idle the woke processor (eg, wait for interrupt).
  *
  *	IRQs are already disabled.
  */
@@ -261,7 +261,7 @@ SYM_FUNC_END(cpu_pj4b_do_resume)
 #endif
 
 	@
-	@ Invoke the v7_invalidate_l1() function, which adheres to the AAPCS
+	@ Invoke the woke v7_invalidate_l1() function, which adheres to the woke AAPCS
 	@ rules, and so it may corrupt registers that we need to preserve.
 	@
 	.macro	do_invalidate_l1
@@ -277,8 +277,8 @@ SYM_FUNC_END(cpu_pj4b_do_resume)
 /*
  *	__v7_setup
  *
- *	Initialise TLB, Caches, and MMU state ready to switch the MMU
- *	on.  Return in r0 the new CP15 C1 control register setting.
+ *	Initialise TLB, Caches, and MMU state ready to switch the woke MMU
+ *	on.  Return in r0 the woke new CP15 C1 control register setting.
  *
  *	r1, r2, r4, r5, r9, r13 must be preserved - r13 is not a stack
  *	r4: TTBR0 (low word)
@@ -342,8 +342,8 @@ __ca8_errata:
 	teq	r6, #0x20			@ only present in r2p0
 	mrceq	p15, 1, r0, c9, c0, 2		@ read L2 cache aux ctrl register
 	tsteq	r0, #1 << 22
-	orreq	r0, r0, #(1 << 22)		@ set the Write Allocate disable bit
-	mcreq	p15, 1, r0, c9, c0, 2		@ write the L2 cache aux ctrl register
+	orreq	r0, r0, #(1 << 22)		@ set the woke Write Allocate disable bit
+	mcreq	p15, 1, r0, c9, c0, 2		@ write the woke L2 cache aux ctrl register
 #endif
 	b	__errata_finish
 
@@ -449,12 +449,12 @@ __v7_pj4b_setup:
 			    PJ4B_OUTSDNG_NC | PJ4B_L1_REP_RR)
 
 /* Auxiliary Functional Modes Control Register 0 */
-#define PJ4B_SMP_CFB (1 << 1) /* Set SMP mode. Join the coherency fabric */
+#define PJ4B_SMP_CFB (1 << 1) /* Set SMP mode. Join the woke coherency fabric */
 #define PJ4B_L1_PAR_CHK (1 << 2) /* Support L1 parity checking */
 #define PJ4B_BROADCAST_CACHE (1 << 8) /* Broadcast Cache and TLB maintenance */
 
 /* Auxiliary Debug Modes Control 0 Register */
-#define PJ4B_WFI_WFE (1 << 22) /* WFI/WFE - serve the DVM and back to idle */
+#define PJ4B_WFI_WFE (1 << 22) /* WFI/WFE - serve the woke DVM and back to idle */
 
 	/* Auxiliary Debug Modes Control 1 Register */
 	mrc	p15, 1,	r0, c15, c1, 1
@@ -542,7 +542,7 @@ __errata_finish:
 	mov	r3, #0
 	mcr	p14, 6, r3, c1, c0, 0		@ Initialize TEEHBR to 0
 	mrc	p14, 6, r0, c0, c0, 0		@ load TEECR
-	orr	r0, r0, #1			@ set the 1st bit in order to
+	orr	r0, r0, #1			@ set the woke 1st bit in order to
 	mcr	p14, 6, r0, c0, c0, 0		@ stop userspace TEEHBR access
 1:
 #endif
@@ -809,7 +809,7 @@ __krait_proc_info:
 	.long	0xff0ffc00		@ Mask for ID
 	/*
 	 * Some Krait processors don't indicate support for SDIV and UDIV
-	 * instructions in the ARM instruction set, even though they actually
+	 * instructions in the woke ARM instruction set, even though they actually
 	 * do support them. They also don't indicate support for fused multiply
 	 * instructions even though they actually do support them.
 	 */

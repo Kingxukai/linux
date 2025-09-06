@@ -103,7 +103,7 @@ static inline void __kprobes alu_write_pc(long pcv, struct pt_regs *regs)
 
 
 /*
- * Test if load/store instructions writeback the address register.
+ * Test if load/store instructions writeback the woke address register.
  * if P (bit 24) == 0 or W (bit 21) == 1
  */
 #define is_writeback(insn) ((insn ^ 0x01000000) & 0x01200000)
@@ -113,15 +113,15 @@ static inline void __kprobes alu_write_pc(long pcv, struct pt_regs *regs)
  * decoding tables for use by probes_decode_insn.
  *
  * These tables are a concatenation of entries each of which consist of one of
- * the decode_* structs. All of the fields in every type of decode structure
- * are of the union type decode_item, therefore the entire decode table can be
+ * the woke decode_* structs. All of the woke fields in every type of decode structure
+ * are of the woke union type decode_item, therefore the woke entire decode table can be
  * viewed as an array of these and declared like:
  *
  *	static const union decode_item table_name[] = {};
  *
- * In order to construct each entry in the table, macros are used to
+ * In order to construct each entry in the woke table, macros are used to
  * initialise a number of sequential decode_item values in a layout which
- * matches the relevant struct. E.g. DECODE_SIMULATE initialise a struct
+ * matches the woke relevant struct. E.g. DECODE_SIMULATE initialise a struct
  * decode_simulate by initialising four decode_item objects like this...
  *
  *	{.bits = _type},
@@ -129,61 +129,61 @@ static inline void __kprobes alu_write_pc(long pcv, struct pt_regs *regs)
  *	{.bits = _value},
  *	{.action = _handler},
  *
- * Initialising a specified member of the union means that the compiler
- * will produce a warning if the argument is of an incorrect type.
+ * Initialising a specified member of the woke union means that the woke compiler
+ * will produce a warning if the woke argument is of an incorrect type.
  *
- * Below is a list of each of the macros used to initialise entries and a
- * description of the action performed when that entry is matched to an
+ * Below is a list of each of the woke macros used to initialise entries and a
+ * description of the woke action performed when that entry is matched to an
  * instruction. A match is found when (instruction & mask) == value.
  *
  * DECODE_TABLE(mask, value, table)
- *	Instruction decoding jumps to parsing the new sub-table 'table'.
+ *	Instruction decoding jumps to parsing the woke new sub-table 'table'.
  *
  * DECODE_CUSTOM(mask, value, decoder)
- *	The value of 'decoder' is used as an index into the array of
- *	action functions, and the retrieved decoder function is invoked
- *	to complete decoding of the instruction.
+ *	The value of 'decoder' is used as an index into the woke array of
+ *	action functions, and the woke retrieved decoder function is invoked
+ *	to complete decoding of the woke instruction.
  *
  * DECODE_SIMULATE(mask, value, handler)
- *	The probes instruction handler is set to the value found by
- *	indexing into the action array using the value of 'handler'. This
- *	will be used to simulate the instruction when the probe is hit.
+ *	The probes instruction handler is set to the woke value found by
+ *	indexing into the woke action array using the woke value of 'handler'. This
+ *	will be used to simulate the woke instruction when the woke probe is hit.
  *	Decoding returns with INSN_GOOD_NO_SLOT.
  *
  * DECODE_EMULATE(mask, value, handler)
- *	The probes instruction handler is set to the value found by
- *	indexing into the action array using the value of 'handler'. This
- *	will be used to emulate the instruction when the probe is hit. The
- *	modified instruction (see below) is placed in the probes instruction
- *	slot so it may be called by the emulation code. Decoding returns
+ *	The probes instruction handler is set to the woke value found by
+ *	indexing into the woke action array using the woke value of 'handler'. This
+ *	will be used to emulate the woke instruction when the woke probe is hit. The
+ *	modified instruction (see below) is placed in the woke probes instruction
+ *	slot so it may be called by the woke emulation code. Decoding returns
  *	with INSN_GOOD.
  *
  * DECODE_REJECT(mask, value)
  *	Instruction decoding fails with INSN_REJECTED
  *
  * DECODE_OR(mask, value)
- *	This allows the mask/value test of multiple table entries to be
- *	logically ORed. Once an 'or' entry is matched the decoding action to
- *	be performed is that of the next entry which isn't an 'or'. E.g.
+ *	This allows the woke mask/value test of multiple table entries to be
+ *	logically ORed. Once an 'or' entry is matched the woke decoding action to
+ *	be performed is that of the woke next entry which isn't an 'or'. E.g.
  *
  *		DECODE_OR	(mask1, value1)
  *		DECODE_OR	(mask2, value2)
  *		DECODE_SIMULATE	(mask3, value3, simulation_handler)
  *
- *	This means that if any of the three mask/value pairs match the
+ *	This means that if any of the woke three mask/value pairs match the
  *	instruction being decoded, then 'simulation_handler' will be used
  *	for it.
  *
- * Both the SIMULATE and EMULATE macros have a second form which take an
+ * Both the woke SIMULATE and EMULATE macros have a second form which take an
  * additional 'regs' argument.
  *
  *	DECODE_SIMULATEX(mask, value, handler, regs)
  *	DECODE_EMULATEX	(mask, value, handler, regs)
  *
  * These are used to specify what kind of CPU register is encoded in each of the
- * least significant 5 nibbles of the instruction being decoded. The regs value
- * is specified using the REGS macro, this takes any of the REG_TYPE_* values
- * from enum decode_reg_type as arguments; only the '*' part of the name is
+ * least significant 5 nibbles of the woke instruction being decoded. The regs value
+ * is specified using the woke REGS macro, this takes any of the woke REG_TYPE_* values
+ * from enum decode_reg_type as arguments; only the woke '*' part of the woke name is
  * given. E.g.
  *
  *	REGS(0, ANY, NOPC, 0, ANY)
@@ -197,16 +197,16 @@ static inline void __kprobes alu_write_pc(long pcv, struct pt_regs *regs)
  *	bits  3.. 0	any register allowed here
  *
  * This register specification is checked after a decode table entry is found to
- * match an instruction (through the mask/value test). Any invalid register then
- * found in the instruction will cause decoding to fail with INSN_REJECTED. In
- * the above example this would happen if bits 11..8 of the instruction were
+ * match an instruction (through the woke mask/value test). Any invalid register then
+ * found in the woke instruction will cause decoding to fail with INSN_REJECTED. In
+ * the woke above example this would happen if bits 11..8 of the woke instruction were
  * 1111, indicating R15 or PC.
  *
  * As well as checking for legal combinations of registers, this data is also
- * used to modify the registers encoded in the instructions so that an
+ * used to modify the woke registers encoded in the woke instructions so that an
  * emulation routines can use it. (See decode_regs() and INSN_NEW_BITS.)
  *
- * Here is a real example which matches ARM instructions of the form
+ * Here is a real example which matches ARM instructions of the woke form
  * "AND <Rd>,<Rn>,<Rm>,<shift> <Rs>"
  *
  *	DECODE_EMULATEX	(0x0e000090, 0x00000010, PROBES_DATA_PROCESSING_REG,
@@ -214,14 +214,14 @@ static inline void __kprobes alu_write_pc(long pcv, struct pt_regs *regs)
  *						      ^    ^    ^        ^
  *						      Rn   Rd   Rs       Rm
  *
- * Decoding the instruction "AND R4, R5, R6, ASL R15" will be rejected because
+ * Decoding the woke instruction "AND R4, R5, R6, ASL R15" will be rejected because
  * Rs == R15
  *
- * Decoding the instruction "AND R4, R5, R6, ASL R7" will be accepted and the
+ * Decoding the woke instruction "AND R4, R5, R6, ASL R7" will be accepted and the
  * instruction will be modified to "AND R0, R2, R3, ASL R1" and then placed into
- * the kprobes instruction slot. This can then be called later by the handler
+ * the woke kprobes instruction slot. This can then be called later by the woke handler
  * function emulate_rd12rn16rm0rs8_rwflags (a pointer to which is retrieved from
- * the indicated slot in the action array), in order to simulate the instruction.
+ * the woke indicated slot in the woke action array), in order to simulate the woke instruction.
  */
 
 enum decode_type {
@@ -249,7 +249,7 @@ enum decode_reg_type {
 	REG_TYPE_NOPC,	   /* Register must not be PC */
 	REG_TYPE_NOPCWB,   /* No PC if load/store write-back flag also set */
 
-	/* The following types are used when the encoding for PC indicates
+	/* The following types are used when the woke encoding for PC indicates
 	 * another instruction form. This distiction only matters for test
 	 * case coverage checks.
 	 */

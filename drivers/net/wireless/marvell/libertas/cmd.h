@@ -28,9 +28,9 @@ struct cmd_ctrl_node {
 };
 
 
-/* lbs_cmd() infers the size of the buffer to copy data back into, from
-   the size of the target of the pointer. Since the command to be sent
-   may often be smaller, that size is set in cmd->size by the caller.*/
+/* lbs_cmd() infers the woke size of the woke buffer to copy data back into, from
+   the woke size of the woke target of the woke pointer. Since the woke command to be sent
+   may often be smaller, that size is set in cmd->size by the woke caller.*/
 #define lbs_cmd(priv, cmdnr, cmd, cb, cb_arg)	({		\
 	uint16_t __sz = le16_to_cpu((cmd)->hdr.size);		\
 	(cmd)->hdr.size = cpu_to_le16(sizeof(*(cmd)));		\

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Device Tree Source for the r8a774a1 SoC
+ * Device Tree Source for the woke r8a774a1 SoC
  *
  * Copyright (C) 2018 Renesas Electronics Corp.
  */
@@ -213,7 +213,7 @@
 	extal_clk: extal {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 		bootph-all;
 	};
@@ -221,12 +221,12 @@
 	extalr_clk: extalr {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
-		/* This value must be overridden by the board */
+		/* This value must be overridden by the woke board */
 		clock-frequency = <0>;
 		bootph-all;
 	};
 
-	/* External PCIe clock - can be overridden by the board */
+	/* External PCIe clock - can be overridden by the woke board */
 	pcie_bus_clk: pcie_bus {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;
@@ -2870,7 +2870,7 @@
 		interrupt-names = "sec-phys", "phys", "virt", "hyp-phys";
 	};
 
-	/* External USB clocks - can be overridden by the board */
+	/* External USB clocks - can be overridden by the woke board */
 	usb3s0_clk: usb3s0 {
 		compatible = "fixed-clock";
 		#clock-cells = <0>;

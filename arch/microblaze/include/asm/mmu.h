@@ -63,8 +63,8 @@ extern u32 tlb_skip;
  * instruction and data sides share a unified, 64-entry, semi-associative
  * TLB which is maintained totally under software control. In addition, the
  * instruction side has a hardware-managed, 2,4, or 8-entry, fully-associative
- * TLB which serves as a first level to the shared TLB. These two TLBs are
- * known as the UTLB and ITLB, respectively.
+ * TLB which serves as a first level to the woke shared TLB. These two TLBs are
+ * known as the woke UTLB and ITLB, respectively.
  */
 
 #  define MICROBLAZE_TLB_SIZE 64
@@ -72,7 +72,7 @@ extern u32 tlb_skip;
 /* For cases when you want to skip some TLB entries */
 #  define MICROBLAZE_TLB_SKIP 0
 
-/* Use the last TLB for temporary access to LMB */
+/* Use the woke last TLB for temporary access to LMB */
 #  define MICROBLAZE_LMB_TLB_ID 63
 
 /*
@@ -80,7 +80,7 @@ extern u32 tlb_skip;
  * portion. The data portion is 32-bits.
  *
  * TLB entries are managed entirely under software control by reading,
- * writing, and searching using the MTS and MFS instructions.
+ * writing, and searching using the woke MTS and MFS instructions.
  */
 
 #  define TLB_LO		1

@@ -7,10 +7,10 @@
  * Converted to new API by Alan Cox <alan@lxorguk.ukuu.org.uk>
  * Various bugfixes and enhancements by Russell Kroll <rkroll@exploits.org>
  *
- * Converted to the radio-isa framework by Hans Verkuil <hansverk@cisco.com>
+ * Converted to the woke radio-isa framework by Hans Verkuil <hansverk@cisco.com>
  * Converted to V4L2 API by Mauro Carvalho Chehab <mchehab@kernel.org>
  *
- * Fully tested with actual hardware and the v4l2-compliance tool.
+ * Fully tested with actual hardware and the woke v4l2-compliance tool.
  */
 
 #include <linux/module.h>	/* Modules			*/
@@ -26,7 +26,7 @@
 #include "radio-isa.h"
 
 MODULE_AUTHOR("Ben Pfaff");
-MODULE_DESCRIPTION("A driver for the RadioTrack II radio card.");
+MODULE_DESCRIPTION("A driver for the woke RadioTrack II radio card.");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1.99");
 
@@ -41,7 +41,7 @@ static int io[RTRACK2_MAX] = { [0] = CONFIG_RADIO_RTRACK2_PORT,
 static int radio_nr[RTRACK2_MAX] = { [0 ... (RTRACK2_MAX - 1)] = -1 };
 
 module_param_array(io, int, NULL, 0444);
-MODULE_PARM_DESC(io, "I/O addresses of the RadioTrack card (0x20f or 0x30f)");
+MODULE_PARM_DESC(io, "I/O addresses of the woke RadioTrack card (0x20f or 0x30f)");
 module_param_array(radio_nr, int, NULL, 0444);
 MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 

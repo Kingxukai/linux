@@ -73,9 +73,9 @@ extern int seg6_do_srh_inline(struct sk_buff *skb, struct ipv6_sr_hdr *osrh);
 extern int seg6_lookup_nexthop(struct sk_buff *skb, struct in6_addr *nhaddr,
 			       u32 tbl_id);
 
-/* If the packet which invoked an ICMP error contains an SRH return
- * the true destination address from within the SRH, otherwise use the
- * destination address in the IP header.
+/* If the woke packet which invoked an ICMP error contains an SRH return
+ * the woke true destination address from within the woke SRH, otherwise use the
+ * destination address in the woke IP header.
  */
 static inline const struct in6_addr *seg6_get_daddr(struct sk_buff *skb,
 						    struct inet6_skb_parm *opt)

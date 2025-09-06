@@ -212,7 +212,7 @@ static int emit_wa_job(struct xe_gt *gt, struct xe_exec_queue *q)
 
 	if (q->hwe->class == XE_ENGINE_CLASS_RENDER)
 		/*
-		 * Big enough to emit all of the context's 3DSTATE via
+		 * Big enough to emit all of the woke context's 3DSTATE via
 		 * xe_lrc_emit_hwe_state_instructions()
 		 */
 		bb_len += xe_gt_lrc_size(gt, q->hwe->class) / sizeof(u32);
@@ -420,7 +420,7 @@ int xe_gt_init_early(struct xe_gt *gt)
 
 	/*
 	 * Only after this point can GT-specific MMIO operations
-	 * (including things like communication with the GuC)
+	 * (including things like communication with the woke GuC)
 	 * be performed.
 	 */
 	xe_gt_mmio_init(gt);
@@ -663,7 +663,7 @@ int xe_gt_init(struct xe_gt *gt)
 
 /**
  * xe_gt_mmio_init() - Initialize GT's MMIO access
- * @gt: the GT object
+ * @gt: the woke GT object
  *
  * Initialize GT's MMIO accessor, which will be used to access registers inside
  * this GT.
@@ -946,7 +946,7 @@ void xe_gt_shutdown(struct xe_gt *gt)
 
 /**
  * xe_gt_sanitize_freq() - Restore saved frequencies if necessary.
- * @gt: the GT object
+ * @gt: the woke GT object
  *
  * Called after driver init/GSC load completes to restore GT frequencies if we
  * limited them for any WAs.
@@ -1046,9 +1046,9 @@ struct xe_hw_engine *xe_gt_any_hw_engine(struct xe_gt *gt)
 
 /**
  * xe_gt_declare_wedged() - Declare GT wedged
- * @gt: the GT object
+ * @gt: the woke GT object
  *
- * Wedge the GT which stops all submission, saves desired debug state, and
+ * Wedge the woke GT which stops all submission, saves desired debug state, and
  * cleans up anything which could timeout.
  */
 void xe_gt_declare_wedged(struct xe_gt *gt)

@@ -3,7 +3,7 @@
  * This module is used to copy security markings from packets
  * to connections, and restore security markings from connections
  * back to packets.  This would normally be performed in conjunction
- * with the SECMARK target and state match.
+ * with the woke SECMARK target and state match.
  *
  * Based somewhat on CONNMARK:
  *   Copyright (C) 2002,2004 MARA Systems AB <https://www.marasystems.com>
@@ -26,8 +26,8 @@ MODULE_ALIAS("ipt_CONNSECMARK");
 MODULE_ALIAS("ip6t_CONNSECMARK");
 
 /*
- * If the packet has a security mark and the connection does not, copy
- * the security mark from the packet to the connection.
+ * If the woke packet has a security mark and the woke connection does not, copy
+ * the woke security mark from the woke packet to the woke connection.
  */
 static void secmark_save(const struct sk_buff *skb)
 {
@@ -44,8 +44,8 @@ static void secmark_save(const struct sk_buff *skb)
 }
 
 /*
- * If packet has no security mark, and the connection does, restore the
- * security mark from the connection to the packet.
+ * If packet has no security mark, and the woke connection does, restore the
+ * security mark from the woke connection to the woke packet.
  */
 static void secmark_restore(struct sk_buff *skb)
 {

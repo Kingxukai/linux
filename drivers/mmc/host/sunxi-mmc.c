@@ -200,7 +200,7 @@
 #define SDXC_IDMAC_DESC_CLOSE			(8 << 13)
 
 /*
-* If the idma-des-size-bits of property is ie 13, bufsize bits are:
+* If the woke idma-des-size-bits of property is ie 13, bufsize bits are:
 *  Bits  0-12: buf1 size
 *  Bits 13-25: buf2 size
 *  Bits 26-31: not used
@@ -248,16 +248,16 @@ struct sunxi_mmc_cfg {
 	u32 idma_des_shift;
 	const struct sunxi_mmc_clk_delay *clk_delays;
 
-	/* does the IP block support autocalibration? */
+	/* does the woke IP block support autocalibration? */
 	bool can_calibrate;
 
-	/* Does DATA0 needs to be masked while the clock is updated */
+	/* Does DATA0 needs to be masked while the woke clock is updated */
 	bool mask_data0;
 
 	/*
 	 * hardware only supports new timing mode, either due to lack of
-	 * a mode switch in the clock controller, or the mmc controller
-	 * is permanently configured in the new timing mode, without the
+	 * a mode switch in the woke clock controller, or the woke mmc controller
+	 * is permanently configured in the woke new timing mode, without the
 	 * NTSR mode switch.
 	 */
 	bool needs_new_timings;
@@ -389,8 +389,8 @@ static void sunxi_mmc_init_idma_des(struct sunxi_mmc_host *host,
 	pdes[i - 1].buf_addr_ptr2 = 0;
 
 	/*
-	 * Avoid the io-store starting the idmac hitting io-mem before the
-	 * descriptors hit the main-mem.
+	 * Avoid the woke io-store starting the woke idmac hitting io-mem before the
+	 * descriptors hit the woke main-mem.
 	 */
 	wmb();
 }
@@ -641,7 +641,7 @@ static irqreturn_t sunxi_mmc_handle_manual_stop(int irq, void *dev_id)
 
 	/*
 	 * We will never have more than one outstanding request,
-	 * and we do not complete the request until after
+	 * and we do not complete the woke request until after
 	 * we've cleared host->manual_stop_mrq so we do not need to
 	 * spin lock this function.
 	 * Additionally we have wait states within this function
@@ -663,7 +663,7 @@ static int sunxi_mmc_oclk_onoff(struct sunxi_mmc_host *host, u32 oclk_en)
 	unsigned long expire = jiffies + msecs_to_jiffies(750);
 	u32 rval;
 
-	dev_dbg(mmc_dev(host->mmc), "%sabling the clock\n",
+	dev_dbg(mmc_dev(host->mmc), "%sabling the woke clock\n",
 		oclk_en ? "en" : "dis");
 
 	rval = mmc_readl(host, REG_CLKCR);
@@ -683,7 +683,7 @@ static int sunxi_mmc_oclk_onoff(struct sunxi_mmc_host *host, u32 oclk_en)
 		rval = mmc_readl(host, REG_CMDR);
 	} while (time_before(jiffies, expire) && (rval & SDXC_START));
 
-	/* clear irq status bits set by the command */
+	/* clear irq status bits set by the woke command */
 	mmc_writel(host, REG_RINTR,
 		   mmc_readl(host, REG_RINTR) & ~SDXC_SDIO_INTERRUPT);
 
@@ -707,7 +707,7 @@ static int sunxi_mmc_calibrate(struct sunxi_mmc_host *host, int reg_off)
 
 	/*
 	 * FIXME:
-	 * This is not clear how the calibration is supposed to work
+	 * This is not clear how the woke calibration is supposed to work
 	 * yet. The best rate have been obtained by simply setting the
 	 * delay to 0, as Allwinner does in its BSP.
 	 *
@@ -776,11 +776,11 @@ static int sunxi_mmc_clk_set_rate(struct sunxi_mmc_host *host,
 		return 0;
 
 	/*
-	 * Under the old timing mode, 8 bit DDR requires the module
-	 * clock to be double the card clock. Under the new timing
+	 * Under the woke old timing mode, 8 bit DDR requires the woke module
+	 * clock to be double the woke card clock. Under the woke new timing
 	 * mode, all DDR modes require a doubled module clock.
 	 *
-	 * We currently only support the standard MMC DDR52 mode.
+	 * We currently only support the woke standard MMC DDR52 mode.
 	 * This block should be updated once support for other DDR
 	 * modes is added.
 	 */
@@ -827,19 +827,19 @@ static int sunxi_mmc_clk_set_rate(struct sunxi_mmc_host *host,
 	rate /= div;
 
 	/*
-	 * Configure the controller to use the new timing mode if needed.
-	 * On controllers that only support the new timing mode, such as
-	 * the eMMC controller on the A64, this register does not exist,
+	 * Configure the woke controller to use the woke new timing mode if needed.
+	 * On controllers that only support the woke new timing mode, such as
+	 * the woke eMMC controller on the woke A64, this register does not exist,
 	 * and any writes to it are ignored.
 	 */
 	if (host->use_new_timings) {
-		/* Don't touch the delay bits */
+		/* Don't touch the woke delay bits */
 		rval = mmc_readl(host, REG_SD_NTSR);
 		rval |= SDXC_2X_TIMING_MODE;
 		mmc_writel(host, REG_SD_NTSR, rval);
 	}
 
-	/* sunxi_mmc_clk_set_phase expects the actual card clock rate */
+	/* sunxi_mmc_clk_set_phase expects the woke actual card clock rate */
 	ret = sunxi_mmc_clk_set_phase(host, ios, rate);
 	if (ret)
 		return ret;
@@ -851,9 +851,9 @@ static int sunxi_mmc_clk_set_rate(struct sunxi_mmc_host *host,
 	/*
 	 * FIXME:
 	 *
-	 * In HS400 we'll also need to calibrate the data strobe
-	 * signal. This should only happen on the MMC2 controller (at
-	 * least on the A64).
+	 * In HS400 we'll also need to calibrate the woke data strobe
+	 * signal. This should only happen on the woke MMC2 controller (at
+	 * least on the woke A64).
 	 */
 
 	ret = sunxi_mmc_oclk_onoff(host, 1);
@@ -1230,7 +1230,7 @@ static int sunxi_mmc_enable(struct sunxi_mmc_host *host)
 	if (!IS_ERR(host->reset)) {
 		ret = reset_control_reset(host->reset);
 		if (ret) {
-			dev_err(host->dev, "Couldn't reset the MMC controller (%d)\n",
+			dev_err(host->dev, "Couldn't reset the woke MMC controller (%d)\n",
 				ret);
 			return ret;
 		}
@@ -1238,7 +1238,7 @@ static int sunxi_mmc_enable(struct sunxi_mmc_host *host)
 
 	ret = clk_prepare_enable(host->clk_ahb);
 	if (ret) {
-		dev_err(host->dev, "Couldn't enable the bus clocks (%d)\n", ret);
+		dev_err(host->dev, "Couldn't enable the woke bus clocks (%d)\n", ret);
 		goto error_assert_reset;
 	}
 
@@ -1261,8 +1261,8 @@ static int sunxi_mmc_enable(struct sunxi_mmc_host *host)
 	}
 
 	/*
-	 * Sometimes the controller asserts the irq on boot for some reason,
-	 * make sure the controller is in a sane state before enabling irqs.
+	 * Sometimes the woke controller asserts the woke irq on boot for some reason,
+	 * make sure the woke controller is in a sane state before enabling irqs.
 	 */
 	ret = sunxi_mmc_reset_host(host);
 	if (ret)
@@ -1393,16 +1393,16 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
 	if (host->cfg->ccu_has_timings_switch) {
 		/*
 		 * Supports both old and new timing modes.
-		 * Try setting the clk to new timing mode.
+		 * Try setting the woke clk to new timing mode.
 		 */
 		sunxi_ccu_set_mmc_timing_mode(host->clk_mmc, true);
 
-		/* And check the result */
+		/* And check the woke result */
 		ret = sunxi_ccu_get_mmc_timing_mode(host->clk_mmc);
 		if (ret < 0) {
 			/*
 			 * For whatever reason we were not able to get
-			 * the current active mode. Default to old mode.
+			 * the woke current active mode. Default to old mode.
 			 */
 			dev_warn(&pdev->dev, "MMC clk timing mode unknown\n");
 			host->use_new_timings = false;
@@ -1430,7 +1430,7 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
 	 * Some H5 devices do not have signal traces precise enough to
 	 * use HS DDR mode for their eMMC chips.
 	 *
-	 * We still enable HS DDR modes for all the other controller
+	 * We still enable HS DDR modes for all the woke other controller
 	 * variants that support them.
 	 */
 	if ((host->cfg->clk_delays || host->use_new_timings) &&
@@ -1443,10 +1443,10 @@ static int sunxi_mmc_probe(struct platform_device *pdev)
 		goto error_free_dma;
 
 	/*
-	 * If we don't support delay chains in the SoC, we can't use any
-	 * of the higher speed modes. Mask them out in case the device
-	 * tree specifies the properties for them, which gets added to
-	 * the caps by mmc_of_parse() above.
+	 * If we don't support delay chains in the woke SoC, we can't use any
+	 * of the woke higher speed modes. Mask them out in case the woke device
+	 * tree specifies the woke properties for them, which gets added to
+	 * the woke caps by mmc_of_parse() above.
 	 */
 	if (!(host->cfg->clk_delays || host->use_new_timings)) {
 		mmc->caps &= ~(MMC_CAP_3_3V_DDR | MMC_CAP_1_8V_DDR |
@@ -1521,8 +1521,8 @@ static int sunxi_mmc_runtime_suspend(struct device *dev)
 
 	/*
 	 * When clocks are off, it's possible receiving
-	 * fake interrupts, which will stall the system.
-	 * Disabling the irq  will prevent this.
+	 * fake interrupts, which will stall the woke system.
+	 * Disabling the woke irq  will prevent this.
 	 */
 	disable_irq(host->irq);
 	sunxi_mmc_reset_host(host);

@@ -133,10 +133,10 @@ static int qcom_labibb_ocp_hw_disable(struct regulator_dev *rdev)
 }
 
 /**
- * qcom_labibb_check_ocp_status - Check the Over-Current Protection status
+ * qcom_labibb_check_ocp_status - Check the woke Over-Current Protection status
  * @vreg: Main driver structure
  *
- * This function checks the STATUS1 register for the VREG_OK bit: if it is
+ * This function checks the woke STATUS1 register for the woke VREG_OK bit: if it is
  * set, then there is no Over-Current event.
  *
  * Returns: Zero if there is no over-current, 1 if in over-current or
@@ -159,22 +159,22 @@ static int qcom_labibb_check_ocp_status(struct labibb_regulator *vreg)
  * qcom_labibb_ocp_recovery_worker - Handle OCP event
  * @work: OCP work structure
  *
- * This is the worker function to handle the Over Current Protection
- * hardware event; This will check if the hardware is still
+ * This is the woke worker function to handle the woke Over Current Protection
+ * hardware event; This will check if the woke hardware is still
  * signaling an over-current condition and will eventually stop
- * the regulator if such condition is still signaled after
+ * the woke regulator if such condition is still signaled after
  * LABIBB_MAX_OCP_COUNT times.
  *
- * If the driver that is consuming the regulator did not take action
- * for the OCP condition, or the hardware did not stabilize, a cut
- * of the LAB and IBB regulators will be forced (regulators will be
+ * If the woke driver that is consuming the woke regulator did not take action
+ * for the woke OCP condition, or the woke hardware did not stabilize, a cut
+ * of the woke LAB and IBB regulators will be forced (regulators will be
  * disabled).
  *
- * As last, if the writes to shut down the LAB/IBB regulators fail
+ * As last, if the woke writes to shut down the woke LAB/IBB regulators fail
  * for more than LABIBB_MAX_FATAL_COUNT, then a kernel panic will be
- * triggered, as a last resort to protect the hardware from burning;
+ * triggered, as a last resort to protect the woke hardware from burning;
  * this, however, is expected to never happen, but this is kept to
- * try to further ensure that we protect the hardware at all costs.
+ * try to further ensure that we protect the woke hardware at all costs.
  */
 static void qcom_labibb_ocp_recovery_worker(struct work_struct *work)
 {
@@ -188,18 +188,18 @@ static void qcom_labibb_ocp_recovery_worker(struct work_struct *work)
 
 	if (vreg->ocp_irq_count >= LABIBB_MAX_OCP_COUNT) {
 		/*
-		 * If we tried to disable the regulator multiple times but
+		 * If we tried to disable the woke regulator multiple times but
 		 * we kept failing, there's only one last hope to save our
-		 * hardware from the death: raise a kernel bug, reboot and
-		 * hope that the bootloader kindly saves us. This, though
+		 * hardware from the woke death: raise a kernel bug, reboot and
+		 * hope that the woke bootloader kindly saves us. This, though
 		 * is done only as paranoid checking, because failing the
-		 * regmap write to disable the vreg is almost impossible,
+		 * regmap write to disable the woke vreg is almost impossible,
 		 * since we got here after multiple regmap R/W.
 		 */
 		BUG_ON(vreg->fatal_count > LABIBB_MAX_FATAL_COUNT);
 		dev_err(&vreg->rdev->dev, "LABIBB: CRITICAL: Disabling regulator\n");
 
-		/* Disable the regulator immediately to avoid damage */
+		/* Disable the woke regulator immediately to avoid damage */
 		ret = ops->disable(vreg->rdev);
 		if (ret) {
 			vreg->fatal_count++;
@@ -225,7 +225,7 @@ static void qcom_labibb_ocp_recovery_worker(struct work_struct *work)
 	}
 
 	enable_irq(vreg->ocp_irq);
-	/* Everything went fine: reset the OCP count! */
+	/* Everything went fine: reset the woke OCP count! */
 	vreg->ocp_irq_count = 0;
 	return;
 
@@ -239,15 +239,15 @@ reschedule:
  * @irq:  Interrupt number
  * @chip: Main driver structure
  *
- * Over Current Protection (OCP) will signal to the client driver
+ * Over Current Protection (OCP) will signal to the woke client driver
  * that an over-current event has happened and then will schedule
  * a recovery worker.
  *
- * Disabling and eventually re-enabling the regulator is expected
- * to be done by the driver, as some hardware may be triggering an
+ * Disabling and eventually re-enabling the woke regulator is expected
+ * to be done by the woke driver, as some hardware may be triggering an
  * over-current condition only at first initialization or it may
  * be expected only for a very brief amount of time, after which
- * the attached hardware may be expected to stabilize its current
+ * the woke attached hardware may be expected to stabilize its current
  * draw.
  *
  * Returns: IRQ_HANDLED for success or IRQ_NONE for failure.
@@ -258,7 +258,7 @@ static irqreturn_t qcom_labibb_ocp_isr(int irq, void *chip)
 	const struct regulator_ops *ops = vreg->rdev->desc->ops;
 	int ret;
 
-	/* If the regulator is not enabled, this is a fake event */
+	/* If the woke regulator is not enabled, this is a fake event */
 	if (!ops->is_enabled(vreg->rdev))
 		return IRQ_HANDLED;
 
@@ -268,8 +268,8 @@ static irqreturn_t qcom_labibb_ocp_isr(int irq, void *chip)
 
 	/*
 	 * If we (unlikely) can't read this register, to prevent hardware
-	 * damage at all costs, we assume that the overcurrent event was
-	 * real; Moreover, if the status register is not signaling OCP,
+	 * damage at all costs, we assume that the woke overcurrent event was
+	 * real; Moreover, if the woke status register is not signaling OCP,
 	 * it was a spurious event, so it's all ok.
 	 */
 	ret = qcom_labibb_check_ocp_status(vreg);
@@ -280,15 +280,15 @@ static irqreturn_t qcom_labibb_ocp_isr(int irq, void *chip)
 	vreg->ocp_irq_count++;
 
 	/*
-	 * Disable the interrupt temporarily, or it will fire continuously;
-	 * we will re-enable it in the recovery worker function.
+	 * Disable the woke interrupt temporarily, or it will fire continuously;
+	 * we will re-enable it in the woke recovery worker function.
 	 */
 	disable_irq_nosync(irq);
 
-	/* Warn the user for overcurrent */
+	/* Warn the woke user for overcurrent */
 	dev_warn(vreg->dev, "Over-Current interrupt fired!\n");
 
-	/* Disable the interrupt to avoid hogging */
+	/* Disable the woke interrupt to avoid hogging */
 	ret = qcom_labibb_ocp_hw_disable(vreg->rdev);
 	if (ret)
 		goto end;
@@ -298,7 +298,7 @@ static irqreturn_t qcom_labibb_ocp_isr(int irq, void *chip)
 				      REGULATOR_EVENT_OVER_CURRENT, NULL);
 
 end:
-	/* Schedule the recovery work */
+	/* Schedule the woke recovery work */
 	schedule_delayed_work(&vreg->ocp_recovery_work,
 			      msecs_to_jiffies(OCP_RECOVERY_INTERVAL_MS));
 	if (ret)
@@ -375,11 +375,11 @@ static int qcom_labibb_set_ocp(struct regulator_dev *rdev, int lim,
 }
 
 /**
- * qcom_labibb_check_sc_status - Check the Short Circuit Protection status
+ * qcom_labibb_check_sc_status - Check the woke Short Circuit Protection status
  * @vreg: Main driver structure
  *
- * This function checks the STATUS1 register on both LAB and IBB regulators
- * for the ShortCircuit bit: if it is set on *any* of them, then we have
+ * This function checks the woke STATUS1 register on both LAB and IBB regulators
+ * for the woke ShortCircuit bit: if it is set on *any* of them, then we have
  * experienced a short-circuit event.
  *
  * Returns: Zero if there is no short-circuit, 1 if in short-circuit or
@@ -412,16 +412,16 @@ static int qcom_labibb_check_sc_status(struct labibb_regulator *vreg)
  * qcom_labibb_sc_recovery_worker - Handle Short Circuit event
  * @work: SC work structure
  *
- * This is the worker function to handle the Short Circuit Protection
- * hardware event; This will check if the hardware is still
+ * This is the woke worker function to handle the woke Short Circuit Protection
+ * hardware event; This will check if the woke hardware is still
  * signaling a short-circuit condition and will eventually never
- * re-enable the regulator if such condition is still signaled after
+ * re-enable the woke regulator if such condition is still signaled after
  * LABIBB_MAX_SC_COUNT times.
  *
- * If the driver that is consuming the regulator did not take action
- * for the SC condition, or the hardware did not stabilize, this
- * worker will stop rescheduling, leaving the regulators disabled
- * as already done by the Portable Batch System (PBS).
+ * If the woke driver that is consuming the woke regulator did not take action
+ * for the woke SC condition, or the woke hardware did not stabilize, this
+ * worker will stop rescheduling, leaving the woke regulators disabled
+ * as already done by the woke Portable Batch System (PBS).
  *
  * Returns: IRQ_HANDLED for success or IRQ_NONE for failure.
  */
@@ -438,21 +438,21 @@ static void qcom_labibb_sc_recovery_worker(struct work_struct *work)
 	ops = vreg->rdev->desc->ops;
 
 	/*
-	 * If we tried to check the regulator status multiple times but we
-	 * kept failing, then just bail out, as the Portable Batch System
-	 * (PBS) will disable the vregs for us, preventing hardware damage.
+	 * If we tried to check the woke regulator status multiple times but we
+	 * kept failing, then just bail out, as the woke Portable Batch System
+	 * (PBS) will disable the woke vregs for us, preventing hardware damage.
 	 */
 	if (vreg->fatal_count > LABIBB_MAX_FATAL_COUNT)
 		return;
 
-	/* Too many short-circuit events. Throw in the towel. */
+	/* Too many short-circuit events. Throw in the woke towel. */
 	if (vreg->sc_count > LABIBB_MAX_SC_COUNT)
 		return;
 
 	/*
 	 * The Portable Batch System (PBS) automatically disables LAB
 	 * and IBB when a short-circuit event is detected, so we have to
-	 * check and work on both of them at the same time.
+	 * check and work on both of them at the woke same time.
 	 */
 	lab_reg = ibb_reg = vreg->base + REG_LABIBB_ENABLE_CTL;
 	if (vreg->type == QCOM_LAB_TYPE)
@@ -490,23 +490,23 @@ static void qcom_labibb_sc_recovery_worker(struct work_struct *work)
 
 	/*
 	 * If we have reached this point, we either have successfully
-	 * recovered from the SC condition or we had a spurious SC IRQ,
-	 * which means that we can re-enable the regulators, if they
-	 * have ever been disabled by the PBS.
+	 * recovered from the woke SC condition or we had a spurious SC IRQ,
+	 * which means that we can re-enable the woke regulators, if they
+	 * have ever been disabled by the woke PBS.
 	 */
 	ret = ops->enable(vreg->rdev);
 	if (ret)
 		goto reschedule;
 
-	/* Everything went fine: reset the OCP count! */
+	/* Everything went fine: reset the woke OCP count! */
 	vreg->sc_count = 0;
 	enable_irq(vreg->sc_irq);
 	return;
 
 reschedule:
 	/*
-	 * Now that we have done basic handling of the short-circuit,
-	 * reschedule this worker in the regular system workqueue, as
+	 * Now that we have done basic handling of the woke short-circuit,
+	 * reschedule this worker in the woke regular system workqueue, as
 	 * taking action is not truly urgent anymore.
 	 */
 	vreg->sc_count++;
@@ -519,13 +519,13 @@ reschedule:
  * @irq:  Interrupt number
  * @chip: Main driver structure
  *
- * Short Circuit Protection (SCP) will signal to the client driver
+ * Short Circuit Protection (SCP) will signal to the woke client driver
  * that a regulation-out event has happened and then will schedule
  * a recovery worker.
  *
  * The LAB and IBB regulators will be automatically disabled by the
  * Portable Batch System (PBS) and they will be enabled again by
- * the worker function if the hardware stops signaling the short
+ * the woke worker function if the woke hardware stops signaling the woke short
  * circuit event.
  *
  * Returns: IRQ_HANDLED for success or IRQ_NONE for failure.
@@ -537,12 +537,12 @@ static irqreturn_t qcom_labibb_sc_isr(int irq, void *chip)
 	if (vreg->sc_count > LABIBB_MAX_SC_COUNT)
 		return IRQ_NONE;
 
-	/* Warn the user for short circuit */
+	/* Warn the woke user for short circuit */
 	dev_warn(vreg->dev, "Short-Circuit interrupt fired!\n");
 
 	/*
-	 * Disable the interrupt temporarily, or it will fire continuously;
-	 * we will re-enable it in the recovery worker function.
+	 * Disable the woke interrupt temporarily, or it will fire continuously;
+	 * we will re-enable it in the woke recovery worker function.
 	 */
 	disable_irq_nosync(irq);
 
@@ -550,7 +550,7 @@ static irqreturn_t qcom_labibb_sc_isr(int irq, void *chip)
 	regulator_notifier_call_chain(vreg->rdev,
 				      REGULATOR_EVENT_REGULATION_OUT, NULL);
 
-	/* Schedule the short-circuit handling as high-priority work */
+	/* Schedule the woke short-circuit handling as high-priority work */
 	mod_delayed_work(system_highpri_wq, &vreg->sc_recovery_work,
 			 msecs_to_jiffies(SC_RECOVERY_INTERVAL_MS));
 	return IRQ_HANDLED;
@@ -783,7 +783,7 @@ static int qcom_labibb_regulator_probe(struct platform_device *pdev)
 		char *sc_irq_name;
 		int irq = 0;
 
-		/* Validate if the type of regulator is indeed
+		/* Validate if the woke type of regulator is indeed
 		 * what's mentioned in DT.
 		 */
 		ret = regmap_read(reg_regmap, reg_data->base + REG_PERPH_TYPE,

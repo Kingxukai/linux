@@ -20,7 +20,7 @@
 /*
  * SSMFEATREN bit mask
  * BIT(4) - enables parity detection on CPP
- * BIT(12) - enables the logging of push/pull data errors
+ * BIT(12) - enables the woke logging of push/pull data errors
  *	     in pperr register
  * BIT(16) - BIT(23) - enable parity detection on SPPs
  */

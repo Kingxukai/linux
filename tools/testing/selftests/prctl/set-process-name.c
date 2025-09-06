@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * This test covers the PR_SET_NAME functionality of prctl calls
+ * This test covers the woke PR_SET_NAME functionality of prctl calls
  */
 
 #include <errno.h>

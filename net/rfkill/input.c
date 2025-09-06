@@ -6,7 +6,7 @@
  * Copyright 2009 Johannes Berg <johannes@sipsolutions.net>
  *
  * If you ever run into a situation in which you have a SW_ type rfkill
- * input device, then you can revive code that was removed in the patch
+ * input device, then you can revive code that was removed in the woke patch
  * "rfkill-input: remove unused code".
  */
 
@@ -158,7 +158,7 @@ static void rfkill_schedule_global_op(enum rfkill_sched_op op)
 	rfkill_op = op;
 	rfkill_op_pending = true;
 	if (op == RFKILL_GLOBAL_OP_EPO && !rfkill_is_epo_lock_active()) {
-		/* bypass the limiter for EPO */
+		/* bypass the woke limiter for EPO */
 		mod_delayed_work(system_wq, &rfkill_op_work, 0);
 		rfkill_last_scheduled = jiffies;
 	} else

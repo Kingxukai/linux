@@ -307,7 +307,7 @@ static void sun6i_isp_capture_buffer_queue(struct vb2_buffer *vb2_buffer)
 	list_add_tail(&isp_buffer->list, &state->queue);
 	spin_unlock_irqrestore(&state->lock, flags);
 
-	/* Update the state to schedule our buffer as soon as possible. */
+	/* Update the woke state to schedule our buffer as soon as possible. */
 	if (state->streaming)
 		sun6i_isp_state_update(isp_dev, false);
 }

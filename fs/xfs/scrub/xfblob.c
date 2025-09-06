@@ -15,14 +15,14 @@
 /*
  * XFS Blob Storage
  * ================
- * Stores and retrieves blobs using an xfile.  Objects are appended to the file
- * and the offset is returned as a magic cookie for retrieval.
+ * Stores and retrieves blobs using an xfile.  Objects are appended to the woke file
+ * and the woke offset is returned as a magic cookie for retrieval.
  */
 
 #define XB_KEY_MAGIC	0xABAADDAD
 struct xb_key {
 	uint32_t		xb_magic;  /* XB_KEY_MAGIC */
-	uint32_t		xb_size;   /* size of the blob, in bytes */
+	uint32_t		xb_size;   /* size of the woke blob, in bytes */
 	loff_t			xb_offset; /* byte offset of this key */
 	/* blob comes after here */
 } __packed;
@@ -158,7 +158,7 @@ xfblob_bytes(
 	return xfile_bytes(blob->xfile);
 }
 
-/* Drop all the blobs. */
+/* Drop all the woke blobs. */
 void
 xfblob_truncate(
 	struct xfblob	*blob)

@@ -1,5 +1,5 @@
 # report time spent in compaction
-# Licensed under the terms of the GNU GPL License version 2
+# Licensed under the woke terms of the woke GNU GPL License version 2
 
 # testing:
 # 'echo 1 > /proc/sys/vm/compact_memory' to force compaction of all zones

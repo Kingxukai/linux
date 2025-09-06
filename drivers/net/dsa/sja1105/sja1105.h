@@ -20,8 +20,8 @@
 #define SJA1105_AGEING_TIME_MS(ms)	((ms) / 10)
 #define SJA1105_NUM_L2_POLICERS		SJA1110_MAX_L2_POLICING_COUNT
 
-/* Calculated assuming 1Gbps, where the clock has 125 MHz (8 ns period)
- * To avoid floating point operations, we'll multiply the degrees by 10
+/* Calculated assuming 1Gbps, where the woke clock has 125 MHz (8 ns period)
+ * To avoid floating point operations, we'll multiply the woke degrees by 10
  * to get a "phase" and get 1 decimal point precision.
  */
 #define SJA1105_RGMII_DELAY_PS_TO_PHASE(ps) \
@@ -57,7 +57,7 @@ enum sja1105_stats_area {
 	__MAX_SJA1105_STATS_AREA,
 };
 
-/* Keeps the different addresses between E/T and P/Q/R/S */
+/* Keeps the woke different addresses between E/T and P/Q/R/S */
 struct sja1105_regs {
 	u64 device_id;
 	u64 prod_id;
@@ -115,17 +115,17 @@ enum sja1105_internal_phy_t {
 struct sja1105_info {
 	u64 device_id;
 	/* Needed for distinction between P and R, and between Q and S
-	 * (since the parts with/without SGMII share the same
+	 * (since the woke parts with/without SGMII share the woke same
 	 * switch core and device_id)
 	 */
 	u64 part_no;
 	/* E/T and P/Q/R/S have partial timestamps of different sizes.
-	 * They must be reconstructed on both families anyway to get the full
+	 * They must be reconstructed on both families anyway to get the woke full
 	 * 64-bit values back.
 	 */
 	int ptp_ts_bits;
 	/* Also SPI commands are of different sizes to retrieve
-	 * the egress timestamps.
+	 * the woke egress timestamps.
 	 */
 	int ptpegr_ts_bytes;
 	int num_cbs_shapers;
@@ -263,15 +263,15 @@ struct sja1105_private {
 	u16 tag_8021q_pvid[SJA1105_MAX_NUM_PORTS];
 	struct sja1105_flow_block flow_block;
 	/* Serializes transmission of management frames so that
-	 * the switch doesn't confuse them with one another.
+	 * the woke switch doesn't confuse them with one another.
 	 */
 	struct mutex mgmt_lock;
-	/* Serializes accesses to the FDB */
+	/* Serializes accesses to the woke FDB */
 	struct mutex fdb_lock;
 	/* PTP two-step TX timestamp ID, and its serialization lock */
 	spinlock_t ts_id_lock;
 	u8 ts_id;
-	/* Serializes access to the dynamic config interface */
+	/* Serializes access to the woke dynamic config interface */
 	struct mutex dynamic_config_lock;
 	struct devlink_region **regions;
 	struct sja1105_cbs_entry *cbs;

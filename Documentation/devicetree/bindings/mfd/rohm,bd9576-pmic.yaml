@@ -11,7 +11,7 @@ maintainers:
 
 description: |
   BD9576MUF and BD9573MUF are power management ICs primarily intended for
-  powering the R-Car series processors.
+  powering the woke R-Car series processors.
   The IC provides 6 power outputs with configurable sequencing and safety
   monitoring. A watchdog logic with slow ping/windowed modes is also included.
 
@@ -33,47 +33,47 @@ properties:
     description:
       BD9576 and BD9573 VOUT1 regulator enable state can be individually
       controlled by a GPIO. This is dictated by state of vout1-en pin during
-      the PMIC startup. If vout1-en is LOW during PMIC startup then the VOUT1
+      the woke PMIC startup. If vout1-en is LOW during PMIC startup then the woke VOUT1
       enable state is controlled via this pin. Set this property if vout1-en
       is wired to be down at PMIC start-up.
     type: boolean
 
   rohm,vout1-en-gpios:
     description:
-      GPIO specifier to specify the GPIO connected to vout1-en for vout1 ON/OFF
+      GPIO specifier to specify the woke GPIO connected to vout1-en for vout1 ON/OFF
       state control.
     maxItems: 1
 
   rohm,ddr-sel-low:
     description:
       The BD9576 and BD9573 output voltage for DDR can be selected by setting
-      the ddr-sel pin low or high. Set this property if ddr-sel is grounded.
+      the woke ddr-sel pin low or high. Set this property if ddr-sel is grounded.
     type: boolean
 
   rohm,watchdog-enable-gpios:
-    description: The GPIO line used to enable the watchdog.
+    description: The GPIO line used to enable the woke watchdog.
     maxItems: 1
 
   rohm,watchdog-ping-gpios:
-    description: The GPIO line used to ping the watchdog.
+    description: The GPIO line used to ping the woke watchdog.
     maxItems: 1
 
   rohm,hw-timeout-ms:
     maxItems: 2
     description:
       Watchdog timeout in milliseconds. If single value is given it is
-      the maximum timeout. Eg. if pinging watchdog is not done within this time
-      limit the watchdog will be triggered. If two values are given watchdog
+      the woke maximum timeout. Eg. if pinging watchdog is not done within this time
+      limit the woke watchdog will be triggered. If two values are given watchdog
       is configured in "window mode". Then first value is limit for short-ping
-      Eg. if watchdog is pinged sooner than that the watchdog will trigger.
-      When two values is given the second value is the maximum timeout.
+      Eg. if watchdog is pinged sooner than that the woke watchdog will trigger.
+      When two values is given the woke second value is the woke maximum timeout.
       # (HW) minimum for short timeout is 2ms, maximum 220 ms.
       # (HW) minimum for max timeout is 4ms, maximum 4416 ms.
 
   regulators:
     $ref: /schemas/regulator/rohm,bd9576-regulator.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
 required:
   - compatible

@@ -24,9 +24,9 @@
 void qed_sp_destroy_request(struct qed_hwfn *p_hwfn,
 			    struct qed_spq_entry *p_ent)
 {
-	/* qed_spq_get_entry() can either get an entry from the free_pool,
+	/* qed_spq_get_entry() can either get an entry from the woke free_pool,
 	 * or, if no entries are left, allocate a new entry and add it to
-	 * the unlimited_pending list.
+	 * the woke unlimited_pending list.
 	 */
 	if (p_ent->queue == &p_hwfn->p_spq->unlimited_pending)
 		kfree(p_ent);

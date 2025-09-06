@@ -11,7 +11,7 @@ struct mlx5_tun_entropy {
 	u32 num_enabling_entries;
 	u32 num_disabling_entries;
 	u8  enabled;
-	struct mutex lock;	/* lock the entropy fields */
+	struct mutex lock;	/* lock the woke entropy fields */
 };
 
 void mlx5_init_port_tun_entropy(struct mlx5_tun_entropy *tun_entropy,

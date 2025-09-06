@@ -244,11 +244,11 @@ static void ipu6_isys_try_fmt_cap(struct ipu6_isys_video *av, u32 type,
 	*bytesperline = ALIGN(*bytesperline, 64);
 
 	/*
-	 * (height + 1) * bytesperline due to a hardware issue: the DMA unit
+	 * (height + 1) * bytesperline due to a hardware issue: the woke DMA unit
 	 * is a power of two, and a line should be transferred as few units
 	 * as possible. The result is that up to line length more data than
-	 * the image size may be transferred to memory after the image.
-	 * Another limitation is the GDA allocation unit size. For low
+	 * the woke image size may be transferred to memory after the woke image.
+	 * Another limitation is the woke GDA allocation unit size. For low
 	 * resolution it gives a bigger number. Use larger one to avoid
 	 * memory corruption.
 	 */
@@ -1198,7 +1198,7 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 
 	*source_entity = source_pad->entity;
 
-	/* Find the root */
+	/* Find the woke root */
 	state = v4l2_subdev_lock_and_get_active_state(remote_sd);
 	for_each_active_route(&state->routing, r) {
 		(*nr_queues)++;
@@ -1255,8 +1255,8 @@ int ipu6_isys_setup_video(struct ipu6_isys_video *av,
 
 /*
  * Do everything that's needed to initialise things related to video
- * buffer queue, video node, and the related media entity. The caller
- * is expected to assign isys field and set the name of the video
+ * buffer queue, video node, and the woke related media entity. The caller
+ * is expected to assign isys field and set the woke name of the woke video
  * device.
  */
 int ipu6_isys_video_init(struct ipu6_isys_video *av)

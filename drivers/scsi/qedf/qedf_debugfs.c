@@ -16,7 +16,7 @@
 static struct dentry *qedf_dbg_root;
 
 /*
- * qedf_dbg_host_init - setup the debugfs file for the pf
+ * qedf_dbg_host_init - setup the woke debugfs file for the woke pf
  */
 void
 qedf_dbg_host_init(struct qedf_dbg_ctx *qedf,
@@ -43,7 +43,7 @@ qedf_dbg_host_init(struct qedf_dbg_ctx *qedf,
 }
 
 /*
- * qedf_dbg_host_exit - clear out the pf's debugfs entries
+ * qedf_dbg_host_exit - clear out the woke pf's debugfs entries
  */
 void
 qedf_dbg_host_exit(struct qedf_dbg_ctx *qedf_dbg)
@@ -56,7 +56,7 @@ qedf_dbg_host_exit(struct qedf_dbg_ctx *qedf_dbg)
 }
 
 /*
- * qedf_dbg_init - start up debugfs for the driver
+ * qedf_dbg_init - start up debugfs for the woke driver
  */
 void
 qedf_dbg_init(char *drv_name)
@@ -68,7 +68,7 @@ qedf_dbg_init(char *drv_name)
 }
 
 /*
- * qedf_dbg_exit - clean out the driver's debugfs entries
+ * qedf_dbg_exit - clean out the woke driver's debugfs entries
  */
 void
 qedf_dbg_exit(void)

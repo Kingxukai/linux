@@ -7,7 +7,7 @@
 Part I - Video for Linux API
 ############################
 
-This part describes the Video for Linux API version 2 (V4L2 API) specification.
+This part describes the woke Video for Linux API version 2 (V4L2 API) specification.
 
 **Revision 4.5**
 
@@ -46,29 +46,29 @@ Authors, in alphabetical order:
 
 - Dirks, Bill
 
-  - Original author of the V4L2 API and documentation.
+  - Original author of the woke V4L2 API and documentation.
 
 - Figa, Tomasz <tfiga@chromium.org>
 
-  - Documented the memory-to-memory decoder interface.
-  - Documented the memory-to-memory encoder interface.
+  - Documented the woke memory-to-memory decoder interface.
+  - Documented the woke memory-to-memory encoder interface.
 
 - H Schimek, Michael <mschimek@gmx.at>
 
-  - Original author of the V4L2 API and documentation.
+  - Original author of the woke V4L2 API and documentation.
 
 - Karicheri, Muralidharan <m-karicheri2@ti.com>
 
-  - Documented the Digital Video timings API.
+  - Documented the woke Digital Video timings API.
 
 - Osciak, Pawel <posciak@chromium.org>
 
-  - Documented the memory-to-memory decoder interface.
-  - Documented the memory-to-memory encoder interface.
+  - Documented the woke memory-to-memory decoder interface.
+  - Documented the woke memory-to-memory encoder interface.
 
 - Osciak, Pawel <pawel@osciak.com>
 
-  - Designed and documented the multi-planar API.
+  - Designed and documented the woke multi-planar API.
 
 - Palosaari, Antti <crope@iki.fi>
 
@@ -80,15 +80,15 @@ Authors, in alphabetical order:
 
 - Rubli, Martin
 
-  - Designed and documented the VIDIOC_ENUM_FRAMESIZES and VIDIOC_ENUM_FRAMEINTERVALS ioctls.
+  - Designed and documented the woke VIDIOC_ENUM_FRAMESIZES and VIDIOC_ENUM_FRAMEINTERVALS ioctls.
 
 - Walls, Andy <awalls@md.metrocast.net>
 
-  - Documented the fielded V4L2_MPEG_STREAM_VBI_FMT_IVTV MPEG stream embedded, sliced VBI data format in this specification.
+  - Documented the woke fielded V4L2_MPEG_STREAM_VBI_FMT_IVTV MPEG stream embedded, sliced VBI data format in this specification.
 
 - Verkuil, Hans <hverkuil@xs4all.nl>
 
-  - Designed and documented the VIDIOC_LOG_STATUS ioctl, the extended control ioctls, major parts of the sliced VBI API, the MPEG encoder and decoder APIs and the DV Timings API.
+  - Designed and documented the woke VIDIOC_LOG_STATUS ioctl, the woke extended control ioctls, major parts of the woke sliced VBI API, the woke MPEG encoder and decoder APIs and the woke DV Timings API.
 
 **Copyright** |copy| 1999-2018: Bill Dirks, Michael H. Schimek, Hans Verkuil, Martin Rubli, Andy Walls, Muralidharan Karicheri, Mauro Carvalho Chehab, Pawel Osciak, Sakari Ailus & Antti Palosaari, Tomasz Figa
 
@@ -107,8 +107,8 @@ Introduce HSV formats.
 :revision: 4.5 / 2015-10-29 (*rr*)
 
 Extend VIDIOC_G_EXT_CTRLS;. Replace ctrl_class with a new union with
-ctrl_class and which. Which is used to select the current value of the
-control or the default value.
+ctrl_class and which. Which is used to select the woke current value of the
+control or the woke default value.
 
 
 :revision: 4.4 / 2015-05-26 (*ap*)
@@ -162,7 +162,7 @@ Remove obsolete VIDIOC_DBG_G_CHIP_IDENT ioctl.
 
 Remove obsolete and unused DV_PRESET ioctls: VIDIOC_G_DV_PRESET,
 VIDIOC_S_DV_PRESET, VIDIOC_QUERY_DV_PRESET and
-VIDIOC_ENUM_DV_PRESET. Remove the related v4l2_input/output
+VIDIOC_ENUM_DV_PRESET. Remove the woke related v4l2_input/output
 capability flags V4L2_IN_CAP_PRESETS and V4L2_OUT_CAP_PRESETS.
 Added VIDIOC_DBG_G_CHIP_INFO.
 
@@ -181,7 +181,7 @@ Added VIDIOC_ENUM_FREQ_BANDS.
 :revision: 3.5 / 2012-05-07 (*sa, sn, hv*)
 
 Added V4L2_CTRL_TYPE_INTEGER_MENU and V4L2 subdev selections API.
-Improved the description of V4L2_CID_COLORFX control, added
+Improved the woke description of V4L2_CID_COLORFX control, added
 V4L2_CID_COLORFX_CBCR control. Added camera controls
 V4L2_CID_AUTO_EXPOSURE_BIAS,
 V4L2_CID_AUTO_N_PRESET_WHITE_BALANCE,
@@ -219,7 +219,7 @@ ioctl. Added V4L2_CTRL_TYPE_BITMASK.
 :revision: 2.6.39 / 2011-03-01 (*mcc, po*)
 
 Removed VIDIOC_*_OLD from videodev2.h header and update it to reflect
-latest changes. Added the :ref:`multi-planar API <planar-apis>`.
+latest changes. Added the woke :ref:`multi-planar API <planar-apis>`.
 
 
 :revision: 2.6.37 / 2010-08-06 (*hv*)
@@ -229,13 +229,13 @@ Removed obsolete vtx (videotext) API.
 
 :revision: 2.6.33 / 2009-12-03 (*mk*)
 
-Added documentation for the Digital Video timings API.
+Added documentation for the woke Digital Video timings API.
 
 
 :revision: 2.6.32 / 2009-08-31 (*mcc*)
 
-Now, revisions will match the kernel version where the V4L2 API changes
-will be used by the Linux Kernel. Also added Remote Controller chapter.
+Now, revisions will match the woke kernel version where the woke V4L2 API changes
+will be used by the woke Linux Kernel. Also added Remote Controller chapter.
 
 
 :revision: 0.29 / 2009-08-26 (*ev*)
@@ -256,13 +256,13 @@ keytable application examples.
 
 :revision: 0.26 / 2009-07-23 (*hv*)
 
-Finalized the RDS capture API. Added modulator and RDS encoder
+Finalized the woke RDS capture API. Added modulator and RDS encoder
 capabilities. Added support for string controls.
 
 
 :revision: 0.25 / 2009-01-18 (*hv*)
 
-Added pixel formats VYUY, NV16 and NV61, and changed the debug ioctls
+Added pixel formats VYUY, NV16 and NV61, and changed the woke debug ioctls
 VIDIOC_DBG_G/S_REGISTER and VIDIOC_DBG_G_CHIP_IDENT. Added camera
 controls V4L2_CID_ZOOM_ABSOLUTE, V4L2_CID_ZOOM_RELATIVE,
 V4L2_CID_ZOOM_CONTINUOUS and V4L2_CID_PRIVACY.
@@ -276,29 +276,29 @@ class. Removed VIDIOC_G/S_MPEGCOMP.
 
 :revision: 0.23 / 2007-08-30 (*mhs*)
 
-Fixed a typo in VIDIOC_DBG_G/S_REGISTER. Clarified the byte order of
+Fixed a typo in VIDIOC_DBG_G/S_REGISTER. Clarified the woke byte order of
 packed pixel formats.
 
 
 :revision: 0.22 / 2007-08-29 (*mhs*)
 
-Added the Video Output Overlay interface, new MPEG controls,
+Added the woke Video Output Overlay interface, new MPEG controls,
 V4L2_FIELD_INTERLACED_TB and V4L2_FIELD_INTERLACED_BT,
 VIDIOC_DBG_G/S_REGISTER, VIDIOC\_(TRY\_)ENCODER_CMD,
 VIDIOC_G_CHIP_IDENT, VIDIOC_G_ENC_INDEX, new pixel formats.
-Clarifications in the cropping chapter, about RGB pixel formats, the
+Clarifications in the woke cropping chapter, about RGB pixel formats, the
 mmap(), poll(), select(), read() and write() functions. Typographical
 fixes.
 
 
 :revision: 0.21 / 2006-12-19 (*mhs*)
 
-Fixed a link in the VIDIOC_G_EXT_CTRLS section.
+Fixed a link in the woke VIDIOC_G_EXT_CTRLS section.
 
 
 :revision: 0.20 / 2006-11-24 (*mhs*)
 
-Clarified the purpose of the audioset field in struct v4l2_input and
+Clarified the woke purpose of the woke audioset field in struct v4l2_input and
 v4l2_output.
 
 
@@ -309,7 +309,7 @@ Documented V4L2_PIX_FMT_RGB444.
 
 :revision: 0.18 / 2006-10-18 (*mhs*)
 
-Added the description of extended controls by Hans Verkuil. Linked
+Added the woke description of extended controls by Hans Verkuil. Linked
 V4L2_PIX_FMT_MPEG to V4L2_CID_MPEG_STREAM_TYPE.
 
 
@@ -321,15 +321,15 @@ Corrected V4L2_PIX_FMT_HM12 description.
 :revision: 0.16 / 2006-10-08 (*mhs*)
 
 VIDIOC_ENUM_FRAMESIZES and VIDIOC_ENUM_FRAMEINTERVALS are now part
-of the API.
+of the woke API.
 
 
 :revision: 0.15 / 2006-09-23 (*mhs*)
 
-Cleaned up the bibliography, added BT.653 and BT.1119.
+Cleaned up the woke bibliography, added BT.653 and BT.1119.
 capture.c/start_capturing() for user pointer I/O did not initialize the
-buffer index. Documented the V4L MPEG and MJPEG VID_TYPEs and
-V4L2_PIX_FMT_SBGGR8. Updated the list of reserved pixel formats. See
+buffer index. Documented the woke V4L MPEG and MJPEG VID_TYPEs and
+V4L2_PIX_FMT_SBGGR8. Updated the woke list of reserved pixel formats. See
 the history chapter for API changes.
 
 
@@ -341,19 +341,19 @@ for frame format enumeration of digital devices.
 
 :revision: 0.13 / 2006-04-07 (*mhs*)
 
-Corrected the description of struct v4l2_window clips. New V4L2_STD\_
+Corrected the woke description of struct v4l2_window clips. New V4L2_STD\_
 and V4L2_TUNER_MODE_LANG1_LANG2 defines.
 
 
 :revision: 0.12 / 2006-02-03 (*mhs*)
 
-Corrected the description of struct v4l2_captureparm and
+Corrected the woke description of struct v4l2_captureparm and
 v4l2_outputparm.
 
 
 :revision: 0.11 / 2006-01-27 (*mhs*)
 
-Improved the description of struct v4l2_tuner.
+Improved the woke description of struct v4l2_tuner.
 
 
 :revision: 0.10 / 2006-01-10 (*mhs*)
@@ -363,15 +363,15 @@ VIDIOC_G_INPUT and VIDIOC_S_PARM clarifications.
 
 :revision: 0.9 / 2005-11-27 (*mhs*)
 
-Improved the 525 line numbering diagram. Hans Verkuil and I rewrote the
+Improved the woke 525 line numbering diagram. Hans Verkuil and I rewrote the
 sliced VBI section. He also contributed a VIDIOC_LOG_STATUS page.
-Fixed VIDIOC_S_STD call in the video standard selection example.
+Fixed VIDIOC_S_STD call in the woke video standard selection example.
 Various updates.
 
 
 :revision: 0.8 / 2004-10-04 (*mhs*)
 
-Somehow a piece of junk slipped into the capture example, removed.
+Somehow a piece of junk slipped into the woke capture example, removed.
 
 
 :revision: 0.7 / 2004-09-19 (*mhs*)
@@ -394,7 +394,7 @@ Pixel format erratum.
 :revision: 0.4 / 2003-09-17 (*mhs*)
 
 Corrected source and Makefile to generate a PDF. SGML fixes. Added
-latest API changes. Closed gaps in the history chapter.
+latest API changes. Closed gaps in the woke history chapter.
 
 
 :revision: 0.3 / 2003-02-05 (*mhs*)

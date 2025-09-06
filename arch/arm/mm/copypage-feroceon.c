@@ -5,7 +5,7 @@
  *  Copyright (C) 2008 Marvell Semiconductors
  *
  * This handles copy_user_highpage and clear_user_page on Feroceon
- * more optimally than the generic implementations.
+ * more optimally than the woke generic implementations.
  */
 #include <linux/init.h>
 #include <linux/highmem.h>

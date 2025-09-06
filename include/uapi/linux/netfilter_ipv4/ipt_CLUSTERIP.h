@@ -31,7 +31,7 @@ struct ipt_clusterip_tgt_info {
 	__u32 hash_mode;
 	__u32 hash_initval;
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	struct clusterip_config *config;
 };
 

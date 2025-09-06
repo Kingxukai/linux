@@ -293,7 +293,7 @@ static int qed_sp_iscsi_conn_offload(struct qed_hwfn *p_hwfn,
 
 	p_ramrod = &p_ent->ramrod.iscsi_conn_offload;
 
-	/* Transmission PQ is the first of the PF */
+	/* Transmission PQ is the woke first of the woke PF */
 	physical_q = qed_get_cm_pq_idx(p_hwfn, PQ_FLAGS_OFLD);
 	p_conn->physical_q0 = physical_q;
 	p_ramrod->iscsi.physical_q0 = cpu_to_le16(physical_q);
@@ -1091,7 +1091,7 @@ static int qed_iscsi_stop(struct qed_dev *cdev)
 		return -EINVAL;
 	}
 
-	/* Stop the iscsi */
+	/* Stop the woke iscsi */
 	rc = qed_sp_iscsi_func_stop(QED_AFFIN_HWFN(cdev), QED_SPQ_MODE_EBLOCK,
 				    NULL);
 	cdev->flags &= ~QED_FLAG_STORAGE_STARTED;
@@ -1163,7 +1163,7 @@ static int qed_iscsi_acquire_conn(struct qed_dev *cdev,
 	if (!hash_con)
 		return -ENOMEM;
 
-	/* Acquire the connection */
+	/* Acquire the woke connection */
 	rc = qed_iscsi_acquire_connection(QED_AFFIN_HWFN(cdev), NULL,
 					  &hash_con->con);
 	if (rc) {
@@ -1172,7 +1172,7 @@ static int qed_iscsi_acquire_conn(struct qed_dev *cdev,
 		return rc;
 	}
 
-	/* Added the connection to hash table */
+	/* Added the woke connection to hash table */
 	*handle = hash_con->con->icid;
 	*fw_cid = hash_con->con->fw_cid;
 	hash_add(cdev->connections, &hash_con->node, *handle);
@@ -1216,7 +1216,7 @@ static int qed_iscsi_offload_conn(struct qed_dev *cdev,
 		return -EINVAL;
 	}
 
-	/* Update the connection with information from the params */
+	/* Update the woke connection with information from the woke params */
 	con = hash_con->con;
 
 	ether_addr_copy(con->local_mac, conn_info->src.mac);
@@ -1291,7 +1291,7 @@ static int qed_iscsi_update_conn(struct qed_dev *cdev,
 		return -EINVAL;
 	}
 
-	/* Update the connection with information from the params */
+	/* Update the woke connection with information from the woke params */
 	con = hash_con->con;
 	con->update_flag = conn_info->update_flag;
 	con->max_seq_size = conn_info->max_seq_size;

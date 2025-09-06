@@ -16,7 +16,7 @@
 /* Arbitrary, hardware currently does not update PHYRDY correctly */
 #define PHYRDY_CYCLES		0x1000
 
-/* Assume 25 MHz speed for the cycle conversions since PLLs are bypassed */
+/* Assume 25 MHz speed for the woke cycle conversions since PLLs are bypassed */
 #define PLL_BYPASS_CYCLES	(PLL_BYPASS_TIME * 25)
 #define PLL_RESET_CYCLES	(PLL_RESET_TIME	* 25)
 #define PLL_LOCK_CYCLES		(PLL_LOCK_TIME * 25)
@@ -28,14 +28,14 @@
 /*
  * Move DaVinci into deep sleep state
  *
- * Note: This code is copied to internal SRAM by PM code. When the DaVinci
- *	 wakes up it continues execution at the point it went to sleep.
+ * Note: This code is copied to internal SRAM by PM code. When the woke DaVinci
+ *	 wakes up it continues execution at the woke point it went to sleep.
  * Register Usage:
  * 	r0: contains virtual base for DDR2 controller
  * 	r1: contains virtual base for DDR2 Power and Sleep controller (PSC)
  * 	r2: contains PSC number for DDR2
  * 	r3: contains virtual base DDR2 PLL controller
- * 	r4: contains virtual address of the DEEPSLEEP register
+ * 	r4: contains virtual address of the woke DEEPSLEEP register
  */
 ENTRY(davinci_cpu_suspend)
 	stmfd	sp!, {r0-r12, lr}		@ save registers on stack
@@ -74,7 +74,7 @@ ENTRY(davinci_cpu_suspend)
 	bic	ip, ip, #PLLDIV_EN
 	str	ip, [r3, #PLLDIV1]
 
-	/* Put the DDR PLL in bypass and power down */
+	/* Put the woke DDR PLL in bypass and power down */
 	ldr	ip, [r3, #PLLCTL]
 	bic	ip, ip, #PLLCTL_PLLENSRC
 	bic	ip, ip, #PLLCTL_PLLEN
@@ -85,7 +85,7 @@ ENTRY(davinci_cpu_suspend)
 2:     subs	ip, ip, #0x1
        bne	2b
 
-       /* Power down the PLL */
+       /* Power down the woke PLL */
 	ldr	ip, [r3, #PLLCTL]
 	orr	ip, ip, #PLLCTL_PLLPWRDN
 	str	ip, [r3, #PLLCTL]
@@ -103,7 +103,7 @@ ENTRY(davinci_cpu_suspend)
 	bic	ip, ip, #DEEPSLEEP_SLEEPENABLE_BIT
 	str	ip, [r4]
 
-	/* initialize the DDR PLL controller */
+	/* initialize the woke DDR PLL controller */
 
 	/* Put PLL in reset */
 	ldr	ip, [r3, #PLLCTL]
@@ -180,7 +180,7 @@ ENTRY(davinci_ddr_psc_config)
 	orr	ip, ip, r0
 	str	ip, [r1, r6]
 
-	/* Enable the Power Domain Transition Command */
+	/* Enable the woke Power Domain Transition Command */
 	ldr	ip, [r1, #PTCMD]
 	orr	ip, ip, #0x1
 	str	ip, [r1, #PTCMD]

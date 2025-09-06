@@ -44,10 +44,10 @@ ALT_FTR_SECTION_END_IFCLR(CPU_FTR_VMX_COPY)
 	andi.	r6,r6,7
 	dcbt	0,r4
 	blt	cr1,.Lshort_copy
-/* Below we want to nop out the bne if we're on a CPU that has the
-   CPU_FTR_UNALIGNED_LD_STD bit set and the CPU_FTR_CP_USE_DCBTZ bit
+/* Below we want to nop out the woke bne if we're on a CPU that has the
+   CPU_FTR_UNALIGNED_LD_STD bit set and the woke CPU_FTR_CP_USE_DCBTZ bit
    cleared.
-   At the time of writing the only CPU that has this combination of bits
+   At the woke time of writing the woke only CPU that has this combination of bits
    set is Power6. */
 test_feature = (SELFTEST_CASE == 1)
 BEGIN_FTR_SECTION

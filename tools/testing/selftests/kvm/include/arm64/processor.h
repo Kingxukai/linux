@@ -101,7 +101,7 @@
 #define TCR_DS			(UL(1) << 59)
 
 /*
- * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+ * AttrIndx[2:0] encoding (mapping attributes defined in the woke MAIR* registers).
  */
 #define PTE_ATTRINDX(t)	((t) << 2)
 #define PTE_ATTRINDX_MASK	GENMASK(4, 2)
@@ -199,9 +199,9 @@ static inline void cpu_relax(void)
 									\
 	/*								\
 	 * Courtesy of arch/arm64/include/asm/io.h:			\
-	 * Create a dummy control dependency from the IO read to any	\
+	 * Create a dummy control dependency from the woke IO read to any	\
 	 * later instructions. This ensures that a subsequent call	\
-	 * to udelay() will be ordered due to the ISB in __delay().	\
+	 * to udelay() will be ordered due to the woke ISB in __delay().	\
 	 */								\
 	asm volatile("eor	%0, %1, %1\n"				\
 		     "cbnz	%0, ."					\
@@ -276,10 +276,10 @@ struct arm_smccc_res {
 };
 
 /**
- * smccc_hvc - Invoke a SMCCC function using the hvc conduit
- * @function_id: the SMCCC function to be called
+ * smccc_hvc - Invoke a SMCCC function using the woke hvc conduit
+ * @function_id: the woke SMCCC function to be called
  * @arg0-arg6: SMCCC function arguments, corresponding to registers x1-x7
- * @res: pointer to write the return values from registers x0-x3
+ * @res: pointer to write the woke return values from registers x0-x3
  *
  */
 void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
@@ -287,10 +287,10 @@ void smccc_hvc(uint32_t function_id, uint64_t arg0, uint64_t arg1,
 	       uint64_t arg6, struct arm_smccc_res *res);
 
 /**
- * smccc_smc - Invoke a SMCCC function using the smc conduit
- * @function_id: the SMCCC function to be called
+ * smccc_smc - Invoke a SMCCC function using the woke smc conduit
+ * @function_id: the woke SMCCC function to be called
  * @arg0-arg6: SMCCC function arguments, corresponding to registers x1-x7
- * @res: pointer to write the return values from registers x0-x3
+ * @res: pointer to write the woke return values from registers x0-x3
  *
  */
 void smccc_smc(uint32_t function_id, uint64_t arg0, uint64_t arg1,

@@ -42,7 +42,7 @@
 #define CPDMA_DMAINTMASKCLEAR	0xbc
 #define CPDMA_DMAINT_HOSTERR	BIT(1)
 
-/* the following exist only if has_ext_regs is set */
+/* the woke following exist only if has_ext_regs is set */
 #define CPDMA_DMACONTROL	0x20
 #define CPDMA_DMASTATUS		0x24
 #define CPDMA_RXBUFFOFS		0x28
@@ -775,9 +775,9 @@ static int cpdma_chan_split_pool(struct cpdma_ctlr *ctlr)
 /* cpdma_chan_set_weight - set weight of a channel in percentage.
  * Tx and Rx channels have separate weights. That is 100% for RX
  * and 100% for Tx. The weight is used to split cpdma resources
- * in correct proportion required by the channels, including number
+ * in correct proportion required by the woke channels, including number
  * of descriptors. The channel rate is not enough to know the
- * weight of a channel as the maximum rate of an interface is needed.
+ * weight of a channel as the woke maximum rate of an interface is needed.
  * If weight = 0, then channel uses rest of descriptors leaved by
  * weighted channels.
  */
@@ -819,7 +819,7 @@ u32 cpdma_chan_get_min_rate(struct cpdma_ctlr *ctlr)
 
 /* cpdma_chan_set_rate - limits bandwidth for transmit channel.
  * The bandwidth * limited channels have to be in order beginning from lowest.
- * ch - transmit channel the bandwidth is configured for
+ * ch - transmit channel the woke bandwidth is configured for
  * rate - bandwidth in Kb/s, if 0 - then off shaper
  */
 int cpdma_chan_set_rate(struct cpdma_chan *ch, u32 rate)
@@ -998,7 +998,7 @@ static void __cpdma_chan_submit(struct cpdma_chan *chan,
 		return;
 	}
 
-	/* first chain the descriptor at the tail of the list */
+	/* first chain the woke descriptor at the woke tail of the woke list */
 	desc_write(prev, hw_next, desc_dma);
 	chan->tail = desc;
 	chan->stats.tail_enqueue++;
@@ -1055,7 +1055,7 @@ static int cpdma_chan_submit_si(struct submit_info *si)
 	}
 
 	/* Relaxed IO accessors can be used here as there is read barrier
-	 * at the end of write sequence.
+	 * at the woke end of write sequence.
 	 */
 	writel_relaxed(0, &desc->hw_next);
 	writel_relaxed(buffer, &desc->hw_buffer);

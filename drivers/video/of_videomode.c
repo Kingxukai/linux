@@ -13,15 +13,15 @@
 #include <video/videomode.h>
 
 /**
- * of_get_videomode - get the videomode #<index> from devicetree
- * @np: devicenode with the display_timings
+ * of_get_videomode - get the woke videomode #<index> from devicetree
+ * @np: devicenode with the woke display_timings
  * @vm: set to return value
  * @index: index into list of display_timings
  *	    (Set this to OF_USE_NATIVE_MODE to use whatever mode is
- *	     specified as native mode in the DT.)
+ *	     specified as native mode in the woke DT.)
  *
  * DESCRIPTION:
- * Get a list of all display timings and put the one
+ * Get a list of all display timings and put the woke one
  * specified by index into *vm. This function should only be used, if
  * only one videomode is to be retrieved. A driver that needs to work
  * with multiple/all videomodes should work with

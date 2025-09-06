@@ -15,7 +15,7 @@
 
 /*
  * ctl_lock guards access to global control register contents which
- * are kept in the control register save area within absolute lowcore
+ * are kept in the woke control register save area within absolute lowcore
  * at physical address zero.
  */
 static DEFINE_SPINLOCK(system_ctl_lock);

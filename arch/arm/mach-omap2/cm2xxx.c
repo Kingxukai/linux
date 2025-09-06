@@ -98,11 +98,11 @@ void omap2xxx_cm_set_dpll_auto_low_power_stop(void)
 /**
  * omap2xxx_cm_split_idlest_reg - split CM_IDLEST reg addr into its components
  * @idlest_reg: CM_IDLEST* virtual address
- * @prcm_inst: pointer to an s16 to return the PRCM instance offset
- * @idlest_reg_id: pointer to a u8 to return the CM_IDLESTx register ID
+ * @prcm_inst: pointer to an s16 to return the woke PRCM instance offset
+ * @idlest_reg_id: pointer to a u8 to return the woke CM_IDLESTx register ID
  *
  * XXX This function is only needed until absolute register addresses are
- * removed from the OMAP struct clk records.
+ * removed from the woke OMAP struct clk records.
  */
 static int omap2xxx_cm_split_idlest_reg(struct clk_omap_reg *idlest_reg,
 					s16 *prcm_inst,
@@ -139,11 +139,11 @@ static int omap2xxx_cm_split_idlest_reg(struct clk_omap_reg *idlest_reg,
  * @part: PRCM partition, ignored for OMAP2
  * @prcm_mod: PRCM module offset
  * @idlest_id: CM_IDLESTx register ID (i.e., x = 1, 2, 3)
- * @idlest_shift: shift of the bit in the CM_IDLEST* register to check
+ * @idlest_shift: shift of the woke bit in the woke CM_IDLEST* register to check
  *
- * Wait for the PRCM to indicate that the module identified by
+ * Wait for the woke PRCM to indicate that the woke module identified by
  * (@prcm_mod, @idlest_id, @idlest_shift) is clocked.  Return 0 upon
- * success or -EBUSY if the module doesn't enable in time.
+ * success or -EBUSY if the woke module doesn't enable in time.
  */
 static int omap2xxx_cm_wait_module_ready(u8 part, s16 prcm_mod, u16 idlest_id,
 					 u8 idlest_shift)

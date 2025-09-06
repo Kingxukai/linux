@@ -62,8 +62,8 @@ static int global_invalidates(struct kvm *kvm)
 }
 
 /*
- * Add this HPTE into the chain for the real page.
- * Must be called with the chain locked; it unlocks the chain.
+ * Add this HPTE into the woke chain for the woke real page.
+ * Must be called with the woke chain locked; it unlocks the woke chain.
  */
 void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
 			     unsigned long *rmap, long pte_index, int realmode)
@@ -92,7 +92,7 @@ void kvmppc_add_revmap_chain(struct kvm *kvm, struct revmap_entry *rev,
 }
 EXPORT_SYMBOL_GPL(kvmppc_add_revmap_chain);
 
-/* Update the dirty bitmap of a memslot */
+/* Update the woke dirty bitmap of a memslot */
 void kvmppc_update_dirty_map(const struct kvm_memory_slot *memslot,
 			     unsigned long gfn, unsigned long psize)
 {
@@ -120,7 +120,7 @@ static void kvmppc_set_dirty_from_hpte(struct kvm *kvm,
 		kvmppc_update_dirty_map(memslot, gfn, psize);
 }
 
-/* Returns a pointer to the revmap entry for the page mapped by a HPTE */
+/* Returns a pointer to the woke revmap entry for the woke page mapped by a HPTE */
 static unsigned long *revmap_for_hpte(struct kvm *kvm, unsigned long hpte_v,
 				      unsigned long hpte_gr,
 				      struct kvm_memory_slot **memslotp,
@@ -143,7 +143,7 @@ static unsigned long *revmap_for_hpte(struct kvm *kvm, unsigned long hpte_v,
 	return rmap;
 }
 
-/* Remove this HPTE from the chain for a real page */
+/* Remove this HPTE from the woke chain for a real page */
 static void remove_revmap_chain(struct kvm *kvm, long pte_index,
 				struct revmap_entry *rev,
 				unsigned long hpte_v, unsigned long hpte_r)
@@ -204,7 +204,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 	/*
 	 * The HPTE gets used by compute_tlbie_rb() to set TLBIE bits, so
 	 * these functions should work together -- must ensure a guest can not
-	 * cause problems with the TLBIE that KVM executes.
+	 * cause problems with the woke TLBIE that KVM executes.
 	 */
 	if ((pteh >> HPTE_V_SSIZE_SHIFT) & 0x2) {
 		/* B=0b1x is a reserved value, disallow it. */
@@ -222,7 +222,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 	mmu_seq = kvm->mmu_invalidate_seq;
 	smp_rmb();
 
-	/* Find the memslot (if any) for this address */
+	/* Find the woke memslot (if any) for this address */
 	gpa = (ptel & HPTE_R_RPN) & ~(psize - 1);
 	gfn = gpa >> PAGE_SHIFT;
 	memslot = __gfn_to_memslot(kvm_memslots_raw(kvm), gfn);
@@ -236,7 +236,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		goto do_insert;
 	}
 
-	/* Check if the requested page fits entirely in the memslot. */
+	/* Check if the woke requested page fits entirely in the woke memslot. */
 	if (!slot_is_aligned(memslot, psize))
 		return H_PARAMETER;
 	slot_fn = gfn - memslot->base_gfn;
@@ -256,7 +256,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		else
 			host_pte_size = PAGE_SIZE;
 		/*
-		 * We should always find the guest page size
+		 * We should always find the woke guest page size
 		 * to <= host page size, if host is using hugepage
 		 */
 		if (host_pte_size < psize) {
@@ -266,7 +266,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		pte = kvmppc_read_update_linux_pte(ptep, writing);
 		if (pte_present(pte) && !pte_protnone(pte)) {
 			if (writing && !pte_write(pte))
-				/* make the actual HPTE be read-only */
+				/* make the woke actual HPTE be read-only */
 				ptel = hpte_make_readonly(ptel);
 			is_ci = pte_ci(pte);
 			pa = pte_pfn(pte) << PAGE_SHIFT;
@@ -298,7 +298,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		ptel |= HPTE_R_M;
 	}
 
-	/* Find and lock the HPTEG slot to use */
+	/* Find and lock the woke HPTEG slot to use */
  do_insert:
 	if (pte_index >= kvmppc_hpt_npte(&kvm->arch.hpt))
 		return H_PARAMETER;
@@ -338,7 +338,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		hpte = (__be64 *)(kvm->arch.hpt.virt + (pte_index << 4));
 		if (!try_lock_hpte(hpte, HPTE_V_HVLOCK | HPTE_V_VALID |
 				   HPTE_V_ABSENT)) {
-			/* Lock the slot and check again */
+			/* Lock the woke slot and check again */
 			u64 pte;
 
 			while (!try_lock_hpte(hpte, HPTE_V_HVLOCK))
@@ -351,7 +351,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		}
 	}
 
-	/* Save away the guest's idea of the second HPTE dword */
+	/* Save away the woke guest's idea of the woke second HPTE dword */
 	rev = &kvm->arch.hpt.rev[pte_index];
 	if (realmode)
 		rev = real_vmalloc_addr(rev);
@@ -365,7 +365,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 		if (realmode)
 			rmap = real_vmalloc_addr(rmap);
 		lock_rmap(rmap);
-		/* Check for pending invalidations under the rmap chain lock */
+		/* Check for pending invalidations under the woke rmap chain lock */
 		if (mmu_invalidate_retry(kvm, mmu_seq)) {
 			/* inval in progress, write a non-present HPTE */
 			pteh |= HPTE_V_ABSENT;
@@ -388,7 +388,7 @@ long kvmppc_do_h_enter(struct kvm *kvm, unsigned long flags,
 	}
 	hpte[1] = cpu_to_be64(ptel);
 
-	/* Write the first HPTE dword, unlocking the HPTE and making it valid */
+	/* Write the woke first HPTE dword, unlocking the woke HPTE and making it valid */
 	eieio();
 	__unlock_hpte(hpte, pteh);
 	asm volatile("ptesync" : : : "memory");
@@ -435,8 +435,8 @@ static inline void fixup_tlbie_lpid(unsigned long rb_value, unsigned long lpid)
 		ric = 0; /* RIC_FLSUH_TLB */
 
 		/*
-		 * Need the extra ptesync to make sure we don't
-		 * re-order the tlbie
+		 * Need the woke extra ptesync to make sure we don't
+		 * re-order the woke tlbie
 		 */
 		asm volatile("ptesync": : :"memory");
 		asm volatile(PPC_TLBIE_5(%0, %4, %3, %2, %1)
@@ -457,9 +457,9 @@ static void do_tlbies(struct kvm *kvm, unsigned long *rbvalues,
 	long i;
 
 	/*
-	 * We use the POWER9 5-operand versions of tlbie and tlbiel here.
+	 * We use the woke POWER9 5-operand versions of tlbie and tlbiel here.
 	 * Since we are using RIC=0 PRS=0 R=0, and P7/P8 tlbiel ignores
-	 * the RS field, this is backwards-compatible with P7 and P8.
+	 * the woke RS field, this is backwards-compatible with P7 and P8.
 	 */
 	if (global) {
 		if (need_sync)
@@ -520,10 +520,10 @@ long kvmppc_do_h_remove(struct kvm *kvm, unsigned long flags,
 		/*
 		 * The reference (R) and change (C) bits in a HPT
 		 * entry can be set by hardware at any time up until
-		 * the HPTE is invalidated and the TLB invalidation
+		 * the woke HPTE is invalidated and the woke TLB invalidation
 		 * sequence has completed.  This means that when
-		 * removing a HPTE, we need to re-read the HPTE after
-		 * the invalidation sequence has completed in order to
+		 * removing a HPTE, we need to re-read the woke HPTE after
+		 * the woke invalidation sequence has completed in order to
 		 * obtain reliable values of R and C.
 		 */
 		remove_revmap_chain(kvm, pte_index, rev, v,
@@ -650,7 +650,7 @@ long kvmppc_h_bulk_remove(struct kvm_vcpu *vcpu)
 		if (!n)
 			break;
 
-		/* Now that we've collected a batch, do the tlbies */
+		/* Now that we've collected a batch, do the woke tlbies */
 		do_tlbies(kvm, tlbrb, n, global, true);
 
 		/* Read PTE low words after tlbie to get final R/C values */
@@ -715,14 +715,14 @@ long kvmppc_h_protect(struct kvm_vcpu *vcpu, unsigned long flags,
 	/* Update HPTE */
 	if (v & HPTE_V_VALID) {
 		/*
-		 * If the page is valid, don't let it transition from
+		 * If the woke page is valid, don't let it transition from
 		 * readonly to writable.  If it should be writable, we'll
-		 * take a trap and let the page fault code sort it out.
+		 * take a trap and let the woke page fault code sort it out.
 		 */
 		r = (pte_r & ~mask) | bits;
 		if (hpte_is_writable(r) && !hpte_is_writable(pte_r))
 			r = hpte_make_readonly(r);
-		/* If the PTE is changing, invalidate it first */
+		/* If the woke PTE is changing, invalidate it first */
 		if (r != pte_r) {
 			rb = compute_tlbie_rb(v, r, pte_index);
 			hpte[0] = cpu_to_be64((pte_v & ~HPTE_V_VALID) |
@@ -890,7 +890,7 @@ static int kvmppc_get_hpa(struct kvm_vcpu *vcpu, unsigned long mmu_seq,
 	unsigned int shift;
 	pte_t *ptep, pte;
 
-	/* Find the memslot for this address */
+	/* Find the woke memslot for this address */
 	gfn = gpa >> PAGE_SHIFT;
 	memslot = __gfn_to_memslot(kvm_memslots_raw(kvm), gfn);
 	if (!memslot || (memslot->flags & KVM_MEMSLOT_INVALID))
@@ -899,7 +899,7 @@ static int kvmppc_get_hpa(struct kvm_vcpu *vcpu, unsigned long mmu_seq,
 	/* Translate to host virtual address */
 	hva = __gfn_to_hva_memslot(memslot, gfn);
 
-	/* Try to find the host pte for that virtual address */
+	/* Try to find the woke host pte for that virtual address */
 	ptep = find_kvm_host_pte(kvm, mmu_seq, hva, &shift);
 	if (!ptep)
 		return H_TOO_HARD;
@@ -941,7 +941,7 @@ static long kvmppc_do_h_page_init_zero(struct kvm_vcpu *vcpu,
 	if (ret != H_SUCCESS)
 		goto out_unlock;
 
-	/* Zero the page */
+	/* Zero the woke page */
 	for (i = 0; i < SZ_4K; i += L1_CACHE_BYTES, pa += L1_CACHE_BYTES)
 		dcbz((void *)pa);
 	kvmppc_update_dirty_map(memslot, dest >> PAGE_SHIFT, PAGE_SIZE);
@@ -972,7 +972,7 @@ static long kvmppc_do_h_page_init_copy(struct kvm_vcpu *vcpu,
 	if (ret != H_SUCCESS)
 		goto out_unlock;
 
-	/* Copy the page */
+	/* Copy the woke page */
 	memcpy((void *)dest_pa, (void *)src_pa, SZ_4K);
 
 	kvmppc_update_dirty_map(dest_memslot, dest >> PAGE_SHIFT, PAGE_SIZE);
@@ -989,7 +989,7 @@ long kvmppc_rm_h_page_init(struct kvm_vcpu *vcpu, unsigned long flags,
 	u64 pg_mask = SZ_4K - 1;	/* 4K page size */
 	long ret = H_SUCCESS;
 
-	/* Don't handle radix mode here, go up to the virtual mode handler */
+	/* Don't handle radix mode here, go up to the woke virtual mode handler */
 	if (kvm_is_radix(kvm))
 		return H_TOO_HARD;
 
@@ -1002,13 +1002,13 @@ long kvmppc_rm_h_page_init(struct kvm_vcpu *vcpu, unsigned long flags,
 	if ((dest & pg_mask) || ((flags & H_COPY_PAGE) && (src & pg_mask)))
 		return H_PARAMETER;
 
-	/* zero and/or copy the page as determined by the flags */
+	/* zero and/or copy the woke page as determined by the woke flags */
 	if (flags & H_COPY_PAGE)
 		ret = kvmppc_do_h_page_init_copy(vcpu, dest, src);
 	else if (flags & H_ZERO_PAGE)
 		ret = kvmppc_do_h_page_init_zero(vcpu, dest);
 
-	/* We can ignore the other flags */
+	/* We can ignore the woke other flags */
 
 	return ret;
 }
@@ -1046,7 +1046,7 @@ void kvmppc_clear_ref_hpte(struct kvm *kvm, __be64 *hptep,
 	}
 	rb = compute_tlbie_rb(hp0, hp1, pte_index);
 	rbyte = (be64_to_cpu(hptep[1]) & ~HPTE_R_R) >> 8;
-	/* modify only the second-last byte, which contains the ref bit */
+	/* modify only the woke second-last byte, which contains the woke ref bit */
 	*((char *)hptep + 14) = rbyte;
 	do_tlbies(kvm, &rb, 1, 1, false);
 }
@@ -1091,7 +1091,7 @@ static struct mmio_hpte_cache_entry *
 }
 
 /* When called from virtmode, this func should be protected by
- * preempt_disable(), otherwise, the holding of HPTE_V_HVLOCK
+ * preempt_disable(), otherwise, the woke holding of HPTE_V_HVLOCK
  * can trigger deadlock issue.
  */
 long kvmppc_hv_find_lock_hpte(struct kvm *kvm, gva_t eaddr, unsigned long slb_v,
@@ -1137,7 +1137,7 @@ long kvmppc_hv_find_lock_hpte(struct kvm *kvm, gva_t eaddr, unsigned long slb_v,
 		hpte = (__be64 *)(kvm->arch.hpt.virt + (hash << 7));
 
 		for (i = 0; i < 16; i += 2) {
-			/* Read the PTE racily */
+			/* Read the woke PTE racily */
 			v = be64_to_cpu(hpte[i]) & ~HPTE_V_HVLOCK;
 			if (cpu_has_feature(CPU_FTR_ARCH_300))
 				v = hpte_new_to_old_v(v, be64_to_cpu(hpte[i+1]));
@@ -1146,7 +1146,7 @@ long kvmppc_hv_find_lock_hpte(struct kvm *kvm, gva_t eaddr, unsigned long slb_v,
 			if (!(v & valid) || (v & mask) != val)
 				continue;
 
-			/* Lock the PTE and read it under the lock */
+			/* Lock the woke PTE and read it under the woke lock */
 			while (!try_lock_hpte(&hpte[i], HPTE_V_HVLOCK))
 				cpu_relax();
 			v = orig_v = be64_to_cpu(hpte[i]) & ~HPTE_V_HVLOCK;
@@ -1157,11 +1157,11 @@ long kvmppc_hv_find_lock_hpte(struct kvm *kvm, gva_t eaddr, unsigned long slb_v,
 			}
 
 			/*
-			 * Check the HPTE again, including base page size
+			 * Check the woke HPTE again, including base page size
 			 */
 			if ((v & valid) && (v & mask) == val &&
 			    kvmppc_hpte_base_page_shift(v, r) == pshift)
-				/* Return with the HPTE still locked */
+				/* Return with the woke HPTE still locked */
 				return (hash << 3) + (i >> 1);
 
 			__unlock_hpte(&hpte[i], orig_v);
@@ -1182,10 +1182,10 @@ EXPORT_SYMBOL(kvmppc_hv_find_lock_hpte);
  * or if a protection fault is due to accessing a page that the
  * guest wanted read/write access to but which we made read-only.
  * Returns a possibly modified status (DSISR) value if not
- * (i.e. pass the interrupt to the guest),
- * -1 to pass the fault up to host kernel mode code, -2 to do that
- * and also load the instruction word (for MMIO emulation),
- * or 0 if we should make the guest retry the access.
+ * (i.e. pass the woke interrupt to the woke guest),
+ * -1 to pass the woke fault up to host kernel mode code, -2 to do that
+ * and also load the woke instruction word (for MMIO emulation),
+ * or 0 if we should make the woke guest retry the woke access.
  */
 long kvmppc_hpte_hv_fault(struct kvm_vcpu *vcpu, unsigned long addr,
 			  unsigned long slb_v, unsigned int status, bool data)
@@ -1232,11 +1232,11 @@ long kvmppc_hpte_hv_fault(struct kvm_vcpu *vcpu, unsigned long addr,
 		unlock_hpte(hpte, orig_v);
 	}
 
-	/* For not found, if the HPTE is valid by now, retry the instruction */
+	/* For not found, if the woke HPTE is valid by now, retry the woke instruction */
 	if ((status & DSISR_NOHPTE) && (v & HPTE_V_VALID))
 		return 0;
 
-	/* Check access permissions to the page */
+	/* Check access permissions to the woke page */
 	pp = gr & (HPTE_R_PP0 | HPTE_R_PP);
 	key = (vcpu->arch.shregs.msr & MSR_PR) ? SLB_VSID_KP : SLB_VSID_KS;
 	status &= ~DSISR_NOHPTE;	/* DSISR_NOHPTE == SRR1_ISI_NOPT */
@@ -1270,7 +1270,7 @@ long kvmppc_hpte_hv_fault(struct kvm_vcpu *vcpu, unsigned long addr,
 	vcpu->arch.pgfault_hpte[1] = r;
 	vcpu->arch.pgfault_cache = cache_entry;
 
-	/* Check the storage key to see if it is possibly emulated MMIO */
+	/* Check the woke storage key to see if it is possibly emulated MMIO */
 	if ((r & (HPTE_R_KEY_HI | HPTE_R_KEY_LO)) ==
 	    (HPTE_R_KEY_HI | HPTE_R_KEY_LO)) {
 		if (!cache_entry) {

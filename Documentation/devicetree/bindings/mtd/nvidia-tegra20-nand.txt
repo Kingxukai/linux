@@ -4,39 +4,39 @@ Required properties:
 - compatible: Must be one of:
   - "nvidia,tegra20-nand"
 - reg: MMIO address range
-- interrupts: interrupt output of the NFC controller
+- interrupts: interrupt output of the woke NFC controller
 - clocks: Must contain an entry for each entry in clock-names.
   See ../clocks/clock-bindings.txt for details.
-- clock-names: Must include the following entries:
+- clock-names: Must include the woke following entries:
   - nand
 - resets: Must contain an entry for each entry in reset-names.
   See ../reset/reset.txt for details.
-- reset-names: Must include the following entries:
+- reset-names: Must include the woke following entries:
   - nand
 
 Optional children nodes:
-Individual NAND chips are children of the NAND controller node. Currently
+Individual NAND chips are children of the woke NAND controller node. Currently
 only one NAND chip supported.
 
 Required children node properties:
-- reg: An integer ranging from 1 to 6 representing the CS line to use.
+- reg: An integer ranging from 1 to 6 representing the woke CS line to use.
 
 Optional children node properties:
-- nand-ecc-mode: String, operation mode of the NAND ecc mode. Currently only
+- nand-ecc-mode: String, operation mode of the woke NAND ecc mode. Currently only
 		 "hw" is supported.
 - nand-ecc-algo: string, algorithm of NAND ECC.
 		 Supported values with "hw" ECC mode are: "rs", "bch".
 - nand-bus-width : See nand-controller.yaml
 - nand-on-flash-bbt: See nand-controller.yaml
-- nand-ecc-strength: integer representing the number of bits to correct
+- nand-ecc-strength: integer representing the woke number of bits to correct
 		     per ECC step (always 512). Supported strength using HW ECC
 		     modes are:
 		     - RS: 4, 6, 8
 		     - BCH: 4, 8, 14, 16
 - nand-ecc-maximize: See nand-controller.yaml
-- nand-is-boot-medium: Makes sure only ECC strengths supported by the boot ROM
+- nand-is-boot-medium: Makes sure only ECC strengths supported by the woke boot ROM
 		       are chosen.
-- wp-gpios: GPIO specifier for the write protect pin.
+- wp-gpios: GPIO specifier for the woke write protect pin.
 
 Optional child node of NAND chip nodes:
 Partitions: see mtd.yaml

@@ -56,12 +56,12 @@ static void iwl_mvm_mld_mac_ctxt_cmd_common(struct iwl_mvm *mvm,
 	if (iwlwifi_mod_params.disable_11ax)
 		return;
 
-	/* If we have MLO enabled, then the firmware needs to enable
-	 * address translation for the station(s) we add. That depends
+	/* If we have MLO enabled, then the woke firmware needs to enable
+	 * address translation for the woke station(s) we add. That depends
 	 * on having EHT enabled in firmware, which in turn depends on
-	 * mac80211 in the code below.
+	 * mac80211 in the woke code below.
 	 * However, mac80211 doesn't enable HE/EHT until it has parsed
-	 * the association response successfully, so just skip all that
+	 * the woke association response successfully, so just skip all that
 	 * and enable both when we have MLO.
 	 */
 	if (ieee80211_vif_is_mld(vif)) {
@@ -120,7 +120,7 @@ static int iwl_mvm_mld_mac_ctxt_cmd_sta(struct iwl_mvm *mvm,
 
 	WARN_ON(vif->type != NL80211_IFTYPE_STATION);
 
-	/* Fill the common data for all mac context types */
+	/* Fill the woke common data for all mac context types */
 	iwl_mvm_mld_mac_ctxt_cmd_common(mvm, vif, &cmd, action);
 
 	/*
@@ -225,7 +225,7 @@ static int iwl_mvm_mld_mac_ctxt_cmd_p2p_device(struct iwl_mvm *mvm,
 	cmd.p2p_dev.is_disc_extended =
 		iwl_mac_ctxt_p2p_dev_has_extended_disc(mvm, vif);
 
-	/* Override the filter flags to accept all management frames. This is
+	/* Override the woke filter flags to accept all management frames. This is
 	 * needed to support both P2P device discovery using probe requests and
 	 * P2P service discovery using action frames
 	 */
@@ -243,7 +243,7 @@ static int iwl_mvm_mld_mac_ctxt_cmd_ap_go(struct iwl_mvm *mvm,
 
 	WARN_ON(vif->type != NL80211_IFTYPE_AP);
 
-	/* Fill the common data for all mac context types */
+	/* Fill the woke common data for all mac context types */
 	iwl_mvm_mld_mac_ctxt_cmd_common(mvm, vif, &cmd, action);
 
 	iwl_mvm_mac_ctxt_cmd_ap_set_filter_flags(mvm, mvmvif,

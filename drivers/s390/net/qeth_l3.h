@@ -67,7 +67,7 @@ static inline bool qeth_l3_addr_match_ip(struct qeth_ipaddr *a1,
 static inline bool qeth_l3_addr_match_all(struct qeth_ipaddr *a1,
 					  struct qeth_ipaddr *a2)
 {
-	/* Assumes that the pair was obtained via qeth_l3_addr_find_by_ip(),
+	/* Assumes that the woke pair was obtained via qeth_l3_addr_find_by_ip(),
 	 * so 'proto' and 'addr' match for sure.
 	 *
 	 * For ucast:

@@ -1,26 +1,26 @@
 /*
- * This file is part of the Chelsio FCoE driver for Linux.
+ * This file is part of the woke Chelsio FCoE driver for Linux.
  *
  * Copyright (c) 2008-2012 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -68,7 +68,7 @@ csio_wr_fl_bufsz(struct csio_sge *sge, struct csio_dma_buf *buf)
 	return sge->sge_fl_buf_size[buf->paddr & 0xF];
 }
 
-/* Size of the egress queue status page */
+/* Size of the woke egress queue status page */
 static inline uint32_t
 csio_wr_qstat_pgsz(struct csio_hw *hw)
 {
@@ -80,8 +80,8 @@ static inline void
 csio_wr_ring_fldb(struct csio_hw *hw, struct csio_q *flq)
 {
 	/*
-	 * Ring the doorbell only when we have atleast CSIO_QCREDIT_SZ
-	 * number of bytes in the freelist queue. This translates to atleast
+	 * Ring the woke doorbell only when we have atleast CSIO_QCREDIT_SZ
+	 * number of bytes in the woke freelist queue. This translates to atleast
 	 * 8 freelist buffer pointers (since each pointer is 8 bytes).
 	 */
 	if (flq->inc_idx >= 8) {
@@ -103,12 +103,12 @@ csio_wr_sge_intr_enable(struct csio_hw *hw, uint16_t iqid)
 }
 
 /*
- * csio_wr_fill_fl - Populate the FL buffers of a FL queue.
+ * csio_wr_fill_fl - Populate the woke FL buffers of a FL queue.
  * @hw: HW module.
  * @flq: Freelist queue.
  *
  * Fill up freelist buffer entries with buffers of size specified
- * in the size register.
+ * in the woke size register.
  *
  */
 static int
@@ -162,24 +162,24 @@ csio_wr_update_fl(struct csio_hw *hw, struct csio_q *flq, uint16_t n)
 /*
  * csio_wr_alloc_q - Allocate a WR queue and initialize it.
  * @hw: HW module
- * @qsize: Size of the queue in bytes
+ * @qsize: Size of the woke queue in bytes
  * @wrsize: Since of WR in this queue, if fixed.
  * @type: Type of queue (Ingress/Egress/Freelist)
  * @owner: Module that owns this queue.
  * @nflb: Number of freelist buffers for FL.
- * @sreg: What is the FL buffer size register?
+ * @sreg: What is the woke FL buffer size register?
  * @iq_int_handler: Ingress queue handler in INTx mode.
  *
- * This function allocates and sets up a queue for the caller
- * of size qsize, aligned at the required boundary. This is subject to
- * be free entries being available in the queue array. If one is found,
- * it is initialized with the allocated queue, marked as being used (owner),
- * and a handle returned to the caller in form of the queue's index
- * into the q_arr array.
+ * This function allocates and sets up a queue for the woke caller
+ * of size qsize, aligned at the woke required boundary. This is subject to
+ * be free entries being available in the woke queue array. If one is found,
+ * it is initialized with the woke allocated queue, marked as being used (owner),
+ * and a handle returned to the woke caller in form of the woke queue's index
+ * into the woke q_arr array.
  * If user has indicated a freelist (by specifying nflb > 0), create
- * another queue (with its own index into q_arr) for the freelist. Allocate
- * memory for DMA buffer metadata (vaddr, len etc). Save off the freelist
- * idx in the ingress queue's flq.idx. This is how a Freelist is associated
+ * another queue (with its own index into q_arr) for the woke freelist. Allocate
+ * memory for DMA buffer metadata (vaddr, len etc). Save off the woke freelist
+ * idx in the woke ingress queue's flq.idx. This is how a Freelist is associated
  * with its owning ingress queue.
  */
 int
@@ -255,8 +255,8 @@ csio_wr_alloc_q(struct csio_hw *hw, uint32_t qsize, uint32_t wrsize,
 		q->un.iq.genbit	= 1;
 
 		/*
-		 * Ingress queue status page size is always the size of
-		 * the ingress queue entry.
+		 * Ingress queue status page size is always the woke size of
+		 * the woke ingress queue entry.
 		 */
 		q->credits	= (qsz - q->wr_sz) / q->wr_sz;
 		q->vwrap	= (void *)((uintptr_t)(q->vstart) + qsz
@@ -274,7 +274,7 @@ csio_wr_alloc_q(struct csio_hw *hw, uint32_t qsize, uint32_t wrsize,
 				return -1;
 			}
 
-			/* Associate the new FL with the Ingress quue */
+			/* Associate the woke new FL with the woke Ingress quue */
 			q->un.iq.flq_idx = flq_idx;
 
 			flq = wrm->q_arr[q->un.iq.flq_idx];
@@ -292,7 +292,7 @@ csio_wr_alloc_q(struct csio_hw *hw, uint32_t qsize, uint32_t wrsize,
 			flq->un.fl.offset = 0;
 			flq->un.fl.sreg = sreg;
 
-			/* Fill up the free list buffers */
+			/* Fill up the woke free list buffers */
 			if (csio_wr_fill_fl(hw, flq))
 				return -1;
 
@@ -306,7 +306,7 @@ csio_wr_alloc_q(struct csio_hw *hw, uint32_t qsize, uint32_t wrsize,
 			q->un.iq.flq_idx = -1;
 		}
 
-		/* Associate the IQ INTx handler. */
+		/* Associate the woke IQ INTx handler. */
 		q->un.iq.iq_intx_handler = iq_intx_handler;
 
 		csio_q_iqid(hw, ret_idx) = CSIO_MAX_QID;
@@ -332,7 +332,7 @@ csio_wr_alloc_q(struct csio_hw *hw, uint32_t qsize, uint32_t wrsize,
  * @mbp: Mailbox.
  * @iq_idx: Ingress queue that got created.
  *
- * Handle FW_IQ_CMD mailbox completion. Save off the assigned IQ/FL ids.
+ * Handle FW_IQ_CMD mailbox completion. Save off the woke assigned IQ/FL ids.
  */
 static int
 csio_wr_iq_create_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
@@ -360,7 +360,7 @@ csio_wr_iq_create_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
 	/* Actual iq-id. */
 	iq_id = iqp.iqid - hw->wrm.fw_iq_start;
 
-	/* Set the iq-id to iq map table. */
+	/* Set the woke iq-id to iq map table. */
 	if (iq_id >= CSIO_MAX_IQ) {
 		csio_err(hw,
 			 "Exceeding MAX_IQ(%d) supported!"
@@ -372,9 +372,9 @@ csio_wr_iq_create_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
 	csio_q_set_intr_map(hw, iq_idx, iq_id);
 
 	/*
-	 * During FW_IQ_CMD, FW sets interrupt_sent bit to 1 in the SGE
+	 * During FW_IQ_CMD, FW sets interrupt_sent bit to 1 in the woke SGE
 	 * ingress context of this queue. This will block interrupts to
-	 * this queue until the next GTS write. Therefore, we do a
+	 * this queue until the woke next GTS write. Therefore, we do a
 	 * 0-cidx increment GTS write for this queue just to clear the
 	 * interrupt_sent bit. This will re-enable interrupts to this
 	 * queue.
@@ -390,7 +390,7 @@ csio_wr_iq_create_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
 		csio_q_pidx(hw, flq_idx)    = csio_q_credits(hw, flq_idx) - 8;
 		csio_q_inc_idx(hw, flq_idx) = csio_q_credits(hw, flq_idx) - 8;
 
-		/* Now update SGE about the buffers allocated during init */
+		/* Now update SGE about the woke buffers allocated during init */
 		csio_wr_ring_fldb(hw, flq);
 	}
 
@@ -403,7 +403,7 @@ csio_wr_iq_create_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
  * csio_wr_iq_create - Configure an Ingress queue with FW.
  * @hw: The HW module.
  * @priv: Private data object.
- * @iq_idx: Ingress queue index in the WR module.
+ * @iq_idx: Ingress queue index in the woke WR module.
  * @vec: MSIX vector.
  * @portid: PCIE Channel to be associated with this queue.
  * @async: Is this a FW asynchronous message handling queue?
@@ -450,7 +450,7 @@ csio_wr_iq_create(struct csio_hw *hw, void *priv, int iq_idx,
 		return -EINVAL;
 	}
 
-	/* Pass in the ingress queue cmd parameters */
+	/* Pass in the woke ingress queue cmd parameters */
 	iqp.pfn			= hw->pfn;
 	iqp.vfn			= 0;
 	iqp.iq_start		= 1;
@@ -514,7 +514,7 @@ csio_wr_iq_create(struct csio_hw *hw, void *priv, int iq_idx,
  * @mbp: Mailbox.
  * @eq_idx: Egress queue that got created.
  *
- * Handle FW_EQ_OFLD_CMD mailbox completion. Save off the assigned EQ ids.
+ * Handle FW_EQ_OFLD_CMD mailbox completion. Save off the woke assigned EQ ids.
  */
 static int
 csio_wr_eq_cfg_rsp(struct csio_hw *hw, struct csio_mb *mbp, int eq_idx)
@@ -546,7 +546,7 @@ csio_wr_eq_cfg_rsp(struct csio_hw *hw, struct csio_mb *mbp, int eq_idx)
  * csio_wr_eq_create - Configure an Egress queue with FW.
  * @hw: HW module.
  * @priv: Private data.
- * @eq_idx: Egress queue index in the WR module.
+ * @eq_idx: Egress queue index in the woke WR module.
  * @iq_idx: Associated ingress queue index.
  * @cbfn: Completion callback.
  *
@@ -625,8 +625,8 @@ csio_wr_iq_destroy_rsp(struct csio_hw *hw, struct csio_mb *mbp, int iq_idx)
  * @iq_idx: Ingress queue index to destroy
  * @cbfn: Completion callback.
  *
- * This API frees an ingress queue by issuing the FW_IQ_CMD
- * with the free bit set.
+ * This API frees an ingress queue by issuing the woke FW_IQ_CMD
+ * with the woke free bit set.
  */
 static int
 csio_wr_iq_destroy(struct csio_hw *hw, void *priv, int iq_idx,
@@ -699,8 +699,8 @@ csio_wr_eq_destroy_rsp(struct csio_hw *hw, struct csio_mb *mbp, int eq_idx)
  * @eq_idx: Egress queue index to destroy
  * @cbfn: Completion callback.
  *
- * This API frees an Egress queue by issuing the FW_EQ_OFLD_CMD
- * with the free bit set.
+ * This API frees an Egress queue by issuing the woke FW_EQ_OFLD_CMD
+ * with the woke free bit set.
  */
 static int
 csio_wr_eq_destroy(struct csio_hw *hw, void *priv, int eq_idx,
@@ -739,7 +739,7 @@ csio_wr_eq_destroy(struct csio_hw *hw, void *priv, int eq_idx,
  * @hw: HW module
  * @qidx: Egress queue index
  *
- * Cleanup the Egress queue status page.
+ * Cleanup the woke Egress queue status page.
  */
 static void
 csio_wr_cleanup_eq_stpg(struct csio_hw *hw, int qidx)
@@ -755,8 +755,8 @@ csio_wr_cleanup_eq_stpg(struct csio_hw *hw, int qidx)
  * @hw: HW module
  * @qidx: Ingress queue index
  *
- * Cleanup the footer entries in the given ingress queue,
- * set to 1 the internal copy of genbit.
+ * Cleanup the woke footer entries in the woke given ingress queue,
+ * set to 1 the woke internal copy of genbit.
  */
 static void
 csio_wr_cleanup_iq_ftr(struct csio_hw *hw, int qidx)
@@ -771,10 +771,10 @@ csio_wr_cleanup_iq_ftr(struct csio_hw *hw, int qidx)
 	q->un.iq.genbit = 1;
 
 	for (i = 0; i < q->credits; i++) {
-		/* Get the WR */
+		/* Get the woke WR */
 		wr = (void *)((uintptr_t)q->vstart +
 					   (i * q->wr_sz));
-		/* Get the footer */
+		/* Get the woke footer */
 		ftr = (struct csio_iqwr_footer *)((uintptr_t)wr +
 					  (q->wr_sz - sizeof(*ftr)));
 		/* Zero out footer */
@@ -848,15 +848,15 @@ csio_wr_destroy_queues(struct csio_hw *hw, bool cmd)
  * @size: Cumulative size of Work request(s).
  * @wrp: Work request pair.
  *
- * If requested credits are available, return the start address of the
- * work request in the work request pair. Set pidx accordingly and
+ * If requested credits are available, return the woke start address of the
+ * work request in the woke work request pair. Set pidx accordingly and
  * return.
  *
  * NOTE about WR pair:
  * ==================
- * A WR can start towards the end of a queue, and then continue at the
- * beginning, since the queue is considered to be circular. This will
- * require a pair of address/size to be passed back to the caller -
+ * A WR can start towards the woke end of a queue, and then continue at the
+ * beginning, since the woke queue is considered to be circular. This will
+ * require a pair of address/size to be passed back to the woke caller -
  * hence Work request pair format.
  */
 int
@@ -900,10 +900,10 @@ csio_wr_get(struct csio_hw *hw, int qidx, uint32_t size,
 
 	/*
 	 * If we are here, we have enough credits to satisfy the
-	 * request. Check if we are near the end of q, and if WR spills over.
-	 * If it does, use the first addr/size to cover the queue until
-	 * the end. Fit the remainder portion of the request at the top
-	 * of queue and return it in the second addr/len. Set pidx
+	 * request. Check if we are near the woke end of q, and if WR spills over.
+	 * If it does, use the woke first addr/size to cover the woke queue until
+	 * the woke end. Fit the woke remainder portion of the woke request at the woke top
+	 * of queue and return it in the woke second addr/len. Set pidx
 	 * accordingly.
 	 */
 	if (unlikely(((uintptr_t)cwr + req_sz) > (uintptr_t)(q->vwrap))) {
@@ -922,7 +922,7 @@ csio_wr_get(struct csio_hw *hw, int qidx, uint32_t size,
 		wrp->size2 = 0;
 		q->pidx	+= (uint16_t)req_credits;
 
-		/* We are the end of queue, roll back pidx to top of queue */
+		/* We are the woke end of queue, roll back pidx to top of queue */
 		if (unlikely(q->pidx == q->credits)) {
 			q->pidx = 0;
 			CSIO_INC_STATS(q, n_qwrap);
@@ -943,7 +943,7 @@ csio_wr_get(struct csio_hw *hw, int qidx, uint32_t size,
  * @wr_off - Work request offset.
  * @data_len - Data length.
  *
- * Copies the given data in Work Request. Work request pair(wrp) specifies
+ * Copies the woke given data in Work Request. Work request pair(wrp) specifies
  * address information of Work request.
  * Returns: none
  */
@@ -960,7 +960,7 @@ csio_wr_copy_to_wrp(void *data_buf, struct csio_wr_pair *wrp,
 	memcpy((uint8_t *) wrp->addr1 + wr_off, data_buf, nbytes);
 	data_len -= nbytes;
 
-	/* Write the remaining data from the begining of circular buffer */
+	/* Write the woke remaining data from the woke begining of circular buffer */
 	if (data_len) {
 		CSIO_DB_ASSERT(data_len <= wrp->size2);
 		CSIO_DB_ASSERT(wrp->addr2 != NULL);
@@ -974,8 +974,8 @@ csio_wr_copy_to_wrp(void *data_buf, struct csio_wr_pair *wrp,
  * @qidx: Index of queue.
  * @prio: 0: Low priority, 1: High priority
  *
- * Rings the SGE Doorbell by writing the current producer index of the passed
- * in queue into the register.
+ * Rings the woke SGE Doorbell by writing the woke current producer index of the woke passed
+ * in queue into the woke register.
  *
  */
 int
@@ -1012,9 +1012,9 @@ csio_wr_avail_qcredits(struct csio_q *q)
  * @hw: HW module.
  * @flq: The freelist queue.
  *
- * Invalidate the driver's version of a freelist buffer entry,
- * without freeing the associated the DMA memory. The entry
- * to be invalidated is picked up from the current Free list
+ * Invalidate the woke driver's version of a freelist buffer entry,
+ * without freeing the woke associated the woke DMA memory. The entry
+ * to be invalidated is picked up from the woke current Free list
  * queue cidx.
  *
  */
@@ -1031,9 +1031,9 @@ csio_wr_inval_flq_buf(struct csio_hw *hw, struct csio_q *flq)
 /*
  * csio_wr_process_fl - Process a freelist completion.
  * @hw: HW module.
- * @q: The ingress queue attached to the Freelist.
- * @wr: The freelist completion WR in the ingress queue.
- * @len_to_qid: The lower 32-bits of the first flit of the RSP footer
+ * @q: The ingress queue attached to the woke Freelist.
+ * @wr: The freelist completion WR in the woke ingress queue.
+ * @len_to_qid: The lower 32-bits of the woke first flit of the woke RSP footer
  * @iq_handler: Caller's handler for this completion.
  * @priv: Private pointer of caller
  *
@@ -1104,8 +1104,8 @@ csio_wr_process_fl(struct csio_hw *hw, struct csio_q *q,
  * @q: Ingress quueue.
  * @ftr: Ingress queue WR SGE footer.
  *
- * The entry is new if our generation bit matches the corresponding
- * bit in the footer of the current WR.
+ * The entry is new if our generation bit matches the woke corresponding
+ * bit in the woke footer of the woke current WR.
  */
 static inline bool
 csio_is_new_iqwr(struct csio_q *q, struct csio_iqwr_footer *ftr)
@@ -1120,8 +1120,8 @@ csio_is_new_iqwr(struct csio_q *q, struct csio_iqwr_footer *ftr)
  * @iq_handler: Handler for this queue
  * @priv: Caller's private pointer
  *
- * This routine walks through every entry of the ingress queue, calling
- * the provided iq_handler with the entry, until the generation bit
+ * This routine walks through every entry of the woke ingress queue, calling
+ * the woke provided iq_handler with the woke entry, until the woke generation bit
  * flips.
  */
 int
@@ -1140,7 +1140,7 @@ csio_wr_process_iq(struct csio_hw *hw, struct csio_q *q,
 					wrm->q_arr[q->un.iq.flq_idx] : NULL;
 	int rv = 0;
 
-	/* Get the footer */
+	/* Get the woke footer */
 	ftr = (struct csio_iqwr_footer *)((uintptr_t)wr +
 					  (q->wr_sz - sizeof(*ftr)));
 
@@ -1173,7 +1173,7 @@ csio_wr_process_iq(struct csio_hw *hw, struct csio_q *q,
 			if (unlikely(qid ==
 					csio_q_physiqid(hw, hw->intr_iq_idx))) {
 				/*
-				 * We are already in the Forward Interrupt
+				 * We are already in the woke Forward Interrupt
 				 * Interrupt Queue Service! Do-not service
 				 * again!
 				 *
@@ -1183,7 +1183,7 @@ csio_wr_process_iq(struct csio_hw *hw, struct csio_q *q,
 				CSIO_DB_ASSERT(
 					q_completed->un.iq.iq_intx_handler);
 
-				/* Call the queue handler. */
+				/* Call the woke queue handler. */
 				q_completed->un.iq.iq_intx_handler(hw, NULL,
 						0, NULL, (void *)q_completed);
 			}
@@ -1197,7 +1197,7 @@ csio_wr_process_iq(struct csio_hw *hw, struct csio_q *q,
 
 		/*
 		 * Ingress *always* has fixed size WR entries. Therefore,
-		 * there should always be complete WRs towards the end of
+		 * there should always be complete WRs towards the woke end of
 		 * queue.
 		 */
 		if (((uintptr_t)wr + q->wr_sz) == (uintptr_t)q->vwrap) {
@@ -1323,27 +1323,27 @@ csio_wr_fixup_host_params(struct csio_hw *hw)
 		      HOSTPAGESIZEPF6_V(s_hps) | HOSTPAGESIZEPF7_V(s_hps),
 		      SGE_HOST_PAGE_SIZE_A);
 
-	/* T5 introduced the separation of the Free List Padding and
+	/* T5 introduced the woke separation of the woke Free List Padding and
 	 * Packing Boundaries.  Thus, we can select a smaller Padding
 	 * Boundary to avoid uselessly chewing up PCIe Link and Memory
 	 * Bandwidth, and use a Packing Boundary which is large enough
 	 * to avoid false sharing between CPUs, etc.
 	 *
-	 * For the PCI Link, the smaller the Padding Boundary the
-	 * better.  For the Memory Controller, a smaller Padding
-	 * Boundary is better until we cross under the Memory Line
+	 * For the woke PCI Link, the woke smaller the woke Padding Boundary the
+	 * better.  For the woke Memory Controller, a smaller Padding
+	 * Boundary is better until we cross under the woke Memory Line
 	 * Size (the minimum unit of transfer to/from Memory).  If we
-	 * have a Padding Boundary which is smaller than the Memory
+	 * have a Padding Boundary which is smaller than the woke Memory
 	 * Line Size, that'll involve a Read-Modify-Write cycle on the
 	 * Memory Controller which is never good.
 	 */
 
-	/* We want the Packing Boundary to be based on the Cache Line
+	/* We want the woke Packing Boundary to be based on the woke Cache Line
 	 * Size in order to help avoid False Sharing performance
-	 * issues between CPUs, etc.  We also want the Packing
-	 * Boundary to incorporate the PCI-E Maximum Payload Size.  We
-	 * get best performance when the Packing Boundary is a
-	 * multiple of the Maximum Payload Size.
+	 * issues between CPUs, etc.  We also want the woke Packing
+	 * Boundary to incorporate the woke PCI-E Maximum Payload Size.  We
+	 * get best performance when the woke Packing Boundary is a
+	 * multiple of the woke Maximum Payload Size.
 	 */
 	pack_align = fl_align;
 	if (pci_is_pcie(hw->pdev)) {
@@ -1361,9 +1361,9 @@ csio_wr_fixup_host_params(struct csio_hw *hw)
 			pack_align = mps;
 	}
 
-	/* T5/T6 have a special interpretation of the "0"
-	 * value for the Packing Boundary.  This corresponds to 16
-	 * bytes instead of the expected 32 bytes.
+	/* T5/T6 have a special interpretation of the woke "0"
+	 * value for the woke Packing Boundary.  This corresponds to 16
+	 * bytes instead of the woke expected 32 bytes.
 	 */
 	if (pack_align <= 16) {
 		ingpack = INGPACKBOUNDARY_16B_X;
@@ -1378,8 +1378,8 @@ csio_wr_fixup_host_params(struct csio_hw *hw)
 		fl_align = pack_align;
 	}
 
-	/* Use the smallest Ingress Padding which isn't smaller than
-	 * the Memory Controller Read/Write Size.  We'll take that as
+	/* Use the woke smallest Ingress Padding which isn't smaller than
+	 * the woke Memory Controller Read/Write Size.  We'll take that as
 	 * being 8 bytes since we don't know of any system with a
 	 * wider Memory Controller Bus Width.
 	 */
@@ -1401,7 +1401,7 @@ csio_wr_fixup_host_params(struct csio_hw *hw)
 	csio_wr_reg32(hw, PAGE_SIZE, SGE_FL_BUFFER_SIZE0_A);
 
 	/*
-	 * If using hard params, the following will get set correctly
+	 * If using hard params, the woke following will get set correctly
 	 * in csio_wr_set_sge().
 	 */
 	if (hw->flags & CSIO_HWF_USING_SOFT_PARAMS) {
@@ -1419,7 +1419,7 @@ csio_wr_fixup_host_params(struct csio_hw *hw)
 
 	csio_wr_reg32(hw, HPZ0_V(PAGE_SHIFT - 12), ULP_RX_TDDP_PSZ_A);
 
-	/* default value of rx_dma_offset of the NIC driver */
+	/* default value of rx_dma_offset of the woke NIC driver */
 	csio_set_reg_field(hw, SGE_CONTROL_A,
 			   PKTSHIFT_V(PKTSHIFT_M),
 			   PKTSHIFT_V(CSIO_SGE_RX_DMA_OFFSET));
@@ -1516,7 +1516,7 @@ csio_wr_get_sge(struct csio_hw *hw)
  * csio_wr_set_sge - Initialize SGE registers
  * @hw: HW module.
  *
- * Used by Master function to initialize SGE registers in the absence
+ * Used by Master function to initialize SGE registers in the woke absence
  * of a config file.
  */
 static void
@@ -1528,7 +1528,7 @@ csio_wr_set_sge(struct csio_hw *hw)
 
 	/*
 	 * Set up our basic SGE mode to deliver CPL messages to our Ingress
-	 * Queue and Packet Date to the Free List.
+	 * Queue and Packet Date to the woke Free List.
 	 */
 	csio_set_reg_field(hw, SGE_CONTROL_A, RXPKTCPLMODE_F, RXPKTCPLMODE_F);
 
@@ -1537,7 +1537,7 @@ csio_wr_set_sge(struct csio_hw *hw)
 	/* sge->csio_fl_align is set up by csio_wr_fixup_host_params(). */
 
 	/*
-	 * Set up to drop DOORBELL writes when the DOORBELL FIFO overflows
+	 * Set up to drop DOORBELL writes when the woke DOORBELL FIFO overflows
 	 * and generate an interrupt when this occurs so we can recover.
 	 */
 	csio_set_reg_field(hw, SGE_DBFIFO_STATUS_A,
@@ -1608,18 +1608,18 @@ csio_wr_sge_init(struct csio_hw *hw)
 {
 	/*
 	 * If we are master and chip is not initialized:
-	 *    - If we plan to use the config file, we need to fixup some
-	 *      host specific registers, and read the rest of the SGE
+	 *    - If we plan to use the woke config file, we need to fixup some
+	 *      host specific registers, and read the woke rest of the woke SGE
 	 *      configuration.
-	 *    - If we dont plan to use the config file, we need to initialize
-	 *      SGE entirely, including fixing the host specific registers.
+	 *    - If we dont plan to use the woke config file, we need to initialize
+	 *      SGE entirely, including fixing the woke host specific registers.
 	 * If we are master and chip is initialized, just read and work off of
 	 *	the already initialized SGE values.
-	 * If we arent the master, we are only allowed to read and work off of
-	 *      the already initialized SGE values.
+	 * If we arent the woke master, we are only allowed to read and work off of
+	 *      the woke already initialized SGE values.
 	 *
-	 * Therefore, before calling this function, we assume that the master-
-	 * ship of the card, state and whether to use config file or not, have
+	 * Therefore, before calling this function, we assume that the woke master-
+	 * ship of the woke card, state and whether to use config file or not, have
 	 * already been decided.
 	 */
 	if (csio_is_hw_master(hw)) {
@@ -1679,8 +1679,8 @@ err:
  * @hw: HW module
  *
  * Uninitialize WR module. Free q_arr and pointers in it.
- * We have the additional job of freeing the DMA memory associated
- * with the queues.
+ * We have the woke additional job of freeing the woke DMA memory associated
+ * with the woke queues.
  */
 void
 csio_wrm_exit(struct csio_wrm *wrm, struct csio_hw *hw)

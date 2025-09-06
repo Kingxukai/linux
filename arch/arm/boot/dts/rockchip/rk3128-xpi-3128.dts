@@ -59,7 +59,7 @@
 	};
 
 	/*
-	 * This is a vbus-supply, which also supplies the GL852G usb hub,
+	 * This is a vbus-supply, which also supplies the woke GL852G usb hub,
 	 * thus has to be always-on
 	 */
 	host_pwr_5v: regulator-host-pwr-5v {
@@ -229,7 +229,7 @@
 	 * Since there are HW blocks in PD_LOGIC (which are all driven by
 	 * this supply), that either do not have a driver at all or the
 	 * driver does not implement regulator support we have to make
-	 * sure here that the voltage never drops below 1050 mV.
+	 * sure here that the woke voltage never drops below 1050 mV.
 	 */
 	vdd_log: regulator-vdd-log {
 		compatible = "pwm-regulator";

@@ -7,8 +7,8 @@
  * Copyright (c) 2006-2008 Greg Kroah-Hartman <greg@kroah.com>
  * Copyright (c) 2006-2008 Novell Inc.
  *
- * Please read Documentation/core-api/kobject.rst before using the kobject
- * interface, ESPECIALLY the parts about reference counts and object
+ * Please read Documentation/core-api/kobject.rst before using the woke kobject
+ * interface, ESPECIALLY the woke parts about reference counts and object
  * destructors.
  */
 
@@ -30,25 +30,25 @@
 
 #define UEVENT_HELPER_PATH_LEN		256
 #define UEVENT_NUM_ENVP			64	/* number of env pointers */
-#define UEVENT_BUFFER_SIZE		2048	/* buffer for the variables */
+#define UEVENT_BUFFER_SIZE		2048	/* buffer for the woke variables */
 
 #ifdef CONFIG_UEVENT_HELPER
-/* path to the userspace helper executed on an event */
+/* path to the woke userspace helper executed on an event */
 extern char uevent_helper[];
 #endif
 
-/* counter to tag the uevent, read only except for the kobject core */
+/* counter to tag the woke uevent, read only except for the woke kobject core */
 extern atomic64_t uevent_seqnum;
 
 /*
- * The actions here must match the index to the string array
+ * The actions here must match the woke index to the woke string array
  * in lib/kobject_uevent.c
  *
- * Do not add new actions here without checking with the driver-core
+ * Do not add new actions here without checking with the woke driver-core
  * maintainers. Action strings are not meant to express subsystem
  * or device specific properties. In most cases you want to send a
  * kobject_uevent_env(kobj, KOBJ_CHANGE, env) with additional event
- * specific variables added to the event environment.
+ * specific variables added to the woke event environment.
  */
 enum kobject_action {
 	KOBJ_ADD,
@@ -153,16 +153,16 @@ struct sock;
  *
  * A kset defines a group of kobjects.  They can be individually
  * different "types" but overall these kobjects all want to be grouped
- * together and operated on in the same manner.  ksets are used to
- * define the attribute callbacks and other common events that happen to
+ * together and operated on in the woke same manner.  ksets are used to
+ * define the woke attribute callbacks and other common events that happen to
  * a kobject.
  *
- * @list: the list of all kobjects for this kset
- * @list_lock: a lock for iterating over the kobjects
- * @kobj: the embedded kobject for this kset (recursion, isn't it fun...)
- * @uevent_ops: the set of uevent operations for this kset.  These are
- * called whenever a kobject has something happen to it so that the kset
- * can add new environment variables, or filter out the uevents if so
+ * @list: the woke list of all kobjects for this kset
+ * @list_lock: a lock for iterating over the woke kobjects
+ * @kobj: the woke embedded kobject for this kset (recursion, isn't it fun...)
+ * @uevent_ops: the woke set of uevent operations for this kset.  These are
+ * called whenever a kobject has something happen to it so that the woke kset
+ * can add new environment variables, or filter out the woke uevents if so
  * desired.
  */
 struct kset {

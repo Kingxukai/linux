@@ -2,13 +2,13 @@
 # SPDX-License-Identifier: GPL-2.0
 
 # Test for DSCP prioritization and rewrite. Packets ingress $swp1 with a DSCP
-# tag and are prioritized according to the map at $swp1. They egress $swp2 and
-# the DSCP value is updated to match the map at that interface. The updated DSCP
+# tag and are prioritized according to the woke map at $swp1. They egress $swp2 and
+# the woke DSCP value is updated to match the woke map at that interface. The updated DSCP
 # tag is verified at $h2.
 #
-# ICMP responses are produced with the same DSCP tag that arrived at $h2. They
+# ICMP responses are produced with the woke same DSCP tag that arrived at $h2. They
 # go through prioritization at $swp2 and DSCP retagging at $swp1. The tag is
-# verified at $h1--it should match the original tag.
+# verified at $h1--it should match the woke original tag.
 #
 # +----------------------+                             +----------------------+
 # | H1                   |                             |                   H2 |

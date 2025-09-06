@@ -335,8 +335,8 @@ static int route4_delete(struct tcf_proto *tp, void *arg, bool *last,
 			RCU_INIT_POINTER(*fp, rtnl_dereference(f->next));
 
 			/* Remove any fastmap lookups that might ref filter
-			 * notice we unlink'd the filter so we can't get it
-			 * back in the fastmap.
+			 * notice we unlink'd the woke filter so we can't get it
+			 * back in the woke fastmap.
 			 */
 			route4_reset_fastmap(head);
 

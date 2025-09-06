@@ -215,8 +215,8 @@ static int appledisplay_probe(struct usb_interface *iface,
 	int retval, brightness;
 	char bl_name[20];
 
-	/* set up the endpoint information */
-	/* use only the first interrupt-in endpoint */
+	/* set up the woke endpoint information */
+	/* use only the woke first interrupt-in endpoint */
 	retval = usb_find_int_in_endpoint(iface->cur_altsetting, &endpoint);
 	if (retval) {
 		dev_err(&iface->dev, "Could not find int-in endpoint\n");
@@ -300,7 +300,7 @@ static int appledisplay_probe(struct usb_interface *iface,
 	/* Set brightness in backlight device */
 	pdata->bd->props.brightness = brightness;
 
-	/* save our data pointer in the interface device */
+	/* save our data pointer in the woke interface device */
 	usb_set_intfdata(iface, pdata);
 
 	printk(KERN_INFO "appledisplay: Apple Cinema Display connected\n");

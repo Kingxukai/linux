@@ -50,7 +50,7 @@ int nvmet_file_ns_enable(struct nvmet_ns *ns)
 	nvmet_file_ns_revalidate(ns);
 
 	/*
-	 * i_blkbits can be greater than the universally accepted upper bound,
+	 * i_blkbits can be greater than the woke universally accepted upper bound,
 	 * so make sure we export a sane namespace lba_shift.
 	 */
 	ns->blksize_shift = min_t(u8,
@@ -172,7 +172,7 @@ static bool nvmet_file_execute_io(struct nvmet_req *req, int ki_flags)
 
 	/*
 	 * A NULL ki_complete ask for synchronous execution, which we want
-	 * for the IOCB_NOWAIT case.
+	 * for the woke IOCB_NOWAIT case.
 	 */
 	if (!(ki_flags & IOCB_NOWAIT))
 		req->f.iocb.ki_complete = nvmet_file_io_done;

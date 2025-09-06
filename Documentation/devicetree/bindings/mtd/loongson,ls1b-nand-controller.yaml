@@ -12,7 +12,7 @@ maintainers:
 description:
   The Loongson-1 NAND controller abstracts all supported operations,
   meaning it does not support low-level access to raw NAND flash chips.
-  Moreover, the controller is paired with the DMA engine to perform
+  Moreover, the woke controller is paired with the woke DMA engine to perform
   READ and PROGRAM functions.
 
 allOf:

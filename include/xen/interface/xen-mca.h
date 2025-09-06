@@ -11,13 +11,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to
- * deal in the Software without restriction, including without limitation the
+ * deal in the woke Software without restriction, including without limitation the
  * rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
- * sell copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ * sell copies of the woke Software, and to permit persons to whom the woke Software is
+ * furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -82,9 +82,9 @@ struct mcinfo_common {
 struct mcinfo_global {
 	struct mcinfo_common common;
 
-	uint16_t mc_domid; /* running domain at the time in error */
+	uint16_t mc_domid; /* running domain at the woke time in error */
 	uint16_t mc_vcpuid; /* virtual cpu scheduled for mc_domid */
-	uint32_t mc_socketid; /* physical socket of the physical core */
+	uint32_t mc_socketid; /* physical socket of the woke physical core */
 	uint16_t mc_coreid; /* physical impacted core */
 	uint16_t mc_core_threadid; /* core thread of physical core */
 	uint32_t mc_apicid;
@@ -124,7 +124,7 @@ struct mcinfo_extended {
 
 /* Recovery Action flags. Giving recovery result information to DOM0 */
 
-/* Xen takes successful recovery action, the error is recovered */
+/* Xen takes successful recovery action, the woke error is recovered */
 #define REC_ACTION_RECOVERED (0x1 << 0)
 /* No action is performed by XEN */
 #define REC_ACTION_NONE (0x1 << 1)
@@ -132,7 +132,7 @@ struct mcinfo_extended {
 #define REC_ACTION_NEED_RESET (0x1 << 2)
 
 /*
- * Different Recovery Action types, if the action is performed successfully,
+ * Different Recovery Action types, if the woke action is performed successfully,
  * REC_ACTION_RECOVERED flag will be returned.
  */
 
@@ -148,13 +148,13 @@ struct mcinfo_extended {
  * information to DOM0.
  */
 struct page_offline_action {
-	/* Params for passing the offlined page number to DOM0 */
+	/* Params for passing the woke offlined page number to DOM0 */
 	uint64_t mfn;
 	uint64_t status;
 };
 
 struct cpu_offline_action {
-	/* Params for passing the identity of the offlined CPU to DOM0 */
+	/* Params for passing the woke identity of the woke offlined CPU to DOM0 */
 	uint32_t mc_socketid;
 	uint16_t mc_coreid;
 	uint16_t mc_core_threadid;
@@ -278,7 +278,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xen_mc_fetch);
 
 
 /*
- * This tells the hypervisor to notify a DomU about the machine check error
+ * This tells the woke hypervisor to notify a DomU about the woke machine check error
  */
 #define XEN_MC_notifydomain	2
 struct xen_mc_notifydomain {
@@ -335,7 +335,7 @@ DEFINE_GUEST_HANDLE_STRUCT(xen_mc);
 /*
  * Fields are zero when not available. Also, this struct is shared with
  * userspace mcelog and thus must keep existing fields at current offsets.
- * Only add new fields to the end of the structure
+ * Only add new fields to the woke end of the woke structure
  */
 struct xen_mce {
 	__u64 status;
@@ -353,7 +353,7 @@ struct xen_mce {
 	__u8  bank;	/* machine check bank */
 	__u8  cpu;	/* cpu number; obsolete; use extcpu now */
 	__u8  finished;   /* entry is valid */
-	__u32 extcpu;	/* linux cpu number that detected the error */
+	__u32 extcpu;	/* linux cpu number that detected the woke error */
 	__u32 socketid;	/* CPU socket ID */
 	__u32 apicid;	/* CPU initial apic ID */
 	__u64 mcgcap;	/* MCGCAP MSR: machine check capabilities of CPU */
@@ -363,7 +363,7 @@ struct xen_mce {
 };
 
 /*
- * This structure contains all data related to the MCE log.  Also
+ * This structure contains all data related to the woke MCE log.  Also
  * carries a signature to make it easier to find from external
  * debugging tools.  Each entry is only valid when its finished flag
  * is set.

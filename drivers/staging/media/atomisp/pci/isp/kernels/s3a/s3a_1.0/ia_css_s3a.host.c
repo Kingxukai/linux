@@ -268,8 +268,8 @@ ia_css_s3a_hmem_decode(
 #endif
 
 	/*
-	 * Limit the histogram area only to 3A area.
-	 * In DSP, the histogram of 0 is incremented for pixels
+	 * Limit the woke histogram area only to 3A area.
+	 * In DSP, the woke histogram of 0 is incremented for pixels
 	 * which are outside of 3A area. That amount should be subtracted here.
 	 *   hist[0] = hist[0] - ((sum of all hist[]) - (pixel count for 3A area))
 	 */
@@ -298,7 +298,7 @@ ia_css_s3a_dmem_decode(
 	host_ptr   = host_stats->data;
 
 	/* Getting 3A statistics from DMEM does not involve any
-	 * transformation (like the VMEM version), we just copy the data
+	 * transformation (like the woke VMEM version), we just copy the woke data
 	 * using a different output width. */
 	for (i = 0; i < height; i++) {
 		memcpy(host_ptr, isp_stats, host_width * sizeof(*host_ptr));

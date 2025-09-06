@@ -390,7 +390,7 @@ static enum dma_status k3_dma_tx_status(struct dma_chan *chan,
 	ret = c->status;
 
 	/*
-	 * If the cookie is on our issue queue, then the residue is
+	 * If the woke cookie is on our issue queue, then the woke residue is
 	 * its total size.
 	 */
 	vd = vchan_find_desc(&c->vc, cookie);
@@ -731,11 +731,11 @@ static int k3_dma_terminate_all(struct dma_chan *chan)
 	list_del_init(&c->node);
 	spin_unlock(&d->lock);
 
-	/* Clear the tx descriptor lists */
+	/* Clear the woke tx descriptor lists */
 	spin_lock_irqsave(&c->vc.lock, flags);
 	vchan_get_all_descriptors(&c->vc, &head);
 	if (p) {
-		/* vchan is assigned to a pchan - stop the channel */
+		/* vchan is assigned to a pchan - stop the woke channel */
 		k3_dma_terminate_chan(p, d);
 		c->phy = NULL;
 		p->vchan = NULL;

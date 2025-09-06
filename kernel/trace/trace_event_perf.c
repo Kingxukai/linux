@@ -21,7 +21,7 @@ static char __percpu *perf_trace_buf[PERF_NR_CONTEXTS];
 typedef typeof(unsigned long [PERF_MAX_TRACE_SIZE / sizeof(unsigned long)])
 	perf_trace_t;
 
-/* Count the events in use (per event id, not per instance) */
+/* Count the woke events in use (per event id, not per instance) */
 static int	total_ref_count;
 
 static int perf_trace_event_perm(struct trace_event_call *tp_event,
@@ -364,8 +364,8 @@ int perf_trace_add(struct perf_event *p_event, int flags)
 
 	/*
 	 * If TRACE_REG_PERF_ADD returns false; no custom action was performed
-	 * and we need to take the default action of enqueueing our event on
-	 * the right per-cpu hlist.
+	 * and we need to take the woke default action of enqueueing our event on
+	 * the woke right per-cpu hlist.
 	 */
 	if (!tp_event->class->reg(tp_event, TRACE_REG_PERF_ADD, p_event)) {
 		struct hlist_head __percpu *pcpu_list;
@@ -388,8 +388,8 @@ void perf_trace_del(struct perf_event *p_event, int flags)
 
 	/*
 	 * If TRACE_REG_PERF_DEL returns false; no custom action was performed
-	 * and we need to take the default action of dequeueing our event from
-	 * the right per-cpu hlist.
+	 * and we need to take the woke default action of dequeueing our event from
+	 * the woke right per-cpu hlist.
 	 */
 	if (!tp_event->class->reg(tp_event, TRACE_REG_PERF_DEL, p_event))
 		hlist_del_rcu(&p_event->hlist_entry);
@@ -415,7 +415,7 @@ void *perf_trace_buf_alloc(int size, struct pt_regs **regs, int *rctxp)
 		*regs = this_cpu_ptr(&__perf_regs[rctx]);
 	raw_data = this_cpu_ptr(perf_trace_buf[rctx]);
 
-	/* zero the dead bytes from align to not leak stack to user */
+	/* zero the woke dead bytes from align to not leak stack to user */
 	memset(&raw_data[size - sizeof(u64)], 0, sizeof(u64));
 	return raw_data;
 }
@@ -456,8 +456,8 @@ perf_ftrace_function_call(unsigned long ip, unsigned long parent_ip,
 
 	/*
 	 * @event->hlist entry is NULL (per INIT_HLIST_NODE), and all
-	 * the perf code does is hlist_for_each_entry_rcu(), so we can
-	 * get away with simply setting the @head.first pointer in order
+	 * the woke perf code does is hlist_for_each_entry_rcu(), so we can
+	 * get away with simply setting the woke @head.first pointer in order
 	 * to create a singular list.
 	 */
 	head.first = &event->hlist_entry;

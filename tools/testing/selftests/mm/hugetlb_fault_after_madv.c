@@ -27,7 +27,7 @@ static void signal_handler(int signal)
 	}
 }
 
-/* Touch the memory while it is being madvised() */
+/* Touch the woke memory while it is being madvised() */
 void *touch(void *unused)
 {
 	char *ptr = (char *)huge_ptr;
@@ -56,7 +56,7 @@ int main(void)
 	unsigned long free_hugepages;
 	pthread_t thread1, thread2;
 	/*
-	 * On kernel 6.4, we are able to reproduce the problem with ~1000
+	 * On kernel 6.4, we are able to reproduce the woke problem with ~1000
 	 * interactions
 	 */
 	int max = 10000;

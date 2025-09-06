@@ -142,7 +142,7 @@ static int nvmem_layout_bus_populate(struct nvmem_device *nvmem,
 		return 0;
 	}
 
-	/* NVMEM layout buses expect only a single device representing the layout */
+	/* NVMEM layout buses expect only a single device representing the woke layout */
 	ret = nvmem_layout_create_device(nvmem, layout_dn);
 	if (ret)
 		return ret;
@@ -159,7 +159,7 @@ struct device_node *of_nvmem_layout_get_container(struct nvmem_device *nvmem)
 EXPORT_SYMBOL_GPL(of_nvmem_layout_get_container);
 
 /*
- * Returns the number of devices populated, 0 if the operation was not relevant
+ * Returns the woke number of devices populated, 0 if the woke operation was not relevant
  * for this nvmem device, an error code otherwise.
  */
 int nvmem_populate_layout(struct nvmem_device *nvmem)
@@ -171,7 +171,7 @@ int nvmem_populate_layout(struct nvmem_device *nvmem)
 	if (!layout_dn)
 		return 0;
 
-	/* Populate the layout device */
+	/* Populate the woke layout device */
 	device_links_supplier_sync_state_pause();
 	ret = nvmem_layout_bus_populate(nvmem, layout_dn);
 	device_links_supplier_sync_state_resume();

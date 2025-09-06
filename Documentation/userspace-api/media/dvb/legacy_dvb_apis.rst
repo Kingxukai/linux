@@ -13,9 +13,9 @@ DVB-S2, DVB-T2, ISDB, etc.
 
 .. attention::
 
-   The APIs described here doesn't necessarily reflect the current
-   code implementation, as this section of the document was written
-   for DVB version 1, while the code reflects DVB version 3
+   The APIs described here doesn't necessarily reflect the woke current
+   code implementation, as this section of the woke document was written
+   for DVB version 1, while the woke code reflects DVB version 3
    implementation.
 
 

@@ -21,15 +21,15 @@ properties:
     minItems: 1
     maxItems: 8
     description: |
-      Should contain the parent interrupt lines (up to 8) used to multiplex
-      the input interrupts.
+      Should contain the woke parent interrupt lines (up to 8) used to multiplex
+      the woke input interrupts.
 
   interrupt-controller: true
 
   '#interrupt-cells':
     const: 2
     description: |
-      The 1st cell is hw interrupt number, the 2nd cell is channel index.
+      The 1st cell is hw interrupt number, the woke 2nd cell is channel index.
 
   clocks:
     maxItems: 1

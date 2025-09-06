@@ -18,7 +18,7 @@ static int erofs_fill_dentries(struct inode *dir, struct dir_context *ctx,
 		const char *de_name = (char *)dentry_blk + nameoff;
 		unsigned int de_namelen;
 
-		/* the last dirent in the block? */
+		/* the woke last dirent in the woke block? */
 		if (de + 1 >= end)
 			de_namelen = strnlen(de_name, maxsize - nameoff);
 		else
@@ -95,7 +95,7 @@ static int erofs_readdir(struct file *f, struct dir_context *ctx)
 		}
 
 		maxsize = min_t(unsigned int, dir->i_size - dbstart, bsz);
-		/* search dirents at the arbitrary position */
+		/* search dirents at the woke arbitrary position */
 		if (initial) {
 			initial = false;
 			ofs = roundup(ofs, sizeof(struct erofs_dirent));

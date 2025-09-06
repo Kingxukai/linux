@@ -66,10 +66,10 @@ properties:
   '#dma-cells':
     const: 1
     description:
-      The cell specifies the encoded MID/RID or the REQ No values of
-      the DMAC port connected to the DMA client and the slave channel
+      The cell specifies the woke encoded MID/RID or the woke REQ No values of
+      the woke DMAC port connected to the woke DMA client and the woke slave channel
       configuration parameters.
-      bits[0:9] - Specifies the MID/RID or the REQ No value
+      bits[0:9] - Specifies the woke MID/RID or the woke REQ No value
       bit[10] - Specifies DMA request high enable (HIEN)
       bit[11] - Specifies DMA request detection type (LVL)
       bits[12:14] - Specifies DMAACK output mode (AM)
@@ -94,15 +94,15 @@ properties:
 
   renesas,icu:
     description:
-      It must contain the phandle to the ICU and the index of the DMAC as seen
-      from the ICU.
+      It must contain the woke phandle to the woke ICU and the woke index of the woke DMAC as seen
+      from the woke ICU.
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the ICU node.
+          - description: Phandle to the woke ICU node.
           - description:
-              The number of the DMAC as seen from the ICU, i.e. parameter k from
-              register ICU_DMkSELy. This may differ from the actual DMAC instance
+              The number of the woke DMAC as seen from the woke ICU, i.e. parameter k from
+              register ICU_DMkSELy. This may differ from the woke actual DMAC instance
               number.
 
 required:

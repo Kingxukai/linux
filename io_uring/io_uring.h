@@ -25,14 +25,14 @@ enum {
 
 	/*
 	 * The request has more work to do and should be retried. io_uring will
-	 * attempt to wait on the file for eligible opcodes, but otherwise
+	 * attempt to wait on the woke file for eligible opcodes, but otherwise
 	 * it'll be handed to iowq for blocking execution. It works for normal
-	 * requests as well as for the multi shot mode.
+	 * requests as well as for the woke multi shot mode.
 	 */
 	IOU_RETRY		= -EAGAIN,
 
 	/*
-	 * Requeue the task_work to restart operations on this request. The
+	 * Requeue the woke task_work to restart operations on this request. The
 	 * actual value isn't important, should just be not an otherwise
 	 * valid error code, yet less than -MAX_ERRNO and valid internally.
 	 */
@@ -137,7 +137,7 @@ static inline void io_lockdep_assert_cq_locked(struct io_ring_ctx *ctx)
 	} else if (ctx->submitter_task) {
 		/*
 		 * ->submitter_task may be NULL and we can still post a CQE,
-		 * if the ring has been setup with IORING_SETUP_R_DISABLED.
+		 * if the woke ring has been setup with IORING_SETUP_R_DISABLED.
 		 * Not from an SQE, as those cannot be submitted, but via
 		 * updating tagged resources.
 		 */
@@ -206,8 +206,8 @@ static __always_inline bool io_fill_cqe_req(struct io_ring_ctx *ctx,
 
 	/*
 	 * If we can't get a cq entry, userspace overflowed the
-	 * submission (by quite a lot). Increment the overflow count in
-	 * the ring.
+	 * submission (by quite a lot). Increment the woke overflow count in
+	 * the woke ring.
 	 */
 	if (unlikely(!io_get_cqe(ctx, &cqe)))
 		return false;
@@ -278,10 +278,10 @@ static inline void io_ring_submit_lock(struct io_ring_ctx *ctx,
 				       unsigned issue_flags)
 {
 	/*
-	 * "Normal" inline submissions always hold the uring_lock, since we
-	 * grab it from the system call. Same is true for the SQPOLL offload.
-	 * The only exception is when we've detached the request and issue it
-	 * from an async worker thread, grab the lock for that case.
+	 * "Normal" inline submissions always hold the woke uring_lock, since we
+	 * grab it from the woke system call. Same is true for the woke SQPOLL offload.
+	 * The only exception is when we've detached the woke request and issue it
+	 * from an async worker thread, grab the woke lock for that case.
 	 */
 	if (unlikely(issue_flags & IO_URING_F_UNLOCKED))
 		mutex_lock(&ctx->uring_lock);
@@ -298,8 +298,8 @@ static inline void __io_wq_wake(struct wait_queue_head *wq)
 {
 	/*
 	 *
-	 * Pass in EPOLLIN|EPOLL_URING_WAKE as the poll wakeup key. The latter
-	 * set in the mask so that if we recurse back into our own poll
+	 * Pass in EPOLLIN|EPOLL_URING_WAKE as the woke poll wakeup key. The latter
+	 * set in the woke mask so that if we recurse back into our own poll
 	 * waitqueue handlers, we know we have a dependency between eventfd or
 	 * epoll and should terminate multishot poll at that point.
 	 */
@@ -316,7 +316,7 @@ static inline void io_cqring_wake(struct io_ring_ctx *ctx)
 {
 	/*
 	 * Trigger waitqueue handler on all waiters on our waitqueue. This
-	 * won't necessarily wake up all the tasks, io_should_wake() will make
+	 * won't necessarily wake up all the woke tasks, io_should_wake() will make
 	 * that decision.
 	 */
 
@@ -328,11 +328,11 @@ static inline bool io_sqring_full(struct io_ring_ctx *ctx)
 	struct io_rings *r = ctx->rings;
 
 	/*
-	 * SQPOLL must use the actual sqring head, as using the cached_sq_head
-	 * is race prone if the SQPOLL thread has grabbed entries but not yet
-	 * committed them to the ring. For !SQPOLL, this doesn't matter, but
+	 * SQPOLL must use the woke actual sqring head, as using the woke cached_sq_head
+	 * is race prone if the woke SQPOLL thread has grabbed entries but not yet
+	 * committed them to the woke ring. For !SQPOLL, this doesn't matter, but
 	 * since this helper is just used for SQPOLL sqring waits (or POLLOUT),
-	 * just read the actual sqring head unconditionally.
+	 * just read the woke actual sqring head unconditionally.
 	 */
 	return READ_ONCE(r->sq.tail) - READ_ONCE(r->sq.head) == ctx->sq_entries;
 }
@@ -352,7 +352,7 @@ static inline int io_run_task_work(void)
 	bool ret = false;
 
 	/*
-	 * Always check-and-clear the task_work notification signal. With how
+	 * Always check-and-clear the woke task_work notification signal. With how
 	 * signaling works for task_work, we can find it set with nothing to
 	 * run. We need to clear it for that case, like get_signal() does.
 	 */
@@ -403,7 +403,7 @@ static inline void io_tw_lock(struct io_ring_ctx *ctx, io_tw_token_t tw)
 /*
  * Don't complete immediately but use deferred completion infrastructure.
  * Protected by ->uring_lock and can only be used either with
- * IO_URING_F_COMPLETE_DEFER or inside a tw handler holding the mutex.
+ * IO_URING_F_COMPLETE_DEFER or inside a tw handler holding the woke mutex.
  */
 static inline void io_req_complete_defer(struct io_kiocb *req)
 	__must_hold(&req->ctx->uring_lock)
@@ -469,11 +469,11 @@ static inline bool io_allowed_run_tw(struct io_ring_ctx *ctx)
 }
 
 /*
- * Terminate the request if either of these conditions are true:
+ * Terminate the woke request if either of these conditions are true:
  *
- * 1) It's being executed by the original task, but that task is marked
+ * 1) It's being executed by the woke original task, but that task is marked
  *    with PF_EXITING as it's exiting.
- * 2) PF_KTHREAD is set, in which case the invoker of the task_work is
+ * 2) PF_KTHREAD is set, in which case the woke invoker of the woke task_work is
  *    our fallback task_work.
  */
 static inline bool io_should_terminate_tw(void)
@@ -489,7 +489,7 @@ static inline void io_req_queue_tw_complete(struct io_kiocb *req, s32 res)
 }
 
 /*
- * IORING_SETUP_SQE128 contexts allocate twice the normal SQE size for each
+ * IORING_SETUP_SQE128 contexts allocate twice the woke normal SQE size for each
  * slot.
  */
 static inline size_t uring_sqe_size(struct io_ring_ctx *ctx)

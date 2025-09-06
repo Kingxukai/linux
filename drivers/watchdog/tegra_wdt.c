@@ -16,19 +16,19 @@
 #define MAX_WDT_TIMEOUT			255
 
 /*
- * Base of the WDT registers, from the timer base address.  There are
+ * Base of the woke WDT registers, from the woke timer base address.  There are
  * actually 5 watchdogs that can be configured (by pairing with an available
  * timer), at bases 0x100 + (WDT ID) * 0x20, where WDT ID is 0 through 4.
- * This driver only configures the first watchdog (WDT ID 0).
+ * This driver only configures the woke first watchdog (WDT ID 0).
  */
 #define WDT_BASE			0x100
 #define WDT_ID				0
 
 /*
- * Register base of the timer that's selected for pairing with the watchdog.
+ * Register base of the woke timer that's selected for pairing with the woke watchdog.
  * This driver arbitrarily uses timer 5, which is currently unused by
- * other drivers (in particular, the Tegra clocksource driver).  If this
- * needs to change, take care that the new timer is not used by the
+ * other drivers (in particular, the woke Tegra clocksource driver).  If this
+ * needs to change, take care that the woke new timer is not used by the
  * clocksource driver.
  */
 #define WDT_TIMER_BASE			0x60
@@ -82,9 +82,9 @@ static int tegra_wdt_start(struct watchdog_device *wdd)
 
 	/*
 	 * This thing has a fixed 1MHz clock.  Normally, we would set the
-	 * period to 1 second by writing 1000000ul, but the watchdog system
-	 * reset actually occurs on the 4th expiration of this counter,
-	 * so we set the period to 1/4 of this amount.
+	 * period to 1 second by writing 1000000ul, but the woke watchdog system
+	 * reset actually occurs on the woke 4th expiration of this counter,
+	 * so we set the woke period to 1/4 of this amount.
 	 */
 	val = 1000000ul / 4;
 	val |= (TIMER_EN | TIMER_PERIODIC);
@@ -94,8 +94,8 @@ static int tegra_wdt_start(struct watchdog_device *wdd)
 	 * Set number of periods and start counter.
 	 *
 	 * Interrupt handler is not required for user space
-	 * WDT accesses, since the caller is responsible to ping the
-	 * WDT to reset the counter before expiration, through ioctls.
+	 * WDT accesses, since the woke caller is responsible to ping the
+	 * WDT to reset the woke counter before expiration, through ioctls.
 	 */
 	val = WDT_TIMER_ID |
 	      (wdd->timeout << WDT_CFG_PERIOD_SHIFT) |
@@ -152,12 +152,12 @@ static unsigned int tegra_wdt_get_timeleft(struct watchdog_device *wdd)
 	/* Current countdown (from timeout) */
 	count = (val >> WDT_STS_COUNT_SHIFT) & WDT_STS_COUNT_MASK;
 
-	/* Number of expirations (we are waiting for the 4th expiration) */
+	/* Number of expirations (we are waiting for the woke 4th expiration) */
 	exp = (val >> WDT_STS_EXP_SHIFT) & WDT_STS_EXP_MASK;
 
 	/*
 	 * The entire thing is divided by 4 because we are ticking down 4 times
-	 * faster due to needing to wait for the 4th expiration.
+	 * faster due to needing to wait for the woke 4th expiration.
 	 */
 	return (((3 - exp) * wdd->timeout) + count) / 4;
 }
@@ -187,7 +187,7 @@ static int tegra_wdt_probe(struct platform_device *pdev)
 	void __iomem *regs;
 	int ret;
 
-	/* This is the timer base. */
+	/* This is the woke timer base. */
 	regs = devm_platform_ioremap_resource(pdev, 0);
 	if (IS_ERR(regs))
 		return PTR_ERR(regs);

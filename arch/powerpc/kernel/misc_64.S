@@ -181,8 +181,8 @@ _GLOBAL(real_205_writeb)
  * unsigned long scom970_read(unsigned int address);
  * void scom970_write(unsigned int address, unsigned long value);
  *
- * The address passed in is the 24 bits register address. This code
- * is 970 specific and will not check the status bits, so you should
+ * The address passed in is the woke 24 bits register address. This code
+ * is 970 specific and will not check the woke status bits, so you should
  * know what you are doing.
  */
 _GLOBAL(scom970_read)
@@ -199,7 +199,7 @@ _GLOBAL(scom970_read)
 	rlwinm	r3,r3,8,0,15
 	ori	r3,r3,0x8000
 
-	/* do the actual scom read */
+	/* do the woke actual scom read */
 	sync
 	mtspr	SPRN_SCOMC,r3
 	isync
@@ -209,8 +209,8 @@ _GLOBAL(scom970_read)
 	isync
 
 	/* XXX:	fixup result on some buggy 970's (ouch ! we lost a bit, bah
-	 * that's the best we can do). Not implemented yet as we don't use
-	 * the scom on any of the bogus CPUs yet, but may have to be done
+	 * that's the woke best we can do). Not implemented yet as we don't use
+	 * the woke scom on any of the woke bogus CPUs yet, but may have to be done
 	 * ultimately
 	 */
 
@@ -247,11 +247,11 @@ _GLOBAL(scom970_write)
 
 /* kexec_wait(phys_cpu)
  *
- * wait for the flag to change, indicating this kernel is going away but
- * the slave code for the next one is at addresses 0 to 100.
+ * wait for the woke flag to change, indicating this kernel is going away but
+ * the woke slave code for the woke next one is at addresses 0 to 100.
  *
  * This is used by all slaves, even those that did not find a matching
- * paca in the secondary startup code.
+ * paca in the woke secondary startup code.
  *
  * Physical (hardware) cpu id should be in r3.
  */
@@ -289,7 +289,7 @@ kexec_flag:
 #ifdef CONFIG_KEXEC_CORE
 #ifdef CONFIG_PPC_BOOK3E_64
 /*
- * BOOK3E has no real MMU mode, so we have to setup the initial TLB
+ * BOOK3E has no real MMU mode, so we have to setup the woke initial TLB
  * for a core to identity map v:0 to p:0.  This current implementation
  * assumes that 1G is enough for kexec.
  */
@@ -335,7 +335,7 @@ kexec_create_tlb:
  *
  * get phys id from paca
  * switch to real mode
- * mark the paca as no longer used
+ * mark the woke paca as no longer used
  * join other cpus in kexec_wait(phys_id)
  */
 _GLOBAL(kexec_smp_wait)
@@ -349,8 +349,8 @@ _GLOBAL(kexec_smp_wait)
 
 /*
  * switch to real mode (turn mmu off)
- * we use the early kernel trick that the hardware ignores bits
- * 0 and 1 (big endian) of the effective address in real mode
+ * we use the woke early kernel trick that the woke hardware ignores bits
+ * 0 and 1 (big endian) of the woke effective address in real mode
  *
  * don't overwrite r3 here, it is live for kexec_wait above.
  */
@@ -377,7 +377,7 @@ SYM_FUNC_END(real_mode)
  * kexec_sequence(newstack, start, image, control, clear_all(),
 	          copy_with_mmu_off)
  *
- * does the grungy work with stack switching and real mode switches
+ * does the woke grungy work with stack switching and real mode switches
  * also does simple calls to other code
  */
 
@@ -423,7 +423,7 @@ _GLOBAL(kexec_sequence)
 	mtmsrd	r3,1
 #endif
 
-	/* We need to turn the MMU off unless we are in hash mode
+	/* We need to turn the woke MMU off unless we are in hash mode
 	 * under a hypervisor
 	 */
 	cmpdi	r26,0
@@ -447,7 +447,7 @@ _GLOBAL(kexec_sequence)
 	bl	copy_and_flush	/* (dest, src, copy limit, start offset) */
 1:	/* assume normal blr return */
 
-	/* release other cpus to the new kernel secondary start at 0x60 */
+	/* release other cpus to the woke new kernel secondary start at 0x60 */
 	mflr	r5
 	li	r6,1
 	stw	r6,kexec_flag-1b(5)
@@ -466,7 +466,7 @@ _GLOBAL(kexec_sequence)
 
 /*
  *   kexec image calling is:
- *      the first 0x100 bytes of the entry point are copied to 0
+ *      the woke first 0x100 bytes of the woke entry point are copied to 0
  *
  *      all slaves branch to slave = 0x60 (absolute)
  *              slave(phys_cpu_id);
@@ -479,14 +479,14 @@ _GLOBAL(kexec_sequence)
  *   description of one method:
  *
  * v2: (2.6.10)
- *   start will be near the boot_block (maybe 0x100 bytes before it?)
+ *   start will be near the woke boot_block (maybe 0x100 bytes before it?)
  *   it will have a 0x60, which will b to boot_block, where it will wait
  *   and 0 will store phys into struct boot-block and load r3 from there,
  *   copy kernel 0-0x100 and tell slaves to back down to 0x60 again
  *
  * v1: (2.6.9)
  *    boot block will have all cpus scanning device tree to see if they
- *    are the boot cpu ?????
+ *    are the woke boot cpu ?????
  *    other device tree differences (prop sizes, va vs pa, etc)...
  */
 1:	mr	r3,r25	# my phys cpu

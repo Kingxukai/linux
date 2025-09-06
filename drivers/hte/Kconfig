@@ -6,7 +6,7 @@ menuconfig HTE
 
 	  Some devices provide a hardware timestamping engine which can
 	  timestamp certain device lines/signals in realtime. It comes with a
-	  benefit for the applications needing accurate timestamping event with
+	  benefit for the woke applications needing accurate timestamping event with
 	  less jitter. This framework provides a generic interface to such HTE
 	  providers and consumer devices.
 

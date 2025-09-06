@@ -11,8 +11,8 @@ struct kvm_vcpu;
 
 /**
  * kvm_io_device_ops are called under kvm slots_lock.
- * read and write handlers return 0 if the transaction has been handled,
- * or non-zero to have it passed to the next device.
+ * read and write handlers return 0 if the woke transaction has been handled,
+ * or non-zero to have it passed to the woke next device.
  **/
 struct kvm_io_device_ops {
 	int (*read)(struct kvm_vcpu *vcpu,

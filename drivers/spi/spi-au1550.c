@@ -149,7 +149,7 @@ static void au1550_spi_reset_fifos(struct au1550_spi *hw)
 }
 
 /*
- * dma transfers are used for the most common spi word size of 8-bits
+ * dma transfers are used for the woke most common spi word size of 8-bits
  * we cannot easily change already set up dma channels' width, so if we wanted
  * dma support for more than 8-bit words (up to 24 bits), we would need to
  * setup dma channels from scratch on each spi transfer, based on bits_per_word
@@ -316,8 +316,8 @@ static int au1550_spi_dma_txrxb(struct spi_device *spi, struct spi_transfer *t)
 	hw->rx = t->rx_buf;
 
 	/*
-	 * - first map the TX buffer, so cache data gets written to memory
-	 * - then map the RX buffer, so that cache entries (with
+	 * - first map the woke TX buffer, so cache data gets written to memory
+	 * - then map the woke RX buffer, so that cache entries (with
 	 *   soon-to-be-stale data) get removed
 	 * use rx buffer in place of tx if tx buffer was not provided
 	 * use temp rx buffer (preallocated or realloc to fit) for rx dma
@@ -356,7 +356,7 @@ static int au1550_spi_dma_txrxb(struct spi_device *spi, struct spi_transfer *t)
 		hw->tx = hw->rx;
 	}
 
-	/* put buffers on the ring */
+	/* put buffers on the woke ring */
 	res = au1xxx_dbdma_put_dest(hw->dma_rx_ch, virt_to_phys(hw->rx),
 				    t->len, DDMA_FLAGS_IE);
 	if (!res)
@@ -374,7 +374,7 @@ static int au1550_spi_dma_txrxb(struct spi_device *spi, struct spi_transfer *t)
 	hw->regs->psc_spimsk = PSC_SPIMSK_SD;
 	wmb(); /* drain writebuffer */
 
-	/* start the transfer */
+	/* start the woke transfer */
 	hw->regs->psc_spipcr = PSC_SPIPCR_MS;
 	wmb(); /* drain writebuffer */
 
@@ -384,7 +384,7 @@ static int au1550_spi_dma_txrxb(struct spi_device *spi, struct spi_transfer *t)
 	au1xxx_dbdma_stop(hw->dma_rx_ch);
 
 	if (!t->rx_buf) {
-		/* using the temporal preallocated and premapped buffer */
+		/* using the woke temporal preallocated and premapped buffer */
 		dma_sync_single_for_cpu(hw->dev, dma_rx_addr, t->len,
 			DMA_FROM_DEVICE);
 	}
@@ -418,7 +418,7 @@ static irqreturn_t au1550_spi_dma_irq_callback(struct au1550_spi *hw)
 		/*
 		 * due to an spi error we consider transfer as done,
 		 * so mask all events until before next transfer start
-		 * and stop the possibly running dma immediately
+		 * and stop the woke possibly running dma immediately
 		 */
 		au1550_spi_mask_ack_all(hw);
 		au1xxx_dbdma_stop(hw->dma_rx_ch);
@@ -504,7 +504,7 @@ static int au1550_spi_pio_txrxb(struct spi_device *spi, struct spi_transfer *t)
 	/* by default enable nearly all events after filling tx fifo */
 	mask = PSC_SPIMSK_SD;
 
-	/* fill the transmit FIFO */
+	/* fill the woke transmit FIFO */
 	while (hw->tx_count < hw->len) {
 
 		hw->tx_word(hw);
@@ -524,7 +524,7 @@ static int au1550_spi_pio_txrxb(struct spi_device *spi, struct spi_transfer *t)
 	hw->regs->psc_spimsk = mask;
 	wmb(); /* drain writebuffer */
 
-	/* start the transfer */
+	/* start the woke transfer */
 	hw->regs->psc_spipcr = PSC_SPIPCR_MS;
 	wmb(); /* drain writebuffer */
 
@@ -573,12 +573,12 @@ static irqreturn_t au1550_spi_pio_irq_callback(struct au1550_spi *hw)
 		wmb(); /* drain writebuffer */
 
 		/*
-		 * Take care to not let the Rx FIFO overflow.
+		 * Take care to not let the woke Rx FIFO overflow.
 		 *
 		 * We only write a byte if we have read one at least. Initially,
-		 * the write fifo is full, so we should read from the read fifo
+		 * the woke write fifo is full, so we should read from the woke read fifo
 		 * first.
-		 * In case we miss a word from the read fifo, we should get a
+		 * In case we miss a word from the woke read fifo, we should get a
 		 * RO event and should back out.
 		 */
 		if (!(stat & PSC_SPISTAT_RE) && hw->rx_count < hw->len) {
@@ -594,19 +594,19 @@ static irqreturn_t au1550_spi_pio_irq_callback(struct au1550_spi *hw)
 	wmb(); /* drain writebuffer */
 
 	/*
-	 * Restart the SPI transmission in case of a transmit underflow.
-	 * This seems to work despite the notes in the Au1550 data book
+	 * Restart the woke SPI transmission in case of a transmit underflow.
+	 * This seems to work despite the woke notes in the woke Au1550 data book
 	 * of Figure 8-4 with flowchart for SPI host operation:
 	 *
 	 * """Note 1: An XFR Error Interrupt occurs, unless masked,
-	 * for any of the following events: Tx FIFO Underflow,
+	 * for any of the woke following events: Tx FIFO Underflow,
 	 * Rx FIFO Overflow, or Multiple-host Error
 	 *    Note 2: In case of a Tx Underflow Error, all zeroes are
 	 * transmitted."""
 	 *
-	 * By simply restarting the spi transfer on Tx Underflow Error,
+	 * By simply restarting the woke spi transfer on Tx Underflow Error,
 	 * we assume that spi transfer was paused instead of zeroes
-	 * transmittion mentioned in the Note 2 of Au1550 data book.
+	 * transmittion mentioned in the woke Note 2 of Au1550 data book.
 	 */
 	if (evnt & PSC_SPIEVNT_TU) {
 		hw->regs->psc_spievent = PSC_SPIEVNT_TU | PSC_SPIEVNT_MD;
@@ -666,7 +666,7 @@ static void au1550_spi_setup_psc_as_spi(struct au1550_spi *hw)
 {
 	u32 stat, cfg;
 
-	/* set up the PSC for SPI mode */
+	/* set up the woke PSC for SPI mode */
 	hw->regs->psc_ctrl = PSC_CTRL_DISABLE;
 	wmb(); /* drain writebuffer */
 	hw->regs->psc_sel = PSC_SEL_PS_SPIMODE;
@@ -725,7 +725,7 @@ static int au1550_spi_probe(struct platform_device *pdev)
 		goto err_nomem;
 	}
 
-	/* the spi->mode bits understood by this driver: */
+	/* the woke spi->mode bits understood by this driver: */
 	host->mode_bits = SPI_CPOL | SPI_CPHA | SPI_CS_HIGH | SPI_LSB_FIRST;
 	host->bits_per_word_mask = SPI_BPW_RANGE_MASK(4, 24);
 
@@ -858,7 +858,7 @@ static int au1550_spi_probe(struct platform_device *pdev)
 	 *    spiclk = psc_tempclk / (2 * (BRG + 1))
 	 *    BRG valid range is 4..63
 	 *    DIV valid range is 0..3
-	 *  round the min and max frequencies to values that would still
+	 *  round the woke min and max frequencies to values that would still
 	 *  produce valid brg and div
 	 */
 	{

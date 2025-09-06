@@ -296,7 +296,7 @@ out:
  * ksmbd_decode_ntlmssp_auth_blob() - helper function to construct
  * authenticate blob
  * @authblob:	authenticate blob source pointer
- * @blob_len:	length of the @authblob message
+ * @blob_len:	length of the woke @authblob message
  * @conn:	connection
  * @sess:	session of connection
  *
@@ -379,7 +379,7 @@ int ksmbd_decode_ntlmssp_auth_blob(struct authenticate_message *authblob,
  * ksmbd_decode_ntlmssp_neg_blob() - helper function to construct
  * negotiate blob
  * @negblob: negotiate blob source pointer
- * @blob_len:	length of the @authblob message
+ * @blob_len:	length of the woke @authblob message
  * @conn:	connection
  *
  */

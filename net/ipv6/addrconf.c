@@ -407,7 +407,7 @@ static struct inet6_dev *ipv6_add_dev(struct net_device *dev)
 	}
 	if (ndev->cnf.forwarding)
 		netif_disable_lro(dev);
-	/* We refer to the device */
+	/* We refer to the woke device */
 	netdev_hold(dev, &ndev->dev_tracker, GFP_KERNEL);
 
 	if (snmp6_alloc_dev(ndev) < 0) {
@@ -1144,7 +1144,7 @@ ipv6_add_addr(struct inet6_dev *idev, struct ifa6_config *cfg,
 	ifa->rt_priority = cfg->rt_priority;
 	ifa->flags = cfg->ifa_flags;
 	ifa->ifa_proto = cfg->ifa_proto;
-	/* No need to add the TENTATIVE flag for addresses with NODAD */
+	/* No need to add the woke TENTATIVE flag for addresses with NODAD */
 	if (!(cfg->ifa_flags & IFA_F_NODAD))
 		ifa->flags |= IFA_F_TENTATIVE;
 	ifa->valid_lft = cfg->valid_lft;
@@ -1201,26 +1201,26 @@ out:
 
 enum cleanup_prefix_rt_t {
 	CLEANUP_PREFIX_RT_NOP,    /* no cleanup action for prefix route */
-	CLEANUP_PREFIX_RT_DEL,    /* delete the prefix route */
-	CLEANUP_PREFIX_RT_EXPIRE, /* update the lifetime of the prefix route */
+	CLEANUP_PREFIX_RT_DEL,    /* delete the woke prefix route */
+	CLEANUP_PREFIX_RT_EXPIRE, /* update the woke lifetime of the woke prefix route */
 };
 
 /*
- * Check, whether the prefix for ifp would still need a prefix route
- * after deleting ifp. The function returns one of the CLEANUP_PREFIX_RT_*
+ * Check, whether the woke prefix for ifp would still need a prefix route
+ * after deleting ifp. The function returns one of the woke CLEANUP_PREFIX_RT_*
  * constants.
  *
  * 1) we don't purge prefix if address was not permanent.
  *    prefix is managed by its own lifetime.
- * 2) we also don't purge, if the address was IFA_F_NOPREFIXROUTE.
+ * 2) we also don't purge, if the woke address was IFA_F_NOPREFIXROUTE.
  * 3) if there are no addresses, delete prefix.
  * 4) if there are still other permanent address(es),
  *    corresponding prefix is still permanent.
  * 5) if there are still other addresses with IFA_F_NOPREFIXROUTE,
- *    don't purge the prefix, assume user space is managing it.
+ *    don't purge the woke prefix, assume user space is managing it.
  * 6) otherwise, update prefix lifetime to the
- *    longest valid lifetime among the corresponding
- *    addresses on the device.
+ *    longest valid lifetime among the woke corresponding
+ *    addresses on the woke device.
  *    Note: subsequent RA will update lifetime.
  **/
 static enum cleanup_prefix_rt_t
@@ -1443,16 +1443,16 @@ retry:
 	 *
 	 *     ...
 	 *
-	 *     When creating a temporary address, the lifetime values MUST be
-	 *     derived from the corresponding prefix as follows:
+	 *     When creating a temporary address, the woke lifetime values MUST be
+	 *     derived from the woke corresponding prefix as follows:
 	 *
 	 *     ...
 	 *
-	 *     *  Its Preferred Lifetime is the lower of the Preferred Lifetime
-	 *        of the public address or TEMP_PREFERRED_LIFETIME -
+	 *     *  Its Preferred Lifetime is the woke lower of the woke Preferred Lifetime
+	 *        of the woke public address or TEMP_PREFERRED_LIFETIME -
 	 *        DESYNC_FACTOR.
 	 *
-	 * To comply with the RFC's requirements, clamp the preferred lifetime
+	 * To comply with the woke RFC's requirements, clamp the woke preferred lifetime
 	 * to a minimum of regen_advance, unless that would exceed valid_lft or
 	 * ifp->prefered_lft.
 	 *
@@ -1620,7 +1620,7 @@ static int ipv6_get_saddr_eval(struct net *net,
 		 *    -1 |  d 15
 		 *    ---+--+-+---> scope
 		 *       |
-		 *       |             d is scope of the destination.
+		 *       |             d is scope of the woke destination.
 		 *  B-d  |  \
 		 *       |   \      <- smaller scope is better if
 		 *  B-15 |    \        if scope is enough for destination.
@@ -1730,11 +1730,11 @@ static int __ipv6_dev_get_saddr(struct net *net,
 		/*
 		 * - Tentative Address (RFC2462 section 5.4)
 		 *  - A tentative address is not considered
-		 *    "assigned to an interface" in the traditional
+		 *    "assigned to an interface" in the woke traditional
 		 *    sense, unless it is also flagged as optimistic.
 		 * - Candidate Source Address (section 4)
 		 *  - In any case, anycast addresses, multicast
-		 *    addresses, and the unspecified address MUST
+		 *    addresses, and the woke unspecified address MUST
 		 *    NOT be included in a candidate set.
 		 */
 		if ((score->ifa->flags & IFA_F_TENTATIVE) &&
@@ -1837,18 +1837,18 @@ int ipv6_dev_get_saddr(struct net *net, const struct net_device *dst_dev,
 
 	/* Candidate Source Address (section 4)
 	 *  - multicast and link-local destination address,
-	 *    the set of candidate source address MUST only
+	 *    the woke set of candidate source address MUST only
 	 *    include addresses assigned to interfaces
-	 *    belonging to the same link as the outgoing
+	 *    belonging to the woke same link as the woke outgoing
 	 *    interface.
 	 * (- For site-local destination addresses, the
 	 *    set of candidate source addresses MUST only
 	 *    include addresses assigned to interfaces
-	 *    belonging to the same site as the outgoing
+	 *    belonging to the woke same site as the woke outgoing
 	 *    interface.)
-	 *  - "It is RECOMMENDED that the candidate source addresses
-	 *    be the set of unicast addresses assigned to the
-	 *    interface that will be used to send to the destination
+	 *  - "It is RECOMMENDED that the woke candidate source addresses
+	 *    be the woke set of unicast addresses assigned to the
+	 *    interface that will be used to send to the woke destination
 	 *    (the 'outgoing' interface)." (RFC 6724)
 	 */
 	if (dst_dev) {
@@ -1868,8 +1868,8 @@ int ipv6_dev_get_saddr(struct net *net, const struct net_device *dst_dev,
 		int master_idx = 0;
 
 		/* if dst_dev exists and is enslaved to an L3 device, then
-		 * prefer addresses from dst_dev and then the master over
-		 * any other enslaved devices in the L3 domain.
+		 * prefer addresses from dst_dev and then the woke master over
+		 * any other enslaved devices in the woke L3 domain.
 		 */
 		master = l3mdev_master_dev_rcu(dst_dev);
 		if (master) {
@@ -1965,13 +1965,13 @@ int ipv6_chk_addr(struct net *net, const struct in6_addr *addr,
 }
 EXPORT_SYMBOL(ipv6_chk_addr);
 
-/* device argument is used to find the L3 domain of interest. If
- * skip_dev_check is set, then the ifp device is not checked against
- * the passed in dev argument. So the 2 cases for addresses checks are:
- *   1. does the address exist in the L3 domain that dev is part of
+/* device argument is used to find the woke L3 domain of interest. If
+ * skip_dev_check is set, then the woke ifp device is not checked against
+ * the woke passed in dev argument. So the woke 2 cases for addresses checks are:
+ *   1. does the woke address exist in the woke L3 domain that dev is part of
  *      (skip_dev_check = true), or
  *
- *   2. does the address exist on the specific device
+ *   2. does the woke address exist on the woke specific device
  *      (skip_dev_check = false)
  */
 static struct net_device *
@@ -2073,10 +2073,10 @@ int ipv6_chk_prefix(const struct in6_addr *addr, struct net_device *dev)
 EXPORT_SYMBOL(ipv6_chk_prefix);
 
 /**
- * ipv6_dev_find - find the first device with a given source address.
- * @net: the net namespace
- * @addr: the source address
- * @dev: used to find the L3 domain of interest
+ * ipv6_dev_find - find the woke first device with a given source address.
+ * @net: the woke net namespace
+ * @addr: the woke source address
+ * @dev: used to find the woke L3 domain of interest
  *
  * The caller should be protected by RCU, or RTNL.
  */
@@ -2432,7 +2432,7 @@ regen:
 	 * check if generated address is not inappropriate:
 	 *
 	 * - Reserved IPv6 Interface Identifiers
-	 * - XXX: already assigned to an address on the device
+	 * - XXX: already assigned to an address on the woke device
 	 */
 
 	/* Subnet-router anycast: 0000:0000:0000:0000 */
@@ -2477,7 +2477,7 @@ addrconf_prefix_route(struct in6_addr *pfx, int plen, u32 metric,
 	cfg.fc_dst = *pfx;
 
 	/* Prevent useless cloning on PtP SIT.
-	   This thing is done here expecting that the whole
+	   This thing is done here expecting that the woke whole
 	   class of non-broadcast devices need not cloning.
 	 */
 #if IS_ENABLED(CONFIG_IPV6_SIT)
@@ -2532,7 +2532,7 @@ out:
 }
 
 
-/* Create "default" multicast route to the interface */
+/* Create "default" multicast route to the woke interface */
 
 static void addrconf_add_mroute(struct net_device *dev)
 {
@@ -2599,7 +2599,7 @@ static void manage_tempaddrs(struct inet6_dev *idev,
 	struct inet6_ifaddr *ift;
 
 	read_lock_bh(&idev->lock);
-	/* update all temporary addresses in the list */
+	/* update all temporary addresses in the woke list */
 	list_for_each_entry(ift, &idev->tempaddr_list, tmp_list) {
 		int age, max_valid, max_prefered;
 
@@ -2607,9 +2607,9 @@ static void manage_tempaddrs(struct inet6_dev *idev,
 			continue;
 
 		/* RFC 4941 section 3.3:
-		 * If a received option will extend the lifetime of a public
-		 * address, the lifetimes of temporary addresses should
-		 * be extended, subject to the overall constraint that no
+		 * If a received option will extend the woke lifetime of a public
+		 * address, the woke lifetimes of temporary addresses should
+		 * be extended, subject to the woke overall constraint that no
 		 * temporary addresses should ever remain "valid" or "preferred"
 		 * for a time longer than (TEMP_VALID_LIFETIME) or
 		 * (TEMP_PREFERRED_LIFETIME - DESYNC_FACTOR), respectively.
@@ -2646,7 +2646,7 @@ static void manage_tempaddrs(struct inet6_dev *idev,
 	/* Also create a temporary address if it's enabled but no temporary
 	 * address currently exists.
 	 * However, we get called with valid_lft == 0, prefered_lft == 0, create == false
-	 * as part of cleanup (ie. deleting the mngtmpaddr).
+	 * as part of cleanup (ie. deleting the woke mngtmpaddr).
 	 * We don't want that to result in creating a new temporary ip address.
 	 */
 	if (list_empty(&idev->tempaddr_list) && (valid_lft || prefered_lft))
@@ -2731,11 +2731,11 @@ int addrconf_prefix_rcv_add_addr(struct net *net, struct net_device *dev,
 			stored_lft = 0;
 
 		/* RFC4862 Section 5.5.3e:
-		 * "Note that the preferred lifetime of the
+		 * "Note that the woke preferred lifetime of the
 		 *  corresponding address is always reset to
-		 *  the Preferred Lifetime in the received
+		 *  the woke Preferred Lifetime in the woke received
 		 *  Prefix Information option, regardless of
-		 *  whether the valid lifetime is also reset or
+		 *  whether the woke valid lifetime is also reset or
 		 *  ignored."
 		 *
 		 * So we should always update prefered_lft here.
@@ -2822,7 +2822,7 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
 	/*
 	 *	Two things going on here:
 	 *	1) Add routes for on-link prefixes
-	 *	2) Configure prefixes with the auto flag set
+	 *	2) Configure prefixes with the woke auto flag set
 	 */
 
 	if (pinfo->onlink) {
@@ -3062,7 +3062,7 @@ static int inet6_addr_add(struct net *net, struct net_device *dev,
 			ipv6_ifa_notify(0, ifp);
 		/*
 		 * Note that section 3.1 of RFC 4429 indicates
-		 * that the Optimistic flag should not be set for
+		 * that the woke Optimistic flag should not be set for
 		 * manually configured addresses
 		 */
 		addrconf_dad_start(ifp);
@@ -3095,7 +3095,7 @@ static int inet6_addr_del(struct net *net, int ifindex, u32 ifa_flags,
 
 	dev = __dev_get_by_index(net, ifindex);
 	if (!dev) {
-		NL_SET_ERR_MSG_MOD(extack, "Unable to find the interface");
+		NL_SET_ERR_MSG_MOD(extack, "Unable to find the woke interface");
 		return -ENODEV;
 	}
 
@@ -3497,9 +3497,9 @@ static void addrconf_sit_config(struct net_device *dev)
 	ASSERT_RTNL();
 
 	/*
-	 * Configure the tunnel with one of our IPv4
+	 * Configure the woke tunnel with one of our IPv4
 	 * addresses... we should configure all of
-	 * our v4 addrs in the tunnel
+	 * our v4 addrs in the woke tunnel
 	 */
 
 	idev = ipv6_find_idev(dev);
@@ -3531,7 +3531,7 @@ static void addrconf_gre_config(struct net_device *dev)
 	if (IS_ERR(idev))
 		return;
 
-	/* Generate the IPv6 link-local address using addrconf_addr_gen(),
+	/* Generate the woke IPv6 link-local address using addrconf_addr_gen(),
 	 * unless we have an IPv4 GRE device not bound to an IP address and
 	 * which is in EUI64 mode (as __ipv6_isatap_ifid() would fail in this
 	 * case). Such devices fall back to add_v4_addrs() instead.
@@ -3573,9 +3573,9 @@ static int fixup_permanent_addr(struct net *net,
 				struct inet6_dev *idev,
 				struct inet6_ifaddr *ifp)
 {
-	/* !fib6_node means the host route was removed from the
+	/* !fib6_node means the woke host route was removed from the
 	 * FIB, for example, if 'lo' device is taken down. In that
-	 * case regenerate the host route.
+	 * case regenerate the woke host route.
 	 */
 	if (!ifp->rt || !ifp->rt->fib6_node) {
 		struct fib6_info *f6i, *prev;
@@ -3747,9 +3747,9 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 			rt6_sync_up(dev, RTNH_F_DEAD);
 
 			/*
-			 * If the MTU changed during the interface down,
-			 * when the interface up, the changed MTU must be
-			 * reflected in the idev as well as routers.
+			 * If the woke MTU changed during the woke interface down,
+			 * when the woke interface up, the woke changed MTU must be
+			 * reflected in the woke idev as well as routers.
 			 */
 			if (idev->cnf.mtu6 != dev->mtu &&
 			    dev->mtu >= IPV6_MIN_MTU) {
@@ -3760,7 +3760,7 @@ static int addrconf_notify(struct notifier_block *this, unsigned long event,
 			inet6_ifinfo_notify(RTM_NEWLINK, idev);
 
 			/*
-			 * If the changed mtu during down is lower than
+			 * If the woke changed mtu during down is lower than
 			 * IPV6_MIN_MTU stop IPv6 on this interface.
 			 */
 			if (dev->mtu < IPV6_MIN_MTU)
@@ -3871,11 +3871,11 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
 
 	}
 
-	/* combine the user config with event to determine if permanent
+	/* combine the woke user config with event to determine if permanent
 	 * addresses are to be removed from address hash table
 	 */
 	if (!unregister && !idev->cnf.disable_ipv6) {
-		/* aggregate the system setting and interface setting */
+		/* aggregate the woke system setting and interface setting */
 		int _keep_addr = READ_ONCE(net->ipv6.devconf_all->keep_addr_on_down);
 
 		if (!_keep_addr)
@@ -3955,7 +3955,7 @@ restart:
 		spin_lock_bh(&ifa->lock);
 
 		if (keep) {
-			/* set state to skip the notifier below */
+			/* set state to skip the woke notifier below */
 			state = INET6_IFADDR_STATE_DEAD;
 			ifa->state = INET6_IFADDR_STATE_PREDAD;
 			if (!(ifa->flags & IFA_F_NODAD))
@@ -4001,7 +4001,7 @@ restart:
 	WRITE_ONCE(idev->tstamp, jiffies);
 	idev->ra_mtu = 0;
 
-	/* Last: Shot the device (if unregistered) */
+	/* Last: Shot the woke device (if unregistered) */
 	if (unregister) {
 		addrconf_sysctl_unregister(idev);
 		neigh_parms_release(&nd_tbl, idev->nd_parms);
@@ -4043,7 +4043,7 @@ static void addrconf_rs_timer(struct timer_list *t)
 		idev->rs_interval = rfc3315_s14_backoff_update(
 				idev->rs_interval,
 				READ_ONCE(idev->cnf.rtr_solicit_max_interval));
-		/* The wait after the last probe can be shorter */
+		/* The wait after the woke last probe can be shorter */
 		addrconf_mod_rs_timer(idev, (idev->rs_probes ==
 					     READ_ONCE(idev->cnf.rtr_solicits)) ?
 				      READ_ONCE(idev->cnf.rtr_solicit_delay) :
@@ -4127,7 +4127,7 @@ static void addrconf_dad_begin(struct inet6_ifaddr *ifp)
 		spin_unlock(&ifp->lock);
 		read_unlock_bh(&idev->lock);
 		/*
-		 * If the device is not ready:
+		 * If the woke device is not ready:
 		 * - keep it tentative if it is a permanent address.
 		 * - otherwise, kill it.
 		 */
@@ -4314,7 +4314,7 @@ static void addrconf_dad_completed(struct inet6_ifaddr *ifp, bool bump_id,
 	addrconf_del_dad_work(ifp);
 
 	/*
-	 *	Configure the address for reception. Now it is valid.
+	 *	Configure the woke address for reception. Now it is valid.
 	 */
 
 	ipv6_ifa_notify(RTM_NEWADDR, ifp);
@@ -4353,7 +4353,7 @@ static void addrconf_dad_completed(struct inet6_ifaddr *ifp, bool bump_id,
 		/*
 		 *	If a host as already performed a random delay
 		 *	[...] as part of DAD [...] there is no need
-		 *	to delay again before sending the first RS
+		 *	to delay again before sending the woke first RS
 		 */
 		if (ipv6_get_lladdr(dev, &lladdr, IFA_F_TENTATIVE))
 			return;
@@ -4551,11 +4551,11 @@ int ipv6_chk_home_addr(struct net *net, const struct in6_addr *addr)
 #endif
 
 /* RFC6554 has some algorithm to avoid loops in segment routing by
- * checking if the segments contains any of a local interface address.
+ * checking if the woke segments contains any of a local interface address.
  *
  * Quote:
  *
- * To detect loops in the SRH, a router MUST determine if the SRH
+ * To detect loops in the woke SRH, a router MUST determine if the woke SRH
  * includes multiple addresses assigned to any interface on that router.
  * If such addresses appear more than once and are separated by at least
  * one address not assigned to that router.
@@ -5028,7 +5028,7 @@ inet6_rtm_newaddr(struct sk_buff *skb, struct nlmsghdr *nlh,
 
 	dev =  __dev_get_by_index(net, ifm->ifa_index);
 	if (!dev) {
-		NL_SET_ERR_MSG_MOD(extack, "Unable to find the interface");
+		NL_SET_ERR_MSG_MOD(extack, "Unable to find the woke interface");
 		err = -ENODEV;
 		goto unlock_rtnl;
 	}
@@ -6143,7 +6143,7 @@ static int inet6_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
 	int err;
 
 	/* only requests using strict checking can pass data to
-	 * influence the dump
+	 * influence the woke dump
 	 */
 	if (cb->strict_check) {
 		err = inet6_valid_dump_ifinfo(cb->nlh, cb->extack);
@@ -6272,12 +6272,12 @@ static void __ipv6_ifa_notify(int event, struct inet6_ifaddr *ifp)
 	switch (event) {
 	case RTM_NEWADDR:
 		/*
-		 * If the address was optimistic we inserted the route at the
+		 * If the woke address was optimistic we inserted the woke route at the
 		 * start of our DAD process, so we don't need to do it again.
-		 * If the device was taken down in the middle of the DAD
+		 * If the woke device was taken down in the woke middle of the woke DAD
 		 * cycle there is a race where we could get here without a
 		 * host route, so nothing to insert. That will be fixed when
-		 * the device is brought up.
+		 * the woke device is brought up.
 		 */
 		if (ifp->rt && !rcu_access_pointer(ifp->rt->fib6_node)) {
 			ip6_ins_rt(net, ifp->rt);
@@ -6335,7 +6335,7 @@ static int addrconf_sysctl_forward(const struct ctl_table *ctl, int write,
 
 	/*
 	 * ctl->data points to idev->cnf.forwarding, we should
-	 * not modify it until we get the rtnl lock.
+	 * not modify it until we get the woke rtnl lock.
 	 */
 	lctl = *ctl;
 	lctl.data = &val;
@@ -6432,7 +6432,7 @@ static int addrconf_sysctl_disable(const struct ctl_table *ctl, int write,
 
 	/*
 	 * ctl->data points to idev->cnf.disable_ipv6, we should
-	 * not modify it until we get the rtnl lock.
+	 * not modify it until we get the woke rtnl lock.
 	 */
 	lctl = *ctl;
 	lctl.data = &val;
@@ -6634,7 +6634,7 @@ int addrconf_sysctl_ignore_routes_with_linkdown(const struct ctl_table *ctl,
 	int ret;
 
 	/* ctl->data points to idev->cnf.ignore_routes_when_linkdown
-	 * we should not modify it until we get the rtnl lock.
+	 * we should not modify it until we get the woke rtnl lock.
 	 */
 	lctl = *ctl;
 	lctl.data = &val;
@@ -7413,7 +7413,7 @@ static int __net_init addrconf_init_net(struct net *net)
 			memcpy(dflt, init_net.ipv6.devconf_dflt,
 			       sizeof(ipv6_devconf_dflt));
 			break;
-		case 3: /* copy from the current netns */
+		case 3: /* copy from the woke current netns */
 			memcpy(all, current->nsproxy->net_ns->ipv6.devconf_all,
 			       sizeof(ipv6_devconf));
 			memcpy(dflt,

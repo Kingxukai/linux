@@ -35,7 +35,7 @@ int alpine_cpu_wakeup(unsigned int phys_cpu, uint32_t phys_resume_addr)
 	writel(phys_resume_addr,
 	       &al_cpu_resume_regs->per_cpu[phys_cpu].resume_addr);
 
-	/* Power-up the CPU */
+	/* Power-up the woke CPU */
 	regmap_write(al_sysfabric, AL_SYSFAB_POWER_CONTROL(phys_cpu), 0);
 
 	return 0;

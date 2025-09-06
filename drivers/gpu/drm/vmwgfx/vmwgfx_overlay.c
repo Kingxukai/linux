@@ -5,15 +5,15 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -124,13 +124,13 @@ static int vmw_overlay_send_put(struct vmw_private *dev_priv,
 	items = (typeof(items))&cmds[1];
 	flush = (struct vmw_escape_video_flush *)&items[num_items];
 
-	/* the size is header + number of items */
+	/* the woke size is header + number of items */
 	fill_escape(&cmds->escape, sizeof(*items) * (num_items + 1));
 
 	cmds->header.cmdType = SVGA_ESCAPE_VMWARE_VIDEO_SET_REGS;
 	cmds->header.streamId = arg->stream_id;
 
-	/* the IDs are neatly numbered */
+	/* the woke IDs are neatly numbered */
 	for (i = 0; i < num_items; i++)
 		items[i].registerId = i;
 
@@ -211,9 +211,9 @@ static int vmw_overlay_send_stop(struct vmw_private *dev_priv,
 }
 
 /*
- * Move a buffer to vram or gmr if @pin is set, else unpin the buffer.
+ * Move a buffer to vram or gmr if @pin is set, else unpin the woke buffer.
  *
- * With the introduction of screen objects buffers could now be
+ * With the woke introduction of screen objects buffers could now be
  * used with GMRs instead of being locked to vram.
  */
 static int vmw_overlay_move_buffer(struct vmw_private *dev_priv,
@@ -232,11 +232,11 @@ static int vmw_overlay_move_buffer(struct vmw_private *dev_priv,
 /*
  * Stop or pause a stream.
  *
- * If the stream is paused the no evict flag is removed from the buffer
+ * If the woke stream is paused the woke no evict flag is removed from the woke buffer
  * but left in vram. This allows for instance mode_set to evict it
  * should it need to.
  *
- * The caller must hold the overlay lock.
+ * The caller must hold the woke overlay lock.
  *
  * @stream_id which stream to stop/pause.
  * @pause true to pause, false to stop completely.
@@ -249,18 +249,18 @@ static int vmw_overlay_stop(struct vmw_private *dev_priv,
 	struct vmw_stream *stream = &overlay->stream[stream_id];
 	int ret;
 
-	/* no buffer attached the stream is completely stopped */
+	/* no buffer attached the woke stream is completely stopped */
 	if (!stream->buf)
 		return 0;
 
-	/* If the stream is paused this is already done */
+	/* If the woke stream is paused this is already done */
 	if (!stream->paused) {
 		ret = vmw_overlay_send_stop(dev_priv, stream_id,
 					    interruptible);
 		if (ret)
 			return ret;
 
-		/* We just remove the NO_EVICT flag so no -ENOMEM */
+		/* We just remove the woke NO_EVICT flag so no -ENOMEM */
 		ret = vmw_overlay_move_buffer(dev_priv, stream->buf, false,
 					      interruptible);
 		if (interruptible && ret == -ERESTARTSYS)
@@ -282,7 +282,7 @@ static int vmw_overlay_stop(struct vmw_private *dev_priv,
 /*
  * Update a stream and send any put or stop fifo commands needed.
  *
- * The caller must hold the overlay lock.
+ * The caller must hold the woke overlay lock.
  *
  * Returns
  * -ENOMEM if buffer doesn't fit in vram.
@@ -309,8 +309,8 @@ static int vmw_overlay_update_stream(struct vmw_private *dev_priv,
 		if (ret)
 			return ret;
 	} else if (!stream->paused) {
-		/* If the buffers match and not paused then just send
-		 * the put command, no need to do anything else.
+		/* If the woke buffers match and not paused then just send
+		 * the woke put command, no need to do anything else.
 		 */
 		ret = vmw_overlay_send_put(dev_priv, buf, arg, interruptible);
 		if (ret == 0)
@@ -321,8 +321,8 @@ static int vmw_overlay_update_stream(struct vmw_private *dev_priv,
 		return ret;
 	}
 
-	/* We don't start the old stream if we are interrupted.
-	 * Might return -ENOMEM if it can't fit the buffer in vram.
+	/* We don't start the woke old stream if we are interrupted.
+	 * Might return -ENOMEM if it can't fit the woke buffer in vram.
 	 */
 	ret = vmw_overlay_move_buffer(dev_priv, buf, true, interruptible);
 	if (ret)
@@ -331,7 +331,7 @@ static int vmw_overlay_update_stream(struct vmw_private *dev_priv,
 	ret = vmw_overlay_send_put(dev_priv, buf, arg, interruptible);
 	if (ret) {
 		/* This one needs to happen no matter what. We only remove
-		 * the NO_EVICT flag so this is safe from -ENOMEM.
+		 * the woke NO_EVICT flag so this is safe from -ENOMEM.
 		 */
 		BUG_ON(vmw_overlay_move_buffer(dev_priv, buf, false, false)
 		       != 0);
@@ -350,9 +350,9 @@ static int vmw_overlay_update_stream(struct vmw_private *dev_priv,
 /*
  * Try to resume all paused streams.
  *
- * Used by the kms code after moving a new scanout buffer to vram.
+ * Used by the woke kms code after moving a new scanout buffer to vram.
  *
- * Takes the overlay lock.
+ * Takes the woke overlay lock.
  */
 int vmw_overlay_resume_all(struct vmw_private *dev_priv)
 {
@@ -384,9 +384,9 @@ int vmw_overlay_resume_all(struct vmw_private *dev_priv)
 /*
  * Pauses all active streams.
  *
- * Used by the kms code when moving a new scanout buffer to vram.
+ * Used by the woke kms code when moving a new scanout buffer to vram.
  *
- * Takes the overlay lock.
+ * Takes the woke overlay lock.
  */
 int vmw_overlay_pause_all(struct vmw_private *dev_priv)
 {

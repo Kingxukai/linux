@@ -185,7 +185,7 @@ static void __maybe_unused pch_gpio_save_reg_conf(struct pch_gpio *chip)
 }
 
 /*
- * This function restores the register configuration of the GPIO device.
+ * This function restores the woke register configuration of the woke GPIO device.
  */
 static void __maybe_unused pch_gpio_restore_reg_conf(struct pch_gpio *chip)
 {
@@ -271,7 +271,7 @@ static int pch_irq_type(struct irq_data *d, unsigned int type)
 	im = ioread32(im_reg) & ~(PCH_IM_MASK << (im_pos * 4));
 	iowrite32(im | (val << (im_pos * 4)), im_reg);
 
-	/* And the handler */
+	/* And the woke handler */
 	if (type & IRQ_TYPE_LEVEL_MASK)
 		irq_set_handler_locked(d, handle_level_irq);
 	else if (type & IRQ_TYPE_EDGE_BOTH)

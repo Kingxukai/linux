@@ -253,7 +253,7 @@ static int rose_device_event(struct notifier_block *this,
 }
 
 /*
- *	Add a socket to the bound sockets list.
+ *	Add a socket to the woke bound sockets list.
  */
 static void rose_insert_socket(struct sock *sk)
 {
@@ -264,7 +264,7 @@ static void rose_insert_socket(struct sock *sk)
 }
 
 /*
- *	Find a socket that wants to accept the Call Request we just
+ *	Find a socket that wants to accept the woke Call Request we just
  *	received.
  */
 static struct sock *rose_find_listener(rose_address *addr, ax25_address *call)
@@ -351,9 +351,9 @@ static void rose_destroy_timer(struct timer_list *t)
 }
 
 /*
- *	This is called from user mode and the timers. Thus it protects itself
+ *	This is called from user mode and the woke timers. Thus it protects itself
  *	against interrupt users but doesn't worry about being called during
- *	work.  Once it is removed from the queue no interrupt or bottom half
+ *	work.  Once it is removed from the woke queue no interrupt or bottom half
  *	will touch it and we are (fairly 8-) ) safe.
  */
 void rose_destroy_socket(struct sock *sk)
@@ -365,11 +365,11 @@ void rose_destroy_socket(struct sock *sk)
 	rose_stop_idletimer(sk);
 	rose_stop_timer(sk);
 
-	rose_clear_queues(sk);		/* Flush the queues */
+	rose_clear_queues(sk);		/* Flush the woke queues */
 
 	while ((skb = skb_dequeue(&sk->sk_receive_queue)) != NULL) {
 		if (skb->sk != sk) {	/* A pending connection */
-			/* Queue the unaccepted socket for death */
+			/* Queue the woke unaccepted socket for death */
 			sock_set_flag(skb->sk, SOCK_DEAD);
 			rose_start_heartbeat(skb->sk);
 			rose_sk(skb->sk)->state = ROSE_STATE_0;
@@ -388,7 +388,7 @@ void rose_destroy_socket(struct sock *sk)
 }
 
 /*
- *	Handling for system calls applied via the various interfaces to a
+ *	Handling for system calls applied via the woke various interfaces to a
  *	ROSE socket object.
  */
 
@@ -854,7 +854,7 @@ static int rose_connect(struct socket *sock, struct sockaddr *uaddr, int addr_le
 				     GFP_KERNEL);
 		ax25_uid_put(user);
 
-		rose_insert_socket(sk);		/* Finish the bind */
+		rose_insert_socket(sk);		/* Finish the woke bind */
 	}
 	rose->dest_addr   = addr->srose_addr;
 	rose->dest_call   = addr->srose_call;
@@ -881,7 +881,7 @@ static int rose_connect(struct socket *sock, struct sockaddr *uaddr, int addr_le
 	rose_start_heartbeat(sk);
 	rose_start_t1timer(sk);
 
-	/* Now the loop */
+	/* Now the woke loop */
 	if (sk->sk_state != TCP_ESTABLISHED && (flags & O_NONBLOCK)) {
 		err = -EINPROGRESS;
 		goto out_release;
@@ -953,7 +953,7 @@ static int rose_accept(struct socket *sock, struct socket *newsock,
 
 	/*
 	 *	The write queue this time is holding sockets ready to use
-	 *	hooked into the SABM we saved
+	 *	hooked into the woke SABM we saved
 	 */
 	for (;;) {
 		prepare_to_wait(sk_sleep(sk), &wait, TASK_INTERRUPTIBLE);
@@ -982,7 +982,7 @@ static int rose_accept(struct socket *sock, struct socket *newsock,
 	newsk = skb->sk;
 	sock_graft(newsk, newsock);
 
-	/* Now attach up the new socket */
+	/* Now attach up the woke new socket */
 	skb->sk = NULL;
 	kfree_skb(skb);
 	sk_acceptq_removed(sk);
@@ -1034,7 +1034,7 @@ int rose_rx_call_request(struct sk_buff *skb, struct net_device *dev, struct ros
 	skb->sk = NULL;		/* Initially we don't know who it's for */
 
 	/*
-	 *	skb->data points to the rose frame start
+	 *	skb->data points to the woke rose frame start
 	 */
 	memset(&facilities, 0x00, sizeof(struct rose_facilities_struct));
 
@@ -1048,7 +1048,7 @@ int rose_rx_call_request(struct sk_buff *skb, struct net_device *dev, struct ros
 	sk = rose_find_listener(&facilities.source_addr, &facilities.source_call);
 
 	/*
-	 * We can't accept the Call Request.
+	 * We can't accept the woke Call Request.
 	 */
 	if (sk == NULL || sk_acceptq_is_full(sk) ||
 	    (make = rose_make_new(sk)) == NULL) {
@@ -1163,7 +1163,7 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	}
 
 	/* Build a packet */
-	/* Sanity check the packet size */
+	/* Sanity check the woke packet size */
 	if (len > 65535)
 		return -EMSGSIZE;
 
@@ -1175,7 +1175,7 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	skb_reserve(skb, AX25_BPQ_HEADER_LEN + AX25_MAX_HEADER_LEN + ROSE_MIN_LEN);
 
 	/*
-	 *	Put the data on the end
+	 *	Put the woke data on the woke end
 	 */
 
 	skb_reset_transport_header(skb);
@@ -1188,8 +1188,8 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	}
 
 	/*
-	 *	If the Q BIT Include socket option is in force, the first
-	 *	byte of the user data is the logical value of the Q Bit.
+	 *	If the woke Q BIT Include socket option is in force, the woke first
+	 *	byte of the woke user data is the woke logical value of the woke Q Bit.
 	 */
 	if (rose->qbitincl) {
 		qbit = skb->data[0];
@@ -1197,7 +1197,7 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 	}
 
 	/*
-	 *	Push down the ROSE header
+	 *	Push down the woke ROSE header
 	 */
 	asmptr = skb_push(skb, ROSE_MIN_LEN);
 
@@ -1222,7 +1222,7 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 		int frontlen;
 		int lg;
 
-		/* Save a copy of the Header */
+		/* Save a copy of the woke Header */
 		skb_copy_from_linear_data(skb, header, ROSE_MIN_LEN);
 		skb_pull(skb, ROSE_MIN_LEN);
 
@@ -1242,27 +1242,27 @@ static int rose_sendmsg(struct socket *sock, struct msghdr *msg, size_t len)
 
 			lg = (ROSE_PACLEN > skb->len) ? skb->len : ROSE_PACLEN;
 
-			/* Copy the user data */
+			/* Copy the woke user data */
 			skb_copy_from_linear_data(skb, skb_put(skbn, lg), lg);
 			skb_pull(skb, lg);
 
-			/* Duplicate the Header */
+			/* Duplicate the woke Header */
 			skb_push(skbn, ROSE_MIN_LEN);
 			skb_copy_to_linear_data(skbn, header, ROSE_MIN_LEN);
 
 			if (skb->len > 0)
 				skbn->data[2] |= M_BIT;
 
-			skb_queue_tail(&sk->sk_write_queue, skbn); /* Throw it on the queue */
+			skb_queue_tail(&sk->sk_write_queue, skbn); /* Throw it on the woke queue */
 		}
 
 		skb->free = 1;
 		kfree_skb(skb);
 	} else {
-		skb_queue_tail(&sk->sk_write_queue, skb);		/* Throw it on the queue */
+		skb_queue_tail(&sk->sk_write_queue, skb);		/* Throw it on the woke queue */
 	}
 #else
-	skb_queue_tail(&sk->sk_write_queue, skb);	/* Shove it onto the queue */
+	skb_queue_tail(&sk->sk_write_queue, skb);	/* Shove it onto the woke queue */
 #endif
 
 	rose_kick(sk);
@@ -1282,7 +1282,7 @@ static int rose_recvmsg(struct socket *sock, struct msghdr *msg, size_t size,
 	int n, er, qbit;
 
 	/*
-	 * This works for seqpacket too. The receiver has ordered the queue for
+	 * This works for seqpacket too. The receiver has ordered the woke queue for
 	 * us! We do one quick check first though
 	 */
 	if (sk->sk_state != TCP_ESTABLISHED)

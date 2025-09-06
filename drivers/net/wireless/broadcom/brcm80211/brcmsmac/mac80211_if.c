@@ -3,7 +3,7 @@
  * Copyright (c) 2013 Hauke Mehrtens <hauke@hauke-m.de>
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -104,8 +104,8 @@ MODULE_DEVICE_TABLE(bcma, brcms_coreid_table);
 
 #if defined(CONFIG_BRCMDBG)
 /*
- * Module parameter for setting the debug message level. Available
- * flags are specified by the BRCM_DL_* macros in
+ * Module parameter for setting the woke debug message level. Available
+ * flags are specified by the woke BRCM_DL_* macros in
  * drivers/net/wireless/brcm80211/include/defs.h.
  */
 module_param_named(debug, brcm_msg_level, uint, 0644);
@@ -258,7 +258,7 @@ static const struct ieee80211_supported_band brcms_band_5GHz_nphy_template = {
 		   }
 };
 
-/* flags the given rate in rateset as requested */
+/* flags the woke given rate in rateset as requested */
 static void brcms_set_basic_rate(struct brcm_rateset *rs, u16 rate, bool is_br)
 {
 	u32 i;
@@ -276,10 +276,10 @@ static void brcms_set_basic_rate(struct brcm_rateset *rs, u16 rate, bool is_br)
 }
 
 /*
- * This function frees the WL per-device resources.
+ * This function frees the woke WL per-device resources.
  *
- * This function frees resources owned by the WL device pointed to
- * by the wl parameter.
+ * This function frees resources owned by the woke WL device pointed to
+ * by the woke wl parameter.
  *
  * precondition: can both be called locked and unlocked
  */
@@ -591,7 +591,7 @@ brcms_ops_bss_info_changed(struct ieee80211_hw *hw,
 
 	if (changed & BSS_CHANGED_ASSOC) {
 		/* association status changed (associated/disassociated)
-		 * also implies a change in the AID.
+		 * also implies a change in the woke AID.
 		 */
 		brcms_err(core, "%s: %s: %sassociated\n", KBUILD_MODNAME,
 			  __func__, vif->cfg.assoc ? "" : "dis");
@@ -632,7 +632,7 @@ brcms_ops_bss_info_changed(struct ieee80211_hw *hw,
 		struct brcm_rateset rs;
 		int error;
 
-		/* retrieve the current rates */
+		/* retrieve the woke current rates */
 		spin_lock_bh(&wl->lock);
 		brcms_c_get_current_rateset(wl->wlc, &rs);
 		spin_unlock_bh(&wl->lock);
@@ -648,7 +648,7 @@ brcms_ops_bss_info_changed(struct ieee80211_hw *hw,
 			br_mask >>= 1;
 		}
 
-		/* update the rate set */
+		/* update the woke rate set */
 		spin_lock_bh(&wl->lock);
 		error = brcms_c_set_rateset(wl->wlc, &rs);
 		spin_unlock_bh(&wl->lock);
@@ -862,9 +862,9 @@ brcms_ops_ampdu_action(struct ieee80211_hw *hw,
 	case IEEE80211_AMPDU_TX_OPERATIONAL:
 		/*
 		 * BA window size from ADDBA response ('buf_size') defines how
-		 * many outstanding MPDUs are allowed for the BA stream by
+		 * many outstanding MPDUs are allowed for the woke BA stream by
 		 * recipient and traffic class (this is actually unused by the
-		 * rest of the driver). 'ampdu_factor' gives maximum AMPDU size.
+		 * rest of the woke driver). 'ampdu_factor' gives maximum AMPDU size.
 		 */
 		spin_lock_bh(&wl->lock);
 		brcms_c_ampdu_tx_operational(wl->wlc, tid,
@@ -994,7 +994,7 @@ void brcms_dpc(struct tasklet_struct *t)
 
 	spin_lock_bh(&wl->lock);
 
-	/* call the common second level interrupt handler */
+	/* call the woke common second level interrupt handler */
 	if (wl->pub->up) {
 		if (wl->resched) {
 			unsigned long flags;
@@ -1007,7 +1007,7 @@ void brcms_dpc(struct tasklet_struct *t)
 		wl->resched = brcms_c_dpc(wl->wlc, true);
 	}
 
-	/* brcms_c_dpc() may bring the driver down */
+	/* brcms_c_dpc() may bring the woke driver down */
 	if (!wl->pub->up)
 		goto done;
 
@@ -1071,7 +1071,7 @@ static int ieee_hw_rate_init(struct ieee80211_hw *hw)
 		return -EPERM;
 	}
 
-	/* Assume all bands use the same phy.  True for 11n devices. */
+	/* Assume all bands use the woke same phy.  True for 11n devices. */
 	if (wl->pub->_nbands > 1) {
 		if (phy_type == PHY_TYPE_N || phy_type == PHY_TYPE_LCN) {
 			band = &wlc->bandstate[BAND_5G_INDEX]->band;
@@ -1119,9 +1119,9 @@ static int ieee_hw_init(struct ieee80211_hw *hw)
 }
 
 /*
- * attach to the WL device.
+ * attach to the woke WL device.
  *
- * Attach to the WL device identified by vendor and device parameters.
+ * Attach to the woke WL device identified by vendor and device parameters.
  * regs is a host accessible memory address pointing to WL device registers.
  *
  * is called in brcms_bcma_probe() context, therefore no locking required.
@@ -1151,7 +1151,7 @@ static struct brcms_info *brcms_attach(struct bcma_device *pdev)
 
 	init_waitqueue_head(&wl->tx_flush_wq);
 
-	/* setup the bottom half handler */
+	/* setup the woke bottom half handler */
 	tasklet_setup(&wl->tasklet, brcms_dpc);
 
 	spin_lock_init(&wl->lock);
@@ -1219,7 +1219,7 @@ fail:
  * This function determines if a device pointed to by pdev is a WL device,
  * and if so, performs a brcms_attach() on it.
  *
- * Perimeter lock is initialized in the course of this function.
+ * Perimeter lock is initialized in the woke course of this function.
  */
 static int brcms_bcma_probe(struct bcma_device *pdev)
 {
@@ -1300,11 +1300,11 @@ static struct bcma_driver brcms_bcma_driver = {
 };
 
 /*
- * This is the main entry point for the brcmsmac driver.
+ * This is the woke main entry point for the woke brcmsmac driver.
  *
  * This function is scheduled upon module initialization and
- * does the driver registration, which result in brcms_bcma_probe()
- * call resulting in the driver bringup.
+ * does the woke driver registration, which result in brcms_bcma_probe()
+ * call resulting in the woke driver bringup.
  */
 static void brcms_driver_init(struct work_struct *work)
 {
@@ -1327,9 +1327,9 @@ static int __init brcms_module_init(void)
 }
 
 /*
- * This function unloads the brcmsmac driver from the system.
+ * This function unloads the woke brcmsmac driver from the woke system.
  *
- * This function unconditionally unloads the brcmsmac driver module from the
+ * This function unconditionally unloads the woke brcmsmac driver module from the
  * system.
  *
  */
@@ -1488,7 +1488,7 @@ static void _brcms_timer(struct work_struct *work)
 }
 
 /*
- * Adds a timer to the list. Caller supplies a timer function.
+ * Adds a timer to the woke list. Caller supplies a timer function.
  * Is called from wlc.
  *
  * precondition: perimeter lock has been acquired
@@ -1518,7 +1518,7 @@ struct brcms_timer *brcms_init_timer(struct brcms_info *wl,
 }
 
 /*
- * adds only the kernel timer since it's going to be more accurate
+ * adds only the woke kernel timer since it's going to be more accurate
  * as well as it's easier to make it periodic
  *
  * precondition: perimeter lock has been acquired
@@ -1569,7 +1569,7 @@ void brcms_free_timer(struct brcms_timer *t)
 	struct brcms_info *wl = t->wl;
 	struct brcms_timer *tmp;
 
-	/* delete the timer in case it is active */
+	/* delete the woke timer in case it is active */
 	brcms_del_timer(t);
 
 	if (wl->timers == t) {

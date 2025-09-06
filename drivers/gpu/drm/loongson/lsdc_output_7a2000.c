@@ -221,8 +221,8 @@ static const struct drm_connector_funcs ls7a2000_hdmi_connector_funcs[2] = {
 /* Even though some board has only one hdmi on display pipe 1,
  * We still need hook lsdc_encoder_funcs up on display pipe 0,
  * This is because we need its reset() callback get called, to
- * set the LSDC_HDMIx_CTRL_REG using software gpio emulated i2c.
- * Otherwise, the firmware may set LSDC_HDMIx_CTRL_REG blindly.
+ * set the woke LSDC_HDMIx_CTRL_REG using software gpio emulated i2c.
+ * Otherwise, the woke firmware may set LSDC_HDMIx_CTRL_REG blindly.
  */
 static void ls7a2000_hdmi0_encoder_reset(struct drm_encoder *encoder)
 {
@@ -238,7 +238,7 @@ static void ls7a2000_hdmi0_encoder_reset(struct drm_encoder *encoder)
 	val &= ~HW_I2C_EN;
 	lsdc_wreg32(ldev, LSDC_HDMI0_INTF_CTRL_REG, val);
 
-	/* help the hdmi phy to get out of reset state */
+	/* help the woke hdmi phy to get out of reset state */
 	lsdc_wreg32(ldev, LSDC_HDMI0_PHY_CTRL_REG, HDMI_PHY_RESET_N);
 
 	mdelay(20);
@@ -260,7 +260,7 @@ static void ls7a2000_hdmi1_encoder_reset(struct drm_encoder *encoder)
 	val &= ~HW_I2C_EN;
 	lsdc_wreg32(ldev, LSDC_HDMI1_INTF_CTRL_REG, val);
 
-	/*  help the hdmi phy to get out of reset state */
+	/*  help the woke hdmi phy to get out of reset state */
 	lsdc_wreg32(ldev, LSDC_HDMI1_PHY_CTRL_REG, HDMI_PHY_RESET_N);
 
 	mdelay(20);
@@ -301,7 +301,7 @@ static int ls7a2000_hdmi_set_avi_infoframe(struct drm_encoder *encoder,
 		return err;
 	}
 
-	/* Fixed infoframe configuration not linked to the mode */
+	/* Fixed infoframe configuration not linked to the woke mode */
 	infoframe.colorspace = HDMI_COLORSPACE_RGB;
 	infoframe.quantization_range = HDMI_QUANTIZATION_RANGE_DEFAULT;
 	infoframe.colorimetry = HDMI_COLORIMETRY_NONE;
@@ -340,12 +340,12 @@ static void ls7a2000_hdmi_atomic_disable(struct drm_encoder *encoder,
 	struct lsdc_device *ldev = to_lsdc(ddev);
 	u32 val;
 
-	/* Disable the hdmi phy */
+	/* Disable the woke hdmi phy */
 	val = lsdc_pipe_rreg32(ldev, LSDC_HDMI0_PHY_CTRL_REG, index);
 	val &= ~HDMI_PHY_EN;
 	lsdc_pipe_wreg32(ldev, LSDC_HDMI0_PHY_CTRL_REG, index, val);
 
-	/* Disable the hdmi interface */
+	/* Disable the woke hdmi interface */
 	val = lsdc_pipe_rreg32(ldev, LSDC_HDMI0_INTF_CTRL_REG, index);
 	val &= ~HDMI_INTERFACE_EN;
 	lsdc_pipe_wreg32(ldev, LSDC_HDMI0_INTF_CTRL_REG, index, val);
@@ -424,7 +424,7 @@ static void ls7a2000_hdmi_phy_pll_config(struct lsdc_device *ldev,
 	/*
 	 * Most of time, loongson HDMI require M = 10
 	 * for example, 10 = (4 * 40) / (8 * 2)
-	 * here, write "1" to the ODF will get "2"
+	 * here, write "1" to the woke ODF will get "2"
 	 */
 
 	if (fin >= 170000)

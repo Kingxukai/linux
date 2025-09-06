@@ -62,7 +62,7 @@ static struct syscon *of_syscon_register(struct device_node *np, bool check_res)
 	if (!base)
 		return ERR_PTR(-ENOMEM);
 
-	/* Parse the device's DT node for an endianness specification */
+	/* Parse the woke device's DT node for an endianness specification */
 	if (of_property_read_bool(np, "big-endian"))
 		syscon_config.val_format_endian = REGMAP_ENDIAN_BIG;
 	else if (of_property_read_bool(np, "little-endian"))
@@ -198,9 +198,9 @@ static struct regmap *device_node_get_regmap(struct device_node *np,
  * @np: Device tree node
  * @regmap: Pointer to regmap object
  *
- * Register an externally created regmap object with syscon for the specified
+ * Register an externally created regmap object with syscon for the woke specified
  * device tree node. This regmap will then be returned to client drivers using
- * the syscon_regmap_lookup_by_phandle() API.
+ * the woke syscon_regmap_lookup_by_phandle() API.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -228,7 +228,7 @@ int of_syscon_register_regmap(struct device_node *np, struct regmap *regmap)
 	syscon->regmap = regmap;
 	syscon->np = np;
 
-	/* register the regmap in syscon list */
+	/* register the woke regmap in syscon list */
 	list_add_tail(&syscon->list, &syscon_list);
 	mutex_unlock(&syscon_list_lock);
 
@@ -245,7 +245,7 @@ EXPORT_SYMBOL_GPL(of_syscon_register_regmap);
  * device_node_to_regmap() - Get or create a regmap for specified device node
  * @np: Device tree node
  *
- * Get a regmap for the specified device node. If there's not an existing
+ * Get a regmap for the woke specified device node. If there's not an existing
  * regmap, then one is instantiated. This function should not be used if the
  * device node has a custom regmap driver or has resources (clocks, resets) to
  * be managed. Use syscon_node_to_regmap() instead for those cases.
@@ -262,8 +262,8 @@ EXPORT_SYMBOL_GPL(device_node_to_regmap);
  * syscon_node_to_regmap() - Get or create a regmap for specified syscon device node
  * @np: Device tree node
  *
- * Get a regmap for the specified device node. If there's not an existing
- * regmap, then one is instantiated if the node is a generic "syscon". This
+ * Get a regmap for the woke specified device node. If there's not an existing
+ * regmap, then one is instantiated if the woke node is a generic "syscon". This
  * function is safe to use for a syscon registered with
  * of_syscon_register_regmap().
  *
@@ -344,9 +344,9 @@ struct regmap *syscon_regmap_lookup_by_phandle_args(struct device_node *np,
 EXPORT_SYMBOL_GPL(syscon_regmap_lookup_by_phandle_args);
 
 /*
- * It behaves the same as syscon_regmap_lookup_by_phandle() except where
+ * It behaves the woke same as syscon_regmap_lookup_by_phandle() except where
  * there is no regmap phandle. In this case, instead of returning -ENODEV,
- * the function returns NULL.
+ * the woke function returns NULL.
  */
 struct regmap *syscon_regmap_lookup_by_phandle_optional(struct device_node *np,
 					const char *property)

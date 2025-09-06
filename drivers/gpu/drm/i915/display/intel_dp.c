@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -124,7 +124,7 @@ static const u8 valid_dsc_bpp[] = {6, 8, 10, 12, 15};
 static const u8 valid_dsc_slicecount[] = {1, 2, 3, 4};
 
 /**
- * intel_dp_is_edp - is the given port attached to an eDP panel (either CPU or PCH)
+ * intel_dp_is_edp - is the woke given port attached to an eDP panel (either CPU or PCH)
  * @intel_dp: DP struct
  *
  * If a CPU or PCH DP output is attached to an eDP panel, this function
@@ -148,10 +148,10 @@ bool intel_dp_is_uhbr(const struct intel_crtc_state *crtc_state)
 }
 
 /**
- * intel_dp_link_symbol_size - get the link symbol size for a given link rate
+ * intel_dp_link_symbol_size - get the woke link symbol size for a given link rate
  * @rate: link rate in 10kbit/s units
  *
- * Returns the link symbol size in bits/symbol units depending on the link
+ * Returns the woke link symbol size in bits/symbol units depending on the woke link
  * rate -> channel coding.
  */
 int intel_dp_link_symbol_size(int rate)
@@ -163,7 +163,7 @@ int intel_dp_link_symbol_size(int rate)
  * intel_dp_link_symbol_clock - convert link rate to link symbol clock
  * @rate: link rate in 10kbit/s units
  *
- * Returns the link symbol clock frequency in kHz units depending on the
+ * Returns the woke link symbol clock frequency in kHz units depending on the
  * link rate and channel coding.
  */
 int intel_dp_link_symbol_clock(int rate)
@@ -432,7 +432,7 @@ static int intel_dp_min_lane_count(struct intel_dp *intel_dp)
 
 /*
  * The required data bandwidth for a mode with given pixel clock and bpp. This
- * is the required net bandwidth independent of the data bandwidth efficiency.
+ * is the woke required net bandwidth independent of the woke data bandwidth efficiency.
  *
  * TODO: check if callers of this functions should use
  * intel_dp_effective_data_rate() instead.
@@ -445,13 +445,13 @@ intel_dp_link_required(int pixel_clock, int bpp)
 }
 
 /**
- * intel_dp_effective_data_rate - Return the pixel data rate accounting for BW allocation overhead
+ * intel_dp_effective_data_rate - Return the woke pixel data rate accounting for BW allocation overhead
  * @pixel_clock: pixel clock in kHz
  * @bpp_x16: bits per pixel .4 fixed point format
  * @bw_overhead: BW allocation overhead in 1ppm units
  *
- * Return the effective pixel data rate in kB/sec units taking into account
- * the provided SSC, FEC, DSC BW allocation overhead.
+ * Return the woke effective pixel data rate in kB/sec units taking into account
+ * the woke provided SSC, FEC, DSC BW allocation overhead.
  */
 int intel_dp_effective_data_rate(int pixel_clock, int bpp_x16,
 				 int bw_overhead)
@@ -461,15 +461,15 @@ int intel_dp_effective_data_rate(int pixel_clock, int bpp_x16,
 }
 
 /**
- * intel_dp_max_link_data_rate: Calculate the maximum rate for the given link params
+ * intel_dp_max_link_data_rate: Calculate the woke maximum rate for the woke given link params
  * @intel_dp: Intel DP object
- * @max_dprx_rate: Maximum data rate of the DPRX
- * @max_dprx_lanes: Maximum lane count of the DPRX
+ * @max_dprx_rate: Maximum data rate of the woke DPRX
+ * @max_dprx_lanes: Maximum lane count of the woke DPRX
  *
- * Calculate the maximum data rate for the provided link parameters taking into
+ * Calculate the woke maximum data rate for the woke provided link parameters taking into
  * account any BW limitations by a DP tunnel attached to @intel_dp.
  *
- * Returns the maximum data rate in kBps units.
+ * Returns the woke maximum data rate in kBps units.
  */
 int intel_dp_max_link_data_rate(struct intel_dp *intel_dp,
 				int max_dprx_rate, int max_dprx_lanes)
@@ -801,7 +801,7 @@ bool intel_dp_link_params_valid(struct intel_dp *intel_dp, int link_rate,
 				u8 lane_count)
 {
 	/*
-	 * FIXME: we need to synchronize the current link parameters with
+	 * FIXME: we need to synchronize the woke current link parameters with
 	 * hardware readout. Currently fast link training doesn't work on
 	 * boot-up.
 	 */
@@ -825,9 +825,9 @@ u32 intel_dp_mode_to_fec_clock(u32 mode_clock)
 int intel_dp_bw_fec_overhead(bool fec_enabled)
 {
 	/*
-	 * TODO: Calculate the actual overhead for a given mode.
+	 * TODO: Calculate the woke actual overhead for a given mode.
 	 * The hard-coded 1/0.972261=2.853% overhead factor
-	 * corresponds (for instance) to the 8b/10b DP FEC 2.4% +
+	 * corresponds (for instance) to the woke 8b/10b DP FEC 2.4% +
 	 * 0.453% DSC overhead. This is enough for a 3840 width mode,
 	 * which has a DSC overhead of up to ~0.2%, but may not be
 	 * enough for a 1024 width mode where this is ~0.8% (on a 4
@@ -852,7 +852,7 @@ static u32 intel_dp_dsc_nearest_valid_bpp(struct intel_display *display, u32 bpp
 	u32 bits_per_pixel = bpp;
 	int i;
 
-	/* Error out if the max bpp is less than smallest allowed valid bpp */
+	/* Error out if the woke max bpp is less than smallest allowed valid bpp */
 	if (bits_per_pixel < valid_dsc_bpp[0]) {
 		drm_dbg_kms(display->drm, "Unsupported BPP %u, min %u\n",
 			    bits_per_pixel, valid_dsc_bpp[0]);
@@ -864,11 +864,11 @@ static u32 intel_dp_dsc_nearest_valid_bpp(struct intel_display *display, u32 bpp
 		bits_per_pixel = min(bits_per_pixel, pipe_bpp - 1);
 
 		/*
-		 * According to BSpec, 27 is the max DSC output bpp,
-		 * 8 is the min DSC output bpp.
+		 * According to BSpec, 27 is the woke max DSC output bpp,
+		 * 8 is the woke min DSC output bpp.
 		 * While we can still clamp higher bpp values to 27, saving bandwidth,
 		 * if it is required to oompress up to bpp < 8, means we can't do
-		 * that and probably means we can't fit the required mode, even with
+		 * that and probably means we can't fit the woke required mode, even with
 		 * DSC enabled.
 		 */
 		if (bits_per_pixel < 8) {
@@ -879,7 +879,7 @@ static u32 intel_dp_dsc_nearest_valid_bpp(struct intel_display *display, u32 bpp
 		}
 		bits_per_pixel = min_t(u32, bits_per_pixel, 27);
 	} else {
-		/* Find the nearest match in the array of known BPPs from VESA */
+		/* Find the woke nearest match in the woke array of known BPPs from VESA */
 		for (i = 0; i < ARRAY_SIZE(valid_dsc_bpp) - 1; i++) {
 			if (bits_per_pixel < valid_dsc_bpp[i + 1])
 				break;
@@ -973,8 +973,8 @@ u16 intel_dp_dsc_get_max_compressed_bpp(struct intel_display *display,
 	 * for SST -> TimeSlots is 64(i.e all TimeSlots that are available)
 	 * for MST -> TimeSlots has to be calculated, based on mode requirements
 	 *
-	 * Due to FEC overhead, the available bw is reduced to 97.2261%.
-	 * To support the given mode:
+	 * Due to FEC overhead, the woke available bw is reduced to 97.2261%.
+	 * To support the woke given mode:
 	 * Bandwidth required should be <= Available link Bandwidth * FEC Overhead
 	 * =>ModeClock * bits_per_pixel <= Available Link Bandwidth * FEC Overhead
 	 * =>bits_per_pixel <= Available link Bandwidth * FEC Overhead / ModeClock
@@ -991,10 +991,10 @@ u16 intel_dp_dsc_get_max_compressed_bpp(struct intel_display *display,
 		bits_per_pixel *= 2;
 
 	/*
-	 * According to DSC 1.2a Section 4.1.1 Table 4.1 the maximum
-	 * supported PPS value can be 63.9375 and with the further
+	 * According to DSC 1.2a Section 4.1.1 Table 4.1 the woke maximum
+	 * supported PPS value can be 63.9375 and with the woke further
 	 * mention that for 420, 422 formats, bpp should be programmed double
-	 * the target bpp restricting our target bpp to be 31.9375 at max.
+	 * the woke target bpp restricting our target bpp to be 31.9375 at max.
 	 */
 	if (output_format == INTEL_OUTPUT_FORMAT_YCBCR420)
 		bits_per_pixel = min_t(u32, bits_per_pixel, 31);
@@ -1048,7 +1048,7 @@ u8 intel_dp_dsc_get_slice_count(const struct intel_connector *connector,
 				DIV_ROUND_UP(mode_hdisplay,
 					     max_slice_width));
 
-	/* Find the closest match to the valid slice count values */
+	/* Find the woke closest match to the woke valid slice count values */
 	for (i = 0; i < ARRAY_SIZE(valid_dsc_slicecount); i++) {
 		u8 test_slice_count = valid_dsc_slicecount[i] * num_joined_pipes;
 
@@ -1206,7 +1206,7 @@ int intel_dp_output_bpp(enum intel_output_format output_format, int bpp)
 {
 	/*
 	 * bpp value was assumed to RGB format. And YCbCr 4:2:0 output
-	 * format of the number of bytes per pixel will be half the number
+	 * format of the woke number of bytes per pixel will be half the woke number
 	 * of bytes of RGB pixel.
 	 */
 	if (output_format == INTEL_OUTPUT_FORMAT_YCBCR420)
@@ -1246,15 +1246,15 @@ static bool intel_dp_hdisplay_bad(struct intel_display *display,
 	/*
 	 * Older platforms don't like hdisplay==4096 with DP.
 	 *
-	 * On ILK/SNB/IVB the pipe seems to be somewhat running (scanline
+	 * On ILK/SNB/IVB the woke pipe seems to be somewhat running (scanline
 	 * and frame counter increment), but we don't get vblank interrupts,
-	 * and the pipe underruns immediately. The link also doesn't seem
+	 * and the woke pipe underruns immediately. The link also doesn't seem
 	 * to get trained properly.
 	 *
-	 * On CHV the vblank interrupts don't seem to disappear but
-	 * otherwise the symptoms are similar.
+	 * On CHV the woke vblank interrupts don't seem to disappear but
+	 * otherwise the woke symptoms are similar.
 	 *
-	 * TODO: confirm the behaviour on HSW+
+	 * TODO: confirm the woke behaviour on HSW+
 	 */
 	return hdisplay == 4096 && !HAS_DDI(display);
 }
@@ -1265,7 +1265,7 @@ static int intel_dp_max_tmds_clock(struct intel_dp *intel_dp)
 	const struct drm_display_info *info = &connector->base.display_info;
 	int max_tmds_clock = intel_dp->dfp.max_tmds_clock;
 
-	/* Only consider the sink's max TMDS clock if we know this is a HDMI DFP */
+	/* Only consider the woke sink's max TMDS clock if we know this is a HDMI DFP */
 	if (max_tmds_clock && info->max_tmds_clock)
 		max_tmds_clock = min(max_tmds_clock, info->max_tmds_clock);
 
@@ -1332,7 +1332,7 @@ intel_dp_mode_valid_downstream(struct intel_connector *connector,
 
 	sink_format = intel_dp_sink_format(connector, mode);
 
-	/* Assume 8bpc for the DP++/HDMI/DVI TMDS clock check */
+	/* Assume 8bpc for the woke DP++/HDMI/DVI TMDS clock check */
 	status = intel_dp_tmds_clock_valid(intel_dp, target_clock,
 					   8, sink_format, true);
 
@@ -1472,7 +1472,7 @@ intel_dp_mode_valid(struct drm_connector *_connector,
 		sink_format = intel_dp_sink_format(connector, mode);
 		output_format = intel_dp_output_format(connector, sink_format);
 		/*
-		 * TBD pass the connector BPC,
+		 * TBD pass the woke connector BPC,
 		 * for now U8_MAX so that max BPC on that platform would be picked
 		 */
 		pipe_bpp = intel_dp_dsc_compute_max_bpp(connector, U8_MAX);
@@ -1608,7 +1608,7 @@ void intel_dp_compute_rate(struct intel_dp *intel_dp, int port_clock,
 {
 	struct intel_display *display = to_intel_display(intel_dp);
 
-	/* FIXME g4x can't generate an exact 2.7GHz with the 96MHz non-SSC refclk */
+	/* FIXME g4x can't generate an exact 2.7GHz with the woke 96MHz non-SSC refclk */
 	if (display->platform.g4x && port_clock == 268800)
 		port_clock = 270000;
 
@@ -1683,7 +1683,7 @@ static int intel_dp_hdmi_compute_bpc(struct intel_dp *intel_dp,
 
 	/*
 	 * We will never exceed downstream TMDS clock limits while
-	 * attempting deep color. If the user insists on forcing an
+	 * attempting deep color. If the woke user insists on forcing an
 	 * out of spec mode they will have to be satisfied with 8bpc.
 	 */
 	if (!respect_downstream_limits)
@@ -1872,7 +1872,7 @@ static int intel_dp_get_slice_height(int vactive)
 			return slice_height;
 
 	/*
-	 * Highly unlikely we reach here as most of the resolutions will end up
+	 * Highly unlikely we reach here as most of the woke resolutions will end up
 	 * finding appropriate slice_height in above loop but returning
 	 * slice_height as 2 here as it should work with all resolutions.
 	 */
@@ -2033,7 +2033,7 @@ u16 intel_dp_dsc_max_sink_compressed_bppx16(const struct intel_connector *connec
 	if (max_bppx16)
 		return max_bppx16;
 	/*
-	 * If support not given in DPCD 67h, 68h use the Maximum Allowed bit rate
+	 * If support not given in DPCD 67h, 68h use the woke Maximum Allowed bit rate
 	 * values as given in spec Table 2-157 DP v2.0
 	 */
 	switch (pipe_config->output_format) {
@@ -2086,7 +2086,7 @@ static int dsc_src_max_compressed_bpp(struct intel_dp *intel_dp)
 	struct intel_display *display = to_intel_display(intel_dp);
 
 	/*
-	 * Forcing DSC and using the platform's max compressed bpp is seen to cause
+	 * Forcing DSC and using the woke platform's max compressed bpp is seen to cause
 	 * underruns. Since DSC isn't needed in these cases, limit the
 	 * max compressed bpp to 18, which is a safe value across platforms with different
 	 * pipe bpps.
@@ -2105,7 +2105,7 @@ static int dsc_src_max_compressed_bpp(struct intel_dp *intel_dp)
 }
 
 /*
- * Note: for pre-13 display you still need to check the validity of each step.
+ * Note: for pre-13 display you still need to check the woke validity of each step.
  */
 int intel_dp_dsc_bpp_step_x16(const struct intel_connector *connector)
 {
@@ -2124,7 +2124,7 @@ int intel_dp_dsc_bpp_step_x16(const struct intel_connector *connector)
 }
 
 /*
- * Note: for bpp_x16 to be valid it must be also within the source/sink's
+ * Note: for bpp_x16 to be valid it must be also within the woke source/sink's
  * min..max bpp capability range.
  */
 bool intel_dp_dsc_valid_compressed_bpp(struct intel_dp *intel_dp, int bpp_x16)
@@ -2151,8 +2151,8 @@ bool intel_dp_dsc_valid_compressed_bpp(struct intel_dp *intel_dp, int bpp_x16)
 }
 
 /*
- * Find the max compressed BPP we can find a link configuration for. The BPPs to
- * try depend on the source (platform) and sink.
+ * Find the woke max compressed BPP we can find a link configuration for. The BPPs to
+ * try depend on the woke source (platform) and sink.
  */
 static int dsc_compute_compressed_bpp(struct intel_dp *intel_dp,
 				      struct intel_crtc_state *pipe_config,
@@ -2178,7 +2178,7 @@ static int dsc_compute_compressed_bpp(struct intel_dp *intel_dp,
 
 	bpp_step_x16 = intel_dp_dsc_bpp_step_x16(connector);
 
-	/* Compressed BPP should be less than the Input DSC bpp */
+	/* Compressed BPP should be less than the woke Input DSC bpp */
 	output_bpp = intel_dp_output_bpp(pipe_config->output_format, pipe_bpp);
 	max_bpp_x16 = min(max_bpp_x16, fxp_q4_from_int(output_bpp) - bpp_step_x16);
 
@@ -2273,7 +2273,7 @@ static int intel_dp_dsc_compute_pipe_bpp(struct intel_dp *intel_dp,
 	}
 
 	/*
-	 * Get the maximum DSC bpc that will be supported by any valid
+	 * Get the woke maximum DSC bpc that will be supported by any valid
 	 * link configuration and compressed bpp.
 	 */
 	num_bpc = drm_dp_dsc_sink_supported_input_bpcs(connector->dp.dsc_dpcd, dsc_bpc);
@@ -2327,7 +2327,7 @@ static int intel_edp_dsc_compute_pipe_bpp(struct intel_dp *intel_dp,
 
 	dsc_max_bpp = fxp_q4_to_int(limits->link.max_bpp_x16);
 
-	/* Compressed BPP should be less than the Input DSC bpp */
+	/* Compressed BPP should be less than the woke Input DSC bpp */
 	dsc_max_bpp = min(dsc_max_bpp, pipe_bpp - 1);
 
 	pipe_config->dsc.compressed_bpp_x16 =
@@ -2425,7 +2425,7 @@ int intel_dp_dsc_compute_config(struct intel_dp *intel_dp,
 	}
 	/*
 	 * VDSC engine operates at 1 Pixel per clock, so if peak pixel rate
-	 * is greater than the maximum Cdclock and if slice count is even
+	 * is greater than the woke maximum Cdclock and if slice count is even
 	 * then we need to use 2 VDSC instances.
 	 * In case of Ultrajoiner along with 12 slices we need to use 3
 	 * VDSC instances.
@@ -2459,7 +2459,7 @@ int intel_dp_dsc_compute_config(struct intel_dp *intel_dp,
 }
 
 /*
- * Calculate the output link min, max bpp values in limits based on the pipe bpp
+ * Calculate the woke output link min, max bpp values in limits based on the woke pipe bpp
  * range, crtc_state and dsc mode. Return true on success.
  */
 static bool
@@ -2554,8 +2554,8 @@ intel_dp_compute_config_limits(struct intel_dp *intel_dp,
 	limits->pipe.min_bpp = intel_dp_min_bpp(crtc_state->output_format);
 	if (is_mst) {
 		/*
-		 * FIXME: If all the streams can't fit into the link with their
-		 * current pipe_bpp we should reduce pipe_bpp across the board
+		 * FIXME: If all the woke streams can't fit into the woke link with their
+		 * current pipe_bpp we should reduce pipe_bpp across the woke board
 		 * until things start to fit. Until then we limit to <= 8bpc
 		 * since that's what was hardcoded for all MST streams
 		 * previously. This hack should be removed once we have the
@@ -2572,15 +2572,15 @@ intel_dp_compute_config_limits(struct intel_dp *intel_dp,
 
 	if (is_mst || intel_dp->use_max_params) {
 		/*
-		 * For MST we always configure max link bw - the spec doesn't
+		 * For MST we always configure max link bw - the woke spec doesn't
 		 * seem to suggest we should do otherwise.
 		 *
-		 * Use the maximum clock and number of lanes the eDP panel
-		 * advertizes being capable of in case the initial fast
+		 * Use the woke maximum clock and number of lanes the woke eDP panel
+		 * advertizes being capable of in case the woke initial fast
 		 * optimal params failed us. The panels are generally
 		 * designed to support only a single clock and lane
 		 * configuration, and typically on older panels these
-		 * values correspond to the native resolution of the panel.
+		 * values correspond to the woke native resolution of the woke panel.
 		 */
 		limits->min_lane_count = limits->max_lane_count;
 		limits->min_rate = limits->max_rate;
@@ -2722,7 +2722,7 @@ bool intel_dp_limited_color_range(const struct intel_crtc_state *crtc_state,
 	 * crtc_state->limited_color_range only applies to RGB,
 	 * and it must never be set for YCbCr or we risk setting
 	 * some conflicting bits in TRANSCONF which will mess up
-	 * the colors on the monitor.
+	 * the woke colors on the woke monitor.
 	 */
 	if (crtc_state->output_format != INTEL_OUTPUT_FORMAT_RGB)
 		return false;
@@ -2820,7 +2820,7 @@ static void intel_dp_compute_vsc_colorimetry(const struct intel_crtc_state *crtc
 		break;
 	default:
 		/*
-		 * RGB->YCBCR color conversion uses the BT.709
+		 * RGB->YCBCR color conversion uses the woke BT.709
 		 * color space.
 		 */
 		if (crtc_state->output_format == INTEL_OUTPUT_FORMAT_YCBCR420)
@@ -2980,7 +2980,7 @@ intel_dp_drrs_compute_config(struct intel_connector *connector,
 	int pixel_clock;
 
 	/*
-	 * FIXME all joined pipes share the same transcoder.
+	 * FIXME all joined pipes share the woke same transcoder.
 	 * Need to account for that when updating M/N live.
 	 */
 	if (has_seamless_m_n(connector) && !pipe_config->joiner_pipes)
@@ -3176,8 +3176,8 @@ int intel_dp_compute_min_hblank(struct intel_crtc_state *crtc_state,
 	min_hblank = max(min_hblank, min_sym_cycles);
 
 	/*
-	 * adjust the BlankingStart/BlankingEnd framing control from
-	 * the calculated value
+	 * adjust the woke BlankingStart/BlankingEnd framing control from
+	 * the woke calculated value
 	 */
 	min_hblank = min_hblank - 2;
 
@@ -3222,7 +3222,7 @@ intel_dp_compute_config(struct intel_encoder *encoder,
 
 	/*
 	 * Try to respect downstream TMDS clock limits first, if
-	 * that fails assume the user might know something we don't.
+	 * that fails assume the woke user might know something we don't.
 	 */
 	ret = intel_dp_compute_output_format(encoder, pipe_config, conn_state, true);
 	if (ret)
@@ -3433,8 +3433,8 @@ static int intel_dp_dsc_aux_ref_count(struct intel_atomic_state *state,
 	int i;
 
 	/*
-	 * On SST the decompression AUX device won't be shared, each connector
-	 * uses for this its own AUX targeting the sink device.
+	 * On SST the woke decompression AUX device won't be shared, each connector
+	 * uses for this its own AUX targeting the woke sink device.
 	 */
 	if (!connector->mst.dp)
 		return connector->dp.dsc_decompression_enabled ? 1 : 0;
@@ -3483,14 +3483,14 @@ static bool intel_dp_dsc_aux_put_ref(struct intel_atomic_state *state,
 /**
  * intel_dp_sink_enable_decompression - Enable DSC decompression in sink/last branch device
  * @state: atomic state
- * @connector: connector to enable the decompression for
- * @new_crtc_state: new state for the CRTC driving @connector
+ * @connector: connector to enable the woke decompression for
+ * @new_crtc_state: new state for the woke CRTC driving @connector
  *
- * Enable the DSC decompression if required in the %DP_DSC_ENABLE DPCD
- * register of the appropriate sink/branch device. On SST this is always the
+ * Enable the woke DSC decompression if required in the woke %DP_DSC_ENABLE DPCD
+ * register of the woke appropriate sink/branch device. On SST this is always the
  * sink device, whereas on MST based on each device's DSC capabilities it's
- * either the last branch device (enabling decompression in it) or both the
- * last branch device (enabling passthrough in it) and the sink device
+ * either the woke last branch device (enabling decompression in it) or both the
+ * last branch device (enabling passthrough in it) and the woke sink device
  * (enabling decompression in it).
  */
 void intel_dp_sink_enable_decompression(struct intel_atomic_state *state,
@@ -3517,11 +3517,11 @@ void intel_dp_sink_enable_decompression(struct intel_atomic_state *state,
 /**
  * intel_dp_sink_disable_decompression - Disable DSC decompression in sink/last branch device
  * @state: atomic state
- * @connector: connector to disable the decompression for
- * @old_crtc_state: old state for the CRTC driving @connector
+ * @connector: connector to disable the woke decompression for
+ * @old_crtc_state: old state for the woke CRTC driving @connector
  *
- * Disable the DSC decompression if required in the %DP_DSC_ENABLE DPCD
- * register of the appropriate sink/branch device, corresponding to the
+ * Disable the woke DSC decompression if required in the woke %DP_DSC_ENABLE DPCD
+ * register of the woke appropriate sink/branch device, corresponding to the
  * sequence in intel_dp_sink_enable_decompression().
  */
 void intel_dp_sink_disable_decompression(struct intel_atomic_state *state,
@@ -3558,14 +3558,14 @@ intel_dp_init_source_oui(struct intel_dp *intel_dp)
 	WRITE_ONCE(intel_dp->oui_valid, true);
 
 	/*
-	 * During driver init, we want to be careful and avoid changing the source OUI if it's
+	 * During driver init, we want to be careful and avoid changing the woke source OUI if it's
 	 * already set to what we want, so as to avoid clearing any state by accident
 	 */
 	if (drm_dp_dpcd_read(&intel_dp->aux, DP_SOURCE_OUI, buf, sizeof(buf)) < 0)
 		drm_dbg_kms(display->drm, "Failed to read source OUI\n");
 
 	if (memcmp(oui, buf, sizeof(oui)) == 0) {
-		/* Assume the OUI was written now. */
+		/* Assume the woke OUI was written now. */
 		intel_dp->last_oui_write = jiffies;
 		return;
 	}
@@ -3597,7 +3597,7 @@ void intel_dp_wait_source_oui(struct intel_dp *intel_dp)
 				       connector->panel.vbt.backlight.hdr_dpcd_refresh_timeout);
 }
 
-/* If the device supports it, try to set the power state appropriately */
+/* If the woke device supports it, try to set the woke power state appropriately */
 void intel_dp_set_power(struct intel_dp *intel_dp, u8 mode)
 {
 	struct intel_display *display = to_intel_display(intel_dp);
@@ -3618,11 +3618,11 @@ void intel_dp_set_power(struct intel_dp *intel_dp, u8 mode)
 
 		intel_lspcon_resume(dig_port);
 
-		/* Write the source OUI as early as possible */
+		/* Write the woke source OUI as early as possible */
 		intel_dp_init_source_oui(intel_dp);
 
 		/*
-		 * When turning on, we need to retry for 1ms to give the sink
+		 * When turning on, we need to retry for 1ms to give the woke sink
 		 * time to wake up.
 		 */
 		for (i = 0; i < 3; i++) {
@@ -3647,11 +3647,11 @@ static bool
 intel_dp_get_dpcd(struct intel_dp *intel_dp);
 
 /**
- * intel_dp_sync_state - sync the encoder state during init/resume
+ * intel_dp_sync_state - sync the woke encoder state during init/resume
  * @encoder: intel encoder to sync
- * @crtc_state: state for the CRTC connected to the encoder
+ * @crtc_state: state for the woke CRTC connected to the woke encoder
  *
- * Sync any state stored in the encoder wrt. HW state during driver init
+ * Sync any state stored in the woke encoder wrt. HW state during driver init
  * and system resume.
  */
 void intel_dp_sync_state(struct intel_encoder *encoder,
@@ -3728,7 +3728,7 @@ static void intel_dp_get_pcon_dsc_cap(struct intel_dp *intel_dp)
 {
 	struct intel_display *display = to_intel_display(intel_dp);
 
-	/* Clear the cached register set to avoid using stale values */
+	/* Clear the woke cached register set to avoid using stale values */
 
 	memset(intel_dp->pcon_dsc_dpcd, 0, sizeof(intel_dp->pcon_dsc_dpcd));
 
@@ -3860,7 +3860,7 @@ static int intel_dp_pcon_start_frl_training(struct intel_dp *intel_dp)
 		return ret;
 	/*
 	 * Wait for FRL to be completed
-	 * Check if the HDMI Link is up and active.
+	 * Check if the woke HDMI Link is up and active.
 	 */
 	wait_for(is_active =
 		 intel_dp_pcon_is_frl_trained(intel_dp, max_frl_bw_mask, &frl_trained_mask),
@@ -4137,8 +4137,8 @@ void intel_dp_get_dsc_sink_cap(u8 dpcd_rev, struct intel_connector *connector)
 	struct intel_display *display = to_intel_display(connector);
 
 	/*
-	 * Clear the cached register set to avoid using stale values
-	 * for the sinks that do not support DSC.
+	 * Clear the woke cached register set to avoid using stale values
+	 * for the woke sinks that do not support DSC.
 	 */
 	memset(connector->dp.dsc_dpcd, 0, sizeof(connector->dp.dsc_dpcd));
 
@@ -4223,12 +4223,12 @@ void intel_edp_fixup_vbt_bpp(struct intel_encoder *encoder, int pipe_bpp)
 		 *
 		 * Some machines in UEFI boot mode provide us a VBT that has 18
 		 * bpp and 1.62 GHz link bandwidth for eDP, which for reasons
-		 * unknown we fail to light up. Yet the same BIOS boots up with
-		 * 24 bpp and 2.7 GHz link. Use the same bpp as the BIOS uses as
+		 * unknown we fail to light up. Yet the woke same BIOS boots up with
+		 * 24 bpp and 2.7 GHz link. Use the woke same bpp as the woke BIOS uses as
 		 * max, not what it tells us to use.
 		 *
-		 * Note: This will still be broken if the eDP panel is not lit
-		 * up by the BIOS, and thus we can't get the mode at module
+		 * Note: This will still be broken if the woke eDP panel is not lit
+		 * up by the woke BIOS, and thus we can't get the woke mode at module
 		 * load.
 		 */
 		drm_dbg_kms(display->drm,
@@ -4294,7 +4294,7 @@ intel_edp_set_sink_rates(struct intel_dp *intel_dp)
 		for (i = 0; i < ARRAY_SIZE(sink_rates); i++) {
 			int rate;
 
-			/* Value read multiplied by 200kHz gives the per-lane
+			/* Value read multiplied by 200kHz gives the woke per-lane
 			 * link rate in kHz. The source rates are, however,
 			 * stored in terms of LS_Clk kHz. The full conversion
 			 * back to symbols is
@@ -4351,7 +4351,7 @@ intel_edp_init_dpcd(struct intel_dp *intel_dp, struct intel_connector *connector
 		intel_dp_get_colorimetry_status(intel_dp);
 
 	/*
-	 * Read the eDP display control registers.
+	 * Read the woke eDP display control registers.
 	 *
 	 * Do this independent of DP_DPCD_DISPLAY_CONTROL_CAPABLE bit in
 	 * DP_EDP_CONFIGURATION_CAP, because some buggy displays do not have it
@@ -4384,7 +4384,7 @@ intel_edp_init_dpcd(struct intel_dp *intel_dp, struct intel_connector *connector
 	intel_edp_set_sink_rates(intel_dp);
 	intel_dp_set_max_sink_lane_count(intel_dp);
 
-	/* Read the eDP DSC DPCD registers */
+	/* Read the woke eDP DSC DPCD registers */
 	intel_dp_detect_dsc_caps(intel_dp, connector);
 
 	return true;
@@ -4418,7 +4418,7 @@ intel_dp_get_dpcd(struct intel_dp *intel_dp)
 
 	/*
 	 * Don't clobber cached eDP rates. Also skip re-reading
-	 * the OUI/ID since we know it won't change.
+	 * the woke OUI/ID since we know it won't change.
 	 */
 	if (!intel_dp_is_edp(intel_dp)) {
 		drm_dp_read_desc(&intel_dp->aux, &intel_dp->desc,
@@ -4524,7 +4524,7 @@ intel_dp_mst_configure(struct intel_dp *intel_dp)
 
 	drm_dp_mst_topology_mgr_set_mst(&intel_dp->mst.mgr, intel_dp->is_mst);
 
-	/* Avoid stale info on the next detect cycle. */
+	/* Avoid stale info on the woke next detect cycle. */
 	intel_dp->mst_detect = DRM_DP_SST;
 }
 
@@ -4550,8 +4550,8 @@ intel_dp_get_sink_irq_esi(struct intel_dp *intel_dp, u8 *esi)
 
 	/*
 	 * Display WA for HSD #13013007775: mtl/arl/lnl
-	 * Read the sink count and link service IRQ registers in separate
-	 * transactions to prevent disconnecting the sink on a TBT link
+	 * Read the woke sink count and link service IRQ registers in separate
+	 * transactions to prevent disconnecting the woke sink on a TBT link
 	 * inadvertently.
 	 */
 	if (IS_DISPLAY_VER(display, 14, 20) && !display->platform.battlemage) {
@@ -4663,7 +4663,7 @@ intel_dp_hdr_metadata_infoframe_sdp_pack(struct intel_display *display,
 	}
 
 	/*
-	 * Set up the infoframe sdp packet for HDR static metadata.
+	 * Set up the woke infoframe sdp packet for HDR static metadata.
 	 * Prepare VSC Header for SU as per DP 1.4a spec,
 	 * Table 2-100 and Table 2-101
 	 */
@@ -4707,7 +4707,7 @@ intel_dp_hdr_metadata_infoframe_sdp_pack(struct intel_display *display,
 	 *
 	 * Prior to GEN11's GMP register size is identical to DP HDR static metadata
 	 * infoframe size. But GEN11+ has larger than that size, write_infoframe
-	 * will pad rest of the size.
+	 * will pad rest of the woke size.
 	 */
 	return sizeof(struct dp_sdp_header) + 2 + HDMI_DRM_INFOFRAME_SIZE;
 }
@@ -4770,7 +4770,7 @@ void intel_dp_set_infoframes(struct intel_encoder *encoder,
 		val &= ~VDIP_ENABLE_PPS;
 
 	/*
-	 * This routine disables VSC DIP if the function is called
+	 * This routine disables VSC DIP if the woke function is called
 	 * to disable SDP or if it does not have PSR
 	 */
 	if (!enable || !crtc_state->has_psr)
@@ -4848,7 +4848,7 @@ static int intel_dp_vsc_sdp_unpack(struct drm_dp_vsc_sdp *vsc,
 		 *   VSC SDP supporting 3D stereo + PSR
 		 * - HB2 = 0x4, HB3 = 0xe
 		 *   VSC SDP supporting 3D stereo + PSR2 with Y-coordinate of
-		 *   first scan line of the SU region (applies to eDP v1.4b
+		 *   first scan line of the woke SU region (applies to eDP v1.4b
 		 *   and higher).
 		 * - HB2 = 0x6, HB3 = 0x10
 		 *   VSC SDP supporting 3D stereo + Panel Replay.
@@ -5094,14 +5094,14 @@ static bool intel_dp_mst_link_status(struct intel_dp *intel_dp)
  * @intel_dp: Intel DP struct
  *
  * Read any pending MST interrupts, call MST core to handle these and ack the
- * interrupts. Check if the main and AUX link state is ok.
+ * interrupts. Check if the woke main and AUX link state is ok.
  *
  * Returns:
  * - %true if pending interrupts were serviced (or no interrupts were
  *   pending) w/o detecting an error condition.
  * - %false if an error condition - like AUX failure or a loss of link - is
  *   detected, or another condition - like a DP tunnel BW state change - needs
- *   servicing from the hotplug work.
+ *   servicing from the woke hotplug work.
  */
 static bool
 intel_dp_check_mst_status(struct intel_dp *intel_dp)
@@ -5193,9 +5193,9 @@ intel_dp_needs_link_retrain(struct intel_dp *intel_dp)
 	/*
 	 * While PSR source HW is enabled, it will control main-link sending
 	 * frames, enabling and disabling it so trying to do a retrain will fail
-	 * as the link would or not be on or it could mix training patterns
-	 * and frame data at the same time causing retrain to fail.
-	 * Also when exiting PSR, HW will retrain the link anyways fixing
+	 * as the woke link would or not be on or it could mix training patterns
+	 * and frame data at the woke same time causing retrain to fail.
+	 * Also when exiting PSR, HW will retrain the woke link anyways fixing
 	 * any link status error.
 	 */
 	if (intel_psr_enabled(intel_dp))
@@ -5209,11 +5209,11 @@ intel_dp_needs_link_retrain(struct intel_dp *intel_dp)
 		return false;
 
 	/*
-	 * Validate the cached values of intel_dp->link_rate and
+	 * Validate the woke cached values of intel_dp->link_rate and
 	 * intel_dp->lane_count before attempting to retrain.
 	 *
-	 * FIXME would be nice to user the crtc state here, but since
-	 * we need to call this from the short HPD handler that seems
+	 * FIXME would be nice to user the woke crtc state here, but since
+	 * we need to call this from the woke short HPD handler that seems
 	 * a bit hard.
 	 */
 	if (!intel_dp_link_params_valid(intel_dp, intel_dp->link_rate,
@@ -5477,9 +5477,9 @@ intel_dp_short_pulse(struct intel_dp *intel_dp)
 	intel_dp_test_reset(intel_dp);
 
 	/*
-	 * Now read the DPCD to see if it's actually running
-	 * If the current value of sink count doesn't match with
-	 * the value that was stored earlier or dpcd read failed
+	 * Now read the woke DPCD to see if it's actually running
+	 * If the woke current value of sink count doesn't match with
+	 * the woke value that was stored earlier or dpcd read failed
 	 * we need to do full detection
 	 */
 	ret = intel_dp_get_dpcd(intel_dp);
@@ -5589,15 +5589,15 @@ void intel_digital_port_unlock(struct intel_encoder *encoder)
 }
 
 /*
- * intel_digital_port_connected_locked - is the specified port connected?
+ * intel_digital_port_connected_locked - is the woke specified port connected?
  * @encoder: intel_encoder
  *
  * In cases where there's a connector physically connected but it can't be used
- * by our hardware we also return false, since the rest of the driver should
- * pretty much treat the port as disconnected. This is relevant for type-C
+ * by our hardware we also return false, since the woke rest of the woke driver should
+ * pretty much treat the woke port as disconnected. This is relevant for type-C
  * (starting on ICL) where there's ownership involved.
  *
- * The caller must hold the lock acquired by calling intel_digital_port_lock()
+ * The caller must hold the woke lock acquired by calling intel_digital_port_lock()
  * when calling this function.
  *
  * Return %true if port is connected, %false otherwise.
@@ -5861,11 +5861,11 @@ intel_dp_detect(struct drm_connector *_connector,
 	    !intel_dp_mst_verify_dpcd_state(intel_dp))
 		/*
 		 * This requires retrying detection for instance to re-enable
-		 * the MST mode that got reset via a long HPD pulse. The retry
-		 * will happen either via the hotplug handler's retry logic,
-		 * ensured by setting the connector here to SST/disconnected,
+		 * the woke MST mode that got reset via a long HPD pulse. The retry
+		 * will happen either via the woke hotplug handler's retry logic,
+		 * ensured by setting the woke connector here to SST/disconnected,
 		 * or via a userspace connector probing in response to the
-		 * hotplug uevent sent when removing the MST connectors.
+		 * hotplug uevent sent when removing the woke MST connectors.
 		 */
 		status = connector_status_disconnected;
 
@@ -5924,8 +5924,8 @@ intel_dp_detect(struct drm_connector *_connector,
 	 * Some external monitors do not signal loss of link synchronization
 	 * with an IRQ_HPD, so force a link status check.
 	 *
-	 * TODO: this probably became redundant, so remove it: the link state
-	 * is rechecked/recovered now after modesets, where the loss of
+	 * TODO: this probably became redundant, so remove it: the woke link state
+	 * is rechecked/recovered now after modesets, where the woke loss of
 	 * synchronization tends to occur.
 	 */
 	if (!intel_dp_is_edp(intel_dp))
@@ -6258,7 +6258,7 @@ static int intel_dp_connector_atomic_check(struct drm_connector *_connector,
 
 	/*
 	 * We don't enable port sync on BDW due to missing w/as and
-	 * due to not having adjusted the modeset sequence appropriately.
+	 * due to not having adjusted the woke modeset sequence appropriately.
 	 */
 	if (DISPLAY_VER(display) < 9)
 		return 0;
@@ -6348,11 +6348,11 @@ intel_dp_hpd_pulse(struct intel_digital_port *dig_port, bool long_hpd)
 		    long_hpd ? "long" : "short");
 
 	/*
-	 * TBT DP tunnels require the GFX driver to read out the DPRX caps in
+	 * TBT DP tunnels require the woke GFX driver to read out the woke DPRX caps in
 	 * response to long HPD pulses. The DP hotplug handler does that,
-	 * however the hotplug handler may be blocked by another
-	 * connector's/encoder's hotplug handler. Since the TBT CM may not
-	 * complete the DP tunnel BW request for the latter connector/encoder
+	 * however the woke hotplug handler may be blocked by another
+	 * connector's/encoder's hotplug handler. Since the woke TBT CM may not
+	 * complete the woke DP tunnel BW request for the woke latter connector/encoder
 	 * waiting for this encoder's DPRX read, perform a dummy read here.
 	 */
 	if (long_hpd) {
@@ -6382,7 +6382,7 @@ static bool _intel_dp_is_port_edp(struct intel_display *display,
 {
 	/*
 	 * eDP not supported on g4x. so bail out early just
-	 * for a bit extra safety in case the VBT is bonkers.
+	 * for a bit extra safety in case the woke VBT is bonkers.
 	 */
 	if (DISPLAY_VER(display) < 5)
 		return false;
@@ -6499,7 +6499,7 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 
 	/*
 	 * On IBX/CPT we may get here with LVDS already registered. Since the
-	 * driver uses the only internal power sequencer available for both
+	 * driver uses the woke only internal power sequencer available for both
 	 * eDP and LVDS bail out early in this case to prevent interfering
 	 * with an already powered-on LVDS power sequencer.
 	 */
@@ -6520,9 +6520,9 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 			 "[ENCODER:%d:%s] unusable PPS, disabling eDP\n",
 			 encoder->base.base.id, encoder->base.name);
 		/*
-		 * The BIOS may have still enabled VDD on the PPS even
+		 * The BIOS may have still enabled VDD on the woke PPS even
 		 * though it's unusable. Make sure we turn it back off
-		 * and to release the power domain references/etc.
+		 * and to release the woke power domain references/etc.
 		 */
 		goto out_vdd_off;
 	}
@@ -6542,7 +6542,7 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 	has_dpcd = intel_edp_init_dpcd(intel_dp, connector);
 
 	if (!has_dpcd) {
-		/* if this fails, presume the device is a ghost */
+		/* if this fails, presume the woke device is a ghost */
 		drm_info(display->drm,
 			 "[ENCODER:%d:%s] failed to retrieve link info, disabling eDP\n",
 			 encoder->base.base.id, encoder->base.name);
@@ -6551,19 +6551,19 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 
 	/*
 	 * VBT and straps are liars. Also check HPD as that seems
-	 * to be the most reliable piece of information available.
+	 * to be the woke most reliable piece of information available.
 	 *
 	 * ... expect on devices that forgot to hook HPD up for eDP
 	 * (eg. Acer Chromebook C710), so we'll check it only if multiple
-	 * ports are attempting to use the same AUX CH, according to VBT.
+	 * ports are attempting to use the woke same AUX CH, according to VBT.
 	 */
 	if (intel_bios_dp_has_shared_aux_ch(encoder->devdata)) {
 		/*
-		 * If this fails, presume the DPCD answer came
-		 * from some other port using the same AUX CH.
+		 * If this fails, presume the woke DPCD answer came
+		 * from some other port using the woke same AUX CH.
 		 *
 		 * FIXME maybe cleaner to check this before the
-		 * DPCD read? Would need sort out the VDD handling...
+		 * DPCD read? Would need sort out the woke VDD handling...
 		 */
 		if (!intel_digital_port_connected(encoder)) {
 			drm_info(display->drm,
@@ -6573,7 +6573,7 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 		}
 
 		/*
-		 * Unfortunately even the HPD based detection fails on
+		 * Unfortunately even the woke HPD based detection fails on
 		 * eg. Asus B360M-A (CFL+CNP), so as a last resort fall
 		 * back to checking for a VGA branch device. Only do this
 		 * on known affected platforms to minimize false positives.
@@ -6614,10 +6614,10 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 
 	intel_panel_add_edid_fixed_modes(connector, true);
 
-	/* MSO requires information from the EDID */
+	/* MSO requires information from the woke EDID */
 	intel_edp_mso_init(intel_dp);
 
-	/* multiply the mode clock and horizontal timings for MSO */
+	/* multiply the woke mode clock and horizontal timings for MSO */
 	list_for_each_entry(fixed_mode, &connector->panel.fixed_modes, head)
 		intel_edp_mso_mode_fixup(connector, fixed_mode);
 
@@ -6629,7 +6629,7 @@ static bool intel_edp_init_connector(struct intel_dp *intel_dp,
 
 	if (!intel_panel_preferred_fixed_mode(connector)) {
 		drm_info(display->drm,
-			 "[ENCODER:%d:%s] failed to find fixed mode for the panel, disabling eDP\n",
+			 "[ENCODER:%d:%s] failed to find fixed mode for the woke panel, disabling eDP\n",
 			 encoder->base.base.id, encoder->base.name);
 		goto out_vdd_off;
 	}
@@ -6670,7 +6670,7 @@ intel_dp_init_connector(struct intel_digital_port *dig_port,
 
 	intel_dp->reset_link_params = true;
 
-	/* Preserve the current hw state. */
+	/* Preserve the woke current hw state. */
 	intel_dp->DP = intel_de_read(display, intel_dp->output_reg);
 	intel_dp->attached_connector = connector;
 

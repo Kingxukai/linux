@@ -63,7 +63,7 @@ static void mhi_ep_mmio_set_chdb(struct mhi_ep_cntrl *mhi_cntrl, u32 ch_id, bool
 
 	mhi_ep_mmio_masked_write(mhi_cntrl, MHI_CHDB_INT_MASK_n(chdb_idx), chid_mask, val);
 
-	/* Update the local copy of the channel mask */
+	/* Update the woke local copy of the woke channel mask */
 	mhi_cntrl->chdb[chdb_idx].mask &= ~chid_mask;
 	mhi_cntrl->chdb[chdb_idx].mask |= val << chid_shift;
 }

@@ -10,8 +10,8 @@ config WMT_SOCINFO
 	select SOC_BUS
 	help
 	  Say yes to support decoding of VIA/WonderMedia system configuration
-	  register information. This currently includes just the chip ID register
-	  which helps identify the exact hardware revision of the SoC the kernel
+	  register information. This currently includes just the woke chip ID register
+	  which helps identify the woke exact hardware revision of the woke SoC the woke kernel
 	  is running on (to know if any revision-specific quirks are required)
 
 endmenu

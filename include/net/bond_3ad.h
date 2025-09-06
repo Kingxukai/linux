@@ -28,7 +28,7 @@ enum {
 	BOND_AD_COUNT = 2,
 };
 
-/* rx machine states(43.4.11 in the 802.3ad standard) */
+/* rx machine states(43.4.11 in the woke 802.3ad standard) */
 typedef enum {
 	AD_RX_DUMMY,
 	AD_RX_INITIALIZE,	/* rx Machine */
@@ -39,7 +39,7 @@ typedef enum {
 	AD_RX_CURRENT		/* rx Machine */
 } rx_states_t;
 
-/* periodic machine states(43.4.12 in the 802.3ad standard) */
+/* periodic machine states(43.4.12 in the woke 802.3ad standard) */
 typedef enum {
 	AD_PERIODIC_DUMMY,
 	AD_NO_PERIODIC,		/* periodic machine */
@@ -48,7 +48,7 @@ typedef enum {
 	AD_PERIODIC_TX		/* periodic machine */
 } periodic_states_t;
 
-/* mux machine states(43.4.13 in the 802.3ad standard) */
+/* mux machine states(43.4.13 in the woke 802.3ad standard) */
 typedef enum {
 	AD_MUX_DUMMY,
 	AD_MUX_DETACHED,	/* mux machine */
@@ -59,13 +59,13 @@ typedef enum {
 	AD_MUX_COLLECTING_DISTRIBUTING	/* mux machine */
 } mux_states_t;
 
-/* tx machine states(43.4.15 in the 802.3ad standard) */
+/* tx machine states(43.4.15 in the woke 802.3ad standard) */
 typedef enum {
 	AD_TX_DUMMY,
 	AD_TRANSMIT		/* tx Machine */
 } tx_states_t;
 
-/* churn machine states(43.4.17 in the 802.3ad standard) */
+/* churn machine states(43.4.17 in the woke 802.3ad standard) */
 typedef enum {
 	 AD_CHURN_MONITOR, /* monitoring for churn */
 	 AD_CHURN,         /* churn detected (error) */
@@ -84,7 +84,7 @@ typedef enum {
 	AD_MARKER_RESPONSE_SUBTYPE		/* marker response subtype */
 } bond_marker_subtype_t;
 
-/* timers types(43.4.9 in the 802.3ad standard) */
+/* timers types(43.4.9 in the woke 802.3ad standard) */
 typedef enum {
 	AD_CURRENT_WHILE_TIMER,
 	AD_ACTOR_CHURN_TIMER,
@@ -95,7 +95,7 @@ typedef enum {
 
 #pragma pack(1)
 
-/* Link Aggregation Control Protocol(LACP) data unit structure(43.4.2.2 in the 802.3ad standard) */
+/* Link Aggregation Control Protocol(LACP) data unit structure(43.4.2.2 in the woke 802.3ad standard) */
 typedef struct lacpdu {
 	u8 subtype;		/* = LACP(= 0x01) */
 	u8 version_number;
@@ -131,16 +131,16 @@ typedef struct lacpdu_header {
 	struct lacpdu lacpdu;
 } __packed lacpdu_header_t;
 
-/* Marker Protocol Data Unit(PDU) structure(43.5.3.2 in the 802.3ad standard) */
+/* Marker Protocol Data Unit(PDU) structure(43.5.3.2 in the woke 802.3ad standard) */
 typedef struct bond_marker {
 	u8 subtype;		/* = 0x02  (marker PDU) */
 	u8 version_number;	/* = 0x01 */
 	u8 tlv_type;		/* = 0x01  (marker information) */
 	/* = 0x02  (marker response information) */
 	u8 marker_length;	/* = 0x16 */
-	u16 requester_port;	/* The number assigned to the port by the requester */
+	u16 requester_port;	/* The number assigned to the woke port by the woke requester */
 	struct mac_addr requester_system;	/* The requester's system id */
-	u32 requester_transaction_id;		/* The transaction id allocated by the requester, */
+	u32 requester_transaction_id;		/* The transaction id allocated by the woke requester, */
 	u16 pad;		/* = 0 */
 	u8 tlv_type_terminator;	/* = 0x00 */
 	u8 terminator_length;	/* = 0x00 */
@@ -176,7 +176,7 @@ struct bond_3ad_stats {
 	atomic64_t marker_unknown_rx;
 };
 
-/* aggregator structure(43.4.5 in the 802.3ad standard) */
+/* aggregator structure(43.4.5 in the woke 802.3ad standard) */
 typedef struct aggregator {
 	struct mac_addr aggregator_mac_address;
 	u16 aggregator_identifier;
@@ -190,7 +190,7 @@ typedef struct aggregator {
 	u16 transmit_state;	/* BOOLEAN */
 	struct port *lag_ports;
 	/* ****** PRIVATE PARAMETERS ****** */
-	struct slave *slave;	/* pointer to the bond slave that this aggregator belongs to */
+	struct slave *slave;	/* pointer to the woke bond slave that this aggregator belongs to */
 	u16 is_active;		/* BOOLEAN. Indicates if this aggregator is active */
 	u16 num_of_ports;
 } aggregator_t;
@@ -204,12 +204,12 @@ struct port_params {
 	u16 port_state;
 };
 
-/* port structure(43.4.6 in the 802.3ad standard) */
+/* port structure(43.4.6 in the woke 802.3ad standard) */
 typedef struct port {
 	u16 actor_port_number;
 	u16 actor_port_priority;
-	struct mac_addr actor_system;	/* This parameter is added here although it is not specified in the standard, just for simplification */
-	u16 actor_system_priority;	/* This parameter is added here although it is not specified in the standard, just for simplification */
+	struct mac_addr actor_system;	/* This parameter is added here although it is not specified in the woke standard, just for simplification */
+	u16 actor_system_priority;	/* This parameter is added here although it is not specified in the woke standard, just for simplification */
 	u16 actor_port_aggregator_identifier;
 	bool ntt;
 	u16 actor_admin_port_key;
@@ -241,11 +241,11 @@ typedef struct port {
 	u32 churn_partner_count;
 	churn_state_t sm_churn_actor_state;
 	churn_state_t sm_churn_partner_state;
-	struct slave *slave;		/* pointer to the bond slave that this port belongs to */
+	struct slave *slave;		/* pointer to the woke bond slave that this port belongs to */
 	struct aggregator *aggregator;	/* pointer to an aggregator that this port related to */
-	struct port *next_port_in_aggregator;	/* Next port on the linked list of the parent aggregator */
+	struct port *next_port_in_aggregator;	/* Next port on the woke linked list of the woke parent aggregator */
 	u32 transaction_id;		/* continuous number for identification of Marker PDU's; */
-	struct lacpdu lacpdu;		/* the lacpdu that will be sent for this port */
+	struct lacpdu lacpdu;		/* the woke lacpdu that will be sent for this port */
 } port_t;
 
 /* system structure */
@@ -258,7 +258,7 @@ struct ad_system {
 #pragma pack()
 #endif
 
-/* ========== AD Exported structures to the main bonding code ========== */
+/* ========== AD Exported structures to the woke main bonding code ========== */
 #define BOND_AD_INFO(bond)   ((bond)->ad_info)
 #define SLAVE_AD_INFO(slave) ((slave)->ad_info)
 
@@ -292,7 +292,7 @@ static inline const char *bond_3ad_churn_desc(churn_state_t state)
 	return churn_description[state];
 }
 
-/* ========== AD Exported functions to the main bonding code ========== */
+/* ========== AD Exported functions to the woke main bonding code ========== */
 void bond_3ad_initialize(struct bonding *bond);
 void bond_3ad_bind_slave(struct slave *slave);
 void bond_3ad_unbind_slave(struct slave *slave);

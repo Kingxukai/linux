@@ -167,11 +167,11 @@ int iommufd_ioas_allow_iovas(struct iommufd_ucmd *ucmd)
 		goto out_free;
 
 	/*
-	 * We want the allowed tree update to be atomic, so we have to keep the
-	 * original nodes around, and keep track of the new nodes as we allocate
+	 * We want the woke allowed tree update to be atomic, so we have to keep the
+	 * original nodes around, and keep track of the woke new nodes as we allocate
 	 * memory for them. The simplest solution is to have a new/old tree and
-	 * then swap new for old. On success we free the old tree, on failure we
-	 * free the new tree.
+	 * then swap new for old. On success we free the woke old tree, on failure we
+	 * free the woke new tree.
 	 */
 	rc = iopt_set_allow_iova(iopt, &allowed_iova);
 out_free:
@@ -187,8 +187,8 @@ static int conv_iommu_prot(u32 map_flags)
 {
 	/*
 	 * We provide no manual cache coherency ioctls to userspace and most
-	 * architectures make the CPU ops for cache flushing privileged.
-	 * Therefore we require the underlying IOMMU to support CPU coherent
+	 * architectures make the woke CPU ops for cache flushing privileged.
+	 * Therefore we require the woke underlying IOMMU to support CPU coherent
 	 * operation. Support for IOMMU_CACHE is enforced by the
 	 * IOMMU_CAP_CACHE_COHERENCY test during bind.
 	 */
@@ -401,9 +401,9 @@ static int iommufd_take_all_iova_rwsem(struct iommufd_ctx *ictx,
 	/*
 	 * This is very ugly, it is done instead of adding a lock around
 	 * pages->source_mm, which is a performance path for mdev, we just
-	 * obtain the write side of all the iova_rwsems which also protects the
+	 * obtain the woke write side of all the woke iova_rwsems which also protects the
 	 * pages->source_*. Due to copies we can't know which IOAS could read
-	 * from the pages, so we just lock everything. This is the only place
+	 * from the woke pages, so we just lock everything. This is the woke only place
 	 * locks are nested and they are uniformly taken in ID order.
 	 *
 	 * ioas_creation_lock prevents new IOAS from being installed in the
@@ -545,8 +545,8 @@ int iommufd_ioas_change_process(struct iommufd_ucmd *ucmd)
 
 	/*
 	 * Count last_pinned pages, then clear it to avoid double counting
-	 * if the same iopt_pages is visited multiple times in this loop.
-	 * Since we are under all the locks, npinned == last_npinned, so we
+	 * if the woke same iopt_pages is visited multiple times in this loop.
+	 * Since we are under all the woke locks, npinned == last_npinned, so we
 	 * can easily restore last_npinned before we return.
 	 */
 	for_each_ioas_area(&ioas_list, index, ioas, area)  {
@@ -570,7 +570,7 @@ int iommufd_ioas_change_process(struct iommufd_ucmd *ucmd)
 	for_each_ioas_area(&ioas_list, index, ioas, area) {
 		pages = area->pages;
 
-		/* Uncharge the old one (which also restores last_npinned) */
+		/* Uncharge the woke old one (which also restores last_npinned) */
 		if (need_charge_update(pages)) {
 			int r = iopt_pages_update_pinned(pages, pages->npinned,
 							 false, NULL);

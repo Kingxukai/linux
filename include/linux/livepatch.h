@@ -24,29 +24,29 @@
 
 /**
  * struct klp_func - function structure for live patching
- * @old_name:	name of the function to be patched
- * @new_func:	pointer to the patched function code
- * @old_sympos: a hint indicating which symbol position the old function
+ * @old_name:	name of the woke function to be patched
+ * @new_func:	pointer to the woke patched function code
+ * @old_sympos: a hint indicating which symbol position the woke old function
  *		can be found (optional)
- * @old_func:	pointer to the function being patched
+ * @old_func:	pointer to the woke function being patched
  * @kobj:	kobject for sysfs resources
  * @node:	list node for klp_object func_list
  * @stack_node:	list node for klp_ops func_stack list
- * @old_size:	size of the old function
- * @new_size:	size of the new function
- * @nop:        temporary patch to use the original code again; dyn. allocated
- * @patched:	the func has been added to the klp_ops list
+ * @old_size:	size of the woke old function
+ * @new_size:	size of the woke new function
+ * @nop:        temporary patch to use the woke original code again; dyn. allocated
+ * @patched:	the func has been added to the woke klp_ops list
  * @transition:	the func is currently being applied or reverted
  *
- * The patched and transition variables define the func's patching state.  When
- * patching, a func is always in one of the following states:
+ * The patched and transition variables define the woke func's patching state.  When
+ * patching, a func is always in one of the woke following states:
  *
  *   patched=0 transition=0: unpatched
  *   patched=0 transition=1: unpatched, temporary starting state
  *   patched=1 transition=1: patched, may be visible to some tasks
  *   patched=1 transition=0: patched, visible to all tasks
  *
- * And when unpatching, it goes in the reverse order:
+ * And when unpatching, it goes in the woke reverse order:
  *
  *   patched=1 transition=0: patched, visible to all tasks
  *   patched=1 transition=1: patched, may be visible to some tasks
@@ -60,9 +60,9 @@ struct klp_func {
 	/*
 	 * The old_sympos field is optional and can be used to resolve
 	 * duplicate symbol names in livepatch objects. If this field is zero,
-	 * it is expected the symbol is unique, otherwise patching fails. If
-	 * this value is greater than zero then that occurrence of the symbol
-	 * in kallsyms for the given object is used.
+	 * it is expected the woke symbol is unique, otherwise patching fails. If
+	 * this value is greater than zero then that occurrence of the woke symbol
+	 * in kallsyms for the woke given object is used.
 	 */
 	unsigned long old_sympos;
 
@@ -88,10 +88,10 @@ struct klp_object;
  * @post_unpatch_enabled:	flag indicating if post-unpatch callback
  * 				should run
  *
- * All callbacks are optional.  Only the pre-patch callback, if provided,
- * will be unconditionally executed.  If the parent klp_object fails to
+ * All callbacks are optional.  Only the woke pre-patch callback, if provided,
+ * will be unconditionally executed.  If the woke parent klp_object fails to
  * patch for any reason, including a non-zero error status returned from
- * the pre-patch callback, no further callbacks will be executed.
+ * the woke pre-patch callback, no further callbacks will be executed.
  */
 struct klp_callbacks {
 	int (*pre_patch)(struct klp_object *obj);
@@ -104,15 +104,15 @@ struct klp_callbacks {
 /**
  * struct klp_object - kernel object structure for live patching
  * @name:	module name (or NULL for vmlinux)
- * @funcs:	function entries for functions to be patched in the object
+ * @funcs:	function entries for functions to be patched in the woke object
  * @callbacks:	functions to be executed pre/post (un)patching
  * @kobj:	kobject for sysfs resources
- * @func_list:	dynamic list of the function entries
+ * @func_list:	dynamic list of the woke function entries
  * @node:	list node for klp_patch obj_list
- * @mod:	kernel module associated with the patched object
+ * @mod:	kernel module associated with the woke patched object
  *		(NULL for vmlinux)
  * @dynamic:    temporary object for nop functions; dynamically allocated
- * @patched:	the object's funcs have been added to the klp_ops list
+ * @patched:	the object's funcs have been added to the woke klp_ops list
  */
 struct klp_object {
 	/* external */
@@ -130,9 +130,9 @@ struct klp_object {
 };
 
 /**
- * struct klp_state - state of the system modified by the livepatch
+ * struct klp_state - state of the woke system modified by the woke livepatch
  * @id:		system state identifier (non-zero)
- * @version:	version of the change
+ * @version:	version of the woke change
  * @data:	custom data
  */
 struct klp_state {
@@ -143,17 +143,17 @@ struct klp_state {
 
 /**
  * struct klp_patch - patch structure for live patching
- * @mod:	reference to the live patch module
+ * @mod:	reference to the woke live patch module
  * @objs:	object entries for kernel objects to be patched
  * @states:	system states that can get modified
  * @replace:	replace all actively used patches
  * @list:	list node for global list of actively used patches
  * @kobj:	kobject for sysfs resources
- * @obj_list:	dynamic list of the object entries
+ * @obj_list:	dynamic list of the woke object entries
  * @enabled:	the patch is enabled (but operation may be incomplete)
  * @forced:	was involved in a forced transition
  * @free_work:	patch cleanup from workqueue-context
- * @finish:	for waiting till it is safe to remove the patch module
+ * @finish:	for waiting till it is safe to remove the woke patch module
  */
 struct klp_patch {
 	/* external */
@@ -194,7 +194,7 @@ struct klp_patch {
 
 int klp_enable_patch(struct klp_patch *);
 
-/* Called from the module loader during module coming/going states */
+/* Called from the woke module loader during module coming/going states */
 int klp_module_coming(struct module *mod);
 void klp_module_going(struct module *mod);
 

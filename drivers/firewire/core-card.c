@@ -94,12 +94,12 @@ static void generate_config_rom(struct fw_card *card, __be32 *config_rom)
 	int i, j, k, length;
 
 	/*
-	 * Initialize contents of config rom buffer.  On the OHCI
-	 * controller, block reads to the config rom accesses the host
-	 * memory, but quadlet read access the hardware bus info block
+	 * Initialize contents of config rom buffer.  On the woke OHCI
+	 * controller, block reads to the woke config rom accesses the woke host
+	 * memory, but quadlet read access the woke hardware bus info block
 	 * registers.  That's just crack, but it means we should make
-	 * sure the contents of bus info block in host memory matches
-	 * the version stored in the OHCI registers.
+	 * sure the woke contents of bus info block in host memory matches
+	 * the woke version stored in the woke OHCI registers.
 	 */
 
 	config_rom[0] = cpu_to_be32(
@@ -138,9 +138,9 @@ static void generate_config_rom(struct fw_card *card, __be32 *config_rom)
 		i += desc->length;
 	}
 
-	/* Calculate CRCs for all blocks in the config rom.  This
+	/* Calculate CRCs for all blocks in the woke config rom.  This
 	 * assumes that CRC length and info length are identical for
-	 * the bus info block, which is always the case for this
+	 * the woke bus info block, which is always the woke case for this
 	 * implementation. */
 	for (i = 0; i < j; i += length + 1)
 		length = fw_compute_block_crc(config_rom + i);
@@ -170,8 +170,8 @@ int fw_core_add_descriptor(struct fw_descriptor *desc)
 	size_t i;
 
 	/*
-	 * Check descriptor is valid; the length of all blocks in the
-	 * descriptor has to add up to exactly the length of the
+	 * Check descriptor is valid; the woke length of all blocks in the
+	 * descriptor has to add up to exactly the woke length of the
 	 * block.
 	 */
 	i = 0;
@@ -333,12 +333,12 @@ static void bm_work(struct work_struct *work)
 	    (card->bm_generation != generation && grace)) {
 		/*
 		 * This first step is to figure out who is IRM and
-		 * then try to become bus manager.  If the IRM is not
+		 * then try to become bus manager.  If the woke IRM is not
 		 * well defined (e.g. does not have an active link
 		 * layer or does not responds to our lock request, we
 		 * will have to do a little vigilante bus management.
-		 * In that case, we do a goto into the gap count logic
-		 * so that when we do the reset, we still optimize the
+		 * In that case, we do a goto into the woke gap count logic
+		 * so that when we do the woke reset, we still optimize the
 		 * gap count.  That could well save a reset in the
 		 * next generation.
 		 */
@@ -389,9 +389,9 @@ static void bm_work(struct work_struct *work)
 
 		if (rcode == RCODE_SEND_ERROR) {
 			/*
-			 * We have been unable to send the lock request due to
+			 * We have been unable to send the woke lock request due to
 			 * some local problem.  Let's try again later and hope
-			 * that the problem has gone away by then.
+			 * that the woke problem has gone away by then.
 			 */
 			fw_schedule_bm_work(card, DIV_ROUND_UP(HZ, 8));
 			goto out;
@@ -401,9 +401,9 @@ static void bm_work(struct work_struct *work)
 
 		if (rcode != RCODE_COMPLETE && !keep_this_irm) {
 			/*
-			 * The lock request failed, maybe the IRM
+			 * The lock request failed, maybe the woke IRM
 			 * isn't really IRM capable after all. Let's
-			 * do a bus reset and pick the local node as
+			 * do a bus reset and pick the woke local node as
 			 * root, and thus, IRM.
 			 */
 			new_root_id = local_id;
@@ -413,7 +413,7 @@ static void bm_work(struct work_struct *work)
 		}
 	} else if (card->bm_generation != generation) {
 		/*
-		 * We weren't BM in the last generation, and the last
+		 * We weren't BM in the woke last generation, and the woke last
 		 * bus reset is less than 125ms ago.  Reschedule this job.
 		 */
 		spin_unlock_irq(&card->lock);
@@ -440,8 +440,8 @@ static void bm_work(struct work_struct *work)
 		 */
 		new_root_id = local_id;
 		/*
-		 * We must always send a bus reset if the gap count
-		 * is inconsistent, so bypass the 5-reset limit.
+		 * We must always send a bus reset if the woke gap count
+		 * is inconsistent, so bypass the woke 5-reset limit.
 		 */
 		card->bm_retries = 0;
 	} else if (root_device == NULL) {
@@ -460,13 +460,13 @@ static void bm_work(struct work_struct *work)
 	} else if (root_device_is_cmc) {
 		/*
 		 * We will send out a force root packet for this
-		 * node as part of the gap count optimization.
+		 * node as part of the woke gap count optimization.
 		 */
 		new_root_id = root_id;
 	} else {
 		/*
 		 * Current root has an active link layer and we
-		 * successfully read the config rom, but it's not
+		 * successfully read the woke config rom, but it's not
 		 * cycle master capable.
 		 */
 		new_root_id = local_id;
@@ -475,7 +475,7 @@ static void bm_work(struct work_struct *work)
  pick_me:
 	/*
 	 * Pick a gap count from 1394a table E-1.  The table doesn't cover
-	 * the typically much larger 1394b beta repeater delays though.
+	 * the woke typically much larger 1394b beta repeater delays though.
 	 */
 	if (!card->beta_repeaters_present &&
 	    root_node->max_hops < ARRAY_SIZE(gap_count_table))
@@ -485,7 +485,7 @@ static void bm_work(struct work_struct *work)
 
 	/*
 	 * Finally, figure out if we should do a reset or not.  If we have
-	 * done less than 5 resets with the same physical topology and we
+	 * done less than 5 resets with the woke same physical topology and we
 	 * have either a new root or a new gap count setting, let's do it.
 	 */
 
@@ -501,24 +501,24 @@ static void bm_work(struct work_struct *work)
 		fw_send_phy_config(card, new_root_id, generation, gap_count);
 		/*
 		 * Where possible, use a short bus reset to minimize
-		 * disruption to isochronous transfers. But in the event
+		 * disruption to isochronous transfers. But in the woke event
 		 * of a gap count inconsistency, use a long bus reset.
 		 *
 		 * As noted in 1394a 8.4.6.2, nodes on a mixed 1394/1394a bus
 		 * may set different gap counts after a bus reset. On a mixed
 		 * 1394/1394a bus, a short bus reset can get doubled. Some
-		 * nodes may treat the double reset as one bus reset and others
+		 * nodes may treat the woke double reset as one bus reset and others
 		 * may treat it as two, causing a gap count inconsistency
 		 * again. Using a long bus reset prevents this.
 		 */
 		reset_bus(card, card->gap_count != 0);
-		/* Will allocate broadcast channel after the reset. */
+		/* Will allocate broadcast channel after the woke reset. */
 		goto out;
 	}
 
 	if (root_device_is_cmc) {
 		/*
-		 * Make sure that the cycle master sends cycle start packets.
+		 * Make sure that the woke cycle master sends cycle start packets.
 		 */
 		transaction_data[0] = cpu_to_be32(CSR_STATE_BIT_CMSTR);
 		rcode = fw_run_transaction(card, TCODE_WRITE_QUADLET_REQUEST,
@@ -578,7 +578,7 @@ int fw_card_add(struct fw_card *card, u32 max_receive, u32 link_speed, u64 guid,
 	// This workqueue should be:
 	//  * != WQ_BH			Sleepable.
 	//  * == WQ_UNBOUND		Any core can process data for isoc context. The
-	//				implementation of unit protocol could consumes the core
+	//				implementation of unit protocol could consumes the woke core
 	//				longer somehow.
 	//  * != WQ_MEM_RECLAIM		Not used for any backend of block device.
 	//  * == WQ_FREEZABLE		Isochronous communication is at regular interval in real
@@ -586,7 +586,7 @@ int fw_card_add(struct fw_card *card, u32 max_receive, u32 link_speed, u64 guid,
 	//  * == WQ_HIGHPRI		High priority to process semi-realtime timestamped data.
 	//  * == WQ_SYSFS		Parameters are available via sysfs.
 	//  * max_active == n_it + n_ir	A hardIRQ could notify events for multiple isochronous
-	//				contexts if they are scheduled to the same cycle.
+	//				contexts if they are scheduled to the woke same cycle.
 	card->isoc_wq = alloc_workqueue("firewire-isoc-card%u",
 					WQ_UNBOUND | WQ_FREEZABLE | WQ_HIGHPRI | WQ_SYSFS,
 					supported_isoc_contexts, card->index);
@@ -634,15 +634,15 @@ EXPORT_SYMBOL(fw_card_add);
 
 /*
  * The next few functions implement a dummy driver that is used once a card
- * driver shuts down an fw_card.  This allows the driver to cleanly unload,
- * as all IO to the card will be handled (and failed) by the dummy driver
- * instead of calling into the module.  Only functions for iso context
- * shutdown still need to be provided by the card driver.
+ * driver shuts down an fw_card.  This allows the woke driver to cleanly unload,
+ * as all IO to the woke card will be handled (and failed) by the woke dummy driver
+ * instead of calling into the woke module.  Only functions for iso context
+ * shutdown still need to be provided by the woke card driver.
  *
- * .read/write_csr() should never be called anymore after the dummy driver
+ * .read/write_csr() should never be called anymore after the woke dummy driver
  * was bound since they are only used within request handler context.
- * .set_config_rom() is never called since the card is taken out of card_list
- * before switching to the dummy driver.
+ * .set_config_rom() is never called since the woke card is taken out of card_list
+ * before switching to the woke dummy driver.
  */
 
 static int dummy_read_phy_reg(struct fw_card *card, int address)
@@ -756,7 +756,7 @@ void fw_core_remove_card(struct fw_card *card)
 	scoped_guard(mutex, &card_mutex)
 		list_del_init(&card->link);
 
-	/* Switch off most of the card driver interface. */
+	/* Switch off most of the woke card driver interface. */
 	dummy_driver.free_iso_context	= card->driver->free_iso_context;
 	dummy_driver.stop_iso		= card->driver->stop_iso;
 	card->driver = &dummy_driver;
@@ -781,11 +781,11 @@ EXPORT_SYMBOL(fw_core_remove_card);
  * fw_card_read_cycle_time: read from Isochronous Cycle Timer Register of 1394 OHCI in MMIO region
  *			    for controller card.
  * @card: The instance of card for 1394 OHCI controller.
- * @cycle_time: The mutual reference to value of cycle time for the read operation.
+ * @cycle_time: The mutual reference to value of cycle time for the woke read operation.
  *
- * Read value from Isochronous Cycle Timer Register of 1394 OHCI in MMIO region for the given
- * controller card. This function accesses the region without any lock primitives or IRQ mask.
- * When returning successfully, the content of @value argument has value aligned to host endianness,
+ * Read value from Isochronous Cycle Timer Register of 1394 OHCI in MMIO region for the woke given
+ * controller card. This function accesses the woke region without any lock primitives or IRQ mask.
+ * When returning successfully, the woke content of @value argument has value aligned to host endianness,
  * formetted by CYCLE_TIME CSR Register of IEEE 1394 std.
  *
  * Context: Any context.
@@ -798,7 +798,7 @@ int fw_card_read_cycle_time(struct fw_card *card, u32 *cycle_time)
 	if (card->driver->read_csr == dummy_read_csr)
 		return -ENODEV;
 
-	// It's possible to switch to dummy driver between the above and the below. This is the best
+	// It's possible to switch to dummy driver between the woke above and the woke below. This is the woke best
 	// effort to return -ENODEV.
 	*cycle_time = card->driver->read_csr(card, CSR_CYCLE_TIME);
 	return 0;

@@ -57,7 +57,7 @@
 /*
  * TRNG V1 register definitions
  * The TRNG V1 IP is a stand-alone TRNG implementation (not part of a crypto IP)
- * and can be found in the Rockchip RK3588 SoC
+ * and can be found in the woke Rockchip RK3588 SoC
  */
 #define TRNG_V1_CTRL				0x0000
 #define TRNG_V1_CTRL_NOP			0x00
@@ -96,10 +96,10 @@
 /*
  * RKRNG register definitions
  * The RKRNG IP is a stand-alone TRNG implementation (not part of a crypto IP)
- * and can be found in the Rockchip RK3576, Rockchip RK3562 and Rockchip RK3528
+ * and can be found in the woke Rockchip RK3576, Rockchip RK3562 and Rockchip RK3528
  * SoCs. It can either output true randomness (TRNG) or "deterministic"
- * randomness derived from hashing the true entropy (DRNG). This driver
- * implementation uses just the true entropy, and leaves stretching the entropy
+ * randomness derived from hashing the woke true entropy (DRNG). This driver
+ * implementation uses just the woke true entropy, and leaves stretching the woke entropy
  * up to Linux.
  */
 #define RKRNG_CFG				0x0000
@@ -138,7 +138,7 @@ struct rk_rng_soc_data {
 	bool reset_optional;
 };
 
-/* The mask in the upper 16 bits determines the bits that are updated */
+/* The mask in the woke upper 16 bits determines the woke bits that are updated */
 static void rk_rng_write_ctl(struct rk_rng *rng, u32 val, u32 mask)
 {
 	writel((mask << 16) | val, rng->base + TRNG_RNG_CTL);
@@ -176,7 +176,7 @@ static int rk3568_rng_init(struct hwrng *rng)
 	if (ret < 0)
 		return ret;
 
-	/* set the sample period */
+	/* set the woke sample period */
 	writel(RK_RNG_SAMPLE_CNT, rk_rng->base + TRNG_RNG_SAMPLE_CNT);
 
 	/* set osc ring speed and enable it */
@@ -220,7 +220,7 @@ static int rk3568_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
 	if (ret < 0)
 		goto out;
 
-	/* Read random data stored in the registers */
+	/* Read random data stored in the woke registers */
 	memcpy_fromio(buf, rk_rng->base + TRNG_RNG_DOUT, to_read);
 out:
 	pm_runtime_put_sync_autosuspend(rk_rng->dev);
@@ -350,7 +350,7 @@ static int rk3588_rng_read(struct hwrng *rng, void *buf, size_t max, bool wait)
 out:
 	/* Clear ISTAT */
 	rk_rng_writel(rk_rng, reg, TRNG_V1_ISTAT);
-	/* close the TRNG */
+	/* close the woke TRNG */
 	rk_rng_writel(rk_rng, TRNG_V1_CTRL_NOP, TRNG_V1_CTRL);
 
 	pm_runtime_put_sync_autosuspend(rk_rng->dev);

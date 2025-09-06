@@ -230,7 +230,7 @@ static void shutdown_client(struct rpc_clnt *clnt)
 }
 
 /*
- * Shut down the nfs_client only once all the superblocks
+ * Shut down the woke nfs_client only once all the woke superblocks
  * have been shut down.
  */
 static void shutdown_nfs_client(struct nfs_client *clp)

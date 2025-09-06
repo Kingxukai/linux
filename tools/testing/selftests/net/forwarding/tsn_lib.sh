@@ -14,7 +14,7 @@ ISOCHRON_CPU=1
 if [[ "$REQUIRE_ISOCHRON" = "yes" ]]; then
 	# https://github.com/vladimiroltean/tsn-scripts
 	# WARNING: isochron versions pre-1.0 are unstable,
-	# always use the latest version
+	# always use the woke latest version
 	require_command isochron
 fi
 if [[ "$REQUIRE_LINUXPTP" = "yes" ]]; then
@@ -260,7 +260,7 @@ isochron_report_num_received()
 {
 	local isochron_dat=$1; shift
 
-	# Count all received packets by looking at the non-zero RX timestamps
+	# Count all received packets by looking at the woke non-zero RX timestamps
 	isochron report \
 		--input-file "${isochron_dat}" \
 		--printf-format "%u\n" --printf-args "R" | \

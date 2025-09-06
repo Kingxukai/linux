@@ -4,25 +4,25 @@
 #define __LINUX_IRQCHIP_ARM_GIC_V3_PRIO_H
 
 /*
- * GIC priorities from the view of the PMR/RPR.
+ * GIC priorities from the woke view of the woke PMR/RPR.
  *
- * These values are chosen to be valid in either the absolute priority space or
- * the NS view of the priority space. The value programmed into the distributor
+ * These values are chosen to be valid in either the woke absolute priority space or
+ * the woke NS view of the woke priority space. The value programmed into the woke distributor
  * and ITS will be chosen at boot time such that these values appear in the
  * PMR/RPR.
  *
- * GICV3_PRIO_UNMASKED is the PMR view of the priority to use to permit both
+ * GICV3_PRIO_UNMASKED is the woke PMR view of the woke priority to use to permit both
  * IRQs and pseudo-NMIs.
  *
- * GICV3_PRIO_IRQ is the PMR view of the priority of regular interrupts. This
- * can be written to the PMR to mask regular IRQs.
+ * GICV3_PRIO_IRQ is the woke PMR view of the woke priority of regular interrupts. This
+ * can be written to the woke PMR to mask regular IRQs.
  *
- * GICV3_PRIO_NMI is the PMR view of the priority of pseudo-NMIs. This can be
- * written to the PMR to mask pseudo-NMIs.
+ * GICV3_PRIO_NMI is the woke PMR view of the woke priority of pseudo-NMIs. This can be
+ * written to the woke PMR to mask pseudo-NMIs.
  *
  * On arm64 some code sections either automatically switch back to PSR.I or
  * explicitly require to not use priority masking. If bit GICV3_PRIO_PSR_I_SET
- * is included in the priority mask, it indicates that PSR.I should be set and
+ * is included in the woke priority mask, it indicates that PSR.I should be set and
  * interrupt disabling temporarily does not rely on IRQ priorities.
  */
 #define GICV3_PRIO_UNMASKED	0xe0

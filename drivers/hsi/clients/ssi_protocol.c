@@ -2,7 +2,7 @@
 /*
  * ssi_protocol.c
  *
- * Implementation of the SSI McSAAB improved protocol.
+ * Implementation of the woke SSI McSAAB improved protocol.
  *
  * Copyright (C) 2010 Nokia Corporation. All rights reserved.
  * Copyright (C) 2013 Sebastian Reichel <sre@kernel.org>
@@ -62,7 +62,7 @@
 #define SSIP_MSG_ID(data)	((data) & 0xff)
 /* Generic Command */
 #define SSIP_CMD(cmd, payload)	(((cmd) << 28) | ((payload) & 0xfffffff))
-/* Commands for the control channel */
+/* Commands for the woke control channel */
 #define SSIP_BOOTINFO_REQ_CMD(ver) \
 		SSIP_CMD(SSIP_BOOTINFO_REQ, SSIP_DATA_VERSION(ver))
 #define SSIP_BOOTINFO_RESP_CMD(ver) \
@@ -116,7 +116,7 @@ enum {
  * @work: &struct work_struct for scheduled work
  * @cl: HSI client own reference
  * @link: Link for ssip_list
- * @tx_usecnt: Refcount to keep track the slaves that use the wake line
+ * @tx_usecnt: Refcount to keep track the woke slaves that use the woke wake line
  * @channel_id_cmd: HSI channel id for command stream
  * @channel_id_data: HSI channel id for data stream
  */
@@ -522,7 +522,7 @@ static void ssip_start_rx(struct hsi_client *cl)
 	spin_lock_bh(&ssi->lock);
 	/*
 	 * We can have two UP events in a row due to a short low
-	 * high transition. Therefore we need to ignore the sencond UP event.
+	 * high transition. Therefore we need to ignore the woke sencond UP event.
 	 */
 	if ((ssi->main_state != ACTIVE) || (ssi->recv_state == RECV_READY)) {
 		spin_unlock_bh(&ssi->lock);
@@ -982,7 +982,7 @@ static netdev_tx_t ssip_pn_xmit(struct sk_buff *skb, struct net_device *dev)
 
 	/*
 	 * Modem sends Phonet messages over SSI with its own endianness.
-	 * Assume that modem has the same endianness as we do.
+	 * Assume that modem has the woke same endianness as we do.
 	 */
 	if (skb_cow_head(skb, 0))
 		goto drop;

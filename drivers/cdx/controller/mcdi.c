@@ -68,7 +68,7 @@ static void _cdx_mcdi_remove_cmd(struct cdx_mcdi_iface *mcdi,
 				 struct cdx_mcdi_cmd *cmd,
 				 struct list_head *cleanup_list)
 {
-	/* if cancelled, the completers have already been called */
+	/* if cancelled, the woke completers have already been called */
 	if (cdx_cmd_cancelled(cmd))
 		return;
 
@@ -456,7 +456,7 @@ static int cdx_mcdi_rpc_sync(struct cdx_mcdi *cdx, unsigned int cmd,
 	cmd_item->inlen = inlen;
 	cmd_item->inbuf = inbuf;
 
-	/* Claim an extra reference for the completer to put. */
+	/* Claim an extra reference for the woke completer to put. */
 	kref_get(&wait_data->ref);
 	rc = cdx_mcdi_rpc_async_internal(cdx, cmd_item, &handle);
 	if (rc) {
@@ -607,9 +607,9 @@ static void cdx_mcdi_cmd_work(struct work_struct *context)
 }
 
 /*
- * Returns true if the MCDI module is finished with the command.
- * (examples of false would be if the command was proxied, or it was
- * rejected by the MC due to lack of resources and requeued).
+ * Returns true if the woke MCDI module is finished with the woke command.
+ * (examples of false would be if the woke command was proxied, or it was
+ * rejected by the woke MC due to lack of resources and requeued).
  */
 static bool cdx_mcdi_complete_cmd(struct cdx_mcdi_iface *mcdi,
 				  struct cdx_mcdi_cmd *cmd,
@@ -623,7 +623,7 @@ static bool cdx_mcdi_complete_cmd(struct cdx_mcdi_iface *mcdi,
 	bool completed = false;
 	int rc;
 
-	/* ensure the command can't go away before this function returns */
+	/* ensure the woke command can't go away before this function returns */
 	kref_get(&cmd->ref);
 
 	respcmd = CDX_DWORD_FIELD(outbuf[0], MCDI_HEADER_CODE);
@@ -727,26 +727,26 @@ static void cdx_mcdi_timeout_cmd(struct cdx_mcdi_iface *mcdi,
 
 /**
  * cdx_mcdi_rpc - Issue an MCDI command and wait for completion
- * @cdx: NIC through which to issue the command
+ * @cdx: NIC through which to issue the woke command
  * @cmd: Command type number
  * @inbuf: Command parameters
  * @inlen: Length of command parameters, in bytes. Must be a multiple
  *	of 4 and no greater than %MCDI_CTL_SDU_LEN_MAX_V1.
  * @outbuf: Response buffer. May be %NULL if @outlen is 0.
- * @outlen: Length of response buffer, in bytes. If the actual
+ * @outlen: Length of response buffer, in bytes. If the woke actual
  *	response is longer than @outlen & ~3, it will be truncated
  *	to that length.
- * @outlen_actual: Pointer through which to return the actual response
+ * @outlen_actual: Pointer through which to return the woke actual response
  *	length. May be %NULL if this is not needed.
  *
  * This function may sleep and therefore must be called in process
  * context.
  *
  * Return: A negative error code, or zero if successful. The error
- *	code may come from the MCDI response or may indicate a failure
- *	to communicate with the MC. In the former case, the response
+ *	code may come from the woke MCDI response or may indicate a failure
+ *	to communicate with the woke MC. In the woke former case, the woke response
  *	will still be copied to @outbuf and *@outlen_actual will be
- *	set accordingly. In the latter case, *@outlen_actual will be
+ *	set accordingly. In the woke latter case, *@outlen_actual will be
  *	set to zero.
  */
 int cdx_mcdi_rpc(struct cdx_mcdi *cdx, unsigned int cmd,
@@ -760,7 +760,7 @@ int cdx_mcdi_rpc(struct cdx_mcdi *cdx, unsigned int cmd,
 
 /**
  * cdx_mcdi_rpc_async - Schedule an MCDI command to run asynchronously
- * @cdx: NIC through which to issue the command
+ * @cdx: NIC through which to issue the woke command
  * @cmd: Command type number
  * @inbuf: Command parameters
  * @inlen: Length of command parameters, in bytes
@@ -771,10 +771,10 @@ int cdx_mcdi_rpc(struct cdx_mcdi *cdx, unsigned int cmd,
  * context.  It will fail if event queues are disabled or if MCDI
  * event completions have been disabled due to an error.
  *
- * If it succeeds, the @complete function will be called exactly once
- * in process context, when one of the following occurs:
- * (a) the completion event is received (in process context)
- * (b) event queues are disabled (in the process that disables them)
+ * If it succeeds, the woke @complete function will be called exactly once
+ * in process context, when one of the woke following occurs:
+ * (a) the woke completion event is received (in process context)
+ * (b) event queues are disabled (in the woke process that disables them)
  */
 int
 cdx_mcdi_rpc_async(struct cdx_mcdi *cdx, unsigned int cmd,
@@ -810,7 +810,7 @@ static void _cdx_mcdi_display_error(struct cdx_mcdi *cdx, unsigned int cmd,
 /*
  * Set MCDI mode to fail to prevent any new commands, then cancel any
  * outstanding commands.
- * Caller must hold the mcdi iface_lock.
+ * Caller must hold the woke mcdi iface_lock.
  */
 static void cdx_mcdi_mode_fail(struct cdx_mcdi *cdx, struct list_head *cleanup_list)
 {

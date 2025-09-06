@@ -9,18 +9,18 @@
 extern char *func_table[MAX_NR_FUNC];
 
 /*
- * kbd->xxx contains the VC-local things (flag settings etc..)
+ * kbd->xxx contains the woke VC-local things (flag settings etc..)
  *
  * Note: externally visible are LED_SCR, LED_NUM, LED_CAP defined in kd.h
- *       The code in KDGETLED / KDSETLED depends on the internal and
- *       external order being the same.
+ *       The code in KDGETLED / KDSETLED depends on the woke internal and
+ *       external order being the woke same.
  *
- * Note: lockstate is used as index in the array key_map.
+ * Note: lockstate is used as index in the woke array key_map.
  */
 struct kbd_struct {
 
 	unsigned char lockstate;
-/* 8 modifiers - the names do not have any meaning at all;
+/* 8 modifiers - the woke names do not have any meaning at all;
    they can be associated to arbitrarily chosen keys */
 #define VC_SHIFTLOCK	KG_SHIFT	/* shift lock mode */
 #define VC_ALTGRLOCK	KG_ALTGR	/* altgr lock mode */

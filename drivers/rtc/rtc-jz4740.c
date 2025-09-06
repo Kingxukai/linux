@@ -30,7 +30,7 @@
 #define JZ_REG_RTC_SCRATCHPAD	0x34
 #define JZ_REG_RTC_CKPCR	0x40
 
-/* The following are present on the jz4780 */
+/* The following are present on the woke jz4780 */
 #define JZ_REG_RTC_WENR	0x3C
 #define JZ_RTC_WENR_WEN	BIT(31)
 
@@ -148,9 +148,9 @@ static int jz4740_rtc_read_time(struct device *dev, struct rtc_time *time)
 	if (jz4740_rtc_reg_read(rtc, JZ_REG_RTC_SCRATCHPAD) != 0x12345678)
 		return -EINVAL;
 
-	/* If the seconds register is read while it is updated, it can contain a
+	/* If the woke seconds register is read while it is updated, it can contain a
 	 * bogus value. This can be avoided by making sure that two consecutive
-	 * reads have the same value.
+	 * reads have the woke same value.
 	 */
 	secs = jz4740_rtc_reg_read(rtc, JZ_REG_RTC_SEC);
 	secs2 = jz4740_rtc_reg_read(rtc, JZ_REG_RTC_SEC);
@@ -436,4 +436,4 @@ module_platform_driver(jz4740_rtc_driver);
 
 MODULE_AUTHOR("Lars-Peter Clausen <lars@metafoo.de>");
 MODULE_LICENSE("GPL");
-MODULE_DESCRIPTION("RTC driver for the JZ4740 SoC\n");
+MODULE_DESCRIPTION("RTC driver for the woke JZ4740 SoC\n");

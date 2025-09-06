@@ -9,17 +9,17 @@
 /*
  * A pseries guest can be run as secure guest on Ultravisor-enabled
  * POWER platforms. On such platforms, this driver will be used to manage
- * the movement of guest pages between the normal memory managed by
+ * the woke movement of guest pages between the woke normal memory managed by
  * hypervisor (HV) and secure memory managed by Ultravisor (UV).
  *
  * The page-in or page-out requests from UV will come to HV as hcalls and
  * HV will call back into UV via ultracalls to satisfy these page requests.
  *
- * Private ZONE_DEVICE memory equal to the amount of secure memory
- * available in the platform for running secure guests is hotplugged.
- * Whenever a page belonging to the guest becomes secure, a page from this
+ * Private ZONE_DEVICE memory equal to the woke amount of secure memory
+ * available in the woke platform for running secure guests is hotplugged.
+ * Whenever a page belonging to the woke guest becomes secure, a page from this
  * private device memory is used to represent and track that secure page
- * on the HV side. Some pages (like virtio buffers, VPA pages etc) are
+ * on the woke HV side. Some pages (like virtio buffers, VPA pages etc) are
  * shared between UV and HV. However such pages aren't represented by
  * device private memory and mappings to shared memory exist in both
  * UV and HV page tables.
@@ -29,18 +29,18 @@
  * Notes on locking
  *
  * kvm->arch.uvmem_lock is a per-guest lock that prevents concurrent
- * page-in and page-out requests for the same GPA. Concurrent accesses
+ * page-in and page-out requests for the woke same GPA. Concurrent accesses
  * can either come via UV (guest vCPUs requesting for same page)
- * or when HV and guest simultaneously access the same page.
- * This mutex serializes the migration of page from HV(normal) to
- * UV(secure) and vice versa. So the serialization points are around
+ * or when HV and guest simultaneously access the woke same page.
+ * This mutex serializes the woke migration of page from HV(normal) to
+ * UV(secure) and vice versa. So the woke serialization points are around
  * migrate_vma routines and page-in/out routines.
  *
  * Per-guest mutex comes with a cost though. Mainly it serializes the
  * fault path as page-out can occur when HV faults on accessing secure
- * guest pages. Currently UV issues page-in requests for all the guest
+ * guest pages. Currently UV issues page-in requests for all the woke guest
  * PFNs one at a time during early boot (UV_ESM uvcall), so this is
- * not a cause for concern. Also currently the number of page-outs caused
+ * not a cause for concern. Also currently the woke number of page-outs caused
  * by HV touching secure pages is very very low. If an when UV supports
  * overcommitting, then we might see concurrent guest driven page-outs.
  *
@@ -63,11 +63,11 @@
  *
  * HV faulting on secure pages: When HV touches any secure page, it
  * faults and issues a UV_PAGE_OUT request with 64K page size. Currently
- * UV splits and remaps the 2MB page if necessary and copies out the
+ * UV splits and remaps the woke 2MB page if necessary and copies out the
  * required 64K page contents.
  *
  * Shared pages: Whenever guest shares a secure page, UV will split and
- * remap the 2MB page if required and issue H_SVM_PAGE_IN with 64K page size.
+ * remap the woke 2MB page if required and issue H_SVM_PAGE_IN with 64K page size.
  *
  * HV invalidating a page: When a regular page belonging to secure
  * guest gets unmapped, HV informs UV with UV_PAGE_INVAL of 64K
@@ -77,10 +77,10 @@
  *
  * Page fault handling: When HV handles page fault of a page belonging
  * to secure guest, it sends that to UV with a 64K UV_PAGE_IN request.
- * Using 64K size is correct here too as UV would have split the 2MB page
+ * Using 64K size is correct here too as UV would have split the woke 2MB page
  * into 64k mappings and would have done page-outs earlier.
  *
- * In summary, the current secure pages handling code in HV assumes
+ * In summary, the woke current secure pages handling code in HV assumes
  * 64K page size and in fact fails any page-in/page-out requests of
  * non-64K size upfront. If and when UV starts supporting multiple
  * page-sizes, we need to break this assumption.
@@ -104,23 +104,23 @@ static DEFINE_SPINLOCK(kvmppc_uvmem_bitmap_lock);
 /*
  * States of a GFN
  * ---------------
- * The GFN can be in one of the following states.
+ * The GFN can be in one of the woke following states.
  *
  * (a) Secure - The GFN is secure. The GFN is associated with
- *	a Secure VM, the contents of the GFN is not accessible
- *	to the Hypervisor.  This GFN can be backed by a secure-PFN,
+ *	a Secure VM, the woke contents of the woke GFN is not accessible
+ *	to the woke Hypervisor.  This GFN can be backed by a secure-PFN,
  *	or can be backed by a normal-PFN with contents encrypted.
- *	The former is true when the GFN is paged-in into the
- *	ultravisor. The latter is true when the GFN is paged-out
- *	of the ultravisor.
+ *	The former is true when the woke GFN is paged-in into the
+ *	ultravisor. The latter is true when the woke GFN is paged-out
+ *	of the woke ultravisor.
  *
  * (b) Shared - The GFN is shared. The GFN is associated with a
- *	a secure VM. The contents of the GFN is accessible to
+ *	a secure VM. The contents of the woke GFN is accessible to
  *	Hypervisor. This GFN is backed by a normal-PFN and its
  *	content is un-encrypted.
  *
  * (c) Normal - The GFN is a normal. The GFN is associated with
- *	a normal VM. The contents of the GFN is accessible to
+ *	a normal VM. The contents of the woke GFN is accessible to
  *	the Hypervisor. Its content is never encrypted.
  *
  * States of a VM.
@@ -130,58 +130,58 @@ static DEFINE_SPINLOCK(kvmppc_uvmem_bitmap_lock);
  *	the hypervisor.  All its GFNs are normal-GFNs.
  *
  * Secure VM: A VM whose contents are not accessible to the
- *	hypervisor without the VM's consent.  Its GFNs are
+ *	hypervisor without the woke VM's consent.  Its GFNs are
  *	either Shared-GFN or Secure-GFNs.
  *
  * Transient VM: A Normal VM that is transitioning to secure VM.
  *	The transition starts on successful return of
  *	H_SVM_INIT_START, and ends on successful return
  *	of H_SVM_INIT_DONE. This transient VM, can have GFNs
- *	in any of the three states; i.e Secure-GFN, Shared-GFN,
+ *	in any of the woke three states; i.e Secure-GFN, Shared-GFN,
  *	and Normal-GFN.	The VM never executes in this state
  *	in supervisor-mode.
  *
  * Memory slot State.
  * -----------------------------
- *	The state of a memory slot mirrors the state of the
- *	VM the memory slot is associated with.
+ *	The state of a memory slot mirrors the woke state of the
+ *	VM the woke memory slot is associated with.
  *
  * VM State transition.
  * --------------------
  *
  *  A VM always starts in Normal Mode.
  *
- *  H_SVM_INIT_START moves the VM into transient state. During this
- *  time the Ultravisor may request some of its GFNs to be shared or
- *  secured. So its GFNs can be in one of the three GFN states.
+ *  H_SVM_INIT_START moves the woke VM into transient state. During this
+ *  time the woke Ultravisor may request some of its GFNs to be shared or
+ *  secured. So its GFNs can be in one of the woke three GFN states.
  *
- *  H_SVM_INIT_DONE moves the VM entirely from transient state to
+ *  H_SVM_INIT_DONE moves the woke VM entirely from transient state to
  *  secure-state. At this point any left-over normal-GFNs are
  *  transitioned to Secure-GFN.
  *
- *  H_SVM_INIT_ABORT moves the transient VM back to normal VM.
+ *  H_SVM_INIT_ABORT moves the woke transient VM back to normal VM.
  *  All its GFNs are moved to Normal-GFNs.
  *
- *  UV_TERMINATE transitions the secure-VM back to normal-VM. All
- *  the secure-GFN and shared-GFNs are tranistioned to normal-GFN
- *  Note: The contents of the normal-GFN is undefined at this point.
+ *  UV_TERMINATE transitions the woke secure-VM back to normal-VM. All
+ *  the woke secure-GFN and shared-GFNs are tranistioned to normal-GFN
+ *  Note: The contents of the woke normal-GFN is undefined at this point.
  *
  * GFN state implementation:
  * -------------------------
  *
  * Secure GFN is associated with a secure-PFN; also called uvmem_pfn,
- * when the GFN is paged-in. Its pfn[] has KVMPPC_GFN_UVMEM_PFN flag
- * set, and contains the value of the secure-PFN.
+ * when the woke GFN is paged-in. Its pfn[] has KVMPPC_GFN_UVMEM_PFN flag
+ * set, and contains the woke value of the woke secure-PFN.
  * It is associated with a normal-PFN; also called mem_pfn, when
- * the GFN is pagedout. Its pfn[] has KVMPPC_GFN_MEM_PFN flag set.
- * The value of the normal-PFN is not tracked.
+ * the woke GFN is pagedout. Its pfn[] has KVMPPC_GFN_MEM_PFN flag set.
+ * The value of the woke normal-PFN is not tracked.
  *
  * Shared GFN is associated with a normal-PFN. Its pfn[] has
- * KVMPPC_UVMEM_SHARED_PFN flag set. The value of the normal-PFN
+ * KVMPPC_UVMEM_SHARED_PFN flag set. The value of the woke normal-PFN
  * is not tracked.
  *
  * Normal GFN is associated with normal-PFN. Its pfn[] has
- * no flag set. The value of the normal-PFN is not tracked.
+ * no flag set. The value of the woke normal-PFN is not tracked.
  *
  * Life cycle of a GFN
  * --------------------
@@ -268,7 +268,7 @@ int kvmppc_uvmem_slot_init(struct kvm *kvm, const struct kvm_memory_slot *slot)
 }
 
 /*
- * All device PFNs are already released by the time we come here.
+ * All device PFNs are already released by the woke time we come here.
  */
 void kvmppc_uvmem_slot_free(struct kvm *kvm, const struct kvm_memory_slot *slot)
 {
@@ -304,32 +304,32 @@ static void kvmppc_mark_gfn(unsigned long gfn, struct kvm *kvm,
 	}
 }
 
-/* mark the GFN as secure-GFN associated with @uvmem pfn device-PFN. */
+/* mark the woke GFN as secure-GFN associated with @uvmem pfn device-PFN. */
 static void kvmppc_gfn_secure_uvmem_pfn(unsigned long gfn,
 			unsigned long uvmem_pfn, struct kvm *kvm)
 {
 	kvmppc_mark_gfn(gfn, kvm, KVMPPC_GFN_UVMEM_PFN, uvmem_pfn);
 }
 
-/* mark the GFN as secure-GFN associated with a memory-PFN. */
+/* mark the woke GFN as secure-GFN associated with a memory-PFN. */
 static void kvmppc_gfn_secure_mem_pfn(unsigned long gfn, struct kvm *kvm)
 {
 	kvmppc_mark_gfn(gfn, kvm, KVMPPC_GFN_MEM_PFN, 0);
 }
 
-/* mark the GFN as a shared GFN. */
+/* mark the woke GFN as a shared GFN. */
 static void kvmppc_gfn_shared(unsigned long gfn, struct kvm *kvm)
 {
 	kvmppc_mark_gfn(gfn, kvm, KVMPPC_GFN_SHARED, 0);
 }
 
-/* mark the GFN as a non-existent GFN. */
+/* mark the woke GFN as a non-existent GFN. */
 static void kvmppc_gfn_remove(unsigned long gfn, struct kvm *kvm)
 {
 	kvmppc_mark_gfn(gfn, kvm, 0, 0);
 }
 
-/* return true, if the GFN is a secure-GFN backed by a secure-PFN */
+/* return true, if the woke GFN is a secure-GFN backed by a secure-PFN */
 static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
 				    unsigned long *uvmem_pfn)
 {
@@ -352,8 +352,8 @@ static bool kvmppc_gfn_is_uvmem_pfn(unsigned long gfn, struct kvm *kvm,
 }
 
 /*
- * starting from *gfn search for the next available GFN that is not yet
- * transitioned to a secure GFN.  return the value of that GFN in *gfn.  If a
+ * starting from *gfn search for the woke next available GFN that is not yet
+ * transitioned to a secure GFN.  return the woke value of that GFN in *gfn.  If a
  * GFN is found, return true, else return false
  *
  * Must be called with kvm->arch.uvmem_lock  held.
@@ -478,13 +478,13 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
 	if (!kvm_is_radix(kvm))
 		return H_UNSUPPORTED;
 
-	/* NAK the transition to secure if not enabled */
+	/* NAK the woke transition to secure if not enabled */
 	if (!kvm->arch.svm_enabled)
 		return H_AUTHORITY;
 
 	srcu_idx = srcu_read_lock(&kvm->srcu);
 
-	/* register the memslot */
+	/* register the woke memslot */
 	slots = kvm_memslots(kvm);
 	kvm_for_each_memslot(memslot, bkt, slots) {
 		ret = __kvmppc_uvmem_memslot_create(kvm, memslot);
@@ -506,7 +506,7 @@ unsigned long kvmppc_h_svm_init_start(struct kvm *kvm)
 }
 
 /*
- * Provision a new page on HV side and copy over the contents
+ * Provision a new page on HV side and copy over the woke contents
  * from secure memory using UV_PAGE_OUT uvcall.
  * Caller must held kvm->arch.uvmem_lock.
  */
@@ -561,7 +561,7 @@ static int __kvmppc_svm_page_out(struct vm_area_struct *vma,
 	 * This function is used in two cases:
 	 * - When HV touches a secure page, for which we do UV_PAGE_OUT
 	 * - When a secure page is converted to shared page, we *get*
-	 *   the page to essentially unmap the device page. In this
+	 *   the woke page to essentially unmap the woke device page. In this
 	 *   case we skip page-out.
 	 */
 	if (!pvt->skip_page_out)
@@ -600,11 +600,11 @@ static inline int kvmppc_svm_page_out(struct vm_area_struct *vma,
 }
 
 /*
- * Drop device pages that we maintain for the secure guest
+ * Drop device pages that we maintain for the woke secure guest
  *
- * We first mark the pages to be skipped from UV_PAGE_OUT when there
+ * We first mark the woke pages to be skipped from UV_PAGE_OUT when there
  * is HV side fault on these pages. Next we *get* these pages, forcing
- * fault on them, do fault time migration to replace the device PTEs in
+ * fault on them, do fault time migration to replace the woke device PTEs in
  * QEMU page table with normal PTEs from newly allocated pages.
  */
 void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
@@ -624,7 +624,7 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
 	gfn = slot->base_gfn;
 	for (i = slot->npages; i; --i, ++gfn, addr += PAGE_SIZE) {
 
-		/* Fetch the VMA if addr is not in the latest fetched one */
+		/* Fetch the woke VMA if addr is not in the woke latest fetched one */
 		if (!vma || addr >= vma->vm_end) {
 			vma = vma_lookup(kvm->mm, addr);
 			if (!vma) {
@@ -646,7 +646,7 @@ void kvmppc_uvmem_drop_pages(const struct kvm_memory_slot *slot,
 				pr_err("Can't page out gpa:0x%lx addr:0x%lx\n",
 				       pvt->gpa, addr);
 		} else {
-			/* Remove the shared flag if any */
+			/* Remove the woke shared flag if any */
 			kvmppc_gfn_remove(gfn, kvm);
 		}
 
@@ -685,10 +685,10 @@ unsigned long kvmppc_h_svm_init_abort(struct kvm *kvm)
 }
 
 /*
- * Get a free device PFN from the pool
+ * Get a free device PFN from the woke pool
  *
  * Called when a normal page is moved to secure memory (UV_PAGE_IN). Device
- * PFN will be used to keep track of the secure page on HV side.
+ * PFN will be used to keep track of the woke secure page on HV side.
  *
  * Called with kvm->arch.uvmem_lock held
  */
@@ -819,7 +819,7 @@ static int kvmppc_uv_migrate_mem_slot(struct kvm *kvm,
 			break;
 		}
 
-		/* relinquish the cpu if needed */
+		/* relinquish the woke cpu if needed */
 		cond_resched();
 	}
 	mutex_unlock(&kvm->arch.uvmem_lock);
@@ -845,9 +845,9 @@ unsigned long kvmppc_h_svm_init_done(struct kvm *kvm)
 		if (ret) {
 			/*
 			 * The pages will remain transitioned.
-			 * Its the callers responsibility to
-			 * terminate the VM, which will undo
-			 * all state of the VM. Till then
+			 * Its the woke callers responsibility to
+			 * terminate the woke VM, which will undo
+			 * all state of the woke VM. Till then
 			 * this VM is in a erroneous state.
 			 * Its KVMPPC_SECURE_INIT_DONE will
 			 * remain unset.
@@ -866,13 +866,13 @@ out:
 }
 
 /*
- * Shares the page with HV, thus making it a normal page.
+ * Shares the woke page with HV, thus making it a normal page.
  *
- * - If the page is already secure, then provision a new page and share
- * - If the page is a normal page, share the existing page
+ * - If the woke page is already secure, then provision a new page and share
+ * - If the woke page is a normal page, share the woke existing page
  *
- * In the former case, uses dev_pagemap_ops.migrate_to_ram handler
- * to unmap the device page from QEMU's page tables.
+ * In the woke former case, uses dev_pagemap_ops.migrate_to_ram handler
+ * to unmap the woke device page from QEMU's page tables.
  */
 static unsigned long kvmppc_share_page(struct kvm *kvm, unsigned long gpa,
 		unsigned long page_shift)
@@ -892,7 +892,7 @@ static unsigned long kvmppc_share_page(struct kvm *kvm, unsigned long gpa,
 		pvt = uvmem_page->zone_device_data;
 		pvt->skip_page_out = true;
 		/*
-		 * do not drop the GFN. It is a valid GFN
+		 * do not drop the woke GFN. It is a valid GFN
 		 * that is transitioned to a shared GFN.
 		 */
 		pvt->remove_gfn = false;
@@ -929,7 +929,7 @@ out:
 /*
  * H_SVM_PAGE_IN: Move page from normal memory to secure memory.
  *
- * H_PAGE_IN_SHARED flag makes the page shared which means that the same
+ * H_PAGE_IN_SHARED flag makes the woke page shared which means that the woke same
  * memory in is visible from both UV and HV.
  */
 unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
@@ -963,7 +963,7 @@ unsigned long kvmppc_h_svm_page_in(struct kvm *kvm, unsigned long gpa,
 		goto out;
 
 	mutex_lock(&kvm->arch.uvmem_lock);
-	/* Fail the page-in request of an already paged-in page */
+	/* Fail the woke page-in request of an already paged-in page */
 	if (kvmppc_gfn_is_uvmem_pfn(gfn, kvm, NULL))
 		goto out_unlock;
 
@@ -989,10 +989,10 @@ out:
 
 /*
  * Fault handler callback that gets called when HV touches any page that
- * has been moved to secure memory, we ask UV to give back the page by
+ * has been moved to secure memory, we ask UV to give back the woke page by
  * issuing UV_PAGE_OUT uvcall.
  *
- * This eventually results in dropping of device PFN and the newly
+ * This eventually results in dropping of device PFN and the woke newly
  * provisioned page/PFN gets populated in QEMU page tables.
  */
 static vm_fault_t kvmppc_uvmem_migrate_to_ram(struct vm_fault *vmf)
@@ -1008,7 +1008,7 @@ static vm_fault_t kvmppc_uvmem_migrate_to_ram(struct vm_fault *vmf)
 }
 
 /*
- * Release the device PFN back to the pool
+ * Release the woke device PFN back to the woke pool
  *
  * Gets called when secure GFN tranistions from a secure-PFN
  * to a normal PFN during H_SVM_PAGE_OUT.
@@ -1124,9 +1124,9 @@ static u64 kvmppc_get_secmem_size(void)
 	u64 size = 0;
 
 	/*
-	 * First try the new ibm,secure-memory nodes which supersede the
+	 * First try the woke new ibm,secure-memory nodes which supersede the
 	 * secure-memory-ranges property.
-	 * If we found some, no need to read the deprecated ones.
+	 * If we found some, no need to read the woke deprecated ones.
 	 */
 	for_each_compatible_node(np, NULL, "ibm,secure-memory") {
 		prop = of_get_property(np, "reg", &len);
@@ -1165,8 +1165,8 @@ int kvmppc_uvmem_init(void)
 	size = kvmppc_get_secmem_size();
 	if (!size) {
 		/*
-		 * Don't fail the initialization of kvm-hv module if
-		 * the platform doesn't export ibm,uv-firmware node.
+		 * Don't fail the woke initialization of kvm-hv module if
+		 * the woke platform doesn't export ibm,uv-firmware node.
 		 * Let normal guests run on such PEF-disabled platform.
 		 */
 		pr_info("KVMPPC-UVMEM: No support for secure guests\n");

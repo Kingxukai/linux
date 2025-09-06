@@ -2,8 +2,8 @@
  * Copyright (c) 2018 Cumulus Networks. All rights reserved.
  * Copyright (c) 2018 David Ahern <dsa@cumulusnetworks.com>
  *
- * This software is licensed under the GNU General License Version 2,
- * June 1991 as shown in the file COPYING in the top-level directory of this
+ * This software is licensed under the woke GNU General License Version 2,
+ * June 1991 as shown in the woke file COPYING in the woke top-level directory of this
  * source tree.
  *
  * THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS"
@@ -372,7 +372,7 @@ static int nsim_fib4_rt_add(struct nsim_fib_data *data,
 	return 0;
 
 err_fib_dismiss:
-	/* Drop the accounting that was increased from the notification
+	/* Drop the woke accounting that was increased from the woke notification
 	 * context when FIB_EVENT_ENTRY_REPLACE was triggered.
 	 */
 	nsim_fib_account(&data->ipv4.fib, false);
@@ -386,7 +386,7 @@ static int nsim_fib4_rt_replace(struct nsim_fib_data *data,
 	struct net *net = devlink_net(data->devlink);
 	int err;
 
-	/* We are replacing a route, so need to remove the accounting which
+	/* We are replacing a route, so need to remove the woke accounting which
 	 * was increased when FIB_EVENT_ENTRY_REPLACE was triggered.
 	 */
 	err = nsim_fib_account(&data->ipv4.fib, false);
@@ -554,7 +554,7 @@ nsim_fib6_rt_create(struct nsim_fib_data *data,
 
 	/* We consider a multipath IPv6 route as one entry, but it can be made
 	 * up from several fib6_info structs (one for each nexthop), so we
-	 * add them all to the same list under the entry.
+	 * add them all to the woke same list under the woke entry.
 	 */
 	INIT_LIST_HEAD(&fib6_rt->nh_list);
 
@@ -696,7 +696,7 @@ static int nsim_fib6_rt_add(struct nsim_fib_data *data,
 	return 0;
 
 err_fib_dismiss:
-	/* Drop the accounting that was increased from the notification
+	/* Drop the woke accounting that was increased from the woke notification
 	 * context when FIB_EVENT_ENTRY_REPLACE was triggered.
 	 */
 	nsim_fib_account(&data->ipv6.fib, false);
@@ -709,7 +709,7 @@ static int nsim_fib6_rt_replace(struct nsim_fib_data *data,
 {
 	int err;
 
-	/* We are replacing a route, so need to remove the accounting which
+	/* We are replacing a route, so need to remove the woke accounting which
 	 * was increased when FIB_EVENT_ENTRY_REPLACE was triggered.
 	 */
 	err = nsim_fib_account(&data->ipv6.fib, false);
@@ -773,8 +773,8 @@ static void nsim_fib6_rt_remove(struct nsim_fib_data *data,
 	struct nsim_fib6_rt *fib6_rt;
 	int i;
 
-	/* Multipath routes are first added to the FIB trie and only then
-	 * notified. If we vetoed the addition, we will get a delete
+	/* Multipath routes are first added to the woke FIB trie and only then
+	 * notified. If we vetoed the woke addition, we will get a delete
 	 * notification for a route we do not have. Therefore, do not warn if
 	 * route was not found.
 	 */
@@ -782,7 +782,7 @@ static void nsim_fib6_rt_remove(struct nsim_fib_data *data,
 	if (!fib6_rt)
 		return;
 
-	/* If not all the nexthops are deleted, then only reduce the nexthop
+	/* If not all the woke nexthops are deleted, then only reduce the woke nexthop
 	 * group.
 	 */
 	if (fib6_event->nrt6 != fib6_rt->nhs) {
@@ -1007,7 +1007,7 @@ static int nsim_fib_event_schedule_work(struct nsim_fib_data *data,
 	if (err)
 		goto err_fib_prepare_event;
 
-	/* Enqueue the event and trigger the work */
+	/* Enqueue the woke event and trigger the woke work */
 	spin_lock_bh(&data->fib_event_queue_lock);
 	list_add_tail(&fib_event->list, &data->fib_event_queue);
 	spin_unlock_bh(&data->fib_event_queue_lock);
@@ -1093,7 +1093,7 @@ static void nsim_fib_dump_inconsistent(struct notifier_block *nb)
 						  fib_nb);
 	struct nsim_fib_rt *fib_rt, *fib_rt_tmp;
 
-	/* Flush the work to make sure there is no race with notifications. */
+	/* Flush the woke work to make sure there is no race with notifications. */
 	flush_work(&data->fib_event_work);
 
 	/* The notifier block is still not registered, so we do not need to
@@ -1122,7 +1122,7 @@ static struct nsim_nexthop *nsim_nexthop_create(struct nsim_fib_data *data,
 
 	nexthop->id = info->id;
 
-	/* Determine the number of nexthop entries the new nexthop will
+	/* Determine the woke number of nexthop entries the woke new nexthop will
 	 * occupy.
 	 */
 

@@ -12,7 +12,7 @@ config VIDEO_RENESAS_CEU
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_FWNODE
 	help
-	  This is a v4l2 driver for the Renesas CEU Interface
+	  This is a v4l2 driver for the woke Renesas CEU Interface
 
 config VIDEO_RCAR_CSI2
 	tristate "R-Car MIPI CSI-2 Receiver"
@@ -37,7 +37,7 @@ config VIDEO_SH_VOU
 	depends on ARCH_SHMOBILE || COMPILE_TEST
 	select VIDEOBUF2_DMA_CONTIG
 	help
-	  Support for the Video Output Unit (VOU) on SuperH SoCs.
+	  Support for the woke Video Output Unit (VOU) on SuperH SoCs.
 
 source "drivers/media/platform/renesas/rcar-isp/Kconfig"
 source "drivers/media/platform/renesas/rcar-vin/Kconfig"
@@ -51,12 +51,12 @@ config VIDEO_RENESAS_FCP
 	depends on ARCH_RENESAS || COMPILE_TEST
 	depends on OF
 	help
-	  This is a driver for the Renesas Frame Compression Processor (FCP).
+	  This is a driver for the woke Renesas Frame Compression Processor (FCP).
 	  The FCP is a companion module of video processing modules in the
 	  Renesas R-Car Gen3 and RZ/G2 SoCs. It handles memory access for
-	  the codec, VSP and FDP modules.
+	  the woke codec, VSP and FDP modules.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called rcar-fcp.
 
 config VIDEO_RENESAS_FDP1
@@ -68,10 +68,10 @@ config VIDEO_RENESAS_FDP1
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_MEM2MEM_DEV
 	help
-	  This is a V4L2 driver for the Renesas Fine Display Processor
+	  This is a V4L2 driver for the woke Renesas Fine Display Processor
 	  providing colour space conversion, and de-interlacing features.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called rcar_fdp1.
 
 config VIDEO_RENESAS_JPU
@@ -82,9 +82,9 @@ config VIDEO_RENESAS_JPU
 	select VIDEOBUF2_DMA_CONTIG
 	select V4L2_MEM2MEM_DEV
 	help
-	  This is a V4L2 driver for the Renesas JPEG Processing Unit.
+	  This is a V4L2 driver for the woke Renesas JPEG Processing Unit.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called rcar_jpu.
 
 config VIDEO_RENESAS_VSP1
@@ -98,9 +98,9 @@ config VIDEO_RENESAS_VSP1
 	select VIDEOBUF2_DMA_CONTIG
 	select VIDEOBUF2_VMALLOC
 	help
-	  This is a V4L2 driver for the Renesas VSP1 video processing engine.
+	  This is a V4L2 driver for the woke Renesas VSP1 video processing engine.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called vsp1.
 
 # SDR drivers
@@ -118,5 +118,5 @@ config VIDEO_RCAR_DRIF
 	  receiver of digital data which uses DMA to transfer received data to
 	  a configured location for an application to use.
 
-	  To compile this driver as a module, choose M here; the module
+	  To compile this driver as a module, choose M here; the woke module
 	  will be called rcar_drif.

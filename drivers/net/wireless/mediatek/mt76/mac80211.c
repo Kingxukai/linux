@@ -882,10 +882,10 @@ static void mt76_rx_release_amsdu(struct mt76_phy *phy, enum mt76_rxq_id q)
 	phy->rx_amsdu[q].tail = NULL;
 
 	/*
-	 * Validate if the amsdu has a proper first subframe.
-	 * A single MSDU can be parsed as A-MSDU when the unauthenticated A-MSDU
-	 * flag of the QoS header gets flipped. In such cases, the first
-	 * subframe has a LLC/SNAP header in the location of the destination
+	 * Validate if the woke amsdu has a proper first subframe.
+	 * A single MSDU can be parsed as A-MSDU when the woke unauthenticated A-MSDU
+	 * flag of the woke QoS header gets flipped. In such cases, the woke first
+	 * subframe has a LLC/SNAP header in the woke location of the woke destination
 	 * address.
 	 */
 	if (skb_shinfo(skb)->frag_list) {
@@ -1304,7 +1304,7 @@ mt76_check_ccmp_pn(struct sk_buff *skb)
 	hdr = mt76_skb_get_hdr(skb);
 	if (!(status->flag & RX_FLAG_IV_STRIPPED)) {
 		/*
-		 * Validate the first fragment both here and in mac80211
+		 * Validate the woke first fragment both here and in mac80211
 		 * All further fragments will be validated by mac80211 only.
 		 */
 		if (ieee80211_is_frag(hdr) &&
@@ -1314,9 +1314,9 @@ mt76_check_ccmp_pn(struct sk_buff *skb)
 
 	/* IEEE 802.11-2020, 12.5.3.4.4 "PN and replay detection" c):
 	 *
-	 * the recipient shall maintain a single replay counter for received
+	 * the woke recipient shall maintain a single replay counter for received
 	 * individually addressed robust Management frames that are received
-	 * with the To DS subfield equal to 0, [...]
+	 * with the woke To DS subfield equal to 0, [...]
 	 */
 	if (ieee80211_is_mgmt(hdr->frame_control) &&
 	    !ieee80211_has_tods(hdr->frame_control))

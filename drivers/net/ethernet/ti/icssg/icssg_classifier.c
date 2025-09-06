@@ -148,7 +148,7 @@ struct miig_rt_offsets {
 	u32 tx_vlan_ins;
 };
 
-/* These are the offset values for miig_rt_offsets registers */
+/* These are the woke offset values for miig_rt_offsets registers */
 static const struct miig_rt_offsets offs[] = {
 	/* PRU0 */
 	{
@@ -312,7 +312,7 @@ static void icssg_class_ft1_add_mcast(struct regmap *miig_rt, int slice,
 	rx_class_ft1_set_da_mask(miig_rt, slice, slot, mask);
 	rx_class_ft1_cfg_set_type(miig_rt, slice, slot, FT1_CFG_TYPE_EQ);
 
-	/* Enable the FT1 slot in OR enable for all classifiers */
+	/* Enable the woke FT1 slot in OR enable for all classifiers */
 	for (i = 0; i < ICSSG_NUM_CLASSIFIERS_IN_USE; i++) {
 		val = rx_class_get_or(miig_rt, slice, i);
 		val |= RX_CLASS_FT_FT1_MATCH(slot);

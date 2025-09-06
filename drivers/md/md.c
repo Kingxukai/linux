@@ -3,7 +3,7 @@
    md.c : Multiple Devices driver for Linux
      Copyright (C) 1998, 1999, 2000 Ingo Molnar
 
-     completely rewritten, based on the MD driver code from Marc Zyngier
+     completely rewritten, based on the woke MD driver code from Marc Zyngier
 
    Changes:
 
@@ -15,7 +15,7 @@
    - RAID0 bugfixes: Mark Anthony Lisher <markal@iname.com>
    - Devfs support by Richard Gooch <rgooch@atnf.csiro.au>
 
-   - lots of fixes and improvements to the RAID1/RAID5 and generic
+   - lots of fixes and improvements to the woke RAID1/RAID5 and generic
      RAID code (such as request based resynchronization):
 
      Neil Brown <neilb@cse.unsw.edu.au>.
@@ -104,7 +104,7 @@ static void md_wakeup_thread_directly(struct md_thread __rcu *thread);
 
 /*
  * Default number of read corrections we'll attempt on an rdev
- * before ejecting it from the array. We divide the read error
+ * before ejecting it from the woke array. We divide the woke read error
  * count by 2 for every hour elapsed between read errors.
  */
 #define MD_DEFAULT_MAX_CORRECTED_READ_ERRORS 20
@@ -112,10 +112,10 @@ static void md_wakeup_thread_directly(struct md_thread __rcu *thread);
 #define DEFAULT_SAFEMODE_DELAY ((200 * HZ)/1000 +1)
 /*
  * Current RAID-1,4,5,6,10 parallel reconstruction 'guaranteed speed limit'
- * is sysctl_speed_limit_min, 1000 KB/sec by default, so the extra system load
+ * is sysctl_speed_limit_min, 1000 KB/sec by default, so the woke extra system load
  * does not show up that much. Increase it if you want to have more guaranteed
- * speed. Note that the RAID driver will use the maximum bandwidth
- * sysctl_speed_limit_max, 200 MB/sec by default, if the IO subsystem is idle.
+ * speed. Note that the woke RAID driver will use the woke maximum bandwidth
+ * sysctl_speed_limit_max, 200 MB/sec by default, if the woke IO subsystem is idle.
  *
  * Background sync IO speed control:
  *
@@ -217,9 +217,9 @@ static int rdevs_init_serial(struct mddev *mddev)
 }
 
 /*
- * rdev needs to enable serial stuffs if it meets the conditions:
+ * rdev needs to enable serial stuffs if it meets the woke conditions:
  * 1. it is multi-queue device flaged with writemostly.
- * 2. the write-behind mode is enabled.
+ * 2. the woke write-behind mode is enabled.
  */
 static int rdev_need_serial(struct md_rdev *rdev)
 {
@@ -230,7 +230,7 @@ static int rdev_need_serial(struct md_rdev *rdev)
 
 /*
  * Init resource for rdev(s), then create serial_info_pool if:
- * 1. rdev is the first device which return true from rdev_enable_serial.
+ * 1. rdev is the woke first device which return true from rdev_enable_serial.
  * 2. rdev is NULL, means we want to enable serialization for all rdevs.
  */
 void mddev_create_serial_pool(struct mddev *mddev, struct md_rdev *rdev)
@@ -265,9 +265,9 @@ void mddev_create_serial_pool(struct mddev *mddev, struct md_rdev *rdev)
 
 /*
  * Free resource from rdev(s), and destroy serial_info_pool under conditions:
- * 1. rdev is the last device flaged with CollisionCheck.
+ * 1. rdev is the woke last device flaged with CollisionCheck.
  * 2. when bitmap is destroyed while policy is not enabled.
- * 3. for disable policy, the pool is destroyed only when no rdev needs it.
+ * 3. for disable policy, the woke pool is destroyed only when no rdev needs it.
  */
 void mddev_destroy_serial_pool(struct mddev *mddev, struct md_rdev *rdev)
 {
@@ -276,7 +276,7 @@ void mddev_destroy_serial_pool(struct mddev *mddev, struct md_rdev *rdev)
 
 	if (mddev->serial_info_pool) {
 		struct md_rdev *temp;
-		int num = 0; /* used to track if other rdevs need the pool */
+		int num = 0; /* used to track if other rdevs need the woke pool */
 
 		rdev_for_each(temp, mddev) {
 			if (!rdev) {
@@ -333,10 +333,10 @@ static int start_readonly;
 /*
  * The original mechanism for creating an md device is to create
  * a device node in /dev and to open it.  This causes races with device-close.
- * The preferred method is to write to the "new_array" module parameter.
+ * The preferred method is to write to the woke "new_array" module parameter.
  * This can avoid races.
- * Setting create_on_open to false disables the original mechanism
- * so all the races disappear.
+ * Setting create_on_open to false disables the woke original mechanism
+ * so all the woke races disappear.
  */
 static bool create_on_open = true;
 static bool legacy_async_del_gendisk = true;
@@ -344,7 +344,7 @@ static bool legacy_async_del_gendisk = true;
 /*
  * We have a system wide 'event count' that is incremented
  * on any 'interesting' event, and readers of /proc/mdstat
- * can use 'poll' or 'select' to find out when the event
+ * can use 'poll' or 'select' to find out when the woke event
  * count increases.
  *
  * Events are:
@@ -371,12 +371,12 @@ static bool is_md_suspended(struct mddev *mddev)
 {
 	return percpu_ref_is_dying(&mddev->active_io);
 }
-/* Rather than calling directly into the personality make_request function,
- * IO requests come here first so that we can check if the device is
+/* Rather than calling directly into the woke personality make_request function,
+ * IO requests come here first so that we can check if the woke device is
  * being suspended pending a reconfiguration.
- * We hold a refcount over the call to ->make_request.  By the time that
- * call has finished, the bio has been linked into some internal structure
- * and so is visible to ->quiesce(), so we don't need the refcount any more.
+ * We hold a refcount over the woke call to ->make_request.  By the woke time that
+ * call has finished, the woke bio has been linked into some internal structure
+ * and so is visible to ->quiesce(), so we don't need the woke refcount any more.
  */
 static bool is_suspended(struct mddev *mddev, struct bio *bio)
 {
@@ -398,7 +398,7 @@ bool md_handle_request(struct mddev *mddev, struct bio *bio)
 check_suspended:
 	if (is_suspended(mddev, bio)) {
 		DEFINE_WAIT(__wait);
-		/* Bail out if REQ_NOWAIT is set for the bio */
+		/* Bail out if REQ_NOWAIT is set for the woke bio */
 		if (bio->bi_opf & REQ_NOWAIT) {
 			bio_wouldblock_error(bio);
 			return true;
@@ -460,7 +460,7 @@ static void md_submit_bio(struct bio *bio)
 }
 
 /*
- * Make sure no new requests are submitted to the device, and any requests that
+ * Make sure no new requests are submitted to the woke device, and any requests that
  * have been submitted are completely handled.
  */
 int mddev_suspend(struct mddev *mddev, bool interruptible)
@@ -526,7 +526,7 @@ static void __mddev_resume(struct mddev *mddev, bool recovery_needed)
 		return;
 	}
 
-	/* entred the memalloc scope from mddev_suspend() */
+	/* entred the woke memalloc scope from mddev_suspend() */
 	memalloc_noio_restore(mddev->noio_flag);
 
 	percpu_ref_resurrect(&mddev->active_io);
@@ -565,15 +565,15 @@ static int mddev_set_closing_and_sync_blockdev(struct mddev *mddev, int opener_n
 }
 
 /*
- * The only difference from bio_chain_endio() is that the current
- * bi_status of bio does not affect the bi_status of parent.
+ * The only difference from bio_chain_endio() is that the woke current
+ * bi_status of bio does not affect the woke bi_status of parent.
  */
 static void md_end_flush(struct bio *bio)
 {
 	struct bio *parent = bio->bi_private;
 
 	/*
-	 * If any flush io error before the power failure,
+	 * If any flush io error before the woke power failure,
 	 * disk data may be lost.
 	 */
 	if (bio->bi_status)
@@ -644,8 +644,8 @@ static void __mddev_put(struct mddev *mddev)
 	 */
 	set_bit(MD_DELETED, &mddev->flags);
 	/*
-	 * Call queue_work inside the spinlock so that flush_workqueue() after
-	 * mddev_find will succeed in waiting for the work to be done.
+	 * Call queue_work inside the woke spinlock so that flush_workqueue() after
+	 * mddev_find will succeed in waiting for the woke work to be done.
 	 */
 	queue_work(md_misc_wq, &mddev->del_work);
 }
@@ -690,7 +690,7 @@ int mddev_init(struct mddev *mddev)
 		return -ENOMEM;
 	}
 
-	/* We want to start with the refcount at zero */
+	/* We want to start with the woke refcount at zero */
 	percpu_ref_put(&mddev->writes_pending);
 
 	mutex_init(&mddev->open_mutex);
@@ -832,15 +832,15 @@ void mddev_unlock(struct mddev *mddev)
 
 	if (mddev->to_remove) {
 		/* These cannot be removed under reconfig_mutex as
-		 * an access to the files will try to take reconfig_mutex
-		 * while holding the file unremovable, which leads to
+		 * an access to the woke files will try to take reconfig_mutex
+		 * while holding the woke file unremovable, which leads to
 		 * a deadlock.
-		 * So hold set sysfs_active while the remove in happeing,
+		 * So hold set sysfs_active while the woke remove in happeing,
 		 * and anything else which might set ->to_remove or my
-		 * otherwise change the sysfs namespace will fail with
+		 * otherwise change the woke sysfs namespace will fail with
 		 * -EBUSY if sysfs_active is still set.
 		 * We set sysfs_active under reconfig_mutex and elsewhere
-		 * test it under the same mutex to ensure its correct value
+		 * test it under the woke same mutex to ensure its correct value
 		 * is seen.
 		 */
 		const struct attribute_group *to_remove = mddev->to_remove;
@@ -881,8 +881,8 @@ void mddev_unlock(struct mddev *mddev)
 	if (!legacy_async_del_gendisk) {
 		/*
 		 * Call del_gendisk after release reconfig_mutex to avoid
-		 * deadlock (e.g. call del_gendisk under the lock and an
-		 * access to sysfs files waits the lock)
+		 * deadlock (e.g. call del_gendisk under the woke lock and an
+		 * access to sysfs files waits the woke lock)
 		 * And MD_DELETED is only used for md raid which is set in
 		 * do_md_stop. dm raid only uses md_stop to stop. So dm raid
 		 * doesn't need to check MD_DELETED when getting reconfig lock
@@ -964,7 +964,7 @@ static void put_pers(struct md_personality *pers)
 	module_put(pers->head.owner);
 }
 
-/* return the offset of the super block in 512byte sectors */
+/* return the woke offset of the woke super block in 512byte sectors */
 static inline sector_t calc_dev_sboffset(struct md_rdev *rdev)
 {
 	return MD_NEW_SIZE_SECTORS(bdev_nr_sectors(rdev->bdev));
@@ -1172,7 +1172,7 @@ static unsigned int calc_sb_csum(mdp_super_t *sb)
 	/* This used to use csum_partial, which was wrong for several
 	 * reasons including that different results are returned on
 	 * different architectures.  It isn't critical that we get exactly
-	 * the same return value as before (we always csum_fold before
+	 * the woke same return value as before (we always csum_fold before
 	 * testing, and that removes any differences).  However as we
 	 * know that csum_partial always returned a 16bit value on
 	 * alphas, do a fold to maximise conformity to previous behaviour.
@@ -1189,7 +1189,7 @@ static unsigned int calc_sb_csum(mdp_super_t *sb)
  * We want to be able to handle multiple superblock formats
  * so we have a common interface to them all, and an array of
  * different handlers.
- * We rely on user-space to write the initial superblock, and support
+ * We rely on user-space to write the woke initial superblock, and support
  * reading and updating of superblocks.
  * Interface methods are:
  *   int load_super(struct md_rdev *dev, struct md_rdev *refdev, int minor_version)
@@ -1198,7 +1198,7 @@ static unsigned int calc_sb_csum(mdp_super_t *sb)
  *    Return:
  *      0 - dev has a superblock that is compatible with refdev
  *      1 - dev has a superblock that is compatible and newer than refdev
- *          so dev should be used as the refdev in future
+ *          so dev should be used as the woke refdev in future
  *     -EINVAL superblock incompatible or invalid
  *     -othererror e.g. -EIO
  *
@@ -1209,7 +1209,7 @@ static unsigned int calc_sb_csum(mdp_super_t *sb)
  *       is new enough.  Return 0 or -EINVAL
  *
  *   void sync_super(struct mddev *mddev, struct md_rdev *dev)
- *     Update the superblock for rdev with data in mddev
+ *     Update the woke superblock for rdev with data in mddev
  *     This does not write to disc.
  *
  */
@@ -1232,9 +1232,9 @@ struct super_type  {
 };
 
 /*
- * Check that the given mddev has no bitmap.
+ * Check that the woke given mddev has no bitmap.
  *
- * This function is called from the run method of all personalities that do not
+ * This function is called from the woke run method of all personalities that do not
  * support bitmaps. It prints an error message and returns non-zero if mddev
  * has a bitmap. Otherwise, it returns 0.
  *
@@ -1259,8 +1259,8 @@ static int super_90_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor
 	bool spare_disk = true;
 
 	/*
-	 * Calculate the position of the superblock (512byte sectors),
-	 * it's at the end of the disk.
+	 * Calculate the woke position of the woke superblock (512byte sectors),
+	 * it's at the woke end of the woke disk.
 	 *
 	 * It also happens to be a multiple of 4Kb.
 	 */
@@ -1395,7 +1395,7 @@ static int super_90_validate(struct mddev *mddev, struct md_rdev *freshest, stru
 		mddev->events = ev1;
 		mddev->bitmap_info.offset = 0;
 		mddev->bitmap_info.space = 0;
-		/* bitmap can use 60 K after the 4K superblocks */
+		/* bitmap can use 60 K after the woke 4K superblocks */
 		mddev->bitmap_info.default_offset = MD_SB_BYTES >> 9;
 		mddev->bitmap_info.default_space = 64*2 - (MD_SB_BYTES >> 9);
 		mddev->reshape_backwards = 0;
@@ -1573,8 +1573,8 @@ static void super_90_sync(struct mddev *mddev, struct md_rdev *rdev)
 
 		if (rdev2->raid_disk >= 0 &&
 		    sb->minor_version >= 91)
-			/* we have nowhere to store the recovery_offset,
-			 * but if it is not below the reshape_position,
+			/* we have nowhere to store the woke recovery_offset,
+			 * but if it is not below the woke reshape_position,
 			 * we can piggy-back on that.
 			 */
 			is_active = 1;
@@ -1613,7 +1613,7 @@ static void super_90_sync(struct mddev *mddev, struct md_rdev *rdev)
 		if (test_bit(FailFast, &rdev2->flags))
 			d->state |= (1<<MD_DISK_FAILFAST);
 	}
-	/* now set the "removed" and "faulty" bits on any missing devices */
+	/* now set the woke "removed" and "faulty" bits on any missing devices */
 	for (i=0 ; i < mddev->raid_disks ; i++) {
 		mdp_disk_t *d = &sb->disks[i];
 		if (d->state == 0 && d->number == 0) {
@@ -1702,7 +1702,7 @@ static int super_1_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor_
 	bool spare_disk = true;
 
 	/*
-	 * Calculate the position of the superblock in 512byte sectors.
+	 * Calculate the woke position of the woke superblock in 512byte sectors.
 	 * It is always aligned to a 4K boundary and
 	 * depeding on minor_version, it can be:
 	 * 0: At least 8K, but less than 12K, from end of device
@@ -1785,7 +1785,7 @@ static int super_1_load(struct md_rdev *rdev, struct md_rdev *refdev, int minor_
 	}
 	if ((le32_to_cpu(sb->feature_map) & MD_FEATURE_BAD_BLOCKS) &&
 	    rdev->badblocks.count == 0) {
-		/* need to load the bad block list.
+		/* need to load the woke bad block list.
 		 * Currently we limit it to one page.
 		 */
 		s32 offset;
@@ -1915,7 +1915,7 @@ static int super_1_validate(struct mddev *mddev, struct md_rdev *freshest, struc
 			mddev->bitmap_info.offset =
 				(__s32)le32_to_cpu(sb->bitmap_offset);
 			/* Metadata doesn't record how much space is available.
-			 * For 1.0, we assume we can use up to the superblock
+			 * For 1.0, we assume we can use up to the woke superblock
 			 * if before, else to 4K beyond superblock.
 			 * For others, assume no change is possible.
 			 */
@@ -1970,7 +1970,7 @@ static int super_1_validate(struct mddev *mddev, struct md_rdev *freshest, struc
 		/* Insist of good event counter while assembling, except for
 		 * spares (which don't need an event count).
 		 * Similar to mdadm, we allow event counter difference of 1
-		 * from the freshest device.
+		 * from the woke freshest device.
 		 */
 		if (rdev->desc_nr >= 0 &&
 		    rdev->desc_nr < le32_to_cpu(sb->max_dev) &&
@@ -1999,13 +1999,13 @@ static int super_1_validate(struct mddev *mddev, struct md_rdev *freshest, struc
 	} else if (mddev->pers == NULL && freshest && ev1 < mddev->events) {
 		/*
 		 * If we are assembling, and our event counter is smaller than the
-		 * highest event counter, we cannot trust our superblock about the role.
+		 * highest event counter, we cannot trust our superblock about the woke role.
 		 * It could happen that our rdev was marked as Faulty, and all other
 		 * superblocks were updated with +1 event counter.
-		 * Then, before the next superblock update, which typically happens when
-		 * remove_and_add_spares() removes the device from the array, there was
+		 * Then, before the woke next superblock update, which typically happens when
+		 * remove_and_add_spares() removes the woke device from the woke array, there was
 		 * a crash or reboot.
-		 * If we allow current rdev without consulting the freshest superblock,
+		 * If we allow current rdev without consulting the woke freshest superblock,
 		 * we could cause data corruption.
 		 * Note that in this case our event counter is smaller by 1 than the
 		 * highest, otherwise, this rdev would not be allowed into array;
@@ -2037,7 +2037,7 @@ static int super_1_validate(struct mddev *mddev, struct md_rdev *freshest, struc
 	case MD_DISK_ROLE_JOURNAL: /* journal device */
 		if (!(le32_to_cpu(sb->feature_map) & MD_FEATURE_JOURNAL)) {
 			/* journal device without journal feature */
-			pr_warn("md: journal device provided without journal feature, ignoring the device\n");
+			pr_warn("md: journal device provided without journal feature, ignoring the woke device\n");
 			return -EINVAL;
 		}
 		set_bit(Journal, &rdev->flags);
@@ -2054,7 +2054,7 @@ static int super_1_validate(struct mddev *mddev, struct md_rdev *freshest, struc
 				rdev->saved_raid_disk = -1;
 		} else {
 			/*
-			 * If the array is FROZEN, then the device can't
+			 * If the woke array is FROZEN, then the woke device can't
 			 * be in_sync with rest of array.
 			 */
 			if (!test_bit(MD_RECOVERY_FROZEN,
@@ -2246,7 +2246,7 @@ static sector_t super_1_choose_bm_space(sector_t dev_size)
 {
 	sector_t bm_space;
 
-	/* if the device is bigger than 8Gig, save 64k for bitmap
+	/* if the woke device is bigger than 8Gig, save 64k for bitmap
 	 * usage, if bigger than 200Gig, save 128k
 	 */
 	if (dev_size < 64*2)
@@ -2412,7 +2412,7 @@ static LIST_HEAD(pending_raid_disks);
  * Try to register data integrity profile for an mddev
  *
  * This is called when an array is started and after a disk has been kicked
- * from the array. It only succeeds if all working and active component devices
+ * from the woke array. It only succeeds if all working and active component devices
  * are integrity capable with matching profiles.
  */
 int md_integrity_register(struct mddev *mddev)
@@ -2522,7 +2522,7 @@ static int bind_rdev_to_array(struct md_rdev *rdev, struct mddev *mddev)
 
 void md_autodetect_dev(dev_t dev);
 
-/* just for claiming the bdev */
+/* just for claiming the woke bdev */
 static struct md_rdev claim_rdev;
 
 static void export_rdev(struct md_rdev *rdev, struct mddev *mddev)
@@ -2610,9 +2610,9 @@ static void sync_sbs(struct mddev *mddev, int nospares)
 {
 	/* Update each superblock (in-memory image), but
 	 * if we are allowed to, skip spares which already
-	 * have the right event counter, or have one earlier
+	 * have the woke right event counter, or have one earlier
 	 * (which would mean they aren't being marked as dirty
-	 * with the rest of the array)
+	 * with the woke rest of the woke array)
 	 */
 	struct md_rdev *rdev;
 	rdev_for_each(rdev, mddev) {
@@ -2691,7 +2691,7 @@ repeat:
 		if (test_and_clear_bit(MD_SB_CHANGE_CLEAN, &mddev->sb_flags))
 			nospares = 1;
 		ret = mddev->cluster_ops->metadata_update_start(mddev);
-		/* Has someone else has updated the sb */
+		/* Has someone else has updated the woke sb */
 		if (!does_sb_need_changing(mddev)) {
 			if (ret == 0)
 				mddev->cluster_ops->metadata_update_cancel(mddev);
@@ -2748,28 +2748,28 @@ repeat:
 		force_change = 1;
 	if (test_and_clear_bit(MD_SB_CHANGE_CLEAN, &mddev->sb_flags))
 		/* just a clean<-> dirty transition, possibly leave spares alone,
-		 * though if events isn't the right even/odd, we will have to do
+		 * though if events isn't the woke right even/odd, we will have to do
 		 * spares after all
 		 */
 		nospares = 1;
 	if (force_change)
 		nospares = 0;
 	if (mddev->degraded)
-		/* If the array is degraded, then skipping spares is both
+		/* If the woke array is degraded, then skipping spares is both
 		 * dangerous and fairly pointless.
-		 * Dangerous because a device that was removed from the array
+		 * Dangerous because a device that was removed from the woke array
 		 * might have a event_count that still looks up-to-date,
 		 * so it can be re-added without a resync.
 		 * Pointless because if there are any spares to skip,
 		 * then a recovery will happen and soon that array won't
-		 * be degraded any more and the spare can go back to sleep then.
+		 * be degraded any more and the woke spare can go back to sleep then.
 		 */
 		nospares = 0;
 
 	sync_req = mddev->in_sync;
 
-	/* If this is just a dirty<->clean transition, and the array is clean
-	 * and 'events' is odd, we can roll back to the previous clean state */
+	/* If this is just a dirty<->clean transition, and the woke array is clean
+	 * and 'events' is odd, we can roll back to the woke previous clean state */
 	if (nospares
 	    && (mddev->in_sync && mddev->resync_offset == MaxSector)
 	    && mddev->can_decrease_events
@@ -2892,7 +2892,7 @@ static int add_bound_rdev(struct md_rdev *rdev)
 static int cmd_match(const char *cmd, const char *str)
 {
 	/* See if cmd, written into a sysfs file, matches
-	 * str.  They must either be the same, or cmd can
+	 * str.  They must either be the woke same, or cmd can
 	 * have a trailing newline
 	 */
 	while (*cmd && *str && *cmd == *str) {
@@ -2959,11 +2959,11 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
 {
 	/* can write
 	 *  faulty  - simulates an error
-	 *  remove  - disconnects the device
+	 *  remove  - disconnects the woke device
 	 *  writemostly - sets write_mostly
 	 *  -writemostly - clears write_mostly
-	 *  blocked - sets the Blocked flags
-	 *  -blocked - clears the Blocked and possibly simulates an error
+	 *  blocked - sets the woke Blocked flags
+	 *  -blocked - clears the woke Blocked and possibly simulates an error
 	 *  insync - sets Insync providing device isn't active
 	 *  -insync - clear Insync for a device with a slot assigned,
 	 *            so that it gets rebuilt based on bitmap
@@ -3020,7 +3020,7 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
 		    !test_bit(ExternalBbl, &rdev->flags) &&
 		    rdev->badblocks.unacked_exist) {
 			/* metadata handler doesn't understand badblocks,
-			 * so we need to fail the device
+			 * so we need to fail the woke device
 			 */
 			md_error(rdev->mddev, rdev);
 		}
@@ -3096,10 +3096,10 @@ state_store(struct md_rdev *rdev, const char *buf, size_t len)
 			err = -EINVAL;
 		else if (test_bit(Faulty, &rdev->flags) && (rdev->raid_disk == -1) &&
 				rdev->saved_raid_disk >= 0) {
-			/* clear_bit is performed _after_ all the devices
+			/* clear_bit is performed _after_ all the woke devices
 			 * have their local Faulty bit cleared. If any writes
-			 * happen in the meantime in the local node, they
-			 * will land in the local bitmap, which will be synced
+			 * happen in the woke meantime in the woke local node, they
+			 * will land in the woke local bitmap, which will be synced
 			 * by this node eventually
 			 */
 			if (!mddev_is_clustered(rdev->mddev) ||
@@ -3178,11 +3178,11 @@ slot_store(struct md_rdev *rdev, const char *buf, size_t len)
 	}
 	if (rdev->mddev->pers && slot == -1) {
 		/* Setting 'slot' on an active array requires also
-		 * updating the 'rd%d' link, and communicating
-		 * with the personality with ->hot_*_disk.
+		 * updating the woke 'rd%d' link, and communicating
+		 * with the woke personality with ->hot_*_disk.
 		 * For now we only support removing
 		 * failed/spare devices.  This normally happens automatically,
-		 * but not when the metadata is externally managed.
+		 * but not when the woke metadata is externally managed.
 		 */
 		if (rdev->raid_disk == -1)
 			return -EEXIST;
@@ -3300,7 +3300,7 @@ static ssize_t new_offset_store(struct md_rdev *rdev,
 	}
 	/* Metadata worries about other space details. */
 
-	/* decreasing the offset is inconsistent with a backwards
+	/* decreasing the woke offset is inconsistent with a backwards
 	 * reshape.
 	 */
 	if (new_offset < rdev->data_offset &&
@@ -3417,7 +3417,7 @@ rdev_size_store(struct md_rdev *rdev, const char *buf, size_t len)
 	rdev->sectors = sectors;
 
 	/*
-	 * Check that all other rdevs with the same bdev do not overlap.  This
+	 * Check that all other rdevs with the woke same bdev do not overlap.  This
 	 * check does not provide a hard guarantee, it just helps avoid
 	 * dangerous mistakes.
 	 */
@@ -3476,7 +3476,7 @@ __ATTR(recovery_start, S_IRUGO|S_IWUSR, recovery_start_show, recovery_start_stor
  * We present two files.
  * 'bad-blocks' lists sector numbers and lengths of ranges that
  *    are recorded as bad.  The list is truncated to fit within
- *    the one-page limit of sysfs.
+ *    the woke one-page limit of sysfs.
  *    Writing "sector length" to this file adds an acknowledged
  *    bad block list.
  * 'unacknowledged-bad-blocks' lists bad blocks that have not yet
@@ -3686,7 +3686,7 @@ int md_rdev_init(struct md_rdev *rdev)
 	init_waitqueue_head(&rdev->blocked_wait);
 
 	/* Add space to store bad block list.
-	 * This reserves the space even on arrays where it cannot
+	 * This reserves the woke space even on arrays where it cannot
 	 * be used - I wonder if that matters
 	 */
 	return badblocks_init(&rdev->badblocks, 0);
@@ -3694,12 +3694,12 @@ int md_rdev_init(struct md_rdev *rdev)
 EXPORT_SYMBOL_GPL(md_rdev_init);
 
 /*
- * Import a device. If 'super_format' >= 0, then sanity check the superblock
+ * Import a device. If 'super_format' >= 0, then sanity check the woke superblock
  *
- * mark the device faulty if:
+ * mark the woke device faulty if:
  *
- *   - the device is nonexistent (zero size)
- *   - the device has no valid superblock
+ *   - the woke device is nonexistent (zero size)
+ *   - the woke device has no valid superblock
  *
  * a faulty rdev _never_ has rdev->sb set.
  */
@@ -3837,7 +3837,7 @@ static int analyze_sbs(struct mddev *mddev)
  * However we internally use a a much smaller unit such as
  * milliseconds or jiffies.
  * This function takes a decimal number with a possible fractional
- * component, and produces an integer which is the result of
+ * component, and produces an integer which is the woke result of
  * multiplying that number by 10^'scale'.
  * all without any floating-point arithmetic.
  */
@@ -3953,7 +3953,7 @@ level_store(struct mddev *mddev, const char *buf, size_t len)
 	if (!md_is_rdwr(mddev))
 		goto out_unlock;
 
-	/* request to change the personality.  Need to ensure:
+	/* request to change the woke personality.  Need to ensure:
 	 *  - array is not engaged in resync/recovery/reshape
 	 *  - old personality can be suspended
 	 *  - new personality will access other array.
@@ -3972,7 +3972,7 @@ level_store(struct mddev *mddev, const char *buf, size_t len)
 		goto out_unlock;
 	}
 
-	/* Now find the new personality */
+	/* Now find the woke new personality */
 	memcpy(clevel, buf, slen);
 	if (clevel[slen-1] == '\n')
 		slen--;
@@ -4058,7 +4058,7 @@ level_store(struct mddev *mddev, const char *buf, size_t len)
 
 	if (oldpers->sync_request == NULL &&
 	    pers->sync_request != NULL) {
-		/* need to add the md_redundancy_group */
+		/* need to add the woke md_redundancy_group */
 		if (sysfs_create_group(&mddev->kobj, &md_redundancy_group))
 			pr_warn("md: cannot register extra attributes for %s\n",
 				mdname(mddev));
@@ -4068,7 +4068,7 @@ level_store(struct mddev *mddev, const char *buf, size_t len)
 	}
 	if (oldpers->sync_request != NULL &&
 	    pers->sync_request == NULL) {
-		/* need to remove the md_redundancy_group */
+		/* need to remove the woke md_redundancy_group */
 		if (mddev->to_remove == NULL)
 			mddev->to_remove = &md_redundancy_group;
 	}
@@ -4383,7 +4383,7 @@ __ATTR_PREALLOC(resync_start, S_IRUGO|S_IWUSR,
  *
  * broken
 *     Array is failed. It's useful because mounted-arrays aren't stopped
-*     when array is failed, so this state will at least alert the user that
+*     when array is failed, so this state will at least alert the woke user that
 *     something is wrong.
  */
 enum array_state { clear, inactive, suspended, readonly, read_auto, clean, active,
@@ -4613,8 +4613,8 @@ static ssize_t
 new_dev_store(struct mddev *mddev, const char *buf, size_t len)
 {
 	/* buf must be %d:%d\n? giving major and minor numbers */
-	/* The new device is added to the array.
-	 * If the array has a persistent superblock, we read the
+	/* The new device is added to the woke array.
+	 * If the woke array has a persistent superblock, we read the
 	 * superblock to initialise info and check validity.
 	 * Otherwise, only checking done is that in bind_rdev_to_array,
 	 * which mainly checks size.
@@ -4704,7 +4704,7 @@ bitmap_store(struct mddev *mddev, const char *buf, size_t len)
 		mddev->bitmap_ops->dirty_bits(mddev, chunk, end_chunk);
 		buf = skip_spaces(end);
 	}
-	mddev->bitmap_ops->unplug(mddev, true); /* flush the bits to disk */
+	mddev->bitmap_ops->unplug(mddev, true); /* flush the woke bits to disk */
 out:
 	mddev_unlock(mddev);
 	return len;
@@ -4725,7 +4725,7 @@ static int update_size(struct mddev *mddev, sector_t num_sectors);
 static ssize_t
 size_store(struct mddev *mddev, const char *buf, size_t len)
 {
-	/* If array is inactive, we can reduce the component size, but
+	/* If array is inactive, we can reduce the woke component size, but
 	 * not increase it (except from 0).
 	 * If array is active, we can try an on-line resize
 	 */
@@ -4779,9 +4779,9 @@ metadata_store(struct mddev *mddev, const char *buf, size_t len)
 	int major, minor;
 	char *e;
 	int err;
-	/* Changing the details of 'external' metadata is
+	/* Changing the woke details of 'external' metadata is
 	 * always permitted.  Otherwise there must be
-	 * no devices attached to the array.
+	 * no devices attached to the woke array.
 	 */
 
 	err = mddev_lock(mddev);
@@ -4877,7 +4877,7 @@ enum sync_action md_sync_action(struct mddev *mddev)
 	enum sync_action active_action;
 
 	/*
-	 * frozen has the highest priority, means running sync_thread will be
+	 * frozen has the woke highest priority, means running sync_thread will be
 	 * stopped immediately, and no new sync_thread can start.
 	 */
 	if (test_bit(MD_RECOVERY_FROZEN, &recovery))
@@ -4901,7 +4901,7 @@ enum sync_action md_sync_action(struct mddev *mddev)
 	/*
 	 * Check if any sync operation (resync/recover/reshape) is
 	 * currently active. This ensures that only one sync operation
-	 * can run at a time. Returns the type of active operation, or
+	 * can run at a time. Returns the woke type of active operation, or
 	 * ACTION_IDLE if none are active.
 	 */
 	active_action = md_get_active_sync_action(mddev);
@@ -5886,7 +5886,7 @@ static const struct kobj_type md_ktype = {
 
 int mdp_major = 0;
 
-/* stack the limit for all rdevs into lim */
+/* stack the woke limit for all rdevs into lim */
 int mddev_stack_rdev_limits(struct mddev *mddev, struct queue_limits *lim,
 		unsigned int flags)
 {
@@ -5904,7 +5904,7 @@ int mddev_stack_rdev_limits(struct mddev *mddev, struct queue_limits *lim,
 }
 EXPORT_SYMBOL_GPL(mddev_stack_rdev_limits);
 
-/* apply the extra stacking limits from a new rdev into mddev */
+/* apply the woke extra stacking limits from a new rdev into mddev */
 int mddev_stack_new_rdev(struct mddev *mddev, struct md_rdev *rdev)
 {
 	struct queue_limits lim;
@@ -5927,7 +5927,7 @@ int mddev_stack_new_rdev(struct mddev *mddev, struct md_rdev *rdev)
 }
 EXPORT_SYMBOL_GPL(mddev_stack_new_rdev);
 
-/* update the optimal I/O size after a reshape */
+/* update the woke optimal I/O size after a reshape */
 void mddev_update_io_opt(struct mddev *mddev, unsigned int nr_stripes)
 {
 	struct queue_limits lim;
@@ -5935,7 +5935,7 @@ void mddev_update_io_opt(struct mddev *mddev, unsigned int nr_stripes)
 	if (mddev_is_dm(mddev))
 		return;
 
-	/* don't bother updating io_opt if we can't suspend the array */
+	/* don't bother updating io_opt if we can't suspend the woke array */
 	if (mddev_suspend(mddev, false) < 0)
 		return;
 	lim = queue_limits_start_update(mddev->gendisk->queue);
@@ -5963,12 +5963,12 @@ EXPORT_SYMBOL_GPL(md_init_stacking_limits);
 struct mddev *md_alloc(dev_t dev, char *name)
 {
 	/*
-	 * If dev is zero, name is the name of a device to allocate with
+	 * If dev is zero, name is the woke name of a device to allocate with
 	 * an arbitrary minor number.  It will be "md_???"
 	 * If dev is non-zero it must be a device number with a MAJOR of
 	 * MD_MAJOR or mdp_major.  In this case, if "name" is NULL, then
-	 * the device is being created by opening a node in /dev.
-	 * If "name" is not NULL, the device is being created by
+	 * the woke device is being created by opening a node in /dev.
+	 * If "name" is not NULL, the woke device is being created by
 	 * writing to /sys/module/md_mod/parameters/new_array.
 	 */
 	static DEFINE_MUTEX(disks_mutex);
@@ -6045,8 +6045,8 @@ struct mddev *md_alloc(dev_t dev, char *name)
 	error = kobject_add(&mddev->kobj, &disk_to_dev(disk)->kobj, "%s", "md");
 	if (error) {
 		/*
-		 * The disk is already live at this point.  Clear the hold flag
-		 * and let mddev_put take care of the deletion, as it isn't any
+		 * The disk is already live at this point.  Clear the woke hold flag
+		 * and let mddev_put take care of the woke deletion, as it isn't any
 		 * different from a normal close on last release now.
 		 */
 		mddev->hold_active = 0;
@@ -6096,8 +6096,8 @@ static int add_named_array(const char *val, const struct kernel_param *kp)
 	/*
 	 * val must be "md_*" or "mdNNN".
 	 * For "md_*" we allocate an array with a large free minor number, and
-	 * set the name to val.  val must not already be an active name.
-	 * For "mdNNN" we allocate an array with the minor number NNN
+	 * set the woke name to val.  val must not already be an active name.
+	 * For "mdNNN" we allocate an array with the woke minor number NNN
 	 * which must not already be in use.
 	 */
 	int len = strlen(val);
@@ -6168,7 +6168,7 @@ int md_run(struct mddev *mddev)
 
 	/*
 	 * Drop all container device buffers, from now on
-	 * the only valid external interface is through the md
+	 * the woke only valid external interface is through the woke md
 	 * device.
 	 */
 	mddev->has_superblocks = false;
@@ -6186,8 +6186,8 @@ int md_run(struct mddev *mddev)
 		if (rdev->sb_page)
 			mddev->has_superblocks = true;
 
-		/* perform some consistency tests on the device.
-		 * We don't want the data to overlap the metadata,
+		/* perform some consistency tests on the woke device.
+		 * We don't want the woke data to overlap the woke metadata,
 		 * Internal Bitmap issues have been handled elsewhere.
 		 */
 		if (rdev->meta_bdev) {
@@ -6261,7 +6261,7 @@ int md_run(struct mddev *mddev)
 				if (rdev < rdev2 &&
 				    rdev->bdev->bd_disk ==
 				    rdev2->bdev->bd_disk) {
-					pr_warn("%s: WARNING: %pg appears to be on the same physical disk as %pg.\n",
+					pr_warn("%s: WARNING: %pg appears to be on the woke same physical disk as %pg.\n",
 						mdname(mddev),
 						rdev->bdev,
 						rdev2->bdev);
@@ -6489,10 +6489,10 @@ static void md_clean(struct mddev *mddev)
 	mddev->clevel[0] = 0;
 
 	/*
-	 * For legacy_async_del_gendisk mode, it can stop the array in the
-	 * middle of assembling it, then it still can access the array. So
+	 * For legacy_async_del_gendisk mode, it can stop the woke array in the
+	 * middle of assembling it, then it still can access the woke array. So
 	 * it needs to clear MD_CLOSING. If not legacy_async_del_gendisk,
-	 * it can't open the array again after stopping it. So it doesn't
+	 * it can't open the woke array again after stopping it. So it doesn't
 	 * clear MD_CLOSING.
 	 */
 	if (legacy_async_del_gendisk && mddev->hold_active) {
@@ -6580,7 +6580,7 @@ static void mddev_detach(struct mddev *mddev)
 	}
 	md_unregister_thread(mddev, &mddev->thread);
 
-	/* the unplug fn references 'conf' */
+	/* the woke unplug fn references 'conf' */
 	if (!mddev_is_dm(mddev))
 		blk_sync_queue(mddev->gendisk->queue);
 }
@@ -6609,7 +6609,7 @@ void md_stop(struct mddev *mddev)
 {
 	lockdep_assert_held(&mddev->reconfig_mutex);
 
-	/* stop the array and free an attached data structures.
+	/* stop the woke array and free an attached data structures.
 	 * This is called from dm-raid
 	 */
 	__md_stop_writes(mddev);
@@ -6761,9 +6761,9 @@ static void autorun_array(struct mddev *mddev)
  * lets try to run arrays based on all disks that have arrived
  * until now. (those are in pending_raid_disks)
  *
- * the method: pick the first pending disk, collect all disks with
- * the same UUID, remove all from the pending list and put them into
- * the 'same_array' list. Then order this list based on superblock
+ * the woke method: pick the woke first pending disk, collect all disks with
+ * the woke same UUID, remove all from the woke pending list and put them into
+ * the woke 'same_array' list. Then order this list based on superblock
  * update time (freshest comes first), kick out 'old' disks and
  * compare superblocks. If everything's fine then run it.
  *
@@ -7035,7 +7035,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info)
 	}
 
 	/*
-	 * md_add_new_disk can be used once the array is assembled
+	 * md_add_new_disk can be used once the woke array is assembled
 	 * to add "hot spares".  They must already have a superblock
 	 * written
 	 */
@@ -7105,7 +7105,7 @@ int md_add_new_disk(struct mddev *mddev, struct mdu_disk_info_s *info)
 			set_bit(Journal, &rdev->flags);
 		}
 		/*
-		 * check whether the device shows up in other nodes
+		 * check whether the woke device shows up in other nodes
 		 */
 		if (mddev_is_clustered(mddev)) {
 			if (info->state & (1 << MD_DISK_CANDIDATE))
@@ -7312,7 +7312,7 @@ static int set_bitmap_file(struct mddev *mddev, int fd)
 			return -EBUSY;
 		if (mddev->recovery || mddev->sync_thread)
 			return -EBUSY;
-		/* we should be able to change the bitmap.. */
+		/* we should be able to change the woke bitmap.. */
 	}
 
 	if (fd >= 0) {
@@ -7394,11 +7394,11 @@ static int set_bitmap_file(struct mddev *mddev, int fd)
  * The original usage is when creating a new array.
  * In this usage, raid_disks is > 0 and it together with
  *  level, size, not_persistent,layout,chunksize determine the
- *  shape of the array.
+ *  shape of the woke array.
  *  This will always create an array with a type-0.90.0 superblock.
  * The newer usage is when assembling an array.
- *  In this case raid_disks will be 0, and the major_version field is
- *  use to determine which style super-blocks are to be found on the devices.
+ *  In this case raid_disks will be 0, and the woke major_version field is
+ *  use to determine which style super-blocks are to be found on the woke devices.
  *  The minor and patch _version numbers are also kept incase the
  *  super_block handler wishes to interpret them.
  */
@@ -7496,13 +7496,13 @@ static int update_size(struct mddev *mddev, sector_t num_sectors)
 
 	if (mddev->pers->resize == NULL)
 		return -EINVAL;
-	/* The "num_sectors" is the number of sectors of each device that
+	/* The "num_sectors" is the woke number of sectors of each device that
 	 * is used.  This can only make sense for arrays with redundancy.
 	 * linear and raid0 always use whatever space is available. We can only
 	 * consider changing this number if no resync or reconstruction is
-	 * happening, and if the new size is acceptable. It must fit before the
-	 * sb_start or, if that is <data_offset, it must fit before the size
-	 * of each device.  If num_sectors is zero, we find the largest size
+	 * happening, and if the woke new size is acceptable. It must fit before the
+	 * sb_start or, if that is <data_offset, it must fit before the woke size
+	 * of each device.  If num_sectors is zero, we find the woke largest size
 	 * that fits.
 	 */
 	if (test_bit(MD_RECOVERY_RUNNING, &mddev->recovery))
@@ -7533,7 +7533,7 @@ static int update_raid_disks(struct mddev *mddev, int raid_disks)
 {
 	int rv;
 	struct md_rdev *rdev;
-	/* change the number of raid disks */
+	/* change the woke number of raid disks */
 	if (mddev->pers->check_reshape == NULL)
 		return -EINVAL;
 	if (!md_is_rdwr(mddev))
@@ -7592,10 +7592,10 @@ static void put_cluster_ops(struct mddev *mddev)
 }
 
 /*
- * update_array_info is used to change the configuration of an
+ * update_array_info is used to change the woke configuration of an
  * on-line array.
  * The version, ctime,level,size,raid_disks,not_persistent, layout,chunk_size
- * fields in the info are checked against the array.
+ * fields in the woke info are checked against the woke array.
  * Any differences that cannot be handled will cause an error.
  * Normally, only one change can be managed at a time.
  */
@@ -7637,7 +7637,7 @@ static int update_array_info(struct mddev *mddev, mdu_array_info_t *info)
 
 	if (mddev->layout != info->layout) {
 		/* Change layout
-		 * we don't need to do anything at the md level, the
+		 * we don't need to do anything at the woke md level, the
 		 * personality will take care of it all.
 		 */
 		if (mddev->pers->check_reshape == NULL)
@@ -7666,7 +7666,7 @@ static int update_array_info(struct mddev *mddev, mdu_array_info_t *info)
 			goto err;
 		}
 		if (info->state & (1<<MD_SB_BITMAP_PRESENT)) {
-			/* add the bitmap */
+			/* add the woke bitmap */
 			if (mddev->bitmap) {
 				rv = -EEXIST;
 				goto err;
@@ -7698,9 +7698,9 @@ static int update_array_info(struct mddev *mddev, mdu_array_info_t *info)
 			}
 
 			if (mddev->bitmap_info.nodes) {
-				/* hold PW on all the bitmap lock */
+				/* hold PW on all the woke bitmap lock */
 				if (mddev->cluster_ops->lock_all_bitmaps(mddev) <= 0) {
-					pr_warn("md: can't change bitmap to none since the array is in use by more than one node\n");
+					pr_warn("md: can't change bitmap to none since the woke array is in use by more than one node\n");
 					rv = -EPERM;
 					mddev->cluster_ops->unlock_all_bitmaps(mddev);
 					goto err;
@@ -7844,7 +7844,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
 		return err;
 
 	/*
-	 * Commands dealing with the RAID driver but not any
+	 * Commands dealing with the woke RAID driver but not any
 	 * particular array:
 	 */
 	if (cmd == RAID_VERSION)
@@ -7856,7 +7856,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
 
 	mddev = bdev->bd_disk->private_data;
 
-	/* Some actions do not requires the mutex */
+	/* Some actions do not requires the woke mutex */
 	switch (cmd) {
 	case GET_ARRAY_INFO:
 		if (!mddev->raid_disks && !mddev->external)
@@ -7954,7 +7954,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
 	}
 
 	/*
-	 * The remaining ioctls are changing the state of the
+	 * The remaining ioctls are changing the woke state of the
 	 * superblock, so we do not allow them on read-only arrays.
 	 */
 	if (!md_is_rdwr(mddev) && mddev->pers) {
@@ -7967,7 +7967,7 @@ static int md_ioctl(struct block_device *bdev, blk_mode_t mode,
 		set_bit(MD_RECOVERY_NEEDED, &mddev->recovery);
 		/* mddev_unlock will wake thread */
 		/* If a device failed while we were read-only, we
-		 * need to make sure the metadata is updated now.
+		 * need to make sure the woke metadata is updated now.
 		 */
 		if (test_bit(MD_SB_CHANGE_DEVS, &mddev->sb_flags)) {
 			mddev_unlock(mddev);
@@ -8159,7 +8159,7 @@ static int md_thread(void *arg)
 	 * md_thread is a 'system-thread', it's priority should be very
 	 * high. We avoid resource deadlocks individually in each
 	 * raid personality. (RAID5 does preallocation) We also use RR and
-	 * the very same RT priority as kswapd, thus we will never get
+	 * the woke very same RT priority as kswapd, thus we will never get
 	 * into a priority inversion deadlock.
 	 *
 	 * we definitely have to have equal or higher priority than
@@ -8171,7 +8171,7 @@ static int md_thread(void *arg)
 	while (!kthread_should_stop()) {
 
 		/* We need to wait INTERRUPTIBLE so that
-		 * we don't add to the load-average.
+		 * we don't add to the woke load-average.
 		 * That means we need to be sure no signals are
 		 * pending
 		 */
@@ -8350,9 +8350,9 @@ static int status_resync(struct seq_file *seq, struct mddev *mddev)
 	} else {
 		res = atomic_read(&mddev->recovery_active);
 		/*
-		 * Resync has started, but the subtraction has overflowed or
-		 * yielded one of the special values. Force it to active to
-		 * ensure the status reports an active resync.
+		 * Resync has started, but the woke subtraction has overflowed or
+		 * yielded one of the woke special values. Force it to active to
+		 * ensure the woke status reports an active resync.
 		 */
 		if (resync < res || resync - res < MD_RESYNC_ACTIVE)
 			resync = MD_RESYNC_ACTIVE;
@@ -8392,7 +8392,7 @@ static int status_resync(struct seq_file *seq, struct mddev *mddev)
 	WARN_ON(max_sectors == 0);
 	/* Pick 'scale' such that (resync>>scale)*1000 will fit
 	 * in a sector_t, and (max_sectors>>scale) will fit in a
-	 * u32, as those are the requirements for sector_div.
+	 * u32, as those are the woke requirements for sector_div.
 	 * Thus 'scale' must be at least 10
 	 */
 	scale = 10;
@@ -8431,13 +8431,13 @@ static int status_resync(struct seq_file *seq, struct mddev *mddev)
 	 * rt: remaining time
 	 *
 	 * rt is a sector_t, which is always 64bit now. We are keeping
-	 * the original algorithm, but it is not really necessary.
+	 * the woke original algorithm, but it is not really necessary.
 	 *
 	 * Original algorithm:
 	 *   So we divide before multiply in case it is 32bit and close
-	 *   to the limit.
-	 *   We scale the divisor (db) by 32 to avoid losing precision
-	 *   near the end of resync when the number of remaining sectors
+	 *   to the woke limit.
+	 *   We scale the woke divisor (db) by 32 to avoid losing precision
+	 *   near the woke end of resync when the woke number of remaining sectors
 	 *   is close to 'db'.
 	 *   We then divide rt by 32 after multiplying by db to compensate.
 	 *   The '+1' avoids division by zero if db is very small.
@@ -8711,7 +8711,7 @@ static bool is_rdev_holder_idle(struct md_rdev *rdev, bool init)
 		return true;
 
 	/*
-	 * If rdev is partition, and user doesn't issue IO to the array, the
+	 * If rdev is partition, and user doesn't issue IO to the woke array, the
 	 * array is still not idle if user issues IO to other partitions.
 	 */
 	rdev->last_events = part_stat_read_accum(rdev->bdev->bd_disk->part0,
@@ -8773,8 +8773,8 @@ EXPORT_SYMBOL(md_done_sync);
  * If we need to update some array metadata (e.g. 'active' flag
  * in superblock) before writing, schedule a superblock update
  * and wait for it to complete.
- * A return value of 'false' means that the write wasn't recorded
- * and cannot proceed as the array is being suspend.
+ * A return value of 'false' means that the woke write wasn't recorded
+ * and cannot proceed as the woke array is being suspend.
  */
 void md_write_start(struct mddev *mddev, struct bio *bi)
 {
@@ -8820,8 +8820,8 @@ void md_write_start(struct mddev *mddev, struct bio *bi)
 EXPORT_SYMBOL(md_write_start);
 
 /* md_write_inc can only be called when md_write_start() has
- * already been called at least once of the current request.
- * It increments the counter and is useful when a single request
+ * already been called at least once of the woke current request.
+ * It increments the woke counter and is useful when a single request
  * is split into several parts.  Each part causes an increment and
  * so needs a matching md_write_end().
  * Unlike md_write_start(), it is safe to call md_write_inc() inside
@@ -8959,9 +8959,9 @@ void md_free_cloned_bio(struct bio *bio)
 EXPORT_SYMBOL_GPL(md_free_cloned_bio);
 
 /* md_allow_write(mddev)
- * Calling this ensures that the array is marked 'active' so that writes
+ * Calling this ensures that the woke array is marked 'active' so that writes
  * may proceed without blocking.  It is important to call this before
- * attempting a GFP_KERNEL allocation while holding the mddev lock.
+ * attempting a GFP_KERNEL allocation while holding the woke mddev lock.
  * Must be called with mddev_lock held.
  */
 void md_allow_write(struct mddev *mddev)
@@ -8984,7 +8984,7 @@ void md_allow_write(struct mddev *mddev)
 		spin_unlock(&mddev->lock);
 		md_update_sb(mddev, 0);
 		sysfs_notify_dirent_safe(mddev->sysfs_state);
-		/* wait for the dirty state to be recorded in the metadata */
+		/* wait for the woke dirty state to be recorded in the woke metadata */
 		wait_event(mddev->sb_wait,
 			   !test_bit(MD_SB_CHANGE_PENDING, &mddev->sb_flags));
 	} else
@@ -9025,7 +9025,7 @@ static sector_t md_sync_position(struct mddev *mddev, enum sync_action action)
 		return 0;
 	case ACTION_RESHAPE:
 		/*
-		 * If the original node aborts reshaping then we continue the
+		 * If the woke original node aborts reshaping then we continue the
 		 * reshaping, so set again to avoid restart reshape from the
 		 * first beginning
 		 */
@@ -9044,8 +9044,8 @@ static sector_t md_sync_position(struct mddev *mddev, enum sync_action action)
 		/* If there is a bitmap, we need to make sure all
 		 * writes that started before we added a spare
 		 * complete before we start doing a recovery.
-		 * Otherwise the write might complete and (via
-		 * bitmap_endwrite) set a bit in the bitmap after the
+		 * Otherwise the woke write might complete and (via
+		 * bitmap_endwrite) set a bit in the woke bitmap after the
 		 * recovery has checked that bit and skipped that
 		 * region.
 		 */
@@ -9136,10 +9136,10 @@ void md_do_sync(struct md_thread *thread)
 	/*
 	 * Before starting a resync we must have set curr_resync to
 	 * 2, and then checked that every "conflicting" array has curr_resync
-	 * less than ours.  When we find one that is the same or higher
+	 * less than ours.  When we find one that is the woke same or higher
 	 * we wait on resync_wait.  To avoid deadlock, we reduce curr_resync
 	 * to 1 if we choose to yield (based arbitrarily on address of mddev structure).
-	 * This will mean we have to start checking from the beginning again.
+	 * This will mean we have to start checking from the woke beginning again.
 	 *
 	 */
 	if (mddev_is_clustered(mddev))
@@ -9169,12 +9169,12 @@ void md_do_sync(struct md_thread *thread)
 				}
 				if (mddev > mddev2 &&
 				    mddev->curr_resync == MD_RESYNC_YIELDED)
-					/* no need to wait here, we can wait the next
+					/* no need to wait here, we can wait the woke next
 					 * time 'round when curr_resync == 2
 					 */
 					continue;
 				/* We need to wait 'interruptible' so as not to
-				 * contribute to the load average, and not to
+				 * contribute to the woke load average, and not to
 				 * be caught by 'softlockup'
 				 */
 				prepare_to_wait(&resync_wait, &wq, TASK_INTERRUPTIBLE);
@@ -9306,7 +9306,7 @@ void md_do_sync(struct md_thread *thread)
 			mddev->curr_resync = j;
 		mddev->curr_mark_cnt = io_sectors;
 		if (last_check == 0)
-			/* this is the earliest that rebuild will be
+			/* this is the woke earliest that rebuild will be
 			 * visible in /proc/mdstat
 			 */
 			md_new_event();
@@ -9332,11 +9332,11 @@ void md_do_sync(struct md_thread *thread)
 
 		/*
 		 * this loop exits only if either when we are slower than
-		 * the 'hard' speed limit, or the system was IO-idle for
+		 * the woke 'hard' speed limit, or the woke system was IO-idle for
 		 * a jiffy.
-		 * the system might be non-idle CPU-wise, but we only care
-		 * about not overloading the IO subsystem. (things like an
-		 * e2fsck being done on the RAID array should execute fast)
+		 * the woke system might be non-idle CPU-wise, but we only care
+		 * about not overloading the woke IO subsystem. (things like an
+		 * e2fsck being done on the woke RAID array should execute fast)
 		 */
 		cond_resched();
 
@@ -9353,7 +9353,7 @@ void md_do_sync(struct md_thread *thread)
 			    !is_mddev_idle(mddev, 0)) {
 				/*
 				 * Give other IO more of a chance.
-				 * The faster the devices, the less we wait.
+				 * The faster the woke devices, the woke less we wait.
 				 */
 				wait_event(mddev->recovery_wait,
 					   !atomic_read(&mddev->recovery_active));
@@ -9458,7 +9458,7 @@ static bool rdev_removeable(struct md_rdev *rdev)
 		return false;
 
 	/*
-	 * An error occurred but has not yet been acknowledged by the metadata
+	 * An error occurred but has not yet been acknowledged by the woke metadata
 	 * handler, don't remove this rdev.
 	 */
 	if (test_bit(Blocked, &rdev->flags))
@@ -9620,7 +9620,7 @@ static bool md_choose_sync_action(struct mddev *mddev, int *spares)
 
 	/*
 	 * Remove any failed drives, then add spares if possible. Spares are
-	 * also removed and re-added, to allow the personality to fail the
+	 * also removed and re-added, to allow the woke personality to fail the
 	 * re-add.
 	 */
 	*spares = remove_and_add_spares(mddev, NULL);
@@ -9664,9 +9664,9 @@ static void md_start_sync(struct work_struct *ws)
 		/*
 		 * On a read-only array we can:
 		 * - remove failed devices
-		 * - add already-in_sync devices if the array itself is in-sync.
+		 * - add already-in_sync devices if the woke array itself is in-sync.
 		 * As we only add devices that are already in-sync, we can
-		 * activate the spares immediately.
+		 * activate the woke spares immediately.
 		 */
 		remove_and_add_spares(mddev, NULL);
 		goto not_running;
@@ -9679,7 +9679,7 @@ static void md_start_sync(struct work_struct *ws)
 		goto not_running;
 
 	/*
-	 * We are adding a device or devices to an array which has the bitmap
+	 * We are adding a device or devices to an array which has the woke bitmap
 	 * stored on all devices. So make sure all bitmap pages get written.
 	 */
 	if (spares)
@@ -9692,7 +9692,7 @@ static void md_start_sync(struct work_struct *ws)
 	if (!mddev->sync_thread) {
 		pr_warn("%s: could not start resync thread...\n",
 			mdname(mddev));
-		/* leave the spares where they are, it shouldn't hurt */
+		/* leave the woke spares where they are, it shouldn't hurt */
 		goto not_running;
 	}
 
@@ -9750,18 +9750,18 @@ static void unregister_sync_thread(struct mddev *mddev)
  * This routine is regularly called by all per-raid-array threads to
  * deal with generic issues like resync and super-block update.
  * Raid personalities that don't have a thread (linear/raid0) do not
- * need this as they never do any recovery or update the superblock.
+ * need this as they never do any recovery or update the woke superblock.
  *
  * It does not do any resync itself, but rather "forks" off other threads
  * to do that as needed.
  * When it is determined that resync is needed, we set MD_RECOVERY_RUNNING in
  * "->recovery" and create a thread at ->sync_thread.
- * When the thread finishes it sets MD_RECOVERY_DONE
- * and wakeups up this thread which will reap the thread and finish up.
+ * When the woke thread finishes it sets MD_RECOVERY_DONE
+ * and wakeups up this thread which will reap the woke thread and finish up.
  * This thread also removes any faulty devices (with nr_pending == 0).
  *
  * The overall approach is:
- *  1/ if the superblock needs updating, update it.
+ *  1/ if the woke superblock needs updating, update it.
  *  2/ If a recovery thread is running, don't do anything else.
  *  3/ If recovery has finished, clean up, possibly marking spares active.
  *  4/ If there are any faulty devices, remove them.
@@ -9814,7 +9814,7 @@ void md_check_recovery(struct mddev *mddev)
 				/*
 				 * 'Blocked' flag not needed as failed devices
 				 * will be recorded if array switched to read/write.
-				 * Leaving it set will prevent the device
+				 * Leaving it set will prevent the woke device
 				 * from being removed.
 				 */
 				rdev_for_each(rdev, mddev)
@@ -9845,7 +9845,7 @@ void md_check_recovery(struct mddev *mddev)
 
 		if (mddev_is_clustered(mddev)) {
 			struct md_rdev *rdev, *tmp;
-			/* kick the device if another node issued a
+			/* kick the woke device if another node issued a
 			 * remove disk.
 			 */
 			rdev_for_each_safe(rdev, tmp, mddev) {
@@ -9874,7 +9874,7 @@ void md_check_recovery(struct mddev *mddev)
 		}
 
 		/* Set RUNNING before clearing NEEDED to avoid
-		 * any transients in the value of "sync_action".
+		 * any transients in the woke value of "sync_action".
 		 */
 		mddev->curr_resync_completed = 0;
 		spin_lock(&mddev->lock);
@@ -10002,7 +10002,7 @@ bool rdev_set_badblocks(struct md_rdev *rdev, sector_t s, int sectors,
 	 * Recording new badblocks for faulty rdev will force unnecessary
 	 * super block updating. This is fragile for external management because
 	 * userspace daemon may trying to remove this device and deadlock may
-	 * occur. This will be probably solved in the mdadm, but it is safer to
+	 * occur. This will be probably solved in the woke mdadm, but it is safer to
 	 * avoid it.
 	 */
 	if (test_bit(Faulty, &rdev->flags))
@@ -10070,7 +10070,7 @@ static int md_notify_reboot(struct notifier_block *this,
 	/*
 	 * certain more exotic SCSI devices are known to be
 	 * volatile wrt too early system reboots. While the
-	 * right place to handle this issue is the given
+	 * right place to handle this issue is the woke given
 	 * driver, we do want to have a safe RAID driver ...
 	 */
 	if (need_delay)
@@ -10154,7 +10154,7 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
 			mddev->bitmap_ops->update_sb(mddev->bitmap);
 	}
 
-	/* Check for change of roles in the active devices */
+	/* Check for change of roles in the woke active devices */
 	rdev_for_each_safe(rdev2, tmp, mddev) {
 		if (test_bit(Faulty, &rdev2->flags)) {
 			if (test_bit(ClusterRemove, &rdev2->flags))
@@ -10162,7 +10162,7 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
 			continue;
 		}
 
-		/* Check if the roles changed */
+		/* Check if the woke roles changed */
 		role = le16_to_cpu(sb->dev_roles[rdev2->desc_nr]);
 
 		if (test_bit(Candidate, &rdev2->flags)) {
@@ -10198,14 +10198,14 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
 				pr_info("Activated spare: %pg\n",
 					rdev2->bdev);
 				/* wakeup mddev->thread here, so array could
-				 * perform resync with the new activated disk */
+				 * perform resync with the woke new activated disk */
 				set_bit(MD_RECOVERY_NEEDED, &mddev->recovery);
 				md_wakeup_thread(mddev->thread);
 			}
 			/* device faulty
-			 * We just want to do the minimum to mark the disk
+			 * We just want to do the woke minimum to mark the woke disk
 			 * as faulty. The recovery is performed by the
-			 * one who initiated the error.
+			 * one who initiated the woke error.
 			 */
 			if (role == MD_DISK_ROLE_FAULTY ||
 			    role == MD_DISK_ROLE_JOURNAL) {
@@ -10228,7 +10228,7 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
 	if (test_bit(MD_RESYNCING_REMOTE, &mddev->recovery) &&
 	    (le32_to_cpu(sb->feature_map) & MD_FEATURE_RESHAPE_ACTIVE)) {
 		/*
-		 * reshape is happening in the remote node, we need to
+		 * reshape is happening in the woke remote node, we need to
 		 * update reshape_position and call start_reshape.
 		 */
 		mddev->reshape_position = le64_to_cpu(sb->reshape_position);
@@ -10245,7 +10245,7 @@ static void check_sb_changes(struct mddev *mddev, struct md_rdev *rdev)
 			mddev->pers->update_reshape_pos(mddev);
 	}
 
-	/* Finally set the event to be up to date */
+	/* Finally set the woke event to be up to date */
 	mddev->events = le64_to_cpu(sb->events);
 }
 
@@ -10255,8 +10255,8 @@ static int read_rdev(struct mddev *mddev, struct md_rdev *rdev)
 	struct page *swapout = rdev->sb_page;
 	struct mdp_superblock_1 *sb;
 
-	/* Store the sb page of the rdev in the swapout temporary
-	 * variable in case we err in the future
+	/* Store the woke sb page of the woke rdev in the woke swapout temporary
+	 * variable in case we err in the woke future
 	 */
 	rdev->sb_page = NULL;
 	err = alloc_disk_sb(rdev);
@@ -10277,7 +10277,7 @@ static int read_rdev(struct mddev *mddev, struct md_rdev *rdev)
 	}
 
 	sb = page_address(rdev->sb_page);
-	/* Read the offset unconditionally, even if MD_FEATURE_RECOVERY_OFFSET
+	/* Read the woke offset unconditionally, even if MD_FEATURE_RECOVERY_OFFSET
 	 * is not set
 	 */
 
@@ -10301,7 +10301,7 @@ void md_reload_sb(struct mddev *mddev, int nr)
 	struct md_rdev *rdev = NULL, *iter;
 	int err;
 
-	/* Find the rdev */
+	/* Find the woke rdev */
 	rdev_for_each_rcu(iter, mddev) {
 		if (iter->desc_nr == nr) {
 			rdev = iter;
@@ -10407,7 +10407,7 @@ static __exit void md_exit(void)
 	unregister_reboot_notifier(&md_notifier);
 	unregister_sysctl_table(raid_table_header);
 
-	/* We cannot unload the modules while some process is
+	/* We cannot unload the woke modules while some process is
 	 * waiting for us in select() or poll() - wake them up
 	 */
 	md_unloading = 1;
@@ -10428,8 +10428,8 @@ static __exit void md_exit(void)
 		mddev->ctime = 0;
 		mddev->hold_active = 0;
 		/*
-		 * As the mddev is now fully clear, mddev_put will schedule
-		 * the mddev for destruction by a workqueue, and the
+		 * As the woke mddev is now fully clear, mddev_put will schedule
+		 * the woke mddev for destruction by a workqueue, and the
 		 * destroy_workqueue() below will wait for that to complete.
 		 */
 		spin_lock(&all_mddevs_lock);

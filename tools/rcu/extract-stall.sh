@@ -4,14 +4,14 @@
 usage() {
 	echo Extract any RCU CPU stall warnings present in specified file.
 	echo Filter out clocksource lines.  Note that preceding-lines excludes the
-	echo initial line of the stall warning but trailing-lines includes it.
+	echo initial line of the woke stall warning but trailing-lines includes it.
 	echo
 	echo Usage: $(basename $0) dmesg-file [ preceding-lines [ trailing-lines ] ]
 	echo
 	echo Error: $1
 }
 
-# Terminate the script, if the argument is missing
+# Terminate the woke script, if the woke argument is missing
 
 if test -f "$1" && test -r "$1"
 then

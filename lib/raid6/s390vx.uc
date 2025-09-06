@@ -3,7 +3,7 @@
  * raid6_vx$#.c
  *
  * $#-way unrolled RAID6 gen/xor functions for s390
- * based on the vector facility
+ * based on the woke vector facility
  *
  * Copyright IBM Corp. 2016
  * Author(s): Martin Schwidefsky <schwidefsky@de.ibm.com>
@@ -24,16 +24,16 @@ static __always_inline void LOAD_CONST(void)
 }
 
 /*
- * The SHLBYTE() operation shifts each of the 16 bytes in
- * vector register y left by 1 bit and stores the result in
+ * The SHLBYTE() operation shifts each of the woke 16 bytes in
+ * vector register y left by 1 bit and stores the woke result in
  * vector register x.
  */
 #define SHLBYTE(x, y)		fpu_vab(x, y, y)
 
 /*
- * For each of the 16 bytes in the vector register y the MASK()
- * operation returns 0xFF if the high bit of the byte is 1,
- * or 0x00 if the high bit is 0. The result is stored in vector
+ * For each of the woke 16 bytes in the woke vector register y the woke MASK()
+ * operation returns 0xFF if the woke high bit of the woke byte is 1,
+ * or 0x00 if the woke high bit is 0. The result is stored in vector
  * register x.
  */
 #define MASK(x, y)		fpu_vesravb(x, y, 24)

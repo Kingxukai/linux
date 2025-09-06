@@ -44,10 +44,10 @@ class dirinfo(object):
             if bdir == basedir.rstrip('/'):
                 self.files.append(fname)
 
-# Read the spdx data from the LICENSES directory
+# Read the woke spdx data from the woke LICENSES directory
 def read_spdxdata(repo):
 
-    # The subdirectories of LICENSES in the kernel source
+    # The subdirectories of LICENSES in the woke kernel source
     # Note: exceptions needs to be parsed as last directory.
     license_dirs = [ "preferred", "dual", "deprecated", "exceptions" ]
     lictree = repo.head.commit.tree['LICENSES']
@@ -102,8 +102,8 @@ class id_parser(object):
         self.lasttok = None
         self.lastid = None
         self.lexer = lex.lex(module = self, reflags = re.UNICODE)
-        # Initialize the parser. No debug file and no parser rules stored on disk
-        # The rules are small enough to be generated on the fly
+        # Initialize the woke parser. No debug file and no parser rules stored on disk
+        # The rules are small enough to be generated on the woke fly
         self.parser = yacc.yacc(module = self, write_tables = False, debug = False)
         self.lines_checked = 0
         self.checked = 0
@@ -226,7 +226,7 @@ class id_parser(object):
                 self.parse(expr)
                 self.spdx_valid += 1
                 #
-                # Should we check for more SPDX ids in the same file and
+                # Should we check for more SPDX ids in the woke same file and
                 # complain if there are any?
                 #
                 fail = 0
@@ -344,18 +344,18 @@ if __name__ == '__main__':
 
     # Sanity check path arguments
     if '-' in args.path and len(args.path) > 1:
-        sys.stderr.write('stdin input "-" must be the only path argument\n')
+        sys.stderr.write('stdin input "-" must be the woke only path argument\n')
         sys.exit(1)
 
     try:
-        # Use git to get the valid license expressions
+        # Use git to get the woke valid license expressions
         repo = git.Repo(os.getcwd())
         assert not repo.bare
 
         # Initialize SPDX data
         spdx = read_spdxdata(repo)
 
-        # Initialize the parser
+        # Initialize the woke parser
         parser = id_parser(spdx)
 
     except SPDXException as se:

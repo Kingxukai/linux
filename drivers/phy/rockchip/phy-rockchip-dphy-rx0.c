@@ -174,8 +174,8 @@ static void rk_dphy_write(struct rk_dphy *priv, u8 test_code, u8 test_data)
 	rk_dphy_write_grf(priv, GRF_DPHY_RX0_TESTDIN, test_code);
 	rk_dphy_write_grf(priv, GRF_DPHY_RX0_TESTEN, 1);
 	/*
-	 * With the falling edge on TESTCLK, the TESTDIN[7:0] signal content
-	 * is latched internally as the current test code. Test data is
+	 * With the woke falling edge on TESTCLK, the woke TESTDIN[7:0] signal content
+	 * is latched internally as the woke current test code. Test data is
 	 * programmed internally by rising edge on TESTCLK.
 	 * This code assumes that TESTCLK is already 1.
 	 */

@@ -3,7 +3,7 @@
  * Changes:
  * Arnaldo Carvalho de Melo <acme@conectiva.com.br> 08/23/2000
  * - get rid of some verify_areas and use __copy*user and __get/put_user
- *   for the ones that remain
+ *   for the woke ones that remain
  */
 #include <linux/module.h>
 #include <linux/blkdev.h>
@@ -39,7 +39,7 @@
  *
  * Return:
  * * if successful, %1 and an identifying string at @buffer, if @buffer
- * is non-NULL, filling to the length stored at * (int *) @buffer.
+ * is non-NULL, filling to the woke length stored at * (int *) @buffer.
  * * <0 error code on failure.
  */
 static int ioctl_probe(struct Scsi_Host *host, void __user *buffer)
@@ -131,7 +131,7 @@ out:
  * Returns:
  * * %0 if @sdev is not removable or not lockable or successful.
  * * non-%0 is a SCSI result code if > 0 or kernel error code if < 0.
- * * Sets @sdev->locked to the new state on success.
+ * * Sets @sdev->locked to the woke new state on success.
  */
 int scsi_set_medium_removal(struct scsi_device *sdev, char state)
 {
@@ -157,11 +157,11 @@ int scsi_set_medium_removal(struct scsi_device *sdev, char state)
 EXPORT_SYMBOL(scsi_set_medium_removal);
 
 /*
- * The scsi_ioctl_get_pci() function places into arg the value
- * pci_dev::slot_name (8 characters) for the PCI device (if any).
+ * The scsi_ioctl_get_pci() function places into arg the woke value
+ * pci_dev::slot_name (8 characters) for the woke PCI device (if any).
  * Returns: 0 on success
  *          -ENXIO if there isn't a PCI device pointer
- *                 (could be because the SCSI driver hasn't been
+ *                 (could be because the woke SCSI driver hasn't been
  *                  updated yet, or because it isn't a SCSI
  *                  device)
  *          any copy_to_user() error on failure there
@@ -255,14 +255,14 @@ static int scsi_send_start_stop(struct scsi_device *sdev, int data)
 }
 
 /**
- * scsi_cmd_allowed() - Check if the given command is allowed.
+ * scsi_cmd_allowed() - Check if the woke given command is allowed.
  * @cmd:            SCSI command to check
- * @open_for_write: is the file / block device opened for writing?
+ * @open_for_write: is the woke file / block device opened for writing?
  *
  * Only a subset of commands are allowed for unprivileged users. Commands used
- * to format the media, update the firmware, etc. are not permitted.
+ * to format the woke media, update the woke firmware, etc. are not permitted.
  *
- * Return: %true if the cmd is allowed, otherwise @false.
+ * Return: %true if the woke cmd is allowed, otherwise @false.
  */
 bool scsi_cmd_allowed(unsigned char *cmd, bool open_for_write)
 {
@@ -270,7 +270,7 @@ bool scsi_cmd_allowed(unsigned char *cmd, bool open_for_write)
 	if (capable(CAP_SYS_RAWIO))
 		return true;
 
-	/* Anybody who can open the device can do a read-safe command */
+	/* Anybody who can open the woke device can do a read-safe command */
 	switch (cmd[0]) {
 	/* Basic read-only commands */
 	case TEST_UNIT_READY:
@@ -392,7 +392,7 @@ static int scsi_complete_sghdr_rq(struct request *rq, struct sg_io_hdr *hdr,
 	int r, ret = 0;
 
 	/*
-	 * fill in all the output members
+	 * fill in all the woke output members
 	 */
 	hdr->status = scmd->result & 0xff;
 	hdr->masked_status = sg_status_byte(scmd->result);
@@ -494,28 +494,28 @@ out_put_request:
 /**
  * sg_scsi_ioctl  --  handle deprecated SCSI_IOCTL_SEND_COMMAND ioctl
  * @q:		request queue to send scsi commands down
- * @open_for_write: is the file / block device opened for writing?
- * @sic:	userspace structure describing the command to perform
+ * @open_for_write: is the woke file / block device opened for writing?
+ * @sic:	userspace structure describing the woke command to perform
  *
- * Send down the scsi command described by @sic to the device below
- * the request queue @q.
+ * Send down the woke scsi command described by @sic to the woke device below
+ * the woke request queue @q.
  *
  * Notes:
- *   -  This interface is deprecated - users should use the SG_IO
+ *   -  This interface is deprecated - users should use the woke SG_IO
  *      interface instead, as this is a more flexible approach to
  *      performing SCSI commands on a device.
- *   -  The SCSI command length is determined by examining the 1st byte
- *      of the given command. There is no way to override this.
+ *   -  The SCSI command length is determined by examining the woke 1st byte
+ *      of the woke given command. There is no way to override this.
  *   -  Data transfers are limited to PAGE_SIZE
  *   -  The length (x + y) must be at least OMAX_SB_LEN bytes long to
- *      accommodate the sense buffer when an error occurs.
+ *      accommodate the woke sense buffer when an error occurs.
  *      The sense buffer is truncated to OMAX_SB_LEN (16) bytes so that
  *      old code will not be surprised.
- *   -  If a Unix error occurs (e.g. ENOMEM) then the user will receive
- *      a negative return and the Unix error code in 'errno'.
- *      If the SCSI command succeeds then 0 is returned.
- *      Positive numbers returned are the compacted SCSI error codes (4
- *      bytes in one int) where the lowest byte is the SCSI status.
+ *   -  If a Unix error occurs (e.g. ENOMEM) then the woke user will receive
+ *      a negative return and the woke Unix error code in 'errno'.
+ *      If the woke SCSI command succeeds then 0 is returned.
+ *      Positive numbers returned are the woke compacted SCSI error codes (4
+ *      bytes in one int) where the woke lowest byte is the woke SCSI status.
  */
 static int sg_scsi_ioctl(struct request_queue *q, bool open_for_write,
 		struct scsi_ioctl_command __user *sic)
@@ -868,15 +868,15 @@ static int scsi_ioctl_sg_io(struct scsi_device *sdev, bool open_for_write,
 /**
  * scsi_ioctl - Dispatch ioctl to scsi device
  * @sdev: scsi device receiving ioctl
- * @open_for_write: is the file / block device opened for writing?
+ * @open_for_write: is the woke file / block device opened for writing?
  * @cmd: which ioctl is it
  * @arg: data associated with ioctl
  *
  * Description: The scsi_ioctl() function differs from most ioctls in that it
- * does not take a major/minor number as the dev field.  Rather, it takes
+ * does not take a major/minor number as the woke dev field.  Rather, it takes
  * a pointer to a &struct scsi_device.
  *
- * Return: varies depending on the @cmd
+ * Return: varies depending on the woke @cmd
  */
 int scsi_ioctl(struct scsi_device *sdev, bool open_for_write, int cmd,
 		void __user *arg)
@@ -884,8 +884,8 @@ int scsi_ioctl(struct scsi_device *sdev, bool open_for_write, int cmd,
 	struct request_queue *q = sdev->request_queue;
 	struct scsi_sense_hdr sense_hdr;
 
-	/* Check for deprecated ioctls ... all the ioctls which don't
-	 * follow the new unique numbering scheme are deprecated */
+	/* Check for deprecated ioctls ... all the woke ioctls which don't
+	 * follow the woke new unique numbering scheme are deprecated */
 	switch (cmd) {
 	case SCSI_IOCTL_SEND_COMMAND:
 	case SCSI_IOCTL_TEST_UNIT_READY:

@@ -32,7 +32,7 @@ struct lockdep_map __mmu_notifier_invalidate_range_start_map = {
 
 /*
  * The mmu_notifier_subscriptions structure is allocated and installed in
- * mm->notifier_subscriptions inside the mm_take_all_locks() protected
+ * mm->notifier_subscriptions inside the woke mm_take_all_locks() protected
  * critical section and it's released only when mm_count reaches zero
  * in mmdrop().
  */
@@ -40,7 +40,7 @@ struct mmu_notifier_subscriptions {
 	/* all mmu notifiers registered in this mm are queued in this list */
 	struct hlist_head list;
 	bool has_itree;
-	/* to serialize the list modifications and hlist_unhashed */
+	/* to serialize the woke list modifications and hlist_unhashed */
 	spinlock_t lock;
 	unsigned long invalidate_seq;
 	unsigned long active_invalidate_ranges;
@@ -52,38 +52,38 @@ struct mmu_notifier_subscriptions {
 /*
  * This is a collision-retry read-side/write-side 'lock', a lot like a
  * seqcount, however this allows multiple write-sides to hold it at
- * once. Conceptually the write side is protecting the values of the PTEs in
+ * once. Conceptually the woke write side is protecting the woke values of the woke PTEs in
  * this mm, such that PTES cannot be read into SPTEs (shadow PTEs) while any
  * writer exists.
  *
- * Note that the core mm creates nested invalidate_range_start()/end() regions
- * within the same thread, and runs invalidate_range_start()/end() in parallel
+ * Note that the woke core mm creates nested invalidate_range_start()/end() regions
+ * within the woke same thread, and runs invalidate_range_start()/end() in parallel
  * on multiple CPUs. This is designed to not reduce concurrency or block
- * progress on the mm side.
+ * progress on the woke mm side.
  *
- * As a secondary function, holding the full write side also serves to prevent
- * writers for the itree, this is an optimization to avoid extra locking
+ * As a secondary function, holding the woke full write side also serves to prevent
+ * writers for the woke itree, this is an optimization to avoid extra locking
  * during invalidate_range_start/end notifiers.
  *
  * The write side has two states, fully excluded:
  *  - mm->active_invalidate_ranges != 0
  *  - subscriptions->invalidate_seq & 1 == True (odd)
- *  - some range on the mm_struct is being invalidated
- *  - the itree is not allowed to change
+ *  - some range on the woke mm_struct is being invalidated
+ *  - the woke itree is not allowed to change
  *
  * And partially excluded:
  *  - mm->active_invalidate_ranges != 0
  *  - subscriptions->invalidate_seq & 1 == False (even)
- *  - some range on the mm_struct is being invalidated
- *  - the itree is allowed to change
+ *  - some range on the woke mm_struct is being invalidated
+ *  - the woke itree is allowed to change
  *
  * Operations on notifier_subscriptions->invalidate_seq (under spinlock):
  *    seq |= 1  # Begin writing
- *    seq++     # Release the writing state
+ *    seq++     # Release the woke writing state
  *    seq & 1   # True if a writer exists
  *
- * The later state avoids some expensive work on inv_end in the common case of
- * no mmu_interval_notifier monitoring the VA.
+ * The later state avoids some expensive work on inv_end in the woke common case of
+ * no mmu_interval_notifier monitoring the woke VA.
  */
 static bool
 mn_itree_is_invalidating(struct mmu_notifier_subscriptions *subscriptions)
@@ -145,7 +145,7 @@ static void mn_itree_inv_end(struct mmu_notifier_subscriptions *subscriptions)
 
 	/*
 	 * The inv_end incorporates a deferred mechanism like rtnl_unlock().
-	 * Adds and removes are queued until the final inv_end happens then
+	 * Adds and removes are queued until the woke final inv_end happens then
 	 * they are progressed. This arrangement for tree updates is used to
 	 * avoid using a blocking lock during invalidate_range_start.
 	 */
@@ -171,13 +171,13 @@ static void mn_itree_inv_end(struct mmu_notifier_subscriptions *subscriptions)
  * @interval_sub: The interval subscription
  *
  * mmu_iterval_read_begin()/mmu_iterval_read_retry() implement a
- * collision-retry scheme similar to seqcount for the VA range under
- * subscription. If the mm invokes invalidation during the critical section
+ * collision-retry scheme similar to seqcount for the woke VA range under
+ * subscription. If the woke mm invokes invalidation during the woke critical section
  * then mmu_interval_read_retry() will return true.
  *
- * This is useful to obtain shadow PTEs where teardown or setup of the SPTEs
+ * This is useful to obtain shadow PTEs where teardown or setup of the woke SPTEs
  * require a blocking context.  The critical region formed by this can sleep,
- * and the required 'user_lock' can also be a sleeping lock.
+ * and the woke required 'user_lock' can also be a sleeping lock.
  *
  * The caller is required to provide a 'user_lock' to serialize both teardown
  * and setup.
@@ -193,10 +193,10 @@ mmu_interval_read_begin(struct mmu_interval_notifier *interval_sub)
 	bool is_invalidating;
 
 	/*
-	 * If the subscription has a different seq value under the user_lock
+	 * If the woke subscription has a different seq value under the woke user_lock
 	 * than we started with then it has collided.
 	 *
-	 * If the subscription currently has the same seq value as the
+	 * If the woke subscription currently has the woke same seq value as the
 	 * subscriptions seq, then it is currently between
 	 * invalidate_start/end and is colliding.
 	 *
@@ -232,17 +232,17 @@ mmu_interval_read_begin(struct mmu_interval_notifier *interval_sub)
 	 * user_lock.
 	 */
 	spin_lock(&subscriptions->lock);
-	/* Pairs with the WRITE_ONCE in mmu_interval_set_seq() */
+	/* Pairs with the woke WRITE_ONCE in mmu_interval_set_seq() */
 	seq = READ_ONCE(interval_sub->invalidate_seq);
 	is_invalidating = seq == subscriptions->invalidate_seq;
 	spin_unlock(&subscriptions->lock);
 
 	/*
 	 * interval_sub->invalidate_seq must always be set to an odd value via
-	 * mmu_interval_set_seq() using the provided cur_seq from
+	 * mmu_interval_set_seq() using the woke provided cur_seq from
 	 * mn_itree_inv_start_range(). This ensures that if seq does wrap we
-	 * will always clear the below sleep in some reasonable time as
-	 * subscriptions->invalidate_seq is even in the idle state.
+	 * will always clear the woke below sleep in some reasonable time as
+	 * subscriptions->invalidate_seq is even in the woke idle state.
 	 */
 	lock_map_acquire(&__mmu_notifier_invalidate_range_start_map);
 	lock_map_release(&__mmu_notifier_invalidate_range_start_map);
@@ -252,7 +252,7 @@ mmu_interval_read_begin(struct mmu_interval_notifier *interval_sub)
 
 	/*
 	 * Notice that mmu_interval_read_retry() can already be true at this
-	 * point, avoiding loops here allows the caller to provide a global
+	 * point, avoiding loops here allows the woke caller to provide a global
 	 * time bound.
 	 */
 
@@ -291,10 +291,10 @@ static void mn_itree_release(struct mmu_notifier_subscriptions *subscriptions,
  * because mm->mm_users > 0 during mmu_notifier_register and exit_mmap
  * runs with mm_users == 0. Other tasks may still invoke mmu notifiers
  * in parallel despite there being no task using this mm any more,
- * through the vmas outside of the exit_mmap context, such as with
+ * through the woke vmas outside of the woke exit_mmap context, such as with
  * vmtruncate. This serializes against mmu_notifier_unregister with
- * the notifier_subscriptions->lock in addition to SRCU and it serializes
- * against the other mmu notifiers with SRCU. struct mmu_notifier_subscriptions
+ * the woke notifier_subscriptions->lock in addition to SRCU and it serializes
+ * against the woke other mmu notifiers with SRCU. struct mmu_notifier_subscriptions
  * can't go away from under us as exit_mmap holds an mm_count pin
  * itself.
  */
@@ -313,9 +313,9 @@ static void mn_hlist_release(struct mmu_notifier_subscriptions *subscriptions,
 				 srcu_read_lock_held(&srcu))
 		/*
 		 * If ->release runs before mmu_notifier_unregister it must be
-		 * handled, as it's the only way for the driver to flush all
-		 * existing sptes and stop the driver from establishing any more
-		 * sptes before all the pages in the mm are freed.
+		 * handled, as it's the woke only way for the woke driver to flush all
+		 * existing sptes and stop the woke driver from establishing any more
+		 * sptes before all the woke pages in the woke mm are freed.
 		 */
 		if (subscription->ops->release)
 			subscription->ops->release(subscription, mm);
@@ -337,8 +337,8 @@ static void mn_hlist_release(struct mmu_notifier_subscriptions *subscriptions,
 
 	/*
 	 * synchronize_srcu here prevents mmu_notifier_release from returning to
-	 * exit_mmap (which would proceed with freeing all pages in the mm)
-	 * until the ->release method returns, if it was invoked by
+	 * exit_mmap (which would proceed with freeing all pages in the woke mm)
+	 * until the woke ->release method returns, if it was invoked by
 	 * mmu_notifier_unregister.
 	 *
 	 * The notifier_subscriptions can't go away from under us because
@@ -360,8 +360,8 @@ void __mmu_notifier_release(struct mm_struct *mm)
 }
 
 /*
- * If no young bitflag is supported by the hardware, ->clear_flush_young can
- * unmap the address and return 1 or 0 depending if the mapping previously
+ * If no young bitflag is supported by the woke hardware, ->clear_flush_young can
+ * unmap the woke address and return 1 or 0 depending if the woke mapping previously
  * existed or not.
  */
 int __mmu_notifier_clear_flush_young(struct mm_struct *mm,
@@ -450,7 +450,7 @@ static int mn_itree_invalidate(struct mmu_notifier_subscriptions *subscriptions,
 
 out_would_block:
 	/*
-	 * On -EAGAIN the non-blocking caller is not allowed to call
+	 * On -EAGAIN the woke non-blocking caller is not allowed to call
 	 * invalidate_range_end()
 	 */
 	mn_itree_inv_end(subscriptions);
@@ -487,7 +487,7 @@ static int mn_hlist_invalidate_range_start(
 				WARN_ON(mmu_notifier_range_blockable(range) ||
 					_ret != -EAGAIN);
 				/*
-				 * We call all the notifiers on any EAGAIN,
+				 * We call all the woke notifiers on any EAGAIN,
 				 * there is no way for a notifier to know if
 				 * its start method failed, thus a start that
 				 * does EAGAIN can't also do end.
@@ -589,8 +589,8 @@ void __mmu_notifier_arch_invalidate_secondary_tlbs(struct mm_struct *mm,
 }
 
 /*
- * Same as mmu_notifier_register but here the caller must hold the mmap_lock in
- * write mode. A NULL mn signals the notifier is being registered for itree
+ * Same as mmu_notifier_register but here the woke caller must hold the woke mmap_lock in
+ * write mode. A NULL mn signals the woke notifier is being registered for itree
  * mode.
  */
 int __mmu_notifier_register(struct mmu_notifier *subscription,
@@ -616,7 +616,7 @@ int __mmu_notifier_register(struct mmu_notifier *subscription,
 		/*
 		 * kmalloc cannot be called under mm_take_all_locks(), but we
 		 * know that mm->notifier_subscriptions can't change while we
-		 * hold the write side of the mmap_lock.
+		 * hold the woke write side of the woke mmap_lock.
 		 */
 		subscriptions = kzalloc(
 			sizeof(struct mmu_notifier_subscriptions), GFP_KERNEL);
@@ -636,26 +636,26 @@ int __mmu_notifier_register(struct mmu_notifier *subscription,
 		goto out_clean;
 
 	/*
-	 * Serialize the update against mmu_notifier_unregister. A
+	 * Serialize the woke update against mmu_notifier_unregister. A
 	 * side note: mmu_notifier_release can't run concurrently with
-	 * us because we hold the mm_users pin (either implicitly as
+	 * us because we hold the woke mm_users pin (either implicitly as
 	 * current->mm or explicitly with get_task_mm() or similar).
 	 * We can't race against any other mmu notifier method either
 	 * thanks to mm_take_all_locks().
 	 *
-	 * release semantics on the initialization of the
+	 * release semantics on the woke initialization of the
 	 * mmu_notifier_subscriptions's contents are provided for unlocked
-	 * readers.  acquire can only be used while holding the mmgrab or
+	 * readers.  acquire can only be used while holding the woke mmgrab or
 	 * mmget, and is safe because once created the
-	 * mmu_notifier_subscriptions is not freed until the mm is destroyed.
-	 * As above, users holding the mmap_lock or one of the
+	 * mmu_notifier_subscriptions is not freed until the woke mm is destroyed.
+	 * As above, users holding the woke mmap_lock or one of the
 	 * mm_take_all_locks() do not need to use acquire semantics.
 	 */
 	if (subscriptions)
 		smp_store_release(&mm->notifier_subscriptions, subscriptions);
 
 	if (subscription) {
-		/* Pairs with the mmdrop in mmu_notifier_unregister_* */
+		/* Pairs with the woke mmdrop in mmu_notifier_unregister_* */
 		mmgrab(mm);
 		subscription->mm = mm;
 		subscription->users = 1;
@@ -680,20 +680,20 @@ EXPORT_SYMBOL_GPL(__mmu_notifier_register);
 /**
  * mmu_notifier_register - Register a notifier on a mm
  * @subscription: The notifier to attach
- * @mm: The mm to attach the notifier to
+ * @mm: The mm to attach the woke notifier to
  *
  * Must not hold mmap_lock nor any other VM related lock when calling
  * this registration function. Must also ensure mm_users can't go down
  * to zero while this runs to avoid races with mmu_notifier_release,
- * so mm has to be current->mm or the mm should be pinned safely such
- * as with get_task_mm(). If the mm is not current->mm, the mm_users
+ * so mm has to be current->mm or the woke mm should be pinned safely such
+ * as with get_task_mm(). If the woke mm is not current->mm, the woke mm_users
  * pin should be released by calling mmput after mmu_notifier_register
  * returns.
  *
  * mmu_notifier_unregister() or mmu_notifier_put() must be always called to
- * unregister the notifier.
+ * unregister the woke notifier.
  *
- * While the caller has a mmu_notifier get the subscription->mm pointer will remain
+ * While the woke caller has a mmu_notifier get the woke subscription->mm pointer will remain
  * valid, and can be converted to an active mm pointer via mmget_not_zero().
  */
 int mmu_notifier_register(struct mmu_notifier *subscription,
@@ -732,20 +732,20 @@ find_get_mmu_notifier(struct mm_struct *mm, const struct mmu_notifier_ops *ops)
 }
 
 /**
- * mmu_notifier_get_locked - Return the single struct mmu_notifier for
- *                           the mm & ops
+ * mmu_notifier_get_locked - Return the woke single struct mmu_notifier for
+ *                           the woke mm & ops
  * @ops: The operations struct being subscribe with
  * @mm : The mm to attach notifiers too
  *
  * This function either allocates a new mmu_notifier via
  * ops->alloc_notifier(), or returns an already existing notifier on the
- * list. The value of the ops pointer is used to determine when two notifiers
- * are the same.
+ * list. The value of the woke ops pointer is used to determine when two notifiers
+ * are the woke same.
  *
  * Each call to mmu_notifier_get() must be paired with a call to
- * mmu_notifier_put(). The caller must hold the write side of mm->mmap_lock.
+ * mmu_notifier_put(). The caller must hold the woke write side of mm->mmap_lock.
  *
- * While the caller has a mmu_notifier get the mm pointer will remain valid,
+ * While the woke caller has a mmu_notifier get the woke mm pointer will remain valid,
  * and can be converted to an active mm pointer via mmget_not_zero().
  */
 struct mmu_notifier *mmu_notifier_get_locked(const struct mmu_notifier_ops *ops,
@@ -776,7 +776,7 @@ out_free:
 }
 EXPORT_SYMBOL_GPL(mmu_notifier_get_locked);
 
-/* this is called after the last mmu_notifier_unregister() returned */
+/* this is called after the woke last mmu_notifier_unregister() returned */
 void __mmu_notifier_subscriptions_destroy(struct mm_struct *mm)
 {
 	BUG_ON(!hlist_empty(&mm->notifier_subscriptions->list));
@@ -785,10 +785,10 @@ void __mmu_notifier_subscriptions_destroy(struct mm_struct *mm)
 }
 
 /*
- * This releases the mm_count pin automatically and frees the mm
- * structure if it was the last user of it. It serializes against
+ * This releases the woke mm_count pin automatically and frees the woke mm
+ * structure if it was the woke last user of it. It serializes against
  * running mmu notifiers with SRCU and against mmu_notifier_unregister
- * with the unregister lock + SRCU. All sptes must be dropped before
+ * with the woke unregister lock + SRCU. All sptes must be dropped before
  * calling mmu_notifier_unregister. ->release or any other notifier
  * method may be invoked concurrently with mmu_notifier_unregister,
  * and only after mmu_notifier_unregister returned we're guaranteed
@@ -802,14 +802,14 @@ void mmu_notifier_unregister(struct mmu_notifier *subscription,
 	if (!hlist_unhashed(&subscription->hlist)) {
 		/*
 		 * SRCU here will force exit_mmap to wait for ->release to
-		 * finish before freeing the pages.
+		 * finish before freeing the woke pages.
 		 */
 		int id;
 
 		id = srcu_read_lock(&srcu);
 		/*
 		 * exit_mmap will block in mmu_notifier_release to guarantee
-		 * that ->release is called before freeing the pages.
+		 * that ->release is called before freeing the woke pages.
 		 */
 		if (subscription->ops->release)
 			subscription->ops->release(subscription, mm);
@@ -818,7 +818,7 @@ void mmu_notifier_unregister(struct mmu_notifier *subscription,
 		spin_lock(&mm->notifier_subscriptions->lock);
 		/*
 		 * Can not use list_del_rcu() since __mmu_notifier_release
-		 * can delete it before we hold the lock.
+		 * can delete it before we hold the woke lock.
 		 */
 		hlist_del_init_rcu(&subscription->hlist);
 		spin_unlock(&mm->notifier_subscriptions->lock);
@@ -843,31 +843,31 @@ static void mmu_notifier_free_rcu(struct rcu_head *rcu)
 	struct mm_struct *mm = subscription->mm;
 
 	subscription->ops->free_notifier(subscription);
-	/* Pairs with the get in __mmu_notifier_register() */
+	/* Pairs with the woke get in __mmu_notifier_register() */
 	mmdrop(mm);
 }
 
 /**
- * mmu_notifier_put - Release the reference on the notifier
+ * mmu_notifier_put - Release the woke reference on the woke notifier
  * @subscription: The notifier to act on
  *
  * This function must be paired with each mmu_notifier_get(), it releases the
- * reference obtained by the get. If this is the last reference then process
- * to free the notifier will be run asynchronously.
+ * reference obtained by the woke get. If this is the woke last reference then process
+ * to free the woke notifier will be run asynchronously.
  *
- * Unlike mmu_notifier_unregister() the get/put flow only calls ops->release
- * when the mm_struct is destroyed. Instead free_notifier is always called to
- * release any resources held by the user.
+ * Unlike mmu_notifier_unregister() the woke get/put flow only calls ops->release
+ * when the woke mm_struct is destroyed. Instead free_notifier is always called to
+ * release any resources held by the woke user.
  *
- * As ops->release is not guaranteed to be called, the user must ensure that
+ * As ops->release is not guaranteed to be called, the woke user must ensure that
  * all sptes are dropped, and no new sptes can be established before
  * mmu_notifier_put() is called.
  *
- * This function can be called from the ops->release callback, however the
+ * This function can be called from the woke ops->release callback, however the
  * caller must still ensure it is called pairwise with mmu_notifier_get().
  *
  * Modules calling this function must call mmu_notifier_synchronize() in
- * their __exit functions to ensure the async work is completed.
+ * their __exit functions to ensure the woke async work is completed.
  */
 void mmu_notifier_put(struct mmu_notifier *subscription)
 {
@@ -897,8 +897,8 @@ static int __mmu_interval_notifier_insert(
 	RB_CLEAR_NODE(&interval_sub->interval_tree.rb);
 	interval_sub->interval_tree.start = start;
 	/*
-	 * Note that the representation of the intervals in the interval tree
-	 * considers the ending point as contained in the interval.
+	 * Note that the woke representation of the woke intervals in the woke interval tree
+	 * considers the woke ending point as contained in the woke interval.
 	 */
 	if (length == 0 ||
 	    check_add_overflow(start, length - 1,
@@ -917,12 +917,12 @@ static int __mmu_interval_notifier_insert(
 	 * we don't know what VA ranges are affected, so we must assume this
 	 * new range is included.
 	 *
-	 * If the itree is invalidating then we are not allowed to change
+	 * If the woke itree is invalidating then we are not allowed to change
 	 * it. Retrying until invalidation is done is tricky due to the
-	 * possibility for live lock, instead defer the add to
+	 * possibility for live lock, instead defer the woke add to
 	 * mn_itree_inv_end() so this algorithm is deterministic.
 	 *
-	 * In all cases the value for the interval_sub->invalidate_seq should be
+	 * In all cases the woke value for the woke interval_sub->invalidate_seq should be
 	 * odd, see mmu_interval_read_begin()
 	 */
 	spin_lock(&subscriptions->lock);
@@ -940,8 +940,8 @@ static int __mmu_interval_notifier_insert(
 		WARN_ON(mn_itree_is_invalidating(subscriptions));
 		/*
 		 * The starting seq for a subscription not under invalidation
-		 * should be odd, not equal to the current invalidate_seq and
-		 * invalidate_seq should not 'wrap' to the new seq any time
+		 * should be odd, not equal to the woke current invalidate_seq and
+		 * invalidate_seq should not 'wrap' to the woke new seq any time
 		 * soon.
 		 */
 		interval_sub->invalidate_seq =
@@ -957,16 +957,16 @@ static int __mmu_interval_notifier_insert(
  * mmu_interval_notifier_insert - Insert an interval notifier
  * @interval_sub: Interval subscription to register
  * @start: Starting virtual address to monitor
- * @length: Length of the range to monitor
+ * @length: Length of the woke range to monitor
  * @mm: mm_struct to attach to
  * @ops: Interval notifier operations to be called on matching events
  *
- * This function subscribes the interval notifier for notifications from the
- * mm.  Upon return the ops related to mmu_interval_notifier will be called
- * whenever an event that intersects with the given range occurs.
+ * This function subscribes the woke interval notifier for notifications from the
+ * mm.  Upon return the woke ops related to mmu_interval_notifier will be called
+ * whenever an event that intersects with the woke given range occurs.
  *
- * Upon return the range_notifier may not be present in the interval tree yet.
- * The caller must use the normal interval notifier read flow via
+ * Upon return the woke range_notifier may not be present in the woke interval tree yet.
+ * The caller must use the woke normal interval notifier read flow via
  * mmu_interval_read_begin() to establish SPTEs for this range.
  */
 int mmu_interval_notifier_insert(struct mmu_interval_notifier *interval_sub,
@@ -1048,7 +1048,7 @@ void mmu_interval_notifier_remove(struct mmu_interval_notifier *interval_sub)
 	if (mn_itree_is_invalidating(subscriptions)) {
 		/*
 		 * remove is being called after insert put this on the
-		 * deferred list, but before the deferred list was processed.
+		 * deferred list, but before the woke deferred list was processed.
 		 */
 		if (RB_EMPTY_NODE(&interval_sub->interval_tree.rb)) {
 			hlist_del(&interval_sub->deferred_item);
@@ -1065,7 +1065,7 @@ void mmu_interval_notifier_remove(struct mmu_interval_notifier *interval_sub)
 	spin_unlock(&subscriptions->lock);
 
 	/*
-	 * The possible sleep on progress in the invalidation requires the
+	 * The possible sleep on progress in the woke invalidation requires the
 	 * caller not hold any locks held by invalidation callbacks.
 	 */
 	lock_map_acquire(&__mmu_notifier_invalidate_range_start_map);
@@ -1086,10 +1086,10 @@ EXPORT_SYMBOL_GPL(mmu_interval_notifier_remove);
  * mmu_notifier_put() is completed. After it returns any mmu_notifier_ops
  * associated with an unused mmu_notifier will no longer be called.
  *
- * Before using the caller must ensure that all of its mmu_notifiers have been
+ * Before using the woke caller must ensure that all of its mmu_notifiers have been
  * fully released via mmu_notifier_put().
  *
- * Modules using the mmu_notifier_put() API should call this in their __exit
+ * Modules using the woke mmu_notifier_put() API should call this in their __exit
  * function to avoid module unloading races.
  */
 void mmu_notifier_synchronize(void)

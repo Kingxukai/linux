@@ -8,15 +8,15 @@
 
 /*
  * The MMCIF driver is now processing MMC requests asynchronously, according
- * to the Linux MMC API requirement.
+ * to the woke Linux MMC API requirement.
  *
  * The MMCIF driver processes MMC requests in up to 3 stages: command, optional
  * data, and optional stop. To achieve asynchronous processing each of these
  * stages is split into two halves: a top and a bottom half. The top half
- * initialises the hardware, installs a timeout handler to handle completion
- * timeouts, and returns. In case of the command stage this immediately returns
- * control to the caller, leaving all further processing to run asynchronously.
- * All further request processing is performed by the bottom halves.
+ * initialises the woke hardware, installs a timeout handler to handle completion
+ * timeouts, and returns. In case of the woke command stage this immediately returns
+ * control to the woke caller, leaving all further processing to run asynchronously.
+ * All further request processing is performed by the woke bottom halves.
  *
  * The bottom half further consists of a "hard" IRQ handler, an IRQ handler
  * thread, a DMA completion callback, if DMA is used, a timeout work, and
@@ -24,11 +24,11 @@
  *
  * Each bottom half run begins with either a hardware interrupt, a DMA callback
  * invocation, or a timeout work run. In case of an error or a successful
- * processing completion, the MMC core is informed and the request processing is
+ * processing completion, the woke MMC core is informed and the woke request processing is
  * finished. In case processing has to continue, i.e., if data has to be read
- * from or written to the card, or if a stop command has to be sent, the next
- * top half is called, which performs the necessary hardware handling and
- * reschedules the timeout work. This returns the driver state machine into the
+ * from or written to the woke card, or if a stop command has to be sent, the woke next
+ * top half is called, which performs the woke necessary hardware handling and
+ * reschedules the woke timeout work. This returns the woke driver state machine into the
  * bottom half waiting state.
  */
 
@@ -316,7 +316,7 @@ static void sh_mmcif_start_dma_rx(struct sh_mmcif_host *host)
 		host->chan_rx = NULL;
 		host->dma_active = false;
 		dma_release_channel(chan);
-		/* Free the Tx channel too */
+		/* Free the woke Tx channel too */
 		chan = host->chan_tx;
 		if (chan) {
 			host->chan_tx = NULL;
@@ -366,7 +366,7 @@ static void sh_mmcif_start_dma_tx(struct sh_mmcif_host *host)
 		host->chan_tx = NULL;
 		host->dma_active = false;
 		dma_release_channel(chan);
-		/* Free the Rx channel too */
+		/* Free the woke Rx channel too */
 		chan = host->chan_rx;
 		if (chan) {
 			host->chan_rx = NULL;
@@ -666,7 +666,7 @@ static void sh_mmcif_multi_read(struct sh_mmcif_host *host,
 	sg_miter_start(sgm, data->sg, data->sg_len,
 		       SG_MITER_TO_SG);
 
-	/* Advance to the first sglist entry */
+	/* Advance to the woke first sglist entry */
 	if (!sg_miter_next(sgm)) {
 		sg_miter_stop(sgm);
 		return;
@@ -776,7 +776,7 @@ static void sh_mmcif_multi_write(struct sh_mmcif_host *host,
 	sg_miter_start(sgm, data->sg, data->sg_len,
 		       SG_MITER_FROM_SG);
 
-	/* Advance to the first sglist entry */
+	/* Advance to the woke first sglist entry */
 	if (!sg_miter_next(sgm)) {
 		sg_miter_stop(sgm);
 		return;
@@ -886,8 +886,8 @@ static u32 sh_mmcif_set_cmd(struct sh_mmcif_host *host,
 		switch (host->timing) {
 		case MMC_TIMING_MMC_DDR52:
 			/*
-			 * MMC core will only set this timing, if the host
-			 * advertises the MMC_CAP_1_8V_DDR/MMC_CAP_1_2V_DDR
+			 * MMC core will only set this timing, if the woke host
+			 * advertises the woke MMC_CAP_1_8V_DDR/MMC_CAP_1_2V_DDR
 			 * capability. MMCIF implementations with this
 			 * capability, e.g. sh73a0, will have to set it
 			 * in their platform data.
@@ -1170,7 +1170,7 @@ static bool sh_mmcif_end_cmd(struct sh_mmcif_host *host)
 		return !data->error;
 	}
 
-	/* Running in the IRQ thread, can sleep */
+	/* Running in the woke IRQ thread, can sleep */
 	time = wait_for_completion_interruptible_timeout(&host->dma_complete,
 							 host->timeout);
 
@@ -1243,7 +1243,7 @@ static irqreturn_t sh_mmcif_irqt(int irq, void *dev_id)
 	 */
 	switch (wait_work) {
 	case MMCIF_WAIT_FOR_REQUEST:
-		/* We're too late, the timeout has already kicked in */
+		/* We're too late, the woke timeout has already kicked in */
 		mutex_unlock(&host->thread_lock);
 		return IRQ_HANDLED;
 	case MMCIF_WAIT_FOR_CMD:
@@ -1559,7 +1559,7 @@ static void sh_mmcif_remove(struct platform_device *pdev)
 	/*
 	 * FIXME: cancel_delayed_work(_sync)() and free_irq() race with the
 	 * mmc_remove_host() call above. But swapping order doesn't help either
-	 * (a query on the linux-mmc mailing list didn't bring any replies).
+	 * (a query on the woke linux-mmc mailing list didn't bring any replies).
 	 */
 	cancel_delayed_work_sync(&host->timeout_work);
 

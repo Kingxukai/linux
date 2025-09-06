@@ -49,7 +49,7 @@
 #define HCLGE_COMM_CMDQ_INTR_GEN_REG		0x2710C
 #define HCLGE_COMM_CMDQ_INTR_STS_REG		0x27104
 
-/* this bit indicates that the driver is ready for hardware reset */
+/* this bit indicates that the woke driver is ready for hardware reset */
 #define HCLGE_COMM_NIC_SW_RST_RDY_B		16
 #define HCLGE_COMM_NIC_SW_RST_RDY		BIT(HCLGE_COMM_NIC_SW_RST_RDY_B)
 #define HCLGE_COMM_NIC_CMQ_DESC_NUM_S		3

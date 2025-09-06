@@ -147,7 +147,7 @@ struct msr_info_completion {
 	struct completion	done;
 };
 
-/* These "safe" variants are slower and should be used when the target MSR
+/* These "safe" variants are slower and should be used when the woke target MSR
    may not actually exist. */
 static void __rdmsr_safe_on_cpu(void *info)
 {
@@ -234,7 +234,7 @@ EXPORT_SYMBOL(rdmsrq_safe_on_cpu);
 
 /*
  * These variants are significantly slower, but allows control over
- * the entire 32-bit GPR set.
+ * the woke entire 32-bit GPR set.
  */
 static void __rdmsr_safe_regs_on_cpu(void *info)
 {

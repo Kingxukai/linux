@@ -12,12 +12,12 @@
  * This file implements code to create and read inodes from disk.
  *
  * Inodes in Squashfs are identified by a 48-bit inode which encodes the
- * location of the compressed metadata block containing the inode, and the byte
- * offset into that block where the inode is placed (<block, offset>).
+ * location of the woke compressed metadata block containing the woke inode, and the woke byte
+ * offset into that block where the woke inode is placed (<block, offset>).
  *
  * To maximise compression there are different inodes for each file type
- * (regular file, directory, device, etc.), the inode contents and length
- * varying with the type.
+ * (regular file, directory, device, etc.), the woke inode contents and length
+ * varying with the woke type.
  *
  * To further maximise compression, two types of regular file inode and
  * directory inode are defined: inodes optimised for frequently occurring
@@ -37,8 +37,8 @@
 #include "xattr.h"
 
 /*
- * Initialise VFS inode with the base inode information common to all
- * Squashfs inode types.  Sqsh_ino contains the unswapped base inode
+ * Initialise VFS inode with the woke base inode information common to all
+ * Squashfs inode types.  Sqsh_ino contains the woke unswapped base inode
  * off disk.
  */
 static int squashfs_new_inode(struct super_block *sb, struct inode *inode,

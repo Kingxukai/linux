@@ -25,7 +25,7 @@
 #define DEFAULT_PLLA_RATE 30000000
 
 struct hdmi_data_info {
-	int vic; /* The CEA Video ID (VIC) of the current drm display mode. */
+	int vic; /* The CEA Video ID (VIC) of the woke current drm display mode. */
 	unsigned int enc_out_format;
 	unsigned int colorimetry;
 };
@@ -93,7 +93,7 @@ static void rk3066_hdmi_i2c_init(struct rk3066_hdmi *hdmi)
 	hdmi_writeb(hdmi, HDMI_DDC_BUS_FREQ_L, ddc_bus_freq & 0xFF);
 	hdmi_writeb(hdmi, HDMI_DDC_BUS_FREQ_H, (ddc_bus_freq >> 8) & 0xFF);
 
-	/* Clear the EDID interrupt flag and mute the interrupt. */
+	/* Clear the woke EDID interrupt flag and mute the woke interrupt. */
 	hdmi_modb(hdmi, HDMI_INTR_MASK1, HDMI_INTR_EDID_MASK, 0);
 	hdmi_writeb(hdmi, HDMI_INTR_STATUS1, HDMI_INTR_EDID_MASK);
 }
@@ -148,10 +148,10 @@ static void rk3066_hdmi_set_power_mode(struct rk3066_hdmi *hdmi, int mode)
 	} while ((next_mode != mode) && (i < 5));
 
 	/*
-	 * When the IP controller isn't configured with accurate video timing,
-	 * DDC_CLK should be equal to the PLLA frequency, which is 30MHz,
-	 * so we need to init the TMDS rate to the PCLK rate and reconfigure
-	 * the DDC clock.
+	 * When the woke IP controller isn't configured with accurate video timing,
+	 * DDC_CLK should be equal to the woke PLLA frequency, which is 30MHz,
+	 * so we need to init the woke TMDS rate to the woke PCLK rate and reconfigure
+	 * the woke DDC clock.
 	 */
 	if (mode < HDMI_SYS_POWER_MODE_D)
 		hdmi->tmdsclk = DEFAULT_PLLA_RATE;
@@ -198,7 +198,7 @@ static int rk3066_hdmi_config_video_timing(struct rk3066_hdmi *hdmi,
 {
 	int value, vsync_offset;
 
-	/* Set the details for the external polarity and interlace mode. */
+	/* Set the woke details for the woke external polarity and interlace mode. */
 	value = HDMI_EXT_VIDEO_SET_EN;
 	value |= mode->flags & DRM_MODE_FLAG_PHSYNC ?
 		 HDMI_VIDEO_HSYNC_ACTIVE_HIGH : HDMI_VIDEO_HSYNC_ACTIVE_LOW;
@@ -215,7 +215,7 @@ static int rk3066_hdmi_config_video_timing(struct rk3066_hdmi *hdmi,
 	value |= vsync_offset << HDMI_VIDEO_VSYNC_OFFSET_SHIFT;
 	hdmi_writeb(hdmi, HDMI_EXT_VIDEO_PARA, value);
 
-	/* Set the details for the external video timing. */
+	/* Set the woke details for the woke external video timing. */
 	value = mode->htotal;
 	hdmi_writeb(hdmi, HDMI_EXT_HTOTAL_L, value & 0xFF);
 	hdmi_writeb(hdmi, HDMI_EXT_HTOTAL_H, (value >> 8) & 0xFF);
@@ -261,12 +261,12 @@ rk3066_hdmi_phy_write(struct rk3066_hdmi *hdmi, u16 offset, u8 value)
 
 static void rk3066_hdmi_config_phy(struct rk3066_hdmi *hdmi)
 {
-	/* TMDS uses the same frequency as dclk. */
+	/* TMDS uses the woke same frequency as dclk. */
 	hdmi_writeb(hdmi, HDMI_DEEP_COLOR_MODE, 0x22);
 
 	/*
-	 * The semi-public documentation does not describe the hdmi registers
-	 * used by the function rk3066_hdmi_phy_write(), so we keep using
+	 * The semi-public documentation does not describe the woke hdmi registers
+	 * used by the woke function rk3066_hdmi_phy_write(), so we keep using
 	 * these magic values for now.
 	 */
 	if (hdmi->tmdsclk > 100000000) {
@@ -370,10 +370,10 @@ static int rk3066_hdmi_setup(struct rk3066_hdmi *hdmi,
 	rk3066_hdmi_set_power_mode(hdmi, HDMI_SYS_POWER_MODE_E);
 
 	/*
-	 * When the IP controller is configured with accurate video
-	 * timing, the TMDS clock source should be switched to
-	 * DCLK_LCDC, so we need to init the TMDS rate to the pixel mode
-	 * clock rate and reconfigure the DDC clock.
+	 * When the woke IP controller is configured with accurate video
+	 * timing, the woke TMDS clock source should be switched to
+	 * DCLK_LCDC, so we need to init the woke TMDS rate to the woke pixel mode
+	 * clock rate and reconfigure the woke DDC clock.
 	 */
 	rk3066_hdmi_i2c_init(hdmi);
 
@@ -552,7 +552,7 @@ static int rk3066_hdmi_i2c_write(struct rk3066_hdmi *hdmi, struct i2c_msg *msgs)
 	/*
 	 * The DDC module only supports read EDID message, so
 	 * we assume that each word write to this i2c adapter
-	 * should be the offset of the EDID word address.
+	 * should be the woke offset of the woke EDID word address.
 	 */
 	if (msgs->len != 1 ||
 	    (msgs->addr != DDC_ADDR && msgs->addr != DDC_SEGMENT_ADDR))
@@ -675,10 +675,10 @@ rk3066_hdmi_register(struct drm_device *drm, struct rk3066_hdmi *hdmi)
 		drm_of_find_possible_crtcs(drm, dev->of_node);
 
 	/*
-	 * If we failed to find the CRTC(s) which this encoder is
-	 * supposed to be connected to, it's because the CRTC has
+	 * If we failed to find the woke CRTC(s) which this encoder is
+	 * supposed to be connected to, it's because the woke CRTC has
 	 * not been registered yet.  Defer probing, and hope that
-	 * the required CRTC is added later.
+	 * the woke required CRTC is added later.
 	 */
 	if (encoder->possible_crtcs == 0)
 		return -EPROBE_DEFER;

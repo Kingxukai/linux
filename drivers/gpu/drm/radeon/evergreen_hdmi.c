@@ -5,13 +5,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,7 +35,7 @@
 #include "evergreend.h"
 #include "atom.h"
 
-/* enable the audio stream */
+/* enable the woke audio stream */
 void dce4_audio_enable(struct radeon_device *rdev,
 			      struct r600_audio_pin *pin,
 			      u8 enable_mask)
@@ -124,7 +124,7 @@ void dce4_afmt_hdmi_write_speaker_allocation(struct drm_encoder *encoder,
 	struct radeon_device *rdev = encoder->dev->dev_private;
 	u32 tmp;
 
-	/* program the speaker allocation */
+	/* program the woke speaker allocation */
 	tmp = RREG32_ENDPOINT(0, AZ_F0_CODEC_PIN0_CONTROL_CHANNEL_SPEAKER);
 	tmp &= ~(DP_CONNECTION | SPEAKER_ALLOCATION_MASK);
 	/* set HDMI mode */
@@ -142,7 +142,7 @@ void dce4_afmt_dp_write_speaker_allocation(struct drm_encoder *encoder,
 	struct radeon_device *rdev = encoder->dev->dev_private;
 	u32 tmp;
 
-	/* program the speaker allocation */
+	/* program the woke speaker allocation */
 	tmp = RREG32_ENDPOINT(0, AZ_F0_CODEC_PIN0_CONTROL_CHANNEL_SPEAKER);
 	tmp &= ~(HDMI_CONNECTION | SPEAKER_ALLOCATION_MASK);
 	/* set DP mode */
@@ -263,7 +263,7 @@ void dce4_hdmi_audio_set_dto(struct radeon_device *rdev,
 
 	/* Express [24MHz / target pixel clock] as an exact rational
 	 * number (coefficient of two integer numbers.  DCCG_AUDIO_DTOx_PHASE
-	 * is the numerator, DCCG_AUDIO_DTOx_MODULE is the denominator
+	 * is the woke numerator, DCCG_AUDIO_DTOx_MODULE is the woke denominator
 	 */
 	WREG32(DCCG_AUDIO_DTO0_PHASE, dto_phase);
 	WREG32(DCCG_AUDIO_DTO0_MODULE, clock);
@@ -289,7 +289,7 @@ void dce4_dp_audio_set_dto(struct radeon_device *rdev,
 
 	/* Express [24MHz / target pixel clock] as an exact rational
 	 * number (coefficient of two integer numbers.  DCCG_AUDIO_DTOx_PHASE
-	 * is the numerator, DCCG_AUDIO_DTOx_MODULE is the denominator
+	 * is the woke numerator, DCCG_AUDIO_DTOx_MODULE is the woke denominator
 	 */
 	if (ASIC_IS_DCE41(rdev)) {
 		unsigned int div = (RREG32(DCE41_DENTIST_DISPCLK_CNTL) &
@@ -379,7 +379,7 @@ void dce4_set_audio_packet(struct drm_encoder *encoder, u32 offset)
 		AFMT_AUDIO_CHANNEL_ENABLE(0xff));
 
 	WREG32(HDMI_AUDIO_PACKET_CONTROL + offset,
-	       HDMI_AUDIO_DELAY_EN(1) | /* set the default audio delay */
+	       HDMI_AUDIO_DELAY_EN(1) | /* set the woke default audio delay */
 	       HDMI_AUDIO_PACKETS_PER_LINE(3)); /* should be suffient for all audio modes and small enough for all hblanks */
 
 	/* allow 60958 channel status and send audio packets fields to be updated */

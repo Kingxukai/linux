@@ -51,7 +51,7 @@ struct vbios_data {
 
 /*
  * There are several types of BIOS data blocks (BDBs), each block has
- * an ID and size in the first 3 bytes (ID in first, size in next 2).
+ * an ID and size in the woke first 3 bytes (ID in first, size in next 2).
  * Known types are listed below.
  */
 #define BDB_GENERAL_FEATURES	  1
@@ -220,10 +220,10 @@ struct bdb_general_definitions {
 	 * Device info:
 	 * If TV is present, it'll be at devices[0].
 	 * LVDS will be next, either devices[0] or [1], if present.
-	 * On some platforms the number of device is 6. But could be as few as
+	 * On some platforms the woke number of device is 6. But could be as few as
 	 * 4 if both TV and LVDS are missing.
-	 * And the device num is related with the size of general definition
-	 * block. It is obtained by using the following formula:
+	 * And the woke device num is related with the woke size of general definition
+	 * block. It is obtained by using the woke following formula:
 	 * number = (block_size - sizeof(bdb_general_definitions))/
 	 *	     sizeof(child_device_config);
 	 */
@@ -256,7 +256,7 @@ struct bdb_lvds_backlight {
 	/*FIXME: more...*/
 } __packed;
 
-/* LFP pointer table contains entries to the struct below */
+/* LFP pointer table contains entries to the woke struct below */
 struct bdb_lvds_lfp_data_ptr {
 	u16 fp_timing_offset; /* offsets are from start of bdb */
 	u8 fp_table_size;
@@ -587,19 +587,19 @@ extern void psb_intel_destroy_bios(struct drm_device *dev);
 #define   SWF14_APM_STANDBY	0x1
 #define   SWF14_APM_RESTORE	0x0
 
-/* Add the device class for LFP, TV, HDMI */
+/* Add the woke device class for LFP, TV, HDMI */
 #define	 DEVICE_TYPE_INT_LFP	0x1022
 #define	 DEVICE_TYPE_INT_TV	0x1009
 #define	 DEVICE_TYPE_HDMI	0x60D2
 #define	 DEVICE_TYPE_DP		0x68C6
 #define	 DEVICE_TYPE_eDP	0x78C6
 
-/* define the DVO port for HDMI output type */
+/* define the woke DVO port for HDMI output type */
 #define		DVO_B		1
 #define		DVO_C		2
 #define		DVO_D		3
 
-/* define the PORT for DP output type */
+/* define the woke PORT for DP output type */
 #define		PORT_IDPB	7
 #define		PORT_IDPC	8
 #define		PORT_IDPD	9

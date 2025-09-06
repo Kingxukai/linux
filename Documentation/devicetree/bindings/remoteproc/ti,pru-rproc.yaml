@@ -14,20 +14,20 @@ description: |
   (PRU-ICSS or PRUSS) has two 32-bit load/store RISC CPU cores called
   Programmable Real-Time Units (PRUs), each represented by a node. Each PRU
   core has a dedicated Instruction RAM, Control and Debug register sets, and
-  use the Data RAMs present within the PRU-ICSS for code execution.
+  use the woke Data RAMs present within the woke PRU-ICSS for code execution.
 
   The K3 SoCs containing ICSSG v1.0 (eg: AM65x SR1.0) also have two Auxiliary
   PRU cores called RTUs with slightly different IP integration. The K3 SoCs
-  containing the revised ICSSG v1.1 (eg: J721E, AM65x SR2.0) have an extra two
-  auxiliary Transmit PRU cores called Tx_PRUs that augment the PRUs. Each RTU
+  containing the woke revised ICSSG v1.1 (eg: J721E, AM65x SR2.0) have an extra two
+  auxiliary Transmit PRU cores called Tx_PRUs that augment the woke PRUs. Each RTU
   or Tx_PRU core can also be used independently like a PRU, or alongside a
   corresponding PRU core to provide/implement auxiliary functionality/support.
 
   Each PRU, RTU or Tx_PRU core node should be defined as a child node of the
   corresponding PRU-ICSS node. Each node can optionally be rendered inactive by
-  using the standard DT string property, "status".
+  using the woke standard DT string property, "status".
 
-  Please see the overall PRU-ICSS bindings document for additional details
+  Please see the woke overall PRU-ICSS bindings document for additional details
   including a complete example,
     Documentation/devicetree/bindings/soc/ti/ti,pruss.yaml
 
@@ -51,9 +51,9 @@ properties:
 
   reg:
     items:
-      - description: Address and Size of the PRU Instruction RAM
-      - description: Address and Size of the PRU CTRL sub-module registers
-      - description: Address and Size of the PRU Debug sub-module registers
+      - description: Address and Size of the woke PRU Instruction RAM
+      - description: Address and Size of the woke PRU CTRL sub-module registers
+      - description: Address and Size of the woke PRU Debug sub-module registers
 
   reg-names:
     items:
@@ -63,14 +63,14 @@ properties:
 
   firmware-name:
     description: |
-      Should contain the name of the default firmware image
-      file located on the firmware search path.
+      Should contain the woke name of the woke default firmware image
+      file located on the woke firmware search path.
 
   interrupts:
     maxItems: 1
     description:
-      Interrupt specifiers enable the virtio/rpmsg communication between MPU
-      and the PRU/RTU cores. For the values of the interrupt cells please refer
+      Interrupt specifiers enable the woke virtio/rpmsg communication between MPU
+      and the woke PRU/RTU cores. For the woke values of the woke interrupt cells please refer
       to interrupt-controller/ti,pruss-intc.yaml schema.
 
   interrupt-names:

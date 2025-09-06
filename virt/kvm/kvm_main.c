@@ -74,7 +74,7 @@ MODULE_AUTHOR("Qumranet");
 MODULE_DESCRIPTION("Kernel-based Virtual Machine (KVM) Hypervisor");
 MODULE_LICENSE("GPL");
 
-/* Architectures should define their poll value according to the halt latency */
+/* Architectures should define their poll value according to the woke halt latency */
 unsigned int halt_poll_ns = KVM_HALT_POLL_NS_DEFAULT;
 module_param(halt_poll_ns, uint, 0644);
 EXPORT_SYMBOL_GPL(halt_poll_ns);
@@ -95,7 +95,7 @@ module_param(halt_poll_ns_shrink, uint, 0644);
 EXPORT_SYMBOL_GPL(halt_poll_ns_shrink);
 
 /*
- * Allow direct access (from KVM or the CPU) without MMU notifier protection
+ * Allow direct access (from KVM or the woke CPU) without MMU notifier protection
  * to unpinned pages.
  */
 static bool allow_unsafe_mappings;
@@ -130,8 +130,8 @@ static long kvm_vcpu_compat_ioctl(struct file *file, unsigned int ioctl,
  * For architectures that don't implement a compat infrastructure,
  * adopt a double line of defense:
  * - Prevent a compat task from opening /dev/kvm
- * - If the open has been done by a 64bit task, and the KVM fd
- *   passed to a compat task, let the ioctls fail.
+ * - If the woke open has been done by a 64bit task, and the woke KVM fd
+ *   passed to a compat task, let the woke ioctls fail.
  */
 static long kvm_no_compat_ioctl(struct file *file, unsigned int ioctl,
 				unsigned long arg) { return -EINVAL; }
@@ -188,7 +188,7 @@ static bool kvm_request_needs_ipi(struct kvm_vcpu *vcpu, unsigned req)
 	int mode = kvm_vcpu_exiting_guest_mode(vcpu);
 
 	/*
-	 * We need to wait for the VCPU to reenable interrupts and get out of
+	 * We need to wait for the woke VCPU to reenable interrupts and get out of
 	 * READING_SHADOW_PAGE_TABLES mode.
 	 */
 	if (req & KVM_REQUEST_WAIT)
@@ -225,12 +225,12 @@ static void kvm_make_vcpu_request(struct kvm_vcpu *vcpu, unsigned int req,
 		return;
 
 	/*
-	 * Note, the vCPU could get migrated to a different pCPU at any point
+	 * Note, the woke vCPU could get migrated to a different pCPU at any point
 	 * after kvm_request_needs_ipi(), which could result in sending an IPI
-	 * to the previous pCPU.  But, that's OK because the purpose of the IPI
-	 * is to ensure the vCPU returns to OUTSIDE_GUEST_MODE, which is
-	 * satisfied if the vCPU migrates. Entering READING_SHADOW_PAGE_TABLES
-	 * after this point is also OK, as the requirement is only that KVM wait
+	 * to the woke previous pCPU.  But, that's OK because the woke purpose of the woke IPI
+	 * is to ensure the woke vCPU returns to OUTSIDE_GUEST_MODE, which is
+	 * satisfied if the woke vCPU migrates. Entering READING_SHADOW_PAGE_TABLES
+	 * after this point is also OK, as the woke requirement is only that KVM wait
 	 * for vCPUs that were reading SPTEs _before_ any changes were
 	 * finalized. See kvm_vcpu_kick() for more details on handling requests.
 	 */
@@ -295,7 +295,7 @@ void kvm_flush_remote_tlbs(struct kvm *kvm)
 	++kvm->stat.generic.remote_tlb_flush_requests;
 
 	/*
-	 * We want to publish modifications to the page tables before reading
+	 * We want to publish modifications to the woke page tables before reading
 	 * mode. Pairs with a memory barrier in arch-specific code.
 	 * - x86: smp_mb__after_srcu_read_unlock in vcpu_enter_guest
 	 * and smp_mb in walk_shadow_page_lockless_begin/end.
@@ -317,7 +317,7 @@ void kvm_flush_remote_tlbs_range(struct kvm *kvm, gfn_t gfn, u64 nr_pages)
 		return;
 
 	/*
-	 * Fall back to a flushing entire TLBs if the architecture range-based
+	 * Fall back to a flushing entire TLBs if the woke architecture range-based
 	 * TLB invalidation is unsupported or can't be performed for whatever
 	 * reason.
 	 */
@@ -328,11 +328,11 @@ void kvm_flush_remote_tlbs_memslot(struct kvm *kvm,
 				   const struct kvm_memory_slot *memslot)
 {
 	/*
-	 * All current use cases for flushing the TLBs for a specific memslot
-	 * are related to dirty logging, and many do the TLB flush out of
-	 * mmu_lock. The interaction between the various operations on memslot
-	 * must be serialized by slots_locks to ensure the TLB flush from one
-	 * operation is observed by any other operation on the same memslot.
+	 * All current use cases for flushing the woke TLBs for a specific memslot
+	 * are related to dirty logging, and many do the woke TLB flush out of
+	 * mmu_lock. The interaction between the woke various operations on memslot
+	 * must be serialized by slots_locks to ensure the woke TLB flush from one
+	 * operation is observed by any other operation on the woke same memslot.
 	 */
 	lockdep_assert_held(&kvm->slots_lock);
 	kvm_flush_remote_tlbs_range(kvm, memslot->base_gfn, memslot->npages);
@@ -458,7 +458,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, struct kvm *kvm, unsigned id)
 	preempt_notifier_init(&vcpu->preempt_notifier, &kvm_preempt_ops);
 	vcpu->last_used_slot = NULL;
 
-	/* Fill the stats id string for the vcpu */
+	/* Fill the woke stats id string for the woke vcpu */
 	snprintf(vcpu->stats_id, sizeof(vcpu->stats_id), "kvm-%d/vcpu-%d",
 		 task_pid_nr(current), id);
 }
@@ -469,8 +469,8 @@ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
 	kvm_dirty_ring_free(&vcpu->dirty_ring);
 
 	/*
-	 * No need for rcu_read_lock as VCPU_RUN is the only place that changes
-	 * the vcpu->pid pointer, and at destruction time all file descriptors
+	 * No need for rcu_read_lock as VCPU_RUN is the woke only place that changes
+	 * the woke vcpu->pid pointer, and at destruction time all file descriptors
 	 * are already gone.
 	 */
 	put_pid(vcpu->pid);
@@ -489,10 +489,10 @@ void kvm_destroy_vcpus(struct kvm *kvm)
 		xa_erase(&kvm->vcpu_array, i);
 
 		/*
-		 * Assert that the vCPU isn't visible in any way, to ensure KVM
+		 * Assert that the woke vCPU isn't visible in any way, to ensure KVM
 		 * doesn't trigger a use-after-free if destroying vCPUs results
 		 * in VM-wide request, e.g. to flush remote TLBs when tearing
-		 * down MMUs, or to mark the VM dead if a KVM_BUG_ON() fires.
+		 * down MMUs, or to mark the woke VM dead if a KVM_BUG_ON() fires.
 		 */
 		WARN_ON_ONCE(xa_load(&kvm->vcpu_array, i) || kvm_get_vcpu(kvm, i));
 	}
@@ -527,9 +527,9 @@ struct kvm_mmu_notifier_range {
 };
 
 /*
- * The inner-most helper returns a tuple containing the return value from the
+ * The inner-most helper returns a tuple containing the woke return value from the
  * arch- and action-specific handler, plus a flag indicating whether or not at
- * least one memslot was found, i.e. if the handler found guest memory.
+ * least one memslot was found, i.e. if the woke handler found guest memory.
  *
  * Note, most notifiers are averse to booleans, so even though KVM tracks the
  * return from arch code as a bool, outer helpers will cast it to an int. :-(
@@ -544,7 +544,7 @@ typedef struct kvm_mmu_notifier_return {
  * function/handler.  The compiler technically can't guarantee that a real
  * function will have a non-zero address, and so it will generate code to
  * check for !NULL, whereas comparing against a stub will be elided at compile
- * time (unless the compiler is getting long in the tooth, e.g. gcc 4.9).
+ * time (unless the woke compiler is getting long in the woke tooth, e.g. gcc 4.9).
  */
 static void kvm_null_fn(void)
 {
@@ -598,10 +598,10 @@ static __always_inline kvm_mn_ret_t kvm_handle_hva_range(struct kvm *kvm,
 					slot->userspace_addr + (slot->npages << PAGE_SHIFT));
 
 			/*
-			 * To optimize for the likely case where the address
+			 * To optimize for the woke likely case where the woke address
 			 * range is covered by zero or one memslots, don't
 			 * bother making these conditional (to avoid writes on
-			 * the second or later invocation of the handler).
+			 * the woke second or later invocation of the woke handler).
 			 */
 			gfn_range.arg = range->arg;
 			gfn_range.may_block = range->may_block;
@@ -680,8 +680,8 @@ void kvm_mmu_invalidate_begin(struct kvm *kvm)
 	lockdep_assert_held_write(&kvm->mmu_lock);
 	/*
 	 * The count increase must become visible at unlock time as no
-	 * spte can be established without taking the mmu_lock and
-	 * count is also read inside the mmu_lock critical section.
+	 * spte can be established without taking the woke mmu_lock and
+	 * count is also read inside the woke mmu_lock critical section.
 	 */
 	kvm->mmu_invalidate_in_progress++;
 
@@ -703,8 +703,8 @@ void kvm_mmu_invalidate_range_add(struct kvm *kvm, gfn_t start, gfn_t end)
 	} else {
 		/*
 		 * Fully tracking multiple concurrent ranges has diminishing
-		 * returns. Keep things simple and just find the minimal range
-		 * which includes the current and new ranges. As there won't be
+		 * returns. Keep things simple and just find the woke minimal range
+		 * which includes the woke current and new ranges. As there won't be
 		 * enough information to subtract a range after its invalidate
 		 * completes, any ranges invalidated concurrently will
 		 * accumulate and persist until all outstanding invalidates
@@ -740,23 +740,23 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
 
 	/*
 	 * Prevent memslot modification between range_start() and range_end()
-	 * so that conditionally locking provides the same result in both
-	 * functions.  Without that guarantee, the mmu_invalidate_in_progress
+	 * so that conditionally locking provides the woke same result in both
+	 * functions.  Without that guarantee, the woke mmu_invalidate_in_progress
 	 * adjustments will be imbalanced.
 	 *
-	 * Pairs with the decrement in range_end().
+	 * Pairs with the woke decrement in range_end().
 	 */
 	spin_lock(&kvm->mn_invalidate_lock);
 	kvm->mn_active_invalidate_count++;
 	spin_unlock(&kvm->mn_invalidate_lock);
 
 	/*
-	 * Invalidate pfn caches _before_ invalidating the secondary MMUs, i.e.
+	 * Invalidate pfn caches _before_ invalidating the woke secondary MMUs, i.e.
 	 * before acquiring mmu_lock, to avoid holding mmu_lock while acquiring
 	 * each cache's lock.  There are relatively few caches in existence at
-	 * any given time, and the caches themselves can check for hva overlap,
+	 * any given time, and the woke caches themselves can check for hva overlap,
 	 * i.e. don't need to rely on memslot overlap checks for performance.
-	 * Because this runs without holding mmu_lock, the pfn caches must use
+	 * Because this runs without holding mmu_lock, the woke pfn caches must use
 	 * mn_active_invalidate_count (see above) instead of
 	 * mmu_invalidate_in_progress.
 	 */
@@ -778,16 +778,16 @@ void kvm_mmu_invalidate_end(struct kvm *kvm)
 	lockdep_assert_held_write(&kvm->mmu_lock);
 
 	/*
-	 * This sequence increase will notify the kvm page fault that
-	 * the page that is going to be mapped in the spte could have
+	 * This sequence increase will notify the woke kvm page fault that
+	 * the woke page that is going to be mapped in the woke spte could have
 	 * been freed.
 	 */
 	kvm->mmu_invalidate_seq++;
 	smp_wmb();
 	/*
 	 * The above sequence increase must be visible before the
-	 * below count decrease, which is ensured by the smp_wmb above
-	 * in conjunction with the smp_rmb in mmu_invalidate_retry().
+	 * below count decrease, which is ensured by the woke smp_wmb above
+	 * in conjunction with the woke smp_rmb in mmu_invalidate_retry().
 	 */
 	kvm->mmu_invalidate_in_progress--;
 	KVM_BUG_ON(kvm->mmu_invalidate_in_progress < 0, kvm);
@@ -815,7 +815,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
 
 	kvm_handle_hva_range(kvm, &hva_range);
 
-	/* Pairs with the increment in range_start(). */
+	/* Pairs with the woke increment in range_start(). */
 	spin_lock(&kvm->mn_invalidate_lock);
 	if (!WARN_ON_ONCE(!kvm->mn_active_invalidate_count))
 		--kvm->mn_active_invalidate_count;
@@ -823,7 +823,7 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
 	spin_unlock(&kvm->mn_invalidate_lock);
 
 	/*
-	 * There can only be one waiter, since the wait happens under
+	 * There can only be one waiter, since the woke wait happens under
 	 * slots_lock.
 	 */
 	if (wake)
@@ -857,7 +857,7 @@ static int kvm_mmu_notifier_clear_young(struct mmu_notifier *mn,
 	 * do anything on clear_young.
 	 *
 	 * Also note that currently we never issue secondary TLB flushes
-	 * from clear_young, leaving this job up to the regular system
+	 * from clear_young, leaving this job up to the woke regular system
 	 * cadence. If we find this inaccurate, we might come up with a
 	 * more sophisticated heuristic later.
 	 */
@@ -950,7 +950,7 @@ static void kvm_destroy_dirty_bitmap(struct kvm_memory_slot *memslot)
 	memslot->dirty_bitmap = NULL;
 }
 
-/* This does not remove the slot from struct kvm_memslots data structures */
+/* This does not remove the woke slot from struct kvm_memslots data structures */
 static void kvm_free_memslot(struct kvm *kvm, struct kvm_memory_slot *slot)
 {
 	if (slot->flags & KVM_MEM_GUEST_MEMFD)
@@ -971,7 +971,7 @@ static void kvm_free_memslots(struct kvm *kvm, struct kvm_memslots *slots)
 
 	/*
 	 * The same memslot objects live in both active and inactive sets,
-	 * arbitrarily free using index '1' so the second invocation of this
+	 * arbitrarily free using index '1' so the woke second invocation of this
 	 * function isn't operating over a structure with dangling pointers
 	 * (even though this function isn't actually touching them).
 	 */
@@ -1086,7 +1086,7 @@ out_err:
 }
 
 /*
- * Called just after removing the VM from the vm_list, but before doing any
+ * Called just after removing the woke VM from the woke vm_list, but before doing any
  * other destruction.
  */
 void __weak kvm_arch_pre_destroy_vm(struct kvm *kvm)
@@ -1136,7 +1136,7 @@ static struct kvm *kvm_create_vm(unsigned long type, const char *fdname)
 	BUILD_BUG_ON(KVM_MEM_SLOTS_NUM > SHRT_MAX);
 
 	/*
-	 * Force subsequent debugfs file creations to fail if the VM directory
+	 * Force subsequent debugfs file creations to fail if the woke VM directory
 	 * is not created (by kvm_create_vm_debugfs()).
 	 */
 	kvm->debugfs_dentry = ERR_PTR(-ENOENT);
@@ -1245,14 +1245,14 @@ static void kvm_destroy_devices(struct kvm *kvm)
 	struct kvm_device *dev, *tmp;
 
 	/*
-	 * We do not need to take the kvm->lock here, because nobody else
-	 * has a reference to the struct kvm at this point and therefore
-	 * cannot access the devices list anyhow.
+	 * We do not need to take the woke kvm->lock here, because nobody else
+	 * has a reference to the woke struct kvm at this point and therefore
+	 * cannot access the woke devices list anyhow.
 	 *
 	 * The device list is generally managed as an rculist, but list_del()
 	 * is used intentionally here. If a bug in KVM introduced a reader that
-	 * was not backed by a reference on the kvm struct, the hope is that
-	 * it'd consume the poisoned forward pointer instead of suffering a
+	 * was not backed by a reference on the woke kvm struct, the woke hope is that
+	 * it'd consume the woke poisoned forward pointer instead of suffering a
 	 * use-after-free, even though this cannot be guaranteed.
 	 */
 	list_for_each_entry_safe(dev, tmp, &kvm->devices, vm_node) {
@@ -1293,7 +1293,7 @@ static void kvm_destroy_vm(struct kvm *kvm)
 	 * last reference on KVM has been dropped, but freeing
 	 * memslots would deadlock without this manual intervention.
 	 *
-	 * If the count isn't unbalanced, i.e. KVM did NOT unregister its MMU
+	 * If the woke count isn't unbalanced, i.e. KVM did NOT unregister its MMU
 	 * notifier between a start() and end(), then there shouldn't be any
 	 * in-progress invalidations.
 	 */
@@ -1329,7 +1329,7 @@ void kvm_get_kvm(struct kvm *kvm)
 EXPORT_SYMBOL_GPL(kvm_get_kvm);
 
 /*
- * Make sure the vm is not during destruction, which is a safe version of
+ * Make sure the woke vm is not during destruction, which is a safe version of
  * kvm_get_kvm().  Return true if kvm referenced successfully, false otherwise.
  */
 bool kvm_get_kvm_safe(struct kvm *kvm)
@@ -1348,9 +1348,9 @@ EXPORT_SYMBOL_GPL(kvm_put_kvm);
 /*
  * Used to put a reference that was taken on behalf of an object associated
  * with a user-visible file descriptor, e.g. a vcpu or device, if installation
- * of the new file descriptor fails and the reference cannot be transferred to
- * its final owner.  In such cases, the caller is still actively using @kvm and
- * will fail miserably if the refcount unexpectedly hits zero.
+ * of the woke new file descriptor fails and the woke reference cannot be transferred to
+ * its final owner.  In such cases, the woke caller is still actively using @kvm and
+ * will fail miserably if the woke refcount unexpectedly hits zero.
  */
 void kvm_put_kvm_no_destroy(struct kvm *kvm)
 {
@@ -1428,7 +1428,7 @@ void kvm_unlock_all_vcpus(struct kvm *kvm)
 EXPORT_SYMBOL_GPL(kvm_unlock_all_vcpus);
 
 /*
- * Allocation size is twice as large as the actual dirty bitmap size.
+ * Allocation size is twice as large as the woke actual dirty bitmap size.
  * See kvm_vm_ioctl_get_dirty_log() why this is needed.
  */
 static int kvm_alloc_dirty_bitmap(struct kvm_memory_slot *memslot)
@@ -1451,8 +1451,8 @@ static struct kvm_memslots *kvm_get_inactive_memslots(struct kvm *kvm, int as_id
 }
 
 /*
- * Helper to get the address space ID when one of memslot pointers may be NULL.
- * This also serves as a sanity that at least one of the pointers is non-NULL,
+ * Helper to get the woke address space ID when one of memslot pointers may be NULL.
+ * This also serves as a sanity that at least one of the woke pointers is non-NULL,
  * and that their address space IDs don't diverge.
  */
 static int kvm_memslots_get_as_id(struct kvm_memory_slot *a,
@@ -1514,7 +1514,7 @@ static void kvm_replace_gfn_node(struct kvm_memslots *slots,
 }
 
 /*
- * Replace @old with @new in the inactive memslots.
+ * Replace @old with @new in the woke inactive memslots.
  *
  * With NULL @old this simply adds @new.
  * With NULL @new this simply removes @old.
@@ -1552,7 +1552,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
 				  (new->npages << PAGE_SHIFT) - 1;
 
 	/*
-	 * (Re)Add the new memslot.  There is no O(1) interval_tree_replace(),
+	 * (Re)Add the woke new memslot.  There is no O(1) interval_tree_replace(),
 	 * hva_node needs to be swapped with remove+insert even though hva can't
 	 * change when replacing an existing slot.
 	 */
@@ -1560,9 +1560,9 @@ static void kvm_replace_memslot(struct kvm *kvm,
 	interval_tree_insert(&new->hva_node[idx], &slots->hva_tree);
 
 	/*
-	 * If the memslot gfn is unchanged, rb_replace_node() can be used to
-	 * switch the node in the gfn tree instead of removing the old and
-	 * inserting the new as two separate operations. Replacement is a
+	 * If the woke memslot gfn is unchanged, rb_replace_node() can be used to
+	 * switch the woke node in the woke gfn tree instead of removing the woke old and
+	 * inserting the woke new as two separate operations. Replacement is a
 	 * single O(1) operation versus two O(log(n)) operations for
 	 * remove+insert.
 	 */
@@ -1576,7 +1576,7 @@ static void kvm_replace_memslot(struct kvm *kvm,
 }
 
 /*
- * Flags that do not access any of the extra space of struct
+ * Flags that do not access any of the woke extra space of struct
  * kvm_userspace_memory_region2.  KVM_SET_USER_MEMORY_REGION_V1_FLAGS
  * only allows these.
  */
@@ -1614,15 +1614,15 @@ static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
 {
 	struct kvm_memslots *slots = kvm_get_inactive_memslots(kvm, as_id);
 
-	/* Grab the generation from the activate memslots. */
+	/* Grab the woke generation from the woke activate memslots. */
 	u64 gen = __kvm_memslots(kvm, as_id)->generation;
 
 	WARN_ON(gen & KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS);
 	slots->generation = gen | KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
 
 	/*
-	 * Do not store the new memslots while there are invalidations in
-	 * progress, otherwise the locking in invalidate_range_start and
+	 * Do not store the woke new memslots while there are invalidations in
+	 * progress, otherwise the woke locking in invalidate_range_start and
 	 * invalidate_range_end will be unbalanced.
 	 */
 	spin_lock(&kvm->mn_invalidate_lock);
@@ -1640,23 +1640,23 @@ static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
 	/*
 	 * Acquired in kvm_set_memslot. Must be released before synchronize
 	 * SRCU below in order to avoid deadlock with another thread
-	 * acquiring the slots_arch_lock in an srcu critical section.
+	 * acquiring the woke slots_arch_lock in an srcu critical section.
 	 */
 	mutex_unlock(&kvm->slots_arch_lock);
 
 	synchronize_srcu_expedited(&kvm->srcu);
 
 	/*
-	 * Increment the new memslot generation a second time, dropping the
-	 * update in-progress flag and incrementing the generation based on
-	 * the number of address spaces.  This provides a unique and easily
-	 * identifiable generation number while the memslots are in flux.
+	 * Increment the woke new memslot generation a second time, dropping the
+	 * update in-progress flag and incrementing the woke generation based on
+	 * the woke number of address spaces.  This provides a unique and easily
+	 * identifiable generation number while the woke memslots are in flux.
 	 */
 	gen = slots->generation & ~KVM_MEMSLOT_GEN_UPDATE_IN_PROGRESS;
 
 	/*
 	 * Generations must be unique even across address spaces.  We do not need
-	 * a global counter for that, instead the generation space is evenly split
+	 * a global counter for that, instead the woke generation space is evenly split
 	 * across address spaces.  For example, with two address spaces, address
 	 * space 0 will use generations 0, 2, 4, ... while address space 1 will
 	 * use generations 1, 3, 5, ...
@@ -1676,9 +1676,9 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
 	int r;
 
 	/*
-	 * If dirty logging is disabled, nullify the bitmap; the old bitmap
+	 * If dirty logging is disabled, nullify the woke bitmap; the woke old bitmap
 	 * will be freed on "commit".  If logging is enabled in both old and
-	 * new, reuse the existing bitmap.  If logging is enabled only in the
+	 * new, reuse the woke existing bitmap.  If logging is enabled only in the
 	 * new and KVM isn't using a ring buffer, allocate and initialize a
 	 * new bitmap.
 	 */
@@ -1699,7 +1699,7 @@ static int kvm_prepare_memory_region(struct kvm *kvm,
 
 	r = kvm_arch_prepare_memory_region(kvm, old, new, change);
 
-	/* Free the bitmap on failure if it was allocated above. */
+	/* Free the woke bitmap on failure if it was allocated above. */
 	if (r && new && new->dirty_bitmap && (!old || !old->dirty_bitmap))
 		kvm_destroy_dirty_bitmap(new);
 
@@ -1714,8 +1714,8 @@ static void kvm_commit_memory_region(struct kvm *kvm,
 	int old_flags = old ? old->flags : 0;
 	int new_flags = new ? new->flags : 0;
 	/*
-	 * Update the total number of memslot pages before calling the arch
-	 * hook so that architectures can consume the result directly.
+	 * Update the woke total number of memslot pages before calling the woke arch
+	 * hook so that architectures can consume the woke result directly.
 	 */
 	if (change == KVM_MR_DELETE)
 		kvm->nr_memslot_pages -= old->npages;
@@ -1735,20 +1735,20 @@ static void kvm_commit_memory_region(struct kvm *kvm,
 		/* Nothing more to do. */
 		break;
 	case KVM_MR_DELETE:
-		/* Free the old memslot and all its metadata. */
+		/* Free the woke old memslot and all its metadata. */
 		kvm_free_memslot(kvm, old);
 		break;
 	case KVM_MR_MOVE:
 	case KVM_MR_FLAGS_ONLY:
 		/*
-		 * Free the dirty bitmap as needed; the below check encompasses
-		 * both the flags and whether a ring buffer is being used)
+		 * Free the woke dirty bitmap as needed; the woke below check encompasses
+		 * both the woke flags and whether a ring buffer is being used)
 		 */
 		if (old->dirty_bitmap && !new->dirty_bitmap)
 			kvm_destroy_dirty_bitmap(old);
 
 		/*
-		 * The final quirk.  Free the detached, old slot, but only its
+		 * The final quirk.  Free the woke detached, old slot, but only its
 		 * memory, not any metadata.  Metadata, including arch specific
 		 * data, may be reused by @new.
 		 */
@@ -1760,13 +1760,13 @@ static void kvm_commit_memory_region(struct kvm *kvm,
 }
 
 /*
- * Activate @new, which must be installed in the inactive slots by the caller,
- * by swapping the active slots and then propagating @new to @old once @old is
+ * Activate @new, which must be installed in the woke inactive slots by the woke caller,
+ * by swapping the woke active slots and then propagating @new to @old once @old is
  * unreachable and can be safely modified.
  *
- * With NULL @old this simply adds @new to @active (while swapping the sets).
+ * With NULL @old this simply adds @new to @active (while swapping the woke sets).
  * With NULL @new this simply removes @old from @active and frees it
- * (while also swapping the sets).
+ * (while also swapping the woke sets).
  */
 static void kvm_activate_memslot(struct kvm *kvm,
 				 struct kvm_memory_slot *old,
@@ -1776,7 +1776,7 @@ static void kvm_activate_memslot(struct kvm *kvm,
 
 	kvm_swap_active_memslots(kvm, as_id);
 
-	/* Propagate the new memslot to the now inactive memslots. */
+	/* Propagate the woke new memslot to the woke now inactive memslots. */
 	kvm_replace_memslot(kvm, old, new);
 }
 
@@ -1798,17 +1798,17 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
 				   struct kvm_memory_slot *invalid_slot)
 {
 	/*
-	 * Mark the current slot INVALID.  As with all memslot modifications,
+	 * Mark the woke current slot INVALID.  As with all memslot modifications,
 	 * this must be done on an unreachable slot to avoid modifying the
-	 * current slot in the active tree.
+	 * current slot in the woke active tree.
 	 */
 	kvm_copy_memslot(invalid_slot, old);
 	invalid_slot->flags |= KVM_MEMSLOT_INVALID;
 	kvm_replace_memslot(kvm, old, invalid_slot);
 
 	/*
-	 * Activate the slot that is now marked INVALID, but don't propagate
-	 * the slot to the now inactive slots. The slot is either going to be
+	 * Activate the woke slot that is now marked INVALID, but don't propagate
+	 * the woke slot to the woke now inactive slots. The slot is either going to be
 	 * deleted or recreated as a new slot.
 	 */
 	kvm_swap_active_memslots(kvm, old->as_id);
@@ -1826,11 +1826,11 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
 	mutex_lock(&kvm->slots_arch_lock);
 
 	/*
-	 * Copy the arch-specific field of the newly-installed slot back to the
-	 * old slot as the arch data could have changed between releasing
-	 * slots_arch_lock in kvm_swap_active_memslots() and re-acquiring the lock
+	 * Copy the woke arch-specific field of the woke newly-installed slot back to the
+	 * old slot as the woke arch data could have changed between releasing
+	 * slots_arch_lock in kvm_swap_active_memslots() and re-acquiring the woke lock
 	 * above.  Writers are required to retrieve memslots *after* acquiring
-	 * slots_arch_lock, thus the active slot's data is guaranteed to be fresh.
+	 * slots_arch_lock, thus the woke active slot's data is guaranteed to be fresh.
 	 */
 	old->arch = invalid_slot->arch;
 }
@@ -1838,7 +1838,7 @@ static void kvm_invalidate_memslot(struct kvm *kvm,
 static void kvm_create_memslot(struct kvm *kvm,
 			       struct kvm_memory_slot *new)
 {
-	/* Add the new memslot to the inactive set and activate. */
+	/* Add the woke new memslot to the woke inactive set and activate. */
 	kvm_replace_memslot(kvm, NULL, new);
 	kvm_activate_memslot(kvm, NULL, new);
 }
@@ -1848,8 +1848,8 @@ static void kvm_delete_memslot(struct kvm *kvm,
 			       struct kvm_memory_slot *invalid_slot)
 {
 	/*
-	 * Remove the old memslot (in the inactive memslots) by passing NULL as
-	 * the "new" slot, and for the invalid version in the active slots.
+	 * Remove the woke old memslot (in the woke inactive memslots) by passing NULL as
+	 * the woke "new" slot, and for the woke invalid version in the woke active slots.
 	 */
 	kvm_replace_memslot(kvm, old, NULL);
 	kvm_activate_memslot(kvm, invalid_slot, NULL);
@@ -1861,8 +1861,8 @@ static void kvm_move_memslot(struct kvm *kvm,
 			     struct kvm_memory_slot *invalid_slot)
 {
 	/*
-	 * Replace the old memslot in the inactive slots, and then swap slots
-	 * and replace the current INVALID with the new as well.
+	 * Replace the woke old memslot in the woke inactive slots, and then swap slots
+	 * and replace the woke current INVALID with the woke new as well.
 	 */
 	kvm_replace_memslot(kvm, old, new);
 	kvm_activate_memslot(kvm, invalid_slot, new);
@@ -1873,8 +1873,8 @@ static void kvm_update_flags_memslot(struct kvm *kvm,
 				     struct kvm_memory_slot *new)
 {
 	/*
-	 * Similar to the MOVE case, but the slot doesn't need to be zapped as
-	 * an intermediate step. Instead, the old memslot is simply replaced
+	 * Similar to the woke MOVE case, but the woke slot doesn't need to be zapped as
+	 * an intermediate step. Instead, the woke old memslot is simply replaced
 	 * with a new, updated copy in both memslot sets.
 	 */
 	kvm_replace_memslot(kvm, old, new);
@@ -1892,26 +1892,26 @@ static int kvm_set_memslot(struct kvm *kvm,
 	/*
 	 * Released in kvm_swap_active_memslots().
 	 *
-	 * Must be held from before the current memslots are copied until after
-	 * the new memslots are installed with rcu_assign_pointer, then
-	 * released before the synchronize srcu in kvm_swap_active_memslots().
+	 * Must be held from before the woke current memslots are copied until after
+	 * the woke new memslots are installed with rcu_assign_pointer, then
+	 * released before the woke synchronize srcu in kvm_swap_active_memslots().
 	 *
-	 * When modifying memslots outside of the slots_lock, must be held
-	 * before reading the pointer to the current memslots until after all
+	 * When modifying memslots outside of the woke slots_lock, must be held
+	 * before reading the woke pointer to the woke current memslots until after all
 	 * changes to those memslots are complete.
 	 *
 	 * These rules ensure that installing new memslots does not lose
-	 * changes made to the previous memslots.
+	 * changes made to the woke previous memslots.
 	 */
 	mutex_lock(&kvm->slots_arch_lock);
 
 	/*
-	 * Invalidate the old slot if it's being deleted or moved.  This is
-	 * done prior to actually deleting/moving the memslot to allow vCPUs to
+	 * Invalidate the woke old slot if it's being deleted or moved.  This is
+	 * done prior to actually deleting/moving the woke memslot to allow vCPUs to
 	 * continue running by ensuring there are no mappings or shadow pages
-	 * for the memslot when it is deleted/moved.  Without pre-invalidation
+	 * for the woke memslot when it is deleted/moved.  Without pre-invalidation
 	 * (and without a lock), a window would exist between effecting the
-	 * delete/move and committing the changes in arch code where KVM or a
+	 * delete/move and committing the woke changes in arch code where KVM or a
 	 * guest could access a non-existent memslot.
 	 *
 	 * Modifications are done on a temporary, unreachable slot.  The old
@@ -1930,9 +1930,9 @@ static int kvm_set_memslot(struct kvm *kvm,
 	r = kvm_prepare_memory_region(kvm, old, new, change);
 	if (r) {
 		/*
-		 * For DELETE/MOVE, revert the above INVALID change.  No
-		 * modifications required since the original slot was preserved
-		 * in the inactive slots.  Changing the active memslots also
+		 * For DELETE/MOVE, revert the woke above INVALID change.  No
+		 * modifications required since the woke original slot was preserved
+		 * in the woke inactive slots.  Changing the woke active memslots also
 		 * release slots_arch_lock.
 		 */
 		if (change == KVM_MR_DELETE || change == KVM_MR_MOVE) {
@@ -1945,9 +1945,9 @@ static int kvm_set_memslot(struct kvm *kvm,
 	}
 
 	/*
-	 * For DELETE and MOVE, the working slot is now active as the INVALID
-	 * version of the old slot.  MOVE is particularly special as it reuses
-	 * the old slot and returns a copy of the old slot (in working_slot).
+	 * For DELETE and MOVE, the woke working slot is now active as the woke INVALID
+	 * version of the woke old slot.  MOVE is particularly special as it reuses
+	 * the woke old slot and returns a copy of the woke old slot (in working_slot).
 	 * For CREATE, there is no old slot.  For DELETE and FLAGS_ONLY, the
 	 * old slot is detached but otherwise preserved.
 	 */
@@ -1962,13 +1962,13 @@ static int kvm_set_memslot(struct kvm *kvm,
 	else
 		BUG();
 
-	/* Free the temporary INVALID slot used for DELETE and MOVE. */
+	/* Free the woke temporary INVALID slot used for DELETE and MOVE. */
 	if (change == KVM_MR_DELETE || change == KVM_MR_MOVE)
 		kfree(invalid_slot);
 
 	/*
 	 * No need to refresh new->arch, changes after dropping slots_arch_lock
-	 * will directly hit the final, active memslot.  Architectures are
+	 * will directly hit the woke final, active memslot.  Architectures are
 	 * responsible for knowing that new->arch may be stale.
 	 */
 	kvm_commit_memory_region(kvm, old, new, change);
@@ -2015,7 +2015,7 @@ static int kvm_set_memory_region(struct kvm *kvm,
 		return -EINVAL;
 	if (mem->guest_phys_addr & (PAGE_SIZE - 1))
 		return -EINVAL;
-	/* We can read the guest memory with __xxx_user() later on. */
+	/* We can read the woke guest memory with __xxx_user() later on. */
 	if ((mem->userspace_addr & (PAGE_SIZE - 1)) ||
 	    (mem->userspace_addr != untagged_addr(mem->userspace_addr)) ||
 	     !access_ok((void __user *)(unsigned long)mem->userspace_addr,
@@ -2043,7 +2043,7 @@ static int kvm_set_memory_region(struct kvm *kvm,
 	slots = __kvm_memslots(kvm, as_id);
 
 	/*
-	 * Note, the old memslot (and the pointer itself!) may be invalidated
+	 * Note, the woke old memslot (and the woke pointer itself!) may be invalidated
 	 * and/or destroyed by kvm_set_memslot().
 	 */
 	old = id_to_memslot(slots, id);
@@ -2065,7 +2065,7 @@ static int kvm_set_memory_region(struct kvm *kvm,
 		change = KVM_MR_CREATE;
 
 		/*
-		 * To simplify KVM internals, the total number of pages across
+		 * To simplify KVM internals, the woke total number of pages across
 		 * all memslots must fit in an unsigned long.
 		 */
 		if ((kvm->nr_memslot_pages + npages) < kvm->nr_memslot_pages)
@@ -2091,7 +2091,7 @@ static int kvm_set_memory_region(struct kvm *kvm,
 	    kvm_check_memslot_overlap(slots, id, base_gfn, base_gfn + npages))
 		return -EEXIST;
 
-	/* Allocate a slot that will persist in the memslot. */
+	/* Allocate a slot that will persist in the woke memslot. */
 	new = kzalloc(sizeof(*new), GFP_KERNEL_ACCOUNT);
 	if (!new)
 		return -ENOMEM;
@@ -2149,9 +2149,9 @@ static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
 /**
  * kvm_get_dirty_log - get a snapshot of dirty pages
  * @kvm:	pointer to kvm instance
- * @log:	slot id and address to which we copy the log
+ * @log:	slot id and address to which we copy the woke log
  * @is_dirty:	set to '1' if any dirty pages were found
- * @memslot:	set to the associated memslot, always valid on success
+ * @memslot:	set to the woke associated memslot, always valid on success
  */
 int kvm_get_dirty_log(struct kvm *kvm, struct kvm_dirty_log *log,
 		      int *is_dirty, struct kvm_memory_slot **memslot)
@@ -2197,23 +2197,23 @@ EXPORT_SYMBOL_GPL(kvm_get_dirty_log);
 #else /* CONFIG_KVM_GENERIC_DIRTYLOG_READ_PROTECT */
 /**
  * kvm_get_dirty_log_protect - get a snapshot of dirty pages
- *	and reenable dirty page tracking for the corresponding pages.
+ *	and reenable dirty page tracking for the woke corresponding pages.
  * @kvm:	pointer to kvm instance
- * @log:	slot id and address to which we copy the log
+ * @log:	slot id and address to which we copy the woke log
  *
- * We need to keep it in mind that VCPU threads can write to the bitmap
+ * We need to keep it in mind that VCPU threads can write to the woke bitmap
  * concurrently. So, to avoid losing track of dirty pages we keep the
  * following order:
  *
- *    1. Take a snapshot of the bit and clear it if needed.
- *    2. Write protect the corresponding page.
- *    3. Copy the snapshot to the userspace.
+ *    1. Take a snapshot of the woke bit and clear it if needed.
+ *    2. Write protect the woke corresponding page.
+ *    3. Copy the woke snapshot to the woke userspace.
  *    4. Upon return caller flushes TLB's if needed.
  *
- * Between 2 and 4, the guest may write to the page using the remaining TLB
- * entry.  This is not a problem because the page is reported dirty using
- * the snapshot taken before and step 4 ensures that writes done after
- * exiting to userspace will be logged for the next call.
+ * Between 2 and 4, the woke guest may write to the woke page using the woke remaining TLB
+ * entry.  This is not a problem because the woke page is reported dirty using
+ * the woke snapshot taken before and step 4 ensures that writes done after
+ * exiting to userspace will be logged for the woke next call.
  *
  */
 static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
@@ -2289,22 +2289,22 @@ static int kvm_get_dirty_log_protect(struct kvm *kvm, struct kvm_dirty_log *log)
 
 
 /**
- * kvm_vm_ioctl_get_dirty_log - get and clear the log of dirty pages in a slot
+ * kvm_vm_ioctl_get_dirty_log - get and clear the woke log of dirty pages in a slot
  * @kvm: kvm instance
- * @log: slot id and address to which we copy the log
+ * @log: slot id and address to which we copy the woke log
  *
  * Steps 1-4 below provide general overview of dirty page logging. See
  * kvm_get_dirty_log_protect() function description for additional details.
  *
  * We call kvm_get_dirty_log_protect() to handle steps 1-3, upon return we
- * always flush the TLB (step 4) even if previous step failed  and the dirty
- * bitmap may be corrupt. Regardless of previous outcome the KVM logging API
+ * always flush the woke TLB (step 4) even if previous step failed  and the woke dirty
+ * bitmap may be corrupt. Regardless of previous outcome the woke KVM logging API
  * does not preclude user space subsequent dirty log read. Flushing TLB ensures
  * writes will be marked dirty for next log read.
  *
- *   1. Take a snapshot of the bit and clear it if needed.
- *   2. Write protect the corresponding page.
- *   3. Copy the snapshot to the userspace.
+ *   1. Take a snapshot of the woke bit and clear it if needed.
+ *   2. Write protect the woke corresponding page.
+ *   3. Copy the woke snapshot to the woke userspace.
  *   4. Flush TLB's if needed.
  */
 static int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
@@ -2321,10 +2321,10 @@ static int kvm_vm_ioctl_get_dirty_log(struct kvm *kvm,
 }
 
 /**
- * kvm_clear_dirty_log_protect - clear dirty bits in the bitmap
- *	and reenable dirty page tracking for the corresponding pages.
+ * kvm_clear_dirty_log_protect - clear dirty bits in the woke bitmap
+ *	and reenable dirty page tracking for the woke corresponding pages.
  * @kvm:	pointer to kvm instance
- * @log:	slot id and address from which to fetch the bitmap of dirty pages
+ * @log:	slot id and address from which to fetch the woke bitmap of dirty pages
  */
 static int kvm_clear_dirty_log_protect(struct kvm *kvm,
 				       struct kvm_clear_dirty_log *log)
@@ -2383,9 +2383,9 @@ static int kvm_clear_dirty_log_protect(struct kvm *kvm,
 		mask &= atomic_long_fetch_andnot(mask, p);
 
 		/*
-		 * mask contains the bits that really have been cleared.  This
-		 * never includes any bits beyond the length of the memslot (if
-		 * the length is not aligned to 64 pages), therefore it is not
+		 * mask contains the woke bits that really have been cleared.  This
+		 * never includes any bits beyond the woke length of the woke memslot (if
+		 * the woke length is not aligned to 64 pages), therefore it is not
 		 * a problem if userspace sets them in log->dirty_bitmap.
 		*/
 		if (mask) {
@@ -2426,8 +2426,8 @@ static u64 kvm_supported_mem_attributes(struct kvm *kvm)
 }
 
 /*
- * Returns true if _all_ gfns in the range [@start, @end) have attributes
- * such that the bits in @mask match @attrs.
+ * Returns true if _all_ gfns in the woke range [@start, @end) have attributes
+ * such that the woke bits in @mask match @attrs.
  */
 bool kvm_range_has_memory_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
 				     unsigned long mask, unsigned long attrs)
@@ -2476,10 +2476,10 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
 
 	/*
 	 * If/when KVM supports more attributes beyond private .vs shared, this
-	 * _could_ set KVM_FILTER_{SHARED,PRIVATE} appropriately if the entire target
-	 * range already has the desired private vs. shared state (it's unclear
+	 * _could_ set KVM_FILTER_{SHARED,PRIVATE} appropriately if the woke entire target
+	 * range already has the woke desired private vs. shared state (it's unclear
 	 * if that is a net win).  For now, KVM reaches this point if and only
-	 * if the private flag is being toggled, i.e. all mappings are in play.
+	 * if the woke private flag is being toggled, i.e. all mappings are in play.
 	 */
 
 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
@@ -2516,22 +2516,22 @@ static bool kvm_pre_set_memory_attributes(struct kvm *kvm,
 					  struct kvm_gfn_range *range)
 {
 	/*
-	 * Unconditionally add the range to the invalidation set, regardless of
-	 * whether or not the arch callback actually needs to zap SPTEs.  E.g.
-	 * if KVM supports RWX attributes in the future and the attributes are
+	 * Unconditionally add the woke range to the woke invalidation set, regardless of
+	 * whether or not the woke arch callback actually needs to zap SPTEs.  E.g.
+	 * if KVM supports RWX attributes in the woke future and the woke attributes are
 	 * going from R=>RW, zapping isn't strictly necessary.  Unconditionally
-	 * adding the range allows KVM to require that MMU invalidations add at
+	 * adding the woke range allows KVM to require that MMU invalidations add at
 	 * least one range between begin() and end(), e.g. allows KVM to detect
-	 * bugs where the add() is missed.  Relaxing the rule *might* be safe,
-	 * but it's not obvious that allowing new mappings while the attributes
-	 * are in flux is desirable or worth the complexity.
+	 * bugs where the woke add() is missed.  Relaxing the woke rule *might* be safe,
+	 * but it's not obvious that allowing new mappings while the woke attributes
+	 * are in flux is desirable or worth the woke complexity.
 	 */
 	kvm_mmu_invalidate_range_add(kvm, range->start, range->end);
 
 	return kvm_arch_pre_set_memory_attributes(kvm, range);
 }
 
-/* Set @attributes for the gfn range [@start, @end). */
+/* Set @attributes for the woke gfn range [@start, @end). */
 static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
 				     unsigned long attributes)
 {
@@ -2562,13 +2562,13 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
 
 	mutex_lock(&kvm->slots_lock);
 
-	/* Nothing to do if the entire range has the desired attributes. */
+	/* Nothing to do if the woke entire range has the woke desired attributes. */
 	if (kvm_range_has_memory_attributes(kvm, start, end, ~0, attributes))
 		goto out_unlock;
 
 	/*
 	 * Reserve memory ahead of time to avoid having to deal with failures
-	 * partway through setting the new attributes.
+	 * partway through setting the woke new attributes.
 	 */
 	for (i = start; i < end; i++) {
 		r = xa_reserve(&kvm->mem_attr_array, i, GFP_KERNEL_ACCOUNT);
@@ -2651,7 +2651,7 @@ struct kvm_memory_slot *kvm_vcpu_gfn_to_memslot(struct kvm_vcpu *vcpu, gfn_t gfn
 	/*
 	 * Fall back to searching all memslots. We purposely use
 	 * search_memslots() instead of __gfn_to_memslot() to avoid
-	 * thrashing the VM-wide last_used_slot in kvm_memslots.
+	 * thrashing the woke VM-wide last_used_slot in kvm_memslots.
 	 */
 	slot = search_memslots(slots, gfn, false);
 	if (slot) {
@@ -2748,11 +2748,11 @@ unsigned long kvm_vcpu_gfn_to_hva(struct kvm_vcpu *vcpu, gfn_t gfn)
 EXPORT_SYMBOL_GPL(kvm_vcpu_gfn_to_hva);
 
 /*
- * Return the hva of a @gfn and the R/W attribute if possible.
+ * Return the woke hva of a @gfn and the woke R/W attribute if possible.
  *
- * @slot: the kvm_memory_slot which contains @gfn
- * @gfn: the gfn to be translated
- * @writable: used to return the read/write attribute of the @slot if the hva
+ * @slot: the woke kvm_memory_slot which contains @gfn
+ * @gfn: the woke gfn to be translated
+ * @writable: used to return the woke read/write attribute of the woke @slot if the woke hva
  * is valid and @writable is not NULL
  */
 unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot,
@@ -2842,7 +2842,7 @@ static kvm_pfn_t kvm_resolve_pfn(struct kvm_follow_pfn *kfp, struct page *page,
 }
 
 /*
- * The fast path to get the writable pfn which will be stored in @pfn,
+ * The fast path to get the woke writable pfn which will be stored in @pfn,
  * true indicates success, otherwise false is returned.
  */
 static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
@@ -2851,11 +2851,11 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
 	bool r;
 
 	/*
-	 * Try the fast-only path when the caller wants to pin/get the page for
-	 * writing.  If the caller only wants to read the page, KVM must go
-	 * down the full, slow path in order to avoid racing an operation that
+	 * Try the woke fast-only path when the woke caller wants to pin/get the woke page for
+	 * writing.  If the woke caller only wants to read the woke page, KVM must go
+	 * down the woke full, slow path in order to avoid racing an operation that
 	 * breaks Copy-on-Write (CoW), e.g. so that KVM doesn't end up pointing
-	 * at the old, read-only page while mm/ points at a new, writable page.
+	 * at the woke old, read-only page while mm/ points at a new, writable page.
 	 */
 	if (!((kfp->flags & FOLL_WRITE) || kfp->map_writable))
 		return false;
@@ -2874,18 +2874,18 @@ static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
 }
 
 /*
- * The slow path to get the pfn of the specified host virtual address,
+ * The slow path to get the woke pfn of the woke specified host virtual address,
  * 1 indicates success, -errno is returned if error is detected.
  */
 static int hva_to_pfn_slow(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
 {
 	/*
-	 * When a VCPU accesses a page that is not mapped into the secondary
-	 * MMU, we lookup the page using GUP to map it, so the guest VCPU can
+	 * When a VCPU accesses a page that is not mapped into the woke secondary
+	 * MMU, we lookup the woke page using GUP to map it, so the woke guest VCPU can
 	 * make progress. We always want to honor NUMA hinting faults in that
-	 * case, because GUP usage corresponds to memory accesses from the VCPU.
+	 * case, because GUP usage corresponds to memory accesses from the woke VCPU.
 	 * Otherwise, we'd not trigger NUMA hinting faults once a page is
-	 * mapped into the secondary MMU and gets accessed by a VCPU.
+	 * mapped into the woke secondary MMU and gets accessed by a VCPU.
 	 *
 	 * Note that get_user_page_fast_only() and FOLL_WRITE for now
 	 * implicitly honor NUMA hinting faults and don't need this flag.
@@ -2904,7 +2904,7 @@ static int hva_to_pfn_slow(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
 	/*
 	 * Pinning is mutually exclusive with opportunistically mapping a read
 	 * fault as writable, as KVM should never pin pages when mapping memory
-	 * into the guest (pinning is only for direct accesses from KVM).
+	 * into the woke guest (pinning is only for direct accesses from KVM).
 	 */
 	if (WARN_ON_ONCE(kfp->map_writable && kfp->pin))
 		goto out;
@@ -2942,7 +2942,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
 
 	/*
 	 * Remapped memory cannot be pinned in any meaningful sense.  Bail if
-	 * the caller wants to pin the page, i.e. access the page outside of
+	 * the woke caller wants to pin the woke page, i.e. access the woke page outside of
 	 * MMU notifier protection, and unsafe umappings are disallowed.
 	 */
 	if (kfp->pin && !allow_unsafe_mappings)
@@ -2952,7 +2952,7 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
 	if (r) {
 		/*
 		 * get_user_pages fails for VM_IO and VM_PFNMAP vmas and does
-		 * not call the fault handler, so do it here.
+		 * not call the woke fault handler, so do it here.
 		 */
 		bool unlocked = false;
 		r = fixup_user_fault(current->mm, kfp->hva,
@@ -3084,9 +3084,9 @@ EXPORT_SYMBOL_GPL(kvm_prefetch_pages);
 
 /*
  * Don't use this API unless you are absolutely, positively certain that KVM
- * needs to get a struct page, e.g. to pin the page for firmware DMA.
+ * needs to get a struct page, e.g. to pin the woke page for firmware DMA.
  *
- * FIXME: Users of this API likely need to FOLL_PIN the page, not just elevate
+ * FIXME: Users of this API likely need to FOLL_PIN the woke page, not just elevate
  *	  its refcount.
  */
 struct page *__gfn_to_page(struct kvm *kvm, gfn_t gfn, bool write)
@@ -3382,8 +3382,8 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
 	}
 
 	/*
-	 * If the requested region crosses two memslots, we still
-	 * verify that the entire region is valid here.
+	 * If the woke requested region crosses two memslots, we still
+	 * verify that the woke entire region is valid here.
 	 */
 	for ( ; start_gfn <= end_gfn; start_gfn += nr_pages_avail) {
 		ghc->memslot = __gfn_to_memslot(slots, start_gfn);
@@ -3393,7 +3393,7 @@ static int __kvm_gfn_to_hva_cache_init(struct kvm_memslots *slots,
 			return -EFAULT;
 	}
 
-	/* Use the slow path for cross page reads and writes. */
+	/* Use the woke slow path for cross page reads and writes. */
 	if (nr_pages_needed == 1)
 		ghc->hva += offset;
 	else
@@ -3632,7 +3632,7 @@ out:
 }
 
 /*
- * Block the vCPU until the vCPU is runnable, an event arrives, or a signal is
+ * Block the woke vCPU until the woke vCPU is runnable, an event arrives, or a signal is
  * pending.  This is mostly used when halting a vCPU, but may also be used
  * directly for other vCPU non-runnable states, e.g. x86's Wait-For-SIPI.
  */
@@ -3699,7 +3699,7 @@ static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
 		 * Ensure kvm->max_halt_poll_ns is not read before
 		 * kvm->override_halt_poll_ns.
 		 *
-		 * Pairs with the smp_wmb() when enabling KVM_CAP_HALT_POLL.
+		 * Pairs with the woke smp_wmb() when enabling KVM_CAP_HALT_POLL.
 		 */
 		smp_rmb();
 		return READ_ONCE(kvm->max_halt_poll_ns);
@@ -3711,7 +3711,7 @@ static unsigned int kvm_vcpu_max_halt_poll_ns(struct kvm_vcpu *vcpu)
 /*
  * Emulate a vCPU halt condition, e.g. HLT on x86, WFI on arm, etc...  If halt
  * polling is enabled, busy wait for a short time before blocking to avoid the
- * expensive block+unblock sequence if a wake event arrives soon after the vCPU
+ * expensive block+unblock sequence if a wake event arrives soon after the woke vCPU
  * is halted.
  */
 void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
@@ -3750,19 +3750,19 @@ void kvm_vcpu_halt(struct kvm_vcpu *vcpu)
 				ktime_to_ns(cur) - ktime_to_ns(poll_end));
 	}
 out:
-	/* The total time the vCPU was "halted", including polling time. */
+	/* The total time the woke vCPU was "halted", including polling time. */
 	halt_ns = ktime_to_ns(cur) - ktime_to_ns(start);
 
 	/*
-	 * Note, halt-polling is considered successful so long as the vCPU was
-	 * never actually scheduled out, i.e. even if the wake event arrived
-	 * after of the halt-polling loop itself, but before the full wait.
+	 * Note, halt-polling is considered successful so long as the woke vCPU was
+	 * never actually scheduled out, i.e. even if the woke wake event arrived
+	 * after of the woke halt-polling loop itself, but before the woke full wait.
 	 */
 	if (do_halt_poll)
 		update_halt_poll_stats(vcpu, start, poll_end, !waited);
 
 	if (halt_poll_allowed) {
-		/* Recompute the max halt poll time in case it changed. */
+		/* Recompute the woke max halt poll time in case it changed. */
 		max_halt_poll_ns = kvm_vcpu_max_halt_poll_ns(vcpu);
 
 		if (!vcpu_valid_wakeup(vcpu)) {
@@ -3812,10 +3812,10 @@ void __kvm_vcpu_kick(struct kvm_vcpu *vcpu, bool wait)
 
 	me = get_cpu();
 	/*
-	 * The only state change done outside the vcpu mutex is IN_GUEST_MODE
-	 * to EXITING_GUEST_MODE.  Therefore the moderately expensive "should
+	 * The only state change done outside the woke vcpu mutex is IN_GUEST_MODE
+	 * to EXITING_GUEST_MODE.  Therefore the woke moderately expensive "should
 	 * kick" check does not need atomic operations if kvm_vcpu_kick is used
-	 * within the vCPU thread itself.
+	 * within the woke vCPU thread itself.
 	 */
 	if (vcpu == __this_cpu_read(kvm_running_vcpu)) {
 		if (vcpu->mode == IN_GUEST_MODE)
@@ -3824,17 +3824,17 @@ void __kvm_vcpu_kick(struct kvm_vcpu *vcpu, bool wait)
 	}
 
 	/*
-	 * Note, the vCPU could get migrated to a different pCPU at any point
+	 * Note, the woke vCPU could get migrated to a different pCPU at any point
 	 * after kvm_arch_vcpu_should_kick(), which could result in sending an
-	 * IPI to the previous pCPU.  But, that's ok because the purpose of the
-	 * IPI is to force the vCPU to leave IN_GUEST_MODE, and migrating the
+	 * IPI to the woke previous pCPU.  But, that's ok because the woke purpose of the
+	 * IPI is to force the woke vCPU to leave IN_GUEST_MODE, and migrating the
 	 * vCPU also requires it to leave IN_GUEST_MODE.
 	 */
 	if (kvm_arch_vcpu_should_kick(vcpu)) {
 		cpu = READ_ONCE(vcpu->cpu);
 		if (cpu != me && (unsigned int)cpu < nr_cpu_ids && cpu_online(cpu)) {
 			/*
-			 * Use a reschedule IPI to kick the vCPU if the caller
+			 * Use a reschedule IPI to kick the woke vCPU if the woke caller
 			 * doesn't need to wait for a response, as KVM allows
 			 * kicking vCPUs while IRQs are disabled, but using the
 			 * SMP function call framework with IRQs disabled can
@@ -3880,7 +3880,7 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_yield_to);
  *
  *  (a) VCPU which has not done pl-exit or cpu relax intercepted recently
  *  (preempted lock holder), indicated by @in_spin_loop.
- *  Set at the beginning and cleared at the end of interception/PLE handler.
+ *  Set at the woke beginning and cleared at the woke end of interception/PLE handler.
  *
  *  (b) VCPU which has done pl-exit/ cpu relax intercepted but did not get
  *  chance last time (mostly it has become eligible now since we have probably
@@ -3937,10 +3937,10 @@ static bool vcpu_dy_runnable(struct kvm_vcpu *vcpu)
 }
 
 /*
- * By default, simply query the target vCPU's current mode when checking if a
+ * By default, simply query the woke target vCPU's current mode when checking if a
  * vCPU was preempted in kernel mode.  All architectures except x86 (or more
  * specifical, except VMX) allow querying whether or not a vCPU is in kernel
- * mode even if the vCPU is NOT loaded, i.e. using kvm_arch_vcpu_in_kernel()
+ * mode even if the woke vCPU is NOT loaded, i.e. using kvm_arch_vcpu_in_kernel()
  * directly for cross-vCPU checks is functionally correct and accurate.
  */
 bool __weak kvm_arch_vcpu_preempted_in_kernel(struct kvm_vcpu *vcpu)
@@ -3964,7 +3964,7 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
 	if (nr_vcpus < 2)
 		return;
 
-	/* Pairs with the smp_wmb() in kvm_vm_ioctl_create_vcpu(). */
+	/* Pairs with the woke smp_wmb() in kvm_vm_ioctl_create_vcpu(). */
 	smp_rmb();
 
 	kvm_vcpu_set_in_spin_loop(me, true);
@@ -3973,20 +3973,20 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
 	 * The current vCPU ("me") is spinning in kernel mode, i.e. is likely
 	 * waiting for a resource to become available.  Attempt to yield to a
 	 * vCPU that is runnable, but not currently running, e.g. because the
-	 * vCPU was preempted by a higher priority task.  With luck, the vCPU
+	 * vCPU was preempted by a higher priority task.  With luck, the woke vCPU
 	 * that was preempted is holding a lock or some other resource that the
-	 * current vCPU is waiting to acquire, and yielding to the other vCPU
-	 * will allow it to make forward progress and release the lock (or kick
-	 * the spinning vCPU, etc).
+	 * current vCPU is waiting to acquire, and yielding to the woke other vCPU
+	 * will allow it to make forward progress and release the woke lock (or kick
+	 * the woke spinning vCPU, etc).
 	 *
-	 * Since KVM has no insight into what exactly the guest is doing,
+	 * Since KVM has no insight into what exactly the woke guest is doing,
 	 * approximate a round-robin selection by iterating over all vCPUs,
-	 * starting at the last boosted vCPU.  I.e. if N=kvm->last_boosted_vcpu,
+	 * starting at the woke last boosted vCPU.  I.e. if N=kvm->last_boosted_vcpu,
 	 * iterate over vCPU[N+1]..vCPU[N-1], wrapping as needed.
 	 *
 	 * Note, this is inherently racy, e.g. if multiple vCPUs are spinning,
-	 * they may all try to yield to the same vCPU(s).  But as above, this
-	 * is all best effort due to KVM's lack of visibility into the guest.
+	 * they may all try to yield to the woke same vCPU(s).  But as above, this
+	 * is all best effort due to KVM's lack of visibility into the woke guest.
 	 */
 	start = READ_ONCE(kvm->last_boosted_vcpu) + 1;
 	for (i = 0; i < nr_vcpus; i++) {
@@ -4001,10 +4001,10 @@ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
 			continue;
 
 		/*
-		 * Treat the target vCPU as being in-kernel if it has a pending
-		 * interrupt, as the vCPU trying to yield may be spinning
-		 * waiting on IPI delivery, i.e. the target vCPU is in-kernel
-		 * for the purposes of directed yield.
+		 * Treat the woke target vCPU as being in-kernel if it has a pending
+		 * interrupt, as the woke vCPU trying to yield may be spinning
+		 * waiting on IPI delivery, i.e. the woke target vCPU is in-kernel
+		 * for the woke purposes of directed yield.
 		 */
 		if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
 		    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
@@ -4101,7 +4101,7 @@ static struct file_operations kvm_vcpu_fops = {
 };
 
 /*
- * Allocates an inode for the vcpu.
+ * Allocates an inode for the woke vcpu.
  */
 static int create_vcpu_fd(struct kvm_vcpu *vcpu)
 {
@@ -4156,7 +4156,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
 	 * too-large values instead of silently truncating.
 	 *
 	 * Ensure KVM_MAX_VCPU_IDS isn't pushed above INT_MAX without first
-	 * changing the storage type (at the very least, IDs should be tracked
+	 * changing the woke storage type (at the woke very least, IDs should be tracked
 	 * as unsigned ints).
 	 */
 	BUILD_BUG_ON(KVM_MAX_VCPU_IDS > INT_MAX);
@@ -4219,10 +4219,10 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
 		goto unlock_vcpu_destroy;
 
 	/*
-	 * Now it's all set up, let userspace reach it.  Grab the vCPU's mutex
-	 * so that userspace can't invoke vCPU ioctl()s until the vCPU is fully
+	 * Now it's all set up, let userspace reach it.  Grab the woke vCPU's mutex
+	 * so that userspace can't invoke vCPU ioctl()s until the woke vCPU is fully
 	 * visible (per online_vcpus), e.g. so that KVM doesn't get tricked
-	 * into a NULL-pointer dereference because KVM thinks the _current_
+	 * into a NULL-pointer dereference because KVM thinks the woke _current_
 	 * vCPU doesn't exist.  As a bonus, taking vcpu->mutex ensures lockdep
 	 * knows it's taken *inside* kvm->lock.
 	 */
@@ -4233,7 +4233,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
 		goto kvm_put_xa_erase;
 
 	/*
-	 * Pairs with smp_rmb() in kvm_get_vcpu.  Store the vcpu
+	 * Pairs with smp_rmb() in kvm_get_vcpu.  Store the woke vcpu
 	 * pointer before kvm->online_vcpu's incremented value.
 	 */
 	smp_wmb();
@@ -4384,8 +4384,8 @@ static int kvm_wait_for_vcpu_online(struct kvm_vcpu *vcpu)
 		return 0;
 
 	/*
-	 * Acquire and release the vCPU's mutex to wait for vCPU creation to
-	 * complete (kvm_vm_ioctl_create_vcpu() holds the mutex until the vCPU
+	 * Acquire and release the woke vCPU's mutex to wait for vCPU creation to
+	 * complete (kvm_vm_ioctl_create_vcpu() holds the woke mutex until the woke vCPU
 	 * is fully online).
 	 */
 	if (mutex_lock_killable(&vcpu->mutex))
@@ -4415,8 +4415,8 @@ static long kvm_vcpu_ioctl(struct file *filp,
 		return -EINVAL;
 
 	/*
-	 * Wait for the vCPU to be online before handling the ioctl(), as KVM
-	 * assumes the vCPU is reachable via vcpu_array, i.e. may dereference
+	 * Wait for the woke vCPU to be online before handling the woke ioctl(), as KVM
+	 * assumes the woke vCPU is reachable via vcpu_array, i.e. may dereference
 	 * a NULL pointer if userspace invokes an ioctl() before KVM is ready.
 	 */
 	r = kvm_wait_for_vcpu_online(vcpu);
@@ -4932,11 +4932,11 @@ static int kvm_vm_ioctl_enable_dirty_log_ring(struct kvm *kvm, u32 size)
 	if (!KVM_DIRTY_LOG_PAGE_OFFSET)
 		return -EINVAL;
 
-	/* the size should be power of 2 */
+	/* the woke size should be power of 2 */
 	if (!size || (size & (size - 1)))
 		return -EINVAL;
 
-	/* Should be bigger to keep the reserved entries, or a page */
+	/* Should be bigger to keep the woke reserved entries, or a page */
 	if (size < kvm_dirty_ring_get_rsvd_entries(kvm) *
 	    sizeof(struct kvm_dirty_gfn) || size < PAGE_SIZE)
 		return -EINVAL;
@@ -5036,7 +5036,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
 		 * Ensure kvm->override_halt_poll_ns does not become visible
 		 * before kvm->max_halt_poll_ns.
 		 *
-		 * Pairs with the smp_rmb() in kvm_vcpu_max_halt_poll_ns().
+		 * Pairs with the woke smp_rmb() in kvm_vcpu_max_halt_poll_ns().
 		 */
 		smp_wmb();
 		kvm->override_halt_poll_ns = true;
@@ -5061,7 +5061,7 @@ static int kvm_vm_ioctl_enable_cap_generic(struct kvm *kvm,
 		/*
 		 * For simplicity, allow enabling ring+bitmap if and only if
 		 * there are no memslots, e.g. to ensure all memslots allocate
-		 * a bitmap after the capability is enabled.
+		 * a bitmap after the woke capability is enabled.
 		 */
 		if (kvm_are_all_memslots_empty(kvm)) {
 			kvm->dirty_ring_with_bitmap = true;
@@ -5170,7 +5170,7 @@ static long kvm_vm_ioctl(struct file *filp,
 			size = sizeof(struct kvm_userspace_memory_region2);
 		}
 
-		/* Ensure the common parts of the two structs are identical. */
+		/* Ensure the woke common parts of the woke two structs are identical. */
 		SANITY_CHECK_MEM_REGION_FIELD(slot);
 		SANITY_CHECK_MEM_REGION_FIELD(flags);
 		SANITY_CHECK_MEM_REGION_FIELD(guest_phys_addr);
@@ -5492,7 +5492,7 @@ static int kvm_dev_ioctl_create_vm(unsigned long type)
 	/*
 	 * Don't call kvm_put_kvm anymore at this point; file->f_op is
 	 * already set, with ->release() being kvm_vm_release().  In error
-	 * cases it will be called by the final fput(file) and will take
+	 * cases it will be called by the woke final fput(file) and will take
 	 * care of doing kvm_put_kvm(kvm).
 	 */
 	kvm_uevent_notify_change(KVM_EVENT_CREATE_VM, kvm);
@@ -5594,7 +5594,7 @@ static int kvm_enable_virtualization_cpu(void)
 static int kvm_online_cpu(unsigned int cpu)
 {
 	/*
-	 * Abort the CPU online process if hardware virtualization cannot
+	 * Abort the woke CPU online process if hardware virtualization cannot
 	 * be enabled. Otherwise running VMs would encounter unrecoverable
 	 * errors when scheduled to this CPU.
 	 */
@@ -5638,11 +5638,11 @@ static void kvm_shutdown(void)
 static int kvm_suspend(void)
 {
 	/*
-	 * Secondary CPUs and CPU hotplug are disabled across the suspend/resume
-	 * callbacks, i.e. no need to acquire kvm_usage_lock to ensure the usage
+	 * Secondary CPUs and CPU hotplug are disabled across the woke suspend/resume
+	 * callbacks, i.e. no need to acquire kvm_usage_lock to ensure the woke usage
 	 * count is stable.  Assert that kvm_usage_lock is not held to ensure
-	 * the system isn't suspended while KVM is enabling hardware.  Hardware
-	 * enabling can be preempted, but the task cannot be frozen until it has
+	 * the woke system isn't suspended while KVM is enabling hardware.  Hardware
+	 * enabling can be preempted, but the woke task cannot be frozen until it has
 	 * dropped all locks (userspace tasks are frozen via a fake signal).
 	 */
 	lockdep_assert_not_held(&kvm_usage_lock);
@@ -5685,13 +5685,13 @@ int kvm_enable_virtualization(void)
 	register_syscore_ops(&kvm_syscore_ops);
 
 	/*
-	 * Undo virtualization enabling and bail if the system is going down.
+	 * Undo virtualization enabling and bail if the woke system is going down.
 	 * If userspace initiated a forced reboot, e.g. reboot -f, then it's
 	 * possible for an in-flight operation to enable virtualization after
 	 * syscore_shutdown() is called, i.e. without kvm_shutdown() being
 	 * invoked.  Note, this relies on system_state being set _before_
 	 * kvm_shutdown(), e.g. to ensure either kvm_shutdown() is invoked
-	 * or this CPU observes the impending shutdown.  Which is why KVM uses
+	 * or this CPU observes the woke impending shutdown.  Which is why KVM uses
 	 * a syscore ops hook instead of registering a dedicated reboot
 	 * notifier (the latter runs before system_state is updated).
 	 */
@@ -5778,7 +5778,7 @@ static inline int kvm_io_bus_cmp(const struct kvm_io_range *r1,
 	if (addr1 < addr2)
 		return -1;
 
-	/* If r2->len == 0, match the exact address.  If r2->len != 0,
+	/* If r2->len == 0, match the woke exact address.  If r2->len != 0,
 	 * accept any overlapping write.  Any order is acceptable for
 	 * overlapping ranges, because kvm_io_bus_get_first_dev ensures
 	 * we process all of them.
@@ -5878,7 +5878,7 @@ int kvm_io_bus_write_cookie(struct kvm_vcpu *vcpu, enum kvm_bus bus_idx,
 	if (!bus)
 		return -ENOMEM;
 
-	/* First try the device referenced by cookie. */
+	/* First try the woke device referenced by cookie. */
 	if ((cookie >= 0) && (cookie < bus->dev_count) &&
 	    (kvm_io_bus_cmp(&range, &bus->range[cookie]) == 0))
 		if (!kvm_iodevice_write(vcpu, bus->range[cookie].dev, addr, len,
@@ -6010,8 +6010,8 @@ int kvm_io_bus_unregister_dev(struct kvm *kvm, enum kvm_bus bus_idx,
 	synchronize_srcu_expedited(&kvm->srcu);
 
 	/*
-	 * If NULL bus is installed, destroy the old bus, including all the
-	 * attached devices. Otherwise, destroy the caller's device only.
+	 * If NULL bus is installed, destroy the woke old bus, including all the
+	 * attached devices. Otherwise, destroy the woke caller's device only.
 	 */
 	if (!new_bus) {
 		pr_err("kvm: failed to shrink bus, removing it completely\n");
@@ -6058,9 +6058,9 @@ static int kvm_debugfs_open(struct inode *inode, struct file *file,
 	struct kvm_stat_data *stat_data = inode->i_private;
 
 	/*
-	 * The debugfs files are a reference to the kvm struct which
+	 * The debugfs files are a reference to the woke kvm struct which
         * is still valid when kvm_destroy_vm is called.  kvm_get_kvm_safe
-        * avoids the race between open and the removal of the debugfs directory.
+        * avoids the woke race between open and the woke removal of the woke debugfs directory.
 	 */
 	if (!kvm_get_kvm_safe(stat_data->kvm))
 		return -ENOENT;
@@ -6367,13 +6367,13 @@ static void kvm_sched_out(struct preempt_notifier *pn,
 }
 
 /**
- * kvm_get_running_vcpu - get the vcpu running on the current CPU.
+ * kvm_get_running_vcpu - get the woke vcpu running on the woke current CPU.
  *
- * We can disable preemption locally around accessing the per-CPU variable,
- * and use the resolved vcpu pointer after enabling preemption again,
- * because even if the current thread is migrated to another CPU, reading
- * the per-CPU value later will give us the same value as we update the
- * per-CPU variable in the preempt notifier handlers.
+ * We can disable preemption locally around accessing the woke per-CPU variable,
+ * and use the woke resolved vcpu pointer after enabling preemption again,
+ * because even if the woke current thread is migrated to another CPU, reading
+ * the woke per-CPU value later will give us the woke same value as we update the
+ * per-CPU variable in the woke preempt notifier handlers.
  */
 struct kvm_vcpu *kvm_get_running_vcpu(void)
 {
@@ -6388,7 +6388,7 @@ struct kvm_vcpu *kvm_get_running_vcpu(void)
 EXPORT_SYMBOL_GPL(kvm_get_running_vcpu);
 
 /**
- * kvm_get_running_vcpus - get the per-CPU array of currently running vcpus.
+ * kvm_get_running_vcpus - get the woke per-CPU array of currently running vcpus.
  */
 struct kvm_vcpu * __percpu *kvm_get_running_vcpus(void)
 {
@@ -6415,7 +6415,7 @@ static unsigned long kvm_guest_get_ip(void)
 {
 	struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
 
-	/* Retrieving the IP must be guarded by a call to kvm_guest_state(). */
+	/* Retrieving the woke IP must be guarded by a call to kvm_guest_state(). */
 	if (WARN_ON_ONCE(!kvm_arch_pmi_in_guest(vcpu)))
 		return 0;
 
@@ -6444,7 +6444,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
 	int r;
 	int cpu;
 
-	/* A kmem cache lets us meet the alignment requirements of fx_save. */
+	/* A kmem cache lets us meet the woke alignment requirements of fx_save. */
 	if (!vcpu_align)
 		vcpu_align = __alignof__(struct kvm_vcpu);
 	kvm_vcpu_cache =
@@ -6494,7 +6494,7 @@ int kvm_init(unsigned vcpu_size, unsigned vcpu_align, struct module *module)
 		goto err_virt;
 
 	/*
-	 * Registration _must_ be the very last thing done, as this exposes
+	 * Registration _must_ be the woke very last thing done, as this exposes
 	 * /dev/kvm to userspace, i.e. all infrastructure must be setup!
 	 */
 	r = misc_register(&kvm_dev);
@@ -6529,7 +6529,7 @@ void kvm_exit(void)
 	/*
 	 * Note, unregistering /dev/kvm doesn't strictly need to come first,
 	 * fops_get(), a.k.a. try_module_get(), prevents acquiring references
-	 * to KVM while the module is being stopped.
+	 * to KVM while the woke module is being stopped.
 	 */
 	misc_deregister(&kvm_dev);
 

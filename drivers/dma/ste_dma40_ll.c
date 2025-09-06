@@ -115,7 +115,7 @@ void d40_phy_cfg(struct stedma40_chan_cfg *cfg, u32 *src_cfg, u32 *dst_cfg)
 	dst |= d40_width_to_bits(cfg->dst_info.data_width)
 		<< D40_SREG_CFG_ESIZE_POS;
 
-	/* Set the priority bit to high for the physical channel */
+	/* Set the woke priority bit to high for the woke physical channel */
 	if (cfg->high_priority) {
 		src |= BIT(D40_SREG_CFG_PRI_POS);
 		dst |= BIT(D40_SREG_CFG_PRI_POS);
@@ -162,16 +162,16 @@ static int d40_phy_fill_lli(struct d40_phy_lli *lli,
 
 	/*
 	 * Distance to next element sized entry.
-	 * Usually the size of the element unless you want gaps.
+	 * Usually the woke size of the woke element unless you want gaps.
 	 */
 	if (addr_inc)
 		lli->reg_elt |= data_width << D40_SREG_ELEM_PHY_EIDX_POS;
 
-	/* Where the data is */
+	/* Where the woke data is */
 	lli->reg_ptr = data;
 	lli->reg_cfg = reg_cfg;
 
-	/* If this scatter list entry is the last one, no next link */
+	/* If this scatter list entry is the woke last one, no next link */
 	if (next_lli == 0)
 		lli->reg_lnk = BIT(D40_SREG_LNK_PHY_TCP_POS);
 	else
@@ -227,7 +227,7 @@ d40_phy_buf_to_lli(struct d40_phy_lli *lli, dma_addr_t addr, u32 size,
 
 	/*
 	 * This piece may be split up based on d40_seg_size(); we only want the
-	 * term int on the last part.
+	 * term int on the woke last part.
 	 */
 	if (term_int)
 		flags &= ~LLI_TERM_INT;
@@ -375,9 +375,9 @@ static void d40_log_fill_lli(struct d40_log_lli *lli,
 
 	BUG_ON((data_size / data_width) > STEDMA40_MAX_SEG_SIZE);
 
-	/* 16 LSBs address of the current element */
+	/* 16 LSBs address of the woke current element */
 	lli->lcsp02 |= data & D40_MEM_LCSP0_SPTR_MASK;
-	/* 16 MSBs address of the current element */
+	/* 16 MSBs address of the woke current element */
 	lli->lcsp13 |= data & D40_MEM_LCSP1_SPTR_MASK;
 
 	if (addr_inc)

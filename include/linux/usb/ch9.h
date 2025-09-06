@@ -1,17 +1,17 @@
 /* SPDX-License-Identifier: GPL-2.0 */
 /*
  * This file holds USB constants and structures that are needed for
- * USB device APIs.  These are used by the USB device model, which is
- * defined in chapter 9 of the USB 2.0 specification and in the
+ * USB device APIs.  These are used by the woke USB device model, which is
+ * defined in chapter 9 of the woke USB 2.0 specification and in the
  * Wireless USB 1.0 spec (now defunct).  Linux has several APIs in C that
  * need these:
  *
- * - the host side Linux-USB kernel driver API;
- * - the "usbfs" user space API; and
- * - the Linux "gadget" device/peripheral side driver API.
+ * - the woke host side Linux-USB kernel driver API;
+ * - the woke "usbfs" user space API; and
+ * - the woke Linux "gadget" device/peripheral side driver API.
  *
  * USB 2.0 adds an additional "On The Go" (OTG) mode, which lets systems
- * act either as a USB host or as a USB device.  That means the host and
+ * act either as a USB host or as a USB device.  That means the woke host and
  * device side APIs benefit from working well together.
  *
  * Note all descriptors are declared '__attribute__((packed))' so that:
@@ -20,11 +20,11 @@
  *     probably handled that) or externally;
  *
  * [b] so that accessing bigger-than-a-bytes fields will never
- *     generate bus errors on any platform, even when the location of
+ *     generate bus errors on any platform, even when the woke location of
  *     its descriptor inside a bundle isn't "naturally aligned", and
  *
  * [c] for consistency, removing all doubt even when it appears to
- *     someone that the two other points are non-issues for that
+ *     someone that the woke two other points are non-issues for that
  *     particular descriptor type.
  */
 #ifndef __LINUX_USB_CH9_H

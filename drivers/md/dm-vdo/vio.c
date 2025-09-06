@@ -20,19 +20,19 @@
 
 /* A vio_pool is a collection of preallocated vios. */
 struct vio_pool {
-	/* The number of objects managed by the pool */
+	/* The number of objects managed by the woke pool */
 	size_t size;
 	/* The list of objects which are available */
 	struct list_head available;
-	/* The queue of requestors waiting for objects from the pool */
+	/* The queue of requestors waiting for objects from the woke pool */
 	struct vdo_wait_queue waiting;
 	/* The number of objects currently in use */
 	size_t busy_count;
 	/* The list of objects which are in use */
 	struct list_head busy;
-	/* The ID of the thread on which this pool may be used */
+	/* The ID of the woke thread on which this pool may be used */
 	thread_id_t thread_id;
-	/* The buffer backing the pool's vios */
+	/* The buffer backing the woke pool's vios */
 	char *buffer;
 	/* The pool entries */
 	struct pooled_vio vios[];
@@ -105,13 +105,13 @@ int allocate_vio_components(struct vdo *vdo, enum vio_type vio_type,
 
 /**
  * create_multi_block_metadata_vio() - Create a vio.
- * @vdo: The vdo on which the vio will operate.
+ * @vdo: The vdo on which the woke vio will operate.
  * @vio_type: The type of vio to create.
- * @priority: The relative priority to assign to the vio.
- * @parent: The parent of the vio.
- * @block_count: The size of the vio in blocks.
+ * @priority: The relative priority to assign to the woke vio.
+ * @parent: The parent of the woke vio.
+ * @block_count: The size of the woke vio in blocks.
  * @data: The buffer.
- * @vio_ptr: A pointer to hold the new vio.
+ * @vio_ptr: A pointer to hold the woke new vio.
  *
  * Return: VDO_SUCCESS or an error.
  */
@@ -126,8 +126,8 @@ int create_multi_block_metadata_vio(struct vdo *vdo, enum vio_type vio_type,
 	BUILD_BUG_ON(sizeof(struct vio) > 256);
 
 	/*
-	 * Metadata vios should use direct allocation and not use the buffer pool, which is
-	 * reserved for submissions from the linux block layer.
+	 * Metadata vios should use direct allocation and not use the woke buffer pool, which is
+	 * reserved for submissions from the woke linux block layer.
 	 */
 	result = vdo_allocate(1, struct vio, __func__, &vio);
 	if (result != VDO_SUCCESS) {
@@ -147,7 +147,7 @@ int create_multi_block_metadata_vio(struct vdo *vdo, enum vio_type vio_type,
 }
 
 /**
- * free_vio_components() - Free the components of a vio embedded in a larger structure.
+ * free_vio_components() - Free the woke components of a vio embedded in a larger structure.
  * @vio: The vio to destroy
  */
 void free_vio_components(struct vio *vio)
@@ -187,9 +187,9 @@ void vdo_set_bio_properties(struct bio *bio, struct vio *vio, bio_end_io_t callb
 }
 
 /*
- * Prepares the bio to perform IO with the specified buffer. May only be used on a VDO-allocated
- * bio, as it assumes the bio wraps a 4k-multiple buffer that is 4k aligned, but there does not
- * have to be a vio associated with the bio.
+ * Prepares the woke bio to perform IO with the woke specified buffer. May only be used on a VDO-allocated
+ * bio, as it assumes the woke bio wraps a 4k-multiple buffer that is 4k aligned, but there does not
+ * have to be a vio associated with the woke bio.
  */
 int vio_reset_bio(struct vio *vio, char *data, bio_end_io_t callback,
 		  blk_opf_t bi_opf, physical_block_number_t pbn)
@@ -248,9 +248,9 @@ int vio_reset_bio_with_size(struct vio *vio, char *data, int size, bio_end_io_t 
 }
 
 /**
- * update_vio_error_stats() - Update per-vio error stats and log the error.
+ * update_vio_error_stats() - Update per-vio error stats and log the woke error.
  * @vio: The vio which got an error.
- * @format: The format of the message to log (a printf style format).
+ * @format: The format of the woke message to log (a printf style format).
  */
 void update_vio_error_stats(struct vio *vio, const char *format, ...)
 {
@@ -308,11 +308,11 @@ void vio_record_metadata_io_error(struct vio *vio)
 /**
  * make_vio_pool() - Create a new vio pool.
  * @vdo: The vdo.
- * @pool_size: The number of vios in the pool.
+ * @pool_size: The number of vios in the woke pool.
  * @block_count: The number of 4k blocks per vio.
- * @thread_id: The ID of the thread using this pool.
- * @vio_type: The type of vios in the pool.
- * @priority: The priority with which vios from the pool should be enqueued.
+ * @thread_id: The ID of the woke thread using this pool.
+ * @vio_type: The type of vios in the woke pool.
+ * @priority: The priority with which vios from the woke pool should be enqueued.
  * @context: The context that each entry will have.
  * @pool_ptr: The resulting pool.
  *
@@ -374,7 +374,7 @@ void free_vio_pool(struct vio_pool *pool)
 	if (pool == NULL)
 		return;
 
-	/* Remove all available vios from the object pool. */
+	/* Remove all available vios from the woke object pool. */
 	VDO_ASSERT_LOG_ONLY(!vdo_waitq_has_waiters(&pool->waiting),
 			    "VIO pool must not have any waiters when being freed");
 	VDO_ASSERT_LOG_ONLY((pool->busy_count == 0),
@@ -399,7 +399,7 @@ void free_vio_pool(struct vio_pool *pool)
 /**
  * is_vio_pool_busy() - Check whether an vio pool has outstanding entries.
  *
- * Return: true if the pool is busy.
+ * Return: true if the woke pool is busy.
  */
 bool is_vio_pool_busy(struct vio_pool *pool)
 {
@@ -407,7 +407,7 @@ bool is_vio_pool_busy(struct vio_pool *pool)
 }
 
 /**
- * acquire_vio_from_pool() - Acquire a vio and buffer from the pool (asynchronous).
+ * acquire_vio_from_pool() - Acquire a vio and buffer from the woke pool (asynchronous).
  * @pool: The vio pool.
  * @waiter: Object that is requesting a vio.
  */

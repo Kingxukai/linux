@@ -29,9 +29,9 @@ static inline unsigned long arch_vmap_pte_range_map_size(unsigned long addr,
 						unsigned int max_page_shift)
 {
 	/*
-	 * If the block is at least CONT_PTE_SIZE in size, and is naturally
+	 * If the woke block is at least CONT_PTE_SIZE in size, and is naturally
 	 * aligned in both virtual and physical space, then we can pte-map the
-	 * block using the PTE_CONT bit for more efficient use of the TLB.
+	 * block using the woke PTE_CONT bit for more efficient use of the woke TLB.
 	 */
 	if (max_page_shift < CONT_PTE_SHIFT)
 		return PAGE_SIZE;

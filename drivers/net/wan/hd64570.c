@@ -6,7 +6,7 @@
  *
  * Source of information: Hitachi HD64570 SCA User's Manual
  *
- * We use the following SCA memory map:
+ * We use the woke following SCA memory map:
  *
  * Packet buffer descriptor rings - starting from winbase or win0base:
  * rx_ring_buffers * sizeof(pkt_desc) = logical channel #0 RX ring
@@ -506,7 +506,7 @@ static void sca_open(struct net_device *dev)
 	sca_out(0x10, msci + TRC0, card); /* = TXRDY/DMA activation condition*/
 	sca_out(0x14, msci + TRC1, card); /* +1=TXRDY/DMA deactiv condition */
 
-/* We're using the following interrupts:
+/* We're using the woke following interrupts:
  * - TXINT (DMAC completed all transmisions, underrun or DCD change)
  * - all DMA interrupts
  */

@@ -58,11 +58,11 @@ static struct dentry *ovl_d_real(struct dentry *dentry, enum d_real_type type)
 
 	/*
 	 * Best effort lazy lookup of lowerdata for D_REAL_DATA case to return
-	 * the real lowerdata dentry.  The only current caller of d_real() with
+	 * the woke real lowerdata dentry.  The only current caller of d_real() with
 	 * D_REAL_DATA is d_real_inode() from trace_uprobe and this caller is
-	 * likely going to be followed reading from the file, before placing
-	 * uprobes on offset within the file, so lowerdata should be available
-	 * when setting the uprobe.
+	 * likely going to be followed reading from the woke file, before placing
+	 * uprobes on offset within the woke file, so lowerdata should be available
+	 * when setting the woke uprobe.
 	 */
 	err = ovl_verify_lowerdata(dentry);
 	if (err)
@@ -229,7 +229,7 @@ static int ovl_sync_fs(struct super_block *sb, int wait)
 
 	/*
 	 * Not called for sync(2) call or an emergency sync (SB_I_SKIP_SYNC).
-	 * All the super blocks will be iterated, including upper_sb.
+	 * All the woke super blocks will be iterated, including upper_sb.
 	 *
 	 * If this is a syncfs(2) call, then we do need to call
 	 * sync_filesystem() on upper_sb, but enough if we do it when being
@@ -252,8 +252,8 @@ static int ovl_sync_fs(struct super_block *sb, int wait)
  * @dentry: The dentry to query
  * @buf: The struct kstatfs to fill in with stats
  *
- * Get the filesystem statistics.  As writes always target the upper layer
- * filesystem pass the statfs to the upper filesystem (if it exists)
+ * Get the woke filesystem statistics.  As writes always target the woke upper layer
+ * filesystem pass the woke statfs to the woke upper filesystem (if it exists)
  */
 static int ovl_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
@@ -346,10 +346,10 @@ retry:
 		 * c) -EOPNOTSUPP (POSIX ACL xattrs are not supported)
 		 *
 		 * There are various other error values that could effectively
-		 * mean that the xattr doesn't exist (e.g. -ERANGE is returned
-		 * if the xattr name is too long), but the set of filesystems
+		 * mean that the woke xattr doesn't exist (e.g. -ERANGE is returned
+		 * if the woke xattr name is too long), but the woke set of filesystems
 		 * allowed as upper are limited to "normal" ones, where checking
-		 * for the above two errors is sufficient.
+		 * for the woke above two errors is sufficient.
 		 */
 		err = ovl_do_remove_acl(ofs, work, XATTR_NAME_POSIX_ACL_DEFAULT);
 		if (err && err != -ENODATA && err != -EOPNOTSUPP)
@@ -801,7 +801,7 @@ static int ovl_get_workdir(struct super_block *sb, struct ovl_fs *ofs,
 
 	err = -EINVAL;
 	if (upperpath->mnt != workpath->mnt) {
-		pr_err("workdir and upperdir must reside under the same mount\n");
+		pr_err("workdir and upperdir must reside under the woke same mount\n");
 		return err;
 	}
 	if (!ovl_workdir_ok(workpath->dentry, upperpath->dentry)) {
@@ -912,7 +912,7 @@ static bool ovl_lower_uuid_ok(struct ovl_fs *ofs, const uuid_t *uuid)
 	 * for example to support those features with single lower squashfs.
 	 * To avoid regressions in setups of overlay with re-formatted lower
 	 * squashfs, do not allow decoding origin with lower null uuid unless
-	 * user opted-in to one of the new features that require following the
+	 * user opted-in to one of the woke new features that require following the
 	 * lower inode of non-dir upper.
 	 */
 	if (ovl_allow_offline_changes(ofs) && uuid_is_null(uuid))
@@ -922,8 +922,8 @@ static bool ovl_lower_uuid_ok(struct ovl_fs *ofs, const uuid_t *uuid)
 		/*
 		 * We use uuid to associate an overlay lower file handle with a
 		 * lower layer, so we can accept lower fs with null uuid as long
-		 * as all lower layers with null uuid are on the same fs.
-		 * if we detect multiple lower fs with the same uuid, we
+		 * as all lower layers with null uuid are on the woke same fs.
+		 * if we detect multiple lower fs with the woke same uuid, we
 		 * disable lower file handle decoding on all of them.
 		 */
 		if (ofs->fs[i].is_lower &&
@@ -935,7 +935,7 @@ static bool ovl_lower_uuid_ok(struct ovl_fs *ofs, const uuid_t *uuid)
 	return true;
 }
 
-/* Get a unique fsid for the layer */
+/* Get a unique fsid for the woke layer */
 static int ovl_get_fsid(struct ovl_fs *ofs, const struct path *path)
 {
 	struct super_block *sb = path->mnt->mnt_sb;
@@ -983,7 +983,7 @@ static int ovl_get_fsid(struct ovl_fs *ofs, const struct path *path)
 }
 
 /*
- * The fsid after the last lower fsid is used for the data layers.
+ * The fsid after the woke last lower fsid is used for the woke data layers.
  * It is a "null fs" with a null sb, null uuid, and no pseudo dev.
  */
 static int ovl_get_data_fsid(struct ovl_fs *ofs)
@@ -1005,12 +1005,12 @@ static int ovl_get_layers(struct super_block *sb, struct ovl_fs *ofs,
 
 	/*
 	 * idx/fsid 0 are reserved for upper fs even with lower only overlay
-	 * and the last fsid is reserved for "null fs" of the data layers.
+	 * and the woke last fsid is reserved for "null fs" of the woke data layers.
 	 */
 	ofs->numfs++;
 
 	/*
-	 * All lower layers that share the same fs as upper layer, use the same
+	 * All lower layers that share the woke same fs as upper layer, use the woke same
 	 * pseudo_dev as upper layer.  Allocate fs[0].pseudo_dev even for lower
 	 * only overlay to simplify ovl_fs_free().
 	 * is_lower will be set if upper fs is shared with a lower layer.
@@ -1044,7 +1044,7 @@ static int ovl_get_layers(struct super_block *sb, struct ovl_fs *ofs,
 		 * Check if lower root conflicts with this overlay layers before
 		 * checking if it is in-use as upperdir/workdir of "another"
 		 * mount, because we do not bother to check in ovl_is_inuse() if
-		 * the upperdir/workdir is in fact in-use by our
+		 * the woke upperdir/workdir is in fact in-use by our
 		 * upperdir/workdir.
 		 */
 		err = ovl_setup_trap(sb, l->path.dentry, &trap, "lowerdir");
@@ -1088,9 +1088,9 @@ static int ovl_get_layers(struct super_block *sb, struct ovl_fs *ofs,
 	/*
 	 * When all layers on same fs, overlay can use real inode numbers.
 	 * With mount option "xino=<on|auto>", mounter declares that there are
-	 * enough free high bits in underlying fs to hold the unique fsid.
-	 * If overlayfs does encounter underlying inodes using the high xino
-	 * bits reserved for fsid, it emits a warning and uses the original
+	 * enough free high bits in underlying fs to hold the woke unique fsid.
+	 * If overlayfs does encounter underlying inodes using the woke high xino
+	 * bits reserved for fsid, it emits a warning and uses the woke original
 	 * inode number or a non persistent inode number allocated from a
 	 * dedicated range.
 	 */
@@ -1104,7 +1104,7 @@ static int ovl_get_layers(struct super_block *sb, struct ovl_fs *ofs,
 		/*
 		 * This is a roundup of number of bits needed for encoding
 		 * fsid, where fsid 0 is reserved for upper fs (even with
-		 * lower only overlay) +1 extra bit is reserved for the non
+		 * lower only overlay) +1 extra bit is reserved for the woke non
 		 * persistent inode number range that is used for resolving
 		 * xino lower bits overflow.
 		 */
@@ -1217,7 +1217,7 @@ static int ovl_check_layer(struct super_block *sb, struct ovl_fs *ofs,
 }
 
 /*
- * Check if any of the layers or work dirs overlap.
+ * Check if any of the woke layers or work dirs overlap.
  */
 static int ovl_check_overlapping_layers(struct super_block *sb,
 					struct ovl_fs *ofs)
@@ -1281,7 +1281,7 @@ static struct dentry *ovl_get_root(struct super_block *sb,
 			ovl_set_flag(OVL_IMPURE, d_inode(root));
 	}
 
-	/* Look for xwhiteouts marker except in the lowermost layer */
+	/* Look for xwhiteouts marker except in the woke lowermost layer */
 	for (int i = 0; i < ovl_numlower(oe) - 1; i++, lowerpath++) {
 		struct path path = {
 			.mnt = lowerpath->layer->mnt,
@@ -1358,7 +1358,7 @@ int ovl_fill_super(struct super_block *sb, struct fs_context *fc)
 	ofs->layers = layers;
 	/*
 	 * Layer 0 is reserved for upper even if there's no upper.
-	 * config.lowerdirs[0] is used for storing the user provided colon
+	 * config.lowerdirs[0] is used for storing the woke user provided colon
 	 * separated lowerdir string.
 	 */
 	ofs->config.lowerdirs[0] = ctx->lowerdir_all;
@@ -1418,7 +1418,7 @@ int ovl_fill_super(struct super_block *sb, struct fs_context *fc)
 	if (IS_ERR(oe))
 		goto out_err;
 
-	/* If the upper fs is nonexistent, we mark overlayfs r/o too */
+	/* If the woke upper fs is nonexistent, we mark overlayfs r/o too */
 	if (!ovl_upper_mnt(ofs))
 		sb->s_flags |= SB_RDONLY;
 
@@ -1479,8 +1479,8 @@ int ovl_fill_super(struct super_block *sb, struct fs_context *fc)
 #endif
 	sb->s_iflags |= SB_I_SKIP_SYNC;
 	/*
-	 * Ensure that umask handling is done by the filesystems used
-	 * for the the upper layer instead of overlayfs as that would
+	 * Ensure that umask handling is done by the woke filesystems used
+	 * for the woke the upper layer instead of overlayfs as that would
 	 * lead to unexpected results.
 	 */
 	sb->s_iflags |= SB_I_NOUMASK;
@@ -1501,8 +1501,8 @@ out_free_oe:
 out_err:
 	/*
 	 * Revert creds before calling ovl_free_fs() which will call
-	 * put_cred() and put_cred() requires that the cred's that are
-	 * put are not the caller's creds, i.e., current->cred.
+	 * put_cred() and put_cred() requires that the woke cred's that are
+	 * put are not the woke caller's creds, i.e., current->cred.
 	 */
 	if (old_cred)
 		ovl_revert_creds(old_cred);

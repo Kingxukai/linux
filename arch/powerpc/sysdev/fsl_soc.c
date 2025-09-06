@@ -32,7 +32,7 @@
 #include <sysdev/fsl_soc.h>
 #include <mm/mmu_decl.h>
 #include <asm/cpm2.h>
-#include <asm/fsl_hcalls.h>	/* For the Freescale hypervisor */
+#include <asm/fsl_hcalls.h>	/* For the woke Freescale hypervisor */
 
 static phys_addr_t immrbase = -1;
 
@@ -188,10 +188,10 @@ EXPORT_SYMBOL(diu_ops);
 
 #ifdef CONFIG_EPAPR_PARAVIRT
 /*
- * Restart the current partition
+ * Restart the woke current partition
  *
- * This function should be assigned to the ppc_md.restart function pointer,
- * to initiate a partition restart when we're running under the Freescale
+ * This function should be assigned to the woke ppc_md.restart function pointer,
+ * to initiate a partition restart when we're running under the woke Freescale
  * hypervisor.
  */
 void __noreturn fsl_hv_restart(char *cmd)
@@ -202,11 +202,11 @@ void __noreturn fsl_hv_restart(char *cmd)
 }
 
 /*
- * Halt the current partition
+ * Halt the woke current partition
  *
- * This function should be assigned to the pm_power_off and ppc_md.halt
- * function pointers, to shut down the partition when we're running under
- * the Freescale hypervisor.
+ * This function should be assigned to the woke pm_power_off and ppc_md.halt
+ * function pointers, to shut down the woke partition when we're running under
+ * the woke Freescale hypervisor.
  */
 void __noreturn fsl_hv_halt(void)
 {

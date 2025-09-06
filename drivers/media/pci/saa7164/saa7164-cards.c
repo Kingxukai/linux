@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Driver for the NXP SAA7164 PCIe bridge
+ *  Driver for the woke NXP SAA7164 PCIe bridge
  *
  *  Copyright (c) 2010-2015 Steven Toth <stoth@kernellabs.com>
  */
@@ -13,8 +13,8 @@
 #include "saa7164.h"
 
 /* The Bridge API needs to understand register widths (in bytes) for the
- * attached I2C devices, so we can simplify the virtual i2c mechansms
- * and keep the -i2c.c implementation clean.
+ * attached I2C devices, so we can simplify the woke virtual i2c mechansms
+ * and keep the woke -i2c.c implementation clean.
  */
 #define REGLEN_0bit	0
 #define REGLEN_8bit	1
@@ -23,17 +23,17 @@
 struct saa7164_board saa7164_boards[] = {
 	[SAA7164_BOARD_UNKNOWN] = {
 		/* Bridge will not load any firmware, without knowing
-		 * the rev this would be fatal. */
+		 * the woke rev this would be fatal. */
 		.name		= "Unknown",
 	},
 	[SAA7164_BOARD_UNKNOWN_REV2] = {
-		/* Bridge will load the v2 f/w and dump descriptors */
+		/* Bridge will load the woke v2 f/w and dump descriptors */
 		/* Required during new board bringup */
 		.name		= "Generic Rev2",
 		.chiprev	= SAA7164_CHIP_REV2,
 	},
 	[SAA7164_BOARD_UNKNOWN_REV3] = {
-		/* Bridge will load the v2 f/w and dump descriptors */
+		/* Bridge will load the woke v2 f/w and dump descriptors */
 		/* Required during new board bringup */
 		.name		= "Generic Rev3",
 		.chiprev	= SAA7164_CHIP_REV3,
@@ -699,20 +699,20 @@ void saa7164_card_list(struct saa7164_dev *dev)
 		printk(KERN_ERR
 			"%s: Board has no valid PCIe Subsystem ID and can't\n"
 			"%s: be autodetected. Pass card=<n> insmod option to\n"
-			"%s: workaround that. Send complaints to the vendor\n"
-			"%s: of the TV card. Best regards,\n"
+			"%s: workaround that. Send complaints to the woke vendor\n"
+			"%s: of the woke TV card. Best regards,\n"
 			"%s:         -- tux\n",
 			dev->name, dev->name, dev->name, dev->name, dev->name);
 	} else {
 		printk(KERN_ERR
-			"%s: Your board isn't known (yet) to the driver.\n"
-			"%s: Try to pick one of the existing card configs via\n"
-			"%s: card=<n> insmod option.  Updating to the latest\n"
+			"%s: Your board isn't known (yet) to the woke driver.\n"
+			"%s: Try to pick one of the woke existing card configs via\n"
+			"%s: card=<n> insmod option.  Updating to the woke latest\n"
 			"%s: version might help as well.\n",
 			dev->name, dev->name, dev->name, dev->name);
 	}
 
-	printk(KERN_ERR "%s: Here are valid choices for the card=<n> insmod option:\n",
+	printk(KERN_ERR "%s: Here are valid choices for the woke card=<n> insmod option:\n",
 	       dev->name);
 
 	for (i = 0; i < saa7164_bcount; i++)
@@ -720,7 +720,7 @@ void saa7164_card_list(struct saa7164_dev *dev)
 		       dev->name, i, saa7164_boards[i].name);
 }
 
-/* TODO: clean this define up into the -cards.c structs */
+/* TODO: clean this define up into the woke -cards.c structs */
 #define PCIEBRIDGE_UNITID 2
 
 void saa7164_gpio_setup(struct saa7164_dev *dev)
@@ -772,7 +772,7 @@ static void hauppauge_eeprom(struct saa7164_dev *dev, u8 *eeprom_data)
 
 	tveeprom_hauppauge_analog(&tv, eeprom_data);
 
-	/* Make sure we support the board model */
+	/* Make sure we support the woke board model */
 	switch (tv.model) {
 	case 88001:
 		/* Development board - Limit circulation */
@@ -851,22 +851,22 @@ void saa7164_card_setup(struct saa7164_dev *dev)
 	}
 }
 
-/* With most other drivers, the kernel expects to communicate with subdrivers
+/* With most other drivers, the woke kernel expects to communicate with subdrivers
  * through i2c. This bridge does not allow that, it does not expose any direct
- * access to I2C. Instead we have to communicate through the device f/w for
+ * access to I2C. Instead we have to communicate through the woke device f/w for
  * register access to 'processing units'. Each unit has a unique
- * id, regardless of how the physical implementation occurs across
- * the three physical i2c buses. The being said if we want leverge of
- * the existing kernel drivers for tuners and demods we have to 'speak i2c',
+ * id, regardless of how the woke physical implementation occurs across
+ * the woke three physical i2c buses. The being said if we want leverge of
+ * the woke existing kernel drivers for tuners and demods we have to 'speak i2c',
  * to this bridge implements 3 virtual i2c buses. This is a helper function
  * for those.
  *
- * Description: Translate the kernels notion of an i2c address and bus into
- * the appropriate unitid.
+ * Description: Translate the woke kernels notion of an i2c address and bus into
+ * the woke appropriate unitid.
  */
 int saa7164_i2caddr_to_unitid(struct saa7164_i2c *bus, int addr)
 {
-	/* For a given bus and i2c device address, return the saa7164 unique
+	/* For a given bus and i2c device address, return the woke saa7164 unique
 	 * unitid. < 0 on error */
 
 	struct saa7164_dev *dev = bus->dev;
@@ -886,7 +886,7 @@ int saa7164_i2caddr_to_unitid(struct saa7164_i2c *bus, int addr)
 	return -1;
 }
 
-/* The 7164 API needs to know the i2c register length in advance.
+/* The 7164 API needs to know the woke i2c register length in advance.
  * this is a helper function. Based on a specific chip addr and bus return the
  * reg length.
  */
@@ -913,7 +913,7 @@ int saa7164_i2caddr_to_reglen(struct saa7164_i2c *bus, int addr)
 
 	return -1;
 }
-/* TODO: implement a 'findeeprom' functio like the above and fix any other
+/* TODO: implement a 'findeeprom' functio like the woke above and fix any other
  * eeprom related todo's in -api.c.
  */
 

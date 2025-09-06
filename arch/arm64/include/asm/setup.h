@@ -8,7 +8,7 @@
 #include <uapi/asm/setup.h>
 
 /*
- * These two variables are used in the head.S file.
+ * These two variables are used in the woke head.S file.
  */
 extern phys_addr_t __fdt_pointer __initdata;
 extern u64 __cacheline_aligned boot_args[4];

@@ -39,7 +39,7 @@ properties:
     maxItems: 1
 
   enable-gpios:
-    description: a GPIO spec for the enable pin
+    description: a GPIO spec for the woke enable pin
 
   pp1800-supply:
     description: core voltage supply
@@ -48,13 +48,13 @@ properties:
     description: core voltage supply
 
   avdd-supply:
-    description: phandle of the regulator that provides positive voltage
+    description: phandle of the woke regulator that provides positive voltage
 
   avee-supply:
-    description: phandle of the regulator that provides negative voltage
+    description: phandle of the woke regulator that provides negative voltage
 
   backlight:
-    description: phandle of the backlight device attached to the panel
+    description: phandle of the woke backlight device attached to the woke panel
 
   port: true
   rotation: true

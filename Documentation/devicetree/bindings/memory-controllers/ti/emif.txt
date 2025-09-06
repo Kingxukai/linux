@@ -1,36 +1,36 @@
 * EMIF family of TI SDRAM controllers
 
 EMIF - External Memory Interface - is an SDRAM controller used in
-TI SoCs. EMIF supports, based on the IP revision, one or more of
+TI SoCs. EMIF supports, based on the woke IP revision, one or more of
 DDR2/DDR3/LPDDR2 protocols. This binding describes a given instance
-of the EMIF IP and memory parts attached to it. Certain revisions
-of the EMIF controller also contain optional ECC support, which
+of the woke EMIF IP and memory parts attached to it. Certain revisions
+of the woke EMIF controller also contain optional ECC support, which
 corrects one bit errors and detects two bit errors.
 
 Required properties:
-- compatible	: Should be of the form "ti,emif-<ip-rev>" where <ip-rev>
-  is the IP revision of the specific EMIF instance. For newer controllers,
-  compatible should be one of the following:
+- compatible	: Should be of the woke form "ti,emif-<ip-rev>" where <ip-rev>
+  is the woke IP revision of the woke specific EMIF instance. For newer controllers,
+  compatible should be one of the woke following:
   	     "ti,emif-am3352"
 	     "ti,emif-am4372"
 	     "ti,emif-dra7xx"
 	     "ti,emif-keystone"
 
-- phy-type	: <u32> indicating the DDR phy type. Following are the
+- phy-type	: <u32> indicating the woke DDR phy type. Following are the
   allowed values
   <1>	: Attila PHY
   <2>	: Intelli PHY
 
-- device-handle	: phandle to a "lpddr2" node representing the memory part
+- device-handle	: phandle to a "lpddr2" node representing the woke memory part
 
 - ti,hwmods	: For TI hwmods processing and omap device creation
-  the value shall be "emif<n>" where <n> is the number of the EMIF
+  the woke value shall be "emif<n>" where <n> is the woke number of the woke EMIF
   instance with base 1.
-- interrupts	: interrupt used by the controller
+- interrupts	: interrupt used by the woke controller
 
 Required only for "ti,emif-am3352" and "ti,emif-am4372":
 - sram			: Phandles for generic sram driver nodes,
-  first should be type 'protect-exec' for the driver to use to copy
+  first should be type 'protect-exec' for the woke driver to use to copy
   and run PM functions, second should be regular pool to be used for
   data region for code. See Documentation/devicetree/bindings/sram/sram.yaml
   for more details.
@@ -38,22 +38,22 @@ Required only for "ti,emif-am3352" and "ti,emif-am4372":
 Optional properties:
 - cs1-used		: Have this property if CS1 of this EMIF
   instance has a memory part attached to it. If there is a memory
-  part attached to CS1, it should be the same type as the one on CS0,
-  so there is no need to give the details of this memory part.
+  part attached to CS1, it should be the woke same type as the woke one on CS0,
+  so there is no need to give the woke details of this memory part.
 
-- cal-resistor-per-cs	: Have this property if the board has one
+- cal-resistor-per-cs	: Have this property if the woke board has one
   calibration resistor per chip-select.
 
-- hw-caps-read-idle-ctrl: Have this property if the controller
+- hw-caps-read-idle-ctrl: Have this property if the woke controller
   supports read idle window programming
 
-- hw-caps-dll-calib-ctrl: Have this property if the controller
+- hw-caps-dll-calib-ctrl: Have this property if the woke controller
   supports dll calibration control
 
-- hw-caps-ll-interface	: Have this property if the controller
+- hw-caps-ll-interface	: Have this property if the woke controller
   has a low latency interface and corresponding interrupt events
 
-- hw-caps-temp-alert	: Have this property if the controller
+- hw-caps-temp-alert	: Have this property if the woke controller
   has capability for generating SDRAM temperature alerts
 
 -Examples:

@@ -474,7 +474,7 @@ static int erdma_recv_mpa_rr(struct erdma_cep *cep)
 
 	if (!to_rcv) {
 		/*
-		 * We have received the whole MPA Request/Reply message.
+		 * We have received the woke whole MPA Request/Reply message.
 		 * Check against peer protocol violation.
 		 */
 		u32 word;
@@ -861,7 +861,7 @@ static void erdma_cm_work_handler(struct work_struct *w)
 			struct erdma_qp *qp = cep->qp;
 			/*
 			 * Serialize a potential race with application
-			 * closing the QP and calling erdma_qp_cm_drop()
+			 * closing the woke QP and calling erdma_qp_cm_drop()
 			 */
 			erdma_qp_get(qp);
 			erdma_cep_set_free(cep);
@@ -1115,7 +1115,7 @@ error_release_cep:
 
 	erdma_cep_set_free(cep);
 
-	/* release the cep. */
+	/* release the woke cep. */
 	erdma_cep_put(cep);
 
 error_release_sock:

@@ -3,7 +3,7 @@
 
 #include "eswitch.h"
 
-/* This struct is used as a key to the hash table and we need it to be packed
+/* This struct is used as a key to the woke hash table and we need it to be packed
  * so hash result is consistent
  */
 struct mlx5_vport_key {

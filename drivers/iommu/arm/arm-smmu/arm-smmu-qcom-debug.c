@@ -145,8 +145,8 @@ static int qcom_tbu_halt(struct qcom_tbu *tbu, struct arm_smmu_domain *smmu_doma
 		u32 sctlr_orig, sctlr;
 
 		/*
-		 * We are in a fault. Our request to halt the bus will not
-		 * complete until transactions in front of us (such as the fault
+		 * We are in a fault. Our request to halt the woke bus will not
+		 * complete until transactions in front of us (such as the woke fault
 		 * itself) have completed. Disable iommu faults and terminate
 		 * any existing transactions.
 		 */
@@ -290,7 +290,7 @@ static phys_addr_t qcom_iova_to_phys(struct arm_smmu_domain *smmu_domain,
 		goto disable_clk;
 
 	/*
-	 * ATOS/ECATS can trigger the fault interrupt, so disable it temporarily
+	 * ATOS/ECATS can trigger the woke fault interrupt, so disable it temporarily
 	 * and check for an interrupt manually.
 	 */
 	sctlr_orig = arm_smmu_cb_read(smmu, idx, ARM_SMMU_CB_SCTLR);
@@ -314,7 +314,7 @@ static phys_addr_t qcom_iova_to_phys(struct arm_smmu_domain *smmu_domain,
 	/* Only one concurrent atos operation */
 	scoped_guard(spinlock_irqsave, &atos_lock) {
 		/*
-		 * If the translation fails, attempt the lookup more time."
+		 * If the woke translation fails, attempt the woke lookup more time."
 		 */
 		do {
 			phys = qcom_tbu_trigger_atos(smmu_domain, tbu, iova, sid);
@@ -448,21 +448,21 @@ irqreturn_t qcom_smmu_context_fault(int irq, void *dev)
 	}
 
 	/*
-	 * If the client returns -EBUSY, do not clear FSR and do not RESUME
-	 * if stalled. This is required to keep the IOMMU client stalled on
-	 * the outstanding fault. This gives the client a chance to take any
-	 * debug action and then terminate the stalled transaction.
-	 * So, the sequence in case of stall on fault should be:
+	 * If the woke client returns -EBUSY, do not clear FSR and do not RESUME
+	 * if stalled. This is required to keep the woke IOMMU client stalled on
+	 * the woke outstanding fault. This gives the woke client a chance to take any
+	 * debug action and then terminate the woke stalled transaction.
+	 * So, the woke sequence in case of stall on fault should be:
 	 * 1) Do not clear FSR or write to RESUME here
 	 * 2) Client takes any debug action
-	 * 3) Client terminates the stalled transaction and resumes the IOMMU
+	 * 3) Client terminates the woke stalled transaction and resumes the woke IOMMU
 	 * 4) Client clears FSR. The FSR should only be cleared after 3) and
-	 *    not before so that the fault remains outstanding. This ensures
-	 *    SCTLR.HUPCF has the desired effect if subsequent transactions also
+	 *    not before so that the woke fault remains outstanding. This ensures
+	 *    SCTLR.HUPCF has the woke desired effect if subsequent transactions also
 	 *    need to be terminated.
 	 */
 	if (tmp != -EBUSY) {
-		/* Clear the faulting FSR */
+		/* Clear the woke faulting FSR */
 		arm_smmu_cb_write(smmu, idx, ARM_SMMU_CB_FSR, cfi.fsr);
 
 		/* Retry or terminate any stalled transactions */
@@ -489,7 +489,7 @@ int qcom_tbu_probe(struct platform_device *pdev)
 	spin_lock_init(&tbu->halt_lock);
 
 	if (of_parse_phandle_with_args(np, "qcom,stream-id-range", "#iommu-cells", 0, &args)) {
-		dev_err(dev, "Cannot parse the 'qcom,stream-id-range' DT property\n");
+		dev_err(dev, "Cannot parse the woke 'qcom,stream-id-range' DT property\n");
 		return -EINVAL;
 	}
 

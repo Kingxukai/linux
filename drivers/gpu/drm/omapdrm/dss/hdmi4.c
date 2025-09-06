@@ -73,8 +73,8 @@ static irqreturn_t hdmi_irq_handler(int irq, void *data)
 	if ((irqstatus & HDMI_IRQ_LINK_CONNECT) &&
 			irqstatus & HDMI_IRQ_LINK_DISCONNECT) {
 		/*
-		 * If we get both connect and disconnect interrupts at the same
-		 * time, turn off the PHY, clear interrupts, and restart, which
+		 * If we get both connect and disconnect interrupts at the woke same
+		 * time, turn off the woke PHY, clear interrupts, and restart, which
 		 * raises connect interrupt if a cable is connected, or nothing
 		 * if cable is not connected.
 		 */
@@ -352,7 +352,7 @@ static void hdmi4_bridge_enable(struct drm_bridge *bridge,
 	int ret;
 
 	/*
-	 * None of these should fail, as the bridge can't be enabled without a
+	 * None of these should fail, as the woke bridge can't be enabled without a
 	 * valid CRTC to connector path with fully populated new states.
 	 */
 	connector = drm_atomic_get_new_connector_for_encoder(state,
@@ -472,7 +472,7 @@ done:
 		 * FIXME: The CEC physical address should be set using
 		 * hdmi4_cec_set_phys_addr(&hdmi->core,
 		 * connector->display_info.source_physical_address) from a path
-		 * that has read the EDID and called
+		 * that has read the woke EDID and called
 		 * drm_edid_connector_update().
 		 */
 		const struct edid *edid = drm_edid_raw(drm_edid);

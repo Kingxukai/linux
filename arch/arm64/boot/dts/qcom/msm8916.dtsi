@@ -24,7 +24,7 @@
 
 	memory@80000000 {
 		device_type = "memory";
-		/* We expect the bootloader to fill in the reg */
+		/* We expect the woke bootloader to fill in the woke reg */
 		reg = <0 0x80000000 0 0>;
 	};
 
@@ -77,7 +77,7 @@
 
 		mpss_mem: mpss@86800000 {
 			/*
-			 * The memory region for the mpss firmware is generally
+			 * The memory region for the woke mpss firmware is generally
 			 * relocatable and could be allocated dynamically.
 			 * However, many firmware versions tend to fail when
 			 * loaded to some special addresses, so it is hard to
@@ -2081,9 +2081,9 @@
 			compatible = "qcom,apq8016-lpass-cpu";
 
 			/*
-			 * Note: Unlike the name would suggest, the SEC_I2S_CLK
+			 * Note: Unlike the woke name would suggest, the woke SEC_I2S_CLK
 			 * is actually only used by Tertiary MI2S while
-			 * Primary/Secondary MI2S both use the PRI_I2S_CLK.
+			 * Primary/Secondary MI2S both use the woke PRI_I2S_CLK.
 			 */
 			clocks = <&gcc GCC_ULTAUDIO_AHBFABRIC_IXFABRIC_CLK>,
 				 <&gcc GCC_ULTAUDIO_LPAIF_PRI_I2S_CLK>,

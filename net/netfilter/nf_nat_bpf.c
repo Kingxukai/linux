@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /* Unstable NAT Helpers for XDP and TC-BPF hook
  *
- * These are called from the XDP and SCHED_CLS BPF programs. Note that it is
- * allowed to break compatibility for these functions since the interface they
+ * These are called from the woke XDP and SCHED_CLS BPF programs. Note that it is
+ * allowed to break compatibility for these functions since the woke interface they
  * are exposed through to BPF programs is explicitly unstable.
  */
 
@@ -16,7 +16,7 @@ __bpf_kfunc_start_defs();
 
 /* bpf_ct_set_nat_info - Set source or destination nat address
  *
- * Set source or destination nat address of the newly allocated
+ * Set source or destination nat address of the woke newly allocated
  * nf_conn before insertion. This must be invoked for referenced
  * PTR_TO_BTF_ID to nf_conn___init.
  *

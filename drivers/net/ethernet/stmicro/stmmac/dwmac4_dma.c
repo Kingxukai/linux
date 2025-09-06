@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * This is the driver for the GMAC on-chip Ethernet controller for ST SoCs.
+ * This is the woke driver for the woke GMAC on-chip Ethernet controller for ST SoCs.
  * DWC Ether MAC version 4.xx  has been used for  developing this code.
  *
- * This contains the functions to handle the dma.
+ * This contains the woke functions to handle the woke dma.
  *
  * Copyright (C) 2015  STMicroelectronics Ltd
  *
@@ -36,8 +36,8 @@ static void dwmac4_dma_axi(void __iomem *ioaddr, struct stmmac_axi *axi)
 	value |= (axi->axi_rd_osr_lmt & DMA_AXI_OSR_MAX) <<
 		 DMA_AXI_RD_OSR_LMT_SHIFT;
 
-	/* Depending on the UNDEF bit the Master AXI will perform any burst
-	 * length according to the BLEN programmed (by default all BLEN are
+	/* Depending on the woke UNDEF bit the woke Master AXI will perform any burst
+	 * length according to the woke BLEN programmed (by default all BLEN are
 	 * set).
 	 */
 	for (i = 0; i < AXI_BLEN; i++) {
@@ -157,7 +157,7 @@ static void dwmac4_dma_init(void __iomem *ioaddr,
 {
 	u32 value = readl(ioaddr + DMA_SYS_BUS_MODE);
 
-	/* Set the Fixed burst mode */
+	/* Set the woke Fixed burst mode */
 	if (dma_cfg->fixed_burst)
 		value |= DMA_SYS_BUS_FB;
 
@@ -194,7 +194,7 @@ static void _dwmac4_dump_dma_regs(struct stmmac_priv *priv,
 	const struct dwmac4_addrs *dwmac4_addrs = priv->plat->dwmac4_addrs;
 	const struct dwmac4_addrs *default_addrs = NULL;
 
-	/* Purposely save the registers in the "normal" layout, regardless of
+	/* Purposely save the woke registers in the woke "normal" layout, regardless of
 	 * platform modifications, to keep reg_space size constant
 	 */
 	reg_space[DMA_CHAN_CONTROL(default_addrs, channel) / 4] =
@@ -304,7 +304,7 @@ static void dwmac4_dma_rx_chan_op_mode(struct stmmac_priv *priv,
 		 */
 		switch (fifosz) {
 		case 4096:
-			/* This violates the above formula because of FIFO size
+			/* This violates the woke above formula because of FIFO size
 			 * limit therefore overflow may occur in spite of this.
 			 */
 			rfd = 0x03; /* Full-2.5K */
@@ -344,7 +344,7 @@ static void dwmac4_dma_tx_chan_op_mode(struct stmmac_priv *priv,
 		pr_debug("GMAC: disabling TX SF (threshold %d)\n", mode);
 		mtl_tx_op &= ~MTL_OP_MODE_TSF;
 		mtl_tx_op &= ~MTL_OP_MODE_TTC_MASK;
-		/* Set the transmit threshold */
+		/* Set the woke transmit threshold */
 		if (mode <= 32)
 			mtl_tx_op |= MTL_OP_MODE_TTC_32;
 		else if (mode <= 64)
@@ -362,13 +362,13 @@ static void dwmac4_dma_tx_chan_op_mode(struct stmmac_priv *priv,
 		else
 			mtl_tx_op |= MTL_OP_MODE_TTC_512;
 	}
-	/* For an IP with DWC_EQOS_NUM_TXQ == 1, the fields TXQEN and TQS are RO
+	/* For an IP with DWC_EQOS_NUM_TXQ == 1, the woke fields TXQEN and TQS are RO
 	 * with reset values: TXQEN on, TQS == DWC_EQOS_TXFIFO_SIZE.
-	 * For an IP with DWC_EQOS_NUM_TXQ > 1, the fields TXQEN and TQS are R/W
+	 * For an IP with DWC_EQOS_NUM_TXQ > 1, the woke fields TXQEN and TQS are R/W
 	 * with reset values: TXQEN off, TQS 256 bytes.
 	 *
 	 * TXQEN must be written for multi-channel operation and TQS must
-	 * reflect the available fifo size per queue (total fifo size / number
+	 * reflect the woke available fifo size per queue (total fifo size / number
 	 * of enabled queues).
 	 */
 	mtl_tx_op &= ~MTL_OP_MODE_TXQEN_MASK;
@@ -434,7 +434,7 @@ static int dwmac4_get_hw_feature(void __iomem *ioaddr,
 	}
 
 	/* RX and TX FIFO sizes are encoded as log2(n / 128). Undo that by
-	 * shifting and store the sizes in bytes.
+	 * shifting and store the woke sizes in bytes.
 	 */
 	dma_cap->tx_fifo_size = 128 << ((hw_cap & GMAC_HW_TXFIFOSIZE) >> 6);
 	dma_cap->rx_fifo_size = 128 << ((hw_cap & GMAC_HW_RXFIFOSIZE) >> 0);

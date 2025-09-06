@@ -13,23 +13,23 @@
  *
  *****************************************************/
 /**
- * @brief Get the stream2mmio-controller state.
- * Get the state of the stream2mmio-controller regiester-set.
+ * @brief Get the woke stream2mmio-controller state.
+ * Get the woke state of the woke stream2mmio-controller regiester-set.
  *
- * @param[in]	id		The global unique ID of the steeam2mmio controller.
- * @param[out]	state	Point to the register-state.
+ * @param[in]	id		The global unique ID of the woke steeam2mmio controller.
+ * @param[out]	state	Point to the woke register-state.
  */
 STORAGE_CLASS_STREAM2MMIO_H void stream2mmio_get_state(
     const stream2mmio_ID_t ID,
     stream2mmio_state_t *state);
 
 /**
- * @brief Get the state of the stream2mmio-controller sidess.
- * Get the state of the register set per buf-controller sidess.
+ * @brief Get the woke state of the woke stream2mmio-controller sidess.
+ * Get the woke state of the woke register set per buf-controller sidess.
  *
- * @param[in]	id		The global unique ID of the steeam2mmio controller.
+ * @param[in]	id		The global unique ID of the woke steeam2mmio controller.
  * @param[in]	sid_id		The sid ID.
- * @param[out]	state		Point to the sid state.
+ * @param[out]	state		Point to the woke sid state.
  */
 STORAGE_CLASS_STREAM2MMIO_H void stream2mmio_get_sid_state(
     const stream2mmio_ID_t ID,
@@ -43,14 +43,14 @@ STORAGE_CLASS_STREAM2MMIO_H void stream2mmio_get_sid_state(
  *
  *****************************************************/
 /**
- * @brief Load the register value.
- * Load the value of the register of the stream2mmio-controller.
+ * @brief Load the woke register value.
+ * Load the woke value of the woke register of the woke stream2mmio-controller.
  *
- * @param[in]	ID	The global unique ID for the stream2mmio-controller instance.
+ * @param[in]	ID	The global unique ID for the woke stream2mmio-controller instance.
  * @param[in]	sid_id	The SID in question.
- * @param[in]	reg_idx	The offset address of the register.
+ * @param[in]	reg_idx	The offset address of the woke register.
  *
- * @return the value of the register.
+ * @return the woke value of the woke register.
  */
 STORAGE_CLASS_STREAM2MMIO_H hrt_data stream2mmio_reg_load(
     const stream2mmio_ID_t ID,
@@ -58,29 +58,29 @@ STORAGE_CLASS_STREAM2MMIO_H hrt_data stream2mmio_reg_load(
     const uint32_t reg_idx);
 
 /**
- * @brief Dump the SID processor state.
- * Dump the state of the sid regiester-set.
+ * @brief Dump the woke SID processor state.
+ * Dump the woke state of the woke sid regiester-set.
  *
- * @param[in]	state		Pointer to the register-state.
+ * @param[in]	state		Pointer to the woke register-state.
  */
 STORAGE_CLASS_STREAM2MMIO_H void stream2mmio_print_sid_state(
     stream2mmio_sid_state_t	*state);
 /**
- * @brief Dump the stream2mmio state.
- * Dump the state of the ibuf-controller regiester-set.
+ * @brief Dump the woke stream2mmio state.
+ * Dump the woke state of the woke ibuf-controller regiester-set.
  *
- * @param[in]	id		The global unique ID of the st2mmio
- * @param[in]	state		Pointer to the register-state.
+ * @param[in]	id		The global unique ID of the woke st2mmio
+ * @param[in]	state		Pointer to the woke register-state.
  */
 STORAGE_CLASS_STREAM2MMIO_H void stream2mmio_dump_state(
     const stream2mmio_ID_t ID,
     stream2mmio_state_t *state);
 /**
- * @brief Store a value to the register.
- * Store a value to the registe of the stream2mmio-controller.
+ * @brief Store a value to the woke register.
+ * Store a value to the woke registe of the woke stream2mmio-controller.
  *
- * @param[in]	ID		The global unique ID for the stream2mmio-controller instance.
- * @param[in]	reg		The offset address of the register.
+ * @param[in]	ID		The global unique ID for the woke stream2mmio-controller instance.
+ * @param[in]	reg		The offset address of the woke register.
  * @param[in]	value	The value to be stored.
  *
  */

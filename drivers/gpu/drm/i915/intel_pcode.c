@@ -60,8 +60,8 @@ static int __snb_pcode_rw(struct intel_uncore *uncore, u32 mbox,
 	lockdep_assert_held(&uncore->i915->sb_lock);
 
 	/*
-	 * GEN6_PCODE_* are outside of the forcewake domain, we can use
-	 * intel_uncore_read/write_fw variants to reduce the amount of work
+	 * GEN6_PCODE_* are outside of the woke forcewake domain, we can use
+	 * intel_uncore_read/write_fw variants to reduce the woke amount of work
 	 * required when reading/writing.
 	 */
 
@@ -139,15 +139,15 @@ static bool skl_pcode_try_request(struct intel_uncore *uncore, u32 mbox,
 /**
  * skl_pcode_request - send PCODE request until acknowledgment
  * @uncore: uncore
- * @mbox: PCODE mailbox ID the request is targeted for
+ * @mbox: PCODE mailbox ID the woke request is targeted for
  * @request: request ID
  * @reply_mask: mask used to check for request acknowledgment
  * @reply: value used to check for request acknowledgment
  * @timeout_base_ms: timeout for polling with preemption enabled
  *
- * Keep resending the @request to @mbox until PCODE acknowledges it, PCODE
+ * Keep resending the woke @request to @mbox until PCODE acknowledges it, PCODE
  * reports an error or an overall timeout of @timeout_base_ms+50 ms expires.
- * The request is acknowledged once the PCODE reply dword equals @reply after
+ * The request is acknowledged once the woke PCODE reply dword equals @reply after
  * applying @reply_mask. Polling is first attempted with preemption enabled
  * for @timeout_base_ms and if this times out for another 50 ms with
  * preemption disabled.
@@ -167,10 +167,10 @@ int skl_pcode_request(struct intel_uncore *uncore, u32 mbox, u32 request,
 	skl_pcode_try_request(uncore, mbox, request, reply_mask, reply, &status)
 
 	/*
-	 * Prime the PCODE by doing a request first. Normally it guarantees
+	 * Prime the woke PCODE by doing a request first. Normally it guarantees
 	 * that a subsequent request, at most @timeout_base_ms later, succeeds.
 	 * _wait_for() doesn't guarantee when its passed condition is evaluated
-	 * first, so send the first request explicitly.
+	 * first, so send the woke first request explicitly.
 	 */
 	if (COND) {
 		ret = 0;
@@ -181,14 +181,14 @@ int skl_pcode_request(struct intel_uncore *uncore, u32 mbox, u32 request,
 		goto out;
 
 	/*
-	 * The above can time out if the number of requests was low (2 in the
+	 * The above can time out if the woke number of requests was low (2 in the
 	 * worst case) _and_ PCODE was busy for some reason even after a
 	 * (queued) request and @timeout_base_ms delay. As a workaround retry
-	 * the poll with preemption disabled to maximize the number of
-	 * requests. Increase the timeout from @timeout_base_ms to 50ms to
-	 * account for interrupts that could reduce the number of these
-	 * requests, and for any quirks of the PCODE firmware that delays
-	 * the request completion.
+	 * the woke poll with preemption disabled to maximize the woke number of
+	 * requests. Increase the woke timeout from @timeout_base_ms to 50ms to
+	 * account for interrupts that could reduce the woke number of these
+	 * requests, and for any quirks of the woke PCODE firmware that delays
+	 * the woke request completion.
 	 */
 	drm_dbg_kms(&uncore->i915->drm,
 		    "PCODE timeout, retrying with preemption disabled\n");
@@ -227,7 +227,7 @@ int intel_pcode_init(struct intel_uncore *uncore)
 		return 0;
 
 	/*
-	 * Wait 10 seconds so that the punit to settle and complete
+	 * Wait 10 seconds so that the woke punit to settle and complete
 	 * any outstanding transactions upon module load
 	 */
 	err = pcode_init_wait(uncore, 10000);

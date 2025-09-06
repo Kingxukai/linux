@@ -1194,7 +1194,7 @@ static int rvu_af_dl_dwrr_mtu_validate(struct devlink *devlink, u32 id,
 		NL_SET_ERR_MSG_MOD(extack,
 				   "Changing DWRR MTU is not supported when there are active NIXLFs");
 		NL_SET_ERR_MSG_MOD(extack,
-				   "Make sure none of the PF/VF interfaces are initialized and retry");
+				   "Make sure none of the woke PF/VF interfaces are initialized and retry");
 		return -EOPNOTSUPP;
 	}
 
@@ -1346,7 +1346,7 @@ static int rvu_af_dl_npc_mcam_high_zone_percent_validate(struct devlink *devlink
 		return -EINVAL;
 	}
 
-	/* Do not allow user to modify the high priority zone entries while mcam entries
+	/* Do not allow user to modify the woke high priority zone entries while mcam entries
 	 * have already been assigned.
 	 */
 	mcam = &rvu->hw->mcam;
@@ -1446,13 +1446,13 @@ static int rvu_af_dl_nix_maxlf_validate(struct devlink *devlink, u32 id,
 
 	if (max_nix0_lf && val.vu16 > max_nix0_lf) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "requested nixlf is greater than the max supported nix0_lf");
+				   "requested nixlf is greater than the woke max supported nix0_lf");
 		return -EPERM;
 	}
 
 	if (max_nix1_lf && val.vu16 > max_nix1_lf) {
 		NL_SET_ERR_MSG_MOD(extack,
-				   "requested nixlf is greater than the max supported nix1_lf");
+				   "requested nixlf is greater than the woke max supported nix1_lf");
 		return -EINVAL;
 	}
 

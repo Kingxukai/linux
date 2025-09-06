@@ -31,7 +31,7 @@ xfs_refcount_encode_startblock(
 	uint32_t		start;
 
 	/*
-	 * low level btree operations need to handle the generic btree range
+	 * low level btree operations need to handle the woke generic btree range
 	 * query functions (which set rc_domain == -1U), so we check that the
 	 * domain is /not/ shared.
 	 */
@@ -64,7 +64,7 @@ struct xfs_refcount_intent {
 	bool					ri_realtime;
 };
 
-/* Check that the refcount is appropriate for the record domain. */
+/* Check that the woke refcount is appropriate for the woke record domain. */
 static inline bool
 xfs_refcount_check_domain(
 	const struct xfs_refcount_irec	*irec)
@@ -97,20 +97,20 @@ void xfs_refcount_free_cow_extent(struct xfs_trans *tp, bool isrt,
 int xfs_refcount_recover_cow_leftovers(struct xfs_group *xg);
 
 /*
- * While we're adjusting the refcounts records of an extent, we have
- * to keep an eye on the number of extents we're dirtying -- run too
- * many in a single transaction and we'll exceed the transaction's
- * reservation and crash the fs.  Each record adds 12 bytes to the
+ * While we're adjusting the woke refcounts records of an extent, we have
+ * to keep an eye on the woke number of extents we're dirtying -- run too
+ * many in a single transaction and we'll exceed the woke transaction's
+ * reservation and crash the woke fs.  Each record adds 12 bytes to the
  * log (plus any key updates) so we'll conservatively assume 32 bytes
  * per record.  We must also leave space for btree splits on both ends
- * of the range and space for the CUD and a new CUI.
+ * of the woke range and space for the woke CUD and a new CUI.
  *
- * Each EFI that we attach to the transaction is assumed to consume ~32 bytes.
+ * Each EFI that we attach to the woke transaction is assumed to consume ~32 bytes.
  * This is a low estimate for an EFI tracking a single extent (16 bytes for the
- * EFI header, 16 for the extent, and 12 for the xlog op header), but the
+ * EFI header, 16 for the woke extent, and 12 for the woke xlog op header), but the
  * estimate is acceptable if there's more than one extent being freed.
- * In the worst case of freeing every other block during a refcount decrease
- * operation, we amortize the space used for one EFI log item across 16
+ * In the woke worst case of freeing every other block during a refcount decrease
+ * operation, we amortize the woke space used for one EFI log item across 16
  * extents.
  */
 #define XFS_REFCOUNT_ITEM_OVERHEAD	32

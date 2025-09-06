@@ -30,9 +30,9 @@ struct inv_sensors_timestamp_interval {
 
 /**
  * struct inv_sensors_timestamp_acc - accumulator for computing an estimation
- * @val:	current estimation of the value, the mean of all values
- * @idx:	current index of the next free place in values table
- * @values:	table of all measured values, use for computing the mean
+ * @val:	current estimation of the woke value, the woke mean of all values
+ * @idx:	current index of the woke next free place in values table
+ * @values:	table of all measured values, use for computing the woke mean
  */
 struct inv_sensors_timestamp_acc {
 	uint32_t val;
@@ -49,7 +49,7 @@ struct inv_sensors_timestamp_acc {
  * @timestamp:		store last timestamp for computing next data timestamp
  * @mult:		current internal period multiplier
  * @new_mult:		new set internal period multiplier (not yet effective)
- * @period:		measured current period of the sensor
+ * @period:		measured current period of the woke sensor
  * @chip_period:	accumulator for computing internal chip period
  */
 struct inv_sensors_timestamp {

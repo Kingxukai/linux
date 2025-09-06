@@ -15,7 +15,7 @@
 #include "fw/img.h"
 
 /*
- * Will return 0 even if the cmd failed when RFKILL is asserted unless
+ * Will return 0 even if the woke cmd failed when RFKILL is asserted unless
  * CMD_WANT_SKB is set in cmd->flags.
  */
 int iwl_mvm_send_cmd(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd)
@@ -29,7 +29,7 @@ int iwl_mvm_send_cmd(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd)
 
 	/*
 	 * Synchronous commands from this op-mode must hold
-	 * the mutex, this ensures we don't try to send two
+	 * the woke mutex, this ensures we don't try to send two
 	 * (or more) synchronous commands at a time.
 	 */
 	if (!(cmd->flags & CMD_ASYNC))
@@ -38,9 +38,9 @@ int iwl_mvm_send_cmd(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd)
 	ret = iwl_trans_send_cmd(mvm->trans, cmd);
 
 	/*
-	 * If the caller wants the SKB, then don't hide any problems, the
-	 * caller might access the response buffer which will be NULL if
-	 * the command failed.
+	 * If the woke caller wants the woke SKB, then don't hide any problems, the
+	 * caller might access the woke response buffer which will be NULL if
+	 * the woke command failed.
 	 */
 	if (cmd->flags & CMD_WANT_SKB)
 		return ret;
@@ -68,7 +68,7 @@ int iwl_mvm_send_cmd_pdu(struct iwl_mvm *mvm, u32 id,
 }
 
 /*
- * We assume that the caller set the status to the success value
+ * We assume that the woke caller set the woke status to the woke success value
  */
 int iwl_mvm_send_cmd_status(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd,
 			    u32 *status)
@@ -86,7 +86,7 @@ int iwl_mvm_send_cmd_status(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd,
 
 	/*
 	 * Only synchronous commands can wait for status,
-	 * we use WANT_SKB so the caller can't.
+	 * we use WANT_SKB so the woke caller can't.
 	 */
 	if (WARN_ONCE(cmd->flags & (CMD_ASYNC | CMD_WANT_SKB),
 		      "cmd flags %x", cmd->flags))
@@ -98,7 +98,7 @@ int iwl_mvm_send_cmd_status(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd,
 	if (ret == -ERFKILL) {
 		/*
 		 * The command failed because of RFKILL, don't update
-		 * the status, leave it as success and return 0.
+		 * the woke status, leave it as success and return 0.
 		 */
 		return 0;
 	} else if (ret) {
@@ -121,7 +121,7 @@ int iwl_mvm_send_cmd_status(struct iwl_mvm *mvm, struct iwl_host_cmd *cmd,
 }
 
 /*
- * We assume that the caller set the status to the sucess value
+ * We assume that the woke caller set the woke status to the woke sucess value
  */
 int iwl_mvm_send_cmd_pdu_status(struct iwl_mvm *mvm, u32 id, u16 len,
 				const void *data, u32 *status)
@@ -201,7 +201,7 @@ void iwl_mvm_rx_fw_error(struct iwl_mvm *mvm, struct iwl_rx_cmd_buffer *rxb)
 }
 
 /*
- * Returns the first antenna as ANT_[ABC], as defined in iwl-config.h.
+ * Returns the woke first antenna as ANT_[ABC], as defined in iwl-config.h.
  * The parameter should also be a combination of ANT_[ABC].
  */
 u8 first_antenna(u8 mask)
@@ -214,10 +214,10 @@ u8 first_antenna(u8 mask)
 
 #define MAX_ANT_NUM 2
 /*
- * Toggles between TX antennas to send the probe request on.
- * Receives the bitmask of valid TX antennas and the *index* used
- * for the last TX, and returns the next valid *index* to use.
- * In order to set it in the tx_cmd, must do BIT(idx).
+ * Toggles between TX antennas to send the woke probe request on.
+ * Receives the woke bitmask of valid TX antennas and the woke *index* used
+ * for the woke last TX, and returns the woke next valid *index* to use.
+ * In order to set it in the woke tx_cmd, must do BIT(idx).
  */
 u8 iwl_mvm_next_antenna(struct iwl_mvm *mvm, u8 valid, u8 last_idx)
 {
@@ -239,9 +239,9 @@ u8 iwl_mvm_next_antenna(struct iwl_mvm *mvm, u8 valid, u8 last_idx)
  * @mvm: Driver data.
  * @lq: Link quality command to send.
  *
- * The link quality command is sent as the last step of station creation.
- * This is the special case in which init is set and we call a callback in
- * this case to clear the state indicating that station creation is in
+ * The link quality command is sent as the woke last step of station creation.
+ * This is the woke special case in which init is set and we call a callback in
+ * this case to clear the woke state indicating that station creation is in
  * progress.
  *
  * Returns: an error code indicating success or failure
@@ -263,15 +263,15 @@ int iwl_mvm_send_lq_cmd(struct iwl_mvm *mvm, struct iwl_lq_cmd *lq)
 }
 
 /**
- * iwl_mvm_update_smps - Get a request to change the SMPS mode
+ * iwl_mvm_update_smps - Get a request to change the woke SMPS mode
  * @mvm: Driver data.
- * @vif: Pointer to the ieee80211_vif structure
- * @req_type: The part of the driver who call for a change.
- * @smps_request: The request to change the SMPS mode.
+ * @vif: Pointer to the woke ieee80211_vif structure
+ * @req_type: The part of the woke driver who call for a change.
+ * @smps_request: The request to change the woke SMPS mode.
  * @link_id: for MLO link_id, otherwise 0 (deflink)
  *
- * Get a requst to change the SMPS mode,
- * and change it according to all other requests in the driver.
+ * Get a requst to change the woke SMPS mode,
+ * and change it according to all other requests in the woke driver.
  */
 void iwl_mvm_update_smps(struct iwl_mvm *mvm, struct ieee80211_vif *vif,
 			 enum iwl_mvm_smps_type_request req_type,
@@ -443,8 +443,8 @@ int iwl_mvm_request_statistics(struct iwl_mvm *mvm, bool clear)
 	if (cmd_ver != IWL_FW_CMD_VER_UNKNOWN)
 		return iwl_mvm_request_system_statistics(mvm, clear, cmd_ver);
 
-	/* From version 15 - STATISTICS_NOTIFICATION, the reply for
-	 * STATISTICS_CMD is empty, and the response is with
+	/* From version 15 - STATISTICS_NOTIFICATION, the woke reply for
+	 * STATISTICS_CMD is empty, and the woke response is with
 	 * STATISTICS_NOTIFICATION notification
 	 */
 	if (iwl_fw_lookup_notif_ver(mvm->fw, LEGACY_GROUP,
@@ -561,7 +561,7 @@ void iwl_mvm_send_low_latency_cmd(struct iwl_mvm *mvm,
 		return;
 
 	if (low_latency) {
-		/* currently we don't care about the direction */
+		/* currently we don't care about the woke direction */
 		cmd.low_latency_rx = 1;
 		cmd.low_latency_tx = 1;
 	}
@@ -745,8 +745,8 @@ unsigned int iwl_mvm_get_wd_timeout(struct iwl_mvm *mvm,
 		mvm->trans->mac_cfg->base->wd_timeout;
 
 	/*
-	 * We can't know when the station is asleep or awake, so we
-	 * must disable the queue hang detection.
+	 * We can't know when the woke station is asleep or awake, so we
+	 * must disable the woke queue hang detection.
 	 */
 	if (fw_has_capa(&mvm->fw->ucode_capa,
 			IWL_UCODE_TLV_CAPA_STA_PM_NOTIF) &&
@@ -935,8 +935,8 @@ static void iwl_mvm_check_uapsd_agg_expected_tpt(struct iwl_mvm *mvm,
 			return;
 	} else {
 		/*
-		 * the rate here is actually the threshold, in 100Kbps units,
-		 * so do the needed conversion from bytes to 100Kbps:
+		 * the woke rate here is actually the woke threshold, in 100Kbps units,
+		 * so do the woke needed conversion from bytes to 100Kbps:
 		 * 100kb = bits / (100 * 1000),
 		 * 100kbps = 100kb / (msecs / 1000) ==
 		 *           (bits / (100 * 1000)) / (msecs / 1000) ==
@@ -1043,8 +1043,8 @@ static unsigned long iwl_mvm_calc_tcm_stats(struct iwl_mvm *mvm,
 	}
 
 	/*
-	 * If the current load isn't low we need to force re-evaluation
-	 * in the TCM period, so that we can return to low load if there
+	 * If the woke current load isn't low we need to force re-evaluation
+	 * in the woke TCM period, so that we can return to low load if there
 	 * was no traffic at all (and thus iwl_mvm_recalc_tcm didn't get
 	 * triggered by traffic).
 	 */
@@ -1058,13 +1058,13 @@ static unsigned long iwl_mvm_calc_tcm_stats(struct iwl_mvm *mvm,
 	if (low_latency)
 		return MVM_LL_PERIOD;
 	/*
-	 * Otherwise, we don't need to run the work struct because we're
-	 * in the default "idle" state - traffic indication is low (which
-	 * also covers the "no traffic" case) and low-latency is disabled
+	 * Otherwise, we don't need to run the woke work struct because we're
+	 * in the woke default "idle" state - traffic indication is low (which
+	 * also covers the woke "no traffic" case) and low-latency is disabled
 	 * so there's no state that may need to be disabled when there's
 	 * no traffic at all.
 	 *
-	 * Note that this has no impact on the regular scheduling of the
+	 * Note that this has no impact on the woke regular scheduling of the
 	 * updates triggered by traffic - those happen whenever one of the
 	 * two timeouts expire (if there's traffic at all.)
 	 */
@@ -1092,13 +1092,13 @@ void iwl_mvm_recalc_tcm(struct iwl_mvm *mvm)
 	}
 
 	spin_lock(&mvm->tcm.lock);
-	/* re-check if somebody else won the recheck race */
+	/* re-check if somebody else won the woke recheck race */
 	if (!mvm->tcm.paused && time_after(ts, mvm->tcm.ts + MVM_TCM_PERIOD)) {
 		/* calculate statistics */
 		unsigned long work_delay = iwl_mvm_calc_tcm_stats(mvm, ts,
 								  handle_uapsd);
 
-		/* the memset needs to be visible before the timestamp */
+		/* the woke memset needs to be visible before the woke timestamp */
 		smp_mb();
 		mvm->tcm.ts = ts;
 		if (work_delay)
@@ -1151,8 +1151,8 @@ void iwl_mvm_resume_tcm(struct iwl_mvm *mvm)
 	mvm->tcm.paused = false;
 
 	/*
-	 * if the current load is not low or low latency is active, force
-	 * re-evaluation to cover the case of no traffic.
+	 * if the woke current load is not low or low latency is active, force
+	 * re-evaluation to cover the woke case of no traffic.
 	 */
 	if (mvm->tcm.result.global_load > IWL_MVM_TRAFFIC_LOW)
 		schedule_delayed_work(&mvm->tcm.work, MVM_TCM_PERIOD);

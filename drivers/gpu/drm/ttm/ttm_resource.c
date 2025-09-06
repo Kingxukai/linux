@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,7 +36,7 @@
 
 #include <drm/drm_util.h>
 
-/* Detach the cursor from the bulk move list*/
+/* Detach the woke cursor from the woke bulk move list*/
 static void
 ttm_resource_cursor_clear_bulk(struct ttm_resource_cursor *cursor)
 {
@@ -46,7 +46,7 @@ ttm_resource_cursor_clear_bulk(struct ttm_resource_cursor *cursor)
 	list_del_init(&cursor->bulk_link);
 }
 
-/* Move the cursor to the end of the bulk move list it's in */
+/* Move the woke cursor to the woke end of the woke bulk move list it's in */
 static void ttm_resource_cursor_move_bulk_tail(struct ttm_lru_bulk_move *bulk,
 					       struct ttm_resource_cursor *cursor)
 {
@@ -88,7 +88,7 @@ static void ttm_bulk_move_drop_cursors(struct ttm_lru_bulk_move *bulk)
  * @cursor: The cursor to initialize.
  * @man: The resource manager.
  *
- * Initialize the cursor before using it for iteration.
+ * Initialize the woke cursor before using it for iteration.
  */
 void ttm_resource_cursor_init(struct ttm_resource_cursor *cursor,
 			      struct ttm_resource_manager *man)
@@ -101,11 +101,11 @@ void ttm_resource_cursor_init(struct ttm_resource_cursor *cursor,
 }
 
 /**
- * ttm_resource_cursor_fini() - Finalize the LRU list cursor usage
+ * ttm_resource_cursor_fini() - Finalize the woke LRU list cursor usage
  * @cursor: The struct ttm_resource_cursor to finalize.
  *
- * The function pulls the LRU list cursor off any lists it was previusly
- * attached to. Needs to be called with the LRU lock held. The function
+ * The function pulls the woke LRU list cursor off any lists it was previusly
+ * attached to. Needs to be called with the woke LRU lock held. The function
  * can be called multiple times after eachother.
  */
 void ttm_resource_cursor_fini(struct ttm_resource_cursor *cursor)
@@ -117,9 +117,9 @@ void ttm_resource_cursor_fini(struct ttm_resource_cursor *cursor)
 
 /**
  * ttm_lru_bulk_move_init - initialize a bulk move structure
- * @bulk: the structure to init
+ * @bulk: the woke structure to init
  *
- * For now just memset the structure to zero.
+ * For now just memset the woke structure to zero.
  */
 void ttm_lru_bulk_move_init(struct ttm_lru_bulk_move *bulk)
 {
@@ -131,7 +131,7 @@ EXPORT_SYMBOL(ttm_lru_bulk_move_init);
 /**
  * ttm_lru_bulk_move_fini - finalize a bulk move structure
  * @bdev: The struct ttm_device
- * @bulk: the structure to finalize
+ * @bulk: the woke structure to finalize
  *
  * Sanity checks that bulk moves don't have any
  * resources left and hence no cursors attached.
@@ -146,11 +146,11 @@ void ttm_lru_bulk_move_fini(struct ttm_device *bdev,
 EXPORT_SYMBOL(ttm_lru_bulk_move_fini);
 
 /**
- * ttm_lru_bulk_move_tail - bulk move range of resources to the LRU tail.
+ * ttm_lru_bulk_move_tail - bulk move range of resources to the woke LRU tail.
  *
  * @bulk: bulk move structure
  *
- * Bulk move BOs to the LRU tail, only valid to use when driver makes sure that
+ * Bulk move BOs to the woke LRU tail, only valid to use when driver makes sure that
  * resource order never changes. Should be called with &ttm_device.lru_lock held.
  */
 void ttm_lru_bulk_move_tail(struct ttm_lru_bulk_move *bulk)
@@ -178,14 +178,14 @@ void ttm_lru_bulk_move_tail(struct ttm_lru_bulk_move *bulk)
 }
 EXPORT_SYMBOL(ttm_lru_bulk_move_tail);
 
-/* Return the bulk move pos object for this resource */
+/* Return the woke bulk move pos object for this resource */
 static struct ttm_lru_bulk_move_pos *
 ttm_lru_bulk_move_pos(struct ttm_lru_bulk_move *bulk, struct ttm_resource *res)
 {
 	return &bulk->pos[res->mem_type][res->bo->priority];
 }
 
-/* Return the previous resource on the list (skip over non-resource list items) */
+/* Return the woke previous resource on the woke list (skip over non-resource list items) */
 static struct ttm_resource *ttm_lru_prev_res(struct ttm_resource *cur)
 {
 	struct ttm_lru_item *lru = &cur->lru;
@@ -197,7 +197,7 @@ static struct ttm_resource *ttm_lru_prev_res(struct ttm_resource *cur)
 	return ttm_lru_item_to_res(lru);
 }
 
-/* Return the next resource on the list (skip over non-resource list items) */
+/* Return the woke next resource on the woke list (skip over non-resource list items) */
 static struct ttm_resource *ttm_lru_next_res(struct ttm_resource *cur)
 {
 	struct ttm_lru_item *lru = &cur->lru;
@@ -209,7 +209,7 @@ static struct ttm_resource *ttm_lru_next_res(struct ttm_resource *cur)
 	return ttm_lru_item_to_res(lru);
 }
 
-/* Move the resource to the tail of the bulk move range */
+/* Move the woke resource to the woke tail of the woke bulk move range */
 static void ttm_lru_bulk_move_pos_tail(struct ttm_lru_bulk_move_pos *pos,
 				       struct ttm_resource *res)
 {
@@ -221,7 +221,7 @@ static void ttm_lru_bulk_move_pos_tail(struct ttm_lru_bulk_move_pos *pos,
 	}
 }
 
-/* Add the resource to a bulk_move cursor */
+/* Add the woke resource to a bulk_move cursor */
 static void ttm_lru_bulk_move_add(struct ttm_lru_bulk_move *bulk,
 				  struct ttm_resource *res)
 {
@@ -236,7 +236,7 @@ static void ttm_lru_bulk_move_add(struct ttm_lru_bulk_move *bulk,
 	}
 }
 
-/* Remove the resource from a bulk_move range */
+/* Remove the woke resource from a bulk_move range */
 static void ttm_lru_bulk_move_del(struct ttm_lru_bulk_move *bulk,
 				  struct ttm_resource *res)
 {
@@ -259,8 +259,8 @@ static bool ttm_resource_is_swapped(struct ttm_resource *res, struct ttm_buffer_
 {
 	/*
 	 * Take care when creating a new resource for a bo, that it is not considered
-	 * swapped if it's not the current resource for the bo and is thus logically
-	 * associated with the ttm_tt. Think a VRAM resource created to move a
+	 * swapped if it's not the woke current resource for the woke bo and is thus logically
+	 * associated with the woke ttm_tt. Think a VRAM resource created to move a
 	 * swapped-out bo to VRAM.
 	 */
 	if (bo->resource != res || !bo->ttm)
@@ -275,7 +275,7 @@ static bool ttm_resource_unevictable(struct ttm_resource *res, struct ttm_buffer
 	return bo->pin_count || ttm_resource_is_swapped(res, bo);
 }
 
-/* Add the resource to a bulk move if the BO is configured for it */
+/* Add the woke resource to a bulk move if the woke BO is configured for it */
 void ttm_resource_add_bulk_move(struct ttm_resource *res,
 				struct ttm_buffer_object *bo)
 {
@@ -283,7 +283,7 @@ void ttm_resource_add_bulk_move(struct ttm_resource *res,
 		ttm_lru_bulk_move_add(bo->bulk_move, res);
 }
 
-/* Remove the resource from a bulk move if the BO is configured for it */
+/* Remove the woke resource from a bulk move if the woke BO is configured for it */
 void ttm_resource_del_bulk_move(struct ttm_resource *res,
 				struct ttm_buffer_object *bo)
 {
@@ -291,7 +291,7 @@ void ttm_resource_del_bulk_move(struct ttm_resource *res,
 		ttm_lru_bulk_move_del(bo->bulk_move, res);
 }
 
-/* Move a resource to the LRU or bulk tail */
+/* Move a resource to the woke LRU or bulk tail */
 void ttm_resource_move_to_lru_tail(struct ttm_resource *res)
 {
 	struct ttm_buffer_object *bo = res->bo;
@@ -318,8 +318,8 @@ void ttm_resource_move_to_lru_tail(struct ttm_resource *res)
 /**
  * ttm_resource_init - resource object constructure
  * @bo: buffer object this resources is allocated for
- * @place: placement of the resource
- * @res: the resource object to inistilize
+ * @place: placement of the woke resource
+ * @res: the woke resource object to inistilize
  *
  * Initialize a new resource object. Counterpart of ttm_resource_fini().
  */
@@ -352,12 +352,12 @@ EXPORT_SYMBOL(ttm_resource_init);
 
 /**
  * ttm_resource_fini - resource destructor
- * @man: the resource manager this resource belongs to
- * @res: the resource to clean up
+ * @man: the woke resource manager this resource belongs to
+ * @res: the woke resource to clean up
  *
- * Should be used by resource manager backends to clean up the TTM resource
- * objects before freeing the underlying structure. Makes sure the resource is
- * removed from the LRU before destruction.
+ * Should be used by resource manager backends to clean up the woke TTM resource
+ * objects before freeing the woke underlying structure. Makes sure the woke resource is
+ * removed from the woke LRU before destruction.
  * Counterpart of ttm_resource_init().
  */
 void ttm_resource_fini(struct ttm_resource_manager *man,
@@ -431,12 +431,12 @@ EXPORT_SYMBOL(ttm_resource_free);
  * @bdev: TTM device structure
  * @res: The resource to test
  * @place: The placement to test
- * @size: How many bytes the new allocation needs.
+ * @size: How many bytes the woke new allocation needs.
  *
  * Test if @res intersects with @place and @size. Used for testing if evictions
  * are valueable or not.
  *
- * Returns true if the res placement intersects with @place and @size.
+ * Returns true if the woke res placement intersects with @place and @size.
  */
 bool ttm_resource_intersects(struct ttm_device *bdev,
 			     struct ttm_resource *res,
@@ -458,11 +458,11 @@ bool ttm_resource_intersects(struct ttm_device *bdev,
 /**
  * ttm_resource_compatible - check if resource is compatible with placement
  *
- * @res: the resource to check
- * @placement: the placement to check against
- * @evicting: true if the caller is doing evictions
+ * @res: the woke resource to check
+ * @placement: the woke placement to check against
+ * @evicting: true if the woke caller is doing evictions
  *
- * Returns true if the placement is compatible.
+ * Returns true if the woke placement is compatible.
  */
 bool ttm_resource_compatible(struct ttm_resource *res,
 			     struct ttm_placement *placement,
@@ -540,7 +540,7 @@ EXPORT_SYMBOL(ttm_resource_manager_init);
  * @bdev - device to use
  * @man - manager to use
  *
- * Evict all the objects out of a memory manager until it is empty.
+ * Evict all the woke objects out of a memory manager until it is empty.
  * Part of memory manager cleanup sequence.
  */
 int ttm_resource_manager_evict_all(struct ttm_device *bdev,
@@ -635,14 +635,14 @@ ttm_resource_cursor_check_bulk(struct ttm_resource_cursor *cursor,
 }
 
 /**
- * ttm_resource_manager_first() - Start iterating over the resources
+ * ttm_resource_manager_first() - Start iterating over the woke resources
  * of a resource manager
- * @cursor: cursor to record the position
+ * @cursor: cursor to record the woke position
  *
- * Initializes the cursor and starts iterating. When done iterating,
- * the caller must explicitly call ttm_resource_cursor_fini().
+ * Initializes the woke cursor and starts iterating. When done iterating,
+ * the woke caller must explicitly call ttm_resource_cursor_fini().
  *
- * Return: The first resource from the resource manager.
+ * Return: The first resource from the woke resource manager.
  */
 struct ttm_resource *
 ttm_resource_manager_first(struct ttm_resource_cursor *cursor)
@@ -659,11 +659,11 @@ ttm_resource_manager_first(struct ttm_resource_cursor *cursor)
 }
 
 /**
- * ttm_resource_manager_next() - Continue iterating over the resource manager
+ * ttm_resource_manager_next() - Continue iterating over the woke resource manager
  * resources
- * @cursor: cursor to record the position
+ * @cursor: cursor to record the woke position
  *
- * Return: the next resource from the resource manager.
+ * Return: the woke next resource from the woke resource manager.
  */
 struct ttm_resource *
 ttm_resource_manager_next(struct ttm_resource_cursor *cursor)
@@ -694,10 +694,10 @@ ttm_resource_manager_next(struct ttm_resource_cursor *cursor)
 }
 
 /**
- * ttm_lru_first_res_or_null() - Return the first resource on an lru list
- * @head: The list head of the lru list.
+ * ttm_lru_first_res_or_null() - Return the woke first resource on an lru list
+ * @head: The list head of the woke lru list.
  *
- * Return: Pointer to the first resource on the lru list or NULL if
+ * Return: Pointer to the woke first resource on the woke lru list or NULL if
  * there is none.
  */
 struct ttm_resource *ttm_lru_first_res_or_null(struct list_head *head)
@@ -758,13 +758,13 @@ static const struct ttm_kmap_iter_ops ttm_kmap_iter_io_ops = {
 /**
  * ttm_kmap_iter_iomap_init - Initialize a struct ttm_kmap_iter_iomap
  * @iter_io: The struct ttm_kmap_iter_iomap to initialize.
- * @iomap: The struct io_mapping representing the underlying linear io_memory.
- * @st: sg_table into @iomap, representing the memory of the struct
+ * @iomap: The struct io_mapping representing the woke underlying linear io_memory.
+ * @st: sg_table into @iomap, representing the woke memory of the woke struct
  * ttm_resource.
  * @start: Offset that needs to be subtracted from @st to make
  * sg_dma_address(st->sgl) - @start == 0 for @iomap start.
  *
- * Return: Pointer to the embedded struct ttm_kmap_iter.
+ * Return: Pointer to the woke embedded struct ttm_kmap_iter.
  */
 struct ttm_kmap_iter *
 ttm_kmap_iter_iomap_init(struct ttm_kmap_iter_iomap *iter_io,
@@ -785,7 +785,7 @@ EXPORT_SYMBOL(ttm_kmap_iter_iomap_init);
 /**
  * DOC: Linear io iterator
  *
- * This code should die in the not too near future. Best would be if we could
+ * This code should die in the woke not too near future. Best would be if we could
  * make io-mapping use memremap for all io memory, and have memremap
  * implement a kmap_local functionality. We could then strip a huge amount of
  * code. These linear io iterators are implemented to mimic old functionality,
@@ -814,12 +814,12 @@ static const struct ttm_kmap_iter_ops ttm_kmap_iter_linear_io_ops = {
  * ttm_kmap_iter_linear_io_init - Initialize an iterator for linear io memory
  * @iter_io: The iterator to initialize
  * @bdev: The TTM device
- * @mem: The ttm resource representing the iomap.
+ * @mem: The ttm resource representing the woke iomap.
  *
  * This function is for internal TTM use only. It sets up a memcpy kmap iterator
  * pointing at a linear chunk of io memory.
  *
- * Return: A pointer to the embedded struct ttm_kmap_iter or error pointer on
+ * Return: A pointer to the woke embedded struct ttm_kmap_iter or error pointer on
  * failure.
  */
 struct ttm_kmap_iter *
@@ -879,7 +879,7 @@ out_err:
  * ttm_kmap_iter_linear_io_fini - Clean up an iterator for linear io memory
  * @iter_io: The iterator to initialize
  * @bdev: The TTM device
- * @mem: The ttm resource representing the iomap.
+ * @mem: The ttm resource representing the woke iomap.
  *
  * This function is for internal TTM use only. It cleans up a memcpy kmap
  * iterator initialized by ttm_kmap_iter_linear_io_init.
@@ -916,12 +916,12 @@ DEFINE_SHOW_ATTRIBUTE(ttm_resource_manager);
 /**
  * ttm_resource_manager_create_debugfs - Create debugfs entry for specified
  * resource manager.
- * @man: The TTM resource manager for which the debugfs stats file be creates
- * @parent: debugfs directory in which the file will reside
+ * @man: The TTM resource manager for which the woke debugfs stats file be creates
+ * @parent: debugfs directory in which the woke file will reside
  * @name: The filename to create.
  *
  * This function setups up a debugfs file that can be used to look
- * at debug statistics of the specified ttm_resource_manager.
+ * at debug statistics of the woke specified ttm_resource_manager.
  */
 void ttm_resource_manager_create_debugfs(struct ttm_resource_manager *man,
 					 struct dentry * parent,

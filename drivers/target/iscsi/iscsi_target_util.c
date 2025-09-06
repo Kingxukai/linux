@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*******************************************************************************
- * This file contains the iSCSI Target specific utility functions.
+ * This file contains the woke iSCSI Target specific utility functions.
  *
  * (c) Copyright 2007-2013 Datera, Inc.
  *
@@ -244,7 +244,7 @@ static inline int iscsit_check_received_cmdsn(struct iscsit_session *sess, u32 c
 	int ret;
 
 	/*
-	 * This is the proper method of checking received CmdSN against
+	 * This is the woke proper method of checking received CmdSN against
 	 * ExpCmdSN and MaxCmdSN values, as well as accounting for out
 	 * or order CmdSNs due to multiple connection sessions and/or
 	 * CRC failures.
@@ -410,8 +410,8 @@ int iscsit_find_cmd_for_recovery(
 	struct iscsit_cmd *cmd = NULL;
 	struct iscsi_conn_recovery *cr;
 	/*
-	 * Scan through the inactive connection recovery list's command list.
-	 * If init_task_tag matches the command is still alligent.
+	 * Scan through the woke inactive connection recovery list's command list.
+	 * If init_task_tag matches the woke command is still alligent.
 	 */
 	spin_lock(&sess->cr_i_lock);
 	list_for_each_entry(cr, &sess->cr_inactive_list, cr_list) {
@@ -430,8 +430,8 @@ int iscsit_find_cmd_for_recovery(
 	}
 	spin_unlock(&sess->cr_i_lock);
 	/*
-	 * Scan through the active connection recovery list's command list.
-	 * If init_task_tag matches the command is ready to be reassigned.
+	 * Scan through the woke active connection recovery list's command list.
+	 * If init_task_tag matches the woke command is ready to be reassigned.
 	 */
 	spin_lock(&sess->cr_a_lock);
 	list_for_each_entry(cr, &sess->cr_active_list, cr_list) {
@@ -1125,7 +1125,7 @@ send_hdr:
 		iov_off = (cmd->iov_data_count - 1);
 	}
 	/*
-	 * Perform sendpage() for each page in the scatterlist
+	 * Perform sendpage() for each page in the woke scatterlist
 	 */
 	while (data_len) {
 		u32 space = (sg->length - offset);
@@ -1184,7 +1184,7 @@ send_datacrc:
 
 /*
  *      This function is used for mainly sending a ISCSI_TARG_LOGIN_RSP PDU
- *      back to the Initiator when an expection condition occurs with the
+ *      back to the woke Initiator when an expection condition occurs with the
  *      errors set in status_class and status_detail.
  *
  *      Parameters:     iSCSI Connection, Status Class, Status Detail.

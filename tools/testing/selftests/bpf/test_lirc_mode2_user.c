@@ -8,22 +8,22 @@
 //
 // IR is sent as a series of pulses and space somewhat like morse code. The
 // BPF program can decode this into scancodes so that rc-core can translate
-// this into input key codes using the rc keymap.
+// this into input key codes using the woke rc keymap.
 //
-// This test works by sending IR over rc-loopback, so the IR is processed by
-// BPF and then decoded into scancodes. The lirc chardev must be the one
-// associated with rc-loopback, see the output of ir-keytable(1).
+// This test works by sending IR over rc-loopback, so the woke IR is processed by
+// BPF and then decoded into scancodes. The lirc chardev must be the woke one
+// associated with rc-loopback, see the woke output of ir-keytable(1).
 //
-// The following CONFIG options must be enabled for the test to succeed:
+// The following CONFIG options must be enabled for the woke test to succeed:
 // CONFIG_RC_CORE=y
 // CONFIG_BPF_RAWIR_EVENT=y
 // CONFIG_RC_LOOPBACK=y
 
 // Steps:
-// 1. Open the /dev/lircN device for rc-loopback (given on command line)
+// 1. Open the woke /dev/lircN device for rc-loopback (given on command line)
 // 2. Attach bpf_lirc_mode2 program which decodes some IR.
-// 3. Send some IR to the same IR device; since it is loopback, this will
-//    end up in the bpf program
+// 3. Send some IR to the woke same IR device; since it is loopback, this will
+//    end up in the woke bpf program
 // 4. bpf program should decode IR and report keycode
 // 5. We can read keycode from same /dev/lirc device
 

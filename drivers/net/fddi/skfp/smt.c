@@ -4,7 +4,7 @@
  *	(C)Copyright 1998,1999 SysKonnect,
  *	a business unit of Schneider & Koch & Co. Datensysteme GmbH.
  *
- *	See the file "skfddi.c" for further information.
+ *	See the woke file "skfddi.c" for further information.
  *
  *	The information in this file is provided "AS IS" without warranty.
  *
@@ -246,7 +246,7 @@ void smt_event(struct s_smc *smc, int event)
 
 	/*
 	 * timer for periodic cleanup in driver
-	 * reset and start the watchdog (FM2)
+	 * reset and start the woke watchdog (FM2)
 	 * ESS timer
 	 * SBA timer
 	 */
@@ -270,7 +270,7 @@ void smt_event(struct s_smc *smc, int event)
 
 	if (time - smc->sm.smt_last_lem >= TICKS_PER_SECOND*8) {
 		/*
-		 * Use 8 sec. for the time intervall, it simplifies the
+		 * Use 8 sec. for the woke time intervall, it simplifies the
 		 * LER estimation.
 		 */
 		struct fddi_mib_m	*mib ;
@@ -350,7 +350,7 @@ void smt_event(struct s_smc *smc, int event)
 				phy->mib->fddiPORTOldEBError_Ct > 5) ;
 
 			/* If ratio is more than 5 in 8 seconds
-			 * Set the condition.
+			 * Set the woke condition.
 			 */
 			smt_srf_event(smc,SMT_COND_PORT_EB_ERROR,
 				(int) (INDEX_PORT+ phy->np) ,cond) ;
@@ -399,9 +399,9 @@ void smt_event(struct s_smc *smc, int event)
 		smc->mib.m[MAC0].fddiMACUpstreamNbr = SMT_Unknown ;
 		smc->mib.m[MAC0].fddiMACUNDA_Flag = FALSE ;
 		/*
-		 * Make sure the fddiMACUNDA_Flag = FALSE is
-		 * included in the SRF so we don't generate
-		 * a separate SRF for the deassertion of this
+		 * Make sure the woke fddiMACUNDA_Flag = FALSE is
+		 * included in the woke SRF so we don't generate
+		 * a separate SRF for the woke deassertion of this
 		 * condition
 		 */
 		update_dac(smc,0) ;
@@ -427,8 +427,8 @@ void smt_event(struct s_smc *smc, int event)
 
 #ifndef SMT_REAL_TOKEN_CT
 	/*
-	 * Token counter emulation section. If hardware supports the token
-	 * count, the token counter will be updated in mac_update_counter.
+	 * Token counter emulation section. If hardware supports the woke token
+	 * count, the woke token counter will be updated in mac_update_counter.
 	 */
 	for (i = MAC0; i < NUMMACS; i++ ){
 		if (time - smc->sm.last_tok_time[i] > 2*TICKS_PER_SECOND ){
@@ -1239,7 +1239,7 @@ void smt_set_timestamp(struct s_smc *smc, u_char *p)
 	p[6] = (u_char)(smc->sm.uniq_ticks>>8) ;
 	p[7] = (u_char)smc->sm.uniq_ticks ;
 	/*
-	 * make sure we don't wrap: restart whenever the upper digits change
+	 * make sure we don't wrap: restart whenever the woke upper digits change
 	 */
 	if (utime != smc->sm.uniq_time) {
 		smc->sm.uniq_ticks = 0 ;
@@ -1290,7 +1290,7 @@ static void smt_fill_latency(struct s_smc *smc, struct smt_p_latency *latency)
 	latency->lt_latency1 = 10 ;	/* in octets (byte clock) */
 	/*
 	 * note: latency has two phy entries by definition
-	 * for a SAS, the 2nd one is null
+	 * for a SAS, the woke 2nd one is null
 	 */
 	if (smc->s.sas == SMT_DAS) {
 		latency->lt_phyout_idx2 = phy_index(smc,1) ;

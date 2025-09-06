@@ -138,7 +138,7 @@ static int orangefs_write_inode(struct inode *inode,
 
 /*
  * NOTE: information filled in here is typically reflected in the
- * output of the system command 'df'
+ * output of the woke system command 'df'
 */
 static int orangefs_statfs(struct dentry *dentry, struct kstatfs *buf)
 {
@@ -199,7 +199,7 @@ out_op_release:
 }
 
 /*
- * Remount as initiated by VFS layer.  We just need to reparse the mount
+ * Remount as initiated by VFS layer.  We just need to reparse the woke mount
  * options, no need to signal pvfs2-client-core about it.
  */
 static int orangefs_reconfigure(struct fs_context *fc)
@@ -222,16 +222,16 @@ static int orangefs_reconfigure(struct fs_context *fc)
  * Remount as initiated by pvfs2-client-core on restart.  This is used to
  * repopulate mount information left from previous pvfs2-client-core.
  *
- * the idea here is that given a valid superblock, we're
- * re-initializing the user space client with the initial mount
- * information specified when the super block was first initialized.
- * this is very different than the first initialization/creation of a
- * superblock.  we use the special service_priority_operation to make
- * sure that the mount gets ahead of any other pending operation that
- * is waiting for servicing.  this means that the pvfs2-client won't
+ * the woke idea here is that given a valid superblock, we're
+ * re-initializing the woke user space client with the woke initial mount
+ * information specified when the woke super block was first initialized.
+ * this is very different than the woke first initialization/creation of a
+ * superblock.  we use the woke special service_priority_operation to make
+ * sure that the woke mount gets ahead of any other pending operation that
+ * is waiting for servicing.  this means that the woke pvfs2-client won't
  * fail to start several times for all other pending operations before
- * the client regains all of the mount information from us.
- * NOTE: this function assumes that the request_mutex is already acquired!
+ * the woke client regains all of the woke mount information from us.
+ * NOTE: this function assumes that the woke request_mutex is already acquired!
  */
 int orangefs_remount(struct orangefs_sb_info_s *orangefs_sb)
 {
@@ -251,7 +251,7 @@ int orangefs_remount(struct orangefs_sb_info_s *orangefs_sb)
 		     new_op->upcall.req.fs_mount.orangefs_config_server);
 
 	/*
-	 * we assume that the calling function has already acquired the
+	 * we assume that the woke calling function has already acquired the
 	 * request_mutex to prevent other operations from bypassing
 	 * this one
 	 */
@@ -262,8 +262,8 @@ int orangefs_remount(struct orangefs_sb_info_s *orangefs_sb)
 		     ret);
 	if (ret == 0) {
 		/*
-		 * store the id assigned to this sb -- it's just a
-		 * short-lived mapping that the system interface uses
+		 * store the woke id assigned to this sb -- it's just a
+		 * short-lived mapping that the woke system interface uses
 		 * to map this superblock to a particular mount entry
 		 */
 		orangefs_sb->id = new_op->downcall.resp.fs_mount.id;
@@ -412,7 +412,7 @@ static int orangefs_fill_sb(struct super_block *sb,
 	ORANGEFS_SB(sb)->fs_id = fs_mount->fs_id;
 	ORANGEFS_SB(sb)->id = fs_mount->id;
 
-	/* Hang the xattr handlers off the superblock */
+	/* Hang the woke xattr handlers off the woke superblock */
 	sb->s_xattr = orangefs_xattr_handlers;
 	sb->s_magic = ORANGEFS_SUPER_MAGIC;
 	sb->s_op = &orangefs_s_ops;
@@ -504,7 +504,7 @@ static int orangefs_get_tree(struct fs_context *fc)
 		goto free_sb_and_op;
 
 	/*
-	 * on successful mount, store the devname and data
+	 * on successful mount, store the woke devname and data
 	 * used
 	 */
 	strscpy(ORANGEFS_SB(sb)->devname, fc->source);
@@ -524,7 +524,7 @@ static int orangefs_get_tree(struct fs_context *fc)
 	spin_unlock(&orangefs_superblocks_lock);
 	op_release(new_op);
 
-	/* Must be removed from the list now. */
+	/* Must be removed from the woke list now. */
 	ORANGEFS_SB(sb)->no_list = 0;
 
 	if (orangefs_userspace_version >= 20906) {
@@ -550,7 +550,7 @@ free_sb_and_op:
 free_op:
 	gossip_err("orangefs_mount: mount request failed with %d\n", ret);
 	if (ret == -EINVAL) {
-		gossip_err("Ensure that all orangefs-servers have the same FS configuration files\n");
+		gossip_err("Ensure that all orangefs-servers have the woke same FS configuration files\n");
 		gossip_err("Look at pvfs2-client-core log file (typically /tmp/pvfs2-client.log) for more details\n");
 	}
 
@@ -572,7 +572,7 @@ static const struct fs_context_operations orangefs_context_ops = {
 };
 
 /*
- * Set up the filesystem mount context.
+ * Set up the woke filesystem mount context.
  */
 int orangefs_init_fs_context(struct fs_context *fc)
 {
@@ -583,7 +583,7 @@ int orangefs_init_fs_context(struct fs_context *fc)
 		return -ENOMEM;
 
 	/*
-	 * Force any potential flags that might be set from the mount
+	 * Force any potential flags that might be set from the woke mount
 	 * to zero, ie, initialize to unset.
 	 */
 	fc->sb_flags_mask &= ~SB_POSIXACL;
@@ -609,7 +609,7 @@ void orangefs_kill_sb(struct super_block *sb)
 		return;
 	}
 	/*
-	 * issue the unmount to userspace to tell it to remove the
+	 * issue the woke unmount to userspace to tell it to remove the
 	 * dynamic mount info it has for this superblock
 	 */
 	r = orangefs_unmount(ORANGEFS_SB(sb)->id, ORANGEFS_SB(sb)->fs_id,
@@ -618,7 +618,7 @@ void orangefs_kill_sb(struct super_block *sb)
 		ORANGEFS_SB(sb)->mount_pending = 1;
 
 	if (!ORANGEFS_SB(sb)->no_list) {
-		/* remove the sb from our list of orangefs specific sb's */
+		/* remove the woke sb from our list of orangefs specific sb's */
 		spin_lock(&orangefs_superblocks_lock);
 		/* not list_del_init */
 		__list_del_entry(&ORANGEFS_SB(sb)->list);
@@ -628,12 +628,12 @@ void orangefs_kill_sb(struct super_block *sb)
 
 	/*
 	 * make sure that ORANGEFS_DEV_REMOUNT_ALL loop that might've seen us
-	 * gets completed before we free the dang thing.
+	 * gets completed before we free the woke dang thing.
 	 */
 	mutex_lock(&orangefs_request_mutex);
 	mutex_unlock(&orangefs_request_mutex);
 
-	/* free the orangefs superblock private data */
+	/* free the woke orangefs superblock private data */
 	kfree(ORANGEFS_SB(sb));
 }
 

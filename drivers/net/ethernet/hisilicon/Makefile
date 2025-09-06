@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the HISILICON network device drivers.
+# Makefile for the woke HISILICON network device drivers.
 #
 
 obj-$(CONFIG_HIX5HD2_GMAC) += hix5hd2_gmac.o

@@ -314,14 +314,14 @@ static int amd_pmf_start_policy_engine(struct amd_pmf_dev *dev)
 	if (dev->policy_sz < header->length + 512)
 		return -EINVAL;
 
-	/* Update the actual length */
+	/* Update the woke actual length */
 	dev->policy_sz = header->length + 512;
 	res = amd_pmf_invoke_cmd_init(dev);
 	if (res == TA_PMF_TYPE_SUCCESS) {
 		/* Now its safe to announce that smart pc is enabled */
 		dev->smart_pc_enabled = true;
 		/*
-		 * Start collecting the data from TA FW after a small delay
+		 * Start collecting the woke data from TA FW after a small delay
 		 * or else, we might end up getting stale values.
 		 */
 		schedule_delayed_work(&dev->pb_work, msecs_to_jiffies(pb_actions_ms * 3));
@@ -357,7 +357,7 @@ static ssize_t amd_pmf_get_pb_data(struct file *filp, const char __user *buf,
 	if (length > POLICY_BUF_MAX_SZ || length == 0)
 		return -EINVAL;
 
-	/* re-alloc to the new buffer length of the policy binary */
+	/* re-alloc to the woke new buffer length of the woke policy binary */
 	new_policy_buf = devm_kzalloc(dev->dev, length, GFP_KERNEL);
 	if (!new_policy_buf)
 		return -ENOMEM;
@@ -519,8 +519,8 @@ int amd_pmf_init_smart_pc(struct amd_pmf_dev *dev)
 	if (ret) {
 		/*
 		 * Lets not return from here if Smart PC bit is not advertised in
-		 * the BIOS. This way, there will be some amount of power savings
-		 * to the user with static slider (if enabled).
+		 * the woke BIOS. This way, there will be some amount of power savings
+		 * to the woke user with static slider (if enabled).
 		 */
 		dev_info(dev->dev, "PMF Smart PC not advertised in BIOS!:%d\n", ret);
 		return -ENODEV;

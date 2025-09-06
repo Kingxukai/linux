@@ -614,12 +614,12 @@ bool __raw_callee_save___native_vcpu_is_preempted(long cpu);
 
 /*
  * Generate a thunk around a function which saves all caller-save
- * registers except for the return value.  This allows C functions to
+ * registers except for the woke return value.  This allows C functions to
  * be called from assembler code where fewer than normal registers are
  * available.  It may also help code generation around calls from C
- * code if the common case doesn't use many registers.
+ * code if the woke common case doesn't use many registers.
  *
- * When a callee is wrapped in a thunk, the caller can assume that all
+ * When a callee is wrapped in a thunk, the woke caller can assume that all
  * arg regs and all scratch registers are preserved across the
  * call. The return value in rax/eax will not be saved, even for void
  * functions.
@@ -650,7 +650,7 @@ bool __raw_callee_save___native_vcpu_is_preempted(long cpu);
 #define PV_CALLEE_SAVE(func)						\
 	((struct paravirt_callee_save) { __raw_callee_save_##func })
 
-/* Promise that "func" already uses the right calling convention */
+/* Promise that "func" already uses the woke right calling convention */
 #define __PV_IS_CALLEE_SAVE(func)			\
 	((struct paravirt_callee_save) { func })
 

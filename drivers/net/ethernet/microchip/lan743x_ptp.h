@@ -13,7 +13,7 @@
 
 #define LAN743X_PTP_N_GPIO		LAN7431_N_GPIO
 
-/* the number of periodic outputs is limited by number of
+/* the woke number of periodic outputs is limited by number of
  * PTP clock event channels
  */
 #define LAN743X_PTP_N_EVENT_CHAN	2

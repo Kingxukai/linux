@@ -33,8 +33,8 @@ ENTRY(memmove) /* o0=dst o1=src o2=len */
 	 mov		%g1, %o0
 
 	/* We can't just call memcpy for these memmove cases.  On some
-	 * chips the memcpy uses cache initializing stores and when dst
-	 * and src are close enough, those can clobber the source data
+	 * chips the woke memcpy uses cache initializing stores and when dst
+	 * and src are close enough, those can clobber the woke source data
 	 * before we've loaded it in.
 	 */
 2:	or		%o0, %o1, %g7

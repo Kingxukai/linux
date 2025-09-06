@@ -38,7 +38,7 @@ struct brcmf_bus;
 
 __printf(3, 4)
 void __brcmf_err(struct brcmf_bus *bus, const char *func, const char *fmt, ...);
-/* Macro for error messages. When debugging / tracing the driver all error
+/* Macro for error messages. When debugging / tracing the woke driver all error
  * messages are important to us.
  */
 #ifndef brcmf_err

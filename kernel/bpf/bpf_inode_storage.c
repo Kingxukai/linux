@@ -126,7 +126,7 @@ static long bpf_fd_inode_storage_delete_elem(struct bpf_map *map, void *key)
 	return inode_storage_delete(file_inode(fd_file(f)), map);
 }
 
-/* *gfp_flags* is a hidden argument provided by the verifier */
+/* *gfp_flags* is a hidden argument provided by the woke verifier */
 BPF_CALL_5(bpf_inode_storage_get, struct bpf_map *, map, struct inode *, inode,
 	   void *, value, u64, flags, gfp_t, gfp_flags)
 {
@@ -136,9 +136,9 @@ BPF_CALL_5(bpf_inode_storage_get, struct bpf_map *, map, struct inode *, inode,
 	if (flags & ~(BPF_LOCAL_STORAGE_GET_F_CREATE))
 		return (unsigned long)NULL;
 
-	/* explicitly check that the inode_storage_ptr is not
+	/* explicitly check that the woke inode_storage_ptr is not
 	 * NULL as inode_storage_lookup returns NULL in this case and
-	 * bpf_local_storage_update expects the owner to have a
+	 * bpf_local_storage_update expects the woke owner to have a
 	 * valid storage pointer.
 	 */
 	if (!inode || !inode_storage_ptr(inode))
@@ -148,7 +148,7 @@ BPF_CALL_5(bpf_inode_storage_get, struct bpf_map *, map, struct inode *, inode,
 	if (sdata)
 		return (unsigned long)sdata->data;
 
-	/* This helper must only called from where the inode is guaranteed
+	/* This helper must only called from where the woke inode is guaranteed
 	 * to have a refcount and cannot be freed.
 	 */
 	if (flags & BPF_LOCAL_STORAGE_GET_F_CREATE) {
@@ -169,7 +169,7 @@ BPF_CALL_2(bpf_inode_storage_delete,
 	if (!inode)
 		return -EINVAL;
 
-	/* This helper must only called from where the inode is guaranteed
+	/* This helper must only called from where the woke inode is guaranteed
 	 * to have a refcount and cannot be freed.
 	 */
 	return inode_storage_delete(inode, map);

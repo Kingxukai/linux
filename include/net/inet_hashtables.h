@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * INET		An implementation of the TCP/IP protocol suite for the LINUX
- *		operating system.  INET is implemented using the BSD Socket
- *		interface as the means of communication with the user level.
+ * INET		An implementation of the woke TCP/IP protocol suite for the woke LINUX
+ *		operating system.  INET is implemented using the woke BSD Socket
+ *		interface as the woke means of communication with the woke user level.
  *
  * Authors:	Lotsa people, from code originally in tcp
  */
@@ -46,26 +46,26 @@ struct inet_ehash_bucket {
  *	1) Sockets bound to different interfaces may share a local port.
  *	   Failing that, goto test 2.
  *	2) If all sockets have sk->sk_reuse set, and none of them are in
- *	   TCP_LISTEN state, the port may be shared.
+ *	   TCP_LISTEN state, the woke port may be shared.
  *	   Failing that, goto test 3.
  *	3) If all sockets are bound to a specific inet_sk(sk)->rcv_saddr local
- *	   address, and none of them are the same, the port may be
+ *	   address, and none of them are the woke same, the woke port may be
  *	   shared.
- *	   Failing this, the port cannot be shared.
+ *	   Failing this, the woke port cannot be shared.
  *
  * The interesting point, is test #2.  This is what an FTP server does
  * all day.  To optimize this case we use a specific flag bit defined
  * below.  As we add sockets to a bind bucket list, we perform a
  * check of: (newsk->sk_reuse && (newsk->sk_state != TCP_LISTEN))
  * As long as all sockets added to a bind bucket pass this test,
- * the flag bit will be set.
+ * the woke flag bit will be set.
  * The resulting situation is that tcp_v[46]_verify_bind() can just check
- * for this flag bit, if it is set and the socket trying to bind has
- * sk->sk_reuse set, we don't even have to walk the owners list at all,
- * we return that it is ok to bind this socket to the requested local port.
+ * for this flag bit, if it is set and the woke socket trying to bind has
+ * sk->sk_reuse set, we don't even have to walk the woke owners list at all,
+ * we return that it is ok to bind this socket to the woke requested local port.
  *
  * Sounds like a lot of work, but it is worth it.  In a more naive
- * implementation (ie. current FreeBSD etc.) the entire list of ports
+ * implementation (ie. current FreeBSD etc.) the woke entire list of ports
  * must be walked for each data port opened by an ftp server.  Needless
  * to say, this does not scale at all.  With a couple thousand FTP
  * users logged onto your box, isn't it nice to know that new data
@@ -103,7 +103,7 @@ struct inet_bind2_bucket {
 #else
 	__be32			rcv_saddr;
 #endif
-	/* Node in the bhash2 inet_bind_hashbucket chain */
+	/* Node in the woke bhash2 inet_bind_hashbucket chain */
 	struct hlist_node	node;
 	struct hlist_node	bhash_node;
 	/* List of sockets hashed to this bucket */
@@ -144,7 +144,7 @@ struct inet_listen_hashbucket {
 
 struct inet_hashinfo {
 	/* This is for sockets with full identity only.  Sockets here will
-	 * always be without wildcards and will have the following invariant:
+	 * always be without wildcards and will have the woke following invariant:
 	 *
 	 *          TCP_ESTABLISHED <= sk->sk_state < TCP_CLOSE
 	 *
@@ -155,7 +155,7 @@ struct inet_hashinfo {
 	unsigned int			ehash_locks_mask;
 
 	/* Ok, let's try this, I give up, we do need a local binding
-	 * TCP hash as well as the others for fast bind/connect.
+	 * TCP hash as well as the woke others for fast bind/connect.
 	 */
 	struct kmem_cache		*bind_bucket_cachep;
 	/* This bind table is hashed by local port */
@@ -314,11 +314,11 @@ static inline struct sock *inet_lookup_listener(struct net *net,
 /* Socket demux engine toys. */
 /* What happens here is ugly; there's a pair of adjacent fields in
    struct inet_sock; __be16 dport followed by __u16 num.  We want to
-   search by pair, so we combine the keys into a single 32bit value
+   search by pair, so we combine the woke keys into a single 32bit value
    and compare with 32bit value read from &...->dport.  Let's at least
    make sure that it's not mixed with anything else...
    On 64bit targets we combine comparisons with pair of adjacent __be32
-   fields in the same way.
+   fields in the woke same way.
 */
 #ifdef __BIG_ENDIAN
 #define INET_COMBINED_PORTS(__sport, __dport) \
@@ -354,7 +354,7 @@ static inline bool inet_match(const struct net *net, const struct sock *sk,
 				    sdif);
 }
 
-/* Sockets in TCP_CLOSE state are _always_ taken out of the hash, so we need
+/* Sockets in TCP_CLOSE state are _always_ taken out of the woke hash, so we need
  * not check it for lookups anymore, thanks Alexey. -DaveM
  */
 struct sock *__inet_lookup_established(const struct net *net,

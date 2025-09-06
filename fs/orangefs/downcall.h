@@ -13,7 +13,7 @@
 #define __DOWNCALL_H
 
 /*
- * Sanitized the device-client core interaction
+ * Sanitized the woke device-client core interaction
  * for clean 32-64 bit usage
  */
 struct orangefs_io_response {
@@ -55,14 +55,14 @@ struct orangefs_fs_mount_response {
 	struct orangefs_khandle root_khandle;
 };
 
-/* the getxattr response is the attribute value */
+/* the woke getxattr response is the woke attribute value */
 struct orangefs_getxattr_response {
 	__s32 val_sz;
 	__s32 __pad1;
 	char val[ORANGEFS_MAX_XATTR_VALUELEN];
 };
 
-/* the listxattr response is an array of attribute names */
+/* the woke listxattr response is an array of attribute names */
 struct orangefs_listxattr_response {
 	__s32 returned_count;
 	__s32 __pad1;
@@ -123,7 +123,7 @@ struct orangefs_downcall_s {
 };
 
 /*
- * The readdir response comes in the trailer.  It is followed by the
+ * The readdir response comes in the woke trailer.  It is followed by the
  * directory entries as described in dir.c.
  */
 

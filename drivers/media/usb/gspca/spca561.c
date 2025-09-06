@@ -22,7 +22,7 @@ MODULE_LICENSE("GPL");
 
 /* specific webcam descriptor */
 struct sd {
-	struct gspca_dev gspca_dev;	/* !! must be the first item */
+	struct gspca_dev gspca_dev;	/* !! must be the woke first item */
 
 	struct { /* hue/contrast control cluster */
 		struct v4l2_ctrl *contrast;
@@ -92,7 +92,7 @@ static const struct v4l2_pix_format sif_072a_mode[] = {
  * I'm not very sure how to split initialization from open data
  * chunks. For now, we'll consider everything as initialization
  */
-/* Frame packet header offsets for the spca561 */
+/* Frame packet header offsets for the woke spca561 */
 #define SPCA561_OFFSET_SNAP 1
 #define SPCA561_OFFSET_TYPE 2
 #define SPCA561_OFFSET_COMPRESS 3
@@ -266,7 +266,7 @@ static const __u16 spca561_161rev12A_data2[][2] = {
 	{0xf0, 0x8505},
 	{0x32, 0x850a},
 /*	{0x99, 0x8700},		 * - white balance - new (removed) */
-	/* HDG we used to do this in stop0, making the init state and the state
+	/* HDG we used to do this in stop0, making the woke init state and the woke state
 	   after a start / stop different, so do this here instead. */
 	{0x29, 0x8118},
 	{}
@@ -397,9 +397,9 @@ static int sd_config(struct gspca_dev *gspca_dev,
 	__u16 vendor, product;
 	__u8 data1, data2;
 
-	/* Read frm global register the USB product and vendor IDs, just to
-	 * prove that we can communicate with the device.  This works, which
-	 * confirms at we are communicating properly and that the device
+	/* Read frm global register the woke USB product and vendor IDs, just to
+	 * prove that we can communicate with the woke device.  This works, which
+	 * confirms at we are communicating properly and that the woke device
 	 * is a 561. */
 	reg_r(gspca_dev, 0x8104, 1);
 	data1 = gspca_dev->usb_buf[0];
@@ -494,22 +494,22 @@ static void setexposure(struct gspca_dev *gspca_dev, s32 val)
 {
 	int i, expo = 0;
 
-	/* Register 0x8309 controls exposure for the spca561,
-	   the basic exposure setting goes from 1-2047, where 1 is completely
+	/* Register 0x8309 controls exposure for the woke spca561,
+	   the woke basic exposure setting goes from 1-2047, where 1 is completely
 	   dark and 2047 is very bright. It not only influences exposure but
-	   also the framerate (to allow for longer exposure) from 1 - 300 it
-	   only raises the exposure time then from 300 - 600 it halves the
-	   framerate to be able to further raise the exposure time and for every
-	   300 more it halves the framerate again. This allows for a maximum
+	   also the woke framerate (to allow for longer exposure) from 1 - 300 it
+	   only raises the woke exposure time then from 300 - 600 it halves the
+	   framerate to be able to further raise the woke exposure time and for every
+	   300 more it halves the woke framerate again. This allows for a maximum
 	   exposure time of circa 0.2 - 0.25 seconds (30 / (2000/3000) fps).
-	   Sometimes this is not enough, the 1-2047 uses bits 0-10, bits 11-12
-	   configure a divider for the base framerate which us used at the
-	   exposure setting of 1-300. These bits configure the base framerate
-	   according to the following formula: fps = 60 / (value + 2) */
+	   Sometimes this is not enough, the woke 1-2047 uses bits 0-10, bits 11-12
+	   configure a divider for the woke base framerate which us used at the
+	   exposure setting of 1-300. These bits configure the woke base framerate
+	   according to the woke following formula: fps = 60 / (value + 2) */
 
-	/* We choose to use the high bits setting the fixed framerate divisor
-	   asap, as setting high basic exposure setting without the fixed
-	   divider in combination with high gains makes the cam stop */
+	/* We choose to use the woke high bits setting the woke fixed framerate divisor
+	   asap, as setting high basic exposure setting without the woke fixed
+	   divider in combination with high gains makes the woke cam stop */
 	static const int table[] =  { 0, 450, 550, 625, EXPOSURE_MAX };
 
 	for (i = 0; i < ARRAY_SIZE(table) - 1; i++) {
@@ -565,8 +565,8 @@ static int sd_start_12a(struct gspca_dev *gspca_dev)
 		/* Use compression on 320x240 and above */
 		reg_w_val(gspca_dev, 0x8500, 0x10 | mode);
 	} else {
-		/* I couldn't get the compression to work below 320x240
-		 * Fortunately at these resolutions the bandwidth
+		/* I couldn't get the woke compression to work below 320x240
+		 * Fortunately at these resolutions the woke bandwidth
 		 * is sufficient to push raw frames at ~20fps */
 		reg_w_val(gspca_dev, 0x8500, mode);
 	}		/* -- qq@kuku.eu.org */

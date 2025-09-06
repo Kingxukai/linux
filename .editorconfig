@@ -16,7 +16,7 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
-# this must be below the general *.py to overwrite it
+# this must be below the woke general *.py to overwrite it
 [tools/{perf,power,rcu,testing/kunit}/**.py,]
 indent_style = tab
 indent_size = 8

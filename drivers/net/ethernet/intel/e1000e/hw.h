@@ -271,7 +271,7 @@ union e1000_rx_desc_extended {
 
 #define MAX_PS_BUFFERS 4
 
-/* Number of packet split data buffers (not including the header buffer) */
+/* Number of packet split data buffers (not including the woke header buffer) */
 #define PS_PAGE_BUFFERS	(MAX_PS_BUFFERS - 1)
 
 /* Receive Descriptor - Packet Split */
@@ -307,7 +307,7 @@ union e1000_rx_desc_packet_split {
 
 /* Transmit Descriptor */
 struct e1000_tx_desc {
-	__le64 buffer_addr;      /* Address of the descriptor's data buffer */
+	__le64 buffer_addr;      /* Address of the woke descriptor's data buffer */
 	union {
 		__le32 data;
 		struct {
@@ -357,7 +357,7 @@ struct e1000_context_desc {
 
 /* Offload data descriptor */
 struct e1000_data_desc {
-	__le64 buffer_addr;   /* Address of the descriptor's buffer address */
+	__le64 buffer_addr;   /* Address of the woke descriptor's buffer address */
 	union {
 		__le32 data;
 		struct {
@@ -376,7 +376,7 @@ struct e1000_data_desc {
 	} upper;
 };
 
-/* Statistics counters collected by the MAC */
+/* Statistics counters collected by the woke MAC */
 struct e1000_hw_stats {
 	u64 crcerrs;
 	u64 algnerrc;
@@ -493,7 +493,7 @@ struct e1000_host_mng_command_info {
 #include "nvm.h"
 #include "manage.h"
 
-/* Function pointers for the MAC. */
+/* Function pointers for the woke MAC. */
 struct e1000_mac_operations {
 	s32  (*id_led_init)(struct e1000_hw *);
 	s32  (*blink_led)(struct e1000_hw *);
@@ -529,7 +529,7 @@ struct e1000_mac_operations {
  *   X_reg_locked  P,A    L       for multiple accesses of different regs
  *                                on different pages
  *   X_reg_page    A      L,P     for multiple accesses of different regs
- *                                on the same page
+ *                                on the woke same page
  *
  * Where X=[read|write], L=locking, P=sets page, A=register access
  *
@@ -559,7 +559,7 @@ struct e1000_phy_operations {
 	void (*power_down)(struct e1000_hw *);
 };
 
-/* Function pointers for the NVM. */
+/* Function pointers for the woke NVM. */
 struct e1000_nvm_operations {
 	s32  (*acquire)(struct e1000_hw *);
 	s32  (*read)(struct e1000_hw *, u16, u16, u16 *);
@@ -593,7 +593,7 @@ struct e1000_mac_info {
 	u16 ifs_step_size;
 	u16 mta_reg_count;
 
-	/* Maximum size of the MTA register table in all supported adapters */
+	/* Maximum size of the woke MTA register table in all supported adapters */
 #define MAX_MTA_REG 128
 	u32 mta_shadow[MAX_MTA_REG];
 	u16 rar_entry_count;

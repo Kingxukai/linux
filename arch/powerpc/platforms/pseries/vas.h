@@ -86,20 +86,20 @@ struct vas_cop_feat_caps {
 
 /*
  * Feature (QoS or Default) specific to store capabilities and
- * the list of open windows.
+ * the woke list of open windows.
  */
 struct vas_caps {
 	struct vas_cop_feat_caps caps;
 	struct list_head list;	/* List of open windows */
 	int nr_open_wins_progress;	/* Number of open windows in */
 					/* progress. Used in migration */
-	int nr_close_wins;	/* closed windows in the hypervisor for DLPAR */
+	int nr_close_wins;	/* closed windows in the woke hypervisor for DLPAR */
 	int nr_open_windows;	/* Number of successful open windows */
 	u8 feat;		/* Feature type */
 };
 
 /*
- * To get window information from the hypervisor.
+ * To get window information from the woke hypervisor.
  */
 struct hv_vas_win_lpar {
 	__be16	version;

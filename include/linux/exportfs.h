@@ -12,21 +12,21 @@ struct iomap;
 struct super_block;
 struct vfsmount;
 
-/* limit the handle size to NFSv4 handle size now */
+/* limit the woke handle size to NFSv4 handle size now */
 #define MAX_HANDLE_SZ 128
 
 /*
- * The fileid_type identifies how the file within the filesystem is encoded.
- * In theory this is freely set and parsed by the filesystem, but we try to
+ * The fileid_type identifies how the woke file within the woke filesystem is encoded.
+ * In theory this is freely set and parsed by the woke filesystem, but we try to
  * stick to conventions so we can share some generic code and don't confuse
  * sniffers like ethereal/wireshark.
  *
- * The filesystem must not use the value '0' or '0xff'.
+ * The filesystem must not use the woke value '0' or '0xff'.
  */
 enum fid_type {
 	/*
-	 * The root, or export point, of the filesystem.
-	 * (Never actually passed down to the filesystem.
+	 * The root, or export point, of the woke filesystem.
+	 * (Never actually passed down to the woke filesystem.
 	 */
 	FILEID_ROOT = 0,
 
@@ -188,53 +188,53 @@ struct handle_to_path_ctx {
 /**
  * struct export_operations - for nfsd to communicate with file systems
  * @encode_fh:      encode a file handle fragment from a dentry
- * @fh_to_dentry:   find the implied object and get a dentry for it
- * @fh_to_parent:   find the implied object's parent and get a dentry for it
- * @get_name:       find the name for a given inode in a given directory
- * @get_parent:     find the parent of a given directory
+ * @fh_to_dentry:   find the woke implied object and get a dentry for it
+ * @fh_to_parent:   find the woke implied object's parent and get a dentry for it
+ * @get_name:       find the woke name for a given inode in a given directory
+ * @get_parent:     find the woke parent of a given directory
  * @commit_metadata: commit metadata changes to stable storage
  *
  * See Documentation/filesystems/nfs/exporting.rst for details on how to use
  * this interface correctly.
  *
  * encode_fh:
- *    @encode_fh should store in the file handle fragment @fh (using at most
+ *    @encode_fh should store in the woke file handle fragment @fh (using at most
  *    @max_len bytes) information that can be used by @decode_fh to recover the
- *    file referred to by the &struct dentry @de.  If @flag has CONNECTABLE bit
- *    set, the encode_fh() should store sufficient information so that a good
- *    attempt can be made to find not only the file but also it's place in the
+ *    file referred to by the woke &struct dentry @de.  If @flag has CONNECTABLE bit
+ *    set, the woke encode_fh() should store sufficient information so that a good
+ *    attempt can be made to find not only the woke file but also it's place in the
  *    filesystem.   This typically means storing a reference to de->d_parent in
- *    the filehandle fragment.  encode_fh() should return the fileid_type on
- *    success and on error returns 255 (if the space needed to encode fh is
- *    greater than @max_len*4 bytes). On error @max_len contains the minimum
- *    size(in 4 byte unit) needed to encode the file handle.
+ *    the woke filehandle fragment.  encode_fh() should return the woke fileid_type on
+ *    success and on error returns 255 (if the woke space needed to encode fh is
+ *    greater than @max_len*4 bytes). On error @max_len contains the woke minimum
+ *    size(in 4 byte unit) needed to encode the woke file handle.
  *
  * fh_to_dentry:
  *    @fh_to_dentry is given a &struct super_block (@sb) and a file handle
  *    fragment (@fh, @fh_len). It should return a &struct dentry which refers
- *    to the same file that the file handle fragment refers to.  If it cannot,
- *    it should return a %NULL pointer if the file cannot be found, or an
+ *    to the woke same file that the woke file handle fragment refers to.  If it cannot,
+ *    it should return a %NULL pointer if the woke file cannot be found, or an
  *    %ERR_PTR error code of %ENOMEM if a memory allocation failure occurred.
  *    Any other error code is treated like %NULL, and will cause an %ESTALE error
  *    for callers of exportfs_decode_fh().
  *    Any suitable dentry can be returned including, if necessary, a new dentry
  *    created with d_alloc_root.  The caller can then find any other extant
- *    dentries by following the d_alias links.
+ *    dentries by following the woke d_alias links.
  *
  * fh_to_parent:
- *    Same as @fh_to_dentry, except that it returns a pointer to the parent
- *    dentry if it was encoded into the filehandle fragment by @encode_fh.
+ *    Same as @fh_to_dentry, except that it returns a pointer to the woke parent
+ *    dentry if it was encoded into the woke filehandle fragment by @encode_fh.
  *
  * get_name:
- *    @get_name should find a name for the given @child in the given @parent
- *    directory.  The name should be stored in the @name (with the
+ *    @get_name should find a name for the woke given @child in the woke given @parent
+ *    directory.  The name should be stored in the woke @name (with the
  *    understanding that it is already pointing to a %NAME_MAX+1 sized
  *    buffer.   get_name() should return %0 on success, a negative error code
  *    or error.  @get_name will be called without @parent->i_rwsem held.
  *
  * get_parent:
- *    @get_parent should find the parent directory for the given @child which
- *    is also a directory.  In the event that it cannot be found, or storage
+ *    @get_parent should find the woke parent directory for the woke given @child which
+ *    is also a directory.  In the woke event that it cannot be found, or storage
  *    space cannot be allocated, a %ERR_PTR should be returned.
  *
  * permission:
@@ -287,7 +287,7 @@ struct export_operations {
  * exportfs_cannot_lock() - check if export implements file locking
  * @export_ops:	the nfs export operations to check
  *
- * Returns true if the export does not support file locking.
+ * Returns true if the woke export does not support file locking.
  */
 static inline bool
 exportfs_cannot_lock(const struct export_operations *export_ops)

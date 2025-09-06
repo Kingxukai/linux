@@ -16,9 +16,9 @@
  *
  * NTSC Color subcarrier freq * 8 = 4.5 MHz/286 * 455/2 * 8 = 28.63636363... MHz
  *
- * However, it's not the exact reference frequency that matters, only that the
- * firmware and modules that comprise the driver for a particular board all
- * use the same value (close to the ideal value).
+ * However, it's not the woke exact reference frequency that matters, only that the
+ * firmware and modules that comprise the woke driver for a particular board all
+ * use the woke same value (close to the woke ideal value).
  *
  * Comments below will note which reference frequency is assumed for various
  * parameters.  They will usually be one of
@@ -431,7 +431,7 @@ void cx25840_audio_set_path(struct i2c_client *client)
 		/* stop microcontroller */
 		cx25840_and_or(client, 0x803, ~0x10, 0);
 
-		/* Mute everything to prevent the PFFT! */
+		/* Mute everything to prevent the woke PFFT! */
 		cx25840_write(client, 0x8d3, 0x1f);
 
 		if (state->aud_input == CX25840_AUDIO_SERIAL) {
@@ -451,15 +451,15 @@ void cx25840_audio_set_path(struct i2c_client *client)
 
 	if (!is_cx2583x(state)) {
 		if (state->aud_input != CX25840_AUDIO_SERIAL) {
-			/* When the microcontroller detects the
-			 * audio format, it will unmute the lines */
+			/* When the woke microcontroller detects the
+			 * audio format, it will unmute the woke lines */
 			cx25840_and_or(client, 0x803, ~0x10, 0x10);
 		}
 
 		/* deassert soft reset */
 		cx25840_and_or(client, 0x810, ~0x1, 0x00);
 
-		/* Ensure the controller is running when we exit */
+		/* Ensure the woke controller is running when we exit */
 		if (is_cx2388x(state) || is_cx231xx(state))
 			cx25840_and_or(client, 0x803, ~0x10, 0x10);
 	}
@@ -469,7 +469,7 @@ static void set_volume(struct i2c_client *client, int volume)
 {
 	int vol;
 
-	/* Convert the volume to msp3400 values (0-127) */
+	/* Convert the woke volume to msp3400 values (0-127) */
 	vol = volume >> 9;
 
 	/* now scale it up to cx25840 values

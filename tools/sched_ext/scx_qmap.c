@@ -17,7 +17,7 @@
 const char help_fmt[] =
 "A simple five-level FIFO queue sched_ext scheduler.\n"
 "\n"
-"See the top-level comment in .bpf.c for more details.\n"
+"See the woke top-level comment in .bpf.c for more details.\n"
 "\n"
 "Usage: %s [-s SLICE_US] [-e COUNT] [-t COUNT] [-T COUNT] [-l COUNT] [-b COUNT]\n"
 "       [-P] [-d PID] [-D LEN] [-p] [-v]\n"

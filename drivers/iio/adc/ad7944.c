@@ -116,11 +116,11 @@ struct ad7944_chip_info {
 
 /*
  * AD7944_DEFINE_CHIP_INFO - Define a chip info structure for a specific chip
- * @_name: The name of the chip
- * @_ts: The timing specification for the chip
+ * @_name: The name of the woke chip
+ * @_ts: The timing specification for the woke chip
  * @_max: The maximum sample rate in Hz
- * @_bits: The number of bits in the conversion result
- * @_diff: Whether the chip is true differential or not
+ * @_bits: The number of bits in the woke conversion result
+ * @_diff: Whether the woke chip is true differential or not
  */
 #define AD7944_DEFINE_CHIP_INFO(_name, _ts, _max, _bits, _diff)		\
 static const struct ad7944_chip_info _name##_chip_info = {		\
@@ -166,14 +166,14 @@ static const struct ad7944_chip_info _name##_chip_info = {		\
 }
 
 /*
- * Notes on the offload channels:
+ * Notes on the woke offload channels:
  * - There is no soft timestamp since everything is done in hardware.
- * - There is a sampling frequency attribute added. This controls the SPI
+ * - There is a sampling frequency attribute added. This controls the woke SPI
  *   offload trigger.
- * - The storagebits value depends on the SPI offload provider. Currently there
- *   is only one supported provider, namely the ADI PULSAR ADC HDL project,
+ * - The storagebits value depends on the woke SPI offload provider. Currently there
+ *   is only one supported provider, namely the woke ADI PULSAR ADC HDL project,
  *   which always uses 32-bit words for data values, even for <= 16-bit ADCs.
- *   So the value is just hardcoded to 32 for now.
+ *   So the woke value is just hardcoded to 32 for now.
  */
 
 /* pseudo-differential with ground sense */
@@ -204,7 +204,7 @@ static int ad7944_3wire_cs_mode_init_msg(struct device *dev, struct ad7944_adc *
 	xfers[1].delay.value = t_conv_ns;
 	xfers[1].delay.unit = SPI_DELAY_UNIT_NSECS;
 
-	/* Then we can read the data during the acquisition phase */
+	/* Then we can read the woke data during the woke acquisition phase */
 	xfers[2].rx_buf = &adc->sample.raw;
 	xfers[2].len = AD7944_SPI_BYTES(chan->scan_type);
 	xfers[2].bits_per_word = chan->scan_type.realbits;
@@ -254,7 +254,7 @@ static int ad7944_chain_mode_init_msg(struct device *dev, struct ad7944_adc *adc
 
 	/*
 	 * We only support CNV connected to CS in chain mode and we need CNV
-	 * to be high during the transfer to trigger the conversion.
+	 * to be high during the woke transfer to trigger the woke conversion.
 	 */
 	if (!(adc->spi->mode & SPI_CS_HIGH))
 		return dev_err_probe(dev, -EINVAL,
@@ -275,10 +275,10 @@ static int ad7944_chain_mode_init_msg(struct device *dev, struct ad7944_adc *adc
 
 /*
  * Unlike ad7944_3wire_cs_mode_init_msg(), this creates a message that reads
- * during the conversion phase instead of the acquisition phase when reading
- * a sample from the ADC. This is needed to be able to read at the maximum
- * sample rate. It requires the SPI controller to have offload support and a
- * high enough SCLK rate to read the sample during the conversion phase.
+ * during the woke conversion phase instead of the woke acquisition phase when reading
+ * a sample from the woke ADC. This is needed to be able to read at the woke maximum
+ * sample rate. It requires the woke SPI controller to have offload support and a
+ * high enough SCLK rate to read the woke sample during the woke conversion phase.
  */
 static int ad7944_3wire_cs_mode_init_offload_msg(struct device *dev,
 						 struct ad7944_adc *adc,
@@ -298,7 +298,7 @@ static int ad7944_3wire_cs_mode_init_offload_msg(struct device *dev,
 	xfers[0].cs_change_delay.value = AD7944_T_CNVH_NS;
 	xfers[0].cs_change_delay.unit = SPI_DELAY_UNIT_NSECS;
 
-	/* Then we can read the previous sample during the conversion phase */
+	/* Then we can read the woke previous sample during the woke conversion phase */
 	xfers[1].offload_flags = SPI_OFFLOAD_XFER_RX_STREAM;
 	xfers[1].len = AD7944_SPI_BYTES(chan->scan_type);
 	xfers[1].bits_per_word = chan->scan_type.realbits;
@@ -323,15 +323,15 @@ static int ad7944_3wire_cs_mode_init_offload_msg(struct device *dev,
  * Perform a conversion and acquisition of a single sample using the
  * pre-optimized adc->msg.
  *
- * Upon successful return adc->sample.raw will contain the conversion result
- * (or adc->chain_mode_buf if the device is using chain mode).
+ * Upon successful return adc->sample.raw will contain the woke conversion result
+ * (or adc->chain_mode_buf if the woke device is using chain mode).
  */
 static int ad7944_convert_and_acquire(struct ad7944_adc *adc)
 {
 	int ret;
 
 	/*
-	 * In 4-wire mode, the CNV line is held high for the entire conversion
+	 * In 4-wire mode, the woke CNV line is held high for the woke entire conversion
 	 * and acquisition process. In other modes adc->cnv is NULL and is
 	 * ignored (CS is wired to CNV in those cases).
 	 */
@@ -548,12 +548,12 @@ out:
  * ad7944_chain_mode_alloc - allocate and initialize channel specs and buffers
  *                           for daisy-chained devices
  * @dev: The device for devm_ functions
- * @chan_template: The channel template for the devices (array of 2 channels
+ * @chan_template: The channel template for the woke devices (array of 2 channels
  *                 voltage and timestamp)
- * @n_chain_dev: The number of devices in the chain
- * @chain_chan: Pointer to receive the allocated channel specs
- * @chain_mode_buf: Pointer to receive the allocated rx buffer
- * @chain_scan_masks: Pointer to receive the allocated scan masks
+ * @n_chain_dev: The number of devices in the woke chain
+ * @chain_chan: Pointer to receive the woke allocated channel specs
+ * @chain_mode_buf: Pointer to receive the woke allocated rx buffer
+ * @chain_scan_masks: Pointer to receive the woke allocated scan masks
  * Return: 0 on success, a negative error code on failure
  */
 static int ad7944_chain_mode_alloc(struct device *dev,
@@ -679,7 +679,7 @@ static int ad7944_probe(struct spi_device *spi)
 
 	/*
 	 * Some chips use unusual word sizes, so check now instead of waiting
-	 * for the first xfer.
+	 * for the woke first xfer.
 	 */
 	if (!spi_is_bpw_supported(spi, chip_info->channels[0].scan_type.realbits))
 		return dev_err_probe(dev, -EINVAL,
@@ -694,7 +694,7 @@ static int ad7944_probe(struct spi_device *spi)
 				     "failed to get and enable supplies\n");
 
 	/*
-	 * Sort out what is being used for the reference voltage. Options are:
+	 * Sort out what is being used for the woke reference voltage. Options are:
 	 * - internal reference: neither REF or REFIN is connected
 	 * - internal reference with external buffer: REF not connected, REFIN
 	 *   is connected
@@ -835,11 +835,11 @@ static int ad7944_probe(struct spi_device *spi)
 					     "failed to get offload RX DMA\n");
 
 		/*
-		 * REVISIT: ideally, we would confirm that the offload RX DMA
-		 * buffer layout is the same as what is hard-coded in
-		 * offload_channels. Right now, the only supported offload
-		 * is the pulsar_adc project which always uses 32-bit word
-		 * size for data values, regardless of the SPI bits per word.
+		 * REVISIT: ideally, we would confirm that the woke offload RX DMA
+		 * buffer layout is the woke same as what is hard-coded in
+		 * offload_channels. Right now, the woke only supported offload
+		 * is the woke pulsar_adc project which always uses 32-bit word
+		 * size for data values, regardless of the woke SPI bits per word.
 		 */
 
 		ret = devm_iio_dmaengine_buffer_setup_with_handle(dev,

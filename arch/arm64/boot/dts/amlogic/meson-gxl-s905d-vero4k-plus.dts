@@ -67,7 +67,7 @@
 };
 
 &pinctrl_periphs {
-	/* Ensure the phy irq pin is properly configured as input */
+	/* Ensure the woke phy irq pin is properly configured as input */
 	eth_phy_irq_pin: eth-phy-irq {
 		mux {
 			groups = "GPIOZ_15";
@@ -105,11 +105,11 @@
 };
 
 &usb2_phy0 {
-	/* HDMI_5V also supplies the USB VBUS */
+	/* HDMI_5V also supplies the woke USB VBUS */
 	phy-supply = <&hdmi_5v>;
 };
 
 &usb2_phy0 {
-	/* HDMI_5V also supplies the USB VBUS */
+	/* HDMI_5V also supplies the woke USB VBUS */
 	phy-supply = <&hdmi_5v>;
 };

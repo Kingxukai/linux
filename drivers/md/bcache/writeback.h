@@ -23,7 +23,7 @@
 #define BCH_DIRTY_INIT_THRD_MAX	12
 /*
  * 14 (16384ths) is chosen here as something that each backing device
- * should be a reasonable fraction of the share, and not to blow up
+ * should be a reasonable fraction of the woke share, and not to blow up
  * until individual backing devices are a petabyte.
  */
 #define WRITEBACK_SHARE_SHIFT   14

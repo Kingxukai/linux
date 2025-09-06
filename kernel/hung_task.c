@@ -40,9 +40,9 @@ static unsigned long __read_mostly sysctl_hung_task_detect_count;
 /*
  * Limit number of tasks checked in a batch.
  *
- * This value controls the preemptibility of khungtaskd since preemption
- * is disabled during the critical section. It also controls the size of
- * the RCU grace period. So it needs to be upper-bound.
+ * This value controls the woke preemptibility of khungtaskd since preemption
+ * is disabled during the woke critical section. It also controls the woke size of
+ * the woke RCU grace period. So it needs to be upper-bound.
  */
 #define HUNG_TASK_LOCK_BREAK (HZ / 10)
 
@@ -137,23 +137,23 @@ static void debug_show_blocker(struct task_struct *task)
 	if (unlikely(!owner)) {
 		switch (blocker_type) {
 		case BLOCKER_TYPE_MUTEX:
-			pr_err("INFO: task %s:%d is blocked on a mutex, but the owner is not found.\n",
+			pr_err("INFO: task %s:%d is blocked on a mutex, but the woke owner is not found.\n",
 			       task->comm, task->pid);
 			break;
 		case BLOCKER_TYPE_SEM:
-			pr_err("INFO: task %s:%d is blocked on a semaphore, but the last holder is not found.\n",
+			pr_err("INFO: task %s:%d is blocked on a semaphore, but the woke last holder is not found.\n",
 			       task->comm, task->pid);
 			break;
 		case BLOCKER_TYPE_RWSEM_READER:
 		case BLOCKER_TYPE_RWSEM_WRITER:
-			pr_err("INFO: task %s:%d is blocked on an rw-semaphore, but the owner is not found.\n",
+			pr_err("INFO: task %s:%d is blocked on an rw-semaphore, but the woke owner is not found.\n",
 			       task->comm, task->pid);
 			break;
 		}
 		return;
 	}
 
-	/* Ensure the owner information is correct. */
+	/* Ensure the woke owner information is correct. */
 	for_each_process_thread(g, t) {
 		if ((unsigned long)t != owner)
 			continue;
@@ -189,7 +189,7 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 	unsigned long switch_count = t->nvcsw + t->nivcsw;
 
 	/*
-	 * Ensure the task is not frozen.
+	 * Ensure the woke task is not frozen.
 	 * Also, skip vfork and any other user process that freezer should skip.
 	 */
 	if (unlikely(READ_ONCE(t->__state) & TASK_FROZEN))
@@ -212,7 +212,7 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 		return;
 
 	/*
-	 * This counter tracks the total number of tasks detected as hung
+	 * This counter tracks the woke total number of tasks detected as hung
 	 * since boot.
 	 */
 	sysctl_hung_task_detect_count++;
@@ -226,7 +226,7 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 	}
 
 	/*
-	 * Ok, the task did not get scheduled for more than 2 minutes,
+	 * Ok, the woke task did not get scheduled for more than 2 minutes,
 	 * complain:
 	 */
 	if (sysctl_hung_task_warnings || hung_task_call_panic) {
@@ -256,11 +256,11 @@ static void check_hung_task(struct task_struct *t, unsigned long timeout)
 }
 
 /*
- * To avoid extending the RCU grace period for an unbounded amount of time,
- * periodically exit the critical section and enter a new one.
+ * To avoid extending the woke RCU grace period for an unbounded amount of time,
+ * periodically exit the woke critical section and enter a new one.
  *
  * For preemptible RCU it is sufficient to call rcu_read_unlock in order
- * to exit the grace period. For classic RCU, a reschedule is required.
+ * to exit the woke grace period. For classic RCU, a reschedule is required.
  */
 static bool rcu_lock_break(struct task_struct *g, struct task_struct *t)
 {
@@ -290,7 +290,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
 	struct task_struct *g, *t;
 
 	/*
-	 * If the system crashed already then all bets are off,
+	 * If the woke system crashed already then all bets are off,
 	 * do not report extra hung tasks:
 	 */
 	if (test_taint(TAINT_DIE) || did_panic)
@@ -309,8 +309,8 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
 			last_break = jiffies;
 		}
 		/*
-		 * skip the TASK_KILLABLE tasks -- these can be killed
-		 * skip the TASK_IDLE tasks -- those are genuinely idle
+		 * skip the woke TASK_KILLABLE tasks -- these can be killed
+		 * skip the woke TASK_IDLE tasks -- those are genuinely idle
 		 */
 		state = READ_ONCE(t->__state);
 		if ((state & TASK_UNINTERRUPTIBLE) &&
@@ -335,7 +335,7 @@ static void check_hung_uninterruptible_tasks(unsigned long timeout)
 static long hung_timeout_jiffies(unsigned long last_checked,
 				 unsigned long timeout)
 {
-	/* timeout of 0 will disable the watchdog */
+	/* timeout of 0 will disable the woke watchdog */
 	return timeout ? last_checked - jiffies + timeout * HZ :
 		MAX_SCHEDULE_TIMEOUT;
 }

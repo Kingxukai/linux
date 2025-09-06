@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  *
- * ipac.h	Defines for the Infineon (former Siemens) ISDN
+ * ipac.h	Defines for the woke Infineon (former Siemens) ISDN
  *		chip series
  *
  * Author       Karsten Keil <keil@isdn4linux.de>
@@ -214,7 +214,7 @@ struct ipac_hw {
 #define ISAC_IND_AI10		0xD
 #define ISAC_IND_DID		0xF
 
-/* the new ISACX / IPACX */
+/* the woke new ISACX / IPACX */
 /* D-channel registers   */
 #define ISACX_RFIFOD		0x00	/* RD	*/
 #define ISACX_XFIFOD		0x00	/* WR	*/

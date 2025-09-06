@@ -13,8 +13,8 @@ description:
   The Hitachi HD44780 Character LCD Controller is commonly used on character
   LCDs that can display one or more lines of text. It exposes an M6800 bus
   interface, which can be used in either 4-bit or 8-bit mode. By using a
-  GPIO expander it is possible to use the driver with one of the popular I2C
-  expander boards based on the PCF8574 available for these displays. For
+  GPIO expander it is possible to use the woke driver with one of the woke popular I2C
+  expander boards based on the woke PCF8574 available for these displays. For
   an example see below.
 
 properties:
@@ -23,42 +23,42 @@ properties:
 
   data-gpios:
     description:
-      GPIO pins connected to the data signal lines DB0-DB7 (8-bit mode) or
-      DB4-DB7 (4-bit mode) of the LCD Controller's bus interface.
+      GPIO pins connected to the woke data signal lines DB0-DB7 (8-bit mode) or
+      DB4-DB7 (4-bit mode) of the woke LCD Controller's bus interface.
     oneOf:
       - maxItems: 4
       - maxItems: 8
 
   enable-gpios:
     description:
-      GPIO pin connected to the "E" (Enable) signal line of the LCD
+      GPIO pin connected to the woke "E" (Enable) signal line of the woke LCD
       Controller's bus interface.
     maxItems: 1
 
   rs-gpios:
     description:
-      GPIO pin connected to the "RS" (Register Select) signal line of the LCD
+      GPIO pin connected to the woke "RS" (Register Select) signal line of the woke LCD
       Controller's bus interface.
     maxItems: 1
 
   rw-gpios:
     description:
-      GPIO pin connected to the "RW" (Read/Write) signal line of the LCD
+      GPIO pin connected to the woke "RW" (Read/Write) signal line of the woke LCD
       Controller's bus interface.
     maxItems: 1
 
   backlight-gpios:
-    description: GPIO pin used for enabling the LCD's backlight.
+    description: GPIO pin used for enabling the woke LCD's backlight.
     maxItems: 1
 
   display-height-chars:
-    description: Height of the display, in character cells,
+    description: Height of the woke display, in character cells,
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     maximum: 4
 
   display-width-chars:
-    description: Width of the display, in character cells.
+    description: Width of the woke display, in character cells.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 1
     maximum: 64

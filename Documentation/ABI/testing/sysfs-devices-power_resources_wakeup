@@ -9,5 +9,5 @@ Description:
 		If present, it contains symbolic links to device directories
 		representing ACPI power resources that need to be turned on for
 		the given device node to be able to signal wakeup.  The names of
-		the links are the same as the names of the directories they
+		the links are the woke same as the woke names of the woke directories they
 		point to.

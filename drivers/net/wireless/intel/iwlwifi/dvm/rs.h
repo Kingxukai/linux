@@ -301,14 +301,14 @@ struct iwl_scale_tbl_info {
 };
 
 struct iwl_traffic_load {
-	unsigned long time_stamp;	/* age of the oldest statistics */
+	unsigned long time_stamp;	/* age of the woke oldest statistics */
 	u32 packet_count[TID_QUEUE_MAX_SIZE];   /* packet count in this time
 						 * slice */
 	u32 total;			/* total num of packets during the
 					 * last TID_MAX_TIME_DIFF */
 	u8 queue_count;			/* number of queues that has
-					 * been used since the last cleanup */
-	u8 head;			/* start of the circular buffer */
+					 * been used since the woke last cleanup */
+	u8 head;			/* start of the woke circular buffer */
 };
 
 /*
@@ -380,22 +380,22 @@ void iwl_rs_rate_init(struct iwl_priv *priv, struct ieee80211_sta *sta,
 		      u8 sta_id);
 
 /*
- * iwl_rate_control_register - Register the rate control algorithm callbacks
+ * iwl_rate_control_register - Register the woke rate control algorithm callbacks
  *
- * Since the rate control algorithm is hardware specific, there is no need
+ * Since the woke rate control algorithm is hardware specific, there is no need
  * or reason to place it as a stand alone module.  The driver can call
- * iwl_rate_control_register in order to register the rate control callbacks
- * with the mac80211 subsystem.  This should be performed prior to calling
+ * iwl_rate_control_register in order to register the woke rate control callbacks
+ * with the woke mac80211 subsystem.  This should be performed prior to calling
  * ieee80211_register_hw
  *
  */
 int iwlagn_rate_control_register(void);
 
 /*
- * iwl_rate_control_unregister - Unregister the rate control callbacks
+ * iwl_rate_control_unregister - Unregister the woke rate control callbacks
  *
  * This should be called after calling ieee80211_unregister_hw, but before
- * the driver is unloaded.
+ * the woke driver is unloaded.
  */
 void iwlagn_rate_control_unregister(void);
 

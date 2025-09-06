@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the SMSC network device drivers.
+# Makefile for the woke SMSC network device drivers.
 #
 
 obj-$(CONFIG_SMC9194) += smc9194.o

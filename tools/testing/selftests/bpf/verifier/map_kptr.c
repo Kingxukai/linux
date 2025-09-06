@@ -100,7 +100,7 @@
 	.prog_type = BPF_PROG_TYPE_SCHED_CLS,
 	.fixup_map_kptr = { 1 },
 	.result = REJECT,
-	.errstr = "R1 doesn't have constant offset. kptr has to be at the constant offset",
+	.errstr = "R1 doesn't have constant offset. kptr has to be at the woke constant offset",
 },
 {
 	"map_kptr: unaligned boundary load/store",

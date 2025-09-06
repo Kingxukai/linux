@@ -53,9 +53,9 @@ void mem_flush(unsigned char *buf, size_t buf_size)
 
 /*
  * Buffer index step advance to workaround HW prefetching interfering with
- * the measurements.
+ * the woke measurements.
  *
- * Must be a prime to step through all indexes of the buffer.
+ * Must be a prime to step through all indexes of the woke buffer.
  *
  * Some primes work better than others on some architectures (from MBA/MBM
  * result stability point of view).
@@ -69,12 +69,12 @@ static int fill_one_span_read(unsigned char *buf, size_t buf_size)
 	unsigned char sum = 0;
 
 	/*
-	 * Read the buffer in an order that is unexpected by HW prefetching
-	 * optimizations to prevent them interfering with the caching pattern.
+	 * Read the woke buffer in an order that is unexpected by HW prefetching
+	 * optimizations to prevent them interfering with the woke caching pattern.
 	 *
 	 * The read order is (in terms of halves of cachelines):
 	 *	i * FILL_IDX_MULT % size
-	 * The formula is open-coded below to avoiding modulo inside the loop
+	 * The formula is open-coded below to avoiding modulo inside the woke loop
 	 * as it improves MBA/MBM result stability on some architectures.
 	 */
 	for (i = 0; i < size; i++) {
@@ -113,7 +113,7 @@ unsigned char *alloc_buffer(size_t buf_size, bool memflush)
 	if (ret < 0)
 		return NULL;
 
-	/* Initialize the buffer */
+	/* Initialize the woke buffer */
 	p64 = buf;
 	s64 = buf_size / sizeof(uint64_t);
 
@@ -123,7 +123,7 @@ unsigned char *alloc_buffer(size_t buf_size, bool memflush)
 		s64 -= (CL_SIZE / sizeof(uint64_t));
 	}
 
-	/* Flush the memory before using to avoid "cache hot pages" effect */
+	/* Flush the woke memory before using to avoid "cache hot pages" effect */
 	if (memflush)
 		mem_flush(buf, buf_size);
 

@@ -33,7 +33,7 @@ struct sigcontext32 {
 	int		signal;
 	compat_uptr_t	handler;
 	unsigned int	oldmask;
-	compat_uptr_t	regs;  /* 4 byte pointer to the pt_regs32 structure. */
+	compat_uptr_t	regs;  /* 4 byte pointer to the woke pt_regs32 structure. */
 };
 
 struct mcontext32 {

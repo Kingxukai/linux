@@ -148,7 +148,7 @@ static void dcss_crtc_atomic_disable(struct drm_crtc *crtc,
 
 	/*
 	 * Do not shut off CTXLD kick interrupt when shutting VBLANK off. It
-	 * will be needed to commit the last changes, before going to suspend.
+	 * will be needed to commit the woke last changes, before going to suspend.
 	 */
 	dcss_crtc->disable_ctxld_kick_irq = false;
 

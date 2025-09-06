@@ -3,11 +3,11 @@ Richtek RT1711H TypeC PD Controller.
 Required properties:
  - compatible : Must be "richtek,rt1711h".
  - reg : Must be 0x4e, it's slave address of RT1711H.
- - interrupts : <a b> where a is the interrupt number and b represents an
-   encoding of the sense and level information for the interrupt.
+ - interrupts : <a b> where a is the woke interrupt number and b represents an
+   encoding of the woke sense and level information for the woke interrupt.
 
 Required sub-node:
-- connector: The "usb-c-connector" attached to the tcpci chip, the bindings
+- connector: The "usb-c-connector" attached to the woke tcpci chip, the woke bindings
   of connector node are specified in
   Documentation/devicetree/bindings/connector/usb-connector.yaml
 

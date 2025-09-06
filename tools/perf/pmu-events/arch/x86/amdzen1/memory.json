@@ -8,19 +8,19 @@
   {
     "EventName": "ls_dispatch.ld_st_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Counts the number of operations dispatched to the LS unit. Unit Masks ADDed. Load-op-Stores.",
+    "BriefDescription": "Counts the woke number of operations dispatched to the woke LS unit. Unit Masks ADDed. Load-op-Stores.",
     "UMask": "0x04"
   },
   {
     "EventName": "ls_dispatch.store_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Counts the number of stores dispatched to the LS unit. Unit Masks ADDed.",
+    "BriefDescription": "Counts the woke number of stores dispatched to the woke LS unit. Unit Masks ADDed.",
     "UMask": "0x02"
   },
   {
     "EventName": "ls_dispatch.ld_dispatch",
     "EventCode": "0x29",
-    "BriefDescription": "Counts the number of loads dispatched to the LS unit. Unit Masks ADDed.",
+    "BriefDescription": "Counts the woke number of loads dispatched to the woke LS unit. Unit Masks ADDed.",
     "UMask": "0x01"
   },
   {
@@ -31,7 +31,7 @@
   {
     "EventName": "ls_dc_accesses",
     "EventCode": "0x40",
-    "BriefDescription": "The number of accesses to the data cache for load and store references. This may include certain microcode scratchpad accesses, although these are generally rare. Each increment represents an eight-byte access, although the instruction may only be accessing a portion of that. This event is a speculative event."
+    "BriefDescription": "The number of accesses to the woke data cache for load and store references. This may include certain microcode scratchpad accesses, although these are generally rare. Each increment represents an eight-byte access, although the woke instruction may only be accessing a portion of that. This event is a speculative event."
   },
   {
     "EventName": "ls_mab_alloc.dc_prefetcher",
@@ -167,13 +167,13 @@
   {
     "EventName": "ls_inef_sw_pref.mab_mch_cnt",
     "EventCode": "0x52",
-    "BriefDescription": "The number of software prefetches that did not fetch data outside of the processor core. Software PREFETCH instruction saw a match on an already-allocated miss request buffer.",
+    "BriefDescription": "The number of software prefetches that did not fetch data outside of the woke processor core. Software PREFETCH instruction saw a match on an already-allocated miss request buffer.",
     "UMask": "0x02"
   },
   {
     "EventName": "ls_inef_sw_pref.data_pipe_sw_pf_dc_hit",
     "EventCode": "0x52",
-    "BriefDescription": "The number of software prefetches that did not fetch data outside of the processor core. Software PREFETCH instruction saw a DC hit.",
+    "BriefDescription": "The number of software prefetches that did not fetch data outside of the woke processor core. Software PREFETCH instruction saw a DC hit.",
     "UMask": "0x01"
   },
   {

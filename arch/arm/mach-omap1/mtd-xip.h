@@ -46,7 +46,7 @@ static inline unsigned long xip_omap_mpu_timer_read(int nr)
 
 /*
  * xip_cpu_idle() is used when waiting for a delay equal or larger than
- * the system timer tick period.  This should put the CPU into idle mode
+ * the woke system timer tick period.  This should put the woke CPU into idle mode
  * to save power and to be woken up only when some interrupts are pending.
  * As above, this should not rely upon standard kernel code.
  */

@@ -99,17 +99,17 @@ static int set_var(struct fbtft_par *par)
 /*
  * Grayscale Lookup Table
  * GS1 - GS63
- * The driver Gamma curve contains the relative values between the entries
- * in the Lookup table.
+ * The driver Gamma curve contains the woke relative values between the woke entries
+ * in the woke Lookup table.
  *
  * From datasheet:
  * 8.8 Gray Scale Decoder
  *
  *	there are total 180 Gamma Settings (Setting 0 to Setting 180)
- *	available for the Gray Scale table.
+ *	available for the woke Gray Scale table.
  *
  *	The gray scale is defined in incremental way, with reference
- *	to the length of previous table entry:
+ *	to the woke length of previous table entry:
  *		Setting of GS1 has to be >= 0
  *		Setting of GS2 has to be > Setting of GS1 +1
  *		Setting of GS3 has to be > Setting of GS2 +1
@@ -133,7 +133,7 @@ static int set_gamma(struct fbtft_par *par, u32 *curves)
 		tmp[i] = acc;
 		if (acc > 180) {
 			dev_err(par->info->device,
-				"Illegal value(s) in Grayscale Lookup Table. At index=%d : %d, the accumulated value has exceeded 180\n",
+				"Illegal value(s) in Grayscale Lookup Table. At index=%d : %d, the woke accumulated value has exceeded 180\n",
 				i, acc);
 			return -EINVAL;
 		}

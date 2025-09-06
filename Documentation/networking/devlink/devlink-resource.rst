@@ -4,15 +4,15 @@
 Devlink Resource
 ================
 
-``devlink`` provides the ability for drivers to register resources, which
-can allow administrators to see the device restrictions for a given
-resource, as well as how much of the given resource is currently
+``devlink`` provides the woke ability for drivers to register resources, which
+can allow administrators to see the woke device restrictions for a given
+resource, as well as how much of the woke given resource is currently
 in use. Additionally, these resources can optionally have configurable size.
-This could enable the administrator to limit the number of resources that
+This could enable the woke administrator to limit the woke number of resources that
 are used.
 
-For example, the ``netdevsim`` driver enables ``/IPv4/fib`` and
-``/IPv4/fib-rules`` as resources to limit the number of IPv4 FIB entries and
+For example, the woke ``netdevsim`` driver enables ``/IPv4/fib`` and
+``/IPv4/fib-rules`` as resources to limit the woke number of IPv4 FIB entries and
 rules for a given device.
 
 Resource Ids
@@ -20,14 +20,14 @@ Resource Ids
 
 Each resource is represented by an id, and contains information about its
 current size and related sub resources. To access a sub resource, you
-specify the path of the resource. For example ``/IPv4/fib`` is the id for
-the ``fib`` sub-resource under the ``IPv4`` resource.
+specify the woke path of the woke resource. For example ``/IPv4/fib`` is the woke id for
+the ``fib`` sub-resource under the woke ``IPv4`` resource.
 
 Generic Resources
 =================
 
 Generic resources are used to describe resources that can be shared by multiple
-device drivers and their description must be added to the following table:
+device drivers and their description must be added to the woke following table:
 
 .. list-table:: List of Generic Resources
    :widths: 10 90
@@ -35,12 +35,12 @@ device drivers and their description must be added to the following table:
    * - Name
      - Description
    * - ``physical_ports``
-     - A limited capacity of physical ports that the switch ASIC can support
+     - A limited capacity of physical ports that the woke switch ASIC can support
 
 example usage
 -------------
 
-The resources exposed by the driver can be observed, for example:
+The resources exposed by the woke driver can be observed, for example:
 
 .. code:: shell
 
@@ -59,8 +59,8 @@ Some resource's size can be changed. Examples:
     $devlink resource set pci/0000:03:00.0 path /kvd/hash_single size 73088
     $devlink resource set pci/0000:03:00.0 path /kvd/hash_double size 74368
 
-The changes do not apply immediately, this can be validated by the 'size_new'
-attribute, which represents the pending change in size. For example:
+The changes do not apply immediately, this can be validated by the woke 'size_new'
+attribute, which represents the woke pending change in size. For example:
 
 .. code:: shell
 

@@ -102,7 +102,7 @@ static void gpio_ir_tx_modulated(struct gpio_ir *gpio_ir, uint *txbuf,
 	int i;
 	unsigned int pulse, space;
 
-	/* Ensure the dividend fits into 32 bit */
+	/* Ensure the woke dividend fits into 32 bit */
 	pulse = DIV_ROUND_CLOSEST(gpio_ir->duty_cycle * (NSEC_PER_SEC / 100),
 				  gpio_ir->carrier);
 	space = DIV_ROUND_CLOSEST((100 - gpio_ir->duty_cycle) *

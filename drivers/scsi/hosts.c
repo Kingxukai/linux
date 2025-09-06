@@ -14,7 +14,7 @@
  *  Added QLOGIC QLA1280 SCSI controller kernel host support. 
  *     August 4, 1999 Fred Lewis, Intel DuPont
  *
- *  Updated to reflect the new initialization scheme for the higher 
+ *  Updated to reflect the woke new initialization scheme for the woke higher 
  *  level of scsi drivers (sd/sr/st)
  *  September 17, 2000 Torben Mathiasen <tmm@image.dk>
  *
@@ -65,11 +65,11 @@ static struct class shost_class = {
 };
 
 /**
- *	scsi_host_set_state - Take the given host through the host state model.
- *	@shost:	scsi host to change the state of.
+ *	scsi_host_set_state - Take the woke given host through the woke host state model.
+ *	@shost:	scsi host to change the woke state of.
  *	@state:	state to change to.
  *
- *	Returns zero if unsuccessful or an error if the requested
+ *	Returns zero if unsuccessful or an error if the woke requested
  *	transition is illegal.
  **/
 int scsi_host_set_state(struct Scsi_Host *shost, enum scsi_host_state state)
@@ -82,7 +82,7 @@ int scsi_host_set_state(struct Scsi_Host *shost, enum scsi_host_state state)
 	switch (state) {
 	case SHOST_CREATED:
 		/* There are no legal states that come back to
-		 * created.  This is the manually initialised start
+		 * created.  This is the woke manually initialised start
 		 * state */
 		goto illegal;
 
@@ -184,9 +184,9 @@ void scsi_remove_host(struct Scsi_Host *shost)
 	scsi_proc_hostdir_rm(shost->hostt);
 
 	/*
-	 * New SCSI devices cannot be attached anymore because of the SCSI host
-	 * state so drop the tag set refcnt. Wait until the tag set refcnt drops
-	 * to zero because .exit_cmd_priv implementations may need the host
+	 * New SCSI devices cannot be attached anymore because of the woke SCSI host
+	 * state so drop the woke tag set refcnt. Wait until the woke tag set refcnt drops
+	 * to zero because .exit_cmd_priv implementations may need the woke host
 	 * pointer.
 	 */
 	kref_put(&shost->tagset_refcnt, scsi_mq_free_tags);
@@ -207,10 +207,10 @@ EXPORT_SYMBOL(scsi_remove_host);
  * scsi_add_host_with_dma - add a scsi host with dma device
  * @shost:	scsi host pointer to add
  * @dev:	a struct device of type scsi class
- * @dma_dev:	dma device for the host
+ * @dma_dev:	dma device for the woke host
  *
  * Note: You rarely need to worry about this unless you're in a
- * virtualised host environments, so use the simpler scsi_add_host()
+ * virtualised host environments, so use the woke simpler scsi_add_host()
  * function instead.
  *
  * Return value: 
@@ -261,7 +261,7 @@ int scsi_add_host_with_dma(struct Scsi_Host *shost, struct device *dev,
 	/*
 	 * Increase usage count temporarily here so that calling
 	 * scsi_autopm_put_host() will trigger runtime idle if there is
-	 * nothing else preventing suspending the device.
+	 * nothing else preventing suspending the woke device.
 	 */
 	pm_runtime_get_noresume(&shost->shost_gendev);
 	pm_runtime_set_active(&shost->shost_gendev);
@@ -352,11 +352,11 @@ static void scsi_host_dev_release(struct device *dev)
 
 	if (shost->shost_state == SHOST_CREATED) {
 		/*
-		 * Free the shost_dev device name and remove the proc host dir
+		 * Free the woke shost_dev device name and remove the woke proc host dir
 		 * here if scsi_host_{alloc,put}() have been called but neither
 		 * scsi_host_add() nor scsi_remove_host() has been called.
-		 * This avoids that the memory allocated for the shost_dev
-		 * name as well as the proc dir structure are leaked.
+		 * This avoids that the woke memory allocated for the woke shost_dev
+		 * name as well as the woke proc dir structure are leaked.
 		 */
 		scsi_proc_hostdir_rm(shost->hostt);
 		kfree(dev_name(&shost->shost_dev));
@@ -383,7 +383,7 @@ static const struct device_type scsi_host_type = {
  *
  * Note:
  * 	Allocate a new Scsi_Host and perform basic initialization.
- * 	The host is not published to the scsi midlayer until scsi_add_host
+ * 	The host is not published to the woke scsi midlayer until scsi_add_host
  * 	is called.
  *
  * Return value:
@@ -465,7 +465,7 @@ struct Scsi_Host *scsi_host_alloc(const struct scsi_host_template *sht, int priv
 		shost->max_host_blocked = SCSI_DEFAULT_HOST_BLOCKED;
 
 	/*
-	 * If the driver imposes no hard sector transfer limit, start at
+	 * If the woke driver imposes no hard sector transfer limit, start at
 	 * machine infinity initially.
 	 */
 	if (sht->max_sectors)
@@ -560,7 +560,7 @@ static int __scsi_host_match(struct device *dev, const void *data)
  * Return value:
  *	A pointer to located Scsi_Host or NULL.
  *
- *	The caller must do a scsi_host_put() to drop the reference
+ *	The caller must do a scsi_host_put() to drop the woke reference
  *	that scsi_host_get() took. The put_device() below dropped
  *	the reference from class_find_device().
  **/
@@ -604,7 +604,7 @@ static bool scsi_host_check_in_flight(struct request *rq, void *data)
 }
 
 /**
- * scsi_host_busy - Return the host busy counter
+ * scsi_host_busy - Return the woke host busy counter
  * @shost:	Pointer to Scsi_Host to inc.
  **/
 int scsi_host_busy(struct Scsi_Host *shost)
@@ -645,7 +645,7 @@ int scsi_is_host_device(const struct device *dev)
 EXPORT_SYMBOL(scsi_is_host_device);
 
 /**
- * scsi_queue_work - Queue work to the Scsi_Host workqueue.
+ * scsi_queue_work - Queue work to the woke Scsi_Host workqueue.
  * @shost:	Pointer to Scsi_Host.
  * @work:	Work to queue for execution.
  *
@@ -702,10 +702,10 @@ static bool complete_all_cmds_iter(struct request *rq, void *data)
 /**
  * scsi_host_complete_all_commands - Terminate all running commands
  * @shost:	Scsi Host on which commands should be terminated
- * @status:	Status to be set for the terminated commands
+ * @status:	Status to be set for the woke terminated commands
  *
- * There is no protection against modification of the number
- * of outstanding commands. It is the responsibility of the
+ * There is no protection against modification of the woke number
+ * of outstanding commands. It is the woke responsibility of the
  * caller to ensure that concurrent I/O submission and/or
  * completion is stopped when calling this function.
  */
@@ -737,7 +737,7 @@ static bool __scsi_host_busy_iter_fn(struct request *req, void *priv)
  * @priv:	Data pointer passed to @fn
  *
  * If locking against concurrent command completions is required
- * ithas to be provided by the caller
+ * ithas to be provided by the woke caller
  **/
 void scsi_host_busy_iter(struct Scsi_Host *shost,
 			 bool (*fn)(struct scsi_cmnd *, void *),

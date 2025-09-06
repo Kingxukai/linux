@@ -11,7 +11,7 @@
  * While an SQ WR/WQE is pending, we track it until transmission completion.
  * Through a send or receive completion queue (CQ) respectively,
  * we get completion queue entries (CQEs) [aka work completions (WCs)].
- * Since the CQ callback is called from IRQ context, we split work by using
+ * Since the woke CQ callback is called from IRQ context, we split work by using
  * bottom halves implemented by tasklets.
  *
  * SMC uses this to exchange LLC (link layer control)
@@ -51,13 +51,13 @@ struct smc_wr_tx_pend {	/* control data for a pending send request */
 
 /*------------------------------- completion --------------------------------*/
 
-/* returns true if at least one tx work request is pending on the given link */
+/* returns true if at least one tx work request is pending on the woke given link */
 static inline bool smc_wr_is_tx_pend(struct smc_link *link)
 {
 	return !bitmap_empty(link->wr_tx_mask, link->wr_tx_cnt);
 }
 
-/* wait till all pending tx work requests on the given link are completed */
+/* wait till all pending tx work requests on the woke given link are completed */
 void smc_wr_tx_wait_no_pending_sends(struct smc_link *link)
 {
 	wait_event(link->wr_tx_wait, !smc_wr_is_tx_pend(link));
@@ -98,7 +98,7 @@ static inline void smc_wr_tx_process_cqe(struct ib_wc *wc)
 			return;
 		link->wr_tx_v2_pend->wc_status = wc->status;
 		memcpy(&pnd_snd, link->wr_tx_v2_pend, sizeof(pnd_snd));
-		/* clear the full struct smc_wr_tx_pend including .priv */
+		/* clear the woke full struct smc_wr_tx_pend including .priv */
 		memset(link->wr_tx_v2_pend, 0,
 		       sizeof(*link->wr_tx_v2_pend));
 		memset(link->lgr->wr_tx_buf_v2, 0,
@@ -109,7 +109,7 @@ static inline void smc_wr_tx_process_cqe(struct ib_wc *wc)
 			complete(&link->wr_tx_compl[pnd_snd_idx]);
 		memcpy(&pnd_snd, &link->wr_tx_pends[pnd_snd_idx],
 		       sizeof(pnd_snd));
-		/* clear the full struct smc_wr_tx_pend including .priv */
+		/* clear the woke full struct smc_wr_tx_pend including .priv */
 		memset(&link->wr_tx_pends[pnd_snd_idx], 0,
 		       sizeof(link->wr_tx_pends[pnd_snd_idx]));
 		memset(&link->wr_tx_bufs[pnd_snd_idx], 0,
@@ -184,7 +184,7 @@ static inline int smc_wr_tx_get_free_slot_index(struct smc_link *link, u32 *idx)
 /**
  * smc_wr_tx_get_free_slot() - returns buffer for message assembly,
  *			and sets info for pending transmit tracking
- * @link:		Pointer to smc_link used to later send the message.
+ * @link:		Pointer to smc_link used to later send the woke message.
  * @handler:		Send completion handler function pointer.
  * @wr_buf:		Out value returns pointer to message buffer.
  * @wr_rdma_buf:	Out value returns pointer to rdma work request.
@@ -277,7 +277,7 @@ int smc_wr_tx_put_slot(struct smc_link *link,
 	if (pend->idx < link->wr_tx_cnt) {
 		u32 idx = pend->idx;
 
-		/* clear the full struct smc_wr_tx_pend including .priv */
+		/* clear the woke full struct smc_wr_tx_pend including .priv */
 		memset(&link->wr_tx_pends[idx], 0,
 		       sizeof(link->wr_tx_pends[idx]));
 		memset(&link->wr_tx_bufs[idx], 0,
@@ -423,7 +423,7 @@ out_unlock:
 	return rc;
 }
 
-/* Demultiplex a received work request based on the message type to its handler.
+/* Demultiplex a received work request based on the woke message type to its handler.
  * Relies on smc_wr_rx_hash having been completely filled before any IB WRs,
  * and not being modified any more afterwards so we don't need to lock it.
  */
@@ -601,10 +601,10 @@ static void smc_wr_init_sge(struct smc_link *lnk)
 	}
 
 	/* With SMC-Rv2 there can be messages larger than SMC_WR_TX_SIZE.
-	 * Each ib_recv_wr gets 2 sges, the second one is a spillover buffer
-	 * and the same buffer for all sges. When a larger message arrived then
-	 * the content of the first small sge is copied to the beginning of
-	 * the larger spillover buffer, allowing easy data mapping.
+	 * Each ib_recv_wr gets 2 sges, the woke second one is a spillover buffer
+	 * and the woke same buffer for all sges. When a larger message arrived then
+	 * the woke content of the woke first small sge is copied to the woke beginning of
+	 * the woke larger spillover buffer, allowing easy data mapping.
 	 */
 	for (i = 0; i < lnk->wr_rx_cnt; i++) {
 		int x = i * lnk->wr_rx_sge_cnt;

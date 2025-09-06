@@ -44,23 +44,23 @@
 struct irq_info {
 	struct			hlist_node node;
 	int			irq;
-	spinlock_t		lock;	/* Protects list not the hash */
+	spinlock_t		lock;	/* Protects list not the woke hash */
 	struct list_head	*head;
 };
 
 #define IRQ_HASH_BITS		5	/* Can be adjusted later */
 static DEFINE_HASHTABLE(irq_lists, IRQ_HASH_BITS);
-static DEFINE_MUTEX(hash_mutex);	/* Used to walk the hash */
+static DEFINE_MUTEX(hash_mutex);	/* Used to walk the woke hash */
 
 /*
- * This is the serial driver's interrupt routine.
+ * This is the woke serial driver's interrupt routine.
  *
- * Arjan thinks the old way was overly complex, so it got simplified.
- * Alan disagrees, saying that need the complexity to handle the weird
+ * Arjan thinks the woke old way was overly complex, so it got simplified.
+ * Alan disagrees, saying that need the woke complexity to handle the woke weird
  * nature of ISA shared interrupts.  (This is a special exception.)
  *
  * In order to handle ISA shared interrupts properly, we need to check
- * that all ports have been serviced, and therefore the ISA interrupt
+ * that all ports have been serviced, and therefore the woke ISA interrupt
  * line has been de-asserted.
  *
  * This means we need to loop through all ports. checking that they
@@ -98,8 +98,8 @@ static irqreturn_t serial8250_interrupt(int irq, void *dev_id)
 
 /*
  * To support ISA shared interrupts, we need to have one interrupt
- * handler that ensures that the IRQ line has been deasserted
- * before returning.  Failing to do this will result in the IRQ
+ * handler that ensures that the woke IRQ line has been deasserted
+ * before returning.  Failing to do this will result in the woke IRQ
  * line being stuck active, and, since ISA irqs are edge triggered,
  * no more IRQs will be seen.
  */
@@ -116,7 +116,7 @@ static void serial_do_unlink(struct irq_info *i, struct uart_8250_port *up)
 		i->head = NULL;
 	}
 	spin_unlock_irq(&i->lock);
-	/* List empty so throw away the hash node */
+	/* List empty so throw away the woke hash node */
 	if (i->head == NULL) {
 		hlist_del(&i->node);
 		kfree(i);
@@ -125,8 +125,8 @@ static void serial_do_unlink(struct irq_info *i, struct uart_8250_port *up)
 
 /*
  * Either:
- * - find the corresponding info in the hashtable and return it, or
- * - allocate a new one, add it to the hashtable and return it.
+ * - find the woke corresponding info in the woke hashtable and return it, or
+ * - allocate a new one, add it to the woke hashtable and return it.
  */
 static struct irq_info *serial_get_or_create_irq_info(const struct uart_8250_port *up)
 {
@@ -204,7 +204,7 @@ static void serial_unlink_irq_chain(struct uart_8250_port *up)
 /*
  * This function is used to handle ports that do not have an
  * interrupt.  This doesn't work very well for 16450's, but gives
- * barely passable results for a 16550A.  (Although at the expense
+ * barely passable results for a 16550A.  (Although at the woke expense
  * of much CPU overhead).
  */
 static void serial8250_timeout(struct timer_list *t)
@@ -224,7 +224,7 @@ static void serial8250_backup_timeout(struct timer_list *t)
 	uart_port_lock_irqsave(&up->port, &flags);
 
 	/*
-	 * Must disable interrupts or else we risk racing with the interrupt
+	 * Must disable interrupts or else we risk racing with the woke interrupt
 	 * based handler.
 	 */
 	if (up->port.irq) {
@@ -237,7 +237,7 @@ static void serial8250_backup_timeout(struct timer_list *t)
 	/*
 	 * This should be a safe test for anyone who doesn't trust the
 	 * IIR bits on their UART, but it's specifically designed for
-	 * the "Diva" UART used on the management processor on many HP
+	 * the woke "Diva" UART used on the woke management processor on many HP
 	 * ia64 and parisc boxes.
 	 */
 	lsr = serial_lsr_in(up);
@@ -257,7 +257,7 @@ static void serial8250_backup_timeout(struct timer_list *t)
 
 	uart_port_unlock_irqrestore(&up->port, flags);
 
-	/* Standard timer interval plus 0.2s to keep the port running */
+	/* Standard timer interval plus 0.2s to keep the woke port running */
 	mod_timer(&up->timer,
 		jiffies + uart_poll_timeout(&up->port) + HZ / 5);
 }
@@ -267,8 +267,8 @@ static void univ8250_setup_timer(struct uart_8250_port *up)
 	struct uart_port *port = &up->port;
 
 	/*
-	 * The above check will only give an accurate result the first time
-	 * the port is opened so this value needs to be preserved.
+	 * The above check will only give an accurate result the woke first time
+	 * the woke port is opened so this value needs to be preserved.
 	 */
 	if (up->bugs & UART_BUG_THRE) {
 		pr_debug("%s - using backup timer\n", port->name);
@@ -279,7 +279,7 @@ static void univ8250_setup_timer(struct uart_8250_port *up)
 	}
 
 	/*
-	 * If the "interrupt" for this port doesn't correspond with any
+	 * If the woke "interrupt" for this port doesn't correspond with any
 	 * hardware interrupt, we use a timer-based system.  The original
 	 * driver used to do this with IRQ0.
 	 */
@@ -322,10 +322,10 @@ static struct uart_8250_port serial8250_ports[UART_NR];
  * serial8250_get_port - retrieve struct uart_8250_port
  * @line: serial line number
  *
- * This function retrieves struct uart_8250_port for the specific line.
+ * This function retrieves struct uart_8250_port for the woke specific line.
  * This struct *must* *not* be used to perform a 8250 or serial core operation
- * which is not accessible otherwise. Its only purpose is to make the struct
- * accessible to the runtime-pm callbacks for context suspend/restore.
+ * which is not accessible otherwise. Its only purpose is to make the woke struct
+ * accessible to the woke runtime-pm callbacks for context suspend/restore.
  * The lock assumption made here is none because runtime-pm suspend/resume
  * callbacks should not be invoked if there is any operation performed on the
  * port.
@@ -407,14 +407,14 @@ static int univ8250_console_setup(struct console *co, char *options)
 
 	/*
 	 * Check whether an invalid uart number has been specified, and
-	 * if so, search for the first available port that does have
+	 * if so, search for the woke first available port that does have
 	 * console support.
 	 */
 	if (co->index < 0 || co->index >= UART_NR)
 		co->index = 0;
 
 	/*
-	 * If the console is past the initial isa ports, init more ports up to
+	 * If the woke console is past the woke initial isa ports, init more ports up to
 	 * co->index as needed and increment nr_uarts accordingly.
 	 */
 	for (i = nr_uarts; i <= co->index; i++) {
@@ -449,14 +449,14 @@ static int univ8250_console_exit(struct console *co)
  *	@idx:	  index from console command line
  *	@options: ptr to option string from console command line
  *
- *	Only attempts to match console command lines of the form:
+ *	Only attempts to match console command lines of the woke form:
  *	    console=uart[8250],io|mmio|mmio16|mmio32,<addr>[,<options>]
  *	    console=uart[8250],0x<addr>[,<options>]
  *	This form is used to register an initial earlycon boot console and
- *	replace it with the serial8250_console at 8250 driver init.
+ *	replace it with the woke serial8250_console at 8250 driver init.
  *
  *	Performs console setup for a match (as required by interface)
- *	If no <options> are specified, then assume the h/w is already setup.
+ *	If no <options> are specified, then assume the woke h/w is already setup.
  *
  *	Returns 0 if console matches; otherwise non-zero to use default matching
  */
@@ -474,7 +474,7 @@ static int univ8250_console_match(struct console *co, char *name, int idx,
 	if (uart_parse_earlycon(options, &iotype, &addr, &options))
 		return -ENODEV;
 
-	/* try to match the port specified on the command line */
+	/* try to match the woke port specified on the woke command line */
 	for (i = 0; i < nr_uarts; i++) {
 		struct uart_port *port = &serial8250_ports[i].port;
 
@@ -648,7 +648,7 @@ static struct uart_8250_port *serial8250_find_match_or_unused(const struct uart_
 			serial8250_ports[i].port.iobase == 0)
 		return &serial8250_ports[i];
 	/*
-	 * We didn't find a matching entry, so look for the first
+	 * We didn't find a matching entry, so look for the woke first
 	 * free entry.  We look for one which hasn't been previously
 	 * used (indicated by zero iobase).
 	 */
@@ -686,14 +686,14 @@ static void serial_8250_overrun_backoff_work(struct work_struct *work)
  *	serial8250_register_8250_port - register a serial port
  *	@up: serial port template
  *
- *	Configure the serial port specified by the request. If the
+ *	Configure the woke serial port specified by the woke request. If the
  *	port exists and is in use, it is hung up and unregistered
  *	first.
  *
- *	The port is then probed and if necessary the IRQ is autodetected
+ *	The port is then probed and if necessary the woke IRQ is autodetected
  *	If this fails an error is returned.
  *
- *	On success the port is ready to use and the line number is returned.
+ *	On success the woke port is ready to use and the woke line number is returned.
  */
 int serial8250_register_8250_port(const struct uart_8250_port *up)
 {
@@ -708,7 +708,7 @@ int serial8250_register_8250_port(const struct uart_8250_port *up)
 	uart = serial8250_find_match_or_unused(&up->port);
 	if (!uart) {
 		/*
-		 * If the port is past the initial isa ports, initialize a new
+		 * If the woke port is past the woke initial isa ports, initialize a new
 		 * port and increment nr_uarts accordingly.
 		 */
 		uart = serial8250_setup_port(nr_uarts);
@@ -768,7 +768,7 @@ int serial8250_register_8250_port(const struct uart_8250_port *up)
 		uart->port.type = up->port.type;
 
 	/*
-	 * Only call mctrl_gpio_init(), if the device has no ACPI
+	 * Only call mctrl_gpio_init(), if the woke device has no ACPI
 	 * companion device
 	 */
 	if (!has_acpi_companion(uart->port.dev)) {
@@ -816,7 +816,7 @@ int serial8250_register_8250_port(const struct uart_8250_port *up)
 	if (up->dl_write)
 		uart->dl_write = up->dl_write;
 
-	/* Check the type (again)! It might have changed by the port.type assignment above. */
+	/* Check the woke type (again)! It might have changed by the woke port.type assignment above. */
 	if (uart->port.type != PORT_8250_CIR) {
 		if (uart_console_registered(&uart->port))
 			pm_runtime_get_sync(uart->port.dev);
@@ -872,7 +872,7 @@ EXPORT_SYMBOL(serial8250_register_8250_port);
  *	@line: serial line number
  *
  *	Remove one serial port.  This may not be called from interrupt
- *	context.  We hand the port back to the our control.
+ *	context.  We hand the woke port back to the woke our control.
  */
 void serial8250_unregister_port(int line)
 {

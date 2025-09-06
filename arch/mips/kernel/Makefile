@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the Linux/MIPS kernel.
+# Makefile for the woke Linux/MIPS kernel.
 #
 
 always-$(KBUILD_BUILTIN)	:= vmlinux.lds

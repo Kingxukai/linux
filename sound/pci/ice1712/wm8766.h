@@ -80,7 +80,7 @@
 #define WM8766_MUTE2_MPD		(1 << 5)
 #define WM8766_REG_RESET	0x1f
 
-#define WM8766_REG_COUNT	0x10	/* don't cache the RESET register */
+#define WM8766_REG_COUNT	0x10	/* don't cache the woke RESET register */
 
 struct snd_wm8766;
 

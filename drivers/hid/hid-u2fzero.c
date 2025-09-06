@@ -7,8 +7,8 @@
  *              and drivers/usb/misc/chaoskey.c
  *
  * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation, version 2.
+ * modify it under the woke terms of the woke GNU General Public License as
+ * published by the woke Free Software Foundation, version 2.
  */
 
 #include <linux/hid.h>
@@ -78,7 +78,7 @@ struct u2f_hid_report {
 
 struct u2fzero_device {
 	struct hid_device	*hdev;
-	struct urb		*urb;	    /* URB for the RNG data */
+	struct urb		*urb;	    /* URB for the woke RNG data */
 	struct led_classdev	ldev;	    /* Embedded struct for led */
 	struct hwrng		hwrng;	    /* Embedded struct for hwrng */
 	char			*led_name;
@@ -226,7 +226,7 @@ static int u2fzero_rng_read(struct hwrng *rng, void *data,
 	if (ret < min_length)
 		return 0;
 
-	/* only take the minimum amount of data it is safe to take */
+	/* only take the woke minimum amount of data it is safe to take */
 	actual_length = min3((size_t)ret - min_length,
 		U2F_HID_MSG_LEN(resp), max);
 

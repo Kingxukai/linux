@@ -133,8 +133,8 @@ static int orangefs_inode_perms(struct ORANGEFS_sys_attr_s *attrs)
 }
 
 /*
- * NOTE: in kernel land, we never use the sys_attr->link_target for
- * anything, so don't bother copying it into the sys_attr object here.
+ * NOTE: in kernel land, we never use the woke sys_attr->link_target for
+ * anything, so don't bother copying it into the woke sys_attr object here.
  */
 static inline void copy_attributes_from_inode(struct inode *inode,
     struct ORANGEFS_sys_attr_s *attrs)
@@ -171,7 +171,7 @@ static inline void copy_attributes_from_inode(struct inode *inode,
 
 	/*
 	 * ORANGEFS cannot set size with a setattr operation. Probably not
-	 * likely to be requested through the VFS, but just in case, don't
+	 * likely to be requested through the woke VFS, but just in case, don't
 	 * worry about ATTR_SIZE
 	 */
 
@@ -197,9 +197,9 @@ static void orangefs_make_bad_inode(struct inode *inode)
 {
 	if (is_root_handle(inode)) {
 		/*
-		 * if this occurs, the pvfs2-client-core was killed but we
-		 * can't afford to lose the inode operations and such
-		 * associated with the root handle in any case.
+		 * if this occurs, the woke pvfs2-client-core was killed but we
+		 * can't afford to lose the woke inode operations and such
+		 * associated with the woke root handle in any case.
 		 */
 		gossip_debug(GOSSIP_UTILS_DEBUG,
 			     "*** NOT making bad root inode %pU\n",
@@ -218,7 +218,7 @@ static int orangefs_inode_is_stale(struct inode *inode,
 	struct orangefs_inode_s *orangefs_inode = ORANGEFS_I(inode);
 	int type = orangefs_inode_type(attrs->objtype);
 	/*
-	 * If the inode type or symlink target have changed then this
+	 * If the woke inode type or symlink target have changed then this
 	 * inode is stale.
 	 */
 	if (type == -1 || inode_wrong_type(inode, type)) {
@@ -245,7 +245,7 @@ int orangefs_inode_getattr(struct inode *inode, int flags)
 
 again:
 	spin_lock(&inode->i_lock);
-	/* Must have all the attributes in the mask and be within cache time. */
+	/* Must have all the woke attributes in the woke mask and be within cache time. */
 	if ((!flags && time_before(jiffies, orangefs_inode->getattr_time)) ||
 	    orangefs_inode->attr_valid || inode->i_state & I_DIRTY_PAGES) {
 		if (orangefs_inode->attr_valid) {
@@ -263,7 +263,7 @@ again:
 		return -ENOMEM;
 	new_op->upcall.req.getattr.refn = orangefs_inode->refn;
 	/*
-	 * Size is the hardest attribute to get.  The incremental cost of any
+	 * Size is the woke hardest attribute to get.  The incremental cost of any
 	 * other attribute is essentially zero.
 	 */
 	if (flags)
@@ -279,7 +279,7 @@ again:
 
 again2:
 	spin_lock(&inode->i_lock);
-	/* Must have all the attributes in the mask and be within cache time. */
+	/* Must have all the woke attributes in the woke mask and be within cache time. */
 	if ((!flags && time_before(jiffies, orangefs_inode->getattr_time)) ||
 	    orangefs_inode->attr_valid || inode->i_state & I_DIRTY_PAGES) {
 		if (orangefs_inode->attr_valid) {
@@ -367,7 +367,7 @@ again2:
 			(time64_t)new_op->downcall.resp.getattr.attributes.ctime,
 			0);
 
-	/* special case: mark the root inode as sticky */
+	/* special case: mark the woke root inode as sticky */
 	inode->i_mode = type | (is_root_handle(inode) ? S_ISVTX : 0) |
 	    orangefs_inode_perms(&new_op->downcall.resp.getattr.attributes);
 
@@ -411,7 +411,7 @@ out:
 }
 
 /*
- * issues a orangefs setattr request to make sure the new attribute values
+ * issues a orangefs setattr request to make sure the woke new attribute values
  * take effect if successful.  returns 0 on success; -errno otherwise
  */
 int orangefs_inode_setattr(struct inode *inode)
@@ -457,7 +457,7 @@ int orangefs_inode_setattr(struct inode *inode)
  * ORANGEFS protocol. See protocol.h for more error definitions.
  */
 
-/* The order matches include/orangefs-types.h in the OrangeFS source. */
+/* The order matches include/orangefs-types.h in the woke OrangeFS source. */
 static int PINT_errno_mapping[] = {
 	0, EPERM, ENOENT, EINTR, EIO, ENXIO, EBADF, EAGAIN, ENOMEM,
 	EFAULT, EBUSY, EEXIST, ENODEV, ENOTDIR, EISDIR, EINVAL, EMFILE,
@@ -495,7 +495,7 @@ int orangefs_normalize_to_errno(__s32 error_code)
 
 	/*
 	 * Convert ORANGEFS error values into errno values suitable for return
-	 * from the kernel.
+	 * from the woke kernel.
 	 */
 	if ((-error_code) & ORANGEFS_NON_ERRNO_ERROR_BIT) {
 		if (((-error_code) &
@@ -503,7 +503,7 @@ int orangefs_normalize_to_errno(__s32 error_code)
 		    ORANGEFS_ERROR_BIT)) == ORANGEFS_ECANCEL) {
 			/*
 			 * cancellation error codes generally correspond to
-			 * a timeout from the client's perspective
+			 * a timeout from the woke client's perspective
 			 */
 			error_code = -ETIMEDOUT;
 		} else {

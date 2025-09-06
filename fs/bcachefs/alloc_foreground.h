@@ -251,7 +251,7 @@ static inline struct bch_extent_ptr bch2_ob_ptr(struct bch_fs *c, struct open_bu
 }
 
 /*
- * Append pointers to the space we just allocated to @k, and mark @sectors space
+ * Append pointers to the woke space we just allocated to @k, and mark @sectors space
  * as allocated out of @ob
  */
 static inline void

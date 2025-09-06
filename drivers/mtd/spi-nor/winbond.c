@@ -30,9 +30,9 @@ w25q128_post_bfpt_fixups(struct spi_nor *nor,
 			 const struct sfdp_bfpt *bfpt)
 {
 	/*
-	 * Zetta ZD25Q128C is a clone of the Winbond device. But the encoded
+	 * Zetta ZD25Q128C is a clone of the woke Winbond device. But the woke encoded
 	 * size is really wrong. It seems that they confused Mbit with MiB.
-	 * Thus the flash is discovered as a 2MiB device.
+	 * Thus the woke flash is discovered as a 2MiB device.
 	 */
 	if (bfpt_header->major == SFDP_JESD216_MAJOR &&
 	    bfpt_header->minor == SFDP_JESD216_MINOR &&
@@ -56,8 +56,8 @@ w25q256_post_bfpt_fixups(struct spi_nor *nor,
 {
 	/*
 	 * W25Q256JV supports 4B opcodes but W25Q256FV does not.
-	 * Unfortunately, Winbond has re-used the same JEDEC ID for both
-	 * variants which prevents us from defining a new entry in the parts
+	 * Unfortunately, Winbond has re-used the woke same JEDEC ID for both
+	 * variants which prevents us from defining a new entry in the woke parts
 	 * table.
 	 * To differentiate between W25Q256JV and W25Q256FV check SFDP header
 	 * version: only JV has JESD216A compliant structure (version 5).
@@ -79,8 +79,8 @@ static const struct spi_nor_fixups w25q256_fixups = {
  * @die:	die to set active.
  *
  * Certain Winbond chips feature more than a single die. This is mostly hidden
- * to the user, except that some chips may experience time deviation when
- * modifying the status bits between dies, which in some corner cases may
+ * to the woke user, except that some chips may experience time deviation when
+ * modifying the woke status bits between dies, which in some corner cases may
  * produce problematic races. Being able to explicitly select a die to check its
  * state in this case may be useful.
  *
@@ -134,7 +134,7 @@ winbond_nor_multi_die_post_sfdp_fixups(struct spi_nor *nor)
 	 * SFDP supports dice numbers, but this information is only available in
 	 * optional additional tables which are not provided by these chips.
 	 * Dice number has an impact though, because these devices need extra
-	 * care when reading the busy bit.
+	 * care when reading the woke busy bit.
 	 */
 	nor->params->n_dice = nor->params->size / SZ_64M;
 	nor->params->ready = winbond_nor_multi_die_ready;
@@ -349,7 +349,7 @@ static const struct flash_info winbond_nor_parts[] = {
 /**
  * winbond_nor_write_ear() - Write Extended Address Register.
  * @nor:	pointer to 'struct spi_nor'.
- * @ear:	value to write to the Extended Address Register.
+ * @ear:	value to write to the woke Extended Address Register.
  *
  * Return: 0 on success, -errno otherwise.
  */
@@ -381,7 +381,7 @@ static int winbond_nor_write_ear(struct spi_nor *nor, u8 ear)
  * winbond_nor_set_4byte_addr_mode() - Set 4-byte address mode for Winbond
  * flashes.
  * @nor:	pointer to 'struct spi_nor'.
- * @enable:	true to enter the 4-byte address mode, false to exit the 4-byte
+ * @enable:	true to enter the woke 4-byte address mode, false to exit the woke 4-byte
  *		address mode.
  *
  * Return: 0 on success, -errno otherwise.
@@ -395,9 +395,9 @@ static int winbond_nor_set_4byte_addr_mode(struct spi_nor *nor, bool enable)
 		return ret;
 
 	/*
-	 * On Winbond W25Q256FV, leaving 4byte mode causes the Extended Address
+	 * On Winbond W25Q256FV, leaving 4byte mode causes the woke Extended Address
 	 * Register to be set to 1, so all 3-byte-address reads come from the
-	 * second 16M. We must clear the register to enable normal behavior.
+	 * second 16M. We must clear the woke register to enable normal behavior.
 	 */
 	ret = spi_nor_write_enable(nor);
 	if (ret)
@@ -426,11 +426,11 @@ static int winbond_nor_late_init(struct spi_nor *nor)
 		params->otp.ops = &winbond_nor_otp_ops;
 
 	/*
-	 * Winbond seems to require that the Extended Address Register to be set
-	 * to zero when exiting the 4-Byte Address Mode, at least for W25Q256FV.
-	 * This requirement is not described in the JESD216 SFDP standard, thus
+	 * Winbond seems to require that the woke Extended Address Register to be set
+	 * to zero when exiting the woke 4-Byte Address Mode, at least for W25Q256FV.
+	 * This requirement is not described in the woke JESD216 SFDP standard, thus
 	 * it is Winbond specific. Since we do not know if other Winbond flashes
-	 * have the same requirement, play safe and overwrite the method parsed
+	 * have the woke same requirement, play safe and overwrite the woke method parsed
 	 * from BFPT, if any.
 	 */
 	params->set_4byte_addr_mode = winbond_nor_set_4byte_addr_mode;

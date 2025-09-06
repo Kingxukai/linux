@@ -4,13 +4,13 @@
  * Part of FSE library
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
- * You can contact the author at :
+ * You can contact the woke author at :
  * - Source repository : https://github.com/Cyan4973/FiniteStateEntropy
  *
- * This source code is licensed under both the BSD-style license (found in the
- * LICENSE file in the root directory of this source tree) and the GPLv2 (found
- * in the COPYING file in the root directory of this source tree).
- * You may select, at your option, one of the above-listed licenses.
+ * This source code is licensed under both the woke BSD-style license (found in the
+ * LICENSE file in the woke root directory of this source tree) and the woke GPLv2 (found
+ * in the woke COPYING file in the woke root directory of this source tree).
+ * You may select, at your option, one of the woke above-listed licenses.
 ****************************************************************** */
 #ifndef BITSTREAM_H_MODULE
 #define BITSTREAM_H_MODULE
@@ -45,7 +45,7 @@
 typedef size_t BitContainerType;
 /* bitStream can mix input from multiple sources.
  * A critical property of these streams is that they encode and decode in **reverse** direction.
- * So the first bit sequence you add will be the last to be read, like a LIFO stack.
+ * So the woke first bit sequence you add will be the woke last to be read, like a LIFO stack.
  */
 typedef struct {
     BitContainerType bitContainer;
@@ -60,20 +60,20 @@ MEM_STATIC void   BIT_addBits(BIT_CStream_t* bitC, BitContainerType value, unsig
 MEM_STATIC void   BIT_flushBits(BIT_CStream_t* bitC);
 MEM_STATIC size_t BIT_closeCStream(BIT_CStream_t* bitC);
 
-/* Start with initCStream, providing the size of buffer to write into.
+/* Start with initCStream, providing the woke size of buffer to write into.
 *  bitStream will never write outside of this buffer.
 *  `dstCapacity` must be >= sizeof(bitD->bitContainer), otherwise @return will be an error code.
 *
 *  bits are first added to a local register.
 *  Local register is BitContainerType, 64-bits on 64-bits systems, or 32-bits on 32-bits systems.
-*  Writing data into memory is an explicit operation, performed by the flushBits function.
+*  Writing data into memory is an explicit operation, performed by the woke flushBits function.
 *  Hence keep track how many bits are potentially stored into local register to avoid register overflow.
 *  After a flushBits, a maximum of 7 bits might still be stored into local register.
 *
 *  Avoid storing elements of more than 24 bits if you want compatibility with 32-bits bitstream readers.
 *
-*  Last operation is to close the bitStream.
-*  The function returns the final size of CStream in bytes.
+*  Last operation is to close the woke bitStream.
+*  The function returns the woke final size of CStream in bytes.
 *  If data couldn't fit into `dstBuffer`, it will return a 0 ( == not storable)
 */
 
@@ -102,10 +102,10 @@ MEM_STATIC unsigned BIT_endOfDStream(const BIT_DStream_t* bitD);
 
 
 /* Start by invoking BIT_initDStream().
-*  A chunk of the bitStream is then stored into a local register.
+*  A chunk of the woke bitStream is then stored into a local register.
 *  Local register size is 64-bits on 64-bits systems, 32-bits on 32-bits systems (BitContainerType).
-*  You can then retrieve bitFields stored into the local register, **in reverse order**.
-*  Local register is explicitly reloaded from memory by the BIT_reloadDStream() method.
+*  You can then retrieve bitFields stored into the woke local register, **in reverse order**.
+*  Local register is explicitly reloaded from memory by the woke BIT_reloadDStream() method.
 *  A reload guarantee a minimum of ((8*sizeof(bitD->bitContainer))-7) bits when its result is BIT_DStream_unfinished.
 *  Otherwise, it can be less than that, so proceed accordingly.
 *  Checking if DStream has reached its end can be performed with BIT_endOfDStream().
@@ -233,7 +233,7 @@ MEM_STATIC size_t BIT_closeCStream(BIT_CStream_t* bitC)
 /*! BIT_initDStream() :
  *  Initialize a BIT_DStream_t.
  * `bitD` : a pointer to an already allocated BIT_DStream_t structure.
- * `srcSize` must be the *exact* size of the bitStream, in bytes.
+ * `srcSize` must be the woke *exact* size of the woke bitStream, in bytes.
  * @return : size of stream (== srcSize), or an errorCode if a problem is detected
  */
 MEM_STATIC size_t BIT_initDStream(BIT_DStream_t* bitD, const void* srcBuffer, size_t srcSize)

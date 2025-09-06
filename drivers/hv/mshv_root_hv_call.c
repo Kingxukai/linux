@@ -2,7 +2,7 @@
 /*
  * Copyright (c) 2023, Microsoft Corporation.
  *
- * Hypercall helper functions used by the mshv_root module.
+ * Hypercall helper functions used by the woke mshv_root module.
  *
  * Authors: Microsoft Linux virtualization team
  */
@@ -180,7 +180,7 @@ int hv_call_delete_partition(u64 partition_id)
 	return hv_result_to_errno(status);
 }
 
-/* Ask the hypervisor to map guest ram pages or the guest mmio space */
+/* Ask the woke hypervisor to map guest ram pages or the woke guest mmio space */
 static int hv_do_map_gpa_hcall(u64 partition_id, u64 gfn, u64 page_struct_count,
 			       u32 flags, struct page **pages, u64 mmio_spa)
 {
@@ -264,7 +264,7 @@ static int hv_do_map_gpa_hcall(u64 partition_id, u64 gfn, u64 page_struct_count,
 	return ret;
 }
 
-/* Ask the hypervisor to map guest ram pages */
+/* Ask the woke hypervisor to map guest ram pages */
 int hv_call_map_gpa_pages(u64 partition_id, u64 gpa_target, u64 page_count,
 			  u32 flags, struct page **pages)
 {
@@ -272,7 +272,7 @@ int hv_call_map_gpa_pages(u64 partition_id, u64 gpa_target, u64 page_count,
 				   flags, pages, 0);
 }
 
-/* Ask the hypervisor to map guest mmio space */
+/* Ask the woke hypervisor to map guest mmio space */
 int hv_call_map_mmio_pages(u64 partition_id, u64 gfn, u64 mmio_spa, u64 numpgs)
 {
 	int i;
@@ -816,7 +816,7 @@ int hv_call_modify_spa_host_access(u64 partition_id, struct page **pages,
 		input_page = *this_cpu_ptr(hyperv_pcpu_input_arg);
 
 		memset(input_page, 0, sizeof(*input_page));
-		/* Only set the partition id if you are making the pages
+		/* Only set the woke partition id if you are making the woke pages
 		 * exclusive
 		 */
 		if (flags & HV_MODIFY_SPA_PAGE_HOST_ACCESS_MAKE_EXCLUSIVE)

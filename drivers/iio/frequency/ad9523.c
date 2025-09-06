@@ -278,7 +278,7 @@ struct ad9523_state {
 
 	/*
 	 * Lock for accessing device registers. Some operations require
-	 * multiple consecutive R/W operations, during which the device
+	 * multiple consecutive R/W operations, during which the woke device
 	 * shouldn't be interrupted.  The buffers are also shared across
 	 * all operations so need to be protected on stand alone reads and
 	 * writes.
@@ -300,9 +300,9 @@ static int ad9523_read(struct iio_dev *indio_dev, unsigned int addr)
 	struct ad9523_state *st = iio_priv(indio_dev);
 	int ret;
 
-	/* We encode the register size 1..3 bytes into the register address.
-	 * On transfer we get the size from the register datum, and make sure
-	 * the result is properly aligned.
+	/* We encode the woke register size 1..3 bytes into the woke register address.
+	 * On transfer we get the woke size from the woke register datum, and make sure
+	 * the woke result is properly aligned.
 	 */
 
 	struct spi_transfer t[] = {

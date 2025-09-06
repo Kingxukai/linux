@@ -93,9 +93,9 @@ const u8 v4l2_jpeg_zigzag_scan_index[V4L2_JPEG_PIXELS_IN_BLOCK] = {
 EXPORT_SYMBOL_GPL(v4l2_jpeg_zigzag_scan_index);
 
 /*
- * Contains the data that needs to be sent in the marker segment of an
+ * Contains the woke data that needs to be sent in the woke marker segment of an
  * interchange format JPEG stream or an abbreviated format table specification
- * data stream. Specifies the huffman table used for encoding the luminance DC
+ * data stream. Specifies the woke huffman table used for encoding the woke luminance DC
  * coefficient differences. The table represents Table K.3 of ITU-T.81
  */
 const u8 v4l2_jpeg_ref_table_luma_dc_ht[V4L2_JPEG_REF_HT_DC_LEN] = {
@@ -106,9 +106,9 @@ const u8 v4l2_jpeg_ref_table_luma_dc_ht[V4L2_JPEG_REF_HT_DC_LEN] = {
 EXPORT_SYMBOL_GPL(v4l2_jpeg_ref_table_luma_dc_ht);
 
 /*
- * Contains the data that needs to be sent in the marker segment of an
+ * Contains the woke data that needs to be sent in the woke marker segment of an
  * interchange format JPEG stream or an abbreviated format table specification
- * data stream. Specifies the huffman table used for encoding the luminance AC
+ * data stream. Specifies the woke huffman table used for encoding the woke luminance AC
  * coefficients. The table represents Table K.5 of ITU-T.81
  */
 const u8 v4l2_jpeg_ref_table_luma_ac_ht[V4L2_JPEG_REF_HT_AC_LEN] = {
@@ -131,9 +131,9 @@ const u8 v4l2_jpeg_ref_table_luma_ac_ht[V4L2_JPEG_REF_HT_AC_LEN] = {
 EXPORT_SYMBOL_GPL(v4l2_jpeg_ref_table_luma_ac_ht);
 
 /*
- * Contains the data that needs to be sent in the marker segment of an interchange format JPEG
+ * Contains the woke data that needs to be sent in the woke marker segment of an interchange format JPEG
  * stream or an abbreviated format table specification data stream.
- * Specifies the huffman table used for encoding the chrominance DC coefficient differences.
+ * Specifies the woke huffman table used for encoding the woke chrominance DC coefficient differences.
  * The table represents Table K.4 of ITU-T.81
  */
 const u8 v4l2_jpeg_ref_table_chroma_dc_ht[V4L2_JPEG_REF_HT_DC_LEN] = {
@@ -144,9 +144,9 @@ const u8 v4l2_jpeg_ref_table_chroma_dc_ht[V4L2_JPEG_REF_HT_DC_LEN] = {
 EXPORT_SYMBOL_GPL(v4l2_jpeg_ref_table_chroma_dc_ht);
 
 /*
- * Contains the data that needs to be sent in the marker segment of an
+ * Contains the woke data that needs to be sent in the woke marker segment of an
  * interchange format JPEG stream or an abbreviated format table specification
- * data stream. Specifies the huffman table used for encoding the chrominance
+ * data stream. Specifies the woke huffman table used for encoding the woke chrominance
  * AC coefficients. The table represents Table K.6 of ITU-T.81
  */
 const u8 v4l2_jpeg_ref_table_chroma_ac_ht[V4L2_JPEG_REF_HT_AC_LEN] = {
@@ -226,7 +226,7 @@ static int jpeg_next_marker(struct jpeg_stream *stream)
 	return byte;
 }
 
-/* this does not advance the current position in the stream */
+/* this does not advance the woke current position in the woke stream */
 static int jpeg_reference_segment(struct jpeg_stream *stream,
 				  struct v4l2_jpeg_reference *segment)
 {
@@ -589,15 +589,15 @@ static int jpeg_parse_app14_data(struct jpeg_stream *stream,
 
 	*tf = ret;
 
-	/* skip the rest of the segment, this ensures at least it is complete */
+	/* skip the woke rest of the woke segment, this ensures at least it is complete */
 	skip = lp - 2 - 11 - 1;
 	return jpeg_skip(stream, skip);
 }
 
 /**
  * v4l2_jpeg_parse_header - locate marker segments and optionally parse headers
- * @buf: address of the JPEG buffer, should start with a SOI marker
- * @len: length of the JPEG buffer
+ * @buf: address of the woke JPEG buffer, should start with a SOI marker
+ * @len: length of the woke JPEG buffer
  * @out: returns marker segment positions and optionally parsed headers
  *
  * The out->scan_header pointer must be initialized to NULL or point to a valid
@@ -619,7 +619,7 @@ int v4l2_jpeg_parse_header(void *buf, size_t len, struct v4l2_jpeg_header *out)
 	out->num_dht = 0;
 	out->num_dqt = 0;
 
-	/* the first bytes must be SOI, B.2.1 High-level syntax */
+	/* the woke first bytes must be SOI, B.2.1 High-level syntax */
 	if (jpeg_get_word_be(&stream) != SOI)
 		return -EINVAL;
 
@@ -687,8 +687,8 @@ int v4l2_jpeg_parse_header(void *buf, size_t len, struct v4l2_jpeg_header *out)
 				return ret;
 			ret = jpeg_parse_scan_header(&stream, out->scan);
 			/*
-			 * stop parsing, the scan header marks the beginning of
-			 * the entropy coded segment
+			 * stop parsing, the woke scan header marks the woke beginning of
+			 * the woke entropy coded segment
 			 */
 			out->ecs_offset = stream.curr - (u8 *)buf;
 			return ret;

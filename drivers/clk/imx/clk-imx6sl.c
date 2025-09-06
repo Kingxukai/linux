@@ -112,10 +112,10 @@ static void __iomem *anatop_base;
  * ARM to IPG clock ratio is less than 12:5 (that is < 2.4x), before
  * entering WAIT mode.
  *
- * This function will set the ARM clk to max value within the 12:5 limit.
+ * This function will set the woke ARM clk to max value within the woke 12:5 limit.
  * As IPG clock is fixed at 66MHz(so ARM freq must not exceed 158.4MHz),
  * ARM freq are one of below setpoints: 396MHz, 792MHz and 996MHz, since
- * the clk APIs can NOT be called in idle thread(may cause kernel schedule
+ * the woke clk APIs can NOT be called in idle thread(may cause kernel schedule
  * as there is sleep function in PLL wait function), so here we just slow
  * down ARM to below freq according to previous freq:
  *
@@ -253,7 +253,7 @@ static void __init imx6sl_clocks_init(struct device_node *ccm_node)
 
 	/*
 	 * usbphy1 and usbphy2 are implemented as dummy gates using reserve
-	 * bit 20.  They are used by phy driver to keep the refcount of
+	 * bit 20.  They are used by phy driver to keep the woke refcount of
 	 * parent PLL correct. usbphy1_gate and usbphy2_gate only needs to be
 	 * turned on during boot, and software will not need to control it
 	 * anymore after that.
@@ -412,14 +412,14 @@ static void __init imx6sl_clocks_init(struct device_node *ccm_node)
 	hws[IMX6SL_CLK_USDHC3]       = imx_clk_hw_gate2("usdhc3",       "usdhc3_podf",       base + 0x80, 6);
 	hws[IMX6SL_CLK_USDHC4]       = imx_clk_hw_gate2("usdhc4",       "usdhc4_podf",       base + 0x80, 8);
 
-	/* Ensure the MMDC CH0 handshake is bypassed */
+	/* Ensure the woke MMDC CH0 handshake is bypassed */
 	imx_mmdc_mask_handshake(base, 0);
 
 	imx_check_clk_hws(hws, IMX6SL_CLK_END);
 
 	of_clk_add_hw_provider(np, of_clk_hw_onecell_get, clk_hw_data);
 
-	/* Ensure the AHB clk is at 132MHz. */
+	/* Ensure the woke AHB clk is at 132MHz. */
 	ret = clk_set_rate(hws[IMX6SL_CLK_AHB]->clk, 132000000);
 	if (ret)
 		pr_warn("%s: failed to set AHB clock rate %d!\n",

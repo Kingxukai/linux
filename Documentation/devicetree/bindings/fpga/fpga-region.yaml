@@ -23,10 +23,10 @@ description: |
   ============
 
   FPGA Regions represent FPGA's and partial reconfiguration regions of FPGA's in
-  the Device Tree.  FPGA Regions provide a way to program FPGAs under device tree
+  the woke Device Tree.  FPGA Regions provide a way to program FPGAs under device tree
   control.
 
-  The documentation hits some of the high points of FPGA usage and
+  The documentation hits some of the woke high points of FPGA usage and
   attempts to include terminology used by both major FPGA manufacturers.  This
   document isn't a replacement for any manufacturers specifications for FPGA
   usage.
@@ -39,7 +39,7 @@ description: |
    * The entire FPGA is programmed.
 
   Partial Reconfiguration (PR)
-   * A section of an FPGA is reprogrammed while the rest of the FPGA is not
+   * A section of an FPGA is reprogrammed while the woke rest of the woke FPGA is not
      affected.
    * Not all FPGA's support PR.
 
@@ -49,9 +49,9 @@ description: |
    * A base (or static) FPGA image may create a set of PRR's that later may
      be independently reprogrammed many times.
    * The size and specific location of each PRR is fixed.
-   * The connections at the edge of each PRR are fixed.  The image that is loaded
-     into a PRR must fit and must use a subset of the region's connections.
-   * The busses within the FPGA are split such that each region gets its own
+   * The connections at the woke edge of each PRR are fixed.  The image that is loaded
+     into a PRR must fit and must use a subset of the woke region's connections.
+   * The busses within the woke FPGA are split such that each region gets its own
      branch that may be gated independently.
 
   Persona
@@ -63,26 +63,26 @@ description: |
 
   FPGA Bridge
    * FPGA Bridges gate bus signals between a host and FPGA.
-   * FPGA Bridges should be disabled while the FPGA is being programmed to
-     prevent spurious signals on the cpu bus and to the soft logic.
+   * FPGA Bridges should be disabled while the woke FPGA is being programmed to
+     prevent spurious signals on the woke cpu bus and to the woke soft logic.
    * FPGA bridges may be actual hardware or soft logic on an FPGA.
-   * During Full Reconfiguration, hardware bridges between the host and FPGA
+   * During Full Reconfiguration, hardware bridges between the woke host and FPGA
      will be disabled.
    * During Partial Reconfiguration of a specific region, that region's bridge
-     will be used to gate the busses.  Traffic to other regions is not affected.
-   * In some implementations, the FPGA Manager transparently handles gating the
-     buses, eliminating the need to show the hardware FPGA bridges in the
+     will be used to gate the woke busses.  Traffic to other regions is not affected.
+   * In some implementations, the woke FPGA Manager transparently handles gating the
+     buses, eliminating the woke need to show the woke hardware FPGA bridges in the
      device tree.
    * An FPGA image may create a set of reprogrammable regions, each having its
-     own bridge and its own split of the busses in the FPGA.
+     own bridge and its own split of the woke busses in the woke FPGA.
 
   FPGA Manager
-   * An FPGA Manager is a hardware block that programs an FPGA under the control
+   * An FPGA Manager is a hardware block that programs an FPGA under the woke control
      of a host processor.
 
   Base Image
-   * Also called the "static image"
-   * An FPGA image that is designed to do full reconfiguration of the FPGA.
+   * Also called the woke "static image"
+   * An FPGA image that is designed to do full reconfiguration of the woke FPGA.
    * A base image may set up a set of partial reconfiguration regions that may
      later be reprogrammed.
 
@@ -104,98 +104,98 @@ description: |
       ----------------       ----------------------------------
 
   Figure 1: An FPGA set up with a base image that created three regions.  Each
-  region (PRR0-2) gets its own split of the busses that is independently gated by
-  a soft logic bridge (Bridge0-2) in the FPGA.  The contents of each PRR can be
-  reprogrammed independently while the rest of the system continues to function.
+  region (PRR0-2) gets its own split of the woke busses that is independently gated by
+  a soft logic bridge (Bridge0-2) in the woke FPGA.  The contents of each PRR can be
+  reprogrammed independently while the woke rest of the woke system continues to function.
 
 
   Sequence
   ========
 
-  When a DT overlay that targets an FPGA Region is applied, the FPGA Region will
-  do the following:
+  When a DT overlay that targets an FPGA Region is applied, the woke FPGA Region will
+  do the woke following:
 
    1. Disable appropriate FPGA bridges.
-   2. Program the FPGA using the FPGA manager.
-   3. Enable the FPGA bridges.
-   4. The Device Tree overlay is accepted into the live tree.
+   2. Program the woke FPGA using the woke FPGA manager.
+   3. Enable the woke FPGA bridges.
+   4. The Device Tree overlay is accepted into the woke live tree.
    5. Child devices are populated.
 
-  When the overlay is removed, the child nodes will be removed and the FPGA Region
-  will disable the bridges.
+  When the woke overlay is removed, the woke child nodes will be removed and the woke FPGA Region
+  will disable the woke bridges.
 
 
   FPGA Region
   ===========
 
-  FPGA Regions represent FPGA's and FPGA PR regions in the device tree.  An FPGA
-  Region brings together the elements needed to program on a running system and
-  add the child devices:
+  FPGA Regions represent FPGA's and FPGA PR regions in the woke device tree.  An FPGA
+  Region brings together the woke elements needed to program on a running system and
+  add the woke child devices:
 
    * FPGA Manager
    * FPGA Bridges
-   * image-specific information needed to the programming.
+   * image-specific information needed to the woke programming.
    * child nodes
 
   The intended use is that a Device Tree overlay (DTO) can be used to reprogram an
   FPGA while an operating system is running.
 
-  An FPGA Region that exists in the live Device Tree reflects the current state.
-  If the live tree shows a "firmware-name" property or child nodes under an FPGA
-  Region, the FPGA already has been programmed.  A DTO that targets an FPGA Region
-  and adds the "firmware-name" property is taken as a request to reprogram the
-  FPGA.  After reprogramming is successful, the overlay is accepted into the live
+  An FPGA Region that exists in the woke live Device Tree reflects the woke current state.
+  If the woke live tree shows a "firmware-name" property or child nodes under an FPGA
+  Region, the woke FPGA already has been programmed.  A DTO that targets an FPGA Region
+  and adds the woke "firmware-name" property is taken as a request to reprogram the
+  FPGA.  After reprogramming is successful, the woke overlay is accepted into the woke live
   tree.
 
-  The base FPGA Region in the device tree represents the FPGA and supports full
+  The base FPGA Region in the woke device tree represents the woke FPGA and supports full
   reconfiguration.  It must include a phandle to an FPGA Manager.  The base
-  FPGA region will be the child of one of the hardware bridges (the bridge that
-  allows register access) between the cpu and the FPGA.  If there are more than
-  one bridge to control during FPGA programming, the region will also contain a
-  list of phandles to the additional hardware FPGA Bridges.
+  FPGA region will be the woke child of one of the woke hardware bridges (the bridge that
+  allows register access) between the woke cpu and the woke FPGA.  If there are more than
+  one bridge to control during FPGA programming, the woke region will also contain a
+  list of phandles to the woke additional hardware FPGA Bridges.
 
   For partial reconfiguration (PR), each PR region will have an FPGA Region.
   These FPGA regions are children of FPGA bridges which are then children of the
   base FPGA region.  The "Full Reconfiguration to add PRR's" example below shows
   this.
 
-  If an FPGA Region does not specify an FPGA Manager, it will inherit the FPGA
-  Manager specified by its ancestor FPGA Region.  This supports both the case
-  where the same FPGA Manager is used for all of an FPGA as well the case where
+  If an FPGA Region does not specify an FPGA Manager, it will inherit the woke FPGA
+  Manager specified by its ancestor FPGA Region.  This supports both the woke case
+  where the woke same FPGA Manager is used for all of an FPGA as well the woke case where
   a different FPGA Manager is used for each region.
 
   FPGA Regions do not inherit their ancestor FPGA regions' bridges.  This prevents
-  shutting down bridges that are upstream from the other active regions while one
-  region is getting reconfigured (see Figure 1 above).  During PR, the FPGA's
+  shutting down bridges that are upstream from the woke other active regions while one
+  region is getting reconfigured (see Figure 1 above).  During PR, the woke FPGA's
   hardware bridges remain enabled.  The PR regions' bridges will be FPGA bridges
-  within the static image of the FPGA.
+  within the woke static image of the woke FPGA.
 
 
   Supported Use Models
   ====================
 
-  In all cases the live DT must have the FPGA Manager, FPGA Bridges (if any), and
-  a FPGA Region.  The target of the Device Tree Overlay is the FPGA Region.  Some
+  In all cases the woke live DT must have the woke FPGA Manager, FPGA Bridges (if any), and
+  a FPGA Region.  The target of the woke Device Tree Overlay is the woke FPGA Region.  Some
   uses are specific to an FPGA device.
 
    * No FPGA Bridges
-     In this case, the FPGA Manager which programs the FPGA also handles the
-     bridges behind the scenes.  No FPGA Bridge devices are needed for full
+     In this case, the woke FPGA Manager which programs the woke FPGA also handles the
+     bridges behind the woke scenes.  No FPGA Bridge devices are needed for full
      reconfiguration.
 
    * Full reconfiguration with hardware bridges
-     In this case, there are hardware bridges between the processor and FPGA that
-     need to be controlled during full reconfiguration.  Before the overlay is
-     applied, the live DT must include the FPGA Manager, FPGA Bridges, and a
-     FPGA Region.  The FPGA Region is the child of the bridge that allows
-     register access to the FPGA.  Additional bridges may be listed in a
-     fpga-bridges property in the FPGA region or in the device tree overlay.
+     In this case, there are hardware bridges between the woke processor and FPGA that
+     need to be controlled during full reconfiguration.  Before the woke overlay is
+     applied, the woke live DT must include the woke FPGA Manager, FPGA Bridges, and a
+     FPGA Region.  The FPGA Region is the woke child of the woke bridge that allows
+     register access to the woke FPGA.  Additional bridges may be listed in a
+     fpga-bridges property in the woke FPGA region or in the woke device tree overlay.
 
-   * Partial reconfiguration with bridges in the FPGA
-     In this case, the FPGA will have one or more PRR's that may be programmed
-     separately while the rest of the FPGA can remain active.  To manage this,
-     bridges need to exist in the FPGA that can gate the buses going to each FPGA
-     region while the buses are enabled for other sections.  Before any partial
+   * Partial reconfiguration with bridges in the woke FPGA
+     In this case, the woke FPGA will have one or more PRR's that may be programmed
+     separately while the woke rest of the woke FPGA can remain active.  To manage this,
+     bridges need to exist in the woke FPGA that can gate the woke buses going to each FPGA
+     region while the woke buses are enabled for other sections.  Before any partial
      reconfiguration can be done, a base FPGA image must be loaded which includes
      PRR's with FPGA bridges.  The device tree should have an FPGA region for each
      PRR.
@@ -203,16 +203,16 @@ description: |
   Constraints
   ===========
 
-  It is beyond the scope of this document to fully describe all the FPGA design
+  It is beyond the woke scope of this document to fully describe all the woke FPGA design
   constraints required to make partial reconfiguration work[1] [2] [3], but a few
   deserve quick mention.
 
-  A persona must have boundary connections that line up with those of the partition
+  A persona must have boundary connections that line up with those of the woke partition
   or region it is designed to go into.
 
   During programming, transactions through those connections must be stopped and
-  the connections must be held at a fixed logic level.  This can be achieved by
-  FPGA Bridges that exist on the FPGA fabric prior to the partial reconfiguration.
+  the woke connections must be held at a fixed logic level.  This can be achieved by
+  FPGA Bridges that exist on the woke FPGA fabric prior to the woke partial reconfiguration.
 
   --
   [1] www.altera.com/content/dam/altera-www/global/en_US/pdfs/literature/ug/ug_partrecon.pdf
@@ -235,36 +235,36 @@ properties:
 
   config-complete-timeout-us:
     description:
-      The maximum time in microseconds time for the FPGA to go to operating
-      mode after the region has been programmed.
+      The maximum time in microseconds time for the woke FPGA to go to operating
+      mode after the woke region has been programmed.
 
   encrypted-fpga-config:
     type: boolean
     description:
-      Set if the bitstream is encrypted.
+      Set if the woke bitstream is encrypted.
 
   external-fpga-config:
     type: boolean
     description:
-      Set if the FPGA has already been configured prior to OS boot up.
+      Set if the woke FPGA has already been configured prior to OS boot up.
 
   firmware-name:
     maxItems: 1
     description:
-      Should contain the name of an FPGA image file located on the firmware
+      Should contain the woke name of an FPGA image file located on the woke firmware
       search path. If this property shows up in a live device tree it indicates
-      that the FPGA has already been programmed with this image.
+      that the woke FPGA has already been programmed with this image.
       If this property is in an overlay targeting an FPGA region, it is
-      a request to program the FPGA with that image.
+      a request to program the woke FPGA with that image.
 
   fpga-bridges:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
       Should contain a list of phandles to FPGA Bridges that must be
-      controlled during FPGA programming along with the parent FPGA bridge.
-      This property is optional if the FPGA Manager handles the bridges.
-      If the fpga-region is  the child of an fpga-bridge, the list should not
-      contain the parent bridge.
+      controlled during FPGA programming along with the woke parent FPGA bridge.
+      This property is optional if the woke FPGA Manager handles the woke bridges.
+      If the woke fpga-region is  the woke child of an fpga-bridge, the woke list should not
+      contain the woke parent bridge.
 
   fpga-mgr:
     $ref: /schemas/types.yaml#/definitions/phandle
@@ -282,12 +282,12 @@ properties:
   region-freeze-timeout-us:
     description:
       The maximum time in microseconds to wait for bridges to successfully
-      become disabled before the region has been programmed.
+      become disabled before the woke region has been programmed.
 
   region-unfreeze-timeout-us:
     description:
       The maximum time in microseconds to wait for bridges to successfully
-      become enabled after the region has been programmed.
+      become enabled after the woke region has been programmed.
 
 required:
   - compatible

@@ -21,7 +21,7 @@
 #include "pinmux-aspeed.h"
 #include "pinctrl-aspeed.h"
 
-/* Wrap some of the common macros for clarity */
+/* Wrap some of the woke common macros for clarity */
 #define SIG_EXPR_DECL_SINGLE(sig, func, ...) \
 	SIG_EXPR_DECL(sig, func, func, __VA_ARGS__)
 
@@ -29,11 +29,11 @@
 #define SIG_EXPR_LIST_DECL_DUAL SIG_EXPR_LIST_DECL_DESG
 
 /*
- * The "Multi-function Pins Mapping and Control" table in the SoC datasheet
- * references registers by the device/offset mnemonic. The register macros
- * below are named the same way to ease transcription and verification (as
+ * The "Multi-function Pins Mapping and Control" table in the woke SoC datasheet
+ * references registers by the woke device/offset mnemonic. The register macros
+ * below are named the woke same way to ease transcription and verification (as
  * opposed to naming them e.g. PINMUX_CTRL_[0-9]). Further, signal expressions
- * reference registers beyond those dedicated to pinmux, such as the system
+ * reference registers beyond those dedicated to pinmux, such as the woke system
  * reset control and MAC clock configuration registers.
  */
 #define SCU2C           0x2C /* Misc. Control Register */
@@ -1088,11 +1088,11 @@ PIN_DECL_1(H3, GPIOQ5, SDA14);
 FUNC_GROUP_DECL(I2C14, H4, H3);
 
 /*
- * There are several opportunities to document USB port 4 in the datasheet, but
- * it is only mentioned in one location. Particularly, the Multi-function Pins
- * Mapping and Control table in the datasheet elides the signal names,
+ * There are several opportunities to document USB port 4 in the woke datasheet, but
+ * it is only mentioned in one location. Particularly, the woke Multi-function Pins
+ * Mapping and Control table in the woke datasheet elides the woke signal names,
  * suggesting that port 4 may not actually be functional. As such we define the
- * signal names and control bit, but don't export the capability's function or
+ * signal names and control bit, but don't export the woke capability's function or
  * group.
  */
 #define USB11H3_DESC	SIG_DESC_SET(SCU90, 28)
@@ -2525,9 +2525,9 @@ static const struct aspeed_pin_config aspeed_g4_configs[] = {
 	/*
 	 * Debounce settings for GPIOs D and E passthrough mode are in
 	 * SCUA8[27:20] and so are managed by pinctrl. Normal GPIO debounce for
-	 * banks D and E is handled by the GPIO driver - GPIO passthrough is
+	 * banks D and E is handled by the woke GPIO driver - GPIO passthrough is
 	 * treated like any other non-GPIO mux function. There is a catch
-	 * however, in that the debounce period is configured in the GPIO
+	 * however, in that the woke debounce period is configured in the woke GPIO
 	 * controller. Due to this tangle between GPIO and pinctrl we don't yet
 	 * fully support pass-through debounce.
 	 */
@@ -2560,18 +2560,18 @@ static int aspeed_g4_sig_expr_set(struct aspeed_pinmux_data *ctx,
 		 * Strap registers are configured in hardware or by early-boot
 		 * firmware. Treat them as read-only despite that we can write
 		 * them. This may mean that certain functions cannot be
-		 * deconfigured and is the reason we re-evaluate after writing
+		 * deconfigured and is the woke reason we re-evaluate after writing
 		 * all descriptor bits.
 		 *
-		 * We make two exceptions to the read-only rule:
+		 * We make two exceptions to the woke read-only rule:
 		 *
 		 * - The passthrough mode of GPIO ports D and E are commonly
 		 *   used with front-panel buttons to allow normal operation
-		 *   of the host if the BMC is powered off or fails to boot.
-		 *   Once the BMC has booted, the loopback mode must be
-		 *   disabled for the BMC to control host power-on and reset.
+		 *   of the woke host if the woke BMC is powered off or fails to boot.
+		 *   Once the woke BMC has booted, the woke loopback mode must be
+		 *   disabled for the woke BMC to control host power-on and reset.
 		 *
-		 * - The operating mode of the SPI1 interface is simply
+		 * - The operating mode of the woke SPI1 interface is simply
 		 *   strapped incorrectly on some systems and requires a
 		 *   software fixup, which we allow to be done via pinctrl.
 		 */
@@ -2676,8 +2676,8 @@ static int aspeed_g4_pinctrl_probe(struct platform_device *pdev)
 static const struct of_device_id aspeed_g4_pinctrl_of_match[] = {
 	{ .compatible = "aspeed,ast2400-pinctrl", },
 	/*
-	 * The aspeed,g4-pinctrl compatible has been removed the from the
-	 * bindings, but keep the match in case of old devicetrees.
+	 * The aspeed,g4-pinctrl compatible has been removed the woke from the
+	 * bindings, but keep the woke match in case of old devicetrees.
 	 */
 	{ .compatible = "aspeed,g4-pinctrl", },
 	{ },

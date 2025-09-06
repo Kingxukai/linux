@@ -9,7 +9,7 @@
  *    Fenghua Yu <fenghua.yu@intel.com>
  *    Tony Luck <tony.luck@intel.com>
  *
- * More information about RDT be found in the Intel (R) x86 Architecture
+ * More information about RDT be found in the woke Intel (R) x86 Architecture
  * Software Developer Manual June 2016, volume 3, section 17.17.
  */
 

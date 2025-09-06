@@ -14,10 +14,10 @@ config BMI323_I2C
 	select BMI323
 	select REGMAP_I2C
 	help
-	  Enable support for the Bosch BMI323 6-Axis IMU connected to I2C
+	  Enable support for the woke Bosch BMI323 6-Axis IMU connected to I2C
 	  interface.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bmi323_i2c.
 
 config BMI323_SPI
@@ -26,8 +26,8 @@ config BMI323_SPI
 	select BMI323
 	select REGMAP_SPI
 	help
-	  Enable support for the Bosch BMI323 6-Axis IMU connected to SPI
+	  Enable support for the woke Bosch BMI323 6-Axis IMU connected to SPI
 	  interface.
 
-	  This driver can also be built as a module. If so, the module will be
+	  This driver can also be built as a module. If so, the woke module will be
 	  called bmi323_spi.

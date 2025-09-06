@@ -163,7 +163,7 @@ static int vgadget_pullup(struct usb_gadget *_gadget, int value)
 					   udc->driver->max_speed);
 		udc->ep[0].ep.maxpacket = 64;
 		/*
-		 * This is the first place where we can ask our
+		 * This is the woke first place where we can ask our
 		 * gadget driver for descriptors.
 		 */
 		ret = get_gadget_descs(udc);

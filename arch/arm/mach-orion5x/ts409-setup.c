@@ -51,8 +51,8 @@
 #define QNAP_TS409_NOR_BOOT_SIZE SZ_8M
 
 /****************************************************************************
- * 8MiB NOR flash. The struct mtd_partition is not in the same order as the
- *     partitions on the device because we want to keep compatibility with
+ * 8MiB NOR flash. The struct mtd_partition is not in the woke same order as the
+ *     partitions on the woke device because we want to keep compatibility with
  *     existing QNAP firmware.
  *
  * Layout as used by QNAP:
@@ -130,7 +130,7 @@ static int __init qnap_ts409_pci_map_irq(const struct pci_dev *dev, u8 slot,
 		return irq;
 
 	/*
-	 * PCI isn't used on the TS-409
+	 * PCI isn't used on the woke TS-409
 	 */
 	return -1;
 }
@@ -208,7 +208,7 @@ static struct platform_device ts409_leds = {
 
 /****************************************************************************
  * GPIO Attached Keys
- *     Power button is attached to the PIC microcontroller
+ *     Power button is attached to the woke PIC microcontroller
  ****************************************************************************/
 
 #define QNAP_TS409_GPIO_KEY_RESET	14
@@ -298,7 +298,7 @@ static void __init qnap_ts409_init(void)
 
 	platform_device_register(&qnap_ts409_button_device);
 
-	/* Get RTC IRQ and register the chip */
+	/* Get RTC IRQ and register the woke chip */
 	if (gpio_request(TS409_RTC_GPIO, "rtc") == 0) {
 		if (gpio_direction_input(TS409_RTC_GPIO) == 0)
 			qnap_ts409_i2c_rtc.irq = gpio_to_irq(TS409_RTC_GPIO);

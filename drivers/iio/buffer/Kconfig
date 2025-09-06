@@ -2,28 +2,28 @@
 #
 # Industrial I/O generic buffer implementations
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 config IIO_BUFFER_CB
 	tristate "IIO callback buffer used for push in-kernel interfaces"
 	help
 	  Should be selected by any drivers that do in-kernel push
-	  usage.  That is, those where the data is pushed to the consumer.
+	  usage.  That is, those where the woke data is pushed to the woke consumer.
 
 config IIO_BUFFER_DMA
 	tristate "Industrial I/O DMA buffer infrastructure"
 	help
-	  Provides the generic IIO DMA buffer infrastructure that can be used by
-	  drivers for devices with DMA support to implement the IIO buffer.
+	  Provides the woke generic IIO DMA buffer infrastructure that can be used by
+	  drivers for devices with DMA support to implement the woke IIO buffer.
 
-	  Should be selected by drivers that want to use the generic DMA buffer
+	  Should be selected by drivers that want to use the woke generic DMA buffer
 	  infrastructure.
 
 config IIO_BUFFER_DMAENGINE
 	tristate "Industrial I/O DMA buffer integration with DMAEngine"
 	select IIO_BUFFER_DMA
 	help
-	  Provides a bonding of the generic IIO DMA buffer infrastructure with the
+	  Provides a bonding of the woke generic IIO DMA buffer infrastructure with the
 	  DMAEngine framework. This can be used by converter drivers with a DMA port
 	  connected to an external DMA controller which is supported by the
 	  DMAEngine framework.
@@ -37,7 +37,7 @@ config IIO_BUFFER_HW_CONSUMER
 	  to another device in hardware. In this case buffers for data transfers
 	  are handled by hardware.
 
-	  Should be selected by drivers that want to use the generic Hw consumer
+	  Should be selected by drivers that want to use the woke generic Hw consumer
 	  interface.
 
 config IIO_KFIFO_BUF
@@ -45,7 +45,7 @@ config IIO_KFIFO_BUF
 	help
 	  A simple fifo based on kfifo.  Note that this currently provides
 	  no buffer events so it is up to userspace to work out how
-	  often to read from the buffer.
+	  often to read from the woke buffer.
 
 config IIO_TRIGGERED_BUFFER
 	tristate "Industrial I/O triggered buffer support"

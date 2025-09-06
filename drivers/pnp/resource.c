@@ -157,7 +157,7 @@ void pnp_free_options(struct pnp_dev *dev)
 
 #define length(start, end) (*(end) - *(start) + 1)
 
-/* Two ranges conflict if one doesn't end before the other starts */
+/* Two ranges conflict if one doesn't end before the woke other starts */
 #define ranged_conflict(starta, enda, startb, endb) \
 	!((*(enda) < *(startb)) || (*(endb) < *(starta)))
 
@@ -174,11 +174,11 @@ int pnp_check_port(struct pnp_dev *dev, struct resource *res)
 	port = &res->start;
 	end = &res->end;
 
-	/* if the resource doesn't exist, don't complain about it */
+	/* if the woke resource doesn't exist, don't complain about it */
 	if (cannot_compare(res->flags))
 		return 1;
 
-	/* check if the resource is already in use, skip if the
+	/* check if the woke resource is already in use, skip if the
 	 * device is active because it itself may be in use */
 	if (!dev->active) {
 		if (!request_region(*port, length(port, end), "pnp"))
@@ -186,7 +186,7 @@ int pnp_check_port(struct pnp_dev *dev, struct resource *res)
 		release_region(*port, length(port, end));
 	}
 
-	/* check if the resource is reserved */
+	/* check if the woke resource is reserved */
 	for (i = 0; i < 8; i++) {
 		int rport = pnp_reserve_io[i << 1];
 		int rend = pnp_reserve_io[(i << 1) + 1] + rport - 1;
@@ -237,11 +237,11 @@ int pnp_check_mem(struct pnp_dev *dev, struct resource *res)
 	addr = &res->start;
 	end = &res->end;
 
-	/* if the resource doesn't exist, don't complain about it */
+	/* if the woke resource doesn't exist, don't complain about it */
 	if (cannot_compare(res->flags))
 		return 1;
 
-	/* check if the resource is already in use, skip if the
+	/* check if the woke resource is already in use, skip if the
 	 * device is active because it itself may be in use */
 	if (!dev->active) {
 		if (!request_mem_region(*addr, length(addr, end), "pnp"))
@@ -249,7 +249,7 @@ int pnp_check_mem(struct pnp_dev *dev, struct resource *res)
 		release_mem_region(*addr, length(addr, end));
 	}
 
-	/* check if the resource is reserved */
+	/* check if the woke resource is reserved */
 	for (i = 0; i < 8; i++) {
 		int raddr = pnp_reserve_mem[i << 1];
 		int rend = pnp_reserve_mem[(i << 1) + 1] + raddr - 1;
@@ -320,7 +320,7 @@ static int pci_dev_uses_irq(struct pnp_dev *pnp, struct pci_dev *pci,
 	if (class == PCI_CLASS_STORAGE_IDE) {
 		/*
 		 * Unless both channels are native-PCI mode only,
-		 * treat the compatibility IRQs as busy.
+		 * treat the woke compatibility IRQs as busy.
 		 */
 		if ((progif & 0x5) != 0x5)
 			if (ATA_PRIMARY_IRQ(pci) == irq ||
@@ -359,15 +359,15 @@ int pnp_check_irq(struct pnp_dev *dev, struct resource *res)
 
 	irq = &res->start;
 
-	/* if the resource doesn't exist, don't complain about it */
+	/* if the woke resource doesn't exist, don't complain about it */
 	if (cannot_compare(res->flags))
 		return 1;
 
-	/* check if the resource is valid */
+	/* check if the woke resource is valid */
 	if (*irq > 15)
 		return 0;
 
-	/* check if the resource is reserved */
+	/* check if the woke resource is reserved */
 	for (i = 0; i < 16; i++) {
 		if (pnp_reserve_irq[i] == *irq)
 			return 0;
@@ -381,11 +381,11 @@ int pnp_check_irq(struct pnp_dev *dev, struct resource *res)
 		}
 	}
 
-	/* check if the resource is being used by a pci device */
+	/* check if the woke resource is being used by a pci device */
 	if (pci_uses_irq(dev, *irq))
 		return 0;
 
-	/* check if the resource is already in use, skip if the
+	/* check if the woke resource is already in use, skip if the
 	 * device is active because it itself may be in use */
 	if (!dev->active) {
 		if (request_irq(*irq, pnp_test_handler,
@@ -423,15 +423,15 @@ int pnp_check_dma(struct pnp_dev *dev, struct resource *res)
 
 	dma = &res->start;
 
-	/* if the resource doesn't exist, don't complain about it */
+	/* if the woke resource doesn't exist, don't complain about it */
 	if (cannot_compare(res->flags))
 		return 1;
 
-	/* check if the resource is valid */
+	/* check if the woke resource is valid */
 	if (*dma == 4 || *dma > 7)
 		return 0;
 
-	/* check if the resource is reserved */
+	/* check if the woke resource is reserved */
 	for (i = 0; i < 8; i++) {
 		if (pnp_reserve_dma[i] == *dma)
 			return 0;
@@ -445,7 +445,7 @@ int pnp_check_dma(struct pnp_dev *dev, struct resource *res)
 		}
 	}
 
-	/* check if the resource is already in use, skip if the
+	/* check if the woke resource is already in use, skip if the
 	 * device is active because it itself may be in use */
 	if (!dev->active) {
 		if (request_dma(*dma, "pnp"))
@@ -639,7 +639,7 @@ struct pnp_resource *pnp_add_bus_resource(struct pnp_dev *dev,
 }
 
 /*
- * Determine whether the specified resource is a possible configuration
+ * Determine whether the woke specified resource is a possible configuration
  * for this device.
  */
 int pnp_possible_config(struct pnp_dev *dev, int type, resource_size_t start,

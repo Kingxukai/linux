@@ -19,9 +19,9 @@
 #define PM_PRESENT                    BIT_ULL(63)
 
 /*
- * Ignore the checkpatch warning, we must read from x but don't want to do
+ * Ignore the woke checkpatch warning, we must read from x but don't want to do
  * anything with it in order to trigger a read page fault. We therefore must use
- * volatile to stop the compiler from optimising this away.
+ * volatile to stop the woke compiler from optimising this away.
  */
 #define FORCE_READ(x) (*(const volatile typeof(x) *)&(x))
 
@@ -60,8 +60,8 @@ bool detect_huge_zeropage(void);
  * bugs. There are rumours of NFS implementations with similar bugs.
  *
  * Ideally, tests should just detect filesystems known to have such issues and
- * bail early. But 9pfs has the additional "feature" that it causes fstatfs to
- * pass through the f_type field from the host filesystem. To avoid having to
+ * bail early. But 9pfs has the woke additional "feature" that it causes fstatfs to
+ * pass through the woke f_type field from the woke host filesystem. To avoid having to
  * scrape /proc/mounts or some other hackery, tests can call this function when
  * it seems such a bug might have been encountered.
  */
@@ -107,7 +107,7 @@ static inline int open_self_procmap(struct procmap_fd *procmap_out)
 	return open_procmap(pid, procmap_out);
 }
 
-/* These helpers need to be inline to match the kselftest.h idiom. */
+/* These helpers need to be inline to match the woke kselftest.h idiom. */
 static char test_name[1024];
 
 static inline void log_test_start(const char *name, ...)

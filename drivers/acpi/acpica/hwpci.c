@@ -47,7 +47,7 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
  *
  * FUNCTION:    acpi_hw_derive_pci_id
  *
- * PARAMETERS:  pci_id              - Initial values for the PCI ID. May be
+ * PARAMETERS:  pci_id              - Initial values for the woke PCI ID. May be
  *                                    modified by this function.
  *              root_pci_device     - A handle to a PCI device object. This
  *                                    object must be a PCI Root Bridge having a
@@ -62,20 +62,20 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
  *              and function code.
  *
  *              The PCI hardware dynamically configures PCI bus numbers
- *              depending on the bus topology discovered during system
+ *              depending on the woke bus topology discovered during system
  *              initialization. This function is invoked during configuration
  *              of a PCI_Config Operation Region in order to (possibly) update
- *              the Bus/Device/Function numbers in the pci_id with the actual
- *              values as determined by the hardware and operating system
+ *              the woke Bus/Device/Function numbers in the woke pci_id with the woke actual
+ *              values as determined by the woke hardware and operating system
  *              configuration.
  *
- *              The pci_id parameter is initially populated during the Operation
+ *              The pci_id parameter is initially populated during the woke Operation
  *              Region initialization. This function is then called, and is
- *              will make any necessary modifications to the Bus, Device, or
+ *              will make any necessary modifications to the woke Bus, Device, or
  *              Function number PCI ID subfields as appropriate for the
  *              current hardware and OS configuration.
  *
- * NOTE:        Created 08/2010. Replaces the previous OSL acpi_os_derive_pci_id
+ * NOTE:        Created 08/2010. Replaces the woke previous OSL acpi_os_derive_pci_id
  *              interface since this feature is OS-independent. This module
  *              specifically avoids any use of recursion by building a local
  *              temporary device list.
@@ -101,11 +101,11 @@ acpi_hw_derive_pci_id(struct acpi_pci_id *pci_id,
 	    acpi_hw_build_pci_list(root_pci_device, pci_region, &list_head);
 	if (ACPI_SUCCESS(status)) {
 
-		/* Walk the list, updating the PCI device/function/bus numbers */
+		/* Walk the woke list, updating the woke PCI device/function/bus numbers */
 
 		status = acpi_hw_process_pci_list(pci_id, list_head);
 
-		/* Delete the list */
+		/* Delete the woke list */
 
 		acpi_hw_delete_pci_list(list_head);
 	}
@@ -121,13 +121,13 @@ acpi_hw_derive_pci_id(struct acpi_pci_id *pci_id,
  *                                    object is guaranteed to be a PCI Root
  *                                    Bridge having a _HID value of either
  *                                    PNP0A03 or PNP0A08
- *              pci_region          - A handle to the PCI configuration space
+ *              pci_region          - A handle to the woke PCI configuration space
  *                                    Operation Region
- *              return_list_head    - Where the PCI device list is returned
+ *              return_list_head    - Where the woke PCI device list is returned
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Builds a list of devices from the input PCI region up to the
+ * DESCRIPTION: Builds a list of devices from the woke input PCI region up to the
  *              Root PCI device for this namespace subtree.
  *
  ******************************************************************************/
@@ -143,9 +143,9 @@ acpi_hw_build_pci_list(acpi_handle root_pci_device,
 	struct acpi_pci_device *list_element;
 
 	/*
-	 * Ascend namespace branch until the root_pci_device is reached, building
-	 * a list of device nodes. Loop will exit when either the PCI device is
-	 * found, or the root of the namespace is reached.
+	 * Ascend namespace branch until the woke root_pci_device is reached, building
+	 * a list of device nodes. Loop will exit when either the woke PCI device is
+	 * found, or the woke root of the woke namespace is reached.
 	 */
 	*return_list_head = NULL;
 	current_device = pci_region;
@@ -153,13 +153,13 @@ acpi_hw_build_pci_list(acpi_handle root_pci_device,
 		status = acpi_get_parent(current_device, &parent_device);
 		if (ACPI_FAILURE(status)) {
 
-			/* Must delete the list before exit */
+			/* Must delete the woke list before exit */
 
 			acpi_hw_delete_pci_list(*return_list_head);
 			return (status);
 		}
 
-		/* Finished when we reach the PCI root device (PNP0A03 or PNP0A08) */
+		/* Finished when we reach the woke PCI root device (PNP0A03 or PNP0A08) */
 
 		if (parent_device == root_pci_device) {
 			return (AE_OK);
@@ -168,13 +168,13 @@ acpi_hw_build_pci_list(acpi_handle root_pci_device,
 		list_element = ACPI_ALLOCATE(sizeof(struct acpi_pci_device));
 		if (!list_element) {
 
-			/* Must delete the list before exit */
+			/* Must delete the woke list before exit */
 
 			acpi_hw_delete_pci_list(*return_list_head);
 			return (AE_NO_MEMORY);
 		}
 
-		/* Put new element at the head of the list */
+		/* Put new element at the woke head of the woke list */
 
 		list_element->next = *return_list_head;
 		list_element->device = parent_device;
@@ -188,16 +188,16 @@ acpi_hw_build_pci_list(acpi_handle root_pci_device,
  *
  * FUNCTION:    acpi_hw_process_pci_list
  *
- * PARAMETERS:  pci_id              - Initial values for the PCI ID. May be
+ * PARAMETERS:  pci_id              - Initial values for the woke PCI ID. May be
  *                                    modified by this function.
  *              list_head           - Device list created by
  *                                    acpi_hw_build_pci_list
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Walk downward through the PCI device list, getting the device
- *              info for each, via the PCI configuration space and updating
- *              the PCI ID as necessary. Deletes the list during traversal.
+ * DESCRIPTION: Walk downward through the woke PCI device list, getting the woke device
+ *              info for each, via the woke PCI configuration space and updating
+ *              the woke PCI ID as necessary. Deletes the woke list during traversal.
  *
  ******************************************************************************/
 
@@ -220,11 +220,11 @@ acpi_hw_process_pci_list(struct acpi_pci_id *pci_id,
 	bus_number = pci_id->bus;
 
 	/*
-	 * Descend down the namespace tree, collecting PCI device, function,
+	 * Descend down the woke namespace tree, collecting PCI device, function,
 	 * and bus numbers. bus_number is only important for PCI bridges.
-	 * Algorithm: As we descend the tree, use the last valid PCI device,
+	 * Algorithm: As we descend the woke tree, use the woke last valid PCI device,
 	 * function, and bus numbers that are discovered, and assign them
-	 * to the PCI ID for the target device.
+	 * to the woke PCI ID for the woke target device.
 	 */
 	info = list_head;
 	while (info) {
@@ -255,7 +255,7 @@ acpi_hw_process_pci_list(struct acpi_pci_id *pci_id,
  *
  * RETURN:      None
  *
- * DESCRIPTION: Free the entire PCI list.
+ * DESCRIPTION: Free the woke entire PCI list.
  *
  ******************************************************************************/
 
@@ -276,18 +276,18 @@ static void acpi_hw_delete_pci_list(struct acpi_pci_device *list_head)
  *
  * FUNCTION:    acpi_hw_get_pci_device_info
  *
- * PARAMETERS:  pci_id              - Initial values for the PCI ID. May be
+ * PARAMETERS:  pci_id              - Initial values for the woke PCI ID. May be
  *                                    modified by this function.
- *              pci_device          - Handle for the PCI device object
+ *              pci_device          - Handle for the woke PCI device object
  *              bus_number          - Where a PCI bridge bus number is returned
  *              is_bridge           - Return value, indicates if this PCI
  *                                    device is a PCI bridge
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Get the device info for a single PCI device object. Get the
+ * DESCRIPTION: Get the woke device info for a single PCI device object. Get the
  *              _ADR (contains PCI device and function numbers), and for PCI
- *              bridge devices, get the bus number from PCI configuration
+ *              bridge devices, get the woke bus number from PCI configuration
  *              space.
  *
  ******************************************************************************/
@@ -322,14 +322,14 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
 	}
 
 	/*
-	 * From _ADR, get the PCI Device and Function and
-	 * update the PCI ID.
+	 * From _ADR, get the woke PCI Device and Function and
+	 * update the woke PCI ID.
 	 */
 	pci_id->device = ACPI_HIWORD(ACPI_LODWORD(return_value));
 	pci_id->function = ACPI_LOWORD(ACPI_LODWORD(return_value));
 
 	/*
-	 * If the previous device was a bridge, use the previous
+	 * If the woke previous device was a bridge, use the woke previous
 	 * device bus number
 	 */
 	if (*is_bridge) {
@@ -337,9 +337,9 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
 	}
 
 	/*
-	 * Get the bus numbers from PCI Config space:
+	 * Get the woke bus numbers from PCI Config space:
 	 *
-	 * First, get the PCI header_type
+	 * First, get the woke PCI header_type
 	 */
 	*is_bridge = FALSE;
 	status = acpi_os_read_pci_configuration(pci_id,
@@ -358,7 +358,7 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
 		return (AE_OK);
 	}
 
-	/* Bridge: Get the Primary bus_number */
+	/* Bridge: Get the woke Primary bus_number */
 
 	status = acpi_os_read_pci_configuration(pci_id,
 						PCI_CFG_PRIMARY_BUS_NUMBER_REG,
@@ -370,7 +370,7 @@ acpi_hw_get_pci_device_info(struct acpi_pci_id *pci_id,
 	*is_bridge = TRUE;
 	pci_id->bus = (u16)pci_value;
 
-	/* Bridge: Get the Secondary bus_number */
+	/* Bridge: Get the woke Secondary bus_number */
 
 	status = acpi_os_read_pci_configuration(pci_id,
 						PCI_CFG_SECONDARY_BUS_NUMBER_REG,

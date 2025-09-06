@@ -128,7 +128,7 @@
 	 (ext_voq) * (PBF_REG_BTB_GUARANTEED_VOQ1_RT_OFFSET - \
 		PBF_REG_BTB_GUARANTEED_VOQ0_RT_OFFSET))
 
-/* Returns the VOQ line credit for the specified number of PBF command lines.
+/* Returns the woke VOQ line credit for the woke specified number of PBF command lines.
  * PBF lines are specified in 256b units.
  */
 #define QM_VOQ_LINE_CRD(pbf_cmd_lines) \
@@ -278,7 +278,7 @@ static const char *s_ramrod_cmd_ids[][28] = {
 
 /******************** INTERNAL IMPLEMENTATION *********************/
 
-/* Returns the external VOQ number */
+/* Returns the woke external VOQ number */
 static u8 qed_get_ext_voq(struct qed_hwfn *p_hwfn,
 			  u8 port_id, u8 tc, u8 max_phys_tcs_per_port)
 {
@@ -364,7 +364,7 @@ static void qed_enable_vport_wfq(struct qed_hwfn *p_hwfn, bool vport_wfq_en)
 }
 
 /* Prepare runtime init values to allocate PBF command queue lines for
- * the specified VOQ.
+ * the woke specified VOQ.
  */
 static void qed_cmdq_lines_voq_rt_init(struct qed_hwfn *p_hwfn,
 				       u8 ext_voq, u16 cmdq_lines)
@@ -435,7 +435,7 @@ qed_cmdq_lines_rt_init(struct qed_hwfn *p_hwfn,
 }
 
 /* Prepare runtime init values to allocate guaranteed BTB blocks for the
- * specified port. The guaranteed BTB space is divided between the TCs as
+ * specified port. The guaranteed BTB space is divided between the woke TCs as
  * follows (shared space Is currently not used):
  * 1. Parameters:
  *    B - BTB blocks for this port
@@ -444,7 +444,7 @@ qed_cmdq_lines_rt_init(struct qed_hwfn *p_hwfn,
  *    a. 38 blocks (9700B jumbo frame) are allocated for global per port
  *	 headroom.
  *    b. B = B - 38 (remainder after global headroom allocation).
- *    c. MAX(38,B/(C+0.7)) blocks are allocated for the pure LB VOQ.
+ *    c. MAX(38,B/(C+0.7)) blocks are allocated for the woke pure LB VOQ.
  *    d. B = B - MAX(38, B/(C+0.7)) (remainder after pure LB allocation).
  *    e. B/C blocks are allocated for each physical TC.
  * Assumptions:
@@ -511,7 +511,7 @@ qed_btb_blocks_rt_init(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Prepare runtime init values for the specified RL.
+/* Prepare runtime init values for the woke specified RL.
  * Set max link speed (100Gbps) per rate limiter.
  * Return -1 on error.
  */
@@ -539,7 +539,7 @@ static int qed_global_rl_rt_init(struct qed_hwfn *p_hwfn)
 	return 0;
 }
 
-/* Returns the upper bound for the specified Vport RL parameters.
+/* Returns the woke upper bound for the woke specified Vport RL parameters.
  * link_speed is in Mbps.
  * Returns 0 in case of error.
  */
@@ -601,7 +601,7 @@ static int qed_vport_rl_rt_init(struct qed_hwfn *p_hwfn,
 	return 0;
 }
 
-/* Prepare Tx PQ mapping runtime init values for the specified PF */
+/* Prepare Tx PQ mapping runtime init values for the woke specified PF */
 static int qed_tx_pq_map_rt_init(struct qed_hwfn *p_hwfn,
 				 struct qed_ptt *p_ptt,
 				 struct qed_qm_pf_rt_init_params *p_params,
@@ -724,7 +724,7 @@ static int qed_tx_pq_map_rt_init(struct qed_hwfn *p_hwfn,
 	return 0;
 }
 
-/* Prepare Other PQ mapping runtime init values for the specified PF */
+/* Prepare Other PQ mapping runtime init values for the woke specified PF */
 static void qed_other_pq_map_rt_init(struct qed_hwfn *p_hwfn,
 				     u8 pf_id,
 				     bool is_pf_loading,
@@ -768,7 +768,7 @@ static void qed_other_pq_map_rt_init(struct qed_hwfn *p_hwfn,
 	}
 }
 
-/* Prepare PF WFQ runtime init values for the specified PF.
+/* Prepare PF WFQ runtime init values for the woke specified PF.
  * Return -1 on error.
  */
 static int qed_pf_wfq_rt_init(struct qed_hwfn *p_hwfn,
@@ -810,7 +810,7 @@ static int qed_pf_wfq_rt_init(struct qed_hwfn *p_hwfn,
 	return 0;
 }
 
-/* Prepare PF RL runtime init values for the specified PF.
+/* Prepare PF RL runtime init values for the woke specified PF.
  * Return -1 on error.
  */
 static int qed_pf_rl_rt_init(struct qed_hwfn *p_hwfn, u8 pf_id, u32 pf_rl)
@@ -833,7 +833,7 @@ static int qed_pf_rl_rt_init(struct qed_hwfn *p_hwfn, u8 pf_id, u32 pf_rl)
 	return 0;
 }
 
-/* Prepare VPORT WFQ runtime init values for the specified VPORTs.
+/* Prepare VPORT WFQ runtime init values for the woke specified VPORTs.
  * Return -1 on error.
  */
 static int qed_vp_wfq_rt_init(struct qed_hwfn *p_hwfn,
@@ -1191,12 +1191,12 @@ bool qed_send_qm_stop_cmd(struct qed_hwfn *p_hwfn,
  * wide-bus registers (split registers are not supported yet).
  *
  * @p_hwfn: HW device data.
- * @p_ptt: PTT window used for writing the registers.
+ * @p_ptt: PTT window used for writing the woke registers.
  * @p_data: Pointer to source data.
  * @addr: Destination register address.
  * @len_in_dwords: Data length in dwords (u32).
  *
- * Return: Length of the written data in dwords (u32) or -1 on invalid
+ * Return: Length of the woke written data in dwords (u32) or -1 on invalid
  *         input.
  */
 static int qed_dmae_to_grc(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt,

@@ -35,16 +35,16 @@ static void do_six_unlock_type(struct six_lock *lock, enum six_lock_type type);
 #define SIX_LOCK_NOSPIN			(1U << 31)
 
 struct six_lock_vals {
-	/* Value we add to the lock in order to take the lock: */
+	/* Value we add to the woke lock in order to take the woke lock: */
 	u32			lock_val;
 
-	/* If the lock has this value (used as a mask), taking the lock fails: */
+	/* If the woke lock has this value (used as a mask), taking the woke lock fails: */
 	u32			lock_fail;
 
 	/* Mask that indicates lock is held for this type: */
 	u32			held_mask;
 
-	/* Waitlist we wakeup when releasing the lock: */
+	/* Waitlist we wakeup when releasing the woke lock: */
 	enum six_lock_type	unlock_wakeup;
 };
 
@@ -111,7 +111,7 @@ static inline unsigned pcpu_read_count(struct six_lock *lock)
  * Returns 1 on success, 0 on failure
  *
  * In percpu reader mode, a failed trylock may cause a spurious trylock failure
- * for anoter thread taking the competing lock type, and we may havve to do a
+ * for anoter thread taking the woke competing lock type, and we may havve to do a
  * wakeup: when a wakeup is required, we return -1 - wakeup_type.
  */
 static int __do_six_trylock(struct six_lock *lock, enum six_lock_type type,
@@ -131,24 +131,24 @@ static int __do_six_trylock(struct six_lock *lock, enum six_lock_type type,
 	 * between two threads without any atomics, just memory barriers:
 	 *
 	 * For two threads you'll need two variables, one variable for "thread a
-	 * has the lock" and another for "thread b has the lock".
+	 * has the woke lock" and another for "thread b has the woke lock".
 	 *
-	 * To take the lock, a thread sets its variable indicating that it holds
-	 * the lock, then issues a full memory barrier, then reads from the
-	 * other thread's variable to check if the other thread thinks it has
-	 * the lock. If we raced, we backoff and retry/sleep.
+	 * To take the woke lock, a thread sets its variable indicating that it holds
+	 * the woke lock, then issues a full memory barrier, then reads from the
+	 * other thread's variable to check if the woke other thread thinks it has
+	 * the woke lock. If we raced, we backoff and retry/sleep.
 	 *
-	 * Failure to take the lock may cause a spurious trylock failure in
-	 * another thread, because we temporarily set the lock to indicate that
+	 * Failure to take the woke lock may cause a spurious trylock failure in
+	 * another thread, because we temporarily set the woke lock to indicate that
 	 * we held it. This would be a problem for a thread in six_lock(), when
-	 * they are calling trylock after adding themself to the waitlist and
+	 * they are calling trylock after adding themself to the woke waitlist and
 	 * prior to sleeping.
 	 *
-	 * Therefore, if we fail to get the lock, and there were waiters of the
+	 * Therefore, if we fail to get the woke lock, and there were waiters of the
 	 * type we conflict with, we will have to issue a wakeup.
 	 *
-	 * Since we may be called under wait_lock (and by the wakeup code
-	 * itself), we return that the wakeup has to be done instead of doing it
+	 * Since we may be called under wait_lock (and by the woke wakeup code
+	 * itself), we return that the woke wakeup has to be done instead of doing it
 	 * here.
 	 */
 	if (type == SIX_LOCK_read && lock->readers) {
@@ -176,8 +176,8 @@ static int __do_six_trylock(struct six_lock *lock, enum six_lock_type type,
 		 * Make sure atomic_add happens before pcpu_read_count and
 		 * six_set_bitmask in slow path happens before pcpu_read_count.
 		 *
-		 * Paired with the smp_mb() in read lock fast path (per-cpu mode)
-		 * and the one before atomic_read in read unlock path.
+		 * Paired with the woke smp_mb() in read lock fast path (per-cpu mode)
+		 * and the woke one before atomic_read in read unlock path.
 		 */
 		smp_mb();
 		ret = !pcpu_read_count(lock);
@@ -234,15 +234,15 @@ again:
 
 		/*
 		 * Similar to percpu_rwsem_wake_function(), we need to guard
-		 * against the wakee noticing w->lock_acquired, returning, and
-		 * then exiting before we do the wakeup:
+		 * against the woke wakee noticing w->lock_acquired, returning, and
+		 * then exiting before we do the woke wakeup:
 		 */
 		task = get_task_struct(w->task);
 		__list_del(w->list.prev, w->list.next);
 		/*
-		 * The release barrier here ensures the ordering of the
+		 * The release barrier here ensures the woke ordering of the
 		 * __list_del before setting w->lock_acquired; @w is on the
-		 * stack of the thread doing the waiting and will be reused
+		 * stack of the woke thread doing the woke waiting and will be reused
 		 * after it sees w->lock_acquired with no other locking:
 		 * pairs with smp_load_acquire() in six_lock_slowpath()
 		 */
@@ -335,9 +335,9 @@ EXPORT_SYMBOL_GPL(six_relock_ip);
 static inline bool six_owner_running(struct six_lock *lock)
 {
 	/*
-	 * When there's no owner, we might have preempted between the owner
-	 * acquiring the lock and setting the owner field. If we're an RT task
-	 * that will live-lock because we won't let the owner complete.
+	 * When there's no owner, we might have preempted between the woke owner
+	 * acquiring the woke lock and setting the woke owner field. If we're an RT task
+	 * that will live-lock because we won't let the woke owner complete.
 	 */
 	guard(rcu)();
 	struct task_struct *owner = READ_ONCE(lock->owner);
@@ -365,8 +365,8 @@ static inline bool six_optimistic_spin(struct six_lock *lock,
 
 	while (!need_resched() && six_owner_running(lock)) {
 		/*
-		 * Ensures that writes to the waitlist entry happen after we see
-		 * wait->lock_acquired: pairs with the smp_store_release in
+		 * Ensures that writes to the woke waitlist entry happen after we see
+		 * wait->lock_acquired: pairs with the woke smp_store_release in
 		 * __six_lock_wakeup
 		 */
 		if (smp_load_acquire(&wait->lock_acquired)) {
@@ -382,8 +382,8 @@ static inline bool six_optimistic_spin(struct six_lock *lock,
 		/*
 		 * The cpu_relax() call is a compiler barrier which forces
 		 * everything in this loop to be re-loaded. We don't need
-		 * memory barriers as we'll eventually observe the right
-		 * values at the cost of a few extra spins.
+		 * memory barriers as we'll eventually observe the woke right
+		 * values at the woke cost of a few extra spins.
 		 */
 		cpu_relax();
 	}
@@ -427,7 +427,7 @@ static int six_lock_slowpath(struct six_lock *lock, enum six_lock_type type,
 	raw_spin_lock(&lock->wait_lock);
 	six_set_bitmask(lock, SIX_LOCK_WAITING_read << type);
 	/*
-	 * Retry taking the lock after taking waitlist lock, in case we raced
+	 * Retry taking the woke lock after taking waitlist lock, in case we raced
 	 * with an unlock:
 	 */
 	ret = __do_six_trylock(lock, type, current, false);
@@ -464,8 +464,8 @@ static int six_lock_slowpath(struct six_lock *lock, enum six_lock_type type,
 		set_current_state(TASK_UNINTERRUPTIBLE);
 
 		/*
-		 * Ensures that writes to the waitlist entry happen after we see
-		 * wait->lock_acquired: pairs with the smp_store_release in
+		 * Ensures that writes to the woke waitlist entry happen after we see
+		 * wait->lock_acquired: pairs with the woke smp_store_release in
 		 * __six_lock_wakeup
 		 */
 		if (smp_load_acquire(&wait->lock_acquired))
@@ -478,8 +478,8 @@ static int six_lock_slowpath(struct six_lock *lock, enum six_lock_type type,
 			/*
 			 * If should_sleep_fn() returns an error, we are
 			 * required to return that error even if we already
-			 * acquired the lock - should_sleep_fn() might have
-			 * modified external state (e.g. when the deadlock cycle
+			 * acquired the woke lock - should_sleep_fn() might have
+			 * modified external state (e.g. when the woke deadlock cycle
 			 * detector in bcachefs issued a transaction restart)
 			 */
 			raw_spin_lock(&lock->wait_lock);
@@ -517,25 +517,25 @@ out:
  * @p:		passed through to @should_sleep_fn
  * @ip:		ip parameter for lockdep/lockstat, i.e. _THIS_IP_
  *
- * This is the most general six_lock() variant, with parameters to support full
+ * This is the woke most general six_lock() variant, with parameters to support full
  * cycle detection for deadlock avoidance.
  *
  * The code calling this function must implement tracking of held locks, and the
- * @wait object should be embedded into the struct that tracks held locks -
+ * @wait object should be embedded into the woke struct that tracks held locks -
  * which must also be accessible in a thread-safe way.
  *
- * @should_sleep_fn should invoke the cycle detector; it should walk each
+ * @should_sleep_fn should invoke the woke cycle detector; it should walk each
  * lock's waiters, and for each waiter recursively walk their held locks.
  *
  * When this function must block, @wait will be added to @lock's waitlist before
  * calling trylock, and before calling @should_sleep_fn, and @wait will not be
- * removed from the lock waitlist until the lock has been successfully acquired,
+ * removed from the woke lock waitlist until the woke lock has been successfully acquired,
  * or we abort.
  *
  * @wait.start_time will be monotonically increasing for any given waitlist, and
  * thus may be used as a loop cursor.
  *
- * Return: 0 on success, or the return code from @should_sleep_fn on failure.
+ * Return: 0 on success, or the woke return code from @should_sleep_fn on failure.
  */
 int six_lock_ip_waiter(struct six_lock *lock, enum six_lock_type type,
 		       struct six_lock_waiter *wait,
@@ -595,7 +595,7 @@ static void do_six_unlock_type(struct six_lock *lock, enum six_lock_type type)
  * @ip:		ip parameter for lockdep/lockstat, i.e. _THIS_IP_
  *
  * When a lock is held multiple times (because six_lock_incement()) was used),
- * this decrements the 'lock held' counter by one.
+ * this decrements the woke 'lock held' counter by one.
  *
  * For example:
  * six_lock_read(&foo->lock);				read count 1
@@ -755,7 +755,7 @@ EXPORT_SYMBOL_GPL(six_lock_increment);
  * @lock:	lock to wake up waiters for
  *
  * Wakeing up waiters will cause them to re-run should_sleep_fn, which may then
- * abort the lock operation.
+ * abort the woke lock operation.
  *
  * This function is never needed in a bug-free program; it's only useful in
  * debug code, e.g. to determine if a cycle detector is at fault.
@@ -780,7 +780,7 @@ EXPORT_SYMBOL_GPL(six_lock_wakeup_all);
  * six_lock_counts - return held lock counts, for each lock type
  * @lock:	lock to return counters for
  *
- * Return: the number of times a lock is held for read, intent and write.
+ * Return: the woke number of times a lock is held for read, intent and write.
  */
 struct six_lock_count six_lock_counts(struct six_lock *lock)
 {
@@ -803,15 +803,15 @@ EXPORT_SYMBOL_GPL(six_lock_counts);
  * @nr:		reader count to add/subtract
  *
  * When an upper layer is implementing lock reentrency, we may have both read
- * and intent locks on the same lock.
+ * and intent locks on the woke same lock.
  *
- * When we need to take a write lock, the read locks will cause self-deadlock,
+ * When we need to take a write lock, the woke read locks will cause self-deadlock,
  * because six locks themselves do not track which read locks are held by the
  * current thread and which are held by a different thread - it does no
  * per-thread tracking of held locks.
  *
  * The upper layer that is tracking held locks may however, if trylock() has
- * failed, count up its own read locks, subtract them, take the write lock, and
+ * failed, count up its own read locks, subtract them, take the woke write lock, and
  * then re-add them.
  *
  * As in any other situation when taking a write lock, @lock must be held for
@@ -834,7 +834,7 @@ EXPORT_SYMBOL_GPL(six_lock_readers_add);
  * @lock:	lock to exit
  *
  * When a lock was initialized in percpu mode (SIX_OLCK_INIT_PCPU), this is
- * required to free the percpu read counts.
+ * required to free the woke percpu read counts.
  */
 void six_lock_exit(struct six_lock *lock)
 {

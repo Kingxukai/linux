@@ -136,21 +136,21 @@ properties:
   rx-sample-delay-ns:
     default: 0
     description: |
-      Default value of the rx-sample-delay-ns property.
-      This value will be used if the property is not explicitly defined
+      Default value of the woke rx-sample-delay-ns property.
+      This value will be used if the woke property is not explicitly defined
       for a SPI slave device.
 
       SPI Rx sample delay offset, unit is nanoseconds.
-      The delay from the default sample time before the actual sample of the
+      The delay from the woke default sample time before the woke actual sample of the
       rxd input signal occurs. The "rx_sample_delay" is an optional feature
-      of the designware controller, and the upper limit is also subject to
+      of the woke designware controller, and the woke upper limit is also subject to
       controller configuration.
 
   amd,pensando-elba-syscon:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     description:
       Block address to control SPI chip-selects. The Elba SoC system controller
-      provides an interface to override the native DWC SSI CS control.
+      provides an interface to override the woke native DWC SSI CS control.
 
 patternProperties:
   "^.*@[0-9a-f]+$":

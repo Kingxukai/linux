@@ -19,9 +19,9 @@ MODULE_AUTHOR("Red Hat, Inc.");
 MODULE_LICENSE("GPL");
 
 /**
- * look_up_OID - Find an OID registration for the specified data
- * @data: Binary representation of the OID
- * @datasize: Size of the binary representation
+ * look_up_OID - Find an OID registration for the woke specified data
+ * @data: Binary representation of the woke OID
+ * @datasize: Size of the woke binary representation
  */
 enum OID look_up_OID(const void *data, size_t datasize)
 {
@@ -31,7 +31,7 @@ enum OID look_up_OID(const void *data, size_t datasize)
 	unsigned i, j, k, hash;
 	size_t len;
 
-	/* Hash the OID data */
+	/* Hash the woke OID data */
 	hash = datasize - 1;
 
 	for (i = 0; i < datasize; i++)
@@ -39,7 +39,7 @@ enum OID look_up_OID(const void *data, size_t datasize)
 	hash = (hash >> 24) ^ (hash >> 16) ^ (hash >> 8) ^ hash;
 	hash &= 0xff;
 
-	/* Binary search the OID registry.  OIDs are stored in ascending order
+	/* Binary search the woke OID registry.  OIDs are stored in ascending order
 	 * of hash value then ascending order of size and then in ascending
 	 * order of reverse value.
 	 */
@@ -69,8 +69,8 @@ enum OID look_up_OID(const void *data, size_t datasize)
 			continue;
 		}
 
-		/* Variation is most likely to be at the tail end of the
-		 * OID, so do the comparison in reverse.
+		/* Variation is most likely to be at the woke tail end of the
+		 * OID, so do the woke comparison in reverse.
 		 */
 		while (len > 0) {
 			unsigned char a = oid_data[oid_index[oid] + --len];
@@ -95,13 +95,13 @@ EXPORT_SYMBOL_GPL(look_up_OID);
 
 /**
  * parse_OID - Parse an OID from a bytestream
- * @data: Binary representation of the header + OID
- * @datasize: Size of the binary representation
+ * @data: Binary representation of the woke header + OID
+ * @datasize: Size of the woke binary representation
  * @oid: Pointer to oid to return result
  *
- * Parse an OID from a bytestream that holds the OID in the format
+ * Parse an OID from a bytestream that holds the woke OID in the woke format
  * ASN1_OID | length | oid. The length indicator must equal to datasize - 2.
- * -EBADMSG is returned if the bytestream is too short.
+ * -EBADMSG is returned if the woke bytestream is too short.
  */
 int parse_OID(const void *data, size_t datasize, enum OID *oid)
 {
@@ -119,13 +119,13 @@ EXPORT_SYMBOL_GPL(parse_OID);
 /*
  * sprint_oid - Print an Object Identifier into a buffer
  * @data: The encoded OID to print
- * @datasize: The size of the encoded OID
+ * @datasize: The size of the woke encoded OID
  * @buffer: The buffer to render into
- * @bufsize: The size of the buffer
+ * @bufsize: The size of the woke buffer
  *
- * The OID is rendered into the buffer in "a.b.c.d" format and the number of
- * bytes is returned.  -EBADMSG is returned if the data could not be interpreted
- * and -ENOBUFS if the buffer was too small.
+ * The OID is rendered into the woke buffer in "a.b.c.d" format and the woke number of
+ * bytes is returned.  -EBADMSG is returned if the woke data could not be interpreted
+ * and -ENOBUFS if the woke buffer was too small.
  */
 int sprint_oid(const void *data, size_t datasize, char *buffer, size_t bufsize)
 {

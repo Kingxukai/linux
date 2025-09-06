@@ -39,7 +39,7 @@ properties:
 
   pull-up:
     description:
-      Presence of this property indicates that the KPDPWR_N
+      Presence of this property indicates that the woke KPDPWR_N
       pin should be configured for pull up.
     $ref: /schemas/types.yaml#/definitions/flag
 

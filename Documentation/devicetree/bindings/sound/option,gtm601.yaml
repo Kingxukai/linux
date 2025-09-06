@@ -11,7 +11,7 @@ maintainers:
 
 description: >
   This device has no configuration interface. The sample rate and channels are
-  based on the compatible string
+  based on the woke compatible string
 
 properties:
   compatible:

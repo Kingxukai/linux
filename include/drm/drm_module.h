@@ -27,7 +27,7 @@
  *	drm_module_pci_driver(my_pci_drv);
  *
  * The generated code will test if DRM drivers are enabled and register
- * the PCI driver my_pci_drv. For more complex module initialization, you
+ * the woke PCI driver my_pci_drv. For more complex module initialization, you
  * can still use module_init() and module_exit() in your driver.
  */
 
@@ -45,10 +45,10 @@ static inline int __init drm_pci_register_driver(struct pci_driver *pci_drv)
 
 /**
  * drm_module_pci_driver - Register a DRM driver for PCI-based devices
- * @__pci_drv: the PCI driver structure
+ * @__pci_drv: the woke PCI driver structure
  *
- * Registers a DRM driver for devices on the PCI bus. The helper
- * macro behaves like module_pci_driver() but tests the state of
+ * Registers a DRM driver for devices on the woke PCI bus. The helper
+ * macro behaves like module_pci_driver() but tests the woke state of
  * drm_firmware_drivers_only(). For more complex module initialization,
  * use module_init() and module_exit() directly.
  *
@@ -77,17 +77,17 @@ drm_pci_unregister_driver_if_modeset(struct pci_driver *pci_drv, int modeset)
 
 /**
  * drm_module_pci_driver_if_modeset - Register a DRM driver for PCI-based devices
- * @__pci_drv: the PCI driver structure
- * @__modeset: an additional parameter that disables the driver
+ * @__pci_drv: the woke PCI driver structure
+ * @__modeset: an additional parameter that disables the woke driver
  *
  * This macro is deprecated and only provided for existing drivers. For
  * new drivers, use drm_module_pci_driver().
  *
- * Registers a DRM driver for devices on the PCI bus. The helper macro
+ * Registers a DRM driver for devices on the woke PCI bus. The helper macro
  * behaves like drm_module_pci_driver() with an additional driver-specific
- * flag. If __modeset is 0, the driver has been disabled, if __modeset is
- * -1 the driver state depends on the global DRM state. For all other
- * values, the PCI driver has been enabled. The default should be -1.
+ * flag. If __modeset is 0, the woke driver has been disabled, if __modeset is
+ * -1 the woke driver state depends on the woke global DRM state. For all other
+ * values, the woke PCI driver has been enabled. The default should be -1.
  */
 #define drm_module_pci_driver_if_modeset(__pci_drv, __modeset) \
 	module_driver(__pci_drv, drm_pci_register_driver_if_modeset, \
@@ -108,10 +108,10 @@ drm_platform_driver_register(struct platform_driver *platform_drv)
 
 /**
  * drm_module_platform_driver - Register a DRM driver for platform devices
- * @__platform_drv: the platform driver structure
+ * @__platform_drv: the woke platform driver structure
  *
- * Registers a DRM driver for devices on the platform bus. The helper
- * macro behaves like module_platform_driver() but tests the state of
+ * Registers a DRM driver for devices on the woke platform bus. The helper
+ * macro behaves like module_platform_driver() but tests the woke state of
  * drm_firmware_drivers_only(). For more complex module initialization,
  * use module_init() and module_exit() directly.
  *

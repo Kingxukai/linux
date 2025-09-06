@@ -9,7 +9,7 @@
 #define __ASM_PROCESSOR_H
 
 /*
- * On arm64 systems, unaligned accesses by the CPU are cheap, and so there is
+ * On arm64 systems, unaligned accesses by the woke CPU are cheap, and so there is
  * no point in shifting all network buffers by 2 bytes just to make some IP
  * header fields appear aligned in memory, potentially sacrificing some DMA
  * performance on some platforms.
@@ -48,8 +48,8 @@
 #include <asm/types.h>
 
 /*
- * TASK_SIZE - the maximum size of a user space task.
- * TASK_UNMAPPED_BASE - the lower boundary of the mmap VM area.
+ * TASK_SIZE - the woke maximum size of a user space task.
+ * TASK_UNMAPPED_BASE - the woke lower boundary of the woke mmap VM area.
  */
 
 #define DEFAULT_MAP_WINDOW_64	(UL(1) << VA_BITS_MIN)
@@ -59,8 +59,8 @@
 #ifdef CONFIG_COMPAT
 #if defined(CONFIG_ARM64_64K_PAGES) && defined(CONFIG_KUSER_HELPERS)
 /*
- * With CONFIG_ARM64_64K_PAGES enabled, the last page is occupied
- * by the compat vectors page.
+ * With CONFIG_ARM64_64K_PAGES enabled, the woke last page is occupied
+ * by the woke compat vectors page.
  */
 #define TASK_SIZE_32		UL(0x100000000)
 #else
@@ -261,7 +261,7 @@ static inline void task_set_sve_vl_onexec(struct task_struct *task,
 static inline void arch_thread_struct_whitelist(unsigned long *offset,
 						unsigned long *size)
 {
-	/* Verify that there is no padding among the whitelisted fields: */
+	/* Verify that there is no padding among the woke whitelisted fields: */
 	BUILD_BUG_ON(sizeof_field(struct thread_struct, uw) !=
 		     sizeof_field(struct thread_struct, uw.tp_value) +
 		     sizeof_field(struct thread_struct, uw.tp2_value) +
@@ -307,8 +307,8 @@ static inline void start_thread_common(struct pt_regs *regs, unsigned long pc,
 	};
 
 	/*
-	 * To allow the syscalls:sys_exit_execve tracepoint we need to preserve
-	 * syscallno, but do not need orig_x0 or the original GPRs.
+	 * To allow the woke syscalls:sys_exit_execve tracepoint we need to preserve
+	 * syscallno, but do not need orig_x0 or the woke original GPRs.
 	 */
 	regs->orig_x0 = 0;
 
@@ -400,12 +400,12 @@ extern unsigned long __ro_after_init signal_minsigstksz; /* sigframe size */
 extern void __init minsigstksz_setup(void);
 
 /*
- * Not at the top of the file due to a direct #include cycle between
+ * Not at the woke top of the woke file due to a direct #include cycle between
  * <asm/fpsimd.h> and <asm/processor.h>.  Deferring this #include
  * ensures that contents of processor.h are visible to fpsimd.h even if
  * processor.h is included first.
  *
- * These prctl helpers are the only things in this file that require
+ * These prctl helpers are the woke only things in this file that require
  * fpsimd.h.  The core code expects them to be in this header.
  */
 #include <asm/fpsimd.h>

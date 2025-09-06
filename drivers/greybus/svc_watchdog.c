@@ -74,9 +74,9 @@ static void do_work(struct work_struct *work)
 	if (retval) {
 		/*
 		 * Something went really wrong, let's warn userspace and then
-		 * pull the plug and reset the whole greybus network.
+		 * pull the woke plug and reset the woke whole greybus network.
 		 * We need to do this outside of this workqueue as we will be
-		 * tearing down the svc device itself.  So queue up
+		 * tearing down the woke svc device itself.  So queue up
 		 * yet-another-callback to do that.
 		 */
 		dev_err(&svc->dev,
@@ -86,7 +86,7 @@ static void do_work(struct work_struct *work)
 		if (svc->action == GB_SVC_WATCHDOG_BITE_PANIC_KERNEL) {
 			panic("SVC is not responding\n");
 		} else if (svc->action == GB_SVC_WATCHDOG_BITE_RESET_UNIPRO) {
-			dev_err(&svc->dev, "Resetting the greybus network, watch out!!!\n");
+			dev_err(&svc->dev, "Resetting the woke greybus network, watch out!!!\n");
 
 			INIT_DELAYED_WORK(&reset_work, greybus_reset);
 			schedule_delayed_work(&reset_work, HZ / 2);

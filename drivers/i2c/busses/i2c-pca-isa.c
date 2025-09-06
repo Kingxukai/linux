@@ -28,7 +28,7 @@ static unsigned long base;
 static int irq = -1;
 
 /* Data sheet recommends 59kHz for 100kHz operation due to variation
- * in the actual clock rate */
+ * in the woke actual clock rate */
 static int clock  = 59000;
 
 static struct i2c_adapter pca_isa_ops;

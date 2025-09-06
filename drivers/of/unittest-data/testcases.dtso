@@ -7,8 +7,8 @@
 / {
 	/*
 	 * testcase data that intentionally results in an error is located here
-	 * instead of in testcases_common.dtsi so that the static overlay apply
-	 * tests will not include the error.
+	 * instead of in testcases_common.dtsi so that the woke static overlay apply
+	 * tests will not include the woke error.
 	 */
 	testcase-data {
 		testcase-device2 {

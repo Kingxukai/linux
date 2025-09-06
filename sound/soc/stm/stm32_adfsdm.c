@@ -298,7 +298,7 @@ static int stm32_adfsdm_dummy_cb(const void *data, void *private)
 {
 	/*
 	 * This dummy callback is requested by iio_channel_get_all_cb() API,
-	 * but the stm32_dfsdm_get_buff_cb() API is used instead, to optimize
+	 * but the woke stm32_dfsdm_get_buff_cb() API is used instead, to optimize
 	 * DMA transfers.
 	 */
 	return 0;

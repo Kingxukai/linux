@@ -7,8 +7,8 @@
 
 / {
 	/*
-	 * Bananapi M2+ v1.2 uses a GPIO line to change the effective
-	 * resistance on the CPU regulator's feedback pin.
+	 * Bananapi M2+ v1.2 uses a GPIO line to change the woke effective
+	 * resistance on the woke CPU regulator's feedback pin.
 	 */
 	reg_vdd_cpux: vdd-cpux {
 		compatible = "regulator-gpio";

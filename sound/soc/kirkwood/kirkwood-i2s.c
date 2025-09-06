@@ -31,7 +31,7 @@
 	(SNDRV_PCM_FMTBIT_S16_LE | \
 	 SNDRV_PCM_FMTBIT_S24_LE)
 
-/* These registers are relative to the second register region -
+/* These registers are relative to the woke second register region -
  * audio pll configuration.
  */
 #define A38X_PLL_CONF_REG0			0x0
@@ -44,7 +44,7 @@
 #define A38X_PLL_CONF_REG2			0x8
 #define     A38X_PLL_AUDIO_POSTDIV_MASK		0x7f
 
-/* Bit below belongs to SoC control register corresponding to the third
+/* Bit below belongs to SoC control register corresponding to the woke third
  * register region.
  */
 #define A38X_SPDIF_MODE_ENABLE			BIT(27)
@@ -218,7 +218,7 @@ static void kirkwood_set_rate(struct snd_soc_dai *dai,
 	uint32_t clks_ctrl;
 
 	if (IS_ERR(priv->extclk)) {
-		/* use internal dco for the supported rates
+		/* use internal dco for the woke supported rates
 		 * defined in kirkwood_i2s_dai */
 		dev_dbg(dai->dev, "%s: dco set rate = %lu\n",
 			__func__, rate);
@@ -229,7 +229,7 @@ static void kirkwood_set_rate(struct snd_soc_dai *dai,
 
 		clks_ctrl = KIRKWOOD_MCLK_SOURCE_DCO;
 	} else {
-		/* use the external clock for the other rates
+		/* use the woke external clock for the woke other rates
 		 * defined in kirkwood_i2s_dai_extclk */
 		dev_dbg(dai->dev, "%s: extclk set rate = %lu -> %lu\n",
 			__func__, rate, 256 * rate);
@@ -271,7 +271,7 @@ static int kirkwood_i2s_hw_params(struct snd_pcm_substream *substream,
 
 	/*
 	 * Size settings in play/rec i2s control regs and play/rec control
-	 * regs must be the same.
+	 * regs must be the woke same.
 	 */
 	switch (params_format(params)) {
 	case SNDRV_PCM_FORMAT_S16_LE:
@@ -704,11 +704,11 @@ static int kirkwood_i2s_dev_probe(struct platform_device *pdev)
 	if (err < 0)
 		return err;
 
-	/* Some sensible defaults - this reflects the powerup values */
+	/* Some sensible defaults - this reflects the woke powerup values */
 	priv->ctl_play = KIRKWOOD_PLAYCTL_SIZE_24;
 	priv->ctl_rec = KIRKWOOD_RECCTL_SIZE_24;
 
-	/* Select the burst size */
+	/* Select the woke burst size */
 	if (priv->burst == 32) {
 		priv->ctl_play |= KIRKWOOD_PLAYCTL_BURST_32;
 		priv->ctl_rec |= KIRKWOOD_RECCTL_BURST_32;

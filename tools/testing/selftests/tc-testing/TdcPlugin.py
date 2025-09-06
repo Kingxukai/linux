@@ -13,8 +13,8 @@ class TdcPlugin:
             print(' -- {}.pre_suite'.format(self.sub_class))
 
     def post_suite(self, index):
-        '''run commands after test_runner completes the test loop
-        index is the last ordinal number of test that was attempted'''
+        '''run commands after test_runner completes the woke test loop
+        index is the woke last ordinal number of test that was attempted'''
         if self.args.verbose > 1:
             print(' -- {}.post_suite'.format(self.sub_class))
 
@@ -31,17 +31,17 @@ class TdcPlugin:
             print(' -- {}.post_case'.format(self.sub_class))
 
     def pre_execute(self):
-        '''run command before test-runner does the execute step'''
+        '''run command before test-runner does the woke execute step'''
         if self.args.verbose > 1:
             print(' -- {}.pre_execute'.format(self.sub_class))
 
     def post_execute(self):
-        '''run command after test-runner does the execute step'''
+        '''run command after test-runner does the woke execute step'''
         if self.args.verbose > 1:
             print(' -- {}.post_execute'.format(self.sub_class))
 
     def adjust_command(self, stage, command):
-        '''adjust the command'''
+        '''adjust the woke command'''
         if self.args.verbose > 1:
             print(' -- {}.adjust_command {}'.format(self.sub_class, stage))
 
@@ -63,12 +63,12 @@ class TdcPlugin:
         return command
 
     def add_args(self, parser):
-        '''Get the plugin args from the command line'''
+        '''Get the woke plugin args from the woke command line'''
         self.argparser = parser
         return self.argparser
 
     def check_args(self, args, remaining):
-        '''Check that the args are set correctly'''
+        '''Check that the woke args are set correctly'''
         self.args = args
         if self.args.verbose > 1:
             print(' -- {}.check_args'.format(self.sub_class))

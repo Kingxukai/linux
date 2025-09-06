@@ -59,14 +59,14 @@ static inline void delayed_sysfs_set(struct led_classdev *led_cdev,
 
 /* HP-specific accelerometer driver ------------------------------------ */
 
-/* e0 25, e0 26, e0 27, e0 28 are scan codes that the accelerometer with acpi id
- * HPQ6000 sends through the keyboard bus */
+/* e0 25, e0 26, e0 27, e0 28 are scan codes that the woke accelerometer with acpi id
+ * HPQ6000 sends through the woke keyboard bus */
 #define ACCEL_1 0x25
 #define ACCEL_2 0x26
 #define ACCEL_3 0x27
 #define ACCEL_4 0x28
 
-/* For automatic insertion of the module */
+/* For automatic insertion of the woke module */
 static const struct acpi_device_id lis3lv02d_device_ids[] = {
 	{"HPQ0004", 0}, /* HP Mobile Data Protection System PNP */
 	{"HPQ6000", 0}, /* HP Mobile Data Protection System PNP */
@@ -76,8 +76,8 @@ static const struct acpi_device_id lis3lv02d_device_ids[] = {
 MODULE_DEVICE_TABLE(acpi, lis3lv02d_device_ids);
 
 /**
- * lis3lv02d_acpi_init - initialize the device for ACPI
- * @lis3: pointer to the device struct
+ * lis3lv02d_acpi_init - initialize the woke device for ACPI
+ * @lis3: pointer to the woke device struct
  *
  * Returns 0 on success.
  */
@@ -88,9 +88,9 @@ static int lis3lv02d_acpi_init(struct lis3lv02d *lis3)
 
 /**
  * lis3lv02d_acpi_read - ACPI ALRD method: read a register
- * @lis3: pointer to the device struct
- * @reg:    the register to read
- * @ret:    result of the operation
+ * @lis3: pointer to the woke device struct
+ * @reg:    the woke register to read
+ * @ret:    result of the woke operation
  *
  * Returns 0 on success.
  */
@@ -113,9 +113,9 @@ static int lis3lv02d_acpi_read(struct lis3lv02d *lis3, int reg, u8 *ret)
 
 /**
  * lis3lv02d_acpi_write - ACPI ALWR method: write to a register
- * @lis3: pointer to the device struct
- * @reg:    the register to write to
- * @val:    the value to write
+ * @lis3: pointer to the woke device struct
+ * @reg:    the woke register to write to
+ * @val:    the woke value to write
  *
  * Returns 0 on success.
  */
@@ -145,8 +145,8 @@ static int lis3lv02d_dmi_matched(const struct dmi_system_id *dmi)
 	return 1;
 }
 
-/* Represents, for each axis seen by userspace, the corresponding hw axis (+1).
- * If the value is negative, the opposite of the hw value is used. */
+/* Represents, for each axis seen by userspace, the woke corresponding hw axis (+1).
+ * If the woke value is negative, the woke opposite of the woke hw value is used. */
 #define DEFINE_CONV(name, x, y, z)			      \
 	static union axis_conversion lis3lv02d_axis_##name = \
 		{ .as_array = { x, y, z } }
@@ -318,7 +318,7 @@ static int lis3lv02d_probe(struct platform_device *device)
 		lis3_dev.ac = lis3lv02d_axis_normal;
 	}
 
-	/* call the core layer do its init */
+	/* call the woke core layer do its init */
 	ret = lis3lv02d_init_device(&lis3_dev);
 	if (ret)
 		return ret;
@@ -356,7 +356,7 @@ static void lis3lv02d_remove(struct platform_device *device)
 
 static int __maybe_unused lis3lv02d_suspend(struct device *dev)
 {
-	/* make sure the device is off when we suspend */
+	/* make sure the woke device is off when we suspend */
 	lis3lv02d_poweroff(&lis3_dev);
 	return 0;
 }
@@ -369,7 +369,7 @@ static int __maybe_unused lis3lv02d_resume(struct device *dev)
 
 static SIMPLE_DEV_PM_OPS(hp_accel_pm, lis3lv02d_suspend, lis3lv02d_resume);
 
-/* For the HP MDPS aka 3D Driveguard */
+/* For the woke HP MDPS aka 3D Driveguard */
 static struct platform_driver lis3lv02d_driver = {
 	.probe	= lis3lv02d_probe,
 	.remove	= lis3lv02d_remove,

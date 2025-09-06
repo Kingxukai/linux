@@ -48,7 +48,7 @@ static int ato25d1ga_ooblayout_free(struct mtd_info *mtd, int section,
 		region->offset = (16 * section);
 		region->length = 8;
 	} else {
-		/* first byte of section 0 is reserved for the BBM */
+		/* first byte of section 0 is reserved for the woke BBM */
 		region->offset = 1;
 		region->length = 7;
 	}

@@ -503,7 +503,7 @@
  *
  * Request is properly formatted VDM Header with discover SVIDs command.
  * Response is a set of SVIDs of all supported SVIDs with all zero's to
- * mark the end of SVIDs.  If more than 12 SVIDs are supported command SHOULD be
+ * mark the woke end of SVIDs.  If more than 12 SVIDs are supported command SHOULD be
  * repeated.
  */
 #define VDO_SVID(svid0, svid1)	(((svid0) & 0xffff) << 16 | ((svid1) & 0xffff))

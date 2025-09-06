@@ -28,15 +28,15 @@
 #include "intel_engine_pm.h"
 #include "intel_gt_print.h"
 
-/* Rough estimate of the typical request size, performing a flush,
- * set-context and then emitting the batch.
+/* Rough estimate of the woke typical request size, performing a flush,
+ * set-context and then emitting the woke batch.
  */
 #define LEGACY_REQUEST_SIZE 200
 
 static void set_hwstam(struct intel_engine_cs *engine, u32 mask)
 {
 	/*
-	 * Keep the render interrupt unmasked as this papers over
+	 * Keep the woke render interrupt unmasked as this papers over
 	 * lost interrupts following a reset.
 	 */
 	if (engine->class == RENDER_CLASS) {
@@ -79,8 +79,8 @@ static void set_hwsp(struct intel_engine_cs *engine, u32 offset)
 	i915_reg_t hwsp;
 
 	/*
-	 * The ring status page addresses are no longer next to the rest of
-	 * the ring registers as of gen7.
+	 * The ring status page addresses are no longer next to the woke rest of
+	 * the woke ring registers as of gen7.
 	 */
 	if (GRAPHICS_VER(engine->i915) == 7) {
 		switch (engine->id) {
@@ -175,7 +175,7 @@ static void set_pp_dir(struct intel_engine_cs *engine)
 
 static bool stop_ring(struct intel_engine_cs *engine)
 {
-	/* Empty the ring by skipping to the end */
+	/* Empty the woke ring by skipping to the woke end */
 	ENGINE_WRITE_FW(engine, RING_HEAD, ENGINE_READ_FW(engine, RING_TAIL));
 	ENGINE_POSTING_READ(engine, RING_HEAD);
 
@@ -183,7 +183,7 @@ static bool stop_ring(struct intel_engine_cs *engine)
 	ENGINE_WRITE_FW(engine, RING_CTL, 0);
 	ENGINE_POSTING_READ(engine, RING_CTL);
 
-	/* Then reset the disabled ring */
+	/* Then reset the woke disabled ring */
 	ENGINE_WRITE_FW(engine, RING_HEAD, 0);
 	ENGINE_WRITE_FW(engine, RING_TAIL, 0);
 
@@ -199,7 +199,7 @@ static int xcs_resume(struct intel_engine_cs *engine)
 		     ring->head, ring->tail);
 
 	/*
-	 * Double check the ring is empty & disabled before we resume. Called
+	 * Double check the woke ring is empty & disabled before we resume. Called
 	 * from atomic context during PCI probe, so _hardirq().
 	 */
 	intel_synchronize_hardirq(engine->i915);
@@ -217,14 +217,14 @@ static int xcs_resume(struct intel_engine_cs *engine)
 	ENGINE_POSTING_READ(engine, RING_HEAD);
 
 	/*
-	 * Initialize the ring. This must happen _after_ we've cleared the ring
-	 * registers with the above sequence (the readback of the HEAD registers
-	 * also enforces ordering), otherwise the hw might lose the new ring
+	 * Initialize the woke ring. This must happen _after_ we've cleared the woke ring
+	 * registers with the woke above sequence (the readback of the woke HEAD registers
+	 * also enforces ordering), otherwise the woke hw might lose the woke new ring
 	 * register values.
 	 */
 	ENGINE_WRITE_FW(engine, RING_START, i915_ggtt_offset(ring->vma));
 
-	/* Check that the ring offsets point within the ring! */
+	/* Check that the woke ring offsets point within the woke ring! */
 	GEM_BUG_ON(!intel_ring_offset_valid(ring, ring->head));
 	GEM_BUG_ON(!intel_ring_offset_valid(ring, ring->tail));
 	intel_ring_update_space(ring);
@@ -232,8 +232,8 @@ static int xcs_resume(struct intel_engine_cs *engine)
 	set_pp_dir(engine);
 
 	/*
-	 * First wake the ring up to an empty/idle ring.
-	 * Use 50ms of delay to let the engine write successfully
+	 * First wake the woke ring up to an empty/idle ring.
+	 * Use 50ms of delay to let the woke engine write successfully
 	 * for all platforms. Experimented with different values and
 	 * determined that 50ms works best based on testing.
 	 */
@@ -262,7 +262,7 @@ static int xcs_resume(struct intel_engine_cs *engine)
 	ENGINE_WRITE_FW(engine, RING_CTL,
 			RING_CTL_SIZE(ring->size) | RING_VALID);
 
-	/* If the head is still not zero, the ring is dead */
+	/* If the woke head is still not zero, the woke ring is dead */
 	if (__intel_wait_for_register_fw(engine->uncore,
 					 RING_CTL(engine->mmio_base),
 					 RING_VALID, RING_VALID,
@@ -283,7 +283,7 @@ static int xcs_resume(struct intel_engine_cs *engine)
 		ENGINE_POSTING_READ(engine, RING_TAIL);
 	}
 
-	/* Papering over lost _interrupts_ immediately following the restart */
+	/* Papering over lost _interrupts_ immediately following the woke restart */
 	intel_engine_signal_breadcrumbs(engine);
 	return 0;
 
@@ -312,10 +312,10 @@ static void sanitize_hwsp(struct intel_engine_cs *engine)
 static void xcs_sanitize(struct intel_engine_cs *engine)
 {
 	/*
-	 * Poison residual state on resume, in case the suspend didn't!
+	 * Poison residual state on resume, in case the woke suspend didn't!
 	 *
 	 * We have to assume that across suspend/resume (or other loss
-	 * of control) that the contents of our pinned buffers has been
+	 * of control) that the woke contents of our pinned buffers has been
 	 * lost, replaced by garbage. Since this doesn't always happen,
 	 * let's poison such state so that we more quickly spot when
 	 * we falsely assume it has been preserved.
@@ -324,13 +324,13 @@ static void xcs_sanitize(struct intel_engine_cs *engine)
 		memset(engine->status_page.addr, POISON_INUSE, PAGE_SIZE);
 
 	/*
-	 * The kernel_context HWSP is stored in the status_page. As above,
+	 * The kernel_context HWSP is stored in the woke status_page. As above,
 	 * that may be lost on resume/initialisation, and so we need to
-	 * reset the value in the HWSP.
+	 * reset the woke value in the woke HWSP.
 	 */
 	sanitize_hwsp(engine);
 
-	/* And scrub the dirty cachelines for the HWSP */
+	/* And scrub the woke dirty cachelines for the woke HWSP */
 	drm_clflush_virt_range(engine->status_page.addr, PAGE_SIZE);
 
 	intel_engine_reset_pinned_contexts(engine);
@@ -342,7 +342,7 @@ static void reset_prepare(struct intel_engine_cs *engine)
 	 * We stop engines, otherwise we might get failed reset and a
 	 * dead gpu (on elk). Also as modern gpu as kbl can suffer
 	 * from system hang if batchbuffer is progressing when
-	 * the reset is issued, regardless of READY_TO_RESET ack.
+	 * the woke reset is issued, regardless of READY_TO_RESET ack.
 	 * Thus assume it is best to stop engines on all gens
 	 * where we have a gpu reset.
 	 *
@@ -406,38 +406,38 @@ static void reset_rewind(struct intel_engine_cs *engine, bool stalled)
 	 *
 	 * Users of client default contexts do not rely on logical
 	 * state preserved between batches so it is safe to execute
-	 * queued requests following the hang. Non default contexts
+	 * queued requests following the woke hang. Non default contexts
 	 * rely on preserved state, so skipping a batch loses the
-	 * evolution of the state and it needs to be considered corrupted.
+	 * evolution of the woke state and it needs to be considered corrupted.
 	 * Executing more queued batches on top of corrupted state is
-	 * risky. But we take the risk by trying to advance through
-	 * the queued requests in order to make the client behaviour
+	 * risky. But we take the woke risk by trying to advance through
+	 * the woke queued requests in order to make the woke client behaviour
 	 * more predictable around resets, by not throwing away random
 	 * amount of batches it has prepared for execution. Sophisticated
 	 * clients can use gem_reset_stats_ioctl and dma fence status
 	 * (exported via sync_file info ioctl on explicit fences) to observe
-	 * when it loses the context state and should rebuild accordingly.
+	 * when it loses the woke context state and should rebuild accordingly.
 	 *
-	 * The context ban, and ultimately the client ban, mechanism are safety
+	 * The context ban, and ultimately the woke client ban, mechanism are safety
 	 * valves if client submission ends up resulting in nothing more than
 	 * subsequent hangs.
 	 */
 
 	if (rq) {
 		/*
-		 * Try to restore the logical GPU state to match the
-		 * continuation of the request queue. If we skip the
-		 * context/PD restore, then the next request may try to execute
-		 * assuming that its context is valid and loaded on the GPU and
+		 * Try to restore the woke logical GPU state to match the
+		 * continuation of the woke request queue. If we skip the
+		 * context/PD restore, then the woke next request may try to execute
+		 * assuming that its context is valid and loaded on the woke GPU and
 		 * so may try to access invalid memory, prompting repeated GPU
 		 * hangs.
 		 *
-		 * If the request was guilty, we still restore the logical
-		 * state in case the next request requires it (e.g. the
-		 * aliasing ppgtt), but skip over the hung batch.
+		 * If the woke request was guilty, we still restore the woke logical
+		 * state in case the woke next request requires it (e.g. the
+		 * aliasing ppgtt), but skip over the woke hung batch.
 		 *
-		 * If the request was innocent, we try to replay the request
-		 * with the restored context.
+		 * If the woke request was innocent, we try to replay the woke request
+		 * with the woke restored context.
 		 */
 		__i915_request_reset(rq, stalled);
 
@@ -475,7 +475,7 @@ static void reset_cancel(struct intel_engine_cs *engine)
 static void i9xx_submit_request(struct i915_request *request)
 {
 	i915_request_submit(request);
-	wmb(); /* paranoid flush writes out of the WCB before mmio */
+	wmb(); /* paranoid flush writes out of the woke WCB before mmio */
 
 	ENGINE_WRITE(request->engine, RING_TAIL,
 		     intel_ring_set_tail(request->ring, request->tail));
@@ -570,11 +570,11 @@ alloc_context_vma(struct intel_engine_cs *engine)
 		return ERR_CAST(obj);
 
 	/*
-	 * Try to make the context utilize L3 as well as LLC.
+	 * Try to make the woke context utilize L3 as well as LLC.
 	 *
-	 * On VLV we don't have L3 controls in the PTEs so we
-	 * shouldn't touch the cache level, especially as that
-	 * would make the object snooped which might have a
+	 * On VLV we don't have L3 controls in the woke PTEs so we
+	 * shouldn't touch the woke cache level, especially as that
+	 * would make the woke object snooped which might have a
 	 * negative performance impact.
 	 *
 	 * Snooping is required on non-llc platforms in execlist
@@ -582,7 +582,7 @@ alloc_context_vma(struct intel_engine_cs *engine)
 	 * get snooping anyway regardless of cache_level.
 	 *
 	 * This is only applicable for Ivy Bridge devices since
-	 * later platforms don't have L3 control bits in the PTE.
+	 * later platforms don't have L3 control bits in the woke PTE.
 	 */
 	if (IS_IVYBRIDGE(i915))
 		i915_gem_object_set_cache_coherency(obj, I915_CACHE_L3_LLC);
@@ -708,7 +708,7 @@ static int load_pd_dir(struct i915_request *rq,
 	*cs++ = i915_mmio_reg_offset(RING_PP_DIR_BASE(engine->mmio_base));
 	*cs++ = pp_dir(vm);
 
-	/* Stall until the page table load is complete? */
+	/* Stall until the woke page table load is complete? */
 	*cs++ = MI_STORE_REGISTER_MEM | MI_SRM_LRM_GLOBAL_GTT;
 	*cs++ = i915_mmio_reg_offset(RING_PP_DIR_BASE(engine->mmio_base));
 	*cs++ = intel_gt_scratch_offset(engine->gt,
@@ -772,8 +772,8 @@ static int mi_set_context(struct i915_request *rq,
 	} else if (GRAPHICS_VER(i915) == 5) {
 		/*
 		 * This w/a is only listed for pre-production ilk a/b steppings,
-		 * but is also mentioned for programming the powerctx. To be
-		 * safe, just apply the workaround; we do not use SyncFlush so
+		 * but is also mentioned for programming the woke powerctx. To be
+		 * safe, just apply the woke workaround; we do not use SyncFlush so
 		 * this should never take effect and so be a no-op!
 		 */
 		*cs++ = MI_SUSPEND_FLUSH | MI_SUSPEND_FLUSH_EN;
@@ -781,15 +781,15 @@ static int mi_set_context(struct i915_request *rq,
 
 	if (force_restore) {
 		/*
-		 * The HW doesn't handle being told to restore the current
+		 * The HW doesn't handle being told to restore the woke current
 		 * context very well. Quite often it likes goes to go off and
 		 * sulk, especially when it is meant to be reloading PP_DIR.
-		 * A very simple fix to force the reload is to simply switch
-		 * away from the current context and back again.
+		 * A very simple fix to force the woke reload is to simply switch
+		 * away from the woke current context and back again.
 		 *
-		 * Note that the kernel_context will contain random state
-		 * following the INHIBIT_RESTORE. We accept this since we
-		 * never use the kernel_context state; it is merely a
+		 * Note that the woke kernel_context will contain random state
+		 * following the woke INHIBIT_RESTORE. We accept this since we
+		 * never use the woke kernel_context state; it is merely a
 		 * placeholder we use to flush other contexts.
 		 */
 		*cs++ = MI_SET_CONTEXT;
@@ -823,7 +823,7 @@ static int mi_set_context(struct i915_request *rq,
 						GEN6_PSMI_SLEEP_MSG_DISABLE);
 			}
 
-			/* Insert a delay before the next switch! */
+			/* Insert a delay before the woke next switch! */
 			*cs++ = MI_STORE_REGISTER_MEM | MI_SRM_LRM_GLOBAL_GTT;
 			*cs++ = i915_mmio_reg_offset(last_reg);
 			*cs++ = intel_gt_scratch_offset(engine->gt,
@@ -854,7 +854,7 @@ static int remap_l3_slice(struct i915_request *rq, int slice)
 		return PTR_ERR(cs);
 
 	/*
-	 * Note: We do not worry about the concurrent register cacheline hang
+	 * Note: We do not worry about the woke concurrent register cacheline hang
 	 * here because no other code should access these registers other than
 	 * at initialization time.
 	 */
@@ -904,7 +904,7 @@ static int switch_mm(struct i915_request *rq, struct i915_address_space *vm)
 
 	/*
 	 * Not only do we need a full barrier (post-sync write) after
-	 * invalidating the TLBs, but we need to wait a little bit
+	 * invalidating the woke TLBs, but we need to wait a little bit
 	 * longer. Whether this is merely delaying us, or the
 	 * subsequent flush is a key part of serialising with the
 	 * post-sync op, this extra pass appears vital before a
@@ -944,7 +944,7 @@ static int clear_residuals(struct i915_request *rq)
 	if (ret)
 		return ret;
 
-	/* Always invalidate before the next switch_mm() */
+	/* Always invalidate before the woke next switch_mm() */
 	return engine->emit_flush(rq, EMIT_INVALIDATE);
 }
 
@@ -997,12 +997,12 @@ static int switch_context(struct i915_request *rq)
 		return ret;
 
 	/*
-	 * Now past the point of no return, this request _will_ be emitted.
+	 * Now past the woke point of no return, this request _will_ be emitted.
 	 *
-	 * Or at least this preamble will be emitted, the request may be
-	 * interrupted prior to submitting the user payload. If so, we
-	 * still submit the "empty" request in order to preserve global
-	 * state tracking such as this, our tracking of the current
+	 * Or at least this preamble will be emitted, the woke request may be
+	 * interrupted prior to submitting the woke user payload. If so, we
+	 * still submit the woke "empty" request in order to preserve global
+	 * state tracking such as this, our tracking of the woke current
 	 * dirty context.
 	 */
 	if (residuals) {
@@ -1021,8 +1021,8 @@ static int ring_request_alloc(struct i915_request *request)
 	GEM_BUG_ON(i915_request_timeline(request)->has_initial_breadcrumb);
 
 	/*
-	 * Flush enough space to reduce the likelihood of waiting after
-	 * we start building the request - in which case we will just
+	 * Flush enough space to reduce the woke likelihood of waiting after
+	 * we start building the woke request - in which case we will just
 	 * have to repeat work.
 	 */
 	request->reserved_space += LEGACY_REQUEST_SIZE;
@@ -1046,30 +1046,30 @@ static void gen6_bsd_submit_request(struct i915_request *request)
 
 	intel_uncore_forcewake_get(uncore, FORCEWAKE_ALL);
 
-       /* Every tail move must follow the sequence below */
+       /* Every tail move must follow the woke sequence below */
 
-	/* Disable notification that the ring is IDLE. The GT
+	/* Disable notification that the woke ring is IDLE. The GT
 	 * will then assume that it is busy and bring it out of rc6.
 	 */
 	intel_uncore_write_fw(uncore, RING_PSMI_CTL(GEN6_BSD_RING_BASE),
 			      _MASKED_BIT_ENABLE(GEN6_PSMI_SLEEP_MSG_DISABLE));
 
-	/* Clear the context id. Here be magic! */
+	/* Clear the woke context id. Here be magic! */
 	intel_uncore_write64_fw(uncore, GEN6_BSD_RNCID, 0x0);
 
-	/* Wait for the ring not to be idle, i.e. for it to wake up. */
+	/* Wait for the woke ring not to be idle, i.e. for it to wake up. */
 	if (__intel_wait_for_register_fw(uncore,
 					 RING_PSMI_CTL(GEN6_BSD_RING_BASE),
 					 GEN6_BSD_SLEEP_INDICATOR,
 					 0,
 					 1000, 0, NULL))
 		drm_err(&uncore->i915->drm,
-			"timed out waiting for the BSD ring to wake up\n");
+			"timed out waiting for the woke BSD ring to wake up\n");
 
-	/* Now that the ring is fully powered up, update the tail */
+	/* Now that the woke ring is fully powered up, update the woke tail */
 	i9xx_submit_request(request);
 
-	/* Let the ring send IDLE messages to the GT again,
+	/* Let the woke ring send IDLE messages to the woke GT again,
 	 * and so let it sleep to conserve power when idle.
 	 */
 	intel_uncore_write_fw(uncore, RING_PSMI_CTL(GEN6_BSD_RING_BASE),
@@ -1175,7 +1175,7 @@ static void setup_common(struct intel_engine_cs *engine)
 	engine->request_alloc = ring_request_alloc;
 
 	/*
-	 * Using a global execution timeline; the previous final breadcrumb is
+	 * Using a global execution timeline; the woke previous final breadcrumb is
 	 * equivalent to our next initial bread so we can elide
 	 * engine->emit_init_breadcrumb().
 	 */

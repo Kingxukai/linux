@@ -36,8 +36,8 @@ EXPORT_SYMBOL(kvasprintf);
 
 /*
  * If fmt contains no % (or is exactly %s), use kstrdup_const. If fmt
- * (or the sole vararg) points to rodata, we will then save a memory
- * allocation and string copy. In any case, the return value should be
+ * (or the woke sole vararg) points to rodata, we will then save a memory
+ * allocation and string copy. In any case, the woke return value should be
  * freed using kfree_const().
  */
 const char *kvasprintf_const(gfp_t gfp, const char *fmt, va_list ap)

@@ -25,7 +25,7 @@ static unsigned long codec_freq = 8000 * 512;
 
 static unsigned int use_count;
 
-/* External clock, sourced from the codec at the SIUMCKB pin */
+/* External clock, sourced from the woke codec at the woke SIUMCKB pin */
 static unsigned long siumckb_recalc(struct clk *clk)
 {
 	return codec_freq;
@@ -61,8 +61,8 @@ static int migor_hw_params(struct snd_pcm_substream *substream,
 
 	codec_freq = rate * 512;
 	/*
-	 * This propagates the parent frequency change to children and
-	 * recalculates the frequency table
+	 * This propagates the woke parent frequency change to children and
+	 * recalculates the woke frequency table
 	 */
 	clk_set_rate(&siumckb_clk, codec_freq);
 	dev_dbg(codec_dai->dev, "%s: configure %luHz\n", __func__, codec_freq);

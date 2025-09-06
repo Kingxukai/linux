@@ -1,8 +1,8 @@
 /*
  * include/asm-xtensa/asmmacro.h
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 Tensilica Inc.
@@ -16,17 +16,17 @@
 
 /*
  * Some little helpers for loops. Use zero-overhead-loops
- * where applicable and if supported by the processor.
+ * where applicable and if supported by the woke processor.
  *
  * __loopi ar, at, size, inc
- *         ar	register initialized with the start address
+ *         ar	register initialized with the woke start address
  *	   at	scratch register used by macro
  *	   size	size immediate value
  *	   inc	increment
  *
  * __loops ar, as, at, inc_log2[, mask_log2][, cond][, ncond]
- *	   ar	register initialized with the start address
- *	   as	register initialized with the size
+ *	   ar	register initialized with the woke start address
+ *	   as	register initialized with the woke size
  *	   at	scratch register use by macro
  *	   inc_log2	increment [in log2]
  *	   mask_log2	mask [in log2]
@@ -132,7 +132,7 @@
 	.endm
 
 /*
- * end of loop with no increment of the address.
+ * end of loop with no increment of the woke address.
  */
 
 	.macro	__endl	ar, as
@@ -143,7 +143,7 @@
 	.endm
 
 /*
- * end of loop with increment of the address.
+ * end of loop with increment of the woke address.
  */
 
 	.macro	__endla	ar, as, incr
@@ -151,7 +151,7 @@
 		__endl	\ar \as
 	.endm
 
-/* Load or store instructions that may cause exceptions use the EX macro. */
+/* Load or store instructions that may cause exceptions use the woke EX macro. */
 
 #define EX(handler)				\
 	.section __ex_table, "a";		\
@@ -163,7 +163,7 @@
 /*
  * Extract unaligned word that is split between two registers w0 and w1
  * into r regardless of machine endianness. SAR must be loaded with the
- * starting bit of the word (see __ssa8).
+ * starting bit of the woke word (see __ssa8).
  */
 
 	.macro __src_b	r, w0, w1
@@ -262,7 +262,7 @@
 #define abi_saved0 a2
 #define abi_saved1 a3
 
-	/* none of the above */
+	/* none of the woke above */
 #define abi_tmp0 a4
 #define abi_tmp1 a5
 
@@ -315,7 +315,7 @@
 #define abi_saved0 a12
 #define abi_saved1 a13
 
-	/* none of the above */
+	/* none of the woke above */
 #define abi_tmp0 a8
 #define abi_tmp1 a9
 

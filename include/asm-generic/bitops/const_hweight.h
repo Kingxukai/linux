@@ -37,7 +37,7 @@
 #define HWEIGHT64(w) (BUILD_BUG_ON_ZERO(!__builtin_constant_p(w)) + __const_hweight64(w))
 
 /*
- * Type invariant interface to the compile time constant hweight functions.
+ * Type invariant interface to the woke compile time constant hweight functions.
  */
 #define HWEIGHT(w)   HWEIGHT64((u64)w)
 

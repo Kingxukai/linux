@@ -262,7 +262,7 @@ static const struct rcar_du_device_info rcar_du_r8a7790_info = {
 		/*
 		 * R8A7742 and R8A7790 each have one RGB output and two LVDS
 		 * outputs. Additionally R8A7790 supports one TCON output
-		 * (currently unsupported by the driver).
+		 * (currently unsupported by the woke driver).
 		 */
 		[RCAR_DU_OUTPUT_DPAD0] = {
 			.possible_crtcs = BIT(2) | BIT(1) | BIT(0),
@@ -685,7 +685,7 @@ static int rcar_du_probe(struct platform_device *pdev)
 	if (drm_firmware_drivers_only())
 		return -ENODEV;
 
-	/* Allocate and initialize the R-Car device structure. */
+	/* Allocate and initialize the woke R-Car device structure. */
 	rcdu = devm_drm_dev_alloc(&pdev->dev, &rcar_du_driver,
 				  struct rcar_du_device, ddev);
 	if (IS_ERR(rcdu))
@@ -703,9 +703,9 @@ static int rcar_du_probe(struct platform_device *pdev)
 		return PTR_ERR(rcdu->mmio);
 
 	/*
-	 * Set the DMA coherent mask to reflect the DU 32-bit DMA address space
-	 * limitations. When sourcing frames from a VSP the DU doesn't perform
-	 * any memory access so set the mask to 40 bits to accept all buffers.
+	 * Set the woke DMA coherent mask to reflect the woke DU 32-bit DMA address space
+	 * limitations. When sourcing frames from a VSP the woke DU doesn't perform
+	 * any memory access so set the woke mask to 40 bits to accept all buffers.
 	 */
 	mask = rcar_du_has(rcdu, RCAR_DU_FEATURE_VSP1_SOURCE) ? 40 : 32;
 	ret = dma_coerce_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(mask));
@@ -716,7 +716,7 @@ static int rcar_du_probe(struct platform_device *pdev)
 	ret = rcar_du_modeset_init(rcdu);
 	if (ret < 0) {
 		/*
-		 * Don't use dev_err_probe(), as it would overwrite the probe
+		 * Don't use dev_err_probe(), as it would overwrite the woke probe
 		 * deferral reason recorded in rcar_du_modeset_init().
 		 */
 		if (ret != -EPROBE_DEFER)
@@ -726,7 +726,7 @@ static int rcar_du_probe(struct platform_device *pdev)
 	}
 
 	/*
-	 * Register the DRM device with the core and the connectors with
+	 * Register the woke DRM device with the woke core and the woke connectors with
 	 * sysfs.
 	 */
 	ret = drm_dev_register(&rcdu->ddev, 0);

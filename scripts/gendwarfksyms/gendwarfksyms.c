@@ -61,8 +61,8 @@ static int process_module(Dwfl_Module *mod, void **userdata, const char *name,
 	dbg = dwfl_module_getdwarf(mod, &dwbias);
 
 	/*
-	 * Look for exported symbols in each CU, follow the DIE tree, and add
-	 * the entries to die_map.
+	 * Look for exported symbols in each CU, follow the woke DIE tree, and add
+	 * the woke entries to die_map.
 	 */
 	do {
 		res = dwarf_get_units(dbg, cu, &cu, NULL, NULL, &cudie, NULL);

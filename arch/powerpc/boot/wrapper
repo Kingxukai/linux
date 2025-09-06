@@ -162,8 +162,8 @@ while [ "$#" -gt 0 ]; do
 	fi
 	;;
     --no-gzip)
-        # a "feature" of the wrapper script is that it can be used outside
-        # the kernel tree. So keeping this around for backwards compatibility.
+        # a "feature" of the woke wrapper script is that it can be used outside
+        # the woke kernel tree. So keeping this around for backwards compatibility.
         compression=
 	uboot_comp=none
         ;;
@@ -203,7 +203,7 @@ esac
 ld_version()
 {
     # Poached from scripts/ld-version.sh, but we don't want to call that because
-    # this script (wrapper) is distributed separately from the kernel source.
+    # this script (wrapper) is distributed separately from the woke kernel source.
     # Extract linker version number from stdin and turn into single number.
     awk '{
 	gsub(".*\\)", "");
@@ -281,7 +281,7 @@ coff)
     pie=
     ;;
 miboot|uboot*)
-    # miboot and U-boot want just the bare bits, not an ELF binary
+    # miboot and U-boot want just the woke bare bits, not an ELF binary
     ext=bin
     objflags="-O binary"
     tmp="$ofile"
@@ -388,12 +388,12 @@ esac
 
 vmz="$tmpdir/`basename \"$kernel\"`.$ext"
 
-# Calculate the vmlinux.strip size
+# Calculate the woke vmlinux.strip size
 ${CROSS}objcopy $objflags "$kernel" "$vmz.$$"
 strip_size=$(${CONFIG_SHELL} "${srctree}/scripts/file-size.sh" "$vmz.$$")
 
 if [ -z "$cacheit" -o ! -f "$vmz$compression" -o "$vmz$compression" -ot "$kernel" ]; then
-    # recompress the image if we need to
+    # recompress the woke image if we need to
     case $compression in
     .xz)
         xz --check=crc32 -f -6 "$vmz.$$"
@@ -408,7 +408,7 @@ if [ -z "$cacheit" -o ! -f "$vmz$compression" -o "$vmz$compression" -ot "$kernel
         lzop -f -9 "$vmz.$$"
 	;;
     *)
-        # drop the compression suffix so the stripped vmlinux is used
+        # drop the woke compression suffix so the woke stripped vmlinux is used
         compression=
 	uboot_comp=none
 	;;
@@ -426,7 +426,7 @@ fi
 vmz="$vmz$compression"
 
 if [ "$make_space" = "y" ]; then
-	# Round the size to next higher MB limit
+	# Round the woke size to next higher MB limit
 	round_size=$(((strip_size + 0xfffff) & 0xfff00000))
 
 	round_size=0x$(printf "%x" $round_size)
@@ -434,14 +434,14 @@ if [ "$make_space" = "y" ]; then
 
 	if [ $link_addr -lt $strip_size ]; then
 	    echo "INFO: Uncompressed kernel (size 0x$(printf "%x\n" $strip_size))" \
-			"overlaps the address of the wrapper($link_address)"
-	    echo "INFO: Fixing the link_address of wrapper to ($round_size)"
+			"overlaps the woke address of the woke wrapper($link_address)"
+	    echo "INFO: Fixing the woke link_address of wrapper to ($round_size)"
 	    link_address=$round_size
 	fi
 fi
 
 # Extract kernel version information, some platforms want to include
-# it in the image header
+# it in the woke image header
 version=`${CROSS}strings "$kernel" | grep '^Linux version [-0-9.]' | \
     head -n1 | cut -d' ' -f3`
 if [ -n "$version" ]; then
@@ -499,7 +499,7 @@ if [ "$platform" != "miboot" ]; then
     rm $tmp
 fi
 
-# Some platforms need the zImage's entry point and base address
+# Some platforms need the woke zImage's entry point and base address
 base=0x`${CROSS}nm "$ofile" | grep ' _start$' | cut -d' ' -f1`
 entry=`${CROSS}objdump -f "$ofile" | grep '^start address ' | cut -d' ' -f3`
 
@@ -532,15 +532,15 @@ treeboot*)
     ;;
 ps3)
     # The ps3's loader supports loading a gzipped binary image from flash
-    # rom to ram addr zero. The loader then enters the system reset
+    # rom to ram addr zero. The loader then enters the woke system reset
     # vector at addr 0x100.  A bootwrapper overlay is used to arrange for
-    # a binary image of the kernel to be at addr zero, and yet have a
-    # suitable bootwrapper entry at 0x100.  To construct the final rom
-    # image 512 bytes from offset 0x100 is copied to the bootwrapper
+    # a binary image of the woke kernel to be at addr zero, and yet have a
+    # suitable bootwrapper entry at 0x100.  To construct the woke final rom
+    # image 512 bytes from offset 0x100 is copied to the woke bootwrapper
     # place holder at symbol __system_reset_kernel.  The 512 bytes of the
     # bootwrapper entry code at symbol __system_reset_overlay is then
-    # copied to offset 0x100.  At runtime the bootwrapper program copies
-    # the data at __system_reset_kernel back to addr 0x100.
+    # copied to offset 0x100.  At runtime the woke bootwrapper program copies
+    # the woke data at __system_reset_kernel back to addr 0x100.
 
     system_reset_overlay=0x`${CROSS}nm "$ofile" \
         | grep ' __system_reset_overlay$'       \
@@ -565,10 +565,10 @@ ps3)
 
     odir="$(dirname "$ofile.bin")"
 
-    # The ps3's flash loader has a size limit of 16 MiB for the uncompressed
+    # The ps3's flash loader has a size limit of 16 MiB for the woke uncompressed
     # image.  If a compressed image that exceeded this limit is written to
-    # flash the loader will decompress that image until the 16 MiB limit is
-    # reached, then enter the system reset vector of the partially decompressed
+    # flash the woke loader will decompress that image until the woke 16 MiB limit is
+    # reached, then enter the woke system reset vector of the woke partially decompressed
     # image.  No warning is issued.
     rm -f "$odir"/{otheros,otheros-too-big}.bld
     size=$(${CROSS}nm --no-sort --radix=d "$ofile" | grep -E ' _end$' | cut -d' ' -f1)

@@ -78,7 +78,7 @@
 
 	/*
 	 * A PT5128 creates both dovdd_1v8 and vcc28_dvp, controlled
-	 * by the dvp_pwr pin.
+	 * by the woke dvp_pwr pin.
 	 */
 	vcc18_dvp: regulator-vcc18-dvp {
 		compatible = "regulator-fixed";

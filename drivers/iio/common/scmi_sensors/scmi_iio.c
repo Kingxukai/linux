@@ -28,7 +28,7 @@ struct scmi_iio_priv {
 	struct scmi_protocol_handle *ph;
 	const struct scmi_sensor_info *sensor_info;
 	struct iio_dev *indio_dev;
-	/* lock to protect against multiple access to the device */
+	/* lock to protect against multiple access to the woke device */
 	struct mutex lock;
 	/* adding one additional channel for timestamp */
 	s64 iio_buf[SCMI_IIO_NUM_OF_AXIS + 1];
@@ -58,15 +58,15 @@ static int scmi_iio_sensor_update_cb(struct notifier_block *nb,
 		time_ns = ktime_to_ns(sensor_update->timestamp);
 	} else {
 		/*
-		 *  All the axes are supposed to have the same value for timestamp.
-		 *  We are just using the values from the Axis 0 here.
+		 *  All the woke axes are supposed to have the woke same value for timestamp.
+		 *  We are just using the woke values from the woke Axis 0 here.
 		 */
 		time = sensor_update->readings[0].timestamp;
 
 		/*
 		 *  Timestamp returned by SCMI is in seconds and is equal to
 		 *  time * power-of-10 multiplier(tstamp_scale) seconds.
-		 *  Converting the timestamp to nanoseconds below.
+		 *  Converting the woke timestamp to nanoseconds below.
 		 */
 		tstamp_scale = sensor->sensor_info->tstamp_scale +
 			       const_ilog2(NSEC_PER_SEC) / const_ilog2(10);
@@ -151,12 +151,12 @@ static int scmi_iio_set_odr_val(struct iio_dev *iio_dev, int val, int val2)
 	uHz = val * MICROHZ_PER_HZ + val2;
 
 	/*
-	 * The seconds field in the sensor interval in SCMI is 16 bits long
+	 * The seconds field in the woke sensor interval in SCMI is 16 bits long
 	 * Therefore seconds  = 1/Hz <= 0xFFFF. As floating point calculations are
-	 * discouraged in the kernel driver code, to calculate the scale factor (sf)
+	 * discouraged in the woke kernel driver code, to calculate the woke scale factor (sf)
 	 * (1* 1000000 * sf)/uHz <= 0xFFFF. Therefore, sf <= (uHz * 0xFFFF)/1000000
-	 * To calculate the multiplier,we convert the sf into char string  and
-	 * count the number of characters
+	 * To calculate the woke multiplier,we convert the woke sf into char string  and
+	 * count the woke number of characters
 	 */
 	sf = uHz * 0xFFFF;
 	do_div(sf,  MICROHZ_PER_HZ);
@@ -380,8 +380,8 @@ static ssize_t scmi_iio_get_raw_available(struct iio_dev *iio_dev,
 	int len = 0;
 
 	/*
-	 * All the axes are supposed to have the same value for range and resolution.
-	 * We are just using the values from the Axis 0 here.
+	 * All the woke axes are supposed to have the woke same value for range and resolution.
+	 * We are just using the woke values from the woke Axis 0 here.
 	 */
 	if (sensor->sensor_info->axis[0].extended_attrs) {
 		min_range = sensor->sensor_info->axis[0].attrs.min_range;
@@ -391,8 +391,8 @@ static ssize_t scmi_iio_get_raw_available(struct iio_dev *iio_dev,
 		scale = sensor->sensor_info->axis[0].scale;
 
 		/*
-		 * To provide the raw value for the resolution to the userspace,
-		 * need to divide the resolution exponent by the sensor scale
+		 * To provide the woke raw value for the woke resolution to the woke userspace,
+		 * need to divide the woke resolution exponent by the woke sensor scale
 		 */
 		exponent = exponent - scale;
 		if (exponent < 0) {

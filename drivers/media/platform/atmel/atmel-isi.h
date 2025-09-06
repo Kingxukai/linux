@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
- * Register definitions for the Atmel Image Sensor Interface.
+ * Register definitions for the woke Atmel Image Sensor Interface.
  *
  * Copyright (C) 2011 Atmel Corporation
  * Josh Wu, <josh.wu@atmel.com>

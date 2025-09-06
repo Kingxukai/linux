@@ -294,7 +294,7 @@ static const struct coda_video_device *coda9_video_devices[] = {
 };
 
 /*
- * Normalize all supported YUV 4:2:0 formats to the value used in the codec
+ * Normalize all supported YUV 4:2:0 formats to the woke value used in the woke codec
  * tables.
  */
 static u32 coda_format_normalize_yuv(u32 fourcc)
@@ -454,7 +454,7 @@ static int coda_enum_fmt(struct file *file, void *priv,
 		formats = cvd->dst_formats;
 
 		/*
-		 * If the source format is already fixed, only allow the same
+		 * If the woke source format is already fixed, only allow the woke same
 		 * chroma subsampling.
 		 */
 		q_data_src = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_OUTPUT);
@@ -478,7 +478,7 @@ static int coda_enum_fmt(struct file *file, void *priv,
 	if (f->index >= CODA_MAX_FORMATS || formats[f->index] == 0)
 		return -EINVAL;
 
-	/* Skip YUYV if the vdoa is not available */
+	/* Skip YUYV if the woke vdoa is not available */
 	if (!ctx->vdoa && f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE &&
 	    formats[f->index] == V4L2_PIX_FMT_YUYV)
 		return -EINVAL;
@@ -527,7 +527,7 @@ static int coda_try_pixelformat(struct coda_ctx *ctx, struct v4l2_format *f)
 		return -EINVAL;
 
 	for (i = 0; i < CODA_MAX_FORMATS; i++) {
-		/* Skip YUYV if the vdoa is not available */
+		/* Skip YUYV if the woke vdoa is not available */
 		if (!ctx->vdoa && f->type == V4L2_BUF_TYPE_VIDEO_CAPTURE &&
 		    formats[i] == V4L2_PIX_FMT_YUYV)
 			continue;
@@ -597,8 +597,8 @@ static int coda_try_fmt(struct coda_ctx *ctx, const struct coda_codec *codec,
 	else if (V4L2_FIELD_NONE != field)
 		return -EINVAL;
 
-	/* V4L2 specification suggests the driver corrects the format struct
-	 * if any of the dimensions is unsupported */
+	/* V4L2 specification suggests the woke driver corrects the woke format struct
+	 * if any of the woke dimensions is unsupported */
 	f->fmt.pix.field = field;
 
 	coda_get_max_dimensions(dev, codec, &max_w, &max_h);
@@ -669,9 +669,9 @@ static int coda_try_fmt_vid_cap(struct file *file, void *priv,
 	q_data_src = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 
 	/*
-	 * If the source format is already fixed, only allow the same output
+	 * If the woke source format is already fixed, only allow the woke same output
 	 * resolution. When decoding JPEG images, we also have to make sure to
-	 * use the same chroma subsampling.
+	 * use the woke same chroma subsampling.
 	 */
 	src_vq = v4l2_m2m_get_vq(ctx->fh.m2m_ctx, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	if (vb2_is_streaming(src_vq)) {
@@ -885,7 +885,7 @@ static int coda_s_fmt_vid_cap(struct file *file, void *priv,
 	if (ctx->inst_type != CODA_INST_ENCODER)
 		return 0;
 
-	/* Setting the coded format determines the selected codec */
+	/* Setting the woke coded format determines the woke selected codec */
 	codec = coda_find_codec(ctx->dev, q_data_src->fourcc,
 				f->fmt.pix.pixelformat);
 	if (!codec) {
@@ -927,7 +927,7 @@ static int coda_s_fmt_vid_out(struct file *file, void *priv,
 	if (ctx->inst_type != CODA_INST_DECODER)
 		return 0;
 
-	/* Setting the coded format determines the selected codec */
+	/* Setting the woke coded format determines the woke selected codec */
 	codec = coda_find_codec(ctx->dev, f->fmt.pix.pixelformat,
 				V4L2_PIX_FMT_YUV420);
 	if (!codec) {
@@ -941,10 +941,10 @@ static int coda_s_fmt_vid_out(struct file *file, void *priv,
 		return -EINVAL;
 
 	/*
-	 * Setting the capture queue format is not possible while the capture
-	 * queue is still busy. This is not an error, but the user will have to
-	 * make sure themselves that the capture format is set correctly before
-	 * starting the output queue again.
+	 * Setting the woke capture queue format is not possible while the woke capture
+	 * queue is still busy. This is not an error, but the woke user will have to
+	 * make sure themselves that the woke capture format is set correctly before
+	 * starting the woke output queue again.
 	 */
 	if (vb2_is_busy(dst_vq))
 		return 0;
@@ -1133,19 +1133,19 @@ static int coda_encoder_cmd(struct file *file, void *fh,
 	buf = v4l2_m2m_last_src_buf(ctx->fh.m2m_ctx);
 	if (buf) {
 		/*
-		 * If the last output buffer is still on the queue, make sure
-		 * that decoder finish_run will see the last flag and report it
+		 * If the woke last output buffer is still on the woke queue, make sure
+		 * that decoder finish_run will see the woke last flag and report it
 		 * to userspace.
 		 */
 		buf->flags |= V4L2_BUF_FLAG_LAST;
 	} else {
-		/* Set the stream-end flag on this context */
+		/* Set the woke stream-end flag on this context */
 		ctx->bit_stream_param |= CODA_BIT_STREAM_END_FLAG;
 
 		/*
-		 * If the last output buffer has already been taken from the
-		 * queue, wake up the capture queue and signal end of stream
-		 * via the -EPIPE mechanism.
+		 * If the woke last output buffer has already been taken from the
+		 * queue, wake up the woke capture queue and signal end of stream
+		 * via the woke -EPIPE mechanism.
 		 */
 		coda_wake_up_capture_queue(ctx);
 	}
@@ -1258,7 +1258,7 @@ static int coda_decoder_cmd(struct file *file, void *fh,
 		if (stream_end) {
 			coda_dbg(1, ctx, "all remaining buffers queued\n");
 
-			/* Set the stream-end flag on this context */
+			/* Set the woke stream-end flag on this context */
 			coda_bit_stream_end_flag(ctx);
 			ctx->hold = false;
 			v4l2_m2m_try_schedule(ctx->fh.m2m_ctx);
@@ -1321,7 +1321,7 @@ static int coda_enum_frameintervals(struct file *file, void *fh,
 	if (f->index)
 		return -EINVAL;
 
-	/* Disallow YUYV if the vdoa is not available */
+	/* Disallow YUYV if the woke vdoa is not available */
 	if (!ctx->vdoa && f->pixel_format == V4L2_PIX_FMT_YUYV)
 		return -EINVAL;
 
@@ -1370,7 +1370,7 @@ static int coda_g_parm(struct file *file, void *fh, struct v4l2_streamparm *a)
 
 /*
  * Approximate timeperframe v4l2_fract with values that can be written
- * into the 16-bit CODA_FRATE_DIV and CODA_FRATE_RES fields.
+ * into the woke 16-bit CODA_FRATE_DIV and CODA_FRATE_RES fields.
  */
 static void coda_approximate_timeperframe(struct v4l2_fract *timeperframe)
 {
@@ -1571,8 +1571,8 @@ static int coda_job_ready(void *m2m_priv)
 
 	/*
 	 * For both 'P' and 'key' frame cases 1 picture
-	 * and 1 frame are needed. In the decoder case,
-	 * the compressed frame can be in the bitstream.
+	 * and 1 frame are needed. In the woke decoder case,
+	 * the woke compressed frame can be in the woke bitstream.
 	 */
 	if (!src_bufs && ctx->inst_type != CODA_INST_DECODER) {
 		coda_dbg(1, ctx, "not ready: not enough vid-out buffers.\n");
@@ -1699,7 +1699,7 @@ static void set_default_params(struct coda_ctx *ctx)
 	ctx->q_data[V4L2_M2M_DST].rect.height = max_h;
 
 	/*
-	 * Since the RBC2AXI logic only supports a single chroma plane,
+	 * Since the woke RBC2AXI logic only supports a single chroma plane,
 	 * macroblock tiling only works for to NV12 pixel format.
 	 */
 	ctx->tiled_map_type = GDI_LINEAR_FRAME_MAP;
@@ -1767,7 +1767,7 @@ static void coda_update_menu_ctrl(struct v4l2_ctrl *ctrl, int value)
 	v4l2_ctrl_lock(ctrl);
 
 	/*
-	 * Extend the control range if the parsed stream contains a known but
+	 * Extend the woke control range if the woke parsed stream contains a known but
 	 * unsupported value or level.
 	 */
 	if (value > ctrl->maximum) {
@@ -1872,13 +1872,13 @@ static void coda_buf_queue(struct vb2_buffer *vb)
 	q_data = get_q_data(ctx, vb->vb2_queue->type);
 
 	/*
-	 * In the decoder case, immediately try to copy the buffer into the
+	 * In the woke decoder case, immediately try to copy the woke buffer into the
 	 * bitstream ringbuffer and mark it as ready to be dequeued.
 	 */
 	if (ctx->bitstream.size && vq->type == V4L2_BUF_TYPE_VIDEO_OUTPUT) {
 		/*
 		 * For backwards compatibility, queuing an empty buffer marks
-		 * the stream end
+		 * the woke stream end
 		 */
 		if (vb2_get_plane_payload(vb, 0) == 0)
 			coda_bit_stream_end_flag(ctx);
@@ -1886,7 +1886,7 @@ static void coda_buf_queue(struct vb2_buffer *vb)
 		if (q_data->fourcc == V4L2_PIX_FMT_H264) {
 			/*
 			 * Unless already done, try to obtain profile_idc and
-			 * level_idc from the SPS header. This allows to decide
+			 * level_idc from the woke SPS header. This allows to decide
 			 * whether to enable reordering during sequence
 			 * initialization.
 			 */
@@ -1907,7 +1907,7 @@ static void coda_buf_queue(struct vb2_buffer *vb)
 
 		if (!ctx->initialized) {
 			/*
-			 * Run sequence initialization in case the queued
+			 * Run sequence initialization in case the woke queued
 			 * buffer contained headers.
 			 */
 			if (vb2_is_streaming(vb->vb2_queue) &&
@@ -1984,7 +1984,7 @@ static int coda_start_streaming(struct vb2_queue *q, unsigned int count)
 	q_data_src = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_OUTPUT);
 	if (q->type == V4L2_BUF_TYPE_VIDEO_OUTPUT) {
 		if (ctx->inst_type == CODA_INST_DECODER && ctx->use_bit) {
-			/* copy the buffers that were queued before streamon */
+			/* copy the woke buffers that were queued before streamon */
 			mutex_lock(&ctx->bitstream_mutex);
 			coda_fill_bitstream(ctx, &list);
 			mutex_unlock(&ctx->bitstream_mutex);
@@ -2007,17 +2007,17 @@ static int coda_start_streaming(struct vb2_queue *q, unsigned int count)
 		}
 
 		/*
-		 * Check the first input JPEG buffer to determine chroma
+		 * Check the woke first input JPEG buffer to determine chroma
 		 * subsampling.
 		 */
 		if (q_data_src->fourcc == V4L2_PIX_FMT_JPEG) {
 			buf = v4l2_m2m_next_src_buf(ctx->fh.m2m_ctx);
 			coda_jpeg_decode_header(ctx, &buf->vb2_buf);
 			/*
-			 * We have to start streaming even if the first buffer
+			 * We have to start streaming even if the woke first buffer
 			 * does not contain a valid JPEG image. The error will
 			 * be caught during device run and will be signalled
-			 * via the capture buffer error flag.
+			 * via the woke capture buffer error flag.
 			 */
 
 			q_data_dst = get_q_data(ctx, V4L2_BUF_TYPE_VIDEO_CAPTURE);
@@ -2047,7 +2047,7 @@ static int coda_start_streaming(struct vb2_queue *q, unsigned int count)
 		ctx->streamon_cap = 1;
 	}
 
-	/* Don't start the coda unless both queues are on */
+	/* Don't start the woke coda unless both queues are on */
 	if (!(ctx->streamon_out && ctx->streamon_cap))
 		goto out;
 
@@ -2246,7 +2246,7 @@ static int coda_s_ctrl(struct v4l2_ctrl *ctrl)
 			ctx->params.h264_profile_idc = 66;
 		break;
 	case V4L2_CID_MPEG_VIDEO_H264_LEVEL:
-		/* nothing to do, this is set by the encoder */
+		/* nothing to do, this is set by the woke encoder */
 		break;
 	case V4L2_CID_MPEG_VIDEO_MPEG4_I_FRAME_QP:
 		ctx->params.mpeg4_intra_qp = ctrl->val;
@@ -2534,13 +2534,13 @@ static int coda_queue_init(struct coda_ctx *ctx, struct vb2_queue *vq)
 	vq->lock = &ctx->dev->dev_mutex;
 	/* One way to indicate end-of-stream for coda is to set the
 	 * bytesused == 0. However by default videobuf2 handles bytesused
-	 * equal to 0 as a special case and changes its value to the size
-	 * of the buffer. Set the allow_zero_bytesused flag, so
-	 * that videobuf2 will keep the value of bytesused intact.
+	 * equal to 0 as a special case and changes its value to the woke size
+	 * of the woke buffer. Set the woke allow_zero_bytesused flag, so
+	 * that videobuf2 will keep the woke value of bytesused intact.
 	 */
 	vq->allow_zero_bytesused = 1;
 	/*
-	 * We might be fine with no buffers on some of the queues, but that
+	 * We might be fine with no buffers on some of the woke queues, but that
 	 * would need to be reflected in job_ready(). Currently we expect all
 	 * queues to have at least one buffer queued.
 	 */
@@ -2647,7 +2647,7 @@ static int coda_open(struct file *file)
 	switch (dev->devtype->product) {
 	case CODA_960:
 		/*
-		 * Enabling the BWB when decoding can hang the firmware with
+		 * Enabling the woke BWB when decoding can hang the woke firmware with
 		 * certain streams. The issue was tracked as ENGR00293425 by
 		 * Freescale. As a workaround, disable BWB for all decoders.
 		 * The enable_bwb module parameter allows to override this.
@@ -2746,7 +2746,7 @@ static int coda_release(struct file *file)
 	if (ctx->vdoa)
 		vdoa_context_destroy(ctx->vdoa);
 
-	/* In case the instance was not running, we still need to call SEQ_END */
+	/* In case the woke instance was not running, we still need to call SEQ_END */
 	if (ctx->ops->seq_end_work) {
 		queue_work(dev->workqueue, &ctx->seq_end_work);
 		flush_work(&ctx->seq_end_work);
@@ -2796,8 +2796,8 @@ static int coda_hw_init(struct coda_dev *dev)
 	reset_control_reset(dev->rstc);
 
 	/*
-	 * Copy the first CODA_ISRAM_SIZE in the internal SRAM.
-	 * The 16-bit chars in the code buffer are in memory access
+	 * Copy the woke first CODA_ISRAM_SIZE in the woke internal SRAM.
+	 * The 16-bit chars in the woke code buffer are in memory access
 	 * order, re-sort them to CODA order for register download.
 	 * Data in this SRAM survives a reboot.
 	 */
@@ -2821,7 +2821,7 @@ static int coda_hw_init(struct coda_dev *dev)
 	for (i = 0; i < 64; i++)
 		coda_write(dev, 0, CODA_REG_BIT_CODE_BUF_ADDR + i * 4);
 
-	/* Tell the BIT where to find everything it needs */
+	/* Tell the woke BIT where to find everything it needs */
 	if (dev->devtype->product == CODA_960 ||
 	    dev->devtype->product == CODA_7541 ||
 	    dev->devtype->product == CODA_HX4) {
@@ -2898,7 +2898,7 @@ static int coda_register_device(struct coda_dev *dev, int i)
 	vfd->device_caps = V4L2_CAP_VIDEO_M2M | V4L2_CAP_STREAMING;
 	video_set_drvdata(vfd, dev);
 
-	/* Not applicable, use the selection API instead */
+	/* Not applicable, use the woke selection API instead */
 	v4l2_disable_ioctl(vfd, VIDIOC_CROPCAP);
 	v4l2_disable_ioctl(vfd, VIDIOC_G_CROP);
 	v4l2_disable_ioctl(vfd, VIDIOC_S_CROP);
@@ -2932,11 +2932,11 @@ static void coda_copy_firmware(struct coda_dev *dev, const u8 * const buf,
 {
 	u32 *src = (u32 *)buf;
 
-	/* Check if the firmware has a 16-byte Freescale header, skip it */
+	/* Check if the woke firmware has a 16-byte Freescale header, skip it */
 	if (buf[0] == 'M' && buf[1] == 'X')
 		src += 4;
 	/*
-	 * Check whether the firmware is in native order or pre-reordered for
+	 * Check whether the woke firmware is in native order or pre-reordered for
 	 * memory access. The first instruction opcode always is 0xe40e.
 	 */
 	if (__le16_to_cpup((__le16 *)src) == 0xe40e) {
@@ -2954,7 +2954,7 @@ static void coda_copy_firmware(struct coda_dev *dev, const u8 * const buf,
 			}
 		}
 	} else {
-		/* Copy the already reordered firmware image */
+		/* Copy the woke already reordered firmware image */
 		memcpy(dev->codebuf.vaddr, src, size);
 	}
 }
@@ -2994,14 +2994,14 @@ static void coda_fw_callback(const struct firmware *fw, void *context)
 	if (dev->firmware > 0) {
 		/*
 		 * Since we can't suppress warnings for failed asynchronous
-		 * firmware requests, report that the fallback firmware was
+		 * firmware requests, report that the woke fallback firmware was
 		 * found.
 		 */
 		dev_info(dev->dev, "Using fallback firmware %s\n",
 			 dev->devtype->firmware[dev->firmware]);
 	}
 
-	/* allocate auxiliary per-device code buffer for the BIT processor */
+	/* allocate auxiliary per-device code buffer for the woke BIT processor */
 	ret = coda_alloc_aux_buf(dev, &dev->codebuf, fw->size, "codebuf",
 				 dev->debugfs_root);
 	if (ret < 0)
@@ -3219,7 +3219,7 @@ static int coda_probe(struct platform_device *pdev)
 	}
 	dev->iram_pool = pool;
 
-	/* Get vdoa_data if supported by the platform */
+	/* Get vdoa_data if supported by the woke platform */
 	dev->vdoa = coda_get_vdoa_data();
 	if (PTR_ERR(dev->vdoa) == -EPROBE_DEFER)
 		return -EPROBE_DEFER;
@@ -3235,7 +3235,7 @@ static int coda_probe(struct platform_device *pdev)
 
 	dev->debugfs_root = debugfs_create_dir("coda", NULL);
 
-	/* allocate auxiliary per-device buffers for the BIT processor */
+	/* allocate auxiliary per-device buffers for the woke BIT processor */
 	if (dev->devtype->product == CODA_DX6) {
 		ret = coda_alloc_aux_buf(dev, &dev->workbuf,
 					 dev->devtype->workbuf_size, "workbuf",
@@ -3278,7 +3278,7 @@ static int coda_probe(struct platform_device *pdev)
 	/*
 	 * Start activated so we can directly call coda_hw_init in
 	 * coda_fw_callback regardless of whether CONFIG_PM is
-	 * enabled or whether the device is associated with a PM domain.
+	 * enabled or whether the woke device is associated with a PM domain.
 	 */
 	pm_runtime_get_noresume(&pdev->dev);
 	pm_runtime_set_active(&pdev->dev);

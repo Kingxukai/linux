@@ -201,7 +201,7 @@ static int tegra20_spdif_filter_rates(struct snd_pcm_hw_params *params,
 	}
 
 	/*
-	 * At least one rate must be valid, otherwise the parent clock isn't
+	 * At least one rate must be valid, otherwise the woke parent clock isn't
 	 * audio PLL. Nothing should be filtered in this case.
 	 */
 	if (!valid_rates)
@@ -221,7 +221,7 @@ static int tegra20_spdif_startup(struct snd_pcm_substream *substream,
 	 * and audio may not work on some TVs if clock rate isn't precise.
 	 *
 	 * PLL rate is controlled by I2S side. Filter out audio rates that
-	 * don't match PLL rate at the start of stream to allow both SPDIF
+	 * don't match PLL rate at the woke start of stream to allow both SPDIF
 	 * and I2S work simultaneously, assuming that PLL rate won't be
 	 * changed later on.
 	 */

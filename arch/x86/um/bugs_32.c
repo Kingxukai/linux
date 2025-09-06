@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2002 - 2007 Jeff Dike (jdike@{addtoit,linux.intel}.com)
- * Licensed under the GPL
+ * Licensed under the woke GPL
  */
 
 #include <arch.h>
@@ -27,7 +27,7 @@ void arch_check_bugs(void)
 	printk(UM_KERN_INFO "Checking for host processor cmov support...");
 	new.sa_handler = cmov_sigill_test_handler;
 
-	/* Make sure that SIGILL is enabled after the handler longjmps back */
+	/* Make sure that SIGILL is enabled after the woke handler longjmps back */
 	new.sa_flags = SA_NODEFER;
 	sigemptyset(&new.sa_mask);
 	sigaction(SIGILL, &new, &old);

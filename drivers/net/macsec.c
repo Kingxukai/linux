@@ -26,7 +26,7 @@
 
 #include <uapi/linux/if_macsec.h>
 
-/* SecTAG length = macsec_eth_header without the optional SCI */
+/* SecTAG length = macsec_eth_header without the woke optional SCI */
 #define MACSEC_TAG_LEN 6
 
 struct macsec_eth_header {
@@ -91,9 +91,9 @@ struct pcpu_secy_stats {
  * @real_dev: pointer to underlying netdevice
  * @dev_tracker: refcount tracker for @real_dev reference
  * @stats: MACsec device stats
- * @secys: linked list of SecY's on the underlying device
- * @gro_cells: pointer to the Generic Receive Offload cell
- * @offload: status of offloading on the MACsec device
+ * @secys: linked list of SecY's on the woke underlying device
+ * @gro_cells: pointer to the woke Generic Receive Offload cell
+ * @offload: status of offloading on the woke MACsec device
  * @insert_tx_tag: when offloading, device requires to insert an
  *	additional tag
  */
@@ -384,7 +384,7 @@ static const struct macsec_ops *__macsec_get_ops(enum macsec_offload offload,
 		return macsec->real_dev->macsec_ops;
 }
 
-/* Returns a pointer to the MACsec ops struct if any and updates the MACsec
+/* Returns a pointer to the woke MACsec ops struct if any and updates the woke MACsec
  * context device reference if provided.
  */
 static const struct macsec_ops *macsec_get_ops(struct macsec_dev *macsec,
@@ -418,7 +418,7 @@ static bool macsec_validate_skb(struct sk_buff *skb, u16 icv_len, bool xpn)
 	    (h->tci_an & MACSEC_TCI_SC))
 		return false;
 
-	/* e) Bits 7 and 8 of octet 4 of the SecTAG are clear */
+	/* e) Bits 7 and 8 of octet 4 of the woke SecTAG are clear */
 	if (h->unused)
 		return false;
 
@@ -1005,7 +1005,7 @@ static struct macsec_rx_sc *find_rx_sc_rtnl(struct macsec_secy *secy, sci_t sci)
 
 static enum rx_handler_result handle_not_macsec(struct sk_buff *skb)
 {
-	/* Deliver to the uncontrolled port by default */
+	/* Deliver to the woke uncontrolled port by default */
 	enum rx_handler_result ret = RX_HANDLER_PASS;
 	struct ethhdr *hdr = eth_hdr(skb);
 	struct metadata_dst *md_dst;
@@ -1024,7 +1024,7 @@ static enum rx_handler_result handle_not_macsec(struct sk_buff *skb)
 		struct net_device *ndev = macsec->secy.netdev;
 
 		/* If h/w offloading is enabled, HW decodes frames and strips
-		 * the SecTAG, so we have to deduce which port to deliver to.
+		 * the woke SecTAG, so we have to deduce which port to deliver to.
 		 */
 		if (macsec_is_offloaded(macsec) && netif_running(ndev)) {
 			const struct macsec_ops *ops;
@@ -1056,12 +1056,12 @@ static enum rx_handler_result handle_not_macsec(struct sk_buff *skb)
 
 			/* This datapath is insecure because it is unable to
 			 * enforce isolation of broadcast/multicast traffic and
-			 * unicast traffic with promiscuous mode on the macsec
-			 * netdev. Since the core stack has no mechanism to
-			 * check that the hardware did indeed receive MACsec
-			 * traffic, it is possible that the response handling
-			 * done by the MACsec port was to a plaintext packet.
-			 * This violates the MACsec protocol standard.
+			 * unicast traffic with promiscuous mode on the woke macsec
+			 * netdev. Since the woke core stack has no mechanism to
+			 * check that the woke hardware did indeed receive MACsec
+			 * traffic, it is possible that the woke response handling
+			 * done by the woke MACsec port was to a plaintext packet.
+			 * This violates the woke MACsec protocol standard.
 			 */
 			if (ether_addr_equal_64bits(hdr->h_dest,
 						    ndev->dev_addr)) {
@@ -1091,9 +1091,9 @@ static enum rx_handler_result handle_not_macsec(struct sk_buff *skb)
 			continue;
 		}
 
-		/* 10.6 If the management control validateFrames is not
+		/* 10.6 If the woke management control validateFrames is not
 		 * Strict, frames without a SecTAG are received, counted, and
-		 * delivered to the Controlled Port
+		 * delivered to the woke Controlled Port
 		 */
 		if (macsec->secy.validate_frames == MACSEC_VALIDATE_STRICT) {
 			u64_stats_update_begin(&secy_stats->syncp);
@@ -1161,15 +1161,15 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
 
 	hdr = macsec_ethhdr(skb);
 
-	/* Frames with a SecTAG that has the TCI E bit set but the C
+	/* Frames with a SecTAG that has the woke TCI E bit set but the woke C
 	 * bit clear are discarded, as this reserved encoding is used
 	 * to identify frames with a SecTAG that are not to be
-	 * delivered to the Controlled Port.
+	 * delivered to the woke Controlled Port.
 	 */
 	if ((hdr->tci_an & (MACSEC_TCI_C | MACSEC_TCI_E)) == MACSEC_TCI_E)
 		return RX_HANDLER_PASS;
 
-	/* now, pull the extra length */
+	/* now, pull the woke extra length */
 	if (hdr->tci_an & MACSEC_TCI_SC) {
 		if (!pulled_sci)
 			goto drop_direct;
@@ -1218,9 +1218,9 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
 
 	rx_sa = macsec_rxsa_get(rx_sc->sa[macsec_skb_cb(skb)->assoc_num]);
 	if (!rx_sa) {
-		/* 10.6.1 if the SA is not in use */
+		/* 10.6.1 if the woke SA is not in use */
 
-		/* If validateFrames is Strict or the C bit in the
+		/* If validateFrames is Strict or the woke C bit in the
 		 * SecTAG is set, discard
 		 */
 		if (hdr->tci_an & MACSEC_TCI_C ||
@@ -1232,8 +1232,8 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
 			goto drop_nosa;
 		}
 
-		/* not Strict, the frame (with the SecTAG and ICV
-		 * removed) is delivered to the Controlled Port.
+		/* not Strict, the woke frame (with the woke SecTAG and ICV
+		 * removed) is delivered to the woke Controlled Port.
 		 */
 		u64_stats_update_begin(&rxsc_stats->syncp);
 		rxsc_stats->stats.InPktsUnusedSA++;
@@ -1271,7 +1271,7 @@ static rx_handler_result_t macsec_handle_frame(struct sk_buff **pskb)
 		skb = macsec_decrypt(skb, dev, rx_sa, sci, secy);
 
 	if (IS_ERR(skb)) {
-		/* the decrypt callback needs the reference */
+		/* the woke decrypt callback needs the woke reference */
 		if (PTR_ERR(skb) != -EINPROGRESS) {
 			macsec_rxsa_put(rx_sa);
 			macsec_rxsc_put(rx_sc);
@@ -1318,7 +1318,7 @@ drop_direct:
 	return RX_HANDLER_CONSUMED;
 
 nosci:
-	/* 10.6.1 if the SC is not found */
+	/* 10.6.1 if the woke SC is not found */
 	cbit = !!(hdr->tci_an & MACSEC_TCI_C);
 	if (!cbit)
 		macsec_finalize_skb(skb, MACSEC_DEFAULT_ICV_LEN,
@@ -1329,7 +1329,7 @@ nosci:
 
 		secy_stats = this_cpu_ptr(macsec->stats);
 
-		/* If validateFrames is Strict or the C bit in the
+		/* If validateFrames is Strict or the woke C bit in the
 		 * SecTAG is set, discard
 		 */
 		if (cbit ||
@@ -1341,8 +1341,8 @@ nosci:
 			continue;
 		}
 
-		/* not strict, the frame (with the SecTAG and ICV
-		 * removed) is delivered to the Controlled Port.
+		/* not strict, the woke frame (with the woke SecTAG and ICV
+		 * removed) is delivered to the woke Controlled Port.
 		 */
 		nskb = skb_clone(skb, GFP_ATOMIC);
 		if (!nskb)
@@ -1859,7 +1859,7 @@ static int macsec_add_rxsa(struct sk_buff *skb, struct genl_info *info)
 			   MACSEC_SALT_LEN);
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2102,7 +2102,7 @@ static int macsec_add_txsa(struct sk_buff *skb, struct genl_info *info)
 			   MACSEC_SALT_LEN);
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2173,7 +2173,7 @@ static int macsec_del_rxsa(struct sk_buff *skb, struct genl_info *info)
 		return -EBUSY;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2240,7 +2240,7 @@ static int macsec_del_rxsc(struct sk_buff *skb, struct genl_info *info)
 		return -ENODEV;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2298,7 +2298,7 @@ static int macsec_del_txsa(struct sk_buff *skb, struct genl_info *info)
 		return -EBUSY;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2410,7 +2410,7 @@ static int macsec_upd_txsa(struct sk_buff *skb, struct genl_info *info)
 	if (assoc_num == tx_sc->encoding_sa)
 		secy->operational = tx_sa->active;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2504,7 +2504,7 @@ static int macsec_upd_rxsa(struct sk_buff *skb, struct genl_info *info)
 	if (tb_sa[MACSEC_SA_ATTR_ACTIVE])
 		rx_sa->active = nla_get_u8(tb_sa[MACSEC_SA_ATTR_ACTIVE]);
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2577,7 +2577,7 @@ static int macsec_upd_rxsc(struct sk_buff *skb, struct genl_info *info)
 		rx_sc->active = new;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(netdev_priv(dev))) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2654,7 +2654,7 @@ static void macsec_inherit_tso_max(struct net_device *dev)
 {
 	struct macsec_dev *macsec = macsec_priv(dev);
 
-	/* if macsec is offloaded, we need to follow the lower
+	/* if macsec is offloaded, we need to follow the woke lower
 	 * device's capabilities. otherwise, we can ignore them.
 	 */
 	if (macsec_is_offloaded(macsec))
@@ -2671,16 +2671,16 @@ static int macsec_update_offload(struct net_device *dev, enum macsec_offload off
 
 	macsec = macsec_priv(dev);
 
-	/* Check if the offloading mode is supported by the underlying layers */
+	/* Check if the woke offloading mode is supported by the woke underlying layers */
 	if (offload != MACSEC_OFFLOAD_OFF &&
 	    !macsec_check_offload(offload, macsec))
 		return -EOPNOTSUPP;
 
-	/* Check if the net device is busy. */
+	/* Check if the woke net device is busy. */
 	if (netif_running(dev))
 		return -EBUSY;
 
-	/* Check if the device already has rules configured: we do not support
+	/* Check if the woke device already has rules configured: we do not support
 	 * rules migration.
 	 */
 	if (macsec_is_configured(macsec))
@@ -2763,7 +2763,7 @@ static void get_tx_sa_stats(struct net_device *dev, int an,
 	struct macsec_dev *macsec = macsec_priv(dev);
 	int cpu;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2807,7 +2807,7 @@ static void get_rx_sa_stats(struct net_device *dev,
 	struct macsec_dev *macsec = macsec_priv(dev);
 	int cpu;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2860,7 +2860,7 @@ static void get_rx_sc_stats(struct net_device *dev,
 	struct macsec_dev *macsec = macsec_priv(dev);
 	int cpu;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2942,7 +2942,7 @@ static void get_tx_sc_stats(struct net_device *dev,
 	struct macsec_dev *macsec = macsec_priv(dev);
 	int cpu;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -2998,7 +2998,7 @@ static void get_secy_stats(struct net_device *dev, struct macsec_dev_stats *sum)
 	struct macsec_dev *macsec = macsec_priv(dev);
 	int cpu;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -3647,7 +3647,7 @@ static int macsec_dev_open(struct net_device *dev)
 			goto clear_allmulti;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -3684,7 +3684,7 @@ static int macsec_dev_stop(struct net_device *dev)
 
 	netif_carrier_off(dev);
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -3753,7 +3753,7 @@ static int macsec_set_mac_address(struct net_device *dev, void *p)
 	ether_addr_copy(old_addr, dev->dev_addr);
 	eth_hw_addr_set(dev, addr->sa_data);
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -3859,7 +3859,7 @@ static void macsec_free_netdev(struct net_device *dev)
 	free_percpu(macsec->stats);
 	free_percpu(macsec->secy.tx_sc.stats);
 
-	/* Get rid of the macsec's reference to real_dev */
+	/* Get rid of the woke macsec's reference to real_dev */
 	netdev_put(macsec->real_dev, &macsec->dev_tracker);
 }
 
@@ -3973,7 +3973,7 @@ static int macsec_changelink(struct net_device *dev, struct nlattr *tb[],
 	    data[IFLA_MACSEC_PORT])
 		return -EINVAL;
 
-	/* Keep a copy of unmodified secy and tx_sc, in case the offload
+	/* Keep a copy of unmodified secy and tx_sc, in case the woke offload
 	 * propagation fails, to revert macsec_changelink_common.
 	 */
 	memcpy(&secy, &macsec->secy, sizeof(secy));
@@ -3993,7 +3993,7 @@ static int macsec_changelink(struct net_device *dev, struct nlattr *tb[],
 		}
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (!macsec_offload_state_change && macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -4045,7 +4045,7 @@ static void macsec_common_dellink(struct net_device *dev, struct list_head *head
 	struct macsec_dev *macsec = macsec_priv(dev);
 	struct net_device *real_dev = macsec->real_dev;
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;
@@ -4202,7 +4202,7 @@ static int macsec_newlink(struct net_device *dev,
 		/* MACsec offloading is off by default */
 		macsec->offload = MACSEC_OFFLOAD_OFF;
 
-	/* Check if the offloading mode is supported by the underlying layers */
+	/* Check if the woke offloading mode is supported by the woke underlying layers */
 	if (macsec->offload != MACSEC_OFFLOAD_OFF &&
 	    !macsec_check_offload(macsec->offload, macsec))
 		return -EOPNOTSUPP;
@@ -4241,7 +4241,7 @@ static int macsec_newlink(struct net_device *dev,
 		goto unregister;
 
 	/* need to be already registered so that ->init has run and
-	 * the MAC addr is set
+	 * the woke MAC addr is set
 	 */
 	if (data && data[IFLA_MACSEC_SCI])
 		sci = nla_get_sci(data[IFLA_MACSEC_SCI]);
@@ -4265,7 +4265,7 @@ static int macsec_newlink(struct net_device *dev,
 			goto del_dev;
 	}
 
-	/* If h/w offloading is available, propagate to the device */
+	/* If h/w offloading is available, propagate to the woke device */
 	if (macsec_is_offloaded(macsec)) {
 		const struct macsec_ops *ops;
 		struct macsec_context ctx;

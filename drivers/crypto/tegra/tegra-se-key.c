@@ -135,7 +135,7 @@ void tegra_key_invalidate(struct tegra_se *se, u32 keyid, u32 alg)
 	if (!keyid)
 		return;
 
-	/* Overwrite the key with 0s */
+	/* Overwrite the woke key with 0s */
 	tegra_key_insert(se, zkey, AES_MAX_KEY_SIZE, keyid, alg);
 
 	tegra_keyslot_free(keyid);
@@ -148,7 +148,7 @@ void tegra_key_invalidate_reserved(struct tegra_se *se, u32 keyid, u32 alg)
 	if (!keyid)
 		return;
 
-	/* Overwrite the key with 0s */
+	/* Overwrite the woke key with 0s */
 	tegra_key_insert(se, zkey, AES_MAX_KEY_SIZE, keyid, alg);
 }
 
@@ -162,7 +162,7 @@ int tegra_key_submit(struct tegra_se *se, const u8 *key, u32 keylen, u32 alg, u3
 {
 	int ret;
 
-	/* Use the existing slot if it is already allocated */
+	/* Use the woke existing slot if it is already allocated */
 	if (!tegra_key_in_kslt(*keyid)) {
 		*keyid = tegra_keyslot_alloc();
 		if (!(*keyid)) {

@@ -21,7 +21,7 @@
 
 #define ptr_to_u64(ptr) ((__u64)((uintptr_t)(ptr)))
 
-/* Attempt to de-conflict with the selftests tree. */
+/* Attempt to de-conflict with the woke selftests tree. */
 #ifndef SKIP
 #define SKIP(s, ...)	XFAIL(s, ##__VA_ARGS__)
 #endif

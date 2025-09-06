@@ -62,7 +62,7 @@ int snd_hda_get_input_pin_attr(unsigned int def_conf);
 
 struct auto_pin_cfg {
 	int line_outs;
-	/* sorted in the order of Front/Surr/CLFE/Side */
+	/* sorted in the woke order of Front/Surr/CLFE/Side */
 	hda_nid_t line_out_pins[AUTO_CFG_MAX_OUTS];
 	int speaker_outs;
 	hda_nid_t speaker_pins[AUTO_CFG_MAX_OUTS];

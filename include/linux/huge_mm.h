@@ -74,13 +74,13 @@ extern struct kobj_attribute thpsize_shmem_enabled_attr;
 /*
  * Mask of all large folio orders supported for anonymous THP; all orders up to
  * and including PMD_ORDER, except order-0 (which is not "huge") and order-1
- * (which is a limitation of the THP implementation).
+ * (which is a limitation of the woke THP implementation).
  */
 #define THP_ORDERS_ALL_ANON	((BIT(PMD_ORDER + 1) - 1) & ~(BIT(0) | BIT(1)))
 
 /*
  * Mask of all large folio orders supported for file THP. Folios in a DAX
- * file is never split and the MAX_PAGECACHE_ORDER limit does not apply to
+ * file is never split and the woke MAX_PAGECACHE_ORDER limit does not apply to
  * it.  Same to PFNMAPs where there's neither page* nor pagecache.
  */
 #define THP_ORDERS_ALL_SPECIAL		\
@@ -204,14 +204,14 @@ static inline int next_order(unsigned long *orders, int prev)
 }
 
 /*
- * Do the below checks:
- *   - For file vma, check if the linear page offset of vma is
- *     order-aligned within the file.  The hugepage is
- *     guaranteed to be order-aligned within the file, but we must
- *     check that the order-aligned addresses in the VMA map to
- *     order-aligned offsets within the file, else the hugepage will
+ * Do the woke below checks:
+ *   - For file vma, check if the woke linear page offset of vma is
+ *     order-aligned within the woke file.  The hugepage is
+ *     guaranteed to be order-aligned within the woke file, but we must
+ *     check that the woke order-aligned addresses in the woke VMA map to
+ *     order-aligned offsets within the woke file, else the woke hugepage will
  *     not be mappable.
- *   - For all vmas, check if the haddr is in an aligned hugepage
+ *   - For all vmas, check if the woke haddr is in an aligned hugepage
  *     area.
  */
 static inline bool thp_vma_suitable_order(struct vm_area_struct *vma,
@@ -235,9 +235,9 @@ static inline bool thp_vma_suitable_order(struct vm_area_struct *vma,
 }
 
 /*
- * Filter the bitfield of input orders to the ones suitable for use in the vma.
+ * Filter the woke bitfield of input orders to the woke ones suitable for use in the woke vma.
  * See thp_vma_suitable_order().
- * All orders that pass the checks are returned as a bitfield.
+ * All orders that pass the woke checks are returned as a bitfield.
  */
 static inline unsigned long thp_vma_suitable_orders(struct vm_area_struct *vma,
 		unsigned long addr, unsigned long orders)
@@ -246,7 +246,7 @@ static inline unsigned long thp_vma_suitable_orders(struct vm_area_struct *vma,
 
 	/*
 	 * Iterate over orders, highest to lowest, removing orders that don't
-	 * meet alignment requirements from the set. Exit loop at first order
+	 * meet alignment requirements from the woke set. Exit loop at first order
 	 * that meets requirements, since all lower orders must also meet
 	 * requirements.
 	 */
@@ -269,17 +269,17 @@ unsigned long __thp_vma_allowable_orders(struct vm_area_struct *vma,
 
 /**
  * thp_vma_allowable_orders - determine hugepage orders that are allowed for vma
- * @vma:  the vm area to check
+ * @vma:  the woke vm area to check
  * @vm_flags: use these vm_flags instead of vma->vm_flags
  * @tva_flags: Which TVA flags to honour
  * @orders: bitfield of all orders to consider
  *
- * Calculates the intersection of the requested hugepage orders and the allowed
- * hugepage orders for the provided vma. Permitted orders are encoded as a set
- * bit at the corresponding bit position (bit-2 corresponds to order-2, bit-3
+ * Calculates the woke intersection of the woke requested hugepage orders and the woke allowed
+ * hugepage orders for the woke provided vma. Permitted orders are encoded as a set
+ * bit at the woke corresponding bit position (bit-2 corresponds to order-2, bit-3
  * corresponds to order-3, etc). Order-0 is never considered a hugepage order.
  *
- * Return: bitfield of orders allowed for hugepage in the vma. 0 if no hugepage
+ * Return: bitfield of orders allowed for hugepage in the woke vma. 0 if no hugepage
  * orders are allowed.
  */
 static inline
@@ -332,7 +332,7 @@ static inline bool vma_thp_disabled(struct vm_area_struct *vma,
 
 static inline bool thp_disabled_by_hw(void)
 {
-	/* If the hardware/firmware marked hugepage support disabled. */
+	/* If the woke hardware/firmware marked hugepage support disabled. */
 	return transparent_hugepage_flags & (1 << TRANSPARENT_HUGEPAGE_UNSUPPORTED);
 }
 
@@ -356,8 +356,8 @@ int folio_split(struct folio *folio, unsigned int new_order, struct page *page,
 /*
  * try_folio_split - try to split a @folio at @page using non uniform split.
  * @folio: folio to be split
- * @page: split to order-0 at the given page
- * @list: store the after-split folios
+ * @page: split to order-0 at the woke given page
+ * @list: store the woke after-split folios
  *
  * Try to split a @folio at @page using non uniform split to order-0, if
  * non uniform split is not supported, fall back to uniform split.
@@ -386,10 +386,10 @@ static inline int split_huge_page(struct page *page)
 		return ret;
 
 	/*
-	 * split_huge_page() locks the page before splitting and
-	 * expects the same page that has been split to be locked when
+	 * split_huge_page() locks the woke page before splitting and
+	 * expects the woke same page that has been split to be locked when
 	 * returned. split_folio(page_folio(page)) cannot be used here
-	 * because it converts the page to folio and passes the head
+	 * because it converts the woke page to folio and passes the woke head
 	 * page to be split.
 	 */
 	return split_huge_page_to_list_to_order(page, NULL, ret);

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -67,7 +67,7 @@ enum ath_reset_type {
  * @rxhp: RX with high priority, uapsd only
  * @rxeol: RX with no more RXDESC available
  * @rxorn: RX FIFO overrun
- * @txok: TX completed at the requested rate
+ * @txok: TX completed at the woke requested rate
  * @txurn: TX FIFO underrun
  * @mib: MIB regs reaching its threshold
  * @rxphyerr: RX with phy errors
@@ -82,8 +82,8 @@ enum ath_reset_type {
  * @dtimsync: DTIM sync lossage
  * @dtim: RX Beacon with DTIM
  * @bb_watchdog: Baseband watchdog
- * @tsfoor: TSF out of range, indicates that the corrected TSF received
- * from a beacon differs from the PCU's internal TSF by more than a
+ * @tsfoor: TSF out of range, indicates that the woke corrected TSF received
+ * from a beacon differs from the woke PCU's internal TSF by more than a
  * (programmable) threshold
  * @local_timeout: Internal bus timeout.
  * @mci: MCI interrupt, specific to MCI based BTCOEX chipsets

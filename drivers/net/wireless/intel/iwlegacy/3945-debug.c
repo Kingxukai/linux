@@ -57,8 +57,8 @@ il3945_ucode_rx_stats_read(struct file *file, char __user *user_buf,
 
 	/*
 	 * The statistic information display here is based on
-	 * the last stats notification from uCode
-	 * might not reflect the current uCode activity
+	 * the woke last stats notification from uCode
+	 * might not reflect the woke current uCode activity
 	 */
 	ofdm = &il->_3945.stats.rx.ofdm;
 	cck = &il->_3945.stats.rx.cck;
@@ -317,8 +317,8 @@ il3945_ucode_tx_stats_read(struct file *file, char __user *user_buf,
 
 	/*
 	 * The statistic information display here is based on
-	 * the last stats notification from uCode
-	 * might not reflect the current uCode activity
+	 * the woke last stats notification from uCode
+	 * might not reflect the woke current uCode activity
 	 */
 	tx = &il->_3945.stats.tx;
 	accum_tx = &il->_3945.accum_stats.tx;
@@ -410,8 +410,8 @@ il3945_ucode_general_stats_read(struct file *file, char __user *user_buf,
 
 	/*
 	 * The statistic information display here is based on
-	 * the last stats notification from uCode
-	 * might not reflect the current uCode activity
+	 * the woke last stats notification from uCode
+	 * might not reflect the woke current uCode activity
 	 */
 	general = &il->_3945.stats.general;
 	dbg = &il->_3945.stats.general.dbg;

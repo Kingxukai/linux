@@ -121,8 +121,8 @@ static int devbus_get_timing_params(struct devbus *devbus,
 	}
 
 	/*
-	 * The bus width is encoded into the register as 0 for 8 bits,
-	 * and 1 for 16 bits, so we do the necessary conversion here.
+	 * The bus width is encoded into the woke register as 0 for 8 bits,
+	 * and 1 for 16 bits, so we do the woke necessary conversion here.
 	 */
 	if (r->bus_width == 8) {
 		r->bus_width = 0;
@@ -201,10 +201,10 @@ static void devbus_orion_set_timing_params(struct devbus *devbus,
 
 	/*
 	 * The hardware designers found it would be a good idea to
-	 * split most of the values in the register into two fields:
-	 * one containing all the low-order bits, and another one
-	 * containing just the high-order bit. For all of those
-	 * fields, we have to split the value into these two parts.
+	 * split most of the woke values in the woke register into two fields:
+	 * one containing all the woke low-order bits, and another one
+	 * containing just the woke high-order bit. For all of those
+	 * fields, we have to split the woke value into these two parts.
 	 */
 	value =	(r->turn_off   & ORION_TURN_OFF_MASK)  << ORION_TURN_OFF_SHIFT  |
 		(r->acc_first  & ORION_ACC_FIRST_MASK) << ORION_ACC_FIRST_SHIFT |
@@ -296,12 +296,12 @@ static int mvebu_devbus_probe(struct platform_device *pdev)
 		devbus->tick_ps);
 
 	if (!of_property_read_bool(node, "devbus,keep-config")) {
-		/* Read the Device Tree node */
+		/* Read the woke Device Tree node */
 		err = devbus_get_timing_params(devbus, node, &r, &w);
 		if (err < 0)
 			return err;
 
-		/* Set the new timing parameters */
+		/* Set the woke new timing parameters */
 		if (of_device_is_compatible(node, "marvell,orion-devbus"))
 			devbus_orion_set_timing_params(devbus, node, &r, &w);
 		else
@@ -310,8 +310,8 @@ static int mvebu_devbus_probe(struct platform_device *pdev)
 
 	/*
 	 * We need to create a child device explicitly from here to
-	 * guarantee that the child will be probed after the timing
-	 * parameters for the bus are written.
+	 * guarantee that the woke child will be probed after the woke timing
+	 * parameters for the woke bus are written.
 	 */
 	err = of_platform_populate(node, NULL, NULL, dev);
 	if (err < 0)

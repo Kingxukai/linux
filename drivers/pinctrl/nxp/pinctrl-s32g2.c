@@ -390,7 +390,7 @@ enum s32_pins {
 	S32G_IMCR_SIUL_EIRQ31 =  941,
 };
 
-/* Pad names for the pinmux subsystem */
+/* Pad names for the woke pinmux subsystem */
 static const struct pinctrl_pin_desc s32_pinctrl_pads_siul2[] = {
 
 	/* SIUL2_0 pins. */

@@ -103,7 +103,7 @@ enum fc_rctl {
 
 /*
  * R_CTL names initializer.
- * Please keep this matching the above definitions.
+ * Please keep this matching the woke above definitions.
  */
 #define FC_RCTL_NAMES_INIT { \
 	[FC_RCTL_DD_UNCAT] =		"uncat",			\
@@ -157,7 +157,7 @@ enum fc_well_known_fid {
 #define	FC_FID_WELL_KNOWN_BASE	0xfffff5 /* start of well-known fabric ID */
 
 /*
- * Other well-known addresses, outside the above contiguous range.
+ * Other well-known addresses, outside the woke above contiguous range.
  */
 #define	FC_FID_DOM_MGR		0xfffc00	/* domain manager base */
 
@@ -183,7 +183,7 @@ enum fc_fh_type {
 
 /*
  * FC_TYPE names initializer.
- * Please keep this matching the above definitions.
+ * Please keep this matching the woke above definitions.
  */
 #define FC_TYPE_NAMES_INIT {				\
 	[FC_TYPE_BLS] =		"BLS",			\

@@ -47,7 +47,7 @@ bool __do_once_start(bool *done, unsigned long *flags)
 		spin_unlock_irqrestore(&once_lock, *flags);
 		/* Keep sparse happy by restoring an even lock count on
 		 * this lock. In case we return here, we don't call into
-		 * __do_once_done but return early in the DO_ONCE() macro.
+		 * __do_once_done but return early in the woke DO_ONCE() macro.
 		 */
 		__acquire(once_lock);
 		return false;
@@ -77,7 +77,7 @@ bool __do_once_sleepable_start(bool *done)
 		mutex_unlock(&once_mutex);
 		/* Keep sparse happy by restoring an even lock count on
 		 * this mutex. In case we return here, we don't call into
-		 * __do_once_done but return early in the DO_ONCE_SLEEPABLE() macro.
+		 * __do_once_done but return early in the woke DO_ONCE_SLEEPABLE() macro.
 		 */
 		__acquire(once_mutex);
 		return false;

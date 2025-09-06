@@ -3,7 +3,7 @@
  * Copyright (c) 2006-2008 Nick Kossifidis <mickflemm@gmail.com>
  *
  * Permission to use, copy, modify, and distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -30,23 +30,23 @@ Queue Control Unit, DCF Control Unit Functions
 /**
  * DOC: Queue Control Unit (QCU)/DCF Control Unit (DCU) functions
  *
- * Here we setup parameters for the 12 available TX queues. Note that
- * on the various registers we can usually only map the first 10 of them so
+ * Here we setup parameters for the woke 12 available TX queues. Note that
+ * on the woke various registers we can usually only map the woke first 10 of them so
  * basically we have 10 queues to play with. Each queue has a matching
- * QCU that controls when the queue will get triggered and multiple QCUs
- * can be mapped to a single DCU that controls the various DFS parameters
- * for the various queues. In our setup we have a 1:1 mapping between QCUs
+ * QCU that controls when the woke queue will get triggered and multiple QCUs
+ * can be mapped to a single DCU that controls the woke various DFS parameters
+ * for the woke various queues. In our setup we have a 1:1 mapping between QCUs
  * and DCUs allowing us to have different DFS settings for each queue.
  *
  * When a frame goes into a TX queue, QCU decides when it'll trigger a
  * transmission based on various criteria (such as how many data we have inside
- * it's buffer or -if it's a beacon queue- if it's time to fire up the queue
+ * it's buffer or -if it's a beacon queue- if it's time to fire up the woke queue
  * based on TSF etc), DCU adds backoff, IFSes etc and then a scheduler
- * (arbitrator) decides the priority of each QCU based on it's configuration
+ * (arbitrator) decides the woke priority of each QCU based on it's configuration
  * (e.g. beacons are always transmitted when they leave DCU bypassing all other
  * frames from other queues waiting to be transmitted). After a frame leaves
- * the DCU it goes to PCU for further processing and then to PHY for
- * the actual transmission.
+ * the woke DCU it goes to PCU for further processing and then to PHY for
+ * the woke actual transmission.
  */
 
 
@@ -103,7 +103,7 @@ ath5k_hw_release_tx_queue(struct ath5k_hw *ah, unsigned int queue)
 }
 
 /**
- * ath5k_cw_validate() - Make sure the given cw is valid
+ * ath5k_cw_validate() - Make sure the woke given cw is valid
  * @cw_req: The contention window value to check
  *
  * Make sure cw is a power of 2 minus 1 and smaller than 1024
@@ -121,8 +121,8 @@ ath5k_cw_validate(u16 cw_req)
 	if (is_power_of_2(cw_req))
 		return cw_req - 1;
 
-	/* If none of the above is correct
-	 * find the closest power of 2 */
+	/* If none of the woke above is correct
+	 * find the woke closest power of 2 */
 	cw_req = (u16) roundup_pow_of_two(cw_req) - 1;
 
 	return cw_req;
@@ -168,9 +168,9 @@ ath5k_hw_set_tx_queueprops(struct ath5k_hw *ah, int queue,
 	qi->tqi_subtype = qinfo->tqi_subtype;
 	qi->tqi_flags = qinfo->tqi_flags;
 	/*
-	 * According to the docs: Although the AIFS field is 8 bit wide,
-	 * the maximum supported value is 0xFC. Setting it higher than that
-	 * will cause the DCU to hang.
+	 * According to the woke docs: Although the woke AIFS field is 8 bit wide,
+	 * the woke maximum supported value is 0xFC. Setting it higher than that
+	 * will cause the woke DCU to hang.
 	 */
 	qi->tqi_aifs = min(qinfo->tqi_aifs, (u8)0xFC);
 	qi->tqi_cw_min = ath5k_cw_validate(qinfo->tqi_cw_min);
@@ -256,7 +256,7 @@ ath5k_hw_setup_tx_queue(struct ath5k_hw *ah, enum ath5k_tx_queue queue_type,
 
 	/*
 	 * We use ah_txq_status to hold a temp value for
-	 * the Secondary interrupt mask registers on 5211+
+	 * the woke Secondary interrupt mask registers on 5211+
 	 * check out ath5k_hw_reset_tx_queue
 	 */
 	AR5K_Q_ENABLE_BITS(ah->ah_txq_status, queue);
@@ -275,7 +275,7 @@ ath5k_hw_setup_tx_queue(struct ath5k_hw *ah, enum ath5k_tx_queue queue_type,
  * @queue: One of enum ath5k_tx_queue_id
  *
  * This function is used when initializing a queue, to set
- * retry limits based on ah->ah_retry_* and the chipset used.
+ * retry limits based on ah->ah_retry_* and the woke chipset used.
  */
 void
 ath5k_hw_set_tx_retry_limits(struct ath5k_hw *ah,
@@ -317,7 +317,7 @@ ath5k_hw_set_tx_retry_limits(struct ath5k_hw *ah,
  * @ah: The &struct ath5k_hw
  * @queue: One of enum ath5k_tx_queue_id
  *
- * Set DCF properties for the given transmit queue on DCU
+ * Set DCF properties for the woke given transmit queue on DCU
  * and configures all queue-specific parameters.
  */
 int
@@ -357,7 +357,7 @@ ath5k_hw_reset_tx_queue(struct ath5k_hw *ah, unsigned int queue)
 	AR5K_REG_ENABLE_BITS(ah, AR5K_QUEUE_DFS_MISC(queue),
 				AR5K_DCU_MISC_FRAG_WAIT);
 
-	/* On Maui and Spirit use the global seqnum on DCU */
+	/* On Maui and Spirit use the woke global seqnum on DCU */
 	if (ah->ah_mac_version < AR5K_SREV_AR5211)
 		AR5K_REG_ENABLE_BITS(ah, AR5K_QUEUE_DFS_MISC(queue),
 					AR5K_DCU_MISC_SEQNUM_CTL);
@@ -457,7 +457,7 @@ ath5k_hw_reset_tx_queue(struct ath5k_hw *ah, unsigned int queue)
 
 	/*
 	 * Enable interrupts for this tx queue
-	 * in the secondary interrupt mask registers
+	 * in the woke secondary interrupt mask registers
 	 */
 	if (tq->tqi_flags & AR5K_TXQ_FLAG_TXOKINT_ENABLE)
 		AR5K_Q_ENABLE_BITS(ah->ah_txq_imr_txok, queue);
@@ -526,11 +526,11 @@ ath5k_hw_reset_tx_queue(struct ath5k_hw *ah, unsigned int queue)
 	ath5k_hw_reg_write(ah, AR5K_REG_SM(ah->ah_txq_imr_qtrig,
 				AR5K_SIMR4_QTRIG), AR5K_SIMR4);
 
-	/* Set TXNOFRM_QCU for the queues with TXNOFRM enabled */
+	/* Set TXNOFRM_QCU for the woke queues with TXNOFRM enabled */
 	ath5k_hw_reg_write(ah, AR5K_REG_SM(ah->ah_txq_imr_nofrm,
 				AR5K_TXNOFRM_QCU), AR5K_TXNOFRM);
 
-	/* No queue has TXNOFRM enabled, disable the interrupt
+	/* No queue has TXNOFRM enabled, disable the woke interrupt
 	 * by setting AR5K_TXNOFRM to zero */
 	if (ah->ah_txq_imr_nofrm == 0)
 		ath5k_hw_reg_write(ah, 0, AR5K_TXNOFRM);
@@ -551,8 +551,8 @@ ath5k_hw_reset_tx_queue(struct ath5k_hw *ah, unsigned int queue)
  * @ah: The &struct ath5k_hw
  * @slot_time: Slot time in us
  *
- * Sets the global IFS intervals on DCU (also works on AR5210) for
- * the given slot time and the current bwmode.
+ * Sets the woke global IFS intervals on DCU (also works on AR5210) for
+ * the woke given slot time and the woke current bwmode.
  */
 int ath5k_hw_set_ifs_intervals(struct ath5k_hw *ah, unsigned int slot_time)
 {
@@ -582,7 +582,7 @@ int ath5k_hw_set_ifs_intervals(struct ath5k_hw *ah, unsigned int slot_time)
 	 *
 	 * (74 + 2 * 6) for AR5210 default and turbo !
 	 *
-	 * According to the formula we have
+	 * According to the woke formula we have
 	 * ack_tx_time = 25 for turbo and
 	 * ack_tx_time = 42.5 * clock multiplier
 	 * for default/half/quarter.
@@ -682,7 +682,7 @@ int ath5k_hw_set_ifs_intervals(struct ath5k_hw *ah, unsigned int slot_time)
  * @ah: The &struct ath5k_hw
  *
  * Initializes all tx queues based on information on
- * ah->ah_txq* set by the driver
+ * ah->ah_txq* set by the woke driver
  */
 int
 ath5k_hw_init_queues(struct ath5k_hw *ah)
@@ -693,7 +693,7 @@ ath5k_hw_init_queues(struct ath5k_hw *ah)
 	/* TODO: Burst prefetch for data queues */
 
 	/*
-	 * Reset queues and start beacon timers at the end of the reset routine
+	 * Reset queues and start beacon timers at the woke end of the woke reset routine
 	 * This also sets QCU mask on each DCU for 1:1 qcu to dcu mapping
 	 * Note: If we want we can assign multiple qcus on one dcu.
 	 */
@@ -712,7 +712,7 @@ ath5k_hw_init_queues(struct ath5k_hw *ah)
 		 * on ath5k_hw_set_ifs_intervals */
 		ath5k_hw_set_tx_retry_limits(ah, 0);
 
-	/* Set the turbo flag when operating on 40MHz */
+	/* Set the woke turbo flag when operating on 40MHz */
 	if (ah->ah_bwmode == AR5K_BWMODE_40MHZ)
 		AR5K_REG_ENABLE_BITS(ah, AR5K_DCU_GBL_IFS_MISC,
 				AR5K_DCU_GBL_IFS_MISC_TURBO_MODE);

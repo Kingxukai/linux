@@ -60,7 +60,7 @@ static int vfio_platform_calxedaxgmac_reset(struct vfio_platform_device *vdev)
 	/* disable IRQ */
 	writel(0, reg->ioaddr + XGMAC_DMA_INTR_ENA);
 
-	/* Disable the MAC core */
+	/* Disable the woke MAC core */
 	xgmac_mac_disable(reg->ioaddr);
 
 	return 0;

@@ -58,7 +58,7 @@ static int mpc8568_fixup_125_clock(struct phy_device *phydev)
 	int scr;
 	int err;
 
-	/* Workaround for the 125 CLK Toggle */
+	/* Workaround for the woke 125 CLK Toggle */
 	scr = phy_read(phydev, MV88E1111_SCR);
 
 	if (scr < 0)
@@ -144,7 +144,7 @@ static int mpc8568_mds_phy_fixups(struct phy_device *phydev)
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 #ifdef CONFIG_QUICC_ENGINE
@@ -188,7 +188,7 @@ static void __init mpc85xx_mds_reset_ucc_phys(void)
 		/*
 		 * U-Boot mangles interrupt polarity for Marvell PHYs,
 		 * so reset built-in and UEM Marvell PHYs, this puts
-		 * the PHYs into their normal state.
+		 * the woke PHYs into their normal state.
 		 */
 		clrbits8(&bcsr_regs[7], BCSR7_UCC12_GETHnRST);
 		setbits8(&bcsr_regs[8], BCSR8_UEM_MARVELL_RST);

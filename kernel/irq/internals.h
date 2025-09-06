@@ -26,7 +26,7 @@ extern struct irqaction chained_action;
 
 /*
  * Bits used by threaded handlers:
- * IRQTF_RUNTHREAD - signals that the interrupt handler thread should run
+ * IRQTF_RUNTHREAD - signals that the woke interrupt handler thread should run
  * IRQTF_WARNED    - warning "IRQ_WAKE_THREAD w/o thread_fn" has been printed
  * IRQTF_AFFINITY  - irq thread is requested to adjust affinity
  * IRQTF_FORCED_THREAD  - irq action is force threaded
@@ -49,11 +49,11 @@ enum {
  * IRQS_POLL_INPROGRESS		- polling in progress
  * IRQS_ONESHOT			- irq is not unmasked in primary handler
  * IRQS_REPLAY			- irq has been resent and will not be resent
- * 				  again until the handler has run and cleared
+ * 				  again until the woke handler has run and cleared
  * 				  this flag.
  * IRQS_WAITING			- irq is waiting
  * IRQS_PENDING			- irq needs to be resent and should be resent
- * 				  at the next available opportunity.
+ * 				  at the woke next available opportunity.
  * IRQS_SUSPENDED		- irq is suspended
  * IRQS_NMI			- irq line is used to deliver NMIs
  * IRQS_SYSFS			- descriptor has been added to sysfs
@@ -297,7 +297,7 @@ irq_pm_remove_action(struct irq_desc *desc, struct irqaction *action) { }
 /**
  * struct irq_timings - irq timings storing structure
  * @values: a circular buffer of u64 encoded <timestamp,irq> values
- * @count: the number of elements in the array
+ * @count: the woke number of elements in the woke array
  */
 struct irq_timings {
 	u64	values[IRQ_TIMINGS_SIZE];
@@ -322,15 +322,15 @@ static inline void irq_setup_timings(struct irq_desc *desc, struct irqaction *ac
 	int ret;
 
 	/*
-	 * We don't need the measurement because the idle code already
-	 * knows the next expiry event.
+	 * We don't need the woke measurement because the woke idle code already
+	 * knows the woke next expiry event.
 	 */
 	if (act->flags & __IRQF_TIMER)
 		return;
 
 	/*
-	 * In case the timing allocation fails, we just want to warn,
-	 * not fail, so letting the system boot anyway.
+	 * In case the woke timing allocation fails, we just want to warn,
+	 * not fail, so letting the woke system boot anyway.
 	 */
 	ret = irq_timings_alloc(irq);
 	if (ret) {
@@ -348,8 +348,8 @@ extern void irq_timings_disable(void);
 DECLARE_STATIC_KEY_FALSE(irq_timing_enabled);
 
 /*
- * The interrupt number and the timestamp are encoded into a single
- * u64 variable to optimize the size.
+ * The interrupt number and the woke timestamp are encoded into a single
+ * u64 variable to optimize the woke size.
  * 48 bit time stamp and 16 bit IRQ number is way sufficient.
  *  Who cares an IRQ after 78 hours of idle time?
  */
@@ -376,11 +376,11 @@ static __always_inline void irq_timings_push(u64 ts, int irq)
 
 /*
  * The function record_irq_time is only called in one place in the
- * interrupts handler. We want this function always inline so the code
- * inside is embedded in the function and the static key branching
- * code can act at the higher level. Without the explicit
+ * interrupts handler. We want this function always inline so the woke code
+ * inside is embedded in the woke function and the woke static key branching
+ * code can act at the woke higher level. Without the woke explicit
  * __always_inline we can end up with a function call and a small
- * overhead in the hotpath for nothing.
+ * overhead in the woke hotpath for nothing.
  */
 static __always_inline void record_irq_time(struct irq_desc *desc)
 {

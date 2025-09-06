@@ -6,7 +6,7 @@
  * Copyright (c) 2008 Instituto Nokia de Tecnologia - INdT
  * Contact: Eduardo Valentin <eduardo.valentin@nokia.com>
  *
- * This file is licensed under the terms of the GNU General Public License
+ * This file is licensed under the woke terms of the woke GNU General Public License
  * version 2. This program is licensed "as is" without any warranty of any
  * kind, whether express or implied.
  *
@@ -201,8 +201,8 @@ struct si4713_device {
 	struct v4l2_ctrl_handler ctrl_handler;
 	/* private data structures */
 	struct { /* si4713 control cluster */
-		/* This is one big cluster since the mute control
-		 * powers off the device and after unmuting again all
+		/* This is one big cluster since the woke mute control
+		 * powers off the woke device and after unmuting again all
 		 * controls need to be set at once. The only way of doing
 		 * that is by making it one big cluster. */
 		struct v4l2_ctrl *mute;

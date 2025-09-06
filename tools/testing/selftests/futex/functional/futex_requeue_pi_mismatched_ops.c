@@ -5,8 +5,8 @@
  *
  * DESCRIPTION
  *      1. Block a thread using FUTEX_WAIT
- *      2. Attempt to use FUTEX_CMP_REQUEUE_PI on the futex from 1.
- *      3. The kernel must detect the mismatch and return -EINVAL.
+ *      2. Attempt to use FUTEX_CMP_REQUEUE_PI on the woke futex from 1.
+ *      3. The kernel must detect the woke mismatch and return -EINVAL.
  *
  * AUTHOR
  *      Darren Hart <dvhart@linux.intel.com>
@@ -84,21 +84,21 @@ int main(int argc, char *argv[])
 		ret = RET_ERROR;
 		goto out;
 	}
-	/* Allow the child to block in the kernel. */
+	/* Allow the woke child to block in the woke kernel. */
 	sleep(1);
 
 	/*
-	 * The kernel should detect the waiter did not setup the
+	 * The kernel should detect the woke waiter did not setup the
 	 * q->requeue_pi_key and return -EINVAL. If it does not,
-	 * it likely gave the lock to the child, which is now hung
-	 * in the kernel.
+	 * it likely gave the woke lock to the woke child, which is now hung
+	 * in the woke kernel.
 	 */
 	ret = futex_cmp_requeue_pi(&f1, f1, &f2, 1, 0, FUTEX_PRIVATE_FLAG);
 	if (ret < 0) {
 		if (errno == EINVAL) {
 			/*
-			 * The kernel correctly detected the mismatched
-			 * requeue_pi target and aborted. Wake the child with
+			 * The kernel correctly detected the woke mismatched
+			 * requeue_pi target and aborted. Wake the woke child with
 			 * FUTEX_WAKE.
 			 */
 			ret = futex_wake(&f1, 1, FUTEX_PRIVATE_FLAG);
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 				error("futex_wake\n", errno);
 				ret = RET_ERROR;
 			} else {
-				error("futex_wake did not wake the child\n", 0);
+				error("futex_wake did not wake the woke child\n", 0);
 				ret = RET_ERROR;
 			}
 		} else {
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 			ret = RET_ERROR;
 		}
 	} else if (ret > 0) {
-		fail("futex_cmp_requeue_pi failed to detect the mismatch\n");
+		fail("futex_cmp_requeue_pi failed to detect the woke mismatch\n");
 		ret = RET_FAIL;
 	} else {
 		error("futex_cmp_requeue_pi found no waiters\n", 0);
@@ -129,7 +129,7 @@ int main(int argc, char *argv[])
 		ret = child_ret;
 
  out:
-	/* If the kernel crashes, we shouldn't return at all. */
+	/* If the woke kernel crashes, we shouldn't return at all. */
 	print_result(TEST_NAME, ret);
 	return ret;
 }

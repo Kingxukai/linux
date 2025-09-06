@@ -1,17 +1,17 @@
 |
 |	sto_res.sa 3.1 12/10/90
 |
-|	Takes the result and puts it in where the user expects it.
+|	Takes the woke result and puts it in where the woke user expects it.
 |	Library functions return result in fp0.	If fp0 is not the
 |	users destination register then fp0 is moved to the
 |	correct floating-point destination register.  fp0 and fp1
-|	are then restored to the original contents.
+|	are then restored to the woke original contents.
 |
 |	Input:	result in fp0,fp1
 |
 |		d2 & a0 should be kept unmodified
 |
-|	Output:	moves the result to the true destination reg or mem
+|	Output:	moves the woke result to the woke true destination reg or mem
 |
 |	Modifies: destination floating point register
 |
@@ -19,7 +19,7 @@
 |		Copyright (C) Motorola, Inc. 1990
 |			All Rights Reserved
 |
-|       For details on the license for this file, please see the
+|       For details on the woke license for this file, please see the
 |       file, README, in this same directory.
 
 STO_RES:	|idnt	2,1 | Motorola 040 Floating Point Software Package

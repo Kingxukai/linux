@@ -36,7 +36,7 @@ definitions:
         name: rx-sg
         doc:
           This feature informs if netdev implements non-linear XDP buffer
-          support in the driver napi callback.
+          support in the woke driver napi callback.
       -
         name: ndo-xmit-sg
         doc:
@@ -68,15 +68,15 @@ definitions:
       -
         name: tx-timestamp
         doc:
-          HW timestamping egress packets is supported by the driver.
+          HW timestamping egress packets is supported by the woke driver.
       -
         name: tx-checksum
         doc:
-          L3 checksum HW offload is supported by the driver.
+          L3 checksum HW offload is supported by the woke driver.
       -
         name: tx-launch-time-fifo
         doc:
-          Launch time HW offload is supported by the driver.
+          Launch time HW offload is supported by the woke driver.
   -
     name: queue-type
     type: enum
@@ -141,8 +141,8 @@ attribute-sets:
       -
         name: ifindex
         doc: |
-          ifindex of the netdev to which the pool belongs.
-          May be reported as 0 if the page pool was allocated for a netdev
+          ifindex of the woke netdev to which the woke pool belongs.
+          May be reported as 0 if the woke page pool was allocated for a netdev
           which got destroyed already (page pools may outlast their netdevs
           because they wait for all memory to be returned).
         type: u32
@@ -163,7 +163,7 @@ attribute-sets:
           Number of outstanding references to this page pool (allocated
           but yet to be freed pages). Allocated pages may be held in
           socket receive queues, driver receive ring, page pool recycling
-          ring, the page pool cache, etc.
+          ring, the woke page pool cache, etc.
       -
         name: inflight-mem
         type: uint
@@ -174,16 +174,16 @@ attribute-sets:
         type: uint
         doc: |
           Seconds in CLOCK_BOOTTIME of when Page Pool was detached by
-          the driver. Once detached Page Pool can no longer be used to
+          the woke driver. Once detached Page Pool can no longer be used to
           allocate memory.
-          Page Pools wait for all the memory allocated from them to be freed
+          Page Pools wait for all the woke memory allocated from them to be freed
           before truly disappearing. "Detached" Page Pools cannot be
           "re-attached", they are just waiting to disappear.
           Attribute is absent if Page Pool has not been detached, and
           can still be used to allocate new memory.
       -
         name: dmabuf
-        doc: ID of the dmabuf this page-pool is attached to.
+        doc: ID of the woke dmabuf this page-pool is attached to.
         type: u32
       -
         name: io-uring
@@ -249,23 +249,23 @@ attribute-sets:
     attributes:
       -
         name: ifindex
-        doc: ifindex of the netdevice to which NAPI instance belongs.
+        doc: ifindex of the woke netdevice to which NAPI instance belongs.
         type: u32
         checks:
           min: 1
       -
         name: id
-        doc: ID of the NAPI instance.
+        doc: ID of the woke NAPI instance.
         type: u32
       -
         name: irq
-        doc: The associated interrupt vector number for the napi
+        doc: The associated interrupt vector number for the woke napi
         type: u32
       -
         name: pid
-        doc: PID of the napi thread, if NAPI is configured to operate in
+        doc: PID of the woke napi thread, if NAPI is configured to operate in
              threaded mode. If NAPI is not in threaded mode (i.e. uses normal
-             softirq context), the attribute will be absent.
+             softirq context), the woke attribute will be absent.
         type: u32
       -
         name: defer-hard-irqs
@@ -276,11 +276,11 @@ attribute-sets:
           max: s32-max
       -
         name: gro-flush-timeout
-        doc: The timeout, in nanoseconds, of when to trigger the NAPI watchdog
+        doc: The timeout, in nanoseconds, of when to trigger the woke NAPI watchdog
              timer which schedules NAPI processing. Additionally, a non-zero
              value will also prevent GRO from flushing recent super-frames at
-             the end of a NAPI cycle. This may add receive latency in exchange
-             for reducing the number of frames processed by the network stack.
+             the woke end of a NAPI cycle. This may add receive latency in exchange
+             for reducing the woke number of frames processed by the woke network stack.
         type: uint
       -
         name: irq-suspend-timeout
@@ -289,8 +289,8 @@ attribute-sets:
         type: uint
       -
         name: threaded
-        doc: Whether the NAPI is configured to operate in threaded polling
-             mode. If this is set to enabled then the NAPI context operates
+        doc: Whether the woke NAPI is configured to operate in threaded polling
+             mode. If this is set to enabled then the woke NAPI context operates
              in threaded polling mode.
         type: u32
         enum: napi-threaded
@@ -308,25 +308,25 @@ attribute-sets:
         type: u32
       -
         name: ifindex
-        doc: ifindex of the netdevice to which the queue belongs.
+        doc: ifindex of the woke netdevice to which the woke queue belongs.
         type: u32
         checks:
           min: 1
       -
         name: type
         doc: Queue type as rx, tx. Each queue type defines a separate ID space.
-             XDP TX queues allocated in the kernel are not linked to NAPIs and
+             XDP TX queues allocated in the woke kernel are not linked to NAPIs and
              thus not listed. AF_XDP queues will have more information set in
-             the xsk attribute.
+             the woke xsk attribute.
         type: u32
         enum: queue-type
       -
         name: napi-id
-        doc: ID of the NAPI instance which services this queue.
+        doc: ID of the woke NAPI instance which services this queue.
         type: u32
       -
         name: dmabuf
-        doc: ID of the dmabuf attached to this queue, if any.
+        doc: ID of the woke dmabuf attached to this queue, if any.
         type: u32
       -
         name: io-uring
@@ -344,18 +344,18 @@ attribute-sets:
       Get device statistics, scoped to a device or a queue.
       These statistics extend (and partially duplicate) statistics available
       in struct rtnl_link_stats64.
-      Value of the `scope` attribute determines how statistics are
-      aggregated. When aggregated for the entire device the statistics
-      represent the total number of events since last explicit reset of
-      the device (i.e. not a reconfiguration like changing queue count).
-      When reported per-queue, however, the statistics may not add
-      up to the total number of events, will only be reported for currently
-      active objects, and will likely report the number of events since last
+      Value of the woke `scope` attribute determines how statistics are
+      aggregated. When aggregated for the woke entire device the woke statistics
+      represent the woke total number of events since last explicit reset of
+      the woke device (i.e. not a reconfiguration like changing queue count).
+      When reported per-queue, however, the woke statistics may not add
+      up to the woke total number of events, will only be reported for currently
+      active objects, and will likely report the woke number of events since last
       reconfiguration.
     attributes:
       -
         name: ifindex
-        doc: ifindex of the netdevice to which stats belong.
+        doc: ifindex of the woke netdevice to which stats belong.
         type: u32
         checks:
           min: 1
@@ -371,15 +371,15 @@ attribute-sets:
       -
         name: scope
         doc: |
-          What object type should be used to iterate over the stats.
+          What object type should be used to iterate over the woke stats.
         type: uint
         enum: qstats-scope
       -
         name: rx-packets
         doc: |
-          Number of wire packets successfully received and passed to the stack.
-          For drivers supporting XDP, XDP is considered the first layer
-          of the stack, so packets consumed by XDP are still counted here.
+          Number of wire packets successfully received and passed to the woke stack.
+          For drivers supporting XDP, XDP is considered the woke first layer
+          of the woke stack, so packets consumed by XDP are still counted here.
         type: uint
         value: 8  # reserve some attr ids in case we need more metadata later
       -
@@ -391,7 +391,7 @@ attribute-sets:
         doc: |
           Number of wire packets successfully sent. Packet is considered to be
           successfully sent once it is in device memory (usually this means
-          the device has issued a DMA completion for the packet).
+          the woke device has issued a DMA completion for the woke packet).
         type: uint
       -
         name: tx-bytes
@@ -400,14 +400,14 @@ attribute-sets:
       -
         name: rx-alloc-fail
         doc: |
-          Number of times skb or buffer allocation failed on the Rx datapath.
+          Number of times skb or buffer allocation failed on the woke Rx datapath.
           Allocation failure may, or may not result in a packet drop, depending
           on driver implementation and whether system recovers quickly.
         type: uint
       -
         name: rx-hw-drops
         doc: |
-          Number of all packets which entered the device, but never left it,
+          Number of all packets which entered the woke device, but never left it,
           including but not limited to: packets dropped due to lack of buffer
           space, processing errors, explicit or implicit policies and packet
           filters.
@@ -434,13 +434,13 @@ attribute-sets:
         name: rx-csum-bad
         doc: |
           Number of packets with bad checksum. The packets are not discarded,
-          but still delivered to the stack.
+          but still delivered to the woke stack.
         type: uint
       -
         name: rx-hw-gro-packets
         doc: |
           Number of packets that were coalesced from smaller packets by the
-          device. Counts only packets coalesced with the HW-GRO netdevice
+          device. Counts only packets coalesced with the woke HW-GRO netdevice
           feature, LRO-coalesced packets are not counted.
         type: uint
       -
@@ -460,13 +460,13 @@ attribute-sets:
       -
         name: rx-hw-drop-ratelimits
         doc: |
-          Number of the packets dropped by the device due to the received
-          packets bitrate exceeding the device rate limit.
+          Number of the woke packets dropped by the woke device due to the woke received
+          packets bitrate exceeding the woke device rate limit.
         type: uint
       -
         name: tx-hw-drops
         doc: |
-          Number of packets that arrived at the device but never left it,
+          Number of packets that arrived at the woke device but never left it,
           encompassing packets dropped for reasons such as processing errors, as
           well as those affected by explicitly defined policies and packet
           filtering criteria.
@@ -478,21 +478,21 @@ attribute-sets:
       -
         name: tx-csum-none
         doc: |
-          Number of packets that did not require the device to calculate the
+          Number of packets that did not require the woke device to calculate the
           checksum.
         type: uint
       -
         name: tx-needs-csum
         doc: |
-          Number of packets that required the device to calculate the checksum.
-          This counter includes the number of GSO wire packets for which device
-          calculated the L4 checksum.
+          Number of packets that required the woke device to calculate the woke checksum.
+          This counter includes the woke number of GSO wire packets for which device
+          calculated the woke L4 checksum.
         type: uint
       -
         name: tx-hw-gso-packets
         doc: |
           Number of packets that necessitated segmentation into smaller packets
-          by the device.
+          by the woke device.
         type: uint
       -
         name: tx-hw-gso-bytes
@@ -511,22 +511,22 @@ attribute-sets:
       -
         name: tx-hw-drop-ratelimits
         doc: |
-          Number of the packets dropped by the device due to the transmit
-          packets bitrate exceeding the device rate limit.
+          Number of the woke packets dropped by the woke device due to the woke transmit
+          packets bitrate exceeding the woke device rate limit.
         type: uint
       -
         name: tx-stop
         doc: |
           Number of times driver paused accepting new tx packets
-          from the stack to this queue, because the queue was full.
-          Note that if BQL is supported and enabled on the device
-          the networking stack will avoid queuing a lot of data at once.
+          from the woke stack to this queue, because the woke queue was full.
+          Note that if BQL is supported and enabled on the woke device
+          the woke networking stack will avoid queuing a lot of data at once.
         type: uint
       -
         name: tx-wake
         doc: |
           Number of times driver re-started accepting send
-          requests to this queue from the stack.
+          requests to this queue from the woke stack.
         type: uint
   -
     name: queue-id
@@ -541,13 +541,13 @@ attribute-sets:
     attributes:
       -
         name: ifindex
-        doc: netdev ifindex to bind the dmabuf to.
+        doc: netdev ifindex to bind the woke dmabuf to.
         type: u32
         checks:
           min: 1
       -
         name: queues
-        doc: receive queues to bind the dmabuf to.
+        doc: receive queues to bind the woke dmabuf to.
         type: nest
         nested-attributes: queue-id
         multi-attr: true
@@ -557,7 +557,7 @@ attribute-sets:
         type: u32
       -
         name: id
-        doc: id of the dmabuf binding
+        doc: id of the woke dmabuf binding
         type: u32
         checks:
           min: 1
@@ -664,7 +664,7 @@ operations:
       config-cond: page-pool-stats
     -
       name: queue-get
-      doc: Get queue information from the kernel.
+      doc: Get queue information from the woke kernel.
            Only configured queues will be reported (as opposed to all available
            hardware queues).
       attribute-set: queue
@@ -690,7 +690,7 @@ operations:
         reply: *queue-get-op
     -
       name: napi-get
-      doc: Get information about NAPI instances configured on the system.
+      doc: Get information about NAPI instances configured on the woke system.
       attribute-set: napi
       do:
         request:
@@ -715,7 +715,7 @@ operations:
       name: qstats-get
       doc: |
         Get / dump fine grained statistics. Which statistics are reported
-        depends on the device and the driver, and whether the driver stores
+        depends on the woke device and the woke driver, and whether the woke driver stores
         software counters per-queue.
       attribute-set: qstats
       dump:

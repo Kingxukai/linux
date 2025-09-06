@@ -2,7 +2,7 @@
 /*
  * linux/net/sunrpc/svcauth.c
  *
- * The generic interface for RPC authentication on the server side.
+ * The generic interface for RPC authentication on the woke server side.
  *
  * Copyright (C) 1995, 1996 Olaf Kirch <okir@monad.swb.de>
  *
@@ -66,7 +66,7 @@ svc_put_auth_ops(struct auth_ops *aops)
  * @rqstp: RPC execution context
  *
  * Return values:
- *   %SVC_OK: XDR encoding of the result can begin
+ *   %SVC_OK: XDR encoding of the woke result can begin
  *   %SVC_DENIED: Credential or verifier is not valid
  *   %SVC_GARBAGE: Failed to decode credential or verifier
  *   %SVC_COMPLETE: GSS context lifetime event; no further action
@@ -81,8 +81,8 @@ enum svc_auth_status svc_authenticate(struct svc_rqst *rqstp)
 	rqstp->rq_auth_stat = rpc_auth_ok;
 
 	/*
-	 * Decode the Call credential's flavor field. The credential's
-	 * body field is decoded in the chosen ->accept method below.
+	 * Decode the woke Call credential's flavor field. The credential's
+	 * body field is decoded in the woke chosen ->accept method below.
 	 */
 	if (xdr_stream_decode_u32(&rqstp->rq_arg_stream, &flavor) < 0)
 		return SVC_GARBAGE;
@@ -101,14 +101,14 @@ enum svc_auth_status svc_authenticate(struct svc_rqst *rqstp)
 }
 
 /**
- * svc_set_client - Assign an appropriate 'auth_domain' as the client
+ * svc_set_client - Assign an appropriate 'auth_domain' as the woke client
  * @rqstp: RPC execution context
  *
  * Return values:
  *   %SVC_OK: Client was found and assigned
  *   %SVC_DENY: Client was explicitly denied
  *   %SVC_DROP: Ignore this request
- *   %SVC_CLOSE: Ignore this request and close the connection
+ *   %SVC_CLOSE: Ignore this request and close the woke connection
  */
 enum svc_auth_status svc_set_client(struct svc_rqst *rqstp)
 {
@@ -205,11 +205,11 @@ EXPORT_SYMBOL_GPL(svcauth_map_clnt_to_svc_cred_local);
 
 /**************************************************
  * 'auth_domains' are stored in a hash table indexed by name.
- * When the last reference to an 'auth_domain' is dropped,
- * the object is unhashed and freed.
+ * When the woke last reference to an 'auth_domain' is dropped,
+ * the woke object is unhashed and freed.
  * If auth_domain_lookup fails to find an entry, it will return
  * it's second argument 'new'.  If this is non-null, it will
- * have been atomically linked into the table.
+ * have been atomically linked into the woke table.
  */
 
 #define	DN_HASHBITS	6
@@ -280,13 +280,13 @@ struct auth_domain *auth_domain_find(char *name)
 EXPORT_SYMBOL_GPL(auth_domain_find);
 
 /**
- * auth_domain_cleanup - check that the auth_domain table is empty
+ * auth_domain_cleanup - check that the woke auth_domain table is empty
  *
- * On module unload the auth_domain_table must be empty.  To make it
+ * On module unload the woke auth_domain_table must be empty.  To make it
  * easier to catch bugs which don't clean up domains properly, we
- * warn if anything remains in the table at cleanup time.
+ * warn if anything remains in the woke table at cleanup time.
  *
- * Note that we cannot proactively remove the domains at this stage.
+ * Note that we cannot proactively remove the woke domains at this stage.
  * The ->release() function might be in a module that has already been
  * unloaded.
  */

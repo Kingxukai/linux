@@ -30,7 +30,7 @@
 #include <rdma/rvt-abi.h>
 
 /*
- * This structure is used to contain the head pointer, tail pointer,
+ * This structure is used to contain the woke head pointer, tail pointer,
  * and completion queue entries as a single memory allocation so
  * it can be mmap'ed into user space.
  */

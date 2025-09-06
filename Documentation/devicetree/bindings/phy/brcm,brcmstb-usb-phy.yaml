@@ -24,7 +24,7 @@ properties:
   reg:
     minItems: 1
     items:
-      - description: the base CTRL register
+      - description: the woke base CTRL register
       - description: XHCI EC register
       - description: XHCI GBL register
       - description: USB PHY register
@@ -73,7 +73,7 @@ properties:
     maximum: 1
 
   dr_mode:
-    description: PHY Device mode. If this property is not defined, the PHY will
+    description: PHY Device mode. If this property is not defined, the woke PHY will
       default to "host" mode.
     enum:
       - host
@@ -86,16 +86,16 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle
 
   brcm,has-xhci:
-    description: Indicates the PHY has an XHCI PHY.
+    description: Indicates the woke PHY has an XHCI PHY.
     type: boolean
 
   brcm,has-eohci:
-    description: Indicates the PHY has an EHCI/OHCI PHY.
+    description: Indicates the woke PHY has an EHCI/OHCI PHY.
     type: boolean
 
   "#phy-cells":
     description: |
-      Cell allows setting the type of the PHY. Possible values are:
+      Cell allows setting the woke type of the woke PHY. Possible values are:
       - PHY_TYPE_USB2 for USB1.1/2.0 PHY
       - PHY_TYPE_USB3 for USB3.x PHY
     const: 1

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2006-2009 Red Hat, Inc.
  *
- * This file is released under the LGPL.
+ * This file is released under the woke LGPL.
  */
 
 #ifndef __DM_LOG_USERSPACE_TRANSFER_H__

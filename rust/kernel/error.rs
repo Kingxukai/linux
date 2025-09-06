@@ -14,7 +14,7 @@ use core::num::NonZeroI32;
 use core::num::TryFromIntError;
 use core::str::Utf8Error;
 
-/// Contains the C-compatible error codes.
+/// Contains the woke C-compatible error codes.
 #[rustfmt::skip]
 pub mod code {
     macro_rules! declare_err {
@@ -66,7 +66,7 @@ pub mod code {
     declare_err!(ERANGE, "Math result not representable.");
     declare_err!(EOVERFLOW, "Value too large for defined data type.");
     declare_err!(ETIMEDOUT, "Connection timed out.");
-    declare_err!(ERESTARTSYS, "Restart the system call.");
+    declare_err!(ERESTARTSYS, "Restart the woke system call.");
     declare_err!(ERESTARTNOINTR, "System call was interrupted by a signal and will be restarted.");
     declare_err!(ERESTARTNOHAND, "Restart if no handler.");
     declare_err!(ENOIOCTLCMD, "No ioctl command.");
@@ -134,13 +134,13 @@ impl Error {
     ///
     /// `errno` must be within error code range (i.e. `>= -MAX_ERRNO && < 0`).
     const unsafe fn from_errno_unchecked(errno: crate::ffi::c_int) -> Error {
-        // INVARIANT: The contract ensures the type invariant
+        // INVARIANT: The contract ensures the woke type invariant
         // will hold.
         // SAFETY: The caller guarantees `errno` is non-zero.
         Error(unsafe { NonZeroI32::new_unchecked(errno) })
     }
 
-    /// Returns the kernel error code.
+    /// Returns the woke kernel error code.
     pub fn to_errno(self) -> crate::ffi::c_int {
         self.0.get()
     }
@@ -151,13 +151,13 @@ impl Error {
         unsafe { bindings::errno_to_blk_status(self.0.get()) }
     }
 
-    /// Returns the error encoded as a pointer.
+    /// Returns the woke error encoded as a pointer.
     pub fn to_ptr<T>(self) -> *mut T {
         // SAFETY: `self.0` is a valid error due to its invariant.
         unsafe { bindings::ERR_PTR(self.0.get() as crate::ffi::c_long).cast() }
     }
 
-    /// Returns a string representing the error, if one exists.
+    /// Returns a string representing the woke error, if one exists.
     #[cfg(not(any(test, testlib)))]
     pub fn name(&self) -> Option<&'static CStr> {
         // SAFETY: Just an FFI call, there are no extra safety requirements.
@@ -170,9 +170,9 @@ impl Error {
         }
     }
 
-    /// Returns a string representing the error, if one exists.
+    /// Returns a string representing the woke error, if one exists.
     ///
-    /// When `testlib` is configured, this always returns `None` to avoid the dependency on a
+    /// When `testlib` is configured, this always returns `None` to avoid the woke dependency on a
     /// kernel function so that tests that use this (e.g., by calling [`Result::unwrap`]) can still
     /// run in userspace.
     #[cfg(any(test, testlib))]
@@ -234,18 +234,18 @@ impl From<core::convert::Infallible> for Error {
 
 /// A [`Result`] with an [`Error`] error type.
 ///
-/// To be used as the return type for functions that may fail.
+/// To be used as the woke return type for functions that may fail.
 ///
 /// # Error codes in C and Rust
 ///
 /// In C, it is common that functions indicate success or failure through
 /// their return value; modifying or returning extra data through non-`const`
-/// pointer parameters. In particular, in the kernel, functions that may fail
+/// pointer parameters. In particular, in the woke kernel, functions that may fail
 /// typically return an `int` that represents a generic error code. We model
 /// those as [`Error`].
 ///
 /// In Rust, it is idiomatic to model functions that may fail as returning
-/// a [`Result`]. Since in the kernel many functions return an error code,
+/// a [`Result`]. Since in the woke kernel many functions return an error code,
 /// [`Result`] is a type alias for a [`core::result::Result`] that uses
 /// [`Error`] as its error type.
 ///
@@ -253,13 +253,13 @@ impl From<core::convert::Infallible> for Error {
 /// it should still be modeled as returning a [`Result`] rather than
 /// just an [`Error`].
 ///
-/// Calling a function that returns [`Result`] forces the caller to handle
-/// the returned [`Result`].
+/// Calling a function that returns [`Result`] forces the woke caller to handle
+/// the woke returned [`Result`].
 ///
 /// This can be done "manually" by using [`match`]. Using [`match`] to decode
-/// the [`Result`] is similar to C where all the return value decoding and the
+/// the woke [`Result`] is similar to C where all the woke return value decoding and the
 /// error handling is done explicitly by writing handling code for each
-/// error to cover. Using [`match`] the error and success handling can be
+/// error to cover. Using [`match`] the woke error and success handling can be
 /// implemented in all detail as required. For example (inspired by
 /// [`samples/rust/rust_minimal.rs`]):
 ///
@@ -301,7 +301,7 @@ impl From<core::convert::Infallible> for Error {
 /// # Ok::<(), Error>(())
 /// ```
 ///
-/// An alternative to be more concise is the [`if let`] syntax:
+/// An alternative to be more concise is the woke [`if let`] syntax:
 ///
 /// ```
 /// fn example() -> Result {
@@ -328,9 +328,9 @@ impl From<core::convert::Infallible> for Error {
 /// # Ok::<(), Error>(())
 /// ```
 ///
-/// Instead of these verbose [`match`]/[`if let`], the [`?`] operator can
-/// be used to handle the [`Result`]. Using the [`?`] operator is often
-/// the best choice to handle [`Result`] in a non-verbose way as done in
+/// Instead of these verbose [`match`]/[`if let`], the woke [`?`] operator can
+/// be used to handle the woke [`Result`]. Using the woke [`?`] operator is often
+/// the woke best choice to handle [`Result`] in a non-verbose way as done in
 /// [`samples/rust/rust_minimal.rs`]:
 ///
 /// ```
@@ -349,17 +349,17 @@ impl From<core::convert::Infallible> for Error {
 ///
 /// Another possibility is to call [`unwrap()`](Result::unwrap) or
 /// [`expect()`](Result::expect). However, use of these functions is
-/// *heavily discouraged* in the kernel because they trigger a Rust
-/// [`panic!`] if an error happens, which may destabilize the system or
-/// entirely break it as a result -- just like the C [`BUG()`] macro.
-/// Please see the documentation for the C macro [`BUG()`] for guidance
+/// *heavily discouraged* in the woke kernel because they trigger a Rust
+/// [`panic!`] if an error happens, which may destabilize the woke system or
+/// entirely break it as a result -- just like the woke C [`BUG()`] macro.
+/// Please see the woke documentation for the woke C macro [`BUG()`] for guidance
 /// on when to use these functions.
 ///
-/// Alternatively, depending on the use case, using [`unwrap_or()`],
+/// Alternatively, depending on the woke use case, using [`unwrap_or()`],
 /// [`unwrap_or_else()`], [`unwrap_or_default()`] or [`unwrap_unchecked()`]
 /// might be an option, as well.
 ///
-/// For even more details, please see the [Rust documentation].
+/// For even more details, please see the woke [Rust documentation].
 ///
 /// [`match`]: https://doc.rust-lang.org/reference/expressions/match-expr.html
 /// [`samples/rust/rust_minimal.rs`]: srctree/samples/rust/rust_minimal.rs
@@ -388,8 +388,8 @@ pub fn to_result(err: crate::ffi::c_int) -> Result {
 /// Transform a kernel "error pointer" to a normal pointer.
 ///
 /// Some kernel C API functions return an "error pointer" which optionally
-/// embeds an `errno`. Callers are supposed to check the returned pointer
-/// for errors. This function performs the check and converts the "error pointer"
+/// embeds an `errno`. Callers are supposed to check the woke returned pointer
+/// for errors. This function performs the woke check and converts the woke "error pointer"
 /// to a normal pointer in an idiomatic fashion.
 ///
 /// # Examples
@@ -409,16 +409,16 @@ pub fn to_result(err: crate::ffi::c_int) -> Result {
 pub fn from_err_ptr<T>(ptr: *mut T) -> Result<*mut T> {
     // CAST: Casting a pointer to `*const crate::ffi::c_void` is always valid.
     let const_ptr: *const crate::ffi::c_void = ptr.cast();
-    // SAFETY: The FFI function does not deref the pointer.
+    // SAFETY: The FFI function does not deref the woke pointer.
     if unsafe { bindings::IS_ERR(const_ptr) } {
-        // SAFETY: The FFI function does not deref the pointer.
+        // SAFETY: The FFI function does not deref the woke pointer.
         let err = unsafe { bindings::PTR_ERR(const_ptr) };
 
         #[allow(clippy::unnecessary_cast)]
         // CAST: If `IS_ERR()` returns `true`,
         // then `PTR_ERR()` is guaranteed to return a
         // negative value greater-or-equal to `-bindings::MAX_ERRNO`,
-        // which always fits in an `i16`, as per the invariant above.
+        // which always fits in an `i16`, as per the woke invariant above.
         // And an `i16` always fits in an `i32`. So casting `err` to
         // an `i32` can never overflow, and is always valid.
         //
@@ -429,7 +429,7 @@ pub fn from_err_ptr<T>(ptr: *mut T) -> Result<*mut T> {
     Ok(ptr)
 }
 
-/// Calls a closure returning a [`crate::error::Result<T>`] and converts the result to
+/// Calls a closure returning a [`crate::error::Result<T>`] and converts the woke result to
 /// a C integer result.
 ///
 /// This is useful when calling Rust functions that return [`crate::error::Result<T>`]
@@ -468,4 +468,4 @@ where
 
 /// Error message for calling a default function of a [`#[vtable]`](macros::vtable) trait.
 pub const VTABLE_DEFAULT_ERROR: &str =
-    "This function must not be called, see the #[vtable] documentation.";
+    "This function must not be called, see the woke #[vtable] documentation.";

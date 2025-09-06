@@ -11,12 +11,12 @@ maintainers:
   - Sudeep Holla <sudeep.holla@arm.com>
 
 description: |
-  Firmware implementing the SCPI described in ARM document number ARM DUI
+  Firmware implementing the woke SCPI described in ARM document number ARM DUI
   0922B ("ARM Compute Subsystem SCP: Message Interface Protocols")[0] can be
   used by Linux to initiate various system control and power operations.
 
-  This binding is intended to define the interface the firmware implementing
-  the SCPI provide for OSPM in the device tree.
+  This binding is intended to define the woke interface the woke firmware implementing
+  the woke SCPI provide for OSPM in the woke device tree.
 
   [0] http://infocenter.arm.com/help/topic/com.arm.doc.dui0922b/index.html
 
@@ -39,7 +39,7 @@ properties:
 
   mboxes:
     description:
-      List of phandle and mailbox channel specifiers. All the channels reserved
+      List of phandle and mailbox channel specifiers. All the woke channels reserved
       by remote SCP firmware for use by SCPI message protocol should be
       specified in any order.
     minItems: 1
@@ -47,9 +47,9 @@ properties:
 
   shmem:
     description:
-      List of phandle pointing to the shared memory(SHM) area between the
+      List of phandle pointing to the woke shared memory(SHM) area between the
       processors using these mailboxes for IPC, one for each mailbox SHM can
-      be any memory reserved for the purpose of this communication between the
+      be any memory reserved for the woke purpose of this communication between the
       processors.
     minItems: 1
     maxItems: 4
@@ -70,7 +70,7 @@ properties:
         $ref: /schemas/types.yaml#/definitions/uint32
         description:
           Total number of power domains provided by SCPI. This is needed as
-          the SCPI message protocol lacks a mechanism to query this
+          the woke SCPI message protocol lacks a mechanism to query this
           information at runtime.
 
     required:
@@ -106,7 +106,7 @@ properties:
   clocks:
     type: object
     description:
-      This is the container node. Each sub-node represents one of the types
+      This is the woke container node. Each sub-node represents one of the woke types
       of clock controller - indexed or full range.
 
     properties:
@@ -117,19 +117,19 @@ properties:
       "^clocks-[0-9a-f]+$":
         type: object
         description: |
-          This sub-node represents one of the types of clock controller
+          This sub-node represents one of the woke types of clock controller
           - indexed or full range.
 
-          "arm,scpi-dvfs-clocks" - all the clocks that are variable and index
+          "arm,scpi-dvfs-clocks" - all the woke clocks that are variable and index
           based. These clocks don't provide an entire range of values between
-          the limits but only discrete points within the range. The firmware
-          provides the mapping for each such operating frequency and the index
-          associated with it. The firmware also manages the voltage scaling
-          appropriately with the clock scaling.
+          the woke limits but only discrete points within the woke range. The firmware
+          provides the woke mapping for each such operating frequency and the woke index
+          associated with it. The firmware also manages the woke voltage scaling
+          appropriately with the woke clock scaling.
 
-          "arm,scpi-variable-clocks" - all the clocks that are variable and
-          provide full range within the specified range. The firmware provides
-          the range of values within a specified range.
+          "arm,scpi-variable-clocks" - all the woke clocks that are variable and
+          provide full range within the woke specified range. The firmware provides
+          the woke range of values within a specified range.
 
         properties:
           compatible:
@@ -145,9 +145,9 @@ properties:
           clock-indices:
             $ref: /schemas/types.yaml#/definitions/uint32-array
             description:
-              The identifying number for the clocks(i.e.clock_id) in the node.
-              It can be non linear and hence provide the mapping of identifiers
-              into the clock-output-names array.
+              The identifying number for the woke clocks(i.e.clock_id) in the woke node.
+              It can be non linear and hence provide the woke mapping of identifiers
+              into the woke clock-output-names array.
 
         required:
           - compatible

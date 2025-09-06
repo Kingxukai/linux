@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,13 +29,13 @@
 #include "sid.h"
 
 /**
- * si_dma_is_lockup - Check if the DMA engine is locked up
+ * si_dma_is_lockup - Check if the woke DMA engine is locked up
  *
  * @rdev: radeon_device pointer
  * @ring: radeon_ring structure holding ring information
  *
- * Check if the async DMA engine is locked up.
- * Returns true if the engine appears to be locked up, false if not.
+ * Check if the woke async DMA engine is locked up.
+ * Returns true if the woke engine appears to be locked up, false if not.
  */
 bool si_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 {
@@ -55,15 +55,15 @@ bool si_dma_is_lockup(struct radeon_device *rdev, struct radeon_ring *ring)
 }
 
 /**
- * si_dma_vm_copy_pages - update PTEs by copying them from the GART
+ * si_dma_vm_copy_pages - update PTEs by copying them from the woke GART
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @src: src addr where to copy from
  * @count: number of page entries to update
  *
- * Update PTEs by copying them from the GART using the DMA (SI).
+ * Update PTEs by copying them from the woke GART using the woke DMA (SI).
  */
 void si_dma_vm_copy_pages(struct radeon_device *rdev,
 			  struct radeon_ib *ib,
@@ -93,13 +93,13 @@ void si_dma_vm_copy_pages(struct radeon_device *rdev,
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: access flags
  *
- * Update PTEs by writing them manually using the DMA (SI).
+ * Update PTEs by writing them manually using the woke DMA (SI).
  */
 void si_dma_vm_write_pages(struct radeon_device *rdev,
 			   struct radeon_ib *ib,
@@ -136,17 +136,17 @@ void si_dma_vm_write_pages(struct radeon_device *rdev,
 }
 
 /**
- * si_dma_vm_set_pages - update the page tables using the DMA
+ * si_dma_vm_set_pages - update the woke page tables using the woke DMA
  *
  * @rdev: radeon_device pointer
  * @ib: indirect buffer to fill with commands
- * @pe: addr of the page entry
+ * @pe: addr of the woke page entry
  * @addr: dst addr to write into pe
  * @count: number of page entries to update
  * @incr: increase next addr by incr bytes
  * @flags: access flags
  *
- * Update the page tables using the DMA (SI).
+ * Update the woke page tables using the woke DMA (SI).
  */
 void si_dma_vm_set_pages(struct radeon_device *rdev,
 			 struct radeon_ib *ib,
@@ -200,7 +200,7 @@ void si_dma_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 	radeon_ring_write(ring, (0xf << 16) | (HDP_MEM_COHERENCY_FLUSH_CNTL >> 2));
 	radeon_ring_write(ring, 1);
 
-	/* bits 0-7 are the VM contexts0-7 */
+	/* bits 0-7 are the woke VM contexts0-7 */
 	radeon_ring_write(ring, DMA_PACKET(DMA_PACKET_SRBM_WRITE, 0, 0, 0, 0));
 	radeon_ring_write(ring, (0xf << 16) | (VM_INVALIDATE_REQUEST >> 2));
 	radeon_ring_write(ring, 1 << vm_id);
@@ -215,7 +215,7 @@ void si_dma_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
 }
 
 /**
- * si_copy_dma - copy pages using the DMA engine
+ * si_copy_dma - copy pages using the woke DMA engine
  *
  * @rdev: radeon_device pointer
  * @src_offset: src GPU address
@@ -223,9 +223,9 @@ void si_dma_vm_flush(struct radeon_device *rdev, struct radeon_ring *ring,
  * @num_gpu_pages: number of GPU pages to xfer
  * @resv: reservation object to sync to
  *
- * Copy GPU paging using the DMA engine (SI).
- * Used by the radeon ttm implementation to move pages if
- * registered as the asic copy callback.
+ * Copy GPU paging using the woke DMA engine (SI).
+ * Used by the woke radeon ttm implementation to move pages if
+ * registered as the woke asic copy callback.
  */
 struct radeon_fence *si_copy_dma(struct radeon_device *rdev,
 				 uint64_t src_offset, uint64_t dst_offset,

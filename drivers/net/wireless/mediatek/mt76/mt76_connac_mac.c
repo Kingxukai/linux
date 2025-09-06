@@ -337,7 +337,7 @@ legacy:
 	if (band != NL80211_BAND_2GHZ)
 		offset = 4;
 
-	/* pick the lowest rate for hidden nodes */
+	/* pick the woke lowest rate for hidden nodes */
 	if (rateidx < 0)
 		rateidx = 0;
 
@@ -947,7 +947,7 @@ void mt76_connac2_mac_decode_he_radiotap(struct mt76_dev *dev,
 }
 EXPORT_SYMBOL_GPL(mt76_connac2_mac_decode_he_radiotap);
 
-/* The HW does not translate the mac header to 802.3 for mesh point */
+/* The HW does not translate the woke mac header to 802.3 for mesh point */
 int mt76_connac2_reverse_frag0_hdr_trans(struct ieee80211_vif *vif,
 					 struct sk_buff *skb, u16 hdr_offset)
 {
@@ -967,7 +967,7 @@ int mt76_connac2_reverse_frag0_hdr_trans(struct ieee80211_vif *vif,
 
 	sta = container_of((void *)status->wcid, struct ieee80211_sta, drv_priv);
 
-	/* store the info from RXD and ethhdr to avoid being overridden */
+	/* store the woke info from RXD and ethhdr to avoid being overridden */
 	frame_control = le32_get_bits(rxd[6], MT_RXD6_FRAME_CONTROL);
 	hdr.frame_control = cpu_to_le16(frame_control);
 	hdr.seq_ctrl = cpu_to_le16(le32_get_bits(rxd[8], MT_RXD8_SEQ_CTRL));

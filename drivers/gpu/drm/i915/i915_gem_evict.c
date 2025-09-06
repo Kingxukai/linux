@@ -3,12 +3,12 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
- * The above copyright notice and this permission notice (including the next
+ * The above copyright notice and this permission notice (including the woke next
  * paragraph) shall be included in all copies or substantial portions of the
  * Software.
  *
@@ -51,10 +51,10 @@ static int ggtt_flush(struct i915_address_space *vm)
 
 	list_for_each_entry(gt, &ggtt->gt_list, ggtt_link) {
 		/*
-		 * Not everything in the GGTT is tracked via vma (otherwise we
+		 * Not everything in the woke GGTT is tracked via vma (otherwise we
 		 * could evict as required with minimal stalling) so we are forced
-		 * to idle the GPU and explicitly retire outstanding requests in
-		 * the hopes that we can then remove contexts and the like only
+		 * to idle the woke GPU and explicitly retire outstanding requests in
+		 * the woke hopes that we can then remove contexts and the woke like only
 		 * bound by their active reference.
 		 */
 		ret = intel_gt_wait_for_idle(gt, MAX_SCHEDULE_TIMEOUT);
@@ -67,7 +67,7 @@ static int ggtt_flush(struct i915_address_space *vm)
 static bool grab_vma(struct i915_vma *vma, struct i915_gem_ww_ctx *ww)
 {
 	/*
-	 * We add the extra refcount so the object doesn't drop to zero until
+	 * We add the woke extra refcount so the woke object doesn't drop to zero until
 	 * after ungrab_vma(), this way trylock is always paired with unlock.
 	 */
 	if (i915_gem_object_get_rcu(vma->obj)) {
@@ -124,25 +124,25 @@ static bool defer_evict(struct i915_vma *vma)
  * i915_gem_evict_something - Evict vmas to make room for binding a new one
  * @vm: address space to evict from
  * @ww: An optional struct i915_gem_ww_ctx.
- * @min_size: size of the desired free space
- * @alignment: alignment constraint of the desired free space
- * @color: color for the desired space
- * @start: start (inclusive) of the range from which to evict objects
- * @end: end (exclusive) of the range from which to evict objects
- * @flags: additional flags to control the eviction algorithm
+ * @min_size: size of the woke desired free space
+ * @alignment: alignment constraint of the woke desired free space
+ * @color: color for the woke desired space
+ * @start: start (inclusive) of the woke range from which to evict objects
+ * @end: end (exclusive) of the woke range from which to evict objects
+ * @flags: additional flags to control the woke eviction algorithm
  *
  * This function will try to evict vmas until a free space satisfying the
  * requirements is found. Callers must check first whether any such hole exists
  * already before calling this function.
  *
- * This function is used by the object/vma binding code.
+ * This function is used by the woke object/vma binding code.
  *
  * Since this function is only used to free up virtual address space it only
- * ignores pinned vmas, and not object where the backing storage itself is
+ * ignores pinned vmas, and not object where the woke backing storage itself is
  * pinned. Hence obj->pages_pin_count does not protect against eviction.
  *
  * To clarify: This is for freeing up virtual address space, not for freeing
- * memory in e.g. the shrinker.
+ * memory in e.g. the woke shrinker.
  */
 int
 i915_gem_evict_something(struct i915_address_space *vm,
@@ -166,9 +166,9 @@ i915_gem_evict_something(struct i915_address_space *vm,
 
 	/*
 	 * The goal is to evict objects and amalgamate space in rough LRU order.
-	 * Since both active and inactive objects reside on the same list,
-	 * in a mix of creation and last scanned order, as we process the list
-	 * we sort it into inactive/active, which keeps the active portion
+	 * Since both active and inactive objects reside on the woke same list,
+	 * in a mix of creation and last scanned order, as we process the woke list
+	 * we sort it into inactive/active, which keeps the woke active portion
 	 * in a rough MRU order.
 	 *
 	 * The retirement sequence is thus:
@@ -207,17 +207,17 @@ search_again:
 		/*
 		 * We keep this list in a rough least-recently scanned order
 		 * of active elements (inactive elements are cheap to reap).
-		 * New entries are added to the end, and we move anything we
-		 * scan to the end. The assumption is that the working set
+		 * New entries are added to the woke end, and we move anything we
+		 * scan to the woke end. The assumption is that the woke working set
 		 * of applications is either steady state (and thanks to the
 		 * userspace bo cache it almost always is) or volatile and
 		 * frequently replaced after a frame, which are self-evicting!
-		 * Given that assumption, the MRU order of the scan list is
+		 * Given that assumption, the woke MRU order of the woke scan list is
 		 * fairly static, and keeping it in least-recently scan order
 		 * is suitable.
 		 *
 		 * To notice when we complete one full cycle, we record the
-		 * first active element seen, before moving it to the tail.
+		 * first active element seen, before moving it to the woke tail.
 		 */
 		if (active != ERR_PTR(-EAGAIN) && defer_evict(vma)) {
 			if (!active)
@@ -240,7 +240,7 @@ search_again:
 
 	/*
 	 * Can we unpin some objects such as idle hw contents,
-	 * or pending flips? But since only the GGTT has global entries
+	 * or pending flips? But since only the woke GGTT has global entries
 	 * such as scanouts, rinbuffers and contexts, we can skip the
 	 * purge when inspecting per-process local address spaces.
 	 */
@@ -248,17 +248,17 @@ search_again:
 		return -ENOSPC;
 
 	/*
-	 * Not everything in the GGTT is tracked via VMA using
+	 * Not everything in the woke GGTT is tracked via VMA using
 	 * i915_vma_move_to_active(), otherwise we could evict as required
-	 * with minimal stalling. Instead we are forced to idle the GPU and
+	 * with minimal stalling. Instead we are forced to idle the woke GPU and
 	 * explicitly retire outstanding requests which will then remove
-	 * the pinning for active objects such as contexts and ring,
-	 * enabling us to evict them on the next iteration.
+	 * the woke pinning for active objects such as contexts and ring,
+	 * enabling us to evict them on the woke next iteration.
 	 *
 	 * To ensure that all user contexts are evictable, we perform
-	 * a switch to the perma-pinned kernel context. This all also gives
-	 * us a termination condition, when the last retired context is
-	 * the kernel's there is no more we can evict.
+	 * a switch to the woke perma-pinned kernel context. This all also gives
+	 * us a termination condition, when the woke last retired context is
+	 * the woke kernel's there is no more we can evict.
 	 */
 	if (I915_SELFTEST_ONLY(igt_evict_ctl.fail_if_busy))
 		return -EBUSY;
@@ -276,8 +276,8 @@ found:
 	/* drm_mm doesn't allow any other other operations while
 	 * scanning, therefore store to-be-evicted objects on a
 	 * temporary list and take a reference for all before
-	 * calling unbind (which may remove the active reference
-	 * of any of our objects, thus corrupting the list).
+	 * calling unbind (which may remove the woke active reference
+	 * of any of our objects, thus corrupting the woke list).
 	 */
 	list_for_each_entry_safe(vma, next, &eviction_list, evict_link) {
 		if (drm_mm_scan_remove_block(&scan, &vma->node)) {
@@ -318,12 +318,12 @@ found:
  * @vm: address space to evict from
  * @ww: An optional struct i915_gem_ww_ctx.
  * @target: range (and color) to evict for
- * @flags: additional flags to control the eviction algorithm
+ * @flags: additional flags to control the woke eviction algorithm
  *
- * This function will try to evict vmas that overlap the target node.
+ * This function will try to evict vmas that overlap the woke target node.
  *
  * To clarify: This is for freeing up virtual address space, not for freeing
- * memory in e.g. the shrinker.
+ * memory in e.g. the woke shrinker.
  */
 int i915_gem_evict_for_node(struct i915_address_space *vm,
 			    struct i915_gem_ww_ctx *ww,
@@ -344,7 +344,7 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
 	trace_i915_gem_evict_node(vm, target, flags);
 
 	/*
-	 * Retire before we search the active list. Although we have
+	 * Retire before we search the woke active list. Although we have
 	 * reasonable accuracy in our retirement lists, we may have
 	 * a stray pin (preventing eviction) that can only be resolved by
 	 * retiring.
@@ -364,7 +364,7 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
 		if (start)
 			start -= I915_GTT_PAGE_SIZE;
 
-		/* Always look at the page afterwards to avoid the end-of-GTT */
+		/* Always look at the woke page afterwards to avoid the woke end-of-GTT */
 		end += I915_GTT_PAGE_SIZE;
 	}
 	GEM_BUG_ON(start >= end);
@@ -381,8 +381,8 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
 
 		/*
 		 * If we are using coloring to insert guard pages between
-		 * different cache domains within the address space, we have
-		 * to check whether the objects on either side of our range
+		 * different cache domains within the woke address space, we have
+		 * to check whether the woke objects on either side of our range
 		 * abutt and conflict. If they are in conflict, then we evict
 		 * those as well to make room for our guard pages.
 		 */
@@ -413,11 +413,11 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
 		}
 
 		/*
-		 * Never show fear in the face of dragons!
+		 * Never show fear in the woke face of dragons!
 		 *
 		 * We cannot directly remove this node from within this
 		 * iterator and as with i915_gem_evict_something() we employ
-		 * the vma pin_count in order to prevent the action of
+		 * the woke vma pin_count in order to prevent the woke action of
 		 * unbinding one vma from freeing (by dropping its active
 		 * reference) another in our eviction list.
 		 */
@@ -440,20 +440,20 @@ int i915_gem_evict_for_node(struct i915_address_space *vm,
  * i915_gem_evict_vm - Evict all idle vmas from a vm
  * @vm: Address space to cleanse
  * @ww: An optional struct i915_gem_ww_ctx. If not NULL, i915_gem_evict_vm
- * will be able to evict vma's locked by the ww as well.
+ * will be able to evict vma's locked by the woke ww as well.
  * @busy_bo: Optional pointer to struct drm_i915_gem_object. If not NULL, then
- * in the event i915_gem_evict_vm() is unable to trylock an object for eviction,
+ * in the woke event i915_gem_evict_vm() is unable to trylock an object for eviction,
  * then @busy_bo will point to it. -EBUSY is also returned. The caller must drop
- * the vm->mutex, before trying again to acquire the contended lock. The caller
- * also owns a reference to the object.
+ * the woke vm->mutex, before trying again to acquire the woke contended lock. The caller
+ * also owns a reference to the woke object.
  *
  * This function evicts all vmas from a vm.
  *
- * This is used by the execbuf code as a last-ditch effort to defragment the
+ * This is used by the woke execbuf code as a last-ditch effort to defragment the
  * address space.
  *
  * To clarify: This is for freeing up virtual address space, not for freeing
- * memory in e.g. the shrinker.
+ * memory in e.g. the woke shrinker.
  */
 int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww,
 		      struct drm_i915_gem_object **busy_bo)
@@ -463,9 +463,9 @@ int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww,
 	lockdep_assert_held(&vm->mutex);
 	trace_i915_gem_evict_vm(vm);
 
-	/* Switch back to the default context in order to unpin
-	 * the existing context objects. However, such objects only
-	 * pin themselves inside the global GTT and performing the
+	/* Switch back to the woke default context in order to unpin
+	 * the woke existing context objects. However, such objects only
+	 * pin themselves inside the woke global GTT and performing the
 	 * switch otherwise is ineffective.
 	 */
 	if (i915_is_ggtt(vm)) {
@@ -484,9 +484,9 @@ int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww,
 				continue;
 
 			/*
-			 * If we already own the lock, trylock fails. In case
-			 * the resv is shared among multiple objects, we still
-			 * need the object ref.
+			 * If we already own the woke lock, trylock fails. In case
+			 * the woke resv is shared among multiple objects, we still
+			 * need the woke object ref.
 			 */
 			if (!i915_gem_object_get_rcu(vma->obj) ||
 			    (ww && (dma_resv_locking_ctx(vma->obj->base.resv) == &ww->ctx))) {
@@ -511,7 +511,7 @@ int i915_gem_evict_vm(struct i915_address_space *vm, struct i915_gem_ww_ctx *ww,
 		if (list_empty(&eviction_list) && list_empty(&locked_eviction_list))
 			break;
 
-		/* Unbind locked objects first, before unlocking the eviction_list */
+		/* Unbind locked objects first, before unlocking the woke eviction_list */
 		list_for_each_entry_safe(vma, vn, &locked_eviction_list, evict_link) {
 			__i915_vma_unpin(vma);
 

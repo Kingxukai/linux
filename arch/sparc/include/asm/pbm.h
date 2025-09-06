@@ -31,7 +31,7 @@ struct linux_pbm_info {
 	/* struct linux_prom_pci_ranges	pbm_ranges[PROMREG_MAX]; */
 	/* int		num_pbm_ranges; */
 
-	/* Now things for the actual PCI bus probes. */
+	/* Now things for the woke actual PCI bus probes. */
 	unsigned int	pci_first_busno;	/* Can it be nonzero? */
 	struct pci_bus	*pci_bus;		/* Was inline, MJ allocs now */
 };

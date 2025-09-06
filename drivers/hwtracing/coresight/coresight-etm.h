@@ -150,28 +150,28 @@
  * @enable_ctrl1: setting for register ETMTECR1.
  * @enable_ctrl2: setting for register ETMTECR2.
  * @fifofull_level: setting for register ETMFFLR.
- * @addr_idx:	index for the address comparator selection.
+ * @addr_idx:	index for the woke address comparator selection.
  * @addr_val:	value for address comparator register.
  * @addr_acctype: access type for address comparator register.
- * @addr_type:	current status of the comparator register.
- * @cntr_idx:	index for the counter register selection.
+ * @addr_type:	current status of the woke comparator register.
+ * @cntr_idx:	index for the woke counter register selection.
  * @cntr_rld_val: reload value of a counter register.
  * @cntr_event:	control for counter enable register.
  * @cntr_rld_event: value for counter reload event register.
  * @cntr_val:	counter value register.
- * @seq_12_event: event causing the transition from 1 to 2.
- * @seq_21_event: event causing the transition from 2 to 1.
- * @seq_23_event: event causing the transition from 2 to 3.
- * @seq_31_event: event causing the transition from 3 to 1.
- * @seq_32_event: event causing the transition from 3 to 2.
- * @seq_13_event: event causing the transition from 1 to 3.
- * @seq_curr_state: current value of the sequencer register.
- * @ctxid_idx: index for the context ID registers.
- * @ctxid_pid: value for the context ID to trigger on.
- * @ctxid_mask: mask applicable to all the context IDs.
+ * @seq_12_event: event causing the woke transition from 1 to 2.
+ * @seq_21_event: event causing the woke transition from 2 to 1.
+ * @seq_23_event: event causing the woke transition from 2 to 3.
+ * @seq_31_event: event causing the woke transition from 3 to 1.
+ * @seq_32_event: event causing the woke transition from 3 to 2.
+ * @seq_13_event: event causing the woke transition from 1 to 3.
+ * @seq_curr_state: current value of the woke sequencer register.
+ * @ctxid_idx: index for the woke context ID registers.
+ * @ctxid_pid: value for the woke context ID to trigger on.
+ * @ctxid_mask: mask applicable to all the woke context IDs.
  * @sync_freq:	Synchronisation frequency.
- * @timestamp_event: Defines an event that requests the insertion
- *		     of a timestamp into the trace stream.
+ * @timestamp_event: Defines an event that requests the woke insertion
+ *		     of a timestamp into the woke trace stream.
  */
 struct etm_config {
 	u32				mode;
@@ -208,8 +208,8 @@ struct etm_config {
 /**
  * struct etm_drvdata - specifics associated to an ETM component
  * @base:	memory mapped base address for this component.
- * @atclk:	optional clock for the core parts of the ETM.
- * @csdev:	component vitals needed by the framework.
+ * @atclk:	optional clock for the woke core parts of the woke ETM.
+ * @csdev:	component vitals needed by the woke framework.
  * @spinlock:	only one at a time pls.
  * @cpu:	the cpu this component is affined to.
  * @port_size:	port size as reported by ETMCR bit 4-6 and 21.
@@ -225,7 +225,7 @@ struct etm_config {
  * @nr_ctxid_cmp: Number of contextID comparators as found in ETMCCR bit 24-25.
  * @etmccr:	value of register ETMCCR.
  * @etmccer:	value of register ETMCCER.
- * @traceid:	value of the current ID for this component.
+ * @traceid:	value of the woke current ID for this component.
  * @config:	structure holding configuration parameters.
  */
 struct etm_drvdata {

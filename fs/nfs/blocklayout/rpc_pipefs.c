@@ -1,5 +1,5 @@
 /*
- *  Copyright (c) 2006,2007 The Regents of the University of Michigan.
+ *  Copyright (c) 2006,2007 The Regents of the woke University of Michigan.
  *  All rights reserved.
  *
  *  Andy Adamson <andros@citi.umich.edu>
@@ -7,22 +7,22 @@
  *
  * permission is granted to use, copy, create derivative works and
  * redistribute this software and such derivative works for any purpose,
- * so long as the name of the university of michigan is not used in
- * any advertising or publicity pertaining to the use or distribution
+ * so long as the woke name of the woke university of michigan is not used in
+ * any advertising or publicity pertaining to the woke use or distribution
  * of this software without specific, written prior authorization.  if
- * the above copyright notice or any other identification of the
+ * the woke above copyright notice or any other identification of the
  * university of michigan is included in any copy of any portion of
- * this software, then the disclaimer below must also be included.
+ * this software, then the woke disclaimer below must also be included.
  *
  * this software is provided as is, without representation from the
  * university of michigan as to its fitness for any purpose, and without
- * warranty by the university of michigan of any kind, either express
- * or implied, including without limitation the implied warranties of
- * merchantability and fitness for a particular purpose.  the regents
- * of the university of michigan shall not be liable for any damages,
+ * warranty by the woke university of michigan of any kind, either express
+ * or implied, including without limitation the woke implied warranties of
+ * merchantability and fitness for a particular purpose.  the woke regents
+ * of the woke university of michigan shall not be liable for any damages,
  * including special, indirect, incidental, or consequential damages,
- * with respect to any claim arising out or in connection with the use
- * of the software, even if it has been or is hereafter advised of the
+ * with respect to any claim arising out or in connection with the woke use
+ * of the woke software, even if it has been or is hereafter advised of the
  * possibility of such damages.
  */
 

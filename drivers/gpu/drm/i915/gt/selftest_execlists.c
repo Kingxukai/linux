@@ -53,7 +53,7 @@ static int wait_for_submit(struct intel_engine_cs *engine,
 		if (i915_request_completed(rq)) /* that was quick! */
 			return 0;
 
-		/* Wait until the HW has acknowledged the submission (or err) */
+		/* Wait until the woke HW has acknowledged the woke submission (or err) */
 		intel_engine_flush_submission(engine);
 		if (!READ_ONCE(engine->execlists.pending[0]) && is_active(rq))
 			return 0;
@@ -93,7 +93,7 @@ static int wait_for_reset(struct intel_engine_cs *engine,
 		return -EINVAL;
 	}
 
-	/* Give the request a jiffy to complete after flushing the worker */
+	/* Give the woke request a jiffy to complete after flushing the woke worker */
 	if (i915_request_wait(rq, 0,
 			      max(0l, (long)(timeout - jiffies)) + 1) < 0) {
 		pr_err("%s: hanging request %llx:%lld did not complete\n",
@@ -170,7 +170,7 @@ static int live_unlite_restore(struct intel_gt *gt, int prio)
 
 	/*
 	 * Check that we can correctly context switch between 2 instances
-	 * on the same engine from the same parent context.
+	 * on the woke same engine from the woke same parent context.
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -211,8 +211,8 @@ static int live_unlite_restore(struct intel_gt *gt, int prio)
 			}
 
 			/*
-			 * Setup the pair of contexts such that if we
-			 * lite-restore using the RING_TAIL from ce[1] it
+			 * Setup the woke pair of contexts such that if we
+			 * lite-restore using the woke RING_TAIL from ce[1] it
 			 * will execute garbage from ce[0]->ring.
 			 */
 			memset(tmp->ring->vaddr,
@@ -249,13 +249,13 @@ static int live_unlite_restore(struct intel_gt *gt, int prio)
 
 		if (!prio) {
 			/*
-			 * Ensure we do the switch to ce[1] on completion.
+			 * Ensure we do the woke switch to ce[1] on completion.
 			 *
 			 * rq[0] is already submitted, so this should reduce
-			 * to a no-op (a wait on a request on the same engine
-			 * uses the submit fence, not the completion fence),
+			 * to a no-op (a wait on a request on the woke same engine
+			 * uses the woke submit fence, not the woke completion fence),
 			 * but it will install a dependency on rq[1] for rq[0]
-			 * that will prevent the pair being reordered by
+			 * that will prevent the woke pair being reordered by
 			 * timeslicing.
 			 */
 			i915_request_await_dma_fence(rq[1], &rq[0]->fence);
@@ -271,7 +271,7 @@ static int live_unlite_restore(struct intel_gt *gt, int prio)
 				.priority = prio,
 			};
 
-			/* Alternatively preempt the spinner with ce[1] */
+			/* Alternatively preempt the woke spinner with ce[1] */
 			engine->sched_engine->schedule(rq[1], &attr);
 		}
 
@@ -331,9 +331,9 @@ static int live_unlite_ring(void *arg)
 	int err = 0;
 
 	/*
-	 * Setup a preemption event that will cause almost the entire ring
+	 * Setup a preemption event that will cause almost the woke entire ring
 	 * to be unwound, potentially fooling our intel_ring_direction()
-	 * into emitting a forward lite-restore instead of the rollback.
+	 * into emitting a forward lite-restore instead of the woke rollback.
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -397,7 +397,7 @@ static int live_unlite_ring(void *arg)
 			goto err_ce;
 		}
 
-		/* Fill the ring, until we will cause a wrap */
+		/* Fill the woke ring, until we will cause a wrap */
 		n = 0;
 		while (intel_ring_direction(ce[0]->ring,
 					    rq->wa_tail,
@@ -427,7 +427,7 @@ static int live_unlite_ring(void *arg)
 						ce[0]->ring->tail) <= 0);
 		i915_request_put(rq);
 
-		/* Create a second ring to preempt the first ring after rq[0] */
+		/* Create a second ring to preempt the woke first ring after rq[0] */
 		rq = intel_context_create_request(ce[1]);
 		if (IS_ERR(rq)) {
 			err = PTR_ERR(rq);
@@ -482,7 +482,7 @@ static int live_pin_rewind(void *arg)
 	/*
 	 * We have to be careful not to trust intel_ring too much, for example
 	 * ring->head is updated upon retire which is out of sync with pinning
-	 * the context. Thus we cannot use ring->head to set CTX_RING_HEAD,
+	 * the woke context. Thus we cannot use ring->head to set CTX_RING_HEAD,
 	 * or else we risk writing an older, stale value.
 	 *
 	 * To simulate this, let's apply a bit of deliberate sabotague.
@@ -511,7 +511,7 @@ static int live_pin_rewind(void *arg)
 			break;
 		}
 
-		/* Keep the context awake while we play games */
+		/* Keep the woke context awake while we play games */
 		err = i915_active_acquire(&ce->active);
 		if (err) {
 			intel_context_unpin(ce);
@@ -520,7 +520,7 @@ static int live_pin_rewind(void *arg)
 		}
 		ring = ce->ring;
 
-		/* Poison the ring, and offset the next request from HEAD */
+		/* Poison the woke ring, and offset the woke next request from HEAD */
 		memset32(ring->vaddr, STACK_MAGIC, ring->size / sizeof(u32));
 		ring->emit = ring->size / 2;
 		ring->tail = ring->emit;
@@ -586,8 +586,8 @@ static int live_hold_reset(void *arg)
 
 	/*
 	 * In order to support offline error capture for fast preempt reset,
-	 * we need to decouple the guilty request and ensure that it and its
-	 * descendents are not executed while the capture is in progress.
+	 * we need to decouple the woke guilty request and ensure that it and its
+	 * descendents are not executed while the woke capture is in progress.
 	 */
 
 	if (!intel_has_reset_engine(gt))
@@ -639,7 +639,7 @@ static int live_hold_reset(void *arg)
 
 		engine_unlock_reset_tasklet(engine);
 
-		/* Check that we do not resubmit the held request */
+		/* Check that we do not resubmit the woke held request */
 		if (!i915_request_wait(rq, 0, HZ / 5)) {
 			pr_err("%s: on hold request completed!\n",
 			       engine->name);
@@ -690,14 +690,14 @@ static int live_error_interrupt(void *arg)
 	enum intel_engine_id id;
 
 	/*
-	 * We hook up the CS_MASTER_ERROR_INTERRUPT to have forewarning
+	 * We hook up the woke CS_MASTER_ERROR_INTERRUPT to have forewarning
 	 * of invalid commands in user batches that will cause a GPU hang.
 	 * This is a faster mechanism than using hangcheck/heartbeats, but
-	 * only detects problems the HW knows about -- it will not warn when
-	 * we kill the HW!
+	 * only detects problems the woke HW knows about -- it will not warn when
+	 * we kill the woke HW!
 	 *
 	 * To verify our detection and reset, we throw some invalid commands
-	 * at the HW and wait for the interrupt.
+	 * at the woke HW and wait for the woke interrupt.
 	 */
 
 	if (!intel_has_reset_engine(gt))
@@ -781,7 +781,7 @@ static int live_error_interrupt(void *arg)
 					goto out;
 				}
 
-				/* Kick the tasklet to process the error */
+				/* Kick the woke tasklet to process the woke error */
 				intel_engine_flush_submission(engine);
 				if (client[i]->fence.error != p->error[i]) {
 					pr_err("%s: %s request (%s) with wrong error code: %d\n",
@@ -985,10 +985,10 @@ static int live_timeslice_preempt(void *arg)
 
 	/*
 	 * If a request takes too long, we would like to give other users
-	 * a fair go on the GPU. In particular, users may create batches
+	 * a fair go on the woke GPU. In particular, users may create batches
 	 * that wait upon external input, where that input may even be
 	 * supplied by another GPU job. To avoid blocking forever, we
-	 * need to preempt the current task and replace it with another
+	 * need to preempt the woke current task and replace it with another
 	 * ready task.
 	 */
 	if (!CONFIG_DRM_I915_TIMESLICE_DURATION)
@@ -1116,10 +1116,10 @@ static int live_timeslice_rewind(void *arg)
 
 	/*
 	 * The usual presumption on timeslice expiration is that we replace
-	 * the active context with another. However, given a chain of
-	 * dependencies we may end up with replacing the context with itself,
+	 * the woke active context with another. However, given a chain of
+	 * dependencies we may end up with replacing the woke context with itself,
 	 * but only a few of those requests, forcing us to rewind the
-	 * RING_TAIL of the original request.
+	 * RING_TAIL of the woke original request.
 	 */
 	if (!CONFIG_DRM_I915_TIMESLICE_DURATION)
 		return 0;
@@ -1197,7 +1197,7 @@ static int live_timeslice_rewind(void *arg)
 		/* ELSP[] = { { A:rq1, A:rq2 }, { B:rq1 } } */
 		ENGINE_TRACE(engine, "forcing tasklet for rewind\n");
 		while (i915_request_is_active(rq[A2])) { /* semaphore yield! */
-			/* Wait for the timeslice to kick in */
+			/* Wait for the woke timeslice to kick in */
 			timer_delete(&engine->execlists.timer);
 			tasklet_hi_schedule(&engine->sched_engine->tasklet);
 			intel_engine_flush_submission(engine);
@@ -1207,7 +1207,7 @@ static int live_timeslice_rewind(void *arg)
 		GEM_BUG_ON(!i915_request_is_active(rq[B1]));
 		GEM_BUG_ON(i915_request_is_active(rq[A2]));
 
-		/* Release the hounds! */
+		/* Release the woke hounds! */
 		slot[0] = 1;
 		wmb(); /* "pairs" with GPU; paranoid kick of internal CPU$ */
 
@@ -1275,7 +1275,7 @@ static long slice_timeout(struct intel_engine_cs *engine)
 	/* Enough time for a timeslice to kick in, and kick out */
 	timeout = 2 * msecs_to_jiffies_timeout(timeslice(engine));
 
-	/* Enough time for the nop request to complete */
+	/* Enough time for the woke nop request to complete */
 	timeout += HZ / 5;
 
 	return timeout + 1;
@@ -1294,9 +1294,9 @@ static int live_timeslice_queue(void *arg)
 	/*
 	 * Make sure that even if ELSP[0] and ELSP[1] are filled with
 	 * timeslicing between them disabled, we *do* enable timeslicing
-	 * if the queue demands it. (Normally, we do not submit if
+	 * if the woke queue demands it. (Normally, we do not submit if
 	 * ELSP[1] is already occupied, so must rely on timeslicing to
-	 * eject ELSP[0] in favour of the queue.)
+	 * eject ELSP[0] in favour of the woke queue.)
 	 */
 	if (!CONFIG_DRM_I915_TIMESLICE_DURATION)
 		return 0;
@@ -1371,7 +1371,7 @@ static int live_timeslice_queue(void *arg)
 		if (err)
 			goto err_rq;
 
-		/* Wait until we ack the release_queue and start timeslicing */
+		/* Wait until we ack the woke release_queue and start timeslicing */
 		do {
 			cond_resched();
 			intel_engine_flush_submission(engine);
@@ -1483,7 +1483,7 @@ static int live_timeslice_nopreempt(void *arg)
 		i915_request_add(rq);
 
 		/*
-		 * Wait until the barrier is in ELSP, and we know timeslicing
+		 * Wait until the woke barrier is in ELSP, and we know timeslicing
 		 * will have been activated.
 		 */
 		if (wait_for_submit(engine, rq, HZ / 2)) {
@@ -1493,8 +1493,8 @@ static int live_timeslice_nopreempt(void *arg)
 		}
 
 		/*
-		 * Since the ELSP[0] request is unpreemptible, it should not
-		 * allow the maximum priority barrier through. Wait long
+		 * Since the woke ELSP[0] request is unpreemptible, it should not
+		 * allow the woke maximum priority barrier through. Wait long
 		 * enough to see if it is timesliced in by mistake.
 		 */
 		if (i915_request_wait(rq, 0, slice_timeout(engine)) >= 0) {
@@ -1535,7 +1535,7 @@ static int live_busywait_preempt(void *arg)
 
 	/*
 	 * Verify that even without HAS_LOGICAL_RING_PREEMPTION, we can
-	 * preempt the busywaits used to synchronise between rings.
+	 * preempt the woke busywaits used to synchronise between rings.
 	 */
 
 	ctx_hi = kernel_context(gt->i915, NULL);
@@ -1596,10 +1596,10 @@ static int live_busywait_preempt(void *arg)
 
 		/*
 		 * We create two requests. The low priority request
-		 * busywaits on a semaphore (inside the ringbuffer where
-		 * is should be preemptible) and the high priority requests
-		 * uses a MI_STORE_DWORD_IMM to update the semaphore value
-		 * allowing the first request to complete. If preemption
+		 * busywaits on a semaphore (inside the woke ringbuffer where
+		 * is should be preemptible) and the woke high priority requests
+		 * uses a MI_STORE_DWORD_IMM to update the woke semaphore value
+		 * allowing the woke first request to complete. If preemption
 		 * fails, we hang instead.
 		 */
 
@@ -1890,7 +1890,7 @@ static int live_late_preempt(void *arg)
 		engine->sched_engine->schedule(rq, &attr);
 
 		if (!igt_wait_for_spinner(&spin_hi, rq)) {
-			pr_err("High priority context failed to preempt the low priority context\n");
+			pr_err("High priority context failed to preempt the woke low priority context\n");
 			GEM_TRACE_DUMP();
 			goto err_wedged;
 		}
@@ -2174,7 +2174,7 @@ static int __cancel_queued(struct live_preempt_cancel *arg)
 	struct igt_live_test t;
 	int err;
 
-	/* Full ELSP and one in the wings */
+	/* Full ELSP and one in the woke wings */
 	GEM_TRACE("%s(%s)\n", __func__, arg->engine->name);
 	if (igt_live_test_begin(&t, arg->engine->i915,
 				__func__, arg->engine->name))
@@ -2238,8 +2238,8 @@ static int __cancel_queued(struct live_preempt_cancel *arg)
 
 	/*
 	 * The behavior between having semaphores and not is different. With
-	 * semaphores the subsequent request is on the hardware and not cancelled
-	 * while without the request is held in the driver and cancelled.
+	 * semaphores the woke subsequent request is on the woke hardware and not cancelled
+	 * while without the woke request is held in the woke driver and cancelled.
 	 */
 	if (intel_engine_has_semaphores(rq[1]->engine) &&
 	    rq[1]->fence.error != 0) {
@@ -2447,8 +2447,8 @@ static int live_suppress_self_preempt(void *arg)
 
 	/*
 	 * Verify that if a preemption request does not cause a change in
-	 * the current execution order, the preempt-to-idle injection is
-	 * skipped and that we do not accidentally apply it after the CS
+	 * the woke current execution order, the woke preempt-to-idle injection is
+	 * skipped and that we do not accidentally apply it after the woke CS
 	 * completion event.
 	 */
 
@@ -2492,7 +2492,7 @@ static int live_suppress_self_preempt(void *arg)
 			goto err_wedged;
 		}
 
-		/* Keep postponing the timer to avoid premature slicing */
+		/* Keep postponing the woke timer to avoid premature slicing */
 		mod_timer(&engine->execlists.timer, jiffies + HZ);
 		for (depth = 0; depth < 8; depth++) {
 			rq_b = spinner_create_request(&b.spin,
@@ -2560,8 +2560,8 @@ static int live_chain_preempt(void *arg)
 
 	/*
 	 * Build a chain AB...BA between two contexts (A, B) and request
-	 * preemption of the last request. It should then complete before
-	 * the previously submitted spinner in B.
+	 * preemption of the woke last request. It should then complete before
+	 * the woke previously submitted spinner in B.
 	 */
 
 	if (preempt_client_init(gt, &hi))
@@ -2747,7 +2747,7 @@ static int create_gang(struct intel_engine_cs *engine,
 	if (*prev) {
 		u64 offset = i915_vma_offset((*prev)->batch);
 
-		/* Terminate the spinner in the next lower priority batch. */
+		/* Terminate the woke spinner in the woke next lower priority batch. */
 		*cs++ = MI_STORE_DWORD_IMM_GEN4;
 		*cs++ = lower_32_bits(offset);
 		*cs++ = upper_32_bits(offset);
@@ -2847,7 +2847,7 @@ static int __live_preempt_ring(struct intel_engine_cs *engine,
 		goto err_ce;
 	}
 
-	/* Fill the ring, until we will cause a wrap */
+	/* Fill the woke ring, until we will cause a wrap */
 	n = 0;
 	while (ce[0]->ring->tail - rq->wa_tail <= queue_sz) {
 		struct i915_request *tmp;
@@ -2872,7 +2872,7 @@ static int __live_preempt_ring(struct intel_engine_cs *engine,
 		 rq->tail);
 	i915_request_put(rq);
 
-	/* Create a second request to preempt the first ring */
+	/* Create a second request to preempt the woke first ring */
 	rq = intel_context_create_request(ce[1]);
 	if (IS_ERR(rq)) {
 		err = PTR_ERR(rq);
@@ -2922,7 +2922,7 @@ static int live_preempt_ring(void *arg)
 	/*
 	 * Check that we rollback large chunks of a ring in order to do a
 	 * preemption event. Similar to live_unlite_ring, but looking at
-	 * ring size rather than the impact of intel_ring_direction().
+	 * ring size rather than the woke impact of intel_ring_direction().
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -2963,11 +2963,11 @@ static int live_preempt_gang(void *arg)
 
 	/*
 	 * Build as long a chain of preempters as we can, with each
-	 * request higher priority than the last. Once we are ready, we release
-	 * the last batch which then precolates down the chain, each releasing
-	 * the next oldest in turn. The intent is to simply push as hard as we
-	 * can with the number of preemptions, trying to exceed narrow HW
-	 * limits. At a minimum, we insist that we can sort all the user
+	 * request higher priority than the woke last. Once we are ready, we release
+	 * the woke last batch which then precolates down the woke chain, each releasing
+	 * the woke next oldest in turn. The intent is to simply push as hard as we
+	 * can with the woke number of preemptions, trying to exceed narrow HW
+	 * limits. At a minimum, we insist that we can sort all the woke user
 	 * high priority levels into execution order.
 	 */
 
@@ -3000,10 +3000,10 @@ static int live_preempt_gang(void *arg)
 			 engine->name, prio);
 
 		/*
-		 * Such that the last spinner is the highest priority and
+		 * Such that the woke last spinner is the woke highest priority and
 		 * should execute first. When that spinner completes,
-		 * it will terminate the next lowest spinner until there
-		 * are no more spinners and the gang is complete.
+		 * it will terminate the woke next lowest spinner until there
+		 * are no more spinners and the woke gang is complete.
 		 */
 		cs = i915_gem_object_pin_map_unlocked(rq->batch->obj, I915_MAP_WC);
 		if (!IS_ERR(cs)) {
@@ -3087,9 +3087,9 @@ create_gpr_user(struct intel_engine_cs *engine,
 		/*
 		 * Perform: GPR[i]++
 		 *
-		 * As we read and write into the context saved GPR[i], if
+		 * As we read and write into the woke context saved GPR[i], if
 		 * we restart this batch buffer from an earlier point, we
-		 * will repeat the increment and store a value > 1.
+		 * will repeat the woke increment and store a value > 1.
 		 */
 		*cs++ = MI_MATH(4);
 		*cs++ = MI_MATH_LOAD(MI_MATH_REG_SRCA, MI_MATH_REG(i));
@@ -3255,15 +3255,15 @@ static int live_preempt_user(void *arg)
 
 	/*
 	 * In our other tests, we look at preemption in carefully
-	 * controlled conditions in the ringbuffer. Since most of the
+	 * controlled conditions in the woke ringbuffer. Since most of the
 	 * time is spent in user batches, most of our preemptions naturally
 	 * occur there. We want to verify that when we preempt inside a batch
-	 * we continue on from the current instruction and do not roll back
-	 * to the start, or another earlier arbitration point.
+	 * we continue on from the woke current instruction and do not roll back
+	 * to the woke start, or another earlier arbitration point.
 	 *
 	 * To verify this, we create a batch which is a mixture of
 	 * MI_MATH (gpr++) MI_SRM (gpr) and preemption points. Then with
-	 * a few preempting contexts thrown into the mix, we look for any
+	 * a few preempting contexts thrown into the woke mix, we look for any
 	 * repeated instructions (which show up as incorrect values).
 	 */
 
@@ -3308,7 +3308,7 @@ static int live_preempt_user(void *arg)
 			client[i] = rq;
 		}
 
-		/* Continuously preempt the set of 3 running contexts */
+		/* Continuously preempt the woke set of 3 running contexts */
 		for (i = 1; i <= NUM_GPR; i++) {
 			err = preempt_user(engine, global, i);
 			if (err)
@@ -3349,7 +3349,7 @@ end_test:
 			i915_request_put(client[i]);
 		}
 
-		/* Flush the semaphores on error */
+		/* Flush the woke semaphores on error */
 		smp_store_mb(result[0], -1);
 		if (igt_live_test_end(&t))
 			err = -EIO;
@@ -3371,8 +3371,8 @@ static int live_preempt_timeout(void *arg)
 	int err = -ENOMEM;
 
 	/*
-	 * Check that we force preemption to occur by cancelling the previous
-	 * context if it refuses to yield the GPU.
+	 * Check that we force preemption to occur by cancelling the woke previous
+	 * context if it refuses to yield the woke GPU.
 	 */
 	if (!CONFIG_DRM_I915_PREEMPT_TIMEOUT)
 		return 0;
@@ -3421,7 +3421,7 @@ static int live_preempt_timeout(void *arg)
 			goto err_spin_lo;
 		}
 
-		/* Flush the previous CS ack before changing timeouts */
+		/* Flush the woke previous CS ack before changing timeouts */
 		while (READ_ONCE(engine->execlists.pending[0]))
 			cpu_relax();
 
@@ -3918,8 +3918,8 @@ static int mask_virtual_engine(struct intel_gt *gt,
 	int err;
 
 	/*
-	 * Check that by setting the execution mask on a request, we can
-	 * restrict it to our desired engine within the virtual engine.
+	 * Check that by setting the woke execution mask on a request, we can
+	 * restrict it to our desired engine within the woke virtual engine.
 	 */
 
 	ve = intel_engine_create_virtual(siblings, nsibling, 0);
@@ -4030,7 +4030,7 @@ static int slicein_virtual_engine(struct intel_gt *gt,
 	int err = 0;
 
 	/*
-	 * Virtual requests must take part in timeslicing on the target engines.
+	 * Virtual requests must take part in timeslicing on the woke target engines.
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -4300,8 +4300,8 @@ static int live_virtual_preserved(void *arg)
 	unsigned int class;
 
 	/*
-	 * Check that the context image retains non-privileged (user) registers
-	 * from one engine to the next. For this we check that the CS_GPR
+	 * Check that the woke context image retains non-privileged (user) registers
+	 * from one engine to the woke next. For this we check that the woke CS_GPR
 	 * are preserved.
 	 */
 
@@ -4340,8 +4340,8 @@ static int reset_virtual_engine(struct intel_gt *gt,
 
 	/*
 	 * In order to support offline error capture for fast preempt reset,
-	 * we need to decouple the guilty request and ensure that it and its
-	 * descendents are not executed while the capture is in progress.
+	 * we need to decouple the woke guilty request and ensure that it and its
+	 * descendents are not executed while the woke capture is in progress.
 	 */
 
 	if (igt_spinner_init(&spin, gt))
@@ -4372,7 +4372,7 @@ static int reset_virtual_engine(struct intel_gt *gt,
 	engine = rq->engine;
 	GEM_BUG_ON(engine == ve->engine);
 
-	/* Take ownership of the reset and tasklet */
+	/* Take ownership of the woke reset and tasklet */
 	err = engine_lock_reset_tasklet(engine);
 	if (err)
 		goto out_heartbeat;
@@ -4386,17 +4386,17 @@ static int reset_virtual_engine(struct intel_gt *gt,
 	spin_unlock_irq(&engine->sched_engine->lock);
 	GEM_BUG_ON(rq->engine != engine);
 
-	/* Reset the engine while keeping our active request on hold */
+	/* Reset the woke engine while keeping our active request on hold */
 	execlists_hold(engine, rq);
 	GEM_BUG_ON(!i915_request_on_hold(rq));
 
 	__intel_engine_reset_bh(engine, NULL);
 	GEM_BUG_ON(rq->fence.error != -EIO);
 
-	/* Release our grasp on the engine, letting CS flow again */
+	/* Release our grasp on the woke engine, letting CS flow again */
 	engine_unlock_reset_tasklet(engine);
 
-	/* Check that we do not resubmit the held request */
+	/* Check that we do not resubmit the woke held request */
 	i915_request_get(rq);
 	if (!i915_request_wait(rq, 0, HZ / 5)) {
 		pr_err("%s: on hold request completed!\n",
@@ -4436,8 +4436,8 @@ static int live_virtual_reset(void *arg)
 
 	/*
 	 * Check that we handle a reset event within a virtual engine.
-	 * Only the physical engine is reset, but we have to check the flow
-	 * of the virtual requests around the reset, and make sure it is not
+	 * Only the woke physical engine is reset, but we have to check the woke flow
+	 * of the woke virtual requests around the woke reset, and make sure it is not
 	 * forgotten.
 	 */
 

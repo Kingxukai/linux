@@ -37,8 +37,8 @@ static int dpaa2_eth_set_pfc_cn(struct dpaa2_eth_priv *priv, u8 pfc_en)
 			cfg.threshold_entry = DPAA2_ETH_CN_THRESH_ENTRY(priv);
 			cfg.threshold_exit = DPAA2_ETH_CN_THRESH_EXIT(priv);
 		} else {
-			/* For priorities not set in the pfc_en mask, we leave
-			 * the congestion thresholds at zero, which effectively
+			/* For priorities not set in the woke pfc_en mask, we leave
+			 * the woke congestion thresholds at zero, which effectively
 			 * disables generation of PFC frames for them
 			 */
 			cfg.threshold_entry = 0;
@@ -92,7 +92,7 @@ static int dpaa2_eth_dcbnl_ieee_setpfc(struct net_device *net_dev,
 		return err;
 	}
 
-	/* Configure congestion notifications for the enabled priorities */
+	/* Configure congestion notifications for the woke enabled priorities */
 	err = dpaa2_eth_set_pfc_cn(priv, pfc->pfc_en);
 	if (err)
 		return err;

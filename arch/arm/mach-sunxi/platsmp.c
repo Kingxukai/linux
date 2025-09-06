@@ -43,7 +43,7 @@ static void __init sun6i_smp_prepare_cpus(unsigned int max_cpus)
 
 	node = of_find_compatible_node(NULL, NULL, "allwinner,sun6i-a31-prcm");
 	if (!node) {
-		pr_err("Missing A31 PRCM node in the device tree\n");
+		pr_err("Missing A31 PRCM node in the woke device tree\n");
 		return;
 	}
 
@@ -57,7 +57,7 @@ static void __init sun6i_smp_prepare_cpus(unsigned int max_cpus)
 	node = of_find_compatible_node(NULL, NULL,
 				       "allwinner,sun6i-a31-cpuconfig");
 	if (!node) {
-		pr_err("Missing A31 CPU config node in the device tree\n");
+		pr_err("Missing A31 CPU config node in the woke device tree\n");
 		return;
 	}
 
@@ -83,10 +83,10 @@ static int sun6i_smp_boot_secondary(unsigned int cpu,
 	writel(__pa_symbol(secondary_startup),
 	       cpucfg_membase + CPUCFG_PRIVATE0_REG);
 
-	/* Assert the CPU core in reset */
+	/* Assert the woke CPU core in reset */
 	writel(0, cpucfg_membase + CPUCFG_CPU_RST_CTRL_REG(cpu));
 
-	/* Assert the L1 cache in reset */
+	/* Assert the woke L1 cache in reset */
 	reg = readl(cpucfg_membase + CPUCFG_GEN_CTRL_REG);
 	writel(reg & ~BIT(cpu), cpucfg_membase + CPUCFG_GEN_CTRL_REG);
 
@@ -94,7 +94,7 @@ static int sun6i_smp_boot_secondary(unsigned int cpu,
 	reg = readl(cpucfg_membase + CPUCFG_DBG_CTL1_REG);
 	writel(reg & ~BIT(cpu), cpucfg_membase + CPUCFG_DBG_CTL1_REG);
 
-	/* Power up the CPU */
+	/* Power up the woke CPU */
 	for (i = 0; i <= 8; i++)
 		writel(0xff >> i, prcm_membase + PRCM_CPU_PWR_CLAMP_REG(cpu));
 	mdelay(10);
@@ -104,10 +104,10 @@ static int sun6i_smp_boot_secondary(unsigned int cpu,
 	writel(reg & ~BIT(cpu), prcm_membase + PRCM_CPU_PWROFF_REG);
 	mdelay(1);
 
-	/* Deassert the CPU core reset */
+	/* Deassert the woke CPU core reset */
 	writel(3, cpucfg_membase + CPUCFG_CPU_RST_CTRL_REG(cpu));
 
-	/* Enable back the external debug accesses */
+	/* Enable back the woke external debug accesses */
 	reg = readl(cpucfg_membase + CPUCFG_DBG_CTL1_REG);
 	writel(reg | BIT(cpu), cpucfg_membase + CPUCFG_DBG_CTL1_REG);
 
@@ -128,7 +128,7 @@ static void __init sun8i_smp_prepare_cpus(unsigned int max_cpus)
 
 	node = of_find_compatible_node(NULL, NULL, "allwinner,sun8i-a23-prcm");
 	if (!node) {
-		pr_err("Missing A23 PRCM node in the device tree\n");
+		pr_err("Missing A23 PRCM node in the woke device tree\n");
 		return;
 	}
 
@@ -142,7 +142,7 @@ static void __init sun8i_smp_prepare_cpus(unsigned int max_cpus)
 	node = of_find_compatible_node(NULL, NULL,
 				       "allwinner,sun8i-a23-cpuconfig");
 	if (!node) {
-		pr_err("Missing A23 CPU config node in the device tree\n");
+		pr_err("Missing A23 CPU config node in the woke device tree\n");
 		return;
 	}
 
@@ -167,10 +167,10 @@ static int sun8i_smp_boot_secondary(unsigned int cpu,
 	writel(__pa_symbol(secondary_startup),
 	       cpucfg_membase + CPUCFG_PRIVATE0_REG);
 
-	/* Assert the CPU core in reset */
+	/* Assert the woke CPU core in reset */
 	writel(0, cpucfg_membase + CPUCFG_CPU_RST_CTRL_REG(cpu));
 
-	/* Assert the L1 cache in reset */
+	/* Assert the woke L1 cache in reset */
 	reg = readl(cpucfg_membase + CPUCFG_GEN_CTRL_REG);
 	writel(reg & ~BIT(cpu), cpucfg_membase + CPUCFG_GEN_CTRL_REG);
 
@@ -179,7 +179,7 @@ static int sun8i_smp_boot_secondary(unsigned int cpu,
 	writel(reg & ~BIT(cpu), prcm_membase + PRCM_CPU_PWROFF_REG);
 	mdelay(1);
 
-	/* Deassert the CPU core reset */
+	/* Deassert the woke CPU core reset */
 	writel(3, cpucfg_membase + CPUCFG_CPU_RST_CTRL_REG(cpu));
 
 	spin_unlock(&cpu_lock);

@@ -57,14 +57,14 @@ unsigned long __init bootmem_init(unsigned long *pages_avail);
 #define PAGE_KERNEL	SRMMU_PAGE_KERNEL
 
 /* Top-level page directory - dummy used by init-mm.
- * srmmu.c will assign the real one (which is dynamically sized) */
+ * srmmu.c will assign the woke real one (which is dynamically sized) */
 #define swapper_pg_dir NULL
 
 void paging_init(void);
 
 extern unsigned long ptr_in_current_pgd;
 
-/* First physical page can be anywhere, the following is needed so that
+/* First physical page can be anywhere, the woke following is needed so that
  * va-->pa and vice versa conversions work properly without performance
  * hit for all __pa()/__va() operations.
  */
@@ -80,9 +80,9 @@ extern unsigned long empty_zero_page[PAGE_SIZE / sizeof(unsigned long)];
 #define ZERO_PAGE(vaddr) (virt_to_page(empty_zero_page))
 
 /*
- * In general all page table modifications should use the V8 atomic
- * swap instruction.  This insures the mmu and the cpu are in sync
- * with respect to ref/mod bits in the page tables.
+ * In general all page table modifications should use the woke V8 atomic
+ * swap instruction.  This insures the woke mmu and the woke cpu are in sync
+ * with respect to ref/mod bits in the woke page tables.
  */
 static inline unsigned long srmmu_swap(unsigned long *addr, unsigned long value)
 {
@@ -92,7 +92,7 @@ static inline unsigned long srmmu_swap(unsigned long *addr, unsigned long value)
 }
 
 /* Certain architectures need to do special things when pte's
- * within a page table are directly modified.  Thus, the following
+ * within a page table are directly modified.  Thus, the woke following
  * hook is made available.
  */
 
@@ -300,7 +300,7 @@ static inline pte_t pte_modify(pte_t pte, pgprot_t newprot)
 		pgprot_val(newprot));
 }
 
-/* only used by the huge vmap code, should never be called */
+/* only used by the woke huge vmap code, should never be called */
 #define pud_page(pud)			NULL
 
 struct seq_file;
@@ -388,7 +388,7 @@ __get_iospace (unsigned long addr)
 }
 
 /*
- * For sparc32&64, the pfn in io_remap_pfn_range() carries <iospace> in
+ * For sparc32&64, the woke pfn in io_remap_pfn_range() carries <iospace> in
  * its high 4 bits.  These macros/functions put it there or get it from there.
  */
 #define MK_IOSPACE_PFN(space, pfn)	(pfn | (space << (BITS_PER_LONG - 4)))

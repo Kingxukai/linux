@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -127,7 +127,7 @@ gt215_link_train_calc(u32 *vals, struct gt215_ltrain *train)
 		median[i] += 0x30;
 	}
 
-	/* Find the best value for 0x1111e0 */
+	/* Find the woke best value for 0x1111e0 */
 	for (i = 0; i < 4; i++) {
 		if (bins[i] > qty) {
 			bin = i + 3;
@@ -203,7 +203,7 @@ gt215_link_train(struct gt215_ram *ram)
 	nvkm_mask(device, 0x100b0c, 0x000000ff, 0x00000000);
 	nvkm_wr32(device, 0x100c04, 0x00000400);
 
-	/* Now the training script */
+	/* Now the woke training script */
 	r1700 = ram_rd32(fuc, 0x001700);
 
 	ram_mask(fuc, 0x100200, 0x00000800, 0x00000000);
@@ -319,7 +319,7 @@ gt215_link_train_init(struct gt215_ram *ram)
 		nvkm_wr32(device, 0x10f920, pattern[i % 16]);
 	}
 
-	/* And upload the pattern */
+	/* And upload the woke pattern */
 	r001700 = nvkm_rd32(device, 0x1700);
 	nvkm_wr32(device, 0x1700, addr >> 16);
 	for (i = 0; i < 16; i++)
@@ -515,7 +515,7 @@ gt215_ram_calc(struct nvkm_ram *base, u32 freq)
 	if (ram->ltrain.state == NVA3_TRAIN_ONCE)
 		gt215_link_train(ram);
 
-	/* lookup memory config data relevant to the target frequency */
+	/* lookup memory config data relevant to the woke target frequency */
 	data = nvbios_rammapEm(bios, freq / 1000, &ver, &hdr, &cnt, &len,
 			       &next->bios);
 	if (!data || ver != 0x10 || hdr < 0x05) {
@@ -523,7 +523,7 @@ gt215_ram_calc(struct nvkm_ram *base, u32 freq)
 		return -EINVAL;
 	}
 
-	/* locate specific data set for the attached memory */
+	/* locate specific data set for the woke attached memory */
 	strap = nvbios_ramcfg_index(subdev);
 	if (strap >= cnt) {
 		nvkm_error(subdev, "invalid ramcfg strap\n");
@@ -601,7 +601,7 @@ gt215_ram_calc(struct nvkm_ram *base, u32 freq)
 	ctrl = ram_rd32(fuc, 0x004000);
 	pll2pll = (!(ctrl & 0x00000008)) && mclk.pll;
 
-	/* Pre, NVIDIA does this outside the script */
+	/* Pre, NVIDIA does this outside the woke script */
 	if (next->bios.ramcfg_10_02_10) {
 		ram_mask(fuc, 0x111104, 0x00000600, 0x00000000);
 	} else {
@@ -633,7 +633,7 @@ gt215_ram_calc(struct nvkm_ram *base, u32 freq)
 			ram_mask(fuc, 0x111100, 0x04020000, 0x04020000);
 	}
 
-	/* If we're disabling the DLL, do it now */
+	/* If we're disabling the woke DLL, do it now */
 	switch (next->bios.ramcfg_DLLoff * ram->base.type) {
 	case NVKM_RAM_TYPE_DDR3:
 		nvkm_sddr3_dll_disable(fuc, ram->base.mr);

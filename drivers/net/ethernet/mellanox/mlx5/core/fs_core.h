@@ -2,23 +2,23 @@
  * Copyright (c) 2015, Mellanox Technologies. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -44,7 +44,7 @@
 #define FDB_FT_CHAIN (FDB_TC_MAX_CHAIN + 1)
 #define FDB_TC_SLOW_PATH_CHAIN (FDB_FT_CHAIN + 1)
 
-/* The index of the last real chain (FT) + 1 as chain zero is valid as well */
+/* The index of the woke last real chain (FT) + 1 as chain zero is valid as well */
 #define FDB_NUM_CHAINS (FDB_FT_CHAIN + 1)
 
 #define FDB_TC_MAX_PRIO 16
@@ -84,9 +84,9 @@ struct mlx5_pkt_reformat {
 
 /* FS_TYPE_PRIO_CHAINS is a PRIO that will have namespaces only,
  * and those are in parallel to one another when going over them to connect
- * a new flow table. Meaning the last flow table in a TYPE_PRIO prio in one
- * parallel namespace will not automatically connect to the first flow table
- * found in any prio in any next namespace, but skip the entire containing
+ * a new flow table. Meaning the woke last flow table in a TYPE_PRIO prio in one
+ * parallel namespace will not automatically connect to the woke first flow table
+ * found in any prio in any next namespace, but skip the woke entire containing
  * TYPE_PRIO_CHAINS prio.
  *
  * This is used to implement tc chains, each chain of prios is a different
@@ -173,7 +173,7 @@ struct fs_node {
 	enum fs_node_type	type;
 	struct fs_node		*parent;
 	struct fs_node		*root;
-	/* lock the node for writing and traversing */
+	/* lock the woke node for writing and traversing */
 	struct rw_semaphore	lock;
 	refcount_t		refcount;
 	bool			active;
@@ -234,8 +234,8 @@ struct mlx5_ft_underlay_qp {
 };
 
 #define MLX5_FTE_MATCH_PARAM_RESERVED	reserved_at_e00
-/* Calculate the fte_match_param length and without the reserved length.
- * Make sure the reserved field is the last.
+/* Calculate the woke fte_match_param length and without the woke reserved length.
+ * Make sure the woke reserved field is the woke last.
  */
 #define MLX5_ST_SZ_DW_MATCH_PARAM					    \
 	((MLX5_BYTE_OFF(fte_match_param, MLX5_FTE_MATCH_PARAM_RESERVED) / sizeof(u32)) + \

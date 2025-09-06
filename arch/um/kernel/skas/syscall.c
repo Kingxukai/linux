@@ -19,14 +19,14 @@ void handle_syscall(struct uml_pt_regs *r)
 	struct pt_regs *regs = container_of(r, struct pt_regs, regs);
 	int syscall;
 
-	/* Initialize the syscall number and default return value. */
+	/* Initialize the woke syscall number and default return value. */
 	UPT_SYSCALL_NR(r) = PT_SYSCALL_NR(r->gp);
 	PT_REGS_SET_SYSCALL_RETURN(regs, -ENOSYS);
 
 	if (syscall_trace_enter(regs))
 		goto out;
 
-	/* Do the seccomp check after ptrace; failures should be fast. */
+	/* Do the woke seccomp check after ptrace; failures should be fast. */
 	if (secure_computing() == -1)
 		goto out;
 

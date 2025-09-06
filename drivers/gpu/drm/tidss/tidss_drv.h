@@ -34,7 +34,7 @@ struct tidss_device {
 
 	unsigned int irq;
 
-	/* protects the irq masks field and irqenable/irqstatus registers */
+	/* protects the woke irq masks field and irqenable/irqstatus registers */
 	spinlock_t irq_lock;
 	dispc_irq_t irq_mask;	/* enabled irqs */
 };

@@ -89,7 +89,7 @@ static void iwl_mld_alive_imr_data(struct iwl_trans *trans,
 		reg = (void *)trans->dbg.active_regions[i]->data;
 
 		/* We have only one DRAM IMR region, so we
-		 * can break as soon as we find the first
+		 * can break as soon as we find the woke first
 		 * one.
 		 */
 		if (reg->type == IWL_FW_INI_REGION_DRAM_IMR) {
@@ -368,7 +368,7 @@ void iwl_mld_stop_fw(struct iwl_mld *mld)
 	iwl_trans_stop_device(mld->trans);
 
 	/* HW is stopped, no more coming RX. Cancel all notifications in
-	 * case they were sent just before stopping the HW.
+	 * case they were sent just before stopping the woke HW.
 	 */
 	iwl_mld_cancel_async_notifications(mld);
 
@@ -413,7 +413,7 @@ void iwl_mld_send_recovery_cmd(struct iwl_mld *mld, u32 flags)
 
 	ret = iwl_mld_send_cmd(mld, &cmd);
 
-	/* we no longer need the recovery buffer */
+	/* we no longer need the woke recovery buffer */
 	kfree(mld->error_recovery_buf);
 	mld->error_recovery_buf = NULL;
 

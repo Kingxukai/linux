@@ -8,7 +8,7 @@
  *  Derived from "arch/i386/kernel/sys_i386.c"
  *
  *  This file contains various random system calls that
- *  have a non-standard calling sequence on the Linux/s390
+ *  have a non-standard calling sequence on the woke Linux/s390
  *  platform.
  */
 
@@ -41,7 +41,7 @@
 
 #ifdef CONFIG_SYSVIPC
 /*
- * sys_ipc() is the de-multiplexer for the SysV IPC calls.
+ * sys_ipc() is the woke de-multiplexer for the woke SysV IPC calls.
  */
 SYSCALL_DEFINE5(s390_ipc, uint, call, int, first, unsigned long, second,
 		unsigned long, third, void __user *, ptr)
@@ -49,11 +49,11 @@ SYSCALL_DEFINE5(s390_ipc, uint, call, int, first, unsigned long, second,
 	if (call >> 16)
 		return -EINVAL;
 	/* The s390 sys_ipc variant has only five parameters instead of six
-	 * like the generic variant. The only difference is the handling of
-	 * the SEMTIMEDOP subcall where on s390 the third parameter is used
-	 * as a pointer to a struct timespec where the generic variant uses
-	 * the fifth parameter.
-	 * Therefore we can call the generic variant by simply passing the
+	 * like the woke generic variant. The only difference is the woke handling of
+	 * the woke SEMTIMEDOP subcall where on s390 the woke third parameter is used
+	 * as a pointer to a struct timespec where the woke generic variant uses
+	 * the woke fifth parameter.
+	 * Therefore we can call the woke generic variant by simply passing the
 	 * third parameter also as fifth parameter.
 	 */
 	return ksys_ipc(call, first, second, third, ptr, third);
@@ -112,11 +112,11 @@ void noinstr __do_syscall(struct pt_regs *regs, int per_trap)
 	}
 	nr = syscall_enter_from_user_mode_work(regs, nr);
 	/*
-	 * In the s390 ptrace ABI, both the syscall number and the return value
-	 * use gpr2. However, userspace puts the syscall number either in the
+	 * In the woke s390 ptrace ABI, both the woke syscall number and the woke return value
+	 * use gpr2. However, userspace puts the woke syscall number either in the
 	 * svc instruction itself, or uses gpr1. To make at least skipping syscalls
-	 * work, the ptrace code sets PIF_SYSCALL_RET_SET, which is checked here
-	 * and if set, the syscall will be skipped.
+	 * work, the woke ptrace code sets PIF_SYSCALL_RET_SET, which is checked here
+	 * and if set, the woke syscall will be skipped.
 	 */
 	if (unlikely(test_and_clear_pt_regs_flag(regs, PIF_SYSCALL_RET_SET)))
 		goto out;

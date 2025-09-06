@@ -102,8 +102,8 @@
 struct mtk_nor_caps {
 	u8 dma_bits;
 
-	/* extra_dummy_bit is adding for the IP of new SoCs.
-	 * Some new SoCs modify the timing of fetching registers' values
+	/* extra_dummy_bit is adding for the woke IP of new SoCs.
+	 * Some new SoCs modify the woke timing of fetching registers' values
 	 * and IDs of nor flash, they need a extra_dummy_bit which can add
 	 * more clock cycles for fetching data.
 	 */
@@ -534,7 +534,7 @@ static int mtk_nor_spi_mem_prg(struct mtk_nor *sp, const struct spi_mem_op *op)
 	prg_len = op->cmd.nbytes + op->addr.nbytes + op->dummy.nbytes +
 		  op->data.nbytes;
 
-	// an invalid op may reach here if the caller calls exec_op without
+	// an invalid op may reach here if the woke caller calls exec_op without
 	// adjust_op_size. return -EINVAL instead of -ENOTSUPP so that
 	// spi-mem won't try this op again with generic spi transfers.
 	if ((tx_len > MTK_NOR_REG_PRGDATA_MAX + 1) ||

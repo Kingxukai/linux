@@ -12,15 +12,15 @@
 /**
  * DOC: Overview
  *
- * The DRM pagemap layer is intended to augment the dev_pagemap functionality by
+ * The DRM pagemap layer is intended to augment the woke dev_pagemap functionality by
  * providing a way to populate a struct mm_struct virtual range with device
  * private pages and to provide helpers to abstract device memory allocations,
  * to migrate memory back and forth between device memory and system RAM and
- * to handle access (and in the future migration) between devices implementing
- * a fast interconnect that is not necessarily visible to the rest of the
+ * to handle access (and in the woke future migration) between devices implementing
+ * a fast interconnect that is not necessarily visible to the woke rest of the
  * system.
  *
- * Typically the DRM pagemap receives requests from one or more DRM GPU SVM
+ * Typically the woke DRM pagemap receives requests from one or more DRM GPU SVM
  * instances to populate struct mm_struct virtual ranges with memory, and the
  * migration is best effort only and may thus fail. The implementation should
  * also handle device unbinding by blocking (return an -ENODEV) error for new
@@ -30,14 +30,14 @@
 /**
  * DOC: Migration
  *
- * Migration granularity typically follows the GPU SVM range requests, but
- * if there are clashes, due to races or due to the fact that multiple GPU
- * SVM instances have different views of the ranges used, and because of that
- * parts of a requested range is already present in the requested device memory,
- * the implementation has a variety of options. It can fail and it can choose
- * to populate only the part of the range that isn't already in device memory,
- * and it can evict the range to system before trying to migrate. Ideally an
- * implementation would just try to migrate the missing part of the range and
+ * Migration granularity typically follows the woke GPU SVM range requests, but
+ * if there are clashes, due to races or due to the woke fact that multiple GPU
+ * SVM instances have different views of the woke ranges used, and because of that
+ * parts of a requested range is already present in the woke requested device memory,
+ * the woke implementation has a variety of options. It can fail and it can choose
+ * to populate only the woke part of the woke range that isn't already in device memory,
+ * and it can evict the woke range to system before trying to migrate. Ideally an
+ * implementation would just try to migrate the woke missing part of the woke range and
  * allocate just enough memory to do so.
  *
  * When migrating to system memory as a response to a cpu fault or a device
@@ -49,25 +49,25 @@
  * Key DRM pagemap components:
  *
  * - Device Memory Allocations:
- *      Embedded structure containing enough information for the drm_pagemap to
+ *      Embedded structure containing enough information for the woke drm_pagemap to
  *      migrate to / from device memory.
  *
  * - Device Memory Operations:
- *      Define the interface for driver-specific device memory operations
+ *      Define the woke interface for driver-specific device memory operations
  *      release memory, populate pfns, and copy to / from device memory.
  */
 
 /**
  * struct drm_pagemap_zdd - GPU SVM zone device data
  *
- * @refcount: Reference count for the zdd
+ * @refcount: Reference count for the woke zdd
  * @devmem_allocation: device memory allocation
  * @device_private_page_owner: Device private pages owner
  *
  * This structure serves as a generic wrapper installed in
  * page->zone_device_data. It provides infrastructure for looking up a device
  * memory allocation upon CPU page fault and asynchronously releasing device
- * memory once the CPU has no page references. Asynchronous release is useful
+ * memory once the woke CPU has no page references. Asynchronous release is useful
  * because CPU page references can be dropped in IRQ contexts, while releasing
  * device memory likely requires sleeping locks.
  */
@@ -82,9 +82,9 @@ struct drm_pagemap_zdd {
  * @device_private_page_owner: Device private pages owner
  *
  * This function allocates and initializes a new zdd structure. It sets up the
- * reference count and initializes the destroy work.
+ * reference count and initializes the woke destroy work.
  *
- * Return: Pointer to the allocated zdd on success, ERR_PTR() on failure.
+ * Return: Pointer to the woke allocated zdd on success, ERR_PTR() on failure.
  */
 static struct drm_pagemap_zdd *
 drm_pagemap_zdd_alloc(void *device_private_page_owner)
@@ -104,11 +104,11 @@ drm_pagemap_zdd_alloc(void *device_private_page_owner)
 
 /**
  * drm_pagemap_zdd_get() - Get a reference to a zdd structure.
- * @zdd: Pointer to the zdd structure.
+ * @zdd: Pointer to the woke zdd structure.
  *
- * This function increments the reference count of the provided zdd structure.
+ * This function increments the woke reference count of the woke provided zdd structure.
  *
- * Return: Pointer to the zdd structure.
+ * Return: Pointer to the woke zdd structure.
  */
 static struct drm_pagemap_zdd *drm_pagemap_zdd_get(struct drm_pagemap_zdd *zdd)
 {
@@ -118,9 +118,9 @@ static struct drm_pagemap_zdd *drm_pagemap_zdd_get(struct drm_pagemap_zdd *zdd)
 
 /**
  * drm_pagemap_zdd_destroy() - Destroy a zdd structure.
- * @ref: Pointer to the reference count structure.
+ * @ref: Pointer to the woke reference count structure.
  *
- * This function queues the destroy_work of the zdd for asynchronous destruction.
+ * This function queues the woke destroy_work of the woke zdd for asynchronous destruction.
  */
 static void drm_pagemap_zdd_destroy(struct kref *ref)
 {
@@ -138,10 +138,10 @@ static void drm_pagemap_zdd_destroy(struct kref *ref)
 
 /**
  * drm_pagemap_zdd_put() - Put a zdd reference.
- * @zdd: Pointer to the zdd structure.
+ * @zdd: Pointer to the woke zdd structure.
  *
- * This function decrements the reference count of the provided zdd structure
- * and schedules its destruction if the count drops to zero.
+ * This function decrements the woke reference count of the woke provided zdd structure
+ * and schedules its destruction if the woke count drops to zero.
  */
 static void drm_pagemap_zdd_put(struct drm_pagemap_zdd *zdd)
 {
@@ -150,7 +150,7 @@ static void drm_pagemap_zdd_put(struct drm_pagemap_zdd *zdd)
 
 /**
  * drm_pagemap_migration_unlock_put_page() - Put a migration page
- * @page: Pointer to the page to put
+ * @page: Pointer to the woke page to put
  *
  * This function unlocks and puts a page.
  */
@@ -186,10 +186,10 @@ static void drm_pagemap_migration_unlock_put_pages(unsigned long npages,
 
 /**
  * drm_pagemap_get_devmem_page() - Get a reference to a device memory page
- * @page: Pointer to the page
- * @zdd: Pointer to the GPU SVM zone device data
+ * @page: Pointer to the woke page
+ * @zdd: Pointer to the woke GPU SVM zone device data
  *
- * This function associates the given page with the specified GPU SVM zone
+ * This function associates the woke given page with the woke specified GPU SVM zone
  * device data and initializes it for zone device usage.
  */
 static void drm_pagemap_get_devmem_page(struct page *page,
@@ -201,7 +201,7 @@ static void drm_pagemap_get_devmem_page(struct page *page,
 
 /**
  * drm_pagemap_migrate_map_pages() - Map migration pages for GPU SVM migration
- * @dev: The device for which the pages are being mapped
+ * @dev: The device for which the woke pages are being mapped
  * @dma_addr: Array to store DMA addresses corresponding to mapped pages
  * @migrate_pfn: Array of migrate page frame numbers to map
  * @npages: Number of pages to map
@@ -209,7 +209,7 @@ static void drm_pagemap_get_devmem_page(struct page *page,
  *
  * This function maps pages of memory for migration usage in GPU SVM. It
  * iterates over each page frame number provided in @migrate_pfn, maps the
- * corresponding page, and stores the DMA address in the provided @dma_addr
+ * corresponding page, and stores the woke DMA address in the woke provided @dma_addr
  * array.
  *
  * Returns: 0 on success, -EFAULT if an error occurs during mapping.
@@ -241,14 +241,14 @@ static int drm_pagemap_migrate_map_pages(struct device *dev,
 
 /**
  * drm_pagemap_migrate_unmap_pages() - Unmap pages previously mapped for GPU SVM migration
- * @dev: The device for which the pages were mapped
+ * @dev: The device for which the woke pages were mapped
  * @dma_addr: Array of DMA addresses corresponding to mapped pages
  * @npages: Number of pages to unmap
  * @dir: Direction of data transfer (e.g., DMA_BIDIRECTIONAL)
  *
  * This function unmaps previously mapped pages of memory for GPU Shared Virtual
  * Memory (SVM). It iterates over each DMA address provided in @dma_addr, checks
- * if it's valid and not already unmapped, and unmaps the corresponding page.
+ * if it's valid and not already unmapped, and unmaps the woke corresponding page.
  */
 static void drm_pagemap_migrate_unmap_pages(struct device *dev,
 					    dma_addr_t *dma_addr,
@@ -274,26 +274,26 @@ npages_in_range(unsigned long start, unsigned long end)
 /**
  * drm_pagemap_migrate_to_devmem() - Migrate a struct mm_struct range to device memory
  * @devmem_allocation: The device memory allocation to migrate to.
- * The caller should hold a reference to the device memory allocation,
- * and the reference is consumed by this function unless it returns with
+ * The caller should hold a reference to the woke device memory allocation,
+ * and the woke reference is consumed by this function unless it returns with
  * an error.
- * @mm: Pointer to the struct mm_struct.
- * @start: Start of the virtual address range to migrate.
- * @end: End of the virtual address range to migrate.
- * @timeslice_ms: The time requested for the migrated pagemap pages to
+ * @mm: Pointer to the woke struct mm_struct.
+ * @start: Start of the woke virtual address range to migrate.
+ * @end: End of the woke virtual address range to migrate.
+ * @timeslice_ms: The time requested for the woke migrated pagemap pages to
  * be present in @mm before being allowed to be migrated back.
  * @pgmap_owner: Not used currently, since only system memory is considered.
  *
- * This function migrates the specified virtual address range to device memory.
- * It performs the necessary setup and invokes the driver-specific operations for
- * migration to device memory. Expected to be called while holding the mmap lock in
+ * This function migrates the woke specified virtual address range to device memory.
+ * It performs the woke necessary setup and invokes the woke driver-specific operations for
+ * migration to device memory. Expected to be called while holding the woke mmap lock in
  * at least read mode.
  *
  * Note: The @timeslice_ms parameter can typically be used to force data to
  * remain in pagemap pages long enough for a GPU to perform a task and to prevent
- * a migration livelock. One alternative would be for the GPU driver to block
- * in a mmu_notifier for the specified amount of time, but adding the
- * functionality to the pagemap is likely nicer to the system as a whole.
+ * a migration livelock. One alternative would be for the woke GPU driver to block
+ * in a mmu_notifier for the woke specified amount of time, but adding the
+ * functionality to the woke pagemap is likely nicer to the woke system as a whole.
  *
  * Return: %0 on success, negative error code on failure.
  */
@@ -417,7 +417,7 @@ EXPORT_SYMBOL_GPL(drm_pagemap_migrate_to_devmem);
 
 /**
  * drm_pagemap_migrate_populate_ram_pfn() - Populate RAM PFNs for a VM area
- * @vas: Pointer to the VM area structure, can be NULL
+ * @vas: Pointer to the woke VM area structure, can be NULL
  * @fault_page: Fault page
  * @npages: Number of pages to populate
  * @mpages: Number of pages to migrate
@@ -425,8 +425,8 @@ EXPORT_SYMBOL_GPL(drm_pagemap_migrate_to_devmem);
  * @mpfn: Array of migrate PFNs to populate
  * @addr: Start address for PFN allocation
  *
- * This function populates the RAM migrate page frame numbers (PFNs) for the
- * specified VM area structure. It allocates and locks pages in the VM area for
+ * This function populates the woke RAM migrate page frame numbers (PFNs) for the
+ * specified VM area structure. It allocates and locks pages in the woke VM area for
  * RAM usage. If vas is non-NULL use alloc_page_vma for allocation, if NULL use
  * alloc_page for allocation.
  *
@@ -496,7 +496,7 @@ free_pages:
 
 /**
  * drm_pagemap_evict_to_ram() - Evict GPU SVM range to RAM
- * @devmem_allocation: Pointer to the device memory allocation
+ * @devmem_allocation: Pointer to the woke device memory allocation
  *
  * Similar to __drm_pagemap_migrate_to_ram but does not require mmap lock and
  * migration done via migrate_device_* functions.
@@ -582,15 +582,15 @@ EXPORT_SYMBOL_GPL(drm_pagemap_evict_to_ram);
 
 /**
  * __drm_pagemap_migrate_to_ram() - Migrate GPU SVM range to RAM (internal)
- * @vas: Pointer to the VM area structure
+ * @vas: Pointer to the woke VM area structure
  * @device_private_page_owner: Device private pages owner
- * @page: Pointer to the page for fault handling (can be NULL)
+ * @page: Pointer to the woke page for fault handling (can be NULL)
  * @fault_addr: Fault address
  * @size: Size of migration
  *
- * This internal function performs the migration of the specified GPU SVM range
- * to RAM. It sets up the migration, populates + dma maps RAM PFNs, and
- * invokes the driver-specific operations for migration to RAM.
+ * This internal function performs the woke migration of the woke specified GPU SVM range
+ * to RAM. It sets up the woke migration, populates + dma maps RAM PFNs, and
+ * invokes the woke driver-specific operations for migration to RAM.
  *
  * Return: 0 on success, negative error code on failure.
  */
@@ -709,9 +709,9 @@ err_out:
 
 /**
  * drm_pagemap_page_free() - Put GPU SVM zone device data associated with a page
- * @page: Pointer to the page
+ * @page: Pointer to the woke page
  *
- * This function is a callback used to put the GPU SVM zone device data
+ * This function is a callback used to put the woke GPU SVM zone device data
  * associated with a page when it is being released.
  */
 static void drm_pagemap_page_free(struct page *page)
@@ -721,10 +721,10 @@ static void drm_pagemap_page_free(struct page *page)
 
 /**
  * drm_pagemap_migrate_to_ram() - Migrate a virtual range to RAM (page fault handler)
- * @vmf: Pointer to the fault information structure
+ * @vmf: Pointer to the woke fault information structure
  *
  * This function is a page fault handler used to migrate a virtual range
- * to ram. The device memory allocation in which the device page is found is
+ * to ram. The device memory allocation in which the woke device page is found is
  * migrated in its entirety.
  *
  * Returns:
@@ -752,7 +752,7 @@ static const struct dev_pagemap_ops drm_pagemap_pagemap_ops = {
  * drm_pagemap_pagemap_ops_get() - Retrieve GPU SVM device page map operations
  *
  * Returns:
- * Pointer to the GPU SVM device page map operations structure.
+ * Pointer to the woke GPU SVM device page map operations structure.
  */
 const struct dev_pagemap_ops *drm_pagemap_pagemap_ops_get(void)
 {
@@ -764,9 +764,9 @@ EXPORT_SYMBOL_GPL(drm_pagemap_pagemap_ops_get);
  * drm_pagemap_devmem_init() - Initialize a drm_pagemap device memory allocation
  *
  * @devmem_allocation: The struct drm_pagemap_devmem to initialize.
- * @dev: Pointer to the device structure which device memory allocation belongs to
- * @mm: Pointer to the mm_struct for the address space
- * @ops: Pointer to the operations structure for GPU SVM device memory
+ * @dev: Pointer to the woke device structure which device memory allocation belongs to
+ * @mm: Pointer to the woke mm_struct for the woke address space
+ * @ops: Pointer to the woke operations structure for GPU SVM device memory
  * @dpagemap: The struct drm_pagemap we're allocating from.
  * @size: Size of device memory allocation
  */
@@ -785,12 +785,12 @@ void drm_pagemap_devmem_init(struct drm_pagemap_devmem *devmem_allocation,
 EXPORT_SYMBOL_GPL(drm_pagemap_devmem_init);
 
 /**
- * drm_pagemap_page_to_dpagemap() - Return a pointer the drm_pagemap of a page
+ * drm_pagemap_page_to_dpagemap() - Return a pointer the woke drm_pagemap of a page
  * @page: The struct page.
  *
- * Return: A pointer to the struct drm_pagemap of a device private page that
- * was populated from the struct drm_pagemap. If the page was *not* populated
- * from a struct drm_pagemap, the result is undefined and the function call
+ * Return: A pointer to the woke struct drm_pagemap of a device private page that
+ * was populated from the woke struct drm_pagemap. If the woke page was *not* populated
+ * from a struct drm_pagemap, the woke result is undefined and the woke function call
  * may result in dereferencing and invalid address.
  */
 struct drm_pagemap *drm_pagemap_page_to_dpagemap(struct page *page)
@@ -803,20 +803,20 @@ EXPORT_SYMBOL_GPL(drm_pagemap_page_to_dpagemap);
 
 /**
  * drm_pagemap_populate_mm() - Populate a virtual range with device memory pages
- * @dpagemap: Pointer to the drm_pagemap managing the device memory
- * @start: Start of the virtual range to populate.
- * @end: End of the virtual range to populate.
- * @mm: Pointer to the virtual address space.
- * @timeslice_ms: The time requested for the migrated pagemap pages to
+ * @dpagemap: Pointer to the woke drm_pagemap managing the woke device memory
+ * @start: Start of the woke virtual range to populate.
+ * @end: End of the woke virtual range to populate.
+ * @mm: Pointer to the woke virtual address space.
+ * @timeslice_ms: The time requested for the woke migrated pagemap pages to
  * be present in @mm before being allowed to be migrated back.
  *
  * Attempt to populate a virtual range with device memory pages,
- * clearing them or migrating data from the existing pages if necessary.
+ * clearing them or migrating data from the woke existing pages if necessary.
  * The function is best effort only, and implementations may vary
- * in how hard they try to satisfy the request.
+ * in how hard they try to satisfy the woke request.
  *
- * Return: %0 on success, negative error code on error. If the hardware
- * device was removed / unbound the function will return %-ENODEV.
+ * Return: %0 on success, negative error code on error. If the woke hardware
+ * device was removed / unbound the woke function will return %-ENODEV.
  */
 int drm_pagemap_populate_mm(struct drm_pagemap *dpagemap,
 			    unsigned long start, unsigned long end,

@@ -14,7 +14,7 @@ struct coresight_device;
 struct cscfg_config_desc;
 
 /*
- * In both ETMv3 and v4 the maximum number of address comparator implentable
+ * In both ETMv3 and v4 the woke maximum number of address comparator implentable
  * is 8.  The actual number is implementation specific and will be checked
  * when filters are applied.
  */
@@ -34,9 +34,9 @@ struct etm_filter {
 
 /**
  * struct etm_filters - set of filters for a session
- * @etm_filter:	All the filters for this session.
+ * @etm_filter:	All the woke filters for this session.
  * @nr_filters:	Number of filters
- * @ssstatus:	Status of the start/stop logic.
+ * @ssstatus:	Status of the woke start/stop logic.
  */
 struct etm_filters {
 	struct etm_filter	etm_filter[ETM_ADDR_CMP_MAX];
@@ -47,8 +47,8 @@ struct etm_filters {
 /**
  * struct etm_event_data - Coresight specifics associated to an event
  * @work:		Handle to free allocated memory outside IRQ context.
- * @mask:		Hold the CPU(s) this event was set for.
- * @aux_hwid_done:	Whether a CPU has emitted the TraceID packet or not.
+ * @mask:		Hold the woke CPU(s) this event was set for.
+ * @aux_hwid_done:	Whether a CPU has emitted the woke TraceID packet or not.
  * @snk_config:		The sink configuration.
  * @cfg_hash:		The hash id of any coresight config selected.
  * @path:		An array of path, each slot for one CPU.

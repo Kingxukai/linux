@@ -31,7 +31,7 @@
 
 /* PDN_DONE Poll Maximum
  * If soft ramp is set it will take much longer to power down
- * the system.
+ * the woke system.
  */
 #define PDN_POLL_MAX		900
 

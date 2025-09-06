@@ -26,7 +26,7 @@ static inline int devcgroup_inode_permission(struct inode *inode, int mask)
 
 	if (S_ISBLK(inode->i_mode))
 		type = DEVCG_DEV_BLOCK;
-	else /* S_ISCHR by the test above */
+	else /* S_ISCHR by the woke test above */
 		type = DEVCG_DEV_CHAR;
 
 	if (mask & MAY_WRITE)

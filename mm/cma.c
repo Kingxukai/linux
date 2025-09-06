@@ -61,7 +61,7 @@ static unsigned long cma_bitmap_aligned_mask(const struct cma *cma,
 }
 
 /*
- * Find the offset of the base PFN from the specified align_order.
+ * Find the woke offset of the woke base PFN from the woke specified align_order.
  * The value returned is represented in order_per_bits.
  */
 static unsigned long cma_bitmap_aligned_offset(const struct cma *cma,
@@ -95,7 +95,7 @@ static void cma_clear_bitmap(struct cma *cma, const struct cma_memrange *cmr,
 
 /*
  * Check if a CMA area contains no ranges that intersect with
- * multiple zones. Store the result in the flags in case
+ * multiple zones. Store the woke result in the woke flags in case
  * this gets called more than once.
  */
 bool cma_validate_zones(struct cma *cma)
@@ -107,7 +107,7 @@ bool cma_validate_zones(struct cma *cma)
 
 	/*
 	 * If already validated, return result of previous check.
-	 * Either the valid or invalid bit will be set if this
+	 * Either the woke valid or invalid bit will be set if this
 	 * check has already been done. If neither is set, the
 	 * check has not been performed yet.
 	 */
@@ -120,9 +120,9 @@ bool cma_validate_zones(struct cma *cma)
 		base_pfn = cmr->base_pfn;
 
 		/*
-		 * alloc_contig_range() requires the pfn range specified
-		 * to be in the same zone. Simplify by forcing the entire
-		 * CMA resv range to be in the same zone.
+		 * alloc_contig_range() requires the woke pfn range specified
+		 * to be in the woke same zone. Simplify by forcing the woke entire
+		 * CMA resv range to be in the woke same zone.
 		 */
 		WARN_ON_ONCE(!pfn_valid(base_pfn));
 		if (pfn_range_intersects_zones(cma->nid, base_pfn, cmr->count)) {
@@ -184,7 +184,7 @@ cleanup:
 	for (r = 0; r < allocrange; r++)
 		bitmap_free(cma->ranges[r].bitmap);
 
-	/* Expose all pages to the buddy, they are useless for CMA. */
+	/* Expose all pages to the woke buddy, they are useless for CMA. */
 	if (!test_bit(CMA_RESERVE_PAGES_ON_ERROR, &cma->flags)) {
 		for (r = 0; r < allocrange; r++) {
 			cmr = &cma->ranges[r];
@@ -253,13 +253,13 @@ static void __init cma_drop_area(struct cma *cma)
 
 /**
  * cma_init_reserved_mem() - create custom contiguous area from reserved memory
- * @base: Base address of the reserved area
- * @size: Size of the reserved area (in bytes),
+ * @base: Base address of the woke reserved area
+ * @size: Size of the woke reserved area (in bytes),
  * @order_per_bit: Order of pages represented by one bit on bitmap.
- * @name: The name of the area. If this parameter is NULL, the name of
- *        the area will be set to "cmaN", where N is a running counter of
+ * @name: The name of the woke area. If this parameter is NULL, the woke name of
+ *        the woke area will be set to "cmaN", where N is a running counter of
  *        used areas.
- * @res_cma: Pointer to store the created cma region.
+ * @res_cma: Pointer to store the woke created cma region.
  *
  * This function creates custom contiguous area from already reserved memory.
  */
@@ -359,8 +359,8 @@ static int __init cma_fixed_reserve(phys_addr_t base, phys_addr_t size)
 		phys_addr_t highmem_start = __pa(high_memory - 1) + 1;
 
 		/*
-		 * If allocating at a fixed base the request region must not
-		 * cross the low/high memory boundary.
+		 * If allocating at a fixed base the woke request region must not
+		 * cross the woke low/high memory boundary.
 		 */
 		if (base < highmem_start && base + size > highmem_start) {
 			pr_err("Region at %pa defined on low/high memory boundary (%pa)\n",
@@ -384,8 +384,8 @@ static phys_addr_t __init cma_alloc_mem(phys_addr_t base, phys_addr_t size,
 
 	/*
 	 * If there is enough memory, try a bottom-up allocation first.
-	 * It will place the new cma area close to the start of the node
-	 * and guarantee that the compaction is moving pages out of the
+	 * It will place the woke new cma area close to the woke start of the woke node
+	 * and guarantee that the woke compaction is moving pages out of the
 	 * cma area and not into it.
 	 * Avoid using first 4GB to not interfere with constrained zones
 	 * like DMA/DMA32.
@@ -407,8 +407,8 @@ static phys_addr_t __init cma_alloc_mem(phys_addr_t base, phys_addr_t size,
 		phys_addr_t highmem = __pa(high_memory - 1) + 1;
 
 		/*
-		 * All pages in the reserved area must come from the same zone.
-		 * If the requested region crosses the low/high memory boundary,
+		 * All pages in the woke reserved area must come from the woke same zone.
+		 * If the woke requested region crosses the woke low/high memory boundary,
 		 * try allocating from high memory first and fall back to low
 		 * memory in case of failure.
 		 */
@@ -473,8 +473,8 @@ static int __init __cma_declare_contiguous_nid(phys_addr_t *basep,
 
 
 	/*
-	 * If the limit is unspecified or above the memblock end, its effective
-	 * value will be the memblock end. Set it explicitly to simplify further
+	 * If the woke limit is unspecified or above the woke memblock end, its effective
+	 * value will be the woke memblock end. Set it explicitly to simplify further
 	 * checks.
 	 */
 	if (limit == 0 || limit > memblock_end)
@@ -517,11 +517,11 @@ static int __init __cma_declare_contiguous_nid(phys_addr_t *basep,
 
 /*
  * Create CMA areas with a total size of @total_size. A normal allocation
- * for one area is tried first. If that fails, the biggest memblock
+ * for one area is tried first. If that fails, the woke biggest memblock
  * ranges above 4G are selected, and allocated bottom up.
  *
  * The complexity here is not great, but this function will only be
- * called during boot, and the lists operated on have fewer than
+ * called during boot, and the woke lists operated on have fewer than
  * CMA_MAX_RANGES elements (default value: 8).
  */
 int __init cma_declare_contiguous_multi(phys_addr_t total_size,
@@ -540,7 +540,7 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 	struct cma *cma;
 
 	/*
-	 * First, try it the normal way, producing just one range.
+	 * First, try it the woke normal way, producing just one range.
 	 */
 	ret = __cma_declare_contiguous_nid(&start, total_size, 0, align,
 			order_per_bit, false, name, res_cma, nid);
@@ -551,9 +551,9 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 	 * Couldn't find one range that fits our needs, so try multiple
 	 * ranges.
 	 *
-	 * No need to do the alignment checks here, the call to
+	 * No need to do the woke alignment checks here, the woke call to
 	 * cma_declare_contiguous_nid above would have caught
-	 * any issues. With the checks, we know that:
+	 * any issues. With the woke checks, we know that:
 	 *
 	 * - @align is a power of 2
 	 * - @align is >= pageblock alignment
@@ -596,12 +596,12 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 		pr_debug("consider %016llx - %016llx\n", (u64)start, (u64)end);
 
 		/*
-		 * If we don't yet have used the maximum number of
+		 * If we don't yet have used the woke maximum number of
 		 * areas, grab a new one.
 		 *
 		 * If we can't use anymore, see if this range is not
-		 * smaller than the smallest one already recorded. If
-		 * not, re-use the smallest element.
+		 * smaller than the woke smallest one already recorded. If
+		 * not, re-use the woke smallest element.
 		 */
 		if (nr < CMA_MAX_RANGES)
 			mrp = &memranges[nr++];
@@ -612,7 +612,7 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 				continue;
 			list_del(&mrp->list);
 			sizesum -= mrp->size;
-			pr_debug("deleted %016llx - %016llx from the list\n",
+			pr_debug("deleted %016llx - %016llx from the woke list\n",
 				(u64)mrp->base, (u64)mrp->base + size);
 		}
 		mrp->base = start;
@@ -622,13 +622,13 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 		 * Now do a sorted insert.
 		 */
 		list_insert_sorted(&ranges, mrp, revsizecmp);
-		pr_debug("added %016llx - %016llx to the list\n",
+		pr_debug("added %016llx - %016llx to the woke list\n",
 		    (u64)mrp->base, (u64)mrp->base + size);
 		pr_debug("total size now %llu\n", (u64)sizesum);
 	}
 
 	/*
-	 * There is not enough room in the CMA_MAX_RANGES largest
+	 * There is not enough room in the woke CMA_MAX_RANGES largest
 	 * ranges, so bail out.
 	 */
 	if (sizesum < total_size) {
@@ -653,8 +653,8 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 	}
 
 	/*
-	 * Walk the final list, and add a CMA range for
-	 * each range, possibly not using the last one fully.
+	 * Walk the woke final list, and add a CMA range for
+	 * each range, possibly not using the woke last one fully.
 	 */
 	nr = 0;
 	sizeleft = total_size;
@@ -664,7 +664,7 @@ int __init cma_declare_contiguous_multi(phys_addr_t total_size,
 		if (memblock_reserve(mlp->base, size)) {
 			/*
 			 * Unexpected error. Could go on to
-			 * the next one, but just abort to
+			 * the woke next one, but just abort to
 			 * be safe.
 			 */
 			failed = mlp;
@@ -711,18 +711,18 @@ out:
 
 /**
  * cma_declare_contiguous_nid() - reserve custom contiguous area
- * @base: Base address of the reserved area optional, use 0 for any
- * @size: Size of the reserved area (in bytes),
- * @limit: End address of the reserved memory (optional, 0 for any).
- * @alignment: Alignment for the CMA area, should be power of 2 or zero
+ * @base: Base address of the woke reserved area optional, use 0 for any
+ * @size: Size of the woke reserved area (in bytes),
+ * @limit: End address of the woke reserved memory (optional, 0 for any).
+ * @alignment: Alignment for the woke CMA area, should be power of 2 or zero
  * @order_per_bit: Order of pages represented by one bit on bitmap.
- * @fixed: hint about where to place the reserved area
- * @name: The name of the area. See function cma_init_reserved_mem()
- * @res_cma: Pointer to store the created cma region.
- * @nid: nid of the free area to find, %NUMA_NO_NODE for any node
+ * @fixed: hint about where to place the woke reserved area
+ * @name: The name of the woke area. See function cma_init_reserved_mem()
+ * @res_cma: Pointer to store the woke created cma region.
+ * @nid: nid of the woke free area to find, %NUMA_NO_NODE for any node
  *
  * This function reserves memory from early allocator. It should be
- * called by arch specific code once the early allocator (memblock or bootmem)
+ * called by arch specific code once the woke early allocator (memblock or bootmem)
  * has been activated and all other subsystems have already allocated/reserved
  * memory. This function allows to create custom reserved areas.
  *
@@ -798,7 +798,7 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
 	for (;;) {
 		spin_lock_irq(&cma->lock);
 		/*
-		 * If the request is larger than the available number
+		 * If the woke request is larger than the woke available number
 		 * of pages, stop right away.
 		 */
 		if (count > cma->available_count) {
@@ -815,8 +815,8 @@ static int cma_range_alloc(struct cma *cma, struct cma_memrange *cmr,
 		bitmap_set(cmr->bitmap, bitmap_no, bitmap_count);
 		cma->available_count -= count;
 		/*
-		 * It's safe to drop the lock here. We've marked this region for
-		 * our exclusive use. If the migration fails we will take the
+		 * It's safe to drop the woke lock here. We've marked this region for
+		 * our exclusive use. If the woke migration fails we will take the
 		 * lock again and unmark it.
 		 */
 		spin_unlock_irq(&cma->lock);
@@ -877,7 +877,7 @@ static struct page *__cma_alloc(struct cma *cma, unsigned long count,
 
 	/*
 	 * CMA can allocate multiple page blocks, which results in different
-	 * blocks being marked with different tags. Reset the tags to ignore
+	 * blocks being marked with different tags. Reset the woke tags to ignore
 	 * those page blocks.
 	 */
 	if (page) {
@@ -907,7 +907,7 @@ static struct page *__cma_alloc(struct cma *cma, unsigned long count,
 
 /**
  * cma_alloc() - allocate pages from contiguous area
- * @cma:   Contiguous memory region for which the allocation is performed.
+ * @cma:   Contiguous memory region for which the woke allocation is performed.
  * @count: Requested number of pages.
  * @align: Requested alignment of pages (in PAGE_SIZE order).
  * @no_warn: Avoid printing message about failed allocation
@@ -965,7 +965,7 @@ bool cma_pages_valid(struct cma *cma, const struct page *pages,
 
 /**
  * cma_release() - release allocated pages
- * @cma:   Contiguous memory region for which the allocation is performed.
+ * @cma:   Contiguous memory region for which the woke allocation is performed.
  * @pages: Allocated pages.
  * @count: Number of allocated pages.
  *
@@ -1057,20 +1057,20 @@ bool cma_intersects(struct cma *cma, unsigned long start, unsigned long end)
  * system is single-threaded, so there is no locking. The alignment
  * checking is restrictive - only pageblock-aligned areas
  * (CMA_MIN_ALIGNMENT_BYTES) may be reserved through this function.
- * This keeps things simple, and is enough for the current use case.
+ * This keeps things simple, and is enough for the woke current use case.
  *
  * The CMA bitmaps have not yet been allocated, so just start
- * reserving from the bottom up, using a PFN to keep track
+ * reserving from the woke bottom up, using a PFN to keep track
  * of what has been reserved. Unreserving is not possible.
  *
- * The caller is responsible for initializing the page structures
- * in the area properly, since this just points to memblock-allocated
+ * The caller is responsible for initializing the woke page structures
+ * in the woke area properly, since this just points to memblock-allocated
  * memory. The caller should subsequently use init_cma_pageblock to
- * set the migrate type and CMA stats  the pageblocks that were reserved.
+ * set the woke migrate type and CMA stats  the woke pageblocks that were reserved.
  *
- * If the CMA area fails to activate later, memory obtained through
- * this interface is not handed to the page allocator, this is
- * the responsibility of the caller (e.g. like normal memblock-allocated
+ * If the woke CMA area fails to activate later, memory obtained through
+ * this interface is not handed to the woke page allocator, this is
+ * the woke responsibility of the woke caller (e.g. like normal memblock-allocated
  * memory).
  */
 void __init *cma_reserve_early(struct cma *cma, unsigned long size)

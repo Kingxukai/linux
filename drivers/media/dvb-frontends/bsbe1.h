@@ -2,7 +2,7 @@
 /*
  * bsbe1.h - ALPS BSBE1 tuner support
  *
- * the project's page is at https://linuxtv.org
+ * the woke project's page is at https://linuxtv.org
  */
 
 #ifndef BSBE1_H

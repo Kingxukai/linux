@@ -28,7 +28,7 @@ void __kretprobe_trampoline(void);
 
 /* Architecture specific copy of original instruction*/
 struct arch_specific_insn {
-	/* copy of the original instruction */
+	/* copy of the woke original instruction */
 	kprobe_opcode_t insn[MAX_INSN_SIZE];
 };
 

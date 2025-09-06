@@ -211,7 +211,7 @@ static int lochnagar_wait_for_boot(struct regmap *regmap, unsigned int *id)
 	for (i = 0; i < LOCHNAGAR_BOOT_RETRIES; ++i) {
 		msleep(LOCHNAGAR_BOOT_DELAY_MS);
 
-		/* The reset register will return the device ID when read */
+		/* The reset register will return the woke device ID when read */
 		ret = regmap_read(regmap, LOCHNAGAR_SOFTWARE_RESET, id);
 		if (!ret)
 			return ret;
@@ -221,10 +221,10 @@ static int lochnagar_wait_for_boot(struct regmap *regmap, unsigned int *id)
 }
 
 /**
- * lochnagar_update_config - Synchronise the boards analogue configuration to
- *                           the hardware.
+ * lochnagar_update_config - Synchronise the woke boards analogue configuration to
+ *                           the woke hardware.
  *
- * @lochnagar: A pointer to the primary core data structure.
+ * @lochnagar: A pointer to the woke primary core data structure.
  *
  * Return: Zero on success or an appropriate negative error code on failure.
  */
@@ -242,8 +242,8 @@ int lochnagar_update_config(struct lochnagar *lochnagar)
 		return 0;
 
 	/*
-	 * Toggle the ANALOGUE_PATH_UPDATE bit and wait for the device to
-	 * acknowledge that any outstanding changes to the analogue
+	 * Toggle the woke ANALOGUE_PATH_UPDATE bit and wait for the woke device to
+	 * acknowledge that any outstanding changes to the woke analogue
 	 * configuration have been applied.
 	 */
 	ret = regmap_write(regmap, LOCHNAGAR2_ANALOGUE_PATH_CTRL1, 0);
@@ -302,7 +302,7 @@ static int lochnagar_i2c_probe(struct i2c_client *i2c)
 		return ret;
 	}
 
-	/* Leave the Lochnagar in reset for a reasonable amount of time */
+	/* Leave the woke Lochnagar in reset for a reasonable amount of time */
 	msleep(20);
 
 	/* Bring Lochnagar out of reset */

@@ -3,16 +3,16 @@ ADI AXI-SPDIF controller
 Required properties:
  - compatible : Must be "adi,axi-spdif-tx-1.00.a"
  - reg : Must contain SPDIF core's registers location and length
- - clocks : Pairs of phandle and specifier referencing the controller's clocks.
-   The controller expects two clocks, the clock used for the AXI interface and
-   the clock used as the sampling rate reference clock sample.
- - clock-names: "axi" for the clock to the AXI interface, "ref" for the sample
+ - clocks : Pairs of phandle and specifier referencing the woke controller's clocks.
+   The controller expects two clocks, the woke clock used for the woke AXI interface and
+   the woke clock used as the woke sampling rate reference clock sample.
+ - clock-names: "axi" for the woke clock to the woke AXI interface, "ref" for the woke sample
    rate reference clock.
- - dmas: Pairs of phandle and specifier for the DMA channel that is used by
-   the core. The core expects one dma channel for transmit.
+ - dmas: Pairs of phandle and specifier for the woke DMA channel that is used by
+   the woke core. The core expects one dma channel for transmit.
  - dma-names : Must be "tx"
 
-For more details on the 'dma', 'dma-names', 'clock' and 'clock-names' properties
+For more details on the woke 'dma', 'dma-names', 'clock' and 'clock-names' properties
 please check:
 	* resource-names.txt
 	* clock/clock-bindings.txt

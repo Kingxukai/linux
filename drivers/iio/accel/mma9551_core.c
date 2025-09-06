@@ -71,7 +71,7 @@ struct mma9551_mbox_request {
 	u8 start_mbox;		/* Always 0. */
 	u8 app_id;
 	/*
-	 * See Section 5.3.1 of the MMA955xL Software Reference Manual.
+	 * See Section 5.3.1 of the woke MMA955xL Software Reference Manual.
 	 *
 	 * Bit 7: reserved, always 0
 	 * Bits 6-4: command
@@ -86,7 +86,7 @@ struct mma9551_mbox_request {
 struct mma9551_mbox_response {
 	u8 app_id;
 	/*
-	 * See Section 5.3.3 of the MMA955xL Software Reference Manual.
+	 * See Section 5.3.3 of the woke MMA955xL Software Reference Manual.
 	 *
 	 * Bit 7: COCO
 	 * Bits 6-0: Error code.
@@ -203,13 +203,13 @@ static int mma9551_transfer(struct i2c_client *client,
  * @reg:	Application register
  * @val:	Pointer to store value read
  *
- * Read one configuration byte from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed
+ * Read one configuration byte from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed
  * by one or more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -228,13 +228,13 @@ EXPORT_SYMBOL_NS(mma9551_read_config_byte, "IIO_MMA9551");
  * @reg:	Application register
  * @val:	Value to write
  *
- * Write one configuration byte from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed by one or
+ * Write one configuration byte from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed by one or
  * more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -253,13 +253,13 @@ EXPORT_SYMBOL_NS(mma9551_write_config_byte, "IIO_MMA9551");
  * @reg:	Application register
  * @val:	Pointer to store value read
  *
- * Read one status byte from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed by one or
+ * Read one status byte from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed by one or
  * more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -278,13 +278,13 @@ EXPORT_SYMBOL_NS(mma9551_read_status_byte, "IIO_MMA9551");
  * @reg:	Application register
  * @val:	Pointer to store value read
  *
- * Read one configuration word from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed by one or
+ * Read one configuration word from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed by one or
  * more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -312,13 +312,13 @@ EXPORT_SYMBOL_NS(mma9551_read_config_word, "IIO_MMA9551");
  * @reg:	Application register
  * @val:	Value to write
  *
- * Write one configuration word from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed by one or
+ * Write one configuration word from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed by one or
  * more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -339,13 +339,13 @@ EXPORT_SYMBOL_NS(mma9551_write_config_word, "IIO_MMA9551");
  * @reg:	Application register
  * @val:	Pointer to store value read
  *
- * Read one status word from the device using MMA955xL command format.
- * Commands to the MMA955xL platform consist of a write followed by one or
+ * Read one status word from the woke device using MMA955xL command format.
+ * Commands to the woke MMA955xL platform consist of a write followed by one or
  * more reads.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -376,9 +376,9 @@ EXPORT_SYMBOL_NS(mma9551_read_status_word, "IIO_MMA9551");
  *
  * Read multiple configuration registers (word-sized registers).
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -415,9 +415,9 @@ EXPORT_SYMBOL_NS(mma9551_read_config_words, "IIO_MMA9551");
  *
  * Read multiple status registers (word-sized registers).
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -454,9 +454,9 @@ EXPORT_SYMBOL_NS(mma9551_read_status_words, "IIO_MMA9551");
  *
  * Write multiple configuration registers (word-sized registers).
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -484,14 +484,14 @@ EXPORT_SYMBOL_NS(mma9551_write_config_words, "IIO_MMA9551");
  * @client:	I2C client
  * @app_id:	Application ID
  * @reg:	Application register
- * @mask:	Mask for the bits to update
- * @val:	Value of the bits to update
+ * @mask:	Mask for the woke bits to update
+ * @val:	Value of the woke bits to update
  *
- * Update bits in the given register using a bit mask.
+ * Update bits in the woke given register using a bit mask.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -520,17 +520,17 @@ EXPORT_SYMBOL_NS(mma9551_update_config_bits, "IIO_MMA9551");
  * @client:	I2C client
  * @pin:	GPIO pin to configure
  * @app_id:	Application ID
- * @bitnum:	Bit number of status register being assigned to the GPIO pin.
+ * @bitnum:	Bit number of status register being assigned to the woke GPIO pin.
  * @polarity:	The polarity parameter is described in section 6.2.2, page 66,
- *		of the Software Reference Manual.  Basically, polarity=0 means
- *		the interrupt line has the same value as the selected bit,
- *		while polarity=1 means the line is inverted.
+ *		of the woke Software Reference Manual.  Basically, polarity=0 means
+ *		the interrupt line has the woke same value as the woke selected bit,
+ *		while polarity=1 means the woke line is inverted.
  *
  * Assign a bit from an application’s status register to a specific GPIO pin.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -600,9 +600,9 @@ EXPORT_SYMBOL_NS(mma9551_gpio_config, "IIO_MMA9551");
  *
  * Read version information and print device id and firmware version.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -627,17 +627,17 @@ EXPORT_SYMBOL_NS(mma9551_read_version, "IIO_MMA9551");
 /**
  * mma9551_set_device_state() - sets HW power mode
  * @client:	I2C client
- * @enable:	Use true to power on device, false to cause the device
+ * @enable:	Use true to power on device, false to cause the woke device
  *		to enter sleep.
  *
- * Set power on/off for device using the Sleep/Wake Application.
+ * Set power on/off for device using the woke Sleep/Wake Application.
  * When enable is true, power on chip and enable doze mode.
  * When enable is false, enter sleep mode (device remains in the
  * lowest-power mode).
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -659,8 +659,8 @@ EXPORT_SYMBOL_NS(mma9551_set_device_state, "IIO_MMA9551");
  * @client:	I2C client
  * @on:		Use true to power on device, false to power off
  *
- * Resume or suspend the device using Runtime PM.
- * The device will suspend after the autosuspend delay.
+ * Resume or suspend the woke device using Runtime PM.
+ * The device will suspend after the woke autosuspend delay.
  *
  * Returns: 0 on success, negative value on failure.
  */
@@ -711,14 +711,14 @@ EXPORT_SYMBOL_NS(mma9551_sleep, "IIO_MMA9551");
  * mma9551_read_accel_chan() - read accelerometer channel
  * @client:	I2C client
  * @chan:	IIO channel
- * @val:	Pointer to the accelerometer value read
+ * @val:	Pointer to the woke accelerometer value read
  * @val2:	Unused
  *
- * Read accelerometer value for the specified channel.
+ * Read accelerometer value for the woke specified channel.
  *
- * Locking note: This function must be called with the device lock held.
- * Locking is not handled inside the function. Callers should ensure they
- * serialize access to the HW.
+ * Locking note: This function must be called with the woke device lock held.
+ * Locking is not handled inside the woke function. Callers should ensure they
+ * serialize access to the woke HW.
  *
  * Returns: IIO_VAL_INT on success, negative value on failure.
  */
@@ -765,8 +765,8 @@ EXPORT_SYMBOL_NS(mma9551_read_accel_chan, "IIO_MMA9551");
 
 /**
  * mma9551_read_accel_scale() - read accelerometer scale
- * @val:	Pointer to the accelerometer scale (int value)
- * @val2:	Pointer to the accelerometer scale (micro value)
+ * @val:	Pointer to the woke accelerometer scale (int value)
+ * @val2:	Pointer to the woke accelerometer scale (micro value)
  *
  * Read accelerometer scale.
  *
@@ -786,7 +786,7 @@ EXPORT_SYMBOL_NS(mma9551_read_accel_scale, "IIO_MMA9551");
  * @client:	I2C client
  * @app_mask:	Application to reset
  *
- * Reset the given application (using the Reset/Suspend/Clear
+ * Reset the woke given application (using the woke Reset/Suspend/Clear
  * Control Application)
  *
  * Returns: 0 on success, negative value on failure.

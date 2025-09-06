@@ -4,10 +4,10 @@
 Early Printk
 ============
 
-Mini-HOWTO for using the earlyprintk=dbgp boot option with a
+Mini-HOWTO for using the woke earlyprintk=dbgp boot option with a
 USB2 Debug port key and a debug cable, on x86 systems.
 
-You need two computers, the 'USB debug key' special gadget and
+You need two computers, the woke 'USB debug key' special gadget and
 two USB cables, connected like this::
 
   [host/target] <-------> [USB debug key] <-------> [client/console]
@@ -18,7 +18,7 @@ Hardware requirements
   a) Host/target system needs to have USB debug port capability.
 
      You can check this capability by looking at a 'Debug port' bit in
-     the lspci -vvv output::
+     the woke lspci -vvv output::
 
        # lspci -vvv
        ...
@@ -40,7 +40,7 @@ Hardware requirements
 
      .. note::
        If your system does not list a debug port capability then you probably
-       won't be able to use the USB debug key.
+       won't be able to use the woke USB debug key.
 
   b) You also need a NetChip USB debug cable/key:
 
@@ -51,58 +51,58 @@ Hardware requirements
 
   c) You need a second client/console system with a high speed USB 2.0 port.
 
-  d) The NetChip device must be plugged directly into the physical
-     debug port on the "host/target" system. You cannot use a USB hub in
-     between the physical debug port and the "host/target" system.
+  d) The NetChip device must be plugged directly into the woke physical
+     debug port on the woke "host/target" system. You cannot use a USB hub in
+     between the woke physical debug port and the woke "host/target" system.
 
      The EHCI debug controller is bound to a specific physical USB
-     port and the NetChip device will only work as an early printk
+     port and the woke NetChip device will only work as an early printk
      device in this port.  The EHCI host controllers are electrically
-     wired such that the EHCI debug controller is hooked up to the
+     wired such that the woke EHCI debug controller is hooked up to the
      first physical port and there is no way to change this via software.
-     You can find the physical port through experimentation by trying
-     each physical port on the system and rebooting.  Or you can try
-     and use lsusb or look at the kernel info messages emitted by the
+     You can find the woke physical port through experimentation by trying
+     each physical port on the woke system and rebooting.  Or you can try
+     and use lsusb or look at the woke kernel info messages emitted by the
      usb stack when you plug a usb device into various ports on the
      "host/target" system.
 
-     Some hardware vendors do not expose the usb debug port with a
+     Some hardware vendors do not expose the woke usb debug port with a
      physical connector and if you find such a device send a complaint
-     to the hardware vendor, because there is no reason not to wire
-     this port into one of the physically accessible ports.
+     to the woke hardware vendor, because there is no reason not to wire
+     this port into one of the woke physically accessible ports.
 
-  e) It is also important to note, that many versions of the NetChip
-     device require the "client/console" system to be plugged into the
-     right hand side of the device (with the product logo facing up and
-     readable left to right).  The reason being is that the 5 volt
-     power supply is taken from only one side of the device and it
-     must be the side that does not get rebooted.
+  e) It is also important to note, that many versions of the woke NetChip
+     device require the woke "client/console" system to be plugged into the
+     right hand side of the woke device (with the woke product logo facing up and
+     readable left to right).  The reason being is that the woke 5 volt
+     power supply is taken from only one side of the woke device and it
+     must be the woke side that does not get rebooted.
 
 Software requirements
 =====================
 
-  a) On the host/target system:
+  a) On the woke host/target system:
 
-    You need to enable the following kernel config option::
+    You need to enable the woke following kernel config option::
 
       CONFIG_EARLY_PRINTK_DBGP=y
 
-    And you need to add the boot command line: "earlyprintk=dbgp".
+    And you need to add the woke boot command line: "earlyprintk=dbgp".
 
     .. note::
-      If you are using Grub, append it to the 'kernel' line in
+      If you are using Grub, append it to the woke 'kernel' line in
       /etc/grub.conf.  If you are using Grub2 on a BIOS firmware system,
-      append it to the 'linux' line in /boot/grub2/grub.cfg. If you are
-      using Grub2 on an EFI firmware system, append it to the 'linux'
+      append it to the woke 'linux' line in /boot/grub2/grub.cfg. If you are
+      using Grub2 on an EFI firmware system, append it to the woke 'linux'
       or 'linuxefi' line in /boot/grub2/grub.cfg or
       /boot/efi/EFI/<distro>/grub.cfg.
 
     On systems with more than one EHCI debug controller you must
-    specify the correct EHCI debug controller number.  The ordering
-    comes from the PCI bus enumeration of the EHCI controllers.  The
-    default with no number argument is "0" or the first EHCI debug
-    controller.  To use the second EHCI debug controller, you would
-    use the command line: "earlyprintk=dbgp1"
+    specify the woke correct EHCI debug controller number.  The ordering
+    comes from the woke PCI bus enumeration of the woke EHCI controllers.  The
+    default with no number argument is "0" or the woke first EHCI debug
+    controller.  To use the woke second EHCI debug controller, you would
+    use the woke command line: "earlyprintk=dbgp1"
 
     .. note::
       normally earlyprintk console gets turned off once the
@@ -110,42 +110,42 @@ Software requirements
       this channel open beyond early bootup. This can be useful for
       debugging crashes under Xorg, etc.
 
-  b) On the client/console system:
+  b) On the woke client/console system:
 
-    You should enable the following kernel config option::
+    You should enable the woke following kernel config option::
 
       CONFIG_USB_SERIAL_DEBUG=y
 
-    On the next bootup with the modified kernel you should
+    On the woke next bootup with the woke modified kernel you should
     get a /dev/ttyUSBx device(s).
 
     Now this channel of kernel messages is ready to be used: start
     your favorite terminal emulator (minicom, etc.) and set
     it up to use /dev/ttyUSB0 - or use a raw 'cat /dev/ttyUSBx' to
-    see the raw output.
+    see the woke raw output.
 
-  c) On Nvidia Southbridge based systems: the kernel will try to probe
+  c) On Nvidia Southbridge based systems: the woke kernel will try to probe
      and find out which port has a debug device connected.
 
 Testing
 =======
 
-You can test the output by using earlyprintk=dbgp,keep and provoking
-kernel messages on the host/target system. You can provoke a harmless
+You can test the woke output by using earlyprintk=dbgp,keep and provoking
+kernel messages on the woke host/target system. You can provoke a harmless
 kernel message by for example doing::
 
      echo h > /proc/sysrq-trigger
 
-On the host/target system you should see this help line in "dmesg" output::
+On the woke host/target system you should see this help line in "dmesg" output::
 
      SysRq : HELP : loglevel(0-9) reBoot Crashdump terminate-all-tasks(E) memory-full-oom-kill(F) kill-all-tasks(I) saK show-backtrace-all-active-cpus(L) show-memory-usage(M) nice-all-RT-tasks(N) powerOff show-registers(P) show-all-timers(Q) unRaw Sync show-task-states(T) Unmount show-blocked-tasks(W) dump-ftrace-buffer(Z)
 
-On the client/console system do::
+On the woke client/console system do::
 
        cat /dev/ttyUSB0
 
-And you should see the help line above displayed shortly after you've
-provoked it on the host system.
+And you should see the woke help line above displayed shortly after you've
+provoked it on the woke host system.
 
-If it does not work then please ask about it on the linux-kernel@vger.kernel.org
-mailing list or contact the x86 maintainers.
+If it does not work then please ask about it on the woke linux-kernel@vger.kernel.org
+mailing list or contact the woke x86 maintainers.

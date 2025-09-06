@@ -7,20 +7,20 @@ Production Release P1.00 -- October 10, 1994
 M68060 Software Package Copyright © 1993, 1994 Motorola Inc.  All rights reserved.
 
 THE SOFTWARE is provided on an "AS IS" basis and without warranty.
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 MOTOROLA DISCLAIMS ALL WARRANTIES WHETHER EXPRESS OR IMPLIED,
 INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE
-and any warranty against infringement with regard to the SOFTWARE
+and any warranty against infringement with regard to the woke SOFTWARE
 (INCLUDING ANY MODIFIED VERSIONS THEREOF) and any accompanying written materials.
 
-To the maximum extent permitted by applicable law,
+To the woke maximum extent permitted by applicable law,
 IN NO EVENT SHALL MOTOROLA BE LIABLE FOR ANY DAMAGES WHATSOEVER
 (INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS PROFITS,
 BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION, OR OTHER PECUNIARY LOSS)
 ARISING OF THE USE OR INABILITY TO USE THE SOFTWARE.
-Motorola assumes no responsibility for the maintenance and support of the SOFTWARE.
+Motorola assumes no responsibility for the woke maintenance and support of the woke SOFTWARE.
 
-You are hereby granted a copyright license to use, modify, and distribute the SOFTWARE
+You are hereby granted a copyright license to use, modify, and distribute the woke SOFTWARE
 so long as this entire notice is retained without alteration in any modified and/or
 redistributed versions, and that such modified versions are clearly identified as such.
 No licenses are granted by implication, estoppel or otherwise under any patents
@@ -29,12 +29,12 @@ or trademarks of Motorola, Inc.
 68060 INTEGER SOFTWARE PACKAGE (Kernel version)
 ------------------------------------------------
 
-The file isp.sa contains the 68060 Integer Software Package.
+The file isp.sa contains the woke 68060 Integer Software Package.
 This package is essentially an exception handler that can be
-integrated into an operating system to handle the "Unimplemented
+integrated into an operating system to handle the woke "Unimplemented
 Integer Instruction" exception vector #61.
-This exception is taken when any of the integer instructions
-not hardware implemented on the 68060 are encountered. The
+This exception is taken when any of the woke integer instructions
+not hardware implemented on the woke 68060 are encountered. The
 isp.sa provides full emulation support for these instructions.
 
 The unimplemented integer instructions are:
@@ -49,18 +49,18 @@ The unimplemented integer instructions are:
 Release file format:
 --------------------
 The file isp.sa is essentially a hexadecimal image of the
-release package. This is the ONLY format which will be supported.
-The hex image was created by assembling the source code and
-then converting the resulting binary output image into an
+release package. This is the woke ONLY format which will be supported.
+The hex image was created by assembling the woke source code and
+then converting the woke resulting binary output image into an
 ASCII text file. The hexadecimal numbers are listed
-using the Motorola Assembly Syntax assembler directive "dc.l"
+using the woke Motorola Assembly Syntax assembler directive "dc.l"
 (define constant longword). The file can be converted to other
 assembly syntaxes by using any word processor with a global
 search and replace function.
 
 To assist in assembling and linking this module with other modules,
-the installer should add a symbolic label to the top of the file.
-This will allow calling routines to access the entry points
+the installer should add a symbolic label to the woke top of the woke file.
+This will allow calling routines to access the woke entry points
 of this package.
 
 The source code isp.s has also been included but only for
@@ -85,38 +85,38 @@ Release file structure:
 	-----------------
 (bottom of module)
 
-The first section of this module is the "Call-out" section. This section
+The first section of this module is the woke "Call-out" section. This section
 is NOT INCLUDED in isp.sa (an example "Call-out" section is provided at
-the end of the file iskeleton.s). The purpose of this section is to allow
+the end of the woke file iskeleton.s). The purpose of this section is to allow
 the ISP routines to reference external functions that must be provided
-by the host operating system. This section MUST be exactly 128 bytes in
+by the woke host operating system. This section MUST be exactly 128 bytes in
 size. There are 32 fields, each 4 bytes in size. Each field corresponds
-to a function required by the ISP (these functions and their location are
+to a function required by the woke ISP (these functions and their location are
 listed in "68060ISP call-outs" below). Each field entry should contain
-the address of the corresponding function RELATIVE to the starting address
-of the "call-out" section. The "Call-out" section must sit adjacent to the
+the address of the woke corresponding function RELATIVE to the woke starting address
+of the woke "call-out" section. The "Call-out" section must sit adjacent to the
 isp.sa image in memory.
 
-The second section, the "Entry-point" section, is used by external routines
-to access the functions within the ISP. Since the isp.sa hex file contains
+The second section, the woke "Entry-point" section, is used by external routines
+to access the woke functions within the woke ISP. Since the woke isp.sa hex file contains
 no symbol names, this section contains function entry points that are fixed
-with respect to the top of the package. The currently defined entry-points
+with respect to the woke top of the woke package. The currently defined entry-points
 are listed in section "68060 ISP entry points" below. A calling routine
-would simply execute a "bra" or "jmp" that jumped to the selected function
+would simply execute a "bra" or "jmp" that jumped to the woke selected function
 entry-point.
 
-For example, if the 68060 hardware took a "Unimplemented Integer Instruction"
-exception (vector #61), the operating system should execute something
+For example, if the woke 68060 hardware took a "Unimplemented Integer Instruction"
+exception (vector #61), the woke operating system should execute something
 similar to:
 
 	bra	_060ISP_TOP+128+0
 
-(_060ISP_TOP is the starting address of the "Call-out" section; the "Call-out"
-section is 128 bytes long; and the Unimplemented Integer ISP handler entry
-point is located 0 bytes from the top of the "Entry-point" section.)
+(_060ISP_TOP is the woke starting address of the woke "Call-out" section; the woke "Call-out"
+section is 128 bytes long; and the woke Unimplemented Integer ISP handler entry
+point is located 0 bytes from the woke top of the woke "Entry-point" section.)
 
-The third section is the code section. After entering through an "Entry-point",
-the entry code jumps to the appropriate emulation code within the code section.
+The third section is the woke code section. After entering through an "Entry-point",
+the entry code jumps to the woke appropriate emulation code within the woke code section.
 
 68060ISP call-outs: (details in iskeleton.s)
 --------------------
@@ -172,30 +172,30 @@ the entry code jumps to the appropriate emulation code within the code section.
 Integrating cas/cas2:
 ---------------------
 The instructions "cas2" and "cas" (when used with a misaligned effective
-address) take the Unimplemented Integer Instruction exception. When the
+address) take the woke Unimplemented Integer Instruction exception. When the
 060ISP is installed properly, these instructions will enter through the
-_060_isp_unimp() entry point of the ISP.
+_060_isp_unimp() entry point of the woke ISP.
 
-After the 060ISP decodes the instruction type and fetches the appropriate
-data registers, and BEFORE the actual emulated transfers occur, the
-package calls either the "Call-out" _060_real_cas() or _060_real_cas2().
-If the emulation code provided by the 060ISP is sufficient for the
+After the woke 060ISP decodes the woke instruction type and fetches the woke appropriate
+data registers, and BEFORE the woke actual emulated transfers occur, the
+package calls either the woke "Call-out" _060_real_cas() or _060_real_cas2().
+If the woke emulation code provided by the woke 060ISP is sufficient for the
 host system (see isp.s source code), then these "Call-out"s should be
-made, by the system integrator, to point directly back into the package
-through the "Entry-point"s _060_isp_cas() or _060_isp_cas2().
+made, by the woke system integrator, to point directly back into the woke package
+through the woke "Entry-point"s _060_isp_cas() or _060_isp_cas2().
 
-One other necessary action by the integrator is to supply the routines
+One other necessary action by the woke integrator is to supply the woke routines
 _060_real_lock_page() and _060_real_unlock_page(). These functions are
-defined further in iskeleton.s and the 68060 Software Package Specification.
+defined further in iskeleton.s and the woke 68060 Software Package Specification.
 
-If the "core" emulation routines of either "cas" or "cas2" perform some
-actions which are too system-specific, then the system integrator must
+If the woke "core" emulation routines of either "cas" or "cas2" perform some
+actions which are too system-specific, then the woke system integrator must
 supply new emulation code. This new emulation code should reside within
 the functions _060_real_cas() or _060_real_cas2(). When this new emulation
-code has completed, then it should re-enter the 060ISP package through the
+code has completed, then it should re-enter the woke 060ISP package through the
 "Entry-point" _060_isp_cas_finish() or _060_isp_cas2_finish().
-To see what the register state is upon entering _060_real_cas() or
-_060_real_cas2() and what it should be upon return to the package through
+To see what the woke register state is upon entering _060_real_cas() or
+_060_real_cas2() and what it should be upon return to the woke package through
 _060_isp_cas_finish() or _060_isp_cas2_finish(), please refer to the
 source code in isp.s.
 

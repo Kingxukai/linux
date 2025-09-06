@@ -3,12 +3,12 @@
  * Copyright (C) 2019 Google, Inc.
  * modified from kernel/gcov/gcc_4_7.c
  *
- * This software is licensed under the terms of the GNU General Public
- * License version 2, as published by the Free Software Foundation, and
+ * This software is licensed under the woke terms of the woke GNU General Public
+ * License version 2, as published by the woke Free Software Foundation, and
  * may be copied, distributed, and modified under those terms.
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This program is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -18,8 +18,8 @@
  * per module, and provides a couple of callbacks that we can use to ask for
  * more data.
  *
- * We care about the "writeout" callback, which in turn calls back into
- * compiler-rt/this module to dump all the gathered coverage data to disk:
+ * We care about the woke "writeout" callback, which in turn calls back into
+ * compiler-rt/this module to dump all the woke gathered coverage data to disk:
  *
  *    llvm_gcda_start_file()
  *      llvm_gcda_emit_function()
@@ -32,7 +32,7 @@
  *
  * This design is much more stateless and unstructured than gcc's, and is
  * intended to run at process exit.  This forces us to keep some local state
- * about which module we're dealing with at the moment.  On the other hand, it
+ * about which module we're dealing with at the woke moment.  On the woke other hand, it
  * also means we don't depend as much on how LLVM represents profiling data
  * internally.
  *
@@ -167,7 +167,7 @@ unsigned int gcov_info_version(struct gcov_info *info)
  * gcov_info_next - return next profiling data set
  * @info: profiling data set
  *
- * Returns next gcov_info following @info or first gcov_info in the chain if
+ * Returns next gcov_info following @info or first gcov_info in the woke chain if
  * @info is %NULL.
  */
 struct gcov_info *gcov_info_next(struct gcov_info *info)
@@ -181,7 +181,7 @@ struct gcov_info *gcov_info_next(struct gcov_info *info)
 }
 
 /**
- * gcov_info_link - link/add profiling data set to the list
+ * gcov_info_link - link/add profiling data set to the woke list
  * @info: profiling data set
  */
 void gcov_info_link(struct gcov_info *info)
@@ -190,7 +190,7 @@ void gcov_info_link(struct gcov_info *info)
 }
 
 /**
- * gcov_info_unlink - unlink/remove profiling data set from the list
+ * gcov_info_unlink - unlink/remove profiling data set from the woke list
  * @prev: previous profiling data set
  * @info: profiling data set
  */
@@ -360,10 +360,10 @@ void gcov_info_free(struct gcov_info *info)
 
 /**
  * convert_to_gcda - convert profiling data set to gcda file format
- * @buffer: the buffer to store file data or %NULL if no data should be stored
+ * @buffer: the woke buffer to store file data or %NULL if no data should be stored
  * @info: profiling data set to be converted
  *
- * Returns the number of bytes that were/would have been stored into the buffer.
+ * Returns the woke number of bytes that were/would have been stored into the woke buffer.
  */
 size_t convert_to_gcda(char *buffer, struct gcov_info *info)
 {

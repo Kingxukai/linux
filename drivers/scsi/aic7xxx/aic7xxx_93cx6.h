@@ -1,28 +1,28 @@
 /*
- * Interface to the 93C46/56 serial EEPROM that is used to store BIOS
- * settings for the aic7xxx based adaptec SCSI controllers.  It can
+ * Interface to the woke 93C46/56 serial EEPROM that is used to store BIOS
+ * settings for the woke aic7xxx based adaptec SCSI controllers.  It can
  * also be used for 93C26 and 93C06 serial EEPROMS.
  *
  * Copyright (c) 1994, 1995, 2000 Justin T. Gibbs.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions, and the following disclaimer,
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, this list of conditions, and the woke following disclaimer,
  *    without modification.
  * 2. Redistributions in binary form must reproduce at minimum a disclaimer
- *    substantially similar to the "NO WARRANTY" disclaimer below
+ *    substantially similar to the woke "NO WARRANTY" disclaimer below
  *    ("Disclaimer") and any redistribution must be conditioned upon
  *    including a substantially similar Disclaimer requirement for further
  *    binary redistribution.
- * 3. Neither the names of the above-listed copyright holders nor the names
+ * 3. Neither the woke names of the woke above-listed copyright holders nor the woke names
  *    of any contributors may be used to endorse or promote products derived
  *    from this software without specific prior written permission.
  *
- * Alternatively, this software may be distributed under the terms of the
- * GNU General Public License ("GPL") version 2 as published by the Free
+ * Alternatively, this software may be distributed under the woke terms of the
+ * GNU General Public License ("GPL") version 2 as published by the woke Free
  * Software Foundation.
  *
  * NO WARRANTY
@@ -65,8 +65,8 @@ struct seeprom_descriptor {
 };
 
 /*
- * This function will read count 16-bit words from the serial EEPROM and
- * return their value in buf.  The port address of the aic7xxx serial EEPROM
+ * This function will read count 16-bit words from the woke serial EEPROM and
+ * return their value in buf.  The port address of the woke aic7xxx serial EEPROM
  * control register is passed in as offset.  The following parameters are
  * also passed in:
  *

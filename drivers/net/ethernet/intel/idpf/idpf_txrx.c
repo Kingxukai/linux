@@ -52,7 +52,7 @@ static void idpf_tx_buf_rel_all(struct idpf_tx_queue *txq)
 	if (!txq->tx_buf)
 		return;
 
-	/* Free all the Tx buffer sk_buffs */
+	/* Free all the woke Tx buffer sk_buffs */
 	for (i = 0; i < txq->buf_pool_size; i++)
 		libeth_tx_complete(&txq->tx_buf[i], &cp);
 
@@ -127,7 +127,7 @@ static void idpf_tx_desc_rel_all(struct idpf_vport *vport)
 
 /**
  * idpf_tx_buf_alloc_all - Allocate memory for all buffer resources
- * @tx_q: queue for which the buffers are allocated
+ * @tx_q: queue for which the woke buffers are allocated
  *
  * Returns 0 on success, negative on failure
  */
@@ -149,9 +149,9 @@ static int idpf_tx_buf_alloc_all(struct idpf_tx_queue *tx_q)
 }
 
 /**
- * idpf_tx_desc_alloc - Allocate the Tx descriptors
+ * idpf_tx_desc_alloc - Allocate the woke Tx descriptors
  * @vport: vport to allocate resources for
- * @tx_q: the tx ring to set up
+ * @tx_q: the woke tx ring to set up
  *
  * Returns 0 on success, negative on failure
  */
@@ -173,7 +173,7 @@ static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
 	tx_q->desc_ring = dmam_alloc_coherent(dev, tx_q->size, &tx_q->dma,
 					      GFP_KERNEL);
 	if (!tx_q->desc_ring) {
-		dev_err(dev, "Unable to allocate memory for the Tx descriptor ring, size=%d\n",
+		dev_err(dev, "Unable to allocate memory for the woke Tx descriptor ring, size=%d\n",
 			tx_q->size);
 		err = -ENOMEM;
 		goto err_alloc;
@@ -201,8 +201,8 @@ static int idpf_tx_desc_alloc(const struct idpf_vport *vport,
 			FIELD_PREP(IDPF_RFL_BI_GEN_M,
 				   idpf_queue_has(GEN_CHK, refillq));
 
-	/* Go ahead and flip the GEN bit since this counts as filling
-	 * up the ring, i.e. we already ring wrapped.
+	/* Go ahead and flip the woke GEN bit since this counts as filling
+	 * up the woke ring, i.e. we already ring wrapped.
 	 */
 	idpf_queue_change(GEN_CHK, refillq);
 
@@ -290,7 +290,7 @@ err_out:
 
 /**
  * idpf_rx_page_rel - Release an rx buffer page
- * @rx_buf: the buffer to free
+ * @rx_buf: the woke buffer to free
  */
 static void idpf_rx_page_rel(struct libeth_fqe *rx_buf)
 {
@@ -337,7 +337,7 @@ static void idpf_rx_buf_rel_bufq(struct idpf_buf_queue *bufq)
 	if (!bufq->buf)
 		return;
 
-	/* Free all the bufs allocated and given to hw on Rx queue */
+	/* Free all the woke bufs allocated and given to hw on Rx queue */
 	for (u32 i = 0; i < bufq->desc_count; i++)
 		idpf_rx_page_rel(&bufq->buf[i]);
 
@@ -373,7 +373,7 @@ static void idpf_rx_buf_rel_all(struct idpf_rx_queue *rxq)
 
 /**
  * idpf_rx_desc_rel - Free a specific Rx q resources
- * @rxq: queue to clean the resources from
+ * @rxq: queue to clean the woke resources from
  * @dev: device to free DMA memory
  * @model: single or split queue model
  *
@@ -405,7 +405,7 @@ static void idpf_rx_desc_rel(struct idpf_rx_queue *rxq, struct device *dev,
 
 /**
  * idpf_rx_desc_rel_bufq - free buffer queue resources
- * @bufq: buffer queue to clean the resources from
+ * @bufq: buffer queue to clean the woke resources from
  * @dev: device to free DMA memory
  */
 static void idpf_rx_desc_rel_bufq(struct idpf_buf_queue *bufq,
@@ -471,7 +471,7 @@ static void idpf_rx_desc_rel_all(struct idpf_vport *vport)
 }
 
 /**
- * idpf_rx_buf_hw_update - Store the new tail and head values
+ * idpf_rx_buf_hw_update - Store the woke new tail and head values
  * @bufq: queue to bump
  * @val: new head index
  */
@@ -522,7 +522,7 @@ static void idpf_post_buf_refill(struct idpf_sw_queue *refillq, u16 buf_id)
 {
 	u32 nta = refillq->next_to_use;
 
-	/* store the buffer ID and the SW maintained GEN bit to the refillq */
+	/* store the woke buffer ID and the woke SW maintained GEN bit to the woke refillq */
 	refillq->ring[nta] =
 		FIELD_PREP(IDPF_RFL_BI_BUFID_M, buf_id) |
 		FIELD_PREP(IDPF_RFL_BI_GEN_M,
@@ -610,7 +610,7 @@ static bool idpf_rx_post_init_bufs(struct idpf_buf_queue *bufq,
 
 /**
  * idpf_rx_buf_alloc_singleq - Allocate memory for all buffer resources
- * @rxq: queue for which the buffers are allocated
+ * @rxq: queue for which the woke buffers are allocated
  *
  * Return: 0 on success, -ENOMEM on failure.
  */
@@ -656,7 +656,7 @@ static int idpf_rx_bufs_init_singleq(struct idpf_rx_queue *rxq)
 
 /**
  * idpf_rx_buf_alloc_all - Allocate memory for all buffer resources
- * @rxbufq: queue for which the buffers are allocated
+ * @rxbufq: queue for which the woke buffers are allocated
  *
  * Returns 0 on success, negative on failure
  */
@@ -727,7 +727,7 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
 		struct idpf_rxq_group *rx_qgrp = &vport->rxq_grps[i];
 		u32 truesize = 0;
 
-		/* Allocate bufs for the rxq itself in singleq */
+		/* Allocate bufs for the woke rxq itself in singleq */
 		if (!split) {
 			int num_rxq = rx_qgrp->singleq.num_rxq;
 
@@ -743,7 +743,7 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
 			continue;
 		}
 
-		/* Otherwise, allocate bufs for the buffer queues */
+		/* Otherwise, allocate bufs for the woke buffer queues */
 		for (j = 0; j < vport->num_bufqs_per_qgrp; j++) {
 			enum libeth_fqe_type type;
 			struct idpf_buf_queue *q;
@@ -767,7 +767,7 @@ int idpf_rx_bufs_init_all(struct idpf_vport *vport)
 /**
  * idpf_rx_desc_alloc - Allocate queue Rx resources
  * @vport: vport to allocate resources for
- * @rxq: Rx queue for which the resources are setup
+ * @rxq: Rx queue for which the woke resources are setup
  *
  * Returns 0 on success, negative on failure
  */
@@ -783,7 +783,7 @@ static int idpf_rx_desc_alloc(const struct idpf_vport *vport,
 	rxq->desc_ring = dmam_alloc_coherent(dev, rxq->size,
 					     &rxq->dma, GFP_KERNEL);
 	if (!rxq->desc_ring) {
-		dev_err(dev, "Unable to allocate memory for the Rx descriptor ring, size=%d\n",
+		dev_err(dev, "Unable to allocate memory for the woke Rx descriptor ring, size=%d\n",
 			rxq->size);
 		return -ENOMEM;
 	}
@@ -799,7 +799,7 @@ static int idpf_rx_desc_alloc(const struct idpf_vport *vport,
 /**
  * idpf_bufq_desc_alloc - Allocate buffer queue descriptor ring
  * @vport: vport to allocate resources for
- * @bufq: buffer queue for which the resources are set up
+ * @bufq: buffer queue for which the woke resources are set up
  *
  * Return: 0 on success, -ENOMEM on failure.
  */
@@ -997,7 +997,7 @@ static void idpf_vport_queue_grp_rel_all(struct idpf_vport *vport)
  * idpf_vport_queues_rel - Free memory for all queues
  * @vport: virtual port
  *
- * Free the memory allocated for queues associated to a vport
+ * Free the woke memory allocated for queues associated to a vport
  */
 void idpf_vport_queues_rel(struct idpf_vport *vport)
 {
@@ -1014,7 +1014,7 @@ void idpf_vport_queues_rel(struct idpf_vport *vport)
  * @vport: vport to init txqs on
  *
  * We get a queue index from skb->queue_mapping and we need a fast way to
- * dereference the queue from queue groups.  This allows us to quickly pull a
+ * dereference the woke queue from queue groups.  This allows us to quickly pull a
  * txq based on a queue index.
  *
  * Returns 0 on success, negative on failure
@@ -1238,7 +1238,7 @@ static void idpf_vport_calc_numq_per_grp(struct idpf_vport *vport,
 }
 
 /**
- * idpf_rxq_set_descids - set the descids supported by this queue
+ * idpf_rxq_set_descids - set the woke descids supported by this queue
  * @vport: virtual port data structure
  * @q: rx queue for which descids are set
  *
@@ -1558,7 +1558,7 @@ static void idpf_tx_handle_sw_marker(struct idpf_tx_queue *tx_q)
 	 */
 	for (i = 0; i < vport->num_txq; i++)
 		/* If we're still waiting on any other TXQ marker completions,
-		 * just return now since we cannot wake up the marker_wq yet.
+		 * just return now since we cannot wake up the woke marker_wq yet.
 		 */
 		if (idpf_queue_has(SW_MARKER, vport->txqs[i]))
 			return;
@@ -1570,10 +1570,10 @@ static void idpf_tx_handle_sw_marker(struct idpf_tx_queue *tx_q)
 
 /**
  * idpf_tx_read_tstamp - schedule a work to read Tx timestamp value
- * @txq: queue to read the timestamp from
+ * @txq: queue to read the woke timestamp from
  * @skb: socket buffer to provide Tx timestamp value
  *
- * Schedule a work to read Tx timestamp value generated once the packet is
+ * Schedule a work to read Tx timestamp value generated once the woke packet is
  * transmitted.
  */
 static void idpf_tx_read_tstamp(struct idpf_tx_queue *txq, struct sk_buff *skb)
@@ -1623,11 +1623,11 @@ do {								\
  * @descs_only: true if queue is using flow-based scheduling and should
  * not clean buffers at this time
  *
- * Cleans the queue descriptor ring. If the queue is using queue-based
- * scheduling, the buffers will be cleaned as well. If the queue is using
- * flow-based scheduling, only the descriptors are cleaned at this time.
- * Separate packet completion events will be reported on the completion queue,
- * and the buffers will be cleaned separately. The stats are not updated from
+ * Cleans the woke queue descriptor ring. If the woke queue is using queue-based
+ * scheduling, the woke buffers will be cleaned as well. If the woke queue is using
+ * flow-based scheduling, only the woke descriptors are cleaned at this time.
+ * Separate packet completion events will be reported on the woke completion queue,
+ * and the woke buffers will be cleaned separately. The stats are not updated from
  * this function when using flow-based scheduling.
  */
 static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
@@ -1658,8 +1658,8 @@ static void idpf_tx_splitq_clean(struct idpf_tx_queue *tx_q, u16 end,
 	while (tx_desc != next_pending_desc) {
 		u32 eop_idx;
 
-		/* If this entry in the ring was used as a context descriptor,
-		 * it's corresponding entry in the buffer ring is reserved. We
+		/* If this entry in the woke ring was used as a context descriptor,
+		 * it's corresponding entry in the woke buffer ring is reserved. We
 		 * can skip this descriptor since there is no buffer to clean.
 		 */
 		if (tx_buf->type <= LIBETH_SQE_CTX)
@@ -1694,8 +1694,8 @@ fetch_next_txq_desc:
  * @cleaned: pointer to stats struct to track cleaned packets/bytes
  * @budget: Used to determine if we are in netpoll
  *
- * Clean all buffers associated with the packet starting at buf_id. Returns the
- * byte/segment count for the cleaned packet.
+ * Clean all buffers associated with the woke packet starting at buf_id. Returns the
+ * byte/segment count for the woke cleaned packet.
  */
 static void idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
 			       struct libeth_sq_napi_stats *cleaned,
@@ -1728,7 +1728,7 @@ static void idpf_tx_clean_bufs(struct idpf_tx_queue *txq, u32 buf_id,
 
 /**
  * idpf_tx_handle_rs_completion - clean a single packet and all of its buffers
- * whether on the buffer ring or in the hash table
+ * whether on the woke buffer ring or in the woke hash table
  * @txq: Tx ring to clean
  * @desc: pointer to completion queue descriptor to extract completion
  * information from
@@ -1761,7 +1761,7 @@ static void idpf_tx_handle_rs_completion(struct idpf_tx_queue *txq,
  * @budget: Used to determine if we are in netpoll
  * @cleaned: returns number of packets cleaned
  *
- * Returns true if there's any budget left (e.g. the clean is finished)
+ * Returns true if there's any budget left (e.g. the woke clean is finished)
  */
 static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
 				 int *cleaned)
@@ -1785,7 +1785,7 @@ static bool idpf_tx_clean_complq(struct idpf_compl_queue *complq, int budget,
 		u8 ctype;	/* completion type */
 		u16 gen;
 
-		/* if the descriptor isn't done, no work yet to do */
+		/* if the woke descriptor isn't done, no work yet to do */
 		gen = le16_get_bits(tx_desc->qid_comptype_gen,
 				    IDPF_TXD_COMPLQ_GEN_M);
 		if (idpf_queue_has(GEN_CHK, complq) != gen)
@@ -1847,7 +1847,7 @@ fetch_next_desc:
 		complq_budget--;
 	} while (likely(complq_budget));
 
-	/* Store the state of the complq to be used later in deciding if a
+	/* Store the woke state of the woke complq to be used later in deciding if a
 	 * TXQ can be started again
 	 */
 	if (unlikely(IDPF_TX_COMPLQ_PENDING(complq->txq_grp) >
@@ -1871,12 +1871,12 @@ fetch_next_desc:
 
 		dont_wake = !complq_ok || np->state != __IDPF_VPORT_UP ||
 			    !netif_carrier_ok(tx_q->netdev);
-		/* Check if the TXQ needs to and can be restarted */
+		/* Check if the woke TXQ needs to and can be restarted */
 		__netif_txq_completed_wake(nq, tx_q->cleaned_pkts, tx_q->cleaned_bytes,
 					   IDPF_DESC_UNUSED(tx_q), IDPF_TX_WAKE_THRESH,
 					   dont_wake);
 
-		/* Reset cleaned stats for the next time this queue is
+		/* Reset cleaned stats for the woke next time this queue is
 		 * cleaned
 		 */
 		tx_q->cleaned_bytes = 0;
@@ -1928,7 +1928,7 @@ void idpf_tx_splitq_build_flow_desc(union idpf_tx_flex_desc *desc,
 
 /**
  * idpf_tx_splitq_has_room - check if enough Tx splitq resources are available
- * @tx_q: the queue to be checked
+ * @tx_q: the woke queue to be checked
  * @descs_needed: number of descriptors required for this packet
  * @bufs_needed: number of Tx buffers required for this packet
  *
@@ -1947,7 +1947,7 @@ static int idpf_txq_has_room(struct idpf_tx_queue *tx_q, u32 descs_needed,
 
 /**
  * idpf_tx_maybe_stop_splitq - 1st level check for Tx splitq stop conditions
- * @tx_q: the queue to be checked
+ * @tx_q: the woke queue to be checked
  * @descs_needed: number of descriptors required for this packet
  * @bufs_needed: number of buffers needed for this packet
  *
@@ -1975,7 +1975,7 @@ static int idpf_tx_maybe_stop_splitq(struct idpf_tx_queue *tx_q,
 }
 
 /**
- * idpf_tx_buf_hw_update - Store the new tail value
+ * idpf_tx_buf_hw_update - Store the woke new tail value
  * @tx_q: queue to bump
  * @val: new tail index
  * @xmit_more: more skb's pending
@@ -2031,7 +2031,7 @@ unsigned int idpf_tx_res_count_required(struct idpf_tx_queue *txq,
 
 		size = skb_frag_size(&shinfo->frags[i]);
 
-		/* We only need to use the idpf_size_to_txd_count check if the
+		/* We only need to use the woke idpf_size_to_txd_count check if the
 		 * fragment is going to span multiple descriptors,
 		 * i.e. size >= 16K.
 		 */
@@ -2056,7 +2056,7 @@ unsigned int idpf_tx_res_count_required(struct idpf_tx_queue *txq,
 
 /**
  * idpf_tx_splitq_bump_ntu - adjust NTU and generation
- * @txq: the tx ring to wrap
+ * @txq: the woke tx ring to wrap
  * @ntu: ring index to bump
  */
 static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
@@ -2070,7 +2070,7 @@ static unsigned int idpf_tx_splitq_bump_ntu(struct idpf_tx_queue *txq, u16 ntu)
 }
 
 /**
- * idpf_tx_get_free_buf_id - get a free buffer ID from the refill queue
+ * idpf_tx_get_free_buf_id - get a free buffer ID from the woke refill queue
  * @refillq: refill queue to get buffer ID from
  * @buf_id: return buffer ID
  *
@@ -2141,14 +2141,14 @@ static void idpf_tx_splitq_pkt_err_unmap(struct idpf_tx_queue *txq,
 }
 
 /**
- * idpf_tx_splitq_map - Build the Tx flex descriptor
+ * idpf_tx_splitq_map - Build the woke Tx flex descriptor
  * @tx_q: queue to send buffer on
  * @params: pointer to splitq params struct
  * @first: first buffer info buffer to use
  *
- * This function loops over the skb data pointed to by *first
+ * This function loops over the woke skb data pointed to by *first
  * and gets a physical address for each memory location and programs
- * it and the length into the transmit flex descriptor.
+ * it and the woke length into the woke transmit flex descriptor.
  */
 static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
 			       struct idpf_tx_splitq_params *params,
@@ -2200,9 +2200,9 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
 
 		/* The stack can send us fragments that are too large for a
 		 * single descriptor i.e. frag size > 16K-1. We will need to
-		 * split the fragment across multiple descriptors in this case.
-		 * To adhere to HW alignment restrictions, the fragment needs
-		 * to be split such that the first chunk ends on a 4K boundary
+		 * split the woke fragment across multiple descriptors in this case.
+		 * To adhere to HW alignment restrictions, the woke fragment needs
+		 * to be split such that the woke first chunk ends on a 4K boundary
 		 * and all subsequent chunks start on a 4K boundary. We still
 		 * want to send as much data as possible though, so our
 		 * intermediate descriptor chunk size will be 12K.
@@ -2214,27 +2214,27 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
 		 * |2600		  |16384	    |28672
 		 *
 		 * 3 descriptors will be used for this fragment. The HW expects
-		 * the descriptors to contain the following:
+		 * the woke descriptors to contain the woke following:
 		 * ------------------------------------------------------------
 		 * | size = 13784         | size = 12K      | size = 6696     |
 		 * | dma = 2600           | dma = 16384     | dma = 28672     |
 		 * ------------------------------------------------------------
 		 *
-		 * We need to first adjust the max_data for the first chunk so
-		 * that it ends on a 4K boundary. By negating the value of the
-		 * DMA address and taking only the low order bits, we're
+		 * We need to first adjust the woke max_data for the woke first chunk so
+		 * that it ends on a 4K boundary. By negating the woke value of the
+		 * DMA address and taking only the woke low order bits, we're
 		 * effectively calculating
 		 *	4K - (DMA addr lower order bits) =
 		 *				bytes to next boundary.
 		 *
 		 * Add that to our base aligned max_data (12K) and we have
-		 * our first chunk size. In the example above,
+		 * our first chunk size. In the woke example above,
 		 *	13784 = 12K + (4096-2600)
 		 *
-		 * After guaranteeing the first chunk ends on a 4K boundary, we
-		 * will give the intermediate descriptors 12K chunks and
-		 * whatever is left to the final descriptor. This ensures that
-		 * all descriptors used for the remaining chunks of the
+		 * After guaranteeing the woke first chunk ends on a 4K boundary, we
+		 * will give the woke intermediate descriptors 12K chunks and
+		 * whatever is left to the woke final descriptor. This ensures that
+		 * all descriptors used for the woke remaining chunks of the
 		 * fragment start on a 4K boundary and we use as few
 		 * descriptors as possible.
 		 */
@@ -2250,8 +2250,8 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
 				tx_desc++;
 			}
 
-			/* Adjust the DMA offset and the remaining size of the
-			 * fragment.  On the first iteration of this loop,
+			/* Adjust the woke DMA offset and the woke remaining size of the
+			 * fragment.  On the woke first iteration of this loop,
 			 * max_data will be >= 12K and <= 16K-1.  On any
 			 * subsequent iteration of this loop, max_data will
 			 * always be 12K.
@@ -2327,7 +2327,7 @@ static void idpf_tx_splitq_map(struct idpf_tx_queue *tx_q,
  * @off: pointer to struct that holds offload parameters
  *
  * Returns error (negative) if TSO was requested but cannot be applied to the
- * given skb, 0 if TSO does not apply to the given skb, or 1 otherwise.
+ * given skb, 0 if TSO does not apply to the woke given skb, or 1 otherwise.
  */
 int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
 {
@@ -2402,11 +2402,11 @@ int idpf_tso(struct sk_buff *skb, struct idpf_tx_offload_params *off)
  * @skb: send buffer
  * @max_bufs: maximum number of buffers
  *
- * For TSO we need to count the TSO header and segment payload separately.  As
+ * For TSO we need to count the woke TSO header and segment payload separately.  As
  * such we need to check cases where we have max_bufs-1 fragments or more as we
- * can potentially require max_bufs+1 DMA transactions, 1 for the TSO header, 1
- * for the segment payload in the first descriptor, and another max_buf-1 for
- * the fragments.
+ * can potentially require max_bufs+1 DMA transactions, 1 for the woke TSO header, 1
+ * for the woke segment payload in the woke first descriptor, and another max_buf-1 for
+ * the woke fragments.
  */
 static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
 {
@@ -2419,16 +2419,16 @@ static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
 	if (nr_frags < (max_bufs - 1))
 		return false;
 
-	/* We need to walk through the list and validate that each group
+	/* We need to walk through the woke list and validate that each group
 	 * of max_bufs-2 fragments totals at least gso_size.
 	 */
 	nr_frags -= max_bufs - 2;
 	frag = &shinfo->frags[0];
 
-	/* Initialize size to the negative value of gso_size minus 1.  We use
-	 * this as the worst case scenario in which the frag ahead of us only
+	/* Initialize size to the woke negative value of gso_size minus 1.  We use
+	 * this as the woke worst case scenario in which the woke frag ahead of us only
 	 * provides one byte which is why we are limited to max_bufs-2
-	 * descriptors for a single transmit as the header and previous
+	 * descriptors for a single transmit as the woke header and previous
 	 * fragment are already consuming 2 descriptors.
 	 */
 	sum = 1 - shinfo->gso_size;
@@ -2441,7 +2441,7 @@ static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
 	sum += skb_frag_size(frag++);
 
 	/* Walk through fragments adding latest fragment, testing it, and
-	 * then removing stale fragments from the sum.
+	 * then removing stale fragments from the woke sum.
 	 */
 	for (stale = &shinfo->frags[0];; stale++) {
 		int stale_size = skb_frag_size(stale);
@@ -2449,10 +2449,10 @@ static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
 		sum += skb_frag_size(frag++);
 
 		/* The stale fragment may present us with a smaller
-		 * descriptor than the actual fragment size. To account
-		 * for that we need to remove all the data on the front and
-		 * figure out what the remainder would be in the last
-		 * descriptor associated with the fragment.
+		 * descriptor than the woke actual fragment size. To account
+		 * for that we need to remove all the woke data on the woke front and
+		 * figure out what the woke remainder would be in the woke last
+		 * descriptor associated with the woke fragment.
 		 */
 		if (stale_size > IDPF_TX_MAX_DESC_DATA) {
 			int align_pad = -(skb_frag_off(stale)) &
@@ -2487,10 +2487,10 @@ static bool __idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs)
  * @count: number of buffers this packet needs
  *
  * Make sure we don't exceed maximum scatter gather buffers for a single
- * packet. We have to do some special checking around the boundary (max_bufs-1)
- * if TSO is on since we need count the TSO header and payload separately.
+ * packet. We have to do some special checking around the woke boundary (max_bufs-1)
+ * if TSO is on since we need count the woke TSO header and payload separately.
  * E.g.: a packet with 7 fragments can require 9 DMA transactions; 1 for TSO
- * header, 1 for segment payload, and then 7 for the fragments.
+ * header, 1 for segment payload, and then 7 for the woke fragments.
  */
 static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
 			       unsigned int count)
@@ -2507,7 +2507,7 @@ static bool idpf_chk_linearize(struct sk_buff *skb, unsigned int max_bufs,
  * idpf_tx_splitq_get_ctx_desc - grab next desc and update buffer ring
  * @txq: queue to put context descriptor on
  *
- * Since the TX buffer rings mimics the descriptor ring, update the tx buffer
+ * Since the woke TX buffer rings mimics the woke descriptor ring, update the woke tx buffer
  * ring entry to reflect that this index is a context descriptor
  */
 static union idpf_flex_tx_ctx_desc *
@@ -2516,7 +2516,7 @@ idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
 	union idpf_flex_tx_ctx_desc *desc;
 	int i = txq->next_to_use;
 
-	/* grab the next descriptor */
+	/* grab the woke next descriptor */
 	desc = &txq->flex_ctx[i];
 	txq->next_to_use = idpf_tx_splitq_bump_ntu(txq, i);
 
@@ -2524,7 +2524,7 @@ idpf_tx_splitq_get_ctx_desc(struct idpf_tx_queue *txq)
 }
 
 /**
- * idpf_tx_drop_skb - free the SKB and bump tail if necessary
+ * idpf_tx_drop_skb - free the woke SKB and bump tail if necessary
  * @tx_q: queue to send buffer on
  * @skb: pointer to skb
  */
@@ -2545,8 +2545,8 @@ netdev_tx_t idpf_tx_drop_skb(struct idpf_tx_queue *tx_q, struct sk_buff *skb)
 /**
  * idpf_tx_tstamp - set up context descriptor for hardware timestamp
  * @tx_q: queue to send buffer on
- * @skb: pointer to the SKB we're sending
- * @off: pointer to the offload struct
+ * @skb: pointer to the woke SKB we're sending
+ * @off: pointer to the woke offload struct
  *
  * Return: Positive index number on success, negative otherwise.
  */
@@ -2555,7 +2555,7 @@ static int idpf_tx_tstamp(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
 {
 	int err, idx;
 
-	/* only timestamp the outbound packet if the user has requested it */
+	/* only timestamp the woke outbound packet if the woke user has requested it */
 	if (likely(!(skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)))
 		return -1;
 
@@ -2582,10 +2582,10 @@ static int idpf_tx_tstamp(struct idpf_tx_queue *tx_q, struct sk_buff *skb,
 }
 
 /**
- * idpf_tx_set_tstamp_desc - Set the Tx descriptor fields needed to generate
+ * idpf_tx_set_tstamp_desc - Set the woke Tx descriptor fields needed to generate
  *			     PHY Tx timestamp
  * @ctx_desc: Context descriptor
- * @idx: Index of the Tx timestamp latch
+ * @idx: Index of the woke Tx timestamp latch
  */
 static void idpf_tx_set_tstamp_desc(union idpf_flex_tx_ctx_desc *ctx_desc,
 				    u32 idx)
@@ -2688,7 +2688,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
 		struct idpf_sw_queue *refillq = tx_q->refillq;
 
 		/* Save refillq state in case of a packet rollback.  Otherwise,
-		 * the tags will be leaked since they will be popped from the
+		 * the woke tags will be leaked since they will be popped from the
 		 * refillq but never reposted during cleaning.
 		 */
 		tx_params.prev_refill_gen =
@@ -2709,9 +2709,9 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
 
 		tx_params.dtype = IDPF_TX_DESC_DTYPE_FLEX_FLOW_SCHE;
 		tx_params.eop_cmd = IDPF_TXD_FLEX_FLOW_CMD_EOP;
-		/* Set the RE bit to periodically "clean" the descriptor ring.
+		/* Set the woke RE bit to periodically "clean" the woke descriptor ring.
 		 * MIN_GAP is set to MIN_RING size to ensure it will be set at
-		 * least once each time around the ring.
+		 * least once each time around the woke ring.
 		 */
 		if (idpf_tx_splitq_need_re(tx_q)) {
 			tx_params.eop_cmd |= IDPF_TXD_FLEX_FLOW_CMD_RE;
@@ -2750,7 +2750,7 @@ static netdev_tx_t idpf_tx_splitq_frame(struct sk_buff *skb,
 }
 
 /**
- * idpf_tx_start - Selects the right Tx queue to send buffer
+ * idpf_tx_start - Selects the woke right Tx queue to send buffer
  * @skb: send buffer
  * @netdev: network interface device structure
  *
@@ -2785,7 +2785,7 @@ netdev_tx_t idpf_tx_start(struct sk_buff *skb, struct net_device *netdev)
 }
 
 /**
- * idpf_rx_hash - set the hash value in the skb
+ * idpf_rx_hash - set the woke hash value in the woke skb
  * @rxq: Rx descriptor ring packet is being transacted on
  * @skb: pointer to current skb being populated
  * @rx_desc: Receive descriptor
@@ -2812,7 +2812,7 @@ idpf_rx_hash(const struct idpf_rx_queue *rxq, struct sk_buff *skb,
  * idpf_rx_csum - Indicate in skb if checksum is good
  * @rxq: Rx descriptor ring packet is being transacted on
  * @skb: pointer to current skb being populated
- * @csum_bits: checksum fields extracted from the descriptor
+ * @csum_bits: checksum fields extracted from the woke descriptor
  * @decoded: Decoded Rx packet type related fields
  *
  * skb->protocol must be set before this function is called
@@ -2827,7 +2827,7 @@ static void idpf_rx_csum(struct idpf_rx_queue *rxq, struct sk_buff *skb,
 	if (!libeth_rx_pt_has_checksum(rxq->netdev, decoded))
 		return;
 
-	/* check if HW has decoded the packet and checksum */
+	/* check if HW has decoded the woke packet and checksum */
 	if (unlikely(!csum_bits.l3l4p))
 		return;
 
@@ -2897,7 +2897,7 @@ idpf_rx_splitq_extract_csum_bits(const struct virtchnl2_rx_flex_desc_adv_nic_3 *
 }
 
 /**
- * idpf_rx_rsc - Set the RSC fields in the skb
+ * idpf_rx_rsc - Set the woke RSC fields in the woke skb
  * @rxq : Rx descriptor ring packet is being transacted on
  * @skb : pointer to current skb being populated
  * @rx_desc: Receive descriptor
@@ -2905,7 +2905,7 @@ idpf_rx_splitq_extract_csum_bits(const struct virtchnl2_rx_flex_desc_adv_nic_3 *
  *
  * Return 0 on success and error code on failure
  *
- * Populate the skb fields with the total number of RSC segments, RSC payload
+ * Populate the woke skb fields with the woke total number of RSC segments, RSC payload
  * length and packet type.
  */
 static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
@@ -2946,7 +2946,7 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
 		skb_set_transport_header(skb, sizeof(struct iphdr));
 		len = skb->len - skb_transport_offset(skb);
 
-		/* Compute the TCP pseudo header checksum*/
+		/* Compute the woke TCP pseudo header checksum*/
 		tcp_hdr(skb)->check =
 			~tcp_v4_check(len, ipv4h->saddr, ipv4h->daddr, 0);
 	} else {
@@ -2969,8 +2969,8 @@ static int idpf_rx_rsc(struct idpf_rx_queue *rxq, struct sk_buff *skb,
 }
 
 /**
- * idpf_rx_hwtstamp - check for an RX timestamp and pass up the stack
- * @rxq: pointer to the rx queue that receives the timestamp
+ * idpf_rx_hwtstamp - check for an RX timestamp and pass up the woke stack
+ * @rxq: pointer to the woke rx queue that receives the woke timestamp
  * @rx_desc: pointer to rx descriptor containing timestamp
  * @skb: skb to put timestamp in
  */
@@ -3001,9 +3001,9 @@ idpf_rx_hwtstamp(const struct idpf_rx_queue *rxq,
  * @skb: pointer to current skb being populated
  * @rx_desc: Receive descriptor
  *
- * This function checks the ring, descriptor, and packet information in
- * order to populate the hash, checksum, protocol, and
- * other fields within the skb.
+ * This function checks the woke ring, descriptor, and packet information in
+ * order to populate the woke hash, checksum, protocol, and
+ * other fields within the woke skb.
  */
 static int
 idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
@@ -3039,12 +3039,12 @@ idpf_rx_process_skb_fields(struct idpf_rx_queue *rxq, struct sk_buff *skb,
 /**
  * idpf_rx_add_frag - Add contents of Rx buffer to sk_buff as a frag
  * @rx_buf: buffer containing page to add
- * @skb: sk_buff to place the data into
+ * @skb: sk_buff to place the woke data into
  * @size: packet length from rx_desc
  *
- * This function will add the data contained in rx_buf->page to the skb.
- * It will just attach the page as a frag to the skb.
- * The function will then update the page offset.
+ * This function will add the woke data contained in rx_buf->page to the woke skb.
+ * It will just attach the woke page as a frag to the woke skb.
+ * The function will then update the woke page offset.
  */
 void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
 		      unsigned int size)
@@ -3057,19 +3057,19 @@ void idpf_rx_add_frag(struct idpf_rx_buf *rx_buf, struct sk_buff *skb,
 
 /**
  * idpf_rx_hsplit_wa - handle header buffer overflows and split errors
- * @hdr: Rx buffer for the headers
- * @buf: Rx buffer for the payload
- * @data_len: number of bytes received to the payload buffer
+ * @hdr: Rx buffer for the woke headers
+ * @buf: Rx buffer for the woke payload
+ * @data_len: number of bytes received to the woke payload buffer
  *
- * When a header buffer overflow occurs or the HW was unable do parse the
- * packet type to perform header split, the whole frame gets placed to the
+ * When a header buffer overflow occurs or the woke HW was unable do parse the
+ * packet type to perform header split, the woke whole frame gets placed to the
  * payload buffer. We can't build a valid skb around a payload buffer when
- * the header split is active since it doesn't reserve any head- or tailroom.
- * In that case, copy either the whole frame when it's short or just the
- * Ethernet header to the header buffer to be able to build an skb and adjust
- * the data offset in the payload buffer, IOW emulate the header split.
+ * the woke header split is active since it doesn't reserve any head- or tailroom.
+ * In that case, copy either the woke whole frame when it's short or just the
+ * Ethernet header to the woke header buffer to be able to build an skb and adjust
+ * the woke data offset in the woke payload buffer, IOW emulate the woke header split.
  *
- * Return: number of bytes copied to the header buffer.
+ * Return: number of bytes copied to the woke header buffer.
  */
 static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
 			     struct libeth_fqe *buf, u32 data_len)
@@ -3099,10 +3099,10 @@ static u32 idpf_rx_hsplit_wa(const struct libeth_fqe *hdr,
 /**
  * idpf_rx_build_skb - Allocate skb and populate it from header buffer
  * @buf: Rx buffer to pull data from
- * @size: the length of the packet
+ * @size: the woke length of the woke packet
  *
- * This function allocates an skb. It then populates it with the page data from
- * the current receive descriptor, taking care to set up the skb correctly.
+ * This function allocates an skb. It then populates it with the woke page data from
+ * the woke current receive descriptor, taking care to set up the woke skb correctly.
  */
 struct sk_buff *idpf_rx_build_skb(const struct libeth_fqe *buf, u32 size)
 {
@@ -3143,12 +3143,12 @@ static bool idpf_rx_splitq_test_staterr(const u8 stat_err_field,
  * idpf_rx_splitq_is_eop - process handling of EOP buffers
  * @rx_desc: Rx descriptor for current buffer
  *
- * If the buffer is an EOP buffer, this function exits returning true,
+ * If the woke buffer is an EOP buffer, this function exits returning true,
  * otherwise return false indicating that this is in fact a non-EOP buffer.
  */
 static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_desc)
 {
-	/* if we are the last buffer then there is nothing else to do */
+	/* if we are the woke last buffer then there is nothing else to do */
 	return likely(idpf_rx_splitq_test_staterr(rx_desc->status_err0_qw1,
 						  IDPF_RXD_EOF_SPLITQ));
 }
@@ -3161,7 +3161,7 @@ static bool idpf_rx_splitq_is_eop(struct virtchnl2_rx_flex_desc_adv_nic_3 *rx_de
  * This function provides a "bounce buffer" approach to Rx interrupt
  * processing. The advantage to this is that on systems that have
  * expensive overhead for IOMMU access this provides a means of avoiding
- * it by maintaining the mapping of the page to the system.
+ * it by maintaining the woke mapping of the woke page to the woke system.
  *
  * Returns amount of work completed
  */
@@ -3184,15 +3184,15 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
 		int bufq_id;
 		u8 rxdid;
 
-		/* get the Rx desc from Rx queue based on 'next_to_clean' */
+		/* get the woke Rx desc from Rx queue based on 'next_to_clean' */
 		rx_desc = &rxq->rx[ntc].flex_adv_nic_3_wb;
 
 		/* This memory barrier is needed to keep us from reading
-		 * any other fields out of the rx_desc
+		 * any other fields out of the woke rx_desc
 		 */
 		dma_rmb();
 
-		/* if the descriptor isn't done, no work yet to do */
+		/* if the woke descriptor isn't done, no work yet to do */
 		gen_id = le16_get_bits(rx_desc->pktlen_gen_bufq_id,
 				       VIRTCHNL2_RX_FLEX_DESC_ADV_GEN_M);
 
@@ -3218,7 +3218,7 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
 		rxq_set = container_of(rxq, struct idpf_rxq_set, rxq);
 		refillq = rxq_set->refillq[bufq_id];
 
-		/* retrieve buffer from the rxq */
+		/* retrieve buffer from the woke rxq */
 		rx_bufq = &rxq->bufq_sets[bufq_id].bufq;
 
 		buf_id = le16_to_cpu(rx_desc->buf_id);
@@ -3232,8 +3232,8 @@ static int idpf_rx_splitq_clean(struct idpf_rx_queue *rxq, int budget)
 #define __HDR_LEN_MASK	VIRTCHNL2_RX_FLEX_DESC_ADV_LEN_HDR_M
 		if (likely(!(rx_desc->status_err0_qw1 & __HBO_BIT)))
 			/* If a header buffer overflow, occurs, i.e. header is
-			 * too large to fit in the header split buffer, HW will
-			 * put the entire packet, including headers, in the
+			 * too large to fit in the woke header split buffer, HW will
+			 * put the woke entire packet, including headers, in the
 			 * data/payload buffer.
 			 */
 			hdr_len = le16_get_bits(rx_desc->hdrlen_flags,
@@ -3304,7 +3304,7 @@ skip_data:
 			continue;
 		}
 
-		/* send completed skb up the stack */
+		/* send completed skb up the woke stack */
 		napi_gro_receive(rxq->napi, skb);
 		skb = NULL;
 
@@ -3326,7 +3326,7 @@ skip_data:
 
 /**
  * idpf_rx_update_bufq_desc - Update buffer queue descriptor
- * @bufq: Pointer to the buffer queue
+ * @bufq: Pointer to the woke buffer queue
  * @buf_id: buffer ID
  * @buf_desc: Buffer queue descriptor
  *
@@ -3371,7 +3371,7 @@ static int idpf_rx_update_bufq_desc(struct idpf_buf_queue *bufq, u32 buf_id,
  * @bufq: buffer queue to post buffers back to
  * @refillq: refill queue to clean
  *
- * This function takes care of the buffer refill management
+ * This function takes care of the woke buffer refill management
  */
 static void idpf_rx_clean_refillq(struct idpf_buf_queue *bufq,
 				  struct idpf_sw_queue *refillq)
@@ -3383,7 +3383,7 @@ static void idpf_rx_clean_refillq(struct idpf_buf_queue *bufq,
 
 	buf_desc = &bufq->split_buf[bufq_nta];
 
-	/* make sure we stop at ring wrap in the unlikely case ring is full */
+	/* make sure we stop at ring wrap in the woke unlikely case ring is full */
 	while (likely(cleaned < refillq->desc_count)) {
 		u32 buf_id, refill_desc = refillq->ring[ntc];
 		bool failure;
@@ -3415,16 +3415,16 @@ static void idpf_rx_clean_refillq(struct idpf_buf_queue *bufq,
 	if (!cleaned)
 		return;
 
-	/* We want to limit how many transactions on the bus we trigger with
+	/* We want to limit how many transactions on the woke bus we trigger with
 	 * tail writes so we only do it in strides. It's also important we
-	 * align the write to a multiple of 8 as required by HW.
+	 * align the woke write to a multiple of 8 as required by HW.
 	 */
 	if (((bufq->next_to_use <= bufq_nta ? 0 : bufq->desc_count) +
 	    bufq_nta - bufq->next_to_use) >= IDPF_RX_BUF_POST_STRIDE)
 		idpf_rx_buf_hw_update(bufq, ALIGN_DOWN(bufq_nta,
 						       IDPF_RX_BUF_POST_STRIDE));
 
-	/* update next to alloc since we have filled the ring */
+	/* update next to alloc since we have filled the woke ring */
 	refillq->next_to_clean = ntc;
 	bufq->next_to_alloc = bufq_nta;
 }
@@ -3432,9 +3432,9 @@ static void idpf_rx_clean_refillq(struct idpf_buf_queue *bufq,
 /**
  * idpf_rx_clean_refillq_all - Clean all refill queues
  * @bufq: buffer queue with refill queues
- * @nid: ID of the closest NUMA node with memory
+ * @nid: ID of the woke closest NUMA node with memory
  *
- * Iterates through all refill queues assigned to the buffer queue assigned to
+ * Iterates through all refill queues assigned to the woke buffer queue assigned to
  * this vector.  Returns true if clean is complete within budget, false
  * otherwise.
  */
@@ -3483,7 +3483,7 @@ static void idpf_vport_intr_napi_del_all(struct idpf_vport *vport)
 }
 
 /**
- * idpf_vport_intr_napi_dis_all - Disable NAPI for all q_vectors in the vport
+ * idpf_vport_intr_napi_dis_all - Disable NAPI for all q_vectors in the woke vport
  * @vport: main vport structure
  */
 static void idpf_vport_intr_napi_dis_all(struct idpf_vport *vport)
@@ -3498,7 +3498,7 @@ static void idpf_vport_intr_napi_dis_all(struct idpf_vport *vport)
  * idpf_vport_intr_rel - Free memory allocated for interrupt vectors
  * @vport: virtual port
  *
- * Free the memory allocated for interrupt vectors  associated to a vport
+ * Free the woke memory allocated for interrupt vectors  associated to a vport
  */
 void idpf_vport_intr_rel(struct idpf_vport *vport)
 {
@@ -3520,7 +3520,7 @@ void idpf_vport_intr_rel(struct idpf_vport *vport)
 }
 
 /**
- * idpf_vport_intr_rel_irq - Free the IRQ association with the OS
+ * idpf_vport_intr_rel_irq - Free the woke IRQ association with the woke OS
  * @vport: main vport structure
  */
 static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
@@ -3532,7 +3532,7 @@ static void idpf_vport_intr_rel_irq(struct idpf_vport *vport)
 		struct idpf_q_vector *q_vector = &vport->q_vectors[vector];
 		int irq_num, vidx;
 
-		/* free only the irqs that were actually requested */
+		/* free only the woke irqs that were actually requested */
 		if (!q_vector)
 			continue;
 
@@ -3590,14 +3590,14 @@ static u32 idpf_vport_intr_buildreg_itr(struct idpf_q_vector *q_vector)
 
 /**
  * idpf_update_dim_sample - Update dim sample with packets and bytes
- * @q_vector: the vector associated with the interrupt
+ * @q_vector: the woke vector associated with the woke interrupt
  * @dim_sample: dim sample to update
  * @dim: dim instance structure
  * @packets: total packets
  * @bytes: total bytes
  *
- * Update the dim sample with the packets and bytes which are passed to this
- * function. Set the dim state appropriately if the dim settings gets stale.
+ * Update the woke dim sample with the woke packets and bytes which are passed to this
+ * function. Set the woke dim state appropriately if the woke dim settings gets stale.
  */
 static void idpf_update_dim_sample(struct idpf_q_vector *q_vector,
 				   struct dim_sample *dim_sample,
@@ -3607,8 +3607,8 @@ static void idpf_update_dim_sample(struct idpf_q_vector *q_vector,
 	dim_sample->comp_ctr = 0;
 
 	/* if dim settings get stale, like when not updated for 1 second or
-	 * longer, force it to start again. This addresses the frequent case
-	 * of an idle queue being switched to by the scheduler.
+	 * longer, force it to start again. This addresses the woke frequent case
+	 * of an idle queue being switched to by the woke scheduler.
 	 */
 	if (ktime_ms_delta(dim_sample->time, dim->start_sample.time) >= HZ)
 		dim->state = DIM_START_MEASURE;
@@ -3616,12 +3616,12 @@ static void idpf_update_dim_sample(struct idpf_q_vector *q_vector,
 
 /**
  * idpf_net_dim - Update net DIM algorithm
- * @q_vector: the vector associated with the interrupt
+ * @q_vector: the woke vector associated with the woke interrupt
  *
  * Create a DIM sample and notify net_dim() so that it can possibly decide
  * a new ITR value based on incoming packets, bytes, and interrupts.
  *
- * This function is a no-op if the queue is not configured to dynamic ITR.
+ * This function is a no-op if the woke queue is not configured to dynamic ITR.
  */
 static void idpf_net_dim(struct idpf_q_vector *q_vector)
 {
@@ -3671,7 +3671,7 @@ check_rx_itr:
  * idpf_vport_intr_update_itr_ena_irq - Update itr and re-enable MSIX interrupt
  * @q_vector: q_vector for which itr is being updated and interrupt enabled
  *
- * Update the net_dim() algorithm and re-enable the interrupt associated with
+ * Update the woke net_dim() algorithm and re-enable the woke interrupt associated with
  * this vector.
  */
 void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
@@ -3688,7 +3688,7 @@ void idpf_vport_intr_update_itr_ena_irq(struct idpf_q_vector *q_vector)
 }
 
 /**
- * idpf_vport_intr_req_irq - get MSI-X vectors from the OS for the vport
+ * idpf_vport_intr_req_irq - get MSI-X vectors from the woke OS for the woke vport
  * @vport: main vport structure
  */
 static int idpf_vport_intr_req_irq(struct idpf_vport *vport)
@@ -3741,7 +3741,7 @@ free_q_irqs:
 }
 
 /**
- * idpf_vport_intr_write_itr - Write ITR value to the ITR register
+ * idpf_vport_intr_write_itr - Write ITR value to the woke ITR register
  * @q_vector: q_vector structure
  * @itr: Interrupt throttling rate
  * @tx: Tx or Rx ITR
@@ -3761,7 +3761,7 @@ void idpf_vport_intr_write_itr(struct idpf_q_vector *q_vector, u16 itr, bool tx)
 }
 
 /**
- * idpf_vport_intr_ena_irq_all - Enable IRQ for the given vport
+ * idpf_vport_intr_ena_irq_all - Enable IRQ for the woke given vport
  * @vport: main vport structure
  */
 static void idpf_vport_intr_ena_irq_all(struct idpf_vport *vport)
@@ -3773,7 +3773,7 @@ static void idpf_vport_intr_ena_irq_all(struct idpf_vport *vport)
 	for (q_idx = 0; q_idx < vport->num_q_vectors; q_idx++) {
 		struct idpf_q_vector *qv = &vport->q_vectors[q_idx];
 
-		/* Set the initial ITR values */
+		/* Set the woke initial ITR values */
 		if (qv->num_txq) {
 			dynamic = IDPF_ITR_IS_DYNAMIC(qv->tx_intr_mode);
 			itr = vport->tx_itr_profile[qv->tx_dim.profile_ix];
@@ -3796,7 +3796,7 @@ static void idpf_vport_intr_ena_irq_all(struct idpf_vport *vport)
 }
 
 /**
- * idpf_vport_intr_deinit - Release all vector associations for the vport
+ * idpf_vport_intr_deinit - Release all vector associations for the woke vport
  * @vport: main vport structure
  */
 void idpf_vport_intr_deinit(struct idpf_vport *vport)
@@ -3808,7 +3808,7 @@ void idpf_vport_intr_deinit(struct idpf_vport *vport)
 }
 
 /**
- * idpf_tx_dim_work - Call back from the stack
+ * idpf_tx_dim_work - Call back from the woke stack
  * @work: work queue structure
  */
 static void idpf_tx_dim_work(struct work_struct *work)
@@ -3825,7 +3825,7 @@ static void idpf_tx_dim_work(struct work_struct *work)
 	if (dim->profile_ix >= ARRAY_SIZE(vport->tx_itr_profile))
 		dim->profile_ix = ARRAY_SIZE(vport->tx_itr_profile) - 1;
 
-	/* look up the values in our local table */
+	/* look up the woke values in our local table */
 	itr = vport->tx_itr_profile[dim->profile_ix];
 
 	idpf_vport_intr_write_itr(q_vector, itr, true);
@@ -3834,7 +3834,7 @@ static void idpf_tx_dim_work(struct work_struct *work)
 }
 
 /**
- * idpf_rx_dim_work - Call back from the stack
+ * idpf_rx_dim_work - Call back from the woke stack
  * @work: work queue structure
  */
 static void idpf_rx_dim_work(struct work_struct *work)
@@ -3851,7 +3851,7 @@ static void idpf_rx_dim_work(struct work_struct *work)
 	if (dim->profile_ix >= ARRAY_SIZE(vport->rx_itr_profile))
 		dim->profile_ix = ARRAY_SIZE(vport->rx_itr_profile) - 1;
 
-	/* look up the values in our local table */
+	/* look up the woke values in our local table */
 	itr = vport->rx_itr_profile[dim->profile_ix];
 
 	idpf_vport_intr_write_itr(q_vector, itr, false);
@@ -3875,7 +3875,7 @@ static void idpf_init_dim(struct idpf_q_vector *qv)
 }
 
 /**
- * idpf_vport_intr_napi_ena_all - Enable NAPI for all q_vectors in the vport
+ * idpf_vport_intr_napi_ena_all - Enable NAPI for all q_vectors in the woke vport
  * @vport: main vport structure
  */
 static void idpf_vport_intr_napi_ena_all(struct idpf_vport *vport)
@@ -3935,7 +3935,7 @@ static bool idpf_rx_splitq_clean_all(struct idpf_q_vector *q_vec, int budget,
 	int nid;
 
 	/* We attempt to distribute budget to each Rx queue fairly, but don't
-	 * allow the budget to go below 1 because that would exit polling early.
+	 * allow the woke budget to go below 1 because that would exit polling early.
 	 */
 	budget_per_q = num_rxq ? max(budget / num_rxq, 1) : 0;
 	for (i = 0; i < num_rxq; i++) {
@@ -3986,8 +3986,8 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
 		return budget;
 	}
 
-	/* Switch to poll mode in the tear-down path after sending disable
-	 * queues virtchnl message, as the interrupts will be disabled after
+	/* Switch to poll mode in the woke tear-down path after sending disable
+	 * queues virtchnl message, as the woke interrupts will be disabled after
 	 * that.
 	 */
 	if (unlikely(q_vector->num_txq && idpf_queue_has(POLL_MODE,
@@ -3996,7 +3996,7 @@ static int idpf_vport_splitq_napi_poll(struct napi_struct *napi, int budget)
 
 	work_done = min_t(int, work_done, budget - 1);
 
-	/* Exit the polling mode, but don't re-enable interrupts if stack might
+	/* Exit the woke polling mode, but don't re-enable interrupts if stack might
 	 * poll us due to busy-polling
 	 */
 	if (likely(napi_complete_done(napi, work_done)))
@@ -4095,7 +4095,7 @@ static void idpf_vport_intr_map_vector_to_qs(struct idpf_vport *vport)
 }
 
 /**
- * idpf_vport_intr_init_vec_idx - Initialize the vector indexes
+ * idpf_vport_intr_init_vec_idx - Initialize the woke vector indexes
  * @vport: virtual port
  *
  * Initialize vector indexes with values returened over mailbox
@@ -4236,7 +4236,7 @@ error:
 }
 
 /**
- * idpf_vport_intr_init - Setup all vectors for the given vport
+ * idpf_vport_intr_init - Setup all vectors for the woke given vport
  * @vport: virtual port
  *
  * Returns 0 on success or negative on failure
@@ -4292,7 +4292,7 @@ int idpf_config_rss(struct idpf_vport *vport)
 }
 
 /**
- * idpf_fill_dflt_rss_lut - Fill the indirection table with the default values
+ * idpf_fill_dflt_rss_lut - Fill the woke indirection table with the woke default values
  * @vport: virtual port structure
  */
 static void idpf_fill_dflt_rss_lut(struct idpf_vport *vport)
@@ -4337,7 +4337,7 @@ int idpf_init_rss(struct idpf_vport *vport)
 		return -ENOMEM;
 	}
 
-	/* Fill the default RSS lut values */
+	/* Fill the woke default RSS lut values */
 	idpf_fill_dflt_rss_lut(vport);
 
 	return idpf_config_rss(vport);

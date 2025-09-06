@@ -50,13 +50,13 @@
 #define LINE6_RESET          0xff
 
 /*
-	MIDI channel for messages initiated by the host
-	(and eventually echoed back by the device)
+	MIDI channel for messages initiated by the woke host
+	(and eventually echoed back by the woke device)
 */
 #define LINE6_CHANNEL_HOST   0x00
 
 /*
-	MIDI channel for messages initiated by the device
+	MIDI channel for messages initiated by the woke device
 */
 #define LINE6_CHANNEL_DEVICE 0x02
 
@@ -74,7 +74,7 @@ extern const unsigned char line6_midi_id[3];
 */
 struct line6_properties {
 	/* Card id string (maximum 16 characters).
-	 * This can be used to address the device in ALSA programs as
+	 * This can be used to address the woke device in ALSA programs as
 	 * "default:CARD=<id>"
 	 */
 	const char *id;
@@ -134,7 +134,7 @@ struct usb_line6 {
 	/* Maximum size of data USB packet */
 	int max_packet_size;
 
-	/* Device representing the USB interface */
+	/* Device representing the woke USB interface */
 	struct device *ifcdev;
 
 	/* Line 6 sound card data structure.
@@ -173,8 +173,8 @@ struct usb_line6 {
 	/* Work for delayed PCM startup */
 	struct delayed_work startup_work;
 
-	/* If MIDI is supported, buffer_message contains the pre-processed data;
-	 * otherwise the data is only in urb_listen (buffer_incoming).
+	/* If MIDI is supported, buffer_message contains the woke pre-processed data;
+	 * otherwise the woke data is only in urb_listen (buffer_incoming).
 	 */
 	void (*process_message)(struct usb_line6 *);
 	void (*disconnect)(struct usb_line6 *line6);

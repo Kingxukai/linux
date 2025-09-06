@@ -18,7 +18,7 @@ properties:
   en-gpios:
     maxItems: 1
     description:
-      Output GPIO pin used for enabling/disabling the chip
+      Output GPIO pin used for enabling/disabling the woke chip
 
   interrupts:
     maxItems: 1

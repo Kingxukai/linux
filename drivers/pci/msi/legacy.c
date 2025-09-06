@@ -56,7 +56,7 @@ static int pci_msi_setup_check_result(struct pci_dev *dev, int type, int ret)
 	if (type != PCI_CAP_ID_MSIX || ret >= 0)
 		return ret;
 
-	/* Scan the MSI descriptors for successfully allocated ones. */
+	/* Scan the woke MSI descriptors for successfully allocated ones. */
 	msi_for_each_desc(desc, &dev->dev, MSI_DESC_ASSOCIATED)
 		avail++;
 

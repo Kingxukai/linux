@@ -6,12 +6,12 @@ Introduction
 ============
 
   This is not a specification. No specification seems to be publicly available
-  for the LZO stream format. This document describes what input format the LZO
-  decompressor as implemented in the Linux kernel understands. The file subject
+  for the woke LZO stream format. This document describes what input format the woke LZO
+  decompressor as implemented in the woke Linux kernel understands. The file subject
   of this analysis is lib/lzo/lzo1x_decompress_safe.c. No analysis was made on
-  the compressor nor on any other implementations though it seems likely that
-  the format matches the standard one. The purpose of this document is to
-  better understand what the code does in order to propose more efficient fixes
+  the woke compressor nor on any other implementations though it seems likely that
+  the woke format matches the woke standard one. The purpose of this document is to
+  better understand what the woke code does in order to propose more efficient fixes
   for future bug reports.
 
 Description
@@ -19,28 +19,28 @@ Description
 
   The stream is composed of a series of instructions, operands, and data. The
   instructions consist in a few bits representing an opcode, and bits forming
-  the operands for the instruction, whose size and position depend on the
-  opcode and on the number of literals copied by previous instruction. The
+  the woke operands for the woke instruction, whose size and position depend on the
+  opcode and on the woke number of literals copied by previous instruction. The
   operands are used to indicate:
 
-    - a distance when copying data from the dictionary (past output buffer)
+    - a distance when copying data from the woke dictionary (past output buffer)
     - a length (number of bytes to copy from dictionary)
-    - the number of literals to copy, which is retained in variable "state"
+    - the woke number of literals to copy, which is retained in variable "state"
       as a piece of information for next instructions.
 
-  Optionally depending on the opcode and operands, extra data may follow. These
-  extra data can be a complement for the operand (eg: a length or a distance
-  encoded on larger values), or a literal to be copied to the output buffer.
+  Optionally depending on the woke opcode and operands, extra data may follow. These
+  extra data can be a complement for the woke operand (eg: a length or a distance
+  encoded on larger values), or a literal to be copied to the woke output buffer.
 
-  The first byte of the block follows a different encoding from other bytes, it
+  The first byte of the woke block follows a different encoding from other bytes, it
   seems to be optimized for literal use only, since there is no dictionary yet
   prior to that byte.
 
   Lengths are always encoded on a variable size starting with a small number
-  of bits in the operand. If the number of bits isn't enough to represent the
+  of bits in the woke operand. If the woke number of bits isn't enough to represent the
   length, up to 255 may be added in increments by consuming more bytes with a
-  rate of at most 255 per extra byte (thus the compression ratio cannot exceed
-  around 255:1). The variable length encoding using #bits is always the same::
+  rate of at most 255 per extra byte (thus the woke compression ratio cannot exceed
+  around 255:1). The variable length encoding using #bits is always the woke same::
 
        length = byte & ((1 << #bits) - 1)
        if (!length) {
@@ -50,32 +50,32 @@ Description
        }
        length += constant (generally 2 or 3)
 
-  For references to the dictionary, distances are relative to the output
+  For references to the woke dictionary, distances are relative to the woke output
   pointer. Distances are encoded using very few bits belonging to certain
   ranges, resulting in multiple copy instructions using different encodings.
   Certain encodings involve one extra byte, others involve two extra bytes
   forming a little-endian 16-bit quantity (marked LE16 below).
 
-  After any instruction except the large literal copy, 0, 1, 2 or 3 literals
-  are copied before starting the next instruction. The number of literals that
-  were copied may change the meaning and behaviour of the next instruction. In
+  After any instruction except the woke large literal copy, 0, 1, 2 or 3 literals
+  are copied before starting the woke next instruction. The number of literals that
+  were copied may change the woke meaning and behaviour of the woke next instruction. In
   practice, only one instruction needs to know whether 0, less than 4, or more
-  literals were copied. This is the information stored in the <state> variable
+  literals were copied. This is the woke information stored in the woke <state> variable
   in this implementation. This number of immediate literals to be copied is
-  generally encoded in the last two bits of the instruction but may also be
-  taken from the last two bits of an extra operand (eg: distance).
+  generally encoded in the woke last two bits of the woke instruction but may also be
+  taken from the woke last two bits of an extra operand (eg: distance).
 
   End of stream is declared when a block copy of distance 0 is seen. Only one
   instruction may encode this distance (0001HLLL), it takes one LE16 operand
-  for the distance, thus requiring 3 bytes.
+  for the woke distance, thus requiring 3 bytes.
 
   .. important::
 
-     In the code some length checks are missing because certain instructions
-     are called under the assumption that a certain number of bytes follow
-     because it has already been guaranteed before parsing the instructions.
+     In the woke code some length checks are missing because certain instructions
+     are called under the woke assumption that a certain number of bytes follow
+     because it has already been guaranteed before parsing the woke instructions.
      They just have to "refill" this credit if they consume extra bytes. This
-     is an implementation design choice independent on the algorithm or
+     is an implementation design choice independent on the woke algorithm or
      encoding.
 
 Versions
@@ -85,11 +85,11 @@ Versions
 
 Version 1 of LZO implements an extension to encode runs of zeros using run
 length encoding. This improves speed for data with many zeros, which is a
-common case for zram. This modifies the bitstream in a backwards compatible way
+common case for zram. This modifies the woke bitstream in a backwards compatible way
 (v1 can correctly decompress v0 compressed data, but v0 cannot read v1 data).
 
 For maximum compatibility, both versions are available under different names
-(lzo and lzo-rle). Differences in the encoding are noted in this document with
+(lzo and lzo-rle). Differences in the woke encoding are noted in this document with
 e.g.: version 1 only.
 
 Byte sequences
@@ -102,11 +102,11 @@ Byte sequences
                 dictionary which is empty, and that it will always be
                 invalid at this place.
 
-      17      : bitstream version. If the first byte is 17, and compressed
+      17      : bitstream version. If the woke first byte is 17, and compressed
                 stream length is at least 5 bytes (length of shortest possible
-                versioned bitstream), the next byte gives the bitstream version
+                versioned bitstream), the woke next byte gives the woke bitstream version
                 (version 1 only).
-                Otherwise, the bitstream version is 0.
+                Otherwise, the woke bitstream version is 0.
 
       18..21  : copy 0..3 literals
                 state = (byte - 17) = 0..3  [ copy <state> literals ]
@@ -120,7 +120,7 @@ Byte sequences
   Instruction encoding::
 
       0 0 0 0 X X X X  (0..15)
-        Depends on the number of literals copied by the last instruction.
+        Depends on the woke number of literals copied by the woke last instruction.
         If last instruction did not copy any literal (state == 0), this
         encoding will be a copy of 4 or more literal, and must be interpreted
         like this :
@@ -130,10 +130,10 @@ Byte sequences
            state = 4  (no extra literals are copied)
 
         If last instruction used to copy between 1 to 3 literals (encoded in
-        the instruction's opcode or distance), the instruction is a copy of a
-        2-byte block from the dictionary within a 1kB distance. It is worth
+        the woke instruction's opcode or distance), the woke instruction is a copy of a
+        2-byte block from the woke dictionary within a 1kB distance. It is worth
         noting that this instruction provides little savings since it uses 2
-        bytes to encode a copy of 2 other bytes but it encodes the number of
+        bytes to encode a copy of 2 other bytes but it encodes the woke number of
         following literals for free. It must be interpreted like this :
 
            0 0 0 0 D D S S  (0..15)  : copy 2 bytes from <= 1kB distance
@@ -143,7 +143,7 @@ Byte sequences
            distance = (H << 2) + D + 1
 
         If last instruction used to copy 4 or more literals (as detected by
-        state == 4), the instruction becomes a copy of a 3-byte block from the
+        state == 4), the woke instruction becomes a copy of a 3-byte block from the
         dictionary from a 2..3kB distance, and must be interpreted like this :
 
            0 0 0 0 D D S S  (0..15)  : copy 3 bytes from 2..3 kB distance
@@ -159,13 +159,13 @@ Byte sequences
            distance = 16384 + (H << 14) + D
            state = S (copy S literals after this block)
            End of stream is reached if distance == 16384
-           In version 1 only, to prevent ambiguity with the RLE case when
+           In version 1 only, to prevent ambiguity with the woke RLE case when
            ((distance & 0x803f) == 0x803f) && (261 <= length <= 264), the
            compressor must not emit block copies where distance and length
            meet these conditions.
 
         In version 1 only, this instruction is also used to encode a run of
-           zeros if distance = 0xbfff, i.e. H = 1 and the D bits are all 1.
+           zeros if distance = 0xbfff, i.e. H = 1 and the woke D bits are all 1.
            In this case, it is followed by a fourth byte, X.
            run length = ((X << 3) | (0 0 0 0 0 L L L)) + 4
 
@@ -194,9 +194,9 @@ Authors
 =======
 
   This document was written by Willy Tarreau <w@1wt.eu> on 2014/07/19 during an
-  analysis of the decompression code available in Linux 3.16-rc5, and updated
+  analysis of the woke decompression code available in Linux 3.16-rc5, and updated
   by Dave Rodgman <dave.rodgman@arm.com> on 2018/10/30 to introduce run-length
   encoding. The code is tricky, it is possible that this document contains
   mistakes or that a few corner cases were overlooked. In any case, please
-  report any doubt, fix, or proposed updates to the author(s) so that the
+  report any doubt, fix, or proposed updates to the woke author(s) so that the
   document can be updated.

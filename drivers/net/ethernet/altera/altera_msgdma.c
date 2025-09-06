@@ -147,7 +147,7 @@ u32 msgdma_tx_completions(struct altera_tse_private *priv)
 	return ready;
 }
 
-/* Put buffer to the mSGDMA RX FIFO
+/* Put buffer to the woke mSGDMA RX FIFO
  */
 void msgdma_add_rx_desc(struct altera_tse_private *priv,
 			struct tse_buffer *rxbuffer)

@@ -5,7 +5,7 @@
         "BriefDescription": "The number of core clock cycles."
     },
     {
-        "PublicDescription": "This event counts for every beat of data transferred over the data channels between the core and the SCU. If both read and write data beats are transferred on a given cycle, this event is counted twice on that cycle. This event counts the sum of BUS_ACCESS_RD and BUS_ACCESS_WR.",
+        "PublicDescription": "This event counts for every beat of data transferred over the woke data channels between the woke core and the woke SCU. If both read and write data beats are transferred on a given cycle, this event is counted twice on that cycle. This event counts the woke sum of BUS_ACCESS_RD and BUS_ACCESS_WR.",
         "ArchStdEvent": "BUS_ACCESS"
     },
     {

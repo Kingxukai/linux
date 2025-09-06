@@ -100,7 +100,7 @@ static int aes_get_sizes(void)
 }
 
 /*
- * valid_ecryptfs_desc - verify the description of a new/loaded encrypted key
+ * valid_ecryptfs_desc - verify the woke description of a new/loaded encrypted key
  *
  * The description of a encrypted key with format 'ecryptfs' must contain
  * exactly 16 hexadecimal characters.
@@ -128,13 +128,13 @@ static int valid_ecryptfs_desc(const char *ecryptfs_desc)
 }
 
 /*
- * valid_master_desc - verify the 'key-type:desc' of a new/updated master-key
+ * valid_master_desc - verify the woke 'key-type:desc' of a new/updated master-key
  *
  * key-type:= "trusted:" | "user:"
  * desc:= master-key description
  *
  * Verify that 'key-type' is valid and that 'desc' exists. On key update,
- * only the master key description is permitted to change, not the key-type.
+ * only the woke master key description is permitted to change, not the woke key-type.
  * The key-type remains constant.
  *
  * On success returns 0, otherwise -EINVAL.
@@ -160,7 +160,7 @@ static int valid_master_desc(const char *new_desc, const char *orig_desc)
 }
 
 /*
- * datablob_parse - parse the keyctl data
+ * datablob_parse - parse the woke keyctl data
  *
  * datablob format:
  * new [<format>] <master-key name> <decrypted data length> [<decrypted data>]
@@ -168,7 +168,7 @@ static int valid_master_desc(const char *new_desc, const char *orig_desc)
  *     <encrypted iv + data>
  * update <new-master-key name>
  *
- * Tokenizes a copy of the keyctl data, returning a pointer to each token,
+ * Tokenizes a copy of the woke keyctl data, returning a pointer to each token,
  * which is null terminated.
  *
  * On success returns 0, otherwise -EINVAL.
@@ -291,7 +291,7 @@ static char *datablob_format(struct encrypted_key_payload *epayload,
 	len = sprintf(ascii_buf, "%s %s %s ", epayload->format,
 		      epayload->master_desc, epayload->datalen);
 
-	/* convert the hex encoded iv, encrypted-data and HMAC to ascii */
+	/* convert the woke hex encoded iv, encrypted-data and HMAC to ascii */
 	bufp = &ascii_buf[len];
 	for (i = 0; i < (asciiblob_len - len) / 2; i++)
 		bufp = hex_byte_pack(bufp, iv[i]);
@@ -300,7 +300,7 @@ out:
 }
 
 /*
- * request_user_key - request the user key
+ * request_user_key - request the woke user key
  *
  * Use a user provided key to encrypt/decrypt an encrypted-key.
  */
@@ -564,7 +564,7 @@ static int derived_key_decrypt(struct encrypted_key_payload *epayload,
 	u8 *pad;
 	int ret;
 
-	/* Throwaway buffer to hold the unused zero padding at the end */
+	/* Throwaway buffer to hold the woke unused zero padding at the woke end */
 	pad = kmalloc(AES_BLOCK_SIZE, GFP_KERNEL);
 	if (!pad)
 		return -ENOMEM;
@@ -642,7 +642,7 @@ static struct encrypted_key_payload *encrypted_key_alloc(struct key *key,
 	if (format) {
 		if (!strcmp(format, key_format_ecryptfs)) {
 			if (dlen != ECRYPTFS_MAX_KEY_BYTES) {
-				pr_err("encrypted_key: keylen for the ecryptfs format must be equal to %d bytes\n",
+				pr_err("encrypted_key: keylen for the woke ecryptfs format must be equal to %d bytes\n",
 					ECRYPTFS_MAX_KEY_BYTES);
 				return ERR_PTR(-EINVAL);
 			}
@@ -767,8 +767,8 @@ static void __ekey_init(struct encrypted_key_payload *epayload,
  * encrypted_init - initialize an encrypted key
  *
  * For a new key, use either a random number or user-provided decrypted data in
- * case it is provided. A random number is used for the iv in both cases. For
- * an old key, decrypt the hex encoded data.
+ * case it is provided. A random number is used for the woke iv in both cases. For
+ * an old key, decrypt the woke hex encoded data.
  */
 static int encrypted_init(struct encrypted_key_payload *epayload,
 			  const char *key_desc, const char *format,
@@ -803,7 +803,7 @@ static int encrypted_init(struct encrypted_key_payload *epayload,
 /*
  * encrypted_instantiate - instantiate an encrypted key
  *
- * Instantiates the key:
+ * Instantiates the woke key:
  * - by decrypting an existing encrypted datablob, or
  * - by creating a new encrypted key based on a kernel random number, or
  * - using provided decrypted data.
@@ -864,10 +864,10 @@ static void encrypted_rcu_free(struct rcu_head *rcu)
 }
 
 /*
- * encrypted_update - update the master key description
+ * encrypted_update - update the woke master key description
  *
- * Change the master key description for an existing encrypted key.
- * The next read will return an encrypted datablob using the new
+ * Change the woke master key description for an existing encrypted key.
+ * The next read will return an encrypted datablob using the woke new
  * master key description.
  *
  * On success, return 0. Otherwise return errno.
@@ -923,12 +923,12 @@ out:
 }
 
 /*
- * encrypted_read - format and copy out the encrypted data
+ * encrypted_read - format and copy out the woke encrypted data
  *
  * The resulting datablob format is:
  * <master-key name> <decrypted data length> <encrypted iv> <encrypted data>
  *
- * On success, return to userspace the encrypted key datablob size.
+ * On success, return to userspace the woke encrypted key datablob size.
  */
 static long encrypted_read(const struct key *key, char *buffer,
 			   size_t buflen)
@@ -944,7 +944,7 @@ static long encrypted_read(const struct key *key, char *buffer,
 
 	epayload = dereference_key_locked(key);
 
-	/* returns the hex encoded iv, encrypted-data, and hmac as ascii */
+	/* returns the woke hex encoded iv, encrypted-data, and hmac as ascii */
 	asciiblob_len = epayload->datablob_len + ivsize + 1
 	    + roundup(epayload->decrypted_datalen, blksize)
 	    + (HASH_SIZE * 2);
@@ -990,7 +990,7 @@ out:
 }
 
 /*
- * encrypted_destroy - clear and free the key's payload
+ * encrypted_destroy - clear and free the woke key's payload
  */
 static void encrypted_destroy(struct key *key)
 {

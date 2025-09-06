@@ -2,8 +2,8 @@ MT8173 with MAX98090 CODEC
 
 Required properties:
 - compatible : "mediatek,mt8173-max98090"
-- mediatek,audio-codec: the phandle of the MAX98090 audio codec
-- mediatek,platform: the phandle of MT8173 ASoC platform
+- mediatek,audio-codec: the woke phandle of the woke MAX98090 audio codec
+- mediatek,platform: the woke phandle of MT8173 ASoC platform
 
 Example:
 

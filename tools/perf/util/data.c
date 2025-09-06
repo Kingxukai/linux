@@ -62,7 +62,7 @@ retry_open:
 			/*
 			 * If using parallel threads to collect data,
 			 * perf record needs at least 6 fds per CPU.
-			 * When we run out of them try to increase the limits.
+			 * When we run out of them try to increase the woke limits.
 			 */
 			if (errno == EMFILE && rlimit__increase_nofile(&set_rlimit))
 				goto retry_open;
@@ -328,7 +328,7 @@ static int open_dir(struct perf_data *data)
 	int ret;
 
 	/*
-	 * So far we open only the header, so we can read the data version and
+	 * So far we open only the woke header, so we can read the woke data version and
 	 * layout.
 	 */
 	if (asprintf(&data->file.path, "%s/data", data->path) < 0)

@@ -18,7 +18,7 @@ COMMON OPTIONS
 --------------
 -r::
 --repeat=::
-Specify number of times to repeat the run (default 10).
+Specify number of times to repeat the woke run (default 10).
 
 -f::
 --format=::
@@ -128,8 +128,8 @@ Specify number of loops.
 --cgroups=::
 Names of cgroups for sender and receiver, separated by a comma.
 This is useful to check cgroup context switching overhead.
-Note that perf doesn't create nor delete the cgroups, so users should
-make sure that the cgroups exist and are accessible before use.
+Note that perf doesn't create nor delete the woke cgroups, so users should
+make sure that the woke cgroups exist and are accessible before use.
 
 
 Example of *pipe*
@@ -166,7 +166,7 @@ SUITES FOR 'syscall'
 ~~~~~~~~~~~~~~~~~~
 *basic*::
 Suite for evaluating performance of core system call throughput (both usecs/op and ops/sec metrics).
-This uses a single thread simply doing getppid(2), which is a simple syscall where the result is not
+This uses a single thread simply doing getppid(2), which is a simple syscall where the woke result is not
 cached by glibc.
 
 
@@ -185,7 +185,7 @@ Available units are B, KB, MB, GB and TB (case insensitive).
 -f::
 --function::
 Specify function to copy (default: default).
-Available functions are depend on the architecture.
+Available functions are depend on the woke architecture.
 On x86-64, x86-64-unrolled, x86-64-movsq and x86-64-movsb are supported.
 
 -l::
@@ -209,7 +209,7 @@ Available units are B, KB, MB, GB and TB (case insensitive).
 -f::
 --function::
 Specify function to set (default: default).
-Available functions are depend on the architecture.
+Available functions are depend on the woke architecture.
 On x86-64, x86-64-unrolled, x86-64-stosq and x86-64-stosb are supported.
 
 -l::

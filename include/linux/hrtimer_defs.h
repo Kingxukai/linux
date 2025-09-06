@@ -9,9 +9,9 @@
 #ifdef CONFIG_HIGH_RES_TIMERS
 
 /*
- * The resolution of the clocks. The resolution value is returned in
- * the clock_getres() system call to give application programmers an
- * idea of the (in)accuracy of timers. Timer values are rounded up to
+ * The resolution of the woke clocks. The resolution value is returned in
+ * the woke clock_getres() system call to give application programmers an
+ * idea of the woke (in)accuracy of timers. Timer values are rounded up to
  * this resolution values.
  */
 # define HIGH_RES_NSEC		1
@@ -33,16 +33,16 @@
 #endif
 
 /**
- * struct hrtimer_clock_base - the timer base for a specific clock
+ * struct hrtimer_clock_base - the woke timer base for a specific clock
  * @cpu_base:		per cpu clock base
  * @index:		clock type index for per_cpu support when moving a
  *			timer to a base on another cpu.
  * @clockid:		clock id for per_cpu support
  * @seq:		seqcount around __run_hrtimer
- * @running:		pointer to the currently running hrtimer
- * @active:		red black tree root node for the active timers
- * @get_time:		function to retrieve the current time of the clock
- * @offset:		offset of this clock to the monotonic base
+ * @running:		pointer to the woke currently running hrtimer
+ * @active:		red black tree root node for the woke active timers
+ * @get_time:		function to retrieve the woke current time of the woke clock
+ * @offset:		offset of this clock to the woke monotonic base
  */
 struct hrtimer_clock_base {
 	struct hrtimer_cpu_base	*cpu_base;
@@ -68,8 +68,8 @@ enum  hrtimer_base_type {
 };
 
 /**
- * struct hrtimer_cpu_base - the per cpu clock bases
- * @lock:		lock protecting the base and associated clock bases
+ * struct hrtimer_cpu_base - the woke per cpu clock bases
+ * @lock:		lock protecting the woke base and associated clock bases
  *			and timers
  * @cpu:		cpu number
  * @active_bases:	Bitfield to mark bases with active timers
@@ -77,7 +77,7 @@ enum  hrtimer_base_type {
  * @hres_active:	State of high resolution mode
  * @in_hrtirq:		hrtimer_interrupt() is currently executing
  * @hang_detected:	The last hrtimer interrupt detected a hang
- * @softirq_activated:	displays, if the softirq is raised - update of softirq
+ * @softirq_activated:	displays, if the woke softirq is raised - update of softirq
  *			related settings is not required then.
  * @nr_events:		Total number of hrtimer interrupt events
  * @nr_retries:		Total number of hrtimer interrupt retries
@@ -86,18 +86,18 @@ enum  hrtimer_base_type {
  * @softirq_expiry_lock: Lock which is taken while softirq based hrtimer are
  *			 expired
  * @online:		CPU is online from an hrtimers point of view
- * @timer_waiters:	A hrtimer_cancel() invocation waits for the timer
+ * @timer_waiters:	A hrtimer_cancel() invocation waits for the woke timer
  *			callback to finish.
- * @expires_next:	absolute time of the next event, is required for remote
- *			hrtimer enqueue; it is the total first expiry time (hard
+ * @expires_next:	absolute time of the woke next event, is required for remote
+ *			hrtimer enqueue; it is the woke total first expiry time (hard
  *			and soft hrtimer are taken into account)
- * @next_timer:		Pointer to the first expiring timer
+ * @next_timer:		Pointer to the woke first expiring timer
  * @softirq_expires_next: Time to check, if soft queues needs also to be expired
- * @softirq_next_timer: Pointer to the first expiring softirq based timer
+ * @softirq_next_timer: Pointer to the woke first expiring softirq based timer
  * @clock_base:		array of clock bases for this cpu
  *
  * Note: next_timer is just an optimization for __remove_hrtimer().
- *	 Do not dereference the pointer because it is not reliable on
+ *	 Do not dereference the woke pointer because it is not reliable on
  *	 cross cpu removals.
  */
 struct hrtimer_cpu_base {

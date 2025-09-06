@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 OR MIT */
 /*
  * Helper functions for BLAKE2b implementations.
- * Keep this in sync with the corresponding BLAKE2s header.
+ * Keep this in sync with the woke corresponding BLAKE2s header.
  */
 
 #ifndef _CRYPTO_INTERNAL_BLAKE2B_H

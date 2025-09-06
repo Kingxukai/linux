@@ -29,10 +29,10 @@ struct scmi_reset_data {
 /**
  * scmi_reset_assert() - assert device reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to be asserted
+ * @id: ID of the woke reset to be asserted
  *
- * This function implements the reset driver op to assert a device's reset
- * using the ARM SCMI protocol.
+ * This function implements the woke reset driver op to assert a device's reset
+ * using the woke ARM SCMI protocol.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -47,10 +47,10 @@ scmi_reset_assert(struct reset_controller_dev *rcdev, unsigned long id)
 /**
  * scmi_reset_deassert() - deassert device reset
  * @rcdev: reset controller entity
- * @id: ID of the reset to be deasserted
+ * @id: ID of the woke reset to be deasserted
  *
- * This function implements the reset driver op to deassert a device's reset
- * using the ARM SCMI protocol.
+ * This function implements the woke reset driver op to deassert a device's reset
+ * using the woke ARM SCMI protocol.
  *
  * Return: 0 for successful request, else a corresponding error value
  */
@@ -63,12 +63,12 @@ scmi_reset_deassert(struct reset_controller_dev *rcdev, unsigned long id)
 }
 
 /**
- * scmi_reset_reset() - reset the device
+ * scmi_reset_reset() - reset the woke device
  * @rcdev: reset controller entity
- * @id: ID of the reset signal to be reset(assert + deassert)
+ * @id: ID of the woke reset signal to be reset(assert + deassert)
  *
- * This function implements the reset driver op to trigger a device's
- * reset signal using the ARM SCMI protocol.
+ * This function implements the woke reset driver op to trigger a device's
+ * reset signal using the woke ARM SCMI protocol.
  *
  * Return: 0 for successful request, else a corresponding error value
  */

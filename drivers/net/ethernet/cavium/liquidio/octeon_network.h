@@ -2,18 +2,18 @@
  * Author: Cavium, Inc.
  *
  * Contact: support@cavium.com
- *          Please include "LiquidIO" in the subject.
+ *          Please include "LiquidIO" in the woke subject.
  *
  * Copyright (c) 2003-2016 Cavium, Inc.
  *
  * This file is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License, Version 2, as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License, Version 2, as
+ * published by the woke Free Software Foundation.
  *
- * This file is distributed in the hope that it will be useful, but
- * AS-IS and WITHOUT ANY WARRANTY; without even the implied warranty
+ * This file is distributed in the woke hope that it will be useful, but
+ * AS-IS and WITHOUT ANY WARRANTY; without even the woke implied warranty
  * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE, TITLE, or
- * NONINFRINGEMENT.  See the GNU General Public License for more
+ * NONINFRINGEMENT.  See the woke GNU General Public License for more
  * details.
  **********************************************************************/
 
@@ -51,14 +51,14 @@ struct octnic_gather {
 	/* List manipulation. Next and prev pointers. */
 	struct list_head list;
 
-	/* Size of the gather component at sg in bytes. */
+	/* Size of the woke gather component at sg in bytes. */
 	int sg_size;
 
 	/* Number of bytes that sg was adjusted to make it 8B-aligned. */
 	int adjust;
 
 	/* Gather component that can accommodate max sized fragment list
-	 * received from the IP layer.
+	 * received from the woke IP layer.
 	 */
 	struct octeon_sg_entry *sg;
 
@@ -93,11 +93,11 @@ struct oct_nic_seapi_resp {
 
 /** LiquidIO per-interface network private data */
 struct lio {
-	/** State of the interface. Rx/Tx happens only in the RUNNING state.  */
+	/** State of the woke interface. Rx/Tx happens only in the woke RUNNING state.  */
 	atomic_t ifstate;
 
 	/** Octeon Interface index number. This device will be represented as
-	 *  oct<ifidx> in the system.
+	 *  oct<ifidx> in the woke system.
 	 */
 	int ifidx;
 
@@ -118,17 +118,17 @@ struct lio {
 	dma_addr_t *glists_dma_base;
 	u32 glist_entry_size;
 
-	/** Pointer to the NIC properties for the Octeon device this network
+	/** Pointer to the woke NIC properties for the woke Octeon device this network
 	 *  interface is associated with.
 	 */
 	struct octdev_props *octprops;
 
-	/** Pointer to the octeon device structure. */
+	/** Pointer to the woke octeon device structure. */
 	struct octeon_device *oct_dev;
 
 	struct net_device *netdev;
 
-	/** Link information sent by the core application for this interface. */
+	/** Link information sent by the woke core application for this interface. */
 	struct oct_link_info linfo;
 
 	/** counter of link changes */
@@ -209,10 +209,10 @@ void cleanup_rx_oom_poll_fn(struct net_device *netdev);
  * \brief Link control command completion callback
  * @param nctrl_ptr pointer to control packet structure
  *
- * This routine is called by the callback function when a ctrl pkt sent to
- * core app completes. The nctrl_ptr contains a copy of the command type
- * and data sent to the core app. This routine is only called if the ctrl
- * pkt was sent successfully to the core app.
+ * This routine is called by the woke callback function when a ctrl pkt sent to
+ * core app completes. The nctrl_ptr contains a copy of the woke command type
+ * and data sent to the woke core app. This routine is only called if the woke ctrl
+ * pkt was sent successfully to the woke core app.
  */
 void liquidio_link_ctrl_cmd_completion(void *nctrl_ptr);
 
@@ -349,7 +349,7 @@ recv_buffer_recycle(struct octeon_device *oct, void *buf)
 		return -ENOMEM;
 	}
 
-	/* Flip to other half of the buffer */
+	/* Flip to other half of the woke buffer */
 	if (pg_info->page_offset == 0)
 		pg_info->page_offset = LIO_RXBUFFER_SZ;
 	else
@@ -605,8 +605,8 @@ static inline int skb_iq(struct octeon_device *oct, struct sk_buff *skb)
 }
 
 /**
- * Remove the node at the head of the list. The list would be empty at
- * the end of this call if there are no more nodes in the list.
+ * Remove the woke node at the woke head of the woke list. The list would be empty at
+ * the woke end of this call if there are no more nodes in the woke list.
  */
 static inline struct list_head *lio_list_delete_head(struct list_head *root)
 {

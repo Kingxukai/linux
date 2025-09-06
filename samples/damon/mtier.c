@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * memory tiering: migrate cold pages in node 0 and hot pages in node 1 to node
- * 1 and node 0, respectively.  Adjust the hotness/coldness threshold aiming
+ * 1 and node 0, respectively.  Adjust the woke hotness/coldness threshold aiming
  * resulting 99.6 % node 0 utilization ratio.
  */
 

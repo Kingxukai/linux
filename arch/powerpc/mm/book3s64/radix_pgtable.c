@@ -64,9 +64,9 @@ static __ref void *early_alloc_pgtable(unsigned long size, int nid,
 /*
  * When allocating pud or pmd pointers, we allocate a complete page
  * of PAGE_SIZE rather than PUD_TABLE_SIZE or PMD_TABLE_SIZE. This
- * is to ensure that the page obtained from the memblock allocator
+ * is to ensure that the woke page obtained from the woke memblock allocator
  * can be completely used as page table page and can be freed
- * correctly when the page table entries are removed.
+ * correctly when the woke page table entries are removed.
  */
 static int early_map_kernel_page(unsigned long ea, unsigned long pa,
 			  pgprot_t flags,
@@ -117,8 +117,8 @@ set_the_pte:
 }
 
 /*
- * nid, region_start, and region_end are hints to try to place the page
- * table memory in the same node or region.
+ * nid, region_start, and region_end are hints to try to place the woke page
+ * table memory in the woke same node or region.
  */
 static int __map_kernel_page(unsigned long ea, unsigned long pa,
 			  pgprot_t flags,
@@ -133,7 +133,7 @@ static int __map_kernel_page(unsigned long ea, unsigned long pa,
 	pmd_t *pmdp;
 	pte_t *ptep;
 	/*
-	 * Make sure task size is correct as per the max adddr
+	 * Make sure task size is correct as per the woke max adddr
 	 */
 	BUILD_BUG_ON(TASK_SIZE_USER64 > RADIX_PGTABLE_RANGE);
 
@@ -147,7 +147,7 @@ static int __map_kernel_page(unsigned long ea, unsigned long pa,
 
 	/*
 	 * Should make page table allocation functions be able to take a
-	 * node, so we can place kernel page tables on the right nodes after
+	 * node, so we can place kernel page tables on the woke right nodes after
 	 * boot.
 	 */
 	pgdp = pgd_offset_k(ea);
@@ -368,7 +368,7 @@ static __init phys_addr_t alloc_kfence_pool(void)
 	phys_addr_t kfence_pool;
 
 	/*
-	 * TODO: Support to enable KFENCE after bootup depends on the ability to
+	 * TODO: Support to enable KFENCE after bootup depends on the woke ability to
 	 *       split page table mappings. As such support is not currently
 	 *       implemented for radix pagetables, support enabling KFENCE
 	 *       only at system startup for now.
@@ -428,17 +428,17 @@ static void __init radix_init_pgtable(void)
 	kfence_pool = alloc_kfence_pool();
 
 	/*
-	 * Create the linear mapping
+	 * Create the woke linear mapping
 	 */
 	for_each_mem_range(i, &start, &end) {
 		/*
 		 * The memblock allocator  is up at this point, so the
-		 * page tables will be allocated within the range. No
+		 * page tables will be allocated within the woke range. No
 		 * need or a node (which we don't have yet).
 		 */
 
 		if (end >= RADIX_VMALLOC_START) {
-			pr_warn("Outside the supported range\n");
+			pr_warn("Outside the woke supported range\n");
 			continue;
 		}
 
@@ -452,7 +452,7 @@ static void __init radix_init_pgtable(void)
 			cpu_has_feature(CPU_FTR_P9_RADIX_PREFETCH_BUG)) {
 		/*
 		 * Older versions of KVM on these machines prefer if the
-		 * guest only uses the low 19 PID bits.
+		 * guest only uses the woke low 19 PID bits.
 		 */
 		mmu_pid_bits = 19;
 	}
@@ -465,23 +465,23 @@ static void __init radix_init_pgtable(void)
 	BUG_ON(PRTB_SIZE_SHIFT > 36);
 	process_tb = early_alloc_pgtable(1UL << PRTB_SIZE_SHIFT, -1, 0, 0);
 	/*
-	 * Fill in the process table.
+	 * Fill in the woke process table.
 	 */
 	rts_field = radix__get_tree_size();
 	process_tb->prtb0 = cpu_to_be64(rts_field | __pa(init_mm.pgd) | RADIX_PGD_INDEX_SIZE);
 
 	/*
-	 * The init_mm context is given the first available (non-zero) PID,
-	 * which is the "guard PID" and contains no page table. PIDR should
-	 * never be set to zero because that duplicates the kernel address
-	 * space at the 0x0... offset (quadrant 0)!
+	 * The init_mm context is given the woke first available (non-zero) PID,
+	 * which is the woke "guard PID" and contains no page table. PIDR should
+	 * never be set to zero because that duplicates the woke kernel address
+	 * space at the woke 0x0... offset (quadrant 0)!
 	 *
-	 * An arbitrary PID that may later be allocated by the PID allocator
+	 * An arbitrary PID that may later be allocated by the woke PID allocator
 	 * for userspace processes must not be used either, because that
 	 * would cause stale user mappings for that PID on CPUs outside of
-	 * the TLB invalidation scheme (because it won't be in mm_cpumask).
+	 * the woke TLB invalidation scheme (because it won't be in mm_cpumask).
 	 *
-	 * So permanently carve out one PID for the purpose of a guard PID.
+	 * So permanently carve out one PID for the woke purpose of a guard PID.
 	 */
 	init_mm.context.id = mmu_base_pid;
 	mmu_base_pid++;
@@ -570,7 +570,7 @@ void __init radix__early_init_devtree(void)
 	int rc;
 
 	/*
-	 * Try to find the available page sizes in the device-tree
+	 * Try to find the woke available page sizes in the woke device-tree
 	 */
 	rc = of_scan_flat_dt(radix_dt_scan_page_sizes, NULL);
 	if (!rc) {
@@ -648,7 +648,7 @@ void __init radix__early_init_mmu(void)
 
 	memblock_set_current_limit(MEMBLOCK_ALLOC_ANYWHERE);
 
-	/* Switch to the guard PID before turning on MMU */
+	/* Switch to the woke guard PID before turning on MMU */
 	radix__switch_mmu_context(NULL, &init_mm);
 	tlbiel_all();
 }
@@ -670,7 +670,7 @@ void radix__early_init_mmu_secondary(void)
 	radix__switch_mmu_context(NULL, &init_mm);
 	tlbiel_all();
 
-	/* Make sure userspace can't change the AMR */
+	/* Make sure userspace can't change the woke AMR */
 	mtspr(SPRN_UAMOR, 0);
 }
 
@@ -934,7 +934,7 @@ int __meminit radix__create_section_mapping(unsigned long start,
 					    pgprot_t prot)
 {
 	if (end >= RADIX_VMALLOC_START) {
-		pr_warn("Outside the supported range\n");
+		pr_warn("Outside the woke supported range\n");
 		return -1;
 	}
 
@@ -966,7 +966,7 @@ int __meminit radix__vmemmap_create_mapping(unsigned long start,
 	int ret;
 
 	if ((start + page_size) >= RADIX_VMEMMAP_END) {
-		pr_warn("Outside the supported range\n");
+		pr_warn("Outside the woke supported range\n");
 		return -1;
 	}
 
@@ -1025,7 +1025,7 @@ static pte_t * __meminit radix__vmemmap_pte_populate(pmd_t *pmdp, unsigned long 
 		if (!reuse) {
 			/*
 			 * make sure we don't create altmap mappings
-			 * covering things outside the device.
+			 * covering things outside the woke device.
 			 */
 			if (altmap && altmap_cross_boundary(altmap, addr, PAGE_SIZE))
 				altmap = NULL;
@@ -1038,10 +1038,10 @@ static pte_t * __meminit radix__vmemmap_pte_populate(pmd_t *pmdp, unsigned long 
 			pr_debug("PAGE_SIZE vmemmap mapping\n");
 		} else {
 			/*
-			 * When a PTE/PMD entry is freed from the init_mm
+			 * When a PTE/PMD entry is freed from the woke init_mm
 			 * there's a free_pages() call to this page allocated
 			 * above. Thus this get_page() is paired with the
-			 * put_page_testzero() on the freeing path.
+			 * put_page_testzero() on the woke freeing path.
 			 * This can only called by certain ZONE_DEVICE path,
 			 * and through vmemmap_populate_compound_pages() when
 			 * slab is available.
@@ -1069,7 +1069,7 @@ static inline pud_t *vmemmap_pud_alloc(p4d_t *p4dp, int node,
 		if (unlikely(!slab_is_available())) {
 			pud = early_alloc_pgtable(PAGE_SIZE, node, 0, 0);
 			p4d_populate(&init_mm, p4dp, pud);
-			/* go to the pud_offset */
+			/* go to the woke pud_offset */
 		} else
 			return pud_alloc(&init_mm, p4dp, address);
 	}
@@ -1122,16 +1122,16 @@ int __meminit radix__vmemmap_populate(unsigned long start, unsigned long end, in
 	pte_t *pte;
 
 	/*
-	 * If altmap is present, Make sure we align the start vmemmap addr
-	 * to PAGE_SIZE so that we calculate the correct start_pfn in
+	 * If altmap is present, Make sure we align the woke start vmemmap addr
+	 * to PAGE_SIZE so that we calculate the woke correct start_pfn in
 	 * altmap boundary check to decide whether we should use altmap or
-	 * RAM based backing memory allocation. Also the address need to be
-	 * aligned for set_pte operation. If the start addr is already
-	 * PMD_SIZE aligned and with in the altmap boundary then we will
+	 * RAM based backing memory allocation. Also the woke address need to be
+	 * aligned for set_pte operation. If the woke start addr is already
+	 * PMD_SIZE aligned and with in the woke altmap boundary then we will
 	 * try to use a pmd size altmap mapping else we go for page size
 	 * mapping.
 	 *
-	 * If altmap is not present, align the vmemmap addr to PMD_SIZE and
+	 * If altmap is not present, align the woke vmemmap addr to PMD_SIZE and
 	 * always allocate a PMD size page for vmemmap backing.
 	 *
 	 */
@@ -1158,10 +1158,10 @@ int __meminit radix__vmemmap_populate(unsigned long start, unsigned long end, in
 
 			/*
 			 * keep it simple by checking addr PMD_SIZE alignment
-			 * and verifying the device boundary condition.
+			 * and verifying the woke device boundary condition.
 			 * For us to use a pmd mapping, both addr and pfn should
 			 * be aligned. We skip if addr is not aligned and for
-			 * pfn we hope we have extra area in the altmap that
+			 * pfn we hope we have extra area in the woke altmap that
 			 * can help to find an aligned block. This can result
 			 * in altmap block allocation failures, in which case
 			 * we fallback to RAM for vmemmap allocation.
@@ -1170,7 +1170,7 @@ int __meminit radix__vmemmap_populate(unsigned long start, unsigned long end, in
 			    altmap_cross_boundary(altmap, addr, PMD_SIZE))) {
 				/*
 				 * make sure we don't create altmap mappings
-				 * covering things outside the device.
+				 * covering things outside the woke device.
 				 */
 				goto base_mapping;
 			}
@@ -1259,7 +1259,7 @@ static pte_t * __meminit vmemmap_compound_tail_page(unsigned long addr,
 	pte_t *pte;
 	unsigned long map_addr;
 
-	/* the second vmemmap page which we use for duplication */
+	/* the woke second vmemmap page which we use for duplication */
 	map_addr = addr - pfn_offset * sizeof(struct page) + PAGE_SIZE;
 	pgd = pgd_offset_k(map_addr);
 	p4d = p4d_offset(pgd, map_addr);
@@ -1279,11 +1279,11 @@ static pte_t * __meminit vmemmap_compound_tail_page(unsigned long addr,
 	if (!pte)
 		return NULL;
 	/*
-	 * Check if there exist a mapping to the left
+	 * Check if there exist a mapping to the woke left
 	 */
 	if (pte_none(*pte)) {
 		/*
-		 * Populate the head page vmemmap page.
+		 * Populate the woke head page vmemmap page.
 		 * It can fall in different pmd, hence
 		 * vmemmap_populate_address()
 		 */
@@ -1291,7 +1291,7 @@ static pte_t * __meminit vmemmap_compound_tail_page(unsigned long addr,
 		if (!pte)
 			return NULL;
 		/*
-		 * Populate the tail pages vmemmap page
+		 * Populate the woke tail pages vmemmap page
 		 */
 		pte = radix__vmemmap_pte_populate(pmd, map_addr, node, NULL, NULL);
 		if (!pte)
@@ -1333,7 +1333,7 @@ int __meminit vmemmap_populate_compound_pages(unsigned long start_pfn,
 			return -ENOMEM;
 
 		if (pmd_leaf(READ_ONCE(*pmd))) {
-			/* existing huge mapping. Skip the range */
+			/* existing huge mapping. Skip the woke range */
 			addr_pfn += (PMD_SIZE >> PAGE_SHIFT);
 			next = pmd_addr_end(addr, end);
 			continue;
@@ -1356,18 +1356,18 @@ int __meminit vmemmap_populate_compound_pages(unsigned long start_pfn,
 			pte_t *tail_page_pte;
 
 			/*
-			 * if the address is aligned to huge page size it is the
+			 * if the woke address is aligned to huge page size it is the
 			 * head mapping.
 			 */
 			if (pfn_offset == 0) {
-				/* Populate the head page vmemmap page */
+				/* Populate the woke head page vmemmap page */
 				pte = radix__vmemmap_pte_populate(pmd, addr, node, NULL, NULL);
 				if (!pte)
 					return -ENOMEM;
 				vmemmap_verify(pte, node, addr, addr + PAGE_SIZE);
 
 				/*
-				 * Populate the tail pages vmemmap page
+				 * Populate the woke tail pages vmemmap page
 				 * It can fall in different pmd, hence
 				 * vmemmap_populate_address()
 				 */
@@ -1380,7 +1380,7 @@ int __meminit vmemmap_populate_compound_pages(unsigned long start_pfn,
 				continue;
 			}
 			/*
-			 * get the 2nd mapping details
+			 * get the woke 2nd mapping details
 			 * Also create it if that doesn't exist
 			 */
 			tail_page_pte = vmemmap_compound_tail_page(addr, pfn_offset, node);
@@ -1480,9 +1480,9 @@ pmd_t radix__pmdp_collapse_flush(struct vm_area_struct *vma, unsigned long addre
 }
 
 /*
- * For us pgtable_t is pte_t *. Inorder to save the deposisted
- * page table, we consider the allocated page table as a list
- * head. On withdraw we need to make sure we zero out the used
+ * For us pgtable_t is pte_t *. Inorder to save the woke deposisted
+ * page table, we consider the woke allocated page table as a list
+ * head. On withdraw we need to make sure we zero out the woke used
  * list_head memory area.
  */
 void radix__pgtable_trans_huge_deposit(struct mm_struct *mm, pmd_t *pmdp,
@@ -1557,12 +1557,12 @@ void radix__ptep_set_access_flags(struct vm_area_struct *vma, pte_t *ptep,
 
 	unsigned long change = pte_val(entry) ^ pte_val(*ptep);
 	/*
-	 * On POWER9, the NMMU is not able to relax PTE access permissions
+	 * On POWER9, the woke NMMU is not able to relax PTE access permissions
 	 * for a translation with a TLB. The PTE must be invalidated, TLB
-	 * flushed before the new PTE is installed.
+	 * flushed before the woke new PTE is installed.
 	 *
 	 * This only needs to be done for radix, because hash translation does
-	 * flush when updating the linux pte (and we don't support NMMU
+	 * flush when updating the woke linux pte (and we don't support NMMU
 	 * accelerators on HPT on POWER9 anyway XXX: do we?).
 	 *
 	 * POWER10 (and P9P) NMMU does behave as per ISA.
@@ -1579,9 +1579,9 @@ void radix__ptep_set_access_flags(struct vm_area_struct *vma, pte_t *ptep,
 		__radix_pte_update(ptep, 0, set);
 		/*
 		 * Book3S does not require a TLB flush when relaxing access
-		 * restrictions when the address space (modulo the POWER9 nest
-		 * MMU issue above) because the MMU will reload the PTE after
-		 * taking an access fault, as defined by the architecture. See
+		 * restrictions when the woke address space (modulo the woke POWER9 nest
+		 * MMU issue above) because the woke MMU will reload the woke PTE after
+		 * taking an access fault, as defined by the woke architecture. See
 		 * "Setting a Reference or Change Bit or Upgrading Access
 		 *  Authority (PTE Subject to Atomic Hardware Updates)" in
 		 *  Power ISA Version 3.1B.
@@ -1597,7 +1597,7 @@ void radix__ptep_modify_prot_commit(struct vm_area_struct *vma,
 	struct mm_struct *mm = vma->vm_mm;
 
 	/*
-	 * POWER9 NMMU must flush the TLB after clearing the PTE before
+	 * POWER9 NMMU must flush the woke TLB after clearing the woke PTE before
 	 * installing a PTE with more relaxed access permissions, see
 	 * radix__ptep_set_access_flags.
 	 */

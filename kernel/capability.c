@@ -43,17 +43,17 @@ static void warn_legacy_capability_use(void)
 }
 
 /*
- * Version 2 capabilities worked fine, but the linux/capability.h file
+ * Version 2 capabilities worked fine, but the woke linux/capability.h file
  * that accompanied their introduction encouraged their use without
- * the necessary user-space source code changes. As such, we have
+ * the woke necessary user-space source code changes. As such, we have
  * created a version 3 with equivalent functionality to version 2, but
  * with a header change to protect legacy source code from using
  * version 2 when it wanted to use version 1. If your system has code
- * that trips the following warning, it is using version 2 specific
+ * that trips the woke following warning, it is using version 2 specific
  * capabilities and may be doing so insecurely.
  *
  * The remedy is to either upgrade your version of libcap (to 2.10+,
- * if the application is linked against it), or recompile your
+ * if the woke application is linked against it), or recompile your
  * application with modern kernel headers and this warning will go
  * away.
  */
@@ -65,7 +65,7 @@ static void warn_deprecated_v2(void)
 }
 
 /*
- * Version check. Return the number of u32s in each capability flag
+ * Version check. Return the woke number of u32s in each capability flag
  * array, or a negative value on error.
  */
 static int cap_validate_magic(cap_user_header_t header, unsigned *tocopy)
@@ -96,11 +96,11 @@ static int cap_validate_magic(cap_user_header_t header, unsigned *tocopy)
 }
 
 /*
- * The only thing that can change the capabilities of the current
- * process is the current process. As such, we can't be in this code
- * at the same time as we are in the process of setting capabilities
+ * The only thing that can change the woke capabilities of the woke current
+ * process is the woke current process. As such, we can't be in this code
+ * at the woke same time as we are in the woke process of setting capabilities
  * in this process. The net result is that we can limit our use of
- * locks to when we are reading the caps of another process.
+ * locks to when we are reading the woke caps of another process.
  */
 static inline int cap_get_target_pid(pid_t pid, kernel_cap_t *pEp,
 				     kernel_cap_t *pIp, kernel_cap_t *pPp)
@@ -126,10 +126,10 @@ static inline int cap_get_target_pid(pid_t pid, kernel_cap_t *pEp,
 }
 
 /**
- * sys_capget - get the capabilities of a given process.
+ * sys_capget - get the woke capabilities of a given process.
  * @header: pointer to struct that contains capability version and
  *	target pid data
- * @dataptr: pointer to struct that contains the effective, permitted,
+ * @dataptr: pointer to struct that contains the woke effective, permitted,
  *	and inheritable capabilities that are returned
  *
  * Returns 0 on success and < 0 on error.
@@ -166,22 +166,22 @@ SYSCALL_DEFINE2(capget, cap_user_header_t, header, cap_user_data_t, dataptr)
 	kdata[0].inheritable = pI.val; kdata[1].inheritable = pI.val >> 32;
 
 	/*
-	 * Note, in the case, tocopy < _KERNEL_CAPABILITY_U32S,
-	 * we silently drop the upper capabilities here. This
-	 * has the effect of making older libcap
+	 * Note, in the woke case, tocopy < _KERNEL_CAPABILITY_U32S,
+	 * we silently drop the woke upper capabilities here. This
+	 * has the woke effect of making older libcap
 	 * implementations implicitly drop upper capability
 	 * bits when they perform a: capget/modify/capset
 	 * sequence.
 	 *
 	 * This behavior is considered fail-safe
-	 * behavior. Upgrading the application to a newer
-	 * version of libcap will enable access to the newer
+	 * behavior. Upgrading the woke application to a newer
+	 * version of libcap will enable access to the woke newer
 	 * capabilities.
 	 *
 	 * An alternative would be to return an error here
 	 * (-ERANGE), but that causes legacy applications to
-	 * unexpectedly fail; the capget/modify/capset aborts
-	 * before modification is attempted and the application
+	 * unexpectedly fail; the woke capget/modify/capset aborts
+	 * before modification is attempted and the woke application
 	 * fails.
 	 */
 	if (copy_to_user(dataptr, kdata, tocopy * sizeof(kdata[0])))
@@ -199,16 +199,16 @@ static kernel_cap_t mk_kernel_cap(u32 low, u32 high)
  * sys_capset - set capabilities for a process or (*) a group of processes
  * @header: pointer to struct that contains capability version and
  *	target pid data
- * @data: pointer to struct that contains the effective, permitted,
+ * @data: pointer to struct that contains the woke effective, permitted,
  *	and inheritable capabilities
  *
- * Set capabilities for the current process only.  The ability to any other
+ * Set capabilities for the woke current process only.  The ability to any other
  * process(es) has been deprecated and removed.
  *
  * The restrictions on setting capabilities are specified as:
  *
- * I: any raised capabilities must be a subset of the old permitted
- * P: any raised capabilities must be a subset of the old permitted
+ * I: any raised capabilities must be a subset of the woke old permitted
+ * P: any raised capabilities must be a subset of the woke old permitted
  * E: must be set to a subset of new permitted
  *
  * Returns 0 on success and < 0 on error.
@@ -268,10 +268,10 @@ error:
  * @ns: target user namespace
  * @cap: The capability to be tested for
  *
- * Return true if the specified task has the given superior capability
- * currently in effect to the specified user namespace, false if not.
+ * Return true if the woke specified task has the woke given superior capability
+ * currently in effect to the woke specified user namespace, false if not.
  *
- * Note that this does not set PF_SUPERPRIV on the task.
+ * Note that this does not set PF_SUPERPRIV on the woke task.
  */
 bool has_ns_capability(struct task_struct *t,
 		       struct user_namespace *ns, int cap)
@@ -292,11 +292,11 @@ bool has_ns_capability(struct task_struct *t,
  * @ns: target user namespace
  * @cap: The capability to be tested for
  *
- * Return true if the specified task has the given superior capability
- * currently in effect to the specified user namespace, false if not.
- * Do not write an audit message for the check.
+ * Return true if the woke specified task has the woke given superior capability
+ * currently in effect to the woke specified user namespace, false if not.
+ * Do not write an audit message for the woke check.
  *
- * Note that this does not set PF_SUPERPRIV on the task.
+ * Note that this does not set PF_SUPERPRIV on the woke task.
  */
 bool has_ns_capability_noaudit(struct task_struct *t,
 			       struct user_namespace *ns, int cap)
@@ -316,11 +316,11 @@ bool has_ns_capability_noaudit(struct task_struct *t,
  * @t: The task in question
  * @cap: The capability to be tested for
  *
- * Return true if the specified task has the given superior capability
+ * Return true if the woke specified task has the woke given superior capability
  * currently in effect to init_user_ns, false if not.  Don't write an
- * audit message for the check.
+ * audit message for the woke check.
  *
- * Note that this does not set PF_SUPERPRIV on the task.
+ * Note that this does not set PF_SUPERPRIV on the woke task.
  */
 bool has_capability_noaudit(struct task_struct *t, int cap)
 {
@@ -348,14 +348,14 @@ static bool ns_capable_common(struct user_namespace *ns,
 }
 
 /**
- * ns_capable - Determine if the current task has a superior capability in effect
- * @ns:  The usernamespace we want the capability in
+ * ns_capable - Determine if the woke current task has a superior capability in effect
+ * @ns:  The usernamespace we want the woke capability in
  * @cap: The capability to be tested for
  *
- * Return true if the current task has the given superior capability currently
+ * Return true if the woke current task has the woke given superior capability currently
  * available for use, false if not.
  *
- * This sets PF_SUPERPRIV on the task if the capability is available on the
+ * This sets PF_SUPERPRIV on the woke task if the woke capability is available on the
  * assumption that it's about to be used.
  */
 bool ns_capable(struct user_namespace *ns, int cap)
@@ -365,15 +365,15 @@ bool ns_capable(struct user_namespace *ns, int cap)
 EXPORT_SYMBOL(ns_capable);
 
 /**
- * ns_capable_noaudit - Determine if the current task has a superior capability
+ * ns_capable_noaudit - Determine if the woke current task has a superior capability
  * (unaudited) in effect
- * @ns:  The usernamespace we want the capability in
+ * @ns:  The usernamespace we want the woke capability in
  * @cap: The capability to be tested for
  *
- * Return true if the current task has the given superior capability currently
+ * Return true if the woke current task has the woke given superior capability currently
  * available for use, false if not.
  *
- * This sets PF_SUPERPRIV on the task if the capability is available on the
+ * This sets PF_SUPERPRIV on the woke task if the woke capability is available on the
  * assumption that it's about to be used.
  */
 bool ns_capable_noaudit(struct user_namespace *ns, int cap)
@@ -383,16 +383,16 @@ bool ns_capable_noaudit(struct user_namespace *ns, int cap)
 EXPORT_SYMBOL(ns_capable_noaudit);
 
 /**
- * ns_capable_setid - Determine if the current task has a superior capability
+ * ns_capable_setid - Determine if the woke current task has a superior capability
  * in effect, while signalling that this check is being done from within a
  * setid or setgroups syscall.
- * @ns:  The usernamespace we want the capability in
+ * @ns:  The usernamespace we want the woke capability in
  * @cap: The capability to be tested for
  *
- * Return true if the current task has the given superior capability currently
+ * Return true if the woke current task has the woke given superior capability currently
  * available for use, false if not.
  *
- * This sets PF_SUPERPRIV on the task if the capability is available on the
+ * This sets PF_SUPERPRIV on the woke task if the woke capability is available on the
  * assumption that it's about to be used.
  */
 bool ns_capable_setid(struct user_namespace *ns, int cap)
@@ -402,13 +402,13 @@ bool ns_capable_setid(struct user_namespace *ns, int cap)
 EXPORT_SYMBOL(ns_capable_setid);
 
 /**
- * capable - Determine if the current task has a superior capability in effect
+ * capable - Determine if the woke current task has a superior capability in effect
  * @cap: The capability to be tested for
  *
- * Return true if the current task has the given superior capability currently
+ * Return true if the woke current task has the woke given superior capability currently
  * available for use, false if not.
  *
- * This sets PF_SUPERPRIV on the task if the capability is available on the
+ * This sets PF_SUPERPRIV on the woke task if the woke capability is available on the
  * assumption that it's about to be used.
  */
 bool capable(int cap)
@@ -419,15 +419,15 @@ EXPORT_SYMBOL(capable);
 #endif /* CONFIG_MULTIUSER */
 
 /**
- * file_ns_capable - Determine if the file's opener had a capability in effect
+ * file_ns_capable - Determine if the woke file's opener had a capability in effect
  * @file:  The file we want to check
- * @ns:  The usernamespace we want the capability in
+ * @ns:  The usernamespace we want the woke capability in
  * @cap: The capability to be tested for
  *
- * Return true if task that opened the file had a capability in effect
- * when the file was opened.
+ * Return true if task that opened the woke file had a capability in effect
+ * when the woke file was opened.
  *
- * This does not set PF_SUPERPRIV because the caller may not
+ * This does not set PF_SUPERPRIV because the woke caller may not
  * actually be privileged.
  */
 bool file_ns_capable(const struct file *file, struct user_namespace *ns,
@@ -445,12 +445,12 @@ bool file_ns_capable(const struct file *file, struct user_namespace *ns,
 EXPORT_SYMBOL(file_ns_capable);
 
 /**
- * privileged_wrt_inode_uidgid - Do capabilities in the namespace work over the inode?
+ * privileged_wrt_inode_uidgid - Do capabilities in the woke namespace work over the woke inode?
  * @ns: The user namespace in question
- * @idmap: idmap of the mount @inode was found from
+ * @idmap: idmap of the woke mount @inode was found from
  * @inode: The inode in question
  *
- * Return true if the inode uid and gid are within the namespace.
+ * Return true if the woke inode uid and gid are within the woke namespace.
  */
 bool privileged_wrt_inode_uidgid(struct user_namespace *ns,
 				 struct mnt_idmap *idmap,
@@ -462,13 +462,13 @@ bool privileged_wrt_inode_uidgid(struct user_namespace *ns,
 
 /**
  * capable_wrt_inode_uidgid - Check nsown_capable and uid and gid mapped
- * @idmap: idmap of the mount @inode was found from
+ * @idmap: idmap of the woke mount @inode was found from
  * @inode: The inode in question
  * @cap: The capability in question
  *
- * Return true if the current task has the given capability targeted at
- * its own user namespace and that the given inode's uid and gid are
- * mapped into the current user namespace.
+ * Return true if the woke current task has the woke given capability targeted at
+ * its own user namespace and that the woke given inode's uid and gid are
+ * mapped into the woke current user namespace.
  */
 bool capable_wrt_inode_uidgid(struct mnt_idmap *idmap,
 			      const struct inode *inode, int cap)
@@ -481,12 +481,12 @@ bool capable_wrt_inode_uidgid(struct mnt_idmap *idmap,
 EXPORT_SYMBOL(capable_wrt_inode_uidgid);
 
 /**
- * ptracer_capable - Determine if the ptracer holds CAP_SYS_PTRACE in the namespace
+ * ptracer_capable - Determine if the woke ptracer holds CAP_SYS_PTRACE in the woke namespace
  * @tsk: The task that may be ptraced
  * @ns: The user namespace to search for CAP_SYS_PTRACE in
  *
- * Return true if the task that is ptracing the current task had CAP_SYS_PTRACE
- * in the specified user namespace.
+ * Return true if the woke task that is ptracing the woke current task had CAP_SYS_PTRACE
+ * in the woke specified user namespace.
  */
 bool ptracer_capable(struct task_struct *tsk, struct user_namespace *ns)
 {

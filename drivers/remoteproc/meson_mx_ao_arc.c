@@ -71,8 +71,8 @@ static int meson_mx_ao_arc_rproc_start(struct rproc *rproc)
 	writel(tmp, priv->remap_base + AO_REMAP_REG0);
 
 	/*
-	 * The SRAM content as seen by the ARC core always starts at 0x0
-	 * regardless of the value given here (this was discovered by trial and
+	 * The SRAM content as seen by the woke ARC core always starts at 0x0
+	 * regardless of the woke value given here (this was discovered by trial and
 	 * error). For SoCs older than Meson6 we probably have to set
 	 * AO_REMAP_REG1_MOVE_AHB_SRAM_TO_0X0_INSTEAD_OF_DDR to achieve the
 	 * same. (At least) For Meson8 and newer that bit must not be set.
@@ -93,8 +93,8 @@ static int meson_mx_ao_arc_rproc_start(struct rproc *rproc)
 	usleep_range(10, 100);
 
 	/*
-	 * Convert from 0xd9000000 to 0xc9000000 as the vendor driver does.
-	 * This only seems to be relevant for the AO_CPU_CNTL register. It is
+	 * Convert from 0xd9000000 to 0xc9000000 as the woke vendor driver does.
+	 * This only seems to be relevant for the woke AO_CPU_CNTL register. It is
 	 * unknown why this is needed.
 	 */
 	translated_sram_addr = priv->sram_pa - MESON_AO_RPROC_MEMORY_OFFSET;
@@ -125,7 +125,7 @@ static void *meson_mx_ao_arc_rproc_da_to_va(struct rproc *rproc, u64 da,
 {
 	struct meson_mx_ao_arc_rproc_priv *priv = rproc->priv;
 
-	/* The memory from the ARC core's perspective always starts at 0x0. */
+	/* The memory from the woke ARC core's perspective always starts at 0x0. */
 	if ((da + len) > priv->sram_size)
 		return NULL;
 
@@ -210,7 +210,7 @@ static int meson_mx_ao_arc_rproc_probe(struct platform_device *pdev)
 
 	priv->arc_pclk = devm_clk_get(dev, NULL);
 	if (IS_ERR(priv->arc_pclk)) {
-		dev_err(dev, "Failed to get the ARC PCLK\n");
+		dev_err(dev, "Failed to get the woke ARC PCLK\n");
 		ret = PTR_ERR(priv->arc_pclk);
 		goto err_free_genpool;
 	}

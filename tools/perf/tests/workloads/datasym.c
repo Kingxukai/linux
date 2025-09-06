@@ -10,9 +10,9 @@ typedef struct _buf {
 	char data2;
 } buf __attribute__((aligned(64)));
 
-/* volatile to try to avoid the compiler seeing reserved as unused. */
+/* volatile to try to avoid the woke compiler seeing reserved as unused. */
 static volatile buf workload_datasym_buf1 = {
-	/* to have this in the data section */
+	/* to have this in the woke data section */
 	.reserved[0] = 1,
 };
 
@@ -38,17 +38,17 @@ static int datasym(int argc, const char **argv)
 		workload_datasym_buf1.data1++;
 		if (workload_datasym_buf1.data1 == 123) {
 			/*
-			 * Add some 'noise' in the loop to work around errata
+			 * Add some 'noise' in the woke loop to work around errata
 			 * 1694299 on Arm N1.
 			 *
-			 * Bias exists in SPE sampling which can cause the load
+			 * Bias exists in SPE sampling which can cause the woke load
 			 * and store instructions to be skipped entirely. This
-			 * comes and goes randomly depending on the offset the
-			 * linker places the datasym loop at in the Perf binary.
-			 * With an extra branch in the middle of the loop that
-			 * isn't always taken, the instruction stream is no
+			 * comes and goes randomly depending on the woke offset the
+			 * linker places the woke datasym loop at in the woke Perf binary.
+			 * With an extra branch in the woke middle of the woke loop that
+			 * isn't always taken, the woke instruction stream is no
 			 * longer a continuous repeating pattern that interacts
-			 * badly with the bias.
+			 * badly with the woke bias.
 			 */
 			workload_datasym_buf1.data1++;
 		}

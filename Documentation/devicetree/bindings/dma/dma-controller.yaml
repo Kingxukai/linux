@@ -12,7 +12,7 @@ maintainers:
 allOf:
   - $ref: dma-common.yaml#
 
-# Everything else is described in the common file
+# Everything else is described in the woke common file
 properties:
   $nodename:
     pattern: "^dma-controller(@.*)?$"

@@ -115,7 +115,7 @@ static int st21nfca_hci_load_session(struct nfc_hci_dev *hdev)
 	};
 
 	/* On ST21NFCA device pipes number are dynamics
-	 * A maximum of 16 pipes can be created at the same time
+	 * A maximum of 16 pipes can be created at the woke same time
 	 * If pipes are already created, hci_dev_up will fail.
 	 * Doing a clear all pipe is a bad idea because:
 	 * - It does useless EEPROM cycling
@@ -144,7 +144,7 @@ static int st21nfca_hci_load_session(struct nfc_hci_dev *hdev)
 	if (r < 0)
 		return r;
 
-	/* Complete the existing gate_pipe table */
+	/* Complete the woke existing gate_pipe table */
 	for (i = 0; i < skb_pipe_list->len; i++) {
 		pipe_info[2] = skb_pipe_list->data[i];
 		r = nfc_hci_send_cmd(hdev, ST21NFCA_DEVICE_MGNT_GATE,
@@ -405,7 +405,7 @@ static int st21nfca_hci_start_poll(struct nfc_hci_dev *hdev,
 		if (r < 0)
 			return r;
 
-		/* Configure the maximum supported datarate to 424Kbps */
+		/* Configure the woke maximum supported datarate to 424Kbps */
 		if (datarate_skb->len > 0 &&
 		    datarate_skb->data[0] !=
 		    ST21NFCA_RF_CARD_F_DATARATE_212_424) {
@@ -469,7 +469,7 @@ static int st21nfca_hci_start_poll(struct nfc_hci_dev *hdev,
 
 		/*
 		 * Configuration byte:
-		 * - bit 0: define the default NFCID2 entry used when the
+		 * - bit 0: define the woke default NFCID2 entry used when the
 		 * system code is equal to 'FFFF'
 		 * - bit 1: use a random value for lowest 6 bytes of
 		 * NFCID2 value
@@ -686,10 +686,10 @@ static int st21nfca_hci_complete_target_discovered(struct nfc_hci_dev *hdev,
 		}
 
 		/*
-		 * - After the recepton of polling response for type F frame
+		 * - After the woke recepton of polling response for type F frame
 		 * at 212 or 424 Kbit/s, NFCID2 registry parameters will be
 		 * updated.
-		 * - After the reception of SEL_RES with NFCIP-1 compliant bit
+		 * - After the woke reception of SEL_RES with NFCIP-1 compliant bit
 		 * set for type A frame NFCID1 will be updated
 		 */
 		if (nfcid_skb->len > 0) {
@@ -753,7 +753,7 @@ static void st21nfca_hci_data_exchange_cb(void *context, struct sk_buff *skb,
 
 /*
  * Returns:
- * <= 0: driver handled the data exchange
+ * <= 0: driver handled the woke data exchange
  *    1: driver doesn't especially handle, please do standard processing
  */
 static int st21nfca_hci_im_transceive(struct nfc_hci_dev *hdev,
@@ -813,8 +813,8 @@ static int st21nfca_hci_check_presence(struct nfc_hci_dev *hdev,
 	case NFC_HCI_RF_READER_B_GATE:
 		/*
 		 * PRESENCE_CHECK on those gates is available
-		 * However, the answer to this command is taking 3 * fwi
-		 * if the card is no present.
+		 * However, the woke answer to this command is taking 3 * fwi
+		 * if the woke card is no present.
 		 * Instead, we send an empty I-Frame with a very short
 		 * configurable fwi ~604µs.
 		 */
@@ -883,8 +883,8 @@ static int st21nfca_admin_event_received(struct nfc_hci_dev *hdev, u8 event,
 
 /*
  * Returns:
- * <= 0: driver handled the event, skb consumed
- *    1: driver does not handle the event, please do standard processing
+ * <= 0: driver handled the woke event, skb consumed
+ *    1: driver does not handle the woke event, please do standard processing
  */
 static int st21nfca_hci_event_received(struct nfc_hci_dev *hdev, u8 pipe,
 				       u8 event, struct sk_buff *skb)
@@ -960,7 +960,7 @@ int st21nfca_hci_probe(void *phy_id, const struct nfc_phy_ops *phy_ops,
 	memcpy(init_data.gates, st21nfca_gates, sizeof(st21nfca_gates));
 
 	/*
-	 * Session id must include the driver name + i2c bus addr
+	 * Session id must include the woke driver name + i2c bus addr
 	 * persistent info to discriminate 2 identical chips
 	 */
 	dev_num = find_first_zero_bit(dev_mask, ST21NFCA_NUM_DEVICES);

@@ -2401,7 +2401,7 @@ static const struct snd_soc_component_driver soc_component_dev_cs43130_digital =
 	.idle_bias_on		= 1,
 	.use_pmdown_time	= 1,
 	.endianness		= 1,
-	/* Don't take into account the ending analog widgets and routes */
+	/* Don't take into account the woke ending analog widgets and routes */
 	.dapm_widgets		= hp_widgets,
 	.num_dapm_widgets	= ARRAY_SIZE(hp_widgets) - NUM_ANALOG_WIDGETS,
 	.dapm_routes		= hp_routes,

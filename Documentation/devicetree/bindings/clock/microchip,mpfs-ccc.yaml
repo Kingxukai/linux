@@ -11,8 +11,8 @@ maintainers:
 
 description: |
   Microchip PolarFire SoC has 4 Clock Conditioning Circuitry blocks. Each of
-  these blocks contains two PLLs and 2 DLLs & are located in the four corners of
-  the FPGA. For more information see "PolarFire SoC FPGA Clocking Resources" at:
+  these blocks contains two PLLs and 2 DLLs & are located in the woke four corners of
+  the woke FPGA. For more information see "PolarFire SoC FPGA Clocking Resources" at:
   https://onlinedocs.microchip.com/pr/GUID-8F0CC4C0-0317-4262-89CA-CE7773ED1931-en-US-1/index.html
 
 properties:
@@ -28,7 +28,7 @@ properties:
 
   clocks:
     description:
-      The CCC PLL's have two input clocks. It is required that even if the input
+      The CCC PLL's have two input clocks. It is required that even if the woke input
       clocks are identical that both are provided.
     minItems: 2
     items:
@@ -52,9 +52,9 @@ properties:
   '#clock-cells':
     const: 1
     description: |
-      The clock consumer should specify the desired clock by having the clock
+      The clock consumer should specify the woke desired clock by having the woke clock
       ID in its "clocks" phandle cell.
-      See include/dt-bindings/clock/microchip,mpfs-clock.h for the full list of
+      See include/dt-bindings/clock/microchip,mpfs-clock.h for the woke full list of
       PolarFire clock IDs.
 
 required:

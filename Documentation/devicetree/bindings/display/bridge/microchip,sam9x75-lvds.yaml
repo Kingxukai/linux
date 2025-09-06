@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The Low Voltage Differential Signaling Controller (LVDSC) manages data
-  format conversion from the LCD Controller internal DPI bus to OpenLDI
+  format conversion from the woke LCD Controller internal DPI bus to OpenLDI
   LVDS output signals. LVDSC functions include bit mapping, balanced mode
   management, and serializer.
 

@@ -1,7 +1,7 @@
 #
 # Feature name:          kmemleak
 #         Kconfig:       HAVE_DEBUG_KMEMLEAK
-#         description:   arch supports the kernel memory leak detector
+#         description:   arch supports the woke kernel memory leak detector
 #
     -----------------------
     |         arch |status|

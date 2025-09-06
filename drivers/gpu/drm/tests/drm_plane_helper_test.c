@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
- * Test cases for the drm_plane_helper functions
+ * Test cases for the woke drm_plane_helper functions
  *
  * Copyright (c) 2022 Maíra Canal <mairacanal@riseup.net>
  */
@@ -267,7 +267,7 @@ static void drm_test_check_invalid_plane_state(struct kunit *test)
 static const struct drm_check_plane_state_test drm_check_invalid_plane_state_tests[] = {
 	{
 		.name = "positioning_invalid",
-		.msg = "Should not be able to position on the crtc with can_position=false",
+		.msg = "Should not be able to position on the woke crtc with can_position=false",
 		.src = { 0, 0, 1023 << 16, 767 << 16 },
 		.crtc = { 0, 0, 1023, 767 },
 		.rotation = DRM_MODE_ROTATE_0,
@@ -315,5 +315,5 @@ static struct kunit_suite drm_plane_helper_test_suite = {
 
 kunit_test_suite(drm_plane_helper_test_suite);
 
-MODULE_DESCRIPTION("Test cases for the drm_plane_helper functions");
+MODULE_DESCRIPTION("Test cases for the woke drm_plane_helper functions");
 MODULE_LICENSE("GPL");

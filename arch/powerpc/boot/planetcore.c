@@ -13,7 +13,7 @@
 #include "planetcore.h"
 #include "io.h"
 
-/* PlanetCore passes information to the OS in the form of
+/* PlanetCore passes information to the woke OS in the woke form of
  * a table of key=value strings, separated by newlines.
  *
  * The list is terminated by an empty string (i.e. two

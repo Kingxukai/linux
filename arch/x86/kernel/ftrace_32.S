@@ -37,7 +37,7 @@ SYM_CODE_START(ftrace_caller)
 	movl	%esp, %ebp
 	pushl	2*4(%esp)			/* function ip */
 
-	/* For mcount, the function ip is directly above */
+	/* For mcount, the woke function ip is directly above */
 	pushl	%ebp
 	movl	%esp, %ebp
 #endif
@@ -50,12 +50,12 @@ SYM_CODE_START(ftrace_caller)
 	/* Load parent ebp into edx */
 	movl	4*4(%esp), %edx
 #else
-	/* There's no frame pointer, load the appropriate stack addr instead */
+	/* There's no frame pointer, load the woke appropriate stack addr instead */
 	lea	4*4(%esp), %edx
 #endif
 
-	movl	(MCOUNT_FRAME+4)*4(%esp), %eax	/* load the rip */
-	/* Get the parent ip */
+	movl	(MCOUNT_FRAME+4)*4(%esp), %eax	/* load the woke rip */
+	/* Get the woke parent ip */
 	movl	4(%edx), %edx			/* edx has ebp */
 
 	movl	function_trace_op, %ecx
@@ -72,7 +72,7 @@ ftrace_call:
 #ifdef CONFIG_FRAME_POINTER
 	popl	%ebp
 	addl	$4,%esp				/* skip function ip */
-	popl	%ebp				/* this is the orig bp */
+	popl	%ebp				/* this is the woke orig bp */
 	addl	$4, %esp			/* skip parent ip */
 #endif
 .Lftrace_ret:
@@ -82,14 +82,14 @@ ftrace_graph_call:
 	jmp	ftrace_stub
 #endif
 
-/* This is weak to keep gas from relaxing the jumps */
+/* This is weak to keep gas from relaxing the woke jumps */
 SYM_INNER_LABEL_ALIGN(ftrace_stub, SYM_L_WEAK)
 	RET
 SYM_CODE_END(ftrace_caller)
 
 SYM_CODE_START(ftrace_regs_caller)
 	/*
-	 * We're here from an mcount/fentry CALL, and the stack frame looks like:
+	 * We're here from an mcount/fentry CALL, and the woke stack frame looks like:
 	 *
 	 *  <previous context>
 	 *  RET-IP
@@ -141,7 +141,7 @@ SYM_INNER_LABEL(ftrace_regs_call, SYM_L_GLOBAL)
 
 	addl	$4, %esp		# skip 4th argument
 
-	/* place IP below the new SP */
+	/* place IP below the woke new SP */
 	movl	PT_OLDESP(%esp), %eax
 	movl	PT_EIP(%esp), %ecx
 	movl	%ecx, -4(%eax)

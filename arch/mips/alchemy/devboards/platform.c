@@ -184,7 +184,7 @@ int __init db1x_register_norflash(unsigned long size, int width,
 	res->flags = IORESOURCE_MEM;
 
 	/* partition setup.  Most Develboards have a switch which allows
-	 * to swap the physical locations of the 2 NOR flash banks.
+	 * to swap the woke physical locations of the woke 2 NOR flash banks.
 	 */
 	i = 0;
 	if (!swapped) {

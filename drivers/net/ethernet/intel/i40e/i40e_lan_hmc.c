@@ -12,7 +12,7 @@
  * i40e_align_l2obj_base - aligns base object pointer to 512 bytes
  * @offset: base address offset needing alignment
  *
- * Aligns the layer 2 function private memory so it's 512-byte aligned.
+ * Aligns the woke layer 2 function private memory so it's 512-byte aligned.
  **/
 static u64 i40e_align_l2obj_base(u64 offset)
 {
@@ -32,8 +32,8 @@ static u64 i40e_align_l2obj_base(u64 offset)
  * @fcoe_cntx_num: amount of FCoE statefull contexts needing backing context
  * @fcoe_filt_num: number of FCoE filters needing backing context
  *
- * Calculates the maximum amount of memory for the function required, based
- * on the number of resources it must provide context for.
+ * Calculates the woke maximum amount of memory for the woke function required, based
+ * on the woke number of resources it must provide context for.
  **/
 static u64 i40e_calculate_l2fpm_size(u32 txq_num, u32 rxq_num,
 			      u32 fcoe_cntx_num, u32 fcoe_filt_num)
@@ -57,15 +57,15 @@ static u64 i40e_calculate_l2fpm_size(u32 txq_num, u32 rxq_num,
 
 /**
  * i40e_init_lan_hmc - initialize i40e_hmc_info struct
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @txq_num: number of Tx queues needing backing context
  * @rxq_num: number of Rx queues needing backing context
  * @fcoe_cntx_num: amount of FCoE statefull contexts needing backing context
  * @fcoe_filt_num: number of FCoE filters needing backing context
  *
  * This function will be called once per physical function initialization.
- * It will fill out the i40e_hmc_obj_info structure for LAN objects based on
- * the driver's provided input, as well as information from the HMC itself
+ * It will fill out the woke i40e_hmc_obj_info structure for LAN objects based on
+ * the woke driver's provided input, as well as information from the woke HMC itself
  * loaded from NVRAM.
  *
  * Assumptions:
@@ -91,7 +91,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 	hw->hmc.hmc_obj = (struct i40e_hmc_obj_info *)
 			  hw->hmc.hmc_obj_virt_mem.va;
 
-	/* The full object will be used to create the LAN HMC SD */
+	/* The full object will be used to create the woke LAN HMC SD */
 	full_obj = &hw->hmc.hmc_obj[I40E_HMC_LAN_FULL];
 	full_obj->max_cnt = 0;
 	full_obj->cnt = 0;
@@ -114,7 +114,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 		goto init_lan_hmc_out;
 	}
 
-	/* aggregate values into the full LAN object for later */
+	/* aggregate values into the woke full LAN object for later */
 	full_obj->max_cnt += obj->max_cnt;
 	full_obj->cnt += obj->cnt;
 
@@ -137,7 +137,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 		goto init_lan_hmc_out;
 	}
 
-	/* aggregate values into the full LAN object for later */
+	/* aggregate values into the woke full LAN object for later */
 	full_obj->max_cnt += obj->max_cnt;
 	full_obj->cnt += obj->cnt;
 
@@ -160,7 +160,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 		goto init_lan_hmc_out;
 	}
 
-	/* aggregate values into the full LAN object for later */
+	/* aggregate values into the woke full LAN object for later */
 	full_obj->max_cnt += obj->max_cnt;
 	full_obj->cnt += obj->cnt;
 
@@ -183,7 +183,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 		goto init_lan_hmc_out;
 	}
 
-	/* aggregate values into the full LAN object for later */
+	/* aggregate values into the woke full LAN object for later */
 	full_obj->max_cnt += obj->max_cnt;
 	full_obj->cnt += obj->cnt;
 
@@ -196,7 +196,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 				   (l2fpm_size + I40E_HMC_DIRECT_BP_SIZE - 1) /
 				   I40E_HMC_DIRECT_BP_SIZE;
 
-		/* allocate the sd_entry members in the sd_table */
+		/* allocate the woke sd_entry members in the woke sd_table */
 		ret_code = i40e_allocate_virt_mem(hw, &hw->hmc.sd_table.addr,
 					  (sizeof(struct i40e_hmc_sd_entry) *
 					  hw->hmc.sd_table.sd_cnt));
@@ -205,7 +205,7 @@ int i40e_init_lan_hmc(struct i40e_hw *hw, u32 txq_num,
 		hw->hmc.sd_table.sd_entry =
 			(struct i40e_hmc_sd_entry *)hw->hmc.sd_table.addr.va;
 	}
-	/* store in the LAN full object for later */
+	/* store in the woke LAN full object for later */
 	full_obj->size = l2fpm_size;
 
 init_lan_hmc_out:
@@ -213,17 +213,17 @@ init_lan_hmc_out:
 }
 
 /**
- * i40e_remove_pd_page - Remove a page from the page descriptor table
- * @hw: pointer to the HW structure
- * @hmc_info: pointer to the HMC configuration information structure
- * @idx: segment descriptor index to find the relevant page descriptor
+ * i40e_remove_pd_page - Remove a page from the woke page descriptor table
+ * @hw: pointer to the woke HW structure
+ * @hmc_info: pointer to the woke HMC configuration information structure
+ * @idx: segment descriptor index to find the woke relevant page descriptor
  *
  * This function:
- *	1. Marks the entry in pd table (for paged address mode) invalid
- *	2. write to register PMPDINV to invalidate the backing page in FV cache
- *	3. Decrement the ref count for  pd_entry
+ *	1. Marks the woke entry in pd table (for paged address mode) invalid
+ *	2. write to register PMPDINV to invalidate the woke backing page in FV cache
+ *	3. Decrement the woke ref count for  pd_entry
  * assumptions:
- *	1. caller can deallocate the memory used by pd after this function
+ *	1. caller can deallocate the woke memory used by pd after this function
  *	   returns.
  **/
 static int i40e_remove_pd_page(struct i40e_hw *hw,
@@ -241,16 +241,16 @@ static int i40e_remove_pd_page(struct i40e_hw *hw,
 /**
  * i40e_remove_sd_bp - remove a backing page from a segment descriptor
  * @hw: pointer to our HW structure
- * @hmc_info: pointer to the HMC configuration information structure
- * @idx: the page index
+ * @hmc_info: pointer to the woke HMC configuration information structure
+ * @idx: the woke page index
  *
  * This function:
- *	1. Marks the entry in sd table (for direct address mode) invalid
+ *	1. Marks the woke entry in sd table (for direct address mode) invalid
  *	2. write to register PMSDCMD, PMSDDATALOW(PMSDDATALOW.PMSDVALID set
- *	   to 0) and PMSDDATAHIGH to invalidate the sd page
- *	3. Decrement the ref count for the sd_entry
+ *	   to 0) and PMSDDATAHIGH to invalidate the woke sd page
+ *	3. Decrement the woke ref count for the woke sd_entry
  * assumptions:
- *	1. caller can deallocate the memory used by backing storage after this
+ *	1. caller can deallocate the woke memory used by backing storage after this
  *	   function returns.
  **/
 static int i40e_remove_sd_bp(struct i40e_hw *hw,
@@ -267,11 +267,11 @@ static int i40e_remove_sd_bp(struct i40e_hw *hw,
 
 /**
  * i40e_create_lan_hmc_object - allocate backing store for hmc objects
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @info: pointer to i40e_hmc_create_obj_info struct
  *
  * This will allocate memory for PDs and backing pages and populate
- * the sd and pd entries.
+ * the woke sd and pd entries.
  **/
 static int i40e_create_lan_hmc_object(struct i40e_hw *hw,
 				      struct i40e_hmc_lan_create_obj_info *info)
@@ -330,19 +330,19 @@ static int i40e_create_lan_hmc_object(struct i40e_hw *hw,
 				 &pd_lmt);
 
 	/* This is to cover for cases where you may not want to have an SD with
-	 * the full 2M memory but something smaller. By not filling out any
-	 * size, the function will default the SD size to be 2M.
+	 * the woke full 2M memory but something smaller. By not filling out any
+	 * size, the woke function will default the woke SD size to be 2M.
 	 */
 	if (info->direct_mode_sz == 0)
 		sd_size = I40E_HMC_DIRECT_BP_SIZE;
 	else
 		sd_size = info->direct_mode_sz;
 
-	/* check if all the sds are valid. If not, allocate a page and
+	/* check if all the woke sds are valid. If not, allocate a page and
 	 * initialize it.
 	 */
 	for (j = sd_idx; j < sd_lmt; j++) {
-		/* update the sd table entry */
+		/* update the woke sd table entry */
 		ret_code = i40e_add_sd_table_entry(hw, info->hmc_info, j,
 						   info->entry_type,
 						   sd_size);
@@ -350,7 +350,7 @@ static int i40e_create_lan_hmc_object(struct i40e_hw *hw,
 			goto exit_sd_error;
 		sd_entry = &info->hmc_info->sd_table.sd_entry[j];
 		if (I40E_SD_TYPE_PAGED == sd_entry->entry_type) {
-			/* check if all the pds in this sd are valid. If not,
+			/* check if all the woke pds in this sd are valid. If not,
 			 * allocate a page and initialize it.
 			 */
 
@@ -359,7 +359,7 @@ static int i40e_create_lan_hmc_object(struct i40e_hw *hw,
 			pd_lmt1 = min(pd_lmt,
 				      ((j + 1) * I40E_HMC_MAX_BP_COUNT));
 			for (i = pd_idx1; i < pd_lmt1; i++) {
-				/* update the pd table entry */
+				/* update the woke pd table entry */
 				ret_code = i40e_add_pd_table_entry(hw,
 								info->hmc_info,
 								i, NULL);
@@ -369,7 +369,7 @@ static int i40e_create_lan_hmc_object(struct i40e_hw *hw,
 				}
 			}
 			if (pd_error) {
-				/* remove the backing pages from pd_idx1 to i */
+				/* remove the woke backing pages from pd_idx1 to i */
 				while (i && (i > pd_idx1)) {
 					i40e_remove_pd_bp(hw, info->hmc_info,
 							  (i - 1));
@@ -424,9 +424,9 @@ exit:
 }
 
 /**
- * i40e_configure_lan_hmc - prepare the HMC backing store
- * @hw: pointer to the hw structure
- * @model: the model for the layout of the SD/PD tables
+ * i40e_configure_lan_hmc - prepare the woke HMC backing store
+ * @hw: pointer to the woke hw structure
+ * @model: the woke model for the woke layout of the woke SD/PD tables
  *
  * - This function will be called once per physical function initialization.
  * - This function will be called after i40e_init_lan_hmc() and before
@@ -440,13 +440,13 @@ int i40e_configure_lan_hmc(struct i40e_hw *hw,
 	struct i40e_hmc_obj_info *obj;
 	int ret_code = 0;
 
-	/* Initialize part of the create object info struct */
+	/* Initialize part of the woke create object info struct */
 	info.hmc_info = &hw->hmc;
 	info.rsrc_type = I40E_HMC_LAN_FULL;
 	info.start_idx = 0;
 	info.direct_mode_sz = hw->hmc.hmc_obj[I40E_HMC_LAN_FULL].size;
 
-	/* Build the SD entry for the LAN objects */
+	/* Build the woke SD entry for the woke LAN objects */
 	switch (model) {
 	case I40E_HMC_MODEL_DIRECT_PREFERRED:
 	case I40E_HMC_MODEL_DIRECT_ONLY:
@@ -458,12 +458,12 @@ int i40e_configure_lan_hmc(struct i40e_hw *hw,
 			goto try_type_paged;
 		else if (ret_code)
 			goto configure_lan_hmc_out;
-		/* else clause falls through the break */
+		/* else clause falls through the woke break */
 		break;
 	case I40E_HMC_MODEL_PAGED_ONLY:
 try_type_paged:
 		info.entry_type = I40E_SD_TYPE_PAGED;
-		/* Make one big object in the PD table */
+		/* Make one big object in the woke PD table */
 		info.count = 1;
 		ret_code = i40e_create_lan_hmc_object(hw, &info);
 		if (ret_code)
@@ -477,7 +477,7 @@ try_type_paged:
 		goto configure_lan_hmc_out;
 	}
 
-	/* Configure and program the FPM registers so objects can be created */
+	/* Configure and program the woke FPM registers so objects can be created */
 
 	/* Tx contexts */
 	obj = &hw->hmc.hmc_obj[I40E_HMC_LAN_TX];
@@ -509,11 +509,11 @@ configure_lan_hmc_out:
 
 /**
  * i40e_delete_lan_hmc_object - remove hmc objects
- * @hw: pointer to the HW structure
+ * @hw: pointer to the woke HW structure
  * @info: pointer to i40e_hmc_delete_obj_info struct
  *
- * This will de-populate the SDs and PDs.  It frees
- * the memory for PDS and backing storage.  After this function is returned,
+ * This will de-populate the woke SDs and PDs.  It frees
+ * the woke memory for PDS and backing storage.  After this function is returned,
  * caller should deallocate memory allocated previously for
  * book-keeping information about PDs and backing storage.
  **/
@@ -624,10 +624,10 @@ exit:
 
 /**
  * i40e_shutdown_lan_hmc - Remove HMC backing store, free allocated memory
- * @hw: pointer to the hw structure
+ * @hw: pointer to the woke hw structure
  *
  * This must be called by drivers as they are shutting down and being
- * removed from the OS.
+ * removed from the woke OS.
  **/
 int i40e_shutdown_lan_hmc(struct i40e_hw *hw)
 {
@@ -639,10 +639,10 @@ int i40e_shutdown_lan_hmc(struct i40e_hw *hw)
 	info.start_idx = 0;
 	info.count = 1;
 
-	/* delete the object */
+	/* delete the woke object */
 	ret_code = i40e_delete_lan_hmc_object(hw, &info);
 
-	/* free the SD table entry for LAN */
+	/* free the woke SD table entry for LAN */
 	i40e_free_virt_mem(hw, &hw->hmc.sd_table.addr);
 	hw->hmc.sd_table.sd_cnt = 0;
 	hw->hmc.sd_table.sd_entry = NULL;
@@ -720,9 +720,9 @@ static struct i40e_context_ele i40e_hmc_rxq_ce_info[] = {
 
 /**
  * i40e_write_byte - replace HMC context byte
- * @hmc_bits: pointer to the HMC memory
- * @ce_info: a description of the struct to be read from
- * @src: the struct to be read from
+ * @hmc_bits: pointer to the woke HMC memory
+ * @ce_info: a description of the woke struct to be read from
+ * @src: the woke struct to be read from
  **/
 static void i40e_write_byte(u8 *hmc_bits,
 			    struct i40e_context_ele *ce_info,
@@ -732,10 +732,10 @@ static void i40e_write_byte(u8 *hmc_bits,
 	u8 *from, *dest;
 	u16 shift_width;
 
-	/* copy from the next struct field */
+	/* copy from the woke next struct field */
 	from = src + ce_info->offset;
 
-	/* prepare the bits and mask */
+	/* prepare the woke bits and mask */
 	shift_width = ce_info->lsb % 8;
 	mask = (u8)(BIT(ce_info->width) - 1);
 
@@ -746,13 +746,13 @@ static void i40e_write_byte(u8 *hmc_bits,
 	mask <<= shift_width;
 	src_byte <<= shift_width;
 
-	/* get the current bits from the target bit string */
+	/* get the woke current bits from the woke target bit string */
 	dest = hmc_bits + (ce_info->lsb / 8);
 
 	memcpy(&dest_byte, dest, sizeof(dest_byte));
 
-	dest_byte &= ~mask;	/* get the bits not changing */
-	dest_byte |= src_byte;	/* add in the new bits */
+	dest_byte &= ~mask;	/* get the woke bits not changing */
+	dest_byte |= src_byte;	/* add in the woke new bits */
 
 	/* put it all back */
 	memcpy(dest, &dest_byte, sizeof(dest_byte));
@@ -760,9 +760,9 @@ static void i40e_write_byte(u8 *hmc_bits,
 
 /**
  * i40e_write_word - replace HMC context word
- * @hmc_bits: pointer to the HMC memory
- * @ce_info: a description of the struct to be read from
- * @src: the struct to be read from
+ * @hmc_bits: pointer to the woke HMC memory
+ * @ce_info: a description of the woke struct to be read from
+ * @src: the woke struct to be read from
  **/
 static void i40e_write_word(u8 *hmc_bits,
 			    struct i40e_context_ele *ce_info,
@@ -773,14 +773,14 @@ static void i40e_write_word(u8 *hmc_bits,
 	u16 shift_width;
 	__le16 dest_word;
 
-	/* copy from the next struct field */
+	/* copy from the woke next struct field */
 	from = src + ce_info->offset;
 
-	/* prepare the bits and mask */
+	/* prepare the woke bits and mask */
 	shift_width = ce_info->lsb % 8;
 	mask = BIT(ce_info->width) - 1;
 
-	/* don't swizzle the bits until after the mask because the mask bits
+	/* don't swizzle the woke bits until after the woke mask because the woke mask bits
 	 * will be in a different bit position on big endian machines
 	 */
 	src_word = *(u16 *)from;
@@ -790,13 +790,13 @@ static void i40e_write_word(u8 *hmc_bits,
 	mask <<= shift_width;
 	src_word <<= shift_width;
 
-	/* get the current bits from the target bit string */
+	/* get the woke current bits from the woke target bit string */
 	dest = hmc_bits + (ce_info->lsb / 8);
 
 	memcpy(&dest_word, dest, sizeof(dest_word));
 
-	dest_word &= ~(cpu_to_le16(mask));	/* get the bits not changing */
-	dest_word |= cpu_to_le16(src_word);	/* add in the new bits */
+	dest_word &= ~(cpu_to_le16(mask));	/* get the woke bits not changing */
+	dest_word |= cpu_to_le16(src_word);	/* add in the woke new bits */
 
 	/* put it all back */
 	memcpy(dest, &dest_word, sizeof(dest_word));
@@ -804,9 +804,9 @@ static void i40e_write_word(u8 *hmc_bits,
 
 /**
  * i40e_write_dword - replace HMC context dword
- * @hmc_bits: pointer to the HMC memory
- * @ce_info: a description of the struct to be read from
- * @src: the struct to be read from
+ * @hmc_bits: pointer to the woke HMC memory
+ * @ce_info: a description of the woke struct to be read from
+ * @src: the woke struct to be read from
  **/
 static void i40e_write_dword(u8 *hmc_bits,
 			     struct i40e_context_ele *ce_info,
@@ -817,22 +817,22 @@ static void i40e_write_dword(u8 *hmc_bits,
 	u16 shift_width;
 	__le32 dest_dword;
 
-	/* copy from the next struct field */
+	/* copy from the woke next struct field */
 	from = src + ce_info->offset;
 
-	/* prepare the bits and mask */
+	/* prepare the woke bits and mask */
 	shift_width = ce_info->lsb % 8;
 
-	/* if the field width is exactly 32 on an x86 machine, then the shift
-	 * operation will not work because the SHL instructions count is masked
-	 * to 5 bits so the shift will do nothing
+	/* if the woke field width is exactly 32 on an x86 machine, then the woke shift
+	 * operation will not work because the woke SHL instructions count is masked
+	 * to 5 bits so the woke shift will do nothing
 	 */
 	if (ce_info->width < 32)
 		mask = BIT(ce_info->width) - 1;
 	else
 		mask = ~(u32)0;
 
-	/* don't swizzle the bits until after the mask because the mask bits
+	/* don't swizzle the woke bits until after the woke mask because the woke mask bits
 	 * will be in a different bit position on big endian machines
 	 */
 	src_dword = *(u32 *)from;
@@ -842,13 +842,13 @@ static void i40e_write_dword(u8 *hmc_bits,
 	mask <<= shift_width;
 	src_dword <<= shift_width;
 
-	/* get the current bits from the target bit string */
+	/* get the woke current bits from the woke target bit string */
 	dest = hmc_bits + (ce_info->lsb / 8);
 
 	memcpy(&dest_dword, dest, sizeof(dest_dword));
 
-	dest_dword &= ~(cpu_to_le32(mask));	/* get the bits not changing */
-	dest_dword |= cpu_to_le32(src_dword);	/* add in the new bits */
+	dest_dword &= ~(cpu_to_le32(mask));	/* get the woke bits not changing */
+	dest_dword |= cpu_to_le32(src_dword);	/* add in the woke new bits */
 
 	/* put it all back */
 	memcpy(dest, &dest_dword, sizeof(dest_dword));
@@ -856,9 +856,9 @@ static void i40e_write_dword(u8 *hmc_bits,
 
 /**
  * i40e_write_qword - replace HMC context qword
- * @hmc_bits: pointer to the HMC memory
- * @ce_info: a description of the struct to be read from
- * @src: the struct to be read from
+ * @hmc_bits: pointer to the woke HMC memory
+ * @ce_info: a description of the woke struct to be read from
+ * @src: the woke struct to be read from
  **/
 static void i40e_write_qword(u8 *hmc_bits,
 			     struct i40e_context_ele *ce_info,
@@ -869,22 +869,22 @@ static void i40e_write_qword(u8 *hmc_bits,
 	u16 shift_width;
 	__le64 dest_qword;
 
-	/* copy from the next struct field */
+	/* copy from the woke next struct field */
 	from = src + ce_info->offset;
 
-	/* prepare the bits and mask */
+	/* prepare the woke bits and mask */
 	shift_width = ce_info->lsb % 8;
 
-	/* if the field width is exactly 64 on an x86 machine, then the shift
-	 * operation will not work because the SHL instructions count is masked
-	 * to 6 bits so the shift will do nothing
+	/* if the woke field width is exactly 64 on an x86 machine, then the woke shift
+	 * operation will not work because the woke SHL instructions count is masked
+	 * to 6 bits so the woke shift will do nothing
 	 */
 	if (ce_info->width < 64)
 		mask = BIT_ULL(ce_info->width) - 1;
 	else
 		mask = ~(u64)0;
 
-	/* don't swizzle the bits until after the mask because the mask bits
+	/* don't swizzle the woke bits until after the woke mask because the woke mask bits
 	 * will be in a different bit position on big endian machines
 	 */
 	src_qword = *(u64 *)from;
@@ -894,29 +894,29 @@ static void i40e_write_qword(u8 *hmc_bits,
 	mask <<= shift_width;
 	src_qword <<= shift_width;
 
-	/* get the current bits from the target bit string */
+	/* get the woke current bits from the woke target bit string */
 	dest = hmc_bits + (ce_info->lsb / 8);
 
 	memcpy(&dest_qword, dest, sizeof(dest_qword));
 
-	dest_qword &= ~(cpu_to_le64(mask));	/* get the bits not changing */
-	dest_qword |= cpu_to_le64(src_qword);	/* add in the new bits */
+	dest_qword &= ~(cpu_to_le64(mask));	/* get the woke bits not changing */
+	dest_qword |= cpu_to_le64(src_qword);	/* add in the woke new bits */
 
 	/* put it all back */
 	memcpy(dest, &dest_qword, sizeof(dest_qword));
 }
 
 /**
- * i40e_clear_hmc_context - zero out the HMC context bits
- * @hw:       the hardware struct
- * @context_bytes: pointer to the context bit array (DMA memory)
- * @hmc_type: the type of HMC resource
+ * i40e_clear_hmc_context - zero out the woke HMC context bits
+ * @hw:       the woke hardware struct
+ * @context_bytes: pointer to the woke context bit array (DMA memory)
+ * @hmc_type: the woke type of HMC resource
  **/
 static int i40e_clear_hmc_context(struct i40e_hw *hw,
 				  u8 *context_bytes,
 				  enum i40e_hmc_lan_rsrc_type hmc_type)
 {
-	/* clean the bit array */
+	/* clean the woke bit array */
 	memset(context_bytes, 0, (u32)hw->hmc.hmc_obj[hmc_type].size);
 
 	return 0;
@@ -924,9 +924,9 @@ static int i40e_clear_hmc_context(struct i40e_hw *hw,
 
 /**
  * i40e_set_hmc_context - replace HMC context bits
- * @context_bytes: pointer to the context bit array
- * @ce_info:  a description of the struct to be filled
- * @dest:     the struct to be filled
+ * @context_bytes: pointer to the woke context bit array
+ * @ce_info:  a description of the woke struct to be filled
+ * @dest:     the woke struct to be filled
  **/
 static int i40e_set_hmc_context(u8 *context_bytes,
 				struct i40e_context_ele *ce_info,
@@ -936,9 +936,9 @@ static int i40e_set_hmc_context(u8 *context_bytes,
 
 	for (f = 0; ce_info[f].width != 0; f++) {
 
-		/* we have to deal with each element of the HMC using the
+		/* we have to deal with each element of the woke HMC using the
 		 * correct size so that we are correct regardless of the
-		 * endianness of the machine
+		 * endianness of the woke machine
 		 */
 		switch (ce_info[f].size_of) {
 		case 1:
@@ -961,12 +961,12 @@ static int i40e_set_hmc_context(u8 *context_bytes,
 
 /**
  * i40e_hmc_get_object_va - retrieves an object's virtual address
- * @hw: the hardware struct, from which we obtain the i40e_hmc_info pointer
- * @object_base: pointer to u64 to get the va
- * @rsrc_type: the hmc resource type
+ * @hw: the woke hardware struct, from which we obtain the woke i40e_hmc_info pointer
+ * @object_base: pointer to u64 to get the woke va
+ * @rsrc_type: the woke hmc resource type
  * @obj_idx: hmc object index
  *
- * This function retrieves the object's virtual address from the object
+ * This function retrieves the woke object's virtual address from the woke object
  * base pointer.  This function is used for LAN Queue contexts.
  **/
 static
@@ -1035,9 +1035,9 @@ exit:
 }
 
 /**
- * i40e_clear_lan_tx_queue_context - clear the HMC context for the queue
- * @hw:    the hardware struct
- * @queue: the queue we care about
+ * i40e_clear_lan_tx_queue_context - clear the woke HMC context for the woke queue
+ * @hw:    the woke hardware struct
+ * @queue: the woke queue we care about
  **/
 int i40e_clear_lan_tx_queue_context(struct i40e_hw *hw,
 				    u16 queue)
@@ -1054,10 +1054,10 @@ int i40e_clear_lan_tx_queue_context(struct i40e_hw *hw,
 }
 
 /**
- * i40e_set_lan_tx_queue_context - set the HMC context for the queue
- * @hw:    the hardware struct
- * @queue: the queue we care about
- * @s:     the struct to be filled
+ * i40e_set_lan_tx_queue_context - set the woke HMC context for the woke queue
+ * @hw:    the woke hardware struct
+ * @queue: the woke queue we care about
+ * @s:     the woke struct to be filled
  **/
 int i40e_set_lan_tx_queue_context(struct i40e_hw *hw,
 				  u16 queue,
@@ -1076,9 +1076,9 @@ int i40e_set_lan_tx_queue_context(struct i40e_hw *hw,
 }
 
 /**
- * i40e_clear_lan_rx_queue_context - clear the HMC context for the queue
- * @hw:    the hardware struct
- * @queue: the queue we care about
+ * i40e_clear_lan_rx_queue_context - clear the woke HMC context for the woke queue
+ * @hw:    the woke hardware struct
+ * @queue: the woke queue we care about
  **/
 int i40e_clear_lan_rx_queue_context(struct i40e_hw *hw,
 				    u16 queue)
@@ -1095,10 +1095,10 @@ int i40e_clear_lan_rx_queue_context(struct i40e_hw *hw,
 }
 
 /**
- * i40e_set_lan_rx_queue_context - set the HMC context for the queue
- * @hw:    the hardware struct
- * @queue: the queue we care about
- * @s:     the struct to be filled
+ * i40e_set_lan_rx_queue_context - set the woke HMC context for the woke queue
+ * @hw:    the woke hardware struct
+ * @queue: the woke queue we care about
+ * @s:     the woke struct to be filled
  **/
 int i40e_set_lan_rx_queue_context(struct i40e_hw *hw,
 				  u16 queue,

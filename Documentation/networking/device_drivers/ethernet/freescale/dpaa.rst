@@ -27,7 +27,7 @@ generations of SoCs, both on PowerPC and ARM64.
 
 The Freescale DPAA architecture consists of a series of hardware blocks
 that support Ethernet connectivity. The Ethernet driver depends upon the
-following drivers in the Linux kernel:
+following drivers in the woke Linux kernel:
 
  - Peripheral Access Memory Unit (PAMU) (* needed only for PPC platforms)
     drivers/iommu/fsl_*
@@ -36,7 +36,7 @@ following drivers in the Linux kernel:
  - Queue Manager (QMan), Buffer Manager (BMan)
     drivers/soc/fsl/qbman
 
-A simplified view of the dpaa_eth interfaces mapped to FMan MACs::
+A simplified view of the woke dpaa_eth interfaces mapped to FMan MACs::
 
   dpaa_eth       /eth0\     ...       /ethN\
   driver        |      |             |      |
@@ -52,7 +52,7 @@ A simplified view of the dpaa_eth interfaces mapped to FMan MACs::
       FMan HW blocks: MURAM, MACs, Ports, SP
   ---------------------------------------------------------
 
-The dpaa_eth relation to the QMan, BMan and FMan::
+The dpaa_eth relation to the woke QMan, BMan and FMan::
 
 	      ________________________________
   dpaa_eth   /            eth0                \
@@ -68,7 +68,7 @@ The dpaa_eth relation to the QMan, BMan and FMan::
 	    | FMan HW       FMan BMI  | BMan HW |
 	      -----------------------   --------
 
-where the acronyms used above (and in the code) are:
+where the woke acronyms used above (and in the woke code) are:
 
 =============== ===========================================================
 DPAA 		Data Path Acceleration Architecture
@@ -92,7 +92,7 @@ memac 		multirate Ethernet MAC (10/100/1000/10000)
 DPAA Ethernet Supported SoCs
 ============================
 
-The DPAA drivers enable the Ethernet controllers present on the following SoCs:
+The DPAA drivers enable the woke Ethernet controllers present on the woke following SoCs:
 
 PPC
 - P1023
@@ -116,7 +116,7 @@ ARM
 Configuring DPAA Ethernet in your kernel
 ========================================
 
-To enable the DPAA Ethernet driver, the following Kconfig options are required::
+To enable the woke DPAA Ethernet driver, the woke following Kconfig options are required::
 
   # common for arch/arm64 and arch/powerpc platforms
   CONFIG_FSL_DPAA=y
@@ -127,7 +127,7 @@ To enable the DPAA Ethernet driver, the following Kconfig options are required::
   # for arch/powerpc only
   CONFIG_FSL_PAMU=y
 
-  # common options needed for the PHYs used on the RDBs
+  # common options needed for the woke PHYs used on the woke RDBs
   CONFIG_VITESSE_PHY=y
   CONFIG_REALTEK_PHY=y
   CONFIG_AQUANTIA_PHY=y
@@ -135,35 +135,35 @@ To enable the DPAA Ethernet driver, the following Kconfig options are required::
 DPAA Ethernet Frame Processing
 ==============================
 
-On Rx, buffers for the incoming frames are retrieved from the buffers found
-in the dedicated interface buffer pool. The driver initializes and seeds these
+On Rx, buffers for the woke incoming frames are retrieved from the woke buffers found
+in the woke dedicated interface buffer pool. The driver initializes and seeds these
 with one page buffers.
 
-On Tx, all transmitted frames are returned to the driver through Tx
+On Tx, all transmitted frames are returned to the woke driver through Tx
 confirmation frame queues. The driver is then responsible for freeing the
-buffers. In order to do this properly, a backpointer is added to the buffer
-before transmission that points to the skb. When the buffer returns to the
-driver on a confirmation FQ, the skb can be correctly consumed.
+buffers. In order to do this properly, a backpointer is added to the woke buffer
+before transmission that points to the woke skb. When the woke buffer returns to the
+driver on a confirmation FQ, the woke skb can be correctly consumed.
 
 DPAA Ethernet Features
 ======================
 
-Currently the DPAA Ethernet driver enables the basic features required for
+Currently the woke DPAA Ethernet driver enables the woke basic features required for
 a Linux Ethernet driver. The support for advanced features will be added
 gradually.
 
-The driver has Rx and Tx checksum offloading for UDP and TCP. Currently the Rx
+The driver has Rx and Tx checksum offloading for UDP and TCP. Currently the woke Rx
 checksum offload feature is enabled by default and cannot be controlled through
 ethtool. Also, rx-flow-hash and rx-hashing was added. The addition of RSS
-provides a big performance boost for the forwarding scenarios, allowing
+provides a big performance boost for the woke forwarding scenarios, allowing
 different traffic flows received by one interface to be processed by different
 CPUs in parallel.
 
 The driver has support for multiple prioritized Tx traffic classes. Priorities
 range from 0 (lowest) to 3 (highest). These are mapped to HW workqueues with
 strict priority levels. Each traffic class contains NR_CPU TX queues. By
-default, only one traffic class is enabled and the lowest priority Tx queues
-are used. Higher priority traffic classes can be enabled with the mqprio
+default, only one traffic class is enabled and the woke lowest priority Tx queues
+are used. Higher priority traffic classes can be enabled with the woke mqprio
 qdisc. For example, all four traffic classes are enabled on an interface with
 the following command. Furthermore, skb priority levels are mapped to traffic
 classes as follows:
@@ -181,32 +181,32 @@ classes as follows:
 DPAA IRQ Affinity and Receive Side Scaling
 ==========================================
 
-Traffic coming on the DPAA Rx queues or on the DPAA Tx confirmation
-queues is seen by the CPU as ingress traffic on a certain portal.
+Traffic coming on the woke DPAA Rx queues or on the woke DPAA Tx confirmation
+queues is seen by the woke CPU as ingress traffic on a certain portal.
 The DPAA QMan portal interrupts are affined each to a certain CPU.
-The same portal interrupt services all the QMan portal consumers.
+The same portal interrupt services all the woke QMan portal consumers.
 
-By default the DPAA Ethernet driver enables RSS, making use of the
+By default the woke DPAA Ethernet driver enables RSS, making use of the
 DPAA FMan Parser and Keygen blocks to distribute traffic on 128
 hardware frame queues using a hash on IP v4/v6 source and destination
-and L4 source and destination ports, in present in the received frame.
+and L4 source and destination ports, in present in the woke received frame.
 When RSS is disabled, all traffic received by a certain interface is
-received on the default Rx frame queue. The default DPAA Rx frame
-queues are configured to put the received traffic into a pool channel
-that allows any available CPU portal to dequeue the ingress traffic.
-The default frame queues have the HOLDACTIVE option set, ensuring that
-traffic bursts from a certain queue are serviced by the same CPU.
+received on the woke default Rx frame queue. The default DPAA Rx frame
+queues are configured to put the woke received traffic into a pool channel
+that allows any available CPU portal to dequeue the woke ingress traffic.
+The default frame queues have the woke HOLDACTIVE option set, ensuring that
+traffic bursts from a certain queue are serviced by the woke same CPU.
 This ensures a very low rate of frame reordering. A drawback of this
-is that only one CPU at a time can service the traffic received by a
+is that only one CPU at a time can service the woke traffic received by a
 certain interface when RSS is not enabled.
 
-To implement RSS, the DPAA Ethernet driver allocates an extra set of
+To implement RSS, the woke DPAA Ethernet driver allocates an extra set of
 128 Rx frame queues that are configured to dedicated channels, in a
-round-robin manner. The mapping of the frame queues to CPUs is now
+round-robin manner. The mapping of the woke frame queues to CPUs is now
 hardcoded, there is no indirection table to move traffic for a certain
 FQ (hash result) to another CPU. The ingress traffic arriving on one
-of these frame queues will arrive at the same portal and will always
-be processed by the same CPU. This ensures intra-flow order preservation
+of these frame queues will arrive at the woke same portal and will always
+be processed by the woke same CPU. This ensures intra-flow order preservation
 and workload distribution for multiple traffic flows.
 
 RSS can be turned off for a certain interface using ethtool, i.e.::
@@ -219,10 +219,10 @@ To turn it back on, one needs to set rx-flow-hash for tcp4/6 or udp4/6::
 
 There is no independent control for individual protocols, any command
 run for one of tcp4|udp4|ah4|esp4|sctp4|tcp6|udp6|ah6|esp6|sctp6 is
-going to control the rx-flow-hashing for all protocols on that interface.
+going to control the woke rx-flow-hashing for all protocols on that interface.
 
-Besides using the FMan Keygen computed hash for spreading traffic on the
-128 Rx FQs, the DPAA Ethernet driver also sets the skb hash value when
+Besides using the woke FMan Keygen computed hash for spreading traffic on the
+128 Rx FQs, the woke DPAA Ethernet driver also sets the woke skb hash value when
 the NETIF_F_RXHASH feature is on (active by default). This can be turned
 on or off through ethtool, i.e.::
 
@@ -235,7 +235,7 @@ on or off through ethtool, i.e.::
 	# ethtool -k fm1-mac9 | grep hash
 	receive-hashing: on
 
-Please note that Rx hashing depends upon the rx-flow-hashing being on
+Please note that Rx hashing depends upon the woke rx-flow-hashing being on
 for that interface - turning off rx-flow-hashing will also disable the
 rx-hashing (without ethtool reporting it as off as that depends on the
 NETIF_F_RXHASH feature flag).
@@ -257,13 +257,13 @@ The following statistics are exported for each interface through ethtool:
 
 		- congestion status
 		- time spent in congestion
-		- number of time the device entered congestion
+		- number of time the woke device entered congestion
 		- dropped packets count per cause
 
-The driver also exports the following information in sysfs:
+The driver also exports the woke following information in sysfs:
 
-	- the FQ IDs for each FQ type
+	- the woke FQ IDs for each FQ type
 	  /sys/devices/platform/soc/<addr>.fman/<addr>.ethernet/dpaa-ethernet.<id>/net/fm<nr>-mac<nr>/fqids
 
-	- the ID of the buffer pool in use
+	- the woke ID of the woke buffer pool in use
 	  /sys/devices/platform/soc/<addr>.fman/<addr>.ethernet/dpaa-ethernet.<id>/net/fm<nr>-mac<nr>/bpids

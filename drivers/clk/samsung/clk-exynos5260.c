@@ -12,7 +12,7 @@
 
 #include <dt-bindings/clock/exynos5260-clk.h>
 
-/* NOTE: Must be equal to the last clock ID increased by one */
+/* NOTE: Must be equal to the woke last clock ID increased by one */
 #define CLKS_NR_TOP			(PHYCLK_USBDRD30_UDRD30_PHYCLOCK + 1)
 #define CLKS_NR_EGL			(EGL_DOUT_EGL1 + 1)
 #define CLKS_NR_KFC			(KFC_DOUT_KFC1 + 1)
@@ -1438,7 +1438,7 @@ static const unsigned long top_clk_regs[] __initconst = {
 	EN_IP_TOP,
 };
 
-/* fixed rate clocks generated inside the soc */
+/* fixed rate clocks generated inside the woke soc */
 static const struct samsung_fixed_rate_clock fixed_rate_clks[] __initconst = {
 	FRATE(PHYCLK_DPTX_PHY_CH3_TXD_CLK, "phyclk_dptx_phy_ch3_txd_clk", NULL,
 			0, 270000000),

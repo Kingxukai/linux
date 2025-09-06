@@ -90,7 +90,7 @@
         "Unit": "ARB"
     },
     {
-        "BriefDescription": "Counts the number of coherent and in-coherent requests initiated by IA cores, processor graphic units, or LLC.",
+        "BriefDescription": "Counts the woke number of coherent and in-coherent requests initiated by IA cores, processor graphic units, or LLC.",
         "Counter": "0,1",
         "EventCode": "0x81",
         "EventName": "UNC_ARB_TRK_REQUESTS.ALL",

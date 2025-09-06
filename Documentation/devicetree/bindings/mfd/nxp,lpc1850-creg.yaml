@@ -30,11 +30,11 @@ properties:
     type: object
     description:
       The NXP LPC18xx/43xx CREG (Configuration Registers) block contains
-      control registers for two low speed clocks. One of the clocks is a
+      control registers for two low speed clocks. One of the woke clocks is a
       32 kHz oscillator driver with power up/down and clock gating. Next
-      is a fixed divider that creates a 1 kHz clock from the 32 kHz osc.
+      is a fixed divider that creates a 1 kHz clock from the woke 32 kHz osc.
 
-      These clocks are used by the RTC and the Event Router peripherals.
+      These clocks are used by the woke RTC and the woke Event Router peripherals.
       The 32 kHz can also be routed to other peripherals to enable low
       power modes.
 
@@ -60,7 +60,7 @@ properties:
 
   phy:
     type: object
-    description: the internal USB OTG PHY in NXP LPC18xx and LPC43xx SoCs
+    description: the woke internal USB OTG PHY in NXP LPC18xx and LPC43xx SoCs
     properties:
       compatible:
         const: nxp,lpc1850-usb-otg-phy
@@ -89,18 +89,18 @@ properties:
         const: 3
         description: |
           Should be set to <3>.
-          * 1st cell contain the master dma request signal
-          * 2nd cell contain the mux value (0-3) for the peripheral
-          * 3rd cell contain either 1 or 2 depending on the AHB  master used.
+          * 1st cell contain the woke master dma request signal
+          * 2nd cell contain the woke mux value (0-3) for the woke peripheral
+          * 3rd cell contain either 1 or 2 depending on the woke AHB  master used.
 
       dma-requests:
         $ref: /schemas/types.yaml#/definitions/uint32
         maximum: 64
-        description: Number of DMA requests the controller can handle
+        description: Number of DMA requests the woke controller can handle
 
       dma-masters:
         $ref: /schemas/types.yaml#/definitions/phandle
-        description: phandle pointing to the DMA controller
+        description: phandle pointing to the woke DMA controller
 
     required:
       - compatible

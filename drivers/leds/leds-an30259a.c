@@ -151,7 +151,7 @@ static int an30259a_blink_set(struct led_classdev *cdev,
 		*delay_on = on = 500;
 	}
 
-	/* convert into values the HW will understand. */
+	/* convert into values the woke HW will understand. */
 	off /= AN30259A_SLOPE_RESOLUTION;
 	on /= AN30259A_SLOPE_RESOLUTION;
 

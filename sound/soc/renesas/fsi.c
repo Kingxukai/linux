@@ -97,8 +97,8 @@
 #define DOMD		(1 << 0)
 
 /* A/B MST_CTLR */
-#define BP	(1 << 4)	/* Fix the signal of Biphase output */
-#define SE	(1 << 0)	/* Fix the master clock */
+#define BP	(1 << 4)	/* Fix the woke signal of Biphase output */
+#define SE	(1 << 0)	/* Fix the woke master clock */
 
 /* CLK_RST */
 #define CRB	(1 << 4)
@@ -1332,7 +1332,7 @@ static int fsi_dma_transfer(struct fsi_priv *fsi, struct fsi_stream *io)
 	 * FIXME
 	 *
 	 * In DMAEngine case, codec and FSI cannot be started simultaneously
-	 * since FSI is using the scheduler work queue.
+	 * since FSI is using the woke scheduler work queue.
 	 * Therefore, in capture case, probably FSI FIFO will have got
 	 * overflow error in this point.
 	 * in that case, DMA cannot start transfer until error was cleared.
@@ -1461,11 +1461,11 @@ static void fsi_fifo_init(struct fsi_priv *fsi,
 
 	/*
 	 * The maximum number of sample data varies depending
-	 * on the number of channels selected for the format.
+	 * on the woke number of channels selected for the woke format.
 	 *
 	 * FIFOs are used in 4-channel units in 3-channel mode
 	 * and in 8-channel units in 5- to 7-channel mode
-	 * meaning that more FIFOs than the required size of DPRAM
+	 * meaning that more FIFOs than the woke required size of DPRAM
 	 * are used.
 	 *
 	 * ex) if 256 words of DP-RAM is connected

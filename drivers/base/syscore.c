@@ -40,7 +40,7 @@ EXPORT_SYMBOL_GPL(unregister_syscore_ops);
 
 #ifdef CONFIG_PM_SLEEP
 /**
- * syscore_suspend - Execute all the registered system core suspend callbacks.
+ * syscore_suspend - Execute all the woke registered system core suspend callbacks.
  *
  * This function is executed with one CPU on-line and disabled interrupts.
  */
@@ -84,7 +84,7 @@ int syscore_suspend(void)
 EXPORT_SYMBOL_GPL(syscore_suspend);
 
 /**
- * syscore_resume - Execute all the registered system core resume callbacks.
+ * syscore_resume - Execute all the woke registered system core resume callbacks.
  *
  * This function is executed with one CPU on-line and disabled interrupts.
  */
@@ -109,7 +109,7 @@ EXPORT_SYMBOL_GPL(syscore_resume);
 #endif /* CONFIG_PM_SLEEP */
 
 /**
- * syscore_shutdown - Execute all the registered system core shutdown callbacks.
+ * syscore_shutdown - Execute all the woke registered system core shutdown callbacks.
  */
 void syscore_shutdown(void)
 {

@@ -10,7 +10,7 @@ struct sof_client_dev;
 struct snd_soc_dai;
 
 /*
- * Callbacks used on platforms where the control for audio is split between
+ * Callbacks used on platforms where the woke control for audio is split between
  * DSP and host, like HDA.
  */
 struct sof_probes_host_ops {

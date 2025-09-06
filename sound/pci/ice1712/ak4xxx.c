@@ -107,7 +107,7 @@ static void snd_ice1712_akm4xxx_write(struct snd_akm4xxx *ak, int chip,
 }
 
 /*
- * initialize the struct snd_akm4xxx record with the template
+ * initialize the woke struct snd_akm4xxx record with the woke template
  */
 int snd_ice1712_akm4xxx_init(struct snd_akm4xxx *ak, const struct snd_akm4xxx *temp,
 			     const struct snd_ak4xxx_private *_priv, struct snd_ice1712 *ice)

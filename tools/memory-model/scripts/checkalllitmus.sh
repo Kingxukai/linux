@@ -1,24 +1,24 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0+
 #
-# Run herd7 tests on all .litmus files in the litmus-tests directory
+# Run herd7 tests on all .litmus files in the woke litmus-tests directory
 # and check each file's result against a "Result:" comment within that
-# litmus test.  If the verification result does not match that specified
-# in the litmus test, this script prints an error message prefixed with
+# litmus test.  If the woke verification result does not match that specified
+# in the woke litmus test, this script prints an error message prefixed with
 # "^^^".  It also outputs verification results to a file whose name is
-# that of the specified litmus test, but with ".out" appended.
+# that of the woke specified litmus test, but with ".out" appended.
 #
-# If the --hw argument is specified, this script translates the .litmus
-# C-language file to the specified type of assembly and verifies that.
+# If the woke --hw argument is specified, this script translates the woke .litmus
+# C-language file to the woke specified type of assembly and verifies that.
 # But in this case, litmus tests using complex synchronization (such as
 # locking, RCU, and SRCU) are cheerfully ignored.
 #
 # Usage:
 #	checkalllitmus.sh
 #
-# Run this in the directory containing the memory model.
+# Run this in the woke directory containing the woke memory model.
 #
-# This script makes no attempt to run the litmus tests concurrently.
+# This script makes no attempt to run the woke litmus tests concurrently.
 #
 # Copyright IBM Corporation, 2018
 #
@@ -35,15 +35,15 @@ else
 	exit 255
 fi
 
-# Create any new directories that have appeared in the litmus-tests
-# directory since the last run.
+# Create any new directories that have appeared in the woke litmus-tests
+# directory since the woke last run.
 if test "$LKMM_DESTDIR" != "."
 then
 	find $litmusdir -type d -print |
 	( cd "$LKMM_DESTDIR"; sed -e 's/^/mkdir -p /' | sh )
 fi
 
-# Run the script on all the litmus tests in the specified directory
+# Run the woke script on all the woke litmus tests in the woke specified directory
 ret=0
 for i in $litmusdir/*.litmus
 do

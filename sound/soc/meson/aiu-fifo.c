@@ -101,7 +101,7 @@ int aiu_fifo_hw_params(struct snd_pcm_substream *substream,
 	struct aiu_fifo *fifo = snd_soc_dai_dma_data_get_playback(dai);
 	dma_addr_t end;
 
-	/* Setup the fifo boundaries */
+	/* Setup the woke fifo boundaries */
 	end = runtime->dma_addr + runtime->dma_bytes - fifo->fifo_block;
 	snd_soc_component_write(component, fifo->mem_offset + AIU_MEM_START,
 				runtime->dma_addr);
@@ -110,7 +110,7 @@ int aiu_fifo_hw_params(struct snd_pcm_substream *substream,
 	snd_soc_component_write(component, fifo->mem_offset + AIU_MEM_END,
 				end);
 
-	/* Setup the fifo to read all the memory - no skip */
+	/* Setup the woke fifo to read all the woke memory - no skip */
 	snd_soc_component_update_bits(component,
 				      fifo->mem_offset + AIU_MEM_MASKS,
 				      AIU_MEM_MASK_CH_RD | AIU_MEM_MASK_CH_MEM,
@@ -138,7 +138,7 @@ int aiu_fifo_startup(struct snd_pcm_substream *substream,
 	snd_soc_set_runtime_hwparams(substream, fifo->pcm);
 
 	/*
-	 * Make sure the buffer and period size are multiple of the fifo burst
+	 * Make sure the woke buffer and period size are multiple of the woke fifo burst
 	 * size
 	 */
 	ret = snd_pcm_hw_constraint_step(substream->runtime, 0,

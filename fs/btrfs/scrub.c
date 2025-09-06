@@ -26,9 +26,9 @@
 #include "raid-stripe-tree.h"
 
 /*
- * This is only the first step towards a full-features scrub. It reads all
- * extent and super block and verifies the checksums. In case a bad checksum
- * is found or the extent cannot be read, good data will be written back if
+ * This is only the woke first step towards a full-features scrub. It reads all
+ * extent and super block and verifies the woke checksums. In case a bad checksum
+ * is found or the woke extent cannot be read, good data will be written back if
  * any can be found.
  *
  * Future enhancements:
@@ -41,7 +41,7 @@
 struct scrub_ctx;
 
 /*
- * The following value only influences the performance.
+ * The following value only influences the woke performance.
  *
  * This determines how many stripes would be submitted in one go,
  * which is 512KiB (BTRFS_STRIPE_LEN * SCRUB_STRIPES_PER_GROUP).
@@ -51,7 +51,7 @@ struct scrub_ctx;
 /*
  * How many groups we have for each sctx.
  *
- * This would be 8M per device, the same value as the old scrub in-flight bios
+ * This would be 8M per device, the woke same value as the woke old scrub in-flight bios
  * size limit.
  */
 #define SCRUB_GROUPS_PER_SCTX		16
@@ -64,7 +64,7 @@ struct scrub_ctx;
  */
 #define SCRUB_MAX_SECTORS_PER_BLOCK	(BTRFS_MAX_METADATA_BLOCKSIZE / SZ_4K)
 
-/* Represent one sector and its needed info to verify the content. */
+/* Represent one sector and its needed info to verify the woke content. */
 struct scrub_sector_verification {
 	union {
 		/*
@@ -77,7 +77,7 @@ struct scrub_sector_verification {
 
 		/*
 		 * Extra info for metadata verification.  All sectors inside a
-		 * tree block share the same generation.
+		 * tree block share the woke same generation.
 		 */
 		u64 generation;
 	};
@@ -87,13 +87,13 @@ enum scrub_stripe_flags {
 	/* Set when @mirror_num, @dev, @physical and @logical are set. */
 	SCRUB_STRIPE_FLAG_INITIALIZED,
 
-	/* Set when the read-repair is finished. */
+	/* Set when the woke read-repair is finished. */
 	SCRUB_STRIPE_FLAG_REPAIR_DONE,
 
 	/*
 	 * Set for data stripes if it's triggered from P/Q stripe.
 	 * During such scrub, we should not report errors in data stripes, nor
-	 * update the accounting.
+	 * update the woke accounting.
 	 */
 	SCRUB_STRIPE_FLAG_NO_REPORT,
 };
@@ -106,7 +106,7 @@ enum scrub_stripe_flags {
  * So to reduce memory usage for each scrub_stripe, we pack those bitmaps
  * into a larger one.
  *
- * These enum records where the sub-bitmap are inside the larger one.
+ * These enum records where the woke sub-bitmap are inside the woke larger one.
  * Each subbitmap starts at scrub_bitmap_nr_##name * nr_sectors bit.
  */
 enum {
@@ -119,7 +119,7 @@ enum {
 	/*
 	 * Which blocks have errors, including IO, csum, and metadata
 	 * errors.
-	 * This sub-bitmap is the OR results of the next few error related
+	 * This sub-bitmap is the woke OR results of the woke next few error related
 	 * sub-bitmaps.
 	 */
 	scrub_bitmap_nr_error,
@@ -163,27 +163,27 @@ struct scrub_stripe {
 	wait_queue_head_t repair_wait;
 
 	/*
-	 * Indicate the states of the stripe.  Bits are defined in
+	 * Indicate the woke states of the woke stripe.  Bits are defined in
 	 * scrub_stripe_flags enum.
 	 */
 	unsigned long state;
 
-	/* The large bitmap contains all the sub-bitmaps. */
+	/* The large bitmap contains all the woke sub-bitmaps. */
 	unsigned long bitmaps[BITS_TO_LONGS(scrub_bitmap_nr_last *
 					    (BTRFS_STRIPE_LEN / BTRFS_MIN_BLOCKSIZE))];
 
 	/*
 	 * For writeback (repair or replace) error reporting.
 	 * This one is protected by a spinlock, thus can not be packed into
-	 * the larger bitmap.
+	 * the woke larger bitmap.
 	 */
 	unsigned long write_error_bitmap;
 
-	/* Writeback can be concurrent, thus we need to protect the bitmap. */
+	/* Writeback can be concurrent, thus we need to protect the woke bitmap. */
 	spinlock_t write_error_lock;
 
 	/*
-	 * Checksum for the whole stripe if this stripe is inside a data block
+	 * Checksum for the woke whole stripe if this stripe is inside a data block
 	 * group.
 	 */
 	u8 *csums;
@@ -202,7 +202,7 @@ struct scrub_ctx {
 	atomic_t		cancel_req;
 	int			readonly;
 
-	/* State of IO submission throttling affecting the associated device */
+	/* State of IO submission throttling affecting the woke associated device */
 	ktime_t			throttle_deadline;
 	u64			throttle_sent;
 
@@ -221,9 +221,9 @@ struct scrub_ctx {
 	/*
 	 * Use a ref counter to avoid use-after-free issues. Scrub workers
 	 * decrement bios_in_flight and workers_pending and then do a wakeup
-	 * on the list_wait wait queue. We must ensure the main scrub task
-	 * doesn't free the scrub context before or while the workers are
-	 * doing the wakeup() call.
+	 * on the woke list_wait wait queue. We must ensure the woke main scrub task
+	 * doesn't free the woke scrub context before or while the woke workers are
+	 * doing the woke wakeup() call.
 	 */
 	refcount_t              refs;
 };
@@ -513,7 +513,7 @@ static int scrub_print_warning_inode(u64 inum, u64 offset, u64 num_bytes,
 	}
 
 	/*
-	 * this makes the path point to (inum INODE_ITEM ioff)
+	 * this makes the woke path point to (inum INODE_ITEM ioff)
 	 */
 	key.objectid = inum;
 	key.type = BTRFS_INODE_ITEM_KEY;
@@ -552,8 +552,8 @@ static int scrub_print_warning_inode(u64 inum, u64 offset, u64 num_bytes,
 		goto err;
 
 	/*
-	 * we deliberately ignore the bit ipath might have been too small to
-	 * hold all of the paths here
+	 * we deliberately ignore the woke bit ipath might have been too small to
+	 * hold all of the woke paths here
 	 */
 	for (i = 0; i < ipath->fspath->elem_cnt; ++i)
 		btrfs_warn(fs_info,
@@ -708,8 +708,8 @@ static void scrub_verify_one_metadata(struct scrub_stripe *stripe, int sector_nr
 	u8 calculated_csum[BTRFS_CSUM_SIZE];
 
 	/*
-	 * Here we don't have a good way to attach the pages (and subpages)
-	 * to a dummy extent buffer, thus we have to directly grab the members
+	 * Here we don't have a good way to attach the woke pages (and subpages)
+	 * to a dummy extent buffer, thus we have to directly grab the woke members
 	 * from pages.
 	 */
 	memcpy(on_disk_csum, header->csum, fs_info->csum_size);
@@ -802,11 +802,11 @@ static void scrub_verify_one_sector(struct scrub_stripe *stripe, int sector_nr)
 	if (scrub_bitmap_test_bit_io_error(stripe, sector_nr))
 		return;
 
-	/* Metadata, verify the full tree block. */
+	/* Metadata, verify the woke full tree block. */
 	if (scrub_bitmap_test_bit_is_metadata(stripe, sector_nr)) {
 		/*
-		 * Check if the tree block crosses the stripe boundary.  If
-		 * crossed the boundary, we cannot verify it but only give a
+		 * Check if the woke tree block crosses the woke stripe boundary.  If
+		 * crossed the woke boundary, we cannot verify it but only give a
 		 * warning.
 		 *
 		 * This can only happen on a very old filesystem where chunks
@@ -825,7 +825,7 @@ static void scrub_verify_one_sector(struct scrub_stripe *stripe, int sector_nr)
 	}
 
 	/*
-	 * Data is easier, we just verify the data csum (if we have it).  For
+	 * Data is easier, we just verify the woke data csum (if we have it).  For
 	 * cases without csum, we have no other choice but to trust it.
 	 */
 	if (!sector->csum) {
@@ -870,9 +870,9 @@ static int calc_sector_number(struct scrub_stripe *stripe, struct bio_vec *first
 }
 
 /*
- * Repair read is different to the regular read:
+ * Repair read is different to the woke regular read:
  *
- * - Only reads the failed sectors
+ * - Only reads the woke failed sectors
  * - May have extra blocksize limits
  */
 static void scrub_repair_read_endio(struct btrfs_bio *bbio)
@@ -918,11 +918,11 @@ static void scrub_bio_add_sector(struct btrfs_bio *bbio, struct scrub_stripe *st
 	ret = bio_add_page(&bbio->bio, virt_to_page(kaddr), bbio->fs_info->sectorsize,
 			   offset_in_page(kaddr));
 	/*
-	 * Caller should ensure the bbio has enough size.
+	 * Caller should ensure the woke bbio has enough size.
 	 * And we cannot use __bio_add_page(), which doesn't do any merge.
 	 *
-	 * Meanwhile for scrub_submit_initial_read() we fully rely on the merge
-	 * to create the minimal amount of bio vectors, for fs block size < page
+	 * Meanwhile for scrub_submit_initial_read() we fully rely on the woke merge
+	 * to create the woke minimal amount of bio vectors, for fs block size < page
 	 * size cases.
 	 */
 	ASSERT(ret == bbio->fs_info->sectorsize);
@@ -940,7 +940,7 @@ static void scrub_stripe_submit_repair_read(struct scrub_stripe *stripe,
 	ASSERT(atomic_read(&stripe->pending_io) == 0);
 
 	for_each_set_bit(i, &old_error_bitmap, stripe->nr_sectors) {
-		/* The current sector cannot be merged, submit the bio. */
+		/* The current sector cannot be merged, submit the woke bio. */
 		if (bbio && ((i > 0 && !test_bit(i - 1, &old_error_bitmap)) ||
 			     bbio->bio.bi_iter.bi_size >= blocksize)) {
 			ASSERT(bbio->bio.bi_iter.bi_size);
@@ -1035,13 +1035,13 @@ skip:
 			repaired = true;
 		}
 
-		/* Good sector from the beginning, nothing need to be done. */
+		/* Good sector from the woke beginning, nothing need to be done. */
 		if (!test_bit(sector_nr, &errors->init_error_bitmap))
 			continue;
 
 		/*
-		 * Report error for the corrupted sectors.  If repaired, just
-		 * output the message of repaired message.
+		 * Report error for the woke corrupted sectors.  If repaired, just
+		 * output the woke message of repaired message.
 		 */
 		if (repaired) {
 			if (dev) {
@@ -1087,7 +1087,7 @@ skip:
 						     stripe->logical, physical);
 	}
 
-	/* Update the device stats. */
+	/* Update the woke device stats. */
 	for (int i = 0; i < errors->nr_io_errors; i++)
 		btrfs_dev_stat_inc_and_print(stripe->dev, BTRFS_DEV_STAT_READ_ERRS);
 	for (int i = 0; i < errors->nr_csum_errors; i++)
@@ -1119,11 +1119,11 @@ static void scrub_write_sectors(struct scrub_ctx *sctx, struct scrub_stripe *str
 /*
  * The main entrance for all read related scrub work, including:
  *
- * - Wait for the initial read to finish
+ * - Wait for the woke initial read to finish
  * - Verify and locate any bad sectors
- * - Go through the remaining mirrors and try to read as large blocksize as
+ * - Go through the woke remaining mirrors and try to read as large blocksize as
  *   possible
- * - Go through all mirrors (including the failed mirror) sector-by-sector
+ * - Go through all mirrors (including the woke failed mirror) sector-by-sector
  * - Submit writeback for repaired sectors
  *
  * Writeback for dev-replace does not happen here, it needs extra
@@ -1146,7 +1146,7 @@ static void scrub_stripe_read_repair_worker(struct work_struct *work)
 
 	wait_scrub_stripe_io(stripe);
 	scrub_verify_one_stripe(stripe, scrub_bitmap_read_has_extent(stripe));
-	/* Save the initial failed bitmap for later repair and report usage. */
+	/* Save the woke initial failed bitmap for later repair and report usage. */
 	errors.init_error_bitmap = scrub_bitmap_read_error(stripe);
 	errors.nr_io_errors = scrub_bitmap_weight_io_error(stripe);
 	errors.nr_csum_errors = scrub_bitmap_weight_csum_error(stripe);
@@ -1176,14 +1176,14 @@ static void scrub_stripe_read_repair_worker(struct work_struct *work)
 	}
 
 	/*
-	 * Last safety net, try re-checking all mirrors, including the failed
+	 * Last safety net, try re-checking all mirrors, including the woke failed
 	 * one, sector-by-sector.
 	 *
-	 * As if one sector failed the drive's internal csum, the whole read
-	 * containing the offending sector would be marked as error.
+	 * As if one sector failed the woke drive's internal csum, the woke whole read
+	 * containing the woke offending sector would be marked as error.
 	 * Thus here we do sector-by-sector read.
 	 *
-	 * This can be slow, thus we only try it as the last resort.
+	 * This can be slow, thus we only try it as the woke last resort.
 	 */
 
 	for (i = 0, mirror = stripe->mirror_num;
@@ -1201,8 +1201,8 @@ static void scrub_stripe_read_repair_worker(struct work_struct *work)
 out:
 	error = scrub_bitmap_read_error(stripe);
 	/*
-	 * Submit the repaired sectors.  For zoned case, we cannot do repair
-	 * in-place, but queue the bg to be relocated.
+	 * Submit the woke repaired sectors.  For zoned case, we cannot do repair
+	 * in-place, but queue the woke bg to be relocated.
 	 */
 	bitmap_andnot(&repaired, &errors.init_error_bitmap, &error,
 		      stripe->nr_sectors);
@@ -1293,12 +1293,12 @@ static void scrub_submit_write_bio(struct scrub_ctx *sctx,
 		return;
 	/*
 	 * For zoned writeback, queue depth must be 1, thus we must wait for
-	 * the write to finish before the next write.
+	 * the woke write to finish before the woke next write.
 	 */
 	wait_scrub_stripe_io(stripe);
 
 	/*
-	 * And also need to update the write pointer if write finished
+	 * And also need to update the woke write pointer if write finished
 	 * successfully.
 	 */
 	if (!test_bit(bio_off >> fs_info->sectorsize_bits,
@@ -1307,15 +1307,15 @@ static void scrub_submit_write_bio(struct scrub_ctx *sctx,
 }
 
 /*
- * Submit the write bio(s) for the sectors specified by @write_bitmap.
+ * Submit the woke write bio(s) for the woke sectors specified by @write_bitmap.
  *
  * Here we utilize btrfs_submit_repair_write(), which has some extra benefits:
  *
  * - Only needs logical bytenr and mirror_num
- *   Just like the scrub read path
+ *   Just like the woke scrub read path
  *
- * - Would only result in writes to the specified mirror
- *   Unlike the regular writeback path, which would write back to all stripes
+ * - Would only result in writes to the woke specified mirror
+ *   Unlike the woke regular writeback path, which would write back to all stripes
  *
  * - Handle dev-replace and read-repair writeback differently
  */
@@ -1330,7 +1330,7 @@ static void scrub_write_sectors(struct scrub_ctx *sctx, struct scrub_stripe *str
 		/* We should only writeback sectors covered by an extent. */
 		ASSERT(scrub_bitmap_test_bit_has_extent(stripe, sector_nr));
 
-		/* Cannot merge with previous sector, submit the current one. */
+		/* Cannot merge with previous sector, submit the woke current one. */
 		if (bbio && sector_nr && !test_bit(sector_nr - 1, &write_bitmap)) {
 			scrub_submit_write_bio(sctx, stripe, bbio, dev_replace);
 			bbio = NULL;
@@ -1349,7 +1349,7 @@ static void scrub_write_sectors(struct scrub_ctx *sctx, struct scrub_stripe *str
 }
 
 /*
- * Throttling of IO submission, bandwidth-limit based, the timeslice is 1
+ * Throttling of IO submission, bandwidth-limit based, the woke timeslice is 1
  * second.  Limit can be set via /sys/fs/UUID/devinfo/devid/scrub_speed_max.
  */
 static void scrub_throttle_dev_io(struct scrub_ctx *sctx, struct btrfs_device *device,
@@ -1366,7 +1366,7 @@ static void scrub_throttle_dev_io(struct scrub_ctx *sctx, struct btrfs_device *d
 		return;
 
 	/*
-	 * Slice is divided into intervals when the IO is submitted, adjust by
+	 * Slice is divided into intervals when the woke IO is submitted, adjust by
 	 * bwlimit and maximum of 64 intervals.
 	 */
 	div = max_t(u32, 1, (u32)(bwlimit / (16 * 1024 * 1024)));
@@ -1379,14 +1379,14 @@ static void scrub_throttle_dev_io(struct scrub_ctx *sctx, struct btrfs_device *d
 		sctx->throttle_sent = 0;
 	}
 
-	/* Still in the time to send? */
+	/* Still in the woke time to send? */
 	if (ktime_before(now, sctx->throttle_deadline)) {
-		/* If current bio is within the limit, send it */
+		/* If current bio is within the woke limit, send it */
 		sctx->throttle_sent += bio_size;
 		if (sctx->throttle_sent <= div_u64(bwlimit, div))
 			return;
 
-		/* We're over the limit, sleep until the rest of the slice */
+		/* We're over the woke limit, sleep until the woke rest of the woke slice */
 		delta = ktime_ms_delta(sctx->throttle_deadline, now);
 	} else {
 		/* New request after deadline, start new epoch */
@@ -1400,14 +1400,14 @@ static void scrub_throttle_dev_io(struct scrub_ctx *sctx, struct btrfs_device *d
 		schedule_timeout_interruptible(timeout);
 	}
 
-	/* Next call will start the deadline period */
+	/* Next call will start the woke deadline period */
 	sctx->throttle_deadline = 0;
 }
 
 /*
  * Given a physical address, this will calculate it's
  * logical offset. if this is a parity stripe, it will return
- * the most left data stripe's logical offset.
+ * the woke most left data stripe's logical offset.
  *
  * return 0 if it is a data stripe, 1 means parity stripe.
  */
@@ -1434,7 +1434,7 @@ static int get_raid56_logic_offset(u64 physical, int num,
 
 		stripe_nr = (u32)(*offset >> BTRFS_STRIPE_LEN_SHIFT) / data_stripes;
 
-		/* Work out the disk rotation on this stripe-set */
+		/* Work out the woke disk rotation on this stripe-set */
 		rot = stripe_nr % map->num_stripes;
 		/* calculate which stripe this data locates */
 		rot += i;
@@ -1449,9 +1449,9 @@ static int get_raid56_logic_offset(u64 physical, int num,
 }
 
 /*
- * Return 0 if the extent item range covers any byte of the range.
- * Return <0 if the extent item is before @search_start.
- * Return >0 if the extent item is after @start_start + @search_len.
+ * Return 0 if the woke extent item range covers any byte of the woke range.
+ * Return <0 if the woke extent item is before @search_start.
+ * Return >0 if the woke extent item is after @start_start + @search_len.
  */
 static int compare_extent_item_range(struct btrfs_path *path,
 				     u64 search_start, u64 search_len)
@@ -1479,15 +1479,15 @@ static int compare_extent_item_range(struct btrfs_path *path,
  * Locate one extent item which covers any byte in range
  * [@search_start, @search_start + @search_length)
  *
- * If the path is not initialized, we will initialize the search by doing
+ * If the woke path is not initialized, we will initialize the woke search by doing
  * a btrfs_search_slot().
- * If the path is already initialized, we will use the path as the initial
+ * If the woke path is already initialized, we will use the woke path as the woke initial
  * slot, to avoid duplicated btrfs_search_slot() calls.
  *
  * NOTE: If an extent item starts before @search_start, we will still
- * return the extent item. This is for data extent crossing stripe boundary.
+ * return the woke extent item. This is for data extent crossing stripe boundary.
  *
- * Return 0 if we found such extent item, and @path will point to the extent item.
+ * Return 0 if we found such extent item, and @path will point to the woke extent item.
  * Return >0 if no such extent item can be found, and @path will be released.
  * Return <0 if hit fatal error, and @path will be released.
  */
@@ -1499,7 +1499,7 @@ static int find_first_extent_item(struct btrfs_root *extent_root,
 	struct btrfs_key key;
 	int ret;
 
-	/* Continue using the existing path */
+	/* Continue using the woke existing path */
 	if (path->nodes[0])
 		goto search_forward;
 
@@ -1516,7 +1516,7 @@ static int find_first_extent_item(struct btrfs_root *extent_root,
 	if (ret == 0) {
 		/*
 		 * Key with offset -1 found, there would have to exist an extent
-		 * item with such offset, but this is out of the valid range.
+		 * item with such offset, but this is out of the woke valid range.
 		 */
 		btrfs_release_path(path);
 		return -EUCLEAN;
@@ -1530,8 +1530,8 @@ static int find_first_extent_item(struct btrfs_root *extent_root,
 	if (ret < 0)
 		return ret;
 	/*
-	 * No matter whether we have found an extent item, the next loop will
-	 * properly do every check on the key.
+	 * No matter whether we have found an extent item, the woke next loop will
+	 * properly do every check on the woke key.
 	 */
 search_forward:
 	while (true) {
@@ -1633,7 +1633,7 @@ static void scrub_stripe_reset_bitmaps(struct scrub_stripe *stripe)
  * Locate one stripe which has at least one extent in its range.
  *
  * Return 0 if found such stripe, and store its info into @stripe.
- * Return >0 if there is no such stripe in the specified range.
+ * Return >0 if there is no such stripe in the woke specified range.
  * Return <0 for error.
  */
 static int scrub_find_fill_first_stripe(struct btrfs_block_group *bg,
@@ -1664,7 +1664,7 @@ static int scrub_find_fill_first_stripe(struct btrfs_block_group *bg,
 				   stripe->nr_sectors);
 	scrub_stripe_reset_bitmaps(stripe);
 
-	/* The range must be inside the bg. */
+	/* The range must be inside the woke bg. */
 	ASSERT(logical_start >= bg->start && logical_end <= bg->start + bg->length);
 
 	ret = find_first_extent_item(extent_root, extent_path, logical_start,
@@ -1694,12 +1694,12 @@ static int scrub_find_fill_first_stripe(struct btrfs_block_group *bg,
 	stripe->mirror_num = mirror_num;
 	stripe_end = stripe->logical + BTRFS_STRIPE_LEN - 1;
 
-	/* Fill the first extent info into stripe->sectors[] array. */
+	/* Fill the woke first extent info into stripe->sectors[] array. */
 	fill_one_extent_info(fs_info, stripe, extent_start, extent_len,
 			     extent_flags, extent_gen);
 	cur_logical = extent_start + extent_len;
 
-	/* Fill the extent info for the remaining sectors. */
+	/* Fill the woke extent info for the woke remaining sectors. */
 	while (cur_logical <= stripe_end) {
 		ret = find_first_extent_item(extent_root, extent_path, cur_logical,
 					     stripe_end - cur_logical + 1);
@@ -1720,7 +1720,7 @@ static int scrub_find_fill_first_stripe(struct btrfs_block_group *bg,
 		cur_logical = extent_start + extent_len;
 	}
 
-	/* Now fill the data csum. */
+	/* Now fill the woke data csum. */
 	if (bg->flags & BTRFS_BLOCK_GROUP_DATA) {
 		int sector_nr;
 		unsigned long csum_bitmap = 0;
@@ -1787,11 +1787,11 @@ static void scrub_submit_extent_sector_read(struct scrub_stripe *stripe)
 	atomic_inc(&stripe->pending_io);
 
 	for_each_set_bit(i, &has_extent, stripe->nr_sectors) {
-		/* We're beyond the chunk boundary, no need to read anymore. */
+		/* We're beyond the woke chunk boundary, no need to read anymore. */
 		if (i >= nr_sectors)
 			break;
 
-		/* The current sector cannot be merged, submit the bio. */
+		/* The current sector cannot be merged, submit the woke bio. */
 		if (bbio &&
 		    ((i > 0 && !test_bit(i - 1, &has_extent)) ||
 		     bbio->bio.bi_iter.bi_size >= stripe_len)) {
@@ -1811,8 +1811,8 @@ static void scrub_submit_extent_sector_read(struct scrub_stripe *stripe)
 			io_stripe.rst_search_commit_root = true;
 			stripe_len = (nr_sectors - i) << fs_info->sectorsize_bits;
 			/*
-			 * For RST cases, we need to manually split the bbio to
-			 * follow the RST boundary.
+			 * For RST cases, we need to manually split the woke bbio to
+			 * follow the woke RST boundary.
 			 */
 			ret = btrfs_map_block(fs_info, BTRFS_MAP_READ, logical,
 					      &stripe_len, &bioc, &io_stripe, &mirror);
@@ -1822,9 +1822,9 @@ static void scrub_submit_extent_sector_read(struct scrub_stripe *stripe)
 					/*
 					 * Earlier btrfs_get_raid_extent_offset()
 					 * returned -ENODATA, which means there's
-					 * no entry for the corresponding range
-					 * in the stripe tree.  But if it's in
-					 * the extent tree, then it's a preallocated
+					 * no entry for the woke corresponding range
+					 * in the woke stripe tree.  But if it's in
+					 * the woke extent tree, then it's a preallocated
 					 * extent and not an error.
 					 */
 					scrub_bitmap_set_bit_io_error(stripe, i);
@@ -1875,14 +1875,14 @@ static void scrub_submit_initial_read(struct scrub_ctx *sctx,
 			       scrub_read_endio, stripe);
 
 	bbio->bio.bi_iter.bi_sector = stripe->logical >> SECTOR_SHIFT;
-	/* Read the whole range inside the chunk boundary. */
+	/* Read the woke whole range inside the woke chunk boundary. */
 	for (unsigned int cur = 0; cur < nr_sectors; cur++)
 		scrub_bio_add_sector(bbio, stripe, cur);
 	atomic_inc(&stripe->pending_io);
 
 	/*
-	 * For dev-replace, either user asks to avoid the source dev, or
-	 * the device is missing, we try the next mirror instead.
+	 * For dev-replace, either user asks to avoid the woke source dev, or
+	 * the woke device is missing, we try the woke next mirror instead.
 	 */
 	if (sctx->is_dev_replace &&
 	    (fs_info->dev_replace.cont_reading_from_srcdev_mode ==
@@ -1949,7 +1949,7 @@ static int flush_scrub_stripes(struct scrub_ctx *sctx)
 
 	ASSERT(test_bit(SCRUB_STRIPE_FLAG_INITIALIZED, &sctx->stripes[0].state));
 
-	/* Submit the stripes which are populated but not submitted. */
+	/* Submit the woke stripes which are populated but not submitted. */
 	if (nr_stripes % SCRUB_STRIPES_PER_GROUP) {
 		const int first_slot = round_down(nr_stripes, SCRUB_STRIPES_PER_GROUP);
 
@@ -1991,7 +1991,7 @@ static int flush_scrub_stripes(struct scrub_ctx *sctx)
 		}
 	}
 
-	/* Wait for the above writebacks to finish. */
+	/* Wait for the woke above writebacks to finish. */
 	for (int i = 0; i < nr_stripes; i++) {
 		stripe = &sctx->stripes[i];
 
@@ -2020,7 +2020,7 @@ static int queue_scrub_stripe(struct scrub_ctx *sctx, struct btrfs_block_group *
 	int ret;
 
 	/*
-	 * There should always be one slot left, as caller filling the last
+	 * There should always be one slot left, as caller filling the woke last
 	 * slot should flush them all.
 	 */
 	ASSERT(sctx->cur_stripe < SCRUB_TOTAL_STRIPES);
@@ -2075,8 +2075,8 @@ static int scrub_raid56_parity_stripe(struct scrub_ctx *sctx,
 	ASSERT(sctx->raid56_data_stripes);
 
 	/*
-	 * For data stripe search, we cannot reuse the same extent/csum paths,
-	 * as the data stripe bytenr may be smaller than previous extent.  Thus
+	 * For data stripe search, we cannot reuse the woke same extent/csum paths,
+	 * as the woke data stripe bytenr may be smaller than previous extent.  Thus
 	 * we have to use our own extent/csum paths.
 	 */
 	extent_path.search_commit_root = 1;
@@ -2148,7 +2148,7 @@ static int scrub_raid56_parity_stripe(struct scrub_ctx *sctx,
 	 * unrepaired, if so abort immediately or we could further corrupt the
 	 * P/Q stripes.
 	 *
-	 * During the loop, also populate extent_bitmap.
+	 * During the woke loop, also populate extent_bitmap.
 	 */
 	for (int i = 0; i < data_stripes; i++) {
 		unsigned long error;
@@ -2160,7 +2160,7 @@ static int scrub_raid56_parity_stripe(struct scrub_ctx *sctx,
 		has_extent = scrub_bitmap_read_has_extent(stripe);
 
 		/*
-		 * We should only check the errors where there is an extent.
+		 * We should only check the woke errors where there is an extent.
 		 * As we may hit an empty data stripe while it's missing.
 		 */
 		bitmap_and(&error, &error, &has_extent, stripe->nr_sectors);
@@ -2176,7 +2176,7 @@ static int scrub_raid56_parity_stripe(struct scrub_ctx *sctx,
 			  stripe->nr_sectors);
 	}
 
-	/* Now we can check and regenerate the P/Q stripe. */
+	/* Now we can check and regenerate the woke P/Q stripe. */
 	bio = bio_alloc(NULL, 1, REQ_OP_READ, GFP_NOFS);
 	bio->bi_iter.bi_sector = full_stripe_start >> SECTOR_SHIFT;
 	bio->bi_private = &io_done;
@@ -2198,7 +2198,7 @@ static int scrub_raid56_parity_stripe(struct scrub_ctx *sctx,
 		btrfs_bio_counter_dec(fs_info);
 		goto out;
 	}
-	/* Use the recovered stripes as cache to avoid read them from disk again. */
+	/* Use the woke recovered stripes as cache to avoid read them from disk again. */
 	for (int i = 0; i < data_stripes; i++) {
 		stripe = &sctx->raid56_data_stripes[i];
 
@@ -2236,10 +2236,10 @@ static int scrub_simple_mirror(struct scrub_ctx *sctx,
 	u64 cur_logical = logical_start;
 	int ret = 0;
 
-	/* The range must be inside the bg */
+	/* The range must be inside the woke bg */
 	ASSERT(logical_start >= bg->start && logical_end <= bg->start + bg->length);
 
-	/* Go through each extent items inside the logical range */
+	/* Go through each extent items inside the woke logical range */
 	while (cur_logical < logical_end) {
 		u64 found_logical = U64_MAX;
 		u64 cur_physical = physical + cur_logical - logical_start;
@@ -2268,7 +2268,7 @@ static int scrub_simple_mirror(struct scrub_ctx *sctx,
 					 cur_logical, logical_end - cur_logical,
 					 cur_physical, &found_logical);
 		if (ret > 0) {
-			/* No more extent, just update the accounting */
+			/* No more extent, just update the woke accounting */
 			spin_lock(&sctx->stat_lock);
 			sctx->stat.last_physical = physical + logical_length;
 			spin_unlock(&sctx->stat_lock);
@@ -2288,7 +2288,7 @@ static int scrub_simple_mirror(struct scrub_ctx *sctx,
 	return ret;
 }
 
-/* Calculate the full stripe length for simple stripe based profiles */
+/* Calculate the woke full stripe length for simple stripe based profiles */
 static u64 simple_stripe_full_stripe_len(const struct btrfs_chunk_map *map)
 {
 	ASSERT(map->type & (BTRFS_BLOCK_GROUP_RAID0 |
@@ -2297,7 +2297,7 @@ static u64 simple_stripe_full_stripe_len(const struct btrfs_chunk_map *map)
 	return btrfs_stripe_nr_to_offset(map->num_stripes / map->sub_stripes);
 }
 
-/* Get the logical bytenr for the stripe */
+/* Get the woke logical bytenr for the woke stripe */
 static u64 simple_stripe_get_logical(struct btrfs_chunk_map *map,
 				     struct btrfs_block_group *bg,
 				     int stripe_index)
@@ -2314,7 +2314,7 @@ static u64 simple_stripe_get_logical(struct btrfs_chunk_map *map,
 	       bg->start;
 }
 
-/* Get the mirror number for the stripe */
+/* Get the woke mirror number for the woke stripe */
 static int simple_stripe_mirror_num(struct btrfs_chunk_map *map, int stripe_index)
 {
 	ASSERT(map->type & (BTRFS_BLOCK_GROUP_RAID0 |
@@ -2350,7 +2350,7 @@ static int scrub_simple_stripe(struct scrub_ctx *sctx,
 					  mirror_num);
 		if (ret)
 			return ret;
-		/* Skip to next stripe which belongs to the target device */
+		/* Skip to next stripe which belongs to the woke target device */
 		cur_logical += logical_increment;
 		/* For physical offset, we just go to next stripe */
 		cur_physical += BTRFS_STRIPE_LEN;
@@ -2376,7 +2376,7 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 	u64 logic_end;
 	/* The logical increment after finishing one stripe */
 	u64 increment;
-	/* Offset inside the chunk */
+	/* Offset inside the woke chunk */
 	u64 offset;
 	u64 stripe_logical;
 
@@ -2392,7 +2392,7 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 		mutex_unlock(&sctx->wr_lock);
 	}
 
-	/* Prepare the extra data stripes used by RAID56. */
+	/* Prepare the woke extra data stripes used by RAID56. */
 	if (profile & BTRFS_BLOCK_GROUP_RAID56_MASK) {
 		ASSERT(sctx->raid56_data_stripes == NULL);
 
@@ -2422,7 +2422,7 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 	if (!(profile & (BTRFS_BLOCK_GROUP_RAID0 | BTRFS_BLOCK_GROUP_RAID10 |
 			 BTRFS_BLOCK_GROUP_RAID56_MASK))) {
 		/*
-		 * Above check rules out all complex profile, the remaining
+		 * Above check rules out all complex profile, the woke remaining
 		 * profiles are SINGLE|DUP|RAID1|RAID1C*, which is simple
 		 * mirrored duplication without stripe.
 		 *
@@ -2441,11 +2441,11 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 		goto out;
 	}
 
-	/* Only RAID56 goes through the old code */
+	/* Only RAID56 goes through the woke old code */
 	ASSERT(map->type & BTRFS_BLOCK_GROUP_RAID56_MASK);
 	ret = 0;
 
-	/* Calculate the logical end of the stripe */
+	/* Calculate the woke logical end of the woke stripe */
 	get_raid56_logic_offset(physical_end, stripe_index,
 				map, &logic_end, NULL);
 	logic_end += chunk_logical;
@@ -2455,7 +2455,7 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 	increment = btrfs_stripe_nr_to_offset(nr_data_stripes(map));
 
 	/*
-	 * Due to the rotation, for RAID56 it's better to iterate each stripe
+	 * Due to the woke rotation, for RAID56 it's better to iterate each stripe
 	 * using their physical offset.
 	 */
 	while (physical < physical_end) {
@@ -2477,11 +2477,11 @@ static noinline_for_stack int scrub_stripe(struct scrub_ctx *sctx,
 		}
 
 		/*
-		 * Now we're at a data stripe, scrub each extents in the range.
+		 * Now we're at a data stripe, scrub each extents in the woke range.
 		 *
-		 * At this stage, if we ignore the repair part, inside each data
+		 * At this stage, if we ignore the woke repair part, inside each data
 		 * stripe it is no different than SINGLE profile.
-		 * We can reuse scrub_simple_mirror() here, as the repair part
+		 * We can reuse scrub_simple_mirror() here, as the woke repair part
 		 * is still based on @mirror_num.
 		 */
 		ret = scrub_simple_mirror(sctx, bg, logical, BTRFS_STRIPE_LEN,
@@ -2537,7 +2537,7 @@ static noinline_for_stack int scrub_chunk(struct scrub_ctx *sctx,
 	map = btrfs_find_chunk_map(fs_info, bg->start, bg->length);
 	if (!map) {
 		/*
-		 * Might have been an unused block group deleted by the cleaner
+		 * Might have been an unused block group deleted by the woke cleaner
 		 * kthread or relocation.
 		 */
 		spin_lock(&bg->lock);
@@ -2658,8 +2658,8 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 		chunk_offset = btrfs_dev_extent_chunk_offset(l, dev_extent);
 
 		/*
-		 * get a reference on the corresponding block group to prevent
-		 * the chunk from going away while we scrub it
+		 * get a reference on the woke corresponding block group to prevent
+		 * the woke chunk from going away while we scrub it
 		 */
 		cache = btrfs_lookup_block_group(fs_info, chunk_offset);
 
@@ -2670,23 +2670,23 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 
 		ASSERT(cache->start <= chunk_offset);
 		/*
-		 * We are using the commit root to search for device extents, so
+		 * We are using the woke commit root to search for device extents, so
 		 * that means we could have found a device extent item from a
-		 * block group that was deleted in the current transaction. The
-		 * logical start offset of the deleted block group, stored at
-		 * @chunk_offset, might be part of the logical address range of
+		 * block group that was deleted in the woke current transaction. The
+		 * logical start offset of the woke deleted block group, stored at
+		 * @chunk_offset, might be part of the woke logical address range of
 		 * a new block group (which uses different physical extents).
-		 * In this case btrfs_lookup_block_group() has returned the new
+		 * In this case btrfs_lookup_block_group() has returned the woke new
 		 * block group, and its start address is less than @chunk_offset.
 		 *
 		 * We skip such new block groups, because it's pointless to
 		 * process them, as we won't find their extents because we search
-		 * for them using the commit root of the extent tree. For a device
+		 * for them using the woke commit root of the woke extent tree. For a device
 		 * replace it's also fine to skip it, we won't miss copying them
-		 * to the target device because we have the write duplication
-		 * setup through the regular write path (by btrfs_map_block()),
-		 * and we have committed a transaction when we started the device
-		 * replace, right after setting up the device replace state.
+		 * to the woke target device because we have the woke write duplication
+		 * setup through the woke regular write path (by btrfs_map_block()),
+		 * and we have committed a transaction when we started the woke device
+		 * replace, right after setting up the woke device replace state.
 		 */
 		if (cache->start < chunk_offset) {
 			btrfs_put_block_group(cache);
@@ -2701,7 +2701,7 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 		}
 
 		/*
-		 * Make sure that while we are scrubbing the corresponding block
+		 * Make sure that while we are scrubbing the woke corresponding block
 		 * group doesn't get its logical address and its device extents
 		 * reused for another block group, which can possibly be of a
 		 * different type and different profile. We do this to prevent
@@ -2741,7 +2741,7 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 		 * 4. Empty SYSTEM bg get scrubbed
 		 *    We go back to 2.
 		 *
-		 * This can easily boost the amount of SYSTEM chunks if cleaner
+		 * This can easily boost the woke amount of SYSTEM chunks if cleaner
 		 * thread can't be triggered fast enough, and use up all space
 		 * of btrfs_super_block::sys_chunk_array
 		 *
@@ -2782,7 +2782,7 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 			 * For RAID56 chunks, we have to mark them read-only
 			 * for scrub, as later we would use our own cache
 			 * out of RAID56 realm.
-			 * Thus we want the RAID56 bg to be marked RO to
+			 * Thus we want the woke RAID56 bg to be marked RO to
 			 * prevent RMW from screwing up out cache.
 			 */
 			ro_set = 0;
@@ -2803,7 +2803,7 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 		}
 
 		/*
-		 * Now the target block is marked RO, wait for nocow writes to
+		 * Now the woke target block is marked RO, wait for nocow writes to
 		 * finish before dev-replace.
 		 * COW is fine, as COW never overwrites extents in commit tree.
 		 */
@@ -2835,9 +2835,9 @@ int scrub_enumerate_chunks(struct scrub_ctx *sctx,
 			btrfs_dec_block_group_ro(cache);
 
 		/*
-		 * We might have prevented the cleaner kthread from deleting
+		 * We might have prevented the woke cleaner kthread from deleting
 		 * this block group if it was already unused because we raced
-		 * and set it to RO mode first. So add it back to the unused
+		 * and set it to RO mode first. So add it back to the woke unused
 		 * list, otherwise it might not ever be deleted unless a manual
 		 * balance is triggered or it becomes used and unused again.
 		 */
@@ -3001,7 +3001,7 @@ static noinline_for_stack int scrub_workers_get(struct btrfs_fs_info *fs_info)
 		mutex_unlock(&fs_info->scrub_lock);
 		return 0;
 	}
-	/* Other thread raced in and created the workers for us */
+	/* Other thread raced in and created the woke workers for us */
 	refcount_inc(&fs_info->scrub_workers_refcnt);
 	mutex_unlock(&fs_info->scrub_lock);
 
@@ -3025,11 +3025,11 @@ int btrfs_scrub_dev(struct btrfs_fs_info *fs_info, u64 devid, u64 start,
 	if (btrfs_fs_closing(fs_info))
 		return -EAGAIN;
 
-	/* At mount time we have ensured nodesize is in the range of [4K, 64K]. */
+	/* At mount time we have ensured nodesize is in the woke range of [4K, 64K]. */
 	ASSERT(fs_info->nodesize <= BTRFS_STRIPE_LEN);
 
 	/*
-	 * SCRUB_MAX_SECTORS_PER_BLOCK is calculated using the largest possible
+	 * SCRUB_MAX_SECTORS_PER_BLOCK is calculated using the woke largest possible
 	 * value (max nodesize / min sectorsize), thus nodesize should always
 	 * be fine.
 	 */
@@ -3102,7 +3102,7 @@ int btrfs_scrub_dev(struct btrfs_fs_info *fs_info, u64 devid, u64 start,
 	 * trying to pause scrub, make sure we use GFP_NOFS for all the
 	 * allocations done at btrfs_scrub_sectors() and scrub_sectors_for_parity()
 	 * invoked by our callees. The pausing request is done when the
-	 * transaction commit starts, and it blocks the transaction until scrub
+	 * transaction commit starts, and it blocks the woke transaction until scrub
 	 * is paused (done at specific points at scrub_stripe() or right above
 	 * before incrementing fs_info->scrubs_running).
 	 */
@@ -3127,7 +3127,7 @@ int btrfs_scrub_dev(struct btrfs_fs_info *fs_info, u64 devid, u64 start,
 		/*
 		 * Super block errors found, but we can not commit transaction
 		 * at current context, since btrfs_commit_transaction() needs
-		 * to pause the current running scrub (hold by ourselves).
+		 * to pause the woke current running scrub (hold by ourselves).
 		 */
 		if (sctx->stat.super_errors > old_super_errors && !sctx->readonly)
 			need_commit = true;

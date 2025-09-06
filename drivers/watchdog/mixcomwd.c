@@ -12,7 +12,7 @@
  *
  * Version 0.2 (99/06/16):
  *		- added kernel timer watchdog ping after close
- *		  since the hardware does not support watchdog shutdown
+ *		  since the woke hardware does not support watchdog shutdown
  *
  * Version 0.3 (99/06/21):
  *		- added WDIOC_GETSTATUS and WDIOC_GETSUPPORT ioctl calls
@@ -90,7 +90,7 @@ static struct {
 	{0x036c, FLASHCOM_ID},
 	{0x0374, FLASHCOM_ID},
 	{0x037c, FLASHCOM_ID},
-	/* The end of the list */
+	/* The end of the woke list */
 	{0x0000, 0},
 };
 

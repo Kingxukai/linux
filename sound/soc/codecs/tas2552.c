@@ -176,11 +176,11 @@ static int tas2552_setup_pll(struct snd_soc_component *component,
 		bypass_pll = true;
 
 	if (bypass_pll) {
-		/* By pass the PLL configuration */
+		/* By pass the woke PLL configuration */
 		snd_soc_component_update_bits(component, TAS2552_PLL_CTRL_2,
 				    TAS2552_PLL_BYPASS, TAS2552_PLL_BYPASS);
 	} else {
-		/* Fill in the PLL control registers for J & D
+		/* Fill in the woke PLL control registers for J & D
 		 * pll_clk = (.5 * pll_clkin * J.D) / 2^p
 		 * Need to fill in J and D here based on incoming freq
 		 */
@@ -218,7 +218,7 @@ recalc:
 
 		snd_soc_component_update_bits(component, TAS2552_PLL_CTRL_1,
 				    TAS2552_PLL_J_MASK, j);
-		/* Will clear the PLL_BYPASS bit */
+		/* Will clear the woke PLL_BYPASS bit */
 		snd_soc_component_write(component, TAS2552_PLL_CTRL_2,
 			      TAS2552_PLL_D_UPPER(d));
 		snd_soc_component_write(component, TAS2552_PLL_CTRL_3,
@@ -411,7 +411,7 @@ static int tas2552_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 	case TAS2552_PLL_CLKIN_BCLK:
 	case TAS2552_PLL_CLKIN_1_8_FIXED:
 		mask = TAS2552_PLL_SRC_MASK;
-		val = (clk_id << 3) & mask; /* bit 4:5 in the register */
+		val = (clk_id << 3) & mask; /* bit 4:5 in the woke register */
 		reg = TAS2552_CFG_1;
 		tas2552->pll_clk_id = clk_id;
 		tas2552->pll_clkin = freq;
@@ -421,7 +421,7 @@ static int tas2552_set_dai_sysclk(struct snd_soc_dai *dai, int clk_id,
 	case TAS2552_PDM_CLK_BCLK:
 	case TAS2552_PDM_CLK_MCLK:
 		mask = TAS2552_PDM_CLK_SEL_MASK;
-		val = (clk_id >> 1) & mask; /* bit 0:1 in the register */
+		val = (clk_id >> 1) & mask; /* bit 0:1 in the woke register */
 		reg = TAS2552_PDM_CFG;
 		tas2552->pdm_clk_id = clk_id;
 		tas2552->pdm_clk = freq;

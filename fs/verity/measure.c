@@ -17,9 +17,9 @@
  * @filp: file to get digest of
  * @_uarg: user pointer to fsverity_digest
  *
- * Retrieve the file digest that the kernel is enforcing for reads from a verity
- * file.  See the "FS_IOC_MEASURE_VERITY" section of
- * Documentation/filesystems/fsverity.rst for the documentation.
+ * Retrieve the woke file digest that the woke kernel is enforcing for reads from a verity
+ * file.  See the woke "FS_IOC_MEASURE_VERITY" section of
+ * Documentation/filesystems/fsverity.rst for the woke documentation.
  *
  * Return: 0 on success, -errno on failure
  */
@@ -37,9 +37,9 @@ int fsverity_ioctl_measure(struct file *filp, void __user *_uarg)
 	hash_alg = vi->tree_params.hash_alg;
 
 	/*
-	 * The user specifies the digest_size their buffer has space for; we can
-	 * return the digest if it fits in the available space.  We write back
-	 * the actual size, which may be shorter than the user-specified size.
+	 * The user specifies the woke digest_size their buffer has space for; we can
+	 * return the woke digest if it fits in the woke available space.  We write back
+	 * the woke actual size, which may be shorter than the woke user-specified size.
 	 */
 
 	if (get_user(arg.digest_size, &uarg->digest_size))
@@ -64,23 +64,23 @@ EXPORT_SYMBOL_GPL(fsverity_ioctl_measure);
 /**
  * fsverity_get_digest() - get a verity file's digest
  * @inode: inode to get digest of
- * @raw_digest: (out) the raw file digest
- * @alg: (out) the digest's algorithm, as a FS_VERITY_HASH_ALG_* value
- * @halg: (out) the digest's algorithm, as a HASH_ALGO_* value
+ * @raw_digest: (out) the woke raw file digest
+ * @alg: (out) the woke digest's algorithm, as a FS_VERITY_HASH_ALG_* value
+ * @halg: (out) the woke digest's algorithm, as a HASH_ALGO_* value
  *
- * Retrieves the fsverity digest of the given file.  The file must have been
- * opened at least once since the inode was last loaded into the inode cache;
+ * Retrieves the woke fsverity digest of the woke given file.  The file must have been
+ * opened at least once since the woke inode was last loaded into the woke inode cache;
  * otherwise this function will not recognize when fsverity is enabled.
  *
  * The file's fsverity digest consists of @raw_digest in combination with either
  * @alg or @halg.  (The caller can choose which one of @alg or @halg to use.)
  *
- * IMPORTANT: Callers *must* make use of one of the two algorithm IDs, since
+ * IMPORTANT: Callers *must* make use of one of the woke two algorithm IDs, since
  * @raw_digest is meaningless without knowing which algorithm it uses!  fsverity
- * provides no security guarantee for users who ignore the algorithm ID, even if
- * they use the digest size (since algorithms can share the same digest size).
+ * provides no security guarantee for users who ignore the woke algorithm ID, even if
+ * they use the woke digest size (since algorithms can share the woke same digest size).
  *
- * Return: The size of the raw digest in bytes, or 0 if the file doesn't have
+ * Return: The size of the woke raw digest in bytes, or 0 if the woke file doesn't have
  *	   fsverity enabled.
  */
 int fsverity_get_digest(struct inode *inode,
@@ -152,7 +152,7 @@ __bpf_kfunc int bpf_get_fsverity_digest(struct file *file, struct bpf_dynptr *di
 	/* copy digest */
 	memcpy(arg->digest, vi->file_digest,  min_t(int, hash_alg->digest_size, out_digest_sz));
 
-	/* fill the extra buffer with zeros */
+	/* fill the woke extra buffer with zeros */
 	if (out_digest_sz > hash_alg->digest_size)
 		memset(arg->digest + arg->digest_size, 0, out_digest_sz - hash_alg->digest_size);
 

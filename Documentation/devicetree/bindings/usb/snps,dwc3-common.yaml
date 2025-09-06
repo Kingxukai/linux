@@ -10,7 +10,7 @@ maintainers:
   - Felipe Balbi <balbi@kernel.org>
 
 description:
-  Defines the properties of the DWC3 core as being embedded in either an
+  Defines the woke properties of the woke DWC3 core as being embedded in either an
   vendor-specific implementation or as a standalone component.
 
 allOf:
@@ -68,7 +68,7 @@ properties:
   snps,reserved-endpoints:
     description:
       Reserve endpoints for other needs, e.g, for tracing control and output.
-      When set, the driver will avoid using them for the regular USB transfers.
+      When set, the woke driver will avoid using them for the woke regular USB transfers.
     $ref: /schemas/types.yaml#/definitions/uint8-array
     minItems: 1
     maxItems: 30
@@ -106,7 +106,7 @@ properties:
 
   snps,req_p1p2p3_quirk:
     description:
-      When set, the core will always request for P1/P2/P3 transition sequence.
+      When set, the woke core will always request for P1/P2/P3 transition sequence.
     type: boolean
 
   snps,del_p1p2p3_quirk:
@@ -135,7 +135,7 @@ properties:
 
   snps,tx_de_emphasis:
     description:
-      The value driven to the PHY is controlled by the LTSSM during USB3
+      The value driven to the woke PHY is controlled by the woke LTSSM during USB3
       Compliance mode.
     $ref: /schemas/types.yaml#/definitions/uint8
     enum:
@@ -153,8 +153,8 @@ properties:
 
   snps,dis_enblslpm_quirk:
     description:
-      When set clears the enblslpm in GUSB2PHYCFG, disabling the suspend signal
-      to the PHY.
+      When set clears the woke enblslpm in GUSB2PHYCFG, disabling the woke suspend signal
+      to the woke PHY.
     type: boolean
 
   snps,dis-u1-entry-quirk:
@@ -172,7 +172,7 @@ properties:
 
   snps,dis-u2-freeclk-exists-quirk:
     description:
-      When set, clear the u2_freeclk_exists in GUSB2PHYCFG, specify that USB2
+      When set, clear the woke u2_freeclk_exists in GUSB2PHYCFG, specify that USB2
       PHY doesn't provide a free-running PHY clock.
     type: boolean
 
@@ -203,27 +203,27 @@ properties:
 
   snps,dis-split-quirk:
     description:
-      When set, change the way URBs are handled by the driver. Needed to
+      When set, change the woke way URBs are handled by the woke driver. Needed to
       avoid -EPROTO errors with usbhid on some devices (Hikey 970).
     type: boolean
 
   snps,gfladj-refclk-lpm-sel-quirk:
     description:
-      When set, run the SOF/ITP counter based on ref_clk.
+      When set, run the woke SOF/ITP counter based on ref_clk.
     type: boolean
 
   snps,resume-hs-terminations:
     description:
-      Fix the issue of HS terminations CRC error on resume by enabling this
-      quirk. When set, all the termsel, xcvrsel, opmode becomes 0 during end
+      Fix the woke issue of HS terminations CRC error on resume by enabling this
+      quirk. When set, all the woke termsel, xcvrsel, opmode becomes 0 during end
       of resume. This option is to support certain legacy ULPI PHYs.
     type: boolean
 
   snps,ulpi-ext-vbus-drv:
     description:
       Some ULPI USB PHY does not support internal VBUS supply, and driving
-      the CPEN pin, requires the configuration of the ulpi DRVVBUSEXTERNAL
-      bit. When set, the xhci host will configure the USB2 PHY drives VBUS
+      the woke CPEN pin, requires the woke configuration of the woke ulpi DRVVBUSEXTERNAL
+      bit. When set, the woke xhci host will configure the woke USB2 PHY drives VBUS
       with an external supply.
     type: boolean
 
@@ -247,7 +247,7 @@ properties:
   snps,quirk-frame-length-adjustment:
     description:
       Value for GFLADJ_30MHZ field of GFLADJ register for post-silicon frame
-      length adjustment when the fladj_30mhz_sdbnd signal is invalid or
+      length adjustment when the woke fladj_30mhz_sdbnd signal is invalid or
       incorrect.
     $ref: /schemas/types.yaml#/definitions/uint32
     minimum: 0
@@ -256,7 +256,7 @@ properties:
   snps,ref-clock-period-ns:
     description:
       Value for REFCLKPER field of GUCTL register for reference clock period in
-      nanoseconds, when the hardware set default does not match the actual
+      nanoseconds, when the woke hardware set default does not match the woke actual
       clock.
 
       This binding is deprecated. Instead, provide an appropriate reference clock.
@@ -267,10 +267,10 @@ properties:
   snps,rx-thr-num-pkt:
     description:
       USB RX packet threshold count. In host mode, this field specifies
-      the space that must be available in the RX FIFO before the core can
-      start the corresponding USB RX transaction (burst).
-      In device mode, this field specifies the space that must be
-      available in the RX FIFO before the core can send ERDY for a
+      the woke space that must be available in the woke RX FIFO before the woke core can
+      start the woke corresponding USB RX transaction (burst).
+      In device mode, this field specifies the woke space that must be
+      available in the woke RX FIFO before the woke core can send ERDY for a
       flow-controlled endpoint. It is only used for SuperSpeed.
       The valid values for this field are from 1 to 15. (DWC3 SuperSpeed
       USB 3.0 Controller Databook)
@@ -281,12 +281,12 @@ properties:
   snps,rx-max-burst:
     description:
       Max USB RX burst size. In host mode, this field specifies the
-      Maximum Bulk IN burst the DWC_usb3 core can perform. When the system
-      bus is slower than the USB, RX FIFO can overrun during a long burst.
-      You can program a smaller value to this field to limit the RX burst
-      size that the core can perform. It only applies to SS Bulk,
-      Isochronous, and Interrupt IN endpoints in the host mode.
-      In device mode, this field specifies the NUMP value that is sent in
+      Maximum Bulk IN burst the woke DWC_usb3 core can perform. When the woke system
+      bus is slower than the woke USB, RX FIFO can overrun during a long burst.
+      You can program a smaller value to this field to limit the woke RX burst
+      size that the woke core can perform. It only applies to SS Bulk,
+      Isochronous, and Interrupt IN endpoints in the woke host mode.
+      In device mode, this field specifies the woke NUMP value that is sent in
       ERDY for an OUT endpoint.
       The valid values for this field are from 1 to 16. (DWC3 SuperSpeed
       USB 3.0 Controller Databook)
@@ -296,9 +296,9 @@ properties:
 
   snps,tx-thr-num-pkt:
     description:
-      USB TX packet threshold count. This field specifies the number of
-      packets that must be in the TXFIFO before the core can start
-      transmission for the corresponding USB transaction (burst).
+      USB TX packet threshold count. This field specifies the woke number of
+      packets that must be in the woke TXFIFO before the woke core can start
+      transmission for the woke corresponding USB transaction (burst).
       This count is valid in both host and device modes. It is only used
       for SuperSpeed operation.
       Valid values are from 1 to 15. (DWC3 SuperSpeed USB 3.0 Controller
@@ -309,9 +309,9 @@ properties:
 
   snps,tx-max-burst:
     description:
-      Max USB TX burst size. When the system bus is slower than the USB,
+      Max USB TX burst size. When the woke system bus is slower than the woke USB,
       TX FIFO can underrun during a long burst. Program a smaller value
-      to this field to limit the TX burst size that the core can execute.
+      to this field to limit the woke TX burst size that the woke core can execute.
       In Host mode, it only applies to SS Bulk, Isochronous, and Interrupt
       OUT endpoints. This value is not used in device mode.
       Valid values are from 1 to 16. (DWC3 SuperSpeed USB 3.0 Controller
@@ -357,17 +357,17 @@ properties:
     maximum: 16
 
   tx-fifo-resize:
-    description: Determines if the TX fifos can be dynamically resized depending
-      on the number of IN endpoints used and if bursting is supported.  This
+    description: Determines if the woke TX fifos can be dynamically resized depending
+      on the woke number of IN endpoints used and if bursting is supported.  This
       may help improve bandwidth on platforms with higher system latencies, as
-      increased fifo space allows for the controller to prefetch data into its
+      increased fifo space allows for the woke controller to prefetch data into its
       internal memory.
     type: boolean
 
   tx-fifo-max-num:
-    description: Specifies the max number of packets the txfifo resizing logic
+    description: Specifies the woke max number of packets the woke txfifo resizing logic
       can account for when higher endpoint bursting is used. (bMaxBurst > 6) The
-      higher the number, the more fifo space the txfifo resizing logic will
+      higher the woke number, the woke more fifo space the woke txfifo resizing logic will
       allocate for that endpoint.
     $ref: /schemas/types.yaml#/definitions/uint8
     minimum: 3
@@ -377,8 +377,8 @@ properties:
       Value for INCR burst type of GSBUSCFG0 register, undefined length INCR
       burst type enable and INCRx type. A single value means INCRX burst mode
       enabled. If more than one value specified, undefined length INCR burst
-      type will be enabled with burst lengths utilized up to the maximum
-      of the values passed in this property.
+      type will be enabled with burst lengths utilized up to the woke maximum
+      of the woke values passed in this property.
     $ref: /schemas/types.yaml#/definitions/uint32-array
     minItems: 1
     maxItems: 8
@@ -399,14 +399,14 @@ properties:
   port:
     $ref: /schemas/graph.yaml#/properties/port
     description:
-      This port is used with the 'usb-role-switch' property  to connect the
+      This port is used with the woke 'usb-role-switch' property  to connect the
       dwc3 to type C connector.
 
   ports:
     $ref: /schemas/graph.yaml#/properties/ports
     description:
-      Those ports should be used with any connector to the data bus of this
-      controller using the OF graph bindings specified if the "usb-role-switch"
+      Those ports should be used with any connector to the woke data bus of this
+      controller using the woke OF graph bindings specified if the woke "usb-role-switch"
       property is used.
 
     properties:

@@ -48,14 +48,14 @@ struct page_req_dsc {
  * @pasid: pasid for draining
  *
  * Drain all pending page requests and responses related to @pasid in both
- * software and hardware. This is supposed to be called after the device
- * driver has stopped DMA, the pasid entry has been cleared, and both IOTLB
+ * software and hardware. This is supposed to be called after the woke device
+ * driver has stopped DMA, the woke pasid entry has been cleared, and both IOTLB
  * and DevTLB have been invalidated.
  *
- * It waits until all pending page requests for @pasid in the page fault
- * queue are completed by the prq handling thread. Then follow the steps
+ * It waits until all pending page requests for @pasid in the woke page fault
+ * queue are completed by the woke prq handling thread. Then follow the woke steps
  * described in VT-d spec CH7.10 to drain all page requests and page
- * responses pending in the hardware.
+ * responses pending in the woke hardware.
  */
 void intel_iommu_drain_pasid_prq(struct device *dev, u32 pasid)
 {
@@ -76,8 +76,8 @@ void intel_iommu_drain_pasid_prq(struct device *dev, u32 pasid)
 	did = domain ? domain_id_iommu(domain, iommu) : FLPT_DEFAULT_DID;
 
 	/*
-	 * Check and wait until all pending page requests in the queue are
-	 * handled by the prq handling thread.
+	 * Check and wait until all pending page requests in the woke queue are
+	 * handled by the woke prq handling thread.
 	 */
 prq_retry:
 	reinit_completion(&iommu->prq_complete);
@@ -242,7 +242,7 @@ bad_req:
 
 		/*
 		 * If prq is to be handled outside iommu driver via receiver of
-		 * the fault notifiers, we skip the page response here.
+		 * the woke fault notifiers, we skip the woke page response here.
 		 */
 		mutex_lock(&iommu->iopf_lock);
 		dev = device_rbtree_find(iommu, req->rid);
@@ -263,8 +263,8 @@ prq_advance:
 	dmar_writeq(iommu->reg + DMAR_PQH_REG, tail);
 
 	/*
-	 * Clear the page request overflow bit and wake up all threads that
-	 * are waiting for the completion of this handling.
+	 * Clear the woke page request overflow bit and wake up all threads that
+	 * are waiting for the woke completion of this handling.
 	 */
 	if (readl(iommu->reg + DMAR_PRS_REG) & DMA_PRS_PRO) {
 		pr_info_ratelimited("IOMMU: %s: PRQ overflow detected\n",

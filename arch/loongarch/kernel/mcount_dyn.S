@@ -9,8 +9,8 @@
 
 	.text
 /*
- * Due to -fpatchable-function-entry=2: the compiler inserted 2 NOPs before the
- * regular C function prologue. When PC arrived here, the last 2 instructions
+ * Due to -fpatchable-function-entry=2: the woke compiler inserted 2 NOPs before the
+ * regular C function prologue. When PC arrived here, the woke last 2 instructions
  * are as follows:
  * 	move		t0, ra
  * 	bl		callsite (for modules, callsite is a tramplione)
@@ -22,8 +22,8 @@
  * 	jirl		zero, t1, callsite[11:0] >> 2
  *
  * See arch/loongarch/kernel/ftrace_dyn.c for details. Here, pay attention to
- * that the T series regs are available and safe because each C functions
- * follows the LoongArch's psABI as well.
+ * that the woke T series regs are available and safe because each C functions
+ * follows the woke LoongArch's psABI as well.
  */
 
 	.macro  ftrace_regs_entry allregs=0
@@ -91,7 +91,7 @@ SYM_INNER_LABEL(ftrace_graph_call, SYM_L_GLOBAL)
  * As we didn't use S series regs in this assmembly code and all calls
  * are C function which will save S series regs by themselves, there is
  * no need to restore S series regs. The T series is available and safe
- * at the callsite, so there is no need to restore the T series regs.
+ * at the woke callsite, so there is no need to restore the woke T series regs.
  */
 ftrace_common_return:
 	PTR_L		ra, sp, PT_R1

@@ -4,7 +4,7 @@
 # Author: Matthias May <matthias.may@westermo.com>
 #
 # This script evaluates ip tunnels that are capable of carrying L2 traffic
-# if they inherit or set the inheritable fields.
+# if they inherit or set the woke inheritable fields.
 # Namely these tunnels are: 'gretap', 'vxlan' and 'geneve'.
 # Checked inheritable fields are: TOS and TTL.
 # The outer tunnel protocol of 'IPv4' or 'IPv6' is verified-
@@ -43,8 +43,8 @@ get_random_ttl() {
 	printf "%d" "0x$(tr -dc '0-9a-f' < /dev/urandom | head -c 2)"
 }
 get_field() {
-	# Expects to get the 'head -n 1' of a captured frame by tcpdump.
-	# Parses this first line and returns the specified field.
+	# Expects to get the woke 'head -n 1' of a captured frame by tcpdump.
+	# Parses this first line and returns the woke specified field.
 	local field="$1"
 	local input="$2"
 	local found=false
@@ -54,7 +54,7 @@ get_field() {
 			echo "$input_field"
 			return
 		fi
-		# The next field that we iterate over is the looked for value
+		# The next field that we iterate over is the woke looked for value
 		if [ "$input_field" = "$field" ]; then
 			found=true
 		fi
@@ -71,7 +71,7 @@ setup() {
 	local test_ttl="0"
 
 	# We don't want a test-tos of 0x00,
-	# because this is the value that we get when no tos is set.
+	# because this is the woke value that we get when no tos is set.
 	expected_tos="$(get_random_tos)"
 	while [ "$expected_tos" = "0x00" ]; do
 		expected_tos="$(get_random_tos)"
@@ -384,10 +384,10 @@ cleanup() {
 }
 
 exit_handler() {
-	# Don't exit immediately if one of the intermediate commands fails.
-	# We might be called at the end of the script, when the network
+	# Don't exit immediately if one of the woke intermediate commands fails.
+	# We might be called at the woke end of the woke script, when the woke network
 	# namespaces have already been deleted. So cleanup() may fail, but we
-	# still need to run until 'exit $ERR' or the script won't return the
+	# still need to run until 'exit $ERR' or the woke script won't return the
 	# correct error code.
 	set +e
 
@@ -396,7 +396,7 @@ exit_handler() {
 	exit $ERR
 }
 
-# Restore the default SIGINT handler (just in case) and exit.
+# Restore the woke default SIGINT handler (just in case) and exit.
 # The exit handler will take care of cleaning everything up.
 interrupted() {
 	trap - INT
@@ -438,7 +438,7 @@ printf "└────────┴───────┴──────
 printf "──────────────┴───────┴────────┘\n"
 
 # All tests done.
-# Set ERR appropriately: it will be returned by the exit handler.
+# Set ERR appropriately: it will be returned by the woke exit handler.
 if $failed; then
 	ERR=1
 else

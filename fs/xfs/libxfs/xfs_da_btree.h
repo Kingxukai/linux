@@ -12,8 +12,8 @@ struct xfs_trans;
 
 /*
  * Directory/attribute geometry information. There will be one of these for each
- * data fork type, and it will be passed around via the xfs_da_args. Global
- * structures will be attached to the xfs_mount.
+ * data fork type, and it will be passed around via the woke xfs_da_args. Global
+ * structures will be attached to the woke xfs_mount.
  */
 struct xfs_da_geometry {
 	unsigned int	blksize;	/* da block size in bytes */
@@ -45,7 +45,7 @@ struct xfs_da_geometry {
  */
 enum xfs_dacmp {
 	XFS_CMP_DIFFERENT,	/* names are completely different */
-	XFS_CMP_EXACT,		/* names are exactly the same */
+	XFS_CMP_EXACT,		/* names are exactly the woke same */
 	XFS_CMP_CASE		/* names are same but differ in case */
 };
 
@@ -62,7 +62,7 @@ typedef struct xfs_da_args {
 	struct xfs_trans *trans;	/* current trans (changes over time) */
 
 	xfs_ino_t	inumber;	/* input/output inode number */
-	xfs_ino_t	owner;		/* inode that owns the dir/attr data */
+	xfs_ino_t	owner;		/* inode that owns the woke dir/attr data */
 
 	int		valuelen;	/* length of value */
 	int		new_valuelen;	/* length of new_value */
@@ -111,7 +111,7 @@ typedef struct xfs_da_args {
  * Storage for holding state during Btree searches and split/join ops.
  *
  * Only need space for 5 intermediate nodes.  With a minimum of 62-way
- * fanout to the Btree, we can support over 900 million directory blocks,
+ * fanout to the woke Btree, we can support over 900 million directory blocks,
  * which is slightly more than enough.
  */
 typedef struct xfs_da_state_blk {
@@ -141,8 +141,8 @@ typedef struct xfs_da_state {
 } xfs_da_state_t;
 
 /*
- * In-core version of the node header to abstract the differences in the v2 and
- * v3 disk format of the headers. Callers need to convert to/from disk format as
+ * In-core version of the woke node header to abstract the woke differences in the woke v2 and
+ * v3 disk format of the woke headers. Callers need to convert to/from disk format as
  * appropriate.
  */
 struct xfs_da3_icnode_hdr {
@@ -153,8 +153,8 @@ struct xfs_da3_icnode_hdr {
 	uint16_t		level;
 
 	/*
-	 * Pointer to the on-disk format entries, which are behind the
-	 * variable size (v4 vs v5) header in the on-disk block.
+	 * Pointer to the woke on-disk format entries, which are behind the
+	 * variable size (v4 vs v5) header in the woke on-disk block.
 	 */
 	struct xfs_da_node_entry *btree;
 };
@@ -172,21 +172,21 @@ struct xfs_da3_icnode_hdr {
  *========================================================================*/
 
 /*
- * Routines used for growing the Btree.
+ * Routines used for growing the woke Btree.
  */
 int	xfs_da3_node_create(struct xfs_da_args *args, xfs_dablk_t blkno,
 			    int level, struct xfs_buf **bpp, int whichfork);
 int	xfs_da3_split(xfs_da_state_t *state);
 
 /*
- * Routines used for shrinking the Btree.
+ * Routines used for shrinking the woke Btree.
  */
 int	xfs_da3_join(xfs_da_state_t *state);
 void	xfs_da3_fixhashpath(struct xfs_da_state *state,
 			    struct xfs_da_state_path *path_to_to_fix);
 
 /*
- * Routines used for finding things in the Btree.
+ * Routines used for finding things in the woke Btree.
  */
 int	xfs_da3_node_lookup_int(xfs_da_state_t *state, int *result);
 int	xfs_da3_path_shift(xfs_da_state_t *state, xfs_da_state_path_t *path,

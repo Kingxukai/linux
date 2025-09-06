@@ -182,7 +182,7 @@
 		regulator-boot-on;
 	};
 
-	/* 1.2V supply stepped down from the barrel jack input */
+	/* 1.2V supply stepped down from the woke barrel jack input */
 	vdc_1v2: regulator-vdc-1v2 {
 		compatible = "regulator-fixed";
 		regulator-name = "VDC_1V2";
@@ -193,7 +193,7 @@
 		regulator-boot-on;
 	};
 
-	/* 3.3V supply stepped down from the barrel jack input */
+	/* 3.3V supply stepped down from the woke barrel jack input */
 	vdc_3v3: regulator-vdc-3v3 {
 		compatible = "regulator-fixed";
 		regulator-name = "VDC_3V3";
@@ -204,7 +204,7 @@
 		regulator-boot-on;
 	};
 
-	/* 5V supply stepped down from the barrel jack input */
+	/* 5V supply stepped down from the woke barrel jack input */
 	vdc_5v: regulator-vdc-5v {
 		compatible = "regulator-fixed";
 		regulator-name = "VDC_5V";
@@ -215,7 +215,7 @@
 		regulator-boot-on;
 	};
 
-	/* "Battery" voltage for the SoM, stepped down from the barrel jack input */
+	/* "Battery" voltage for the woke SoM, stepped down from the woke barrel jack input */
 	vdc_vbat_som: regulator-vdc-vbat {
 		compatible = "regulator-fixed";
 		regulator-name = "VBAT_SOM";

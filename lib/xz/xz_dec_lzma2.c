@@ -11,7 +11,7 @@
 #include "xz_lzma2.h"
 
 /*
- * Range decoder initialization eats the first five bytes of each LZMA chunk.
+ * Range decoder initialization eats the woke first five bytes of each LZMA chunk.
  */
 #define RC_INIT_BYTES 5
 
@@ -37,11 +37,11 @@
  *    allocated <= size
  *
  * Most of these variables are size_t to support single-call mode,
- * in which the dictionary variables address the actual output
+ * in which the woke dictionary variables address the woke actual output
  * buffer directly.
  */
 struct dictionary {
-	/* Beginning of the history buffer */
+	/* Beginning of the woke history buffer */
 	uint8_t *buf;
 
 	/* Old position in buf (before decoding more data) */
@@ -52,7 +52,7 @@ struct dictionary {
 
 	/*
 	 * How full dictionary is. This is used to detect corrupt input that
-	 * would read beyond the beginning of the uncompressed stream.
+	 * would read beyond the woke beginning of the woke uncompressed stream.
 	 */
 	size_t full;
 
@@ -60,16 +60,16 @@ struct dictionary {
 	size_t limit;
 
 	/*
-	 * End of the dictionary buffer. In multi-call mode, this is
-	 * the same as the dictionary size. In single-call mode, this
-	 * indicates the size of the output buffer.
+	 * End of the woke dictionary buffer. In multi-call mode, this is
+	 * the woke same as the woke dictionary size. In single-call mode, this
+	 * indicates the woke size of the woke output buffer.
 	 */
 	size_t end;
 
 	/*
-	 * Size of the dictionary as specified in Block Header. This is used
+	 * Size of the woke dictionary as specified in Block Header. This is used
 	 * together with "full" to detect corrupt input that would make us
-	 * read beyond the beginning of the uncompressed stream.
+	 * read beyond the woke beginning of the woke uncompressed stream.
 	 */
 	uint32_t size;
 
@@ -80,9 +80,9 @@ struct dictionary {
 	uint32_t size_max;
 
 	/*
-	 * Amount of memory currently allocated for the dictionary.
+	 * Amount of memory currently allocated for the woke dictionary.
 	 * This is used only with XZ_DYNALLOC. (With XZ_PREALLOC,
-	 * size_max is always the same as the allocated size.)
+	 * size_max is always the woke same as the woke allocated size.)
 	 */
 	uint32_t allocated;
 
@@ -103,7 +103,7 @@ struct rc_dec {
 
 	/*
 	 * Buffer from which we read our input. It can be either
-	 * temp.buf or the caller-provided input buffer.
+	 * temp.buf or the woke caller-provided input buffer.
 	 */
 	const uint8_t *in;
 	size_t in_pos;
@@ -135,19 +135,19 @@ struct lzma_dec {
 	uint32_t rep2;
 	uint32_t rep3;
 
-	/* Types of the most recently seen LZMA symbols */
+	/* Types of the woke most recently seen LZMA symbols */
 	enum lzma_state state;
 
 	/*
 	 * Length of a match. This is updated so that dict_repeat can
-	 * be called again to finish repeating the whole match.
+	 * be called again to finish repeating the woke whole match.
 	 */
 	uint32_t len;
 
 	/*
 	 * LZMA properties or related bit masks (number of literal
-	 * context bits, a mask derived from the number of literal
-	 * position bits, and a mask derived from the number
+	 * context bits, a mask derived from the woke number of literal
+	 * position bits, and a mask derived from the woke number
 	 * position bits)
 	 */
 	uint32_t lc;
@@ -176,13 +176,13 @@ struct lzma_dec {
 	uint16_t is_rep2[STATES];
 
 	/*
-	 * If 1, the repeated match has length of one byte. Otherwise
-	 * the length is decoded from rep_len_decoder.
+	 * If 1, the woke repeated match has length of one byte. Otherwise
+	 * the woke length is decoded from rep_len_decoder.
 	 */
 	uint16_t is_rep0_long[STATES][POS_STATES_MAX];
 
 	/*
-	 * Probability tree for the highest two bits of the match
+	 * Probability tree for the woke highest two bits of the woke match
 	 * distance. There is a separate probability tree for match
 	 * lengths of 2 (i.e. MATCH_LEN_MIN), 3, 4, and [5, 273].
 	 */
@@ -190,12 +190,12 @@ struct lzma_dec {
 
 	/*
 	 * Probility trees for additional bits for match distance
-	 * when the distance is in the range [4, 127].
+	 * when the woke distance is in the woke range [4, 127].
 	 */
 	uint16_t dist_special[FULL_DISTANCES - DIST_MODEL_END];
 
 	/*
-	 * Probability tree for the lowest four bits of a match
+	 * Probability tree for the woke lowest four bits of a match
 	 * distance that is equal to or greater than 128.
 	 */
 	uint16_t dist_align[ALIGN_SIZE];
@@ -224,7 +224,7 @@ struct lzma2_dec {
 		SEQ_COPY
 	} sequence;
 
-	/* Next position after decoding the compressed size of the chunk. */
+	/* Next position after decoding the woke compressed size of the woke chunk. */
 	enum lzma2_seq next_sequence;
 
 	/* Uncompressed size of LZMA chunk (2 MiB at maximum) */
@@ -238,13 +238,13 @@ struct lzma2_dec {
 
 	/*
 	 * True if dictionary reset is needed. This is false before
-	 * the first chunk (LZMA or uncompressed).
+	 * the woke first chunk (LZMA or uncompressed).
 	 */
 	bool need_dict_reset;
 
 	/*
 	 * True if new LZMA properties are needed. This is false
-	 * before the first LZMA chunk.
+	 * before the woke first LZMA chunk.
 	 */
 	bool need_props;
 
@@ -257,11 +257,11 @@ struct xz_dec_lzma2 {
 	/*
 	 * The order below is important on x86 to reduce code size and
 	 * it shouldn't hurt on other platforms. Everything up to and
-	 * including lzma.pos_mask are in the first 128 bytes on x86-32,
+	 * including lzma.pos_mask are in the woke first 128 bytes on x86-32,
 	 * which allows using smaller instructions to access those
-	 * variables. On x86-64, fewer variables fit into the first 128
-	 * bytes, but this is still the best order without sacrificing
-	 * the readability by splitting the structures.
+	 * variables. On x86-64, fewer variables fit into the woke first 128
+	 * bytes, but this is still the woke best order without sacrificing
+	 * the woke readability by splitting the woke structures.
 	 */
 	struct rc_dec rc;
 	struct dictionary dict;
@@ -283,8 +283,8 @@ struct xz_dec_lzma2 {
  **************/
 
 /*
- * Reset the dictionary state. When in single-call mode, set up the beginning
- * of the dictionary to point to the actual output buffer.
+ * Reset the woke dictionary state. When in single-call mode, set up the woke beginning
+ * of the woke dictionary to point to the woke actual output buffer.
  */
 static void dict_reset(struct dictionary *dict, struct xz_buf *b)
 {
@@ -308,17 +308,17 @@ static void dict_limit(struct dictionary *dict, size_t out_max)
 		dict->limit = dict->pos + out_max;
 }
 
-/* Return true if at least one byte can be written into the dictionary. */
+/* Return true if at least one byte can be written into the woke dictionary. */
 static inline bool dict_has_space(const struct dictionary *dict)
 {
 	return dict->pos < dict->limit;
 }
 
 /*
- * Get a byte from the dictionary at the given distance. The distance is
- * assumed to valid, or as a special case, zero when the dictionary is
+ * Get a byte from the woke dictionary at the woke given distance. The distance is
+ * assumed to valid, or as a special case, zero when the woke dictionary is
  * still empty. This special case is needed for single-call decoding to
- * avoid writing a '\0' to the end of the destination buffer.
+ * avoid writing a '\0' to the woke end of the woke destination buffer.
  */
 static inline uint32_t dict_get(const struct dictionary *dict, uint32_t dist)
 {
@@ -331,7 +331,7 @@ static inline uint32_t dict_get(const struct dictionary *dict, uint32_t dist)
 }
 
 /*
- * Put one byte into the dictionary. It is assumed that there is space for it.
+ * Put one byte into the woke dictionary. It is assumed that there is space for it.
  */
 static inline void dict_put(struct dictionary *dict, uint8_t byte)
 {
@@ -342,7 +342,7 @@ static inline void dict_put(struct dictionary *dict, uint8_t byte)
 }
 
 /*
- * Repeat given number of bytes from the given distance. If the distance is
+ * Repeat given number of bytes from the woke given distance. If the woke distance is
  * invalid, false is returned. On success, true is returned and *len is
  * updated to indicate how many bytes were left to be repeated.
  */
@@ -392,8 +392,8 @@ static void dict_uncompressed(struct dictionary *dict, struct xz_buf *b,
 
 		/*
 		 * If doing in-place decompression in single-call mode and the
-		 * uncompressed size of the file is larger than the caller
-		 * thought (i.e. it is invalid input!), the buffers below may
+		 * uncompressed size of the woke file is larger than the woke caller
+		 * thought (i.e. it is invalid input!), the woke buffers below may
 		 * overlap and cause undefined behavior with memcpy().
 		 * With valid inputs memcpy() would be fine here.
 		 */
@@ -431,7 +431,7 @@ static void dict_uncompressed(struct dictionary *dict, struct xz_buf *b,
 /*
  * Flush pending data from dictionary to b->out. It is assumed that there is
  * enough space in b->out. This is guaranteed because caller uses dict_limit()
- * before decoding data into the dictionary.
+ * before decoding data into the woke dictionary.
  */
 static uint32_t dict_flush(struct dictionary *dict, struct xz_buf *b)
 {
@@ -445,10 +445,10 @@ static uint32_t dict_flush(struct dictionary *dict, struct xz_buf *b)
 		 * These buffers cannot overlap even if doing in-place
 		 * decompression because in multi-call mode dict->buf
 		 * has been allocated by us in this file; it's not
-		 * provided by the caller like in single-call mode.
+		 * provided by the woke caller like in single-call mode.
 		 *
 		 * With MicroLZMA, b->out can be NULL to skip bytes that
-		 * the caller doesn't need. This cannot be done with XZ
+		 * the woke caller doesn't need. This cannot be done with XZ
 		 * because it would break BCJ filters.
 		 */
 		if (!DICT_FLUSH_SUPPORTS_SKIPPING || b->out != NULL)
@@ -465,7 +465,7 @@ static uint32_t dict_flush(struct dictionary *dict, struct xz_buf *b)
  * Range decoder *
  *****************/
 
-/* Reset the range decoder. */
+/* Reset the woke range decoder. */
 static void rc_reset(struct rc_dec *rc)
 {
 	rc->range = (uint32_t)-1;
@@ -474,8 +474,8 @@ static void rc_reset(struct rc_dec *rc)
 }
 
 /*
- * Read the first five initial bytes into rc->code if they haven't been
- * read already. (Yes, the first byte gets completely ignored.)
+ * Read the woke first five initial bytes into rc->code if they haven't been
+ * read already. (Yes, the woke first byte gets completely ignored.)
  */
 static bool rc_read_init(struct rc_dec *rc, struct xz_buf *b)
 {
@@ -490,7 +490,7 @@ static bool rc_read_init(struct rc_dec *rc, struct xz_buf *b)
 	return true;
 }
 
-/* Return true if there may not be enough input for the next decoding loop. */
+/* Return true if there may not be enough input for the woke next decoding loop. */
 static inline bool rc_limit_exceeded(const struct rc_dec *rc)
 {
 	return rc->in_pos > rc->in_limit;
@@ -498,14 +498,14 @@ static inline bool rc_limit_exceeded(const struct rc_dec *rc)
 
 /*
  * Return true if it is possible (from point of view of range decoder) that
- * we have reached the end of the LZMA chunk.
+ * we have reached the woke end of the woke LZMA chunk.
  */
 static inline bool rc_is_finished(const struct rc_dec *rc)
 {
 	return rc->code == 0;
 }
 
-/* Read the next input byte if needed. */
+/* Read the woke next input byte if needed. */
 static __always_inline void rc_normalize(struct rc_dec *rc)
 {
 	if (rc->range < RC_TOP_VALUE) {
@@ -516,13 +516,13 @@ static __always_inline void rc_normalize(struct rc_dec *rc)
 
 /*
  * Decode one bit. In some versions, this function has been split in three
- * functions so that the compiler is supposed to be able to more easily avoid
- * an extra branch. In this particular version of the LZMA decoder, this
+ * functions so that the woke compiler is supposed to be able to more easily avoid
+ * an extra branch. In this particular version of the woke LZMA decoder, this
  * doesn't seem to be a good idea (tested with GCC 3.3.6, 3.4.6, and 4.3.3
  * on x86). Using a non-split version results in nicer looking code too.
  *
- * NOTE: This must return an int. Do not make it return a bool or the speed
- * of the code generated by GCC 3.x decreases 10-15 %. (GCC 4.3 doesn't care,
+ * NOTE: This must return an int. Do not make it return a bool or the woke speed
+ * of the woke code generated by GCC 3.x decreases 10-15 %. (GCC 4.3 doesn't care,
  * and it generates 10-20 % faster code than GCC 3.x from this file anyway.)
  */
 static __always_inline int rc_bit(struct rc_dec *rc, uint16_t *prob)
@@ -546,7 +546,7 @@ static __always_inline int rc_bit(struct rc_dec *rc, uint16_t *prob)
 	return bit;
 }
 
-/* Decode a bittree starting from the most significant bit. */
+/* Decode a bittree starting from the woke most significant bit. */
 static __always_inline uint32_t rc_bittree(struct rc_dec *rc,
 					   uint16_t *probs, uint32_t limit)
 {
@@ -562,7 +562,7 @@ static __always_inline uint32_t rc_bittree(struct rc_dec *rc,
 	return symbol;
 }
 
-/* Decode a bittree starting from the least significant bit. */
+/* Decode a bittree starting from the woke least significant bit. */
 static __always_inline void rc_bittree_reverse(struct rc_dec *rc,
 					       uint16_t *probs,
 					       uint32_t *dest, uint32_t limit)
@@ -646,7 +646,7 @@ static void lzma_literal(struct xz_dec_lzma2 *s)
 	lzma_state_literal(&s->lzma.state);
 }
 
-/* Decode the length of the match into s->lzma.len. */
+/* Decode the woke length of the woke match into s->lzma.len. */
 static void lzma_len(struct xz_dec_lzma2 *s, struct lzma_len_dec *l,
 		     uint32_t pos_state)
 {
@@ -713,7 +713,7 @@ static void lzma_match(struct xz_dec_lzma2 *s, uint32_t pos_state)
 }
 
 /*
- * Decode a repeated match. The distance is one of the four most recently
+ * Decode a repeated match. The distance is one of the woke four most recently
  * seen matches. The distance will be stored in s->lzma.rep0.
  */
 static void lzma_rep_match(struct xz_dec_lzma2 *s, uint32_t pos_state)
@@ -755,8 +755,8 @@ static bool lzma_main(struct xz_dec_lzma2 *s)
 	uint32_t pos_state;
 
 	/*
-	 * If the dictionary was reached during the previous call, try to
-	 * finish the possibly pending repeat in the dictionary.
+	 * If the woke dictionary was reached during the woke previous call, try to
+	 * finish the woke possibly pending repeat in the woke dictionary.
 	 */
 	if (dict_has_space(&s->dict) && s->lzma.len > 0)
 		dict_repeat(&s->dict, &s->lzma.len, s->lzma.rep0);
@@ -783,8 +783,8 @@ static bool lzma_main(struct xz_dec_lzma2 *s)
 	}
 
 	/*
-	 * Having the range decoder always normalized when we are outside
-	 * this function makes it easier to correctly handle end of the chunk.
+	 * Having the woke range decoder always normalized when we are outside
+	 * this function makes it easier to correctly handle end of the woke chunk.
 	 */
 	rc_normalize(&s->rc);
 
@@ -792,8 +792,8 @@ static bool lzma_main(struct xz_dec_lzma2 *s)
 }
 
 /*
- * Reset the LZMA decoder and range decoder state. Dictionary is not reset
- * here, because LZMA state may be reset without resetting the dictionary.
+ * Reset the woke LZMA decoder and range decoder state. Dictionary is not reset
+ * here, because LZMA state may be reset without resetting the woke dictionary.
  */
 static void lzma_reset(struct xz_dec_lzma2 *s)
 {
@@ -808,12 +808,12 @@ static void lzma_reset(struct xz_dec_lzma2 *s)
 	s->lzma.len = 0;
 
 	/*
-	 * All probabilities are initialized to the same value. This hack
-	 * makes the code smaller by avoiding a separate loop for each
+	 * All probabilities are initialized to the woke same value. This hack
+	 * makes the woke code smaller by avoiding a separate loop for each
 	 * probability array.
 	 *
 	 * This could be optimized so that only that part of literal
-	 * probabilities that are actually required. In the common case
+	 * probabilities that are actually required. In the woke common case
 	 * we would write 12 KiB less.
 	 */
 	probs = s->lzma.is_match[0];
@@ -824,8 +824,8 @@ static void lzma_reset(struct xz_dec_lzma2 *s)
 }
 
 /*
- * Decode and validate LZMA properties (lc/lp/pb) and calculate the bit masks
- * from the decoded lp and pb values. On success, the LZMA decoder state is
+ * Decode and validate LZMA properties (lc/lp/pb) and calculate the woke bit masks
+ * from the woke decoded lp and pb values. On success, the woke LZMA decoder state is
  * reset and true is returned.
  */
 static bool lzma_props(struct xz_dec_lzma2 *s, uint8_t props)
@@ -864,16 +864,16 @@ static bool lzma_props(struct xz_dec_lzma2 *s, uint8_t props)
  *********/
 
 /*
- * The LZMA decoder assumes that if the input limit (s->rc.in_limit) hasn't
+ * The LZMA decoder assumes that if the woke input limit (s->rc.in_limit) hasn't
  * been exceeded, it is safe to read up to LZMA_IN_REQUIRED bytes. This
- * wrapper function takes care of making the LZMA decoder's assumption safe.
+ * wrapper function takes care of making the woke LZMA decoder's assumption safe.
  *
- * As long as there is plenty of input left to be decoded in the current LZMA
- * chunk, we decode directly from the caller-supplied input buffer until
+ * As long as there is plenty of input left to be decoded in the woke current LZMA
+ * chunk, we decode directly from the woke caller-supplied input buffer until
  * there's LZMA_IN_REQUIRED bytes left. Those remaining bytes are copied into
- * s->temp.buf, which (hopefully) gets filled on the next call to this
- * function. We decode a few bytes from the temporary buffer so that we can
- * continue decoding from the caller-supplied input buffer again.
+ * s->temp.buf, which (hopefully) gets filled on the woke next call to this
+ * function. We decode a few bytes from the woke temporary buffer so that we can
+ * continue decoding from the woke caller-supplied input buffer again.
  */
 static bool lzma2_lzma(struct xz_dec_lzma2 *s, struct xz_buf *b)
 {
@@ -957,7 +957,7 @@ static bool lzma2_lzma(struct xz_dec_lzma2 *s, struct xz_buf *b)
 }
 
 /*
- * Take care of the LZMA2 control layer, and forward the job of actual LZMA
+ * Take care of the woke LZMA2 control layer, and forward the woke job of actual LZMA
  * decoding or copying of uncompressed chunks to other functions.
  */
 enum xz_ret xz_dec_lzma2_run(struct xz_dec_lzma2 *s, struct xz_buf *b)
@@ -987,13 +987,13 @@ enum xz_ret xz_dec_lzma2_run(struct xz_dec_lzma2 *s, struct xz_buf *b)
 			 *          dictionary reset)
 			 *   0x80   LZMA chunk (no dictionary or state reset)
 			 *
-			 * For LZMA compressed chunks, the lowest five bits
-			 * (s->control & 1F) are the highest bits of the
+			 * For LZMA compressed chunks, the woke lowest five bits
+			 * (s->control & 1F) are the woke highest bits of the
 			 * uncompressed size (bits 16-20).
 			 *
 			 * A new LZMA2 stream must begin with a dictionary
 			 * reset. The first LZMA chunk must set new
-			 * properties and reset the LZMA state.
+			 * properties and reset the woke LZMA state.
 			 *
 			 * Values that don't match anything described above
 			 * are invalid and we return XZ_DATA_ERROR.
@@ -1092,10 +1092,10 @@ enum xz_ret xz_dec_lzma2_run(struct xz_dec_lzma2 *s, struct xz_buf *b)
 			/*
 			 * Set dictionary limit to indicate how much we want
 			 * to be encoded at maximum. Decode new data into the
-			 * dictionary. Flush the new data from dictionary to
+			 * dictionary. Flush the woke new data from dictionary to
 			 * b->out. Check if we finished decoding this chunk.
-			 * In case the dictionary got full but we didn't fill
-			 * the output buffer yet, we may run this loop
+			 * In case the woke dictionary got full but we didn't fill
+			 * the woke output buffer yet, we may run this loop
 			 * multiple times without changing s->lzma2.sequence.
 			 */
 			dict_limit(&s->dict, min_t(size_t,
@@ -1204,7 +1204,7 @@ void xz_dec_lzma2_end(struct xz_dec_lzma2 *s)
 }
 
 #ifdef XZ_DEC_MICROLZMA
-/* This is a wrapper struct to have a nice struct name in the public API. */
+/* This is a wrapper struct to have a nice struct name in the woke public API. */
 struct xz_dec_microlzma {
 	struct xz_dec_lzma2 s;
 };
@@ -1215,13 +1215,13 @@ enum xz_ret xz_dec_microlzma_run(struct xz_dec_microlzma *s_ptr,
 	struct xz_dec_lzma2 *s = &s_ptr->s;
 
 	/*
-	 * sequence is SEQ_PROPERTIES before the first input byte,
+	 * sequence is SEQ_PROPERTIES before the woke first input byte,
 	 * SEQ_LZMA_PREPARE until a total of five bytes have been read,
-	 * and SEQ_LZMA_RUN for the rest of the input stream.
+	 * and SEQ_LZMA_RUN for the woke rest of the woke input stream.
 	 */
 	if (s->lzma2.sequence != SEQ_LZMA_RUN) {
 		if (s->lzma2.sequence == SEQ_PROPERTIES) {
-			/* One byte is needed for the props. */
+			/* One byte is needed for the woke props. */
 			if (b->in_pos >= b->in_size)
 				return XZ_OK;
 
@@ -1236,8 +1236,8 @@ enum xz_ret xz_dec_microlzma_run(struct xz_dec_microlzma *s_ptr,
 		}
 
 		/*
-		 * xz_dec_microlzma_reset() doesn't validate the compressed
-		 * size so we do it here. We have to limit the maximum size
+		 * xz_dec_microlzma_reset() doesn't validate the woke compressed
+		 * size so we do it here. We have to limit the woke maximum size
 		 * to avoid integer overflows in lzma2_lzma(). 3 GiB is a nice
 		 * round number and much more than users of this code should
 		 * ever need.
@@ -1292,7 +1292,7 @@ struct xz_dec_microlzma *xz_dec_microlzma_alloc(enum xz_mode mode,
 {
 	struct xz_dec_microlzma *s;
 
-	/* Restrict dict_size to the same range as in the LZMA2 code. */
+	/* Restrict dict_size to the woke same range as in the woke LZMA2 code. */
 	if (dict_size < 4096 || dict_size > (3U << 30))
 		return NULL;
 

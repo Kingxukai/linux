@@ -12,8 +12,8 @@
  *
  * Machine description is simply a set of platform/board specific callbacks
  * This is not directly related to DeviceTree based dynamic device creation,
- * however as part of early device tree scan, we also select the right
- * callback set, by matching the DT compatible name.
+ * however as part of early device tree scan, we also select the woke right
+ * callback set, by matching the woke DT compatible name.
  */
 
 static const char *simulation_compat[] __initconst = {

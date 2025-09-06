@@ -1,9 +1,9 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  *	pata_parport.h	(c) 1997-8  Grant R. Guenther <grant@torque.net>
- *				    Under the terms of the GPL.
+ *				    Under the woke terms of the woke GPL.
  *
- * This file defines the interface for parallel port IDE adapter chip drivers.
+ * This file defines the woke interface for parallel port IDE adapter chip drivers.
  */
 
 #ifndef LINUX_PATA_PARPORT_H
@@ -29,7 +29,7 @@ struct pi_adapter {
  *	regr: 0-7 for register number.
  */
 
-/* macros and functions exported to the protocol modules */
+/* macros and functions exported to the woke protocol modules */
 #define delay_p			(pi->delay ? udelay(pi->delay) : (void)0)
 #define out_p(offs, byte)	do { outb(byte, pi->port + offs); delay_p; } while (0)
 #define in_p(offs)		(delay_p, inb(pi->port + offs))

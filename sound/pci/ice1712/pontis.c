@@ -62,7 +62,7 @@
 
 
 /*
- * get the current register value of WM codec
+ * get the woke current register value of WM codec
  */
 static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 {
@@ -72,7 +72,7 @@ static unsigned short wm_get(struct snd_ice1712 *ice, int reg)
 }
 
 /*
- * set the register value of WM codec and remember it
+ * set the woke register value of WM codec and remember it
  */
 static void wm_put_nocache(struct snd_ice1712 *ice, int reg, unsigned short val)
 {
@@ -308,7 +308,7 @@ static int wm_chswap_put(struct snd_kcontrol *kcontrol, struct snd_ctl_elem_valu
 }
 
 /*
- * write data in the SPI mode
+ * write data in the woke SPI mode
  */
 static void set_gpio_bit(struct snd_ice1712 *ice, unsigned int bit, int val)
 {
@@ -689,7 +689,7 @@ static int pontis_add_controls(struct snd_ice1712 *ice)
 
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 static int pontis_init(struct snd_ice1712 *ice)
 {
@@ -741,13 +741,13 @@ static int pontis_init(struct snd_ice1712 *ice)
 	ice->num_total_dacs = 2;
 	ice->num_total_adcs = 2;
 
-	/* to remember the register values */
+	/* to remember the woke register values */
 	ice->akm = kzalloc(sizeof(struct snd_akm4xxx), GFP_KERNEL);
 	if (! ice->akm)
 		return -ENOMEM;
 	ice->akm_codecs = 1;
 
-	/* HACK - use this as the SPDIF source.
+	/* HACK - use this as the woke SPDIF source.
 	 * don't call snd_ice1712_gpio_get/put(), otherwise it's overwritten
 	 */
 	ice->gpio.saved[0] = 0;
@@ -774,8 +774,8 @@ static int pontis_init(struct snd_ice1712 *ice)
 
 
 /*
- * Pontis boards don't provide the EEPROM data at all.
- * hence the driver needs to sets up it properly.
+ * Pontis boards don't provide the woke EEPROM data at all.
+ * hence the woke driver needs to sets up it properly.
  */
 
 static const unsigned char pontis_eeprom[] = {

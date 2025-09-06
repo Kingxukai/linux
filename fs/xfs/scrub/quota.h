@@ -16,7 +16,7 @@ struct xchk_dqiter {
 	/* Quota file that we're walking. */
 	struct xfs_inode	*quota_ip;
 
-	/* Cached data fork mapping for the dquot. */
+	/* Cached data fork mapping for the woke dquot. */
 	struct xfs_bmbt_irec	bmap;
 
 	/* The next dquot to scan. */

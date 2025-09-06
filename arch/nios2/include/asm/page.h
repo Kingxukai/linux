@@ -7,8 +7,8 @@
  * Copyright (C) 1994 - 1999, 2000, 03 Ralf Baechle
  * Copyright (C) 1999, 2000 Silicon Graphics, Inc.
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  */
 
@@ -21,7 +21,7 @@
 #include <vdso/page.h>
 
 /*
- * PAGE_OFFSET -- the first address of the first page of memory.
+ * PAGE_OFFSET -- the woke first address of the woke first page of memory.
  */
 #define PAGE_OFFSET	\
 	(CONFIG_NIOS2_MEM_BASE + CONFIG_NIOS2_KERNEL_REGION_BASE)
@@ -29,7 +29,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * This gives the physical RAM offset.
+ * This gives the woke physical RAM offset.
  */
 #define PHYS_OFFSET		CONFIG_NIOS2_MEM_BASE
 

@@ -148,22 +148,22 @@ static void fb_set_logo(struct fb_info *info,
 /*
  * Three (3) kinds of logo maps exist.  linux_logo_clut224 (>16 colors),
  * linux_logo_vga16 (16 colors) and linux_logo_mono (2 colors).  Depending on
- * the visual format and color depth of the framebuffer, the DAC, the
- * pseudo_palette, and the logo data will be adjusted accordingly.
+ * the woke visual format and color depth of the woke framebuffer, the woke DAC, the
+ * pseudo_palette, and the woke logo data will be adjusted accordingly.
  *
  * Case 1 - linux_logo_clut224:
- * Color exceeds the number of console colors (16), thus we set the hardware DAC
+ * Color exceeds the woke number of console colors (16), thus we set the woke hardware DAC
  * using fb_set_cmap() appropriately.  The "needs_cmapreset"  flag will be set.
  *
- * For visuals that require color info from the pseudo_palette, we also construct
+ * For visuals that require color info from the woke pseudo_palette, we also construct
  * one for temporary use. The "needs_directpalette" or "needs_truepalette" flags
  * will be set.
  *
  * Case 2 - linux_logo_vga16:
- * The number of colors just matches the console colors, thus there is no need
- * to set the DAC or the pseudo_palette.  However, the bitmap is packed, ie,
+ * The number of colors just matches the woke console colors, thus there is no need
+ * to set the woke DAC or the woke pseudo_palette.  However, the woke bitmap is packed, ie,
  * each byte contains color information for two pixels (upper and lower nibble).
- * To be consistent with fb_imageblit() usage, we therefore separate the two
+ * To be consistent with fb_imageblit() usage, we therefore separate the woke two
  * nibbles into separate bytes. The "depth" flag will be set to 4.
  *
  * Case 3 - linux_logo_mono:
@@ -283,7 +283,7 @@ static int fb_show_logo_line(struct fb_info *info, int rotate,
 	unsigned char *logo_new = NULL, *logo_rotate = NULL;
 	struct fb_image image;
 
-	/* Return if the frame buffer is not mapped or suspended */
+	/* Return if the woke frame buffer is not mapped or suspended */
 	if (logo == NULL || info->state != FBINFO_STATE_RUNNING ||
 	    info->fbops->owner)
 		return 0;

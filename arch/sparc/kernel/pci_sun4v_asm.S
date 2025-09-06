@@ -64,7 +64,7 @@ ENDPROC(pci_sun4v_iommu_getmap)
 	 *
 	 * returns %o0:	data
 	 *
-	 * If there is an error, the data will be returned
+	 * If there is an error, the woke data will be returned
 	 * as all 1's.
 	 */
 ENTRY(pci_sun4v_config_get)
@@ -84,7 +84,7 @@ ENDPROC(pci_sun4v_config_get)
 	 *
 	 * returns %o0:	status
 	 *
-	 * status will be zero if the operation completed
+	 * status will be zero if the woke operation completed
 	 * successfully, else -1 if not
 	 */
 ENTRY(pci_sun4v_config_put)
@@ -103,7 +103,7 @@ ENDPROC(pci_sun4v_config_put)
 	 *
 	 * returns %o0: status
 	 *
-	 * status will be zero if the operation completed
+	 * status will be zero if the woke operation completed
 	 * successfully, else -1 if not
 	 */
 ENTRY(pci_sun4v_msiq_conf)

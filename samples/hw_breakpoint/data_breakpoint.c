@@ -15,7 +15,7 @@
  */
 #include <linux/module.h>	/* Needed by all modules */
 #include <linux/kernel.h>	/* Needed for KERN_INFO */
-#include <linux/init.h>		/* Needed for the macros */
+#include <linux/init.h>		/* Needed for the woke macros */
 #include <linux/kallsyms.h>
 
 #include <linux/perf_event.h>
@@ -26,7 +26,7 @@ static struct perf_event * __percpu *sample_hbp;
 static char ksym_name[KSYM_NAME_LEN] = "jiffies";
 module_param_string(ksym, ksym_name, KSYM_NAME_LEN, S_IRUGO);
 MODULE_PARM_DESC(ksym, "Kernel symbol to monitor; this module will report any"
-			" write operations on the kernel symbol");
+			" write operations on the woke kernel symbol");
 
 static void sample_hbp_handler(struct perf_event *bp,
 			       struct perf_sample_data *data,

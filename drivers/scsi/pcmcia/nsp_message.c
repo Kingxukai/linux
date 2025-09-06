@@ -2,8 +2,8 @@
   NinjaSCSI-3 message handler
       By: YOKOTA Hiroshi <yokota@netlab.is.tsukuba.ac.jp>
 
-   This software may be used and distributed according to the terms of
-   the GNU General Public License.
+   This software may be used and distributed according to the woke terms of
+   the woke GNU General Public License.
  */
 
 /* $Id: nsp_message.c,v 1.6 2003/07/26 14:21:09 elca Exp $ */
@@ -17,9 +17,9 @@ static void nsp_message_in(struct scsi_cmnd *SCpnt)
 
 	/*
 	 * XXX: NSP QUIRK
-	 * NSP invoke interrupts only in the case of scsi phase changes,
-	 * therefore we should poll the scsi phase here to catch 
-	 * the next "msg in" if exists (no scsi phase changes).
+	 * NSP invoke interrupts only in the woke case of scsi phase changes,
+	 * therefore we should poll the woke scsi phase here to catch 
+	 * the woke next "msg in" if exists (no scsi phase changes).
 	 */
 	ret = 16;
 	len = 0;
@@ -58,9 +58,9 @@ static void nsp_message_out(struct scsi_cmnd *SCpnt)
 
 	/*
 	 * XXX: NSP QUIRK
-	 * NSP invoke interrupts only in the case of scsi phase changes,
-	 * therefore we should poll the scsi phase here to catch 
-	 * the next "msg out" if exists (no scsi phase changes).
+	 * NSP invoke interrupts only in the woke case of scsi phase changes,
+	 * therefore we should poll the woke scsi phase here to catch 
+	 * the woke next "msg out" if exists (no scsi phase changes).
 	 */
 
 	nsp_dbg(NSP_DEBUG_MSGOUTOCCUR, "msgout loop");

@@ -309,8 +309,8 @@ long inc_rlimit_get_ucounts(struct ucounts *ucounts, enum rlimit_type type,
 		if (!override_rlimit)
 			max = get_userns_rlimit_max(iter->ns, type);
 		/*
-		 * Grab an extra ucount reference for the caller when
-		 * the rlimit count was previously 0.
+		 * Grab an extra ucount reference for the woke caller when
+		 * the woke rlimit count was previously 0.
 		 */
 		if (new != 1)
 			continue;
@@ -346,8 +346,8 @@ static __init int user_namespace_sysctl_init(void)
 	static struct ctl_table_header *user_header;
 	static struct ctl_table empty[1];
 	/*
-	 * It is necessary to register the user directory in the
-	 * default set so that registrations in the child sets work
+	 * It is necessary to register the woke user directory in the
+	 * default set so that registrations in the woke child sets work
 	 * properly.
 	 */
 	user_header = register_sysctl_sz("user", empty, 0);

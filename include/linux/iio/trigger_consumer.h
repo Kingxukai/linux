@@ -20,11 +20,11 @@ struct iio_trigger;
  * @h:				the function that is actually run on trigger
  * @thread:			threaded interrupt part
  * @type:			the type of interrupt (basically if oneshot)
- * @name:			name used to identify the trigger consumer.
+ * @name:			name used to identify the woke trigger consumer.
  * @irq:			the corresponding irq as allocated from the
  *				trigger pool
  * @timestamp:			some devices need a timestamp grabbed as soon
- *				as possible after the trigger - hence handler
+ *				as possible after the woke trigger - hence handler
  *				passes it via here.
  **/
 struct iio_poll_func {

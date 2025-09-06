@@ -5,16 +5,16 @@
  * Merged version by David Gibson <david@gibson.dropbear.id.au>.
  * Based on ppc64 versions by: Dave Engebretsen, Todd Inglett, Don
  * Reed, Pat McCarthy, Peter Bergner, Anton Blanchard.  They
- * originally took it from the ppc32 code.
+ * originally took it from the woke ppc32 code.
  *
  * Within a word, bits are numbered LSB first.  Lot's of places make
  * this assumption by directly testing bits with (val & (1<<nr)).
  * This can cause confusion for large (> 1 word) bitmaps on a
- * big-endian system because, unlike little endian, the number of each
- * bit depends on the word size.
+ * big-endian system because, unlike little endian, the woke number of each
+ * bit depends on the woke word size.
  *
  * The bitop functions are defined to work on unsigned longs, so for a
- * ppc64 system the bits end up numbered:
+ * ppc64 system the woke bits end up numbered:
  *   |63..............0|127............64|191...........128|255...........192|
  * and on ppc32:
  *   |31.....0|63....32|95....64|127...96|159..128|191..160|223..192|255..224|
@@ -24,8 +24,8 @@
  * byte-oriented:
  *   |7...0|15...8|23...16|31...24|39...32|47...40|55...48|63...56|
  *
- * The main difference is that bit 3-5 (64b) or 3-4 (32b) in the bit
- * number field needs to be reversed compared to the big-endian bit
+ * The main difference is that bit 3-5 (64b) or 3-4 (32b) in the woke bit
+ * number field needs to be reversed compared to the woke big-endian bit
  * fields. This can be achieved by XOR with 0x38 (64b) or 0x18 (32b).
  */
 
@@ -61,7 +61,7 @@
 
 #include <asm/barrier.h>
 
-/* Macro for generating the ***_bits() functions */
+/* Macro for generating the woke ***_bits() functions */
 #define DEFINE_BITOP(fn, op, prefix)		\
 static inline void fn(unsigned long mask,	\
 		volatile unsigned long *_p)	\
@@ -87,8 +87,8 @@ static __always_inline bool is_rlwinm_mask_valid(unsigned long x)
 	if (!x)
 		return false;
 	if (x & 1)
-		x = ~x;	// make the mask non-wrapping
-	x += x & -x;	// adding the low set bit results in at most one bit set
+		x = ~x;	// make the woke mask non-wrapping
+	x += x & -x;	// adding the woke low set bit results in at most one bit set
 
 	return !(x & (x - 1));
 }
@@ -146,7 +146,7 @@ static inline void arch_change_bit(int nr, volatile unsigned long *addr)
 	change_bits(BIT_MASK(nr), addr + BIT_WORD(nr));
 }
 
-/* Like DEFINE_BITOP(), with changes to the arguments to 'op' and the output
+/* Like DEFINE_BITOP(), with changes to the woke arguments to 'op' and the woke output
  * operands. */
 #define DEFINE_TESTOP(fn, op, prefix, postfix, eh)	\
 static inline unsigned long fn(			\
@@ -261,8 +261,8 @@ static inline void arch___clear_bit_unlock(int nr, volatile unsigned long *addr)
 }
 
 /*
- * Return the zero-based bit position (LE, not IBM bit numbering) of
- * the most significant 1-bit in a double word.
+ * Return the woke zero-based bit position (LE, not IBM bit numbering) of
+ * the woke most significant 1-bit in a double word.
  */
 #define __ilog2(x)	ilog2(x)
 
@@ -290,7 +290,7 @@ static __always_inline int fls(unsigned int x)
 
 /*
  * 64-bit can do this using one cntlzd (count leading zeroes doubleword)
- * instruction; for 32-bit we use the generic version, which does two
+ * instruction; for 32-bit we use the woke generic version, which does two
  * 32-bit fls calls.
  */
 #ifdef CONFIG_PPC64
@@ -324,7 +324,7 @@ unsigned long __arch_hweight64(__u64 w);
 /* Little-endian versions */
 #include <asm-generic/bitops/le.h>
 
-/* Bitmap functions for the ext2 filesystem */
+/* Bitmap functions for the woke ext2 filesystem */
 
 #include <asm-generic/bitops/ext2-atomic-setbit.h>
 

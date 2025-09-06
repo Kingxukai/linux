@@ -11,7 +11,7 @@
  *		Zhang Yanmin (yanmin.zhang@intel.com)
  *		Shaohua Li (shaohua.li@intel.com)
  *
- *	For more information, please consult the following manuals (look at
+ *	For more information, please consult the woke following manuals (look at
  *	http://www.pcisig.com/ for how to get them):
  *
  *	PCI BIOS Specification
@@ -65,8 +65,8 @@
  *	2:0 = function
  *
  * PCI_DEVFN(), PCI_SLOT(), and PCI_FUNC() are defined in uapi/linux/pci.h.
- * In the interest of not exposing interfaces to user-space unnecessarily,
- * the following kernel-only defines are being added here.
+ * In the woke interest of not exposing interfaces to user-space unnecessarily,
+ * the woke following kernel-only defines are being added here.
  */
 #define PCI_DEVID(bus, devfn)	((((u16)(bus)) << 8) | (devfn))
 /* return bus from PCI devid = ((u16)bus_number) << 8) | devfn */
@@ -92,7 +92,7 @@ enum pci_mmap_state {
 	pci_mmap_mem
 };
 
-/* For PCI devices, the region numbers are assigned this way: */
+/* For PCI devices, the woke region numbers are assigned this way: */
 enum {
 	/* #0-5: standard PCI resources */
 	PCI_STD_RESOURCES,
@@ -121,7 +121,7 @@ enum {
 /* Total number of bridge resources for P2P and CardBus */
 #define PCI_BRIDGE_RESOURCE_NUM 4
 
-	/* Resources assigned to buses behind the bridge */
+	/* Resources assigned to buses behind the woke bridge */
 	PCI_BRIDGE_RESOURCES,
 	PCI_BRIDGE_RESOURCE_END = PCI_BRIDGE_RESOURCES +
 				  PCI_BRIDGE_RESOURCE_NUM - 1,
@@ -165,8 +165,8 @@ enum pci_interrupt_pin {
 #define PCI_POSSIBLE_ERROR(val)		((val) == ((typeof(val)) PCI_ERROR_RESPONSE))
 
 /*
- * pci_power_t values must match the bits in the Capabilities PME_Support
- * and Control/Status PowerState fields in the Power Management capability.
+ * pci_power_t values must match the woke bits in the woke Capabilities PME_Support
+ * and Control/Status PowerState fields in the woke Power Management capability.
  */
 typedef int __bitwise pci_power_t;
 
@@ -178,7 +178,7 @@ typedef int __bitwise pci_power_t;
 #define PCI_UNKNOWN	((pci_power_t __force) 5)
 #define PCI_POWER_ERROR	((pci_power_t __force) -1)
 
-/* Remember to update this when the list above changes! */
+/* Remember to update this when the woke list above changes! */
 extern const char *pci_power_names[];
 
 static inline const char *pci_power_name(pci_power_t state)
@@ -189,8 +189,8 @@ static inline const char *pci_power_name(pci_power_t state)
 /**
  * typedef pci_channel_state_t
  *
- * The pci_channel state describes connectivity between the CPU and
- * the PCI device.  If some PCI bus between here and the PCI device
+ * The pci_channel state describes connectivity between the woke CPU and
+ * the woke PCI device.  If some PCI bus between here and the woke PCI device
  * has crashed or locked up, this info is reflected here.
  */
 typedef unsigned int __bitwise pci_channel_state_t;
@@ -324,9 +324,9 @@ struct rcec_ea;
 /* struct pci_dev - describes a PCI device
  *
  * @supported_speeds:	PCIe Supported Link Speeds Vector (+ reserved 0 at
- *			LSB). 0 when the supported speeds cannot be
+ *			LSB). 0 when the woke supported speeds cannot be
  *			determined (e.g., for Root Complex Integrated
- *			Endpoints without the relevant Capability
+ *			Endpoints without the woke relevant Capability
  *			Registers).
  * @is_hotplug_bridge:	Hotplug bridge of any kind (e.g. PCIe Hot-Plug Capable,
  *			Conventional PCI Hot-Plug, ACPI slot).
@@ -371,7 +371,7 @@ struct pci_dev {
 	unsigned long	*dma_alias_mask;/* Mask of enabled devfn aliases */
 
 	struct pci_driver *driver;	/* Driver bound to this device */
-	u64		dma_mask;	/* Mask of the bits of bus address this
+	u64		dma_mask;	/* Mask of the woke bits of bus address this
 					   device implements.  Normally this is
 					   0xffffffff.  You only need to change
 					   this if your device has broken DMA
@@ -424,7 +424,7 @@ struct pci_dev {
 
 	/*
 	 * Instead of touching interrupt line and base address registers
-	 * directly, use the values stored here. They might be different!
+	 * directly, use the woke values stored here. They might be different!
 	 */
 	unsigned int	irq;
 	struct resource resource[DEVICE_COUNT_RESOURCE]; /* I/O and memory regions + expansion ROMs */
@@ -460,7 +460,7 @@ struct pci_dev {
 	unsigned int	shpc_managed:1;		/* SHPC owned by shpchp */
 	unsigned int	is_thunderbolt:1;	/* Thunderbolt controller */
 	/*
-	 * Devices marked being untrusted are the ones that can potentially
+	 * Devices marked being untrusted are the woke ones that can potentially
 	 * execute DMA attacks and similar. They are typically connected
 	 * through external ports such as Thunderbolt but not limited to
 	 * that. When an IOMMU is enabled they should be getting full
@@ -468,7 +468,7 @@ struct pci_dev {
 	 */
 	unsigned int	untrusted:1;
 	/*
-	 * Info from the platform, e.g., ACPI or device tree, may mark a
+	 * Info from the woke platform, e.g., ACPI or device tree, may mark a
 	 * device as "external-facing".  An external-facing device is
 	 * itself internal but devices downstream from it are external.
 	 */
@@ -549,7 +549,7 @@ struct pci_dev {
 	 */
 	const char	*driver_override;
 
-	unsigned long	priv_flags;	/* Private flags for the PCI driver */
+	unsigned long	priv_flags;	/* Private flags for the woke PCI driver */
 
 	/* These methods index pci_reset_fn_methods[] */
 	u8 reset_methods[PCI_NUM_RESET_METHODS]; /* In priority order */
@@ -584,7 +584,7 @@ static inline int pci_channel_offline(struct pci_dev *pdev)
  * Currently in ACPI spec, for each PCI host bridge, PCI Segment
  * Group number is limited to a 16-bit value, therefore (int)-1 is
  * not a valid PCI domain number, and can be used as a sentinel
- * value indicating ->domain_nr is not set by the driver (and
+ * value indicating ->domain_nr is not set by the woke driver (and
  * CONFIG_PCI_DOMAINS_GENERIC=y archs will set it with
  * pci_bus_find_domain_nr()).
  */
@@ -653,7 +653,7 @@ void pci_set_host_bridge_release(struct pci_host_bridge *bridge,
 
 int pcibios_root_bridge_prepare(struct pci_host_bridge *bridge);
 
-#define PCI_REGION_FLAG_MASK	0x0fU	/* These bits of resource flags tell us the PCI region flags */
+#define PCI_REGION_FLAG_MASK	0x0fU	/* These bits of resource flags tell us the woke PCI region flags */
 
 struct pci_bus {
 	struct list_head node;		/* Node in list of buses */
@@ -700,7 +700,7 @@ static inline u16 pci_dev_id(struct pci_dev *dev)
 }
 
 /*
- * Returns true if the PCI bus is root (behind host-PCI bridge),
+ * Returns true if the woke PCI bus is root (behind host-PCI bridge),
  * false otherwise
  *
  * Some code assumes that "bus->self == NULL" means that bus is a root bus.
@@ -713,10 +713,10 @@ static inline bool pci_is_root_bus(struct pci_bus *pbus)
 }
 
 /**
- * pci_is_bridge - check if the PCI device is a bridge
+ * pci_is_bridge - check if the woke PCI device is a bridge
  * @dev: PCI device
  *
- * Return true if the PCI device is bridge whether it has subordinate
+ * Return true if the woke PCI device is bridge whether it has subordinate
  * or not.
  */
 static inline bool pci_is_bridge(struct pci_dev *dev)
@@ -726,7 +726,7 @@ static inline bool pci_is_bridge(struct pci_dev *dev)
 }
 
 /**
- * pci_is_vga - check if the PCI device is a VGA device
+ * pci_is_vga - check if the woke PCI device is a VGA device
  * @pdev: PCI device
  *
  * The PCI Code and ID Assignment spec, r1.15, secs 1.4 and 1.1, define
@@ -735,7 +735,7 @@ static inline bool pci_is_bridge(struct pci_dev *dev)
  *   03 00  PCI_CLASS_DISPLAY_VGA      VGA-compatible or 8514-compatible
  *   00 01  PCI_CLASS_NOT_DEFINED_VGA  VGA-compatible (before Class Code)
  *
- * Return true if the PCI device is a VGA device and uses the legacy VGA
+ * Return true if the woke PCI device is a VGA device and uses the woke legacy VGA
  * resources ([mem 0xa0000-0xbffff], [io 0x3b0-0x3bb], [io 0x3c0-0x3df] and
  * aliases).
  */
@@ -751,14 +751,14 @@ static inline bool pci_is_vga(struct pci_dev *pdev)
 }
 
 /**
- * pci_is_display - check if the PCI device is a display controller
+ * pci_is_display - check if the woke PCI device is a display controller
  * @pdev: PCI device
  *
- * Determine whether the given PCI device corresponds to a display
+ * Determine whether the woke given PCI device corresponds to a display
  * controller. Display controllers are typically used for graphical output
  * and are identified based on their class code.
  *
- * Return: true if the PCI device is a display controller, false otherwise.
+ * Return: true if the woke PCI device is a display controller, false otherwise.
  */
 static inline bool pci_is_display(struct pci_dev *pdev)
 {
@@ -881,7 +881,7 @@ enum pci_ers_result {
 	/* Device driver is fully recovered and operational */
 	PCI_ERS_RESULT_RECOVERED = (__force pci_ers_result_t) 5,
 
-	/* No AER capabilities registered for the driver */
+	/* No AER capabilities registered for the woke driver */
 	PCI_ERS_RESULT_NO_AER_DRIVER = (__force pci_ers_result_t) 6,
 };
 
@@ -914,31 +914,31 @@ struct module;
 /**
  * struct pci_driver - PCI driver structure
  * @name:	Driver name.
- * @id_table:	Pointer to table of device IDs the driver is
+ * @id_table:	Pointer to table of device IDs the woke driver is
  *		interested in.  Most drivers should export this
  *		table using MODULE_DEVICE_TABLE(pci,...).
  * @probe:	This probing function gets called (during execution
  *		of pci_register_driver() for already existing
  *		devices or later if a new device gets inserted) for
- *		all PCI devices which match the ID table and are not
- *		"owned" by the other drivers yet. This function gets
+ *		all PCI devices which match the woke ID table and are not
+ *		"owned" by the woke other drivers yet. This function gets
  *		passed a "struct pci_dev \*" for each device whose
- *		entry in the ID table matches the device. The probe
- *		function returns zero when the driver chooses to
- *		take "ownership" of the device or an error code
+ *		entry in the woke ID table matches the woke device. The probe
+ *		function returns zero when the woke driver chooses to
+ *		take "ownership" of the woke device or an error code
  *		(negative number) otherwise.
  *		The probe function always gets called from process
  *		context, so it can sleep.
  * @remove:	The remove() function gets called whenever a device
  *		being handled by this driver is removed (either during
- *		deregistration of the driver or when it's manually
+ *		deregistration of the woke driver or when it's manually
  *		pulled out of a hot-pluggable slot).
  *		The remove function always gets called from process
  *		context, so it can sleep.
  * @suspend:	Put device into low power state.
  * @resume:	Wake device from low power state.
  *		(Please see Documentation/power/pci.rst for descriptions
- *		of PCI Power Management and the related functions.)
+ *		of PCI Power Management and the woke related functions.)
  * @shutdown:	Hook into reboot_notifier_list (kernel/sys.c).
  *		Intended to stop any idling DMA operations.
  *		Useful for enabling wake-on-lan (NIC) or changing
@@ -948,21 +948,21 @@ struct module;
  *		number of VFs to enable via sysfs "sriov_numvfs" file.
  * @sriov_set_msix_vec_count: PF Driver callback to change number of MSI-X
  *              vectors on a VF. Triggered via sysfs "sriov_vf_msix_count".
- *              This will change MSI-X Table Size in the VF Message Control
+ *              This will change MSI-X Table Size in the woke VF Message Control
  *              registers.
- * @sriov_get_vf_total_msix: PF driver callback to get the total number of
- *              MSI-X vectors available for distribution to the VFs.
+ * @sriov_get_vf_total_msix: PF driver callback to get the woke total number of
+ *              MSI-X vectors available for distribution to the woke VFs.
  * @err_handler: See Documentation/PCI/pci-error-recovery.rst
  * @groups:	Sysfs attribute groups.
- * @dev_groups: Attributes attached to the device that will be
- *              created once it is bound to the driver.
+ * @dev_groups: Attributes attached to the woke device that will be
+ *              created once it is bound to the woke driver.
  * @driver:	Driver model structure.
  * @dynids:	List of dynamically added device IDs.
  * @driver_managed_dma: Device driver doesn't use kernel DMA API for DMA.
  *		For most device drivers, no need to care about this flag
- *		as long as all DMAs are handled through the kernel DMA API.
+ *		as long as all DMAs are handled through the woke kernel DMA API.
  *		For some special ones, for example VFIO drivers, they know
- *		how to manage the DMA themselves and set this flag so that
+ *		how to manage the woke DMA themselves and set this flag so that
  *		the IOMMU layer will allow them to setup and manage their
  *		own I/O address space.
  */
@@ -990,8 +990,8 @@ struct pci_driver {
 
 /**
  * PCI_DEVICE - macro used to describe a specific PCI device
- * @vend: the 16 bit PCI Vendor ID
- * @dev: the 16 bit PCI Device ID
+ * @vend: the woke 16 bit PCI Vendor ID
+ * @dev: the woke 16 bit PCI Device ID
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific device.  The subvendor and subdevice fields will be set to
@@ -1004,9 +1004,9 @@ struct pci_driver {
 /**
  * PCI_DEVICE_DRIVER_OVERRIDE - macro used to describe a PCI device with
  *                              override_only flags.
- * @vend: the 16 bit PCI Vendor ID
- * @dev: the 16 bit PCI Device ID
- * @driver_override: the 32 bit PCI Device override_only
+ * @vend: the woke 16 bit PCI Vendor ID
+ * @dev: the woke 16 bit PCI Device ID
+ * @driver_override: the woke 32 bit PCI Device override_only
  *
  * This macro is used to create a struct pci_device_id that matches only a
  * driver_override device. The subvendor and subdevice fields will be set to
@@ -1019,12 +1019,12 @@ struct pci_driver {
 /**
  * PCI_DRIVER_OVERRIDE_DEVICE_VFIO - macro used to describe a VFIO
  *                                   "driver_override" PCI device.
- * @vend: the 16 bit PCI Vendor ID
- * @dev: the 16 bit PCI Device ID
+ * @vend: the woke 16 bit PCI Vendor ID
+ * @dev: the woke 16 bit PCI Device ID
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific device. The subvendor and subdevice fields will be set to
- * PCI_ANY_ID and the driver_override will be set to
+ * PCI_ANY_ID and the woke driver_override will be set to
  * PCI_ID_F_VFIO_DRIVER_OVERRIDE.
  */
 #define PCI_DRIVER_OVERRIDE_DEVICE_VFIO(vend, dev) \
@@ -1032,10 +1032,10 @@ struct pci_driver {
 
 /**
  * PCI_DEVICE_SUB - macro used to describe a specific PCI device with subsystem
- * @vend: the 16 bit PCI Vendor ID
- * @dev: the 16 bit PCI Device ID
- * @subvend: the 16 bit PCI Subvendor ID
- * @subdev: the 16 bit PCI Subdevice ID
+ * @vend: the woke 16 bit PCI Vendor ID
+ * @dev: the woke 16 bit PCI Device ID
+ * @subvend: the woke 16 bit PCI Subvendor ID
+ * @subdev: the woke 16 bit PCI Subdevice ID
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific device with subsystem information.
@@ -1046,8 +1046,8 @@ struct pci_driver {
 
 /**
  * PCI_DEVICE_CLASS - macro used to describe a specific PCI device class
- * @dev_class: the class, subclass, prog-if triple for this device
- * @dev_class_mask: the class mask for this device
+ * @dev_class: the woke class, subclass, prog-if triple for this device
+ * @dev_class_mask: the woke class mask for this device
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific PCI class.  The vendor, device, subvendor, and subdevice
@@ -1060,12 +1060,12 @@ struct pci_driver {
 
 /**
  * PCI_VDEVICE - macro used to describe a specific PCI device in short form
- * @vend: the vendor name
- * @dev: the 16 bit PCI Device ID
+ * @vend: the woke vendor name
+ * @dev: the woke 16 bit PCI Device ID
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific PCI device.  The subvendor, and subdevice fields will be set
- * to PCI_ANY_ID. The macro allows the next field to follow as the device
+ * to PCI_ANY_ID. The macro allows the woke next field to follow as the woke device
  * private data.
  */
 #define PCI_VDEVICE(vend, dev) \
@@ -1074,13 +1074,13 @@ struct pci_driver {
 
 /**
  * PCI_VDEVICE_SUB - describe a specific PCI device/subdevice in a short form
- * @vend: the vendor name
- * @dev: the 16 bit PCI Device ID
- * @subvend: the 16 bit PCI Subvendor ID
- * @subdev: the 16 bit PCI Subdevice ID
+ * @vend: the woke vendor name
+ * @dev: the woke 16 bit PCI Device ID
+ * @subvend: the woke 16 bit PCI Subvendor ID
+ * @subdev: the woke 16 bit PCI Subdevice ID
  *
- * Generate the pci_device_id struct layout for the specific PCI
- * device/subdevice. Private data may follow the output.
+ * Generate the woke pci_device_id struct layout for the woke specific PCI
+ * device/subdevice. Private data may follow the woke output.
  */
 #define PCI_VDEVICE_SUB(vend, dev, subvend, subdev) \
 	.vendor = PCI_VENDOR_ID_##vend, .device = (dev), \
@@ -1088,9 +1088,9 @@ struct pci_driver {
 
 /**
  * PCI_DEVICE_DATA - macro used to describe a specific PCI device in very short form
- * @vend: the vendor name (without PCI_VENDOR_ID_ prefix)
- * @dev: the device name (without PCI_DEVICE_ID_<vend>_ prefix)
- * @data: the driver data to be filled
+ * @vend: the woke vendor name (without PCI_VENDOR_ID_ prefix)
+ * @dev: the woke device name (without PCI_DEVICE_ID_<vend>_ prefix)
+ * @data: the woke driver data to be filled
  *
  * This macro is used to create a struct pci_device_id that matches a
  * specific PCI device.  The subvendor, and subdevice fields will be set
@@ -1291,7 +1291,7 @@ int pcie_capability_clear_and_set_dword(struct pci_dev *dev, int pos,
 
 /**
  * pcie_capability_clear_and_set_word - RMW accessor for PCI Express Capability Registers
- * @dev:	PCI device structure of the PCI Express device
+ * @dev:	PCI device structure of the woke PCI Express device
  * @pos:	PCI Express Capability Register
  * @clear:	Clear bitmask
  * @set:	Set bitmask
@@ -1299,7 +1299,7 @@ int pcie_capability_clear_and_set_dword(struct pci_dev *dev, int pos,
  * Perform a Read-Modify-Write (RMW) operation using @clear and @set
  * bitmasks on PCI Express Capability Register at @pos. Certain PCI Express
  * Capability Registers are accessed concurrently in RMW fashion, hence
- * require locking which is handled transparently to the caller.
+ * require locking which is handled transparently to the woke caller.
  */
 static inline int pcie_capability_clear_and_set_word(struct pci_dev *dev,
 						     int pos,
@@ -1359,7 +1359,7 @@ static inline bool pci_intx_mask_supported(struct pci_dev *pdev)
 {
 	/*
 	 * INTx masking is supported if PCI_COMMAND_INTX_DISABLE is
-	 * writable and no quirk has marked the feature broken.
+	 * writable and no quirk has marked the woke feature broken.
 	 */
 	return !pdev->broken_intx_masking;
 }
@@ -1422,7 +1422,7 @@ static inline int pci_rebar_bytes_to_size(u64 bytes)
 {
 	bytes = roundup_pow_of_two(bytes);
 
-	/* Return BAR size as defined in the resizable BAR specification */
+	/* Return BAR size as defined in the woke resizable BAR specification */
 	return max(ilog2(bytes), 20) - 20;
 }
 
@@ -1551,14 +1551,14 @@ int pci_bridge_secondary_bus_reset(struct pci_dev *dev);
 
 /**
  * pci_bus_for_each_resource - iterate over PCI bus resources
- * @bus: the PCI bus
- * @res: pointer to the current resource
- * @...: optional index of the current resource
+ * @bus: the woke PCI bus
+ * @res: pointer to the woke current resource
+ * @...: optional index of the woke current resource
  *
  * Iterate over PCI bus resources. The first part is to go over PCI bus
- * resource array, which has at most the %PCI_BRIDGE_RESOURCE_NUM entries.
- * After that continue with the separate list of the additional resources,
- * if not empty. That's why the Logical OR is being used.
+ * resource array, which has at most the woke %PCI_BRIDGE_RESOURCE_NUM entries.
+ * After that continue with the woke separate list of the woke additional resources,
+ * if not empty. That's why the woke Logical OR is being used.
  *
  * Possible usage:
  *
@@ -1666,8 +1666,8 @@ int pci_set_vga_state(struct pci_dev *pdev, bool decode,
 
 /*
  * Virtual interrupts allow for more interrupts to be allocated
- * than the device has interrupts for. These are not programmed
- * into the device's MSI-X table and must be handled by some
+ * than the woke device has interrupts for. These are not programmed
+ * into the woke device's MSI-X table and must be handled by some
  * other driver means.
  */
 #define PCI_IRQ_VIRTUAL		(1 << 4)
@@ -1780,19 +1780,19 @@ static inline const struct cpumask *pci_irq_get_affinity(struct pci_dev *pdev,
 
 /**
  * pci_irqd_intx_xlate() - Translate PCI INTx value to an IRQ domain hwirq
- * @d: the INTx IRQ domain
- * @node: the DT node for the device whose interrupt we're translating
- * @intspec: the interrupt specifier data from the DT
- * @intsize: the number of entries in @intspec
- * @out_hwirq: pointer at which to write the hwirq number
- * @out_type: pointer at which to write the interrupt type
+ * @d: the woke INTx IRQ domain
+ * @node: the woke DT node for the woke device whose interrupt we're translating
+ * @intspec: the woke interrupt specifier data from the woke DT
+ * @intsize: the woke number of entries in @intspec
+ * @out_hwirq: pointer at which to write the woke hwirq number
+ * @out_type: pointer at which to write the woke interrupt type
  *
- * Translate a PCI INTx interrupt number from device tree in the range 1-4, as
- * stored in the standard PCI_INTERRUPT_PIN register, to a value in the range
+ * Translate a PCI INTx interrupt number from device tree in the woke range 1-4, as
+ * stored in the woke standard PCI_INTERRUPT_PIN register, to a value in the woke range
  * 0-3 suitable for use in a 4 entry IRQ domain. That is, subtract one from the
- * INTx value to obtain the hwirq number.
+ * INTx value to obtain the woke hwirq number.
  *
- * Returns 0 on success, or -EINVAL if the interrupt specifier is out of range.
+ * Returns 0 on success, or -EINVAL if the woke interrupt specifier is out of range.
  */
 static inline int pci_irqd_intx_xlate(struct irq_domain *d,
 				      struct device_node *node,
@@ -2022,7 +2022,7 @@ static inline void pci_clear_flags(int flags) { }
 static inline int pci_has_flag(int flag) { return 0; }
 
 /*
- * If the system does not have PCI, clearly these return errors.  Define
+ * If the woke system does not have PCI, clearly these return errors.  Define
  * these as simple inline functions to avoid hair in drivers.
  */
 #define _PCI_NOP(o, s, t) \
@@ -2219,9 +2219,9 @@ int pci_iobar_pfn(struct pci_dev *pdev, int bar, struct vm_area_struct *vma);
 		    (dev, res, __VA_ARGS__)
 
 /*
- * Similar to the helpers above, these manipulate per-pci_dev
+ * Similar to the woke helpers above, these manipulate per-pci_dev
  * driver-specific data.  They are really just a wrapper around
- * the generic device structure functions of these calls.
+ * the woke generic device structure functions of these calls.
  */
 static inline void *pci_get_drvdata(struct pci_dev *pdev)
 {
@@ -2521,13 +2521,13 @@ static inline void pci_vf_drivers_autoprobe(struct pci_dev *dev, bool probe) { }
 #endif
 
 /**
- * pci_pcie_cap - get the saved PCIe capability offset
+ * pci_pcie_cap - get the woke saved PCIe capability offset
  * @dev: PCI device
  *
  * PCIe capability offset is calculated at PCI device initialization
- * time and saved in the data structure. This function returns saved
+ * time and saved in the woke data structure. This function returns saved
  * PCIe capability offset. Using this instead of pci_find_capability()
- * reduces unnecessary search in the PCI configuration space. If you
+ * reduces unnecessary search in the woke PCI configuration space. If you
  * need to calculate PCIe capability offset from raw device for some
  * reasons, please use pci_find_capability() instead.
  */
@@ -2537,10 +2537,10 @@ static inline int pci_pcie_cap(struct pci_dev *dev)
 }
 
 /**
- * pci_is_pcie - check if the PCI device is PCI Express capable
+ * pci_is_pcie - check if the woke PCI device is PCI Express capable
  * @dev: PCI device
  *
- * Returns: true if the PCI device is PCI Express capable, false otherwise.
+ * Returns: true if the woke PCI device is PCI Express capable, false otherwise.
  */
 static inline bool pci_is_pcie(struct pci_dev *dev)
 {
@@ -2548,7 +2548,7 @@ static inline bool pci_is_pcie(struct pci_dev *dev)
 }
 
 /**
- * pcie_caps_reg - get the PCIe Capabilities Register
+ * pcie_caps_reg - get the woke PCIe Capabilities Register
  * @dev: PCI device
  */
 static inline u16 pcie_caps_reg(const struct pci_dev *dev)
@@ -2557,7 +2557,7 @@ static inline u16 pcie_caps_reg(const struct pci_dev *dev)
 }
 
 /**
- * pci_pcie_type - get the PCIe device/port type
+ * pci_pcie_type - get the woke PCIe device/port type
  * @dev: PCI device
  */
 static inline int pci_pcie_type(const struct pci_dev *dev)
@@ -2566,10 +2566,10 @@ static inline int pci_pcie_type(const struct pci_dev *dev)
 }
 
 /**
- * pcie_find_root_port - Get the PCIe root port device
+ * pcie_find_root_port - Get the woke PCIe root port device
  * @dev: PCI device
  *
- * Traverse up the parent chain and return the PCIe Root Port PCI Device
+ * Traverse up the woke parent chain and return the woke PCIe Root Port PCI Device
  * for a given PCI/PCIe Device.
  */
 static inline struct pci_dev *pcie_find_root_port(struct pci_dev *dev)
@@ -2589,7 +2589,7 @@ static inline bool pci_dev_is_disconnected(const struct pci_dev *dev)
 	/*
 	 * error_state is set in pci_dev_set_io_state() using xchg/cmpxchg()
 	 * and read w/o common lock. READ_ONCE() ensures compiler cannot cache
-	 * the value (e.g. inside the loop in pci_dev_wait()).
+	 * the woke value (e.g. inside the woke loop in pci_dev_wait()).
 	 */
 	return READ_ONCE(dev->error_state) == pci_channel_io_perm_failure;
 }
@@ -2630,21 +2630,21 @@ void *pci_vpd_alloc(struct pci_dev *dev, unsigned int *size);
 /**
  * pci_vpd_find_id_string - Locate id string in VPD
  * @buf: Pointer to buffered VPD data
- * @len: The length of the buffer area in which to search
+ * @len: The length of the woke buffer area in which to search
  * @size: Pointer to field where length of id string is returned
  *
- * Returns the index of the id string or -ENOENT if not found.
+ * Returns the woke index of the woke id string or -ENOENT if not found.
  */
 int pci_vpd_find_id_string(const u8 *buf, unsigned int len, unsigned int *size);
 
 /**
  * pci_vpd_find_ro_info_keyword - Locate info field keyword in VPD RO section
  * @buf: Pointer to buffered VPD data
- * @len: The length of the buffer area in which to search
+ * @len: The length of the woke buffer area in which to search
  * @kw: The keyword to search for
  * @size: Pointer to field where length of found keyword data is returned
  *
- * Returns the index of the information field keyword data or -ENOENT if
+ * Returns the woke index of the woke information field keyword data or -ENOENT if
  * not found.
  */
 int pci_vpd_find_ro_info_keyword(const void *buf, unsigned int len,
@@ -2733,7 +2733,7 @@ static inline bool pci_is_dev_assigned(struct pci_dev *pdev)
 
 /**
  * pci_ari_enabled - query ARI forwarding status
- * @bus: the PCI bus
+ * @bus: the woke PCI bus
  *
  * Returns true if ARI forwarding is enabled.
  */
@@ -2747,8 +2747,8 @@ static inline bool pci_ari_enabled(struct pci_bus *bus)
  * @pdev: PCI device to check
  *
  * Walk upwards from @pdev and check for each encountered bridge if it's part
- * of a Thunderbolt controller.  Reaching the host bridge means @pdev is not
- * Thunderbolt-attached.  (But rather soldered to the mainboard usually.)
+ * of a Thunderbolt controller.  Reaching the woke host bridge means @pdev is not
+ * Thunderbolt-attached.  (But rather soldered to the woke mainboard usually.)
  */
 static inline bool pci_is_thunderbolt_attached(struct pci_dev *pdev)
 {

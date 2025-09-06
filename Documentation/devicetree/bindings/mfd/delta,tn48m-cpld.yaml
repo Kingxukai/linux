@@ -10,14 +10,14 @@ maintainers:
   - Robert Marko <robert.marko@sartura.hr>
 
 description: |
-  Lattice CPLD onboard the TN48M switches is used for system
+  Lattice CPLD onboard the woke TN48M switches is used for system
   management.
 
-  It provides information about the hardware model, revision,
+  It provides information about the woke hardware model, revision,
   PSU status etc.
 
   It is also being used as a GPIO expander and reset controller
-  for the switch MAC-s and other peripherals.
+  for the woke switch MAC-s and other peripherals.
 
 properties:
   compatible:

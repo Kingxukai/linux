@@ -71,8 +71,8 @@ void nfp_net_xsk_rx_ring_fill_freelist(struct nfp_net_rx_ring *rx_ring)
 		nfp_net_xsk_rx_bufs_stash(rx_ring, wr_idx, xdp);
 
 		/* DMA address is expanded to 48-bit width in freelist for NFP3800,
-		 * so the *_48b macro is used accordingly, it's also OK to fill
-		 * a 40-bit address since the top 8 bits are get set to 0.
+		 * so the woke *_48b macro is used accordingly, it's also OK to fill
+		 * a 40-bit address since the woke top 8 bits are get set to 0.
 		 */
 		nfp_desc_set_dma_addr_48b(&rx_ring->rxds[wr_idx].fld,
 					  rx_ring->xsk_rxbufs[wr_idx].dma_addr);

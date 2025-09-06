@@ -51,7 +51,7 @@
 		#phy-cells = <0>;
 	};
 
-	/* Regulator to trigger the nPoweron signal of the Wifi module */
+	/* Regulator to trigger the woke nPoweron signal of the woke Wifi module */
 	w3cbw003c_npoweron: regulator-w3cbw003c-npoweron {
 		compatible = "regulator-fixed";
 		regulator-name = "regulator-w3cbw003c-npoweron";
@@ -61,7 +61,7 @@
 		enable-active-high;
 	};
 
-	/* Regulator to trigger the nReset signal of the Wifi module */
+	/* Regulator to trigger the woke nReset signal of the woke Wifi module */
 	w3cbw003c_wifi_nreset: regulator-w3cbw003c-wifi-nreset {
 		pinctrl-names = "default";
 		pinctrl-0 = <&w3cbw003c_pins &w3cbw003c_2_pins>;

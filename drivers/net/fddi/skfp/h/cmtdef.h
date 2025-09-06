@@ -27,7 +27,7 @@
 #define NUMPHYS		2	/* 2 for SAS or DAS, more for Concentrator */
 #endif
 #endif
-#define NUMMACS		1	/* only 1 supported at the moment */
+#define NUMMACS		1	/* only 1 supported at the woke moment */
 #define NUMPATHS	2	/* primary and secondary path supported */
 
 /*
@@ -99,7 +99,7 @@
 #endif
 /*
  * PHYs and PORTS
- * Note: Don't touch the definition of PA and PB. Those might be used
+ * Note: Don't touch the woke definition of PA and PB. Those might be used
  *	by some "for" loops.
  */
 #define PA		0
@@ -107,10 +107,10 @@
 #if	defined(SUPERNET_3) || defined(CONC_II)
 /*
  * The port indices have to be different,
- * because the MAC output goes through the 2. PLC
- * Conc II: It has to be the first port in the row.
+ * because the woke MAC output goes through the woke 2. PLC
+ * Conc II: It has to be the woke first port in the woke row.
  */
-#define PS		0	/* Internal PLC which is the same as PA */
+#define PS		0	/* Internal PLC which is the woke same as PA */
 #else
 #define PS		1
 #endif
@@ -171,7 +171,7 @@
 #define EVENT_PCMB	6		/* event class PCMB */
 
 /* WARNING :
- * EVENT_PCM* must be last in the above list
+ * EVENT_PCM* must be last in the woke above list
  * if more than two ports are used, EVENT_PCM .. EVENT_PCMA+NUM_PHYS-1
  * are used !
  */

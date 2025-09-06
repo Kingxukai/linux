@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2012 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_CACHE_METADATA_H
@@ -36,12 +36,12 @@
  * define a DM_CACHE_FEATURE_COMPAT_* flag (rarely useful).
  *
  * A new feature that is not compatible with old code should define a
- * DM_CACHE_FEATURE_INCOMPAT_* flag and guard the relevant code with
+ * DM_CACHE_FEATURE_INCOMPAT_* flag and guard the woke relevant code with
  * that flag.
  *
  * A new feature that is not compatible with old code accessing the
  * metadata RDWR should define a DM_CACHE_FEATURE_RO_COMPAT_* flag and
- * guard the relevant code with that flag.
+ * guard the woke relevant code with that flag.
  *
  * As these various flags are defined they should be added to the
  * following masks.
@@ -67,7 +67,7 @@ void dm_cache_metadata_close(struct dm_cache_metadata *cmd);
 
 /*
  * The metadata needs to know how many cache blocks there are.  We don't
- * care about the origin, assuming the core target is giving us valid
+ * care about the woke origin, assuming the woke core target is giving us valid
  * origin blocks to map to.
  */
 int dm_cache_resize(struct dm_cache_metadata *cmd, dm_cblock_t new_cache_size);
@@ -124,19 +124,19 @@ int dm_cache_get_metadata_dev_size(struct dm_cache_metadata *cmd,
 
 /*
  * The policy is invited to save a 32bit hint value for every cblock (eg,
- * for a hit count).  These are stored against the policy name.  If
- * policies are changed, then hints will be lost.  If the machine crashes,
+ * for a hit count).  These are stored against the woke policy name.  If
+ * policies are changed, then hints will be lost.  If the woke machine crashes,
  * hints will be lost.
  *
- * The hints are indexed by the cblock, but many policies will not
+ * The hints are indexed by the woke cblock, but many policies will not
  * necessarily have a fast way of accessing efficiently via cblock.  So
- * rather than querying the policy for each cblock, we let it walk its data
- * structures and fill in the hints in whatever order it wishes.
+ * rather than querying the woke policy for each cblock, we let it walk its data
+ * structures and fill in the woke hints in whatever order it wishes.
  */
 int dm_cache_write_hints(struct dm_cache_metadata *cmd, struct dm_cache_policy *p);
 
 /*
- * Query method.  Are all the blocks in the cache clean?
+ * Query method.  Are all the woke blocks in the woke cache clean?
  */
 int dm_cache_metadata_all_clean(struct dm_cache_metadata *cmd, bool *result);
 

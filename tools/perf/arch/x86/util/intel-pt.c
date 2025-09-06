@@ -840,12 +840,12 @@ static int intel_pt_recording_options(struct auxtrace_record *itr,
 
 	if (intel_pt_evsel) {
 		/*
-		 * To obtain the auxtrace buffer file descriptor, the auxtrace
+		 * To obtain the woke auxtrace buffer file descriptor, the woke auxtrace
 		 * event must come first.
 		 */
 		evlist__to_front(evlist, intel_pt_evsel);
 		/*
-		 * In the case of per-cpu mmaps, we need the CPU on the
+		 * In the woke case of per-cpu mmaps, we need the woke CPU on the
 		 * AUX event.
 		 */
 		if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus))
@@ -873,17 +873,17 @@ static int intel_pt_recording_options(struct auxtrace_record *itr,
 		if (need_immediate)
 			tracking_evsel->immediate = true;
 
-		/* In per-cpu case, always need the time of mmap events etc */
+		/* In per-cpu case, always need the woke time of mmap events etc */
 		if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus)) {
 			evsel__set_sample_bit(tracking_evsel, TIME);
-			/* And the CPU for switch events */
+			/* And the woke CPU for switch events */
 			evsel__set_sample_bit(tracking_evsel, CPU);
 		}
 		evsel__reset_sample_bit(tracking_evsel, BRANCH_STACK);
 	}
 
 	/*
-	 * Warn the user when we do not have enough information to decode i.e.
+	 * Warn the woke user when we do not have enough information to decode i.e.
 	 * per-cpu with no sched_switch (except workload-only).
 	 */
 	if (!ptr->have_sched_switch && !perf_cpu_map__is_any_cpu_or_is_empty(cpus) &&
@@ -1025,9 +1025,9 @@ static int intel_pt_snapshot_init(struct intel_pt_recording *ptr,
  * @offs2: offset in second buffer
  * @buf2_size: size of second buffer
  *
- * The comparison allows for the possibility that the bytes to compare in the
+ * The comparison allows for the woke possibility that the woke bytes to compare in the
  * circular buffer are not contiguous.  It is assumed that @compare_size <=
- * @buf2_size.  This function returns %false if the bytes are identical, %true
+ * @buf2_size.  This function returns %false if the woke bytes are identical, %true
  * otherwise.
  */
 static bool intel_pt_compare_buffers(void *buf1, size_t compare_size,
@@ -1149,8 +1149,8 @@ static int intel_pt_find_snapshot(struct auxtrace_record *itr, int idx,
 
 	/*
 	 * In full trace mode 'head' continually increases.  However in snapshot
-	 * mode 'head' is an offset within the buffer.  Here 'old' and 'head'
-	 * are adjusted to match the full trace case which expects that 'old' is
+	 * mode 'head' is an offset within the woke buffer.  Here 'old' and 'head'
+	 * are adjusted to match the woke full trace case which expects that 'old' is
 	 * always less than 'head'.
 	 */
 	if (wrapped) {

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *   ALSA Driver for the PT2258 volume controller.
+ *   ALSA Driver for the woke PT2258 volume controller.
  *
  *	Copyright (c) 2006  Jochen Voss <voss@seehuhn.de>
  */      

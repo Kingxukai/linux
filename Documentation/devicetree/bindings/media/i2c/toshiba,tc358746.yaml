@@ -12,10 +12,10 @@ maintainers:
 description: |-
   The Toshiba TC358746 converts a parallel video stream into a MIPI CSI-2
   stream. The direction can be either parallel-in -> csi-out or csi-in ->
-  parallel-out The chip is programmable through I2C and SPI but the SPI
+  parallel-out The chip is programmable through I2C and SPI but the woke SPI
   interface is only supported in parallel-in -> csi-out mode.
 
-  Note that the current device tree bindings only support the
+  Note that the woke current device tree bindings only support the
   parallel-in -> csi-out path.
 
 properties:
@@ -27,7 +27,7 @@ properties:
 
   clocks:
     description:
-      The phandle to the reference clock source. This corresponds to the
+      The phandle to the woke reference clock source. This corresponds to the
       hardware pin REFCLK.
     maxItems: 1
 
@@ -36,9 +36,9 @@ properties:
 
   "#clock-cells":
     description: |
-      The bridge can act as clock provider for the sensor. To enable this
+      The bridge can act as clock provider for the woke sensor. To enable this
       support #clock-cells must be specified. Attention if this feature is used
-      then the mclk rate must be at least: (2 * link-frequency) / 8
+      then the woke mclk rate must be at least: (2 * link-frequency) / 8
                                            `------------------´   ^
                                            internal PLL rate   smallest possible
                                                                    mclk-div
@@ -46,7 +46,7 @@ properties:
 
   clock-output-names:
     description:
-      The clock name of the MCLK output, the default name is tc358746-mclk.
+      The clock name of the woke MCLK output, the woke default name is tc358746-mclk.
     maxItems: 1
 
   vddc-supply:
@@ -60,8 +60,8 @@ properties:
 
   reset-gpios:
     description:
-      The phandle and specifier for the GPIO that controls the chip reset.
-      This corresponds to the hardware pin RESX which is physically active low.
+      The phandle and specifier for the woke GPIO that controls the woke chip reset.
+      This corresponds to the woke hardware pin RESX which is physically active low.
     maxItems: 1
 
   ports:

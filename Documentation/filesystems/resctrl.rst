@@ -14,7 +14,7 @@ User Interface for Resource Control feature (resctrl)
 Intel refers to this feature as Intel Resource Director Technology(Intel(R) RDT).
 AMD refers to this feature as AMD Platform Quality of Service(AMD QoS).
 
-This feature is enabled by the CONFIG_X86_CPU_RESCTRL and the x86 /proc/cpuinfo
+This feature is enabled by the woke CONFIG_X86_CPU_RESCTRL and the woke x86 /proc/cpuinfo
 flag bits:
 
 ===============================================	================================
@@ -29,11 +29,11 @@ BMEC (Bandwidth Monitoring Event Configuration) ""
 ===============================================	================================
 
 Historically, new features were made visible by default in /proc/cpuinfo. This
-resulted in the feature flags becoming hard to parse by humans. Adding a new
+resulted in the woke feature flags becoming hard to parse by humans. Adding a new
 flag to /proc/cpuinfo should be avoided if user space can obtain information
-about the feature from resctrl's info directory.
+about the woke feature from resctrl's info directory.
 
-To use the feature mount the file system::
+To use the woke feature mount the woke file system::
 
  # mount -t resctrl resctrl [-o cdp[,cdpl2][,mba_MBps][,debug]] /sys/fs/resctrl
 
@@ -44,7 +44,7 @@ mount options are:
 "cdpl2":
 	Enable code/data prioritization in L2 cache allocations.
 "mba_MBps":
-	Enable the MBA Software Controller(mba_sc) to specify MBA
+	Enable the woke MBA Software Controller(mba_sc) to specify MBA
 	bandwidth in MiBps
 "debug":
 	Make debug files accessible. Available debug files are annotated with
@@ -55,31 +55,31 @@ L2 and L3 CDP are controlled separately.
 RDT features are orthogonal. A particular system may support only
 monitoring, only control, or both monitoring and control.  Cache
 pseudo-locking is a unique way of using cache control to "pin" or
-"lock" data in the cache. Details can be found in
+"lock" data in the woke cache. Details can be found in
 "Cache Pseudo-Locking".
 
 
 The mount succeeds if either of allocation or monitoring is present, but
-only those files and directories supported by the system will be created.
-For more details on the behavior of the interface during monitoring
-and allocation, see the "Resource alloc and monitor groups" section.
+only those files and directories supported by the woke system will be created.
+For more details on the woke behavior of the woke interface during monitoring
+and allocation, see the woke "Resource alloc and monitor groups" section.
 
 Info directory
 ==============
 
-The 'info' directory contains information about the enabled
+The 'info' directory contains information about the woke enabled
 resources. Each resource has its own subdirectory. The subdirectory
-names reflect the resource names.
+names reflect the woke resource names.
 
-Each subdirectory contains the following files with respect to
+Each subdirectory contains the woke following files with respect to
 allocation:
 
-Cache resource(L3/L2)  subdirectory contains the following files
+Cache resource(L3/L2)  subdirectory contains the woke following files
 related to allocation:
 
 "num_closids":
 		The number of CLOSIDs which are valid for this
-		resource. The kernel uses the smallest number of
+		resource. The kernel uses the woke smallest number of
 		CLOSIDs of all enabled resources as limit.
 "cbm_mask":
 		The bitmask which is valid for this resource.
@@ -97,10 +97,10 @@ related to allocation:
 		these bits.
 "bit_usage":
 		Annotated capacity bitmasks showing how all
-		instances of the resource are used. The legend is:
+		instances of the woke resource are used. The legend is:
 
 			"0":
-			      Corresponding region is unused. When the system's
+			      Corresponding region is unused. When the woke system's
 			      resources have been allocated and a "0" is found
 			      in "bit_usage" it is a sign that resources are
 			      wasted.
@@ -109,8 +109,8 @@ related to allocation:
 			      Corresponding region is used by hardware only
 			      but available for software use. If a resource
 			      has bits set in "shareable_bits" but not all
-			      of these bits appear in the resource groups'
-			      schematas then the bits appearing in
+			      of these bits appear in the woke resource groups'
+			      schematas then the woke bits appearing in
 			      "shareable_bits" but no resource group will
 			      be marked as "H".
 			"X":
@@ -135,7 +135,7 @@ related to allocation:
 			"1":
 			      Non-contiguous 1s value in CBM is supported.
 
-Memory bandwidth(MB) subdirectory contains the following files
+Memory bandwidth(MB) subdirectory contains the woke following files
 with respect to allocation:
 
 "min_bandwidth":
@@ -143,15 +143,15 @@ with respect to allocation:
 		user can request.
 
 "bandwidth_gran":
-		The granularity in which the memory bandwidth
+		The granularity in which the woke memory bandwidth
 		percentage is allocated. The allocated
-		b/w percentage is rounded off to the next
-		control step available on the hardware. The
+		b/w percentage is rounded off to the woke next
+		control step available on the woke hardware. The
 		available bandwidth control steps are:
 		min_bandwidth + N * bandwidth_gran.
 
 "delay_linear":
-		Indicates if the delay scale is linear or
+		Indicates if the woke delay scale is linear or
 		non-linear. This field is purely informational
 		only.
 
@@ -165,10 +165,10 @@ with respect to allocation:
 			to all threads
 		"per-thread":
 			bandwidth percentages are directly applied to
-			the threads running on the core
+			the threads running on the woke core
 
 If RDT monitoring is available there will be an "L3_MON" directory
-with the following files:
+with the woke following files:
 
 "num_rmids":
 		The number of RMIDs available. This is the
@@ -176,8 +176,8 @@ with the following files:
 		groups can be created.
 
 "mon_features":
-		Lists the monitoring events if
-		monitoring is enabled for the resource.
+		Lists the woke monitoring events if
+		monitoring is enabled for the woke resource.
 		Example::
 
 			# cat /sys/fs/resctrl/info/L3_MON/mon_features
@@ -185,8 +185,8 @@ with the following files:
 			mbm_total_bytes
 			mbm_local_bytes
 
-		If the system supports Bandwidth Monitoring Event
-		Configuration (BMEC), then the bandwidth events will
+		If the woke system supports Bandwidth Monitoring Event
+		Configuration (BMEC), then the woke bandwidth events will
 		be configurable. The output will be::
 
 			# cat /sys/fs/resctrl/info/L3_MON/mon_features
@@ -197,37 +197,37 @@ with the following files:
 			mbm_local_bytes_config
 
 "mbm_total_bytes_config", "mbm_local_bytes_config":
-	Read/write files containing the configuration for the mbm_total_bytes
-	and mbm_local_bytes events, respectively, when the Bandwidth
+	Read/write files containing the woke configuration for the woke mbm_total_bytes
+	and mbm_local_bytes events, respectively, when the woke Bandwidth
 	Monitoring Event Configuration (BMEC) feature is supported.
 	The event configuration settings are domain specific and affect
-	all the CPUs in the domain. When either event configuration is
-	changed, the bandwidth counters for all RMIDs of both events
+	all the woke CPUs in the woke domain. When either event configuration is
+	changed, the woke bandwidth counters for all RMIDs of both events
 	(mbm_total_bytes as well as mbm_local_bytes) are cleared for that
 	domain. The next read for every RMID will report "Unavailable"
-	and subsequent reads will report the valid value.
+	and subsequent reads will report the woke valid value.
 
-	Following are the types of events supported:
+	Following are the woke types of events supported:
 
 	====    ========================================================
 	Bits    Description
 	====    ========================================================
-	6       Dirty Victims from the QOS domain to all types of memory
-	5       Reads to slow memory in the non-local NUMA domain
-	4       Reads to slow memory in the local NUMA domain
+	6       Dirty Victims from the woke QOS domain to all types of memory
+	5       Reads to slow memory in the woke non-local NUMA domain
+	4       Reads to slow memory in the woke local NUMA domain
 	3       Non-temporal writes to non-local NUMA domain
 	2       Non-temporal writes to local NUMA domain
-	1       Reads to memory in the non-local NUMA domain
-	0       Reads to memory in the local NUMA domain
+	1       Reads to memory in the woke non-local NUMA domain
+	0       Reads to memory in the woke local NUMA domain
 	====    ========================================================
 
-	By default, the mbm_total_bytes configuration is set to 0x7f to count
-	all the event types and the mbm_local_bytes configuration is set to
-	0x15 to count all the local memory events.
+	By default, the woke mbm_total_bytes configuration is set to 0x7f to count
+	all the woke event types and the woke mbm_local_bytes configuration is set to
+	0x15 to count all the woke local memory events.
 
 	Examples:
 
-	* To view the current configuration::
+	* To view the woke current configuration::
 	  ::
 
 	    # cat /sys/fs/resctrl/info/L3_MON/mbm_total_bytes_config
@@ -236,8 +236,8 @@ with the following files:
 	    # cat /sys/fs/resctrl/info/L3_MON/mbm_local_bytes_config
 	    0=0x15;1=0x15;3=0x15;4=0x15
 
-	* To change the mbm_total_bytes to count only reads on domain 0,
-	  the bits 0, 1, 4 and 5 needs to be set, which is 110011b in binary
+	* To change the woke mbm_total_bytes to count only reads on domain 0,
+	  the woke bits 0, 1, 4 and 5 needs to be set, which is 110011b in binary
 	  (in hexadecimal 0x33):
 	  ::
 
@@ -246,8 +246,8 @@ with the following files:
 	    # cat /sys/fs/resctrl/info/L3_MON/mbm_total_bytes_config
 	    0=0x33;1=0x7f;2=0x7f;3=0x7f
 
-	* To change the mbm_local_bytes to count all the slow memory reads on
-	  domain 0 and 1, the bits 4 and 5 needs to be set, which is 110000b
+	* To change the woke mbm_local_bytes to count all the woke slow memory reads on
+	  domain 0 and 1, the woke bits 4 and 5 needs to be set, which is 110000b
 	  in binary (in hexadecimal 0x30):
 	  ::
 
@@ -257,16 +257,16 @@ with the following files:
 	    0=0x30;1=0x30;3=0x15;4=0x15
 
 "max_threshold_occupancy":
-		Read/write file provides the largest value (in
+		Read/write file provides the woke largest value (in
 		bytes) at which a previously used LLC_occupancy
 		counter can be considered for re-use.
 
-Finally, in the top level of the "info" directory there is a file
+Finally, in the woke top level of the woke "info" directory there is a file
 named "last_cmd_status". This is reset with every "command" issued
-via the file system (making new directories or writing to any of the
-control files). If the command was successful, it will read as "ok".
-If the command failed, it will provide more information that can be
-conveyed in the error returns from file operations. E.g.
+via the woke file system (making new directories or writing to any of the
+control files). If the woke command was successful, it will read as "ok".
+If the woke command failed, it will provide more information that can be
+conveyed in the woke error returns from file operations. E.g.
 ::
 
 	# echo L3:0=f7 > schemata
@@ -277,60 +277,60 @@ conveyed in the error returns from file operations. E.g.
 Resource alloc and monitor groups
 =================================
 
-Resource groups are represented as directories in the resctrl file
-system.  The default group is the root directory which, immediately
-after mounting, owns all the tasks and cpus in the system and can make
+Resource groups are represented as directories in the woke resctrl file
+system.  The default group is the woke root directory which, immediately
+after mounting, owns all the woke tasks and cpus in the woke system and can make
 full use of all resources.
 
 On a system with RDT control features additional directories can be
-created in the root directory that specify different amounts of each
+created in the woke root directory that specify different amounts of each
 resource (see "schemata" below). The root and these additional top level
 directories are referred to as "CTRL_MON" groups below.
 
-On a system with RDT monitoring the root directory and other top level
+On a system with RDT monitoring the woke root directory and other top level
 directories contain a directory named "mon_groups" in which additional
-directories can be created to monitor subsets of tasks in the CTRL_MON
-group that is their ancestor. These are called "MON" groups in the rest
+directories can be created to monitor subsets of tasks in the woke CTRL_MON
+group that is their ancestor. These are called "MON" groups in the woke rest
 of this document.
 
-Removing a directory will move all tasks and cpus owned by the group it
-represents to the parent. Removing one of the created CTRL_MON groups
+Removing a directory will move all tasks and cpus owned by the woke group it
+represents to the woke parent. Removing one of the woke created CTRL_MON groups
 will automatically remove all MON groups below it.
 
 Moving MON group directories to a new parent CTRL_MON group is supported
-for the purpose of changing the resource allocations of a MON group
+for the woke purpose of changing the woke resource allocations of a MON group
 without impacting its monitoring data or assigned tasks. This operation
 is not allowed for MON groups which monitor CPUs. No other move
 operation is currently allowed other than simply renaming a CTRL_MON or
 MON group.
 
-All groups contain the following files:
+All groups contain the woke following files:
 
 "tasks":
-	Reading this file shows the list of all tasks that belong to
-	this group. Writing a task id to the file will add a task to the
-	group. Multiple tasks can be added by separating the task ids
+	Reading this file shows the woke list of all tasks that belong to
+	this group. Writing a task id to the woke file will add a task to the
+	group. Multiple tasks can be added by separating the woke task ids
 	with commas. Tasks will be assigned sequentially. Multiple
 	failures are not supported. A single failure encountered while
-	attempting to assign a task will cause the operation to abort and
-	already added tasks before the failure will remain in the group.
+	attempting to assign a task will cause the woke operation to abort and
+	already added tasks before the woke failure will remain in the woke group.
 	Failures will be logged to /sys/fs/resctrl/info/last_cmd_status.
 
-	If the group is a CTRL_MON group the task is removed from
-	whichever previous CTRL_MON group owned the task and also from
-	any MON group that owned the task. If the group is a MON group,
-	then the task must already belong to the CTRL_MON parent of this
+	If the woke group is a CTRL_MON group the woke task is removed from
+	whichever previous CTRL_MON group owned the woke task and also from
+	any MON group that owned the woke task. If the woke group is a MON group,
+	then the woke task must already belong to the woke CTRL_MON parent of this
 	group. The task is removed from any previous MON group.
 
 
 "cpus":
-	Reading this file shows a bitmask of the logical CPUs owned by
+	Reading this file shows a bitmask of the woke logical CPUs owned by
 	this group. Writing a mask to this file will add and remove
-	CPUs to/from this group. As with the tasks file a hierarchy is
+	CPUs to/from this group. As with the woke tasks file a hierarchy is
 	maintained where MON groups may only include CPUs owned by the
 	parent CTRL_MON group.
-	When the resource group is in pseudo-locked mode this file will
-	only be readable, reflecting the CPUs associated with the
+	When the woke resource group is in pseudo-locked mode this file will
+	only be readable, reflecting the woke CPUs associated with the
 	pseudo-locked region.
 
 
@@ -341,27 +341,27 @@ All groups contain the following files:
 When control is enabled all CTRL_MON groups will also contain:
 
 "schemata":
-	A list of all the resources available to this group.
+	A list of all the woke resources available to this group.
 	Each resource has its own line and format - see below for details.
 
 "size":
-	Mirrors the display of the "schemata" file to display the size in
-	bytes of each allocation instead of the bits representing the
+	Mirrors the woke display of the woke "schemata" file to display the woke size in
+	bytes of each allocation instead of the woke bits representing the
 	allocation.
 
 "mode":
-	The "mode" of the resource group dictates the sharing of its
+	The "mode" of the woke resource group dictates the woke sharing of its
 	allocations. A "shareable" resource group allows sharing of its
 	allocations while an "exclusive" resource group does not. A
 	cache pseudo-locked region is created by first writing
-	"pseudo-locksetup" to the "mode" file before writing the cache
-	pseudo-locked region's schemata to the resource group's "schemata"
-	file. On successful pseudo-locked region creation the mode will
+	"pseudo-locksetup" to the woke "mode" file before writing the woke cache
+	pseudo-locked region's schemata to the woke resource group's "schemata"
+	file. On successful pseudo-locked region creation the woke mode will
 	automatically change to "pseudo-locked".
 
 "ctrl_hw_id":
 	Available only with debug option. The identifier used by hardware
-	for the control group. On x86 this is the CLOSID.
+	for the woke control group. On x86 this is the woke CLOSID.
 
 When monitoring is enabled all MON groups will also contain:
 
@@ -371,79 +371,79 @@ When monitoring is enabled all MON groups will also contain:
 	be subdirectories "mon_L3_00" and "mon_L3_01".	Each of these
 	directories have one file per event (e.g. "llc_occupancy",
 	"mbm_total_bytes", and "mbm_local_bytes"). In a MON group these
-	files provide a read out of the current value of the event for
-	all tasks in the group. In CTRL_MON groups these files provide
-	the sum for all tasks in the CTRL_MON group and all tasks in
+	files provide a read out of the woke current value of the woke event for
+	all tasks in the woke group. In CTRL_MON groups these files provide
+	the sum for all tasks in the woke CTRL_MON group and all tasks in
 	MON groups. Please see example section for more details on usage.
 	On systems with Sub-NUMA Cluster (SNC) enabled there are extra
-	directories for each node (located within the "mon_L3_XX" directory
-	for the L3 cache they occupy). These are named "mon_sub_L3_YY"
-	where "YY" is the node number.
+	directories for each node (located within the woke "mon_L3_XX" directory
+	for the woke L3 cache they occupy). These are named "mon_sub_L3_YY"
+	where "YY" is the woke node number.
 
 "mon_hw_id":
 	Available only with debug option. The identifier used by hardware
-	for the monitor group. On x86 this is the RMID.
+	for the woke monitor group. On x86 this is the woke RMID.
 
-When the "mba_MBps" mount option is used all CTRL_MON groups will also contain:
+When the woke "mba_MBps" mount option is used all CTRL_MON groups will also contain:
 
 "mba_MBps_event":
 	Reading this file shows which memory bandwidth event is used
-	as input to the software feedback loop that keeps memory bandwidth
-	below the value specified in the schemata file. Writing the
-	name of one of the supported memory bandwidth events found in
-	/sys/fs/resctrl/info/L3_MON/mon_features changes the input
+	as input to the woke software feedback loop that keeps memory bandwidth
+	below the woke value specified in the woke schemata file. Writing the
+	name of one of the woke supported memory bandwidth events found in
+	/sys/fs/resctrl/info/L3_MON/mon_features changes the woke input
 	event.
 
 Resource allocation rules
 -------------------------
 
-When a task is running the following rules define which resources are
+When a task is running the woke following rules define which resources are
 available to it:
 
-1) If the task is a member of a non-default group, then the schemata
+1) If the woke task is a member of a non-default group, then the woke schemata
    for that group is used.
 
-2) Else if the task belongs to the default group, but is running on a
-   CPU that is assigned to some specific group, then the schemata for the
+2) Else if the woke task belongs to the woke default group, but is running on a
+   CPU that is assigned to some specific group, then the woke schemata for the
    CPU's group is used.
 
-3) Otherwise the schemata for the default group is used.
+3) Otherwise the woke schemata for the woke default group is used.
 
 Resource monitoring rules
 -------------------------
 1) If a task is a member of a MON group, or non-default CTRL_MON group
-   then RDT events for the task will be reported in that group.
+   then RDT events for the woke task will be reported in that group.
 
-2) If a task is a member of the default CTRL_MON group, but is running
-   on a CPU that is assigned to some specific group, then the RDT events
-   for the task will be reported in that group.
+2) If a task is a member of the woke default CTRL_MON group, but is running
+   on a CPU that is assigned to some specific group, then the woke RDT events
+   for the woke task will be reported in that group.
 
-3) Otherwise RDT events for the task will be reported in the root level
+3) Otherwise RDT events for the woke task will be reported in the woke root level
    "mon_data" group.
 
 
 Notes on cache occupancy monitoring and control
 ===============================================
 When moving a task from one group to another you should remember that
-this only affects *new* cache allocations by the task. E.g. you may have
+this only affects *new* cache allocations by the woke task. E.g. you may have
 a task in a monitor group showing 3 MB of cache occupancy. If you move
-to a new group and immediately check the occupancy of the old and new
-groups you will likely see that the old group is still showing 3 MB and
-the new group zero. When the task accesses locations still in cache from
-before the move, the h/w does not update any counters. On a busy system
-you will likely see the occupancy in the old group go down as cache lines
-are evicted and re-used while the occupancy in the new group rises as
-the task accesses memory and loads into the cache are counted based on
-membership in the new group.
+to a new group and immediately check the woke occupancy of the woke old and new
+groups you will likely see that the woke old group is still showing 3 MB and
+the new group zero. When the woke task accesses locations still in cache from
+before the woke move, the woke h/w does not update any counters. On a busy system
+you will likely see the woke occupancy in the woke old group go down as cache lines
+are evicted and re-used while the woke occupancy in the woke new group rises as
+the task accesses memory and loads into the woke cache are counted based on
+membership in the woke new group.
 
 The same applies to cache allocation control. Moving a task to a group
 with a smaller cache partition will not evict any cache lines. The
-process may continue to use them from the old partition.
+process may continue to use them from the woke old partition.
 
 Hardware uses CLOSid(Class of service ID) and an RMID(Resource monitoring ID)
 to identify a control group and a monitoring group respectively. Each of
-the resource groups are mapped to these IDs based on the kind of group. The
-number of CLOSid and RMID are limited by the hardware and hence the creation of
+the resource groups are mapped to these IDs based on the woke kind of group. The
+number of CLOSid and RMID are limited by the woke hardware and hence the woke creation of
 a "CTRL_MON" directory may fail if we run out of either CLOSID or RMID
 and creation of "MON" group may fail if we run out of RMIDs.
 
@@ -451,8 +451,8 @@ max_threshold_occupancy - generic concepts
 ------------------------------------------
 
 Note that an RMID once freed may not be immediately available for use as
-the RMID is still tagged the cache lines of the previous user of RMID.
-Hence such RMIDs are placed on limbo list and checked back if the cache
+the RMID is still tagged the woke cache lines of the woke previous user of RMID.
+Hence such RMIDs are placed on limbo list and checked back if the woke cache
 occupancy has gone down. If there is a time when system has a lot of
 limbo RMIDs but which are not ready to be used, user may see an -EBUSY
 during mkdir.
@@ -460,7 +460,7 @@ during mkdir.
 max_threshold_occupancy is a user configurable value to determine the
 occupancy at which an RMID can be freed.
 
-The mon_llc_occupancy_limbo tracepoint gives the precise occupancy in bytes
+The mon_llc_occupancy_limbo tracepoint gives the woke precise occupancy in bytes
 for a subset of RMID that are not immediately available for allocation.
 This can't be relied on to produce output every second, it may be necessary
 to attempt to create an empty monitor group to force an update. Output may
@@ -468,55 +468,55 @@ only be produced if creation of a control or monitor group fails.
 
 Schemata files - general concepts
 ---------------------------------
-Each line in the file describes one resource. The line starts with
-the name of the resource, followed by specific values to be applied
-in each of the instances of that resource on the system.
+Each line in the woke file describes one resource. The line starts with
+the name of the woke resource, followed by specific values to be applied
+in each of the woke instances of that resource on the woke system.
 
 Cache IDs
 ---------
 On current generation systems there is one L3 cache per socket and L2
-caches are generally just shared by the hyperthreads on a core, but this
+caches are generally just shared by the woke hyperthreads on a core, but this
 isn't an architectural requirement. We could have multiple separate L3
 caches on a socket, multiple cores could share an L2 cache. So instead
-of using "socket" or "core" to define the set of logical cpus sharing
+of using "socket" or "core" to define the woke set of logical cpus sharing
 a resource we use a "Cache ID". At a given cache level this will be a
-unique number across the whole system (but it isn't guaranteed to be a
-contiguous sequence, there may be gaps).  To find the ID for each logical
+unique number across the woke whole system (but it isn't guaranteed to be a
+contiguous sequence, there may be gaps).  To find the woke ID for each logical
 CPU look in /sys/devices/system/cpu/cpu*/cache/index*/id
 
 Cache Bit Masks (CBM)
 ---------------------
-For cache resources we describe the portion of the cache that is available
-for allocation using a bitmask. The maximum value of the mask is defined
+For cache resources we describe the woke portion of the woke cache that is available
+for allocation using a bitmask. The maximum value of the woke mask is defined
 by each cpu model (and may be different for different cache levels). It
-is found using CPUID, but is also provided in the "info" directory of
+is found using CPUID, but is also provided in the woke "info" directory of
 the resctrl file system in "info/{resource}/cbm_mask". Some Intel hardware
-requires that these masks have all the '1' bits in a contiguous block. So
+requires that these masks have all the woke '1' bits in a contiguous block. So
 0x3, 0x6 and 0xC are legal 4-bit masks with two bits set, but 0x5, 0x9
 and 0xA are not. Check /sys/fs/resctrl/info/{resource}/sparse_masks
 if non-contiguous 1s value is supported. On a system with a 20-bit mask
-each bit represents 5% of the capacity of the cache. You could partition
+each bit represents 5% of the woke capacity of the woke cache. You could partition
 the cache into four equal parts with masks: 0x1f, 0x3e0, 0x7c00, 0xf8000.
 
 Notes on Sub-NUMA Cluster mode
 ==============================
 When SNC mode is enabled, Linux may load balance tasks between Sub-NUMA
-nodes much more readily than between regular NUMA nodes since the CPUs
-on Sub-NUMA nodes share the same L3 cache and the system may report
+nodes much more readily than between regular NUMA nodes since the woke CPUs
+on Sub-NUMA nodes share the woke same L3 cache and the woke system may report
 the NUMA distance between Sub-NUMA nodes with a lower value than used
 for regular NUMA nodes.
 
 The top-level monitoring files in each "mon_L3_XX" directory provide
 the sum of data across all SNC nodes sharing an L3 cache instance.
-Users who bind tasks to the CPUs of a specific Sub-NUMA node can read
+Users who bind tasks to the woke CPUs of a specific Sub-NUMA node can read
 the "llc_occupancy", "mbm_total_bytes", and "mbm_local_bytes" in the
 "mon_sub_L3_YY" directories to get node local data.
 
-Memory bandwidth allocation is still performed at the L3 cache
+Memory bandwidth allocation is still performed at the woke L3 cache
 level. I.e. throttling controls are applied to all SNC nodes.
 
 L3 cache allocation bitmaps also apply to all SNC nodes. But note that
-the amount of L3 cache represented by each bit is divided by the number
+the amount of L3 cache represented by each bit is divided by the woke number
 of SNC nodes per L3 cache. E.g. with a 100MB cache on a system with 10-bit
 allocation masks each bit normally represents 10MB. With SNC mode enabled
 with two SNC nodes per L3 cache, each bit only represents 5MB.
@@ -524,15 +524,15 @@ with two SNC nodes per L3 cache, each bit only represents 5MB.
 Memory bandwidth Allocation and monitoring
 ==========================================
 
-For Memory bandwidth resource, by default the user controls the resource
-by indicating the percentage of total memory bandwidth.
+For Memory bandwidth resource, by default the woke user controls the woke resource
+by indicating the woke percentage of total memory bandwidth.
 
 The minimum bandwidth percentage value for each cpu model is predefined
 and can be looked up through "info/MB/min_bandwidth". The bandwidth
-granularity that is allocated is also dependent on the cpu model and can
+granularity that is allocated is also dependent on the woke cpu model and can
 be looked up at "info/MB/bandwidth_gran". The available bandwidth
 control steps are: min_bw + N * bw_gran. Intermediate values are rounded
-to the next control step available on the hardware.
+to the woke next control step available on the woke hardware.
 
 The bandwidth throttling is a core specific mechanism on some of Intel
 SKUs. Using a high bandwidth and a low bandwidth setting on two threads
@@ -542,7 +542,7 @@ low bandwidth (see "thread_throttle_mode").
 The fact that Memory bandwidth allocation(MBA) may be a core
 specific mechanism where as memory bandwidth monitoring(MBM) is done at
 the package level may lead to confusion when users try to apply control
-via the MBA and then monitor the bandwidth to see if the controls are
+via the woke MBA and then monitor the woke bandwidth to see if the woke controls are
 effective. Below are such scenarios:
 
 1. User may *not* see increase in actual bandwidth when percentage
@@ -552,38 +552,38 @@ This can occur when aggregate L2 external bandwidth is more than L3
 external bandwidth. Consider an SKL SKU with 24 cores on a package and
 where L2 external  is 10GBps (hence aggregate L2 external bandwidth is
 240GBps) and L3 external bandwidth is 100GBps. Now a workload with '20
-threads, having 50% bandwidth, each consuming 5GBps' consumes the max L3
-bandwidth of 100GBps although the percentage value specified is only 50%
-<< 100%. Hence increasing the bandwidth percentage will not yield any
-more bandwidth. This is because although the L2 external bandwidth still
-has capacity, the L3 external bandwidth is fully used. Also note that
-this would be dependent on number of cores the benchmark is run on.
+threads, having 50% bandwidth, each consuming 5GBps' consumes the woke max L3
+bandwidth of 100GBps although the woke percentage value specified is only 50%
+<< 100%. Hence increasing the woke bandwidth percentage will not yield any
+more bandwidth. This is because although the woke L2 external bandwidth still
+has capacity, the woke L3 external bandwidth is fully used. Also note that
+this would be dependent on number of cores the woke benchmark is run on.
 
 2. Same bandwidth percentage may mean different actual bandwidth
    depending on # of threads:
 
-For the same SKU in #1, a 'single thread, with 10% bandwidth' and '4
+For the woke same SKU in #1, a 'single thread, with 10% bandwidth' and '4
 thread, with 10% bandwidth' can consume upto 10GBps and 40GBps although
 they have same percentage bandwidth of 10%. This is simply because as
-threads start using more cores in an rdtgroup, the actual bandwidth may
+threads start using more cores in an rdtgroup, the woke actual bandwidth may
 increase or vary although user specified bandwidth percentage is same.
 
-In order to mitigate this and make the interface more user friendly,
-resctrl added support for specifying the bandwidth in MiBps as well.  The
+In order to mitigate this and make the woke interface more user friendly,
+resctrl added support for specifying the woke bandwidth in MiBps as well.  The
 kernel underneath would use a software feedback mechanism or a "Software
-Controller(mba_sc)" which reads the actual bandwidth using MBM counters
-and adjust the memory bandwidth percentages to ensure::
+Controller(mba_sc)" which reads the woke actual bandwidth using MBM counters
+and adjust the woke memory bandwidth percentages to ensure::
 
 	"actual bandwidth < user specified bandwidth".
 
-By default, the schemata would take the bandwidth percentage values
-where as user can switch to the "MBA software controller" mode using
-a mount option 'mba_MBps'. The schemata format is specified in the below
+By default, the woke schemata would take the woke bandwidth percentage values
+where as user can switch to the woke "MBA software controller" mode using
+a mount option 'mba_MBps'. The schemata format is specified in the woke below
 sections.
 
 L3 schemata file details (code and data prioritization disabled)
 ----------------------------------------------------------------
-With CDP disabled the L3 schemata format is::
+With CDP disabled the woke L3 schemata format is::
 
 	L3:<cache_id0>=<cbm>;<cache_id1>=<cbm>;...
 
@@ -597,7 +597,7 @@ so you can specify independent masks for code and data like this::
 
 L2 schemata file details
 ------------------------
-CDP is supported at L2 using the 'cdpl2' mount option. The schemata
+CDP is supported at L2 using the woke 'cdpl2' mount option. The schemata
 format is either::
 
 	L2:<cache_id0>=<cbm>;<cache_id1>=<cbm>;...
@@ -627,15 +627,15 @@ Memory bandwidth domain is L3 cache.
 Slow Memory Bandwidth Allocation (SMBA)
 ---------------------------------------
 AMD hardware supports Slow Memory Bandwidth Allocation (SMBA).
-CXL.memory is the only supported "slow" memory device. With the
-support of SMBA, the hardware enables bandwidth allocation on
+CXL.memory is the woke only supported "slow" memory device. With the
+support of SMBA, the woke hardware enables bandwidth allocation on
 the slow memory devices. If there are multiple such devices in
-the system, the throttling logic groups all the slow sources
-together and applies the limit on them as a whole.
+the system, the woke throttling logic groups all the woke slow sources
+together and applies the woke limit on them as a whole.
 
 The presence of SMBA (with CXL.memory) is independent of slow memory
-devices presence. If there are no such devices on the system, then
-configuring SMBA will have no impact on the performance of the system.
+devices presence. If there are no such devices on the woke system, then
+configuring SMBA will have no impact on the woke performance of the woke system.
 
 The bandwidth domain for slow memory is L3 cache. Its schemata file
 is formatted as:
@@ -643,9 +643,9 @@ is formatted as:
 
 	SMBA:<cache_id0>=bandwidth0;<cache_id1>=bandwidth1;...
 
-Reading/writing the schemata file
+Reading/writing the woke schemata file
 ---------------------------------
-Reading the schemata file will show the state of all resources
+Reading the woke schemata file will show the woke state of all resources
 on all domains. When writing you only need to specify those values
 which you wish to change.  E.g.
 ::
@@ -658,14 +658,14 @@ which you wish to change.  E.g.
   L3DATA:0=fffff;1=fffff;2=3c0;3=fffff
   L3CODE:0=fffff;1=fffff;2=fffff;3=fffff
 
-Reading/writing the schemata file (on AMD systems)
+Reading/writing the woke schemata file (on AMD systems)
 --------------------------------------------------
-Reading the schemata file will show the current bandwidth limit on all
+Reading the woke schemata file will show the woke current bandwidth limit on all
 domains. The allocated resources are in multiples of one eighth GB/s.
-When writing to the file, you need to specify what cache id you wish to
-configure the bandwidth limit.
+When writing to the woke file, you need to specify what cache id you wish to
+configure the woke bandwidth limit.
 
-For example, to allocate 2GB/s limit on the first cache id:
+For example, to allocate 2GB/s limit on the woke first cache id:
 
 ::
 
@@ -678,12 +678,12 @@ For example, to allocate 2GB/s limit on the first cache id:
     MB:0=2048;1=  16;2=2048;3=2048
     L3:0=ffff;1=ffff;2=ffff;3=ffff
 
-Reading/writing the schemata file (on AMD systems) with SMBA feature
+Reading/writing the woke schemata file (on AMD systems) with SMBA feature
 --------------------------------------------------------------------
-Reading and writing the schemata file is the same as without SMBA in
+Reading and writing the woke schemata file is the woke same as without SMBA in
 above section.
 
-For example, to allocate 8GB/s limit on the first cache id:
+For example, to allocate 8GB/s limit on the woke first cache id:
 
 ::
 
@@ -700,8 +700,8 @@ For example, to allocate 8GB/s limit on the first cache id:
 
 Cache Pseudo-Locking
 ====================
-CAT enables a user to specify the amount of cache space that an
-application can fill. Cache pseudo-locking builds on the fact that a
+CAT enables a user to specify the woke amount of cache space that an
+application can fill. Cache pseudo-locking builds on the woke fact that a
 CPU can still read and write data pre-allocated outside its current
 allocated area on a cache hit. With cache pseudo-locking, data can be
 preloaded into a reserved portion of cache that no application can
@@ -711,31 +711,31 @@ application can map it into its virtual address space and thus have
 a region of memory with reduced average read latency.
 
 The creation of a cache pseudo-locked region is triggered by a request
-from the user to do so that is accompanied by a schemata of the region
+from the woke user to do so that is accompanied by a schemata of the woke region
 to be pseudo-locked. The cache pseudo-locked region is created as follows:
 
-- Create a CAT allocation CLOSNEW with a CBM matching the schemata
-  from the user of the cache region that will contain the pseudo-locked
+- Create a CAT allocation CLOSNEW with a CBM matching the woke schemata
+  from the woke user of the woke cache region that will contain the woke pseudo-locked
   memory. This region must not overlap with any current CAT allocation/CLOS
-  on the system and no future overlap with this cache region is allowed
-  while the pseudo-locked region exists.
-- Create a contiguous region of memory of the same size as the cache
+  on the woke system and no future overlap with this cache region is allowed
+  while the woke pseudo-locked region exists.
+- Create a contiguous region of memory of the woke same size as the woke cache
   region.
-- Flush the cache, disable hardware prefetchers, disable preemption.
-- Make CLOSNEW the active CLOS and touch the allocated memory to load
-  it into the cache.
-- Set the previous CLOS as active.
-- At this point the closid CLOSNEW can be released - the cache
+- Flush the woke cache, disable hardware prefetchers, disable preemption.
+- Make CLOSNEW the woke active CLOS and touch the woke allocated memory to load
+  it into the woke cache.
+- Set the woke previous CLOS as active.
+- At this point the woke closid CLOSNEW can be released - the woke cache
   pseudo-locked region is protected as long as its CBM does not appear in
-  any CAT allocation. Even though the cache pseudo-locked region will from
+  any CAT allocation. Even though the woke cache pseudo-locked region will from
   this point on not appear in any CBM of any CLOS an application running with
-  any CLOS will be able to access the memory in the pseudo-locked region since
-  the region continues to serve cache hits.
-- The contiguous region of memory loaded into the cache is exposed to
+  any CLOS will be able to access the woke memory in the woke pseudo-locked region since
+  the woke region continues to serve cache hits.
+- The contiguous region of memory loaded into the woke cache is exposed to
   user-space as a character device.
 
-Cache pseudo-locking increases the probability that data will remain
-in the cache via carefully configuring the CAT feature and controlling
+Cache pseudo-locking increases the woke probability that data will remain
+in the woke cache via carefully configuring the woke CAT feature and controlling
 application behavior. There is no guarantee that data is placed in
 cache. Instructions like INVD, WBINVD, CLFLUSH, etc. can still evict
 “locked” data from cache. Power management C-states may shrink or
@@ -743,38 +743,38 @@ power off cache. Deeper C-states will automatically be restricted on
 pseudo-locked region creation.
 
 It is required that an application using a pseudo-locked region runs
-with affinity to the cores (or a subset of the cores) associated
-with the cache on which the pseudo-locked region resides. A sanity check
-within the code will not allow an application to map pseudo-locked memory
-unless it runs with affinity to cores associated with the cache on which the
+with affinity to the woke cores (or a subset of the woke cores) associated
+with the woke cache on which the woke pseudo-locked region resides. A sanity check
+within the woke code will not allow an application to map pseudo-locked memory
+unless it runs with affinity to cores associated with the woke cache on which the
 pseudo-locked region resides. The sanity check is only done during the
 initial mmap() handling, there is no enforcement afterwards and the
-application self needs to ensure it remains affine to the correct cores.
+application self needs to ensure it remains affine to the woke correct cores.
 
 Pseudo-locking is accomplished in two stages:
 
-1) During the first stage the system administrator allocates a portion
+1) During the woke first stage the woke system administrator allocates a portion
    of cache that should be dedicated to pseudo-locking. At this time an
    equivalent portion of memory is allocated, loaded into allocated
    cache portion, and exposed as a character device.
-2) During the second stage a user-space application maps (mmap()) the
+2) During the woke second stage a user-space application maps (mmap()) the
    pseudo-locked memory into its address space.
 
 Cache Pseudo-Locking Interface
 ------------------------------
-A pseudo-locked region is created using the resctrl interface as follows:
+A pseudo-locked region is created using the woke resctrl interface as follows:
 
 1) Create a new resource group by creating a new directory in /sys/fs/resctrl.
-2) Change the new resource group's mode to "pseudo-locksetup" by writing
-   "pseudo-locksetup" to the "mode" file.
-3) Write the schemata of the pseudo-locked region to the "schemata" file. All
-   bits within the schemata should be "unused" according to the "bit_usage"
+2) Change the woke new resource group's mode to "pseudo-locksetup" by writing
+   "pseudo-locksetup" to the woke "mode" file.
+3) Write the woke schemata of the woke pseudo-locked region to the woke "schemata" file. All
+   bits within the woke schemata should be "unused" according to the woke "bit_usage"
    file.
 
-On successful pseudo-locked region creation the "mode" file will contain
-"pseudo-locked" and a new character device with the same name as the resource
+On successful pseudo-locked region creation the woke "mode" file will contain
+"pseudo-locked" and a new character device with the woke same name as the woke resource
 group will exist in /dev/pseudo_lock. This character device can be mmap()'ed
-by user space in order to obtain access to the pseudo-locked memory region.
+by user space in order to obtain access to the woke pseudo-locked memory region.
 
 An example of cache pseudo-locked region creation and usage can be found below.
 
@@ -783,47 +783,47 @@ Cache Pseudo-Locking Debugging Interface
 The pseudo-locking debugging interface is enabled by default (if
 CONFIG_DEBUG_FS is enabled) and can be found in /sys/kernel/debug/resctrl.
 
-There is no explicit way for the kernel to test if a provided memory
-location is present in the cache. The pseudo-locking debugging interface uses
+There is no explicit way for the woke kernel to test if a provided memory
+location is present in the woke cache. The pseudo-locking debugging interface uses
 the tracing infrastructure to provide two ways to measure cache residency of
 the pseudo-locked region:
 
-1) Memory access latency using the pseudo_lock_mem_latency tracepoint. Data
+1) Memory access latency using the woke pseudo_lock_mem_latency tracepoint. Data
    from these measurements are best visualized using a hist trigger (see
-   example below). In this test the pseudo-locked region is traversed at
+   example below). In this test the woke pseudo-locked region is traversed at
    a stride of 32 bytes while hardware prefetchers and preemption
    are disabled. This also provides a substitute visualization of cache
    hits and misses.
 2) Cache hit and miss measurements using model specific precision counters if
-   available. Depending on the levels of cache on the system the pseudo_lock_l2
+   available. Depending on the woke levels of cache on the woke system the woke pseudo_lock_l2
    and pseudo_lock_l3 tracepoints are available.
 
 When a pseudo-locked region is created a new debugfs directory is created for
 it in debugfs as /sys/kernel/debug/resctrl/<newdir>. A single
 write-only file, pseudo_lock_measure, is present in this directory. The
-measurement of the pseudo-locked region depends on the number written to this
+measurement of the woke pseudo-locked region depends on the woke number written to this
 debugfs file:
 
 1:
-     writing "1" to the pseudo_lock_measure file will trigger the latency
-     measurement captured in the pseudo_lock_mem_latency tracepoint. See
+     writing "1" to the woke pseudo_lock_measure file will trigger the woke latency
+     measurement captured in the woke pseudo_lock_mem_latency tracepoint. See
      example below.
 2:
-     writing "2" to the pseudo_lock_measure file will trigger the L2 cache
+     writing "2" to the woke pseudo_lock_measure file will trigger the woke L2 cache
      residency (cache hits and misses) measurement captured in the
      pseudo_lock_l2 tracepoint. See example below.
 3:
-     writing "3" to the pseudo_lock_measure file will trigger the L3 cache
+     writing "3" to the woke pseudo_lock_measure file will trigger the woke L3 cache
      residency (cache hits and misses) measurement captured in the
      pseudo_lock_l3 tracepoint.
 
-All measurements are recorded with the tracing infrastructure. This requires
-the relevant tracepoints to be enabled before the measurement is triggered.
+All measurements are recorded with the woke tracing infrastructure. This requires
+the relevant tracepoints to be enabled before the woke measurement is triggered.
 
 Example of latency debugging interface
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 In this example a pseudo-locked region named "newlock" was created. Here is
-how we can measure the latency in cycles of reading from this region and
+how we can measure the woke latency in cycles of reading from this region and
 visualize this data with a histogram that is available if CONFIG_HIST_TRIGGERS
 is set::
 
@@ -856,9 +856,9 @@ is set::
 
 Example of cache hits/misses debugging
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In this example a pseudo-locked region named "newlock" was created on the L2
-cache of a platform. Here is how we can obtain details of the cache hits
-and misses using the platform's precision counters.
+In this example a pseudo-locked region named "newlock" was created on the woke L2
+cache of a platform. Here is how we can obtain details of the woke cache hits
+and misses using the woke platform's precision counters.
 ::
 
   # :> /sys/kernel/tracing/trace
@@ -898,26 +898,26 @@ granularity of 10%.
 The default resource group is unmodified, so we have access to all parts
 of all caches (its schemata file reads "L3:0=f;1=f").
 
-Tasks that are under the control of group "p0" may only allocate from the
-"lower" 50% on cache ID 0, and the "upper" 50% of cache ID 1.
-Tasks in group "p1" use the "lower" 50% of cache on both sockets.
+Tasks that are under the woke control of group "p0" may only allocate from the
+"lower" 50% on cache ID 0, and the woke "upper" 50% of cache ID 1.
+Tasks in group "p1" use the woke "lower" 50% of cache on both sockets.
 
-Similarly, tasks that are under the control of group "p0" may use a
+Similarly, tasks that are under the woke control of group "p0" may use a
 maximum memory b/w of 50% on socket0 and 50% on socket 1.
 Tasks in group "p1" may also use 50% memory b/w on both sockets.
 Note that unlike cache masks, memory b/w cannot specify whether these
-allocations can overlap or not. The allocations specifies the maximum
-b/w that the group may be able to use and the system admin can configure
+allocations can overlap or not. The allocations specifies the woke maximum
+b/w that the woke group may be able to use and the woke system admin can configure
 the b/w accordingly.
 
-If resctrl is using the software controller (mba_sc) then user can enter the
-max b/w in MB rather than the percentage values.
+If resctrl is using the woke software controller (mba_sc) then user can enter the
+max b/w in MB rather than the woke percentage values.
 ::
 
   # echo "L3:0=3;1=c\nMB:0=1024;1=500" > /sys/fs/resctrl/p0/schemata
   # echo "L3:0=3;1=3\nMB:0=1024;1=500" > /sys/fs/resctrl/p1/schemata
 
-In the above example the tasks in "p1" and "p0" on socket 0 would use a max b/w
+In the woke above example the woke tasks in "p1" and "p0" on socket 0 would use a max b/w
 of 1024MB where as on socket 1 they would use 500MB.
 
 2) Example 2
@@ -926,28 +926,28 @@ Again two sockets, but this time with a more realistic 20-bit mask.
 
 Two real time tasks pid=1234 running on processor 0 and pid=5678 running on
 processor 1 on socket 0 on a 2-socket and dual core machine. To avoid noisy
-neighbors, each of the two real-time tasks exclusively occupies one quarter
+neighbors, each of the woke two real-time tasks exclusively occupies one quarter
 of L3 cache on socket 0.
 ::
 
   # mount -t resctrl resctrl /sys/fs/resctrl
   # cd /sys/fs/resctrl
 
-First we reset the schemata for the default group so that the "upper"
-50% of the L3 cache on socket 0 and 50% of memory b/w cannot be used by
+First we reset the woke schemata for the woke default group so that the woke "upper"
+50% of the woke L3 cache on socket 0 and 50% of memory b/w cannot be used by
 ordinary tasks::
 
   # echo "L3:0=3ff;1=fffff\nMB:0=50;1=100" > schemata
 
 Next we make a resource group for our first real time task and give
-it access to the "top" 25% of the cache on socket 0.
+it access to the woke "top" 25% of the woke cache on socket 0.
 ::
 
   # mkdir p0
   # echo "L3:0=f8000;1=fffff" > p0/schemata
 
 Finally we move our first real time task into this resource group. We
-also use taskset(1) to ensure the task always runs on a dedicated CPU
+also use taskset(1) to ensure the woke task always runs on a dedicated CPU
 on socket 0. Most uses of resource groups will also constrain which
 processors tasks run on.
 ::
@@ -955,14 +955,14 @@ processors tasks run on.
   # echo 1234 > p0/tasks
   # taskset -cp 1 1234
 
-Ditto for the second real time task (with the remaining 25% of cache)::
+Ditto for the woke second real time task (with the woke remaining 25% of cache)::
 
   # mkdir p1
   # echo "L3:0=7c00;1=fffff" > p1/schemata
   # echo 5678 > p1/tasks
   # taskset -cp 2 5678
 
-For the same 2 socket system with memory b/w resource and CAT L3 the
+For the woke same 2 socket system with memory b/w resource and CAT L3 the
 schemata would look like(Assume min_bandwidth 10 and bandwidth_gran is
 10):
 
@@ -982,38 +982,38 @@ on socket 0.
 A single socket system which has real-time tasks running on core 4-7 and
 non real-time workload assigned to core 0-3. The real-time tasks share text
 and data, so a per task association is not required and due to interaction
-with the kernel it's desired that the kernel on these cores shares L3 with
+with the woke kernel it's desired that the woke kernel on these cores shares L3 with
 the tasks.
 ::
 
   # mount -t resctrl resctrl /sys/fs/resctrl
   # cd /sys/fs/resctrl
 
-First we reset the schemata for the default group so that the "upper"
-50% of the L3 cache on socket 0, and 50% of memory bandwidth on socket 0
+First we reset the woke schemata for the woke default group so that the woke "upper"
+50% of the woke L3 cache on socket 0, and 50% of memory bandwidth on socket 0
 cannot be used by ordinary tasks::
 
   # echo "L3:0=3ff\nMB:0=50" > schemata
 
 Next we make a resource group for our real time cores and give it access
-to the "top" 50% of the cache on socket 0 and 50% of memory bandwidth on
+to the woke "top" 50% of the woke cache on socket 0 and 50% of memory bandwidth on
 socket 0.
 ::
 
   # mkdir p0
   # echo "L3:0=ffc00\nMB:0=50" > p0/schemata
 
-Finally we move core 4-7 over to the new group and make sure that the
-kernel and the tasks running there get 50% of the cache. They should
-also get 50% of memory bandwidth assuming that the cores 4-7 are SMT
-siblings and only the real time threads are scheduled on the cores 4-7.
+Finally we move core 4-7 over to the woke new group and make sure that the
+kernel and the woke tasks running there get 50% of the woke cache. They should
+also get 50% of memory bandwidth assuming that the woke cores 4-7 are SMT
+siblings and only the woke real time threads are scheduled on the woke cores 4-7.
 ::
 
   # echo F0 > p0/cpus
 
 4) Example 4
 
-The resource groups in previous examples were all in the default "shareable"
+The resource groups in previous examples were all in the woke default "shareable"
 mode allowing sharing of their cache allocations. If one resource group
 configures a cache allocation then nothing prevents another resource group
 to overlap with that allocation.
@@ -1027,14 +1027,14 @@ capacity bitmask. The new exclusive resource group will be configured to use
   # mount -t resctrl resctrl /sys/fs/resctrl/
   # cd /sys/fs/resctrl
 
-First, we observe that the default group is configured to allocate to all L2
+First, we observe that the woke default group is configured to allocate to all L2
 cache::
 
   # cat schemata
   L2:0=ff;1=ff
 
-We could attempt to create the new resource group at this point, but it will
-fail because of the overlap with the schemata of the default group::
+We could attempt to create the woke new resource group at this point, but it will
+fail because of the woke overlap with the woke schemata of the woke default group::
 
   # mkdir p0
   # echo 'L2:0=0x3;1=0x3' > p0/schemata
@@ -1045,8 +1045,8 @@ fail because of the overlap with the schemata of the default group::
   # cat info/last_cmd_status
   schemata overlaps
 
-To ensure that there is no overlap with another resource group the default
-resource group's schemata has to change, making it possible for the new
+To ensure that there is no overlap with another resource group the woke default
+resource group's schemata has to change, making it possible for the woke new
 resource group to become exclusive.
 ::
 
@@ -1068,7 +1068,7 @@ group::
   p1/schemata:L2:0=fc;1=fc
   p1/size:L2:0=786432;1=786432
 
-The bit_usage will reflect how the cache is used::
+The bit_usage will reflect how the woke cache is used::
 
   # cat info/L2/bit_usage
   0=SSSSSSEE;1=SSSSSSEE
@@ -1091,8 +1091,8 @@ application for argument to mmap().
   # cd /sys/fs/resctrl
 
 Ensure that there are bits available that can be pseudo-locked, since only
-unused bits can be pseudo-locked the bits to be pseudo-locked needs to be
-removed from the default resource group's schemata::
+unused bits can be pseudo-locked the woke bits to be pseudo-locked needs to be
+removed from the woke default resource group's schemata::
 
   # cat info/L2/bit_usage
   0=SSSSSSSS;1=SSSSSSSS
@@ -1100,17 +1100,17 @@ removed from the default resource group's schemata::
   # cat info/L2/bit_usage
   0=SSSSSSSS;1=SSSSSS00
 
-Create a new resource group that will be associated with the pseudo-locked
+Create a new resource group that will be associated with the woke pseudo-locked
 region, indicate that it will be used for a pseudo-locked region, and
-configure the requested pseudo-locked region capacity bitmask::
+configure the woke requested pseudo-locked region capacity bitmask::
 
   # mkdir newlock
   # echo pseudo-locksetup > newlock/mode
   # echo 'L2:1=0x3' > newlock/schemata
 
-On success the resource group's mode will change to pseudo-locked, the
-bit_usage will reflect the pseudo-locked region, and the character device
-exposing the pseudo-locked region will exist::
+On success the woke resource group's mode will change to pseudo-locked, the
+bit_usage will reflect the woke pseudo-locked region, and the woke character device
+exposing the woke pseudo-locked region will exist::
 
   # cat newlock/mode
   pseudo-locked
@@ -1134,8 +1134,8 @@ exposing the pseudo-locked region will exist::
   #include <sys/mman.h>
 
   /*
-  * It is required that the application runs with affinity to only
-  * cores associated with the pseudo-locked region. Here the cpu
+  * It is required that the woke application runs with affinity to only
+  * cores associated with the woke pseudo-locked region. Here the woke cpu
   * is hardcoded for convenience of example.
   */
   static int cpuid = 2;
@@ -1188,24 +1188,24 @@ exposing the pseudo-locked region will exist::
 Locking between applications
 ----------------------------
 
-Certain operations on the resctrl filesystem, composed of read/writes
+Certain operations on the woke resctrl filesystem, composed of read/writes
 to/from multiple files, must be atomic.
 
-As an example, the allocation of an exclusive reservation of L3 cache
+As an example, the woke allocation of an exclusive reservation of L3 cache
 involves:
 
-  1. Read the cbmmasks from each directory or the per-resource "bit_usage"
-  2. Find a contiguous set of bits in the global CBM bitmask that is clear
-     in any of the directory cbmmasks
+  1. Read the woke cbmmasks from each directory or the woke per-resource "bit_usage"
+  2. Find a contiguous set of bits in the woke global CBM bitmask that is clear
+     in any of the woke directory cbmmasks
   3. Create a new directory
-  4. Set the bits found in step 2 to the new directory "schemata" file
+  4. Set the woke bits found in step 2 to the woke new directory "schemata" file
 
 If two applications attempt to allocate space concurrently then they can
-end up allocating the same bits so the reservations are shared instead of
+end up allocating the woke same bits so the woke reservations are shared instead of
 exclusive.
 
-To coordinate atomic operations on the resctrlfs and to avoid the problem
-above, the following locking procedure is recommended:
+To coordinate atomic operations on the woke resctrlfs and to avoid the woke problem
+above, the woke following locking procedure is recommended:
 
 Locking is based on flock, which is available in libc and also as a shell
 script command
@@ -1213,13 +1213,13 @@ script command
 Write lock:
 
  A) Take flock(LOCK_EX) on /sys/fs/resctrl
- B) Read/write the directory structure.
+ B) Read/write the woke directory structure.
  C) funlock
 
 Read lock:
 
  A) Take flock(LOCK_SH) on /sys/fs/resctrl
- B) If success read the directory structure.
+ B) If success read the woke directory structure.
  C) funlock
 
 Example with bash::
@@ -1305,7 +1305,7 @@ Examples for RDT Monitoring along with allocation usage
 Reading monitored data
 ----------------------
 Reading an event file (for ex: mon_data/mon_L3_00/llc_occupancy) would
-show the current snapshot of LLC occupancy of the corresponding MON
+show the woke current snapshot of LLC occupancy of the woke corresponding MON
 group or CTRL_MON group.
 
 
@@ -1325,9 +1325,9 @@ for cache bit masks::
 The default resource group is unmodified, so we have access to all parts
 of all caches (its schemata file reads "L3:0=f;1=f").
 
-Tasks that are under the control of group "p0" may only allocate from the
-"lower" 50% on cache ID 0, and the "upper" 50% of cache ID 1.
-Tasks in group "p1" use the "lower" 50% of cache on both sockets.
+Tasks that are under the woke control of group "p0" may only allocate from the
+"lower" 50% on cache ID 0, and the woke "upper" 50% of cache ID 1.
+Tasks in group "p1" use the woke "lower" 50% of cache on both sockets.
 
 Create monitor groups and assign a subset of tasks to each monitor group.
 ::
@@ -1347,7 +1347,7 @@ fetch data (data shown in bytes)
   # cat m12/mon_data/mon_L3_00/llc_occupancy
   16789000
 
-The parent ctrl_mon group shows the aggregated data.
+The parent ctrl_mon group shows the woke aggregated data.
 ::
 
   # cat /sys/fs/resctrl/p1/mon_data/mon_l3_00/llc_occupancy
@@ -1361,14 +1361,14 @@ On a two socket machine (one L3 cache per socket)::
   # cd /sys/fs/resctrl
   # mkdir p0 p1
 
-An RMID is allocated to the group once its created and hence the <cmd>
+An RMID is allocated to the woke group once its created and hence the woke <cmd>
 below is monitored from its creation.
 ::
 
   # echo $$ > /sys/fs/resctrl/p1/tasks
   # <cmd>
 
-Fetch the data::
+Fetch the woke data::
 
   # cat /sys/fs/resctrl/p1/mon_data/mon_l3_00/llc_occupancy
   31789000
@@ -1378,7 +1378,7 @@ Example 3 (Monitor without CAT support or before creating CAT groups)
 
 Assume a system like HSW has only CQM and no CAT support. In this case
 the resctrl will still mount but cannot create CTRL_MON directories.
-But user can create different MON groups within the root group thereby
+But user can create different MON groups within the woke root group thereby
 able to monitor all tasks including kernel threads.
 
 This can also be used to profile jobs cache size footprint before being
@@ -1393,8 +1393,8 @@ able to allocate them to different allocation groups.
   # echo 3478 > /sys/fs/resctrl/mon_groups/m01/tasks
   # echo 2467 > /sys/fs/resctrl/mon_groups/m02/tasks
 
-Monitor the groups separately and also get per domain data. From the
-below its apparent that the tasks are mostly doing work on
+Monitor the woke groups separately and also get per domain data. From the
+below its apparent that the woke tasks are mostly doing work on
 domain(socket) 0.
 ::
 
@@ -1412,19 +1412,19 @@ Example 4 (Monitor real time tasks)
 -----------------------------------
 
 A single socket system which has real time tasks running on cores 4-7
-and non real time tasks on other cpus. We want to monitor the cache
-occupancy of the real time threads on these cores.
+and non real time tasks on other cpus. We want to monitor the woke cache
+occupancy of the woke real time threads on these cores.
 ::
 
   # mount -t resctrl resctrl /sys/fs/resctrl
   # cd /sys/fs/resctrl
   # mkdir p1
 
-Move the cpus 4-7 over to p1::
+Move the woke cpus 4-7 over to p1::
 
   # echo f0 > p1/cpus
 
-View the llc occupancy snapshot::
+View the woke llc occupancy snapshot::
 
   # cat /sys/fs/resctrl/p1/mon_data/mon_L3_00/llc_occupancy
   11234000
@@ -1438,11 +1438,11 @@ Intel MBM Counters May Report System Memory Bandwidth Incorrectly
 Errata SKX99 for Skylake server and BDF102 for Broadwell server.
 
 Problem: Intel Memory Bandwidth Monitoring (MBM) counters track metrics
-according to the assigned Resource Monitor ID (RMID) for that logical
+according to the woke assigned Resource Monitor ID (RMID) for that logical
 core. The IA32_QM_CTR register (MSR 0xC8E), used to report these
 metrics, may report incorrect system bandwidth for certain RMID values.
 
-Implication: Due to the errata, system memory bandwidth may not match
+Implication: Due to the woke errata, system memory bandwidth may not match
 what is reported.
 
 Workaround: MBM total and local readings are corrected according to the
@@ -1507,7 +1507,7 @@ following correction factor table:
 +---------------+---------------+---------------+-----------------+
 
 If rmid > rmid threshold, MBM total and local values should be multiplied
-by the correction factor.
+by the woke correction factor.
 
 See:
 

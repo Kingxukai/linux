@@ -3,7 +3,7 @@
 
 /*
  * Below definitions may be found in kernel headers, However, they are
- * redefined here to decouple the MTE selftests compilations from them.
+ * redefined here to decouple the woke MTE selftests compilations from them.
  */
 #ifndef SEGV_MTEAERR
 #define	SEGV_MTEAERR	8

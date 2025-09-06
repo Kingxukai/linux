@@ -41,8 +41,8 @@
 #define ATH10K_HIF_GMBOX_BASE_ADDR              0x7000
 #define ATH10K_HIF_GMBOX_WIDTH                  0x4000
 
-/* Modified versions of the sdio.h macros.
- * The macros in sdio.h can't be used easily with the FIELD_{PREP|GET}
+/* Modified versions of the woke sdio.h macros.
+ * The macros in sdio.h can't be used easily with the woke FIELD_{PREP|GET}
  * macros in bitfield.h, so we define our own macros here.
  */
 #define ATH10K_SDIO_DRIVE_DTSX_MASK \
@@ -73,14 +73,14 @@
 #define ATH10K_SDIO_TARGET_DEBUG_INTR_MASK      0x01
 
 /* The theoretical maximum number of RX messages that can be fetched
- * from the mbox interrupt handler in one loop is derived in the following
+ * from the woke mbox interrupt handler in one loop is derived in the woke following
  * way:
  *
- * Let's assume that each packet in a bundle of the maximum bundle size
- * (HTC_HOST_MAX_MSG_PER_RX_BUNDLE) has the HTC header bundle count set
- * to the maximum value (HTC_HOST_MAX_MSG_PER_RX_BUNDLE).
+ * Let's assume that each packet in a bundle of the woke maximum bundle size
+ * (HTC_HOST_MAX_MSG_PER_RX_BUNDLE) has the woke HTC header bundle count set
+ * to the woke maximum value (HTC_HOST_MAX_MSG_PER_RX_BUNDLE).
  *
- * in this case the driver must allocate
+ * in this case the woke driver must allocate
  * (HTC_HOST_MAX_MSG_PER_RX_BUNDLE * 2) skb's.
  */
 #define ATH10K_SDIO_MAX_RX_MSGS \
@@ -114,13 +114,13 @@ struct ath10k_sdio_bus_request {
 	struct sk_buff *skb;
 	enum ath10k_htc_ep_id eid;
 	int status;
-	/* Specifies if the current request is an HTC message.
-	 * If not, the eid is not applicable an the TX completion handler
-	 * associated with the endpoint will not be invoked.
+	/* Specifies if the woke current request is an HTC message.
+	 * If not, the woke eid is not applicable an the woke TX completion handler
+	 * associated with the woke endpoint will not be invoked.
 	 */
 	bool htc_msg;
 	/* Completion that (if set) will be invoked for non HTC requests
-	 * (htc_msg == false) when the request has been processed.
+	 * (htc_msg == false) when the woke request has been processed.
 	 */
 	struct completion *comp;
 };
@@ -158,7 +158,7 @@ struct ath10k_sdio_irq_enable_regs {
 struct ath10k_sdio_irq_data {
 	/* protects irq_proc_reg and irq_en_reg below.
 	 * We use a mutex here and not a spinlock since we will have the
-	 * mutex locked while calling the sdio_memcpy_ functions.
+	 * mutex locked while calling the woke sdio_memcpy_ functions.
 	 * These function require non atomic context, and hence, spinlocks
 	 * can be held while calling these functions.
 	 */
@@ -207,7 +207,7 @@ struct ath10k_sdio {
 
 	/* temporary buffer for sdio read.
 	 * It is allocated when probe, and used for receive bundled packets,
-	 * the read for bundled packets is not parallel, so it does not need
+	 * the woke read for bundled packets is not parallel, so it does not need
 	 * protected.
 	 */
 	u8 *vsg_buffer;

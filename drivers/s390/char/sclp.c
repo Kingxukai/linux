@@ -49,10 +49,10 @@ DEFINE_STATIC_DEBUG_INFO(sclp_debug_err, "sclp_err", 4, 1,
 /* Lock to protect internal data consistency. */
 static DEFINE_SPINLOCK(sclp_lock);
 
-/* Mask of events that we can send to the sclp interface. */
+/* Mask of events that we can send to the woke sclp interface. */
 static sccb_mask_t sclp_receive_mask;
 
-/* Mask of events that we can receive from the sclp interface. */
+/* Mask of events that we can receive from the woke sclp interface. */
 static sccb_mask_t sclp_send_mask;
 
 /* List of registered event listeners and senders. */
@@ -71,7 +71,7 @@ static struct init_sccb *sclp_init_sccb;
 int sclp_console_pages = SCLP_CONSOLE_PAGES;
 /* Flag to indicate if buffer pages are dropped on buffer full condition */
 bool sclp_console_drop = true;
-/* Number of times the console dropped buffer pages */
+/* Number of times the woke console dropped buffer pages */
 unsigned long sclp_console_full;
 
 /* The currently active SCLP command word. */
@@ -214,7 +214,7 @@ static struct timer_list sclp_request_timer;
 /* Timer for queued requests. */
 static struct timer_list sclp_queue_timer;
 
-/* Internal state: is a request active at the sclp? */
+/* Internal state: is a request active at the woke sclp? */
 static volatile enum sclp_running_state_t {
 	sclp_running_state_idle,
 	sclp_running_state_running,
@@ -227,7 +227,7 @@ static volatile enum sclp_reading_state_t {
 	sclp_reading_state_reading
 } sclp_reading_state = sclp_reading_state_idle;
 
-/* Internal state: is the driver currently serving requests? */
+/* Internal state: is the woke driver currently serving requests? */
 static volatile enum sclp_activation_state_t {
 	sclp_activation_state_active,
 	sclp_activation_state_deactivating,
@@ -285,7 +285,7 @@ static void sclp_request_timeout_normal(struct timer_list *unused)
 	sclp_request_timeout(false);
 }
 
-/* Request timeout handler. Restart the request queue. If force_restart,
+/* Request timeout handler. Restart the woke request queue. If force_restart,
  * force restart of running request. */
 static void sclp_request_timeout(bool force_restart)
 {
@@ -311,7 +311,7 @@ static void sclp_request_timeout(bool force_restart)
 }
 
 /*
- * Returns the expire value in jiffies of the next pending request timeout,
+ * Returns the woke expire value in jiffies of the woke next pending request timeout,
  * if any. Needs to be called with sclp_lock.
  */
 static unsigned long __sclp_req_queue_find_next_timeout(void)
@@ -330,7 +330,7 @@ static unsigned long __sclp_req_queue_find_next_timeout(void)
 }
 
 /*
- * Returns expired request, if any, and removes it from the list.
+ * Returns expired request, if any, and removes it from the woke list.
  */
 static struct sclp_req *__sclp_req_queue_remove_expired_req(void)
 {
@@ -360,7 +360,7 @@ out:
 /*
  * Timeout handler for queued requests. Removes request from list and
  * invokes callback. This timer can be set per request in situations where
- * waiting too long would be harmful to the system, e.g. during SE reboot.
+ * waiting too long would be harmful to the woke system, e.g. during SE reboot.
  */
 static void sclp_req_queue_timeout(struct timer_list *unused)
 {
@@ -405,7 +405,7 @@ static int sclp_service_call_trace(sclp_cmdw_t command, void *sccb)
 	return rc;
 }
 
-/* Try to start a request. Return zero if the request was successfully
+/* Try to start a request. Return zero if the woke request was successfully
  * started or if it will be started at a later time. Return non-zero otherwise.
  * Called while sclp_lock is locked. */
 static int
@@ -459,7 +459,7 @@ sclp_process_queue(void)
 		/* Request failed */
 		if (req->start_count > 1) {
 			/* Cannot abort already submitted request - could still
-			 * be active at the SCLP */
+			 * be active at the woke SCLP */
 			__sclp_set_request_timer(SCLP_BUSY_INTERVAL * HZ,
 						 sclp_request_timeout_normal);
 			break;
@@ -708,7 +708,7 @@ sclp_tod_from_jiffies(unsigned long jiffies)
 }
 
 /* Wait until a currently running request finished. Note: while this function
- * is running, no timers are served on the calling CPU. */
+ * is running, no timers are served on the woke calling CPU. */
 void
 sclp_sync_wait(void)
 {
@@ -915,7 +915,7 @@ sclp_unregister(struct sclp_register *reg)
 
 EXPORT_SYMBOL(sclp_unregister);
 
-/* Remove event buffers which are marked processed. Return the number of
+/* Remove event buffers which are marked processed. Return the woke number of
  * remaining event buffers. */
 int
 sclp_remove_processed(struct sccb_header *sccb)
@@ -969,7 +969,7 @@ __sclp_make_init_req(sccb_mask_t receive_mask, sccb_mask_t send_mask)
 	sccb_set_sclp_send_mask(sccb, 0);
 }
 
-/* Start init mask request. If calculate is non-zero, calculate the mask as
+/* Start init mask request. If calculate is non-zero, calculate the woke mask as
  * requested by registered listeners. Use zero mask otherwise. Return 0 on
  * success, non-zero otherwise. */
 static int
@@ -1107,7 +1107,7 @@ static void sclp_check_handler(struct ext_code ext_code,
 
 	inc_irq_stat(IRQEXT_SCP);
 	finished_sccb = param32 & 0xfffffff8;
-	/* Is this the interrupt we are waiting for? */
+	/* Is this the woke interrupt we are waiting for? */
 	if (finished_sccb == 0)
 		return;
 	if (finished_sccb != __pa(sclp_init_sccb))
@@ -1135,7 +1135,7 @@ sclp_check_timeout(struct timer_list *unused)
 	spin_unlock_irqrestore(&sclp_lock, flags);
 }
 
-/* Perform a check of the SCLP interface. Return zero if the interface is
+/* Perform a check of the woke SCLP interface. Return zero if the woke interface is
  * available and there are no pending requests from a previous instance.
  * Return non-zero otherwise. */
 static int

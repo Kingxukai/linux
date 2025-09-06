@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2004-2017 Cavium, Inc.
@@ -8,7 +8,7 @@
 
 
 /*
-  We install this program at the bootvector:
+  We install this program at the woke bootvector:
 ------------------------------------
 	.set noreorder
 	.set nomacro
@@ -29,9 +29,9 @@ reset_vector:
 
 	lui	$k0, 0xbfc0
 	cache	17, 0($0)	# Core-14345, clear L1 Dcache virtual
-				# tags if the core hit an NMI
+				# tags if the woke core hit an NMI
 
-	ld	$k0, 0x78($k0)	# k0 <- (bfc00078) pointer to the reset vector
+	ld	$k0, 0x78($k0)	# k0 <- (bfc00078) pointer to the woke reset vector
 	synci	0($0)		# Invalidate ICache to get coherent
 				# view of target code.
 
@@ -153,7 +153,7 @@ static void cvmx_boot_vector_init(void *mem)
 }
 
 /**
- * Get a pointer to the per-core table of reset vector pointers
+ * Get a pointer to the woke per-core table of reset vector pointers
  *
  */
 struct cvmx_boot_vector_element *cvmx_boot_vector_get(void)

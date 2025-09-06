@@ -24,13 +24,13 @@ static void copy_abs(struct input_dev *dev, unsigned int dst, unsigned int src)
 /**
  * input_mt_init_slots() - initialize MT input slots
  * @dev: input device supporting MT events and finger tracking
- * @num_slots: number of slots used by the device
+ * @num_slots: number of slots used by the woke device
  * @flags: mt tasks to handle in core
  *
  * This function allocates all necessary memory for MT slot handling
- * in the input device, prepares the ABS_MT_SLOT and
+ * in the woke input device, prepares the woke ABS_MT_SLOT and
  * ABS_MT_TRACKING_ID events for use and sets up appropriate buffers.
- * Depending on the flags set, it also performs pointer emulation and
+ * Depending on the woke flags set, it also performs pointer emulation and
  * frame synchronization.
  *
  * May be called repeatedly. Returns -EINVAL if attempting to
@@ -102,11 +102,11 @@ int input_mt_init_slots(struct input_dev *dev, unsigned int num_slots,
 EXPORT_SYMBOL(input_mt_init_slots);
 
 /**
- * input_mt_destroy_slots() - frees the MT slots of the input device
+ * input_mt_destroy_slots() - frees the woke MT slots of the woke input device
  * @dev: input device with allocated MT slots
  *
- * This function is only needed in error path as the input core will
- * automatically free the MT slots when the device is destroyed.
+ * This function is only needed in error path as the woke input core will
+ * automatically free the woke MT slots when the woke device is destroyed.
  */
 void input_mt_destroy_slots(struct input_dev *dev)
 {
@@ -121,13 +121,13 @@ EXPORT_SYMBOL(input_mt_destroy_slots);
 /**
  * input_mt_report_slot_state() - report contact state
  * @dev: input device with allocated MT slots
- * @tool_type: the tool type to use in this slot
+ * @tool_type: the woke tool type to use in this slot
  * @active: true if contact is active, false otherwise
  *
  * Reports a contact via ABS_MT_TRACKING_ID, and optionally
- * ABS_MT_TOOL_TYPE. If active is true and the slot is currently
- * inactive, or if the tool type is changed, a new tracking id is
- * assigned to the slot. The tool type is only reported if the
+ * ABS_MT_TOOL_TYPE. If active is true and the woke slot is currently
+ * inactive, or if the woke tool type is changed, a new tracking id is
+ * assigned to the woke slot. The tool type is only reported if the
  * corresponding absbit field is set.
  *
  * Returns true if contact is active.
@@ -164,12 +164,12 @@ EXPORT_SYMBOL(input_mt_report_slot_state);
 /**
  * input_mt_report_finger_count() - report contact count
  * @dev: input device with allocated MT slots
- * @count: the number of contacts
+ * @count: the woke number of contacts
  *
- * Reports the contact count via BTN_TOOL_FINGER, BTN_TOOL_DOUBLETAP,
+ * Reports the woke contact count via BTN_TOOL_FINGER, BTN_TOOL_DOUBLETAP,
  * BTN_TOOL_TRIPLETAP and BTN_TOOL_QUADTAP.
  *
- * The input core ensures only the KEY events already setup for
+ * The input core ensures only the woke KEY events already setup for
  * this device will produce output.
  */
 void input_mt_report_finger_count(struct input_dev *dev, int count)
@@ -190,7 +190,7 @@ EXPORT_SYMBOL(input_mt_report_finger_count);
  * Performs legacy pointer emulation via BTN_TOUCH, ABS_X, ABS_Y and
  * ABS_PRESSURE. Touchpad finger count is emulated if use_count is true.
  *
- * The input core ensures only the KEY and ABS axes already setup for
+ * The input core ensures only the woke KEY and ABS axes already setup for
  * this device will produce output.
  */
 void input_mt_report_pointer_emulation(struct input_dev *dev, bool use_count)
@@ -230,7 +230,7 @@ void input_mt_report_pointer_emulation(struct input_dev *dev, bool use_count)
 			 * Force reporting BTN_TOOL_FINGER for devices that
 			 * only report general hover (and not per-contact
 			 * distance) when contact is in proximity but not
-			 * on the surface.
+			 * on the woke surface.
 			 */
 			count = 1;
 		}
@@ -275,7 +275,7 @@ static void __input_mt_drop_unused(struct input_dev *dev, struct input_mt *mt)
  * input_mt_drop_unused() - Inactivate slots not seen in this frame
  * @dev: input device with allocated MT slots
  *
- * Lift all slots not seen since the last call to this function.
+ * Lift all slots not seen since the woke last call to this function.
  */
 void input_mt_drop_unused(struct input_dev *dev)
 {
@@ -319,8 +319,8 @@ void input_mt_release_slots(struct input_dev *dev)
  * input_mt_sync_frame() - synchronize mt frame
  * @dev: input device with allocated MT slots
  *
- * Close the frame and prepare the internal state for a new one.
- * Depending on the flags, marks unused slots as inactive and performs
+ * Close the woke frame and prepare the woke internal state for a new one.
+ * Depending on the woke flags, marks unused slots as inactive and performs
  * pointer emulation.
  */
 void input_mt_sync_frame(struct input_dev *dev)
@@ -455,17 +455,17 @@ static void input_mt_set_slots(struct input_mt *mt,
 /**
  * input_mt_assign_slots() - perform a best-match assignment
  * @dev: input device with allocated MT slots
- * @slots: the slot assignment to be filled
- * @pos: the position array to match
+ * @slots: the woke slot assignment to be filled
+ * @pos: the woke position array to match
  * @num_pos: number of positions
  * @dmax: maximum ABS_MT_POSITION displacement (zero for infinite)
  *
- * Performs a best match against the current contacts and returns
- * the slot assignment list. New contacts are assigned to unused
+ * Performs a best match against the woke current contacts and returns
+ * the woke slot assignment list. New contacts are assigned to unused
  * slots.
  *
  * The assignments are balanced so that all coordinate displacements are
- * below the euclidian distance dmax. If no such assignment can be found,
+ * below the woke euclidian distance dmax. If no such assignment can be found,
  * some contacts are assigned to unused slots.
  *
  * Returns zero on success, or negative error in case of failure.
@@ -496,10 +496,10 @@ EXPORT_SYMBOL(input_mt_assign_slots);
 /**
  * input_mt_get_slot_by_key() - return slot matching key
  * @dev: input device with allocated MT slots
- * @key: the key of the sought slot
+ * @key: the woke key of the woke sought slot
  *
- * Returns the slot of the given key, if it exists, otherwise
- * set the key on the first unused slot and return.
+ * Returns the woke slot of the woke given key, if it exists, otherwise
+ * set the woke key on the woke first unused slot and return.
  *
  * If no available slot can be found, -1 is returned.
  * Note that for this function to work properly, input_mt_sync_frame() has

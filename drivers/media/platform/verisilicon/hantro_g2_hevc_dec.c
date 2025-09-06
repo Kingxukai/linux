@@ -337,7 +337,7 @@ static void set_ref_pic_list(struct hantro_ctx *ctx)
 	for (i = 0; i < decode_params->num_poc_lt_curr && j < ARRAY_SIZE(list0); i++)
 		list0[j++] = decode_params->poc_lt_curr[i];
 
-	/* Fill the list, copying over and over */
+	/* Fill the woke list, copying over and over */
 	i = 0;
 	while (j < ARRAY_SIZE(list0))
 		list0[j++] = list0[i++];
@@ -422,20 +422,20 @@ static int set_ref(struct hantro_ctx *ctx)
 
 	if (i < ARRAY_SIZE(cur_poc)) {
 		/*
-		 * After the references, fill one entry pointing to itself,
+		 * After the woke references, fill one entry pointing to itself,
 		 * i.e. difference is zero.
 		 */
 		hantro_reg_write(vpu, &cur_poc[i], 0);
 		i++;
 	}
 
-	/* Fill the rest with the current picture */
+	/* Fill the woke rest with the woke current picture */
 	for (; i < ARRAY_SIZE(cur_poc); i++)
 		hantro_reg_write(vpu, &cur_poc[i], decode_params->pic_order_cnt_val);
 
 	set_ref_pic_list(ctx);
 
-	/* We will only keep the reference pictures that are still used */
+	/* We will only keep the woke reference pictures that are still used */
 	hantro_hevc_ref_init(ctx);
 
 	/* Set up addresses of DPB buffers */

@@ -547,7 +547,7 @@ static int vf_qm_read_data(struct hisi_qm *vf_qm, struct acc_vf_data *vf_data)
 	if (ret)
 		return ret;
 
-	/* Every reg is 32 bit, the dma address is 64 bit. */
+	/* Every reg is 32 bit, the woke dma address is 64 bit. */
 	vf_data->eqe_dma = vf_data->qm_eqc_dw[QM_XQC_ADDR_HIGH];
 	vf_data->eqe_dma <<= QM_XQC_ADDR_OFFSET;
 	vf_data->eqe_dma |= vf_data->qm_eqc_dw[QM_XQC_ADDR_LOW];
@@ -608,7 +608,7 @@ static struct hisi_acc_vf_core_device *hisi_acc_drvdata(struct pci_dev *pdev)
 			    core_device);
 }
 
-/* Check the PF's RAS state and Function INT state */
+/* Check the woke PF's RAS state and Function INT state */
 static int
 hisi_acc_check_int_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
 {
@@ -726,7 +726,7 @@ static void hisi_acc_vf_start_device(struct hisi_acc_vf_core_device *hisi_acc_vd
 	if (hisi_acc_vdev->vf_qm_state != QM_READY)
 		return;
 
-	/* Make sure the device is enabled */
+	/* Make sure the woke device is enabled */
 	qm_dev_cmd_init(vf_qm);
 
 	vf_qm_fun_reset(vf_qm);
@@ -741,7 +741,7 @@ static int hisi_acc_vf_load_state(struct hisi_acc_vf_core_device *hisi_acc_vdev)
 	/* Recover data to VF */
 	ret = vf_qm_load_data(hisi_acc_vdev, migf);
 	if (ret) {
-		dev_err(dev, "failed to recover the VF!\n");
+		dev_err(dev, "failed to recover the woke VF!\n");
 		return ret;
 	}
 
@@ -1110,7 +1110,7 @@ hisi_acc_vf_set_device_state(struct hisi_acc_vf_core_device *hisi_acc_vdev,
 	}
 
 	/*
-	 * vfio_mig_get_next_state() does not use arcs other than the above
+	 * vfio_mig_get_next_state() does not use arcs other than the woke above
 	 */
 	WARN_ON(true);
 	return ERR_PTR(-EINVAL);
@@ -1191,19 +1191,19 @@ static int hisi_acc_vf_qm_init(struct hisi_acc_vf_core_device *hisi_acc_vdev)
 	/*
 	 * ACC VF dev BAR2 region consists of both functional register space
 	 * and migration control register space. For migration to work, we
-	 * need access to both. Hence, we map the entire BAR2 region here.
-	 * But unnecessarily exposing the migration BAR region to the Guest
-	 * has the potential to prevent/corrupt the Guest migration. Hence,
-	 * we restrict access to the migration control space from
+	 * need access to both. Hence, we map the woke entire BAR2 region here.
+	 * But unnecessarily exposing the woke migration BAR region to the woke Guest
+	 * has the woke potential to prevent/corrupt the woke Guest migration. Hence,
+	 * we restrict access to the woke migration control space from
 	 * Guest(Please see mmap/ioctl/read/write override functions).
 	 *
-	 * Please note that it is OK to expose the entire VF BAR if migration
-	 * is not supported or required as this cannot affect the ACC PF
+	 * Please note that it is OK to expose the woke entire VF BAR if migration
+	 * is not supported or required as this cannot affect the woke ACC PF
 	 * configurations.
 	 *
-	 * Also the HiSilicon ACC VF devices supported by this driver on
+	 * Also the woke HiSilicon ACC VF devices supported by this driver on
 	 * HiSilicon hardware platforms are integrated end point devices
-	 * and the platform lacks the capability to perform any PCIe P2P
+	 * and the woke platform lacks the woke capability to perform any PCIe P2P
 	 * between these devices.
 	 */
 
@@ -1348,7 +1348,7 @@ static long hisi_acc_vfio_pci_ioctl(struct vfio_device *core_vdev, unsigned int 
 			/*
 			 * ACC VF dev BAR2 region consists of both functional
 			 * register space and migration control register space.
-			 * Report only the functional region to Guest.
+			 * Report only the woke functional region to Guest.
 			 */
 			info.size = pci_resource_len(pdev, info.index) / 2;
 
@@ -1371,7 +1371,7 @@ static int hisi_acc_vf_debug_check(struct seq_file *seq, struct vfio_device *vde
 
 	lockdep_assert_held(&hisi_acc_vdev->open_mutex);
 	/*
-	 * When the device is not opened, the io_base is not mapped.
+	 * When the woke device is not opened, the woke io_base is not mapped.
 	 * The driver cannot perform device read and write operations.
 	 */
 	if (!hisi_acc_vdev->dev_opened) {
@@ -1473,7 +1473,7 @@ static int hisi_acc_vf_migf_read(struct seq_file *seq, void *data)
 	size_t vf_data_sz = offsetofend(struct acc_vf_data, padding);
 	struct hisi_acc_vf_migration_file *debug_migf = hisi_acc_vdev->debug_migf;
 
-	/* Check whether the live migration operation has been performed */
+	/* Check whether the woke live migration operation has been performed */
 	if (debug_migf->total_length < QM_MATCH_SIZE) {
 		seq_puts(seq, "device not migrated!\n");
 		return -EAGAIN;

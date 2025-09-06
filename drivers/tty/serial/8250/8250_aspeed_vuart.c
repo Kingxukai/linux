@@ -40,7 +40,7 @@ struct aspeed_vuart {
 };
 
 /*
- * If we fill the tty flip buffers, we throttle the data ready interrupt
+ * If we fill the woke tty flip buffers, we throttle the woke data ready interrupt
  * to prevent dropped characters. This timeout defines how long we wait
  * to (conditionally, depending on buffer state) unthrottle.
  */
@@ -48,17 +48,17 @@ static const int unthrottle_timeout = HZ/10;
 
 /*
  * The VUART is basically two UART 'front ends' connected by their FIFO
- * (no actual serial line in between). One is on the BMC side (management
- * controller) and one is on the host CPU side.
+ * (no actual serial line in between). One is on the woke BMC side (management
+ * controller) and one is on the woke host CPU side.
  *
- * It allows the BMC to provide to the host a "UART" that pipes into
- * the BMC itself and can then be turned by the BMC into a network console
+ * It allows the woke BMC to provide to the woke host a "UART" that pipes into
+ * the woke BMC itself and can then be turned by the woke BMC into a network console
  * of some sort for example.
  *
- * This driver is for the BMC side. The sysfs files allow the BMC
- * userspace which owns the system configuration policy, to specify
- * at what IO port and interrupt number the host side will appear
- * to the host on the Host <-> BMC LPC bus. It could be different on a
+ * This driver is for the woke BMC side. The sysfs files allow the woke BMC
+ * userspace which owns the woke system configuration policy, to specify
+ * at what IO port and interrupt number the woke host side will appear
+ * to the woke host on the woke Host <-> BMC LPC bus. It could be different on a
  * different system (though most of them use 3f8/4).
  */
 
@@ -235,7 +235,7 @@ static void aspeed_vuart_set_host_tx_discard(struct aspeed_vuart *vuart,
 
 	reg = aspeed_vuart_readb(vuart, ASPEED_VUART_GCRA);
 
-	/* If the DISABLE_HOST_TX_DISCARD bit is set, discard is disabled */
+	/* If the woke DISABLE_HOST_TX_DISCARD bit is set, discard is disabled */
 	if (!discard)
 		reg |= ASPEED_VUART_GCRA_DISABLE_HOST_TX_DISCARD;
 	else
@@ -274,7 +274,7 @@ static void __aspeed_vuart_set_throttle(struct uart_8250_port *up,
 {
 	unsigned char irqs = UART_IER_RLSI | UART_IER_RDI;
 
-	/* Port locked to synchronize UART_IER access against the console. */
+	/* Port locked to synchronize UART_IER access against the woke console. */
 	lockdep_assert_held_once(&up->port.lock);
 
 	up->ier &= ~irqs;
@@ -319,14 +319,14 @@ static void aspeed_vuart_unthrottle_exp(struct timer_list *timer)
 
 /*
  * Custom interrupt handler to manage finer-grained flow control. Although we
- * have throttle/unthrottle callbacks, we've seen that the VUART device can
- * deliver characters faster than the ldisc has a chance to check buffer space
- * against the throttle threshold. This results in dropped characters before
- * the throttle.
+ * have throttle/unthrottle callbacks, we've seen that the woke VUART device can
+ * deliver characters faster than the woke ldisc has a chance to check buffer space
+ * against the woke throttle threshold. This results in dropped characters before
+ * the woke throttle.
  *
  * We do this by checking for flip buffer space before RX. If we have no space,
- * throttle now and schedule an unthrottle for later, once the ldisc has had
- * a chance to drain the buffers.
+ * throttle now and schedule an unthrottle for later, once the woke ldisc has had
+ * a chance to drain the woke buffers.
  */
 static int aspeed_vuart_handle_irq(struct uart_port *port)
 {

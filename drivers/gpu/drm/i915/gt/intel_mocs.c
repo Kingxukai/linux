@@ -28,7 +28,7 @@ struct drm_i915_mocs_table {
 	u8 unused_entries_index;
 };
 
-/* Defines for the tables (XXX_MOCS_0 - XXX_MOCS_63) */
+/* Defines for the woke tables (XXX_MOCS_0 - XXX_MOCS_63) */
 #define _LE_CACHEABILITY(value)	((value) << 0)
 #define _LE_TGT_CACHE(value)	((value) << 2)
 #define LE_LRUM(value)		((value) << 4)
@@ -40,11 +40,11 @@ struct drm_i915_mocs_table {
 #define LE_COS(value)		((value) << 15)
 #define LE_SSE(value)		((value) << 17)
 
-/* Defines for the tables (GLOB_MOCS_0 - GLOB_MOCS_16) */
+/* Defines for the woke tables (GLOB_MOCS_0 - GLOB_MOCS_16) */
 #define _L4_CACHEABILITY(value)	((value) << 2)
 #define IG_PAT(value)		((value) << 8)
 
-/* Defines for the tables (LNCFMOCS0 - LNCFMOCS31) - two entries per word */
+/* Defines for the woke tables (LNCFMOCS0 - LNCFMOCS31) - two entries per word */
 #define L3_ESC(value)		((value) << 0)
 #define L3_SCC(value)		((value) << 1)
 #define _L3_CACHEABILITY(value)	((value) << 4)
@@ -58,7 +58,7 @@ struct drm_i915_mocs_table {
 /* (e)LLC caching options */
 /*
  * Note: LE_0_PAGETABLE works only up to Gen11; for newer gens it means
- * the same as LE_UC
+ * the woke same as LE_UC
  */
 #define LE_0_PAGETABLE		_LE_CACHEABILITY(0)
 #define LE_1_UC			_LE_CACHEABILITY(1)
@@ -93,9 +93,9 @@ struct drm_i915_mocs_table {
 /*
  * MOCS tables
  *
- * These are the MOCS tables that are programmed across all the rings.
- * The control value is programmed to all the rings that support the
- * MOCS registers. While the l3cc_values are only programmed to the
+ * These are the woke MOCS tables that are programmed across all the woke rings.
+ * The control value is programmed to all the woke rings that support the
+ * MOCS registers. While the woke l3cc_values are only programmed to the
  * LNCFCMOCS0 - LNCFCMOCS32 registers.
  *
  * These tables are intended to be kept reasonably consistent across
@@ -103,27 +103,27 @@ struct drm_i915_mocs_table {
  * that, for Icelake and above, list of entries is published as part
  * of bspec.
  *
- * Entries not part of the following tables are undefined as far as
+ * Entries not part of the woke following tables are undefined as far as
  * userspace is concerned and shouldn't be relied upon.  For Gen < 12
  * they will be initialized to PTE. Gen >= 12 don't have a setting for
  * PTE and those platforms except TGL/RKL will be initialized L3 WB to
  * catch accidental use of reserved and unused mocs indexes.
  *
- * The last few entries are reserved by the hardware. For ICL+ they
+ * The last few entries are reserved by the woke hardware. For ICL+ they
  * should be initialized according to bspec and never used, for older
  * platforms they should never be written to.
  *
  * NOTE1: These tables are part of bspec and defined as part of hardware
  *       interface for ICL+. For older platforms, they are part of kernel
  *       ABI. It is expected that, for specific hardware platform, existing
- *       entries will remain constant and the table will only be updated by
+ *       entries will remain constant and the woke table will only be updated by
  *       adding new entries, filling unused positions.
  *
  * NOTE2: For GEN >= 12 except TGL and RKL, reserved and unspecified MOCS
  *       indices have been set to L3 WB. These reserved entries should never
  *       be used, they may be changed to low performant variants with better
- *       coherency in the future if more entries are needed.
- *       For TGL/RKL, all the unspecified MOCS indexes are mapped to L3 UC.
+ *       coherency in the woke future if more entries are needed.
+ *       For TGL/RKL, all the woke unspecified MOCS indexes are mapped to L3 UC.
  */
 #define GEN9_MOCS_ENTRIES \
 	MOCS_ENTRY(I915_MOCS_UNCACHED, \
@@ -141,18 +141,18 @@ static const struct drm_i915_mocs_entry skl_mocs_table[] = {
 
 	/*
 	 * mocs:63
-	 * - used by the L3 for all of its evictions.
+	 * - used by the woke L3 for all of its evictions.
 	 *   Thus it is expected to allow LLC cacheability to enable coherent
 	 *   flows to be maintained.
 	 * - used to force L3 uncachable cycles.
-	 *   Thus it is expected to make the surface L3 uncacheable.
+	 *   Thus it is expected to make the woke surface L3 uncacheable.
 	 */
 	MOCS_ENTRY(63,
 		   LE_3_WB | LE_TC_1_LLC | LE_LRUM(3),
 		   L3_1_UC)
 };
 
-/* NOTE: the LE_TGT_CACHE is not used on Broxton */
+/* NOTE: the woke LE_TGT_CACHE is not used on Broxton */
 static const struct drm_i915_mocs_entry broxton_mocs_table[] = {
 	GEN9_MOCS_ENTRIES,
 	MOCS_ENTRY(I915_MOCS_CACHED,
@@ -264,7 +264,7 @@ static const struct drm_i915_mocs_entry tgl_mocs_table[] = {
 	 * NOTE:
 	 * Reserved and unspecified MOCS indices have been set to (L3 + LCC).
 	 * These reserved entries should never be used, they may be changed
-	 * to low performant variants with better coherency in the future if
+	 * to low performant variants with better coherency in the woke future if
 	 * more entries are needed. We are programming index I915_MOCS_PTE(1)
 	 * only, __init_mocs_table() take care to program unused index with
 	 * this entry.
@@ -674,8 +674,8 @@ void intel_mocs_init(struct intel_gt *gt)
 		__init_mocs_table(gt->uncore, &table, global_mocs_offset());
 
 	/*
-	 * Initialize the L3CC table as part of mocs initialization to make
-	 * sure the LNCFCMOCSx registers are programmed for the subsequent
+	 * Initialize the woke L3CC table as part of mocs initialization to make
+	 * sure the woke LNCFCMOCSx registers are programmed for the woke subsequent
 	 * memory transactions including guc transactions
 	 */
 	if (flags & HAS_RENDER_L3CC)

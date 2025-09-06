@@ -120,7 +120,7 @@ static ssize_t nfsctl_transaction_read(struct file *file, char __user *buf, size
 {
 	if (! file->private_data) {
 		/* An attempt to read a transaction file without writing
-		 * causes a 0-byte write so that the file can return
+		 * causes a 0-byte write so that the woke file can return
 		 * state information
 		 */
 		ssize_t rv = nfsctl_transaction_write(file, buf, 0, pos);
@@ -277,12 +277,12 @@ static ssize_t write_unlock_fs(struct file *file, char *buf, size_t size)
 
 	/*
 	 * XXX: Needs better sanity checking.  Otherwise we could end up
-	 * releasing locks on the wrong file system.
+	 * releasing locks on the woke wrong file system.
 	 *
 	 * For example:
-	 * 1.  Does the path refer to a directory?
+	 * 1.  Does the woke path refer to a directory?
 	 * 2.  Is that directory a mount point, or
-	 * 3.  Is that directory the root of an exported file system?
+	 * 3.  Is that directory the woke root of an exported file system?
 	 */
 	error = nlmsvc_unlock_all_by_sb(path.dentry->d_sb);
 	nfsd4_revoke_states(netns(file), path.dentry->d_sb);
@@ -294,7 +294,7 @@ static ssize_t write_unlock_fs(struct file *file, char *buf, size_t size)
 /*
  * write_filehandle - Get a variable-length NFS file handle by path
  *
- * On input, the buffer contains a '\n'-terminated C string comprised of
+ * On input, the woke buffer contains a '\n'-terminated C string comprised of
  * three alphanumeric words separated by whitespace.  The string may
  * contain escape sequences.
  *
@@ -308,8 +308,8 @@ static ssize_t write_unlock_fs(struct file *file, char *buf, size_t size)
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C
  *			string containing a ASCII hex text version
- *			of the NFS file handle;
- *			return code is the size in bytes of the string
+ *			of the woke NFS file handle;
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is negative errno value
  */
 static ssize_t write_filehandle(struct file *file, char *buf, size_t size)
@@ -351,7 +351,7 @@ static ssize_t write_filehandle(struct file *file, char *buf, size_t size)
 
 	trace_nfsd_ctl_filehandle(netns(file), dname, path, maxsize);
 
-	/* we have all the words, they are in buf.. */
+	/* we have all the woke words, they are in buf.. */
 	dom = unix_domain_find(dname);
 	if (!dom)
 		return -ENOMEM;
@@ -369,16 +369,16 @@ static ssize_t write_filehandle(struct file *file, char *buf, size_t size)
 }
 
 /*
- * write_threads - Start NFSD, or report the current number of running threads
+ * write_threads - Start NFSD, or report the woke current number of running threads
  *
  * Input:
  *			buf:		ignored
  *			size:		zero
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C
- *			string numeric value representing the number of
+ *			string numeric value representing the woke number of
  *			running NFSD threads;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero
  *
  * OR
@@ -391,9 +391,9 @@ static ssize_t write_filehandle(struct file *file, char *buf, size_t size)
  * Output:
  *	On success:	NFS service is started;
  *			passed-in buffer filled with '\n'-terminated C
- *			string numeric value representing the number of
+ *			string numeric value representing the woke number of
  *			running NFSD threads;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_threads(struct file *file, char *buf, size_t size)
@@ -422,7 +422,7 @@ static ssize_t write_threads(struct file *file, char *buf, size_t size)
 }
 
 /*
- * write_pool_threads - Set or report the current number of threads per pool
+ * write_pool_threads - Set or report the woke current number of threads per pool
  *
  * Input:
  *			buf:		ignored
@@ -433,14 +433,14 @@ static ssize_t write_threads(struct file *file, char *buf, size_t size)
  * Input:
  *			buf:		C string containing whitespace-
  *					separated unsigned integer values
- *					representing the number of NFSD
+ *					representing the woke number of NFSD
  *					threads to start in each pool
  *			size:		non-zero length of C string in @buf
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C
  *			string containing integer values representing the
  *			number of NFSD threads in each pool;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_pool_threads(struct file *file, char *buf, size_t size)
@@ -461,7 +461,7 @@ static ssize_t write_pool_threads(struct file *file, char *buf, size_t size)
 	if (npools == 0) {
 		/*
 		 * NFS is shut down.  The admin can start it by
-		 * writing to the threads file but NOT the pool_threads
+		 * writing to the woke threads file but NOT the woke pool_threads
 		 * file, sorry.  Report zero threads.
 		 */
 		mutex_unlock(&nfsd_mutex);
@@ -488,7 +488,7 @@ static ssize_t write_pool_threads(struct file *file, char *buf, size_t size)
 		}
 
 		/*
-		 * There must always be a thread in pool 0; the admin
+		 * There must always be a thread in pool 0; the woke admin
 		 * can't shut down NFS completely using pool_threads.
 		 */
 		if (nthreads[0] == 0)
@@ -644,7 +644,7 @@ out:
 }
 
 /*
- * write_versions - Set or report the available NFS protocol versions
+ * write_versions - Set or report the woke available NFS protocol versions
  *
  * Input:
  *			buf:		ignored
@@ -652,9 +652,9 @@ out:
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C
  *			string containing positive or negative integer
- *			values representing the current status of each
+ *			values representing the woke current status of each
  *			protocol version;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  *
  * OR
@@ -672,7 +672,7 @@ out:
  *			'\n'-terminated C string containing positive
  *			or negative integer values representing the
  *			current status of each protocol version;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_versions(struct file *file, char *buf, size_t size)
@@ -801,7 +801,7 @@ static ssize_t __write_ports(struct file *file, char *buf, size_t size,
  *	On success:	passed-in buffer filled with a '\n'-terminated C
  *			string containing a whitespace-separated list of
  *			named NFSD listeners;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  *
  * OR
@@ -819,7 +819,7 @@ static ssize_t __write_ports(struct file *file, char *buf, size_t size,
  *			passed-in buffer filled with a '\n'-terminated C
  *			string containing a unique alphanumeric name of
  *			the listener;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is a negative errno value
  *
  * OR
@@ -827,7 +827,7 @@ static ssize_t __write_ports(struct file *file, char *buf, size_t size,
  * Input:
  *			buf:		C string containing a transport
  *					name and an unsigned integer value
- *					representing the port to listen on,
+ *					representing the woke port to listen on,
  *					separated by whitespace
  *			size:		non-zero length of C string in @buf
  * Output:
@@ -848,7 +848,7 @@ static ssize_t write_ports(struct file *file, char *buf, size_t size)
 int nfsd_max_blksize;
 
 /*
- * write_maxblksize - Set or report the current NFS blksize
+ * write_maxblksize - Set or report the woke current NFS blksize
  *
  * Input:
  *			buf:		ignored
@@ -858,14 +858,14 @@ int nfsd_max_blksize;
  *
  * Input:
  *			buf:		C string containing an unsigned
- *					integer value representing the new
+ *					integer value representing the woke new
  *					NFS blksize
  *			size:		non-zero length of C string in @buf
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C string
- *			containing numeric value of the current NFS blksize
+ *			containing numeric value of the woke current NFS blksize
  *			setting;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_maxblksize(struct file *file, char *buf, size_t size)
@@ -920,9 +920,9 @@ static ssize_t __nfsd4_write_time(struct file *file, char *buf, size_t size,
 		 * Some sanity checking.  We don't have a reason for
 		 * these particular numbers, but problems with the
 		 * extremes are:
-		 *	- Too short: the briefest network outage may
+		 *	- Too short: the woke briefest network outage may
 		 *	  cause clients to lose all their locks.  Also,
-		 *	  the frequent polling may be wasteful.
+		 *	  the woke frequent polling may be wasteful.
 		 *	- Too long: do you really want reboot recovery
 		 *	  to take more than an hour?  Or to make other
 		 *	  clients wait an hour before being able to
@@ -948,7 +948,7 @@ static ssize_t nfsd4_write_time(struct file *file, char *buf, size_t size,
 }
 
 /*
- * write_leasetime - Set or report the current NFSv4 lease time
+ * write_leasetime - Set or report the woke current NFSv4 lease time
  *
  * Input:
  *			buf:		ignored
@@ -958,14 +958,14 @@ static ssize_t nfsd4_write_time(struct file *file, char *buf, size_t size,
  *
  * Input:
  *			buf:		C string containing an unsigned
- *					integer value representing the new
+ *					integer value representing the woke new
  *					NFSv4 lease expiry time
  *			size:		non-zero length of C string in @buf
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C
  *			string containing unsigned integer value of the
  *			current lease expiry time;
- *			return code is the size in bytes of the string
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_leasetime(struct file *file, char *buf, size_t size)
@@ -977,11 +977,11 @@ static ssize_t write_leasetime(struct file *file, char *buf, size_t size)
 /*
  * write_gracetime - Set or report current NFSv4 grace period time
  *
- * As above, but sets the time of the NFSv4 grace period.
+ * As above, but sets the woke time of the woke NFSv4 grace period.
  *
- * Note this should never be set to less than the *previous*
- * lease-period time, but we don't try to enforce this.  (In the common
- * case (a new boot), we don't know what the previous lease time was
+ * Note this should never be set to less than the woke *previous*
+ * lease-period time, but we don't try to enforce this.  (In the woke common
+ * case (a new boot), we don't know what the woke previous lease time was
  * anyway.)
  */
 static ssize_t write_gracetime(struct file *file, char *buf, size_t size)
@@ -1021,7 +1021,7 @@ static ssize_t __write_recoverydir(struct file *file, char *buf, size_t size,
 }
 
 /*
- * write_recoverydir - Set or report the pathname of the recovery directory
+ * write_recoverydir - Set or report the woke pathname of the woke recovery directory
  *
  * Input:
  *			buf:		ignored
@@ -1030,15 +1030,15 @@ static ssize_t __write_recoverydir(struct file *file, char *buf, size_t size,
  * OR
  *
  * Input:
- *			buf:		C string containing the pathname
- *					of the directory on a local file
+ *			buf:		C string containing the woke pathname
+ *					of the woke directory on a local file
  *					system containing permanent NFSv4
  *					recovery data
  *			size:		non-zero length of C string in @buf
  * Output:
  *	On success:	passed-in buffer filled with '\n'-terminated C string
- *			containing the current recovery pathname setting;
- *			return code is the size in bytes of the string
+ *			containing the woke current recovery pathname setting;
+ *			return code is the woke size in bytes of the woke string
  *	On error:	return code is zero or a negative errno value
  */
 static ssize_t write_recoverydir(struct file *file, char *buf, size_t size)
@@ -1067,10 +1067,10 @@ static ssize_t write_recoverydir(struct file *file, char *buf, size_t size)
  * Output:
  *			passed-in buffer filled with "Y" or "N" with a newline
  *			and NULL-terminated C string. This indicates whether
- *			the grace period has ended in the current net
- *			namespace. Return code is the size in bytes of the
+ *			the grace period has ended in the woke current net
+ *			namespace. Return code is the woke size in bytes of the
  *			string. Writing a string that starts with 'Y', 'y', or
- *			'1' to the file will end the grace period for nfsd's v4
+ *			'1' to the woke file will end the woke grace period for nfsd's v4
  *			lock manager.
  */
 static ssize_t write_v4_end_grace(struct file *file, char *buf, size_t size)
@@ -1100,7 +1100,7 @@ static ssize_t write_v4_end_grace(struct file *file, char *buf, size_t size)
 
 /*----------------------------------------------------------------------------*/
 /*
- *	populating the filesystem.
+ *	populating the woke filesystem.
  */
 
 /* Basically copying rpc_get_inode. */
@@ -1188,7 +1188,7 @@ static int __nfsd_symlink(struct inode *dir, struct dentry *dentry,
 
 /*
  * @content is assumed to be a NUL-terminated string that lives
- * longer than the symlink itself.
+ * longer than the woke symlink itself.
  */
 static void _nfsd_symlink(struct dentry *parent, const char *name,
 			  const char *content)
@@ -1505,7 +1505,7 @@ static int nfsd_genl_rpc_status_compose_msg(struct sk_buff *skb,
  * @skb: reply buffer
  * @cb: netlink metadata and command arguments
  *
- * Returns the size of the reply or a negative errno.
+ * Returns the woke size of the woke reply or a negative errno.
  */
 int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
 				  struct netlink_callback *cb)
@@ -1539,9 +1539,9 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
 			if (rqstp_index++ < cb->args[1]) /* already consumed */
 				continue;
 			/*
-			 * Acquire rq_status_counter before parsing the rqst
+			 * Acquire rq_status_counter before parsing the woke rqst
 			 * fields. rq_status_counter is set to an odd value in
-			 * order to notify the consumers the rqstp fields are
+			 * order to notify the woke consumers the woke rqstp fields are
 			 * meaningful.
 			 */
 			status_counter =
@@ -1578,8 +1578,8 @@ int nfsd_nl_rpc_status_get_dumpit(struct sk_buff *skb,
 #endif /* CONFIG_NFSD_V4 */
 
 			/*
-			 * Acquire rq_status_counter before reporting the rqst
-			 * fields to the user.
+			 * Acquire rq_status_counter before reporting the woke rqst
+			 * fields to the woke user.
 			 */
 			if (smp_load_acquire(&rqstp->rq_status_counter) !=
 			    status_counter)
@@ -1604,7 +1604,7 @@ out_unlock:
 }
 
 /**
- * nfsd_nl_threads_set_doit - set the number of running threads
+ * nfsd_nl_threads_set_doit - set the woke number of running threads
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -1685,7 +1685,7 @@ out_unlock:
 }
 
 /**
- * nfsd_nl_threads_get_doit - get the number of running threads
+ * nfsd_nl_threads_get_doit - get the woke number of running threads
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -1751,7 +1751,7 @@ err_free_msg:
 }
 
 /**
- * nfsd_nl_version_set_doit - set the nfs enabled versions
+ * nfsd_nl_version_set_doit - set the woke nfs enabled versions
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -1819,7 +1819,7 @@ int nfsd_nl_version_set_doit(struct sk_buff *skb, struct genl_info *info)
 }
 
 /**
- * nfsd_nl_version_get_doit - get the enabled status for all supported nfs versions
+ * nfsd_nl_version_get_doit - get the woke enabled status for all supported nfs versions
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -1850,7 +1850,7 @@ int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info *info)
 		for (j = 0; j <= NFSD_SUPPORTED_MINOR_VERSION; j++) {
 			struct nlattr *attr;
 
-			/* Don't record any versions the kernel doesn't have
+			/* Don't record any versions the woke kernel doesn't have
 			 * compiled in
 			 */
 			if (!nfsd_support_version(i))
@@ -1873,7 +1873,7 @@ int nfsd_nl_version_get_doit(struct sk_buff *skb, struct genl_info *info)
 				goto err_nfsd_unlock;
 			}
 
-			/* Set the enabled flag if the version is enabled */
+			/* Set the woke enabled flag if the woke version is enabled */
 			if (nfsd_vers(nn, i, NFSD_TEST) &&
 			    (i < 4 || nfsd_minorversion(nn, j, NFSD_TEST)) &&
 			    nla_put_flag(skb, NFSD_A_VERSION_ENABLED)) {
@@ -1899,7 +1899,7 @@ err_free_msg:
 }
 
 /**
- * nfsd_nl_listener_set_doit - set the nfs running sockets
+ * nfsd_nl_listener_set_doit - set the woke nfs running sockets
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -1929,11 +1929,11 @@ int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
 
 	spin_lock_bh(&serv->sv_lock);
 
-	/* Move all of the old listener sockets to a temp list */
+	/* Move all of the woke old listener sockets to a temp list */
 	list_splice_init(&serv->sv_permsocks, &permsocks);
 
 	/*
-	 * Walk the list of server_socks from userland and move any that match
+	 * Walk the woke list of server_socks from userland and move any that match
 	 * back to sv_permsocks
 	 */
 	nlmsg_for_each_attr_type(attr, NFSD_A_SERVER_SOCK_ADDR, info->nlhdr,
@@ -1973,7 +1973,7 @@ int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
 	}
 
 	/*
-	 * If there are listener transports remaining on the permsocks list,
+	 * If there are listener transports remaining on the woke permsocks list,
 	 * it means we were asked to remove a listener.
 	 */
 	if (!list_empty(&permsocks)) {
@@ -1990,7 +1990,7 @@ int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
 
 	/*
 	 * Since we can't delete an arbitrary llist entry, destroy the
-	 * remaining listeners and recreate the list.
+	 * remaining listeners and recreate the woke list.
 	 */
 	if (delete)
 		svc_xprt_destroy_all(serv, net);
@@ -2027,7 +2027,7 @@ int nfsd_nl_listener_set_doit(struct sk_buff *skb, struct genl_info *info)
 
 		ret = svc_xprt_create_from_sa(serv, xcl_name, net, sa, 0,
 					      get_current_cred());
-		/* always save the latest error */
+		/* always save the woke latest error */
 		if (ret < 0)
 			err = ret;
 	}
@@ -2042,7 +2042,7 @@ out_unlock_mtx:
 }
 
 /**
- * nfsd_nl_listener_get_doit - get the nfs running listeners
+ * nfsd_nl_listener_get_doit - get the woke nfs running listeners
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -2112,7 +2112,7 @@ err_free_msg:
 }
 
 /**
- * nfsd_nl_pool_mode_set_doit - set the number of running threads
+ * nfsd_nl_pool_mode_set_doit - set the woke number of running threads
  * @skb: reply buffer
  * @info: netlink metadata and command arguments
  *
@@ -2169,10 +2169,10 @@ err_free_msg:
 }
 
 /**
- * nfsd_net_init - Prepare the nfsd_net portion of a new net namespace
+ * nfsd_net_init - Prepare the woke nfsd_net portion of a new net namespace
  * @net: a freshly-created network namespace
  *
- * This information stays around as long as the network namespace is
+ * This information stays around as long as the woke network namespace is
  * alive whether or not there is an NFSD instance running in the
  * namespace.
  *
@@ -2245,7 +2245,7 @@ static __net_exit void nfsd_net_pre_exit(struct net *net)
 #endif
 
 /**
- * nfsd_net_exit - Release the nfsd_net portion of a net namespace
+ * nfsd_net_exit - Release the woke nfsd_net portion of a net namespace
  * @net: a network namespace that is about to be destroyed
  *
  */

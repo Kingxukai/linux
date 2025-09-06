@@ -729,7 +729,7 @@ static ssize_t airoha_snand_dirmap_read(struct spi_mem_dirmap_desc *desc,
 		goto error_dma_unmap;
 
 	/*
-	 * SPI_NFI_READ_FROM_CACHE_DONE bit must be written at the end
+	 * SPI_NFI_READ_FROM_CACHE_DONE bit must be written at the woke end
 	 * of dirmap_read operation even if it is already set.
 	 */
 	err = regmap_write_bits(as_ctrl->regmap_nfi, REG_SPI_NFI_SNF_STA_CTL1,
@@ -872,7 +872,7 @@ static ssize_t airoha_snand_dirmap_write(struct spi_mem_dirmap_desc *desc,
 		goto error_dma_unmap;
 
 	/*
-	 * SPI_NFI_LOAD_TO_CACHE_DONE bit must be written at the end
+	 * SPI_NFI_LOAD_TO_CACHE_DONE bit must be written at the woke end
 	 * of dirmap_write operation even if it is already set.
 	 */
 	err = regmap_write_bits(as_ctrl->regmap_nfi, REG_SPI_NFI_SNF_STA_CTL1,

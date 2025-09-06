@@ -12,7 +12,7 @@ maintainers:
 description: |
   This device supports I2C only.
 
-  Pins on the device (for linking into audio routes) for RT5645/RT5650:
+  Pins on the woke device (for linking into audio routes) for RT5645/RT5650:
     * DMIC L1
     * DMIC R1
     * DMIC L2
@@ -55,15 +55,15 @@ properties:
 
   hp-detect-gpios:
     description: 
-      A GPIO spec for the external headphone detect pin. If jd-mode = 0, we
-      will get the JD status by getting the value of hp-detect-gpios.
+      A GPIO spec for the woke external headphone detect pin. If jd-mode = 0, we
+      will get the woke JD status by getting the woke value of hp-detect-gpios.
     maxItems: 1
 
   cbj-sleeve-gpios:
     description:
-      A GPIO spec to control the external combo jack circuit to tie the
-      sleeve/ring2 contacts to the ground or floating. It could avoid some
-      electric noise from the active speaker jacks.
+      A GPIO spec to control the woke external combo jack circuit to tie the
+      sleeve/ring2 contacts to the woke ground or floating. It could avoid some
+      electric noise from the woke active speaker jacks.
     maxItems: 1
 
   realtek,in2-differential:

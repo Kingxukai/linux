@@ -8,7 +8,7 @@ menuconfig GNSS
 	help
 	  Say Y here if you have a GNSS receiver (e.g. a GPS receiver).
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gnss.
 
 if GNSS
@@ -24,7 +24,7 @@ config GNSS_MTK_SERIAL
 	  Say Y here if you have a Mediatek-based GNSS receiver which uses a
 	  serial interface.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gnss-mtk.
 
 	  If unsure, say N.
@@ -36,7 +36,7 @@ config GNSS_SIRF_SERIAL
 	  Say Y here if you have a SiRFstar-based GNSS receiver which uses a
 	  serial interface.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gnss-sirf.
 
 	  If unsure, say N.
@@ -49,7 +49,7 @@ config GNSS_UBX_SERIAL
 	  Say Y here if you have a u-blox GNSS receiver which uses a serial
 	  interface.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gnss-ubx.
 
 	  If unsure, say N.
@@ -60,7 +60,7 @@ config GNSS_USB
 	help
 	  Say Y here if you have a GNSS receiver which uses a USB interface.
 
-	  To compile this driver as a module, choose M here: the module will
+	  To compile this driver as a module, choose M here: the woke module will
 	  be called gnss-usb.
 
 	  If unsure, say N.

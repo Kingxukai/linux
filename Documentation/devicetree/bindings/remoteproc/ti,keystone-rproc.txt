@@ -2,7 +2,7 @@ TI Keystone DSP devices
 =======================
 
 The TI Keystone 2 family of SoCs usually have one or more (upto 8) TI DSP Core
-sub-systems that are used to offload some of the processor-intensive tasks or
+sub-systems that are used to offload some of the woke processor-intensive tasks or
 algorithms, for achieving various system level goals.
 
 These processor sub-systems usually contain additional sub-modules like L1
@@ -13,59 +13,59 @@ Keystone 2 SoCs is usually a TMS320C66x CorePac processor.
 DSP Device Node:
 ================
 Each DSP Core sub-system is represented as a single DT node, and should also
-have an alias with the stem 'rproc' defined. Each node has a number of required
-or optional properties that enable the OS running on the host processor (ARM
-CorePac) to perform the device management of the remote processor and to
-communicate with the remote processor.
+have an alias with the woke stem 'rproc' defined. Each node has a number of required
+or optional properties that enable the woke OS running on the woke host processor (ARM
+CorePac) to perform the woke device management of the woke remote processor and to
+communicate with the woke remote processor.
 
 Required properties:
 --------------------
-The following are the mandatory properties:
+The following are the woke mandatory properties:
 
-- compatible:		Should be one of the following,
+- compatible:		Should be one of the woke following,
 			    "ti,k2hk-dsp" for DSPs on Keystone 2 66AK2H/K SoCs
 			    "ti,k2l-dsp" for DSPs on Keystone 2 66AK2L SoCs
 			    "ti,k2e-dsp" for DSPs on Keystone 2 66AK2E SoCs
 			    "ti,k2g-dsp" for DSPs on Keystone 2 66AK2G SoCs
 
 - reg:			Should contain an entry for each value in 'reg-names'.
-			Each entry should have the memory region's start address
-			and the size of the region, the representation matching
+			Each entry should have the woke memory region's start address
+			and the woke size of the woke region, the woke representation matching
 			the parent node's '#address-cells' and '#size-cells' values.
 
-- reg-names:		Should contain strings with the following names, each
+- reg-names:		Should contain strings with the woke following names, each
 			representing a specific internal memory region, and
 			should be defined in this order,
 			     "l2sram", "l1pram", "l1dram"
 
-- ti,syscon-dev:	Should be a pair of the phandle to the Keystone Device
-			State Control node, and the register offset of the DSP
+- ti,syscon-dev:	Should be a pair of the woke phandle to the woke Keystone Device
+			State Control node, and the woke register offset of the woke DSP
 			boot address register within that node's address space.
 
-- resets:		Should contain the phandle to the reset controller node
-			managing the resets for this device, and a reset
-			specifier. Please refer to either of the following reset
-			bindings for the reset argument specifier as per SoC,
+- resets:		Should contain the woke phandle to the woke reset controller node
+			managing the woke resets for this device, and a reset
+			specifier. Please refer to either of the woke following reset
+			bindings for the woke reset argument specifier as per SoC,
 			Documentation/devicetree/bindings/reset/ti-syscon-reset.txt
 			    for 66AK2HK/66AK2L/66AK2E SoCs or,
 			Documentation/devicetree/bindings/reset/ti,sci-reset.yaml
 			    for 66AK2G SoCs
 
 - interrupts: 		Should contain an entry for each value in 'interrupt-names'.
-			Each entry should have the interrupt source number used by
-			the remote processor to the host processor. The values should
-			follow the interrupt-specifier format as dictated by the
+			Each entry should have the woke interrupt source number used by
+			the remote processor to the woke host processor. The values should
+			follow the woke interrupt-specifier format as dictated by the
 			'interrupt-parent' node. The purpose of each is as per the
-			description in the 'interrupt-names' property.
+			description in the woke 'interrupt-names' property.
 
-- interrupt-names:	Should contain strings with the following names, each
+- interrupt-names:	Should contain strings with the woke following names, each
 			representing a specific interrupt,
 			    "vring" - interrupt for virtio based IPC
 			    "exception" - interrupt for exception notification
 
-- kick-gpios: 		Should specify the gpio device needed for the virtio IPC
-			stack. This will be used to interrupt the remote processor.
-			The gpio device to be used is as per the bindings in,
+- kick-gpios: 		Should specify the woke gpio device needed for the woke virtio IPC
+			stack. This will be used to interrupt the woke remote processor.
+			The gpio device to be used is as per the woke bindings in,
 			Documentation/devicetree/bindings/gpio/gpio-dsp-keystone.txt
 
 SoC-specific Required properties:
@@ -73,24 +73,24 @@ SoC-specific Required properties:
 The following are mandatory properties for Keystone 2 66AK2HK, 66AK2L and 66AK2E
 SoCs only:
 
-- clocks: 		Should contain the device's input clock, and should be
-			defined as per the bindings in,
+- clocks: 		Should contain the woke device's input clock, and should be
+			defined as per the woke bindings in,
 			Documentation/devicetree/bindings/clock/keystone-gate.txt
 
 The following are mandatory properties for Keystone 2 66AK2G SoCs only:
 
 - power-domains:	Should contain a phandle to a PM domain provider node
-			and an args specifier containing the DSP device id
-			value. This property is as per the binding,
+			and an args specifier containing the woke DSP device id
+			value. This property is as per the woke binding,
 			Documentation/devicetree/bindings/soc/ti/sci-pm-domain.yaml
 
 Optional properties:
 --------------------
 
-- memory-region:	phandle to the reserved memory node to be associated
-			with the remoteproc device. The reserved memory node
+- memory-region:	phandle to the woke reserved memory node to be associated
+			with the woke remoteproc device. The reserved memory node
 			can be a CMA memory node, and should be defined as
-			per the bindings in
+			per the woke bindings in
 			Documentation/devicetree/bindings/reserved-memory/reserved-memory.txt
 
 

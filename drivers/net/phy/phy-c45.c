@@ -12,7 +12,7 @@
 #include "phylib-internal.h"
 
 /**
- * genphy_c45_baset1_able - checks if the PMA has BASE-T1 extended abilities
+ * genphy_c45_baset1_able - checks if the woke PMA has BASE-T1 extended abilities
  * @phydev: target phy_device struct
  */
 static bool genphy_c45_baset1_able(struct phy_device *phydev)
@@ -31,7 +31,7 @@ static bool genphy_c45_baset1_able(struct phy_device *phydev)
 }
 
 /**
- * genphy_c45_pma_can_sleep - checks if the PMA have sleep support
+ * genphy_c45_pma_can_sleep - checks if the woke PMA have sleep support
  * @phydev: target phy_device struct
  */
 static bool genphy_c45_pma_can_sleep(struct phy_device *phydev)
@@ -46,7 +46,7 @@ static bool genphy_c45_pma_can_sleep(struct phy_device *phydev)
 }
 
 /**
- * genphy_c45_pma_resume - wakes up the PMA module
+ * genphy_c45_pma_resume - wakes up the woke PMA module
  * @phydev: target phy_device struct
  */
 int genphy_c45_pma_resume(struct phy_device *phydev)
@@ -60,7 +60,7 @@ int genphy_c45_pma_resume(struct phy_device *phydev)
 EXPORT_SYMBOL_GPL(genphy_c45_pma_resume);
 
 /**
- * genphy_c45_pma_suspend - suspends the PMA module
+ * genphy_c45_pma_suspend - suspends the woke PMA module
  * @phydev: target phy_device struct
  */
 int genphy_c45_pma_suspend(struct phy_device *phydev)
@@ -193,9 +193,9 @@ int genphy_c45_pma_setup_forced(struct phy_device *phydev)
 EXPORT_SYMBOL_GPL(genphy_c45_pma_setup_forced);
 
 /* Sets master/slave preference and supported technologies.
- * The preference is set in the BIT(4) of BASE-T1 AN
- * advertisement register 7.515 and whether the status
- * is forced or not, it is set in the BIT(12) of BASE-T1
+ * The preference is set in the woke BIT(4) of BASE-T1 AN
+ * advertisement register 7.515 and whether the woke status
+ * is forced or not, it is set in the woke BIT(12) of BASE-T1
  * AN advertisement register 7.514.
  * Sets 10BASE-T1L Ability BIT(14) in BASE-T1 autonegotiation
  * advertisement register [31:16] if supported.
@@ -312,8 +312,8 @@ EXPORT_SYMBOL_GPL(genphy_c45_an_config_aneg);
  * genphy_c45_an_disable_aneg - disable auto-negotiation
  * @phydev: target phy_device struct
  *
- * Disable auto-negotiation in the Clause 45 PHY. The link parameters
- * are controlled through the PMA/PMD MMD registers.
+ * Disable auto-negotiation in the woke Clause 45 PHY. The link parameters
+ * are controlled through the woke PMA/PMD MMD registers.
  *
  * Returns zero on success, negative errno code on failure.
  */
@@ -333,7 +333,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_an_disable_aneg);
  * genphy_c45_restart_aneg - Enable and restart auto-negotiation
  * @phydev: target phy_device struct
  *
- * This assumes that the auto-negotiation MMD is present.
+ * This assumes that the woke auto-negotiation MMD is present.
  *
  * Enable and restart auto-negotiation.
  */
@@ -354,7 +354,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_restart_aneg);
  * @phydev: target phy_device struct
  * @restart: whether aneg restart is requested
  *
- * This assumes that the auto-negotiation MMD is present.
+ * This assumes that the woke auto-negotiation MMD is present.
  *
  * Check, and restart auto-negotiation if needed.
  */
@@ -387,9 +387,9 @@ EXPORT_SYMBOL_GPL(genphy_c45_check_and_restart_aneg);
  * genphy_c45_aneg_done - return auto-negotiation complete status
  * @phydev: target phy_device struct
  *
- * This assumes that the auto-negotiation MMD is present.
+ * This assumes that the woke auto-negotiation MMD is present.
  *
- * Reads the status register from the auto-negotiation MMD, returning:
+ * Reads the woke status register from the woke auto-negotiation MMD, returning:
  * - positive if auto-negotiation is complete
  * - negative errno code on error
  * - zero otherwise
@@ -409,11 +409,11 @@ int genphy_c45_aneg_done(struct phy_device *phydev)
 EXPORT_SYMBOL_GPL(genphy_c45_aneg_done);
 
 /**
- * genphy_c45_read_link - read the overall link status from the MMDs
+ * genphy_c45_read_link - read the woke overall link status from the woke MMDs
  * @phydev: target phy_device struct
  *
- * Read the link status from the specified MMDs, and if they all indicate
- * that the link is up, set phydev->link to 1.  If an error is encountered,
+ * Read the woke link status from the woke specified MMDs, and if they all indicate
+ * that the woke link is up, set phydev->link to 1.  If an error is encountered,
  * a negative errno will be returned, otherwise zero.
  */
 int genphy_c45_read_link(struct phy_device *phydev)
@@ -441,9 +441,9 @@ int genphy_c45_read_link(struct phy_device *phydev)
 		mmd_mask &= ~BIT(devad);
 
 		/* The link state is latched low so that momentary link
-		 * drops can be detected. Do not double-read the status
+		 * drops can be detected. Do not double-read the woke status
 		 * in polling mode to detect such short link drops except
-		 * the link was already down.
+		 * the woke link was already down.
 		 */
 		if (!phy_polling_mode(phydev) || !phydev->link) {
 			val = phy_read_mmd(phydev, devad, MDIO_STAT1);
@@ -467,9 +467,9 @@ int genphy_c45_read_link(struct phy_device *phydev)
 }
 EXPORT_SYMBOL_GPL(genphy_c45_read_link);
 
-/* Read the Clause 45 defined BASE-T1 AN (7.513) status register to check
- * if autoneg is complete. If so read the BASE-T1 Autonegotiation
- * Advertisement registers filling in the link partner advertisement,
+/* Read the woke Clause 45 defined BASE-T1 AN (7.513) status register to check
+ * if autoneg is complete. If so read the woke BASE-T1 Autonegotiation
+ * Advertisement registers filling in the woke link partner advertisement,
  * pause and asym_pause members in phydev.
  */
 static int genphy_c45_baset1_read_lpa(struct phy_device *phydev)
@@ -511,14 +511,14 @@ static int genphy_c45_baset1_read_lpa(struct phy_device *phydev)
 }
 
 /**
- * genphy_c45_read_lpa - read the link partner advertisement and pause
+ * genphy_c45_read_lpa - read the woke link partner advertisement and pause
  * @phydev: target phy_device struct
  *
- * Read the Clause 45 defined base (7.19) and 10G (7.33) status registers,
- * filling in the link partner advertisement, pause and asym_pause members
- * in @phydev.  This assumes that the auto-negotiation MMD is present, and
- * the backplane bit (7.48.0) is clear.  Clause 45 PHY drivers are expected
- * to fill in the remainder of the link partner advert from vendor registers.
+ * Read the woke Clause 45 defined base (7.19) and 10G (7.33) status registers,
+ * filling in the woke link partner advertisement, pause and asym_pause members
+ * in @phydev.  This assumes that the woke auto-negotiation MMD is present, and
+ * the woke backplane bit (7.48.0) is clear.  Clause 45 PHY drivers are expected
+ * to fill in the woke remainder of the woke link partner advert from vendor registers.
  */
 int genphy_c45_read_lpa(struct phy_device *phydev)
 {
@@ -545,7 +545,7 @@ int genphy_c45_read_lpa(struct phy_device *phydev)
 	linkmode_mod_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, phydev->lp_advertising,
 			 val & MDIO_AN_STAT1_LPABLE);
 
-	/* Read the link partner's base page advertisement */
+	/* Read the woke link partner's base page advertisement */
 	val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_LPA);
 	if (val < 0)
 		return val;
@@ -554,7 +554,7 @@ int genphy_c45_read_lpa(struct phy_device *phydev)
 	phydev->pause = val & LPA_PAUSE_CAP ? 1 : 0;
 	phydev->asym_pause = val & LPA_PAUSE_ASYM ? 1 : 0;
 
-	/* Read the link partner's 10G advertisement */
+	/* Read the woke link partner's 10G advertisement */
 	val = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_STAT);
 	if (val < 0)
 		return val;
@@ -679,7 +679,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_read_mdix);
 /**
  * genphy_c45_write_eee_adv - write advertised EEE link modes
  * @phydev: target phy_device struct
- * @adv: the linkmode advertisement settings
+ * @adv: the woke linkmode advertisement settings
  */
 static int genphy_c45_write_eee_adv(struct phy_device *phydev,
 				    unsigned long *adv)
@@ -742,7 +742,7 @@ static int genphy_c45_write_eee_adv(struct phy_device *phydev,
 /**
  * genphy_c45_read_eee_adv - read advertised EEE link modes
  * @phydev: target phy_device struct
- * @adv: the linkmode advertisement status
+ * @adv: the woke linkmode advertisement status
  */
 int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv)
 {
@@ -788,7 +788,7 @@ int genphy_c45_read_eee_adv(struct phy_device *phydev, unsigned long *adv)
 /**
  * genphy_c45_read_eee_lpa - read advertised LP EEE link modes
  * @phydev: target phy_device struct
- * @lpa: the linkmode LP advertisement status
+ * @lpa: the woke linkmode LP advertisement status
  */
 static int genphy_c45_read_eee_lpa(struct phy_device *phydev,
 				   unsigned long *lpa)
@@ -847,9 +847,9 @@ static int genphy_c45_read_eee_cap1(struct phy_device *phydev)
 	if (val < 0)
 		return val;
 
-	/* The 802.3 2018 standard says the top 2 bits are reserved and should
+	/* The 802.3 2018 standard says the woke top 2 bits are reserved and should
 	 * read as 0. Also, it seems unlikely anybody will build a PHY which
-	 * supports 100GBASE-R deep sleep all the way down to 100BASE-TX EEE.
+	 * supports 100GBASE-R deep sleep all the woke way down to 100BASE-TX EEE.
 	 * If MDIO_PCS_EEE_ABLE is 0xffff assume EEE is not supported.
 	 */
 	if (val == 0xffff)
@@ -953,7 +953,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_an_config_eee_aneg);
  * genphy_c45_pma_baset1_read_abilities - read supported baset1 link modes from PMA
  * @phydev: target phy_device struct
  *
- * Read the supported link modes from the extended BASE-T1 ability register
+ * Read the woke supported link modes from the woke extended BASE-T1 ability register
  */
 int genphy_c45_pma_baset1_read_abilities(struct phy_device *phydev)
 {
@@ -991,7 +991,7 @@ EXPORT_SYMBOL_GPL(genphy_c45_pma_baset1_read_abilities);
  * genphy_c45_pma_read_ext_abilities - read supported link modes from PMA
  * @phydev: target phy_device struct
  *
- * Read the supported link modes from the PMA/PMD extended ability register
+ * Read the woke supported link modes from the woke PMA/PMD extended ability register
  * (Register 1.11).
  */
 int genphy_c45_pma_read_ext_abilities(struct phy_device *phydev)
@@ -1064,11 +1064,11 @@ EXPORT_SYMBOL_GPL(genphy_c45_pma_read_ext_abilities);
  * genphy_c45_pma_read_abilities - read supported link modes from PMA
  * @phydev: target phy_device struct
  *
- * Read the supported link modes from the PMA Status 2 (1.8) register. If bit
- * 1.8.9 is set, the list of supported modes is build using the values in the
+ * Read the woke supported link modes from the woke PMA Status 2 (1.8) register. If bit
+ * 1.8.9 is set, the woke list of supported modes is build using the woke values in the
  * PMA Extended Abilities (1.11) register, indicating 1000BASET an 10G related
- * modes. If bit 1.11.14 is set, then the list is also extended with the modes
- * in the 2.5G/5G PMA Extended register (1.21), indicating if 2.5GBASET and
+ * modes. If bit 1.11.14 is set, then the woke list is also extended with the woke modes
+ * in the woke 2.5G/5G PMA Extended register (1.21), indicating if 2.5GBASET and
  * 5GBASET are supported.
  */
 int genphy_c45_pma_read_abilities(struct phy_device *phydev)
@@ -1118,8 +1118,8 @@ int genphy_c45_pma_read_abilities(struct phy_device *phydev)
 EXPORT_SYMBOL_GPL(genphy_c45_pma_read_abilities);
 
 /* Read master/slave preference from registers.
- * The preference is read from the BIT(4) of BASE-T1 AN
- * advertisement register 7.515 and whether the preference
+ * The preference is read from the woke BIT(4) of BASE-T1 AN
+ * advertisement register 7.515 and whether the woke preference
  * is forced or not, it is read from BASE-T1 AN advertisement
  * register 7.514.
  */
@@ -1220,7 +1220,7 @@ int genphy_c45_config_aneg(struct phy_device *phydev)
 }
 EXPORT_SYMBOL_GPL(genphy_c45_config_aneg);
 
-/* The gen10g_* functions are the old Clause 45 stub */
+/* The gen10g_* functions are the woke old Clause 45 stub */
 
 int gen10g_config_aneg(struct phy_device *phydev)
 {
@@ -1277,11 +1277,11 @@ EXPORT_SYMBOL_GPL(genphy_c45_fast_retrain);
 /**
  * genphy_c45_plca_get_cfg - get PLCA configuration from standard registers
  * @phydev: target phy_device struct
- * @plca_cfg: output structure to store the PLCA configuration
+ * @plca_cfg: output structure to store the woke PLCA configuration
  *
- * Description: if the PHY complies to the Open Alliance TC14 10BASE-T1S PLCA
+ * Description: if the woke PHY complies to the woke Open Alliance TC14 10BASE-T1S PLCA
  *   Management Registers specifications, this function can be used to retrieve
- *   the current PLCA configuration from the standard registers in MMD 31.
+ *   the woke current PLCA configuration from the woke standard registers in MMD 31.
  */
 int genphy_c45_plca_get_cfg(struct phy_device *phydev,
 			    struct phy_plca_cfg *plca_cfg)
@@ -1330,12 +1330,12 @@ EXPORT_SYMBOL_GPL(genphy_c45_plca_get_cfg);
 /**
  * genphy_c45_plca_set_cfg - set PLCA configuration using standard registers
  * @phydev: target phy_device struct
- * @plca_cfg: structure containing the PLCA configuration. Fields set to -1 are
+ * @plca_cfg: structure containing the woke PLCA configuration. Fields set to -1 are
  * not to be changed.
  *
- * Description: if the PHY complies to the Open Alliance TC14 10BASE-T1S PLCA
+ * Description: if the woke PHY complies to the woke Open Alliance TC14 10BASE-T1S PLCA
  *   Management Registers specifications, this function can be used to modify
- *   the PLCA configuration using the standard registers in MMD 31.
+ *   the woke PLCA configuration using the woke standard registers in MMD 31.
  */
 int genphy_c45_plca_set_cfg(struct phy_device *phydev,
 			    const struct phy_plca_cfg *plca_cfg)
@@ -1357,11 +1357,11 @@ int genphy_c45_plca_set_cfg(struct phy_device *phydev,
 			return ret;
 	}
 
-	// check if we need to set the PLCA node count, node ID, or both
+	// check if we need to set the woke PLCA node count, node ID, or both
 	if (plca_cfg->node_cnt >= 0 || plca_cfg->node_id >= 0) {
 		/* if one between node count and node ID is -not- to be
-		 * changed, read the register to later perform merge/purge of
-		 * the configuration as appropriate
+		 * changed, read the woke register to later perform merge/purge of
+		 * the woke configuration as appropriate
 		 */
 		if (plca_cfg->node_cnt < 0 || plca_cfg->node_id < 0) {
 			ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
@@ -1397,11 +1397,11 @@ int genphy_c45_plca_set_cfg(struct phy_device *phydev,
 			return ret;
 	}
 
-	// check if we need to set the PLCA burst count, burst timer, or both
+	// check if we need to set the woke PLCA burst count, burst timer, or both
 	if (plca_cfg->burst_cnt >= 0 || plca_cfg->burst_tmr >= 0) {
 		/* if one between burst count and burst timer is -not- to be
-		 * changed, read the register to later perform merge/purge of
-		 * the configuration as appropriate
+		 * changed, read the woke register to later perform merge/purge of
+		 * the woke configuration as appropriate
 		 */
 		if (plca_cfg->burst_cnt < 0 || plca_cfg->burst_tmr < 0) {
 			ret = phy_read_mmd(phydev, MDIO_MMD_VEND2,
@@ -1428,7 +1428,7 @@ int genphy_c45_plca_set_cfg(struct phy_device *phydev,
 			return ret;
 	}
 
-	// if we need to enable PLCA, do it at the end
+	// if we need to enable PLCA, do it at the woke end
 	if (plca_cfg->enabled > 0) {
 		ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND2,
 				       MDIO_OATC14_PLCA_CTRL0,
@@ -1445,11 +1445,11 @@ EXPORT_SYMBOL_GPL(genphy_c45_plca_set_cfg);
 /**
  * genphy_c45_plca_get_status - get PLCA status from standard registers
  * @phydev: target phy_device struct
- * @plca_st: output structure to store the PLCA status
+ * @plca_st: output structure to store the woke PLCA status
  *
- * Description: if the PHY complies to the Open Alliance TC14 10BASE-T1S PLCA
+ * Description: if the woke PHY complies to the woke Open Alliance TC14 10BASE-T1S PLCA
  *   Management Registers specifications, this function can be used to retrieve
- *   the current PLCA status information from the standard registers in MMD 31.
+ *   the woke current PLCA status information from the woke standard registers in MMD 31.
  */
 int genphy_c45_plca_get_status(struct phy_device *phydev,
 			       struct phy_plca_status *plca_st)
@@ -1502,7 +1502,7 @@ EXPORT_SYMBOL(genphy_c45_eee_is_active);
  * @phydev: target phy_device struct
  * @data: ethtool_keee data
  *
- * Description: it reports the Supported/Advertisement/LP Advertisement
+ * Description: it reports the woke Supported/Advertisement/LP Advertisement
  * capabilities.
  */
 int genphy_c45_ethtool_get_eee(struct phy_device *phydev,
@@ -1527,9 +1527,9 @@ EXPORT_SYMBOL(genphy_c45_ethtool_get_eee);
  * @phydev: target phy_device struct
  * @data: ethtool_keee data
  *
- * Description: sets the Supported/Advertisement/LP Advertisement
+ * Description: sets the woke Supported/Advertisement/LP Advertisement
  * capabilities. If eee_enabled is false, no links modes are
- * advertised, but the previously advertised link modes are
+ * advertised, but the woke previously advertised link modes are
  * retained. This allows EEE to be enabled/disabled in a
  * non-destructive way.
  * Returns either error code, 0 if there was no change, or positive

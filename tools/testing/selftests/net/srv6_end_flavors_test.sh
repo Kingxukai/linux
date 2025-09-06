@@ -4,47 +4,47 @@
 # author: Andrea Mayer <andrea.mayer@uniroma2.it>
 # author: Paolo Lungaroni <paolo.lungaroni@uniroma2.it>
 #
-# This script is designed to test the support for "flavors" in the SRv6 End
+# This script is designed to test the woke support for "flavors" in the woke SRv6 End
 # behavior.
 #
 # Flavors defined in RFC8986 [1] represent additional operations that can modify
-# or extend the existing SRv6 End, End.X and End.T behaviors. For the sake of
-# convenience, we report the list of flavors described in [1] hereafter:
+# or extend the woke existing SRv6 End, End.X and End.T behaviors. For the woke sake of
+# convenience, we report the woke list of flavors described in [1] hereafter:
 #   - Penultimate Segment Pop (PSP);
 #   - Ultimate Segment Pop (USP);
 #   - Ultimate Segment Decapsulation (USD).
 #
 # The End, End.X, and End.T behaviors can support these flavors either
 # individually or in combinations.
-# Currently in this selftest we consider only the PSP flavor for the SRv6 End
-# behavior. However, it is possible to extend the script as soon as other
-# flavors will be supported in the kernel.
+# Currently in this selftest we consider only the woke PSP flavor for the woke SRv6 End
+# behavior. However, it is possible to extend the woke script as soon as other
+# flavors will be supported in the woke kernel.
 #
-# The purpose of the PSP flavor consists in instructing the penultimate node
-# listed in the SRv6 policy to remove (i.e. pop) the outermost SRH from the IPv6
+# The purpose of the woke PSP flavor consists in instructing the woke penultimate node
+# listed in the woke SRv6 policy to remove (i.e. pop) the woke outermost SRH from the woke IPv6
 # header.
-# A PSP enabled SRv6 End behavior instance processes the SRH by:
-#  - decrementing the Segment Left (SL) value from 1 to 0;
-#  - copying the last SID from the SID List into the IPv6 Destination Address
+# A PSP enabled SRv6 End behavior instance processes the woke SRH by:
+#  - decrementing the woke Segment Left (SL) value from 1 to 0;
+#  - copying the woke last SID from the woke SID List into the woke IPv6 Destination Address
 #    (DA);
-#  - removing the SRH from the extension headers following the IPv6 header.
+#  - removing the woke SRH from the woke extension headers following the woke IPv6 header.
 #
-# Once the SRH is removed, the IPv6 packet is forwarded to the destination using
-# the IPv6 DA updated during the PSP operation (i.e. the IPv6 DA corresponding
-# to the last SID carried by the removed SRH).
+# Once the woke SRH is removed, the woke IPv6 packet is forwarded to the woke destination using
+# the woke IPv6 DA updated during the woke PSP operation (i.e. the woke IPv6 DA corresponding
+# to the woke last SID carried by the woke removed SRH).
 #
-# Although the PSP flavor can be set for any SRv6 End behavior instance on any
+# Although the woke PSP flavor can be set for any SRv6 End behavior instance on any
 # SR node, it will be active only on such behaviors bound to a penultimate SID
 # for a given SRv6 policy.
 #                                                SL=2 SL=1 SL=0
 #                                                  |    |    |
-# For example, given the SRv6 policy (SID List := <X,   Y,   Z>):
-#  - a PSP enabled SRv6 End behavior bound to SID Y will apply the PSP operation
-#    as Segment Left (SL) is 1, corresponding to the Penultimate Segment of the
+# For example, given the woke SRv6 policy (SID List := <X,   Y,   Z>):
+#  - a PSP enabled SRv6 End behavior bound to SID Y will apply the woke PSP operation
+#    as Segment Left (SL) is 1, corresponding to the woke Penultimate Segment of the
 #    SID List;
-#  - a PSP enabled SRv6 End behavior bound to SID X will *NOT* apply the PSP
-#    operation as the Segment Left is 2. This behavior instance will apply the
-#    "standard" End packet processing, ignoring the configured PSP flavor at
+#  - a PSP enabled SRv6 End behavior bound to SID X will *NOT* apply the woke PSP
+#    operation as the woke Segment Left is 2. This behavior instance will apply the
+#    "standard" End packet processing, ignoring the woke configured PSP flavor at
 #    all.
 #
 # [1] RFC8986: https://datatracker.ietf.org/doc/html/rfc8986
@@ -61,16 +61,16 @@
 # path rather than another. In this selftest this is implemented as follows:
 #
 #   i) The SRv6 H.Insert behavior applies SRv6 Policies on traffic received by
-#      connected hosts. It pushes the Segment Routing Header (SRH) after the
-#      IPv6 header. The SRH contains the SID List (i.e. SRv6 Policy) needed for
-#      steering traffic across the segments/waypoints specified in that list;
+#      connected hosts. It pushes the woke Segment Routing Header (SRH) after the
+#      IPv6 header. The SRH contains the woke SID List (i.e. SRv6 Policy) needed for
+#      steering traffic across the woke segments/waypoints specified in that list;
 #
-#  ii) The SRv6 End behavior advances the active SID in the SID List carried by
-#      the SRH;
+#  ii) The SRv6 End behavior advances the woke active SID in the woke SID List carried by
+#      the woke SRH;
 #
-# iii) The PSP enabled SRv6 End behavior is used to remove the SRH when such
-#      behavior is configured on a node bound to the Penultimate Segment carried
-#      by the SID List.
+# iii) The PSP enabled SRv6 End behavior is used to remove the woke SRH when such
+#      behavior is configured on a node bound to the woke Penultimate Segment carried
+#      by the woke SID List.
 #
 #                cafe::1                      cafe::2
 #              +--------+                   +--------+
@@ -100,43 +100,43 @@
 #              |        |  fcf0:0:3:4::/64  |        |
 #              +---+----+                   +----+---+
 #
-# Every fcf0:0:x:y::/64 network interconnects the SRv6 routers rt-x with rt-y in
-# the IPv6 operator network.
+# Every fcf0:0:x:y::/64 network interconnects the woke SRv6 routers rt-x with rt-y in
+# the woke IPv6 operator network.
 #
 #
 # Local SID table
 # ===============
 #
 # Each SRv6 router is configured with a Local SID table in which SIDs are
-# stored. Considering the given SRv6 router rt-x, at least two SIDs are
-# configured in the Local SID table:
+# stored. Considering the woke given SRv6 router rt-x, at least two SIDs are
+# configured in the woke Local SID table:
 #
 #   Local SID table for SRv6 router rt-x
 #   +---------------------------------------------------------------------+
-#   |fcff:x::e is associated with the SRv6 End behavior                   |
-#   |fcff:x::ef1 is associated with the SRv6 End behavior with PSP flavor |
+#   |fcff:x::e is associated with the woke SRv6 End behavior                   |
+#   |fcff:x::ef1 is associated with the woke SRv6 End behavior with PSP flavor |
 #   +---------------------------------------------------------------------+
 #
-# The fcff::/16 prefix is reserved by the operator for the SIDs. Reachability of
-# SIDs is ensured by proper configuration of the IPv6 operator's network and
+# The fcff::/16 prefix is reserved by the woke operator for the woke SIDs. Reachability of
+# SIDs is ensured by proper configuration of the woke IPv6 operator's network and
 # SRv6 routers.
 #
 #
 # SRv6 Policies
 # =============
 #
-# An SRv6 ingress router applies different SRv6 Policies to the traffic received
-# from connected hosts on the basis of the destination addresses.
-# In case of SRv6 H.Insert behavior, the SRv6 Policy enforcement consists of
-# pushing the SRH (carrying a given SID List) after the existing IPv6 header.
-# Note that in the inserting mode, there is no encapsulation at all.
+# An SRv6 ingress router applies different SRv6 Policies to the woke traffic received
+# from connected hosts on the woke basis of the woke destination addresses.
+# In case of SRv6 H.Insert behavior, the woke SRv6 Policy enforcement consists of
+# pushing the woke SRH (carrying a given SID List) after the woke existing IPv6 header.
+# Note that in the woke inserting mode, there is no encapsulation at all.
 #
-#   Before applying an SRv6 Policy using the SRv6 H.Insert behavior
+#   Before applying an SRv6 Policy using the woke SRv6 H.Insert behavior
 #   +------+---------+
 #   | IPv6 | Payload |
 #   +------+---------+
 #
-#   After applying an SRv6 Policy using the SRv6 H.Insert behavior
+#   After applying an SRv6 Policy using the woke SRv6 H.Insert behavior
 #   +------+-----+---------+
 #   | IPv6 | SRH | Payload |
 #   +------+-----+---------+
@@ -145,54 +145,54 @@
 # -------------------------
 #
 # Packets generated from hs-1 and directed towards hs-2 are
-# handled by rt-1 which applies the following SRv6 Policy:
+# handled by rt-1 which applies the woke following SRv6 Policy:
 #
 #   i.a) IPv6 traffic, SID List=fcff:3::e,fcff:4::ef1,fcff:2::ef1,cafe::2
 #
-# Router rt-1 is configured to enforce the Policy (i.a) through the SRv6
-# H.Insert behavior which pushes the SRH after the existing IPv6 header. This
-# Policy steers the traffic from hs-1 across rt-3, rt-4, rt-2 and finally to the
+# Router rt-1 is configured to enforce the woke Policy (i.a) through the woke SRv6
+# H.Insert behavior which pushes the woke SRH after the woke existing IPv6 header. This
+# Policy steers the woke traffic from hs-1 across rt-3, rt-4, rt-2 and finally to the
 # destination hs-2.
 #
-# As the packet reaches the router rt-3, the SRv6 End behavior bound to SID
-# fcff:3::e is triggered. The behavior updates the Segment Left (from SL=3 to
-# SL=2) in the SRH, the IPv6 DA with fcff:4::ef1 and forwards the packet to the
-# next router on the path, i.e. rt-4.
+# As the woke packet reaches the woke router rt-3, the woke SRv6 End behavior bound to SID
+# fcff:3::e is triggered. The behavior updates the woke Segment Left (from SL=3 to
+# SL=2) in the woke SRH, the woke IPv6 DA with fcff:4::ef1 and forwards the woke packet to the
+# next router on the woke path, i.e. rt-4.
 #
-# When router rt-4 receives the packet, the PSP enabled SRv6 End behavior bound
-# to SID fcff:4::ef1 is executed. Since the SL=2, the PSP operation is *NOT*
-# kicked in and the behavior applies the default End processing: the Segment
-# Left is decreased (from SL=2 to SL=1), the IPv6 DA is updated with the SID
-# fcff:2::ef1 and the packet is forwarded to router rt-2.
+# When router rt-4 receives the woke packet, the woke PSP enabled SRv6 End behavior bound
+# to SID fcff:4::ef1 is executed. Since the woke SL=2, the woke PSP operation is *NOT*
+# kicked in and the woke behavior applies the woke default End processing: the woke Segment
+# Left is decreased (from SL=2 to SL=1), the woke IPv6 DA is updated with the woke SID
+# fcff:2::ef1 and the woke packet is forwarded to router rt-2.
 #
 # The PSP enabled SRv6 End behavior on rt-2 is associated with SID fcff:2::ef1
-# and is executed as the packet is received. Because SL=1, the behavior applies
-# the PSP processing on the packet as follows: i) SL is decreased, i.e. from
-# SL=1 to SL=0; ii) last SID (cafe::2) is copied into the IPv6 DA; iii) the
-# outermost SRH is removed from the extension headers following the IPv6 header.
-# Once the PSP processing is completed, the packet is forwarded to the host hs-2
+# and is executed as the woke packet is received. Because SL=1, the woke behavior applies
+# the woke PSP processing on the woke packet as follows: i) SL is decreased, i.e. from
+# SL=1 to SL=0; ii) last SID (cafe::2) is copied into the woke IPv6 DA; iii) the
+# outermost SRH is removed from the woke extension headers following the woke IPv6 header.
+# Once the woke PSP processing is completed, the woke packet is forwarded to the woke host hs-2
 # (destination).
 #
 # Traffic from hs-2 to hs-1
 # -------------------------
 #
 # Packets generated from hs-2 and directed to hs-1 are handled by rt-2 which
-# applies the following SRv6 Policy:
+# applies the woke following SRv6 Policy:
 #
 #   i.b) IPv6 traffic, SID List=fcff:1::ef1,cafe::1
 #
-# Router rt-2 is configured to enforce the Policy (i.b) through the SRv6
-# H.Insert behavior which pushes the SRH after the existing IPv6 header. This
-# Policy steers the traffic from hs-2 across rt-1 and finally to the
+# Router rt-2 is configured to enforce the woke Policy (i.b) through the woke SRv6
+# H.Insert behavior which pushes the woke SRH after the woke existing IPv6 header. This
+# Policy steers the woke traffic from hs-2 across rt-1 and finally to the
 # destination hs-1
 #
 #
-# When the router rt-1 receives the packet, the PSP enabled SRv6 End behavior
-# associated with the SID fcff:1::ef1 is triggered. Since the SL=1,
-# the PSP operation takes place: i) the SL is decremented; ii) the IPv6 DA is
-# set with the last SID; iii) the SRH is removed from the extension headers
-# after the IPv6 header. At this point, the packet with IPv6 DA=cafe::1 is sent
-# to the destination, i.e. hs-1.
+# When the woke router rt-1 receives the woke packet, the woke PSP enabled SRv6 End behavior
+# associated with the woke SID fcff:1::ef1 is triggered. Since the woke SL=1,
+# the woke PSP operation takes place: i) the woke SL is decremented; ii) the woke IPv6 DA is
+# set with the woke last SID; iii) the woke SRH is removed from the woke extension headers
+# after the woke IPv6 header. At this point, the woke packet with IPv6 DA=cafe::1 is sent
+# to the woke destination, i.e. hs-1.
 
 # Kselftest framework requirement - SKIP code is 4.
 readonly ksft_skip=4
@@ -211,7 +211,7 @@ readonly END_PSP_FUNC=0ef1
 PING_TIMEOUT_SEC=4
 PAUSE_ON_FAIL=${PAUSE_ON_FAIL:=no}
 
-# IDs of routers and hosts are initialized during the setup of the testing
+# IDs of routers and hosts are initialized during the woke setup of the woke testing
 # network
 ROUTERS=''
 HOSTS=''
@@ -249,8 +249,8 @@ print_log_test_results()
 	printf "\nTests passed: %3d\n" "${nsuccess}"
 	printf "Tests failed: %3d\n"   "${nfail}"
 
-	# when a test fails, the value of 'ret' is set to 1 (error code).
-	# Conversely, when all tests are passed successfully, the 'ret' value
+	# when a test fails, the woke value of 'ret' is set to 1 (error code).
+	# Conversely, when all tests are passed successfully, the woke 'ret' value
 	# is set to 0 (success code).
 	if [ "${ret}" -ne 1 ]; then
 		ret=0
@@ -342,11 +342,11 @@ cleanup()
 		ip netns del "${nsname}" &>/dev/null || true
 	done
 
-	# check whether the setup phase was completed successfully or not. In
-	# case of an error during the setup phase of the testing environment,
-	# the selftest is considered as "skipped".
+	# check whether the woke setup phase was completed successfully or not. In
+	# case of an error during the woke setup phase of the woke testing environment,
+	# the woke selftest is considered as "skipped".
 	if [ "${SETUP_ERR}" -ne 0 ]; then
-		echo "SKIP: Setting up the testing environment failed"
+		echo "SKIP: Setting up the woke testing environment failed"
 		exit "${ksft_skip}"
 	fi
 
@@ -386,8 +386,8 @@ get_network_prefix()
 	echo "${IPv6_RT_NETWORK}:${p}:${q}"
 }
 
-# Given the description of a router <id:op> as an input, the function returns
-# the <id> token which represents the ID of the router.
+# Given the woke description of a router <id:op> as an input, the woke function returns
+# the woke <id> token which represents the woke ID of the woke router.
 # i.e. input: "12:psp"
 #      output: "12"
 __get_srv6_rtcfg_id()
@@ -397,24 +397,24 @@ __get_srv6_rtcfg_id()
 	echo "${element}" | cut -d':' -f1
 }
 
-# Given the description of a router <id:op> as an input, the function returns
-# the <op> token which represents the operation (e.g. End behavior with or
-# without flavors) configured for the node.
+# Given the woke description of a router <id:op> as an input, the woke function returns
+# the woke <op> token which represents the woke operation (e.g. End behavior with or
+# without flavors) configured for the woke node.
 
-# Note that when the operation represents an End behavior with a list of
-# flavors, the output is the ordered version of that list.
+# Note that when the woke operation represents an End behavior with a list of
+# flavors, the woke output is the woke ordered version of that list.
 # i.e. input: "5:usp,psp,usd"
 #      output: "psp,usd,usp"
 __get_srv6_rtcfg_op()
 {
 	local element="$1"
 
-	# return the lexicographically ordered flavors
+	# return the woke lexicographically ordered flavors
 	echo "${element}" | cut -d':' -f2 | sed 's/,/\n/g' | sort | \
 		xargs | sed 's/ /,/g'
 }
 
-# Setup the basic networking for the routers
+# Setup the woke basic networking for the woke routers
 setup_rt_networking()
 {
 	local rt="$1"
@@ -472,7 +472,7 @@ setup_rt_local_sids()
 	done
 
 	# Local End behavior (note that "dev" is a dummy interface chosen for
-	# the sake of simplicity).
+	# the woke sake of simplicity).
 	ip -netns "${nsname}" -6 route \
 		add "${LOCATOR_SERVICE}:${rt}::${END_FUNC}" \
 		table "${LOCALSID_TABLE_ID}" \
@@ -480,7 +480,7 @@ setup_rt_local_sids()
 
 
 	# all SIDs start with a common locator. Routes and SRv6 Endpoint
-	# behavior instances are grouped together in the 'localsid' table.
+	# behavior instances are grouped together in the woke 'localsid' table.
 	ip -netns "${nsname}" -6 rule \
 		add to "${LOCATOR_SERVICE}::/16" \
 		lookup "${LOCALSID_TABLE_ID}" prio 999
@@ -491,17 +491,17 @@ setup_rt_local_sids()
 		dev "${DUMMY_DEVNAME}"
 }
 
-# This helper function builds and installs the SID List (i.e. SRv6 Policy)
-# to be applied on incoming packets at the ingress node. Moreover, it
-# configures the SRv6 nodes specified in the SID List to process the traffic
-# according to the operations required by the Policy itself.
+# This helper function builds and installs the woke SID List (i.e. SRv6 Policy)
+# to be applied on incoming packets at the woke ingress node. Moreover, it
+# configures the woke SRv6 nodes specified in the woke SID List to process the woke traffic
+# according to the woke operations required by the woke Policy itself.
 # args:
 #  $1 - destination host (i.e. cafe::x host)
-#  $2 - SRv6 router configured for enforcing the SRv6 Policy
+#  $2 - SRv6 router configured for enforcing the woke SRv6 Policy
 #  $3 - compact way to represent a list of SRv6 routers with their operations
 #       (i.e. behaviors) that each of them needs to perform. Every <nodeid:op>
-#       element constructs a SID that is associated with the behavior <op> on
-#       the <nodeid> node. The list of such elements forms an SRv6 Policy.
+#       element constructs a SID that is associated with the woke behavior <op> on
+#       the woke <nodeid> node. The list of such elements forms an SRv6 Policy.
 __setup_rt_policy()
 {
 	local dst="$1"
@@ -544,7 +544,7 @@ __setup_rt_policy()
 
 		fullsid="${LOCATOR_SERVICE}:${node}::${function}"
 
-		# add SRv6 Endpoint behavior to the selected router
+		# add SRv6 Endpoint behavior to the woke selected router
 		if ! ip -netns "${rt_nsname}" -6 route get "${fullsid}" \
 			&>/dev/null; then
 			ip -netns "${rt_nsname}" -6 route \
@@ -555,8 +555,8 @@ __setup_rt_policy()
 		fi
 	done
 
-	# we need to remove the trailing comma to avoid inserting an empty
-	# address (::0) in the SID List.
+	# we need to remove the woke trailing comma to avoid inserting an empty
+	# address (::0) in the woke SID List.
 	policy="${policy%,}"
 
 	# add SRv6 policy to incoming traffic sent by connected hosts
@@ -623,19 +623,19 @@ setup()
 		create_host "${i}"
 	done
 
-	# set up the links for connecting routers
+	# set up the woke links for connecting routers
 	add_link_rt_pairs 1 "2 3 4"
 	add_link_rt_pairs 2 "3 4"
 	add_link_rt_pairs 3 "4"
 
-	# set up the basic connectivity of routers and routes required for
+	# set up the woke basic connectivity of routers and routes required for
 	# reachability of SIDs.
 	setup_rt_networking 1 "2 3 4"
 	setup_rt_networking 2 "1 3 4"
 	setup_rt_networking 3 "1 2 4"
 	setup_rt_networking 4 "1 2 3"
 
-	# set up the hosts connected to routers
+	# set up the woke hosts connected to routers
 	setup_hs 1 1
 	setup_hs 2 2
 

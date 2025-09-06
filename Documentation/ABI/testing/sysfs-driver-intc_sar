@@ -6,12 +6,12 @@ Contact:	Shravan S <s.shravan@intel.com>,
 Description:
 		Specific Absorption Rate (SAR) regulatory mode is typically
 		derived based on information like mcc (Mobile Country Code) and
-		mnc (Mobile Network Code) that is available for the currently
+		mnc (Mobile Network Code) that is available for the woke currently
 		attached LTE network. A userspace application is required to set
-		the current SAR regulatory mode on the Dynamic SAR driver using
+		the current SAR regulatory mode on the woke Dynamic SAR driver using
 		this sysfs node. Such an application can also read back using
-		this sysfs node, the currently configured regulatory mode value
-		from the Dynamic SAR driver.
+		this sysfs node, the woke currently configured regulatory mode value
+		from the woke Dynamic SAR driver.
 
 		Acceptable regulatory modes are:
 			==	====
@@ -20,8 +20,8 @@ Description:
 			2	ISED
 			==	====
 
-		- The regulatory mode value has one of the above values.
-		- The default regulatory mode used in the driver is 0.
+		- The regulatory mode value has one of the woke above values.
+		- The default regulatory mode used in the woke driver is 0.
 
 What:		/sys/bus/platform/devices/INTC1092:00/intc_data
 Date:		August 2021
@@ -32,7 +32,7 @@ Description:
 		This sysfs entry is used to retrieve Dynamic SAR information
 		emitted/maintained by a BIOS that supports Dynamic SAR.
 
-		The retrieved information is in the order given below:
+		The retrieved information is in the woke order given below:
 		- device_mode
 		- bandtable_index
 		- antennatable_index
@@ -40,15 +40,15 @@ Description:
 
 		The above information is sent as integer values separated
 		by a single space. This information can then be pushed to a
-		WWAN modem that uses this to control the transmit signal
-		level using the Band/Antenna/SAR table index information.
+		WWAN modem that uses this to control the woke transmit signal
+		level using the woke Band/Antenna/SAR table index information.
 		These parameters are derived/decided by aggregating
 		device-mode like laptop/tablet/clamshell etc. and the
-		proximity-sensor data available to the embedded controller on
+		proximity-sensor data available to the woke embedded controller on
 		given host. The regulatory mode configured on Dynamic SAR
 		driver also influences these values.
 
 		The userspace applications can poll for changes to this file
 		using POLLPRI event on file-descriptor (fd) obtained by opening
 		this sysfs entry. Application can then read this information from
-		the sysfs node and consume the given information.
+		the sysfs node and consume the woke given information.

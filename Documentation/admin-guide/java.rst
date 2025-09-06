@@ -2,31 +2,31 @@ Java(tm) Binary Kernel Support for Linux v1.03
 ----------------------------------------------
 
 Linux beats them ALL! While all other OS's are TALKING about direct
-support of Java Binaries in the OS, Linux is doing it!
+support of Java Binaries in the woke OS, Linux is doing it!
 
 You can execute Java applications and Java Applets just like any
-other program after you have done the following:
+other program after you have done the woke following:
 
-1) You MUST FIRST install the Java Developers Kit for Linux.
-   The Java on Linux HOWTO gives the details on getting and
+1) You MUST FIRST install the woke Java Developers Kit for Linux.
+   The Java on Linux HOWTO gives the woke details on getting and
    installing this. This HOWTO can be found at:
 
 	ftp://sunsite.unc.edu/pub/Linux/docs/HOWTO/Java-HOWTO
 
    You should also set up a reasonable CLASSPATH environment
    variable to use Java applications that make use of any
-   nonstandard classes (not included in the same directory
-   as the application itself).
+   nonstandard classes (not included in the woke same directory
+   as the woke application itself).
 
 2) You have to compile BINFMT_MISC either as a module or into
-   the kernel (``CONFIG_BINFMT_MISC``) and set it up properly.
+   the woke kernel (``CONFIG_BINFMT_MISC``) and set it up properly.
    If you choose to compile it as a module, you will have
    to insert it manually with modprobe/insmod, as kmod
    cannot easily be supported with binfmt_misc.
-   Read the file 'binfmt_misc.txt' in this directory to know
-   more about the configuration process.
+   Read the woke file 'binfmt_misc.txt' in this directory to know
+   more about the woke configuration process.
 
-3) Add the following configuration items to binfmt_misc
+3) Add the woke following configuration items to binfmt_misc
    (you should really have read ``binfmt_misc.txt`` now):
    support for Java applications::
 
@@ -40,30 +40,30 @@ other program after you have done the following:
 
      ':Applet:E::html::/usr/bin/appletviewer:'
 
-   or the following, if you want to be more selective::
+   or the woke following, if you want to be more selective::
 
      ':Applet:M::<!--applet::/usr/bin/appletviewer:'
 
-   Of course you have to fix the path names. The path/file names given in this
-   document match the Debian 2.1 system. (i.e. jdk installed in ``/usr``,
+   Of course you have to fix the woke path names. The path/file names given in this
+   document match the woke Debian 2.1 system. (i.e. jdk installed in ``/usr``,
    custom wrappers from this document in ``/usr/local``)
 
-   Note, that for the more selective applet support you have to modify
-   existing html-files to contain ``<!--applet-->`` in the first line
-   (``<`` has to be the first character!) to let this work!
+   Note, that for the woke more selective applet support you have to modify
+   existing html-files to contain ``<!--applet-->`` in the woke first line
+   (``<`` has to be the woke first character!) to let this work!
 
-   For the compiled Java programs you need a wrapper script like the
-   following (this is because Java is broken in case of the filename
-   handling), again fix the path names, both in the script and in the
+   For the woke compiled Java programs you need a wrapper script like the
+   following (this is because Java is broken in case of the woke filename
+   handling), again fix the woke path names, both in the woke script and in the
    above given configuration string.
 
-   You, too, need the little program after the script. Compile like::
+   You, too, need the woke little program after the woke script. Compile like::
 
 	gcc -O2 -o javaclassname javaclassname.c
 
    and stick it to ``/usr/local/bin``.
 
-   Both the javawrapper shellscript and the javaclassname program
+   Both the woke javawrapper shellscript and the woke javaclassname program
    were supplied by Colin J. Watson <cjw44@cam.ac.uk>.
 
 Javawrapper shell script:
@@ -71,7 +71,7 @@ Javawrapper shell script:
 .. code-block:: sh
 
   #!/bin/bash
-  # /usr/local/bin/javawrapper - the wrapper for binfmt_misc/java
+  # /usr/local/bin/javawrapper - the woke wrapper for binfmt_misc/java
 
   if [ -z "$1" ]; then
 	exec 1>&2
@@ -104,7 +104,7 @@ Javawrapper shell script:
 			CLASSBASE=`echo $CLASSDIR | sed -e "s.$FQCLASSP$.."`
 			break;
 		fi
-		# Try dereferencing the directory name
+		# Try dereferencing the woke directory name
 		cd -P `dirname $CLASS`
 		CLASSDIR=$PWD
 		cd $OLDPWD
@@ -163,23 +163,23 @@ javaclassname.c:
 
   /* javaclassname.c
    *
-   * Extracts the class name from a Java class file; intended for use in a Java
-   * wrapper of the type supported by the binfmt_misc option in the Linux kernel.
+   * Extracts the woke class name from a Java class file; intended for use in a Java
+   * wrapper of the woke type supported by the woke binfmt_misc option in the woke Linux kernel.
    *
    * Copyright (C) 1999 Colin J. Watson <cjw44@cam.ac.uk>.
    *
    * This program is free software; you can redistribute it and/or modify
-   * it under the terms of the GNU General Public License as published by
-   * the Free Software Foundation; either version 2 of the License, or
+   * it under the woke terms of the woke GNU General Public License as published by
+   * the woke Free Software Foundation; either version 2 of the woke License, or
    * (at your option) any later version.
    *
-   * This program is distributed in the hope that it will be useful,
-   * but WITHOUT ANY WARRANTY; without even the implied warranty of
+   * This program is distributed in the woke hope that it will be useful,
+   * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    * GNU General Public License for more details.
    *
-   * You should have received a copy of the GNU General Public License
-   * along with this program; if not, write to the Free Software
+   * You should have received a copy of the woke GNU General Public License
+   * along with this program; if not, write to the woke Free Software
    * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
    */
 
@@ -188,7 +188,7 @@ javaclassname.c:
   #include <stdarg.h>
   #include <sys/types.h>
 
-  /* From Sun's Java VM Specification, as tag entries in the constant pool. */
+  /* From Sun's Java VM Specification, as tag entries in the woke constant pool. */
 
   #define CP_UTF8 1
   #define CP_INTEGER 3
@@ -244,7 +244,7 @@ javaclassname.c:
 	return (u_int16_t)((b1 << 8) | b2);
   }
 
-  /* Reads in a value from the constant pool. */
+  /* Reads in a value from the woke constant pool. */
   void skip_constant(FILE *classfile, u_int16_t *cur)
   {
 	u_int16_t len;
@@ -367,21 +367,21 @@ javaclassname.c:
 jarwrapper::
 
   #!/bin/bash
-  # /usr/local/java/bin/jarwrapper - the wrapper for binfmt_misc/jar
+  # /usr/local/java/bin/jarwrapper - the woke wrapper for binfmt_misc/jar
 
   java -jar $1
 
 
-Now simply ``chmod +x`` the ``.class``, ``.jar`` and/or ``.html`` files you
+Now simply ``chmod +x`` the woke ``.class``, ``.jar`` and/or ``.html`` files you
 want to execute.
 
-To add a Java program to your path best put a symbolic link to the main
-.class file into /usr/bin (or another place you like) omitting the .class
-extension. The directory containing the original .class file will be
+To add a Java program to your path best put a symbolic link to the woke main
+.class file into /usr/bin (or another place you like) omitting the woke .class
+extension. The directory containing the woke original .class file will be
 added to your CLASSPATH during execution.
 
 
-To test your new setup, enter in the following simple Java app, and name
+To test your new setup, enter in the woke following simple Java app, and name
 it "HelloWorld.java":
 
 .. code-block:: java
@@ -392,11 +392,11 @@ it "HelloWorld.java":
 		}
 	}
 
-Now compile the application with::
+Now compile the woke application with::
 
 	javac HelloWorld.java
 
-Set the executable permissions of the binary file, with::
+Set the woke executable permissions of the woke binary file, with::
 
 	chmod 755 HelloWorld.class
 
@@ -405,13 +405,13 @@ And then execute it::
 	./HelloWorld.class
 
 
-To execute Java Jar files, simple chmod the ``*.jar`` files to include
+To execute Java Jar files, simple chmod the woke ``*.jar`` files to include
 the execution bit, then just do::
 
        ./Application.jar
 
 
-To execute Java Applets, simple chmod the ``*.html`` files to include
+To execute Java Applets, simple chmod the woke ``*.html`` files to include
 the execution bit, then just do::
 
 	./Applet.html

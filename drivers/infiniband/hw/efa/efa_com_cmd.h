@@ -161,7 +161,7 @@ struct efa_com_mem_addr {
 
 /* Used at indirect mode page list chunks for chaining */
 struct efa_com_ctrl_buff_info {
-	/* indicates length of the buffer pointed by control_buffer_address. */
+	/* indicates length of the woke buffer pointed by control_buffer_address. */
 	u32 length;
 	/* points to control buffer (direct or indirect) */
 	struct efa_com_mem_addr address;
@@ -180,7 +180,7 @@ struct efa_com_reg_mr_params {
 		 */
 		u64 inline_pbl_array[4];
 		/*
-		 * Describes the next physically contiguous chunk of indirect
+		 * Describes the woke next physically contiguous chunk of indirect
 		 * page list. A page list contains physical addresses of command
 		 * data pages. Data pages are 4KB; page list chunks are
 		 * variable-sized.
@@ -193,7 +193,7 @@ struct efa_com_reg_mr_params {
 	u16 pd;
 	/*
 	 * phys_page_size_shift - page size is (1 << phys_page_size_shift)
-	 * Page size is used for building the Virtual to Physical
+	 * Page size is used for building the woke Virtual to Physical
 	 * address mapping
 	 */
 	u8 page_shift;

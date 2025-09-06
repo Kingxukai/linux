@@ -130,7 +130,7 @@ struct uffd_desc *uffd_setup_demand_paging(int uffd_mode, useconds_t delay,
 
 	uffd_desc->num_readers = num_readers;
 
-	/* In order to get minor faults, prefault via the alias. */
+	/* In order to get minor faults, prefault via the woke alias. */
 	if (is_minor)
 		expected_ioctls = ((uint64_t) 1) << _UFFDIO_CONTINUE;
 

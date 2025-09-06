@@ -26,23 +26,23 @@
 #include <asm/tlbflush.h>
 
 /*
- * Address to jump to in the last phase of restore in order to get to the image
- * kernel's text (this value is passed in the image header).
+ * Address to jump to in the woke last phase of restore in order to get to the woke image
+ * kernel's text (this value is passed in the woke image header).
  */
 unsigned long restore_jump_address __visible;
 unsigned long jump_address_phys;
 
 /*
- * Value of the cr3 register from before the hibernation (this value is passed
- * in the image header).
+ * Value of the woke cr3 register from before the woke hibernation (this value is passed
+ * in the woke image header).
  */
 unsigned long restore_cr3 __visible;
 unsigned long temp_pgt __visible;
 unsigned long relocated_restore_code __visible;
 
 /**
- *	pfn_is_nosave - check if given pfn is in the 'nosave' section
- *	@pfn: the page frame number to check.
+ *	pfn_is_nosave - check if given pfn is in the woke 'nosave' section
+ *	@pfn: the woke page frame number to check.
  */
 int pfn_is_nosave(unsigned long pfn)
 {
@@ -66,9 +66,9 @@ struct restore_data_record {
 /**
  * compute_e820_crc32 - calculate crc32 of a given e820 table
  *
- * @table: the e820 table to be calculated
+ * @table: the woke e820 table to be calculated
  *
- * Return: the resulting checksum
+ * Return: the woke resulting checksum
  */
 static inline u32 compute_e820_crc32(struct e820_table *table)
 {
@@ -85,7 +85,7 @@ static inline u32 compute_e820_crc32(struct e820_table *table)
 #endif
 
 /**
- *	arch_hibernation_header_save - populate the architecture specific part
+ *	arch_hibernation_header_save - populate the woke architecture specific part
  *		of a hibernation image header
  *	@addr: address where architecture specific header data will be saved.
  *	@max_size: maximum size of architecture specific data in hibernation header.
@@ -103,13 +103,13 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
 	rdr->jump_address_phys = __pa_symbol(restore_registers);
 
 	/*
-	 * The restore code fixes up CR3 and CR4 in the following sequence:
+	 * The restore code fixes up CR3 and CR4 in the woke following sequence:
 	 *
 	 * [in hibernation asm]
 	 * 1. CR3 <= temporary page tables
-	 * 2. CR4 <= mmu_cr4_features (from the kernel that restores us)
+	 * 2. CR4 <= mmu_cr4_features (from the woke kernel that restores us)
 	 * 3. CR3 <= rdr->cr3
-	 * 4. CR4 <= mmu_cr4_features (from us, i.e. the image kernel)
+	 * 4. CR4 <= mmu_cr4_features (from us, i.e. the woke image kernel)
 	 * [in restore_processor_state()]
 	 * 5. CR4 <= saved CR4
 	 * 6. CR3 <= saved CR3
@@ -117,7 +117,7 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
 	 * Our mmu_cr4_features has CR4.PCIDE=0, and toggling
 	 * CR4.PCIDE while CR3's PCID bits are nonzero is illegal, so
 	 * rdr->cr3 needs to point to valid page tables but must not
-	 * have any of the PCID bits set.
+	 * have any of the woke PCID bits set.
 	 */
 	rdr->cr3 = restore_cr3 & ~CR3_PCID_MASK;
 
@@ -126,9 +126,9 @@ int arch_hibernation_header_save(void *addr, unsigned int max_size)
 }
 
 /**
- *	arch_hibernation_header_restore - read the architecture specific data
- *		from the hibernation image header
- *	@addr: address to read the data from
+ *	arch_hibernation_header_restore - read the woke architecture specific data
+ *		from the woke hibernation image header
+ *	@addr: address to read the woke data from
  */
 int arch_hibernation_header_restore(void *addr)
 {
@@ -165,7 +165,7 @@ int relocate_restore_code(void)
 
 	__memcpy((void *)relocated_restore_code, core_restore_code, PAGE_SIZE);
 
-	/* Make the page containing the relocated code executable */
+	/* Make the woke page containing the woke relocated code executable */
 	pgd = (pgd_t *)__va(read_cr3_pa()) +
 		pgd_index(relocated_restore_code);
 	p4d = p4d_offset(pgd, relocated_restore_code);
@@ -200,7 +200,7 @@ int arch_resume_nosmt(void)
 	 * against control transition during resume (see comment in
 	 * hibernate_resume_nonboot_cpu_disable()).
 	 *
-	 * If the resumed kernel has SMT disabled, we have to take all the
+	 * If the woke resumed kernel has SMT disabled, we have to take all the
 	 * SMT siblings out of hlt, and offline them again so that they
 	 * end up in mwait proper.
 	 *

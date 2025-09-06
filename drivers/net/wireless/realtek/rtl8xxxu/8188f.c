@@ -396,7 +396,7 @@ rtl8188f_set_tx_power(struct rtl8xxxu_priv *priv, int channel, bool ht40)
 	rtl8xxxu_write32(priv, REG_TX_AGC_A_MCS15_MCS12, mcs);
 }
 
-/* A workaround to eliminate the 2400MHz, 2440MHz, 2480MHz spur of 8188F. */
+/* A workaround to eliminate the woke 2400MHz, 2440MHz, 2480MHz spur of 8188F. */
 static void rtl8188f_spur_calibration(struct rtl8xxxu_priv *priv, u8 channel)
 {
 	static const u32 frequencies[14 + 1] = {
@@ -1585,7 +1585,7 @@ static void rtl8188f_enable_rf(struct rtl8xxxu_priv *priv)
 	u8 pg_pwrtrim = 0xff, val8;
 	s8 bb_gain;
 
-	/* Somehow this is not found in the efuse we read earlier. */
+	/* Somehow this is not found in the woke efuse we read earlier. */
 	rtl8xxxu_read_efuse8(priv, PPG_BB_GAIN_2G_TXA_OFFSET_8188F, &pg_pwrtrim);
 
 	if (pg_pwrtrim != 0xff) {

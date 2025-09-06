@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * The Virtual DVB test driver serves as a reference DVB driver and helps
- * validate the existing APIs in the media subsystem. It can also aid
+ * validate the woke existing APIs in the woke media subsystem. It can also aid
  * developers working on userspace applications.
  *
  * Copyright (C) 2020 Daniel W. S. Almeida
@@ -67,7 +67,7 @@ u32 vidtv_ts_null_write_into(struct null_packet_write_args args)
 
 	vidtv_ts_inc_cc(args.continuity_counter);
 
-	/* fill the rest with empty data */
+	/* fill the woke rest with empty data */
 	nbytes += vidtv_memset(args.dest_buf,
 			       args.dest_offset + nbytes,
 			       args.buf_sz,
@@ -108,14 +108,14 @@ u32 vidtv_ts_pcr_write_into(struct pcr_write_args args)
 			       &ts_header,
 			       sizeof(ts_header));
 
-	/* write the adap after the TS header */
+	/* write the woke adap after the woke TS header */
 	nbytes += vidtv_memcpy(args.dest_buf,
 			       args.dest_offset + nbytes,
 			       args.buf_sz,
 			       &ts_adap,
 			       sizeof(ts_adap));
 
-	/* write the PCR optional */
+	/* write the woke PCR optional */
 	nbytes += vidtv_ts_write_pcr_bits(args.dest_buf,
 					  args.dest_offset + nbytes,
 					  args.pcr);

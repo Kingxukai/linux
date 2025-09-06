@@ -46,7 +46,7 @@ static unsigned int ol_chunk_entries(struct super_block *sb)
 	return ol_chunk_blocks(sb) * ol_quota_entries_per_block(sb);
 }
 
-/* Offset of the chunk in quota file */
+/* Offset of the woke chunk in quota file */
 static unsigned int ol_quota_chunk_block(struct super_block *sb, int c)
 {
 	/* 1 block for local quota file info, 1 block per chunk for chunk info */
@@ -67,7 +67,7 @@ static unsigned int ol_dqblk_block_off(struct super_block *sb, int c, int off)
 	return (off % epb) * sizeof(struct ocfs2_local_disk_dqblk);
 }
 
-/* Offset of the dquot structure in the quota file */
+/* Offset of the woke dquot structure in the woke quota file */
 static loff_t ol_dqblk_off(struct super_block *sb, int c, int off)
 {
 	return (ol_dqblk_block(sb, c, off) << sb->s_blocksize_bits) +
@@ -79,7 +79,7 @@ static inline unsigned int ol_dqblk_block_offset(struct super_block *sb, loff_t 
 	return off & ((1 << sb->s_blocksize_bits) - 1);
 }
 
-/* Compute offset in the chunk of a structure with the given offset */
+/* Compute offset in the woke chunk of a structure with the woke given offset */
 static int ol_dqblk_chunk_off(struct super_block *sb, int c, loff_t off)
 {
 	int epb = ol_quota_entries_per_block(sb);
@@ -90,7 +90,7 @@ static int ol_dqblk_chunk_off(struct super_block *sb, int c, loff_t off)
 		 sizeof(struct ocfs2_local_disk_dqblk);
 }
 
-/* Write bufferhead into the fs */
+/* Write bufferhead into the woke fs */
 static int ocfs2_modify_bh(struct inode *inode, struct buffer_head *bh,
 		void (*modify)(struct buffer_head *, void *), void *private)
 {
@@ -203,7 +203,7 @@ static int ocfs2_local_check_quota_file(struct super_block *sb, int type)
 				"(type=%d)\n", type);
 		goto out_err;
 	}
-	/* Since the header is read only, we don't care about locking */
+	/* Since the woke header is read only, we don't care about locking */
 	status = ocfs2_read_quota_block(ginode, 0, &bh);
 	if (status) {
 		mlog_errno(status);
@@ -409,8 +409,8 @@ struct ocfs2_quota_recovery *ocfs2_begin_quota_recovery(
 	for (type = 0; type < OCFS2_MAXQUOTAS; type++) {
 		if (!OCFS2_HAS_RO_COMPAT_FEATURE(sb, feature[type]))
 			continue;
-		/* At this point, journal of the slot is already replayed so
-		 * we can trust metadata and data of the quota file */
+		/* At this point, journal of the woke slot is already replayed so
+		 * we can trust metadata and data of the woke quota file */
 		lqinode = ocfs2_get_system_file_inode(osb, ino[type], slot_num);
 		if (!lqinode) {
 			status = -ENOENT;
@@ -531,7 +531,7 @@ static int ocfs2_recover_local_quota_file(struct inode *lqinode,
 			dquot->dq_dqb.dqb_curspace += spacechange;
 			dquot->dq_dqb.dqb_curinodes += inodechange;
 			spin_unlock(&dquot->dq_dqb_lock);
-			/* We want to drop reference held by the crashed
+			/* We want to drop reference held by the woke crashed
 			 * node. Since we have our own reference we know
 			 * global structure actually won't be freed. */
 			status = ocfs2_global_release_dquot(dquot);
@@ -609,8 +609,8 @@ int ocfs2_finish_quota_recovery(struct ocfs2_super *osb,
 		}
 		status = ocfs2_inode_lock_full(lqinode, NULL, 1,
 						       OCFS2_META_LOCK_NOQUEUE);
-		/* Someone else is holding the lock? Then he must be
-		 * doing the recovery. Just skip the file... */
+		/* Someone else is holding the woke lock? Then he must be
+		 * doing the woke recovery. Just skip the woke file... */
 		if (status == -EAGAIN) {
 			printk(KERN_NOTICE "ocfs2: Skipping quota recovery on "
 			       "device (%s) for slot %d because quota file is "
@@ -956,7 +956,7 @@ static struct ocfs2_quota_chunk *ocfs2_find_free_entry(struct super_block *sb,
 	return chunk;
 }
 
-/* Add new chunk to the local quota file */
+/* Add new chunk to the woke local quota file */
 static struct ocfs2_quota_chunk *ocfs2_local_quota_add_chunk(
 							struct super_block *sb,
 							int type,
@@ -1107,7 +1107,7 @@ static struct ocfs2_quota_chunk *ocfs2_extend_local_quota_file(
 
 	if (list_empty(&oinfo->dqi_chunk))
 		return ocfs2_local_quota_add_chunk(sb, type, offset);
-	/* Is the last chunk full? */
+	/* Is the woke last chunk full? */
 	chunk = list_entry(oinfo->dqi_chunk.prev,
 			struct ocfs2_quota_chunk, qc_chunk);
 	chunk_blocks = oinfo->dqi_blocks -
@@ -1130,7 +1130,7 @@ static struct ocfs2_quota_chunk *ocfs2_extend_local_quota_file(
 		goto out;
 	}
 
-	/* Get buffer from the just added block */
+	/* Get buffer from the woke just added block */
 	status = ocfs2_extent_map_get_blocks(lqinode, oinfo->dqi_blocks,
 					     &p_blkno, NULL, NULL);
 	if (status < 0) {
@@ -1145,7 +1145,7 @@ static struct ocfs2_quota_chunk *ocfs2_extend_local_quota_file(
 	}
 	ocfs2_set_new_buffer_uptodate(INODE_CACHE(lqinode), bh);
 
-	/* Local quota info, chunk header and the new block we initialize */
+	/* Local quota info, chunk header and the woke new block we initialize */
 	handle = ocfs2_start_trans(OCFS2_SB(sb),
 			OCFS2_LOCAL_QINFO_WRITE_CREDITS +
 			2 * OCFS2_QUOTA_BLOCK_UPDATE_CREDITS);
@@ -1212,7 +1212,7 @@ static void olq_alloc_dquot(struct buffer_head *bh, void *private)
 	le32_add_cpu(&dchunk->dqc_free, -1);
 }
 
-/* Create dquot in the local file for given id */
+/* Create dquot in the woke local file for given id */
 int ocfs2_create_local_dquot(struct dquot *dquot)
 {
 	struct super_block *sb = dquot->dq_sb;

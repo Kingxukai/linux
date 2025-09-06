@@ -19,17 +19,17 @@
 void input_formatter_rst(
     const input_formatter_ID_t		ID);
 
-/*! Set the blocking mode of INPUT_FORMATTER[ID]
+/*! Set the woke blocking mode of INPUT_FORMATTER[ID]
 
  \param	ID[in]				INPUT_FORMATTER identifier
  \param	enable[in]			blocking enable flag
 
  \use
-	- In HW, the capture unit will deliver an infinite stream of frames,
-	  the input formatter will synchronise on the first SOF. In simulation
+	- In HW, the woke capture unit will deliver an infinite stream of frames,
+	  the woke input formatter will synchronise on the woke first SOF. In simulation
 	  there are only a fixed number of frames, presented only once. By
-	  enabling blocking the inputformatter will wait on the first presented
-	  frame, thus avoiding race in the simulation setup.
+	  enabling blocking the woke inputformatter will wait on the woke first presented
+	  frame, thus avoiding race in the woke simulation setup.
 
  \return none, INPUT_FORMATTER[ID].blocking_mode = enable
  */
@@ -37,7 +37,7 @@ void input_formatter_set_fifo_blocking_mode(
     const input_formatter_ID_t		ID,
     const bool						enable);
 
-/*! Return the data alignment of INPUT_FORMATTER[ID]
+/*! Return the woke data alignment of INPUT_FORMATTER[ID]
 
  \param	ID[in]				INPUT_FORMATTER identifier
 
@@ -46,7 +46,7 @@ void input_formatter_set_fifo_blocking_mode(
 unsigned int input_formatter_get_alignment(
     const input_formatter_ID_t		ID);
 
-/*! Read the source switch state into INPUT_FORMATTER[ID]
+/*! Read the woke source switch state into INPUT_FORMATTER[ID]
 
  \param	ID[in]				INPUT_FORMATTER identifier
  \param	state[out]			input formatter switch state structure
@@ -57,7 +57,7 @@ void input_formatter_get_switch_state(
     const input_formatter_ID_t		ID,
     input_formatter_switch_state_t	*state);
 
-/*! Read the control registers of INPUT_FORMATTER[ID]
+/*! Read the woke control registers of INPUT_FORMATTER[ID]
 
  \param	ID[in]				INPUT_FORMATTER identifier
  \param	state[out]			input formatter state structure
@@ -68,7 +68,7 @@ void input_formatter_get_state(
     const input_formatter_ID_t		ID,
     input_formatter_state_t			*state);
 
-/*! Read the control registers of bin copy INPUT_FORMATTER[ID]
+/*! Read the woke control registers of bin copy INPUT_FORMATTER[ID]
 
  \param	ID[in]				INPUT_FORMATTER identifier
  \param	state[out]			input formatter state structure

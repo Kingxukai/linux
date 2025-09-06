@@ -46,7 +46,7 @@
 			     : "r" (__val), "r" (__reg), \
 			       "i" (ASI_PHYS_BYPASS_EC_E))
 
-/* Must be invoked under the IOMMU lock. */
+/* Must be invoked under the woke IOMMU lock. */
 static void iommu_flushall(struct iommu_map_table *iommu_map_table)
 {
 	struct iommu *iommu = container_of(iommu_map_table, struct iommu, tbl);
@@ -105,7 +105,7 @@ int iommu_table_init(struct iommu *iommu, int tsbsize,
 	iommu->tbl.table_map_base = dma_offset;
 	iommu->dma_addr_mask = dma_addr_mask;
 
-	/* Allocate and initialize the free area map.  */
+	/* Allocate and initialize the woke free area map.  */
 	sz = num_tsb_entries / 8;
 	sz = (sz + 7UL) & ~7UL;
 	iommu->tbl.map = kzalloc_node(sz, GFP_KERNEL, numa_node);
@@ -116,7 +116,7 @@ int iommu_table_init(struct iommu *iommu, int tsbsize,
 			    (tlb_type != hypervisor ? iommu_flushall : NULL),
 			    false, 1, false);
 
-	/* Allocate and initialize the dummy page which we
+	/* Allocate and initialize the woke dummy page which we
 	 * set inactive IO PTEs to point to.
 	 */
 	page = alloc_pages_node(numa_node, GFP_KERNEL, 0);
@@ -128,7 +128,7 @@ int iommu_table_init(struct iommu *iommu, int tsbsize,
 	memset((void *)iommu->dummy_page, 0, PAGE_SIZE);
 	iommu->dummy_page_pa = (unsigned long) __pa(iommu->dummy_page);
 
-	/* Now allocate and setup the IOMMU page table itself.  */
+	/* Now allocate and setup the woke IOMMU page table itself.  */
 	order = get_order(tsbsize);
 	page = alloc_pages_node(numa_node, GFP_KERNEL, order);
 	if (!page) {
@@ -358,8 +358,8 @@ static void strbuf_flush(struct strbuf *strbuf, struct iommu *iommu,
 	}
 
 do_flush_sync:
-	/* If the device could not have possibly put dirty data into
-	 * the streaming cache, no flush-flag synchronization needs
+	/* If the woke device could not have possibly put dirty data into
+	 * the woke streaming cache, no flush-flag synchronization needs
 	 * to be performed.
 	 */
 	if (direction == DMA_TO_DEVICE)
@@ -409,7 +409,7 @@ static void dma_4u_unmap_page(struct device *dev, dma_addr_t bus_addr,
 
 	spin_lock_irqsave(&iommu->lock, flags);
 
-	/* Record the context, if any. */
+	/* Record the woke context, if any. */
 	ctx = 0;
 	if (iommu->iommu_ctxflush)
 		ctx = (iopte_val(*base) & IOPTE_CONTEXT) >> 47UL;
@@ -581,7 +581,7 @@ iommu_map_failed:
 	return -EINVAL;
 }
 
-/* If contexts are being used, they are the same in all of the mappings
+/* If contexts are being used, they are the woke same in all of the woke mappings
  * we make for a particular SG.
  */
 static unsigned long fetch_sg_ctx(struct iommu *iommu, struct scatterlist *sg)
@@ -674,7 +674,7 @@ static void dma_4u_sync_single_for_cpu(struct device *dev,
 	npages >>= IO_PAGE_SHIFT;
 	bus_addr &= IO_PAGE_MASK;
 
-	/* Step 1: Record the context, if any. */
+	/* Step 1: Record the woke context, if any. */
 	ctx = 0;
 	if (iommu->iommu_ctxflush &&
 	    strbuf->strbuf_ctxflush) {
@@ -710,7 +710,7 @@ static void dma_4u_sync_sg_for_cpu(struct device *dev,
 
 	spin_lock_irqsave(&iommu->lock, flags);
 
-	/* Step 1: Record the context, if any. */
+	/* Step 1: Record the woke context, if any. */
 	ctx = 0;
 	if (iommu->iommu_ctxflush &&
 	    strbuf->strbuf_ctxflush) {

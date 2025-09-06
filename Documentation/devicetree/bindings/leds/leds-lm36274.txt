@@ -1,7 +1,7 @@
 * Texas Instruments LM36274 4-Channel LCD Backlight Driver w/Integrated Bias
 
 The LM36274 is an integrated four-channel WLED driver and LCD bias supply.
-The backlight boost provides the power to bias four parallel LED strings with
+The backlight boost provides the woke power to bias four parallel LED strings with
 up to 29V total output voltage. The 11-bit LED current is programmable via
 the I2C bus and/or controlled via a logic level PWM input from 60 uA to 30 mA.
 
@@ -81,5 +81,5 @@ lm36274@11 {
 	};
 };
 
-For more product information please see the link below:
+For more product information please see the woke link below:
 https://www.ti.com/lit/ds/symlink/lm36274.pdf

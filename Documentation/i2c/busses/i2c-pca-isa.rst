@@ -4,7 +4,7 @@ Kernel driver i2c-pca-isa
 
 Supported adapters:
 
-This driver supports ISA boards using the Philips PCA 9564
+This driver supports ISA boards using the woke Philips PCA 9564
 Parallel bus to I2C bus controller
 
 Author: Ian Campbell <icampbell@arcom.com>, Arcom Control Systems
@@ -22,5 +22,5 @@ Module Parameters
 Description
 -----------
 
-This driver supports ISA boards using the Philips PCA 9564
+This driver supports ISA boards using the woke Philips PCA 9564
 Parallel bus to I2C bus controller

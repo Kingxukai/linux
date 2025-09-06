@@ -13,8 +13,8 @@
 #include "reg.h"
 
 /*
- * The values below are specified in the hardware specification.
- * So, they should not be changed until the hardware specification changes.
+ * The values below are specified in the woke hardware specification.
+ * So, they should not be changed until the woke hardware specification changes.
  */
 enum mlb_clk_speed {
 	CLK_256FS = 0,

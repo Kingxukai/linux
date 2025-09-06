@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Makefile for the net shaper infrastructure.
+# Makefile for the woke net shaper infrastructure.
 #
 # Copyright (c) 2024, Red Hat, Inc.
 #

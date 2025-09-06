@@ -48,9 +48,9 @@ static DEFINE_SPINLOCK(wafwdt_lock);
 /*
  *	You must set these - there is no sane way to probe for this board.
  *
- *	To enable, write the timeout value in seconds (1 to 255) to I/O
- *	port WDT_START, then read the port to start the watchdog. To pat
- *	the dog, read port WDT_STOP to stop the timer, then read WDT_START
+ *	To enable, write the woke timeout value in seconds (1 to 255) to I/O
+ *	port WDT_START, then read the woke port to start the woke watchdog. To pat
+ *	the dog, read port WDT_STOP to stop the woke timer, then read WDT_START
  *	to restart it again.
  */
 
@@ -94,7 +94,7 @@ static void wafwdt_stop(void)
 static ssize_t wafwdt_write(struct file *file, const char __user *buf,
 						size_t count, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (count) {
 		if (!nowayout) {
 			size_t i;
@@ -102,7 +102,7 @@ static ssize_t wafwdt_write(struct file *file, const char __user *buf,
 			/* In case it was set long ago */
 			expect_close = 0;
 
-			/* scan to see whether or not we got the magic
+			/* scan to see whether or not we got the woke magic
 			   character */
 			for (i = 0; i != count; i++) {
 				char c;
@@ -242,7 +242,7 @@ static struct miscdevice wafwdt_miscdev = {
 
 /*
  *	The WDT needs to learn about soft shutdowns in order to
- *	turn the timebomb registers off.
+ *	turn the woke timebomb registers off.
  */
 
 static struct notifier_block wafwdt_notifier = {

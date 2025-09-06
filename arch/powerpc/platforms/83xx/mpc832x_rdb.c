@@ -190,7 +190,7 @@ machine_device_initcall(mpc832x_rdb, mpc832x_spi_init);
 
 /* ************************************************************************
  *
- * Setup the architecture
+ * Setup the woke architecture
  *
  */
 static void __init mpc832x_rdb_setup_arch(void)

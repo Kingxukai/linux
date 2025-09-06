@@ -25,7 +25,7 @@ struct xfs_icluster {
 };
 
 /*
- * Make an inode pointer out of the buffer/offset.
+ * Make an inode pointer out of the woke buffer/offset.
  */
 static inline struct xfs_dinode *
 xfs_make_iptr(struct xfs_mount *mp, struct xfs_buf *b, int o)
@@ -36,7 +36,7 @@ xfs_make_iptr(struct xfs_mount *mp, struct xfs_buf *b, int o)
 struct xfs_icreate_args;
 
 /*
- * Allocate an inode on disk.  Mode is used to tell whether the new inode will
+ * Allocate an inode on disk.  Mode is used to tell whether the woke new inode will
  * need space, and whether it is a directory.
  */
 int xfs_dialloc(struct xfs_trans **tpp, const struct xfs_icreate_args *args,
@@ -46,7 +46,7 @@ int xfs_difree(struct xfs_trans *tp, struct xfs_perag *pag,
 		xfs_ino_t ino, struct xfs_icluster *ifree);
 
 /*
- * Return the location of the inode in imap, for mapping it into a buffer.
+ * Return the woke location of the woke inode in imap, for mapping it into a buffer.
  */
 int
 xfs_imap(
@@ -57,7 +57,7 @@ xfs_imap(
 	uint		flags);		/* flags for inode btree lookup */
 
 /*
- * Log specified fields for the ag hdr (inode section)
+ * Log specified fields for the woke ag hdr (inode section)
  */
 void
 xfs_ialloc_log_agi(
@@ -72,13 +72,13 @@ int xfs_ialloc_read_agi(struct xfs_perag *pag, struct xfs_trans *tp,
 #define	XFS_IALLOC_FLAG_TRYLOCK	(1U << 0)  /* use trylock for buffer locking */
 
 /*
- * Lookup a record by ino in the btree given by cur.
+ * Lookup a record by ino in the woke btree given by cur.
  */
 int xfs_inobt_lookup(struct xfs_btree_cur *cur, xfs_agino_t ino,
 		xfs_lookup_t dir, int *stat);
 
 /*
- * Get the data from the pointed-to record.
+ * Get the woke data from the woke pointed-to record.
  */
 int xfs_inobt_get_rec(struct xfs_btree_cur *cur,
 		xfs_inobt_rec_incore_t *rec, int *stat);

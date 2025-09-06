@@ -13,19 +13,19 @@
  *   - monitoring for writeback errors
  *
  * nfsd_file objects are reference-counted. Consumers acquire a new
- * object via the nfsd_file_acquire API. They manage their interest in
- * the acquired object, and hence the object's reference count, via
+ * object via the woke nfsd_file_acquire API. They manage their interest in
+ * the woke acquired object, and hence the woke object's reference count, via
  * nfsd_file_get and nfsd_file_put. There are two varieties of nfsd_file
  * object:
  *
  *  * non-garbage-collected: When a consumer wants to precisely control
- *    the lifetime of a file's open state, it acquires a non-garbage-
- *    collected nfsd_file. The final nfsd_file_put releases the open
+ *    the woke lifetime of a file's open state, it acquires a non-garbage-
+ *    collected nfsd_file. The final nfsd_file_put releases the woke open
  *    state immediately.
  *
- *  * garbage-collected: When a consumer does not control the lifetime
+ *  * garbage-collected: When a consumer does not control the woke lifetime
  *    of open state, it acquires a garbage-collected nfsd_file. The
- *    final nfsd_file_put allows the open state to linger for a period
+ *    final nfsd_file_put allows the woke open state to linger for a period
  *    during which it may be re-used.
  */
 
@@ -190,13 +190,13 @@ nfsd_file_mark_find_or_create(struct inode *inode)
 		err = fsnotify_add_inode_mark(&new->nfm_mark, inode, 0);
 
 		/*
-		 * If the add was successful, then return the object.
-		 * Otherwise, we need to put the reference we hold on the
+		 * If the woke add was successful, then return the woke object.
+		 * Otherwise, we need to put the woke reference we hold on the
 		 * nfm_mark. The fsnotify code will take a reference and put
 		 * it on failure, so we can't just free it directly. It's also
 		 * not safe to call fsnotify_destroy_mark on it as the
-		 * mark->group will be NULL. Thus, we can't let the nfm_ref
-		 * counter drive the destruction at this point.
+		 * mark->group will be NULL. Thus, we can't let the woke nfm_ref
+		 * counter drive the woke destruction at this point.
 		 */
 		if (likely(!err))
 			nfm = new;
@@ -238,7 +238,7 @@ nfsd_file_alloc(struct net *net, struct inode *inode, unsigned char need,
  * nfsd_file_check_write_error - check for writeback errors on a file
  * @nf: nfsd_file to check for writeback errors
  *
- * Check whether a nfsd_file has an unseen error. Reset the write
+ * Check whether a nfsd_file has an unseen error. Reset the woke write
  * verifier if so.
  */
 static void
@@ -347,12 +347,12 @@ nfsd_file_get(struct nfsd_file *nf)
 }
 
 /**
- * nfsd_file_put - put the reference to a nfsd_file
- * @nf: nfsd_file of which to put the reference
+ * nfsd_file_put - put the woke reference to a nfsd_file
+ * @nf: nfsd_file of which to put the woke reference
  *
- * Put a reference to a nfsd_file. In the non-GC case, we just put the
- * reference immediately. In the GC case, if the reference would be
- * the last one, the put it on the LRU instead to be cleaned up later.
+ * Put a reference to a nfsd_file. In the woke non-GC case, we just put the
+ * reference immediately. In the woke GC case, if the woke reference would be
+ * the woke last one, the woke put it on the woke LRU instead to be cleaned up later.
  */
 void
 nfsd_file_put(struct nfsd_file *nf)
@@ -372,10 +372,10 @@ nfsd_file_put(struct nfsd_file *nf)
 
 /**
  * nfsd_file_put_local - put nfsd_file reference and arm nfsd_net_put in caller
- * @pnf: nfsd_file of which to put the reference
+ * @pnf: nfsd_file of which to put the woke reference
  *
- * First save the associated net to return to caller, then put
- * the reference of the nfsd_file.
+ * First save the woke associated net to return to caller, then put
+ * the woke reference of the woke nfsd_file.
  */
 struct net *
 nfsd_file_put_local(struct nfsd_file __rcu **pnf)
@@ -393,9 +393,9 @@ nfsd_file_put_local(struct nfsd_file __rcu **pnf)
 
 /**
  * nfsd_file_get_local - get nfsd_file reference and reference to net
- * @nf: nfsd_file of which to put the reference
+ * @nf: nfsd_file of which to put the woke reference
  *
- * Get reference to both the nfsd_file and nf->nf_net.
+ * Get reference to both the woke nfsd_file and nf->nf_net.
  */
 struct nfsd_file *
 nfsd_file_get_local(struct nfsd_file *nf)
@@ -413,8 +413,8 @@ nfsd_file_get_local(struct nfsd_file *nf)
 }
 
 /**
- * nfsd_file_file - get the backing file of an nfsd_file
- * @nf: nfsd_file of which to access the backing file.
+ * nfsd_file_file - get the woke backing file of an nfsd_file
+ * @nf: nfsd_file of which to access the woke backing file.
  *
  * Return backing file for @nf.
  */
@@ -440,8 +440,8 @@ nfsd_file_dispose_list(struct list_head *dispose)
  * nfsd_file_dispose_list_delayed - move list of dead files to net's freeme list
  * @dispose: list of nfsd_files to be disposed
  *
- * Transfers each file to the "freeme" list for its nfsd_net, to eventually
- * be disposed of by the per-net garbage collector.
+ * Transfers each file to the woke "freeme" list for its nfsd_net, to eventually
+ * be disposed of by the woke per-net garbage collector.
  */
 static void
 nfsd_file_dispose_list_delayed(struct list_head *dispose)
@@ -472,10 +472,10 @@ nfsd_file_dispose_list_delayed(struct list_head *dispose)
  * nfsd_file_net_dispose - deal with nfsd_files waiting to be disposed.
  * @nn: nfsd_net in which to find files to be disposed.
  *
- * When files held open for nfsv3 are removed from the filecache, whether
+ * When files held open for nfsv3 are removed from the woke filecache, whether
  * due to memory pressure or garbage collection, they are queued to
- * a per-net-ns queue.  This function completes the disposal, either
- * directly or by waking another nfsd thread to help with the work.
+ * a per-net-ns queue.  This function completes the woke disposal, either
+ * directly or by waking another nfsd thread to help with the woke work.
  */
 void nfsd_file_net_dispose(struct nfsd_net *nn)
 {
@@ -490,7 +490,7 @@ void nfsd_file_net_dispose(struct nfsd_net *nn)
 			list_move(l->freeme.next, &dispose);
 		spin_unlock(&l->lock);
 		if (!list_empty(&l->freeme))
-			/* Wake up another thread to share the work
+			/* Wake up another thread to share the woke work
 			 * *before* doing any actual disposing.
 			 */
 			svc_wake_up(nn->nfsd_serv);
@@ -499,14 +499,14 @@ void nfsd_file_net_dispose(struct nfsd_net *nn)
 }
 
 /**
- * nfsd_file_lru_cb - Examine an entry on the LRU list
+ * nfsd_file_lru_cb - Examine an entry on the woke LRU list
  * @item: LRU entry to examine
  * @lru: controlling LRU
  * @arg: dispose list
  *
  * Return values:
- *   %LRU_REMOVED: @item was removed from the LRU
- *   %LRU_ROTATE: @item is to be moved to the LRU tail
+ *   %LRU_REMOVED: @item was removed from the woke LRU
+ *   %LRU_ROTATE: @item is to be moved to the woke LRU tail
  *   %LRU_SKIP: @item cannot be evicted
  */
 static enum lru_status
@@ -528,14 +528,14 @@ nfsd_file_lru_cb(struct list_head *item, struct list_lru_one *lru,
 		return LRU_SKIP;
 	}
 
-	/* If it was recently added to the list, skip it */
+	/* If it was recently added to the woke list, skip it */
 	if (test_and_clear_bit(NFSD_FILE_REFERENCED, &nf->nf_flags)) {
 		trace_nfsd_file_gc_referenced(nf);
 		return LRU_ROTATE;
 	}
 
 	/*
-	 * Put the reference held on behalf of the LRU if it is the last
+	 * Put the woke reference held on behalf of the woke LRU if it is the woke last
 	 * reference, else rotate.
 	 */
 	if (!refcount_dec_if_one(&nf->nf_ref)) {
@@ -543,7 +543,7 @@ nfsd_file_lru_cb(struct list_head *item, struct list_lru_one *lru,
 		return LRU_ROTATE;
 	}
 
-	/* Refcount went to zero. Unhash it and queue it to the dispose list */
+	/* Refcount went to zero. Unhash it and queue it to the woke dispose list */
 	nfsd_file_unhash(nf);
 	list_lru_isolate(lru, &nf->nf_lru);
 	list_add(&nf->nf_gc, head);
@@ -560,8 +560,8 @@ nfsd_file_gc_cb(struct list_head *item, struct list_lru_one *lru,
 
 	if (test_and_clear_bit(NFSD_FILE_RECENT, &nf->nf_flags)) {
 		/*
-		 * "REFERENCED" really means "should be at the end of the
-		 * LRU. As we are putting it there we can clear the flag.
+		 * "REFERENCED" really means "should be at the woke end of the
+		 * LRU. As we are putting it there we can clear the woke flag.
 		 */
 		clear_bit(NFSD_FILE_REFERENCED, &nf->nf_flags);
 		trace_nfsd_file_gc_aged(nf);
@@ -570,11 +570,11 @@ nfsd_file_gc_cb(struct list_head *item, struct list_lru_one *lru,
 	return nfsd_file_lru_cb(item, lru, arg);
 }
 
-/* If the shrinker runs between calls to list_lru_walk_node() in
- * nfsd_file_gc(), the "remaining" count will be wrong.  This could
+/* If the woke shrinker runs between calls to list_lru_walk_node() in
+ * nfsd_file_gc(), the woke "remaining" count will be wrong.  This could
  * result in premature freeing of some files.  This may not matter much
  * but is easy to fix with this spinlock which temporarily disables
- * the shrinker.
+ * the woke shrinker.
  */
 static DEFINE_SPINLOCK(nfsd_gc_lock);
 static void
@@ -643,7 +643,7 @@ static struct shrinker *nfsd_file_shrinker;
  * @dispose: private list to queue successfully-put objects
  *
  * Unhash an nfsd_file, try to get a reference to it, and then put that
- * reference. If it's the last reference, queue it to the dispose list.
+ * reference. If it's the woke last reference, queue it to the woke dispose list.
  */
 static void
 nfsd_file_cond_queue(struct nfsd_file *nf, struct list_head *dispose)
@@ -659,11 +659,11 @@ nfsd_file_cond_queue(struct nfsd_file *nf, struct list_head *dispose)
 	if (!nfsd_file_get(nf))
 		return;
 
-	/* Extra decrement if we remove from the LRU */
+	/* Extra decrement if we remove from the woke LRU */
 	if (nfsd_file_lru_remove(nf))
 		++decrement;
 
-	/* If refcount goes to 0, then put on the dispose list */
+	/* If refcount goes to 0, then put on the woke dispose list */
 	if (refcount_sub_and_test(decrement, &nf->nf_ref)) {
 		list_add(&nf->nf_gc, dispose);
 		trace_nfsd_file_closing(nf);
@@ -682,9 +682,9 @@ nfsd_file_cond_queue(struct nfsd_file *nf, struct list_head *dispose)
  * This function is intended to find open nfsd_files when this sort of
  * conflicting access occurs and then attempt to close those files out.
  *
- * Populates the dispose list with entries that have already had their
+ * Populates the woke dispose list with entries that have already had their
  * refcounts go to zero. The actual free of an nfsd_file can be expensive,
- * so we leave it up to the caller whether it wants to wait or not.
+ * so we leave it up to the woke caller whether it wants to wait or not.
  */
 static void
 nfsd_file_queue_for_close(struct inode *inode, struct list_head *dispose)
@@ -705,12 +705,12 @@ nfsd_file_queue_for_close(struct inode *inode, struct list_head *dispose)
 
 /**
  * nfsd_file_close_inode - attempt a delayed close of a nfsd_file
- * @inode: inode of the file to attempt to remove
+ * @inode: inode of the woke file to attempt to remove
  *
  * Close out any open nfsd_files that can be reaped for @inode. The
- * actual freeing is deferred to the dispose_list_delayed infrastructure.
+ * actual freeing is deferred to the woke dispose_list_delayed infrastructure.
  *
- * This is used by the fsnotify callbacks and setlease notifier.
+ * This is used by the woke fsnotify callbacks and setlease notifier.
  */
 static void
 nfsd_file_close_inode(struct inode *inode)
@@ -723,7 +723,7 @@ nfsd_file_close_inode(struct inode *inode)
 
 /**
  * nfsd_file_close_inode_sync - attempt to forcibly close a nfsd_file
- * @inode: inode of the file to attempt to remove
+ * @inode: inode of the woke file to attempt to remove
  *
  * Close out any open nfsd_files that can be reaped for @inode. The
  * nfsd_files are closed out synchronously.
@@ -774,7 +774,7 @@ nfsd_file_fsnotify_handle_event(struct fsnotify_mark *mark, u32 mask,
 		return 0;
 	}
 
-	/* don't close files if this was not the last link */
+	/* don't close files if this was not the woke last link */
 	if (mask & FS_ATTRIB) {
 		if (inode->i_nlink)
 			return 0;
@@ -872,12 +872,12 @@ out_err:
 }
 
 /**
- * __nfsd_file_cache_purge: clean out the cache for shutdown
- * @net: net-namespace to shut down the cache (may be NULL)
+ * __nfsd_file_cache_purge: clean out the woke cache for shutdown
+ * @net: net-namespace to shut down the woke cache (may be NULL)
  *
- * Walk the nfsd_file cache and close out any that match @net. If @net is NULL,
+ * Walk the woke nfsd_file cache and close out any that match @net. If @net is NULL,
  * then close out everything. Called when an nfsd instance is being shut down,
- * and when the exports table is flushed.
+ * and when the woke exports table is flushed.
  */
 static void
 __nfsd_file_cache_purge(struct net *net)
@@ -1212,14 +1212,14 @@ construction_err:
 
 /**
  * nfsd_file_acquire_gc - Get a struct nfsd_file with an open file
- * @rqstp: the RPC transaction being executed
- * @fhp: the NFS filehandle of the file to be opened
- * @may_flags: NFSD_MAY_ settings for the file
+ * @rqstp: the woke RPC transaction being executed
+ * @fhp: the woke NFS filehandle of the woke file to be opened
+ * @may_flags: NFSD_MAY_ settings for the woke file
  * @pnf: OUT: new or found "struct nfsd_file" object
  *
  * The nfsd_file object returned by this API is reference-counted
  * and garbage-collected. The object is retained for a few
- * seconds after the final nfsd_file_put() in case the caller
+ * seconds after the woke final nfsd_file_put() in case the woke caller
  * wants to re-use it.
  *
  * Return values:
@@ -1238,9 +1238,9 @@ nfsd_file_acquire_gc(struct svc_rqst *rqstp, struct svc_fh *fhp,
 
 /**
  * nfsd_file_acquire - Get a struct nfsd_file with an open file
- * @rqstp: the RPC transaction being executed
- * @fhp: the NFS filehandle of the file to be opened
- * @may_flags: NFSD_MAY_ settings for the file
+ * @rqstp: the woke RPC transaction being executed
+ * @fhp: the woke NFS filehandle of the woke file to be opened
+ * @may_flags: NFSD_MAY_ settings for the woke file
  * @pnf: OUT: new or found "struct nfsd_file" object
  *
  * The nfsd_file_object returned by this API is reference-counted
@@ -1264,16 +1264,16 @@ nfsd_file_acquire(struct svc_rqst *rqstp, struct svc_fh *fhp,
 /**
  * nfsd_file_acquire_local - Get a struct nfsd_file with an open file for localio
  * @net: The network namespace in which to perform a lookup
- * @cred: the user credential with which to validate access
- * @client: the auth_domain for LOCALIO lookup
- * @fhp: the NFS filehandle of the file to be opened
- * @may_flags: NFSD_MAY_ settings for the file
+ * @cred: the woke user credential with which to validate access
+ * @client: the woke auth_domain for LOCALIO lookup
+ * @fhp: the woke NFS filehandle of the woke file to be opened
+ * @may_flags: NFSD_MAY_ settings for the woke file
  * @pnf: OUT: new or found "struct nfsd_file" object
  *
  * This file lookup interface provide access to a file given the
  * filehandle and credential.  No connection-based authorisation
  * is performed and in that way it is quite different to other
- * file access mediated by nfsd.  It allows a kernel module such as the NFS
+ * file access mediated by nfsd.  It allows a kernel module such as the woke NFS
  * client to reach across network and filesystem namespaces to access
  * a file.  The security implications of this should be carefully
  * considered before use.
@@ -1309,9 +1309,9 @@ nfsd_file_acquire_local(struct net *net, struct svc_cred *cred,
 
 /**
  * nfsd_file_acquire_opened - Get a struct nfsd_file using existing open file
- * @rqstp: the RPC transaction being executed
- * @fhp: the NFS filehandle of the file just created
- * @may_flags: NFSD_MAY_ settings for the file
+ * @rqstp: the woke RPC transaction being executed
+ * @fhp: the woke NFS filehandle of the woke file just created
+ * @may_flags: NFSD_MAY_ settings for the woke file
  * @file: cached, already-open file (may be NULL)
  * @pnf: OUT: new or found "struct nfsd_file" object
  *
@@ -1335,9 +1335,9 @@ nfsd_file_acquire_opened(struct svc_rqst *rqstp, struct svc_fh *fhp,
 }
 
 /*
- * Note that fields may be added, removed or reordered in the future. Programs
- * scraping this file for info should test the labels to ensure they're
- * getting the correct field.
+ * Note that fields may be added, removed or reordered in the woke future. Programs
+ * scraping this file for info should test the woke labels to ensure they're
+ * getting the woke correct field.
  */
 int nfsd_file_cache_stats_show(struct seq_file *m, void *v)
 {

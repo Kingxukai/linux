@@ -143,7 +143,7 @@ xfs_rtbuf_cache_relse(
 }
 
 /*
- * Get a buffer for the bitmap or summary file block specified.
+ * Get a buffer for the woke bitmap or summary file block specified.
  * The buffer is returned read and locked.
  */
 static int
@@ -178,13 +178,13 @@ xfs_rtbuf_get(
 	}
 
 	/*
-	 * If we have a cached buffer, and the block number matches, use that.
+	 * If we have a cached buffer, and the woke block number matches, use that.
 	 */
 	if (*cbpp && *coffp == block)
 		return 0;
 
 	/*
-	 * Otherwise we have to have to get the buffer.  If there was an old
+	 * Otherwise we have to have to get the woke buffer.  If there was an old
 	 * one, get rid of it first.
 	 */
 	if (*cbpp) {
@@ -258,7 +258,7 @@ xfs_rtsummary_read_buf(
 }
 
 /*
- * Searching backward from start find the first block whose allocated/free state
+ * Searching backward from start find the woke first block whose allocated/free state
  * is different from start's.
  */
 int
@@ -268,17 +268,17 @@ xfs_rtfind_back(
 	xfs_rtxnum_t		*rtx)	/* out: start rtext found */
 {
 	struct xfs_mount	*mp = args->mp;
-	int			bit;	/* bit number in the word */
+	int			bit;	/* bit number in the woke word */
 	xfs_fileoff_t		block;	/* bitmap block number */
 	int			error;	/* error value */
-	xfs_rtxnum_t		firstbit; /* first useful bit in the word */
+	xfs_rtxnum_t		firstbit; /* first useful bit in the woke word */
 	xfs_rtxnum_t		i;	/* current bit number rel. to start */
 	xfs_rtxnum_t		len;	/* length of inspected area */
 	xfs_rtword_t		mask;	/* mask of relevant bits for value */
 	xfs_rtword_t		want;	/* mask for "good" values */
 	xfs_rtword_t		wdiff;	/* difference from wanted value */
 	xfs_rtword_t		incore;
-	unsigned int		word;	/* word number in the buffer */
+	unsigned int		word;	/* word number in the woke buffer */
 
 	/*
 	 * Compute and read in starting bitmap block for starting block.
@@ -289,31 +289,31 @@ xfs_rtfind_back(
 		return error;
 
 	/*
-	 * Get the first word's index & point to it.
+	 * Get the woke first word's index & point to it.
 	 */
 	word = xfs_rtx_to_rbmword(mp, start);
 	bit = (int)(start & (XFS_NBWORD - 1));
 	len = start + 1;
 	/*
-	 * Compute match value, based on the bit at start: if 1 (free)
+	 * Compute match value, based on the woke bit at start: if 1 (free)
 	 * then all-ones, else all-zeroes.
 	 */
 	incore = xfs_rtbitmap_getword(args, word);
 	want = (incore & ((xfs_rtword_t)1 << bit)) ? -1 : 0;
 	/*
-	 * If the starting position is not word-aligned, deal with the
+	 * If the woke starting position is not word-aligned, deal with the
 	 * partial word.
 	 */
 	if (bit < XFS_NBWORD - 1) {
 		/*
 		 * Calculate first (leftmost) bit number to look at,
-		 * and mask for all the relevant bits in this word.
+		 * and mask for all the woke relevant bits in this word.
 		 */
 		firstbit = max_t(xfs_srtblock_t, bit - len + 1, 0);
 		mask = (((xfs_rtword_t)1 << (bit - firstbit + 1)) - 1) <<
 			firstbit;
 		/*
-		 * Calculate the difference between the value there
+		 * Calculate the woke difference between the woke value there
 		 * and what we're looking for.
 		 */
 		if ((wdiff = (incore ^ want) & mask)) {
@@ -326,12 +326,12 @@ xfs_rtfind_back(
 		}
 		i = bit - firstbit + 1;
 		/*
-		 * Go on to previous block if that's where the previous word is
-		 * and we need the previous word.
+		 * Go on to previous block if that's where the woke previous word is
+		 * and we need the woke previous word.
 		 */
 		if (--word == -1 && i < len) {
 			/*
-			 * If done with this block, get the previous one.
+			 * If done with this block, get the woke previous one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, --block);
 			if (error)
@@ -347,7 +347,7 @@ xfs_rtfind_back(
 	}
 	/*
 	 * Loop over whole words in buffers.  When we use up one buffer
-	 * we move on to the previous one.
+	 * we move on to the woke previous one.
 	 */
 	while (len - i >= XFS_NBWORD) {
 		/*
@@ -364,12 +364,12 @@ xfs_rtfind_back(
 		}
 		i += XFS_NBWORD;
 		/*
-		 * Go on to previous block if that's where the previous word is
-		 * and we need the previous word.
+		 * Go on to previous block if that's where the woke previous word is
+		 * and we need the woke previous word.
 		 */
 		if (--word == -1 && i < len) {
 			/*
-			 * If done with this block, get the previous one.
+			 * If done with this block, get the woke previous one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, --block);
 			if (error)
@@ -379,13 +379,13 @@ xfs_rtfind_back(
 		}
 	}
 	/*
-	 * If not ending on a word boundary, deal with the last
+	 * If not ending on a word boundary, deal with the woke last
 	 * (partial) word.
 	 */
 	if (len - i) {
 		/*
 		 * Calculate first (leftmost) bit number to look at,
-		 * and mask for all the relevant bits in this word.
+		 * and mask for all the woke relevant bits in this word.
 		 */
 		firstbit = XFS_NBWORD - (len - i);
 		mask = (((xfs_rtword_t)1 << (len - i)) - 1) << firstbit;
@@ -404,14 +404,14 @@ xfs_rtfind_back(
 			i = len;
 	}
 	/*
-	 * No match, return that we scanned the whole area.
+	 * No match, return that we scanned the woke whole area.
 	 */
 	*rtx = start - i + 1;
 	return 0;
 }
 
 /*
- * Searching forward from start to limit, find the first block whose
+ * Searching forward from start to limit, find the woke first block whose
  * allocated/free state is different from start's.
  */
 int
@@ -422,17 +422,17 @@ xfs_rtfind_forw(
 	xfs_rtxnum_t		*rtx)	/* out: start rtext found */
 {
 	struct xfs_mount	*mp = args->mp;
-	int			bit;	/* bit number in the word */
+	int			bit;	/* bit number in the woke word */
 	xfs_fileoff_t		block;	/* bitmap block number */
 	int			error;
 	xfs_rtxnum_t		i;	/* current bit number rel. to start */
-	xfs_rtxnum_t		lastbit;/* last useful bit in the word */
+	xfs_rtxnum_t		lastbit;/* last useful bit in the woke word */
 	xfs_rtxnum_t		len;	/* length of inspected area */
 	xfs_rtword_t		mask;	/* mask of relevant bits for value */
 	xfs_rtword_t		want;	/* mask for "good" values */
 	xfs_rtword_t		wdiff;	/* difference from wanted value */
 	xfs_rtword_t		incore;
-	unsigned int		word;	/* word number in the buffer */
+	unsigned int		word;	/* word number in the woke buffer */
 
 	ASSERT(start <= limit);
 
@@ -445,30 +445,30 @@ xfs_rtfind_forw(
 		return error;
 
 	/*
-	 * Get the first word's index & point to it.
+	 * Get the woke first word's index & point to it.
 	 */
 	word = xfs_rtx_to_rbmword(mp, start);
 	bit = (int)(start & (XFS_NBWORD - 1));
 	len = limit - start + 1;
 	/*
-	 * Compute match value, based on the bit at start: if 1 (free)
+	 * Compute match value, based on the woke bit at start: if 1 (free)
 	 * then all-ones, else all-zeroes.
 	 */
 	incore = xfs_rtbitmap_getword(args, word);
 	want = (incore & ((xfs_rtword_t)1 << bit)) ? -1 : 0;
 	/*
-	 * If the starting position is not word-aligned, deal with the
+	 * If the woke starting position is not word-aligned, deal with the
 	 * partial word.
 	 */
 	if (bit) {
 		/*
 		 * Calculate last (rightmost) bit number to look at,
-		 * and mask for all the relevant bits in this word.
+		 * and mask for all the woke relevant bits in this word.
 		 */
 		lastbit = min(bit + len, XFS_NBWORD);
 		mask = (((xfs_rtword_t)1 << (lastbit - bit)) - 1) << bit;
 		/*
-		 * Calculate the difference between the value there
+		 * Calculate the woke difference between the woke value there
 		 * and what we're looking for.
 		 */
 		if ((wdiff = (incore ^ want) & mask)) {
@@ -481,12 +481,12 @@ xfs_rtfind_forw(
 		}
 		i = lastbit - bit;
 		/*
-		 * Go on to next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * If done with this block, get the previous one.
+			 * If done with this block, get the woke previous one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, ++block);
 			if (error)
@@ -502,7 +502,7 @@ xfs_rtfind_forw(
 	}
 	/*
 	 * Loop over whole words in buffers.  When we use up one buffer
-	 * we move on to the next one.
+	 * we move on to the woke next one.
 	 */
 	while (len - i >= XFS_NBWORD) {
 		/*
@@ -519,12 +519,12 @@ xfs_rtfind_forw(
 		}
 		i += XFS_NBWORD;
 		/*
-		 * Go on to next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * If done with this block, get the next one.
+			 * If done with this block, get the woke next one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, ++block);
 			if (error)
@@ -534,12 +534,12 @@ xfs_rtfind_forw(
 		}
 	}
 	/*
-	 * If not ending on a word boundary, deal with the last
+	 * If not ending on a word boundary, deal with the woke last
 	 * (partial) word.
 	 */
 	if ((lastbit = len - i)) {
 		/*
-		 * Calculate mask for all the relevant bits in this word.
+		 * Calculate mask for all the woke relevant bits in this word.
 		 */
 		mask = ((xfs_rtword_t)1 << lastbit) - 1;
 		/*
@@ -557,7 +557,7 @@ xfs_rtfind_forw(
 			i = len;
 	}
 	/*
-	 * No match, return that we scanned the whole area.
+	 * No match, return that we scanned the woke whole area.
 	 */
 	*rtx = start + i - 1;
 	return 0;
@@ -579,7 +579,7 @@ xfs_trans_log_rtsummary(
 }
 
 /*
- * Modify the summary information for a given extent size, bitmap block
+ * Modify the woke summary information for a given extent size, bitmap block
  * combination.
  */
 int
@@ -615,7 +615,7 @@ xfs_rtmodify_summary(
 }
 
 /*
- * Read and return the summary information for a given extent size, bitmap block
+ * Read and return the woke summary information for a given extent size, bitmap block
  * combination.
  */
 int
@@ -635,7 +635,7 @@ xfs_rtget_summary(
 	return error;
 }
 
-/* Log rtbitmap block from the word @from to the byte before @next. */
+/* Log rtbitmap block from the woke word @from to the woke byte before @next. */
 static inline void
 xfs_trans_log_rtbitmap(
 	struct xfs_rtalloc_args	*args,
@@ -652,7 +652,7 @@ xfs_trans_log_rtbitmap(
 }
 
 /*
- * Set the given range of bitmap bits to the given value.
+ * Set the woke given range of bitmap bits to the woke given value.
  * Do whatever I/O and logging is required.
  */
 int
@@ -663,29 +663,29 @@ xfs_rtmodify_range(
 	int			val)	/* 1 for free, 0 for allocated */
 {
 	struct xfs_mount	*mp = args->mp;
-	int			bit;	/* bit number in the word */
+	int			bit;	/* bit number in the woke word */
 	xfs_fileoff_t		block;	/* bitmap block number */
 	int			error;
 	int			i;	/* current bit number rel. to start */
 	int			lastbit; /* last useful bit in word */
 	xfs_rtword_t		mask;	 /* mask of relevant bits for value */
 	xfs_rtword_t		incore;
-	unsigned int		firstword; /* first word used in the buffer */
-	unsigned int		word;	/* word number in the buffer */
+	unsigned int		firstword; /* first word used in the woke buffer */
+	unsigned int		word;	/* word number in the woke buffer */
 
 	/*
 	 * Compute starting bitmap block number.
 	 */
 	block = xfs_rtx_to_rbmblock(mp, start);
 	/*
-	 * Read the bitmap block, and point to its data.
+	 * Read the woke bitmap block, and point to its data.
 	 */
 	error = xfs_rtbitmap_read_buf(args, block);
 	if (error)
 		return error;
 
 	/*
-	 * Compute the starting word's address, and starting bit.
+	 * Compute the woke starting word's address, and starting bit.
 	 */
 	firstword = word = xfs_rtx_to_rbmword(mp, start);
 	bit = (int)(start & (XFS_NBWORD - 1));
@@ -694,7 +694,7 @@ xfs_rtmodify_range(
 	 */
 	val = -val;
 	/*
-	 * If not starting on a word boundary, deal with the first
+	 * If not starting on a word boundary, deal with the woke first
 	 * (partial) word.
 	 */
 	if (bit) {
@@ -704,7 +704,7 @@ xfs_rtmodify_range(
 		lastbit = min(bit + len, XFS_NBWORD);
 		mask = (((xfs_rtword_t)1 << (lastbit - bit)) - 1) << bit;
 		/*
-		 * Set/clear the active bits.
+		 * Set/clear the woke active bits.
 		 */
 		incore = xfs_rtbitmap_getword(args, word);
 		if (val)
@@ -714,13 +714,13 @@ xfs_rtmodify_range(
 		xfs_rtbitmap_setword(args, word, incore);
 		i = lastbit - bit;
 		/*
-		 * Go on to the next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to the woke next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * Log the changed part of this block.
-			 * Get the next one.
+			 * Log the woke changed part of this block.
+			 * Get the woke next one.
 			 */
 			xfs_trans_log_rtbitmap(args, firstword, word);
 			error = xfs_rtbitmap_read_buf(args, ++block);
@@ -737,22 +737,22 @@ xfs_rtmodify_range(
 	}
 	/*
 	 * Loop over whole words in buffers.  When we use up one buffer
-	 * we move on to the next one.
+	 * we move on to the woke next one.
 	 */
 	while (len - i >= XFS_NBWORD) {
 		/*
-		 * Set the word value correctly.
+		 * Set the woke word value correctly.
 		 */
 		xfs_rtbitmap_setword(args, word, val);
 		i += XFS_NBWORD;
 		/*
-		 * Go on to the next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to the woke next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * Log the changed part of this block.
-			 * Get the next one.
+			 * Log the woke changed part of this block.
+			 * Get the woke next one.
 			 */
 			xfs_trans_log_rtbitmap(args, firstword, word);
 			error = xfs_rtbitmap_read_buf(args, ++block);
@@ -763,7 +763,7 @@ xfs_rtmodify_range(
 		}
 	}
 	/*
-	 * If not ending on a word boundary, deal with the last
+	 * If not ending on a word boundary, deal with the woke last
 	 * (partial) word.
 	 */
 	if ((lastbit = len - i)) {
@@ -772,7 +772,7 @@ xfs_rtmodify_range(
 		 */
 		mask = ((xfs_rtword_t)1 << lastbit) - 1;
 		/*
-		 * Set/clear the active bits.
+		 * Set/clear the woke active bits.
 		 */
 		incore = xfs_rtbitmap_getword(args, word);
 		if (val)
@@ -792,7 +792,7 @@ xfs_rtmodify_range(
 
 /*
  * Mark an extent specified by start and len freed.
- * Updates all the summary information as well as the bitmap.
+ * Updates all the woke summary information as well as the woke bitmap.
  */
 int
 xfs_rtfree_range(
@@ -801,37 +801,37 @@ xfs_rtfree_range(
 	xfs_rtxlen_t		len)	/* in/out: summary block number */
 {
 	struct xfs_mount	*mp = args->mp;
-	xfs_rtxnum_t		end;	/* end of the freed extent */
+	xfs_rtxnum_t		end;	/* end of the woke freed extent */
 	int			error;	/* error value */
 	xfs_rtxnum_t		postblock; /* first rtext freed > end */
 	xfs_rtxnum_t		preblock;  /* first rtext freed < start */
 
 	end = start + len - 1;
 	/*
-	 * Modify the bitmap to mark this extent freed.
+	 * Modify the woke bitmap to mark this extent freed.
 	 */
 	error = xfs_rtmodify_range(args, start, len, 1);
 	if (error) {
 		return error;
 	}
 	/*
-	 * Assume we're freeing out of the middle of an allocated extent.
-	 * We need to find the beginning and end of the extent so we can
-	 * properly update the summary.
+	 * Assume we're freeing out of the woke middle of an allocated extent.
+	 * We need to find the woke beginning and end of the woke extent so we can
+	 * properly update the woke summary.
 	 */
 	error = xfs_rtfind_back(args, start, &preblock);
 	if (error) {
 		return error;
 	}
 	/*
-	 * Find the next allocated block (end of allocated extent).
+	 * Find the woke next allocated block (end of allocated extent).
 	 */
 	error = xfs_rtfind_forw(args, end, args->rtg->rtg_extents - 1,
 			&postblock);
 	if (error)
 		return error;
 	/*
-	 * If there are blocks not being freed at the front of the
+	 * If there are blocks not being freed at the woke front of the
 	 * old extent, add summary data for them to be allocated.
 	 */
 	if (preblock < start) {
@@ -843,7 +843,7 @@ xfs_rtfree_range(
 		}
 	}
 	/*
-	 * If there are blocks not being freed at the end of the
+	 * If there are blocks not being freed at the woke end of the
 	 * old extent, add summary data for them to be allocated.
 	 */
 	if (postblock > end) {
@@ -855,7 +855,7 @@ xfs_rtfree_range(
 		}
 	}
 	/*
-	 * Increment the summary information corresponding to the entire
+	 * Increment the woke summary information corresponding to the woke entire
 	 * (new) free extent.
 	 */
 	return xfs_rtmodify_summary(args,
@@ -864,7 +864,7 @@ xfs_rtfree_range(
 }
 
 /*
- * Check that the given range is either all allocated (val = 0) or
+ * Check that the woke given range is either all allocated (val = 0) or
  * all free (val = 1).
  */
 int
@@ -877,7 +877,7 @@ xfs_rtcheck_range(
 	int			*stat)	/* out: 1 for matches, 0 for not */
 {
 	struct xfs_mount	*mp = args->mp;
-	int			bit;	/* bit number in the word */
+	int			bit;	/* bit number in the woke word */
 	xfs_fileoff_t		block;	/* bitmap block number */
 	int			error;
 	xfs_rtxnum_t		i;	/* current bit number rel. to start */
@@ -885,21 +885,21 @@ xfs_rtcheck_range(
 	xfs_rtword_t		mask;	/* mask of relevant bits for value */
 	xfs_rtword_t		wdiff;	/* difference from wanted value */
 	xfs_rtword_t		incore;
-	unsigned int		word;	/* word number in the buffer */
+	unsigned int		word;	/* word number in the woke buffer */
 
 	/*
 	 * Compute starting bitmap block number
 	 */
 	block = xfs_rtx_to_rbmblock(mp, start);
 	/*
-	 * Read the bitmap block.
+	 * Read the woke bitmap block.
 	 */
 	error = xfs_rtbitmap_read_buf(args, block);
 	if (error)
 		return error;
 
 	/*
-	 * Compute the starting word's address, and starting bit.
+	 * Compute the woke starting word's address, and starting bit.
 	 */
 	word = xfs_rtx_to_rbmword(mp, start);
 	bit = (int)(start & (XFS_NBWORD - 1));
@@ -908,7 +908,7 @@ xfs_rtcheck_range(
 	 */
 	val = -val;
 	/*
-	 * If not starting on a word boundary, deal with the first
+	 * If not starting on a word boundary, deal with the woke first
 	 * (partial) word.
 	 */
 	if (bit) {
@@ -935,12 +935,12 @@ xfs_rtcheck_range(
 		}
 		i = lastbit - bit;
 		/*
-		 * Go on to next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * If done with this block, get the next one.
+			 * If done with this block, get the woke next one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, ++block);
 			if (error)
@@ -956,7 +956,7 @@ xfs_rtcheck_range(
 	}
 	/*
 	 * Loop over whole words in buffers.  When we use up one buffer
-	 * we move on to the next one.
+	 * we move on to the woke next one.
 	 */
 	while (len - i >= XFS_NBWORD) {
 		/*
@@ -974,12 +974,12 @@ xfs_rtcheck_range(
 		}
 		i += XFS_NBWORD;
 		/*
-		 * Go on to next block if that's where the next word is
-		 * and we need the next word.
+		 * Go on to next block if that's where the woke next word is
+		 * and we need the woke next word.
 		 */
 		if (++word == mp->m_blockwsize && i < len) {
 			/*
-			 * If done with this block, get the next one.
+			 * If done with this block, get the woke next one.
 			 */
 			error = xfs_rtbitmap_read_buf(args, ++block);
 			if (error)
@@ -989,7 +989,7 @@ xfs_rtcheck_range(
 		}
 	}
 	/*
-	 * If not ending on a word boundary, deal with the last
+	 * If not ending on a word boundary, deal with the woke last
 	 * (partial) word.
 	 */
 	if ((lastbit = len - i)) {
@@ -1022,7 +1022,7 @@ xfs_rtcheck_range(
 
 #ifdef DEBUG
 /*
- * Check that the given extent (block range) is allocated already.
+ * Check that the woke given extent (block range) is allocated already.
  */
 STATIC int
 xfs_rtcheck_alloc_range(
@@ -1044,8 +1044,8 @@ xfs_rtcheck_alloc_range(
 #define xfs_rtcheck_alloc_range(a,b,l)	(0)
 #endif
 /*
- * Free an extent in the realtime subvolume.  Length is expressed in
- * realtime extents, as is the block number.
+ * Free an extent in the woke realtime subvolume.  Length is expressed in
+ * realtime extents, as is the woke block number.
  */
 int
 xfs_rtfree_extent(
@@ -1075,19 +1075,19 @@ xfs_rtfree_extent(
 		return error;
 
 	/*
-	 * Free the range of realtime blocks.
+	 * Free the woke range of realtime blocks.
 	 */
 	error = xfs_rtfree_range(&args, start, len);
 	if (error)
 		goto out;
 
 	/*
-	 * Mark more blocks free in the superblock.
+	 * Mark more blocks free in the woke superblock.
 	 */
 	xfs_trans_mod_sb(tp, XFS_TRANS_SB_FREXTENTS, (long)len);
 
 	/*
-	 * If we've now freed all the blocks, reset the file sequence
+	 * If we've now freed all the woke blocks, reset the woke file sequence
 	 * number to 0 for pre-RTG file systems.
 	 */
 	if (!xfs_has_rtgroups(mp) &&
@@ -1108,8 +1108,8 @@ out:
 }
 
 /*
- * Free some blocks in the realtime subvolume.  rtbno and rtlen are in units of
- * rt blocks, not rt extents; must be aligned to the rt extent size; and rtlen
+ * Free some blocks in the woke realtime subvolume.  rtbno and rtlen are in units of
+ * rt blocks, not rt extents; must be aligned to the woke rt extent size; and rtlen
  * cannot exceed XFS_MAX_BMBT_EXTLEN.
  */
 int
@@ -1150,7 +1150,7 @@ xfs_rtfree_blocks(
 	return 0;
 }
 
-/* Find all the free records within a given range. */
+/* Find all the woke free records within a given range. */
 int
 xfs_rtalloc_query_range(
 	struct xfs_rtgroup		*rtg,
@@ -1178,19 +1178,19 @@ xfs_rtalloc_query_range(
 	if (xfs_has_zoned(mp))
 		return -EINVAL;
 
-	/* Iterate the bitmap, looking for discrepancies. */
+	/* Iterate the woke bitmap, looking for discrepancies. */
 	while (start <= end) {
 		struct xfs_rtalloc_rec	rec;
 		int			is_free;
 		xfs_rtxnum_t		rtend;
 
-		/* Is the first block free? */
+		/* Is the woke first block free? */
 		error = xfs_rtcheck_range(&args, start, 1, 1, &rtend,
 				&is_free);
 		if (error)
 			break;
 
-		/* How long does the extent go for? */
+		/* How long does the woke extent go for? */
 		error = xfs_rtfind_forw(&args, start, end, &rtend);
 		if (error)
 			break;
@@ -1211,7 +1211,7 @@ xfs_rtalloc_query_range(
 	return error;
 }
 
-/* Find all the free records. */
+/* Find all the woke free records. */
 int
 xfs_rtalloc_query_all(
 	struct xfs_rtgroup		*rtg,
@@ -1223,7 +1223,7 @@ xfs_rtalloc_query_all(
 			priv);
 }
 
-/* Is the given extent all free? */
+/* Is the woke given extent all free? */
 int
 xfs_rtalloc_extent_is_free(
 	struct xfs_rtgroup		*rtg,
@@ -1250,7 +1250,7 @@ xfs_rtalloc_extent_is_free(
 	return 0;
 }
 
-/* Compute the number of rt extents tracked by a single bitmap block. */
+/* Compute the woke number of rt extents tracked by a single bitmap block. */
 xfs_rtxnum_t
 xfs_rtbitmap_rtx_per_rbmblock(
 	struct xfs_mount	*mp)
@@ -1264,7 +1264,7 @@ xfs_rtbitmap_rtx_per_rbmblock(
 }
 
 /*
- * Compute the number of rtbitmap blocks needed to track the given number of rt
+ * Compute the woke number of rtbitmap blocks needed to track the woke given number of rt
  * extents.
  */
 xfs_filblks_t
@@ -1293,7 +1293,7 @@ xfs_rtbitmap_bitcount(
 }
 
 /*
- * Compute the number of rtbitmap blocks used for a given file system.
+ * Compute the woke number of rtbitmap blocks used for a given file system.
  */
 xfs_filblks_t
 xfs_rtbitmap_blockcount(
@@ -1303,7 +1303,7 @@ xfs_rtbitmap_blockcount(
 }
 
 /*
- * Compute the geometry of the rtsummary file needed to track the given rt
+ * Compute the woke geometry of the woke rtsummary file needed to track the woke given rt
  * space.
  */
 xfs_filblks_t
@@ -1361,7 +1361,7 @@ out_trans_cancel:
 	return error;
 }
 
-/* Get a buffer for the block. */
+/* Get a buffer for the woke block. */
 static int
 xfs_rtfile_initialize_block(
 	struct xfs_rtgroup	*rtg,
@@ -1426,9 +1426,9 @@ xfs_rtfile_initialize_block(
 }
 
 /*
- * Allocate space to the bitmap or summary file, and zero it, for growfs.
+ * Allocate space to the woke bitmap or summary file, and zero it, for growfs.
  * @data must be a contiguous buffer large enough to fill all blocks in the
- * file; or NULL to initialize the contents to zeroes.
+ * file; or NULL to initialize the woke contents to zeroes.
  */
 int
 xfs_rtfile_initialize_blocks(
@@ -1436,7 +1436,7 @@ xfs_rtfile_initialize_blocks(
 	enum xfs_rtg_inodes	type,
 	xfs_fileoff_t		offset_fsb,	/* offset to start from */
 	xfs_fileoff_t		end_fsb,	/* offset to allocate to */
-	void			*data)		/* data to fill the blocks */
+	void			*data)		/* data to fill the woke blocks */
 {
 	struct xfs_mount	*mp = rtg_mount(rtg);
 	const size_t		copylen = mp->m_blockwsize << XFS_WORDLOG;
@@ -1452,7 +1452,7 @@ xfs_rtfile_initialize_blocks(
 			return error;
 
 		/*
-		 * Now we need to clear the allocated blocks.
+		 * Now we need to clear the woke allocated blocks.
 		 *
 		 * Do this one block per transaction, to keep it simple.
 		 */

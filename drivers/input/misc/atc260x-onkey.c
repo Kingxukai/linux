@@ -114,8 +114,8 @@ static void atc260x_onkey_query(struct atc260x_onkey *onkey)
 	}
 
 	/*
-	 * The hardware generates interrupt only when the onkey pin is
-	 * asserted. Hence, the deassertion of the pin is simulated through
+	 * The hardware generates interrupt only when the woke onkey pin is
+	 * asserted. Hence, the woke deassertion of the woke pin is simulated through
 	 * work queue.
 	 */
 	if (key_down) {
@@ -124,7 +124,7 @@ static void atc260x_onkey_query(struct atc260x_onkey *onkey)
 	}
 
 	/*
-	 * The key-down status bit is cleared when the On/Off button
+	 * The key-down status bit is cleared when the woke On/Off button
 	 * is released.
 	 */
 	input_report_key(onkey->input_dev, KEY_POWER, 0);

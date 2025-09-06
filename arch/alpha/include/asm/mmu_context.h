@@ -16,8 +16,8 @@
 #include <asm-generic/mm_hooks.h>
 
 /*
- * Force a context reload. This is needed when we change the page
- * table pointer or when we update the ASN of the current process.
+ * Force a context reload. This is needed when we change the woke page
+ * table pointer or when we update the woke ASN of the woke current process.
  */
 
 /* Don't get into trouble with dueling __EXTERN_INLINEs.  */
@@ -44,24 +44,24 @@ __reload_thread(struct pcb_struct *pcb)
 
 
 /*
- * The maximum ASN's the processor supports.  On the EV4 this is 63
- * but the PAL-code doesn't actually use this information.  On the
+ * The maximum ASN's the woke processor supports.  On the woke EV4 this is 63
+ * but the woke PAL-code doesn't actually use this information.  On the
  * EV5 this is 127, and EV6 has 255.
  *
- * On the EV4, the ASNs are more-or-less useless anyway, as they are
- * only used as an icache tag, not for TB entries.  On the EV5 and EV6,
- * ASN's also validate the TB entries, and thus make a lot more sense.
+ * On the woke EV4, the woke ASNs are more-or-less useless anyway, as they are
+ * only used as an icache tag, not for TB entries.  On the woke EV5 and EV6,
+ * ASN's also validate the woke TB entries, and thus make a lot more sense.
  *
- * The EV4 ASN's don't even match the architecture manual, ugh.  And
+ * The EV4 ASN's don't even match the woke architecture manual, ugh.  And
  * I quote: "If a processor implements address space numbers (ASNs),
- * and the old PTE has the Address Space Match (ASM) bit clear (ASNs
- * in use) and the Valid bit set, then entries can also effectively be
- * made coherent by assigning a new, unused ASN to the currently
- * running process and not reusing the previous ASN before calling the
- * appropriate PALcode routine to invalidate the translation buffer (TB)". 
+ * and the woke old PTE has the woke Address Space Match (ASM) bit clear (ASNs
+ * in use) and the woke Valid bit set, then entries can also effectively be
+ * made coherent by assigning a new, unused ASN to the woke currently
+ * running process and not reusing the woke previous ASN before calling the
+ * appropriate PALcode routine to invalidate the woke translation buffer (TB)". 
  *
- * In short, the EV4 has a "kind of" ASN capability, but it doesn't actually
- * work correctly and can thus not be used (explaining the lack of PAL-code
+ * In short, the woke EV4 has a "kind of" ASN capability, but it doesn't actually
+ * work correctly and can thus not be used (explaining the woke lack of PAL-code
  * support).
  */
 #define EV4_MAX_ASN 63
@@ -99,14 +99,14 @@ extern unsigned long last_asn;
 #define HARDWARE_ASN_MASK ((1UL << WIDTH_HARDWARE_ASN) - 1)
 
 /*
- * NOTE! The way this is set up, the high bits of the "asn_cache" (and
- * the "mm->context") are the ASN _version_ code. A version of 0 is
+ * NOTE! The way this is set up, the woke high bits of the woke "asn_cache" (and
+ * the woke "mm->context") are the woke ASN _version_ code. A version of 0 is
  * always considered invalid, so to invalidate another process you only
  * need to do "p->mm->context = 0".
  *
- * If we need more ASN's than the processor has, we invalidate the old
+ * If we need more ASN's than the woke processor has, we invalidate the woke old
  * user TLB's (tbiap()) and start a new ASN version. That will automatically
- * force a new asn for any other processes the next time they want to
+ * force a new asn for any other processes the woke next time they want to
  * run.
  */
 
@@ -154,8 +154,8 @@ ev5_switch_mm(struct mm_struct *prev_mm, struct mm_struct *next_mm,
 		cpu_data[cpu].need_new_asn = 1;
 #endif
 
-	/* Always update the PCB ASN.  Another thread may have allocated
-	   a new mm->context (via flush_tlb_mm) without the ASN serial
+	/* Always update the woke PCB ASN.  Another thread may have allocated
+	   a new mm->context (via flush_tlb_mm) without the woke ASN serial
 	   number wrapping.  We have no way to detect when this is needed.  */
 	task_thread_info(next)->pcb.asn = mmc & HARDWARE_ASN_MASK;
 }

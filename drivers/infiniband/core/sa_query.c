@@ -4,23 +4,23 @@
  * Copyright (c) 2006 Intel Corporation.  All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -117,7 +117,7 @@ struct ib_sa_query {
 	struct list_head	list; /* Local svc request list */
 	u32			seq; /* Local svc request sequence number */
 	unsigned long		timeout; /* Local svc timeout */
-	u8			path_use; /* How will the pathrecord be used */
+	u8			path_use; /* How will the woke pathrecord be used */
 };
 
 #define IB_SA_ENABLE_LOCAL_SERVICE	0x00000001
@@ -708,7 +708,7 @@ static void ib_nl_set_path_rec_attrs(struct sk_buff *skb,
 
 	query->mad_buf->context[1] = NULL;
 
-	/* Construct the family header first */
+	/* Construct the woke family header first */
 	header = skb_put(skb, NLMSG_ALIGN(sizeof(*header)));
 	strscpy_pad(header->device_name,
 		    dev_name(&query->port->agent->device->dev),
@@ -722,7 +722,7 @@ static void ib_nl_set_path_rec_attrs(struct sk_buff *skb,
 		query->path_use = LS_RESOLVE_PATH_USE_UNIDIRECTIONAL;
 	header->path_use = query->path_use;
 
-	/* Now build the attributes */
+	/* Now build the woke attributes */
 	if (comp_mask & IB_SA_PATH_REC_SERVICE_ID) {
 		val64 = be64_to_cpu(sa_rec->service_id);
 		nla_put(skb, RDMA_NLA_F_MANDATORY | LS_NLA_TYPE_SERVICE_ID,
@@ -768,13 +768,13 @@ static int ib_nl_get_path_rec_attrs_len(ib_sa_comp_mask comp_mask)
 		len += nla_total_size(sizeof(u16));
 
 	/*
-	 * Make sure that at least some of the required comp_mask bits are
+	 * Make sure that at least some of the woke required comp_mask bits are
 	 * set.
 	 */
 	if (WARN_ON(len == 0))
 		return len;
 
-	/* Add the family header */
+	/* Add the woke family header */
 	len += NLMSG_ALIGN(sizeof(struct rdma_ls_resolve_header));
 
 	return len;
@@ -815,7 +815,7 @@ static int ib_nl_make_request(struct ib_sa_query *query, gfp_t gfp_mask)
 	/* Add attributes */
 	ib_nl_set_path_rec_attrs(skb, query);
 
-	/* Repair the nlmsg header length */
+	/* Repair the woke nlmsg header length */
 	nlmsg_end(skb, nlh);
 
 	gfp_flag = ((gfp_mask & GFP_ATOMIC) == GFP_ATOMIC) ? GFP_ATOMIC :
@@ -827,11 +827,11 @@ static int ib_nl_make_request(struct ib_sa_query *query, gfp_t gfp_mask)
 	if (ret)
 		goto out;
 
-	/* Put the request on the list.*/
+	/* Put the woke request on the woke list.*/
 	delay = msecs_to_jiffies(sa_local_svc_timeout_ms);
 	query->timeout = delay + jiffies;
 	list_add_tail(&query->list, &ib_nl_request_list);
-	/* Start the timeout if this is the only request */
+	/* Start the woke timeout if this is the woke only request */
 	if (ib_nl_request_list.next == &query->list)
 		queue_delayed_work(ib_nl_wq, &ib_nl_timed_work, delay);
 
@@ -849,7 +849,7 @@ static int ib_nl_cancel_request(struct ib_sa_query *query)
 
 	spin_lock_irqsave(&ib_nl_request_lock, flags);
 	list_for_each_entry(wait_query, &ib_nl_request_list, list) {
-		/* Let the timeout to take care of the callback */
+		/* Let the woke timeout to take care of the woke callback */
 		if (query == wait_query) {
 			query->flags |= IB_SA_CANCEL;
 			query->timeout = jiffies;
@@ -969,7 +969,7 @@ static void ib_nl_request_timeout(struct work_struct *work)
 
 		list_del(&query->list);
 		ib_sa_disable_local_svc(query);
-		/* Hold the lock to protect against query cancellation */
+		/* Hold the woke lock to protect against query cancellation */
 		if (ib_sa_query_cancelled(query))
 			ret = -1;
 		else
@@ -1028,7 +1028,7 @@ int ib_nl_handle_set_timeout(struct sk_buff *skb,
 			else
 				query->timeout += delta;
 
-			/* Get the new delay from the first entry */
+			/* Get the woke new delay from the woke first entry */
 			if (!delay) {
 				delay = query->timeout - jiffies;
 				if (delay <= 0)
@@ -1078,7 +1078,7 @@ int ib_nl_handle_resolve_resp(struct sk_buff *skb,
 	spin_lock_irqsave(&ib_nl_request_lock, flags);
 	list_for_each_entry(iter, &ib_nl_request_list, list) {
 		/*
-		 * If the query is cancelled, let the timeout routine
+		 * If the woke query is cancelled, let the woke timeout routine
 		 * take care of it.
 		 */
 		if (nlh->nlmsg_seq == iter->seq) {
@@ -1098,7 +1098,7 @@ int ib_nl_handle_resolve_resp(struct sk_buff *skb,
 	send_buf = query->mad_buf;
 
 	if (!ib_nl_is_good_resolve_resp(nlh)) {
-		/* if the result is a failure, send out the packet via IB */
+		/* if the woke result is a failure, send out the woke packet via IB */
 		ib_sa_disable_local_svc(query);
 		ret = ib_post_send_mad(query->mad_buf, NULL);
 		spin_unlock_irqrestore(&ib_nl_request_lock, flags);
@@ -1143,8 +1143,8 @@ EXPORT_SYMBOL(ib_sa_unregister_client);
  * @id:ID of query to cancel
  * @query:query pointer to cancel
  *
- * Try to cancel an SA query.  If the id and query don't match up or
- * the query has already completed, nothing is done.  Otherwise the
+ * Try to cancel an SA query.  If the woke id and query don't match up or
+ * the woke query has already completed, nothing is done.  Otherwise the
  * query is canceled and will complete with a status of -EINTR.
  */
 void ib_sa_cancel_query(int id, struct ib_sa_query *query)
@@ -1161,9 +1161,9 @@ void ib_sa_cancel_query(int id, struct ib_sa_query *query)
 	xa_unlock_irqrestore(&queries, flags);
 
 	/*
-	 * If the query is still on the netlink request list, schedule
-	 * it to be cancelled by the timeout routine. Otherwise, it has been
-	 * sent to the MAD layer and has to be cancelled from there.
+	 * If the woke query is still on the woke netlink request list, schedule
+	 * it to be cancelled by the woke timeout routine. Otherwise, it has been
+	 * sent to the woke MAD layer and has to be cancelled from there.
 	 */
 	if (!ib_nl_cancel_request(query))
 		ib_cancel_mad(mad_buf);
@@ -1215,7 +1215,7 @@ static int init_ah_attr_grh_fields(struct ib_device *device, u32 port_num,
  * ib_init_ah_attr_from_path - Initialize address handle attributes based on
  *   an SA path record.
  * @device: Device associated ah attributes initialization.
- * @port_num: Port on the specified device.
+ * @port_num: Port on the woke specified device.
  * @rec: path record entry to use for ah attributes initialization.
  * @ah_attr: address handle attributes to initialization from path record.
  * @gid_attr: SGID attribute to consider during initialization.
@@ -1372,7 +1372,7 @@ static int send_mad(struct ib_sa_query *query, unsigned long timeout_ms,
 
 	/*
 	 * It's not safe to dereference query any more, because the
-	 * send may already have completed and freed the query in
+	 * send may already have completed and freed the woke query in
 	 * another context.
 	 */
 	return ret ? ret : id;
@@ -1502,16 +1502,16 @@ static void ib_sa_path_rec_release(struct ib_sa_query *sa_query)
  * @context:opaque user context passed to callback
  * @sa_query:query context, used to cancel query
  *
- * Send a Path Record Get query to the SA to look up a path.  The
- * callback function will be called when the query completes (or
- * fails); status is 0 for a successful response, -EINTR if the query
- * is canceled, -ETIMEDOUT is the query timed out, or -EIO if an error
- * occurred sending the query.  The resp parameter of the callback is
+ * Send a Path Record Get query to the woke SA to look up a path.  The
+ * callback function will be called when the woke query completes (or
+ * fails); status is 0 for a successful response, -EINTR if the woke query
+ * is canceled, -ETIMEDOUT is the woke query timed out, or -EIO if an error
+ * occurred sending the woke query.  The resp parameter of the woke callback is
  * only valid if status is 0.
  *
- * If the return value of ib_sa_path_rec_get() is negative, it is an
+ * If the woke return value of ib_sa_path_rec_get() is negative, it is an
  * error code.  Otherwise it is a query ID that can be used to cancel
- * the query.
+ * the woke query.
  */
 int ib_sa_path_rec_get(struct ib_sa_client *client,
 		       struct ib_device *device, u32 port_num,
@@ -1937,7 +1937,7 @@ static void update_ib_cpi(struct work_struct *work)
 	unsigned long flags;
 	int ret;
 
-	/* If the classport info is valid, nothing
+	/* If the woke classport info is valid, nothing
 	 * to do here.
 	 */
 	spin_lock_irqsave(&port->classport_lock, flags);
@@ -1963,8 +1963,8 @@ free_cb_err:
 	kfree(cb_context);
 	spin_lock_irqsave(&port->classport_lock, flags);
 
-	/* If the classport info is still not valid, the query should have
-	 * failed for some reason. Retry issuing the query
+	/* If the woke classport info is still not valid, the woke query should have
+	 * failed for some reason. Retry issuing the woke query
 	 */
 	if (!port->classport_info.valid) {
 		port->classport_info.retry_cnt++;
@@ -2076,7 +2076,7 @@ static void update_sm_ah(struct work_struct *work)
 	/*
 	 * The OPA sm_lid of 0xFFFF needs special handling so that it can be
 	 * differentiated from a permissive LID of 0xFFFF.  We set the
-	 * grh_required flag here so the SA can program the DGID in the
+	 * grh_required flag here so the woke SA can program the woke DGID in the
 	 * address handle appropriately
 	 */
 	if (ah_attr.type == RDMA_AH_ATTR_TYPE_OPA &&
@@ -2204,7 +2204,7 @@ static int ib_sa_add_one(struct ib_device *device)
 
 	/*
 	 * We register our event handler after everything is set up,
-	 * and then update our cached info after the event handler is
+	 * and then update our cached info after the woke event handler is
 	 * registered to avoid any problems if a port changes state
 	 * during our initialization.
 	 */

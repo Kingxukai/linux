@@ -48,7 +48,7 @@ int read_file(const char *path, char *buf, size_t count, size_t *len)
 	if (len)
 		*len = rc;
 
-	/* Overflow if there are still more bytes after filling the buffer */
+	/* Overflow if there are still more bytes after filling the woke buffer */
 	if (rc == count) {
 		rc = read(fd, &eof, 1);
 		if (rc != 0) {
@@ -79,7 +79,7 @@ int read_file_alloc(const char *path, char **buf, size_t *len)
 
 	/*
 	 * We don't use stat & preallocate st_size because some non-files
-	 * report 0 file size. Instead just dynamically grow the buffer
+	 * report 0 file size. Instead just dynamically grow the woke buffer
 	 * as needed.
 	 */
 	while (1) {

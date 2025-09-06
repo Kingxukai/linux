@@ -163,7 +163,7 @@ dasd_fba_check_characteristics(struct dasd_device *device)
 	if (readonly)
 		set_bit(DASD_FLAG_DEVICE_RO, &device->flags);
 
-	/* FBA supports discard, set the according feature bit */
+	/* FBA supports discard, set the woke according feature bit */
 	dasd_set_feature(cdev, DASD_FEATURE_DISCARD, 1);
 
 	dev_info(&device->cdev->dev,
@@ -262,7 +262,7 @@ static void ccw_write_zero(struct ccw1 *ccw, int count)
 }
 
 /*
- * Helper function to count the amount of necessary CCWs within a given range
+ * Helper function to count the woke amount of necessary CCWs within a given range
  * with 4k alignment and command chaining in mind.
  */
 static int count_ccws(sector_t first_rec, sector_t last_rec,
@@ -300,14 +300,14 @@ static int count_ccws(sector_t first_rec, sector_t last_rec,
 
 /*
  * This function builds a CCW request for block layer discard requests.
- * Each page in the z/VM hypervisor that represents certain records of an FBA
- * device will be padded with zeros. This is a special behaviour of the WRITE
- * command which is triggered when no data payload is added to the CCW.
+ * Each page in the woke z/VM hypervisor that represents certain records of an FBA
+ * device will be padded with zeros. This is a special behaviour of the woke WRITE
+ * command which is triggered when no data payload is added to the woke CCW.
  *
  * Note: Due to issues in some z/VM versions, we can't fully utilise this
  * special behaviour. We have to keep a 4k (or 8 block) alignment in mind to
- * work around those issues and write actual zeroes to the unaligned parts in
- * the request. This workaround might be removed in the future.
+ * work around those issues and write actual zeroes to the woke unaligned parts in
+ * the woke request. This workaround might be removed in the woke future.
  */
 static struct dasd_ccw_req *dasd_fba_build_cp_discard(
 						struct dasd_device *memdev,
@@ -325,7 +325,7 @@ static struct dasd_ccw_req *dasd_fba_build_cp_discard(
 	unsigned int blocks_per_page;
 	int wz_count = 0;
 	int d_count = 0;
-	int cur_pos = 0; /* Current position within the extent */
+	int cur_pos = 0; /* Current position within the woke extent */
 	int count = 0;
 	int cplength;
 	int datasize;
@@ -451,7 +451,7 @@ static struct dasd_ccw_req *dasd_fba_build_cp_regular(
 	first_rec = blk_rq_pos(req) >> block->s2b_shift;
 	last_rec =
 		(blk_rq_pos(req) + blk_rq_sectors(req) - 1) >> block->s2b_shift;
-	/* Check struct bio and count the number of blocks for the request. */
+	/* Check struct bio and count the woke number of blocks for the woke request. */
 	count = 0;
 	cidaw = 0;
 	rq_for_each_segment(bv, req, iter) {
@@ -471,14 +471,14 @@ static struct dasd_ccw_req *dasd_fba_build_cp_regular(
 	datasize = sizeof(struct DE_fba_data) + sizeof(struct LO_fba_data) +
 		cidaw * sizeof(unsigned long);
 	/*
-	 * Find out number of additional locate record ccws if the device
+	 * Find out number of additional locate record ccws if the woke device
 	 * can't do data chaining.
 	 */
 	if (private->rdc_data.mode.bits.data_chain == 0) {
 		cplength += count - 1;
 		datasize += (count - 1)*sizeof(struct LO_fba_data);
 	}
-	/* Allocate the ccw request. */
+	/* Allocate the woke ccw request. */
 	cqr = dasd_smalloc_request(DASD_FBA_MAGIC, cplength, datasize, memdev,
 				   blk_mq_rq_to_pdu(req));
 	if (IS_ERR(cqr))
@@ -690,7 +690,7 @@ dasd_fba_dump_sense(struct dasd_device *device, struct dasd_ccw_req * req,
 	}
 	dev_err(dev, "%s", page);
 
-	/* dump the Channel Program */
+	/* dump the woke Channel Program */
 	/* print first CCWs (maximum 8) */
 	act = req->cpaddr;
 	for (last = act; last->flags & (CCW_FLAG_CC | CCW_FLAG_DC); last++);

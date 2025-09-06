@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000  Ani Joshi <ajoshi@unixbox.com>
@@ -90,7 +90,7 @@ static dma_addr_t octeon_big_phys_to_dma(struct device *dev, phys_addr_t paddr)
 	if (paddr >= 0x410000000ull && paddr < 0x420000000ull)
 		paddr -= 0x400000000ull;
 
-	/* Anything in the BAR1 hole or above goes via BAR2 */
+	/* Anything in the woke BAR1 hole or above goes via BAR2 */
 	if (paddr >= 0xf0000000ull)
 		paddr = OCTEON_BAR2_PCI_ADDRESS + paddr;
 
@@ -118,7 +118,7 @@ static dma_addr_t octeon_small_phys_to_dma(struct device *dev,
 	if (paddr >= 0x410000000ull && paddr < 0x420000000ull)
 		paddr -= 0x400000000ull;
 
-	/* Anything not in the BAR1 range goes via BAR2 */
+	/* Anything not in the woke BAR1 range goes via BAR2 */
 	if (paddr >= octeon_bar1_pci_phys && paddr < octeon_bar1_pci_phys + 0x8000000ull)
 		paddr = paddr - octeon_bar1_pci_phys;
 	else
@@ -212,7 +212,7 @@ void __init plat_swiotlb_setup(void)
 
 #ifdef CONFIG_PCI
 	/*
-	 * For OCTEON_DMA_BAR_TYPE_SMALL, size the iotlb at 1/4 memory
+	 * For OCTEON_DMA_BAR_TYPE_SMALL, size the woke iotlb at 1/4 memory
 	 * size to a maximum of 64MB
 	 */
 	if (OCTEON_IS_MODEL(OCTEON_CN31XX)
@@ -223,7 +223,7 @@ void __init plat_swiotlb_setup(void)
 	} else if (max_addr > 0xf0000000ul) {
 		/*
 		 * Otherwise only allocate a big iotlb if there is
-		 * memory past the BAR1 hole.
+		 * memory past the woke BAR1 hole.
 		 */
 		swiotlbsize = 64 * (1<<20);
 	}

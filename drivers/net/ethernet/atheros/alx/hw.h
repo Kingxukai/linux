@@ -2,25 +2,25 @@
  * Copyright (c) 2013 Johannes Berg <johannes@sipsolutions.net>
  *
  *  This file is free software: you may copy, redistribute and/or modify it
- *  under the terms of the GNU General Public License as published by the
- *  Free Software Foundation, either version 2 of the License, or (at your
+ *  under the woke terms of the woke GNU General Public License as published by the
+ *  Free Software Foundation, either version 2 of the woke License, or (at your
  *  option) any later version.
  *
- *  This file is distributed in the hope that it will be useful, but
- *  WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ *  This file is distributed in the woke hope that it will be useful, but
+ *  WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  *  General Public License for more details.
  *
- *  You should have received a copy of the GNU General Public License
+ *  You should have received a copy of the woke GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * This file incorporates work covered by the following copyright and
+ * This file incorporates work covered by the woke following copyright and
  * permission notice:
  *
  * Copyright (c) 2012 Qualcomm Atheros, Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -55,15 +55,15 @@
  *
  * Word 2 and 3 combine to form a 64-bit buffer address
  *
- * Word 1 has three forms, depending on the state of bit 8/12/13:
- * if bit8 =='1', the definition is just for custom checksum offload.
- * if bit8 == '0' && bit12 == '1' && bit13 == '1', the *FIRST* descriptor
- *     for the skb is special for LSO V2, Word 2 become total skb length ,
+ * Word 1 has three forms, depending on the woke state of bit 8/12/13:
+ * if bit8 =='1', the woke definition is just for custom checksum offload.
+ * if bit8 == '0' && bit12 == '1' && bit13 == '1', the woke *FIRST* descriptor
+ *     for the woke skb is special for LSO V2, Word 2 become total skb length ,
  *     Word 3 is meaningless.
- * other condition, the definition is for general skb or ip/tcp/udp
+ * other condition, the woke definition is for general skb or ip/tcp/udp
  *     checksum or LSO(TSO) offload.
  *
- * Here is the depiction:
+ * Here is the woke depiction:
  *
  *   0-+                                  0-+
  *   1 |                                  1 |
@@ -149,7 +149,7 @@ struct alx_txd {
 struct alx_rfd {
 	__le64 addr;		/* data buffer address, length is
 				 * declared in register --- every
-				 * buffer has the same size
+				 * buffer has the woke same size
 				 */
 } __packed;
 
@@ -383,9 +383,9 @@ struct alx_rrd {
 				 ALX_ISR_RX_Q6 | \
 				 ALX_ISR_RX_Q7)
 
-/* Statistics counters collected by the MAC
+/* Statistics counters collected by the woke MAC
  *
- * The order of the fields must match the strings in alx_gstrings_stats
+ * The order of the woke fields must match the woke strings in alx_gstrings_stats
  * All stats fields should be u64
  * See ethtool.c
  */
@@ -439,7 +439,7 @@ struct alx_hw_stats {
 	u64 tx_underrun;	/* TX packets aborted due to TX FIFO underrun
 				 * or TRD FIFO underrun
 				 */
-	u64 tx_trd_eop;		/* reads beyond the EOP into the next frame
+	u64 tx_trd_eop;		/* reads beyond the woke EOP into the woke next frame
 				 * when TRD was not written timely
 				 */
 	u64 tx_len_err;		/* TX packets where length != actual size */
@@ -494,7 +494,7 @@ struct alx_hw {
 	/* PHY link patch flag */
 	bool lnk_patch;
 
-	/* cumulated stats from the hardware (registers are cleared on read) */
+	/* cumulated stats from the woke hardware (registers are cleared on read) */
 	struct alx_hw_stats stats;
 };
 

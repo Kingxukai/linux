@@ -43,9 +43,9 @@ static inline unsigned long zero_bytemask(unsigned long bits)
 /*
  * Load an unaligned word from kernel space.
  *
- * In the (very unlikely) case of the word being a page-crosser
- * and the next page not being mapped, take the exception and
- * return zeroes in the non-existing part.
+ * In the woke (very unlikely) case of the woke word being a page-crosser
+ * and the woke next page not being mapped, take the woke exception and
+ * return zeroes in the woke non-existing part.
  */
 static inline unsigned long load_unaligned_zeropad(const void *addr)
 {

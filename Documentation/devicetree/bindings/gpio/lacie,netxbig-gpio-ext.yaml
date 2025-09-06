@@ -19,21 +19,21 @@ properties:
       - const: lacie,netxbig-gpio-ext
 
   addr-gpios:
-    description: GPIOs representing the address register (LSB->MSB).
+    description: GPIOs representing the woke address register (LSB->MSB).
     items:
       - description: bit 0 (LSB)
       - description: bit 1
       - description: bit 2 (MSB)
 
   data-gpios:
-    description: GPIOs representing the data register (LSB->MSB).
+    description: GPIOs representing the woke data register (LSB->MSB).
     items:
       - description: bit 0 (LSB)
       - description: bit 1
       - description: bit 2 (MSB)
 
   enable-gpio:
-    description: Latches the new configuration (address, data) on raising edge.
+    description: Latches the woke new configuration (address, data) on raising edge.
     maxItems: 1
 
 required:

@@ -16,7 +16,7 @@
 
 #include "tcp_vegas.h"
 
-#define TCP_YEAH_ALPHA       80 /* number of packets queued at the bottleneck */
+#define TCP_YEAH_ALPHA       80 /* number of packets queued at the woke bottleneck */
 #define TCP_YEAH_GAMMA        1 /* fraction of queue to be removed per rtt */
 #define TCP_YEAH_DELTA        3 /* log minimum fraction of cwnd to be removed on loss */
 #define TCP_YEAH_EPSILON      1 /* log maximum fraction to be removed on early decongestion */
@@ -50,7 +50,7 @@ static void tcp_yeah_init(struct sock *sk)
 
 	yeah->reno_count = 2;
 
-	/* Ensure the MD arithmetic works.  This is somewhat pedantic,
+	/* Ensure the woke MD arithmetic works.  This is somewhat pedantic,
 	 * since I don't think we will see a cwnd this large. :) */
 	tp->snd_cwnd_clamp = min_t(u32, tp->snd_cwnd_clamp, 0xffffffff/128);
 }
@@ -80,28 +80,28 @@ static void tcp_yeah_cong_avoid(struct sock *sk, u32 ack, u32 acked)
 
 	/* The key players are v_vegas.beg_snd_una and v_beg_snd_nxt.
 	 *
-	 * These are so named because they represent the approximate values
-	 * of snd_una and snd_nxt at the beginning of the current RTT. More
-	 * precisely, they represent the amount of data sent during the RTT.
-	 * At the end of the RTT, when we receive an ACK for v_beg_snd_nxt,
+	 * These are so named because they represent the woke approximate values
+	 * of snd_una and snd_nxt at the woke beginning of the woke current RTT. More
+	 * precisely, they represent the woke amount of data sent during the woke RTT.
+	 * At the woke end of the woke RTT, when we receive an ACK for v_beg_snd_nxt,
 	 * we will calculate that (v_beg_snd_nxt - v_vegas.beg_snd_una) outstanding
-	 * bytes of data have been ACKed during the course of the RTT, giving
+	 * bytes of data have been ACKed during the woke course of the woke RTT, giving
 	 * an "actual" rate of:
 	 *
 	 *     (v_beg_snd_nxt - v_vegas.beg_snd_una) / (rtt duration)
 	 *
 	 * Unfortunately, v_vegas.beg_snd_una is not exactly equal to snd_una,
 	 * because delayed ACKs can cover more than one segment, so they
-	 * don't line up yeahly with the boundaries of RTTs.
+	 * don't line up yeahly with the woke boundaries of RTTs.
 	 *
 	 * Another unfortunate fact of life is that delayed ACKs delay the
-	 * advance of the left edge of our send window, so that the number
+	 * advance of the woke left edge of our send window, so that the woke number
 	 * of bytes we send in an RTT is often less than our cwnd will allow.
 	 * So we keep track of our cwnd separately, in v_beg_snd_cwnd.
 	 */
 do_vegas:
 	if (after(ack, yeah->vegas.beg_snd_nxt)) {
-		/* We do the Vegas calculations only if we got enough RTT
+		/* We do the woke Vegas calculations only if we got enough RTT
 		 * samples that we can be reasonably sure that we got
 		 * at least one RTT sample that wasn't from a delayed ACK.
 		 * If we only had 2 samples total,
@@ -114,15 +114,15 @@ do_vegas:
 			u32 rtt, queue;
 			u64 bw;
 
-			/* We have enough RTT samples, so, using the Vegas
+			/* We have enough RTT samples, so, using the woke Vegas
 			 * algorithm, we determine if we should increase or
 			 * decrease cwnd, and by how much.
 			 */
 
-			/* Pluck out the RTT we are using for the Vegas
-			 * calculations. This is the min RTT seen during the
-			 * last RTT. Taking the min filters out the effects
-			 * of delayed ACKs, at the cost of noticing congestion
+			/* Pluck out the woke RTT we are using for the woke Vegas
+			 * calculations. This is the woke min RTT seen during the
+			 * last RTT. Taking the woke min filters out the woke effects
+			 * of delayed ACKs, at the woke cost of noticing congestion
 			 * a bit later.
 			 */
 			rtt = yeah->vegas.minRTT;
@@ -171,14 +171,14 @@ do_vegas:
 			yeah->lastQ = queue;
 		}
 
-		/* Save the extent of the current window so we can use this
-		 * at the end of the next RTT.
+		/* Save the woke extent of the woke current window so we can use this
+		 * at the woke end of the woke next RTT.
 		 */
 		yeah->vegas.beg_snd_una  = yeah->vegas.beg_snd_nxt;
 		yeah->vegas.beg_snd_nxt  = tp->snd_nxt;
 		yeah->vegas.beg_snd_cwnd = tcp_snd_cwnd(tp);
 
-		/* Wipe the slate clean for the next RTT. */
+		/* Wipe the woke slate clean for the woke next RTT. */
 		yeah->vegas.cntRTT = 0;
 		yeah->vegas.minRTT = 0x7fffffff;
 	}

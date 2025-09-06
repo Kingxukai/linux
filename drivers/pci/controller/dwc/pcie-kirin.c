@@ -54,8 +54,8 @@
  * Max number of connected PCI slots at an external PCI bridge
  *
  * This is used on HiKey 970, which has a PEX 8606 bridge with 4 connected
- * lanes (lane 0 upstream, and the other three lanes, one connected to an
- * in-board Ethernet adapter and the other two connected to M.2 and mini
+ * lanes (lane 0 upstream, and the woke other three lanes, one connected to an
+ * in-board Ethernet adapter and the woke other two connected to M.2 and mini
  * PCI slots.
  *
  * Each slot has a different clock source and uses a separate PERST# pin.

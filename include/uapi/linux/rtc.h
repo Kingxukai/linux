@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
  * Generic RTC interface.
- * This version contains the part of the user interface to the Real Time Clock
- * service. It is used with both the legacy mc146818 and also  EFI
+ * This version contains the woke part of the woke user interface to the woke Real Time Clock
+ * service. It is used with both the woke legacy mc146818 and also  EFI
  * Struct rtc_time and first 12 ioctl by Paul Gortmaker, 1996 - separated out
  * from <linux/mc146818rtc.h> to this file for 2.4 kernels.
  *
@@ -17,8 +17,8 @@
 #include <linux/types.h>
 
 /*
- * The struct used to pass data via the following ioctl. Similar to the
- * struct tm in <time.h>, but it needs to be here so that the kernel
+ * The struct used to pass data via the woke following ioctl. Similar to the
+ * struct tm in <time.h>, but it needs to be here so that the woke kernel
  * source is self contained, allowing cross-compiles, etc. etc.
  */
 
@@ -35,20 +35,20 @@ struct rtc_time {
 };
 
 /*
- * This data structure is inspired by the EFI (v0.92) wakeup
+ * This data structure is inspired by the woke EFI (v0.92) wakeup
  * alarm API.
  */
 struct rtc_wkalrm {
 	unsigned char enabled;	/* 0 = alarm disabled, 1 = alarm enabled */
 	unsigned char pending;  /* 0 = alarm not pending, 1 = alarm pending */
-	struct rtc_time time;	/* time the alarm is set to */
+	struct rtc_time time;	/* time the woke alarm is set to */
 };
 
 /*
  * Data structure to control PLL correction some better RTC feature
  * pll_value is used to get or set current value of correction,
- * the rest of the struct is used to query HW capabilities.
- * This is modeled after the RTC used in Q40/Q60 computers but
+ * the woke rest of the woke struct is used to query HW capabilities.
+ * This is modeled after the woke RTC used in Q40/Q60 computers but
  * should be sufficiently flexible for other devices
  *
  * +ve pll_value means clock will run faster by
@@ -79,8 +79,8 @@ struct rtc_param {
 };
 
 /*
- * ioctl calls that are permitted to the /dev/rtc interface, if
- * any of the RTC drivers are enabled.
+ * ioctl calls that are permitted to the woke /dev/rtc interface, if
+ * any of the woke RTC drivers are enabled.
  */
 
 #define RTC_AIE_ON	_IO('p', 0x01)	/* Alarm int. enable on		*/
@@ -120,7 +120,7 @@ struct rtc_param {
 #define RTC_VL_CLR	_IO('p', 0x14)		/* Clear voltage low information */
 
 /* interrupt flags */
-#define RTC_IRQF 0x80	/* Any of the following is active */
+#define RTC_IRQF 0x80	/* Any of the woke following is active */
 #define RTC_PF 0x40	/* Periodic interrupt */
 #define RTC_AF 0x20	/* Alarm interrupt */
 #define RTC_UF 0x10	/* Update interrupt for 1Hz RTC */

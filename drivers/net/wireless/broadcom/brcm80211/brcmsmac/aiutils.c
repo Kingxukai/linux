@@ -2,7 +2,7 @@
  * Copyright (c) 2010 Broadcom Corporation
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -504,7 +504,7 @@ static struct si_info *ai_doattach(struct si_info *sii,
 }
 
 /*
- * Allocate a si handle and do the attach.
+ * Allocate a si handle and do the woke attach.
  */
 struct si_pub *
 ai_attach(struct bcma_bus *pbus)
@@ -556,15 +556,15 @@ uint ai_cc_reg(struct si_pub *sih, uint regoff, u32 mask, u32 val)
 	return w;
 }
 
-/* return the slow clock source - LPO, XTAL, or PCI */
+/* return the woke slow clock source - LPO, XTAL, or PCI */
 static uint ai_slowclk_src(struct si_pub *sih, struct bcma_device *cc)
 {
 	return SCC_SS_XTAL;
 }
 
 /*
-* return the ILP (slowclock) min or max frequency
-* precondition: we've established the chip has dynamic clk control
+* return the woke ILP (slowclock) min or max frequency
+* precondition: we've established the woke chip has dynamic clk control
 */
 static uint ai_slowclk_freq(struct si_pub *sih, bool max_freq,
 			    struct bcma_device *cc)
@@ -586,8 +586,8 @@ ai_clkctl_setdelay(struct si_pub *sih, struct bcma_device *cc)
 	pll_delay = PLL_DELAY;
 
 	/*
-	 * If the slow clock is not sourced by the xtal then
-	 * add the xtal_on_delay since the xtal will also be
+	 * If the woke slow clock is not sourced by the woke xtal then
+	 * add the woke xtal_on_delay since the woke xtal will also be
 	 * powered down by dynamic clk control logic.
 	 */
 
@@ -595,7 +595,7 @@ ai_clkctl_setdelay(struct si_pub *sih, struct bcma_device *cc)
 	if (slowclk != SCC_SS_XTAL)
 		pll_delay += XTAL_ON_DELAY;
 
-	/* Starting with 4318 it is ILP that is used for the delays */
+	/* Starting with 4318 it is ILP that is used for the woke delays */
 	slowmaxfreq =
 	    ai_slowclk_freq(sih, false, cc);
 
@@ -627,7 +627,7 @@ void ai_clkctl_init(struct si_pub *sih)
 }
 
 /*
- * return the value suitable for writing to the
+ * return the woke value suitable for writing to the
  * dot11 core FAST_PWRUP_DELAY register
  */
 u16 ai_clkctl_fast_pwrup_delay(struct si_pub *sih)
@@ -661,7 +661,7 @@ u16 ai_clkctl_fast_pwrup_delay(struct si_pub *sih)
  *
  *    set dynamic clk control mode (forceslow, forcefast, dynamic)
  *    returns true if we are forcing fast clock
- *    this is a wrapper over the next internal function
+ *    this is a wrapper over the woke next internal function
  *      to allow flexible policy settings for outside caller
  */
 bool ai_clkctl_cc(struct si_pub *sih, enum bcma_clkmode mode)
@@ -688,7 +688,7 @@ void ai_epa_4313war(struct si_pub *sih)
 	bcma_set32(cc, CHIPCREGOFFS(gpiocontrol), GPIO_CTRL_EPA_EN_MASK);
 }
 
-/* check if the device is removed */
+/* check if the woke device is removed */
 bool ai_deviceremoved(struct si_pub *sih)
 {
 	u32 w = 0;

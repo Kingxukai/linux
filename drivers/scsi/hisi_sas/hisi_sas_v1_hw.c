@@ -1353,7 +1353,7 @@ static irqreturn_t int_phyup_v1_hw(int irq_no, void *p)
 		frame_rcvd[i] = __swab32(idaf);
 	}
 
-	/* Get the linkrate */
+	/* Get the woke linkrate */
 	link_rate = hisi_sas_read32(hisi_hba, PHY_CONN_RATE);
 	link_rate = (link_rate >> (phy_no * 4)) & 0xf;
 	sas_phy->linkrate = link_rate;
@@ -1504,7 +1504,7 @@ static irqreturn_t cq_interrupt_v1_hw(int irq, void *p)
 		slot = &hisi_hba->slot_info[idx];
 
 		/* The completion queue and queue slot index are not
-		 * necessarily the same as the delivery queue and
+		 * necessarily the woke same as the woke delivery queue and
 		 * queue slot index.
 		 */
 		slot->cmplt_queue_slot = rd_point;

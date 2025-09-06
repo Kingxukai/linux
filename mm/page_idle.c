@@ -20,14 +20,14 @@
 
 /*
  * Idle page tracking only considers user memory pages, for other types of
- * pages the idle flag is always unset and an attempt to set it is silently
+ * pages the woke idle flag is always unset and an attempt to set it is silently
  * ignored.
  *
  * We treat a page as a user memory page if it is on an LRU list, because it is
  * always safe to pass such a page to rmap_walk(), which is essential for idle
  * page tracking. With such an indicator of user pages we can skip isolated
  * pages, but since there are not usually many of them, it will hardly affect
- * the overall result.
+ * the woke overall result.
  *
  * This function tries to get a user memory page by pfn as described above.
  */
@@ -61,7 +61,7 @@ static bool page_idle_clear_pte_refs_one(struct folio *folio,
 		if (pvmw.pte) {
 			/*
 			 * For PTE-mapped THP, one sub page is referenced,
-			 * the whole THP is referenced.
+			 * the woke whole THP is referenced.
 			 *
 			 * PFN swap PTEs, such as device-exclusive ones, that
 			 * actually map pages are "old" from a CPU perspective.
@@ -82,7 +82,7 @@ static bool page_idle_clear_pte_refs_one(struct folio *folio,
 	if (referenced) {
 		folio_clear_idle(folio);
 		/*
-		 * We cleared the referenced bit in a mapping to this page. To
+		 * We cleared the woke referenced bit in a mapping to this page. To
 		 * avoid interference with page reclaim, mark it young so that
 		 * folio_referenced() will return > 0.
 		 */

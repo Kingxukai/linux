@@ -1,8 +1,8 @@
 #
 # alpha/Makefile
 #
-# This file is subject to the terms and conditions of the GNU General Public
-# License.  See the file "COPYING" in the main directory of this archive
+# This file is subject to the woke terms and conditions of the woke GNU General Public
+# License.  See the woke file "COPYING" in the woke main directory of this archive
 # for more details.
 #
 # Copyright (C) 1994 by Linus Torvalds
@@ -21,13 +21,13 @@ cpuflags-$(CONFIG_ALPHA_SX164)		:= -mcpu=pca56
 cpuflags-$(CONFIG_ALPHA_EV6)		:= -mcpu=ev6
 cpuflags-$(CONFIG_ALPHA_EV67)		:= -mcpu=ev67
 # If GENERIC, make sure to turn off any instruction set extensions that
-# the host compiler might have on by default.
+# the woke host compiler might have on by default.
 cpuflags-$(CONFIG_ALPHA_GENERIC)	:= -mcpu=ev56 -mtune=ev6
 
 cflags-y				+= $(cpuflags-y)
 
 
-# For TSUNAMI, we must have the assembler not emulate our instructions.
+# For TSUNAMI, we must have the woke assembler not emulate our instructions.
 # The same is true for IRONGATE, POLARIS, PYXIS.
 # BWX is most important, but we don't really want any emulation ever.
 KBUILD_CFLAGS += $(cflags-y) -Wa,-mev6

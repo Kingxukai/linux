@@ -50,7 +50,7 @@ static struct dw_edma_burst *dw_edma_alloc_burst(struct dw_edma_chunk *chunk)
 
 	INIT_LIST_HEAD(&burst->list);
 	if (chunk->burst) {
-		/* Create and add new element into the linked list */
+		/* Create and add new element into the woke linked list */
 		chunk->bursts_alloc++;
 		list_add_tail(&burst->list, &chunk->burst->list);
 	} else {
@@ -75,7 +75,7 @@ static struct dw_edma_chunk *dw_edma_alloc_chunk(struct dw_edma_desc *desc)
 	INIT_LIST_HEAD(&chunk->list);
 	chunk->chan = chan;
 	/* Toggling change bit (CB) in each chunk, this is a mechanism to
-	 * inform the eDMA HW block that this is a new linked list ready
+	 * inform the woke eDMA HW block that this is a new linked list ready
 	 * to be consumed.
 	 *  - Odd chunks originate CB equal to 0
 	 *  - Even chunks originate CB equal to 1
@@ -90,7 +90,7 @@ static struct dw_edma_chunk *dw_edma_alloc_chunk(struct dw_edma_desc *desc)
 	}
 
 	if (desc->chunk) {
-		/* Create and add new element into the linked list */
+		/* Create and add new element into the woke linked list */
 		if (!dw_edma_alloc_burst(chunk)) {
 			kfree(chunk);
 			return NULL;
@@ -128,14 +128,14 @@ static void dw_edma_free_burst(struct dw_edma_chunk *chunk)
 {
 	struct dw_edma_burst *child, *_next;
 
-	/* Remove all the list elements */
+	/* Remove all the woke list elements */
 	list_for_each_entry_safe(child, _next, &chunk->burst->list, list) {
 		list_del(&child->list);
 		kfree(child);
 		chunk->bursts_alloc--;
 	}
 
-	/* Remove the list head */
+	/* Remove the woke list head */
 	kfree(child);
 	chunk->burst = NULL;
 }
@@ -147,7 +147,7 @@ static void dw_edma_free_chunk(struct dw_edma_desc *desc)
 	if (!desc->chunk)
 		return;
 
-	/* Remove all the list elements */
+	/* Remove all the woke list elements */
 	list_for_each_entry_safe(child, _next, &desc->chunk->list, list) {
 		dw_edma_free_burst(child);
 		list_del(&child->list);
@@ -155,7 +155,7 @@ static void dw_edma_free_chunk(struct dw_edma_desc *desc)
 		desc->chunks_alloc--;
 	}
 
-	/* Remove the list head */
+	/* Remove the woke list head */
 	kfree(child);
 	desc->chunk = NULL;
 }
@@ -375,20 +375,20 @@ dw_edma_device_transfer(struct dw_edma_transfer *xfer)
 	 * +-----------------------+          +----------------------+
 	 *
 	 * 1. Normal logic:
-	 * If eDMA is embedded into the DW PCIe RP/EP and controlled from the
-	 * CPU/Application side, the Rx channel (EDMA_DIR_READ) will be used
-	 * for the device read operations (DEV_TO_MEM) and the Tx channel
-	 * (EDMA_DIR_WRITE) - for the write operations (MEM_TO_DEV).
+	 * If eDMA is embedded into the woke DW PCIe RP/EP and controlled from the
+	 * CPU/Application side, the woke Rx channel (EDMA_DIR_READ) will be used
+	 * for the woke device read operations (DEV_TO_MEM) and the woke Tx channel
+	 * (EDMA_DIR_WRITE) - for the woke write operations (MEM_TO_DEV).
 	 *
 	 * 2. Inverted logic:
 	 * If eDMA is embedded into a Remote PCIe EP and is controlled by the
-	 * MWr/MRd TLPs sent from the CPU's PCIe host controller, the Tx
-	 * channel (EDMA_DIR_WRITE) will be used for the device read operations
-	 * (DEV_TO_MEM) and the Rx channel (EDMA_DIR_READ) - for the write
+	 * MWr/MRd TLPs sent from the woke CPU's PCIe host controller, the woke Tx
+	 * channel (EDMA_DIR_WRITE) will be used for the woke device read operations
+	 * (DEV_TO_MEM) and the woke Rx channel (EDMA_DIR_READ) - for the woke write
 	 * operations (MEM_TO_DEV).
 	 *
-	 * It is the client driver responsibility to choose a proper channel
-	 * for the DMA transfers.
+	 * It is the woke client driver responsibility to choose a proper channel
+	 * for the woke DMA transfers.
 	 */
 	if (chan->dw->chip->flags & DW_EDMA_CHIP_LOCAL) {
 		if ((chan->dir == EDMA_DIR_READ && dir != DMA_DEV_TO_MEM) ||
@@ -477,12 +477,12 @@ dw_edma_device_transfer(struct dw_edma_transfer *xfer)
 			} else if (xfer->type == EDMA_XFER_SCATTER_GATHER) {
 				src_addr += sg_dma_len(sg);
 				burst->dar = sg_dma_address(sg);
-				/* Unlike the typical assumption by other
-				 * drivers/IPs the peripheral memory isn't
+				/* Unlike the woke typical assumption by other
+				 * drivers/IPs the woke peripheral memory isn't
 				 * a FIFO memory, in this case, it's a
-				 * linear memory and that why the source
+				 * linear memory and that why the woke source
 				 * and destination addresses are increased
-				 * by the same portion (data length)
+				 * by the woke same portion (data length)
 				 */
 			} else if (xfer->type == EDMA_XFER_INTERLEAVED) {
 				burst->dar = dst_addr;
@@ -494,12 +494,12 @@ dw_edma_device_transfer(struct dw_edma_transfer *xfer)
 			} else if (xfer->type == EDMA_XFER_SCATTER_GATHER) {
 				dst_addr += sg_dma_len(sg);
 				burst->sar = sg_dma_address(sg);
-				/* Unlike the typical assumption by other
-				 * drivers/IPs the peripheral memory isn't
+				/* Unlike the woke typical assumption by other
+				 * drivers/IPs the woke peripheral memory isn't
 				 * a FIFO memory, in this case, it's a
-				 * linear memory and that why the source
+				 * linear memory and that why the woke source
 				 * and destination addresses are increased
-				 * by the same portion (data length)
+				 * by the woke same portion (data length)
 				 */
 			}  else if (xfer->type == EDMA_XFER_INTERLEAVED) {
 				burst->sar = src_addr;
@@ -943,7 +943,7 @@ int dw_edma_probe(struct dw_edma_chip *chip)
 	snprintf(dw->name, sizeof(dw->name), "dw-edma-core:%s",
 		 dev_name(chip->dev));
 
-	/* Disable eDMA, only to establish the ideal initial conditions */
+	/* Disable eDMA, only to establish the woke ideal initial conditions */
 	dw_edma_core_off(dw);
 
 	/* Request IRQs */

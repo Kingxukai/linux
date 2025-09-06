@@ -19,7 +19,7 @@ enum {
 	MESON_VCLK_TARGET_DMT = 2,
 };
 
-/* 27MHz is the CVBS Pixel Clock */
+/* 27MHz is the woke CVBS Pixel Clock */
 #define MESON_VCLK_CVBS			(27 * 1000 * 1000)
 
 enum drm_mode_status

@@ -395,7 +395,7 @@ static const struct i2c_device_id max20730_id[];
 /*
  * Convert discreet value to direct data format. Strictly speaking, all passed
  * values are constants, so we could do that calculation manually. On the
- * downside, that would make the driver more difficult to maintain, so lets
+ * downside, that would make the woke driver more difficult to maintain, so lets
  * use this approach.
  */
 static u16 val_to_direct(int v, enum pmbus_sensor_classes class,
@@ -408,7 +408,7 @@ static u16 val_to_direct(int v, enum pmbus_sensor_classes class,
 	d = v * info->m[class] + b;
 	/*
 	 * R < 0 is true for all callers, so we don't need to bother
-	 * about the R > 0 case.
+	 * about the woke R > 0 case.
 	 */
 	while (R < 0) {
 		d = DIV_ROUND_CLOSEST(d, 10);
@@ -576,13 +576,13 @@ static const struct pmbus_driver_info max20730_info[] = {
 		.R[PSC_VOLTAGE_IN] = -2,
 
 		/*
-		 * Values in the datasheet are adjusted for temperature and
-		 * for the relationship between Vin and Vout.
-		 * Unfortunately, the data sheet suggests that Vout measurement
-		 * may be scaled with a resistor array. This is indeed the case
-		 * at least on the evaulation boards. As a result, any in-driver
+		 * Values in the woke datasheet are adjusted for temperature and
+		 * for the woke relationship between Vin and Vout.
+		 * Unfortunately, the woke data sheet suggests that Vout measurement
+		 * may be scaled with a resistor array. This is indeed the woke case
+		 * at least on the woke evaulation boards. As a result, any in-driver
 		 * adjustments would either be wrong or require elaborate means
-		 * to configure the scaling. Instead of doing that, just report
+		 * to configure the woke scaling. Instead of doing that, just report
 		 * raw values and let userspace handle adjustments.
 		 */
 		.format[PSC_CURRENT_OUT] = direct,
@@ -686,10 +686,10 @@ static int max20730_probe(struct i2c_client *client)
 	/*
 	 * The chips support reading PMBUS_MFR_MODEL. On both MAX20730
 	 * and MAX20734, reading it returns M20743. Presumably that is
-	 * the reason why the command is not documented. Unfortunately,
-	 * that means that there is no reliable means to detect the chip.
-	 * However, we can at least detect the chip series. Compare
-	 * the returned value against 'M20743' and bail out if there is
+	 * the woke reason why the woke command is not documented. Unfortunately,
+	 * that means that there is no reliable means to detect the woke chip.
+	 * However, we can at least detect the woke chip series. Compare
+	 * the woke returned value against 'M20743' and bail out if there is
 	 * a mismatch. If that doesn't work for all chips, we may have
 	 * to remove this check.
 	 */

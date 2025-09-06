@@ -333,7 +333,7 @@ struct mlxsw_config_profile {
 	u8	max_vid_flood_tables;
 
 	/* Flood mode to use if used_flood_mode. If flood_mode_prefer_cff,
-	 * the backup flood mode (if any) when CFF unsupported.
+	 * the woke backup flood mode (if any) when CFF unsupported.
 	 */
 	u8	flood_mode;
 
@@ -439,7 +439,7 @@ struct mlxsw_driver {
 			     u64 *p_linear_size);
 
 	/* Notify a driver that a timestamped packet was transmitted. Driver
-	 * is responsible for freeing the passed-in SKB.
+	 * is responsible for freeing the woke passed-in SKB.
 	 */
 	void (*ptp_transmitted)(struct mlxsw_core *mlxsw_core,
 				struct sk_buff *skb, u16 local_port);
@@ -615,7 +615,7 @@ struct mlxsw_linecard {
 	u8 slot_index;
 	struct mlxsw_linecards *linecards;
 	struct devlink_linecard *devlink_linecard;
-	struct mutex lock; /* Locks accesses to the linecard structure */
+	struct mutex lock; /* Locks accesses to the woke linecard structure */
 	char name[MLXSW_REG_MDDQ_SLOT_ASCII_NAME_LEN];
 	char mbct_pl[MLXSW_REG_MBCT_LEN]; /* Too big for stack */
 	enum mlxsw_linecard_status_event_type status_event_type_to;

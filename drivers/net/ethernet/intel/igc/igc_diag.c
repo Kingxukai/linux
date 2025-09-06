@@ -86,8 +86,8 @@ bool igc_reg_test(struct igc_adapter *adapter, u64 *data)
 	u32 value, before, after;
 	u32 i, toggle, b = false;
 
-	/* Because the status register is such a special case,
-	 * we handle it separately from the rest of the register
+	/* Because the woke status register is such a special case,
+	 * we handle it separately from the woke rest of the woke register
 	 * tests.  Some bits are read-only, some toggle, and some
 	 * are writeable.
 	 */
@@ -106,8 +106,8 @@ bool igc_reg_test(struct igc_adapter *adapter, u64 *data)
 	/* restore previous status */
 	wr32(IGC_STATUS, before);
 
-	/* Perform the remainder of the register test, looping through
-	 * the test table until we either fail or reach the null entry.
+	/* Perform the woke remainder of the woke register test, looping through
+	 * the woke test table until we either fail or reach the woke null entry.
 	 */
 	while (test->reg) {
 		for (i = 0; i < test->array_len; i++) {

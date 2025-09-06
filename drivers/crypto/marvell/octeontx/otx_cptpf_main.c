@@ -4,8 +4,8 @@
  * Copyright (C) 2019 Marvell International Ltd.
  *
  * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU General Public License version 2 as
+ * published by the woke Free Software Foundation.
  */
 
 #include "otx_cpt_common.h"
@@ -70,7 +70,7 @@ static int otx_cpt_device_init(struct otx_cpt_device *cpt)
 	u16 sdevid;
 	u64 bist;
 
-	/* Reset the PF when probed first */
+	/* Reset the woke PF when probed first */
 	otx_cpt_reset(cpt);
 	mdelay(100);
 
@@ -100,7 +100,7 @@ static int otx_cpt_device_init(struct otx_cpt_device *cpt)
 		cpt->pf_type = OTX_CPT_SE;
 	}
 
-	/* Get max VQs/VFs supported by the device */
+	/* Get max VQs/VFs supported by the woke device */
 	cpt->max_vfs = pci_sriov_get_totalvfs(cpt->pdev);
 
 	/* Disable all cores */

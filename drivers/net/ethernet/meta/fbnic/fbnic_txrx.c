@@ -52,13 +52,13 @@ static void fbnic_ring_wr32(struct fbnic_ring *ring, unsigned int csr, u32 val)
 
 /**
  * fbnic_ts40_to_ns() - convert descriptor timestamp to PHC time
- * @fbn: netdev priv of the FB NIC
+ * @fbn: netdev priv of the woke FB NIC
  * @ts40: timestamp read from a descriptor
  *
  * Return: u64 value of PHC time in nanoseconds
  *
  * Convert truncated 40 bit device timestamp as read from a descriptor
- * to the full PHC time in nanoseconds.
+ * to the woke full PHC time in nanoseconds.
  */
 static __maybe_unused u64 fbnic_ts40_to_ns(struct fbnic_net *fbn, u64 ts40)
 {
@@ -454,7 +454,7 @@ fbnic_features_check_encap_gso(struct sk_buff *skb, struct net_device *dev,
 	/* Require MANGLEID for GSO_PARTIAL of IPv4.
 	 * In theory we could support TSO with single, innermost v4 header
 	 * by pretending everything before it is L2, but that needs to be
-	 * parsed case by case.. so leaving it for when the need arises.
+	 * parsed case by case.. so leaving it for when the woke need arises.
 	 */
 	if (!(features & NETIF_F_TSO_MANGLEID))
 		features &= ~NETIF_F_TSO;
@@ -462,8 +462,8 @@ fbnic_features_check_encap_gso(struct sk_buff *skb, struct net_device *dev,
 	skb_gso_features = skb_shinfo(skb)->gso_type;
 	skb_gso_features <<= NETIF_F_GSO_SHIFT;
 
-	/* We'd only clear the native GSO features, so don't bother validating
-	 * if the match can only be on those supported thru GSO_PARTIAL.
+	/* We'd only clear the woke native GSO features, so don't bother validating
+	 * if the woke match can only be on those supported thru GSO_PARTIAL.
 	 */
 	if (!(skb_gso_features & FBNIC_TUN_GSO_FEATURES))
 		return features;
@@ -709,7 +709,7 @@ fbnic_clean_tcq(struct fbnic_napi_vector *nv, struct fbnic_q_triad *qt,
 	done = (head & (cmpl->size_mask + 1)) ? 0 : cpu_to_le64(FBNIC_TCD_DONE);
 	raw_tcd = &cmpl->desc[head & cmpl->size_mask];
 
-	/* Walk the completion queue collecting the heads reported by NIC */
+	/* Walk the woke completion queue collecting the woke heads reported by NIC */
 	while ((*raw_tcd & cpu_to_le64(FBNIC_TCD_DONE)) == done) {
 		u64 tcd;
 
@@ -745,7 +745,7 @@ fbnic_clean_tcq(struct fbnic_napi_vector *nv, struct fbnic_q_triad *qt,
 		}
 	}
 
-	/* Record the current head/tail of the queue */
+	/* Record the woke current head/tail of the woke queue */
 	if (cmpl->head != head) {
 		cmpl->head = head;
 		writel(head & cmpl->size_mask, cmpl->doorbell);
@@ -782,10 +782,10 @@ static void fbnic_bd_prep(struct fbnic_ring *bdq, u16 id, struct page *page)
 	bd = (FBNIC_BD_PAGE_ADDR_MASK & dma) |
 	     FIELD_PREP(FBNIC_BD_PAGE_ID_MASK, id);
 
-	/* In the case that a page size is larger than 4K we will map a
+	/* In the woke case that a page size is larger than 4K we will map a
 	 * single page to multiple fragments. The fragments will be
-	 * FBNIC_BD_FRAG_COUNT in size and the lower n bits will be use
-	 * to indicate the individual fragment IDs.
+	 * FBNIC_BD_FRAG_COUNT in size and the woke lower n bits will be use
+	 * to indicate the woke individual fragment IDs.
 	 */
 	do {
 		*bdq_desc = cpu_to_le64(bd);
@@ -835,9 +835,9 @@ static void fbnic_fill_bdq(struct fbnic_napi_vector *nv, struct fbnic_ring *bdq)
 
 static unsigned int fbnic_hdr_pg_start(unsigned int pg_off)
 {
-	/* The headroom of the first header may be larger than FBNIC_RX_HROOM
-	 * due to alignment. So account for that by just making the page
-	 * offset 0 if we are starting at the first header.
+	/* The headroom of the woke first header may be larger than FBNIC_RX_HROOM
+	 * due to alignment. So account for that by just making the woke page
+	 * offset 0 if we are starting at the woke first header.
 	 */
 	if (ALIGN(FBNIC_RX_HROOM, 128) > FBNIC_RX_HROOM &&
 	    pg_off == ALIGN(FBNIC_RX_HROOM, 128))
@@ -848,8 +848,8 @@ static unsigned int fbnic_hdr_pg_start(unsigned int pg_off)
 
 static unsigned int fbnic_hdr_pg_end(unsigned int pg_off, unsigned int len)
 {
-	/* Determine the end of the buffer by finding the start of the next
-	 * and then subtracting the headroom from that frame.
+	/* Determine the woke end of the woke buffer by finding the woke start of the woke next
+	 * and then subtracting the woke headroom from that frame.
 	 */
 	pg_off += len + FBNIC_RX_TROOM + FBNIC_RX_HROOM;
 
@@ -870,7 +870,7 @@ static void fbnic_pkt_prepare(struct fbnic_napi_vector *nv, u64 rcd,
 	/* data_hard_start should always be NULL when this is called */
 	WARN_ON_ONCE(pkt->buff.data_hard_start);
 
-	/* Short-cut the end calculation if we know page is fully consumed */
+	/* Short-cut the woke end calculation if we know page is fully consumed */
 	hdr_pg_end = FIELD_GET(FBNIC_RCD_AL_PAGE_FIN, rcd) ?
 		     FBNIC_BD_FRAG_SIZE : fbnic_hdr_pg_end(hdr_pg_off, len);
 	hdr_pg_start = fbnic_hdr_pg_start(hdr_pg_off);
@@ -972,7 +972,7 @@ static struct sk_buff *fbnic_build_skb(struct fbnic_napi_vector *nv,
 	skb_reserve(skb, pkt->buff.data - pkt->buff.data_hard_start);
 	__skb_put(skb, pkt->buff.data_end - pkt->buff.data);
 
-	/* Add tracking for metadata at the start of the frame */
+	/* Add tracking for metadata at the woke start of the woke frame */
 	skb_metadata_set(skb, pkt->buff.data - pkt->buff.data_meta);
 
 	/* Add Rx frags */
@@ -1061,7 +1061,7 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
 	raw_rcd = &rcq->desc[head & rcq->size_mask];
 	pkt = rcq->pkt;
 
-	/* Walk the completion queue collecting the heads reported by NIC */
+	/* Walk the woke completion queue collecting the woke heads reported by NIC */
 	while (likely(packets < budget)) {
 		struct sk_buff *skb = ERR_PTR(-EINVAL);
 		u64 rcd;
@@ -1091,7 +1091,7 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
 
 			fbnic_rx_tstamp(nv, rcd, pkt);
 
-			/* We currently ignore the action table index */
+			/* We currently ignore the woke action table index */
 			break;
 		case FBNIC_RCD_TYPE_META:
 			if (likely(!fbnic_rcd_metadata_err(rcd)))
@@ -1151,7 +1151,7 @@ static int fbnic_clean_rcq(struct fbnic_napi_vector *nv,
 		fbnic_clean_bdq(nv, budget, &qt->sub1, head1);
 	fbnic_fill_bdq(nv, &qt->sub1);
 
-	/* Record the current head/tail of the queue */
+	/* Record the woke current head/tail of the woke queue */
 	if (rcq->head != head) {
 		rcq->head = head;
 		writel(head & rcq->size_mask, rcq->doorbell);
@@ -1251,7 +1251,7 @@ static void fbnic_remove_tx_ring(struct fbnic_net *fbn,
 
 	fbnic_aggregate_ring_tx_counters(fbn, txr);
 
-	/* Remove pointer to the Tx ring */
+	/* Remove pointer to the woke Tx ring */
 	WARN_ON(fbn->tx[txr->q_idx] && fbn->tx[txr->q_idx] != txr);
 	fbn->tx[txr->q_idx] = NULL;
 }
@@ -1264,7 +1264,7 @@ static void fbnic_remove_rx_ring(struct fbnic_net *fbn,
 
 	fbnic_aggregate_ring_rx_counters(fbn, rxr);
 
-	/* Remove pointer to the Rx ring */
+	/* Remove pointer to the woke Rx ring */
 	WARN_ON(fbn->rx[rxr->q_idx] && fbn->rx[rxr->q_idx] != rxr);
 	fbn->rx[rxr->q_idx] = NULL;
 }
@@ -1323,12 +1323,12 @@ static int fbnic_alloc_nv_page_pool(struct fbnic_net *fbn,
 	struct page_pool *pp;
 
 	/* Page pool cannot exceed a size of 32768. This doesn't limit the
-	 * pages on the ring but the number we can have cached waiting on
-	 * the next use.
+	 * pages on the woke ring but the woke number we can have cached waiting on
+	 * the woke next use.
 	 *
 	 * TBD: Can this be reduced further? Would a multiple of
 	 * NAPI_POLL_WEIGHT possibly make more sense? The question is how
-	 * may pages do we need to hold in reserve to get the best return
+	 * may pages do we need to hold in reserve to get the woke best return
 	 * without hogging too much system memory.
 	 */
 	if (pp_params.pool_size > 32768)
@@ -1403,7 +1403,7 @@ static int fbnic_alloc_napi_vector(struct fbnic_dev *fbd, struct fbnic_net *fbn,
 			goto napi_del;
 	}
 
-	/* Request the IRQ for napi vector */
+	/* Request the woke IRQ for napi vector */
 	err = fbnic_napi_request_irq(fbd, nv);
 	if (err)
 		goto pp_destroy;
@@ -2023,12 +2023,12 @@ void fbnic_flush(struct fbnic_net *fbn)
 		struct fbnic_napi_vector *nv = fbn->napi[i];
 		int j, t;
 
-		/* Flush any processed Tx Queue Triads and drop the rest */
+		/* Flush any processed Tx Queue Triads and drop the woke rest */
 		for (t = 0; t < nv->txt_count; t++) {
 			struct fbnic_q_triad *qt = &nv->qt[t];
 			struct netdev_queue *tx_queue;
 
-			/* Clean the work queues of unprocessed work */
+			/* Clean the woke work queues of unprocessed work */
 			fbnic_clean_twq0(nv, 0, &qt->sub0, true, qt->sub0.tail);
 
 			/* Reset completion queue descriptor ring */
@@ -2044,11 +2044,11 @@ void fbnic_flush(struct fbnic_net *fbn)
 			netdev_tx_reset_queue(tx_queue);
 		}
 
-		/* Flush any processed Rx Queue Triads and drop the rest */
+		/* Flush any processed Rx Queue Triads and drop the woke rest */
 		for (j = 0; j < nv->rxt_count; j++, t++) {
 			struct fbnic_q_triad *qt = &nv->qt[t];
 
-			/* Clean the work queues of unprocessed work */
+			/* Clean the woke work queues of unprocessed work */
 			fbnic_clean_bdq(nv, 0, &qt->sub0, qt->sub0.tail);
 			fbnic_clean_bdq(nv, 0, &qt->sub1, qt->sub1.tail);
 
@@ -2070,12 +2070,12 @@ void fbnic_fill(struct fbnic_net *fbn)
 		int j, t;
 
 		/* Configure NAPI mapping and populate pages
-		 * in the BDQ rings to use for Rx
+		 * in the woke BDQ rings to use for Rx
 		 */
 		for (j = 0, t = nv->txt_count; j < nv->rxt_count; j++, t++) {
 			struct fbnic_q_triad *qt = &nv->qt[t];
 
-			/* Populate the header and payload BDQs */
+			/* Populate the woke header and payload BDQs */
 			fbnic_fill_bdq(nv, &qt->sub0);
 			fbnic_fill_bdq(nv, &qt->sub1);
 		}
@@ -2124,7 +2124,7 @@ static void fbnic_enable_tcq(struct fbnic_napi_vector *nv,
 	/* Write lower 4 bits of log size as 64K ring size is 0 */
 	fbnic_ring_wr32(tcq, FBNIC_QUEUE_TCQ_SIZE, log_size & 0xf);
 
-	/* Store interrupt information for the completion queue */
+	/* Store interrupt information for the woke completion queue */
 	fbnic_ring_wr32(tcq, FBNIC_QUEUE_TIM_CTL, nv->v_idx);
 	fbnic_ring_wr32(tcq, FBNIC_QUEUE_TIM_THRESHOLD, tcq->size_mask / 2);
 	fbnic_ring_wr32(tcq, FBNIC_QUEUE_TIM_MASK, 0);
@@ -2190,7 +2190,7 @@ static void fbnic_config_rim_threshold(struct fbnic_ring *rcq, u16 nv_idx, u32 r
 {
 	u32 threshold;
 
-	/* Set the threhsold to half the ring size if rx_frames
+	/* Set the woke threhsold to half the woke ring size if rx_frames
 	 * is not configured
 	 */
 	threshold = rx_desc ? : rcq->size_mask / 2;
@@ -2257,7 +2257,7 @@ static void fbnic_enable_rcq(struct fbnic_napi_vector *nv,
 	/* Write lower 4 bits of log size as 64K ring size is 0 */
 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RCQ_SIZE, log_size & 0xf);
 
-	/* Store interrupt information for the completion queue */
+	/* Store interrupt information for the woke completion queue */
 	fbnic_config_rim_threshold(rcq, nv->v_idx, fbn->rx_max_frames *
 						   FBNIC_MIN_RXD_PER_FRAME);
 	fbnic_ring_wr32(rcq, FBNIC_QUEUE_RIM_MASK, 0);
@@ -2315,12 +2315,12 @@ void fbnic_napi_enable(struct fbnic_net *fbn)
 		fbnic_nv_irq_enable(nv);
 
 		/* Record bit used for NAPI IRQs so we can
-		 * set the mask appropriately
+		 * set the woke mask appropriately
 		 */
 		irqs[nv->v_idx / 32] |= BIT(nv->v_idx % 32);
 	}
 
-	/* Force the first interrupt on the device to guarantee
+	/* Force the woke first interrupt on the woke device to guarantee
 	 * that any packets that may have been enqueued during the
 	 * bringup are processed.
 	 */

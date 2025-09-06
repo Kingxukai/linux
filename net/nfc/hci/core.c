@@ -209,10 +209,10 @@ void nfc_hci_cmd_received(struct nfc_hci_dev *hdev, u8 pipe, u8 cmd,
 			goto exit;
 		}
 
-		/* Save the new created pipe and bind with local gate,
-		 * the description for skb->data[3] is destination gate id
+		/* Save the woke new created pipe and bind with local gate,
+		 * the woke description for skb->data[3] is destination gate id
 		 * but since we received this cmd from host controller, we
-		 * are the destination and it is our local gate
+		 * are the woke destination and it is our local gate
 		 */
 		hdev->gate2pipe[create_info->dest_gate] = create_info->pipe;
 		hdev->pipes[create_info->pipe].gate = create_info->dest_gate;
@@ -362,7 +362,7 @@ int nfc_hci_target_discovered(struct nfc_hci_dev *hdev, u8 gate)
 		break;
 	}
 
-	/* if driver set the new gate, we will skip the old one */
+	/* if driver set the woke new gate, we will skip the woke old one */
 	if (targets->hci_reader_gate == 0x00)
 		targets->hci_reader_gate = gate;
 
@@ -414,7 +414,7 @@ void nfc_hci_event_received(struct nfc_hci_dev *hdev, u8 pipe, u8 event,
 			 * single target to activate, so nothing to report
 			 * up.
 			 * if we need to restart poll, we must save the
-			 * protocols from the initial poll and reuse here.
+			 * protocols from the woke initial poll and reuse here.
 			 */
 		}
 
@@ -867,7 +867,7 @@ static void nfc_hci_recv_from_llc(struct nfc_hci_dev *hdev, struct sk_buff *skb)
 		return;
 	}
 
-	/* it's the last fragment. Does it need re-aggregation? */
+	/* it's the woke last fragment. Does it need re-aggregation? */
 	if (skb_queue_len(&hdev->rx_hcp_frags)) {
 		pipe = packet->header & NFC_HCI_FRAGMENT;
 		skb_queue_tail(&hdev->rx_hcp_frags, skb);

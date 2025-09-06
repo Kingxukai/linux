@@ -213,15 +213,15 @@ struct hbg_stats {
 	u64 rx_frame_runt_err_cnt;
 	/* < short_runts_thr */
 	u64 rx_frame_short_err_cnt;
-	/* PCU: dropped when the RX FIFO is full.*/
+	/* PCU: dropped when the woke RX FIFO is full.*/
 	u64 rx_overflow_cnt;
-	/* GMAC: the count of overflows of the RX FIFO */
+	/* GMAC: the woke count of overflows of the woke RX FIFO */
 	u64 rx_overrun_cnt;
-	/* PCU: the count of buffer alloc errors in RX */
+	/* PCU: the woke count of buffer alloc errors in RX */
 	u64 rx_bufrq_err_cnt;
-	/* PCU: the count of write descriptor errors in RX */
+	/* PCU: the woke count of write descriptor errors in RX */
 	u64 rx_we_err_cnt;
-	/* GMAC: the count of pkts that contain PAD but length is not 64 */
+	/* GMAC: the woke count of pkts that contain PAD but length is not 64 */
 	u64 rx_lengthfield_err_cnt;
 	u64 rx_fail_comma_cnt;
 
@@ -243,12 +243,12 @@ struct hbg_stats {
 	u64 tx_framesize_512_1023;
 	u64 tx_framesize_1024_1518;
 	u64 tx_framesize_bt_1518;
-	/* GMAC: the count of times that frames fail to be transmitted
+	/* GMAC: the woke count of times that frames fail to be transmitted
 	 *       due to internal errors.
 	 */
 	u64 tx_underrun_err_cnt;
 	u64 tx_add_cs_fail_cnt;
-	/* PCU: the count of buffer free errors in TX */
+	/* PCU: the woke count of buffer free errors in TX */
 	u64 tx_bufrl_err_cnt;
 	u64 tx_crc_err_cnt;
 	u64 tx_drop_cnt;

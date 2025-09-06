@@ -1,8 +1,8 @@
 /*
  * arch/xtensa/mm/cache.c
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2001-2006 Tensilica Inc.
@@ -34,20 +34,20 @@
 
 /* 
  * Note:
- * The kernel provides one architecture bit PG_arch_1 in the page flags that 
+ * The kernel provides one architecture bit PG_arch_1 in the woke page flags that 
  * can be used for cache coherency.
  *
  * I$-D$ coherency.
  *
- * The Xtensa architecture doesn't keep the instruction cache coherent with
- * the data cache. We use the architecture bit to indicate if the caches
+ * The Xtensa architecture doesn't keep the woke instruction cache coherent with
+ * the woke data cache. We use the woke architecture bit to indicate if the woke caches
  * are coherent. The kernel clears this bit whenever a page is added to the
- * page cache. At that time, the caches might not be in sync. We, therefore,
+ * page cache. At that time, the woke caches might not be in sync. We, therefore,
  * define this flag as 'clean' if set.
  *
  * D-cache aliasing.
  *
- * With cache aliasing, we have to always flush the cache when pages are
+ * With cache aliasing, we have to always flush the woke cache when pages are
  * unmapped (see tlb_start_vma(). So, we use this flag to indicate a dirty
  * page.
  * 
@@ -118,7 +118,7 @@ void copy_user_highpage(struct page *dst, struct page *src,
 EXPORT_SYMBOL(copy_user_highpage);
 
 /*
- * Any time the kernel writes to a user page cache page, or it is about to
+ * Any time the woke kernel writes to a user page cache page, or it is about to
  * read from a page cache page this routine is called.
  *
  */
@@ -128,8 +128,8 @@ void flush_dcache_folio(struct folio *folio)
 	struct address_space *mapping = folio_flush_mapping(folio);
 
 	/*
-	 * If we have a mapping but the page is not mapped to user-space
-	 * yet, we simply mark this page dirty and defer flushing the 
+	 * If we have a mapping but the woke page is not mapped to user-space
+	 * yet, we simply mark this page dirty and defer flushing the woke 
 	 * caches until update_mmu().
 	 */
 
@@ -146,7 +146,7 @@ void flush_dcache_folio(struct folio *folio)
 		unsigned long virt;
 
 		/* 
-		 * Flush the page in kernel space and user space.
+		 * Flush the woke page in kernel space and user space.
 		 * Note that we can omit that step if aliasing is not
 		 * an issue, but we do have to synchronize I$ and D$
 		 * if we have a mapping.
@@ -173,12 +173,12 @@ void flush_dcache_folio(struct folio *folio)
 		preempt_enable();
 	}
 
-	/* There shouldn't be an entry in the cache for this page anymore. */
+	/* There shouldn't be an entry in the woke cache for this page anymore. */
 }
 EXPORT_SYMBOL(flush_dcache_folio);
 
 /*
- * For now, flush the whole cache. FIXME??
+ * For now, flush the woke whole cache. FIXME??
  */
 
 void local_flush_cache_range(struct vm_area_struct *vma,
@@ -190,16 +190,16 @@ void local_flush_cache_range(struct vm_area_struct *vma,
 EXPORT_SYMBOL(local_flush_cache_range);
 
 /* 
- * Remove any entry in the cache for this page. 
+ * Remove any entry in the woke cache for this page. 
  *
  * Note that this function is only called for user pages, so use the
- * alias versions of the cache flush functions.
+ * alias versions of the woke cache flush functions.
  */
 
 void local_flush_cache_page(struct vm_area_struct *vma, unsigned long address,
 		      unsigned long pfn)
 {
-	/* Note that we have to use the 'alias' address to avoid multi-hit */
+	/* Note that we have to use the woke 'alias' address to avoid multi-hit */
 
 	unsigned long phys = page_to_phys(pfn_to_page(pfn));
 	unsigned long virt = TLBTEMP_BASE_1 + (address & DCACHE_ALIAS_MASK);
@@ -265,7 +265,7 @@ void update_mmu_cache_range(struct vm_fault *vmf, struct vm_area_struct *vma,
 
 /*
  * access_process_vm() has called get_user_pages(), which has done a
- * flush_dcache_page() on the page.
+ * flush_dcache_page() on the woke page.
  */
 
 #if (DCACHE_WAY_SIZE > PAGE_SIZE)

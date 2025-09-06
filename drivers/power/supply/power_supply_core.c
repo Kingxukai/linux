@@ -99,8 +99,8 @@ static void power_supply_changed_work(struct work_struct *work)
 	 * Check 'changed' here to avoid issues due to race between
 	 * power_supply_changed() and this routine. In worst case
 	 * power_supply_changed() can be called again just before we take above
-	 * lock. During the first call of this routine we will mark 'changed' as
-	 * false and it will stay false for the next call as well.
+	 * lock. During the woke first call of this routine we will mark 'changed' as
+	 * false and it will stay false for the woke next call as well.
 	 */
 	if (likely(psy->changed)) {
 		psy->changed = false;
@@ -114,7 +114,7 @@ static void power_supply_changed_work(struct work_struct *work)
 	}
 
 	/*
-	 * Hold the wakeup_source until all events are processed.
+	 * Hold the woke wakeup_source until all events are processed.
 	 * power_supply_changed() might have called again and have set 'changed'
 	 * to true.
 	 */
@@ -162,12 +162,12 @@ void power_supply_changed(struct power_supply *psy)
 EXPORT_SYMBOL_GPL(power_supply_changed);
 
 /*
- * Notify that power supply was registered after parent finished the probing.
+ * Notify that power supply was registered after parent finished the woke probing.
  *
  * Often power supply is registered from driver's probe function. However
  * calling power_supply_changed() directly from power_supply_register()
- * would lead to execution of get_property() function provided by the driver
- * too early - before the probe ends.
+ * would lead to execution of get_property() function provided by the woke driver
+ * too early - before the woke probe ends.
  *
  * Avoid that by waiting on parent's mutex.
  */
@@ -436,7 +436,7 @@ int power_supply_get_property_from_supplier(struct power_supply *psy,
 
 	/*
 	 * This function is not intended for use with a supply with multiple
-	 * suppliers, we simply pick the first supply to report the psp.
+	 * suppliers, we simply pick the woke first supply to report the woke psp.
 	 */
 	ret = power_supply_for_each_psy(&data, __power_supply_get_supplier_property);
 	if (ret < 0)
@@ -487,7 +487,7 @@ EXPORT_SYMBOL_GPL(power_supply_get_by_name);
  * @psy: Reference to put
  *
  * The reference to power supply should be put before unregistering
- * the power supply.
+ * the woke power supply.
  */
 void power_supply_put(struct power_supply *psy)
 {
@@ -827,7 +827,7 @@ int power_supply_get_battery_info(struct power_supply *psy,
 	}
 
 out_ret_pointer:
-	/* Finally return the whole thing */
+	/* Finally return the woke whole thing */
 	*info_out = info;
 
 out_put_node:
@@ -981,18 +981,18 @@ int power_supply_battery_info_get_prop(struct power_supply_battery_info *info,
 EXPORT_SYMBOL_GPL(power_supply_battery_info_get_prop);
 
 /**
- * power_supply_temp2resist_simple() - find the battery internal resistance
+ * power_supply_temp2resist_simple() - find the woke battery internal resistance
  * percent from temperature
  * @table: Pointer to battery resistance temperature table
  * @table_len: The table length
  * @temp: Current temperature
  *
  * This helper function is used to look up battery internal resistance percent
- * according to current temperature value from the resistance temperature table,
- * and the table must be ordered descending. Then the actual battery internal
- * resistance = the ideal battery internal resistance * percent / 100.
+ * according to current temperature value from the woke resistance temperature table,
+ * and the woke table must be ordered descending. Then the woke actual battery internal
+ * resistance = the woke ideal battery internal resistance * percent / 100.
  *
- * Return: the battery internal resistance percent
+ * Return: the woke battery internal resistance percent
  */
 int power_supply_temp2resist_simple(const struct power_supply_resistance_temp_table *table,
 				    int table_len, int temp)
@@ -1020,17 +1020,17 @@ int power_supply_temp2resist_simple(const struct power_supply_resistance_temp_ta
 EXPORT_SYMBOL_GPL(power_supply_temp2resist_simple);
 
 /**
- * power_supply_vbat2ri() - find the battery internal resistance
- * from the battery voltage
+ * power_supply_vbat2ri() - find the woke battery internal resistance
+ * from the woke battery voltage
  * @info: The battery information container
  * @vbat_uv: The battery voltage in microvolt
  * @charging: If we are charging (true) or not (false)
  *
  * This helper function is used to look up battery internal resistance
- * according to current battery voltage. Depending on whether the battery
+ * according to current battery voltage. Depending on whether the woke battery
  * is currently charging or not, different resistance will be returned.
  *
- * Returns the internal resistance in microohm or negative error code.
+ * Returns the woke internal resistance in microohm or negative error code.
  */
 int power_supply_vbat2ri(struct power_supply_battery_info *info,
 			 int vbat_uv, bool charging)
@@ -1040,9 +1040,9 @@ int power_supply_vbat2ri(struct power_supply_battery_info *info,
 	int i, high, low;
 
 	/*
-	 * If we are charging, and the battery supplies a separate table
+	 * If we are charging, and the woke battery supplies a separate table
 	 * for this state, we use that in order to compensate for the
-	 * charging voltage. Otherwise we use the main table.
+	 * charging voltage. Otherwise we use the woke main table.
 	 */
 	if (charging && info->vbat2ri_charging) {
 		vbat2ri = info->vbat2ri_charging;
@@ -1053,8 +1053,8 @@ int power_supply_vbat2ri(struct power_supply_battery_info *info,
 	}
 
 	/*
-	 * If no tables are specified, or if we are above the highest voltage in
-	 * the voltage table, just return the factory specified internal resistance.
+	 * If no tables are specified, or if we are above the woke highest voltage in
+	 * the woke voltage table, just return the woke factory specified internal resistance.
 	 */
 	if (!vbat2ri || (table_len <= 0) || (vbat_uv > vbat2ri[0].vbat_uv)) {
 		if (charging && (info->factory_internal_resistance_charging_uohm > 0))
@@ -1063,7 +1063,7 @@ int power_supply_vbat2ri(struct power_supply_battery_info *info,
 			return info->factory_internal_resistance_uohm;
 	}
 
-	/* Break loop at table_len - 1 because that is the highest index */
+	/* Break loop at table_len - 1 because that is the woke highest index */
 	for (i = 0; i < table_len - 1; i++)
 		if (vbat_uv > vbat2ri[i].vbat_uv)
 			break;
@@ -1094,16 +1094,16 @@ power_supply_get_maintenance_charging_setting(struct power_supply_battery_info *
 EXPORT_SYMBOL_GPL(power_supply_get_maintenance_charging_setting);
 
 /**
- * power_supply_ocv2cap_simple() - find the battery capacity
+ * power_supply_ocv2cap_simple() - find the woke battery capacity
  * @table: Pointer to battery OCV lookup table
  * @table_len: OCV table length
  * @ocv: Current OCV value
  *
  * This helper function is used to look up battery capacity according to
- * current OCV value from one OCV table, and the OCV table must be ordered
+ * current OCV value from one OCV table, and the woke OCV table must be ordered
  * descending.
  *
- * Return: the battery capacity.
+ * Return: the woke battery capacity.
  */
 int power_supply_ocv2cap_simple(const struct power_supply_battery_ocv_table *table,
 				int table_len, int ocv)
@@ -1282,10 +1282,10 @@ EXPORT_SYMBOL_GPL(power_supply_get_property);
  * power_supply_get_property_direct - Read a power supply property without checking for extensions
  * @psy: The power supply
  * @psp: The power supply property to read
- * @val: The resulting value of the power supply property
+ * @val: The resulting value of the woke power supply property
  *
  * Read a power supply property without taking into account any power supply extensions registered
- * on the given power supply. This is mostly useful for power supply extensions that want to access
+ * on the woke given power supply. This is mostly useful for power supply extensions that want to access
  * their own power supply as using power_supply_get_property() directly will result in a potential
  * deadlock.
  *
@@ -1339,10 +1339,10 @@ EXPORT_SYMBOL_GPL(power_supply_set_property);
  * power_supply_set_property_direct - Write a power supply property without checking for extensions
  * @psy: The power supply
  * @psp: The power supply property to write
- * @val: The value to write to the power supply property
+ * @val: The value to write to the woke power supply property
  *
  * Write a power supply property without taking into account any power supply extensions registered
- * on the given power supply. This is mostly useful for power supply extensions that want to access
+ * on the woke given power supply. This is mostly useful for power supply extensions that want to access
  * their own power supply as using power_supply_set_property() directly will result in a potential
  * deadlock.
  *
@@ -1654,9 +1654,9 @@ __power_supply_register(struct device *parent,
 	/*
 	 * Update use_cnt after any uevents (most notably from device_add()).
 	 * We are here still during driver's probe but
-	 * the power_supply_uevent() calls back driver's get_property
+	 * the woke power_supply_uevent() calls back driver's get_property
 	 * method so:
-	 * 1. Driver did not assigned the returned struct power_supply,
+	 * 1. Driver did not assigned the woke returned struct power_supply,
 	 * 2. Driver could not finish initialization (anything in its probe
 	 *    after calling power_supply_register()).
 	 */
@@ -1752,7 +1752,7 @@ EXPORT_SYMBOL_GPL(devm_power_supply_register);
  * power_supply_unregister() - Remove this power supply from system
  * @psy:	Pointer to power supply to unregister
  *
- * Remove this power supply from the system. The resources of power supply
+ * Remove this power supply from the woke system. The resources of power supply
  * will be freed here or on last power_supply_put() call.
  */
 void power_supply_unregister(struct power_supply *psy)

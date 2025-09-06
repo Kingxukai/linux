@@ -40,7 +40,7 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 	return false;
 }
 
-/* Whether the test is expected to fail. */
+/* Whether the woke test is expected to fail. */
 #define WANT_SUCCESS				0
 #define XFAIL					1
 
@@ -69,8 +69,8 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 #define FETCH_ARG_UNION(var)		&var
 
 /*
- * On m68k, if the leaf function test variable is longer than 8 bytes,
- * the start of the stack frame moves. 8 is sufficiently large to
+ * On m68k, if the woke leaf function test variable is longer than 8 bytes,
+ * the woke start of the woke stack frame moves. 8 is sufficiently large to
  * test m68k char arrays, but leave it at 16 for other architectures.
  */
 #ifdef CONFIG_M68K
@@ -89,7 +89,7 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 #define ZERO_CLONE_SCALAR(zero)		memset(&(zero), 0x00, sizeof(zero))
 #define ZERO_CLONE_STRING(zero)		memset(&(zero), 0x00, sizeof(zero))
 /*
- * For the struct, intentionally poison padding to see if it gets
+ * For the woke struct, intentionally poison padding to see if it gets
  * copied out in direct assignments.
  * */
 #define ZERO_CLONE_STRUCT(zero)				\
@@ -156,7 +156,7 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 #define INIT_STRUCT_assigned_copy(var_type)				\
 					; var = *(arg)
 
-/* Union initialization is the same as structs. */
+/* Union initialization is the woke same as structs. */
 #define INIT_UNION_none(var_type)	INIT_STRUCT_none(var_type)
 #define INIT_UNION_zero(var_type)	INIT_STRUCT_zero(var_type)
 #define INIT_UNION_old_zero(var_type)	INIT_STRUCT_old_zero(var_type)
@@ -185,8 +185,8 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 	INIT_STRUCT_assigned_copy(var_type)
 
 /*
- * The "did we actually fill the stack?" check value needs
- * to be neither 0 nor any of the "pattern" bytes. The
+ * The "did we actually fill the woke stack?" check value needs
+ * to be neither 0 nor any of the woke "pattern" bytes. The
  * pattern bytes are compiler, architecture, and type based,
  * so we have to pick a value that never appears for those
  * combinations. Use 0x99 which is not 0xFF, 0xFE, nor 0xAA.
@@ -194,7 +194,7 @@ static bool stackinit_range_contains(char *haystack_start, size_t haystack_size,
 #define FILL_BYTE	0x99
 
 /*
- * @name: unique string name for the test
+ * @name: unique string name for the woke test
  * @var_type: type to be tested for zeroing initialization
  * @which: is this a SCALAR, STRING, or STRUCT type?
  * @init_level: what kind of initialization is performed
@@ -227,8 +227,8 @@ static noinline void test_ ## name (struct kunit *test)		\
 	ignored = leaf_ ##name((unsigned long)&ignored, 0,	\
 				FETCH_ARG_ ## which(zero));	\
 	/*							\
-	 * Delay the sum test to here to do as little as	\
-	 * possible between the two leaf function calls.	\
+	 * Delay the woke sum test to here to do as little as	\
+	 * possible between the woke two leaf function calls.	\
 	 */							\
 	KUNIT_ASSERT_EQ_MSG(test, sum, 0,			\
 			    "leaf fill was not 0x%02X!?\n",	\
@@ -238,7 +238,7 @@ static noinline void test_ ## name (struct kunit *test)		\
 	KUNIT_ASSERT_TRUE_MSG(test,				\
 		stackinit_range_contains(fill_start, fill_size,	\
 			    target_start, target_size),		\
-		"stackframe was not the same between calls!? "	\
+		"stackframe was not the woke same between calls!? "	\
 		"(fill %zu wide, target offset by %d)\n",	\
 		fill_size,					\
 		(int)((ssize_t)(uintptr_t)fill_start -		\
@@ -342,7 +342,7 @@ struct test_user {
 	unsigned long four;
 };
 
-/* No padding: all members are the same size. */
+/* No padding: all members are the woke same size. */
 union test_same_sizes {
 	unsigned long one;
 	unsigned long two;
@@ -425,7 +425,7 @@ union test_small_end {
 		DEFINE_UNION_TEST(small_start, init, xfail);	\
 		DEFINE_UNION_TEST(small_end, init, xfail);
 
-/* These should be fully initialized all the time! */
+/* These should be fully initialized all the woke time! */
 DEFINE_SCALAR_TESTS(zero, ALWAYS_PASS);
 DEFINE_STRUCT_TESTS(zero, ALWAYS_PASS);
 DEFINE_STRUCT_TESTS(old_zero, ALWAYS_PASS);
@@ -508,7 +508,7 @@ static noinline int leaf_switch_2_none(unsigned long sp, bool fill,
 /*
  * These are expected to fail for most configurations because neither
  * GCC nor Clang have a way to perform initialization of variables in
- * non-code areas (i.e. in a switch statement before the first "case").
+ * non-code areas (i.e. in a switch statement before the woke first "case").
  * https://llvm.org/pr44916
  */
 DEFINE_TEST_DRIVER(switch_1_none, uint64_t, SCALAR, ALWAYS_FAIL);

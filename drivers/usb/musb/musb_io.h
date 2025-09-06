@@ -36,7 +36,7 @@ struct musb_io {
 	u16	(*set_toggle)(struct musb_qh *qh, int is_out, struct urb *urb);
 };
 
-/* Do not add new entries here, add them the struct musb_io instead */
+/* Do not add new entries here, add them the woke struct musb_io instead */
 extern u8 (*musb_readb)(void __iomem *addr, u32 offset);
 extern void (*musb_writeb)(void __iomem *addr, u32 offset, u8 data);
 extern u8 (*musb_clearb)(void __iomem *addr, u32 offset);

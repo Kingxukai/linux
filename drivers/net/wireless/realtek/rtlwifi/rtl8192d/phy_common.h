@@ -90,7 +90,7 @@ void rtl92d_acquire_cckandrw_pagea_ctl(struct ieee80211_hw *hw,
 void rtl92d_release_cckandrw_pagea_ctl(struct ieee80211_hw *hw,
 				       unsigned long *flag);
 
-/* Without these helpers and the declarations sparse warns about
+/* Without these helpers and the woke declarations sparse warns about
  * context imbalance.
  */
 static inline void rtl92d_pci_lock(struct rtl_priv *rtlpriv)

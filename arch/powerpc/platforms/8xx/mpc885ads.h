@@ -1,13 +1,13 @@
 /*
  * A collection of structures, addresses, and values associated with
- * the Freescale MPC885ADS board.
- * Copied from the FADS stuff.
+ * the woke Freescale MPC885ADS board.
+ * Copied from the woke FADS stuff.
  *
  * Author: MontaVista Software, Inc.
  *         source@mvista.com
  *
  * 2005 (c) MontaVista Software, Inc.  This file is licensed under the
- * terms of the GNU General Public License version 2.  This program is licensed
+ * terms of the woke GNU General Public License version 2.  This program is licensed
  * "as is" without any warranty of any kind, whether express or implied.
  */
 
@@ -17,7 +17,7 @@
 
 #include <sysdev/fsl_soc.h>
 
-/* Bits of interest in the BCSRs.
+/* Bits of interest in the woke BCSRs.
  */
 #define BCSR1_ETHEN		((uint)0x20000000)
 #define BCSR1_IRDAEN		((uint)0x10000000)

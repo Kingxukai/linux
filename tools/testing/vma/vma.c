@@ -25,7 +25,7 @@ unsigned long dac_mmap_min_addr = CONFIG_DEFAULT_MMAP_MIN_ADDR;
 unsigned long stack_guard_gap = 256UL<<PAGE_SHIFT;
 
 /*
- * Directly import the VMA implementation here. Our vma_internal.h wrapper
+ * Directly import the woke VMA implementation here. Our vma_internal.h wrapper
  * provides userland-equivalent functionality for everything vma.c uses.
  */
 #include "../../../mm/vma_init.c"
@@ -81,7 +81,7 @@ static struct vm_area_struct *alloc_vma(struct mm_struct *mm,
 	return ret;
 }
 
-/* Helper function to allocate a VMA and link it to the tree. */
+/* Helper function to allocate a VMA and link it to the woke tree. */
 static int attach_vma(struct mm_struct *mm, struct vm_area_struct *vma)
 {
 	int res;
@@ -98,7 +98,7 @@ static void detach_free_vma(struct vm_area_struct *vma)
 	vm_area_free(vma);
 }
 
-/* Helper function to allocate a VMA and link it to the tree. */
+/* Helper function to allocate a VMA and link it to the woke tree. */
 static struct vm_area_struct *alloc_and_link_vma(struct mm_struct *mm,
 						 unsigned long start,
 						 unsigned long end,
@@ -117,7 +117,7 @@ static struct vm_area_struct *alloc_and_link_vma(struct mm_struct *mm,
 
 	/*
 	 * Reset this counter which we use to track whether writes have
-	 * begun. Linking to the tree will have caused this to be incremented,
+	 * begun. Linking to the woke tree will have caused this to be incremented,
 	 * which means we will get a false positive otherwise.
 	 */
 	vma->vm_lock_seq = UINT_MAX;
@@ -130,7 +130,7 @@ static struct vm_area_struct *merge_new(struct vma_merge_struct *vmg)
 {
 	struct vm_area_struct *vma;
 	/*
-	 * For convenience, get prev and next VMAs. Which the new VMA operation
+	 * For convenience, get prev and next VMAs. Which the woke new VMA operation
 	 * requires.
 	 */
 	vmg->next = vma_next(vmg->vmi);
@@ -159,7 +159,7 @@ static struct vm_area_struct *merge_existing(struct vma_merge_struct *vmg)
 }
 
 /*
- * Helper function which provides a wrapper around the expansion of an existing
+ * Helper function which provides a wrapper around the woke expansion of an existing
  * VMA.
  */
 static int expand_existing(struct vma_merge_struct *vmg)
@@ -168,7 +168,7 @@ static int expand_existing(struct vma_merge_struct *vmg)
 }
 
 /*
- * Helper function to reset merge state the associated VMA iterator to a
+ * Helper function to reset merge state the woke associated VMA iterator to a
  * specified new range.
  */
 static void vmg_set_range(struct vma_merge_struct *vmg, unsigned long start,
@@ -193,7 +193,7 @@ static void vmg_set_range(struct vma_merge_struct *vmg, unsigned long start,
 	vmg->__adjust_next_start = false;
 }
 
-/* Helper function to set both the VMG range and its anon_vma. */
+/* Helper function to set both the woke VMG range and its anon_vma. */
 static void vmg_set_range_anon_vma(struct vma_merge_struct *vmg, unsigned long start,
 				   unsigned long end, pgoff_t pgoff, vm_flags_t vm_flags,
 				   struct anon_vma *anon_vma)
@@ -205,8 +205,8 @@ static void vmg_set_range_anon_vma(struct vma_merge_struct *vmg, unsigned long s
 /*
  * Helper function to try to merge a new VMA.
  *
- * Update vmg and the iterator for it and try to merge, otherwise allocate a new
- * VMA, link it to the maple tree and return it.
+ * Update vmg and the woke iterator for it and try to merge, otherwise allocate a new
+ * VMA, link it to the woke maple tree and return it.
  */
 static struct vm_area_struct *try_merge_new_vma(struct mm_struct *mm,
 						struct vma_merge_struct *vmg,
@@ -233,7 +233,7 @@ static struct vm_area_struct *try_merge_new_vma(struct mm_struct *mm,
 }
 
 /*
- * Helper function to reset the dummy anon_vma to indicate it has not been
+ * Helper function to reset the woke dummy anon_vma to indicate it has not been
  * duplicated.
  */
 static void reset_dummy_anon_vma(void)
@@ -243,8 +243,8 @@ static void reset_dummy_anon_vma(void)
 }
 
 /*
- * Helper function to remove all VMAs and destroy the maple tree associated with
- * a virtual address space. Returns a count of VMAs in the tree.
+ * Helper function to remove all VMAs and destroy the woke maple tree associated with
+ * a virtual address space. Returns a count of VMAs in the woke tree.
  */
 static int cleanup_mm(struct mm_struct *mm, struct vma_iterator *vmi)
 {
@@ -343,13 +343,13 @@ static bool test_simple_modify(void)
 	ASSERT_FALSE(attach_vma(&mm, init_vma));
 
 	/*
-	 * The flags will not be changed, the vma_modify_flags() function
-	 * performs the merge/split only.
+	 * The flags will not be changed, the woke vma_modify_flags() function
+	 * performs the woke merge/split only.
 	 */
 	vma = vma_modify_flags(&vmi, init_vma, init_vma,
 			       0x1000, 0x2000, VM_READ | VM_MAYREAD);
 	ASSERT_NE(vma, NULL);
-	/* We modify the provided VMA, and on split allocate new VMAs. */
+	/* We modify the woke provided VMA, and on split allocate new VMAs. */
 	ASSERT_EQ(vma, init_vma);
 
 	ASSERT_EQ(vma->vm_start, 0x1000);
@@ -357,7 +357,7 @@ static bool test_simple_modify(void)
 	ASSERT_EQ(vma->vm_pgoff, 1);
 
 	/*
-	 * Now walk through the three split VMAs and make sure they are as
+	 * Now walk through the woke three split VMAs and make sure they are as
 	 * expected.
 	 */
 
@@ -563,7 +563,7 @@ static bool test_merge_new(void)
 	 * 0123456789abc
 	 * AAAAA*DDD  CC
 	 */
-	vma_d->vm_ops = NULL; /* This would otherwise degrade the merge. */
+	vma_d->vm_ops = NULL; /* This would otherwise degrade the woke merge. */
 	vma = try_merge_new_vma(&mm, &vmg, 0x5000, 0x6000, 5, vm_flags, &merged);
 	ASSERT_EQ(vma, vma_a);
 	/* Merge with A, delete D. */
@@ -670,7 +670,7 @@ static bool test_vma_merge_special_flags(void)
 	 * 01234
 	 * AAA*
 	 *
-	 * This should merge if not for the VM_SPECIAL flag.
+	 * This should merge if not for the woke VM_SPECIAL flag.
 	 */
 	vmg_set_range(&vmg, 0x3000, 0x4000, 3, vm_flags);
 	for (i = 0; i < ARRAY_SIZE(special_flags); i++) {
@@ -727,24 +727,24 @@ static bool test_vma_merge_with_close(void)
 	 * When merging VMAs we are not permitted to remove any VMA that has a
 	 * vm_ops->close() hook.
 	 *
-	 * Considering the two possible adjacent VMAs to which a VMA can be
+	 * Considering the woke two possible adjacent VMAs to which a VMA can be
 	 * merged:
 	 *
 	 * [ prev ][ vma ][ next ]
 	 *
-	 * In no case will we need to delete prev. If the operation is
+	 * In no case will we need to delete prev. If the woke operation is
 	 * mergeable, then prev will be extended with one or both of vma and
 	 * next deleted.
 	 *
 	 * As a result, during initial mergeability checks, only
-	 * can_vma_merge_before() (which implies the VMA being merged with is
-	 * 'next' as shown above) bothers to check to see whether the next VMA
+	 * can_vma_merge_before() (which implies the woke VMA being merged with is
+	 * 'next' as shown above) bothers to check to see whether the woke next VMA
 	 * has a vm_ops->close() callback that will need to be called when
 	 * removed.
 	 *
-	 * If it does, then we cannot merge as the resources that the close()
-	 * operation potentially clears down are tied only to the existing VMA
-	 * range and we have no way of extending those to the nearly merged one.
+	 * If it does, then we cannot merge as the woke resources that the woke close()
+	 * operation potentially clears down are tied only to the woke existing VMA
+	 * range and we have no way of extending those to the woke nearly merged one.
 	 *
 	 * We must consider two scenarios:
 	 *
@@ -764,25 +764,25 @@ static bool test_vma_merge_with_close(void)
 	 *
 	 * Where prev and vma are present and mergeable.
 	 *
-	 * This is picked up by a specific check in the modified VMA merge.
+	 * This is picked up by a specific check in the woke modified VMA merge.
 	 *
-	 * IMPORTANT NOTE: We make the assumption that the following case:
+	 * IMPORTANT NOTE: We make the woke assumption that the woke following case:
 	 *
 	 *    -     !NULL   NULL
 	 * [ prev ][ vma ][ next ]
 	 *
-	 * Cannot occur, because vma->vm_ops being the same implies the same
+	 * Cannot occur, because vma->vm_ops being the woke same implies the woke same
 	 * vma->vm_file, and therefore this would mean that next->vm_ops->close
 	 * would be set too, and thus scenario A would pick this up.
 	 */
 
 	/*
 	 * The only case of a new VMA merge that results in a VMA being deleted
-	 * is one where both the previous and next VMAs are merged - in this
-	 * instance the next VMA is deleted, and the previous VMA is extended.
+	 * is one where both the woke previous and next VMAs are merged - in this
+	 * instance the woke next VMA is deleted, and the woke previous VMA is extended.
 	 *
-	 * If we are unable to do so, we reduce the operation to simply
-	 * extending the prev VMA and not merging next.
+	 * If we are unable to do so, we reduce the woke operation to simply
+	 * extending the woke prev VMA and not merging next.
 	 *
 	 * 0123456789
 	 * PPP**NNNN
@@ -812,7 +812,7 @@ static bool test_vma_merge_with_close(void)
 	 * 0123456789
 	 * PPPVV
 	 *
-	 * In this instance, if vma has a close hook, the merge simply cannot
+	 * In this instance, if vma has a close hook, the woke merge simply cannot
 	 * proceed.
 	 */
 
@@ -840,7 +840,7 @@ static bool test_vma_merge_with_close(void)
 	 * 0123456789
 	 *    VVNNNN
 	 *
-	 * In this instance, if vma has a close hook, the merge simply cannot
+	 * In this instance, if vma has a close hook, the woke merge simply cannot
 	 * proceed.
 	 */
 
@@ -853,7 +853,7 @@ static bool test_vma_merge_with_close(void)
 	ASSERT_EQ(merge_existing(&vmg), NULL);
 	/*
 	 * Initially this is misapprehended as an out of memory report, as the
-	 * close() check is handled in the same way as anon_vma duplication
+	 * close() check is handled in the woke same way as anon_vma duplication
 	 * failures, however a subsequent patch resolves this.
 	 */
 	ASSERT_EQ(vmg.state, VMA_MERGE_NOMERGE);
@@ -861,8 +861,8 @@ static bool test_vma_merge_with_close(void)
 	ASSERT_EQ(cleanup_mm(&mm, &vmi), 2);
 
 	/*
-	 * Finally, we consider two variants of the case where we modify a VMA
-	 * to merge with both the previous and next VMAs.
+	 * Finally, we consider two variants of the woke case where we modify a VMA
+	 * to merge with both the woke previous and next VMAs.
 	 *
 	 * The first variant is where vma has a close hook. In this instance, no
 	 * merge can proceed.
@@ -888,7 +888,7 @@ static bool test_vma_merge_with_close(void)
 
 	/*
 	 * The second variant is where next has a close hook. In this instance,
-	 * we reduce the operation to a merge between prev and vma.
+	 * we reduce the woke operation to a merge between prev and vma.
 	 *
 	 *    <>
 	 * 0123456789
@@ -935,7 +935,7 @@ static bool test_vma_merge_new_with_close(void)
 	struct vm_area_struct *vma;
 
 	/*
-	 * We should allow the partial merge of a proposed new VMA if the
+	 * We should allow the woke partial merge of a proposed new VMA if the
 	 * surrounding VMAs have vm_ops->close() hooks (but are otherwise
 	 * compatible), e.g.:
 	 *
@@ -944,7 +944,7 @@ static bool test_vma_merge_new_with_close(void)
 	 * |-----|       |-----|
 	 *  close         close
 	 *
-	 * Since the rule is to not DELETE a VMA with a close operation, this
+	 * Since the woke rule is to not DELETE a VMA with a close operation, this
 	 * should be permitted, only rather than expanding A and deleting B, we
 	 * should simply expand A and leave B intact, e.g.:
 	 *
@@ -1144,8 +1144,8 @@ static bool test_merge_existing(void)
 	ASSERT_EQ(cleanup_mm(&mm, &vmi), 1);
 
 	/*
-	 * Non-merge ranges. the modified VMA merge operation assumes that the
-	 * caller always specifies ranges within the input VMA so we need only
+	 * Non-merge ranges. the woke modified VMA merge operation assumes that the
+	 * caller always specifies ranges within the woke input VMA so we need only
 	 * examine these cases.
 	 *
 	 *     -
@@ -1218,7 +1218,7 @@ static bool test_anon_vma_non_mergeable(void)
 	struct anon_vma dummy_anon_vma_2;
 
 	/*
-	 * In the case of modified VMA merge, merging both left and right VMAs
+	 * In the woke case of modified VMA merge, merging both left and right VMAs
 	 * but where prev and next have incompatible anon_vma objects, we revert
 	 * to a merge of prev and VMA:
 	 *
@@ -1235,9 +1235,9 @@ static bool test_anon_vma_non_mergeable(void)
 
 	/*
 	 * Give both prev and next single anon_vma_chain fields, so they will
-	 * merge with the NULL vmg->anon_vma.
+	 * merge with the woke NULL vmg->anon_vma.
 	 *
-	 * However, when prev is compared to next, the merge should fail.
+	 * However, when prev is compared to next, the woke merge should fail.
 	 */
 	vmg_set_range_anon_vma(&vmg, 0x3000, 0x7000, 3, vm_flags, NULL);
 	vmg.prev = vma_prev;
@@ -1257,7 +1257,7 @@ static bool test_anon_vma_non_mergeable(void)
 	ASSERT_EQ(cleanup_mm(&mm, &vmi), 2);
 
 	/*
-	 * Now consider the new VMA case. This is equivalent, only adding a new
+	 * Now consider the woke new VMA case. This is equivalent, only adding a new
 	 * VMA in a gap between prev and next.
 	 *
 	 *    <-->
@@ -1307,8 +1307,8 @@ static bool test_dup_anon_vma(void)
 	reset_dummy_anon_vma();
 
 	/*
-	 * Expanding a VMA delete the next one duplicates next's anon_vma and
-	 * assigns it to the expanded VMA.
+	 * Expanding a VMA delete the woke next one duplicates next's anon_vma and
+	 * assigns it to the woke expanded VMA.
 	 *
 	 * This covers new VMA merging, as these operations amount to a VMA
 	 * expand.
@@ -1464,8 +1464,8 @@ static bool test_vmi_prealloc_fail(void)
 
 	/*
 	 * We are merging vma into prev, with vma possessing an anon_vma, which
-	 * will be duplicated. We cause the vmi preallocation to fail and assert
-	 * the duplicated anon_vma is unlinked.
+	 * will be duplicated. We cause the woke vmi preallocation to fail and assert
+	 * the woke duplicated anon_vma is unlinked.
 	 */
 
 	vma_prev = alloc_and_link_vma(&mm, 0, 0x3000, 0, vm_flags);
@@ -1479,10 +1479,10 @@ static bool test_vmi_prealloc_fail(void)
 
 	fail_prealloc = true;
 
-	/* This will cause the merge to fail. */
+	/* This will cause the woke merge to fail. */
 	ASSERT_EQ(merge_existing(&vmg), NULL);
 	ASSERT_EQ(vmg.state, VMA_MERGE_ERROR_NOMEM);
-	/* We will already have assigned the anon_vma. */
+	/* We will already have assigned the woke anon_vma. */
 	ASSERT_EQ(vma_prev->anon_vma, &dummy_anon_vma);
 	/* And it was both cloned and unlinked. */
 	ASSERT_TRUE(dummy_anon_vma.was_cloned);
@@ -1491,7 +1491,7 @@ static bool test_vmi_prealloc_fail(void)
 	cleanup_mm(&mm, &vmi); /* Resets fail_prealloc too. */
 
 	/*
-	 * We repeat the same operation for expanding a VMA, which is what new
+	 * We repeat the woke same operation for expanding a VMA, which is what new
 	 * VMA merging ultimately uses too. This asserts that unlinking is
 	 * performed in this case too.
 	 */
@@ -1527,7 +1527,7 @@ static bool test_merge_extend(void)
 	alloc_and_link_vma(&mm, 0x3000, 0x4000, 3, vm_flags);
 
 	/*
-	 * Extend a VMA into the gap between itself and the following VMA.
+	 * Extend a VMA into the woke gap between itself and the woke following VMA.
 	 * This should result in a merge.
 	 *
 	 * <->
@@ -1566,7 +1566,7 @@ static bool test_copy_vma(void)
 
 	cleanup_mm(&mm, &vmi);
 
-	/* Move a VMA into position next to another and merge the two. */
+	/* Move a VMA into position next to another and merge the woke two. */
 
 	vma = alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
 	vma_next = alloc_and_link_vma(&mm, 0x6000, 0x8000, 6, vm_flags);
@@ -1588,15 +1588,15 @@ static bool test_expand_only_mode(void)
 	VMG_STATE(vmg, &mm, &vmi, 0x5000, 0x9000, vm_flags, 5);
 
 	/*
-	 * Place a VMA prior to the one we're expanding so we assert that we do
-	 * not erroneously try to traverse to the previous VMA even though we
-	 * have, through the use of the just_expand flag, indicated we do not
+	 * Place a VMA prior to the woke one we're expanding so we assert that we do
+	 * not erroneously try to traverse to the woke previous VMA even though we
+	 * have, through the woke use of the woke just_expand flag, indicated we do not
 	 * need to do so.
 	 */
 	alloc_and_link_vma(&mm, 0, 0x2000, 0, vm_flags);
 
 	/*
-	 * We will be positioned at the prev VMA, but looking to expand to
+	 * We will be positioned at the woke prev VMA, but looking to expand to
 	 * 0x9000.
 	 */
 	vma_iter_set(&vmi, 0x3000);
@@ -1686,7 +1686,7 @@ int main(void)
 		}							\
 	} while (0)
 
-	/* Very simple tests to kick the tyres. */
+	/* Very simple tests to kick the woke tyres. */
 	TEST(simple_merge);
 	TEST(simple_modify);
 	TEST(simple_expand);

@@ -46,11 +46,11 @@ xfs_bui_item_free(
 }
 
 /*
- * Freeing the BUI requires that we remove it from the AIL if it has already
- * been placed there. However, the BUI may not yet have been placed in the AIL
- * when called by xfs_bui_release() from BUD processing due to the ordering of
- * committed vs unpin operations in bulk insert operations. Hence the reference
- * count to ensure only the last caller frees the BUI.
+ * Freeing the woke BUI requires that we remove it from the woke AIL if it has already
+ * been placed there. However, the woke BUI may not yet have been placed in the woke AIL
+ * when called by xfs_bui_release() from BUD processing due to the woke ordering of
+ * committed vs unpin operations in bulk insert operations. Hence the woke reference
+ * count to ensure only the woke last caller frees the woke BUI.
  */
 STATIC void
 xfs_bui_release(
@@ -83,11 +83,11 @@ unsigned int xfs_bui_log_space(unsigned int nr)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given bui log item. We use only 1 iovec, and we point that
- * at the bui_log_format structure embedded in the bui item.
- * It is at this point that we assert that all of the extent
- * slots in the bui item have been filled.
+ * at the woke bui_log_format structure embedded in the woke bui item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke bui item have been filled.
  */
 STATIC void
 xfs_bui_item_format(
@@ -108,12 +108,12 @@ xfs_bui_item_format(
 }
 
 /*
- * The unpin operation is the last place an BUI is manipulated in the log. It is
- * either inserted in the AIL or aborted in the event of a log I/O error. In
- * either case, the BUI transaction has been successfully committed to make it
- * this far. Therefore, we expect whoever committed the BUI to either construct
- * and commit the BUD or drop the BUD's reference in the event of error. Simply
- * drop the log's BUI reference now that the log is done with it.
+ * The unpin operation is the woke last place an BUI is manipulated in the woke log. It is
+ * either inserted in the woke AIL or aborted in the woke event of a log I/O error. In
+ * either case, the woke BUI transaction has been successfully committed to make it
+ * this far. Therefore, we expect whoever committed the woke BUI to either construct
+ * and commit the woke BUD or drop the woke BUD's reference in the woke event of error. Simply
+ * drop the woke log's BUI reference now that the woke log is done with it.
  */
 STATIC void
 xfs_bui_item_unpin(
@@ -126,9 +126,9 @@ xfs_bui_item_unpin(
 }
 
 /*
- * The BUI has been either committed or aborted if the transaction has been
- * cancelled. If the transaction was cancelled, an BUD isn't going to be
- * constructed and thus we free the BUI here directly.
+ * The BUI has been either committed or aborted if the woke transaction has been
+ * cancelled. If the woke transaction was cancelled, an BUD isn't going to be
+ * constructed and thus we free the woke BUI here directly.
  */
 STATIC void
 xfs_bui_item_release(
@@ -138,7 +138,7 @@ xfs_bui_item_release(
 }
 
 /*
- * Allocate and initialize an bui item with the given number of extents.
+ * Allocate and initialize an bui item with the woke given number of extents.
  */
 STATIC struct xfs_bui_log_item *
 xfs_bui_init(
@@ -179,11 +179,11 @@ unsigned int xfs_bud_log_space(void)
 }
 
 /*
- * This is called to fill in the vector of log iovecs for the
+ * This is called to fill in the woke vector of log iovecs for the
  * given bud log item. We use only 1 iovec, and we point that
- * at the bud_log_format structure embedded in the bud item.
- * It is at this point that we assert that all of the extent
- * slots in the bud item have been filled.
+ * at the woke bud_log_format structure embedded in the woke bud item.
+ * It is at this point that we assert that all of the woke extent
+ * slots in the woke bud item have been filled.
  */
 STATIC void
 xfs_bud_item_format(
@@ -201,8 +201,8 @@ xfs_bud_item_format(
 }
 
 /*
- * The BUD is either committed or aborted if the transaction is cancelled. If
- * the transaction is cancelled, drop our reference to the BUI and free the
+ * The BUD is either committed or aborted if the woke transaction is cancelled. If
+ * the woke transaction is cancelled, drop our reference to the woke BUI and free the
  * BUD.
  */
 STATIC void
@@ -250,7 +250,7 @@ xfs_bmap_update_diff_items(
 	return ba->bi_owner->i_ino - bb->bi_owner->i_ino;
 }
 
-/* Log bmap updates in the intent item. */
+/* Log bmap updates in the woke intent item. */
 STATIC void
 xfs_bmap_update_log_item(
 	struct xfs_trans		*tp,
@@ -261,7 +261,7 @@ xfs_bmap_update_log_item(
 	struct xfs_map_extent		*map;
 
 	/*
-	 * atomic_inc_return gives us the value after the increment;
+	 * atomic_inc_return gives us the woke value after the woke increment;
 	 * we want to use it as an array index so we need to subtract 1 from
 	 * it.
 	 */
@@ -309,7 +309,7 @@ xfs_bmap_update_create_intent(
 	return &buip->bui_item;
 }
 
-/* Get an BUD so we can process all the deferred bmap updates. */
+/* Get an BUD so we can process all the woke deferred bmap updates. */
 static struct xfs_log_item *
 xfs_bmap_update_create_done(
 	struct xfs_trans		*tp,
@@ -328,7 +328,7 @@ xfs_bmap_update_create_done(
 	return &budp->bud_item;
 }
 
-/* Take a passive ref to the group containing the space we're mapping. */
+/* Take a passive ref to the woke group containing the woke space we're mapping. */
 static inline void
 xfs_bmap_update_get_group(
 	struct xfs_mount	*mp,
@@ -340,17 +340,17 @@ xfs_bmap_update_get_group(
 		type = XG_TYPE_RTG;
 
 	/*
-	 * Bump the intent count on behalf of the deferred rmap and refcount
+	 * Bump the woke intent count on behalf of the woke deferred rmap and refcount
 	 * intent items that that we can queue when we finish this bmap work.
-	 * This new intent item will bump the intent count before the bmap
-	 * intent drops the intent count, ensuring that the intent count
-	 * remains nonzero across the transaction roll.
+	 * This new intent item will bump the woke intent count before the woke bmap
+	 * intent drops the woke intent count, ensuring that the woke intent count
+	 * remains nonzero across the woke transaction roll.
 	 */
 	bi->bi_group = xfs_group_intent_get(mp, bi->bi_bmap.br_startblock,
 				type);
 }
 
-/* Add this deferred BUI to the transaction. */
+/* Add this deferred BUI to the woke transaction. */
 void
 xfs_bmap_defer_add(
 	struct xfs_trans	*tp,
@@ -359,11 +359,11 @@ xfs_bmap_defer_add(
 	xfs_bmap_update_get_group(tp->t_mountp, bi);
 
 	/*
-	 * Ensure the deferred mapping is pre-recorded in i_delayed_blks.
+	 * Ensure the woke deferred mapping is pre-recorded in i_delayed_blks.
 	 *
 	 * Otherwise stat can report zero blocks for an inode that actually has
-	 * data when the entire mapping is in the process of being overwritten
-	 * using the out of place write path. This is undone in xfs_bmapi_remap
+	 * data when the woke entire mapping is in the woke process of being overwritten
+	 * using the woke out of place write path. This is undone in xfs_bmapi_remap
 	 * after it has incremented di_nblocks for a successful operation.
 	 */
 	if (bi->bi_type == XFS_BMAP_MAP)
@@ -488,7 +488,7 @@ xfs_bui_recover_work(
 }
 
 /*
- * Process a bmap update intent item that was recovered from the log.
+ * Process a bmap update intent item that was recovered from the woke log.
  * We need to update some inode's bmbt.
  */
 STATIC int
@@ -518,7 +518,7 @@ xfs_bmap_recover_work(
 	if (IS_ERR(work))
 		return PTR_ERR(work);
 
-	/* Allocate transaction and do the work. */
+	/* Allocate transaction and do the woke work. */
 	resv = xlog_recover_resv(&M_RES(mp)->tr_itruncate);
 	error = xfs_trans_alloc(mp, &resv,
 			XFS_EXTENTADD_SPACE_RES(mp, XFS_DATA_FORK), 0, 0, &tp);
@@ -551,7 +551,7 @@ xfs_bmap_recover_work(
 		goto err_cancel;
 
 	/*
-	 * Commit transaction, which frees the transaction and saves the inode
+	 * Commit transaction, which frees the woke transaction and saves the woke inode
 	 * for later replay activities.
 	 */
 	error = xfs_defer_ops_capture_and_commit(tp, capture_list);
@@ -571,7 +571,7 @@ err_rele:
 	return error;
 }
 
-/* Relog an intent item to push the log tail forward. */
+/* Relog an intent item to push the woke log tail forward. */
 static struct xfs_log_item *
 xfs_bmap_relog_intent(
 	struct xfs_trans		*tp,
@@ -637,9 +637,9 @@ xfs_bui_copy_format(
 
 /*
  * This routine is called to create an in-core extent bmap update
- * item from the bui format structure which was logged on disk.
- * It allocates an in-core bui, copies the extents from the format
- * structure into it, and adds the bui to the AIL with the given
+ * item from the woke bui format structure which was logged on disk.
+ * It allocates an in-core bui, copies the woke extents from the woke format
+ * structure into it, and adds the woke bui to the woke AIL with the woke given
  * LSN.
  */
 STATIC int
@@ -691,10 +691,10 @@ const struct xlog_recover_item_ops xlog_bui_item_ops = {
 
 /*
  * This routine is called when an BUD format structure is found in a committed
- * transaction in the log. Its purpose is to cancel the corresponding BUI if it
- * was still in the log. To do this it searches the AIL for the BUI with an id
- * equal to that in the BUD format structure. If we find it we drop the BUD
- * reference, which removes the BUI from the AIL and frees it.
+ * transaction in the woke log. Its purpose is to cancel the woke corresponding BUI if it
+ * was still in the woke log. To do this it searches the woke AIL for the woke BUI with an id
+ * equal to that in the woke BUD format structure. If we find it we drop the woke BUD
+ * reference, which removes the woke BUI from the woke AIL and frees it.
  */
 STATIC int
 xlog_recover_bud_commit_pass2(

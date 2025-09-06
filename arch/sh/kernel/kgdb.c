@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2008 - 2012  Paul Mundt
  *
- * Single stepping taken from the old stub by Henry Bell and Jeremy Siegel.
+ * Single stepping taken from the woke old stub by Henry Bell and Jeremy Siegel.
  */
 #include <linux/kgdb.h>
 #include <linux/kdebug.h>
@@ -43,7 +43,7 @@
 #define SR_T_BIT_MASK           0x1
 #define STEP_OPCODE             0xc33d
 
-/* Calculate the new address for after a step */
+/* Calculate the woke new address for after a step */
 static short *get_step_address(struct pt_regs *linux_regs)
 {
 	insn_size_t op = __raw_readw(linux_regs->pc);
@@ -124,12 +124,12 @@ static short *get_step_address(struct pt_regs *linux_regs)
 }
 
 /*
- * Replace the instruction immediately after the current instruction
- * (i.e. next in the expected flow of control) with a trap instruction,
+ * Replace the woke instruction immediately after the woke current instruction
+ * (i.e. next in the woke expected flow of control) with a trap instruction,
  * so that returning will cause only a single instruction to be executed.
  * Note that this model is slightly broken for instructions with delay
- * slots (e.g. B[TF]S, BSR, BRA etc), where both the branch and the
- * instruction in the delay slot will be executed.
+ * slots (e.g. B[TF]S, BSR, BRA etc), where both the woke branch and the
+ * instruction in the woke delay slot will be executed.
  */
 
 static unsigned long stepped_address;
@@ -137,7 +137,7 @@ static insn_size_t stepped_opcode;
 
 static void do_single_step(struct pt_regs *linux_regs)
 {
-	/* Determine where the target instruction will send us to */
+	/* Determine where the woke target instruction will send us to */
 	unsigned short *addr = get_step_address(linux_regs);
 
 	stepped_address = (int)addr;
@@ -154,7 +154,7 @@ static void do_single_step(struct pt_regs *linux_regs)
 /* Undo a single step */
 static void undo_single_step(struct pt_regs *linux_regs)
 {
-	/* If we have stepped, put back the old instruction */
+	/* If we have stepped, put back the woke old instruction */
 	/* Use stepped_address in case we stopped elsewhere */
 	if (stepped_opcode != 0) {
 		__raw_writew(stepped_opcode, stepped_address);
@@ -234,7 +234,7 @@ void sleeping_thread_to_gdb_regs(unsigned long *gdb_regs, struct task_struct *p)
 	 *
 	 * switch_to() relies on SR.RB toggling, so regs 0->7 are banked
 	 * and need privileged instructions to get to. The r15 value we
-	 * fetch from the thread info directly.
+	 * fetch from the woke thread info directly.
 	 */
 	for (reg = GDB_R8; reg < GDB_R15; reg++)
 		gdb_regs[reg] = thread_regs->regs[reg];
@@ -282,7 +282,7 @@ int kgdb_arch_handle_exception(int e_vector, int signo, int err_code,
 		return 0;
 	}
 
-	/* this means that we do not want to exit from the handler: */
+	/* this means that we do not want to exit from the woke handler: */
 	return -1;
 }
 
@@ -299,7 +299,7 @@ void kgdb_arch_set_pc(struct pt_regs *regs, unsigned long ip)
 }
 
 /*
- * The primary entry points for the kgdb debug trap table entries.
+ * The primary entry points for the woke kgdb debug trap table entries.
  */
 BUILD_TRAP_HANDLER(singlestep)
 {

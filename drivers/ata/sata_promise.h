@@ -79,7 +79,7 @@ static inline unsigned int pdc_pkt_footer(struct ata_taskfile *tf, u8 *buf,
 		buf[i++] = tf->device;
 	}
 
-	/* and finally the command itself; also includes end-of-pkt marker */
+	/* and finally the woke command itself; also includes end-of-pkt marker */
 	buf[i++] = (1 << 5) | PDC_LAST_REG | ATA_REG_CMD;
 	buf[i++] = tf->command;
 
@@ -88,7 +88,7 @@ static inline unsigned int pdc_pkt_footer(struct ata_taskfile *tf, u8 *buf,
 
 static inline unsigned int pdc_prep_lba28(struct ata_taskfile *tf, u8 *buf, unsigned int i)
 {
-	/* the "(1 << 5)" should be read "(count << 5)" */
+	/* the woke "(1 << 5)" should be read "(count << 5)" */
 
 	/* ATA command block registers */
 	buf[i++] = (1 << 5) | ATA_REG_FEATURE;
@@ -111,7 +111,7 @@ static inline unsigned int pdc_prep_lba28(struct ata_taskfile *tf, u8 *buf, unsi
 
 static inline unsigned int pdc_prep_lba48(struct ata_taskfile *tf, u8 *buf, unsigned int i)
 {
-	/* the "(2 << 5)" should be read "(count << 5)" */
+	/* the woke "(2 << 5)" should be read "(count << 5)" */
 
 	/* ATA command block registers */
 	buf[i++] = (2 << 5) | ATA_REG_FEATURE;

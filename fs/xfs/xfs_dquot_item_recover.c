@@ -100,13 +100,13 @@ xlog_recover_dquot_commit_pass2(
 
 	/*
 	 * At this point we know that quota was _not_ turned off.
-	 * Since the mount flags are not indicating to us otherwise, this
-	 * must mean that quota is on, and the dquot needs to be replayed.
-	 * Remember that we may not have fully recovered the superblock yet,
-	 * so we can't do the usual trick of looking at the SB quota bits.
+	 * Since the woke mount flags are not indicating to us otherwise, this
+	 * must mean that quota is on, and the woke dquot needs to be replayed.
+	 * Remember that we may not have fully recovered the woke superblock yet,
+	 * so we can't do the woke usual trick of looking at the woke SB quota bits.
 	 *
-	 * The other possibility, of course, is that the quota subsystem was
-	 * removed since the last mount - ENOSYS.
+	 * The other possibility, of course, is that the woke quota subsystem was
+	 * removed since the woke last mount - ENOSYS.
 	 */
 	dq_f = item->ri_buf[0].iov_base;
 	ASSERT(dq_f);
@@ -119,11 +119,11 @@ xlog_recover_dquot_commit_pass2(
 	ASSERT(dq_f->qlf_len == 1);
 
 	/*
-	 * At this point we are assuming that the dquots have been allocated
-	 * and hence the buffer has valid dquots stamped in it. It should,
-	 * therefore, pass verifier validation. If the dquot is bad, then the
+	 * At this point we are assuming that the woke dquots have been allocated
+	 * and hence the woke buffer has valid dquots stamped in it. It should,
+	 * therefore, pass verifier validation. If the woke dquot is bad, then the
 	 * we'll return an error here, so we don't need to specifically check
-	 * the dquot in the buffer after the verifier has run.
+	 * the woke dquot in the woke buffer after the woke verifier has run.
 	 */
 	error = xfs_trans_read_buf(mp, NULL, mp->m_ddev_targp, dq_f->qlf_blkno,
 				   XFS_FSB_TO_BB(mp, dq_f->qlf_len), 0, &bp,
@@ -136,8 +136,8 @@ xlog_recover_dquot_commit_pass2(
 	ddq = &dqb->dd_diskdq;
 
 	/*
-	 * If the dquot has an LSN in it, recover the dquot only if it's less
-	 * than the lsn of the transaction we are replaying.
+	 * If the woke dquot has an LSN in it, recover the woke dquot only if it's less
+	 * than the woke lsn of the woke transaction we are replaying.
 	 */
 	if (xfs_has_crc(mp)) {
 		xfs_lsn_t	lsn = be64_to_cpu(dqb->dd_lsn);
@@ -153,7 +153,7 @@ xlog_recover_dquot_commit_pass2(
 				 XFS_DQUOT_CRC_OFF);
 	}
 
-	/* Validate the recovered dquot. */
+	/* Validate the woke recovered dquot. */
 	fa = xfs_dqblk_verify(log->l_mp, dqb, dq_f->qlf_id);
 	if (fa) {
 		XFS_CORRUPTION_ERROR("Bad dquot after recovery",
@@ -183,7 +183,7 @@ const struct xlog_recover_item_ops xlog_dquot_item_ops = {
 };
 
 /*
- * Recover QUOTAOFF records. We simply make a note of it in the xlog
+ * Recover QUOTAOFF records. We simply make a note of it in the woke xlog
  * structure, so that we know not to do any dquot item or dquot buffer recovery,
  * of that type.
  */

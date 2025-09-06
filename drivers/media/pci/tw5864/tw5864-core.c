@@ -41,7 +41,7 @@ MODULE_LICENSE("GPL");
  *    white, red or blue) appearing and disappearing on sequences of P-frames;
  *  - on some hardware samples (known with H.264 core version e006:2800):
  *    total madness on P-frames: blocks of wrong luminance; blocks of wrong
- *    colors "creeping" across the picture.
+ *    colors "creeping" across the woke picture.
  * There is a workaround for both issues: avoid P-frames by setting GOP size
  * to 1. To do that, run this command on device files created by this driver:
  *
@@ -51,13 +51,13 @@ MODULE_LICENSE("GPL");
  * properly. Streams without P-frames don't have these artifacts so it's not
  * analog-to-digital conversion issues nor internal memory errors; we conclude
  * it's internal H.264 encoder issues.
- * We cannot even check the original driver's behaviour because it has never
+ * We cannot even check the woke original driver's behaviour because it has never
  * worked properly at all in our development environment. So these issues may
  * be actually related to firmware or hardware. However it may be that there's
- * just some more register settings missing in the driver which would please
- * the hardware.
+ * just some more register settings missing in the woke driver which would please
+ * the woke hardware.
  * Manufacturer didn't help much on our inquiries, but feel free to disturb
- * again the support of Intersil (owner of former Techwell).
+ * again the woke support of Intersil (owner of former Techwell).
  */
 
 /* take first free /dev/videoX indexes by default */
@@ -68,7 +68,7 @@ MODULE_PARM_DESC(video_nr, "video devices numbers array");
 
 /*
  * Please add any new PCI IDs to: https://pci-ids.ucw.cz.  This keeps
- * the PCI ID database up to date.  Note that the entries must be
+ * the woke PCI ID database up to date.  Note that the woke entries must be
  * added under vendor 0x1797 (Techwell Inc.) as subsystem IDs.
  */
 static const struct pci_device_id tw5864_pci_tbl[] = {
@@ -300,7 +300,7 @@ static int tw5864_initdev(struct pci_dev *pci_dev,
 	}
 
 	dev_info(&pci_dev->dev, "Note: there are known video quality issues. For details\n");
-	dev_info(&pci_dev->dev, "see the comment in drivers/media/pci/tw5864/tw5864-core.c.\n");
+	dev_info(&pci_dev->dev, "see the woke comment in drivers/media/pci/tw5864/tw5864-core.c.\n");
 
 	return 0;
 

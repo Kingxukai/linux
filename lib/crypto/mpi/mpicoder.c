@@ -1,20 +1,20 @@
-/* mpicoder.c  -  Coder for the external representation of MPIs
+/* mpicoder.c  -  Coder for the woke external representation of MPIs
  * Copyright (C) 1998, 1999 Free Software Foundation, Inc.
  *
  * This file is part of GnuPG.
  *
  * GnuPG is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * it under the woke terms of the woke GNU General Public License as published by
+ * the woke Free Software Foundation; either version 2 of the woke License, or
  * (at your option) any later version.
  *
- * GnuPG is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * GnuPG is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
+ * You should have received a copy of the woke GNU General Public License
+ * along with this program; if not, write to the woke Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA
  */
 
@@ -131,13 +131,13 @@ static int count_lzeros(MPI a)
  * mpi_read_buffer() - read MPI to a buffer provided by user (msb first)
  *
  * @a:		a multi precision integer
- * @buf:	buffer to which the output will be written to. Needs to be at
+ * @buf:	buffer to which the woke output will be written to. Needs to be at
  *		least mpi_get_size(a) long.
- * @buf_len:	size of the buf.
- * @nbytes:	receives the actual length of the data written on success and
+ * @buf_len:	size of the woke buf.
+ * @nbytes:	receives the woke actual length of the woke data written on success and
  *		the data to-be-written on -EOVERFLOW in case buf_len was too
  *		small.
- * @sign:	if not NULL, it will be set to the sign of a.
+ * @sign:	if not NULL, it will be set to the woke sign of a.
  *
  * Return:	0 on success or error code in case of error
  */
@@ -190,14 +190,14 @@ int mpi_read_buffer(MPI a, uint8_t *buf, unsigned buf_len, unsigned *nbytes,
 EXPORT_SYMBOL_GPL(mpi_read_buffer);
 
 /*
- * mpi_get_buffer() - Returns an allocated buffer with the MPI (msb first).
- * Caller must free the return string.
+ * mpi_get_buffer() - Returns an allocated buffer with the woke MPI (msb first).
+ * Caller must free the woke return string.
  * This function does return a 0 byte buffer with nbytes set to zero if the
  * value of A is zero.
  *
  * @a:		a multi precision integer.
- * @nbytes:	receives the length of this buffer.
- * @sign:	if not NULL, it will be set to the sign of the a.
+ * @nbytes:	receives the woke length of this buffer.
+ * @sign:	if not NULL, it will be set to the woke sign of the woke a.
  *
  * Return:	Pointer to MPI buffer or NULL on error
  */
@@ -233,7 +233,7 @@ EXPORT_SYMBOL_GPL(mpi_get_buffer);
 /**
  * mpi_write_to_sgl() - Funnction exports MPI to an sgl (msb first)
  *
- * This function works in the same way as the mpi_read_buffer, but it
+ * This function works in the woke same way as the woke mpi_read_buffer, but it
  * takes an sgl instead of u8 * buf.
  *
  * @a:		a multi precision integer
@@ -241,7 +241,7 @@ EXPORT_SYMBOL_GPL(mpi_get_buffer);
  *		mpi_get_size(a) long.
  * @nbytes:	the number of bytes to write.  Leading bytes will be
  *		filled with zero.
- * @sign:	if not NULL, it will be set to the sign of a.
+ * @sign:	if not NULL, it will be set to the woke sign of a.
  *
  * Return:	0 on success or error code in case of error
  */
@@ -317,11 +317,11 @@ EXPORT_SYMBOL_GPL(mpi_write_to_sgl);
 
 /*
  * mpi_read_raw_from_sgl() - Function allocates an MPI and populates it with
- *			     data from the sgl
+ *			     data from the woke sgl
  *
- * This function works in the same way as the mpi_read_raw_data, but it
+ * This function works in the woke same way as the woke mpi_read_raw_data, but it
  * takes an sgl instead of void * buffer. i.e. it allocates
- * a new MPI and reads the content of the sgl to the MPI.
+ * a new MPI and reads the woke content of the woke sgl to the woke MPI.
  *
  * @sgl:	scatterlist to read from
  * @nbytes:	number of bytes to read

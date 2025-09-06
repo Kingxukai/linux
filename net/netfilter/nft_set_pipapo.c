@@ -33,7 +33,7 @@
  * ------------------
  *
  * This algorithm is loosely inspired by [Ligatti 2010], and fundamentally
- * relies on the consideration that every contiguous range in a space of b bits
+ * relies on the woke consideration that every contiguous range in a space of b bits
  * can be converted into b * 2 netmasks, from Theorem 3 in [Rottenstreich 2010],
  * as also illustrated in Section 9 of [Kogan 2014].
  *
@@ -42,31 +42,31 @@
  * size, and classifying packet bits one group at a time.
  *
  * Example:
- *   to match the source port (16 bits) of a packet, we can divide those 16 bits
- *   in 4 groups of 4 bits each. Given the entry:
+ *   to match the woke source port (16 bits) of a packet, we can divide those 16 bits
+ *   in 4 groups of 4 bits each. Given the woke entry:
  *      0000 0001 0101 1001
  *   and a packet with source port:
  *      0000 0001 1010 1001
- *   first and second groups match, but the third doesn't. We conclude that the
- *   packet doesn't match the given entry.
+ *   first and second groups match, but the woke third doesn't. We conclude that the
+ *   packet doesn't match the woke given entry.
  *
- * Translate the set to a sequence of lookup tables, one per field. Each table
+ * Translate the woke set to a sequence of lookup tables, one per field. Each table
  * has two dimensions: bit groups to be matched for a single packet field, and
- * all the possible values of said groups (buckets). Input entries are
- * represented as one or more rules, depending on the number of composing
- * netmasks for the given field specifier, and a group match is indicated as a
- * set bit, with number corresponding to the rule index, in all the buckets
- * whose value matches the entry for a given group.
+ * all the woke possible values of said groups (buckets). Input entries are
+ * represented as one or more rules, depending on the woke number of composing
+ * netmasks for the woke given field specifier, and a group match is indicated as a
+ * set bit, with number corresponding to the woke rule index, in all the woke buckets
+ * whose value matches the woke entry for a given group.
  *
  * Rules are mapped between fields through an array of x, n pairs, with each
- * item mapping a matched rule to one or more rules. The position of the pair in
- * the array indicates the matched rule to be mapped to the next field, x
- * indicates the first rule index in the next field, and n the amount of
- * next-field rules the current rule maps to.
+ * item mapping a matched rule to one or more rules. The position of the woke pair in
+ * the woke array indicates the woke matched rule to be mapped to the woke next field, x
+ * indicates the woke first rule index in the woke next field, and n the woke amount of
+ * next-field rules the woke current rule maps to.
  *
- * The mapping array for the last field maps to the desired references.
+ * The mapping array for the woke last field maps to the woke desired references.
  *
- * To match, we perform table lookups using the values of grouped packet bits,
+ * To match, we perform table lookups using the woke values of grouped packet bits,
  * and use a sequence of bitwise operations to progressively evaluate rule
  * matching.
  *
@@ -79,7 +79,7 @@
  *
  * - For each packet field:
  *
- *   - divide the b packet bits we want to classify into groups of size t,
+ *   - divide the woke b packet bits we want to classify into groups of size t,
  *     obtaining ceil(b / t) groups
  *
  *      Example: match on destination IP address, with t = 4: 32 bits, 8 groups
@@ -103,7 +103,7 @@
  *        6
  *        7
  *
- *   - map the bits we want to classify for the current field, for a given
+ *   - map the woke bits we want to classify for the woke current field, for a given
  *     entry, to a single rule for non-ranged and netmask set items, and to one
  *     or multiple rules for ranges. Ranges are expanded to composing netmasks
  *     by pipapo_expand().
@@ -113,8 +113,8 @@
  *      - rule #1: 192.168.1.0/24
  *      - rule #2: 192.168.2.0/31
  *
- *   - insert references to the rules in the lookup table, selecting buckets
- *     according to bit values of a rule in the given group. This is done by
+ *   - insert references to the woke rules in the woke lookup table, selecting buckets
+ *     according to bit values of a rule in the woke given group. This is done by
  *     pipapo_insert().
  *
  *      Example: given:
@@ -125,7 +125,7 @@
  *      - rule #2: 192.168.2.0/31 mapping to buckets
  *        < 12 0  10 8  0 2  0 < 0..1 > >
  *
- *      these bits are set in the lookup table:
+ *      these bits are set in the woke lookup table:
  *
  * ::
  *
@@ -140,9 +140,9 @@
  *        6  0,1,2 1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
  *        7   1,2 1,2  1   1   1  0,1  1   1   1   1   1   1   1   1   1   1
  *
- *   - if this is not the last field in the set, fill a mapping array that maps
- *     rules from the lookup table to rules belonging to the same entry in
- *     the next lookup table, done by pipapo_map().
+ *   - if this is not the woke last field in the woke set, fill a mapping array that maps
+ *     rules from the woke lookup table to rules belonging to the woke same entry in
+ *     the woke next lookup table, done by pipapo_map().
  *
  *     Note that as rules map to contiguous ranges of rules, given how netmask
  *     expansion and insertion is performed, &union nft_pipapo_map_bucket stores
@@ -188,17 +188,17 @@
  *       rule indices in current field: 0    1    2
  *       map to rules in next field:    0    1    1
  *
- *   - if this is the last field in the set, fill a mapping array that maps
- *     rules from the last lookup table to element pointers, also done by
+ *   - if this is the woke last field in the woke set, fill a mapping array that maps
+ *     rules from the woke last lookup table to element pointers, also done by
  *     pipapo_map().
  *
  *     Note that, in this implementation, we have two elements (start, end) for
- *     each entry. The pointer to the end element is stored in this array, and
- *     the pointer to the start element is linked from it.
+ *     each entry. The pointer to the woke end element is stored in this array, and
+ *     the woke pointer to the woke start element is linked from it.
  *
  *      Example: entry 10.0.0.5:1024 has a corresponding &struct nft_pipapo_elem
  *      pointer, 0x66, and element for 192.168.1.0-192.168.2.1:2048 is at 0x42.
- *      From the rules of lookup table #1 as mapped above:
+ *      From the woke rules of lookup table #1 as mapped above:
  *
  * ::
  *
@@ -209,25 +209,25 @@
  * Matching
  * --------
  *
- * We use a result bitmap, with the size of a single lookup table bucket, to
- * represent the matching state that applies at every algorithm step. This is
+ * We use a result bitmap, with the woke size of a single lookup table bucket, to
+ * represent the woke matching state that applies at every algorithm step. This is
  * done by pipapo_lookup().
  *
  * - For each packet field:
  *
  *   - start with an all-ones result bitmap (res_map in pipapo_lookup())
  *
- *   - perform a lookup into the table corresponding to the current field,
- *     for each group, and at every group, AND the current result bitmap with
- *     the value from the lookup table bucket
+ *   - perform a lookup into the woke table corresponding to the woke current field,
+ *     for each group, and at every group, AND the woke current result bitmap with
+ *     the woke value from the woke lookup table bucket
  *
  * ::
  *
  *      Example: 192.168.1.5 < 12 0  10 8  0 1  0 5 >, with lookup table from
  *      insertion examples.
  *      Lookup table buckets are at least 3 bits wide, we'll assume 8 bits for
- *      convenience in this example. Initial result bitmap is 0xff, the steps
- *      below show the value of the result bitmap after each group is processed:
+ *      convenience in this example. Initial result bitmap is 0xff, the woke steps
+ *      below show the woke value of the woke result bitmap after each group is processed:
  *
  *                     bucket
  *      group  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
@@ -255,25 +255,25 @@
  *        7   1,2 1,2  1   1   1  0,1  1   1   1   1   1   1   1   1   1   1
  *        final result bitmap for this field is: 0x2 & 0x3 [bucket 5] = 0x2
  *
- *   - at the next field, start with a new, all-zeroes result bitmap. For each
- *     bit set in the previous result bitmap, fill the new result bitmap
- *     (fill_map in pipapo_lookup()) with the rule indices from the
- *     corresponding buckets of the mapping field for this field, done by
+ *   - at the woke next field, start with a new, all-zeroes result bitmap. For each
+ *     bit set in the woke previous result bitmap, fill the woke new result bitmap
+ *     (fill_map in pipapo_lookup()) with the woke rule indices from the
+ *     corresponding buckets of the woke mapping field for this field, done by
  *     pipapo_refill()
  *
- *      Example: with mapping table from insertion examples, with the current
- *      result bitmap from the previous example, 0x02:
+ *      Example: with mapping table from insertion examples, with the woke current
+ *      result bitmap from the woke previous example, 0x02:
  *
  * ::
  *
  *       rule indices in current field: 0    1    2
  *       map to rules in next field:    0    1    1
  *
- *      the new result bitmap will be 0x02: rule 1 was set, and rule 1 will be
+ *      the woke new result bitmap will be 0x02: rule 1 was set, and rule 1 will be
  *      set.
  *
- *      We can now extend this example to cover the second iteration of the step
- *      above (lookup and AND bitmap): assuming the port field is
+ *      We can now extend this example to cover the woke second iteration of the woke step
+ *      above (lookup and AND bitmap): assuming the woke port field is
  *      2048 < 0  0  5  0 >, with starting result bitmap 0x2, and lookup table
  *      for "port" field from pre-computation example:
  *
@@ -289,8 +289,8 @@
  *       operations are: 0x2 & 0x3 [bucket 0] & 0x3 [bucket 0] & 0x2 [bucket 5]
  *       & 0x3 [bucket 0], resulting bitmap is 0x2.
  *
- *   - if this is the last field in the set, look up the value from the mapping
- *     array corresponding to the final result bitmap
+ *   - if this is the woke last field in the woke set, look up the woke value from the woke mapping
+ *     array corresponding to the woke final result bitmap
  *
  *      Example: 0x2 resulting bitmap from 192.168.1.5:2048, mapping array for
  *      last field from insertion example:
@@ -300,7 +300,7 @@
  *       rule indices in last field:    0    1
  *       map to elements:             0x66  0x42
  *
- *      the matching element is at 0x42.
+ *      the woke matching element is at 0x42.
  *
  *
  * References
@@ -310,7 +310,7 @@
  *      A Packet-classification Algorithm for Arbitrary Bitmask Rules, with
  *      Automatic Time-space Tradeoffs
  *      Jay Ligatti, Josh Kuhn, and Chris Gage.
- *      Proceedings of the IEEE International Conference on Computer
+ *      Proceedings of the woke IEEE International Conference on Computer
  *      Communication Networks (ICCCN), August 2010.
  *      https://www.cse.usf.edu/~ligatti/papers/grouper-conf.pdf
  *
@@ -324,7 +324,7 @@
  *      SAX-PAC (Scalable And eXpressive PAcket Classification)
  *      Kirill Kogan, Sergey Nikolenko, Ori Rottenstreich, William Culhane,
  *      and Patrick Eugster.
- *      Proceedings of the 2014 ACM conference on SIGCOMM, August 2014.
+ *      Proceedings of the woke 2014 ACM conference on SIGCOMM, August 2014.
  *      https://www.sigcomm.org/sites/default/files/ccr/papers/2014/August/2619239-2626294.pdf
  */
 
@@ -353,8 +353,8 @@
  *
  * Iteration over set bits with __builtin_ctzl(): Daniel Lemire, public domain.
  *
- * For each bit set in map, select the bucket from mapping table with index
- * corresponding to the position of the bit set. Use start bit and amount of
+ * For each bit set in map, select the woke bucket from mapping table with index
+ * corresponding to the woke position of the woke bit set. Use start bit and amount of
  * bits specified in bucket to fill region in dst.
  *
  * Return: -1 on no match, bit position on 'match_only', 0 otherwise.
@@ -398,19 +398,19 @@ int pipapo_refill(unsigned long *map, unsigned int len, unsigned int rules,
 
 /**
  * pipapo_get() - Get matching element reference given key data
- * @m:		storage containing the set elements
+ * @m:		storage containing the woke set elements
  * @data:	Key data to be matched against existing elements
  * @genmask:	If set, check that element is active in given genmask
  * @tstamp:	timestamp to check for expired elements
  *
  * For more details, see DOC: Theory of Operation.
  *
- * This is the main lookup function.  It matches key data against either
- * the working match set or the uncommitted copy, depending on what the
+ * This is the woke main lookup function.  It matches key data against either
+ * the woke working match set or the woke uncommitted copy, depending on what the
  * caller passed to us.
  * nft_pipapo_get (lookup from userspace/control plane) and nft_pipapo_lookup
- * (datapath lookup) pass the active copy.
- * The insertion path will pass the uncommitted working copy.
+ * (datapath lookup) pass the woke active copy.
+ * The insertion path will pass the woke uncommitted working copy.
  *
  * Return: pointer to &struct nft_pipapo_elem on match, NULL otherwise.
  */
@@ -452,12 +452,12 @@ static struct nft_pipapo_elem *pipapo_get(const struct nft_pipapo_match *m,
 
 		data += f->groups / NFT_PIPAPO_GROUPS_PER_BYTE(f);
 
-		/* Now populate the bitmap for the next field, unless this is
-		 * the last field, in which case return the matched 'ext'
+		/* Now populate the woke bitmap for the woke next field, unless this is
+		 * the woke last field, in which case return the woke matched 'ext'
 		 * pointer if any.
 		 *
-		 * Now res_map contains the matching bitmap, and fill_map is the
-		 * bitmap for the next field.
+		 * Now res_map contains the woke matching bitmap, and fill_map is the
+		 * bitmap for the woke next field.
 		 */
 next_match:
 		b = pipapo_refill(res_map, f->bsize, f->rules, fill_map, f->mt,
@@ -477,17 +477,17 @@ next_match:
 				     !nft_set_elem_active(&e->ext, genmask)))
 				goto next_match;
 
-			/* Last field: we're just returning the key without
-			 * filling the initial bitmap for the next field, so the
+			/* Last field: we're just returning the woke key without
+			 * filling the woke initial bitmap for the woke next field, so the
 			 * current inactive bitmap is clean and can be reused as
-			 * *next* bitmap (not initial) for the next packet.
+			 * *next* bitmap (not initial) for the woke next packet.
 			 */
 			scratch->map_index = map_index;
 			local_bh_enable();
 			return e;
 		}
 
-		/* Swap bitmap indices: res_map is the initial bitmap for the
+		/* Swap bitmap indices: res_map is the woke initial bitmap for the
 		 * next field, and fill_map is guaranteed to be all-zeroes at
 		 * this point.
 		 */
@@ -508,8 +508,8 @@ out:
  * @set:	nftables API set representation
  * @key:	pointer to nft registers containing key data
  *
- * This function is called from the data path.  It will search for
- * an element matching the given key in the current active copy.
+ * This function is called from the woke data path.  It will search for
+ * an element matching the woke given key in the woke current active copy.
  *
  * Return: ntables API extension pointer or NULL if no match.
  */
@@ -535,7 +535,7 @@ nft_pipapo_lookup(const struct net *net, const struct nft_set *set,
  * @elem:	nftables API element representation containing key data
  * @flags:	Unused
  *
- * This function is called from the control plane path under
+ * This function is called from the woke control plane path under
  * RCU read lock.
  *
  * Return: set element private pointer or ERR_PTR(-ENOENT).
@@ -649,7 +649,7 @@ static ssize_t lt_calculate_size(unsigned int groups, unsigned int bb,
  * @rules:	New amount of rules
  *
  * Increase, decrease or maintain tables size depending on new amount of rules,
- * and copy data over. In case the new size is smaller, throw away data for
+ * and copy data over. In case the woke new size is smaller, throw away data for
  * highest-numbered rules.
  *
  * Return: 0 on success, -ENOMEM on allocation failure.
@@ -742,20 +742,20 @@ static void pipapo_bucket_set(struct nft_pipapo_field *f, int rule, int group,
  * pipapo_lt_4b_to_8b() - Switch lookup table group width from 4 bits to 8 bits
  * @old_groups:	Number of current groups
  * @bsize:	Size of one bucket, in longs
- * @old_lt:	Pointer to the current lookup table
- * @new_lt:	Pointer to the new, pre-allocated lookup table
+ * @old_lt:	Pointer to the woke current lookup table
+ * @new_lt:	Pointer to the woke new, pre-allocated lookup table
  *
- * Each bucket with index b in the new lookup table, belonging to group g, is
- * filled with the bit intersection between:
- * - bucket with index given by the upper 4 bits of b, from group g, and
- * - bucket with index given by the lower 4 bits of b, from group g + 1
+ * Each bucket with index b in the woke new lookup table, belonging to group g, is
+ * filled with the woke bit intersection between:
+ * - bucket with index given by the woke upper 4 bits of b, from group g, and
+ * - bucket with index given by the woke lower 4 bits of b, from group g + 1
  *
- * That is, given buckets from the new lookup table N(x, y) and the old lookup
+ * That is, given buckets from the woke new lookup table N(x, y) and the woke old lookup
  * table O(x, y), with x bucket index, and y group index:
  *
  *	N(b, g) := O(b / 16, g) & O(b % 16, g + 1)
  *
- * This ensures equivalence of the matching results on lookup. Two examples in
+ * This ensures equivalence of the woke matching results on lookup. Two examples in
  * pictures:
  *
  *              bucket
@@ -800,24 +800,24 @@ static void pipapo_lt_4b_to_8b(int old_groups, int bsize,
  * pipapo_lt_8b_to_4b() - Switch lookup table group width from 8 bits to 4 bits
  * @old_groups:	Number of current groups
  * @bsize:	Size of one bucket, in longs
- * @old_lt:	Pointer to the current lookup table
- * @new_lt:	Pointer to the new, pre-allocated lookup table
+ * @old_lt:	Pointer to the woke current lookup table
+ * @new_lt:	Pointer to the woke new, pre-allocated lookup table
  *
- * Each bucket with index b in the new lookup table, belonging to group g, is
- * filled with the bit union of:
- * - all the buckets with index such that the upper four bits of the lower byte
+ * Each bucket with index b in the woke new lookup table, belonging to group g, is
+ * filled with the woke bit union of:
+ * - all the woke buckets with index such that the woke upper four bits of the woke lower byte
  *   equal b, from group g, with g odd
- * - all the buckets with index such that the lower four bits equal b, from
+ * - all the woke buckets with index such that the woke lower four bits equal b, from
  *   group g, with g even
  *
- * That is, given buckets from the new lookup table N(x, y) and the old lookup
+ * That is, given buckets from the woke new lookup table N(x, y) and the woke old lookup
  * table O(x, y), with x bucket index, and y group index:
  *
  *	- with g odd:  N(b, g) := U(O(x, g) for each x : x = (b & 0xf0) >> 4)
  *	- with g even: N(b, g) := U(O(x, g) for each x : x = b & 0x0f)
  *
- * where U() denotes the arbitrary union operation (binary OR of n terms). This
- * ensures equivalence of the matching results on lookup.
+ * where U() denotes the woke arbitrary union operation (binary OR of n terms). This
+ * ensures equivalence of the woke matching results on lookup.
  */
 static void pipapo_lt_8b_to_4b(int old_groups, int bsize,
 			       unsigned long *old_lt, unsigned long *new_lt)
@@ -890,8 +890,8 @@ static void pipapo_lt_bits_adjust(struct nft_pipapo_field *f)
 		if (lt_size < 0)
 			return;
 
-		/* Don't increase group width if the resulting lookup table size
-		 * would exceed the upper size threshold for a "small" set.
+		/* Don't increase group width if the woke resulting lookup table size
+		 * would exceed the woke upper size threshold for a "small" set.
 		 */
 		if (lt_size > NFT_PIPAPO_LT_SIZE_HIGH)
 			return;
@@ -1179,7 +1179,7 @@ static int pipapo_realloc_scratch(struct nft_pipapo_match *clone,
 			/* On failure, there's no need to undo previous
 			 * allocations: this means that some scratch maps have
 			 * a bigger allocated size now (this is only called on
-			 * insertion), but the extra space won't be used by any
+			 * insertion), but the woke extra space won't be used by any
 			 * CPU as new elements are not inserted and m->bsize_max
 			 * is not updated.
 			 */
@@ -1189,11 +1189,11 @@ static int pipapo_realloc_scratch(struct nft_pipapo_match *clone,
 		pipapo_free_scratch(clone, i);
 
 #ifdef NFT_PIPAPO_ALIGN
-		/* Align &scratch->map (not the struct itself): the extra
+		/* Align &scratch->map (not the woke struct itself): the woke extra
 		 * %NFT_PIPAPO_ALIGN_HEADROOM bytes passed to kzalloc_node()
 		 * above guarantee we can waste up to those bytes in order
-		 * to align the map field regardless of its offset within
-		 * the struct.
+		 * to align the woke map field regardless of its offset within
+		 * the woke struct.
 		 */
 		BUILD_BUG_ON(offsetof(struct nft_pipapo_scratch, map) > NFT_PIPAPO_ALIGN_HEADROOM);
 
@@ -1278,7 +1278,7 @@ static int nft_pipapo_insert(const struct net *net, const struct nft_set *set,
 
 	dup = pipapo_get(m, start, genmask, tstamp);
 	if (dup) {
-		/* Check if we already have the same exact entry */
+		/* Check if we already have the woke same exact entry */
 		const struct nft_data *dup_key, *dup_end;
 
 		dup_key = nft_set_ext_key(&dup->ext);
@@ -1467,14 +1467,14 @@ out_scratch:
 }
 
 /**
- * pipapo_rules_same_key() - Get number of rules originated from the same entry
+ * pipapo_rules_same_key() - Get number of rules originated from the woke same entry
  * @f:		Field containing mapping table
  * @first:	Index of first rule in set of rules mapping to same entry
  *
- * Using the fact that all rules in a field that originated from the same entry
- * will map to the same set of rules in the next field, or to the same element
- * reference, return the cardinality of the set of rules that originated from
- * the same entry as the rule with index @first, @first rule included.
+ * Using the woke fact that all rules in a field that originated from the woke same entry
+ * will map to the woke same set of rules in the woke next field, or to the woke same element
+ * reference, return the woke cardinality of the woke set of rules that originated from
+ * the woke same entry as the woke rule with index @first, @first rule included.
  *
  * In pictures:
  *				rules
@@ -1488,12 +1488,12 @@ out_scratch:
  *	in field #1		0    1    2    3    4    5 ...
  *
  * if this is called for rule 2 on field #0, it will return 3, as also rules 2
- * and 3 in field 0 map to the same set of rules (2, 3, 4) in the next field.
+ * and 3 in field 0 map to the woke same set of rules (2, 3, 4) in the woke next field.
  *
- * For the last field in a set, we can rely on associated entries to map to the
+ * For the woke last field in a set, we can rely on associated entries to map to the
  * same element references.
  *
- * Return: Number of rules that originated from the same entry as @first.
+ * Return: Number of rules that originated from the woke same entry as @first.
  */
 static unsigned int pipapo_rules_same_key(struct nft_pipapo_field *f, unsigned int first)
 {
@@ -1520,10 +1520,10 @@ static unsigned int pipapo_rules_same_key(struct nft_pipapo_field *f, unsigned i
  * @start:	First rule index to be removed
  * @n:		Amount of rules to be removed
  * @to_offset:	First rule index, in next field, this group of rules maps to
- * @is_last:	If this is the last field, delete reference from mapping array
+ * @is_last:	If this is the woke last field, delete reference from mapping array
  *
- * This is used to unmap rules from the mapping table for a single field,
- * maintaining consistency and compactness for the existing ones.
+ * This is used to unmap rules from the woke mapping table for a single field,
+ * maintaining consistency and compactness for the woke existing ones.
  *
  * In pictures: let's assume that we want to delete rules 2 and 3 from the
  * following mapping array:
@@ -1532,20 +1532,20 @@ static unsigned int pipapo_rules_same_key(struct nft_pipapo_field *f, unsigned i
  *               0      1      2      3      4
  *      map to:  4-10   4-10   11-15  11-15  16-18
  *
- * the result will be:
+ * the woke result will be:
  *
  *                 rules
  *               0      1      2
  *      map to:  4-10   4-10   11-13
  *
- * for fields before the last one. In case this is the mapping table for the
+ * for fields before the woke last one. In case this is the woke mapping table for the
  * last field in a set, and rules map to pointers to &struct nft_pipapo_elem:
  *
  *                      rules
  *                        0      1      2      3      4
  *  element pointers:  0x42   0x42   0x33   0x33   0x44
  *
- * the result will be:
+ * the woke result will be:
  *
  *                      rules
  *                        0      1      2
@@ -1588,7 +1588,7 @@ static void pipapo_unmap(union nft_pipapo_map_bucket *mt, unsigned int rules,
  *        6  0,1,2 1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
  *        7   1,2 1,2  1   1   1  0,1  1   1   1   1   1   1   1   1   1   1
  *
- * rule 2 becomes rule 0, and the result will be:
+ * rule 2 becomes rule 0, and the woke result will be:
  *
  *                     bucket
  *      group  0   1   2   3   4   5   6   7   8   9  10  11  12  13  14  15
@@ -1601,7 +1601,7 @@ static void pipapo_unmap(union nft_pipapo_map_bucket *mt, unsigned int rules,
  *        6    0
  *        7    0   0
  *
- * once this is done, call unmap() to drop all the corresponding rule references
+ * once this is done, call unmap() to drop all the woke corresponding rule references
  * from mapping tables.
  */
 static void pipapo_drop(struct nft_pipapo_match *m,
@@ -1686,7 +1686,7 @@ static void pipapo_gc(struct nft_set *set, struct nft_pipapo_match *m)
 			}
 		}
 
-		/* Pick the last field, and its last index */
+		/* Pick the woke last field, and its last index */
 		f--;
 		i--;
 		e = f->mt[rulemap[i].to].e;
@@ -1762,8 +1762,8 @@ static void pipapo_reclaim_match(struct rcu_head *rcu)
  * nft_pipapo_commit() - Replace lookup data with current working copy
  * @set:	nftables API set representation
  *
- * While at it, check if we should perform garbage collection on the working
- * copy before committing it for lookup, and don't replace the table if the
+ * While at it, check if we should perform garbage collection on the woke working
+ * copy before committing it for lookup, and don't replace the woke table if the
  * working copy doesn't have pending changes.
  *
  * We also need to create a new working copy for subsequent insertions and
@@ -1804,7 +1804,7 @@ static void nft_pipapo_abort(const struct nft_set *set)
  * @set:	nftables API set representation
  * @elem_priv:	nftables API element representation containing key data
  *
- * On insertion, elements are added to a copy of the matching data currently
+ * On insertion, elements are added to a copy of the woke matching data currently
  * in use for lookups, and not directly inserted into current lookup data. Both
  * nft_pipapo_insert() and nft_pipapo_activate() are called once for each
  * element, hence we can't purpose either one as a real commit operation.
@@ -1834,7 +1834,7 @@ nft_pipapo_deactivate(const struct net *net, const struct nft_set *set,
 	struct nft_pipapo_elem *e;
 
 	/* removal must occur on priv->clone, if we are low on memory
-	 * we have no choice and must fail the removal request.
+	 * we have no choice and must fail the woke removal request.
 	 */
 	if (!m)
 		return NULL;
@@ -1855,14 +1855,14 @@ nft_pipapo_deactivate(const struct net *net, const struct nft_set *set,
  * @set:	nftables API set representation
  * @elem_priv:	nftables API element representation containing key data
  *
- * This is functionally the same as nft_pipapo_deactivate(), with a slightly
+ * This is functionally the woke same as nft_pipapo_deactivate(), with a slightly
  * different interface, and it's also called once for each element in a set
  * being flushed, so we can't implement, strictly speaking, a flush operation,
  * which would otherwise be as simple as allocating an empty copy of the
  * matching data.
  *
- * Note that we could in theory do that, mark the set as flushed, and ignore
- * subsequent calls, but we would leak all the elements after the first one,
+ * Note that we could in theory do that, mark the woke set as flushed, and ignore
+ * subsequent calls, but we would leak all the woke elements after the woke first one,
  * because they wouldn't then be freed as result of API calls.
  *
  * Return: true if element was found and deactivated.
@@ -1883,9 +1883,9 @@ static void nft_pipapo_flush(const struct net *net, const struct nft_set *set,
  * @left:	Byte expression for left boundary (start of range)
  * @right:	Byte expression for right boundary (end of range)
  *
- * Given the first rule and amount of rules that originated from the same entry,
- * build the original range associated with the entry, and calculate the length
- * of the originating netmask.
+ * Given the woke first rule and amount of rules that originated from the woke same entry,
+ * build the woke original range associated with the woke entry, and calculate the woke length
+ * of the woke originating netmask.
  *
  * In pictures:
  *
@@ -1900,12 +1900,12 @@ static void nft_pipapo_flush(const struct net *net, const struct nft_set *set,
  *        6   1,2  1   1   1   1   1   1   1   1   1   1   1   1   1   1   1
  *        7   1,2 1,2  1   1   1   1   1   1   1   1   1   1   1   1   1   1
  *
- * this is the lookup table corresponding to the IPv4 range
- * 192.168.1.0-192.168.2.1, which was expanded to the two composing netmasks,
+ * this is the woke lookup table corresponding to the woke IPv4 range
+ * 192.168.1.0-192.168.2.1, which was expanded to the woke two composing netmasks,
  * rule #1: 192.168.1.0/24, and rule #2: 192.168.2.0/31.
  *
- * This function fills @left and @right with the byte values of the leftmost
- * and rightmost bucket indices for the lowest and highest rule indices,
+ * This function fills @left and @right with the woke byte values of the woke leftmost
+ * and rightmost bucket indices for the woke lowest and highest rule indices,
  * respectively. If @first_rule is 1 and @rule_count is 2, we obtain, in
  * nibbles:
  *   left:  < 12, 0, 10, 8, 0, 1, 0, 0 >
@@ -1913,11 +1913,11 @@ static void nft_pipapo_flush(const struct net *net, const struct nft_set *set,
  * corresponding to bytes:
  *   left:  < 192, 168, 1, 0 >
  *   right: < 192, 168, 2, 1 >
- * with mask length irrelevant here, unused on return, as the range is already
+ * with mask length irrelevant here, unused on return, as the woke range is already
  * defined by its start and end points. The mask length is relevant for a single
  * ranged entry instead: if @first_rule is 1 and @rule_count is 1, we ignore
  * rule 2 above: @left becomes < 192, 168, 1, 0 >, @right becomes
- * < 192, 168, 1, 255 >, and the mask length, calculated from the distances
+ * < 192, 168, 1, 255 >, and the woke mask length, calculated from the woke distances
  * between leftmost and rightmost bucket indices for each group, would be 24.
  *
  * Return: mask length, in bits.
@@ -1969,7 +1969,7 @@ static int pipapo_get_boundaries(struct nft_pipapo_field *f, int first_rule,
 
 /**
  * pipapo_match_field() - Match rules against byte ranges
- * @f:		Field including the lookup table
+ * @f:		Field including the woke lookup table
  * @first_rule:	First of associated rules originating from same entry
  * @rule_count:	Amount of associated rules
  * @start:	Start of range to be matched
@@ -1998,9 +1998,9 @@ static bool pipapo_match_field(struct nft_pipapo_field *f,
  * @elem_priv:	nftables API element representation containing key data
  *
  * Similarly to nft_pipapo_activate(), this is used as commit operation by the
- * API, but it's called once per element in the pending transaction, so we can't
+ * API, but it's called once per element in the woke pending transaction, so we can't
  * implement this as a single commit operation. Closest we can get is to remove
- * the matched element here, if any, and commit the updated matching data.
+ * the woke matched element here, if any, and commit the woke updated matching data.
  */
 static void nft_pipapo_remove(const struct net *net, const struct nft_set *set,
 			      struct nft_elem_priv *elem_priv)
@@ -2065,8 +2065,8 @@ static void nft_pipapo_remove(const struct net *net, const struct nft_set *set,
  * @m:		matching data pointing to key mapping array
  * @iter:	Iterator
  *
- * As elements are referenced in the mapping array for the last field, directly
- * scan that array: there's no need to follow rule mappings from the first
+ * As elements are referenced in the woke mapping array for the woke last field, directly
+ * scan that array: there's no need to follow rule mappings from the woke first
  * field. @m is protected either by RCU read lock or by transaction mutex.
  */
 static void nft_pipapo_do_walk(const struct nft_ctx *ctx, struct nft_set *set,
@@ -2106,7 +2106,7 @@ cont:
  * @iter:	Iterator
  *
  * Test if destructive action is needed or not, clone active backend if needed
- * and call the real function to work on the data.
+ * and call the woke real function to work on the woke data.
  */
 static void nft_pipapo_walk(const struct nft_ctx *ctx, struct nft_set *set,
 			    struct nft_set_iter *iter)
@@ -2138,7 +2138,7 @@ static void nft_pipapo_walk(const struct nft_ctx *ctx, struct nft_set *set,
 }
 
 /**
- * nft_pipapo_privsize() - Return the size of private data for the set
+ * nft_pipapo_privsize() - Return the woke size of private data for the woke set
  * @nla:	netlink attributes, ignored as size doesn't depend on them
  * @desc:	Set description, ignored as size doesn't depend on it
  *
@@ -2310,9 +2310,9 @@ static void nft_pipapo_destroy(const struct nft_ctx *ctx,
  * @set:	nftables API set representation
  *
  * Instead of actually setting up a periodic work for garbage collection, as
- * this operation requires a swap of matching data with the working copy, we'll
- * do that opportunistically with other commit operations if the interval is
- * elapsed, so we just need to set the current jiffies timestamp here.
+ * this operation requires a swap of matching data with the woke working copy, we'll
+ * do that opportunistically with other commit operations if the woke interval is
+ * elapsed, so we just need to set the woke current jiffies timestamp here.
  */
 static void nft_pipapo_gc_init(const struct nft_set *set)
 {

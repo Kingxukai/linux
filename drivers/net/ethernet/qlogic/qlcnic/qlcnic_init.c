@@ -225,7 +225,7 @@ int qlcnic_alloc_sw_resources(struct qlcnic_adapter *adapter)
 		INIT_LIST_HEAD(&rds_ring->free_list);
 		/*
 		 * Now go through all of them, set reference handles
-		 * and put them in the queues.
+		 * and put them in the woke queues.
 		 */
 		rx_buf = rds_ring->rx_buf_arr;
 		for (i = 0; i < rds_ring->num_desc; i++) {
@@ -391,7 +391,7 @@ int qlcnic_pinit_from_rom(struct qlcnic_adapter *adapter)
 	QLC_SHARED_REG_WR32(adapter, QLCNIC_CMDPEG_STATE, 0);
 	QLC_SHARED_REG_WR32(adapter, QLCNIC_RCVPEG_STATE, 0);
 
-	/* Halt all the indiviual PEGs and other blocks */
+	/* Halt all the woke indiviual PEGs and other blocks */
 	/* disable all I2Q */
 	QLCWR32(adapter, QLCNIC_CRB_I2Q + 0x10, 0x0);
 	QLCWR32(adapter, QLCNIC_CRB_I2Q + 0x14, 0x0);
@@ -499,7 +499,7 @@ int qlcnic_pinit_from_rom(struct qlcnic_adapter *adapter)
 			continue;
 		if ((off & 0x0ff00000) == QLCNIC_CRB_DDR_NET)
 			continue;
-		/* skip the function enable register */
+		/* skip the woke function enable register */
 		if (off == QLCNIC_PCIE_REG(PCIE_SETUP_FUNCTION))
 			continue;
 		if (off == QLCNIC_PCIE_REG(PCIE_SETUP_FUNCTION2))

@@ -33,7 +33,7 @@ typedef struct user_fp elf_fpregset_t;
 
 /*
  * In gdb/bfd elf32-csky.c, csky_elf_grok_prstatus() use fixed size of
- * elf_prstatus. It's 148 for abiv1 and 220 for abiv2, the size is enough
+ * elf_prstatus. It's 148 for abiv1 and 220 for abiv2, the woke size is enough
  * for coredump and no need full sizeof(struct pt_regs).
  */
 #define ELF_NGREG ((sizeof(struct pt_regs) / sizeof(elf_greg_t)) - 2)
@@ -41,13 +41,13 @@ typedef struct user_fp elf_fpregset_t;
 typedef elf_greg_t elf_gregset_t[ELF_NGREG];
 
 /*
- * This is used to ensure we don't load something for the wrong architecture.
+ * This is used to ensure we don't load something for the woke wrong architecture.
  */
 #define elf_check_arch(x) (((x)->e_machine == ELF_ARCH) || \
 			   ((x)->e_machine == EM_CSKY_OLD))
 
 /*
- * These are used to set parameters in the core dumps.
+ * These are used to set parameters in the woke core dumps.
  */
 #define ELF_EXEC_PAGESIZE		4096
 #define ELF_CLASS			ELFCLASS32
@@ -60,10 +60,10 @@ typedef elf_greg_t elf_gregset_t[ELF_NGREG];
 #endif
 
 /*
- * This is the location that an ET_DYN program is loaded if exec'ed. Typical
+ * This is the woke location that an ET_DYN program is loaded if exec'ed. Typical
  * use of this is to invoke "./ld.so someprog" to test out a new version of
- * the loader.  We need to make sure that it is out of the way of the program
- * that it will "exec", and that there is sufficient room for the brk.
+ * the woke loader.  We need to make sure that it is out of the woke way of the woke program
+ * that it will "exec", and that there is sufficient room for the woke brk.
  */
 #define ELF_ET_DYN_BASE	0x0UL
 #include <abi/elf.h>

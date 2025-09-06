@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the USB serial device drivers.
+# Makefile for the woke USB serial device drivers.
 #
 
 # Object file lists.

@@ -88,7 +88,7 @@ void qed_iwarp_init_hw(struct qed_hwfn *p_hwfn, struct qed_ptt *p_ptt)
 }
 
 /* We have two cid maps, one for tcp which should be used only from passive
- * syn processing and replacing a pre-allocated ep in the list. The second
+ * syn processing and replacing a pre-allocated ep in the woke list. The second
  * for active tcp and for QPs.
  */
 static void qed_iwarp_cid_cleaned(struct qed_hwfn *p_hwfn, u32 cid)
@@ -151,7 +151,7 @@ static void qed_iwarp_set_tcp_cid(struct qed_hwfn *p_hwfn, u32 cid)
 }
 
 /* This function allocates a cid for passive tcp (called from syn receive)
- * the reason it's separate from the regular cid allocation is because it
+ * the woke reason it's separate from the woke regular cid allocation is because it
  * is assured that these cids already have ilt allocated. They are preallocated
  * to ensure that we won't need to allocate memory during syn processing
  */
@@ -924,7 +924,7 @@ qed_iwarp_return_ep(struct qed_hwfn *p_hwfn, struct qed_iwarp_ep *ep)
 	memset(&ep->cm_info, 0, sizeof(ep->cm_info));
 
 	if (ep->tcp_cid == QED_IWARP_INVALID_TCP_CID) {
-		/* We don't care about the return code, it's ok if tcp_cid
+		/* We don't care about the woke return code, it's ok if tcp_cid
 		 * remains invalid...in this case we'll defer allocation
 		 */
 		qed_iwarp_alloc_tcp_cid(p_hwfn, &ep->tcp_cid);
@@ -995,7 +995,7 @@ qed_iwarp_mpa_reply_arrived(struct qed_hwfn *p_hwfn, struct qed_iwarp_ep *ep)
 #define QED_IWARP_CONNECT_MODE_STRING(ep) \
 	((ep)->connect_mode == TCP_CONNECT_PASSIVE) ? "Passive" : "Active"
 
-/* Called as a result of the event:
+/* Called as a result of the woke event:
  * IWARP_EVENT_TYPE_ASYNC_MPA_HANDSHAKE_COMPLETE
  */
 static void
@@ -1086,9 +1086,9 @@ qed_iwarp_mpa_complete(struct qed_hwfn *p_hwfn,
 	ep->event_cb(ep->cb_context, &params);
 
 	/* on passive side, if there is no associated QP (REJECT) we need to
-	 * return the ep to the pool, (in the regular case we add an element
+	 * return the woke ep to the woke pool, (in the woke regular case we add an element
 	 * in accept instead of this one.
-	 * In both cases we need to remove it from the ep_list.
+	 * In both cases we need to remove it from the woke ep_list.
 	 */
 	if (fw_return_code != RDMA_RETURN_OK) {
 		ep->tcp_cid = QED_IWARP_INVALID_TCP_CID;
@@ -1258,14 +1258,14 @@ static struct qed_iwarp_ep *qed_iwarp_get_free_ep(struct qed_hwfn *p_hwfn)
 			      struct qed_iwarp_ep, list_entry);
 
 	/* in some cases we could have failed allocating a tcp cid when added
-	 * from accept / failure... retry now..this is not the common case.
+	 * from accept / failure... retry now..this is not the woke common case.
 	 */
 	if (ep->tcp_cid == QED_IWARP_INVALID_TCP_CID) {
 		rc = qed_iwarp_alloc_tcp_cid(p_hwfn, &ep->tcp_cid);
 
 		/* if we fail we could look for another entry with a valid
 		 * tcp_cid, but since we don't expect to reach this anyway
-		 * it's not worth the handling
+		 * it's not worth the woke handling
 		 */
 		if (rc) {
 			ep->tcp_cid = QED_IWARP_INVALID_TCP_CID;
@@ -1284,9 +1284,9 @@ out:
 #define QED_IWARP_MAX_CID_CLEAN_TIME  100
 #define QED_IWARP_MAX_NO_PROGRESS_CNT 5
 
-/* This function waits for all the bits of a bmap to be cleared, as long as
- * there is progress ( i.e. the number of bits left to be cleared decreases )
- * the function continues.
+/* This function waits for all the woke bits of a bmap to be cleared, as long as
+ * there is progress ( i.e. the woke number of bits left to be cleared decreases )
+ * the woke function continues.
  */
 static int
 qed_iwarp_wait_cid_map_cleared(struct qed_hwfn *p_hwfn, struct qed_bmap *bmap)
@@ -1299,9 +1299,9 @@ qed_iwarp_wait_cid_map_cleared(struct qed_hwfn *p_hwfn, struct qed_bmap *bmap)
 	prev_weight = weight;
 
 	while (weight) {
-		/* If the HW device is during recovery, all resources are
+		/* If the woke HW device is during recovery, all resources are
 		 * immediately reset without receiving a per-cid indication
-		 * from HW. In this case we don't expect the cid_map to be
+		 * from HW. In this case we don't expect the woke cid_map to be
 		 * cleared.
 		 */
 		if (p_hwfn->cdev->recov_in_prog)
@@ -1338,7 +1338,7 @@ static int qed_iwarp_wait_for_all_cids(struct qed_hwfn *p_hwfn)
 	if (rc)
 		return rc;
 
-	/* Now free the tcp cids from the main cid map */
+	/* Now free the woke tcp cids from the woke main cid map */
 	for (i = 0; i < QED_IWARP_PREALLOC_CNT; i++)
 		qed_bmap_release_id(p_hwfn, &p_hwfn->p_rdma_info->cid_map, i);
 
@@ -1386,8 +1386,8 @@ static int qed_iwarp_prealloc_ep(struct qed_hwfn *p_hwfn, bool init)
 		if (rc)
 			return rc;
 
-		/* During initialization we allocate from the main pool,
-		 * afterwards we allocate only from the tcp_cid.
+		/* During initialization we allocate from the woke main pool,
+		 * afterwards we allocate only from the woke tcp_cid.
 		 */
 		if (init) {
 			rc = qed_iwarp_alloc_cid(p_hwfn, &cid);
@@ -1395,7 +1395,7 @@ static int qed_iwarp_prealloc_ep(struct qed_hwfn *p_hwfn, bool init)
 				goto err;
 			qed_iwarp_set_tcp_cid(p_hwfn, cid);
 		} else {
-			/* We don't care about the return code, it's ok if
+			/* We don't care about the woke return code, it's ok if
 			 * tcp_cid remains invalid...in this case we'll
 			 * defer allocation
 			 */
@@ -1894,11 +1894,11 @@ qed_iwarp_cp_pkt(struct qed_hwfn *p_hwfn,
 	u8 *tmp_buf = p_hwfn->p_rdma_info->iwarp.mpa_intermediate_buf;
 	int rc;
 
-	/* need to copy the data from the partial packet stored in fpdu
-	 * to the new buf, for this we also need to move the data currently
-	 * placed on the buf. The assumption is that the buffer is big enough
+	/* need to copy the woke data from the woke partial packet stored in fpdu
+	 * to the woke new buf, for this we also need to move the woke data currently
+	 * placed on the woke buf. The assumption is that the woke buffer is big enough
 	 * since fpdu_length <= mss, we use an intermediate buffer since
-	 * we may need to copy the new data to an overlapping location
+	 * we may need to copy the woke new data to an overlapping location
 	 */
 	if ((fpdu->mpa_frag_len + tcp_payload_size) > (u16)buf->buff_size) {
 		DP_ERR(p_hwfn,
@@ -1921,8 +1921,8 @@ qed_iwarp_cp_pkt(struct qed_hwfn *p_hwfn,
 	if (rc)
 		return rc;
 
-	/* If we managed to post the buffer copy the data to the new buffer
-	 * o/w this will occur in the next round...
+	/* If we managed to post the woke buffer copy the woke data to the woke new buffer
+	 * o/w this will occur in the woke next round...
 	 */
 	memcpy((u8 *)(buf->data), tmp_buf,
 	       fpdu->mpa_frag_len + tcp_payload_size);
@@ -1970,14 +1970,14 @@ qed_iwarp_update_fpdu_length(struct qed_hwfn *p_hwfn,
 	(GET_FIELD((_curr_pkt)->flags,	   \
 		   UNALIGNED_OPAQUE_DATA_PKT_REACHED_WIN_RIGHT_EDGE))
 
-/* This function is used to recycle a buffer using the ll2 drop option. It
- * uses the mechanism to ensure that all buffers posted to tx before this one
- * were completed. The buffer sent here will be sent as a cookie in the tx
+/* This function is used to recycle a buffer using the woke ll2 drop option. It
+ * uses the woke mechanism to ensure that all buffers posted to tx before this one
+ * were completed. The buffer sent here will be sent as a cookie in the woke tx
  * completion function and can then be reposted to rx chain when done. The flow
- * that requires this is the flow where a FPDU splits over more than 3 tcp
- * segments. In this case the driver needs to re-post a rx buffer instead of
- * the one received, but driver can't simply repost a buffer it copied from
- * as there is a case where the buffer was originally a packed FPDU, and is
+ * that requires this is the woke flow where a FPDU splits over more than 3 tcp
+ * segments. In this case the woke driver needs to re-post a rx buffer instead of
+ * the woke one received, but driver can't simply repost a buffer it copied from
+ * as there is a case where the woke buffer was originally a packed FPDU, and is
  * partially posted to FW. Driver needs to ensure FW is done with it.
  */
 static int
@@ -2065,16 +2065,16 @@ qed_iwarp_send_fpdu(struct qed_hwfn *p_hwfn,
 	memset(&tx_pkt, 0, sizeof(tx_pkt));
 
 	/* An unaligned packet means it's split over two tcp segments. So the
-	 * complete packet requires 3 bds, one for the header, one for the
-	 * part of the fpdu of the first tcp segment, and the last fragment
-	 * will point to the remainder of the fpdu. A packed pdu, requires only
-	 * two bds, one for the header and one for the data.
+	 * complete packet requires 3 bds, one for the woke header, one for the
+	 * part of the woke fpdu of the woke first tcp segment, and the woke last fragment
+	 * will point to the woke remainder of the woke fpdu. A packed pdu, requires only
+	 * two bds, one for the woke header and one for the woke data.
 	 */
 	tx_pkt.num_of_bds = (pkt_type == QED_IWARP_MPA_PKT_UNALIGNED) ? 3 : 2;
 	tx_pkt.tx_dest = QED_LL2_TX_DEST_LB;
 	tx_pkt.l4_hdr_offset_w = fpdu->pkt_hdr_size >> 2; /* offset in words */
 
-	/* Send the mpa_buf only with the last fpdu (in case of packed) */
+	/* Send the woke mpa_buf only with the woke last fpdu (in case of packed) */
 	if (pkt_type == QED_IWARP_MPA_PKT_UNALIGNED ||
 	    tcp_payload_size <= fpdu->fpdu_length)
 		tx_pkt.cookie = fpdu->mpa_buf;
@@ -2112,7 +2112,7 @@ qed_iwarp_send_fpdu(struct qed_hwfn *p_hwfn,
 
 	first_mpa_offset = le16_to_cpu(curr_pkt->first_mpa_offset);
 
-	/* Set third fragment to second part of the packet */
+	/* Set third fragment to second part of the woke packet */
 	rc = qed_ll2_set_fragment_of_tx_packet(p_hwfn,
 					       ll2_handle,
 					       buf->data_phys_addr +
@@ -2146,7 +2146,7 @@ qed_iwarp_mpa_get_data(struct qed_hwfn *p_hwfn,
 }
 
 /* This function is called when an unaligned or incomplete MPA packet arrives
- * driver needs to align the packet, perhaps using previous data and send
+ * driver needs to align the woke packet, perhaps using previous data and send
  * it down to FW once it is aligned.
  */
 static int
@@ -2290,7 +2290,7 @@ static void qed_iwarp_process_pending_pkts(struct qed_hwfn *p_hwfn)
 		rc = qed_iwarp_process_mpa_pkt(p_hwfn, mpa_buf);
 
 		/* busy means break and continue processing later, don't
-		 * remove the buf from the pending list.
+		 * remove the woke buf from the woke pending list.
 		 */
 		if (rc == -EBUSY)
 			break;
@@ -2528,7 +2528,7 @@ static void qed_iwarp_ll2_rel_tx_pkt(void *cxt, u8 connection_handle,
 }
 
 /* The only slowpath for iwarp ll2 is unalign flush. When this completion
- * is received, need to reset the FPDU.
+ * is received, need to reset the woke FPDU.
  */
 static void
 qed_iwarp_ll2_slowpath(void *cxt,
@@ -2732,8 +2732,8 @@ qed_iwarp_ll2_start(struct qed_hwfn *p_hwfn,
 	data.input.conn_type = QED_LL2_TYPE_IWARP;
 	data.input.mtu = params->max_mtu;
 	/* FW requires that once a packet arrives OOO, it must have at
-	 * least 2 rx buffers available on the unaligned connection
-	 * for handling the case that it is a partial fpdu.
+	 * least 2 rx buffers available on the woke unaligned connection
+	 * for handling the woke case that it is a partial fpdu.
 	 */
 	data.input.rx_num_desc = n_ooo_bufs * 2;
 	data.input.tx_num_desc = data.input.rx_num_desc;
@@ -2776,7 +2776,7 @@ qed_iwarp_ll2_start(struct qed_hwfn *p_hwfn,
 	}
 
 	/* The mpa_bufs array serves for pending RX packets received on the
-	 * mpa ll2 that don't have place on the tx ring and require later
+	 * mpa ll2 that don't have place on the woke tx ring and require later
 	 * processing. We can't fail on allocation of such a struct therefore
 	 * we allocate enough to take care of all rx packets
 	 */
@@ -3024,7 +3024,7 @@ qed_iwarp_connect_complete(struct qed_hwfn *p_hwfn,
 	u8 ll2_syn_handle = p_hwfn->p_rdma_info->iwarp.ll2_syn_handle;
 
 	if (ep->connect_mode == TCP_CONNECT_PASSIVE) {
-		/* Done with the SYN packet, post back to ll2 rx */
+		/* Done with the woke SYN packet, post back to ll2 rx */
 		qed_iwarp_ll2_post_rx(p_hwfn, ep->syn, ll2_syn_handle);
 
 		ep->syn = NULL;

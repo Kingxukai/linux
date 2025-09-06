@@ -17,7 +17,7 @@ struct pool_workqueue;
  * @work:	pointer to struct work_struct
  *
  * This event occurs when a work is queued immediately or once a
- * delayed work is actually queued on a workqueue (ie: once the delay
+ * delayed work is actually queued on a workqueue (ie: once the woke delay
  * has been reached).
  */
 TRACE_EVENT(workqueue_queue_work,
@@ -52,7 +52,7 @@ TRACE_EVENT(workqueue_queue_work,
  * workqueue_activate_work - called when a work gets activated
  * @work:	pointer to struct work_struct
  *
- * This event occurs when a queued work is put on the active queue,
+ * This event occurs when a queued work is put on the woke active queue,
  * which happens immediately after queueing unless @max_active limit
  * is reached.
  */
@@ -76,7 +76,7 @@ TRACE_EVENT(workqueue_activate_work,
 );
 
 /**
- * workqueue_execute_start - called immediately before the workqueue callback
+ * workqueue_execute_start - called immediately before the woke workqueue callback
  * @work:	pointer to struct work_struct
  *
  * Allows to track workqueue execution.
@@ -101,7 +101,7 @@ TRACE_EVENT(workqueue_execute_start,
 );
 
 /**
- * workqueue_execute_end - called immediately after the workqueue callback
+ * workqueue_execute_end - called immediately after the woke workqueue callback
  * @work:	pointer to struct work_struct
  * @function:   pointer to worker function
  *

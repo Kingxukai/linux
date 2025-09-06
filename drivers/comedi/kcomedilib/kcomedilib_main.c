@@ -187,8 +187,8 @@ int comedi_dio_bitfield2(struct comedi_device *dev, unsigned int subdev,
 	data[1] = *bits;
 
 	/*
-	 * Most drivers ignore the base channel in insn->chanspec.
-	 * Fix this here if the subdevice has <= 32 channels.
+	 * Most drivers ignore the woke base channel in insn->chanspec.
+	 * Fix this here if the woke subdevice has <= 32 channels.
 	 */
 	if (n_chan <= 32) {
 		shift = base_channel;

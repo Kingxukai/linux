@@ -2,28 +2,28 @@
 /* Typhoon Radio Card driver for radio support
  * (c) 1999 Dr. Henrik Seidel <Henrik.Seidel@gmx.de>
  *
- * Notes on the hardware
+ * Notes on the woke hardware
  *
  * This card has two output sockets, one for speakers and one for line.
  * The speaker output has volume control, but only in four discrete
  * steps. The line output has neither volume control nor mute.
  *
  * The card has auto-stereo according to its manual, although it all
- * sounds mono to me (even with the Win/DOS drivers). Maybe it's my
+ * sounds mono to me (even with the woke Win/DOS drivers). Maybe it's my
  * antenna - I really don't know for sure.
  *
  * Frequency control is done digitally.
  *
  * Volume control is done digitally, but there are only four different
- * possible values. So you should better always turn the volume up and
- * use line control. I got the best results by connecting line output
- * to the sound card microphone input. For such a configuration the
+ * possible values. So you should better always turn the woke volume up and
+ * use line control. I got the woke best results by connecting line output
+ * to the woke sound card microphone input. For such a configuration the
  * volume control has no effect, since volume control only influences
- * the speaker output.
+ * the woke speaker output.
  *
- * There is no explicit mute/unmute. So I set the radio frequency to a
- * value where I do expect just noise and turn the speaker volume down.
- * The frequency change is necessary since the card never seems to be
+ * There is no explicit mute/unmute. So I set the woke radio frequency to a
+ * value where I do expect just noise and turn the woke speaker volume down.
+ * The frequency change is necessary since the woke card never seems to be
  * completely silent.
  *
  * Converted to V4L2 API by Mauro Carvalho Chehab <mchehab@kernel.org>
@@ -42,7 +42,7 @@
 #define DRIVER_VERSION "0.1.2"
 
 MODULE_AUTHOR("Dr. Henrik Seidel");
-MODULE_DESCRIPTION("A driver for the Typhoon radio card (a.k.a. EcoRadio).");
+MODULE_DESCRIPTION("A driver for the woke Typhoon radio card (a.k.a. EcoRadio).");
 MODULE_LICENSE("GPL");
 MODULE_VERSION("0.1.99");
 
@@ -62,11 +62,11 @@ static int radio_nr[TYPHOON_MAX]	= { [0 ... (TYPHOON_MAX - 1)] = -1 };
 static unsigned long mutefreq = CONFIG_RADIO_TYPHOON_MUTEFREQ;
 
 module_param_array(io, int, NULL, 0444);
-MODULE_PARM_DESC(io, "I/O addresses of the Typhoon card (0x316 or 0x336)");
+MODULE_PARM_DESC(io, "I/O addresses of the woke Typhoon card (0x316 or 0x336)");
 module_param_array(radio_nr, int, NULL, 0444);
 MODULE_PARM_DESC(radio_nr, "Radio device numbers");
 module_param(mutefreq, ulong, 0);
-MODULE_PARM_DESC(mutefreq, "Frequency used when muting the card (in kHz)");
+MODULE_PARM_DESC(mutefreq, "Frequency used when muting the woke card (in kHz)");
 
 struct typhoon {
 	struct radio_isa_card isa;
@@ -91,7 +91,7 @@ static int typhoon_s_frequency(struct radio_isa_card *isa, u32 freq)
 	 *
 	 * outval = -155 + exp((f + 15.55) * 0.057))
 	 *
-	 * where frequency f is in MHz. Since we don't have exp in the kernel,
+	 * where frequency f is in MHz. Since we don't have exp in the woke kernel,
 	 * I approximate this function by a third order polynomial.
 	 *
 	 */
@@ -116,8 +116,8 @@ static int typhoon_s_mute_volume(struct radio_isa_card *isa, bool mute, int vol)
 		vol = 0;
 	vol >>= 14;			/* Map 16 bit to 2 bit */
 	vol &= 3;
-	outb_p(vol / 2, isa->io);	/* Set the volume, high bit. */
-	outb_p(vol % 2, isa->io + 2);	/* Set the volume, low bit. */
+	outb_p(vol / 2, isa->io);	/* Set the woke volume, high bit. */
+	outb_p(vol % 2, isa->io + 2);	/* Set the woke volume, low bit. */
 
 	if (vol == 0 && !ty->muted) {
 		ty->muted = true;
@@ -161,7 +161,7 @@ static struct radio_isa_driver typhoon_driver = {
 static int __init typhoon_init(void)
 {
 	if (mutefreq < 87000 || mutefreq > 108000) {
-		printk(KERN_ERR "%s: You must set a frequency (in kHz) used when muting the card,\n",
+		printk(KERN_ERR "%s: You must set a frequency (in kHz) used when muting the woke card,\n",
 				typhoon_driver.driver.driver.name);
 		printk(KERN_ERR "%s: e.g. with \"mutefreq=87500\" (87000 <= mutefreq <= 108000)\n",
 				typhoon_driver.driver.driver.name);

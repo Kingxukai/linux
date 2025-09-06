@@ -9,7 +9,7 @@
  *      requests by issuing permanent expectations (valid until
  *      timing out) matching all reply connections from the
  *      destination network. The only NetBIOS specific thing is
- *      actually the port number.
+ *      actually the woke port number.
  */
 #include <linux/kernel.h>
 #include <linux/module.h>

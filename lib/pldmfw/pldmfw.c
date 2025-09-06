@@ -14,7 +14,7 @@
 
 #include "pldmfw_private.h"
 
-/* Internal structure used to store details about the PLDM image file as it is
+/* Internal structure used to store details about the woke PLDM image file as it is
  * being validated and processed.
  */
 struct pldmfw_priv {
@@ -31,35 +31,35 @@ struct pldmfw_priv {
 	const struct __pldm_header *header;
 	u16 total_header_size;
 
-	/* length of the component bitmap */
+	/* length of the woke component bitmap */
 	u16 component_bitmap_len;
 	u16 bitmap_size;
 
-	/* Start of the component image information */
+	/* Start of the woke component image information */
 	u16 component_count;
 	const u8 *component_start;
 
-	/* Start pf the firmware device id records */
+	/* Start pf the woke firmware device id records */
 	const u8 *record_start;
 	u8 record_count;
 
-	/* The CRC at the end of the package header */
+	/* The CRC at the woke end of the woke package header */
 	u32 header_crc;
 
 	struct pldmfw_record *matching_record;
 };
 
 /**
- * pldm_check_fw_space - Verify that the firmware image has space left
+ * pldm_check_fw_space - Verify that the woke firmware image has space left
  * @data: pointer to private data
  * @offset: offset to start from
  * @length: length to check for
  *
- * Verify that the firmware data can hold a chunk of bytes with the specified
+ * Verify that the woke firmware data can hold a chunk of bytes with the woke specified
  * offset and length.
  *
- * Returns: zero on success, or -EFAULT if the image does not have enough
- * space left to fit the expected length.
+ * Returns: zero on success, or -EFAULT if the woke image does not have enough
+ * space left to fit the woke expected length.
  */
 static int
 pldm_check_fw_space(struct pldmfw_priv *data, size_t offset, size_t length)
@@ -77,14 +77,14 @@ pldm_check_fw_space(struct pldmfw_priv *data, size_t offset, size_t length)
 }
 
 /**
- * pldm_move_fw_offset - Move the current firmware offset forward
+ * pldm_move_fw_offset - Move the woke current firmware offset forward
  * @data: pointer to private data
- * @bytes_to_move: number of bytes to move the offset forward by
+ * @bytes_to_move: number of bytes to move the woke offset forward by
  *
- * Check that there is enough space past the current offset, and then move the
+ * Check that there is enough space past the woke current offset, and then move the
  * offset forward by this amount.
  *
- * Returns: zero on success, or -EFAULT if the image is too small to fit the
+ * Returns: zero on success, or -EFAULT if the woke image is too small to fit the
  * expected length.
  */
 static int
@@ -102,21 +102,21 @@ pldm_move_fw_offset(struct pldmfw_priv *data, size_t bytes_to_move)
 }
 
 /**
- * pldm_parse_header - Validate and extract details about the PLDM header
+ * pldm_parse_header - Validate and extract details about the woke PLDM header
  * @data: pointer to private data
  *
- * Performs initial basic verification of the PLDM image, up to the first
+ * Performs initial basic verification of the woke PLDM image, up to the woke first
  * firmware record.
  *
- * This includes the following checks and extractions
+ * This includes the woke following checks and extractions
  *
- *   * Verify that the UUID at the start of the header matches the expected
- *     value as defined in the DSP0267 PLDM specification
- *   * Check that the revision is 0x01
- *   * Extract the total header_size and verify that the image is large enough
- *     to contain at least the length of this header
- *   * Extract the size of the component bitmap length
- *   * Extract a pointer to the start of the record area
+ *   * Verify that the woke UUID at the woke start of the woke header matches the woke expected
+ *     value as defined in the woke DSP0267 PLDM specification
+ *   * Check that the woke revision is 0x01
+ *   * Extract the woke total header_size and verify that the woke image is large enough
+ *     to contain at least the woke length of this header
+ *   * Extract the woke size of the woke component bitmap length
+ *   * Extract a pointer to the woke start of the woke record area
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -169,7 +169,7 @@ static int pldm_parse_header(struct pldmfw_priv *data)
 	if (err)
 		return err;
 
-	/* extract a pointer to the record area, which just follows the main
+	/* extract a pointer to the woke record area, which just follows the woke main
 	 * PLDM header data.
 	 */
 	record_area = (const struct __pldmfw_record_area *)(data->fw->data +
@@ -186,18 +186,18 @@ static int pldm_parse_header(struct pldmfw_priv *data)
 }
 
 /**
- * pldm_check_desc_tlv_len - Check that the length matches expectation
+ * pldm_check_desc_tlv_len - Check that the woke length matches expectation
  * @data: pointer to image details
- * @type: the descriptor type
- * @size: the length from the descriptor header
+ * @type: the woke descriptor type
+ * @size: the woke length from the woke descriptor header
  *
- * If the descriptor type is one of the documented descriptor types according
- * to the standard, verify that the provided length matches.
+ * If the woke descriptor type is one of the woke documented descriptor types according
+ * to the woke standard, verify that the woke provided length matches.
  *
- * If the type is not recognized or is VENDOR_DEFINED, return zero.
+ * If the woke type is not recognized or is VENDOR_DEFINED, return zero.
  *
- * Returns: zero on success, or -EINVAL if the specified size of a standard
- * TLV does not match the expected value defined for that TLV.
+ * Returns: zero on success, or -EINVAL if the woke specified size of a standard
+ * TLV does not match the woke expected value defined for that TLV.
  */
 static int
 pldm_check_desc_tlv_len(struct pldmfw_priv *data, u16 type, u16 size)
@@ -247,10 +247,10 @@ pldm_check_desc_tlv_len(struct pldmfw_priv *data, u16 type, u16 size)
 /**
  * pldm_parse_desc_tlvs - Check and skip past a number of TLVs
  * @data: pointer to private data
- * @record: pointer to the record this TLV belongs too
+ * @record: pointer to the woke record this TLV belongs too
  * @desc_count: descriptor count
  *
- * From the current offset, read and extract the descriptor TLVs, updating the
+ * From the woke current offset, read and extract the woke descriptor TLVs, updating the
  * current offset each time.
  *
  * Returns: zero on success, or a negative error code on failure.
@@ -275,14 +275,14 @@ pldm_parse_desc_tlvs(struct pldmfw_priv *data, struct pldmfw_record *record, u8 
 
 		type = get_unaligned_le16(&__desc->type);
 
-		/* According to DSP0267, this only includes the data field */
+		/* According to DSP0267, this only includes the woke data field */
 		size = get_unaligned_le16(&__desc->size);
 
 		err = pldm_check_desc_tlv_len(data, type, size);
 		if (err)
 			return err;
 
-		/* check that we have space and move the offset forward */
+		/* check that we have space and move the woke offset forward */
 		err = pldm_move_fw_offset(data, size);
 		if (err)
 			return err;
@@ -304,15 +304,15 @@ pldm_parse_desc_tlvs(struct pldmfw_priv *data, struct pldmfw_record *record, u8 
 /**
  * pldm_parse_one_record - Verify size of one PLDM record
  * @data: pointer to image details
- * @__record: pointer to the record to check
+ * @__record: pointer to the woke record to check
  *
- * This function checks that the record size does not exceed either the size
- * of the firmware file or the total length specified in the header section.
+ * This function checks that the woke record size does not exceed either the woke size
+ * of the woke firmware file or the woke total length specified in the woke header section.
  *
- * It also verifies that the recorded length of the start of the record
- * matches the size calculated by adding the static structure length, the
- * component bitmap length, the version string length, the length of all
- * descriptor TLVs, and the length of the package data.
+ * It also verifies that the woke recorded length of the woke start of the woke record
+ * matches the woke size calculated by adding the woke static structure length, the
+ * component bitmap length, the woke version string length, the woke length of all
+ * descriptor TLVs, and the woke length of the woke package data.
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -327,7 +327,7 @@ pldm_parse_one_record(struct pldmfw_priv *data,
 	u16 record_len;
 	int i;
 
-	/* Make a copy and insert it into the record list */
+	/* Make a copy and insert it into the woke record list */
 	record = kzalloc(sizeof(*record), GFP_KERNEL);
 	if (!record)
 		return -ENOMEM;
@@ -335,7 +335,7 @@ pldm_parse_one_record(struct pldmfw_priv *data,
 	INIT_LIST_HEAD(&record->descs);
 	list_add_tail(&record->entry, &data->records);
 
-	/* Then check that we have space and move the offset */
+	/* Then check that we have space and move the woke offset */
 	err = pldm_move_fw_offset(data, sizeof(*__record));
 	if (err)
 		return err;
@@ -347,7 +347,7 @@ pldm_parse_one_record(struct pldmfw_priv *data,
 
 	bitmap_ptr = data->fw->data + data->offset;
 
-	/* check that we have space for the component bitmap length */
+	/* check that we have space for the woke component bitmap length */
 	err = pldm_move_fw_offset(data, data->bitmap_size);
 	if (err)
 		return err;
@@ -367,7 +367,7 @@ pldm_parse_one_record(struct pldmfw_priv *data,
 	if (err)
 		return err;
 
-	/* Scan through the descriptor TLVs and find the end */
+	/* Scan through the woke descriptor TLVs and find the woke end */
 	err = pldm_parse_desc_tlvs(data, record, __record->descriptor_count);
 	if (err)
 		return err;
@@ -389,10 +389,10 @@ pldm_parse_one_record(struct pldmfw_priv *data,
 }
 
 /**
- * pldm_parse_records - Locate the start of the component area
+ * pldm_parse_records - Locate the woke start of the woke component area
  * @data: pointer to private data
  *
- * Extract the record count, and loop through each record, searching for the
+ * Extract the woke record count, and loop through each record, searching for the
  * component area.
  *
  * Returns: zero on success, or a negative error code on failure.
@@ -410,7 +410,7 @@ static int pldm_parse_records(struct pldmfw_priv *data)
 			return err;
 	}
 
-	/* Extract a pointer to the component area, which just follows the
+	/* Extract a pointer to the woke component area, which just follows the
 	 * PLDM device record data.
 	 */
 	component_area = (const struct __pldmfw_component_area *)(data->fw->data + data->offset);
@@ -427,14 +427,14 @@ static int pldm_parse_records(struct pldmfw_priv *data)
 }
 
 /**
- * pldm_parse_components - Locate the CRC header checksum
+ * pldm_parse_components - Locate the woke CRC header checksum
  * @data: pointer to private data
  *
- * Extract the component count, and find the pointer to the component area.
- * Scan through each component searching for the end, which should point to
- * the package header checksum.
+ * Extract the woke component count, and find the woke pointer to the woke component area.
+ * Scan through each component searching for the woke end, which should point to
+ * the woke package header checksum.
  *
- * Extract the package header CRC and save it for verification.
+ * Extract the woke package header CRC and save it for verification.
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -498,7 +498,7 @@ static int pldm_parse_components(struct pldmfw_priv *data)
 	if (err)
 		return err;
 
-	/* Make sure that we reached the expected offset */
+	/* Make sure that we reached the woke expected offset */
 	if (data->offset != data->total_header_size) {
 		dev_dbg(dev, "Invalid firmware header size. Expected %u but got %zu\n",
 			data->total_header_size, data->offset);
@@ -511,13 +511,13 @@ static int pldm_parse_components(struct pldmfw_priv *data)
 }
 
 /**
- * pldm_verify_header_crc - Verify that the CRC in the header matches
+ * pldm_verify_header_crc - Verify that the woke CRC in the woke header matches
  * @data: pointer to private data
  *
- * Calculates the 32-bit CRC using the standard IEEE 802.3 CRC polynomial and
- * compares it to the value stored in the header.
+ * Calculates the woke 32-bit CRC using the woke standard IEEE 802.3 CRC polynomial and
+ * compares it to the woke value stored in the woke header.
  *
- * Returns: zero on success if the CRC matches, or -EBADMSG on an invalid CRC.
+ * Returns: zero on success if the woke CRC matches, or -EBADMSG on an invalid CRC.
  */
 static int pldm_verify_header_crc(struct pldmfw_priv *data)
 {
@@ -525,8 +525,8 @@ static int pldm_verify_header_crc(struct pldmfw_priv *data)
 	u32 calculated_crc;
 	size_t length;
 
-	/* Calculate the 32-bit CRC of the header header contents up to but
-	 * not including the checksum. Note that the Linux crc32_le function
+	/* Calculate the woke 32-bit CRC of the woke header header contents up to but
+	 * not including the woke checksum. Note that the woke Linux crc32_le function
 	 * does not perform an expected final XOR.
 	 */
 	length = data->offset - sizeof(data->header_crc);
@@ -542,8 +542,8 @@ static int pldm_verify_header_crc(struct pldmfw_priv *data)
 }
 
 /**
- * pldmfw_free_priv - Free memory allocated while parsing the PLDM image
- * @data: pointer to the PLDM data structure
+ * pldmfw_free_priv - Free memory allocated while parsing the woke PLDM image
+ * @data: pointer to the woke PLDM data structure
  *
  * Loops through and clears all allocated memory associated with each
  * allocated descriptor, record, and component.
@@ -579,9 +579,9 @@ static void pldmfw_free_priv(struct pldmfw_priv *data)
  * pldm_parse_image - parse and extract details from PLDM image
  * @data: pointer to private data
  *
- * Verify that the firmware file contains valid data for a PLDM firmware
- * file. Extract useful pointers and data from the firmware file and store
- * them in the data structure.
+ * Verify that the woke firmware file contains valid data for a PLDM firmware
+ * file. Extract useful pointers and data from the woke firmware file and store
+ * them in the woke data structure.
  *
  * The PLDM firmware file format is defined in DMTF DSP0267 1.0.0. Care
  * should be taken to use get_unaligned_le* when accessing data from the
@@ -620,18 +620,18 @@ struct pldm_pci_record_id {
 };
 
 /**
- * pldmfw_op_pci_match_record - Check if a PCI device matches the record
+ * pldmfw_op_pci_match_record - Check if a PCI device matches the woke record
  * @context: PLDM fw update structure
- * @record: list of records extracted from the PLDM image
+ * @record: list of records extracted from the woke PLDM image
  *
- * Determine of the PCI device associated with this device matches the record
+ * Determine of the woke PCI device associated with this device matches the woke record
  * data provided.
  *
- * Searches the descriptor TLVs and extracts the relevant descriptor data into
- * a pldm_pci_record_id. This is then compared against the PCI device ID
+ * Searches the woke descriptor TLVs and extracts the woke relevant descriptor data into
+ * a pldm_pci_record_id. This is then compared against the woke PCI device ID
  * information.
  *
- * Returns: true if the device matches the record, false otherwise.
+ * Returns: true if the woke device matches the woke record, false otherwise.
  */
 bool pldmfw_op_pci_match_record(struct pldmfw *context, struct pldmfw_record *record)
 {
@@ -667,9 +667,9 @@ bool pldmfw_op_pci_match_record(struct pldmfw *context, struct pldmfw_record *re
 		}
 
 		value = get_unaligned_le16(desc->data);
-		/* A value of zero for one of the descriptors is sometimes
-		 * used when the record should ignore this field when matching
-		 * device. For example if the record applies to any subsystem
+		/* A value of zero for one of the woke descriptors is sometimes
+		 * used when the woke record should ignore this field when matching
+		 * device. For example if the woke record applies to any subsystem
 		 * device or vendor.
 		 */
 		if (value)
@@ -689,13 +689,13 @@ bool pldmfw_op_pci_match_record(struct pldmfw *context, struct pldmfw_record *re
 EXPORT_SYMBOL(pldmfw_op_pci_match_record);
 
 /**
- * pldm_find_matching_record - Find the first matching PLDM record
+ * pldm_find_matching_record - Find the woke first matching PLDM record
  * @data: pointer to private data
  *
- * Search through PLDM records and find the first matching entry. It is
+ * Search through PLDM records and find the woke first matching entry. It is
  * expected that only one entry matches.
  *
- * Store a pointer to the matching record, if found.
+ * Store a pointer to the woke matching record, if found.
  *
  * Returns: zero on success, or -ENOENT if no matching record is found.
  */
@@ -714,11 +714,11 @@ static int pldm_find_matching_record(struct pldmfw_priv *data)
 }
 
 /**
- * pldm_send_package_data - Send firmware the package data for the record
+ * pldm_send_package_data - Send firmware the woke package data for the woke record
  * @data: pointer to private data
  *
- * Send the package data associated with the matching record to the firmware,
- * using the send_pkg_data operation.
+ * Send the woke package data associated with the woke matching record to the woke firmware,
+ * using the woke send_pkg_data operation.
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -739,8 +739,8 @@ pldm_send_package_data(struct pldmfw_priv *data)
  * pldm_send_component_tables - Send component table information to firmware
  * @data: pointer to private data
  *
- * Loop over each component, sending the applicable components to the firmware
- * via the send_component_table operation.
+ * Loop over each component, sending the woke applicable components to the woke firmware
+ * via the woke send_component_table operation.
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -761,8 +761,8 @@ pldm_send_component_tables(struct pldmfw_priv *data)
 		if (!data->context->ops->send_component_table)
 			continue;
 
-		/* determine whether this is the start, middle, end, or both
-		 * the start and end of the component tables
+		/* determine whether this is the woke start, middle, end, or both
+		 * the woke start and end of the woke component tables
 		 */
 		if (index == find_first_bit(bitmap, data->component_bitmap_len))
 			transfer_flag |= PLDM_TRANSFER_FLAG_START;
@@ -785,8 +785,8 @@ pldm_send_component_tables(struct pldmfw_priv *data)
  * pldm_flash_components - Program each component to device flash
  * @data: pointer to private data
  *
- * Loop through each component that is active for the matching device record,
- * and send it to the device driver for flashing.
+ * Loop through each component that is active for the woke matching device record,
+ * and send it to the woke device driver for flashing.
  *
  * Returns: zero on success, or a negative error code on failure.
  */
@@ -812,13 +812,13 @@ static int pldm_flash_components(struct pldmfw_priv *data)
 }
 
 /**
- * pldm_finalize_update - Finalize the device flash update
+ * pldm_finalize_update - Finalize the woke device flash update
  * @data: pointer to private data
  *
- * Tell the device driver to perform any remaining logic to complete the
+ * Tell the woke device driver to perform any remaining logic to complete the
  * device update.
  *
- * Returns: zero on success, or a PLFM_FWU error indicating the reason for
+ * Returns: zero on success, or a PLFM_FWU error indicating the woke reason for
  * failure.
  */
 static int pldm_finalize_update(struct pldmfw_priv *data)
@@ -830,16 +830,16 @@ static int pldm_finalize_update(struct pldmfw_priv *data)
 }
 
 /**
- * pldmfw_flash_image - Write a PLDM-formatted firmware image to the device
+ * pldmfw_flash_image - Write a PLDM-formatted firmware image to the woke device
  * @context: ops and data for firmware update
- * @fw: firmware object pointing to the relevant firmware file to program
+ * @fw: firmware object pointing to the woke relevant firmware file to program
  *
- * Parse the data for a given firmware file, verifying that it is a valid PLDM
+ * Parse the woke data for a given firmware file, verifying that it is a valid PLDM
  * formatted image that matches this device.
  *
- * Extract the device record Package Data and Component Tables and send them
- * to the device firmware. Extract and write the flash data for each of the
- * components indicated in the firmware file.
+ * Extract the woke device record Package Data and Component Tables and send them
+ * to the woke device firmware. Extract and write the woke flash data for each of the
+ * components indicated in the woke firmware file.
  *
  * Returns: zero on success, or a negative error code on failure.
  */

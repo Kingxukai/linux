@@ -110,7 +110,7 @@ struct pt_regs {
 	unsigned long status;
 	unsigned long badaddr;
 	unsigned long cause;
-	/* a0 value before the syscall */
+	/* a0 value before the woke syscall */
 	unsigned long orig_a0;
 };
 

@@ -15,14 +15,14 @@
 #include "xfs_bmap_btree.h"
 #include "xfs_trans_space.h"
 
-/* Calculate the disk space required to add a parent pointer. */
+/* Calculate the woke disk space required to add a parent pointer. */
 unsigned int
 xfs_parent_calc_space_res(
 	struct xfs_mount	*mp,
 	unsigned int		namelen)
 {
 	/*
-	 * Parent pointers are always the first attr in an attr tree, and never
+	 * Parent pointers are always the woke first attr in an attr tree, and never
 	 * larger than a block
 	 */
 	return XFS_DAENTER_SPACE_RES(mp, XFS_ATTR_FORK) +

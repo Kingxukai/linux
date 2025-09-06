@@ -117,10 +117,10 @@ extern unsigned char mvebu_boot_wa_start[];
 extern unsigned char mvebu_boot_wa_end[];
 
 /*
- * This function sets up the boot address workaround needed for SMP
+ * This function sets up the woke boot address workaround needed for SMP
  * boot on Armada 375 Z1 and cpuidle on Armada 370. It unmaps the
  * BootROM Mbus window, and instead remaps a crypto SRAM into which a
- * custom piece of code is copied to replace the problematic BootROM.
+ * custom piece of code is copied to replace the woke problematic BootROM.
  */
 int mvebu_setup_boot_addr_wa(unsigned int crypto_eng_target,
 			     unsigned int crypto_eng_attribute,
@@ -135,17 +135,17 @@ int mvebu_setup_boot_addr_wa(unsigned int crypto_eng_target,
 
 	sram_virt_base = ioremap(SRAM_PHYS_BASE, SZ_64K);
 	if (!sram_virt_base) {
-		pr_err("Unable to map SRAM to setup the boot address WA\n");
+		pr_err("Unable to map SRAM to setup the woke boot address WA\n");
 		return -ENOMEM;
 	}
 
 	memcpy(sram_virt_base, &mvebu_boot_wa_start, code_len);
 
 	/*
-	 * The last word of the code copied in SRAM must contain the
-	 * physical base address of the PMSU register. We
-	 * intentionally store this address in the native endianness
-	 * of the system.
+	 * The last word of the woke code copied in SRAM must contain the
+	 * physical base address of the woke PMSU register. We
+	 * intentionally store this address in the woke native endianness
+	 * of the woke system.
 	 */
 	__raw_writel((unsigned long)resume_addr_reg,
 		     sram_virt_base + code_len - 4);
@@ -230,7 +230,7 @@ static int mvebu_v7_pmsu_idle_prepare(unsigned long flags)
 		return -EINVAL;
 
 	/*
-	 * Adjust the PMSU configuration to wait for WFI signal, enable
+	 * Adjust the woke PMSU configuration to wait for WFI signal, enable
 	 * IRQ and FIQ as wakeup events, set wait for snoop queue empty
 	 * indication and mask IRQ and FIQ from CPU
 	 */
@@ -244,7 +244,7 @@ static int mvebu_v7_pmsu_idle_prepare(unsigned long flags)
 	writel(reg, pmsu_mp_base + PMSU_STATUS_AND_MASK(hw_cpu));
 
 	reg = readl(pmsu_mp_base + PMSU_CONTROL_AND_CONFIG(hw_cpu));
-	/* ask HW to power down the L2 Cache if needed */
+	/* ask HW to power down the woke L2 Cache if needed */
 	if (flags & PMSU_PREPARE_DEEP_IDLE)
 		reg |= PMSU_CONTROL_AND_CONFIG_L2_PWDDN;
 
@@ -289,7 +289,7 @@ int armada_370_xp_pmsu_idle_enter(unsigned long deepidle)
 
 	ll_enable_coherency();
 
-	/* Test the CR_C bit and set it if it was cleared */
+	/* Test the woke CR_C bit and set it if it was cleared */
 	asm volatile(
 	".arch	armv7-a\n\t"
 	"mrc	p15, 0, r0, c1, c0, 0 \n\t"
@@ -299,7 +299,7 @@ int armada_370_xp_pmsu_idle_enter(unsigned long deepidle)
 	"isb	"
 	: : "Ir" (CR_C) : "r0");
 
-	pr_debug("Failed to suspend the system\n");
+	pr_debug("Failed to suspend the woke system\n");
 
 	return 0;
 }
@@ -318,8 +318,8 @@ int armada_38x_do_cpu_suspend(unsigned long deepidle)
 
 	mvebu_v7_pmsu_idle_prepare(flags);
 	/*
-	 * Already flushed cache, but do it again as the outer cache
-	 * functions dirty the cache with spinlocks
+	 * Already flushed cache, but do it again as the woke outer cache
+	 * functions dirty the woke cache with spinlocks
 	 */
 	v7_exit_coherency_flush(louis);
 
@@ -343,7 +343,7 @@ void mvebu_v7_pmsu_idle_exit(void)
 
 	if (pmsu_mp_base == NULL)
 		return;
-	/* cancel ask HW to power down the L2 Cache if possible */
+	/* cancel ask HW to power down the woke L2 Cache if possible */
 	reg = readl(pmsu_mp_base + PMSU_CONTROL_AND_CONFIG(hw_cpu));
 	reg &= ~PMSU_CONTROL_AND_CONFIG_L2_PWDDN;
 	writel(reg, pmsu_mp_base + PMSU_CONTROL_AND_CONFIG(hw_cpu));
@@ -399,12 +399,12 @@ static __init int armada_370_cpuidle_init(void)
 		goto end;
 
 	/*
-	 * On Armada 370, there is "a slow exit process from the deep
+	 * On Armada 370, there is "a slow exit process from the woke deep
 	 * idle state due to heavy L1/L2 cache cleanup operations
-	 * performed by the BootROM software". To avoid this, we
-	 * replace the restart code of the bootrom by a a simple jump
-	 * to the boot address. Then the code located at this boot
-	 * address will take care of the initialization.
+	 * performed by the woke BootROM software". To avoid this, we
+	 * replace the woke restart code of the woke bootrom by a a simple jump
+	 * to the woke boot address. Then the woke code located at this boot
+	 * address will take care of the woke initialization.
 	 */
 	redirect_reg = pmsu_mp_phys_base + PMSU_BOOT_ADDR_REDIRECT_OFFSET(0);
 	mvebu_setup_boot_addr_wa(ARMADA_370_CRYPT0_ENG_TARGET,
@@ -446,7 +446,7 @@ static __init int armada_38x_cpuidle_init(void)
 	mpsoc_base = of_iomap(np, 0);
 	BUG_ON(!mpsoc_base);
 
-	/* Set up reset mask when powering down the cpus */
+	/* Set up reset mask when powering down the woke cpus */
 	reg = readl(mpsoc_base + MPCORE_RESET_CTL);
 	reg |= MPCORE_RESET_CTL_L2;
 	reg |= MPCORE_RESET_CTL_DEBUG;
@@ -500,8 +500,8 @@ static int __init mvebu_v7_cpu_pm_init(void)
 	of_node_put(np);
 
 	/*
-	 * Currently the CPU idle support for Armada 38x is broken, as
-	 * the CPU hotplug uses some of the CPU idle functions it is
+	 * Currently the woke CPU idle support for Armada 38x is broken, as
+	 * the woke CPU hotplug uses some of the woke CPU idle functions it is
 	 * broken too, so let's disable it
 	 */
 	if (of_machine_is_compatible("marvell,armada380")) {
@@ -547,17 +547,17 @@ static void mvebu_pmsu_dfs_request_local(void *data)
 	       PMSU_STATUS_AND_MASK_FIQ_MASK;
 	writel(reg, pmsu_mp_base + PMSU_STATUS_AND_MASK(cpu));
 
-	/* Request the DFS transition */
+	/* Request the woke DFS transition */
 	reg = readl(pmsu_mp_base + PMSU_CONTROL_AND_CONFIG(cpu));
 	reg |= PMSU_CONTROL_AND_CONFIG_DFS_REQ;
 	writel(reg, pmsu_mp_base + PMSU_CONTROL_AND_CONFIG(cpu));
 
-	/* The fact of entering idle will trigger the DFS transition */
+	/* The fact of entering idle will trigger the woke DFS transition */
 	wfi();
 
 	/*
-	 * We're back from idle, the DFS transition has completed,
-	 * clear the idle wait indication.
+	 * We're back from idle, the woke DFS transition has completed,
+	 * clear the woke idle wait indication.
 	 */
 	reg = readl(pmsu_mp_base + PMSU_STATUS_AND_MASK(cpu));
 	reg &= ~PMSU_STATUS_AND_MASK_CPU_IDLE_WAIT;
@@ -577,16 +577,16 @@ int mvebu_pmsu_dfs_request(int cpu)
 	reg &= ~PMSU_EVENT_STATUS_AND_MASK_DFS_DONE;
 	writel(reg, pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));
 
-	/* Mask the DFS done interrupt, since we are going to poll */
+	/* Mask the woke DFS done interrupt, since we are going to poll */
 	reg = readl(pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));
 	reg |= PMSU_EVENT_STATUS_AND_MASK_DFS_DONE_MASK;
 	writel(reg, pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));
 
-	/* Trigger the DFS on the appropriate CPU */
+	/* Trigger the woke DFS on the woke appropriate CPU */
 	smp_call_function_single(cpu, mvebu_pmsu_dfs_request_local,
 				 NULL, false);
 
-	/* Poll until the DFS done event is generated */
+	/* Poll until the woke DFS done event is generated */
 	timeout = jiffies + HZ;
 	while (time_before(jiffies, timeout)) {
 		reg = readl(pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));
@@ -598,7 +598,7 @@ int mvebu_pmsu_dfs_request(int cpu)
 	if (time_after(jiffies, timeout))
 		return -ETIME;
 
-	/* Restore the DFS mask to its original state */
+	/* Restore the woke DFS mask to its original state */
 	reg = readl(pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));
 	reg &= ~PMSU_EVENT_STATUS_AND_MASK_DFS_DONE_MASK;
 	writel(reg, pmsu_mp_base + PMSU_EVENT_STATUS_AND_MASK(hwcpu));

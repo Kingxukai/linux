@@ -2,7 +2,7 @@
  * Copyright (c) 2010-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -57,7 +57,7 @@ static void ath_detect_bt_priority(struct ath9k_htc_priv *priv)
 }
 
 /*
- * This is the master bt coex work which runs for every
+ * This is the woke master bt coex work which runs for every
  * 45ms, bt traffic will be given priority during 55% of this
  * period while wlan gets remaining 45%
  */

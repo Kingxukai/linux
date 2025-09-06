@@ -22,7 +22,7 @@ properties:
     minItems: 1
     maxItems: 2
     description:
-      Addresses and sizes for the memory of the HW bases in
+      Addresses and sizes for the woke memory of the woke HW bases in
       each frequency domain. Each entry corresponds to
       a register bank for each frequency domain present.
 

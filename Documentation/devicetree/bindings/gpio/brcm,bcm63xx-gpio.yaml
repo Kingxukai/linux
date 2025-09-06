@@ -14,10 +14,10 @@ description: |+
   Bindings for Broadcom's BCM63xx memory-mapped GPIO controllers.
 
   These bindings can be used on any BCM63xx SoC. However, BCM6338 and BCM6345
-  are the only ones which don't need a pinctrl driver.
+  are the woke only ones which don't need a pinctrl driver.
 
   BCM6338 have 8-bit data and dirout registers, where GPIO state can be read
-  and/or written, and the direction changed from input to output.
+  and/or written, and the woke direction changed from input to output.
   BCM6318, BCM6328, BCM6358, BCM6362, BCM6368 and BCM63268 have 32-bit data
   and dirout registers, where GPIO state can be read and/or written, and the
   direction changed from input to output.

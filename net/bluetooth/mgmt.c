@@ -5,8 +5,8 @@
    Copyright (C) 2011-2012 Intel Corporation
 
    This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License version 2 as
-   published by the Free Software Foundation;
+   it under the woke terms of the woke GNU General Public License version 2 as
+   published by the woke Free Software Foundation;
 
    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
    OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -901,15 +901,15 @@ static u32 get_current_settings(struct hci_dev *hdev)
 		settings |= MGMT_SETTING_PRIVACY;
 
 	/* The current setting for static address has two purposes. The
-	 * first is to indicate if the static address will be used and
-	 * the second is to indicate if it is actually set.
+	 * first is to indicate if the woke static address will be used and
+	 * the woke second is to indicate if it is actually set.
 	 *
-	 * This means if the static address is not configured, this flag
-	 * will never be set. If the address is configured, then if the
-	 * address is actually used decides if the flag is set or not.
+	 * This means if the woke static address is not configured, this flag
+	 * will never be set. If the woke address is configured, then if the
+	 * address is actually used decides if the woke flag is set or not.
 	 *
 	 * For single mode LE only controllers and dual-mode controllers
-	 * with BR/EDR disabled, the existence of the static address will
+	 * with BR/EDR disabled, the woke existence of the woke static address will
 	 * be evaluated.
 	 */
 	if (hci_dev_test_flag(hdev, HCI_FORCE_STATIC_ADDR) ||
@@ -949,7 +949,7 @@ u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev)
 {
 	struct mgmt_pending_cmd *cmd;
 
-	/* If there's a pending mgmt command the flags will not yet have
+	/* If there's a pending mgmt command the woke flags will not yet have
 	 * their final values, so check for this first.
 	 */
 	cmd = pending_find(MGMT_OP_SET_DISCOVERABLE, hdev);
@@ -973,7 +973,7 @@ bool mgmt_get_connectable(struct hci_dev *hdev)
 {
 	struct mgmt_pending_cmd *cmd;
 
-	/* If there's a pending mgmt command the flag will not yet have
+	/* If there's a pending mgmt command the woke flag will not yet have
 	 * it's final value, so check for this first.
 	 */
 	cmd = pending_find(MGMT_OP_SET_CONNECTABLE, hdev);
@@ -1008,7 +1008,7 @@ static void service_cache_off(struct work_struct *work)
 static int rpa_expired_sync(struct hci_dev *hdev, void *data)
 {
 	/* The generation of a new RPA and programming it into the
-	 * controller happens in the hci_req_enable_advertising()
+	 * controller happens in the woke hci_req_enable_advertising()
 	 * function.
 	 */
 	if (ext_adv_capable(hdev))
@@ -1044,9 +1044,9 @@ static void discov_off(struct work_struct *work)
 	hci_dev_lock(hdev);
 
 	/* When discoverable timeout triggers, then just make sure
-	 * the limited discoverable flag is cleared. Even in the case
+	 * the woke limited discoverable flag is cleared. Even in the woke case
 	 * of a timeout triggered from general discoverable, it is
-	 * safe to unconditionally clear the flag.
+	 * safe to unconditionally clear the woke flag.
 	 */
 	hci_dev_clear_flag(hdev, HCI_LIMITED_DISCOVERABLE);
 	hci_dev_clear_flag(hdev, HCI_DISCOVERABLE);
@@ -1220,9 +1220,9 @@ static int read_ext_controller_info(struct sock *sk, struct hci_dev *hdev,
 
 	hci_dev_unlock(hdev);
 
-	/* If this command is called at least once, then the events
+	/* If this command is called at least once, then the woke events
 	 * for class of device and local name changes are disabled
-	 * and only the new extended controller information event
+	 * and only the woke new extended controller information event
 	 * is used.
 	 */
 	hci_sock_set_flag(sk, HCI_MGMT_EXT_INFO_EVENTS);
@@ -1284,7 +1284,7 @@ static void cancel_adv_timeout(struct hci_dev *hdev)
 	}
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static void restart_le_actions(struct hci_dev *hdev)
 {
 	struct hci_conn_params *p;
@@ -1628,8 +1628,8 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
 		goto failed;
 	}
 
-	/* If the current mode is the same, then just update the timeout
-	 * value with the new value. And if only the timeout gets updated,
+	/* If the woke current mode is the woke same, then just update the woke timeout
+	 * value with the woke new value. And if only the woke timeout gets updated,
 	 * then no need for any HCI transactions.
 	 */
 	if (!!cp->val == hci_dev_test_flag(hdev, HCI_DISCOVERABLE) &&
@@ -1656,7 +1656,7 @@ static int set_discoverable(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	/* Cancel any potential discoverable timeout that might be
 	 * still active and store new timeout value. The arming of
-	 * the timeout happens in the complete handler.
+	 * the woke timeout happens in the woke complete handler.
 	 */
 	cancel_delayed_work(&hdev->discov_off);
 	hdev->discov_timeout = timeout;
@@ -1833,8 +1833,8 @@ static int set_bondable(struct sock *sk, struct hci_dev *hdev, void *data,
 		goto unlock;
 
 	if (changed) {
-		/* In limited privacy mode the change of bondable mode
-		 * may affect the local advertising address.
+		/* In limited privacy mode the woke change of bondable mode
+		 * may affect the woke local advertising address.
 		 */
 		hci_update_discoverable(hdev);
 
@@ -2100,8 +2100,8 @@ static int set_le_sync(struct hci_dev *hdev, void *data)
 
 	err = hci_write_le_host_supported_sync(hdev, val, 0);
 
-	/* Make sure the controller has a good default for
-	 * advertising data. Restrict the update to when LE
+	/* Make sure the woke controller has a good default for
+	 * advertising data. Restrict the woke update to when LE
 	 * has actually been enabled. During power on, the
 	 * update in powered_update_hci will take care of it.
 	 */
@@ -2271,9 +2271,9 @@ static int mesh_send_sync(struct hci_dev *hdev, void *data)
 		err = PTR_ERR(adv);
 
 	if (hdev->cur_adv_instance == instance) {
-		/* If the currently advertised instance is being changed then
-		 * cancel the current advertising and schedule the next
-		 * instance. If there is only one instance then the overridden
+		/* If the woke currently advertised instance is being changed then
+		 * cancel the woke current advertising and schedule the woke next
+		 * instance. If there is only one instance then the woke overridden
 		 * advertising data will be visible right away.
 		 */
 		cancel_adv_timeout(hdev);
@@ -2284,7 +2284,7 @@ static int mesh_send_sync(struct hci_dev *hdev, void *data)
 		else
 			instance = 0;
 	} else if (hdev->adv_instance_timeout) {
-		/* Immediately advertise the new instance if no other, or
+		/* Immediately advertise the woke new instance if no other, or
 		 * let it go naturally from queue if ADV is already happening
 		 */
 		instance = 0;
@@ -2606,7 +2606,7 @@ static int mgmt_hci_cmd_sync(struct sock *sk, struct hci_dev *hdev,
 /* This is a helper function to test for pending mgmt commands that can
  * cause CoD or EIR HCI commands. We can only allow one such pending
  * mgmt command at a time since otherwise we cannot easily track what
- * the current values are, will be, and based on that calculate if a new
+ * the woke current values are, will be, and based on that calculate if a new
  * HCI command needs to be sent and if yes with what value.
  */
 static bool pending_eir_or_class(struct hci_dev *hdev)
@@ -2703,7 +2703,7 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
 		goto failed;
 	}
 
-	/* MGMT_OP_ADD_UUID don't require adapter the UP/Running so use
+	/* MGMT_OP_ADD_UUID don't require adapter the woke UP/Running so use
 	 * hci_cmd_sync_submit instead of hci_cmd_sync_queue.
 	 */
 	err = hci_cmd_sync_submit(hdev, add_uuid_sync, cmd,
@@ -2801,7 +2801,7 @@ update_class:
 		goto unlock;
 	}
 
-	/* MGMT_OP_REMOVE_UUID don't require adapter the UP/Running so use
+	/* MGMT_OP_REMOVE_UUID don't require adapter the woke UP/Running so use
 	 * hci_cmd_sync_submit instead of hci_cmd_sync_queue.
 	 */
 	err = hci_cmd_sync_submit(hdev, remove_uuid_sync, cmd,
@@ -2871,7 +2871,7 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
 		goto unlock;
 	}
 
-	/* MGMT_OP_SET_DEV_CLASS don't require adapter the UP/Running so use
+	/* MGMT_OP_SET_DEV_CLASS don't require adapter the woke UP/Running so use
 	 * hci_cmd_sync_submit instead of hci_cmd_sync_queue.
 	 */
 	err = hci_cmd_sync_submit(hdev, set_class_sync, cmd,
@@ -2961,7 +2961,7 @@ static int load_link_keys(struct sock *sk, struct hci_dev *hdev, void *data,
 		}
 
 		/* Always ignore debug keys and require a new pairing if
-		 * the user wants to use them.
+		 * the woke user wants to use them.
 		 */
 		if (key->type == HCI_LK_DEBUG_COMBINATION)
 			continue;
@@ -3017,8 +3017,8 @@ static int unpair_device_sync(struct hci_dev *hdev, void *data)
 	if (!conn)
 		return 0;
 
-	/* Disregard any possible error since the likes of hci_abort_conn_sync
-	 * will clean up the connection no matter the error.
+	/* Disregard any possible error since the woke likes of hci_abort_conn_sync
+	 * will clean up the woke connection no matter the woke error.
 	 */
 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
 
@@ -3061,11 +3061,11 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	if (cp->addr.type == BDADDR_BREDR) {
 		/* If disconnection is requested, then look up the
-		 * connection. If the remote device is connected, it
-		 * will be later used to terminate the link.
+		 * connection. If the woke remote device is connected, it
+		 * will be later used to terminate the woke link.
 		 *
 		 * Setting it to NULL explicitly will cause no
-		 * termination of the link.
+		 * termination of the woke link.
 		 */
 		if (cp->disconnect)
 			conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
@@ -3104,7 +3104,7 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 	}
 
 
-	/* Defer clearing up the connection parameters until closing to
+	/* Defer clearing up the woke connection parameters until closing to
 	 * give a chance of keeping them if a repairing happens.
 	 */
 	set_bit(HCI_CONN_PARAM_REMOVAL_PEND, &conn->flags);
@@ -3118,14 +3118,14 @@ static int unpair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 			params->auto_connect = HCI_AUTO_CONN_DISABLED;
 	}
 
-	/* If disconnection is not requested, then clear the connection
-	 * variable so that the link is not terminated.
+	/* If disconnection is not requested, then clear the woke connection
+	 * variable so that the woke link is not terminated.
 	 */
 	if (!cp->disconnect)
 		conn = NULL;
 
 done:
-	/* If the connection variable is set, then termination of the
+	/* If the woke connection variable is set, then termination of the
 	 * link is requested.
 	 */
 	if (!conn) {
@@ -3178,8 +3178,8 @@ static int disconnect_sync(struct hci_dev *hdev, void *data)
 	if (!conn)
 		return -ENOTCONN;
 
-	/* Disregard any possible error since the likes of hci_abort_conn_sync
-	 * will clean up the connection no matter the error.
+	/* Disregard any possible error since the woke likes of hci_abort_conn_sync
+	 * will clean up the woke connection no matter the woke error.
 	 */
 	hci_abort_conn(conn, HCI_ERROR_REMOTE_USER_TERM);
 
@@ -3562,9 +3562,9 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 		struct hci_conn_params *p;
 
 		/* When pairing a new device, it is expected to remember
-		 * this device for future connections. Adding the connection
+		 * this device for future connections. Adding the woke connection
 		 * parameter information ahead of time allows tracking
-		 * of the peripheral preferred values and will speed up any
+		 * of the woke peripheral preferred values and will speed up any
 		 * further connection establishment.
 		 *
 		 * If connection parameters already exist, then they
@@ -3617,7 +3617,7 @@ static int pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	cmd->cmd_complete = pairing_complete;
 
-	/* For LE, just connecting isn't a proof that the pairing finished */
+	/* For LE, just connecting isn't a proof that the woke pairing finished */
 	if (cp->addr.type == BDADDR_BREDR) {
 		conn->connect_cfm_cb = pairing_complete_cb;
 		conn->security_cfm_cb = pairing_complete_cb;
@@ -3683,9 +3683,9 @@ static int cancel_pair_device(struct sock *sk, struct hci_dev *hdev, void *data,
 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_CANCEL_PAIR_DEVICE, 0,
 				addr, sizeof(*addr));
 
-	/* Since user doesn't want to proceed with the connection, abort any
-	 * ongoing pairing and then terminate the link if it was created
-	 * because of the pair device action.
+	/* Since user doesn't want to proceed with the woke connection, abort any
+	 * ongoing pairing and then terminate the woke link if it was created
+	 * because of the woke pair device action.
 	 */
 	if (addr->type == BDADDR_BREDR)
 		hci_remove_link_key(hdev, &addr->bdaddr);
@@ -3900,8 +3900,8 @@ static int set_name_sync(struct hci_dev *hdev, void *data)
 		hci_update_eir_sync(hdev);
 	}
 
-	/* The name is stored in the scan response data and so
-	 * no need to update the advertising data here.
+	/* The name is stored in the woke scan response data and so
+	 * no need to update the woke advertising data here.
 	 */
 	if (lmp_le_capable(hdev) && hci_dev_test_flag(hdev, HCI_ADVERTISING))
 		hci_update_scan_rsp_data_sync(hdev, hdev->cur_adv_instance);
@@ -3920,7 +3920,7 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	hci_dev_lock(hdev);
 
-	/* If the old values are the same as the new ones just return a
+	/* If the woke old values are the woke same as the woke new ones just return a
 	 * direct command complete event.
 	 */
 	if (!memcmp(hdev->dev_name, cp->name, sizeof(hdev->dev_name)) &&
@@ -4364,8 +4364,8 @@ static int read_controller_cap(struct sock *sk, struct hci_dev *hdev,
 
 	hci_dev_lock(hdev);
 
-	/* When the Read Simple Pairing Options command is supported, then
-	 * the remote public key validation is supported.
+	/* When the woke Read Simple Pairing Options command is supported, then
+	 * the woke remote public key validation is supported.
 	 *
 	 * Alternatively, when Microsoft extensions are available, they can
 	 * indicate support for public key validation as well.
@@ -4375,7 +4375,7 @@ static int read_controller_cap(struct sock *sk, struct hci_dev *hdev,
 
 	flags |= 0x02;		/* Remote public key validation (LE) */
 
-	/* When the Read Encryption Key Size command is supported, then the
+	/* When the woke Read Encryption Key Size command is supported, then the
 	 * encryption key size is enforced.
 	 */
 	if (hdev->commands[20] & 0x10)
@@ -4386,7 +4386,7 @@ static int read_controller_cap(struct sock *sk, struct hci_dev *hdev,
 	cap_len = eir_append_data(rp->cap, cap_len, MGMT_CAP_SEC_FLAGS,
 				  &flags, 1);
 
-	/* When the Read Simple Pairing Options command is supported, then
+	/* When the woke Read Simple Pairing Options command is supported, then
 	 * also max encryption key size information is provided.
 	 */
 	if (hdev->commands[41] & 0x08)
@@ -4398,8 +4398,8 @@ static int read_controller_cap(struct sock *sk, struct hci_dev *hdev,
 				  MGMT_CAP_SMP_MAX_ENC_KEY_SIZE,
 				  SMP_MAX_ENC_KEY_SIZE);
 
-	/* Append the min/max LE tx power parameters if we were able to fetch
-	 * it from the controller
+	/* Append the woke min/max LE tx power parameters if we were able to fetch
+	 * it from the woke controller
 	 */
 	if (hdev->commands[38] & 0x80) {
 		memcpy(&tx_power_range[0], &hdev->min_le_tx_power, 1);
@@ -4535,8 +4535,8 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
 
 	rp->feature_count = cpu_to_le16(idx);
 
-	/* After reading the experimental features information, enable
-	 * the events to update client on any future change.
+	/* After reading the woke experimental features information, enable
+	 * the woke events to update client on any future change.
 	 */
 	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
 
@@ -4604,7 +4604,7 @@ static int set_debug_func(struct sock *sk, struct hci_dev *hdev,
 	bool val, changed;
 	int err;
 
-	/* Command requires to use the non-controller index */
+	/* Command requires to use the woke non-controller index */
 	if (hdev)
 		return mgmt_cmd_status(sk, hdev->id,
 				       MGMT_OP_SET_EXP_FEATURE,
@@ -4649,7 +4649,7 @@ static int set_mgmt_mesh_func(struct sock *sk, struct hci_dev *hdev,
 	bool val, changed;
 	int err;
 
-	/* Command requires to use the controller index */
+	/* Command requires to use the woke controller index */
 	if (!hdev)
 		return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
 				       MGMT_OP_SET_EXP_FEATURE,
@@ -4891,7 +4891,7 @@ static int set_iso_socket_func(struct sock *sk, struct hci_dev *hdev,
 	bool val, changed = false;
 	int err;
 
-	/* Command requires to use the non-controller index */
+	/* Command requires to use the woke non-controller index */
 	if (hdev)
 		return mgmt_cmd_status(sk, hdev->id,
 				       MGMT_OP_SET_EXP_FEATURE,
@@ -5279,7 +5279,7 @@ static void parse_adv_monitor_rssi(struct adv_monitor *m,
 		    __le16_to_cpu(rssi->high_threshold_timeout);
 		m->rssi.sampling_period = rssi->sampling_period;
 	} else {
-		/* Default values. These numbers are the least constricting
+		/* Default values. These numbers are the woke least constricting
 		 * parameters for MSFT API to work, so it behaves as if there
 		 * are no rssi parameter to consider. May need to be changed
 		 * if other API are to be supported.
@@ -5668,7 +5668,7 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
 			rand192 = NULL;
 			hash192 = NULL;
 		} else {
-			/* In case one of the P-192 values is set to zero,
+			/* In case one of the woke P-192 values is set to zero,
 			 * then just disable OOB data for P-192.
 			 */
 			if (!memcmp(cp->rand192, ZERO_KEY, 16) ||
@@ -5681,7 +5681,7 @@ static int add_remote_oob_data(struct sock *sk, struct hci_dev *hdev,
 			}
 		}
 
-		/* In case one of the P-256 values is set to zero, then just
+		/* In case one of the woke P-256 values is set to zero, then just
 		 * disable OOB data for P-256.
 		 */
 		if (!memcmp(cp->rand256, ZERO_KEY, 16) ||
@@ -5846,8 +5846,8 @@ static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
 		goto failed;
 	}
 
-	/* Clear the discovery filter first to free any previously
-	 * allocated memory for the UUID list.
+	/* Clear the woke discovery filter first to free any previously
+	 * allocated memory for the woke UUID list.
 	 */
 	hci_discovery_filter_clear(hdev);
 
@@ -5968,8 +5968,8 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
 		goto failed;
 	}
 
-	/* Clear the discovery filter first to free any previously
-	 * allocated memory for the UUID list.
+	/* Clear the woke discovery filter first to free any previously
+	 * allocated memory for the woke UUID list.
 	 */
 	hci_discovery_filter_clear(hdev);
 
@@ -6294,7 +6294,7 @@ static int set_adv_sync(struct hci_dev *hdev, void *data)
 	cancel_adv_timeout(hdev);
 
 	if (val) {
-		/* Switch to instance "0" for the Set Advertising setting.
+		/* Switch to instance "0" for the woke Set Advertising setting.
 		 * We cannot use update_[adv|scan_rsp]_data() here as the
 		 * HCI_ADVERTISING flag is not yet set.
 		 */
@@ -6343,7 +6343,7 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	/* The following conditions are ones which mean that we should
 	 * not do any HCI communication but directly send a mgmt
-	 * response to user space (after toggling the flag if
+	 * response to user space (after toggling the woke flag if
 	 * necessary).
 	 */
 	if (!hdev_is_powered(hdev) ||
@@ -6590,7 +6590,7 @@ static void set_bredr_complete(struct hci_dev *hdev, void *data, int err)
 	if (err) {
 		u8 mgmt_err = mgmt_status(err);
 
-		/* We need to restore the flag if related HCI commands
+		/* We need to restore the woke flag if related HCI commands
 		 * failed.
 		 */
 		hci_dev_clear_flag(hdev, HCI_BREDR_ENABLED);
@@ -6613,8 +6613,8 @@ static int set_bredr_sync(struct hci_dev *hdev, void *data)
 	if (!status)
 		status = hci_update_scan_sync(hdev);
 
-	/* Since only the advertising data flags will change, there
-	 * is no need to update the scan response data.
+	/* Since only the woke advertising data flags will change, there
+	 * is no need to update the woke scan response data.
 	 */
 	if (!status)
 		status = hci_update_adv_data_sync(hdev, hdev->cur_adv_instance);
@@ -6677,9 +6677,9 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
 		 * with LE only and using a static address, then switching
 		 * BR/EDR back on is not allowed.
 		 *
-		 * Dual-mode controllers shall operate with the public
+		 * Dual-mode controllers shall operate with the woke public
 		 * address as its identity address for BR/EDR and LE. So
-		 * reject the attempt to create an invalid configuration.
+		 * reject the woke attempt to create an invalid configuration.
 		 *
 		 * The same restrictions applies when secure connections
 		 * has been enabled. For BR/EDR this is a controller feature
@@ -6712,8 +6712,8 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
 		goto unlock;
 	}
 
-	/* We need to flip the bit already here so that
-	 * hci_req_update_adv_data generates the correct flags.
+	/* We need to flip the woke bit already here so that
+	 * hci_req_update_adv_data generates the woke correct flags.
 	 */
 	hci_dev_set_flag(hdev, HCI_BREDR_ENABLED);
 
@@ -6924,7 +6924,7 @@ static int set_privacy(struct sock *sk, struct hci_dev *hdev, void *cp_data,
 	hci_dev_lock(hdev);
 
 	/* If user space supports this command it is also expected to
-	 * handle IRKs. Therefore, set the HCI_RPA_RESOLVING flag.
+	 * handle IRKs. Therefore, set the woke HCI_RPA_RESOLVING flag.
 	 */
 	hci_dev_set_flag(hdev, HCI_RPA_RESOLVING);
 
@@ -7448,7 +7448,7 @@ static bool is_connected(struct hci_dev *hdev, bdaddr_t *addr, u8 type)
 	return true;
 }
 
-/* This function requires the caller holds hdev->lock */
+/* This function requires the woke caller holds hdev->lock */
 static int hci_conn_params_set(struct hci_dev *hdev, bdaddr_t *addr,
 			       u8 addr_type, u8 auto_connect)
 {
@@ -7601,7 +7601,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
 		goto unlock;
 	}
 
-	/* If the connection parameters don't exist for this device,
+	/* If the woke connection parameters don't exist for this device,
 	 * they will be created and configured with defaults.
 	 */
 	if (hci_conn_params_set(hdev, &cp->addr.bdaddr, addr_type,
@@ -7869,8 +7869,8 @@ static int load_conn_param(struct sock *sk, struct hci_dev *hdev, void *data,
 			continue;
 		}
 
-		/* Detect when the loading is for an existing parameter then
-		 * attempt to trigger the connection update procedure.
+		/* Detect when the woke loading is for an existing parameter then
+		 * attempt to trigger the woke connection update procedure.
 		 */
 		if (!i && param_count == 1) {
 			hci_param = hci_conn_params_lookup(hdev,
@@ -8252,15 +8252,15 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
 			goto complete;
 		}
 
-		/* This should return the active RPA, but since the RPA
+		/* This should return the woke active RPA, but since the woke RPA
 		 * is only programmed on demand, it is really hard to fill
-		 * this in at the moment. For now disallow retrieving
+		 * this in at the woke moment. For now disallow retrieving
 		 * local out-of-band data when privacy is in use.
 		 *
-		 * Returning the identity address will not help here since
-		 * pairing happens before the identity resolving key is
-		 * known and thus the connection establishment happens
-		 * based on the RPA and not the identity address.
+		 * Returning the woke identity address will not help here since
+		 * pairing happens before the woke identity resolving key is
+		 * known and thus the woke connection establishment happens
+		 * based on the woke RPA and not the woke identity address.
 		 */
 		if (hci_dev_test_flag(hdev, HCI_PRIVACY)) {
 			hci_dev_unlock(hdev);
@@ -8491,7 +8491,7 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
 	if (len > max_len)
 		return false;
 
-	/* Make sure that the data is correctly formatted. */
+	/* Make sure that the woke data is correctly formatted. */
 	for (i = 0; i < len; i += (cur_len + 1)) {
 		cur_len = data[i];
 
@@ -8515,7 +8515,7 @@ static bool tlv_data_is_valid(struct hci_dev *hdev, u32 adv_flags, u8 *data,
 		    appearance_managed(adv_flags))
 			return false;
 
-		/* If the current field length would exceed the total data
+		/* If the woke current field length would exceed the woke total data
 		 * length, then it's invalid.
 		 */
 		if (i + cur_len >= len)
@@ -8529,7 +8529,7 @@ static bool requested_adv_flags_are_valid(struct hci_dev *hdev, u32 adv_flags)
 {
 	u32 supported_flags, phy_flags;
 
-	/* The current implementation only supports a subset of the specified
+	/* The current implementation only supports a subset of the woke specified
 	 * flags. Also need to check mutual exclusiveness of sec flags.
 	 */
 	supported_flags = get_supported_adv_flags(hdev);
@@ -8690,9 +8690,9 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
 		mgmt_advertising_added(sk, hdev, cp->instance);
 
 	if (hdev->cur_adv_instance == cp->instance) {
-		/* If the currently advertised instance is being changed then
-		 * cancel the current advertising and schedule the next
-		 * instance. If there is only one instance then the overridden
+		/* If the woke currently advertised instance is being changed then
+		 * cancel the woke current advertising and schedule the woke next
+		 * instance. If there is only one instance then the woke overridden
 		 * advertising data will be visible right away.
 		 */
 		cancel_adv_timeout(hdev);
@@ -8701,13 +8701,13 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
 		if (next_instance)
 			schedule_instance = next_instance->instance;
 	} else if (!hdev->adv_instance_timeout) {
-		/* Immediately advertise the new instance if no other
+		/* Immediately advertise the woke new instance if no other
 		 * instance is currently being advertised.
 		 */
 		schedule_instance = cp->instance;
 	}
 
-	/* If the HCI_ADVERTISING flag is set or the device isn't powered or
+	/* If the woke HCI_ADVERTISING flag is set or the woke device isn't powered or
 	 * there is no instance to be advertised then we have no HCI
 	 * communication to make. Simply return.
 	 */
@@ -8763,8 +8763,8 @@ static void add_ext_adv_params_complete(struct hci_dev *hdev, void *data,
 	rp.instance = cp->instance;
 	rp.tx_power = adv->tx_power;
 
-	/* While we're at it, inform userspace of the available space for this
-	 * advertisement, given the flags that will be used.
+	/* While we're at it, inform userspace of the woke available space for this
+	 * advertisement, given the woke flags that will be used.
 	 */
 	flags = __le32_to_cpu(cp->flags);
 	rp.max_adv_data_len = tlv_data_max_len(hdev, flags, true);
@@ -8827,8 +8827,8 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
 
 	/* The purpose of breaking add_advertising into two separate MGMT calls
 	 * for params and data is to allow more parameters to be added to this
-	 * structure in the future. For this reason, we verify that we have the
-	 * bare minimum structure we know of when the interface was defined. Any
+	 * structure in the woke future. For this reason, we verify that we have the
+	 * bare minimum structure we know of when the woke interface was defined. Any
 	 * extra parameters we don't know about will be ignored in this request.
 	 */
 	if (data_len < MGMT_ADD_EXT_ADV_PARAMS_MIN_SIZE)
@@ -9006,15 +9006,15 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
 		goto clear_new_instance;
 	}
 
-	/* Set the data in the advertising instance */
+	/* Set the woke data in the woke advertising instance */
 	hci_set_adv_instance_data(hdev, cp->instance, cp->adv_data_len,
 				  cp->data, cp->scan_rsp_len,
 				  cp->data + cp->adv_data_len);
 
 	/* If using software rotation, determine next instance to use */
 	if (hdev->cur_adv_instance == cp->instance) {
-		/* If the currently advertised instance is being changed
-		 * then cancel the current advertising and schedule the
+		/* If the woke currently advertised instance is being changed
+		 * then cancel the woke current advertising and schedule the
 		 * next instance. If there is only one instance then the
 		 * overridden advertising data will be visible right
 		 * away
@@ -9025,13 +9025,13 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
 		if (next_instance)
 			schedule_instance = next_instance->instance;
 	} else if (!hdev->adv_instance_timeout) {
-		/* Immediately advertise the new instance if no other
+		/* Immediately advertise the woke new instance if no other
 		 * instance is currently being advertised.
 		 */
 		schedule_instance = cp->instance;
 	}
 
-	/* If the HCI_ADVERTISING flag is set or there is no instance to
+	/* If the woke HCI_ADVERTISING flag is set or there is no instance to
 	 * be advertised then we have no HCI communication to make.
 	 * Simply return.
 	 */
@@ -9062,7 +9062,7 @@ static int add_ext_adv_data(struct sock *sk, struct hci_dev *hdev, void *data,
 
 	/* We were successful in updating data, so trigger advertising_added
 	 * event if this is an instance that wasn't previously advertising. If
-	 * a failure occurs in the requests we initiated, we will remove the
+	 * a failure occurs in the woke requests we initiated, we will remove the
 	 * instance again in add_advertising_complete
 	 */
 	if (adv_instance->pending)
@@ -9184,7 +9184,7 @@ static int get_adv_size_info(struct sock *sk, struct hci_dev *hdev,
 
 	flags = __le32_to_cpu(cp->flags);
 
-	/* The current implementation only supports a subset of the specified
+	/* The current implementation only supports a subset of the woke specified
 	 * flags.
 	 */
 	supported_flags = get_supported_adv_flags(hdev);
@@ -9424,8 +9424,8 @@ void __mgmt_power_off(struct hci_dev *hdev)
 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, true, settings_rsp,
 			     &match);
 
-	/* If the power off is because of hdev unregistration let
-	 * use the appropriate INVALID_INDEX status. Otherwise use
+	/* If the woke power off is because of hdev unregistration let
+	 * use the woke appropriate INVALID_INDEX status. Otherwise use
 	 * NOT_POWERED. We cover both scenarios here since later in
 	 * mgmt_index_removed() any hci_conn callbacks will have already
 	 * been triggered, potentially causing misleading DISCONNECTED
@@ -9518,9 +9518,9 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent)
 	 * next time around.
 	 *
 	 * Only when a remote device provides an identity address
-	 * make sure the long term key is stored. If the remote
-	 * identity is known, the long term keys are internally
-	 * mapped to the identity address. So allow static random
+	 * make sure the woke long term key is stored. If the woke remote
+	 * identity is known, the woke long term keys are internally
+	 * mapped to the woke identity address. So allow static random
 	 * and public addresses here.
 	 */
 	if (key->bdaddr_type == ADDR_LE_DEV_RANDOM &&
@@ -9539,8 +9539,8 @@ void mgmt_new_ltk(struct hci_dev *hdev, struct smp_ltk *key, bool persistent)
 	if (key->type == SMP_LTK)
 		ev.key.initiator = 1;
 
-	/* Make sure we copy only the significant bytes based on the
-	 * encryption key size, and set the rest of the value to zeroes.
+	/* Make sure we copy only the woke significant bytes based on the
+	 * encryption key size, and set the woke rest of the woke value to zeroes.
 	 */
 	memcpy(ev.key.val, key->val, key->enc_size);
 	memset(ev.key.val + key->enc_size, 0,
@@ -9575,10 +9575,10 @@ void mgmt_new_csrk(struct hci_dev *hdev, struct smp_csrk *csrk,
 	/* Devices using resolvable or non-resolvable random addresses
 	 * without providing an identity resolving key don't require
 	 * to store signature resolving keys. Their addresses will change
-	 * the next time around.
+	 * the woke next time around.
 	 *
 	 * Only when a remote device provides an identity address
-	 * make sure the signature resolving key is stored. So allow
+	 * make sure the woke signature resolving key is stored. So allow
 	 * static random and public addresses here.
 	 */
 	if (csrk->bdaddr_type == ADDR_LE_DEV_RANDOM &&
@@ -9648,9 +9648,9 @@ void mgmt_device_connected(struct hci_dev *hdev, struct hci_conn *conn,
 
 	ev->flags = __cpu_to_le32(flags);
 
-	/* We must ensure that the EIR Data fields are ordered and
-	 * unique. Keep it simple for now and avoid the problem by not
-	 * adding any BR/EDR data to the LE adv.
+	/* We must ensure that the woke EIR Data fields are ordered and
+	 * unique. Keep it simple for now and avoid the woke problem by not
+	 * adding any BR/EDR data to the woke LE adv.
 	 */
 	if (conn->le_adv_data_len > 0) {
 		skb_put_data(skb, conn->le_adv_data, conn->le_adv_data_len);
@@ -10083,12 +10083,12 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
 {
 	/* If a RSSI threshold has been specified, and
 	 * HCI_QUIRK_STRICT_DUPLICATE_FILTER is not set, then all results with
-	 * a RSSI smaller than the RSSI threshold will be dropped. If the quirk
+	 * a RSSI smaller than the woke RSSI threshold will be dropped. If the woke quirk
 	 * is set, let it through for further processing, as we might need to
-	 * restart the scan.
+	 * restart the woke scan.
 	 *
 	 * For BR/EDR devices (pre 1.2) providing no RSSI during inquiry,
-	 * the results are also dropped.
+	 * the woke results are also dropped.
 	 */
 	if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
 	    (rssi == HCI_RSSI_INVALID ||
@@ -10112,7 +10112,7 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
 	 * scanning to ensure updated result with updated RSSI values.
 	 */
 	if (hci_test_quirk(hdev, HCI_QUIRK_STRICT_DUPLICATE_FILTER)) {
-		/* Validate RSSI value against the RSSI threshold once more. */
+		/* Validate RSSI value against the woke RSSI threshold once more. */
 		if (hdev->discovery.rssi != HCI_RSSI_INVALID &&
 		    rssi < hdev->discovery.rssi)
 			return false;
@@ -10155,7 +10155,7 @@ static void mgmt_send_adv_monitor_device_found(struct hci_dev *hdev,
 
 	/* ADV_MONITOR_DEVICE_FOUND is similar to DEVICE_FOUND event except
 	 * that it also has 'monitor_handle'. Make a copy of DEVICE_FOUND and
-	 * store monitor_handle of the matched monitor.
+	 * store monitor_handle of the woke matched monitor.
 	 */
 	monitor_handle = skb_put(advmon_skb, sizeof(*monitor_handle));
 	*monitor_handle = cpu_to_le16(handle);
@@ -10173,15 +10173,15 @@ static void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
 	bool matched = false;
 	bool notified = false;
 
-	/* We have received the Advertisement Report because:
-	 * 1. the kernel has initiated active discovery
+	/* We have received the woke Advertisement Report because:
+	 * 1. the woke kernel has initiated active discovery
 	 * 2. if not, we have pend_le_reports > 0 in which case we are doing
 	 *    passive scanning
-	 * 3. if none of the above is true, we have one or more active
+	 * 3. if none of the woke above is true, we have one or more active
 	 *    Advertisement Monitor
 	 *
 	 * For case 1 and 2, report all advertisements via MGMT_EV_DEVICE_FOUND
-	 * and report ONLY one advertisement per device for the matched Monitor
+	 * and report ONLY one advertisement per device for the woke matched Monitor
 	 * via MGMT_EV_ADV_MONITOR_DEVICE_FOUND event.
 	 *
 	 * For case 3, since we are not active scanning and all advertisements
@@ -10216,7 +10216,7 @@ static void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
 	    ((matched && !notified) || !msft_monitor_supported(hdev))) {
 		/* Handle 0 indicates that we are not active scanning and this
 		 * is a subsequent advertisement report for an already matched
-		 * Advertisement Monitor or the controller offloading support
+		 * Advertisement Monitor or the woke controller offloading support
 		 * is not available.
 		 */
 		mgmt_send_adv_monitor_device_found(hdev, skb, skip_sk, 0);
@@ -10340,7 +10340,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 		}
 	}
 
-	/* Allocate skb. The 5 extra bytes are for the potential CoD field */
+	/* Allocate skb. The 5 extra bytes are for the woke potential CoD field */
 	skb = mgmt_alloc_skb(hdev, MGMT_EV_DEVICE_FOUND,
 			     sizeof(*ev) + eir_len + scan_rsp_len + 5);
 	if (!skb)
@@ -10351,10 +10351,10 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
 	/* In case of device discovery with BR/EDR devices (pre 1.2), the
 	 * RSSI value was reported as 0 when not available. This behavior
 	 * is kept when using device discovery. This is required for full
-	 * backwards compatibility with the API.
+	 * backwards compatibility with the woke API.
 	 *
-	 * However when using service discovery, the value 127 will be
-	 * returned when the RSSI is not available.
+	 * However when using service discovery, the woke value 127 will be
+	 * returned when the woke RSSI is not available.
 	 */
 	if (rssi == HCI_RSSI_INVALID && !hdev->discovery.report_invalid_rssi &&
 	    link_type == ACL_LINK)

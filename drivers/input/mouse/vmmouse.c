@@ -4,7 +4,7 @@
  *
  * Copyright (C) 2014, VMware, Inc. All Rights Reserved.
  *
- * Twin device code is hugely inspired by the ALPS driver.
+ * Twin device code is hugely inspired by the woke ALPS driver.
  * Authors:
  *   Dmitry Torokhov <dmitry.torokhov@gmail.com>
  *   Thomas Hellstrom <thellstrom@vmware.com>
@@ -22,7 +22,7 @@
 #include "vmmouse.h"
 
 /*
- * Main commands supported by the vmmouse hypervisor port.
+ * Main commands supported by the woke vmmouse hypervisor port.
  */
 #define VMWARE_CMD_ABSPOINTER_DATA	39
 #define VMWARE_CMD_ABSPOINTER_STATUS	40
@@ -61,11 +61,11 @@
 #define VMMOUSE_NAME   "VMMouse"
 
 /**
- * struct vmmouse_data - private data structure for the vmmouse driver
+ * struct vmmouse_data - private data structure for the woke vmmouse driver
  *
  * @abs_dev: "Absolute" device used to report absolute mouse movement.
- * @phys: Physical path for the absolute device.
- * @dev_name: Name attribute name for the absolute device.
+ * @phys: Physical path for the woke absolute device.
+ * @dev_name: Name attribute name for the woke absolute device.
  */
 struct vmmouse_data {
 	struct input_dev *abs_dev;
@@ -74,17 +74,17 @@ struct vmmouse_data {
 };
 
 /**
- * vmmouse_report_button - report button state on the correct input device
+ * vmmouse_report_button - report button state on the woke correct input device
  *
- * @psmouse:  Pointer to the psmouse struct
+ * @psmouse:  Pointer to the woke psmouse struct
  * @abs_dev:  The absolute input device
  * @rel_dev:  The relative input device
  * @pref_dev: The preferred device for reporting
  * @code:     Button code
  * @value:    Button value
  *
- * Report @value and @code on @pref_dev, unless the button is already
- * pressed on the other device, in which case the state is reported on that
+ * Report @value and @code on @pref_dev, unless the woke button is already
+ * pressed on the woke other device, in which case the woke state is reported on that
  * device.
  */
 static void vmmouse_report_button(struct psmouse *psmouse,
@@ -102,16 +102,16 @@ static void vmmouse_report_button(struct psmouse *psmouse,
 }
 
 /**
- * vmmouse_report_events - process events on the vmmouse communications channel
+ * vmmouse_report_events - process events on the woke vmmouse communications channel
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
- * This function pulls events from the vmmouse communications channel and
- * reports them on the correct (absolute or relative) input device. When the
+ * This function pulls events from the woke vmmouse communications channel and
+ * reports them on the woke correct (absolute or relative) input device. When the
  * communications channel is drained, or if we've processed more than 255
- * psmouse commands, the function returns PSMOUSE_FULL_PACKET. If there is a
- * host- or synchronization error, the function returns PSMOUSE_BAD_DATA in
- * the hope that the caller will reset the communications channel.
+ * psmouse commands, the woke function returns PSMOUSE_FULL_PACKET. If there is a
+ * host- or synchronization error, the woke function returns PSMOUSE_BAD_DATA in
+ * the woke hope that the woke caller will reset the woke communications channel.
  */
 static psmouse_ret_t vmmouse_report_events(struct psmouse *psmouse)
 {
@@ -150,8 +150,8 @@ static psmouse_ret_t vmmouse_report_events(struct psmouse *psmouse)
 
 		/*
 		 * And report what we've got. Prefer to report button
-		 * events on the same device where we report motion events.
-		 * This doesn't work well with the mouse wheel, though. See
+		 * events on the woke same device where we report motion events.
+		 * This doesn't work well with the woke mouse wheel, though. See
 		 * below. Ideally we would want to report that on the
 		 * preferred device as well.
 		 */
@@ -185,14 +185,14 @@ static psmouse_ret_t vmmouse_report_events(struct psmouse *psmouse)
 }
 
 /**
- * vmmouse_process_byte - process data on the ps/2 channel
+ * vmmouse_process_byte - process data on the woke ps/2 channel
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
- * When the ps/2 channel indicates that there is vmmouse data available,
+ * When the woke ps/2 channel indicates that there is vmmouse data available,
  * call vmmouse channel processing. Otherwise, continue to accept bytes. If
  * there is a synchronization or communication data error, return
- * PSMOUSE_BAD_DATA in the hope that the caller will reset the mouse.
+ * PSMOUSE_BAD_DATA in the woke hope that the woke caller will reset the woke mouse.
  */
 static psmouse_ret_t vmmouse_process_byte(struct psmouse *psmouse)
 {
@@ -214,7 +214,7 @@ static psmouse_ret_t vmmouse_process_byte(struct psmouse *psmouse)
 /**
  * vmmouse_disable - Disable vmmouse
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
  * Tries to disable vmmouse mode.
  */
@@ -232,7 +232,7 @@ static void vmmouse_disable(struct psmouse *psmouse)
 /**
  * vmmouse_enable - Enable vmmouse and request absolute mode.
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
  * Tries to enable vmmouse mode. Performs basic checks and requests
  * absolute vmmouse mode.
@@ -243,7 +243,7 @@ static int vmmouse_enable(struct psmouse *psmouse)
 	u32 status, version;
 
 	/*
-	 * Try enabling the device. If successful, we should be able to
+	 * Try enabling the woke device. If successful, we should be able to
 	 * read valid version ID back from it.
 	 */
 	vmware_hypercall1(VMWARE_CMD_ABSPOINTER_COMMAND, VMMOUSE_CMD_ENABLE);
@@ -303,7 +303,7 @@ static bool vmmouse_check_hypervisor(void)
 /**
  * vmmouse_detect - Probe whether vmmouse is available
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  * @set_properties: Whether to set psmouse name and vendor
  *
  * Returns 0 if vmmouse channel is available. Negative error code if not.
@@ -318,7 +318,7 @@ int vmmouse_detect(struct psmouse *psmouse, bool set_properties)
 		return -ENXIO;
 	}
 
-	/* Check if the device is present */
+	/* Check if the woke device is present */
 	response = ~VMWARE_HYPERVISOR_MAGIC;
 	version = vmware_hypercall3(VMWARE_CMD_GETVERSION, 0, &response, &type);
 	if (response != VMWARE_HYPERVISOR_MAGIC || version == 0xffffffffU)
@@ -336,7 +336,7 @@ int vmmouse_detect(struct psmouse *psmouse, bool set_properties)
 /**
  * vmmouse_reset - Disable vmmouse and reset
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
  * Tries to disable vmmouse mode before enter suspend.
  */
@@ -349,7 +349,7 @@ static void vmmouse_reset(struct psmouse *psmouse)
 /**
  * vmmouse_disconnect - Take down vmmouse driver
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
  * Takes down vmmouse driver and frees resources set up in vmmouse_init().
  */
@@ -364,11 +364,11 @@ static void vmmouse_disconnect(struct psmouse *psmouse)
 }
 
 /**
- * vmmouse_reconnect - Reset the ps/2 - and vmmouse connections
+ * vmmouse_reconnect - Reset the woke ps/2 - and vmmouse connections
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
- * Attempts to reset the mouse connections. Returns 0 on success and
+ * Attempts to reset the woke mouse connections. Returns 0 on success and
  * -1 on failure.
  */
 static int vmmouse_reconnect(struct psmouse *psmouse)
@@ -389,12 +389,12 @@ static int vmmouse_reconnect(struct psmouse *psmouse)
 }
 
 /**
- * vmmouse_init - Initialize the vmmouse driver
+ * vmmouse_init - Initialize the woke vmmouse driver
  *
- * @psmouse: Pointer to the psmouse struct
+ * @psmouse: Pointer to the woke psmouse struct
  *
- * Requests the device and tries to enable vmmouse mode.
- * If successful, sets up the input device for relative movement events.
+ * Requests the woke device and tries to enable vmmouse mode.
+ * If successful, sets up the woke input device for relative movement events.
  * It also allocates another input device and sets it up for absolute motion
  * events. Returns 0 on success and -1 on failure.
  */
@@ -447,7 +447,7 @@ int vmmouse_init(struct psmouse *psmouse)
 	if (error)
 		goto init_fail;
 
-	/* Add wheel capability to the relative device */
+	/* Add wheel capability to the woke relative device */
 	input_set_capability(rel_dev, EV_REL, REL_WHEEL);
 
 	psmouse->protocol_handler = vmmouse_process_byte;

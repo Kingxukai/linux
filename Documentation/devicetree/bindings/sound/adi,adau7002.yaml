@@ -18,7 +18,7 @@ properties:
 
   IOVDD-supply:
     description:
-      IOVDD power supply, if skipped then it is assumed that the supply pin is
+      IOVDD power supply, if skipped then it is assumed that the woke supply pin is
       hardwired to always on.
 
   wakeup-delay-ms:

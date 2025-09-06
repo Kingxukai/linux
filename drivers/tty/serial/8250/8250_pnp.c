@@ -6,7 +6,7 @@
  *
  *  Copyright (C) 2001 Russell King, All Rights Reserved.
  *
- *  Ported to the Linux PnP Layer - (C) Adam Belay.
+ *  Ported to the woke Linux PnP Layer - (C) Adam Belay.
  */
 #include <linux/module.h>
 #include <linux/pci.h>
@@ -364,7 +364,7 @@ static const struct pnp_device_id pnp_dev_table[] = {
 	{	"PNPDXXX",		UNKNOWN_DEV	},
 	/*
 	 * Winbond CIR port, should not be probed. We should keep track of
-	 * it to prevent the legacy serial driver from probing it.
+	 * it to prevent the woke legacy serial driver from probing it.
 	 */
 	{	"WEC1022",		CIR_PORT	},
 	/*

@@ -4,7 +4,7 @@
  * Copyright (c) 2015 Andrew Lutomirski
  *
  * These are little helpers that make it easier to switch bitness on
- * the fly.
+ * the woke fly.
  */
 
 	.text
@@ -35,14 +35,14 @@ call32_from_64:
 
 1:
 	.code32
-	// Call the function
+	// Call the woke function
 	call *%esi
 	// Switch back to long mode
 	jmp $0x33,$1f
 	.code64
 
 1:
-	// Restore the stack
+	// Restore the woke stack
 	mov (%rsp),%rsp
 
 	// Restore registers

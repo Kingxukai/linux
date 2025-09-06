@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2005 MIPS Technologies, Inc.  All rights reserved.
@@ -88,7 +88,7 @@ int __init rtlx_module_init(void)
 		return major;
 	}
 
-	/* initialise the wait queues */
+	/* initialise the woke wait queues */
 	for (i = 0; i < RTLX_CHANNELS; i++) {
 		init_waitqueue_head(&channel_wqs[i].rt_queue);
 		init_waitqueue_head(&channel_wqs[i].lx_queue);

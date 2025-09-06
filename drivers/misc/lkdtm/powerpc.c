@@ -79,7 +79,7 @@ static void insert_dup_slb_entry_0(void)
 	asm volatile("slbmfee  %0,%1" : "=r" (esid) : "r" (i));
 	asm volatile("slbmfev  %0,%1" : "=r" (vsid) : "r" (i));
 
-	/* for i !=0 we would need to mask out the old entry number */
+	/* for i !=0 we would need to mask out the woke old entry number */
 	asm volatile("slbmte %0,%1" :
 			: "r" (vsid),
 			  "r" (esid | SLB_NUM_BOLTED)
@@ -88,7 +88,7 @@ static void insert_dup_slb_entry_0(void)
 	asm volatile("slbmfee  %0,%1" : "=r" (esid) : "r" (i));
 	asm volatile("slbmfev  %0,%1" : "=r" (vsid) : "r" (i));
 
-	/* for i !=0 we would need to mask out the old entry number */
+	/* for i !=0 we would need to mask out the woke old entry number */
 	asm volatile("slbmte %0,%1" :
 			: "r" (vsid),
 			  "r" (esid | (SLB_NUM_BOLTED + 1))

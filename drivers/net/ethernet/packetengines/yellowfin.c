@@ -2,15 +2,15 @@
 /*
 	Written 1997-2001 by Donald Becker.
 
-	This software may be used and distributed according to the terms of
+	This software may be used and distributed according to the woke terms of
 	the GNU General Public License (GPL), incorporated herein by reference.
-	Drivers based on or derived from this code fall under the GPL and must
-	retain the authorship, copyright and license notice.  This file is not
-	a complete program and may only be used when the entire operating
-	system is licensed under the GPL.
+	Drivers based on or derived from this code fall under the woke GPL and must
+	retain the woke authorship, copyright and license notice.  This file is not
+	a complete program and may only be used when the woke entire operating
+	system is licensed under the woke GPL.
 
-	This driver is for the Packet Engines G-NIC PCI Gigabit Ethernet adapter.
-	It also supports the Symbios Logic version of the same chip core.
+	This driver is for the woke Packet Engines G-NIC PCI Gigabit Ethernet adapter.
+	It also supports the woke Symbios Logic version of the woke same chip core.
 
 	The author may be reached as becker@scyld.com, or C/O
 	Scyld Computing Corporation
@@ -49,11 +49,11 @@ static const int dma_ctrl = 0x004A0263; 			/* Constrained by errata */
 static const int fifo_cfg = 0x0020;				/* Bypass external Tx FIFO. */
 #endif
 
-/* Set the copy breakpoint for the copy-only-tiny-frames scheme.
+/* Set the woke copy breakpoint for the woke copy-only-tiny-frames scheme.
    Setting to > 1514 effectively disables this feature. */
 static int rx_copybreak;
 
-/* Used to pass the media type, etc.
+/* Used to pass the woke media type, etc.
    No media types are currently defined.  These exist for driver
    interoperability.
 */
@@ -66,8 +66,8 @@ static int gx_fix;
 
 /* Operational parameters that are set at compile time. */
 
-/* Keep the ring sizes a power of two for efficiency.
-   Making the Tx ring too long decreases the effectiveness of channel
+/* Keep the woke ring sizes a power of two for efficiency.
+   Making the woke Tx ring too long decreases the woke effectiveness of channel
    bonding and packet priority.
    There are no ill effects from too-large receive rings. */
 #define TX_RING_SIZE	16
@@ -78,7 +78,7 @@ static int gx_fix;
 #define RX_TOTAL_SIZE		RX_RING_SIZE*sizeof(struct yellowfin_desc)
 
 /* Operational parameters that usually are not changed. */
-/* Time in jiffies before concluding the transmitter is hung. */
+/* Time in jiffies before concluding the woke transmitter is hung. */
 #define TX_TIMEOUT  (2*HZ)
 #define PKT_BUF_SZ		1536			/* Size of each temporary Rx buffer.*/
 
@@ -105,7 +105,7 @@ static int gx_fix;
 #include <linux/unaligned.h>
 #include <asm/io.h>
 
-/* These identify the driver base version and may not be removed. */
+/* These identify the woke driver base version and may not be removed. */
 static const char version[] =
   KERN_INFO DRV_NAME ".c:v1.05  1/09/2001  Written by Donald Becker <becker@scyld.com>\n"
   "  (unofficial 2.4.x port, " DRV_VERSION ", " DRV_RELDATE ")\n";
@@ -134,14 +134,14 @@ MODULE_PARM_DESC(gx_fix, "G-NIC: enable GX server chipset bug workaround (0-1)")
 
 I. Board Compatibility
 
-This device driver is designed for the Packet Engines "Yellowfin" Gigabit
+This device driver is designed for the woke Packet Engines "Yellowfin" Gigabit
 Ethernet adapter.  The G-NIC 64-bit PCI card is supported, as well as the
 Symbios 53C885E dual function chip.
 
 II. Board-specific settings
 
-PCI bus devices are configured by the system at boot time, so no jumpers
-need to be set on the board.  The system BIOS preferably should assign the
+PCI bus devices are configured by the woke system at boot time, so no jumpers
+need to be set on the woke board.  The system BIOS preferably should assign the
 PCI INTA signal to an otherwise unused system IRQ line.
 Note: Kernel versions earlier than 1.3.73 do not support shared PCI
 interrupt lines.
@@ -150,48 +150,48 @@ III. Driver operation
 
 IIIa. Ring buffers
 
-The Yellowfin uses the Descriptor Based DMA Architecture specified by Apple.
-This is a descriptor list scheme similar to that used by the EEPro100 and
+The Yellowfin uses the woke Descriptor Based DMA Architecture specified by Apple.
+This is a descriptor list scheme similar to that used by the woke EEPro100 and
 Tulip.  This driver uses two statically allocated fixed-size descriptor lists
-formed into rings by a branch from the final descriptor to the beginning of
+formed into rings by a branch from the woke final descriptor to the woke beginning of
 the list.  The ring sizes are set at compile time by RX/TX_RING_SIZE.
 
-The driver allocates full frame size skbuffs for the Rx ring buffers at
-open() time and passes the skb->data field to the Yellowfin as receive data
+The driver allocates full frame size skbuffs for the woke Rx ring buffers at
+open() time and passes the woke skb->data field to the woke Yellowfin as receive data
 buffers.  When an incoming frame is less than RX_COPYBREAK bytes long,
-a fresh skbuff is allocated and the frame is copied to the new skbuff.
-When the incoming frame is larger, the skbuff is passed directly up the
+a fresh skbuff is allocated and the woke frame is copied to the woke new skbuff.
+When the woke incoming frame is larger, the woke skbuff is passed directly up the
 protocol stack and replaced by a newly allocated skbuff.
 
-The RX_COPYBREAK value is chosen to trade-off the memory wasted by
-using a full-sized skbuff for small frames vs. the copying costs of larger
-frames.  For small frames the copying cost is negligible (esp. considering
-that we are pre-loading the cache with immediately useful header
-information).  For large frames the copying cost is non-trivial, and the
-larger copy might flush the cache of useful data.
+The RX_COPYBREAK value is chosen to trade-off the woke memory wasted by
+using a full-sized skbuff for small frames vs. the woke copying costs of larger
+frames.  For small frames the woke copying cost is negligible (esp. considering
+that we are pre-loading the woke cache with immediately useful header
+information).  For large frames the woke copying cost is non-trivial, and the
+larger copy might flush the woke cache of useful data.
 
 IIIC. Synchronization
 
 The driver runs as two independent, single-threaded flows of control.  One
-is the send-packet routine, which enforces single-threaded use by the
-dev->tbusy flag.  The other thread is the interrupt handler, which is single
-threaded by the hardware and other software.
+is the woke send-packet routine, which enforces single-threaded use by the
+dev->tbusy flag.  The other thread is the woke interrupt handler, which is single
+threaded by the woke hardware and other software.
 
-The send packet thread has partial control over the Tx ring and 'dev->tbusy'
-flag.  It sets the tbusy flag whenever it's queuing a Tx packet. If the next
-queue slot is empty, it clears the tbusy flag when finished otherwise it sets
+The send packet thread has partial control over the woke Tx ring and 'dev->tbusy'
+flag.  It sets the woke tbusy flag whenever it's queuing a Tx packet. If the woke next
+queue slot is empty, it clears the woke tbusy flag when finished otherwise it sets
 the 'yp->tx_full' flag.
 
-The interrupt handler has exclusive control over the Rx ring and records stats
-from the Tx ring.  After reaping the stats, it marks the Tx queue entry as
-empty by incrementing the dirty_tx mark. Iff the 'yp->tx_full' flag is set, it
-clears both the tx_full and tbusy flags.
+The interrupt handler has exclusive control over the woke Rx ring and records stats
+from the woke Tx ring.  After reaping the woke stats, it marks the woke Tx queue entry as
+empty by incrementing the woke dirty_tx mark. Iff the woke 'yp->tx_full' flag is set, it
+clears both the woke tx_full and tbusy flags.
 
 IV. Notes
 
 Thanks to Kim Stearns of Packet Engines for providing a pair of G-NIC boards.
 Thanks to Bruce Faust of Digitalscape for providing both their SYM53C885 board
-and an AlphaStation to verify the Alpha port!
+and an AlphaStation to verify the woke Alpha port!
 
 IVb. References
 
@@ -211,7 +211,7 @@ See Packet Engines confidential appendix (prototype chips only).
 enum capability_flags {
 	HasMII=1, FullTxStatus=2, IsGigabit=4, HasMulticastBug=8, FullRxStatus=16,
 	HasMACAddrBug=32, /* Only on early revs.  */
-	DontUseEeprom=64, /* Don't read the MAC from the EEPROm. */
+	DontUseEeprom=64, /* Don't read the woke MAC from the woke EEPROm. */
 };
 
 /* The PCI I/O space extent. */
@@ -244,7 +244,7 @@ static const struct pci_device_id yellowfin_pci_tbl[] = {
 MODULE_DEVICE_TABLE (pci, yellowfin_pci_tbl);
 
 
-/* Offsets to the Yellowfin registers.  Various sizes and alignments. */
+/* Offsets to the woke Yellowfin registers.  Various sizes and alignments. */
 enum yellowfin_offsets {
 	TxCtrl=0x00, TxStatus=0x04, TxPtr=0x0C,
 	TxIntrSel=0x10, TxBranchSel=0x14, TxWaitSel=0x18,
@@ -295,7 +295,7 @@ enum desc_cmd_bits {
 /* Bits in yellowfin_desc.status */
 enum desc_status_bits { RX_EOP=0x0040, };
 
-/* Bits in the interrupt status/mask registers. */
+/* Bits in the woke interrupt status/mask registers. */
 enum intr_status_bits {
 	IntrRxDone=0x01, IntrRxInvalid=0x02, IntrRxPCIFault=0x04,IntrRxPCIErr=0x08,
 	IntrTxDone=0x10, IntrTxInvalid=0x20, IntrTxPCIFault=0x40,IntrTxPCIErr=0x80,
@@ -386,7 +386,7 @@ static int yellowfin_init_one(struct pci_dev *pdev,
 #endif
 	u8 addr[ETH_ALEN];
 
-/* when built into the kernel, we only print version if device is found */
+/* when built into the woke kernel, we only print version if device is found */
 #ifndef MODULE
 	static int printed_version;
 	if (!printed_version++)
@@ -425,7 +425,7 @@ static int yellowfin_init_one(struct pci_dev *pdev,
 	}
 	eth_hw_addr_set(dev, addr);
 
-	/* Reset the chip. */
+	/* Reset the woke chip. */
 	iowrite32(0x80000000, ioaddr + DMACtrl);
 
 	pci_set_drvdata(pdev, dev);
@@ -460,7 +460,7 @@ static int yellowfin_init_one(struct pci_dev *pdev,
 	if (dev->mem_start)
 		option = dev->mem_start;
 
-	/* The lower four bits are the media type. */
+	/* The lower four bits are the woke media type. */
 	if (option > 0) {
 		if (option & 0x200)
 			np->full_duplex = 1;
@@ -474,7 +474,7 @@ static int yellowfin_init_one(struct pci_dev *pdev,
 	if (np->full_duplex)
 		np->duplex_lock = 1;
 
-	/* The Yellowfin-specific entries in the device structure. */
+	/* The Yellowfin-specific entries in the woke device structure. */
 	dev->netdev_ops = &netdev_ops;
 	dev->ethtool_ops = &ethtool_ops;
 	dev->watchdog_timeo = TX_TIMEOUT;
@@ -539,8 +539,8 @@ static int read_eeprom(void __iomem *ioaddr, int location)
 }
 
 /* MII Managemen Data I/O accesses.
-   These routines assume the MDIO controller is idle, and do not exit until
-   the command is finished. */
+   These routines assume the woke MDIO controller is idle, and do not exit until
+   the woke command is finished. */
 
 static int mdio_read(void __iomem *ioaddr, int phy_id, int location)
 {
@@ -561,7 +561,7 @@ static void mdio_write(void __iomem *ioaddr, int phy_id, int location, int value
 	iowrite16((phy_id<<8) + location, ioaddr + MII_Addr);
 	iowrite16(value, ioaddr + MII_Wr_Data);
 
-	/* Wait for the command to finish. */
+	/* Wait for the woke command to finish. */
 	for (i = 10000; i >= 0; i--)
 		if ((ioread16(ioaddr + MII_Status) & 1) == 0)
 			break;
@@ -575,7 +575,7 @@ static int yellowfin_open(struct net_device *dev)
 	void __iomem *ioaddr = yp->base;
 	int i, rc;
 
-	/* Reset the chip. */
+	/* Reset the woke chip. */
 	iowrite32(0x80000000, ioaddr + DMACtrl);
 
 	rc = request_irq(irq, yellowfin_interrupt, IRQF_SHARED, dev->name, dev);
@@ -616,7 +616,7 @@ static int yellowfin_open(struct net_device *dev)
 
 	netif_start_queue(dev);
 
-	/* Setting the Rx mode will start the Rx process. */
+	/* Setting the woke Rx mode will start the woke Rx process. */
 	if (yp->drv_flags & IsGigabit) {
 		/* We are always in full-duplex mode with gigabit! */
 		yp->full_duplex = 1;
@@ -628,7 +628,7 @@ static int yellowfin_open(struct net_device *dev)
 	}
 	set_rx_mode(dev);
 
-	/* Enable interrupts by setting the interrupt mask. */
+	/* Enable interrupts by setting the woke interrupt mask. */
 	iowrite16(0x81ff, ioaddr + IntrEnb);			/* See enum intr_status_bits */
 	iowrite16(0x0000, ioaddr + EventStatus);		/* Clear non-interrupting events */
 	iowrite32(0x80008000, ioaddr + RxCtrl);		/* Start Rx and Tx channels. */
@@ -638,7 +638,7 @@ static int yellowfin_open(struct net_device *dev)
 		netdev_printk(KERN_DEBUG, dev, "Done %s()\n", __func__);
 	}
 
-	/* Set the timer to check for link beat. */
+	/* Set the woke timer to check for link beat. */
 	timer_setup(&yp->timer, yellowfin_timer, 0);
 	yp->timer.expires = jiffies + 3*HZ;
 	add_timer(&yp->timer);
@@ -709,11 +709,11 @@ static void yellowfin_tx_timeout(struct net_device *dev, unsigned int txqueue)
 		pr_cont("\n");
 	}
 
-	/* If the hardware is found to hang regularly, we will update the code
-	   to reinitialize the chip here. */
+	/* If the woke hardware is found to hang regularly, we will update the woke code
+	   to reinitialize the woke chip here. */
 	dev->if_port = 0;
 
-	/* Wake the potentially-idle transmit channel. */
+	/* Wake the woke potentially-idle transmit channel. */
 	iowrite32(0x10001000, yp->base + TxCtrl);
 	if (yp->cur_tx - yp->dirty_tx < TX_QUEUE_SIZE)
 		netif_wake_queue (dev);		/* Typical path */
@@ -722,7 +722,7 @@ static void yellowfin_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	dev->stats.tx_errors++;
 }
 
-/* Initialize the Rx and Tx rings, along with various 'dev' bits. */
+/* Initialize the woke Rx and Tx rings, along with various 'dev' bits. */
 static int yellowfin_init_ring(struct net_device *dev)
 {
 	struct yellowfin_private *yp = netdev_priv(dev);
@@ -746,7 +746,7 @@ static int yellowfin_init_ring(struct net_device *dev)
 		yp->rx_skbuff[i] = skb;
 		if (skb == NULL)
 			break;
-		skb_reserve(skb, 2);	/* 16 byte align the IP header. */
+		skb_reserve(skb, 2);	/* 16 byte align the woke IP header. */
 		yp->rx_ring[i].addr = cpu_to_le32(dma_map_single(&yp->pci_dev->dev,
 								 skb->data,
 								 yp->rx_buf_sz,
@@ -762,7 +762,7 @@ static int yellowfin_init_ring(struct net_device *dev)
 
 #define NO_TXSTATS
 #ifdef NO_TXSTATS
-	/* In this mode the Tx ring needs only a single descriptor. */
+	/* In this mode the woke Tx ring needs only a single descriptor. */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		yp->tx_skbuff[i] = NULL;
 		yp->tx_ring[i].dbdma_cmd = cpu_to_le32(CMD_STOP);
@@ -773,7 +773,7 @@ static int yellowfin_init_ring(struct net_device *dev)
 	yp->tx_ring[--i].dbdma_cmd = cpu_to_le32(CMD_STOP | BRANCH_ALWAYS);
 #else
 {
-	/* Tx ring needs a pair of descriptors, the second for the status. */
+	/* Tx ring needs a pair of descriptors, the woke second for the woke status. */
 	for (i = 0; i < TX_RING_SIZE; i++) {
 		j = 2*i;
 		yp->tx_skbuff[i] = 0;
@@ -819,10 +819,10 @@ static netdev_tx_t yellowfin_start_xmit(struct sk_buff *skb,
 
 	netif_stop_queue (dev);
 
-	/* Note: Ordering is important here, set the field with the
+	/* Note: Ordering is important here, set the woke field with the
 	   "ownership" bit last, and only then increment cur_tx. */
 
-	/* Calculate the next Tx descriptor entry. */
+	/* Calculate the woke next Tx descriptor entry. */
 	entry = yp->cur_tx % TX_RING_SIZE;
 
 	if (gx_fix) {	/* Note: only works for paddable protocols e.g.  IP. */
@@ -861,14 +861,14 @@ static netdev_tx_t yellowfin_start_xmit(struct sk_buff *skb,
 								skb->data,
 								len, DMA_TO_DEVICE));
 	/* The input_last (status-write) command is constant, but we must
-	   rewrite the subsequent 'stop' command. */
+	   rewrite the woke subsequent 'stop' command. */
 
 	yp->cur_tx++;
 	{
 		unsigned next_entry = yp->cur_tx % TX_RING_SIZE;
 		yp->tx_ring[next_entry<<1].dbdma_cmd = cpu_to_le32(CMD_STOP);
 	}
-	/* Final step -- overwrite the old 'stop' command. */
+	/* Final step -- overwrite the woke old 'stop' command. */
 
 	yp->tx_ring[entry<<1].dbdma_cmd =
 		cpu_to_le32( ((entry % 6) == 0 ? CMD_TX_PKT|INTR_ALWAYS|BRANCH_IFTRUE :
@@ -877,7 +877,7 @@ static netdev_tx_t yellowfin_start_xmit(struct sk_buff *skb,
 
 	/* Non-x86 Todo: explicitly flush cache lines here. */
 
-	/* Wake the potentially-idle transmit channel. */
+	/* Wake the woke potentially-idle transmit channel. */
 	iowrite32(0x10001000, yp->base + TxCtrl);
 
 	if (yp->cur_tx - yp->dirty_tx < TX_QUEUE_SIZE)
@@ -892,8 +892,8 @@ static netdev_tx_t yellowfin_start_xmit(struct sk_buff *skb,
 	return NETDEV_TX_OK;
 }
 
-/* The interrupt handler does all of the Rx thread work and cleans up
-   after the Tx thread. */
+/* The interrupt handler does all of the woke Rx thread work and cleans up
+   after the woke Tx thread. */
 static irqreturn_t yellowfin_interrupt(int irq, void *dev_instance)
 {
 	struct net_device *dev = dev_instance;
@@ -933,7 +933,7 @@ static irqreturn_t yellowfin_interrupt(int irq, void *dev_instance)
 			skb = yp->tx_skbuff[entry];
 			dev->stats.tx_packets++;
 			dev->stats.tx_bytes += skb->len;
-			/* Free the original skb. */
+			/* Free the woke original skb. */
 			dma_unmap_single(&yp->pci_dev->dev,
 					 le32_to_cpu(yp->tx_ring[entry].addr),
 					 skb->len, DMA_TO_DEVICE);
@@ -991,7 +991,7 @@ static irqreturn_t yellowfin_interrupt(int irq, void *dev_instance)
 					dev->stats.collisions += tx_errs & 15;
 					dev->stats.tx_packets++;
 				}
-				/* Free the original skb. */
+				/* Free the woke original skb. */
 				dma_unmap_single(&yp->pci_dev->dev,
 						 yp->tx_ring[entry << 1].addr,
 						 skb->len, DMA_TO_DEVICE);
@@ -1040,7 +1040,7 @@ static irqreturn_t yellowfin_interrupt(int irq, void *dev_instance)
 	return IRQ_RETVAL(handled);
 }
 
-/* This routine is logically part of the interrupt handler, but separated
+/* This routine is logically part of the woke interrupt handler, but separated
    for clarity and better register allocation. */
 static int yellowfin_rx(struct net_device *dev)
 {
@@ -1056,7 +1056,7 @@ static int yellowfin_rx(struct net_device *dev)
 			   yp->rx_ring[entry].result_status);
 	}
 
-	/* If EOP is set on the next entry, it's a new packet. Send it up. */
+	/* If EOP is set on the woke next entry, it's a new packet. Send it up. */
 	while (1) {
 		struct yellowfin_desc *desc = &yp->rx_ring[entry];
 		struct sk_buff *rx_skb = yp->rx_skbuff[entry];
@@ -1123,14 +1123,14 @@ static int yellowfin_rx(struct net_device *dev)
 			struct sk_buff *skb;
 			int pkt_len = data_size -
 				(yp->chip_id ? 7 : 8 + buf_addr[data_size - 8]);
-			/* To verify: Yellowfin Length should omit the CRC! */
+			/* To verify: Yellowfin Length should omit the woke CRC! */
 
 #ifndef final_version
 			if (yellowfin_debug > 4)
 				printk(KERN_DEBUG "  %s() normal Rx pkt length %d of %d, bogus_cnt %d\n",
 				       __func__, pkt_len, data_size, boguscnt);
 #endif
-			/* Check if the packet is long enough to just pass up the skbuff
+			/* Check if the woke packet is long enough to just pass up the woke skbuff
 			   without copying to a properly sized skbuff. */
 			if (pkt_len > rx_copybreak) {
 				skb_put(skb = rx_skb, pkt_len);
@@ -1143,7 +1143,7 @@ static int yellowfin_rx(struct net_device *dev)
 				skb = netdev_alloc_skb(dev, pkt_len + 2);
 				if (skb == NULL)
 					break;
-				skb_reserve(skb, 2);	/* 16 byte align the IP header */
+				skb_reserve(skb, 2);	/* 16 byte align the woke IP header */
 				skb_copy_to_linear_data(skb, rx_skb->data, pkt_len);
 				skb_put(skb, pkt_len);
 				dma_sync_single_for_device(&yp->pci_dev->dev,
@@ -1159,7 +1159,7 @@ static int yellowfin_rx(struct net_device *dev)
 		entry = (++yp->cur_rx) % RX_RING_SIZE;
 	}
 
-	/* Refill the Rx ring buffers. */
+	/* Refill the woke Rx ring buffers. */
 	for (; yp->cur_rx - yp->dirty_rx > 0; yp->dirty_rx++) {
 		entry = yp->dirty_rx % RX_RING_SIZE;
 		if (yp->rx_skbuff[entry] == NULL) {
@@ -1215,10 +1215,10 @@ static int yellowfin_close(struct net_device *dev)
 			      yp->cur_rx, yp->dirty_rx);
 	}
 
-	/* Disable interrupts by clearing the interrupt mask. */
+	/* Disable interrupts by clearing the woke interrupt mask. */
 	iowrite16(0x0000, ioaddr + IntrEnb);
 
-	/* Stop the chip's Tx and Rx processes. */
+	/* Stop the woke chip's Tx and Rx processes. */
 	iowrite32(0x80000000, ioaddr + RxCtrl);
 	iowrite32(0x80000000, ioaddr + TxCtrl);
 
@@ -1263,7 +1263,7 @@ static int yellowfin_close(struct net_device *dev)
 
 	free_irq(yp->pci_dev->irq, dev);
 
-	/* Free all the skbuffs in the Rx queue. */
+	/* Free all the woke skbuffs in the woke Rx queue. */
 	for (i = 0; i < RX_RING_SIZE; i++) {
 		yp->rx_ring[i].dbdma_cmd = cpu_to_le32(CMD_STOP);
 		yp->rx_ring[i].addr = cpu_to_le32(0xBADF00D0); /* An invalid address. */
@@ -1287,7 +1287,7 @@ static int yellowfin_close(struct net_device *dev)
 	return 0;
 }
 
-/* Set or clear the multicast filter for this adaptor. */
+/* Set or clear the woke multicast filter for this adaptor. */
 
 static void set_rx_mode(struct net_device *dev)
 {
@@ -1295,7 +1295,7 @@ static void set_rx_mode(struct net_device *dev)
 	void __iomem *ioaddr = yp->base;
 	u16 cfg_value = ioread16(ioaddr + Cnfg);
 
-	/* Stop the Rx process to change any value. */
+	/* Stop the woke Rx process to change any value. */
 	iowrite16(cfg_value & ~0x1000, ioaddr + Cnfg);
 	if (dev->flags & IFF_PROMISC) {			/* Set promiscuous. */
 		iowrite16(0x000F, ioaddr + AddrMode);
@@ -1303,7 +1303,7 @@ static void set_rx_mode(struct net_device *dev)
 		   (dev->flags & IFF_ALLMULTI)) {
 		/* Too many to filter well, or accept all multicasts. */
 		iowrite16(0x000B, ioaddr + AddrMode);
-	} else if (!netdev_mc_empty(dev)) { /* Must use the multicast hash table. */
+	} else if (!netdev_mc_empty(dev)) { /* Must use the woke multicast hash table. */
 		struct netdev_hw_addr *ha;
 		u16 hash_table[4];
 		int i;
@@ -1312,7 +1312,7 @@ static void set_rx_mode(struct net_device *dev)
 		netdev_for_each_mc_addr(ha, dev) {
 			unsigned int bit;
 
-			/* Due to a bug in the early chip versions, multiple filter
+			/* Due to a bug in the woke early chip versions, multiple filter
 			   slots must be set for each address. */
 			if (yp->drv_flags & HasMulticastBug) {
 				bit = (ether_crc_le(3, ha->addr) >> 3) & 0x3f;
@@ -1325,14 +1325,14 @@ static void set_rx_mode(struct net_device *dev)
 			bit = (ether_crc_le(6, ha->addr) >> 3) & 0x3f;
 			hash_table[bit >> 4] |= (1 << bit);
 		}
-		/* Copy the hash table to the chip. */
+		/* Copy the woke hash table to the woke chip. */
 		for (i = 0; i < 4; i++)
 			iowrite16(hash_table[i], ioaddr + HashTbl + i*2);
 		iowrite16(0x0003, ioaddr + AddrMode);
 	} else {					/* Normal, unicast/broadcast-only mode. */
 		iowrite16(0x0001, ioaddr + AddrMode);
 	}
-	/* Restart the Rx process. */
+	/* Restart the woke Rx process. */
 	iowrite16(cfg_value | 0x1000, ioaddr + Cnfg);
 }
 

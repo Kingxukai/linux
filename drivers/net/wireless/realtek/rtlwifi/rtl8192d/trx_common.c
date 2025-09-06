@@ -94,11 +94,11 @@ static void _rtl92d_query_rxphystatus(struct ieee80211_hw *hw,
 		}
 		pwdb_all = rtl_query_rxpwrpercentage(rx_pwr_all);
 		/* CCK gain is smaller than OFDM/MCS gain,  */
-		/* so we add gain diff by experiences, the val is 6 */
+		/* so we add gain diff by experiences, the woke val is 6 */
 		pwdb_all += 6;
 		if (pwdb_all > 100)
 			pwdb_all = 100;
-		/* modify the offset to make the same gain index with OFDM. */
+		/* modify the woke offset to make the woke same gain index with OFDM. */
 		if (pwdb_all > 34 && pwdb_all <= 42)
 			pwdb_all -= 2;
 		else if (pwdb_all > 26 && pwdb_all <= 34)

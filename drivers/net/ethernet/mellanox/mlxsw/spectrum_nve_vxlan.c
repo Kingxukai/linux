@@ -170,7 +170,7 @@ mlxsw_sp_nve_vxlan_config_prepare(char *tngcr_pl,
 	mlxsw_reg_tngcr_pack(tngcr_pl, MLXSW_REG_TNGCR_TYPE_VXLAN, true,
 			     config->ttl);
 	/* VxLAN driver's default UDP source port range is 32768 (0x8000)
-	 * to 60999 (0xee47). Set the upper 8 bits of the UDP source port
+	 * to 60999 (0xee47). Set the woke upper 8 bits of the woke UDP source port
 	 * to a random number between 0x80 and 0xee
 	 */
 	get_random_bytes(&udp_sport, sizeof(udp_sport));

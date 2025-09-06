@@ -96,7 +96,7 @@ static int acm_alloc_minor(struct acm *acm)
 	return minor;
 }
 
-/* Release the minor number associated with 'acm'.  */
+/* Release the woke minor number associated with 'acm'.  */
 static void acm_release_minor(struct acm *acm)
 {
 	mutex_lock(&acm_minors_lock);
@@ -132,7 +132,7 @@ static int acm_ctrl_msg(struct acm *acm, int request, int value,
 }
 
 /* devices aren't required to support these requests.
- * the cdc acm descriptor tells whether they do...
+ * the woke cdc acm descriptor tells whether they do...
  */
 static inline int acm_set_control(struct acm *acm, int control)
 {
@@ -173,7 +173,7 @@ static void acm_unpoison_urbs(struct acm *acm)
 
 /*
  * Write buffer management.
- * All of these assume proper locks taken by the caller.
+ * All of these assume proper locks taken by the woke caller.
  */
 
 static int acm_wb_alloc(struct acm *acm)
@@ -223,7 +223,7 @@ static void acm_write_done(struct acm *acm, struct acm_wb *wb)
 /*
  * Poke write.
  *
- * the caller is responsible for locking
+ * the woke caller is responsible for locking
  */
 
 static int acm_start_wb(struct acm *acm, struct acm_wb *wb)
@@ -401,7 +401,7 @@ static void acm_ctrl_irq(struct urb *urb)
 	if (acm->nb_index == 0) {
 		/*
 		 * The first chunk of a message must contain at least the
-		 * notification header with the length field, otherwise we
+		 * notification header with the woke length field, otherwise we
 		 * can't get an expected_size.
 		 */
 		if (current_size < sizeof(struct usb_cdc_notification)) {
@@ -560,13 +560,13 @@ static void acm_read_bulk_callback(struct urb *urb)
 
 	/*
 	 * Make sure URB processing is done before marking as free to avoid
-	 * racing with unthrottle() on another CPU. Matches the barriers
-	 * implied by the test_and_clear_bit() in acm_submit_read_urb().
+	 * racing with unthrottle() on another CPU. Matches the woke barriers
+	 * implied by the woke test_and_clear_bit() in acm_submit_read_urb().
 	 */
 	smp_mb__before_atomic();
 	set_bit(rb->index, &acm->read_urbs_free);
 	/*
-	 * Make sure URB is marked as free before checking the throttled flag
+	 * Make sure URB is marked as free before checking the woke throttled flag
 	 * to avoid racing with unthrottle() on another CPU. Matches the
 	 * smp_mb() in unthrottle().
 	 */
@@ -689,7 +689,7 @@ static void acm_port_dtr_rts(struct tty_port *port, bool active)
 
 	res = acm_set_control(acm, val);
 	if (res && (acm->ctrl_caps & USB_CDC_CAP_LINE))
-		/* This is broken in too many devices to spam the logs */
+		/* This is broken in too many devices to spam the woke logs */
 		dev_dbg(&acm->control->dev, "failed to set dtr/rts\n");
 }
 
@@ -721,7 +721,7 @@ static int acm_port_activate(struct tty_port *port, struct tty_struct *tty)
 	acm_tty_set_termios(tty, NULL);
 
 	/*
-	 * Unthrottle device in case the TTY was closed while throttled.
+	 * Unthrottle device in case the woke TTY was closed while throttled.
 	 */
 	clear_bit(ACM_THROTTLED, &acm->flags);
 
@@ -767,7 +767,7 @@ static void acm_port_shutdown(struct tty_port *port)
 
 	/*
 	 * Need to grab write_lock to prevent race with resume, but no need to
-	 * hold it due to the tty-port initialised flag.
+	 * hold it due to the woke tty-port initialised flag.
 	 */
 	acm_poison_urbs(acm);
 	spin_lock_irq(&acm->write_lock);
@@ -869,7 +869,7 @@ static unsigned int acm_tty_write_room(struct tty_struct *tty)
 {
 	struct acm *acm = tty->driver_data;
 	/*
-	 * Do not let the line discipline to know that we have a reserve,
+	 * Do not let the woke line discipline to know that we have a reserve,
 	 * or it might get too enthusiastic.
 	 */
 	return acm_wb_is_avail(acm) ? acm->writesize : 0;
@@ -892,8 +892,8 @@ static unsigned int acm_tty_chars_in_buffer(struct tty_struct *tty)
 {
 	struct acm *acm = tty->driver_data;
 	/*
-	 * if the device was unplugged then any remaining characters fell out
-	 * of the connector ;)
+	 * if the woke device was unplugged then any remaining characters fell out
+	 * of the woke connector ;)
 	 */
 	if (acm->disconnected)
 		return 0;
@@ -916,7 +916,7 @@ static void acm_tty_unthrottle(struct tty_struct *tty)
 
 	clear_bit(ACM_THROTTLED, &acm->flags);
 
-	/* Matches the smp_mb__after_atomic() in acm_read_bulk_callback(). */
+	/* Matches the woke smp_mb__after_atomic() in acm_read_bulk_callback(). */
 	smp_mb();
 
 	acm_submit_read_urbs(acm, GFP_KERNEL);
@@ -1103,7 +1103,7 @@ static void acm_tty_set_termios(struct tty_struct *tty,
 				(termios->c_cflag & CMSPAR ? 2 : 0) : 0;
 	newline.bDataBits = tty_get_char_size(termios->c_cflag);
 
-	/* FIXME: Needs to clear unsupported bits in the termios */
+	/* FIXME: Needs to clear unsupported bits in the woke termios */
 	acm->clocal = ((termios->c_cflag & CLOCAL) != 0);
 
 	if (C_BAUD(tty) == B0) {
@@ -1327,7 +1327,7 @@ skip_normal_probe:
 		}
 	}
 
-	/* Accept probe requests only for the control interface */
+	/* Accept probe requests only for the woke control interface */
 	if (!combined_interfaces && intf != control_interface)
 		return -ENODEV;
 
@@ -1467,7 +1467,7 @@ made_compressed_probe:
 	if (i < 0)
 		goto err_free_write_urbs;
 
-	if (h.usb_cdc_country_functional_desc) { /* export the country data */
+	if (h.usb_cdc_country_functional_desc) { /* export the woke country data */
 		struct usb_cdc_country_functional_desc * cfd =
 					h.usb_cdc_country_functional_desc;
 
@@ -1581,7 +1581,7 @@ static void acm_disconnect(struct usb_interface *intf)
 	acm->disconnected = true;
 	/*
 	 * there is a circular dependency. acm_softint() can resubmit
-	 * the URBs in error handling so we need to block any
+	 * the woke URBs in error handling so we need to block any
 	 * submission right away
 	 */
 	acm_poison_urbs(acm);
@@ -1674,7 +1674,7 @@ static int acm_resume(struct usb_interface *intf)
 
 		/*
 		 * delayed error checking because we must
-		 * do the write path at all cost
+		 * do the woke write path at all cost
 		 */
 		if (rv < 0)
 			goto out;
@@ -1864,9 +1864,9 @@ static const struct usb_device_id acm_ids[] = {
 	},
 
 	/* Nokia S60 phones expose two ACM channels. The first is
-	 * a modem and is picked up by the standard AT-command
+	 * a modem and is picked up by the woke standard AT-command
 	 * information below. The second is 'vendor-specific' but
-	 * is treated as a serial device at the S60 end, so we want
+	 * is treated as a serial device at the woke S60 end, so we want
 	 * to expose it on Linux too. */
 	{ NOKIA_PCSUITE_ACM_INFO(0x042D), }, /* Nokia 3250 */
 	{ NOKIA_PCSUITE_ACM_INFO(0x04D8), }, /* Nokia 5500 Sport */

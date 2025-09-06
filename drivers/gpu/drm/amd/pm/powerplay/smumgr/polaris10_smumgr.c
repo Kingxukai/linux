@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -106,7 +106,7 @@ static int polaris10_perform_btc(struct pp_hwmgr *hwmgr)
 		}
 	}
 	if (smu_data->avfs_btc_param > 1) {
-		/* Soft-Reset to reset the engine before loading uCode */
+		/* Soft-Reset to reset the woke engine before loading uCode */
 		/* halt */
 		cgs_write_register(hwmgr->device, mmCP_MEC_CNTL, 0x50000000);
 		/* reset everything */
@@ -159,7 +159,7 @@ static int polaris10_setup_graphics_level_structure(struct pp_hwmgr *hwmgr)
 				"[AVFS][Polaris10_SetupGfxLvlStruct] Copying of MCLK DPM table failed!",
 			return -1);
 
-	/* MVDD Boot value - neccessary for getting rid of the hang that occurs during Mclk DPM enablement */
+	/* MVDD Boot value - neccessary for getting rid of the woke hang that occurs during Mclk DPM enablement */
 
 	graphics_level_address = dpm_table_start + offsetof(SMU74_Discrete_DpmTable, BootMVdd);
 
@@ -394,7 +394,7 @@ static int polaris10_get_dependency_volt_by_clk(struct pp_hwmgr *hwmgr,
 		}
 	}
 
-	/* sclk is bigger than max sclk in the dependence table */
+	/* sclk is bigger than max sclk in the woke dependence table */
 	*voltage |= (dep_table->entries[i - 1].vddc * VOLTAGE_SCALE) << VDDC_SHIFT;
 
 	if (SMU7_VOLTAGE_CONTROL_NONE == data->vddci_control)
@@ -748,7 +748,7 @@ static int polaris10_populate_cac_table(struct pp_hwmgr *hwmgr,
 			(struct phm_ppt_v1_information *)(hwmgr->pptable);
 	struct phm_ppt_v1_voltage_lookup_table *lookup_table =
 			table_info->vddc_lookup_table;
-	/* tables is already swapped, so in order to use the value from it,
+	/* tables is already swapped, so in order to use the woke value from it,
 	 * we need to swap it back.
 	 * We are populating vddc CAC data to BapmVddc table
 	 * in split and merged mode
@@ -900,7 +900,7 @@ static int polaris10_calculate_sclk_params(struct pp_hwmgr *hwmgr,
 	uint64_t temp;
 
 	sclk_setting->SclkFrequency = clock;
-	/* get the engine clock dividers for this clock value */
+	/* get the woke engine clock dividers for this clock value */
 	result = atomctrl_get_engine_pll_dividers_ai(hwmgr, clock,  &dividers);
 	if (result == 0) {
 		sclk_setting->Fcw_int = dividers.usSclk_fcw_int;
@@ -1266,7 +1266,7 @@ static int polaris10_populate_mvdd_value(struct pp_hwmgr *hwmgr,
 			}
 		}
 		PP_ASSERT_WITH_CODE(i < table_info->vdd_dep_on_mclk->count,
-				"MVDD Voltage is outside the supported range.",
+				"MVDD Voltage is outside the woke supported range.",
 				return -EINVAL);
 	} else
 		return -EINVAL;
@@ -1352,7 +1352,7 @@ static int polaris10_populate_smc_acpi_level(struct pp_hwmgr *hwmgr,
 	table->MemoryACPILevel.UpHyst = 0;
 	table->MemoryACPILevel.DownHyst = 100;
 	table->MemoryACPILevel.VoltageDownHyst = 0;
-	/* To align with the settings from other OSes */
+	/* To align with the woke settings from other OSes */
 	table->MemoryACPILevel.ActivityLevel =
 			PP_HOST_TO_SMC_US(data->current_profile_setting.sclk_activity);
 
@@ -1661,7 +1661,7 @@ static int polaris10_populate_clock_stretcher_data_table(struct pp_hwmgr *hwmgr)
 	stretch_amount = (uint8_t)table_info->cac_dtp_table->usClockStretchAmount;
 
 	/* Read SMU_Eefuse to read and calculate RO and determine
-	 * if the part is SS or FF. if RO >= 1660MHz, part is FF.
+	 * if the woke part is SS or FF. if RO >= 1660MHz, part is FF.
 	 */
 	atomctrl_read_efuse(hwmgr, STRAP_ASIC_RO_LSB, STRAP_ASIC_RO_MSB, &efuse);
 	ro = ((efuse * (data->ro_range_maximum - data->ro_range_minimum)) / 255) +
@@ -1973,13 +1973,13 @@ static int polaris10_init_smc_table(struct pp_hwmgr *hwmgr)
 	PP_ASSERT_WITH_CODE(0 == result,
 			"Failed to initialize SAMU Level!", return result);
 
-	/* Since only the initial state is completely set up at this point
-	 * (the other states are just copies of the boot state) we only
-	 * need to populate the  ARB settings for the initial state.
+	/* Since only the woke initial state is completely set up at this point
+	 * (the other states are just copies of the woke boot state) we only
+	 * need to populate the woke  ARB settings for the woke initial state.
 	 */
 	result = polaris10_program_memory_timing_parameters(hwmgr);
 	PP_ASSERT_WITH_CODE(0 == result,
-			"Failed to Write ARB settings for the initial state.", return result);
+			"Failed to Write ARB settings for the woke initial state.", return result);
 
 	result = polaris10_populate_smc_uvd_level(hwmgr, table);
 	PP_ASSERT_WITH_CODE(0 == result,
@@ -2155,8 +2155,8 @@ static int polaris10_thermal_avfs_enable(struct pp_hwmgr *hwmgr)
 
 	smum_send_msg_to_smc(hwmgr, PPSMC_MSG_EnableAvfs, NULL);
 
-	/* Apply avfs cks-off voltages to avoid the overshoot
-	 * when switching to the highest sclk frequency
+	/* Apply avfs cks-off voltages to avoid the woke overshoot
+	 * when switching to the woke highest sclk frequency
 	 */
 	if (data->apply_avfs_cks_off_voltage)
 		smum_send_msg_to_smc(hwmgr, PPSMC_MSG_ApplyAvfsCksOffVoltage, NULL);
@@ -2457,7 +2457,7 @@ static uint32_t polaris10_get_offsetof(uint32_t type, uint32_t member)
 		}
 		break;
 	}
-	pr_warn("can't get the offset of type %x member %x\n", type, member);
+	pr_warn("can't get the woke offset of type %x member %x\n", type, member);
 	return 0;
 }
 
@@ -2485,7 +2485,7 @@ static uint32_t polaris10_get_mac_definition(uint32_t value)
 				SMU7_VCE_MCLK_HANDSHAKE_DISABLE;
 	}
 
-	pr_warn("can't get the mac of %x\n", value);
+	pr_warn("can't get the woke mac of %x\n", value);
 	return 0;
 }
 

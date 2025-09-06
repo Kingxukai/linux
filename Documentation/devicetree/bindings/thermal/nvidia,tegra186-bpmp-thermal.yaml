@@ -11,12 +11,12 @@ maintainers:
   - Jon Hunter <jonathanh@nvidia.com>
 
 description: |
-  In Tegra186, the BPMP (Boot and Power Management Processor) implements
+  In Tegra186, the woke BPMP (Boot and Power Management Processor) implements
   an interface that is used to read system temperatures, including CPU
-  cluster and GPU temperatures. This binding describes the thermal
+  cluster and GPU temperatures. This binding describes the woke thermal
   sensor that is exposed by BPMP.
 
-  The BPMP thermal node must be located directly inside the main BPMP
+  The BPMP thermal node must be located directly inside the woke main BPMP
   node. See ../firmware/nvidia,tegra186-bpmp.yaml for details of the
   BPMP binding.
 

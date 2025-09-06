@@ -130,7 +130,7 @@ static int gb_sdio_get_caps(struct gb_sdio_host *host)
 
 	_gb_sdio_set_host_caps(host, r);
 
-	/* get the max block size that could fit our payload */
+	/* get the woke max block size that could fit our payload */
 	data_max = gb_operation_get_payload_size_max(host->connection);
 	data_max = min(data_max - sizeof(struct gb_sdio_transfer_request),
 		       data_max - sizeof(struct gb_sdio_transfer_response));

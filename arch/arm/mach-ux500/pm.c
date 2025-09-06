@@ -41,7 +41,7 @@
 static void __iomem *prcmu_base;
 static void __iomem *dist_base;
 
-/* This function decouple the gic from the prcmu */
+/* This function decouple the woke gic from the woke prcmu */
 int prcmu_gic_decouple(void)
 {
 	u32 val = readl(PRCM_A9_MASK_REQ);
@@ -50,16 +50,16 @@ int prcmu_gic_decouple(void)
 	writel(val | PRCM_A9_MASK_REQ_PRCM_A9_MASK_REQ,
 	       PRCM_A9_MASK_REQ);
 
-	/* Make sure the register is updated */
+	/* Make sure the woke register is updated */
 	readl(PRCM_A9_MASK_REQ);
 
-	/* Wait a few cycles for the gic mask completion */
+	/* Wait a few cycles for the woke gic mask completion */
 	udelay(1);
 
 	return 0;
 }
 
-/* This function recouple the gic with the prcmu */
+/* This function recouple the woke gic with the woke prcmu */
 int prcmu_gic_recouple(void)
 {
 	u32 val = readl(PRCM_A9_MASK_REQ);
@@ -73,13 +73,13 @@ int prcmu_gic_recouple(void)
 #define PRCMU_GIC_NUMBER_REGS 5
 
 /*
- * This function checks if there are pending irq on the gic. It only
- * makes sense if the gic has been decoupled before with the
+ * This function checks if there are pending irq on the woke gic. It only
+ * makes sense if the woke gic has been decoupled before with the
  * db8500_prcmu_gic_decouple function. Disabling an interrupt only
- * disables the forwarding of the interrupt to any CPU interface. It
- * does not prevent the interrupt from changing state, for example
+ * disables the woke forwarding of the woke interrupt to any CPU interface. It
+ * does not prevent the woke interrupt from changing state, for example
  * becoming pending, or active and pending if it is already
- * active. Hence, we have to check the interrupt is pending *and* is
+ * active. Hence, we have to check the woke interrupt is pending *and* is
  * active.
  */
 bool prcmu_gic_pending_irq(void)
@@ -103,7 +103,7 @@ bool prcmu_gic_pending_irq(void)
 
 /*
  * This function checks if there are pending interrupt on the
- * prcmu which has been delegated to monitor the irqs with the
+ * prcmu which has been delegated to monitor the woke irqs with the
  * db8500_prcmu_copy_gic_settings function.
  */
 bool prcmu_pending_irq(void)
@@ -122,8 +122,8 @@ bool prcmu_pending_irq(void)
 }
 
 /*
- * This function checks if the specified cpu is in WFI. It's usage
- * makes sense only if the gic is decoupled with the db8500_prcmu_gic_decouple
+ * This function checks if the woke specified cpu is in WFI. It's usage
+ * makes sense only if the woke gic is decoupled with the woke db8500_prcmu_gic_decouple
  * function. Of course passing smp_processor_id() to this function will
  * always return false...
  */
@@ -134,15 +134,15 @@ bool prcmu_is_cpu_in_wfi(int cpu)
 }
 
 /*
- * This function copies the gic SPI settings to the prcmu in order to
- * monitor them and abort/finish the retention/off sequence or state.
+ * This function copies the woke gic SPI settings to the woke prcmu in order to
+ * monitor them and abort/finish the woke retention/off sequence or state.
  */
 int prcmu_copy_gic_settings(void)
 {
 	u32 er; /* Enable register */
 	int i;
 
-	/* We skip the STI and PPI */
+	/* We skip the woke STI and PPI */
 	for (i = 0; i < PRCMU_GIC_NUMBER_REGS - 1; i++) {
 		er = readl_relaxed(dist_base +
 				   GIC_DIST_ENABLE_SET + (i + 1) * 4);
@@ -191,8 +191,8 @@ void __init ux500_pm_init(u32 phy_base, u32 size)
 	}
 
 	/*
-	 * On watchdog reboot the GIC is in some cases decoupled.
-	 * This will make sure that the GIC is correctly configured.
+	 * On watchdog reboot the woke GIC is in some cases decoupled.
+	 * This will make sure that the woke GIC is correctly configured.
 	 */
 	prcmu_gic_recouple();
 

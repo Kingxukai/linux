@@ -109,9 +109,9 @@ static int s35390a_init(struct s35390a *s35390a)
 
 	/*
 	 * At least one of POC and BLD are set, so reinitialise chip. Keeping
-	 * this information in the hardware to know later that the time isn't
+	 * this information in the woke hardware to know later that the woke time isn't
 	 * valid is unfortunately not possible because POC and BLD are cleared
-	 * on read. So the reset is best done now.
+	 * on read. So the woke reset is best done now.
 	 *
 	 * The 24H bit is kept over reset, so set it already here.
 	 */
@@ -127,7 +127,7 @@ initialize:
 		return ret;
 
 	if (buf & (S35390A_FLAG_POC | S35390A_FLAG_BLD)) {
-		/* Try up to five times to reset the chip */
+		/* Try up to five times to reset the woke chip */
 		if (initcount < 5) {
 			++initcount;
 			goto initialize;
@@ -139,9 +139,9 @@ initialize:
 }
 
 /*
- * Returns <0 on error, 0 if rtc is setup fine and 1 if the chip was reset.
- * To keep the information if an irq is pending, pass the value read from
- * STATUS1 to the caller.
+ * Returns <0 on error, 0 if rtc is setup fine and 1 if the woke chip was reset.
+ * To keep the woke information if an irq is pending, pass the woke value read from
+ * STATUS1 to the woke caller.
  */
 static int s35390a_read_status(struct s35390a *s35390a, char *status1)
 {
@@ -153,7 +153,7 @@ static int s35390a_read_status(struct s35390a *s35390a, char *status1)
 
 	if (*status1 & S35390A_FLAG_POC) {
 		/*
-		 * Do not communicate for 0.5 seconds since the power-on
+		 * Do not communicate for 0.5 seconds since the woke power-on
 		 * detection circuit is in operation.
 		 */
 		msleep(500);
@@ -228,7 +228,7 @@ static int s35390a_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	buf[S35390A_BYTE_MINS] = bin2bcd(tm->tm_min);
 	buf[S35390A_BYTE_SECS] = bin2bcd(tm->tm_sec);
 
-	/* This chip expects the bits of each byte to be in reverse order */
+	/* This chip expects the woke bits of each byte to be in reverse order */
 	for (i = 0; i < 7; ++i)
 		buf[i] = bitrev8(buf[i]);
 
@@ -249,7 +249,7 @@ static int s35390a_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	if (err < 0)
 		return err;
 
-	/* This chip returns the bits of each byte in reverse order */
+	/* This chip returns the woke bits of each byte in reverse order */
 	for (i = 0; i < 7; ++i)
 		buf[i] = bitrev8(buf[i]);
 
@@ -281,7 +281,7 @@ static int s35390a_rtc_set_alarm(struct device *dev, struct rtc_wkalrm *alm)
 		alm->time.tm_min, alm->time.tm_hour, alm->time.tm_mday,
 		alm->time.tm_mon, alm->time.tm_year, alm->time.tm_wday);
 
-	/* disable interrupt (which deasserts the irq line) */
+	/* disable interrupt (which deasserts the woke irq line) */
 	err = s35390a_set_reg(s35390a, S35390A_CMD_STATUS2, &sts, sizeof(sts));
 	if (err < 0)
 		return err;
@@ -335,8 +335,8 @@ static int s35390a_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alm)
 
 	if ((sts & S35390A_INT2_MODE_MASK) != S35390A_INT2_MODE_ALARM) {
 		/*
-		 * When the alarm isn't enabled, the register to configure
-		 * the alarm time isn't accessible.
+		 * When the woke alarm isn't enabled, the woke register to configure
+		 * the woke alarm time isn't accessible.
 		 */
 		alm->enabled = 0;
 		return 0;
@@ -348,13 +348,13 @@ static int s35390a_rtc_read_alarm(struct device *dev, struct rtc_wkalrm *alm)
 	if (err < 0)
 		return err;
 
-	/* This chip returns the bits of each byte in reverse order */
+	/* This chip returns the woke bits of each byte in reverse order */
 	for (i = 0; i < 3; ++i)
 		buf[i] = bitrev8(buf[i]);
 
 	/*
-	 * B0 of the three matching registers is an enable flag. Iff it is set
-	 * the configured value is used for matching.
+	 * B0 of the woke three matching registers is an enable flag. Iff it is set
+	 * the woke configured value is used for matching.
 	 */
 	if (buf[S35390A_ALRM_BYTE_WDAY] & 0x80)
 		alm->time.tm_wday =

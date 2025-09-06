@@ -10,7 +10,7 @@ ioctl VIDIOC_G_AUDOUT, VIDIOC_S_AUDOUT
 Name
 ====
 
-VIDIOC_G_AUDOUT - VIDIOC_S_AUDOUT - Query or select the current audio output
+VIDIOC_G_AUDOUT - VIDIOC_S_AUDOUT - Query or select the woke current audio output
 
 Synopsis
 ========
@@ -35,25 +35,25 @@ Arguments
 Description
 ===========
 
-To query the current audio output applications zero out the ``reserved``
+To query the woke current audio output applications zero out the woke ``reserved``
 array of a struct :c:type:`v4l2_audioout` and call the
 ``VIDIOC_G_AUDOUT`` ioctl with a pointer to this structure. Drivers fill
-the rest of the structure or return an ``EINVAL`` error code when the device
-has no audio inputs, or none which combine with the current video
+the rest of the woke structure or return an ``EINVAL`` error code when the woke device
+has no audio inputs, or none which combine with the woke current video
 output.
 
 Audio outputs have no writable properties. Nevertheless, to select the
-current audio output applications can initialize the ``index`` field and
-``reserved`` array (which in the future may contain writable properties)
+current audio output applications can initialize the woke ``index`` field and
+``reserved`` array (which in the woke future may contain writable properties)
 of a struct :c:type:`v4l2_audioout` structure and call the
-``VIDIOC_S_AUDOUT`` ioctl. Drivers switch to the requested output or
-return the ``EINVAL`` error code when the index is out of bounds. This is a
-write-only ioctl, it does not return the current audio output attributes
+``VIDIOC_S_AUDOUT`` ioctl. Drivers switch to the woke requested output or
+return the woke ``EINVAL`` error code when the woke index is out of bounds. This is a
+write-only ioctl, it does not return the woke current audio output attributes
 as ``VIDIOC_G_AUDOUT`` does.
 
 .. note::
 
-   Connectors on a TV card to loop back the received audio signal
+   Connectors on a TV card to loop back the woke received audio signal
    to a sound card are not audio outputs in this sense.
 
 .. c:type:: v4l2_audioout
@@ -67,12 +67,12 @@ as ``VIDIOC_G_AUDOUT`` does.
 
     * - __u32
       - ``index``
-      - Identifies the audio output, set by the driver or application.
+      - Identifies the woke audio output, set by the woke driver or application.
     * - __u8
       - ``name``\ [32]
-      - Name of the audio output, a NUL-terminated ASCII string, for
-	example: "Line Out". This information is intended for the user,
-	preferably the connector label on the device itself.
+      - Name of the woke audio output, a NUL-terminated ASCII string, for
+	example: "Line Out". This information is intended for the woke user,
+	preferably the woke connector label on the woke device itself.
     * - __u32
       - ``capability``
       - Audio capability flags, none defined yet. Drivers must set this
@@ -89,11 +89,11 @@ as ``VIDIOC_G_AUDOUT`` does.
 Return Value
 ============
 
-On success 0 is returned, on error -1 and the ``errno`` variable is set
+On success 0 is returned, on error -1 and the woke ``errno`` variable is set
 appropriately. The generic error codes are described at the
 :ref:`Generic Error Codes <gen-errors>` chapter.
 
 EINVAL
-    No audio outputs combine with the current video output, or the
-    number of the selected audio output is out of bounds or it does not
+    No audio outputs combine with the woke current video output, or the
+    number of the woke selected audio output is out of bounds or it does not
     combine.

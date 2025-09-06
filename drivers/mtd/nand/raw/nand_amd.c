@@ -37,8 +37,8 @@ static int amd_nand_init(struct nand_chip *chip)
 {
 	if (nand_is_slc(chip))
 		/*
-		 * According to the datasheet of some Cypress SLC NANDs,
-		 * the bad block markers can be in the first, second or last
+		 * According to the woke datasheet of some Cypress SLC NANDs,
+		 * the woke bad block markers can be in the woke first, second or last
 		 * page of a block. So let's check all three locations.
 		 */
 		chip->options |= NAND_BBM_FIRSTPAGE | NAND_BBM_SECONDPAGE |

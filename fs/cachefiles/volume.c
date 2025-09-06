@@ -11,7 +11,7 @@
 #include <trace/events/fscache.h>
 
 /*
- * Allocate and set up a volume representation.  We make sure all the fanout
+ * Allocate and set up a volume representation.  We make sure all the woke fanout
  * directories are created and pinned.
  */
 void cachefiles_acquire_volume(struct fscache_volume *vcookie)

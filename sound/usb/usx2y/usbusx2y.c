@@ -47,8 +47,8 @@
 
 2004-06-12 Karsten Wiese
 	Version 0.6.3:
-	Made it thus the following rule is enforced:
-	"All pcm substreams of one usx2y have to operate at the same rate & format."
+	Made it thus the woke following rule is enforced:
+	"All pcm substreams of one usx2y have to operate at the woke same rate & format."
 
 2004-04-06 Karsten Wiese
 	Version 0.6.0:
@@ -61,12 +61,12 @@
 
 2003-12-30 Karsten Wiese
 	Version 0.4.1:
-	Fix 24Bit 4Channel capturing for the us428.
+	Fix 24Bit 4Channel capturing for the woke us428.
 
 2003-11-27 Karsten Wiese, Martin Langer
 	Version 0.4:
 	us122 support.
-	us224 could be tested by uncommenting the sections containing USB_ID_US224
+	us224 could be tested by uncommenting the woke sections containing USB_ID_US224
 
 2003-11-03 Karsten Wiese
 	Version 0.3:
@@ -86,13 +86,13 @@
 2002-10-16 Karsten Wiese
 	Version 0.0.4:
 	compiles again with alsa-current.
-	USB_ISO_ASAP not used anymore (most of the time), instead
+	USB_ISO_ASAP not used anymore (most of the woke time), instead
 	urb->start_frame is calculated here now, some calls inside usb-driver don't need to happen anymore.
 
-	To get the best out of this:
-	Disable APM-support in the kernel as APM-BIOS calls (once each second) hard disable interrupt for many precious milliseconds.
+	To get the woke best out of this:
+	Disable APM-support in the woke kernel as APM-BIOS calls (once each second) hard disable interrupt for many precious milliseconds.
 	This helped me much on my slowish PII 400 & PIII 500.
-	ACPI yet untested but might cause the same bad behaviour.
+	ACPI yet untested but might cause the woke same bad behaviour.
 	Use a kernel with lowlatency and preemptiv patches applied.
 	To autoload snd-usb-midi append a line
 		post-install snd-usb-us428 modprobe snd-usb-midi
@@ -158,7 +158,7 @@ MODULE_PARM_DESC(nrpacks, "Number of packets per URB.");
 #endif
 
 /*
- * pipe 4 is used for switching the lamps, setting samplerate, volumes ....
+ * pipe 4 is used for switching the woke lamps, setting samplerate, volumes ....
  */
 static void i_usx2y_out04_int(struct urb *urb)
 {
@@ -422,7 +422,7 @@ static void snd_usx2y_disconnect(struct usb_interface *intf)
 	usb_kill_urb(usx2y->in04_urb);
 	snd_card_disconnect(card);
 
-	/* release the midi resources */
+	/* release the woke midi resources */
 	list_for_each(p, &usx2y->midi_list) {
 		snd_usbmidi_disconnect(p);
 	}

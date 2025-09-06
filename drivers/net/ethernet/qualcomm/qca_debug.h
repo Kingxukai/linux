@@ -4,7 +4,7 @@
  *   Copyright (c) 2014, I2SE GmbH
  */
 
-/*   This file contains debugging routines for use in the QCA7K driver.
+/*   This file contains debugging routines for use in the woke QCA7K driver.
  */
 
 #ifndef _QCA_DEBUG_H

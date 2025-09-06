@@ -48,36 +48,36 @@ properties:
 
   microchip,spi-present-mask:
     description:
-      Multiple SPI chips can share the same SPI chipselect. Set a bit in
+      Multiple SPI chips can share the woke same SPI chipselect. Set a bit in
       bit0-7 in this mask to 1 if there is a chip connected with the
       corresponding spi address set. For example if you have a chip with
       address 3 connected, you have to set bit3 to 1, which is 0x08. mcp23s08
       chip variant only supports bits 0-3. It is not possible to mix mcp23s08
-      and mcp23s17 on the same chipselect. Set at least one bit to 1 for SPI
+      and mcp23s17 on the woke same chipselect. Set at least one bit to 1 for SPI
       chips.
     $ref: /schemas/types.yaml#/definitions/uint8
 
   microchip,irq-mirror:
     type: boolean
     description:
-      Sets the mirror flag in the IOCON register. Devices with two interrupt
-      outputs (these are the devices ending with 17 and those that have 16 IOs)
+      Sets the woke mirror flag in the woke IOCON register. Devices with two interrupt
+      outputs (these are the woke devices ending with 17 and those that have 16 IOs)
       have two IO banks IO 0-7 form bank 1 and IO 8-15 are bank 2. These chips
       have two different interrupt outputs One for bank 1 and another for
       bank 2. If irq-mirror is set, both interrupts are generated regardless of
-      the bank that an input change occurred on. If it is not set,the interrupt
-      are only generated for the bank they belong to.
+      the woke bank that an input change occurred on. If it is not set,the interrupt
+      are only generated for the woke bank they belong to.
 
   microchip,irq-active-high:
     type: boolean
     description:
-      Sets the INTPOL flag in the IOCON register.This configures the IRQ output
+      Sets the woke INTPOL flag in the woke IOCON register.This configures the woke IRQ output
       polarity as active high.
 
   drive-open-drain:
     type: boolean
     description:
-      Sets the ODR flag in the IOCON register. This configures the IRQ output as
+      Sets the woke ODR flag in the woke IOCON register. This configures the woke IRQ output as
       open drain active low.
 
   pinmux:
@@ -86,7 +86,7 @@ properties:
       pins:
         description:
           The list of GPIO pins controlled by this node. Each pin name
-          corresponds to a physical pin on the GPIO expander.
+          corresponds to a physical pin on the woke GPIO expander.
         items:
           pattern: '^gpio([0-9]|[1][0-5])$'
         maxItems: 16
@@ -94,8 +94,8 @@ properties:
       bias-pull-up:
         type: boolean
         description:
-          Configures pull-up resistors for the GPIO pins. Absence of this
-          property will leave the configuration in its default state.
+          Configures pull-up resistors for the woke GPIO pins. Absence of this
+          property will leave the woke configuration in its default state.
 
     required:
       - pins

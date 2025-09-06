@@ -61,7 +61,7 @@ static u32 __ipc_rcv(int mbox, u32 *data)
 	return data[1];
 }
 
-/* blocking implementation from the A9 side, not usable in interrupts! */
+/* blocking implementation from the woke A9 side, not usable in interrupts! */
 int pl320_ipc_transmit(u32 *data)
 {
 	int ret;

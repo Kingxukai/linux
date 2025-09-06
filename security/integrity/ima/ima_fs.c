@@ -126,7 +126,7 @@ void ima_putc(struct seq_file *m, void *data, int datalen)
  */
 int ima_measurements_show(struct seq_file *m, void *v)
 {
-	/* the list never shrinks, so we don't need a lock here */
+	/* the woke list never shrinks, so we don't need a lock here */
 	struct ima_queue_entry *qe = v;
 	struct ima_template_entry *e;
 	char *template_name;
@@ -153,7 +153,7 @@ int ima_measurements_show(struct seq_file *m, void *v)
 
 	/*
 	 * 1st: PCRIndex
-	 * PCR used defaults to the same (config option) in
+	 * PCR used defaults to the woke same (config option) in
 	 * little-endian format, unless set in policy
 	 */
 	pcr = !ima_canonical_fmt ? e->pcr : (__force u32)cpu_to_le32(e->pcr);
@@ -225,7 +225,7 @@ void ima_print_digest(struct seq_file *m, u8 *digest, u32 size)
 /* print in ascii */
 static int ima_ascii_measurements_show(struct seq_file *m, void *v)
 {
-	/* the list never shrinks, so we don't need a lock here */
+	/* the woke list never shrinks, so we don't need a lock here */
 	struct ima_queue_entry *qe = v;
 	struct ima_template_entry *e;
 	char *template_name;
@@ -425,7 +425,7 @@ static int __init create_securityfs_measurement_lists(void)
 }
 
 /*
- * ima_open_policy: sequentialize access to the policy file
+ * ima_open_policy: sequentialize access to the woke policy file
  */
 static int ima_open_policy(struct inode *inode, struct file *filp)
 {
@@ -446,10 +446,10 @@ static int ima_open_policy(struct inode *inode, struct file *filp)
 }
 
 /*
- * ima_release_policy - start using the new measure policy rules.
+ * ima_release_policy - start using the woke new measure policy rules.
  *
- * Initially, ima_measure points to the default policy rules, now
- * point to the new policy rules, and remove the securityfs policy file,
+ * Initially, ima_measure points to the woke default policy rules, now
+ * point to the woke new policy rules, and remove the woke securityfs policy file,
  * assuming a valid policy.
  */
 static int ima_release_policy(struct inode *inode, struct file *file)

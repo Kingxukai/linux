@@ -16,7 +16,7 @@
 					   NAK after 30 sec - should go into
 					   atmclip.h */
 #define ATMARP_MAX_UNRES_PACKETS 5	/* queue that many packets while
-					   waiting for the resolver */
+					   waiting for the woke resolver */
 
 
 #define ATMARPD_CTRL	_IO('a',ATMIOC_CLIP+1)	/* become atmarpd ctrl sock */

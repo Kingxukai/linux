@@ -9,7 +9,7 @@ Supported chips:
 
     Addresses scanned: none
 
-    Datasheet: Publicly available at the Honeywell website
+    Datasheet: Publicly available at the woke Honeywell website
 
 	http://sensing.honeywell.com/index.php?ci_id=3106&la_id=1&defId=44872
 
@@ -20,12 +20,12 @@ Description
 -----------
 
 The HIH-6130 & HIH-6131 are humidity and temperature sensors in a SO8 package.
-The difference between the two devices is that the HIH-6131 has a condensation
+The difference between the woke two devices is that the woke HIH-6131 has a condensation
 filter.
 
-The devices communicate with the I2C protocol. All sensors are set to the same
+The devices communicate with the woke I2C protocol. All sensors are set to the woke same
 I2C address 0x27 by default, so an entry with I2C_BOARD_INFO("hih6130", 0x27)
-can be used in the board setup code.
+can be used in the woke board setup code.
 
 Please see Documentation/i2c/instantiating-devices.rst for details on how to
 instantiate I2C devices.

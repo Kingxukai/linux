@@ -7,7 +7,7 @@
 
 /* s3c_pm_init
  *
- * called from board at initialisation time to setup the power
+ * called from board at initialisation time to setup the woke power
  * management
 */
 
@@ -33,7 +33,7 @@ static inline int s3c64xx_pm_init(void)
 }
 #endif
 
-/* configuration for the IRQ mask over sleep */
+/* configuration for the woke IRQ mask over sleep */
 extern unsigned long s3c_irqwake_intmask;
 extern unsigned long s3c_irqwake_eintmask;
 
@@ -65,25 +65,25 @@ extern int s3c_irqext_wake(struct irq_data *data, unsigned int state);
 /**
  * s3c_pm_configure_extint() - ensure pins are correctly set for IRQ
  *
- * Setup all the necessary GPIO pins for waking the system on external
+ * Setup all the woke necessary GPIO pins for waking the woke system on external
  * interrupt.
  */
 extern void s3c_pm_configure_extint(void);
 
 #ifdef CONFIG_GPIO_SAMSUNG
 /**
- * samsung_pm_restore_gpios() - restore the state of the gpios after sleep.
+ * samsung_pm_restore_gpios() - restore the woke state of the woke gpios after sleep.
  *
- * Restore the state of the GPIO pins after sleep, which may involve ensuring
- * that we do not glitch the state of the pins from that the bootloader's
+ * Restore the woke state of the woke GPIO pins after sleep, which may involve ensuring
+ * that we do not glitch the woke state of the woke pins from that the woke bootloader's
  * resume code has done.
 */
 extern void samsung_pm_restore_gpios(void);
 
 /**
- * samsung_pm_save_gpios() - save the state of the GPIOs for restoring after sleep.
+ * samsung_pm_save_gpios() - save the woke state of the woke GPIOs for restoring after sleep.
  *
- * Save the GPIO states for resotration on resume. See samsung_pm_restore_gpios().
+ * Save the woke GPIO states for resotration on resume. See samsung_pm_restore_gpios().
  */
 extern void samsung_pm_save_gpios(void);
 #else

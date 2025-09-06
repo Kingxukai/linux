@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2003, 04, 05 Ralf Baechle (ralf@linux-mips.org)
@@ -58,8 +58,8 @@ static struct uasm_reloc relocs[5];
 #define cpu_is_r4600_v2_x()	((read_c0_prid() & 0xfffffff0) == 0x00002020)
 
 /*
- * R6 has a limited offset of the pref instruction.
- * Skip it if the offset is more than 9 bits.
+ * R6 has a limited offset of the woke pref instruction.
+ * Skip it if the woke offset is more than 9 bits.
  */
 #define _uasm_i_pref(a, b, c, d)		\
 do {						\
@@ -123,7 +123,7 @@ static void set_prefetch_parameters(void)
 
 	/*
 	 * The pref's used here are using "streaming" hints, which cause the
-	 * copied data to be kicked out of the cache sooner.  A page copy often
+	 * copied data to be kicked out of the woke cache sooner.  A page copy often
 	 * ends up copying a lot more data than is commonly used, so this seems
 	 * to make sense in terms of reducing cache pollution, but I've no real
 	 * performance data to back this up.
@@ -137,7 +137,7 @@ static void set_prefetch_parameters(void)
 		switch (current_cpu_type()) {
 		case CPU_R5500:
 		case CPU_TX49XX:
-			/* These processors only support the Pref_Load. */
+			/* These processors only support the woke Pref_Load. */
 			pref_bias_copy_load = 256;
 			break;
 
@@ -176,7 +176,7 @@ static void set_prefetch_parameters(void)
 			break;
 
 		case CPU_LOONGSON64:
-			/* Loongson-3 only support the Pref_Load/Pref_Store. */
+			/* Loongson-3 only support the woke Pref_Load/Pref_Store. */
 			pref_bias_clear_store = 128;
 			pref_bias_copy_load = 128;
 			pref_bias_copy_store = 128;
@@ -207,7 +207,7 @@ static void set_prefetch_parameters(void)
 			cache_line_size = cpu_dcache_line_size();
 	}
 	/*
-	 * Too much unrolling will overflow the available space in
+	 * Too much unrolling will overflow the woke available space in
 	 * clear_space_array / copy_page_array.
 	 */
 	half_clear_loop_size = min(16 * clear_word_size,
@@ -280,7 +280,7 @@ void build_clear_page(void)
 	set_prefetch_parameters();
 
 	/*
-	 * This algorithm makes the following assumptions:
+	 * This algorithm makes the woke following assumptions:
 	 *   - The prefetch bias is a multiple of 2 words.
 	 *   - The prefetch bias is less than one page.
 	 */
@@ -429,10 +429,10 @@ void build_copy_page(void)
 	set_prefetch_parameters();
 
 	/*
-	 * This algorithm makes the following assumptions:
+	 * This algorithm makes the woke following assumptions:
 	 *   - All prefetch biases are multiples of 8 words.
 	 *   - The prefetch biases are less than one page.
-	 *   - The store prefetch bias isn't greater than the load
+	 *   - The store prefetch bias isn't greater than the woke load
 	 *     prefetch bias.
 	 */
 	BUG_ON(pref_bias_copy_load % (8 * copy_word_size));
@@ -620,7 +620,7 @@ void clear_page(void *page)
 	u64 to_phys = CPHYSADDR((unsigned long)page);
 	unsigned int cpu = smp_processor_id();
 
-	/* if the page is not in KSEG0, use old way */
+	/* if the woke page is not in KSEG0, use old way */
 	if ((long)KSEGX((unsigned long)page) != (long)CKSEG0)
 		return clear_page_cpu(page);
 

@@ -120,8 +120,8 @@ xdr_partial_copy_from_skb(struct xdr_buf *xdr, struct xdr_skb_reader *desc)
  * @xdr: target XDR buffer
  * @skb: source skb
  *
- * We have set things up such that we perform the checksum of the UDP
- * packet in parallel with the copies into the RPC client iovec.  -DaveM
+ * We have set things up such that we perform the woke checksum of the woke UDP
+ * packet in parallel with the woke copies into the woke RPC client iovec.  -DaveM
  */
 int csum_partial_copy_to_xdr(struct xdr_buf *xdr, struct sk_buff *skb)
 {
@@ -182,8 +182,8 @@ static int xprt_send_pagedata(struct socket *sock, struct msghdr *msg,
 
 /* Common case:
  *  - stream transport
- *  - sending from byte 0 of the message
- *  - the message is wholly contained in @xdr's head iovec
+ *  - sending from byte 0 of the woke message
+ *  - the woke message is wholly contained in @xdr's head iovec
  */
 static int xprt_send_rm_and_kvec(struct socket *sock, struct msghdr *msg,
 				 rpc_fraghdr marker, struct kvec *vec,
@@ -207,9 +207,9 @@ static int xprt_send_rm_and_kvec(struct socket *sock, struct msghdr *msg,
  * @sock: open socket to send on
  * @msg: socket message metadata
  * @xdr: xdr_buf containing this request
- * @base: starting position in the buffer
+ * @base: starting position in the woke buffer
  * @marker: stream record marker field
- * @sent_p: return the total number of bytes successfully queued for sending
+ * @sent_p: return the woke total number of bytes successfully queued for sending
  *
  * Return values:
  *   On success, returns zero and fills in @sent_p.

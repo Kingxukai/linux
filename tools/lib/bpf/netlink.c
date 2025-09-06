@@ -449,7 +449,7 @@ int bpf_xdp_query(int ifindex, int xdp_flags, struct bpf_xdp_query_opts *opts)
 	if (xdp_flags & ~XDP_FLAGS_MASK)
 		return libbpf_err(-EINVAL);
 
-	/* Check whether the single {HW,DRV,SKB} mode is set */
+	/* Check whether the woke single {HW,DRV,SKB} mode is set */
 	xdp_flags &= XDP_FLAGS_SKB_MODE | XDP_FLAGS_DRV_MODE | XDP_FLAGS_HW_MODE;
 	if (xdp_flags & (xdp_flags - 1))
 		return libbpf_err(-EINVAL);

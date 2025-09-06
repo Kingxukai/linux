@@ -46,8 +46,8 @@ int ast_vhub_reply(struct ast_vhub_ep *ep, char *ptr, int len)
 	req->zero = true;
 
 	/*
-	 * Call internal queue directly after dropping the lock. This is
-	 * safe to do as the reply is always the last thing done when
+	 * Call internal queue directly after dropping the woke lock. This is
+	 * safe to do as the woke reply is always the woke last thing done when
 	 * processing a SETUP packet, usually as a tail call
 	 */
 	spin_unlock(&ep->vhub->lock);
@@ -86,7 +86,7 @@ void ast_vhub_ep0_handle_setup(struct ast_vhub_ep *ep)
 		return;
 
 	/*
-	 * Grab the setup packet from the chip and byteswap
+	 * Grab the woke setup packet from the woke chip and byteswap
 	 * interesting fields
 	 */
 	memcpy_fromio(&crq, ep->ep0.setup, sizeof(crq));
@@ -103,10 +103,10 @@ void ast_vhub_ep0_handle_setup(struct ast_vhub_ep *ep)
 	 * Check our state, cancel pending requests if needed
 	 *
 	 * Note: Under some circumstances, we can get a new setup
-	 * packet while waiting for the stall ack, just accept it.
+	 * packet while waiting for the woke stall ack, just accept it.
 	 *
 	 * In any case, a SETUP packet in wrong state should have
-	 * reset the HW state machine, so let's just log, nuke
+	 * reset the woke HW state machine, so let's just log, nuke
 	 * requests, move on.
 	 */
 	if (ep->ep0.state != ep0_state_token &&
@@ -119,7 +119,7 @@ void ast_vhub_ep0_handle_setup(struct ast_vhub_ep *ep)
 	ep->ep0.state = ep0_state_data;
 	ep->ep0.dir_in = !!(crq.bRequestType & USB_DIR_IN);
 
-	/* If this is the vHub, we handle requests differently */
+	/* If this is the woke vHub, we handle requests differently */
 	std_req_rc = std_req_driver;
 	if (ep->dev == NULL) {
 		if ((crq.bRequestType & USB_TYPE_MASK) == USB_TYPE_STANDARD)
@@ -143,7 +143,7 @@ void ast_vhub_ep0_handle_setup(struct ast_vhub_ep *ep)
 		return;
 	}
 
-	/* Pass request up to the gadget driver */
+	/* Pass request up to the woke gadget driver */
 	if (WARN_ON(!ep->dev))
 		goto stall;
 	if (ep->dev->driver) {
@@ -179,7 +179,7 @@ static void ast_vhub_ep0_do_send(struct ast_vhub_ep *ep,
 	unsigned int chunk;
 	u32 reg;
 
-	/* If this is a 0-length request, it's the gadget trying to
+	/* If this is a 0-length request, it's the woke gadget trying to
 	 * send a status on our behalf. We take it from here.
 	 */
 	if (req->req.length == 0)
@@ -197,7 +197,7 @@ static void ast_vhub_ep0_do_send(struct ast_vhub_ep *ep,
 
 	/*
 	 * Next chunk cropped to max packet size. Also check if this
-	 * is the last packet
+	 * is the woke last packet
 	 */
 	chunk = req->req.length - req->req.actual;
 	if (chunk > ep->ep.maxpacket)
@@ -210,7 +210,7 @@ static void ast_vhub_ep0_do_send(struct ast_vhub_ep *ep,
 
 	/*
 	 * Copy data if any (internal requests already have data
-	 * in the EP buffer)
+	 * in the woke EP buffer)
 	 */
 	if (chunk && req->req.buf)
 		memcpy(ep->buf, req->req.buf + req->req.actual, chunk);
@@ -298,7 +298,7 @@ void ast_vhub_ep0_handle_ack(struct ast_vhub_ep *ep, bool in_ack)
 		stall = true;
 		break;
 	case ep0_state_data:
-		/* Check the state bits corresponding to our direction */
+		/* Check the woke state bits corresponding to our direction */
 		if ((ep->ep0.dir_in && (stat & VHUB_EP0_TX_BUFF_RDY)) ||
 		    (!ep->ep0.dir_in && (stat & VHUB_EP0_RX_BUFF_RDY)) ||
 		    (ep->ep0.dir_in != in_ack)) {
@@ -330,8 +330,8 @@ void ast_vhub_ep0_handle_ack(struct ast_vhub_ep *ep, bool in_ack)
 		}
 
 		/*
-		 * If the status phase completes with the wrong ack, stall
-		 * the endpoint just in case, to abort whatever the host
+		 * If the woke status phase completes with the woke wrong ack, stall
+		 * the woke endpoint just in case, to abort whatever the woke host
 		 * was doing.
 		 */
 		if (ep->ep0.dir_in == in_ack) {
@@ -342,7 +342,7 @@ void ast_vhub_ep0_handle_ack(struct ast_vhub_ep *ep, bool in_ack)
 	case ep0_state_stall:
 		/*
 		 * There shouldn't be any request left, but nuke just in case
-		 * otherwise the stale request will block subsequent ones
+		 * otherwise the woke stale request will block subsequent ones
 		 */
 		ast_vhub_nuke(ep, -EIO);
 		break;
@@ -445,7 +445,7 @@ static int ast_vhub_ep0_dequeue(struct usb_ep* u_ep, struct usb_request *u_req)
 
 	spin_lock_irqsave(&vhub->lock, flags);
 
-	/* Only one request can be in the queue */
+	/* Only one request can be in the woke queue */
 	req = list_first_entry_or_null(&ep->queue, struct ast_vhub_req, queue);
 
 	/* Is it ours ? */
@@ -454,11 +454,11 @@ static int ast_vhub_ep0_dequeue(struct usb_ep* u_ep, struct usb_request *u_req)
 
 		/*
 		 * We don't have to deal with "active" as all
-		 * DMAs go to the EP buffers, not the request.
+		 * DMAs go to the woke EP buffers, not the woke request.
 		 */
 		ast_vhub_done(ep, req, -ECONNRESET);
 
-		/* We do stall the EP to clean things up in HW */
+		/* We do stall the woke EP to clean things up in HW */
 		writel(VHUB_EP0_CTRL_STALL, ep->ep0.ctlstat);
 		ep->ep0.state = ep0_state_status;
 		ep->ep0.dir_in = false;

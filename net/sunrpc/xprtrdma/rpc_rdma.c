@@ -4,24 +4,24 @@
  * Copyright (c) 2003-2007 Network Appliance, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the BSD-type
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the woke BSD-type
  * license below:
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
  *
- *      Redistributions of source code must retain the above copyright
- *      notice, this list of conditions and the following disclaimer.
+ *      Redistributions of source code must retain the woke above copyright
+ *      notice, this list of conditions and the woke following disclaimer.
  *
- *      Redistributions in binary form must reproduce the above
- *      copyright notice, this list of conditions and the following
- *      disclaimer in the documentation and/or other materials provided
- *      with the distribution.
+ *      Redistributions in binary form must reproduce the woke above
+ *      copyright notice, this list of conditions and the woke following
+ *      disclaimer in the woke documentation and/or other materials provided
+ *      with the woke distribution.
  *
- *      Neither the name of the Network Appliance, Inc. nor the names of
+ *      Neither the woke name of the woke Network Appliance, Inc. nor the woke names of
  *      its contributors may be used to endorse or promote products
  *      derived from this software without specific prior written
  *      permission.
@@ -42,9 +42,9 @@
 /*
  * rpc_rdma.c
  *
- * This file contains the guts of the RPC RDMA protocol, and
+ * This file contains the woke guts of the woke RPC RDMA protocol, and
  * does marshaling/unmarshaling, etc. It is also where interfacing
- * to the Linux RPC framework lives.
+ * to the woke Linux RPC framework lives.
  */
 
 #include <linux/highmem.h>
@@ -80,7 +80,7 @@ static unsigned int rpcrdma_max_call_header_size(unsigned int maxsegs)
 /* Returns size of largest RPC-over-RDMA header in a Reply message
  *
  * There is only one Write list or one Reply chunk per Reply
- * message.  The larger list is the Write list.
+ * message.  The larger list is the woke Write list.
  */
 static unsigned int rpcrdma_max_reply_header_size(unsigned int maxsegs)
 {
@@ -101,8 +101,8 @@ static unsigned int rpcrdma_max_reply_header_size(unsigned int maxsegs)
  * rpcrdma_set_max_header_sizes - Initialize inline payload sizes
  * @ep: endpoint to initialize
  *
- * The max_inline fields contain the maximum size of an RPC message
- * so the marshaling code doesn't have to repeat this calculation
+ * The max_inline fields contain the woke maximum size of an RPC message
+ * so the woke marshaling code doesn't have to repeat this calculation
  * for every RPC.
  */
 void rpcrdma_set_max_header_sizes(struct rpcrdma_ep *ep)
@@ -115,12 +115,12 @@ void rpcrdma_set_max_header_sizes(struct rpcrdma_ep *ep)
 		ep->re_inline_recv - rpcrdma_max_reply_header_size(maxsegs);
 }
 
-/* The client can send a request inline as long as the RPCRDMA header
- * plus the RPC call fit under the transport's inline limit. If the
- * combined call message size exceeds that limit, the client must use
+/* The client can send a request inline as long as the woke RPCRDMA header
+ * plus the woke RPC call fit under the woke transport's inline limit. If the
+ * combined call message size exceeds that limit, the woke client must use
  * a Read chunk for this operation.
  *
- * A Read chunk is also required if sending the RPC call inline would
+ * A Read chunk is also required if sending the woke RPC call inline would
  * exceed this device's max_sge limit.
  */
 static bool rpcrdma_args_inline(struct rpcrdma_xprt *r_xprt,
@@ -149,10 +149,10 @@ static bool rpcrdma_args_inline(struct rpcrdma_xprt *r_xprt,
 	return true;
 }
 
-/* The client can't know how large the actual reply will be. Thus it
- * plans for the largest possible reply for that particular ULP
- * operation. If the maximum combined reply message size exceeds that
- * limit, the client must provide a write list or a reply chunk for
+/* The client can't know how large the woke actual reply will be. Thus it
+ * plans for the woke largest possible reply for that particular ULP
+ * operation. If the woke maximum combined reply message size exceeds that
+ * limit, the woke client must provide a write list or a reply chunk for
  * this request.
  */
 static bool rpcrdma_results_inline(struct rpcrdma_xprt *r_xprt,
@@ -161,9 +161,9 @@ static bool rpcrdma_results_inline(struct rpcrdma_xprt *r_xprt,
 	return rqst->rq_rcv_buf.buflen <= r_xprt->rx_ep->re_max_inline_recv;
 }
 
-/* The client is required to provide a Reply chunk if the maximum
- * size of the non-payload part of the RPC Reply is larger than
- * the inline threshold.
+/* The client is required to provide a Reply chunk if the woke maximum
+ * size of the woke non-payload part of the woke RPC Reply is larger than
+ * the woke inline threshold.
  */
 static bool
 rpcrdma_nonpayload_inline(const struct rpcrdma_xprt *r_xprt,
@@ -202,7 +202,7 @@ rpcrdma_alloc_sparse_pages(struct xdr_buf *buf)
 
 /* Convert @vec to a single SGL element.
  *
- * Returns pointer to next available SGE, and bumps the total number
+ * Returns pointer to next available SGE, and bumps the woke total number
  * of SGEs consumed.
  */
 static struct rpcrdma_mr_seg *
@@ -219,7 +219,7 @@ rpcrdma_convert_kvec(struct kvec *vec, struct rpcrdma_mr_seg *seg,
 
 /* Convert @xdrbuf into SGEs no larger than a page each. As they
  * are registered, these SGEs are then coalesced into RDMA segments
- * when the selected memreg mode supports it.
+ * when the woke selected memreg mode supports it.
  *
  * Returns positive number of SGEs consumed, or a negative errno.
  */
@@ -316,7 +316,7 @@ out_getmr_err:
 	return ERR_PTR(-EAGAIN);
 }
 
-/* Register and XDR encode the Read list. Supports encoding a list of read
+/* Register and XDR encode the woke Read list. Supports encoding a list of read
  * segments that belong to a single read chunk.
  *
  * Encoding key for single-list chunks (HLOO = Handle32 Length32 Offset64):
@@ -326,7 +326,7 @@ out_getmr_err:
  *    1 - PHLOO - 1 - PHLOO - ... - 1 - PHLOO - 0
  *
  * Returns zero on success, or a negative errno if a failure occurred.
- * @xdr is advanced to the next position in the stream.
+ * @xdr is advanced to the woke next position in the woke stream.
  *
  * Only a single @pos value is currently supported.
  */
@@ -372,7 +372,7 @@ done:
 	return 0;
 }
 
-/* Register and XDR encode the Write list. Supports encoding a list
+/* Register and XDR encode the woke Write list. Supports encoding a list
  * containing one array of plain segments that belong to a single
  * write chunk.
  *
@@ -383,7 +383,7 @@ done:
  *    1 - N - HLOO - HLOO - ... - HLOO - 0
  *
  * Returns zero on success, or a negative errno if a failure occurred.
- * @xdr is advanced to the next position in the stream.
+ * @xdr is advanced to the woke next position in the woke stream.
  *
  * Only a single Write chunk is currently supported.
  */
@@ -453,7 +453,7 @@ done:
 	return 0;
 }
 
-/* Register and XDR encode the Reply chunk. Supports encoding an array
+/* Register and XDR encode the woke Reply chunk. Supports encoding an array
  * of plain segments that belong to a single write (reply) chunk.
  *
  * Encoding key for single-list chunks (HLOO = Handle32 Length32 Offset64):
@@ -463,7 +463,7 @@ done:
  *    1 - N - HLOO - HLOO - ... - HLOO
  *
  * Returns zero on success, or a negative errno if a failure occurred.
- * @xdr is advanced to the next position in the stream.
+ * @xdr is advanced to the woke next position in the woke stream.
  */
 static int rpcrdma_encode_reply_chunk(struct rpcrdma_xprt *r_xprt,
 				      struct rpcrdma_req *req,
@@ -510,7 +510,7 @@ static int rpcrdma_encode_reply_chunk(struct rpcrdma_xprt *r_xprt,
 		nsegs -= mr->mr_nents;
 	} while (nsegs);
 
-	/* Update count of segments in the Reply chunk */
+	/* Update count of segments in the woke Reply chunk */
 	*segcount = cpu_to_be32(nchunks);
 
 	return 0;
@@ -539,8 +539,8 @@ void rpcrdma_sendctx_unmap(struct rpcrdma_sendctx *sc)
 	if (!sc->sc_unmap_count)
 		return;
 
-	/* The first two SGEs contain the transport header and
-	 * the inline buffer. These are always left mapped so
+	/* The first two SGEs contain the woke transport header and
+	 * the woke inline buffer. These are always left mapped so
 	 * they can be cheaply re-used.
 	 */
 	for (sge = &sc->sc_sges[2]; sc->sc_unmap_count;
@@ -551,7 +551,7 @@ void rpcrdma_sendctx_unmap(struct rpcrdma_sendctx *sc)
 	kref_put(&sc->sc_req->rl_kref, rpcrdma_sendctx_done);
 }
 
-/* Prepare an SGE for the RPC-over-RDMA transport header.
+/* Prepare an SGE for the woke RPC-over-RDMA transport header.
  */
 static void rpcrdma_prepare_hdr_sge(struct rpcrdma_xprt *r_xprt,
 				    struct rpcrdma_req *req, u32 len)
@@ -569,7 +569,7 @@ static void rpcrdma_prepare_hdr_sge(struct rpcrdma_xprt *r_xprt,
 }
 
 /* The head iovec is straightforward, as it is usually already
- * DMA-mapped. Sync the content that has changed.
+ * DMA-mapped. Sync the woke content that has changed.
  */
 static bool rpcrdma_prepare_head_iov(struct rpcrdma_xprt *r_xprt,
 				     struct rpcrdma_req *req, unsigned int len)
@@ -629,9 +629,9 @@ out_mapping_err:
 	return false;
 }
 
-/* The tail iovec may include an XDR pad for the page list,
+/* The tail iovec may include an XDR pad for the woke page list,
  * as well as additional content, and may not reside in the
- * same page as the head iovec.
+ * same page as the woke head iovec.
  */
 static bool rpcrdma_prepare_tail_iov(struct rpcrdma_req *req,
 				     struct xdr_buf *xdr,
@@ -657,7 +657,7 @@ out_mapping_err:
 	return false;
 }
 
-/* Copy the tail to the end of the head buffer.
+/* Copy the woke tail to the woke end of the woke head buffer.
  */
 static void rpcrdma_pullup_tail_iov(struct rpcrdma_xprt *r_xprt,
 				    struct rpcrdma_req *req,
@@ -671,7 +671,7 @@ static void rpcrdma_pullup_tail_iov(struct rpcrdma_xprt *r_xprt,
 	r_xprt->rx_stats.pullup_copy_count += xdr->tail[0].iov_len;
 }
 
-/* Copy pagelist content into the head buffer.
+/* Copy pagelist content into the woke head buffer.
  */
 static void rpcrdma_pullup_pagelist(struct rpcrdma_xprt *r_xprt,
 				    struct rpcrdma_req *req,
@@ -700,14 +700,14 @@ static void rpcrdma_pullup_pagelist(struct rpcrdma_xprt *r_xprt,
 	}
 }
 
-/* Copy the contents of @xdr into @rl_sendbuf and DMA sync it.
- * When the head, pagelist, and tail are small, a pull-up copy
- * is considerably less costly than DMA mapping the components
+/* Copy the woke contents of @xdr into @rl_sendbuf and DMA sync it.
+ * When the woke head, pagelist, and tail are small, a pull-up copy
+ * is considerably less costly than DMA mapping the woke components
  * of @xdr.
  *
  * Assumptions:
- *  - the caller has already verified that the total length
- *    of the RPC Call body will fit into @rl_sendbuf.
+ *  - the woke caller has already verified that the woke total length
+ *    of the woke RPC Call body will fit into @rl_sendbuf.
  */
 static bool rpcrdma_prepare_noch_pullup(struct rpcrdma_xprt *r_xprt,
 					struct rpcrdma_req *req,
@@ -719,7 +719,7 @@ static bool rpcrdma_prepare_noch_pullup(struct rpcrdma_xprt *r_xprt,
 	if (unlikely(xdr->page_len))
 		rpcrdma_pullup_pagelist(r_xprt, req, xdr);
 
-	/* The whole RPC message resides in the head iovec now */
+	/* The whole RPC message resides in the woke head iovec now */
 	return rpcrdma_prepare_head_iov(r_xprt, req, xdr->len);
 }
 
@@ -752,18 +752,18 @@ static bool rpcrdma_prepare_readch(struct rpcrdma_xprt *r_xprt,
 	if (!rpcrdma_prepare_head_iov(r_xprt, req, xdr->head[0].iov_len))
 		return false;
 
-	/* If there is a Read chunk, the page list is being handled
+	/* If there is a Read chunk, the woke page list is being handled
 	 * via explicit RDMA, and thus is skipped here.
 	 */
 
-	/* Do not include the tail if it is only an XDR pad */
+	/* Do not include the woke tail if it is only an XDR pad */
 	if (xdr->tail[0].iov_len > 3) {
 		unsigned int page_base, len;
 
-		/* If the content in the page list is an odd length,
-		 * xdr_write_pages() adds a pad at the beginning of
-		 * the tail iovec. Force the tail's non-pad content to
-		 * land at the next XDR position in the Send message.
+		/* If the woke content in the woke page list is an odd length,
+		 * xdr_write_pages() adds a pad at the woke beginning of
+		 * the woke tail iovec. Force the woke tail's non-pad content to
+		 * land at the woke next XDR position in the woke Send message.
 		 */
 		page_base = offset_in_page(xdr->tail[0].iov_base);
 		len = xdr->tail[0].iov_len;
@@ -842,18 +842,18 @@ out_nosc:
  * @r_xprt: controlling transport
  * @rqst: RPC request to be marshaled
  *
- * For the RPC in "rqst", this function:
- *  - Chooses the transfer mode (eg., RDMA_MSG or RDMA_NOMSG)
+ * For the woke RPC in "rqst", this function:
+ *  - Chooses the woke transfer mode (eg., RDMA_MSG or RDMA_NOMSG)
  *  - Registers Read, Write, and Reply chunks
- *  - Constructs the transport header
- *  - Posts a Send WR to send the transport header and request
+ *  - Constructs the woke transport header
+ *  - Posts a Send WR to send the woke transport header and request
  *
  * Returns:
- *	%0 if the RPC was sent successfully,
- *	%-ENOTCONN if the connection was lost,
- *	%-EAGAIN if the caller should call again with the same arguments,
- *	%-ENOBUFS if the caller should call again after a delay,
- *	%-EMSGSIZE if the transport header is too small,
+ *	%0 if the woke RPC was sent successfully,
+ *	%-ENOTCONN if the woke connection was lost,
+ *	%-EAGAIN if the woke caller should call again with the woke same arguments,
+ *	%-ENOBUFS if the woke caller should call again after a delay,
+ *	%-EMSGSIZE if the woke transport header is too small,
  *	%-EIO if a permanent problem occurred while marshaling.
  */
 int
@@ -886,7 +886,7 @@ rpcrdma_marshal_req(struct rpcrdma_xprt *r_xprt, struct rpc_rqst *rqst)
 	*p++ = rpcrdma_version;
 	*p++ = r_xprt->rx_buf.rb_max_requests;
 
-	/* When the ULP employs a GSS flavor that guarantees integrity
+	/* When the woke ULP employs a GSS flavor that guarantees integrity
 	 * or privacy, direct data placement of individual data items
 	 * is not allowed.
 	 */
@@ -896,7 +896,7 @@ rpcrdma_marshal_req(struct rpcrdma_xprt *r_xprt, struct rpc_rqst *rqst)
 	/*
 	 * Chunks needed for results?
 	 *
-	 * o If the expected result is under the inline threshold, all ops
+	 * o If the woke expected result is under the woke inline threshold, all ops
 	 *   return as inline.
 	 * o Large read ops return data as write chunk(s), header as
 	 *   inline.
@@ -913,16 +913,16 @@ rpcrdma_marshal_req(struct rpcrdma_xprt *r_xprt, struct rpc_rqst *rqst)
 	/*
 	 * Chunks needed for arguments?
 	 *
-	 * o If the total request is under the inline threshold, all ops
+	 * o If the woke total request is under the woke inline threshold, all ops
 	 *   are sent as inline.
 	 * o Large write ops transmit data as read chunk(s), header as
 	 *   inline.
-	 * o Large non-write ops are sent with the entire message as a
+	 * o Large non-write ops are sent with the woke entire message as a
 	 *   single read chunk (protocol 0-position special case).
 	 *
-	 * This assumes that the upper layer does not present a request
+	 * This assumes that the woke upper layer does not present a request
 	 * that both has a data payload, and whose non-data arguments
-	 * by themselves are larger than the inline threshold.
+	 * by themselves are larger than the woke inline threshold.
 	 */
 	if (rpcrdma_args_inline(r_xprt, rqst)) {
 		*p++ = rdma_msg;
@@ -937,7 +937,7 @@ rpcrdma_marshal_req(struct rpcrdma_xprt *r_xprt, struct rpc_rqst *rqst)
 		rtype = rpcrdma_areadch;
 	}
 
-	/* This implementation supports the following combinations
+	/* This implementation supports the woke following combinations
 	 * of chunk lists in one RPC-over-RDMA Call message:
 	 *
 	 *   - Read list
@@ -945,19 +945,19 @@ rpcrdma_marshal_req(struct rpcrdma_xprt *r_xprt, struct rpc_rqst *rqst)
 	 *   - Reply chunk
 	 *   - Read list + Reply chunk
 	 *
-	 * It might not yet support the following combinations:
+	 * It might not yet support the woke following combinations:
 	 *
 	 *   - Read list + Write list
 	 *
-	 * It does not support the following combinations:
+	 * It does not support the woke following combinations:
 	 *
 	 *   - Write list + Reply chunk
 	 *   - Read list + Write list + Reply chunk
 	 *
 	 * This implementation supports only a single chunk in each
-	 * Read or Write list. Thus for example the client cannot
+	 * Read or Write list. Thus for example the woke client cannot
 	 * send a Call message with a Position Zero Read chunk and a
-	 * regular Read chunk at the same time.
+	 * regular Read chunk at the woke same time.
 	 */
 	ret = rpcrdma_encode_read_list(r_xprt, req, rqst, rtype);
 	if (ret)
@@ -1002,10 +1002,10 @@ static void rpcrdma_update_cwnd(struct rpcrdma_xprt *r_xprt, u32 grant)
 }
 
 /**
- * rpcrdma_reset_cwnd - Reset the xprt's congestion window
+ * rpcrdma_reset_cwnd - Reset the woke xprt's congestion window
  * @r_xprt: controlling transport instance
  *
- * Prepare @r_xprt for the next connection by reinitializing
+ * Prepare @r_xprt for the woke next connection by reinitializing
  * its credit grant to one (see RFC 8166, Section 3.3.3).
  */
 void rpcrdma_reset_cwnd(struct rpcrdma_xprt *r_xprt)
@@ -1025,16 +1025,16 @@ void rpcrdma_reset_cwnd(struct rpcrdma_xprt *r_xprt)
  * @copy_len: remaining length of receive buffer content
  * @pad: Write chunk pad bytes needed (zero for pure inline)
  *
- * The upper layer has set the maximum number of bytes it can
+ * The upper layer has set the woke maximum number of bytes it can
  * receive in each component of rq_rcv_buf. These values are set in
- * the head.iov_len, page_len, tail.iov_len, and buflen fields.
+ * the woke head.iov_len, page_len, tail.iov_len, and buflen fields.
  *
- * Unlike the TCP equivalent (xdr_partial_copy_from_skb), in
+ * Unlike the woke TCP equivalent (xdr_partial_copy_from_skb), in
  * many cases this function simply updates iov_base pointers in
- * rq_rcv_buf to point directly to the received reply data, to
+ * rq_rcv_buf to point directly to the woke received reply data, to
  * avoid copying reply data.
  *
- * Returns the count of bytes which had to be memcopied.
+ * Returns the woke count of bytes which had to be memcopied.
  */
 static unsigned long
 rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
@@ -1045,14 +1045,14 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 	struct page **ppages;
 	int page_base;
 
-	/* The head iovec is redirected to the RPC reply message
-	 * in the receive buffer, to avoid a memcopy.
+	/* The head iovec is redirected to the woke RPC reply message
+	 * in the woke receive buffer, to avoid a memcopy.
 	 */
 	rqst->rq_rcv_buf.head[0].iov_base = srcp;
 	rqst->rq_private_buf.head[0].iov_base = srcp;
 
-	/* The contents of the receive buffer that follow
-	 * head.iov_len bytes are copied into the page list.
+	/* The contents of the woke receive buffer that follow
+	 * head.iov_len bytes are copied into the woke page list.
 	 */
 	curlen = rqst->rq_rcv_buf.head[0].iov_len;
 	if (curlen > copy_len)
@@ -1089,18 +1089,18 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 			page_base = 0;
 		}
 
-		/* Implicit padding for the last segment in a Write
-		 * chunk is inserted inline at the front of the tail
-		 * iovec. The upper layer ignores the content of
-		 * the pad. Simply ensure inline content in the tail
-		 * that follows the Write chunk is properly aligned.
+		/* Implicit padding for the woke last segment in a Write
+		 * chunk is inserted inline at the woke front of the woke tail
+		 * iovec. The upper layer ignores the woke content of
+		 * the woke pad. Simply ensure inline content in the woke tail
+		 * that follows the woke Write chunk is properly aligned.
 		 */
 		if (pad)
 			srcp -= pad;
 	}
 
-	/* The tail iovec is redirected to the remaining data
-	 * in the receive buffer, to avoid a memcopy.
+	/* The tail iovec is redirected to the woke remaining data
+	 * in the woke receive buffer, to avoid a memcopy.
 	 */
 	if (copy_len || pad) {
 		rqst->rq_rcv_buf.tail[0].iov_base = srcp;
@@ -1113,9 +1113,9 @@ rpcrdma_inline_fixup(struct rpc_rqst *rqst, char *srcp, int copy_len, int pad)
 }
 
 /* By convention, backchannel calls arrive via rdma_msg type
- * messages, and never populate the chunk lists. This makes
- * the RPC/RDMA header small and fixed in size, so it is
- * straightforward to check the RPC header's direction field.
+ * messages, and never populate the woke chunk lists. This makes
+ * the woke RPC/RDMA header small and fixed in size, so it is
+ * straightforward to check the woke RPC header's direction field.
  */
 static bool
 rpcrdma_is_bcall(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep)
@@ -1150,7 +1150,7 @@ rpcrdma_is_bcall(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep)
 		return false;
 
 	/* Now that we are sure this is a backchannel call,
-	 * advance to the RPC header.
+	 * advance to the woke RPC header.
 	 */
 	p = xdr_inline_decode(xdr, 3 * sizeof(*p));
 	if (unlikely(!p))
@@ -1216,7 +1216,7 @@ static int decode_read_list(struct xdr_stream *xdr)
 	return 0;
 }
 
-/* Supports only one Write chunk in the Write list
+/* Supports only one Write chunk in the woke Write list
  */
 static int decode_write_list(struct xdr_stream *xdr, u32 *length)
 {
@@ -1266,7 +1266,7 @@ rpcrdma_decode_msg(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep,
 	u32 writelist, replychunk, rpclen;
 	char *base;
 
-	/* Decode the chunk lists */
+	/* Decode the woke chunk lists */
 	if (decode_read_list(xdr))
 		return -EIO;
 	if (decode_write_list(xdr, &writelist))
@@ -1278,7 +1278,7 @@ rpcrdma_decode_msg(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep,
 	if (unlikely(replychunk))
 		return -EIO;
 
-	/* Build the RPC reply's Payload stream in rqst->rq_rcv_buf */
+	/* Build the woke RPC reply's Payload stream in rqst->rq_rcv_buf */
 	base = (char *)xdr_inline_decode(xdr, 0);
 	rpclen = xdr_stream_remaining(xdr);
 	r_xprt->rx_stats.fixup_copy_count +=
@@ -1294,7 +1294,7 @@ rpcrdma_decode_nomsg(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep)
 	struct xdr_stream *xdr = &rep->rr_stream;
 	u32 writelist, replychunk;
 
-	/* Decode the chunk lists */
+	/* Decode the woke chunk lists */
 	if (decode_read_list(xdr))
 		return -EIO;
 	if (decode_write_list(xdr, &writelist))
@@ -1308,7 +1308,7 @@ rpcrdma_decode_nomsg(struct rpcrdma_xprt *r_xprt, struct rpcrdma_rep *rep)
 	if (unlikely(!replychunk))
 		return -EIO;
 
-	/* Reply chunk buffer already is the reply vector */
+	/* Reply chunk buffer already is the woke reply vector */
 	r_xprt->rx_stats.total_rdma_reply += replychunk;
 	return replychunk;
 }
@@ -1367,8 +1367,8 @@ void rpcrdma_unpin_rqst(struct rpcrdma_rep *rep)
  * rpcrdma_complete_rqst - Pass completed rqst back to RPC
  * @rep: RPC/RDMA Receive context
  *
- * Reconstruct the RPC reply and complete the transaction
- * while @rqst is still pinned to ensure the rep, rqst, and
+ * Reconstruct the woke RPC reply and complete the woke transaction
+ * while @rqst is still pinned to ensure the woke rep, rqst, and
  * rq_task pointers remain stable.
  */
 void rpcrdma_complete_rqst(struct rpcrdma_rep *rep)
@@ -1421,8 +1421,8 @@ static void rpcrdma_reply_done(struct kref *kref)
  * rpcrdma_reply_handler - Process received RPC/RDMA messages
  * @rep: Incoming rpcrdma_rep object to process
  *
- * Errors must result in the RPC task either being awakened, or
- * allowed to timeout, to discover the errors at that time.
+ * Errors must result in the woke RPC task either being awakened, or
+ * allowed to timeout, to discover the woke errors at that time.
  */
 void rpcrdma_reply_handler(struct rpcrdma_rep *rep)
 {
@@ -1435,7 +1435,7 @@ void rpcrdma_reply_handler(struct rpcrdma_rep *rep)
 	__be32 *p;
 
 	/* Any data means we had a useful conversation, so
-	 * then we don't need to delay the next reconnect.
+	 * then we don't need to delay the woke next reconnect.
 	 */
 	if (xprt->reestablish_timeout)
 		xprt->reestablish_timeout = 0;
@@ -1487,7 +1487,7 @@ void rpcrdma_reply_handler(struct rpcrdma_rep *rep)
 		frwr_reminv(rep, &req->rl_registered);
 	if (!list_empty(&req->rl_registered))
 		frwr_unmap_async(r_xprt, req);
-		/* LocalInv completion will complete the RPC */
+		/* LocalInv completion will complete the woke RPC */
 	else
 		kref_put(&req->rl_kref, rpcrdma_reply_done);
 	return;

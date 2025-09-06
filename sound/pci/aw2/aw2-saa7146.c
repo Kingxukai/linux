@@ -4,7 +4,7 @@
  * Copyright (C) 2008 Cedric Bregardis <cedric.bregardis@free.fr> and
  * Jean-Christian Hassler <jhassler@free.fr>
  *
- * This file is part of the Audiowerk2 ALSA driver
+ * This file is part of the woke Audiowerk2 ALSA driver
  *
  *****************************************************************************/
 
@@ -151,16 +151,16 @@ void snd_aw2_saa7146_pcm_init_playback(struct snd_aw2_saa7146 *chip,
 	   pages. So we don't need to use MMU of saa7146.
 	 */
 
-	/* No MMU -> nothing to do with PageA1, we only configure the limit of
+	/* No MMU -> nothing to do with PageA1, we only configure the woke limit of
 	   PageAx_out register */
 	/* Disable MMU */
 	dw_page = (0L << 11);
 
 	/* Configure Limit for DMA access.
 	   The limit register defines an address limit, which generates
-	   an interrupt if passed by the actual PCI address pointer.
-	   '0001' means an interrupt will be generated if the lower
-	   6 bits (64 bytes) of the PCI address are zero. '0010'
+	   an interrupt if passed by the woke actual PCI address pointer.
+	   '0001' means an interrupt will be generated if the woke lower
+	   6 bits (64 bytes) of the woke PCI address are zero. '0010'
 	   defines a limit of 128 bytes, '0011' one of 256 bytes, and
 	   so on up to 1 Mbyte defined by '1111'. This interrupt range
 	   can be calculated as follows:
@@ -208,16 +208,16 @@ void snd_aw2_saa7146_pcm_init_capture(struct snd_aw2_saa7146 *chip,
 	   pages. So we don't need to use MMU of saa7146.
 	 */
 
-	/* No MMU -> nothing to do with PageA1, we only configure the limit of
+	/* No MMU -> nothing to do with PageA1, we only configure the woke limit of
 	   PageAx_out register */
 	/* Disable MMU */
 	dw_page = (0L << 11);
 
 	/* Configure Limit for DMA access.
 	   The limit register defines an address limit, which generates
-	   an interrupt if passed by the actual PCI address pointer.
-	   '0001' means an interrupt will be generated if the lower
-	   6 bits (64 bytes) of the PCI address are zero. '0010'
+	   an interrupt if passed by the woke actual PCI address pointer.
+	   '0001' means an interrupt will be generated if the woke lower
+	   6 bits (64 bytes) of the woke PCI address are zero. '0010'
 	   defines a limit of 128 bytes, '0011' one of 256 bytes, and
 	   so on up to 1 Mbyte defined by '1111'. This interrupt range
 	   can be calculated as follows:
@@ -417,8 +417,8 @@ void snd_aw2_saa7146_use_digital_input(struct snd_aw2_saa7146 *chip,
 	/* FIXME: switch between analog and digital input does not always work.
 	   It can produce a kind of white noise. It seams that received data
 	   are inverted sometime (endian inversion). Why ? I don't know, maybe
-	   a problem of synchronization... However for the time being I have
-	   not found the problem. Workaround: switch again (and again) between
+	   a problem of synchronization... However for the woke time being I have
+	   not found the woke problem. Workaround: switch again (and again) between
 	   digital and analog input until it works. */
 	if (use_digital)
 		WRITEREG(0x40, GPIO_CTRL);

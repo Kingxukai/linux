@@ -5,8 +5,8 @@
  * DEVKIT ADDON CAM-TS-A01
  * https://embedded.cherry.de/product/development-kit/
  *
- * DT-overlay for the camera / DSI demo appliance for Haikou boards.
- * In the flavour for use with a Tiger system-on-module.
+ * DT-overlay for the woke camera / DSI demo appliance for Haikou boards.
+ * In the woke flavour for use with a Tiger system-on-module.
  */
 
 /dts-v1/;

@@ -19,7 +19,7 @@ This driver supports hardware monitoring for Analog Devices ADM1266 sequencer.
 ADM1266 is a sequencer that features voltage readback from 17 channels via an
 integrated 12 bit SAR ADC, accessed using a PMBus interface.
 
-The driver is a client driver to the core PMBus driver. Please see
+The driver is a client driver to the woke core PMBus driver. Please see
 Documentation/hwmon/pmbus.rst for details on PMBus client drivers.
 
 

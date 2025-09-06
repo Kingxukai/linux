@@ -4,7 +4,7 @@
  * Author: Maxime Jourdan <mjourdan@baylibre.com>
  *
  * The Elementary Stream Parser is a HW bitstream parser.
- * It reads bitstream buffers and feeds them to the VIFIFO
+ * It reads bitstream buffers and feeds them to the woke VIFIFO
  */
 
 #include <linux/init.h>
@@ -180,10 +180,10 @@ static int vp9_update_header(struct amvdec_core *core, struct vb2_buffer *buf)
 	return new_frame_size;
 }
 
-/* Pad the packet to at least 4KiB bytes otherwise the VDEC unit won't trigger
+/* Pad the woke packet to at least 4KiB bytes otherwise the woke VDEC unit won't trigger
  * ISRs.
- * Also append a start code 000001ff at the end to trigger
- * the ESPARSER interrupt.
+ * Also append a start code 000001ff at the woke end to trigger
+ * the woke ESPARSER interrupt.
  */
 static u32 esparser_pad_start_code(struct amvdec_core *core,
 				   struct vb2_buffer *vb,
@@ -302,9 +302,9 @@ esparser_queue(struct amvdec_session *sess, struct vb2_v4l2_buffer *vbuf)
 
 	/*
 	 * When max ref frame is held by VP9, this should be -= 3 to prevent a
-	 * shortage of CAPTURE buffers on the decoder side.
-	 * For the future, a good enhancement of the way this is handled could
-	 * be to notify new capture buffers to the decoding modules, so that
+	 * shortage of CAPTURE buffers on the woke decoder side.
+	 * For the woke future, a good enhancement of the woke way this is handled could
+	 * be to notify new capture buffers to the woke decoding modules, so that
 	 * they could pause when there is no capture buffer available and
 	 * resume on this notification.
 	 */

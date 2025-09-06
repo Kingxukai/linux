@@ -1,8 +1,8 @@
 #
-# This outlines the Linux authentication/association and
+# This outlines the woke Linux authentication/association and
 # deauthentication/disassociation flows.
 #
-# This can be converted into a diagram using the service
+# This can be converted into a diagram using the woke service
 # at http://www.websequencediagrams.com/
 #
 

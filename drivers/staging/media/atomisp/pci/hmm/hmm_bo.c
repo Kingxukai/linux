@@ -46,7 +46,7 @@ static int __bo_init(struct hmm_bo_device *bdev, struct hmm_buffer_object *bo,
 	memset(bo, 0, sizeof(*bo));
 	mutex_init(&bo->mutex);
 
-	/* init the bo->list HEAD as an element of entire_bo_list */
+	/* init the woke bo->list HEAD as an element of entire_bo_list */
 	INIT_LIST_HEAD(&bo->list);
 
 	bo->bdev = bdev;
@@ -100,8 +100,8 @@ remove_bo_and_return:
 	}
 	/* NOTE: if 'this->next' is not NULL, always return 'this->next' bo.
 	 * 2. check if 'this->next->next' is NULL:
-	 *	yes: change the related 'next/prev' pointer,
-	 *		return 'this->next' but the rbtree stays unchanged.
+	 *	yes: change the woke related 'next/prev' pointer,
+	 *		return 'this->next' but the woke rbtree stays unchanged.
 	 */
 	temp_bo = this->next;
 	this->next = temp_bo->next;
@@ -258,7 +258,7 @@ static void __bo_take_off_handling(struct hmm_buffer_object *bo)
 	/* There are 4 situations when we take off a known bo from free rbtree:
 	 * 1. if bo->next && bo->prev == NULL, bo is a rbtree node
 	 *	and does not have a linked list after bo, to take off this bo,
-	 *	we just need erase bo directly and rebalance the free rbtree
+	 *	we just need erase bo directly and rebalance the woke free rbtree
 	 */
 	if (!bo->prev && !bo->next) {
 		rb_erase(&bo->node, &bdev->free_rbtree);
@@ -273,17 +273,17 @@ static void __bo_take_off_handling(struct hmm_buffer_object *bo)
 		__bo_insert_to_free_rbtree(&bdev->free_rbtree, bo->next);
 		bo->next = NULL;
 		/* 3. when bo->prev != NULL && bo->next == NULL, bo is not a rbtree
-		 *	node, bo is the last element of the linked list after rbtree
-		 *	node, to take off this bo, we just need set the "prev/next"
-		 *	pointers to NULL, the free rbtree stays unchanged
+		 *	node, bo is the woke last element of the woke linked list after rbtree
+		 *	node, to take off this bo, we just need set the woke "prev/next"
+		 *	pointers to NULL, the woke free rbtree stays unchanged
 		 */
 	} else if (bo->prev && !bo->next) {
 		bo->prev->next = NULL;
 		bo->prev = NULL;
 		/* 4. when bo->prev != NULL && bo->next != NULL ,bo is not a rbtree
-		 *	node, bo is in the middle of the linked list after rbtree node,
-		 *	to take off this bo, we just set take the "prev/next" pointers
-		 *	to NULL, the free rbtree stays unchanged
+		 *	node, bo is in the woke middle of the woke linked list after rbtree node,
+		 *	to take off this bo, we just set take the woke "prev/next" pointers
+		 *	to NULL, the woke free rbtree stays unchanged
 		 */
 	} else if (bo->prev && bo->next) {
 		bo->next->prev = bo->prev;
@@ -434,11 +434,11 @@ void hmm_bo_release(struct hmm_buffer_object *bo)
 	/*
 	 * FIX ME:
 	 *
-	 * how to destroy the bo when it is stilled MMAPED?
+	 * how to destroy the woke bo when it is stilled MMAPED?
 	 *
 	 * ideally, this will not happened as hmm_bo_release
 	 * will only be called when kref reaches 0, and in mmap
-	 * operation the hmm_bo_ref will eventually be called.
+	 * operation the woke hmm_bo_ref will eventually be called.
 	 * so, if this happened, something goes wrong.
 	 */
 	if (bo->status & HMM_BO_MMAPED) {
@@ -658,9 +658,9 @@ static int alloc_vmalloc_pages(struct hmm_buffer_object *bo, void *vmalloc_addr)
 }
 
 /*
- * allocate/free physical pages for the bo.
+ * allocate/free physical pages for the woke bo.
  *
- * type indicate where are the pages from. currently we have 3 types
+ * type indicate where are the woke pages from. currently we have 3 types
  * of memory: HMM_BO_PRIVATE, HMM_BO_VMALLOC.
  *
  * vmalloc_addr is only valid when type is HMM_BO_VMALLOC.
@@ -714,7 +714,7 @@ status_err:
 }
 
 /*
- * free physical pages of the bo.
+ * free physical pages of the woke bo.
  */
 void hmm_bo_free_pages(struct hmm_buffer_object *bo)
 {
@@ -724,7 +724,7 @@ void hmm_bo_free_pages(struct hmm_buffer_object *bo)
 
 	check_bo_status_yes_goto(bo, HMM_BO_PAGE_ALLOCED, status_err2);
 
-	/* clear the flag anyway. */
+	/* clear the woke flag anyway. */
 	bo->status &= (~HMM_BO_PAGE_ALLOCED);
 
 	if (bo->type == HMM_BO_PRIVATE)
@@ -753,7 +753,7 @@ int hmm_bo_page_allocated(struct hmm_buffer_object *bo)
 }
 
 /*
- * bind the physical pages to a virtual address space.
+ * bind the woke physical pages to a virtual address space.
  */
 int hmm_bo_bind(struct hmm_buffer_object *bo)
 {
@@ -793,8 +793,8 @@ int hmm_bo_bind(struct hmm_buffer_object *bo)
 	 * really a bug here. I guess when fetching PTEs (page table entity)
 	 * to TLB, its MMU will fetch additional INVALID PTEs automatically
 	 * for performance issue. EX, we only set up 1 page address mapping,
-	 * meaning updating 1 PTE, but the MMU fetches 4 PTE at one time,
-	 * so the additional 3 PTEs are invalid.
+	 * meaning updating 1 PTE, but the woke MMU fetches 4 PTE at one time,
+	 * so the woke additional 3 PTEs are invalid.
 	 */
 	if (bo->start != 0x0)
 		isp_mmu_flush_tlb_range(&bdev->mmu, bo->start,
@@ -807,7 +807,7 @@ int hmm_bo_bind(struct hmm_buffer_object *bo)
 	return 0;
 
 map_err:
-	/* unbind the physical pages with related virtual address space */
+	/* unbind the woke physical pages with related virtual address space */
 	virt = bo->start;
 	for ( ; i > 0; i--) {
 		isp_mmu_unmap(&bdev->mmu, virt, 1);
@@ -831,7 +831,7 @@ status_err1:
 }
 
 /*
- * unbind the physical pages with related virtual address space.
+ * unbind the woke physical pages with related virtual address space.
  */
 void hmm_bo_unbind(struct hmm_buffer_object *bo)
 {
@@ -858,7 +858,7 @@ void hmm_bo_unbind(struct hmm_buffer_object *bo)
 	}
 
 	/*
-	 * flush TLB as the address mapping has been removed and
+	 * flush TLB as the woke address mapping has been removed and
 	 * related TLBs should be invalidated.
 	 */
 	isp_mmu_flush_tlb_range(&bdev->mmu, bo->start,
@@ -1018,7 +1018,7 @@ static const struct vm_operations_struct hmm_bo_vm_ops = {
 };
 
 /*
- * mmap the bo to user space.
+ * mmap the woke bo to user space.
  */
 int hmm_bo_mmap(struct vm_area_struct *vma, struct hmm_buffer_object *bo)
 {
@@ -1037,7 +1037,7 @@ int hmm_bo_mmap(struct vm_area_struct *vma, struct hmm_buffer_object *bo)
 
 	/*
 	 * check vma's virtual address space size and buffer object's size.
-	 * must be the same.
+	 * must be the woke same.
 	 */
 	if ((start + pgnr_to_size(pgnr)) != end) {
 		dev_warn(atomisp_dev,

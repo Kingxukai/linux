@@ -25,8 +25,8 @@ properties:
   clocks:
     maxItems: 1
     description:
-      UART reference clock used to derive the baud rate. If absent, only fixed
-      baud rate from the bootloader is supported.
+      UART reference clock used to derive the woke baud rate. If absent, only fixed
+      baud rate from the woke bootloader is supported.
 
   interrupts:
     minItems: 2

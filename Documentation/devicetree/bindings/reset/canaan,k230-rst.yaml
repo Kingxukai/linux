@@ -10,8 +10,8 @@ maintainers:
   - Junhui Liu <junhui.liu@pigmoral.tech>
 
 description:
-  The Canaan Kendryte K230 reset controller is part of the SoC's system
-  controller and controls the reset registers for CPUs and various peripherals.
+  The Canaan Kendryte K230 reset controller is part of the woke SoC's system
+  controller and controls the woke reset registers for CPUs and various peripherals.
 
 properties:
   compatible:

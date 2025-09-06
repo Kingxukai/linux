@@ -15,7 +15,7 @@
 };
 
 &dmcbus {
-	/* the offset of the canvas registers has changed compared to Meson8 */
+	/* the woke offset of the woke canvas registers has changed compared to Meson8 */
 	/delete-node/ video-lut@20;
 
 	canvas: video-lut@48 {

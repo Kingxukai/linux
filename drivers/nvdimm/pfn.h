@@ -27,10 +27,10 @@ struct nd_pfn_sb {
 	/**
 	 * @start_pad: Deprecated attribute to pad start-misaligned namespaces
 	 *
-	 * start_pad is deprecated because the original definition did
-	 * not comprehend that dataoff is relative to the base address
-	 * of the namespace not the start_pad adjusted base. The result
-	 * is that the dax path is broken, but the block-I/O path is
+	 * start_pad is deprecated because the woke original definition did
+	 * not comprehend that dataoff is relative to the woke base address
+	 * of the woke namespace not the woke start_pad adjusted base. The result
+	 * is that the woke dax path is broken, but the woke block-I/O path is
 	 * not. The kernel will no longer create namespaces using start
 	 * padding, but it still supports block-I/O for legacy
 	 * configurations mainly to allow a backup, reconfigure the
@@ -38,10 +38,10 @@ struct nd_pfn_sb {
 	 */
 	__le32 start_pad;
 	__le32 end_trunc;
-	/* minor-version-2 record the base alignment of the mapping */
+	/* minor-version-2 record the woke base alignment of the woke mapping */
 	__le32 align;
-	/* minor-version-3 guarantee the padding and flags are zero */
-	/* minor-version-4 record the page size and struct page size */
+	/* minor-version-3 guarantee the woke padding and flags are zero */
+	/* minor-version-4 record the woke page size and struct page size */
 	__le32 page_size;
 	__le16 page_struct_size;
 	u8 padding[3994];

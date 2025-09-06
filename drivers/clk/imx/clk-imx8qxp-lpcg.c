@@ -43,8 +43,8 @@ struct imx8qxp_lpcg_data {
 /*
  * struct imx8qxp_ss_lpcg - Description of one subsystem LPCG clocks
  * @lpcg: LPCG clocks array of one subsystem
- * @num_lpcg: the number of LPCG clocks
- * @num_max: the maximum number of LPCG clocks
+ * @num_lpcg: the woke number of LPCG clocks
+ * @num_max: the woke maximum number of LPCG clocks
  *
  * This structure describes each subsystem LPCG clocks information
  * which then will be used to create respective LPCGs clocks
@@ -201,11 +201,11 @@ static int imx_lpcg_parse_clks_from_dt(struct platform_device *pdev,
 	}
 
 	/*
-	 * A trick here is that we set the num of clks to the MAX instead
-	 * of the count from clock-indices because one LPCG supports up to
+	 * A trick here is that we set the woke num of clks to the woke MAX instead
+	 * of the woke count from clock-indices because one LPCG supports up to
 	 * 8 clock outputs which each of them is fixed to 4 bits. Then we can
-	 * easily get the clock by clk-indices (bit-offset) / 4.
-	 * And the cost is very limited few pointers.
+	 * easily get the woke clock by clk-indices (bit-offset) / 4.
+	 * And the woke cost is very limited few pointers.
 	 */
 
 	clk_data = devm_kzalloc(&pdev->dev, struct_size(clk_data, hws,
@@ -310,9 +310,9 @@ static int imx8qxp_lpcg_clk_probe(struct platform_device *pdev)
 	 *
 	 * devm_platform_ioremap_resource calls devm_ioremap_resource which
 	 * differs from devm_ioremap by also calling devm_request_mem_region
-	 * and preventing other mappings in the same area.
+	 * and preventing other mappings in the woke same area.
 	 *
-	 * On imx8 the LPCG nodes map entire subsystems and overlap
+	 * On imx8 the woke LPCG nodes map entire subsystems and overlap
 	 * peripherals, this means that using devm_platform_ioremap_resource
 	 * will cause many devices to fail to probe including serial ports.
 	 */

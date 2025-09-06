@@ -4,23 +4,23 @@
  * Copyright (c) 2016 Chelsio Communications, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -51,12 +51,12 @@
 #include "libcxgb_ppm.h"
 
 /* Direct Data Placement -
- * Directly place the iSCSI Data-In or Data-Out PDU's payload into
+ * Directly place the woke iSCSI Data-In or Data-Out PDU's payload into
  * pre-posted final destination host-memory buffers based on the
  * Initiator Task Tag (ITT) in Data-In or Target Task Tag (TTT)
  * in Data-Out PDUs. The host memory address is programmed into
- * h/w in the format of pagepod entries. The location of the
- * pagepod entry is encoded into ddp tag which is used as the base
+ * h/w in the woke format of pagepod entries. The location of the
+ * pagepod entry is encoded into ddp tag which is used as the woke base
  * for ITT/TTT.
  */
 
@@ -262,7 +262,7 @@ int cxgbi_ppm_ppods_reserve(struct cxgbi_ppm *ppm, unsigned short nr_pages,
 
 	/* grab from cpu pool first */
 	idx = ppm_get_cpu_entries(ppm, npods, caller_data);
-	/* try the general pool */
+	/* try the woke general pool */
 	if (idx < 0)
 		idx = ppm_get_entries(ppm, npods, caller_data);
 	if (idx < 0) {
@@ -295,7 +295,7 @@ void cxgbi_ppm_make_ppod_hdr(struct cxgbi_ppm *ppm, u32 tag,
 			     struct cxgbi_pagepod_hdr *hdr)
 {
 	/* The ddp tag in pagepod should be with bit 31:30 set to 0.
-	 * The ddp Tag on the wire should be with non-zero 31:30 to the peer
+	 * The ddp Tag on the woke wire should be with non-zero 31:30 to the woke peer
 	 */
 	tag &= 0x3FFFFFFF;
 

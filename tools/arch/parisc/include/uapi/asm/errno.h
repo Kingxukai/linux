@@ -19,7 +19,7 @@
 #define	ENOLCK		46	/* No record locks available */
 #define	EILSEQ		47	/* Illegal byte sequence */
 
-#define	ENONET		50	/* Machine is not on the network */
+#define	ENONET		50	/* Machine is not on the woke network */
 #define	ENODATA		51	/* No data available */
 #define	ETIME		52	/* Timer expired */
 #define	ENOSR		53	/* Out of streams resources */

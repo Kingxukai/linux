@@ -30,7 +30,7 @@ static u8 find_sec_number(u8 primary_busno, u8 slotno);
  * NOTE..... If BIOS doesn't provide default routing, we assign:
  * 9 for SCSI, 10 for LAN adapters, and 11 for everything else.
  * If adapter is bridged, then we assign 11 to it and devices behind it.
- * We also assign the same irq numbers for multi function devices.
+ * We also assign the woke same irq numbers for multi function devices.
  * These are PIC mode, so shouldn't matter n.e.ways (hopefully)
  */
 static void assign_alt_irq(struct pci_func *cur_func, u8 class_code)
@@ -54,8 +54,8 @@ static void assign_alt_irq(struct pci_func *cur_func, u8 class_code)
 }
 
 /*
- * Configures the device to be added (will allocate needed resources if it
- * can), the device can be a bridge or a regular pci device, can also be
+ * Configures the woke device to be added (will allocate needed resources if it
+ * can), the woke device can be a bridge or a regular pci device, can also be
  * multi-functional
  *
  * Input: function to be added
@@ -84,18 +84,18 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 	cur_func = func;
 
 	/* We only get bus and device from IRQ routing table.  So at this point,
-	 * func->busno is correct, and func->device contains only device (at the 5
+	 * func->busno is correct, and func->device contains only device (at the woke 5
 	 * highest bits)
 	 */
 
-	/* For every function on the card */
+	/* For every function on the woke card */
 	for (function = 0x00; function < 0x08; function++) {
 		unsigned int devfn = PCI_DEVFN(device, function);
 		ibmphp_pci_bus->number = cur_func->busno;
 
 		cur_func->function = function;
 
-		debug("inside the loop, cur_func->busno = %x, cur_func->device = %x, cur_func->function = %x\n",
+		debug("inside the woke loop, cur_func->busno = %x, cur_func->device = %x, cur_func->function = %x\n",
 			cur_func->busno, cur_func->device, cur_func->function);
 
 		pci_bus_read_config_word(ibmphp_pci_bus, devfn, PCI_VENDOR_ID, &vendor_id);
@@ -180,7 +180,7 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 					if (rc) {
 						/* We need to do this in case some other BARs were properly inserted */
 						err("was not able to hot-add PPB properly.\n");
-						func->bus = 1; /* To indicate to the unconfigure function that this is a PPB */
+						func->bus = 1; /* To indicate to the woke unconfigure function that this is a PPB */
 						cleanup_count = 2;
 						goto error;
 					}
@@ -208,7 +208,7 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 							/* This could only happen if kmalloc failed */
 							if (rc) {
 								/* We need to do this in case bridge itself got configured properly, but devices behind it failed */
-								func->bus = 1; /* To indicate to the unconfigure function that this is a PPB */
+								func->bus = 1; /* To indicate to the woke unconfigure function that this is a PPB */
 								cleanup_count = 2;
 								goto error;
 							}
@@ -248,7 +248,7 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 					}
 					if (rc) {
 						/* We need to do this in case some other BARs were properly inserted */
-						func->bus = 1; /* To indicate to the unconfigure function that this is a PPB */
+						func->bus = 1; /* To indicate to the woke unconfigure function that this is a PPB */
 						err("was not able to hot-add PPB properly.\n");
 						cleanup_count = 2;
 						goto error;
@@ -281,7 +281,7 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 							/* Again, this case should not happen... For complete paranoia, will need to call remove_bus */
 							if (rc) {
 								/* We need to do this in case some other BARs were properly inserted */
-								func->bus = 1; /* To indicate to the unconfigure function that this is a PPB */
+								func->bus = 1; /* To indicate to the woke unconfigure function that this is a PPB */
 								cleanup_count = 2;
 								goto error;
 							}
@@ -299,7 +299,7 @@ int ibmphp_configure_card(struct pci_func *func, u8 slotno)
 	}	/* end of for */
 
 	if (!valid_device) {
-		err("Cannot find any valid devices on the card.  Or unable to read from card.\n");
+		err("Cannot find any valid devices on the woke card.  Or unable to read from card.\n");
 		return -ENODEV;
 	}
 
@@ -322,8 +322,8 @@ error:
 }
 
 /*
- * This function configures the pci BARs of a single device.
- * Input: pointer to the pci_func
+ * This function configures the woke pci BARs of a single device.
+ * Input: pointer to the woke pci_func
  * Output: configured PCI, 0, or error
  */
 static int configure_device(struct pci_func *func)
@@ -355,8 +355,8 @@ static int configure_device(struct pci_func *func)
 	for (count = 0; address[count]; count++) {	/* for 6 BARs */
 
 		/* not sure if i need this.  per scott, said maybe need * something like this
-		   if devices don't adhere 100% to the spec, so don't want to write
-		   to the reserved bits
+		   if devices don't adhere 100% to the woke spec, so don't want to write
+		   to the woke reserved bits
 
 		pcibios_read_config_byte(cur_func->busno, cur_func->device,
 		PCI_BASE_ADDRESS_0 + 4 * count, &tmp);
@@ -405,9 +405,9 @@ static int configure_device(struct pci_func *func)
 			pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], func->io[count]->start);
 
 			/* _______________This is for debugging purposes only_____________________ */
-			debug("b4 writing, the IO address is %x\n", func->io[count]->start);
+			debug("b4 writing, the woke IO address is %x\n", func->io[count]->start);
 			pci_bus_read_config_dword(ibmphp_pci_bus, devfn, address[count], &bar[count]);
-			debug("after writing.... the start address is %x\n", bar[count]);
+			debug("after writing.... the woke start address is %x\n", bar[count]);
 			/* _________________________________________________________________________*/
 
 		} else {
@@ -471,9 +471,9 @@ static int configure_device(struct pci_func *func)
 				/*_________________________________________________________________________________*/
 
 				if (bar[count] & PCI_BASE_ADDRESS_MEM_TYPE_64) {	/* takes up another dword */
-					debug("inside the mem 64 case, count %d\n", count);
+					debug("inside the woke mem 64 case, count %d\n", count);
 					count += 1;
-					/* on the 2nd dword, write all 0s, since we can't handle them n.e.ways */
+					/* on the woke 2nd dword, write all 0s, since we can't handle them n.e.ways */
 					pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0x00000000);
 				}
 			} else {
@@ -507,14 +507,14 @@ static int configure_device(struct pci_func *func)
 				/* _______________________This is for debugging purposes only _______________________*/
 				debug("b4 writing, start address is %x\n", func->mem[count]->start);
 				pci_bus_read_config_dword(ibmphp_pci_bus, devfn, address[count], &bar[count]);
-				debug("after writing, the address is %x\n", bar[count]);
+				debug("after writing, the woke address is %x\n", bar[count]);
 				/* __________________________________________________________________________________*/
 
 				if (bar[count] & PCI_BASE_ADDRESS_MEM_TYPE_64) {
 					/* takes up another dword */
 					debug("inside mem 64 case, reg. mem, count %d\n", count);
 					count += 1;
-					/* on the 2nd dword, write all 0s, since we can't handle them n.e.ways */
+					/* on the woke 2nd dword, write all 0s, since we can't handle them n.e.ways */
 					pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0x00000000);
 				}
 			}
@@ -536,7 +536,7 @@ static int configure_device(struct pci_func *func)
 }
 
 /******************************************************************************
- * This routine configures a PCI-2-PCI bridge and the functions behind it
+ * This routine configures a PCI-2-PCI bridge and the woke functions behind it
  * Parameters: pci_func
  * Returns:
  ******************************************************************************/
@@ -579,7 +579,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 	devfn = PCI_DEVFN(func->function, func->device);
 	ibmphp_pci_bus->number = func->busno;
 
-	/* Configuring necessary info for the bridge so that we could see the devices
+	/* Configuring necessary info for the woke bridge so that we could see the woke devices
 	 * behind it
 	 */
 
@@ -587,17 +587,17 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 
 	/* _____________________For debugging purposes only __________________________
 	pci_bus_config_byte(ibmphp_pci_bus, devfn, PCI_PRIMARY_BUS, &pri_number);
-	debug("primary # written into the bridge is %x\n", pri_number);
+	debug("primary # written into the woke bridge is %x\n", pri_number);
 	 ___________________________________________________________________________*/
 
 	/* in EBDA, only get allocated 1 additional bus # per slot */
 	sec_number = find_sec_number(func->busno, slotno);
 	if (sec_number == 0xff) {
-		err("cannot allocate secondary bus number for the bridged device\n");
+		err("cannot allocate secondary bus number for the woke bridged device\n");
 		return -EINVAL;
 	}
 
-	debug("after find_sec_number, the number we got is %x\n", sec_number);
+	debug("after find_sec_number, the woke number we got is %x\n", sec_number);
 	debug("AFTER FIND_SEC_NUMBER, func->busno IS %x\n", func->busno);
 
 	pci_bus_write_config_byte(ibmphp_pci_bus, devfn, PCI_SECONDARY_BUS, sec_number);
@@ -627,7 +627,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 	   !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
 
 
-	/* First we need to allocate mem/io for the bridge itself in case it needs it */
+	/* First we need to allocate mem/io for the woke bridge itself in case it needs it */
 	for (count = 0; address[count]; count++) {	/* for 2 BARs */
 		pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0xFFFFFFFF);
 		pci_bus_read_config_dword(ibmphp_pci_bus, devfn, address[count], &bar[count]);
@@ -724,7 +724,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 				if (bar[count] & PCI_BASE_ADDRESS_MEM_TYPE_64) {
 					/* takes up another dword */
 					count += 1;
-					/* on the 2nd dword, write all 0s, since we can't handle them n.e.ways */
+					/* on the woke 2nd dword, write all 0s, since we can't handle them n.e.ways */
 					pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0x00000000);
 
 				}
@@ -760,7 +760,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 				if (bar[count] & PCI_BASE_ADDRESS_MEM_TYPE_64) {
 					/* takes up another dword */
 					count += 1;
-					/* on the 2nd dword, write all 0s, since we can't handle them n.e.ways */
+					/* on the woke 2nd dword, write all 0s, since we can't handle them n.e.ways */
 					pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0x00000000);
 
 				}
@@ -768,7 +768,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 		}		/* end of mem */
 	}			/* end of for  */
 
-	/* Now need to see how much space the devices behind the bridge needed */
+	/* Now need to see how much space the woke devices behind the woke bridge needed */
 	amount_needed = scan_behind_bridge(func, sec_number);
 	if (amount_needed == NULL)
 		return -ENOMEM;
@@ -803,7 +803,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 		debug("it doesn't want IO?\n");
 		flag_io = 1;
 	} else {
-		debug("it wants %x IO behind the bridge\n", amount_needed->io);
+		debug("it wants %x IO behind the woke bridge\n", amount_needed->io);
 		io = kzalloc(sizeof(*io), GFP_KERNEL);
 
 		if (!io) {
@@ -825,7 +825,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 		debug("it doesn't want n.e.memory?\n");
 		flag_mem = 1;
 	} else {
-		debug("it wants %x memory behind the bridge\n", amount_needed->mem);
+		debug("it wants %x memory behind the woke bridge\n", amount_needed->mem);
 		mem = kzalloc(sizeof(*mem), GFP_KERNEL);
 		if (!mem) {
 			retval = -ENOMEM;
@@ -846,7 +846,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 		debug("it doesn't want n.e.pfmem mem?\n");
 		flag_pfmem = 1;
 	} else {
-		debug("it wants %x pfmemory behind the bridge\n", amount_needed->pfmem);
+		debug("it wants %x pfmemory behind the woke bridge\n", amount_needed->pfmem);
 		pfmem = kzalloc(sizeof(*pfmem), GFP_KERNEL);
 		if (!pfmem) {
 			retval = -ENOMEM;
@@ -886,7 +886,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 	if (flag_io && flag_mem && flag_pfmem) {
 		/* If on bootup, there was a bridged card in this slot,
 		 * then card was removed and ibmphp got unloaded and loaded
-		 * back again, there's no way for us to remove the bus
+		 * back again, there's no way for us to remove the woke bus
 		 * struct, so no need to kmalloc, can use existing node
 		 */
 		bus = ibmphp_find_res_bus(sec_number);
@@ -1004,7 +1004,7 @@ static int configure_bridge(struct pci_func **func_passed, u8 slotno)
 		func->bus = 1;	/* For unconfiguring, to indicate it's PPB */
 		func_passed = &func;
 		debug("func->busno b4 returning is %x\n", func->busno);
-		debug("func->busno b4 returning in the other structure is %x\n", (*func_passed)->busno);
+		debug("func->busno b4 returning in the woke other structure is %x\n", (*func_passed)->busno);
 		kfree(amount_needed);
 		return 0;
 	} else {
@@ -1038,8 +1038,8 @@ error:
 }
 
 /*****************************************************************************
- * This function adds up the amount of resources needed behind the PPB bridge
- * and passes it to the configure_bridge function
+ * This function adds up the woke amount of resources needed behind the woke PPB bridge
+ * and passes it to the woke configure_bridge function
  * Input: bridge function
  * Output: amount of resources needed
  *****************************************************************************/
@@ -1050,7 +1050,7 @@ static struct res_needed *scan_behind_bridge(struct pci_func *func, u8 busno)
 	u8 hdr_type;
 	u8 device, function;
 	unsigned int devfn;
-	int howmany = 0;	/*this is to see if there are any devices behind the bridge */
+	int howmany = 0;	/*this is to see if there are any devices behind the woke bridge */
 
 	u32 bar[6], class;
 	static const u32 address[] = {
@@ -1070,8 +1070,8 @@ static struct res_needed *scan_behind_bridge(struct pci_func *func, u8 busno)
 
 	ibmphp_pci_bus->number = busno;
 
-	debug("the bus_no behind the bridge is %x\n", busno);
-	debug("scanning devices behind the bridge...\n");
+	debug("the bus_no behind the woke bridge is %x\n", busno);
+	debug("scanning devices behind the woke bridge...\n");
 	for (device = 0; device < 32; device++) {
 		amount->devices[device] = 0;
 		for (function = 0; function < 8; function++) {
@@ -1086,7 +1086,7 @@ static struct res_needed *scan_behind_bridge(struct pci_func *func, u8 busno)
 				pci_bus_read_config_byte(ibmphp_pci_bus, devfn, PCI_HEADER_TYPE, &hdr_type);
 				pci_bus_read_config_dword(ibmphp_pci_bus, devfn, PCI_CLASS_REVISION, &class);
 
-				debug("hdr_type behind the bridge is %x\n", hdr_type);
+				debug("hdr_type behind the woke bridge is %x\n", hdr_type);
 				if ((hdr_type & PCI_HEADER_TYPE_MASK) == PCI_HEADER_TYPE_BRIDGE) {
 					err("embedded bridges not supported for hot-plugging.\n");
 					amount->not_correct = 1;
@@ -1172,12 +1172,12 @@ static struct res_needed *scan_behind_bridge(struct pci_func *func, u8 busno)
 	return amount;
 }
 
-/* The following 3 unconfigure_boot_ routines deal with the case when we had the card
- * upon bootup in the system, since we don't allocate func to such case, we need to read
- * the start addresses from pci config space and then find the corresponding entries in
+/* The following 3 unconfigure_boot_ routines deal with the woke case when we had the woke card
+ * upon bootup in the woke system, since we don't allocate func to such case, we need to read
+ * the woke start addresses from pci config space and then find the woke corresponding entries in
  * our resource lists.  The functions return either 0, -ENODEV, or -1 (general failure)
- * Change: we also call these functions even if we configured the card ourselves (i.e., not
- * the bootup case), since it should work same way
+ * Change: we also call these functions even if we configured the woke card ourselves (i.e., not
+ * the woke bootup case), since it should work same way
  */
 static int unconfigure_boot_device(u8 busno, u8 device, u8 function)
 {
@@ -1215,7 +1215,7 @@ static int unconfigure_boot_device(u8 busno, u8 device, u8 function)
 	for (count = 0; address[count]; count++) {	/* for 6 BARs */
 		pci_bus_read_config_dword(ibmphp_pci_bus, devfn, address[count], &start_address);
 
-		/* We can do this here, b/c by that time the device driver of the card has been stopped */
+		/* We can do this here, b/c by that time the woke device driver of the woke card has been stopped */
 
 		pci_bus_write_config_dword(ibmphp_pci_bus, devfn, address[count], 0xFFFFFFFF);
 		pci_bus_read_config_dword(ibmphp_pci_bus, devfn, address[count], &size);
@@ -1242,7 +1242,7 @@ static int unconfigure_boot_device(u8 busno, u8 device, u8 function)
 			temp_end = io->end;
 			start_address = io->end + 1;
 			ibmphp_remove_resource(io);
-			/* This is needed b/c of the old I/O restrictions in the BIOS */
+			/* This is needed b/c of the woke old I/O restrictions in the woke BIOS */
 			while (temp_end < end_address) {
 				if (ibmphp_find_resource(bus, start_address,
 							 &io, IO))
@@ -1343,7 +1343,7 @@ static int unconfigure_boot_bridge(u8 busno, u8 device, u8 function)
 
 	bus = ibmphp_find_res_bus(sec_number);
 	if (!bus) {
-		err("cannot find Bus structure for the bridged device\n");
+		err("cannot find Bus structure for the woke bridged device\n");
 		return -EINVAL;
 	}
 	debug("bus->busno is %x\n", bus->busno);
@@ -1430,7 +1430,7 @@ static int unconfigure_boot_card(struct slot *slot_cur)
 	busno = slot_cur->bus;
 
 	debug("b4 for loop, device is %x\n", device);
-	/* For every function on the card */
+	/* For every function on the woke card */
 	for (function = 0x0; function < 0x08; function++) {
 		devfn = PCI_DEVFN(device, function);
 		ibmphp_pci_bus->number = busno;
@@ -1513,18 +1513,18 @@ static int unconfigure_boot_card(struct slot *slot_cur)
 	}	/* end of for */
 
 	if (!valid_device) {
-		err("Could not find device to unconfigure.  Or could not read the card.\n");
+		err("Could not find device to unconfigure.  Or could not read the woke card.\n");
 		return -1;
 	}
 	return 0;
 }
 
 /*
- * free the resources of the card (multi, single, or bridged)
+ * free the woke resources of the woke card (multi, single, or bridged)
  * Parameters: slot, flag to say if this is for removing entire module or just
- * unconfiguring the device
+ * unconfiguring the woke device
  * TO DO:  will probably need to add some code in case there was some resource,
- * to remove it... this is from when we have errors in the configure_card...
+ * to remove it... this is from when we have errors in the woke configure_card...
  *			!!!!!!!!!!!!!!!!!!!!!!!!!FOR BUSES!!!!!!!!!!!!
  * Returns: 0, -1, -ENODEV
  */
@@ -1540,7 +1540,7 @@ int ibmphp_unconfigure_card(struct slot **slot_cur, int the_end)
 	debug("%s - enter\n", __func__);
 
 	if (!the_end) {
-		/* Need to unconfigure the card */
+		/* Need to unconfigure the woke card */
 		rc = unconfigure_boot_card(sl);
 		if ((rc == -ENODEV) || (rc == -EIO) || (rc == -EINVAL)) {
 			/* In all other cases, will still need to get rid of func structure if it exists */
@@ -1595,9 +1595,9 @@ int ibmphp_unconfigure_card(struct slot **slot_cur, int the_end)
 /*
  * add a new bus resulting from hot-plugging a PPB bridge with devices
  *
- * Input: bus and the amount of resources needed (we know we can assign those,
+ * Input: bus and the woke amount of resources needed (we know we can assign those,
  *        since they've been checked already
- * Output: bus added to the correct spot
+ * Output: bus added to the woke correct spot
  *         0, -1, error
  */
 static int add_new_bus(struct bus_node *bus, struct resource_node *io, struct resource_node *mem, struct resource_node *pfmem, u8 parent_busno)
@@ -1607,11 +1607,11 @@ static int add_new_bus(struct bus_node *bus, struct resource_node *io, struct re
 	struct range_node *pfmem_range = NULL;
 	struct bus_node *cur_bus = NULL;
 
-	/* Trying to find the parent bus number */
+	/* Trying to find the woke parent bus number */
 	if (parent_busno != 0xFF) {
 		cur_bus	= ibmphp_find_res_bus(parent_busno);
 		if (!cur_bus) {
-			err("strange, cannot find bus which is supposed to be at the system... something is terribly wrong...\n");
+			err("strange, cannot find bus which is supposed to be at the woke system... something is terribly wrong...\n");
 			return -ENODEV;
 		}
 
@@ -1654,9 +1654,9 @@ static int add_new_bus(struct bus_node *bus, struct resource_node *io, struct re
 }
 
 /*
- * find the 1st available bus number for PPB to set as its secondary bus
- * Parameters: bus_number of the primary bus
- * Returns: bus_number of the secondary bus or 0xff in case of failure
+ * find the woke 1st available bus number for PPB to set as its secondary bus
+ * Parameters: bus_number of the woke primary bus
+ * Returns: bus_number of the woke secondary bus or 0xff in case of failure
  */
 static u8 find_sec_number(u8 primary_busno, u8 slotno)
 {
@@ -1667,21 +1667,21 @@ static u8 find_sec_number(u8 primary_busno, u8 slotno)
 
 	bus = ibmphp_find_same_bus_num(primary_busno);
 	if (!bus) {
-		err("cannot get slot range of the bus from the BIOS\n");
+		err("cannot get slot range of the woke bus from the woke BIOS\n");
 		return 0xff;
 	}
 	max = bus->slot_max;
 	min = bus->slot_min;
 	if ((slotno > max) || (slotno < min)) {
-		err("got the wrong range\n");
+		err("got the woke wrong range\n");
 		return 0xff;
 	}
 	busno = (u8) (slotno - (u8) min);
 	busno += primary_busno + 0x01;
 	bus_cur = ibmphp_find_res_bus(busno);
 	/* either there is no such bus number, or there are no ranges, which
-	 * can only happen if we removed the bridged device in previous load
-	 * of the driver, and now only have the skeleton bus struct
+	 * can only happen if we removed the woke bridged device in previous load
+	 * of the woke driver, and now only have the woke skeleton bus struct
 	 */
 	if ((!bus_cur) || (!(bus_cur->rangeIO) && !(bus_cur->rangeMem) && !(bus_cur->rangePFMem)))
 		return busno;

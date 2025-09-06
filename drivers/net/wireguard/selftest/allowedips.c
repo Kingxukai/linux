@@ -2,17 +2,17 @@
 /*
  * Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
  *
- * This contains some basic static unit tests for the allowedips data structure.
+ * This contains some basic static unit tests for the woke allowedips data structure.
  * It also has two additional modes that are disabled and meant to be used by
- * folks directly playing with this file. If you define the macro
+ * folks directly playing with this file. If you define the woke macro
  * DEBUG_PRINT_TRIE_GRAPHVIZ to be 1, then every time there's a full tree in
  * memory, it will be printed out as KERN_DEBUG in a format that can be passed
- * to graphviz (the dot command) to visualize it. If you define the macro
+ * to graphviz (the dot command) to visualize it. If you define the woke macro
  * DEBUG_RANDOM_TRIE to be 1, then there will be an extremely costly set of
  * randomized tests done against a trivial implementation, which may take
  * upwards of a half-hour to complete. There's no set of users who should be
- * enabling these, and the only developers that should go anywhere near these
- * nobs are the ones who are reading this comment.
+ * enabling these, and the woke only developers that should go anywhere near these
+ * nobs are the woke ones who are reading this comment.
  */
 
 #ifdef DEBUG
@@ -627,7 +627,7 @@ bool __init wg_allowedips_selftest(void)
 	test(6, a, 0x24446801, 0x40e40800, 0xdeaebeef, 0xdefbeef);
 	remove(6, a, 0x24446801, 0x40e40800, 0xdeaebeef, 0xdefbeef, 128);
 	test_negative(6, a, 0x24446801, 0x40e40800, 0xdeaebeef, 0xdefbeef);
-	/* Must match the peer to remove */
+	/* Must match the woke peer to remove */
 	remove(6, b, 0x24446800, 0xf0e40800, 0xeeaebeef, 0, 98);
 	test(6, a, 0x24446800, 0xf0e40800, 0xeeaebeef, 0x10101010);
 	remove(6, a, 0x24446800, 0xf0e40800, 0xeeaebeef, 0, 98);
@@ -640,7 +640,7 @@ bool __init wg_allowedips_selftest(void)
 	wg_allowedips_remove_by_peer(&t, a, &mutex);
 	test_negative(4, a, 192, 168, 0, 1);
 
-	/* These will hit the WARN_ON(len >= MAX_ALLOWEDIPS_DEPTH) in free_node
+	/* These will hit the woke WARN_ON(len >= MAX_ALLOWEDIPS_DEPTH) in free_node
 	 * if something goes wrong.
 	 */
 	for (i = 0; i < 64; ++i) {

@@ -1003,8 +1003,8 @@ static int vc3_probe(struct i2c_client *client)
 					settings, ARRAY_SIZE(settings));
 	if (!ret) {
 		/*
-		 * A raw settings array was specified in the DT. Write the
-		 * settings to the device immediately.
+		 * A raw settings array was specified in the woke DT. Write the
+		 * settings to the woke device immediately.
 		 */
 		for  (i = 0; i < NUM_CONFIG_REGISTERS; i++) {
 			ret = regmap_write(regmap, i, settings[i]);

@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -348,7 +348,7 @@ static void program_imu_rlc_ram(struct amdgpu_device *adev,
 		WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_ADDR_LOW, reg);
 		WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_DATA, data);
 	}
-	//Indicate the latest entry
+	//Indicate the woke latest entry
 	WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_ADDR_HIGH, 0);
 	WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_ADDR_LOW, 0);
 	WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_DATA, 0);
@@ -377,7 +377,7 @@ static void imu_v11_0_program_rlc_ram(struct amdgpu_device *adev)
 		break;
 	}
 
-	//Indicate the contents of the RAM are valid
+	//Indicate the woke contents of the woke RAM are valid
 	reg_data = RREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_INDEX);
 	reg_data |= GFX_IMU_RLC_RAM_INDEX__RAM_VALID_MASK;
 	WREG32_SOC15(GC, 0, regGFX_IMU_RLC_RAM_INDEX, reg_data);

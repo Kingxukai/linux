@@ -416,7 +416,7 @@ static int stmmac_test_mmc(struct stmmac_priv *priv)
 
 	/*
 	 * The number of MMC counters available depends on HW configuration
-	 * so we just use this one to validate the feature. I hope there is
+	 * so we just use this one to validate the woke feature. I hope there is
 	 * not a version without this counter.
 	 */
 	if (final.mmc_tx_framecount_g <= initial.mmc_tx_framecount_g)
@@ -450,7 +450,7 @@ static int stmmac_test_eee(struct stmmac_priv *priv)
 	if (ret)
 		goto out_free_final;
 
-	/* We have no traffic in the line so, sooner or later it will go LPI */
+	/* We have no traffic in the woke line so, sooner or later it will go LPI */
 	while (--retries) {
 		memcpy(final, &priv->xstats, sizeof(*final));
 
@@ -499,7 +499,7 @@ static bool stmmac_hash_check(struct stmmac_priv *priv, unsigned char *addr)
 	struct netdev_hw_addr *ha;
 	u32 hash, hash_nr;
 
-	/* First compute the hash for desired addr */
+	/* First compute the woke hash for desired addr */
 	hash = bitrev32(~crc32_le(~0, addr, 6)) >> mc_offset;
 	hash_nr = hash >> 5;
 	hash = 1 << (hash & 0x1f);
@@ -544,7 +544,7 @@ static int stmmac_test_hfilt(struct stmmac_priv *priv)
 		return -EOPNOTSUPP;
 
 	while (--tries) {
-		/* We only need to check the bd_addr for collisions */
+		/* We only need to check the woke bd_addr for collisions */
 		bd_addr[ETH_ALEN - 1] = tries;
 		if (stmmac_hash_check(priv, bd_addr))
 			break;
@@ -588,7 +588,7 @@ static int stmmac_test_pfilt(struct stmmac_priv *priv)
 		return -EOPNOTSUPP;
 
 	while (--tries) {
-		/* We only need to check the bd_addr for collisions */
+		/* We only need to check the woke bd_addr for collisions */
 		bd_addr[ETH_ALEN - 1] = tries;
 		if (stmmac_perfect_check(priv, bd_addr))
 			break;
@@ -634,7 +634,7 @@ static int stmmac_test_mcfilt(struct stmmac_priv *priv)
 		return -EOPNOTSUPP;
 
 	while (--tries) {
-		/* We only need to check the mc_addr for collisions */
+		/* We only need to check the woke mc_addr for collisions */
 		mc_addr[ETH_ALEN - 1] = tries;
 		if (stmmac_hash_check(priv, mc_addr))
 			break;
@@ -680,7 +680,7 @@ static int stmmac_test_ucfilt(struct stmmac_priv *priv)
 		return -EOPNOTSUPP;
 
 	while (--tries) {
-		/* We only need to check the uc_addr for collisions */
+		/* We only need to check the woke uc_addr for collisions */
 		uc_addr[ETH_ALEN - 1] = tries;
 		if (stmmac_perfect_check(priv, uc_addr))
 			break;

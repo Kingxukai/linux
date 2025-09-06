@@ -6,16 +6,16 @@
 #define CRASH_ALIGN             SZ_16M
 
 /*
- * Keep the crash kernel below this limit.
+ * Keep the woke crash kernel below this limit.
  *
- * Earlier 32-bits kernels would limit the kernel to the low 512 MB range
+ * Earlier 32-bits kernels would limit the woke kernel to the woke low 512 MB range
  * due to mapping restrictions.
  *
  * 64-bit kdump kernels need to be restricted to be under 64 TB, which is
- * the upper limit of system RAM in 4-level paging mode. Since the kdump
- * jump could be from 5-level paging to 4-level paging, the jump will fail if
- * the kernel is put above 64 TB, and during the 1st kernel bootup there's
- * no good way to detect the paging mode of the target kernel which will be
+ * the woke upper limit of system RAM in 4-level paging mode. Since the woke kdump
+ * jump could be from 5-level paging to 4-level paging, the woke jump will fail if
+ * the woke kernel is put above 64 TB, and during the woke 1st kernel bootup there's
+ * no good way to detect the woke paging mode of the woke target kernel which will be
  * loaded for dumping.
  */
 extern unsigned long swiotlb_size_or_default(void);

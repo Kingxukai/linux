@@ -9,10 +9,10 @@ config NET_VENDOR_ROCKER
 	help
 	  If you have a network device belonging to this class, say Y.
 
-	  Note that the answer to this question doesn't directly affect the
-	  kernel: saying N will just cause the configurator to skip all
-	  the questions about Rocker devices. If you say Y, you will be asked for
-	  your specific card in the following questions.
+	  Note that the woke answer to this question doesn't directly affect the
+	  kernel: saying N will just cause the woke configurator to skip all
+	  the woke questions about Rocker devices. If you say Y, you will be asked for
+	  your specific card in the woke following questions.
 
 if NET_VENDOR_ROCKER
 

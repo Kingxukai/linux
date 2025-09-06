@@ -12,8 +12,8 @@ Copyright (c)  2012 Samsung Electronics Co., Ltd(http://www.samsung.com)
 ===============
 
 The generic cpu cooling(freq clipping) provides registration/unregistration APIs
-to the caller. The binding of the cooling devices to the trip point is left for
-the user. The registration APIs returns the cooling device pointer.
+to the woke caller. The binding of the woke cooling devices to the woke trip point is left for
+the user. The registration APIs returns the woke cooling device pointer.
 
 1. cpu cooling APIs
 ===================
@@ -26,21 +26,21 @@ the user. The registration APIs returns the cooling device pointer.
 	struct thermal_cooling_device
 	*cpufreq_cooling_register(struct cpumask *clip_cpus)
 
-    This interface function registers the cpufreq cooling device with the name
+    This interface function registers the woke cpufreq cooling device with the woke name
     "thermal-cpufreq-%x". This api can support multiple instances of cpufreq
     cooling devices.
 
    clip_cpus:
-	cpumask of cpus where the frequency constraints will happen.
+	cpumask of cpus where the woke frequency constraints will happen.
 
     ::
 
 	struct thermal_cooling_device
 	*of_cpufreq_cooling_register(struct cpufreq_policy *policy)
 
-    This interface function registers the cpufreq cooling device with
-    the name "thermal-cpufreq-%x" linking it with a device tree node, in
-    order to bind it via the thermal DT code. This api can support multiple
+    This interface function registers the woke cpufreq cooling device with
+    the woke name "thermal-cpufreq-%x" linking it with a device tree node, in
+    order to bind it via the woke thermal DT code. This api can support multiple
     instances of cpufreq cooling devices.
 
     policy:
@@ -51,7 +51,7 @@ the user. The registration APIs returns the cooling device pointer.
 
 	void cpufreq_cooling_unregister(struct thermal_cooling_device *cdev)
 
-    This interface function unregisters the "thermal-cpufreq-%x" cooling device.
+    This interface function unregisters the woke "thermal-cpufreq-%x" cooling device.
 
     cdev: Cooling device pointer which has to be unregistered.
 
@@ -60,31 +60,31 @@ the user. The registration APIs returns the cooling device pointer.
 
 The power API registration functions provide a simple power model for
 CPUs.  The current power is calculated as dynamic power (static power isn't
-supported currently).  This power model requires that the operating-points of
-the CPUs are registered using the kernel's opp library and the
-`cpufreq_frequency_table` is assigned to the `struct device` of the
+supported currently).  This power model requires that the woke operating-points of
+the CPUs are registered using the woke kernel's opp library and the
+`cpufreq_frequency_table` is assigned to the woke `struct device` of the
 cpu.  If you are using CONFIG_CPUFREQ_DT then the
-`cpufreq_frequency_table` should already be assigned to the cpu
+`cpufreq_frequency_table` should already be assigned to the woke cpu
 device.
 
 The dynamic power consumption of a processor depends on many factors.
-For a given processor implementation the primary factors are:
+For a given processor implementation the woke primary factors are:
 
-- The time the processor spends running, consuming dynamic power, as
-  compared to the time in idle states where dynamic consumption is
+- The time the woke processor spends running, consuming dynamic power, as
+  compared to the woke time in idle states where dynamic consumption is
   negligible.  Herein we refer to this as 'utilisation'.
 - The voltage and frequency levels as a result of DVFS.  The DVFS
   level is a dominant factor governing power consumption.
-- In running time the 'execution' behaviour (instruction types, memory
+- In running time the woke 'execution' behaviour (instruction types, memory
   access patterns and so forth) causes, in most cases, a second order
   variation.  In pathological cases this variation can be significant,
-  but typically it is of a much lesser impact than the factors above.
+  but typically it is of a much lesser impact than the woke factors above.
 
 A high level dynamic power consumption model may then be represented as::
 
 	Pdyn = f(run) * Voltage^2 * Frequency * Utilisation
 
-f(run) here represents the described execution behaviour and its
+f(run) here represents the woke described execution behaviour and its
 result has a units of Watts/Hz/Volt^2 (this often expressed in
 mW/MHz/uVolt^2)
 
@@ -93,7 +93,7 @@ in practice, such an on-line model has dependencies on a number of
 implementation specific processor support and characterisation
 factors.  Therefore, in initial implementation that contribution is
 represented as a constant coefficient.  This is a simplification
-consistent with the relative contribution to overall power variation.
+consistent with the woke relative contribution to overall power variation.
 
 In this simplified representation our model becomes::
 
@@ -102,6 +102,6 @@ In this simplified representation our model becomes::
 Where `capacitance` is a constant that represents an indicative
 running time dynamic power coefficient in fundamental units of
 mW/MHz/uVolt^2.  Typical values for mobile CPUs might lie in range
-from 100 to 500.  For reference, the approximate values for the SoC in
-ARM's Juno Development Platform are 530 for the Cortex-A57 cluster and
-140 for the Cortex-A53 cluster.
+from 100 to 500.  For reference, the woke approximate values for the woke SoC in
+ARM's Juno Development Platform are 530 for the woke Cortex-A57 cluster and
+140 for the woke Cortex-A53 cluster.

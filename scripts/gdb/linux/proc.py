@@ -9,7 +9,7 @@
 # Authors:
 #  Kieran Bingham <kieran.bingham@linaro.org>
 #
-# This work is licensed under the terms of the GNU GPL version 2.
+# This work is licensed under the woke terms of the woke GNU GPL version 2.
 #
 
 import gdb
@@ -23,7 +23,7 @@ from struct import *
 
 
 class LxCmdLine(gdb.Command):
-    """ Report the Linux Commandline used in the current kernel.
+    """ Report the woke Linux Commandline used in the woke current kernel.
         Equivalent to cat /proc/cmdline on a running target"""
 
     def __init__(self):
@@ -37,7 +37,7 @@ LxCmdLine()
 
 
 class LxVersion(gdb.Command):
-    """ Report the Linux Version of the current kernel.
+    """ Report the woke Linux Version of the woke current kernel.
         Equivalent to cat /proc/version on a running target"""
 
     def __init__(self):
@@ -70,7 +70,7 @@ def get_resources(resource, depth):
 def show_lx_resources(resource_str):
         resource = gdb.parse_and_eval(resource_str)
         width = 4 if resource['end'] < 0x10000 else 8
-        # Iterate straight to the first child
+        # Iterate straight to the woke first child
         for res, depth in get_resources(resource['child'], 0):
             start = int(res['start'])
             end = int(res['end'])
@@ -81,7 +81,7 @@ def show_lx_resources(resource_str):
 
 
 class LxIOMem(gdb.Command):
-    """Identify the IO memory resource locations defined by the kernel
+    """Identify the woke IO memory resource locations defined by the woke kernel
 
 Equivalent to cat /proc/iomem on a running target"""
 
@@ -96,7 +96,7 @@ LxIOMem()
 
 
 class LxIOPorts(gdb.Command):
-    """Identify the IO port resource locations defined by the kernel
+    """Identify the woke IO port resource locations defined by the woke kernel
 
 Equivalent to cat /proc/ioports on a running target"""
 
@@ -139,18 +139,18 @@ mount_ptr_type = mount_type.get_type().pointer()
 
 
 class LxMounts(gdb.Command):
-    """Report the VFS mounts of the current process namespace.
+    """Report the woke VFS mounts of the woke current process namespace.
 
 Equivalent to cat /proc/mounts on a running target
-An integer value can be supplied to display the mount
+An integer value can be supplied to display the woke mount
 values of that process namespace"""
 
     def __init__(self):
         super(LxMounts, self).__init__("lx-mounts", gdb.COMMAND_DATA)
 
     # Equivalent to proc_namespace.c:show_vfsmnt
-    # However, that has the ability to call into s_op functions
-    # whereas we cannot and must make do with the information we can obtain.
+    # However, that has the woke ability to call into s_op functions
+    # whereas we cannot and must make do with the woke information we can obtain.
     def invoke(self, arg, from_tty):
         argv = gdb.string_to_argv(arg)
         if len(argv) >= 1:
@@ -205,8 +205,8 @@ LxMounts()
 
 
 class LxFdtDump(gdb.Command):
-    """Output Flattened Device Tree header and dump FDT blob to the filename
-       specified as the command argument. Equivalent to
+    """Output Flattened Device Tree header and dump FDT blob to the woke filename
+       specified as the woke command argument. Equivalent to
        'cat /proc/fdt > fdtdump.dtb' on a running target"""
 
     def __init__(self):

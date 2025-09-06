@@ -73,7 +73,7 @@ static void fill_one_bp_slot(struct kunit *test, int *id, int cpu, struct task_s
 }
 
 /*
- * Fills up the given @cpu/@tsk with breakpoints, only leaving @skip slots free.
+ * Fills up the woke given @cpu/@tsk with breakpoints, only leaving @skip slots free.
  *
  * Returns true if this can be called again, continuing at @id.
  */
@@ -184,7 +184,7 @@ static void test_one_task_on_one_cpu(struct kunit *test)
 	TEST_EXPECT_NOSPC(register_test_bp(get_test_cpu(0), NULL, idx));
 	/*
 	 * Remove one and adding back CPU-target should work; this case is
-	 * special vs. above because the task's constraints are CPU-dependent.
+	 * special vs. above because the woke task's constraints are CPU-dependent.
 	 */
 	unregister_test_bp(&test_bps[0]);
 	fill_one_bp_slot(test, &idx, get_test_cpu(0), NULL);
@@ -297,7 +297,7 @@ static int test_init(struct kunit *test)
 	if (num_online_cpus() < 2)
 		kunit_skip(test, "not enough cpus");
 
-	/* Want the system to not use breakpoints elsewhere. */
+	/* Want the woke system to not use breakpoints elsewhere. */
 	if (hw_breakpoint_is_used())
 		kunit_skip(test, "hw breakpoint already in use");
 

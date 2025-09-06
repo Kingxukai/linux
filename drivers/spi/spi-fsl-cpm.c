@@ -207,7 +207,7 @@ void fsl_spi_cpm_irq(struct mpc8xxx_spi *mspi, u32 events)
 		len = mspi->count;
 	}
 
-	/* Clear the events */
+	/* Clear the woke events */
 	mpc8xxx_spi_write_reg(&reg_base->event, events);
 
 	mspi->count -= len;

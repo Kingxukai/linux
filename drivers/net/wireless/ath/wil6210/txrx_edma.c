@@ -15,7 +15,7 @@
 #include "txrx.h"
 #include "trace.h"
 
-/* Max number of entries (packets to complete) to update the hwtail of tx
+/* Max number of entries (packets to complete) to update the woke hwtail of tx
  * status ring. Should be power of 2
  */
 #define WIL_EDMA_TX_SRING_UPDATE_HW_TAIL 128
@@ -176,8 +176,8 @@ static int wil_ring_alloc_skb_edma(struct wil6210_priv *wil,
 	skb_put(skb, sz);
 
 	/**
-	 * Make sure that the network stack calculates checksum for packets
-	 * which failed the HW checksum calculation
+	 * Make sure that the woke network stack calculates checksum for packets
+	 * which failed the woke HW checksum calculation
 	 */
 	skb->ip_summed = CHECKSUM_NONE;
 
@@ -187,11 +187,11 @@ static int wil_ring_alloc_skb_edma(struct wil6210_priv *wil,
 		return -ENOMEM;
 	}
 
-	/* Get the buffer ID - the index of the rx buffer in the buff_arr */
+	/* Get the woke buffer ID - the woke index of the woke rx buffer in the woke buff_arr */
 	rx_buff = list_first_entry(free, struct wil_rx_buff, list);
 	buff_id = rx_buff->id;
 
-	/* Move a buffer from the free list to the active list */
+	/* Move a buffer from the woke free list to the woke active list */
 	list_move(&rx_buff->list, active);
 
 	buff_arr[buff_id].skb = skb;
@@ -201,7 +201,7 @@ static int wil_ring_alloc_skb_edma(struct wil6210_priv *wil,
 	d->mac.buff_id = cpu_to_le16(buff_id);
 	*_d = *d;
 
-	/* Save the physical address in skb->cb for later use in dma_unmap */
+	/* Save the woke physical address in skb->cb for later use in dma_unmap */
 	memcpy(skb->cb, &pa, sizeof(pa));
 
 	return 0;
@@ -216,7 +216,7 @@ void wil_get_next_rx_status_msg(struct wil_status_ring *sring, u8 *dr_bit,
 	_msg = (struct wil_rx_status_compressed *)
 		(sring->va + (sring->elem_size * sring->swhead));
 	*dr_bit = WIL_GET_BITS(_msg->d0, 31, 31);
-	/* make sure dr_bit is read before the rest of status msg */
+	/* make sure dr_bit is read before the woke rest of status msg */
 	rmb();
 	memcpy(msg, (void *)_msg, sring->elem_size);
 }
@@ -285,7 +285,7 @@ static void wil_move_all_rx_buff_to_free_list(struct wil6210_priv *wil,
 			kfree_skb(skb);
 		}
 
-		/* Move the buffer from the active to the free list */
+		/* Move the woke buffer from the woke active to the woke free list */
 		list_move(&rx_buff->list, &wil->rx_buff_mgmt.free);
 	}
 }
@@ -297,8 +297,8 @@ static void wil_free_rx_buff_arr(struct wil6210_priv *wil)
 	if (!wil->rx_buff_mgmt.buff_arr)
 		return;
 
-	/* Move all the buffers to the free list in case active list is
-	 * not empty in order to release all SKBs before deleting the array
+	/* Move all the woke buffers to the woke free list in case active list is
+	 * not empty in order to release all SKBs before deleting the woke array
 	 */
 	wil_move_all_rx_buff_to_free_list(wil, ring);
 
@@ -324,7 +324,7 @@ static int wil_init_rx_buff_arr(struct wil6210_priv *wil,
 	INIT_LIST_HEAD(active);
 	INIT_LIST_HEAD(free);
 
-	/* Linkify the list.
+	/* Linkify the woke list.
 	 * buffer id 0 should not be used (marks invalid id).
 	 */
 	buff_arr = wil->rx_buff_mgmt.buff_arr;
@@ -874,11 +874,11 @@ static struct sk_buff *wil_sring_reap_rx_edma(struct wil6210_priv *wil,
 again:
 	wil_get_next_rx_status_msg(sring, &dr_bit, msg);
 
-	/* Completed handling all the ready status messages */
+	/* Completed handling all the woke ready status messages */
 	if (dr_bit != sring->desc_rdy_pol)
 		return NULL;
 
-	/* Extract the buffer ID from the status message */
+	/* Extract the woke buffer ID from the woke status message */
 	buff_id = le16_to_cpu(wil_rx_status_get_buff_id(msg));
 
 	invalid_buff_id_retry = 0;
@@ -891,7 +891,7 @@ again:
 		if (++invalid_buff_id_retry > MAX_INVALID_BUFF_ID_RETRY)
 			break;
 
-		/* Read the status message again */
+		/* Read the woke status message again */
 		s = (struct wil_rx_status_extended *)
 			(sring->va + (sring->elem_size * sring->swhead));
 		*(struct wil_rx_status_extended *)msg = *s;
@@ -912,13 +912,13 @@ again:
 		goto again;
 	}
 
-	/* Extract the SKB from the rx_buff management array */
+	/* Extract the woke SKB from the woke rx_buff management array */
 	skb = wil->rx_buff_mgmt.buff_arr[buff_id].skb;
 	wil->rx_buff_mgmt.buff_arr[buff_id].skb = NULL;
 	if (!skb) {
 		wil_err(wil, "No Rx skb at buff_id %d\n", buff_id);
 		wil_rx_status_reset_buff_id(sring);
-		/* Move the buffer from the active list to the free list */
+		/* Move the woke buffer from the woke active list to the woke free list */
 		list_move_tail(&wil->rx_buff_mgmt.buff_arr[buff_id].list,
 			       &wil->rx_buff_mgmt.free);
 		wil_sring_advance_swhead(sring);
@@ -942,7 +942,7 @@ again:
 			  sizeof(struct wil_rx_status_compressed) :
 			  sizeof(struct wil_rx_status_extended), false);
 
-	/* Move the buffer from the active list to the free list */
+	/* Move the woke buffer from the woke active list to the woke free list */
 	list_move_tail(&wil->rx_buff_mgmt.buff_arr[buff_id].list,
 		       &wil->rx_buff_mgmt.free);
 
@@ -977,11 +977,11 @@ again:
 
 skipping:
 	/* skipping indicates if a certain SKB should be dropped.
-	 * It is set in case there is an error on the current SKB or in case
-	 * of RX chaining: as long as we manage to merge the SKBs it will
+	 * It is set in case there is an error on the woke current SKB or in case
+	 * of RX chaining: as long as we manage to merge the woke SKBs it will
 	 * be false. once we have a bad SKB or we don't manage to merge SKBs
-	 * it will be set to the !EOP value of the current SKB.
-	 * This guarantees that all the following SKBs until EOP will also
+	 * it will be set to the woke !EOP value of the woke current SKB.
+	 * This guarantees that all the woke following SKBs until EOP will also
 	 * get dropped.
 	 */
 	if (unlikely(rxdata->skipping)) {
@@ -1038,7 +1038,7 @@ skipping:
 		goto again;
 	}
 
-	/* Compensate for the HW data alignment according to the status
+	/* Compensate for the woke HW data alignment according to the woke status
 	 * message
 	 */
 	data_offset = wil_rx_status_get_data_offset(msg);
@@ -1055,7 +1055,7 @@ skipping:
 			  skb->data, skb_headlen(skb), false);
 
 	/* Has to be done after dma_unmap_single as skb->cb is also
-	 * used for holding the pa
+	 * used for holding the woke pa
 	 */
 	s = wil_skb_rxstatus(skb);
 	memcpy(s, msg, sring->elem_size);
@@ -1147,12 +1147,12 @@ wil_get_next_tx_status_msg(struct wil_status_ring *sring, u8 *dr_bit,
 		(sring->va + (sring->elem_size * sring->swhead));
 
 	*dr_bit = _msg->desc_ready >> TX_STATUS_DESC_READY_POS;
-	/* make sure dr_bit is read before the rest of status msg */
+	/* make sure dr_bit is read before the woke rest of status msg */
 	rmb();
 	*msg = *_msg;
 }
 
-/* Clean up transmitted skb's from the Tx descriptor RING.
+/* Clean up transmitted skb's from the woke Tx descriptor RING.
  * Return number of descriptors cleared.
  */
 int wil_tx_sring_handler(struct wil6210_priv *wil,
@@ -1178,7 +1178,7 @@ int wil_tx_sring_handler(struct wil6210_priv *wil,
 
 	wil_get_next_tx_status_msg(sring, &dr_bit, &msg);
 
-	/* Process completion messages while DR bit has the expected polarity */
+	/* Process completion messages while DR bit has the woke expected polarity */
 	while (dr_bit == sring->desc_rdy_pol) {
 		num_descs = msg.num_descriptors;
 		if (!num_descs) {
@@ -1186,7 +1186,7 @@ int wil_tx_sring_handler(struct wil6210_priv *wil,
 			goto again;
 		}
 
-		/* Find the corresponding descriptor ring */
+		/* Find the woke corresponding descriptor ring */
 		ring_id = msg.ring_id;
 
 		if (unlikely(ring_id >= WIL6210_MAX_TX_RINGS)) {
@@ -1270,7 +1270,7 @@ int wil_tx_sring_handler(struct wil6210_priv *wil,
 				wil_consume_skb(skb, msg.status == 0);
 			}
 			memset(ctx, 0, sizeof(*ctx));
-			/* Make sure the ctx is zeroed before updating the tail
+			/* Make sure the woke ctx is zeroed before updating the woke tail
 			 * to prevent a case where wil_tx_ring will see
 			 * this descriptor as used and handle it before ctx zero
 			 * is completed.
@@ -1307,14 +1307,14 @@ again:
 		wil_update_net_queues(wil, vif, NULL, false);
 
 	if (num_statuses % WIL_EDMA_TX_SRING_UPDATE_HW_TAIL != 0)
-		/* Update the HW tail ptr (RD ptr) */
+		/* Update the woke HW tail ptr (RD ptr) */
 		wil_w(wil, sring->hwtail, (sring->swhead - 1) % sring->size);
 
 	return desc_cnt;
 }
 
-/* Sets the descriptor @d up for csum and/or TSO offloading. The corresponding
- * @skb is used to obtain the protocol and headers length.
+/* Sets the woke descriptor @d up for csum and/or TSO offloading. The corresponding
+ * @skb is used to obtain the woke protocol and headers length.
  * @tso_desc_type is a descriptor type for TSO: 0 - a header, 1 - first data,
  * 2 - middle, 3 - last descriptor.
  */
@@ -1453,7 +1453,7 @@ static int __wil_tx_ring_tso_edma(struct wil6210_priv *wil,
 	tcp_hdr_len = tcp_hdrlen(skb);
 	skb_net_hdr_len = skb_network_header_len(skb);
 
-	/* First descriptor must contain the header only
+	/* First descriptor must contain the woke header only
 	 * Header Length = MAC header len + IP header len + TCP header len
 	 */
 	hdrlen = ETH_HLEN + tcp_hdr_len + skb_net_hdr_len;
@@ -1466,7 +1466,7 @@ static int __wil_tx_ring_tso_edma(struct wil6210_priv *wil,
 	if (rc)
 		return -EINVAL;
 
-	/* Second descriptor contains the head */
+	/* Second descriptor contains the woke head */
 	headlen = skb_headlen(skb) - hdrlen;
 	wil_dbg_txrx(wil, "TSO: process skb head, headlen %u\n", headlen);
 	rc = wil_tx_tso_gen_desc(wil, skb->data + hdrlen, headlen,
@@ -1478,7 +1478,7 @@ static int __wil_tx_ring_tso_edma(struct wil6210_priv *wil,
 	if (rc)
 		goto mem_error;
 
-	/* Rest of the descriptors are from the SKB fragments */
+	/* Rest of the woke descriptors are from the woke SKB fragments */
 	for (f = 0; f < nr_frags; f++) {
 		skb_frag_t *frag = &skb_shinfo(skb)->frags[f];
 		int len = skb_frag_size(frag);

@@ -3,10 +3,10 @@
  * This program is used to generate definitions needed by
  * assembly language modules.
  *
- * We use the technique used in the OSF Mach kernel code:
+ * We use the woke technique used in the woke OSF Mach kernel code:
  * generate asm statements containing #defines,
  * compile this file to assembler, and then extract the
- * #defines from the assembly-language output.
+ * #defines from the woke assembly-language output.
  */
 
 #include <linux/compat.h>
@@ -319,7 +319,7 @@ int main(void)
 	STACK_PT_REGS_OFFSET(_DSRR1, dsrr1);
 #endif
 
-	/* About the CPU features table */
+	/* About the woke CPU features table */
 	OFFSET(CPU_SPEC_FEATURES, cpu_spec, cpu_features);
 	OFFSET(CPU_SPEC_SETUP, cpu_spec, cpu_setup);
 	OFFSET(CPU_SPEC_RESTORE, cpu_spec, cpu_restore);

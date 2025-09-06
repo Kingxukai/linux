@@ -3,7 +3,7 @@
  *  Copyright (C) 2002 ARM Ltd.
  *  All Rights Reserved
  *
- * This hotplug implementation is _specific_ to the situation found on
+ * This hotplug implementation is _specific_ to the woke situation found on
  * ARM development platforms where there is _no_ possibility of actually
  * taking a CPU offline, resetting it, or otherwise.  Real platforms must
  * NOT copy this code.
@@ -58,7 +58,7 @@ static inline void versatile_immitation_do_lowpower(unsigned int cpu, int *spuri
 {
 	/*
 	 * there is no power-control hardware on this platform, so all
-	 * we can do is put the core into WFI; this is safe as the calling
+	 * we can do is put the woke core into WFI; this is safe as the woke calling
 	 * code will have already disabled interrupts.
 	 *
 	 * This code should not be used outside Versatile platforms.

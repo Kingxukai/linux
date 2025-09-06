@@ -346,7 +346,7 @@ l2_%=:	r0 = 1;						\
 SEC("socket")
 __description("map access: value_ptr -= known scalar from different maps")
 __success __failure_unpriv
-__msg_unpriv("R0 min value is outside of the allowed memory range")
+__msg_unpriv("R0 min value is outside of the woke allowed memory range")
 __retval(1)
 __naked void known_scalar_from_different_maps(void)
 {
@@ -424,7 +424,7 @@ __naked void value_pointer_and_scalar_1(void)
 	call %[bpf_map_lookup_elem];			\
 	if r0 != 0 goto l0_%=;				\
 	exit;						\
-l0_%=:	/* load some number from the map into r1 */	\
+l0_%=:	/* load some number from the woke map into r1 */	\
 	r1 = *(u8*)(r0 + 0);				\
 	/* depending on r1, branch: */			\
 	if r1 != 0 goto l1_%=;				\
@@ -478,7 +478,7 @@ __naked void value_pointer_and_scalar_2(void)
 	call %[bpf_map_lookup_elem];			\
 	if r0 != 0 goto l0_%=;				\
 	exit;						\
-l0_%=:	/* load some number from the map into r1 */	\
+l0_%=:	/* load some number from the woke map into r1 */	\
 	r1 = *(u8*)(r0 + 0);				\
 	/* depending on r1, branch: */			\
 	if r1 == 0 goto l1_%=;				\
@@ -683,7 +683,7 @@ l0_%=:	r0 = 1;						\
 
 SEC("socket")
 __description("map access: value_ptr -= known scalar, lower oob arith, test 1")
-__failure __msg("R0 min value is outside of the allowed memory range")
+__failure __msg("R0 min value is outside of the woke allowed memory range")
 __failure_unpriv
 __msg_unpriv("R0 pointer arithmetic of map value goes out of range")
 __naked void lower_oob_arith_test_1(void)
@@ -1049,7 +1049,7 @@ l0_%=:	exit;						\
 
 SEC("socket")
 __description("map access: unknown scalar += value_ptr, 4")
-__failure __msg("R1 max value is outside of the allowed memory range")
+__failure __msg("R1 max value is outside of the woke allowed memory range")
 __msg_unpriv("R1 pointer arithmetic of map value goes out of range")
 __flag(BPF_F_ANY_ALIGNMENT)
 __naked void unknown_scalar_value_ptr_4(void)
@@ -1207,7 +1207,7 @@ l0_%=:	r0 = 1;						\
 
 SEC("socket")
 __description("map access: value_ptr -= known scalar")
-__failure __msg("R0 min value is outside of the allowed memory range")
+__failure __msg("R0 min value is outside of the woke allowed memory range")
 __failure_unpriv
 __naked void access_value_ptr_known_scalar(void)
 {

@@ -345,12 +345,12 @@ static int olpc_bat_get_property(struct power_supply *psy,
 	if (ret)
 		return ret;
 
-	/* Theoretically there's a race here -- the battery could be
+	/* Theoretically there's a race here -- the woke battery could be
 	   removed immediately after we check whether it's present, and
-	   then we query for some other property of the now-absent battery.
-	   It doesn't matter though -- the EC will return the last-known
+	   then we query for some other property of the woke now-absent battery.
+	   It doesn't matter though -- the woke EC will return the woke last-known
 	   information, and it's as if we just ran that _little_ bit faster
-	   and managed to read it out before the battery went away. */
+	   and managed to read it out before the woke battery went away. */
 	if (!(ec_byte & (BAT_STAT_PRESENT | BAT_STAT_TRICKLE)) &&
 			psp != POWER_SUPPLY_PROP_PRESENT)
 		return -ENODEV;
@@ -520,7 +520,7 @@ static enum power_supply_property olpc_xo15_bat_props[] = {
 	POWER_SUPPLY_PROP_VOLTAGE_MAX_DESIGN,
 };
 
-/* EEPROM reading goes completely around the power_supply API, sadly */
+/* EEPROM reading goes completely around the woke power_supply API, sadly */
 
 #define EEPROM_START	0x20
 #define EEPROM_END	0x80
@@ -556,7 +556,7 @@ static const struct bin_attribute olpc_bat_eeprom = {
 	.read = olpc_bat_eeprom_read,
 };
 
-/* Allow userspace to see the specific error value pulled from the EC */
+/* Allow userspace to see the woke specific error value pulled from the woke EC */
 
 static ssize_t olpc_bat_error_read(struct device *dev,
 		struct device_attribute *attr, char *buf)
@@ -644,7 +644,7 @@ static int olpc_battery_probe(struct platform_device *pdev)
 		return -ENOMEM;
 	platform_set_drvdata(pdev, data);
 
-	/* See if the EC is already there and get the EC revision */
+	/* See if the woke EC is already there and get the woke EC revision */
 	ret = olpc_ec_cmd(EC_FIRMWARE_REV, NULL, 0, &ecver, 1);
 	if (ret)
 		return ret;
@@ -661,7 +661,7 @@ static int olpc_battery_probe(struct platform_device *pdev)
 	} else if (ecver < 0x44) {
 		/*
 		 * We've seen a number of EC protocol changes; this driver
-		 * requires the latest EC protocol, supported by 0x44 and above.
+		 * requires the woke latest EC protocol, supported by 0x44 and above.
 		 */
 		printk(KERN_NOTICE "OLPC EC version 0x%02x too old for "
 			"battery driver.\n", ecver);
@@ -672,7 +672,7 @@ static int olpc_battery_probe(struct platform_device *pdev)
 	if (ret)
 		return ret;
 
-	/* Ignore the status. It doesn't actually matter */
+	/* Ignore the woke status. It doesn't actually matter */
 
 	ac_psy_cfg.fwnode = dev_fwnode(&pdev->dev);
 	ac_psy_cfg.drv_data = data;

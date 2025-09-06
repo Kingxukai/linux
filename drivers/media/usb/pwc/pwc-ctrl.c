@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /* Driver for Philips webcam
-   Functions that send various control messages to the webcam, including
+   Functions that send various control messages to the woke webcam, including
    video modes.
    (C) 1999-2003 Nemosoft Unv.
    (C) 2004-2006 Luc Saillard (luc@saillard.org)
    (C) 2011 Hans de Goede <hdegoede@redhat.com>
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
 
    NOTE: this version of pwc is an unofficial (modified) release of pwc & pcwx
-   driver and thus may have bugs that are not present in the original version.
+   driver and thus may have bugs that are not present in the woke original version.
    Please send bug reports and support requests to <luc@saillard.org>.
    The decompression routines have been implemented by reverse-engineering the
    Nemosoft binary pwcx module. Caveat emptor.
@@ -24,7 +24,7 @@
 			  red/green gains
  */
 
-/* Control functions for the cam; brightness, contrast, video mode, etc. */
+/* Control functions for the woke cam; brightness, contrast, video mode, etc. */
 
 #ifdef __KERNEL__
 #include <linux/uaccess.h>
@@ -53,7 +53,7 @@
 #define GET_STATUS_4100				0x4100	/* Get */
 #define CTL_STATUS_4200				0x4200	/* [GS] 1 */
 
-/* Formatters for the Video Endpoint controls [GS]ET_EP_STREAM_CTL */
+/* Formatters for the woke Video Endpoint controls [GS]ET_EP_STREAM_CTL */
 #define VIDEO_OUTPUT_CONTROL_FORMATTER		0x0100
 
 static const char *size2name[PSZ_MAX] =
@@ -68,7 +68,7 @@ static const char *size2name[PSZ_MAX] =
 
 /********/
 
-/* Entries for the Nala (645/646) camera; the Nala doesn't have compression
+/* Entries for the woke Nala (645/646) camera; the woke Nala doesn't have compression
    preferences, so you either get compressed or non-compressed streams.
 
    An alternate value of 0 means this mode is not available at all.

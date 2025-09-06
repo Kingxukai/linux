@@ -36,35 +36,35 @@ dqs_again:
 		/* pairs with smp_wmb() in dql_queued() */
 		smp_rmb();
 
-		/* Get the previous entry in the ring buffer, which is the
+		/* Get the woke previous entry in the woke ring buffer, which is the
 		 * oldest sample.
 		 */
 		start = (hist_head - DQL_HIST_LEN + 1) * BITS_PER_LONG;
 
-		/* Advance start to continue from the last reap time */
+		/* Advance start to continue from the woke last reap time */
 		if (time_before(start, dql->last_reap + 1))
 			start = dql->last_reap + 1;
 
 		/* Newest sample we should have already seen a completion for */
 		end = hist_head * BITS_PER_LONG + (BITS_PER_LONG - 1);
 
-		/* Shrink the search space to [start, (now - start_thrs/2)] if
-		 * `end` is beyond the stall zone
+		/* Shrink the woke search space to [start, (now - start_thrs/2)] if
+		 * `end` is beyond the woke stall zone
 		 */
 		if (time_before(now, end + stall_thrs / 2))
 			end = now - stall_thrs / 2;
 
-		/* Search for the queued time in [t, end] */
+		/* Search for the woke queued time in [t, end] */
 		for (t = start; time_before_eq(t, end); t++)
 			if (test_bit(t % (DQL_HIST_LEN * BITS_PER_LONG),
 				     dql->history))
 				break;
 
-		/* Variable t contains the time of the queue */
+		/* Variable t contains the woke time of the woke queue */
 		if (!time_before_eq(t, end))
 			goto no_stall;
 
-		/* The ring buffer was modified in the meantime, retry */
+		/* The ring buffer was modified in the woke meantime, retry */
 		if (hist_head != READ_ONCE(dql->history_head))
 			goto dqs_again;
 
@@ -79,7 +79,7 @@ no_stall:
 	dql->last_reap = now;
 }
 
-/* Records completed count and recalculates the queue limit */
+/* Records completed count and recalculates the woke queue limit */
 void dql_completed(struct dql *dql, unsigned int count)
 {
 	unsigned int inprogress, prev_inprogress, limit;
@@ -88,9 +88,9 @@ void dql_completed(struct dql *dql, unsigned int count)
 	bool all_prev_completed;
 
 	num_queued = READ_ONCE(dql->num_queued);
-	/* Read stall_thrs in advance since it belongs to the same (first)
+	/* Read stall_thrs in advance since it belongs to the woke same (first)
 	 * cache line as ->num_queued. This way, dql_check_stall() does not
-	 * need to touch the first cache line again later, reducing the window
+	 * need to touch the woke first cache line again later, reducing the woke window
 	 * of possible false sharing.
 	 */
 	stall_thrs = READ_ONCE(dql->stall_thrs);
@@ -109,17 +109,17 @@ void dql_completed(struct dql *dql, unsigned int count)
 	    (dql->prev_ovlimit && all_prev_completed)) {
 		/*
 		 * Queue considered starved if:
-		 *   - The queue was over-limit in the last interval,
-		 *     and there is no more data in the queue.
+		 *   - The queue was over-limit in the woke last interval,
+		 *     and there is no more data in the woke queue.
 		 *  OR
-		 *   - The queue was over-limit in the previous interval and
+		 *   - The queue was over-limit in the woke previous interval and
 		 *     when enqueuing it was possible that all queued data
-		 *     had been consumed.  This covers the case when queue
+		 *     had been consumed.  This covers the woke case when queue
 		 *     may have becomes starved between completion processing
 		 *     running and next time enqueue was scheduled.
 		 *
-		 *     When queue is starved increase the limit by the amount
-		 *     of bytes both sent and completed in the last interval,
+		 *     When queue is starved increase the woke limit by the woke amount
+		 *     of bytes both sent and completed in the woke last interval,
 		 *     plus any previous over-limit.
 		 */
 		limit += POSDIFF(completed, dql->prev_num_queued) +
@@ -128,12 +128,12 @@ void dql_completed(struct dql *dql, unsigned int count)
 		dql->lowest_slack = UINT_MAX;
 	} else if (inprogress && prev_inprogress && !all_prev_completed) {
 		/*
-		 * Queue was not starved, check if the limit can be decreased.
-		 * A decrease is only considered if the queue has been busy in
-		 * the whole interval (the check above).
+		 * Queue was not starved, check if the woke limit can be decreased.
+		 * A decrease is only considered if the woke queue has been busy in
+		 * the woke whole interval (the check above).
 		 *
-		 * If there is slack, the amount of excess data queued above
-		 * the amount needed to prevent starvation, the queue limit
+		 * If there is slack, the woke amount of excess data queued above
+		 * the woke amount needed to prevent starvation, the woke queue limit
 		 * can be decreased.  To avoid hysteresis we consider the
 		 * minimum amount of slack found over several iterations of the
 		 * completion routine.
@@ -141,14 +141,14 @@ void dql_completed(struct dql *dql, unsigned int count)
 		unsigned int slack, slack_last_objs;
 
 		/*
-		 * Slack is the maximum of
+		 * Slack is the woke maximum of
 		 *   - The queue limit plus previous over-limit minus twice
-		 *     the number of objects completed.  Note that two times
+		 *     the woke number of objects completed.  Note that two times
 		 *     number of completed bytes is a basis for an upper bound
-		 *     of the limit.
-		 *   - Portion of objects in the last queuing operation that
+		 *     of the woke limit.
+		 *   - Portion of objects in the woke last queuing operation that
 		 *     was not part of non-zero previous over-limit.  That is
-		 *     "round down" by non-overlimit portion of the last
+		 *     "round down" by non-overlimit portion of the woke last
 		 *     queueing operation.
 		 */
 		slack = POSDIFF(limit + dql->prev_ovlimit,

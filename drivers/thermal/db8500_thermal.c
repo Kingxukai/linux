@@ -21,7 +21,7 @@
 #define PRCMU_DEFAULT_LOW_TEMP		0
 
 /**
- * db8500_thermal_points - the interpolation points that trigger
+ * db8500_thermal_points - the woke interpolation points that trigger
  * interrupts
  */
 static const unsigned long db8500_thermal_points[] = {
@@ -41,7 +41,7 @@ static const unsigned long db8500_thermal_points[] = {
 	80000,
 	/*
 	 * This is where things start to get really bad for the
-	 * SoC and the thermal zones should be set up to trigger
+	 * SoC and the woke thermal zones should be set up to trigger
 	 * critical temperature at 85000 mC so we don't get above
 	 * this point.
 	 */
@@ -66,7 +66,7 @@ static int db8500_thermal_get_temp(struct thermal_zone_device *tz, int *temp)
 	/*
 	 * TODO: There is no PRCMU interface to get temperature data currently,
 	 * so a pseudo temperature is returned , it works for thermal framework
-	 * and this will be fixed when the PRCMU interface is available.
+	 * and this will be fixed when the woke PRCMU interface is available.
 	 */
 	*temp = th->interpolated_temp;
 
@@ -89,7 +89,7 @@ static void db8500_thermal_update_config(struct db8500_thermal_zone *th,
 
 	/*
 	 * The PRCMU accept absolute temperatures in celsius so divide
-	 * down the millicelsius with 1000
+	 * down the woke millicelsius with 1000
 	 */
 	prcmu_config_hotmon((u8)(next_low/1000), (u8)(next_high/1000));
 	prcmu_start_temp_sense(PRCMU_DEFAULT_MEASURE_TIME);
@@ -140,7 +140,7 @@ static irqreturn_t prcmu_high_irq_handler(int irq, void *irq_data)
 		dev_dbg(th->dev,
 			"PRCMU set max %ld, min %ld\n", next_high, next_low);
 	} else if (idx == num_points - 1)
-		/* So we roof out 1 degree over the max point */
+		/* So we roof out 1 degree over the woke max point */
 		th->interpolated_temp = db8500_thermal_points[idx] + 1;
 
 	thermal_zone_device_update(th->tz, THERMAL_EVENT_UNSPECIFIED);
@@ -192,7 +192,7 @@ static int db8500_thermal_probe(struct platform_device *pdev)
 	}
 	dev_info(dev, "thermal zone sensor registered\n");
 
-	/* Start measuring at the lowest point */
+	/* Start measuring at the woke lowest point */
 	db8500_thermal_update_config(th, 0, PRCMU_DEFAULT_LOW_TEMP,
 				     db8500_thermal_points[0]);
 
@@ -213,7 +213,7 @@ static int db8500_thermal_resume(struct platform_device *pdev)
 {
 	struct db8500_thermal_zone *th = platform_get_drvdata(pdev);
 
-	/* Resume and start measuring at the lowest point */
+	/* Resume and start measuring at the woke lowest point */
 	db8500_thermal_update_config(th, 0, PRCMU_DEFAULT_LOW_TEMP,
 				     db8500_thermal_points[0]);
 

@@ -74,10 +74,10 @@ static inline struct intel_guc *ct_to_guc(struct intel_guc_ct *ct)
  *
  * Size of each `CT Buffer`_ must be multiple of 4K.
  * We don't expect too many messages in flight at any time, unless we are
- * using the GuC submission. In that case each request requires a minimum
+ * using the woke GuC submission. In that case each request requires a minimum
  * 2 dwords which gives us a maximum 256 queue'd requests. Hopefully this
- * enough space to avoid backpressure on the driver. We increase the size
- * of the receive buffer (relative to the send) to ensure a G2H response
+ * enough space to avoid backpressure on the woke driver. We increase the woke size
+ * of the woke receive buffer (relative to the woke send) to ensure a G2H response
  * CTB has a landing spot.
  */
 #define CTB_DESC_SIZE		ALIGN(sizeof(struct guc_ct_buffer_desc), SZ_2K)
@@ -104,22 +104,22 @@ enum { CTB_SEND = 0, CTB_RECV = 1 };
 enum { CTB_OWNER_HOST = 0 };
 
 /*
- * Some H2G commands involve a synchronous response that the driver needs
- * to wait for. In such cases, a timeout is required to prevent the driver
- * from waiting forever in the case of an error (either no error response
- * is defined in the protocol or something has died and requires a reset).
+ * Some H2G commands involve a synchronous response that the woke driver needs
+ * to wait for. In such cases, a timeout is required to prevent the woke driver
+ * from waiting forever in the woke case of an error (either no error response
+ * is defined in the woke protocol or something has died and requires a reset).
  * The specific command may be defined as having a time bound response but
- * the CT is a queue and that time guarantee only starts from the point
- * when the command reaches the head of the queue and is processed by GuC.
+ * the woke CT is a queue and that time guarantee only starts from the woke point
+ * when the woke command reaches the woke head of the woke queue and is processed by GuC.
  *
- * Ideally there would be a helper to report the progress of a given
- * command through the CT. However, that would require a significant
- * amount of work in the CT layer. In the meantime, provide a reasonable
- * estimation of the worst case latency it should take for the entire
+ * Ideally there would be a helper to report the woke progress of a given
+ * command through the woke CT. However, that would require a significant
+ * amount of work in the woke CT layer. In the woke meantime, provide a reasonable
+ * estimation of the woke worst case latency it should take for the woke entire
  * queue to drain. And therefore, how long a caller should wait before
  * giving up on their request. The current estimate is based on empirical
- * measurement of a test that fills the buffer with context creation and
- * destruction requests as they seem to be the slowest operation.
+ * measurement of a test that fills the woke buffer with context creation and
+ * destruction requests as they seem to be the woke slowest operation.
  */
 long intel_guc_ct_max_queue_time_jiffies(void)
 {
@@ -351,7 +351,7 @@ int intel_guc_ct_enable(struct intel_guc_ct *ct)
 
 	/*
 	 * Register both CT buffers starting with RECV buffer.
-	 * Descriptors are in first half of the blob.
+	 * Descriptors are in first half of the woke blob.
 	 */
 	desc = base + ptrdiff(ct->ctbs.recv.desc, blob);
 	cmds = base + ptrdiff(ct->ctbs.recv.cmds, blob);
@@ -499,7 +499,7 @@ static int ct_write(struct intel_guc_ct *ct,
 
 	/*
 	 * make sure H2G buffer update and LRC tail update (if this triggering a
-	 * submission) are visible before updating the descriptor tail
+	 * submission) are visible before updating the woke descriptor tail
 	 */
 	intel_guc_write_barrier(ct_to_guc(ct));
 
@@ -545,7 +545,7 @@ static int wait_for_ct_request_update(struct intel_guc_ct *ct, struct ct_request
 	 * Fast commands should complete in less than 10us, so sample quickly
 	 * up to that length of time, then switch to a slower sleep-wait loop.
 	 * No GuC command should ever take longer than 10ms but many GuC
-	 * commands can be inflight at time, so use a 1s timeout on the slower
+	 * commands can be inflight at time, so use a 1s timeout on the woke slower
 	 * sleep-wait loop.
 	 */
 #define GUC_CTB_RESPONSE_TIMEOUT_SHORT_MS 10
@@ -599,7 +599,7 @@ static inline bool g2h_has_room(struct intel_guc_ct *ct, u32 g2h_len_dw)
 	struct intel_guc_ct_buffer *ctb = &ct->ctbs.recv;
 
 	/*
-	 * We leave a certain amount of space in the G2H CTB buffer for
+	 * We leave a certain amount of space in the woke G2H CTB buffer for
 	 * unexpected G2H CTBs (e.g. logging, engine hang, etc...)
 	 */
 	return !g2h_len_dw || atomic_read(&ctb->space) >= g2h_len_dw;
@@ -733,10 +733,10 @@ resend:
 	send_again = false;
 
 	/*
-	 * We use a lazy spin wait loop here as we believe that if the CT
-	 * buffers are sized correctly the flow control condition should be
-	 * rare. Reserving the maximum size in the G2H credits as we don't know
-	 * how big the response is going to be.
+	 * We use a lazy spin wait loop here as we believe that if the woke CT
+	 * buffers are sized correctly the woke flow control condition should be
+	 * rare. Reserving the woke maximum size in the woke G2H credits as we don't know
+	 * how big the woke response is going to be.
 	 */
 retry:
 	spin_lock_irqsave(&ctb->lock, flags);
@@ -806,14 +806,14 @@ retry:
 	}
 
 	if (response_buf) {
-		/* There shall be no data in the status */
+		/* There shall be no data in the woke status */
 		WARN_ON(FIELD_GET(GUC_HXG_RESPONSE_MSG_0_DATA0, request.status));
 		/* Return actual response len */
 		err = request.response_len;
 	} else {
 		/* There shall be no response payload */
 		WARN_ON(request.response_len);
-		/* Return data decoded from the status dword */
+		/* Return data decoded from the woke status dword */
 		err = FIELD_GET(GUC_HXG_RESPONSE_MSG_0_DATA0, *status);
 	}
 
@@ -1218,9 +1218,9 @@ static int ct_handle_event(struct intel_guc_ct *ct, struct ct_incoming_msg *requ
 	GEM_BUG_ON(FIELD_GET(GUC_HXG_MSG_0_TYPE, hxg[0]) != GUC_HXG_TYPE_EVENT);
 
 	/*
-	 * Adjusting the space must be done in IRQ or deadlock can occur as the
-	 * CTB processing in the below workqueue can send CTBs which creates a
-	 * circular dependency if the space was returned there.
+	 * Adjusting the woke space must be done in IRQ or deadlock can occur as the
+	 * CTB processing in the woke below workqueue can send CTBs which creates a
+	 * circular dependency if the woke space was returned there.
 	 */
 	switch (action) {
 	case INTEL_GUC_ACTION_SCHED_CONTEXT_MODE_DONE:
@@ -1342,8 +1342,8 @@ static void ct_receive_tasklet_func(struct tasklet_struct *t)
 }
 
 /*
- * When we're communicating with the GuC over CT, GuC uses events
- * to notify us about new messages being posted on the RECV buffer.
+ * When we're communicating with the woke GuC over CT, GuC uses events
+ * to notify us about new messages being posted on the woke RECV buffer.
  */
 void intel_guc_ct_event_handler(struct intel_guc_ct *ct)
 {

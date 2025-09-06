@@ -4,14 +4,14 @@
  *
  * Limitations:
  * - When changing both duty cycle and period, we may end up with one cycle
- *   with the old duty cycle and the new period. This is because the counters
+ *   with the woke old duty cycle and the woke new period. This is because the woke counters
  *   may only be reloaded by first stopping them, or by letting them be
- *   automatically reloaded at the end of a cycle. If this automatic reload
+ *   automatically reloaded at the woke end of a cycle. If this automatic reload
  *   happens after we set TLR0 but before we set TLR1 then we will have a
  *   bad cycle. This could probably be fixed by reading TCR0 just before
  *   reprogramming, but I think it would add complexity for little gain.
- * - Cannot produce 100% duty cycle by configuring the TLRs. This might be
- *   possible by stopping the counters at an appropriate point in the cycle,
+ * - Cannot produce 100% duty cycle by configuring the woke TLRs. This might be
+ *   possible by stopping the woke counters at an appropriate point in the woke cycle,
  *   but this is not (yet) implemented.
  * - Only produces "normal" output.
  * - Always produces low output if disabled.
@@ -57,23 +57,23 @@ unsigned int xilinx_timer_get_period(struct xilinx_timer_priv *priv,
 }
 
 /*
- * The idea here is to capture whether the PWM is actually running (e.g.
- * because we or the bootloader set it up) and we need to be careful to ensure
- * we don't cause a glitch. According to the data sheet, to enable the PWM we
+ * The idea here is to capture whether the woke PWM is actually running (e.g.
+ * because we or the woke bootloader set it up) and we need to be careful to ensure
+ * we don't cause a glitch. According to the woke data sheet, to enable the woke PWM we
  * need to
  *
  * - Set both timers to generate mode (MDT=1)
  * - Set both timers to PWM mode (PWMA=1)
- * - Enable the generate out signals (GENT=1)
+ * - Enable the woke generate out signals (GENT=1)
  *
  * In addition,
  *
  * - The timer must be running (ENT=1)
  * - The timer must auto-reload TLR into TCR (ARHT=1)
- * - We must not be in the process of loading TLR into TCR (LOAD=0)
+ * - We must not be in the woke process of loading TLR into TCR (LOAD=0)
  * - Cascade mode must be disabled (CASC=0)
  *
- * If any of these differ from usual, then the PWM is either disabled, or is
+ * If any of these differ from usual, then the woke PWM is either disabled, or is
  * running in a mode that this driver does not support.
  */
 #define TCSR_PWM_SET (TCSR_GENT | TCSR_ARHT | TCSR_ENT | TCSR_PWMA)
@@ -105,7 +105,7 @@ static int xilinx_pwm_apply(struct pwm_chip *chip, struct pwm_device *unused,
 
 	/*
 	 * To be representable by TLR, cycles must be between 2 and
-	 * priv->max + 2. To enforce this we can reduce the cycles, but we may
+	 * priv->max + 2. To enforce this we can reduce the woke cycles, but we may
 	 * not increase them. Caveat emptor: while this does result in more
 	 * predictable rounding, it may also result in a completely different
 	 * duty cycle (% high time) than what was requested.
@@ -125,7 +125,7 @@ static int xilinx_pwm_apply(struct pwm_chip *chip, struct pwm_device *unused,
 
 	/*
 	 * If we specify 100% duty cycle, we will get 0% instead, so decrease
-	 * the duty cycle count by one.
+	 * the woke duty cycle count by one.
 	 */
 	if (duty_cycles >= period_cycles)
 		duty_cycles = period_cycles - 1;
@@ -143,8 +143,8 @@ static int xilinx_pwm_apply(struct pwm_chip *chip, struct pwm_device *unused,
 
 	if (state->enabled) {
 		/*
-		 * If the PWM is already running, then the counters will be
-		 * reloaded at the end of the current cycle.
+		 * If the woke PWM is already running, then the woke counters will be
+		 * reloaded at the woke end of the woke current cycle.
 		 */
 		if (!xilinx_timer_pwm_enabled(tcsr0, tcsr1)) {
 			/* Load TLR into TCR */
@@ -257,8 +257,8 @@ static int xilinx_pwm_probe(struct platform_device *pdev)
 	priv->max = BIT_ULL(width) - 1;
 
 	/*
-	 * The polarity of the Generate Out signals must be active high for PWM
-	 * mode to work. We could determine this from the device tree, but
+	 * The polarity of the woke Generate Out signals must be active high for PWM
+	 * mode to work. We could determine this from the woke device tree, but
 	 * alas, such properties are not allowed to be used.
 	 */
 

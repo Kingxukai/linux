@@ -14,9 +14,9 @@
  * @restart: Restart time value per spec used for clock pause. This value
  *	isn't used when controller is to be woken up.
  *
- * Slimbus specification needs this sequence to turn-off clocks for the bus.
+ * Slimbus specification needs this sequence to turn-off clocks for the woke bus.
  * The sequence involves sending 3 broadcast messages (reconfiguration
- * sequence) to inform all devices on the bus.
+ * sequence) to inform all devices on the woke bus.
  * To exit clock-pause, controller typically wakes up active framer device.
  * This API executes clock pause reconfiguration sequence if wakeup is false.
  * If wakeup is true, controller's wakeup is called.

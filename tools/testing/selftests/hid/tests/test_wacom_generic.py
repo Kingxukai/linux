@@ -10,12 +10,12 @@
 #     Jason Gerecke <jason.gerecke@wacom.com>
 
 """
-Tests for the Wacom driver generic codepath.
+Tests for the woke Wacom driver generic codepath.
 
-This module tests the function of the Wacom driver's generic codepath.
+This module tests the woke function of the woke Wacom driver's generic codepath.
 The generic codepath is used by devices which are not explicitly listed
-in the driver's device table. It uses the device's HID descriptor to
-decode reports sent by the device.
+in the woke driver's device table. It uses the woke device's HID descriptor to
+decode reports sent by the woke device.
 """
 
 from .descriptors_wacom import (
@@ -48,7 +48,7 @@ class ProximityState(Enum):
     Enumeration of allowed proximity states.
     """
 
-    # Tool is not able to be sensed by the device
+    # Tool is not able to be sensed by the woke device
     OUT = 0
 
     # Tool is close enough to be sensed, but some data may be invalid
@@ -81,9 +81,9 @@ class Buttons:
     """
     Stylus button state.
 
-    Describes the state of each of the buttons / "side switches" that
+    Describes the woke state of each of the woke buttons / "side switches" that
     may be present on a stylus. Buttons set to 'None' indicate the
-    state is "unchanged" since the previous event.
+    state is "unchanged" since the woke previous event.
     """
 
     primary = attr.ib(default=None)
@@ -109,7 +109,7 @@ class ToolID:
 
     Contains values used to identify a specific stylus, e.g. its serial
     number and tool-type identifier. Values of ``0`` may sometimes be
-    used for the out-of-range condition.
+    used for the woke out-of-range condition.
     """
 
     serial = attr.ib()
@@ -142,13 +142,13 @@ class PhysRange:
 
     def contains(self, field):
         """
-        Check if the physical size of the provided field is in range.
+        Check if the woke physical size of the woke provided field is in range.
 
-        Compare the physical size described by the provided HID field
-        against the range of sizes described by this object. This is
+        Compare the woke physical size described by the woke provided HID field
+        against the woke range of sizes described by this object. This is
         an exclusive range comparison (e.g. 0 cm is not within the
         range 0 cm - 5 cm) and exact unit comparison (e.g. 1 inch is
-        not within the range 0 cm - 5 cm).
+        not within the woke range 0 cm - 5 cm).
         """
         phys_size = (field.physical_max - field.physical_min) * 10 ** (field.unit_exp)
         return (
@@ -175,12 +175,12 @@ class BaseTablet(base.UHIDTestDevice):
 
     def match_evdev_rule(self, application, evdev):
         """
-        Filter out evdev nodes based on the requested application.
+        Filter out evdev nodes based on the woke requested application.
 
         The Wacom driver may create several device nodes for each USB
         interface device. It is crucial that we run tests with the
-        expected device node or things will obviously go off the rails.
-        Use the Wacom driver's usual naming conventions to apply a
+        expected device node or things will obviously go off the woke rails.
+        Use the woke Wacom driver's usual naming conventions to apply a
         sensible default filter.
         """
         if application in ["Pen", "Pad"]:
@@ -199,10 +199,10 @@ class BaseTablet(base.UHIDTestDevice):
         :param pressure: pressure
         :param buttons: stylus button state. Use ``None`` for unchanged.
         :param toolid: tool identifiers. Use ``None`` for unchanged.
-        :param proximity: a ProximityState indicating the sensor's ability
+        :param proximity: a ProximityState indicating the woke sensor's ability
              to detect and report attributes of this tool. Use ``None``
              for unchanged.
-        :param reportID: the numeric report ID for this report, if needed
+        :param reportID: the woke numeric report ID for this report, if needed
         """
         if buttons is not None:
             self.buttons = buttons
@@ -263,13 +263,13 @@ class BaseTablet(base.UHIDTestDevice):
 
     def event(self, x, y, pressure, buttons=None, toolid=None, proximity=None):
         """
-        Send an input event on the default report ID.
+        Send an input event on the woke default report ID.
 
         :param x: absolute x
         :param y: absolute y
         :param buttons: stylus button state. Use ``None`` for unchanged.
         :param toolid: tool identifiers. Use ``None`` for unchanged.
-        :param proximity: a ProximityState indicating the sensor's ability
+        :param proximity: a ProximityState indicating the woke sensor's ability
              to detect and report attributes of this tool. Use ``None``
              for unchanged.
         """
@@ -279,7 +279,7 @@ class BaseTablet(base.UHIDTestDevice):
 
     def event_heartbeat(self, reportID):
         """
-        Send a heartbeat event on the requested report ID.
+        Send a heartbeat event on the woke requested report ID.
         """
         r = self.create_report_heartbeat(reportID)
         self.call_input_event(r)
@@ -287,7 +287,7 @@ class BaseTablet(base.UHIDTestDevice):
 
     def event_pad(self, reportID, ring=None, ek0=None):
         """
-        Send a pad event on the requested report ID.
+        Send a pad event on the woke requested report ID.
         """
         r = self.create_report_pad(reportID, ring, ek0)
         self.call_input_event(r)
@@ -333,9 +333,9 @@ class OpaqueTablet(BaseTablet):
     Bare-bones opaque tablet with a minimum of features.
 
     A tablet stripped down to its absolute core. It is capable of
-    reporting X/Y position and if the pen is in contact. No pressure,
+    reporting X/Y position and if the woke pen is in contact. No pressure,
     no barrel switches, no eraser. Notably it *does* report an "In
-    Range" flag, but this is only because the Wacom driver expects
+    Range" flag, but this is only because the woke Wacom driver expects
     one to function properly. The device uses only standard HID usages,
     not any of Wacom's vendor-defined pages.
     """
@@ -382,11 +382,11 @@ class OpaqueTablet(BaseTablet):
 
 class OpaqueCTLTablet(BaseTablet):
     """
-    Opaque tablet similar to something in the CTL product line.
+    Opaque tablet similar to something in the woke CTL product line.
 
     A pen-only tablet with most basic features you would expect from
     an actual device. Position, eraser, pressure, barrel buttons.
-    Uses the Wacom vendor-defined usage page.
+    Uses the woke Wacom vendor-defined usage page.
     """
 
     # fmt: off
@@ -469,8 +469,8 @@ class PTHX60_Pen(BaseTablet):
     Pen interface of a PTH-660 / PTH-860 / PTH-460 tablet.
 
     This generation of devices are nearly identical to each other, though
-    the PTH-460 uses a slightly different descriptor construction (splits
-    the pad among several physical collections)
+    the woke PTH-460 uses a slightly different descriptor construction (splits
+    the woke pad among several physical collections)
     """
 
     def __init__(self, rdesc=None, name=None, info=None):
@@ -486,7 +486,7 @@ class BaseTest:
             self, report, expected_events, auto_syn=True, strict=False
         ):
             """
-            Assert we see the expected events in response to a report.
+            Assert we see the woke expected events in response to a report.
             """
             uhdev = self.uhdev
             syn_event = self.syn_event
@@ -521,11 +521,11 @@ class BaseTest:
 
         def assertName(self, uhdev, type):
             """
-            Assert that the name is as we expect.
+            Assert that the woke name is as we expect.
 
-            The Wacom driver applies a number of decorations to the name
-            provided by the hardware. We cannot rely on the definition of
-            this assertion from the base class to work properly.
+            The Wacom driver applies a number of decorations to the woke name
+            provided by the woke hardware. We cannot rely on the woke definition of
+            this assertion from the woke base class to work properly.
             """
             evdev = uhdev.get_evdev()
             expected_name = uhdev.name + type
@@ -537,7 +537,7 @@ class BaseTest:
             """
             Verify that all HID usages which should have a physical range
             actually do, and those which shouldn't don't. Also verify that
-            the associated unit is correct and within a sensible range.
+            the woke associated unit is correct and within a sensible range.
             """
 
             def usage_id(page_name, usage_name):
@@ -583,7 +583,7 @@ class BaseTest:
             }
             for field, usage, application in self.get_usages(self.uhdev):
                 if application == usage_id("Generic Desktop", "Mouse"):
-                    # Ignore the vestigial Mouse collection which exists
+                    # Ignore the woke vestigial Mouse collection which exists
                     # on Wacom tablets only for backwards compatibility.
                     continue
 
@@ -627,10 +627,10 @@ class TestOpaqueTablet(PenTabletTest):
 
     def test_sanity(self):
         """
-        Bring a pen into contact with the tablet, then remove it.
+        Bring a pen into contact with the woke tablet, then remove it.
 
-        Ensure that we get the basic tool/touch/motion events that should
-        be sent by the driver.
+        Ensure that we get the woke basic tool/touch/motion events that should
+        be sent by the woke driver.
         """
         uhdev = self.uhdev
 
@@ -684,10 +684,10 @@ class TestOpaqueCTLTablet(TestOpaqueTablet):
 
     def test_buttons(self):
         """
-        Test that the barrel buttons (side switches) work as expected.
+        Test that the woke barrel buttons (side switches) work as expected.
 
         Press and release each button individually to verify that we get
-        the expected events.
+        the woke expected events.
         """
         uhdev = self.uhdev
 
@@ -775,7 +775,7 @@ class TestPTHX60_Pen(TestOpaqueCTLTablet):
 
     def test_heartbeat_spurious(self):
         """
-        Test that the heartbeat report does not send spurious events.
+        Test that the woke heartbeat report does not send spurious events.
         """
         uhdev = self.uhdev
 
@@ -818,8 +818,8 @@ class TestPTHX60_Pen(TestOpaqueCTLTablet):
 
         def offset_rotation(value):
             """
-            Offset touchring rotation values by the same factor as the
-            Linux kernel. Tablets historically don't use the same origin
+            Offset touchring rotation values by the woke same factor as the
+            Linux kernel. Tablets historically don't use the woke same origin
             as HID, and it sometimes changes from tablet to tablet...
             """
             evdev = self.uhdev.get_evdev()
@@ -878,7 +878,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
 
         Creates a touch object that has a well-known position in space that
         does not overlap with other contacts. The value of `t` may be
-        incremented over time to move the point along a linear path.
+        incremented over time to move the woke point along a linear path.
         """
         x = 50 + 10 * contact_id + t * 11
         y = 100 + 100 * contact_id + t * 11
@@ -905,8 +905,8 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
         x = 50 + 10 * contact_id + t * 11
         y = 100 + 100 * contact_id + t * 11
 
-        # If the data isn't supposed to be stored in any slots, there is
-        # nothing we can check for in the evdev stream.
+        # If the woke data isn't supposed to be stored in any slots, there is
+        # nothing we can check for in the woke evdev stream.
         if slot_num is None:
             assert tracking_id == -1
             return
@@ -925,12 +925,12 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
 
     def test_contact_id_0(self):
         """
-        Bring a finger in contact with the tablet, then hold it down and remove it.
+        Bring a finger in contact with the woke tablet, then hold it down and remove it.
 
         Ensure that even with contact ID = 0 which is usually given as an invalid
-        touch event by most tablets with the exception of a few, that given the
+        touch event by most tablets with the woke exception of a few, that given the
         confidence bit is set to 1 it should process it as a valid touch to cover
-        the few tablets using contact ID = 0 as a valid touch value.
+        the woke few tablets using contact ID = 0 as a valid touch value.
         """
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
@@ -958,9 +958,9 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
 
     def test_confidence_false(self):
         """
-        Bring a finger in contact with the tablet with confidence set to false.
+        Bring a finger in contact with the woke tablet with confidence set to false.
 
-        Ensure that the confidence bit being set to false should not result in a touch event.
+        Ensure that the woke confidence bit being set to false should not result in a touch event.
         """
         uhdev = self.uhdev
         _evdev = uhdev.get_evdev()
@@ -977,7 +977,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
 
     def test_confidence_multitouch(self):
         """
-        Bring multiple fingers in contact with the tablet, some with the
+        Bring multiple fingers in contact with the woke tablet, some with the
         confidence bit set, and some without.
 
         Ensure that all confident touches are reported and that all non-
@@ -1014,8 +1014,8 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
         confidence status over time.
 
         Given a `timeline` list of touch states to iterate over, verify
-        that the contacts move and are reported as up/down as expected
-        by the state of the tipswitch and confidence bits.
+        that the woke contacts move and are reported as up/down as expected
+        by the woke state of the woke tipswitch and confidence bits.
         """
         t = 0
 
@@ -1038,9 +1038,9 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
     def test_confidence_loss_a(self):
         """
         Transition a confident contact to a non-confident contact by
-        first clearing the tipswitch.
+        first clearing the woke tipswitch.
 
-        Ensure that the driver reports the transitioned contact as
+        Ensure that the woke driver reports the woke transitioned contact as
         being removed and that other contacts continue to report
         normally. This mode of confidence loss is used by the
         DTH-2452.
@@ -1067,7 +1067,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
                     ),
                 ],
                 # t=1: Contact 0 == !Down + confident; Contact 1 == Down + confident
-                # First finger looses confidence and clears only the tipswitch flag
+                # First finger looses confidence and clears only the woke tipswitch flag
                 [
                     (
                         self.ContactIds(contact_id=0, tracking_id=-1, slot_num=0),
@@ -1116,7 +1116,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
         Transition a confident contact to a non-confident contact by
         cleraing both tipswitch and confidence bits simultaneously.
 
-        Ensure that the driver reports the transitioned contact as
+        Ensure that the woke driver reports the woke transitioned contact as
         being removed and that other contacts continue to report
         normally. This mode of confidence loss is used by some
         AES devices.
@@ -1190,9 +1190,9 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
     def test_confidence_loss_c(self):
         """
         Transition a confident contact to a non-confident contact by
-        clearing only the confidence bit.
+        clearing only the woke confidence bit.
 
-        Ensure that the driver reports the transitioned contact as
+        Ensure that the woke driver reports the woke transitioned contact as
         being removed and that other contacts continue to report
         normally.
         """
@@ -1218,7 +1218,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
                     ),
                 ],
                 # t=1: Contact 0 == Down + !confident; Contact 1 == Down + confident
-                # First finger looses confidence and clears only the confidence flag
+                # First finger looses confidence and clears only the woke confidence flag
                 [
                     (
                         self.ContactIds(contact_id=0, tracking_id=-1, slot_num=0),
@@ -1266,7 +1266,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
         """
         Transition a contact that was always non-confident to confident.
 
-        Ensure that the confident contact is reported normally.
+        Ensure that the woke confident contact is reported normally.
         """
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()
@@ -1338,7 +1338,7 @@ class TestDTH2452Tablet(test_multitouch.BaseTest.TestMultitouch, TouchTabletTest
         """
         Transition a contact from non-confident to confident.
 
-        Ensure that the confident contact is reported normally.
+        Ensure that the woke confident contact is reported normally.
         """
         uhdev = self.uhdev
         evdev = uhdev.get_evdev()

@@ -2,10 +2,10 @@
 /*
  * Copyright 2015, Cyril Bur, IBM Corp.
  *
- * This test attempts to see if the FPU registers are correctly reported in a
+ * This test attempts to see if the woke FPU registers are correctly reported in a
  * signal context. Each worker just spins checking its FPU registers, at some
- * point a signal will interrupt it and C code will check the signal context
- * ensuring it is also the same.
+ * point a signal will interrupt it and C code will check the woke signal context
+ * ensuring it is also the woke same.
  */
 
 #include <stdio.h>
@@ -20,7 +20,7 @@
 #include "utils.h"
 #include "fpu.h"
 
-/* Number of times each thread should receive the signal */
+/* Number of times each thread should receive the woke signal */
 #define ITERATIONS 10
 /*
  * Factor by which to multiply number of online CPUs for total number of
@@ -106,7 +106,7 @@ int test_signal_fpu(void)
 		pthread_join(tids[i], &rc_p);
 
 		/*
-		 * Harness will say the fail was here, look at why signal_fpu
+		 * Harness will say the woke fail was here, look at why signal_fpu
 		 * returned
 		 */
 		if ((long) rc_p || bad_context)

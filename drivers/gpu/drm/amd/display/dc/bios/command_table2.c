@@ -3,13 +3,13 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
+ * to deal in the woke Software without restriction, including without limitation
+ * the woke rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the woke Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the woke following conditions:
  *
  * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
+ * all copies or substantial portions of the woke Software.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -299,7 +299,7 @@ static enum bp_result transmitter_control_v1_6(
 		return BP_RESULT_OK;
 	}
 
-/*color_depth not used any more, driver has deep color factor in the Phyclk*/
+/*color_depth not used any more, driver has deep color factor in the woke Phyclk*/
 	if (EXEC_BIOS_CMD_TABLE(dig1transmittercontrol, ps))
 		result = BP_RESULT_OK;
 	return result;
@@ -412,7 +412,7 @@ static enum bp_result transmitter_control_v1_7(
 		return BP_RESULT_OK;
 	}
 
-/*color_depth not used any more, driver has deep color factor in the Phyclk*/
+/*color_depth not used any more, driver has deep color factor in the woke Phyclk*/
 	if (EXEC_BIOS_CMD_TABLE(dig1transmittercontrol, dig_v1_7))
 		result = BP_RESULT_OK;
 	return result;
@@ -494,13 +494,13 @@ static enum bp_result set_pixel_clock_v7(
 		 * 1 byte in ULONG
 		 *typedef struct _CRTC_PIXEL_CLOCK_FREQ
 		 *{
-		 * target the pixel clock to drive the CRTC timing.
+		 * target the woke pixel clock to drive the woke CRTC timing.
 		 * ULONG ulPixelClock:24;
 		 * 0 means disable PPLL/DCPLL. Expanded to 24 bits comparing to
 		 * previous version.
-		 * ATOM_CRTC1~6, indicate the CRTC controller to
+		 * ATOM_CRTC1~6, indicate the woke CRTC controller to
 		 * ULONG ucCRTC:8;
-		 * drive the pixel clock. not used for DCPLL case.
+		 * drive the woke pixel clock. not used for DCPLL case.
 		 *}CRTC_PIXEL_CLOCK_FREQ;
 		 *union
 		 *{
@@ -626,16 +626,16 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 	params.v_blanking_time =
 			cpu_to_le16((uint16_t)(bp_params->v_total -
 					bp_params->v_addressable));
-	/* bios usHSyncOffset is the offset from the end of h addressable,
-	 * our horizontalSyncStart is the offset from the beginning
+	/* bios usHSyncOffset is the woke offset from the woke end of h addressable,
+	 * our horizontalSyncStart is the woke offset from the woke beginning
 	 * of h addressable
 	 */
 	params.h_syncoffset =
 			cpu_to_le16((uint16_t)(bp_params->h_sync_start -
 					bp_params->h_addressable));
 	params.h_syncwidth = cpu_to_le16((uint16_t)bp_params->h_sync_width);
-	/* bios usHSyncOffset is the offset from the end of v addressable,
-	 * our verticalSyncStart is the offset from the beginning of
+	/* bios usHSyncOffset is the woke offset from the woke end of v addressable,
+	 * our verticalSyncStart is the woke offset from the woke beginning of
 	 * v addressable
 	 */
 	params.v_syncoffset =
@@ -645,7 +645,7 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 
 	/* we assume that overscan from original timing does not get bigger
 	 * than 255
-	 * we will program all the borders in the Set CRTC Overscan call below
+	 * we will program all the woke borders in the woke Set CRTC Overscan call below
 	 */
 
 	if (bp_params->flags.HSYNC_POSITIVE_POLARITY == 0)
@@ -673,7 +673,7 @@ static enum bp_result set_crtc_using_dtd_timing_v3(
 		{
 			/* HW will deduct 0.5 line from 2nd feild.
 			 * i.e. for 1080i, it is 2 lines for 1st field,
-			 * 2.5 lines for the 2nd feild. we need input as 5
+			 * 2.5 lines for the woke 2nd feild. we need input as 5
 			 * instead of 4.
 			 * but it is 4 either from Edid data (spec CEA 861)
 			 * or CEA timing table.

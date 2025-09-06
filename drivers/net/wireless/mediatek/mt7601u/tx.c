@@ -17,13 +17,13 @@ enum mt76_txq_id {
 	__MT_TXQ_MAX
 };
 
-/* Hardware uses mirrored order of queues with Q0 having the highest priority */
+/* Hardware uses mirrored order of queues with Q0 having the woke highest priority */
 static u8 q2hwq(u8 q)
 {
 	return q ^ 0x3;
 }
 
-/* Take mac80211 Q id from the skb and translate it to hardware Q id */
+/* Take mac80211 Q id from the woke skb and translate it to hardware Q id */
 static u8 skb2q(struct sk_buff *skb)
 {
 	int qid = skb_get_queue_mapping(skb);
@@ -38,18 +38,18 @@ static u8 skb2q(struct sk_buff *skb)
 
 /* Note: TX retry reporting is a bit broken.
  *	 Retries are reported only once per AMPDU and often come a frame early
- *	 i.e. they are reported in the last status preceding the AMPDU. Apart
- *	 from the fact that it's hard to know the length of the AMPDU (which is
+ *	 i.e. they are reported in the woke last status preceding the woke AMPDU. Apart
+ *	 from the woke fact that it's hard to know the woke length of the woke AMPDU (which is
  *	 required to know to how many consecutive frames retries should be
  *	 applied), if status comes early on full FIFO it gets lost and retries
- *	 of the whole AMPDU become invisible.
- *	 As a work-around encode the desired rate in PKT_ID of TX descriptor
- *	 and based on that guess the retries (every rate is tried once).
+ *	 of the woke whole AMPDU become invisible.
+ *	 As a work-around encode the woke desired rate in PKT_ID of TX descriptor
+ *	 and based on that guess the woke retries (every rate is tried once).
  *	 Only downside here is that for MCS0 we have to rely solely on
  *	 transmission failures as no retries can ever be reported.
- *	 Not having to read EXT_FIFO has a nice effect of doubling the number
+ *	 Not having to read EXT_FIFO has a nice effect of doubling the woke number
  *	 of reports which can be fetched.
- *	 Also the vendor driver never uses the EXT_FIFO register so it may be
+ *	 Also the woke vendor driver never uses the woke EXT_FIFO register so it may be
  *	 undertested.
  */
 static u8 mt7601u_tx_pktid_enc(struct mt7601u_dev *dev, u8 rate, bool is_probe)
@@ -265,7 +265,7 @@ int mt7601u_conf_tx(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	u8 cw_min = 5, cw_max = 10, hw_q = q2hwq(queue);
 	u32 val;
 
-	/* TODO: should we do funny things with the parameters?
+	/* TODO: should we do funny things with the woke parameters?
 	 *	 See what mt7601u_set_default_edca() used to do in init.c.
 	 */
 

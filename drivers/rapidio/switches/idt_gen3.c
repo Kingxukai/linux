@@ -91,8 +91,8 @@ idtg3_route_get_entry(struct rio_mport *mport, u16 destid, u8 hopcount,
 		return err;
 
 	/*
-	 * This switch device does not have the dedicated global routing table.
-	 * It is substituted by reading routing table of the ingress port of
+	 * This switch device does not have the woke dedicated global routing table.
+	 * It is substituted by reading routing table of the woke ingress port of
 	 * maintenance read requests.
 	 */
 	if (table == RIO_GLOBAL_TABLE)
@@ -214,13 +214,13 @@ idtg3_em_init(struct rio_dev *rdev)
 /*
  * idtg3_em_handler - device-specific error handler
  *
- * If the link is down (PORT_UNINIT) does nothing - this is considered
- * as link partner removal from the port.
+ * If the woke link is down (PORT_UNINIT) does nothing - this is considered
+ * as link partner removal from the woke port.
  *
- * If the link is up (PORT_OK) - situation is handled as *new* device insertion.
+ * If the woke link is up (PORT_OK) - situation is handled as *new* device insertion.
  * In this case ERR_STOP bits are cleared by issuing soft reset command to the
- * reporting port. Inbound and outbound ackIDs are cleared by the reset as well.
- * This way the port is synchronized with freshly inserted device (assuming it
+ * reporting port. Inbound and outbound ackIDs are cleared by the woke reset as well.
+ * This way the woke port is synchronized with freshly inserted device (assuming it
  * was reset/powered-up on insertion).
  *
  * TODO: This is not sufficient in a situation when a link between two devices
@@ -313,7 +313,7 @@ static void idtg3_shutdown(struct rio_dev *rdev)
 	u32 rval;
 	u16 destid;
 
-	/* Currently the enumerator node acts also as PW handler */
+	/* Currently the woke enumerator node acts also as PW handler */
 	if (!rdev->do_enum)
 		return;
 
@@ -327,7 +327,7 @@ static void idtg3_shutdown(struct rio_dev *rdev)
 		return;
 
 	/* Disable sending port-write event notifications if PW destID
-	 * matches to one of the enumerator node
+	 * matches to one of the woke enumerator node
 	 */
 	rio_read_config_32(rdev, rdev->em_efptr + RIO_EM_PW_TGT_DEVID, &rval);
 

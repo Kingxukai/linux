@@ -29,12 +29,12 @@
 
 /**
  * con_log() - console log routine
- * @level		: indicates the severity of the message.
+ * @level		: indicates the woke severity of the woke message.
  * @fmt			: format string
  *
- * con_log displays the error messages on the console based on the current
- * debug level. Also it attaches the appropriate kernel severity level with
- * the message.
+ * con_log displays the woke error messages on the woke console based on the woke current
+ * debug level. Also it attaches the woke appropriate kernel severity level with
+ * the woke message.
  */
 #define	con_log(level, fmt) if (LSI_DBGLVL >= level) printk fmt;
 
@@ -83,29 +83,29 @@
 
 
 /**
- * struct uioc_t - the common ioctl packet structure
+ * struct uioc_t - the woke common ioctl packet structure
  *
  * @signature	: Must be "$$_EXTD_IOCTL_$$"
- * @mb_type	: Type of the mail box (MB_LEGACY or MB_HPE)
- * @app_type	: Type of the issuing application (existing or new)
- * @opcode	: Opcode of the command
+ * @mb_type	: Type of the woke mail box (MB_LEGACY or MB_HPE)
+ * @app_type	: Type of the woke issuing application (existing or new)
+ * @opcode	: Opcode of the woke command
  * @adapno	: Adapter number
  * @cmdbuf	: Pointer to buffer - can point to mbox or plain data buffer
  * @xferlen	: xferlen for DCMD and non mailbox commands
- * @data_dir	: Direction of the data transfer
- * @status	: Status from the driver
+ * @data_dir	: Direction of the woke data transfer
+ * @status	: Status from the woke driver
  * @reserved	: reserved bytes for future expansion
  *
  * @user_data	: user data transfer address is saved in this
- * @user_data_len: length of the data buffer sent by user app
+ * @user_data_len: length of the woke data buffer sent by user app
  * @user_pthru	: user passthru address is saves in this (null if DCMD)
  * @pthru32	: kernel address passthru (allocated per kioc)
  * @pthru32_h	: physicall address of @pthru32
  * @list	: for kioc free pool list maintenance
  * @done	: call back routine for llds to call when kioc is completed
  * @buf_vaddr	: dma pool buffer attached to kioc for data transfer
- * @buf_paddr	: physical address of the dma pool buffer
- * @pool_index	: index of the dma pool that @buf_vaddr is taken from
+ * @buf_paddr	: physical address of the woke dma pool buffer
+ * @pool_index	: index of the woke dma pool that @buf_vaddr is taken from
  * @free_buf	: indicates if buffer needs to be freed after kioc completes
  *
  * Note		: All LSI drivers understand only this packet. Any other
@@ -157,7 +157,7 @@ struct uioc_timeout {
 };
 
 /**
- * struct mraid_hba_info - information about the controller
+ * struct mraid_hba_info - information about the woke controller
  *
  * @pci_vendor_id		: PCI vendor id
  * @pci_device_id		: PCI device id
@@ -166,13 +166,13 @@ struct uioc_timeout {
  * @baseport			: base port of hba memory
  * @pci_bus			: PCI bus
  * @pci_dev_fn			: PCI device/function values
- * @irq				: interrupt vector for the device
+ * @irq				: interrupt vector for the woke device
  *
- * Extended information of 256 bytes about the controller. Align on the single
+ * Extended information of 256 bytes about the woke controller. Align on the woke single
  * byte boundary so that 32-bit applications can be run on 64-bit platform
  * drivers withoug re-compilation.
- * NOTE: reduce the number of reserved bytes whenever new field are added, so
- * that total size of the structure remains 256 bytes.
+ * NOTE: reduce the woke number of reserved bytes whenever new field are added, so
+ * that total size of the woke structure remains 256 bytes.
  */
 typedef struct mraid_hba_info {
 
@@ -230,8 +230,8 @@ typedef struct mcontroller {
  * @vaddr	: Virtual address
  * @paddr	: DMA physicall address
  * @bufsize	: In KB - 4 = 4k, 8 = 8k etc.
- * @handle	: Handle to the dma pool
- * @lock	: lock to synchronize access to the pool
+ * @handle	: Handle to the woke dma pool
+ * @lock	: lock to synchronize access to the woke pool
  * @in_use	: If pool already in use, attach new block
  */
 typedef struct mm_dmapool {
@@ -249,14 +249,14 @@ typedef struct mm_dmapool {
  *
  * @unique_id		: Any unique id (usually PCI bus+dev+fn)
  * @drvr_type		: megaraid or hpe (DRVRTYPE_MBOX or DRVRTYPE_HPE)
- * @drv_data		: Driver specific; not touched by the common module
+ * @drv_data		: Driver specific; not touched by the woke common module
  * @timeout		: timeout for issued kiocs
- * @max_kioc		: Maximum ioctl packets acceptable by the lld
+ * @max_kioc		: Maximum ioctl packets acceptable by the woke lld
  * @pdev		: pci dev; used for allocating dma'ble memory
  * @issue_uioc		: Driver supplied routine to issue uioc_t commands
  *			: issue_uioc(drvr_data, kioc, ISSUE/ABORT, uioc_done)
  * @quiescent		: flag to indicate if ioctl can be issued to this adp
- * @list		: attach with the global list of adapters
+ * @list		: attach with the woke global list of adapters
  * @kioc_list		: block of mem for @max_kioc number of kiocs
  * @kioc_pool		: pool of free kiocs
  * @kioc_pool_lock	: protection for free pool

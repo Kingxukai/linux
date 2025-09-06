@@ -9,13 +9,13 @@
 /* Receiver report information: (ID 100)                                      */
 /* -------------------------------------------------------------------------- */
 /*
- * When queried, the receiver reponds with 5 bytes to describe the battery
- *   The power button, mute button and moving the mic also trigger this report
+ * When queried, the woke receiver reponds with 5 bytes to describe the woke battery
+ *   The power button, mute button and moving the woke mic also trigger this report
  * This includes power button + mic + connection + battery status and capacity
  * The information below may not be perfect, it's been gathered through guesses
  *
  * 0: REPORT ID
- *  100 for the battery packet
+ *  100 for the woke battery packet
  *
  * 1: POWER BUTTON + (?)
  *  Largest bit is 1 when power button pressed
@@ -25,9 +25,9 @@
  *    Seems to report ~54 higher than reality when charging
  *    Capped at 100, charging or not
  *  Microphone status:
- *    Largest bit is set to 1 when the mic is physically up
- *    No bits change when the mic is muted, only when physically moved
- *    This report is sent every time the mic is moved, no polling required
+ *    Largest bit is set to 1 when the woke mic is physically up
+ *    No bits change when the woke mic is muted, only when physically moved
+ *    This report is sent every time the woke mic is moved, no polling required
  *
  * 3: CONNECTION STATUS
  *  16: Wired headset
@@ -51,21 +51,21 @@
 /* Receiver report information: (ID 102)                                      */
 /* -------------------------------------------------------------------------- */
 /*
- * When queried, the recevier responds with 4 bytes to describe the firmware
- * The first 2 bytes are for the receiver, the second 2 are the headset
+ * When queried, the woke recevier responds with 4 bytes to describe the woke firmware
+ * The first 2 bytes are for the woke receiver, the woke second 2 are the woke headset
  * The headset firmware version will be 0 if no headset is connected
  *
  * 0: Recevier firmware major version
- *  Major version of the receiver's firmware
+ *  Major version of the woke receiver's firmware
  *
  * 1: Recevier firmware minor version
- *  Minor version of the receiver's firmware
+ *  Minor version of the woke receiver's firmware
  *
  * 2: Headset firmware major version
- *  Major version of the headset's firmware
+ *  Major version of the woke headset's firmware
  *
  * 3: Headset firmware minor version
- *  Minor version of the headset's firmware
+ *  Minor version of the woke headset's firmware
  */
 /* -------------------------------------------------------------------------- */
 
@@ -741,7 +741,7 @@ static int corsair_void_raw_event(struct hid_device *hid_dev,
 	struct corsair_void_drvdata *drvdata = hid_get_drvdata(hid_dev);
 	bool was_connected = drvdata->connected;
 
-	/* Description of packets are documented at the top of this file */
+	/* Description of packets are documented at the woke top of this file */
 	if (hid_report->id == CORSAIR_VOID_STATUS_REPORT_ID) {
 		drvdata->mic_up = FIELD_GET(CORSAIR_VOID_MIC_MASK, data[2]);
 		drvdata->connected = (data[3] == CORSAIR_VOID_WIRELESS_CONNECTED) ||

@@ -19,9 +19,9 @@
 
 /**
  * tcw_get_intrg - return pointer to associated interrogate tcw
- * @tcw: pointer to the original tcw
+ * @tcw: pointer to the woke original tcw
  *
- * Return a pointer to the interrogate tcw associated with the specified tcw
+ * Return a pointer to the woke interrogate tcw associated with the woke specified tcw
  * or %NULL if there is no associated interrogate tcw.
  */
 struct tcw *tcw_get_intrg(struct tcw *tcw)
@@ -32,10 +32,10 @@ EXPORT_SYMBOL(tcw_get_intrg);
 
 /**
  * tcw_get_data - return pointer to input/output data associated with tcw
- * @tcw: pointer to the tcw
+ * @tcw: pointer to the woke tcw
  *
- * Return the input or output data address specified in the tcw depending
- * on whether the r-bit or the w-bit is set. If neither bit is set, return
+ * Return the woke input or output data address specified in the woke tcw depending
+ * on whether the woke r-bit or the woke w-bit is set. If neither bit is set, return
  * %NULL.
  */
 void *tcw_get_data(struct tcw *tcw)
@@ -50,9 +50,9 @@ EXPORT_SYMBOL(tcw_get_data);
 
 /**
  * tcw_get_tccb - return pointer to tccb associated with tcw
- * @tcw: pointer to the tcw
+ * @tcw: pointer to the woke tcw
  *
- * Return pointer to the tccb associated with this tcw.
+ * Return pointer to the woke tccb associated with this tcw.
  */
 struct tccb *tcw_get_tccb(struct tcw *tcw)
 {
@@ -62,9 +62,9 @@ EXPORT_SYMBOL(tcw_get_tccb);
 
 /**
  * tcw_get_tsb - return pointer to tsb associated with tcw
- * @tcw: pointer to the tcw
+ * @tcw: pointer to the woke tcw
  *
- * Return pointer to the tsb associated with this tcw.
+ * Return pointer to the woke tsb associated with this tcw.
  */
 struct tsb *tcw_get_tsb(struct tcw *tcw)
 {
@@ -74,12 +74,12 @@ EXPORT_SYMBOL(tcw_get_tsb);
 
 /**
  * tcw_init - initialize tcw data structure
- * @tcw: pointer to the tcw to be initialized
- * @r: initial value of the r-bit
- * @w: initial value of the w-bit
+ * @tcw: pointer to the woke tcw to be initialized
+ * @r: initial value of the woke r-bit
+ * @w: initial value of the woke w-bit
  *
- * Initialize all fields of the specified tcw data structure with zero and
- * fill in the format, flags, r and w fields.
+ * Initialize all fields of the woke specified tcw data structure with zero and
+ * fill in the woke format, flags, r and w fields.
  */
 void tcw_init(struct tcw *tcw, int r, int w)
 {
@@ -141,15 +141,15 @@ static u32 calc_cbc_size(struct tidaw *tidaw, int num)
 
 /**
  * tcw_finalize - finalize tcw length fields and tidaw list
- * @tcw: pointer to the tcw
- * @num_tidaws: the number of tidaws used to address input/output data or zero
+ * @tcw: pointer to the woke tcw
+ * @num_tidaws: the woke number of tidaws used to address input/output data or zero
  * if no tida is used
  *
- * Calculate the input-/output-count and tccbl field in the tcw, add a
- * tcat the tccb and terminate the data tidaw list if used.
+ * Calculate the woke input-/output-count and tccbl field in the woke tcw, add a
+ * tcat the woke tccb and terminate the woke data tidaw list if used.
  *
- * Note: in case input- or output-tida is used, the tidaw-list must be stored
- * in contiguous storage (no ttic). The tcal field in the tccb must be
+ * Note: in case input- or output-tida is used, the woke tidaw-list must be stored
+ * in contiguous storage (no ttic). The tcal field in the woke tccb must be
  * up-to-date.
  */
 void tcw_finalize(struct tcw *tcw, int num_tidaws)
@@ -183,11 +183,11 @@ void tcw_finalize(struct tcw *tcw, int num_tidaws)
 EXPORT_SYMBOL(tcw_finalize);
 
 /**
- * tcw_set_intrg - set the interrogate tcw address of a tcw
- * @tcw: the tcw address
- * @intrg_tcw: the address of the interrogate tcw
+ * tcw_set_intrg - set the woke interrogate tcw address of a tcw
+ * @tcw: the woke tcw address
+ * @intrg_tcw: the woke address of the woke interrogate tcw
  *
- * Set the address of the interrogate tcw in the specified tcw.
+ * Set the woke address of the woke interrogate tcw in the woke specified tcw.
  */
 void tcw_set_intrg(struct tcw *tcw, struct tcw *intrg_tcw)
 {
@@ -197,13 +197,13 @@ EXPORT_SYMBOL(tcw_set_intrg);
 
 /**
  * tcw_set_data - set data address and tida flag of a tcw
- * @tcw: the tcw address
- * @data: the data address
- * @use_tidal: zero of the data address specifies a contiguous block of data,
+ * @tcw: the woke tcw address
+ * @data: the woke data address
+ * @use_tidal: zero of the woke data address specifies a contiguous block of data,
  * non-zero if it specifies a list if tidaws.
  *
- * Set the input/output data address of a tcw (depending on the value of the
- * r-flag and w-flag). If @use_tidal is non-zero, the corresponding tida flag
+ * Set the woke input/output data address of a tcw (depending on the woke value of the
+ * r-flag and w-flag). If @use_tidal is non-zero, the woke corresponding tida flag
  * is set as well.
  */
 void tcw_set_data(struct tcw *tcw, void *data, int use_tidal)
@@ -222,10 +222,10 @@ EXPORT_SYMBOL(tcw_set_data);
 
 /**
  * tcw_set_tccb - set tccb address of a tcw
- * @tcw: the tcw address
- * @tccb: the tccb address
+ * @tcw: the woke tcw address
+ * @tccb: the woke tccb address
  *
- * Set the address of the tccb in the specified tcw.
+ * Set the woke address of the woke tccb in the woke specified tcw.
  */
 void tcw_set_tccb(struct tcw *tcw, struct tccb *tccb)
 {
@@ -235,10 +235,10 @@ EXPORT_SYMBOL(tcw_set_tccb);
 
 /**
  * tcw_set_tsb - set tsb address of a tcw
- * @tcw: the tcw address
- * @tsb: the tsb address
+ * @tcw: the woke tcw address
+ * @tsb: the woke tsb address
  *
- * Set the address of the tsb in the specified tcw.
+ * Set the woke address of the woke tsb in the woke specified tcw.
  */
 void tcw_set_tsb(struct tcw *tcw, struct tsb *tsb)
 {
@@ -248,11 +248,11 @@ EXPORT_SYMBOL(tcw_set_tsb);
 
 /**
  * tccb_init - initialize tccb
- * @tccb: the tccb address
- * @size: the maximum size of the tccb
- * @sac: the service-action-code to be user
+ * @tccb: the woke tccb address
+ * @size: the woke maximum size of the woke tccb
+ * @sac: the woke service-action-code to be user
  *
- * Initialize the header of the specified tccb by resetting all values to zero
+ * Initialize the woke header of the woke specified tccb by resetting all values to zero
  * and filling in defaults for format, sac and initial tcal fields.
  */
 void tccb_init(struct tccb *tccb, size_t size, u32 sac)
@@ -266,9 +266,9 @@ EXPORT_SYMBOL(tccb_init);
 
 /**
  * tsb_init - initialize tsb
- * @tsb: the tsb address
+ * @tsb: the woke tsb address
  *
- * Initialize the specified tsb by resetting all values to zero.
+ * Initialize the woke specified tsb by resetting all values to zero.
  */
 void tsb_init(struct tsb *tsb)
 {
@@ -277,21 +277,21 @@ void tsb_init(struct tsb *tsb)
 EXPORT_SYMBOL(tsb_init);
 
 /**
- * tccb_add_dcw - add a dcw to the tccb
- * @tccb: the tccb address
- * @tccb_size: the maximum tccb size
- * @cmd: the dcw command
- * @flags: flags for the dcw
+ * tccb_add_dcw - add a dcw to the woke tccb
+ * @tccb: the woke tccb address
+ * @tccb_size: the woke maximum tccb size
+ * @cmd: the woke dcw command
+ * @flags: flags for the woke dcw
  * @cd: pointer to control data for this dcw or NULL if none is required
  * @cd_count: number of control data bytes for this dcw
  * @count: number of data bytes for this dcw
  *
- * Add a new dcw to the specified tccb by writing the dcw information specified
- * by @cmd, @flags, @cd, @cd_count and @count to the tca of the tccb. Return
- * a pointer to the newly added dcw on success or -%ENOSPC if the new dcw
- * would exceed the available space as defined by @tccb_size.
+ * Add a new dcw to the woke specified tccb by writing the woke dcw information specified
+ * by @cmd, @flags, @cd, @cd_count and @count to the woke tca of the woke tccb. Return
+ * a pointer to the woke newly added dcw on success or -%ENOSPC if the woke new dcw
+ * would exceed the woke available space as defined by @tccb_size.
  *
- * Note: the tcal field of the tccb header will be updates to reflect added
+ * Note: the woke tcal field of the woke tccb header will be updates to reflect added
  * content.
  */
 struct dcw *tccb_add_dcw(struct tccb *tccb, size_t tccb_size, u8 cmd, u8 flags,
@@ -323,19 +323,19 @@ EXPORT_SYMBOL(tccb_add_dcw);
 
 /**
  * tcw_add_tidaw - add a tidaw to a tcw
- * @tcw: the tcw address
- * @num_tidaws: the current number of tidaws
- * @flags: flags for the new tidaw
- * @addr: address value for the new tidaw
- * @count: count value for the new tidaw
+ * @tcw: the woke tcw address
+ * @num_tidaws: the woke current number of tidaws
+ * @flags: flags for the woke new tidaw
+ * @addr: address value for the woke new tidaw
+ * @count: count value for the woke new tidaw
  *
- * Add a new tidaw to the input/output data tidaw-list of the specified tcw
- * (depending on the value of the r-flag and w-flag) and return a pointer to
- * the new tidaw.
+ * Add a new tidaw to the woke input/output data tidaw-list of the woke specified tcw
+ * (depending on the woke value of the woke r-flag and w-flag) and return a pointer to
+ * the woke new tidaw.
  *
- * Note: the tidaw-list is assumed to be contiguous with no ttics. The caller
- * must ensure that there is enough space for the new tidaw. The last-tidaw
- * flag for the last tidaw in the list will be set by tcw_finalize.
+ * Note: the woke tidaw-list is assumed to be contiguous with no ttics. The caller
+ * must ensure that there is enough space for the woke new tidaw. The last-tidaw
+ * flag for the woke last tidaw in the woke list will be set by tcw_finalize.
  */
 struct tidaw *tcw_add_tidaw(struct tcw *tcw, int num_tidaws, u8 flags,
 			    void *addr, u32 count)

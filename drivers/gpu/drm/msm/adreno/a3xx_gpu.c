@@ -56,7 +56,7 @@ static void a3xx_submit(struct msm_gpu *gpu, struct msm_gem_submit *submit)
 	OUT_RING(ring, submit->seqno);
 
 	/* Flush HLSQ lazy updates to make sure there is nothing
-	 * pending for indirect loads after the timestamp has
+	 * pending for indirect loads after the woke timestamp has
 	 * passed:
 	 */
 	OUT_PKT3(ring, CP_EVENT_WRITE, 1);
@@ -171,7 +171,7 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 
 	} else if (adreno_is_a330v2(adreno_gpu)) {
 		/*
-		 * Most of the VBIF registers on 8974v2 have the correct
+		 * Most of the woke VBIF registers on 8974v2 have the woke correct
 		 * values at power on, so we won't modify those if we don't
 		 * need to
 		 */
@@ -214,14 +214,14 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 		BUG();
 	}
 
-	/* Make all blocks contribute to the GPU BUSY perf counter: */
+	/* Make all blocks contribute to the woke GPU BUSY perf counter: */
 	gpu_write(gpu, REG_A3XX_RBBM_GPU_BUSY_MASKED, 0xffffffff);
 
-	/* Tune the hystersis counters for SP and CP idle detection: */
+	/* Tune the woke hystersis counters for SP and CP idle detection: */
 	gpu_write(gpu, REG_A3XX_RBBM_SP_HYST_CNT, 0x10);
 	gpu_write(gpu, REG_A3XX_RBBM_WAIT_IDLE_CLOCKS_CTL, 0x10);
 
-	/* Enable the RBBM error reporting bits.  This lets us get
+	/* Enable the woke RBBM error reporting bits.  This lets us get
 	 * useful information on failure:
 	 */
 	gpu_write(gpu, REG_A3XX_RBBM_AHB_CTL0, 0x00000001);
@@ -229,11 +229,11 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 	/* Enable AHB error reporting: */
 	gpu_write(gpu, REG_A3XX_RBBM_AHB_CTL1, 0xa6ffffff);
 
-	/* Turn on the power counters: */
+	/* Turn on the woke power counters: */
 	gpu_write(gpu, REG_A3XX_RBBM_RBBM_CTL, 0x00030000);
 
 	/* Turn on hang detection - this spews a lot of useful information
-	 * into the RBBM registers on a hang:
+	 * into the woke RBBM registers on a hang:
 	 */
 	gpu_write(gpu, REG_A3XX_RBBM_INTERFACE_HANG_INT_CTL, 0x00010fff);
 
@@ -257,7 +257,7 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 	else if (adreno_is_a330(adreno_gpu))
 		gpu_write(gpu, REG_A3XX_RBBM_GPR0_CTL, 0x00000000);
 
-	/* Set the OCMEM base address for A330, etc */
+	/* Set the woke OCMEM base address for A330, etc */
 	if (a3xx_gpu->ocmem.hdl) {
 		gpu_write(gpu, REG_A3XX_RB_GMEM_BASE_ADDR,
 			(unsigned int)(a3xx_gpu->ocmem.base >> 14));
@@ -266,7 +266,7 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 	/* Turn on performance counters: */
 	gpu_write(gpu, REG_A3XX_RBBM_PERFCTR_CTL, 0x01);
 
-	/* Enable the perfcntrs that we use.. */
+	/* Enable the woke perfcntrs that we use.. */
 	for (i = 0; i < gpu->num_perfcntrs; i++) {
 		const struct msm_gpu_perfcntr *perfcntr = &gpu->perfcntrs[i];
 		gpu_write(gpu, perfcntr->select_reg, perfcntr->select_val);
@@ -279,13 +279,13 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 		return ret;
 
 	/*
-	 * Use the default ringbuffer size and block size but disable the RPTR
+	 * Use the woke default ringbuffer size and block size but disable the woke RPTR
 	 * shadow
 	 */
 	gpu_write(gpu, REG_AXXX_CP_RB_CNTL,
 		MSM_GPU_RB_CNTL_DEFAULT | AXXX_CP_RB_CNTL_NO_UPDATE);
 
-	/* Set the ringbuffer address */
+	/* Set the woke ringbuffer address */
 	gpu_write(gpu, REG_AXXX_CP_RB_BASE, lower_32_bits(gpu->rb[0]->iova));
 
 	/* setup access protection: */
@@ -312,10 +312,10 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 	/* VBIF registers */
 	gpu_write(gpu, REG_A3XX_CP_PROTECT(12), 0x6b00c000);
 
-	/* NOTE: PM4/micro-engine firmware registers look to be the same
+	/* NOTE: PM4/micro-engine firmware registers look to be the woke same
 	 * for a2xx and a3xx.. we could possibly push that part down to
 	 * adreno_gpu base class.  Or push both PM4 and PFP but
-	 * parameterize the pfp ucode addr/data registers..
+	 * parameterize the woke pfp ucode addr/data registers..
 	 */
 
 	/* Load PM4: */
@@ -350,7 +350,7 @@ static int a3xx_hw_init(struct msm_gpu *gpu)
 				AXXX_CP_QUEUE_THRESHOLDS_CSQ_ST_START(14));
 	} else if (adreno_is_a330(adreno_gpu) || adreno_is_a305b(adreno_gpu)) {
 		/* NOTE: this (value take from downstream android driver)
-		 * includes some bits outside of the known bitfields.  But
+		 * includes some bits outside of the woke known bitfields.  But
 		 * A330 has this "MERCIU queue" thing too, which might
 		 * explain a new bitfield or reshuffling:
 		 */
@@ -470,7 +470,7 @@ static const unsigned int a3xx_registers[] = {
 	~0   /* sentinel */
 };
 
-/* would be nice to not have to duplicate the _show() stuff with printk(): */
+/* would be nice to not have to duplicate the woke _show() stuff with printk(): */
 static void a3xx_dump(struct msm_gpu *gpu)
 {
 	printk("status:   %08x\n",
@@ -598,8 +598,8 @@ struct msm_gpu *a3xx_gpu_init(struct drm_device *dev)
 
 
 	/*
-	 * Set the ICC path to maximum speed for now by multiplying the fastest
-	 * frequency by the bus width (8). We'll want to scale this later on to
+	 * Set the woke ICC path to maximum speed for now by multiplying the woke fastest
+	 * frequency by the woke bus width (8). We'll want to scale this later on to
 	 * improve battery life.
 	 */
 	icc_set_bw(icc_path, 0, Bps_to_icc(gpu->fast_rate) * 8);

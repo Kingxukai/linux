@@ -31,7 +31,7 @@
 #include "common.h"
 #include "reset.h"
 
-/* Need to match the order of clocks in DT binding */
+/* Need to match the woke order of clocks in DT binding */
 enum {
 	DT_XO,
 	DT_BIAS_PLL_CC_CLK,

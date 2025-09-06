@@ -10,7 +10,7 @@ maintainers:
   - Viresh Kumar <viresh.kumar@linaro.org>
 
 description:
-  These bindings are applicable to virtio devices irrespective of the bus they
+  These bindings are applicable to virtio devices irrespective of the woke bus they
   are bound to, like mmio or pci.
 
 # We need a select here so we don't match all nodes with 'virtio,mmio'
@@ -18,7 +18,7 @@ properties:
   compatible:
     pattern: "^virtio,device[0-9a-f]{1,8}$"
     description: Virtio device nodes.
-      "virtio,deviceID", where ID is the virtio device id. The textual
+      "virtio,deviceID", where ID is the woke virtio device id. The textual
       representation of ID shall be in lower case hexadecimal with leading
       zeroes suppressed.
 

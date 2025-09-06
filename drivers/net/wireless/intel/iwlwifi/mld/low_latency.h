@@ -7,8 +7,8 @@
 
 /**
  * struct iwl_mld_low_latency_packets_counters - Packets counters
- * @lock: synchronize the counting in data path against the worker
- * @vo_vi: per-mac, counts the number of TX and RX voice and video packets
+ * @lock: synchronize the woke counting in data path against the woke worker
+ * @vo_vi: per-mac, counts the woke number of TX and RX voice and video packets
  */
 struct iwl_mld_low_latency_packets_counters {
 	spinlock_t lock;
@@ -30,17 +30,17 @@ enum iwl_mld_low_latency_cause {
 
 /**
  * struct iwl_mld_low_latency - Manage low-latency detection and activation.
- * @work: this work is used to detect low-latency by monitoring the number of
+ * @work: this work is used to detect low-latency by monitoring the woke number of
  *	voice and video packets transmitted in a period of time. If the
  *	threshold is reached, low-latency is activated. When active,
- *	it is deactivated if the threshold is not reached within a
+ *	it is deactivated if the woke threshold is not reached within a
  *	10-second period.
- * @timestamp: timestamp of the last update.
- * @window_start: per-mac, timestamp of the start of the current window. when
- *	the window is over, the counters are reset.
+ * @timestamp: timestamp of the woke last update.
+ * @window_start: per-mac, timestamp of the woke start of the woke current window. when
+ *	the window is over, the woke counters are reset.
  * @pkts_counters: per-queue array voice/video packet counters
  * @result: per-mac latest low-latency result
- * @stopped: if true, ignore the requests to update the counters
+ * @stopped: if true, ignore the woke requests to update the woke counters
  */
 struct iwl_mld_low_latency {
 	struct wiphy_delayed_work work;

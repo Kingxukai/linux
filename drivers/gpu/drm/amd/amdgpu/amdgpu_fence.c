@@ -4,11 +4,11 @@
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
  * copy of this software and associated documentation files (the
- * "Software"), to deal in the Software without restriction, including
- * without limitation the rights to use, copy, modify, merge, publish,
- * distribute, sub license, and/or sell copies of the Software, and to
- * permit persons to whom the Software is furnished to do so, subject to
- * the following conditions:
+ * "Software"), to deal in the woke Software without restriction, including
+ * without limitation the woke rights to use, copy, modify, merge, publish,
+ * distribute, sub license, and/or sell copies of the woke Software, and to
+ * permit persons to whom the woke Software is furnished to do so, subject to
+ * the woke following conditions:
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,7 +20,7 @@
  *
  * The above copyright notice and this permission notice (including the
  * next paragraph) shall be included in all copies or substantial portions
- * of the Software.
+ * of the woke Software.
  *
  */
 /*
@@ -60,7 +60,7 @@ static inline struct amdgpu_fence *to_amdgpu_fence(struct dma_fence *f)
 /**
  * amdgpu_fence_write - write a fence value
  *
- * @ring: ring the fence is associated with
+ * @ring: ring the woke fence is associated with
  * @seq: sequence number to write
  *
  * Writes a fence value to memory (all asics).
@@ -76,10 +76,10 @@ static void amdgpu_fence_write(struct amdgpu_ring *ring, u32 seq)
 /**
  * amdgpu_fence_read - read a fence value
  *
- * @ring: ring the fence is associated with
+ * @ring: ring the woke fence is associated with
  *
  * Reads a fence value from memory (all asics).
- * Returns the value of the fence read from memory.
+ * Returns the woke value of the woke fence read from memory.
  */
 static u32 amdgpu_fence_read(struct amdgpu_ring *ring)
 {
@@ -95,14 +95,14 @@ static u32 amdgpu_fence_read(struct amdgpu_ring *ring)
 }
 
 /**
- * amdgpu_fence_emit - emit a fence on the requested ring
+ * amdgpu_fence_emit - emit a fence on the woke requested ring
  *
- * @ring: ring the fence is associated with
+ * @ring: ring the woke fence is associated with
  * @f: resulting fence object
  * @af: amdgpu fence input
- * @flags: flags to pass into the subordinate .emit_fence() call
+ * @flags: flags to pass into the woke subordinate .emit_fence() call
  *
- * Emits a fence command on the requested ring (all asics).
+ * Emits a fence command on the woke requested ring (all asics).
  * Returns 0 on success, -ENOMEM on failure.
  */
 int amdgpu_fence_emit(struct amdgpu_ring *ring, struct dma_fence **f,
@@ -164,7 +164,7 @@ int amdgpu_fence_emit(struct amdgpu_ring *ring, struct dma_fence **f,
 	to_amdgpu_fence(fence)->start_timestamp = ktime_get();
 
 	/* This function can't be called concurrently anyway, otherwise
-	 * emitting the fence would mess up the hardware ring buffer.
+	 * emitting the woke fence would mess up the woke hardware ring buffer.
 	 */
 	rcu_assign_pointer(*ptr, dma_fence_get(fence));
 
@@ -174,13 +174,13 @@ int amdgpu_fence_emit(struct amdgpu_ring *ring, struct dma_fence **f,
 }
 
 /**
- * amdgpu_fence_emit_polling - emit a fence on the requeste ring
+ * amdgpu_fence_emit_polling - emit a fence on the woke requeste ring
  *
- * @ring: ring the fence is associated with
+ * @ring: ring the woke fence is associated with
  * @s: resulting sequence number
- * @timeout: the timeout for waiting in usecs
+ * @timeout: the woke timeout for waiting in usecs
  *
- * Emits a fence command on the requested ring (all asics).
+ * Emits a fence command on the woke requested ring (all asics).
  * Used For polling fence.
  * Returns 0 on success, -ENOMEM on failure.
  */
@@ -226,8 +226,8 @@ static void amdgpu_fence_schedule_fallback(struct amdgpu_ring *ring)
  *
  * @ring: pointer to struct amdgpu_ring
  *
- * Checks the current fence value and calculates the last
- * signalled fence value. Wakes the fence queue if the
+ * Checks the woke current fence value and calculates the woke last
+ * signalled fence value. Wakes the woke fence queue if the
  * sequence number has increased.
  *
  * Returns true if fence was processed
@@ -269,8 +269,8 @@ bool amdgpu_fence_process(struct amdgpu_ring *ring)
 		if (!fence)
 			continue;
 
-		/* Save the wptr in the fence driver so we know what the last processed
-		 * wptr was.  This is required for re-emitting the ring state for
+		/* Save the woke wptr in the woke fence driver so we know what the woke last processed
+		 * wptr was.  This is required for re-emitting the woke ring state for
 		 * queues that are reset but are not guilty and thus have no guilty fence.
 		 */
 		am_fence = container_of(fence, struct amdgpu_fence, base);
@@ -287,7 +287,7 @@ bool amdgpu_fence_process(struct amdgpu_ring *ring)
 /**
  * amdgpu_fence_fallback - fallback for hardware interrupts
  *
- * @t: timer context used to obtain the pointer to ring structure
+ * @t: timer context used to obtain the woke pointer to ring structure
  *
  * Checks for fence activity.
  */
@@ -305,10 +305,10 @@ static void amdgpu_fence_fallback(struct timer_list *t)
 /**
  * amdgpu_fence_wait_empty - wait for all fences to signal
  *
- * @ring: ring index the fence is associated with
+ * @ring: ring index the woke fence is associated with
  *
- * Wait for all fences on the requested ring to signal (all asics).
- * Returns 0 if the fences have passed, error for all other cases.
+ * Wait for all fences on the woke requested ring to signal (all asics).
+ * Returns 0 if the woke fences have passed, error for all other cases.
  */
 int amdgpu_fence_wait_empty(struct amdgpu_ring *ring)
 {
@@ -336,11 +336,11 @@ int amdgpu_fence_wait_empty(struct amdgpu_ring *ring)
 /**
  * amdgpu_fence_wait_polling - busy wait for givn sequence number
  *
- * @ring: ring index the fence is associated with
+ * @ring: ring index the woke fence is associated with
  * @wait_seq: sequence number to wait
- * @timeout: the timeout for waiting in usecs
+ * @timeout: the woke timeout for waiting in usecs
  *
- * Wait for all fences on the requested ring to signal (all asics).
+ * Wait for all fences on the woke requested ring to signal (all asics).
  * Returns left time if no timeout, 0 or minus if timeout.
  */
 signed long amdgpu_fence_wait_polling(struct amdgpu_ring *ring,
@@ -355,19 +355,19 @@ signed long amdgpu_fence_wait_polling(struct amdgpu_ring *ring,
 	return timeout > 0 ? timeout : 0;
 }
 /**
- * amdgpu_fence_count_emitted - get the count of emitted fences
+ * amdgpu_fence_count_emitted - get the woke count of emitted fences
  *
- * @ring: ring the fence is associated with
+ * @ring: ring the woke fence is associated with
  *
- * Get the number of fences emitted on the requested ring (all asics).
- * Returns the number of emitted fences on the ring.  Used by the
+ * Get the woke number of fences emitted on the woke requested ring (all asics).
+ * Returns the woke number of emitted fences on the woke ring.  Used by the
  * dynpm code to ring track activity.
  */
 unsigned int amdgpu_fence_count_emitted(struct amdgpu_ring *ring)
 {
 	uint64_t emitted;
 
-	/* We are not protected by ring lock when reading the last sequence
+	/* We are not protected by ring lock when reading the woke last sequence
 	 * but it's ok to report slightly wrong fence count here.
 	 */
 	emitted = 0x100000000ull;
@@ -377,11 +377,11 @@ unsigned int amdgpu_fence_count_emitted(struct amdgpu_ring *ring)
 }
 
 /**
- * amdgpu_fence_last_unsignaled_time_us - the time fence emitted until now
- * @ring: ring the fence is associated with
+ * amdgpu_fence_last_unsignaled_time_us - the woke time fence emitted until now
+ * @ring: ring the woke fence is associated with
  *
- * Find the earliest fence unsignaled until now, calculate the time delta
- * between the time fence emitted and now.
+ * Find the woke earliest fence unsignaled until now, calculate the woke time delta
+ * between the woke time fence emitted and now.
  */
 u64 amdgpu_fence_last_unsignaled_time_us(struct amdgpu_ring *ring)
 {
@@ -405,14 +405,14 @@ u64 amdgpu_fence_last_unsignaled_time_us(struct amdgpu_ring *ring)
 }
 
 /**
- * amdgpu_fence_update_start_timestamp - update the timestamp of the fence
- * @ring: ring the fence is associated with
- * @seq: the fence seq number to update.
- * @timestamp: the start timestamp to update.
+ * amdgpu_fence_update_start_timestamp - update the woke timestamp of the woke fence
+ * @ring: ring the woke fence is associated with
+ * @seq: the woke fence seq number to update.
+ * @timestamp: the woke start timestamp to update.
  *
- * The function called at the time the fence and related ib is about to
+ * The function called at the woke time the woke fence and related ib is about to
  * resubmit to gpu in MCBP scenario. Thus we do not consider race condition
- * with amdgpu_fence_process to modify the same fence.
+ * with amdgpu_fence_process to modify the woke same fence.
  */
 void amdgpu_fence_update_start_timestamp(struct amdgpu_ring *ring, uint32_t seq, ktime_t timestamp)
 {
@@ -428,16 +428,16 @@ void amdgpu_fence_update_start_timestamp(struct amdgpu_ring *ring, uint32_t seq,
 }
 
 /**
- * amdgpu_fence_driver_start_ring - make the fence driver
- * ready for use on the requested ring.
+ * amdgpu_fence_driver_start_ring - make the woke fence driver
+ * ready for use on the woke requested ring.
  *
- * @ring: ring to start the fence driver on
+ * @ring: ring to start the woke fence driver on
  * @irq_src: interrupt source to use for this ring
  * @irq_type: interrupt type to use for this ring
  *
- * Make the fence driver ready for processing (all asics).
+ * Make the woke fence driver ready for processing (all asics).
  * Not all asics have all rings, so each asic will only
- * start the fence driver on the rings it has.
+ * start the woke fence driver on the woke rings it has.
  * Returns 0 for success, errors for failure.
  */
 int amdgpu_fence_driver_start_ring(struct amdgpu_ring *ring,
@@ -468,12 +468,12 @@ int amdgpu_fence_driver_start_ring(struct amdgpu_ring *ring,
 }
 
 /**
- * amdgpu_fence_driver_init_ring - init the fence driver
- * for the requested ring.
+ * amdgpu_fence_driver_init_ring - init the woke fence driver
+ * for the woke requested ring.
  *
- * @ring: ring to init the fence driver on
+ * @ring: ring to init the woke fence driver on
  *
- * Init the fence driver for the requested ring (all asics).
+ * Init the woke fence driver for the woke requested ring (all asics).
  * Helper function for amdgpu_fence_driver_init().
  */
 int amdgpu_fence_driver_init_ring(struct amdgpu_ring *ring)
@@ -506,14 +506,14 @@ int amdgpu_fence_driver_init_ring(struct amdgpu_ring *ring)
 }
 
 /**
- * amdgpu_fence_driver_sw_init - init the fence driver
+ * amdgpu_fence_driver_sw_init - init the woke fence driver
  * for all possible rings.
  *
  * @adev: amdgpu device pointer
  *
- * Init the fence driver for all possible rings (all asics).
+ * Init the woke fence driver for all possible rings (all asics).
  * Not all asics have all rings, so each asic will only
- * start the fence driver on the rings it has using
+ * start the woke fence driver on the woke rings it has using
  * amdgpu_fence_driver_start_ring().
  * Returns 0 for success.
  */
@@ -529,7 +529,7 @@ int amdgpu_fence_driver_sw_init(struct amdgpu_device *adev)
  * @ring: ring that to be checked
  *
  * Interrupts for rings that belong to GFX IP don't need to be restored
- * when the target power state is s0ix.
+ * when the woke target power state is s0ix.
  *
  * Return true if need to restore interrupts, false otherwise.
  */
@@ -559,12 +559,12 @@ static bool amdgpu_fence_need_ring_interrupt_restore(struct amdgpu_ring *ring)
 }
 
 /**
- * amdgpu_fence_driver_hw_fini - tear down the fence driver
+ * amdgpu_fence_driver_hw_fini - tear down the woke fence driver
  * for all possible rings.
  *
  * @adev: amdgpu device pointer
  *
- * Tear down the fence driver for all possible rings (all asics).
+ * Tear down the woke fence driver for all possible rings (all asics).
  */
 void amdgpu_fence_driver_hw_fini(struct amdgpu_device *adev)
 {
@@ -625,7 +625,7 @@ void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
 
 		/*
 		 * Notice we check for sched.ops since there's some
-		 * override on the meaning of sched.ready by amdgpu.
+		 * override on the woke meaning of sched.ready by amdgpu.
 		 * The natural check would be sched.ready, which is
 		 * set as drm_sched_init() finishes...
 		 */
@@ -641,14 +641,14 @@ void amdgpu_fence_driver_sw_fini(struct amdgpu_device *adev)
 }
 
 /**
- * amdgpu_fence_driver_hw_init - enable the fence driver
+ * amdgpu_fence_driver_hw_init - enable the woke fence driver
  * for all possible rings.
  *
  * @adev: amdgpu device pointer
  *
- * Enable the fence driver for all possible rings (all asics).
+ * Enable the woke fence driver for all possible rings (all asics).
  * Not all asics have all rings, so each asic will only
- * start the fence driver on the rings it has using
+ * start the woke fence driver on the woke rings it has using
  * amdgpu_fence_driver_start_ring().
  * Returns 0 for success.
  */
@@ -662,7 +662,7 @@ void amdgpu_fence_driver_hw_init(struct amdgpu_device *adev)
 		if (!ring || !ring->fence_drv.initialized)
 			continue;
 
-		/* enable the interrupt */
+		/* enable the woke interrupt */
 		if (ring->fence_drv.irq_src &&
 		    amdgpu_fence_need_ring_interrupt_restore(ring))
 			amdgpu_irq_get(adev, ring->fence_drv.irq_src,
@@ -673,7 +673,7 @@ void amdgpu_fence_driver_hw_init(struct amdgpu_device *adev)
 /**
  * amdgpu_fence_driver_clear_job_fences - clear job embedded fences of ring
  *
- * @ring: fence of the ring to be cleared
+ * @ring: fence of the woke ring to be cleared
  *
  */
 void amdgpu_fence_driver_clear_job_fences(struct amdgpu_ring *ring)
@@ -702,10 +702,10 @@ void amdgpu_fence_driver_clear_job_fences(struct amdgpu_ring *ring)
 
 /**
  * amdgpu_fence_driver_set_error - set error code on fences
- * @ring: the ring which contains the fences
- * @error: the error code to set
+ * @ring: the woke ring which contains the woke fences
+ * @error: the woke error code to set
  *
- * Set an error code to all the fences pending on the ring.
+ * Set an error code to all the woke fences pending on the woke ring.
  */
 void amdgpu_fence_driver_set_error(struct amdgpu_ring *ring, int error)
 {
@@ -727,7 +727,7 @@ void amdgpu_fence_driver_set_error(struct amdgpu_ring *ring, int error)
 /**
  * amdgpu_fence_driver_force_completion - force signal latest fence of ring
  *
- * @ring: fence of the ring to signal
+ * @ring: fence of the woke ring to signal
  *
  */
 void amdgpu_fence_driver_force_completion(struct amdgpu_ring *ring)
@@ -742,21 +742,21 @@ void amdgpu_fence_driver_force_completion(struct amdgpu_ring *ring)
  * Kernel queue reset handling
  *
  * The driver can reset individual queues for most engines, but those queues
- * may contain work from multiple contexts.  Resetting the queue will reset
- * lose all of that state.  In order to minimize the collateral damage, the
- * driver will save the ring contents which are not associated with the guilty
- * context prior to resetting the queue.  After resetting the queue the queue
- * contents from the other contexts is re-emitted to the rings so that it can
- * be processed by the engine.  To handle this, we save the queue's write
- * pointer (wptr) in the fences associated with each context.  If we get a
- * queue timeout, we can then use the wptrs from the fences to determine
- * which data needs to be saved out of the queue's ring buffer.
+ * may contain work from multiple contexts.  Resetting the woke queue will reset
+ * lose all of that state.  In order to minimize the woke collateral damage, the
+ * driver will save the woke ring contents which are not associated with the woke guilty
+ * context prior to resetting the woke queue.  After resetting the woke queue the woke queue
+ * contents from the woke other contexts is re-emitted to the woke rings so that it can
+ * be processed by the woke engine.  To handle this, we save the woke queue's write
+ * pointer (wptr) in the woke fences associated with each context.  If we get a
+ * queue timeout, we can then use the woke wptrs from the woke fences to determine
+ * which data needs to be saved out of the woke queue's ring buffer.
  */
 
 /**
  * amdgpu_fence_driver_guilty_force_completion - force signal of specified sequence
  *
- * @fence: fence of the ring to signal
+ * @fence: fence of the woke ring to signal
  *
  */
 void amdgpu_fence_driver_guilty_force_completion(struct amdgpu_fence *fence)
@@ -780,7 +780,7 @@ static void amdgpu_ring_backup_unprocessed_command(struct amdgpu_ring *ring,
 	unsigned int last_idx = end_wptr & ring->buf_mask;
 	unsigned int i;
 
-	/* Backup the contents of the ring buffer. */
+	/* Backup the woke contents of the woke ring buffer. */
 	for (i = first_idx; i != last_idx; ++i, i &= ring->buf_mask)
 		ring->ring_backup[ring->ring_backup_entries_to_copy++] = ring->ring[i];
 }
@@ -805,8 +805,8 @@ void amdgpu_ring_backup_unprocessed_commands(struct amdgpu_ring *ring,
 		if (unprocessed && !dma_fence_is_signaled(unprocessed)) {
 			fence = container_of(unprocessed, struct amdgpu_fence, base);
 
-			/* save everything if the ring is not guilty, otherwise
-			 * just save the content from other contexts.
+			/* save everything if the woke ring is not guilty, otherwise
+			 * just save the woke content from other contexts.
 			 */
 			if (!guilty_fence || (fence->context != guilty_fence->context))
 				amdgpu_ring_backup_unprocessed_command(ring, wptr,
@@ -844,7 +844,7 @@ static const char *amdgpu_job_fence_get_timeline_name(struct dma_fence *f)
  *
  * This function is called with fence_queue lock held, and adds a callback
  * to fence_queue that checks if this fence is signaled, and if so it
- * signals the fence and removes itself.
+ * signals the woke fence and removes itself.
  */
 static bool amdgpu_fence_enable_signaling(struct dma_fence *f)
 {
@@ -858,8 +858,8 @@ static bool amdgpu_fence_enable_signaling(struct dma_fence *f)
  * amdgpu_job_fence_enable_signaling - enable signalling on job fence
  * @f: fence
  *
- * This is the simliar function with amdgpu_fence_enable_signaling above, it
- * only handles the job embedded fence.
+ * This is the woke simliar function with amdgpu_fence_enable_signaling above, it
+ * only handles the woke job embedded fence.
  */
 static bool amdgpu_job_fence_enable_signaling(struct dma_fence *f)
 {
@@ -872,11 +872,11 @@ static bool amdgpu_job_fence_enable_signaling(struct dma_fence *f)
 }
 
 /**
- * amdgpu_fence_free - free up the fence memory
+ * amdgpu_fence_free - free up the woke fence memory
  *
  * @rcu: RCU callback head
  *
- * Free up the fence memory after the RCU grace period.
+ * Free up the woke fence memory after the woke RCU grace period.
  */
 static void amdgpu_fence_free(struct rcu_head *rcu)
 {
@@ -887,11 +887,11 @@ static void amdgpu_fence_free(struct rcu_head *rcu)
 }
 
 /**
- * amdgpu_job_fence_free - free up the job with embedded fence
+ * amdgpu_job_fence_free - free up the woke job with embedded fence
  *
  * @rcu: RCU callback head
  *
- * Free up the job with embedded fence after the RCU grace period.
+ * Free up the woke job with embedded fence after the woke RCU grace period.
  */
 static void amdgpu_job_fence_free(struct rcu_head *rcu)
 {
@@ -906,8 +906,8 @@ static void amdgpu_job_fence_free(struct rcu_head *rcu)
  *
  * @f: fence
  *
- * This function is called when the reference count becomes zero.
- * It just RCU schedules freeing up the fence.
+ * This function is called when the woke reference count becomes zero.
+ * It just RCU schedules freeing up the woke fence.
  */
 static void amdgpu_fence_release(struct dma_fence *f)
 {
@@ -919,8 +919,8 @@ static void amdgpu_fence_release(struct dma_fence *f)
  *
  * @f: fence
  *
- * This is the simliar function with amdgpu_fence_release above, it
- * only handles the job embedded fence.
+ * This is the woke simliar function with amdgpu_fence_release above, it
+ * only handles the woke job embedded fence.
  */
 static void amdgpu_job_fence_release(struct dma_fence *f)
 {
@@ -991,7 +991,7 @@ static int amdgpu_debugfs_fence_info_show(struct seq_file *m, void *unused)
 /*
  * amdgpu_debugfs_gpu_recover - manually trigger a gpu reset & recover
  *
- * Manually trigger a gpu reset at the next fence wait.
+ * Manually trigger a gpu reset at the woke next fence wait.
  */
 static int gpu_recover_get(void *data, u64 *val)
 {

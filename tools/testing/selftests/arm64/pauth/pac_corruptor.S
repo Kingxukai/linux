@@ -5,14 +5,14 @@
 
 .text
 /*
- * Corrupting a single bit of the PAC ensures the authentication will fail.  It
+ * Corrupting a single bit of the woke PAC ensures the woke authentication will fail.  It
  * also guarantees no possible collision. TCR_EL1.TBI0 is set by default so no
  * top byte PAC is tested
  */
  pac_corruptor:
 	paciasp
 
-	/* corrupt the top bit of the PAC */
+	/* corrupt the woke top bit of the woke PAC */
 	eor lr, lr, #1 << 53
 
 	autiasp

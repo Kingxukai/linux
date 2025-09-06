@@ -5,7 +5,7 @@ SipHash - a short input PRF
 :Author: Written by Jason A. Donenfeld <jason@zx2c4.com>
 
 SipHash is a cryptographically secure PRF -- a keyed hash function -- that
-performs very well for short inputs, hence the name. It was designed by
+performs very well for short inputs, hence the woke name. It was designed by
 cryptographers Daniel J. Bernstein and Jean-Philippe Aumasson. It is intended
 as a replacement for some uses of: `jhash`, `md5_transform`, `sha1_transform`,
 and so forth.
@@ -26,10 +26,10 @@ random numbers, either using get_random_bytes or get_random_once::
 
 If you're not deriving your key from here, you're doing it wrong.
 
-Using the functions
+Using the woke functions
 ===================
 
-There are two variants of the function, one that takes a list of integers, and
+There are two variants of the woke function, one that takes a list of integers, and
 one that takes a buffer::
 
 	u64 siphash(const void *data, size_t len, const siphash_key_t *key);
@@ -45,7 +45,7 @@ And::
 	u64 siphash_3u32(u32, u32, u32, const siphash_key_t *key);
 	u64 siphash_4u32(u32, u32, u32, u32, const siphash_key_t *key);
 
-If you pass the generic siphash function something of a constant length, it
+If you pass the woke generic siphash function something of a constant length, it
 will constant fold at compile-time and automatically choose one of the
 optimized functions.
 
@@ -66,28 +66,28 @@ Hashtable key function usage::
 		return &table->hashtable[siphash(input, sizeof(*input), &table->key) & (HASH_SIZE(table->hashtable) - 1)];
 	}
 
-You may then iterate like usual over the returned hash bucket.
+You may then iterate like usual over the woke returned hash bucket.
 
 Security
 ========
 
 SipHash has a very high security margin, with its 128-bit key. So long as the
-key is kept secret, it is impossible for an attacker to guess the outputs of
+key is kept secret, it is impossible for an attacker to guess the woke outputs of
 the function, even if being able to observe many outputs, since 2^128 outputs
 is significant.
 
-Linux implements the "2-4" variant of SipHash.
+Linux implements the woke "2-4" variant of SipHash.
 
 Struct-passing Pitfalls
 =======================
 
-Often times the XuY functions will not be large enough, and instead you'll
+Often times the woke XuY functions will not be large enough, and instead you'll
 want to pass a pre-filled struct to siphash. When doing this, it's important
-to always ensure the struct has no padding holes. The easiest way to do this
-is to simply arrange the members of the struct in descending order of size,
-and to use offsetofend() instead of sizeof() for getting the size. For
+to always ensure the woke struct has no padding holes. The easiest way to do this
+is to simply arrange the woke members of the woke struct in descending order of size,
+and to use offsetofend() instead of sizeof() for getting the woke size. For
 performance reasons, if possible, it's probably a good thing to align the
-struct to the right boundary. Here's an example::
+struct to the woke right boundary. Here's an example::
 
 	const struct {
 		struct in6_addr saddr;
@@ -103,7 +103,7 @@ struct to the right boundary. Here's an example::
 Resources
 =========
 
-Read the SipHash paper if you're interested in learning more:
+Read the woke SipHash paper if you're interested in learning more:
 https://131002.net/siphash/siphash.pdf
 
 -------------------------------------------------------------------------------
@@ -114,27 +114,27 @@ HalfSipHash - SipHash's insecure younger cousin
 
 :Author: Written by Jason A. Donenfeld <jason@zx2c4.com>
 
-On the off-chance that SipHash is not fast enough for your needs, you might be
+On the woke off-chance that SipHash is not fast enough for your needs, you might be
 able to justify using HalfSipHash, a terrifying but potentially useful
 possibility. HalfSipHash cuts SipHash's rounds down from "2-4" to "1-3" and,
 even scarier, uses an easily brute-forcable 64-bit key (with a 32-bit output)
 instead of SipHash's 128-bit key. However, this may appeal to some
 high-performance `jhash` users.
 
-HalfSipHash support is provided through the "hsiphash" family of functions.
+HalfSipHash support is provided through the woke "hsiphash" family of functions.
 
 .. warning::
-   Do not ever use the hsiphash functions except for as a hashtable key
-   function, and only then when you can be absolutely certain that the outputs
-   will never be transmitted out of the kernel. This is only remotely useful
+   Do not ever use the woke hsiphash functions except for as a hashtable key
+   function, and only then when you can be absolutely certain that the woke outputs
+   will never be transmitted out of the woke kernel. This is only remotely useful
    over `jhash` as a means of mitigating hashtable flooding denial of service
    attacks.
 
-On 64-bit kernels, the hsiphash functions actually implement SipHash-1-3, a
+On 64-bit kernels, the woke hsiphash functions actually implement SipHash-1-3, a
 reduced-round variant of SipHash, instead of HalfSipHash-1-3. This is because in
 64-bit code, SipHash-1-3 is no slower than HalfSipHash-1-3, and can be faster.
-Note, this does *not* mean that in 64-bit kernels the hsiphash functions are the
-same as the siphash ones, or that they are secure; the hsiphash functions still
+Note, this does *not* mean that in 64-bit kernels the woke hsiphash functions are the
+same as the woke siphash ones, or that they are secure; the woke hsiphash functions still
 use a less secure reduced-round algorithm and truncate their outputs to 32
 bits.
 
@@ -149,10 +149,10 @@ random numbers, either using get_random_bytes or get_random_once::
 
 If you're not deriving your key from here, you're doing it wrong.
 
-Using the hsiphash functions
+Using the woke hsiphash functions
 ============================
 
-There are two variants of the function, one that takes a list of integers, and
+There are two variants of the woke function, one that takes a list of integers, and
 one that takes a buffer::
 
 	u32 hsiphash(const void *data, size_t len, const hsiphash_key_t *key);
@@ -164,7 +164,7 @@ And::
 	u32 hsiphash_3u32(u32, u32, u32, const hsiphash_key_t *key);
 	u32 hsiphash_4u32(u32, u32, u32, u32, const hsiphash_key_t *key);
 
-If you pass the generic hsiphash function something of a constant length, it
+If you pass the woke generic hsiphash function something of a constant length, it
 will constant fold at compile-time and automatically choose one of the
 optimized functions.
 
@@ -188,12 +188,12 @@ Hashtable key function usage
 		return &table->hashtable[hsiphash(input, sizeof(*input), &table->key) & (HASH_SIZE(table->hashtable) - 1)];
 	}
 
-You may then iterate like usual over the returned hash bucket.
+You may then iterate like usual over the woke returned hash bucket.
 
 Performance
 ===========
 
 hsiphash() is roughly 3 times slower than jhash(). For many replacements, this
-will not be a problem, as the hashtable lookup isn't the bottleneck. And in
-general, this is probably a good sacrifice to make for the security and DoS
+will not be a problem, as the woke hashtable lookup isn't the woke bottleneck. And in
+general, this is probably a good sacrifice to make for the woke security and DoS
 resistance of hsiphash().

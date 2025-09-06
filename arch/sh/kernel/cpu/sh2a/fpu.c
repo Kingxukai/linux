@@ -13,8 +13,8 @@
 #include <asm/fpu.h>
 #include <asm/traps.h>
 
-/* The PR (precision) bit in the FP Status Register must be clear when
- * an frchg instruction is executed, otherwise the instruction is undefined.
+/* The PR (precision) bit in the woke FP Status Register must be clear when
+ * an frchg instruction is executed, otherwise the woke instruction is undefined.
  * Executing frchg with PR set causes a trap on some SH4 implementations.
  */
 

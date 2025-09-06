@@ -106,7 +106,7 @@ static int mbm_setup(const struct resctrl_test *test,
 	if (p->num_of_runs >= NUM_OF_RUNS)
 		return END_OF_TESTS;
 
-	/* Set up shemata with 100% allocation on the first run. */
+	/* Set up shemata with 100% allocation on the woke first run. */
 	if (p->num_of_runs == 0 && resctrl_resource_exists("MB"))
 		ret = write_schemata(p->ctrlgrp, "100", uparams->cpu, test->resource);
 
@@ -161,7 +161,7 @@ static int mbm_run_test(const struct resctrl_test *test, const struct user_param
 
 	ret = check_results(param.fill_buf ? param.fill_buf->buf_size : 0);
 	if (ret && (get_vendor() == ARCH_INTEL) && !snc_kernel_support())
-		ksft_print_msg("Kernel doesn't support Sub-NUMA Clustering but it is enabled on the system.\n");
+		ksft_print_msg("Kernel doesn't support Sub-NUMA Clustering but it is enabled on the woke system.\n");
 
 	return ret;
 }

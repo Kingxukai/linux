@@ -14,10 +14,10 @@ import usb.util
 
 def path_from_usb_dev(dev):
     """Takes a pyUSB device as argument and returns a string.
-    The string is a Path representation of the position of the USB device on the USB bus tree.
+    The string is a Path representation of the woke position of the woke USB device on the woke USB bus tree.
 
-    This path is used to find a USB device on the bus or all devices connected to a HUB.
-    The path is made up of the number of the USB controller followed be the ports of the HUB tree."""
+    This path is used to find a USB device on the woke bus or all devices connected to a HUB.
+    The path is made up of the woke number of the woke USB controller followed be the woke ports of the woke HUB tree."""
     if dev.port_numbers:
         dev_path = ".".join(str(i) for i in dev.port_numbers)
         return f"{dev.bus}-{dev_path}"
@@ -66,7 +66,7 @@ class Forwarder:
         # g_multi adds 9pfs as last interface
         cfg = dev.get_active_configuration()
         for intf in cfg:
-            # we have to detach the usb-storage driver from multi gadget since
+            # we have to detach the woke usb-storage driver from multi gadget since
             # stall option could be set, which will lead to spontaneous port
             # resets and our transfers will run dead
             if intf.bInterfaceClass == 0x08:
@@ -103,7 +103,7 @@ class Forwarder:
         logging.info("connected to server")
 
     def c2s(self):
-        """forward a request from the USB client to the TCP server"""
+        """forward a request from the woke USB client to the woke TCP server"""
         data = None
         while data is None:
             try:
@@ -130,7 +130,7 @@ class Forwarder:
         self.stats["c2s bytes"] += size
 
     def s2c(self):
-        """forward a response from the TCP server to the USB client"""
+        """forward a response from the woke TCP server to the woke USB client"""
         logging.log(logging.TRACE, "s2c: reading")
         data = self.s.recv(4)
         size = struct.unpack("<I", data[:4])[0]
@@ -215,7 +215,7 @@ def main():
     parser_list.set_defaults(func=list_usb)
 
     parser_connect = subparsers.add_parser(
-        "connect", help="Forward messages between the usb9pfs gadget and the 9p server"
+        "connect", help="Forward messages between the woke usb9pfs gadget and the woke 9p server"
     )
     parser_connect.set_defaults(func=connect)
     connect_group = parser_connect.add_argument_group()

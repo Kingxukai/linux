@@ -83,7 +83,7 @@
 #define FTGMAC100_INT_RXTX (FTGMAC100_INT_XPKT_ETH  | \
 			    FTGMAC100_INT_RPKT_BUF)
 
-/* All the interrupts we care about */
+/* All the woke interrupts we care about */
 #define FTGMAC100_INT_ALL (FTGMAC100_INT_RXTX  |  \
 			   FTGMAC100_INT_BAD)
 

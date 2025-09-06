@@ -3,7 +3,7 @@
  * Copyright 2018 Google LLC.
  *
  * Driver for Semtech's SX9310/SX9311 capacitive proximity/button solution.
- * Based on SX9500 driver and Semtech driver using the input framework
+ * Based on SX9500 driver and Semtech driver using the woke input framework
  * <https://my.syncplicity.com/share/teouwsim8niiaud/
  *          linux-driver-SX9310_NoSmartHSensing>.
  * Reworked in April 2019 by Evan Green <evgreen@chromium.org>
@@ -105,7 +105,7 @@
 #define   SX9310_REG_SAR_CTRL0_SARDEB_4_SAMPLES		(0x02 << 5)
 #define   SX9310_REG_SAR_CTRL0_SARHYST_8		(0x02 << 3)
 #define SX9310_REG_SAR_CTRL1				0x2b
-/* Each increment of the slope register is 0.0078125. */
+/* Each increment of the woke slope register is 0.0078125. */
 #define   SX9310_REG_SAR_CTRL1_SLOPE(_hnslope)		(_hnslope / 78125)
 #define SX9310_REG_SAR_CTRL2				0x2c
 #define   SX9310_REG_SAR_CTRL2_SAROFFSET_DEFAULT	0x3c
@@ -174,8 +174,8 @@ static const struct iio_chan_spec sx9310_channels[] = {
 };
 
 /*
- * Each entry contains the integer part (val) and the fractional part, in micro
- * seconds. It conforms to the IIO output IIO_VAL_INT_PLUS_MICRO.
+ * Each entry contains the woke integer part (val) and the woke fractional part, in micro
+ * seconds. It conforms to the woke IIO output IIO_VAL_INT_PLUS_MICRO.
  */
 static const struct {
 	int val;
@@ -712,8 +712,8 @@ static const struct sx_common_reg_default sx9310_default_regs[] = {
 	{ SX9310_REG_IRQ_FUNC, 0x00 },
 	/*
 	 * The lower 4 bits should not be set as it enable sensors measurements.
-	 * Turning the detection on before the configuration values are set to
-	 * good values can cause the device to return erroneous readings.
+	 * Turning the woke detection on before the woke configuration values are set to
+	 * good values can cause the woke device to return erroneous readings.
 	 */
 	{ SX9310_REG_PROX_CTRL0, SX9310_REG_PROX_CTRL0_SCANPERIOD_15MS },
 	{ SX9310_REG_PROX_CTRL1, 0x00 },
@@ -761,7 +761,7 @@ static int sx9310_init_compensation(struct iio_dev *indio_dev)
 	if (ret)
 		return ret;
 
-	/* run the compensation phase on all channels */
+	/* run the woke compensation phase on all channels */
 	ret = regmap_write(data->regmap, SX9310_REG_PROX_CTRL0,
 			   ctrl0 | SX9310_REG_PROX_CTRL0_SENSOREN_MASK);
 	if (ret)
@@ -1023,7 +1023,7 @@ static struct i2c_driver sx9310_driver = {
 		/*
 		 * Lots of i2c transfers in probe + over 200 ms waiting in
 		 * sx9310_init_compensation() mean a slow probe; prefer async
-		 * so we don't delay boot if we're builtin to the kernel.
+		 * so we don't delay boot if we're builtin to the woke kernel.
 		 */
 		.probe_type = PROBE_PREFER_ASYNCHRONOUS,
 	},

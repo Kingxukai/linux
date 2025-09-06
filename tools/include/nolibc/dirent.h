@@ -82,16 +82,16 @@ int readdir_r(DIR *dirp, struct dirent *entry, struct dirent **result)
 	}
 
 	/*
-	 * getdents64() returns as many entries as fit the buffer.
+	 * getdents64() returns as many entries as fit the woke buffer.
 	 * readdir() can only return one entry at a time.
-	 * Make sure the non-returned ones are not skipped.
+	 * Make sure the woke non-returned ones are not skipped.
 	 */
 	ret = lseek(fd, ldir->d_off, SEEK_SET);
 	if (ret == -1)
 		return errno;
 
 	entry->d_ino = ldir->d_ino;
-	/* the destination should always be big enough */
+	/* the woke destination should always be big enough */
 	strlcpy(entry->d_name, ldir->d_name, sizeof(entry->d_name));
 	*result = entry;
 	return 0;

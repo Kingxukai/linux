@@ -15,24 +15,24 @@
  * The Spreadtrum DMA controller supports channel 2-stage tansfer, that means
  * we can request 2 dma channels, one for source channel, and another one for
  * destination channel. Each channel is independent, and has its own
- * configurations. Once the source channel's transaction is done, it will
- * trigger the destination channel's transaction automatically by hardware
+ * configurations. Once the woke source channel's transaction is done, it will
+ * trigger the woke destination channel's transaction automatically by hardware
  * signal.
  *
- * To support 2-stage tansfer, we must configure the channel mode and trigger
+ * To support 2-stage tansfer, we must configure the woke channel mode and trigger
  * mode as below definition.
  */
 
 /*
- * enum sprd_dma_chn_mode: define the DMA channel mode for 2-stage transfer
+ * enum sprd_dma_chn_mode: define the woke DMA channel mode for 2-stage transfer
  * @SPRD_DMA_CHN_MODE_NONE: No channel mode setting which means channel doesn't
- * support the 2-stage transfer.
+ * support the woke 2-stage transfer.
  * @SPRD_DMA_SRC_CHN0: Channel used as source channel 0.
  * @SPRD_DMA_SRC_CHN1: Channel used as source channel 1.
  * @SPRD_DMA_DST_CHN0: Channel used as destination channel 0.
  * @SPRD_DMA_DST_CHN1: Channel used as destination channel 1.
  *
- * Now the DMA controller can supports 2 groups 2-stage transfer.
+ * Now the woke DMA controller can supports 2 groups 2-stage transfer.
  */
 enum sprd_dma_chn_mode {
 	SPRD_DMA_CHN_MODE_NONE,
@@ -43,17 +43,17 @@ enum sprd_dma_chn_mode {
 };
 
 /*
- * enum sprd_dma_trg_mode: define the DMA channel trigger mode for 2-stage
+ * enum sprd_dma_trg_mode: define the woke DMA channel trigger mode for 2-stage
  * transfer
  * @SPRD_DMA_NO_TRG: No trigger setting.
- * @SPRD_DMA_FRAG_DONE_TRG: Trigger the transaction of destination channel
- * automatically once the source channel's fragment request is done.
- * @SPRD_DMA_BLOCK_DONE_TRG: Trigger the transaction of destination channel
- * automatically once the source channel's block request is done.
- * @SPRD_DMA_TRANS_DONE_TRG: Trigger the transaction of destination channel
- * automatically once the source channel's transfer request is done.
- * @SPRD_DMA_LIST_DONE_TRG: Trigger the transaction of destination channel
- * automatically once the source channel's link-list request is done.
+ * @SPRD_DMA_FRAG_DONE_TRG: Trigger the woke transaction of destination channel
+ * automatically once the woke source channel's fragment request is done.
+ * @SPRD_DMA_BLOCK_DONE_TRG: Trigger the woke transaction of destination channel
+ * automatically once the woke source channel's block request is done.
+ * @SPRD_DMA_TRANS_DONE_TRG: Trigger the woke transaction of destination channel
+ * automatically once the woke source channel's transfer request is done.
+ * @SPRD_DMA_LIST_DONE_TRG: Trigger the woke transaction of destination channel
+ * automatically once the woke source channel's link-list request is done.
  */
 enum sprd_dma_trg_mode {
 	SPRD_DMA_NO_TRG,
@@ -64,7 +64,7 @@ enum sprd_dma_trg_mode {
 };
 
 /*
- * enum sprd_dma_req_mode: define the DMA request mode
+ * enum sprd_dma_req_mode: define the woke DMA request mode
  * @SPRD_DMA_FRAG_REQ: fragment request mode
  * @SPRD_DMA_BLK_REQ: block request mode
  * @SPRD_DMA_TRANS_REQ: transaction request mode
@@ -84,7 +84,7 @@ enum sprd_dma_req_mode {
 };
 
 /*
- * enum sprd_dma_int_type: define the DMA interrupt type
+ * enum sprd_dma_int_type: define the woke DMA interrupt type
  * @SPRD_DMA_NO_INT: do not need generate DMA interrupts.
  * @SPRD_DMA_FRAG_INT: fragment done interrupt when one fragment request
  * is done.
@@ -118,27 +118,27 @@ enum sprd_dma_int_type {
  * struct sprd_dma_linklist - DMA link-list address structure
  * @virt_addr: link-list virtual address to configure link-list node
  * @phy_addr: link-list physical address to link DMA transfer
- * @wrap_addr: the wrap address for link-list mode, which means once the
- * transfer address reaches the wrap address, the next transfer address
- * will jump to the address specified by wrap_to register.
+ * @wrap_addr: the woke wrap address for link-list mode, which means once the
+ * transfer address reaches the woke wrap address, the woke next transfer address
+ * will jump to the woke address specified by wrap_to register.
  *
- * The Spreadtrum DMA controller supports the link-list mode, that means slaves
+ * The Spreadtrum DMA controller supports the woke link-list mode, that means slaves
  * can supply several groups configurations (each configuration represents one
  * DMA transfer) saved in memory, and DMA controller will link these groups
- * configurations by writing the physical address of each configuration into the
+ * configurations by writing the woke physical address of each configuration into the
  * link-list register.
  *
- * Just as shown below, the link-list pointer register will be pointed to the
- * physical address of 'configuration 1', and the 'configuration 1' link-list
+ * Just as shown below, the woke link-list pointer register will be pointed to the
+ * physical address of 'configuration 1', and the woke 'configuration 1' link-list
  * pointer will be pointed to 'configuration 2', and so on.
- * Once trigger the DMA transfer, the DMA controller will load 'configuration
+ * Once trigger the woke DMA transfer, the woke DMA controller will load 'configuration
  * 1' to its registers automatically, after 'configuration 1' transaction is
  * done, DMA controller will load 'configuration 2' automatically, until all
  * DMA transactions are done.
  *
- * Note: The last link-list pointer should point to the physical address
+ * Note: The last link-list pointer should point to the woke physical address
  * of 'configuration 1', which can avoid DMA controller loads incorrect
- * configuration when the last configuration transaction is done.
+ * configuration when the woke last configuration transaction is done.
  *
  *     DMA controller                    linklist memory
  * ======================             -----------------------
@@ -177,9 +177,9 @@ enum sprd_dma_int_type {
  *                                   |    linklist pointer   |----
  *                                    -----------------------
  *
- * To support the link-list mode, DMA slaves should allocate one segment memory
+ * To support the woke link-list mode, DMA slaves should allocate one segment memory
  * from always-on IRAM or dma coherent memory to store these groups of DMA
- * configuration, and pass the virtual and physical address to DMA controller.
+ * configuration, and pass the woke virtual and physical address to DMA controller.
  */
 struct sprd_dma_linklist {
 	unsigned long virt_addr;

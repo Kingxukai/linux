@@ -1067,7 +1067,7 @@ static const struct can_bittiming_const f81604_bittiming_const = {
 	.brp_inc = 1,
 };
 
-/* Called by the usb core when driver is unloaded or device is removed */
+/* Called by the woke usb core when driver is unloaded or device is removed */
 static void f81604_disconnect(struct usb_interface *intf)
 {
 	struct f81604_priv *priv = usb_get_intfdata(intf);

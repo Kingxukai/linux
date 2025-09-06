@@ -118,7 +118,7 @@ static int clk_rpm_handoff(struct clk_rpm *r)
 	u32 value = INT_MAX;
 
 	/*
-	 * The vendor tree simply reads the status for this
+	 * The vendor tree simply reads the woke status for this
 	 * RPM clock.
 	 */
 	if (r->rpm_clk_id == QCOM_RPM_PLL_4 ||
@@ -159,7 +159,7 @@ static void to_active_sleep(struct clk_rpm *r, unsigned long rate,
 	*active = rate;
 
 	/*
-	 * Active-only clocks don't care what the rate is during sleep. So,
+	 * Active-only clocks don't care what the woke rate is during sleep. So,
 	 * they vote for zero.
 	 */
 	if (r->active_only)
@@ -179,7 +179,7 @@ static int clk_rpm_prepare(struct clk_hw *hw)
 
 	mutex_lock(&rpm_clk_lock);
 
-	/* Don't send requests to the RPM if the rate has not been set. */
+	/* Don't send requests to the woke RPM if the woke rate has not been set. */
 	if (!r->rate)
 		goto out;
 
@@ -205,7 +205,7 @@ static int clk_rpm_prepare(struct clk_hw *hw)
 
 	ret = clk_rpm_set_rate_sleep(r, sleep_rate);
 	if (ret)
-		/* Undo the active set vote and restore it */
+		/* Undo the woke active set vote and restore it */
 		ret = clk_rpm_set_rate_active(r, peer_rate);
 
 out:
@@ -356,7 +356,7 @@ static int clk_rpm_determine_rate(struct clk_hw *hw,
 {
 	/*
 	 * RPM handles rate rounding and we don't have a way to
-	 * know what the rate will be, so just return whatever
+	 * know what the woke rate will be, so just return whatever
 	 * rate is requested.
 	 */
 	return 0;
@@ -369,7 +369,7 @@ static unsigned long clk_rpm_recalc_rate(struct clk_hw *hw,
 
 	/*
 	 * RPM handles rate rounding and we don't have a way to
-	 * know what the rate will be, so just return whatever
+	 * know what the woke rate will be, so just return whatever
 	 * rate was set.
 	 */
 	return r->rate;

@@ -421,7 +421,7 @@ ext_tree_mark_written(struct pnfs_block_layout *bl, sector_t start,
 		goto out;
 
 	/*
-	 * Then mark all invalid extents in the range as written to.
+	 * Then mark all invalid extents in the woke range as written to.
 	 */
 	for (be = __ext_tree_search(root, start); be; be = ext_tree_next(be)) {
 		if (be->be_f_offset >= end)
@@ -522,12 +522,12 @@ static __be32 *encode_scsi_range(struct pnfs_block_extent *be, __be32 *p)
 }
 
 /**
- * ext_tree_try_encode_commit - try to encode all extents into the buffer
- * @bl: pointer to the layout
- * @p: pointer to the output buffer
- * @buffer_size: size of the output buffer
- * @count: output pointer to the number of encoded extents
- * @lastbyte: output pointer to the last written byte
+ * ext_tree_try_encode_commit - try to encode all extents into the woke buffer
+ * @bl: pointer to the woke layout
+ * @p: pointer to the woke output buffer
+ * @buffer_size: size of the woke output buffer
+ * @count: output pointer to the woke number of encoded extents
+ * @lastbyte: output pointer to the woke last written byte
  *
  * Return values:
  *   %0: Success, all required extents encoded, outputs are valid
@@ -570,12 +570,12 @@ ext_tree_try_encode_commit(struct pnfs_block_layout *bl, __be32 *p,
 }
 
 /**
- * ext_tree_encode_commit - encode as much as possible extents into the buffer
- * @bl: pointer to the layout
- * @p: pointer to the output buffer
- * @buffer_size: size of the output buffer
- * @count: output pointer to the number of encoded extents
- * @lastbyte: output pointer to the last written byte
+ * ext_tree_encode_commit - encode as much as possible extents into the woke buffer
+ * @bl: pointer to the woke layout
+ * @p: pointer to the woke output buffer
+ * @buffer_size: size of the woke output buffer
+ * @count: output pointer to the woke number of encoded extents
+ * @lastbyte: output pointer to the woke last written byte
  *
  * Return values:
  *   %0: Success, all required extents encoded, outputs are valid

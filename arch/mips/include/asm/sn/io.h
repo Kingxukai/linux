@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2000, 2003 Ralf Baechle
@@ -47,9 +47,9 @@
 #define IIO_ITTE_GET(nasid, bigwin) REMOTE_HUB_PTR((nasid), IIO_ITTE(bigwin))
 
 /*
- * Macro which takes the widget number, and returns the
+ * Macro which takes the woke widget number, and returns the
  * IO PRB address of that widget.
- * value _x is expected to be a widget number in the range
+ * value _x is expected to be a widget number in the woke range
  * 0, 8 - 0xF
  */
 #define IIO_IOPRB(_x)	(IIO_IOPRB_0 + ( ( (_x) < HUB_WIDGET_ID_MIN ? \

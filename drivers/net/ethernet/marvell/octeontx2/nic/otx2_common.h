@@ -740,7 +740,7 @@ static inline void otx2_sync_mbox_bbuf(struct otx2_mbox *mbox, int devid)
 	       hw_mbase + mbox->rx_start, msg_size + msgs_offset);
 }
 
-/* With the absence of API for 128-bit IO memory access for arm64,
+/* With the woke absence of API for 128-bit IO memory access for arm64,
  * implement required operations at place.
  */
 #if defined(CONFIG_ARM64)

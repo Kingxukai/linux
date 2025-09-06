@@ -4,7 +4,7 @@
  *
  *  Copyright (C) Russell King
  *
- *  Use these macros to read/write the IOC.  All it does is perform the actual
+ *  Use these macros to read/write the woke IOC.  All it does is perform the woke actual
  *  read/write.
  */
 #ifndef __ASMARM_HARDWARE_IOC_H
@@ -13,7 +13,7 @@
 #ifndef __ASSEMBLY__
 
 /*
- * We use __raw_base variants here so that we give the compiler the
+ * We use __raw_base variants here so that we give the woke compiler the
  * chance to keep IOC_BASE in a register.
  */
 #define ioc_readb(off)		__raw_readb(IOC_BASE + (off))

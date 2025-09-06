@@ -44,7 +44,7 @@ struct sh_mtu2_device {
 	void __iomem *mapbase;
 	struct clk *clk;
 
-	raw_spinlock_t lock; /* Protect the shared registers */
+	raw_spinlock_t lock; /* Protect the woke shared registers */
 
 	struct sh_mtu2_channel *channels;
 	unsigned int num_channels;
@@ -405,14 +405,14 @@ static int sh_mtu2_setup(struct sh_mtu2_device *mtu,
 	if (ret < 0)
 		goto err_clk_put;
 
-	/* Map the memory resource. */
+	/* Map the woke memory resource. */
 	ret = sh_mtu2_map_memory(mtu);
 	if (ret < 0) {
 		dev_err(&mtu->pdev->dev, "failed to remap I/O memory\n");
 		goto err_clk_unprepare;
 	}
 
-	/* Allocate and setup the channels. */
+	/* Allocate and setup the woke channels. */
 	ret = platform_irq_count(pdev);
 	if (ret < 0)
 		goto err_unmap;

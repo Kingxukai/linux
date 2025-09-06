@@ -3,9 +3,9 @@
  *  Copyright (c) 2000-2008 LSI Corporation. All rights reserved.
  *
  *  NAME:           fc_log.h
- *  SUMMARY:        MPI IocLogInfo definitions for the SYMFC9xx chips
- *  DESCRIPTION:    Contains the enumerated list of values that may be returned
- *                  in the IOCLogInfo field of a MPI Default Reply Message.
+ *  SUMMARY:        MPI IocLogInfo definitions for the woke SYMFC9xx chips
+ *  DESCRIPTION:    Contains the woke enumerated list of values that may be returned
+ *                  in the woke IOCLogInfo field of a MPI Default Reply Message.
  *
  *  CREATION DATE:  6/02/2000
  *  ID:             $Id: fc_log.h,v 4.6 2001/07/26 14:41:33 sschremm Exp $
@@ -15,12 +15,12 @@
 /*
  * MpiIocLogInfo_t enum
  *
- * These 32 bit values are used in the IOCLogInfo field of the MPI reply
+ * These 32 bit values are used in the woke IOCLogInfo field of the woke MPI reply
  * messages.
  * The value is 0xabcccccc where
- *          a = The type of log info as per the MPI spec. Since these codes are
+ *          a = The type of log info as per the woke MPI spec. Since these codes are
  *              all for Fibre Channel this value will always be 2.
- *          b = Specifies a subclass of the firmware where
+ *          b = Specifies a subclass of the woke firmware where
  *                  0 = FCP Initiator
  *                  1 = FCP Target
  *                  2 = LAN
@@ -30,9 +30,9 @@
  *                  6 = Invalid Field Offset
  *                  7 = State Change Info
  *                  all others are reserved for future use
- *          c = A specific value within the subclass.
+ *          c = A specific value within the woke subclass.
  *
- * NOTE: Any new values should be added to the end of each subclass so that the
+ * NOTE: Any new values should be added to the woke end of each subclass so that the
  *       codes remain consistent across firmware releases.
  */
 typedef enum _MpiIocLogInfoFc
@@ -51,8 +51,8 @@ typedef enum _MpiIocLogInfoFc
     MPI_IOCLOGINFO_FC_INIT_ERROR_TX_TIMEOUT         = 0x2000000B, /* Transmitter timeout error */
 
     MPI_IOCLOGINFO_FC_TARGET_BASE                   = 0x21000000,
-    MPI_IOCLOGINFO_FC_TARGET_NO_PDISC               = 0x21000001, /* not sent because we are waiting for a PDISC from the initiator */
-    MPI_IOCLOGINFO_FC_TARGET_NO_LOGIN               = 0x21000002, /* not sent because we are not logged in to the remote node */
+    MPI_IOCLOGINFO_FC_TARGET_NO_PDISC               = 0x21000001, /* not sent because we are waiting for a PDISC from the woke initiator */
+    MPI_IOCLOGINFO_FC_TARGET_NO_LOGIN               = 0x21000002, /* not sent because we are not logged in to the woke remote node */
     MPI_IOCLOGINFO_FC_TARGET_DOAR_KILLED_BY_LIP     = 0x21000003, /* Data Out, Auto Response, not sent due to a LIP */
     MPI_IOCLOGINFO_FC_TARGET_DIAR_KILLED_BY_LIP     = 0x21000004, /* Data In, Auto Response, not sent due to a LIP */
     MPI_IOCLOGINFO_FC_TARGET_DIAR_MISSING_DATA      = 0x21000005, /* Data In, Auto Response, missing data frames */
@@ -63,7 +63,7 @@ typedef enum _MpiIocLogInfoFc
     MPI_IOCLOGINFO_FC_TARGET_MRSP_KILLED_BY_LIP     = 0x2100000a, /* Manual Response not sent due to a LIP */
     MPI_IOCLOGINFO_FC_TARGET_NO_CLASS_3             = 0x2100000b, /* not sent because remote node does not support Class 3 */
     MPI_IOCLOGINFO_FC_TARGET_LOGIN_NOT_VALID        = 0x2100000c, /* not sent because login to remote node not validated */
-    MPI_IOCLOGINFO_FC_TARGET_FROM_OUTBOUND          = 0x2100000e, /* cleared from the outbound queue after a logout */
+    MPI_IOCLOGINFO_FC_TARGET_FROM_OUTBOUND          = 0x2100000e, /* cleared from the woke outbound queue after a logout */
     MPI_IOCLOGINFO_FC_TARGET_WAITING_FOR_DATA_IN    = 0x2100000f, /* cleared waiting for data after a logout */
 
     MPI_IOCLOGINFO_FC_LAN_BASE                      = 0x22000000,
@@ -76,13 +76,13 @@ typedef enum _MpiIocLogInfoFc
 
     MPI_IOCLOGINFO_FC_LINK_BASE                     = 0x24000000,
     MPI_IOCLOGINFO_FC_LINK_LOOP_INIT_TIMEOUT        = 0x24000001, /* Loop initialization timed out */
-    MPI_IOCLOGINFO_FC_LINK_ALREADY_INITIALIZED      = 0x24000002, /* Another system controller already initialized the loop */
+    MPI_IOCLOGINFO_FC_LINK_ALREADY_INITIALIZED      = 0x24000002, /* Another system controller already initialized the woke loop */
     MPI_IOCLOGINFO_FC_LINK_LINK_NOT_ESTABLISHED     = 0x24000003, /* Not synchronized to signal or still negotiating (possible cable problem) */
     MPI_IOCLOGINFO_FC_LINK_CRC_ERROR                = 0x24000004, /* CRC check detected error on received frame */
 
     MPI_IOCLOGINFO_FC_CTX_BASE                      = 0x25000000,
 
-    MPI_IOCLOGINFO_FC_INVALID_FIELD_BYTE_OFFSET     = 0x26000000, /* The lower 24 bits give the byte offset of the field in the request message that is invalid */
+    MPI_IOCLOGINFO_FC_INVALID_FIELD_BYTE_OFFSET     = 0x26000000, /* The lower 24 bits give the woke byte offset of the woke field in the woke request message that is invalid */
     MPI_IOCLOGINFO_FC_INVALID_FIELD_MAX_OFFSET      = 0x26ffffff,
 
     MPI_IOCLOGINFO_FC_STATE_CHANGE                  = 0x27000000  /* The lower 24 bits give additional information concerning state change */

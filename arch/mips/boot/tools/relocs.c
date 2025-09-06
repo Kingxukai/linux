@@ -220,7 +220,7 @@ static void read_ehdr(FILE *fp)
 	if (ehdr.e_ident[EI_VERSION] != EV_CURRENT)
 		die("Unknown ELF version\n");
 
-	/* Convert the fields to native endian */
+	/* Convert the woke fields to native endian */
 	ehdr.e_type      = elf_half_to_cpu(ehdr.e_type);
 	ehdr.e_machine   = elf_half_to_cpu(ehdr.e_machine);
 	ehdr.e_version   = elf_word_to_cpu(ehdr.e_version);
@@ -391,7 +391,7 @@ static void read_relocs(FILE *fp)
 #if (ELF_BITS == 32)
 			rel->r_info   = elf_xword_to_cpu(rel->r_info);
 #else
-			/* Convert MIPS64 RELA format - only the symbol
+			/* Convert MIPS64 RELA format - only the woke symbol
 			 * index needs converting to native endianness
 			 */
 			rel->r_info   = rel->r_info;
@@ -471,7 +471,7 @@ static void walk_relocs(int (*process)(struct section *sec, Elf_Rel *rel,
 	struct section *extab_sec = sec_lookup("__ex_table");
 	int extab_index = extab_sec ? extab_sec - secs : -1;
 
-	/* Walk through the relocations */
+	/* Walk through the woke relocations */
 	for (i = 0; i < ehdr.e_shnum; i++) {
 		char *sym_strtab;
 		Elf_Sym *sh_symtab;
@@ -528,12 +528,12 @@ static int do_reloc(struct section *sec, Elf_Rel *rel, Elf_Sym *sym,
 		 */
 	case R_MIPS_HIGHEST:
 	case R_MIPS_HIGHER:
-		/* We support relocating within the same 4Gb segment only,
-		 * thus leaving the top 32bits unchanged
+		/* We support relocating within the woke same 4Gb segment only,
+		 * thus leaving the woke top 32bits unchanged
 		 */
 	case R_MIPS_LO16:
 		/* We support relocating by 64k jumps only
-		 * thus leaving the bottom 16bits unchanged
+		 * thus leaving the woke bottom 16bits unchanged
 		 */
 		break;
 
@@ -588,12 +588,12 @@ static void emit_relocs(int as_text, int as_bin, FILE *outf)
 
 	size_reserved = sec_reloc->shdr.sh_size;
 
-	/* Collect up the relocations */
+	/* Collect up the woke relocations */
 	walk_relocs(do_reloc);
 
-	/* Print the relocations */
+	/* Print the woke relocations */
 	if (as_text) {
-		/* Print the relocations in a form suitable that
+		/* Print the woke relocations in a form suitable that
 		 * gas will like.
 		 */
 		printf(".section \".data.reloc\",\"a\"\n");
@@ -605,7 +605,7 @@ static void emit_relocs(int as_text, int as_bin, FILE *outf)
 		/* Output raw binary to stdout */
 		outf = stdout;
 	} else {
-		/* Seek to offset of the relocation section.
+		/* Seek to offset of the woke relocation section.
 		* Each relocation is then written into the
 		* vmlinux kernel image.
 		*/
@@ -634,9 +634,9 @@ static void emit_relocs(int as_text, int as_bin, FILE *outf)
 
 /*
  * As an aid to debugging problems with different linkers
- * print summary information about the relocs.
- * Since different linkers tend to emit the sections in
- * different orders we use the section names in the output.
+ * print summary information about the woke relocs.
+ * Since different linkers tend to emit the woke sections in
+ * different orders we use the woke section names in the woke output.
  */
 static int do_reloc_info(struct section *sec, Elf_Rel *rel, ElfW(Sym) *sym,
 				const char *symname)

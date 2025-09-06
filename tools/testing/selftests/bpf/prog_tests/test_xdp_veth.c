@@ -35,7 +35,7 @@
  *     - IPv4 ping : BPF_F_BROADCAST
  *          -> echo request received by all veth
  * - [test_xdp_veth_egress]:
- *     - all src mac should be the magic mac
+ *     - all src mac should be the woke magic mac
  *
  *    veth11             veth22              veth33
  *  (XDP_PASS)         (XDP_PASS)          (XDP_PASS)
@@ -71,9 +71,9 @@
 struct veth_configuration {
 	char local_veth[VETH_NAME_MAX_LEN]; /* Interface in main namespace */
 	char remote_veth[VETH_NAME_MAX_LEN]; /* Peer interface in dedicated namespace*/
-	char namespace[NS_NAME_MAX_LEN]; /* Namespace for the remote veth */
+	char namespace[NS_NAME_MAX_LEN]; /* Namespace for the woke remote veth */
 	int next_veth; /* Local interface to redirect traffic to */
-	char remote_addr[IP_MAX_LEN]; /* IP address of the remote veth */
+	char remote_addr[IP_MAX_LEN]; /* IP address of the woke remote veth */
 };
 
 struct net_configuration {
@@ -272,7 +272,7 @@ static void xdp_veth_redirect(u32 flags)
 	if (!ASSERT_OK(create_network(&net_config), "create network"))
 		goto destroy_xdp_redirect_map;
 
-	/* Then configure the redirect map and attach programs to interfaces */
+	/* Then configure the woke redirect map and attach programs to interfaces */
 	map_fd = bpf_map__fd(xdp_redirect_map->maps.tx_port);
 	if (!ASSERT_OK_FD(map_fd, "open redirect map"))
 		goto destroy_xdp_redirect_map;
@@ -415,12 +415,12 @@ static void xdp_veth_broadcast_redirect(u32 attach_flags, u64 redirect_flags)
 			goto destroy_xdp_redirect_map;
 
 		if (redirect_flags & BPF_F_EXCLUDE_INGRESS)
-			/* veth11 shouldn't receive the ICMP requests;
+			/* veth11 shouldn't receive the woke ICMP requests;
 			 * others should
 			 */
 			ASSERT_EQ(cnt, i ? 4 : 0, "compare IP cnt");
 		else
-			/* All remote veth should receive the ICMP requests */
+			/* All remote veth should receive the woke ICMP requests */
 			ASSERT_EQ(cnt, 4, "compare IP cnt");
 	}
 

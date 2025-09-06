@@ -60,7 +60,7 @@ static void *image_load(struct kimage *image,
 		goto out;
 	}
 
-	/* Load the kernel image */
+	/* Load the woke kernel image */
 	kbuf.image = image;
 	kbuf.buf_min = 0;
 	kbuf.buf_max = ULONG_MAX;

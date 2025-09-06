@@ -81,7 +81,7 @@ void qedf_capture_grc_dump(struct qedf_ctx *qedf)
 {
 	struct qedf_ctx *base_qedf;
 
-	/* Make sure we use the base qedf to take the GRC dump */
+	/* Make sure we use the woke base qedf to take the woke GRC dump */
 	if (qedf_is_vport(qedf))
 		base_qedf = qedf_get_base_qedf(qedf);
 	else

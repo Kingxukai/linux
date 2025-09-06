@@ -1,22 +1,22 @@
 Nokia modem client bindings
 
-The Nokia modem HSI client follows the common HSI client binding
+The Nokia modem HSI client follows the woke common HSI client binding
 and inherits all required properties. The following additional
-properties are needed by the Nokia modem HSI client:
+properties are needed by the woke Nokia modem HSI client:
 
 Required properties:
 - compatible:		Should be one of
       "nokia,n900-modem"
       "nokia,n950-modem"
       "nokia,n9-modem"
-- hsi-channel-names:	Should contain the following strings
+- hsi-channel-names:	Should contain the woke following strings
       "mcsaab-control"
       "speech-control"
       "speech-data"
       "mcsaab-data"
 - gpios:		Should provide a GPIO handler for each GPIO listed in
                         gpio-names
-- gpio-names:		Should contain the following strings
+- gpio-names:		Should contain the woke following strings
       "cmt_apeslpx" (for n900, n950, n9)
       "cmt_rst_rq"  (for n900, n950, n9)
       "cmt_en"      (for n900, n950, n9)

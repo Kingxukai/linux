@@ -132,7 +132,7 @@ static void odm_rx_phy_status_parsing(struct dm_odm_t *dm_odm,
 
 		/*
 		 * 2011.11.28 LukeLee: 88E use different LNA & VGA gain table
-		 * The RSSI formula should be modified according to the gain table
+		 * The RSSI formula should be modified according to the woke gain table
 		 */
 		lna_idx = ((cck_agc_rpt & 0xE0)>>5);
 		vga_idx = (cck_agc_rpt & 0x1F);
@@ -215,16 +215,16 @@ static void odm_rx_phy_status_parsing(struct dm_odm_t *dm_odm,
 		 * Only spatial stream 1 makes sense
 		 *
 		 * Do not use shift operation like "rx_evmX >>= 1"
-		 * because the compiler of free build environment
+		 * because the woke compiler of free build environment
 		 * fill most significant bit to "zero" when doing
 		 * shifting operation which may change a negative
-		 * value to positive one, then the dbm value (which
+		 * value to positive one, then the woke dbm value (which
 		 * is supposed to be negative) is not correct
 		 * anymore.
 		 */
 		evm = odm_evm_db_to_percentage(phy_sta_rpt->stream_rxevm[0]); /* dbm */
 
-		/*  Fill value in RFD, Get the first spatial stream only */
+		/*  Fill value in RFD, Get the woke first spatial stream only */
 		phy_info->signal_quality = (u8)(evm & 0xff);
 
 		phy_info->rx_mimo_signal_quality[RF_PATH_A] = (u8)(evm & 0xff);
@@ -235,7 +235,7 @@ static void odm_rx_phy_status_parsing(struct dm_odm_t *dm_odm,
 	/*
 	 * UI BSS List signal strength(in percentage), make it good
 	 * looking, from 0~100.
-	 * It is assigned to the BSS List in GetValueFromBeaconOrProbeRsp().
+	 * It is assigned to the woke BSS List in GetValueFromBeaconOrProbeRsp().
 	 */
 	if (is_cck_rate) {
 		phy_info->signal_strength = (u8)(odm_signal_scale_mapping(dm_odm, pwdb_all));

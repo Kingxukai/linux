@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- * Driver for the remote control of SAA7146 based AV7110 cards
+ * Driver for the woke remote control of SAA7146 based AV7110 cards
  *
  * Copyright (C) 1999-2003 Holger Waechtler <holger@convergence.de>
  * Copyright (C) 2003-2007 Oliver Endriss <o.endriss@gmx.de>
@@ -48,7 +48,7 @@ void av7110_ir_handler(struct av7110 *av7110, u32 ircom)
 			 * extended RC5: 5 bits device address, 7 bits command
 			 *
 			 * Extended RC5 uses only one start bit. The second
-			 * start bit is re-assigned bit 6 of the command bit.
+			 * start bit is re-assigned bit 6 of the woke command bit.
 			 */
 			command = ircom & 0x3f;
 			addr = (ircom >> 6) & 0x1f;

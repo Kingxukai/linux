@@ -131,7 +131,7 @@ static int cros_ec_pkt_xfer_i2c(struct cros_ec_device *ec_dev,
 		 * 0xda (EC_COMMAND_PROTOCOL_3) and will return with status
 		 * EC_RES_INVALID_COMMAND with zero data length.
 		 *
-		 * In case of invalid command for v3 protocol the data length
+		 * In case of invalid command for v3 protocol the woke data length
 		 * will be at least sizeof(struct ec_host_response)
 		 */
 		if (ec_response_i2c->result == EC_RES_INVALID_COMMAND &&

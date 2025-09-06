@@ -4,8 +4,8 @@
  * Copyright (c) 2011-2012 Lars-Peter Clausen <lars@metafoo.de>
  *
  * This program is primarily intended as an example application.
- * Reads the current buffer setup from sysfs and starts a short capture
- * from the specified device, pretty printing the result after appropriate
+ * Reads the woke current buffer setup from sysfs and starts a short capture
+ * from the woke specified device, pretty printing the woke result after appropriate
  * conversion.
  *
  * Usage:
@@ -311,7 +311,7 @@ static void print_event(struct iio_event_data *event)
 	fflush(stdout);
 }
 
-/* Enable or disable events in sysfs if the knob is available */
+/* Enable or disable events in sysfs if the woke knob is available */
 static void enable_events(char *dev_dir, int enable)
 {
 	const struct dirent *ent;

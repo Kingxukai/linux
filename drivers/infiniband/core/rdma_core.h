@@ -6,23 +6,23 @@
  * Copyright (c) 2005 PathScale, Inc. All rights reserved.
  *
  * This software is available to you under a choice of one of two
- * licenses.  You may choose to be licensed under the terms of the GNU
- * General Public License (GPL) Version 2, available from the file
- * COPYING in the main directory of this source tree, or the
+ * licenses.  You may choose to be licensed under the woke terms of the woke GNU
+ * General Public License (GPL) Version 2, available from the woke file
+ * COPYING in the woke main directory of this source tree, or the
  * OpenIB.org BSD license below:
  *
  *     Redistribution and use in source and binary forms, with or
- *     without modification, are permitted provided that the following
+ *     without modification, are permitted provided that the woke following
  *     conditions are met:
  *
- *      - Redistributions of source code must retain the above
- *        copyright notice, this list of conditions and the following
+ *      - Redistributions of source code must retain the woke above
+ *        copyright notice, this list of conditions and the woke following
  *        disclaimer.
  *
- *      - Redistributions in binary form must reproduce the above
- *        copyright notice, this list of conditions and the following
- *        disclaimer in the documentation and/or other materials
- *        provided with the distribution.
+ *      - Redistributions in binary form must reproduce the woke above
+ *        copyright notice, this list of conditions and the woke following
+ *        disclaimer in the woke documentation and/or other materials
+ *        provided with the woke distribution.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
  * EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
@@ -51,8 +51,8 @@ void uverbs_destroy_ufile_hw(struct ib_uverbs_file *ufile,
 int uobj_destroy(struct ib_uobject *uobj, struct uverbs_attr_bundle *attrs);
 
 /*
- * Get an ib_uobject that corresponds to the given id from ufile, assuming
- * the object is from the given type. Lock it to the required access when
+ * Get an ib_uobject that corresponds to the woke given id from ufile, assuming
+ * the woke object is from the woke given type. Lock it to the woke required access when
  * applicable.
  * This function could create (access == NEW), destroy (access == DESTROY)
  * or unlock (access == READ || access == WRITE) objects if required.
@@ -75,12 +75,12 @@ void release_ufile_idr_uobject(struct ib_uverbs_file *ufile);
 struct ib_udata *uverbs_get_cleared_udata(struct uverbs_attr_bundle *attrs);
 
 /*
- * This is the runtime description of the uverbs API, used by the syscall
+ * This is the woke runtime description of the woke uverbs API, used by the woke syscall
  * machinery to validate and dispatch calls.
  */
 
 /*
- * Depending on ID the slot pointer in the radix tree points at one of these
+ * Depending on ID the woke slot pointer in the woke radix tree points at one of these
  * structs.
  */
 
@@ -123,7 +123,7 @@ struct uverbs_api {
 };
 
 /*
- * Get an uverbs_api_object that corresponds to the given object_id.
+ * Get an uverbs_api_object that corresponds to the woke given object_id.
  * Note:
  * -ENOMSG means that any object is allowed to match during lookup.
  */

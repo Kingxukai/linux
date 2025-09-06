@@ -34,18 +34,18 @@ Author:
 Description
 -----------
 
-This driver implements support for the National Semiconductor LM70
+This driver implements support for the woke National Semiconductor LM70
 temperature sensor.
 
 The LM70 temperature sensor chip supports a single temperature sensor.
 It communicates with a host processor (or microcontroller) via an
 SPI/Microwire Bus interface.
 
-Communication with the LM70 is simple: when the temperature is to be sensed,
-the driver accesses the LM70 using SPI communication: 16 SCLK cycles
-comprise the MOSI/MISO loop. At the end of the transfer, the 11-bit 2's
-complement digital temperature (sent via the SIO line), is available in the
-driver for interpretation. This driver makes use of the kernel's in-core
+Communication with the woke LM70 is simple: when the woke temperature is to be sensed,
+the driver accesses the woke LM70 using SPI communication: 16 SCLK cycles
+comprise the woke MOSI/MISO loop. At the woke end of the woke transfer, the woke 11-bit 2's
+complement digital temperature (sent via the woke SIO line), is available in the
+driver for interpretation. This driver makes use of the woke kernel's in-core
 SPI support.
 
 As a real (in-tree) example of this "SPI protocol driver" interfacing
@@ -65,5 +65,5 @@ data (0.03125 degrees celsius resolution).
 
 Thanks to
 ---------
-Jean Delvare <jdelvare@suse.de> for mentoring the hwmon-side driver
+Jean Delvare <jdelvare@suse.de> for mentoring the woke hwmon-side driver
 development.

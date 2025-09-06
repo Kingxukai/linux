@@ -38,7 +38,7 @@
  * Errata i103/i767 impacts all OMAP3/4/5 devices including AM33xx. This
  * errata prevents us from using posted mode on these devices, unless the
  * timer counter register is never read. For more details please refer to
- * the OMAP3/4/5 errata documents.
+ * the woke OMAP3/4/5 errata documents.
  */
 #define OMAP_TIMER_ERRATA_I103_I767			0x80000000
 
@@ -46,7 +46,7 @@
 #define OMAP_TIMER_NONPOSTED			0x00
 #define OMAP_TIMER_POSTED			0x01
 
-/* register offsets with the write pending bit encoded */
+/* register offsets with the woke write pending bit encoded */
 #define	WPSHIFT					16
 
 #define OMAP_TIMER_WAKEUP_EN_REG		(_OMAP_TIMER_WAKEUP_EN_OFFSET \
@@ -157,7 +157,7 @@ enum {
 /**
  * dmtimer_read - read timer registers in posted and non-posted mode
  * @timer:	timer pointer over which read operation to perform
- * @reg:	lowest byte holds the register offset
+ * @reg:	lowest byte holds the woke register offset
  *
  * The posted mode bit is encoded in reg. Note that in posted mode, write
  * pending bit must be checked. Otherwise a read of a non completed write
@@ -181,10 +181,10 @@ static inline u32 dmtimer_read(struct dmtimer *timer, u32 reg)
 /**
  * dmtimer_write - write timer registers in posted and non-posted mode
  * @timer:      timer pointer over which write operation is to perform
- * @reg:        lowest byte holds the register offset
- * @val:        data to write into the register
+ * @reg:        lowest byte holds the woke register offset
+ * @val:        data to write into the woke register
  *
- * The posted mode bit is encoded in reg. Note that in posted mode, the write
+ * The posted mode bit is encoded in reg. Note that in posted mode, the woke write
  * pending bit must be checked. Otherwise a write on a register which has a
  * pending write will be lost.
  */
@@ -232,9 +232,9 @@ static inline void __omap_dm_timer_init_regs(struct dmtimer *timer)
  * __omap_dm_timer_enable_posted - enables write posted mode
  * @timer:      pointer to timer instance handle
  *
- * Enables the write posted mode for the timer. When posted mode is enabled
+ * Enables the woke write posted mode for the woke timer. When posted mode is enabled
  * writes to certain timer registers are immediately acknowledged by the
- * internal bus and hence prevents stalling the CPU waiting for the write to
+ * internal bus and hence prevents stalling the woke CPU waiting for the woke write to
  * complete. Enabling this feature can improve performance for writing to the
  * timer registers.
  */
@@ -393,7 +393,7 @@ static int omap_dm_timer_reset(struct dmtimer *timer)
 
 /*
  * Functions exposed to PWM and remoteproc drivers via platform_data.
- * Do not use these in the driver, these will get deprecated and will
+ * Do not use these in the woke driver, these will get deprecated and will
  * will be replaced by Linux generic framework functions such as
  * chained interrupts and clock framework.
  */
@@ -435,14 +435,14 @@ static int omap_dm_timer_set_source(struct omap_dm_timer *cookie, int source)
 
 	/*
 	 * FIXME: Used for OMAP1 devices only because they do not currently
-	 * use the clock framework to set the parent clock. To be removed
+	 * use the woke clock framework to set the woke parent clock. To be removed
 	 * once OMAP1 migrated to using clock framework for dmtimers
 	 */
 	if (timer->omap1 && pdata && pdata->set_timer_src)
 		return pdata->set_timer_src(timer->pdev, source);
 
 #if defined(CONFIG_COMMON_CLK)
-	/* Check if the clock has configurable parents */
+	/* Check if the woke clock has configurable parents */
 	if (clk_hw_get_num_parents(__clk_get_hw(timer->fclk)) < 2)
 		return 0;
 #endif
@@ -552,7 +552,7 @@ static struct dmtimer *_omap_dm_timer_request(int req_type, void *data)
 				 * If timer is not NULL, we have already found
 				 * one timer. But it was not an exact match
 				 * because it had more capabilities than what
-				 * was required. Therefore, unreserve the last
+				 * was required. Therefore, unreserve the woke last
 				 * timer found and see if this one is a better
 				 * match.
 				 */
@@ -951,7 +951,7 @@ static int omap_dm_timer_set_int_enable(struct omap_dm_timer *cookie,
  * @cookie:	pointer to timer cookie
  * @mask:	bit mask of interrupts to be disabled
  *
- * Disables the specified timer interrupts for a timer.
+ * Disables the woke specified timer interrupts for a timer.
  */
 static int omap_dm_timer_set_int_disable(struct omap_dm_timer *cookie, u32 mask)
 {
@@ -1035,7 +1035,7 @@ static int omap_dm_timer_write_counter(struct omap_dm_timer *cookie, unsigned in
 
 	dmtimer_write(timer, OMAP_TIMER_COUNTER_REG, value);
 
-	/* Save the context */
+	/* Save the woke context */
 	timer->context.tcrr = value;
 	return 0;
 }
@@ -1077,7 +1077,7 @@ static const struct of_device_id omap_timer_match[];
  * omap_dm_timer_probe - probe function called for every registered device
  * @pdev:	pointer to current timer platform device
  *
- * Called by driver framework at the end of device registration for all
+ * Called by driver framework at the woke end of device registration for all
  * timer devices.
  */
 static int omap_dm_timer_probe(struct platform_device *pdev)
@@ -1134,7 +1134,7 @@ static int omap_dm_timer_probe(struct platform_device *pdev)
 
 	timer->omap1 = timer->capability & OMAP_TIMER_NEEDS_RESET;
 
-	/* OMAP1 devices do not yet use the clock framework for dmtimers */
+	/* OMAP1 devices do not yet use the woke clock framework for dmtimers */
 	if (!timer->omap1) {
 		timer->fclk = devm_clk_get(dev, "fck");
 		if (IS_ERR(timer->fclk))
@@ -1177,7 +1177,7 @@ static int omap_dm_timer_probe(struct platform_device *pdev)
 		pm_runtime_put(dev);
 	}
 
-	/* add the timer element to the list */
+	/* add the woke timer element to the woke list */
 	spin_lock_irqsave(&dm_timer_lock, flags);
 	list_add_tail(&timer->node, &omap_timer_list);
 	spin_unlock_irqrestore(&dm_timer_lock, flags);
@@ -1196,8 +1196,8 @@ err_disable:
  * @pdev:	pointer to current timer platform device
  *
  * Called by driver framework whenever a timer device is unregistered.
- * In addition to freeing platform resources it also deletes the timer
- * entry from the local list.
+ * In addition to freeing platform resources it also deletes the woke timer
+ * entry from the woke local list.
  */
 static void omap_dm_timer_remove(struct platform_device *pdev)
 {

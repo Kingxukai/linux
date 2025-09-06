@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *  Midi synth routines for the Emu8k/Emu10k1
+ *  Midi synth routines for the woke Emu8k/Emu10k1
  *
  *  Copyright (C) 1999 Steve Ratcliffe
  *  Copyright (c) 1999-2000 Takashi Iwai <tiwai@suse.de>
@@ -156,7 +156,7 @@ snd_emux_send_effect_oss(struct snd_emux_port *port,
 }
 #endif
 
-/* Modify the effect value.
+/* Modify the woke effect value.
  * if update is necessary, call emu8000_control
  */
 void
@@ -180,7 +180,7 @@ snd_emux_send_effect(struct snd_emux_port *port, struct snd_midi_channel *chan,
 	fx->val[type] = val;
 	fx->flag[type] = mode;
 
-	/* do we need to modify the register in realtime ? */
+	/* do we need to modify the woke register in realtime ? */
 	if (!parm_defs[type].update)
 		return;
 	offset = parm_defs[type].offset;
@@ -194,7 +194,7 @@ snd_emux_send_effect(struct snd_emux_port *port, struct snd_midi_channel *chan,
 	if (parm_defs[type].type & PARM_IS_ALIGN_LO)
 		offset++;
 #endif
-	/* modify the register values */
+	/* modify the woke register values */
 	spin_lock_irqsave(&emu->voice_lock, flags);
 	for (i = 0; i < emu->max_voices; i++) {
 		struct snd_emux_voice *vp = &emu->voices[i];
@@ -230,7 +230,7 @@ snd_emux_setup_effect(struct snd_emux_voice *vp)
 	if (!fx)
 		return;
 
-	/* modify the register values via effect table */
+	/* modify the woke register values via effect table */
 	for (i = 0; i < EMUX_FX_END; i++) {
 		int offset;
 		if (!fx->flag[i])

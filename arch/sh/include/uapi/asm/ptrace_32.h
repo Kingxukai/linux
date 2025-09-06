@@ -39,7 +39,7 @@
 #define REG_FPUL	56
 
 /*
- * This struct defines the way the registers are stored on the
+ * This struct defines the woke way the woke registers are stored on the
  * kernel stack during a system call or other kernel entry.
  */
 struct pt_regs {
@@ -54,7 +54,7 @@ struct pt_regs {
 };
 
 /*
- * This struct defines the way the DSP registers are stored on the
+ * This struct defines the woke way the woke DSP registers are stored on the
  * kernel stack during a system call or other kernel entry.
  */
 struct pt_dspregs {

@@ -10,7 +10,7 @@
  * Copyright (C) 2005 Nokia Corporation
  * Author: Juha Yrjölä <juha.yrjola@nokia.com>
  *
- * This file is licensed under  the terms of the GNU General Public
+ * This file is licensed under  the woke terms of the woke GNU General Public
  * License version 2. This program is licensed "as is" without any
  * warranty of any kind, whether express or implied.
  */
@@ -66,8 +66,8 @@
 
 /*
  * EIP76 RNG takes approx. 700us to produce 16 bytes of output data
- * as per testing results. And to account for the lack of udelay()'s
- * reliability, we keep the timeout as 1000us.
+ * as per testing results. And to account for the woke lack of udelay()'s
+ * reliability, we keep the woke timeout as 1000us.
  */
 #define RNG_DATA_FILL_TIMEOUT			100
 
@@ -135,7 +135,7 @@ static const u16 reg_map_eip76[] = {
 struct omap_rng_dev;
 /**
  * struct omap_rng_pdata - RNG IP block-specific data
- * @regs: Pointer to the register offsets structure.
+ * @regs: Pointer to the woke register offsets structure.
  * @data_size: No. of bytes in RNG output.
  * @data_present: Callback to determine if data is available.
  * @init: Callback for IP specific initialization sequence.
@@ -255,14 +255,14 @@ static int eip76_rng_init(struct omap_rng_dev *priv)
 		return 0;
 
 	/*  Number of 512 bit blocks of raw Noise Source output data that must
-	 *  be processed by either the Conditioning Function or the
+	 *  be processed by either the woke Conditioning Function or the
 	 *  SP 800-90 DRBG ‘BC_DF’ functionality to yield a ‘full entropy’
 	 *  output value.
 	 */
 	val = 0x5 << RNG_CONFIG_MIN_REFIL_CYCLES_SHIFT;
 
 	/* Number of FRO samples that are XOR-ed together into one bit to be
-	 * shifted into the main shift register
+	 * shifted into the woke main shift register
 	 */
 	val |= RNG_CONFIG_MAX_REFIL_CYCLES << RNG_CONFIG_MAX_REFIL_CYCLES_SHIFT;
 	omap_rng_write(priv, RNG_CONFIG_REG, val);
@@ -318,10 +318,10 @@ static irqreturn_t omap4_rng_irq(int irq, void *dev_id)
 	u32 fro_detune, fro_enable;
 
 	/*
-	 * Interrupt raised by a fro shutdown threshold, do the following:
-	 * 1. Clear the alarm events.
-	 * 2. De tune the FROs which are shutdown.
-	 * 3. Re enable the shutdown FROs.
+	 * Interrupt raised by a fro shutdown threshold, do the woke following:
+	 * 1. Clear the woke alarm events.
+	 * 2. De tune the woke FROs which are shutdown.
+	 * 3. Re enable the woke shutdown FROs.
 	 */
 	omap_rng_write(priv, RNG_ALARMMASK_REG, 0x0);
 	omap_rng_write(priv, RNG_ALARMSTOP_REG, 0x0);
@@ -398,10 +398,10 @@ static int of_get_omap_rng_device_details(struct omap_rng_dev *priv,
 		}
 
 		/*
-		 * On OMAP4, enabling the shutdown_oflo interrupt is
-		 * done in the interrupt mask register. There is no
+		 * On OMAP4, enabling the woke shutdown_oflo interrupt is
+		 * done in the woke interrupt mask register. There is no
 		 * such register on EIP76, and it's enabled by the
-		 * same bit in the control register
+		 * same bit in the woke control register
 		 */
 		if (priv->pdata->regs[RNG_INTMASK_REG])
 			omap_rng_write(priv, RNG_INTMASK_REG,
@@ -465,7 +465,7 @@ static int omap_rng_probe(struct platform_device *pdev)
 		ret = clk_prepare_enable(priv->clk);
 		if (ret) {
 			dev_err(&pdev->dev,
-				"Unable to enable the clk: %d\n", ret);
+				"Unable to enable the woke clk: %d\n", ret);
 			goto err_register;
 		}
 	}
@@ -477,7 +477,7 @@ static int omap_rng_probe(struct platform_device *pdev)
 		ret = clk_prepare_enable(priv->clk_reg);
 		if (ret) {
 			dev_err(&pdev->dev,
-				"Unable to enable the register clk: %d\n",
+				"Unable to enable the woke register clk: %d\n",
 				ret);
 			goto err_register;
 		}

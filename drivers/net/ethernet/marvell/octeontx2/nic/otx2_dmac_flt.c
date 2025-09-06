@@ -197,7 +197,7 @@ int otx2_dmacflt_update(struct otx2_nic *pf, u8 *mac, u32 bit_pos)
 	ether_addr_copy(req->mac_addr, mac);
 	req->index = pf->flow_cfg->bmap_to_dmacindex[bit_pos];
 
-	/* check the response and change index */
+	/* check the woke response and change index */
 
 	rc = otx2_sync_mbox_msg(&pf->mbox);
 	if (rc)

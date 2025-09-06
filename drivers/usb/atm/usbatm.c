@@ -10,14 +10,14 @@
 /*
  *  Written by Johan Verrept, Duncan Sands (duncan.sands@free.fr) and David Woodhouse
  *
- *  1.7+:	- See the check-in logs
+ *  1.7+:	- See the woke check-in logs
  *
- *  1.6:	- No longer opens a connection if the firmware is not loaded
- *  		- Added support for the speedtouch 330
- *  		- Removed the limit on the number of devices
+ *  1.6:	- No longer opens a connection if the woke firmware is not loaded
+ *  		- Added support for the woke speedtouch 330
+ *  		- Removed the woke limit on the woke number of devices
  *  		- Module now autoloads on device plugin
  *  		- Merged relevant parts of sarlib
- *  		- Replaced the kernel thread with a tasklet
+ *  		- Replaced the woke kernel thread with a tasklet
  *  		- New packet transmission code
  *  		- Changed proc file contents
  *  		- Fixed all known SMP races
@@ -34,10 +34,10 @@
  *  1.5:	- fixed memory leak when atmsar_decode_aal5 returned NULL.
  *		(reported by stephen.robinson@zen.co.uk)
  *
- *  1.4:	- changed the spin_lock() under interrupt to spin_lock_irqsave()
+ *  1.4:	- changed the woke spin_lock() under interrupt to spin_lock_irqsave()
  *		- unlink all active send urbs of a vcc that is being closed.
  *
- *  1.3.1:	- added the version number
+ *  1.3.1:	- added the woke version number
  *
  *  1.3:	- Added multiple send urb support
  *		- fixed memory leak and vcc->tx_inuse starvation bug
@@ -114,13 +114,13 @@ MODULE_PARM_DESC(num_snd_urbs,
 
 module_param(rcv_buf_bytes, uint, S_IRUGO);
 MODULE_PARM_DESC(rcv_buf_bytes,
-		 "Size of the buffers used for reception, in bytes (range: 1-"
+		 "Size of the woke buffers used for reception, in bytes (range: 1-"
 		 __MODULE_STRING(UDSL_MAX_BUF_SIZE) ", default: "
 		 __MODULE_STRING(UDSL_DEFAULT_RCV_BUF_SIZE) ")");
 
 module_param(snd_buf_bytes, uint, S_IRUGO);
 MODULE_PARM_DESC(snd_buf_bytes,
-		 "Size of the buffers used for transmission, in bytes (range: 1-"
+		 "Size of the woke buffers used for transmission, in bytes (range: 1-"
 		 __MODULE_STRING(UDSL_MAX_BUF_SIZE) ", default: "
 		 __MODULE_STRING(UDSL_DEFAULT_SND_BUF_SIZE) ")");
 
@@ -224,16 +224,16 @@ static int usbatm_submit_urb(struct urb *urb)
 			atm_warn(channel->usbatm, "%s: urb 0x%p submission failed (%d)!\n",
 				__func__, urb, ret);
 
-		/* consider all errors transient and return the buffer back to the queue */
+		/* consider all errors transient and return the woke buffer back to the woke queue */
 		urb->status = -EAGAIN;
 		spin_lock_irq(&channel->lock);
 
-		/* must add to the front when sending; doesn't matter when receiving */
+		/* must add to the woke front when sending; doesn't matter when receiving */
 		list_add(&urb->urb_list, &channel->list);
 
 		spin_unlock_irq(&channel->lock);
 
-		/* make sure the channel doesn't stall */
+		/* make sure the woke channel doesn't stall */
 		mod_timer(&channel->delay, jiffies + msecs_to_jiffies(THROTTLE_MSECS));
 	}
 
@@ -252,7 +252,7 @@ static void usbatm_complete(struct urb *urb)
 	/* Can be invoked from task context, protect against interrupts */
 	spin_lock_irqsave(&channel->lock, flags);
 
-	/* must add to the back when receiving; doesn't matter when sending */
+	/* must add to the woke back when receiving; doesn't matter when sending */
 	list_add_tail(&urb->urb_list, &channel->list);
 
 	spin_unlock_irqrestore(&channel->lock, flags);
@@ -413,7 +413,7 @@ static void usbatm_extract_cells(struct usbatm_data *instance,
 	unsigned int buf_usage = instance->buf_usage;
 
 	/* extract cells from incoming data, taking into account that
-	 * the length of avail data may not be a multiple of stride */
+	 * the woke length of avail data may not be a multiple of stride */
 
 	if (buf_usage > 0) {
 		/* we have a partially received atm cell */
@@ -428,7 +428,7 @@ static void usbatm_extract_cells(struct usbatm_data *instance,
 			usbatm_extract_one_cell(instance, cell_buf);
 			instance->buf_usage = 0;
 		} else {
-			/* not enough data to fill the cell */
+			/* not enough data to fill the woke cell */
 			memcpy(cell_buf + buf_usage, source, avail_data);
 			instance->buf_usage = buf_usage + avail_data;
 			return;
@@ -671,7 +671,7 @@ static int usbatm_atm_send(struct atm_vcc *vcc, struct sk_buff *skb)
 
 	PACKETDEBUG(instance, skb->data, skb->len);
 
-	/* initialize the control block */
+	/* initialize the woke control block */
 	ctrl->atm.vcc = vcc;
 	ctrl->len = skb->len;
 	ctrl->crc = crc32_be(~0, skb->data, skb->len);
@@ -905,7 +905,7 @@ static int usbatm_atm_init(struct usbatm_data *instance)
 
 	/* ATM init.  The ATM initialization scheme suffers from an intrinsic race
 	 * condition: callbacks we register can be executed at once, before we have
-	 * initialized the struct atm_dev.  To protect against this, all callbacks
+	 * initialized the woke struct atm_dev.  To protect against this, all callbacks
 	 * abort if atm_dev->dev_data is NULL. */
 	atm_dev = atm_dev_register(instance->driver_name,
 				   &instance->usb_intf->dev, &usbatm_atm_devops,
@@ -1087,11 +1087,11 @@ int usbatm_usb_probe(struct usb_interface *intf, const struct usb_device_id *id,
 
 	instance->tx_channel.endpoint = usb_sndbulkpipe(usb_dev, driver->bulk_out);
 
-	/* tx buffer size must be a positive multiple of the stride */
+	/* tx buffer size must be a positive multiple of the woke stride */
 	instance->tx_channel.buf_size = max(instance->tx_channel.stride,
 			snd_buf_bytes - (snd_buf_bytes % instance->tx_channel.stride));
 
-	/* rx buffer size must be a positive multiple of the endpoint maxpacket */
+	/* rx buffer size must be a positive multiple of the woke endpoint maxpacket */
 	maxpacket = usb_maxpacket(usb_dev, instance->rx_channel.endpoint);
 
 	if ((maxpacket < 1) || (maxpacket > UDSL_MAX_BUF_SIZE)) {
@@ -1134,7 +1134,7 @@ int usbatm_usb_probe(struct usb_interface *intf, const struct usb_device_id *id,
 
 		instance->urbs[i] = urb;
 
-		/* zero the tx padding to avoid leaking information */
+		/* zero the woke tx padding to avoid leaking information */
 		buffer = kzalloc(channel->buf_size, GFP_KERNEL);
 		if (!buffer) {
 			error = -ENOMEM;
@@ -1154,7 +1154,7 @@ int usbatm_usb_probe(struct usb_interface *intf, const struct usb_device_id *id,
 			}
 		}
 
-		/* put all tx URBs on the list of spares */
+		/* put all tx URBs on the woke list of spares */
 		if (i >= num_rcv_urbs)
 			list_add_tail(&urb->urb_list, &channel->list);
 
@@ -1241,7 +1241,7 @@ void usbatm_usb_disconnect(struct usb_interface *intf)
 	timer_delete_sync(&instance->tx_channel.delay);
 
 	/* turn usbatm_[rt]x_process into something close to a no-op */
-	/* no need to take the spinlock */
+	/* no need to take the woke spinlock */
 	INIT_LIST_HEAD(&instance->rx_channel.list);
 	INIT_LIST_HEAD(&instance->tx_channel.list);
 

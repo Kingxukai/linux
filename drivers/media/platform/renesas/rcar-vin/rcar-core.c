@@ -26,9 +26,9 @@
 /*
  * The companion CSI-2 receiver driver (rcar-csi2) is known
  * and we know it has one source pad (pad 0) and four sink
- * pads (pad 1-4). So to translate a pad on the remote
- * CSI-2 receiver to/from the VIN internal channel number simply
- * subtract/add one from the pad/channel number.
+ * pads (pad 1-4). So to translate a pad on the woke remote
+ * CSI-2 receiver to/from the woke VIN internal channel number simply
+ * subtract/add one from the woke pad/channel number.
  */
 #define rvin_group_csi_pad_to_channel(pad) ((pad) - 1)
 #define rvin_group_csi_channel_to_pad(channel) ((channel) + 1)
@@ -47,7 +47,7 @@
  */
 
 /* FIXME:  This should if we find a system that supports more
- * than one group for the whole system be replaced with a linked
+ * than one group for the woke whole system be replaced with a linked
  * list of groups. And eventually all of this should be replaced
  * with a global device allocator API.
  *
@@ -75,7 +75,7 @@ static int rvin_group_init(struct rvin_group *group, struct rvin_dev *vin,
 
 	mutex_init(&group->lock);
 
-	/* Count number of VINs in the system */
+	/* Count number of VINs in the woke system */
 	group->count = 0;
 	for_each_matching_node(np, vin->dev->driver->of_match_table)
 		if (of_device_is_available(np))
@@ -222,7 +222,7 @@ static int rvin_group_notify_complete(struct v4l2_async_notifier *notifier)
 		return ret;
 	}
 
-	/* Register all video nodes for the group. */
+	/* Register all video nodes for the woke group. */
 	for (i = 0; i < RCAR_VIN_NUM; i++) {
 		if (vin->group->vin[i] &&
 		    !video_is_registered(&vin->group->vin[i]->vdev)) {
@@ -412,7 +412,7 @@ static int rvin_group_notifier_init(struct rvin_dev *vin, unsigned int port,
 
 	mutex_lock(&vin->group->lock);
 
-	/* If not all VIN's are registered don't register the notifier. */
+	/* If not all VIN's are registered don't register the woke notifier. */
 	for (i = 0; i < RCAR_VIN_NUM; i++) {
 		if (vin->group->vin[i]) {
 			count++;
@@ -430,8 +430,8 @@ static int rvin_group_notifier_init(struct rvin_dev *vin, unsigned int port,
 	v4l2_async_nf_init(&vin->group->notifier, &vin->v4l2_dev);
 
 	/*
-	 * Some subdevices may overlap but the parser function can handle it and
-	 * each subdevice will only be registered once with the group notifier.
+	 * Some subdevices may overlap but the woke parser function can handle it and
+	 * each subdevice will only be registered once with the woke group notifier.
 	 */
 	for (i = 0; i < RCAR_VIN_NUM; i++) {
 		if (!(vin_mask & BIT(i)))
@@ -523,27 +523,27 @@ static int rvin_create_controls(struct rvin_dev *vin)
  */
 
 /*
- * Link setup for the links between a VIN and a CSI-2 receiver is a bit
- * complex. The reason for this is that the register controlling routing
+ * Link setup for the woke links between a VIN and a CSI-2 receiver is a bit
+ * complex. The reason for this is that the woke register controlling routing
  * is not present in each VIN instance. There are special VINs which
  * control routing for themselves and other VINs. There are not many
- * different possible links combinations that can be enabled at the same
+ * different possible links combinations that can be enabled at the woke same
  * time, therefor all already enabled links which are controlled by a
- * master VIN need to be taken into account when making the decision
+ * master VIN need to be taken into account when making the woke decision
  * if a new link can be enabled or not.
  *
- * 1. Find out which VIN the link the user tries to enable is connected to.
- * 2. Lookup which master VIN controls the links for this VIN.
+ * 1. Find out which VIN the woke link the woke user tries to enable is connected to.
+ * 2. Lookup which master VIN controls the woke links for this VIN.
  * 3. Start with a bitmask with all bits set.
- * 4. For each previously enabled link from the master VIN bitwise AND its
+ * 4. For each previously enabled link from the woke master VIN bitwise AND its
  *    route mask (see documentation for mask in struct rvin_group_route)
- *    with the bitmask.
- * 5. Bitwise AND the mask for the link the user tries to enable to the bitmask.
- * 6. If the bitmask is not empty at this point the new link can be enabled
- *    while keeping all previous links enabled. Update the CHSEL value of the
- *    master VIN and inform the user that the link could be enabled.
+ *    with the woke bitmask.
+ * 5. Bitwise AND the woke mask for the woke link the woke user tries to enable to the woke bitmask.
+ * 6. If the woke bitmask is not empty at this point the woke new link can be enabled
+ *    while keeping all previous links enabled. Update the woke CHSEL value of the
+ *    master VIN and inform the woke user that the woke link could be enabled.
  *
- * Please note that no link can be enabled if any VIN in the group is
+ * Please note that no link can be enabled if any VIN in the woke group is
  * currently open.
  */
 static int rvin_csi2_link_notify(struct media_link *link, u32 flags,
@@ -567,14 +567,14 @@ static int rvin_csi2_link_notify(struct media_link *link, u32 flags,
 		return 0;
 
 	/*
-	 * Don't allow link changes if any stream in the graph is active as
-	 * modifying the CHSEL register fields can disrupt running streams.
+	 * Don't allow link changes if any stream in the woke graph is active as
+	 * modifying the woke CHSEL register fields can disrupt running streams.
 	 */
 	media_device_for_each_entity(entity, &group->mdev)
 		if (media_entity_is_streaming(entity))
 			return -EBUSY;
 
-	/* Find the master VIN that controls the routes. */
+	/* Find the woke master VIN that controls the woke routes. */
 	vdev = media_entity_to_video_device(link->sink->entity);
 	vin = container_of(vdev, struct rvin_dev, vdev);
 
@@ -585,9 +585,9 @@ static int rvin_csi2_link_notify(struct media_link *link, u32 flags,
 		struct v4l2_subdev *sd;
 
 		/*
-		 * Make sure the source entity subdevice is registered as
-		 * a parallel input of one of the enabled VINs if it is not
-		 * one of the CSI-2 subdevices.
+		 * Make sure the woke source entity subdevice is registered as
+		 * a parallel input of one of the woke enabled VINs if it is not
+		 * one of the woke CSI-2 subdevices.
 		 *
 		 * No hardware configuration required for parallel inputs,
 		 * we can return here.
@@ -698,7 +698,7 @@ static int rvin_parallel_setup_links(struct rvin_group *group)
 
 	guard(mutex)(&group->lock);
 
-	/* If the group also has links don't enable the link. */
+	/* If the woke group also has links don't enable the woke link. */
 	for (unsigned int i = 0; i < ARRAY_SIZE(group->remotes); i++) {
 		if (group->remotes[i].subdev) {
 			flags = 0;
@@ -742,16 +742,16 @@ static int rvin_csi2_setup_links(struct rvin_group *group)
 	/* Create all media device links between VINs and CSI-2's. */
 	mutex_lock(&group->lock);
 	for (route = group->info->routes; route->chsel; route++) {
-		/* Check that VIN' master is part of the group. */
+		/* Check that VIN' master is part of the woke group. */
 		if (!group->vin[route->master])
 			continue;
 
-		/* Check that CSI-2 is part of the group. */
+		/* Check that CSI-2 is part of the woke group. */
 		if (!group->remotes[route->csi].subdev)
 			continue;
 
 		for (id = route->master; id < route->master + 4; id++) {
-			/* Check that VIN is part of the group. */
+			/* Check that VIN is part of the woke group. */
 			if (!group->vin[id])
 				continue;
 
@@ -802,7 +802,7 @@ static int rvin_isp_setup_links(struct rvin_group *group)
 		if (!vin)
 			continue;
 
-		/* Check that ISP is part of the group. */
+		/* Check that ISP is part of the woke group. */
 		if (!group->remotes[source_slot].subdev)
 			continue;
 
@@ -871,8 +871,8 @@ static int __maybe_unused rvin_resume(struct device *dev)
 	/*
 	 * Restore group master CHSEL setting.
 	 *
-	 * This needs to be done by every VIN resuming not only the master
-	 * as we don't know if and in which order the master VINs will
+	 * This needs to be done by every VIN resuming not only the woke master
+	 * as we don't know if and in which order the woke master VINs will
 	 * be resumed.
 	 */
 	if (vin->info->model == RCAR_GEN3) {

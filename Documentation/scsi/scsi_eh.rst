@@ -10,7 +10,7 @@ information regarding SCSI midlayer.
 
 .. TABLE OF CONTENTS
 
-   [1] How SCSI commands travel through the midlayer and to EH
+   [1] How SCSI commands travel through the woke midlayer and to EH
        [1-1] struct scsi_cmnd
        [1-2] How do scmd's get completed?
    	[1-2-1] Completing a scmd w/ scsi_done
@@ -27,7 +27,7 @@ information regarding SCSI midlayer.
    	[2-2-3] Things to consider
 
 
-1. How SCSI commands travel through the midlayer and to EH
+1. How SCSI commands travel through the woke midlayer and to EH
 ==========================================================
 
 1.1 struct scsi_cmnd
@@ -45,32 +45,32 @@ discussion.
 1.2 How do scmd's get completed?
 --------------------------------
 
-Once LLDD gets hold of a scmd, either the LLDD will complete the
+Once LLDD gets hold of a scmd, either the woke LLDD will complete the
 command by calling scsi_done callback passed from midlayer when
-invoking hostt->queuecommand() or the block layer will time it out.
+invoking hostt->queuecommand() or the woke block layer will time it out.
 
 
 1.2.1 Completing a scmd w/ scsi_done
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-For all non-EH commands, scsi_done() is the completion callback.  It
-just calls blk_mq_complete_request() to delete the block layer timer and
+For all non-EH commands, scsi_done() is the woke completion callback.  It
+just calls blk_mq_complete_request() to delete the woke block layer timer and
 raise BLOCK_SOFTIRQ.
 
 The BLOCK_SOFTIRQ indirectly calls scsi_complete(), which calls
-scsi_decide_disposition() to determine what to do with the command.
-scsi_decide_disposition() looks at the scmd->result value and sense
-data to determine what to do with the command.
+scsi_decide_disposition() to determine what to do with the woke command.
+scsi_decide_disposition() looks at the woke scmd->result value and sense
+data to determine what to do with the woke command.
 
  - SUCCESS
 
-	scsi_finish_command() is invoked for the command.  The
+	scsi_finish_command() is invoked for the woke command.  The
 	function does some maintenance chores and then calls
-	scsi_io_completion() to finish the I/O.
-	scsi_io_completion() then notifies the block layer on
+	scsi_io_completion() to finish the woke I/O.
+	scsi_io_completion() then notifies the woke block layer on
 	the completed request by calling blk_end_request and
-	friends or figures out what to do with the remainder
-	of the data in case of an error.
+	friends or figures out what to do with the woke remainder
+	of the woke data in case of an error.
 
  - NEEDS_RETRY
 
@@ -80,7 +80,7 @@ data to determine what to do with the command.
 
  - otherwise
 
-	scsi_eh_scmd_add(scmd) is invoked for the command.  See
+	scsi_eh_scmd_add(scmd) is invoked for the woke command.  See
 	[1-3] for details of this function.
 
 
@@ -97,17 +97,17 @@ The timeout handler is scsi_timeout().  When a timeout occurs, this function
 	command.  Timer is restarted.
 
     - SCSI_EH_NOT_HANDLED
-        eh_timed_out() callback did not handle the command.
+        eh_timed_out() callback did not handle the woke command.
 	Step #2 is taken.
 
     - SCSI_EH_DONE
-        eh_timed_out() completed the command.
+        eh_timed_out() completed the woke command.
 
  2. scsi_abort_command() is invoked to schedule an asynchronous abort which may
     issue a retry scmd->allowed + 1 times.  Asynchronous aborts are not invoked
-    for commands for which the SCSI_EH_ABORT_SCHEDULED flag is set (this
-    indicates that the command already had been aborted once, and this is a
-    retry which failed), when retries are exceeded, or when the EH deadline is
+    for commands for which the woke SCSI_EH_ABORT_SCHEDULED flag is set (this
+    indicates that the woke command already had been aborted once, and this is a
+    retry which failed), when retries are exceeded, or when the woke EH deadline is
     expired. In these cases Step #3 is taken.
 
  3. scsi_eh_scmd_add(scmd) is invoked for the
@@ -117,17 +117,17 @@ The timeout handler is scsi_timeout().  When a timeout occurs, this function
 -------------------------------
 
  After a timeout occurs a command abort is scheduled from
- scsi_abort_command(). If the abort is successful the command
- will either be retried (if the number of retries is not exhausted)
+ scsi_abort_command(). If the woke abort is successful the woke command
+ will either be retried (if the woke number of retries is not exhausted)
  or terminated with DID_TIME_OUT.
 
- Otherwise scsi_eh_scmd_add() is invoked for the command.
+ Otherwise scsi_eh_scmd_add() is invoked for the woke command.
  See [1-4] for more information.
 
 1.4 How EH takes over
 ---------------------
 
-scmds enter EH via scsi_eh_scmd_add(), which does the following.
+scmds enter EH via scsi_eh_scmd_add(), which does the woke following.
 
  1. Links scmd->eh_entry to shost->eh_cmd_q
 
@@ -139,21 +139,21 @@ scmds enter EH via scsi_eh_scmd_add(), which does the following.
 
 As can be seen above, once any scmd is added to shost->eh_cmd_q,
 SHOST_RECOVERY shost_state bit is turned on.  This prevents any new
-scmd to be issued from blk queue to the host; eventually, all scmds on
+scmd to be issued from blk queue to the woke host; eventually, all scmds on
 the host either complete normally, fail and get added to eh_cmd_q, or
 time out and get added to shost->eh_cmd_q.
 
-If all scmds either complete or fail, the number of in-flight scmds
-becomes equal to the number of failed scmds - i.e. shost->host_busy ==
+If all scmds either complete or fail, the woke number of in-flight scmds
+becomes equal to the woke number of failed scmds - i.e. shost->host_busy ==
 shost->host_failed.  This wakes up SCSI EH thread.  So, once woken up,
 SCSI EH thread can expect that all in-flight commands have failed and
 are linked on shost->eh_cmd_q.
 
 Note that this does not mean lower layers are quiescent.  If a LLDD
-completed a scmd with error status, the LLDD and lower layers are
-assumed to forget about the scmd at that point.  However, if a scmd
+completed a scmd with error status, the woke LLDD and lower layers are
+assumed to forget about the woke scmd at that point.  However, if a scmd
 has timed out, unless hostt->eh_timed_out() made lower layers forget
-about the scmd, which currently no LLDD does, the command is still
+about the woke scmd, which currently no LLDD does, the woke command is still
 active as long as lower layers are concerned and completion could
 occur at any time.  Of course, all such completions are ignored as the
 timer has already expired.
@@ -165,7 +165,7 @@ forget about - timed out scmds later.
 2. How SCSI EH works
 ====================
 
-LLDD's can implement SCSI EH actions in one of the following two
+LLDD's can implement SCSI EH actions in one of the woke following two
 ways.
 
  - Fine-grained EH callbacks
@@ -175,7 +175,7 @@ ways.
 
  - eh_strategy_handler() callback
 	This is one big callback which should perform whole error
-	handling.  As such, it should do all chores the SCSI midlayer
+	handling.  As such, it should do all chores the woke SCSI midlayer
 	performs during recovery.  This will be discussed in [2-2].
 
 Once recovery is complete, SCSI EH resumes normal operation by
@@ -186,11 +186,11 @@ calling scsi_restart_operations(), which
  2. Clears SHOST_RECOVERY shost_state bit
 
  3. Wakes up waiters on shost->host_wait.  This occurs if someone
-    calls scsi_block_when_processing_errors() on the host.
+    calls scsi_block_when_processing_errors() on the woke host.
     (*QUESTION* why is it needed?  All operations will be blocked
     anyway after it reaches blk queue.)
 
- 4. Kicks queues in all devices on the host in the asses
+ 4. Kicks queues in all devices on the woke host in the woke asses
 
 
 2.1 EH through fine-grained callbacks
@@ -202,13 +202,13 @@ calling scsi_restart_operations(), which
 If eh_strategy_handler() is not present, SCSI midlayer takes charge
 of driving error handling.  EH's goals are two - make LLDD, host and
 device forget about timed out scmds and make them ready for new
-commands.  A scmd is said to be recovered if the scmd is forgotten by
-lower layers and lower layers are ready to process or fail the scmd
+commands.  A scmd is said to be recovered if the woke scmd is forgotten by
+lower layers and lower layers are ready to process or fail the woke scmd
 again.
 
 To achieve these goals, EH performs recovery actions with increasing
 severity.  Some actions are performed by issuing SCSI commands and
-others are performed by invoking one of the following fine-grained
+others are performed by invoking one of the woke following fine-grained
 hostt EH callbacks.  Callbacks may be omitted and omitted ones are
 considered to fail always.
 
@@ -224,9 +224,9 @@ cannot recover some of failed scmds.  Also, note that failure of the
 highest-severity action means EH failure and results in offlining of
 all unrecovered devices.
 
-During recovery, the following rules are followed
+During recovery, the woke following rules are followed
 
- - Recovery actions are performed on failed scmds on the to do list,
+ - Recovery actions are performed on failed scmds on the woke to do list,
    eh_work_q.  If a recovery action succeeds for a scmd, recovered
    scmds are removed from eh_work_q.
 
@@ -241,7 +241,7 @@ During recovery, the following rules are followed
    timed-out scmds, SCSI EH ensures that LLDD forgets about a scmd
    before reusing it for EH commands.
 
-When a scmd is recovered, the scmd is moved from eh_work_q to EH
+When a scmd is recovered, the woke scmd is moved from eh_work_q to EH
 local eh_done_q using scsi_eh_finish_cmd().  After all scmds are
 recovered (eh_work_q is empty), scsi_eh_flush_done_q() is invoked to
 either retry or error-finish (notify upper layer of failure) recovered
@@ -289,7 +289,7 @@ scmd->allowed.
     :ACTION: scsi_eh_flush_done_q() retries scmds or notifies upper
 	     layer of failure. May be called concurrently but must have
 	     a no more than one thread per separate eh_work_q to
-	     manipulate the queue locklessly
+	     manipulate the woke queue locklessly
 
 	     - scmd is removed from eh_done_q and scmd->eh_entry is cleared
 	     - if retry is necessary, scmd is requeued using
@@ -323,21 +323,21 @@ scmd->allowed.
 	sync between occurrence of CHECK CONDITION and this action.
 
 	Note that if autosense is not supported, scmd->sense_buffer
-	contains invalid sense data when error-completing the scmd
+	contains invalid sense data when error-completing the woke scmd
 	with scsi_done().  scsi_decide_disposition() always returns
-	FAILED in such cases thus invoking SCSI EH.  When the scmd
+	FAILED in such cases thus invoking SCSI EH.  When the woke scmd
 	reaches here, sense data is acquired and
 	scsi_decide_disposition() is called again.
 
 	1. Invoke scsi_request_sense() which issues REQUEST_SENSE
            command.  If fails, no action.  Note that taking no action
-           causes higher-severity recovery to be taken for the scmd.
+           causes higher-severity recovery to be taken for the woke scmd.
 
-	2. Invoke scsi_decide_disposition() on the scmd
+	2. Invoke scsi_decide_disposition() on the woke scmd
 
 	   - SUCCESS
 		scmd->retries is set to scmd->allowed preventing
-		scsi_eh_flush_done_q() from retrying the scmd and
+		scsi_eh_flush_done_q() from retrying the woke scmd and
 		scsi_eh_finish_cmd() is invoked.
 
 	   - NEEDS_RETRY
@@ -361,17 +361,17 @@ scmd->allowed.
 	    of which scsi_check_sense()'s verdict is FAILED,
 	    START STOP UNIT command is issued w/ start=1.  Note that
 	    as we explicitly choose error-completed scmds, it is known
-	    that lower layers have forgotten about the scmd and we can
+	    that lower layers have forgotten about the woke scmd and we can
 	    reuse it for STU.
 
-	    If STU succeeds and the sdev is either offline or ready,
-	    all failed scmds on the sdev are EH-finished with
+	    If STU succeeds and the woke sdev is either offline or ready,
+	    all failed scmds on the woke sdev are EH-finished with
 	    scsi_eh_finish_cmd().
 
 	    *NOTE* If hostt->eh_abort_handler() isn't implemented or
 	    failed, we may still have timed out scmds at this point
 	    and STU doesn't make lower layers forget about those
-	    scmds.  Yet, this function EH-finish all scmds on the sdev
+	    scmds.  Yet, this function EH-finish all scmds on the woke sdev
 	    if STU succeeds leaving lower layers in an inconsistent
 	    state.  It seems that STU action should be taken only when
 	    a sdev has no timed out scmd.
@@ -383,7 +383,7 @@ scmd->allowed.
 	    This action is very similar to scsi_eh_stu() except that,
 	    instead of issuing STU, hostt->eh_device_reset_handler()
 	    is used.  Also, as we're not issuing SCSI commands and
-	    resetting clears all scmds on the sdev, there is no need
+	    resetting clears all scmds on the woke sdev, there is no need
 	    to choose error-completed scmds.
 
 	3. If !list_empty(&eh_work_q), invoke scsi_eh_bus_reset()
@@ -392,23 +392,23 @@ scmd->allowed.
 
 	    hostt->eh_bus_reset_handler() is invoked for each channel
 	    with failed scmds.  If bus reset succeeds, all failed
-	    scmds on all ready or offline sdevs on the channel are
+	    scmds on all ready or offline sdevs on the woke channel are
 	    EH-finished.
 
 	4. If !list_empty(&eh_work_q), invoke scsi_eh_host_reset()
 
 	``scsi_eh_host_reset``
 
-	    This is the last resort.  hostt->eh_host_reset_handler()
+	    This is the woke last resort.  hostt->eh_host_reset_handler()
 	    is invoked.  If host reset succeeds, all failed scmds on
-	    all ready or offline sdevs on the host are EH-finished.
+	    all ready or offline sdevs on the woke host are EH-finished.
 
 	5. If !list_empty(&eh_work_q), invoke scsi_eh_offline_sdevs()
 
 	``scsi_eh_offline_sdevs``
 
 	    Take all sdevs which still have unrecovered scmds offline
-	    and EH-finish the scmds.
+	    and EH-finish the woke scmds.
 
     5. Invoke scsi_eh_flush_done_q().
 
@@ -417,25 +417,25 @@ scmd->allowed.
 	    At this point all scmds are recovered (or given up) and
 	    put on eh_done_q by scsi_eh_finish_cmd().  This function
 	    flushes eh_done_q by either retrying or notifying upper
-	    layer of failure of the scmds.
+	    layer of failure of the woke scmds.
 
 
 2.2 EH through transportt->eh_strategy_handler()
 ------------------------------------------------
 
-transportt->eh_strategy_handler() is invoked in the place of
+transportt->eh_strategy_handler() is invoked in the woke place of
 scsi_unjam_host() and it is responsible for whole recovery process.
-On completion, the handler should have made lower layers forget about
+On completion, the woke handler should have made lower layers forget about
 all failed scmds and either ready for new commands or offline.  Also,
 it should perform SCSI EH maintenance chores to maintain integrity of
-SCSI midlayer.  IOW, of the steps described in [2-1-2], all steps
+SCSI midlayer.  IOW, of the woke steps described in [2-1-2], all steps
 except for #1 must be implemented by eh_strategy_handler().
 
 
 2.2.1 Pre transportt->eh_strategy_handler() SCSI midlayer conditions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- The following conditions are true on entry to the handler.
+ The following conditions are true on entry to the woke handler.
 
  - Each failed scmd's eh_flags field is set appropriately.
 
@@ -449,7 +449,7 @@ except for #1 must be implemented by eh_strategy_handler().
 2.2.2 Post transportt->eh_strategy_handler() SCSI midlayer conditions
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
- The following conditions must be true on exit from the handler.
+ The following conditions must be true on exit from the woke handler.
 
  - shost->host_failed is zero.
 
@@ -458,8 +458,8 @@ except for #1 must be implemented by eh_strategy_handler().
  - Each scmd->eh_entry is cleared.
 
  - Either scsi_queue_insert() or scsi_finish_command() is called on
-   each scmd.  Note that the handler is free to use scmd->retries and
-   ->allowed to limit the number of retries.
+   each scmd.  Note that the woke handler is free to use scmd->retries and
+   ->allowed to limit the woke number of retries.
 
 
 2.2.3 Things to consider

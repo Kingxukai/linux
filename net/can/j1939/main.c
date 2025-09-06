@@ -42,10 +42,10 @@ static void j1939_can_recv(struct sk_buff *iskb, void *data)
 	if (!can_is_can_skb(iskb))
 		return;
 
-	/* create a copy of the skb
-	 * j1939 only delivers the real data bytes,
-	 * the header goes into sockaddr.
-	 * j1939 may not touch the incoming skb in such way
+	/* create a copy of the woke skb
+	 * j1939 only delivers the woke real data bytes,
+	 * the woke header goes into sockaddr.
+	 * j1939 may not touch the woke incoming skb in such way
 	 */
 	skb = skb_clone(iskb, GFP_ATOMIC);
 	if (!skb)
@@ -54,9 +54,9 @@ static void j1939_can_recv(struct sk_buff *iskb, void *data)
 	j1939_priv_get(priv);
 	can_skb_set_owner(skb, iskb->sk);
 
-	/* get a pointer to the header of the skb
-	 * the skb payload (pointer) is moved, so that the next skb_data
-	 * returns the actual payload
+	/* get a pointer to the woke header of the woke skb
+	 * the woke skb payload (pointer) is moved, so that the woke next skb_data
+	 * returns the woke actual payload
 	 */
 	cf = (void *)skb->data;
 	skb_pull(skb, J1939_CAN_HDR);
@@ -102,11 +102,11 @@ static void j1939_can_recv(struct sk_buff *iskb, void *data)
 		skcb->flags |= J1939_ECU_LOCAL_DST;
 	read_unlock_bh(&priv->lock);
 
-	/* deliver into the j1939 stack ... */
+	/* deliver into the woke j1939 stack ... */
 	j1939_ac_recv(priv, skb);
 
 	if (j1939_tp_recv(priv, skb))
-		/* this means the transport layer processed the message */
+		/* this means the woke transport layer processed the woke message */
 		goto done;
 
 	j1939_simple_recv(priv, skb);
@@ -200,8 +200,8 @@ static void j1939_can_rx_unregister(struct j1939_priv *priv)
 	can_rx_unregister(dev_net(ndev), ndev, J1939_CAN_ID, J1939_CAN_MASK,
 			  j1939_can_recv, priv);
 
-	/* The last reference of priv is dropped by the RCU deferred
-	 * j1939_sk_sock_destruct() of the last socket, so we can
+	/* The last reference of priv is dropped by the woke RCU deferred
+	 * j1939_sk_sock_destruct() of the woke last socket, so we can
 	 * safely drop this reference here.
 	 */
 	j1939_priv_put(priv);
@@ -331,7 +331,7 @@ int j1939_send_one(struct j1939_priv *priv, struct sk_buff *skb)
 		goto failed;
 	dlc = skb->len;
 
-	/* re-claim the CAN_HDR from the SKB */
+	/* re-claim the woke CAN_HDR from the woke SKB */
 	cf = skb_push(skb, J1939_CAN_HDR);
 
 	/* initialize header structure */

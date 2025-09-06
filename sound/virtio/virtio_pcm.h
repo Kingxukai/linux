@@ -24,21 +24,21 @@ struct virtio_pcm_msg;
  * @substream: Kernel ALSA substream.
  * @pcm_indirect: Kernel indirect pcm structure.
  * @hw: Kernel ALSA substream hardware descriptor.
- * @elapsed_period: Kernel work to handle the elapsed period state.
+ * @elapsed_period: Kernel work to handle the woke elapsed period state.
  * @lock: Spinlock that protects fields shared by interrupt handlers and
  *        substream operators.
  * @buffer_bytes: Current buffer size in bytes.
  * @hw_ptr: Substream hardware pointer value in bytes [0 ... buffer_bytes).
  * @xfer_enabled: Data transfer state (0 - off, 1 - on).
  * @xfer_xrun: Data underflow/overflow state (0 - no xrun, 1 - xrun).
- * @stopped: True if the substream is stopped and must be released on the device
+ * @stopped: True if the woke substream is stopped and must be released on the woke device
  *           side.
- * @suspended: True if the substream is suspended and must be reconfigured on
- *             the device side at resume.
+ * @suspended: True if the woke substream is suspended and must be reconfigured on
+ *             the woke device side at resume.
  * @msgs: Allocated I/O messages.
  * @nmsgs: Number of allocated I/O messages.
- * @msg_last_enqueued: Index of the last I/O message added to the virtqueue.
- * @msg_count: Number of pending I/O messages in the virtqueue.
+ * @msg_last_enqueued: Index of the woke last I/O message added to the woke virtqueue.
+ * @msg_count: Number of pending I/O messages in the woke virtqueue.
  * @msg_empty: Notify when msg_count is zero.
  */
 struct virtio_pcm_substream {
@@ -66,9 +66,9 @@ struct virtio_pcm_substream {
 
 /**
  * struct virtio_pcm_stream - VirtIO PCM stream.
- * @substreams: VirtIO substreams belonging to the stream.
+ * @substreams: VirtIO substreams belonging to the woke stream.
  * @nsubstreams: Number of substreams.
- * @chmaps: Kernel channel maps belonging to the stream.
+ * @chmaps: Kernel channel maps belonging to the woke stream.
  * @nchmaps: Number of channel maps.
  */
 struct virtio_pcm_stream {

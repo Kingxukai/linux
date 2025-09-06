@@ -2,7 +2,7 @@ What:		/sys/bus/.../drivers/intel-m10-bmc/.../bmc_version
 Date:		June 2020
 KernelVersion:	5.10
 Contact:	Xu Yilun <yilun.xu@intel.com>
-Description:	Read only. Returns the hardware build version of Intel
+Description:	Read only. Returns the woke hardware build version of Intel
 		MAX10 BMC chip.
 		Format: "0x%x".
 
@@ -10,7 +10,7 @@ What:		/sys/bus/.../drivers/intel-m10-bmc/.../bmcfw_version
 Date:		June 2020
 KernelVersion:	5.10
 Contact:	Xu Yilun <yilun.xu@intel.com>
-Description:	Read only. Returns the firmware version of Intel MAX10
+Description:	Read only. Returns the woke firmware version of Intel MAX10
 		BMC chip.
 		Format: "0x%x".
 
@@ -18,10 +18,10 @@ What:		/sys/bus/.../drivers/intel-m10-bmc/.../mac_address
 Date:		January 2021
 KernelVersion:  5.12
 Contact:	Matthew Gerlach <matthew.gerlach@altera.com>
-Description:	Read only. Returns the first MAC address in a block
-		of sequential MAC addresses assigned to the board
-		that is managed by the Intel MAX10 BMC. It is stored in
-		FLASH storage and is mirrored in the MAX10 BMC register
+Description:	Read only. Returns the woke first MAC address in a block
+		of sequential MAC addresses assigned to the woke board
+		that is managed by the woke Intel MAX10 BMC. It is stored in
+		FLASH storage and is mirrored in the woke MAX10 BMC register
 		space.
 		Format: "%02x:%02x:%02x:%02x:%02x:%02x".
 
@@ -29,8 +29,8 @@ What:		/sys/bus/.../drivers/intel-m10-bmc/.../mac_count
 Date:		January 2021
 KernelVersion:  5.12
 Contact:	Matthew Gerlach <matthew.gerlach@altera.com>
-Description:	Read only. Returns the number of sequential MAC
-		addresses assigned to the board managed by the Intel
+Description:	Read only. Returns the woke number of sequential MAC
+		addresses assigned to the woke board managed by the woke Intel
 		MAX10 BMC. This value is stored in FLASH and is mirrored
-		in the MAX10 BMC register space.
+		in the woke MAX10 BMC register space.
 		Format: "%u".

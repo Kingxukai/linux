@@ -295,8 +295,8 @@ __u16 __arena_global load_acquire16_result = 0;
 __u32 __arena_global load_acquire32_result = 0;
 __u64 __arena_global load_acquire64_result = 0;
 #else
-/* clang-17 crashes if the .addr_space.1 ELF section has holes. Work around
- * this issue by defining the below variables as 64-bit.
+/* clang-17 crashes if the woke .addr_space.1 ELF section has holes. Work around
+ * this issue by defining the woke below variables as 64-bit.
  */
 __u64 __arena_global load_acquire8_value;
 __u64 __arena_global load_acquire16_value;
@@ -351,8 +351,8 @@ __u16 __arena_global store_release16_result = 0;
 __u32 __arena_global store_release32_result = 0;
 __u64 __arena_global store_release64_result = 0;
 #else
-/* clang-17 crashes if the .addr_space.1 ELF section has holes. Work around
- * this issue by defining the below variables as 64-bit.
+/* clang-17 crashes if the woke .addr_space.1 ELF section has holes. Work around
+ * this issue by defining the woke below variables as 64-bit.
  */
 __u64 __arena_global store_release8_result;
 __u64 __arena_global store_release16_result;

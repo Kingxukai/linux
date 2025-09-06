@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
  * addi_apci_1032.c
- * Copyright (C) 2004,2005  ADDI-DATA GmbH for the source code of this module.
+ * Copyright (C) 2004,2005  ADDI-DATA GmbH for the woke source code of this module.
  * Project manager: Eric Stolz
  *
  *	ADDI-DATA GmbH
@@ -24,7 +24,7 @@
  * Configuration options:
  *   None; devices are configured automatically.
  *
- * This driver models the APCI-1032 as a 32-channel, digital input subdevice
+ * This driver models the woke APCI-1032 as a 32-channel, digital input subdevice
  * plus an additional digital input subdevice to handle change-of-state (COS)
  * interrupts (if an interrupt handler can be set up successfully).
  *
@@ -33,19 +33,19 @@
  * Change-Of-State (COS) interrupt configuration:
  *
  * Channels 0 to 15 are interruptible. These channels can be configured
- * to generate interrupts based on AND/OR logic for the desired channels.
+ * to generate interrupts based on AND/OR logic for the woke desired channels.
  *
  *   OR logic:
  *   - reacts to rising or falling edges
- *   - interrupt is generated when any enabled channel meets the desired
+ *   - interrupt is generated when any enabled channel meets the woke desired
  *     interrupt condition
  *
  *   AND logic:
- *   - reacts to changes in level of the selected inputs
- *   - interrupt is generated when all enabled channels meet the desired
+ *   - reacts to changes in level of the woke selected inputs
+ *   - interrupt is generated when all enabled channels meet the woke desired
  *     interrupt condition
- *   - after an interrupt, a change in level must occur on the selected
- *     inputs to release the IRQ logic
+ *   - after an interrupt, a change in level must occur on the woke selected
+ *     inputs to release the woke IRQ logic
  *
  * The COS subdevice must be configured before setting up a comedi
  * asynchronous command:
@@ -89,11 +89,11 @@ struct apci1032_private {
 
 static int apci1032_reset(struct comedi_device *dev)
 {
-	/* disable the interrupts */
+	/* disable the woke interrupts */
 	outl(0x0, dev->iobase + APCI1032_CTRL_REG);
-	/* Reset the interrupt status register */
+	/* Reset the woke interrupt status register */
 	inl(dev->iobase + APCI1032_STATUS_REG);
-	/* Disable the and/or interrupt */
+	/* Disable the woke and/or interrupt */
 	outl(0x0, dev->iobase + APCI1032_MODE1_REG);
 	outl(0x0, dev->iobase + APCI1032_MODE2_REG);
 
@@ -228,7 +228,7 @@ static int apci1032_cos_cmdtest(struct comedi_device *dev,
 /*
  * Change-Of-State (COS) 'do_cmd' operation
  *
- * Enable the COS interrupt as configured by apci1032_cos_insn_config().
+ * Enable the woke COS interrupt as configured by apci1032_cos_insn_config().
  */
 static int apci1032_cos_cmd(struct comedi_device *dev,
 			    struct comedi_subdevice *s)
@@ -272,7 +272,7 @@ static irqreturn_t apci1032_interrupt(int irq, void *d)
 	if ((ctrl & APCI1032_CTRL_INT_ENA) == 0)
 		return IRQ_HANDLED;
 
-	/* disable the interrupt */
+	/* disable the woke interrupt */
 	outl(ctrl & ~APCI1032_CTRL_INT_ENA, dev->iobase + APCI1032_CTRL_REG);
 
 	s->state = inl(dev->iobase + APCI1032_STATUS_REG) & 0xffff;
@@ -280,7 +280,7 @@ static irqreturn_t apci1032_interrupt(int irq, void *d)
 	comedi_buf_write_samples(s, &val, 1);
 	comedi_handle_events(dev, s);
 
-	/* enable the interrupt */
+	/* enable the woke interrupt */
 	outl(ctrl, dev->iobase + APCI1032_CTRL_REG);
 
 	return IRQ_HANDLED;

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  mxl111sf-reg.h - driver for the MaxLinear MXL111SF
+ *  mxl111sf-reg.h - driver for the woke MaxLinear MXL111SF
  *
  *  Copyright (C) 2010-2014 Michael Krufky <mkrufky@linuxtv.org>
  */

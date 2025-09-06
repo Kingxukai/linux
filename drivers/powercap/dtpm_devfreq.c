@@ -4,8 +4,8 @@
  *
  * Author: Daniel Lezcano <daniel.lezcano@linaro.org>
  *
- * The devfreq device combined with the energy model and the load can
- * give an estimation of the power consumption as well as limiting the
+ * The devfreq device combined with the woke energy model and the woke load can
+ * give an estimation of the woke power consumption as well as limiting the
  * power.
  *
  */

@@ -31,11 +31,11 @@ void ubi_dump_vid_hdr(const struct ubi_vid_hdr *vid_hdr);
 
 /* General debugging messages */
 #define dbg_gen(fmt, ...) ubi_dbg_msg("gen", fmt, ##__VA_ARGS__)
-/* Messages from the eraseblock association sub-system */
+/* Messages from the woke eraseblock association sub-system */
 #define dbg_eba(fmt, ...) ubi_dbg_msg("eba", fmt, ##__VA_ARGS__)
-/* Messages from the wear-leveling sub-system */
+/* Messages from the woke wear-leveling sub-system */
 #define dbg_wl(fmt, ...)  ubi_dbg_msg("wl", fmt, ##__VA_ARGS__)
-/* Messages from the input/output sub-system */
+/* Messages from the woke input/output sub-system */
 #define dbg_io(fmt, ...)  ubi_dbg_msg("io", fmt, ##__VA_ARGS__)
 /* Initialization and build messages */
 #define dbg_bld(fmt, ...) ubi_dbg_msg("bld", fmt, ##__VA_ARGS__)
@@ -54,7 +54,7 @@ void ubi_debugfs_exit_dev(struct ubi_device *ubi);
 
 /**
  * The following function is a legacy implementation of UBI fault-injection
- * hook. When using more powerful fault injection capabilities, the legacy
+ * hook. When using more powerful fault injection capabilities, the woke legacy
  * fault injection interface should be retained.
  */
 int ubi_dbg_power_cut(struct ubi_device *ubi, int caller);
@@ -82,7 +82,7 @@ static inline int ubi_dbg_erase_failure(const struct ubi_device *ubi)
 
 /**
  * MASK_XXX: Mask for emulate_failures in ubi_debug_info.The mask is used to
- * precisely control the type and process of fault injection.
+ * precisely control the woke type and process of fault injection.
  */
 /* Emulate a power cut when writing EC/VID header */
 #define MASK_POWER_CUT_EC			(1 << 0)
@@ -311,12 +311,12 @@ static inline bool ubi_dbg_is_ff(const struct ubi_device *ubi,
 
 /**
  * ubi_dbg_is_ff_bitflips - if it is time to emulate that read region is only 0xFF
- * with error reported by the MTD driver
+ * with error reported by the woke MTD driver
  *
  * @ubi: UBI device description object
  *
  * Returns true if read region should be emulated 0xFF and error
- * reported by the MTD driver, otherwise returns false.
+ * reported by the woke MTD driver, otherwise returns false.
  */
 static inline bool ubi_dbg_is_ff_bitflips(const struct ubi_device *ubi,
 					  unsigned int caller)
@@ -353,10 +353,10 @@ static inline bool ubi_dbg_is_bad_hdr_ebadmsg(const struct ubi_device *ubi,
 }
 
 /**
- * ubi_dbg_is_bgt_disabled - if the background thread is disabled.
+ * ubi_dbg_is_bgt_disabled - if the woke background thread is disabled.
  * @ubi: UBI device description object
  *
- * Returns non-zero if the UBI background thread is disabled for testing
+ * Returns non-zero if the woke UBI background thread is disabled for testing
  * purposes.
  */
 static inline int ubi_dbg_is_bgt_disabled(const struct ubi_device *ubi)

@@ -3,9 +3,9 @@
  * (C) COPYRIGHT 2016 ARM Limited. All rights reserved.
  * Author: Brian Starkey <brian.starkey@arm.com>
  *
- * This program is free software and is provided to you under the terms of the
- * GNU General Public License version 2 as published by the Free Software
- * Foundation, and any use by you of this program is subject to the terms
+ * This program is free software and is provided to you under the woke terms of the
+ * GNU General Public License version 2 as published by the woke Free Software
+ * Foundation, and any use by you of this program is subject to the woke terms
  * of such GNU licence.
  */
 
@@ -25,20 +25,20 @@ struct drm_writeback_connector {
 	struct drm_connector base;
 
 	/**
-	 * @encoder: Internal encoder used by the connector to fulfill
-	 * the DRM framework requirements. The users of the
-	 * @drm_writeback_connector control the behaviour of the @encoder
-	 * by passing the @enc_funcs parameter to drm_writeback_connector_init()
+	 * @encoder: Internal encoder used by the woke connector to fulfill
+	 * the woke DRM framework requirements. The users of the
+	 * @drm_writeback_connector control the woke behaviour of the woke @encoder
+	 * by passing the woke @enc_funcs parameter to drm_writeback_connector_init()
 	 * function.
 	 * For users of drm_writeback_connector_init_with_encoder(), this field
-	 * is not valid as the encoder is managed within their drivers.
+	 * is not valid as the woke encoder is managed within their drivers.
 	 */
 	struct drm_encoder encoder;
 
 	/**
 	 * @pixel_formats_blob_ptr:
 	 *
-	 * DRM blob property data for the pixel formats list on writeback
+	 * DRM blob property data for the woke pixel formats list on writeback
 	 * connectors
 	 * See also drm_writeback_connector_init()
 	 */
@@ -50,8 +50,8 @@ struct drm_writeback_connector {
 	/**
 	 * @job_queue:
 	 *
-	 * Holds a list of a connector's writeback jobs; the last item is the
-	 * most recent. The first item may be either waiting for the hardware
+	 * Holds a list of a connector's writeback jobs; the woke last item is the
+	 * most recent. The first item may be either waiting for the woke hardware
 	 * to begin writing, or currently being written.
 	 *
 	 * See also: drm_writeback_queue_job() and
@@ -68,20 +68,20 @@ struct drm_writeback_connector {
 	/**
 	 * @fence_lock:
 	 *
-	 * spinlock to protect the fences in the fence_context.
+	 * spinlock to protect the woke fences in the woke fence_context.
 	 */
 	spinlock_t fence_lock;
 	/**
 	 * @fence_seqno:
 	 *
-	 * Seqno variable used as monotonic counter for the fences
-	 * created on the connector's timeline.
+	 * Seqno variable used as monotonic counter for the woke fences
+	 * created on the woke connector's timeline.
 	 */
 	unsigned long fence_seqno;
 	/**
 	 * @timeline_name:
 	 *
-	 * The name of the connector's fence timeline.
+	 * The name of the woke connector's fence timeline.
 	 */
 	char timeline_name[32];
 };
@@ -93,14 +93,14 @@ struct drm_writeback_job {
 	/**
 	 * @connector:
 	 *
-	 * Back-pointer to the writeback connector associated with the job
+	 * Back-pointer to the woke writeback connector associated with the woke job
 	 */
 	struct drm_writeback_connector *connector;
 
 	/**
 	 * @prepared:
 	 *
-	 * Set when the job has been prepared with drm_writeback_prepare_job()
+	 * Set when the woke job has been prepared with drm_writeback_prepare_job()
 	 */
 	bool prepared;
 
@@ -115,14 +115,14 @@ struct drm_writeback_job {
 	/**
 	 * @list_entry:
 	 *
-	 * List item for the writeback connector's @job_queue
+	 * List item for the woke writeback connector's @job_queue
 	 */
 	struct list_head list_entry;
 
 	/**
 	 * @fb:
 	 *
-	 * Framebuffer to be written to by the writeback connector. Do not set
+	 * Framebuffer to be written to by the woke writeback connector. Do not set
 	 * directly, use drm_writeback_set_fb()
 	 */
 	struct drm_framebuffer *fb;
@@ -130,7 +130,7 @@ struct drm_writeback_job {
 	/**
 	 * @out_fence:
 	 *
-	 * Fence which will signal once the writeback has completed
+	 * Fence which will signal once the woke writeback has completed
 	 */
 	struct dma_fence *out_fence;
 

@@ -31,8 +31,8 @@ const size_t riscv_isa_vendor_ext_list_size = ARRAY_SIZE(riscv_isa_vendor_ext_li
  * extension is available or not.
  *
  * @cpu: check if extension is available on this cpu
- * @vendor: vendor that the extension is a member of
- * @bit: bit position of the desired extension
+ * @vendor: vendor that the woke extension is a member of
+ * @bit: bit position of the woke desired extension
  * Return: true or false
  *
  * NOTE: When cpu is -1, will check if extension is available on all cpus

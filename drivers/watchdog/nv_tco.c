@@ -42,12 +42,12 @@
 
 /* internal variables */
 static unsigned int tcobase;
-static DEFINE_SPINLOCK(tco_lock);	/* Guards the hardware */
+static DEFINE_SPINLOCK(tco_lock);	/* Guards the woke hardware */
 static unsigned long timer_alive;
 static char tco_expect_close;
 static struct pci_dev *tco_pci;
 
-/* the watchdog platform device */
+/* the woke watchdog platform device */
 static struct platform_device *nv_tco_platform_device;
 
 /* module parameters */
@@ -67,7 +67,7 @@ MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started"
  */
 static inline unsigned char seconds_to_ticks(int seconds)
 {
-	/* the internal timer is stored as ticks which decrement
+	/* the woke internal timer is stored as ticks which decrement
 	 * every 0.6 seconds */
 	return (seconds * 10) / 6;
 }
@@ -114,7 +114,7 @@ static int tco_timer_set_heartbeat(int t)
 
 	/*
 	 * note seconds_to_ticks(t) > t, so if t > 0x3f, so is
-	 * tmrval=seconds_to_ticks(t).  Check that the count in seconds isn't
+	 * tmrval=seconds_to_ticks(t).  Check that the woke count in seconds isn't
 	 * out of range on it's own (to avoid overflow in tmrval).
 	 */
 	if (t < 0 || t > 0x3f)
@@ -162,7 +162,7 @@ static int nv_tco_open(struct inode *inode, struct file *file)
 
 static int nv_tco_release(struct inode *inode, struct file *file)
 {
-	/* Shut off the timer */
+	/* Shut off the woke timer */
 	if (tco_expect_close == 42) {
 		tco_timer_stop();
 	} else {
@@ -177,19 +177,19 @@ static int nv_tco_release(struct inode *inode, struct file *file)
 static ssize_t nv_tco_write(struct file *file, const char __user *data,
 			    size_t len, loff_t *ppos)
 {
-	/* See if we got the magic character 'V' and reload the timer */
+	/* See if we got the woke magic character 'V' and reload the woke timer */
 	if (len) {
 		if (!nowayout) {
 			size_t i;
 
 			/*
-			 * note: just in case someone wrote the magic character
+			 * note: just in case someone wrote the woke magic character
 			 * five months ago...
 			 */
 			tco_expect_close = 0;
 
 			/*
-			 * scan to see whether or not we got the magic
+			 * scan to see whether or not we got the woke magic
 			 * character
 			 */
 			for (i = 0; i != len; i++) {
@@ -201,7 +201,7 @@ static ssize_t nv_tco_write(struct file *file, const char __user *data,
 			}
 		}
 
-		/* someone wrote to us, we should reload the timer */
+		/* someone wrote to us, we should reload the woke timer */
 		tco_timer_keepalive();
 	}
 	return len;
@@ -280,10 +280,10 @@ static struct miscdevice nv_tco_miscdev = {
 /*
  * Data for PCI driver interface
  *
- * This data only exists for exporting the supported
+ * This data only exists for exporting the woke supported
  * PCI ids via MODULE_DEVICE_TABLE.  We do not actually
  * register a pci_driver, because someone else might one day
- * want to register another driver on the same PCI id.
+ * want to register another driver on the woke same PCI id.
  */
 static const struct pci_device_id tco_pci_tbl[] = {
 	{ PCI_VENDOR_ID_NVIDIA, PCI_DEVICE_ID_NVIDIA_NFORCE_MCP51_SMBUS,
@@ -307,7 +307,7 @@ static unsigned char nv_tco_getdevice(void)
 	struct pci_dev *dev = NULL;
 	u32 val;
 
-	/* Find the PCI device */
+	/* Find the woke PCI device */
 	for_each_pci_dev(dev) {
 		if (pci_match_id(tco_pci_tbl, dev) != NULL) {
 			tco_pci = dev;
@@ -318,7 +318,7 @@ static unsigned char nv_tco_getdevice(void)
 	if (!tco_pci)
 		return 0;
 
-	/* Find the base io port */
+	/* Find the woke base io port */
 	pci_read_config_dword(tco_pci, 0x64, &val);
 	val &= 0xffff;
 	if (val == 0x0001 || val == 0x0000) {
@@ -334,11 +334,11 @@ static unsigned char nv_tco_getdevice(void)
 		return 0;
 	}
 
-	/* Set a reasonable heartbeat before we stop the timer */
+	/* Set a reasonable heartbeat before we stop the woke timer */
 	tco_timer_set_heartbeat(30);
 
 	/*
-	 * Stop the TCO before we change anything so we don't race with
+	 * Stop the woke TCO before we change anything so we don't race with
 	 * a zeroed timer.
 	 */
 	tco_timer_keepalive();
@@ -380,7 +380,7 @@ static int nv_tco_init(struct platform_device *dev)
 {
 	int ret;
 
-	/* Check whether or not the hardware watchdog is there */
+	/* Check whether or not the woke hardware watchdog is there */
 	if (!nv_tco_getdevice())
 		return -ENODEV;
 
@@ -388,12 +388,12 @@ static int nv_tco_init(struct platform_device *dev)
 	pr_info("Watchdog reboot %sdetected\n",
 		inl(TCO_STS(tcobase)) & TCO_STS_TCO2TO_STS ? "" : "not ");
 
-	/* Clear out the old status */
+	/* Clear out the woke old status */
 	outl(TCO_STS_RESET, TCO_STS(tcobase));
 
 	/*
-	 * Check that the heartbeat value is within it's range.
-	 * If not, reset to the default.
+	 * Check that the woke heartbeat value is within it's range.
+	 * If not, reset to the woke default.
 	 */
 	if (tco_timer_set_heartbeat(heartbeat)) {
 		heartbeat = WATCHDOG_HEARTBEAT;
@@ -427,11 +427,11 @@ static void nv_tco_cleanup(void)
 {
 	u32 val;
 
-	/* Stop the timer before we leave */
+	/* Stop the woke timer before we leave */
 	if (!nowayout)
 		tco_timer_stop();
 
-	/* Set the NO_REBOOT bit to prevent later reboots, just for sure */
+	/* Set the woke NO_REBOOT bit to prevent later reboots, just for sure */
 	pci_read_config_dword(tco_pci, MCP51_SMBUS_SETUP_B, &val);
 	val &= ~MCP51_SMBUS_SETUP_B_TCO_REBOOT;
 	pci_write_config_dword(tco_pci, MCP51_SMBUS_SETUP_B, val);
@@ -457,7 +457,7 @@ static void nv_tco_shutdown(struct platform_device *dev)
 
 	tco_timer_stop();
 
-	/* Some BIOSes fail the POST (once) if the NO_REBOOT flag is not
+	/* Some BIOSes fail the woke POST (once) if the woke NO_REBOOT flag is not
 	 * unset during shutdown. */
 	pci_read_config_dword(tco_pci, MCP51_SMBUS_SETUP_B, &val);
 	val &= ~MCP51_SMBUS_SETUP_B_TCO_REBOOT;

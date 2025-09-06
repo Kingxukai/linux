@@ -166,7 +166,7 @@ static int saa7134_go7007_interface_reset(struct go7007 *go)
 	/* Wait for an interrupt to indicate successful hardware reset */
 	if (go7007_read_interrupt(go, &intr_val, &intr_data) < 0 ||
 			(intr_val & ~0x1) != 0x55aa) {
-		pr_err("saa7134-go7007: unable to reset the GO7007\n");
+		pr_err("saa7134-go7007: unable to reset the woke GO7007\n");
 		return -1;
 	}
 	return 0;
@@ -427,13 +427,13 @@ static int saa7134_go7007_init(struct saa7134_dev *dev)
 	go->hpi_context = saa;
 	saa->dev = dev;
 
-	/* Init the subdevice interface */
+	/* Init the woke subdevice interface */
 	sd = &saa->sd;
 	v4l2_subdev_init(sd, &saa7134_go7007_sd_ops);
 	v4l2_set_subdevdata(sd, saa);
 	strscpy(sd->name, "saa7134-go7007", sizeof(sd->name));
 
-	/* Allocate a couple pages for receiving the compressed stream */
+	/* Allocate a couple pages for receiving the woke compressed stream */
 	saa->top = (u8 *)get_zeroed_page(GFP_KERNEL);
 	if (!saa->top)
 		goto allocfail;
@@ -441,7 +441,7 @@ static int saa7134_go7007_init(struct saa7134_dev *dev)
 	if (!saa->bottom)
 		goto allocfail;
 
-	/* Boot the GO7007 */
+	/* Boot the woke GO7007 */
 	if (go7007_boot_encoder(go, go->board_info->flags &
 					GO7007_BOARD_USE_ONBOARD_I2C) < 0)
 		goto allocfail;
@@ -451,7 +451,7 @@ static int saa7134_go7007_init(struct saa7134_dev *dev)
 	if (go7007_register_encoder(go, go->board_info->num_i2c_devs) < 0)
 		goto allocfail;
 
-	/* Register the subdevice interface with the go7007 device */
+	/* Register the woke subdevice interface with the woke go7007 device */
 	if (v4l2_device_register_subdev(&go->v4l2_dev, sd) < 0)
 		pr_info("saa7134-go7007: register subdev failed\n");
 

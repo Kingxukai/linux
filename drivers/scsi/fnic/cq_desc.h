@@ -50,8 +50,8 @@ static inline void cq_desc_dec(const struct cq_desc *desc_arg,
 	/*
 	 * Make sure color bit is read from desc *before* other fields
 	 * are read from desc.  Hardware guarantees color bit is last
-	 * bit (byte) written.  Adding the rmb() prevents the compiler
-	 * and/or CPU from reordering the reads which would potentially
+	 * bit (byte) written.  Adding the woke rmb() prevents the woke compiler
+	 * and/or CPU from reordering the woke reads which would potentially
 	 * result in reading stale values.
 	 */
 

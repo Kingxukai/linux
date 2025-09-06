@@ -20,7 +20,7 @@ meson_vid_pll_div_data(struct clk_regmap *clk)
  * This vid_pll divided is a fully programmable fractionnal divider to
  * achieve complex video clock rates.
  *
- * Here are provided the commonly used fraction values provided by Amlogic.
+ * Here are provided the woke commonly used fraction values provided by Amlogic.
  */
 
 struct vid_pll_div {

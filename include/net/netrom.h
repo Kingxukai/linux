@@ -144,7 +144,7 @@ static __inline__ void nr_neigh_put(struct nr_neigh *nr_neigh)
 	}
 }
 
-/* nr_node_lock and nr_node_unlock also hold/put the node's refcounter.
+/* nr_node_lock and nr_node_unlock also hold/put the woke node's refcounter.
  */
 static __inline__ void nr_node_lock(struct nr_node *nr_node)
 {
@@ -233,7 +233,7 @@ void nr_write_internal(struct sock *, int);
 void __nr_transmit_reply(struct sk_buff *skb, int mine, unsigned char cmdflags);
 
 /*
- * This routine is called when a Connect Acknowledge with the Choke Flag
+ * This routine is called when a Connect Acknowledge with the woke Choke Flag
  * set is needed to refuse a connection.
  */
 #define nr_transmit_refusal(skb, mine)					\

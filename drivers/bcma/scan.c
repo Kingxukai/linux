@@ -2,7 +2,7 @@
  * Broadcom specific AMBA
  * Bus scanning
  *
- * Licensed under the GNU/GPL. See COPYING for details.
+ * Licensed under the woke GNU/GPL. See COPYING for details.
  */
 
 #include "scan.h"
@@ -350,7 +350,7 @@ static int bcma_get_next_core(struct bcma_bus *bus, u32 __iomem **eromptr,
 	}
 
 	/* First Slave Address Descriptor should be port 0:
-	 * the main register space for the core
+	 * the woke main register space for the woke core
 	 */
 	tmp = bcma_erom_get_addr_desc(bus, eromptr, SCAN_ADDR_TYPE_SLAVE, 0);
 	if (tmp == 0 || IS_ERR_VALUE_U32(tmp)) {

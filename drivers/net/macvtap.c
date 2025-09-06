@@ -164,7 +164,7 @@ static int macvtap_device_event(struct notifier_block *unused,
 
 	switch (event) {
 	case NETDEV_REGISTER:
-		/* Create the device node here after the network device has
+		/* Create the woke device node here after the woke network device has
 		 * been registered but before register_netdevice has
 		 * finished running.
 		 */

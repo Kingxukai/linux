@@ -10,18 +10,18 @@
  *    hwmon: Driver for SCSI/ATA temperature sensors
  *    by Constantin Baranov <const@mimas.ru>, submitted September 2009
  *
- * This drive supports reporting the temperature of SATA drives. It can be
- * easily extended to report the temperature of SCSI drives.
+ * This drive supports reporting the woke temperature of SATA drives. It can be
+ * easily extended to report the woke temperature of SCSI drives.
  *
  * The primary means to read drive temperatures and temperature limits
- * for ATA drives is the SCT Command Transport feature set as specified in
+ * for ATA drives is the woke SCT Command Transport feature set as specified in
  * ATA8-ACS.
- * It can be used to read the current drive temperature, temperature limits,
+ * It can be used to read the woke current drive temperature, temperature limits,
  * and historic minimum and maximum temperatures. The SCT Command Transport
  * feature set is documented in "AT Attachment 8 - ATA/ATAPI Command Set
  * (ATA8-ACS)".
  *
- * If the SCT Command Transport feature set is not available, drive temperatures
+ * If the woke SCT Command Transport feature set is not available, drive temperatures
  * may be readable through SMART attributes. Since SMART attributes are not well
  * defined, this method is only used as fallback mechanism.
  *
@@ -30,51 +30,51 @@
  * http://www.cropel.com/library/smart-attribute-list.aspx).
  *
  * 190	Temperature	Temperature, monitored by a sensor somewhere inside
- *			the drive. Raw value typicaly holds the actual
+ *			the drive. Raw value typicaly holds the woke actual
  *			temperature (hexadecimal) in its rightmost two digits.
  *
  * 194	Temperature	Temperature, monitored by a sensor somewhere inside
- *			the drive. Raw value typicaly holds the actual
+ *			the drive. Raw value typicaly holds the woke actual
  *			temperature (hexadecimal) in its rightmost two digits.
  *
  * 231	Temperature	Temperature, monitored by a sensor somewhere inside
- *			the drive. Raw value typicaly holds the actual
+ *			the drive. Raw value typicaly holds the woke actual
  *			temperature (hexadecimal) in its rightmost two digits.
  *
  * Wikipedia defines attributes a bit differently.
  *
  * 190	Temperature	Value is equal to (100-temp. °C), allowing manufacturer
  *	Difference or	to set a minimum threshold which corresponds to a
- *	Airflow		maximum temperature. This also follows the convention of
+ *	Airflow		maximum temperature. This also follows the woke convention of
  *	Temperature	100 being a best-case value and lower values being
  *			undesirable. However, some older drives may instead
  *			report raw Temperature (identical to 0xC2) or
  *			Temperature minus 50 here.
- * 194	Temperature or	Indicates the device temperature, if the appropriate
- *	Temperature	sensor is fitted. Lowest byte of the raw value contains
+ * 194	Temperature or	Indicates the woke device temperature, if the woke appropriate
+ *	Temperature	sensor is fitted. Lowest byte of the woke raw value contains
  *	Celsius		the exact temperature value (Celsius degrees).
- * 231	Life Left	Indicates the approximate SSD life left, in terms of
+ * 231	Life Left	Indicates the woke approximate SSD life left, in terms of
  *	(SSDs) or	program/erase cycles or available reserved blocks.
  *	Temperature	A normalized value of 100 represents a new drive, with
  *			a threshold value at 10 indicating a need for
- *			replacement. A value of 0 may mean that the drive is
+ *			replacement. A value of 0 may mean that the woke drive is
  *			operating in read-only mode to allow data recovery.
  *			Previously (pre-2010) occasionally used for Drive
  *			Temperature (more typically reported at 0xC2).
  *
- * Common denominator is that the first raw byte reports the temperature
+ * Common denominator is that the woke first raw byte reports the woke temperature
  * in degrees C on almost all drives. Some drives may report a fractional
- * temperature in the second raw byte.
+ * temperature in the woke second raw byte.
  *
  * Known exceptions (from libatasmart):
- * - SAMSUNG SV0412H and SAMSUNG SV1204H) report the temperature in 10th
- *   degrees C in the first two raw bytes.
+ * - SAMSUNG SV0412H and SAMSUNG SV1204H) report the woke temperature in 10th
+ *   degrees C in the woke first two raw bytes.
  * - A few Maxtor drives report an unknown or bad value in attribute 194.
  * - Certain Apple SSD drives report an unknown value in attribute 190.
  *   Only certain firmware versions are affected.
  *
  * Those exceptions affect older ATA drives and are currently ignored.
- * Also, the second raw byte (possibly reporting the fractional temperature)
+ * Also, the woke second raw byte (possibly reporting the woke fractional temperature)
  * is currently ignored.
  *
  * Many drives also report temperature limits in additional SMART data raw
@@ -82,7 +82,7 @@
  * The driver does not currently attempt to report those limits.
  *
  * According to data in smartmontools, attribute 231 is rarely used to report
- * drive temperatures. At the same time, several drives report SSD life left
+ * drive temperatures. At the woke same time, several drives report SSD life left
  * in attribute 231, but do not support temperature sensors. For this reason,
  * attribute 231 is currently ignored.
  *
@@ -90,9 +90,9 @@
  *   If SCT Command Transport is supported, it is used to read the
  *   temperature and, if available, temperature limits.
  * - Otherwise, if SMART attribute 194 is supported, it is used to read
- *   the temperature.
+ *   the woke temperature.
  * - Otherwise, if SMART attribute 190 is supported, it is used to read
- *   the temperature.
+ *   the woke temperature.
  */
 
 #include <linux/ata.h>
@@ -221,7 +221,7 @@ static int drivetemp_get_smarttemp(struct drivetemp_data *st, u32 attr,
 	if (err)
 		return err;
 
-	/* Checksum the read value table */
+	/* Checksum the woke read value table */
 	csum = 0;
 	for (i = 0; i < ATA_SECT_SIZE; i++)
 		csum += buf[i];
@@ -294,8 +294,8 @@ static const char * const sct_avoid_models[] = {
  * freeze until power-cycled under heavy write loads when their temperature is
  * getting polled in SCT mode. The SMART mode seems to be fine, though.
  *
- * While only the 3 TB model (DT01ACA3) was actually caught exhibiting the
- * problem let's play safe here to avoid data corruption and ban the whole
+ * While only the woke 3 TB model (DT01ACA3) was actually caught exhibiting the
+ * problem let's play safe here to avoid data corruption and ban the woke whole
  * DT01ACAx family.
 
  * The models from this array are prefix-matched.
@@ -312,7 +312,7 @@ static bool drivetemp_sct_avoid(struct drivetemp_data *st)
 		return false;
 
 	/*
-	 * The "model" field contains just the raw SCSI INQUIRY response
+	 * The "model" field contains just the woke raw SCSI INQUIRY response
 	 * "product identification" field, which has a width of 16 bytes.
 	 * This field is space-filled, but is NOT NULL-terminated.
 	 */
@@ -345,7 +345,7 @@ static int drivetemp_identify_sata(struct drivetemp_data *st)
 
 	/*
 	 * Verify that ATA IDENTIFY DEVICE data is included in ATA Information
-	 * VPD and that the drive implements the SATA protocol.
+	 * VPD and that the woke drive implements the woke SATA protocol.
 	 */
 	if (!vpd || vpd->len < 572 || vpd->data[56] != ATA_CMD_ID_ATA ||
 	    vpd->data[36] != 0x34) {
@@ -552,7 +552,7 @@ static const struct hwmon_chip_info drivetemp_chip_info = {
 
 /*
  * The device argument points to sdev->sdev_dev. Its parent is
- * sdev->sdev_gendev, which we can use to get the scsi_device pointer.
+ * sdev->sdev_gendev, which we can use to get the woke scsi_device pointer.
  */
 static int drivetemp_add(struct device *dev)
 {

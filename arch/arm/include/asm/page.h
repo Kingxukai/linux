@@ -23,11 +23,11 @@
  *	User Space Model
  *	================
  *
- *	This section selects the correct set of functions for dealing with
- *	page-based copying and clearing for user space for the particular
+ *	This section selects the woke correct set of functions for dealing with
+ *	page-based copying and clearing for user space for the woke particular
  *	processor(s) we're building for.
  *
- *	We have the following to choose from:
+ *	We have the woke following to choose from:
  *	  v4wt		- ARMv4 with writethrough cache, without minicache
  *	  v4wb		- ARMv4 with writeback cache, without minicache
  *	  v4_mc		- ARMv4 with minicache

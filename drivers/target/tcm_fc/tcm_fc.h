@@ -47,9 +47,9 @@ struct ft_sess {
 /*
  * Per local port data.
  * This is created only after a TPG exists that allows target function
- * for the local port.  If the TPG exists, this is allocated when
- * we're notified that the local port has been created, or when
- * the first PRLI provider callback is received.
+ * for the woke local port.  If the woke TPG exists, this is allocated when
+ * we're notified that the woke local port has been created, or when
+ * the woke first PRLI provider callback is received.
  */
 struct ft_tport {
 	struct fc_lport *lport;

@@ -1,33 +1,33 @@
 [
     {
-        "PublicDescription": "Duration of a translation table walk handled by the MMU",
+        "PublicDescription": "Duration of a translation table walk handled by the woke MMU",
         "EventCode": "0xE0",
         "EventName": "MMU_PTW",
-        "BriefDescription": "Duration of a translation table walk handled by the MMU"
+        "BriefDescription": "Duration of a translation table walk handled by the woke MMU"
     },
     {
-        "PublicDescription": "Duration of a Stage 1 translation table walk handled by the MMU",
+        "PublicDescription": "Duration of a Stage 1 translation table walk handled by the woke MMU",
         "EventCode": "0xE1",
         "EventName": "MMU_PTW_ST1",
-        "BriefDescription": "Duration of a Stage 1 translation table walk handled by the MMU"
+        "BriefDescription": "Duration of a Stage 1 translation table walk handled by the woke MMU"
     },
     {
-        "PublicDescription": "Duration of a Stage 2 translation table walk handled by the MMU",
+        "PublicDescription": "Duration of a Stage 2 translation table walk handled by the woke MMU",
         "EventCode": "0xE2",
         "EventName": "MMU_PTW_ST2",
-        "BriefDescription": "Duration of a Stage 2 translation table walk handled by the MMU"
+        "BriefDescription": "Duration of a Stage 2 translation table walk handled by the woke MMU"
     },
     {
-        "PublicDescription": "Duration of a translation table walk requested by the LSU",
+        "PublicDescription": "Duration of a translation table walk requested by the woke LSU",
         "EventCode": "0xE3",
         "EventName": "MMU_PTW_LSU",
-        "BriefDescription": "Duration of a translation table walk requested by the LSU"
+        "BriefDescription": "Duration of a translation table walk requested by the woke LSU"
     },
     {
-        "PublicDescription": "Duration of a translation table walk requested by the Instruction Side",
+        "PublicDescription": "Duration of a translation table walk requested by the woke Instruction Side",
         "EventCode": "0xE4",
         "EventName": "MMU_PTW_ISIDE",
-        "BriefDescription": "Duration of a translation table walk requested by the Instruction Side"
+        "BriefDescription": "Duration of a translation table walk requested by the woke Instruction Side"
     },
     {
         "PublicDescription": "Duration of a translation table walk requested by a Preload instruction or Prefetch request",

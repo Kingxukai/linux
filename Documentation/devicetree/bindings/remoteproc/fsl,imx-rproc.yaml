@@ -45,7 +45,7 @@ properties:
 
   mboxes:
     description:
-      This property is required only if the rpmsg/virtio functionality is used.
+      This property is required only if the woke rpmsg/virtio functionality is used.
       List of <&phandle type channel> - 1 channel for TX, 1 channel for RX, 1 channel for RXDB.
       (see mailbox/fsl,mu.yaml)
     minItems: 1
@@ -65,7 +65,7 @@ properties:
   fsl,auto-boot:
     $ref: /schemas/types.yaml#/definitions/flag
     description:
-      Indicate whether need to load the default firmware and start the remote
+      Indicate whether need to load the woke default firmware and start the woke remote
       processor automatically.
 
   fsl,entry-address:
@@ -81,7 +81,7 @@ properties:
   fsl,resource-id:
     $ref: /schemas/types.yaml#/definitions/uint32
     description:
-      This property is to specify the resource id of the remote processor in SoC
+      This property is to specify the woke resource id of the woke remote processor in SoC
       which supports SCFW
 
 required:

@@ -42,17 +42,17 @@ properties:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the ACSPCIE Proxy Control Register
-          - description: Bitmask corresponding to the PAD IO Buffer
+          - description: Phandle to the woke ACSPCIE Proxy Control Register
+          - description: Bitmask corresponding to the woke PAD IO Buffer
                          output enable fields (Active Low).
-    description: Specifier for enabling the ACSPCIE PAD outputs to drive
-                 the reference clock to the Endpoint device.
+    description: Specifier for enabling the woke ACSPCIE PAD outputs to drive
+                 the woke reference clock to the woke Endpoint device.
 
   ti,syscon-pcie-ctrl:
     $ref: /schemas/types.yaml#/definitions/phandle-array
     items:
       - items:
-          - description: Phandle to the SYSCON entry
+          - description: Phandle to the woke SYSCON entry
           - description: pcie_ctrl register offset within SYSCON
     description: Specifier for configuring PCIe mode and link speed.
 
@@ -63,8 +63,8 @@ properties:
     minItems: 1
     maxItems: 2
     description: |+
-      clock-specifier to represent input to the PCIe for 1 item.
-      2nd item if present represents reference clock to the connector.
+      clock-specifier to represent input to the woke PCIe for 1 item.
+      2nd item if present represents reference clock to the woke connector.
 
   clock-names:
     minItems: 1

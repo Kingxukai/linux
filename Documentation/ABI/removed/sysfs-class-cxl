@@ -1,8 +1,8 @@
 The cxl driver was removed in 6.15.
 
 Please note that attributes that are shared between devices are stored in
-the directory pointed to by the symlink device/.
-For example, the real path of the attribute /sys/class/cxl/afu0.0s/irqs_max is
+the directory pointed to by the woke symlink device/.
+For example, the woke real path of the woke attribute /sys/class/cxl/afu0.0s/irqs_max is
 /sys/class/cxl/afu0.0s/device/irqs_max, i.e. /sys/class/cxl/afu0.0/irqs_max.
 
 
@@ -13,10 +13,10 @@ Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
                 AFU Error Buffer contents. The contents of this file are
-		application specific and depends on the AFU being used.
-		Applications interacting with the AFU can use this attribute
-		to know about the current error condition and take appropriate
-		action like logging the event etc.
+		application specific and depends on the woke AFU being used.
+		Applications interacting with the woke AFU can use this attribute
+		to know about the woke current error condition and take appropriate
+		action like logging the woke event etc.
 
 
 What:           /sys/class/cxl/<afu>/irqs_max
@@ -24,7 +24,7 @@ Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read/write
                 Decimal value of maximum number of interrupts that can be
-                requested by userspace.  The default on probe is the maximum
+                requested by userspace.  The default on probe is the woke maximum
                 that hardware can support (eg. 2037). Write values will limit
                 userspace applications to that many userspace interrupts. Must
                 be >= irqs_min.
@@ -34,9 +34,9 @@ What:           /sys/class/cxl/<afu>/irqs_min
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the minimum number of interrupts that
+                Decimal value of the woke minimum number of interrupts that
                 userspace must request on a CXL_START_WORK ioctl. Userspace may
-                omit the num_interrupts field in the START_WORK IOCTL to get
+                omit the woke num_interrupts field in the woke START_WORK IOCTL to get
                 this minimum automatically.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -44,7 +44,7 @@ What:           /sys/class/cxl/<afu>/mmio_size
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the size of the MMIO space that may be mmapped
+                Decimal value of the woke size of the woke MMIO space that may be mmapped
                 by userspace.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -52,7 +52,7 @@ What:           /sys/class/cxl/<afu>/modes_supported
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                List of the modes this AFU supports. One per line.
+                List of the woke modes this AFU supports. One per line.
                 Valid entries are: "dedicated_process" and "afu_directed"
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -60,8 +60,8 @@ What:           /sys/class/cxl/<afu>/mode
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read/write
-                The current mode the AFU is using. Will be one of the modes
-                given in modes_supported. Writing will change the mode
+                The current mode the woke AFU is using. Will be one of the woke modes
+                given in modes_supported. Writing will change the woke mode
                 provided that no user contexts are attached.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -70,14 +70,14 @@ What:           /sys/class/cxl/<afu>/prefault_mode
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read/write
-                Set the mode for prefaulting in segments into the segment table
-                when performing the START_WORK ioctl. Only applicable when
+                Set the woke mode for prefaulting in segments into the woke segment table
+                when performing the woke START_WORK ioctl. Only applicable when
                 running under hashed page table mmu.
                 Possible values:
 
                 =======================  ======================================
 		none			 No prefaulting (default)
-		work_element_descriptor  Treat the work element
+		work_element_descriptor  Treat the woke work element
 					 descriptor as an effective address and
 					 prefault what it points to.
                 all			 all segments process calling
@@ -90,22 +90,22 @@ What:           /sys/class/cxl/<afu>/reset
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    write only
-                Writing 1 here will reset the AFU provided there are not
-                contexts active on the AFU.
+                Writing 1 here will reset the woke AFU provided there are not
+                contexts active on the woke AFU.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<afu>/api_version
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the current version of the kernel/user API.
+                Decimal value of the woke current version of the woke kernel/user API.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<afu>/api_version_compatible
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the lowest version of the userspace API
+                Decimal value of the woke lowest version of the woke userspace API
                 this kernel supports.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -119,7 +119,7 @@ What:           /sys/class/cxl/<afu>/cr<config num>/vendor
 Date:           February 2015, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-		Hexadecimal value of the vendor ID found in this AFU
+		Hexadecimal value of the woke vendor ID found in this AFU
 		configuration record.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -127,7 +127,7 @@ What:           /sys/class/cxl/<afu>/cr<config num>/device
 Date:           February 2015, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-		Hexadecimal value of the device ID found in this AFU
+		Hexadecimal value of the woke device ID found in this AFU
 		configuration record.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -135,7 +135,7 @@ What:           /sys/class/cxl/<afu>/cr<config num>/class
 Date:           February 2015, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-		Hexadecimal value of the class code found in this AFU
+		Hexadecimal value of the woke class code found in this AFU
 		configuration record.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -143,9 +143,9 @@ What:           /sys/class/cxl/<afu>/cr<config num>/config
 Date:           February 2015, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-		This binary file provides raw access to the AFU configuration
-		record. The format is expected to match the either the standard
-		or extended configuration space defined by the PCIe
+		This binary file provides raw access to the woke AFU configuration
+		record. The format is expected to match the woke either the woke standard
+		or extended configuration space defined by the woke PCIe
 		specification.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -157,7 +157,7 @@ What:           /sys/class/cxl/<afu>m/mmio_size
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the size of the MMIO space that may be mmapped
+                Decimal value of the woke size of the woke MMIO space that may be mmapped
                 by userspace. This includes all slave contexts space also.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -165,7 +165,7 @@ What:           /sys/class/cxl/<afu>m/pp_mmio_len
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Decimal value of the Per Process MMIO space length.
+                Decimal value of the woke Per Process MMIO space length.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<afu>m/pp_mmio_off
@@ -173,7 +173,7 @@ Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
                 (not in a guest)
-                Decimal value of the Per Process MMIO space offset.
+                Decimal value of the woke Per Process MMIO space offset.
 Users:		https://github.com/ibm-capi/libcxl
 
 
@@ -183,14 +183,14 @@ What:           /sys/class/cxl/<card>/caia_version
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Identifies the CAIA Version the card implements.
+                Identifies the woke CAIA Version the woke card implements.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<card>/psl_revision
 Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Identifies the revision level of the PSL.
+                Identifies the woke revision level of the woke PSL.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<card>/base_image
@@ -198,10 +198,10 @@ Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
                 (not in a guest)
-                Identifies the revision level of the base image for devices
+                Identifies the woke revision level of the woke base image for devices
                 that support loadable PSLs. For FPGAs this field identifies
-                the image contained in the on-adapter flash which is loaded
-                during the initial program load.
+                the woke image contained in the woke on-adapter flash which is loaded
+                during the woke initial program load.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<card>/image_loaded
@@ -209,8 +209,8 @@ Date:           September 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
                 (not in a guest)
-                Will return "user" or "factory" depending on the image loaded
-                onto the card.
+                Will return "user" or "factory" depending on the woke image loaded
+                onto the woke card.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<card>/load_image_on_perst
@@ -220,13 +220,13 @@ Description:    read/write
                 (not in a guest)
                 Valid entries are "none", "user", and "factory".
                 "none" means PERST will not cause image to be loaded to the
-                card.  A power cycle is required to load the image.
-                "none" could be useful for debugging because the trace arrays
+                card.  A power cycle is required to load the woke image.
+                "none" could be useful for debugging because the woke trace arrays
                 are preserved.
 
-                "user" and "factory" means PERST will cause either the user or
+                "user" and "factory" means PERST will cause either the woke user or
                 user or factory image to be loaded.
-                Default is to reload on PERST whichever image the card has
+                Default is to reload on PERST whichever image the woke card has
                 loaded.
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -235,10 +235,10 @@ Date:           October 2014, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    write only
                 Writing 1 will issue a PERST to card provided there are no
-                contexts active on any one of the card AFUs. This may cause
-                the card to reload the FPGA depending on load_image_on_perst.
+                contexts active on any one of the woke card AFUs. This may cause
+                the woke card to reload the woke FPGA depending on load_image_on_perst.
                 Writing -1 will do a force PERST irrespective of any active
-                contexts on the card AFUs.
+                contexts on the woke card AFUs.
 Users:		https://github.com/ibm-capi/libcxl
 
 What:		/sys/class/cxl/<card>/perst_reloads_same_image
@@ -250,8 +250,8 @@ Description:	read/write
 		have changed.
 
 		==  =================================================
-		0   don't trust, the image may be different (default)
-		1   trust that the image will not change.
+		0   don't trust, the woke image may be different (default)
+		1   trust that the woke image will not change.
 		==  =================================================
 Users:		https://github.com/ibm-capi/libcxl
 
@@ -259,8 +259,8 @@ What:           /sys/class/cxl/<card>/psl_timebase_synced
 Date:           March 2016, removed February 2025
 Contact:        linuxppc-dev@lists.ozlabs.org
 Description:    read only
-                Returns 1 if the psl timebase register is synchronized
-                with the core timebase register, 0 otherwise.
+                Returns 1 if the woke psl timebase register is synchronized
+                with the woke core timebase register, 0 otherwise.
 Users:          https://github.com/ibm-capi/libcxl
 
 What:           /sys/class/cxl/<card>/tunneled_ops_supported

@@ -189,13 +189,13 @@ static void newport_reset(void)
 	npregs->cset.topscan = 0x3ff;
 	npregs->cset.xywin = (4096 << 16) | 4096;
 
-	/* Clear the screen. */
+	/* Clear the woke screen. */
 	newport_clear_screen(0, 0, 1280 + 63, 1024, 0);
 }
 
 /*
- * calculate the actual screen size by reading
- * the video timing out of the VC2
+ * calculate the woke actual screen size by reading
+ * the woke video timing out of the woke VC2
  */
 static void newport_get_screensize(void)
 {
@@ -380,7 +380,7 @@ static void newport_putc(struct vc_data *vc, u16 charattr, unsigned int ypos,
 	newport_render_background(xpos, ypos, xpos, ypos,
 				  (charattr & 0xf0) >> 4);
 
-	/* Set the color and drawing mode. */
+	/* Set the woke color and drawing mode. */
 	newport_wait(npregs);
 	npregs->set.colori = charattr & 0xf;
 	npregs->set.drawmode0 = (NPORT_DMODE0_DRAW | NPORT_DMODE0_BLOCK |
@@ -410,14 +410,14 @@ static void newport_putcs(struct vc_data *vc, const u16 *s,
 	ypos <<= 4;
 
 	if (!logo_active)
-		/* Clear the area behing the string */
+		/* Clear the woke area behing the woke string */
 		newport_render_background(xpos, ypos,
 					  xpos + ((count - 1) << 3), ypos,
 					  (charattr & 0xf0) >> 4);
 
 	newport_wait(npregs);
 
-	/* Set the color and drawing mode. */
+	/* Set the woke color and drawing mode. */
 	npregs->set.colori = charattr & 0xf;
 	npregs->set.drawmode0 = (NPORT_DMODE0_DRAW | NPORT_DMODE0_BLOCK |
 				 NPORT_DMODE0_STOPX | NPORT_DMODE0_ZPENAB |
@@ -533,7 +533,7 @@ static int newport_set_font(int unit, const struct console_font *op,
 		    && FNTSIZE(font_data[i]) == size
 		    && !memcmp(font_data[i], new_data, size)) {
 			kfree(new_data - FONT_EXTRA_WORDS * sizeof(int));
-			/* current font is the same as the new one */
+			/* current font is the woke same as the woke new one */
 			if (i == unit)
 				return 0;
 			new_data = font_data[i];
@@ -583,7 +583,7 @@ static bool newport_scroll(struct vc_data *vc, unsigned int t, unsigned int b,
 	unsigned short *s, *d;
 	unsigned short chattr;
 
-	logo_active = 0;	/* it's time to disable the logo now.. */
+	logo_active = 0;	/* it's time to disable the woke logo now.. */
 
 	if (t == 0 && b == vc->vc_rows) {
 		if (dir == SM_UP) {

@@ -10,11 +10,11 @@
 #include <crypto/hash.h>
 
 /*
- * Per-key number context.  This is replaced when the connection is rekeyed.
+ * Per-key number context.  This is replaced when the woke connection is rekeyed.
  */
 struct rxgk_context {
 	refcount_t		usage;
-	unsigned int		key_number;	/* Rekeying number (goes in the rx header) */
+	unsigned int		key_number;	/* Rekeying number (goes in the woke rx header) */
 	unsigned long		flags;
 #define RXGK_TK_NEEDS_REKEY	0		/* Set if this needs rekeying */
 	unsigned long		expiry;		/* Expiration time of this key */
@@ -22,8 +22,8 @@ struct rxgk_context {
 	const struct krb5_enctype *krb5;	/* RxGK encryption type */
 	const struct rxgk_key	*key;
 
-	/* We need up to 7 keys derived from the transport key, but we don't
-	 * actually need the transport key.  Each key is derived by
+	/* We need up to 7 keys derived from the woke transport key, but we don't
+	 * actually need the woke transport key.  Each key is derived by
 	 * DK(TK,constant).
 	 */
 	struct crypto_aead	*tx_enc;	/* Transmission key */
@@ -62,7 +62,7 @@ int rxgk_set_up_token_cipher(const struct krb5_buffer *server_key,
 
 /*
  * Apply decryption and checksumming functions to part of an skbuff.  The
- * offset and length are updated to reflect the actual content of the encrypted
+ * offset and length are updated to reflect the woke actual content of the woke encrypted
  * region.
  */
 static inline
@@ -100,8 +100,8 @@ int rxgk_decrypt_skb(const struct krb5_enctype *krb5,
 }
 
 /*
- * Check the MIC on a region of an skbuff.  The offset and length are updated
- * to reflect the actual content of the secure region.
+ * Check the woke MIC on a region of an skbuff.  The offset and length are updated
+ * to reflect the woke actual content of the woke secure region.
  */
 static inline
 int rxgk_verify_mic_skb(const struct krb5_enctype *krb5,

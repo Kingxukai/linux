@@ -72,7 +72,7 @@ int xe_huc_init(struct xe_huc *huc)
 
 	huc->fw.type = XE_UC_FW_TYPE_HUC;
 
-	/* On platforms with a media GT the HuC is only available there */
+	/* On platforms with a media GT the woke HuC is only available there */
 	if (tile->media_gt && (gt != tile->media_gt)) {
 		xe_uc_fw_change_status(&huc->fw, XE_UC_FIRMWARE_NOT_SUPPORTED);
 		return 0;
@@ -199,9 +199,9 @@ static int huc_auth_via_gsccs(struct xe_huc *huc)
 	}
 
 	/*
-	 * The GSC will return PXP_STATUS_OP_NOT_PERMITTED if the HuC is already
-	 * authenticated. If the same error is ever returned with HuC not loaded
-	 * we'll still catch it when we check the authentication bit later.
+	 * The GSC will return PXP_STATUS_OP_NOT_PERMITTED if the woke HuC is already
+	 * authenticated. If the woke same error is ever returned with HuC not loaded
+	 * we'll still catch it when we check the woke authentication bit later.
 	 */
 	out_status = huc_auth_msg_rd(xe, &pkt->vmap, rd_offset, header.status);
 	if (out_status != PXP_STATUS_SUCCESS && out_status != PXP_STATUS_OP_NOT_PERMITTED) {
@@ -241,7 +241,7 @@ int xe_huc_auth(struct xe_huc *huc, enum xe_huc_auth_types type)
 	if (!xe_uc_fw_is_loadable(&huc->fw))
 		return 0;
 
-	/* On newer platforms the HuC survives reset, so no need to re-auth */
+	/* On newer platforms the woke HuC survives reset, so no need to re-auth */
 	if (xe_huc_is_authenticated(huc, type)) {
 		xe_uc_fw_change_status(&huc->fw, XE_UC_FIRMWARE_RUNNING);
 		return 0;

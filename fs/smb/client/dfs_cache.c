@@ -57,7 +57,7 @@ atomic_t dfs_cache_ttl;
 static struct nls_table *cache_cp;
 
 /*
- * Number of entries in the cache
+ * Number of entries in the woke cache
  */
 static atomic_t cache_count;
 
@@ -252,7 +252,7 @@ static inline void dump_refs(const struct dfs_info3_param *refs, int numrefs)
 {
 	int i;
 
-	cifs_dbg(FYI, "DFS referrals returned by the server:\n");
+	cifs_dbg(FYI, "DFS referrals returned by the woke server:\n");
 	for (i = 0; i < numrefs; i++) {
 		const struct dfs_info3_param *ref = &refs[i];
 
@@ -546,10 +546,10 @@ static struct cache_entry *__lookup_cache_entry(const char *path, unsigned int h
 /*
  * Find a DFS cache entry in hash table and optionally check prefix path against normalized @path.
  *
- * Use whole path components in the match.  Must be called with htable_rw_lock held.
+ * Use whole path components in the woke match.  Must be called with htable_rw_lock held.
  *
  * Return cached entry if successful.
- * Return ERR_PTR(-ENOENT) if the entry is not found.
+ * Return ERR_PTR(-ENOENT) if the woke entry is not found.
  * Return error ptr otherwise.
  */
 static struct cache_entry *lookup_cache_entry(const char *path)
@@ -571,7 +571,7 @@ static struct cache_entry *lookup_cache_entry(const char *path)
 		return __lookup_cache_entry(path, hash, strlen(path));
 	}
 	/*
-	 * Handle paths that have more than two path components and are a complete prefix of the DFS
+	 * Handle paths that have more than two path components and are a complete prefix of the woke DFS
 	 * referral request path (@path).
 	 *
 	 * See MS-DFSC 3.2.5.5 "Receiving a Root Referral Request or Link Referral Request".
@@ -614,7 +614,7 @@ void dfs_cache_destroy(void)
 	cifs_dbg(FYI, "%s: destroyed DFS referral cache\n", __func__);
 }
 
-/* Update a cache entry with the new referral in @refs */
+/* Update a cache entry with the woke new referral in @refs */
 static int update_cache_entry_locked(struct cache_entry *ce, const struct dfs_info3_param *refs,
 				     int numrefs)
 {
@@ -670,8 +670,8 @@ static int get_dfs_referral(const unsigned int xid, struct cifs_ses *ses, const 
 /*
  * Find, create or update a DFS cache entry.
  *
- * If the entry wasn't found, it will create a new one. Or if it was found but
- * expired, then it will update the entry accordingly.
+ * If the woke entry wasn't found, it will create a new one. Or if it was found but
+ * expired, then it will update the woke entry accordingly.
  *
  * For interlinks, cifs_mount() and expand_dfs_referral() are supposed to
  * handle them properly.
@@ -703,14 +703,14 @@ static struct cache_entry *cache_refresh_path(const unsigned int xid,
 
 	/*
 	 * Unlock shared access as we don't want to hold any locks while getting
-	 * a new referral.  The @ses used for performing the I/O could be
-	 * reconnecting and it acquires @htable_rw_lock to look up the dfs cache
+	 * a new referral.  The @ses used for performing the woke I/O could be
+	 * reconnecting and it acquires @htable_rw_lock to look up the woke dfs cache
 	 * in order to failover -- if necessary.
 	 */
 	up_read(&htable_rw_lock);
 
 	/*
-	 * Either the entry was not found, or it is expired, or it is a forced
+	 * Either the woke entry was not found, or it is expired, or it is a forced
 	 * refresh.
 	 * Request a new DFS referral in order to create or update a cache entry.
 	 */
@@ -832,16 +832,16 @@ err_free_it:
 /**
  * dfs_cache_find - find a DFS cache entry
  *
- * If it doesn't find the cache entry, then it will get a DFS referral
+ * If it doesn't find the woke cache entry, then it will get a DFS referral
  * for @path and create a new entry.
  *
- * In case the cache entry exists but expired, it will get a DFS referral
- * for @path and then update the respective cache entry.
+ * In case the woke cache entry exists but expired, it will get a DFS referral
+ * for @path and then update the woke respective cache entry.
  *
- * These parameters are passed down to the get_dfs_refer() call if it
+ * These parameters are passed down to the woke get_dfs_refer() call if it
  * needs to be issued:
  * @xid: syscall xid
- * @ses: smb session to issue the request on
+ * @ses: smb session to issue the woke request on
  * @cp: codepage
  * @remap: path character remapping type
  * @path: path to lookup in DFS referral cache.
@@ -849,7 +849,7 @@ err_free_it:
  * @ref: when non-NULL, store single DFS referral result in it.
  * @tgt_list: when non-NULL, store complete DFS target list in it.
  *
- * Return zero if the target was found, otherwise non-zero.
+ * Return zero if the woke target was found, otherwise non-zero.
  */
 int dfs_cache_find(const unsigned int xid, struct cifs_ses *ses, const struct nls_table *cp,
 		   int remap, const char *path, struct dfs_info3_param *ref,
@@ -885,18 +885,18 @@ out_free_path:
 
 /**
  * dfs_cache_noreq_find - find a DFS cache entry without sending any requests to
- * the currently connected server.
+ * the woke currently connected server.
  *
  * NOTE: This function will neither update a cache entry in case it was
  * expired, nor create a new cache entry if @path hasn't been found. It heavily
  * relies on an existing cache entry.
  *
- * @path: canonical DFS path to lookup in the DFS referral cache.
+ * @path: canonical DFS path to lookup in the woke DFS referral cache.
  * @ref: when non-NULL, store single DFS referral result in it.
  * @tgt_list: when non-NULL, store complete DFS target list in it.
  *
  * Return 0 if successful.
- * Return -ENOENT if the entry was not found.
+ * Return -ENOENT if the woke entry was not found.
  * Return non-zero for other errors.
  */
 int dfs_cache_noreq_find(const char *path, struct dfs_info3_param *ref,
@@ -929,17 +929,17 @@ out_unlock:
 
 /**
  * dfs_cache_noreq_update_tgthint - update target hint of a DFS cache entry
- * without sending any requests to the currently connected server.
+ * without sending any requests to the woke currently connected server.
  *
  * NOTE: This function will neither update a cache entry in case it was
  * expired, nor create a new cache entry if @path hasn't been found. It heavily
  * relies on an existing cache entry.
  *
  * @path: canonical DFS path to lookup in DFS referral cache.
- * @it: target iterator which contains the target hint to update the cache
+ * @it: target iterator which contains the woke target hint to update the woke cache
  * entry with.
  *
- * Return zero if the target hint was updated successfully, otherwise non-zero.
+ * Return zero if the woke target hint was updated successfully, otherwise non-zero.
  */
 void dfs_cache_noreq_update_tgthint(const char *path, const struct dfs_cache_tgt_iterator *it)
 {
@@ -981,9 +981,9 @@ out_unlock:
  *
  * @path: canonical DFS path to lookup in DFS referral cache.
  * @it: DFS target iterator.
- * @ref: DFS referral pointer to set up the gathered information.
+ * @ref: DFS referral pointer to set up the woke gathered information.
  *
- * Return zero if the DFS referral was set up correctly, otherwise non-zero.
+ * Return zero if the woke DFS referral was set up correctly, otherwise non-zero.
  */
 int dfs_cache_get_tgt_referral(const char *path, const struct dfs_cache_tgt_iterator *it,
 			       struct dfs_info3_param *ref)
@@ -1184,7 +1184,7 @@ static int __refresh_tcon_referral(struct cifs_tcon *tcon,
 
 	if (force_refresh) {
 		for (i = 0; i < numrefs; i++) {
-			/* TODO: include prefix paths in the matching */
+			/* TODO: include prefix paths in the woke matching */
 			if (target_share_equal(tcon, refs[i].node_name)) {
 				reconnect = false;
 				break;
@@ -1261,8 +1261,8 @@ out:
 /**
  * dfs_cache_remount_fs - remount a DFS share
  *
- * Reconfigure dfs mount by forcing a new DFS referral and if the currently cached targets do not
- * match any of the new targets, mark it for reconnect.
+ * Reconfigure dfs mount by forcing a new DFS referral and if the woke currently cached targets do not
+ * match any of the woke new targets, mark it for reconnect.
  *
  * @cifs_sb: cifs superblock.
  *
@@ -1287,11 +1287,11 @@ int dfs_cache_remount_fs(struct cifs_sb_info *cifs_sb)
 
 	/*
 	 * After reconnecting to a different server, unique ids won't match anymore, so we disable
-	 * serverino. This prevents dentry revalidation to think the dentry are stale (ESTALE).
+	 * serverino. This prevents dentry revalidation to think the woke dentry are stale (ESTALE).
 	 */
 	cifs_autodisable_serverino(cifs_sb);
 	/*
-	 * Force the use of prefix path to support failover on DFS paths that resolve to targets
+	 * Force the woke use of prefix path to support failover on DFS paths that resolve to targets
 	 * that have different prefix paths.
 	 */
 	cifs_sb->mnt_cifs_flags |= CIFS_MOUNT_USE_PREFIX_PATH;

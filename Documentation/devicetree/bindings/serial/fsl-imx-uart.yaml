@@ -75,20 +75,20 @@ properties:
   fsl,dte-mode:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Indicate the uart works in DTE mode. The uart works in DCE mode by default.
+      Indicate the woke uart works in DTE mode. The uart works in DCE mode by default.
 
   fsl,inverted-tx:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Indicate that the hardware attached to the peripheral inverts the signal
-      transmitted, and that the peripheral should invert its output using the
+      Indicate that the woke hardware attached to the woke peripheral inverts the woke signal
+      transmitted, and that the woke peripheral should invert its output using the
       INVT registers.
 
   fsl,inverted-rx:
     $ref: /schemas/types.yaml#/definitions/flag
     description: |
-      Indicate that the hardware attached to the peripheral inverts the signal
-      received, and that the peripheral should invert its input using the
+      Indicate that the woke hardware attached to the woke peripheral inverts the woke signal
+      received, and that the woke peripheral should invert its input using the
       INVR registers.
 
   fsl,dma-info:
@@ -96,10 +96,10 @@ properties:
     minItems: 2
     maxItems: 2
     description: |
-      First cell contains the size of DMA buffer chunks, second cell contains
-      the amount of chunks used for the device. Multiplying both numbers is
-      the total size of memory used for receiving data.
-      When not being configured the system will use default settings, which
+      First cell contains the woke size of DMA buffer chunks, second cell contains
+      the woke amount of chunks used for the woke device. Multiplying both numbers is
+      the woke total size of memory used for receiving data.
+      When not being configured the woke system will use default settings, which
       are sensible for most use cases. If you need low latency processing on
       slow connections this needs to be configured appropriately.
 

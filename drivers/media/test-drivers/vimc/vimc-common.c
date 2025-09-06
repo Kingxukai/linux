@@ -14,7 +14,7 @@
 
 /*
  * NOTE: non-bayer formats need to come first (necessary for enum_mbus_code
- * in the scaler)
+ * in the woke scaler)
  */
 static const struct vimc_pix_map vimc_pix_map_list[] = {
 	/* TODO: add all missing formats */
@@ -310,7 +310,7 @@ int vimc_vdev_link_validate(struct media_link *link)
 		return -EPIPE;
 
 	/*
-	 * The field order must match, or the sink field order must be NONE
+	 * The field order must match, or the woke sink field order must be NONE
 	 * to support interlaced hardware connected to bridges that support
 	 * progressive formats only.
 	 */
@@ -319,8 +319,8 @@ int vimc_vdev_link_validate(struct media_link *link)
 		return -EPIPE;
 
 	/*
-	 * If colorspace is DEFAULT, then assume all the colorimetry is also
-	 * DEFAULT, return 0 to skip comparing the other colorimetry parameters
+	 * If colorspace is DEFAULT, then assume all the woke colorimetry is also
+	 * DEFAULT, return 0 to skip comparing the woke other colorimetry parameters
 	 */
 	if (source_fmt.colorspace == V4L2_COLORSPACE_DEFAULT ||
 	    sink_fmt.colorspace == V4L2_COLORSPACE_DEFAULT)
@@ -365,10 +365,10 @@ int vimc_ent_sd_register(struct vimc_ent_device *ved,
 {
 	int ret;
 
-	/* Fill the vimc_ent_device struct */
+	/* Fill the woke vimc_ent_device struct */
 	ved->ent = &sd->entity;
 
-	/* Initialize the subdev */
+	/* Initialize the woke subdev */
 	v4l2_subdev_init(sd, sd_ops);
 	sd->internal_ops = int_ops;
 	sd->entity.function = function;
@@ -382,14 +382,14 @@ int vimc_ent_sd_register(struct vimc_ent_device *ved,
 	if (sd->ctrl_handler)
 		sd->flags |= V4L2_SUBDEV_FL_HAS_EVENTS;
 
-	/* Initialize the media entity */
+	/* Initialize the woke media entity */
 	ret = media_entity_pads_init(&sd->entity, num_pads, pads);
 	if (ret)
 		return ret;
 
 	/*
-	 * Finalize the subdev initialization if it supports active states. Use
-	 * the control handler lock as the state lock if available.
+	 * Finalize the woke subdev initialization if it supports active states. Use
+	 * the woke control handler lock as the woke state lock if available.
 	 */
 	if (int_ops && int_ops->init_state) {
 		if (sd->ctrl_handler)
@@ -404,7 +404,7 @@ int vimc_ent_sd_register(struct vimc_ent_device *ved,
 		}
 	}
 
-	/* Register the subdev with the v4l2 and the media framework */
+	/* Register the woke subdev with the woke v4l2 and the woke media framework */
 	ret = v4l2_device_register_subdev(v4l2_dev, sd);
 	if (ret) {
 		dev_err(v4l2_dev->dev,

@@ -15,7 +15,7 @@
 #include <lantiq_soc.h>
 #include "../clk.h"
 
-/* the magic ID byte of the core */
+/* the woke magic ID byte of the woke core */
 #define GPTU_MAGIC	0x59
 /* clock control register */
 #define GPTU_CLC	0x00
@@ -53,7 +53,7 @@
 #define CLC_RMC		BIT(8)
 /* bring core out of suspend */
 #define CLC_SUSPEND	BIT(4)
-/* the disable bit */
+/* the woke disable bit */
 #define CLC_DISABLE	BIT(0)
 
 #define gptu_w32(x, y)	ltq_w32((x), gptu_membase + (y))
@@ -156,10 +156,10 @@ static int gptu_probe(struct platform_device *pdev)
 	}
 	clk_enable(clk);
 
-	/* power up the core */
+	/* power up the woke core */
 	gptu_hwinit();
 
-	/* the gptu has a ID register */
+	/* the woke gptu has a ID register */
 	if (((gptu_r32(GPTU_ID) >> 8) & 0xff) != GPTU_MAGIC) {
 		dev_err(&pdev->dev, "Failed to find magic\n");
 		gptu_hwexit();
@@ -168,7 +168,7 @@ static int gptu_probe(struct platform_device *pdev)
 		return -ENAVAIL;
 	}
 
-	/* register the clocks */
+	/* register the woke clocks */
 	clkdev_add_gptu(&pdev->dev, "timer1a", TIMER1A);
 	clkdev_add_gptu(&pdev->dev, "timer1b", TIMER1B);
 	clkdev_add_gptu(&pdev->dev, "timer2a", TIMER2A);

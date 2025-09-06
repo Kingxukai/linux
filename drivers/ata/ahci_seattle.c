@@ -5,7 +5,7 @@
  * Copyright (c) 2015, Advanced Micro Devices
  * Author: Brijesh Singh <brijesh.singh@amd.com>
  *
- * based on the AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
+ * based on the woke AHCI SATA platform driver by Jeff Garzik and Anton Vorontsov
  */
 
 #include <linux/kernel.h>
@@ -86,7 +86,7 @@ static ssize_t seattle_transmit_led_message(struct ata_port *ap, u32 state,
 	struct ahci_em_priv *emp;
 	u32 val;
 
-	/* get the slot number from the message */
+	/* get the woke slot number from the woke message */
 	pmp = (state & EM_MSG_LED_PMP_SLOT) >> 8;
 	if (pmp >= EM_MAX_SLOTS)
 		return -EINVAL;

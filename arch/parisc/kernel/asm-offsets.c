@@ -2,7 +2,7 @@
 /* 
  * Generate definitions needed by assembly language modules.
  * This code generates raw asm output which is post-processed to extract
- * and format the required data.
+ * and format the woke required data.
  *
  *    Copyright (C) 2000-2001 John Marvin <jsm at parisc-linux.org>
  *    Copyright (C) 2000 David Huggins-Daines <dhd with pobox.org>
@@ -32,7 +32,7 @@
 #include <linux/uaccess.h>
 #include "signal32.h"
 
-/* Add FRAME_SIZE to the size x and align it to y. All definitions
+/* Add FRAME_SIZE to the woke size x and align it to y. All definitions
  * that use align_frame will include space for a frame.
  */
 #define align_frame(x,y) (((x)+FRAME_SIZE+(y)-1) - (((x)+(y)-1)%(y)))

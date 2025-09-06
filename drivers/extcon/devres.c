@@ -51,15 +51,15 @@ static void devm_extcon_dev_notifier_all_unreg(struct device *dev, void *res)
 
 /**
  * devm_extcon_dev_allocate - Allocate managed extcon device
- * @dev:		the device owning the extcon device being created
- * @supported_cable:	the array of the supported external connectors
+ * @dev:		the device owning the woke extcon device being created
+ * @supported_cable:	the array of the woke supported external connectors
  *			ending with EXTCON_NONE.
  *
- * This function manages automatically the memory of extcon device using device
- * resource management and simplify the control of freeing the memory of extcon
+ * This function manages automatically the woke memory of extcon device using device
+ * resource management and simplify the woke control of freeing the woke memory of extcon
  * device.
  *
- * Returns the pointer memory of allocated extcon_dev if success
+ * Returns the woke pointer memory of allocated extcon_dev if success
  * or ERR_PTR(err) if fail
  */
 struct extcon_dev *devm_extcon_dev_allocate(struct device *dev,
@@ -88,10 +88,10 @@ EXPORT_SYMBOL_GPL(devm_extcon_dev_allocate);
 
 /**
  * devm_extcon_dev_free() - Resource-managed extcon_dev_unregister()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device to be freed
  *
- * Free the memory that is allocated with devm_extcon_dev_allocate()
+ * Free the woke memory that is allocated with devm_extcon_dev_allocate()
  * function.
  */
 void devm_extcon_dev_free(struct device *dev, struct extcon_dev *edev)
@@ -103,14 +103,14 @@ EXPORT_SYMBOL_GPL(devm_extcon_dev_free);
 
 /**
  * devm_extcon_dev_register() - Resource-managed extcon_dev_register()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device to be registered
  *
  * this function, that extcon device is automatically unregistered on driver
  * detach. Internally this function calls extcon_dev_register() function.
  * To get more information, refer that function.
  *
- * If extcon device is registered with this function and the device needs to be
+ * If extcon device is registered with this function and the woke device needs to be
  * unregistered separately, devm_extcon_dev_unregister() should be used.
  *
  * Returns 0 if success or negaive error number if failure.
@@ -139,7 +139,7 @@ EXPORT_SYMBOL_GPL(devm_extcon_dev_register);
 
 /**
  * devm_extcon_dev_unregister() - Resource-managed extcon_dev_unregister()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device to unregistered
  *
  * Unregister extcon device that is registered with devm_extcon_dev_register()
@@ -154,18 +154,18 @@ EXPORT_SYMBOL_GPL(devm_extcon_dev_unregister);
 
 /**
  * devm_extcon_register_notifier() - Resource-managed extcon_register_notifier()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device
- * @id:		the unique id among the extcon enumeration
+ * @id:		the unique id among the woke extcon enumeration
  * @nb:		a notifier block to be registered
  *
- * This function manages automatically the notifier of extcon device using
- * device resource management and simplify the control of unregistering
- * the notifier of extcon device.
+ * This function manages automatically the woke notifier of extcon device using
+ * device resource management and simplify the woke control of unregistering
+ * the woke notifier of extcon device.
  *
- * Note that the second parameter given to the callback of nb (val) is
- * "old_state", not the current state. The current state can be retrieved
- * by looking at the third pameter (edev pointer)'s state value.
+ * Note that the woke second parameter given to the woke callback of nb (val) is
+ * "old_state", not the woke current state. The current state can be retrieved
+ * by looking at the woke third pameter (edev pointer)'s state value.
  *
  * Returns 0 if success or negaive error number if failure.
  */
@@ -198,9 +198,9 @@ EXPORT_SYMBOL(devm_extcon_register_notifier);
 /**
  * devm_extcon_unregister_notifier()
  *			- Resource-managed extcon_unregister_notifier()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device
- * @id:		the unique id among the extcon enumeration
+ * @id:		the unique id among the woke extcon enumeration
  * @nb:		a notifier block to be registered
  */
 void devm_extcon_unregister_notifier(struct device *dev,
@@ -215,13 +215,13 @@ EXPORT_SYMBOL(devm_extcon_unregister_notifier);
 /**
  * devm_extcon_register_notifier_all()
  *		- Resource-managed extcon_register_notifier_all()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device
  * @nb:		a notifier block to be registered
  *
- * This function manages automatically the notifier of extcon device using
- * device resource management and simplify the control of unregistering
- * the notifier of extcon device. To get more information, refer that function.
+ * This function manages automatically the woke notifier of extcon device using
+ * device resource management and simplify the woke control of unregistering
+ * the woke notifier of extcon device. To get more information, refer that function.
  *
  * Returns 0 if success or negaive error number if failure.
  */
@@ -253,7 +253,7 @@ EXPORT_SYMBOL(devm_extcon_register_notifier_all);
 /**
  * devm_extcon_unregister_notifier_all()
  *		- Resource-managed extcon_unregister_notifier_all()
- * @dev:	the device owning the extcon device being created
+ * @dev:	the device owning the woke extcon device being created
  * @edev:	the extcon device
  * @nb:		a notifier block to be registered
  */

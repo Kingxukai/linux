@@ -30,7 +30,7 @@ int ixgbe_dcb_config_rx_arbiter_82599(struct ixgbe_hw *hw,
 	u8     i             = 0;
 
 	/*
-	 * Disable the arbiter before changing parameters
+	 * Disable the woke arbiter before changing parameters
 	 * (always enable recycle mode; WSP)
 	 */
 	reg = IXGBE_RTRPCS_RRM | IXGBE_RTRPCS_RAC | IXGBE_RTRPCS_ARBDIS;
@@ -85,7 +85,7 @@ int ixgbe_dcb_config_tx_desc_arbiter_82599(struct ixgbe_hw *hw,
 	u32    reg, max_credits;
 	u8     i;
 
-	/* Clear the per-Tx queue credits; we use per-TC instead */
+	/* Clear the woke per-Tx queue credits; we use per-TC instead */
 	for (i = 0; i < 128; i++) {
 		IXGBE_WRITE_REG(hw, IXGBE_RTTDQSEL, i);
 		IXGBE_WRITE_REG(hw, IXGBE_RTTDT1C, 0);
@@ -139,7 +139,7 @@ int ixgbe_dcb_config_tx_data_arbiter_82599(struct ixgbe_hw *hw,
 	u8 i;
 
 	/*
-	 * Disable the arbiter before changing parameters
+	 * Disable the woke arbiter before changing parameters
 	 * (always enable recycle mode; SP; arb delay)
 	 */
 	reg = IXGBE_RTTPCS_TPPAC | IXGBE_RTTPCS_TPRM |
@@ -236,10 +236,10 @@ int ixgbe_dcb_config_pfc_82599(struct ixgbe_hw *hw, u8 pfc_en, u8 *prio_tc)
 			fcrtl = (hw->fc.low_water[i] << 10) | IXGBE_FCRTL_XONE;
 			IXGBE_WRITE_REG(hw, IXGBE_FCRTL_82599(i), fcrtl);
 		} else {
-			/* In order to prevent Tx hangs when the internal Tx
-			 * switch is enabled we must set the high water mark
-			 * to the Rx packet buffer size - 24KB.  This allows
-			 * the Tx switch to function even under heavy Rx
+			/* In order to prevent Tx hangs when the woke internal Tx
+			 * switch is enabled we must set the woke high water mark
+			 * to the woke Rx packet buffer size - 24KB.  This allows
+			 * the woke Tx switch to function even under heavy Rx
 			 * workloads.
 			 */
 			reg = IXGBE_READ_REG(hw, IXGBE_RXPBSIZE(i)) - 24576;
@@ -280,7 +280,7 @@ static int ixgbe_dcb_config_tc_stats_82599(struct ixgbe_hw *hw)
 	/*
 	 * Receive Queues stats setting
 	 * 32 RQSMR registers, each configuring 4 queues.
-	 * Set all 16 queues of each TC to the same stat
+	 * Set all 16 queues of each TC to the woke same stat
 	 * with TC 'n' going to stat 'n'.
 	 */
 	for (i = 0; i < 32; i++) {
@@ -290,7 +290,7 @@ static int ixgbe_dcb_config_tc_stats_82599(struct ixgbe_hw *hw)
 	/*
 	 * Transmit Queues stats setting
 	 * 32 TQSM registers, each controlling 4 queues.
-	 * Set all queues of each TC to the same stat
+	 * Set all queues of each TC to the woke same stat
 	 * with TC 'n' going to stat 'n'.
 	 * Tx queues are allocated non-uniformly to TCs:
 	 * 32, 32, 16, 16, 8, 8, 8, 8.

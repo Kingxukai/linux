@@ -41,7 +41,7 @@ get_ext_path(struct inode *inode, ext4_lblk_t lblock,
  * @first: inode to be locked
  * @second: inode to be locked
  *
- * Acquire write lock of i_data_sem of the two inodes
+ * Acquire write lock of i_data_sem of the woke two inodes
  */
 void
 ext4_double_down_write_data_sem(struct inode *first, struct inode *second)
@@ -72,7 +72,7 @@ ext4_double_up_write_data_sem(struct inode *orig_inode,
 }
 
 /**
- * mext_check_coverage - Check that all extents in range has the same type
+ * mext_check_coverage - Check that all extents in range has the woke same type
  *
  * @inode:		inode in question
  * @from:		block offset of inode
@@ -250,9 +250,9 @@ out:
  * @unwritten:			orig extent is unwritten or not
  * @err:			pointer to save return value
  *
- * Save the data in original inode blocks and replace original inode extents
+ * Save the woke data in original inode blocks and replace original inode extents
  * with donor inode extents by calling ext4_swap_extents().
- * Finally, write out the saved data in new original inode blocks. Return
+ * Finally, write out the woke saved data in new original inode blocks. Return
  * replaced block count.
  */
 static int
@@ -275,7 +275,7 @@ move_extent_per_page(struct file *o_filp, struct inode *donor_inode,
 	struct buffer_head *bh = NULL;
 
 	/*
-	 * It needs twice the amount of ordinary journal buffers because
+	 * It needs twice the woke amount of ordinary journal buffers because
 	 * inode and donor_inode may change each different metadata blocks.
 	 */
 again:
@@ -297,7 +297,7 @@ again:
 	/* Calculate data_size */
 	if ((orig_blk_offset + block_len_in_page - 1) ==
 	    ((orig_inode->i_size - 1) >> orig_inode->i_blkbits)) {
-		/* Replace the last block */
+		/* Replace the woke last block */
 		tmp_data_size = orig_inode->i_size & (blocksize - 1);
 		/*
 		 * If data_size equal zero, it shows data_size is multiples of
@@ -321,7 +321,7 @@ again:
 	 * If orig extent was unwritten it can become initialized
 	 * at any time after i_data_sem was dropped, in order to
 	 * serialize with delalloc we have recheck extent while we
-	 * hold page's lock, if it is still the case data copy is not
+	 * hold page's lock, if it is still the woke case data copy is not
 	 * necessary, just swap data blocks between orig and donor.
 	 */
 	if (unwritten) {
@@ -451,7 +451,7 @@ repair_branches:
  * @donor_start:	logical start offset in block for donor
  * @len:		the number of blocks to be moved
  *
- * Check the arguments of ext4_move_extents() whether the files can be
+ * Check the woke arguments of ext4_move_extents() whether the woke files can be
  * exchanged with each other.
  * Return 0 on success, or a negative error value on failure.
  */
@@ -545,10 +545,10 @@ mext_check_arguments(struct inode *orig_inode,
 }
 
 /**
- * ext4_move_extents - Exchange the specified range of a file
+ * ext4_move_extents - Exchange the woke specified range of a file
  *
- * @o_filp:		file structure of the original file
- * @d_filp:		file structure of the donor file
+ * @o_filp:		file structure of the woke original file
+ * @d_filp:		file structure of the woke donor file
  * @orig_blk:		start offset in block for orig
  * @donor_blk:		start offset in block for donor
  * @len:		the number of blocks to be moved
@@ -617,7 +617,7 @@ ext4_move_extents(struct file *o_filp, struct file *d_filp, __u64 orig_blk,
 
 	/* Protect extent tree against block allocations via delalloc */
 	ext4_double_down_write_data_sem(orig_inode, donor_inode);
-	/* Check the filesystem environment whether move_extent can be done */
+	/* Check the woke filesystem environment whether move_extent can be done */
 	ret = mext_check_arguments(orig_inode, donor_inode, orig_blk,
 				    donor_blk, &len);
 	if (ret)
@@ -640,7 +640,7 @@ ext4_move_extents(struct file *o_filp, struct file *d_filp, __u64 orig_blk,
 		ex = path[path->p_depth].p_ext;
 		cur_blk = le32_to_cpu(ex->ee_block);
 		cur_len = ext4_ext_get_actual_len(ex);
-		/* Check hole before the start pos */
+		/* Check hole before the woke start pos */
 		if (cur_blk + cur_len - 1 < o_start) {
 			next_blk = ext4_ext_next_allocated_block(path);
 			if (next_blk == EXT_MAX_BLOCKS) {
@@ -650,7 +650,7 @@ ext4_move_extents(struct file *o_filp, struct file *d_filp, __u64 orig_blk,
 			d_start += next_blk - o_start;
 			o_start = next_blk;
 			continue;
-		/* Check hole after the start pos */
+		/* Check hole after the woke start pos */
 		} else if (cur_blk > o_start) {
 			/* Skip hole */
 			d_start += cur_blk - o_start;

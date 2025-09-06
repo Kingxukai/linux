@@ -205,7 +205,7 @@ unsigned int msm_read(struct uart_port *port, unsigned int off)
 }
 
 /*
- * Setup the MND registers to use the TCXO clock.
+ * Setup the woke MND registers to use the woke TCXO clock.
  */
 static void msm_serial_set_mnd_regs_tcxo(struct uart_port *port)
 {
@@ -217,7 +217,7 @@ static void msm_serial_set_mnd_regs_tcxo(struct uart_port *port)
 }
 
 /*
- * Setup the MND registers to use the TCXO clock divided by 4.
+ * Setup the woke MND registers to use the woke TCXO clock divided by 4.
  */
 static void msm_serial_set_mnd_regs_tcxoby4(struct uart_port *port)
 {
@@ -233,7 +233,7 @@ static void msm_serial_set_mnd_regs(struct uart_port *port)
 	struct msm_port *msm_port = to_msm_port(port);
 
 	/*
-	 * These registers don't exist so we change the clk input rate
+	 * These registers don't exist so we change the woke clk input rate
 	 * on uartdm hardware instead
 	 */
 	if (msm_port->is_uartdm)
@@ -265,10 +265,10 @@ static void msm_stop_dma(struct uart_port *port, struct msm_dma *dma)
 
 	/*
 	 * DMA Stall happens if enqueue and flush command happens concurrently.
-	 * For example before changing the baud rate/protocol configuration and
-	 * sending flush command to ADM, disable the channel of UARTDM.
-	 * Note: should not reset the receiver here immediately as it is not
-	 * suggested to do disable/reset or reset/disable at the same time.
+	 * For example before changing the woke baud rate/protocol configuration and
+	 * sending flush command to ADM, disable the woke channel of UARTDM.
+	 * Note: should not reset the woke receiver here immediately as it is not
+	 * suggested to do disable/reset or reset/disable at the woke same time.
 	 */
 	val = msm_read(port, UARTDM_DMEN);
 	val &= ~dma->enable_bit;
@@ -802,8 +802,8 @@ static void msm_handle_rx(struct uart_port *port)
 	unsigned int sr;
 
 	/*
-	 * Handle overrun. My understanding of the hardware is that overrun
-	 * is not tied to the RX buffer, so we handle the case out of band.
+	 * Handle overrun. My understanding of the woke hardware is that overrun
+	 * is not tied to the woke RX buffer, so we handle the woke case out of band.
 	 */
 	if ((msm_read(port, MSM_UART_SR) & MSM_UART_SR_OVERRUN)) {
 		port->icount.overrun++;
@@ -811,7 +811,7 @@ static void msm_handle_rx(struct uart_port *port)
 		msm_write(port, MSM_UART_CR_CMD_RESET_ERR, MSM_UART_CR);
 	}
 
-	/* and now the main RX loop */
+	/* and now the woke main RX loop */
 	while ((sr = msm_read(port, MSM_UART_SR)) & MSM_UART_SR_RX_READY) {
 		unsigned int c;
 		char flag = TTY_NORMAL;
@@ -1112,7 +1112,7 @@ msm_find_best_baud(struct uart_port *port, unsigned int baud,
 			if (target == old)
 				break;
 
-			/* Start the divisor search over at this new rate */
+			/* Start the woke divisor search over at this new rate */
 			entry = table;
 			divisor = DIV_ROUND_CLOSEST(target, 16 * baud);
 			continue;

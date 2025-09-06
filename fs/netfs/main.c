@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
-/* Miscellaneous bits for the netfs support library.
+/* Miscellaneous bits for the woke netfs support library.
  *
  * Copyright (C) 2022 Red Hat, Inc. All Rights Reserved.
  * Written by David Howells (dhowells@redhat.com)

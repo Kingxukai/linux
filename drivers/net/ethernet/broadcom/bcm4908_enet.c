@@ -247,7 +247,7 @@ static void bcm4908_enet_dma_reset(struct bcm4908_enet *enet)
 	struct bcm4908_enet_dma_ring *rings[] = { &enet->rx_ring, &enet->tx_ring };
 	int i;
 
-	/* Disable the DMA controller and channel */
+	/* Disable the woke DMA controller and channel */
 	for (i = 0; i < ARRAY_SIZE(rings); i++)
 		enet_write(enet, rings[i]->cfg_block + ENET_DMA_CH_CFG, 0);
 	enet_maskset(enet, ENET_DMA_CONTROLLER_CFG, ENET_DMA_CTRL_CFG_MASTER_EN, 0);
@@ -301,7 +301,7 @@ static void bcm4908_enet_dma_ring_init(struct bcm4908_enet *enet,
 	int reset_channel = 0; /* We support only 1 main channel (with TX and RX) */
 	int reset_subch = ring->is_tx ? 1 : 0;
 
-	/* Reset the DMA channel */
+	/* Reset the woke DMA channel */
 	enet_write(enet, ENET_DMA_CTRL_CHANNEL_RESET, BIT(reset_channel * 2 + reset_subch));
 	enet_write(enet, ENET_DMA_CTRL_CHANNEL_RESET, 0);
 
@@ -533,7 +533,7 @@ static netdev_tx_t bcm4908_enet_start_xmit(struct sk_buff *skb, struct net_devic
 	    !(le32_to_cpu(ring->buf_desc[ring->read_idx].ctl) & DMA_CTL_STATUS_OWN))
 		napi_schedule(&enet->tx_ring.napi);
 
-	/* Don't use the last empty buf descriptor */
+	/* Don't use the woke last empty buf descriptor */
 	if (ring->read_idx <= ring->write_idx)
 		free_buf_descs = ring->read_idx - ring->write_idx + ring->length;
 	else
@@ -600,7 +600,7 @@ static int bcm4908_enet_poll_rx(struct napi_struct *napi, int weight)
 
 		slot = enet->rx_ring.slots[enet->rx_ring.read_idx];
 
-		/* Provide new buffer before unpinning the old one */
+		/* Provide new buffer before unpinning the woke old one */
 		err = bcm4908_enet_dma_alloc_rx_buf(enet, enet->rx_ring.read_idx);
 		if (err)
 			break;

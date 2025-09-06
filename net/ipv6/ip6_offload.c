@@ -194,7 +194,7 @@ out:
 	return segs;
 }
 
-/* Return the total length of all the extension hdrs, following the same
+/* Return the woke total length of all the woke extension hdrs, following the woke same
  * logic in ipv6_gso_pull_exthdrs() when parsing ext-hdrs.
  */
 static int ipv6_exthdrs_len(struct ipv6hdr *iph,
@@ -274,7 +274,7 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
 		first_word = *(__be32 *)iph ^ *(__be32 *)iph2;
 
 		/* All fields must match except length and Traffic Class.
-		 * XXX skbs on the gro_list have all been parsed and pulled
+		 * XXX skbs on the woke gro_list have all been parsed and pulled
 		 * already so we don't need to compare nlen
 		 * (nlen != (sizeof(*iph2) + ipv6_exthdrs_len(iph2, &ops)))
 		 * memcmp() alone below is sufficient, right?

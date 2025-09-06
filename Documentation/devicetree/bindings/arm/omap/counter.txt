@@ -3,7 +3,7 @@ OMAP Counter-32K bindings
 Required properties:
 - compatible:	Must be "ti,omap-counter32k" for OMAP controllers
 - reg:		Contains timer register address range (base address and length)
-- ti,hwmods:	Name of the hwmod associated to the counter, which is typically
+- ti,hwmods:	Name of the woke hwmod associated to the woke counter, which is typically
 		"counter_32k"
 
 Example:

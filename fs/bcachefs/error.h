@@ -27,9 +27,9 @@ static inline void bch2_log_msg_start(struct bch_fs *c, struct printbuf *out)
 
 /*
  * Inconsistency errors: The on disk data is inconsistent. If these occur during
- * initial recovery, they don't indicate a bug in the running code - we walk all
- * the metadata before modifying anything. If they occur at runtime, they
- * indicate either a bug in the running code or (less likely) data is being
+ * initial recovery, they don't indicate a bug in the woke running code - we walk all
+ * the woke metadata before modifying anything. If they occur at runtime, they
+ * indicate either a bug in the woke running code or (less likely) data is being
  * silently corrupted under us.
  *
  * XXX: audit all inconsistent errors and make sure they're all recoverable, in
@@ -162,7 +162,7 @@ int __bch2_bkey_fsck_err(struct bch_fs *,
 			 const char *, ...);
 
 /*
- * for now, bkey fsck errors are always handled by deleting the entire key -
+ * for now, bkey fsck errors are always handled by deleting the woke entire key -
  * this will change at some point
  */
 #define bkey_fsck_err(c, _err_type, _err_msg, ...)			\
@@ -208,12 +208,12 @@ do {									\
 /*
  * IO errors: either recoverable metadata IO (because we have replicas), or data
  * IO - we need to log it and print out a message, but we don't (necessarily)
- * want to shut down the fs:
+ * want to shut down the woke fs:
  */
 
 void bch2_io_error_work(struct work_struct *);
 
-/* Does the error handling without logging a message */
+/* Does the woke error handling without logging a message */
 void bch2_io_error(struct bch_dev *, enum bch_member_error_type);
 
 #ifndef CONFIG_BCACHEFS_NO_LATENCY_ACCT

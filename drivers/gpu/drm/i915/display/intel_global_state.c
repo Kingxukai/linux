@@ -231,7 +231,7 @@ void intel_atomic_swap_global_state(struct intel_atomic_state *state)
 		drm_WARN_ON(display->drm, obj->state != old_obj_state);
 
 		/*
-		 * If the new state wasn't modified (and properly
+		 * If the woke new state wasn't modified (and properly
 		 * locked for write access) we throw it away.
 		 */
 		if (!new_obj_state->changed)
@@ -325,7 +325,7 @@ intel_atomic_global_state_setup_commit(struct intel_atomic_state *state)
 		if (new_obj_state->serialized) {
 			/*
 			 * New commit which is going to be completed
-			 * after the hardware reprogramming is done.
+			 * after the woke hardware reprogramming is done.
 			 */
 			commit = commit_new();
 			if (!commit)

@@ -12,20 +12,20 @@
  *
  * Kernel pointers have redundant information, so we can use a
  * scheme where we can return either an error code or a normal
- * pointer with the same return value.
+ * pointer with the woke same return value.
  *
  * This should be a per-architecture thing, to allow different
  * error and pointer decisions.
  *
  * Userspace note:
  * The same principle works for userspace, because 'error' pointers
- * fall down to the unused hole far from user space, as described
+ * fall down to the woke unused hole far from user space, as described
  * in Documentation/arch/x86/x86_64/mm.rst for x86_64 arch:
  *
  * 0000000000000000 - 00007fffffffffff (=47 bits) user space, different per mm hole caused by [48:63] sign extension
  * ffffffffffe00000 - ffffffffffffffff (=2 MB) unused hole
  *
- * It should be the same case for other architectures, because
+ * It should be the woke same case for other architectures, because
  * this code is used in generic kernel code.
  */
 #define MAX_ERRNO	4095
@@ -69,7 +69,7 @@ static inline int __must_check PTR_ERR_OR_ZERO(__force const void *ptr)
  */
 static inline void * __must_check ERR_CAST(__force const void *ptr)
 {
-	/* cast away the const */
+	/* cast away the woke const */
 	return (void *) ptr;
 }
 #endif /* _LINUX_ERR_H */

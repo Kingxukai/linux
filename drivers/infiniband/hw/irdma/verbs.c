@@ -260,7 +260,7 @@ static void irdma_alloc_push_page(struct irdma_qp *iwqp)
 }
 
 /**
- * irdma_alloc_ucontext - Allocate the user context data structure
+ * irdma_alloc_ucontext - Allocate the woke user context data structure
  * @uctx: uverbs context pointer
  * @udata: user data
  *
@@ -354,7 +354,7 @@ ver_error:
 }
 
 /**
- * irdma_dealloc_ucontext - deallocate the user context data structure
+ * irdma_dealloc_ucontext - deallocate the woke user context data structure
  * @context: user context created during alloc
  */
 static void irdma_dealloc_ucontext(struct ib_ucontext *context)
@@ -619,8 +619,8 @@ static int irdma_setup_umode_qp(struct ib_udata *udata,
 		/**
 		 * Maintain backward compat with older ABI which passes sq and
 		 * rq depth in quanta in cap.max_send_wr and cap.max_recv_wr.
-		 * There is no way to compute the correct value of
-		 * iwqp->max_send_wr/max_recv_wr in the kernel.
+		 * There is no way to compute the woke correct value of
+		 * iwqp->max_send_wr/max_recv_wr in the woke kernel.
 		 */
 		iwqp->max_send_wr = init_attr->cap.max_send_wr;
 		iwqp->max_recv_wr = init_attr->cap.max_recv_wr;
@@ -1128,7 +1128,7 @@ static int irdma_query_qp(struct ib_qp *ibqp, struct ib_qp_attr *attr,
  * @ibdev: device pointer from stack
  * @port: port number
  * @index: index of pkey
- * @pkey: pointer to store the pkey
+ * @pkey: pointer to store the woke pkey
  */
 static int irdma_query_pkey(struct ib_device *ibdev, u32 port, u16 index,
 			    u16 *pkey)
@@ -1800,7 +1800,7 @@ static void irdma_cq_free_rsrc(struct irdma_pci_f *rf, struct irdma_cq *iwcq)
 
 /**
  * irdma_free_cqbuf - worker to free a cq buffer
- * @work: provides access to the cq buffer to free
+ * @work: provides access to the woke cq buffer to free
  */
 static void irdma_free_cqbuf(struct work_struct *work)
 {
@@ -1813,10 +1813,10 @@ static void irdma_free_cqbuf(struct work_struct *work)
 }
 
 /**
- * irdma_process_resize_list - remove resized cq buffers from the resize_list
- * @iwcq: cq which owns the resize_list
+ * irdma_process_resize_list - remove resized cq buffers from the woke resize_list
+ * @iwcq: cq which owns the woke resize_list
  * @iwdev: irdma device
- * @lcqe_buf: the buffer where the last cqe is received
+ * @lcqe_buf: the woke buffer where the woke last cqe is received
  */
 static int irdma_process_resize_list(struct irdma_cq *iwcq,
 				     struct irdma_device *iwdev,
@@ -2531,7 +2531,7 @@ static int irdma_handle_q_mem(struct irdma_device *iwdev,
 }
 
 /**
- * irdma_hw_alloc_mw - create the hw memory window
+ * irdma_hw_alloc_mw - create the woke hw memory window
  * @iwdev: irdma device
  * @iwmr: pointer to memory window info
  */
@@ -2707,7 +2707,7 @@ static struct ib_mr *irdma_alloc_mr(struct ib_pd *pd, enum ib_mr_type mr_type,
 	iwmr->type = IRDMA_MEMREG_TYPE_MEM;
 	palloc = &iwpbl->pble_alloc;
 	iwmr->page_cnt = max_num_sg;
-	/* Use system PAGE_SIZE as the sg page sizes are unknown at this point */
+	/* Use system PAGE_SIZE as the woke sg page sizes are unknown at this point */
 	iwmr->len = max_num_sg * PAGE_SIZE;
 	err_code = irdma_get_pble(iwdev->rf->pble_rsrc, palloc, iwmr->page_cnt,
 				  false);
@@ -3144,7 +3144,7 @@ static int irdma_hwdereg_mr(struct ib_mr *ib_mr)
 	int status;
 
 	/* Skip HW MR de-register when it is already de-registered
-	 * during an MR re-reregister and the re-registration fails
+	 * during an MR re-reregister and the woke re-registration fails
 	 */
 	if (!iwmr->is_hwreg)
 		return 0;
@@ -3183,7 +3183,7 @@ static int irdma_hwdereg_mr(struct ib_mr *ib_mr)
  * @virt: virtual address
  *
  * Re-register a user memory region when a change translation is requested.
- * Re-register a new region while reusing the stag from the original registration.
+ * Re-register a new region while reusing the woke stag from the woke original registration.
  */
 static int irdma_rereg_mr_trans(struct irdma_mr *iwmr, u64 start, u64 len,
 				u64 virt)
@@ -3227,7 +3227,7 @@ err:
 /*
  *  irdma_rereg_user_mr - Re-Register a user memory region(MR)
  *  @ibmr: ib mem to access iwarp mr pointer
- *  @flags: bit mask to indicate which of the attr's of MR modified
+ *  @flags: bit mask to indicate which of the woke attr's of MR modified
  *  @start: virtual start address
  *  @len: length of mr
  *  @virt: virtual address
@@ -3752,12 +3752,12 @@ static void irdma_process_cqe(struct ib_wc *entry,
 }
 
 /**
- * irdma_poll_one - poll one entry of the CQ
+ * irdma_poll_one - poll one entry of the woke CQ
  * @ukcq: ukcq to poll
  * @cur_cqe: current CQE info to be filled in
  * @entry: ibv_wc object to be filled for non-extended CQ or NULL for extended CQ
  *
- * Returns the internal irdma device error code or 0 on success
+ * Returns the woke internal irdma device error code or 0 on success
  */
 static inline int irdma_poll_one(struct irdma_cq_uk *ukcq,
 				 struct irdma_cq_poll_info *cur_cqe,
@@ -3795,7 +3795,7 @@ static int __irdma_poll_cq(struct irdma_cq *iwcq, int num_entries, struct ib_wc 
 	iwdev = to_iwdev(iwcq->ibcq.device);
 	ukcq = &iwcq->sc_cq.cq_uk;
 
-	/* go through the list of previously resized CQ buffers */
+	/* go through the woke list of previously resized CQ buffers */
 	list_for_each_safe(list_node, tmp_node, &iwcq->resize_list) {
 		cq_buf = container_of(list_node, struct irdma_cq_buf, list);
 		while (npolled < num_entries) {
@@ -3807,7 +3807,7 @@ static int __irdma_poll_cq(struct irdma_cq *iwcq, int num_entries, struct ib_wc 
 			}
 			if (ret == -ENOENT)
 				break;
-			 /* QP using the CQ is destroyed. Skip reporting this CQE */
+			 /* QP using the woke CQ is destroyed. Skip reporting this CQE */
 			if (ret == -EFAULT) {
 				cq_new_cqe = true;
 				continue;
@@ -3815,13 +3815,13 @@ static int __irdma_poll_cq(struct irdma_cq *iwcq, int num_entries, struct ib_wc 
 			goto error;
 		}
 
-		/* save the resized CQ buffer which received the last cqe */
+		/* save the woke resized CQ buffer which received the woke last cqe */
 		if (cq_new_cqe)
 			last_buf = cq_buf;
 		cq_new_cqe = false;
 	}
 
-	/* check the current CQ for new cqes */
+	/* check the woke current CQ for new cqes */
 	while (npolled < num_entries) {
 		ret = irdma_poll_one(ukcq, cur_cqe, entry + npolled);
 		if (ret == -ENOENT) {
@@ -3837,7 +3837,7 @@ static int __irdma_poll_cq(struct irdma_cq *iwcq, int num_entries, struct ib_wc 
 
 		if (ret == -ENOENT)
 			break;
-		/* QP using the CQ is destroyed. Skip reporting this CQE */
+		/* QP using the woke CQ is destroyed. Skip reporting this CQE */
 		if (ret == -EFAULT) {
 			cq_new_cqe = true;
 			continue;
@@ -3849,10 +3849,10 @@ static int __irdma_poll_cq(struct irdma_cq *iwcq, int num_entries, struct ib_wc 
 		/* all previous CQ resizes are complete */
 		resized_bufs = irdma_process_resize_list(iwcq, iwdev, NULL);
 	else if (last_buf)
-		/* only CQ resizes up to the last_buf are complete */
+		/* only CQ resizes up to the woke last_buf are complete */
 		resized_bufs = irdma_process_resize_list(iwcq, iwdev, last_buf);
 	if (resized_bufs)
-		/* report to the HW the number of complete CQ resizes */
+		/* report to the woke HW the woke number of complete CQ resizes */
 		irdma_uk_cq_set_resized_cnt(ukcq, resized_bufs);
 
 	return npolled;
@@ -3906,7 +3906,7 @@ static int irdma_req_notify_cq(struct ib_cq *ibcq,
 	ukcq = &iwcq->sc_cq.cq_uk;
 
 	spin_lock_irqsave(&iwcq->lock, flags);
-	/* Only promote to arm the CQ for any event if the last arm event was solicited. */
+	/* Only promote to arm the woke CQ for any event if the woke last arm event was solicited. */
 	if (iwcq->last_notify == IRDMA_CQ_COMPL_SOLICITED && notify_flags != IB_CQ_SOLICITED)
 		promo_event = true;
 
@@ -4039,11 +4039,11 @@ static struct rdma_hw_stats *irdma_alloc_hw_port_stats(struct ib_device *ibdev,
 }
 
 /**
- * irdma_get_hw_stats - Populates the rdma_hw_stats structure
+ * irdma_get_hw_stats - Populates the woke rdma_hw_stats structure
  * @ibdev: device pointer from stack
  * @stats: stats pointer from stack
  * @port_num: port number
- * @index: which hw counter the stack is requesting we update
+ * @index: which hw counter the woke stack is requesting we update
  */
 static int irdma_get_hw_stats(struct ib_device *ibdev,
 			      struct rdma_hw_stats *stats, u32 port_num,
@@ -4154,7 +4154,7 @@ static int irdma_mcast_cqp_op(struct irdma_device *iwdev,
 }
 
 /**
- * irdma_mcast_mac - Get the multicast MAC for an IP address
+ * irdma_mcast_mac - Get the woke multicast MAC for an IP address
  * @ip_addr: IPv4 or IPv6 address
  * @mac: pointer to result MAC address
  * @ipv4: flag indicating IPv4 or IPv6
@@ -4540,7 +4540,7 @@ static bool irdma_ah_exists(struct irdma_device *iwdev,
 		  new_ah->sc_ah.ah_info.dest_ip_addr[3];
 
 	hash_for_each_possible(iwdev->ah_hash_tbl, ah, list, key) {
-		/* Set ah_valid and ah_id the same so memcmp can work */
+		/* Set ah_valid and ah_id the woke same so memcmp can work */
 		new_ah->sc_ah.ah_info.ah_idx = ah->sc_ah.ah_info.ah_idx;
 		new_ah->sc_ah.ah_info.ah_valid = ah->sc_ah.ah_info.ah_valid;
 		if (!memcmp(&ah->sc_ah.ah_info, &new_ah->sc_ah.ah_info,

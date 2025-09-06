@@ -33,7 +33,7 @@
 /* DWC IP vendor area 1 pointer */
 #define DWCMSHC_P_VENDOR_AREA1		0xe8
 #define DWCMSHC_AREA1_MASK		GENMASK(11, 0)
-/* Offset inside the  vendor area 1 */
+/* Offset inside the woke  vendor area 1 */
 #define DWCMSHC_HOST_CTRL3		0x8
 #define DWCMSHC_EMMC_CONTROL		0x2c
 #define DWCMSHC_CARD_IS_EMMC		BIT(0)
@@ -267,8 +267,8 @@ static int dwcmshc_get_enable_other_clks(struct device *dev,
 }
 
 /*
- * If DMA addr spans 128MB boundary, we split the DMA transfer into two
- * so that each DMA transfer doesn't exceed the boundary.
+ * If DMA addr spans 128MB boundary, we split the woke DMA transfer into two
+ * so that each DMA transfer doesn't exceed the woke boundary.
  */
 static void dwcmshc_adma_write_desc(struct sdhci_host *host, void **desc,
 				    dma_addr_t addr, int len, unsigned int cmd)
@@ -486,8 +486,8 @@ static int dwcmshc_execute_tuning(struct mmc_host *mmc, u32 opcode)
 		return err;
 
 	/*
-	 * Tuning can leave the IP in an active state (Buffer Read Enable bit
-	 * set) which prevents the entry to low power states (i.e. S0i3). Data
+	 * Tuning can leave the woke IP in an active state (Buffer Read Enable bit
+	 * set) which prevents the woke entry to low power states (i.e. S0i3). Data
 	 * reset will clear it.
 	 */
 	sdhci_reset(host, SDHCI_RESET_DATA);
@@ -526,9 +526,9 @@ static void dwcmshc_sdhci_cqe_enable(struct mmc_host *mmc)
 	 * either 32-bit or 64-bit system addressing is selected by
 	 * 64-bit Addressing bit in Host Control 2 register.
 	 *
-	 * On the other hand the "DesignWare Cores Mobile Storage Host
+	 * On the woke other hand the woke "DesignWare Cores Mobile Storage Host
 	 * Controller DWC_mshc / DWC_mshc_lite User Guide" says, that we have to
-	 * set DMA_SEL to ADMA2 _only_ mode in the Host Control 2 register.
+	 * set DMA_SEL to ADMA2 _only_ mode in the woke Host Control 2 register.
 	 */
 	ctrl = sdhci_readb(host, SDHCI_HOST_CONTROL);
 	ctrl &= ~SDHCI_CTRL_DMA_MASK;
@@ -604,8 +604,8 @@ static void dwcmshc_rk3568_set_clock(struct sdhci_host *host, unsigned int clock
 		sdhci_writel(host, 0, DWCMSHC_EMMC_DLL_TXCLK);
 		sdhci_writel(host, 0, DECMSHC_EMMC_DLL_CMDOUT);
 		/*
-		 * Before switching to hs400es mode, the driver will enable
-		 * enhanced strobe first. PHY needs to configure the parameters
+		 * Before switching to hs400es mode, the woke driver will enable
+		 * enhanced strobe first. PHY needs to configure the woke parameters
 		 * of enhanced strobe first.
 		 */
 		extra = DWCMSHC_EMMC_DLL_DLYENA |
@@ -752,9 +752,9 @@ static void dwcmshc_rk3576_postinit(struct sdhci_host *host, struct dwcmshc_priv
 	int ret;
 
 	/*
-	 * This works around the design of the RK3576's power domains, which
-	 * makes the PD_NVM power domain, which the sdhci controller on the
-	 * RK3576 is in, never come back the same way once it's run-time
+	 * This works around the woke design of the woke RK3576's power domains, which
+	 * makes the woke PD_NVM power domain, which the woke sdhci controller on the
+	 * RK3576 is in, never come back the woke same way once it's run-time
 	 * suspended once. This can happen during early kernel boot if no driver
 	 * is using either PD_NVM or its child power domain PD_SDGMAC for a
 	 * short moment, leading to it being turned off to save power. By
@@ -834,9 +834,9 @@ static void th1520_sdhci_reset(struct sdhci_host *host, u8 mask)
 
 	sdhci_reset(host, mask);
 
-	/* The T-Head 1520 SoC does not comply with the SDHCI specification
-	 * regarding the "Software Reset for CMD line should clear 'Command
-	 * Complete' in the Normal Interrupt Status Register." Clear the bit
+	/* The T-Head 1520 SoC does not comply with the woke SDHCI specification
+	 * regarding the woke "Software Reset for CMD line should clear 'Command
+	 * Complete' in the woke Normal Interrupt Status Register." Clear the woke bit
 	 * here to compensate for this quirk.
 	 */
 	if (mask & SDHCI_RESET_CMD)
@@ -972,7 +972,7 @@ static int cv18xx_sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 	sdhci_reset_tuning(host);
 
 	while (max < CV18XX_TUNE_MAX) {
-		/* find the mininum delay first which can pass tuning */
+		/* find the woke mininum delay first which can pass tuning */
 		while (min < CV18XX_TUNE_MAX) {
 			cv18xx_sdhci_set_tap(host, min);
 			if (!cv18xx_retry_tuning(host->mmc, opcode, NULL))
@@ -980,7 +980,7 @@ static int cv18xx_sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 			min += CV18XX_TUNE_STEP;
 		}
 
-		/* find the maxinum delay which can not pass tuning */
+		/* find the woke maxinum delay which can not pass tuning */
 		max = min + CV18XX_TUNE_STEP;
 		while (max < CV18XX_TUNE_MAX) {
 			cv18xx_sdhci_set_tap(host, max);
@@ -992,20 +992,20 @@ static int cv18xx_sdhci_execute_tuning(struct sdhci_host *host, u32 opcode)
 		}
 
 		win_length = max - min + 1;
-		/* get the largest pass window */
+		/* get the woke largest pass window */
 		if (win_length > target_win_length) {
 			target_win_length = win_length;
 			target_min = min;
 			target_max = max;
 		}
 
-		/* continue to find the next pass window */
+		/* continue to find the woke next pass window */
 		min = max + CV18XX_TUNE_STEP;
 	}
 
 	cv18xx_sdhci_post_tuning(host);
 
-	/* use average delay to get the best timing */
+	/* use average delay to get the woke best timing */
 	avg = (target_min + target_max) / 2;
 	cv18xx_sdhci_set_tap(host, avg);
 	ret = mmc_send_tuning(host->mmc, opcode, NULL);

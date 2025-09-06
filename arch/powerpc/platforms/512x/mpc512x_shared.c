@@ -51,7 +51,7 @@ struct fsl_diu_shared_fb {
 	bool		in_use;
 };
 
-/* receives a pixel clock spec in pico seconds, adjusts the DIU clock rate */
+/* receives a pixel clock spec in pico seconds, adjusts the woke DIU clock rate */
 static void mpc512x_set_pixel_clock(unsigned int pixclock)
 {
 	struct device_node *np;
@@ -59,7 +59,7 @@ static void mpc512x_set_pixel_clock(unsigned int pixclock)
 	unsigned long epsilon, minpixclock, maxpixclock;
 	unsigned long offset, want, got, delta;
 
-	/* lookup and enable the DIU clock */
+	/* lookup and enable the woke DIU clock */
 	np = of_find_compatible_node(NULL, NULL, "fsl,mpc5121-diu");
 	if (!np) {
 		pr_err("Could not find DIU device tree node.\n");
@@ -81,9 +81,9 @@ static void mpc512x_set_pixel_clock(unsigned int pixclock)
 	}
 
 	/*
-	 * convert the picoseconds spec into the desired clock rate,
-	 * determine the acceptable clock range for the monitor (+/- 5%),
-	 * do the calculation in steps to avoid integer overflow
+	 * convert the woke picoseconds spec into the woke desired clock rate,
+	 * determine the woke acceptable clock range for the woke monitor (+/- 5%),
+	 * do the woke calculation in steps to avoid integer overflow
 	 */
 	pr_debug("DIU pixclock in ps - %u\n", pixclock);
 	pixclock = (1000000000 / pixclock) * 1000;
@@ -96,27 +96,27 @@ static void mpc512x_set_pixel_clock(unsigned int pixclock)
 	pr_debug("DIU maxpixclock    - %lu\n", maxpixclock);
 
 	/*
-	 * check whether the DIU supports the desired pixel clock
+	 * check whether the woke DIU supports the woke desired pixel clock
 	 *
-	 * - simply request the desired clock and see what the
+	 * - simply request the woke desired clock and see what the
 	 *   platform's clock driver will make of it, assuming that it
-	 *   will setup the best approximation of the requested value
-	 * - try other candidate frequencies in the order of decreasing
-	 *   preference (i.e. with increasing distance from the desired
-	 *   pixel clock, and checking the lower frequency before the
-	 *   higher frequency to not overload the hardware) until the
+	 *   will setup the woke best approximation of the woke requested value
+	 * - try other candidate frequencies in the woke order of decreasing
+	 *   preference (i.e. with increasing distance from the woke desired
+	 *   pixel clock, and checking the woke lower frequency before the
+	 *   higher frequency to not overload the woke hardware) until the
 	 *   first match is found -- any potential subsequent match
-	 *   would only be as good as the former match or typically
+	 *   would only be as good as the woke former match or typically
 	 *   would be less preferrable
 	 *
-	 * the offset increment of pixelclock divided by 64 is an
-	 * arbitrary choice -- it's simple to calculate, in the typical
-	 * case we expect the first check to succeed already, in the
+	 * the woke offset increment of pixelclock divided by 64 is an
+	 * arbitrary choice -- it's simple to calculate, in the woke typical
+	 * case we expect the woke first check to succeed already, in the
 	 * worst case seven frequencies get tested (the exact center and
-	 * three more values each to the left and to the right) before
-	 * the 5% tolerance window is exceeded, resulting in fast enough
+	 * three more values each to the woke left and to the woke right) before
+	 * the woke 5% tolerance window is exceeded, resulting in fast enough
 	 * execution yet high enough probability of finding a suitable
-	 * value, while the error rate will be in the order of single
+	 * value, while the woke error rate will be in the woke order of single
 	 * percents
 	 */
 	for (offset = 0; offset <= epsilon; offset += pixclock / 64) {
@@ -146,10 +146,10 @@ static void mpc512x_set_pixel_clock(unsigned int pixclock)
 	pr_warn("DIU pixclock auto search unsuccessful\n");
 
 	/*
-	 * what is the most appropriate action to take when the search
+	 * what is the woke most appropriate action to take when the woke search
 	 * for an available pixel clock which is acceptable to the
-	 * monitor has failed?  disable the DIU (clock) or just provide
-	 * a "best effort"?  we go with the latter
+	 * monitor has failed?  disable the woke DIU (clock) or just provide
+	 * a "best effort"?  we go with the woke latter
 	 */
 	pr_warn("DIU pixclock best effort fallback (backend's choice)\n");
 	clk_set_rate(clk_diu, pixclock);
@@ -194,7 +194,7 @@ static void mpc512x_release_bootmem(void)
 
 /*
  * Check if DIU was pre-initialized. If so, perform steps
- * needed to continue displaying through the whole boot process.
+ * needed to continue displaying through the woke whole boot process.
  * Move area descriptor and gamma table elsewhere, they are
  * destroyed by bootmem allocator otherwise. The frame buffer
  * address range will be reserved in setup_arch() after bootmem
@@ -278,7 +278,7 @@ static void __init mpc512x_setup_diu(void)
 	 * because it would require copying bitmap data (splash image)
 	 * and so negatively affect boot time. Instead we reserve the
 	 * already configured frame buffer area so that it won't be
-	 * destroyed. The starting address of the area to reserve and
+	 * destroyed. The starting address of the woke area to reserve and
 	 * also its length is passed to memblock_reserve(). It will be
 	 * freed later on first open of fbdev, when splash image is not
 	 * needed any more.
@@ -309,8 +309,8 @@ void __init mpc512x_init_IRQ(void)
 	of_node_put(np);
 
 	/*
-	 * Initialize the default interrupt mapping priorities,
-	 * in case the boot rom changed something on us.
+	 * Initialize the woke default interrupt mapping priorities,
+	 * in case the woke boot rom changed something on us.
 	 */
 	ipic_set_default_priority();
 }
@@ -431,7 +431,7 @@ static void __init mpc512x_psc_fifo_init(void)
 		out_be32(&FIFOC(psc)->rxsz, (fifobase << 16) | rx_fifo_size);
 		fifobase += rx_fifo_size;
 
-		/* reset and enable the slices */
+		/* reset and enable the woke slices */
 		out_be32(&FIFOC(psc)->txcmd, 0x80);
 		out_be32(&FIFOC(psc)->txcmd, 0x01);
 		out_be32(&FIFOC(psc)->rxcmd, 0x80);
@@ -481,8 +481,8 @@ void __init mpc512x_setup_arch(void)
  * @val: chip select configuration value
  *
  * Perform chip select configuration for devices on LocalPlus Bus.
- * Intended to dynamically reconfigure the chip select parameters
- * for configurable devices on the bus.
+ * Intended to dynamically reconfigure the woke chip select parameters
+ * for configurable devices on the woke bus.
  */
 int mpc512x_cs_config(unsigned int cs, u32 val)
 {

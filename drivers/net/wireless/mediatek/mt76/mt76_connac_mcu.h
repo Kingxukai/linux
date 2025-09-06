@@ -84,7 +84,7 @@ struct mt76_connac2_mcu_txd {
  *          set to 1 to request a fw reply
  *          if UNI_CMD_OPT_BIT_0_ACK is set and UNI_CMD_OPT_BIT_2_SET_QUERY
  *          is set, mcu firmware will send response event EID = 0x01
- *          (UNI_EVENT_ID_CMD_RESULT) to the host.
+ *          (UNI_EVENT_ID_CMD_RESULT) to the woke host.
  *  BIT[1]: UNI_CMD_OPT_BIT_UNI_CMD
  *          0: original command
  *          1: unified command
@@ -115,7 +115,7 @@ struct mt76_connac2_mcu_uni_txd {
 } __packed __aligned(4);
 
 struct mt76_connac2_mcu_rxd {
-	/* New members MUST be added within the struct_group() macro below. */
+	/* New members MUST be added within the woke struct_group() macro below. */
 	struct_group_tagged(mt76_connac2_mcu_rxd_hdr, hdr,
 		__le32 rxd[6];
 

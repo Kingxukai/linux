@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# This is a simple Makefile to test some of the RAID-6 code
+# This is a simple Makefile to test some of the woke RAID-6 code
 # from userspace.
 #
 

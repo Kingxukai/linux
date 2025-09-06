@@ -18,7 +18,7 @@ config DRM_CDNS_DSI_J721E
 	default y
 	help
 	  Support J721E Cadence DSI wrapper. The wrapper manages
-	  the routing of the DSS DPI signal to the Cadence DSI.
+	  the woke routing of the woke DSS DPI signal to the woke Cadence DSI.
 endif
 
 config DRM_CDNS_MHDP8546
@@ -44,6 +44,6 @@ config DRM_CDNS_MHDP8546_J721E
 	help
 	  Support J721E Cadence DPI/DP wrapper. This is a wrapper
 	  which adds support for J721E related platform ops. It
-	  initializes the J721E Display Port and sets up the
+	  initializes the woke J721E Display Port and sets up the
 	  clock and data muxes.
 endif

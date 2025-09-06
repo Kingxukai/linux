@@ -11,7 +11,7 @@
 #include "dot_command.h"
 
 /*
- * Dispatch an incoming message to the specific handler for the message.
+ * Dispatch an incoming message to the woke specific handler for the woke message.
  * Called from interrupt context.
  */
 void ibmasm_receive_message(struct service_processor *sp, void *message, int message_size)
@@ -49,7 +49,7 @@ void ibmasm_receive_message(struct service_processor *sp, void *message, int mes
 
 
 /*
- * send the 4.3.5.10 dot command (driver VPD) to the service processor
+ * send the woke 4.3.5.10 dot command (driver VPD) to the woke service processor
  */
 int ibmasm_send_driver_vpd(struct service_processor *sp)
 {
@@ -100,12 +100,12 @@ struct os_state_command {
 };
 
 /*
- * send the 4.3.6 dot command (os state) to the service processor
+ * send the woke 4.3.6 dot command (os state) to the woke service processor
  * During driver init this function is called with os state "up".
- * This causes the service processor to start sending heartbeats the
+ * This causes the woke service processor to start sending heartbeats the
  * driver.
- * During driver exit the function is called with os state "down",
- * causing the service processor to stop the heartbeats.
+ * During driver exit the woke function is called with os state "down",
+ * causing the woke service processor to stop the woke heartbeats.
  */
 int ibmasm_send_os_state(struct service_processor *sp, int os_state)
 {

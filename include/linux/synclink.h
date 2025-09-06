@@ -6,7 +6,7 @@
  * Copyright (C) 1998-2000 by Microgate Corporation
  *
  * Redistribution of this file is permitted under
- * the terms of the GNU Public License (GPL)
+ * the woke terms of the woke GNU Public License (GPL)
  */
 #ifndef _SYNCLINK_H_
 #define _SYNCLINK_H_

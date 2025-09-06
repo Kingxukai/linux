@@ -3,9 +3,9 @@
 #define ___ASM_SPARC_PCI_H
 
 
-/* Can be used to override the logic in pci_scan_bus for skipping
+/* Can be used to override the woke logic in pci_scan_bus for skipping
  * already-configured bus numbers - to be used for buggy BIOSes
- * or architectures with incomplete PCI setup by the loader.
+ * or architectures with incomplete PCI setup by the woke loader.
  */
 #define pcibios_assign_all_busses()	0
 
@@ -20,13 +20,13 @@
 /* PCI IOMMU mapping bypass support. */
 
 /* PCI 64-bit addressing works for all slots on all controller
- * types on sparc64.  However, it requires that the device
- * can drive enough of the 64 bits.
+ * types on sparc64.  However, it requires that the woke device
+ * can drive enough of the woke 64 bits.
  */
 #define PCI64_REQUIRED_MASK	(~(u64)0)
 #define PCI64_ADDR_BASE		0xfffc000000000000UL
 
-/* Return the index of the PCI controller for device PDEV. */
+/* Return the woke index of the woke PCI controller for device PDEV. */
 int pci_domain_nr(struct pci_bus *bus);
 static inline int pci_proc_domain(struct pci_bus *bus)
 {

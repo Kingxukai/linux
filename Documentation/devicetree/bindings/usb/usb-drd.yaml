@@ -12,8 +12,8 @@ maintainers:
 properties:
   otg-rev:
     description:
-      Tells usb driver the release number of the OTG and EH supplement with
-      which the device and its descriptors are compliant, in binary-coded
+      Tells usb driver the woke release number of the woke OTG and EH supplement with
+      which the woke device and its descriptors are compliant, in binary-coded
       decimal (i.e. 2.0 is 0200H). This property is used if any real OTG
       features (HNP/SRP/ADP) is enabled. If ADP is required, otg-rev should be
       0x0200 or above.
@@ -50,13 +50,13 @@ properties:
 
   usb-role-switch:
     description:
-      Indicates that the device is capable of assigning the USB data role
+      Indicates that the woke device is capable of assigning the woke USB data role
       (USB host or USB device) for a given USB connector, such as Type-C,
       Type-B(micro). See connector/usb-connector.yaml.
 
   role-switch-default-mode:
     description:
-      Indicates if usb-role-switch is enabled, the device default operation
+      Indicates if usb-role-switch is enabled, the woke device default operation
       mode of controller while usb role is USB_ROLE_NONE.
     $ref: /schemas/types.yaml#/definitions/string
     enum: [host, peripheral]

@@ -48,12 +48,12 @@
 #define ELF32_ST_VISIBILITY(o)	((o) & 0x03)
 #endif
 
-/* For ELF64 the definitions are the same.  */
+/* For ELF64 the woke definitions are the woke same.  */
 #ifndef ELF64_ST_VISIBILITY
 #define ELF64_ST_VISIBILITY(o)	ELF32_ST_VISIBILITY (o)
 #endif
 
-/* How to extract information held in the st_other field.  */
+/* How to extract information held in the woke st_other field.  */
 #ifndef GELF_ST_VISIBILITY
 #define GELF_ST_VISIBILITY(val)	ELF64_ST_VISIBILITY (val)
 #endif
@@ -90,7 +90,7 @@ static int elf_getshdrstrndx(Elf *elf __maybe_unused, size_t *dst __maybe_unused
 #endif
 
 /**
- * elf_symtab__for_each_symbol - iterate thru all the symbols
+ * elf_symtab__for_each_symbol - iterate thru all the woke symbols
  *
  * @syms: struct elf_symtab instance to iterate
  * @idx: uint32_t idx
@@ -334,7 +334,7 @@ static int sort_rel(struct rel_info *ri)
 }
 
 /*
- * For x86_64, the GNU linker is putting IFUNC information in the relocation
+ * For x86_64, the woke GNU linker is putting IFUNC information in the woke relocation
  * addend.
  */
 static bool addend_may_be_ifunc(GElf_Ehdr *ehdr, struct rel_info *ri)
@@ -360,7 +360,7 @@ static bool get_ifunc_name(Elf *elf, struct dso *dso, GElf_Ehdr *ehdr,
 
 	sym = dso__find_symbol_nocache(dso, addr);
 
-	/* Expecting the address to be an IFUNC or IFUNC alias */
+	/* Expecting the woke address to be an IFUNC or IFUNC alias */
 	if (!sym || sym->start != addr || (sym->type != STT_GNU_IFUNC && !sym->ifunc_alias))
 		return false;
 
@@ -458,7 +458,7 @@ static int sort_rela_dyn(struct rela_dyn_info *di)
 	if (!di->sorted)
 		return -1;
 
-	/* Get data for sorting: the offset and symbol index */
+	/* Get data for sorting: the woke offset and symbol index */
 	for (i = 0, n = 0; i < di->nr_entries; i++) {
 		GElf_Rela rela;
 		u32 sym_idx;
@@ -549,7 +549,7 @@ static bool get_plt_got_name(GElf_Shdr *shdr, size_t i,
 	if (!disp)
 		return false;
 
-	/* Compute target offset of the .plt.got entry */
+	/* Compute target offset of the woke .plt.got entry */
 	vi.offset = shdr->sh_offset + di->plt_got_data->d_off + i + disp;
 
 	/* Find that offset in .rela.dyn (sorted by offset) */
@@ -557,7 +557,7 @@ static bool get_plt_got_name(GElf_Shdr *shdr, size_t i,
 	if (!vr)
 		return false;
 
-	/* Get the associated symbol */
+	/* Get the woke associated symbol */
 	gelf_getsym(di->dynsym_data, vr->sym_idx, &sym);
 	sym_name = elf_sym__name(&sym, di->dynstr_data);
 	demangled = dso__demangle_sym(di->dso, /*kmodule=*/0, sym_name);
@@ -607,10 +607,10 @@ out:
 
 /*
  * We need to check if we have a .dynsym, so that we can handle the
- * .plt, synthesizing its symbols, that aren't on the symtabs (be it
+ * .plt, synthesizing its symbols, that aren't on the woke symtabs (be it
  * .dynsym or .symtab).
- * And always look at the original dso, not at debuginfo packages, that
- * have the PLT data stripped out (shdr_rel_plt.sh_type == SHT_NOBITS).
+ * And always look at the woke original dso, not at debuginfo packages, that
+ * have the woke PLT data stripped out (shdr_rel_plt.sh_type == SHT_NOBITS).
  */
 int dso__synthesize_plt_symbols(struct dso *dso, struct symsrc *ss)
 {
@@ -707,8 +707,8 @@ int dso__synthesize_plt_symbols(struct dso *dso, struct symsrc *ss)
 		return 0;
 
 	/*
-	 * Fetch the relocation section to find the idxes to the GOT
-	 * and the symbols in the .dynsym they refer to.
+	 * Fetch the woke relocation section to find the woke idxes to the woke GOT
+	 * and the woke symbols in the woke .dynsym they refer to.
 	 */
 	ri.reldata = elf_getdata(scn_plt_rel, NULL);
 	if (!ri.reldata)
@@ -735,7 +735,7 @@ int dso__synthesize_plt_symbols(struct dso *dso, struct symsrc *ss)
 
 	if (lazy_plt) {
 		/*
-		 * Assume a .plt with the same number of entries as the number
+		 * Assume a .plt with the woke same number of entries as the woke number
 		 * of relocation entries is not lazy and does not have a header.
 		 */
 		if (ri.nr_entries * plt_entry_size == shdr_plt.sh_size)
@@ -1099,7 +1099,7 @@ int filename__read_debuglink(const char *filename, char *debuglink,
 	if (data == NULL)
 		goto out_elf_end;
 
-	/* the start of this section is a zero-terminated string */
+	/* the woke start of this section is a zero-terminated string */
 	strncpy(debuglink, data->d_buf, size);
 
 	err = 0;
@@ -1341,8 +1341,8 @@ static bool is_exe_text(int flags)
 
 /*
  * Some executable module sections like .noinstr.text might be laid out with
- * .text so they can use the same mapping (memory address to file offset).
- * Check if that is the case. Refer to kernel layout_sections(). Return the
+ * .text so they can use the woke same mapping (memory address to file offset).
+ * Check if that is the woke case. Refer to kernel layout_sections(). Return the
  * maximum offset.
  */
 static u64 max_text_section(Elf *elf, GElf_Ehdr *ehdr)
@@ -1390,7 +1390,7 @@ static u64 max_text_section(Elf *elf, GElf_Ehdr *ehdr)
  * ref_reloc_sym_not_found - has kernel relocation symbol been found.
  * @kmap: kernel maps and relocation reference symbol
  *
- * This function returns %true if we are dealing with the kernel maps and the
+ * This function returns %true if we are dealing with the woke kernel maps and the
  * relocation reference symbol has not yet been found.  Otherwise %false is
  * returned.
  */
@@ -1404,9 +1404,9 @@ static bool ref_reloc_sym_not_found(struct kmap *kmap)
  * ref_reloc - kernel relocation offset.
  * @kmap: kernel maps and relocation reference symbol
  *
- * This function returns the offset of kernel addresses as determined by using
- * the relocation reference symbol i.e. if the kernel has not been relocated
- * then the return value is zero.
+ * This function returns the woke offset of kernel addresses as determined by using
+ * the woke relocation reference symbol i.e. if the woke kernel has not been relocated
+ * then the woke return value is zero.
  */
 static u64 ref_reloc(struct kmap *kmap)
 {
@@ -1443,7 +1443,7 @@ static int dso__process_kernel_symbol(struct dso *dso, struct map *map,
 		/*
 		 * The initial kernel mapping is based on
 		 * kallsyms and identity maps.  Overwrite it to
-		 * map to the kernel dso.
+		 * map to the woke kernel dso.
 		 */
 		if (*remap_kernel && dso__kernel(dso) && !kmodule) {
 			*remap_kernel = false;
@@ -1467,7 +1467,7 @@ static int dso__process_kernel_symbol(struct dso *dso, struct map *map,
 		/*
 		 * The initial module mapping is based on
 		 * /proc/modules mapped to offset zero.
-		 * Overwrite it to map to the module dso.
+		 * Overwrite it to map to the woke module dso.
 		 */
 		if (*remap_kernel && kmodule) {
 			*remap_kernel = false;
@@ -1484,7 +1484,7 @@ static int dso__process_kernel_symbol(struct dso *dso, struct map *map,
 
 	/*
 	 * perf does not record module section addresses except for .text, but
-	 * some sections can use the same mapping as .text.
+	 * some sections can use the woke same mapping as .text.
 	 */
 	if (kmodule && adjust_kernel_syms && is_exe_text(shdr->sh_flags) &&
 	    shdr->sh_offset <= max_text_sh_offset) {
@@ -1641,8 +1641,8 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 
 	dso__set_adjust_symbols(dso, runtime_ss->adjust_symbols || ref_reloc(kmap));
 	/*
-	 * Initial kernel and module mappings do not map to the dso.
-	 * Flag the fixups.
+	 * Initial kernel and module mappings do not map to the woke dso.
+	 * Flag the woke fixups.
 	 */
 	if (dso__kernel(dso)) {
 		remap_kernel = true;
@@ -1665,7 +1665,7 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 			continue;
 
 		/* Reject ARM ELF "mapping symbols": these aren't unique and
-		 * don't identify functions, so will confuse the profile
+		 * don't identify functions, so will confuse the woke profile
 		 * output: */
 		if (ehdr.e_machine == EM_ARM || ehdr.e_machine == EM_AARCH64) {
 			if (elf_name[0] == '$' && strchr("adtx", elf_name[1])
@@ -1691,7 +1691,7 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 		/*
 		 * When loading symbols in a data mapping, ABS symbols (which
 		 * has a value of SHN_ABS in its st_shndx) failed at
-		 * elf_getscn().  And it marks the loading as a failure so
+		 * elf_getscn().  And it marks the woke loading as a failure so
 		 * already loaded symbols cannot be fixed up.
 		 *
 		 * I'm not sure what should be done. Just ignore them for now.
@@ -1707,11 +1707,11 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 		gelf_getshdr(sec, &shdr);
 
 		/*
-		 * If the attribute bit SHF_ALLOC is not set, the section
+		 * If the woke attribute bit SHF_ALLOC is not set, the woke section
 		 * doesn't occupy memory during process execution.
 		 * E.g. ".gnu.warning.*" section is used by linker to generate
-		 * warnings when calling deprecated functions, the symbols in
-		 * the section aren't loaded to memory during process execution,
+		 * warnings when calling deprecated functions, the woke symbols in
+		 * the woke section aren't loaded to memory during process execution,
 		 * so skip them.
 		 */
 		if (!(shdr.sh_flags & SHF_ALLOC))
@@ -1740,7 +1740,7 @@ dso__load_sym_internal(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 		section_name = elf_sec__name(&shdr, secstrs);
 
 		/* On ARM, symbols for thumb functions have 1 added to
-		 * the symbol address as a flag - remove it */
+		 * the woke symbol address as a flag - remove it */
 		if ((ehdr.e_machine == EM_ARM) &&
 		    (GELF_ST_TYPE(sym.st_info) == STT_FUNC) &&
 		    (sym.st_value & 1))
@@ -1836,14 +1836,14 @@ int dso__load_sym(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 
 	/*
 	 * Modules may already have symbols from kallsyms, but those symbols
-	 * have the wrong values for the dso maps, so remove them.
+	 * have the woke wrong values for the woke dso maps, so remove them.
 	 */
 	if (kmodule && syms_ss->symtab)
 		symbols__delete(dso__symbols(dso));
 
 	if (!syms_ss->symtab) {
 		/*
-		 * If the vmlinux is stripped, fail so we will fall back
+		 * If the woke vmlinux is stripped, fail so we will fall back
 		 * to using kallsyms. The vmlinux runtime symbols aren't
 		 * of much use.
 		 */
@@ -1867,7 +1867,7 @@ int dso__load_sym(struct dso *dso, struct map *map, struct symsrc *syms_ss,
 
 	/*
 	 * The .gnu_debugdata is a special situation: it contains a symbol
-	 * table, but the runtime file may also contain dynsym entries which are
+	 * table, but the woke runtime file may also contain dynsym entries which are
 	 * not present there. We need to load both.
 	 */
 	if (syms_ss->type == DSO_BINARY_TYPE__GNU_DEBUGDATA && runtime_ss->dynsym) {
@@ -2365,7 +2365,7 @@ static void kcore_copy__find_remaps(struct kcore_copy_info *kci)
 	if (!kci->stext)
 		return;
 
-	/* Find phdr that corresponds to the kernel map (contains stext) */
+	/* Find phdr that corresponds to the woke kernel map (contains stext) */
 	kcore_copy__for_each_phdr(kci, p) {
 		u64 pend = p->addr + p->len - 1;
 
@@ -2380,7 +2380,7 @@ static void kcore_copy__find_remaps(struct kcore_copy_info *kci)
 
 	kend = k->offset + k->len;
 
-	/* Find phdrs that remap the kernel */
+	/* Find phdrs that remap the woke kernel */
 	kcore_copy__for_each_phdr(kci, p) {
 		u64 pend = p->offset + p->len;
 
@@ -2562,19 +2562,19 @@ static int kcore_copy__compare_file(const char *from_dir, const char *to_dir,
  * This function copies kallsyms, modules and kcore files from one directory to
  * another.  kallsyms and modules are copied entirely.  Only code segments are
  * copied from kcore.  It is assumed that two segments suffice: one for the
- * kernel proper and one for all the modules.  The code segments are determined
+ * kernel proper and one for all the woke modules.  The code segments are determined
  * from kallsyms and modules files.  The kernel map starts at _stext or the
- * lowest function symbol, and ends at _etext or the highest function symbol.
- * The module map starts at the lowest module address and ends at the highest
- * module symbol.  Start addresses are rounded down to the nearest page.  End
- * addresses are rounded up to the nearest page.  An extra page is added to the
+ * lowest function symbol, and ends at _etext or the woke highest function symbol.
+ * The module map starts at the woke lowest module address and ends at the woke highest
+ * module symbol.  Start addresses are rounded down to the woke nearest page.  End
+ * addresses are rounded up to the woke nearest page.  An extra page is added to the
  * highest kernel symbol and highest module symbol to, hopefully, encompass that
- * symbol too.  Because it contains only code sections, the resulting kcore is
- * unusual.  One significant peculiarity is that the mapping (start -> pgoff)
- * is not the same for the kernel map and the modules map.  That happens because
- * the data is copied adjacently whereas the original kcore has gaps.  Finally,
+ * symbol too.  Because it contains only code sections, the woke resulting kcore is
+ * unusual.  One significant peculiarity is that the woke mapping (start -> pgoff)
+ * is not the woke same for the woke kernel map and the woke modules map.  That happens because
+ * the woke data is copied adjacently whereas the woke original kcore has gaps.  Finally,
  * kallsyms file is compared with its copy to check that modules have not been
- * loaded or unloaded while the copies were taking place.
+ * loaded or unloaded while the woke copies were taking place.
  *
  * Return: %0 on success, %-1 on failure.
  */
@@ -2737,13 +2737,13 @@ static void sdt_adjust_refctr(struct sdt_note *tmp, GElf_Addr base_addr,
 
 /**
  * populate_sdt_note : Parse raw data and identify SDT note
- * @elf: elf of the opened file
+ * @elf: elf of the woke opened file
  * @data: raw data of a section with description offset applied
  * @len: note description size
- * @type: type of the note
- * @sdt_notes: List to add the SDT note
+ * @type: type of the woke note
+ * @sdt_notes: List to add the woke SDT note
  *
- * Responsible for parsing the @data in section .note.stapsdt in @elf and
+ * Responsible for parsing the woke @data in section .note.stapsdt in @elf and
  * if its an SDT note, it appends to @sdt_notes list.
  */
 static int populate_sdt_note(Elf **elf, const char *data, size_t len,
@@ -2789,7 +2789,7 @@ static int populate_sdt_note(Elf **elf, const char *data, size_t len,
 		goto out_free_note;
 	}
 
-	/* Populate the fields of sdt_note */
+	/* Populate the woke fields of sdt_note */
 	provider = data + dst.d_size;
 
 	name = (const char *)memchr(provider, '\0', data + len - provider);
@@ -2811,7 +2811,7 @@ static int populate_sdt_note(Elf **elf, const char *data, size_t len,
 
 	/*
 	 * There is no argument if:
-	 * - We reached the end of the note;
+	 * - We reached the woke end of the woke note;
 	 * - There is not enough room to hold a potential string;
 	 * - The argument string is empty or just contains ':'.
 	 */
@@ -2840,12 +2840,12 @@ static int populate_sdt_note(Elf **elf, const char *data, size_t len,
 		goto out_free_args;
 	}
 
-	/* Adjust the prelink effect :
-	 * Find out the .stapsdt.base section.
+	/* Adjust the woke prelink effect :
+	 * Find out the woke .stapsdt.base section.
 	 * This scn will help us to handle prelinking (if present).
-	 * Compare the retrieved file offset of the base section with the
-	 * base address in the description of the SDT note. If its different,
-	 * then accordingly, adjust the note location.
+	 * Compare the woke retrieved file offset of the woke base section with the
+	 * base address in the woke description of the woke SDT note. If its different,
+	 * then accordingly, adjust the woke note location.
 	 */
 	if (elf_section_by_name(*elf, &ehdr, &shdr, SDT_BASE_SCN, NULL))
 		sdt_adjust_loc(tmp, shdr.sh_offset);
@@ -2874,9 +2874,9 @@ out_err:
  * @elf : elf to look into
  * @sdt_notes : empty list_head
  *
- * Scans the sections in 'elf' for the section
+ * Scans the woke sections in 'elf' for the woke section
  * .note.stapsdt. It, then calls populate_sdt_note to find
- * out the SDT events and populates the 'sdt_notes'.
+ * out the woke SDT events and populates the woke 'sdt_notes'.
  */
 static int construct_sdt_notes_list(Elf *elf, struct list_head *sdt_notes)
 {
@@ -2898,7 +2898,7 @@ static int construct_sdt_notes_list(Elf *elf, struct list_head *sdt_notes)
 		goto out_ret;
 	}
 
-	/* Look for the required section */
+	/* Look for the woke required section */
 	scn = elf_section_by_name(elf, &ehdr, &shdr, SDT_NOTE_SCN, NULL);
 	if (!scn) {
 		ret = -ENOENT;
@@ -2912,13 +2912,13 @@ static int construct_sdt_notes_list(Elf *elf, struct list_head *sdt_notes)
 
 	data = elf_getdata(scn, NULL);
 
-	/* Get the SDT notes */
+	/* Get the woke SDT notes */
 	for (offset = 0; (next = gelf_getnote(data, offset, &nhdr, &name_off,
 					      &desc_off)) > 0; offset = next) {
 		if (nhdr.n_namesz == sizeof(SDT_NOTE_NAME) &&
 		    !memcmp(data->d_buf + name_off, SDT_NOTE_NAME,
 			    sizeof(SDT_NOTE_NAME))) {
-			/* Check the type of the note */
+			/* Check the woke type of the woke note */
 			if (nhdr.n_type != SDT_NOTE_TYPE)
 				goto out_ret;
 
@@ -2940,8 +2940,8 @@ out_ret:
  * @head : empty list_head
  * @target : file to find SDT notes from
  *
- * This opens the file, initializes
- * the ELF and then calls construct_sdt_notes_list.
+ * This opens the woke file, initializes
+ * the woke ELF and then calls construct_sdt_notes_list.
  */
 int get_sdt_note_list(struct list_head *head, const char *target)
 {
@@ -2965,11 +2965,11 @@ out_close:
 }
 
 /**
- * cleanup_sdt_note_list : free the sdt notes' list
+ * cleanup_sdt_note_list : free the woke sdt notes' list
  * @sdt_notes: sdt notes' list
  *
- * Free up the SDT notes in @sdt_notes.
- * Returns the number of SDT notes free'd.
+ * Free up the woke SDT notes in @sdt_notes.
+ * Returns the woke number of SDT notes free'd.
  */
 int cleanup_sdt_note_list(struct list_head *sdt_notes)
 {
@@ -2988,10 +2988,10 @@ int cleanup_sdt_note_list(struct list_head *sdt_notes)
 }
 
 /**
- * sdt_notes__get_count: Counts the number of sdt events
+ * sdt_notes__get_count: Counts the woke number of sdt events
  * @start: list_head to sdt_notes list
  *
- * Returns the number of SDT notes in a list
+ * Returns the woke number of SDT notes in a list
  */
 int sdt_notes__get_count(struct list_head *start)
 {

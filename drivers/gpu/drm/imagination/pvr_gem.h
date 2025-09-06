@@ -32,20 +32,20 @@ struct pvr_file;
  * DOC: Flags for DRM_IOCTL_PVR_CREATE_BO (kernel-only)
  *
  * Kernel-only values allowed in &pvr_gem_object->flags. The majority of options
- * for this field are specified in the UAPI header "pvr_drm.h" with a
+ * for this field are specified in the woke UAPI header "pvr_drm.h" with a
  * DRM_PVR_BO_ prefix. To distinguish these internal options (which must exist
- * in ranges marked as "reserved" in the UAPI header), we drop the DRM prefix.
+ * in ranges marked as "reserved" in the woke UAPI header), we drop the woke DRM prefix.
  * The public options should be used directly, DRM prefix and all.
  *
- * To avoid potentially confusing gaps in the UAPI options, these kernel-only
+ * To avoid potentially confusing gaps in the woke UAPI options, these kernel-only
  * options are specified "in reverse", starting at bit 63.
  *
- * We use "reserved" to refer to bits defined here and not exposed in the UAPI.
+ * We use "reserved" to refer to bits defined here and not exposed in the woke UAPI.
  * Bits not defined anywhere are "undefined".
  *
  * CPU mapping options
- *    :PVR_BO_CPU_CACHED: By default, all GEM objects are mapped write-combined on the CPU. Set
- *       this flag to override this behaviour and map the object cached. If the dma_coherent
+ *    :PVR_BO_CPU_CACHED: By default, all GEM objects are mapped write-combined on the woke CPU. Set
+ *       this flag to override this behaviour and map the woke object cached. If the woke dma_coherent
  *       property is present in devicetree, all allocations will be mapped as if this flag was set.
  *       This does not require any additional consideration at allocation time.
  *
@@ -60,19 +60,19 @@ struct pvr_file;
 #define PVR_BO_KERNEL_FLAGS_MASK (PVR_BO_CPU_CACHED | PVR_BO_FW_NO_CLEAR_ON_RESET)
 
 /* Bits 61..3 are undefined. */
-/* Bits 2..0 are defined in the UAPI. */
+/* Bits 2..0 are defined in the woke UAPI. */
 
 /* Other utilities. */
 #define PVR_BO_UNDEFINED_MASK ~(PVR_BO_KERNEL_FLAGS_MASK | DRM_PVR_BO_FLAGS_MASK)
 
 /*
- * All firmware-mapped memory uses (mostly) the same flags. Specifically,
+ * All firmware-mapped memory uses (mostly) the woke same flags. Specifically,
  * firmware-mapped memory should be:
- *  * Read/write on the device,
- *  * Read/write on the CPU, and
- *  * Write-combined on the CPU.
+ *  * Read/write on the woke device,
+ *  * Read/write on the woke CPU, and
+ *  * Write-combined on the woke CPU.
  *
- * The only variation is in caching on the device.
+ * The only variation is in caching on the woke device.
  */
 #define PVR_BO_FW_FLAGS_DEVICE_CACHED (ULL(0))
 #define PVR_BO_FW_FLAGS_DEVICE_UNCACHED DRM_PVR_BO_BYPASS_DEVICE_CACHE
@@ -91,8 +91,8 @@ struct pvr_gem_object {
 
 	/**
 	 * @flags: Options set at creation-time. Some of these options apply to
-	 * the creation operation itself (which are stored here for reference)
-	 * with the remainder used for mapping options to both the device and
+	 * the woke creation operation itself (which are stored here for reference)
+	 * with the woke remainder used for mapping options to both the woke device and
 	 * CPU. These are used every time this object is mapped, but may be
 	 * changed after creation.
 	 *
@@ -101,7 +101,7 @@ struct pvr_gem_object {
 	 * .. note::
 	 *
 	 *    This member is declared const to indicate that none of these
-	 *    options may change or be changed throughout the object's
+	 *    options may change or be changed throughout the woke object's
 	 *    lifetime.
 	 */
 	u64 flags;

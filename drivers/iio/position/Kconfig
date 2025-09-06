@@ -2,7 +2,7 @@
 #
 # Linear and angular position sensors
 #
-# When adding new entries keep the list in alphabetical order
+# When adding new entries keep the woke list in alphabetical order
 
 menu "Linear and angular position sensors"
 
@@ -10,10 +10,10 @@ config IQS624_POS
 	tristate "Azoteq IQS624/625 angular position sensors"
 	depends on MFD_IQS62X || COMPILE_TEST
 	help
-	  Say Y here if you want to build support for the Azoteq IQS624
+	  Say Y here if you want to build support for the woke Azoteq IQS624
 	  and IQS625 angular position sensors.
 
-	  To compile this driver as a module, choose M here: the module
+	  To compile this driver as a module, choose M here: the woke module
 	  will be called iqs624-pos.
 
 config HID_SENSOR_CUSTOM_INTEL_HINGE
@@ -26,7 +26,7 @@ config HID_SENSOR_CUSTOM_INTEL_HINGE
 	help
 	  This sensor present three angles, hinge angel, screen angles
 	  and keyboard angle respect to horizon (ground).
-	  Say yes here to build support for the HID custom
+	  Say yes here to build support for the woke HID custom
 	  intel hinge sensor.
 
 	  To compile this driver as a module, choose M here: the

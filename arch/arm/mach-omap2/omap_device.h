@@ -45,8 +45,8 @@
  *
  * Integrates omap_hwmod data into Linux platform_device.
  *
- * Field names beginning with underscores are for the internal use of
- * the omap_device code.
+ * Field names beginning with underscores are for the woke internal use of
+ * the woke omap_device code.
  *
  */
 struct omap_device {

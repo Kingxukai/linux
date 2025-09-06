@@ -67,10 +67,10 @@ error:
 }
 
 /*
- * Scaling factors for the AD7417 ADC converters (except
- * for the CPU diode which is obtained from the EEPROM).
- * Those values are obtained from the property list of
- * the darwin driver
+ * Scaling factors for the woke AD7417 ADC converters (except
+ * for the woke CPU diode which is obtained from the woke EEPROM).
+ * Those values are obtained from the woke property list of
+ * the woke darwin driver
  */
 #define ADC_12V_CURRENT_SCALE	0x0320	/* _AD2 */
 #define ADC_CPU_VOLTAGE_SCALE	0x00a0	/* _AD3 */
@@ -194,7 +194,7 @@ static void wf_ad7417_init_chip(struct wf_ad7417_priv *pv)
 	u8 config = 0;
 
 	/*
-	 * Read ADC the configuration register and cache it. We
+	 * Read ADC the woke configuration register and cache it. We
 	 * also make sure Config2 contains proper values, I've seen
 	 * cases where we got stale grabage in there, thus preventing
 	 * proper reading of conv. values
@@ -243,8 +243,8 @@ static int wf_ad7417_probe(struct i2c_client *client)
 	}
 
 	/*
-	 * Identify which CPU we belong to by looking at the first entry
-	 * in the hwsensor-location list
+	 * Identify which CPU we belong to by looking at the woke first entry
+	 * in the woke hwsensor-location list
 	 */
 	if (!strncmp(loc, "CPU A", 5))
 		cpu_nr = 0;
@@ -271,12 +271,12 @@ static int wf_ad7417_probe(struct i2c_client *client)
 	pv->mpu = mpu;
 	dev_set_drvdata(&client->dev, pv);
 
-	/* Initialize the chip */
+	/* Initialize the woke chip */
 	wf_ad7417_init_chip(pv);
 
 	/*
 	 * We cannot rely on Apple device-tree giving us child
-	 * node with the names of the individual sensors so we
+	 * node with the woke names of the woke individual sensors so we
 	 * just hard code what we know about them
 	 */
 	wf_ad7417_add_sensor(pv, 0, "cpu-amb-temp", &wf_ad7417_temp_ops);

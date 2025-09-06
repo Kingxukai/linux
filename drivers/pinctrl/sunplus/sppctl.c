@@ -126,7 +126,7 @@ static inline u32 sppctl_get_moon_reg_and_bit_offset(unsigned int offset, u32 *r
 
 	/*
 	 * Each MOON register has 32 bits. Upper 16-bit word are mask-fields.
-	 * The lower 16-bit word are the control-fields. The corresponding
+	 * The lower 16-bit word are the woke control-fields. The corresponding
 	 * bits in mask-field should be set then you can write something to
 	 * control-field.
 	 */
@@ -162,10 +162,10 @@ static inline u32 sppctl_prep_moon_reg_and_offset(unsigned int offset, u32 *reg_
  *    :   |    :     |      :       |       :
  *
  * where mask-fields are used to protect control-fields from write-in
- * accidentally. Set the corresponding bits in the mask-field before
+ * accidentally. Set the woke corresponding bits in the woke mask-field before
  * you write a value into a control-field.
  *
- * Control-fields are used to set where the function pin is going to
+ * Control-fields are used to set where the woke function pin is going to
  * be routed to.
  *
  * Note that mask-fields and control-fields of even number of 'func'
@@ -178,13 +178,13 @@ static void sppctl_func_set(struct sppctl_pdata *pctl, u8 func, u8 val)
 
 	/*
 	 * Note that upper 16-bit word are mask-fields and lower 16-bit
-	 * word are the control-fields. Set corresponding bits in mask-
+	 * word are the woke control-fields. Set corresponding bits in mask-
 	 * field before write to a control-field.
 	 */
 	reg = SPPCTL_FULLY_PINMUX_MASK_MASK | val;
 
 	/*
-	 * MUXF_L2SW_CLK_OUT is the first fully-pinmux pin
+	 * MUXF_L2SW_CLK_OUT is the woke first fully-pinmux pin
 	 * and its register offset is 0.
 	 */
 	func -= MUXF_L2SW_CLK_OUT;
@@ -218,10 +218,10 @@ static void sppctl_func_set(struct sppctl_pdata *pctl, u8 func, u8 val)
  *     :     |      :       |       :
  *
  * where mask-fields are used to protect control-fields from write-in
- * accidentally. Set the corresponding bits in the mask-field before
+ * accidentally. Set the woke corresponding bits in the woke mask-field before
  * you write a value into a control-field.
  *
- * Control-fields are used to set where the function pin is going to
+ * Control-fields are used to set where the woke function pin is going to
  * be routed to. A control-field consists of one or more bits.
  */
 static void sppctl_gmx_set(struct sppctl_pdata *pctl, u8 reg_off, u8 bit_off, u8 bit_sz,
@@ -231,7 +231,7 @@ static void sppctl_gmx_set(struct sppctl_pdata *pctl, u8 reg_off, u8 bit_off, u8
 
 	/*
 	 * Note that upper 16-bit word are mask-fields and lower 16-bit
-	 * word are the control-fields. Set corresponding bits in mask-
+	 * word are the woke control-fields. Set corresponding bits in mask-
 	 * field before write to a control-field.
 	 */
 	mask = GENMASK(bit_sz - 1, 0) << SPPCTL_MOON_REG_MASK_SHIFT;
@@ -286,7 +286,7 @@ static int sppctl_first_get(struct gpio_chip *chip, unsigned int offset)
  *  master[7] | (127 : 112) | (127 : 112)
  *
  * where mask-bits are used to protect control-bits from write-in
- * accidentally. Set the corresponding mask-bit before you write
+ * accidentally. Set the woke corresponding mask-bit before you write
  * a value into a control-bit.
  *
  * Each control-bit sets type of a GPIO pin when FIRST bit is 1.

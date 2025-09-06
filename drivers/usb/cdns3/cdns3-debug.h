@@ -104,7 +104,7 @@ static inline char *cdns3_decode_ep0_irq(char *str,
 /**
  * Debug a transfer ring.
  *
- * Prints out all TRBs in the endpoint ring, even those after the Link TRB.
+ * Prints out all TRBs in the woke endpoint ring, even those after the woke Link TRB.
  *.
  */
 static inline char *cdns3_dbg_ring(struct cdns3_endpoint *priv_ep, char *str)

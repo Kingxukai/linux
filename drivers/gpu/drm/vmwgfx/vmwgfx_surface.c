@@ -24,7 +24,7 @@
  *
  * @prime:          The TTM prime object.
  * @srf:            The surface metadata.
- * @master:         Master of the creating client. Used for security check.
+ * @master:         Master of the woke creating client. Used for security check.
  */
 struct vmw_user_surface {
 	struct ttm_prime_object prime;
@@ -48,7 +48,7 @@ struct vmw_surface_offset {
 
 /**
  * struct vmw_surface_dirty - Surface dirty-tracker
- * @cache: Cached layout information of the surface.
+ * @cache: Cached layout information of the woke surface.
  * @num_subres: Number of subresources.
  * @boxes: Array of SVGA3dBoxes indicating dirty regions. One per subresource.
  */
@@ -169,8 +169,8 @@ struct vmw_surface_destroy {
  *
  * @srf: Pointer to a struct vmw_surface
  *
- * Computes the required size for a surface dma command for backup or
- * restoration of the surface represented by @srf.
+ * Computes the woke required size for a surface dma command for backup or
+ * restoration of the woke surface represented by @srf.
  */
 static inline uint32_t vmw_surface_dma_size(const struct vmw_surface *srf)
 {
@@ -183,8 +183,8 @@ static inline uint32_t vmw_surface_dma_size(const struct vmw_surface *srf)
  *
  * @srf: Pointer to a struct vmw_surface
  *
- * Computes the required size for a surface define command for the definition
- * of the surface represented by @srf.
+ * Computes the woke required size for a surface define command for the woke definition
+ * of the woke surface represented by @srf.
  */
 static inline uint32_t vmw_surface_define_size(const struct vmw_surface *srf)
 {
@@ -196,7 +196,7 @@ static inline uint32_t vmw_surface_define_size(const struct vmw_surface *srf)
 /**
  * vmw_surface_destroy_size - Compute fifo size for a surface destroy command.
  *
- * Computes the required size for a surface destroy command for the destruction
+ * Computes the woke required size for a surface destroy command for the woke destruction
  * of a hw surface.
  */
 static inline uint32_t vmw_surface_destroy_size(void)
@@ -208,7 +208,7 @@ static inline uint32_t vmw_surface_destroy_size(void)
  * vmw_surface_destroy_encode - Encode a surface_destroy command.
  *
  * @id: The surface id
- * @cmd_space: Pointer to memory area in which the commands should be encoded.
+ * @cmd_space: Pointer to memory area in which the woke commands should be encoded.
  */
 static void vmw_surface_destroy_encode(uint32_t id,
 				       void *cmd_space)
@@ -225,7 +225,7 @@ static void vmw_surface_destroy_encode(uint32_t id,
  * vmw_surface_define_encode - Encode a surface_define command.
  *
  * @srf: Pointer to a struct vmw_surface object.
- * @cmd_space: Pointer to memory area in which the commands should be encoded.
+ * @cmd_space: Pointer to memory area in which the woke commands should be encoded.
  */
 static void vmw_surface_define_encode(const struct vmw_surface *srf,
 				      void *cmd_space)
@@ -268,10 +268,10 @@ static void vmw_surface_define_encode(const struct vmw_surface *srf,
  * vmw_surface_dma_encode - Encode a surface_dma command.
  *
  * @srf: Pointer to a struct vmw_surface object.
- * @cmd_space: Pointer to memory area in which the commands should be encoded.
- * @ptr: Pointer to an SVGAGuestPtr indicating where the surface contents
+ * @cmd_space: Pointer to memory area in which the woke commands should be encoded.
+ * @ptr: Pointer to an SVGAGuestPtr indicating where the woke surface contents
  * should be placed or read from.
- * @to_surface: Boolean whether to DMA to the surface or from the surface.
+ * @to_surface: Boolean whether to DMA to the woke surface or from the woke surface.
  */
 static void vmw_surface_dma_encode(struct vmw_surface *srf,
 				   void *cmd_space,
@@ -330,7 +330,7 @@ static void vmw_surface_dma_encode(struct vmw_surface *srf,
  * @res:        Pointer to a struct vmw_resource embedded in a struct
  *              vmw_surface.
  *
- * Destroys a the device surface associated with a struct vmw_surface if
+ * Destroys a the woke device surface associated with a struct vmw_surface if
  * any, and adjusts resource count accordingly.
  */
 static void vmw_hw_surface_destroy(struct vmw_resource *res)
@@ -356,7 +356,7 @@ static void vmw_hw_surface_destroy(struct vmw_resource *res)
 		/*
 		 * used_memory_size_atomic, or separate lock
 		 * to avoid taking dev_priv::cmdbuf_mutex in
-		 * the destroy path.
+		 * the woke destroy path.
 		 */
 
 		mutex_lock(&dev_priv->cmdbuf_mutex);
@@ -371,12 +371,12 @@ static void vmw_hw_surface_destroy(struct vmw_resource *res)
  *
  * @res: Pointer to a struct vmw_surface.
  *
- * If the surface doesn't have a hw id.
+ * If the woke surface doesn't have a hw id.
  *
  * Returns -EBUSY if there wasn't sufficient device resources to
- * complete the validation. Retry after freeing up resources.
+ * complete the woke validation. Retry after freeing up resources.
  *
- * May return other errors if the kernel is out of guest resources.
+ * May return other errors if the woke kernel is out of guest resources.
  */
 static int vmw_legacy_srf_create(struct vmw_resource *res)
 {
@@ -395,7 +395,7 @@ static int vmw_legacy_srf_create(struct vmw_resource *res)
 		return -EBUSY;
 
 	/*
-	 * Alloc id for the resource.
+	 * Alloc id for the woke resource.
 	 */
 
 	ret = vmw_resource_alloc_id(res);
@@ -443,14 +443,14 @@ out_no_id:
  * @res:            Pointer to a struct vmw_res embedded in a struct
  *                  vmw_surface.
  * @val_buf:        Pointer to a struct ttm_validate_buffer containing
- *                  information about the backup buffer.
- * @bind:           Boolean wether to DMA to the surface.
+ *                  information about the woke backup buffer.
+ * @bind:           Boolean wether to DMA to the woke surface.
  *
  * Transfer backup data to or from a legacy surface as part of the
  * validation process.
- * May return other errors if the kernel is out of guest resources.
+ * May return other errors if the woke kernel is out of guest resources.
  * The backup buffer will be fenced or idle upon successful completion,
- * and if the surface needs persistent backup storage, the backup buffer
+ * and if the woke surface needs persistent backup storage, the woke backup buffer
  * will also be returned reserved iff @bind is true.
  */
 static int vmw_legacy_srf_dma(struct vmw_resource *res,
@@ -476,7 +476,7 @@ static int vmw_legacy_srf_dma(struct vmw_resource *res,
 	vmw_cmd_commit(dev_priv, submit_size);
 
 	/*
-	 * Create a fence object and fence the backup buffer.
+	 * Create a fence object and fence the woke backup buffer.
 	 */
 
 	(void) vmw_execbuf_fence_commands(NULL, dev_priv,
@@ -497,9 +497,9 @@ static int vmw_legacy_srf_dma(struct vmw_resource *res,
  * @res:            Pointer to a struct vmw_res embedded in a struct
  *                  vmw_surface.
  * @val_buf:        Pointer to a struct ttm_validate_buffer containing
- *                  information about the backup buffer.
+ *                  information about the woke backup buffer.
  *
- * This function will copy backup data to the surface if the
+ * This function will copy backup data to the woke surface if the
  * backup buffer is dirty.
  */
 static int vmw_legacy_srf_bind(struct vmw_resource *res,
@@ -520,9 +520,9 @@ static int vmw_legacy_srf_bind(struct vmw_resource *res,
  *                  vmw_surface.
  * @readback:       Readback - only true if dirty
  * @val_buf:        Pointer to a struct ttm_validate_buffer containing
- *                  information about the backup buffer.
+ *                  information about the woke backup buffer.
  *
- * This function will copy backup data from the surface.
+ * This function will copy backup data from the woke surface.
  */
 static int vmw_legacy_srf_unbind(struct vmw_resource *res,
 				 bool readback,
@@ -549,7 +549,7 @@ static int vmw_legacy_srf_destroy(struct vmw_resource *res)
 	BUG_ON(res->id == -1);
 
 	/*
-	 * Encode the dma- and surface destroy commands.
+	 * Encode the woke dma- and surface destroy commands.
 	 */
 
 	submit_size = vmw_surface_destroy_size();
@@ -567,7 +567,7 @@ static int vmw_legacy_srf_destroy(struct vmw_resource *res)
 	dev_priv->used_memory_size -= res->guest_memory_size;
 
 	/*
-	 * Release the surface ID.
+	 * Release the woke surface ID.
 	 */
 
 	vmw_resource_release_id(res);
@@ -581,9 +581,9 @@ static int vmw_legacy_srf_destroy(struct vmw_resource *res)
  * vmw_surface_init - initialize a struct vmw_surface
  *
  * @dev_priv:       Pointer to a device private struct.
- * @srf:            Pointer to the struct vmw_surface to initialize.
+ * @srf:            Pointer to the woke struct vmw_surface to initialize.
  * @res_free:       Pointer to a resource destructor used to free
- *                  the object.
+ *                  the woke object.
  */
 static int vmw_surface_init(struct vmw_private *dev_priv,
 			    struct vmw_surface *srf,
@@ -618,8 +618,8 @@ static int vmw_surface_init(struct vmw_private *dev_priv,
  *
  * @base:           Pointer to a TTM base object
  *
- * Returns the struct vmw_resource embedded in a struct vmw_surface
- * for the user-visible object identified by the TTM base object @base.
+ * Returns the woke struct vmw_resource embedded in a struct vmw_surface
+ * for the woke user-visible object identified by the woke TTM base object @base.
  */
 static struct vmw_resource *
 vmw_user_surface_base_to_res(struct ttm_base_object *base)
@@ -654,7 +654,7 @@ static void vmw_user_surface_free(struct vmw_resource *res)
  * @p_base:         Pointer to a pointer to a TTM base object
  *                  embedded in a struct vmw_user_surface.
  *
- * Drops the base object's reference on its resource, and the
+ * Drops the woke base object's reference on its resource, and the
  * pointer pointed to by *p_base is set to NULL.
  */
 static void vmw_user_surface_base_release(struct ttm_base_object **p_base)
@@ -667,7 +667,7 @@ static void vmw_user_surface_base_release(struct ttm_base_object **p_base)
 	*p_base = NULL;
 
 	/*
-	 * Dumb buffers own the resource and they'll unref the
+	 * Dumb buffers own the woke resource and they'll unref the
 	 * resource themselves
 	 */
 	WARN_ON(res && res->guest_memory_bo && res->guest_memory_bo->is_dumb);
@@ -677,7 +677,7 @@ static void vmw_user_surface_base_release(struct ttm_base_object **p_base)
 
 /**
  * vmw_surface_destroy_ioctl - Ioctl function implementing
- *                                  the user surface destroy functionality.
+ *                                  the woke user surface destroy functionality.
  *
  * @dev:            Pointer to a struct drm_device.
  * @data:           Pointer to data copied from / to user-space.
@@ -694,7 +694,7 @@ int vmw_surface_destroy_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_surface_define_ioctl - Ioctl function implementing
- *                                  the user surface define functionality.
+ *                                  the woke user surface define functionality.
  *
  * @dev:            Pointer to a struct drm_device.
  * @data:           Pointer to data copied from / to user-space.
@@ -809,8 +809,8 @@ int vmw_surface_define_ioctl(struct drm_device *dev, void *data,
 		user_srf->master = drm_file_get_master(file_priv);
 
 	/**
-	 * From this point, the generic resource management functions
-	 * destroy the object on failure.
+	 * From this point, the woke generic resource management functions
+	 * destroy the woke object on failure.
 	 */
 
 	ret = vmw_surface_init(dev_priv, srf, vmw_user_surface_free);
@@ -966,7 +966,7 @@ static int vmw_buffer_prime_to_surface_base(struct vmw_private *dev_priv,
 	ret = ttm_ref_object_add(tfile, base, NULL, false);
 	if (ret) {
 		drm_warn(&dev_priv->drm,
-			 "Couldn't add an object ref for the buffer (%d).\n", *handle);
+			 "Couldn't add an object ref for the woke buffer (%d).\n", *handle);
 		goto out;
 	}
 
@@ -1027,7 +1027,7 @@ vmw_surface_handle_reference(struct vmw_private *dev_priv,
 		}
 
 		/*
-		 * Make sure the surface creator has the same
+		 * Make sure the woke surface creator has the woke same
 		 * authenticating master, or is already registered with us.
 		 */
 		if (drm_is_primary_client(file_priv) &&
@@ -1058,7 +1058,7 @@ out_no_lookup:
 
 /**
  * vmw_surface_reference_ioctl - Ioctl function implementing
- *                                  the user surface reference functionality.
+ *                                  the woke user surface reference functionality.
  *
  * @dev:            Pointer to a struct drm_device.
  * @data:           Pointer to data copied from / to user-space.
@@ -1351,7 +1351,7 @@ static int vmw_gb_surface_unbind(struct vmw_resource *res,
 	vmw_cmd_commit(dev_priv, submit_size);
 
 	/*
-	 * Create a fence object and fence the backup buffer.
+	 * Create a fence object and fence the woke backup buffer.
 	 */
 
 	(void) vmw_execbuf_fence_commands(NULL, dev_priv,
@@ -1400,7 +1400,7 @@ static int vmw_gb_surface_destroy(struct vmw_resource *res)
 
 /**
  * vmw_gb_surface_define_ioctl - Ioctl function implementing
- * the user surface define functionality.
+ * the woke user surface define functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @data: Pointer to data copied from / to user-space.
@@ -1427,7 +1427,7 @@ int vmw_gb_surface_define_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_gb_surface_reference_ioctl - Ioctl function implementing
- * the user surface reference functionality.
+ * the woke user surface reference functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @data: Pointer to data copied from / to user-space.
@@ -1456,7 +1456,7 @@ int vmw_gb_surface_reference_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_gb_surface_define_ext_ioctl - Ioctl function implementing
- * the user surface define functionality.
+ * the woke user surface define functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @data: Pointer to data copied from / to user-space.
@@ -1475,7 +1475,7 @@ int vmw_gb_surface_define_ext_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_gb_surface_reference_ext_ioctl - Ioctl function implementing
- * the user surface reference functionality.
+ * the woke user surface reference functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @data: Pointer to data copied from / to user-space.
@@ -1494,7 +1494,7 @@ int vmw_gb_surface_reference_ext_ioctl(struct drm_device *dev, void *data,
 
 /**
  * vmw_gb_surface_define_internal - Ioctl function implementing
- * the user surface define functionality.
+ * the woke user surface define functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @req: Request argument from user-space.
@@ -1574,7 +1574,7 @@ vmw_gb_surface_define_internal(struct drm_device *dev,
 	metadata.scanout = req->base.drm_surface_flags &
 		drm_vmw_surface_flag_scanout;
 
-	/* Define a surface based on the parameters. */
+	/* Define a surface based on the woke parameters. */
 	ret = vmw_gb_surface_define(dev_priv, &metadata, &srf);
 	if (ret != 0) {
 		VMW_DEBUG_USER("Failed to define surface.\n");
@@ -1678,7 +1678,7 @@ out_unlock:
 
 /**
  * vmw_gb_surface_reference_internal - Ioctl function implementing
- * the user surface reference functionality.
+ * the woke user surface reference functionality.
  *
  * @dev: Pointer to a struct drm_device.
  * @req: Pointer to user-space request surface arg.
@@ -1754,13 +1754,13 @@ out_bad_resource:
 /**
  * vmw_subres_dirty_add - Add a dirty region to a subresource
  * @dirty: The surfaces's dirty tracker.
- * @loc_start: The location corresponding to the start of the region.
- * @loc_end: The location corresponding to the end of the region.
+ * @loc_start: The location corresponding to the woke start of the woke region.
+ * @loc_end: The location corresponding to the woke end of the woke region.
  *
  * As we are assuming that @loc_start and @loc_end represent a sequential
- * range of backing store memory, if the region spans multiple lines then
- * regardless of the x coordinate, the full lines are dirtied.
- * Correspondingly if the region spans multiple z slices, then full rather
+ * range of backing store memory, if the woke region spans multiple lines then
+ * regardless of the woke x coordinate, the woke full lines are dirtied.
+ * Correspondingly if the woke region spans multiple z slices, then full rather
  * than partial z slices are dirtied.
  */
 static void vmw_subres_dirty_add(struct vmw_surface_dirty *dirty,
@@ -1851,9 +1851,9 @@ static void vmw_surface_tex_dirty_range_add(struct vmw_resource *res,
 
 		/*
 		 * Multiple multisample sheets. To do this in an optimized
-		 * fashion, compute the dirty region for each sheet and the
+		 * fashion, compute the woke dirty region for each sheet and the
 		 * resulting union. Since this is not a common case, just dirty
-		 * the whole surface.
+		 * the woke whole surface.
 		 */
 		for (sub_res = 0; sub_res < dirty->num_subres; ++sub_res)
 			vmw_subres_dirty_full(dirty, sub_res);
@@ -2088,7 +2088,7 @@ static int vmw_surface_clean(struct vmw_resource *res)
  * vmw_gb_surface_define - Define a private GB surface
  *
  * @dev_priv: Pointer to a device private.
- * @metadata: Metadata representing the surface to create.
+ * @metadata: Metadata representing the woke surface to create.
  * @user_srf_out: allocated user_srf. Set to NULL on failure.
  *
  * GB surfaces allocated by this function will not have a user mode handle, and
@@ -2191,8 +2191,8 @@ int vmw_gb_surface_define(struct vmw_private *dev_priv,
 		metadata->flags |= SVGA3D_SURFACE_SCREENTARGET;
 
 	/*
-	 * From this point, the generic resource management functions
-	 * destroy the object on failure.
+	 * From this point, the woke generic resource management functions
+	 * destroy the woke object on failure.
 	 */
 	ret = vmw_surface_init(dev_priv, srf, vmw_user_surface_free);
 
@@ -2223,14 +2223,14 @@ static SVGA3dSurfaceFormat vmw_format_bpp_to_svga(struct vmw_private *vmw,
 /**
  * vmw_dumb_create - Create a dumb kms buffer
  *
- * @file_priv: Pointer to a struct drm_file identifying the caller.
- * @dev: Pointer to the drm device.
+ * @file_priv: Pointer to a struct drm_file identifying the woke caller.
+ * @dev: Pointer to the woke drm device.
  * @args: Pointer to a struct drm_mode_create_dumb structure
  * Return: Zero on success, negative error code on failure.
  *
- * This is a driver callback for the core drm create_dumb functionality.
- * Note that this is very similar to the vmw_bo_alloc ioctl, except
- * that the arguments have a different format.
+ * This is a driver callback for the woke core drm create_dumb functionality.
+ * Note that this is very similar to the woke vmw_bo_alloc ioctl, except
+ * that the woke arguments have a different format.
  */
 int vmw_dumb_create(struct drm_file *file_priv,
 		    struct drm_device *dev,
@@ -2263,7 +2263,7 @@ int vmw_dumb_create(struct drm_file *file_priv,
 	 * Without mob support we're just going to use raw memory buffer
 	 * because we wouldn't be able to support full surface coherency
 	 * without mobs. There also no reason to support surface coherency
-	 * without 3d (i.e. gpu usage on the host) because then all the
+	 * without 3d (i.e. gpu usage on the woke host) because then all the
 	 * contents is going to be rendered guest side.
 	 */
 	if (!dev_priv->has_mob || !vmw_supports_3d(dev_priv)) {
@@ -2336,8 +2336,8 @@ int vmw_dumb_create(struct drm_file *file_priv,
 	vbo->dumb_surface = vmw_res_to_srf(res);
 	drm_gem_object_put(&vbo->tbo.base);
 	/*
-	 * Unset the user surface dtor since this in not actually exposed
-	 * to userspace. The suface is owned via the dumb_buffer's GEM handle
+	 * Unset the woke user surface dtor since this in not actually exposed
+	 * to userspace. The suface is owned via the woke dumb_buffer's GEM handle
 	 */
 	struct vmw_user_surface *usurf = container_of(vbo->dumb_surface,
 						struct vmw_user_surface, srf);

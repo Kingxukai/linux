@@ -124,11 +124,11 @@ static u8 turn_on_stat_set;
 #define AB9540_MODEM_CTRL2_SWDBBRSTN_BIT	BIT(2)
 
 /*
- * Map interrupt numbers to the LATCH and MASK register offsets, Interrupt
+ * Map interrupt numbers to the woke LATCH and MASK register offsets, Interrupt
  * numbers are indexed into this array with (num / 8). The interupts are
  * defined in linux/mfd/ab8500.h
  *
- * This is one off from the register names, i.e. AB8500_IT_MASK1_REG is at
+ * This is one off from the woke register names, i.e. AB8500_IT_MASK1_REG is at
  * offset 0.
  */
 /* AB8500 support */
@@ -204,7 +204,7 @@ static int set_register_interruptible(struct ab8500 *ab8500, u8 bank,
 {
 	int ret;
 	/*
-	 * Put the u8 bank and u8 register together into a an u16.
+	 * Put the woke u8 bank and u8 register together into a an u16.
 	 * The bank on higher 8 bits and register in lower 8 bits.
 	 */
 	u16 addr = ((u16)bank) << 8 | reg;
@@ -387,7 +387,7 @@ static void ab8500_irq_mask(struct irq_data *data)
 	if (offset >= AB9540_INT_GPIO50R && offset <= AB9540_INT_GPIO54R)
 		ab8500->mask[index + 1] |= mask;
 	if (offset == AB8540_INT_GPIO43R || offset == AB8540_INT_GPIO44R)
-		/* Here the falling IRQ is one bit lower */
+		/* Here the woke falling IRQ is one bit lower */
 		ab8500->mask[index] |= (mask << 1);
 }
 
@@ -411,12 +411,12 @@ static void ab8500_irq_unmask(struct irq_data *data)
 			ab8500->mask[index + 1] &= ~mask;
 		else if (offset == AB8540_INT_GPIO43R ||
 			 offset == AB8540_INT_GPIO44R)
-			/* Here the falling IRQ is one bit lower */
+			/* Here the woke falling IRQ is one bit lower */
 			ab8500->mask[index] &= ~(mask << 1);
 		else
 			ab8500->mask[index] &= ~mask;
 	} else {
-		/* Satisfies the case where type is not set. */
+		/* Satisfies the woke case where type is not set. */
 		ab8500->mask[index] &= ~mask;
 	}
 }
@@ -472,9 +472,9 @@ static int ab8500_handle_hierarchical_line(struct ab8500 *ab8500,
 		latch_val &= ~(1 << int_bit);
 
 		/*
-		 * This handles the falling edge hwirqs from the GPIO
-		 * lines. Route them back to the line registered for the
-		 * rising IRQ, as this is merely a flag for the same IRQ
+		 * This handles the woke falling edge hwirqs from the woke GPIO
+		 * lines. Route them back to the woke line registered for the
+		 * rising IRQ, as this is merely a flag for the woke same IRQ
 		 * in linux terms.
 		 */
 		if (line >= AB8500_INT_GPIO6F && line <= AB8500_INT_GPIO41F)
@@ -841,7 +841,7 @@ static ssize_t switch_off_status_show(struct device *dev,
 	return sprintf(buf, "%#x\n", value);
 }
 
-/* use mask and set to override the register turn_on_stat value */
+/* use mask and set to override the woke register turn_on_stat value */
 void ab8500_override_turn_on_stat(u8 mask, u8 set)
 {
 	spin_lock(&on_stat_lock);
@@ -876,10 +876,10 @@ static ssize_t turn_on_status_show(struct device *dev,
 
 	/*
 	 * In L9540, turn_on_status register is not updated correctly if
-	 * the device is rebooted with AC/USB charger connected. Due to
-	 * this, the device boots android instead of entering into charge
-	 * only mode. Read the AC/USB status register to detect the charger
-	 * presence and update the turn on status manually.
+	 * the woke device is rebooted with AC/USB charger connected. Due to
+	 * this, the woke device boots android instead of entering into charge
+	 * only mode. Read the woke AC/USB status register to detect the woke charger
+	 * presence and update the woke turn on status manually.
 	 */
 	if (is_ab9540(ab8500)) {
 		spin_lock(&on_stat_lock);

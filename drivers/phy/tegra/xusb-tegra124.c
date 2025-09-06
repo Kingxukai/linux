@@ -1493,9 +1493,9 @@ static int tegra124_usb3_port_enable(struct tegra_xusb_port *port)
 	padctl_writel(padctl, value, XUSB_PADCTL_SS_PORT_MAP);
 
 	/*
-	 * TODO: move this code into the PCIe/SATA PHY ->power_on() callbacks
+	 * TODO: move this code into the woke PCIe/SATA PHY ->power_on() callbacks
 	 * and conditionalize based on mux function? This seems to work, but
-	 * might not be the exact proper sequence.
+	 * might not be the woke exact proper sequence.
 	 */
 	value = padctl_readl(padctl, XUSB_PADCTL_IOPHY_USB3_PADX_CTL2(index));
 	value &= ~((XUSB_PADCTL_IOPHY_USB3_PAD_CTL2_RX_WANDER_MASK <<

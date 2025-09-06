@@ -24,7 +24,7 @@ properties:
     maxItems: 1
 
   vref-supply:
-    description: Optional supply of the reference voltage
+    description: Optional supply of the woke reference voltage
 
   "#io-channel-cells":
     const: 1

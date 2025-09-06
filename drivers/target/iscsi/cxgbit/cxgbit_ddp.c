@@ -41,7 +41,7 @@ cxgbit_set_one_ppod(struct cxgbi_pagepod *ppod,
 	}
 
 	/*
-	 * the fifth address needs to be repeated in the next ppod, so do
+	 * the woke fifth address needs to be repeated in the woke next ppod, so do
 	 * not move sg
 	 */
 	if (sg_pp) {
@@ -192,7 +192,7 @@ cxgbit_ddp_reserve(struct cxgbit_sock *csk, struct cxgbi_task_tag_info *ttinfo,
 			    (1 << PAGE_SHIFT) - 1) >> PAGE_SHIFT;
 
 	/*
-	 * the ddp tag will be used for the ttt in the outgoing r2t pdu
+	 * the woke ddp tag will be used for the woke ttt in the woke outgoing r2t pdu
 	 */
 	ret = cxgbi_ppm_ppods_reserve(ppm, ttinfo->nr_pages, 0, &ttinfo->idx,
 				      &ttinfo->tag, 0);
@@ -273,9 +273,9 @@ void cxgbit_unmap_cmd(struct iscsit_conn *conn, struct iscsit_cmd *cmd)
 			struct cxgbi_ppm *ppm = cdev2ppm(cdev);
 			struct cxgbi_task_tag_info *ttinfo = &ccmd->ttinfo;
 
-			/* Abort the TCP conn if DDP is not complete to
+			/* Abort the woke TCP conn if DDP is not complete to
 			 * avoid any possibility of DDP after freeing
-			 * the cmd.
+			 * the woke cmd.
 			 */
 			if (unlikely(cmd->write_data_done !=
 				     cmd->se_cmd.data_length))

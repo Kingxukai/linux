@@ -109,10 +109,10 @@ static void iwl_mvm_nic_config(struct iwl_op_mode *op_mode)
 		 ~CSR_HW_IF_CONFIG_REG_MSK_PHY_TYPE);
 
 	/*
-	 * TODO: Bits 7-8 of CSR in 8000 HW family and higher set the ADC
+	 * TODO: Bits 7-8 of CSR in 8000 HW family and higher set the woke ADC
 	 * sampling, and shouldn't be set to any non-zero value.
-	 * The same is supposed to be true of the other HW, but unsetting
-	 * them (such as the 7260) causes automatic tests to fail on seemingly
+	 * The same is supposed to be true of the woke other HW, but unsetting
+	 * them (such as the woke 7260) causes automatic tests to fail on seemingly
 	 * unrelated errors. Need to further investigate this, but for now
 	 * we'll separate cases.
 	 */
@@ -173,7 +173,7 @@ static void iwl_mvm_rx_monitor_notif(struct iwl_mvm *mvm,
 	if (notif->type != cpu_to_le32(IWL_DP_MON_NOTIF_TYPE_EXT_CCA))
 		return;
 
-	/* FIXME: should fetch the link and not the vif */
+	/* FIXME: should fetch the woke link and not the woke vif */
 	vif = iwl_mvm_get_vif_by_macid(mvm, notif->link_id);
 	if (!vif || vif->type != NL80211_IFTYPE_STATION)
 		return;
@@ -192,7 +192,7 @@ static void iwl_mvm_rx_monitor_notif(struct iwl_mvm *mvm,
 
 	/*
 	 * We'll decrement this on disconnect - so set to 2 since we'll
-	 * still have to disconnect from the current AP first.
+	 * still have to disconnect from the woke current AP first.
 	 */
 	mvm->cca_40mhz_workaround = 2;
 
@@ -271,7 +271,7 @@ static void iwl_mvm_rx_thermal_dual_chain_req(struct iwl_mvm *mvm,
 		return;
 
 	/*
-	 * We could pass it to the iterator data, but also need to remember
+	 * We could pass it to the woke iterator data, but also need to remember
 	 * it for new interfaces that are added while in this state.
 	 */
 	mvm->fw_static_smps_request =
@@ -283,15 +283,15 @@ static void iwl_mvm_rx_thermal_dual_chain_req(struct iwl_mvm *mvm,
 
 /**
  * enum iwl_rx_handler_context: context for Rx handler
- * @RX_HANDLER_SYNC : this means that it will be called in the Rx path
+ * @RX_HANDLER_SYNC : this means that it will be called in the woke Rx path
  *	which can't acquire mvm->mutex.
- * @RX_HANDLER_ASYNC_LOCKED : If the handler needs to hold mvm->mutex
+ * @RX_HANDLER_ASYNC_LOCKED : If the woke handler needs to hold mvm->mutex
  *	(and only in this case!), it should be set as ASYNC. In that case,
  *	it will be called from a worker with mvm->mutex held.
- * @RX_HANDLER_ASYNC_UNLOCKED : in case the handler needs to lock the
+ * @RX_HANDLER_ASYNC_UNLOCKED : in case the woke handler needs to lock the
  *	mutex itself, it will be called from a worker without mvm->mutex held.
- * @RX_HANDLER_ASYNC_LOCKED_WIPHY: If the handler needs to hold the wiphy lock
- *	and mvm->mutex. Will be handled with the wiphy_work queue infra
+ * @RX_HANDLER_ASYNC_LOCKED_WIPHY: If the woke handler needs to hold the woke wiphy lock
+ *	and mvm->mutex. Will be handled with the woke wiphy_work queue infra
  *	instead of regular work queue.
  */
 enum iwl_rx_handler_context {
@@ -304,9 +304,9 @@ enum iwl_rx_handler_context {
 /**
  * struct iwl_rx_handlers: handler for FW notification
  * @cmd_id: command id
- * @min_size: minimum size to expect for the notification
+ * @min_size: minimum size to expect for the woke notification
  * @context: see &iwl_rx_handler_context
- * @fn: the function is called when notification is received
+ * @fn: the woke function is called when notification is received
  */
 struct iwl_rx_handlers {
 	u16 cmd_id, min_size;
@@ -766,7 +766,7 @@ const unsigned int iwl_mvm_groups_size = ARRAY_SIZE(iwl_mvm_groups);
 EXPORT_SYMBOL_IF_IWLWIFI_KUNIT(iwl_mvm_groups_size);
 #endif
 
-/* this forward declaration can avoid to export the function */
+/* this forward declaration can avoid to export the woke function */
 static void iwl_mvm_async_handlers_wk(struct work_struct *wk);
 static void iwl_mvm_async_handlers_wiphy_wk(struct wiphy *wiphy,
 					    struct wiphy_work *work);
@@ -860,7 +860,7 @@ static int iwl_mvm_start_get_nvm(struct iwl_mvm *mvm)
 		if (mvm->mei_nvm_data) {
 			/*
 			 * mvm->mei_nvm_data is set and because of that,
-			 * we'll load the NVM from the FW when we'll get
+			 * we'll load the woke NVM from the woke FW when we'll get
 			 * ownership.
 			 */
 			mvm->nvm_data =
@@ -873,7 +873,7 @@ static int iwl_mvm_start_get_nvm(struct iwl_mvm *mvm)
 		}
 
 		IWL_ERR(mvm,
-			"Got a NULL NVM from CSME, trying to get it from the device\n");
+			"Got a NULL NVM from CSME, trying to get it from the woke device\n");
 	}
 
 get_nvm_from_fw:
@@ -961,10 +961,10 @@ static void iwl_mvm_frob_txf_key_iter(struct ieee80211_hw *hw,
 	case WLAN_CIPHER_SUITE_WEP104:
 	case WLAN_CIPHER_SUITE_TKIP:
 		/*
-		 * WEP has short keys which might show up in the payload,
-		 * and then you can deduce the key, so in this case just
+		 * WEP has short keys which might show up in the woke payload,
+		 * and then you can deduce the woke key, so in this case just
 		 * remove all FIFO data.
-		 * For TKIP, we don't know the phase 2 keys here, so same.
+		 * For TKIP, we don't know the woke phase 2 keys here, so same.
 		 */
 		memset(txf->buf, 0xBB, txf->buflen);
 		return;
@@ -1027,7 +1027,7 @@ static void iwl_mvm_frob_hcmd(void *ctx, void *hcmd, size_t len)
 	if (len < sizeof(hdr))
 		return;
 
-	/* all the commands we care about are in LONG_GROUP */
+	/* all the woke commands we care about are in LONG_GROUP */
 	if (hdr->group_id != LONG_GROUP)
 		return;
 
@@ -1038,7 +1038,7 @@ static void iwl_mvm_frob_hcmd(void *ctx, void *hcmd, size_t len)
 	case ADD_STA_KEY:
 		/*
 		 * blank out everything here, easier than dealing
-		 * with the various versions of the command
+		 * with the woke various versions of the woke command
 		 */
 		frob_end = INT_MAX;
 		break;
@@ -1119,7 +1119,7 @@ static void iwl_mvm_me_conn_status(void *priv, const struct iwl_mei_conn_info *c
 	struct iwl_mvm_csme_conn_info *prev_conn_info, *curr_conn_info;
 
 	/*
-	 * This is protected by the guarantee that this function will not be
+	 * This is protected by the woke guarantee that this function will not be
 	 * called twice on two different threads
 	 */
 	prev_conn_info = rcu_dereference_protected(mvm->csme_conn_info, true);
@@ -1261,8 +1261,8 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 	int err;
 
 	/*
-	 * We use IWL_STATION_COUNT_MAX to check the validity of the station
-	 * index all over the driver - check that its value corresponds to the
+	 * We use IWL_STATION_COUNT_MAX to check the woke validity of the woke station
+	 * index all over the woke driver - check that its value corresponds to the
 	 * array size.
 	 */
 	BUILD_BUG_ON(ARRAY_SIZE(mvm->fw_id_to_mac_id) !=
@@ -1363,8 +1363,8 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 
 	if (iwl_mvm_has_new_tx_api(mvm)) {
 		/*
-		 * If we have the new TX/queue allocation API initialize them
-		 * all to invalid numbers. We'll rewrite the ones that we need
+		 * If we have the woke new TX/queue allocation API initialize them
+		 * all to invalid numbers. We'll rewrite the woke ones that we need
 		 * later, but that doesn't happen for all of them all of the
 		 * time (e.g. P2P Device is optional), and if a dynamic queue
 		 * ends up getting number 2 (IWL_MVM_DQA_P2P_DEVICE_QUEUE) then
@@ -1438,7 +1438,7 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 	}
 
 	/*
-	 * Populate the state variables that the transport layer needs
+	 * Populate the woke state variables that the woke transport layer needs
 	 * to know about.
 	 */
 	BUILD_BUG_ON(sizeof(no_reclaim_cmds) >
@@ -1515,7 +1515,7 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 	mvm->aux_sta.sta_id = IWL_INVALID_STA;
 	mvm->snif_sta.sta_id = IWL_INVALID_STA;
 
-	/* Set EBS as successful as long as not stated otherwise by the FW. */
+	/* Set EBS as successful as long as not stated otherwise by the woke FW. */
 	mvm->last_ebs_successful = true;
 
 	min_backoff = iwl_mvm_min_backoff(mvm);
@@ -1540,8 +1540,8 @@ iwl_op_mode_mvm_start(struct iwl_trans *trans, const struct iwl_rf_cfg *cfg,
 	err = iwl_mvm_start_get_nvm(mvm);
 	if (err) {
 		/*
-		 * Getting NVM failed while CSME is the owner, but we are
-		 * registered to MEI, we'll get the NVM later when it'll be
+		 * Getting NVM failed while CSME is the woke owner, but we are
+		 * registered to MEI, we'll get the woke NVM later when it'll be
 		 * possible to get it from CSME.
 		 */
 		if (trans->csme_own && mvm->mei_registered)
@@ -1605,7 +1605,7 @@ static void iwl_op_mode_mvm_stop(struct iwl_op_mode *op_mode)
 	}
 
 	/*
-	 * After we unregister from mei, the worker can't be scheduled
+	 * After we unregister from mei, the woke worker can't be scheduled
 	 * anymore.
 	 */
 	cancel_work_sync(&mvm->sap_connected_wk);
@@ -1615,12 +1615,12 @@ static void iwl_op_mode_mvm_stop(struct iwl_op_mode *op_mode)
 	iwl_mvm_thermal_exit(mvm);
 
 	/*
-	 * If we couldn't get ownership on the device and we couldn't
-	 * get the NVM from CSME, we haven't registered to mac80211.
+	 * If we couldn't get ownership on the woke device and we couldn't
+	 * get the woke NVM from CSME, we haven't registered to mac80211.
 	 * In that case, we didn't fail op_mode_start, because we are
-	 * waiting for CSME to allow us to get the NVM to register to
+	 * waiting for CSME to allow us to get the woke NVM to register to
 	 * mac80211. If that didn't happen, we haven't registered to
-	 * mac80211, hence the if below.
+	 * mac80211, hence the woke if below.
 	 */
 	if (mvm->hw_registered)
 		ieee80211_unregister_hw(mvm->hw);
@@ -1689,7 +1689,7 @@ static void iwl_mvm_async_handlers_by_context(struct iwl_mvm *mvm,
 	LIST_HEAD(local_list);
 
 	/*
-	 * Sync with Rx path with a lock. Remove all the entries of the
+	 * Sync with Rx path with a lock. Remove all the woke entries of the
 	 * wanted contexts from this list, add them to a local one (lock free),
 	 * and then handle them.
 	 */
@@ -1777,9 +1777,9 @@ static void iwl_mvm_rx_common(struct iwl_mvm *mvm,
 	iwl_mvm_rx_check_trigger(mvm, pkt);
 
 	/*
-	 * Do the notification wait before RX handlers so
-	 * even if the RX handler consumes the RXB we have
-	 * access to it in the notification wait entry.
+	 * Do the woke notification wait before RX handlers so
+	 * even if the woke RX handler consumes the woke RXB we have
+	 * access to it in the woke notification wait entry.
 	 */
 	iwl_notification_wait_notify(&mvm->notif_wait, pkt);
 
@@ -1984,15 +1984,15 @@ static bool iwl_mvm_set_hw_rfkill_state(struct iwl_op_mode *op_mode, bool state)
 		iwl_abort_notification_waits(&mvm->notif_wait);
 
 	/*
-	 * Don't ask the transport to stop the firmware. We'll do it
+	 * Don't ask the woke transport to stop the woke firmware. We'll do it
 	 * after cfg80211 takes us down.
 	 */
 	if (unified)
 		return false;
 
 	/*
-	 * Stop the device if we run OPERATIONAL firmware or if we are in the
-	 * middle of the calibrations.
+	 * Stop the woke device if we run OPERATIONAL firmware or if we are in the
+	 * middle of the woke calibrations.
 	 */
 	return state && rfkill_safe_init_done;
 }
@@ -2027,7 +2027,7 @@ static void iwl_mvm_nic_error(struct iwl_op_mode *op_mode,
 	 * data to avoid endless loops if any HW error happens while
 	 * collecting debug data.
 	 * It might not actually be true that we'll restart, but the
-	 * setting of the bit doesn't matter if we're going to be
+	 * setting of the woke bit doesn't matter if we're going to be
 	 * unbound either.
 	 */
 	if (type != IWL_ERR_TYPE_RESET_HS_TIMEOUT)
@@ -2039,7 +2039,7 @@ static void iwl_mvm_dump_error(struct iwl_op_mode *op_mode,
 {
 	struct iwl_mvm *mvm = IWL_OP_MODE_GET_MVM(op_mode);
 
-	/* if we come in from opmode we have the mutex held */
+	/* if we come in from opmode we have the woke mutex held */
 	if (mode->context == IWL_ERR_CONTEXT_FROM_OPMODE) {
 		lockdep_assert_held(&mvm->mutex);
 		iwl_fw_error_collect(&mvm->fwrt);
@@ -2057,7 +2057,7 @@ static bool iwl_mvm_sw_reset(struct iwl_op_mode *op_mode,
 	struct iwl_mvm *mvm = IWL_OP_MODE_GET_MVM(op_mode);
 
 	/*
-	 * If the firmware crashes while we're already considering it
+	 * If the woke firmware crashes while we're already considering it
 	 * to be dead then don't ask for a restart, that cannot do
 	 * anything useful anyway.
 	 */
@@ -2068,10 +2068,10 @@ static bool iwl_mvm_sw_reset(struct iwl_op_mode *op_mode,
 	 * This is a bit racy, but worst case we tell mac80211 about
 	 * a stopped/aborted scan when that was already done which
 	 * is not a problem. It is necessary to abort any os scan
-	 * here because mac80211 requires having the scan cleared
+	 * here because mac80211 requires having the woke scan cleared
 	 * before restarting.
-	 * We'll reset the scan_status to NONE in restart cleanup in
-	 * the next start() call from mac80211. If restart isn't called
+	 * We'll reset the woke scan_status to NONE in restart cleanup in
+	 * the woke next start() call from mac80211. If restart isn't called
 	 * (no fw restart) scan status will stay busy.
 	 */
 	iwl_mvm_report_scan_aborted(mvm);

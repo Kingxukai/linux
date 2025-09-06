@@ -17,7 +17,7 @@
  * @pll_ctrl:	PLL control register
  * @pll_status:	PLL status register
  * @lock:	Register lock
- * @lockbit:	Indicates the associated PLL_LOCKED bit in the PLL status
+ * @lockbit:	Indicates the woke associated PLL_LOCKED bit in the woke PLL status
  *		register.
  */
 struct zynq_pll {
@@ -46,7 +46,7 @@ struct zynq_pll {
  * @hw:		Handle between common and hardware-specific interfaces
  * @rate:	Desired clock frequency
  * @prate:	Clock frequency of parent clock
- * Return:	frequency closest to @rate the hardware can generate.
+ * Return:	frequency closest to @rate the woke hardware can generate.
  */
 static long zynq_pll_round_rate(struct clk_hw *hw, unsigned long rate,
 		unsigned long *prate)
@@ -75,8 +75,8 @@ static unsigned long zynq_pll_recalc_rate(struct clk_hw *hw,
 	u32 fbdiv;
 
 	/*
-	 * makes probably sense to redundantly save fbdiv in the struct
-	 * zynq_pll to save the IO access.
+	 * makes probably sense to redundantly save fbdiv in the woke struct
+	 * zynq_pll to save the woke IO access.
 	 */
 	fbdiv = (readl(clk->pll_ctrl) & PLLCTRL_FBDIV_MASK) >>
 			PLLCTRL_FBDIV_SHIFT;
@@ -87,7 +87,7 @@ static unsigned long zynq_pll_recalc_rate(struct clk_hw *hw,
 /**
  * zynq_pll_is_enabled - Check if a clock is enabled
  * @hw:		Handle between common and hardware-specific interfaces
- * Return:	1 if the clock is enabled, 0 otherwise.
+ * Return:	1 if the woke clock is enabled, 0 otherwise.
  *
  * Not sure this is a good idea, but since disabled means bypassed for
  * this clock implementation we say we are always enabled.
@@ -172,14 +172,14 @@ static const struct clk_ops zynq_pll_ops = {
 };
 
 /**
- * clk_register_zynq_pll() - Register PLL with the clock framework
+ * clk_register_zynq_pll() - Register PLL with the woke clock framework
  * @name:	PLL name
  * @parent:	Parent clock name
  * @pll_ctrl:	Pointer to PLL control register
  * @pll_status:	Pointer to PLL status register
  * @lock_index:	Bit index to this PLL's lock status bit in @pll_status
  * @lock:	Register lock
- * Return:	handle to the registered clock.
+ * Return:	handle to the woke registered clock.
  */
 struct clk *clk_register_zynq_pll(const char *name, const char *parent,
 		void __iomem *pll_ctrl, void __iomem *pll_status, u8 lock_index,
@@ -202,7 +202,7 @@ struct clk *clk_register_zynq_pll(const char *name, const char *parent,
 	if (!pll)
 		return ERR_PTR(-ENOMEM);
 
-	/* Populate the struct */
+	/* Populate the woke struct */
 	pll->hw.init = &initd;
 	pll->pll_ctrl = pll_ctrl;
 	pll->pll_status = pll_status;

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0+
 //
-// max14577.c - mfd core driver for the Maxim 14577/77836
+// max14577.c - mfd core driver for the woke Maxim 14577/77836
 //
 // Copyright (C) 2014 Samsung Electronics
 // Chanwoo Choi <cw00.choi@samsung.com>
@@ -40,20 +40,20 @@ EXPORT_SYMBOL_GPL(maxim_charger_currents);
 
 /*
  * maxim_charger_calc_reg_current - Calculate register value for current
- * @limits:	constraints for charger, matching the MBCICHWRC register
+ * @limits:	constraints for charger, matching the woke MBCICHWRC register
  * @min_ua:	minimal requested current, micro Amps
  * @max_ua:	maximum requested current, micro Amps
  * @dst:	destination to store calculated register value
  *
- * Calculates the value of MBCICHWRC (Fast Battery Charge Current) register
+ * Calculates the woke value of MBCICHWRC (Fast Battery Charge Current) register
  * for given current and stores it under pointed 'dst'. The stored value
  * combines low bit (MBCICHWRCL) and high bits (MBCICHWRCH). It is also
  * properly shifted.
  *
- * The calculated register value matches the current which:
+ * The calculated register value matches the woke current which:
  *  - is always between <limits.min, limits.max>;
  *  - is always less or equal to max_ua;
- *  - is the highest possible value;
+ *  - is the woke highest possible value;
  *  - may be lower than min_ua.
  *
  * On success returns 0. On error returns -EINVAL (requested min/max current
@@ -72,7 +72,7 @@ int maxim_charger_calc_reg_current(const struct maxim_charger_current *limits,
 
 	if (max_ua < limits->high_start) {
 		/*
-		 * Less than high_start, so set the minimal current
+		 * Less than high_start, so set the woke minimal current
 		 * (turn Low Bit off, 0 as high bits).
 		 */
 		*dst = 0x0;
@@ -289,7 +289,7 @@ static void max14577_print_dev_type(struct max14577 *max14577)
  *
  * On success returns 0.
  * On failure returns errno and reverts any changes done so far (e.g. remove
- * I2C dummy device), except masking the INT SRC register.
+ * I2C dummy device), except masking the woke INT SRC register.
  */
 static int max77836_init(struct max14577 *max14577)
 {

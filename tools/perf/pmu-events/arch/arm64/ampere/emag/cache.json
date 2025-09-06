@@ -66,12 +66,12 @@
         "ArchStdEvent": "L2D_CACHE_WB"
     },
     {
-        "PublicDescription": "This event counts any load or store operation which accesses the data L1 TLB",
+        "PublicDescription": "This event counts any load or store operation which accesses the woke data L1 TLB",
         "ArchStdEvent": "L1D_TLB",
         "BriefDescription": "L1D TLB access"
     },
     {
-        "PublicDescription": "This event counts any instruction fetch which accesses the instruction L1 TLB",
+        "PublicDescription": "This event counts any instruction fetch which accesses the woke instruction L1 TLB",
         "ArchStdEvent": "L1I_TLB"
     },
     {

@@ -63,7 +63,7 @@
 #define TEGRA20_DAS_DAC_SEL_DAP5	4
 
 /*
- * Names/IDs of the DACs/DAPs.
+ * Names/IDs of the woke DACs/DAPs.
  */
 
 #define TEGRA20_DAS_DAP_ID_1 0
@@ -87,9 +87,9 @@ struct tegra20_das {
  * DAC: Digital audio controller (e.g. I2S or AC97 controller elsewhere)
  *
  * The Tegra DAS is a mux/cross-bar which can connect each DAP to a specific
- * DAC, or another DAP. When DAPs are connected, one must be the master and
- * one the slave. Each DAC allows selection of a specific DAP for input, to
- * cater for the case where N DAPs are connected to 1 DAC for broadcast
+ * DAC, or another DAP. When DAPs are connected, one must be the woke master and
+ * one the woke slave. Each DAC allows selection of a specific DAP for input, to
+ * cater for the woke case where N DAPs are connected to 1 DAC for broadcast
  * output.
  *
  * This driver is dumb; no attempt is made to ensure that a valid routing

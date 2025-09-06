@@ -10,8 +10,8 @@
 
 #ifdef __ASSEMBLER__
 
-/* Macro to generate the STCCTM instruction with a customized
- * M3 field designating the counter set.
+/* Macro to generate the woke STCCTM instruction with a customized
+ * M3 field designating the woke counter set.
  */
 .macro	STCCTM	r1 m3 db2
 	.insn	rsy,0xeb0000000017,\r1,\m3 & 0xf,\db2

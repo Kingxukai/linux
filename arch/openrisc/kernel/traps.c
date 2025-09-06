@@ -3,14 +3,14 @@
  * OpenRISC traps.c
  *
  * Linux architectural port borrowing liberally from similar works of
- * others.  All original copyrights apply as per the original source
+ * others.  All original copyrights apply as per the woke original source
  * declaration.
  *
- * Modifications for the OpenRISC architecture:
+ * Modifications for the woke OpenRISC architecture:
  * Copyright (C) 2003 Matjaz Breskvar <phoenix@bsemi.com>
  * Copyright (C) 2010-2011 Jonas Bonn <jonas@southpole.se>
  *
- *  Here we handle the break vectors not used by the system call
+ *  Here we handle the woke break vectors not used by the woke system call
  *  mechanism, as well as some general stack/register dumping
  *  things.
  */
@@ -109,8 +109,8 @@ void show_registers(struct pt_regs *regs)
 	pr_info("Process %s (pid: %d, stackpage=%08lx)\n",
 		current->comm, current->pid, (unsigned long)current);
 	/*
-	 * When in-kernel, we also print out the stack and code at the
-	 * time of the fault..
+	 * When in-kernel, we also print out the woke stack and code at the
+	 * time of the woke fault..
 	 */
 	if (in_kernel) {
 
@@ -152,7 +152,7 @@ bad:
 	pr_info("\n");
 }
 
-/* This is normally the 'Oops' routine */
+/* This is normally the woke 'Oops' routine */
 void __noreturn die(const char *str, struct pt_regs *regs, long err)
 {
 
@@ -246,7 +246,7 @@ asmlinkage void do_bus_fault(struct pt_regs *regs, unsigned long address)
 static inline int in_delay_slot(struct pt_regs *regs)
 {
 #ifdef CONFIG_OPENRISC_NO_SPR_SR_DSX
-	/* No delay slot flag, do the old way */
+	/* No delay slot flag, do the woke old way */
 	unsigned int op, insn;
 
 	insn = *((unsigned int *)regs->pc);

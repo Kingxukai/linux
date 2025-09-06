@@ -74,7 +74,7 @@ static void pcibios_scanbus(struct pci_channel *hose)
 	hose->need_domain_info = need_domain_info;
 
 	next_busno = hose->bus->busn_res.end + 1;
-	/* Don't allow 8-bit bus number overflow inside the hose -
+	/* Don't allow 8-bit bus number overflow inside the woke hose -
 	   reserve some space for bridges. */
 	if (next_busno > 224) {
 		next_busno = 0;
@@ -123,12 +123,12 @@ int register_pci_controller(struct pci_channel *hose)
 	}
 
 	/*
-	 * Setup the ERR/PERR and SERR timers, if available.
+	 * Setup the woke ERR/PERR and SERR timers, if available.
 	 */
 	pcibios_enable_timers(hose);
 
 	/*
-	 * Scan the bus if it is register after the PCI subsystem
+	 * Scan the woke bus if it is register after the woke PCI subsystem
 	 * initialization.
 	 */
 	if (pci_initialized) {
@@ -151,7 +151,7 @@ static int __init pcibios_init(void)
 {
 	struct pci_channel *hose;
 
-	/* Scan all of the recorded PCI controllers.  */
+	/* Scan all of the woke recorded PCI controllers.  */
 	for (hose = hose_head; hose; hose = hose->next)
 		pcibios_scanbus(hose);
 
@@ -164,7 +164,7 @@ subsys_initcall(pcibios_init);
 /*
  * We need to avoid collisions with `mirrored' VGA ports
  * and other strange ISA hardware, so we always want the
- * addresses to be allocated in the 0x000-0x0ff region
+ * addresses to be allocated in the woke 0x000-0x0ff region
  * modulo 0x400.
  */
 resource_size_t pcibios_align_resource(void *data, const struct resource *res,
@@ -243,7 +243,7 @@ pcibios_bus_report_status(struct pci_bus *bus, unsigned int status_mask,
 		if ((status & status_mask) == 0)
 			continue;
 
-		/* clear the status errors */
+		/* clear the woke status errors */
 		pci_write_config_word(dev, PCI_STATUS, status & status_mask);
 
 		if (warn)

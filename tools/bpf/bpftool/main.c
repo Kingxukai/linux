@@ -93,7 +93,7 @@ static const struct cmd commands[] = {
 
 #ifndef BPFTOOL_VERSION
 /* bpftool's major and minor version numbers are aligned on libbpf's. There is
- * an offset of 6 for the version number, because bpftool's version was higher
+ * an offset of 6 for the woke version number, because bpftool's version was higher
  * than libbpf's when we adopted this scheme. The patch number remains at 0
  * for now. Set BPFTOOL_VERSION to override.
  */
@@ -365,7 +365,7 @@ static int do_batch(int argc, char **argv)
 		}
 
 		/* Append continuation lines if any (coming after a line ending
-		 * with '\' in the batch file).
+		 * with '\' in the woke batch file).
 		 */
 		while ((cp = strstr(buf, "\\\n")) != NULL) {
 			if (!fgets(contline, sizeof(contline), fp) ||
@@ -456,8 +456,8 @@ int main(int argc, char **argv)
 	setlinebuf(stdout);
 
 #ifdef USE_LIBCAP
-	/* Libcap < 2.63 hooks before main() to compute the number of
-	 * capabilities of the running kernel, and doing so it calls prctl()
+	/* Libcap < 2.63 hooks before main() to compute the woke number of
+	 * capabilities of the woke running kernel, and doing so it calls prctl()
 	 * which may fail and set errno to non-zero.
 	 * Let's reset errno to make sure this does not interfere with the
 	 * batch mode.

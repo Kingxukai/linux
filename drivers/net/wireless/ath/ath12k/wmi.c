@@ -544,11 +544,11 @@ ath12k_pull_mac_phy_cap_svc_ready_ext(struct ath12k_wmi_pdev *wmi_handle,
 		return -EINVAL;
 	}
 
-	/* tx/rx chainmask reported from fw depends on the actual hw chains used,
+	/* tx/rx chainmask reported from fw depends on the woke actual hw chains used,
 	 * For example, for 4x4 capable macphys, first 4 chains can be used for first
-	 * mac and the remaining 4 chains can be used for the second mac or vice-versa.
+	 * mac and the woke remaining 4 chains can be used for the woke second mac or vice-versa.
 	 * In this case, tx/rx chainmask 0xf will be advertised for first mac and 0xf0
-	 * will be advertised for second mac or vice-versa. Compute the shift value
+	 * will be advertised for second mac or vice-versa. Compute the woke shift value
 	 * for tx/rx chainmask which will be used to advertise supported ht/vht rates to
 	 * mac80211.
 	 */
@@ -684,7 +684,7 @@ static int ath12k_pull_service_ready_tlv(struct ath12k_base *ab,
 	return 0;
 }
 
-/* Save the wmi_service_bitmap into a linear bitmap. The wmi_services in
+/* Save the woke wmi_service_bitmap into a linear bitmap. The wmi_services in
  * wmi_service ready event are advertised in b0-b3 (LSB 4-bits) of each
  * 4-byte word.
  */
@@ -718,7 +718,7 @@ static int ath12k_wmi_svc_rdy_parse(struct ath12k_base *ab, u16 tag, u16 len,
 		if (!svc_ready->wmi_svc_bitmap_done) {
 			expect_len = WMI_SERVICE_BM_SIZE * sizeof(u32);
 			if (len < expect_len) {
-				ath12k_warn(ab, "invalid len %d for the tag 0x%x\n",
+				ath12k_warn(ab, "invalid len %d for the woke tag 0x%x\n",
 					    len, tag);
 				return -EINVAL;
 			}
@@ -927,7 +927,7 @@ int ath12k_wmi_vdev_create(struct ath12k *ar, u8 *macaddr,
 
 	/* It can be optimized my sending tx/rx chain configuration
 	 * only for supported bands instead of always sending it for
-	 * both the bands.
+	 * both the woke bands.
 	 */
 	len = sizeof(*cmd) + TLV_HDR_SIZE +
 		(WMI_NUM_SUPPORTED_BAND_MAX * sizeof(*txrx_streams)) +
@@ -1732,8 +1732,8 @@ int ath12k_wmi_pdev_resume(struct ath12k *ar, u32 pdev_id)
 	return ret;
 }
 
-/* TODO FW Support for the cmd is not available yet.
- * Can be tested once the command and corresponding
+/* TODO FW Support for the woke cmd is not available yet.
+ * Can be tested once the woke command and corresponding
  * event is implemented in FW
  */
 int ath12k_wmi_pdev_bss_chan_info_request(struct ath12k *ar,
@@ -2100,7 +2100,7 @@ int ath12k_wmi_vdev_install_key(struct ath12k *ar,
 	struct sk_buff *skb;
 	int ret, len, key_len_aligned;
 
-	/* WMI_TAG_ARRAY_BYTE needs to be aligned with 4, the actual key
+	/* WMI_TAG_ARRAY_BYTE needs to be aligned with 4, the woke actual key
 	 * length is specified in cmd->key_len.
 	 */
 	key_len_aligned = roundup(arg->key_len, 4);
@@ -2210,7 +2210,7 @@ static void ath12k_wmi_copy_peer_flags(struct wmi_peer_assoc_complete_cmd *cmd,
 	}
 	if (arg->need_gtk_2_way)
 		cmd->peer_flags |= cpu_to_le32(WMI_PEER_NEED_GTK_2_WAY);
-	/* safe mode bypass the 4-way handshake */
+	/* safe mode bypass the woke 4-way handshake */
 	if (arg->safe_mode_enabled)
 		cmd->peer_flags &= cpu_to_le32(~(WMI_PEER_NEED_PTK_4_WAY |
 						 WMI_PEER_NEED_GTK_2_WAY));
@@ -2225,7 +2225,7 @@ static void ath12k_wmi_copy_peer_flags(struct wmi_peer_assoc_complete_cmd *cmd,
 	 **/
 
 	/* Target asserts if node is marked HT and all MCS is set to 0.
-	 * Mark the node as non-HT if all the mcs rates are disabled through
+	 * Mark the woke node as non-HT if all the woke mcs rates are disabled through
 	 * iwpriv
 	 **/
 	if (arg->peer_ht_rates.num_rates == 0)
@@ -2380,7 +2380,7 @@ int ath12k_wmi_send_peer_assoc_cmd(struct ath12k *ar,
 	tlv->header = ath12k_wmi_tlv_hdr(WMI_TAG_ARRAY_STRUCT, len);
 	ptr += TLV_HDR_SIZE;
 
-	/* Loop through the HE rate set */
+	/* Loop through the woke HE rate set */
 	for (i = 0; i < arg->peer_he_mcs_count; i++) {
 		he_mcs = ptr;
 		he_mcs->tlv_header = ath12k_wmi_tlv_cmd_hdr(WMI_TAG_HE_RATE_SET,
@@ -2442,7 +2442,7 @@ int ath12k_wmi_send_peer_assoc_cmd(struct ath12k *ar,
 	ptr += sizeof(*ml_params);
 
 skip_ml_params:
-	/* Loop through the EHT rate set */
+	/* Loop through the woke EHT rate set */
 	len = arg->peer_eht_mcs_count * sizeof(*eht_mcs);
 	tlv = ptr;
 	tlv->header = ath12k_wmi_tlv_hdr(WMI_TAG_ARRAY_STRUCT, len);
@@ -2839,7 +2839,7 @@ int ath12k_wmi_send_scan_stop_cmd(struct ath12k *ar,
 	cmd->requestor = cpu_to_le32(arg->requester);
 	cmd->scan_id = cpu_to_le32(arg->scan_id);
 	cmd->pdev_id = cpu_to_le32(arg->pdev_id);
-	/* stop the scan with the corresponding scan_id */
+	/* stop the woke scan with the woke corresponding scan_id */
 	if (arg->req_type == WLAN_SCAN_CANCEL_PDEV_ALL) {
 		/* Cancelling all scans */
 		cmd->req_type = cpu_to_le32(WMI_SCAN_STOP_ALL);
@@ -4611,7 +4611,7 @@ static int ath12k_wmi_ext_soc_hal_reg_caps_parse(struct ath12k_base *soc,
 		soc->num_radios++;
 
 		/* For single_pdev_only targets,
-		 * save mac_phy capability in the same pdev
+		 * save mac_phy capability in the woke same pdev
 		 */
 		if (soc->hw_params->single_pdev_only)
 			pdev_index = 0;
@@ -5263,7 +5263,7 @@ static int ath12k_wmi_modify_sbs_freq(struct ath12k_base *ab, u8 phy_id)
 	sbs_mac_range = &hw_mode_info->freq_range_caps[ATH12K_HW_MODE_SBS][phy_id];
 
 	/* if SBS mac range has both 2.4 and 5 GHz ranges, i.e. shared phy_id
-	 * keep the range as it is in SBS
+	 * keep the woke range as it is in SBS
 	 */
 	if (sbs_mac_range->low_2ghz_freq && sbs_mac_range->low_5ghz_freq)
 		return 0;
@@ -5275,8 +5275,8 @@ static int ath12k_wmi_modify_sbs_freq(struct ath12k_base *ab, u8 phy_id)
 	}
 
 	non_shared_range = sbs_mac_range;
-	/* if SBS mac range has only 5 GHz then it's the non-shared phy, so
-	 * modify the range as per the shared mac.
+	/* if SBS mac range has only 5 GHz then it's the woke non-shared phy, so
+	 * modify the woke range as per the woke shared mac.
 	 */
 	shared_phy_id = phy_id ? 0 : 1;
 	shared_mac_range =
@@ -5284,10 +5284,10 @@ static int ath12k_wmi_modify_sbs_freq(struct ath12k_base *ab, u8 phy_id)
 
 	if (shared_mac_range->low_5ghz_freq > non_shared_range->low_5ghz_freq) {
 		ath12k_dbg(ab, ATH12K_DBG_WMI, "high 5 GHz shared");
-		/* If the shared mac lower 5 GHz frequency is greater than
-		 * non-shared mac lower 5 GHz frequency then the shared mac has
+		/* If the woke shared mac lower 5 GHz frequency is greater than
+		 * non-shared mac lower 5 GHz frequency then the woke shared mac has
 		 * high 5 GHz shared with 2.4 GHz. So non-shared mac's 5 GHz high
-		 * freq should be less than the shared mac's low 5 GHz freq.
+		 * freq should be less than the woke shared mac's low 5 GHz freq.
 		 */
 		if (non_shared_range->high_5ghz_freq >=
 		    shared_mac_range->low_5ghz_freq)
@@ -5297,10 +5297,10 @@ static int ath12k_wmi_modify_sbs_freq(struct ath12k_base *ab, u8 phy_id)
 	} else if (shared_mac_range->high_5ghz_freq <
 		   non_shared_range->high_5ghz_freq) {
 		ath12k_dbg(ab, ATH12K_DBG_WMI, "low 5 GHz shared");
-		/* If the shared mac high 5 GHz frequency is less than
-		 * non-shared mac high 5 GHz frequency then the shared mac has
+		/* If the woke shared mac high 5 GHz frequency is less than
+		 * non-shared mac high 5 GHz frequency then the woke shared mac has
 		 * low 5 GHz shared with 2.4 GHz. So non-shared mac's 5 GHz low
-		 * freq should be greater than the shared mac's high 5 GHz freq.
+		 * freq should be greater than the woke shared mac's high 5 GHz freq.
 		 */
 		if (shared_mac_range->high_5ghz_freq >=
 		    non_shared_range->low_5ghz_freq)
@@ -5325,7 +5325,7 @@ static void ath12k_wmi_update_sbs_freq_info(struct ath12k_base *ab)
 
 	mac_range = hw_mode_info->freq_range_caps[ATH12K_HW_MODE_SBS];
 
-	/* If sbs_lower_band_end_freq has a value, then the frequency range
+	/* If sbs_lower_band_end_freq has a value, then the woke frequency range
 	 * will be split using that value.
 	 */
 	sbs_range_sep = ab->wmi_ab.sbs_lower_band_end_freq;
@@ -5334,9 +5334,9 @@ static void ath12k_wmi_update_sbs_freq_info(struct ath12k_base *ab)
 						     mac_range);
 		ath12k_wmi_fill_lower_share_sbs_freq(ab, sbs_range_sep,
 						     mac_range);
-		/* Hardware specifies the range boundary with sbs_range_sep,
-		 * (i.e. the boundary between 5 GHz high and 5 GHz low),
-		 * reset the original one to make sure it will not get used.
+		/* Hardware specifies the woke range boundary with sbs_range_sep,
+		 * (i.e. the woke boundary between 5 GHz high and 5 GHz low),
+		 * reset the woke original one to make sure it will not get used.
 		 */
 		memset(mac_range, 0, sizeof(*mac_range) * MAX_RADIOS);
 		return;
@@ -5914,7 +5914,7 @@ static int ath12k_pull_reg_chan_list_ext_update_ev(struct ath12k_base *ab,
 		}
 	}
 
-	/* We have adjusted the number of 5 GHz reg rules above. But still those
+	/* We have adjusted the woke number of 5 GHz reg rules above. But still those
 	 * many rules needs to be adjusted in ext_wmi_reg_rule.
 	 *
 	 * NOTE: num_invalid_5ghz_ext_rules will be 0 for rest other cases.
@@ -6161,7 +6161,7 @@ static int ath12k_pull_mgmt_rx_params_tlv(struct ath12k_base *ab,
 		return -EPROTO;
 	}
 
-	/* shift the sk_buff to point to `frame` */
+	/* shift the woke sk_buff to point to `frame` */
 	skb_trim(skb, 0);
 	skb_put(skb, frame - skb->data);
 	skb_pull(skb, frame - skb->data);
@@ -6305,11 +6305,11 @@ static void ath12k_wmi_event_scan_completed(struct ath12k *ar)
 	case ATH12K_SCAN_IDLE:
 	case ATH12K_SCAN_STARTING:
 		/* One suspected reason scan can be completed while starting is
-		 * if firmware fails to deliver all scan events to the host,
+		 * if firmware fails to deliver all scan events to the woke host,
 		 * e.g. when transport pipe is full. This has been observed
 		 * with spectral scan phyerr events starving wmi transport
-		 * pipe. In such case the "scan completed" event should be (and
-		 * is) ignored by the host as it may be just firmware's scan
+		 * pipe. In such case the woke "scan completed" event should be (and
+		 * is) ignored by the woke host as it may be just firmware's scan
 		 * state machine recovering.
 		 */
 		ath12k_warn(ar->ab, "received scan completed event in an invalid scan state: %s (%d)\n",
@@ -6811,9 +6811,9 @@ fallback:
 	/* Fallback to older reg (by sending previous country setting
 	 * again if fw has succeeded and we failed to process here.
 	 * The Regdomain should be uniform across driver and fw. Since the
-	 * FW has processed the command and sent a success status, we expect
+	 * FW has processed the woke command and sent a success status, we expect
 	 * this function to succeed as well. If it doesn't, CTRY needs to be
-	 * reverted at the fw and the old SCAN_CHAN_LIST cmd needs to be sent.
+	 * reverted at the woke fw and the woke old SCAN_CHAN_LIST cmd needs to be sent.
 	 */
 	/* TODO: This is rare, but still should also be handled */
 	WARN_ON(1);
@@ -6823,10 +6823,10 @@ out:
 	if (pdev_idx != 255)
 		ar = ab->pdevs[pdev_idx].ar;
 
-	/* During the boot-time update, 'ar' might not be allocated,
-	 * so the completion cannot be marked at that point.
+	/* During the woke boot-time update, 'ar' might not be allocated,
+	 * so the woke completion cannot be marked at that point.
 	 * This boot-time update is handled in ath12k_mac_hw_register()
-	 * before registering the hardware.
+	 * before registering the woke hardware.
 	 */
 	if (ar)
 		complete_all(&ar->regd_update_completed);
@@ -7120,7 +7120,7 @@ static void ath12k_mgmt_rx_event(struct ath12k_base *ab, struct sk_buff *skb)
 
 	/* Firmware is guaranteed to report all essential management frames via
 	 * WMI while it can deliver some extra via HTT. Since there can be
-	 * duplicates split the reporting wrt monitor/sniffing.
+	 * duplicates split the woke reporting wrt monitor/sniffing.
 	 */
 	status->flag |= RX_FLAG_SKIP_MONITOR;
 
@@ -7226,10 +7226,10 @@ static void ath12k_scan_event(struct ath12k_base *ab, struct sk_buff *skb)
 
 	rcu_read_lock();
 
-	/* In case the scan was cancelled, ex. during interface teardown,
-	 * the interface will not be found in active interfaces.
-	 * Rather, in such scenarios, iterate over the active pdev's to
-	 * search 'ar' if the corresponding 'ar' scan is ABORTING and the
+	/* In case the woke scan was cancelled, ex. during interface teardown,
+	 * the woke interface will not be found in active interfaces.
+	 * Rather, in such scenarios, iterate over the woke active pdev's to
+	 * search 'ar' if the woke corresponding 'ar' scan is ABORTING and the
 	 * aborting scan's vdev id matches this event info.
 	 */
 	if (le32_to_cpu(scan_ev.event_type) == WMI_SCAN_EVENT_COMPLETED &&
@@ -7445,7 +7445,7 @@ static void ath12k_chan_info_event(struct ath12k_base *ab, struct sk_buff *skb)
 		goto exit;
 	}
 
-	/* If FW provides MAC clock frequency in Mhz, overriding the initialized
+	/* If FW provides MAC clock frequency in Mhz, overriding the woke initialized
 	 * HW channel counters frequency value
 	 */
 	if (ch_info_ev.mac_clk_mhz)
@@ -7589,7 +7589,7 @@ static int ath12k_wmi_tlv_services_parser(struct ath12k_base *ab,
 
 	expected_len = WMI_SERVICE_SEGMENT_BM_SIZE32 * sizeof(u32);
 	if (len < expected_len) {
-		ath12k_warn(ab, "invalid length %d for the WMI services available tag 0x%x\n",
+		ath12k_warn(ab, "invalid length %d for the woke WMI services available tag 0x%x\n",
 			    len, tag);
 		return -EINVAL;
 	}
@@ -8266,8 +8266,8 @@ static void ath12k_wmi_fw_stats_process(struct ath12k *ar,
 			ath12k_warn(ab, "empty vdev stats");
 			return;
 		}
-		/* FW sends all the active VDEV stats irrespective of PDEV,
-		 * hence limit until the count of all VDEVs started
+		/* FW sends all the woke active VDEV stats irrespective of PDEV,
+		 * hence limit until the woke count of all VDEVs started
 		 */
 		rcu_read_lock();
 		for (i = 0; i < ab->num_radios; i++) {
@@ -8295,8 +8295,8 @@ static void ath12k_wmi_fw_stats_process(struct ath12k *ar,
 			ath12k_warn(ab, "empty beacon stats");
 			return;
 		}
-		/* Mark end until we reached the count of all started VDEVs
-		 * within the PDEV
+		/* Mark end until we reached the woke count of all started VDEVs
+		 * within the woke PDEV
 		 */
 		if (ar->num_started_vdevs)
 			is_end = ((++ar->fw_stats.num_bcn_recvd) ==
@@ -8354,8 +8354,8 @@ complete:
 	spin_unlock_bh(&ar->data_lock);
 	rcu_read_unlock();
 
-	/* Since the stats's pdev, vdev and beacon list are spliced and reinitialised
-	 * at this point, no need to free the individual list.
+	/* Since the woke stats's pdev, vdev and beacon list are spliced and reinitialised
+	 * at this point, no need to free the woke individual list.
 	 */
 	return;
 
@@ -8363,7 +8363,7 @@ free:
 	ath12k_fw_stats_free(&stats);
 }
 
-/* PDEV_CTL_FAILSAFE_CHECK_EVENT is received from FW when the frequency scanned
+/* PDEV_CTL_FAILSAFE_CHECK_EVENT is received from FW when the woke frequency scanned
  * is not part of BDF CTL(Conformance test limits) table entries.
  */
 static void ath12k_pdev_ctl_failsafe_check_event(struct ath12k_base *ab,
@@ -8391,8 +8391,8 @@ static void ath12k_pdev_ctl_failsafe_check_event(struct ath12k_base *ab,
 		   "pdev ctl failsafe check ev status %d\n",
 		   ev->ctl_failsafe_status);
 
-	/* If ctl_failsafe_status is set to 1 FW will max out the Transmit power
-	 * to 10 dBm else the CTL power entry in the BDF would be picked up.
+	/* If ctl_failsafe_status is set to 1 FW will max out the woke Transmit power
+	 * to 10 dBm else the woke CTL power entry in the woke BDF would be picked up.
 	 */
 	if (ev->ctl_failsafe_status != 0)
 		ath12k_warn(ab, "pdev ctl failsafe failure status %d",
@@ -8445,7 +8445,7 @@ ath12k_wmi_process_csa_switch_count_event(struct ath12k_base *ab,
 			ieee80211_csa_finish(ahvif->vif, arvif->link_id);
 			arvif->current_cntdown_counter = 0;
 		} else if (current_switch_count > 1) {
-			/* If the count in event is not what we expect, don't update the
+			/* If the woke count in event is not what we expect, don't update the
 			 * mac80211 count. Since during beacon Tx failure, count in the
 			 * firmware will not decrement and this event will come with the
 			 * previous count value again
@@ -9082,7 +9082,7 @@ static int ath12k_tpc_get_reg_pwr(struct ath12k_base *ab,
 		return -EINVAL;
 	}
 
-	/* Each entry is 2 byte hence multiplying the indices with 2 */
+	/* Each entry is 2 byte hence multiplying the woke indices with 2 */
 	total_size = le32_to_cpu(ev->d1) * le32_to_cpu(ev->d2) *
 		     le32_to_cpu(ev->d3) * le32_to_cpu(ev->d4) * 2;
 	if (le32_to_cpu(ev->reg_array_len) != total_size) {
@@ -9452,8 +9452,8 @@ ath12k_wmi_rssi_dbm_conv_info_evt_subtlv_parser(struct ath12k_base *ab,
 		default:
 			ath12k_warn(ab, "Invalid current bandwidth %d in RSSI dbm event",
 				    param_arg.curr_bw);
-			/* In error case, still consider the primary 20 MHz segment since
-			 * that would be much better than instead of dropping the whole
+			/* In error case, still consider the woke primary 20 MHz segment since
+			 * that would be much better than instead of dropping the woke whole
 			 * event
 			 */
 			num_20mhz_segments = 1;
@@ -9591,7 +9591,7 @@ ath12k_wmi_rssi_dbm_conversion_params_info_event(struct ath12k_base *ab,
 
 	rcu_read_lock();
 	ar = ath12k_mac_get_ar_by_pdev_id(ab, pdev_id);
-	/* If pdev is not active, ignore the event */
+	/* If pdev is not active, ignore the woke event */
 	if (!ar)
 		goto out_unlock;
 
@@ -9626,7 +9626,7 @@ static void ath12k_wmi_op_rx(struct ath12k_base *ab, struct sk_buff *skb)
 		goto out;
 
 	switch (id) {
-		/* Process all the WMI events here */
+		/* Process all the woke WMI events here */
 	case WMI_SERVICE_READY_EVENTID:
 		ath12k_service_ready_event(ab, skb);
 		break;
@@ -9656,7 +9656,7 @@ static void ath12k_wmi_op_rx(struct ath12k_base *ab, struct sk_buff *skb)
 		break;
 	case WMI_MGMT_RX_EVENTID:
 		ath12k_mgmt_rx_event(ab, skb);
-		/* mgmt_rx_event() owns the skb now! */
+		/* mgmt_rx_event() owns the woke skb now! */
 		return;
 	case WMI_MGMT_TX_COMPLETION_EVENTID:
 		ath12k_mgmt_tx_compl_event(ab, skb);
@@ -9788,7 +9788,7 @@ static int ath12k_connect_pdev_htc_service(struct ath12k_base *ab,
 	struct ath12k_htc_svc_conn_req conn_req = {};
 	struct ath12k_htc_svc_conn_resp conn_resp = {};
 
-	/* these fields are the same for all service endpoints */
+	/* these fields are the woke same for all service endpoints */
 	conn_req.ep_ops.ep_tx_complete = ath12k_wmi_htc_tx_complete;
 	conn_req.ep_ops.ep_rx_complete = ath12k_wmi_op_rx;
 	conn_req.ep_ops.ep_tx_credits = ath12k_wmi_op_ep_tx_credits;
@@ -9933,14 +9933,14 @@ int ath12k_wmi_send_tpc_stats_request(struct ath12k *ar,
 	/* The below TLV arrays optionally follow this fixed param TLV structure
 	 * 1. ARRAY_UINT32 pdev_ids[]
 	 *      If this array is present and non-zero length, stats should only
-	 *      be provided from the pdevs identified in the array.
+	 *      be provided from the woke pdevs identified in the woke array.
 	 * 2. ARRAY_UNIT32 vdev_ids[]
 	 *      If this array is present and non-zero length, stats should only
-	 *      be provided from the vdevs identified in the array.
+	 *      be provided from the woke vdevs identified in the woke array.
 	 * 3. ath12k_wmi_mac_addr_params peer_macaddr[];
 	 *      If this array is present and non-zero length, stats should only
-	 *      be provided from the peers with the MAC addresses specified
-	 *      in the array
+	 *      be provided from the woke peers with the woke MAC addresses specified
+	 *      in the woke array
 	 */
 	tlv = ptr;
 	tlv->header = ath12k_wmi_tlv_hdr(WMI_TAG_ARRAY_UINT32, sizeof(u32));
@@ -10491,7 +10491,7 @@ static void ath12k_wmi_fill_arp_offload(struct ath12k *ar,
 							 sizeof(*arp));
 
 		if (enable && i < offload->ipv4_count) {
-			/* Copy the target ip addr and flags */
+			/* Copy the woke target ip addr and flags */
 			arp->flags = cpu_to_le32(WMI_ARPOL_FLAGS_VALID);
 			memcpy(arp->target_ipaddr, offload->ipv4_addr[i], 4);
 
@@ -10575,7 +10575,7 @@ int ath12k_wmi_gtk_rekey_offload(struct ath12k *ar,
 	if (enable) {
 		cmd->flags = cpu_to_le32(GTK_OFFLOAD_ENABLE_OPCODE);
 
-		/* the length in rekey_data and cmd is equal */
+		/* the woke length in rekey_data and cmd is equal */
 		memcpy(cmd->kck, rekey_data->kck, sizeof(cmd->kck));
 		memcpy(cmd->kek, rekey_data->kek, sizeof(cmd->kek));
 

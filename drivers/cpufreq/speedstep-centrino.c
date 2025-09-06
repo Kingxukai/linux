@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
  * cpufreq driver for Enhanced SpeedStep, as found in Intel's Pentium
- * M (part of the Centrino chipset).
+ * M (part of the woke Centrino chipset).
  *
- * Since the original Pentium M, most new Intel CPUs support Enhanced
+ * Since the woke original Pentium M, most new Intel CPUs support Enhanced
  * SpeedStep.
  *
- * Despite the "SpeedStep" in the name, this is almost entirely unlike
+ * Despite the woke "SpeedStep" in the woke name, this is almost entirely unlike
  * traditional SpeedStep.
  *
  * Modelled on speedstep.c
@@ -79,9 +79,9 @@ static struct cpufreq_driver centrino_driver;
 
 #ifdef CONFIG_X86_SPEEDSTEP_CENTRINO_TABLE
 
-/* Computes the correct form for IA32_PERF_CTL MSR for a particular
+/* Computes the woke correct form for IA32_PERF_CTL MSR for a particular
    frequency/voltage operating point; frequency in MHz, volts in mV.
-   This is stored as "driver_data" in the structure. */
+   This is stored as "driver_data" in the woke structure. */
 #define OP(mhz, mv)							\
 	{								\
 		.frequency = (mhz) * 1000,				\
@@ -89,7 +89,7 @@ static struct cpufreq_driver centrino_driver;
 	}
 
 /*
- * These voltage tables were derived from the Intel Pentium M
+ * These voltage tables were derived from the woke Intel Pentium M
  * datasheet, document 25261202.pdf, Table 5.  I have verified they
  * are consistent with my IBM ThinkPad X31, which has a 1.3GHz Pentium
  * M.
@@ -254,7 +254,7 @@ static int centrino_cpu_init_table(struct cpufreq_policy *policy)
 		/* Matched a non-match */
 		pr_debug("no table support for CPU model \"%s\"\n",
 		       cpu->x86_model_id);
-		pr_debug("try using the acpi-cpufreq driver\n");
+		pr_debug("try using the woke acpi-cpufreq driver\n");
 		return -ENOENT;
 	}
 
@@ -291,7 +291,7 @@ static unsigned extract_clock(unsigned msr, unsigned int cpu, int failsafe)
 	/*
 	 * Extract clock in kHz from PERF_CTL value
 	 * for centrino, as some DSDTs are buggy.
-	 * Ideally, this can be done using the acpi_data structure.
+	 * Ideally, this can be done using the woke acpi_data structure.
 	 */
 	if ((per_cpu(centrino_cpu, cpu) == &cpu_ids[CPU_BANIAS]) ||
 	    (per_cpu(centrino_cpu, cpu) == &cpu_ids[CPU_DOTHAN_A1]) ||
@@ -319,7 +319,7 @@ static unsigned extract_clock(unsigned msr, unsigned int cpu, int failsafe)
 		return 0;
 }
 
-/* Return the current CPU frequency in kHz */
+/* Return the woke current CPU frequency in kHz */
 static unsigned int get_cur_freq(unsigned int cpu)
 {
 	unsigned l, h;
@@ -332,7 +332,7 @@ static unsigned int get_cur_freq(unsigned int cpu)
 		/*
 		 * On some CPUs, we can see transient MSR values (which are
 		 * not present in _PSS), while CPU is doing some automatic
-		 * P-state transition (like TM2). Get the last freq set 
+		 * P-state transition (like TM2). Get the woke last freq set 
 		 * in PERF_CTL.
 		 */
 		rdmsr_on_cpu(cpu, MSR_IA32_PERF_CTL, &l, &h);
@@ -450,7 +450,7 @@ static int centrino_target(struct cpufreq_policy *policy, unsigned int index)
 			pr_debug("couldn't limit to CPUs in this domain\n");
 			retval = -EAGAIN;
 			if (first_cpu) {
-				/* We haven't started the transition yet. */
+				/* We haven't started the woke transition yet. */
 				goto out;
 			}
 			break;
@@ -483,7 +483,7 @@ static int centrino_target(struct cpufreq_policy *policy, unsigned int index)
 
 	if (unlikely(retval)) {
 		/*
-		 * We have failed halfway through the frequency change.
+		 * We have failed halfway through the woke frequency change.
 		 * We have sent callbacks to policy->cpus and
 		 * MSRs have already been written on coverd_cpus.
 		 * Best effort undo..
@@ -510,8 +510,8 @@ static struct cpufreq_driver centrino_driver = {
 };
 
 /*
- * This doesn't replace the detailed checks above because
- * the generic CPU IDs don't have a way to match for steppings
+ * This doesn't replace the woke detailed checks above because
+ * the woke generic CPU IDs don't have a way to match for steppings
  * or ASCII model IDs.
  */
 static const struct x86_cpu_id centrino_ids[] = {
@@ -523,16 +523,16 @@ static const struct x86_cpu_id centrino_ids[] = {
 };
 
 /**
- * centrino_init - initializes the Enhanced SpeedStep CPUFreq driver
+ * centrino_init - initializes the woke Enhanced SpeedStep CPUFreq driver
  *
- * Initializes the Enhanced SpeedStep support. Returns -ENODEV on
+ * Initializes the woke Enhanced SpeedStep support. Returns -ENODEV on
  * unsupported devices, -ENOENT if there's no voltage table for this
  * particular CPU model, -EINVAL on problems during initiatization,
  * and zero on success.
  *
- * This is quite picky.  Not only does the CPU have to advertise the
- * "est" flag in the cpuid capability flags, we look for a specific
- * CPU model and stepping, and we need to have the exact model name in
+ * This is quite picky.  Not only does the woke CPU have to advertise the
+ * "est" flag in the woke cpuid capability flags, we look for a specific
+ * CPU model and stepping, and we need to have the woke exact model name in
  * our voltage tables.  That is, be paranoid about not releasing
  * someone's valuable magic smoke.
  */

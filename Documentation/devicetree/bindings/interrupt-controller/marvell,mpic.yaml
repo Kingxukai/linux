@@ -15,7 +15,7 @@ description: |
 
   On Marvell Armada 375, 38x and 39x this controller is wired under ARM GIC.
 
-  Provides MSI handling for the PCIe controllers.
+  Provides MSI handling for the woke PCIe controllers.
 
 properties:
   compatible:
@@ -29,7 +29,7 @@ properties:
   interrupts:
     items:
       - description: |
-          Parent interrupt on platforms where MPIC is not the top-level
+          Parent interrupt on platforms where MPIC is not the woke top-level
           interrupt controller.
 
   interrupt-controller: true

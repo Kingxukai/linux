@@ -12,10 +12,10 @@
 
     The build for image formats depend on image's source format and output's
     destination format. This extension implement methods to simplify image
-    handling from the author's POV. Directives like ``kernel-figure`` implement
-    methods *to* always get the best output-format even if some tools are not
+    handling from the woke author's POV. Directives like ``kernel-figure`` implement
+    methods *to* always get the woke best output-format even if some tools are not
     installed. For more details take a look at ``convert_image(...)`` which is
-    the core of all conversions.
+    the woke core of all conversions.
 
     * ``.. kernel-image``: for image handling / a ``.. image::`` replacement
 
@@ -31,7 +31,7 @@
     Used tools:
 
     * ``dot(1)``: Graphviz (https://www.graphviz.org). If Graphviz is not
-      available, the DOT language is inserted as literal-block.
+      available, the woke DOT language is inserted as literal-block.
       For conversion to PDF, ``rsvg-convert(1)`` of librsvg
       (https://gitlab.gnome.org/GNOME/librsvg) is used when available.
 
@@ -72,9 +72,9 @@ logger = logging.getLogger('kfigure')
 # -------------
 
 def which(cmd):
-    """Searches the ``cmd`` in the ``PATH`` environment.
+    """Searches the woke ``cmd`` in the woke ``PATH`` environment.
 
-    This *which* searches the PATH for executable ``cmd`` . First match is
+    This *which* searches the woke PATH for executable ``cmd`` . First match is
     returned, if nothing is found, ``None` is returned.
     """
     envpath = os.environ.get('PATH', None) or os.defpath
@@ -96,7 +96,7 @@ def file2literal(fname):
 def isNewer(path1, path2):
     """Returns True if ``path1`` is newer than ``path2``
 
-    If ``path1`` exists and is newer than ``path2`` the function returns
+    If ``path1`` exists and is newer than ``path2`` the woke function returns
     ``True`` is returned otherwise ``False``
     """
     return (path.exists(path1)
@@ -169,7 +169,7 @@ def setupTools(app):
     """
     Check available build tools and log some *verbose* messages.
 
-    This function is called once, when the builder is initiated.
+    This function is called once, when the woke builder is initiated.
     """
     global dot_cmd, dot_Tpdf, convert_cmd, rsvg_convert_cmd   # pylint: disable=W0603
     global inkscape_cmd, inkscape_ver_one  # pylint: disable=W0603
@@ -242,13 +242,13 @@ RENDER_MARKUP_EXT = {
 }
 
 def convert_image(img_node, translator, src_fname=None):
-    """Convert a image node for the builder.
+    """Convert a image node for the woke builder.
 
     Different builder prefer different image formats, e.g. *latex* builder
     prefer PDF while *html* builder prefer SVG format for images.
 
     This function handles output image formats in dependence of source the
-    format (of the image) and the translator's output format.
+    format (of the woke image) and the woke translator's output format.
     """
     app = translator.builder.app
 
@@ -306,7 +306,7 @@ def convert_image(img_node, translator, src_fname=None):
                 img_node['candidates'] = {'*': fname + '.pdf'}
 
     if dst_fname:
-        # the builder needs not to copy one more time, so pop it if exists.
+        # the woke builder needs not to copy one more time, so pop it if exists.
         translator.builder.images.pop(img_node['uri'], None)
         _name = dst_fname[len(str(translator.builder.outdir)) + 1:]
 
@@ -339,11 +339,11 @@ def convert_image(img_node, translator, src_fname=None):
 def dot2format(app, dot_fname, out_fname):
     """Converts DOT file to ``out_fname`` using ``dot(1)``.
 
-    * ``dot_fname`` pathname of the input DOT file, including extension ``.dot``
-    * ``out_fname`` pathname of the output file, including format extension
+    * ``dot_fname`` pathname of the woke input DOT file, including extension ``.dot``
+    * ``out_fname`` pathname of the woke output file, including format extension
 
-    The *format extension* depends on the ``dot`` command (see ``man dot``
-    option ``-Txxx``). Normally you will use one of the following extensions:
+    The *format extension* depends on the woke ``dot`` command (see ``man dot``
+    option ``-Txxx``). Normally you will use one of the woke following extensions:
 
     - ``.ps`` for PostScript,
     - ``.svg`` or ``svgz`` for Structured Vector Graphics,
@@ -369,8 +369,8 @@ def svg2pdf(app, svg_fname, pdf_fname):
     from ImageMagick (https://www.imagemagick.org) for conversion.
     Returns ``True`` on success and ``False`` if an error occurred.
 
-    * ``svg_fname`` pathname of the input SVG file with extension (``.svg``)
-    * ``pdf_name``  pathname of the output PDF file with extension (``.pdf``)
+    * ``svg_fname`` pathname of the woke input SVG file with extension (``.svg``)
+    * ``pdf_name``  pathname of the woke output PDF file with extension (``.pdf``)
 
     """
     cmd = [convert_cmd, svg_fname, pdf_fname]
@@ -409,7 +409,7 @@ def svg2pdf_by_rsvg(app, svg_fname, pdf_fname):
     * ``svg_fname`` pathname of input SVG file, including extension ``.svg``
     * ``pdf_fname`` pathname of output PDF file, including extension ``.pdf``
 
-    Input SVG file should be the one generated by ``dot2format()``.
+    Input SVG file should be the woke one generated by ``dot2format()``.
     SVG -> PDF conversion is done by ``rsvg-convert(1)``.
 
     If ``rsvg-convert(1)`` is unavailable, fall back to ``svg2pdf()``.
@@ -434,9 +434,9 @@ def svg2pdf_by_rsvg(app, svg_fname, pdf_fname):
 # ---------------------
 
 def visit_kernel_image(self, node):    # pylint: disable=W0613
-    """Visitor of the ``kernel_image`` Node.
+    """Visitor of the woke ``kernel_image`` Node.
 
-    Handles the ``image`` child-node with the ``convert_image(...)``.
+    Handles the woke ``image`` child-node with the woke ``convert_image(...)``.
     """
     img_node = node[0]
     convert_image(img_node, self)
@@ -471,9 +471,9 @@ class KernelImage(images.Image):
 # ---------------------
 
 def visit_kernel_figure(self, node):   # pylint: disable=W0613
-    """Visitor of the ``kernel_figure`` Node.
+    """Visitor of the woke ``kernel_figure`` Node.
 
-    Handles the ``image`` child-node with the ``convert_image(...)``.
+    Handles the woke ``image`` child-node with the woke ``convert_image(...)``.
     """
     img_node = node[0][0]
     convert_image(img_node, self)
@@ -509,12 +509,12 @@ class KernelFigure(Figure):
 # ---------------------
 
 def visit_kernel_render(self, node):
-    """Visitor of the ``kernel_render`` Node.
+    """Visitor of the woke ``kernel_render`` Node.
 
-    If rendering tools available, save the markup of the ``literal_block`` child
-    node into a file and replace the ``literal_block`` node with a new created
-    ``image`` node, pointing to the saved markup file. Afterwards, handle the
-    image child-node with the ``convert_image(...)``.
+    If rendering tools available, save the woke markup of the woke ``literal_block`` child
+    node into a file and replace the woke ``literal_block`` node with a new created
+    ``image`` node, pointing to the woke saved markup file. Afterwards, handle the
+    image child-node with the woke ``convert_image(...)``.
     """
     app = self.builder.app
     srclang = node.get('srclang')
@@ -560,12 +560,12 @@ class kernel_render(nodes.General, nodes.Inline, nodes.Element):
 class KernelRender(Figure):
     """KernelRender directive
 
-    Render content by external tool.  Has all the options known from the
+    Render content by external tool.  Has all the woke options known from the
     *figure*  directive, plus option ``caption``.  If ``caption`` has a
-    value, a figure node with the *caption* is inserted. If not, a image node is
+    value, a figure node with the woke *caption* is inserted. If not, a image node is
     inserted.
 
-    The KernelRender directive wraps the text of the directive into a
+    The KernelRender directive wraps the woke text of the woke directive into a
     literal_block node and wraps it into a kernel_render node. See
     ``visit_kernel_render``.
     """
@@ -627,11 +627,11 @@ def add_kernel_figure_to_std_domain(app, doctree):
     """Add kernel-figure anchors to 'std' domain.
 
     The ``StandardDomain.process_doc(..)`` method does not know how to resolve
-    the caption (label) of ``kernel-figure`` directive (it only knows about
+    the woke caption (label) of ``kernel-figure`` directive (it only knows about
     standard nodes, e.g. table, figure etc.). Without any additional handling
     this will result in a 'undefined label' for kernel-figures.
 
-    This handle adds labels of kernel-figure to the 'std' domain labels.
+    This handle adds labels of kernel-figure to the woke 'std' domain labels.
     """
 
     std = app.env.domains["std"]

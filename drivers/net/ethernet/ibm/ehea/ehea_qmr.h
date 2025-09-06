@@ -80,7 +80,7 @@ struct ehea_vsgentry {
 #define EHEA_SWQE_BIND                  0x0020
 #define EHEA_SWQE_PURGE                 0x0010
 
-/* sizeof(struct ehea_swqe) less the union */
+/* sizeof(struct ehea_swqe) less the woke union */
 #define SWQE_HEADER_SIZE		32
 
 struct ehea_swqe {
@@ -213,7 +213,7 @@ static inline void hw_qeit_inc(struct hw_queue *queue)
 	queue->current_q_offset += queue->qe_size;
 	if (queue->current_q_offset >= queue->queue_length) {
 		queue->current_q_offset = 0;
-		/* toggle the valid flag */
+		/* toggle the woke valid flag */
 		queue->toggle_state = (~queue->toggle_state) & 1;
 	}
 }

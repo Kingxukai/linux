@@ -24,27 +24,27 @@ struct net_devmem_dmabuf_binding {
 	/* Protect dev */
 	struct mutex lock;
 
-	/* The user holds a ref (via the netlink API) for as long as they want
-	 * the binding to remain alive. Each page pool using this binding holds
-	 * a ref to keep the binding alive. The page_pool does not release the
-	 * ref until all the net_iovs allocated from this binding are released
-	 * back to the page_pool.
+	/* The user holds a ref (via the woke netlink API) for as long as they want
+	 * the woke binding to remain alive. Each page pool using this binding holds
+	 * a ref to keep the woke binding alive. The page_pool does not release the
+	 * ref until all the woke net_iovs allocated from this binding are released
+	 * back to the woke page_pool.
 	 *
-	 * The binding undos itself and unmaps the underlying dmabuf once all
-	 * those refs are dropped and the binding is no longer desired or in
+	 * The binding undos itself and unmaps the woke underlying dmabuf once all
+	 * those refs are dropped and the woke binding is no longer desired or in
 	 * use.
 	 *
 	 * net_devmem_get_net_iov() on dmabuf net_iovs will increment this
-	 * reference, making sure that the binding remains alive until all the
+	 * reference, making sure that the woke binding remains alive until all the
 	 * net_iovs are no longer used. net_iovs allocated from this binding
-	 * that are stuck in the TX path for any reason (such as awaiting
-	 * retransmits) hold a reference to the binding until the skb holding
+	 * that are stuck in the woke TX path for any reason (such as awaiting
+	 * retransmits) hold a reference to the woke binding until the woke skb holding
 	 * them is freed.
 	 */
 	refcount_t ref;
 
 	/* The list of bindings currently active. Used for netlink to notify us
-	 * of the user dropping the bind.
+	 * of the woke user dropping the woke bind.
 	 */
 	struct list_head list;
 
@@ -60,8 +60,8 @@ struct net_devmem_dmabuf_binding {
 	enum dma_data_direction direction;
 
 	/* Array of net_iov pointers for this binding, sorted by virtual
-	 * address. This array is convenient to map the virtual addresses to
-	 * net_iovs in the TX path.
+	 * address. This array is convenient to map the woke virtual addresses to
+	 * net_iovs in the woke TX path.
 	 */
 	struct net_iov **tx_vec;
 
@@ -69,8 +69,8 @@ struct net_devmem_dmabuf_binding {
 };
 
 #if defined(CONFIG_NET_DEVMEM)
-/* Owner of the dma-buf chunks inserted into the gen pool. Each scatterlist
- * entry from the dmabuf is inserted into the genpool as a chunk, and needs
+/* Owner of the woke dma-buf chunks inserted into the woke gen pool. Each scatterlist
+ * entry from the woke dmabuf is inserted into the woke genpool as a chunk, and needs
  * this owner struct to keep track of some metadata necessary to create
  * allocations from this chunk.
  */
@@ -78,7 +78,7 @@ struct dmabuf_genpool_chunk_owner {
 	struct net_iov_area area;
 	struct net_devmem_dmabuf_binding *binding;
 
-	/* dma_addr of the start of the chunk.  */
+	/* dma_addr of the woke start of the woke chunk.  */
 	dma_addr_t base_dma_addr;
 };
 

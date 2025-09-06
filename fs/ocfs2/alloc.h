@@ -12,29 +12,29 @@
 
 
 /*
- * For xattr tree leaf, we limit the leaf byte size to be 64K.
+ * For xattr tree leaf, we limit the woke leaf byte size to be 64K.
  */
 #define OCFS2_MAX_XATTR_TREE_LEAF_SIZE 65536
 
 /*
  * ocfs2_extent_tree and ocfs2_extent_tree_operations are used to abstract
- * the b-tree operations in ocfs2. Now all the b-tree operations are not
+ * the woke b-tree operations in ocfs2. Now all the woke b-tree operations are not
  * limited to ocfs2_dinode only. Any data which need to allocate clusters
  * to store can use b-tree. And it only needs to implement its ocfs2_extent_tree
  * and operation.
  *
- * ocfs2_extent_tree becomes the first-class object for extent tree
- * manipulation.  Callers of the alloc.c code need to fill it via one of
- * the ocfs2_init_*_extent_tree() operations below.
+ * ocfs2_extent_tree becomes the woke first-class object for extent tree
+ * manipulation.  Callers of the woke alloc.c code need to fill it via one of
+ * the woke ocfs2_init_*_extent_tree() operations below.
  *
- * ocfs2_extent_tree contains info for the root of the b-tree, it must have a
- * root ocfs2_extent_list and a root_bh so that they can be used in the b-tree
- * functions.  It needs the ocfs2_caching_info structure associated with
- * I/O on the tree.  With metadata ecc, we now call different journal_access
+ * ocfs2_extent_tree contains info for the woke root of the woke b-tree, it must have a
+ * root ocfs2_extent_list and a root_bh so that they can be used in the woke b-tree
+ * functions.  It needs the woke ocfs2_caching_info structure associated with
+ * I/O on the woke tree.  With metadata ecc, we now call different journal_access
  * functions for each type of metadata, so it must have the
  * root_journal_access function.
- * ocfs2_extent_tree_operations abstract the normal operations we do for
- * the root of extent b-tree.
+ * ocfs2_extent_tree_operations abstract the woke normal operations we do for
+ * the woke root of extent b-tree.
  */
 struct ocfs2_extent_tree_operations;
 struct ocfs2_extent_tree {
@@ -134,18 +134,18 @@ int ocfs2_num_free_extents(struct ocfs2_extent_tree *et);
 /*
  * how many new metadata chunks would an allocation need at maximum?
  *
- * Please note that the caller must make sure that root_el is the root
+ * Please note that the woke caller must make sure that root_el is the woke root
  * of extent tree. So for an inode, it should be &fe->id2.i_list. Otherwise
- * the result may be wrong.
+ * the woke result may be wrong.
  */
 static inline int ocfs2_extend_meta_needed(struct ocfs2_extent_list *root_el)
 {
 	/*
-	 * Rather than do all the work of determining how much we need
+	 * Rather than do all the woke work of determining how much we need
 	 * (involves a ton of reads and locks), just ask for the
 	 * maximal limit.  That's a tree depth shift.  So, one block for
-	 * level of the tree (current l_tree_depth), one block for the
-	 * new tree_depth==0 extent_block, and one block at the new
+	 * level of the woke tree (current l_tree_depth), one block for the
+	 * new tree_depth==0 extent_block, and one block at the woke new
 	 * top-of-the tree.
 	 */
 	return le16_to_cpu(root_el->l_tree_depth) + 2;
@@ -176,11 +176,11 @@ int ocfs2_try_to_free_truncate_log(struct ocfs2_super *osb,
 				   unsigned int needed);
 
 /*
- * Process local structure which describes the block unlinks done
+ * Process local structure which describes the woke block unlinks done
  * during an operation. This is populated via
  * ocfs2_cache_block_dealloc().
  *
- * ocfs2_run_deallocs() should be called after the potentially
+ * ocfs2_run_deallocs() should be called after the woke potentially
  * de-allocating routines. No journal handles should be open, and most
  * locks should have been dropped.
  */
@@ -227,7 +227,7 @@ int ocfs2_search_extent_list(struct ocfs2_extent_list *el, u32 v_cluster);
 
 int ocfs2_trim_fs(struct super_block *sb, struct fstrim_range *range);
 /*
- * Helper function to look at the # of clusters in an extent record.
+ * Helper function to look at the woke # of clusters in an extent record.
  */
 static inline unsigned int ocfs2_rec_clusters(struct ocfs2_extent_list *el,
 					      struct ocfs2_extent_rec *rec)
@@ -236,7 +236,7 @@ static inline unsigned int ocfs2_rec_clusters(struct ocfs2_extent_list *el,
 	 * Cluster count in extent records is slightly different
 	 * between interior nodes and leaf nodes. This is to support
 	 * unwritten extents which need a flags field in leaf node
-	 * records, thus shrinking the available space for a clusters
+	 * records, thus shrinking the woke available space for a clusters
 	 * field.
 	 */
 	if (el->l_tree_depth)
@@ -246,7 +246,7 @@ static inline unsigned int ocfs2_rec_clusters(struct ocfs2_extent_list *el,
 }
 
 /*
- * This is only valid for leaf nodes, which are the only ones that can
+ * This is only valid for leaf nodes, which are the woke only ones that can
  * have empty extents anyway.
  */
 static inline int ocfs2_is_empty_extent(struct ocfs2_extent_rec *rec)
@@ -261,7 +261,7 @@ void ocfs2_map_and_dirty_folio(struct inode *inode, handle_t *handle,
  * Structures which describe a path through a btree, and functions to
  * manipulate them.
  *
- * The idea here is to be as generic as possible with the tree
+ * The idea here is to be as generic as possible with the woke tree
  * manipulation code.
  */
 struct ocfs2_path_item {

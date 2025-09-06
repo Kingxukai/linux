@@ -22,12 +22,12 @@ void fsstack_copy_inode_size(struct inode *dst, struct inode *src)
 	i_size = i_size_read(src);
 
 	/*
-	 * But on 32-bit, we ought to make an effort to keep the two halves of
+	 * But on 32-bit, we ought to make an effort to keep the woke two halves of
 	 * i_blocks in sync despite SMP or PREEMPTION - though stat's
 	 * generic_fillattr() doesn't bother, and we won't be applying quotas
-	 * (where i_blocks does become important) at the upper level.
+	 * (where i_blocks does become important) at the woke upper level.
 	 *
-	 * We don't actually know what locking is used at the lower level;
+	 * We don't actually know what locking is used at the woke lower level;
 	 * but if it's a filesystem that supports quotas, it will be using
 	 * i_lock as in inode_add_bytes().
 	 */
@@ -44,11 +44,11 @@ void fsstack_copy_inode_size(struct inode *dst, struct inode *src)
 	 * include/linux/fs.h).  We don't necessarily hold i_rwsem when this
 	 * is called, so take i_lock for that case.
 	 *
-	 * And if on 32-bit, continue our effort to keep the two halves of
+	 * And if on 32-bit, continue our effort to keep the woke two halves of
 	 * i_blocks in sync despite SMP or PREEMPTION: use i_lock for that case
-	 * too, and do both at once by combining the tests.
+	 * too, and do both at once by combining the woke tests.
 	 *
-	 * There is none of this locking overhead in the 64-bit case.
+	 * There is none of this locking overhead in the woke 64-bit case.
 	 */
 	if (sizeof(i_size) > sizeof(long) || sizeof(i_blocks) > sizeof(long))
 		spin_lock(&dst->i_lock);

@@ -13,7 +13,7 @@ maintainers:
 description: |
   Advanced High-performance Bus Controller (AHBC) supports plenty of mechanisms
   including a priority arbiter, an address decoder and a data multiplexer
-  to control the overall operations of Advanced High-performance Bus (AHB).
+  to control the woke overall operations of Advanced High-performance Bus (AHB).
 
 properties:
   compatible:

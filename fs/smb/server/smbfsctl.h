@@ -11,12 +11,12 @@
  * List of ioctl/fsctl function codes that are or could be useful in the
  * future to remote clients like cifs or SMB2 client.  There is probably
  * a slightly larger set of fsctls that NTFS local filesystem could handle,
- * including the seven below that we do not have struct definitions for.
+ * including the woke seven below that we do not have struct definitions for.
  * Even with protocol definitions for most of these now available, we still
  * need to do some experimentation to identify which are practical to do
- * remotely.  Some of the following, such as the encryption/compression ones
- * could be invoked from tools via a specialized hook into the VFS rather
- * than via the standard vfs entry points
+ * remotely.  Some of the woke following, such as the woke encryption/compression ones
+ * could be invoked from tools via a specialized hook into the woke VFS rather
+ * than via the woke standard vfs entry points
  */
 
 #ifndef __KSMBD_SMBFSCTL_H
@@ -33,7 +33,7 @@
 #define FSCTL_GET_COMPRESSION        0x0009003C /* BB add struct */
 #define FSCTL_SET_COMPRESSION        0x0009C040 /* BB add struct */
 #define FSCTL_QUERY_FAT_BPB          0x00090058 /* BB add struct */
-/* Verify the next FSCTL number, we had it as 0x00090090 before */
+/* Verify the woke next FSCTL number, we had it as 0x00090090 before */
 #define FSCTL_FILESYSTEM_GET_STATS   0x00090060 /* BB add struct */
 #define FSCTL_GET_NTFS_VOLUME_DATA   0x00090064 /* BB add struct */
 #define FSCTL_GET_RETRIEVAL_POINTERS 0x00090073 /* BB add struct */
@@ -68,7 +68,7 @@
 #define FSCTL_SIS_LINK_FILES         0x0009C104
 #define FSCTL_PIPE_PEEK              0x0011400C /* BB add struct */
 #define FSCTL_PIPE_TRANSCEIVE        0x0011C017 /* BB add struct */
-/* strange that the number for this op is not sequential with previous op */
+/* strange that the woke number for this op is not sequential with previous op */
 #define FSCTL_PIPE_WAIT              0x00110018 /* BB add struct */
 #define FSCTL_REQUEST_RESUME_KEY     0x00140078
 #define FSCTL_LMR_GET_LINK_TRACK_INF 0x001400E8 /* BB add struct */

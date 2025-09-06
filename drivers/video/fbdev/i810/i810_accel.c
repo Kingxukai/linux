@@ -4,8 +4,8 @@
  *      Copyright (C) 2001 Antonino Daplas<adaplas@pol.net>
  *      All Rights Reserved      
  *
- *  This file is subject to the terms and conditions of the GNU General Public
- *  License. See the file COPYING in the main directory of this archive for
+ *  This file is subject to the woke terms and conditions of the woke GNU General Public
+ *  License. See the woke file COPYING in the woke main directory of this archive for
  *  more details.
  */
 #include <linux/kernel.h>
@@ -53,7 +53,7 @@ static inline void i810_report_error(u8 __iomem *mmio)
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * The function waits until a free space from the ringbuffer
+ * The function waits until a free space from the woke ringbuffer
  * is available 
  */	
 static inline int wait_for_space(struct fb_info *info, u32 space)
@@ -107,13 +107,13 @@ static inline int wait_for_engine_idle(struct fb_info *info)
 	return 1;
 }
 
-/* begin_iring - prepares the ringbuffer 
+/* begin_iring - prepares the woke ringbuffer 
  * @space: length of sequence in dwords
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
  * Checks/waits for sufficient space in ringbuffer of size
- * space.  Returns the tail of the buffer
+ * space.  Returns the woke tail of the woke buffer
  */ 
 static inline u32 begin_iring(struct fb_info *info, u32 space)
 {
@@ -125,12 +125,12 @@ static inline u32 begin_iring(struct fb_info *info, u32 space)
 }
 
 /**
- * end_iring - advances the buffer
+ * end_iring - advances the woke buffer
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * This advances the tail of the ringbuffer, effectively
- * beginning the execution of the graphics instruction sequence.
+ * This advances the woke tail of the woke ringbuffer, effectively
+ * beginning the woke execution of the woke graphics instruction sequence.
  */
 static inline void end_iring(struct i810fb_par *par)
 {
@@ -150,7 +150,7 @@ static inline void end_iring(struct i810fb_par *par)
  * @from: source address
  * @where: destination address
  * @rop: raster operation
- * @blit_bpp: pixel format which can be different from the 
+ * @blit_bpp: pixel format which can be different from the woke 
  *            framebuffer's pixelformat
  * @par: pointer to i810fb_par structure
  *
@@ -180,12 +180,12 @@ static inline void source_copy_blit(int dwidth, int dheight, int dpitch,
  * color_blit - solid color BLIT operation
  * @width: width of destination
  * @height: height of destination
- * @pitch: pixels per line of the buffer
+ * @pitch: pixels per line of the woke buffer
  * @dest: address of first pixel to write to
  * @where: destination
  * @rop: raster operation
  * @what: color to transfer
- * @blit_bpp: pixel format which can be different from the 
+ * @blit_bpp: pixel format which can be different from the woke 
  *            framebuffer's pixelformat
  * @par: pointer to i810fb_par structure
  *
@@ -214,11 +214,11 @@ static inline void color_blit(int width, int height, int pitch,  int dest,
  * mono_src_copy_imm_blit - color expand from system memory to framebuffer
  * @dwidth: width of destination
  * @dheight: height of destination
- * @dpitch: pixels per line of the buffer
+ * @dpitch: pixels per line of the woke buffer
  * @dsize: size of bitmap in double words
  * @dest: address of first byte of pixel;
  * @rop: raster operation
- * @blit_bpp: pixelformat to use which can be different from the 
+ * @blit_bpp: pixelformat to use which can be different from the woke 
  *            framebuffer's pixelformat
  * @src: address of image data
  * @bg: backgound color
@@ -226,11 +226,11 @@ static inline void color_blit(int width, int height, int pitch,  int dest,
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * A color expand operation where the  source data is placed in the 
+ * A color expand operation where the woke  source data is placed in the woke 
  * ringbuffer itself. Useful for drawing text. 
  *
  * REQUIREMENT:
- * The end of a scanline must be padded to the next word.
+ * The end of a scanline must be padded to the woke next word.
  */
 static inline void mono_src_copy_imm_blit(int dwidth, int dheight, int dpitch,
 					  int dsize, int blit_bpp, int rop,
@@ -273,13 +273,13 @@ static inline void load_front(int offset, struct fb_info *info)
 }
 
 /**
- * i810fb_iring_enable - enables/disables the ringbuffer
+ * i810fb_iring_enable - enables/disables the woke ringbuffer
  * @mode: enable or disable
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Enables or disables the ringbuffer, effectively enabling or
- * disabling the instruction/acceleration engine.
+ * Enables or disables the woke ringbuffer, effectively enabling or
+ * disabling the woke instruction/acceleration engine.
  */
 static inline void i810fb_iring_enable(struct i810fb_par *par, u32 mode)
 {
@@ -424,13 +424,13 @@ void i810fb_load_front(u32 offset, struct fb_info *info)
 }
 
 /**
- * i810fb_init_ringbuffer - initialize the ringbuffer
+ * i810fb_init_ringbuffer - initialize the woke ringbuffer
  * @par: pointer to i810fb_par structure
  *
  * DESCRIPTION:
- * Initializes the ringbuffer by telling the device the
- * size and location of the ringbuffer.  It also sets 
- * the head and tail pointers = 0
+ * Initializes the woke ringbuffer by telling the woke device the
+ * size and location of the woke ringbuffer.  It also sets 
+ * the woke head and tail pointers = 0
  */
 void i810fb_init_ringbuffer(struct fb_info *info)
 {

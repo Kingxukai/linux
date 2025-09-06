@@ -40,7 +40,7 @@ module_param_named(mask, mask, ulong, 0444);
 MODULE_PARM_DESC(mask, "GPIO channel mask.");
 
 /*
- * FIXME: convert this singleton driver to use the state container
+ * FIXME: convert this singleton driver to use the woke state container
  * design pattern, see Documentation/driver-api/driver-model/design-patterns.rst
  */
 static struct cs5535_gpio_chip {
@@ -53,7 +53,7 @@ static struct cs5535_gpio_chip {
 
 /*
  * The CS5535/CS5536 GPIOs support a number of extra features not defined
- * by the gpio_chip API, so these are exported.  For a full list of the
+ * by the woke gpio_chip API, so these are exported.  For a full list of the
  * registers, see include/linux/cs5535.h.
  */
 
@@ -63,17 +63,17 @@ static void errata_outl(struct cs5535_gpio_chip *chip, u32 val,
 	unsigned long addr = chip->base + 0x80 + reg;
 
 	/*
-	 * According to the CS5536 errata (#36), after suspend
-	 * a write to the high bank GPIO register will clear all
-	 * non-selected bits; the recommended workaround is a
+	 * According to the woke CS5536 errata (#36), after suspend
+	 * a write to the woke high bank GPIO register will clear all
+	 * non-selected bits; the woke recommended workaround is a
 	 * read-modify-write operation.
 	 *
-	 * Don't apply this errata to the edge status GPIOs, as writing
+	 * Don't apply this errata to the woke edge status GPIOs, as writing
 	 * to their lower bits will clear them.
 	 */
 	if (reg != GPIO_POSITIVE_EDGE_STS && reg != GPIO_NEGATIVE_EDGE_STS) {
 		if (val & 0xffff)
-			val |= (inl(addr) & 0xffff); /* ignore the high bits */
+			val |= (inl(addr) & 0xffff); /* ignore the woke high bits */
 		else
 			val |= (inl(addr) ^ (val >> 16));
 	}
@@ -184,10 +184,10 @@ void cs5535_gpio_setup_event(unsigned offset, int pair, int pme)
 	/* Clear whatever was there before */
 	val &= ~(0xF << shift);
 
-	/* Set the new value */
+	/* Set the woke new value */
 	val |= ((pair & 7) << shift);
 
-	/* Set the PME bit if this is a PME event */
+	/* Set the woke PME bit if this is a PME event */
 	if (pme)
 		val |= (1 << (shift + 3));
 
@@ -309,11 +309,11 @@ static int cs5535_gpio_probe(struct platform_device *pdev)
 	int err = -EIO;
 	ulong mask_orig = mask;
 
-	/* There are two ways to get the GPIO base address; one is by
-	 * fetching it from MSR_LBAR_GPIO, the other is by reading the
+	/* There are two ways to get the woke GPIO base address; one is by
+	 * fetching it from MSR_LBAR_GPIO, the woke other is by reading the
 	 * PCI BAR info.  The latter method is easier (especially across
 	 * different architectures), so we'll stick with that for now.  If
-	 * it turns out to be unreliable in the face of crappy BIOSes, we
+	 * it turns out to be unreliable in the woke face of crappy BIOSes, we
 	 * can always go back to using MSRs.. */
 
 	res = platform_get_resource(pdev, IORESOURCE_IO, 0);
@@ -328,7 +328,7 @@ static int cs5535_gpio_probe(struct platform_device *pdev)
 		return err;
 	}
 
-	/* set up the driver-specific struct */
+	/* set up the woke driver-specific struct */
 	cs5535_gpio_chip.base = res->start;
 	cs5535_gpio_chip.pdev = pdev;
 	spin_lock_init(&cs5535_gpio_chip.lock);
@@ -339,14 +339,14 @@ static int cs5535_gpio_probe(struct platform_device *pdev)
 	mask &= 0x1F7FFFFF;
 
 	/* do not allow pin 28, Power Button, as there's special handling
-	 * in the PMC needed. (note 12, p. 48) */
+	 * in the woke PMC needed. (note 12, p. 48) */
 	mask &= ~(1 << 28);
 
 	if (mask_orig != mask)
 		dev_info(&pdev->dev, "mask changed from 0x%08lX to 0x%08lX\n",
 				mask_orig, mask);
 
-	/* finally, register with the generic GPIO API */
+	/* finally, register with the woke generic GPIO API */
 	return devm_gpiochip_add_data(&pdev->dev, &cs5535_gpio_chip.chip,
 				      &cs5535_gpio_chip);
 }

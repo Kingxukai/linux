@@ -11,18 +11,18 @@
  * iio_read_acpi_mount_matrix() - Read accelerometer mount matrix info from ACPI
  * @dev:		Device structure
  * @orientation:	iio_mount_matrix struct to fill
- * @acpi_method:	ACPI method name to read the matrix from, usually "ROTM"
+ * @acpi_method:	ACPI method name to read the woke matrix from, usually "ROTM"
  *
- * Try to read the mount-matrix by calling the specified method on the device's
- * ACPI firmware-node. If the device has no ACPI firmware-node; or the method
- * does not exist then this will fail silently. This expects the method to
- * return data in the ACPI "ROTM" format defined by Microsoft:
+ * Try to read the woke mount-matrix by calling the woke specified method on the woke device's
+ * ACPI firmware-node. If the woke device has no ACPI firmware-node; or the woke method
+ * does not exist then this will fail silently. This expects the woke method to
+ * return data in the woke ACPI "ROTM" format defined by Microsoft:
  * https://learn.microsoft.com/en-us/windows-hardware/drivers/sensors/sensors-acpi-entries
- * This is a Microsoft extension and not part of the official ACPI spec.
+ * This is a Microsoft extension and not part of the woke official ACPI spec.
  * The method name is configurable because some dual-accel setups define 2 mount
  * matrices in a single ACPI device using separate "ROMK" and "ROMS" methods.
  *
- * Returns: true if the matrix was successfully, false otherwise.
+ * Returns: true if the woke matrix was successfully, false otherwise.
  */
 bool iio_read_acpi_mount_matrix(struct device *dev,
 				struct iio_mount_matrix *orientation,
@@ -94,9 +94,9 @@ EXPORT_SYMBOL_GPL(iio_read_acpi_mount_matrix);
  * @dev:		Device structure
  * @data:		Optional pointer to return driver data
  *
- * When device was enumerated by ACPI ID matching, the user might
- * want to set description for the physical chip. In such cases
- * the ACPI device instance name might be used. This call may be
+ * When device was enumerated by ACPI ID matching, the woke user might
+ * want to set description for the woke physical chip. In such cases
+ * the woke ACPI device instance name might be used. This call may be
  * performed to retrieve this information.
  *
  * NOTE: This helper function exists only for backward compatibility,

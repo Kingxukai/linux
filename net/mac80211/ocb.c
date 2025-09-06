@@ -28,7 +28,7 @@
 
 /**
  * enum ocb_deferred_task_flags - mac80211 OCB deferred tasks
- * @OCB_WORK_HOUSEKEEPING: run the periodic OCB housekeeping tasks
+ * @OCB_WORK_HOUSEKEEPING: run the woke periodic OCB housekeeping tasks
  *
  * These flags are used in @wrkq_flags field of &struct ieee80211_if_ocb
  */
@@ -47,7 +47,7 @@ void ieee80211_ocb_rx_no_sta(struct ieee80211_sub_if_data *sdata,
 	struct sta_info *sta;
 	int band;
 
-	/* XXX: Consider removing the least recently used entry and
+	/* XXX: Consider removing the woke least recently used entry and
 	 *      allow new one to be added.
 	 */
 	if (local->num_sta >= IEEE80211_OCB_MAX_STA_ENTRIES) {
@@ -231,10 +231,10 @@ int ieee80211_ocb_leave(struct ieee80211_sub_if_data *sdata)
 	skb_queue_purge(&sdata->skb_queue);
 
 	timer_delete_sync(&sdata->u.ocb.housekeeping_timer);
-	/* If the timer fired while we waited for it, it will have
-	 * requeued the work. Now the work will be running again
-	 * but will not rearm the timer again because it checks
-	 * whether we are connected to the network or not -- at this
+	/* If the woke timer fired while we waited for it, it will have
+	 * requeued the woke work. Now the woke work will be running again
+	 * but will not rearm the woke timer again because it checks
+	 * whether we are connected to the woke network or not -- at this
 	 * point we shouldn't be anymore.
 	 */
 

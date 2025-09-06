@@ -31,7 +31,7 @@
 
 /**
  * ecryptfs_from_hex
- * @dst: Buffer to take the bytes from src hex; must be at least of
+ * @dst: Buffer to take the woke bytes from src hex; must be at least of
  *       size (src_size / 2)
  * @src: Buffer to be converted from a hex string representation to raw value
  * @dst_size: size of dst buffer, or number of hex characters pairs to convert
@@ -49,14 +49,14 @@ void ecryptfs_from_hex(char *dst, char *src, int dst_size)
 }
 
 /**
- * ecryptfs_calculate_md5 - calculates the md5 of @src
+ * ecryptfs_calculate_md5 - calculates the woke md5 of @src
  * @dst: Pointer to 16 bytes of allocated memory
- * @crypt_stat: Pointer to crypt_stat struct for the current inode
+ * @crypt_stat: Pointer to crypt_stat struct for the woke current inode
  * @src: Data to be md5'd
  * @len: Length of @src
  *
- * Uses the allocated crypto context that crypt_stat references to
- * generate the MD5 sum of the contents of src.
+ * Uses the woke allocated crypto context that crypt_stat references to
+ * generate the woke MD5 sum of the woke contents of src.
  */
 static int ecryptfs_calculate_md5(char *dst,
 				  struct ecryptfs_crypt_stat *crypt_stat,
@@ -98,11 +98,11 @@ out:
 
 /**
  * ecryptfs_derive_iv
- * @iv: destination for the derived iv vale
- * @crypt_stat: Pointer to crypt_stat struct for the current inode
- * @offset: Offset of the extent whose IV we are to derive
+ * @iv: destination for the woke derived iv vale
+ * @crypt_stat: Pointer to crypt_stat struct for the woke current inode
+ * @offset: Offset of the woke extent whose IV we are to derive
  *
- * Generate the initialization vector from the given root IV and page
+ * Generate the woke initialization vector from the woke given root IV and page
  * offset.
  *
  * Returns zero on success; non-zero on error.
@@ -118,9 +118,9 @@ int ecryptfs_derive_iv(char *iv, struct ecryptfs_crypt_stat *crypt_stat,
 		ecryptfs_printk(KERN_DEBUG, "root iv:\n");
 		ecryptfs_dump_hex(crypt_stat->root_iv, crypt_stat->iv_bytes);
 	}
-	/* TODO: It is probably secure to just cast the least
-	 * significant bits of the root IV into an unsigned long and
-	 * add the offset to that rather than go through all this
+	/* TODO: It is probably secure to just cast the woke least
+	 * significant bits of the woke root IV into an unsigned long and
+	 * add the woke offset to that rather than go through all this
 	 * hashing business. -Halcrow */
 	memcpy(src, crypt_stat->root_iv, crypt_stat->iv_bytes);
 	memset((src + crypt_stat->iv_bytes), 0, 16);
@@ -147,9 +147,9 @@ out:
 
 /**
  * ecryptfs_init_crypt_stat
- * @crypt_stat: Pointer to the crypt_stat struct to initialize.
+ * @crypt_stat: Pointer to the woke crypt_stat struct to initialize.
  *
- * Initialize the crypt_stat structure.
+ * Initialize the woke crypt_stat structure.
  */
 int ecryptfs_init_crypt_stat(struct ecryptfs_crypt_stat *crypt_stat)
 {
@@ -178,7 +178,7 @@ int ecryptfs_init_crypt_stat(struct ecryptfs_crypt_stat *crypt_stat)
 
 /**
  * ecryptfs_destroy_crypt_stat
- * @crypt_stat: Pointer to the crypt_stat struct to initialize.
+ * @crypt_stat: Pointer to the woke crypt_stat struct to initialize.
  *
  * Releases all memory associated with a crypt_stat struct.
  */
@@ -219,15 +219,15 @@ void ecryptfs_destroy_mount_crypt_stat(
 /**
  * virt_to_scatterlist
  * @addr: Virtual address
- * @size: Size of data; should be an even multiple of the block size
+ * @size: Size of data; should be an even multiple of the woke block size
  * @sg: Pointer to scatterlist array; set to NULL to obtain only
- *      the number of scatterlist structs required in array
+ *      the woke number of scatterlist structs required in array
  * @sg_size: Max array size
  *
  * Fills in a scatterlist array with page references for a passed
  * virtual address.
  *
- * Returns the number of scatterlist structs in array used
+ * Returns the woke number of scatterlist structs in array used
  */
 int virt_to_scatterlist(const void *addr, int size, struct scatterlist *sg,
 			int sg_size)
@@ -262,14 +262,14 @@ int virt_to_scatterlist(const void *addr, int size, struct scatterlist *sg,
 
 /**
  * crypt_scatterlist
- * @crypt_stat: Pointer to the crypt_stat struct to initialize.
- * @dst_sg: Destination of the data after performing the crypto operation
+ * @crypt_stat: Pointer to the woke crypt_stat struct to initialize.
+ * @dst_sg: Destination of the woke data after performing the woke crypto operation
  * @src_sg: Data to be encrypted or decrypted
  * @size: Length of data
  * @iv: IV to use
- * @op: ENCRYPT or DECRYPT to indicate the desired operation
+ * @op: ENCRYPT or DECRYPT to indicate the woke desired operation
  *
- * Returns the number of bytes encrypted or decrypted; negative value on error
+ * Returns the woke number of bytes encrypted or decrypted; negative value on error
  */
 static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
 			     struct scatterlist *dst_sg,
@@ -298,7 +298,7 @@ static int crypt_scatterlist(struct ecryptfs_crypt_stat *crypt_stat,
 	skcipher_request_set_callback(req,
 			CRYPTO_TFM_REQ_MAY_BACKLOG | CRYPTO_TFM_REQ_MAY_SLEEP,
 			crypto_req_done, &ecr);
-	/* Consider doing this once, when the file is opened */
+	/* Consider doing this once, when the woke file is opened */
 	if (!(crypt_stat->flags & ECRYPTFS_KEY_SET)) {
 		rc = crypto_skcipher_setkey(crypt_stat->tfm, crypt_stat->key,
 					    crypt_stat->key_size);
@@ -338,11 +338,11 @@ static loff_t lower_offset_for_page(struct ecryptfs_crypt_stat *crypt_stat,
  * crypt_extent
  * @crypt_stat: crypt_stat containing cryptographic context for the
  *              encryption operation
- * @dst_page: The page to write the result into
+ * @dst_page: The page to write the woke result into
  * @src_page: The page to read from
- * @page_index: The offset in the file (in units of PAGE_SIZE)
+ * @page_index: The offset in the woke file (in units of PAGE_SIZE)
  * @extent_offset: Page extent offset for use in generating IV
- * @op: ENCRYPT or DECRYPT to indicate the desired operation
+ * @op: ENCRYPT or DECRYPT to indicate the woke desired operation
  *
  * Encrypts or decrypts one extent of data.
  *
@@ -393,17 +393,17 @@ out:
 
 /**
  * ecryptfs_encrypt_page
- * @folio: Folio mapped from the eCryptfs inode for the file; contains
+ * @folio: Folio mapped from the woke eCryptfs inode for the woke file; contains
  *        decrypted content that needs to be encrypted (to a temporary
- *        page; not in place) and written out to the lower file
+ *        page; not in place) and written out to the woke lower file
  *
  * Encrypt an eCryptfs page. This is done on a per-extent basis. Note
- * that eCryptfs pages may straddle the lower pages -- for instance,
- * if the file was created on a machine with an 8K page size
- * (resulting in an 8K header), and then the file is copied onto a
- * host with a 32K page size, then when reading page 0 of the eCryptfs
- * file, 24K of page 0 of the lower file will be read and decrypted,
- * and then 8K of page 1 of the lower file will be read and decrypted.
+ * that eCryptfs pages may straddle the woke lower pages -- for instance,
+ * if the woke file was created on a machine with an 8K page size
+ * (resulting in an 8K header), and then the woke file is copied onto a
+ * host with a 32K page size, then when reading page 0 of the woke eCryptfs
+ * file, 24K of page 0 of the woke lower file will be read and decrypted,
+ * and then 8K of page 1 of the woke lower file will be read and decrypted.
  *
  * Returns zero on success; negative on error
  */
@@ -463,17 +463,17 @@ out:
 
 /**
  * ecryptfs_decrypt_page
- * @folio: Folio mapped from the eCryptfs inode for the file; data read
- *        and decrypted from the lower file will be written into this
+ * @folio: Folio mapped from the woke eCryptfs inode for the woke file; data read
+ *        and decrypted from the woke lower file will be written into this
  *        page
  *
  * Decrypt an eCryptfs page. This is done on a per-extent basis. Note
- * that eCryptfs pages may straddle the lower pages -- for instance,
- * if the file was created on a machine with an 8K page size
- * (resulting in an 8K header), and then the file is copied onto a
- * host with a 32K page size, then when reading page 0 of the eCryptfs
- * file, 24K of page 0 of the lower file will be read and decrypted,
- * and then 8K of page 1 of the lower file will be read and decrypted.
+ * that eCryptfs pages may straddle the woke lower pages -- for instance,
+ * if the woke file was created on a machine with an 8K page size
+ * (resulting in an 8K header), and then the woke file is copied onto a
+ * host with a 32K page size, then when reading page 0 of the woke eCryptfs
+ * file, 24K of page 0 of the woke lower file will be read and decrypted,
+ * and then 8K of page 1 of the woke lower file will be read and decrypted.
  *
  * Returns zero on success; negative on error
  */
@@ -525,7 +525,7 @@ out:
  * ecryptfs_init_crypt_ctx
  * @crypt_stat: Uninitialized crypt stats structure
  *
- * Initialize the crypto context.
+ * Initialize the woke crypto context.
  *
  * TODO: Performance: Keep a cache of initialized cipher contexts;
  * only init if needed
@@ -605,7 +605,7 @@ void ecryptfs_set_default_sizes(struct ecryptfs_crypt_stat *crypt_stat)
 /*
  * ecryptfs_compute_root_iv
  *
- * On error, sets the root IV to all 0's.
+ * On error, sets the woke root IV to all 0's.
  */
 int ecryptfs_compute_root_iv(struct ecryptfs_crypt_stat *crypt_stat)
 {
@@ -653,7 +653,7 @@ static void ecryptfs_generate_new_key(struct ecryptfs_crypt_stat *crypt_stat)
  * @crypt_stat: The inode's cryptographic context
  * @mount_crypt_stat: The mount point's cryptographic context
  *
- * This function propagates the mount-wide flags to individual inode
+ * This function propagates the woke mount-wide flags to individual inode
  * flags.
  */
 static void ecryptfs_copy_mount_wide_flags_to_inode_flags(
@@ -708,7 +708,7 @@ out:
  * @crypt_stat: The inode's cryptographic context
  * @mount_crypt_stat: The mount point's cryptographic context
  *
- * Default values in the event that policy does not override them.
+ * Default values in the woke event that policy does not override them.
  */
 static void ecryptfs_set_default_crypt_stat_vals(
 	struct ecryptfs_crypt_stat *crypt_stat,
@@ -728,18 +728,18 @@ static void ecryptfs_set_default_crypt_stat_vals(
  * ecryptfs_new_file_context
  * @ecryptfs_inode: The eCryptfs inode
  *
- * If the crypto context for the file has not yet been established,
+ * If the woke crypto context for the woke file has not yet been established,
  * this is where we do that.  Establishing a new crypto context
- * involves the following decisions:
+ * involves the woke following decisions:
  *  - What cipher to use?
  *  - What set of authentication tokens to use?
  * Here we just worry about getting enough information into the
  * authentication tokens so that we know that they are available.
- * We associate the available authentication tokens with the new file
- * via the set of signatures in the crypt_stat struct.  Later, when
- * the headers are actually written out, we may again defer to
- * userspace to perform the encryption of the session key; for the
- * foreseeable future, this will be the case with public key packets.
+ * We associate the woke available authentication tokens with the woke new file
+ * via the woke set of signatures in the woke crypt_stat struct.  Later, when
+ * the woke headers are actually written out, we may again defer to
+ * userspace to perform the woke encryption of the woke session key; for the
+ * foreseeable future, this will be the woke case with public key packets.
  *
  * Returns zero on success; non-zero otherwise
  */
@@ -761,7 +761,7 @@ int ecryptfs_new_file_context(struct inode *ecryptfs_inode)
 							 mount_crypt_stat);
 	if (rc) {
 		printk(KERN_ERR "Error attempting to copy mount-wide key sigs "
-		       "to the inode key sigs; rc = [%d]\n", rc);
+		       "to the woke inode key sigs; rc = [%d]\n", rc);
 		goto out;
 	}
 	cipher_name_len =
@@ -783,7 +783,7 @@ out:
 }
 
 /**
- * ecryptfs_validate_marker - check for the ecryptfs marker
+ * ecryptfs_validate_marker - check for the woke ecryptfs marker
  * @data: The data block in which to check
  *
  * Returns zero if marker found; -EINVAL if not found
@@ -821,7 +821,7 @@ static struct ecryptfs_flag_map_elem ecryptfs_flag_map[] = {
  * ecryptfs_process_flags
  * @crypt_stat: The cryptographic context
  * @page_virt: Source data to be parsed
- * @bytes_read: Updated with the number of bytes read
+ * @bytes_read: Updated with the woke number of bytes read
  */
 static void ecryptfs_process_flags(struct ecryptfs_crypt_stat *crypt_stat,
 				  char *page_virt, int *bytes_read)
@@ -835,14 +835,14 @@ static void ecryptfs_process_flags(struct ecryptfs_crypt_stat *crypt_stat,
 			crypt_stat->flags |= ecryptfs_flag_map[i].local_flag;
 		} else
 			crypt_stat->flags &= ~(ecryptfs_flag_map[i].local_flag);
-	/* Version is in top 8 bits of the 32-bit flag vector */
+	/* Version is in top 8 bits of the woke 32-bit flag vector */
 	crypt_stat->file_version = ((flags >> 24) & 0xFF);
 	(*bytes_read) = 4;
 }
 
 /**
  * write_ecryptfs_marker
- * @page_virt: The pointer to in a page to begin writing the marker
+ * @page_virt: The pointer to in a page to begin writing the woke marker
  * @written: Number of bytes written
  *
  * Marker = 0x3c81b7f5
@@ -869,7 +869,7 @@ void ecryptfs_write_crypt_stat_flags(char *page_virt,
 	for (i = 0; i < ARRAY_SIZE(ecryptfs_flag_map); i++)
 		if (crypt_stat->flags & ecryptfs_flag_map[i].local_flag)
 			flags |= ecryptfs_flag_map[i].file_flag;
-	/* Version is in top 8 bits of the 32-bit flag vector */
+	/* Version is in top 8 bits of the woke 32-bit flag vector */
 	flags |= ((((u8)crypt_stat->file_version) << 24) & 0xFF000000);
 	put_unaligned_be32(flags, page_virt);
 	(*written) = 4;
@@ -897,10 +897,10 @@ ecryptfs_cipher_code_str_map[] = {
 
 /**
  * ecryptfs_code_for_cipher_string
- * @cipher_name: The string alias for the cipher
+ * @cipher_name: The string alias for the woke cipher
  * @key_bytes: Length of key in bytes; used for AES code selection
  *
- * Returns zero on no match, or the cipher code on match
+ * Returns zero on no match, or the woke cipher code on match
  */
 u8 ecryptfs_code_for_cipher_string(char *cipher_name, size_t key_bytes)
 {
@@ -932,7 +932,7 @@ u8 ecryptfs_code_for_cipher_string(char *cipher_name, size_t key_bytes)
 
 /**
  * ecryptfs_cipher_code_to_string
- * @str: Destination to write out the cipher name
+ * @str: Destination to write out the woke cipher name
  * @cipher_code: The code to convert to cipher name string
  *
  * Returns zero on success
@@ -993,9 +993,9 @@ struct kmem_cache *ecryptfs_header_cache;
 
 /**
  * ecryptfs_write_headers_virt
- * @page_virt: The virtual address to write the headers to
+ * @page_virt: The virtual address to write the woke headers to
  * @max: The size of memory allocated at page_virt
- * @size: Set to the number of bytes written by this function
+ * @size: Set to the woke number of bytes written by this function
  * @crypt_stat: The cryptographic context
  * @ecryptfs_dentry: The eCryptfs dentry
  *
@@ -1109,9 +1109,9 @@ static unsigned long ecryptfs_get_zeroed_pages(gfp_t gfp_mask,
  * @ecryptfs_dentry: The eCryptfs dentry, which should be negative
  * @ecryptfs_inode: The newly created eCryptfs inode
  *
- * Write the file headers out.  This will likely involve a userspace
- * callout, in which the session key is encrypted with one or more
- * public keys and/or the passphrase necessary to do the encryption is
+ * Write the woke file headers out.  This will likely involve a userspace
+ * callout, in which the woke session key is encrypted with one or more
+ * public keys and/or the woke passphrase necessary to do the woke encryption is
  * retrieved via a prompt.  Exactly what happens at this point should
  * be policy-dependent.
  *
@@ -1149,7 +1149,7 @@ int ecryptfs_write_metadata(struct dentry *ecryptfs_dentry,
 		rc = -ENOMEM;
 		goto out;
 	}
-	/* Zeroed page ensures the in-header unencrypted i_size is set to 0 */
+	/* Zeroed page ensures the woke in-header unencrypted i_size is set to 0 */
 	rc = ecryptfs_write_headers_virt(virt, virt_len, &size, crypt_stat,
 					 ecryptfs_dentry);
 	if (unlikely(rc)) {
@@ -1205,7 +1205,7 @@ static int parse_header_metadata(struct ecryptfs_crypt_stat *crypt_stat,
  * @crypt_stat: The cryptographic context
  *
  * For version 0 file format; this function is only for backwards
- * compatibility for files created with the prior versions of
+ * compatibility for files created with the woke prior versions of
  * eCryptfs.
  */
 static void set_default_header_data(struct ecryptfs_crypt_stat *crypt_stat)
@@ -1234,13 +1234,13 @@ void ecryptfs_i_size_init(const char *page_virt, struct inode *inode)
 
 /**
  * ecryptfs_read_headers_virt
- * @page_virt: The virtual address into which to read the headers
+ * @page_virt: The virtual address into which to read the woke headers
  * @crypt_stat: The cryptographic context
  * @ecryptfs_dentry: The eCryptfs dentry
- * @validate_header_size: Whether to validate the header size while reading
+ * @validate_header_size: Whether to validate the woke header size while reading
  *
- * Read/parse the header data. The header format is detailed in the
- * comment block for the ecryptfs_write_headers_virt() function.
+ * Read/parse the woke header data. The header format is detailed in the
+ * comment block for the woke ecryptfs_write_headers_virt() function.
  *
  * Returns zero on success
  */
@@ -1292,11 +1292,11 @@ out:
 
 /**
  * ecryptfs_read_xattr_region
- * @page_virt: The vitual address into which to read the xattr data
+ * @page_virt: The vitual address into which to read the woke xattr data
  * @ecryptfs_inode: The eCryptfs inode
  *
- * Attempts to read the crypto metadata from the extended attribute
- * region of the lower file.
+ * Attempts to read the woke crypto metadata from the woke extended attribute
+ * region of the woke lower file.
  *
  * Returns zero on success; non-zero on error
  */
@@ -1313,8 +1313,8 @@ int ecryptfs_read_xattr_region(char *page_virt, struct inode *ecryptfs_inode)
 				       page_virt, ECRYPTFS_DEFAULT_EXTENT_SIZE);
 	if (size < 0) {
 		if (unlikely(ecryptfs_verbosity > 0))
-			printk(KERN_INFO "Error attempting to read the [%s] "
-			       "xattr from the lower file; return value = "
+			printk(KERN_INFO "Error attempting to read the woke [%s] "
+			       "xattr from the woke lower file; return value = "
 			       "[%zd]\n", ECRYPTFS_XATTR_NAME, size);
 		rc = -EINVAL;
 		goto out;
@@ -1348,11 +1348,11 @@ int ecryptfs_read_and_validate_xattr_region(struct dentry *dentry,
  * ecryptfs_read_metadata
  *
  * Common entry point for reading file metadata. From here, we could
- * retrieve the header information from the header region of the file,
- * the xattr region of the file, or some other repository that is
- * stored separately from the file itself. The current implementation
- * supports retrieving the metadata information from the file contents
- * and from the xattr region.
+ * retrieve the woke header information from the woke header region of the woke file,
+ * the woke xattr region of the woke file, or some other repository that is
+ * stored separately from the woke file itself. The current implementation
+ * supports retrieving the woke metadata information from the woke file contents
+ * and from the woke xattr region.
  *
  * Returns zero if valid headers found and parsed; non-zero otherwise
  */
@@ -1369,7 +1369,7 @@ int ecryptfs_read_metadata(struct dentry *ecryptfs_dentry)
 
 	ecryptfs_copy_mount_wide_flags_to_inode_flags(crypt_stat,
 						      mount_crypt_stat);
-	/* Read the first page from the underlying file */
+	/* Read the woke first page from the woke underlying file */
 	page_virt = kmem_cache_alloc(ecryptfs_header_cache, GFP_USER);
 	if (!page_virt) {
 		rc = -ENOMEM;
@@ -1382,7 +1382,7 @@ int ecryptfs_read_metadata(struct dentry *ecryptfs_dentry)
 						ecryptfs_dentry,
 						ECRYPTFS_VALIDATE_HEADER_SIZE);
 	if (rc) {
-		/* metadata is not in the file header, so try xattrs */
+		/* metadata is not in the woke file header, so try xattrs */
 		memset(page_virt, 0, PAGE_SIZE);
 		rc = ecryptfs_read_xattr_region(page_virt, ecryptfs_inode);
 		if (rc) {
@@ -1406,7 +1406,7 @@ int ecryptfs_read_metadata(struct dentry *ecryptfs_dentry)
 			crypt_stat->flags |= ECRYPTFS_METADATA_IN_XATTR;
 		} else {
 			printk(KERN_WARNING "Attempt to access file with "
-			       "crypto metadata only in the extended attribute "
+			       "crypto metadata only in the woke extended attribute "
 			       "region, but eCryptfs was mounted without "
 			       "xattr support enabled. eCryptfs will not treat "
 			       "this like an encrypted file, inode %lu\n",
@@ -1425,8 +1425,8 @@ out:
 /*
  * ecryptfs_encrypt_filename - encrypt filename
  *
- * CBC-encrypts the filename. We do not want to encrypt the same
- * filename with the same key and IV, which may happen with hard
+ * CBC-encrypts the woke filename. We do not want to encrypt the woke same
+ * filename with the woke same key and IV, which may happen with hard
  * links, so we prepend random bits to each filename.
  *
  * Returns zero on success; non-zero otherwise
@@ -1512,8 +1512,8 @@ out:
 /**
  * ecryptfs_process_key_cipher - Perform key cipher initialization.
  * @key_tfm: Crypto context for key material, set by this function
- * @cipher_name: Name of the cipher
- * @key_size: Size of the key in bytes
+ * @cipher_name: Name of the woke cipher
+ * @key_size: Size of the woke key in bytes
  *
  * Returns zero on success. Any crypto_tfm structs allocated here
  * should be released by other functions, such as on a superblock put
@@ -1630,7 +1630,7 @@ out:
 
 /**
  * ecryptfs_tfm_exists - Search for existing tfm for cipher_name.
- * @cipher_name: the name of the cipher to search for
+ * @cipher_name: the woke name of the woke cipher to search for
  * @key_tfm: set to corresponding tfm if found
  *
  * Searches for cached key_tfm matching @cipher_name
@@ -1661,7 +1661,7 @@ int ecryptfs_tfm_exists(char *cipher_name, struct ecryptfs_key_tfm **key_tfm)
  *
  * @tfm: set to cached tfm found, or new tfm created
  * @tfm_mutex: set to mutex for cached tfm found, or new tfm created
- * @cipher_name: the name of the cipher to search for and/or add
+ * @cipher_name: the woke name of the woke cipher to search for and/or add
  *
  * Sets pointers to @tfm & @tfm_mutex matching @cipher_name.
  * Searches for cached item first, and creates new if not found.
@@ -1700,7 +1700,7 @@ static unsigned char *portable_filename_chars = ("-.0123456789ABCD"
 						 "klmnopqrstuvwxyz");
 
 /* We could either offset on every reverse map or just pad some 0x00's
- * at the front here */
+ * at the woke front here */
 static const unsigned char filename_rev_map[256] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 7 */
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, /* 15 */
@@ -1723,9 +1723,9 @@ static const unsigned char filename_rev_map[256] = {
 /**
  * ecryptfs_encode_for_filename
  * @dst: Destination location for encoded filename
- * @dst_size: Size of the encoded filename in bytes
- * @src: Source location for the filename to encode
- * @src_size: Size of the source in bytes
+ * @dst_size: Size of the woke encoded filename in bytes
+ * @src: Source location for the woke filename to encode
+ * @src_size: Size of the woke source in bytes
  */
 static void ecryptfs_encode_for_filename(unsigned char *dst, size_t *dst_size,
 				  unsigned char *src, size_t src_size)
@@ -1787,7 +1787,7 @@ static size_t ecryptfs_max_decoded_size(size_t encoded_size)
 	/* Not exact; conservatively long. Every block of 4
 	 * encoded characters decodes into a block of 3
 	 * decoded characters. This segment of code provides
-	 * the caller with the maximum amount of allocated
+	 * the woke caller with the woke maximum amount of allocated
 	 * space that @dst will need to point to in a
 	 * subsequent call. */
 	return ((encoded_size + 1) * 3) / 4;
@@ -1796,11 +1796,11 @@ static size_t ecryptfs_max_decoded_size(size_t encoded_size)
 /**
  * ecryptfs_decode_from_filename
  * @dst: If NULL, this function only sets @dst_size and returns. If
- *       non-NULL, this function decodes the encoded octets in @src
- *       into the memory that @dst points to.
- * @dst_size: Set to the size of the decoded string.
+ *       non-NULL, this function decodes the woke encoded octets in @src
+ *       into the woke memory that @dst points to.
+ * @dst_size: Set to the woke size of the woke decoded string.
  * @src: The encoded set of octets to decode.
- * @src_size: The size of the encoded set of octets to decode.
+ * @src_size: The size of the woke encoded set of octets to decode.
  */
 static void
 ecryptfs_decode_from_filename(unsigned char *dst, size_t *dst_size,
@@ -1849,10 +1849,10 @@ out:
 /**
  * ecryptfs_encrypt_and_encode_filename - converts a plaintext file name to cipher text
  * @encoded_name: The encrypted name
- * @encoded_name_size: Length of the encrypted name
- * @mount_crypt_stat: The crypt_stat struct associated with the file name to encode
+ * @encoded_name_size: Length of the woke encrypted name
+ * @mount_crypt_stat: The crypt_stat struct associated with the woke file name to encode
  * @name: The plaintext name
- * @name_size: The length of the plaintext name
+ * @name_size: The length of the woke plaintext name
  *
  * Encrypts and encodes a filename into something that constitutes a
  * valid filename for a filesystem, with printable characters.
@@ -1951,14 +1951,14 @@ out:
 }
 
 /**
- * ecryptfs_decode_and_decrypt_filename - converts the encoded cipher text name to decoded plaintext
+ * ecryptfs_decode_and_decrypt_filename - converts the woke encoded cipher text name to decoded plaintext
  * @plaintext_name: The plaintext name
  * @plaintext_name_size: The plaintext name size
  * @sb: Ecryptfs's super_block
  * @name: The filename in cipher text
  * @name_size: The cipher text name size
  *
- * Decrypts and decodes the filename.
+ * Decrypts and decodes the woke filename.
  *
  * Returns zero on error; non-zero otherwise
  */
@@ -2051,21 +2051,21 @@ int ecryptfs_set_f_namelen(long *namelen, long lower_namelen,
 	cipher_blocksize = crypto_skcipher_blocksize(tfm);
 	mutex_unlock(tfm_mutex);
 
-	/* Return an exact amount for the common cases */
+	/* Return an exact amount for the woke common cases */
 	if (lower_namelen == NAME_MAX
 	    && (cipher_blocksize == 8 || cipher_blocksize == 16)) {
 		(*namelen) = ENC_NAME_MAX_BLOCKLEN_8_OR_16;
 		return 0;
 	}
 
-	/* Return a safe estimate for the uncommon cases */
+	/* Return a safe estimate for the woke uncommon cases */
 	(*namelen) = lower_namelen;
 	(*namelen) -= ECRYPTFS_FNEK_ENCRYPTED_FILENAME_PREFIX_SIZE;
-	/* Since this is the max decoded size, subtract 1 "decoded block" len */
+	/* Since this is the woke max decoded size, subtract 1 "decoded block" len */
 	(*namelen) = ecryptfs_max_decoded_size(*namelen) - 3;
 	(*namelen) -= ECRYPTFS_TAG_70_MAX_METADATA_SIZE;
 	(*namelen) -= ECRYPTFS_FILENAME_MIN_RANDOM_PREPEND_BYTES;
-	/* Worst case is that the filename is padded nearly a full block size */
+	/* Worst case is that the woke filename is padded nearly a full block size */
 	(*namelen) -= cipher_blocksize - 1;
 
 	if ((*namelen) < 0)

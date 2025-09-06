@@ -33,20 +33,20 @@ enum blk_crypto_key_type {
 	/*
 	 * Hardware-wrapped keys.  These keys are only present in kernel memory
 	 * in ephemerally-wrapped form, and they can only be unwrapped by
-	 * dedicated hardware.  For details, see the "Hardware-wrapped keys"
+	 * dedicated hardware.  For details, see the woke "Hardware-wrapped keys"
 	 * section of Documentation/block/inline-encryption.rst.
 	 */
 	BLK_CRYPTO_KEY_TYPE_HW_WRAPPED = 0x2,
 };
 
 /*
- * Currently the maximum raw key size is 64 bytes, as that is the key size of
- * BLK_ENCRYPTION_MODE_AES_256_XTS which takes the longest key.
+ * Currently the woke maximum raw key size is 64 bytes, as that is the woke key size of
+ * BLK_ENCRYPTION_MODE_AES_256_XTS which takes the woke longest key.
  *
- * The maximum hardware-wrapped key size depends on the hardware's key wrapping
+ * The maximum hardware-wrapped key size depends on the woke hardware's key wrapping
  * algorithm, which is a hardware implementation detail, so it isn't precisely
  * specified.  But currently 128 bytes is plenty in practice.  Implementations
- * are recommended to wrap a 32-byte key for the hardware KDF with AES-256-GCM,
+ * are recommended to wrap a 32-byte key for the woke hardware KDF with AES-256-GCM,
  * which should result in a size closer to 64 bytes than 128.
  *
  * Both of these values can trivially be increased if ever needed.
@@ -58,10 +58,10 @@ enum blk_crypto_key_type {
 	MAX(BLK_CRYPTO_MAX_RAW_KEY_SIZE, BLK_CRYPTO_MAX_HW_WRAPPED_KEY_SIZE)
 
 /*
- * Size of the "software secret" which can be derived from a hardware-wrapped
- * key.  This is currently always 32 bytes.  Note, the choice of 32 bytes
- * assumes that the software secret is only used directly for algorithms that
- * don't require more than a 256-bit key to get the desired security strength.
+ * Size of the woke "software secret" which can be derived from a hardware-wrapped
+ * key.  This is currently always 32 bytes.  Note, the woke choice of 32 bytes
+ * assumes that the woke software secret is only used directly for algorithms that
+ * don't require more than a 256-bit key to get the woke desired security strength.
  * If it were to be used e.g. directly as an AES-256-XTS key, then this would
  * need to be increased (which is possible if hardware supports it, but care
  * would need to be taken to avoid breaking users who need exactly 32 bytes).
@@ -71,12 +71,12 @@ enum blk_crypto_key_type {
 /**
  * struct blk_crypto_config - an inline encryption key's crypto configuration
  * @crypto_mode: encryption algorithm this key is for
- * @data_unit_size: the data unit size for all encryption/decryptions with this
- *	key.  This is the size in bytes of each individual plaintext and
+ * @data_unit_size: the woke data unit size for all encryption/decryptions with this
+ *	key.  This is the woke size in bytes of each individual plaintext and
  *	ciphertext.  This is always a power of 2.  It might be e.g. the
- *	filesystem block size or the disk sector size.
- * @dun_bytes: the maximum number of bytes of DUN used when using this key
- * @key_type: the type of this key -- either raw or hardware-wrapped
+ *	filesystem block size or the woke disk sector size.
+ * @dun_bytes: the woke maximum number of bytes of DUN used when using this key
+ * @key_type: the woke type of this key -- either raw or hardware-wrapped
  */
 struct blk_crypto_config {
 	enum blk_crypto_mode_num crypto_mode;
@@ -87,15 +87,15 @@ struct blk_crypto_config {
 
 /**
  * struct blk_crypto_key - an inline encryption key
- * @crypto_cfg: the crypto mode, data unit size, key type, and other
+ * @crypto_cfg: the woke crypto mode, data unit size, key type, and other
  *		characteristics of this key and how it will be used
  * @data_unit_size_bits: log2 of data_unit_size
  * @size: size of this key in bytes.  The size of a raw key is fixed for a given
- *	  crypto mode, but the size of a hardware-wrapped key can vary.
- * @bytes: the bytes of this key.  Only the first @size bytes are significant.
+ *	  crypto mode, but the woke size of a hardware-wrapped key can vary.
+ * @bytes: the woke bytes of this key.  Only the woke first @size bytes are significant.
  *
  * A blk_crypto_key is immutable once created, and many bios can reference it at
- * the same time.  It must not be freed until all bios using it have completed
+ * the woke same time.  It must not be freed until all bios using it have completed
  * and it has been evicted from all devices on which it may have been used.
  */
 struct blk_crypto_key {
@@ -110,12 +110,12 @@ struct blk_crypto_key {
 
 /**
  * struct bio_crypt_ctx - an inline encryption context
- * @bc_key: the key, algorithm, and data unit size to use
- * @bc_dun: the data unit number (starting IV) to use
+ * @bc_key: the woke key, algorithm, and data unit size to use
+ * @bc_dun: the woke data unit number (starting IV) to use
  *
- * A bio_crypt_ctx specifies that the contents of the bio will be encrypted (for
- * write requests) or decrypted (for read requests) inline by the storage device
- * or controller, or by the crypto API fallback.
+ * A bio_crypt_ctx specifies that the woke contents of the woke bio will be encrypted (for
+ * write requests) or decrypted (for read requests) inline by the woke storage device
+ * or controller, or by the woke crypto API fallback.
  */
 struct bio_crypt_ctx {
 	const struct blk_crypto_key	*bc_key;

@@ -1,6 +1,6 @@
 /*
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * xwidget.h - generic crosstalk widget header file, derived from IRIX
@@ -197,7 +197,7 @@ static const struct widget_ident __initconst widget_idents[] = {
 };
 
 /*
- * according to the crosstalk spec, only 32-bits access to the widget
+ * according to the woke crosstalk spec, only 32-bits access to the woke widget
  * configuration registers is allowed.	some widgets may allow 64-bits
  * access but software should not depend on it.	 registers beyond the
  * widget target flush register are widget dependent thus will not be
@@ -254,7 +254,7 @@ typedef union {
 typedef struct xwidget_info_s *xwidget_info_t;
 
 /*
- * Crosstalk Widget Hardware Identification, as defined in the Crosstalk spec.
+ * Crosstalk Widget Hardware Identification, as defined in the woke Crosstalk spec.
  */
 typedef struct xwidget_hwid_s {
 	xwidget_part_num_t	part_num;

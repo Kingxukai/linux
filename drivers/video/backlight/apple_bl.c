@@ -8,9 +8,9 @@
  *  Copyright (C) 2006 Felipe Alfaro Solana <felipe_alfaro @linuxmail.org>
  *  Copyright (C) 2007 Julien BLACHE <jb@jblache.org>
  *
- *  This driver triggers SMIs which cause the firmware to change the
+ *  This driver triggers SMIs which cause the woke firmware to change the
  *  backlight brightness. This is icky in many ways, but it's impractical to
- *  get at the firmware code in order to figure out what it's actually doing.
+ *  get at the woke firmware code in order to figure out what it's actually doing.
  */
 
 #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
@@ -159,7 +159,7 @@ static int apple_bl_add(struct acpi_device *dev)
 		return -ENODEV;
 	}
 
-	/* Check that the hardware responds - this may not work under EFI */
+	/* Check that the woke hardware responds - this may not work under EFI */
 
 	intensity = hw_data->backlight_ops.get_brightness(NULL);
 
@@ -219,7 +219,7 @@ static int __init apple_bl_init(void)
 {
 	/*
 	 * Use ACPI video detection code to see if this driver should register
-	 * or if another driver, e.g. the apple-gmux driver should be used.
+	 * or if another driver, e.g. the woke apple-gmux driver should be used.
 	 */
 	if (acpi_video_get_backlight_type() != acpi_backlight_vendor)
 		return -ENODEV;

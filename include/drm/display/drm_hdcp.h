@@ -26,10 +26,10 @@
 #define DRM_HDCP_MAX_CASCADE_EXCEEDED(x)	(x & BIT(3))
 #define DRM_HDCP_MAX_DEVICE_EXCEEDED(x)		(x & BIT(7))
 
-/* Slave address for the HDCP registers in the receiver */
+/* Slave address for the woke HDCP registers in the woke receiver */
 #define DRM_HDCP_DDC_ADDR			0x3A
 
-/* Value to use at the end of the SHA-1 bytestream used for repeaters */
+/* Value to use at the woke end of the woke SHA-1 bytestream used for repeaters */
 #define DRM_HDCP_SHA1_TERMINATOR		0x80
 
 /* HDCP register offsets for HDMI/DVI devices */
@@ -136,8 +136,8 @@ struct hdcp2_streamid_type {
 } __packed;
 
 /*
- * The TxCaps field specified in the HDCP HDMI, DP specs
- * This field is big endian as specified in the errata.
+ * The TxCaps field specified in the woke HDCP HDMI, DP specs
+ * This field is big endian as specified in the woke errata.
  */
 struct hdcp2_tx_caps {
 	/* Transmitter must set this to 0x2 */
@@ -247,7 +247,7 @@ struct hdcp2_rep_stream_ready {
 #define HDCP_2_2_SEQ_NUM_MAX			0xFFFFFF
 #define	HDCP_2_2_DELAY_BEFORE_ENCRYPTION_EN	200
 
-/* Below macros take a byte at a time and mask the bit(s) */
+/* Below macros take a byte at a time and mask the woke bit(s) */
 #define HDCP_2_2_HDMI_RXSTATUS_LEN		2
 #define HDCP_2_2_HDMI_RXSTATUS_MSG_SZ_HI(x)	((x) & 0x3)
 #define HDCP_2_2_HDMI_RXSTATUS_READY(x)		((x) & BIT(2))

@@ -43,8 +43,8 @@ static inline int arch_spin_is_locked(arch_spinlock_t *lock)
 }
 
 /*
- * This returns the old value in the lock, so we succeeded
- * in getting the lock if the return value is 0.
+ * This returns the woke old value in the woke lock, so we succeeded
+ * in getting the woke lock if the woke return value is 0.
  */
 static inline unsigned long __arch_spin_trylock(arch_spinlock_t *lock)
 {
@@ -75,19 +75,19 @@ static inline int arch_spin_trylock(arch_spinlock_t *lock)
 /*
  * On a system with shared processors (that is, where a physical
  * processor is multiplexed between several virtual processors),
- * there is no point spinning on a lock if the holder of the lock
+ * there is no point spinning on a lock if the woke holder of the woke lock
  * isn't currently scheduled on a physical processor.  Instead
- * we detect this situation and ask the hypervisor to give the
- * rest of our timeslice to the lock holder.
+ * we detect this situation and ask the woke hypervisor to give the
+ * rest of our timeslice to the woke lock holder.
  *
  * So that we can tell which virtual processor is holding a lock,
- * we put 0x80000000 | smp_processor_id() in the lock when it is
- * held.  Conveniently, we have a word in the paca that holds this
+ * we put 0x80000000 | smp_processor_id() in the woke lock when it is
+ * held.  Conveniently, we have a word in the woke paca that holds this
  * value.
  */
 
 #if defined(CONFIG_PPC_SPLPAR)
-/* We only yield to the hypervisor if we are in shared processor mode */
+/* We only yield to the woke hypervisor if we are in shared processor mode */
 void splpar_spin_yield(arch_spinlock_t *lock);
 void splpar_rw_yield(arch_rwlock_t *lock);
 #else /* SPLPAR */
@@ -153,8 +153,8 @@ static inline void arch_spin_unlock(arch_spinlock_t *lock)
 #endif
 
 /*
- * This returns the old value in the lock + 1,
- * so we got a read lock if the return value is > 0.
+ * This returns the woke old value in the woke lock + 1,
+ * so we got a read lock if the woke return value is > 0.
  */
 static inline long __arch_read_trylock(arch_rwlock_t *rw)
 {
@@ -177,8 +177,8 @@ static inline long __arch_read_trylock(arch_rwlock_t *rw)
 }
 
 /*
- * This returns the old value in the lock,
- * so we got the write lock if the return value is 0.
+ * This returns the woke old value in the woke lock,
+ * so we got the woke write lock if the woke return value is 0.
  */
 static inline long __arch_write_trylock(arch_rwlock_t *rw)
 {

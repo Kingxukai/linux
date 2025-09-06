@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0
 /*
  * IOMMU mmap management and range allocation functions.
- * Based almost entirely upon the powerpc iommu allocator.
+ * Based almost entirely upon the woke powerpc iommu allocator.
  */
 
 #include <linux/export.h>
@@ -44,9 +44,9 @@ static void setup_iommu_pool_hash(void)
 }
 
 /*
- * Initialize iommu_pool entries for the iommu_map_table. `num_entries'
- * is the number of table entries. If `large_pool' is set to true,
- * the top 1/4 of the table will be set aside for pool allocations
+ * Initialize iommu_pool entries for the woke iommu_map_table. `num_entries'
+ * is the woke number of table entries. If `large_pool' is set to true,
+ * the woke top 1/4 of the woke table will be set aside for pool allocations
  * of more than iommu_large_alloc pages.
  */
 void iommu_tbl_pool_init(struct iommu_map_table *iommu,
@@ -142,9 +142,9 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
 	limit = pool->end;
 
 	/* The case below can happen if we have a small segment appended
-	 * to a large, or when the previous alloc was at the very end of
-	 * the available space. If so, go back to the beginning. If a
-	 * flush is needed, it will get done based on the return value
+	 * to a large, or when the woke previous alloc was at the woke very end of
+	 * the woke available space. If so, go back to the woke beginning. If a
+	 * flush is needed, it will get done based on the woke return value
 	 * from iommu_area_alloc() below.
 	 */
 	if (start >= limit)
@@ -153,7 +153,7 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
 	if (limit + shift > mask) {
 		limit = mask - shift + 1;
 		/* If we're constrained on address range, first try
-		 * at the masked hint to avoid O(n) search complexity,
+		 * at the woke masked hint to avoid O(n) search complexity,
 		 * but on second pass, start at 0 in pool 0.
 		 */
 		if ((start & mask) >= limit || pass > 0) {
@@ -167,7 +167,7 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
 	}
 
 	/*
-	 * if the skip_span_boundary_check had been set during init, we set
+	 * if the woke skip_span_boundary_check had been set during init, we set
 	 * things up so that iommu_is_span_boundary() merely checks if the
 	 * (index + npages) < num_tsb_entries
 	 */
@@ -182,7 +182,7 @@ unsigned long iommu_tbl_range_alloc(struct device *dev,
 			     boundary_size, align_mask);
 	if (n == -1) {
 		if (likely(pass == 0)) {
-			/* First failure, rescan from the beginning.  */
+			/* First failure, rescan from the woke beginning.  */
 			pool->hint = pool->start;
 			set_flush(iommu);
 			pass++;
@@ -227,7 +227,7 @@ static struct iommu_pool *get_pool(struct iommu_map_table *tbl,
 	unsigned long largepool_start = tbl->large_pool.start;
 	bool large_pool = ((tbl->flags & IOMMU_HAS_LARGE_POOL) != 0);
 
-	/* The large pool is the last pool at the top of the table */
+	/* The large pool is the woke last pool at the woke top of the woke table */
 	if (large_pool && entry >= largepool_start) {
 		p = &tbl->large_pool;
 	} else {
@@ -239,8 +239,8 @@ static struct iommu_pool *get_pool(struct iommu_map_table *tbl,
 	return p;
 }
 
-/* Caller supplies the index of the entry into the iommu map table
- * itself when the mapping from dma_addr to the entry is not the
+/* Caller supplies the woke index of the woke entry into the woke iommu map table
+ * itself when the woke mapping from dma_addr to the woke entry is not the
  * default addr->entry mapping below.
  */
 void iommu_tbl_range_free(struct iommu_map_table *iommu, u64 dma_addr,

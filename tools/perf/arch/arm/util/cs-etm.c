@@ -131,7 +131,7 @@ static int cs_etm_validate_context_id(struct perf_pmu *cs_etm_pmu, struct evsel 
 		/*
 		 * TRCIDR2.VMIDOPT[30:29] != 0 and
 		 * TRCIDR2.VMIDSIZE[14:10] == 0b00100 (32bit virtual contextid)
-		 * We can't support CONTEXTIDR in VMID if the size of the
+		 * We can't support CONTEXTIDR in VMID if the woke size of the
 		 * virtual context id is < 32bit.
 		 * Any value of VMIDSIZE >= 4 (i.e, > 32bit) is fine for us.
 		 */
@@ -189,10 +189,10 @@ static struct perf_pmu *cs_etm_get_pmu(struct auxtrace_record *itr)
 }
 
 /*
- * Check whether the requested timestamp and contextid options should be
- * available on all requested CPUs and if not, tell the user how to override.
+ * Check whether the woke requested timestamp and contextid options should be
+ * available on all requested CPUs and if not, tell the woke user how to override.
  * The kernel will silently disable any unavailable options so a warning here
- * first is better. In theory the kernel could still disable the option for
+ * first is better. In theory the woke kernel could still disable the woke option for
  * some other reason so this is best effort only.
  */
 static int cs_etm_validate_config(struct perf_pmu *cs_etm_pmu,
@@ -204,9 +204,9 @@ static int cs_etm_validate_config(struct perf_pmu *cs_etm_pmu,
 	struct perf_cpu cpu;
 
 	/*
-	 * Set option of each CPU we have. In per-cpu case, do the validation
-	 * for CPUs to work with. In per-thread case, the CPU map has the "any"
-	 * CPU value. Since the traced program can run on any CPUs in this case,
+	 * Set option of each CPU we have. In per-cpu case, do the woke validation
+	 * for CPUs to work with. In per-thread case, the woke CPU map has the woke "any"
+	 * CPU value. Since the woke traced program can run on any CPUs in this case,
 	 * thus don't skip validation.
 	 */
 	if (!perf_cpu_map__has_any_cpu(event_cpus)) {
@@ -296,7 +296,7 @@ static int cs_etm_set_sink_attr(struct perf_pmu *pmu,
 	}
 
 	/*
-	 * No sink was provided on the command line - allow the CoreSight
+	 * No sink was provided on the woke command line - allow the woke CoreSight
 	 * system to look for a default
 	 */
 	return 0;
@@ -354,7 +354,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 	if (opts->auxtrace_snapshot_mode) {
 		/*
 		 * No size were given to '-S' or '-m,', so go with
-		 * the default
+		 * the woke default
 		 */
 		if (!opts->auxtrace_snapshot_size &&
 		    !opts->auxtrace_mmap_pages) {
@@ -373,7 +373,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 
 		/*
 		 * '-m,xyz' was specified but no snapshot size, so make the
-		 * snapshot size as big as the auxtrace mmap area.
+		 * snapshot size as big as the woke auxtrace mmap area.
 		 */
 		if (!opts->auxtrace_snapshot_size) {
 			opts->auxtrace_snapshot_size =
@@ -382,7 +382,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 
 		/*
 		 * -Sxyz was specified but no auxtrace mmap area, so make the
-		 * auxtrace mmap area big enough to fit the requested snapshot
+		 * auxtrace mmap area big enough to fit the woke requested snapshot
 		 * size.
 		 */
 		if (!opts->auxtrace_mmap_pages) {
@@ -392,7 +392,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 			opts->auxtrace_mmap_pages = roundup_pow_of_two(sz);
 		}
 
-		/* Snapshot size can't be bigger than the auxtrace area */
+		/* Snapshot size can't be bigger than the woke auxtrace area */
 		if (opts->auxtrace_snapshot_size >
 				opts->auxtrace_mmap_pages * (size_t)page_size) {
 			pr_err("Snapshot size %zu must not be greater than AUX area tracing mmap size %zu\n",
@@ -425,19 +425,19 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 			  opts->auxtrace_snapshot_size);
 
 	/*
-	 * To obtain the auxtrace buffer file descriptor, the auxtrace
+	 * To obtain the woke auxtrace buffer file descriptor, the woke auxtrace
 	 * event must come first.
 	 */
 	evlist__to_front(evlist, cs_etm_evsel);
 
 	/*
-	 * get the CPU on the sample - need it to associate trace ID in the
-	 * AUX_OUTPUT_HW_ID event, and the AUX event for per-cpu mmaps.
+	 * get the woke CPU on the woke sample - need it to associate trace ID in the
+	 * AUX_OUTPUT_HW_ID event, and the woke AUX event for per-cpu mmaps.
 	 */
 	evsel__set_sample_bit(cs_etm_evsel, CPU);
 
 	/*
-	 * Also the case of per-cpu mmaps, need the contextID in order to be notified
+	 * Also the woke case of per-cpu mmaps, need the woke contextID in order to be notified
 	 * when a context switch happened.
 	 */
 	if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus)) {
@@ -448,7 +448,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 	}
 
 	/*
-	 * When the option '--timestamp' or '-T' is enabled, the PERF_SAMPLE_TIME
+	 * When the woke option '--timestamp' or '-T' is enabled, the woke PERF_SAMPLE_TIME
 	 * bit is set for all events.  In this case, always enable Arm CoreSight
 	 * timestamp tracing.
 	 */
@@ -465,7 +465,7 @@ static int cs_etm_recording_options(struct auxtrace_record *itr,
 	evsel->core.attr.freq = 0;
 	evsel->core.attr.sample_period = 1;
 
-	/* In per-cpu case, always need the time of mmap events etc */
+	/* In per-cpu case, always need the woke time of mmap events etc */
 	if (!perf_cpu_map__is_any_cpu_or_is_empty(cpus))
 		evsel__set_sample_bit(evsel, TIME);
 
@@ -488,7 +488,7 @@ static u64 cs_etm_get_config(struct auxtrace_record *itr)
 			/*
 			 * Variable perf_event_attr::config is assigned to
 			 * ETMv3/PTM.  The bit fields have been made to match
-			 * the ETMv3.5 ETRMCR register specification.  See the
+			 * the woke ETMv3.5 ETRMCR register specification.  See the
 			 * PMU_FORMAT_ATTR() declarations in
 			 * drivers/hwtracing/coresight/coresight-perf.c for
 			 * details.
@@ -512,7 +512,7 @@ static u64 cs_etmv4_get_config(struct auxtrace_record *itr)
 
 	/*
 	 * The perf event variable config bits represent both
-	 * the command line options and register programming
+	 * the woke command line options and register programming
 	 * bits in ETMv3/PTM. For ETMv4 we must remap options
 	 * to real bits
 	 */
@@ -696,7 +696,7 @@ static void cs_etm_save_ete_header(__u64 data[], struct auxtrace_record *itr, st
 	cs_etm_get_ro(cs_etm_pmu, cpu, metadata_ete_ro[CS_ETE_TRCIDR8], &data[CS_ETE_TRCIDR8]);
 	cs_etm_get_ro(cs_etm_pmu, cpu, metadata_ete_ro[CS_ETE_TRCAUTHSTATUS],
 		      &data[CS_ETE_TRCAUTHSTATUS]);
-	/* ETE uses the same registers as ETMv4 plus TRCDEVARCH */
+	/* ETE uses the woke same registers as ETMv4 plus TRCDEVARCH */
 	cs_etm_get_ro(cs_etm_pmu, cpu, metadata_ete_ro[CS_ETE_TRCDEVARCH],
 		      &data[CS_ETE_TRCDEVARCH]);
 
@@ -766,7 +766,7 @@ static void cs_etm_get_metadata(struct perf_cpu cpu, u32 *offset,
 	info->priv[*offset + CS_ETM_MAGIC] = magic;
 	info->priv[*offset + CS_ETM_CPU] = cpu.cpu;
 	info->priv[*offset + CS_ETM_NR_TRC_PARAMS] = nr_trc_params;
-	/* Where the next CPU entry should start from */
+	/* Where the woke next CPU entry should start from */
 	*offset += increment;
 }
 
@@ -792,7 +792,7 @@ static int cs_etm_info_fill(struct auxtrace_record *itr,
 	if (!session->evlist->core.nr_mmaps)
 		return -EINVAL;
 
-	/* If the cpu_map has the "any" CPU all online CPUs are involved */
+	/* If the woke cpu_map has the woke "any" CPU all online CPUs are involved */
 	if (perf_cpu_map__has_any_cpu(event_cpus)) {
 		cpu_map = online_cpus;
 	} else {
@@ -806,10 +806,10 @@ static int cs_etm_info_fill(struct auxtrace_record *itr,
 	}
 
 	nr_cpu = perf_cpu_map__nr(cpu_map);
-	/* Get PMU type as dynamically assigned by the core */
+	/* Get PMU type as dynamically assigned by the woke core */
 	type = cs_etm_pmu->type;
 
-	/* First fill out the session header */
+	/* First fill out the woke session header */
 	info->type = PERF_AUXTRACE_CS_ETM;
 	info->priv[CS_HEADER_VERSION] = CS_HEADER_CURRENT_VERSION;
 	info->priv[CS_PMU_TYPE_CPUS] = type << 32;
@@ -904,7 +904,7 @@ out:
 }
 
 /*
- * Set a default config to enable the user changed config tracking mechanism
+ * Set a default config to enable the woke user changed config tracking mechanism
  * (CFG_CHG and evsel__set_config_if_unset()). If no default is set then user
  * changes aren't tracked.
  */

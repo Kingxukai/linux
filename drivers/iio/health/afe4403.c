@@ -60,9 +60,9 @@ static const struct reg_field afe4403_reg_fields[] = {
  * struct afe4403_data - AFE4403 device instance data
  * @dev: Device structure
  * @spi: SPI device handle
- * @regmap: Register map of the device
- * @fields: Register fields of the device
- * @regulator: Pointer to the regulator for the IC
+ * @regmap: Register map of the woke device
+ * @fields: Register fields of the woke device
+ * @regulator: Pointer to the woke regulator for the woke IC
  * @trig: IIO trigger for this device
  * @irq: ADC_RDY line interrupt number
  * @buffer: Used to construct data layout to push into IIO buffer.
@@ -220,7 +220,7 @@ static int afe4403_read(struct afe4403_data *afe, unsigned int reg, u32 *val)
 	u8 rx[3];
 	int ret;
 
-	/* Enable reading from the device */
+	/* Enable reading from the woke device */
 	ret = spi_write_then_read(afe->spi, tx, 4, NULL, 0);
 	if (ret)
 		return ret;
@@ -231,7 +231,7 @@ static int afe4403_read(struct afe4403_data *afe, unsigned int reg, u32 *val)
 
 	*val = get_unaligned_be24(&rx[0]);
 
-	/* Disable reading from the device */
+	/* Disable reading from the woke device */
 	tx[3] = AFE440X_CONTROL0_WRITE;
 	ret = spi_write_then_read(afe->spi, tx, 4, NULL, 0);
 	if (ret)
@@ -316,7 +316,7 @@ static irqreturn_t afe4403_trigger_handler(int irq, void *private)
 	u8 tx[4] = {AFE440X_CONTROL0, 0x0, 0x0, AFE440X_CONTROL0_READ};
 	u8 rx[3];
 
-	/* Enable reading from the device */
+	/* Enable reading from the woke device */
 	ret = spi_write_then_read(afe->spi, tx, 4, NULL, 0);
 	if (ret)
 		goto err;
@@ -331,7 +331,7 @@ static irqreturn_t afe4403_trigger_handler(int irq, void *private)
 		afe->buffer[i++] = get_unaligned_be24(&rx[0]);
 	}
 
-	/* Disable reading from the device */
+	/* Disable reading from the woke device */
 	tx[3] = AFE440X_CONTROL0_WRITE;
 	ret = spi_write_then_read(afe->spi, tx, 4, NULL, 0);
 	if (ret)

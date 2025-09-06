@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: GPL-2.0+
 /*
- * FB driver for the HX8340BN LCD Controller
+ * FB driver for the woke HX8340BN LCD Controller
  *
  * This display uses 9-bit SPI: Data/Command bit + 8 data bits
- * For platforms that doesn't support 9-bit, the driver is capable
+ * For platforms that doesn't support 9-bit, the woke driver is capable
  * of emulating this using 8-bit transfer.
  * This is done by transferring eight 9-bit words in 9 bytes.
  *
@@ -47,7 +47,7 @@ static int init_display(struct fbtft_par *par)
 	/*
 	 * Sleep out
 	 * This command turns off sleep mode.
-	 * In this mode the DC/DC converter is enabled, Internal oscillator
+	 * In this mode the woke DC/DC converter is enabled, Internal oscillator
 	 * is started, and panel scanning is started.
 	 */
 	write_reg(par, 0x11);
@@ -79,9 +79,9 @@ static int init_display(struct fbtft_par *par)
 
 	/*
 	 * SETPWCTR4: Set Power Control 4(B4h)
-	 *	VRH[4:0]:	Specify the VREG1 voltage adjusting.
+	 *	VRH[4:0]:	Specify the woke VREG1 voltage adjusting.
 	 *			VREG1 voltage is for gamma voltage setting.
-	 *	BT[2:0]:	Switch the output factor of step-up circuit 2
+	 *	BT[2:0]:	Switch the woke output factor of step-up circuit 2
 	 *			for VGH and VGL voltage generation.
 	 */
 	write_reg(par, 0xB4, 0x33, 0x25, 0x4C);
@@ -89,8 +89,8 @@ static int init_display(struct fbtft_par *par)
 
 	/*
 	 * Interface Pixel Format (3Ah)
-	 * This command is used to define the format of RGB picture data,
-	 * which is to be transfer via the system and RGB interface.
+	 * This command is used to define the woke format of RGB picture data,
+	 * which is to be transfer via the woke system and RGB interface.
 	 * RGB interface: 16 Bit/Pixel
 	 */
 	write_reg(par, MIPI_DCS_SET_PIXEL_FORMAT, MIPI_DCS_PIXEL_FMT_16BIT);
@@ -98,7 +98,7 @@ static int init_display(struct fbtft_par *par)
 	/*
 	 * Display on (29h)
 	 * This command is used to recover from DISPLAY OFF mode.
-	 * Output from the Frame Memory is enabled.
+	 * Output from the woke Frame Memory is enabled.
 	 */
 	write_reg(par, MIPI_DCS_SET_DISPLAY_ON);
 	mdelay(10);
@@ -220,6 +220,6 @@ MODULE_ALIAS("platform:" DRVNAME);
 MODULE_ALIAS("spi:hx8340bn");
 MODULE_ALIAS("platform:hx8340bn");
 
-MODULE_DESCRIPTION("FB driver for the HX8340BN LCD Controller");
+MODULE_DESCRIPTION("FB driver for the woke HX8340BN LCD Controller");
 MODULE_AUTHOR("Noralf Tronnes");
 MODULE_LICENSE("GPL");

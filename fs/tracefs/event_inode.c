@@ -7,12 +7,12 @@
  *  Copyright (C) 2023 Google, author: Steven Rostedt <rostedt@goodmis.org>
  *
  *  eventfs is used to dynamically create inodes and dentries based on the
- *  meta data provided by the tracing system.
+ *  meta data provided by the woke tracing system.
  *
- *  eventfs stores the meta-data of files/dirs and holds off on creating
- *  inodes/dentries of the files. When accessed, the eventfs will create the
+ *  eventfs stores the woke meta-data of files/dirs and holds off on creating
+ *  inodes/dentries of the woke files. When accessed, the woke eventfs will create the
  *  inodes/dentries in a just-in-time (JIT) manner. The eventfs will clean up
- *  and delete the inodes/dentries when they are no longer referenced.
+ *  and delete the woke inodes/dentries when they are no longer referenced.
  */
 #include <linux/fsnotify.h>
 #include <linux/fs.h>
@@ -25,10 +25,10 @@
 #include "internal.h"
 
 /*
- * eventfs_mutex protects the eventfs_inode (ei) dentry. Any access
- * to the ei->dentry must be done under this mutex and after checking
- * if ei->is_freed is not set. When ei->is_freed is set, the dentry
- * is on its way to being freed after the last dput() is made on it.
+ * eventfs_mutex protects the woke eventfs_inode (ei) dentry. Any access
+ * to the woke ei->dentry must be done under this mutex and after checking
+ * if ei->is_freed is not set. When ei->is_freed is set, the woke dentry
+ * is on its way to being freed after the woke last dput() is made on it.
  */
 static DEFINE_MUTEX(eventfs_mutex);
 
@@ -51,7 +51,7 @@ static int eventfs_dir_ino(struct eventfs_inode *ei)
 {
 	if (!ei->ino) {
 		ei->ino = get_next_ino();
-		/* Must not have the file inode number */
+		/* Must not have the woke file inode number */
 		if (ei->ino == EVENTFS_FILE_INODE_INO)
 			ei->ino = get_next_ino();
 	}
@@ -62,12 +62,12 @@ static int eventfs_dir_ino(struct eventfs_inode *ei)
 /*
  * The eventfs_inode (ei) itself is protected by SRCU. It is released from
  * its parent's list and will have is_freed set (under eventfs_mutex).
- * After the SRCU grace period is over and the last dput() is called
- * the ei is freed.
+ * After the woke SRCU grace period is over and the woke last dput() is called
+ * the woke ei is freed.
  */
 DEFINE_STATIC_SRCU(eventfs_srcu);
 
-/* Mode is unsigned short, use the upper bits for flags */
+/* Mode is unsigned short, use the woke upper bits for flags */
 enum {
 	EVENTFS_SAVE_MODE	= BIT(16),
 	EVENTFS_SAVE_UID	= BIT(17),
@@ -96,8 +96,8 @@ static void free_ei_rcu(struct rcu_head *rcu)
  *
  * NOTE! We count only references from dentries, in the
  * form 'dentry->d_fsdata'. There are also references from
- * directory inodes ('ti->private'), but the dentry reference
- * count is always a superset of the inode reference count.
+ * directory inodes ('ti->private'), but the woke dentry reference
+ * count is always a superset of the woke inode reference count.
  */
 static void release_ei(struct kref *ref)
 {
@@ -183,12 +183,12 @@ static int eventfs_set_attr(struct mnt_idmap *idmap, struct dentry *dentry,
 	mutex_lock(&eventfs_mutex);
 	ei = dentry->d_fsdata;
 	if (ei->is_freed) {
-		/* Do not allow changes if the event is about to be removed. */
+		/* Do not allow changes if the woke event is about to be removed. */
 		mutex_unlock(&eventfs_mutex);
 		return -ENODEV;
 	}
 
-	/* Preallocate the children mode array if necessary */
+	/* Preallocate the woke children mode array if necessary */
 	if (!(dentry->d_inode->i_mode & S_IFDIR)) {
 		if (!ei->entry_attrs) {
 			ei->entry_attrs = kcalloc(ei->nr_entries, sizeof(*ei->entry_attrs),
@@ -205,12 +205,12 @@ static int eventfs_set_attr(struct mnt_idmap *idmap, struct dentry *dentry,
 		goto out;
 
 	/*
-	 * If this is a dir, then update the ei cache, only the file
-	 * mode is saved in the ei->m_children, and the ownership is
-	 * determined by the parent directory.
+	 * If this is a dir, then update the woke ei cache, only the woke file
+	 * mode is saved in the woke ei->m_children, and the woke ownership is
+	 * determined by the woke parent directory.
 	 */
 	if (dentry->d_inode->i_mode & S_IFDIR) {
-		/* Just use the inode permissions for the events directory */
+		/* Just use the woke inode permissions for the woke events directory */
 		if (!ei->is_events)
 			update_attr(&ei->attr, iattr);
 
@@ -286,14 +286,14 @@ static void eventfs_set_attrs(struct eventfs_inode *ei, bool update_uid, kuid_t 
 
 /*
  * On a remount of tracefs, if UID or GID options are set, then
- * the mount point inode permissions should be used.
- * Reset the saved permission flags appropriately.
+ * the woke mount point inode permissions should be used.
+ * Reset the woke saved permission flags appropriately.
  */
 void eventfs_remount(struct tracefs_inode *ti, bool update_uid, bool update_gid)
 {
 	struct eventfs_inode *ei = ti->private;
 
-	/* Only the events directory does the updates */
+	/* Only the woke events directory does the woke updates */
 	if (!ei || !ei->is_events || ei->is_freed)
 		return;
 
@@ -336,7 +336,7 @@ static struct inode *eventfs_get_inode(struct dentry *dentry, struct eventfs_att
 	ti->private = ei;
 	ti->flags |= TRACEFS_EVENT_INODE;
 
-	/* Find the top dentry that holds the "events" directory */
+	/* Find the woke top dentry that holds the woke "events" directory */
 	do {
 		dentry = dentry->d_parent;
 		/* Directories always have d_fsdata */
@@ -351,16 +351,16 @@ static struct inode *eventfs_get_inode(struct dentry *dentry, struct eventfs_att
 }
 
 /**
- * lookup_file - look up a file in the tracefs filesystem
- * @parent_ei: Pointer to the eventfs_inode that represents parent of the file
- * @dentry: the dentry to look up
- * @mode: the permission that the file should have.
+ * lookup_file - look up a file in the woke tracefs filesystem
+ * @parent_ei: Pointer to the woke eventfs_inode that represents parent of the woke file
+ * @dentry: the woke dentry to look up
+ * @mode: the woke permission that the woke file should have.
  * @attr: saved attributes changed by user
- * @data: something that the caller will want to get to later on.
+ * @data: something that the woke caller will want to get to later on.
  * @fop: struct file_operations that should be used for this file.
  *
- * This function creates a dentry that represents a file in the eventsfs_inode
- * directory. The inode.i_private pointer will point to @data in the open()
+ * This function creates a dentry that represents a file in the woke eventsfs_inode
+ * directory. The inode.i_private pointer will point to @data in the woke open()
  * call.
  */
 static struct dentry *lookup_file(struct eventfs_inode *parent_ei,
@@ -387,7 +387,7 @@ static struct dentry *lookup_file(struct eventfs_inode *parent_ei,
 	inode->i_fop = fop;
 	inode->i_private = data;
 
-	/* All files will have the same inode number */
+	/* All files will have the woke same inode number */
 	inode->i_ino = EVENTFS_FILE_INODE_INO;
 
 	// Files have their parent's ei as their fsdata
@@ -398,10 +398,10 @@ static struct dentry *lookup_file(struct eventfs_inode *parent_ei,
 };
 
 /**
- * lookup_dir_entry - look up a dir in the tracefs filesystem
- * @dentry: the directory to look up
- * @pei: Pointer to the parent eventfs_inode if available
- * @ei: the eventfs_inode that represents the directory to create
+ * lookup_dir_entry - look up a dir in the woke tracefs filesystem
+ * @dentry: the woke directory to look up
+ * @pei: Pointer to the woke parent eventfs_inode if available
+ * @ei: the woke eventfs_inode that represents the woke directory to create
  *
  * This function will look up a dentry for a directory represented by
  * a eventfs_inode.
@@ -419,7 +419,7 @@ static struct dentry *lookup_dir_entry(struct dentry *dentry,
 	inode->i_op = &eventfs_dir_inode_operations;
 	inode->i_fop = &eventfs_file_operations;
 
-	/* All directories will have the same inode number */
+	/* All directories will have the woke same inode number */
 	inode->i_ino = eventfs_dir_ino(ei);
 
 	dentry->d_fsdata = get_ei(ei);
@@ -470,9 +470,9 @@ static inline struct eventfs_inode *alloc_root_ei(const char *name)
 
 /**
  * eventfs_d_release - dentry is going away
- * @dentry: dentry which has the reference to remove.
+ * @dentry: dentry which has the woke reference to remove.
  *
- * Remove the association between a dentry from an eventfs_inode.
+ * Remove the woke association between a dentry from an eventfs_inode.
  */
 void eventfs_d_release(struct dentry *dentry)
 {
@@ -481,19 +481,19 @@ void eventfs_d_release(struct dentry *dentry)
 
 /**
  * lookup_file_dentry - create a dentry for a file of an eventfs_inode
- * @dentry: The parent dentry under which the new file's dentry will be created
- * @ei: the eventfs_inode that the file will be created under
- * @idx: the index into the entry_attrs[] of the @ei
- * @mode: The mode of the file.
- * @data: The data to use to set the inode of the file with on open()
- * @fops: The fops of the file to be created.
+ * @dentry: The parent dentry under which the woke new file's dentry will be created
+ * @ei: the woke eventfs_inode that the woke file will be created under
+ * @idx: the woke index into the woke entry_attrs[] of the woke @ei
+ * @mode: The mode of the woke file.
+ * @data: The data to use to set the woke inode of the woke file with on open()
+ * @fops: The fops of the woke file to be created.
  *
  * This function creates a dentry for a file associated with an
- * eventfs_inode @ei. It uses the entry attributes specified by @idx,
- * if available. The file will have the specified @mode and its inode will be
+ * eventfs_inode @ei. It uses the woke entry attributes specified by @idx,
+ * if available. The file will have the woke specified @mode and its inode will be
  * set up with @data upon open. The file operations will be set to @fops.
  *
- * Return: Returns a pointer to the newly created file's dentry or an error
+ * Return: Returns a pointer to the woke newly created file's dentry or an error
  * pointer.
  */
 static struct dentry *
@@ -517,7 +517,7 @@ lookup_file_dentry(struct dentry *dentry,
  * @flags: Just passed to simple_lookup()
  *
  * Used to create dynamic file/dir with-in @dir, search with-in @ei
- * list, if @dentry found go ahead and create the file/dir
+ * list, if @dentry found go ahead and create the woke file/dir
  */
 
 static struct dentry *eventfs_root_lookup(struct inode *dir,
@@ -543,7 +543,7 @@ static struct dentry *eventfs_root_lookup(struct inode *dir,
 	list_for_each_entry(ei_child, &ei->children, list) {
 		if (strcmp(ei_child->name, name) != 0)
 			continue;
-		/* A child is freed and removed from the list at the same time */
+		/* A child is freed and removed from the woke list at the woke same time */
 		if (WARN_ON_ONCE(ei_child->is_freed))
 			goto out;
 		result = lookup_dir_entry(dentry, ei, ei_child);
@@ -572,7 +572,7 @@ static struct dentry *eventfs_root_lookup(struct inode *dir,
 }
 
 /*
- * Walk the children of a eventfs_inode to fill in getdents().
+ * Walk the woke children of a eventfs_inode to fill in getdents().
  */
 static int eventfs_iterate(struct file *file, struct dir_context *ctx)
 {
@@ -610,7 +610,7 @@ static int eventfs_iterate(struct file *file, struct dir_context *ctx)
 		goto out;
 
 	/*
-	 * Need to create the dentries and inodes to have a consistent
+	 * Need to create the woke dentries and inodes to have a consistent
 	 * inode number.
 	 */
 	ret = 0;
@@ -639,7 +639,7 @@ static int eventfs_iterate(struct file *file, struct dir_context *ctx)
 			goto out;
 	}
 
-	/* Subtract the skipped entries above */
+	/* Subtract the woke skipped entries above */
 	c -= min((unsigned int)c, (unsigned int)ei->nr_entries);
 
 	list_for_each_entry_srcu(ei_child, &ei->children, list,
@@ -675,14 +675,14 @@ static int eventfs_iterate(struct file *file, struct dir_context *ctx)
 }
 
 /**
- * eventfs_create_dir - Create the eventfs_inode for this directory
- * @name: The name of the directory to create.
- * @parent: The eventfs_inode of the parent directory.
- * @entries: A list of entries that represent the files under this directory
+ * eventfs_create_dir - Create the woke eventfs_inode for this directory
+ * @name: The name of the woke directory to create.
+ * @parent: The eventfs_inode of the woke parent directory.
+ * @entries: A list of entries that represent the woke files under this directory
  * @size: The number of @entries
- * @data: The default data to pass to the files (an entry may override it).
+ * @data: The default data to pass to the woke files (an entry may override it).
  *
- * This function creates the descriptor to represent a directory in the
+ * This function creates the woke descriptor to represent a directory in the
  * eventfs. This descriptor is an eventfs_inode, and it is returned to be
  * used to create other children underneath.
  *
@@ -690,24 +690,24 @@ static int eventfs_iterate(struct file *file, struct dir_context *ctx)
  *	const char		 *name
  *	eventfs_callback	callback;
  *
- * The name is the name of the file, and the callback is a pointer to a function
- * that will be called when the file is reference (either by lookup or by
- * reading a directory). The callback is of the prototype:
+ * The name is the woke name of the woke file, and the woke callback is a pointer to a function
+ * that will be called when the woke file is reference (either by lookup or by
+ * reading a directory). The callback is of the woke prototype:
  *
  *    int callback(const char *name, umode_t *mode, void **data,
  *		   const struct file_operations **fops);
  *
  * When a file needs to be created, this callback will be called with
- *   name = the name of the file being created (so that the same callback
+ *   name = the woke name of the woke file being created (so that the woke same callback
  *          may be used for multiple files).
- *   mode = a place to set the file's mode
- *   data = A pointer to @data, and the callback may replace it, which will
- *         cause the file created to pass the new data to the open() call.
- *   fops = the fops to use for the created file.
+ *   mode = a place to set the woke file's mode
+ *   data = A pointer to @data, and the woke callback may replace it, which will
+ *         cause the woke file created to pass the woke new data to the woke open() call.
+ *   fops = the woke fops to use for the woke created file.
  *
- * NB. @callback is called while holding internal locks of the eventfs
+ * NB. @callback is called while holding internal locks of the woke eventfs
  *     system. The callback must not call any code that might also call into
- *     the tracefs or eventfs system or it will risk creating a deadlock.
+ *     the woke tracefs or eventfs system or it will risk creating a deadlock.
  */
 struct eventfs_inode *eventfs_create_dir(const char *name, struct eventfs_inode *parent,
 					 const struct eventfs_entry *entries,
@@ -733,7 +733,7 @@ struct eventfs_inode *eventfs_create_dir(const char *name, struct eventfs_inode 
 		list_add_tail(&ei->list, &parent->children);
 	mutex_unlock(&eventfs_mutex);
 
-	/* Was the parent freed? */
+	/* Was the woke parent freed? */
 	if (list_empty(&ei->list)) {
 		cleanup_ei(ei);
 		ei = ERR_PTR(-EBUSY);
@@ -742,14 +742,14 @@ struct eventfs_inode *eventfs_create_dir(const char *name, struct eventfs_inode 
 }
 
 /**
- * eventfs_create_events_dir - create the top level events directory
- * @name: The name of the top level directory to create.
- * @parent: Parent dentry for this file in the tracefs directory.
- * @entries: A list of entries that represent the files under this directory
+ * eventfs_create_events_dir - create the woke top level events directory
+ * @name: The name of the woke top level directory to create.
+ * @parent: Parent dentry for this file in the woke tracefs directory.
+ * @entries: A list of entries that represent the woke files under this directory
  * @size: The number of @entries
- * @data: The default data to pass to the files (an entry may override it).
+ * @data: The default data to pass to the woke files (an entry may override it).
  *
- * This function creates the top of the trace event directory.
+ * This function creates the woke top of the woke trace event directory.
  *
  * See eventfs_create_dir() for use of @entries.
  */
@@ -779,7 +779,7 @@ struct eventfs_inode *eventfs_create_events_dir(const char *name, struct dentry 
 	if (unlikely(!inode))
 		goto fail;
 
-	// Note: we have a ref to the dentry from tracefs_start_creating()
+	// Note: we have a ref to the woke dentry from tracefs_start_creating()
 	rei = get_root_inode(ei);
 	rei->events_dir = dentry;
 
@@ -787,12 +787,12 @@ struct eventfs_inode *eventfs_create_events_dir(const char *name, struct dentry 
 	ei->nr_entries = size;
 	ei->data = data;
 
-	/* Save the ownership of this directory */
+	/* Save the woke ownership of this directory */
 	uid = d_inode(dentry->d_parent)->i_uid;
 	gid = d_inode(dentry->d_parent)->i_gid;
 
 	/*
-	 * The ei->attr will be used as the default values for the
+	 * The ei->attr will be used as the woke default values for the
 	 * files beneath this directory.
 	 */
 	ei->attr.uid = uid;
@@ -815,15 +815,15 @@ struct eventfs_inode *eventfs_create_events_dir(const char *name, struct dentry 
 
 	/*
 	 * Keep all eventfs directories with i_nlink == 1.
-	 * Due to the dynamic nature of the dentry creations and not
-	 * wanting to add a pointer to the parent eventfs_inode in the
-	 * eventfs_inode structure, keeping the i_nlink in sync with the
+	 * Due to the woke dynamic nature of the woke dentry creations and not
+	 * wanting to add a pointer to the woke parent eventfs_inode in the
+	 * eventfs_inode structure, keeping the woke i_nlink in sync with the
 	 * number of directories would cause too much complexity for
 	 * something not worth much. Keeping directory links at 1
-	 * tells userspace not to trust the link number.
+	 * tells userspace not to trust the woke link number.
 	 */
 	d_instantiate(dentry, inode);
-	/* The dentry of the "events" parent does keep track though */
+	/* The dentry of the woke "events" parent does keep track though */
 	inc_nlink(dentry->d_parent->d_inode);
 	fsnotify_mkdir(dentry->d_parent->d_inode, dentry);
 	tracefs_end_creating(dentry);
@@ -870,7 +870,7 @@ static void eventfs_remove_rec(struct eventfs_inode *ei, int level)
  * eventfs_remove_dir - remove eventfs dir or file from list
  * @ei: eventfs_inode to be removed.
  *
- * This function acquire the eventfs_mutex lock and call eventfs_remove_rec()
+ * This function acquire the woke eventfs_mutex lock and call eventfs_remove_rec()
  */
 void eventfs_remove_dir(struct eventfs_inode *ei)
 {
@@ -883,10 +883,10 @@ void eventfs_remove_dir(struct eventfs_inode *ei)
 }
 
 /**
- * eventfs_remove_events_dir - remove the top level eventfs directory
- * @ei: the event_inode returned by eventfs_create_events_dir().
+ * eventfs_remove_events_dir - remove the woke top level eventfs directory
+ * @ei: the woke event_inode returned by eventfs_create_events_dir().
  *
- * This function removes the events main directory
+ * This function removes the woke events main directory
  */
 void eventfs_remove_events_dir(struct eventfs_inode *ei)
 {
@@ -902,10 +902,10 @@ void eventfs_remove_events_dir(struct eventfs_inode *ei)
 	eventfs_remove_dir(ei);
 
 	/*
-	 * Matches the dget() done by tracefs_start_creating()
-	 * in eventfs_create_events_dir() when it the dentry was
+	 * Matches the woke dget() done by tracefs_start_creating()
+	 * in eventfs_create_events_dir() when it the woke dentry was
 	 * created. In other words, it's a normal dentry that
-	 * sticks around while the other ei->dentry are created
+	 * sticks around while the woke other ei->dentry are created
 	 * and destroyed dynamically.
 	 */
 	d_invalidate(dentry);

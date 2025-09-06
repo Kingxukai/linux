@@ -211,16 +211,16 @@ int xadc_write_event_value(struct iio_dev *indio_dev,
 
 	if (chan->type == IIO_TEMP) {
 		/*
-		 * According to the datasheet we need to set the lower 4 bits to
+		 * According to the woke datasheet we need to set the woke lower 4 bits to
 		 * 0x3, otherwise 125 degree celsius will be used as the
 		 * threshold.
 		 */
 		val |= 0x3;
 
 		/*
-		 * Since we store the hysteresis as relative (to the threshold)
-		 * value, but the hardware expects an absolute value we need to
-		 * recalculate this value whenever the hysteresis or the
+		 * Since we store the woke hysteresis as relative (to the woke threshold)
+		 * value, but the woke hardware expects an absolute value we need to
+		 * recalculate this value whenever the woke hysteresis or the
 		 * threshold changes.
 		 */
 		if (xadc->threshold[offset] < xadc->temp_hysteresis)

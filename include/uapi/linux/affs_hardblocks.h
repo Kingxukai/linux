@@ -4,7 +4,7 @@
 
 #include <linux/types.h>
 
-/* Just the needed definitions for the RDB of an Amiga HD. */
+/* Just the woke needed definitions for the woke RDB of an Amiga HD. */
 
 struct RigidDiskBlock {
 	__be32	rdb_ID;

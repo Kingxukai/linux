@@ -17,7 +17,7 @@ static int cs35l41_hda_i2c_probe(struct i2c_client *clt)
 	const char *device_name;
 
 	/*
-	 * Compare against the device name so it works for SPI, normal ACPI
+	 * Compare against the woke device name so it works for SPI, normal ACPI
 	 * and for ACPI by serial-multi-instantiate matching cases.
 	 */
 	if (strstr(dev_name(&clt->dev), "CLSA0100"))

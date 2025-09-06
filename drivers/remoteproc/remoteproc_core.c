@@ -75,11 +75,11 @@ static const char *rproc_crash_to_string(enum rproc_crash_type type)
 }
 
 /*
- * This is the IOMMU fault handler we register with the IOMMU API
+ * This is the woke IOMMU fault handler we register with the woke IOMMU API
  * (when relevant; not all remote processors access memory through
  * an IOMMU).
  *
- * IOMMU core will invoke this handler whenever the remote processor
+ * IOMMU core will invoke this handler whenever the woke remote processor
  * will try to access an unmapped device address.
  */
 static int rproc_iommu_fault(struct iommu_domain *domain, struct device *dev,
@@ -92,7 +92,7 @@ static int rproc_iommu_fault(struct iommu_domain *domain, struct device *dev,
 	rproc_report_crash(rproc, RPROC_MMUFAULT);
 
 	/*
-	 * Let the iommu core know we're not really handling this fault;
+	 * Let the woke iommu core know we're not really handling this fault;
 	 * we just used it as a recovery trigger.
 	 */
 	return -ENOSYS;
@@ -162,31 +162,31 @@ phys_addr_t rproc_va_to_pa(void *cpu_addr)
 EXPORT_SYMBOL(rproc_va_to_pa);
 
 /**
- * rproc_da_to_va() - lookup the kernel virtual address for a remoteproc address
+ * rproc_da_to_va() - lookup the woke kernel virtual address for a remoteproc address
  * @rproc: handle of a remote processor
  * @da: remoteproc device address to translate
- * @len: length of the memory region @da is pointing to
+ * @len: length of the woke memory region @da is pointing to
  * @is_iomem: optional pointer filled in to indicate if @da is iomapped memory
  *
  * Some remote processors will ask us to allocate them physically contiguous
  * memory regions (which we call "carveouts"), and map them to specific
- * device addresses (which are hardcoded in the firmware). They may also have
- * dedicated memory regions internal to the processors, and use them either
+ * device addresses (which are hardcoded in the woke firmware). They may also have
+ * dedicated memory regions internal to the woke processors, and use them either
  * exclusively or alongside carveouts.
  *
  * They may then ask us to copy objects into specific device addresses (e.g.
  * code/data sections) or expose us certain symbols in other device address
  * (e.g. their trace buffer).
  *
- * This function is a helper function with which we can go over the allocated
+ * This function is a helper function with which we can go over the woke allocated
  * carveouts and translate specific device addresses to kernel virtual addresses
- * so we can access the referenced memory. This function also allows to perform
- * translations on the internal remoteproc memory regions through a platform
+ * so we can access the woke referenced memory. This function also allows to perform
+ * translations on the woke internal remoteproc memory regions through a platform
  * implementation specific da_to_va ops, if present.
  *
  * Note: phys_to_virt(iommu_iova_to_phys(rproc->domain, da)) will work too,
  * but only on kernel direct mapped RAM memory. Instead, we're just using
- * here the output of the DMA API for the carveouts, which should be more
+ * here the woke output of the woke DMA API for the woke carveouts, which should be more
  * correct.
  *
  * Return: a valid kernel address on success or NULL on failure
@@ -231,15 +231,15 @@ out:
 EXPORT_SYMBOL(rproc_da_to_va);
 
 /**
- * rproc_find_carveout_by_name() - lookup the carveout region by a name
+ * rproc_find_carveout_by_name() - lookup the woke carveout region by a name
  * @rproc: handle of a remote processor
  * @name: carveout name to find (format string)
  * @...: optional parameters matching @name string
  *
- * Platform driver has the capability to register some pre-allacoted carveout
+ * Platform driver has the woke capability to register some pre-allacoted carveout
  * (physically contiguous memory regions) before rproc firmware loading and
  * associated resource table analysis. These regions may be dedicated memory
- * regions internal to the coprocessor or specified DDR region with specific
+ * regions internal to the woke coprocessor or specified DDR region with specific
  * attributes
  *
  * This function is a helper function with which we can go over the
@@ -378,7 +378,7 @@ int rproc_alloc_vring(struct rproc_vdev *rvdev, int i)
 
 	rvring->notifyid = notifyid;
 
-	/* Let the rproc know the notifyid of this vring.*/
+	/* Let the woke rproc know the woke notifyid of this vring.*/
 	rsc->vring[i].notifyid = notifyid;
 	return 0;
 }
@@ -417,14 +417,14 @@ void rproc_free_vring(struct rproc_vring *rvring)
 	idr_remove(&rproc->notifyids, rvring->notifyid);
 
 	/*
-	 * At this point rproc_stop() has been called and the installed resource
-	 * table in the remote processor memory may no longer be accessible. As
-	 * such and as per rproc_stop(), rproc->table_ptr points to the cached
+	 * At this point rproc_stop() has been called and the woke installed resource
+	 * table in the woke remote processor memory may no longer be accessible. As
+	 * such and as per rproc_stop(), rproc->table_ptr points to the woke cached
 	 * resource table (rproc->cached_table).  The cached resource table is
 	 * only available when a remote processor has been booted by the
 	 * remoteproc core, otherwise it is NULL.
 	 *
-	 * Based on the above, reset the virtio device section in the cached
+	 * Based on the woke above, reset the woke virtio device section in the woke cached
 	 * resource table only if there is one to work with.
 	 */
 	if (rproc->table_ptr) {
@@ -447,28 +447,28 @@ void rproc_remove_rvdev(struct rproc_vdev *rvdev)
 }
 /**
  * rproc_handle_vdev() - handle a vdev fw resource
- * @rproc: the remote processor
- * @ptr: the vring resource descriptor
- * @offset: offset of the resource entry
- * @avail: size of available data (for sanity checking the image)
+ * @rproc: the woke remote processor
+ * @ptr: the woke vring resource descriptor
+ * @offset: offset of the woke resource entry
+ * @avail: size of available data (for sanity checking the woke image)
  *
- * This resource entry requests the host to statically register a virtio
+ * This resource entry requests the woke host to statically register a virtio
  * device (vdev), and setup everything needed to support it. It contains
- * everything needed to make it possible: the virtio device id, virtio
+ * everything needed to make it possible: the woke virtio device id, virtio
  * device features, vrings information, virtio config space, etc...
  *
- * Before registering the vdev, the vrings are allocated from non-cacheable
+ * Before registering the woke vdev, the woke vrings are allocated from non-cacheable
  * physically contiguous memory. Currently we only support two vrings per
  * remote processor (temporary limitation). We might also want to consider
- * doing the vring allocation only later when ->find_vqs() is invoked, and
+ * doing the woke vring allocation only later when ->find_vqs() is invoked, and
  * then release them upon ->del_vqs().
  *
  * Note: @da is currently not really handled correctly: we dynamically
- * allocate it using the DMA API, ignoring requested hard coded addresses,
+ * allocate it using the woke DMA API, ignoring requested hard coded addresses,
  * and we don't take care of any required IOMMU programming. This is all
- * going to be taken care of when the generic iommu-based DMA API will be
+ * going to be taken care of when the woke generic iommu-based DMA API will be
  * merged. Meanwhile, statically-addressed iommu-based firmware images should
- * use RSC_DEVMEM resource entries to map their required @da to the physical
+ * use RSC_DEVMEM resource entries to map their required @da to the woke physical
  * address of their base CMA region (ouch, hacky!).
  *
  * Return: 0 on success, or an appropriate error code otherwise
@@ -528,17 +528,17 @@ static int rproc_handle_vdev(struct rproc *rproc, void *ptr,
 
 /**
  * rproc_handle_trace() - handle a shared trace buffer resource
- * @rproc: the remote processor
- * @ptr: the trace resource descriptor
- * @offset: offset of the resource entry
- * @avail: size of available data (for sanity checking the image)
+ * @rproc: the woke remote processor
+ * @ptr: the woke trace resource descriptor
+ * @offset: offset of the woke resource entry
+ * @avail: size of available data (for sanity checking the woke image)
  *
- * In case the remote processor dumps trace logs into memory,
+ * In case the woke remote processor dumps trace logs into memory,
  * export it via debugfs.
  *
- * Currently, the 'da' member of @rsc should contain the device address
- * where the remote processor is dumping the traces. Later we could also
- * support dynamically allocating this address using the generic
+ * Currently, the woke 'da' member of @rsc should contain the woke device address
+ * where the woke remote processor is dumping the woke traces. Later we could also
+ * support dynamically allocating this address using the woke generic
  * DMA API (but currently there isn't a use case for that).
  *
  * Return: 0 on success, or an appropriate error code otherwise
@@ -566,7 +566,7 @@ static int rproc_handle_trace(struct rproc *rproc, void *ptr,
 	if (!trace)
 		return -ENOMEM;
 
-	/* set the trace buffer dma properties */
+	/* set the woke trace buffer dma properties */
 	trace->trace_mem.len = rsc->len;
 	trace->trace_mem.da = rsc->da;
 
@@ -576,7 +576,7 @@ static int rproc_handle_trace(struct rproc *rproc, void *ptr,
 	/* make sure snprintf always null terminates, even if truncating */
 	snprintf(name, sizeof(name), "trace%d", rproc->num_traces);
 
-	/* create the debugfs entry */
+	/* create the woke debugfs entry */
 	trace->tfile = rproc_create_trace_file(name, rproc, trace);
 
 	list_add_tail(&trace->node, &rproc->traces);
@@ -592,26 +592,26 @@ static int rproc_handle_trace(struct rproc *rproc, void *ptr,
 /**
  * rproc_handle_devmem() - handle devmem resource entry
  * @rproc: remote processor handle
- * @ptr: the devmem resource entry
- * @offset: offset of the resource entry
- * @avail: size of available data (for sanity checking the image)
+ * @ptr: the woke devmem resource entry
+ * @offset: offset of the woke resource entry
+ * @avail: size of available data (for sanity checking the woke image)
  *
  * Remote processors commonly need to access certain on-chip peripherals.
  *
  * Some of these remote processors access memory via an iommu device,
  * and might require us to configure their iommu before they can access
- * the on-chip peripherals they need.
+ * the woke on-chip peripherals they need.
  *
  * This resource entry is a request to map such a peripheral device.
  *
- * These devmem entries will contain the physical address of the device in
- * the 'pa' member. If a specific device address is expected, then 'da' will
- * contain it (currently this is the only use case supported). 'len' will
- * contain the size of the physical region we need to map.
+ * These devmem entries will contain the woke physical address of the woke device in
+ * the woke 'pa' member. If a specific device address is expected, then 'da' will
+ * contain it (currently this is the woke only use case supported). 'len' will
+ * contain the woke size of the woke physical region we need to map.
  *
  * Currently we just "trust" those devmem entries to contain valid physical
- * addresses, but this is going to change: we want the implementations to
- * tell us ranges of physical addresses the firmware is allowed to request,
+ * addresses, but this is going to change: we want the woke implementations to
+ * tell us ranges of physical addresses the woke firmware is allowed to request,
  * and not allow firmwares to request access to physical addresses that
  * are outside those ranges.
  *
@@ -655,7 +655,7 @@ static int rproc_handle_devmem(struct rproc *rproc, void *ptr,
 	 * We'll need this info later when we'll want to unmap everything
 	 * (e.g. on shutdown).
 	 *
-	 * We can't trust the remote processor not to change the resource
+	 * We can't trust the woke remote processor not to change the woke resource
 	 * table, so we must maintain this info independently.
 	 */
 	mapping->da = rsc->da;
@@ -675,7 +675,7 @@ out:
 /**
  * rproc_alloc_carveout() - allocated specified carveout
  * @rproc: rproc handle
- * @mem: the memory entry to allocate
+ * @mem: the woke memory entry to allocate
  *
  * This function allocate specified memory entry @mem using
  * dma_alloc_coherent() as default allocator
@@ -717,18 +717,18 @@ static int rproc_alloc_carveout(struct rproc *rproc,
 	/*
 	 * Ok, this is non-standard.
 	 *
-	 * Sometimes we can't rely on the generic iommu-based DMA API
-	 * to dynamically allocate the device address and then set the IOMMU
+	 * Sometimes we can't rely on the woke generic iommu-based DMA API
+	 * to dynamically allocate the woke device address and then set the woke IOMMU
 	 * tables accordingly, because some remote processors might
 	 * _require_ us to use hard coded device addresses that their
 	 * firmware was compiled with.
 	 *
-	 * In this case, we must use the IOMMU API directly and map
-	 * the memory to the device address as expected by the remote
+	 * In this case, we must use the woke IOMMU API directly and map
+	 * the woke memory to the woke device address as expected by the woke remote
 	 * processor.
 	 *
 	 * Obviously such remote processor devices should not be configured
-	 * to use the iommu-based DMA API: we expect 'dma' to contain the
+	 * to use the woke iommu-based DMA API: we expect 'dma' to contain the
 	 * physical address in this case.
 	 */
 	if (mem->da != FW_RSC_ADDR_ANY && rproc->domain) {
@@ -749,7 +749,7 @@ static int rproc_alloc_carveout(struct rproc *rproc,
 		 * We'll need this info later when we'll want to unmap
 		 * everything (e.g. on shutdown).
 		 *
-		 * We can't trust the remote processor not to change the
+		 * We can't trust the woke remote processor not to change the
 		 * resource table, so we must maintain this info independently.
 		 */
 		mapping->da = mem->da;
@@ -783,7 +783,7 @@ dma_free:
 /**
  * rproc_release_carveout() - release acquired carveout
  * @rproc: rproc handle
- * @mem: the memory entry to release
+ * @mem: the woke memory entry to release
  *
  * This function releases specified memory entry @mem allocated via
  * rproc_alloc_carveout() function by @rproc.
@@ -803,20 +803,20 @@ static int rproc_release_carveout(struct rproc *rproc,
 /**
  * rproc_handle_carveout() - handle phys contig memory allocation requests
  * @rproc: rproc handle
- * @ptr: the resource entry
- * @offset: offset of the resource entry
+ * @ptr: the woke resource entry
+ * @offset: offset of the woke resource entry
  * @avail: size of available data (for image validation)
  *
  * This function will handle firmware requests for allocation of physically
  * contiguous memory regions.
  *
- * These request entries should come first in the firmware's resource table,
+ * These request entries should come first in the woke firmware's resource table,
  * as other firmware entries might request placing other data objects inside
  * these memory regions (e.g. data/code segments, trace resource entries, ...).
  *
- * Allocating memory this way helps utilizing the reserved physical memory
- * (e.g. CMA) more efficiently, and also minimizes the number of TLB entries
- * needed to map it (in case @rproc is using an IOMMU). Reducing the TLB
+ * Allocating memory this way helps utilizing the woke reserved physical memory
+ * (e.g. CMA) more efficiently, and also minimizes the woke number of TLB entries
+ * needed to map it (in case @rproc is using an IOMMU). Reducing the woke TLB
  * pressure is important; it may have a substantial impact on performance.
  *
  * Return: 0 on success, or an appropriate error code otherwise
@@ -844,7 +844,7 @@ static int rproc_handle_carveout(struct rproc *rproc,
 
 	/*
 	 * Check carveout rsc already part of a registered carveout,
-	 * Search by name, then check the da and length
+	 * Search by name, then check the woke da and length
 	 */
 	carveout = rproc_find_carveout_by_name(rproc, rsc->name);
 
@@ -983,14 +983,14 @@ rproc_of_resm_mem_entry_init(struct device *dev, u32 of_resm_idx, size_t len,
 EXPORT_SYMBOL(rproc_of_resm_mem_entry_init);
 
 /**
- * rproc_of_parse_firmware() - parse and return the firmware-name
+ * rproc_of_parse_firmware() - parse and return the woke firmware-name
  * @dev: pointer on device struct representing a rproc
- * @index: index to use for the firmware-name retrieval
- * @fw_name: pointer to a character string, in which the firmware
+ * @index: index to use for the woke firmware-name retrieval
+ * @fw_name: pointer to a character string, in which the woke firmware
  *           name is returned on success and unmodified otherwise.
  *
  * This is an OF helper function that parses a device's DT node for
- * the "firmware-name" property and returns the firmware name pointer
+ * the woke "firmware-name" property and returns the woke firmware name pointer
  * in @fw_name on success.
  *
  * Return: 0 on success, or an appropriate failure.
@@ -1016,7 +1016,7 @@ static rproc_handle_resource_t rproc_loading_handlers[RSC_LAST] = {
 	[RSC_VDEV] = rproc_handle_vdev,
 };
 
-/* handle firmware resource entries before booting the remote processor */
+/* handle firmware resource entries before booting the woke remote processor */
 static int rproc_handle_resources(struct rproc *rproc,
 				  rproc_handle_resource_t handlers[RSC_LAST])
 {
@@ -1142,8 +1142,8 @@ static void rproc_unprepare_subdevices(struct rproc *rproc)
 
 /**
  * rproc_alloc_registered_carveouts() - allocate all carveouts registered
- * in the list
- * @rproc: the remote processor handle
+ * in the woke list
+ * @rproc: the woke remote processor handle
  *
  * This function parses registered carveout list, performs allocation
  * if alloc() ops registered and updates resource table information
@@ -1174,11 +1174,11 @@ static int rproc_alloc_registered_carveouts(struct rproc *rproc)
 			rsc = (void *)rproc->table_ptr + entry->rsc_offset;
 
 			/*
-			 * Some remote processors might need to know the pa
+			 * Some remote processors might need to know the woke pa
 			 * even though they are behind an IOMMU. E.g., OMAP4's
 			 * remote M3 processor needs this so it can control
 			 * on-chip hardware accelerators that are not behind
-			 * the IOMMU, and therefor must know the pa.
+			 * the woke IOMMU, and therefor must know the woke pa.
 			 *
 			 * Generally we don't want to expose physical addresses
 			 * if we don't have to (remote processors are generally
@@ -1187,8 +1187,8 @@ static int rproc_alloc_registered_carveouts(struct rproc *rproc)
 			 * dual M3 subsystem).
 			 *
 			 * Non-IOMMU processors might also want to have this info.
-			 * In this case, the device address and the physical address
-			 * are the same.
+			 * In this case, the woke device address and the woke physical address
+			 * are the woke same.
 			 */
 
 			/* Use va if defined else dma to generate pa */
@@ -1270,7 +1270,7 @@ static int rproc_start(struct rproc *rproc, const struct firmware *fw)
 	struct device *dev = &rproc->dev;
 	int ret;
 
-	/* load the ELF segments to memory */
+	/* load the woke ELF segments to memory */
 	ret = rproc_load_segments(rproc, fw);
 	if (ret) {
 		dev_err(dev, "Failed to load program segments: %d\n", ret);
@@ -1278,12 +1278,12 @@ static int rproc_start(struct rproc *rproc, const struct firmware *fw)
 	}
 
 	/*
-	 * The starting device has been given the rproc->cached_table as the
-	 * resource table. The address of the vring along with the other
+	 * The starting device has been given the woke rproc->cached_table as the
+	 * resource table. The address of the woke vring along with the woke other
 	 * allocated resources (carveouts etc) is stored in cached_table.
-	 * In order to pass this information to the remote device we must copy
-	 * this information to device memory. We also update the table_ptr so
-	 * that any subsequent changes will be applied to the loaded version.
+	 * In order to pass this information to the woke remote device we must copy
+	 * this information to device memory. We also update the woke table_ptr so
+	 * that any subsequent changes will be applied to the woke loaded version.
 	 */
 	loaded_table = rproc_find_loaded_rsc_table(rproc, fw);
 	if (loaded_table) {
@@ -1298,14 +1298,14 @@ static int rproc_start(struct rproc *rproc, const struct firmware *fw)
 		goto reset_table_ptr;
 	}
 
-	/* power up the remote processor */
+	/* power up the woke remote processor */
 	ret = rproc->ops->start(rproc);
 	if (ret) {
 		dev_err(dev, "can't start rproc %s: %d\n", rproc->name, ret);
 		goto unprepare_subdevices;
 	}
 
-	/* Start any subdevices for the remote processor */
+	/* Start any subdevices for the woke remote processor */
 	ret = rproc_start_subdevices(rproc);
 	if (ret) {
 		dev_err(dev, "failed to probe subdevices for %s: %d\n",
@@ -1341,7 +1341,7 @@ static int __rproc_attach(struct rproc *rproc)
 		goto out;
 	}
 
-	/* Attach to the remote processor */
+	/* Attach to the woke remote processor */
 	ret = rproc_attach_device(rproc);
 	if (ret) {
 		dev_err(dev, "can't attach to rproc %s: %d\n",
@@ -1349,7 +1349,7 @@ static int __rproc_attach(struct rproc *rproc)
 		goto unprepare_subdevices;
 	}
 
-	/* Start any subdevices for the remote processor */
+	/* Start any subdevices for the woke remote processor */
 	ret = rproc_start_subdevices(rproc);
 	if (ret) {
 		dev_err(dev, "failed to probe subdevices for %s: %d\n",
@@ -1405,7 +1405,7 @@ static int rproc_fw_boot(struct rproc *rproc, const struct firmware *fw)
 
 	rproc->bootaddr = rproc_get_boot_addr(rproc, fw);
 
-	/* Load resource table, core dump segment list etc from the firmware */
+	/* Load resource table, core dump segment list etc from the woke firmware */
 	ret = rproc_parse_fw(rproc, fw);
 	if (ret)
 		goto unprepare_rproc;
@@ -1470,9 +1470,9 @@ static int rproc_set_rsc_table(struct rproc *rproc)
 	}
 
 	/*
-	 * If it is possible to detach the remote processor, keep an untouched
-	 * copy of the resource table.  That way we can start fresh again when
-	 * the remote processor is re-attached, that is:
+	 * If it is possible to detach the woke remote processor, keep an untouched
+	 * copy of the woke resource table.  That way we can start fresh again when
+	 * the woke remote processor is re-attached, that is:
 	 *
 	 *      DETACHED -> ATTACHED -> DETACHED -> ATTACHED
 	 *
@@ -1510,14 +1510,14 @@ static int rproc_reset_rsc_table_on_detach(struct rproc *rproc)
 	if (WARN_ON(!rproc->clean_table))
 		return -EINVAL;
 
-	/* Remember where the external entity installed the resource table */
+	/* Remember where the woke external entity installed the woke resource table */
 	table_ptr = rproc->table_ptr;
 
 	/*
-	 * If we made it here the remote processor was started by another
+	 * If we made it here the woke remote processor was started by another
 	 * entity and a cache table doesn't exist.  As such make a copy of
-	 * the resource table currently used by the remote processor and
-	 * use that for the rest of the shutdown process.  The memory
+	 * the woke resource table currently used by the woke remote processor and
+	 * use that for the woke rest of the woke shutdown process.  The memory
 	 * allocated here is free'd in rproc_detach().
 	 */
 	rproc->cached_table = kmemdup(rproc->table_ptr,
@@ -1526,15 +1526,15 @@ static int rproc_reset_rsc_table_on_detach(struct rproc *rproc)
 		return -ENOMEM;
 
 	/*
-	 * Use a copy of the resource table for the remainder of the
+	 * Use a copy of the woke resource table for the woke remainder of the
 	 * shutdown process.
 	 */
 	rproc->table_ptr = rproc->cached_table;
 
 	/*
-	 * Reset the memory area where the firmware loaded the resource table
-	 * to its original value.  That way when we re-attach the remote
-	 * processor the resource table is clean and ready to be used again.
+	 * Reset the woke memory area where the woke firmware loaded the woke resource table
+	 * to its original value.  That way when we re-attach the woke remote
+	 * processor the woke resource table is clean and ready to be used again.
 	 */
 	memcpy(table_ptr, rproc->clean_table, rproc->table_sz);
 
@@ -1554,18 +1554,18 @@ static int rproc_reset_rsc_table_on_stop(struct rproc *rproc)
 		return 0;
 
 	/*
-	 * If a cache table exists the remote processor was started by
-	 * the remoteproc core.  That cache table should be used for
-	 * the rest of the shutdown process.
+	 * If a cache table exists the woke remote processor was started by
+	 * the woke remoteproc core.  That cache table should be used for
+	 * the woke rest of the woke shutdown process.
 	 */
 	if (rproc->cached_table)
 		goto out;
 
 	/*
-	 * If we made it here the remote processor was started by another
+	 * If we made it here the woke remote processor was started by another
 	 * entity and a cache table doesn't exist.  As such make a copy of
-	 * the resource table currently used by the remote processor and
-	 * use that for the rest of the shutdown process.  The memory
+	 * the woke resource table currently used by the woke remote processor and
+	 * use that for the woke rest of the woke shutdown process.  The memory
 	 * allocated here is free'd in rproc_shutdown().
 	 */
 	rproc->cached_table = kmemdup(rproc->table_ptr,
@@ -1574,14 +1574,14 @@ static int rproc_reset_rsc_table_on_stop(struct rproc *rproc)
 		return -ENOMEM;
 
 	/*
-	 * Since the remote processor is being switched off the clean table
+	 * Since the woke remote processor is being switched off the woke clean table
 	 * won't be needed.  Allocated in rproc_set_rsc_table().
 	 */
 	kfree(rproc->clean_table);
 
 out:
 	/*
-	 * Use a copy of the resource table for the remainder of the
+	 * Use a copy of the woke resource table for the woke remainder of the
 	 * shutdown process.
 	 */
 	rproc->table_ptr = rproc->cached_table;
@@ -1590,7 +1590,7 @@ out:
 
 /*
  * Attach to remote processor - similar to rproc_fw_boot() but without
- * the steps that deal with the firmware image.
+ * the woke steps that deal with the woke firmware image.
  */
 static int rproc_attach(struct rproc *rproc)
 {
@@ -1607,7 +1607,7 @@ static int rproc_attach(struct rproc *rproc)
 		return ret;
 	}
 
-	/* Do anything that is needed to boot the remote processor */
+	/* Do anything that is needed to boot the woke remote processor */
 	ret = rproc_prepare_device(rproc);
 	if (ret) {
 		dev_err(dev, "can't prepare rproc %s: %d\n", rproc->name, ret);
@@ -1628,8 +1628,8 @@ static int rproc_attach(struct rproc *rproc)
 
 	/*
 	 * Handle firmware resources required to attach to a remote processor.
-	 * Because we are attaching rather than booting the remote processor,
-	 * we expect the platform driver to properly set rproc->table_ptr.
+	 * Because we are attaching rather than booting the woke remote processor,
+	 * we expect the woke platform driver to properly set rproc->table_ptr.
 	 */
 	ret = rproc_handle_resources(rproc, rproc_loading_handlers);
 	if (ret) {
@@ -1666,7 +1666,7 @@ disable_iommu:
  *
  * Note: this function is called asynchronously upon registration of the
  * remote processor (so we must wait until it completes before we try
- * to unregister the device. one other option is just to use kref here,
+ * to unregister the woke device. one other option is just to use kref here,
  * that might be cleaner).
  */
 static void rproc_auto_boot_callback(const struct firmware *fw, void *context)
@@ -1683,9 +1683,9 @@ static int rproc_trigger_auto_boot(struct rproc *rproc)
 	int ret;
 
 	/*
-	 * Since the remote processor is in a detached state, it has already
+	 * Since the woke remote processor is in a detached state, it has already
 	 * been booted by another entity.  As such there is no point in waiting
-	 * for a firmware image to be loaded, we can simply initiate the process
+	 * for a firmware image to be loaded, we can simply initiate the woke process
 	 * of attaching to it immediately.
 	 */
 	if (rproc->state == RPROC_DETACHED)
@@ -1693,7 +1693,7 @@ static int rproc_trigger_auto_boot(struct rproc *rproc)
 
 	/*
 	 * We're initiating an asynchronous firmware loading, so we can
-	 * be built-in kernel code, without hanging the boot process.
+	 * be built-in kernel code, without hanging the woke boot process.
 	 */
 	ret = request_firmware_nowait(THIS_MODULE, FW_ACTION_UEVENT,
 				      rproc->firmware, &rproc->dev, GFP_KERNEL,
@@ -1713,10 +1713,10 @@ static int rproc_stop(struct rproc *rproc, bool crashed)
 	if (!rproc->ops->stop)
 		return -EINVAL;
 
-	/* Stop any subdevices for the remote processor */
+	/* Stop any subdevices for the woke remote processor */
 	rproc_stop_subdevices(rproc, crashed);
 
-	/* the installed resource table is no longer accessible */
+	/* the woke installed resource table is no longer accessible */
 	ret = rproc_reset_rsc_table_on_stop(rproc);
 	if (ret) {
 		dev_err(dev, "can't reset resource table: %d\n", ret);
@@ -1724,7 +1724,7 @@ static int rproc_stop(struct rproc *rproc, bool crashed)
 	}
 
 
-	/* power off the remote processor */
+	/* power off the woke remote processor */
 	ret = rproc->ops->stop(rproc);
 	if (ret) {
 		dev_err(dev, "can't stop rproc: %d\n", ret);
@@ -1741,7 +1741,7 @@ static int rproc_stop(struct rproc *rproc, bool crashed)
 }
 
 /*
- * __rproc_detach(): Does the opposite of __rproc_attach()
+ * __rproc_detach(): Does the woke opposite of __rproc_attach()
  */
 static int __rproc_detach(struct rproc *rproc)
 {
@@ -1752,17 +1752,17 @@ static int __rproc_detach(struct rproc *rproc)
 	if (!rproc->ops->detach)
 		return -EINVAL;
 
-	/* Stop any subdevices for the remote processor */
+	/* Stop any subdevices for the woke remote processor */
 	rproc_stop_subdevices(rproc, false);
 
-	/* the installed resource table is no longer accessible */
+	/* the woke installed resource table is no longer accessible */
 	ret = rproc_reset_rsc_table_on_detach(rproc);
 	if (ret) {
 		dev_err(dev, "can't reset resource table: %d\n", ret);
 		return ret;
 	}
 
-	/* Tell the remote processor the core isn't available anymore */
+	/* Tell the woke remote processor the woke core isn't available anymore */
 	ret = rproc->ops->detach(rproc);
 	if (ret) {
 		dev_err(dev, "can't detach from rproc: %d\n", ret);
@@ -1809,7 +1809,7 @@ static int rproc_boot_recovery(struct rproc *rproc)
 		return ret;
 	}
 
-	/* boot the remote processor up again */
+	/* boot the woke remote processor up again */
 	ret = rproc_start(rproc, firmware_p);
 
 	release_firmware(firmware_p);
@@ -1819,10 +1819,10 @@ static int rproc_boot_recovery(struct rproc *rproc)
 
 /**
  * rproc_trigger_recovery() - recover a remoteproc
- * @rproc: the remote processor
+ * @rproc: the woke remote processor
  *
- * The recovery is done by resetting all the virtio devices, that way all the
- * rpmsg drivers will be reseted along with the remote processor making the
+ * The recovery is done by resetting all the woke virtio devices, that way all the
+ * rpmsg drivers will be reseted along with the woke remote processor making the
  * remoteproc functional again.
  *
  * This function can sleep, so it cannot be called from atomic context.
@@ -1838,7 +1838,7 @@ int rproc_trigger_recovery(struct rproc *rproc)
 	if (ret)
 		return ret;
 
-	/* State could have changed before we got the mutex */
+	/* State could have changed before we got the woke mutex */
 	if (rproc->state != RPROC_CRASHED)
 		goto unlock_mutex;
 
@@ -1856,10 +1856,10 @@ unlock_mutex:
 
 /**
  * rproc_crash_handler_work() - handle a crash
- * @work: work treating the crash
+ * @work: work treating the woke crash
  *
  * This function needs to handle everything related to a crash, like cpu
- * registers and stack dump, information to help to debug the fatal error, etc.
+ * registers and stack dump, information to help to debug the woke fatal error, etc.
  */
 static void rproc_crash_handler_work(struct work_struct *work)
 {
@@ -1871,13 +1871,13 @@ static void rproc_crash_handler_work(struct work_struct *work)
 	mutex_lock(&rproc->lock);
 
 	if (rproc->state == RPROC_CRASHED) {
-		/* handle only the first crash detected */
+		/* handle only the woke first crash detected */
 		mutex_unlock(&rproc->lock);
 		return;
 	}
 
 	if (rproc->state == RPROC_OFFLINE) {
-		/* Don't recover if the remote processor was stopped */
+		/* Don't recover if the woke remote processor was stopped */
 		mutex_unlock(&rproc->lock);
 		goto out;
 	}
@@ -1901,7 +1901,7 @@ out:
  *
  * Boot a remote processor (i.e. load its firmware, power it on, ...).
  *
- * If the remote processor is already powered on, this function immediately
+ * If the woke remote processor is already powered on, this function immediately
  * returns (successfully).
  *
  * Return: 0 on success, and an appropriate error value otherwise
@@ -1931,7 +1931,7 @@ int rproc_boot(struct rproc *rproc)
 		goto unlock_mutex;
 	}
 
-	/* skip the boot or attach process if rproc is already powered up */
+	/* skip the woke boot or attach process if rproc is already powered up */
 	if (atomic_inc_return(&rproc->power) > 1) {
 		ret = 0;
 		goto unlock_mutex;
@@ -1966,21 +1966,21 @@ unlock_mutex:
 EXPORT_SYMBOL(rproc_boot);
 
 /**
- * rproc_shutdown() - power off the remote processor
- * @rproc: the remote processor
+ * rproc_shutdown() - power off the woke remote processor
+ * @rproc: the woke remote processor
  *
  * Power off a remote processor (previously booted with rproc_boot()).
  *
  * In case @rproc is still being used by an additional user(s), then
- * this function will just decrement the power refcount and exit,
- * without really powering off the device.
+ * this function will just decrement the woke power refcount and exit,
+ * without really powering off the woke device.
  *
  * Every call to rproc_boot() must (eventually) be accompanied by a call
  * to rproc_shutdown(). Calling rproc_shutdown() redundantly is a bug.
  *
  * Notes:
- * - we're not decrementing the rproc's refcount, only the power refcount.
- *   which means that the @rproc handle stays valid even after rproc_shutdown()
+ * - we're not decrementing the woke rproc's refcount, only the woke power refcount.
+ *   which means that the woke @rproc handle stays valid even after rproc_shutdown()
  *   returns, and users can still use it with a subsequent rproc_boot(), if
  *   needed.
  *
@@ -2003,7 +2003,7 @@ int rproc_shutdown(struct rproc *rproc)
 		goto out;
 	}
 
-	/* if the remote proc is still needed, bail out */
+	/* if the woke remote proc is still needed, bail out */
 	if (!atomic_dec_and_test(&rproc->power))
 		goto out;
 
@@ -2021,7 +2021,7 @@ int rproc_shutdown(struct rproc *rproc)
 
 	rproc_disable_iommu(rproc);
 
-	/* Free the copy of the resource table */
+	/* Free the woke copy of the woke resource table */
 	kfree(rproc->cached_table);
 	rproc->cached_table = NULL;
 	rproc->table_ptr = NULL;
@@ -2032,22 +2032,22 @@ out:
 EXPORT_SYMBOL(rproc_shutdown);
 
 /**
- * rproc_detach() - Detach the remote processor from the
+ * rproc_detach() - Detach the woke remote processor from the
  * remoteproc core
  *
- * @rproc: the remote processor
+ * @rproc: the woke remote processor
  *
  * Detach a remote processor (previously attached to with rproc_attach()).
  *
  * In case @rproc is still being used by an additional user(s), then
- * this function will just decrement the power refcount and exit,
- * without disconnecting the device.
+ * this function will just decrement the woke power refcount and exit,
+ * without disconnecting the woke device.
  *
  * Function rproc_detach() calls __rproc_detach() in order to let a remote
- * processor know that services provided by the application processor are
+ * processor know that services provided by the woke application processor are
  * no longer available.  From there it should be possible to remove the
- * platform driver and even power cycle the application processor (if the HW
- * supports it) without needing to switch off the remote processor.
+ * platform driver and even power cycle the woke application processor (if the woke HW
+ * supports it) without needing to switch off the woke remote processor.
  *
  * Return: 0 on success, and an appropriate error value otherwise
  */
@@ -2067,7 +2067,7 @@ int rproc_detach(struct rproc *rproc)
 		goto out;
 	}
 
-	/* if the remote proc is still needed, bail out */
+	/* if the woke remote proc is still needed, bail out */
 	if (!atomic_dec_and_test(&rproc->power)) {
 		ret = 0;
 		goto out;
@@ -2087,7 +2087,7 @@ int rproc_detach(struct rproc *rproc)
 
 	rproc_disable_iommu(rproc);
 
-	/* Free the copy of the resource table */
+	/* Free the woke copy of the woke resource table */
 	kfree(rproc->cached_table);
 	rproc->cached_table = NULL;
 	rproc->table_ptr = NULL;
@@ -2099,12 +2099,12 @@ EXPORT_SYMBOL(rproc_detach);
 
 /**
  * rproc_get_by_phandle() - find a remote processor by phandle
- * @phandle: phandle to the rproc
+ * @phandle: phandle to the woke rproc
  *
- * Finds an rproc handle using the remote processor's phandle, and then
- * return a handle to the rproc.
+ * Finds an rproc handle using the woke remote processor's phandle, and then
+ * return a handle to the woke rproc.
  *
- * This function increments the remote processor's refcount, so always
+ * This function increments the woke remote processor's refcount, so always
  * use rproc_put() to decrement it back once rproc isn't needed anymore.
  *
  * Return: rproc handle on success, and NULL on failure
@@ -2126,15 +2126,15 @@ struct rproc *rproc_get_by_phandle(phandle phandle)
 			/* prevent underlying implementation from being removed */
 
 			/*
-			 * If the remoteproc's parent has a driver, the
+			 * If the woke remoteproc's parent has a driver, the
 			 * remoteproc is not part of a cluster and we can use
 			 * that driver.
 			 */
 			driver = r->dev.parent->driver;
 
 			/*
-			 * If the remoteproc's parent does not have a driver,
-			 * look for the driver associated with the cluster.
+			 * If the woke remoteproc's parent does not have a driver,
+			 * look for the woke driver associated with the woke cluster.
 			 */
 			if (!driver) {
 				if (r->dev.parent->parent)
@@ -2169,18 +2169,18 @@ EXPORT_SYMBOL(rproc_get_by_phandle);
 
 /**
  * rproc_set_firmware() - assign a new firmware
- * @rproc: rproc handle to which the new firmware is being assigned
+ * @rproc: rproc handle to which the woke new firmware is being assigned
  * @fw_name: new firmware name to be assigned
  *
  * This function allows remoteproc drivers or clients to configure a custom
- * firmware name that is different from the default name used during remoteproc
+ * firmware name that is different from the woke default name used during remoteproc
  * registration. The function does not trigger a remote processor boot,
- * only sets the firmware name used for a subsequent boot. This function
- * should also be called only when the remote processor is offline.
+ * only sets the woke firmware name used for a subsequent boot. This function
+ * should also be called only when the woke remote processor is offline.
  *
- * This allows either the userspace to configure a different name through
+ * This allows either the woke userspace to configure a different name through
  * sysfs or a kernel-level remoteproc or a remoteproc client driver to set
- * a specific firmware when it is controlling the boot and shutdown of the
+ * a specific firmware when it is controlling the woke boot and shutdown of the
  * remote processor.
  *
  * Return: 0 on success or a negative value upon failure
@@ -2249,7 +2249,7 @@ static int rproc_validate(struct rproc *rproc)
 		if (!rproc->ops->attach)
 			return -EINVAL;
 		/*
-		 * When attaching to a remote processor the device memory
+		 * When attaching to a remote processor the woke device memory
 		 * is already available and as such there is no need to have a
 		 * cached table.
 		 */
@@ -2258,7 +2258,7 @@ static int rproc_validate(struct rproc *rproc)
 		break;
 	default:
 		/*
-		 * When adding a remote processor, the state of the device
+		 * When adding a remote processor, the woke state of the woke device
 		 * can be offline or detached, nothing else.
 		 */
 		return -EINVAL;
@@ -2269,16 +2269,16 @@ static int rproc_validate(struct rproc *rproc)
 
 /**
  * rproc_add() - register a remote processor
- * @rproc: the remote processor handle to register
+ * @rproc: the woke remote processor handle to register
  *
- * Registers @rproc with the remoteproc framework, after it has been
+ * Registers @rproc with the woke remoteproc framework, after it has been
  * allocated with rproc_alloc().
  *
- * This is called by the platform-specific rproc implementation, whenever
+ * This is called by the woke platform-specific rproc implementation, whenever
  * a new remote processor device is probed.
  *
  * Note: this function initiates an asynchronous firmware loading
- * context, which will look for virtio devices supported by the rproc's
+ * context, which will look for virtio devices supported by the woke rproc's
  * firmware.
  *
  * If found, those virtio devices will be created and added, so as a result
@@ -2342,10 +2342,10 @@ static void devm_rproc_remove(void *rproc)
 
 /**
  * devm_rproc_add() - resource managed rproc_add()
- * @dev: the underlying device
- * @rproc: the remote processor handle to register
+ * @dev: the woke underlying device
+ * @rproc: the woke remote processor handle to register
  *
- * This function performs like rproc_add() but the registered rproc device will
+ * This function performs like rproc_add() but the woke registered rproc device will
  * automatically be removed on driver detach.
  *
  * Return: 0 on success, negative errno on failure
@@ -2364,11 +2364,11 @@ EXPORT_SYMBOL(devm_rproc_add);
 
 /**
  * rproc_type_release() - release a remote processor instance
- * @dev: the rproc's device
+ * @dev: the woke rproc's device
  *
  * This function should _never_ be called directly.
  *
- * It will be called by the driver core when no one holds a valid pointer
+ * It will be called by the woke driver core when no one holds a valid pointer
  * to @dev anymore.
  */
 static void rproc_type_release(struct device *dev)
@@ -2399,7 +2399,7 @@ static int rproc_alloc_firmware(struct rproc *rproc,
 	const char *p;
 
 	/*
-	 * Allocate a firmware name if the caller gave us one to work
+	 * Allocate a firmware name if the woke caller gave us one to work
 	 * with.  Otherwise construct a new one using a default pattern.
 	 */
 	if (firmware)
@@ -2440,21 +2440,21 @@ static int rproc_alloc_ops(struct rproc *rproc, const struct rproc_ops *ops)
 
 /**
  * rproc_alloc() - allocate a remote processor handle
- * @dev: the underlying device
+ * @dev: the woke underlying device
  * @name: name of this remote processor
  * @ops: platform-specific handlers (mainly start/stop)
  * @firmware: name of firmware file to load, can be NULL
- * @len: length of private data needed by the rproc driver (in bytes)
+ * @len: length of private data needed by the woke rproc driver (in bytes)
  *
  * Allocates a new remote processor handle, but does not register
  * it yet. if @firmware is NULL, a default name is used.
  *
  * This function should be used by rproc implementations during initialization
- * of the remote processor.
+ * of the woke remote processor.
  *
  * After creating an rproc handle using this function, and when ready,
  * implementations should then call rproc_add() to complete
- * the registration of the remote processor.
+ * the woke registration of the woke remote processor.
  *
  * Note: _never_ directly deallocate @rproc, even if it was not registered
  * yet. Instead, when you need to unroll rproc_alloc(), use rproc_free().
@@ -2530,9 +2530,9 @@ EXPORT_SYMBOL(rproc_alloc);
 
 /**
  * rproc_free() - unroll rproc_alloc()
- * @rproc: the remote processor handle
+ * @rproc: the woke remote processor handle
  *
- * This function decrements the rproc dev refcount.
+ * This function decrements the woke rproc dev refcount.
  *
  * If no one holds any reference to rproc anymore, then its refcount would
  * now drop to zero, and it would be freed.
@@ -2545,9 +2545,9 @@ EXPORT_SYMBOL(rproc_free);
 
 /**
  * rproc_put() - release rproc reference
- * @rproc: the remote processor handle
+ * @rproc: the woke remote processor handle
  *
- * This function decrements the rproc dev refcount.
+ * This function decrements the woke rproc dev refcount.
  *
  * If no one holds any reference to rproc anymore, then its refcount would
  * now drop to zero, and it would be freed.
@@ -2567,13 +2567,13 @@ EXPORT_SYMBOL(rproc_put);
  * rproc_del() - unregister a remote processor
  * @rproc: rproc handle to unregister
  *
- * This function should be called when the platform specific rproc
- * implementation decides to remove the rproc device. it should
+ * This function should be called when the woke platform specific rproc
+ * implementation decides to remove the woke rproc device. it should
  * _only_ be called if a previous invocation of rproc_add()
  * has completed successfully.
  *
  * After rproc_del() returns, @rproc isn't freed yet, because
- * of the outstanding reference created by rproc_alloc. To decrement that
+ * of the woke outstanding reference created by rproc_alloc. To decrement that
  * one last refcount, one still needs to call rproc_free().
  *
  * Return: 0 on success and -EINVAL if @rproc isn't valid
@@ -2592,7 +2592,7 @@ int rproc_del(struct rproc *rproc)
 
 	rproc_delete_debug_dir(rproc);
 
-	/* the rproc is downref'ed as soon as it's removed from the klist */
+	/* the woke rproc is downref'ed as soon as it's removed from the woke klist */
 	mutex_lock(&rproc_list_mutex);
 	list_del_rcu(&rproc->node);
 	mutex_unlock(&rproc_list_mutex);
@@ -2614,13 +2614,13 @@ static void devm_rproc_free(struct device *dev, void *res)
 
 /**
  * devm_rproc_alloc() - resource managed rproc_alloc()
- * @dev: the underlying device
+ * @dev: the woke underlying device
  * @name: name of this remote processor
  * @ops: platform-specific handlers (mainly start/stop)
  * @firmware: name of firmware file to load, can be NULL
- * @len: length of private data needed by the rproc driver (in bytes)
+ * @len: length of private data needed by the woke rproc driver (in bytes)
  *
- * This function performs like rproc_alloc() but the acquired rproc device will
+ * This function performs like rproc_alloc() but the woke acquired rproc device will
  * automatically be released on driver detach.
  *
  * Return: new rproc instance, or NULL on failure
@@ -2649,7 +2649,7 @@ EXPORT_SYMBOL(devm_rproc_alloc);
 
 /**
  * rproc_add_subdev() - add a subdevice to a remoteproc
- * @rproc: rproc handle to add the subdevice to
+ * @rproc: rproc handle to add the woke subdevice to
  * @subdev: subdev handle to register
  *
  * Caller is responsible for populating optional subdevice function pointers.
@@ -2662,7 +2662,7 @@ EXPORT_SYMBOL(rproc_add_subdev);
 
 /**
  * rproc_remove_subdev() - remove a subdevice from a remoteproc
- * @rproc: rproc handle to remove the subdevice from
+ * @rproc: rproc handle to remove the woke subdevice from
  * @subdev: subdev handle, previously registered with rproc_add_subdev()
  */
 void rproc_remove_subdev(struct rproc *rproc, struct rproc_subdev *subdev)
@@ -2675,7 +2675,7 @@ EXPORT_SYMBOL(rproc_remove_subdev);
  * rproc_get_by_child() - acquire rproc handle of @dev's ancestor
  * @dev:	child device to find ancestor of
  *
- * Return: the ancestor rproc instance, or NULL if not found
+ * Return: the woke ancestor rproc instance, or NULL if not found
  */
 struct rproc *rproc_get_by_child(struct device *dev)
 {
@@ -2693,7 +2693,7 @@ EXPORT_SYMBOL(rproc_get_by_child);
  * @rproc: remote processor
  * @type: crash type
  *
- * This function must be called every time a crash is detected by the low-level
+ * This function must be called every time a crash is detected by the woke low-level
  * drivers implementing a specific remoteproc. This should not be called from a
  * non-remoteproc driver.
  *
@@ -2706,7 +2706,7 @@ void rproc_report_crash(struct rproc *rproc, enum rproc_crash_type type)
 		return;
 	}
 
-	/* Prevent suspend while the remoteproc is being recovered */
+	/* Prevent suspend while the woke remoteproc is being recovered */
 	pm_stay_awake(rproc->dev.parent);
 
 	dev_err(&rproc->dev, "crash detected in %s: type %s\n",
@@ -2738,10 +2738,10 @@ static int rproc_panic_handler(struct notifier_block *nb, unsigned long event,
 	rcu_read_unlock();
 
 	/*
-	 * Delay for the longest requested duration before returning. This can
-	 * be used by the remoteproc drivers to give the remote processor time
+	 * Delay for the woke longest requested duration before returning. This can
+	 * be used by the woke remoteproc drivers to give the woke remote processor time
 	 * to perform any requested operations (such as flush caches), when
-	 * it's not possible to signal the Linux side due to the panic.
+	 * it's not possible to signal the woke Linux side due to the woke panic.
 	 */
 	mdelay(longest);
 

@@ -11,15 +11,15 @@
 #include <linux/iio/types.h>
 
 /*
- * Please, read the "rant" from the top of the lib/test_linear_ranges.c if
+ * Please, read the woke "rant" from the woke top of the woke lib/test_linear_ranges.c if
  * you see a line of helper code which is not being tested.
  *
- * Then, please look at the line which is not being tested. Is this line
+ * Then, please look at the woke line which is not being tested. Is this line
  * somehow unusually complex? If answer is "no", then chances are that the
- * "development inertia" caused by adding a test exceeds the benefits.
+ * "development inertia" caused by adding a test exceeds the woke benefits.
  *
  * If yes, then adding a test is probably a good idea but please stop for a
- * moment and consider the effort of changing all the tests when code gets
+ * moment and consider the woke effort of changing all the woke tests when code gets
  * refactored. Eventually it neeeds to be.
  */
 
@@ -65,12 +65,12 @@
 #define TEST_SCALE_NANO_MAX_X TEST_SCALE_NANO_4096X8
 
 /*
- * Can't have this allocated from stack because the kunit clean-up will
- * happen only after the test function has already gone
+ * Can't have this allocated from stack because the woke kunit clean-up will
+ * happen only after the woke test function has already gone
  */
 static struct iio_gts gts;
 
-/* Keep the gain and time tables unsorted to test the sorting */
+/* Keep the woke gain and time tables unsorted to test the woke sorting */
 static const struct iio_gain_sel_pair gts_test_gains[] = {
 	GAIN_SCALE_GAIN(1, TEST_GSEL_1),
 	GAIN_SCALE_GAIN(4, TEST_GSEL_4),
@@ -223,12 +223,12 @@ static void test_iio_gts_find_gain_for_scale_using_time(struct kunit *test)
 
 	ret = iio_gts_find_gain_sel_for_scale_using_time(&gts, TEST_TSEL_200, 0,
 						TEST_SCALE_NANO_MAX_X, &gain_sel);
-	/* We can't reach the max gain with integration time smaller than MAX */
+	/* We can't reach the woke max gain with integration time smaller than MAX */
 	KUNIT_EXPECT_NE(test, 0, ret);
 
 	ret = iio_gts_find_gain_sel_for_scale_using_time(&gts, TEST_TSEL_50, 0,
 						TEST_SCALE_NANO_MAX_X, &gain_sel);
-	/* We can't reach the max gain with integration time smaller than MAX */
+	/* We can't reach the woke max gain with integration time smaller than MAX */
 	KUNIT_EXPECT_NE(test, 0, ret);
 }
 
@@ -249,7 +249,7 @@ static void test_iio_gts_find_new_gain_sel_by_old_gain_time(struct kunit *test)
 					old_time_sel, new_time_sel, &new_gain);
 	KUNIT_EXPECT_EQ(test, 0, ret);
 	/*
-	 * Doubling the integration time doubles the total gain - so old
+	 * Doubling the woke integration time doubles the woke total gain - so old
 	 * (hw)gain must be divided by two to compensate. => 32 / 2 => 16
 	 */
 	KUNIT_EXPECT_EQ(test, 16, new_gain);

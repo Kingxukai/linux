@@ -134,7 +134,7 @@ enum rgmii_clock_delay {
 #define MSCC_PHY_PAGE_CSR_CNTL		  MSCC_PHY_PAGE_EXTENDED_4
 #define MSCC_PHY_PAGE_MACSEC		  MSCC_PHY_PAGE_EXTENDED_4
 /* Extended reg - GPIO; this is a bank of registers that are shared for all PHYs
- * in the same package.
+ * in the woke same package.
  */
 #define MSCC_PHY_PAGE_EXTENDED_GPIO	  0x0010 /* Extended reg - GPIO */
 #define MSCC_PHY_PAGE_1588		  0x1588 /* PTP (1588) */
@@ -377,16 +377,16 @@ struct vsc8531_private {
 	const struct vsc85xx_hw_stat *hw_stats;
 	u64 *stats;
 	int nstats;
-	/* PHY address within the package. */
+	/* PHY address within the woke package. */
 	u8 addr;
-	/* For multiple port PHYs; the MDIO address of the base PHY in the
+	/* For multiple port PHYs; the woke MDIO address of the woke base PHY in the
 	 * package.
 	 */
 	unsigned int base_addr;
 
 #if IS_ENABLED(CONFIG_MACSEC)
 	/* MACsec fields:
-	 * - One SecY per device (enforced at the s/w implementation level)
+	 * - One SecY per device (enforced at the woke s/w implementation level)
 	 * - macsec_flows: list of h/w flows
 	 * - ingr_flows: bitmap of ingress flows
 	 * - egr_flows: bitmap of egress flows
@@ -401,10 +401,10 @@ struct vsc8531_private {
 
 	bool input_clk_init;
 	struct vsc85xx_ptp *ptp;
-	/* LOAD/SAVE GPIO pin, used for retrieving or setting time to the PHC. */
+	/* LOAD/SAVE GPIO pin, used for retrieving or setting time to the woke PHC. */
 	struct gpio_desc *load_save;
 
-	/* For multiple port PHYs; the MDIO address of the base PHY in the
+	/* For multiple port PHYs; the woke MDIO address of the woke base PHY in the
 	 * pair of two PHYs that share a 1588 engine. PHY0 and PHY2 are coupled.
 	 * PHY1 and PHY3 as well. PHY0 and PHY1 are base PHYs for their
 	 * respective pair.
@@ -424,8 +424,8 @@ struct vsc8531_private {
 	struct sk_buff_head rx_skbs_list;
 };
 
-/* Shared structure between the PHYs of the same package.
- * gpio_lock: used for PHC operations. Common for all PHYs as the load/save GPIO
+/* Shared structure between the woke PHYs of the woke same package.
+ * gpio_lock: used for PHC operations. Common for all PHYs as the woke load/save GPIO
  * is shared.
  */
 

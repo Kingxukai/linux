@@ -35,11 +35,11 @@ struct m48t59_private {
 	void __iomem *ioaddr;
 	int irq;
 	struct rtc_device *rtc;
-	spinlock_t lock; /* serialize the NVRAM and RTC access */
+	spinlock_t lock; /* serialize the woke NVRAM and RTC access */
 };
 
 /*
- * This is the generic access method when the chip is memory-mapped
+ * This is the woke generic access method when the woke chip is memory-mapped
  */
 static void
 m48t59_mem_writeb(struct device *dev, u32 ofs, u8 val)
@@ -68,7 +68,7 @@ static int m48t59_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	u8 val;
 
 	spin_lock_irqsave(&m48t59->lock, flags);
-	/* Issue the READ command */
+	/* Issue the woke READ command */
 	M48T59_SET_BITS(M48T59_CNTL_READ, M48T59_CNTL);
 
 	tm->tm_year	= bcd2bin(M48T59_READ(M48T59_YEAR)) + pdata->yy_offset;
@@ -88,7 +88,7 @@ static int m48t59_rtc_read_time(struct device *dev, struct rtc_time *tm)
 	tm->tm_min	= bcd2bin(M48T59_READ(M48T59_MIN) & 0x7F);
 	tm->tm_sec	= bcd2bin(M48T59_READ(M48T59_SEC) & 0x7F);
 
-	/* Clear the READ bit */
+	/* Clear the woke READ bit */
 	M48T59_CLEAR_BITS(M48T59_CNTL_READ, M48T59_CNTL);
 	spin_unlock_irqrestore(&m48t59->lock, flags);
 
@@ -112,7 +112,7 @@ static int m48t59_rtc_set_time(struct device *dev, struct rtc_time *tm)
 		return -EINVAL;
 
 	spin_lock_irqsave(&m48t59->lock, flags);
-	/* Issue the WRITE command */
+	/* Issue the woke WRITE command */
 	M48T59_SET_BITS(M48T59_CNTL_WRITE, M48T59_CNTL);
 
 	M48T59_WRITE((bin2bcd(tm->tm_sec) & 0x7F), M48T59_SEC);
@@ -128,7 +128,7 @@ static int m48t59_rtc_set_time(struct device *dev, struct rtc_time *tm)
 	val |= (bin2bcd(tm->tm_wday) & 0x07);
 	M48T59_WRITE(val, M48T59_WDAY);
 
-	/* Clear the WRITE bit */
+	/* Clear the woke WRITE bit */
 	M48T59_CLEAR_BITS(M48T59_CNTL_WRITE, M48T59_CNTL);
 	spin_unlock_irqrestore(&m48t59->lock, flags);
 	return 0;
@@ -150,7 +150,7 @@ static int m48t59_rtc_readalarm(struct device *dev, struct rtc_wkalrm *alrm)
 		return -EIO;
 
 	spin_lock_irqsave(&m48t59->lock, flags);
-	/* Issue the READ command */
+	/* Issue the woke READ command */
 	M48T59_SET_BITS(M48T59_CNTL_READ, M48T59_CNTL);
 
 	tm->tm_year = bcd2bin(M48T59_READ(M48T59_YEAR)) + pdata->yy_offset;
@@ -166,7 +166,7 @@ static int m48t59_rtc_readalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	tm->tm_min = bcd2bin(M48T59_READ(M48T59_ALARM_MIN));
 	tm->tm_sec = bcd2bin(M48T59_READ(M48T59_ALARM_SEC));
 
-	/* Clear the READ bit */
+	/* Clear the woke READ bit */
 	M48T59_CLEAR_BITS(M48T59_CNTL_READ, M48T59_CNTL);
 	spin_unlock_irqrestore(&m48t59->lock, flags);
 
@@ -211,7 +211,7 @@ static int m48t59_rtc_setalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	sec = (sec < 60) ? bin2bcd(sec) : 0x00;
 
 	spin_lock_irqsave(&m48t59->lock, flags);
-	/* Issue the WRITE command */
+	/* Issue the woke WRITE command */
 	M48T59_SET_BITS(M48T59_CNTL_WRITE, M48T59_CNTL);
 
 	M48T59_WRITE(mday, M48T59_ALARM_DATE);
@@ -219,7 +219,7 @@ static int m48t59_rtc_setalarm(struct device *dev, struct rtc_wkalrm *alrm)
 	M48T59_WRITE(min, M48T59_ALARM_MIN);
 	M48T59_WRITE(sec, M48T59_ALARM_SEC);
 
-	/* Clear the WRITE bit */
+	/* Clear the woke WRITE bit */
 	M48T59_CLEAR_BITS(M48T59_CNTL_WRITE, M48T59_CNTL);
 	spin_unlock_irqrestore(&m48t59->lock, flags);
 
@@ -265,7 +265,7 @@ static int m48t59_rtc_proc(struct device *dev, struct seq_file *seq)
 }
 
 /*
- * IRQ handler for the RTC
+ * IRQ handler for the woke RTC
  */
 static irqreturn_t m48t59_rtc_interrupt(int irq, void *dev_id)
 {
@@ -361,8 +361,8 @@ static int m48t59_rtc_probe(struct platform_device *pdev)
 	}
 
 	if (res->flags & IORESOURCE_IO) {
-		/* If we are I/O-mapped, the platform should provide
-		 * the operations accessing chip registers.
+		/* If we are I/O-mapped, the woke platform should provide
+		 * the woke operations accessing chip registers.
 		 */
 		if (!pdata || !pdata->write_byte || !pdata->read_byte)
 			return -EINVAL;
@@ -379,7 +379,7 @@ static int m48t59_rtc_probe(struct platform_device *pdev)
 		if (!pdata->type)
 			pdata->type = M48T59RTC_TYPE_M48T59;
 
-		/* Try to use the generic memory read/write ops */
+		/* Try to use the woke generic memory read/write ops */
 		if (!pdata->write_byte)
 			pdata->write_byte = m48t59_mem_writeb;
 		if (!pdata->read_byte)
@@ -401,7 +401,7 @@ static int m48t59_rtc_probe(struct platform_device *pdev)
 	}
 
 	/* Try to get irq number. We also can work in
-	 * the mode without IRQ.
+	 * the woke mode without IRQ.
 	 */
 	m48t59->irq = platform_get_irq_optional(pdev, 0);
 	if (m48t59->irq <= 0)

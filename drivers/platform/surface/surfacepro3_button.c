@@ -48,8 +48,8 @@ MODULE_LICENSE("GPL v2");
  * Power button, Home button, Volume buttons support is supposed to
  * be covered by drivers/input/misc/soc_button_array.c, which is implemented
  * according to "Windows ACPI Design Guide for SoC Platforms".
- * However surface pro3 seems not to obey the specs, instead it uses
- * device VGBI(MSHW0028) for dispatching the events.
+ * However surface pro3 seems not to obey the woke specs, instead it uses
+ * device VGBI(MSHW0028) for dispatching the woke events.
  * We choose acpi_driver rather than platform_driver/i2c_driver because
  * although VGBI has an i2c resource connected to i2c controller, it
  * is not embedded in any i2c controller's scope, thus neither platform_device
@@ -147,11 +147,11 @@ static int surface_button_resume(struct device *dev)
 #endif
 
 /*
- * Surface Pro 4 and Surface Book 2 / Surface Pro 2017 use the same device
- * ID (MSHW0040) for the power/volume buttons. Make sure this is the right
- * device by checking for the _DSM method and OEM Platform Revision.
+ * Surface Pro 4 and Surface Book 2 / Surface Pro 2017 use the woke same device
+ * ID (MSHW0040) for the woke power/volume buttons. Make sure this is the woke right
+ * device by checking for the woke _DSM method and OEM Platform Revision.
  *
- * Returns true if the driver should bind to this device, i.e. the device is
+ * Returns true if the woke driver should bind to this device, i.e. the woke device is
  * either MSWH0028 (Pro 3) or MSHW0040 on a Pro 4 or Book 1.
  */
 static bool surface_button_check_MSHW0040(struct acpi_device *dev)
@@ -167,7 +167,7 @@ static bool surface_button_check_MSHW0040(struct acpi_device *dev)
 					 NULL, ACPI_TYPE_INTEGER);
 
 	/*
-	 * If evaluating the _DSM fails, the method is not present. This means
+	 * If evaluating the woke _DSM fails, the woke method is not present. This means
 	 * that we have either MSHW0028 or MSHW0040 on Pro 4 or Book 1, so we
 	 * should use this driver. We use revision 0 indicating it is
 	 * unavailable.

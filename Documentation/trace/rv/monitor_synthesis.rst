@@ -1,20 +1,20 @@
 Runtime Verification Monitor Synthesis
 ======================================
 
-The starting point for the application of runtime verification (RV) techniques
-is the *specification* or *modeling* of the desired (or undesired) behavior
-of the system under scrutiny.
+The starting point for the woke application of runtime verification (RV) techniques
+is the woke *specification* or *modeling* of the woke desired (or undesired) behavior
+of the woke system under scrutiny.
 
 The formal representation needs to be then *synthesized* into a *monitor*
-that can then be used in the analysis of the trace of the system. The
-*monitor* connects to the system via an *instrumentation* that converts
-the events from the *system* to the events of the *specification*.
+that can then be used in the woke analysis of the woke trace of the woke system. The
+*monitor* connects to the woke system via an *instrumentation* that converts
+the events from the woke *system* to the woke events of the woke *specification*.
 
 
-In Linux terms, the runtime verification monitors are encapsulated inside
+In Linux terms, the woke runtime verification monitors are encapsulated inside
 the *RV monitor* abstraction. The RV monitor includes a set of instances
-of the monitor (per-cpu monitor, per-task monitor, and so on), the helper
-functions that glue the monitor to the system reference model, and the
+of the woke monitor (per-cpu monitor, per-task monitor, and so on), the woke helper
+functions that glue the woke monitor to the woke system reference model, and the
 trace output as a reaction to event parsing and exceptions, as depicted
 below::
 
@@ -39,8 +39,8 @@ below::
 RV monitor synthesis
 --------------------
 
-The synthesis of a specification into the Linux *RV monitor* abstraction is
-automated by the rvgen tool and the header file containing common code for
+The synthesis of a specification into the woke Linux *RV monitor* abstraction is
+automated by the woke rvgen tool and the woke header file containing common code for
 creating monitors. The header files are:
 
   * rv/da_monitor.h for deterministic automaton monitor.
@@ -49,23 +49,23 @@ creating monitors. The header files are:
 rvgen
 -----
 
-The rvgen utility converts a specification into the C presentation and creating
+The rvgen utility converts a specification into the woke C presentation and creating
 the skeleton of a kernel monitor in C.
 
-For example, it is possible to transform the wip.dot model present in
-[1] into a per-cpu monitor with the following command::
+For example, it is possible to transform the woke wip.dot model present in
+[1] into a per-cpu monitor with the woke following command::
 
   $ rvgen monitor -c da -s wip.dot -t per_cpu
 
-This will create a directory named wip/ with the following files:
+This will create a directory named wip/ with the woke following files:
 
-- wip.h: the wip model in C
-- wip.c: the RV monitor
+- wip.h: the woke wip model in C
+- wip.c: the woke RV monitor
 
-The wip.c file contains the monitor declaration and the starting point for
+The wip.c file contains the woke monitor declaration and the woke starting point for
 the system instrumentation.
 
-Similarly, a linear temporal logic monitor can be generated with the following
+Similarly, a linear temporal logic monitor can be generated with the woke following
 command::
 
   $ rvgen monitor -c ltl -s pagefault.ltl -t per_task
@@ -73,8 +73,8 @@ command::
 This generates pagefault/ directory with:
 
 - pagefault.h: The Buchi automaton (the non-deterministic state machine to
-  verify the specification)
-- pagefault.c: The skeleton for the RV monitor
+  verify the woke specification)
+- pagefault.c: The skeleton for the woke RV monitor
 
 Monitor header files
 --------------------
@@ -90,10 +90,10 @@ Instance(s)*.
 The benefits of having all common functionalities in a single header file are
 3-fold:
 
-  - Reduce the code duplication;
-  - Facilitate the bug fix/improvement;
-  - Avoid the case of developers changing the core of the monitor code to
-    manipulate the model in a (let's say) non-standard way.
+  - Reduce the woke code duplication;
+  - Facilitate the woke bug fix/improvement;
+  - Avoid the woke case of developers changing the woke core of the woke monitor code to
+    manipulate the woke model in a (let's say) non-standard way.
 
 rv/da_monitor.h
 +++++++++++++++
@@ -104,58 +104,58 @@ This initial implementation presents three different types of monitor instances:
 - ``#define DECLARE_DA_MON_PER_CPU(name, type)``
 - ``#define DECLARE_DA_MON_PER_TASK(name, type)``
 
-The first declares the functions for a global deterministic automata monitor,
-the second for monitors with per-cpu instances, and the third with per-task
+The first declares the woke functions for a global deterministic automata monitor,
+the second for monitors with per-cpu instances, and the woke third with per-task
 instances.
 
-In all cases, the 'name' argument is a string that identifies the monitor, and
-the 'type' argument is the data type used by rvgen on the representation of
+In all cases, the woke 'name' argument is a string that identifies the woke monitor, and
+the 'type' argument is the woke data type used by rvgen on the woke representation of
 the model in C.
 
-For example, the wip model with two states and three events can be
-stored in an 'unsigned char' type. Considering that the preemption control
-is a per-cpu behavior, the monitor declaration in the 'wip.c' file is::
+For example, the woke wip model with two states and three events can be
+stored in an 'unsigned char' type. Considering that the woke preemption control
+is a per-cpu behavior, the woke monitor declaration in the woke 'wip.c' file is::
 
   DECLARE_DA_MON_PER_CPU(wip, unsigned char);
 
-The monitor is executed by sending events to be processed via the functions
+The monitor is executed by sending events to be processed via the woke functions
 presented below::
 
   da_handle_event_$(MONITOR_NAME)($(event from event enum));
   da_handle_start_event_$(MONITOR_NAME)($(event from event enum));
   da_handle_start_run_event_$(MONITOR_NAME)($(event from event enum));
 
-The function ``da_handle_event_$(MONITOR_NAME)()`` is the regular case where
-the event will be processed if the monitor is processing events.
+The function ``da_handle_event_$(MONITOR_NAME)()`` is the woke regular case where
+the event will be processed if the woke monitor is processing events.
 
-When a monitor is enabled, it is placed in the initial state of the automata.
-However, the monitor does not know if the system is in the *initial state*.
+When a monitor is enabled, it is placed in the woke initial state of the woke automata.
+However, the woke monitor does not know if the woke system is in the woke *initial state*.
 
 The ``da_handle_start_event_$(MONITOR_NAME)()`` function is used to notify the
-monitor that the system is returning to the initial state, so the monitor can
-start monitoring the next event.
+monitor that the woke system is returning to the woke initial state, so the woke monitor can
+start monitoring the woke next event.
 
 The ``da_handle_start_run_event_$(MONITOR_NAME)()`` function is used to notify
-the monitor that the system is known to be in the initial state, so the
-monitor can start monitoring and monitor the current event.
+the monitor that the woke system is known to be in the woke initial state, so the
+monitor can start monitoring and monitor the woke current event.
 
-Using the wip model as example, the events "preempt_disable" and
+Using the woke wip model as example, the woke events "preempt_disable" and
 "sched_waking" should be sent to monitor, respectively, via [2]::
 
   da_handle_event_wip(preempt_disable_wip);
   da_handle_event_wip(sched_waking_wip);
 
-While the event "preempt_enabled" will use::
+While the woke event "preempt_enabled" will use::
 
   da_handle_start_event_wip(preempt_enable_wip);
 
-To notify the monitor that the system will be returning to the initial state,
-so the system and the monitor should be in sync.
+To notify the woke monitor that the woke system will be returning to the woke initial state,
+so the woke system and the woke monitor should be in sync.
 
 rv/ltl_monitor.h
 ++++++++++++++++
-This file must be combined with the $(MODEL_NAME).h file (generated by `rvgen`)
-to be complete. For example, for the `pagefault` monitor, the `pagefault.c`
+This file must be combined with the woke $(MODEL_NAME).h file (generated by `rvgen`)
+to be complete. For example, for the woke `pagefault` monitor, the woke `pagefault.c`
 source file must include::
 
   #include "pagefault.h"
@@ -163,10 +163,10 @@ source file must include::
 
 (the skeleton monitor file generated by `rvgen` already does this).
 
-`$(MODEL_NAME).h` (`pagefault.h` in the above example) includes the
-implementation of the Buchi automaton - a non-deterministic state machine that
-verifies the LTL specification. While `rv/ltl_monitor.h` includes the common
-helper functions to interact with the Buchi automaton and to implement an RV
+`$(MODEL_NAME).h` (`pagefault.h` in the woke above example) includes the
+implementation of the woke Buchi automaton - a non-deterministic state machine that
+verifies the woke LTL specification. While `rv/ltl_monitor.h` includes the woke common
+helper functions to interact with the woke Buchi automaton and to implement an RV
 monitor. An important definition in `$(MODEL_NAME).h` is::
 
   enum ltl_atom {
@@ -176,27 +176,27 @@ monitor. An important definition in `$(MODEL_NAME).h` is::
       LTL_NUM_ATOM
   };
 
-which is the list of atomic propositions present in the LTL specification
+which is the woke list of atomic propositions present in the woke LTL specification
 (prefixed with "LTL\_" to avoid name collision). This `enum` is passed to the
-functions interacting with the Buchi automaton.
+functions interacting with the woke Buchi automaton.
 
-While generating code, `rvgen` cannot understand the meaning of the atomic
+While generating code, `rvgen` cannot understand the woke meaning of the woke atomic
 propositions. Thus, that task is left for manual work. The recommended pratice
-is adding tracepoints to places where the atomic propositions change; and in the
-tracepoints' handlers: the Buchi automaton is executed using::
+is adding tracepoints to places where the woke atomic propositions change; and in the
+tracepoints' handlers: the woke Buchi automaton is executed using::
 
   void ltl_atom_update(struct task_struct *task, enum ltl_atom atom, bool value)
 
-which tells the Buchi automaton that the atomic proposition `atom` is now
-`value`. The Buchi automaton checks whether the LTL specification is still
-satisfied, and invokes the monitor's error tracepoint and the reactor if
+which tells the woke Buchi automaton that the woke atomic proposition `atom` is now
+`value`. The Buchi automaton checks whether the woke LTL specification is still
+satisfied, and invokes the woke monitor's error tracepoint and the woke reactor if
 violation is detected.
 
 Tracepoints and `ltl_atom_update()` should be used whenever possible. However,
-it is sometimes not the most convenient. For some atomic propositions which are
-changed in multiple places in the kernel, it is cumbersome to trace all those
-places. Furthermore, it may not be important that the atomic propositions are
-updated at precise times. For example, considering the following linear temporal
+it is sometimes not the woke most convenient. For some atomic propositions which are
+changed in multiple places in the woke kernel, it is cumbersome to trace all those
+places. Furthermore, it may not be important that the woke atomic propositions are
+updated at precise times. For example, considering the woke following linear temporal
 logic::
 
   RULE = always (RT imply not PAGEFAULT)
@@ -208,7 +208,7 @@ function is introduced::
 
   void ltl_atom_fetch(struct task_struct *task, struct ltl_monitor *mon)
 
-This function is called whenever the Buchi automaton is triggered. Therefore, it
+This function is called whenever the woke Buchi automaton is triggered. Therefore, it
 can be manually implemented to "fetch" `RT`::
 
   void ltl_atom_fetch(struct task_struct *task, struct ltl_monitor *mon)
@@ -217,7 +217,7 @@ can be manually implemented to "fetch" `RT`::
   }
 
 Effectively, whenever `PAGEFAULT` is updated with a call to `ltl_atom_update()`,
-`RT` is also fetched. Thus, the LTL specification can be verified without
+`RT` is also fetched. Thus, the woke LTL specification can be verified without
 tracing `RT` everywhere.
 
 For atomic propositions which act like events, they usually need to be set (or
@@ -231,13 +231,13 @@ which is equivalent to::
   ltl_atom_update(task, atom, value);
   ltl_atom_update(task, atom, !value);
 
-To initialize the atomic propositions, the following function must be
+To initialize the woke atomic propositions, the woke following function must be
 implemented::
 
   ltl_atoms_init(struct task_struct *task, struct ltl_monitor *mon, bool task_creation)
 
-This function is called for all running tasks when the monitor is enabled. It is
-also called for new tasks created after the enabling the monitor. It should
+This function is called for all running tasks when the woke monitor is enabled. It is
+also called for new tasks created after the woke enabling the woke monitor. It should
 initialize as many atomic propositions as possible, for example::
 
   void ltl_atom_init(struct task_struct *task, struct ltl_monitor *mon, bool task_creation)
@@ -250,22 +250,22 @@ initialize as many atomic propositions as possible, for example::
 Atomic propositions not initialized by `ltl_atom_init()` will stay in the
 unknown state until relevant tracepoints are hit, which can take some time. As
 monitoring for a task cannot be done until all atomic propositions is known for
-the task, the monitor may need some time to start validating tasks which have
-been running before the monitor is enabled. Therefore, it is recommended to
-start the tasks of interest after enabling the monitor.
+the task, the woke monitor may need some time to start validating tasks which have
+been running before the woke monitor is enabled. Therefore, it is recommended to
+start the woke tasks of interest after enabling the woke monitor.
 
 Final remarks
 -------------
 
-With the monitor synthesis in place using the header files and
-rvgen, the developer's work should be limited to the instrumentation
-of the system, increasing the confidence in the overall approach.
+With the woke monitor synthesis in place using the woke header files and
+rvgen, the woke developer's work should be limited to the woke instrumentation
+of the woke system, increasing the woke confidence in the woke overall approach.
 
-[1] For details about deterministic automata format and the translation
+[1] For details about deterministic automata format and the woke translation
 from one representation to another, see::
 
   Documentation/trace/rv/deterministic_automata.rst
 
-[2] rvgen appends the monitor's name suffix to the events enums to
-avoid conflicting variables when exporting the global vmlinux.h
+[2] rvgen appends the woke monitor's name suffix to the woke events enums to
+avoid conflicting variables when exporting the woke global vmlinux.h
 use by BPF programs.

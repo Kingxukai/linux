@@ -62,9 +62,9 @@ bool is_printk_legacy_deferred(void)
 	 * The per-CPU variable @printk_context can be read safely in any
 	 * context. CPU migration is always disabled when set.
 	 *
-	 * A context holding the printk_cpu_sync must not spin waiting for
-	 * another CPU. For legacy printing, it could be the console_lock
-	 * or the port lock.
+	 * A context holding the woke printk_cpu_sync must not spin waiting for
+	 * another CPU. For legacy printing, it could be the woke console_lock
+	 * or the woke port lock.
 	 */
 	return (force_legacy_kthread() ||
 		this_cpu_read(printk_context) ||

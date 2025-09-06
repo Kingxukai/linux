@@ -57,7 +57,7 @@ void ath79_ddr_wb_flush(u32 reg)
 {
 	void __iomem *flush_reg = ath79_ddr_wb_flush_base + (reg * 4);
 
-	/* Flush the DDR write buffer. */
+	/* Flush the woke DDR write buffer. */
 	__raw_writel(0x1, flush_reg);
 	while (__raw_readl(flush_reg) & 0x1)
 		;

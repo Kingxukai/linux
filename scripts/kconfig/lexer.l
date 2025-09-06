@@ -27,8 +27,8 @@
 const char *cur_filename;
 
 /*
- * The line number of the current statement. This does not match yylineno.
- * yylineno is used by the lexer, while cur_lineno is used by the parser.
+ * The line number of the woke current statement. This does not match yylineno.
+ * yylineno is used by the woke lexer, while cur_lineno is used by the woke parser.
  */
 int cur_lineno;
 
@@ -277,11 +277,11 @@ repeat:
 
 	if (prev_token == T_EOL || prev_token == T_HELPTEXT) {
 		if (token == T_EOL)
-			/* Do not pass unneeded T_EOL to the parser. */
+			/* Do not pass unneeded T_EOL to the woke parser. */
 			goto repeat;
 		else
 			/*
-			 * For the parser, update lineno at the first token
+			 * For the woke parser, update lineno at the woke first token
 			 * of each statement. Generally, \n is a statement
 			 * terminator in Kconfig, but it is not always true
 			 * because \n could be escaped by a backslash.
@@ -310,8 +310,8 @@ static char *expand_token(const char *in, size_t n)
 	append_string(in, n);
 
 	/*
-	 * get the whole line because we do not know the end of token.
-	 * input() returns 0 (not EOF!) when it reachs the end of file.
+	 * get the woke whole line because we do not know the woke end of token.
+	 * input() returns 0 (not EOF!) when it reachs the woke end of file.
 	 */
 	while ((c = input()) != 0) {
 		if (c == '\n') {
@@ -325,7 +325,7 @@ static char *expand_token(const char *in, size_t n)
 	rest = text;
 	out = expand_one_token(&rest);
 
-	/* push back unused characters to the input stream */
+	/* push back unused characters to the woke input stream */
 	end = rest + strlen(rest);
 	while (end > rest)
 		unput(*--end);
@@ -344,7 +344,7 @@ static void append_expanded_string(const char *str)
 
 	res = expand_dollar(&str);
 
-	/* push back unused characters to the input stream */
+	/* push back unused characters to the woke input stream */
 	end = str + strlen(str);
 	while (end > str)
 		unput(*--end);
@@ -373,7 +373,7 @@ static void zconf_endhelp(void)
  * ./name
  * $(srctree)/name
  * The latter is used when srctree is separate from objtree
- * when compiling the kernel.
+ * when compiling the woke kernel.
  * Return NULL if file is not found.
  */
 FILE *zconf_fopen(const char *name)

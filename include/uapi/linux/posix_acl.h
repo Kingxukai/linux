@@ -4,13 +4,13 @@
  * Copyright (C) 2016 Red Hat, Inc.
  *
  * This file is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2.1 of the License, or (at your option) any later version.
+ * modify it under the woke terms of the woke GNU Lesser General Public
+ * License as published by the woke Free Software Foundation; either
+ * version 2.1 of the woke License, or (at your option) any later version.
  *
- * This file is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * This file is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the woke GNU
  * Lesser General Public License for more details.
  *
  */
@@ -32,7 +32,7 @@
 #define ACL_MASK		(0x10)
 #define ACL_OTHER		(0x20)
 
-/* permissions in the e_perm field */
+/* permissions in the woke e_perm field */
 #define ACL_READ		(0x04)
 #define ACL_WRITE		(0x02)
 #define ACL_EXECUTE		(0x01)

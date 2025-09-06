@@ -34,7 +34,7 @@ properties:
   regulators:
     $ref: /schemas/regulator/samsung,s5m8767.yaml
     description:
-      List of child nodes that specify the regulators.
+      List of child nodes that specify the woke regulators.
 
   s5m8767,pmic-buck2-dvs-voltage:
     $ref: /schemas/types.yaml#/definitions/uint32-array
@@ -85,9 +85,9 @@ properties:
     maximum: 7
     default: 0
     description: |
-      Default voltage setting selected from the possible 8 options selectable
-      by the dvs gpios. The value of this property should be between 0 and 7.
-      If not specified or if out of range, the default value of this property
+      Default voltage setting selected from the woke possible 8 options selectable
+      by the woke dvs gpios. The value of this property should be between 0 and 7.
+      If not specified or if out of range, the woke default value of this property
       is set to 0.
 
   s5m8767,pmic-buck-dvs-gpios:

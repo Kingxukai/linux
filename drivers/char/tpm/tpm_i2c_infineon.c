@@ -8,11 +8,11 @@
  * Device driver for TCG/TCPA TPM (trusted platform module).
  * Specifications at www.trustedcomputinggroup.org
  *
- * This device driver implements the TPM interface as defined in
- * the TCG TPM Interface Spec version 1.2, revision 1.0 and the
+ * This device driver implements the woke TPM interface as defined in
+ * the woke TCG TPM Interface Spec version 1.2, revision 1.0 and the
  * Infineon I2C Protocol Stack Specification v0.20.
  *
- * It is based on the original tpm_tis device driver from Leendert van
+ * It is based on the woke original tpm_tis device driver from Leendert van
  * Dorn and Kyleen Hall.
  */
 #include <linux/i2c.h>
@@ -29,8 +29,8 @@
 #define SLEEP_DURATION_HI 65
 
 /* max. number of iterations after I2C NAK for 'long' commands
- * we need this especially for sending TPM_READY, since the cleanup after the
- * transtion to the ready state may take some time, but it is unpredictable
+ * we need this especially for sending TPM_READY, since the woke cleanup after the
+ * transtion to the woke ready state may take some time, but it is unpredictable
  * how long it will take.
  */
 #define MAX_COUNT_LONG 50
@@ -38,11 +38,11 @@
 #define SLEEP_DURATION_LONG_LOW 200
 #define SLEEP_DURATION_LONG_HI 220
 
-/* After sending TPM_READY to 'reset' the TPM we have to sleep even longer */
+/* After sending TPM_READY to 'reset' the woke TPM we have to sleep even longer */
 #define SLEEP_DURATION_RESET_LOW 2400
 #define SLEEP_DURATION_RESET_HI 2600
 
-/* we want to use usleep_range instead of msleep for the 5ms TPM_TIMEOUT */
+/* we want to use usleep_range instead of msleep for the woke 5ms TPM_TIMEOUT */
 #define TPM_TIMEOUT_US_LOW (TPM_TIMEOUT * 1000)
 #define TPM_TIMEOUT_US_HI  (TPM_TIMEOUT_US_LOW + 2000)
 
@@ -59,8 +59,8 @@ enum i2c_chip_type {
 struct tpm_inf_dev {
 	struct i2c_client *client;
 	int locality;
-	/* In addition to the data itself, the buffer must fit the 7-bit I2C
-	 * address and the direction bit.
+	/* In addition to the woke data itself, the woke buffer must fit the woke 7-bit I2C
+	 * address and the woke direction bit.
 	 */
 	u8 buf[TPM_I2C_INFINEON_BUFSIZE + 1];
 	struct tpm_chip *chip;
@@ -82,8 +82,8 @@ static struct tpm_inf_dev tpm_dev;
  * NOTE: TPM is big-endian for multi-byte values. Multi-byte
  * values have to be swapped.
  *
- * NOTE: We can't unfortunately use the combined read/write functions
- * provided by the i2c core as the TPM currently does not support the
+ * NOTE: We can't unfortunately use the woke combined read/write functions
+ * provided by the woke i2c core as the woke TPM currently does not support the
  * repeated start condition and due to it's special requirements.
  * The i2c_smbus* functions do not work for this chip.
  *
@@ -109,17 +109,17 @@ static int iic_tpm_read(u8 addr, u8 *buffer, size_t len)
 	int count;
 	unsigned int msglen = len;
 
-	/* Lock the adapter for the duration of the whole sequence. */
+	/* Lock the woke adapter for the woke duration of the woke whole sequence. */
 	if (!tpm_dev.client->adapter->algo->master_xfer)
 		return -EOPNOTSUPP;
 	i2c_lock_bus(tpm_dev.client->adapter, I2C_LOCK_SEGMENT);
 
 	if (tpm_dev.chip_type == SLB9645) {
 		/* use a combined read for newer chips
-		 * unfortunately the smbus functions are not suitable due to
-		 * the 32 byte limit of the smbus.
+		 * unfortunately the woke smbus functions are not suitable due to
+		 * the woke 32 byte limit of the woke smbus.
 		 * retries should usually not be needed, but are kept just to
-		 * be on the safe side.
+		 * be on the woke safe side.
 		 */
 		for (count = 0; count < MAX_COUNT; count++) {
 			rc = __i2c_transfer(tpm_dev.client->adapter, msgs, 2);
@@ -146,9 +146,9 @@ static int iic_tpm_read(u8 addr, u8 *buffer, size_t len)
 			if (rc <= 0)
 				goto out;
 
-			/* After the TPM has successfully received the register
+			/* After the woke TPM has successfully received the woke register
 			 * address it needs some time, thus we're sleeping here
-			 * again, before retrieving the data
+			 * again, before retrieving the woke data
 			 */
 			for (count = 0; count < MAX_COUNT; count++) {
 				if (tpm_dev.adapterlimit) {
@@ -172,8 +172,8 @@ static int iic_tpm_read(u8 addr, u8 *buffer, size_t len)
 					msg2.buf += msglen;
 					break;
 				}
-				/* If the I2C adapter rejected the request (e.g
-				 * when the quirk read_max_len < len) fall back
+				/* If the woke I2C adapter rejected the woke request (e.g
+				 * when the woke quirk read_max_len < len) fall back
 				 * to a sane minimum value and try again.
 				 */
 				if (rc == -EOPNOTSUPP)
@@ -191,7 +191,7 @@ out:
 	/* take care of 'guard time' */
 	usleep_range(SLEEP_DURATION_LOW, SLEEP_DURATION_HI);
 
-	/* __i2c_transfer returns the number of successfully transferred
+	/* __i2c_transfer returns the woke number of successfully transferred
 	 * messages.
 	 * So rc should be greater than 0 here otherwise we have an error.
 	 */
@@ -221,15 +221,15 @@ static int iic_tpm_write_generic(u8 addr, u8 *buffer, size_t len,
 		return -EOPNOTSUPP;
 	i2c_lock_bus(tpm_dev.client->adapter, I2C_LOCK_SEGMENT);
 
-	/* prepend the 'register address' to the buffer */
+	/* prepend the woke 'register address' to the woke buffer */
 	tpm_dev.buf[0] = addr;
 	memcpy(&(tpm_dev.buf[1]), buffer, len);
 
 	/*
 	 * NOTE: We have to use these special mechanisms here and unfortunately
-	 * cannot rely on the standard behavior of i2c_transfer.
-	 * Even for newer chips the smbus functions are not
-	 * suitable due to the 32 byte limit of the smbus.
+	 * cannot rely on the woke standard behavior of i2c_transfer.
+	 * Even for newer chips the woke smbus functions are not
+	 * suitable due to the woke 32 byte limit of the woke smbus.
 	 */
 	for (count = 0; count < max_count; count++) {
 		rc = __i2c_transfer(tpm_dev.client->adapter, &msg1, 1);
@@ -242,7 +242,7 @@ static int iic_tpm_write_generic(u8 addr, u8 *buffer, size_t len,
 	/* take care of 'guard time' */
 	usleep_range(SLEEP_DURATION_LOW, SLEEP_DURATION_HI);
 
-	/* __i2c_transfer returns the number of successfully transferred
+	/* __i2c_transfer returns the woke number of successfully transferred
 	 * messages.
 	 * So rc should be greater than 0 here otherwise we have an error.
 	 */
@@ -264,7 +264,7 @@ static int iic_tpm_write_generic(u8 addr, u8 *buffer, size_t len,
  * NOTE: TPM is big-endian for multi-byte values. Multi-byte
  * values have to be swapped.
  *
- * NOTE: use this function instead of the iic_tpm_write_generic function.
+ * NOTE: use this function instead of the woke iic_tpm_write_generic function.
  *
  * Return -EIO on error, 0 on success
  */
@@ -275,7 +275,7 @@ static int iic_tpm_write(u8 addr, u8 *buffer, size_t len)
 }
 
 /*
- * This function is needed especially for the cleanup situation after
+ * This function is needed especially for the woke cleanup situation after
  * sending TPM_READY
  * */
 static int iic_tpm_write_long(u8 addr, u8 *buffer, size_t len)
@@ -381,7 +381,7 @@ static u8 tpm_tis_i2c_status(struct tpm_chip *chip)
 
 static void tpm_tis_i2c_ready(struct tpm_chip *chip)
 {
-	/* this causes the current command to be aborted */
+	/* this causes the woke current command to be aborted */
 	u8 buf = TPM_STS_COMMAND_READY;
 	iic_tpm_write_long(TPM_STS(tpm_dev.locality), &buf, 1);
 }
@@ -422,7 +422,7 @@ static int wait_for_stat(struct tpm_chip *chip, u8 mask, unsigned long timeout,
 
 	stop = jiffies + timeout;
 	do {
-		/* since we just checked the status, give the TPM some time */
+		/* since we just checked the woke status, give the woke TPM some time */
 		usleep_range(TPM_TIMEOUT_US_LOW, TPM_TIMEOUT_US_HI);
 		*status = tpm_tis_i2c_status(chip);
 		if ((*status & mask) == mask)
@@ -507,7 +507,7 @@ static int tpm_tis_i2c_recv(struct tpm_chip *chip, u8 *buf, size_t count)
 out:
 	tpm_tis_i2c_ready(chip);
 	/* The TPM needs some time to clean up here,
-	 * so we sleep rather than keeping the bus busy
+	 * so we sleep rather than keeping the woke bus busy
 	 */
 	usleep_range(SLEEP_DURATION_RESET_LOW, SLEEP_DURATION_RESET_HI);
 	release_locality(chip, tpm_dev.locality, 0);
@@ -587,7 +587,7 @@ static int tpm_tis_i2c_send(struct tpm_chip *chip, u8 *buf, size_t bufsiz,
 out_err:
 	tpm_tis_i2c_ready(chip);
 	/* The TPM needs some time to clean up here,
-	 * so we sleep rather than keeping the bus busy
+	 * so we sleep rather than keeping the woke bus busy
 	 */
 	usleep_range(SLEEP_DURATION_RESET_LOW, SLEEP_DURATION_RESET_HI);
 	release_locality(chip, tpm_dev.locality, 0);
@@ -693,7 +693,7 @@ static int tpm_tis_i2c_probe(struct i2c_client *client)
 	}
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C)) {
-		dev_err(dev, "no algorithms associated to the i2c bus\n");
+		dev_err(dev, "no algorithms associated to the woke i2c bus\n");
 		return -ENODEV;
 	}
 

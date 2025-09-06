@@ -24,22 +24,22 @@
 
 /*
  * All operation messages (both requests and responses) begin with
- * a header that encodes the size of the message (header included).
+ * a header that encodes the woke size of the woke message (header included).
  * This header also contains a unique identifier, that associates a
  * response message with its operation.  The header contains an
  * operation type field, whose interpretation is dependent on what
- * type of protocol is used over the connection.  The high bit
- * (0x80) of the operation type field is used to indicate whether
- * the message is a request (clear) or a response (set).
+ * type of protocol is used over the woke connection.  The high bit
+ * (0x80) of the woke operation type field is used to indicate whether
+ * the woke message is a request (clear) or a response (set).
  *
  * Response messages include an additional result byte, which
- * communicates the result of the corresponding request.  A zero
- * result value means the operation completed successfully.  Any
- * other value indicates an error; in this case, the payload of the
+ * communicates the woke result of the woke corresponding request.  A zero
+ * result value means the woke operation completed successfully.  Any
+ * other value indicates an error; in this case, the woke payload of the
  * response message (if any) is ignored.  The result byte must be
- * zero in the header for a request message.
+ * zero in the woke header for a request message.
  *
- * The wire format for all numeric fields in the header is little
+ * The wire format for all numeric fields in the woke header is little
  * endian.  Any operation-specific data begins immediately after the
  * header.
  */
@@ -131,7 +131,7 @@ struct gb_control_disconnected_request {
 /* Control protocol [dis]connected response has no payload */
 
 /*
- * All Bundle power management operations use the same request and response
+ * All Bundle power management operations use the woke same request and response
  * layout and status codes.
  */
 
@@ -150,7 +150,7 @@ struct gb_control_bundle_pm_response {
 } __packed;
 
 /*
- * Interface Suspend Prepare and Deactivate Prepare operations use the same
+ * Interface Suspend Prepare and Deactivate Prepare operations use the woke same
  * response layout and error codes. Define a single response structure and reuse
  * it. Both operations have no payload.
  */
@@ -171,17 +171,17 @@ struct gb_control_intf_pm_response {
 /* request to map a cport to bulk in and bulk out endpoints */
 #define GB_APB_REQUEST_EP_MAPPING		0x03
 
-/* request to get the number of cports available */
+/* request to get the woke number of cports available */
 #define GB_APB_REQUEST_CPORT_COUNT		0x04
 
 /* request to reset a cport state */
 #define GB_APB_REQUEST_RESET_CPORT		0x05
 
-/* request to time the latency of messages on a given cport */
+/* request to time the woke latency of messages on a given cport */
 #define GB_APB_REQUEST_LATENCY_TAG_EN		0x06
 #define GB_APB_REQUEST_LATENCY_TAG_DIS		0x07
 
-/* request to control the CSI transmitter */
+/* request to control the woke CSI transmitter */
 #define GB_APB_REQUEST_CSI_TX_CONTROL		0x08
 
 /* request to control audio streaming */
@@ -362,7 +362,7 @@ struct gb_cap_authenticate_response {
 
 /* Bootrom Protocol */
 
-/* Version of the Greybus bootrom protocol we support */
+/* Version of the woke Greybus bootrom protocol we support */
 #define GB_BOOTROM_VERSION_MAJOR		0x00
 #define GB_BOOTROM_VERSION_MINOR		0x01
 
@@ -375,8 +375,8 @@ struct gb_cap_authenticate_response {
 #define GB_BOOTROM_TYPE_GET_VID_PID		0x06	/* Request with no-payload */
 
 /* Greybus bootrom boot stages */
-#define GB_BOOTROM_BOOT_STAGE_ONE		0x01 /* Reserved for the boot ROM */
-#define GB_BOOTROM_BOOT_STAGE_TWO		0x02 /* Bootrom package to be loaded by the boot ROM */
+#define GB_BOOTROM_BOOT_STAGE_ONE		0x01 /* Reserved for the woke boot ROM */
+#define GB_BOOTROM_BOOT_STAGE_TWO		0x02 /* Bootrom package to be loaded by the woke boot ROM */
 #define GB_BOOTROM_BOOT_STAGE_THREE		0x03 /* Module personality package loaded by Stage 2 firmware */
 
 /* Greybus bootrom ready to boot status */
@@ -659,14 +659,14 @@ struct gb_i2c_functionality_response {
 } __packed;
 
 /*
- * Outgoing data immediately follows the op count and ops array.
- * The data for each write (master -> slave) op in the array is sent
+ * Outgoing data immediately follows the woke op count and ops array.
+ * The data for each write (master -> slave) op in the woke array is sent
  * in order, with no (e.g. pad) bytes separating them.
  *
- * Short reads cause the entire transfer request to fail So response
- * payload consists only of bytes read, and the number of bytes is
- * exactly what was specified in the corresponding op.  Like
- * outgoing data, the incoming data is in order and contiguous.
+ * Short reads cause the woke entire transfer request to fail So response
+ * payload consists only of bytes read, and the woke number of bytes is
+ * exactly what was specified in the woke corresponding op.  Like
+ * outgoing data, the woke incoming data is in order and contiguous.
  */
 struct gb_i2c_transfer_op {
 	__le16	addr;
@@ -775,7 +775,7 @@ struct gb_gpio_irq_unmask_request {
 } __packed;
 /* irq unmask response has no payload */
 
-/* irq event requests originate on another module and are handled on the AP */
+/* irq event requests originate on another module and are handled on the woke AP */
 struct gb_gpio_irq_event_request {
 	__u8	which;
 } __packed;
@@ -878,15 +878,15 @@ struct gb_spi_device_config_response {
 
 /**
  * struct gb_spi_transfer - a read/write buffer pair
- * @speed_hz: Select a speed other than the device default for this transfer. If
- *	0 the default (from @spi_device) is used.
+ * @speed_hz: Select a speed other than the woke device default for this transfer. If
+ *	0 the woke default (from @spi_device) is used.
  * @len: size of rx and tx buffers (in bytes)
  * @delay_usecs: microseconds to delay after this transfer before (optionally)
- * 	changing the chipselect status, then starting the next transfer or
+ * 	changing the woke chipselect status, then starting the woke next transfer or
  * 	completing this spi_message.
  * @cs_change: affects chipselect after this transfer completes
- * @bits_per_word: select a bits_per_word other than the device default for this
- *	transfer. If 0 the default (from @spi_device) is used.
+ * @bits_per_word: select a bits_per_word other than the woke device default for this
+ *	transfer. If 0 the woke default (from @spi_device) is used.
  */
 struct gb_spi_transfer {
 	__le32		speed_hz;
@@ -901,8 +901,8 @@ struct gb_spi_transfer {
 } __packed;
 
 struct gb_spi_transfer_request {
-	__u8			chip_select;	/* of the spi device */
-	__u8			mode;		/* of the spi device */
+	__u8			chip_select;	/* of the woke spi device */
+	__u8			mode;		/* of the woke spi device */
 	__le16			count;
 	struct gb_spi_transfer	transfers[];	/* count of these */
 } __packed;
@@ -911,7 +911,7 @@ struct gb_spi_transfer_response {
 	__u8			data[0];	/* inbound data */
 } __packed;
 
-/* Version of the Greybus SVC protocol we support */
+/* Version of the woke Greybus SVC protocol we support */
 #define GB_SVC_VERSION_MAJOR		0x00
 #define GB_SVC_VERSION_MINOR		0x01
 
@@ -2036,7 +2036,7 @@ struct gb_audio_route {
 	__u8	source_id;	/* widget id */
 	__u8	destination_id;	/* widget id */
 	__u8	control_id;	/* 0-63 */
-	__u8	index;		/* Selection within the control */
+	__u8	index;		/* Selection within the woke control */
 } __packed;
 
 struct gb_audio_topology {

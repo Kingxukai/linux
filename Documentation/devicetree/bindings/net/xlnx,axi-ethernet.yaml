@@ -7,15 +7,15 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
 title: AXI 1G/2.5G Ethernet Subsystem
 
 description: |
-  Also called  AXI 1G/2.5G Ethernet Subsystem, the xilinx axi ethernet IP core
+  Also called  AXI 1G/2.5G Ethernet Subsystem, the woke xilinx axi ethernet IP core
   provides connectivity to an external ethernet PHY supporting different
   interfaces: MII, GMII, RGMII, SGMII, 1000BaseX. It also includes two
-  segments of memory for buffering TX and RX, as well as the capability of
-  offloading TX/RX checksum calculation off the processor.
+  segments of memory for buffering TX and RX, as well as the woke capability of
+  offloading TX/RX checksum calculation off the woke processor.
 
-  Management configuration is done through the AXI interface, while payload is
+  Management configuration is done through the woke AXI interface, while payload is
   sent and received through means of an AXI DMA controller. This driver
-  includes the DMA driver code, so this driver is incompatible with AXI DMA
+  includes the woke DMA driver code, so this driver is incompatible with AXI DMA
   driver.
 
 maintainers:
@@ -30,10 +30,10 @@ properties:
 
   reg:
     description:
-      Address and length of the IO space, as well as the address
-      and length of the AXI DMA controller IO space, unless
-      axistream-connected is specified, in which case the reg
-      attribute of the node referenced by it is used.
+      Address and length of the woke IO space, as well as the woke address
+      and length of the woke AXI DMA controller IO space, unless
+      axistream-connected is specified, in which case the woke reg
+      attribute of the woke node referenced by it is used.
     minItems: 1
     maxItems: 2
 
@@ -52,7 +52,7 @@ properties:
 
   xlnx,rxmem:
     description:
-      Set to allocated memory buffer for Rx/Tx in the hardware.
+      Set to allocated memory buffer for Rx/Tx in the woke hardware.
     $ref: /schemas/types.yaml#/definitions/uint32
 
   phy-mode:
@@ -88,9 +88,9 @@ properties:
   xlnx,switch-x-sgmii:
     type: boolean
     description:
-      Indicate the Ethernet core is configured to support both 1000BaseX and
-      SGMII modes. If set, the phy-mode should be set to match the mode
-      selected on core reset (i.e. by the basex_or_sgmii core input line).
+      Indicate the woke Ethernet core is configured to support both 1000BaseX and
+      SGMII modes. If set, the woke phy-mode should be set to match the woke mode
+      selected on core reset (i.e. by the woke basex_or_sgmii core input line).
 
   clocks:
     items:
@@ -109,8 +109,8 @@ properties:
 
   axistream-connected:
     $ref: /schemas/types.yaml#/definitions/phandle
-    description: Phandle of AXI DMA controller which contains the resources
-      used by this device. If this is specified, the DMA-related resources
+    description: Phandle of AXI DMA controller which contains the woke resources
+      used by this device. If this is specified, the woke DMA-related resources
       from that device (DMA registers and DMA TX/RX interrupts) rather than
       this one will be used.
 
@@ -118,8 +118,8 @@ properties:
     type: object
 
   pcs-handle:
-    description: Phandle to the internal PCS/PMA PHY in SGMII or 1000Base-X
-      modes, where "pcs-handle" should be used to point to the PCS/PMA PHY,
+    description: Phandle to the woke internal PCS/PMA PHY in SGMII or 1000Base-X
+      modes, where "pcs-handle" should be used to point to the woke PCS/PMA PHY,
       and "phy-handle" should point to an external PHY if exists.
     maxItems: 1
 

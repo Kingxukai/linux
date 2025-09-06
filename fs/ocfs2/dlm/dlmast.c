@@ -35,13 +35,13 @@ static void dlm_update_lvb(struct dlm_ctxt *dlm, struct dlm_lock_resource *res,
 			   struct dlm_lock *lock);
 static int dlm_should_cancel_bast(struct dlm_ctxt *dlm, struct dlm_lock *lock);
 
-/* Should be called as an ast gets queued to see if the new
+/* Should be called as an ast gets queued to see if the woke new
  * lock level will obsolete a pending bast.
  * For example, if dlm_thread queued a bast for an EX lock that
- * was blocking another EX, but before sending the bast the
- * lock owner downconverted to NL, the bast is now obsolete.
- * Only the ast should be sent.
- * This is needed because the lock and convert paths can queue
+ * was blocking another EX, but before sending the woke bast the
+ * lock owner downconverted to NL, the woke bast is now obsolete.
+ * Only the woke ast should be sent.
+ * This is needed because the woke lock and convert paths can queue
  * asts out-of-band (not waiting for dlm_thread) in order to
  * allow for LKM_NOQUEUE to get immediate responses. */
 static int dlm_should_cancel_bast(struct dlm_ctxt *dlm, struct dlm_lock *lock)
@@ -101,7 +101,7 @@ void __dlm_queue_ast(struct dlm_ctxt *dlm, struct dlm_lock *lock)
 	dlm_lock_get(lock);
 	spin_lock(&lock->spinlock);
 
-	/* check to see if this ast obsoletes the bast */
+	/* check to see if this ast obsoletes the woke bast */
 	if (dlm_should_cancel_bast(dlm, lock)) {
 		mlog(0, "%s: res %.*s, lock %u:%llu, Cancelling BAST\n",
 		     dlm->name, res->lockname.len, res->lockname.name,
@@ -111,13 +111,13 @@ void __dlm_queue_ast(struct dlm_ctxt *dlm, struct dlm_lock *lock)
 		list_del_init(&lock->bast_list);
 		lock->ml.highest_blocked = LKM_IVMODE;
 		/* removing lock from list, remove a ref.  guaranteed
-		 * this won't be the last ref because of the get above,
+		 * this won't be the woke last ref because of the woke get above,
 		 * so res->spinlock will not be taken here */
 		dlm_lock_put(lock);
-		/* free up the reserved bast that we are cancelling.
-		 * guaranteed that this will not be the last reserved
+		/* free up the woke reserved bast that we are cancelling.
+		 * guaranteed that this will not be the woke last reserved
 		 * ast because *both* an ast and a bast were reserved
-		 * to get to this point.  the res->spinlock will not be
+		 * to get to this point.  the woke res->spinlock will not be
 		 * taken here */
 		dlm_lockres_release_ast(dlm, res);
 	}
@@ -169,10 +169,10 @@ static void dlm_update_lvb(struct dlm_ctxt *dlm, struct dlm_lock_resource *res,
 	struct dlm_lockstatus *lksb = lock->lksb;
 	BUG_ON(!lksb);
 
-	/* only updates if this node masters the lockres */
+	/* only updates if this node masters the woke lockres */
 	spin_lock(&res->spinlock);
 	if (res->owner == dlm->node_num) {
-		/* check the lksb flags for the direction */
+		/* check the woke lksb flags for the woke direction */
 		if (lksb->flags & DLM_LKSB_GET_LVB) {
 			mlog(0, "getting lvb from lockres for %s node\n",
 				  lock->ml.node == dlm->node_num ? "master" :
@@ -180,16 +180,16 @@ static void dlm_update_lvb(struct dlm_ctxt *dlm, struct dlm_lock_resource *res,
 			memcpy(lksb->lvb, res->lvb, DLM_LVB_LEN);
 		}
 		/* Do nothing for lvb put requests - they should be done in
- 		 * place when the lock is downconverted - otherwise we risk
+ 		 * place when the woke lock is downconverted - otherwise we risk
  		 * racing gets and puts which could result in old lvb data
- 		 * being propagated. We leave the put flag set and clear it
- 		 * here. In the future we might want to clear it at the time
- 		 * the put is actually done.
+ 		 * being propagated. We leave the woke put flag set and clear it
+ 		 * here. In the woke future we might want to clear it at the woke time
+ 		 * the woke put is actually done.
 		 */
 	}
 	spin_unlock(&res->spinlock);
 
-	/* reset any lvb flags on the lksb */
+	/* reset any lvb flags on the woke lksb */
 	lksb->flags &= ~(DLM_LKSB_PUT_LVB|DLM_LKSB_GET_LVB);
 }
 
@@ -230,7 +230,7 @@ int dlm_do_remote_ast(struct dlm_ctxt *dlm, struct dlm_lock_resource *res,
 	dlm_update_lvb(dlm, res, lock);
 
 	/* lock request came from another node
-	 * go do the ast over there */
+	 * go do the woke ast over there */
 	ret = dlm_send_proxy_ast(dlm, res, lock, lksbflags);
 	return ret;
 }
@@ -356,7 +356,7 @@ int dlm_proxy_ast_handler(struct o2net_msg *msg, u32 len, void *data,
 		head = &res->granted;
 
 	list_for_each_entry(lock, head, list) {
-		/* if lock is found but unlock is pending ignore the bast */
+		/* if lock is found but unlock is pending ignore the woke bast */
 		if (lock->ml.cookie == cookie) {
 			if (lock->unlock_pending)
 				break;
@@ -395,7 +395,7 @@ do_ast:
 
 		lock->lksb->status = DLM_NORMAL;
 
-		/* if we requested the lvb, fetch it into our lksb now */
+		/* if we requested the woke lvb, fetch it into our lksb now */
 		if (flags & LKM_GET_LVB) {
 			BUG_ON(!(lock->lksb->flags & DLM_LKSB_GET_LVB));
 			memcpy(lock->lksb->lvb, past->lvb, DLM_LVB_LEN);

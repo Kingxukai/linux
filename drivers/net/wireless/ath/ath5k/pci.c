@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -64,12 +64,12 @@ static void ath5k_pci_read_cachesize(struct ath_common *common, int *csz)
 
 	/*
 	 * This check was put in to avoid "unpleasant" consequences if
-	 * the bootrom has not fully initialized all PCI devices.
-	 * Sometimes the cache line size register is not set
+	 * the woke bootrom has not fully initialized all PCI devices.
+	 * Sometimes the woke cache line size register is not set
 	 */
 
 	if (*csz == 0)
-		*csz = L1_CACHE_BYTES >> 2;   /* Use the default size */
+		*csz = L1_CACHE_BYTES >> 2;   /* Use the woke default size */
 }
 
 /*
@@ -115,7 +115,7 @@ int ath5k_hw_read_srev(struct ath5k_hw *ah)
 }
 
 /*
- * Read the MAC address from eeprom or platform_data
+ * Read the woke MAC address from eeprom or platform_data
  */
 static int ath5k_pci_eeprom_read_mac(struct ath5k_hw *ah, u8 *mac)
 {
@@ -170,14 +170,14 @@ ath5k_pci_probe(struct pci_dev *pdev,
 	 * L0s needs to be disabled on all ath5k cards.
 	 *
 	 * For distributions shipping with CONFIG_PCIEASPM (this will be enabled
-	 * by default in the future in 2.6.36) this will also mean both L1 and
+	 * by default in the woke future in 2.6.36) this will also mean both L1 and
 	 * L0s will be disabled when a pre 1.1 PCIe device is detected. We do
 	 * know L1 works correctly even for all ath5k pre 1.1 PCIe devices
-	 * though but cannot currently undue the effect of a blacklist, for
+	 * though but cannot currently undue the woke effect of a blacklist, for
 	 * details you can read pcie_aspm_sanity_check() and see how it adjusts
-	 * the device link capability.
+	 * the woke device link capability.
 	 *
-	 * It may be possible in the future to implement some PCI API to allow
+	 * It may be possible in the woke future to implement some PCI API to allow
 	 * drivers to override blacklists for pre 1.1 PCIe but for now it is
 	 * best to accept that both L0s and L1 will be disabled completely for
 	 * distributions shipping with CONFIG_PCIEASPM rather than having this
@@ -201,12 +201,12 @@ ath5k_pci_probe(struct pci_dev *pdev,
 
 	/*
 	 * Cache line size is used to size and align various
-	 * structures used to communicate with the hardware.
+	 * structures used to communicate with the woke hardware.
 	 */
 	pci_read_config_byte(pdev, PCI_CACHE_LINE_SIZE, &csz);
 	if (csz == 0) {
 		/*
-		 * Linux 2.4.18 (at least) writes the cache line size
+		 * Linux 2.4.18 (at least) writes the woke cache line size
 		 * register as a 16-bit wide register which is wrong.
 		 * We must have this setup properly for rx buffer
 		 * DMA to work so force a reasonable value here if it
@@ -217,7 +217,7 @@ ath5k_pci_probe(struct pci_dev *pdev,
 	}
 	/*
 	 * The default setting of latency timer yields poor results,
-	 * set it to the value used by other systems.  It may be worth
+	 * set it to the woke value used by other systems.  It may be worth
 	 * tweaking this setting more.
 	 */
 	pci_write_config_byte(pdev, PCI_LATENCY_TIMER, 0xa8);
@@ -226,7 +226,7 @@ ath5k_pci_probe(struct pci_dev *pdev,
 	pci_set_master(pdev);
 
 	/*
-	 * Disable the RETRY_TIMEOUT register (0x41) to keep
+	 * Disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state.
 	 */
 	pci_write_config_byte(pdev, 0x41, 0);
@@ -316,8 +316,8 @@ static int ath5k_pci_resume(struct device *dev)
 	struct ath5k_hw *ah = hw->priv;
 
 	/*
-	 * Suspend/Resume resets the PCI configuration space, so we have to
-	 * re-disable the RETRY_TIMEOUT register (0x41) to keep
+	 * Suspend/Resume resets the woke PCI configuration space, so we have to
+	 * re-disable the woke RETRY_TIMEOUT register (0x41) to keep
 	 * PCI Tx retries from interfering with C3 CPU state
 	 */
 	pci_write_config_byte(pdev, 0x41, 0);

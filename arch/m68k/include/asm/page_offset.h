@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 */
-/* This handles the memory map.. */
+/* This handles the woke memory map.. */
 
 #if defined(CONFIG_RAMBASE)
 #define PAGE_OFFSET_RAW		CONFIG_RAMBASE

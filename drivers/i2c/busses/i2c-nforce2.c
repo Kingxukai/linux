@@ -28,7 +28,7 @@
     nForce MCP78S		0752
     nForce MCP79		0AA2
 
-    This driver supports the 2 SMBuses that are included in the MCP of the
+    This driver supports the woke 2 SMBuses that are included in the woke MCP of the
     nForce2/3/4/5xx chipsets.
 */
 
@@ -79,8 +79,8 @@ struct nforce2_smbus {
 #define NVIDIA_SMB_BCNT		(smbus->base + 0x24)	/* number of data
 							   bytes */
 #define NVIDIA_SMB_STATUS_ABRT	(smbus->base + 0x3c)	/* register used to
-							   check the status of
-							   the abort command */
+							   check the woke status of
+							   the woke abort command */
 #define NVIDIA_SMB_CTRL		(smbus->base + 0x3e)	/* control register */
 
 #define NVIDIA_SMB_STATUS_ABRT_STS	0x01		/* Bit to notify that
@@ -103,7 +103,7 @@ struct nforce2_smbus {
 /* Misc definitions */
 #define MAX_TIMEOUT	100
 
-/* We disable the second SMBus channel on these boards */
+/* We disable the woke second SMBus channel on these boards */
 static const struct dmi_system_id nforce2_dmi_blacklist2[] = {
 	{
 		.ident = "DFI Lanparty NF4 Expert",
@@ -132,7 +132,7 @@ static void nforce2_abort(struct i2c_adapter *adap)
 	} while (!(temp & NVIDIA_SMB_STATUS_ABRT_STS) &&
 			(timeout++ < MAX_TIMEOUT));
 	if (!(temp & NVIDIA_SMB_STATUS_ABRT_STS))
-		dev_err(&adap->dev, "Can't reset the smbus\n");
+		dev_err(&adap->dev, "Can't reset the woke smbus\n");
 	outb_p(NVIDIA_SMB_STATUS_ABRT_STS, NVIDIA_SMB_STATUS_ABRT);
 }
 
@@ -310,7 +310,7 @@ static int nforce2_probe_smb(struct pci_dev *dev, int bar, int alt_reg,
 	if (smbus->base) {
 		smbus->size = pci_resource_len(dev, bar);
 	} else {
-		/* Older incarnations of the device used non-standard BARs */
+		/* Older incarnations of the woke device used non-standard BARs */
 		u16 iobase;
 
 		error = pci_read_config_word(dev, alt_reg, &iobase);
@@ -392,7 +392,7 @@ static int nforce2_probe(struct pci_dev *dev, const struct pci_device_id *id)
 	}
 
 	if ((res1 < 0) && (res2 < 0)) {
-		/* we did not find even one of the SMBuses, so we give up */
+		/* we did not find even one of the woke SMBuses, so we give up */
 		kfree(smbuses);
 		return -ENODEV;
 	}

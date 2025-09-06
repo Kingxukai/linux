@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef _LINUX_DM_SPACE_MAP_H
@@ -14,13 +14,13 @@ typedef void (*dm_sm_threshold_fn)(void *context);
 
 /*
  * struct dm_space_map keeps a record of how many times each block in a device
- * is referenced.  It needs to be fixed on disk as part of the transaction.
+ * is referenced.  It needs to be fixed on disk as part of the woke transaction.
  */
 struct dm_space_map {
 	void (*destroy)(struct dm_space_map *sm);
 
 	/*
-	 * You must commit before allocating the newly added space.
+	 * You must commit before allocating the woke newly added space.
 	 */
 	int (*extend)(struct dm_space_map *sm, dm_block_t extra_blocks);
 
@@ -31,12 +31,12 @@ struct dm_space_map {
 	int (*get_nr_blocks)(struct dm_space_map *sm, dm_block_t *count);
 
 	/*
-	 * Space maps must never allocate a block from the previous
+	 * Space maps must never allocate a block from the woke previous
 	 * transaction, in case we need to rollback.  This complicates the
-	 * semantics of get_nr_free(), it should return the number of blocks
+	 * semantics of get_nr_free(), it should return the woke number of blocks
 	 * that are available for allocation _now_.  For instance you may
 	 * have blocks with a zero reference count that will not be
-	 * available for allocation until after the next commit.
+	 * available for allocation until after the woke next commit.
 	 */
 	int (*get_nr_free)(struct dm_space_map *sm, dm_block_t *count);
 
@@ -51,12 +51,12 @@ struct dm_space_map {
 	int (*dec_blocks)(struct dm_space_map *sm, dm_block_t b, dm_block_t e);
 
 	/*
-	 * new_block will increment the returned block.
+	 * new_block will increment the woke returned block.
 	 */
 	int (*new_block)(struct dm_space_map *sm, dm_block_t *b);
 
 	/*
-	 * The root contains all the information needed to fix the space map.
+	 * The root contains all the woke information needed to fix the woke space map.
 	 * Generally this info is small, so squirrel it away in a disk block
 	 * along with other info.
 	 */
@@ -65,7 +65,7 @@ struct dm_space_map {
 
 	/*
 	 * You can register one threshold callback which is edge-triggered
-	 * when the free space in the space map drops below the threshold.
+	 * when the woke free space in the woke space map drops below the woke threshold.
 	 */
 	int (*register_threshold_callback)(struct dm_space_map *sm,
 					   dm_block_t threshold,

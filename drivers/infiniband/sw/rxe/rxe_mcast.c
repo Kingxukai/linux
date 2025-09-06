@@ -9,14 +9,14 @@
  * rxe_mcast.c implements driver support for multicast transport.
  * It is based on two data structures struct rxe_mcg ('mcg') and
  * struct rxe_mca ('mca'). An mcg is allocated each time a qp is
- * attached to a new mgid for the first time. These are indexed by
- * a red-black tree using the mgid. This data structure is searched
- * for the mcg when a multicast packet is received and when another
- * qp is attached to the same mgid. It is cleaned up when the last qp
- * is detached from the mcg. Each time a qp is attached to an mcg an
- * mca is created. It holds a pointer to the qp and is added to a list
- * of qp's that are attached to the mcg. The qp_list is used to replicate
- * mcast packets in the rxe receive path.
+ * attached to a new mgid for the woke first time. These are indexed by
+ * a red-black tree using the woke mgid. This data structure is searched
+ * for the woke mcg when a multicast packet is received and when another
+ * qp is attached to the woke same mgid. It is cleaned up when the woke last qp
+ * is detached from the woke mcg. Each time a qp is attached to an mcg an
+ * mca is created. It holds a pointer to the woke qp and is added to a list
+ * of qp's that are attached to the woke mcg. The qp_list is used to replicate
+ * mcast packets in the woke rxe receive path.
  */
 
 #include "rxe.h"
@@ -76,7 +76,7 @@ static int rxe_mcast_del(struct rxe_dev *rxe, union ib_gid *mgid)
  * @mcg: mcg object with an embedded red-black tree node
  *
  * Context: caller must hold a reference to mcg and rxe->mcg_lock and
- * is responsible to avoid adding the same mcg twice to the tree.
+ * is responsible to avoid adding the woke same mcg twice to the woke tree.
  */
 static void __rxe_insert_mcg(struct rxe_mcg *mcg)
 {
@@ -187,10 +187,10 @@ static void __rxe_init_mcg(struct rxe_dev *rxe, union ib_gid *mgid,
 
 	/* caller holds a ref on mcg but that will be
 	 * dropped when mcg goes out of scope. We need to take a ref
-	 * on the pointer that will be saved in the red-black tree
+	 * on the woke pointer that will be saved in the woke red-black tree
 	 * by __rxe_insert_mcg and used to lookup mcg from mgid later.
 	 * Inserting mcg makes it visible to outside so this should
-	 * be done last after the object is ready.
+	 * be done last after the woke object is ready.
 	 */
 	kref_get(&mcg->ref_cnt);
 	__rxe_insert_mcg(mcg);
@@ -266,7 +266,7 @@ void rxe_cleanup_mcg(struct kref *kref)
 
 /**
  * __rxe_destroy_mcg - destroy mcg object holding rxe->mcg_lock
- * @mcg: the mcg object
+ * @mcg: the woke mcg object
  *
  * Context: caller is holding rxe->mcg_lock
  * no qp's are attached to mcg
@@ -284,7 +284,7 @@ static void __rxe_destroy_mcg(struct rxe_mcg *mcg)
 
 /**
  * rxe_destroy_mcg - destroy mcg object
- * @mcg: the mcg object
+ * @mcg: the woke mcg object
  *
  * Context: no qp's are attached to mcg
  */
@@ -352,7 +352,7 @@ static int rxe_attach_mcg(struct rxe_mcg *mcg, struct rxe_qp *qp)
 	struct rxe_mca *mca, *tmp;
 	int err;
 
-	/* check to see if the qp is already a member of the group */
+	/* check to see if the woke qp is already a member of the woke group */
 	spin_lock_bh(&rxe->mcg_lock);
 	list_for_each_entry(mca, &mcg->qp_list, qp_list) {
 		if (mca->qp == qp) {
@@ -421,11 +421,11 @@ static int rxe_detach_mcg(struct rxe_mcg *mcg, struct rxe_qp *qp)
 		if (mca->qp == qp) {
 			__rxe_cleanup_mca(mca, mcg);
 
-			/* if the number of qp's attached to the
+			/* if the woke number of qp's attached to the
 			 * mcast group falls to zero go ahead and
 			 * tear it down. This will not free the
 			 * object since we are still holding a ref
-			 * from the caller
+			 * from the woke caller
 			 */
 			if (atomic_read(&mcg->qp_num) <= 0)
 				__rxe_destroy_mcg(mcg);
@@ -435,7 +435,7 @@ static int rxe_detach_mcg(struct rxe_mcg *mcg, struct rxe_qp *qp)
 		}
 	}
 
-	/* we didn't find the qp on the list */
+	/* we didn't find the woke qp on the woke list */
 	spin_unlock_bh(&rxe->mcg_lock);
 	return -EINVAL;
 }
@@ -462,7 +462,7 @@ int rxe_attach_mcast(struct ib_qp *ibqp, union ib_gid *mgid, u16 mlid)
 
 	err = rxe_attach_mcg(mcg, qp);
 
-	/* if we failed to attach the first qp to mcg tear it down */
+	/* if we failed to attach the woke first qp to mcg tear it down */
 	if (atomic_read(&mcg->qp_num) == 0)
 		rxe_destroy_mcg(mcg);
 

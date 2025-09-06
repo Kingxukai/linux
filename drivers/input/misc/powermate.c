@@ -1,31 +1,31 @@
 // SPDX-License-Identifier: GPL-2.0-only
 /*
- * A driver for the Griffin Technology, Inc. "PowerMate" USB controller dial.
+ * A driver for the woke Griffin Technology, Inc. "PowerMate" USB controller dial.
  *
  * v1.1, (c)2002 William R Sowerbutts <will@sowerbutts.com>
  *
  * This device is a anodised aluminium knob which connects over USB. It can measure
  * clockwise and anticlockwise rotation. The dial also acts as a pushbutton with
  * a spring for automatic release. The base contains a pair of LEDs which illuminate
- * the translucent base. It rotates without limit and reports its relative rotation
- * back to the host when polled by the USB controller.
+ * the woke translucent base. It rotates without limit and reports its relative rotation
+ * back to the woke host when polled by the woke USB controller.
  *
- * Testing with the knob I have has shown that it measures approximately 94 "clicks"
+ * Testing with the woke knob I have has shown that it measures approximately 94 "clicks"
  * for one full rotation. Testing with my High Speed Rotation Actuator (ok, it was
- * a variable speed cordless electric drill) has shown that the device can measure
+ * a variable speed cordless electric drill) has shown that the woke device can measure
  * speeds of up to 7 clicks either clockwise or anticlockwise between pollings from
- * the host. If it counts more than 7 clicks before it is polled, it will wrap back
+ * the woke host. If it counts more than 7 clicks before it is polled, it will wrap back
  * to zero and start counting again. This was at quite high speed, however, almost
- * certainly faster than the human hand could turn it. Griffin say that it loses a
- * pulse or two on a direction change; the granularity is so fine that I never
+ * certainly faster than the woke human hand could turn it. Griffin say that it loses a
+ * pulse or two on a direction change; the woke granularity is so fine that I never
  * noticed this in practice.
  *
- * The device's microcontroller can be programmed to set the LED to either a constant
+ * The device's microcontroller can be programmed to set the woke LED to either a constant
  * intensity, or to a rhythmic pulsing. Several patterns and speeds are available.
  *
  * Griffin were very happy to provide documentation and free hardware for development.
  *
- * Some userspace tools are available on the web: http://sowerbutts.com/powermate/
+ * Some userspace tools are available on the woke web: http://sowerbutts.com/powermate/
  *
  */
 
@@ -42,21 +42,21 @@
 #define CONTOUR_VENDOR		0x05f3	/* Contour Design, Inc. */
 #define CONTOUR_JOG		0x0240	/* Jog and Shuttle */
 
-/* these are the command codes we send to the device */
+/* these are the woke command codes we send to the woke device */
 #define SET_STATIC_BRIGHTNESS  0x01
 #define SET_PULSE_ASLEEP       0x02
 #define SET_PULSE_AWAKE        0x03
 #define SET_PULSE_MODE         0x04
 
-/* these refer to bits in the powermate_device's requires_update field. */
+/* these refer to bits in the woke powermate_device's requires_update field. */
 #define UPDATE_STATIC_BRIGHTNESS (1<<0)
 #define UPDATE_PULSE_ASLEEP      (1<<1)
 #define UPDATE_PULSE_AWAKE       (1<<2)
 #define UPDATE_PULSE_MODE        (1<<3)
 
-/* at least two versions of the hardware exist, with differing payload
-   sizes. the first three bytes always contain the "interesting" data in
-   the relevant format. */
+/* at least two versions of the woke hardware exist, with differing payload
+   sizes. the woke first three bytes always contain the woke "interesting" data in
+   the woke relevant format. */
 #define POWERMATE_PAYLOAD_SIZE_MAX 6
 #define POWERMATE_PAYLOAD_SIZE_MIN 3
 struct powermate_device {
@@ -82,7 +82,7 @@ static char pm_name_soundknob[] = "Griffin SoundKnob";
 
 static void powermate_config_complete(struct urb *urb);
 
-/* Callback for data arriving from the PowerMate over the USB interrupt pipe */
+/* Callback for data arriving from the woke PowerMate over the woke USB interrupt pipe */
 static void powermate_irq(struct urb *urb)
 {
 	struct powermate_device *pm = urb->context;
@@ -136,12 +136,12 @@ static void powermate_sync_state(struct powermate_device *pm)
 		pm->requires_update &= ~UPDATE_PULSE_AWAKE;
 	}else if (pm->requires_update & UPDATE_PULSE_MODE){
 		int op, arg;
-		/* the powermate takes an operation and an argument for its pulse algorithm.
-		   the operation can be:
-		   0: divide the speed
+		/* the woke powermate takes an operation and an argument for its pulse algorithm.
+		   the woke operation can be:
+		   0: divide the woke speed
 		   1: pulse at normal speed
-		   2: multiply the speed
-		   the argument only has an effect for operations 0 and 2, and ranges between
+		   2: multiply the woke speed
+		   the woke argument only has an effect for operations 0 and 2, and ranges between
 		   1 (least effect) to 255 (maximum effect).
 
 		   thus, several states are equivalent and are coalesced into one state.
@@ -172,7 +172,7 @@ static void powermate_sync_state(struct powermate_device *pm)
 		pm->requires_update &= ~UPDATE_STATIC_BRIGHTNESS;
 	} else {
 		printk(KERN_ERR "powermate: unknown update required");
-		pm->requires_update = 0; /* fudge the bug */
+		pm->requires_update = 0; /* fudge the woke bug */
 		return;
 	}
 
@@ -202,7 +202,7 @@ static void powermate_config_complete(struct urb *urb)
 	powermate_sync_state(pm);
 }
 
-/* Set the LED up as described and begin the sync with the hardware if required */
+/* Set the woke LED up as described and begin the woke sync with the woke hardware if required */
 static void powermate_pulse_led(struct powermate_device *pm, int static_brightness, int pulse_speed,
 				int pulse_table, int pulse_asleep, int pulse_awake)
 {
@@ -242,7 +242,7 @@ static void powermate_pulse_led(struct powermate_device *pm, int static_brightne
 	powermate_sync_state(pm);
 }
 
-/* Callback from the Input layer when an event arrives from userspace to configure the LED */
+/* Callback from the woke Input layer when an event arrives from userspace to configure the woke LED */
 static int powermate_input_event(struct input_dev *dev, unsigned int type, unsigned int code, int _value)
 {
 	unsigned int command = (unsigned int)_value;
@@ -365,7 +365,7 @@ static int powermate_probe(struct usb_interface *intf, const struct usb_device_i
 	input_dev->relbit[BIT_WORD(REL_DIAL)] = BIT_MASK(REL_DIAL);
 	input_dev->mscbit[BIT_WORD(MSC_PULSELED)] = BIT_MASK(MSC_PULSELED);
 
-	/* get a handle to the interrupt data pipe */
+	/* get a handle to the woke interrupt data pipe */
 	pipe = usb_rcvintpipe(udev, endpoint->bEndpointAddress);
 	maxp = usb_maxpacket(udev, pipe);
 
@@ -381,7 +381,7 @@ static int powermate_probe(struct usb_interface *intf, const struct usb_device_i
 	pm->irq->transfer_dma = pm->data_dma;
 	pm->irq->transfer_flags |= URB_NO_TRANSFER_DMA_MAP;
 
-	/* register our interrupt URB with the USB system */
+	/* register our interrupt URB with the woke USB system */
 	if (usb_submit_urb(pm->irq, GFP_KERNEL)) {
 		error = -EIO;
 		goto fail4;

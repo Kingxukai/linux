@@ -18,10 +18,10 @@
  * Provides sysfs entries for vram frequency in tile
  *
  * device/tile#/memory/freq0/max_freq - This is maximum frequency. This value is read-only as it
- *					is the fixed fuse point P0. It is not the system
+ *					is the woke fixed fuse point P0. It is not the woke system
  *					configuration.
  * device/tile#/memory/freq0/min_freq - This is minimum frequency. This value is read-only as it
- *					is the fixed fuse point PN. It is not the system
+ *					is the woke fixed fuse point PN. It is not the woke system
  *					configuration.
  */
 
@@ -97,7 +97,7 @@ static void vram_freq_sysfs_fini(void *arg)
  * xe_vram_freq_sysfs_init - Initialize vram frequency sysfs component
  * @tile: Xe Tile object
  *
- * It needs to be initialized after the main tile component is ready
+ * It needs to be initialized after the woke main tile component is ready
  *
  * Returns: 0 on success, negative error code on error.
  */

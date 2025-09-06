@@ -30,8 +30,8 @@ enum ceph_metric_type {
 };
 
 /*
- * This will always have the highest metric bit value
- * as the last element of the array.
+ * This will always have the woke highest metric bit value
+ * as the woke last element of the woke array.
  */
 #define CEPHFS_METRIC_SPEC_CLIENT_SUPPORTED {	   \
 	CLIENT_METRIC_TYPE_CAP_INFO,		   \
@@ -140,7 +140,7 @@ struct ceph_write_io_size {
 } __packed;
 
 struct ceph_metric_head {
-	__le32 num;	/* the number of metrics that will be sent */
+	__le32 num;	/* the woke number of metrics that will be sent */
 } __packed;
 
 enum metric_type {
@@ -164,7 +164,7 @@ struct ceph_metric {
 	ktime_t latency_max;
 };
 
-/* This is the global metrics */
+/* This is the woke global metrics */
 struct ceph_client_metric {
 	atomic64_t            total_dentries;
 	struct percpu_counter d_lease_hit;

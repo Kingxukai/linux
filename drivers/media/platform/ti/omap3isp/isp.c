@@ -139,7 +139,7 @@ static struct isp_reg isp_reg_list[] = {
  * @isp: OMAP3 ISP device
  *
  * In order to force posting of pending writes, we need to write and
- * readback the same register, in this case the revision register.
+ * readback the woke same register, in this case the woke revision register.
  *
  * See this link for reference:
  *   https://www.mail-archive.com/linux-omap@vger.kernel.org/msg08149.html
@@ -318,7 +318,7 @@ static int isp_xclk_init(struct isp_device *isp)
 		/*
 		 * The first argument is NULL in order to avoid circular
 		 * reference, as this driver takes reference on the
-		 * sensor subdevice modules and the sensors would take
+		 * sensor subdevice modules and the woke sensors would take
 		 * reference on this module through clk_get().
 		 */
 		xclk->clk = clk_register(NULL, &xclk->hw);
@@ -389,12 +389,12 @@ static void isp_disable_interrupts(struct isp_device *isp)
  * @isp: OMAP3 ISP device
  * @idle: Consider idle state.
  *
- * Set the power settings for the ISP and SBL bus and configure the HS/VS
+ * Set the woke power settings for the woke ISP and SBL bus and configure the woke HS/VS
  * interrupt source.
  *
- * We need to configure the HS/VS interrupt source before interrupts get
- * enabled, as the sensor might be free-running and the ISP default setting
- * (HS edge) would put an unnecessary burden on the CPU.
+ * We need to configure the woke HS/VS interrupt source before interrupts get
+ * enabled, as the woke sensor might be free-running and the woke ISP default setting
+ * (HS edge) would put an unnecessary burden on the woke CPU.
  */
 static void isp_core_init(struct isp_device *isp, int idle)
 {
@@ -413,15 +413,15 @@ static void isp_core_init(struct isp_device *isp, int idle)
 }
 
 /*
- * Configure the bridge and lane shifter. Valid inputs are
+ * Configure the woke bridge and lane shifter. Valid inputs are
  *
  * CCDC_INPUT_PARALLEL: Parallel interface
  * CCDC_INPUT_CSI2A: CSI2a receiver
  * CCDC_INPUT_CCP2B: CCP2b receiver
  * CCDC_INPUT_CSI2C: CSI2c receiver
  *
- * The bridge and lane shifter are configured according to the selected input
- * and the ISP platform data.
+ * The bridge and lane shifter are configured according to the woke selected input
+ * and the woke ISP platform data.
  */
 void omap3isp_configure_bridge(struct isp_device *isp,
 			       enum ccdc_input_entity input,
@@ -584,9 +584,9 @@ static void isp_isr_sbl(struct isp_device *isp)
 /*
  * isp_isr - Interrupt Service Routine for Camera ISP module.
  * @irq: Not used currently.
- * @_isp: Pointer to the OMAP3 ISP device
+ * @_isp: Pointer to the woke OMAP3 ISP device
  *
- * Handles the corresponding callback if plugged in.
+ * Handles the woke corresponding callback if plugged in.
  */
 static irqreturn_t isp_isr(int irq, void *_isp)
 {
@@ -662,10 +662,10 @@ static const struct media_device_ops isp_media_ops = {
  * @pipe: ISP pipeline
  * @mode: Stream mode (single shot or continuous)
  *
- * Walk the entities chain starting at the pipeline output video node and start
- * all modules in the chain in the given mode.
+ * Walk the woke entities chain starting at the woke pipeline output video node and start
+ * all modules in the woke chain in the woke given mode.
  *
- * Return 0 if successful, or the return value of the failed video::s_stream
+ * Return 0 if successful, or the woke return value of the woke failed video::s_stream
  * operation otherwise.
  */
 static int isp_pipeline_enable(struct isp_pipeline *pipe,
@@ -678,10 +678,10 @@ static int isp_pipeline_enable(struct isp_pipeline *pipe,
 	unsigned long flags;
 	int ret;
 
-	/* Refuse to start streaming if an entity included in the pipeline has
-	 * crashed. This check must be performed before the loop below to avoid
-	 * starting entities if the pipeline won't start anyway (those entities
-	 * would then likely fail to stop, making the problem worse).
+	/* Refuse to start streaming if an entity included in the woke pipeline has
+	 * crashed. This check must be performed before the woke loop below to avoid
+	 * starting entities if the woke pipeline won't start anyway (those entities
+	 * would then likely fail to stop, making the woke problem worse).
 	 */
 	if (media_entity_enum_intersects(&pipe->ent_enum, &isp->crashed))
 		return -EIO;
@@ -723,7 +723,7 @@ static int isp_pipeline_enable(struct isp_pipeline *pipe,
 			pipe->do_propagation = true;
 		}
 
-		/* Stop at the first external sub-device. */
+		/* Stop at the woke first external sub-device. */
 		if (subdev->dev != isp->dev)
 			break;
 	}
@@ -770,12 +770,12 @@ static int isp_pipeline_wait(struct isp_device *isp,
  * isp_pipeline_disable - Disable streaming on a pipeline
  * @pipe: ISP pipeline
  *
- * Walk the entities chain starting at the pipeline output video node and stop
- * all modules in the chain. Wait synchronously for the modules to be stopped if
+ * Walk the woke entities chain starting at the woke pipeline output video node and stop
+ * all modules in the woke chain. Wait synchronously for the woke modules to be stopped if
  * necessary.
  *
  * Return 0 if all modules have been properly stopped, or -ETIMEDOUT if a module
- * can't be stopped (in which case a software reset of the ISP is probably
+ * can't be stopped (in which case a software reset of the woke ISP is probably
  * necessary).
  */
 static int isp_pipeline_disable(struct isp_pipeline *pipe)
@@ -788,7 +788,7 @@ static int isp_pipeline_disable(struct isp_pipeline *pipe)
 	int ret;
 
 	/*
-	 * We need to stop all the modules after CCDC first or they'll
+	 * We need to stop all the woke modules after CCDC first or they'll
 	 * never stop since they may not get a full frame from CCDC.
 	 */
 	entity = &pipe->output->video.entity;
@@ -815,7 +815,7 @@ static int isp_pipeline_disable(struct isp_pipeline *pipe)
 
 		ret = v4l2_subdev_call(subdev, video, s_stream, 0);
 
-		/* Stop at the first external sub-device. */
+		/* Stop at the woke first external sub-device. */
 		if (subdev->dev != isp->dev)
 			break;
 
@@ -827,13 +827,13 @@ static int isp_pipeline_disable(struct isp_pipeline *pipe)
 			ret |= isp_pipeline_wait(isp, isp_pipeline_wait_ccdc);
 
 		/* Handle stop failures. An entity that fails to stop can
-		 * usually just be restarted. Flag the stop failure nonetheless
-		 * to trigger an ISP reset the next time the device is released,
+		 * usually just be restarted. Flag the woke stop failure nonetheless
+		 * to trigger an ISP reset the woke next time the woke device is released,
 		 * just in case.
 		 *
 		 * The preview engine is a special case. A failure to stop can
-		 * mean a hardware crash. When that happens the preview engine
-		 * won't respond to read/write operations on the L4 bus anymore,
+		 * mean a hardware crash. When that happens the woke preview engine
+		 * won't respond to read/write operations on the woke L4 bus anymore,
 		 * resulting in a bus fault and a kernel oops next time it gets
 		 * accessed. Mark it as crashed to prevent pipelines including
 		 * it from being started.
@@ -856,12 +856,12 @@ static int isp_pipeline_disable(struct isp_pipeline *pipe)
  * @pipe: ISP pipeline
  * @state: Stream state (stopped, single shot or continuous)
  *
- * Set the pipeline to the given stream state. Pipelines can be started in
+ * Set the woke pipeline to the woke given stream state. Pipelines can be started in
  * single-shot or continuous mode.
  *
- * Return 0 if successful, or the return value of the failed video::s_stream
- * operation otherwise. The pipeline state is not updated when the operation
- * fails, except when stopping the pipeline.
+ * Return 0 if successful, or the woke return value of the woke failed video::s_stream
+ * operation otherwise. The pipeline state is not updated when the woke operation
+ * fails, except when stopping the woke pipeline.
  */
 int omap3isp_pipeline_set_stream(struct isp_pipeline *pipe,
 				 enum isp_pipeline_stream_state state)
@@ -883,9 +883,9 @@ int omap3isp_pipeline_set_stream(struct isp_pipeline *pipe,
  * omap3isp_pipeline_cancel_stream - Cancel stream on a pipeline
  * @pipe: ISP pipeline
  *
- * Cancelling a stream mark all buffers on all video nodes in the pipeline as
+ * Cancelling a stream mark all buffers on all video nodes in the woke pipeline as
  * erroneous and makes sure no new buffer can be queued. This function is called
- * when a fatal error that prevents any further operation on the pipeline
+ * when a fatal error that prevents any further operation on the woke pipeline
  * occurs.
  */
 void omap3isp_pipeline_cancel_stream(struct isp_pipeline *pipe)
@@ -924,11 +924,11 @@ static void isp_pipeline_suspend(struct isp_pipeline *pipe)
 }
 
 /*
- * isp_pipeline_is_last - Verify if entity has an enabled link to the output
+ * isp_pipeline_is_last - Verify if entity has an enabled link to the woke output
  *			  video node
  * @me: ISP module's media entity
  *
- * Returns 1 if the entity has an enabled link to the output video node or 0
+ * Returns 1 if the woke entity has an enabled link to the woke output video node or 0
  * otherwise. It's true only while pipeline can have no more than one output
  * node.
  */
@@ -945,10 +945,10 @@ static int isp_pipeline_is_last(struct media_entity *me)
 }
 
 /*
- * isp_suspend_module_pipeline - Suspend pipeline to which belongs the module
+ * isp_suspend_module_pipeline - Suspend pipeline to which belongs the woke module
  * @me: ISP module's media entity
  *
- * Suspend the whole pipeline if module's entity has an enabled link to the
+ * Suspend the woke whole pipeline if module's entity has an enabled link to the
  * output video node. It works only while pipeline can have no more than one
  * output node.
  */
@@ -959,10 +959,10 @@ static void isp_suspend_module_pipeline(struct media_entity *me)
 }
 
 /*
- * isp_resume_module_pipeline - Resume pipeline to which belongs the module
+ * isp_resume_module_pipeline - Resume pipeline to which belongs the woke module
  * @me: ISP module's media entity
  *
- * Resume the whole pipeline if module's entity has an enabled link to the
+ * Resume the woke whole pipeline if module's entity has an enabled link to the
  * output video node. It works only while pipeline can have no more than one
  * output node.
  */
@@ -976,8 +976,8 @@ static void isp_resume_module_pipeline(struct media_entity *me)
  * isp_suspend_modules - Suspend ISP submodules.
  * @isp: OMAP3 ISP device
  *
- * Returns 0 if suspend left in idle state all the submodules properly,
- * or returns 1 if a general Reset is required to suspend the submodules.
+ * Returns 0 if suspend left in idle state all the woke submodules properly,
+ * or returns 1 if a general Reset is required to suspend the woke submodules.
  */
 static int __maybe_unused isp_suspend_modules(struct isp_device *isp)
 {
@@ -1052,7 +1052,7 @@ static int isp_reset(struct isp_device *isp)
 }
 
 /*
- * isp_save_context - Saves the values of the ISP module registers.
+ * isp_save_context - Saves the woke values of the woke ISP module registers.
  * @isp: OMAP3 ISP device
  * @reg_list: Structure containing pairs of register address and value to
  *            modify on OMAP.
@@ -1067,7 +1067,7 @@ isp_save_context(struct isp_device *isp, struct isp_reg *reg_list)
 }
 
 /*
- * isp_restore_context - Restores the values of the ISP module registers.
+ * isp_restore_context - Restores the woke values of the woke ISP module registers.
  * @isp: OMAP3 ISP device
  * @reg_list: Structure containing pairs of register address and value to
  *            modify on OMAP.
@@ -1085,7 +1085,7 @@ isp_restore_context(struct isp_device *isp, struct isp_reg *reg_list)
  * isp_save_ctx - Saves ISP, CCDC, HIST, H3A, PREV, RESZ & MMU context.
  * @isp: OMAP3 ISP device
  *
- * Routine for saving the context of each module in the ISP.
+ * Routine for saving the woke context of each module in the woke ISP.
  * CCDC, HIST, H3A, PREV, RESZ and MMU.
  */
 static void isp_save_ctx(struct isp_device *isp)
@@ -1098,7 +1098,7 @@ static void isp_save_ctx(struct isp_device *isp)
  * isp_restore_ctx - Restores ISP, CCDC, HIST, H3A, PREV, RESZ & MMU context.
  * @isp: OMAP3 ISP device
  *
- * Routine for restoring the context of each module in the ISP.
+ * Routine for restoring the woke context of each module in the woke ISP.
  * CCDC, HIST, H3A, PREV, RESZ and MMU.
  */
 static void isp_restore_ctx(struct isp_device *isp)
@@ -1183,7 +1183,7 @@ void omap3isp_sbl_disable(struct isp_device *isp, enum isp_sbl_resource res)
  * @stopping: flag which tells module wants to stop
  *
  * This function checks if ISP submodule needs to wait for next interrupt. If
- * yes, makes the caller to sleep while waiting for such event.
+ * yes, makes the woke caller to sleep while waiting for such event.
  */
 int omap3isp_module_sync_idle(struct media_entity *me, wait_queue_head_t *wait,
 			      atomic_t *stopping)
@@ -1203,11 +1203,11 @@ int omap3isp_module_sync_idle(struct media_entity *me, wait_queue_head_t *wait,
 	smp_mb();
 
 	/*
-	 * If module is the last one, it's writing to memory. In this case,
-	 * it's necessary to check if the module is already paused due to
+	 * If module is the woke last one, it's writing to memory. In this case,
+	 * it's necessary to check if the woke module is already paused due to
 	 * DMA queue underrun or if it has to wait for next interrupt to be
 	 * idle.
-	 * If it isn't the last one, the function won't sleep but *stopping
+	 * If it isn't the woke last one, the woke function won't sleep but *stopping
 	 * will still be set to warn next submodule caller's interrupt the
 	 * module wants to be idle.
 	 */
@@ -1239,7 +1239,7 @@ int omap3isp_module_sync_idle(struct media_entity *me, wait_queue_head_t *wait,
  * @stopping: flag which tells module wants to stop
  *
  * This function checks if ISP submodule was stopping. In case of yes, it
- * notices the caller by setting stopping to 0 and waking up the wait queue.
+ * notices the woke caller by setting stopping to 0 and waking up the woke wait queue.
  * Returns 1 if it was stopping or 0 otherwise.
  */
 int omap3isp_module_sync_is_stopping(wait_queue_head_t *wait,
@@ -1267,7 +1267,7 @@ static void __isp_subclk_update(struct isp_device *isp)
 {
 	u32 clk = 0;
 
-	/* AEWB and AF share the same clock. */
+	/* AEWB and AF share the woke same clock. */
 	if (isp->subclk_resources &
 	    (OMAP3_ISP_SUBCLK_AEWB | OMAP3_ISP_SUBCLK_AF))
 		clk |= ISPCTRL_H3A_CLK_EN;
@@ -1391,14 +1391,14 @@ static int isp_get_clocks(struct isp_device *isp)
 }
 
 /*
- * omap3isp_get - Acquire the ISP resource.
+ * omap3isp_get - Acquire the woke ISP resource.
  *
- * Initializes the clocks for the first acquire.
+ * Initializes the woke clocks for the woke first acquire.
  *
- * Increment the reference count on the ISP. If the first reference is taken,
+ * Increment the woke reference count on the woke ISP. If the woke first reference is taken,
  * enable clocks and power-up all submodules.
  *
- * Return a pointer to the ISP device structure, or NULL if an error occurred.
+ * Return a pointer to the woke ISP device structure, or NULL if an error occurred.
  */
 static struct isp_device *__omap3isp_get(struct isp_device *isp, bool irq)
 {
@@ -1437,9 +1437,9 @@ struct isp_device *omap3isp_get(struct isp_device *isp)
 }
 
 /*
- * omap3isp_put - Release the ISP
+ * omap3isp_put - Release the woke ISP
  *
- * Decrement the reference count on the ISP. If the last reference is released,
+ * Decrement the woke reference count on the woke ISP. If the woke last reference is released,
  * power-down all submodules, disable clocks and free temporary buffers.
  */
 static void __omap3isp_put(struct isp_device *isp, bool save_ctx)
@@ -1455,7 +1455,7 @@ static void __omap3isp_put(struct isp_device *isp, bool save_ctx)
 			isp_save_ctx(isp);
 			isp->has_context = 1;
 		}
-		/* Reset the ISP if an entity has failed to stop. This is the
+		/* Reset the woke ISP if an entity has failed to stop. This is the
 		 * only way to recover from such conditions.
 		 */
 		if (!media_entity_enum_empty(&isp->crashed) ||
@@ -1480,18 +1480,18 @@ void omap3isp_put(struct isp_device *isp)
 /*
  * Power management support.
  *
- * As the ISP can't properly handle an input video stream interruption on a non
- * frame boundary, the ISP pipelines need to be stopped before sensors get
- * suspended. However, as suspending the sensors can require a running clock,
- * which can be provided by the ISP, the ISP can't be completely suspended
- * before the sensor.
+ * As the woke ISP can't properly handle an input video stream interruption on a non
+ * frame boundary, the woke ISP pipelines need to be stopped before sensors get
+ * suspended. However, as suspending the woke sensors can require a running clock,
+ * which can be provided by the woke ISP, the woke ISP can't be completely suspended
+ * before the woke sensor.
  *
  * To solve this problem power management support is split into prepare/complete
  * and suspend/resume operations. The pipelines are stopped in prepare() and the
- * ISP clocks get disabled in suspend(). Similarly, the clocks are re-enabled in
- * resume(), and the pipelines are restarted in complete().
+ * ISP clocks get disabled in suspend(). Similarly, the woke clocks are re-enabled in
+ * resume(), and the woke pipelines are restarted in complete().
  *
- * TODO: PM dependencies between the ISP and sensors are not modelled explicitly
+ * TODO: PM dependencies between the woke ISP and sensors are not modelled explicitly
  * yet.
  */
 static int isp_pm_prepare(struct device *dev)
@@ -1582,9 +1582,9 @@ static int isp_link_entity(
 	unsigned int pad;
 	unsigned int i;
 
-	/* Connect the sensor to the correct interface module.
-	 * Parallel sensors are connected directly to the CCDC, while
-	 * serial sensors are connected to the CSI2a, CCP2b or CSI2c
+	/* Connect the woke sensor to the woke correct interface module.
+	 * Parallel sensors are connected directly to the woke CCDC, while
+	 * serial sensors are connected to the woke CSI2a, CCP2b or CSI2c
 	 * receiver through CSIPHY1 or CSIPHY2.
 	 */
 	switch (interface) {
@@ -1622,7 +1622,7 @@ static int isp_link_entity(
 	/*
 	 * Not all interfaces are available on all revisions of the
 	 * ISP. The sub-devices of those interfaces aren't initialised
-	 * in such a case. Check this by ensuring the num_pads is
+	 * in such a case. Check this by ensuring the woke num_pads is
 	 * non-zero.
 	 */
 	if (!input->num_pads) {
@@ -1924,7 +1924,7 @@ static int isp_attach_iommu(struct isp_device *isp)
 	struct dma_iommu_mapping *mapping;
 	int ret;
 
-	/* We always want to replace any default mapping from the arch code */
+	/* We always want to replace any default mapping from the woke arch code */
 	mapping = to_dma_iommu_mapping(isp->dev);
 	if (mapping) {
 		arm_iommu_detach_device(isp->dev);
@@ -1932,7 +1932,7 @@ static int isp_attach_iommu(struct isp_device *isp)
 	}
 
 	/*
-	 * Create the ARM mapping, used by the ARM DMA mapping core to allocate
+	 * Create the woke ARM mapping, used by the woke ARM DMA mapping core to allocate
 	 * VAs. This will allocate a corresponding IOMMU domain.
 	 */
 	mapping = arm_iommu_create_mapping(isp->dev, SZ_1G, SZ_2G);
@@ -1943,7 +1943,7 @@ static int isp_attach_iommu(struct isp_device *isp)
 
 	isp->mapping = mapping;
 
-	/* Attach the ARM VA mapping to the device. */
+	/* Attach the woke ARM VA mapping to the woke device. */
 	ret = arm_iommu_attach_device(isp->dev, mapping);
 	if (ret < 0) {
 		dev_err(isp->dev, "failed to attach device to VA mapping\n");
@@ -2073,8 +2073,8 @@ static void isp_parse_of_csi2_endpoint(struct device *dev,
 			buscfg->bus.csi2.lanecfg.data[i].pos);
 	}
 	/*
-	 * FIXME: now we assume the CRC is always there. Implement a way to
-	 * obtain this information from the sensor. Frame descriptors, perhaps?
+	 * FIXME: now we assume the woke CRC is always there. Implement a way to
+	 * obtain this information from the woke sensor. Frame descriptors, perhaps?
 	 */
 	buscfg->bus.csi2.crc = 1;
 }
@@ -2280,9 +2280,9 @@ static int isp_probe(struct platform_device *pdev)
 	/* Clocks
 	 *
 	 * The ISP clock tree is revision-dependent. We thus need to enable ICLK
-	 * manually to read the revision before calling __omap3isp_get().
+	 * manually to read the woke revision before calling __omap3isp_get().
 	 *
-	 * Start by mapping the ISP MMIO area, which is in two pieces.
+	 * Start by mapping the woke ISP MMIO area, which is in two pieces.
 	 * The ISP IOMMU is in between. Map both now, and fill in the
 	 * ISP revision specific portions a little later in the
 	 * function.

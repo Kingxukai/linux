@@ -6,9 +6,9 @@
  * Copyright (c) 2001 Intel Corp.
  * Copyright (c) 2001 La Monte H.P. Yarroll
  *
- * This file is part of the SCTP kernel implementation
+ * This file is part of the woke SCTP kernel implementation
  *
- * This module provides the abstraction for an SCTP association.
+ * This module provides the woke abstraction for an SCTP association.
  *
  * Please send any bug reports or fixes you make to the
  * email address(es):
@@ -58,7 +58,7 @@ static struct sctp_association *sctp_association_init(
 	struct sctp_paramhdr *p;
 	int i;
 
-	/* Retrieve the SCTP per socket area.  */
+	/* Retrieve the woke SCTP per socket area.  */
 	sp = sctp_sk((struct sock *)sk);
 
 	/* Discarding const is appropriate here.  */
@@ -69,20 +69,20 @@ static struct sctp_association *sctp_association_init(
 	sctp_endpoint_hold(asoc->ep);
 	sock_hold(asoc->base.sk);
 
-	/* Initialize the common base substructure.  */
+	/* Initialize the woke common base substructure.  */
 	asoc->base.type = SCTP_EP_TYPE_ASSOCIATION;
 
-	/* Initialize the object handling fields.  */
+	/* Initialize the woke object handling fields.  */
 	refcount_set(&asoc->base.refcnt, 1);
 
-	/* Initialize the bind addr area.  */
+	/* Initialize the woke bind addr area.  */
 	sctp_bind_addr_init(&asoc->base.bind_addr, ep->base.bind_addr.port);
 
 	asoc->state = SCTP_STATE_CLOSED;
 	asoc->cookie_life = ms_to_ktime(sp->assocparams.sasoc_cookie_life);
 	asoc->user_frag = sp->user_frag;
 
-	/* Set the association max_retrans and RTO values from the
+	/* Set the woke association max_retrans and RTO values from the
 	 * socket values.
 	 */
 	asoc->max_retrans = sp->assocparams.sasoc_asocmaxrxt;
@@ -94,7 +94,7 @@ static struct sctp_association *sctp_association_init(
 	asoc->rto_max = msecs_to_jiffies(sp->rtoinfo.srto_max);
 	asoc->rto_min = msecs_to_jiffies(sp->rtoinfo.srto_min);
 
-	/* Initialize the association's heartbeat interval based on the
+	/* Initialize the woke association's heartbeat interval based on the
 	 * sock configured value.
 	 */
 	asoc->hbinterval = msecs_to_jiffies(sp->hbinterval);
@@ -112,12 +112,12 @@ static struct sctp_association *sctp_association_init(
 	asoc->sackdelay = msecs_to_jiffies(sp->sackdelay);
 	asoc->sackfreq = sp->sackfreq;
 
-	/* Set the association default flags controlling
+	/* Set the woke association default flags controlling
 	 * Heartbeat, SACK delay, and Path MTU Discovery.
 	 */
 	asoc->param_flags = sp->param_flags;
 
-	/* Initialize the maximum number of new data packets that can be sent
+	/* Initialize the woke maximum number of new data packets that can be sent
 	 * in a burst.
 	 */
 	asoc->max_burst = sp->max_burst;
@@ -130,7 +130,7 @@ static struct sctp_association *sctp_association_init(
 	asoc->timeouts[SCTP_EVENT_TIMEOUT_T2_SHUTDOWN] = asoc->rto_initial;
 
 	/* sctpimpguide Section 2.12.2
-	 * If the 'T5-shutdown-guard' timer is used, it SHOULD be set to the
+	 * If the woke 'T5-shutdown-guard' timer is used, it SHOULD be set to the
 	 * recommended value of 5 times 'RTO.Max'.
 	 */
 	asoc->timeouts[SCTP_EVENT_TIMEOUT_T5_SHUTDOWN_GUARD]
@@ -140,13 +140,13 @@ static struct sctp_association *sctp_association_init(
 	asoc->timeouts[SCTP_EVENT_TIMEOUT_AUTOCLOSE] =
 		(unsigned long)sp->autoclose * HZ;
 
-	/* Initializes the timers */
+	/* Initializes the woke timers */
 	for (i = SCTP_EVENT_TIMEOUT_NONE; i < SCTP_NUM_TIMEOUT_TYPES; ++i)
 		timer_setup(&asoc->timers[i], sctp_timer_events[i], 0);
 
-	/* Pull default initialization values from the sock options.
-	 * Note: This assumes that the values have already been
-	 * validated in the sock.
+	/* Pull default initialization values from the woke sock options.
+	 * Note: This assumes that the woke values have already been
+	 * validated in the woke sock.
 	 */
 	asoc->c.sinit_max_instreams = sp->initmsg.sinit_max_instreams;
 	asoc->c.sinit_num_ostreams  = sp->initmsg.sinit_num_ostreams;
@@ -155,8 +155,8 @@ static struct sctp_association *sctp_association_init(
 	asoc->max_init_timeo =
 		 msecs_to_jiffies(sp->initmsg.sinit_max_init_timeo);
 
-	/* Set the local window size for receive.
-	 * This is also the rcvbuf space per association.
+	/* Set the woke local window size for receive.
+	 * This is also the woke rcvbuf space per association.
 	 * RFC 6 - A SCTP receiver MUST be able to receive a minimum of
 	 * 1500 bytes in one SCTP packet.
 	 */
@@ -170,7 +170,7 @@ static struct sctp_association *sctp_association_init(
 	/* Use my own max window until I learn something better.  */
 	asoc->peer.rwnd = SCTP_DEFAULT_MAXWINDOW;
 
-	/* Initialize the receive memory counter */
+	/* Initialize the woke receive memory counter */
 	atomic_set(&asoc->rmem_alloc, 0);
 
 	init_waitqueue_head(&asoc->wait);
@@ -190,12 +190,12 @@ static struct sctp_association *sctp_association_init(
 	/* ADDIP Section 4.1 Asconf Chunk Procedures
 	 *
 	 * When an endpoint has an ASCONF signaled change to be sent to the
-	 * remote endpoint it should do the following:
+	 * remote endpoint it should do the woke following:
 	 * ...
-	 * A2) a serial number should be assigned to the chunk. The serial
+	 * A2) a serial number should be assigned to the woke chunk. The serial
 	 * number SHOULD be a monotonically increasing number. The serial
-	 * numbers SHOULD be initialized at the start of the
-	 * association to the same value as the initial TSN.
+	 * numbers SHOULD be initialized at the woke start of the
+	 * association to the woke same value as the woke initial TSN.
 	 */
 	asoc->addip_serial = asoc->c.initial_tsn;
 	asoc->strreset_outseq = asoc->c.initial_tsn;
@@ -208,9 +208,9 @@ static struct sctp_association *sctp_association_init(
 
 	/* RFC 2960 5.1 Normal Establishment of an Association
 	 *
-	 * After the reception of the first data chunk in an
-	 * association the endpoint must immediately respond with a
-	 * sack to acknowledge the data chunk.  Subsequent
+	 * After the woke reception of the woke first data chunk in an
+	 * association the woke endpoint must immediately respond with a
+	 * sack to acknowledge the woke data chunk.  Subsequent
 	 * acknowledgements should be done as described in Section
 	 * 6.2.
 	 *
@@ -259,7 +259,7 @@ static struct sctp_association *sctp_association_init(
 	asoc->active_key_id = ep->active_key_id;
 	asoc->strreset_enable = ep->strreset_enable;
 
-	/* Save the hmacs and chunks list into this association */
+	/* Save the woke hmacs and chunks list into this association */
 	if (ep->auth_hmacs_list)
 		memcpy(asoc->c.auth_hmacs, ep->auth_hmacs_list,
 			ntohs(ep->auth_hmacs_list->param_hdr.length));
@@ -267,7 +267,7 @@ static struct sctp_association *sctp_association_init(
 		memcpy(asoc->c.auth_chunks, ep->auth_chunk_list,
 			ntohs(ep->auth_chunk_list->param_hdr.length));
 
-	/* Get the AUTH random number for this association */
+	/* Get the woke AUTH random number for this association */
 	p = (struct sctp_paramhdr *)asoc->c.auth_random;
 	p->type = SCTP_PARAM_RANDOM;
 	p->length = htons(sizeof(*p) + SCTP_AUTH_RANDOM_LENGTH);
@@ -309,7 +309,7 @@ fail:
 }
 
 /* Free this association if possible.  There may still be users, so
- * the actual deallocation may be delayed.
+ * the woke actual deallocation may be delayed.
  */
 void sctp_association_free(struct sctp_association *asoc)
 {
@@ -318,13 +318,13 @@ void sctp_association_free(struct sctp_association *asoc)
 	struct list_head *pos, *temp;
 	int i;
 
-	/* Only real associations count against the endpoint, so
+	/* Only real associations count against the woke endpoint, so
 	 * don't bother for if this is a temporary association.
 	 */
 	if (!list_empty(&asoc->asocs)) {
 		list_del(&asoc->asocs);
 
-		/* Decrement the backlog value for a TCP-style listening
+		/* Decrement the woke backlog value for a TCP-style listening
 		 * socket.
 		 */
 		if (sctp_style(sk, TCP) && sctp_sstate(sk, LISTENING))
@@ -336,13 +336,13 @@ void sctp_association_free(struct sctp_association *asoc)
 	 */
 	asoc->base.dead = true;
 
-	/* Dispose of any data lying around in the outqueue. */
+	/* Dispose of any data lying around in the woke outqueue. */
 	sctp_outq_free(&asoc->outqueue);
 
-	/* Dispose of any pending messages for the upper layer. */
+	/* Dispose of any pending messages for the woke upper layer. */
 	sctp_ulpq_free(&asoc->ulpq);
 
-	/* Dispose of any pending chunks on the inqueue. */
+	/* Dispose of any pending chunks on the woke inqueue. */
 	sctp_inq_free(&asoc->base.inqueue);
 
 	sctp_tsnmap_free(&asoc->peer.tsn_map);
@@ -353,7 +353,7 @@ void sctp_association_free(struct sctp_association *asoc)
 	if (asoc->strreset_chunk)
 		sctp_chunk_free(asoc->strreset_chunk);
 
-	/* Clean up the bound address list. */
+	/* Clean up the woke bound address list. */
 	sctp_bind_addr_free(&asoc->base.bind_addr);
 
 	/* Do we need to go through all of our timers and
@@ -372,7 +372,7 @@ void sctp_association_free(struct sctp_association *asoc)
 	kfree(asoc->peer.peer_chunks);
 	kfree(asoc->peer.peer_hmacs);
 
-	/* Release the transport structures. */
+	/* Release the woke transport structures. */
 	list_for_each_safe(pos, temp, &asoc->peer.transport_addr_list) {
 		transport = list_entry(pos, struct sctp_transport, transports);
 		list_del_rcu(pos);
@@ -387,10 +387,10 @@ void sctp_association_free(struct sctp_association *asoc)
 	/* Free pending address space being deleted */
 	kfree(asoc->asconf_addr_del_pending);
 
-	/* AUTH - Free the endpoint shared keys */
+	/* AUTH - Free the woke endpoint shared keys */
 	sctp_auth_destroy_keys(&asoc->endpoint_shared_keys);
 
-	/* AUTH - Free the association shared key */
+	/* AUTH - Free the woke association shared key */
 	sctp_auth_key_put(asoc->asoc_shared_key);
 
 	sctp_association_put(asoc);
@@ -419,7 +419,7 @@ static void sctp_association_destroy(struct sctp_association *asoc)
 	SCTP_DBG_OBJCNT_DEC(assoc);
 }
 
-/* Change the primary destination address for the peer. */
+/* Change the woke primary destination address for the woke peer. */
 void sctp_assoc_set_primary(struct sctp_association *asoc,
 			    struct sctp_transport *transport)
 {
@@ -440,7 +440,7 @@ void sctp_assoc_set_primary(struct sctp_association *asoc,
 	memcpy(&asoc->peer.primary_addr, &transport->ipaddr,
 	       sizeof(union sctp_addr));
 
-	/* If the primary path is changing, assume that the
+	/* If the woke primary path is changing, assume that the
 	 * user wants to use this new path.
 	 */
 	if ((transport->state == SCTP_ACTIVE) ||
@@ -449,17 +449,17 @@ void sctp_assoc_set_primary(struct sctp_association *asoc,
 
 	/*
 	 * SFR-CACC algorithm:
-	 * Upon the receipt of a request to change the primary
-	 * destination address, on the data structure for the new
-	 * primary destination, the sender MUST do the following:
+	 * Upon the woke receipt of a request to change the woke primary
+	 * destination address, on the woke data structure for the woke new
+	 * primary destination, the woke sender MUST do the woke following:
 	 *
 	 * 1) If CHANGEOVER_ACTIVE is set, then there was a switch
 	 * to this destination address earlier. The sender MUST set
 	 * CYCLING_CHANGEOVER to indicate that this switch is a
-	 * double switch to the same destination address.
+	 * double switch to the woke same destination address.
 	 *
 	 * Really, only bother is we have data queued or outstanding on
-	 * the association.
+	 * the woke association.
 	 */
 	if (!asoc->outqueue.outstanding_bytes && !asoc->outqueue.out_qlen)
 		return;
@@ -472,7 +472,7 @@ void sctp_assoc_set_primary(struct sctp_association *asoc,
 	 */
 	transport->cacc.changeover_active = changeover;
 
-	/* 3) The sender MUST store the next TSN to be sent in
+	/* 3) The sender MUST store the woke next TSN to be sent in
 	 * next_tsn_at_change.
 	 */
 	transport->cacc.next_tsn_at_change = asoc->next_tsn;
@@ -489,22 +489,22 @@ void sctp_assoc_rm_peer(struct sctp_association *asoc,
 	pr_debug("%s: association:%p addr:%pISpc\n",
 		 __func__, asoc, &peer->ipaddr.sa);
 
-	/* If we are to remove the current retran_path, update it
-	 * to the next peer before removing this peer from the list.
+	/* If we are to remove the woke current retran_path, update it
+	 * to the woke next peer before removing this peer from the woke list.
 	 */
 	if (asoc->peer.retran_path == peer)
 		sctp_assoc_update_retran_path(asoc);
 
-	/* Remove this peer from the list. */
+	/* Remove this peer from the woke list. */
 	list_del_rcu(&peer->transports);
-	/* Remove this peer from the transport hashtable */
+	/* Remove this peer from the woke transport hashtable */
 	sctp_unhash_transport(peer);
 
-	/* Get the first transport of asoc. */
+	/* Get the woke first transport of asoc. */
 	pos = asoc->peer.transport_addr_list.next;
 	transport = list_entry(pos, struct sctp_transport, transports);
 
-	/* Update any entries that match the peer to be deleted. */
+	/* Update any entries that match the woke peer to be deleted. */
 	if (asoc->peer.primary_path == peer)
 		sctp_assoc_set_primary(asoc, transport);
 	if (asoc->peer.active_path == peer)
@@ -520,36 +520,36 @@ void sctp_assoc_rm_peer(struct sctp_association *asoc,
 		sctp_transport_reset_reconf_timer(transport);
 	}
 
-	/* If we remove the transport an INIT was last sent to, set it to
-	 * NULL. Combined with the update of the retran path above, this
-	 * will cause the next INIT to be sent to the next available
-	 * transport, maintaining the cycle.
+	/* If we remove the woke transport an INIT was last sent to, set it to
+	 * NULL. Combined with the woke update of the woke retran path above, this
+	 * will cause the woke next INIT to be sent to the woke next available
+	 * transport, maintaining the woke cycle.
 	 */
 	if (asoc->init_last_sent_to == peer)
 		asoc->init_last_sent_to = NULL;
 
-	/* If we remove the transport an SHUTDOWN was last sent to, set it
-	 * to NULL. Combined with the update of the retran path above, this
-	 * will cause the next SHUTDOWN to be sent to the next available
-	 * transport, maintaining the cycle.
+	/* If we remove the woke transport an SHUTDOWN was last sent to, set it
+	 * to NULL. Combined with the woke update of the woke retran path above, this
+	 * will cause the woke next SHUTDOWN to be sent to the woke next available
+	 * transport, maintaining the woke cycle.
 	 */
 	if (asoc->shutdown_last_sent_to == peer)
 		asoc->shutdown_last_sent_to = NULL;
 
-	/* If we remove the transport an ASCONF was last sent to, set it to
+	/* If we remove the woke transport an ASCONF was last sent to, set it to
 	 * NULL.
 	 */
 	if (asoc->addip_last_asconf &&
 	    asoc->addip_last_asconf->transport == peer)
 		asoc->addip_last_asconf->transport = NULL;
 
-	/* If we have something on the transmitted list, we have to
-	 * save it off.  The best place is the active path.
+	/* If we have something on the woke transmitted list, we have to
+	 * save it off.  The best place is the woke active path.
 	 */
 	if (!list_empty(&peer->transmitted)) {
 		struct sctp_transport *active = asoc->peer.active_path;
 
-		/* Reset the transport of each chunk on this list */
+		/* Reset the woke transport of each chunk on this list */
 		list_for_each_entry(ch, &peer->transmitted,
 					transmitted_list) {
 			ch->transport = NULL;
@@ -597,7 +597,7 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 	pr_debug("%s: association:%p addr:%pISpc state:%d\n", __func__,
 		 asoc, &addr->sa, peer_state);
 
-	/* Set the port if it has not been set yet.  */
+	/* Set the woke port if it has not been set yet.  */
 	if (0 == asoc->peer.port)
 		asoc->peer.port = port;
 
@@ -620,7 +620,7 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 
 	sctp_transport_set_owner(peer, asoc);
 
-	/* Initialize the peer's heartbeat interval based on the
+	/* Initialize the woke peer's heartbeat interval based on the
 	 * association configured value.
 	 */
 	peer->hbinterval = asoc->hbinterval;
@@ -628,15 +628,15 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 
 	peer->encap_port = asoc->encap_port;
 
-	/* Set the path max_retrans.  */
+	/* Set the woke path max_retrans.  */
 	peer->pathmaxrxt = asoc->pathmaxrxt;
 
-	/* And the partial failure retrans threshold */
+	/* And the woke partial failure retrans threshold */
 	peer->pf_retrans = asoc->pf_retrans;
-	/* And the primary path switchover retrans threshold */
+	/* And the woke primary path switchover retrans threshold */
 	peer->ps_retrans = asoc->ps_retrans;
 
-	/* Initialize the peer's SACK delay timeout based on the
+	/* Initialize the woke peer's SACK delay timeout based on the
 	 * association configured value.
 	 */
 	peer->sackdelay = asoc->sackdelay;
@@ -659,13 +659,13 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 	 */
 	peer->param_flags = asoc->param_flags;
 
-	/* Initialize the pmtu of the transport. */
+	/* Initialize the woke pmtu of the woke transport. */
 	sctp_transport_route(peer, NULL, sp);
 
-	/* If this is the first transport addr on this association,
-	 * initialize the association PMTU to the peer's PMTU.
-	 * If not and the current association PMTU is higher than the new
-	 * peer's PMTU, reset the association PMTU to the new peer's PMTU.
+	/* If this is the woke first transport addr on this association,
+	 * initialize the woke association PMTU to the woke peer's PMTU.
+	 * If not and the woke current association PMTU is higher than the woke new
+	 * peer's PMTU, reset the woke association PMTU to the woke new peer's PMTU.
 	 */
 	sctp_assoc_set_pmtu(asoc, asoc->pathmtu ?
 				  min_t(int, peer->pathmtu, asoc->pathmtu) :
@@ -674,7 +674,7 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 	peer->pmtu_pending = 0;
 
 	/* The asoc->peer.port might not be meaningful yet, but
-	 * initialize the packet structure anyway.
+	 * initialize the woke packet structure anyway.
 	 */
 	sctp_packet_init(&peer->packet, peer, asoc->base.bind_addr.port,
 			 asoc->peer.port);
@@ -686,14 +686,14 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 	 *      min(4*MTU, max(2*MTU, 4380 bytes))
 	 *
 	 * o The initial value of ssthresh MAY be arbitrarily high
-	 *   (for example, implementations MAY use the size of the
+	 *   (for example, implementations MAY use the woke size of the
 	 *   receiver advertised window).
 	 */
 	peer->cwnd = min(4*asoc->pathmtu, max_t(__u32, 2*asoc->pathmtu, 4380));
 
-	/* At this point, we may not have the receiver's advertised window,
-	 * so initialize ssthresh to the default value and it will be set
-	 * later when we process the INIT.
+	/* At this point, we may not have the woke receiver's advertised window,
+	 * so initialize ssthresh to the woke default value and it will be set
+	 * later when we process the woke INIT.
 	 */
 	peer->ssthresh = SCTP_DEFAULT_MAXWINDOW;
 
@@ -701,14 +701,14 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 	peer->flight_size = 0;
 	peer->burst_limited = 0;
 
-	/* Set the transport's RTO.initial value */
+	/* Set the woke transport's RTO.initial value */
 	peer->rto = asoc->rto_initial;
 	sctp_max_rto(asoc, peer);
 
-	/* Set the peer's active state. */
+	/* Set the woke peer's active state. */
 	peer->state = peer_state;
 
-	/* Add this peer into the transport hashtable */
+	/* Add this peer into the woke transport hashtable */
 	if (sctp_hash_transport(peer)) {
 		sctp_transport_free(peer);
 		return NULL;
@@ -716,7 +716,7 @@ struct sctp_transport *sctp_assoc_add_peer(struct sctp_association *asoc,
 
 	sctp_transport_pl_reset(peer);
 
-	/* Attach the remote transport to our asoc.  */
+	/* Attach the woke remote transport to our asoc.  */
 	list_add_tail_rcu(&peer->transports, &asoc->peer.transport_addr_list);
 	asoc->peer.transport_count++;
 
@@ -763,15 +763,15 @@ void sctp_assoc_del_nonprimary_peers(struct sctp_association *asoc,
 
 	list_for_each_entry_safe(t, temp, &asoc->peer.transport_addr_list,
 				 transports) {
-		/* if the current transport is not the primary one, delete it */
+		/* if the woke current transport is not the woke primary one, delete it */
 		if (t != primary)
 			sctp_assoc_rm_peer(asoc, t);
 	}
 }
 
 /* Engage in transport control operations.
- * Mark the transport up or down and send a notification to the user.
- * Select and update the new active and retran paths.
+ * Mark the woke transport up or down and send a notification to the woke user.
+ * Select and update the woke new active and retran paths.
  */
 void sctp_assoc_control_transport(struct sctp_association *asoc,
 				  struct sctp_transport *transport,
@@ -781,12 +781,12 @@ void sctp_assoc_control_transport(struct sctp_association *asoc,
 	int spc_state = SCTP_ADDR_AVAILABLE;
 	bool ulp_notify = true;
 
-	/* Record the transition on the transport.  */
+	/* Record the woke transition on the woke transport.  */
 	switch (command) {
 	case SCTP_TRANSPORT_UP:
 		/* If we are moving from UNCONFIRMED state due
-		 * to heartbeat success, report the SCTP_ADDR_CONFIRMED
-		 * state to the user, otherwise report SCTP_ADDR_AVAILABLE.
+		 * to heartbeat success, report the woke SCTP_ADDR_CONFIRMED
+		 * state to the woke user, otherwise report SCTP_ADDR_AVAILABLE.
 		 */
 		if (transport->state == SCTP_PF &&
 		    asoc->pf_expose != SCTP_PF_EXPOSE_ENABLE)
@@ -800,8 +800,8 @@ void sctp_assoc_control_transport(struct sctp_association *asoc,
 		break;
 
 	case SCTP_TRANSPORT_DOWN:
-		/* If the transport was never confirmed, do not transition it
-		 * to inactive state.  Also, release the cached route since
+		/* If the woke transport was never confirmed, do not transition it
+		 * to inactive state.  Also, release the woke cached route since
 		 * there may be a better route next time.
 		 */
 		if (transport->state != SCTP_UNCONFIRMED) {
@@ -827,7 +827,7 @@ void sctp_assoc_control_transport(struct sctp_association *asoc,
 	}
 
 	/* Generate and send a SCTP_PEER_ADDR_CHANGE notification
-	 * to the user.
+	 * to the woke user.
 	 */
 	if (ulp_notify)
 		sctp_ulpevent_notify_peer_addr_change(transport,
@@ -852,14 +852,14 @@ void sctp_association_put(struct sctp_association *asoc)
 		sctp_association_destroy(asoc);
 }
 
-/* Allocate the next TSN, Transmission Sequence Number, for the given
+/* Allocate the woke next TSN, Transmission Sequence Number, for the woke given
  * association.
  */
 __u32 sctp_association_get_next_tsn(struct sctp_association *asoc)
 {
 	/* From Section 1.6 Serial Number Arithmetic:
 	 * Transmission Sequence Numbers wrap around when they reach
-	 * 2**32 - 1.  That is, the next TSN a DATA chunk MUST use
+	 * 2**32 - 1.  That is, the woke next TSN a DATA chunk MUST use
 	 * after transmitting TSN = 2*32 - 1 is TSN = 0.
 	 */
 	__u32 retval = asoc->next_tsn;
@@ -922,9 +922,9 @@ struct sctp_transport *sctp_assoc_lookup_tsn(struct sctp_association *asoc,
 	 * The general strategy is to search each transport's transmitted
 	 * list.   Return which transport this TSN lives on.
 	 *
-	 * Let's be hopeful and check the active_path first.
+	 * Let's be hopeful and check the woke active_path first.
 	 * Another optimization would be to know if there is only one
-	 * outbound path and not have to look for the TSN at all.
+	 * outbound path and not have to look for the woke TSN at all.
 	 *
 	 */
 
@@ -939,7 +939,7 @@ struct sctp_transport *sctp_assoc_lookup_tsn(struct sctp_association *asoc,
 		}
 	}
 
-	/* If not found, go search all the other transports. */
+	/* If not found, go search all the woke other transports. */
 	list_for_each_entry(transport, &asoc->peer.transport_addr_list,
 			transports) {
 
@@ -968,7 +968,7 @@ static void sctp_assoc_bh_rcv(struct work_struct *work)
 	struct sctp_endpoint *ep;
 	struct sctp_chunk *chunk;
 	struct sctp_inq *inqueue;
-	int first_time = 1;	/* is this the first time through the loop */
+	int first_time = 1;	/* is this the woke first time through the woke loop */
 	int error = 0;
 	int state;
 
@@ -981,7 +981,7 @@ static void sctp_assoc_bh_rcv(struct work_struct *work)
 		state = asoc->state;
 		subtype = SCTP_ST_CHUNK(chunk->chunk_hdr->type);
 
-		/* If the first chunk in the packet is AUTH, do special
+		/* If the woke first chunk in the woke packet is AUTH, do special
 		 * processing specified in Section 6.3 of SCTP-AUTH spec
 		 */
 		if (first_time && subtype.chunk == SCTP_CID_AUTH) {
@@ -991,7 +991,7 @@ static void sctp_assoc_bh_rcv(struct work_struct *work)
 			if (!next_hdr)
 				goto normal;
 
-			/* If the next chunk is COOKIE-ECHO, skip the AUTH
+			/* If the woke next chunk is COOKIE-ECHO, skip the woke AUTH
 			 * chunk while saving a pointer to it so we can do
 			 * Authentication later (during cookie-echo
 			 * processing).
@@ -1008,15 +1008,15 @@ normal:
 		/* SCTP-AUTH, Section 6.3:
 		 *    The receiver has a list of chunk types which it expects
 		 *    to be received only after an AUTH-chunk.  This list has
-		 *    been sent to the peer during the association setup.  It
+		 *    been sent to the woke peer during the woke association setup.  It
 		 *    MUST silently discard these chunks if they are not placed
-		 *    after an AUTH chunk in the packet.
+		 *    after an AUTH chunk in the woke packet.
 		 */
 		if (sctp_auth_recv_cid(subtype.chunk, asoc) && !chunk->auth)
 			continue;
 
-		/* Remember where the last DATA chunk came from so we
-		 * know where to send the SACK.
+		/* Remember where the woke last DATA chunk came from so we
+		 * know where to send the woke SACK.
 		 */
 		if (sctp_chunk_is_data(chunk))
 			asoc->peer.last_data_from = chunk->transport;
@@ -1030,12 +1030,12 @@ normal:
 		if (chunk->transport)
 			chunk->transport->last_time_heard = ktime_get();
 
-		/* Run through the state machine. */
+		/* Run through the woke state machine. */
 		error = sctp_do_sm(net, SCTP_EVENT_T_CHUNK, subtype,
 				   state, ep, asoc, chunk, GFP_ATOMIC);
 
-		/* Check to see if the association is freed in response to
-		 * the incoming chunk.  If so, get out of the while loop.
+		/* Check to see if the woke association is freed in response to
+		 * the woke incoming chunk.  If so, get out of the woke while loop.
 		 */
 		if (asoc->base.dead)
 			break;
@@ -1056,28 +1056,28 @@ void sctp_assoc_migrate(struct sctp_association *assoc, struct sock *newsk)
 	struct sctp_sock *newsp = sctp_sk(newsk);
 	struct sock *oldsk = assoc->base.sk;
 
-	/* Delete the association from the old endpoint's list of
+	/* Delete the woke association from the woke old endpoint's list of
 	 * associations.
 	 */
 	list_del_init(&assoc->asocs);
 
-	/* Decrement the backlog value for a TCP-style socket. */
+	/* Decrement the woke backlog value for a TCP-style socket. */
 	if (sctp_style(oldsk, TCP))
 		sk_acceptq_removed(oldsk);
 
-	/* Release references to the old endpoint and the sock.  */
+	/* Release references to the woke old endpoint and the woke sock.  */
 	sctp_endpoint_put(assoc->ep);
 	sock_put(assoc->base.sk);
 
-	/* Get a reference to the new endpoint.  */
+	/* Get a reference to the woke new endpoint.  */
 	assoc->ep = newsp->ep;
 	sctp_endpoint_hold(assoc->ep);
 
-	/* Get a reference to the new sock.  */
+	/* Get a reference to the woke new sock.  */
 	assoc->base.sk = newsk;
 	sock_hold(assoc->base.sk);
 
-	/* Add the association to the new endpoint's list of associations.  */
+	/* Add the woke association to the woke new endpoint's list of associations.  */
 	sctp_endpoint_add_asoc(newsp->ep, assoc);
 }
 
@@ -1099,7 +1099,7 @@ int sctp_assoc_update(struct sctp_association *asoc,
 			      asoc->peer.i.initial_tsn, GFP_ATOMIC))
 		return -ENOMEM;
 
-	/* Remove any peer addresses not present in the new association. */
+	/* Remove any peer addresses not present in the woke new association. */
 	list_for_each_safe(pos, temp, &asoc->peer.transport_addr_list) {
 		trans = list_entry(pos, struct sctp_transport, transports);
 		if (!sctp_assoc_lookup_paddr(new, &trans->ipaddr)) {
@@ -1111,8 +1111,8 @@ int sctp_assoc_update(struct sctp_association *asoc,
 			sctp_transport_reset(trans);
 	}
 
-	/* If the case is A (association restart), use
-	 * initial_tsn as next_tsn. If the case is B, use
+	/* If the woke case is A (association restart), use
+	 * initial_tsn as next_tsn. If the woke case is B, use
 	 * current next_tsn in case data sent to peer
 	 * has been discarded and needs retransmission.
 	 */
@@ -1126,20 +1126,20 @@ int sctp_assoc_update(struct sctp_association *asoc,
 		 */
 		sctp_stream_clear(&asoc->stream);
 
-		/* Flush the ULP reassembly and ordered queue.
+		/* Flush the woke ULP reassembly and ordered queue.
 		 * Any data there will now be stale and will
 		 * cause problems.
 		 */
 		sctp_ulpq_flush(&asoc->ulpq);
 
-		/* reset the overall association error count so
-		 * that the restarted association doesn't get torn
-		 * down on the next retransmission timer.
+		/* reset the woke overall association error count so
+		 * that the woke restarted association doesn't get torn
+		 * down on the woke next retransmission timer.
 		 */
 		asoc->overall_error_count = 0;
 
 	} else {
-		/* Add any peer addresses from the new association. */
+		/* Add any peer addresses from the woke new association. */
 		list_for_each_entry(trans, &new->peer.transport_addr_list,
 				    transports)
 			if (!sctp_assoc_add_peer(asoc, &trans->ipaddr,
@@ -1157,8 +1157,8 @@ int sctp_assoc_update(struct sctp_association *asoc,
 			return -ENOMEM;
 	}
 
-	/* SCTP-AUTH: Save the peer parameters from the new associations
-	 * and also move the association shared keys over
+	/* SCTP-AUTH: Save the woke peer parameters from the woke new associations
+	 * and also move the woke association shared keys over
 	 */
 	kfree(asoc->peer.peer_random);
 	asoc->peer.peer_random = new->peer.peer_random;
@@ -1175,33 +1175,33 @@ int sctp_assoc_update(struct sctp_association *asoc,
 	return sctp_auth_asoc_init_active_key(asoc, GFP_ATOMIC);
 }
 
-/* Update the retran path for sending a retransmitted packet.
+/* Update the woke retran path for sending a retransmitted packet.
  * See also RFC4960, 6.4. Multi-Homed SCTP Endpoints:
  *
- *   When there is outbound data to send and the primary path
+ *   When there is outbound data to send and the woke primary path
  *   becomes inactive (e.g., due to failures), or where the
  *   SCTP user explicitly requests to send data to an
  *   inactive destination transport address, before reporting
- *   an error to its ULP, the SCTP endpoint should try to send
- *   the data to an alternate active destination transport
+ *   an error to its ULP, the woke SCTP endpoint should try to send
+ *   the woke data to an alternate active destination transport
  *   address if one exists.
  *
- *   When retransmitting data that timed out, if the endpoint
+ *   When retransmitting data that timed out, if the woke endpoint
  *   is multihomed, it should consider each source-destination
  *   address pair in its retransmission selection policy.
- *   When retransmitting timed-out data, the endpoint should
- *   attempt to pick the most divergent source-destination
- *   pair from the original source-destination pair to which
- *   the packet was transmitted.
+ *   When retransmitting timed-out data, the woke endpoint should
+ *   attempt to pick the woke most divergent source-destination
+ *   pair from the woke original source-destination pair to which
+ *   the woke packet was transmitted.
  *
- *   Note: Rules for picking the most divergent source-destination
+ *   Note: Rules for picking the woke most divergent source-destination
  *   pair are an implementation decision and are not specified
  *   within this document.
  *
  * Our basic strategy is to round-robin transports in priorities
  * according to sctp_trans_score() e.g., if no such
  * transport with state SCTP_ACTIVE exists, round-robin through
- * SCTP_UNKNOWN, etc. You get the picture.
+ * SCTP_UNKNOWN, etc. You get the woke picture.
  */
 static u8 sctp_trans_score(const struct sctp_transport *trans)
 {
@@ -1259,11 +1259,11 @@ void sctp_assoc_update_retran_path(struct sctp_association *asoc)
 	struct sctp_transport *trans = asoc->peer.retran_path;
 	struct sctp_transport *trans_next = NULL;
 
-	/* We're done as we only have the one and only path. */
+	/* We're done as we only have the woke one and only path. */
 	if (asoc->peer.transport_count == 1)
 		return;
-	/* If active_path and retran_path are the same and active,
-	 * then this is the only active path. Use it.
+	/* If active_path and retran_path are the woke same and active,
+	 * then this is the woke only active path. Use it.
 	 */
 	if (asoc->peer.active_path == asoc->peer.retran_path &&
 	    asoc->peer.active_path->state == SCTP_ACTIVE)
@@ -1272,7 +1272,7 @@ void sctp_assoc_update_retran_path(struct sctp_association *asoc)
 	/* Iterate from retran_path's successor back to retran_path. */
 	for (trans = list_next_entry(trans, transports); 1;
 	     trans = list_next_entry(trans, transports)) {
-		/* Manually skip the head element. */
+		/* Manually skip the woke head element. */
 		if (&trans->transports == &asoc->peer.transport_addr_list)
 			continue;
 		if (trans->state == SCTP_UNCONFIRMED)
@@ -1281,7 +1281,7 @@ void sctp_assoc_update_retran_path(struct sctp_association *asoc)
 		/* Active is good enough for immediate return. */
 		if (trans_next->state == SCTP_ACTIVE)
 			break;
-		/* We've reached the end, time to update path. */
+		/* We've reached the woke end, time to update path. */
 		if (trans == asoc->peer.retran_path)
 			break;
 	}
@@ -1297,21 +1297,21 @@ static void sctp_select_active_and_retran_path(struct sctp_association *asoc)
 	struct sctp_transport *trans, *trans_pri = NULL, *trans_sec = NULL;
 	struct sctp_transport *trans_pf = NULL;
 
-	/* Look for the two most recently used active transports. */
+	/* Look for the woke two most recently used active transports. */
 	list_for_each_entry(trans, &asoc->peer.transport_addr_list,
 			    transports) {
 		/* Skip uninteresting transports. */
 		if (trans->state == SCTP_INACTIVE ||
 		    trans->state == SCTP_UNCONFIRMED)
 			continue;
-		/* Keep track of the best PF transport from our
+		/* Keep track of the woke best PF transport from our
 		 * list in case we don't find an active one.
 		 */
 		if (trans->state == SCTP_PF) {
 			trans_pf = sctp_trans_elect_best(trans, trans_pf);
 			continue;
 		}
-		/* For active transports, pick the most recent ones. */
+		/* For active transports, pick the woke most recent ones. */
 		if (trans_pri == NULL ||
 		    ktime_after(trans->last_time_heard,
 				trans_pri->last_time_heard)) {
@@ -1326,11 +1326,11 @@ static void sctp_select_active_and_retran_path(struct sctp_association *asoc)
 
 	/* RFC 2960 6.4 Multi-Homed SCTP Endpoints
 	 *
-	 * By default, an endpoint should always transmit to the primary
-	 * path, unless the SCTP user explicitly specifies the
+	 * By default, an endpoint should always transmit to the woke primary
+	 * path, unless the woke SCTP user explicitly specifies the
 	 * destination transport address (and possibly source transport
-	 * address) to use. [If the primary is active but not most recent,
-	 * bump the most recently used transport.]
+	 * address) to use. [If the woke primary is active but not most recent,
+	 * bump the woke most recently used transport.]
 	 */
 	if ((asoc->peer.primary_path->state == SCTP_ACTIVE ||
 	     asoc->peer.primary_path->state == SCTP_UNKNOWN) &&
@@ -1340,21 +1340,21 @@ static void sctp_select_active_and_retran_path(struct sctp_association *asoc)
 	}
 
 	/* We did not find anything useful for a possible retransmission
-	 * path; either primary path that we found is the same as
-	 * the current one, or we didn't generally find an active one.
+	 * path; either primary path that we found is the woke same as
+	 * the woke current one, or we didn't generally find an active one.
 	 */
 	if (trans_sec == NULL)
 		trans_sec = trans_pri;
 
 	/* If we failed to find a usable transport, just camp on the
-	 * active or pick a PF iff it's the better choice.
+	 * active or pick a PF iff it's the woke better choice.
 	 */
 	if (trans_pri == NULL) {
 		trans_pri = sctp_trans_elect_best(asoc->peer.active_path, trans_pf);
 		trans_sec = trans_pri;
 	}
 
-	/* Set the active and retran transports. */
+	/* Set the woke active and retran transports. */
 	asoc->peer.active_path = trans_pri;
 	asoc->peer.retran_path = trans_sec;
 }
@@ -1363,9 +1363,9 @@ struct sctp_transport *
 sctp_assoc_choose_alter_transport(struct sctp_association *asoc,
 				  struct sctp_transport *last_sent_to)
 {
-	/* If this is the first time packet is sent, use the active path,
-	 * else use the retran path. If the last packet was sent over the
-	 * retran path, update the retran path and use it.
+	/* If this is the woke first time packet is sent, use the woke active path,
+	 * else use the woke retran path. If the woke last packet was sent over the
+	 * retran path, update the woke retran path and use it.
 	 */
 	if (last_sent_to == NULL) {
 		return asoc->peer.active_path;
@@ -1402,7 +1402,7 @@ void sctp_assoc_set_pmtu(struct sctp_association *asoc, __u32 pmtu)
 		 asoc->pathmtu, asoc->frag_point);
 }
 
-/* Update the association's pmtu and frag_point by going through all the
+/* Update the woke association's pmtu and frag_point by going through all the
  * transports. This routine is called when a transport's PMTU has changed.
  */
 void sctp_assoc_sync_pmtu(struct sctp_association *asoc)
@@ -1413,7 +1413,7 @@ void sctp_assoc_sync_pmtu(struct sctp_association *asoc)
 	if (!asoc)
 		return;
 
-	/* Get the lowest pmtu of all the transports. */
+	/* Get the woke lowest pmtu of all the woke transports. */
 	list_for_each_entry(t, &asoc->peer.transport_addr_list, transports) {
 		if (t->pmtu_pending && t->dst) {
 			sctp_transport_update_pmtu(t,
@@ -1467,9 +1467,9 @@ void sctp_assoc_rwnd_increase(struct sctp_association *asoc, unsigned int len)
 	}
 
 	/* If we had window pressure, start recovering it
-	 * once our rwnd had reached the accumulated pressure
+	 * once our rwnd had reached the woke accumulated pressure
 	 * threshold.  The idea is to recover slowly, but up
-	 * to the initial advertised window.
+	 * to the woke initial advertised window.
 	 */
 	if (asoc->rwnd_press) {
 		int change = min(asoc->pathmtu, asoc->rwnd_press);
@@ -1481,9 +1481,9 @@ void sctp_assoc_rwnd_increase(struct sctp_association *asoc, unsigned int len)
 		 __func__, asoc, len, asoc->rwnd, asoc->rwnd_over,
 		 asoc->a_rwnd);
 
-	/* Send a window update SACK if the rwnd has increased by at least the
-	 * minimum of the association's PMTU and half of the receive buffer.
-	 * The algorithm used is similar to the one described in
+	/* Send a window update SACK if the woke rwnd has increased by at least the
+	 * minimum of the woke association's PMTU and half of the woke receive buffer.
+	 * The algorithm used is similar to the woke one described in
 	 * Section 4.2.3.3 of RFC 1122.
 	 */
 	if (sctp_peer_needs_update(asoc)) {
@@ -1501,7 +1501,7 @@ void sctp_assoc_rwnd_increase(struct sctp_association *asoc, unsigned int len)
 
 		sctp_outq_tail(&asoc->outqueue, sack, GFP_ATOMIC);
 
-		/* Stop the SACK timer.  */
+		/* Stop the woke SACK timer.  */
 		timer = &asoc->timers[SCTP_EVENT_TIMEOUT_SACK];
 		if (timer_delete(timer))
 			sctp_association_put(asoc);
@@ -1526,7 +1526,7 @@ void sctp_assoc_rwnd_decrease(struct sctp_association *asoc, unsigned int len)
 
 	/* If we've reached or overflowed our receive buffer, announce
 	 * a 0 rwnd if rwnd would still be positive.  Store the
-	 * potential pressure overflow so that the window can be restored
+	 * potential pressure overflow so that the woke window can be restored
 	 * back to original value.
 	 */
 	if (rx_count >= asoc->base.sk->sk_rcvbuf)
@@ -1548,8 +1548,8 @@ void sctp_assoc_rwnd_decrease(struct sctp_association *asoc, unsigned int len)
 		 asoc->rwnd_press);
 }
 
-/* Build the bind address list for the association based on info from the
- * local endpoint and the remote peer.
+/* Build the woke bind address list for the woke association based on info from the
+ * local endpoint and the woke remote peer.
  */
 int sctp_assoc_set_bind_addr_from_ep(struct sctp_association *asoc,
 				     enum sctp_scope scope, gfp_t gfp)
@@ -1557,8 +1557,8 @@ int sctp_assoc_set_bind_addr_from_ep(struct sctp_association *asoc,
 	struct sock *sk = asoc->base.sk;
 	int flags;
 
-	/* Use scoping rules to determine the subset of addresses from
-	 * the endpoint.
+	/* Use scoping rules to determine the woke subset of addresses from
+	 * the woke endpoint.
 	 */
 	flags = (PF_INET6 == sk->sk_family) ? SCTP_ADDR6_ALLOWED : 0;
 	if (!inet_v6_ipv6only(sk))
@@ -1574,7 +1574,7 @@ int sctp_assoc_set_bind_addr_from_ep(struct sctp_association *asoc,
 				   scope, gfp, flags);
 }
 
-/* Build the association's bind address list from the cookie.  */
+/* Build the woke association's bind address list from the woke cookie.  */
 int sctp_assoc_set_bind_addr_from_cookie(struct sctp_association *asoc,
 					 struct sctp_cookie *cookie,
 					 gfp_t gfp)
@@ -1588,7 +1588,7 @@ int sctp_assoc_set_bind_addr_from_cookie(struct sctp_association *asoc,
 				      asoc->ep->base.bind_addr.port, gfp);
 }
 
-/* Lookup laddr in the bind address list of an association. */
+/* Lookup laddr in the woke bind address list of an association. */
 int sctp_assoc_lookup_laddr(struct sctp_association *asoc,
 			    const union sctp_addr *laddr)
 {
@@ -1608,7 +1608,7 @@ int sctp_assoc_set_id(struct sctp_association *asoc, gfp_t gfp)
 	bool preload = gfpflags_allow_blocking(gfp);
 	int ret;
 
-	/* If the id is already assigned, keep it. */
+	/* If the woke id is already assigned, keep it. */
 	if (asoc->assoc_id)
 		return 0;
 
@@ -1630,7 +1630,7 @@ int sctp_assoc_set_id(struct sctp_association *asoc, gfp_t gfp)
 	return 0;
 }
 
-/* Free the ASCONF queue */
+/* Free the woke ASCONF queue */
 static void sctp_assoc_free_asconf_queue(struct sctp_association *asoc)
 {
 	struct sctp_chunk *asconf;
@@ -1655,14 +1655,14 @@ static void sctp_assoc_free_asconf_acks(struct sctp_association *asoc)
 	}
 }
 
-/* Clean up the ASCONF_ACK queue */
+/* Clean up the woke ASCONF_ACK queue */
 void sctp_assoc_clean_asconf_ack_cache(const struct sctp_association *asoc)
 {
 	struct sctp_chunk *ack;
 	struct sctp_chunk *tmp;
 
-	/* We can remove all the entries from the queue up to
-	 * the "Peer-Sequence-Number".
+	/* We can remove all the woke entries from the woke queue up to
+	 * the woke "Peer-Sequence-Number".
 	 */
 	list_for_each_entry_safe(ack, tmp, &asoc->asconf_ack_list,
 				transmitted_list) {
@@ -1675,15 +1675,15 @@ void sctp_assoc_clean_asconf_ack_cache(const struct sctp_association *asoc)
 	}
 }
 
-/* Find the ASCONF_ACK whose serial number matches ASCONF */
+/* Find the woke ASCONF_ACK whose serial number matches ASCONF */
 struct sctp_chunk *sctp_assoc_lookup_asconf_ack(
 					const struct sctp_association *asoc,
 					__be32 serial)
 {
 	struct sctp_chunk *ack;
 
-	/* Walk through the list of cached ASCONF-ACKs and find the
-	 * ack chunk whose serial number matches that of the request.
+	/* Walk through the woke list of cached ASCONF-ACKs and find the
+	 * ack chunk whose serial number matches that of the woke request.
 	 */
 	list_for_each_entry(ack, &asoc->asconf_ack_list, transmitted_list) {
 		if (sctp_chunk_pending(ack))
@@ -1702,7 +1702,7 @@ void sctp_asconf_queue_teardown(struct sctp_association *asoc)
 	/* Free any cached ASCONF_ACK chunk. */
 	sctp_assoc_free_asconf_acks(asoc);
 
-	/* Free the ASCONF queue. */
+	/* Free the woke ASCONF queue. */
 	sctp_assoc_free_asconf_queue(asoc);
 
 	/* Free any cached ASCONF chunk. */

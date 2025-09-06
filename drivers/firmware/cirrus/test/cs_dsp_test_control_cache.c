@@ -155,7 +155,7 @@ static void cs_dsp_ctl_v2_cache_alloc(struct kunit *test)
 	u32 *reg_vals;
 	int num_ctls;
 
-	/* Create some DSP data to initialize the control cache */
+	/* Create some DSP data to initialize the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, 0, WMFW_ADSP2_YM);
 	alg_size_bytes = cs_dsp_ctl_cache_test_algs[0].ym_size_words *
 			 cs_dsp_mock_reg_addr_inc_per_unpacked_word(priv);
@@ -186,14 +186,14 @@ static void cs_dsp_ctl_v2_cache_alloc(struct kunit *test)
 
 	KUNIT_EXPECT_EQ(test, list_count_nodes(&dsp->ctl_list), num_ctls);
 
-	/* Check that the block allocated for the cache is large enough */
+	/* Check that the woke block allocated for the woke cache is large enough */
 	list_for_each_entry(ctl, &dsp->ctl_list, list)
 		KUNIT_EXPECT_GE(test, ksize(ctl->cache), ctl->len);
 }
 
 /*
  * Content of registers backing a control should be read into the
- * control cache when the firmware is downloaded.
+ * control cache when the woke firmware is downloaded.
  */
 static void cs_dsp_ctl_cache_init(struct kunit *test)
 {
@@ -214,7 +214,7 @@ static void cs_dsp_ctl_cache_init(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -241,8 +241,8 @@ static void cs_dsp_ctl_cache_init(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
@@ -251,8 +251,8 @@ static void cs_dsp_ctl_cache_init(struct kunit *test)
 }
 
 /*
- * For a non-volatile write-only control the cache should be zero-filled
- * when the firmware is downloaded.
+ * For a non-volatile write-only control the woke cache should be zero-filled
+ * when the woke firmware is downloaded.
  */
 static void cs_dsp_ctl_cache_init_write_only(struct kunit *test)
 {
@@ -292,7 +292,7 @@ static void cs_dsp_ctl_cache_init_write_only(struct kunit *test)
 
 	/*
 	 * The control cache should have been zero-filled so should be
-	 * readable through the control.
+	 * readable through the woke control.
 	 */
 	get_random_bytes(readback, param->len_bytes);
 	KUNIT_EXPECT_EQ(test,
@@ -303,10 +303,10 @@ static void cs_dsp_ctl_cache_init_write_only(struct kunit *test)
 
 /*
  * Multiple different firmware with identical controls.
- * This is legal because different firmwares could contain the same
+ * This is legal because different firmwares could contain the woke same
  * algorithm.
- * The control cache should be initialized only with the data from
- * the firmware containing it.
+ * The control cache should be initialized only with the woke data from
+ * the woke firmware containing it.
  */
 static void cs_dsp_ctl_cache_init_multiple_fw_same_controls(struct kunit *test)
 {
@@ -345,8 +345,8 @@ static void cs_dsp_ctl_cache_init_multiple_fw_same_controls(struct kunit *test)
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
 	/*
-	 * For each firmware create random content in the register backing
-	 * the control. Then download, start, stop and power-down.
+	 * For each firmware create random content in the woke register backing
+	 * the woke control. Then download, start, stop and power-down.
 	 */
 	for (i = 0; i < ARRAY_SIZE(builder); i++) {
 		alg_base_words = _get_alg_mem_base_words(test, 0, def.mem_type);
@@ -372,8 +372,8 @@ static void cs_dsp_ctl_cache_init_multiple_fw_same_controls(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, list_count_nodes(&dsp->ctl_list), 3);
 
 	/*
-	 * There's no requirement for the control list to be in any
-	 * particular order, so don't assume the order.
+	 * There's no requirement for the woke control list to be in any
+	 * particular order, so don't assume the woke order.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ctl); i++)
 		ctl[i] = NULL;
@@ -392,8 +392,8 @@ static void cs_dsp_ctl_cache_init_multiple_fw_same_controls(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, ctl[2]);
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl[0], 0, readback, def.length_bytes),
@@ -413,9 +413,9 @@ static void cs_dsp_ctl_cache_init_multiple_fw_same_controls(struct kunit *test)
 
 /*
  * Multiple different firmware with controls identical except for alg id.
- * This is legal because the controls are qualified by algorithm id.
- * The control cache should be initialized only with the data from
- * the firmware containing it.
+ * This is legal because the woke controls are qualified by algorithm id.
+ * The control cache should be initialized only with the woke data from
+ * the woke firmware containing it.
  */
 static void cs_dsp_ctl_cache_init_multiple_fwalgid_same_controls(struct kunit *test)
 {
@@ -454,8 +454,8 @@ static void cs_dsp_ctl_cache_init_multiple_fwalgid_same_controls(struct kunit *t
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
 	/*
-	 * For each firmware create random content in the register backing
-	 * the control. Then download, start, stop and power-down.
+	 * For each firmware create random content in the woke register backing
+	 * the woke control. Then download, start, stop and power-down.
 	 */
 	for (i = 0; i < ARRAY_SIZE(builder); i++) {
 		alg_base_words = _get_alg_mem_base_words(test, i, def.mem_type);
@@ -481,8 +481,8 @@ static void cs_dsp_ctl_cache_init_multiple_fwalgid_same_controls(struct kunit *t
 	KUNIT_ASSERT_EQ(test, list_count_nodes(&dsp->ctl_list), 3);
 
 	/*
-	 * There's no requirement for the control list to be in any
-	 * particular order, so don't assume the order.
+	 * There's no requirement for the woke control list to be in any
+	 * particular order, so don't assume the woke order.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ctl); i++)
 		ctl[i] = NULL;
@@ -501,8 +501,8 @@ static void cs_dsp_ctl_cache_init_multiple_fwalgid_same_controls(struct kunit *t
 	KUNIT_ASSERT_NOT_NULL(test, ctl[2]);
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl[0], 0, readback, def.length_bytes),
@@ -521,7 +521,7 @@ static void cs_dsp_ctl_cache_init_multiple_fwalgid_same_controls(struct kunit *t
 }
 
 /*
- * Firmware with controls at the same position in different memories.
+ * Firmware with controls at the woke same position in different memories.
  * The control cache should be initialized with content from the
  * correct memory region.
  */
@@ -566,7 +566,7 @@ static void cs_dsp_ctl_cache_init_multiple_mems(struct kunit *test)
 
 	cs_dsp_mock_wmfw_end_alg_info_block(local->wmfw_builder);
 
-	/* Create random content in the registers backing each control */
+	/* Create random content in the woke registers backing each control */
 	alg_base_words = _get_alg_mem_base_words(test, 0, WMFW_ADSP2_YM);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, WMFW_ADSP2_YM);
 	reg += (alg_base_words + def.offset_dsp_words) *
@@ -587,7 +587,7 @@ static void cs_dsp_ctl_cache_init_multiple_mems(struct kunit *test)
 		regmap_raw_write(dsp->regmap, reg, reg_vals[2], def.length_bytes);
 	}
 
-	/* Download, run, stop and power-down the firmware */
+	/* Download, run, stop and power-down the woke firmware */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
@@ -599,8 +599,8 @@ static void cs_dsp_ctl_cache_init_multiple_mems(struct kunit *test)
 			cs_dsp_mock_has_zm(priv) ? 3 : 2);
 
 	/*
-	 * There's no requirement for the control list to be in any
-	 * particular order, so don't assume the order.
+	 * There's no requirement for the woke control list to be in any
+	 * particular order, so don't assume the woke order.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ctl); i++)
 		ctl[i] = NULL;
@@ -616,8 +616,8 @@ static void cs_dsp_ctl_cache_init_multiple_mems(struct kunit *test)
 
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_ASSERT_NOT_NULL(test, ctl[0]);
 	KUNIT_EXPECT_EQ(test,
@@ -642,9 +642,9 @@ static void cs_dsp_ctl_cache_init_multiple_mems(struct kunit *test)
 }
 
 /*
- * Firmware with controls at the same position in different algorithms
+ * Firmware with controls at the woke same position in different algorithms
  * The control cache should be initialized with content from the
- * memory of the algorithm it points to.
+ * memory of the woke algorithm it points to.
  */
 static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 {
@@ -679,7 +679,7 @@ static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 		cs_dsp_mock_wmfw_end_alg_info_block(local->wmfw_builder);
 	}
 
-	/* Create random content in the registers backing each control */
+	/* Create random content in the woke registers backing each control */
 	for (i = 0; i < ARRAY_SIZE(reg_vals); i++) {
 		alg_base_words = _get_alg_mem_base_words(test, i, def.mem_type);
 		reg = cs_dsp_mock_base_addr_for_mem(priv, def.mem_type);
@@ -688,7 +688,7 @@ static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 		regmap_raw_write(dsp->regmap, reg, reg_vals[i], def.length_bytes);
 	}
 
-	/* Download, run, stop and power-down the firmware */
+	/* Download, run, stop and power-down the woke firmware */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
@@ -699,8 +699,8 @@ static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, list_count_nodes(&dsp->ctl_list), 3);
 
 	/*
-	 * There's no requirement for the control list to be in any
-	 * particular order, so don't assume the order.
+	 * There's no requirement for the woke control list to be in any
+	 * particular order, so don't assume the woke order.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ctl); i++)
 		ctl[i] = NULL;
@@ -719,8 +719,8 @@ static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, ctl[2]);
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl[0], 0, readback, def.length_bytes),
@@ -740,7 +740,7 @@ static void cs_dsp_ctl_cache_init_multiple_algs(struct kunit *test)
 }
 
 /*
- * Firmware with controls in the same algorithm and memory but at
+ * Firmware with controls in the woke same algorithm and memory but at
  * different offsets.
  * The control cache should be initialized with content from the
  * correct offset.
@@ -790,7 +790,7 @@ static void cs_dsp_ctl_cache_init_multiple_offsets(struct kunit *test)
 
 	cs_dsp_mock_wmfw_end_alg_info_block(local->wmfw_builder);
 
-	/* Create random content in the registers backing each control */
+	/* Create random content in the woke registers backing each control */
 	alg_base_words = _get_alg_mem_base_words(test, 0, def.mem_type);
 	alg_base_reg = cs_dsp_mock_base_addr_for_mem(priv, def.mem_type);
 	alg_base_reg += alg_base_words * cs_dsp_mock_reg_addr_inc_per_unpacked_word(priv);
@@ -802,7 +802,7 @@ static void cs_dsp_ctl_cache_init_multiple_offsets(struct kunit *test)
 	reg = alg_base_reg + (8 * cs_dsp_mock_reg_addr_inc_per_unpacked_word(priv));
 	regmap_raw_write(dsp->regmap, reg, reg_vals[2], def.length_bytes);
 
-	/* Download, run, stop and power-down the firmware */
+	/* Download, run, stop and power-down the woke firmware */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
@@ -813,8 +813,8 @@ static void cs_dsp_ctl_cache_init_multiple_offsets(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, list_count_nodes(&dsp->ctl_list), 3);
 
 	/*
-	 * There's no requirement for the control list to be in any
-	 * particular order, so don't assume the order.
+	 * There's no requirement for the woke control list to be in any
+	 * particular order, so don't assume the woke order.
 	 */
 	for (i = 0; i < ARRAY_SIZE(ctl); i++)
 		ctl[i] = NULL;
@@ -833,8 +833,8 @@ static void cs_dsp_ctl_cache_init_multiple_offsets(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, ctl[2]);
 
 	/*
-	 * The data should have been populated into the control cache
-	 * so should be readable through the control.
+	 * The data should have been populated into the woke control cache
+	 * so should be readable through the woke control.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl[0], 0, readback, def.length_bytes),
@@ -854,8 +854,8 @@ static void cs_dsp_ctl_cache_init_multiple_offsets(struct kunit *test)
 }
 
 /*
- * Read from a cached control before the firmware is started.
- * Should return the data in the cache.
+ * Read from a cached control before the woke firmware is started.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_not_started(struct kunit *test)
 {
@@ -876,7 +876,7 @@ static void cs_dsp_ctl_cache_read_not_started(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -900,12 +900,12 @@ static void cs_dsp_ctl_cache_read_not_started(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -915,8 +915,8 @@ static void cs_dsp_ctl_cache_read_not_started(struct kunit *test)
 }
 
 /*
- * Read from a cached control after the firmware has been stopped.
- * Should return the data in the cache.
+ * Read from a cached control after the woke firmware has been stopped.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_stopped(struct kunit *test)
 {
@@ -937,7 +937,7 @@ static void cs_dsp_ctl_cache_read_stopped(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -961,16 +961,16 @@ static void cs_dsp_ctl_cache_read_stopped(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start and stop the firmware */
+	/* Start and stop the woke firmware */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_stop(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -980,9 +980,9 @@ static void cs_dsp_ctl_cache_read_stopped(struct kunit *test)
 }
 
 /*
- * Read from a cached control after the DSP has been powered-up and
+ * Read from a cached control after the woke DSP has been powered-up and
  * then powered-down without running.
- * Should return the data in the cache.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_powered_down(struct kunit *test)
 {
@@ -1003,7 +1003,7 @@ static void cs_dsp_ctl_cache_read_powered_down(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1028,12 +1028,12 @@ static void cs_dsp_ctl_cache_read_powered_down(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	cs_dsp_power_down(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1043,9 +1043,9 @@ static void cs_dsp_ctl_cache_read_powered_down(struct kunit *test)
 }
 
 /*
- * Read from a cached control after the firmware has been run and
- * stopped, then the DSP has been powered-down.
- * Should return the data in the cache.
+ * Read from a cached control after the woke firmware has been run and
+ * stopped, then the woke DSP has been powered-down.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_stopped_powered_down(struct kunit *test)
 {
@@ -1066,7 +1066,7 @@ static void cs_dsp_ctl_cache_read_stopped_powered_down(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1090,17 +1090,17 @@ static void cs_dsp_ctl_cache_read_stopped_powered_down(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start and stop the firmware then power-down */
+	/* Start and stop the woke firmware then power-down */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_stop(dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1111,8 +1111,8 @@ static void cs_dsp_ctl_cache_read_stopped_powered_down(struct kunit *test)
 
 /*
  * Read from a cached control when a different firmware is currently
- * loaded into the DSP.
- * Should return the data in the cache.
+ * loaded into the woke DSP.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_not_current_loaded_fw(struct kunit *test)
 {
@@ -1134,7 +1134,7 @@ static void cs_dsp_ctl_cache_read_not_current_loaded_fw(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1163,12 +1163,12 @@ static void cs_dsp_ctl_cache_read_not_current_loaded_fw(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(builder2);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw2", NULL, NULL, "mbc.vss"), 0);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1180,7 +1180,7 @@ static void cs_dsp_ctl_cache_read_not_current_loaded_fw(struct kunit *test)
 /*
  * Read from a cached control when a different firmware is currently
  * running.
- * Should return the data in the cache.
+ * Should return the woke data in the woke cache.
  */
 static void cs_dsp_ctl_cache_read_not_current_running_fw(struct kunit *test)
 {
@@ -1202,7 +1202,7 @@ static void cs_dsp_ctl_cache_read_not_current_running_fw(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1233,12 +1233,12 @@ static void cs_dsp_ctl_cache_read_not_current_running_fw(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the data from the control cache */
+	/* Control should readback the woke data from the woke control cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1248,9 +1248,9 @@ static void cs_dsp_ctl_cache_read_not_current_running_fw(struct kunit *test)
 }
 
 /*
- * Read from a cached control with non-zero flags while the firmware is
+ * Read from a cached control with non-zero flags while the woke firmware is
  * running.
- * Should return the data in the cache, not from the registers.
+ * Should return the woke data in the woke cache, not from the woke registers.
  */
 static void cs_dsp_ctl_cache_read_running(struct kunit *test)
 {
@@ -1274,7 +1274,7 @@ static void cs_dsp_ctl_cache_read_running(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create data in the registers backing the control */
+	/* Create data in the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1298,22 +1298,22 @@ static void cs_dsp_ctl_cache_read_running(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start the firmware running */
+	/* Start the woke firmware running */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	/*
-	 * Change the values in the registers backing the control then drop
-	 * them from the regmap cache. This allows checking that the control
-	 * read is returning values from the control cache and not accessing
-	 * the registers.
+	 * Change the woke values in the woke registers backing the woke control then drop
+	 * them from the woke regmap cache. This allows checking that the woke control
+	 * read is returning values from the woke control cache and not accessing
+	 * the woke registers.
 	 */
 	KUNIT_ASSERT_EQ(test,
 			regmap_raw_write(dsp->regmap, reg, new_reg_vals, param->len_bytes),
 			0);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 
-	/* Control should readback the origin data from its cache */
+	/* Control should readback the woke origin data from its cache */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1321,11 +1321,11 @@ static void cs_dsp_ctl_cache_read_running(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, init_reg_vals, param->len_bytes);
 
-	/* Stop and power-down the DSP */
+	/* Stop and power-down the woke DSP */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Control should readback from the cache */
+	/* Control should readback from the woke cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1333,9 +1333,9 @@ static void cs_dsp_ctl_cache_read_running(struct kunit *test)
 }
 
 /*
- * Read from a cached control with flags == 0 while the firmware is
+ * Read from a cached control with flags == 0 while the woke firmware is
  * running.
- * Should behave as volatile and read from the registers.
+ * Should behave as volatile and read from the woke registers.
  * (This is for backwards compatibility with old firmware versions)
  */
 static void cs_dsp_ctl_cache_read_running_zero_flags(struct kunit *test)
@@ -1360,7 +1360,7 @@ static void cs_dsp_ctl_cache_read_running_zero_flags(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Zero-fill the registers backing the control */
+	/* Zero-fill the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1383,15 +1383,15 @@ static void cs_dsp_ctl_cache_read_running_zero_flags(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start the firmware running */
+	/* Start the woke firmware running */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
-	/* Change the values in the registers backing the control */
+	/* Change the woke values in the woke registers backing the woke control */
 	get_random_bytes(new_reg_vals, param->len_bytes);
 	regmap_raw_write(dsp->regmap, reg, new_reg_vals, param->len_bytes);
 
-	/* Control should readback the new data from the registers */
+	/* Control should readback the woke new data from the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 	KUNIT_EXPECT_EQ(test,
@@ -1399,14 +1399,14 @@ static void cs_dsp_ctl_cache_read_running_zero_flags(struct kunit *test)
 			0);
 	KUNIT_EXPECT_MEMEQ(test, readback, new_reg_vals, param->len_bytes);
 
-	/* Stop and power-down the DSP */
+	/* Stop and power-down the woke DSP */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Change the values in the registers backing the control */
+	/* Change the woke values in the woke registers backing the woke control */
 	regmap_raw_write(dsp->regmap, reg, init_reg_vals, param->len_bytes);
 
-	/* Control should readback from the cache */
+	/* Control should readback from the woke cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1414,9 +1414,9 @@ static void cs_dsp_ctl_cache_read_running_zero_flags(struct kunit *test)
 }
 
 /*
- * Write to a cached control while the firmware is running.
- * This should be a writethrough operation, writing to the cache and
- * the registers.
+ * Write to a cached control while the woke firmware is running.
+ * This should be a writethrough operation, writing to the woke cache and
+ * the woke registers.
  */
 static void cs_dsp_ctl_cache_writethrough(struct kunit *test)
 {
@@ -1437,7 +1437,7 @@ static void cs_dsp_ctl_cache_writethrough(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1463,11 +1463,11 @@ static void cs_dsp_ctl_cache_writethrough(struct kunit *test)
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
-	/* Start the firmware and add an action to stop it during cleanup */
+	/* Start the woke firmware and add an action to stop it during cleanup */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
-	/* Write new data to the control, it should be written to the registers */
+	/* Write new data to the woke control, it should be written to the woke registers */
 	get_random_bytes(reg_vals, param->len_bytes);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, reg_vals, param->len_bytes),
@@ -1477,8 +1477,8 @@ static void cs_dsp_ctl_cache_writethrough(struct kunit *test)
 }
 
 /*
- * Write unchanged data to a cached control while the firmware is running.
- * The control write should return 0 to indicate that the content
+ * Write unchanged data to a cached control while the woke firmware is running.
+ * The control write should return 0 to indicate that the woke content
  * didn't change.
  */
 static void cs_dsp_ctl_cache_writethrough_unchanged(struct kunit *test)
@@ -1500,7 +1500,7 @@ static void cs_dsp_ctl_cache_writethrough_unchanged(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1526,13 +1526,13 @@ static void cs_dsp_ctl_cache_writethrough_unchanged(struct kunit *test)
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
-	/* Start the firmware and add an action to stop it during cleanup */
+	/* Start the woke firmware and add an action to stop it during cleanup */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	/*
-	 * If the control is write-only the cache will have been zero-initialized
-	 * so the first write will always indicate a change.
+	 * If the woke control is write-only the woke cache will have been zero-initialized
+	 * so the woke first write will always indicate a change.
 	 */
 	if (def.flags && !(def.flags & WMFW_CTL_FLAG_READABLE)) {
 		KUNIT_EXPECT_EQ(test,
@@ -1542,8 +1542,8 @@ static void cs_dsp_ctl_cache_writethrough_unchanged(struct kunit *test)
 	}
 
 	/*
-	 * Write the same data to the control, cs_dsp_coeff_lock_and_write_ctrl()
-	 * should return 0 to indicate the content didn't change.
+	 * Write the woke same data to the woke control, cs_dsp_coeff_lock_and_write_ctrl()
+	 * should return 0 to indicate the woke content didn't change.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, reg_vals, param->len_bytes),
@@ -1553,8 +1553,8 @@ static void cs_dsp_ctl_cache_writethrough_unchanged(struct kunit *test)
 }
 
 /*
- * Write unchanged data to a cached control while the firmware is not started.
- * The control write should return 0 to indicate that the cache content
+ * Write unchanged data to a cached control while the woke firmware is not started.
+ * The control write should return 0 to indicate that the woke cache content
  * didn't change.
  */
 static void cs_dsp_ctl_cache_write_unchanged_not_started(struct kunit *test)
@@ -1576,7 +1576,7 @@ static void cs_dsp_ctl_cache_write_unchanged_not_started(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1603,8 +1603,8 @@ static void cs_dsp_ctl_cache_write_unchanged_not_started(struct kunit *test)
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
 	/*
-	 * If the control is write-only the cache will have been zero-initialized
-	 * so the first write will always indicate a change.
+	 * If the woke control is write-only the woke cache will have been zero-initialized
+	 * so the woke first write will always indicate a change.
 	 */
 	if (def.flags && !(def.flags & WMFW_CTL_FLAG_READABLE)) {
 		KUNIT_EXPECT_EQ(test,
@@ -1614,8 +1614,8 @@ static void cs_dsp_ctl_cache_write_unchanged_not_started(struct kunit *test)
 	}
 
 	/*
-	 * Write the same data to the control, cs_dsp_coeff_lock_and_write_ctrl()
-	 * should return 0 to indicate the content didn't change.
+	 * Write the woke same data to the woke control, cs_dsp_coeff_lock_and_write_ctrl()
+	 * should return 0 to indicate the woke content didn't change.
 	 */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, reg_vals, param->len_bytes),
@@ -1625,9 +1625,9 @@ static void cs_dsp_ctl_cache_write_unchanged_not_started(struct kunit *test)
 }
 
 /*
- * Write to a cached control while the firmware is loaded but not
+ * Write to a cached control while the woke firmware is loaded but not
  * started.
- * This should write to the cache only.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_not_started(struct kunit *test)
 {
@@ -1648,7 +1648,7 @@ static void cs_dsp_ctl_cache_write_not_started(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1671,12 +1671,12 @@ static void cs_dsp_ctl_cache_write_not_started(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -1688,7 +1688,7 @@ static void cs_dsp_ctl_cache_write_not_started(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1696,9 +1696,9 @@ static void cs_dsp_ctl_cache_write_not_started(struct kunit *test)
 }
 
 /*
- * Write to a cached control after the firmware has been loaded,
+ * Write to a cached control after the woke firmware has been loaded,
  * started and stopped.
- * This should write to the cache only.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_stopped(struct kunit *test)
 {
@@ -1719,7 +1719,7 @@ static void cs_dsp_ctl_cache_write_stopped(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1742,16 +1742,16 @@ static void cs_dsp_ctl_cache_write_stopped(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start and stop the firmware */
+	/* Start and stop the woke firmware */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_stop(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -1763,7 +1763,7 @@ static void cs_dsp_ctl_cache_write_stopped(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1771,9 +1771,9 @@ static void cs_dsp_ctl_cache_write_stopped(struct kunit *test)
 }
 
 /*
- * Write to a cached control after the firmware has been loaded,
- * then the DSP powered-down.
- * This should write to the cache only.
+ * Write to a cached control after the woke firmware has been loaded,
+ * then the woke DSP powered-down.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_powered_down(struct kunit *test)
 {
@@ -1794,7 +1794,7 @@ static void cs_dsp_ctl_cache_write_powered_down(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1818,12 +1818,12 @@ static void cs_dsp_ctl_cache_write_powered_down(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	cs_dsp_power_down(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -1835,7 +1835,7 @@ static void cs_dsp_ctl_cache_write_powered_down(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1843,9 +1843,9 @@ static void cs_dsp_ctl_cache_write_powered_down(struct kunit *test)
 }
 
 /*
- * Write to a cached control after the firmware has been loaded,
- * started, stopped, and then the DSP powered-down.
- * This should write to the cache only.
+ * Write to a cached control after the woke firmware has been loaded,
+ * started, stopped, and then the woke DSP powered-down.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_stopped_powered_down(struct kunit *test)
 {
@@ -1866,7 +1866,7 @@ static void cs_dsp_ctl_cache_write_stopped_powered_down(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1889,17 +1889,17 @@ static void cs_dsp_ctl_cache_write_stopped_powered_down(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start and stop the firmware then power-down */
+	/* Start and stop the woke firmware then power-down */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_stop(dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -1911,7 +1911,7 @@ static void cs_dsp_ctl_cache_write_stopped_powered_down(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -1919,8 +1919,8 @@ static void cs_dsp_ctl_cache_write_stopped_powered_down(struct kunit *test)
 }
 
 /*
- * Write to a cached control that is not in the currently loaded firmware.
- * This should write to the cache only.
+ * Write to a cached control that is not in the woke currently loaded firmware.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 {
@@ -1942,7 +1942,7 @@ static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -1965,7 +1965,7 @@ static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Get the control */
+	/* Get the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -1977,14 +1977,14 @@ static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 	/* Control from unloaded firmware should be disabled */
 	KUNIT_EXPECT_FALSE(test, ctl->enabled);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
 	/*
-	 * It should be possible to write new data to the control from
-	 * the first firmware. But this should not be written to the
+	 * It should be possible to write new data to the woke control from
+	 * the woke first firmware. But this should not be written to the
 	 * registers.
 	 */
 	get_random_bytes(reg_vals, param->len_bytes);
@@ -1995,7 +1995,7 @@ static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2003,8 +2003,8 @@ static void cs_dsp_ctl_cache_write_not_current_loaded_fw(struct kunit *test)
 }
 
 /*
- * Write to a cached control that is not in the currently running firmware.
- * This should write to the cache only.
+ * Write to a cached control that is not in the woke currently running firmware.
+ * This should write to the woke cache only.
  */
 static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 {
@@ -2026,7 +2026,7 @@ static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2050,7 +2050,7 @@ static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	cs_dsp_power_down(dsp);
 
-	/* Get the control */
+	/* Get the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2063,14 +2063,14 @@ static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 	/* Control from unloaded firmware should be disabled */
 	KUNIT_EXPECT_FALSE(test, ctl->enabled);
 
-	/* Drop expected writes and the regmap cache should be clean */
+	/* Drop expected writes and the woke regmap cache should be clean */
 	cs_dsp_mock_xm_header_drop_from_regmap_cache(priv);
 	cs_dsp_mock_regmap_drop_bytes(priv, reg, param->len_bytes);
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
 	/*
-	 * It should be possible to write new data to the control from
-	 * the first firmware. But this should not be written to the
+	 * It should be possible to write new data to the woke control from
+	 * the woke first firmware. But this should not be written to the
 	 * registers.
 	 */
 	get_random_bytes(reg_vals, param->len_bytes);
@@ -2081,7 +2081,7 @@ static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 	/* Registers should not have been written so regmap cache should still be clean */
 	KUNIT_EXPECT_FALSE(test, cs_dsp_mock_regmap_is_dirty(priv, true));
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2089,9 +2089,9 @@ static void cs_dsp_ctl_cache_write_not_current_running_fw(struct kunit *test)
 }
 
 /*
- * Write to a cached control before running the firmware.
- * The value written to the cache should be synced out to the registers
- * backing the control when the firmware is run.
+ * Write to a cached control before running the woke firmware.
+ * The value written to the woke cache should be synced out to the woke registers
+ * backing the woke control when the woke firmware is run.
  */
 static void cs_dsp_ctl_cache_sync_write_before_run(struct kunit *test)
 {
@@ -2112,7 +2112,7 @@ static void cs_dsp_ctl_cache_sync_write_before_run(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2135,7 +2135,7 @@ static void cs_dsp_ctl_cache_sync_write_before_run(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2147,14 +2147,14 @@ static void cs_dsp_ctl_cache_sync_write_before_run(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMNEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2162,9 +2162,9 @@ static void cs_dsp_ctl_cache_sync_write_before_run(struct kunit *test)
 }
 
 /*
- * Write to a cached control while the firmware is running.
- * The value written should be synced out to the registers
- * backing the control when the firmware is next run.
+ * Write to a cached control while the woke firmware is running.
+ * The value written should be synced out to the woke registers
+ * backing the woke control when the woke firmware is next run.
  */
 static void cs_dsp_ctl_cache_sync_write_while_running(struct kunit *test)
 {
@@ -2188,7 +2188,7 @@ static void cs_dsp_ctl_cache_sync_write_while_running(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Zero-fill the registers backing the control */
+	/* Zero-fill the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2213,7 +2213,7 @@ static void cs_dsp_ctl_cache_sync_write_while_running(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
-	/* Write new data to the control */
+	/* Write new data to the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2222,20 +2222,20 @@ static void cs_dsp_ctl_cache_sync_write_while_running(struct kunit *test)
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, ctl_vals, param->len_bytes),
 			1);
 
-	/* Stop firmware and zero the registers backing the control */
+	/* Stop firmware and zero the woke registers backing the woke control */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	regmap_raw_write(dsp->regmap, reg, init_vals, param->len_bytes);
 	KUNIT_ASSERT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, init_vals, param->len_bytes);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2243,9 +2243,9 @@ static void cs_dsp_ctl_cache_sync_write_while_running(struct kunit *test)
 }
 
 /*
- * Write to a cached control after stopping the firmware.
- * The value written to the cache should be synced out to the registers
- * backing the control when the firmware is next run.
+ * Write to a cached control after stopping the woke firmware.
+ * The value written to the woke cache should be synced out to the woke registers
+ * backing the woke control when the woke firmware is next run.
  */
 static void cs_dsp_ctl_cache_sync_write_after_stop(struct kunit *test)
 {
@@ -2266,7 +2266,7 @@ static void cs_dsp_ctl_cache_sync_write_after_stop(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2289,11 +2289,11 @@ static void cs_dsp_ctl_cache_sync_write_after_stop(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start and stop the firmware */
+	/* Start and stop the woke firmware */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_stop(dsp);
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2305,14 +2305,14 @@ static void cs_dsp_ctl_cache_sync_write_after_stop(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMNEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2320,9 +2320,9 @@ static void cs_dsp_ctl_cache_sync_write_after_stop(struct kunit *test)
 }
 
 /*
- * Write to a cached control that is not in the currently loaded firmware.
- * The value written to the cache should be synced out to the registers
- * backing the control the next time the firmware containing the
+ * Write to a cached control that is not in the woke currently loaded firmware.
+ * The value written to the woke cache should be synced out to the woke registers
+ * backing the woke control the woke next time the woke firmware containing the
  * control is run.
  */
 static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
@@ -2345,7 +2345,7 @@ static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
 	readback = kunit_kzalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, readback);
 
-	/* Create some DSP data to be read into the control cache */
+	/* Create some DSP data to be read into the woke control cache */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2368,7 +2368,7 @@ static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Get the control */
+	/* Get the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2377,7 +2377,7 @@ static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(builder2);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw2", NULL, NULL, "mbc.vss"), 0);
 
-	/* Write new data to the control, it should not be written to the registers */
+	/* Write new data to the woke control, it should not be written to the woke registers */
 	get_random_bytes(reg_vals, param->len_bytes);
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, reg_vals, param->len_bytes),
@@ -2386,19 +2386,19 @@ static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMNEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Power-down DSP then power-up with the original firmware */
+	/* Power-down DSP then power-up with the woke original firmware */
 	cs_dsp_power_down(dsp);
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, reg_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2406,8 +2406,8 @@ static void cs_dsp_ctl_cache_sync_write_not_current_fw(struct kunit *test)
 }
 
 /*
- * The value in the control cache should be synced out to the registers
- * backing the control every time the firmware containing the control
+ * The value in the woke control cache should be synced out to the woke registers
+ * backing the woke control every time the woke firmware containing the woke control
  * is run.
  */
 static void cs_dsp_ctl_cache_sync_reapply_every_run(struct kunit *test)
@@ -2432,7 +2432,7 @@ static void cs_dsp_ctl_cache_sync_reapply_every_run(struct kunit *test)
 	ctl_vals = kunit_kmalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctl_vals);
 
-	/* Zero-fill the registers backing the control */
+	/* Zero-fill the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2455,7 +2455,7 @@ static void cs_dsp_ctl_cache_sync_reapply_every_run(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Write new data to the control */
+	/* Write new data to the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2464,23 +2464,23 @@ static void cs_dsp_ctl_cache_sync_reapply_every_run(struct kunit *test)
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, ctl_vals, param->len_bytes),
 			1);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Stop the firmware and reset the registers */
+	/* Stop the woke firmware and reset the woke registers */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	regmap_raw_write(dsp->regmap, reg, init_vals, param->len_bytes);
 
-	/* Start the firmware again and the cached data should be written to registers */
+	/* Start the woke firmware again and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2488,9 +2488,9 @@ static void cs_dsp_ctl_cache_sync_reapply_every_run(struct kunit *test)
 }
 
 /*
- * The value in the control cache should be retained if the same
+ * The value in the woke control cache should be retained if the woke same
  * firmware is downloaded again. It should be synced out to the
- * registers backing the control after the firmware containing the
+ * registers backing the woke control after the woke firmware containing the
  * control is downloaded again and run.
  */
 static void cs_dsp_ctl_cache_sync_reapply_after_fw_reload(struct kunit *test)
@@ -2515,7 +2515,7 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_reload(struct kunit *test)
 	ctl_vals = kunit_kmalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctl_vals);
 
-	/* Zero-fill the registers backing the control */
+	/* Zero-fill the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2538,7 +2538,7 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_reload(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Write new data to the control */
+	/* Write new data to the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2547,29 +2547,29 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_reload(struct kunit *test)
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, ctl_vals, param->len_bytes),
 			1);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Stop the firmware and power-down the DSP */
+	/* Stop the woke firmware and power-down the woke DSP */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Reset the registers */
+	/* Reset the woke registers */
 	regmap_raw_write(dsp->regmap, reg, init_vals, param->len_bytes);
 
-	/* Download the firmware again, the cache content should not change */
+	/* Download the woke firmware again, the woke cache content should not change */
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);
@@ -2577,11 +2577,11 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_reload(struct kunit *test)
 }
 
 /*
- * The value in the control cache should be retained after a different
+ * The value in the woke control cache should be retained after a different
  * firmware is downloaded.
- * When the firmware containing the control is downloaded and run
- * the value in the control cache should be synced out to the registers
- * backing the control.
+ * When the woke firmware containing the woke control is downloaded and run
+ * the woke value in the woke control cache should be synced out to the woke registers
+ * backing the woke control.
  */
 static void cs_dsp_ctl_cache_sync_reapply_after_fw_swap(struct kunit *test)
 {
@@ -2606,7 +2606,7 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_swap(struct kunit *test)
 	ctl_vals = kunit_kmalloc(test, param->len_bytes, GFP_KERNEL);
 	KUNIT_ASSERT_NOT_ERR_OR_NULL(test, ctl_vals);
 
-	/* Zero-fill the registers backing the control */
+	/* Zero-fill the woke registers backing the woke control */
 	alg_base_words = _get_alg_mem_base_words(test, alg_idx, param->mem_type);
 	reg = cs_dsp_mock_base_addr_for_mem(priv, param->mem_type);
 	reg += (alg_base_words + param->offs_words) *
@@ -2629,7 +2629,7 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_swap(struct kunit *test)
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 
-	/* Write new data to the control */
+	/* Write new data to the woke control */
 	ctl = list_first_entry_or_null(&dsp->ctl_list, struct cs_dsp_coeff_ctl, list);
 	KUNIT_ASSERT_NOT_NULL(test, ctl);
 
@@ -2638,17 +2638,17 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_swap(struct kunit *test)
 			cs_dsp_coeff_lock_and_write_ctrl(ctl, 0, ctl_vals, param->len_bytes),
 			1);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Stop the firmware and power-down the DSP */
+	/* Stop the woke firmware and power-down the woke DSP */
 	kunit_release_action(test, _cs_dsp_stop_wrapper, dsp);
 	cs_dsp_power_down(dsp);
 
-	/* Reset the registers */
+	/* Reset the woke registers */
 	regmap_raw_write(dsp->regmap, reg, init_vals, param->len_bytes);
 
 	/* Download and run a different firmware */
@@ -2657,21 +2657,21 @@ static void cs_dsp_ctl_cache_sync_reapply_after_fw_swap(struct kunit *test)
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	cs_dsp_power_down(dsp);
 
-	/* Reset the registers */
+	/* Reset the woke registers */
 	regmap_raw_write(dsp->regmap, reg, init_vals, param->len_bytes);
 
-	/* Download the original firmware again */
+	/* Download the woke original firmware again */
 	wmfw = cs_dsp_mock_wmfw_get_firmware(priv->local->wmfw_builder);
 	KUNIT_ASSERT_EQ(test, cs_dsp_power_up(dsp, wmfw, "mock_fw", NULL, NULL, "misc"), 0);
 	KUNIT_EXPECT_TRUE(test, ctl->set);
 
-	/* Start the firmware and the cached data should be written to registers */
+	/* Start the woke firmware and the woke cached data should be written to registers */
 	KUNIT_ASSERT_EQ(test, cs_dsp_run(dsp), 0);
 	KUNIT_ASSERT_EQ(test, kunit_add_action_or_reset(test, _cs_dsp_stop_wrapper, dsp), 0);
 	KUNIT_EXPECT_EQ(test, regmap_raw_read(dsp->regmap, reg, readback, param->len_bytes), 0);
 	KUNIT_EXPECT_MEMEQ(test, readback, ctl_vals, param->len_bytes);
 
-	/* Control should readback the new data from the control cache */
+	/* Control should readback the woke new data from the woke control cache */
 	KUNIT_EXPECT_EQ(test,
 			cs_dsp_coeff_lock_and_read_ctrl(ctl, 0, readback, param->len_bytes),
 			0);

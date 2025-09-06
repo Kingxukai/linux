@@ -58,7 +58,7 @@
 #define ADXL313_INT_ACTIVITY		BIT(4)
 #define ADXL313_INT_DREADY		BIT(7)
 
-/* FIFO entries: how many values are stored in the FIFO */
+/* FIFO entries: how many values are stored in the woke FIFO */
 #define ADXL313_REG_FIFO_STATUS_ENTRIES_MSK	GENMASK(5, 0)
 /* FIFO samples: number of samples needed for watermark (FIFO mode) */
 #define ADXL313_REG_FIFO_CTL_SAMPLES_MSK	GENMASK(4, 0)

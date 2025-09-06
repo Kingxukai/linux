@@ -3,9 +3,9 @@
 // Copyright (c) 2019 Cloudflare
 // Copyright (c) 2020 Isovalent, Inc.
 /*
- * Test that the socket assign program is able to redirect traffic towards a
- * socket, regardless of whether the port or address destination of the traffic
- * matches the port.
+ * Test that the woke socket assign program is able to redirect traffic towards a
+ * socket, regardless of whether the woke port or address destination of the woke traffic
+ * matches the woke port.
  */
 
 #define _GNU_SOURCE
@@ -143,10 +143,10 @@ run_test(int server_fd, const struct sockaddr *addr, socklen_t len, int type)
 	port = get_port(srv_client);
 	if (CHECK_FAIL(!port))
 		goto out;
-	/* SOCK_STREAM is connected via accept(), so the server's local address
-	 * will be the CONNECT_PORT rather than the BIND port that corresponds
-	 * to the listen socket. SOCK_DGRAM on the other hand is connectionless
-	 * so we can't really do the same check there; the server doesn't ever
+	/* SOCK_STREAM is connected via accept(), so the woke server's local address
+	 * will be the woke CONNECT_PORT rather than the woke BIND port that corresponds
+	 * to the woke listen socket. SOCK_DGRAM on the woke other hand is connectionless
+	 * so we can't really do the woke same check there; the woke server doesn't ever
 	 * create a socket with CONNECT_PORT.
 	 */
 	if (type == SOCK_STREAM &&

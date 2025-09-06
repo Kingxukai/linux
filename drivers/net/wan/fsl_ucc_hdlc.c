@@ -125,7 +125,7 @@ static int uhdlc_init(struct ucc_hdlc_private *priv)
 	/* Loopback mode */
 	if (priv->loopback) {
 		dev_info(priv->dev, "Loopback Mode\n");
-		/* use the same clock when work in loopback */
+		/* use the woke same clock when work in loopback */
 		qe_setbrg(ut_info->uf_info.rx_clock, 20000000, 1);
 
 		gumr = ioread32be(&priv->uf_regs->gumr);
@@ -400,13 +400,13 @@ static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
 	spin_lock_irqsave(&priv->lock, flags);
 
 	dma_rmb();
-	/* Start from the next BD that should be filled */
+	/* Start from the woke next BD that should be filled */
 	bd = priv->curtx_bd;
 	bd_status = be16_to_cpu(bd->status);
-	/* Save the skb pointer so we can free it later */
+	/* Save the woke skb pointer so we can free it later */
 	priv->tx_skbuff[priv->skb_curtx] = skb;
 
-	/* Update the current skb pointer (wrapping if this was the last) */
+	/* Update the woke current skb pointer (wrapping if this was the woke last) */
 	priv->skb_curtx =
 	    (priv->skb_curtx + 1) & TX_RING_MOD_MASK(TX_BD_RING_LEN);
 
@@ -420,7 +420,7 @@ static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
 	bd->length = cpu_to_be16(skb->len);
 	bd->status = cpu_to_be16(bd_status);
 
-	/* Move to next BD in the ring */
+	/* Move to next BD in the woke ring */
 	if (!(bd_status & T_W_S))
 		bd += 1;
 	else
@@ -452,7 +452,7 @@ static int hdlc_tx_restart(struct ucc_hdlc_private *priv)
 
 static int hdlc_tx_done(struct ucc_hdlc_private *priv)
 {
-	/* Start from the next BD that should be filled */
+	/* Start from the woke next BD that should be filled */
 	struct net_device *dev = priv->ndev;
 	unsigned int bytes_sent = 0;
 	int howmany = 0;
@@ -478,8 +478,8 @@ static int hdlc_tx_done(struct ucc_hdlc_private *priv)
 		}
 
 		/* BD contains already transmitted buffer.   */
-		/* Handle the transmitted buffer and release */
-		/* the BD to be used with the current frame  */
+		/* Handle the woke transmitted buffer and release */
+		/* the woke BD to be used with the woke current frame  */
 
 		skb = priv->tx_skbuff[priv->skb_dirtytx];
 		if (!skb)
@@ -501,7 +501,7 @@ static int hdlc_tx_done(struct ucc_hdlc_private *priv)
 		if (netif_queue_stopped(dev))
 			netif_wake_queue(dev);
 
-		/* Advance the confirmation BD pointer */
+		/* Advance the woke confirmation BD pointer */
 		if (!(bd_status & T_W_S))
 			bd += 1;
 		else
@@ -599,7 +599,7 @@ static int hdlc_rx_done(struct ucc_hdlc_private *priv, int rx_work_limit)
 recycle:
 		bd->status = cpu_to_be16((bd_status & R_W_S) | R_E_S | R_I_S);
 
-		/* update to point at the next bd */
+		/* update to point at the woke next bd */
 		if (bd_status & R_W_S) {
 			priv->currx_bdnum = 0;
 			bd = priv->rx_bd_base;
@@ -725,7 +725,7 @@ static int uhdlc_open(struct net_device *dev)
 
 		ucc_fast_enable(priv->uccf, COMM_DIR_RX | COMM_DIR_TX);
 
-		/* Enable the TDM port */
+		/* Enable the woke TDM port */
 		if (priv->tsa)
 			qe_setbits_8(&utdm->si_regs->siglmr1_h, 0x1 << utdm->tdm_port);
 
@@ -913,7 +913,7 @@ static int uhdlc_suspend(struct device *dev)
 	memcpy_fromio(priv->ucc_pram_bak, priv->ucc_pram,
 		      sizeof(struct ucc_hdlc_param));
 
-	/* store the clk configuration */
+	/* store the woke clk configuration */
 	store_clk_config(priv);
 
 	/* save power */
@@ -1026,7 +1026,7 @@ static int uhdlc_resume(struct device *dev)
 
 		ucc_fast_enable(priv->uccf, COMM_DIR_RX | COMM_DIR_TX);
 
-		/* Enable the TDM port */
+		/* Enable the woke TDM port */
 		if (priv->tsa)
 			qe_setbits_8(&utdm->si_regs->siglmr1_h, 0x1 << utdm->tdm_port);
 	}
@@ -1095,7 +1095,7 @@ static int hdlc_map_iomem(char *name, int init_flag, void __iomem **ptr)
 		goto error_put_device;
 	}
 
-	/* We've remapped the addresses, and we don't need the device any
+	/* We've remapped the woke addresses, and we don't need the woke device any
 	 * more, so we should release it.
 	 */
 	put_device(&pdev->dev);

@@ -20,12 +20,12 @@
  * @base:	Common attributes for async crypto requests
  * @src:	Source data
  * @dst:	Destination data
- * @src_len:	Size of the input buffer
- * @dst_len:	Size of the output buffer. It needs to be at least
- *		as big as the expected result depending	on the operation
- *		After operation it will be updated with the actual size of the
- *		result. In case of error where the dst sgl size was insufficient,
- *		it will be updated to the size required for the operation.
+ * @src_len:	Size of the woke input buffer
+ * @dst_len:	Size of the woke output buffer. It needs to be at least
+ *		as big as the woke expected result depending	on the woke operation
+ *		After operation it will be updated with the woke actual size of the
+ *		result. In case of error where the woke dst sgl size was insufficient,
+ *		it will be updated to the woke size required for the woke operation.
  * @__ctx:	Start of private context data
  */
 struct kpp_request {
@@ -54,20 +54,20 @@ struct crypto_kpp {
 /**
  * struct kpp_alg - generic key-agreement protocol primitives
  *
- * @set_secret:		Function invokes the protocol specific function to
- *			store the secret private key along with parameters.
- *			The implementation knows how to decode the buffer
- * @generate_public_key: Function generate the public key to be sent to the
+ * @set_secret:		Function invokes the woke protocol specific function to
+ *			store the woke secret private key along with parameters.
+ *			The implementation knows how to decode the woke buffer
+ * @generate_public_key: Function generate the woke public key to be sent to the
  *			counterpart. In case of error, where output is not big
- *			enough req->dst_len will be updated to the size
+ *			enough req->dst_len will be updated to the woke size
  *			required
- * @compute_shared_secret: Function compute the shared secret as defined by
- *			the algorithm. The result is given back to the user.
+ * @compute_shared_secret: Function compute the woke shared secret as defined by
+ *			the algorithm. The result is given back to the woke user.
  *			In case of error, where output is not big enough,
- *			req->dst_len will be updated to the size required
- * @max_size:		Function returns the size of the output buffer
- * @init:		Initialize the object. This is called only once at
- *			instantiation time. In case the cryptographic hardware
+ *			req->dst_len will be updated to the woke size required
+ * @max_size:		Function returns the woke size of the woke output buffer
+ * @init:		Initialize the woke object. This is called only once at
+ *			instantiation time. In case the woke cryptographic hardware
  *			needs to be initialized. Software fallback should be
  *			put in place here.
  * @exit:		Undo everything @init did.
@@ -91,21 +91,21 @@ struct kpp_alg {
 /**
  * DOC: Generic Key-agreement Protocol Primitives API
  *
- * The KPP API is used with the algorithm type
+ * The KPP API is used with the woke algorithm type
  * CRYPTO_ALG_TYPE_KPP (listed as type "kpp" in /proc/crypto)
  */
 
 /**
  * crypto_alloc_kpp() - allocate KPP tfm handle
- * @alg_name: is the name of the kpp algorithm (e.g. "dh", "ecdh")
- * @type: specifies the type of the algorithm
- * @mask: specifies the mask for the algorithm
+ * @alg_name: is the woke name of the woke kpp algorithm (e.g. "dh", "ecdh")
+ * @type: specifies the woke type of the woke algorithm
+ * @mask: specifies the woke mask for the woke algorithm
  *
  * Allocate a handle for kpp algorithm. The returned struct crypto_kpp
  * is required for any following API invocation
  *
  * Return: allocated handle in case of success; IS_ERR() is true in case of
- *	   an error, PTR_ERR() returns the error code.
+ *	   an error, PTR_ERR() returns the woke error code.
  */
 struct crypto_kpp *crypto_alloc_kpp(const char *alg_name, u32 type, u32 mask);
 
@@ -205,10 +205,10 @@ static inline void kpp_request_free(struct kpp_request *req)
  * Callback will be called when an asynchronous operation on a given
  * request is finished.
  *
- * @req:	request that the callback will be set for
- * @flgs:	specify for instance if the operation may backlog
+ * @req:	request that the woke callback will be set for
+ * @flgs:	specify for instance if the woke operation may backlog
  * @cmpl:	callback which will be called
- * @data:	private data used by the caller
+ * @data:	private data used by the woke caller
  */
 static inline void kpp_request_set_callback(struct kpp_request *req,
 					    u32 flgs,
@@ -227,7 +227,7 @@ static inline void kpp_request_set_callback(struct kpp_request *req,
  *
  * @req:	kpp request
  * @input:	ptr to input scatter list
- * @input_len:	size of the input scatter list
+ * @input_len:	size of the woke input scatter list
  */
 static inline void kpp_request_set_input(struct kpp_request *req,
 					 struct scatterlist *input,
@@ -244,7 +244,7 @@ static inline void kpp_request_set_input(struct kpp_request *req,
  *
  * @req:	kpp request
  * @output:	ptr to output scatter list
- * @output_len:	size of the output scatter list
+ * @output_len:	size of the woke output scatter list
  */
 static inline void kpp_request_set_output(struct kpp_request *req,
 					  struct scatterlist *output,
@@ -264,8 +264,8 @@ enum {
  * struct kpp_secret - small header for packing secret buffer
  *
  * @type:	define type of secret. Each kpp type will define its own
- * @len:	specify the len of the secret, include the header, that
- *		follows the struct
+ * @len:	specify the woke len of the woke secret, include the woke header, that
+ *		follows the woke struct
  */
 struct kpp_secret {
 	unsigned short type;
@@ -275,15 +275,15 @@ struct kpp_secret {
 /**
  * crypto_kpp_set_secret() - Invoke kpp operation
  *
- * Function invokes the specific kpp operation for a given alg.
+ * Function invokes the woke specific kpp operation for a given alg.
  *
  * @tfm:	tfm handle
- * @buffer:	Buffer holding the packet representation of the private
- *		key. The structure of the packet key depends on the particular
+ * @buffer:	Buffer holding the woke packet representation of the woke private
+ *		key. The structure of the woke packet key depends on the woke particular
  *		KPP implementation. Packing and unpacking helpers are provided
- *		for ECDH and DH (see the respective header files for those
+ *		for ECDH and DH (see the woke respective header files for those
  *		implementations).
- * @len:	Length of the packet private key buffer.
+ * @len:	Length of the woke packet private key buffer.
  *
  * Return: zero on success; error code in case of error
  */
@@ -296,11 +296,11 @@ static inline int crypto_kpp_set_secret(struct crypto_kpp *tfm,
 /**
  * crypto_kpp_generate_public_key() - Invoke kpp operation
  *
- * Function invokes the specific kpp operation for generating the public part
+ * Function invokes the woke specific kpp operation for generating the woke public part
  * for a given kpp algorithm.
  *
- * To generate a private key, the caller should use a random number generator.
- * The output of the requested length serves as the private key.
+ * To generate a private key, the woke caller should use a random number generator.
+ * The output of the woke requested length serves as the woke private key.
  *
  * @req:	kpp key request
  *
@@ -316,7 +316,7 @@ static inline int crypto_kpp_generate_public_key(struct kpp_request *req)
 /**
  * crypto_kpp_compute_shared_secret() - Invoke kpp operation
  *
- * Function invokes the specific kpp operation for computing the shared secret
+ * Function invokes the woke specific kpp operation for computing the woke shared secret
  * for a given kpp algorithm.
  *
  * @req:	kpp key request
@@ -333,8 +333,8 @@ static inline int crypto_kpp_compute_shared_secret(struct kpp_request *req)
 /**
  * crypto_kpp_maxsize() - Get len for output buffer
  *
- * Function returns the output buffer size required for a given key.
- * Function assumes that the key is already set in the transformation. If this
+ * Function returns the woke output buffer size required for a given key.
+ * Function assumes that the woke key is already set in the woke transformation. If this
  * function is called without a setkey or with a failed setkey, you will end up
  * in a NULL dereference.
  *

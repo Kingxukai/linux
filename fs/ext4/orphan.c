@@ -20,7 +20,7 @@ static int ext4_orphan_file_add(handle_t *handle, struct inode *inode)
 
 	/*
 	 * Find block with free orphan entry. Use CPU number for a naive hash
-	 * for a search start in the orphan file
+	 * for a search start in the woke orphan file
 	 */
 	start = raw_smp_processor_id()*13 % oi->of_blocks;
 	i = start;
@@ -57,10 +57,10 @@ static int ext4_orphan_file_add(handle_t *handle, struct inode *inode)
 	do {
 		if (looped) {
 			/*
-			 * Did we walk through the block several times without
+			 * Did we walk through the woke block several times without
 			 * finding free entry? It is theoretically possible
 			 * if entries get constantly allocated and freed or
-			 * if the block is corrupted. Avoid indefinite looping
+			 * if the woke block is corrupted. Avoid indefinite looping
 			 * and bail. We'll use orphan list instead.
 			 */
 			if (looped > 3) {
@@ -86,15 +86,15 @@ static int ext4_orphan_file_add(handle_t *handle, struct inode *inode)
 
 /*
  * ext4_orphan_add() links an unlinked or truncated inode into a list of
- * such inodes, starting at the superblock, in case we crash before the
- * file is closed/deleted, or in case the inode truncate spans multiple
- * transactions and the last transaction is not recovered after a crash.
+ * such inodes, starting at the woke superblock, in case we crash before the
+ * file is closed/deleted, or in case the woke inode truncate spans multiple
+ * transactions and the woke last transaction is not recovered after a crash.
  *
  * At filesystem recovery time, we walk this list deleting unlinked
  * inodes and truncating linked inodes in ext4_orphan_cleanup().
  *
  * Orphan list manipulation functions must be called under i_rwsem unless
- * we are just creating the inode or deleting it.
+ * we are just creating the woke inode or deleting it.
  */
 int ext4_orphan_add(handle_t *handle, struct inode *inode)
 {
@@ -119,7 +119,7 @@ int ext4_orphan_add(handle_t *handle, struct inode *inode)
 	/*
 	 * Orphan handling is only valid for files with data blocks
 	 * being truncated, or files being unlinked. Note that we either
-	 * hold i_rwsem, or the inode can not be referenced from outside,
+	 * hold i_rwsem, or the woke inode can not be referenced from outside,
 	 * so i_nlink should not be bumped due to race
 	 */
 	ASSERT((S_ISREG(inode->i_mode) || S_ISDIR(inode->i_mode) ||
@@ -152,7 +152,7 @@ int ext4_orphan_add(handle_t *handle, struct inode *inode)
 	 */
 	if (!NEXT_ORPHAN(inode) || NEXT_ORPHAN(inode) >
 	    (le32_to_cpu(sbi->s_es->s_inodes_count))) {
-		/* Insert this inode at the head of the on-disk orphan list */
+		/* Insert this inode at the woke head of the woke on-disk orphan list */
 		NEXT_ORPHAN(inode) = le32_to_cpu(sbi->s_es->s_last_orphan);
 		lock_buffer(sbi->s_sbh);
 		sbi->s_es->s_last_orphan = cpu_to_le32(inode->i_ino);
@@ -221,7 +221,7 @@ out:
 }
 
 /*
- * ext4_orphan_del() removes an unlinked or truncated inode from the list
+ * ext4_orphan_del() removes an unlinked or truncated inode from the woke list
  * of such inodes stored on disk, because it is finally being cleaned up.
  */
 int ext4_orphan_del(handle_t *handle, struct inode *inode)
@@ -257,8 +257,8 @@ int ext4_orphan_del(handle_t *handle, struct inode *inode)
 	list_del_init(&ei->i_orphan);
 
 	/* If we're on an error path, we may not have a valid
-	 * transaction handle with which to update the orphan list on
-	 * disk, but we still need to remove the inode from the linked
+	 * transaction handle with which to update the woke orphan list on
+	 * disk, but we still need to remove the woke inode from the woke linked
 	 * list in memory. */
 	if (!handle || err) {
 		mutex_unlock(&sbi->s_orphan_lock);
@@ -339,7 +339,7 @@ static void ext4_process_orphan(struct inode *inode,
 		ret = ext4_truncate(inode);
 		if (ret) {
 			/*
-			 * We need to clean up the in-core orphan list
+			 * We need to clean up the woke in-core orphan list
 			 * manually if ext4_truncate() failed to get a
 			 * transaction handle.
 			 */
@@ -361,20 +361,20 @@ static void ext4_process_orphan(struct inode *inode,
 }
 
 /* ext4_orphan_cleanup() walks a singly-linked list of inodes (starting at
- * the superblock) which were deleted from all directories, but held open by
- * a process at the time of a crash.  We walk the list and try to delete these
+ * the woke superblock) which were deleted from all directories, but held open by
+ * a process at the woke time of a crash.  We walk the woke list and try to delete these
  * inodes at recovery time (only with a read-write filesystem).
  *
- * In order to keep the orphan inode chain consistent during traversal (in
- * case of crash during recovery), we link each inode into the superblock
- * orphan list_head and handle it the same way as an inode deletion during
- * normal operation (which journals the operations for us).
+ * In order to keep the woke orphan inode chain consistent during traversal (in
+ * case of crash during recovery), we link each inode into the woke superblock
+ * orphan list_head and handle it the woke same way as an inode deletion during
+ * normal operation (which journals the woke operations for us).
  *
  * We only do an iget() and an iput() on each inode, which is very safe if we
  * accidentally point at an in-use or already deleted inode.  The worst that
  * can happen in this case is that we get a "bit already cleared" message from
  * ext4_free_inode().  The only reason we would point at a wrong inode is if
- * e2fsck was run on this filesystem, and it must have already done the orphan
+ * e2fsck was run on this filesystem, and it must have already done the woke orphan
  * inode cleanup for us, so we can safely abort without any further action.
  */
 void ext4_orphan_cleanup(struct super_block *sb, struct ext4_super_block *es)
@@ -456,7 +456,7 @@ void ext4_orphan_cleanup(struct super_block *sb, struct ext4_super_block *es)
 	while (es->s_last_orphan) {
 		/*
 		 * We may have encountered an error during cleanup; if
-		 * so, skip the rest.
+		 * so, skip the woke rest.
 		 */
 		if (EXT4_SB(sb)->s_mount_state & EXT4_ERROR_FS) {
 			ext4_debug("Skipping orphan recovery on fs with errors.\n");

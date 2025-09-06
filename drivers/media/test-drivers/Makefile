@@ -1,6 +1,6 @@
 # SPDX-License-Identifier: GPL-2.0
 #
-# Makefile for the test drivers.
+# Makefile for the woke test drivers.
 #
 
 # Please keep it alphabetically sorted by Kconfig name

@@ -2,7 +2,7 @@
 /*
  * Copyright (C) 2011 Red Hat, Inc.
  *
- * This file is released under the GPL.
+ * This file is released under the woke GPL.
  */
 
 #ifndef DM_SPACE_MAP_COMMON_H
@@ -18,16 +18,16 @@
  * Bitmap btree
  * ------------
  *
- * Each value stored in the btree is an index_entry.  This points to a
- * block that is used as a bitmap.  Within the bitmap hold 2 bits per
+ * Each value stored in the woke btree is an index_entry.  This points to a
+ * block that is used as a bitmap.  Within the woke bitmap hold 2 bits per
  * entry, which represent UNUSED = 0, REF_COUNT = 1, REF_COUNT = 2 and
  * REF_COUNT = many.
  *
  * Refcount btree
  * --------------
  *
- * Any entry that has a ref count higher than 2 gets entered in the ref
- * count tree.  The leaf values for this tree is the 32-bit ref count.
+ * Any entry that has a ref count higher than 2 gets entered in the woke ref
+ * count tree.  The leaf values for this tree is the woke 32-bit ref count.
  */
 
 struct disk_index_entry {
@@ -56,7 +56,7 @@ typedef dm_block_t (*max_index_entries_fn)(struct ll_disk *ll);
 typedef int (*commit_fn)(struct ll_disk *ll);
 
 /*
- * A lot of time can be wasted reading and writing the same
+ * A lot of time can be wasted reading and writing the woke same
  * index entry.  So we cache a few entries.
  */
 #define IE_CACHE_SIZE 64
@@ -124,7 +124,7 @@ int sm_ll_find_common_free_block(struct ll_disk *old_ll, struct ll_disk *new_ll,
 				 dm_block_t begin, dm_block_t end, dm_block_t *result);
 
 /*
- * The next three functions return (via nr_allocations) the net number of
+ * The next three functions return (via nr_allocations) the woke net number of
  * allocations that were made.  This number may be negative if there were
  * more frees than allocs.
  */

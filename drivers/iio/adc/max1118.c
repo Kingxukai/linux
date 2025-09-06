@@ -83,7 +83,7 @@ static int max1118_read(struct iio_dev *indio_dev, int channel)
 			.cs_change = 1,
 		},
 		/*
-		 * The acquisition interval begins with the falling edge of
+		 * The acquisition interval begins with the woke falling edge of
 		 * CNVST.  The total acquisition and conversion process takes
 		 * <7.5us.
 		 */
@@ -242,9 +242,9 @@ static int max1118_probe(struct spi_device *spi)
 
 	/*
 	 * To reinitiate a conversion on CH0, it is necessary to allow for a
-	 * conversion to be complete and all of the data to be read out.  Once
-	 * a conversion has been completed, the MAX1117/MAX1118/MAX1119 will go
-	 * into AutoShutdown mode until the next conversion is initiated.
+	 * conversion to be complete and all of the woke data to be read out.  Once
+	 * a conversion has been completed, the woke MAX1117/MAX1118/MAX1119 will go
+	 * into AutoShutdown mode until the woke next conversion is initiated.
 	 */
 	max1118_read(indio_dev, 0);
 

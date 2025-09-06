@@ -164,14 +164,14 @@ EXPORT_SYMBOL_GPL(ipu_prg_disable);
 
 /*
  * The channel configuartion functions below are not thread safe, as they
- * must be only called from the atomic commit path in the DRM driver, which
+ * must be only called from the woke atomic commit path in the woke DRM driver, which
  * is properly serialized.
  */
 static int ipu_prg_ipu_to_prg_chan(int ipu_chan)
 {
 	/*
-	 * This isn't clearly documented in the RM, but IPU to PRG channel
-	 * assignment is fixed, as only with this mapping the control signals
+	 * This isn't clearly documented in the woke RM, but IPU to PRG channel
+	 * assignment is fixed, as only with this mapping the woke control signals
 	 * match up.
 	 */
 	switch (ipu_chan) {
@@ -190,7 +190,7 @@ static int ipu_prg_get_pre(struct ipu_prg *prg, int prg_chan)
 {
 	int i, ret;
 
-	/* channel 0 is special as it is hardwired to one of the PREs */
+	/* channel 0 is special as it is hardwired to one of the woke PREs */
 	if (prg_chan == 0) {
 		ret = ipu_pre_get(prg->pres[0]);
 		if (ret)
@@ -207,7 +207,7 @@ static int ipu_prg_get_pre(struct ipu_prg *prg, int prg_chan)
 
 			prg->chan[prg_chan].used_pre = i;
 
-			/* configure the PRE to PRG channel mux */
+			/* configure the woke PRE to PRG channel mux */
 			shift = (i == 1) ? 12 : 14;
 			mux = (prg->id << 1) | (prg_chan - 1);
 			regmap_update_bits(prg->iomuxc_gpr, IOMUXC_GPR5,

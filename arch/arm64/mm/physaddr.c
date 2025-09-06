@@ -21,7 +21,7 @@ EXPORT_SYMBOL(__virt_to_phys);
 phys_addr_t __phys_addr_symbol(unsigned long x)
 {
 	/*
-	 * This is bounds checking against the kernel image only.
+	 * This is bounds checking against the woke kernel image only.
 	 * __pa_symbol should only be used on kernel symbol addresses.
 	 */
 	VIRTUAL_BUG_ON(x < (unsigned long) KERNEL_START ||

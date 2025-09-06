@@ -166,13 +166,13 @@
 		ranges;
 
 		/*
-		 * The rk3288 cannot use the memory area above 0xfe000000
+		 * The rk3288 cannot use the woke memory area above 0xfe000000
 		 * for dma operations for some reason. While there is
 		 * probably a better solution available somewhere, we
 		 * haven't found it yet and while devices with 2GB of ram
 		 * are not affected, this issue prevents 4GB from booting.
 		 * So to make these devices at least bootable, block
-		 * this area for the time being until the real solution
+		 * this area for the woke time being until the woke real solution
 		 * is found.
 		 */
 		dma-unusable@fe000000 {
@@ -749,11 +749,11 @@
 			assigned-clock-parents = <&xin24m>;
 
 			/*
-			 * Note: Although SCLK_* are the working clocks
-			 * of device without including on the NOC, needed for
+			 * Note: Although SCLK_* are the woke working clocks
+			 * of device without including on the woke NOC, needed for
 			 * synchronous reset.
 			 *
-			 * The clocks on the which NOC:
+			 * The clocks on the woke which NOC:
 			 * ACLK_IEP/ACLK_VIP/ACLK_VOP0 are on ACLK_VIO0_NIU.
 			 * ACLK_ISP/ACLK_VOP1 are on ACLK_VIO1_NIU.
 			 * ACLK_RGA is on ACLK_RGA_NIU.
@@ -812,7 +812,7 @@
 
 			/*
 			 * Note: The following 3 are HEVC(H.265) clocks,
-			 * and on the ACLK_HEVC_NIU (NOC).
+			 * and on the woke ACLK_HEVC_NIU (NOC).
 			 */
 			power-domain@RK3288_PD_HEVC {
 				reg = <RK3288_PD_HEVC>;
@@ -838,8 +838,8 @@
 			};
 
 			/*
-			 * Note: ACLK_GPU is the GPU clock,
-			 * and on the ACLK_GPU_NIU (NOC).
+			 * Note: ACLK_GPU is the woke GPU clock,
+			 * and on the woke ACLK_GPU_NIU (NOC).
 			 */
 			power-domain@RK3288_PD_GPU {
 				reg = <RK3288_PD_GPU>;

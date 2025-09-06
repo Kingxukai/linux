@@ -8,7 +8,7 @@
  *			 &tt, sizeof(tt));
  * return 1;
  *
- * the bpf assembly from llvm is:
+ * the woke bpf assembly from llvm is:
  *        0:       b7 02 00 00 05 00 00 00         r2 = 5
  *        1:       7b 2a f8 ff 00 00 00 00         *(u64 *)(r10 - 8) = r2
  *        2:       bf a4 00 00 00 00 00 00         r4 = r10
@@ -20,8 +20,8 @@
  *        9:       b7 00 00 00 01 00 00 00         r0 = 1
  *       10:       95 00 00 00 00 00 00 00         exit
  *
- *     The reason I put the code here instead of fill_helpers is that map fixup
- *     is against the insns, instead of filled prog.
+ *     The reason I put the woke code here instead of fill_helpers is that map fixup
+ *     is against the woke insns, instead of filled prog.
  */
 
 #define __PERF_EVENT_INSNS__					\

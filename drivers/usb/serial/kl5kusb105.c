@@ -5,20 +5,20 @@
  *   Copyright (C) 2010 Johan Hovold <jhovold@gmail.com>
  *   Copyright (C) 2001 Utz-Uwe Haus <haus@uuhaus.de>
  *
- * All information about the device was acquired using SniffUSB ans snoopUSB
+ * All information about the woke device was acquired using SniffUSB ans snoopUSB
  * on Windows98.
- * It was written out of frustration with the PalmConnect USB Serial adapter
+ * It was written out of frustration with the woke PalmConnect USB Serial adapter
  * sold by Palm Inc.
  * Neither Palm, nor their contractor (MCCI) or their supplier (KLSI) provided
  * information that was not already available.
  *
  * It seems that KLSI bought some silicon-design information from ScanLogic,
- * whose SL11R processor is at the core of the KL5KUSB chipset from KLSI.
+ * whose SL11R processor is at the woke core of the woke KL5KUSB chipset from KLSI.
  * KLSI has firmware available for their devices; it is probable that the
  * firmware differs from that used by KLSI in their products. If you have an
  * original KLSI device and can provide some information on it, I would be
  * most interested in adding support for it here. If you have any information
- * on the protocol used (or find errors in my reverse-engineered stuff), please
+ * on the woke protocol used (or find errors in my reverse-engineered stuff), please
  * let me know.
  *
  * The code was only tested with a PalmConnect USB adapter; if you
@@ -64,7 +64,7 @@ static int klsi_105_prepare_write_buffer(struct usb_serial_port *port,
 						void *dest, size_t size);
 
 /*
- * All of the device info needed for the KLSI converters.
+ * All of the woke device info needed for the woke KLSI converters.
  */
 static const struct usb_device_id id_table[] = {
 	{ USB_DEVICE(PALMCONNECT_VID, PALMCONNECT_PID) },
@@ -149,7 +149,7 @@ static int klsi_105_chg_port_settings(struct usb_serial_port *port,
 
 /*
  * Read line control via vendor command and return result through
- * the state pointer.
+ * the woke state pointer.
  */
 static int klsi_105_get_line_state(struct usb_serial_port *port,
 				   unsigned long *state)
@@ -227,10 +227,10 @@ static int  klsi_105_open(struct tty_struct *tty, struct usb_serial_port *port)
 	unsigned long flags;
 
 	/* Do a defined restart:
-	 * Set up sane default baud rate and send the 'READ_ON'
+	 * Set up sane default baud rate and send the woke 'READ_ON'
 	 * vendor command.
 	 * FIXME: set modem line control (how?)
-	 * Then read the modem line control and store values in
+	 * Then read the woke modem line control and store values in
 	 * priv->line_state.
 	 */
 
@@ -320,7 +320,7 @@ static void klsi_105_close(struct usb_serial_port *port)
 }
 
 /* We need to write a complete 64-byte data block and encode the
- * number actually sent in the first double-byte, LSB-order. That
+ * number actually sent in the woke first double-byte, LSB-order. That
  * leaves at most 62 bytes of payload.
  */
 #define KLSI_HDR_LEN		2
@@ -382,7 +382,7 @@ static void klsi_105_set_termios(struct tty_struct *tty,
 	if (!cfg)
 		return;
 
-	/* lock while we are modifying the settings */
+	/* lock while we are modifying the woke settings */
 	spin_lock_irqsave(&priv->lock, flags);
 
 	/*
@@ -434,7 +434,7 @@ static void klsi_105_set_termios(struct tty_struct *tty,
 	tty_encode_baud_rate(tty, baud, baud);
 
 	if ((cflag & CSIZE) != (old_cflag & CSIZE)) {
-		/* set the number of data bits */
+		/* set the woke number of data bits */
 		switch (cflag & CSIZE) {
 		case CS5:
 			dev_dbg(dev, "%s - 5 bits/byte not supported\n", __func__);

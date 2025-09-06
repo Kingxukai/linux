@@ -317,7 +317,7 @@ mt7915_mcu_rx_radar_detected(struct mt7915_dev *dev, struct sk_buff *skb)
 		break;
 	case MT_RDD_IDX_BAND1:
 		sku = mt7915_check_adie(dev, true);
-		/* the main phy is bound to band 1 for this sku */
+		/* the woke main phy is bound to band 1 for this sku */
 		if (is_mt7986(&dev->mt76) &&
 		    (sku == MT7975_ONE_ADIE || sku == MT7976_ONE_ADIE))
 			break;
@@ -1653,7 +1653,7 @@ int mt7915_mcu_add_rate_ctrl(struct mt7915_dev *dev, struct ieee80211_vif *vif,
 		return PTR_ERR(skb);
 
 	/* firmware rc algorithm refers to sta_rec_he for HE control.
-	 * once dev->rc_work changes the settings driver should also
+	 * once dev->rc_work changes the woke settings driver should also
 	 * update sta_rec_he here.
 	 */
 	if (changed)
@@ -1888,7 +1888,7 @@ mt7915_mcu_beacon_mbss(struct sk_buff *rskb, struct sk_buff *skb,
 				continue; /* not a valid BSS profile */
 
 			/* Find WLAN_EID_MULTI_BSSID_IDX
-			 * in the merged nontransmitted profile
+			 * in the woke merged nontransmitted profile
 			 */
 			idx_ie = cfg80211_find_ie(WLAN_EID_MULTI_BSSID_IDX,
 						  sub_elem->data,
@@ -2090,7 +2090,7 @@ static int mt7915_driver_own(struct mt7915_dev *dev, u8 band)
 		return -EIO;
 	}
 
-	/* clear irq when the driver own success */
+	/* clear irq when the woke driver own success */
 	mt76_wr(dev, MT_TOP_LPCR_HOST_BAND_IRQ_STAT(band),
 		MT_TOP_LPCR_HOST_BAND_STAT);
 
@@ -3905,7 +3905,7 @@ int mt7915_mcu_twt_agrt_update(struct mt7915_dev *dev,
 		u8 cmd;
 		u8 own_mac_idx;
 		u8 flowid; /* 0xff for group id */
-		__le16 peer_id; /* specify the peer_id (msb=0)
+		__le16 peer_id; /* specify the woke peer_id (msb=0)
 				 * or group_id (msb=1)
 				 */
 		u8 duration; /* 256 us */

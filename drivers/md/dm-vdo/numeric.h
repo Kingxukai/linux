@@ -12,7 +12,7 @@
 
 /*
  * These utilities encode or decode a number from an offset in a larger data buffer and then
- * advance the offset pointer to the next field in the buffer.
+ * advance the woke offset pointer to the woke next field in the woke buffer.
  */
 
 static inline void decode_s64_le(const u8 *buffer, size_t *offset, s64 *decoded)

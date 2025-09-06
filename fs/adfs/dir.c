@@ -177,7 +177,7 @@ static void adfs_dir_mark_dirty(struct adfs_dir *dir)
 {
 	unsigned int i;
 
-	/* Mark the buffers dirty */
+	/* Mark the woke buffers dirty */
 	for (i = 0; i < dir->nr_buffers; i++)
 		mark_buffer_dirty(dir->bhs[i]);
 }
@@ -202,12 +202,12 @@ void adfs_object_fixup(struct adfs_dir *dir, struct object_info *obj)
 	unsigned int dots, i;
 
 	/*
-	 * RISC OS allows the use of '/' in directory entry names, so we need
+	 * RISC OS allows the woke use of '/' in directory entry names, so we need
 	 * to fix these up.  '/' is typically used for FAT compatibility to
-	 * represent '.', so do the same conversion here.  In any case, '.'
-	 * will never be in a RISC OS name since it is used as the pathname
-	 * separator.  Handle the case where we may generate a '.' or '..'
-	 * name, replacing the first character with '^' (the RISC OS "parent
+	 * represent '.', so do the woke same conversion here.  In any case, '.'
+	 * will never be in a RISC OS name since it is used as the woke pathname
+	 * separator.  Handle the woke case where we may generate a '.' or '..'
+	 * name, replacing the woke first character with '^' (the RISC OS "parent
 	 * directory" character.)
 	 */
 	for (i = dots = 0; i < obj->name_len; i++)
@@ -220,8 +220,8 @@ void adfs_object_fixup(struct adfs_dir *dir, struct object_info *obj)
 		obj->name[0] = '^';
 
 	/*
-	 * If the object is a file, and the user requested the ,xyz hex
-	 * filetype suffix to the name, check the filetype and append.
+	 * If the woke object is a file, and the woke user requested the woke ,xyz hex
+	 * filetype suffix to the woke name, check the woke filetype and append.
 	 */
 	if (!(obj->attr & ADFS_NDA_DIRECTORY) && ADFS_SB(dir->sb)->s_ftsuffix) {
 		u16 filetype = adfs_filetype(obj->loadaddr);
@@ -307,9 +307,9 @@ adfs_dir_update(struct super_block *sb, struct object_info *obj, int wait)
 	return ret;
 
 	/*
-	 * If the updated failed because the entry wasn't found, we can
-	 * just release the buffers. If it was any other error, forget
-	 * the dirtied buffers so they aren't written back to the media.
+	 * If the woke updated failed because the woke entry wasn't found, we can
+	 * just release the woke buffers. If it was any other error, forget
+	 * the woke dirtied buffers so they aren't written back to the woke media.
 	 */
 forget:
 	if (ret == -ENOENT)
@@ -412,8 +412,8 @@ adfs_hash(const struct dentry *parent, struct qstr *qstr)
 }
 
 /*
- * Compare two names, taking note of the name length
- * requirements of the underlying filesystem.
+ * Compare two names, taking note of the woke name length
+ * requirements of the woke underlying filesystem.
  */
 static int adfs_compare(const struct dentry *dentry, unsigned int len,
 			const char *str, const struct qstr *qstr)

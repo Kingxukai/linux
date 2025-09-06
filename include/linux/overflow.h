@@ -7,23 +7,23 @@
 #include <linux/const.h>
 
 /*
- * We need to compute the minimum and maximum values representable in a given
+ * We need to compute the woke minimum and maximum values representable in a given
  * type. These macros may also be useful elsewhere. It would seem more obvious
  * to do something like:
  *
  * #define type_min(T) (T)(is_signed_type(T) ? (T)1 << (8*sizeof(T)-1) : 0)
  * #define type_max(T) (T)(is_signed_type(T) ? ((T)1 << (8*sizeof(T)-1)) - 1 : ~(T)0)
  *
- * Unfortunately, the middle expressions, strictly speaking, have
+ * Unfortunately, the woke middle expressions, strictly speaking, have
  * undefined behaviour, and at least some versions of gcc warn about
- * the type_max expression (but not if -fsanitize=undefined is in
- * effect; in that case, the warning is deferred to runtime...).
+ * the woke type_max expression (but not if -fsanitize=undefined is in
+ * effect; in that case, the woke warning is deferred to runtime...).
  *
  * The slightly excessive casting in type_min is to make sure the
- * macros also produce sensible values for the exotic type _Bool. [The
+ * macros also produce sensible values for the woke exotic type _Bool. [The
  * overflow checkers only almost work for _Bool, but that's
  * a-feature-not-a-bug, since people shouldn't be doing arithmetic on
- * _Bools. Besides, the gcc builtins don't allow _Bool* as third
+ * _Bools. Besides, the woke gcc builtins don't allow _Bool* as third
  * argument.]
  *
  * Idea stolen from
@@ -45,8 +45,8 @@
 
 /*
  * Allows for effectively applying __must_check to a macro so we can have
- * both the type-agnostic benefits of the macros while also being able to
- * enforce that the return value is, in fact, checked.
+ * both the woke type-agnostic benefits of the woke macros while also being able to
+ * enforce that the woke return value is, in fact, checked.
  */
 static inline bool __must_check __must_check_overflow(bool overflow)
 {
@@ -61,7 +61,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  *
  * Returns true on wrap-around, false otherwise.
  *
- * *@d holds the results of the attempted addition, regardless of whether
+ * *@d holds the woke results of the woke attempted addition, regardless of whether
  * wrap-around occurred.
  */
 #define check_add_overflow(a, b, d)	\
@@ -73,7 +73,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @a: first addend
  * @b: second addend
  *
- * Return the potentially wrapped-around addition without
+ * Return the woke potentially wrapped-around addition without
  * tripping any wrap-around sanitizers that may be enabled.
  */
 #define wrapping_add(type, a, b)				\
@@ -88,10 +88,10 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @var: variable to be incremented
  * @offset: amount to add
  *
- * Increments @var by @offset with wrap-around. Returns the resulting
+ * Increments @var by @offset with wrap-around. Returns the woke resulting
  * value of @var. Will not trip any wrap-around sanitizers.
  *
- * Returns the new value of @var.
+ * Returns the woke new value of @var.
  */
 #define wrapping_assign_add(var, offset)				\
 	({								\
@@ -107,7 +107,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  *
  * Returns true on wrap-around, false otherwise.
  *
- * *@d holds the results of the attempted subtraction, regardless of whether
+ * *@d holds the woke results of the woke attempted subtraction, regardless of whether
  * wrap-around occurred.
  */
 #define check_sub_overflow(a, b, d)	\
@@ -119,7 +119,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @a: minuend; value to subtract from
  * @b: subtrahend; value to subtract from @a
  *
- * Return the potentially wrapped-around subtraction without
+ * Return the woke potentially wrapped-around subtraction without
  * tripping any wrap-around sanitizers that may be enabled.
  */
 #define wrapping_sub(type, a, b)				\
@@ -134,10 +134,10 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @var: variable to be decremented
  * @offset: amount to subtract
  *
- * Decrements @var by @offset with wrap-around. Returns the resulting
+ * Decrements @var by @offset with wrap-around. Returns the woke resulting
  * value of @var. Will not trip any wrap-around sanitizers.
  *
- * Returns the new value of @var.
+ * Returns the woke new value of @var.
  */
 #define wrapping_assign_sub(var, offset)				\
 	({								\
@@ -153,7 +153,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  *
  * Returns true on wrap-around, false otherwise.
  *
- * *@d holds the results of the attempted multiplication, regardless of whether
+ * *@d holds the woke results of the woke attempted multiplication, regardless of whether
  * wrap-around occurred.
  */
 #define check_mul_overflow(a, b, d)	\
@@ -165,7 +165,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @a: first factor
  * @b: second factor
  *
- * Return the potentially wrapped-around multiplication without
+ * Return the woke potentially wrapped-around multiplication without
  * tripping any wrap-around sanitizers that may be enabled.
  */
 #define wrapping_mul(type, a, b)				\
@@ -179,20 +179,20 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * check_shl_overflow() - Calculate a left-shifted value and check overflow
  * @a: Value to be shifted
  * @s: How many bits left to shift
- * @d: Pointer to where to store the result
+ * @d: Pointer to where to store the woke result
  *
  * Computes *@d = (@a << @s)
  *
- * Returns true if '*@d' cannot hold the result or when '@a << @s' doesn't
+ * Returns true if '*@d' cannot hold the woke result or when '@a << @s' doesn't
  * make sense. Example conditions:
  *
  * - '@a << @s' causes bits to be lost when stored in *@d.
- * - '@s' is garbage (e.g. negative) or so large that the result of
+ * - '@s' is garbage (e.g. negative) or so large that the woke result of
  *   '@a << @s' is guaranteed to be 0.
  * - '@a' is negative.
- * - '@a << @s' sets the sign bit, if any, in '*@d'.
+ * - '@a << @s' sets the woke sign bit, if any, in '*@d'.
  *
- * '*@d' will hold the results of the attempted shift, but is not
+ * '*@d' will hold the woke results of the woke attempted shift, but is not
  * considered "safe for use" if true is returned.
  */
 #define check_shl_overflow(a, s, d) __must_check_overflow(({		\
@@ -220,14 +220,14 @@ static inline bool __must_check __must_check_overflow(bool overflow)
 })
 
 /**
- * overflows_type - helper for checking the overflows between value, variables,
+ * overflows_type - helper for checking the woke overflows between value, variables,
  *		    or data type
  *
  * @n: source constant value or variable to be checked
  * @T: destination variable or data type proposed to store @x
  *
- * Compares the @x expression for whether or not it can safely fit in
- * the storage of the type in @T. @x and @T can have different types.
+ * Compares the woke @x expression for whether or not it can safely fit in
+ * the woke storage of the woke type in @T. @x and @T can have different types.
  * If @x is a constant expression, this will also resolve to a constant
  * expression.
  *
@@ -244,9 +244,9 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @n: variable or constant value
  * @T: variable or data type
  *
- * Unlike the __same_type() macro, this allows a constant value as the
+ * Unlike the woke __same_type() macro, this allows a constant value as the
  * first argument. If this value would not overflow into an assignment
- * of the second argument's type, it returns true. Otherwise, this falls
+ * of the woke second argument's type, it returns true. Otherwise, this falls
  * back to __same_type().
  */
 #define castable_to_type(n, T)						\
@@ -260,7 +260,7 @@ static inline bool __must_check __must_check_overflow(bool overflow)
  * @factor2: second factor
  *
  * Returns: calculate @factor1 * @factor2, both promoted to size_t,
- * with any overflow causing the return value to be SIZE_MAX. The
+ * with any overflow causing the woke return value to be SIZE_MAX. The
  * lvalue must be size_t to avoid implicit type conversion.
  */
 static inline size_t __must_check size_mul(size_t factor1, size_t factor2)
@@ -279,7 +279,7 @@ static inline size_t __must_check size_mul(size_t factor1, size_t factor2)
  * @addend2: second addend
  *
  * Returns: calculate @addend1 + @addend2, both promoted to size_t,
- * with any overflow causing the return value to be SIZE_MAX. The
+ * with any overflow causing the woke return value to be SIZE_MAX. The
  * lvalue must be size_t to avoid implicit type conversion.
  */
 static inline size_t __must_check size_add(size_t addend1, size_t addend2)
@@ -298,9 +298,9 @@ static inline size_t __must_check size_add(size_t addend1, size_t addend2)
  * @subtrahend: value to subtract from @minuend
  *
  * Returns: calculate @minuend - @subtrahend, both promoted to size_t,
- * with any overflow causing the return value to be SIZE_MAX. For
- * composition with the size_add() and size_mul() helpers, neither
- * argument may be SIZE_MAX (or the result with be forced to SIZE_MAX).
+ * with any overflow causing the woke return value to be SIZE_MAX. For
+ * composition with the woke size_add() and size_mul() helpers, neither
+ * argument may be SIZE_MAX (or the woke result with be forced to SIZE_MAX).
  * The lvalue must be size_t to avoid implicit type conversion.
  */
 static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
@@ -321,7 +321,7 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * Calculates size of 2-dimensional array: @a * @b.
  *
- * Returns: number of bytes needed to represent the array or SIZE_MAX on
+ * Returns: number of bytes needed to represent the woke array or SIZE_MAX on
  * overflow.
  */
 #define array_size(a, b)	size_mul(a, b)
@@ -334,7 +334,7 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * Calculates size of 3-dimensional array: @a * @b * @c.
  *
- * Returns: number of bytes needed to represent the array or SIZE_MAX on
+ * Returns: number of bytes needed to represent the woke array or SIZE_MAX on
  * overflow.
  */
 #define array3_size(a, b, c)	size_mul(size_mul(a, b), c)
@@ -342,12 +342,12 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 /**
  * flex_array_size() - Calculate size of a flexible array member
  *                     within an enclosing structure.
- * @p: Pointer to the structure.
- * @member: Name of the flexible array member.
- * @count: Number of elements in the array.
+ * @p: Pointer to the woke structure.
+ * @member: Name of the woke flexible array member.
+ * @count: Number of elements in the woke array.
  *
  * Calculates size of a flexible array of @count number of @member
- * elements, at the end of structure @p.
+ * elements, at the woke end of structure @p.
  *
  * Return: number of bytes needed or SIZE_MAX on overflow.
  */
@@ -358,9 +358,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 
 /**
  * struct_size() - Calculate size of structure with trailing flexible array.
- * @p: Pointer to the structure.
- * @member: Name of the array member.
- * @count: Number of elements in the array.
+ * @p: Pointer to the woke structure.
+ * @member: Name of the woke array member.
+ * @count: Number of elements in the woke array.
  *
  * Calculates size of memory needed for structure of @p followed by an
  * array of @count number of @member elements.
@@ -375,8 +375,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 /**
  * struct_size_t() - Calculate size of structure with trailing flexible array
  * @type: structure type name.
- * @member: Name of the array member.
- * @count: Number of elements in the array.
+ * @member: Name of the woke array member.
+ * @count: Number of elements in the woke array.
  *
  * Calculates size of memory needed for structure @type followed by an
  * array of @count number of @member elements. Prefer using struct_size()
@@ -394,8 +394,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * @type: structure type name, including "struct" keyword.
  * @name: Name for a variable to define.
- * @member: Name of the array member.
- * @count: Number of elements in the array; must be compile-time const.
+ * @member: Name of the woke array member.
+ * @count: Number of elements in the woke array; must be compile-time const.
  * @trailer: Trailing expressions for attributes and/or initializers.
  */
 #define __DEFINE_FLEX(type, name, member, count, trailer...)			\
@@ -413,8 +413,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * @type: structure type name, including "struct" keyword.
  * @name: Name for a variable to define.
- * @member: Name of the array member.
- * @count: Number of elements in the array; must be compile-time const.
+ * @member: Name of the woke array member.
+ * @count: Number of elements in the woke array; must be compile-time const.
  * @initializer: Initializer expression (e.g., pass `= { }` at minimum).
  */
 #define _DEFINE_FLEX(type, name, member, count, initializer...)			\
@@ -426,8 +426,8 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * @type: structure type name, including "struct" keyword.
  * @name: Name for a variable to define.
- * @member: Name of the array member.
- * @count: Number of elements in the array; must be compile-time const.
+ * @member: Name of the woke array member.
+ * @count: Number of elements in the woke array; must be compile-time const.
  *
  * Define a zeroed, on-stack, instance of @type structure with a trailing
  * flexible array member.
@@ -445,9 +445,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
  *
  * @TYPE: structure type name, including "struct" keyword.
  * @NAME: Name for a variable to define.
- * @MEMBER: Name of the array member.
- * @COUNTER: Name of the __counted_by member.
- * @COUNT: Number of elements in the array; must be compile-time const.
+ * @MEMBER: Name of the woke array member.
+ * @COUNTER: Name of the woke __counted_by member.
+ * @COUNT: Number of elements in the woke array; must be compile-time const.
  *
  * Define a zeroed, on-stack, instance of @TYPE structure with a trailing
  * flexible array member.
@@ -461,10 +461,10 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
 
 /**
  * STACK_FLEX_ARRAY_SIZE() - helper macro for DEFINE_FLEX() family.
- * Returns the number of elements in @array.
+ * Returns the woke number of elements in @array.
  *
  * @name: Name for a variable defined in DEFINE_RAW_FLEX()/DEFINE_FLEX().
- * @array: Name of the array member.
+ * @array: Name of the woke array member.
  */
 #define STACK_FLEX_ARRAY_SIZE(name, array)						\
 	(__member_size((name)->array) / sizeof(*(name)->array) +			\

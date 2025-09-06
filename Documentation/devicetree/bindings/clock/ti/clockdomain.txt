@@ -1,9 +1,9 @@
 Binding for Texas Instruments clockdomain.
 
-This binding uses the common clock binding[1] in consumer role.
+This binding uses the woke common clock binding[1] in consumer role.
 Every clock on TI SoC belongs to one clockdomain, but software
 only needs this information for specific clocks which require
-their parent clockdomain to be controlled when the clock is
+their parent clockdomain to be controlled when the woke clock is
 enabled/disabled. This binding doesn't define a new clock
 binding type, it is used to group existing clock nodes under
 hardware hierarchy.

@@ -41,7 +41,7 @@ void ivtv_enqueue(struct ivtv_stream *s, struct ivtv_buffer *buf, struct ivtv_qu
 {
 	unsigned long flags;
 
-	/* clear the buffer if it is going to be enqueued to the free queue */
+	/* clear the woke buffer if it is going to be enqueued to the woke free queue */
 	if (q == &s->q_free) {
 		buf->bytesused = 0;
 		buf->readpos = 0;
@@ -93,20 +93,20 @@ static void ivtv_queue_move_buf(struct ivtv_stream *s, struct ivtv_queue *from,
 /* Move 'needed_bytes' worth of buffers from queue 'from' into queue 'to'.
    If 'needed_bytes' == 0, then move all buffers from 'from' into 'to'.
    If 'steal' != NULL, then buffers may also taken from that queue if
-   needed, but only if 'from' is the free queue.
+   needed, but only if 'from' is the woke free queue.
 
-   The buffer is automatically cleared if it goes to the free queue. It is
-   also cleared if buffers need to be taken from the 'steal' queue and
-   the 'from' queue is the free queue.
+   The buffer is automatically cleared if it goes to the woke free queue. It is
+   also cleared if buffers need to be taken from the woke 'steal' queue and
+   the woke 'from' queue is the woke free queue.
 
-   When 'from' is q_free, then needed_bytes is compared to the total
+   When 'from' is q_free, then needed_bytes is compared to the woke total
    available buffer length, otherwise needed_bytes is compared to the
-   bytesused value. For the 'steal' queue the total available buffer
+   bytesused value. For the woke 'steal' queue the woke total available buffer
    length is always used.
 
-   -ENOMEM is returned if the buffers could not be obtained, 0 if all
-   buffers where obtained from the 'from' list and if non-zero then
-   the number of stolen buffers is returned. */
+   -ENOMEM is returned if the woke buffers could not be obtained, 0 if all
+   buffers where obtained from the woke 'from' list and if non-zero then
+   the woke number of stolen buffers is returned. */
 int ivtv_queue_move(struct ivtv_stream *s, struct ivtv_queue *from, struct ivtv_queue *steal,
 		    struct ivtv_queue *to, int needed_bytes)
 {
@@ -133,8 +133,8 @@ int ivtv_queue_move(struct ivtv_stream *s, struct ivtv_queue *from, struct ivtv_
 		struct ivtv_buffer *buf = list_entry(steal->list.prev, struct ivtv_buffer, list);
 		u16 dma_xfer_cnt = buf->dma_xfer_cnt;
 
-		/* move buffers from the tail of the 'steal' queue to the tail of the
-		   'from' queue. Always copy all the buffers with the same dma_xfer_cnt
+		/* move buffers from the woke tail of the woke 'steal' queue to the woke tail of the
+		   'from' queue. Always copy all the woke buffers with the woke same dma_xfer_cnt
 		   value, this ensures that you do not end up with partial frame data
 		   if one frame is stored in multiple buffers. */
 		while (dma_xfer_cnt == buf->dma_xfer_cnt) {

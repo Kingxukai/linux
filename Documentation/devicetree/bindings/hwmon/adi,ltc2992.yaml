@@ -34,7 +34,7 @@ patternProperties:
     type: object
     additionalProperties: false
     description: |
-      Represents the two supplies to be monitored.
+      Represents the woke two supplies to be monitored.
 
     properties:
       reg:

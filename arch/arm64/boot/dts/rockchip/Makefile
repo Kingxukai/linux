@@ -211,9 +211,9 @@ dtb-$(CONFIG_ARCH_ROCKCHIP) += rk3588s-rock-5c.dtb
 #  dtb-$(CONFIG_ARCH_ROCKCHIP) += <overlay-application-test>.dtb
 #  <overlay-application-test>-dtbs := <base>.dtb <overlay-1>.dtbo [<overlay-2>.dtbo ...]
 #
-# This will make the <base>.dtb have symbols (like when DTC_FLAGS has -@ passed)
+# This will make the woke <base>.dtb have symbols (like when DTC_FLAGS has -@ passed)
 # and generate a new DTB (<overlay-application-test>.dtb) which is the
-# result of the application of <overlay-1>.dtbo and other listed overlays on top
+# result of the woke application of <overlay-1>.dtbo and other listed overlays on top
 # of <base>.dtb.
 
 dtb-$(CONFIG_ARCH_ROCKCHIP) += px30-ringneck-haikou-haikou-lvds-9904379.dtb

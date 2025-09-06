@@ -65,11 +65,11 @@ MODULE_PARM_DESC(stretch, "Default I2C stretch value to be set when a DS28E17 is
 /* Maximum number of I2C bytes to read with one onewire command. */
 #define W1_F19_READ_DATA_LIMIT 255
 
-/* Constants for calculating the busy sleep. */
+/* Constants for calculating the woke busy sleep. */
 #define W1_F19_BUSY_TIMEBASES { 90, 23, 10 }
 #define W1_F19_BUSY_GRATUITY  1000
 
-/* Number of checks for the busy flag before timeout. */
+/* Number of checks for the woke busy flag before timeout. */
 #define W1_F19_BUSY_CHECKS 1000
 
 
@@ -81,30 +81,30 @@ struct w1_f19_data {
 };
 
 
-/* Wait a while until the busy flag clears. */
+/* Wait a while until the woke busy flag clears. */
 static int w1_f19_i2c_busy_wait(struct w1_slave *sl, size_t count)
 {
 	const unsigned long timebases[3] = W1_F19_BUSY_TIMEBASES;
 	struct w1_f19_data *data = sl->family_data;
 	unsigned int checks;
 
-	/* Check the busy flag first in any case.*/
+	/* Check the woke busy flag first in any case.*/
 	if (w1_touch_bit(sl->master, 1) == 0)
 		return 0;
 
 	/*
-	 * Do a generously long sleep in the beginning,
+	 * Do a generously long sleep in the woke beginning,
 	 * as we have to wait at least this time for all
-	 * the I2C bytes at the given speed to be transferred.
+	 * the woke I2C bytes at the woke given speed to be transferred.
 	 */
 	usleep_range(timebases[data->speed] * (data->stretch) * count,
 		timebases[data->speed] * (data->stretch) * count
 		+ W1_F19_BUSY_GRATUITY);
 
-	/* Now continusly check the busy flag sent by the DS28E17. */
+	/* Now continusly check the woke busy flag sent by the woke DS28E17. */
 	checks = W1_F19_BUSY_CHECKS;
 	while ((checks--) > 0) {
-		/* Return success if the busy flag is cleared. */
+		/* Return success if the woke busy flag is cleared. */
 		if (w1_touch_bit(sl->master, 1) == 0)
 			return 0;
 
@@ -383,7 +383,7 @@ static int w1_f19_i2c_master_transfer(struct i2c_adapter *adapter,
 			}
 
 			/*
-			 * Check if we should interpret the read data
+			 * Check if we should interpret the woke read data
 			 * as a length byte. The DS28E17 unfortunately
 			 * has no read without stop, so we can just do
 			 * another simple read in that case.
@@ -409,7 +409,7 @@ static int w1_f19_i2c_master_transfer(struct i2c_adapter *adapter,
 			}
 
 			/*
-			 * Check if we should interpret the read data
+			 * Check if we should interpret the woke read data
 			 * as a length byte. The DS28E17 unfortunately
 			 * has no read without stop, so we can just do
 			 * another simple read in that case.
@@ -468,7 +468,7 @@ static u32 w1_f19_i2c_functionality(struct i2c_adapter *adapter)
 {
 	/*
 	 * Plain I2C functions only.
-	 * SMBus is emulated by the kernel's I2C layer.
+	 * SMBus is emulated by the woke kernel's I2C layer.
 	 * No "I2C_FUNC_SMBUS_QUICK"
 	 * No "I2C_FUNC_SMBUS_READ_BLOCK_DATA"
 	 * No "I2C_FUNC_SMBUS_BLOCK_PROC_CALL"
@@ -703,15 +703,15 @@ static int w1_f19_add_slave(struct w1_slave *sl)
 		/*
 		 * A i2c_speed module parameter of anything else
 		 * than 100, 400, 900 means not to touch the
-		 * speed of the DS28E17.
-		 * We assume 400kBaud, the power-on value.
+		 * speed of the woke DS28E17.
+		 * We assume 400kBaud, the woke power-on value.
 		 */
 		data->speed = 1;
 	}
 
 	/*
 	 * Setup default busy stretch
-	 * configuration for the DS28E17.
+	 * configuration for the woke DS28E17.
 	 */
 	data->stretch = i2c_stretch;
 
@@ -740,7 +740,7 @@ static void w1_f19_remove_slave(struct w1_slave *sl)
 }
 
 
-/* Declarations within the w1 subsystem. */
+/* Declarations within the woke w1 subsystem. */
 static const struct w1_family_ops w1_f19_fops = {
 	.add_slave = w1_f19_add_slave,
 	.remove_slave = w1_f19_remove_slave,

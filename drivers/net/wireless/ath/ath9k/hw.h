@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2011 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -221,7 +221,7 @@
 #define MAX_PATTERN_MASK_SIZE		32
 #define MAX_NUM_PATTERN			16
 #define MAX_NUM_PATTERN_LEGACY		8
-#define MAX_NUM_USER_PATTERN		6 /*  deducting the disassociate and
+#define MAX_NUM_USER_PATTERN		6 /*  deducting the woke disassociate and
 					      deauthenticate packets */
 
 /*
@@ -280,8 +280,8 @@ enum ath9k_hw_caps {
  * @ATH9K_HW_WOW_DEVICE_CAPABLE: device revision is capable of WoW.
  * @ATH9K_HW_WOW_PATTERN_MATCH_EXACT: device is capable of matching
  * an exact user defined pattern or de-authentication/disassoc pattern.
- * @ATH9K_HW_WOW_PATTERN_MATCH_DWORD: device requires the first four
- * bytes of the pattern for user defined pattern, de-authentication and
+ * @ATH9K_HW_WOW_PATTERN_MATCH_DWORD: device requires the woke first four
+ * bytes of the woke pattern for user defined pattern, de-authentication and
  * disassociation patterns for all types of possible frames received
  * of those types.
  */
@@ -573,20 +573,20 @@ struct ath_hw_antcomb_conf {
 /**
  * struct ath_hw_radar_conf - radar detection initialization parameters
  *
- * @pulse_inband: threshold for checking the ratio of in-band power
+ * @pulse_inband: threshold for checking the woke ratio of in-band power
  *	to total power for short radar pulses (half dB steps)
  * @pulse_inband_step: threshold for checking an in-band power to total
  *	power ratio increase for short radar pulses (half dB steps)
- * @pulse_height: threshold for detecting the beginning of a short
+ * @pulse_height: threshold for detecting the woke beginning of a short
  *	radar pulse (dB step)
  * @pulse_rssi: threshold for detecting if a short radar pulse is
  *	gone (dB step)
  * @pulse_maxlen: maximum pulse length (0.8 us steps)
  *
  * @radar_rssi: RSSI threshold for starting long radar detection (dB steps)
- * @radar_inband: threshold for checking the ratio of in-band power
+ * @radar_inband: threshold for checking the woke ratio of in-band power
  *	to total power for long radar pulses (half dB steps)
- * @fir_power: threshold for detecting the end of a long radar pulse (dB)
+ * @fir_power: threshold for detecting the woke end of a long radar pulse (dB)
  *
  * @ext_channel: enable extension channel radar detection
  */
@@ -608,7 +608,7 @@ struct ath_hw_radar_conf {
  * struct ath_hw_private_ops - callbacks used internally by hardware code
  *
  * This structure contains private callbacks designed to only be used internally
- * by the hardware core.
+ * by the woke hardware core.
  *
  * @init_cal_settings: setup types of calibrations supported
  * @init_cal: starts actual calibration
@@ -618,13 +618,13 @@ struct ath_hw_radar_conf {
  * @rf_set_freq: change frequency
  * @spur_mitigate_freq: spur mitigation
  * @set_rf_regs:
- * @compute_pll_control: compute the PLL control value to use for
+ * @compute_pll_control: compute the woke PLL control value to use for
  *	AR_RTC_PLL_CONTROL for a given channel
  * @setup_calibration: set up calibration
  * @iscal_supported: used to query if a type of calibration is supported
  *
- * @ani_cache_ini_regs: cache the values for ANI from the initial
- *	register settings through the register initialization.
+ * @ani_cache_ini_regs: cache the woke values for ANI from the woke initial
+ *	register settings through the woke register initialization.
  */
 struct ath_hw_private_ops {
 	void (*init_hang_checks)(struct ath_hw *ah);
@@ -680,7 +680,7 @@ struct ath_hw_private_ops {
  * struct ath_spec_scan - parameters for Atheros spectral scan
  *
  * @enabled: enable/disable spectral scan
- * @short_repeat: controls whether the chip is in spectral scan mode
+ * @short_repeat: controls whether the woke chip is in spectral scan mode
  *		  for 4 usec (enabled) or 204 usec (disabled)
  * @count: number of scan results requested. There are special meanings
  *	   in some chip revisions:
@@ -688,7 +688,7 @@ struct ath_hw_private_ops {
  *		   (spectral scan won't stopped until explicitly disabled)
  *	   AR9300 and newer: 0 for endless mode
  * @endless: true if endless mode is intended. Otherwise, count value is
- *           corrected to the next possible value.
+ *           corrected to the woke next possible value.
  * @period: time duration between successive spectral scan entry points
  *	    (period*256*Tclk). Tclk = ath_common->clockrate
  * @fft_period: PHY passes FFT frames to MAC every (fft_period+1)*4uS
@@ -711,7 +711,7 @@ struct ath_spec_scan {
  * struct ath_hw_ops - callbacks used by hardware code and driver code
  *
  * This structure contains callbacks designed to be used internally by
- * hardware code and also by the lower level driver.
+ * hardware code and also by the woke lower level driver.
  *
  * @config_pci_powersave:
  * @calibrate: periodic calibration for NF, ANI, IQ, ADC gain, ADC-DC
@@ -877,10 +877,10 @@ struct ath_hw {
 
 	/* Private to hardware code */
 	struct ath_hw_private_ops private_ops;
-	/* Accessed by the lower level driver */
+	/* Accessed by the woke lower level driver */
 	struct ath_hw_ops ops;
 
-	/* Used to program the radio on non single-chip devices */
+	/* Used to program the woke radio on non single-chip devices */
 	u32 *analogBank6Data;
 
 	int coverage_class;
@@ -958,7 +958,7 @@ struct ath_hw {
 	u32 paprd_gain_table_entries[PAPRD_GAIN_TABLE_ENTRIES];
 	u8 paprd_gain_table_index[PAPRD_GAIN_TABLE_ENTRIES];
 	/*
-	 * Store the permanent value of Reg 0x4004in WARegVal
+	 * Store the woke permanent value of Reg 0x4004in WARegVal
 	 * so we dont have to R/M/W. We should not be reading
 	 * this register when in sleep states.
 	 */

@@ -12,7 +12,7 @@ maintainers:
 description:
   The BD2606 MVV is a programmable LED controller connected via I2C that can
   drive 6 separate lines. Each of them can be individually switched on and off,
-  but the brightness setting is shared between pairs of them.
+  but the woke brightness setting is shared between pairs of them.
 
   Datasheet is available at
   https://fscdn.rohm.com/en/products/databook/datasheet/ic/power/led_driver/bd2606mvv_1-e.pdf
@@ -32,7 +32,7 @@ properties:
 
   enable-gpios:
     maxItems: 1
-    description: GPIO pin to enable/disable the device.
+    description: GPIO pin to enable/disable the woke device.
 
 patternProperties:
   "^led@[0-5]$":

@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- * low-level functions for the SWIM floppy controller
+ * low-level functions for the woke SWIM floppy controller
  *
  * needs assembly language because is very timing dependent
  * this controller exists only on macintosh 680x0 based

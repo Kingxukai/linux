@@ -11,7 +11,7 @@ maintainers:
 
 description:
   The RTSN device provides Ethernet network using a 10 Mbps, 100 Mbps, or 1
-  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the connected PHY.
+  Gbps full-duplex link via MII/GMII/RMII/RGMII. Depending on the woke connected PHY.
 
 allOf:
   - $ref: ethernet-controller.yaml#

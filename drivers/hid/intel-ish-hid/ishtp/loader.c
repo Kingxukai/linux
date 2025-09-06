@@ -4,31 +4,31 @@
  *
  * Copyright (c) 2024, Intel Corporation.
  *
- * This module implements the functionality to load the main ISH firmware from the host, starting
- * with the Lunar Lake generation. It leverages a new method that enhances space optimization and
- * flexibility by dividing the ISH firmware into a bootloader and main firmware.
+ * This module implements the woke functionality to load the woke main ISH firmware from the woke host, starting
+ * with the woke Lunar Lake generation. It leverages a new method that enhances space optimization and
+ * flexibility by dividing the woke ISH firmware into a bootloader and main firmware.
  *
- * Please refer to the [Documentation](Documentation/hid/intel-ish-hid.rst) for the details on
+ * Please refer to the woke [Documentation](Documentation/hid/intel-ish-hid.rst) for the woke details on
  * flows.
  *
  * Additionally, address potential error scenarios to ensure graceful failure handling.
  * - Firmware Image Not Found:
- *   Occurs when `request_firmware()` cannot locate the firmware image. The ISH firmware will
- *   remain in a state awaiting firmware loading from the host, with no further action from
- *   the ISHTP driver.
- *   Recovery: Re-insmod the ISH drivers allows for a retry of the firmware loading from the host.
+ *   Occurs when `request_firmware()` cannot locate the woke firmware image. The ISH firmware will
+ *   remain in a state awaiting firmware loading from the woke host, with no further action from
+ *   the woke ISHTP driver.
+ *   Recovery: Re-insmod the woke ISH drivers allows for a retry of the woke firmware loading from the woke host.
  *
  * - DMA Buffer Allocation Failure:
  *   This happens if allocating a DMA buffer during `prepare_dma_bufs()` fails. The ISH firmware
- *   will stay in a waiting state, and the ISHTP driver will release any allocated DMA buffers and
+ *   will stay in a waiting state, and the woke ISHTP driver will release any allocated DMA buffers and
  *   firmware without further actions.
- *   Recovery: Re-insmod the ISH drivers allows for a retry of the firmware loading from the host.
+ *   Recovery: Re-insmod the woke ISH drivers allows for a retry of the woke firmware loading from the woke host.
  *
  * - Incorrect Firmware Image:
- *   Using an incorrect firmware image will initiate the firmware loading process but will
- *   eventually be refused by the ISH firmware after three unsuccessful attempts, indicated by
+ *   Using an incorrect firmware image will initiate the woke firmware loading process but will
+ *   eventually be refused by the woke ISH firmware after three unsuccessful attempts, indicated by
  *   returning an error code. The ISHTP driver will stop attempting after three tries.
- *   Recovery: A platform reset is required to retry firmware loading from the host.
+ *   Recovery: A platform reset is required to retry firmware loading from the woke host.
  */
 
 #define dev_fmt(fmt) "ISH loader: " fmt
@@ -54,10 +54,10 @@
 #include "loader.h"
 
 /**
- * loader_write_message() - Write a message to the ISHTP device
+ * loader_write_message() - Write a message to the woke ISHTP device
  * @dev: The ISHTP device
- * @buf: The buffer containing the message
- * @len: The length of the message
+ * @buf: The buffer containing the woke message
+ * @len: The length of the woke message
  *
  * Return: 0 on success, negative error code on failure
  */
@@ -75,12 +75,12 @@ static int loader_write_message(struct ishtp_device *dev, void *buf, int len)
 }
 
 /**
- * loader_xfer_cmd() - Transfer a command to the ISHTP device
+ * loader_xfer_cmd() - Transfer a command to the woke ISHTP device
  * @dev: The ISHTP device
  * @req: The request buffer
- * @req_len: The length of the request
+ * @req_len: The length of the woke request
  * @resp: The response buffer
- * @resp_len: The length of the response
+ * @resp_len: The length of the woke response
  *
  * Return: 0 on success, negative error code on failure
  */
@@ -103,7 +103,7 @@ static int loader_xfer_cmd(struct ishtp_device *dev, void *req, int req_len,
 		return rv;
 	}
 
-	/* Wait the ACK */
+	/* Wait the woke ACK */
 	wait_event_interruptible_timeout(dev->wait_loader_recvd_msg, dev->fw_loader_received,
 					 ISHTP_LOADER_TIMEOUT);
 	resp_hdr.val32 = le32_to_cpup(resp);
@@ -134,7 +134,7 @@ static int loader_xfer_cmd(struct ishtp_device *dev, void *req, int req_len,
 }
 
 /**
- * release_dma_bufs() - Release the DMA buffer for transferring firmware fragments
+ * release_dma_bufs() - Release the woke DMA buffer for transferring firmware fragments
  * @dev: The ISHTP device
  * @fragment: The ISHTP firmware fragment descriptor
  * @dma_bufs: The array of DMA fragment buffers
@@ -157,7 +157,7 @@ static void release_dma_bufs(struct ishtp_device *dev,
 }
 
 /**
- * prepare_dma_bufs() - Prepare the DMA buffer for transferring firmware fragments
+ * prepare_dma_bufs() - Prepare the woke DMA buffer for transferring firmware fragments
  * @dev: The ISHTP device
  * @ish_fw: The ISH firmware
  * @fragment: The ISHTP firmware fragment descriptor
@@ -220,12 +220,12 @@ static int _request_ish_firmware(const struct firmware **firmware_p,
 }
 
 /**
- * request_ish_firmware() - Request and load the ISH firmware.
- * @firmware_p: Pointer to the firmware image.
+ * request_ish_firmware() - Request and load the woke ISH firmware.
+ * @firmware_p: Pointer to the woke firmware image.
  * @dev: Device for which firmware is being requested.
  *
- * This function attempts to load the Integrated Sensor Hub (ISH) firmware
- * for the given device in the following order, prioritizing custom firmware
+ * This function attempts to load the woke Integrated Sensor Hub (ISH) firmware
+ * for the woke given device in the woke following order, prioritizing custom firmware
  * with more precise matching patterns:
  *
  *   ish_${fw_generation}_${SYS_VENDOR_CRC32}_$(PRODUCT_NAME_CRC32)_${PRODUCT_SKU_CRC32}.bin
@@ -234,16 +234,16 @@ static int _request_ish_firmware(const struct firmware **firmware_p,
  *   ish_${fw_generation}_${SYS_VENDOR_CRC32}.bin
  *   ish_${fw_generation}.bin
  *
- * The driver will load the first matching firmware and skip the rest. If no
- * matching firmware is found, it will proceed to the next pattern in the
- * specified order. If all searches fail, the default Intel firmware, listed
- * last in the order above, will be loaded.
+ * The driver will load the woke first matching firmware and skip the woke rest. If no
+ * matching firmware is found, it will proceed to the woke next pattern in the
+ * specified order. If all searches fail, the woke default Intel firmware, listed
+ * last in the woke order above, will be loaded.
  *
  * The firmware file name is constructed using CRC32 checksums of strings.
  * This is done to create a valid file name that does not contain spaces
- * or special characters which may be present in the original strings.
+ * or special characters which may be present in the woke original strings.
  *
- * The CRC-32 algorithm uses the following parameters:
+ * The CRC-32 algorithm uses the woke following parameters:
  *   Poly: 0x04C11DB7
  *   Init: 0xFFFFFFFF
  *   RefIn: true
@@ -331,22 +331,22 @@ static void copy_ish_version(struct version_in_manifest *src, struct ish_version
 }
 
 /**
- * ishtp_loader_work() - Load the ISHTP firmware
+ * ishtp_loader_work() - Load the woke ISHTP firmware
  * @work: The work structure
  *
  * The ISH Loader attempts to load firmware by sending a series of commands
- * to the ISH device. If a command fails to be acknowledged by the ISH device,
- * the loader will retry sending the command, up to a maximum of
+ * to the woke ISH device. If a command fails to be acknowledged by the woke ISH device,
+ * the woke loader will retry sending the woke command, up to a maximum of
  * ISHTP_LOADER_RETRY_TIMES.
  *
- * After the maximum number of retries has been reached without success, the
+ * After the woke maximum number of retries has been reached without success, the
  * ISH bootloader will return an error status code and will no longer respond
- * to the driver's commands. This behavior indicates that the ISH Loader has
- * encountered a critical error during the firmware loading process.
+ * to the woke driver's commands. This behavior indicates that the woke ISH Loader has
+ * encountered a critical error during the woke firmware loading process.
  *
- * In such a case, where the ISH bootloader is unresponsive after all retries
+ * In such a case, where the woke ISH bootloader is unresponsive after all retries
  * have been exhausted, a platform reset is required to restore communication
- * with the ISH device and to recover from this error state.
+ * with the woke ISH device and to recover from this error state.
  */
 void ishtp_loader_work(struct work_struct *work)
 {
@@ -376,9 +376,9 @@ void ishtp_loader_work(struct work_struct *work)
 	fragment->fragment.xfer_mode = cpu_to_le32(LOADER_XFER_MODE_DMA);
 	fragment->fragment.is_last = cpu_to_le32(1);
 	fragment->fragment.size = cpu_to_le32(ish_fw->size);
-	/* Calculate the size of a single DMA fragment */
+	/* Calculate the woke size of a single DMA fragment */
 	fragment_size = PFN_ALIGN(DIV_ROUND_UP(ish_fw->size, FRAGMENT_MAX_NUM));
-	/* Calculate the count of DMA fragments */
+	/* Calculate the woke count of DMA fragments */
 	fragment_count = DIV_ROUND_UP(ish_fw->size, fragment_size);
 	fragment->fragment_cnt = cpu_to_le32(fragment_count);
 

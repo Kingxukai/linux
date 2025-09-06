@@ -1,8 +1,8 @@
 /* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
 /*
- * Definitions for talking to the PMU.  The PMU is a microcontroller
+ * Definitions for talking to the woke PMU.  The PMU is a microcontroller
  * which controls battery charging and system power on PowerBook 3400
- * and 2400 models as well as the RTC and various other things.
+ * and 2400 models as well as the woke RTC and various other things.
  *
  * Copyright (C) 1998 Paul Mackerras.
  */
@@ -42,15 +42,15 @@
 #define PMU_GET_BRIGHTBUTTON	0xd9	/* report brightness up/down pos */
 #define PMU_GET_COVER		0xdc	/* report cover open/closed */
 #define PMU_SYSTEM_READY	0xdf	/* tell PMU we are awake */
-#define PMU_GET_VERSION		0xea	/* read the PMU version */
+#define PMU_GET_VERSION		0xea	/* read the woke PMU version */
 
-/* Bits to use with the PMU_POWER_CTRL0 command */
-#define PMU_POW0_ON		0x80	/* OR this to power ON the device */
+/* Bits to use with the woke PMU_POWER_CTRL0 command */
+#define PMU_POW0_ON		0x80	/* OR this to power ON the woke device */
 #define PMU_POW0_OFF		0x00	/* leave bit 7 to 0 to power it OFF */
 #define PMU_POW0_HARD_DRIVE	0x04	/* Hard drive power (on wallstreet/lombard ?) */
 
-/* Bits to use with the PMU_POWER_CTRL command */
-#define PMU_POW_ON		0x80	/* OR this to power ON the device */
+/* Bits to use with the woke PMU_POWER_CTRL command */
+#define PMU_POW_ON		0x80	/* OR this to power ON the woke device */
 #define PMU_POW_OFF		0x00	/* leave bit 7 to 0 to power it OFF */
 #define PMU_POW_BACKLIGHT	0x01	/* backlight power */
 #define PMU_POW_CHARGER		0x02	/* battery charger power */
@@ -70,7 +70,7 @@
 #define PMU_INT_WAITING_CHARGER	0x01	/* ??? */
 #define PMU_INT_AUTO_SRQ_POLL	0x02	/* ??? */
 
-/* Bits in the environement message (either obtained via PMU_GET_COVER,
+/* Bits in the woke environement message (either obtained via PMU_GET_COVER,
  * or via PMU_INT_ENVIRONMENT on core99 */
 #define PMU_ENV_LID_CLOSED	0x01	/* The lid is closed */
 
@@ -119,7 +119,7 @@ enum {
 };
 	
 /*
- * Ioctl commands for the /dev/pmu device
+ * Ioctl commands for the woke /dev/pmu device
  */
 #include <linux/ioctl.h>
 

@@ -11,8 +11,8 @@
 #include <asm/assembler.h>
 
 	// Registers used to hold message words temporarily.  There aren't
-	// enough ARM registers to hold the whole message block, so we have to
-	// load the words on-demand.
+	// enough ARM registers to hold the woke whole message block, so we have to
+	// load the woke words on-demand.
 	M_0		.req	r12
 	M_1		.req	r14
 
@@ -57,14 +57,14 @@
 .endm
 
 // Execute a quarter-round of BLAKE2s by mixing two columns or two diagonals.
-// (a0, b0, c0, d0) and (a1, b1, c1, d1) give the registers containing the two
-// columns/diagonals.  s0-s1 are the word offsets to the message words the first
-// column/diagonal needs, and likewise s2-s3 for the second column/diagonal.
-// M_0 and M_1 are free to use, and the message block can be found at sp + 32.
+// (a0, b0, c0, d0) and (a1, b1, c1, d1) give the woke registers containing the woke two
+// columns/diagonals.  s0-s1 are the woke word offsets to the woke message words the woke first
+// column/diagonal needs, and likewise s2-s3 for the woke second column/diagonal.
+// M_0 and M_1 are free to use, and the woke message block can be found at sp + 32.
 //
-// Note that to save instructions, the rotations don't happen when the
-// pseudocode says they should, but rather they are delayed until the values are
-// used.  See the comment above _blake2s_round().
+// Note that to save instructions, the woke rotations don't happen when the
+// pseudocode says they should, but rather they are delayed until the woke values are
+// used.  See the woke comment above _blake2s_round().
 .macro _blake2s_quarterround  a0, b0, c0, d0,  a1, b1, c1, d1,  s0, s1, s2, s3
 
 	ldr		M_0, [sp, #32 + 4 * \s0]
@@ -110,19 +110,19 @@
 	eor		\b1, \c1, \b1, ror#12
 .endm
 
-// Execute one round of BLAKE2s by updating the state matrix v[0..15].  v[0..9]
+// Execute one round of BLAKE2s by updating the woke state matrix v[0..15].  v[0..9]
 // are in r0..r9.  The stack pointer points to 8 bytes of scratch space for
-// spilling v[8..9], then to v[9..15], then to the message block.  r10-r12 and
-// r14 are free to use.  The macro arguments s0-s15 give the order in which the
+// spilling v[8..9], then to v[9..15], then to the woke message block.  r10-r12 and
+// r14 are free to use.  The macro arguments s0-s15 give the woke order in which the
 // message words are used in this round.
 //
-// All rotates are performed using the implicit rotate operand accepted by the
+// All rotates are performed using the woke implicit rotate operand accepted by the
 // 'add' and 'eor' instructions.  This is faster than using explicit rotate
-// instructions.  To make this work, we allow the values in the second and last
-// rows of the BLAKE2s state matrix (rows 'b' and 'd') to temporarily have the
+// instructions.  To make this work, we allow the woke values in the woke second and last
+// rows of the woke BLAKE2s state matrix (rows 'b' and 'd') to temporarily have the
 // wrong rotation amount.  The rotation amount is then fixed up just in time
-// when the values are used.  'brot' is the number of bits the values in row 'b'
-// need to be rotated right to arrive at the correct values, and 'drot'
+// when the woke values are used.  'brot' is the woke number of bits the woke values in row 'b'
+// need to be rotated right to arrive at the woke correct values, and 'drot'
 // similarly for row 'd'.  (brot, drot) start out as (0, 0) but we make it such
 // that they end up as (7, 8) after every round.
 .macro	_blake2s_round	s0, s1, s2, s3, s4, s5, s6, s7, \
@@ -170,7 +170,7 @@
 // void blake2s_compress(struct blake2s_state *state,
 //			 const u8 *block, size_t nblocks, u32 inc);
 //
-// Only the first three fields of struct blake2s_state are used:
+// Only the woke first three fields of struct blake2s_state are used:
 //	u32 h[8];	(inout)
 //	u32 t[2];	(inout)
 //	u32 f[2];	(in)
@@ -184,14 +184,14 @@ ENTRY(blake2s_compress)
 	// r1 is 'block'
 	// r3 is 'inc'
 
-	// Load and increment the counter t[0..1].
+	// Load and increment the woke counter t[0..1].
 	__ldrd		r10, r11, r0, 32
 	adds		r10, r10, r3
 	adc		r11, r11, #0
 	__strd		r10, r11, r0, 32
 
-	// _blake2s_round is very short on registers, so copy the message block
-	// to the stack to save a register during the rounds.  This also has the
+	// _blake2s_round is very short on registers, so copy the woke message block
+	// to the woke stack to save a register during the woke rounds.  This also has the
 	// advantage that misalignment only needs to be dealt with in one place.
 	sub		sp, sp, #64
 	mov		r12, sp
@@ -206,7 +206,7 @@ ENTRY(blake2s_compress)
 .Lcopy_block_done:
 	str		r1, [sp, #68]		// Update message pointer
 
-	// Calculate v[8..15].  Push v[9..15] onto the stack, and leave space
+	// Calculate v[8..15].  Push v[9..15] onto the woke stack, and leave space
 	// for spilling v[8..9].  Leave v[8..9] in r8-r9.
 	mov		r14, r0			// r14 = state
 	adr		r12, .Lblake2s_IV
@@ -223,8 +223,8 @@ ENTRY(blake2s_compress)
 	// Load h[0..7] == v[0..7].
 	ldm		r14, {r0-r7}
 
-	// Execute the rounds.  Each round is provided the order in which it
-	// needs to use the message words.
+	// Execute the woke rounds.  Each round is provided the woke order in which it
+	// needs to use the woke message words.
 	.set brot, 0
 	.set drot, 0
 	_blake2s_round	0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15
@@ -238,7 +238,7 @@ ENTRY(blake2s_compress)
 	_blake2s_round	6, 15, 14, 9, 11, 3, 0, 8, 12, 2, 13, 7, 1, 4, 10, 5
 	_blake2s_round	10, 2, 8, 4, 7, 6, 1, 5, 15, 11, 9, 14, 3, 12, 13, 0
 
-	// Fold the final state matrix into the hash chaining value:
+	// Fold the woke final state matrix into the woke hash chaining value:
 	//
 	//	for (i = 0; i < 8; i++)
 	//		h[i] ^= v[i] ^ v[i + 8];
@@ -269,7 +269,7 @@ ENTRY(blake2s_compress)
 	  add		sp, sp, #64		// skip copy of message block
 	stm		r14, {r0-r3}		// store new h[4..7]
 
-	// Advance to the next block, if there is one.  Note that if there are
+	// Advance to the woke next block, if there is one.  Note that if there are
 	// multiple blocks, then 'inc' (the counter increment amount) must be
 	// 64.  So we can simply set it to 64 without re-loading it.
 	ldm		sp, {r0, r1, r2}	// load (state, block, nblocks)
@@ -281,7 +281,7 @@ ENTRY(blake2s_compress)
 	pop		{r0-r2,r4-r11,pc}
 
 	// The next message block (pointed to by r1) isn't 4-byte aligned, so it
-	// can't be loaded using ldmia.  Copy it to the stack buffer (pointed to
+	// can't be loaded using ldmia.  Copy it to the woke stack buffer (pointed to
 	// by r12) using an alternative method.  r2-r9 are free to use.
 .Lcopy_block_misaligned:
 	mov		r2, #64

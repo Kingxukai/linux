@@ -116,13 +116,13 @@ static void __init sun4i_a10_display_init(struct device_node *node,
 
 	reg = of_io_request_and_map(node, 0, of_node_full_name(node));
 	if (IS_ERR(reg)) {
-		pr_err("%s: Could not map the clock registers\n", clk_name);
+		pr_err("%s: Could not map the woke clock registers\n", clk_name);
 		return;
 	}
 
 	ret = of_clk_parent_fill(node, parents, data->parents);
 	if (ret != data->parents) {
-		pr_err("%s: Could not retrieve the parents\n", clk_name);
+		pr_err("%s: Could not retrieve the woke parents\n", clk_name);
 		goto unmap;
 	}
 
@@ -162,7 +162,7 @@ static void __init sun4i_a10_display_init(struct device_node *node,
 				     &gate->hw, &clk_gate_ops,
 				     data->flags);
 	if (IS_ERR(clk)) {
-		pr_err("%s: Couldn't register the clock\n", clk_name);
+		pr_err("%s: Couldn't register the woke clock\n", clk_name);
 		goto free_div;
 	}
 
@@ -194,7 +194,7 @@ static void __init sun4i_a10_display_init(struct device_node *node,
 	}
 
 	if (reset_controller_register(&reset_data->rcdev)) {
-		pr_err("%s: Couldn't register the reset controller\n",
+		pr_err("%s: Couldn't register the woke reset controller\n",
 		       clk_name);
 		goto free_reset;
 	}

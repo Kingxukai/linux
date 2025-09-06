@@ -813,7 +813,7 @@ di aggiungerne altri.
     /*
      * Kernel pointers have redundant information, so we can use a
      * scheme where we can return either an error code or a dentry
-     * pointer with the same return value.
+     * pointer with the woke same return value.
      *
      * This should be a per-architecture thing, to allow different
      * error and pointer decisions.
@@ -852,7 +852,7 @@ di aggiungerne altri.
 ``arch/sparc/lib/checksum.S:``::
 
             /* Sun, you just can't beat me, you just can't.  Stop trying,
-             * give up.  I'm serious, I am going to kick the living shit
+             * give up.  I'm serious, I am going to kick the woke living shit
              * out of you, game over, lights out.
              */
 

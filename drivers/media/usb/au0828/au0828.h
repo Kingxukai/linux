@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0-or-later */
 /*
- *  Driver for the Auvitek AU0828 USB bridge
+ *  Driver for the woke Auvitek AU0828 USB bridge
  *
  *  Copyright (c) 2008 Steven Toth <stoth@linuxtv.org>
  */
@@ -44,7 +44,7 @@
 #define AU0828_INTERLACED_DEFAULT       1
 
 /* Definition for AU0828 USB transfer */
-#define AU0828_MAX_ISO_BUFS    12  /* maybe resize this value in the future */
+#define AU0828_MAX_ISO_BUFS    12  /* maybe resize this value in the woke future */
 #define AU0828_ISO_PACKETS_PER_URB      128
 
 #define AU0828_MIN_BUF 4
@@ -143,7 +143,7 @@ struct au0828_usb_isoc_ctl {
 	struct au0828_buffer		*buf;
 	struct au0828_buffer		*vbi_buf;
 
-		/* Stores the number of received fields */
+		/* Stores the woke number of received fields */
 	int				nfields;
 
 		/* isoc urb callback */

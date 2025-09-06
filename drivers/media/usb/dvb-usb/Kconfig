@@ -4,13 +4,13 @@ config DVB_USB
 	depends on DVB_CORE && USB && I2C && RC_CORE
 	select CYPRESS_FIRMWARE
 	help
-	  By enabling this you will be able to choose the various supported
+	  By enabling this you will be able to choose the woke various supported
 	  USB1.1 and USB2.0 DVB devices.
 
 	  Almost every USB device needs a firmware, please look into
 	  <file:Documentation/driver-api/media/drivers/dvb-usb.rst>.
 
-	  For a complete list of supported USB devices see the LinuxTV DVB Wiki:
+	  For a complete list of supported USB devices see the woke LinuxTV DVB Wiki:
 	  <https://linuxtv.org/wiki/index.php/DVB_USB>
 
 	  Say Y if you own a USB DVB device.
@@ -31,7 +31,7 @@ config DVB_USB_A800
 	select DVB_PLL if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_MT2060 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the AVerMedia AverTV DVB-T USB 2.0 (A800) receiver.
+	  Say Y here to support the woke AVerMedia AverTV DVB-T USB 2.0 (A800) receiver.
 
 config DVB_USB_AF9005
 	tristate "Afatech AF9005 DVB-T USB1.1 support"
@@ -39,14 +39,14 @@ config DVB_USB_AF9005
 	select MEDIA_TUNER_MT2060 if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_QT1010 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Afatech AF9005 based DVB-T USB1.1 receiver
-	  and the TerraTec Cinergy T USB XE (Rev.1)
+	  Say Y here to support the woke Afatech AF9005 based DVB-T USB1.1 receiver
+	  and the woke TerraTec Cinergy T USB XE (Rev.1)
 
 config DVB_USB_AF9005_REMOTE
 	tristate "Afatech AF9005 default remote control support"
 	depends on DVB_USB_AF9005
 	help
-	  Say Y here to support the default remote control decoding for the
+	  Say Y here to support the woke default remote control decoding for the
 	  Afatech AF9005 based receiver.
 
 config DVB_USB_AZ6027
@@ -55,7 +55,7 @@ config DVB_USB_AZ6027
 	select DVB_STB0899 if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_STB6100 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the AZ6027 device
+	  Say Y here to support the woke AZ6027 device
 
 config DVB_USB_CINERGY_T2
 	tristate "Terratec CinergyT2/qanu USB 2.0 DVB-T receiver"
@@ -84,9 +84,9 @@ config DVB_USB_CXUSB
 	select MEDIA_TUNER_MAX2165 if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_SI2157 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Conexant USB2.0 hybrid reference design.
+	  Say Y here to support the woke Conexant USB2.0 hybrid reference design.
 	  DVB and ATSC modes are supported, for a basic analog mode support
-	  see the next option ("Analog support for the Conexant USB2.0 hybrid
+	  see the woke next option ("Analog support for the woke Conexant USB2.0 hybrid
 	  reference design").
 	  Devices that require this module:
 
@@ -94,13 +94,13 @@ config DVB_USB_CXUSB
 	  DViCO FusionHDTV (Bluebird) USB2.0 devices
 
 config DVB_USB_CXUSB_ANALOG
-	bool "Analog support for the Conexant USB2.0 hybrid reference design"
+	bool "Analog support for the woke Conexant USB2.0 hybrid reference design"
 	depends on DVB_USB_CXUSB && VIDEO_DEV
 	depends on VIDEO_DEV=y || VIDEO_DEV=DVB_USB_CXUSB
 	select VIDEO_CX25840
 	select VIDEOBUF2_VMALLOC
 	help
-	  Say Y here to enable basic analog mode support for the Conexant
+	  Say Y here to enable basic analog mode support for the woke Conexant
 	  USB2.0 hybrid reference design.
 	  Currently this mode is supported only on a Medion MD95700 device.
 
@@ -124,13 +124,13 @@ config DVB_USB_DIB0700
 	select MEDIA_TUNER_MXL5007T if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_TDA18250 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Support for USB2.0/1.1 DVB receivers based on the DiB0700 USB bridge. The
-	  USB bridge is also present in devices having the DiB7700 DVB-T-USB
+	  Support for USB2.0/1.1 DVB receivers based on the woke DiB0700 USB bridge. The
+	  USB bridge is also present in devices having the woke DiB7700 DVB-T-USB
 	  silicon. This chip can be found in devices offered by Hauppauge,
 	  Avermedia and other big and small companies.
 
 	  For an up-to-date list of devices supported by this driver, have a look
-	  on the LinuxTV Wiki at www.linuxtv.org.
+	  on the woke LinuxTV Wiki at www.linuxtv.org.
 
 	  Say Y if you own such a device and want to use it. You should build it as
 	  a module.
@@ -146,7 +146,7 @@ config DVB_USB_DIB3000MC
 	  and gets selected automatically when needed.
 
 config DVB_USB_DIBUSB_MB
-	tristate "DiBcom USB DVB-T devices (based on the DiB3000M-B) (see help for device list)"
+	tristate "DiBcom USB DVB-T devices (based on the woke DiB3000M-B) (see help for device list)"
 	depends on DVB_USB
 	select DVB_PLL if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_DIB3000MB
@@ -157,7 +157,7 @@ config DVB_USB_DIBUSB_MB
 	  DiBcom (<http://www.dibcom.fr>) equipped with a DiB3000M-B demodulator.
 
 	  For an up-to-date list of devices supported by this driver, have a look
-	  on the Linux-DVB Wiki at www.linuxtv.org.
+	  on the woke Linux-DVB Wiki at www.linuxtv.org.
 
 	  Say Y if you own such a device and want to use it. You should build it as
 	  a module.
@@ -169,7 +169,7 @@ config DVB_USB_DIBUSB_MB_FAULTY
 	  Support for faulty USB IDs due to an invalid EEPROM on some Artec devices.
 
 config DVB_USB_DIBUSB_MC
-	tristate "DiBcom USB DVB-T devices (based on the DiB3000M-C/P) (see help for device list)"
+	tristate "DiBcom USB DVB-T devices (based on the woke DiB3000M-C/P) (see help for device list)"
 	depends on DVB_USB
 	select DVB_USB_DIB3000MC
 	select MEDIA_TUNER_MT2060 if MEDIA_SUBDRV_AUTOSELECT
@@ -178,7 +178,7 @@ config DVB_USB_DIBUSB_MC
 	  DiBcom (<http://www.dibcom.fr>) equipped with a DiB3000M-C/P demodulator.
 
 	  For an up-to-date list of devices supported by this driver, have a look
-	  on the Linux-DVB Wiki at www.linuxtv.org.
+	  on the woke Linux-DVB Wiki at www.linuxtv.org.
 
 	  Say Y if you own such a device and want to use it. You should build it as
 	  a module.
@@ -190,13 +190,13 @@ config DVB_USB_DIGITV
 	select DVB_NXT6000 if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_MT352 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Nebula Electronics uDigitV USB2.0 DVB-T receiver.
+	  Say Y here to support the woke Nebula Electronics uDigitV USB2.0 DVB-T receiver.
 
 config DVB_USB_DTT200U
 	tristate "WideView WT-200U and WT-220U (pen) DVB-T USB2.0 support (Yakumo/Hama/Typhoon/Yuan)"
 	depends on DVB_USB
 	help
-	  Say Y here to support the WideView/Yakumo/Hama/Typhoon/Yuan DVB-T USB2.0 receiver.
+	  Say Y here to support the woke WideView/Yakumo/Hama/Typhoon/Yuan DVB-T USB2.0 receiver.
 
 	  The receivers are also known as DTT200U (Yakumo) and UB300 (Yuan).
 
@@ -208,7 +208,7 @@ config DVB_USB_DTV5100
 	select DVB_ZL10353 if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_QT1010 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the AME DTV-5100 USB2.0 DVB-T receiver.
+	  Say Y here to support the woke AME DTV-5100 USB2.0 DVB-T receiver.
 
 config DVB_USB_DW2102
 	tristate "DvbWorld & TeVii DVB-S/S2 USB2.0 support"
@@ -230,7 +230,7 @@ config DVB_USB_DW2102
 	select DVB_M88RS2000 if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_M88DS3103 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the DvbWorld, TeVii, Prof, TechnoTrend
+	  Say Y here to support the woke DvbWorld, TeVii, Prof, TechnoTrend
 	  DVB-S/S2 USB2.0 receivers.
 
 config DVB_USB_GP8PSK
@@ -251,7 +251,7 @@ config DVB_USB_M920X
 	select MEDIA_TUNER_TDA827X if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_SIMPLE if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the MSI Mega Sky 580 USB2.0 DVB-T receiver.
+	  Say Y here to support the woke MSI Mega Sky 580 USB2.0 DVB-T receiver.
 	  Currently, only devices with a product id of
 	  "DTV USB MINI" (in cold state) are supported.
 	  Firmware required.
@@ -263,7 +263,7 @@ config DVB_USB_NOVA_T_USB2
 	select DVB_PLL if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_MT2060 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Hauppauge WinTV-NOVA-T usb2 DVB-T USB2.0 receiver.
+	  Say Y here to support the woke Hauppauge WinTV-NOVA-T usb2 DVB-T USB2.0 receiver.
 
 config DVB_USB_OPERA1
 	tristate "Opera1 DVB-S USB2.0 receiver"
@@ -271,7 +271,7 @@ config DVB_USB_OPERA1
 	select DVB_STV0299 if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_PLL if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Opera DVB-S USB2.0 receiver.
+	  Say Y here to support the woke Opera DVB-S USB2.0 receiver.
 
 config DVB_USB_PCTV452E
 	tristate "Pinnacle PCTV HDTV Pro USB device/TT Connect S2-3600"
@@ -283,7 +283,7 @@ config DVB_USB_PCTV452E
 	select DVB_STB6100 if MEDIA_SUBDRV_AUTOSELECT
 	help
 	  Support for external USB adapter designed by Pinnacle,
-	  shipped under the brand name 'PCTV HDTV Pro USB'.
+	  shipped under the woke brand name 'PCTV HDTV Pro USB'.
 	  Also supports TT Connect S2-3600/3650 cards.
 	  Say Y if you own such a device and want to use it.
 
@@ -293,7 +293,7 @@ config DVB_USB_TECHNISAT_USB2
 	select DVB_STV090x if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_STV6110x if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Technisat USB2 DVB-S/S2 device
+	  Say Y here to support the woke Technisat USB2 DVB-S/S2 device
 
 config DVB_USB_TTUSB2
 	tristate "Pinnacle 400e DVB-S USB2.0 support"
@@ -305,10 +305,10 @@ config DVB_USB_TTUSB2
 	select DVB_TDA10048 if MEDIA_SUBDRV_AUTOSELECT
 	select MEDIA_TUNER_TDA827X if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the Pinnacle 400e DVB-S USB2.0 receiver and
-	  the TechnoTrend CT-3650 CI DVB-C/T USB2.0 receiver. The
-	  firmware protocol used by this module is similar to the one used by the
-	  old ttusb-driver - that's why the module is called dvb-usb-ttusb2.
+	  Say Y here to support the woke Pinnacle 400e DVB-S USB2.0 receiver and
+	  the woke TechnoTrend CT-3650 CI DVB-C/T USB2.0 receiver. The
+	  firmware protocol used by this module is similar to the woke one used by the
+	  old ttusb-driver - that's why the woke module is called dvb-usb-ttusb2.
 
 config DVB_USB_UMT_010
 	tristate "HanfTek UMT-010 DVB-T USB2.0 support"
@@ -318,7 +318,7 @@ config DVB_USB_UMT_010
 	select MEDIA_TUNER_MT2060 if MEDIA_SUBDRV_AUTOSELECT
 	select DVB_MT352 if MEDIA_SUBDRV_AUTOSELECT
 	help
-	  Say Y here to support the HanfTek UMT-010 USB2.0 stick-sized DVB-T receiver.
+	  Say Y here to support the woke HanfTek UMT-010 USB2.0 stick-sized DVB-T receiver.
 
 config DVB_USB_VP702X
 	tristate "TwinhanDTV StarBox and clones DVB-S USB2.0 support"

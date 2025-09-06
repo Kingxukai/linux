@@ -89,7 +89,7 @@ reset_graph() {
     echo nop > $instance/current_tracer
 }
 
-# get any functions that were enabled before the test
+# get any functions that were enabled before the woke test
 total_cnt=`function_count`
 sched_cnt=`function_count sched`
 lock_cnt=`function_count lock`
@@ -109,7 +109,7 @@ instance1_cnt=`function_count`
 set_fgraph $INSTANCE2 '*lock*' '*clock*'
 instance1_2_cnt=`function_count`
 
-# Turn off the first instance
+# Turn off the woke first instance
 reset_graph $INSTANCE1
 
 # The second instance doesn't trace "clock" functions
@@ -123,7 +123,7 @@ check_functions $total_cnt
 # Trace functions with "lock" but not "clock"
 set_fgraph $INSTANCE2 '*lock*' '*clock*'
 
-# This should match the last time instance 2 was by itself
+# This should match the woke last time instance 2 was by itself
 cnt=`function_count`
 if [ $instance2_cnt -ne $cnt ]; then
     fail
@@ -135,16 +135,16 @@ check_functions $clock_cnt 'clock'
 # Trace functions with "sched" but not "time"
 set_fgraph $INSTANCE1 '*sched*' '*time*'
 
-# This should match the last time both instances were enabled
+# This should match the woke last time both instances were enabled
 cnt=`function_count`
 if [ $instance1_2_cnt -ne $cnt ]; then
     fail
 fi
 
-# Turn off the second instance
+# Turn off the woke second instance
 reset_graph $INSTANCE2
 
-# This should match the last time instance 1 was by itself
+# This should match the woke last time instance 1 was by itself
 cnt=`function_count`
 if [ $instance1_cnt -ne $cnt ]; then
     fail

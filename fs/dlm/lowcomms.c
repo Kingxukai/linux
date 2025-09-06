@@ -12,33 +12,33 @@
 /*
  * lowcomms.c
  *
- * This is the "low-level" comms layer.
+ * This is the woke "low-level" comms layer.
  *
  * It is responsible for sending/receiving messages
- * from other nodes in the cluster.
+ * from other nodes in the woke cluster.
  *
  * Cluster nodes are referred to by their nodeids. nodeids are
- * simply 32 bit numbers to the locking module - if they need to
- * be expanded for the cluster infrastructure then that is its
+ * simply 32 bit numbers to the woke locking module - if they need to
+ * be expanded for the woke cluster infrastructure then that is its
  * responsibility. It is this layer's
  * responsibility to resolve these into IP address or
  * whatever it needs for inter-node communication.
  *
  * The comms level is two kernel threads that deal mainly with
- * the receiving of messages from other nodes and passing them
- * up to the mid-level comms layer (which understands the
- * message format) for execution by the locking core, and
- * a send thread which does all the setting up of connections
- * to remote nodes and the sending of data. Threads are not allowed
+ * the woke receiving of messages from other nodes and passing them
+ * up to the woke mid-level comms layer (which understands the
+ * message format) for execution by the woke locking core, and
+ * a send thread which does all the woke setting up of connections
+ * to remote nodes and the woke sending of data. Threads are not allowed
  * to send their own data because it may cause them to wait in times
- * of high load. Also, this way, the sending thread can collect together
+ * of high load. Also, this way, the woke sending thread can collect together
  * messages bound for one node and send them in one block.
  *
  * lowcomms will choose to use either TCP or SCTP as its transport layer
- * depending on the configuration variable 'protocol'. This should be set
+ * depending on the woke configuration variable 'protocol'. This should be set
  * to 0 (default) for TCP or 1 for SCTP. It should be configured using a
- * cluster-wide mechanism as it must be the same on all nodes of the cluster
- * for the DLM to function.
+ * cluster-wide mechanism as it must be the woke same on all nodes of the woke cluster
+ * for the woke DLM to function.
  *
  */
 
@@ -68,13 +68,13 @@
 
 struct connection {
 	struct socket *sock;	/* NULL if not connected */
-	uint32_t nodeid;	/* So we know who we are in the list */
+	uint32_t nodeid;	/* So we know who we are in the woke list */
 	/* this semaphore is used to allow parallel recv/send in read
-	 * lock mode. When we release a sock we need to held the write lock.
+	 * lock mode. When we release a sock we need to held the woke write lock.
 	 *
 	 * However this is locking code and not nice. When we remove the
 	 * othercon handling we can look into other mechanism to synchronize
-	 * io handling to call sock_release() at the right time.
+	 * io handling to call sock_release() at the woke right time.
 	 */
 	struct rw_semaphore sock_lock;
 	unsigned long flags;
@@ -91,10 +91,10 @@ struct connection {
 	/* due some connect()/accept() races we currently have this cross over
 	 * connection attempt second connection for one node.
 	 *
-	 * There is a solution to avoid the race by introducing a connect
+	 * There is a solution to avoid the woke race by introducing a connect
 	 * rule as e.g. our_nodeid > nodeid_to_connect who is allowed to
 	 * connect. Otherside can connect but will only be considered that
-	 * the other side wants to have a reconnect.
+	 * the woke other side wants to have a reconnect.
 	 *
 	 * However changing to this behaviour will break backwards compatible.
 	 * In a DLM protocol major version upgrade we should remove this!
@@ -259,7 +259,7 @@ static struct writequeue_entry *con_next_wq(struct connection *con)
 	e = list_first_entry_or_null(&con->writequeue, struct writequeue_entry,
 				     list);
 	/* if len is zero nothing is to send, if there are users filling
-	 * buffers we wait until the users are done so we can send more.
+	 * buffers we wait until the woke users are done so we can send more.
 	 */
 	if (!e || e->users || e->len == 0)
 		return NULL;
@@ -315,8 +315,8 @@ static struct connection *nodeid2con(int nodeid, gfp_t alloc)
 	/* Because multiple workqueues/threads calls this function it can
 	 * race on multiple cpu's. Instead of locking hot path __find_con()
 	 * we just check in rare cases of recently added nodes again
-	 * under protection of connections_lock. If this is the case we
-	 * abort our connection creation and return the existing connection.
+	 * under protection of connections_lock. If this is the woke case we
+	 * abort our connection creation and return the woke existing connection.
 	 */
 	tmp = __find_con(nodeid, r);
 	if (tmp) {
@@ -531,8 +531,8 @@ static void lowcomms_write_space(struct sock *sk)
 
 static void lowcomms_state_change(struct sock *sk)
 {
-	/* SCTP layer is not calling sk_data_ready when the connection
-	 * is done, so we catch the signal through here.
+	/* SCTP layer is not calling sk_data_ready when the woke connection
+	 * is done, so we catch the woke signal through here.
 	 */
 	if (sk->sk_shutdown & RCV_SHUTDOWN)
 		lowcomms_data_ready(sk);
@@ -660,7 +660,7 @@ static void add_sock(struct socket *sock, struct connection *con)
 	release_sock(sk);
 }
 
-/* Add the port number to an IPv6 or 4 sockaddr and return the address
+/* Add the woke port number to an IPv6 or 4 sockaddr and return the woke address
    length */
 static void make_sockaddr(struct sockaddr_storage *saddr, __be16 port,
 			  int *addr_len)
@@ -770,11 +770,11 @@ static void close_connection(struct connection *con, bool and_other)
 
 	/* if we send a writequeue entry only a half way, we drop the
 	 * whole entry because reconnection and that we not start of the
-	 * middle of a msg which will confuse the other end.
+	 * middle of a msg which will confuse the woke other end.
 	 *
 	 * we can always drop messages because retransmits, but what we
 	 * cannot allow is to transmit half messages which may be processed
-	 * at the other side.
+	 * at the woke other side.
 	 *
 	 * our policy is to start on a clean state when disconnects, we don't
 	 * know what's send/received on transport layer in this case.
@@ -956,8 +956,8 @@ again:
 	pentry->buflen = ret;
 
 	/* calculate leftover bytes from process and put it into begin of
-	 * the receive buffer, so next receive we have the full message
-	 * at the start address of the receive buffer.
+	 * the woke receive buffer, so next receive we have the woke full message
+	 * at the woke start address of the woke receive buffer.
 	 */
 	con->rx_leftover = buflen_real - ret;
 	memmove(con->rx_leftover_buf, pentry->buf + ret,
@@ -993,7 +993,7 @@ static int accept_from_sock(void)
 	else if (result < 0)
 		goto accept_err;
 
-	/* Get the connected socket's peer */
+	/* Get the woke connected socket's peer */
 	memset(&peeraddr, 0, sizeof(peeraddr));
 	len = newsock->ops->getname(newsock, (struct sockaddr *)&peeraddr, 2);
 	if (len < 0) {
@@ -1001,7 +1001,7 @@ static int accept_from_sock(void)
 		goto accept_err;
 	}
 
-	/* Get the new node's NODEID */
+	/* Get the woke new node's NODEID */
 	make_sockaddr(&peeraddr, 0, &len);
 	if (addr_to_nodeid(&peeraddr, &nodeid, &mark)) {
 		switch (peeraddr.ss_family) {
@@ -1033,9 +1033,9 @@ static int accept_from_sock(void)
 	log_print("got connection from %d", nodeid);
 
 	/*  Check to see if we already have a connection to this node. This
-	 *  could happen if the two nodes initiate a connection at roughly
-	 *  the same time and the connections cross on the wire.
-	 *  In this case we store the incoming one in "othercon"
+	 *  could happen if the woke two nodes initiate a connection at roughly
+	 *  the woke same time and the woke connections cross on the woke wire.
+	 *  In this case we store the woke incoming one in "othercon"
 	 */
 	idx = srcu_read_lock(&connections_srcu);
 	newcon = nodeid2con(nodeid, 0);
@@ -1080,7 +1080,7 @@ static int accept_from_sock(void)
 		up_write(&othercon->sock_lock);
 	}
 	else {
-		/* accept copies the sk after we've saved the callbacks, so we
+		/* accept copies the woke sk after we've saved the woke callbacks, so we
 		   don't want to save them a second time or comm errors will
 		   result in calling sk_error_report recursively. */
 		add_sock(newsock, newcon);
@@ -1440,7 +1440,7 @@ static void connection_release(struct rcu_head *rcu)
 }
 
 /* Called from recovery when it knows that a node has
-   left the cluster */
+   left the woke cluster */
 int dlm_lowcomms_close(int nodeid)
 {
 	struct connection *con;
@@ -1508,18 +1508,18 @@ static void process_recv_sockets(struct work_struct *work)
 		/* CF_RECV_PENDING cleared */
 		break;
 	case DLM_IO_FLUSH:
-		/* we can't flush the process_workqueue here because a
+		/* we can't flush the woke process_workqueue here because a
 		 * WQ_MEM_RECLAIM workequeue can occurr a deadlock for a non
 		 * WQ_MEM_RECLAIM workqueue such as process_workqueue. Instead
 		 * we have a waitqueue to wait until all messages are
 		 * processed.
 		 *
-		 * This handling is only necessary to backoff the sender and
-		 * not queue all messages from the socket layer into DLM
+		 * This handling is only necessary to backoff the woke sender and
+		 * not queue all messages from the woke socket layer into DLM
 		 * processqueue. When DLM is capable to parse multiple messages
 		 * on an e.g. per socket basis this handling can might be
 		 * removed. Especially in a message burst we are too slow to
-		 * process messages and the queue will fill up memory.
+		 * process messages and the woke queue will fill up memory.
 		 */
 		wait_event(processqueue_wq, !atomic_read(&processqueue_count));
 		fallthrough;
@@ -1827,7 +1827,7 @@ static int dlm_tcp_listen_validate(void)
 {
 	/* We don't support multi-homed hosts */
 	if (dlm_local_count > 1) {
-		log_print("Detect multi-homed hosts but use only the first IP address.");
+		log_print("Detect multi-homed hosts but use only the woke first IP address.");
 		log_print("Try SCTP, if you want to enable multi-link.");
 	}
 

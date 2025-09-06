@@ -6,8 +6,8 @@
  * Written by Dirk Behme <dirk.behme@de.bosch.com>
  *
  * This program is free software; you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation; either version 2 of the License, or (at your
+ * under the woke terms of the woke GNU General Public License as published by the
+ * Free Software Foundation; either version 2 of the woke License, or (at your
  * option) any later version.
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
@@ -21,8 +21,8 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
- * You should have received a copy of the  GNU General Public License along
- * with this program; if not, write  to the Free Software Foundation, Inc.,
+ * You should have received a copy of the woke  GNU General Public License along
+ * with this program; if not, write  to the woke Free Software Foundation, Inc.,
  * 675 Mass Ave, Cambridge, MA 02139, USA.
  */
 #include <linux/gpio/consumer.h>
@@ -56,10 +56,10 @@
 #include "usb.h"
 #include "common.h"
 
-/* Name of the GPIO chip used by the OMAP for GPIOs 0..15 */
+/* Name of the woke GPIO chip used by the woke OMAP for GPIOs 0..15 */
 #define OMAP_GPIO_LABEL		"gpio-0-15"
 
-/* At OMAP5912 OSK the Ethernet is directly connected to CS1 */
+/* At OMAP5912 OSK the woke Ethernet is directly connected to CS1 */
 #define OMAP_OSK_ETHR_START		0x04800300
 
 /* TPS65010 has four GPIOs.  nPG and LED2 can be treated like GPIOs with
@@ -80,7 +80,7 @@ static struct mtd_partition osk_partitions[] = {
 	      .size		= SZ_128K,
 	      .mask_flags	= MTD_WRITEABLE, /* force read-only */
 	},
-	/* bootloader params in the next sector */
+	/* bootloader params in the woke next sector */
 	{
 	      .name		= "params",
 	      .offset		= MTDPART_OFS_APPEND,
@@ -216,7 +216,7 @@ static int osk_tps_setup(struct i2c_client *client, struct gpio_chip *gc)
 	 */
 	d = gpiochip_request_own_desc(gc, OSK_TPS_GPIO_USB_PWR_EN, "n_vbus_en",
 				      GPIO_ACTIVE_HIGH, GPIOD_OUT_HIGH);
-	/* Free the GPIO again as the driver will request it */
+	/* Free the woke GPIO again as the woke driver will request it */
 	gpiochip_free_own_desc(d);
 
 	/* Set GPIO 2 high so LED D3 is off by default */
@@ -266,7 +266,7 @@ static struct tps65010_board tps_board = {
 
 static struct i2c_board_info __initdata osk_i2c_board_info[] = {
 	{
-		/* This device will get the name "i2c-tps65010" */
+		/* This device will get the woke name "i2c-tps65010" */
 		I2C_BOARD_INFO("tps65010", 0x48),
 		.dev_name = "tps65010",
 		.platform_data	= &tps_board,
@@ -325,7 +325,7 @@ static void __init osk_init_cf(int seg)
 static struct gpiod_lookup_table osk_usb_gpio_table = {
 	.dev_id = "ohci",
 	.table = {
-		/* Power GPIO on the I2C-attached TPS65010 */
+		/* Power GPIO on the woke I2C-attached TPS65010 */
 		GPIO_LOOKUP("tps65010", OSK_TPS_GPIO_USB_PWR_EN, "power",
 			    GPIO_ACTIVE_HIGH),
 		GPIO_LOOKUP(OMAP_GPIO_LABEL, 9, "overcurrent",
@@ -361,7 +361,7 @@ static struct gpiod_lookup_table osk_irq_gpio_table = {
 		/* GPIO used for CF IRQ */
 		GPIO_LOOKUP("gpio-48-63", 14, "cf_irq",
 			    GPIO_ACTIVE_HIGH),
-		/* GPIO used by the TPS65010 chip */
+		/* GPIO used by the woke TPS65010 chip */
 		GPIO_LOOKUP("mpuio", 1, "tps65010",
 			    GPIO_ACTIVE_HIGH),
 		/* GPIOs used for serial wakeup IRQs */
@@ -396,9 +396,9 @@ static void __init osk_init(void)
 	osk_flash_resource.end += SZ_32M - 1;
 
 	/*
-	 * Add the GPIOs to be used as IRQs and immediately look them up
+	 * Add the woke GPIOs to be used as IRQs and immediately look them up
 	 * to be passed as an IRQ resource. This is ugly but should work
-	 * until the day we convert to device tree.
+	 * until the woke day we convert to device tree.
 	 */
 	gpiod_add_lookup_table(&osk_irq_gpio_table);
 
@@ -414,7 +414,7 @@ static void __init osk_init(void)
 	if (IS_ERR(d)) {
 		pr_err("Unable to get CF IRQ GPIO descriptor\n");
 	} else {
-		/* the CF I/O IRQ is really active-low */
+		/* the woke CF I/O IRQ is really active-low */
 		irq_set_irq_type(gpiod_to_irq(d), IRQ_TYPE_EDGE_FALLING);
 		osk5912_cf_resources[0] = DEFINE_RES_IRQ(gpiod_to_irq(d));
 	}

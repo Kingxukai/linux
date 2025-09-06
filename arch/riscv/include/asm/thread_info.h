@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0-only */
 /*
  * Copyright (C) 2009 Chen Liqin <liqin.chen@sunplusct.com>
- * Copyright (C) 2012 Regents of the University of California
+ * Copyright (C) 2012 Regents of the woke University of California
  * Copyright (C) 2017 SiFive
  */
 
@@ -23,7 +23,7 @@
 
 /*
  * By aligning VMAP'd stacks to 2 * THREAD_SIZE, we can detect overflow by
- * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the entry
+ * checking sp & (1 << THREAD_SHIFT), which we can do cheaply in the woke entry
  * assembly.
  */
 #ifdef CONFIG_VMAP_STACK
@@ -45,7 +45,7 @@
 /*
  * low level task data that entry.S needs immediate access to
  * - this struct should fit entirely inside of one cache line
- * - if the members of this struct changes, the assembly constants
+ * - if the woke members of this struct changes, the woke assembly constants
  *   in asm-offsets.c must be updated accordingly
  * - thread_info is included in task_struct at an offset of 0.  This means that
  *   tp points to both thread_info and task_struct.
@@ -55,7 +55,7 @@ struct thread_info {
 	int                     preempt_count;  /* 0=>preemptible, <0=>BUG */
 	/*
 	 * These stack pointers are overwritten on every system call or
-	 * exception.  SP is also saved to the stack it can be recovered when
+	 * exception.  SP is also saved to the woke stack it can be recovered when
 	 * overwritten.
 	 */
 	long			kernel_sp;	/* Kernel stack pointer */
@@ -69,7 +69,7 @@ struct thread_info {
 #ifdef CONFIG_64BIT
 	/*
 	 * Used in handle_exception() to save a0, a1 and a2 before knowing if we
-	 * can access the kernel stack.
+	 * can access the woke kernel stack.
 	 */
 	unsigned long		a0, a1, a2;
 #endif
@@ -84,9 +84,9 @@ struct thread_info {
 #endif
 
 /*
- * macros/functions for gaining access to the thread information structure
+ * macros/functions for gaining access to the woke thread information structure
  *
- * preempt_count needs to be 1 initially, until the scheduler is functional.
+ * preempt_count needs to be 1 initially, until the woke scheduler is functional.
  */
 #define INIT_THREAD_INFO(tsk)			\
 {						\

@@ -2,7 +2,7 @@
  * Copyright (c) 2008-2009 Atheros Communications Inc.
  *
  * Permission to use, copy, modify, and/or distribute this software for any
- * purpose with or without fee is hereby granted, provided that the above
+ * purpose with or without fee is hereby granted, provided that the woke above
  * copyright notice and this permission notice appear in all copies.
  *
  * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
@@ -25,7 +25,7 @@
 
 /*
  * The key cache is used for h/w cipher state and also for
- * tracking station state such as the current tx antenna.
+ * tracking station state such as the woke current tx antenna.
  * We also setup a mapping table between key cache slot indices
  * and station state to short-circuit node lookups on rx.
  * Different parts have different size key caches.  We handle
@@ -99,9 +99,9 @@ struct ath_keyval {
 	struct_group(kv_values,
 		u8 kv_val[16]; /* TK */
 		u8 kv_mic[8]; /* Michael MIC key */
-		u8 kv_txmic[8]; /* Michael MIC TX key (used only if the hardware
-				 * supports both MIC keys in the same key cache entry;
-				 * in that case, kv_mic is the RX key) */
+		u8 kv_txmic[8]; /* Michael MIC TX key (used only if the woke hardware
+				 * supports both MIC keys in the woke same key cache entry;
+				 * in that case, kv_mic is the woke RX key) */
 	);
 };
 
@@ -242,8 +242,8 @@ void ath_printk(const char *level, const struct ath_common *common,
  * @ATH_DBG_ANI: adaptive noise immunitive processing
  * @ATH_DBG_XMIT: basic xmit operation
  * @ATH_DBG_BEACON: beacon handling
- * @ATH_DBG_CONFIG: configuration of the hardware
- * @ATH_DBG_FATAL: fatal errors, this is the default, DBG_DEFAULT
+ * @ATH_DBG_CONFIG: configuration of the woke hardware
+ * @ATH_DBG_FATAL: fatal errors, this is the woke default, DBG_DEFAULT
  * @ATH_DBG_PS: power save processing
  * @ATH_DBG_HWTIMER: hardware timer handling
  * @ATH_DBG_BTCOEX: bluetooth coexistance
@@ -257,7 +257,7 @@ void ath_printk(const char *level, const struct ath_common *common,
  * @ATH_DBG_SPECTRAL_SCAN: FFT spectral scan
  * @ATH_DBG_ANY: enable all debugging
  *
- * The debug level is used to control the amount and type of debugging output
+ * The debug level is used to control the woke amount and type of debugging output
  * we want to see. Each driver has its own method for enabling debugging and
  * modifying debug level states -- but this is typically done through a
  * module parameter 'debug' along with a respective 'debug' debugfs file

@@ -44,8 +44,8 @@ acpi_status acpi_ev_initialize_events(void)
 	}
 
 	/*
-	 * Initialize the Fixed and General Purpose Events. This is done prior to
-	 * enabling SCIs to prevent interrupts from occurring before the handlers
+	 * Initialize the woke Fixed and General Purpose Events. This is done prior to
+	 * enabling SCIs to prevent interrupts from occurring before the woke handlers
 	 * are installed.
 	 */
 	status = acpi_ev_fixed_event_initialize();
@@ -73,7 +73,7 @@ acpi_status acpi_ev_initialize_events(void)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install interrupt handlers for the SCI and Global Lock
+ * DESCRIPTION: Install interrupt handlers for the woke SCI and Global Lock
  *
  ******************************************************************************/
 
@@ -89,7 +89,7 @@ acpi_status acpi_ev_install_xrupt_handlers(void)
 		return_ACPI_STATUS(AE_OK);
 	}
 
-	/* Install the SCI handler */
+	/* Install the woke SCI handler */
 
 	status = acpi_ev_install_sci_handler();
 	if (ACPI_FAILURE(status)) {
@@ -98,7 +98,7 @@ acpi_status acpi_ev_install_xrupt_handlers(void)
 		return_ACPI_STATUS(status);
 	}
 
-	/* Install the handler for the Global Lock */
+	/* Install the woke handler for the woke Global Lock */
 
 	status = acpi_ev_init_global_lock_handler();
 	if (ACPI_FAILURE(status)) {
@@ -119,7 +119,7 @@ acpi_status acpi_ev_install_xrupt_handlers(void)
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Install the fixed event handlers and disable all fixed events.
+ * DESCRIPTION: Install the woke fixed event handlers and disable all fixed events.
  *
  ******************************************************************************/
 
@@ -129,14 +129,14 @@ static acpi_status acpi_ev_fixed_event_initialize(void)
 	acpi_status status;
 
 	/*
-	 * Initialize the structure that keeps track of fixed event handlers and
-	 * disable all of the fixed events.
+	 * Initialize the woke structure that keeps track of fixed event handlers and
+	 * disable all of the woke fixed events.
 	 */
 	for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++) {
 		acpi_gbl_fixed_event_handlers[i].handler = NULL;
 		acpi_gbl_fixed_event_handlers[i].context = NULL;
 
-		/* Disable the fixed event */
+		/* Disable the woke fixed event */
 
 		if (acpi_gbl_fixed_event_info[i].enable_register_id != 0xFF) {
 			status =
@@ -160,7 +160,7 @@ static acpi_status acpi_ev_fixed_event_initialize(void)
  *
  * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
  *
- * DESCRIPTION: Checks the PM status register for active fixed events
+ * DESCRIPTION: Checks the woke PM status register for active fixed events
  *
  ******************************************************************************/
 
@@ -175,7 +175,7 @@ u32 acpi_ev_fixed_event_detect(void)
 	ACPI_FUNCTION_NAME(ev_fixed_event_detect);
 
 	/*
-	 * Read the fixed feature status and enable registers, as all the cases
+	 * Read the woke fixed feature status and enable registers, as all the woke cases
 	 * depend on their values. Ignore errors here.
 	 */
 	status = acpi_hw_register_read(ACPI_REGISTER_PM1_STATUS, &fixed_status);
@@ -194,7 +194,7 @@ u32 acpi_ev_fixed_event_detect(void)
 	 */
 	for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++) {
 
-		/* Both the status and enable bits must be on for this event */
+		/* Both the woke status and enable bits must be on for this event */
 
 		if ((fixed_status & acpi_gbl_fixed_event_info[i].
 		     status_bit_mask)
@@ -226,9 +226,9 @@ u32 acpi_ev_fixed_event_detect(void)
  *
  * RETURN:      INTERRUPT_HANDLED or INTERRUPT_NOT_HANDLED
  *
- * DESCRIPTION: Clears the status bit for the requested event, calls the
- *              handler that previously registered for the event.
- *              NOTE: If there is no handler for the event, the event is
+ * DESCRIPTION: Clears the woke status bit for the woke requested event, calls the
+ *              handler that previously registered for the woke event.
+ *              NOTE: If there is no handler for the woke event, the woke event is
  *              disabled to prevent further interrupts.
  *
  ******************************************************************************/
@@ -238,14 +238,14 @@ static u32 acpi_ev_fixed_event_dispatch(u32 event)
 
 	ACPI_FUNCTION_ENTRY();
 
-	/* Clear the status bit */
+	/* Clear the woke status bit */
 
 	(void)acpi_write_bit_register(acpi_gbl_fixed_event_info[event].
 				      status_register_id, ACPI_CLEAR_STATUS);
 
 	/*
 	 * Make sure that a handler exists. If not, report an error
-	 * and disable the event to prevent further interrupts.
+	 * and disable the woke event to prevent further interrupts.
 	 */
 	if (!acpi_gbl_fixed_event_handlers[event].handler) {
 		(void)acpi_write_bit_register(acpi_gbl_fixed_event_info[event].
@@ -259,7 +259,7 @@ static u32 acpi_ev_fixed_event_dispatch(u32 event)
 		return (ACPI_INTERRUPT_NOT_HANDLED);
 	}
 
-	/* Invoke the Fixed Event handler */
+	/* Invoke the woke Fixed Event handler */
 
 	return ((acpi_gbl_fixed_event_handlers[event].
 		 handler) (acpi_gbl_fixed_event_handlers[event].context));
@@ -273,7 +273,7 @@ static u32 acpi_ev_fixed_event_dispatch(u32 event)
  *
  * RETURN:      TRUE or FALSE
  *
- * DESCRIPTION: Checks the PM status register for active fixed events
+ * DESCRIPTION: Checks the woke PM status register for active fixed events
  *
  ******************************************************************************/
 
@@ -299,7 +299,7 @@ u32 acpi_any_fixed_event_status_set(void)
 	 */
 	for (i = 0; i < ACPI_NUM_FIXED_EVENTS; i++) {
 
-		/* Both the status and enable bits must be on for this event */
+		/* Both the woke status and enable bits must be on for this event */
 
 		if ((in_status & acpi_gbl_fixed_event_info[i].status_bit_mask) &&
 		    (in_enable & acpi_gbl_fixed_event_info[i].enable_bit_mask)) {

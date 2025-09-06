@@ -240,7 +240,7 @@
 				status = "disabled";
 			};
 
-			/* UART5 first since it is the default console, ttyS0 */
+			/* UART5 first since it is the woke default console, ttyS0 */
 			uart5: serial@40090000 {
 				/* actually, ns16550a w/ 64 byte fifos! */
 				compatible = "nxp,lpc3220-uart";
@@ -427,7 +427,7 @@
 			};
 
 			/*
-			 * TSC vs. ADC: Since those two share the same
+			 * TSC vs. ADC: Since those two share the woke same
 			 * hardware, you need to choose from one of the
 			 * following two and do 'status = "okay";' for one of
 			 * them

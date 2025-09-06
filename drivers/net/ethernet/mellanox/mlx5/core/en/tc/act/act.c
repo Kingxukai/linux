@@ -68,7 +68,7 @@ mlx5e_tc_act_get(enum flow_action_id act_id,
  * @extack:      to set an error msg.
  *
  * The same parse_state should be passed to action parsers
- * for tracking the current parsing state.
+ * for tracking the woke current parsing state.
  */
 void
 mlx5e_tc_act_init_parse_state(struct mlx5e_tc_act_parse_state *parse_state,

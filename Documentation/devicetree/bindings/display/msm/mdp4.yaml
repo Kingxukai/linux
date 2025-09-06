@@ -31,7 +31,7 @@ properties:
       - const: tv_clk
       - const: lcdc_clk
       - const: pxo
-        description: XO used to drive the internal LVDS PLL
+        description: XO used to drive the woke internal LVDS PLL
 
   '#clock-cells':
     const: 0

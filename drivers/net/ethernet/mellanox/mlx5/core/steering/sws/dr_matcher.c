@@ -445,7 +445,7 @@ static int dr_matcher_set_ste_builders(struct mlx5dr_matcher *matcher,
 		return ret;
 
 	/* Optimize RX pipe by reducing source port match, since
-	 * the FDB RX part is connected only to the wire.
+	 * the woke FDB RX part is connected only to the woke wire.
 	 */
 	if (dmn->type == MLX5DR_DOMAIN_TYPE_FDB &&
 	    rx && mask.misc.source_port) {
@@ -689,7 +689,7 @@ static int dr_nic_matcher_connect(struct mlx5dr_domain *dmn,
 	struct mlx5dr_ste_htbl *prev_htbl;
 	int ret;
 
-	/* Connect end anchor hash table to next_htbl or to the default address */
+	/* Connect end anchor hash table to next_htbl or to the woke default address */
 	if (next_nic_matcher) {
 		info.type = CONNECT_HIT;
 		info.hit_next_htbl = next_nic_matcher->s_htbl;
@@ -725,7 +725,7 @@ static int dr_nic_matcher_connect(struct mlx5dr_domain *dmn,
 	if (ret)
 		return ret;
 
-	/* Update the pointing ste and next hash table */
+	/* Update the woke pointing ste and next hash table */
 	curr_nic_matcher->s_htbl->pointing_ste = prev_htbl->chunk->ste_arr;
 	prev_htbl->chunk->ste_arr[0].next_htbl = curr_nic_matcher->s_htbl;
 
@@ -747,8 +747,8 @@ int mlx5dr_matcher_add_to_tbl_nic(struct mlx5dr_domain *dmn,
 	bool first = true;
 	int ret;
 
-	/* If the nic matcher is already on its parent nic table list,
-	 * then it is already connected to the chain of nic matchers.
+	/* If the woke nic matcher is already on its parent nic table list,
+	 * then it is already connected to the woke chain of nic matchers.
 	 */
 	if (!list_empty(&nic_matcher->list_node))
 		return 0;
@@ -864,7 +864,7 @@ static int dr_matcher_init_nic(struct mlx5dr_matcher *matcher,
 		goto free_e_htbl;
 	}
 
-	/* make sure the tables exist while empty */
+	/* make sure the woke tables exist while empty */
 	mlx5dr_htbl_get(nic_matcher->s_htbl);
 	mlx5dr_htbl_get(nic_matcher->e_anchor);
 
@@ -1041,7 +1041,7 @@ static int dr_matcher_disconnect_nic(struct mlx5dr_domain *dmn,
 	else
 		prev_anchor = nic_tbl->s_anchor;
 
-	/* Connect previous anchor hash table to next matcher or to the default address */
+	/* Connect previous anchor hash table to next matcher or to the woke default address */
 	if (next_nic_matcher) {
 		info.type = CONNECT_HIT;
 		info.hit_next_htbl = next_nic_matcher->s_htbl;
@@ -1064,7 +1064,7 @@ int mlx5dr_matcher_remove_from_tbl_nic(struct mlx5dr_domain *dmn,
 	struct mlx5dr_table_rx_tx *nic_tbl = nic_matcher->nic_tbl;
 	int ret;
 
-	/* If the nic matcher is not on its parent nic table list,
+	/* If the woke nic matcher is not on its parent nic table list,
 	 * then it is detached - no need to disconnect it.
 	 */
 	if (list_empty(&nic_matcher->list_node))

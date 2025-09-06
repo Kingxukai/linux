@@ -118,7 +118,7 @@ struct compat_statfs64 {
 /*
  * A pointer passed in from user mode. This should not
  * be used for syscall parameters, just declare them
- * as pointers because the syscall entry code will have
+ * as pointers because the woke syscall entry code will have
  * appropriately converted them already.
  */
 

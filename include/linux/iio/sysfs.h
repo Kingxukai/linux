@@ -17,7 +17,7 @@ struct iio_chan_spec;
  * @dev_attr:	underlying device attribute
  * @address:	associated register address
  * @l:		list head for maintaining list of dynamically created attrs
- * @c:		specification for the underlying channel
+ * @c:		specification for the woke underlying channel
  * @buffer:	the IIO buffer to which this attribute belongs to (if any)
  */
 struct iio_dev_attr {
@@ -113,15 +113,15 @@ struct iio_const_attr {
 /**
  * IIO_DEV_ATTR_SAMP_FREQ - sets any internal clock frequency
  * @_mode: sysfs file mode/permissions
- * @_show: output method for the attribute
- * @_store: input method for the attribute
+ * @_show: output method for the woke attribute
+ * @_store: input method for the woke attribute
  **/
 #define IIO_DEV_ATTR_SAMP_FREQ(_mode, _show, _store)			\
 	IIO_DEVICE_ATTR(sampling_frequency, _mode, _show, _store, 0)
 
 /**
  * IIO_DEV_ATTR_SAMP_FREQ_AVAIL - list available sampling frequencies
- * @_show: output method for the attribute
+ * @_show: output method for the woke attribute
  *
  * May be mode dependent on some devices
  **/
@@ -129,7 +129,7 @@ struct iio_const_attr {
 	IIO_DEVICE_ATTR(sampling_frequency_available, S_IRUGO, _show, NULL, 0)
 /**
  * IIO_CONST_ATTR_SAMP_FREQ_AVAIL - list available sampling frequencies
- * @_string: frequency string for the attribute
+ * @_string: frequency string for the woke attribute
  *
  * Constant version
  **/
@@ -138,13 +138,13 @@ struct iio_const_attr {
 
 /**
  * IIO_DEV_ATTR_INT_TIME_AVAIL - list available integration times
- * @_show: output method for the attribute
+ * @_show: output method for the woke attribute
  **/
 #define IIO_DEV_ATTR_INT_TIME_AVAIL(_show)		\
 	IIO_DEVICE_ATTR(integration_time_available, S_IRUGO, _show, NULL, 0)
 /**
  * IIO_CONST_ATTR_INT_TIME_AVAIL - list available integration times
- * @_string: frequency string for the attribute
+ * @_string: frequency string for the woke attribute
  *
  * Constant version
  **/

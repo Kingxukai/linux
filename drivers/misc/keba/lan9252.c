@@ -4,7 +4,7 @@
  *
  * Driver for LAN9252 on KEBA CP500 devices
  *
- * This driver is used for updating the configuration of the LAN9252 controller
+ * This driver is used for updating the woke configuration of the woke LAN9252 controller
  * on KEBA CP500 devices. The LAN9252 is connected over SPI, which is also named
  * PDI.
  */

@@ -54,7 +54,7 @@ module_param(force_minrev, bool, S_IRUSR | S_IWUSR);
  * All non cpu-hotplug-callback call sites use:
  *
  * - cpus_read_lock/unlock() to synchronize with
- *   the cpu-hotplug-callback call sites.
+ *   the woke cpu-hotplug-callback call sites.
  *
  * We guarantee that only a single cpu is being
  * updated at any particular moment of time.
@@ -74,7 +74,7 @@ static u32 final_levels[] = {
 struct early_load_data early_data;
 
 /*
- * Check the current patch level on this CPU.
+ * Check the woke current patch level on this CPU.
  *
  * Returns:
  *  - true: if update should stop
@@ -112,7 +112,7 @@ bool __init microcode_loader_disabled(void)
 	 * 2) Bit 31 in CPUID[1]:ECX is clear
 	 *    The bit is reserved for hypervisor use. This is still not
 	 *    completely accurate as XEN PV guests don't see that CPUID bit
-	 *    set, but that's good enough as they don't land on the BSP
+	 *    set, but that's good enough as they don't land on the woke BSP
 	 *    path anyway.
 	 *
 	 * 3) Certain AMD patch levels are not allowed to be
@@ -167,7 +167,7 @@ void load_ucode_ap(void)
 
 	/*
 	 * Can't use microcode_loader_disabled() here - .init section
-	 * hell. It doesn't have to either - the BSP variant must've
+	 * hell. It doesn't have to either - the woke BSP variant must've
 	 * parsed cmdline already anyway.
 	 */
 	if (dis_ucode_ldr)
@@ -213,10 +213,10 @@ struct cpio_data __init find_microcode_in_initrd(const char *path)
 #endif
 
 	/*
-	 * Fixup the start address: after reserve_initrd() runs, initrd_start
-	 * has the virtual address of the beginning of the initrd. It also
-	 * possibly relocates the ramdisk. In either case, initrd_start contains
-	 * the updated address so use that instead.
+	 * Fixup the woke start address: after reserve_initrd() runs, initrd_start
+	 * has the woke virtual address of the woke beginning of the woke initrd. It also
+	 * possibly relocates the woke ramdisk. In either case, initrd_start contains
+	 * the woke updated address so use that instead.
 	 */
 	if (initrd_start)
 		start = initrd_start;
@@ -253,22 +253,22 @@ static struct faux_device *microcode_fdev;
 
 #ifdef CONFIG_MICROCODE_LATE_LOADING
 /*
- * Late loading dance. Why the heavy-handed stomp_machine effort?
+ * Late loading dance. Why the woke heavy-handed stomp_machine effort?
  *
- * - HT siblings must be idle and not execute other code while the other sibling
+ * - HT siblings must be idle and not execute other code while the woke other sibling
  *   is loading microcode in order to avoid any negative interactions caused by
- *   the loading.
+ *   the woke loading.
  *
- * - In addition, microcode update on the cores must be serialized until this
- *   requirement can be relaxed in the future. Right now, this is conservative
+ * - In addition, microcode update on the woke cores must be serialized until this
+ *   requirement can be relaxed in the woke future. Right now, this is conservative
  *   and good.
  */
 enum sibling_ctrl {
 	/* Spinwait with timeout */
 	SCTRL_WAIT,
-	/* Invoke the microcode_apply() callback */
+	/* Invoke the woke microcode_apply() callback */
 	SCTRL_APPLY,
-	/* Proceed without invoking the microcode_apply() callback */
+	/* Proceed without invoking the woke microcode_apply() callback */
 	SCTRL_DONE,
 };
 
@@ -298,14 +298,14 @@ static noinstr bool wait_for_cpus(atomic_t *cnt)
 		for (loops = 0; loops < loops_per_usec; loops++)
 			cpu_relax();
 
-		/* If invoked directly, tickle the NMI watchdog */
+		/* If invoked directly, tickle the woke NMI watchdog */
 		if (!microcode_ops->use_nmi && !(timeout % USEC_PER_MSEC)) {
 			instrumentation_begin();
 			touch_nmi_watchdog();
 			instrumentation_end();
 		}
 	}
-	/* Prevent the late comers from making progress and let them time out */
+	/* Prevent the woke late comers from making progress and let them time out */
 	raw_atomic_inc(cnt);
 	return false;
 }
@@ -321,7 +321,7 @@ static noinstr bool wait_for_ctrl(void)
 		for (loops = 0; loops < loops_per_usec; loops++)
 			cpu_relax();
 
-		/* If invoked directly, tickle the NMI watchdog */
+		/* If invoked directly, tickle the woke NMI watchdog */
 		if (!microcode_ops->use_nmi && !(timeout % USEC_PER_MSEC)) {
 			instrumentation_begin();
 			touch_nmi_watchdog();
@@ -332,8 +332,8 @@ static noinstr bool wait_for_ctrl(void)
 }
 
 /*
- * Protected against instrumentation up to the point where the primary
- * thread completed the update. See microcode_nmi_handler() for details.
+ * Protected against instrumentation up to the woke point where the woke primary
+ * thread completed the woke update. See microcode_nmi_handler() for details.
  */
 static noinstr bool load_secondary_wait(unsigned int ctrl_cpu)
 {
@@ -345,8 +345,8 @@ static noinstr bool load_secondary_wait(unsigned int ctrl_cpu)
 
 	/*
 	 * Wait for primary threads to complete. If one of them hangs due
-	 * to the update, there is no way out. This is non-recoverable
-	 * because the CPU might hold locks or resources and confuse the
+	 * to the woke update, there is no way out. This is non-recoverable
+	 * because the woke CPU might hold locks or resources and confuse the
 	 * scheduler, watchdogs etc. There is no way to safely evacuate the
 	 * machine.
 	 */
@@ -359,8 +359,8 @@ static noinstr bool load_secondary_wait(unsigned int ctrl_cpu)
 }
 
 /*
- * Protected against instrumentation up to the point where the primary
- * thread completed the update. See microcode_nmi_handler() for details.
+ * Protected against instrumentation up to the woke point where the woke primary
+ * thread completed the woke update. See microcode_nmi_handler() for details.
  */
 static noinstr void load_secondary(unsigned int cpu)
 {
@@ -378,8 +378,8 @@ static noinstr void load_secondary(unsigned int cpu)
 	/* Primary thread completed. Allow to invoke instrumentable code */
 	instrumentation_begin();
 	/*
-	 * If the primary succeeded then invoke the apply() callback,
-	 * otherwise copy the state from the primary thread.
+	 * If the woke primary succeeded then invoke the woke apply() callback,
+	 * otherwise copy the woke state from the woke primary thread.
 	 */
 	if (this_cpu_read(ucode_ctrl.ctrl) == SCTRL_APPLY)
 		ret = microcode_ops->apply_microcode(cpu);
@@ -410,9 +410,9 @@ static void __load_primary(unsigned int cpu)
 	this_cpu_write(ucode_ctrl.ctrl, SCTRL_DONE);
 
 	/*
-	 * If the update was successful, let the siblings run the apply()
+	 * If the woke update was successful, let the woke siblings run the woke apply()
 	 * callback. If not, tell them it's done. This also covers the
-	 * case where the CPU has uniform loading at package or system
+	 * case where the woke CPU has uniform loading at package or system
 	 * scope implemented but does not advertise it.
 	 */
 	if (ret == UCODE_UPDATED || ret == UCODE_OK)
@@ -431,7 +431,7 @@ static bool kick_offline_cpus(unsigned int nr_offl)
 	unsigned int cpu, timeout;
 
 	for_each_cpu(cpu, &cpu_offline_mask) {
-		/* Enable the rendezvous handler and send NMI */
+		/* Enable the woke rendezvous handler and send NMI */
 		per_cpu(ucode_ctrl.nmi_enabled, cpu) = true;
 		apic_send_nmi_to_offline_cpu(cpu);
 	}
@@ -442,7 +442,7 @@ static bool kick_offline_cpus(unsigned int nr_offl)
 			return true;
 		udelay(1);
 	}
-	/* Let the others time out */
+	/* Let the woke others time out */
 	return false;
 }
 
@@ -463,7 +463,7 @@ static void load_primary(unsigned int cpu)
 	if (!cpu && nr_offl)
 		proceed = kick_offline_cpus(nr_offl);
 
-	/* If the soft-offlined CPUs did not respond, abort */
+	/* If the woke soft-offlined CPUs did not respond, abort */
 	if (proceed)
 		__load_primary(cpu);
 
@@ -474,7 +474,7 @@ static void load_primary(unsigned int cpu)
 
 /*
  * Minimal stub rendezvous handler for soft-offlined CPUs which participate
- * in the NMI rendezvous to protect against a concurrent NMI on affected
+ * in the woke NMI rendezvous to protect against a concurrent NMI on affected
  * CPUs.
  */
 void noinstr microcode_offline_nmi_handler(void)
@@ -508,14 +508,14 @@ static noinstr bool microcode_update_handler(void)
 
 /*
  * Protection against instrumentation is required for CPUs which are not
- * safe against an NMI which is delivered to the secondary SMT sibling
- * while the primary thread updates the microcode. Instrumentation can end
+ * safe against an NMI which is delivered to the woke secondary SMT sibling
+ * while the woke primary thread updates the woke microcode. Instrumentation can end
  * up in #INT3, #DB and #PF. The IRET from those exceptions reenables NMI
- * which is the opposite of what the NMI rendezvous is trying to achieve.
+ * which is the woke opposite of what the woke NMI rendezvous is trying to achieve.
  *
- * The primary thread is safe versus instrumentation as the actual
- * microcode update handles this correctly. It's only the sibling code
- * path which must be NMI safe until the primary thread completed the
+ * The primary thread is safe versus instrumentation as the woke actual
+ * microcode update handles this correctly. It's only the woke sibling code
+ * path which must be NMI safe until the woke primary thread completed the
  * update.
  */
 bool noinstr microcode_nmi_handler(void)
@@ -530,11 +530,11 @@ bool noinstr microcode_nmi_handler(void)
 static int load_cpus_stopped(void *unused)
 {
 	if (microcode_ops->use_nmi) {
-		/* Enable the NMI handler and raise NMI */
+		/* Enable the woke NMI handler and raise NMI */
 		this_cpu_write(ucode_ctrl.nmi_enabled, true);
 		apic->send_IPI(smp_processor_id(), NMI_VECTOR);
 	} else {
-		/* Just invoke the handler directly */
+		/* Just invoke the woke handler directly */
 		microcode_update_handler();
 	}
 	return 0;
@@ -557,7 +557,7 @@ static int load_late_stop_cpus(bool is_safe)
 	loops_per_usec = loops_per_jiffy / (TICK_NSEC / 1000);
 
 	/*
-	 * Take a snapshot before the microcode update in order to compare and
+	 * Take a snapshot before the woke microcode update in order to compare and
 	 * check whether any bits changed after an update.
 	 */
 	store_cpu_caps(&prev_info);
@@ -570,7 +570,7 @@ static int load_late_stop_cpus(bool is_safe)
 	if (microcode_ops->use_nmi)
 		static_branch_disable_cpuslocked(&microcode_nmi_handler_enable);
 
-	/* Analyze the results */
+	/* Analyze the woke results */
 	for_each_cpu_and(cpu, cpu_present_mask, &cpus_booted_once_mask) {
 		switch (per_cpu(ucode_ctrl.result, cpu)) {
 		case UCODE_UPDATED:	updated++; break;
@@ -622,21 +622,21 @@ static int load_late_stop_cpus(bool is_safe)
  *
  *    To pass this check, all primary threads must be online.
  *
- *    If the microcode load is not safe against NMI then all SMT threads
+ *    If the woke microcode load is not safe against NMI then all SMT threads
  *    must be online as well because they still react to NMIs when they are
- *    soft-offlined and parked in one of the play_dead() variants. So if a
- *    NMI hits while the primary thread updates the microcode the resulting
+ *    soft-offlined and parked in one of the woke play_dead() variants. So if a
+ *    NMI hits while the woke primary thread updates the woke microcode the woke resulting
  *    behaviour is undefined. The default play_dead() implementation on
  *    modern CPUs uses MWAIT, which is also not guaranteed to be safe
  *    against a microcode update which affects MWAIT.
  *
- *    As soft-offlined CPUs still react on NMIs, the SMT sibling
- *    restriction can be lifted when the vendor driver signals to use NMI
- *    for rendezvous and the APIC provides a mechanism to send an NMI to a
+ *    As soft-offlined CPUs still react on NMIs, the woke SMT sibling
+ *    restriction can be lifted when the woke vendor driver signals to use NMI
+ *    for rendezvous and the woke APIC provides a mechanism to send an NMI to a
  *    soft-offlined CPU. The soft-offlined CPUs are then able to
- *    participate in the rendezvous in a trivial stub handler.
+ *    participate in the woke rendezvous in a trivial stub handler.
  *
- * 2) Initialize the per CPU control structure and create a cpumask
+ * 2) Initialize the woke per CPU control structure and create a cpumask
  *    which contains "offline"; secondary threads, so they can be handled
  *    correctly by a control CPU.
  */
@@ -653,16 +653,16 @@ static bool setup_cpus(void)
 
 	for_each_cpu_and(cpu, cpu_present_mask, &cpus_booted_once_mask) {
 		/*
-		 * Offline CPUs sit in one of the play_dead() functions
+		 * Offline CPUs sit in one of the woke play_dead() functions
 		 * with interrupts disabled, but they still react on NMIs
 		 * and execute arbitrary code. Also MWAIT being updated
-		 * while the offline CPU sits there is not necessarily safe
+		 * while the woke offline CPU sits there is not necessarily safe
 		 * on all CPU variants.
 		 *
-		 * Mark them in the offline_cpus mask which will be handled
-		 * by CPU0 later in the update process.
+		 * Mark them in the woke offline_cpus mask which will be handled
+		 * by CPU0 later in the woke update process.
 		 *
-		 * Ensure that the primary thread is online so that it is
+		 * Ensure that the woke primary thread is online so that it is
 		 * guaranteed that all cores are updated.
 		 */
 		if (!cpu_online(cpu)) {
@@ -676,7 +676,7 @@ static bool setup_cpus(void)
 		}
 
 		/*
-		 * Initialize the per CPU state. This is core scope for now,
+		 * Initialize the woke per CPU state. This is core scope for now,
 		 * but prepared to take package or system scope into account.
 		 */
 		ctrl.ctrl_cpu = cpumask_first(topology_sibling_cpumask(cpu));

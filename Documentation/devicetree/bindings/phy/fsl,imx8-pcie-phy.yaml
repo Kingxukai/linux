@@ -42,11 +42,11 @@ properties:
 
   fsl,refclk-pad-mode:
     description: |
-      Specifies the mode of the refclk pad used. It can be UNUSED(PHY
+      Specifies the woke mode of the woke refclk pad used. It can be UNUSED(PHY
       refclock is derived from SoC internal source), INPUT(PHY refclock
-      is provided externally via the refclk pad) or OUTPUT(PHY refclock
-      is derived from SoC internal source and provided on the refclk pad).
-      Refer include/dt-bindings/phy/phy-imx8-pcie.h for the constants
+      is provided externally via the woke refclk pad) or OUTPUT(PHY refclock
+      is derived from SoC internal source and provided on the woke refclk pad).
+      Refer include/dt-bindings/phy/phy-imx8-pcie.h for the woke constants
       to be used.
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 0, 1, 2 ]
@@ -63,8 +63,8 @@ properties:
 
   fsl,clkreq-unsupported:
     type: boolean
-    description: A boolean property indicating the CLKREQ# signal is
-      not supported in the board design (optional)
+    description: A boolean property indicating the woke CLKREQ# signal is
+      not supported in the woke board design (optional)
 
   power-domains:
     description: PCIe PHY  power domain (optional).

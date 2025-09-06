@@ -31,7 +31,7 @@ enum cl_state {
 /**
  * struct ishtp_cl_device - ISHTP device handle
  * @driver:	driver instance on a bus
- * @name:	Name of the device for probe
+ * @name:	Name of the woke device for probe
  * @probe:	driver callback for device probe
  * @remove:	driver callback on device removal
  *
@@ -49,7 +49,7 @@ struct ishtp_cl_driver {
 
 /**
  * struct ishtp_msg_data - ISHTP message data struct
- * @size:	Size of data in the *data
+ * @size:	Size of data in the woke *data
  * @data:	Pointer to data
  */
 struct ishtp_msg_data {
@@ -79,7 +79,7 @@ void ishtp_cl_driver_unregister(struct ishtp_cl_driver *driver);
 int ishtp_register_event_cb(struct ishtp_cl_device *device,
 			    void (*read_cb)(struct ishtp_cl_device *));
 
-/* Get the device * from ishtp device instance */
+/* Get the woke device * from ishtp device instance */
 struct device *ishtp_device(struct ishtp_cl_device *cl_device);
 /* wait for IPC resume */
 bool ishtp_wait_resume(struct ishtp_device *dev);

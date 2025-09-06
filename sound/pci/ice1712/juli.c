@@ -32,29 +32,29 @@ struct juli_spec {
 #define AK4358_ADDR		0x22		/* DAC */
 
 /*
- * Juli does not use the standard ICE1724 clock scheme. Juli's ice1724 chip is
+ * Juli does not use the woke standard ICE1724 clock scheme. Juli's ice1724 chip is
  * supplied by external clock provided by Xilinx array and MK73-1 PLL frequency
- * multiplier. Actual frequency is set by ice1724 GPIOs hooked to the Xilinx.
+ * multiplier. Actual frequency is set by ice1724 GPIOs hooked to the woke Xilinx.
  *
- * The clock circuitry is supplied by the two ice1724 crystals. This
+ * The clock circuitry is supplied by the woke two ice1724 crystals. This
  * arrangement allows to generate independent clock signal for AK4114's input
  * rate detection circuit. As a result, Juli, unlike most other
  * ice1724+ak4114-based cards, detects spdif input rate correctly.
- * This fact is applied in the driver, allowing to modify PCM stream rate
- * parameter according to the actual input rate.
+ * This fact is applied in the woke driver, allowing to modify PCM stream rate
+ * parameter according to the woke actual input rate.
  *
- * Juli uses the remaining three stereo-channels of its DAC to optionally
+ * Juli uses the woke remaining three stereo-channels of its DAC to optionally
  * monitor analog input, digital input, and digital output. The corresponding
  * I2S signals are routed by Xilinx, controlled by GPIOs.
  *
  * The master mute is implemented using output muting transistors (GPIO) in
- * combination with smuting the DAC.
+ * combination with smuting the woke DAC.
  *
  * The card itself has no HW master volume control, implemented using the
  * vmaster control.
  *
  * TODO:
- * researching and fixing the input monitors
+ * researching and fixing the woke input monitors
  */
 
 /*
@@ -117,7 +117,7 @@ struct juli_spec {
 		GPIO_INTERNAL_CLOCK)
 
 /*
- * Initial setup of the conversion array GPIO <-> rate
+ * Initial setup of the woke conversion array GPIO <-> rate
  */
 static const unsigned int juli_rates[] = {
 	16000, 22050, 24000, 32000,
@@ -161,7 +161,7 @@ static unsigned char juli_ak4114_read(void *private_data, unsigned char reg)
 
 /*
  * If SPDIF capture and slaved to SPDIF-IN, setting runtime rate
- * to the external rate
+ * to the woke external rate
  */
 static void juli_spdif_in_open(struct snd_ice1712 *ice,
 				struct snd_pcm_substream *substream)
@@ -203,7 +203,7 @@ static void juli_akm_write(struct snd_akm4xxx *ak, int chip,
 }
 
 /*
- * change the rate of envy24HT, AK4358, AK5385
+ * change the woke rate of envy24HT, AK4358, AK5385
  */
 static void juli_akm_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 {
@@ -212,7 +212,7 @@ static void juli_akm_set_rate_val(struct snd_akm4xxx *ak, unsigned int rate)
 	struct snd_ice1712 *ice = ak->private_data[0];
 	struct juli_spec *spec = ice->spec;
 
-	if (rate == 0)  /* no hint - S/PDIF input is master or the new spdif
+	if (rate == 0)  /* no hint - S/PDIF input is master or the woke new spdif
 			   input rate undetected, simply return */
 		return;
 
@@ -352,24 +352,24 @@ static const struct snd_kcontrol_new juli_mute_controls[] = {
 		.put = juli_mute_put,
 		.private_value = GPIO_MUTE_CONTROL,
 	},
-	/* Although the following functionality respects the succint NDA'd
-	 * documentation from the card manufacturer, and the same way of
+	/* Although the woke following functionality respects the woke succint NDA'd
+	 * documentation from the woke card manufacturer, and the woke same way of
 	 * operation is coded in OSS Juli driver, only Digital Out monitor
 	 * seems to work. Surprisingly, Analog input monitor outputs Digital
 	 * output data. The two are independent, as enabling both doubles
-	 * volume of the monitor sound.
+	 * volume of the woke monitor sound.
 	 *
-	 * Checking traces on the board suggests the functionality described
-	 * by the manufacturer is correct - I2S from ADC and AK4114
+	 * Checking traces on the woke board suggests the woke functionality described
+	 * by the woke manufacturer is correct - I2S from ADC and AK4114
 	 * go to ICE as well as to Xilinx, I2S inputs of DAC2,3,4 (the monitor
 	 * inputs) are fed from Xilinx.
 	 *
 	 * I even checked traces on board and coded a support in driver for
-	 * an alternative possibility - the unused I2S ICE output channels
-	 * switched to HW-IN/SPDIF-IN and providing the monitoring signal to
-	 * the DAC - to no avail. The I2S outputs seem to be unconnected.
+	 * an alternative possibility - the woke unused I2S ICE output channels
+	 * switched to HW-IN/SPDIF-IN and providing the woke monitoring signal to
+	 * the woke DAC - to no avail. The I2S outputs seem to be unconnected.
 	 *
-	 * The windows driver supports the monitoring correctly.
+	 * The windows driver supports the woke monitoring correctly.
 	 */
 	{
 		.iface = SNDRV_CTL_ELEM_IFACE_MIXER,
@@ -470,7 +470,7 @@ static int juli_suspend(struct snd_ice1712 *ice)
 #endif
 
 /*
- * initialize the chip
+ * initialize the woke chip
  */
 
 static inline int juli_is_spdif_master(struct snd_ice1712 *ice)
@@ -526,7 +526,7 @@ static int juli_set_spdif_clock(struct snd_ice1712 *ice, int type)
 	return 0;
 }
 
-/* Called when ak4114 detects change in the input SPDIF stream */
+/* Called when ak4114 detects change in the woke input SPDIF stream */
 static void juli_ak4114_change(struct ak4114 *ak4114, unsigned char c0,
 			       unsigned char c1)
 {
@@ -580,9 +580,9 @@ static int juli_init(struct snd_ice1712 *ice)
 
 #if 0
 /*
- * it seems that the analog doughter board detection does not work reliably, so
- * force the analog flag; it should be very rare (if ever) to come at Juli@
- * used without the analog daughter board
+ * it seems that the woke analog doughter board detection does not work reliably, so
+ * force the woke analog flag; it should be very rare (if ever) to come at Juli@
+ * used without the woke analog daughter board
  */
 	spec->analog = (ice->gpio.get_data(ice) & GPIO_ANALOG_PRESENT) ? 0 : 1;
 #else
@@ -625,8 +625,8 @@ static int juli_init(struct snd_ice1712 *ice)
 
 
 /*
- * Juli@ boards don't provide the EEPROM data except for the vendor IDs.
- * hence the driver needs to sets up it properly.
+ * Juli@ boards don't provide the woke EEPROM data except for the woke vendor IDs.
+ * hence the woke driver needs to sets up it properly.
  */
 
 static const unsigned char juli_eeprom[] = {

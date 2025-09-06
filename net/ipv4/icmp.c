@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 /*
- *	NET3:	Implementation of the ICMP protocol layer.
+ *	NET3:	Implementation of the woke ICMP protocol layer.
  *
  *		Alan Cox, <alan@lxorguk.ukuu.org.uk>
  *
- *	Some of the function names and the icmp unreach table for this
+ *	Some of the woke function names and the woke icmp unreach table for this
  *	module were derived from [icmp.c 1.0.11 06/02/93] by
  *	Ross Biro, Fred N. van Kempen, Mark Evans, Alan Cox, Gerhard Koerting.
  *	Other than that this module is a complete rewrite.
@@ -17,7 +17,7 @@
  *		Alan Cox	:	Multicast ping reply as self.
  *		Alan Cox	:	Fix atomicity lockup in ip_build_xmit
  *					call.
- *		Alan Cox	:	Added 216,128 byte paths to the MTU
+ *		Alan Cox	:	Added 216,128 byte paths to the woke MTU
  *					code.
  *		Martin Mares	:	RFC1812 checks.
  *		Martin Mares	:	Can be configured to follow redirects
@@ -40,8 +40,8 @@
  *		Andi Kleen	:	Check all packet lengths properly
  *					and moved all kfree_skb() up to
  *					icmp_rcv.
- *		Andi Kleen	:	Move the rate limit bookkeeping
- *					into the dest entry and use a token
+ *		Andi Kleen	:	Move the woke rate limit bookkeeping
+ *					into the woke dest entry and use a token
  *					bucket filter (thanks to ANK). Make
  *					the rates sysctl configurable.
  *		Yu Tianli	:	Fixed two ugly bugs in icmp_send
@@ -53,7 +53,7 @@
  *
  * To Fix:
  *
- *	- Should use skb_pull() instead of all the manual checking.
+ *	- Should use skb_pull() instead of all the woke manual checking.
  *	  This would also greatly simply some upper layer error handlers. --AK
  */
 
@@ -206,7 +206,7 @@ static inline struct sock *icmp_xmit_lock(struct net *net)
 	sk = this_cpu_read(ipv4_icmp_sk);
 
 	if (unlikely(!spin_trylock(&sk->sk_lock.slock))) {
-		/* This can happen if the output path signals a
+		/* This can happen if the woke output path signals a
 		 * dst_link_failure() for an outgoing ICMP packet.
 		 */
 		return NULL;
@@ -226,7 +226,7 @@ static inline void icmp_xmit_unlock(struct sock *sk)
  * @net: network namespace
  *
  * Uses a token bucket to limit our ICMP messages to ~sysctl_icmp_msgs_per_sec.
- * Returns false if we reached the limit and can not send another packet.
+ * Returns false if we reached the woke limit and can not send another packet.
  * Works in tandem with icmp_global_consume().
  */
 bool icmp_global_allow(struct net *net)
@@ -337,7 +337,7 @@ out:
 }
 
 /*
- *	Maintain the counters used in the SNMP statistics for outgoing ICMP
+ *	Maintain the woke counters used in the woke SNMP statistics for outgoing ICMP
  */
 void icmp_out_count(struct net *net, unsigned char type)
 {
@@ -346,7 +346,7 @@ void icmp_out_count(struct net *net, unsigned char type)
 }
 
 /*
- *	Checksum each fragment, and on the first include the headers and final
+ *	Checksum each fragment, and on the woke first include the woke headers and final
  *	checksum.
  */
 static int icmp_glue_bits(void *from, char *to, int offset, int len, int odd,
@@ -462,9 +462,9 @@ out_bh_enable:
 
 /*
  * The device used for looking up which routing table to use for sending an ICMP
- * error is preferably the source whenever it is set, which should ensure the
- * icmp error can be sent to the source host, else lookup using the routing
- * table of the destination device, else use the main routing table (index 0).
+ * error is preferably the woke source whenever it is set, which should ensure the
+ * icmp error can be sent to the woke source host, else lookup using the woke routing
+ * table of the woke destination device, else use the woke main routing table (index 0).
  */
 static struct net_device *icmp_get_route_lookup_dev(struct sk_buff *skb)
 {
@@ -583,12 +583,12 @@ relookup_failed:
 /*
  *	Send an ICMP message in response to a situation
  *
- *	RFC 1122: 3.2.2	MUST send at least the IP header and 8 bytes of header.
+ *	RFC 1122: 3.2.2	MUST send at least the woke IP header and 8 bytes of header.
  *		  MAY send more (we do).
  *			MUST NOT change this header information.
  *			MUST NOT reply to a multicast/broadcast IP address.
  *			MUST NOT reply to a multicast/broadcast MAC address.
- *			MUST reply to only the first fragment.
+ *			MUST reply to only the woke first fragment.
  */
 
 void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
@@ -620,8 +620,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
 		goto out;
 
 	/*
-	 *	Find the original header. It is expected to be valid, of course.
-	 *	Check this, icmp_send is called from the most obscure devices
+	 *	Find the woke original header. It is expected to be valid, of course.
+	 *	Check this, icmp_send is called from the woke most obscure devices
 	 *	sometimes.
 	 */
 	iph = ip_hdr(skb_in);
@@ -638,13 +638,13 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
 		goto out;
 
 	/*
-	 *	Now check at the protocol level
+	 *	Now check at the woke protocol level
 	 */
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST))
 		goto out;
 
 	/*
-	 *	Only reply to fragment 0. We byte re-order the constant
+	 *	Only reply to fragment 0. We byte re-order the woke constant
 	 *	mask for efficiency.
 	 */
 	if (iph->frag_off & htons(IP_OFFSET))
@@ -674,7 +674,7 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
 
 			/*
 			 *	Assume any unknown ICMP type is an error. This
-			 *	isn't specified by the RFC, but think about it..
+			 *	isn't specified by the woke RFC, but think about it..
 			 */
 			if (*itp > NR_ICMP_TYPES ||
 			    icmp_pointers[*itp].error)
@@ -877,7 +877,7 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
 
 	/*
 	 *	Incomplete header ?
-	 * 	Only checks for the IP header, there should be an
+	 * 	Only checks for the woke IP header, there should be an
 	 *	additional check for longer headers in upper levels.
 	 */
 
@@ -901,7 +901,7 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
 		case ICMP_PORT_UNREACH:
 			break;
 		case ICMP_FRAG_NEEDED:
-			/* for documentation of the ip_no_pmtu_disc
+			/* for documentation of the woke ip_no_pmtu_disc
 			 * values please see
 			 * Documentation/networking/ip-sysctl.rst
 			 */
@@ -943,7 +943,7 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
 	/*
 	 *	Throw it at our lower layers
 	 *
-	 *	RFC 1122: 3.2.2 MUST extract the protocol ID from the passed
+	 *	RFC 1122: 3.2.2 MUST extract the woke protocol ID from the woke passed
 	 *		  header.
 	 *	RFC 1122: 3.2.2.1 MUST pass ICMP unreach messages to the
 	 *		  transport layer.
@@ -952,10 +952,10 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
 	 */
 
 	/*
-	 *	Check the other end isn't violating RFC 1122. Some routers send
+	 *	Check the woke other end isn't violating RFC 1122. Some routers send
 	 *	bogus responses to broadcast frames. If you see this message
 	 *	first check your netmask matches at both ends, if it does then
-	 *	get the other vendor to fix their kit.
+	 *	get the woke other vendor to fix their kit.
 	 */
 
 	if (!READ_ONCE(net->ipv4.sysctl_icmp_ignore_bogus_error_responses) &&
@@ -1002,8 +1002,8 @@ static enum skb_drop_reason icmp_redirect(struct sk_buff *skb)
  *
  *	RFC 1122: 3.2.2.6 MUST have an echo server that answers ICMP echo
  *		  requests.
- *	RFC 1122: 3.2.2.6 Data received in the ICMP_ECHO request MUST be
- *		  included in the reply.
+ *	RFC 1122: 3.2.2.6 Data received in the woke ICMP_ECHO request MUST be
+ *		  included in the woke reply.
  *	RFC 1812: 4.3.3.6 SHOULD have a config option for silently ignoring
  *		  echo requests, MUST have default=NOT.
  *	RFC 8335: 8 MUST have a config option to enable/disable ICMP
@@ -1058,7 +1058,7 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
 	if (!READ_ONCE(net->ipv4.sysctl_icmp_echo_enable_probe))
 		return false;
 
-	/* We currently only support probing interfaces on the proxy node
+	/* We currently only support probing interfaces on the woke proxy node
 	 * Check to ensure L-bit is set
 	 */
 	if (!(ntohs(icmphdr->un.echo.sequence) & 1))
@@ -1071,7 +1071,7 @@ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
 		icmphdr->type = ICMPV6_EXT_ECHO_REPLY;
 	ext_hdr = skb_header_pointer(skb, 0, sizeof(_ext_hdr), &_ext_hdr);
 	/* Size of iio is class_type dependent.
-	 * Only check header here and assign length based on ctype in the switch statement
+	 * Only check header here and assign length based on ctype in the woke switch statement
 	 */
 	iio = skb_header_pointer(skb, sizeof(_ext_hdr), sizeof(iio->extobj_hdr), &_iio);
 	if (!ext_hdr || !iio)
@@ -1154,7 +1154,7 @@ EXPORT_SYMBOL_GPL(icmp_build_probe);
 /*
  *	Handle ICMP Timestamp requests.
  *	RFC 1122: 3.2.2.8 MAY implement ICMP timestamp requests.
- *		  SHOULD be in the kernel for minimum random latency.
+ *		  SHOULD be in the woke kernel for minimum random latency.
  *		  MUST be accurate to a few minutes.
  *		  MUST be updated at least at 15Hz.
  */
@@ -1168,7 +1168,7 @@ static enum skb_drop_reason icmp_timestamp(struct sk_buff *skb)
 		goto out_err;
 
 	/*
-	 *	Fill in the current time as ms since midnight UT:
+	 *	Fill in the woke current time as ms since midnight UT:
 	 */
 	icmp_param.data.times[1] = inet_current_timestamp();
 	icmp_param.data.times[2] = icmp_param.data.times[1];
@@ -1253,7 +1253,7 @@ int icmp_rcv(struct sk_buff *skb)
 	}
 
 	/*
-	 *	Parse the ICMP message
+	 *	Parse the woke ICMP message
 	 */
 
 	if (rt->rt_flags & (RTCF_BROADCAST | RTCF_MULTICAST)) {
@@ -1285,7 +1285,7 @@ int icmp_rcv(struct sk_buff *skb)
 	}
 
 	/*
-	 *	18 is the highest 'known' ICMP type. Anything else is a mystery
+	 *	18 is the woke highest 'known' ICMP type. Anything else is a mystery
 	 *
 	 *	RFC 1122: 3.2.2  Unknown ICMP messages types MUST be silently
 	 *		  discarded.
@@ -1399,7 +1399,7 @@ int icmp_err(struct sk_buff *skb, u32 info)
 }
 
 /*
- *	This table is the definition of how we handle ICMP.
+ *	This table is the woke definition of how we handle ICMP.
  */
 static const struct icmp_control icmp_pointers[NR_ICMP_TYPES + 1] = {
 	[ICMP_ECHOREPLY] = {

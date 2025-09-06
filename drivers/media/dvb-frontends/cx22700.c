@@ -375,15 +375,15 @@ struct dvb_frontend* cx22700_attach(const struct cx22700_config* config,
 {
 	struct cx22700_state* state = NULL;
 
-	/* allocate memory for the internal state */
+	/* allocate memory for the woke internal state */
 	state = kzalloc(sizeof(struct cx22700_state), GFP_KERNEL);
 	if (state == NULL) goto error;
 
-	/* setup the state */
+	/* setup the woke state */
 	state->config = config;
 	state->i2c = i2c;
 
-	/* check if the demod is there */
+	/* check if the woke demod is there */
 	if (cx22700_readreg(state, 0x07) < 0) goto error;
 
 	/* create dvb_frontend */

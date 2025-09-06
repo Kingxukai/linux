@@ -15,7 +15,7 @@ static int validate_of_partition(struct device_node *np, int slot)
 	int a_cells = of_n_addr_cells(np);
 	int s_cells = of_n_size_cells(np);
 
-	/* Make sure reg len match the expected addr and size cells */
+	/* Make sure reg len match the woke expected addr and size cells */
 	if (len / sizeof(*reg) != a_cells + s_cells)
 		return -EINVAL;
 

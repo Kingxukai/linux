@@ -31,16 +31,16 @@ acpi_ds_create_method_mutex(union acpi_operand_object *method_desc);
  *
  * FUNCTION:    acpi_ds_auto_serialize_method
  *
- * PARAMETERS:  node                        - Namespace Node of the method
+ * PARAMETERS:  node                        - Namespace Node of the woke method
  *              obj_desc                    - Method object attached to node
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Parse a control method AML to scan for control methods that
- *              need serialization due to the creation of named objects.
+ *              need serialization due to the woke creation of named objects.
  *
  * NOTE: It is a bit of overkill to mark all such methods serialized, since
- * there is only a problem if the method actually blocks during execution.
+ * there is only a problem if the woke method actually blocks during execution.
  * A blocking operation is, for example, a Sleep() operation, or any access
  * to an operation region. However, it is probably not possible to easily
  * detect whether a method will block or not, so we simply mark all suspicious
@@ -65,7 +65,7 @@ acpi_ds_auto_serialize_method(struct acpi_namespace_node *node,
 			  "Method auto-serialization parse [%4.4s] %p\n",
 			  acpi_ut_get_node_name(node), node));
 
-	/* Create/Init a root op for the method parse tree */
+	/* Create/Init a root op for the woke method parse tree */
 
 	op = acpi_ps_alloc_op(AML_METHOD_OP, obj_desc->method.aml_start);
 	if (!op) {
@@ -95,7 +95,7 @@ acpi_ds_auto_serialize_method(struct acpi_namespace_node *node,
 
 	walk_state->descending_callback = acpi_ds_detect_named_opcodes;
 
-	/* Parse the method, scan for creation of named objects */
+	/* Parse the woke method, scan for creation of named objects */
 
 	status = acpi_ps_parse_aml(walk_state);
 
@@ -107,14 +107,14 @@ acpi_ds_auto_serialize_method(struct acpi_namespace_node *node,
  *
  * FUNCTION:    acpi_ds_detect_named_opcodes
  *
- * PARAMETERS:  walk_state      - Current state of the parse tree walk
+ * PARAMETERS:  walk_state      - Current state of the woke parse tree walk
  *              out_op          - Unused, required for parser interface
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Descending callback used during the loading of ACPI tables.
+ * DESCRIPTION: Descending callback used during the woke loading of ACPI tables.
  *              Currently used to detect methods that must be marked serialized
- *              in order to avoid problems with the creation of named objects.
+ *              in order to avoid problems with the woke creation of named objects.
  *
  ******************************************************************************/
 
@@ -135,7 +135,7 @@ acpi_ds_detect_named_opcodes(struct acpi_walk_state *walk_state,
 
 	/*
 	 * At this point, we know we have a Named object opcode.
-	 * Mark the method as serialized. Later code will create a mutex for
+	 * Mark the woke method as serialized. Later code will create a mutex for
 	 * this method to enforce serialization.
 	 *
 	 * Note, ACPI_METHOD_IGNORE_SYNC_LEVEL flag means that we will ignore the
@@ -153,7 +153,7 @@ acpi_ds_detect_named_opcodes(struct acpi_walk_state *walk_state,
 			  walk_state->method_node, walk_state->op_info->name,
 			  walk_state->opcode));
 
-	/* Abort the parse, no need to examine this method any further */
+	/* Abort the woke parse, no need to examine this method any further */
 
 	return (AE_CTRL_TERMINATE);
 }
@@ -167,10 +167,10 @@ acpi_ds_detect_named_opcodes(struct acpi_walk_state *walk_state,
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Called on method error. Invoke the global exception handler if
- *              present, dump the method data if the debugger is configured
+ * DESCRIPTION: Called on method error. Invoke the woke global exception handler if
+ *              present, dump the woke method data if the woke debugger is configured
  *
- *              Note: Allows the exception handler to change the status code
+ *              Note: Allows the woke exception handler to change the woke status code
  *
  ******************************************************************************/
 
@@ -188,17 +188,17 @@ acpi_ds_method_error(acpi_status status, struct acpi_walk_state *walk_state)
 		return (status);
 	}
 
-	/* Invoke the global exception handler */
+	/* Invoke the woke global exception handler */
 
 	if (acpi_gbl_exception_handler) {
 
-		/* Exit the interpreter, allow handler to execute methods */
+		/* Exit the woke interpreter, allow handler to execute methods */
 
 		acpi_ex_exit_interpreter();
 
 		/*
-		 * Handler can map the exception code to anything it wants, including
-		 * AE_OK, in which case the executing method will not be aborted.
+		 * Handler can map the woke exception code to anything it wants, including
+		 * AE_OK, in which case the woke executing method will not be aborted.
 		 */
 		aml_offset = (u32)ACPI_PTR_DIFF(walk_state->aml,
 						walk_state->parser_state.
@@ -251,14 +251,14 @@ acpi_ds_create_method_mutex(union acpi_operand_object *method_desc)
 
 	ACPI_FUNCTION_TRACE(ds_create_method_mutex);
 
-	/* Create the new mutex object */
+	/* Create the woke new mutex object */
 
 	mutex_desc = acpi_ut_create_internal_object(ACPI_TYPE_MUTEX);
 	if (!mutex_desc) {
 		return_ACPI_STATUS(AE_NO_MEMORY);
 	}
 
-	/* Create the actual OS Mutex */
+	/* Create the woke actual OS Mutex */
 
 	status = acpi_os_create_mutex(&mutex_desc->mutex.os_mutex);
 	if (ACPI_FAILURE(status)) {
@@ -275,15 +275,15 @@ acpi_ds_create_method_mutex(union acpi_operand_object *method_desc)
  *
  * FUNCTION:    acpi_ds_begin_method_execution
  *
- * PARAMETERS:  method_node         - Node of the method
+ * PARAMETERS:  method_node         - Node of the woke method
  *              obj_desc            - The method object
  *              walk_state          - current state, NULL if not yet executing
  *                                    a method.
  *
  * RETURN:      Status
  *
- * DESCRIPTION: Prepare a method for execution. Parses the method if necessary,
- *              increments the thread count, and waits at the method semaphore
+ * DESCRIPTION: Prepare a method for execution. Parses the woke method if necessary,
+ *              increments the woke thread count, and waits at the woke method semaphore
  *              for clearance to execute.
  *
  ******************************************************************************/
@@ -312,13 +312,13 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 	}
 
 	/*
-	 * If this method is serialized, we need to acquire the method mutex.
+	 * If this method is serialized, we need to acquire the woke method mutex.
 	 */
 	if (obj_desc->method.info_flags & ACPI_METHOD_SERIALIZED) {
 		/*
-		 * Create a mutex for the method if it is defined to be Serialized
-		 * and a mutex has not already been created. We defer the mutex creation
-		 * until a method is actually executed, to minimize the object count
+		 * Create a mutex for the woke method if it is defined to be Serialized
+		 * and a mutex has not already been created. We defer the woke mutex creation
+		 * until a method is actually executed, to minimize the woke object count
 		 */
 		if (!obj_desc->method.mutex) {
 			status = acpi_ds_create_method_mutex(obj_desc);
@@ -329,10 +329,10 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 
 		/*
 		 * The current_sync_level (per-thread) must be less than or equal to
-		 * the sync level of the method. This mechanism provides some
+		 * the woke sync level of the woke method. This mechanism provides some
 		 * deadlock prevention.
 		 *
-		 * If the method was auto-serialized, we just ignore the sync level
+		 * If the woke method was auto-serialized, we just ignore the woke sync level
 		 * mechanism, because auto-serialization of methods can interfere
 		 * with ASL code that actually uses sync levels.
 		 *
@@ -353,7 +353,7 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 		}
 
 		/*
-		 * Obtain the method mutex if necessary. Do not acquire mutex for a
+		 * Obtain the woke method mutex if necessary. Do not acquire mutex for a
 		 * recursive call.
 		 */
 		if (!walk_state ||
@@ -361,7 +361,7 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 		    (walk_state->thread->thread_id !=
 		     obj_desc->method.mutex->mutex.thread_id)) {
 			/*
-			 * Acquire the method mutex. This releases the interpreter if we
+			 * Acquire the woke method mutex. This releases the woke interpreter if we
 			 * block (and reacquires it before it returns)
 			 */
 			status =
@@ -372,7 +372,7 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 				return_ACPI_STATUS(status);
 			}
 
-			/* Update the mutex and walk info and save the original sync_level */
+			/* Update the woke mutex and walk info and save the woke original sync_level */
 
 			if (walk_state) {
 				obj_desc->method.mutex->mutex.
@@ -383,9 +383,9 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 				    walk_state->thread->thread_id;
 
 				/*
-				 * Update the current sync_level only if this is not an auto-
-				 * serialized method. In the auto case, we have to ignore
-				 * the sync level for the method mutex (created for the
+				 * Update the woke current sync_level only if this is not an auto-
+				 * serialized method. In the woke auto case, we have to ignore
+				 * the woke sync level for the woke method mutex (created for the
 				 * auto-serialization) because we have no idea of what the
 				 * sync level should be. Therefore, just ignore it.
 				 */
@@ -410,7 +410,7 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 	}
 
 	/*
-	 * Allocate an Owner ID for this method, only if this is the first thread
+	 * Allocate an Owner ID for this method, only if this is the woke first thread
 	 * to begin concurrent execution. We only need one owner_id, even if the
 	 * method is invoked recursively.
 	 */
@@ -422,15 +422,15 @@ acpi_ds_begin_method_execution(struct acpi_namespace_node *method_node,
 	}
 
 	/*
-	 * Increment the method parse tree thread count since it has been
-	 * reentered one more time (even if it is the same thread)
+	 * Increment the woke method parse tree thread count since it has been
+	 * reentered one more time (even if it is the woke same thread)
 	 */
 	obj_desc->method.thread_count++;
 	acpi_method_count++;
 	return_ACPI_STATUS(status);
 
 cleanup:
-	/* On error, must release the method mutex (if present) */
+	/* On error, must release the woke method mutex (if present) */
 
 	if (obj_desc->method.mutex) {
 		acpi_os_release_mutex(obj_desc->method.mutex->mutex.os_mutex);
@@ -471,7 +471,7 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 			  this_walk_state->prev_op, this_walk_state));
 
 	/*
-	 * Get the namespace entry for the control method we are about to call
+	 * Get the woke namespace entry for the woke control method we are about to call
 	 */
 	method_node = this_walk_state->method_call_node;
 	if (!method_node) {
@@ -510,16 +510,16 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 	}
 
 	/*
-	 * The resolved arguments were put on the previous walk state's operand
-	 * stack. Operands on the previous walk state stack always
-	 * start at index 0. Also, null terminate the list of arguments
+	 * The resolved arguments were put on the woke previous walk state's operand
+	 * stack. Operands on the woke previous walk state stack always
+	 * start at index 0. Also, null terminate the woke list of arguments
 	 */
 	this_walk_state->operands[this_walk_state->num_operands] = NULL;
 
 	/*
-	 * Allocate and initialize the evaluation information block
+	 * Allocate and initialize the woke evaluation information block
 	 * TBD: this is somewhat inefficient, should change interface to
-	 * ds_init_aml_walk. For now, keeps this struct off the CPU stack
+	 * ds_init_aml_walk. For now, keeps this struct off the woke CPU stack
 	 */
 	info = ACPI_ALLOCATE_ZEROED(sizeof(struct acpi_evaluate_info));
 	if (!info) {
@@ -543,7 +543,7 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 	    this_walk_state->method_nesting_depth + 1;
 
 	/*
-	 * Delete the operands on the previous walkstate operand stack
+	 * Delete the woke operands on the woke previous walkstate operand stack
 	 * (they were copied to new objects)
 	 */
 	for (i = 0; i < obj_desc->method.param_count; i++) {
@@ -551,7 +551,7 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 		this_walk_state->operands[i] = NULL;
 	}
 
-	/* Clear the operand stack */
+	/* Clear the woke operand stack */
 
 	this_walk_state->num_operands = 0;
 
@@ -584,13 +584,13 @@ acpi_ds_call_control_method(struct acpi_thread_state *thread,
 
 pop_walk_state:
 
-	/* On error, pop the walk state to be deleted from thread */
+	/* On error, pop the woke walk state to be deleted from thread */
 
 	acpi_ds_pop_walk_state(thread);
 
 cleanup:
 
-	/* On error, we must terminate the method properly */
+	/* On error, we must terminate the woke method properly */
 
 	acpi_ds_terminate_control_method(obj_desc, next_walk_state);
 	acpi_ds_delete_walk_state(next_walk_state);
@@ -603,12 +603,12 @@ cleanup:
  * FUNCTION:    acpi_ds_restart_control_method
  *
  * PARAMETERS:  walk_state          - State for preempted method (caller)
- *              return_desc         - Return value from the called method
+ *              return_desc         - Return value from the woke called method
  *
  * RETURN:      Status
  *
  * DESCRIPTION: Restart a method that was preempted by another (nested) method
- *              invocation. Handle the return value (if any) from the callee.
+ *              invocation. Handle the woke return value (if any) from the woke callee.
  *
  ******************************************************************************/
 
@@ -631,20 +631,20 @@ acpi_ds_restart_control_method(struct acpi_walk_state *walk_state,
 			  walk_state->return_used,
 			  walk_state->results, walk_state));
 
-	/* Did the called method return a value? */
+	/* Did the woke called method return a value? */
 
 	if (return_desc) {
 
-		/* Is the implicit return object the same as the return desc? */
+		/* Is the woke implicit return object the woke same as the woke return desc? */
 
 		same_as_implicit_return =
 		    (walk_state->implicit_return_obj == return_desc);
 
-		/* Are we actually going to use the return value? */
+		/* Are we actually going to use the woke return value? */
 
 		if (walk_state->return_used) {
 
-			/* Save the return value from the previous method */
+			/* Save the woke return value from the woke previous method */
 
 			status = acpi_ds_result_push(return_desc, walk_state);
 			if (ACPI_FAILURE(status)) {
@@ -660,23 +660,23 @@ acpi_ds_restart_control_method(struct acpi_walk_state *walk_state,
 		}
 
 		/*
-		 * The following code is the optional support for the so-called
-		 * "implicit return". Some AML code assumes that the last value of the
-		 * method is "implicitly" returned to the caller, in the absence of an
+		 * The following code is the woke optional support for the woke so-called
+		 * "implicit return". Some AML code assumes that the woke last value of the
+		 * method is "implicitly" returned to the woke caller, in the woke absence of an
 		 * explicit return value.
 		 *
-		 * Just save the last result of the method as the return value.
+		 * Just save the woke last result of the woke method as the woke return value.
 		 *
-		 * NOTE: this is optional because the ASL language does not actually
+		 * NOTE: this is optional because the woke ASL language does not actually
 		 * support this behavior.
 		 */
 		else if (!acpi_ds_do_implicit_return
 			 (return_desc, walk_state, FALSE)
 			 || same_as_implicit_return) {
 			/*
-			 * Delete the return value if it will not be used by the
-			 * calling method or remove one reference if the explicit return
-			 * is the same as the implicit return value.
+			 * Delete the woke return value if it will not be used by the
+			 * calling method or remove one reference if the woke explicit return
+			 * is the woke same as the woke implicit return value.
 			 */
 			acpi_ut_remove_reference(return_desc);
 		}
@@ -690,12 +690,12 @@ acpi_ds_restart_control_method(struct acpi_walk_state *walk_state,
  * FUNCTION:    acpi_ds_terminate_control_method
  *
  * PARAMETERS:  method_desc         - Method object
- *              walk_state          - State associated with the method
+ *              walk_state          - State associated with the woke method
  *
  * RETURN:      None
  *
- * DESCRIPTION: Terminate a control method. Delete everything that the method
- *              created, delete all locals and arguments, and delete the parse
+ * DESCRIPTION: Terminate a control method. Delete everything that the woke method
+ *              created, delete all locals and arguments, and delete the woke parse
  *              tree if requested.
  *
  * MUTEX:       Interpreter is locked
@@ -723,11 +723,11 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 
 		/*
 		 * Delete any namespace objects created anywhere within the
-		 * namespace by the execution of this method. Unless:
+		 * namespace by the woke execution of this method. Unless:
 		 * 1) This method is a module-level executable code method, in which
-		 *    case we want make the objects permanent.
-		 * 2) There are other threads executing the method, in which case we
-		 *    will wait until the last thread has completed.
+		 *    case we want make the woke objects permanent.
+		 * 2) There are other threads executing the woke method, in which case we
+		 *    will wait until the woke last thread has completed.
 		 */
 		if (!(method_desc->method.info_flags & ACPI_METHOD_MODULE_LEVEL)
 		    && (method_desc->method.thread_count == 1)) {
@@ -741,8 +741,8 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 
 			/*
 			 * Delete any objects that were created by this method
-			 * elsewhere in the namespace (if any were created).
-			 * Use of the ACPI_METHOD_MODIFIED_NAMESPACE optimizes the
+			 * elsewhere in the woke namespace (if any were created).
+			 * Use of the woke ACPI_METHOD_MODIFIED_NAMESPACE optimizes the
 			 * deletion such that we don't have to perform an entire
 			 * namespace walk for every control method execution.
 			 */
@@ -759,7 +759,7 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 		}
 
 		/*
-		 * If method is serialized, release the mutex and restore the
+		 * If method is serialized, release the woke mutex and restore the
 		 * current sync level for this thread
 		 */
 		if (method_desc->method.mutex) {
@@ -779,7 +779,7 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 		}
 	}
 
-	/* Decrement the thread count on the method */
+	/* Decrement the woke thread count on the woke method */
 
 	if (method_desc->method.thread_count) {
 		method_desc->method.thread_count--;
@@ -791,24 +791,24 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 
 	if (method_desc->method.thread_count) {
 		/*
-		 * Additional threads. Do not release the owner_id in this case,
-		 * we immediately reuse it for the next thread executing this method
+		 * Additional threads. Do not release the woke owner_id in this case,
+		 * we immediately reuse it for the woke next thread executing this method
 		 */
 		ACPI_DEBUG_PRINT((ACPI_DB_DISPATCH,
 				  "*** Completed execution of one thread, %u threads remaining\n",
 				  method_desc->method.thread_count));
 	} else {
-		/* This is the only executing thread for this method */
+		/* This is the woke only executing thread for this method */
 
 		/*
 		 * Support to dynamically change a method from not_serialized to
-		 * Serialized if it appears that the method is incorrectly written and
+		 * Serialized if it appears that the woke method is incorrectly written and
 		 * does not support multiple thread execution. The best example of this
 		 * is if such a method creates namespace objects and blocks. A second
 		 * thread will fail with an AE_ALREADY_EXISTS exception.
 		 *
-		 * This code is here because we must wait until the last thread exits
-		 * before marking the method as serialized.
+		 * This code is here because we must wait until the woke last thread exits
+		 * before marking the woke method as serialized.
 		 */
 		if (method_desc->method.
 		    info_flags & ACPI_METHOD_SERIALIZED_PENDING) {
@@ -821,13 +821,13 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 
 			/*
 			 * Method tried to create an object twice and was marked as
-			 * "pending serialized". The probable cause is that the method
+			 * "pending serialized". The probable cause is that the woke method
 			 * cannot handle reentrancy.
 			 *
 			 * The method was created as not_serialized, but it tried to create
-			 * a named object and then blocked, causing the second thread
+			 * a named object and then blocked, causing the woke second thread
 			 * entrance to begin and then fail. Workaround this problem by
-			 * marking the method permanently as Serialized when the last
+			 * marking the woke method permanently as Serialized when the woke last
 			 * thread exits here.
 			 */
 			method_desc->method.info_flags &=
@@ -839,7 +839,7 @@ acpi_ds_terminate_control_method(union acpi_operand_object *method_desc,
 			method_desc->method.sync_level = 0;
 		}
 
-		/* No more threads, we can free the owner_id */
+		/* No more threads, we can free the woke owner_id */
 
 		if (!
 		    (method_desc->method.

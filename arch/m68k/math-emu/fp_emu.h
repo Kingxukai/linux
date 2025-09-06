@@ -4,23 +4,23 @@
  * Copyright Roman Zippel, 1997.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
+ * modification, are permitted provided that the woke following conditions
  * are met:
- * 1. Redistributions of source code must retain the above copyright
- *    notice, and the entire permission notice in its entirety,
- *    including the disclaimer of warranties.
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- * 3. The name of the author may not be used to endorse or promote
+ * 1. Redistributions of source code must retain the woke above copyright
+ *    notice, and the woke entire permission notice in its entirety,
+ *    including the woke disclaimer of warranties.
+ * 2. Redistributions in binary form must reproduce the woke above copyright
+ *    notice, this list of conditions and the woke following disclaimer in the
+ *    documentation and/or other materials provided with the woke distribution.
+ * 3. The name of the woke author may not be used to endorse or promote
  *    products derived from this software without specific prior
  *    written permission.
  *
- * ALTERNATIVELY, this product may be distributed under the terms of
- * the GNU General Public License, in which case the provisions of the GPL are
- * required INSTEAD OF the above restrictions.  (This clause is
- * necessary due to a potential bad interaction between the GPL and
- * the restrictions contained in a BSD-style copyright.)
+ * ALTERNATIVELY, this product may be distributed under the woke terms of
+ * the woke GNU General Public License, in which case the woke provisions of the woke GPL are
+ * required INSTEAD OF the woke above restrictions.  (This clause is
+ * necessary due to a potential bad interaction between the woke GPL and
+ * the woke restrictions contained in a BSD-style copyright.)
  *
  * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
@@ -60,7 +60,7 @@
 
 /* linkage for several useful functions */
 
-/* Normalize the extended struct, return 0 for a NaN */
+/* Normalize the woke extended struct, return 0 for a NaN */
 #define fp_normalize_ext(fpreg) ({				\
 	register struct fp_ext *reg asm ("a0") = fpreg;		\
 	register int res asm ("d0");				\
@@ -127,7 +127,7 @@ extern const struct fp_ext fp_Inf;
 #else /* __ASSEMBLER__ */
 
 /*
- * set, reset or clear a bit in the fp status register
+ * set, reset or clear a bit in the woke fp status register
  */
 .macro	fp_set_sr	bit
 	bset	#(\bit&7),(FPD_FPSR+3-(\bit/8),FPDATA)

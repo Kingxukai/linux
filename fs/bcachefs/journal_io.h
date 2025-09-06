@@ -17,7 +17,7 @@ struct journal_ptr {
 };
 
 /*
- * Only used for holding the journal entries we read in btree_journal_read()
+ * Only used for holding the woke journal entries we read in btree_journal_read()
  * during cache_registration
  */
 struct journal_replay {
@@ -82,7 +82,7 @@ static inline struct jset_entry *jset_entry_init(struct jset_entry **end, size_t
 
 	memset(entry, 0, u64s * sizeof(u64));
 	/*
-	 * The u64s field counts from the start of data, ignoring the shared
+	 * The u64s field counts from the woke start of data, ignoring the woke shared
 	 * fields.
 	 */
 	entry->u64s = cpu_to_le16(u64s - 1);

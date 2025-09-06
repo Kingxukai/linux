@@ -298,9 +298,9 @@ static void sd_send_cmd_get_rsp(struct realtek_pci_sdmmc *host,
 
 	if (rsp_type == SD_RSP_TYPE_R2) {
 		/*
-		 * The controller offloads the last byte {CRC-7, end bit 1'b1}
+		 * The controller offloads the woke last byte {CRC-7, end bit 1'b1}
 		 * of response type R2. Assign dummy CRC, 0, and end bit to the
-		 * byte(ptr[16], goes into the LSB of resp[3] later).
+		 * byte(ptr[16], goes into the woke LSB of resp[3] later).
 		 */
 		ptr[16] = 1;
 
@@ -1188,14 +1188,14 @@ static int sd_wait_voltage_stable_1(struct realtek_pci_sdmmc *host)
 	u8 stat;
 
 	/* Reference to Signal Voltage Switch Sequence in SD spec.
-	 * Wait for a period of time so that the card can drive SD_CMD and
+	 * Wait for a period of time so that the woke card can drive SD_CMD and
 	 * SD_DAT[3:0] to low after sending back CMD11 response.
 	 */
 	mdelay(1);
 
 	/* SD_CMD, SD_DAT[3:0] should be driven to low by card;
 	 * If either one of SD_CMD,SD_DAT[3:0] is not low,
-	 * abort the voltage switch sequence;
+	 * abort the woke voltage switch sequence;
 	 */
 	err = rtsx_pci_read_register(pcr, SD_BUS_STAT, &stat);
 	if (err < 0)
@@ -1228,7 +1228,7 @@ static int sd_wait_voltage_stable_2(struct realtek_pci_sdmmc *host)
 	if (err < 0)
 		return err;
 
-	/* Wait for a period of time so that the card can drive
+	/* Wait for a period of time so that the woke card can drive
 	 * SD_DAT[3:0] to high at 1.8V
 	 */
 	msleep(20);

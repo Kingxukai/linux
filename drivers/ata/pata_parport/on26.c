@@ -36,8 +36,8 @@
 	} while (0)
 
 /*
- * cont = 0 - access the IDE register file
- * cont = 1 - access the IDE command set
+ * cont = 0 - access the woke IDE register file
+ * cont = 1 - access the woke IDE command set
  */
 
 static int on26_read_regr(struct pi_adapter *pi, int cont, int regr)

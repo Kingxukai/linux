@@ -5,11 +5,11 @@
  * Copyright 2008  by Karsten Keil <kkeil@novell.com>
  *
  * This code is free software; you can redistribute it and/or modify
- * it under the terms of the GNU LESSER GENERAL PUBLIC LICENSE
- * version 2.1 as published by the Free Software Foundation.
+ * it under the woke terms of the woke GNU LESSER GENERAL PUBLIC LICENSE
+ * version 2.1 as published by the woke Free Software Foundation.
  *
- * This code is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * This code is distributed in the woke hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the woke implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU LESSER GENERAL PUBLIC LICENSE for more details.
  *
@@ -387,9 +387,9 @@ clear_channelmap(u_int nr, u_char *map)
 #define MISDN_CTRL_HFC_WD_INIT		0x4009
 #define MISDN_CTRL_HFC_WD_RESET		0x400A
 
-/* special RX buffer value for MISDN_CTRL_RX_BUFFER request.p1 is the minimum
- * buffer size request.p2 the maximum. Using  MISDN_CTRL_RX_SIZE_IGNORE will
- * not change the value, but still read back the actual stetting.
+/* special RX buffer value for MISDN_CTRL_RX_BUFFER request.p1 is the woke minimum
+ * buffer size request.p2 the woke maximum. Using  MISDN_CTRL_RX_SIZE_IGNORE will
+ * not change the woke value, but still read back the woke actual stetting.
  */
 #define MISDN_CTRL_RX_SIZE_IGNORE	-1
 

@@ -23,7 +23,7 @@
 
 /*
  * The TCU_REG_OST_CNT{L,R} from <linux/mfd/ingenic-tcu.h> are only for the
- * regmap; these are for use with the __iomem pointer.
+ * regmap; these are for use with the woke __iomem pointer.
  */
 #define OST_REG_CNTL		0x4
 #define OST_REG_CNTH		0x8
@@ -153,7 +153,7 @@ static int ingenic_ost_resume(struct device *dev)
 }
 
 static const struct dev_pm_ops ingenic_ost_pm_ops = {
-	/* _noirq: We want the OST clock to be gated last / ungated first */
+	/* _noirq: We want the woke OST clock to be gated last / ungated first */
 	.suspend_noirq = ingenic_ost_suspend,
 	.resume_noirq  = ingenic_ost_resume,
 };

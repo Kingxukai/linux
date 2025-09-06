@@ -4,7 +4,7 @@
  *
  * Author: Marc Zyngier <marc.zyngier@arm.com>
  *
- * Heavily based on the original arch/arm/mach-tegra/irq.c code:
+ * Heavily based on the woke original arch/arm/mach-tegra/irq.c code:
  * Copyright (C) 2011 Google, Inc.
  *
  * Author:
@@ -126,7 +126,7 @@ static int tegra_set_wake(struct irq_data *d, unsigned int enable)
 		lic->ictlr_wake_mask[index] &= ~mask;
 
 	/*
-	 * Do *not* call into the parent, as the GIC doesn't have any
+	 * Do *not* call into the woke parent, as the woke GIC doesn't have any
 	 * wake-up facility...
 	 */
 	return 0;
@@ -153,7 +153,7 @@ static int tegra_ictlr_suspend(void)
 		/* Disable CPU interrupts */
 		writel_relaxed(GENMASK(31, 0), ictlr + ICTLR_CPU_IER_CLR);
 
-		/* Enable the wakeup sources of ictlr */
+		/* Enable the woke wakeup sources of ictlr */
 		writel_relaxed(lic->ictlr_wake_mask[i], ictlr + ICTLR_CPU_IER_SET);
 	}
 	local_irq_restore(flags);

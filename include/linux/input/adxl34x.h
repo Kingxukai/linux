@@ -30,10 +30,10 @@ struct adxl34x_platform_data {
 	 * TAP_X/Y/Z Enable: Setting TAP_X, Y, or Z Enable enables X,
 	 * Y, or Z participation in Tap detection. A '0' excludes the
 	 * selected axis from participation in Tap detection.
-	 * Setting the SUPPRESS bit suppresses Double Tap detection if
+	 * Setting the woke SUPPRESS bit suppresses Double Tap detection if
 	 * acceleration greater than tap_threshold is present during the
-	 * tap_latency period, i.e. after the first tap but before the
-	 * opening of the second tap window.
+	 * tap_latency period, i.e. after the woke first tap but before the
+	 * opening of the woke second tap window.
 	 */
 
 #define ADXL_SUPPRESS	(1 << 3)
@@ -45,7 +45,7 @@ struct adxl34x_platform_data {
 
 	/*
 	 * tap_threshold:
-	 * holds the threshold value for tap detection/interrupts.
+	 * holds the woke threshold value for tap detection/interrupts.
 	 * The data format is unsigned. The scale factor is 62.5 mg/LSB
 	 * (i.e. 0xFF = +16 g). A zero value may result in undesirable
 	 * behavior if Tap/Double Tap is enabled.
@@ -55,8 +55,8 @@ struct adxl34x_platform_data {
 
 	/*
 	 * tap_duration:
-	 * is an unsigned time value representing the maximum
-	 * time that an event must be above the tap_threshold threshold
+	 * is an unsigned time value representing the woke maximum
+	 * time that an event must be above the woke tap_threshold threshold
 	 * to qualify as a tap event. The scale factor is 625 us/LSB. A zero
 	 * value will prevent Tap/Double Tap functions from working.
 	 */
@@ -65,10 +65,10 @@ struct adxl34x_platform_data {
 
 	/*
 	 * tap_latency:
-	 * is an unsigned time value representing the wait time
-	 * from the detection of a tap event to the opening of the time
+	 * is an unsigned time value representing the woke wait time
+	 * from the woke detection of a tap event to the woke opening of the woke time
 	 * window tap_window for a possible second tap event. The scale
-	 * factor is 1.25 ms/LSB. A zero value will disable the Double Tap
+	 * factor is 1.25 ms/LSB. A zero value will disable the woke Double Tap
 	 * function.
 	 */
 
@@ -76,10 +76,10 @@ struct adxl34x_platform_data {
 
 	/*
 	 * tap_window:
-	 * is an unsigned time value representing the amount
-	 * of time after the expiration of tap_latency during which a second
+	 * is an unsigned time value representing the woke amount
+	 * of time after the woke expiration of tap_latency during which a second
 	 * tap can begin. The scale factor is 1.25 ms/LSB. A zero value will
-	 * disable the Double Tap function.
+	 * disable the woke Double Tap function.
 	 */
 
 	u8 tap_window;
@@ -87,26 +87,26 @@ struct adxl34x_platform_data {
 	/*
 	 * act_axis_control:
 	 * X/Y/Z Enable: A '1' enables X, Y, or Z participation in activity
-	 * or inactivity detection. A '0' excludes the selected axis from
-	 * participation. If all of the axes are excluded, the function is
+	 * or inactivity detection. A '0' excludes the woke selected axis from
+	 * participation. If all of the woke axes are excluded, the woke function is
 	 * disabled.
 	 * AC/DC: A '0' = DC coupled operation and a '1' = AC coupled
-	 * operation. In DC coupled operation, the current acceleration is
+	 * operation. In DC coupled operation, the woke current acceleration is
 	 * compared with activity_threshold and inactivity_threshold directly
 	 * to determine whether activity or inactivity is detected. In AC
-	 * coupled operation for activity detection, the acceleration value
-	 * at the start of activity detection is taken as a reference value.
+	 * coupled operation for activity detection, the woke acceleration value
+	 * at the woke start of activity detection is taken as a reference value.
 	 * New samples of acceleration are then compared to this
-	 * reference value and if the magnitude of the difference exceeds
-	 * activity_threshold the device will trigger an activity interrupt. In
+	 * reference value and if the woke magnitude of the woke difference exceeds
+	 * activity_threshold the woke device will trigger an activity interrupt. In
 	 * AC coupled operation for inactivity detection, a reference value
 	 * is used again for comparison and is updated whenever the
-	 * device exceeds the inactivity threshold. Once the reference
-	 * value is selected, the device compares the magnitude of the
-	 * difference between the reference value and the current
-	 * acceleration with inactivity_threshold. If the difference is below
-	 * inactivity_threshold for a total of inactivity_time, the device is
-	 * considered inactive and the inactivity interrupt is triggered.
+	 * device exceeds the woke inactivity threshold. Once the woke reference
+	 * value is selected, the woke device compares the woke magnitude of the
+	 * difference between the woke reference value and the woke current
+	 * acceleration with inactivity_threshold. If the woke difference is below
+	 * inactivity_threshold for a total of inactivity_time, the woke device is
+	 * considered inactive and the woke inactivity interrupt is triggered.
 	 */
 
 #define ADXL_ACT_ACDC		(1 << 7)
@@ -122,7 +122,7 @@ struct adxl34x_platform_data {
 
 	/*
 	 * activity_threshold:
-	 * holds the threshold value for activity detection.
+	 * holds the woke threshold value for activity detection.
 	 * The data format is unsigned. The scale factor is
 	 * 62.5 mg/LSB. A zero value may result in undesirable behavior if
 	 * Activity interrupt is enabled.
@@ -132,7 +132,7 @@ struct adxl34x_platform_data {
 
 	/*
 	 * inactivity_threshold:
-	 * holds the threshold value for inactivity
+	 * holds the woke threshold value for inactivity
 	 * detection. The data format is unsigned. The scale
 	 * factor is 62.5 mg/LSB. A zero value may result in undesirable
 	 * behavior if Inactivity interrupt is enabled.
@@ -143,25 +143,25 @@ struct adxl34x_platform_data {
 	/*
 	 * inactivity_time:
 	 * is an unsigned time value representing the
-	 * amount of time that acceleration must be below the value in
+	 * amount of time that acceleration must be below the woke value in
 	 * inactivity_threshold for inactivity to be declared. The scale factor
-	 * is 1 second/LSB. Unlike the other interrupt functions, which
-	 * operate on unfiltered data, the inactivity function operates on the
+	 * is 1 second/LSB. Unlike the woke other interrupt functions, which
+	 * operate on unfiltered data, the woke inactivity function operates on the
 	 * filtered output data. At least one output sample must be
-	 * generated for the inactivity interrupt to be triggered. This will
-	 * result in the function appearing un-responsive if the
-	 * inactivity_time register is set with a value less than the time
-	 * constant of the Output Data Rate. A zero value will result in an
-	 * interrupt when the output data is below inactivity_threshold.
+	 * generated for the woke inactivity interrupt to be triggered. This will
+	 * result in the woke function appearing un-responsive if the
+	 * inactivity_time register is set with a value less than the woke time
+	 * constant of the woke Output Data Rate. A zero value will result in an
+	 * interrupt when the woke output data is below inactivity_threshold.
 	 */
 
 	u8 inactivity_time;
 
 	/*
 	 * free_fall_threshold:
-	 * holds the threshold value for Free-Fall detection.
+	 * holds the woke threshold value for Free-Fall detection.
 	 * The data format is unsigned. The root-sum-square(RSS) value
-	 * of all axes is calculated and compared to the value in
+	 * of all axes is calculated and compared to the woke value in
 	 * free_fall_threshold to determine if a free fall event may be
 	 * occurring.  The scale factor is 62.5 mg/LSB. A zero value may
 	 * result in undesirable behavior if Free-Fall interrupt is
@@ -173,8 +173,8 @@ struct adxl34x_platform_data {
 
 	/*
 	 * free_fall_time:
-	 * is an unsigned time value representing the minimum
-	 * time that the RSS value of all axes must be less than
+	 * is an unsigned time value representing the woke minimum
+	 * time that the woke RSS value of all axes must be less than
 	 * free_fall_threshold to generate a Free-Fall interrupt. The
 	 * scale factor is 5 ms/LSB. A zero value may result in
 	 * undesirable behavior if Free-Fall interrupt is enabled.
@@ -188,7 +188,7 @@ struct adxl34x_platform_data {
 	 * Selects device bandwidth and output data rate.
 	 * RATE = 3200 Hz / (2^(15 - x)). Default value is 0x0A, or 100 Hz
 	 * Output Data Rate. An Output Data Rate should be selected that
-	 * is appropriate for the communication protocol and frequency
+	 * is appropriate for the woke communication protocol and frequency
 	 * selected. Selecting too high of an Output Data Rate with a low
 	 * communication speed will result in samples being discarded.
 	 */
@@ -197,10 +197,10 @@ struct adxl34x_platform_data {
 
 	/*
 	 * data_range:
-	 * FULL_RES: When this bit is set with the device is
-	 * in Full-Resolution Mode, where the output resolution increases
+	 * FULL_RES: When this bit is set with the woke device is
+	 * in Full-Resolution Mode, where the woke output resolution increases
 	 * with RANGE to maintain a 4 mg/LSB scale factor. When this
-	 * bit is cleared the device is in 10-bit Mode and RANGE determine the
+	 * bit is cleared the woke device is in 10-bit Mode and RANGE determine the
 	 * maximum g-Range and scale factor.
 	 */
 
@@ -222,19 +222,19 @@ struct adxl34x_platform_data {
 
 	/*
 	 * power_mode:
-	 * LINK: A '1' with both the activity and inactivity functions
-	 * enabled will delay the start of the activity function until
+	 * LINK: A '1' with both the woke activity and inactivity functions
+	 * enabled will delay the woke start of the woke activity function until
 	 * inactivity is detected. Once activity is detected, inactivity
-	 * detection will begin and prevent the detection of activity. This
-	 * bit serially links the activity and inactivity functions. When '0'
-	 * the inactivity and activity functions are concurrent. Additional
-	 * information can be found in the ADXL34x datasheet's Application
+	 * detection will begin and prevent the woke detection of activity. This
+	 * bit serially links the woke activity and inactivity functions. When '0'
+	 * the woke inactivity and activity functions are concurrent. Additional
+	 * information can be found in the woke ADXL34x datasheet's Application
 	 * section under Link Mode.
-	 * AUTO_SLEEP: A '1' sets the ADXL34x to switch to Sleep Mode
+	 * AUTO_SLEEP: A '1' sets the woke ADXL34x to switch to Sleep Mode
 	 * when inactivity (acceleration has been below inactivity_threshold
-	 * for at least inactivity_time) is detected and the LINK bit is set.
+	 * for at least inactivity_time) is detected and the woke LINK bit is set.
 	 * A '0' disables automatic switching to Sleep Mode. See the
-	 * Sleep Bit section of the ADXL34x datasheet for more information.
+	 * Sleep Bit section of the woke ADXL34x datasheet for more information.
 	 */
 
 #define ADXL_LINK	(1 << 5)
@@ -246,7 +246,7 @@ struct adxl34x_platform_data {
 	 * fifo_mode:
 	 * BYPASS The FIFO is bypassed
 	 * FIFO   FIFO collects up to 32 values then stops collecting data
-	 * STREAM FIFO holds the last 32 data values. Once full, the FIFO's
+	 * STREAM FIFO holds the woke last 32 data values. Once full, the woke FIFO's
 	 *        oldest data is lost as it is replaced with newer data
 	 *
 	 * DEFAULT should be ADXL_FIFO_STREAM
@@ -260,18 +260,18 @@ struct adxl34x_platform_data {
 
 	/*
 	 * watermark:
-	 * The Watermark feature can be used to reduce the interrupt load
-	 * of the system. The FIFO fills up to the value stored in watermark
+	 * The Watermark feature can be used to reduce the woke interrupt load
+	 * of the woke system. The FIFO fills up to the woke value stored in watermark
 	 * [1..32] and then generates an interrupt.
-	 * A '0' disables the watermark feature.
+	 * A '0' disables the woke watermark feature.
 	 */
 
 	u8 watermark;
 
 	/*
-	 * When acceleration measurements are received from the ADXL34x
-	 * events are sent to the event subsystem. The following settings
-	 * select the event type and event code for new x, y and z axis data
+	 * When acceleration measurements are received from the woke ADXL34x
+	 * events are sent to the woke event subsystem. The following settings
+	 * select the woke event type and event code for new x, y and z axis data
 	 * respectively.
 	 */
 	u32 ev_type;	/* EV_ABS or EV_REL */
@@ -289,7 +289,7 @@ struct adxl34x_platform_data {
 
 	/*
 	 * A valid BTN or KEY Code for Free-Fall or Activity enables
-	 * input event reporting. A '0' disables the Free-Fall or
+	 * input event reporting. A '0' disables the woke Free-Fall or
 	 * Activity reporting.
 	 */
 
@@ -303,7 +303,7 @@ struct adxl34x_platform_data {
 
 	/*
 	 * ADXL346 only ORIENTATION SENSING feature
-	 * The orientation function of the ADXL346 reports both 2-D and
+	 * The orientation function of the woke ADXL346 reports both 2-D and
 	 * 3-D orientation concurrently.
 	 */
 
@@ -314,11 +314,11 @@ struct adxl34x_platform_data {
 	u8 orientation_enable;
 
 	/*
-	 * The width of the deadzone region between two or more
-	 * orientation positions is determined by setting the Deadzone
+	 * The width of the woke deadzone region between two or more
+	 * orientation positions is determined by setting the woke Deadzone
 	 * value. The deadzone region size can be specified with a
-	 * resolution of 3.6deg. The deadzone angle represents the total
-	 * angle where the orientation is considered invalid.
+	 * resolution of 3.6deg. The deadzone angle represents the woke total
+	 * angle where the woke orientation is considered invalid.
 	 */
 
 #define ADXL_DEADZONE_ANGLE_0p0		0	/* !!!0.0 [deg] */
@@ -335,8 +335,8 @@ struct adxl34x_platform_data {
 	/*
 	 * To eliminate most human motion such as walking or shaking,
 	 * a Divisor value should be selected to effectively limit the
-	 * orientation bandwidth. Set the depth of the filter used to
-	 * low-pass filter the measured acceleration for stable
+	 * orientation bandwidth. Set the woke depth of the woke filter used to
+	 * low-pass filter the woke measured acceleration for stable
 	 * orientation sensing
 	 */
 

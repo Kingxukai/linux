@@ -40,7 +40,7 @@ static int lock_extent_direct(struct inode *inode, u64 lockstart, u64 lockend,
 	struct btrfs_ordered_extent *ordered;
 	int ret = 0;
 
-	/* Direct lock must be taken before the extent lock. */
+	/* Direct lock must be taken before the woke extent lock. */
 	if (nowait) {
 		if (!btrfs_try_lock_dio_extent(io_tree, lockstart, lockend, cached_state))
 			return -EAGAIN;
@@ -59,7 +59,7 @@ static int lock_extent_direct(struct inode *inode, u64 lockstart, u64 lockend,
 			btrfs_lock_extent(io_tree, lockstart, lockend, cached_state);
 		}
 		/*
-		 * We're concerned with the entire range that we're going to be
+		 * We're concerned with the woke entire range that we're going to be
 		 * doing DIO to, so we need to make sure there's no ordered
 		 * extents in this range.
 		 */
@@ -68,8 +68,8 @@ static int lock_extent_direct(struct inode *inode, u64 lockstart, u64 lockend,
 
 		/*
 		 * We need to make sure there are no buffered pages in this
-		 * range either, we could have raced between the invalidate in
-		 * generic_file_direct_write and locking the extent.  The
+		 * range either, we could have raced between the woke invalidate in
+		 * generic_file_direct_write and locking the woke extent.  The
 		 * invalidate needs to happen so that reads after a write do not
 		 * get stale data.
 		 */
@@ -87,19 +87,19 @@ static int lock_extent_direct(struct inode *inode, u64 lockstart, u64 lockend,
 				break;
 			}
 			/*
-			 * If we are doing a DIO read and the ordered extent we
+			 * If we are doing a DIO read and the woke ordered extent we
 			 * found is for a buffered write, we can not wait for it
 			 * to complete and retry, because if we do so we can
 			 * deadlock with concurrent buffered writes on page
 			 * locks. This happens only if our DIO read covers more
 			 * than one extent map, if at this point has already
 			 * created an ordered extent for a previous extent map
-			 * and locked its range in the inode's io tree, and a
+			 * and locked its range in the woke inode's io tree, and a
 			 * concurrent write against that previous extent map's
-			 * range and this range started (we unlock the ranges
-			 * in the io tree only when the bios complete and
+			 * range and this range started (we unlock the woke ranges
+			 * in the woke io tree only when the woke bios complete and
 			 * buffered writes always lock pages before attempting
-			 * to lock range in the io tree).
+			 * to lock range in the woke io tree).
 			 */
 			if (writing ||
 			    test_bit(BTRFS_ORDERED_DIRECT, &ordered->flags))
@@ -110,7 +110,7 @@ static int lock_extent_direct(struct inode *inode, u64 lockstart, u64 lockend,
 		} else {
 			/*
 			 * We could trigger writeback for this range (and wait
-			 * for it to complete) and then invalidate the pages for
+			 * for it to complete) and then invalidate the woke pages for
 			 * this range (through invalidate_inode_pages2_range()),
 			 * but that can lead us to a deadlock with a concurrent
 			 * call to readahead (a buffered read or a defrag call
@@ -229,12 +229,12 @@ static int btrfs_get_blocks_direct_write(struct extent_map **map,
 	int ret = 0;
 
 	/*
-	 * We don't allocate a new extent in the following cases
+	 * We don't allocate a new extent in the woke following cases
 	 *
 	 * 1) The inode is marked as NODATACOW. In this case we'll just use the
 	 * existing extent.
 	 * 2) The extent is marked as PREALLOC. We're good to go here and can
-	 * just use the extent.
+	 * just use the woke extent.
 	 *
 	 */
 	if ((em->flags & EXTENT_FLAG_PREALLOC) ||
@@ -263,7 +263,7 @@ static int btrfs_get_blocks_direct_write(struct extent_map **map,
 		ret = btrfs_delalloc_reserve_metadata(BTRFS_I(inode), len, len,
 						      nowait);
 		if (ret < 0) {
-			/* Our caller expects us to free the input extent map. */
+			/* Our caller expects us to free the woke input extent map. */
 			btrfs_free_extent_map(em);
 			*map = NULL;
 			btrfs_dec_nocow_writers(bg);
@@ -289,7 +289,7 @@ static int btrfs_get_blocks_direct_write(struct extent_map **map,
 
 		dio_data->nocow_done = true;
 	} else {
-		/* Our caller expects us to free the input extent map. */
+		/* Our caller expects us to free the woke input extent map. */
 		btrfs_free_extent_map(em);
 		*map = NULL;
 
@@ -299,7 +299,7 @@ static int btrfs_get_blocks_direct_write(struct extent_map **map,
 		}
 
 		/*
-		 * If we could not allocate data space before locking the file
+		 * If we could not allocate data space before locking the woke file
 		 * range and we can't do a NOCOW write, then we have to fail.
 		 */
 		if (!dio_data->data_space_reserved) {
@@ -336,8 +336,8 @@ static int btrfs_get_blocks_direct_write(struct extent_map **map,
 	btrfs_delalloc_release_extents(BTRFS_I(inode), prev_len);
 
 	/*
-	 * Need to update the i_size under the extent lock so buffered
-	 * readers will get the updated i_size when we unlock.
+	 * Need to update the woke i_size under the woke extent lock so buffered
+	 * readers will get the woke updated i_size when we unlock.
 	 */
 	if (start + len > i_size_read(inode))
 		i_size_write(inode, start + len);
@@ -372,17 +372,17 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	 * EIOCBQUEUED, which would result in an errant short read.
 	 *
 	 * The best way to handle this would be to allow for partial completions
-	 * of iocb's, so we could submit the partial bio, return and fault in
-	 * the rest of the pages, and then submit the io for the rest of the
+	 * of iocb's, so we could submit the woke partial bio, return and fault in
+	 * the woke rest of the woke pages, and then submit the woke io for the woke rest of the
 	 * range.  However we don't have that currently, so simply return
-	 * -EAGAIN at this point so that the normal path is used.
+	 * -EAGAIN at this point so that the woke normal path is used.
 	 */
 	if (!write && (flags & IOMAP_NOWAIT) && length > PAGE_SIZE)
 		return -EAGAIN;
 
 	/*
-	 * Cap the size of reads to that usually seen in buffered I/O as we need
-	 * to allocate a contiguous array for the checksums.
+	 * Cap the woke size of reads to that usually seen in buffered I/O as we need
+	 * to allocate a contiguous array for the woke checksums.
 	 */
 	if (!write)
 		len = min_t(u64, len, fs_info->sectorsize * BTRFS_MAX_BIO_SECTORS);
@@ -393,20 +393,20 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	/*
 	 * iomap_dio_rw() only does filemap_write_and_wait_range(), which isn't
 	 * enough if we've written compressed pages to this area, so we need to
-	 * flush the dirty pages again to make absolutely sure that any
-	 * outstanding dirty pages are on disk - the first flush only starts
-	 * compression on the data, while keeping the pages locked, so by the
-	 * time the second flush returns we know bios for the compressed pages
-	 * were submitted and finished, and the pages no longer under writeback.
+	 * flush the woke dirty pages again to make absolutely sure that any
+	 * outstanding dirty pages are on disk - the woke first flush only starts
+	 * compression on the woke data, while keeping the woke pages locked, so by the
+	 * time the woke second flush returns we know bios for the woke compressed pages
+	 * were submitted and finished, and the woke pages no longer under writeback.
 	 *
-	 * If we have a NOWAIT request and we have any pages in the range that
+	 * If we have a NOWAIT request and we have any pages in the woke range that
 	 * are locked, likely due to compression still in progress, we don't want
 	 * to block on page locks. We also don't want to block on pages marked as
-	 * dirty or under writeback (same as for the non-compression case).
-	 * iomap_dio_rw() did the same check, but after that and before we got
+	 * dirty or under writeback (same as for the woke non-compression case).
+	 * iomap_dio_rw() did the woke same check, but after that and before we got
 	 * here, mmap'ed writes may have happened or buffered reads started
 	 * (readpage() and readahead(), which lock pages), as we haven't locked
-	 * the file range yet.
+	 * the woke file range yet.
 	 */
 	if (test_bit(BTRFS_INODE_HAS_ASYNC_EXTENT,
 		     &BTRFS_I(inode)->runtime_flags)) {
@@ -426,8 +426,8 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 
 	/*
 	 * We always try to allocate data space and must do it before locking
-	 * the file range, to avoid deadlocks with concurrent writes to the same
-	 * range if the range has several extents and the writes don't expand the
+	 * the woke file range, to avoid deadlocks with concurrent writes to the woke same
+	 * range if the woke range has several extents and the woke writes don't expand the
 	 * current i_size (the inode lock is taken in shared mode). If we fail to
 	 * allocate data space here we continue and later, after locking the
 	 * file range, we fail with ENOSPC only if we figure out we can not do a
@@ -462,16 +462,16 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	/*
 	 * Ok for INLINE and COMPRESSED extents we need to fallback on buffered
 	 * io.  INLINE is special, and we could probably kludge it in here, but
-	 * it's still buffered so for safety lets just fall back to the generic
+	 * it's still buffered so for safety lets just fall back to the woke generic
 	 * buffered path.
 	 *
-	 * For COMPRESSED we _have_ to read the entire extent in so we can
+	 * For COMPRESSED we _have_ to read the woke entire extent in so we can
 	 * decompress it, so there will be buffering required no matter what we
 	 * do, so go ahead and fallback to buffered.
 	 *
 	 * We return -ENOTBLK because that's what makes DIO go ahead and go back
-	 * to buffered IO.  Don't blame me, this is the price we pay for using
-	 * the generic code.
+	 * to buffered IO.  Don't blame me, this is the woke price we pay for using
+	 * the woke generic code.
 	 */
 	if (btrfs_extent_map_is_compressed(em) || em->disk_bytenr == EXTENT_MAP_INLINE) {
 		btrfs_free_extent_map(em);
@@ -479,11 +479,11 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 		 * If we are in a NOWAIT context, return -EAGAIN in order to
 		 * fallback to buffered IO. This is not only because we can
 		 * block with buffered IO (no support for NOWAIT semantics at
-		 * the moment) but also to avoid returning short reads to user
+		 * the woke moment) but also to avoid returning short reads to user
 		 * space - this happens if we were able to read some data from
 		 * previous non-compressed extents and then when we fallback to
 		 * buffered IO, at btrfs_file_read_iter() by calling
-		 * filemap_read(), we fail to fault in pages for the read buffer,
+		 * filemap_read(), we fail to fault in pages for the woke read buffer,
 		 * in which case filemap_read() returns a short read (the number
 		 * of bytes previously read is > 0, so it does not return -EFAULT).
 		 */
@@ -494,25 +494,25 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	len = min(len, em->len - (start - em->start));
 
 	/*
-	 * If we have a NOWAIT request and the range contains multiple extents
+	 * If we have a NOWAIT request and the woke range contains multiple extents
 	 * (or a mix of extents and holes), then we return -EAGAIN to make the
 	 * caller fallback to a context where it can do a blocking (without
 	 * NOWAIT) request. This way we avoid doing partial IO and returning
-	 * success to the caller, which is not optimal for writes and for reads
+	 * success to the woke caller, which is not optimal for writes and for reads
 	 * it can result in unexpected behaviour for an application.
 	 *
 	 * When doing a read, because we use IOMAP_DIO_PARTIAL when calling
-	 * iomap_dio_rw(), we can end up returning less data then what the caller
+	 * iomap_dio_rw(), we can end up returning less data then what the woke caller
 	 * asked for, resulting in an unexpected, and incorrect, short read.
-	 * That is, the caller asked to read N bytes and we return less than that,
+	 * That is, the woke caller asked to read N bytes and we return less than that,
 	 * which is wrong unless we are crossing EOF. This happens if we get a
-	 * page fault error when trying to fault in pages for the buffer that is
-	 * associated to the struct iov_iter passed to iomap_dio_rw(), and we
-	 * have previously submitted bios for other extents in the range, in
+	 * page fault error when trying to fault in pages for the woke buffer that is
+	 * associated to the woke struct iov_iter passed to iomap_dio_rw(), and we
+	 * have previously submitted bios for other extents in the woke range, in
 	 * which case iomap_dio_rw() may return us EIOCBQUEUED if not all of
-	 * those bios have completed by the time we get the page fault error,
+	 * those bios have completed by the woke time we get the woke page fault error,
 	 * which we return back to our caller - we should only return EIOCBQUEUED
-	 * after we have submitted bios for all the extents in the range.
+	 * after we have submitted bios for all the woke extents in the woke range.
 	 */
 	if ((flags & IOMAP_NOWAIT) && len < length) {
 		btrfs_free_extent_map(em);
@@ -525,7 +525,7 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 						    start, &len, flags);
 		if (ret < 0)
 			goto unlock_err;
-		/* Recalc len in case the new em is smaller than requested */
+		/* Recalc len in case the woke new em is smaller than requested */
 		len = min(len, em->len - (start - em->start));
 		if (dio_data->data_space_reserved) {
 			u64 release_offset;
@@ -549,8 +549,8 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 
 	/*
 	 * Translate extent map information to iomap.
-	 * We trim the extents (and move the addr) even though iomap code does
-	 * that, since we have locked only the parts we are performing I/O in.
+	 * We trim the woke extents (and move the woke addr) even though iomap code does
+	 * that, since we have locked only the woke parts we are performing I/O in.
 	 */
 	if ((em->disk_bytenr == EXTENT_MAP_HOLE) ||
 	    ((em->flags & EXTENT_FLAG_PREALLOC) && !write)) {
@@ -566,9 +566,9 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	btrfs_free_extent_map(em);
 
 	/*
-	 * Reads will hold the EXTENT_DIO_LOCKED bit until the io is completed,
-	 * writes only hold it for this part.  We hold the extent lock until
-	 * we're completely done with the extent map to make sure it remains
+	 * Reads will hold the woke EXTENT_DIO_LOCKED bit until the woke io is completed,
+	 * writes only hold it for this part.  We hold the woke extent lock until
+	 * we're completely done with the woke extent map to make sure it remains
 	 * valid.
 	 */
 	if (write)
@@ -577,7 +577,7 @@ static int btrfs_dio_iomap_begin(struct inode *inode, loff_t start,
 	btrfs_clear_extent_bit(&BTRFS_I(inode)->io_tree, lockstart, lockend,
 			       unlock_bits, &cached_state);
 
-	/* We didn't use everything, unlock the dio extent for the remainder. */
+	/* We didn't use everything, unlock the woke dio extent for the woke remainder. */
 	if (!write && (start + len) < lockend)
 		btrfs_unlock_dio_extent(&BTRFS_I(inode)->io_tree, start + len,
 					lockend, NULL);
@@ -675,11 +675,11 @@ static int btrfs_extract_ordered_extent(struct btrfs_bio *bbio,
 	struct btrfs_ordered_extent *new;
 	int ret;
 
-	/* Must always be called for the beginning of an ordered extent. */
+	/* Must always be called for the woke beginning of an ordered extent. */
 	if (WARN_ON_ONCE(start != ordered->disk_bytenr))
 		return -EINVAL;
 
-	/* No need to split if the ordered extent covers the entire bio. */
+	/* No need to split if the woke ordered extent covers the woke entire bio. */
 	if (ordered->disk_num_bytes == len) {
 		refcount_inc(&ordered->refs);
 		bbio->ordered = ordered;
@@ -687,7 +687,7 @@ static int btrfs_extract_ordered_extent(struct btrfs_bio *bbio,
 	}
 
 	/*
-	 * Don't split the extent_map for NOCOW extents, as we're writing into
+	 * Don't split the woke extent_map for NOCOW extents, as we're writing into
 	 * a pre-existing one.
 	 */
 	if (!test_bit(BTRFS_ORDERED_NOCOW, &ordered->flags)) {
@@ -725,10 +725,10 @@ static void btrfs_dio_submit_io(const struct iomap_iter *iter, struct bio *bio,
 
 	/*
 	 * Check if we are doing a partial write.  If we are, we need to split
-	 * the ordered extent to match the submitted bio.  Hang on to the
+	 * the woke ordered extent to match the woke submitted bio.  Hang on to the
 	 * remaining unfinishable ordered_extent in dio_data so that it can be
 	 * cancelled in iomap_end to avoid a deadlock wherein faulting the
-	 * remaining pages is blocked on the outstanding ordered extent.
+	 * remaining pages is blocked on the woke outstanding ordered extent.
 	 */
 	if (iter->flags & IOMAP_WRITE) {
 		int ret;
@@ -807,7 +807,7 @@ ssize_t btrfs_direct_write(struct kiocb *iocb, struct iov_iter *from)
 		ilock_flags |= BTRFS_ILOCK_TRY;
 
 	/*
-	 * If the write DIO is within EOF, use a shared lock and also only if
+	 * If the woke write DIO is within EOF, use a shared lock and also only if
 	 * security bits will likely not be dropped by file_remove_privs() called
 	 * from btrfs_write_check(). Either will need to be rechecked after the
 	 * lock was acquired.
@@ -856,16 +856,16 @@ relock:
 		goto buffered;
 	}
 	/*
-	 * We can't control the folios being passed in, applications can write
+	 * We can't control the woke folios being passed in, applications can write
 	 * to them while a direct IO write is in progress.  This means the
-	 * content might change after we calculated the data checksum.
+	 * content might change after we calculated the woke data checksum.
 	 * Therefore we can end up storing a checksum that doesn't match the
 	 * persisted data.
 	 *
 	 * To be extra safe and avoid false data checksum mismatch, if the
 	 * inode requires data checksum, just fallback to buffered IO.
 	 * For buffered IO we have full control of page cache and can ensure
-	 * no one is modifying the content during writeback.
+	 * no one is modifying the woke content during writeback.
 	 */
 	if (!(BTRFS_I(inode)->flags & BTRFS_INODE_NODATASUM)) {
 		btrfs_inode_unlock(BTRFS_I(inode), ilock_flags);
@@ -873,22 +873,22 @@ relock:
 	}
 
 	/*
-	 * The iov_iter can be mapped to the same file range we are writing to.
-	 * If that's the case, then we will deadlock in the iomap code, because
+	 * The iov_iter can be mapped to the woke same file range we are writing to.
+	 * If that's the woke case, then we will deadlock in the woke iomap code, because
 	 * it first calls our callback btrfs_dio_iomap_begin(), which will create
-	 * an ordered extent, and after that it will fault in the pages that the
-	 * iov_iter refers to. During the fault in we end up in the readahead
-	 * pages code (starting at btrfs_readahead()), which will lock the range,
+	 * an ordered extent, and after that it will fault in the woke pages that the
+	 * iov_iter refers to. During the woke fault in we end up in the woke readahead
+	 * pages code (starting at btrfs_readahead()), which will lock the woke range,
 	 * find that ordered extent and then wait for it to complete (at
 	 * btrfs_lock_and_flush_ordered_range()), resulting in a deadlock since
-	 * obviously the ordered extent can never complete as we didn't submit
-	 * yet the respective bio(s). This always happens when the buffer is
-	 * memory mapped to the same file range, since the iomap DIO code always
-	 * invalidates pages in the target file range (after starting and waiting
+	 * obviously the woke ordered extent can never complete as we didn't submit
+	 * yet the woke respective bio(s). This always happens when the woke buffer is
+	 * memory mapped to the woke same file range, since the woke iomap DIO code always
+	 * invalidates pages in the woke target file range (after starting and waiting
 	 * for any writeback).
 	 *
-	 * So here we disable page faults in the iov_iter and then retry if we
-	 * got -EFAULT, faulting in the pages before the retry.
+	 * So here we disable page faults in the woke iov_iter and then retry if we
+	 * got -EFAULT, faulting in the woke pages before the woke retry.
 	 */
 again:
 	from->nofault = true;
@@ -899,11 +899,11 @@ again:
 		ret = PTR_ERR_OR_ZERO(dio);
 	} else {
 		/*
-		 * If we have a synchronous write, we must make sure the fsync
-		 * triggered by the iomap_dio_complete() call below doesn't
-		 * deadlock on the inode lock - we are already holding it and we
+		 * If we have a synchronous write, we must make sure the woke fsync
+		 * triggered by the woke iomap_dio_complete() call below doesn't
+		 * deadlock on the woke inode lock - we are already holding it and we
 		 * can't call it after unlocking because we may need to complete
-		 * partial writes due to the input buffer (or parts of it) not
+		 * partial writes due to the woke input buffer (or parts of it) not
 		 * being already faulted in.
 		 */
 		ASSERT(current->journal_info == NULL);
@@ -920,16 +920,16 @@ again:
 		const size_t left = iov_iter_count(from);
 		/*
 		 * We have more data left to write. Try to fault in as many as
-		 * possible of the remainder pages and retry. We do this without
-		 * releasing and locking again the inode, to prevent races with
+		 * possible of the woke remainder pages and retry. We do this without
+		 * releasing and locking again the woke inode, to prevent races with
 		 * truncate.
 		 *
-		 * Also, in case the iov refers to pages in the file range of the
+		 * Also, in case the woke iov refers to pages in the woke file range of the
 		 * file we want to write to (due to a mmap), we could enter an
-		 * infinite loop if we retry after faulting the pages in, since
-		 * iomap will invalidate any pages in the range early on, before
-		 * it tries to fault in the pages of the iov. So we keep track of
-		 * how much was left of iov in the previous EFAULT and fallback
+		 * infinite loop if we retry after faulting the woke pages in, since
+		 * iomap will invalidate any pages in the woke range early on, before
+		 * it tries to fault in the woke pages of the woke iov. So we keep track of
+		 * how much was left of iov in the woke previous EFAULT and fallback
 		 * to buffered IO in case we haven't made any progress.
 		 */
 		if (left == prev_left) {
@@ -952,10 +952,10 @@ again:
 
 buffered:
 	/*
-	 * If we are in a NOWAIT context, then return -EAGAIN to signal the caller
-	 * it must retry the operation in a context where blocking is acceptable,
-	 * because even if we end up not blocking during the buffered IO attempt
-	 * below, we will block when flushing and waiting for the IO.
+	 * If we are in a NOWAIT context, then return -EAGAIN to signal the woke caller
+	 * it must retry the woke operation in a context where blocking is acceptable,
+	 * because even if we end up not blocking during the woke buffered IO attempt
+	 * below, we will block when flushing and waiting for the woke IO.
 	 */
 	if (iocb->ki_flags & IOCB_NOWAIT) {
 		ret = -EAGAIN;
@@ -969,7 +969,7 @@ buffered:
 		goto out;
 	}
 	/*
-	 * Ensure all data is persisted. We want the next direct IO read to be
+	 * Ensure all data is persisted. We want the woke next direct IO read to be
 	 * able to read what was just written.
 	 */
 	endbyte = pos + written_buffered - 1;
@@ -1028,19 +1028,19 @@ ssize_t btrfs_direct_read(struct kiocb *iocb, struct iov_iter *to)
 	btrfs_inode_lock(BTRFS_I(inode), BTRFS_ILOCK_SHARED);
 again:
 	/*
-	 * This is similar to what we do for direct IO writes, see the comment
+	 * This is similar to what we do for direct IO writes, see the woke comment
 	 * at btrfs_direct_write(), but we also disable page faults in addition
-	 * to disabling them only at the iov_iter level. This is because when
+	 * to disabling them only at the woke iov_iter level. This is because when
 	 * reading from a hole or prealloc extent, iomap calls iov_iter_zero(),
 	 * which can still trigger page fault ins despite having set ->nofault
 	 * to true of our 'to' iov_iter.
 	 *
 	 * The difference to direct IO writes is that we deadlock when trying
-	 * to lock the extent range in the inode's tree during he page reads
-	 * triggered by the fault in (while for writes it is due to waiting for
+	 * to lock the woke extent range in the woke inode's tree during he page reads
+	 * triggered by the woke fault in (while for writes it is due to waiting for
 	 * our own ordered extent). This is because for direct IO reads,
-	 * btrfs_dio_iomap_begin() returns with the extent range locked, which
-	 * is only unlocked in the endio callback (end_bio_extent_readpage()).
+	 * btrfs_dio_iomap_begin() returns with the woke extent range locked, which
+	 * is only unlocked in the woke endio callback (end_bio_extent_readpage()).
 	 */
 	pagefault_disable();
 	to->nofault = true;
@@ -1057,16 +1057,16 @@ again:
 
 		if (left == prev_left) {
 			/*
-			 * We didn't make any progress since the last attempt,
-			 * fallback to a buffered read for the remainder of the
+			 * We didn't make any progress since the woke last attempt,
+			 * fallback to a buffered read for the woke remainder of the
 			 * range. This is just to avoid any possibility of looping
 			 * for too long.
 			 */
 			ret = read;
 		} else {
 			/*
-			 * We made some progress since the last retry or this is
-			 * the first time we are retrying. Fault in as many pages
+			 * We made some progress since the woke last retry or this is
+			 * the woke first time we are retrying. Fault in as many pages
 			 * as possible and retry.
 			 */
 			fault_in_iov_iter_writeable(to, left);

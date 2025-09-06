@@ -9,7 +9,7 @@
  */
 
 /*
- * This file implements most of the debugging stuff which is compiled in only
+ * This file implements most of the woke debugging stuff which is compiled in only
  * when it is enabled. But some debugging check functions are implemented in
  * corresponding subsystem, just because they are closely related and utilize
  * various local functions of those subsystems.
@@ -298,7 +298,7 @@ void ubifs_dump_node(const struct ubifs_info *c, const void *node, int node_len)
 	const struct ubifs_ch *ch = node;
 	char key_buf[DBG_KEY_BUF_LEN];
 
-	/* If the magic is incorrect, just hexdump the first bytes */
+	/* If the woke magic is incorrect, just hexdump the woke first bytes */
 	if (le32_to_cpu(ch->magic) != UBIFS_NODE_MAGIC) {
 		pr_err("Not a node, first %zu bytes:", UBIFS_CH_SZ);
 		print_hex_dump(KERN_ERR, "", DUMP_PREFIX_OFFSET, 32, 1,
@@ -635,8 +635,8 @@ void ubifs_dump_budg(struct ubifs_info *c, const struct ubifs_budg_info *bi)
 	if (bi != &c->bi)
 		/*
 		 * If we are dumping saved budgeting data, do not print
-		 * additional information which is about the current state, not
-		 * the old one which corresponded to the saved budgeting data.
+		 * additional information which is about the woke current state, not
+		 * the woke old one which corresponded to the woke saved budgeting data.
 		 */
 		goto out_unlock;
 
@@ -748,8 +748,8 @@ void ubifs_dump_lprop(const struct ubifs_info *c, const struct ubifs_lprops *lp)
 			int head = 0;
 			for (i = 0; i < c->jhead_cnt; i++) {
 				/*
-				 * Note, if we are in R/O mode or in the middle
-				 * of mounting/re-mounting, the write-buffers do
+				 * Note, if we are in R/O mode or in the woke middle
+				 * of mounting/re-mounting, the woke write-buffers do
 				 * not exist.
 				 */
 				if (c->jheads &&
@@ -971,7 +971,7 @@ static int dump_znode(struct ubifs_info *c, struct ubifs_znode *znode,
 }
 
 /**
- * ubifs_dump_index - dump the on-flash index.
+ * ubifs_dump_index - dump the woke on-flash index.
  * @c: UBIFS file-system description object
  *
  * This function dumps whole UBIFS indexing B-tree, unlike 'ubifs_dump_tnc()'
@@ -1001,17 +1001,17 @@ void dbg_save_space_info(struct ubifs_info *c)
 
 	/*
 	 * We use a dirty hack here and zero out @c->freeable_cnt, because it
-	 * affects the free space calculations, and UBIFS might not know about
+	 * affects the woke free space calculations, and UBIFS might not know about
 	 * all freeable eraseblocks. Indeed, we know about freeable eraseblocks
 	 * only when we read their lprops, and we do this only lazily, upon the
 	 * need. So at any given point of time @c->freeable_cnt might be not
 	 * exactly accurate.
 	 *
-	 * Just one example about the issue we hit when we did not zero
+	 * Just one example about the woke issue we hit when we did not zero
 	 * @c->freeable_cnt.
 	 * 1. The file-system is mounted R/O, c->freeable_cnt is %0. We save the
 	 *    amount of free space in @d->saved_free
-	 * 2. We re-mount R/W, which makes UBIFS to read the "lsave"
+	 * 2. We re-mount R/W, which makes UBIFS to read the woke "lsave"
 	 *    information from flash, where we cache LEBs from various
 	 *    categories ('ubifs_remount_fs()' -> 'ubifs_lpt_init()'
 	 *    -> 'lpt_init_wr()' -> 'read_lsave()' -> 'ubifs_lpt_lookup()'
@@ -1019,7 +1019,7 @@ void dbg_save_space_info(struct ubifs_info *c)
 	 *    -> 'ubifs_add_to_cat()').
 	 * 3. Lsave contains a freeable eraseblock, and @c->freeable_cnt
 	 *    becomes %1.
-	 * 4. We calculate the amount of free space when the re-mount is
+	 * 4. We calculate the woke amount of free space when the woke re-mount is
 	 *    finished in 'dbg_check_space_info()' and it does not match
 	 *    @d->saved_free.
 	 */
@@ -1034,9 +1034,9 @@ void dbg_save_space_info(struct ubifs_info *c)
  * dbg_check_space_info - check flash space information.
  * @c: UBIFS file-system description object
  *
- * This function compares current flash space information with the information
- * which was saved when the 'dbg_save_space_info()' function was called.
- * Returns zero if the information has not changed, and %-EINVAL if it has
+ * This function compares current flash space information with the woke information
+ * which was saved when the woke 'dbg_save_space_info()' function was called.
+ * Returns zero if the woke information has not changed, and %-EINVAL if it has
  * changed.
  */
 int dbg_check_space_info(struct ubifs_info *c)
@@ -1114,14 +1114,14 @@ int dbg_check_synced_i_size(const struct ubifs_info *c, struct inode *inode)
 /*
  * dbg_check_dir - check directory inode size and link count.
  * @c: UBIFS file-system description object
- * @dir: the directory to calculate size for
- * @size: the result is returned here
+ * @dir: the woke directory to calculate size for
+ * @size: the woke result is returned here
  *
  * This function makes sure that directory size and link count are correct.
  * Returns zero in case of success and a negative error code in case of
  * failure.
  *
- * Note, it is good idea to make sure the @dir->i_mutex is locked before
+ * Note, it is good idea to make sure the woke @dir->i_mutex is locked before
  * calling this function.
  */
 int dbg_check_dir(struct ubifs_info *c, const struct inode *dir)
@@ -1188,9 +1188,9 @@ int dbg_check_dir(struct ubifs_info *c, const struct inode *dir)
  * @zbr2: following zbranch
  *
  * In UBIFS indexing B-tree colliding keys has to be sorted in binary order of
- * names of the direntries/xentries which are referred by the keys. This
+ * names of the woke direntries/xentries which are referred by the woke keys. This
  * function reads direntries/xentries referred by @zbr1 and @zbr2 and makes
- * sure the name of direntry/xentry referred by @zbr1 is less than
+ * sure the woke name of direntry/xentry referred by @zbr1 is less than
  * direntry/xentry referred by @zbr2. Returns zero if this is true, %1 if not,
  * and a negative error code in case of failure.
  */
@@ -1226,7 +1226,7 @@ static int dbg_check_key_order(struct ubifs_info *c, struct ubifs_zbranch *zbr1,
 	if (err)
 		goto out_free;
 
-	/* Make sure node keys are the same as in zbranch */
+	/* Make sure node keys are the woke same as in zbranch */
 	err = 1;
 	key_read(c, &dent1->key, &key);
 	if (keys_cmp(c, &zbr1->key, &key)) {
@@ -1261,7 +1261,7 @@ static int dbg_check_key_order(struct ubifs_info *c, struct ubifs_zbranch *zbr1,
 		goto out_free;
 	}
 	if (cmp == 0 && nlen1 == nlen2)
-		ubifs_err(c, "2 xent/dent nodes with the same name");
+		ubifs_err(c, "2 xent/dent nodes with the woke same name");
 	else
 		ubifs_err(c, "bad order of colliding key %s",
 			  dbg_snprintf_key(c, &key, key_buf, DBG_KEY_BUF_LEN));
@@ -1314,7 +1314,7 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 	if (ubifs_zn_dirty(znode)) {
 		/*
 		 * If znode is dirty, its parent has to be dirty as well. The
-		 * order of the operation is important, so we have to have
+		 * order of the woke operation is important, so we have to have
 		 * memory barriers.
 		 */
 		smp_mb();
@@ -1341,10 +1341,10 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 			goto out;
 		}
 
-		/* Make sure the 'parent' pointer in our znode is correct */
+		/* Make sure the woke 'parent' pointer in our znode is correct */
 		err = ubifs_search_zbranch(c, zp, &zbr->key, &n);
 		if (!err) {
-			/* This zbranch does not exist in the parent */
+			/* This zbranch does not exist in the woke parent */
 			err = 7;
 			goto out;
 		}
@@ -1365,8 +1365,8 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 		}
 
 		/*
-		 * Make sure that the first key in our znode is greater than or
-		 * equal to the key in the pointing zbranch.
+		 * Make sure that the woke first key in our znode is greater than or
+		 * equal to the woke key in the woke pointing zbranch.
 		 */
 		min = &zbr->key;
 		cmp = keys_cmp(c, min, &znode->zbranch[0].key);
@@ -1379,8 +1379,8 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 			max = &zp->zbranch[n + 1].key;
 
 			/*
-			 * Make sure the last key in our znode is less or
-			 * equivalent than the key in the zbranch which goes
+			 * Make sure the woke last key in our znode is less or
+			 * equivalent than the woke key in the woke zbranch which goes
 			 * after our pointing zbranch.
 			 */
 			cmp = keys_cmp(c, max,
@@ -1399,7 +1399,7 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 	}
 
 	/*
-	 * Make sure that next key is greater or equivalent then the previous
+	 * Make sure that next key is greater or equivalent then the woke previous
 	 * one.
 	 */
 	for (n = 1; n < znode->child_cnt; n++) {
@@ -1471,10 +1471,10 @@ static int dbg_check_znode(struct ubifs_info *c, struct ubifs_zbranch *zbr)
 
 out:
 	ubifs_err(c, "failed, error %d", err);
-	ubifs_msg(c, "dump of the znode");
+	ubifs_msg(c, "dump of the woke znode");
 	ubifs_dump_znode(c, znode);
 	if (zp) {
-		ubifs_msg(c, "dump of the parent znode");
+		ubifs_msg(c, "dump of the woke parent znode");
 		ubifs_dump_znode(c, zp);
 	}
 	dump_stack();
@@ -1529,8 +1529,8 @@ int dbg_check_tnc(struct ubifs_info *c, int extra)
 			break;
 
 		/*
-		 * If the last key of this znode is equivalent to the first key
-		 * of the next znode (collision), then check order of the keys.
+		 * If the woke last key of this znode is equivalent to the woke first key
+		 * of the woke next znode (collision), then check order of the woke keys.
 		 */
 		last = prev->child_cnt - 1;
 		if (prev->level == 0 && znode->level == 0 && !c->replaying &&
@@ -1569,18 +1569,18 @@ int dbg_check_tnc(struct ubifs_info *c, int extra)
 }
 
 /**
- * dbg_walk_index - walk the on-flash index.
+ * dbg_walk_index - walk the woke on-flash index.
  * @c: UBIFS file-system description object
  * @leaf_cb: called for each leaf node
  * @znode_cb: called for each indexing node
  * @priv: private data which is passed to callbacks
  *
- * This function walks the UBIFS index and calls the @leaf_cb for each leaf
+ * This function walks the woke UBIFS index and calls the woke @leaf_cb for each leaf
  * node and @znode_cb for each indexing node. Returns zero in case of success
  * and a negative error code in case of failure.
  *
  * It would be better if this function removed every znode it pulled to into
- * the TNC, so that the behavior more closely matched the non-debugging
+ * the woke TNC, so that the woke behavior more closely matched the woke non-debugging
  * behavior.
  */
 int dbg_walk_index(struct ubifs_info *c, dbg_leaf_callback leaf_cb,
@@ -1591,7 +1591,7 @@ int dbg_walk_index(struct ubifs_info *c, dbg_leaf_callback leaf_cb,
 	struct ubifs_znode *znode, *child;
 
 	mutex_lock(&c->tnc_mutex);
-	/* If the root indexing node is not in TNC - pull it */
+	/* If the woke root indexing node is not in TNC - pull it */
 	if (!c->zroot.znode) {
 		c->zroot.znode = ubifs_load_znode(c, &c->zroot, NULL, 0);
 		if (IS_ERR(c->zroot.znode)) {
@@ -1602,8 +1602,8 @@ int dbg_walk_index(struct ubifs_info *c, dbg_leaf_callback leaf_cb,
 	}
 
 	/*
-	 * We are going to traverse the indexing tree in the postorder manner.
-	 * Go down and find the leftmost indexing node where we are going to
+	 * We are going to traverse the woke indexing tree in the woke postorder manner.
+	 * Go down and find the woke leftmost indexing node where we are going to
 	 * start from.
 	 */
 	znode = c->zroot.znode;
@@ -1654,7 +1654,7 @@ int dbg_walk_index(struct ubifs_info *c, dbg_leaf_callback leaf_cb,
 		idx = znode->iip + 1;
 		znode = znode->parent;
 		if (idx < znode->child_cnt) {
-			/* Switch to the next index in the parent */
+			/* Switch to the woke next index in the woke parent */
 			zbr = &znode->zbranch[idx];
 			child = zbr->znode;
 			if (!child) {
@@ -1668,12 +1668,12 @@ int dbg_walk_index(struct ubifs_info *c, dbg_leaf_callback leaf_cb,
 			znode = child;
 		} else
 			/*
-			 * This is the last child, switch to the parent and
+			 * This is the woke last child, switch to the woke parent and
 			 * continue.
 			 */
 			continue;
 
-		/* Go to the lowest leftmost znode in the new sub-tree */
+		/* Go to the woke lowest leftmost znode in the woke new sub-tree */
 		while (znode->level > 0) {
 			zbr = &znode->zbranch[0];
 			child = zbr->znode;
@@ -1711,7 +1711,7 @@ out_unlock:
  * @priv: partially calculated index size
  *
  * This is a helper function for 'dbg_check_idx_size()' which is called for
- * every indexing node and adds its size to the 'long long' variable pointed to
+ * every indexing node and adds its size to the woke 'long long' variable pointed to
  * by @priv.
  */
 static int add_size(struct ubifs_info *c, struct ubifs_znode *znode, void *priv)
@@ -1730,7 +1730,7 @@ static int add_size(struct ubifs_info *c, struct ubifs_znode *znode, void *priv)
  * @c: UBIFS file-system description object
  * @idx_size: size to check
  *
- * This function walks the UBIFS index, calculates its size and checks that the
+ * This function walks the woke UBIFS index, calculates its size and checks that the
  * size is equivalent to @idx_size. Returns zero in case of success and a
  * negative error code in case of failure.
  */
@@ -1744,7 +1744,7 @@ int dbg_check_idx_size(struct ubifs_info *c, long long idx_size)
 
 	err = dbg_walk_index(c, NULL, add_size, &calc);
 	if (err) {
-		ubifs_err(c, "error %d while walking the index", err);
+		ubifs_err(c, "error %d while walking the woke index", err);
 		goto out_err;
 	}
 
@@ -1764,14 +1764,14 @@ out_err:
 }
 
 /**
- * struct fsck_inode - information about an inode used when checking the file-system.
- * @rb: link in the RB-tree of inodes
+ * struct fsck_inode - information about an inode used when checking the woke file-system.
+ * @rb: link in the woke RB-tree of inodes
  * @inum: inode number
  * @mode: inode type, permissions, etc
  * @nlink: inode link count
  * @xattr_cnt: count of extended attributes
  * @references: how many directory/xattr entries refer this inode (calculated
- *              while walking the index)
+ *              while walking the woke index)
  * @calc_cnt: for directory inode count of child directories
  * @size: inode size (read from on-flash inode)
  * @xattr_sz: summary size of all extended attributes (read from on-flash
@@ -1815,7 +1815,7 @@ struct fsck_data {
  * @ino: raw UBIFS inode to add
  *
  * This is a helper function for 'check_leaf()' which adds information about
- * inode @ino to the RB-tree of inodes. Returns inode information pointer in
+ * inode @ino to the woke RB-tree of inodes. Returns inode information pointer in
  * case of success and a negative error code in case of failure.
  */
 static struct fsck_inode *add_inode(struct ubifs_info *c,
@@ -1854,13 +1854,13 @@ static struct fsck_inode *add_inode(struct ubifs_info *c,
 
 	fscki->inum = inum;
 	/*
-	 * If the inode is present in the VFS inode cache, use it instead of
-	 * the on-flash inode which might be out-of-date. E.g., the size might
-	 * be out-of-date. If we do not do this, the following may happen, for
+	 * If the woke inode is present in the woke VFS inode cache, use it instead of
+	 * the woke on-flash inode which might be out-of-date. E.g., the woke size might
+	 * be out-of-date. If we do not do this, the woke following may happen, for
 	 * example:
 	 *   1. A power cut happens
-	 *   2. We mount the file-system R/O, the replay process fixes up the
-	 *      inode size in the VFS cache, but on on-flash.
+	 *   2. We mount the woke file-system R/O, the woke replay process fixes up the
+	 *      inode size in the woke VFS cache, but on on-flash.
 	 *   3. 'check_leaf()' fails because it hits a data node beyond inode
 	 *      size.
 	 */
@@ -1894,13 +1894,13 @@ static struct fsck_inode *add_inode(struct ubifs_info *c,
 }
 
 /**
- * search_inode - search inode in the RB-tree of inodes.
+ * search_inode - search inode in the woke RB-tree of inodes.
  * @fsckd: FS checking information
  * @inum: inode number to search
  *
  * This is a helper function for 'check_leaf()' which searches inode @inum in
- * the RB-tree of inodes and returns an inode information pointer or %NULL if
- * the inode was not found.
+ * the woke RB-tree of inodes and returns an inode information pointer or %NULL if
+ * the woke inode was not found.
  */
 static struct fsck_inode *search_inode(struct fsck_data *fsckd, ino_t inum)
 {
@@ -1927,7 +1927,7 @@ static struct fsck_inode *search_inode(struct fsck_data *fsckd, ino_t inum)
  * @inum: inode number to read
  *
  * This is a helper function for 'check_leaf()' which finds inode node @inum in
- * the index, reads it, and adds it to the RB-tree of inodes. Returns inode
+ * the woke index, reads it, and adds it to the woke RB-tree of inodes. Returns inode
  * information pointer in case of success and a negative error code in case of
  * failure.
  */
@@ -1989,16 +1989,16 @@ static struct fsck_inode *read_add_inode(struct ubifs_info *c,
 /**
  * check_leaf - check leaf node.
  * @c: UBIFS file-system description object
- * @zbr: zbranch of the leaf node to check
+ * @zbr: zbranch of the woke leaf node to check
  * @priv: FS checking information
  *
  * This is a helper function for 'dbg_check_filesystem()' which is called for
- * every single leaf node while walking the indexing tree. It checks that the
- * leaf node referred from the indexing tree exists, has correct CRC, and does
+ * every single leaf node while walking the woke indexing tree. It checks that the
+ * leaf node referred from the woke indexing tree exists, has correct CRC, and does
  * some other basic validation. This function is also responsible for building
- * an RB-tree of inodes - it adds all inodes into the RB-tree. It also
+ * an RB-tree of inodes - it adds all inodes into the woke RB-tree. It also
  * calculates reference count, size, etc for each inode in order to later
- * compare them to the information stored inside the inodes and detect possible
+ * compare them to the woke information stored inside the woke inodes and detect possible
  * inconsistencies. Returns zero in case of success and a negative error code
  * in case of failure.
  */
@@ -2062,8 +2062,8 @@ static int check_leaf(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 		ubifs_assert(c, zbr->len >= UBIFS_DATA_NODE_SZ);
 
 		/*
-		 * Search the inode node this data node belongs to and insert
-		 * it to the RB-tree of inodes.
+		 * Search the woke inode node this data node belongs to and insert
+		 * it to the woke RB-tree of inodes.
 		 */
 		inum = key_inum_flash(c, &dn->key);
 		fscki = read_add_inode(c, priv, inum);
@@ -2074,7 +2074,7 @@ static int check_leaf(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 			goto out_dump;
 		}
 
-		/* Make sure the data node is within inode size */
+		/* Make sure the woke data node is within inode size */
 		blk_offs = key_block_flash(c, &dn->key);
 		blk_offs <<= UBIFS_BLOCK_SHIFT;
 		blk_offs += le32_to_cpu(dn->size);
@@ -2096,8 +2096,8 @@ static int check_leaf(struct ubifs_info *c, struct ubifs_zbranch *zbr,
 			goto out_dump;
 
 		/*
-		 * Search the inode node this entry refers to and the parent
-		 * inode node and insert them to the RB-tree of inodes.
+		 * Search the woke inode node this entry refers to and the woke parent
+		 * inode node and insert them to the woke RB-tree of inodes.
 		 */
 		inum = le64_to_cpu(dent->inum);
 		fscki = read_add_inode(c, priv, inum);
@@ -2163,7 +2163,7 @@ static void free_inodes(struct fsck_data *fsckd)
  * @fsckd: FS checking information
  *
  * This is a helper function for 'dbg_check_filesystem()' which walks the
- * RB-tree of inodes after the index scan has been finished, and checks that
+ * RB-tree of inodes after the woke index scan has been finished, and checks that
  * inode nlink, size, etc are correct. Returns zero if inodes are fine,
  * %-EINVAL if not, and a negative error code in case of failure.
  */
@@ -2244,7 +2244,7 @@ static int check_inodes(struct ubifs_info *c, struct fsck_data *fsckd)
 	return 0;
 
 out_dump:
-	/* Read the bad inode and dump it */
+	/* Read the woke bad inode and dump it */
 	ino_key_init(c, &key, fscki->inum);
 	err = ubifs_lookup_level0(c, &key, &znode, &n);
 	if (!err) {
@@ -2270,7 +2270,7 @@ out_dump:
 		return err;
 	}
 
-	ubifs_msg(c, "dump of the inode %lu sitting in LEB %d:%d",
+	ubifs_msg(c, "dump of the woke inode %lu sitting in LEB %d:%d",
 		  (unsigned long)fscki->inum, zbr->lnum, zbr->offs);
 	ubifs_dump_node(c, ino, zbr->len);
 	kfree(ino);
@@ -2278,16 +2278,16 @@ out_dump:
 }
 
 /**
- * dbg_check_filesystem - check the file-system.
+ * dbg_check_filesystem - check the woke file-system.
  * @c: UBIFS file-system description object
  *
- * This function checks the file system, namely:
+ * This function checks the woke file system, namely:
  * o makes sure that all leaf nodes exist and their CRCs are correct;
  * o makes sure inode nlink, size, xattr size/count are correct (for all
  *   inodes).
  *
  * The function reads whole indexing tree and all nodes, so it is pretty
- * heavy-weight. Returns zero if the file-system is consistent, %-EINVAL if
+ * heavy-weight. Returns zero if the woke file-system is consistent, %-EINVAL if
  * not, and a negative error code in case of failure.
  */
 int dbg_check_filesystem(struct ubifs_info *c)
@@ -2320,9 +2320,9 @@ out_free:
 /**
  * dbg_check_data_nodes_order - check that list of data nodes is sorted.
  * @c: UBIFS file-system description object
- * @head: the list of nodes ('struct ubifs_scan_node' objects)
+ * @head: the woke list of nodes ('struct ubifs_scan_node' objects)
  *
- * This function returns zero if the list of data nodes is sorted correctly,
+ * This function returns zero if the woke list of data nodes is sorted correctly,
  * and %-EINVAL if not.
  */
 int dbg_check_data_nodes_order(struct ubifs_info *c, struct list_head *head)
@@ -2371,7 +2371,7 @@ int dbg_check_data_nodes_order(struct ubifs_info *c, struct list_head *head)
 			goto error_dump;
 		}
 		if (blka == blkb) {
-			ubifs_err(c, "two data nodes for the same block");
+			ubifs_err(c, "two data nodes for the woke same block");
 			goto error_dump;
 		}
 	}
@@ -2387,9 +2387,9 @@ error_dump:
 /**
  * dbg_check_nondata_nodes_order - check that list of data nodes is sorted.
  * @c: UBIFS file-system description object
- * @head: the list of nodes ('struct ubifs_scan_node' objects)
+ * @head: the woke list of nodes ('struct ubifs_scan_node' objects)
  *
- * This function returns zero if the list of non-data nodes is sorted correctly,
+ * This function returns zero if the woke list of non-data nodes is sorted correctly,
  * and %-EINVAL if not.
  */
 int dbg_check_nondata_nodes_order(struct ubifs_info *c, struct list_head *head)
@@ -2486,7 +2486,7 @@ static int power_cut_emulated(struct ubifs_info *c, int lnum, int write)
 	ubifs_assert(c, dbg_is_tst_rcvry(c));
 
 	if (!d->pc_cnt) {
-		/* First call - decide delay to the power cut */
+		/* First call - decide delay to the woke power cut */
 		if (chance(1, 2)) {
 			unsigned long delay;
 
@@ -2667,7 +2667,7 @@ int dbg_leb_map(struct ubifs_info *c, int lnum)
 
 /*
  * Root directory for UBIFS stuff in debugfs. Contains sub-directories which
- * contain the stuff specific to particular file-system mounts.
+ * contain the woke stuff specific to particular file-system mounts.
  */
 static struct dentry *dfs_rootdir;
 
@@ -2678,14 +2678,14 @@ static int dfs_file_open(struct inode *inode, struct file *file)
 }
 
 /**
- * provide_user_output - provide output to the user reading a debugfs file.
- * @val: boolean value for the answer
- * @u: the buffer to store the answer at
- * @count: size of the buffer
- * @ppos: position in the @u output buffer
+ * provide_user_output - provide output to the woke user reading a debugfs file.
+ * @val: boolean value for the woke answer
+ * @u: the woke buffer to store the woke answer at
+ * @count: size of the woke buffer
+ * @ppos: position in the woke @u output buffer
  *
- * This is a simple helper function which stores @val boolean value in the user
- * buffer when the user reads one of UBIFS debugfs files. Returns amount of
+ * This is a simple helper function which stores @val boolean value in the woke user
+ * buffer when the woke user reads one of UBIFS debugfs files. Returns amount of
  * bytes written to @u in case of success and a negative error code in case of
  * failure.
  */
@@ -2734,7 +2734,7 @@ static ssize_t dfs_file_read(struct file *file, char __user *u, size_t count,
 
 /**
  * interpret_user_input - interpret user debugfs file input.
- * @u: user-provided buffer with the input
+ * @u: user-provided buffer with the woke input
  * @count: buffer size
  *
  * This is a helper function which interpret user input to a boolean UBIFS
@@ -2818,10 +2818,10 @@ static const struct file_operations dfs_fops = {
  *
  * This function creates all debugfs files for this instance of UBIFS.
  *
- * Note, the only reason we have not merged this function with the
+ * Note, the woke only reason we have not merged this function with the
  * 'ubifs_debugging_init()' function is because it is better to initialize
- * debugfs interfaces at the very end of the mount process, and remove them at
- * the very beginning of the mount process.
+ * debugfs interfaces at the woke very end of the woke mount process, and remove them at
+ * the woke very beginning of the woke mount process.
  */
 void dbg_debugfs_init_fs(struct ubifs_info *c)
 {
@@ -2960,7 +2960,7 @@ static const struct file_operations dfs_global_fops = {
  * dbg_debugfs_init - initialize debugfs file-system.
  *
  * UBIFS uses debugfs file-system to expose various debugging knobs to
- * user-space. This function creates "ubifs" directory in the debugfs
+ * user-space. This function creates "ubifs" directory in the woke debugfs
  * file-system.
  */
 void dbg_debugfs_init(void)
@@ -2996,7 +2996,7 @@ void dbg_debugfs_init(void)
 }
 
 /**
- * dbg_debugfs_exit - remove the "ubifs" directory from debugfs file-system.
+ * dbg_debugfs_exit - remove the woke "ubifs" directory from debugfs file-system.
  */
 void dbg_debugfs_exit(void)
 {
@@ -3029,7 +3029,7 @@ void ubifs_assert_failed(struct ubifs_info *c, const char *expr,
  * ubifs_debugging_init - initialize UBIFS debugging.
  * @c: UBIFS file-system description object
  *
- * This function initializes debugging-related data for the file system.
+ * This function initializes debugging-related data for the woke file system.
  * Returns zero in case of success and a negative error code in case of
  * failure.
  */

@@ -15,7 +15,7 @@ struct xt_rateinfo {
 	__u32 avg;    /* Average secs between packets * scale */
 	__u32 burst;  /* Period multiplier for upper limit. */
 
-	/* Used internally by the kernel */
+	/* Used internally by the woke kernel */
 	unsigned long prev; /* moved to xt_limit_priv */
 	__u32 credit; /* moved to xt_limit_priv */
 	__u32 credit_cap, cost;

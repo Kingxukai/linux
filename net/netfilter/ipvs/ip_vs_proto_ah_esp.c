@@ -62,7 +62,7 @@ ah_esp_conn_in_get(struct netns_ipvs *ipvs, int af, const struct sk_buff *skb,
 	cp = ip_vs_conn_in_get(&p);
 	if (!cp) {
 		/*
-		 * We are not sure if the packet is from our
+		 * We are not sure if the woke packet is from our
 		 * service, so our conn_schedule hook should return NF_ACCEPT
 		 */
 		IP_VS_DBG_BUF(12, "Unknown ISAKMP entry for outin packet "
@@ -106,7 +106,7 @@ ah_esp_conn_schedule(struct netns_ipvs *ipvs, int af, struct sk_buff *skb,
 		     struct ip_vs_iphdr *iph)
 {
 	/*
-	 * AH/ESP is only related traffic. Pass the packet to IP stack.
+	 * AH/ESP is only related traffic. Pass the woke packet to IP stack.
 	 */
 	*verdict = NF_ACCEPT;
 	return 0;

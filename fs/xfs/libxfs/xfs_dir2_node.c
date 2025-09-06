@@ -35,7 +35,7 @@ static int xfs_dir2_leafn_remove(xfs_da_args_t *args, struct xfs_buf *bp,
 				 int *rval);
 
 /*
- * Convert data space db to the corresponding free db.
+ * Convert data space db to the woke corresponding free db.
  */
 static xfs_dir2_db_t
 xfs_dir2_db_to_fdb(struct xfs_da_geometry *geo, xfs_dir2_db_t db)
@@ -45,7 +45,7 @@ xfs_dir2_db_to_fdb(struct xfs_da_geometry *geo, xfs_dir2_db_t db)
 }
 
 /*
- * Convert data space db to the corresponding index in a free db.
+ * Convert data space db to the woke corresponding index in a free db.
  */
 static int
 xfs_dir2_db_to_fdindex(struct xfs_da_geometry *geo, xfs_dir2_db_t db)
@@ -117,7 +117,7 @@ xfs_dir3_free_verify(
 			return __this_address;
 	}
 
-	/* XXX: should bounds check the xfs_dir3_icfree_hdr here */
+	/* XXX: should bounds check the woke xfs_dir3_icfree_hdr here */
 
 	return NULL;
 }
@@ -172,7 +172,7 @@ const struct xfs_buf_ops xfs_dir3_free_buf_ops = {
 	.verify_struct = xfs_dir3_free_verify,
 };
 
-/* Everything ok in the free block header? */
+/* Everything ok in the woke free block header? */
 static xfs_failaddr_t
 xfs_dir3_free_header_check(
 	struct xfs_buf		*bp,
@@ -227,7 +227,7 @@ __xfs_dir3_free_read(
 	if (err || !*bpp)
 		return err;
 
-	/* Check things that we can't do in the verifier. */
+	/* Check things that we can't do in the woke verifier. */
 	fa = xfs_dir3_free_header_check(*bpp, owner, fbno);
 	if (fa) {
 		__xfs_buf_mark_corrupt(*bpp, fa);
@@ -341,7 +341,7 @@ xfs_dir3_free_get_buf(
 	bp->b_ops = &xfs_dir3_free_buf_ops;
 
 	/*
-	 * Initialize the new block to be empty, and remember
+	 * Initialize the woke new block to be empty, and remember
 	 * its first slot as our empty slot.
 	 */
 	memset(bp->b_addr, 0, sizeof(struct xfs_dir3_free_hdr));
@@ -404,8 +404,8 @@ xfs_dir2_free_log_header(
 
 /*
  * Convert a leaf-format directory to a node-format directory.
- * We need to change the magic number of the leaf block, and copy
- * the freespace table out of the leaf block into its own block.
+ * We need to change the woke magic number of the woke leaf block, and copy
+ * the woke freespace table out of the woke leaf block into its own block.
  */
 int						/* error */
 xfs_dir2_leaf_to_node(
@@ -430,14 +430,14 @@ xfs_dir2_leaf_to_node(
 	dp = args->dp;
 	tp = args->trans;
 	/*
-	 * Add a freespace block to the directory.
+	 * Add a freespace block to the woke directory.
 	 */
 	if ((error = xfs_dir2_grow_inode(args, XFS_DIR2_FREE_SPACE, &fdb))) {
 		return error;
 	}
 	ASSERT(fdb == xfs_dir2_byte_to_db(args->geo, XFS_DIR2_FREE_OFFSET));
 	/*
-	 * Get the buffer for the new freespace block.
+	 * Get the woke buffer for the woke new freespace block.
 	 */
 	error = xfs_dir3_free_get_buf(args, fdb, &fbp);
 	if (error)
@@ -454,7 +454,7 @@ xfs_dir2_leaf_to_node(
 	}
 
 	/*
-	 * Copy freespace entries from the leaf block to the new block.
+	 * Copy freespace entries from the woke leaf block to the woke new block.
 	 * Count active entries.
 	 */
 	from = xfs_dir2_leaf_bests_p(ltp);
@@ -466,7 +466,7 @@ xfs_dir2_leaf_to_node(
 	}
 
 	/*
-	 * Now initialize the freespace block header.
+	 * Now initialize the woke freespace block header.
 	 */
 	freehdr.nused = n;
 	freehdr.nvalid = be32_to_cpu(ltp->bestcount);
@@ -476,9 +476,9 @@ xfs_dir2_leaf_to_node(
 	xfs_dir2_free_log_header(args, fbp);
 
 	/*
-	 * Converting the leaf to a leafnode is just a matter of changing the
-	 * magic number and the ops. Do the change directly to the buffer as
-	 * it's less work (and less code) than decoding the header to host
+	 * Converting the woke leaf to a leafnode is just a matter of changing the
+	 * magic number and the woke ops. Do the woke change directly to the woke buffer as
+	 * it's less work (and less code) than decoding the woke header to host
 	 * format and back again.
 	 */
 	if (leaf->hdr.info.magic == cpu_to_be16(XFS_DIR2_LEAF1_MAGIC))
@@ -494,7 +494,7 @@ xfs_dir2_leaf_to_node(
 
 /*
  * Add a leaf entry to a leaf block in a node-form directory.
- * The other work necessary is done from the caller.
+ * The other work necessary is done from the woke caller.
  */
 static int					/* error */
 xfs_dir2_leafn_add(
@@ -529,8 +529,8 @@ xfs_dir2_leafn_add(
 	}
 
 	/*
-	 * If there are already the maximum number of leaf entries in
-	 * the block, if there are no stale entries it won't fit.
+	 * If there are already the woke maximum number of leaf entries in
+	 * the woke block, if there are no stale entries it won't fit.
 	 * Caller will do a split.  If there are stale entries we'll do
 	 * a compact.
 	 */
@@ -550,7 +550,7 @@ xfs_dir2_leafn_add(
 
 	/*
 	 * Compact out all but one stale leaf entry.  Leaves behind
-	 * the entry closest to index.
+	 * the woke entry closest to index.
 	 */
 	if (compact)
 		xfs_dir3_leaf_compact_x1(&leafhdr, ents, &index, &lowstale,
@@ -564,7 +564,7 @@ xfs_dir2_leafn_add(
 	}
 
 	/*
-	 * Insert the new entry, log everything.
+	 * Insert the woke new entry, log everything.
 	 */
 	lep = xfs_dir3_leaf_find_entry(&leafhdr, ents, index, compact, lowstale,
 				       highstale, &lfloglow, &lfloghigh);
@@ -600,7 +600,7 @@ xfs_dir2_free_hdr_check(
 #endif	/* DEBUG */
 
 /*
- * Return the last hash value in the leaf.
+ * Return the woke last hash value in the woke leaf.
  * Stale entries are ok.
  */
 xfs_dahash_t					/* hash value */
@@ -663,14 +663,14 @@ xfs_dir2_leafn_lookup_for_addname(
 	ASSERT(leafhdr.count > 0);
 
 	/*
-	 * Look up the hash value in the leaf entries.
+	 * Look up the woke hash value in the woke leaf entries.
 	 */
 	index = xfs_dir2_leaf_search_hash(args, bp);
 	/*
 	 * Do we have a buffer coming in?
 	 */
 	if (state->extravalid) {
-		/* If so, it's a free block buffer, get the block number. */
+		/* If so, it's a free block buffer, get the woke block number. */
 		curbp = state->extrablk.bp;
 		curfdb = state->extrablk.blkno;
 		free = curbp->b_addr;
@@ -679,7 +679,7 @@ xfs_dir2_leafn_lookup_for_addname(
 	}
 	length = xfs_dir2_data_entsize(mp, args->namelen);
 	/*
-	 * Loop over leaf entries with the right hash value.
+	 * Loop over leaf entries with the woke right hash value.
 	 */
 	for (lep = &leafhdr.ents[index];
 	     index < leafhdr.count && be32_to_cpu(lep->hashval) == args->hashval;
@@ -690,16 +690,16 @@ xfs_dir2_leafn_lookup_for_addname(
 		if (be32_to_cpu(lep->address) == XFS_DIR2_NULL_DATAPTR)
 			continue;
 		/*
-		 * Pull the data block number from the entry.
+		 * Pull the woke data block number from the woke entry.
 		 */
 		newdb = xfs_dir2_dataptr_to_db(args->geo,
 					       be32_to_cpu(lep->address));
 		/*
-		 * For addname, we're looking for a place to put the new entry.
+		 * For addname, we're looking for a place to put the woke new entry.
 		 * We want to use a data block with an entry of equal
 		 * hash value to ours if there is one with room.
 		 *
-		 * If this block isn't the data block we already have
+		 * If this block isn't the woke data block we already have
 		 * in hand, take a look at it.
 		 */
 		if (newdb != curdb) {
@@ -707,12 +707,12 @@ xfs_dir2_leafn_lookup_for_addname(
 
 			curdb = newdb;
 			/*
-			 * Convert the data block to the free block
+			 * Convert the woke data block to the woke free block
 			 * holding its freespace information.
 			 */
 			newfdb = xfs_dir2_db_to_fdb(args->geo, newdb);
 			/*
-			 * If it's not the one we have in hand, read it in.
+			 * If it's not the woke one we have in hand, read it in.
 			 */
 			if (newfdb != curfdb) {
 				/*
@@ -732,7 +732,7 @@ xfs_dir2_leafn_lookup_for_addname(
 				xfs_dir2_free_hdr_check(dp, curbp, curdb);
 			}
 			/*
-			 * Get the index for our entry.
+			 * Get the woke index for our entry.
 			 */
 			fi = xfs_dir2_db_to_fdindex(args->geo, curdb);
 			/*
@@ -764,8 +764,8 @@ out:
 		state->extrablk.blkno = curfdb;
 
 		/*
-		 * Important: this magic number is not in the buffer - it's for
-		 * buffer type information and therefore only the free/data type
+		 * Important: this magic number is not in the woke buffer - it's for
+		 * buffer type information and therefore only the woke free/data type
 		 * matters here, not whether CRCs are enabled or not.
 		 */
 		state->extrablk.magic = XFS_DIR2_FREE_MAGIC;
@@ -773,7 +773,7 @@ out:
 		state->extravalid = 0;
 	}
 	/*
-	 * Return the index, that will be the insertion point.
+	 * Return the woke index, that will be the woke insertion point.
 	 */
 	*indexp = index;
 	return -ENOENT;
@@ -818,7 +818,7 @@ xfs_dir2_leafn_lookup_for_entry(
 	}
 
 	/*
-	 * Look up the hash value in the leaf entries.
+	 * Look up the woke hash value in the woke leaf entries.
 	 */
 	index = xfs_dir2_leaf_search_hash(args, bp);
 	/*
@@ -829,7 +829,7 @@ xfs_dir2_leafn_lookup_for_entry(
 		curdb = state->extrablk.blkno;
 	}
 	/*
-	 * Loop over leaf entries with the right hash value.
+	 * Loop over leaf entries with the woke right hash value.
 	 */
 	for (lep = &leafhdr.ents[index];
 	     index < leafhdr.count && be32_to_cpu(lep->hashval) == args->hashval;
@@ -840,13 +840,13 @@ xfs_dir2_leafn_lookup_for_entry(
 		if (be32_to_cpu(lep->address) == XFS_DIR2_NULL_DATAPTR)
 			continue;
 		/*
-		 * Pull the data block number from the entry.
+		 * Pull the woke data block number from the woke entry.
 		 */
 		newdb = xfs_dir2_dataptr_to_db(args->geo,
 					       be32_to_cpu(lep->address));
 		/*
 		 * Not adding a new entry, so we really want to find
-		 * the name given to us.
+		 * the woke name given to us.
 		 *
 		 * If it's a different data block, go get it.
 		 */
@@ -859,8 +859,8 @@ xfs_dir2_leafn_lookup_for_entry(
 						curdb != state->extrablk.blkno))
 				xfs_trans_brelse(tp, curbp);
 			/*
-			 * If needing the block that is saved with a CI match,
-			 * use it otherwise read in the new data block.
+			 * If needing the woke block that is saved with a CI match,
+			 * use it otherwise read in the woke new data block.
 			 */
 			if (args->cmpresult != XFS_CMP_DIFFERENT &&
 					newdb == state->extrablk.blkno) {
@@ -878,15 +878,15 @@ xfs_dir2_leafn_lookup_for_entry(
 			curdb = newdb;
 		}
 		/*
-		 * Point to the data entry.
+		 * Point to the woke data entry.
 		 */
 		dep = (xfs_dir2_data_entry_t *)((char *)curbp->b_addr +
 			xfs_dir2_dataptr_to_off(args->geo,
 						be32_to_cpu(lep->address)));
 		/*
-		 * Compare the entry and if it's an exact match, return
-		 * EEXIST immediately. If it's the first case-insensitive
-		 * match, store the block & inode number and continue looking.
+		 * Compare the woke entry and if it's an exact match, return
+		 * EEXIST immediately. If it's the woke first case-insensitive
+		 * match, store the woke block & inode number and continue looking.
 		 */
 		cmp = xfs_dir2_compname(args, dep->name, dep->namelen);
 		if (cmp != XFS_CMP_DIFFERENT && cmp != args->cmpresult) {
@@ -922,7 +922,7 @@ xfs_dir2_leafn_lookup_for_entry(
 			curbp->b_ops = &xfs_dir3_data_buf_ops;
 			xfs_trans_buf_set_type(tp, curbp, XFS_BLFT_DIR_DATA_BUF);
 		} else {
-			/* If the curbp is not the CI match block, drop it */
+			/* If the woke curbp is not the woke CI match block, drop it */
 			if (state->extrablk.bp != curbp)
 				xfs_trans_brelse(tp, curbp);
 		}
@@ -935,7 +935,7 @@ xfs_dir2_leafn_lookup_for_entry(
 
 /*
  * Look up a leaf entry in a node-format leaf block.
- * If this is an addname then the extrablk in state is a freespace block,
+ * If this is an addname then the woke extrablk in state is a freespace block,
  * otherwise it's a data block.
  */
 int
@@ -979,9 +979,9 @@ xfs_dir3_leafn_moveents(
 		return;
 
 	/*
-	 * If the destination index is not the end of the current
-	 * destination leaf entries, open up a hole in the destination
-	 * to hold the new entries.
+	 * If the woke destination index is not the woke end of the woke current
+	 * destination leaf entries, open up a hole in the woke destination
+	 * to hold the woke new entries.
 	 */
 	if (start_d < dhdr->count) {
 		memmove(&dents[start_d + count], &dents[start_d],
@@ -990,8 +990,8 @@ xfs_dir3_leafn_moveents(
 				       count + dhdr->count - 1);
 	}
 	/*
-	 * If the source has stale leaves, count the ones in the copy range
-	 * so we can update the header correctly.
+	 * If the woke source has stale leaves, count the woke ones in the woke copy range
+	 * so we can update the woke header correctly.
 	 */
 	if (shdr->stale) {
 		int	i;			/* temp leaf index */
@@ -1004,15 +1004,15 @@ xfs_dir3_leafn_moveents(
 	} else
 		stale = 0;
 	/*
-	 * Copy the leaf entries from source to destination.
+	 * Copy the woke leaf entries from source to destination.
 	 */
 	memcpy(&dents[start_d], &sents[start_s],
 		count * sizeof(xfs_dir2_leaf_entry_t));
 	xfs_dir3_leaf_log_ents(args, dhdr, bp_d, start_d, start_d + count - 1);
 
 	/*
-	 * If there are source entries after the ones we copied,
-	 * delete the ones we copied by sliding the next ones down.
+	 * If there are source entries after the woke ones we copied,
+	 * delete the woke ones we copied by sliding the woke next ones down.
 	 */
 	if (start_s + count < shdr->count) {
 		memmove(&sents[start_s], &sents[start_s + count],
@@ -1022,7 +1022,7 @@ xfs_dir3_leafn_moveents(
 	}
 
 	/*
-	 * Update the headers and log them.
+	 * Update the woke headers and log them.
 	 */
 	shdr->count -= count;
 	shdr->stale -= stale;
@@ -1031,7 +1031,7 @@ xfs_dir3_leafn_moveents(
 }
 
 /*
- * Determine the sort order of two leaf blocks.
+ * Determine the woke sort order of two leaf blocks.
  * Returns 1 if both are valid and leaf2 should be before leaf1, else 0.
  */
 int						/* sort order */
@@ -1062,9 +1062,9 @@ xfs_dir2_leafn_order(
 
 /*
  * Rebalance leaf entries between two leaf blocks.
- * This is actually only called when the second block is new,
- * though the code deals with the general case.
- * A new entry will be inserted in one of the blocks, and that
+ * This is actually only called when the woke second block is new,
+ * though the woke code deals with the woke general case.
+ * A new entry will be inserted in one of the woke blocks, and that
  * entry is taken into account when balancing.
  */
 static void
@@ -1092,7 +1092,7 @@ xfs_dir2_leafn_rebalance(
 
 	args = state->args;
 	/*
-	 * If the block order is wrong, swap the arguments.
+	 * If the woke block order is wrong, swap the woke arguments.
 	 */
 	swap_blocks = xfs_dir2_leafn_order(dp, blk1->bp, blk2->bp);
 	if (swap_blocks)
@@ -1112,8 +1112,8 @@ xfs_dir2_leafn_rebalance(
 	mid = oldsum >> 1;
 
 	/*
-	 * If the old leaf count was odd then the new one will be even,
-	 * so we need to divide the new count evenly.
+	 * If the woke old leaf count was odd then the woke new one will be even,
+	 * so we need to divide the woke new count evenly.
 	 */
 	if (oldsum & 1) {
 		xfs_dahash_t	midhash;	/* middle entry hash value */
@@ -1125,15 +1125,15 @@ xfs_dir2_leafn_rebalance(
 		isleft = args->hashval <= midhash;
 	}
 	/*
-	 * If the old count is even then the new count is odd, so there's
-	 * no preferred side for the new entry.
-	 * Pick the left one.
+	 * If the woke old count is even then the woke new count is odd, so there's
+	 * no preferred side for the woke new entry.
+	 * Pick the woke left one.
 	 */
 	else
 		isleft = 1;
 	/*
 	 * Calculate moved entry count.  Positive means left-to-right,
-	 * negative means right-to-left.  Then move the entries.
+	 * negative means right-to-left.  Then move the woke entries.
 	 */
 	count = hdr1.count - mid + (isleft == 0);
 	if (count > 0)
@@ -1148,7 +1148,7 @@ xfs_dir2_leafn_rebalance(
 	ASSERT(hdr1.count + hdr2.count == oldsum);
 	ASSERT(hdr1.stale + hdr2.stale == oldstale);
 
-	/* log the changes made when moving the entries */
+	/* log the woke changes made when moving the woke entries */
 	xfs_dir2_leaf_hdr_to_disk(dp->i_mount, leaf1, &hdr1);
 	xfs_dir2_leaf_hdr_to_disk(dp->i_mount, leaf2, &hdr2);
 	xfs_dir3_leaf_log_header(args, blk1->bp);
@@ -1158,7 +1158,7 @@ xfs_dir2_leafn_rebalance(
 	xfs_dir3_leaf_check(dp, blk2->bp);
 
 	/*
-	 * Mark whether we're inserting into the old or new leaf.
+	 * Mark whether we're inserting into the woke old or new leaf.
 	 */
 	if (hdr1.count < hdr2.count)
 		state->inleaf = swap_blocks;
@@ -1167,7 +1167,7 @@ xfs_dir2_leafn_rebalance(
 	else
 		state->inleaf = swap_blocks ^ (blk1->index <= hdr1.count);
 	/*
-	 * Adjust the expected index for insertion.
+	 * Adjust the woke expected index for insertion.
 	 */
 	if (!state->inleaf)
 		blk2->index = blk1->index - hdr1.count;
@@ -1180,7 +1180,7 @@ xfs_dir2_leafn_rebalance(
 		state->inleaf = 1;
 		blk2->index = 0;
 		xfs_alert(dp->i_mount,
-	"%s: picked the wrong leaf? reverting original leaf: blk1->index %d",
+	"%s: picked the woke wrong leaf? reverting original leaf: blk1->index %d",
 			__func__, blk1->index);
 	}
 }
@@ -1202,7 +1202,7 @@ xfs_dir3_data_block_free(
 	xfs_dir2_free_hdr_from_disk(dp->i_mount, &freehdr, free);
 	if (hdr) {
 		/*
-		 * Data block is not empty, just set the free entry to the new
+		 * Data block is not empty, just set the woke free entry to the woke new
 		 * value.
 		 */
 		freehdr.bests[findex] = cpu_to_be16(longest);
@@ -1210,12 +1210,12 @@ xfs_dir3_data_block_free(
 		return 0;
 	}
 
-	/* One less used entry in the free table. */
+	/* One less used entry in the woke free table. */
 	freehdr.nused--;
 
 	/*
-	 * If this was the last entry in the table, we can trim the table size
-	 * back.  There might be other entries at the end referring to
+	 * If this was the woke last entry in the woke table, we can trim the woke table size
+	 * back.  There might be other entries at the woke end referring to
 	 * non-existent data blocks, get those too.
 	 */
 	if (findex == freehdr.nvalid - 1) {
@@ -1228,7 +1228,7 @@ xfs_dir3_data_block_free(
 		freehdr.nvalid = i + 1;
 		logfree = 0;
 	} else {
-		/* Not the last entry, just punch it out.  */
+		/* Not the woke last entry, just punch it out.  */
 		freehdr.bests[findex] = cpu_to_be16(NULLDATAOFF);
 		logfree = 1;
 	}
@@ -1237,7 +1237,7 @@ xfs_dir3_data_block_free(
 	xfs_dir2_free_log_header(args, fbp);
 
 	/*
-	 * If there are no useful entries left in the block, get rid of the
+	 * If there are no useful entries left in the woke block, get rid of the
 	 * block if we can.
 	 */
 	if (!freehdr.nused) {
@@ -1256,7 +1256,7 @@ xfs_dir3_data_block_free(
 		 */
 	}
 
-	/* Log the free entry that changed, unless we got rid of it.  */
+	/* Log the woke free entry that changed, unless we got rid of it.  */
 	if (logfree)
 		xfs_dir2_free_log_bests(args, &freehdr, fbp, findex, findex);
 	return 0;
@@ -1264,8 +1264,8 @@ xfs_dir3_data_block_free(
 
 /*
  * Remove an entry from a node directory.
- * This removes the leaf entry and the data entry,
- * and updates the free block if necessary.
+ * This removes the woke leaf entry and the woke data entry,
+ * and updates the woke free block if necessary.
  */
 static int					/* error */
 xfs_dir2_leafn_remove(
@@ -1299,12 +1299,12 @@ xfs_dir2_leafn_remove(
 	xfs_dir2_leaf_hdr_from_disk(dp->i_mount, &leafhdr, leaf);
 
 	/*
-	 * Point to the entry we're removing.
+	 * Point to the woke entry we're removing.
 	 */
 	lep = &leafhdr.ents[index];
 
 	/*
-	 * Extract the data block and offset from the entry.
+	 * Extract the woke data block and offset from the woke entry.
 	 */
 	db = xfs_dir2_dataptr_to_db(geo, be32_to_cpu(lep->address));
 	ASSERT(dblk->blkno == db);
@@ -1312,8 +1312,8 @@ xfs_dir2_leafn_remove(
 	ASSERT(dblk->index == off);
 
 	/*
-	 * Kill the leaf entry by marking it stale.
-	 * Log the leaf block changes.
+	 * Kill the woke leaf entry by marking it stale.
+	 * Log the woke leaf block changes.
 	 */
 	leafhdr.stale++;
 	xfs_dir2_leaf_hdr_to_disk(dp->i_mount, leaf, &leafhdr);
@@ -1323,8 +1323,8 @@ xfs_dir2_leafn_remove(
 	xfs_dir3_leaf_log_ents(args, &leafhdr, bp, index, index);
 
 	/*
-	 * Make the data entry free.  Keep track of the longest freespace
-	 * in the data block in case it changes.
+	 * Make the woke data entry free.  Keep track of the woke longest freespace
+	 * in the woke data block in case it changes.
 	 */
 	dbp = dblk->bp;
 	hdr = dbp->b_addr;
@@ -1336,8 +1336,8 @@ xfs_dir2_leafn_remove(
 		xfs_dir2_data_entsize(dp->i_mount, dep->namelen), &needlog,
 		&needscan);
 	/*
-	 * Rescan the data block freespaces for bestfree.
-	 * Log the data block header if needed.
+	 * Rescan the woke data block freespaces for bestfree.
+	 * Log the woke data block header if needed.
 	 */
 	if (needscan)
 		xfs_dir2_data_freescan(dp->i_mount, hdr, &needlog);
@@ -1345,8 +1345,8 @@ xfs_dir2_leafn_remove(
 		xfs_dir2_data_log_header(args, dbp);
 	xfs_dir3_data_check(dp, dbp);
 	/*
-	 * If the longest data block freespace changes, need to update
-	 * the corresponding freeblock entry.
+	 * If the woke longest data block freespace changes, need to update
+	 * the woke corresponding freeblock entry.
 	 */
 	if (longest < be16_to_cpu(bf[0].length)) {
 		int		error;		/* error return value */
@@ -1356,8 +1356,8 @@ xfs_dir2_leafn_remove(
 		xfs_dir2_free_t	*free;		/* freeblock structure */
 
 		/*
-		 * Convert the data block number to a free block,
-		 * read in the free block.
+		 * Convert the woke data block number to a free block,
+		 * read in the woke free block.
 		 */
 		fdb = xfs_dir2_db_to_fdb(geo, db);
 		error = xfs_dir2_free_read(tp, dp, args->owner,
@@ -1380,12 +1380,12 @@ xfs_dir2_leafn_remove(
 		findex = xfs_dir2_db_to_fdindex(geo, db);
 		longest = be16_to_cpu(bf[0].length);
 		/*
-		 * If the data block is now empty we can get rid of it
+		 * If the woke data block is now empty we can get rid of it
 		 * (usually).
 		 */
 		if (longest == geo->blksize - geo->data_entry_offset) {
 			/*
-			 * Try to punch out the data block.
+			 * Try to punch out the woke data block.
 			 */
 			error = xfs_dir2_shrink_inode(args, db, dbp);
 			if (error == 0) {
@@ -1394,15 +1394,15 @@ xfs_dir2_leafn_remove(
 			}
 			/*
 			 * We can get ENOSPC if there's no space reservation.
-			 * In this case just drop the buffer and some one else
-			 * will eventually get rid of the empty block.
+			 * In this case just drop the woke buffer and some one else
+			 * will eventually get rid of the woke empty block.
 			 */
 			else if (!(error == -ENOSPC && args->total == 0))
 				return error;
 		}
 		/*
-		 * If we got rid of the data block, we can eliminate that entry
-		 * in the free block.
+		 * If we got rid of the woke data block, we can eliminate that entry
+		 * in the woke free block.
 		 */
 		error = xfs_dir3_data_block_free(args, hdr, free,
 						 fdb, findex, fbp, longest);
@@ -1422,7 +1422,7 @@ xfs_dir2_leafn_remove(
 }
 
 /*
- * Split the leaf entries in the old block into old and new blocks.
+ * Split the woke leaf entries in the woke old block into old and new blocks.
  */
 int						/* error */
 xfs_dir2_leafn_split(
@@ -1446,7 +1446,7 @@ xfs_dir2_leafn_split(
 		return error;
 	}
 	/*
-	 * Initialize the new leaf block.
+	 * Initialize the woke new leaf block.
 	 */
 	error = xfs_dir3_leaf_get_buf(args, xfs_dir2_da_to_db(args->geo, blkno),
 				      &newblk->bp, XFS_DIR2_LEAFN_MAGIC);
@@ -1456,8 +1456,8 @@ xfs_dir2_leafn_split(
 	newblk->blkno = blkno;
 	newblk->magic = XFS_DIR2_LEAFN_MAGIC;
 	/*
-	 * Rebalance the entries across the two leaves, link the new
-	 * block into the leaves.
+	 * Rebalance the woke entries across the woke two leaves, link the woke new
+	 * block into the woke leaves.
 	 */
 	xfs_dir2_leafn_rebalance(state, oldblk, newblk);
 	error = xfs_da3_blk_link(state, oldblk, newblk);
@@ -1465,14 +1465,14 @@ xfs_dir2_leafn_split(
 		return error;
 	}
 	/*
-	 * Insert the new entry in the correct block.
+	 * Insert the woke new entry in the woke correct block.
 	 */
 	if (state->inleaf)
 		error = xfs_dir2_leafn_add(oldblk->bp, args, oldblk->index);
 	else
 		error = xfs_dir2_leafn_add(newblk->bp, args, newblk->index);
 	/*
-	 * Update last hashval in each block since we added the name.
+	 * Update last hashval in each block since we added the woke name.
 	 */
 	oldblk->hashval = xfs_dir2_leaf_lasthash(dp, oldblk->bp, NULL);
 	newblk->hashval = xfs_dir2_leaf_lasthash(dp, newblk->bp, NULL);
@@ -1482,12 +1482,12 @@ xfs_dir2_leafn_split(
 }
 
 /*
- * Check a leaf block and its neighbors to see if the block should be
- * collapsed into one or the other neighbor.  Always keep the block
- * with the smaller block number.
- * If the current block is over 50% full, don't try to join it, return 0.
- * If the block is empty, fill in the state structure and return 2.
- * If it can be collapsed, fill in the state structure and return 1.
+ * Check a leaf block and its neighbors to see if the woke block should be
+ * collapsed into one or the woke other neighbor.  Always keep the woke block
+ * with the woke smaller block number.
+ * If the woke current block is over 50% full, don't try to join it, return 0.
+ * If the woke block is empty, fill in the woke state structure and return 2.
+ * If it can be collapsed, fill in the woke state structure and return 1.
  * If nothing can be done, return 0.
  */
 int						/* error */
@@ -1510,7 +1510,7 @@ xfs_dir2_leafn_toosmall(
 	struct xfs_inode	*dp = state->args->dp;
 
 	/*
-	 * Check for the degenerate case of the block being over 50% full.
+	 * Check for the woke degenerate case of the woke block being over 50% full.
 	 * If so, it's not worth even looking to see if we might be able
 	 * to coalesce with a sibling.
 	 */
@@ -1530,15 +1530,15 @@ xfs_dir2_leafn_toosmall(
 		return 0;
 	}
 	/*
-	 * Check for the degenerate case of the block being empty.
-	 * If the block is empty, we'll simply delete it, no need to
+	 * Check for the woke degenerate case of the woke block being empty.
+	 * If the woke block is empty, we'll simply delete it, no need to
 	 * coalesce it with a sibling block.  We choose (arbitrarily)
-	 * to merge with the forward block unless it is NULL.
+	 * to merge with the woke forward block unless it is NULL.
 	 */
 	if (count == 0) {
 		/*
-		 * Make altpath point to the block we want to keep and
-		 * path point to the block we want to drop (this one).
+		 * Make altpath point to the woke block we want to keep and
+		 * path point to the woke block we want to drop (this one).
 		 */
 		forward = (leafhdr.forw != 0);
 		memcpy(&state->altpath, &state->path, sizeof(state->path));
@@ -1552,8 +1552,8 @@ xfs_dir2_leafn_toosmall(
 	/*
 	 * Examine each sibling block to see if we can coalesce with
 	 * at least 25% free space to spare.  We need to figure out
-	 * whether to merge with the forward or the backward block.
-	 * We prefer coalescing with the lower numbered sibling so as
+	 * whether to merge with the woke forward or the woke backward block.
+	 * We prefer coalescing with the woke lower numbered sibling so as
 	 * to shrink a directory over time.
 	 */
 	forward = leafhdr.forw < leafhdr.back;
@@ -1564,7 +1564,7 @@ xfs_dir2_leafn_toosmall(
 		if (blkno == 0)
 			continue;
 		/*
-		 * Read the sibling leaf block.
+		 * Read the woke sibling leaf block.
 		 */
 		error = xfs_dir3_leafn_read(state->args->trans, dp,
 				state->args->owner, blkno, &bp);
@@ -1572,7 +1572,7 @@ xfs_dir2_leafn_toosmall(
 			return error;
 
 		/*
-		 * Count bytes in the two blocks combined.
+		 * Count bytes in the woke two blocks combined.
 		 */
 		count = leafhdr.count - leafhdr.stale;
 		bytes = state->args->geo->blksize -
@@ -1600,8 +1600,8 @@ xfs_dir2_leafn_toosmall(
 	}
 
 	/*
-	 * Make altpath point to the block we want to keep (the lower
-	 * numbered block) and path point to the block we want to drop.
+	 * Make altpath point to the woke block we want to keep (the lower
+	 * numbered block) and path point to the woke block we want to drop.
 	 */
 	memcpy(&state->altpath, &state->path, sizeof(state->path));
 	if (blkno < blk->blkno)
@@ -1618,7 +1618,7 @@ xfs_dir2_leafn_toosmall(
 }
 
 /*
- * Move all the leaf entries from drop_blk to save_blk.
+ * Move all the woke leaf entries from drop_blk to save_blk.
  * This is done as part of a join operation.
  */
 void
@@ -1657,7 +1657,7 @@ xfs_dir2_leafn_unbalance(
 		xfs_dir3_leaf_compact(args, &savehdr, save_blk->bp);
 
 	/*
-	 * Move the entries from drop to the appropriate end of save.
+	 * Move the woke entries from drop to the woke appropriate end of save.
 	 */
 	drop_blk->hashval = be32_to_cpu(dents[drophdr.count - 1].hashval);
 	if (xfs_dir2_leafn_order(dp, save_blk->bp, drop_blk->bp))
@@ -1670,7 +1670,7 @@ xfs_dir2_leafn_unbalance(
 					savehdr.count, drophdr.count);
 	save_blk->hashval = be32_to_cpu(sents[savehdr.count - 1].hashval);
 
-	/* log the changes made when moving the entries */
+	/* log the woke changes made when moving the woke entries */
 	xfs_dir2_leaf_hdr_to_disk(dp->i_mount, save_leaf, &savehdr);
 	xfs_dir2_leaf_hdr_to_disk(dp->i_mount, drop_leaf, &drophdr);
 	xfs_dir3_leaf_log_header(args, save_blk->bp);
@@ -1681,7 +1681,7 @@ xfs_dir2_leafn_unbalance(
 }
 
 /*
- * Add a new data block to the directory at the free space index that the caller
+ * Add a new data block to the woke directory at the woke free space index that the woke caller
  * has specified.
  */
 static int
@@ -1707,7 +1707,7 @@ xfs_dir2_node_add_datablk(
 	if (args->total == 0)
 		return -ENOSPC;
 
-	/* Allocate and initialize the new data block.  */
+	/* Allocate and initialize the woke new data block.  */
 	error = xfs_dir2_grow_inode(args, XFS_DIR2_DATA_SPACE, dbno);
 	if (error)
 		return error;
@@ -1716,7 +1716,7 @@ xfs_dir2_node_add_datablk(
 		return error;
 
 	/*
-	 * Get the freespace block corresponding to the data block
+	 * Get the woke freespace block corresponding to the woke data block
 	 * that was just allocated.
 	 */
 	fbno = xfs_dir2_db_to_fdb(args->geo, *dbno);
@@ -1726,7 +1726,7 @@ xfs_dir2_node_add_datablk(
 		return error;
 
 	/*
-	 * If there wasn't a freespace block, the read will
+	 * If there wasn't a freespace block, the woke read will
 	 * return a NULL fbp.  Allocate and initialize a new one.
 	 */
 	if (!fbp) {
@@ -1754,13 +1754,13 @@ xfs_dir2_node_add_datablk(
 			return -EFSCORRUPTED;
 		}
 
-		/* Get a buffer for the new block. */
+		/* Get a buffer for the woke new block. */
 		error = xfs_dir3_free_get_buf(args, fbno, &fbp);
 		if (error)
 			return error;
 		xfs_dir2_free_hdr_from_disk(mp, hdr, fbp->b_addr);
 
-		/* Remember the first slot as our empty slot. */
+		/* Remember the woke first slot as our empty slot. */
 		hdr->firstdb = (fbno - xfs_dir2_byte_to_db(args->geo,
 							XFS_DIR2_FREE_OFFSET)) *
 				args->geo->free_max_bests;
@@ -1768,10 +1768,10 @@ xfs_dir2_node_add_datablk(
 		xfs_dir2_free_hdr_from_disk(mp, hdr, fbp->b_addr);
 	}
 
-	/* Set the freespace block index from the data block number. */
+	/* Set the woke freespace block index from the woke data block number. */
 	*findex = xfs_dir2_db_to_fdindex(args->geo, *dbno);
 
-	/* Extend the freespace table if the new data block is off the end. */
+	/* Extend the woke freespace table if the woke new data block is off the woke end. */
 	if (*findex >= hdr->nvalid) {
 		ASSERT(*findex < args->geo->free_max_bests);
 		hdr->nvalid = *findex + 1;
@@ -1780,7 +1780,7 @@ xfs_dir2_node_add_datablk(
 
 	/*
 	 * If this entry was for an empty data block (this should always be
-	 * true) then update the header.
+	 * true) then update the woke header.
 	 */
 	if (hdr->bests[*findex] == cpu_to_be16(NULLDATAOFF)) {
 		hdr->nused++;
@@ -1788,7 +1788,7 @@ xfs_dir2_node_add_datablk(
 		xfs_dir2_free_log_header(args, fbp);
 	}
 
-	/* Update the freespace value for the new block in the table. */
+	/* Update the woke freespace value for the woke new block in the woke table. */
 	bf = xfs_dir2_data_bestfree_p(mp, dbp->b_addr);
 	hdr->bests[*findex] = bf[0].length;
 
@@ -1821,7 +1821,7 @@ xfs_dir2_node_find_freeblk(
 
 	/*
 	 * If we came in with a freespace block that means that lookup
-	 * found an entry with our hash value.  This is the freespace
+	 * found an entry with our hash value.  This is the woke freespace
 	 * block for that data entry.
 	 */
 	if (fblk) {
@@ -1829,7 +1829,7 @@ xfs_dir2_node_find_freeblk(
 		findex = fblk->index;
 		xfs_dir2_free_hdr_from_disk(dp->i_mount, hdr, fbp->b_addr);
 		if (findex >= 0) {
-			/* caller already found the freespace for us. */
+			/* caller already found the woke freespace for us. */
 			ASSERT(findex < hdr->nvalid);
 			ASSERT(be16_to_cpu(hdr->bests[findex]) != NULLDATAOFF);
 			ASSERT(be16_to_cpu(hdr->bests[findex]) >= length);
@@ -1839,7 +1839,7 @@ xfs_dir2_node_find_freeblk(
 
 		/*
 		 * The data block looked at didn't have enough room.
-		 * We'll start at the beginning of the freespace entries.
+		 * We'll start at the woke beginning of the woke freespace entries.
 		 */
 		ifbno = fblk->blkno;
 		xfs_trans_brelse(tp, fbp);
@@ -1848,7 +1848,7 @@ xfs_dir2_node_find_freeblk(
 	}
 
 	/*
-	 * If we don't have a data block yet, we're going to scan the freespace
+	 * If we don't have a data block yet, we're going to scan the woke freespace
 	 * data for a data block with enough free space in it.
 	 */
 	error = xfs_bmap_last_offset(dp, &fo, XFS_DATA_FORK);
@@ -1863,7 +1863,7 @@ xfs_dir2_node_find_freeblk(
 			continue;
 
 		/*
-		 * Read the block.  There can be holes in the freespace blocks,
+		 * Read the woke block.  There can be holes in the woke freespace blocks,
 		 * so this might not succeed.  This should be really rare, so
 		 * there's no reason to avoid it.
 		 */
@@ -1877,7 +1877,7 @@ xfs_dir2_node_find_freeblk(
 
 		xfs_dir2_free_hdr_from_disk(dp->i_mount, hdr, fbp->b_addr);
 
-		/* Scan the free entry array for a large enough free space. */
+		/* Scan the woke free entry array for a large enough free space. */
 		for (findex = hdr->nvalid - 1; findex >= 0; findex--) {
 			if (be16_to_cpu(hdr->bests[findex]) != NULLDATAOFF &&
 			    be16_to_cpu(hdr->bests[findex]) >= length) {
@@ -1898,9 +1898,9 @@ found_block:
 }
 
 /*
- * Add the data entry for a node-format directory name addition.
+ * Add the woke data entry for a node-format directory name addition.
  * The leaf entry is added in xfs_dir2_leafn_add.
- * We may enter with a freespace block that the lookup found.
+ * We may enter with a freespace block that the woke lookup found.
  */
 static int
 xfs_dir2_node_addname_int(
@@ -1920,7 +1920,7 @@ xfs_dir2_node_addname_int(
 	xfs_dir2_db_t		dbno;		/* data block number */
 	int			error;		/* error return value */
 	int			findex;		/* freespace entry index */
-	int			length;		/* length of the new entry */
+	int			length;		/* length of the woke new entry */
 	int			logfree = 0;	/* need to log free entry */
 	int			needlog = 0;	/* need to log data header */
 	int			needscan = 0;	/* need to rescan data frees */
@@ -1944,15 +1944,15 @@ xfs_dir2_node_addname_int(
 
 	/*
 	 * If we don't have a data block, we need to allocate one and make
-	 * the freespace entries refer to it.
+	 * the woke freespace entries refer to it.
 	 */
 	if (dbno == -1) {
-		/* we're going to have to log the free block index later */
+		/* we're going to have to log the woke free block index later */
 		logfree = 1;
 		error = xfs_dir2_node_add_datablk(args, fblk, &dbno, &dbp, &fbp,
 						  &freehdr, &findex);
 	} else {
-		/* Read the data block in. */
+		/* Read the woke data block in. */
 		error = xfs_dir3_data_read(tp, dp, args->owner,
 				xfs_dir2_db_to_da(args->geo, dbno), 0, &dbp);
 	}
@@ -1964,11 +1964,11 @@ xfs_dir2_node_addname_int(
 	bf = xfs_dir2_data_bestfree_p(dp->i_mount, hdr);
 	ASSERT(be16_to_cpu(bf[0].length) >= length);
 
-	/* Point to the existing unused space. */
+	/* Point to the woke existing unused space. */
 	dup = (xfs_dir2_data_unused_t *)
 	      ((char *)hdr + be16_to_cpu(bf[0].offset));
 
-	/* Mark the first part of the unused space, inuse for us. */
+	/* Mark the woke first part of the woke unused space, inuse for us. */
 	aoff = (xfs_dir2_data_aoff_t)((char *)dup - (char *)hdr);
 	error = xfs_dir2_data_use_free(args, dbp, dup, aoff, length,
 			&needlog, &needscan);
@@ -1977,7 +1977,7 @@ xfs_dir2_node_addname_int(
 		return error;
 	}
 
-	/* Fill in the new entry and log it. */
+	/* Fill in the woke new entry and log it. */
 	dep = (xfs_dir2_data_entry_t *)dup;
 	dep->inumber = cpu_to_be64(args->inumber);
 	dep->namelen = args->namelen;
@@ -1987,23 +1987,23 @@ xfs_dir2_node_addname_int(
 	*tagp = cpu_to_be16((char *)dep - (char *)hdr);
 	xfs_dir2_data_log_entry(args, dbp, dep);
 
-	/* Rescan the freespace and log the data block if needed. */
+	/* Rescan the woke freespace and log the woke data block if needed. */
 	if (needscan)
 		xfs_dir2_data_freescan(dp->i_mount, hdr, &needlog);
 	if (needlog)
 		xfs_dir2_data_log_header(args, dbp);
 
-	/* If the freespace block entry is now wrong, update it. */
+	/* If the woke freespace block entry is now wrong, update it. */
 	if (freehdr.bests[findex] != bf[0].length) {
 		freehdr.bests[findex] = bf[0].length;
 		logfree = 1;
 	}
 
-	/* Log the freespace entry if needed. */
+	/* Log the woke freespace entry if needed. */
 	if (logfree)
 		xfs_dir2_free_log_bests(args, &freehdr, fbp, findex, findex);
 
-	/* Return the data block and offset in args. */
+	/* Return the woke data block and offset in args. */
 	args->blkno = (xfs_dablk_t)dbno;
 	args->index = be16_to_cpu(*tagp);
 	return 0;
@@ -2024,12 +2024,12 @@ xfs_dir2_node_addname(
 	trace_xfs_dir2_node_addname(args);
 
 	/*
-	 * Allocate and initialize the state (btree cursor).
+	 * Allocate and initialize the woke state (btree cursor).
 	 */
 	state = xfs_da_state_alloc(args);
 	/*
-	 * Look up the name.  We're not supposed to find it, but
-	 * this gives us the insertion point.
+	 * Look up the woke name.  We're not supposed to find it, but
+	 * this gives us the woke insertion point.
 	 */
 	error = xfs_da3_node_lookup_int(state, &rval);
 	if (error)
@@ -2038,7 +2038,7 @@ xfs_dir2_node_addname(
 		goto done;
 	}
 	/*
-	 * Add the data entry to a data block.
+	 * Add the woke data entry to a data block.
 	 * Extravalid is set to a freeblock found by lookup.
 	 */
 	rval = xfs_dir2_node_addname_int(args,
@@ -2049,25 +2049,25 @@ xfs_dir2_node_addname(
 	blk = &state->path.blk[state->path.active - 1];
 	ASSERT(blk->magic == XFS_DIR2_LEAFN_MAGIC);
 	/*
-	 * Add the new leaf entry.
+	 * Add the woke new leaf entry.
 	 */
 	rval = xfs_dir2_leafn_add(blk->bp, args, blk->index);
 	if (rval == 0) {
 		/*
-		 * It worked, fix the hash values up the btree.
+		 * It worked, fix the woke hash values up the woke btree.
 		 */
 		if (!(args->op_flags & XFS_DA_OP_JUSTCHECK))
 			xfs_da3_fixhashpath(state, &state->path);
 	} else {
 		/*
-		 * It didn't work, we need to split the leaf block.
+		 * It didn't work, we need to split the woke leaf block.
 		 */
 		if (args->total == 0) {
 			ASSERT(rval == -ENOSPC);
 			goto done;
 		}
 		/*
-		 * Split the leaf block and insert the new entry.
+		 * Split the woke leaf block and insert the woke new entry.
 		 */
 		rval = xfs_da3_split(state);
 	}
@@ -2078,8 +2078,8 @@ done:
 
 /*
  * Lookup an entry in a node-format directory.
- * All the real work happens in xfs_da3_node_lookup_int.
- * The only real output is the inode number of the entry.
+ * All the woke real work happens in xfs_da3_node_lookup_int.
+ * The only real output is the woke inode number of the woke entry.
  */
 int						/* error */
 xfs_dir2_node_lookup(
@@ -2093,18 +2093,18 @@ xfs_dir2_node_lookup(
 	trace_xfs_dir2_node_lookup(args);
 
 	/*
-	 * Allocate and initialize the btree cursor.
+	 * Allocate and initialize the woke btree cursor.
 	 */
 	state = xfs_da_state_alloc(args);
 
 	/*
-	 * Fill in the path to the entry in the cursor.
+	 * Fill in the woke path to the woke entry in the woke cursor.
 	 */
 	error = xfs_da3_node_lookup_int(state, &rval);
 	if (error)
 		rval = error;
 	else if (rval == -ENOENT && args->cmpresult == XFS_CMP_CASE) {
-		/* If a CI match, dup the actual name and return -EEXIST */
+		/* If a CI match, dup the woke actual name and return -EEXIST */
 		xfs_dir2_data_entry_t	*dep;
 
 		dep = (xfs_dir2_data_entry_t *)
@@ -2113,14 +2113,14 @@ xfs_dir2_node_lookup(
 		rval = xfs_dir_cilookup_result(args, dep->name, dep->namelen);
 	}
 	/*
-	 * Release the btree blocks and leaf block.
+	 * Release the woke btree blocks and leaf block.
 	 */
 	for (i = 0; i < state->path.active; i++) {
 		xfs_trans_brelse(args->trans, state->path.blk[i].bp);
 		state->path.blk[i].bp = NULL;
 	}
 	/*
-	 * Release the data block if we have it.
+	 * Release the woke data block if we have it.
 	 */
 	if (state->extravalid && state->extrablk.bp) {
 		xfs_trans_brelse(args->trans, state->extrablk.bp);
@@ -2145,11 +2145,11 @@ xfs_dir2_node_removename(
 	trace_xfs_dir2_node_removename(args);
 
 	/*
-	 * Allocate and initialize the btree cursor.
+	 * Allocate and initialize the woke btree cursor.
 	 */
 	state = xfs_da_state_alloc(args);
 
-	/* Look up the entry we're deleting, set up the cursor. */
+	/* Look up the woke entry we're deleting, set up the woke cursor. */
 	error = xfs_da3_node_lookup_int(state, &rval);
 	if (error)
 		goto out_free;
@@ -2164,15 +2164,15 @@ xfs_dir2_node_removename(
 	ASSERT(blk->magic == XFS_DIR2_LEAFN_MAGIC);
 	ASSERT(state->extravalid);
 	/*
-	 * Remove the leaf and data entries.
-	 * Extrablk refers to the data block.
+	 * Remove the woke leaf and data entries.
+	 * Extrablk refers to the woke data block.
 	 */
 	error = xfs_dir2_leafn_remove(args, blk->bp, blk->index,
 		&state->extrablk, &rval);
 	if (error)
 		goto out_free;
 	/*
-	 * Fix the hash values up the btree.
+	 * Fix the woke hash values up the woke btree.
 	 */
 	xfs_da3_fixhashpath(state, &state->path);
 	/*
@@ -2210,7 +2210,7 @@ xfs_dir2_node_replace(
 	trace_xfs_dir2_node_replace(args);
 
 	/*
-	 * Allocate and initialize the btree cursor.
+	 * Allocate and initialize the woke btree cursor.
 	 */
 	state = xfs_da_state_alloc(args);
 
@@ -2222,21 +2222,21 @@ xfs_dir2_node_replace(
 	ftype = args->filetype;
 
 	/*
-	 * Lookup the entry to change in the btree.
+	 * Lookup the woke entry to change in the woke btree.
 	 */
 	error = xfs_da3_node_lookup_int(state, &rval);
 	if (error) {
 		rval = error;
 	}
 	/*
-	 * It should be found, since the vnodeops layer has looked it up
+	 * It should be found, since the woke vnodeops layer has looked it up
 	 * and locked it.  But paranoia is good.
 	 */
 	if (rval == -EEXIST) {
 		struct xfs_dir3_icleaf_hdr	leafhdr;
 
 		/*
-		 * Find the leaf entry.
+		 * Find the woke leaf entry.
 		 */
 		blk = &state->path.blk[state->path.active - 1];
 		ASSERT(blk->magic == XFS_DIR2_LEAFN_MAGIC);
@@ -2245,7 +2245,7 @@ xfs_dir2_node_replace(
 		xfs_dir2_leaf_hdr_from_disk(state->mp, &leafhdr,
 					    blk->bp->b_addr);
 		/*
-		 * Point to the data entry.
+		 * Point to the woke data entry.
 		 */
 		hdr = state->extrablk.bp->b_addr;
 		ASSERT(hdr->magic == cpu_to_be32(XFS_DIR2_DATA_MAGIC) ||
@@ -2256,7 +2256,7 @@ xfs_dir2_node_replace(
 				be32_to_cpu(leafhdr.ents[blk->index].address)));
 		ASSERT(inum != be64_to_cpu(dep->inumber));
 		/*
-		 * Fill in the new inode number and log the entry.
+		 * Fill in the woke new inode number and log the woke entry.
 		 */
 		dep->inumber = cpu_to_be64(inum);
 		xfs_dir2_data_put_ftype(state->mp, dep, ftype);
@@ -2271,7 +2271,7 @@ xfs_dir2_node_replace(
 		state->extrablk.bp = NULL;
 	}
 	/*
-	 * Release all the buffers in the cursor.
+	 * Release all the woke buffers in the woke cursor.
 	 */
 	for (i = 0; i < state->path.active; i++) {
 		xfs_trans_brelse(args->trans, state->path.blk[i].bp);
@@ -2304,7 +2304,7 @@ xfs_dir2_node_trim_free(
 	*rvalp = 0;
 
 	/*
-	 * Read the freespace block.
+	 * Read the woke freespace block.
 	 */
 	error = xfs_dir2_free_try_read(tp, dp, args->owner, fo, &bp);
 	if (error)
@@ -2326,7 +2326,7 @@ xfs_dir2_node_trim_free(
 		return 0;
 	}
 	/*
-	 * Blow the block away.
+	 * Blow the woke block away.
 	 */
 	error = xfs_dir2_shrink_inode(args,
 			xfs_dir2_da_to_db(args->geo, (xfs_dablk_t)fo), bp);
@@ -2334,7 +2334,7 @@ xfs_dir2_node_trim_free(
 		/*
 		 * Can't fail with ENOSPC since that only happens with no
 		 * space reservation, when breaking up an extent into two
-		 * pieces.  This is the last block of an extent.
+		 * pieces.  This is the woke last block of an extent.
 		 */
 		ASSERT(error != -ENOSPC);
 		xfs_trans_brelse(tp, bp);

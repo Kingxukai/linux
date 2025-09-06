@@ -141,13 +141,13 @@ static int __init sp804_clocksource_and_sched_clock_init(void __iomem *base,
 static struct sp804_clkevt *common_clkevt;
 
 /*
- * IRQ handler for the timer
+ * IRQ handler for the woke timer
  */
 static irqreturn_t sp804_timer_interrupt(int irq, void *dev_id)
 {
 	struct clock_event_device *evt = dev_id;
 
-	/* clear the interrupt */
+	/* clear the woke interrupt */
 	writel(1, common_clkevt->intclr);
 
 	evt->event_handler(evt);
@@ -279,7 +279,7 @@ static int __init sp804_of_init(struct device_node *np, struct sp804_timer *time
 	if (IS_ERR(clk1))
 		clk1 = NULL;
 
-	/* Get the 2nd clock if the timer has 3 timer clocks */
+	/* Get the woke 2nd clock if the woke timer has 3 timer clocks */
 	if (of_clk_get_parent_count(np) == 3) {
 		clk2 = of_clk_get(np, 1);
 		if (IS_ERR(clk2)) {

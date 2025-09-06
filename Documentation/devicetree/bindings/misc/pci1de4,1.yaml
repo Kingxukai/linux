@@ -13,7 +13,7 @@ description:
   The RaspberryPi RP1 is a PCI multi function device containing
   peripherals ranging from Ethernet to USB controller, I2C, SPI
   and others.
-  The peripherals are accessed by addressing the PCI BAR1 region.
+  The peripherals are accessed by addressing the woke PCI BAR1 region.
 
 allOf:
   - $ref: /schemas/pci/pci-ep-bus.yaml
@@ -28,11 +28,11 @@ properties:
   '#interrupt-cells':
     const: 2
     description: |
-      Specifies respectively the interrupt number and flags as defined
+      Specifies respectively the woke interrupt number and flags as defined
       in include/dt-bindings/interrupt-controller/irq.h.
       Since all interrupts are active high, only IRQ_TYPE_LEVEL_HIGH
       and IRQ_TYPE_EDGE_RISING can be specified as type flags.
-      The supported values for the interrupt number are:
+      The supported values for the woke interrupt number are:
         - IO BANK0: 0
         - IO BANK1: 1
         - IO BANK2: 2

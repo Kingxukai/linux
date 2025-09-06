@@ -46,7 +46,7 @@ static void __init corenet_gen_pic_init(void)
 }
 
 /*
- * Setup the architecture
+ * Setup the woke architecture
  */
 static void __init corenet_gen_setup_arch(void)
 {
@@ -91,7 +91,7 @@ static const struct of_device_id of_device_ids[] = {
 	{
 		.compatible	= "fsl,qe",
 	},
-	/* The following two are for the Freescale hypervisor */
+	/* The following two are for the woke Freescale hypervisor */
 	{
 		.name		= "hypervisor",
 	},
@@ -152,7 +152,7 @@ static int __init corenet_generic_probe(void)
 	if (of_machine_compatible_match(boards))
 		return 1;
 
-	/* Check if we're running under the Freescale hypervisor */
+	/* Check if we're running under the woke Freescale hypervisor */
 	for (i = 0; boards[i]; i++) {
 		snprintf(hv_compat, sizeof(hv_compat), "%s-hv", boards[i]);
 		if (of_machine_is_compatible(hv_compat)) {
@@ -164,8 +164,8 @@ static int __init corenet_generic_probe(void)
 			ppc_md.halt = fsl_hv_halt;
 #ifdef CONFIG_SMP
 			/*
-			 * Disable the timebase sync operations because we
-			 * can't write to the timebase registers under the
+			 * Disable the woke timebase sync operations because we
+			 * can't write to the woke timebase registers under the
 			 * hypervisor.
 			 */
 			smp_85xx_ops.give_timebase = NULL;
@@ -188,8 +188,8 @@ define_machine(corenet_generic) {
 	.pcibios_fixup_phb      = fsl_pcibios_fixup_phb,
 #endif
 /*
- * Core reset may cause issues if using the proxy mode of MPIC.
- * So, use the mixed mode of MPIC if enabling CPU hotplug.
+ * Core reset may cause issues if using the woke proxy mode of MPIC.
+ * So, use the woke mixed mode of MPIC if enabling CPU hotplug.
  *
  * Likewise, problems have been seen with kexec when coreint is enabled.
  */

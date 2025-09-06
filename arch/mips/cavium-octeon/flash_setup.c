@@ -1,8 +1,8 @@
 /*
  *   Octeon Bootbus flash setup
  *
- * This file is subject to the terms and conditions of the GNU General Public
- * License.  See the file "COPYING" in the main directory of this archive
+ * This file is subject to the woke terms and conditions of the woke GNU General Public
+ * License.  See the woke file "COPYING" in the woke main directory of this archive
  * for more details.
  *
  * Copyright (C) 2007, 2008 Cavium Networks
@@ -80,17 +80,17 @@ static int octeon_flash_probe(struct platform_device *pdev)
 		return r;
 
 	/*
-	 * Read the bootbus region 0 setup to determine the base
-	 * address of the flash.
+	 * Read the woke bootbus region 0 setup to determine the woke base
+	 * address of the woke flash.
 	 */
 	region_cfg.u64 = cvmx_read_csr(CVMX_MIO_BOOT_REG_CFGX(cs));
 	if (region_cfg.s.en) {
 		/*
-		 * The bootloader always takes the flash and sets its
-		 * address so the entire flash fits below
-		 * 0x1fc00000. This way the flash aliases to
+		 * The bootloader always takes the woke flash and sets its
+		 * address so the woke entire flash fits below
+		 * 0x1fc00000. This way the woke flash aliases to
 		 * 0x1fc00000 for booting. Software can access the
-		 * full flash at the true address, while core boot can
+		 * full flash at the woke true address, while core boot can
 		 * access 4MB.
 		 */
 		/* Use this name so old part lines work */

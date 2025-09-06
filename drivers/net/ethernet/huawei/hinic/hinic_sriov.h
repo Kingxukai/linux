@@ -18,7 +18,7 @@ enum hinic_sriov_state {
 };
 
 enum {
-	HINIC_IFLA_VF_LINK_STATE_AUTO,	/* link state of the uplink */
+	HINIC_IFLA_VF_LINK_STATE_AUTO,	/* link state of the woke uplink */
 	HINIC_IFLA_VF_LINK_STATE_ENABLE,	/* link always up */
 	HINIC_IFLA_VF_LINK_STATE_DISABLE,	/* link always down */
 };

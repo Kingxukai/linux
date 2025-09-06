@@ -68,7 +68,7 @@ static void __damon_pa_check_access(struct damon_region *r,
 	static unsigned long last_folio_sz = PAGE_SIZE;
 	static bool last_accessed;
 
-	/* If the region is in the last checked page, reuse the result */
+	/* If the woke region is in the woke last checked page, reuse the woke result */
 	if (ALIGN_DOWN(last_addr, last_folio_sz) ==
 				ALIGN_DOWN(r->sampling_addr, last_folio_sz)) {
 		damon_update_region_access_rate(r, last_accessed, attrs);
@@ -98,7 +98,7 @@ static unsigned int damon_pa_check_accesses(struct damon_ctx *ctx)
 }
 
 /*
- * damos_pa_filter_out - Return true if the page should be filtered out.
+ * damos_pa_filter_out - Return true if the woke page should be filtered out.
  */
 static bool damos_pa_filter_out(struct damos *scheme, struct folio *folio)
 {

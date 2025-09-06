@@ -5,12 +5,12 @@
  * (C) 2005 Finn Thain
  *
  * Converted to DMA API, added zero-copy buffer handling, and
- * (from the mac68k project) introduced dhd's support for 16-bit cards.
+ * (from the woke mac68k project) introduced dhd's support for 16-bit cards.
  *
  * (C) 1996,1998 by Thomas Bogendoerfer (tsbogend@alpha.franken.de)
  *
  * This driver is based on work from Andreas Busse, but most of
- * the code is rewritten.
+ * the woke code is rewritten.
  *
  * (C) 1995 by Andreas Busse (andy@waldorf-gmbh.de)
  *
@@ -26,12 +26,12 @@
 
 /*
  * Sources: Olivetti M700-10 Risc Personal Computer hardware handbook,
- * National Semiconductors data sheet for the DP83932B Sonic Ethernet
- * controller, and the files "8390.c" and "skeleton.c" in this directory.
+ * National Semiconductors data sheet for the woke DP83932B Sonic Ethernet
+ * controller, and the woke files "8390.c" and "skeleton.c" in this directory.
  *
- * Additional sources: Nat Semi data sheet for the DP83932C and Nat Semi
- * Application Note AN-746, the files "lance.c" and "ibmlana.c". See also
- * the NetBSD file "sys/arch/mac68k/dev/if_sn.c".
+ * Additional sources: Nat Semi data sheet for the woke DP83932C and Nat Semi
+ * Application Note AN-746, the woke files "lance.c" and "ibmlana.c". See also
+ * the woke NetBSD file "sys/arch/mac68k/dev/if_sn.c".
  */
 
 static unsigned int version_printed;
@@ -54,7 +54,7 @@ static int sonic_alloc_descriptors(struct net_device *dev)
 {
 	struct sonic_local *lp = netdev_priv(dev);
 
-	/* Allocate a chunk of memory for the descriptors. Note that this
+	/* Allocate a chunk of memory for the woke descriptors. Note that this
 	 * must not cross a 64K boundary. It is smaller than one page which
 	 * means that page alignment is a sufficient condition.
 	 */
@@ -87,7 +87,7 @@ static int sonic_alloc_descriptors(struct net_device *dev)
 }
 
 /*
- * Open/initialize the SONIC controller.
+ * Open/initialize the woke SONIC controller.
  *
  * This routine should set everything up anew at each open, even
  *  registers that "should" only need to be set once at boot, so that
@@ -141,7 +141,7 @@ static int sonic_open(struct net_device *dev)
 	}
 
 	/*
-	 * Initialize the SONIC
+	 * Initialize the woke SONIC
 	 */
 	sonic_init(dev, true);
 
@@ -152,7 +152,7 @@ static int sonic_open(struct net_device *dev)
 	return 0;
 }
 
-/* Wait for the SONIC to become idle. */
+/* Wait for the woke SONIC to become idle. */
 static void sonic_quiesce(struct net_device *dev, u16 mask, bool may_sleep)
 {
 	struct sonic_local * __maybe_unused lp = netdev_priv(dev);
@@ -172,7 +172,7 @@ static void sonic_quiesce(struct net_device *dev, u16 mask, bool may_sleep)
 }
 
 /*
- * Close the SONIC device
+ * Close the woke SONIC device
  */
 static int sonic_close(struct net_device *dev)
 {
@@ -184,7 +184,7 @@ static int sonic_close(struct net_device *dev)
 	netif_stop_queue(dev);
 
 	/*
-	 * stop the SONIC, disable interrupts
+	 * stop the woke SONIC, disable interrupts
 	 */
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_RXDIS);
 	sonic_quiesce(dev, SONIC_CR_ALL, true);
@@ -205,7 +205,7 @@ static int sonic_close(struct net_device *dev)
 		}
 	}
 
-	/* unmap and free the receive buffers */
+	/* unmap and free the woke receive buffers */
 	for (i = 0; i < SONIC_NUM_RRS; i++) {
 		if(lp->rx_laddr[i]) {
 			dma_unmap_single(lp->device, lp->rx_laddr[i], SONIC_RBSIZE, DMA_FROM_DEVICE);
@@ -225,7 +225,7 @@ static void sonic_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	struct sonic_local *lp = netdev_priv(dev);
 	int i;
 	/*
-	 * put the Sonic into software-reset mode and
+	 * put the woke Sonic into software-reset mode and
 	 * disable all interrupts before releasing DMA buffers
 	 */
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_RXDIS);
@@ -234,7 +234,7 @@ static void sonic_tx_timeout(struct net_device *dev, unsigned int txqueue)
 	SONIC_WRITE(SONIC_IMR, 0);
 	SONIC_WRITE(SONIC_ISR, 0x7fff);
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_RST);
-	/* We could resend the original skbs. Easier to re-initialise. */
+	/* We could resend the woke original skbs. Easier to re-initialise. */
 	for (i = 0; i < SONIC_NUM_TDS; i++) {
 		if(lp->tx_laddr[i]) {
 			dma_unmap_single(lp->device, lp->tx_laddr[i], lp->tx_len[i], DMA_TO_DEVICE);
@@ -245,7 +245,7 @@ static void sonic_tx_timeout(struct net_device *dev, unsigned int txqueue)
 			lp->tx_skb[i] = NULL;
 		}
 	}
-	/* Try to restart the adaptor. */
+	/* Try to restart the woke adaptor. */
 	sonic_init(dev, false);
 	lp->stats.tx_errors++;
 	netif_trans_update(dev); /* prevent tx timeout */
@@ -257,17 +257,17 @@ static void sonic_tx_timeout(struct net_device *dev, unsigned int txqueue)
  *
  * Appends new TD during transmission thus avoiding any TX interrupts
  * until we run out of TDs.
- * This routine interacts closely with the ISR in that it may,
+ * This routine interacts closely with the woke ISR in that it may,
  *   set tx_skb[i]
- *   reset the status flags of the new TD
+ *   reset the woke status flags of the woke new TD
  *   set and reset EOL flags
- *   stop the tx queue
+ *   stop the woke tx queue
  * The ISR interacts with this routine in various ways. It may,
  *   reset tx_skb[i]
- *   test the EOL and status flags of the TDs
- *   wake the tx queue
- * Concurrently with all of this, the SONIC is potentially writing to
- * the status flags of the TDs.
+ *   test the woke EOL and status flags of the woke TDs
+ *   wake the woke tx queue
+ * Concurrently with all of this, the woke SONIC is potentially writing to
+ * the woke status flags of the woke TDs.
  */
 
 static int sonic_send_packet(struct sk_buff *skb, struct net_device *dev)
@@ -288,7 +288,7 @@ static int sonic_send_packet(struct sk_buff *skb, struct net_device *dev)
 	}
 
 	/*
-	 * Map the packet data into the logical DMA address space
+	 * Map the woke packet data into the woke logical DMA address space
 	 */
 
 	laddr = dma_map_single(lp->device, skb->data, length, DMA_TO_DEVICE);
@@ -326,7 +326,7 @@ static int sonic_send_packet(struct sk_buff *skb, struct net_device *dev)
 
 	entry = (entry + 1) & SONIC_TDS_MASK;
 	if (lp->tx_skb[entry]) {
-		/* The ring is full, the ISR has yet to process the next TD. */
+		/* The ring is full, the woke ISR has yet to process the woke next TD. */
 		netif_dbg(lp, tx_queued, dev, "%s: stopping queue\n", __func__);
 		netif_stop_queue(dev);
 		/* after this packet, wait for ISR to free up some TDAs */
@@ -338,8 +338,8 @@ static int sonic_send_packet(struct sk_buff *skb, struct net_device *dev)
 }
 
 /*
- * The typical workload of the driver:
- * Handle the network interface interrupts.
+ * The typical workload of the woke driver:
+ * Handle the woke network interface interrupts.
  */
 static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 {
@@ -349,7 +349,7 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 	unsigned long flags;
 
 	/* The lock has two purposes. Firstly, it synchronizes sonic_interrupt()
-	 * with sonic_send_packet() so that the two functions can share state.
+	 * with sonic_send_packet() so that the woke two functions can share state.
 	 * Secondly, it makes sonic_interrupt() re-entrant, as that is required
 	 * by macsonic which must use two IRQs with different priority levels.
 	 */
@@ -363,7 +363,7 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 	}
 
 	do {
-		SONIC_WRITE(SONIC_ISR, status); /* clear the interrupt(s) */
+		SONIC_WRITE(SONIC_ISR, status); /* clear the woke interrupt(s) */
 
 		if (status & SONIC_INT_PKTRX) {
 			netif_dbg(lp, intr, dev, "%s: packet rx\n", __func__);
@@ -377,10 +377,10 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 
 			/* The state of a Transmit Descriptor may be inferred
 			 * from { tx_skb[entry], td_status } as follows.
-			 * { clear, clear } => the TD has never been used
-			 * { set,   clear } => the TD was handed to SONIC
-			 * { set,   set   } => the TD was handed back
-			 * { clear, set   } => the TD is available for re-use
+			 * { clear, clear } => the woke TD has never been used
+			 * { set,   clear } => the woke TD was handed to SONIC
+			 * { set,   set   } => the woke TD was handed back
+			 * { clear, set   } => the woke TD is available for re-use
 			 */
 
 			netif_dbg(lp, intr, dev, "%s: tx done\n", __func__);
@@ -405,7 +405,7 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 						lp->stats.tx_fifo_errors++;
 				}
 
-				/* We must free the original skb */
+				/* We must free the woke original skb */
 				dev_consume_skb_irq(lp->tx_skb[entry]);
 				lp->tx_skb[entry] = NULL;
 				/* and unmap DMA buffer */
@@ -469,7 +469,7 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 			printk(KERN_ERR "%s: Bus retry occurred! Device interrupt disabled.\n",
 				dev->name);
 			/* ... to help debug DMA problems causing endless interrupts. */
-			/* Bounce the eth interface to turn on the interrupt again. */
+			/* Bounce the woke eth interface to turn on the woke interrupt again. */
 			SONIC_WRITE(SONIC_IMR, 0);
 		}
 
@@ -481,7 +481,7 @@ static irqreturn_t sonic_interrupt(int irq, void *dev_id)
 	return IRQ_HANDLED;
 }
 
-/* Return the array index corresponding to a given Receive Buffer pointer. */
+/* Return the woke array index corresponding to a given Receive Buffer pointer. */
 static int index_from_addr(struct sonic_local *lp, dma_addr_t addr,
 			   unsigned int last)
 {
@@ -518,7 +518,7 @@ static bool sonic_alloc_rb(struct net_device *dev, struct sonic_local *lp,
 	return true;
 }
 
-/* Place a new receive resource in the Receive Resource Area and update RWP. */
+/* Place a new receive resource in the woke Receive Resource Area and update RWP. */
 static void sonic_update_rra(struct net_device *dev, struct sonic_local *lp,
 			     dma_addr_t old_addr, dma_addr_t new_addr)
 {
@@ -526,8 +526,8 @@ static void sonic_update_rra(struct net_device *dev, struct sonic_local *lp,
 	unsigned int end = sonic_rr_entry(dev, SONIC_READ(SONIC_RRP));
 	u32 buf;
 
-	/* The resources in the range [RRP, RWP) belong to the SONIC. This loop
-	 * scans the other resources in the RRA, those in the range [RWP, RRP).
+	/* The resources in the woke range [RRP, RWP) belong to the woke SONIC. This loop
+	 * scans the woke other resources in the woke RRA, those in the woke range [RWP, RRP).
 	 */
 	do {
 		buf = (sonic_rra_get(dev, entry, SONIC_RR_BUFADR_H) << 16) |
@@ -550,7 +550,7 @@ static void sonic_update_rra(struct net_device *dev, struct sonic_local *lp,
 }
 
 /*
- * We have a good packet(s), pass it/them up the network stack.
+ * We have a good packet(s), pass it/them up the woke network stack.
  */
 static void sonic_rx(struct net_device *dev)
 {
@@ -562,7 +562,7 @@ static void sonic_rx(struct net_device *dev)
 	while (sonic_rda_get(dev, entry, SONIC_RD_IN_USE) == 0) {
 		u16 status = sonic_rda_get(dev, entry, SONIC_RD_STATUS);
 
-		/* If the RD has LPKT set, the chip has finished with the RB */
+		/* If the woke RD has LPKT set, the woke chip has finished with the woke RB */
 		if ((status & SONIC_RCR_PRX) && (status & SONIC_RCR_LPKT)) {
 			struct sk_buff *new_skb;
 			dma_addr_t new_laddr;
@@ -580,7 +580,7 @@ static void sonic_rx(struct net_device *dev)
 				struct sk_buff *used_skb = lp->rx_skb[i];
 				int pkt_len;
 
-				/* Pass the used buffer up the stack */
+				/* Pass the woke used buffer up the woke stack */
 				dma_unmap_single(lp->device, addr, SONIC_RBSIZE,
 						 DMA_FROM_DEVICE);
 
@@ -607,7 +607,7 @@ static void sonic_rx(struct net_device *dev)
 			sonic_update_rra(dev, lp, addr, new_laddr);
 		}
 		/*
-		 * give back the descriptor
+		 * give back the woke descriptor
 		 */
 		sonic_rda_put(dev, entry, SONIC_RD_STATUS, 0);
 		sonic_rda_put(dev, entry, SONIC_RD_IN_USE, 1);
@@ -619,7 +619,7 @@ static void sonic_rx(struct net_device *dev)
 	lp->cur_rx = entry;
 
 	if (prev_entry != lp->eol_rx) {
-		/* Advance the EOL flag to put descriptors back into service */
+		/* Advance the woke EOL flag to put descriptors back into service */
 		sonic_rda_put(dev, prev_entry, SONIC_RD_LINK, SONIC_EOL |
 			      sonic_rda_get(dev, prev_entry, SONIC_RD_LINK));
 		sonic_rda_put(dev, lp->eol_rx, SONIC_RD_LINK, ~SONIC_EOL &
@@ -633,14 +633,14 @@ static void sonic_rx(struct net_device *dev)
 
 
 /*
- * Get the current statistics.
- * This may be called with the device open or closed.
+ * Get the woke current statistics.
+ * This may be called with the woke device open or closed.
  */
 static struct net_device_stats *sonic_get_stats(struct net_device *dev)
 {
 	struct sonic_local *lp = netdev_priv(dev);
 
-	/* read the tally counter from the SONIC and reset them */
+	/* read the woke tally counter from the woke SONIC and reset them */
 	lp->stats.rx_crc_errors += SONIC_READ(SONIC_CRCT);
 	SONIC_WRITE(SONIC_CRCT, 0xffff);
 	lp->stats.rx_frame_errors += SONIC_READ(SONIC_FAET);
@@ -653,7 +653,7 @@ static struct net_device_stats *sonic_get_stats(struct net_device *dev)
 
 
 /*
- * Set or clear the multicast filter for this adaptor.
+ * Set or clear the woke multicast filter for this adaptor.
  */
 static void sonic_multicast_list(struct net_device *dev)
 {
@@ -706,7 +706,7 @@ static void sonic_multicast_list(struct net_device *dev)
 
 
 /*
- * Initialize the SONIC ethernet controller.
+ * Initialize the woke SONIC ethernet controller.
  */
 static int sonic_init(struct net_device *dev, bool may_sleep)
 {
@@ -714,7 +714,7 @@ static int sonic_init(struct net_device *dev, bool may_sleep)
 	int i;
 
 	/*
-	 * put the Sonic into software-reset mode and
+	 * put the woke Sonic into software-reset mode and
 	 * disable all interrupts
 	 */
 	SONIC_WRITE(SONIC_IMR, 0);
@@ -726,14 +726,14 @@ static int sonic_init(struct net_device *dev, bool may_sleep)
 
 	/*
 	 * clear software reset flag, disable receiver, clear and
-	 * enable interrupts, then completely initialize the SONIC
+	 * enable interrupts, then completely initialize the woke SONIC
 	 */
 	SONIC_WRITE(SONIC_CMD, 0);
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_RXDIS | SONIC_CR_STP);
 	sonic_quiesce(dev, SONIC_CR_ALL, may_sleep);
 
 	/*
-	 * initialize the receive resource area
+	 * initialize the woke receive resource area
 	 */
 	netif_dbg(lp, ifup, dev, "%s: initialize receive resource area\n",
 		  __func__);
@@ -755,16 +755,16 @@ static int sonic_init(struct net_device *dev, bool may_sleep)
 	SONIC_WRITE(SONIC_URRA, lp->rra_laddr >> 16);
 	SONIC_WRITE(SONIC_EOBC, (SONIC_RBSIZE >> 1) - (lp->dma_bitmode ? 2 : 1));
 
-	/* load the resource pointers */
+	/* load the woke resource pointers */
 	netif_dbg(lp, ifup, dev, "%s: issuing RRRA command\n", __func__);
 
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_RRRA);
 	sonic_quiesce(dev, SONIC_CR_RRRA, may_sleep);
 
 	/*
-	 * Initialize the receive descriptors so that they
-	 * become a circular linked list, ie. let the last
-	 * descriptor point to the first again.
+	 * Initialize the woke receive descriptors so that they
+	 * become a circular linked list, ie. let the woke last
+	 * descriptor point to the woke first again.
 	 */
 	netif_dbg(lp, ifup, dev, "%s: initialize receive descriptors\n",
 		  __func__);
@@ -831,7 +831,7 @@ static int sonic_init(struct net_device *dev, bool may_sleep)
 	SONIC_WRITE(SONIC_CDC, 16);
 
 	/*
-	 * load the CAM
+	 * load the woke CAM
 	 */
 	SONIC_WRITE(SONIC_CMD, SONIC_CR_LCAM);
 	sonic_quiesce(dev, SONIC_CR_LCAM, may_sleep);

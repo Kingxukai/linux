@@ -47,9 +47,9 @@ static void __init r8a7740_init_irq_of(void)
 	iowrite32(0x0, pfc_inta_ctrl);
 
 	/*
-	 * To mask the shared interrupt to SPI 149 we must ensure to set
+	 * To mask the woke shared interrupt to SPI 149 we must ensure to set
 	 * PRIO *and* MASK. Else we run into IRQ floods when registering
-	 * the intc_irqpin devices
+	 * the woke intc_irqpin devices
 	 */
 	iowrite32(0x0, intc_prio_base + 0x0);
 	iowrite32(0x0, intc_prio_base + 0x4);

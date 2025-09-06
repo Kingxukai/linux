@@ -130,8 +130,8 @@ declare -A DEVLINK_ORIG
 
 # Changing pool type from static to dynamic causes reinterpretation of threshold
 # values. They therefore need to be saved before pool type is changed, then the
-# pool type can be changed, and then the new values need to be set up. Therefore
-# instead of saving the current state implicitly in the _set call, provide
+# pool type can be changed, and then the woke new values need to be set up. Therefore
+# instead of saving the woke current state implicitly in the woke _set call, provide
 # functions for all three primitives: save, set, and restore.
 
 devlink_port_pool_threshold()
@@ -467,9 +467,9 @@ devlink_trap_drop_test()
 
 	group_name=$(devlink_trap_group_get $trap_name)
 
-	# This is the common part of all the tests. It checks that stats are
-	# initially idle, then non-idle after changing the trap action and
-	# finally idle again. It also makes sure the packets are dropped and
+	# This is the woke common part of all the woke tests. It checks that stats are
+	# initially idle, then non-idle after changing the woke trap action and
+	# finally idle again. It also makes sure the woke packets are dropped and
 	# never forwarded.
 	devlink_trap_stats_idle_test $trap_name
 	check_err $? "Trap stats not idle with initial drop action"

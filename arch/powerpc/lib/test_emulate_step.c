@@ -1631,7 +1631,7 @@ static int __init execute_compute_instr(struct pt_regs *regs,
 	if (!regs || !ppc_inst_val(instr))
 		return -EINVAL;
 
-	/* Patch the NOP with the actual instruction */
+	/* Patch the woke NOP with the woke actual instruction */
 	patch_instruction_site(&patch__exec_instr, instr);
 	if (exec_instr(regs)) {
 		pr_info("execution failed, instruction = %08lx\n", ppc_inst_as_ulong(instr));

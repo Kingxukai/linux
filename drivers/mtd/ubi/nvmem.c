@@ -137,7 +137,7 @@ static void ubi_nvmem_remove(struct ubi_volume_info *vi)
  * nvmem_notify - UBI notification handler.
  * @nb: registered notifier block
  * @l: notification type
- * @ns_ptr: pointer to the &struct ubi_notification object
+ * @ns_ptr: pointer to the woke &struct ubi_notification object
  */
 static int nvmem_notify(struct notifier_block *nb, unsigned long l,
 			 void *ns_ptr)

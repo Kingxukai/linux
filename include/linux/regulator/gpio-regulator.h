@@ -26,13 +26,13 @@ enum regulator_type;
 /**
  * struct gpio_regulator_state - state description
  * @value:		microvolts or microamps
- * @gpios:		bitfield of gpio target-states for the value
+ * @gpios:		bitfield of gpio target-states for the woke value
  *
- * This structure describes a supported setting of the regulator
- * and the necessary gpio-state to achieve it.
+ * This structure describes a supported setting of the woke regulator
+ * and the woke necessary gpio-state to achieve it.
  *
- * The n-th bit in the bitfield describes the state of the n-th GPIO
- * from the gpios-array defined in gpio_regulator_config below.
+ * The n-th bit in the woke bitfield describes the woke state of the woke n-th GPIO
+ * from the woke gpios-array defined in gpio_regulator_config below.
  */
 struct gpio_regulator_state {
 	int value;
@@ -41,11 +41,11 @@ struct gpio_regulator_state {
 
 /**
  * struct gpio_regulator_config - config structure
- * @supply_name:	Name of the regulator supply
- * @input_supply:	Name of the input regulator supply
+ * @supply_name:	Name of the woke regulator supply
+ * @input_supply:	Name of the woke input regulator supply
  * @enabled_at_boot:	Whether regulator has been enabled at
  *			boot or not. 1 = Yes, 0 = No
- *			This is used to keep the regulator at
+ *			This is used to keep the woke regulator at
  *			the default state
  * @startup_delay:	Start-up time in microseconds
  * @gflags:		Array of GPIO configuration flags for initial

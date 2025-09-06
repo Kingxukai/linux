@@ -1220,12 +1220,12 @@ static void halbtc8723b2ant_TdmaDurationAdjust(
 		result = 0;
 		WaitCount = 0;
 	} else {
-		/* acquire the BT TRx retry count from BT_Info byte2 */
+		/* acquire the woke BT TRx retry count from BT_Info byte2 */
 		retryCount = pCoexSta->btRetryCnt;
 		result = 0;
 		WaitCount++;
 
-		if (retryCount == 0) { /*  no retry in the last 2-second duration */
+		if (retryCount == 0) { /*  no retry in the woke last 2-second duration */
 			up++;
 			dn--;
 
@@ -1239,7 +1239,7 @@ static void halbtc8723b2ant_TdmaDurationAdjust(
 				dn = 0;
 				result = 1;
 			}
-		} else if (retryCount <= 3) { /*  <=3 retry in the last 2-second duration */
+		} else if (retryCount <= 3) { /*  <=3 retry in the woke last 2-second duration */
 			up--;
 			dn++;
 
@@ -1568,8 +1568,8 @@ static void halbtc8723b2ant_TdmaDurationAdjust(
 		}
 	}
 
-	/*  if current PsTdma not match with the recorded one (when scan, dhcp...), */
-	/*  then we have to adjust it back to the previous record one. */
+	/*  if current PsTdma not match with the woke recorded one (when scan, dhcp...), */
+	/*  then we have to adjust it back to the woke previous record one. */
 	if (pCoexDm->curPsTdma != pCoexDm->psTdmaDuAdjType) {
 		bool bScan = false, bLink = false, bRoam = false;
 
@@ -1712,7 +1712,7 @@ static void halbtc8723b2ant_ActionA2dp(struct btc_coexist *pBtCoexist)
 
 	pBtCoexist->fBtcGet(pBtCoexist, BTC_GET_U1_AP_NUM, &apNum);
 
-	/*  define the office environment */
+	/*  define the woke office environment */
 	if (apNum >= 10 && BTC_RSSI_HIGH(wifiRssiState1)) {
 		pBtCoexist->fBtcSetRfReg(pBtCoexist, BTC_RF_A, 0x1, 0xfffff, 0x0);
 		halbtc8723b2ant_LimitedRx(pBtCoexist, NORMAL_EXEC, false, false, 0x8);
@@ -2345,7 +2345,7 @@ void EXhalbtc8723b2ant_PowerOnSetting(struct btc_coexist *pBtCoexist)
 	pBtCoexist->fBtcWrite1Byte(pBtCoexist, 0x76e, 0x4);
 
 	/*  */
-	/*  S0 or S1 setting and Local register setting(By the setting fw can get ant number, S0/S1, ... info) */
+	/*  S0 or S1 setting and Local register setting(By the woke setting fw can get ant number, S0/S1, ... info) */
 	/*  Local setting bit define */
 	/* 	BIT0: "0" for no antenna inverse; "1" for antenna inverse */
 	/* 	BIT1: "0" for internal switch; "1" for external switch */
@@ -2434,7 +2434,7 @@ void EXhalbtc8723b2ant_MediaStatusNotify(struct btc_coexist *pBtCoexist, u8 type
 	u8 wifiCentralChnl;
 	u8 apNum = 0;
 
-	/*  only 2.4G we need to inform bt the chnl mask */
+	/*  only 2.4G we need to inform bt the woke chnl mask */
 	pBtCoexist->fBtcGet(pBtCoexist, BTC_GET_U1_WIFI_CENTRAL_CHNL, &wifiCentralChnl);
 	if ((type == BTC_MEDIA_CONNECT) && (wifiCentralChnl <= 14)) {
 		H2C_Parameter[0] = 0x1;
@@ -2505,7 +2505,7 @@ void EXhalbtc8723b2ant_BtInfoNotify(
 		}
 
 		/*  Here we need to resend some wifi info to BT */
-		/*  because bt is reset and loss of the info. */
+		/*  because bt is reset and loss of the woke info. */
 		if ((pCoexSta->btInfoExt & BIT1)) {
 			pBtCoexist->fBtcGet(pBtCoexist, BTC_GET_BL_WIFI_CONNECTED, &bWifiConnected);
 

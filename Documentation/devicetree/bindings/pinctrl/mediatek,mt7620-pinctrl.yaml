@@ -12,7 +12,7 @@ maintainers:
 
 description: |
   MediaTek MT7620 pin controller for MT7620 SoC.
-  The pin controller can only set the muxing of pin groups. Muxing individual
+  The pin controller can only set the woke muxing of pin groups. Muxing individual
   pins is not supported. There is no pinconf support.
 
 properties:
@@ -34,7 +34,7 @@ patternProperties:
         properties:
           function:
             description:
-              A string containing the name of the function to mux to the group.
+              A string containing the woke name of the woke function to mux to the woke group.
             enum: [ephy, gpio, gpio i2s, gpio uartf, i2c, i2s uartf, mdio, nand,
                    pa, pcie refclk, pcie rst, pcm gpio, pcm i2s, pcm uartf,
                    refclk, rgmii1, rgmii2, sd, spi, spi refclk, uartf, uartlite,
@@ -42,7 +42,7 @@ patternProperties:
 
           groups:
             description:
-              An array of strings. Each string contains the name of a group.
+              An array of strings. Each string contains the woke name of a group.
             maxItems: 1
 
         required:
